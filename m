@@ -1,166 +1,302 @@
-Return-Path: <roman.penyaev@profitbricks.com>
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Wed, 17 Feb 2016 12:45:36 -0500
+From: Tejun Heo <tj@kernel.org>
+To: Paolo Valente <paolo.valente@linaro.org>
+Cc: Jens Axboe <axboe@kernel.dk>, Fabio Checconi <fchecconi@gmail.com>,
+	Arianna Avanzini <avanzini.arianna@gmail.com>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	ulf.hansson@linaro.org, linus.walleij@linaro.org,
+	broonie@kernel.org
+Subject: Re: [PATCH RFC 10/22] block, bfq: add full hierarchical scheduling
+ and cgroups support
+Message-ID: <20160217171525.GX3741@mtj.duckdns.org>
+References: <1454364778-25179-1-git-send-email-paolo.valente@linaro.org>
+ <1454364778-25179-11-git-send-email-paolo.valente@linaro.org>
+ <20160211222824.GD3741@mtj.duckdns.org>
+ <87934440-FAA0-4B2D-897F-AD78EAF5F54E@linaro.org>
+ <20160217171404.GW3741@mtj.duckdns.org>
 MIME-Version: 1.0
-In-Reply-To: <1453803006-12812-1-git-send-email-roman.penyaev@profitbricks.com>
-References: <1453803006-12812-1-git-send-email-roman.penyaev@profitbricks.com>
-From: Roman Penyaev <roman.penyaev@profitbricks.com>
-Date: Mon, 1 Feb 2016 17:29:37 +0100
-Message-ID: <CAJrWOzBYNBzGuStrqjzLirUxhC1K02PE9kPdY+GuJF6ynRBZgA@mail.gmail.com>
-Subject: Re: [PATCH 1/1] block: fix race between opening blkext device and
- freeing it
-Cc: Roman Pen <roman.penyaev@profitbricks.com>, Keith Busch <keith.busch@intel.com>,
-	stable@kernel.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: multipart/mixed; boundary="H+4ONPRPur6+Ovig"
+In-Reply-To: <20160217171404.GW3741@mtj.duckdns.org>
 List-ID: <linux-block@vger.kernel.org>
 
-Hello, Jens.
 
-Could you please take a look at this patch.
-This issue happens quite often on our servers, when udevd
-tries to get detailed info about md raid starting mdadm,
-but this raid device is already in closing state and is
-about to free internal structures, afterwards an oops
-happens and mdadm gets killed.
+--H+4ONPRPur6+Ovig
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
---
-Roman
+Hello, again.
 
+I forgot to cc the source code for the following.
 
-On Tue, Jan 26, 2016 at 11:10 AM, Roman Pen
-<roman.penyaev@profitbricks.com> wrote:
-> There is a race introduced by the commit 2da78092dda13f1e, which causes
-> oops with the following stack and preceding warning:
->
-> WARNING: CPU: 2 PID: 28311 at include/linux/kref.h:47 kobject_get+0x42/0x50()
-> Call Trace:
->  [<ffffffff815c8ea4>] dump_stack+0x46/0x58
->  [<ffffffff81050e6c>] warn_slowpath_common+0x8c/0xc0
->  [<ffffffff81050eba>] warn_slowpath_null+0x1a/0x20
->  [<ffffffff81307392>] kobject_get+0x42/0x50
->  [<ffffffff812ef415>] get_disk+0x45/0x80
->  [<ffffffff812ef959>] get_gendisk+0xb9/0x140
->  [<ffffffff811bd880>] __blkdev_get+0x140/0x4a0
->  [<ffffffff811bdd75>] blkdev_get+0x195/0x2e0
->  [<ffffffff811bdf1f>] blkdev_open+0x5f/0x90
->  [<ffffffff81184752>] do_dentry_open.isra.14+0xf2/0x310
->  [<ffffffff81185d12>] vfs_open+0x52/0x60
->  [<ffffffff811932f4>] do_last.isra.62+0x1f4/0xce0
->  [<ffffffff8119513e>] path_openat+0xbe/0x600
->  [<ffffffff81196d23>] do_filp_open+0x43/0xa0
->  [<ffffffff811860ac>] do_sys_open+0x13c/0x230
->  [<ffffffff811861c2>] SyS_open+0x22/0x30
->  [<ffffffff815d0409>] system_call_fastpath+0x12/0x17
->
-> and immediately oops on attempt to dereference disk->part_tbl inside
-> disk_get_part():
->
-> BUG: unable to handle kernel NULL pointer dereference at 0000000000000010
-> IP: [<ffffffff812ef7ed>] disk_get_part+0xd/0x50
-> Call Trace:
->  [<ffffffff811bd9d5>] __blkdev_get+0x295/0x4a0
->  [<ffffffff811bdd75>] blkdev_get+0x195/0x2e0
->  [<ffffffff811bdf1f>] blkdev_open+0x5f/0x90
->  [<ffffffff81184752>] do_dentry_open.isra.14+0xf2/0x310
->  [<ffffffff81185d12>] vfs_open+0x52/0x60
->  [<ffffffff811932f4>] do_last.isra.62+0x1f4/0xce0
->  [<ffffffff8119513e>] path_openat+0xbe/0x600
->  [<ffffffff81196d23>] do_filp_open+0x43/0xa0
->  [<ffffffff811860ac>] do_sys_open+0x13c/0x230
->  [<ffffffff811861c2>] SyS_open+0x22/0x30
->  [<ffffffff815d0409>] system_call_fastpath+0x12/0x17
->
-> The problem is obvious: the partition removal in commit 2da78092dda13f1e was
-> moved just before final kobject free, when all references are already put,
-> thus breaking atomic idr_find(),kobject_get() sequence.
->
-> This patch replaces partition pointer on NULL before putting the reference
-> on a kobject, but keeping the devt number still occupied till the last free.
->
-> Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
-> Cc: Keith Busch <keith.busch@intel.com>
-> Cc: Jens Axboe <axboe@fb.com>
-> Cc: stable@kernel.org
-> Cc: linux-kernel@vger.kernel.org
-> ---
->  block/genhd.c             | 25 ++++++++++++++++++++++---
->  block/partition-generic.c |  1 +
->  include/linux/genhd.h     |  1 +
->  3 files changed, 24 insertions(+), 3 deletions(-)
->
-> diff --git a/block/genhd.c b/block/genhd.c
-> index eb05dfc..fe33efb 100644
-> --- a/block/genhd.c
-> +++ b/block/genhd.c
-> @@ -441,9 +441,6 @@ int blk_alloc_devt(struct hd_struct *part, dev_t *devt)
->   * @devt: dev_t to free
->   *
->   * Free @devt which was allocated using blk_alloc_devt().
-> - *
-> - * CONTEXT:
-> - * Might sleep.
->   */
->  void blk_free_devt(dev_t devt)
->  {
-> @@ -457,6 +454,27 @@ void blk_free_devt(dev_t devt)
->         }
->  }
->
-> +/**
-> + * blk_disable_devt - keep a dev_t in an array, but replace corresponding
-> + *                    partition pointer with NULL.  We need that to avoid
-> + *                    allocation of the same dev_t, but still to indicate
-> + *                    that partition is not available any more.
-> + * @devt: dev_t to disable
-> + *
-> + * Disable @devt which was allocated using blk_alloc_devt().
-> + */
-> +void blk_disable_devt(dev_t devt)
-> +{
-> +       if (devt == MKDEV(0, 0))
-> +               return;
-> +
-> +       if (MAJOR(devt) == BLOCK_EXT_MAJOR) {
-> +               spin_lock(&ext_devt_lock);
-> +               idr_replace(&ext_devt_idr, NULL, blk_mangle_minor(MINOR(devt)));
-> +               spin_unlock(&ext_devt_lock);
-> +       }
-> +}
-> +
->  static char *bdevt_str(dev_t devt, char *buf)
->  {
->         if (MAJOR(devt) <= 0xff && MINOR(devt) <= 0xff) {
-> @@ -669,6 +687,7 @@ void del_gendisk(struct gendisk *disk)
->                 sysfs_remove_link(block_depr, dev_name(disk_to_dev(disk)));
->         pm_runtime_set_memalloc_noio(disk_to_dev(disk), false);
->         device_del(disk_to_dev(disk));
-> +       blk_disable_devt(disk_to_dev(disk)->devt);
->  }
->  EXPORT_SYMBOL(del_gendisk);
->
-> diff --git a/block/partition-generic.c b/block/partition-generic.c
-> index 746935a..8eceda0 100644
-> --- a/block/partition-generic.c
-> +++ b/block/partition-generic.c
-> @@ -254,6 +254,7 @@ void delete_partition(struct gendisk *disk, int partno)
->         rcu_assign_pointer(ptbl->last_lookup, NULL);
->         kobject_put(part->holder_dir);
->         device_del(part_to_dev(part));
-> +       blk_disable_devt(part_devt(part));
->
->         hd_struct_kill(part);
->  }
-> diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-> index 5c70676..9e4e547 100644
-> --- a/include/linux/genhd.h
-> +++ b/include/linux/genhd.h
-> @@ -615,6 +615,7 @@ struct unixware_disklabel {
->
->  extern int blk_alloc_devt(struct hd_struct *part, dev_t *devt);
->  extern void blk_free_devt(dev_t devt);
-> +extern void blk_disable_devt(dev_t devt);
->  extern dev_t blk_lookup_devt(const char *name, int partno);
->  extern char *disk_name (struct gendisk *hd, int partno, char *buf);
->
-> --
-> 2.6.2
->
+> A-2. test-rawio.c $DEV 8 16
+
+It's a simple program which issues random IOs to the raw device.  The
+above will issue 16 concurrent 4k IOs.
+
+Thanks.
+
+-- 
+tejun
+
+--H+4ONPRPur6+Ovig
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: attachment; filename="test-rawio.c"
+
+#define _GNU_SOURCE
+#define _FILE_OFFSET_BITS 64
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <ctype.h>
+#include <unistd.h>
+#include <inttypes.h>
+#include <sys/ioctl.h>
+#include <signal.h>
+#include <pthread.h>
+#include <time.h>
+#include <string.h>
+#include <sys/time.h>
+
+#include <sys/user.h>
+#include <linux/fs.h>
+
+static int dev_fd, blocks_per_rq, concurrency, do_write;
+static int block_size;
+static uint64_t device_size, nr_blocks;
+
+static int exiting, nr_exited;
+
+static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+static uint64_t *dispenser_ar;
+static unsigned nr_succeeded, nr_failed;
+
+static void sigexit_handler(int dummy)
+{
+	exiting = 1;
+}
+
+static uint64_t dispense_block(int idx)
+{
+	while (1) {
+		uint64_t block;
+		int i;
+		block = ((uint64_t)random() << 31 | random())
+			% (nr_blocks - blocks_per_rq + 1);
+		for (i = 0; i < concurrency; i++) {
+			if (block + blocks_per_rq > dispenser_ar[i] &&
+			    block < dispenser_ar[i] + blocks_per_rq)
+				break;
+		}
+		if (i == concurrency) {
+			dispenser_ar[idx] = block;
+			return block;
+		}
+	}
+}
+
+static void * do_rawio(void *arg)
+{
+	int idx = (int)(unsigned long)arg, my_exiting = 0, i;
+	size_t bufsz = blocks_per_rq * block_size;
+	char *rbuf, *wbuf;
+	uint64_t block;
+	ssize_t ret;
+
+	if ((rbuf = malloc(bufsz + PAGE_SIZE)) == NULL ||
+	    (do_write && (wbuf = malloc(bufsz + PAGE_SIZE)) == NULL)) {
+		perror("malloc");
+		exit(1);
+	}
+
+	rbuf = (void *)((unsigned long)(rbuf + PAGE_SIZE-1) & ~(PAGE_SIZE-1));
+	wbuf = (void *)((unsigned long)(wbuf + PAGE_SIZE-1) & ~(PAGE_SIZE-1));
+
+	if (do_write)
+		for (i = 0; i < bufsz / sizeof(int); i++)
+			wbuf[i] = idx + i;
+
+	pthread_mutex_lock(&mutex);
+ again:
+	if (exiting || my_exiting) {
+		nr_exited++;
+		pthread_mutex_unlock(&mutex);
+		return NULL;
+	}
+	block = dispense_block(idx);
+	pthread_mutex_unlock(&mutex);
+
+	if (do_write) {
+		ret = pwrite(dev_fd, wbuf, bufsz, block * block_size);
+		if (ret != bufsz) {
+			fprintf(stderr, "\rThread %02d: write failed on "
+				"block %"PRIu64" ret=%zd errno=%d wbuf=%p\n",
+				idx, block, ret, errno, wbuf);
+			goto failed;
+		}
+	}
+
+	ret = pread(dev_fd, rbuf, bufsz, block * block_size);
+	if (ret != bufsz) {
+		fprintf(stderr, "\rThread %02d: read failed on block "
+			"%"PRIu64" ret=%zd errno=%d rbuf=%p\n",
+			idx, block, ret, errno, rbuf);
+		goto failed;
+	}
+
+	if (do_write && memcmp(wbuf, rbuf, bufsz) != 0) {
+		fprintf(stderr, "\rThread %02d: data mismatch on block "
+			"%"PRIu64" ret=%zd errno=%d\n", idx, block, ret, errno);
+		goto failed;
+	}
+
+	nr_succeeded++;
+	pthread_mutex_lock(&mutex);
+	goto again;
+
+ failed:
+	nr_failed++;
+	my_exiting = 1;
+	pthread_mutex_lock(&mutex);
+	goto again;
+}
+
+static uint64_t now_in_usec(void)
+{
+	struct timeval tv;
+
+	gettimeofday(&tv, NULL);
+	return (uint64_t)tv.tv_sec * 1000000 + tv.tv_usec;
+}
+
+int main(int argc, char **argv)
+{
+	struct stat sbuf;
+	int i, summary_only;
+	pthread_t *thrs;
+	uint64_t started_at, last_tstmp;
+	unsigned last_succeeded = 0;
+	double iops = 0;
+
+	if (argc < 5) {
+		fprintf(stderr,
+		"Usage: test_rawio BLOCKDEV BLOCKS_PER_RQ CONCURRENCY (r|w) [s(ummary)|w(ait)]\n");
+		return 1;
+	}
+
+	blocks_per_rq = atoi(argv[2]);
+	concurrency = atoi(argv[3]);
+
+	if (blocks_per_rq <= 0 || concurrency <= 0) {
+		fprintf(stderr, "invalid parameters\n");
+		return 1;
+	}
+
+	if (!(dispenser_ar = malloc(sizeof(dispenser_ar[0]) * concurrency)) ||
+	    !(thrs = malloc(sizeof(thrs[0]) * concurrency))) {
+		perror("malloc");
+		return 1;
+	}
+	memset(dispenser_ar, 0, sizeof(dispenser_ar[0]) * concurrency);
+
+	do_write = tolower(argv[4][0]) == 'w';
+
+	summary_only = 0;
+	if (argc >= 6 && strchr(argv[5], 's'))
+		summary_only = 1;
+
+	if (argc >= 6 && strchr(argv[5], 'w')) {
+		char buf[64];
+		printf("press enter to continue\n");
+		fgets(buf, sizeof(buf), stdin);
+	}
+
+	dev_fd = open(argv[1], (do_write ? O_RDWR : O_RDONLY) | O_DIRECT);
+	if (dev_fd < 0) {
+		perror("open");
+		return 1;
+	}
+
+	if (fstat(dev_fd, &sbuf) < 0) {
+		perror("fstat");
+		return 1;
+	}
+
+	if (!S_ISBLK(sbuf.st_mode)) {
+		fprintf(stderr, "not a block device\n");
+		return 1;
+	}
+
+	if (ioctl(dev_fd, BLKSSZGET, &block_size) < 0 ||
+	    ioctl(dev_fd, BLKGETSIZE64, &device_size) < 0) {
+		perror("ioctl");
+		return 1;
+	}
+	nr_blocks = device_size / block_size;
+
+	if (!summary_only)
+		printf("%s block_size=%d nr_blocks=%"PRIu64" (%.2lfGiB)\n",
+		       argv[1], block_size, nr_blocks,
+		       (double)device_size / (1 << 30));
+
+	if (signal(SIGINT, sigexit_handler) == SIG_ERR) {
+		perror("signal");
+		return 1;
+	}
+
+	srandom(getpid());
+
+	for (i = 0; i < concurrency; i++)
+		if ((errno = pthread_create(&thrs[i], NULL, do_rawio,
+					    (void *)(unsigned long)i))) {
+			perror("pthread_create");
+			return 1;
+		}
+
+	started_at = last_tstmp = now_in_usec();
+
+	while (nr_exited < concurrency) {
+		struct timespec ts_200ms = { 0, 200 * 1000 * 1000 };
+		const char pgstr[] = "|/-\\";
+
+		if (!summary_only) {
+			uint64_t now = now_in_usec();
+			double time_delta = ((double)now - last_tstmp) / 1000000;
+			double io_delta = nr_succeeded - last_succeeded;
+
+			if (last_tstmp - started_at < 1000000)
+				iops = io_delta / time_delta;
+			else
+				iops = iops * 0.9 + io_delta / time_delta * 0.1;
+
+			printf("\rnr_succeeded=%-8u nr_failed=%-8u iops=%7.03lf %s%c",
+			       nr_succeeded, nr_failed, iops,
+			       exiting ? "exiting..." : "",
+			       pgstr[i++%(sizeof(pgstr)-1)]);
+
+			last_tstmp = now;
+			last_succeeded += io_delta;
+		}
+
+		fflush(stdout);
+		nanosleep(&ts_200ms, NULL);
+	}
+
+	if (!summary_only)
+		printf("\n");
+	else
+		printf("nr_succeeded=%u nr_failed=%8u iops=%03.03lf\n",
+		       nr_succeeded, nr_failed,
+		       (double)nr_succeeded /
+		       (((double)now_in_usec() - started_at) / 1000000));
+
+	return 0;
+}
+
+--H+4ONPRPur6+Ovig--
