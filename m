@@ -1,203 +1,81 @@
-Return-Path: <vkuznets@redhat.com>
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-To: linux-block@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Dan Williams <dan.j.williams@intel.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Sagi Grimberg <sagig@mellanox.com>, Mike Snitzer <snitzer@redhat.com>,
-        "K. Y. Srinivasan" <kys@microsoft.com>,
-        Cathy Avery <cavery@redhat.com>, Keith Busch <keith.busch@intel.com>
-Subject: [PATCH RFC] block: fix bio merge checks when virt_boundary is set
-Date: Tue, 15 Mar 2016 16:17:56 +0100
-Message-Id: <1458055076-2175-1-git-send-email-vkuznets@redhat.com>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Christoph Hellwig <hch@lst.de>
+To: viro@zeniv.linux.org.uk, axboe@fb.com
+Cc: milosz@adfin.com, linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-api@vger.kernel.org
+Subject: [PATCH 4/6] vfs: add the RWF_HIPRI flag for preadv2/pwritev2
+Date: Thu,  3 Mar 2016 16:04:01 +0100
+Message-Id: <1457017443-17662-5-git-send-email-hch@lst.de>
+In-Reply-To: <1457017443-17662-1-git-send-email-hch@lst.de>
+References: <1457017443-17662-1-git-send-email-hch@lst.de>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Hyper-V storage driver, which switched to using virt_boundary some time
-ago, experiences significant slowdown on non-page-aligned IO. E.g.
+This adds a flag that tells the file system that this is a high priority
+request for which it's worth to poll the hardware.  The flag is purely
+advisory and can be ignored if not supported.
 
-With virt_boundary set:
- # time mkfs.ntfs -Q -s 512 /dev/sdc1
- ...
- real	0m9.406s
- user	0m0.014s
- sys	0m0.672s
-
-Without virt_boundary set (unsafe):
- # time mkfs.ntfs -Q -s 512 /dev/sdc1
- ...
- real	0m6.657s
- user	0m0.012s
- sys	0m6.423s
-
-The reason of the slowdown is the fact that bios don't get merged and we
-end up sending many short requests to the host. My investigation led me to
-the following code (__bvec_gap_to_prev()):
-
-    return offset ||
-           ((bprv->bv_offset + bprv->bv_len) & queue_virt_boundary(q));
-
-Here is an example: we have two bio_vec with the following content:
-    bprv.bv_offset = 512
-    bprv.bv_len = 512
-
-    bnxt.bv_offset = 1024
-    bnxt.bv_len = 512
-
-    bprv.bv_page == bnxt.bv_page
-    virt_boundary is set to PAGE_SIZE-1
-
-The above mentioned code will report that a gap will appear if we merge
-these two (as offset = 1024) but this doesn't look sane. On top of that,
-we have the following optimization in bio_add_pc_page():
-
-    if (page == prev->bv_page &&
-        offset == prev->bv_offset + prev->bv_len) {
-            prev->bv_len += len;
-            bio->bi_iter.bi_size += len;
-            goto done;
-        }
-
-But we don't have such check in other places, which check virt_boundary.
-Modify the check in __bvec_gap_to_prev() to the following:
-1) Report no gap in case bnxt->bv_offset == bprv->bv_offset + bprv->bv_len
-   when bprv.bv_page == bnxt.bv_page.
-2) Continue reporting no gap in (bprv->bv_offset + bprv->bv_len) &
-   queue_virt_boundary(q) case.
-
-Reported-by: John R. Kozee II <jkozee@bowser-morner.com>
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Stephen Bates <stephen.bates@pmcs.com>
+Tested-by: Stephen Bates <stephen.bates@pmcs.com>
+Acked-by: Jeff Moyer <jmoyer@redhat.com>
 ---
-- The condition I'm changing was there since SG_GAPS so I may be missing
-  something important, thus RFC.
----
- block/bio-integrity.c  |  7 +++++--
- block/bio.c            |  4 +++-
- block/blk-merge.c      |  2 +-
- include/linux/blkdev.h | 17 +++++++++--------
- 4 files changed, 18 insertions(+), 12 deletions(-)
+ fs/read_write.c         | 6 ++++--
+ include/linux/fs.h      | 1 +
+ include/uapi/linux/fs.h | 3 +++
+ 3 files changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/block/bio-integrity.c b/block/bio-integrity.c
-index 711e4d8d..f8560da 100644
---- a/block/bio-integrity.c
-+++ b/block/bio-integrity.c
-@@ -136,7 +136,7 @@ int bio_integrity_add_page(struct bio *bio, struct page *page,
- 			   unsigned int len, unsigned int offset)
+diff --git a/fs/read_write.c b/fs/read_write.c
+index 799d25f..cf377cf 100644
+--- a/fs/read_write.c
++++ b/fs/read_write.c
+@@ -698,10 +698,12 @@ static ssize_t do_iter_readv_writev(struct file *filp, struct iov_iter *iter,
+ 	struct kiocb kiocb;
+ 	ssize_t ret;
+ 
+-	if (flags)
++	if (flags & ~RWF_HIPRI)
+ 		return -EOPNOTSUPP;
+ 
+ 	init_sync_kiocb(&kiocb, filp);
++	if (flags & RWF_HIPRI)
++		kiocb.ki_flags |= IOCB_HIPRI;
+ 	kiocb.ki_pos = *ppos;
+ 
+ 	ret = fn(&kiocb, iter);
+@@ -716,7 +718,7 @@ static ssize_t do_loop_readv_writev(struct file *filp, struct iov_iter *iter,
  {
- 	struct bio_integrity_payload *bip = bio_integrity(bio);
--	struct bio_vec *iv;
-+	struct bio_vec *iv, bv;
+ 	ssize_t ret = 0;
  
- 	if (bip->bip_vcnt >= bip->bip_max_vcnt) {
- 		printk(KERN_ERR "%s: bip_vec full\n", __func__);
-@@ -144,10 +144,13 @@ int bio_integrity_add_page(struct bio *bio, struct page *page,
- 	}
+-	if (flags)
++	if (flags & ~RWF_HIPRI)
+ 		return -EOPNOTSUPP;
  
- 	iv = bip->bip_vec + bip->bip_vcnt;
-+	bv.bv_page = page;
-+	bv.bv_len = len;
-+	bv.bv_offset = offset;
+ 	while (iov_iter_count(iter)) {
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index 875277a..a1f731c 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -320,6 +320,7 @@ struct writeback_control;
+ #define IOCB_EVENTFD		(1 << 0)
+ #define IOCB_APPEND		(1 << 1)
+ #define IOCB_DIRECT		(1 << 2)
++#define IOCB_HIPRI		(1 << 3)
  
- 	if (bip->bip_vcnt &&
- 	    bvec_gap_to_prev(bdev_get_queue(bio->bi_bdev),
--			     &bip->bip_vec[bip->bip_vcnt - 1], offset))
-+			     &bip->bip_vec[bip->bip_vcnt - 1], &bv))
- 		return 0;
+ struct kiocb {
+ 	struct file		*ki_filp;
+diff --git a/include/uapi/linux/fs.h b/include/uapi/linux/fs.h
+index 149bec8..d246339 100644
+--- a/include/uapi/linux/fs.h
++++ b/include/uapi/linux/fs.h
+@@ -304,4 +304,7 @@ struct fsxattr {
+ #define SYNC_FILE_RANGE_WRITE		2
+ #define SYNC_FILE_RANGE_WAIT_AFTER	4
  
- 	iv->bv_page = page;
-diff --git a/block/bio.c b/block/bio.c
-index cf75915..1583581 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -730,6 +730,8 @@ int bio_add_pc_page(struct request_queue *q, struct bio *bio, struct page
- 	 */
- 	if (bio->bi_vcnt > 0) {
- 		struct bio_vec *prev = &bio->bi_io_vec[bio->bi_vcnt - 1];
-+		struct bio_vec bv = {.bv_page = page, .bv_len = len,
-+				     .bv_offset = offset};
- 
- 		if (page == prev->bv_page &&
- 		    offset == prev->bv_offset + prev->bv_len) {
-@@ -742,7 +744,7 @@ int bio_add_pc_page(struct request_queue *q, struct bio *bio, struct page
- 		 * If the queue doesn't support SG gaps and adding this
- 		 * offset would create a gap, disallow it.
- 		 */
--		if (bvec_gap_to_prev(q, prev, offset))
-+		if (bvec_gap_to_prev(q, prev, &bv))
- 			return 0;
- 	}
- 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 2613531..8c6c3e2 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -100,7 +100,7 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
- 		 * If the queue doesn't support SG gaps and adding this
- 		 * offset would create a gap, disallow it.
- 		 */
--		if (bvprvp && bvec_gap_to_prev(q, bvprvp, bv.bv_offset))
-+		if (bvprvp && bvec_gap_to_prev(q, bvprvp, &bv))
- 			goto split;
- 
- 		if (sectors + (bv.bv_len >> 9) > max_sectors) {
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 413c84f..b4fa29d 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1373,10 +1373,11 @@ static inline void put_dev_sector(Sector p)
- }
- 
- static inline bool __bvec_gap_to_prev(struct request_queue *q,
--				struct bio_vec *bprv, unsigned int offset)
-+				struct bio_vec *bprv, struct bio_vec *bnxt)
- {
--	return offset ||
--		((bprv->bv_offset + bprv->bv_len) & queue_virt_boundary(q));
-+	if (bprv->bv_page == bnxt->bv_page)
-+		return bnxt->bv_offset != bprv->bv_offset + bprv->bv_len;
-+	return (bprv->bv_offset + bprv->bv_len) & queue_virt_boundary(q);
- }
- 
- /*
-@@ -1384,11 +1385,11 @@ static inline bool __bvec_gap_to_prev(struct request_queue *q,
-  * the SG list. Most drivers don't care about this, but some do.
-  */
- static inline bool bvec_gap_to_prev(struct request_queue *q,
--				struct bio_vec *bprv, unsigned int offset)
-+				struct bio_vec *bprv, struct bio_vec *bnxt)
- {
- 	if (!queue_virt_boundary(q))
- 		return false;
--	return __bvec_gap_to_prev(q, bprv, offset);
-+	return __bvec_gap_to_prev(q, bprv, bnxt);
- }
- 
- static inline bool bio_will_gap(struct request_queue *q, struct bio *prev,
-@@ -1400,7 +1401,7 @@ static inline bool bio_will_gap(struct request_queue *q, struct bio *prev,
- 		bio_get_last_bvec(prev, &pb);
- 		bio_get_first_bvec(next, &nb);
- 
--		return __bvec_gap_to_prev(q, &pb, nb.bv_offset);
-+		return __bvec_gap_to_prev(q, &pb, &nb);
- 	}
- 
- 	return false;
-@@ -1545,7 +1546,7 @@ static inline bool integrity_req_gap_back_merge(struct request *req,
- 	struct bio_integrity_payload *bip_next = bio_integrity(next);
- 
- 	return bvec_gap_to_prev(req->q, &bip->bip_vec[bip->bip_vcnt - 1],
--				bip_next->bip_vec[0].bv_offset);
-+				&bip_next->bip_vec[0]);
- }
- 
- static inline bool integrity_req_gap_front_merge(struct request *req,
-@@ -1555,7 +1556,7 @@ static inline bool integrity_req_gap_front_merge(struct request *req,
- 	struct bio_integrity_payload *bip_next = bio_integrity(req->bio);
- 
- 	return bvec_gap_to_prev(req->q, &bip->bip_vec[bip->bip_vcnt - 1],
--				bip_next->bip_vec[0].bv_offset);
-+				&bip_next->bip_vec[0]);
- }
- 
- #else /* CONFIG_BLK_DEV_INTEGRITY */
++/* flags for preadv2/pwritev2: */
++#define RWF_HIPRI			0x00000001 /* high priority request, poll if possible */
++
+ #endif /* _UAPI_LINUX_FS_H */
 -- 
-2.5.0
+2.1.4
+
