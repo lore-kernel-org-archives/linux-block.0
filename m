@@ -1,173 +1,424 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from verein.lst.de ([213.95.11.211]:57315 "EHLO newverein.lst.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750803AbcCKJyA (ORCPT <rfc822;linux-block@vger.kernel.org>);
-	Fri, 11 Mar 2016 04:54:00 -0500
-Date: Fri, 11 Mar 2016 10:53:57 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: "Michael Kerrisk (man-pages)" <mtk.manpages@gmail.com>
-Cc: Christoph Hellwig <hch@lst.de>, viro@zeniv.linux.org.uk,
-	axboe@fb.com, milosz@adfin.com, linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-api@vger.kernel.org
+Received: from mail-pf0-f178.google.com ([209.85.192.178]:36785 "EHLO
+	mail-pf0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753460AbcCJSPN (ORCPT
+	<rfc822;linux-block@vger.kernel.org>);
+	Thu, 10 Mar 2016 13:15:13 -0500
 Subject: Re: [PATCH 2/6] vfs: vfs: Define new syscalls preadv2,pwritev2
-Message-ID: <20160311095357.GA29350@lst.de>
-References: <1457017443-17662-1-git-send-email-hch@lst.de> <1457017443-17662-3-git-send-email-hch@lst.de> <56E1B9A8.3070904@gmail.com>
+To: Christoph Hellwig <hch@lst.de>, viro@zeniv.linux.org.uk,
+	axboe@fb.com
+References: <1457017443-17662-1-git-send-email-hch@lst.de>
+ <1457017443-17662-3-git-send-email-hch@lst.de>
+Cc: mtk.manpages@gmail.com, milosz@adfin.com,
+	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-api@vger.kernel.org
+From: "Michael Kerrisk (man-pages)" <mtk.manpages@gmail.com>
+Message-ID: <56E1B9A8.3070904@gmail.com>
+Date: Thu, 10 Mar 2016 19:15:04 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <56E1B9A8.3070904@gmail.com>
+In-Reply-To: <1457017443-17662-3-git-send-email-hch@lst.de>
+Content-Type: text/plain; charset=windows-1252
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Thu, Mar 10, 2016 at 07:15:04PM +0100, Michael Kerrisk (man-pages) wrote:
-> Hi Christoph,
+Hi Christoph,
+
+On 03/03/2016 04:03 PM, Christoph Hellwig wrote:
+> From: Milosz Tanski <milosz@adfin.com>
 > 
-> On 03/03/2016 04:03 PM, Christoph Hellwig wrote:
-> > From: Milosz Tanski <milosz@adfin.com>
-> > 
-> > New syscalls that take an flag argument.   No flags are added yet in this
-> > patch.
+> New syscalls that take an flag argument.   No flags are added yet in this
+> patch.
+
+Are there some man pages patches for these proposed system calls?
+
+Thanks,
+
+Michael
+
+
+> Signed-off-by: Milosz Tanski <milosz@adfin.com>
+> [hch: rebased on top of my kiocb changes]
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Reviewed-by: Stephen Bates <stephen.bates@pmcs.com>
+> Tested-by: Stephen Bates <stephen.bates@pmcs.com>
+> Acked-by: Jeff Moyer <jmoyer@redhat.com>
+> ---
+>  fs/read_write.c          | 161 ++++++++++++++++++++++++++++++++++++-----------
+>  include/linux/compat.h   |   6 ++
+>  include/linux/syscalls.h |   6 ++
+>  3 files changed, 138 insertions(+), 35 deletions(-)
 > 
-> Are there some man pages patches for these proposed system calls?
+> diff --git a/fs/read_write.c b/fs/read_write.c
+> index 3b7577d..799d25f 100644
+> --- a/fs/read_write.c
+> +++ b/fs/read_write.c
+> @@ -896,15 +896,15 @@ ssize_t vfs_writev(struct file *file, const struct iovec __user *vec,
+>  
+>  EXPORT_SYMBOL(vfs_writev);
+>  
+> -SYSCALL_DEFINE3(readv, unsigned long, fd, const struct iovec __user *, vec,
+> -		unsigned long, vlen)
+> +static ssize_t do_readv(unsigned long fd, const struct iovec __user *vec,
+> +			unsigned long vlen, int flags)
+>  {
+>  	struct fd f = fdget_pos(fd);
+>  	ssize_t ret = -EBADF;
+>  
+>  	if (f.file) {
+>  		loff_t pos = file_pos_read(f.file);
+> -		ret = vfs_readv(f.file, vec, vlen, &pos, 0);
+> +		ret = vfs_readv(f.file, vec, vlen, &pos, flags);
+>  		if (ret >= 0)
+>  			file_pos_write(f.file, pos);
+>  		fdput_pos(f);
+> @@ -916,15 +916,15 @@ SYSCALL_DEFINE3(readv, unsigned long, fd, const struct iovec __user *, vec,
+>  	return ret;
+>  }
+>  
+> -SYSCALL_DEFINE3(writev, unsigned long, fd, const struct iovec __user *, vec,
+> -		unsigned long, vlen)
+> +static ssize_t do_writev(unsigned long fd, const struct iovec __user *vec,
+> +			 unsigned long vlen, int flags)
+>  {
+>  	struct fd f = fdget_pos(fd);
+>  	ssize_t ret = -EBADF;
+>  
+>  	if (f.file) {
+>  		loff_t pos = file_pos_read(f.file);
+> -		ret = vfs_writev(f.file, vec, vlen, &pos, 0);
+> +		ret = vfs_writev(f.file, vec, vlen, &pos, flags);
+>  		if (ret >= 0)
+>  			file_pos_write(f.file, pos);
+>  		fdput_pos(f);
+> @@ -942,10 +942,9 @@ static inline loff_t pos_from_hilo(unsigned long high, unsigned long low)
+>  	return (((loff_t)high << HALF_LONG_BITS) << HALF_LONG_BITS) | low;
+>  }
+>  
+> -SYSCALL_DEFINE5(preadv, unsigned long, fd, const struct iovec __user *, vec,
+> -		unsigned long, vlen, unsigned long, pos_l, unsigned long, pos_h)
+> +static ssize_t do_preadv(unsigned long fd, const struct iovec __user *vec,
+> +			 unsigned long vlen, loff_t pos, int flags)
+>  {
+> -	loff_t pos = pos_from_hilo(pos_h, pos_l);
+>  	struct fd f;
+>  	ssize_t ret = -EBADF;
+>  
+> @@ -956,7 +955,7 @@ SYSCALL_DEFINE5(preadv, unsigned long, fd, const struct iovec __user *, vec,
+>  	if (f.file) {
+>  		ret = -ESPIPE;
+>  		if (f.file->f_mode & FMODE_PREAD)
+> -			ret = vfs_readv(f.file, vec, vlen, &pos, 0);
+> +			ret = vfs_readv(f.file, vec, vlen, &pos, flags);
+>  		fdput(f);
+>  	}
+>  
+> @@ -966,10 +965,9 @@ SYSCALL_DEFINE5(preadv, unsigned long, fd, const struct iovec __user *, vec,
+>  	return ret;
+>  }
+>  
+> -SYSCALL_DEFINE5(pwritev, unsigned long, fd, const struct iovec __user *, vec,
+> -		unsigned long, vlen, unsigned long, pos_l, unsigned long, pos_h)
+> +static ssize_t do_pwritev(unsigned long fd, const struct iovec __user *vec,
+> +			  unsigned long vlen, loff_t pos, int flags)
+>  {
+> -	loff_t pos = pos_from_hilo(pos_h, pos_l);
+>  	struct fd f;
+>  	ssize_t ret = -EBADF;
+>  
+> @@ -980,7 +978,7 @@ SYSCALL_DEFINE5(pwritev, unsigned long, fd, const struct iovec __user *, vec,
+>  	if (f.file) {
+>  		ret = -ESPIPE;
+>  		if (f.file->f_mode & FMODE_PWRITE)
+> -			ret = vfs_writev(f.file, vec, vlen, &pos, 0);
+> +			ret = vfs_writev(f.file, vec, vlen, &pos, flags);
+>  		fdput(f);
+>  	}
+>  
+> @@ -990,6 +988,58 @@ SYSCALL_DEFINE5(pwritev, unsigned long, fd, const struct iovec __user *, vec,
+>  	return ret;
+>  }
+>  
+> +SYSCALL_DEFINE3(readv, unsigned long, fd, const struct iovec __user *, vec,
+> +		unsigned long, vlen)
+> +{
+> +	return do_readv(fd, vec, vlen, 0);
+> +}
+> +
+> +SYSCALL_DEFINE3(writev, unsigned long, fd, const struct iovec __user *, vec,
+> +		unsigned long, vlen)
+> +{
+> +	return do_writev(fd, vec, vlen, 0);
+> +}
+> +
+> +SYSCALL_DEFINE5(preadv, unsigned long, fd, const struct iovec __user *, vec,
+> +		unsigned long, vlen, unsigned long, pos_l, unsigned long, pos_h)
+> +{
+> +	loff_t pos = pos_from_hilo(pos_h, pos_l);
+> +
+> +	return do_preadv(fd, vec, vlen, pos, 0);
+> +}
+> +
+> +SYSCALL_DEFINE6(preadv2, unsigned long, fd, const struct iovec __user *, vec,
+> +		unsigned long, vlen, unsigned long, pos_l, unsigned long, pos_h,
+> +		int, flags)
+> +{
+> +	loff_t pos = pos_from_hilo(pos_h, pos_l);
+> +
+> +	if (pos == -1)
+> +		return do_readv(fd, vec, vlen, flags);
+> +
+> +	return do_preadv(fd, vec, vlen, pos, flags);
+> +}
+> +
+> +SYSCALL_DEFINE5(pwritev, unsigned long, fd, const struct iovec __user *, vec,
+> +		unsigned long, vlen, unsigned long, pos_l, unsigned long, pos_h)
+> +{
+> +	loff_t pos = pos_from_hilo(pos_h, pos_l);
+> +
+> +	return do_pwritev(fd, vec, vlen, pos, 0);
+> +}
+> +
+> +SYSCALL_DEFINE6(pwritev2, unsigned long, fd, const struct iovec __user *, vec,
+> +		unsigned long, vlen, unsigned long, pos_l, unsigned long, pos_h,
+> +		int, flags)
+> +{
+> +	loff_t pos = pos_from_hilo(pos_h, pos_l);
+> +
+> +	if (pos == -1)
+> +		return do_writev(fd, vec, vlen, flags);
+> +
+> +	return do_pwritev(fd, vec, vlen, pos, flags);
+> +}
+> +
+>  #ifdef CONFIG_COMPAT
+>  
+>  static ssize_t compat_do_readv_writev(int type, struct file *file,
+> @@ -1047,7 +1097,7 @@ out:
+>  
+>  static size_t compat_readv(struct file *file,
+>  			   const struct compat_iovec __user *vec,
+> -			   unsigned long vlen, loff_t *pos)
+> +			   unsigned long vlen, loff_t *pos, int flags)
+>  {
+>  	ssize_t ret = -EBADF;
+>  
+> @@ -1058,7 +1108,7 @@ static size_t compat_readv(struct file *file,
+>  	if (!(file->f_mode & FMODE_CAN_READ))
+>  		goto out;
+>  
+> -	ret = compat_do_readv_writev(READ, file, vec, vlen, pos, 0);
+> +	ret = compat_do_readv_writev(READ, file, vec, vlen, pos, flags);
+>  
+>  out:
+>  	if (ret > 0)
+> @@ -1067,9 +1117,9 @@ out:
+>  	return ret;
+>  }
+>  
+> -COMPAT_SYSCALL_DEFINE3(readv, compat_ulong_t, fd,
+> -		const struct compat_iovec __user *,vec,
+> -		compat_ulong_t, vlen)
+> +static size_t do_compat_readv(compat_ulong_t fd,
+> +				 const struct compat_iovec __user *vec,
+> +				 compat_ulong_t vlen, int flags)
+>  {
+>  	struct fd f = fdget_pos(fd);
+>  	ssize_t ret;
+> @@ -1078,16 +1128,24 @@ COMPAT_SYSCALL_DEFINE3(readv, compat_ulong_t, fd,
+>  	if (!f.file)
+>  		return -EBADF;
+>  	pos = f.file->f_pos;
+> -	ret = compat_readv(f.file, vec, vlen, &pos);
+> +	ret = compat_readv(f.file, vec, vlen, &pos, flags);
+>  	if (ret >= 0)
+>  		f.file->f_pos = pos;
+>  	fdput_pos(f);
+>  	return ret;
+> +
+>  }
+>  
+> -static long __compat_sys_preadv64(unsigned long fd,
+> +COMPAT_SYSCALL_DEFINE3(readv, compat_ulong_t, fd,
+> +		const struct compat_iovec __user *,vec,
+> +		compat_ulong_t, vlen)
+> +{
+> +	return do_compat_readv(fd, vec, vlen, 0);
+> +}
+> +
+> +static long do_compat_preadv64(unsigned long fd,
+>  				  const struct compat_iovec __user *vec,
+> -				  unsigned long vlen, loff_t pos)
+> +				  unsigned long vlen, loff_t pos, int flags)
+>  {
+>  	struct fd f;
+>  	ssize_t ret;
+> @@ -1099,7 +1157,7 @@ static long __compat_sys_preadv64(unsigned long fd,
+>  		return -EBADF;
+>  	ret = -ESPIPE;
+>  	if (f.file->f_mode & FMODE_PREAD)
+> -		ret = compat_readv(f.file, vec, vlen, &pos);
+> +		ret = compat_readv(f.file, vec, vlen, &pos, flags);
+>  	fdput(f);
+>  	return ret;
+>  }
+> @@ -1109,7 +1167,7 @@ COMPAT_SYSCALL_DEFINE4(preadv64, unsigned long, fd,
+>  		const struct compat_iovec __user *,vec,
+>  		unsigned long, vlen, loff_t, pos)
+>  {
+> -	return __compat_sys_preadv64(fd, vec, vlen, pos);
+> +	return do_compat_preadv64(fd, vec, vlen, pos, 0);
+>  }
+>  #endif
+>  
+> @@ -1119,12 +1177,25 @@ COMPAT_SYSCALL_DEFINE5(preadv, compat_ulong_t, fd,
+>  {
+>  	loff_t pos = ((loff_t)pos_high << 32) | pos_low;
+>  
+> -	return __compat_sys_preadv64(fd, vec, vlen, pos);
+> +	return do_compat_preadv64(fd, vec, vlen, pos, 0);
+> +}
+> +
+> +COMPAT_SYSCALL_DEFINE6(preadv2, compat_ulong_t, fd,
+> +		const struct compat_iovec __user *,vec,
+> +		compat_ulong_t, vlen, u32, pos_low, u32, pos_high,
+> +		int, flags)
+> +{
+> +	loff_t pos = ((loff_t)pos_high << 32) | pos_low;
+> +
+> +	if (pos == -1)
+> +		return do_compat_readv(fd, vec, vlen, flags);
+> +
+> +	return do_compat_preadv64(fd, vec, vlen, pos, flags);
+>  }
+>  
+>  static size_t compat_writev(struct file *file,
+>  			    const struct compat_iovec __user *vec,
+> -			    unsigned long vlen, loff_t *pos)
+> +			    unsigned long vlen, loff_t *pos, int flags)
+>  {
+>  	ssize_t ret = -EBADF;
+>  
+> @@ -1144,9 +1215,9 @@ out:
+>  	return ret;
+>  }
+>  
+> -COMPAT_SYSCALL_DEFINE3(writev, compat_ulong_t, fd,
+> -		const struct compat_iovec __user *, vec,
+> -		compat_ulong_t, vlen)
+> +static size_t do_compat_writev(compat_ulong_t fd,
+> +				  const struct compat_iovec __user* vec,
+> +				  compat_ulong_t vlen, int flags)
+>  {
+>  	struct fd f = fdget_pos(fd);
+>  	ssize_t ret;
+> @@ -1155,16 +1226,23 @@ COMPAT_SYSCALL_DEFINE3(writev, compat_ulong_t, fd,
+>  	if (!f.file)
+>  		return -EBADF;
+>  	pos = f.file->f_pos;
+> -	ret = compat_writev(f.file, vec, vlen, &pos);
+> +	ret = compat_writev(f.file, vec, vlen, &pos, flags);
+>  	if (ret >= 0)
+>  		f.file->f_pos = pos;
+>  	fdput_pos(f);
+>  	return ret;
+>  }
+>  
+> -static long __compat_sys_pwritev64(unsigned long fd,
+> +COMPAT_SYSCALL_DEFINE3(writev, compat_ulong_t, fd,
+> +		const struct compat_iovec __user *, vec,
+> +		compat_ulong_t, vlen)
+> +{
+> +	return do_compat_writev(fd, vec, vlen, 0);
+> +}
+> +
+> +static long do_compat_pwritev64(unsigned long fd,
+>  				   const struct compat_iovec __user *vec,
+> -				   unsigned long vlen, loff_t pos)
+> +				   unsigned long vlen, loff_t pos, int flags)
+>  {
+>  	struct fd f;
+>  	ssize_t ret;
+> @@ -1176,7 +1254,7 @@ static long __compat_sys_pwritev64(unsigned long fd,
+>  		return -EBADF;
+>  	ret = -ESPIPE;
+>  	if (f.file->f_mode & FMODE_PWRITE)
+> -		ret = compat_writev(f.file, vec, vlen, &pos);
+> +		ret = compat_writev(f.file, vec, vlen, &pos, flags);
+>  	fdput(f);
+>  	return ret;
+>  }
+> @@ -1186,7 +1264,7 @@ COMPAT_SYSCALL_DEFINE4(pwritev64, unsigned long, fd,
+>  		const struct compat_iovec __user *,vec,
+>  		unsigned long, vlen, loff_t, pos)
+>  {
+> -	return __compat_sys_pwritev64(fd, vec, vlen, pos);
+> +	return do_compat_pwritev64(fd, vec, vlen, pos, 0);
+>  }
+>  #endif
+>  
+> @@ -1196,8 +1274,21 @@ COMPAT_SYSCALL_DEFINE5(pwritev, compat_ulong_t, fd,
+>  {
+>  	loff_t pos = ((loff_t)pos_high << 32) | pos_low;
+>  
+> -	return __compat_sys_pwritev64(fd, vec, vlen, pos);
+> +	return do_compat_pwritev64(fd, vec, vlen, pos, 0);
+> +}
+> +
+> +COMPAT_SYSCALL_DEFINE6(pwritev2, compat_ulong_t, fd,
+> +		const struct compat_iovec __user *,vec,
+> +		compat_ulong_t, vlen, u32, pos_low, u32, pos_high, int, flags)
+> +{
+> +	loff_t pos = ((loff_t)pos_high << 32) | pos_low;
+> +
+> +	if (pos == -1)
+> +		return do_compat_writev(fd, vec, vlen, flags);
+> +
+> +	return do_compat_pwritev64(fd, vec, vlen, pos, flags);
+>  }
+> +
+>  #endif
+>  
+>  static ssize_t do_sendfile(int out_fd, int in_fd, loff_t *ppos,
+> diff --git a/include/linux/compat.h b/include/linux/compat.h
+> index a76c917..fe4ccd0 100644
+> --- a/include/linux/compat.h
+> +++ b/include/linux/compat.h
+> @@ -340,6 +340,12 @@ asmlinkage ssize_t compat_sys_preadv(compat_ulong_t fd,
+>  asmlinkage ssize_t compat_sys_pwritev(compat_ulong_t fd,
+>  		const struct compat_iovec __user *vec,
+>  		compat_ulong_t vlen, u32 pos_low, u32 pos_high);
+> +asmlinkage ssize_t compat_sys_preadv2(compat_ulong_t fd,
+> +		const struct compat_iovec __user *vec,
+> +		compat_ulong_t vlen, u32 pos_low, u32 pos_high, int flags);
+> +asmlinkage ssize_t compat_sys_pwritev2(compat_ulong_t fd,
+> +		const struct compat_iovec __user *vec,
+> +		compat_ulong_t vlen, u32 pos_low, u32 pos_high, int flags);
+>  
+>  #ifdef __ARCH_WANT_COMPAT_SYS_PREADV64
+>  asmlinkage long compat_sys_preadv64(unsigned long fd,
+> diff --git a/include/linux/syscalls.h b/include/linux/syscalls.h
+> index 185815c..d795472 100644
+> --- a/include/linux/syscalls.h
+> +++ b/include/linux/syscalls.h
+> @@ -575,8 +575,14 @@ asmlinkage long sys_pwrite64(unsigned int fd, const char __user *buf,
+>  			     size_t count, loff_t pos);
+>  asmlinkage long sys_preadv(unsigned long fd, const struct iovec __user *vec,
+>  			   unsigned long vlen, unsigned long pos_l, unsigned long pos_h);
+> +asmlinkage long sys_preadv2(unsigned long fd, const struct iovec __user *vec,
+> +			    unsigned long vlen, unsigned long pos_l, unsigned long pos_h,
+> +			    int flags);
+>  asmlinkage long sys_pwritev(unsigned long fd, const struct iovec __user *vec,
+>  			    unsigned long vlen, unsigned long pos_l, unsigned long pos_h);
+> +asmlinkage long sys_pwritev2(unsigned long fd, const struct iovec __user *vec,
+> +			    unsigned long vlen, unsigned long pos_l, unsigned long pos_h,
+> +			    int flags);
+>  asmlinkage long sys_getcwd(char __user *buf, unsigned long size);
+>  asmlinkage long sys_mkdir(const char __user *pathname, umode_t mode);
+>  asmlinkage long sys_chdir(const char __user *filename);
+> 
 
-This is what I have:
 
----
->From d33a02d56f447a6cb223b3964e1dd894f2921d5c Mon Sep 17 00:00:00 2001
-From: Milosz Tanski <milosz@adfin.com>
-Date: Fri, 11 Mar 2016 10:52:31 +0100
-Subject: add preadv2/pwritev2 documentation
-
-New syscalls that are a variation on the preadv/pwritev but support an extra
-flag argument.
-
-Signed-off-by: Milosz Tanski <milosz@adfin.com>
-[hch: added RWF_HIPRI documentation]
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- man2/readv.2 | 63 +++++++++++++++++++++++++++++++++++++++++++++++++++---------
- 1 file changed, 54 insertions(+), 9 deletions(-)
-
-diff --git a/man2/readv.2 b/man2/readv.2
-index 93f2b6f..5cba5e2 100644
---- a/man2/readv.2
-+++ b/man2/readv.2
-@@ -45,6 +45,12 @@ readv, writev, preadv, pwritev \- read or write data into multiple buffers
- .sp
- .BI "ssize_t pwritev(int " fd ", const struct iovec *" iov ", int " iovcnt ,
- .BI "                off_t " offset );
-+.sp
-+.BI "ssize_t preadv2(int " fd ", const struct iovec *" iov ", int " iovcnt ,
-+.BI "                off_t " offset ", int " flags );
-+.sp
-+.BI "ssize_t pwritev2(int " fd ", const struct iovec *" iov ", int " iovcnt ,
-+.BI "                 off_t " offset ", int " flags );
- .fi
- .sp
- .in -4n
-@@ -166,9 +172,9 @@ The
- system call combines the functionality of
- .BR writev ()
- and
--.BR pwrite (2).
-+.BR pwrite (2) "."
- It performs the same task as
--.BR writev (),
-+.BR writev () ","
- but adds a fourth argument,
- .IR offset ,
- which specifies the file offset at which the output operation
-@@ -178,15 +184,43 @@ The file offset is not changed by these system calls.
- The file referred to by
- .I fd
- must be capable of seeking.
-+.SS preadv2() and pwritev2()
-+
-+This pair of system calls has similar functionality to the
-+.BR preadv ()
-+and
-+.BR pwritev ()
-+calls, but adds a fifth argument, \fIflags\fP, which modifies the behavior on a per call basis.
-+
-+Like the
-+.BR preadv ()
-+and
-+.BR pwritev ()
-+calls, they accept an \fIoffset\fP argument. Unlike those calls, if the \fIoffset\fP argument is set to -1 then the current file offset is used and updated.
-+
-+The \fIflags\fP arguments to
-+.BR preadv2 ()
-+and
-+.BR pwritev2 ()
-+contains a bitwise OR of one or more of the following flags:
-+.TP
-+.BR RWF_HIPRI " (since Linux 4.6)"
-+High priority read/write.  Allows block based filesystems to use polling of the
-+device, which provides lower latency, but may use additional ressources.  (Currently
-+only usable on a file descriptor opened using the
-+.BR O_DIRECT " flag)."
-+
- .SH RETURN VALUE
- On success,
--.BR readv ()
--and
-+.BR readv () ","
- .BR preadv ()
--return the number of bytes read;
--.BR writev ()
- and
-+.BR preadv2 ()
-+return the number of bytes read;
-+.BR writev () ","
- .BR pwritev ()
-+and
-+.BR pwritev2 ()
- return the number of bytes written.
- 
- Note that is not an error for a successful call to transfer fewer bytes
-@@ -202,9 +236,11 @@ The errors are as given for
- and
- .BR write (2).
- Furthermore,
--.BR preadv ()
--and
-+.BR preadv () ","
-+.BR preadv2 () ","
- .BR pwritev ()
-+and
-+.BR pwritev2 ()
- can also fail for the same reasons as
- .BR lseek (2).
- Additionally, the following error is defined:
-@@ -218,12 +254,17 @@ value.
- .TP
- .B EINVAL
- The vector count \fIiovcnt\fP is less than zero or greater than the
--permitted maximum.
-+permitted maximum. Or, an unknown flag is specified in \fIflags\fP.
- .SH VERSIONS
- .BR preadv ()
- and
- .BR pwritev ()
- first appeared in Linux 2.6.30; library support was added in glibc 2.10.
-+.sp
-+.BR preadv2 ()
-+and
-+.BR pwritev2 ()
-+first appeared in Linux 4.6
- .SH CONFORMING TO
- .BR readv (),
- .BR writev ():
-@@ -237,6 +278,10 @@ POSIX.1-2001, POSIX.1-2008,
- .BR preadv (),
- .BR pwritev ():
- nonstandard, but present also on the modern BSDs.
-+.sp
-+.BR preadv2 (),
-+.BR pwritev2 ():
-+nonstandard, Linux extension.
- .SH NOTES
- POSIX.1 allows an implementation to place a limit on
- the number of items that can be passed in
 -- 
-2.1.4
-
+Michael Kerrisk
+Linux man-pages maintainer; http://www.kernel.org/doc/man-pages/
+Linux/UNIX System Programming Training: http://man7.org/training/
