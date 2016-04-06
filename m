@@ -1,102 +1,115 @@
-Return-Path: <vkuznets@redhat.com>
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-To: Ming Lei <tom.leiming@gmail.com>
-Cc: Keith Busch <keith.busch@intel.com>, linux-block@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>, Dan Williams <dan.j.williams@intel.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Sagi Grimberg <sagig@mellanox.com>, Mike Snitzer <snitzer@redhat.com>,
-        "K. Y. Srinivasan" <kys@microsoft.com>,
-        Cathy Avery <cavery@redhat.com>
-Subject: Re: [PATCH RFC] block: fix bio merge checks when virt_boundary is set
-References: <1458055076-2175-1-git-send-email-vkuznets@redhat.com>
-	<CACVXFVMs-fOaNVUyedg66T83MiOc7a+op3LeHVt6ogVBQnYdeQ@mail.gmail.com>
-	<87oaae4cej.fsf@vitty.brq.redhat.com>
-	<20160316223804.GA6217@localhost.lm.intel.com>
-	<87egb94agz.fsf@vitty.brq.redhat.com>
-	<20160317163946.GC6217@localhost.lm.intel.com>
-	<CACVXFVNrHJcNxcm3+ieOM8f3GzKtTgu38HndWd19ehVDZBev_g@mail.gmail.com>
-	<CACVXFVO37O2Yp60E82U_YWCe2yUqsEn1ojMb6kpTDmhBk94dQA@mail.gmail.com>
-Date: Wed, 20 Apr 2016 15:48:10 +0200
-In-Reply-To: <CACVXFVO37O2Yp60E82U_YWCe2yUqsEn1ojMb6kpTDmhBk94dQA@mail.gmail.com>
-	(Ming Lei's message of "Wed, 30 Mar 2016 21:07:19 +0800")
-Message-ID: <87shyg1jdx.fsf@vitty.brq.redhat.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pf0-f193.google.com ([209.85.192.193]:33495 "EHLO
+	mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1760262AbcDFDqd (ORCPT
+	<rfc822;linux-block@vger.kernel.org>); Tue, 5 Apr 2016 23:46:33 -0400
+Date: Tue, 5 Apr 2016 19:46:28 -0800
+From: Kent Overstreet <kent.overstreet@gmail.com>
+To: Ming Lei <ming.lei@canonical.com>
+Cc: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+	Eric Wheeler <bcache@lists.ewheeler.net>,
+	Sebastian Roesner <sroesner-kernelorg@roesner-online.de>,
+	"4.3+" <stable@vger.kernel.org>, Shaohua Li <shli@fb.com>
+Subject: Re: [PATCH v1] block: make sure big bio is splitted into at most 256
+ bvecs
+Message-ID: <20160406034628.GA25428@kmo-pixel>
+References: <1459914212-9330-1-git-send-email-ming.lei@canonical.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1459914212-9330-1-git-send-email-ming.lei@canonical.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Ming Lei <tom.leiming@gmail.com> writes:
+On Wed, Apr 06, 2016 at 11:43:32AM +0800, Ming Lei wrote:
+> After arbitrary bio size is supported, the incoming bio may
+> be very big. We have to split the bio into small bios so that
+> each holds at most BIO_MAX_PAGES bvecs for safety reason, such
+> as bio_clone().
+> 
+> This patch fixes the following kernel crash:
+> 
+> > [  172.660142] BUG: unable to handle kernel NULL pointer dereference at 0000000000000028
+> > [  172.660229] IP: [<ffffffff811e53b4>] bio_trim+0xf/0x2a
+> > [  172.660289] PGD 7faf3e067 PUD 7f9279067 PMD 0
+> > [  172.660399] Oops: 0000 [#1] SMP
+> > [...]
+> > [  172.664780] Call Trace:
+> > [  172.664813]  [<ffffffffa007f3be>] ? raid1_make_request+0x2e8/0xad7 [raid1]
+> > [  172.664846]  [<ffffffff811f07da>] ? blk_queue_split+0x377/0x3d4
+> > [  172.664880]  [<ffffffffa005fb5f>] ? md_make_request+0xf6/0x1e9 [md_mod]
+> > [  172.664912]  [<ffffffff811eb860>] ? generic_make_request+0xb5/0x155
+> > [  172.664947]  [<ffffffffa0445c89>] ? prio_io+0x85/0x95 [bcache]
+> > [  172.664981]  [<ffffffffa0448252>] ? register_cache_set+0x355/0x8d0 [bcache]
+> > [  172.665016]  [<ffffffffa04497d3>] ? register_bcache+0x1006/0x1174 [bcache]
+> 
+> Fixes: 54efd50(block: make generic_make_request handle arbitrarily sized bios)
+> Reported-by: Sebastian Roesner <sroesner-kernelorg@roesner-online.de>
+> Reported-by: Eric Wheeler <bcache@lists.ewheeler.net>
+> Cc: stable@vger.kernel.org (4.3+)
+> Cc: Shaohua Li <shli@fb.com>
+> Cc: Kent Overstreet <kent.overstreet@gmail.com>
+> Signed-off-by: Ming Lei <ming.lei@canonical.com>
 
-> On Fri, Mar 18, 2016 at 10:59 AM, Ming Lei <tom.leiming@gmail.com> wrote:
->> On Fri, Mar 18, 2016 at 12:39 AM, Keith Busch <keith.busch@intel.com> wrote:
->>> On Thu, Mar 17, 2016 at 12:20:28PM +0100, Vitaly Kuznetsov wrote:
->>>> Keith Busch <keith.busch@intel.com> writes:
->>>> > been combined. In any case, I think you can get what you're after just
->>>> > by moving the gap check after BIOVEC_PHYS_MERGABLE. Does the following
->>>> > look ok to you?
->>>> >
->>>>
->>>> Thanks, it does.
->>>
->>> Cool, thanks for confirming.
->>>
->>>> Will you send it or would you like me to do that with your Suggested-by?
->>>
->>> I'm not confident yet this doesn't break anything, particularly since
->>> we moved the gap check after the length check. Just wanted to confirm
->>> the concept addressed your concern, but still need to take a closer look
->>> and test before submitting.
->>
->> IMO, the change on blk_bio_segment_split() is correct, because actually it
->> is a sg gap and the check should have been done between segments
->> instead of bvecs. So it is reasonable to move the check just before populating
->> a new segment.
->
-> Thinking of the 1st part change further, looks it is just correct in concept,
-> but wrong from current implementation. Because of bios/reqs merge,
-> blk_rq_map_sg() may end one segment in any bvec in theroy, so I guess
-> that is why each non-1st bvec need the check to make sure no sg gap.
-> Looks a very crazy limit, :-)
->
->>
->> But for the 2nd change in bio_will_gap(), which should fix Vitaly's problem, I
->> am still not sure if it is completely correct. bio_will_gap() is used
->> to check if two
->> bios may be merged. Suppose two bios are continues physically, the last bvec
->> in 1st bio and the first bvec in 2nd bio might not be in one same segment
->> because of segment size limit.
->
-> How about the attached patch?
->
+That'll work
 
-I just wanted to revive the discussion as the issue persists. I
-re-tested your patch against 4.6-rc4 and it efficiently solves the
-issue.
+Acked-by: Kent Overstreet <kent.overstreet@gmail.com>
 
-pre-patch:
-# time mkfs.ntfs /dev/sdb1
-Cluster size has been automatically set to 4096 bytes.
-Initializing device with zeroes: 100% - Done.
-Creating NTFS volume structures.
-mkntfs completed successfully. Have a nice day.
-
-real8m10.977s
-user0m0.115s
-sys0m12.672s
-
-post-patch:
-# time mkfs.ntfs /dev/sdb1
-Cluster size has been automatically set to 4096 bytes.
-Initializing device with zeroes: 100% - Done.
-Creating NTFS volume structures.
-mkntfs completed successfully. Have a nice day.
-
-real0m42.430s
-user0m0.171s
-sys0m7.675s
-
-Will you send this patch? Please let me know if I can further
-assist. Thanks!
-
--- 
-  Vitaly
+> ---
+> V1:
+> 	- Kent pointed out that using max io size can't cover
+> 	the case of non-full bvecs/pages
+> 
+> The issue can be reproduced by the following approach:
+>         - create one raid1 over two virtio-blk
+>         - build bcache device over the above raid1 and another cache device
+> 	and bucket size is set 2Mbytes
+>         - set cache mode as writeback
+>         - run random write over ext4 on the bcache device
+>         - then the crash can be triggered
+> 
+>  block/blk-merge.c | 19 +++++++++++++++++++
+>  1 file changed, 19 insertions(+)
+> 
+> diff --git a/block/blk-merge.c b/block/blk-merge.c
+> index 2613531..7b96471 100644
+> --- a/block/blk-merge.c
+> +++ b/block/blk-merge.c
+> @@ -94,8 +94,10 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
+>  	bool do_split = true;
+>  	struct bio *new = NULL;
+>  	const unsigned max_sectors = get_max_io_size(q, bio);
+> +	unsigned bvecs = 0;
+>  
+>  	bio_for_each_segment(bv, bio, iter) {
+> +		bvecs++;
+>  		/*
+>  		 * If the queue doesn't support SG gaps and adding this
+>  		 * offset would create a gap, disallow it.
+> @@ -103,6 +105,23 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
+>  		if (bvprvp && bvec_gap_to_prev(q, bvprvp, bv.bv_offset))
+>  			goto split;
+>  
+> +		/*
+> +		 * With arbitrary bio size, the incoming bio may be very
+> +		 * big. We have to split the bio into small bios so that
+> +		 * each holds at most BIO_MAX_PAGES bvecs because
+> +		 * bio_clone() can fail to allocate big bvecs.
+> +		 *
+> +		 * It should have been better to apply the limit per
+> +		 * request queue in which bio_clone() is involved,
+> +		 * instead of globally. The biggest blocker is
+> +		 * bio_clone() in bio bounce.
+> +		 *
+> +		 * TODO: deal with bio bounce's bio_clone() gracefully
+> +		 * and convert the global limit into per-queue limit.
+> +		 */
+> +		if (bvecs >= BIO_MAX_PAGES)
+> +			goto split;
+> +
+>  		if (sectors + (bv.bv_len >> 9) > max_sectors) {
+>  			/*
+>  			 * Consider this a new segment if we're splitting in
+> -- 
+> 1.9.1
+> 
