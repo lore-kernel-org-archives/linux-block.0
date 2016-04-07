@@ -1,230 +1,64 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: dm-devel@redhat.com
-Cc: Mike Snitzer <snitzer@redhat.com>, Hannes Reinecke <hare@suse.de>,
-	linux-scsi@vger.kernel.org, sagig@dev.mellanox.co.il,
-	jmoyer@redhat.com, linux-block@vger.kernel.org,
-	j-nomura@ce.jp.nec.com
-Subject: Re: [dm-devel] [RFC PATCH 0/4] dm mpath: vastly improve blk-mq IO performance
-Date: Fri, 08 Apr 2016 13:42:16 +0200
-Message-ID: <2760420.6GyDefUaH5@c203>
-In-Reply-To: <20160407153448.GA30510@redhat.com>
-References: <1459454666-76428-1-git-send-email-snitzer@redhat.com> <57067597.4080103@suse.de> <20160407153448.GA30510@redhat.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:44122 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755855AbcDGPeu (ORCPT <rfc822;linux-block@vger.kernel.org>);
+	Thu, 7 Apr 2016 11:34:50 -0400
+Date: Thu, 7 Apr 2016 11:34:48 -0400
+From: Mike Snitzer <snitzer@redhat.com>
+To: Hannes Reinecke <hare@suse.de>
+Cc: dm-devel@redhat.com, jmoyer@redhat.com,
+	linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+	j-nomura@ce.jp.nec.com, sagig@dev.mellanox.co.il
+Subject: Re: [RFC PATCH 0/4] dm mpath: vastly improve blk-mq IO performance
+Message-ID: <20160407153448.GA30510@redhat.com>
+References: <1459454666-76428-1-git-send-email-snitzer@redhat.com>
+ <57067597.4080103@suse.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Sender: linux-scsi-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <57067597.4080103@suse.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Ladies and Gentlemen,
-To show off some numbers from our testing:
+On Thu, Apr 07 2016 at 10:58am -0400,
+Hannes Reinecke <hare@suse.de> wrote:
 
-All tests are performed against the cache of the Array, not the disks as we 
-wanted to test the Linux stack not the Disk Array.
+> On 03/31/2016 10:04 PM, Mike Snitzer wrote:
+> > I developed these changes some weeks ago but have since focused on
+> > regression and performance testing on larger NUMA systems.
+> > 
+> > For regression testing I've been using mptest:
+> > https://github.com/snitm/mptest
+> > 
+> > For performance testing I've been using a null_blk device (with
+> > various configuration permutations, e.g. pinning memory to a
+> > particular NUMA node, and varied number of submit_queues).
+> > 
+> > By eliminating multipath's heavy use of the m->lock spinlock in the
+> > fast IO paths serious performance improvements are realized.
+> > 
+> [ .. ]
+> > Jeff Moyer has been helping review these changes (and has graciously
+> > labored over _really_ understanding all the concurrency at play in DM
+> > mpath) -- his review isn't yet complete but I wanted to get this
+> > patchset out now to raise awareness about how I think DM multipath
+> > will be changing (for inclussion during the Linux 4.7 merge window).
+> > 
+> > Mike Snitzer (4):
+> >   dm mpath: switch to using bitops for state flags
+> >   dm mpath: use atomic_t for counting members of 'struct multipath'
+> >   dm mpath: move trigger_event member to the end of 'struct multipath'
+> >   dm mpath: eliminate use of spinlock in IO fast-paths
+> > 
+> >  drivers/md/dm-mpath.c | 351 ++++++++++++++++++++++++++++----------------------
+> >  1 file changed, 195 insertions(+), 156 deletions(-)
+> > 
+> Finally got around to test this.
+> The performance is comparable to the previous (RCU-ified) patchset,
+> however, this one is the far superious approach.
+> In fact, the first two are pretty much identical to what I've
+> already had, but I've shirked at modifying the path selectors.
+> So well done here.
 
-All single queue tests have been performed with the deadline I/O Scheduler.
+Awesome, thanks for reviewing and testing, very much appreciated.
 
-Comments welcome, have fun reading :-)
-
-QLogic 32GBit FC HBA NetApp EF560 Array w/ DM MQ this patchset:
-========================================================
-Random Read:
-BS   | IOPS     | BW                |
-------+------------+-------------------+
-4k   | 785136 | 3066.1MB/s |
-8k   | 734983 | 5742.6MB/s |
-16k | 398516 | 6226.9MB/s |
-32k | 200589 | 6268.5MB/s |
-64k | 100417 | 6276.2MB/s |
-
-Sequential Read:
-BS   | IOPS     | BW                |
-------+------------+-------------------+
-4k   | 788620 | 3080.6MB/s |
-8k   | 736359 | 5752.9MB/s |
-16k | 398597 | 6228.8MB/s |
-32k |  200487| 6265.3MB/s |
-64k | 100402 | 6275.2MB/s |
-
-Random Write:
-BS   | IOPS     | BW                |
-------+------------+-------------------+
-4k   | 242105 | 968423KB/s |
-8k   | 222290 | 1736.7MB/s |
-16k | 178191 | 2784.3MB/s |
-32k | 133619 | 4175.7MB/s |
-64k |   97693 | 6105.9MB/s |
-
-Sequential Write:
-BS   | IOPS     | BW                |
-------+------------+-------------------+
-4k   | 134788 | 539155KB/s |
-8k   | 132361 | 1034.8MB/s |
-16k | 129941 | 2030.4MB/s |
-32k | 128288 | 4009.4MB/s |
-64k |   97776 | 6111.0MB/s |
-
-QLogic 32GBit FC HBA NetApp EF560 Array w/ DM SQ this patchset:
-========================================================
-Random Read:
-BS   | IOPS     | BW                |
-------+------------+-------------------+
-4k   | 112402 | 449608KB/s |
-8k   | 112818 | 902551KB/s |
-16k | 111885 | 1748.3MB/s |
-32k | 188015 | 5875.6MB/s |
-64k |   99021 |  6188.9MB/s |
-
-Sequential Read:
-BS   | IOPS     | BW                |
-------+------------+-------------------+
-4k   | 115046 | 460186KB/s |
-8k   | 113974 | 911799KB/s |
-16k | 113374 | 1771.5MB/s |
-32k | 192932 | 6029.2MB/s |
-64k | 100474 | 6279.7MB/s |
-
-Random Write:
-BS   | IOPS     | BW                |
-------+------------+-------------------+
-4k   | 114284 | 457138KB/s |
-8k   | 113992 | 911944KB/s |
-16k | 113715 | 1776.9MB/s |
-32k | 130402 | 4075.9MB/s |
-64k |   92243 | 5765.3MB/s |
-
-Sequential Write:
-BS   | IOPS     | BW                |
-------+------------+-------------------+
-4k   | 115540 | 462162KB/s |
-8k   | 114243 | 913951KB/s |
-16k | 300153 | 4689.1MB/s |
-32k | 141069 | 4408.5MB/s |
-64k |   97620 | 6101.3MB/s |
-
-
-QLogic 32GBit FC HBA NetApp EF560 Array w/ DM MQ previous patchset:
-============================================================
-Random Read:
-BS   | IOPS     | BW                |
-------+------------+-------------------+
-4k   | 782733 | 3057.6MB/s |
-8k   | 732143 | 5719.9MB/s |
-16k | 398314 | 6223.7MB/s |
-32k | 200538 | 6266.9MB/s |
-64k | 100422 | 6276.5MB/s |
-
-Sequential Read:
-BS   | IOPS     | BW                |
-------+------------+-------------------+
-4k   | 786707 | 3073.8MB/s |
-8k   | 730579 | 5707.7MB/s |
-16k | 398799 | 6231.3MB/s |
-32k | 200518 | 6266.2MB/s |
-64k | 100397 | 6274.9MB/s |
-
-Random Write:
-BS   | IOPS     | BW                |
-------+------------+-------------------+
-4k   | 242426 | 969707KB/s |
-8k   | 223079 | 1742.9MB/s |
-16k | 177889 | 2779.6MB/s |
-32k | 133637 | 4176.2MB/s |
-64k |   97727 | 6107.1MB/s |
-
-Sequential Write:
-BS   | IOPS     | BW                |
-------+------------+-------------------+
-4k   | 134360 | 537442KB/s |
-8k   | 129738 | 1013.6MB/s |
-16k | 129746 | 2027.3MB/s |
-32k | 127875 | 3996.1MB/s |
-64k |   97683 | 6105.3MB/s |
-
-Emulex 16GBit FC HBA NetApp EF560 Array w/ DM MQ this patchset :
-========================================================
-[Beware, this is with Hannes' lockless lpfc patches, which are not upstream as 
-they're quite experimental, but are good at showing the capability of the new 
-dm-mpath]
-
-Random Read:
-BS   | IOPS     | BW                |
-------+------------+-------------------+
-4k   | 939752 | 3670.1MB/s |
-8k   | 741462 | 5792.7MB/s |
-16k | 399285 | 6238.9MB/s |
-32k | 196490 | 6140.4MB/s |
-64k | 100325 | 6270.4MB/s |
-
-Sequential Read:
-BS   | IOPS     | BW
-------+------------+-------------------+
-4k   | 926222 | 3618.6MB/s |
-8k   | 750125 | 5860.4MB/s |
-16k | 397770 | 6215.2MB/s |
-32k | 200130 | 6254.8MB/s | 
-64k | 100397 | 6274.9MB/s |
-
-Random Write:
-BS   | IOPS     | BW                |
-------+------------+-------------------+
-4k   | 251938 | 984.14MB/s |
-8k   | 226712 | 1771.2MB/s |
-16k | 180739 | 2824.5MB/s |
-32k | 133316 | 4166.2MB/s |
-64k |  98738  | 6171.2MB/s |
-
-Sequential Write:
-BS   | IOPS     | BW                |
-------+------------+-------------------+
-4k   | 134660 | 538643KB/s |
-8k   | 131585 | 1028.9MB/s |
-16k | 131030 | 2047.4MB/s |
-32k | 126987 | 3968.4MB/s |
-64k |  98882  | 6180.2MB/s |
-
-Emulex 16GBit FC HBA NetApp EF560 Array w/ DM SQ this patchset:
-========================================================
-Random Read:
-BS   | IOPS     | BW                |
-------+------------+-------------------+
-4k   | 101860 | 407443KB/s |
-8k   | 100242 | 801940KB/s |
-16k |   99774 | 1558.1MB/s |
-32k | 134304 | 4197.8MB/s |
-64k | 100126 | 6257.1MB/s |
-
-Sequential Read:
-BS   | IOPS     | BW                |
-------+------------+-------------------+
-4k   | 285585 | 1115.6MB/s | 
-8k   | 313619 | 2450.2MB/s |
-16k | 190696 | 2979.7MB/s |
-32k | 200569 | 6267.9MB/s |
-64k | 100366 | 6272.1MB/s |
-
-Random Write:
-BS   | IOPS     | BW                |
-------+------------+-------------------+
-4k   |  98434  | 393738KB/s |
-8k   |  97286  | 778294KB/s | 
-16k |  97623  | 1525.4MB/s |
-32k | 126999 | 3968.8MB/s |
-64k |  94309  | 5894.4MB/s |
-
-Sequential Write:
-BS   | IOPS     | BW                |
-------+------------+-------------------+
-4k   | 330066 | 1289.4MB/s |
-8k   | 452792 | 3537.5MB/s |
-16k | 334481 | 5226.3MB/s |
-32k | 186916 | 5841.2MB/s |
-64k |  88698  | 5543.7MB/s |
-
--- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: Felix Imend�rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N�rnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
-
+I'll get this set staged in linux-next for 4.7 shortly.
