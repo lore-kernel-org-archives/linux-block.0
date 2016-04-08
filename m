@@ -1,70 +1,46 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:55412 "EHLO mx2.suse.de"
+Received: from mx1.redhat.com ([209.132.183.28]:53568 "EHLO mx1.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S933665AbcDMHDK convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-block@vger.kernel.org>);
-	Wed, 13 Apr 2016 03:03:10 -0400
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: dm-devel@redhat.com
-Cc: Mike Snitzer <snitzer@redhat.com>, linux-scsi@vger.kernel.org,
-	sagig@dev.mellanox.co.il, jmoyer@redhat.com,
-	linux-block@vger.kernel.org, j-nomura@ce.jp.nec.com
-Subject: Re: [dm-devel] [RFC PATCH 0/4] dm mpath: vastly improve blk-mq IO performance
-Date: Wed, 13 Apr 2016 09:03:06 +0200
-Message-ID: <1894861.yMOs7f7bAi@c203>
-In-Reply-To: <20160408192938.GC8453@redhat.com>
-References: <1459454666-76428-1-git-send-email-snitzer@redhat.com> <2760420.6GyDefUaH5@c203> <20160408192938.GC8453@redhat.com>
+	id S1752071AbcDHT3l (ORCPT <rfc822;linux-block@vger.kernel.org>);
+	Fri, 8 Apr 2016 15:29:41 -0400
+Date: Fri, 8 Apr 2016 15:29:39 -0400
+From: Mike Snitzer <snitzer@redhat.com>
+To: Johannes Thumshirn <jthumshirn@suse.de>
+Cc: dm-devel@redhat.com, linux-scsi@vger.kernel.org,
+	sagig@dev.mellanox.co.il, linux-block@vger.kernel.org,
+	jmoyer@redhat.com, j-nomura@ce.jp.nec.com
+Subject: Re: [RFC PATCH 0/4] dm mpath: vastly improve blk-mq IO performance
+Message-ID: <20160408192938.GC8453@redhat.com>
+References: <1459454666-76428-1-git-send-email-snitzer@redhat.com>
+ <57067597.4080103@suse.de>
+ <20160407153448.GA30510@redhat.com>
+ <2760420.6GyDefUaH5@c203>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <2760420.6GyDefUaH5@c203>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Freitag, 8. April 2016 15:29:39 CEST Mike Snitzer wrote:
-> On Fri, Apr 08 2016 at  7:42am -0400,
-> Johannes Thumshirn <jthumshirn@suse.de> wrote:
+On Fri, Apr 08 2016 at  7:42am -0400,
+Johannes Thumshirn <jthumshirn@suse.de> wrote:
+
+> Ladies and Gentlemen,
+> To show off some numbers from our testing:
 > 
-> > Ladies and Gentlemen,
-> > To show off some numbers from our testing:
-> > 
-> > All tests are performed against the cache of the Array, not the disks as we 
-> > wanted to test the Linux stack not the Disk Array.
-> > 
-> > All single queue tests have been performed with the deadline I/O Scheduler.
-> > 
-> > Comments welcome, have fun reading :-)
+> All tests are performed against the cache of the Array, not the disks as we 
+> wanted to test the Linux stack not the Disk Array.
 > 
-> Any chance you collected performance results from DM MQ on this same
-> testbed without any variant of my lockless patches?  The DM SQ results
-> aren't too interesting a reference point.  Seeing how much better
-> lockless DM MQ (multipath) is than the old m->lock heacy code (still in
-> 4.6) would be more interesting.
+> All single queue tests have been performed with the deadline I/O Scheduler.
 > 
-> Not a big deal if you don't have it.. but figured I'd check to see.
+> Comments welcome, have fun reading :-)
 
-I'll have to look if there are some of the old logfiles still available, but we
-can't re-test, as the array was just temporarily allocated to us and we've
-now lost access to it. But IIRC it's been somewhere around 300K IOPS, but 
-don't quote me on that.
+Any chance you collected performance results from DM MQ on this same
+testbed without any variant of my lockless patches?  The DM SQ results
+aren't too interesting a reference point.  Seeing how much better
+lockless DM MQ (multipath) is than the old m->lock heacy code (still in
+4.6) would be more interesting.
 
-Byte,
-	Joahnnes
+Not a big deal if you don't have it.. but figured I'd check to see.
 
- 
-> And thanks for the numbers you've provided.
-> Mike
-> 
-> --
-> dm-devel mailing list
-> dm-devel@redhat.com
-> https://www.redhat.com/mailman/listinfo/dm-devel
-> 
-
-
--- 
-Johannes Thumshirn                                                                                Storage
-jthumshirn@suse.de                                                             +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: Felix Imend�rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N�rnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
-
+And thanks for the numbers you've provided.
+Mike
