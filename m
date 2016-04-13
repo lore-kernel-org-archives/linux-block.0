@@ -1,102 +1,70 @@
-Return-Path: <jack@suse.cz>
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Jeff Moyer <jmoyer@redhat.com>,
-	Jan Kara <jack@suse.com>
-Subject: [PATCH 3/3] cfq-iosched: Convert to use highres timers
-Date: Mon,  4 Apr 2016 17:29:41 +0200
-Message-Id: <1459783781-25537-4-git-send-email-jack@suse.cz>
-In-Reply-To: <1459783781-25537-1-git-send-email-jack@suse.cz>
-References: <1459783781-25537-1-git-send-email-jack@suse.cz>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:55412 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S933665AbcDMHDK convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-block@vger.kernel.org>);
+	Wed, 13 Apr 2016 03:03:10 -0400
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: dm-devel@redhat.com
+Cc: Mike Snitzer <snitzer@redhat.com>, linux-scsi@vger.kernel.org,
+	sagig@dev.mellanox.co.il, jmoyer@redhat.com,
+	linux-block@vger.kernel.org, j-nomura@ce.jp.nec.com
+Subject: Re: [dm-devel] [RFC PATCH 0/4] dm mpath: vastly improve blk-mq IO performance
+Date: Wed, 13 Apr 2016 09:03:06 +0200
+Message-ID: <1894861.yMOs7f7bAi@c203>
+In-Reply-To: <20160408192938.GC8453@redhat.com>
+References: <1459454666-76428-1-git-send-email-snitzer@redhat.com> <2760420.6GyDefUaH5@c203> <20160408192938.GC8453@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="iso-8859-1"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Jan Kara <jack@suse.com>
+On Freitag, 8. April 2016 15:29:39 CEST Mike Snitzer wrote:
+> On Fri, Apr 08 2016 at  7:42am -0400,
+> Johannes Thumshirn <jthumshirn@suse.de> wrote:
+> 
+> > Ladies and Gentlemen,
+> > To show off some numbers from our testing:
+> > 
+> > All tests are performed against the cache of the Array, not the disks as we 
+> > wanted to test the Linux stack not the Disk Array.
+> > 
+> > All single queue tests have been performed with the deadline I/O Scheduler.
+> > 
+> > Comments welcome, have fun reading :-)
+> 
+> Any chance you collected performance results from DM MQ on this same
+> testbed without any variant of my lockless patches?  The DM SQ results
+> aren't too interesting a reference point.  Seeing how much better
+> lockless DM MQ (multipath) is than the old m->lock heacy code (still in
+> 4.6) would be more interesting.
+> 
+> Not a big deal if you don't have it.. but figured I'd check to see.
 
-Signed-off-by: Jan Kara <jack@suse.com>
----
- block/cfq-iosched.c | 21 ++++++++++++---------
- 1 file changed, 12 insertions(+), 9 deletions(-)
+I'll have to look if there are some of the old logfiles still available, but we
+can't re-test, as the array was just temporarily allocated to us and we've
+now lost access to it. But IIRC it's been somewhere around 300K IOPS, but 
+don't quote me on that.
 
-diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
-index c7f1a70dd8f7..9e3ec4bbb81d 100644
---- a/block/cfq-iosched.c
-+++ b/block/cfq-iosched.c
-@@ -362,7 +362,7 @@ struct cfq_data {
- 	/*
- 	 * idle window management
- 	 */
--	struct timer_list idle_slice_timer;
-+	struct hrtimer idle_slice_timer;
- 	struct work_struct unplug_work;
+Byte,
+	Joahnnes
+
  
- 	struct cfq_queue *active_queue;
-@@ -2619,7 +2619,7 @@ static int cfq_allow_merge(struct request_queue *q, struct request *rq,
- 
- static inline void cfq_del_timer(struct cfq_data *cfqd, struct cfq_queue *cfqq)
- {
--	del_timer(&cfqd->idle_slice_timer);
-+	hrtimer_try_to_cancel(&cfqd->idle_slice_timer);
- 	cfqg_stats_update_idle_time(cfqq->cfqg);
- }
- 
-@@ -2981,7 +2981,8 @@ static void cfq_arm_slice_timer(struct cfq_data *cfqd)
- 	else
- 		sl = cfqd->cfq_slice_idle;
- 
--	mod_timer(&cfqd->idle_slice_timer, now + sl);
-+	hrtimer_start(&cfqd->idle_slice_timer, ns_to_ktime(sl),
-+		      HRTIMER_MODE_REL);
- 	cfqg_stats_set_start_idle_time(cfqq->cfqg);
- 	cfq_log_cfqq(cfqd, cfqq, "arm_idle: %llu group_idle: %d", sl,
- 			group_idle ? 1 : 0);
-@@ -3300,7 +3301,7 @@ static struct cfq_queue *cfq_select_queue(struct cfq_data *cfqd)
- 	 * flight or is idling for a new request, allow either of these
- 	 * conditions to happen (or time out) before selecting a new queue.
- 	 */
--	if (timer_pending(&cfqd->idle_slice_timer)) {
-+	if (hrtimer_active(&cfqd->idle_slice_timer)) {
- 		cfqq = NULL;
- 		goto keep_queue;
- 	}
-@@ -4445,9 +4446,10 @@ static void cfq_kick_queue(struct work_struct *work)
- /*
-  * Timer running if the active_queue is currently idling inside its time slice
-  */
--static void cfq_idle_slice_timer(unsigned long data)
-+static enum hrtimer_restart cfq_idle_slice_timer(struct hrtimer *timer)
- {
--	struct cfq_data *cfqd = (struct cfq_data *) data;
-+	struct cfq_data *cfqd = container_of(timer, struct cfq_data,
-+					     idle_slice_timer);
- 	struct cfq_queue *cfqq;
- 	unsigned long flags;
- 	int timed_out = 1;
-@@ -4496,11 +4498,12 @@ out_kick:
- 	cfq_schedule_dispatch(cfqd);
- out_cont:
- 	spin_unlock_irqrestore(cfqd->queue->queue_lock, flags);
-+	return HRTIMER_NORESTART;
- }
- 
- static void cfq_shutdown_timer_wq(struct cfq_data *cfqd)
- {
--	del_timer_sync(&cfqd->idle_slice_timer);
-+	hrtimer_cancel(&cfqd->idle_slice_timer);
- 	cancel_work_sync(&cfqd->unplug_work);
- }
- 
-@@ -4596,9 +4599,9 @@ static int cfq_init_queue(struct request_queue *q, struct elevator_type *e)
- 	cfqg_put(cfqd->root_group);
- 	spin_unlock_irq(q->queue_lock);
- 
--	init_timer(&cfqd->idle_slice_timer);
-+	hrtimer_init(&cfqd->idle_slice_timer, CLOCK_MONOTONIC,
-+		     HRTIMER_MODE_REL);
- 	cfqd->idle_slice_timer.function = cfq_idle_slice_timer;
--	cfqd->idle_slice_timer.data = (unsigned long) cfqd;
- 
- 	INIT_WORK(&cfqd->unplug_work, cfq_kick_queue);
- 
+> And thanks for the numbers you've provided.
+> Mike
+> 
+> --
+> dm-devel mailing list
+> dm-devel@redhat.com
+> https://www.redhat.com/mailman/listinfo/dm-devel
+> 
+
+
 -- 
-2.6.2
+Johannes Thumshirn                                                                                Storage
+jthumshirn@suse.de                                                             +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+
