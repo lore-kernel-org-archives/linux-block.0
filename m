@@ -1,42 +1,59 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:20739 "EHLO mga11.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752120AbcDVXNP (ORCPT <rfc822;linux-block@vger.kernel.org>);
-	Fri, 22 Apr 2016 19:13:15 -0400
-From: Rafael Antognolli <rafael.antognolli@intel.com>
-To: linux-nvme@lists.infradead.org
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	Rafael Antognolli <rafael.antognolli@intel.com>
-Subject: [PATCH 0/2] Add Opal unlock support to NVMe.
-Date: Fri, 22 Apr 2016 16:12:10 -0700
-Message-Id: <1461366732-31779-1-git-send-email-rafael.antognolli@intel.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+Date: Fri, 15 Apr 2016 15:44:32 -0400
+From: Mike Snitzer <snitzer@redhat.com>
+To: mchristi@redhat.com
+Cc: linux-f2fs-devel@lists.sourceforge.net, linux-ext4@vger.kernel.org,
+	konrad.wilk@oracle.com, drbd-dev@lists.linbit.com,
+	philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
+	linux-raid@vger.kernel.org, dm-devel@redhat.com,
+	linux-fsdevel@vger.kernel.org, linux-bcache@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-scsi@vger.kernel.org, linux-mtd@lists.infradead.org,
+	target-devel@vger.kernel.org, linux-btrfs@vger.kernel.org,
+	osd-dev@open-osd.org, xfs@oss.sgi.com, ocfs2-devel@oss.oracle.com
+Subject: Re: [PATCH 00/42] v7: separate operations from flags in the
+ bio/request structs
+Message-ID: <20160415194432.GA30077@redhat.com>
+References: <1460747777-8479-1-git-send-email-mchristi@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1460747777-8479-1-git-send-email-mchristi@redhat.com>
+Sender: linux-scsi-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-This patch series implement a small set of the Opal protocol for self
-encrypting devices. It's implemented only what is needed for saving a password
-and unlocking a given "locking range". The password is saved on the driver and
-replayed back to the device on resume from suspend to RAM. It is specifically
-supporting the single user mode.
+On Fri, Apr 15 2016 at  3:15pm -0400,
+mchristi@redhat.com <mchristi@redhat.com> wrote:
 
-It is not planned to implement the full Opal protocol (at least not for now).
+> The following patches begin to cleanup the request->cmd_flags and
+> bio->bi_rw mess. We currently use cmd_flags to specify the operation,
+> attributes and state of the request. For bi_rw we use it for similar
+> info and also the priority but then also have another bi_flags field
+> for state. At some point, we abused them so much we just made cmd_flags
+> 64 bits, so we could add more.
+> 
+> The following patches seperate the operation (read, write discard,
+> flush, etc) from cmd_flags/bi_rw.
+> 
+> This patchset was made against linux-next from today April 15
+> (git tag next-20160415).
+> 
+> I put a git tree here:
+> https://github.com/mikechristie/linux-kernel.git
+> The patches are in the op branch.
+> 
+> v7:
+> 1. Fix broken feature_flush/fua use.
+> 
+> v6 and maybe hopfully the last version:
+> 1. Adapt patch 41 to Jens's QUEUE_FLAG_WC/FUA patchset.
 
-Rafael Antognolli (2):
-  Add optane OPAL unlocking code.
-  NVMe: Add ioctls to save and unlock an Opal locking range.
+Why are you blasting out the entire patchset for updates to individual
+patches at the end of the series?
 
- drivers/nvme/host/Kconfig         |    7 +
- drivers/nvme/host/Makefile        |    1 +
- drivers/nvme/host/core.c          |    9 +
- drivers/nvme/host/opal.c          | 1270 +++++++++++++++++++++++++++++++++++++
- drivers/nvme/host/opal.h          |   73 +++
- drivers/nvme/host/opal_internal.h |  501 +++++++++++++++
- include/uapi/linux/nvme_ioctl.h   |    7 +
- 7 files changed, 1868 insertions(+)
- create mode 100644 drivers/nvme/host/opal.c
- create mode 100644 drivers/nvme/host/opal.h
- create mode 100644 drivers/nvme/host/opal_internal.h
+Mail is cheap but look at how wide you're repeatedly spamming this
+series.
 
--- 
-1.9.1
+Also, look at what you've done to the dm-devel patchwork:
+https://patchwork.kernel.org/project/dm-devel/list/?state=*
 
+Just sayin'... ;)
