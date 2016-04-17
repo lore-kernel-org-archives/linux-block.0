@@ -1,313 +1,97 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Vishal Verma <vishal.l.verma@intel.com>
-To: linux-nvdimm@lists.01.org
-Cc: Vishal Verma <vishal.l.verma@intel.com>,
-	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-	xfs@oss.sgi.com, linux-ext4@vger.kernel.org, linux-mm@kvack.org,
-	Matthew Wilcox <matthew@wil.cx>,
-	Ross Zwisler <ross.zwisler@linux.intel.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Dave Chinner <david@fromorbit.com>, Jan Kara <jack@suse.cz>,
-	Jens Axboe <axboe@fb.com>, Al Viro <viro@zeniv.linux.org.uk>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-kernel@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Jeff Moyer <jmoyer@redhat.com>
-Subject: [PATCH v4 5/7] fs: prioritize and separate direct_io from dax_io
-Date: Thu, 28 Apr 2016 15:16:56 -0600
-Message-Id: <1461878218-3844-6-git-send-email-vishal.l.verma@intel.com>
-In-Reply-To: <1461878218-3844-1-git-send-email-vishal.l.verma@intel.com>
-References: <1461878218-3844-1-git-send-email-vishal.l.verma@intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-yw0-f194.google.com ([209.85.161.194]:32993 "EHLO
+	mail-yw0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751306AbcDQVav (ORCPT
+	<rfc822;linux-block@vger.kernel.org>);
+	Sun, 17 Apr 2016 17:30:51 -0400
+From: Ming Lei <ming.lei@canonical.com>
+To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+	Al Viro <viro@zeniv.linux.org.uk>,
+	Ming Lei <ming.lei@canonical.com>,
+	drbd-dev@lists.linbit.com (open list:DRBD DRIVER),
+	Jan Kara <jack@suse.cz>, Keith Busch <keith.busch@intel.com>,
+	Kent Overstreet <kent.overstreet@gmail.com>,
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+	Mike Snitzer <snitzer@redhat.com>, Shaohua Li <shli@fb.com>,
+	Tejun Heo <tj@kernel.org>,
+	xfs@oss.sgi.com (open list:XFS FILESYSTEM)
+Subject: [PATCH v5 0/8] block: prepare for multipage bvecs
+Date: Mon, 18 Apr 2016 05:29:49 +0800
+Message-Id: <1460928615-20894-1-git-send-email-ming.lei@canonical.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-All IO in a dax filesystem used to go through dax_do_io, which cannot
-handle media errors, and thus cannot provide a recovery path that can
-send a write through the driver to clear errors.
+Hi,
 
-Add a new iocb flag for DAX, and set it only for DAX mounts. In the IO
-path for DAX filesystems, use the same direct_IO path for both DAX and
-direct_io iocbs, but use the flags to identify when we are in O_DIRECT
-mode vs non O_DIRECT with DAX, and for O_DIRECT, use the conventional
-direct_IO path instead of DAX.
+Interests[1] have been shown in multipage bvecs, so this patchset
+try to prepare for the support and do two things:
 
-This allows us a recovery path in the form of opening the file with
-O_DIRECT and writing to it with the usual O_DIRECT semantics (sector
-alignment restrictions).
+1) the 1st 4 patches use bvec iterator to implement iterate_bvec(),
+then we can drop the non-standard way for iterating bvec, which
+can be thought as a good cleanup for lib/iov_iter.c
 
-Cc: Matthew Wilcox <matthew@wil.cx>
-Cc: Dan Williams <dan.j.williams@intel.com>
-Cc: Ross Zwisler <ross.zwisler@linux.intel.com>
-Cc: Jeff Moyer <jmoyer@redhat.com>
-Cc: Christoph Hellwig <hch@infradead.org>
-Cc: Dave Chinner <david@fromorbit.com>
-Cc: Jan Kara <jack@suse.cz>
-Cc: Jens Axboe <axboe@fb.com>
-Cc: Al Viro <viro@zeniv.linux.org.uk>
-Signed-off-by: Vishal Verma <vishal.l.verma@intel.com>
----
- drivers/block/loop.c |  2 +-
- fs/block_dev.c       | 17 +++++++++++++----
- fs/ext2/inode.c      | 16 ++++++++++++----
- fs/ext4/file.c       |  2 +-
- fs/ext4/inode.c      | 19 +++++++++++++------
- fs/xfs/xfs_aops.c    | 20 +++++++++++++-------
- fs/xfs/xfs_file.c    |  4 ++--
- include/linux/fs.h   | 15 ++++++++++++---
- mm/filemap.c         |  4 ++--
- 9 files changed, 69 insertions(+), 30 deletions(-)
+2) remove BIO_MAX_SECTORS & BIO_MAX_SIZE, and now there is only
+one user for each. Once multipage bvecs is introduced, one bio
+may hold lots of sectors, and we should always use sort of BIO_MAX_VECS
+which should be introduced in future and is similiar with current
+BIO_MAX_PAGES.
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 80cf8ad..c0a24c3 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -568,7 +568,7 @@ struct switch_request {
- 
- static inline void loop_update_dio(struct loop_device *lo)
- {
--	__loop_update_dio(lo, io_is_direct(lo->lo_backing_file) |
-+	__loop_update_dio(lo, (lo->lo_backing_file->f_flags & O_DIRECT) |
- 			lo->use_dio);
- }
- 
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 79defba..97a1f5f 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -167,12 +167,21 @@ blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, loff_t offset)
- 	struct file *file = iocb->ki_filp;
- 	struct inode *inode = bdev_file_inode(file);
- 
--	if (IS_DAX(inode))
-+	if (iocb_is_direct(iocb))
-+		return __blockdev_direct_IO(iocb, inode, I_BDEV(inode), iter,
-+					    offset, blkdev_get_block, NULL,
-+					    NULL, DIO_SKIP_DIO_COUNT);
-+	else if (iocb_is_dax(iocb))
- 		return dax_do_io(iocb, inode, iter, offset, blkdev_get_block,
- 				NULL, DIO_SKIP_DIO_COUNT);
--	return __blockdev_direct_IO(iocb, inode, I_BDEV(inode), iter, offset,
--				    blkdev_get_block, NULL, NULL,
--				    DIO_SKIP_DIO_COUNT);
-+	else {
-+		/*
-+		 * If we're in the direct_IO path, either the IOCB_DIRECT or
-+		 * IOCB_DAX flags must be set.
-+		 */
-+		WARN_ONCE(1, "Kernel Bug with iocb flags\n");
-+		return -ENXIO;
-+	}
- }
- 
- int __sync_blockdev(struct block_device *bdev, int wait)
-diff --git a/fs/ext2/inode.c b/fs/ext2/inode.c
-index 35f2b0bf..45f2b51 100644
---- a/fs/ext2/inode.c
-+++ b/fs/ext2/inode.c
-@@ -861,12 +861,20 @@ ext2_direct_IO(struct kiocb *iocb, struct iov_iter *iter, loff_t offset)
- 	size_t count = iov_iter_count(iter);
- 	ssize_t ret;
- 
--	if (IS_DAX(inode))
--		ret = dax_do_io(iocb, inode, iter, offset, ext2_get_block, NULL,
--				DIO_LOCKING);
--	else
-+	if (iocb_is_direct(iocb))
- 		ret = blockdev_direct_IO(iocb, inode, iter, offset,
- 					 ext2_get_block);
-+	else if (iocb_is_dax(iocb))
-+		ret = dax_do_io(iocb, inode, iter, offset, ext2_get_block, NULL,
-+				DIO_LOCKING);
-+	else {
-+		/*
-+		 * If we're in the direct_IO path, either the IOCB_DIRECT or
-+		 * IOCB_DAX flags must be set.
-+		 */
-+		WARN_ONCE(1, "Kernel Bug with iocb flags\n");
-+		return -ENXIO;
-+	}
- 	if (ret < 0 && iov_iter_rw(iter) == WRITE)
- 		ext2_write_failed(mapping, offset + count);
- 	return ret;
-diff --git a/fs/ext4/file.c b/fs/ext4/file.c
-index 2e9aa49..165a0b8 100644
---- a/fs/ext4/file.c
-+++ b/fs/ext4/file.c
-@@ -94,7 +94,7 @@ ext4_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
- 	struct file *file = iocb->ki_filp;
- 	struct inode *inode = file_inode(iocb->ki_filp);
- 	struct blk_plug plug;
--	int o_direct = iocb->ki_flags & IOCB_DIRECT;
-+	int o_direct = iocb->ki_flags & (IOCB_DIRECT | IOCB_DAX);
- 	int unaligned_aio = 0;
- 	int overwrite = 0;
- 	ssize_t ret;
-diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
-index 6d5d5c1..0b6d77a 100644
---- a/fs/ext4/inode.c
-+++ b/fs/ext4/inode.c
-@@ -3410,15 +3410,22 @@ static ssize_t ext4_direct_IO_write(struct kiocb *iocb, struct iov_iter *iter,
- #ifdef CONFIG_EXT4_FS_ENCRYPTION
- 	BUG_ON(ext4_encrypted_inode(inode) && S_ISREG(inode->i_mode));
- #endif
--	if (IS_DAX(inode)) {
--		ret = dax_do_io(iocb, inode, iter, offset, get_block_func,
--				ext4_end_io_dio, dio_flags);
--	} else
-+	if (iocb_is_direct(iocb))
- 		ret = __blockdev_direct_IO(iocb, inode,
- 					   inode->i_sb->s_bdev, iter, offset,
- 					   get_block_func,
- 					   ext4_end_io_dio, NULL, dio_flags);
--
-+	else if (iocb_is_dax(iocb))
-+		ret = dax_do_io(iocb, inode, iter, offset, get_block_func,
-+				ext4_end_io_dio, dio_flags);
-+	else {
-+		/*
-+		 * If we're in the direct_IO path, either the IOCB_DIRECT or
-+		 * IOCB_DAX flags must be set.
-+		 */
-+		WARN_ONCE(1, "Kernel Bug with iocb flags\n");
-+		return -ENXIO;
-+	}
- 	if (ret > 0 && !overwrite && ext4_test_inode_state(inode,
- 						EXT4_STATE_DIO_UNWRITTEN)) {
- 		int err;
-@@ -3503,7 +3510,7 @@ static ssize_t ext4_direct_IO_read(struct kiocb *iocb, struct iov_iter *iter,
- 		else
- 			unlocked = 1;
- 	}
--	if (IS_DAX(inode)) {
-+	if (iocb_is_dax(iocb)) {
- 		ret = dax_do_io(iocb, inode, iter, offset, ext4_dio_get_block,
- 				NULL, unlocked ? 0 : DIO_LOCKING);
- 	} else {
-diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
-index e49b240..8134e99 100644
---- a/fs/xfs/xfs_aops.c
-+++ b/fs/xfs/xfs_aops.c
-@@ -1412,21 +1412,27 @@ xfs_vm_direct_IO(
- 	struct inode		*inode = iocb->ki_filp->f_mapping->host;
- 	dio_iodone_t		*endio = NULL;
- 	int			flags = 0;
--	struct block_device	*bdev;
-+	struct block_device     *bdev = xfs_find_bdev_for_inode(inode);
- 
- 	if (iov_iter_rw(iter) == WRITE) {
- 		endio = xfs_end_io_direct_write;
- 		flags = DIO_ASYNC_EXTEND;
- 	}
- 
--	if (IS_DAX(inode)) {
-+	if (iocb_is_direct(iocb))
-+		return  __blockdev_direct_IO(iocb, inode, bdev, iter, offset,
-+				xfs_get_blocks_direct, endio, NULL, flags);
-+	else if (iocb_is_dax(iocb))
- 		return dax_do_io(iocb, inode, iter, offset,
--				 xfs_get_blocks_direct, endio, 0);
-+				xfs_get_blocks_direct, endio, 0);
-+	else {
-+		/*
-+		 * If we're in the direct_IO path, either the IOCB_DIRECT or
-+		 * IOCB_DAX flags must be set.
-+		 */
-+		WARN_ONCE(1, "Kernel Bug with iocb flags\n");
-+		return -ENXIO;
- 	}
--
--	bdev = xfs_find_bdev_for_inode(inode);
--	return  __blockdev_direct_IO(iocb, inode, bdev, iter, offset,
--			xfs_get_blocks_direct, endio, NULL, flags);
- }
- 
- /*
-diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
-index c2946f4..3d5d3c2 100644
---- a/fs/xfs/xfs_file.c
-+++ b/fs/xfs/xfs_file.c
-@@ -300,7 +300,7 @@ xfs_file_read_iter(
- 
- 	XFS_STATS_INC(mp, xs_read_calls);
- 
--	if (unlikely(iocb->ki_flags & IOCB_DIRECT))
-+	if (unlikely(iocb->ki_flags & (IOCB_DIRECT | IOCB_DAX)))
- 		ioflags |= XFS_IO_ISDIRECT;
- 	if (file->f_mode & FMODE_NOCMTIME)
- 		ioflags |= XFS_IO_INVIS;
-@@ -898,7 +898,7 @@ xfs_file_write_iter(
- 	if (XFS_FORCED_SHUTDOWN(ip->i_mount))
- 		return -EIO;
- 
--	if ((iocb->ki_flags & IOCB_DIRECT) || IS_DAX(inode))
-+	if ((iocb->ki_flags & (IOCB_DIRECT | IOCB_DAX)))
- 		ret = xfs_file_dio_aio_write(iocb, from);
- 	else
- 		ret = xfs_file_buffered_aio_write(iocb, from);
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 9f28130..adca1d8 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -322,6 +322,7 @@ struct writeback_control;
- #define IOCB_APPEND		(1 << 1)
- #define IOCB_DIRECT		(1 << 2)
- #define IOCB_HIPRI		(1 << 3)
-+#define IOCB_DAX		(1 << 4)
- 
- struct kiocb {
- 	struct file		*ki_filp;
-@@ -2930,9 +2931,15 @@ extern int generic_show_options(struct seq_file *m, struct dentry *root);
- extern void save_mount_options(struct super_block *sb, char *options);
- extern void replace_mount_options(struct super_block *sb, char *options);
- 
--static inline bool io_is_direct(struct file *filp)
-+static inline bool iocb_is_dax(struct kiocb *iocb)
- {
--	return (filp->f_flags & O_DIRECT) || IS_DAX(filp->f_mapping->host);
-+	return IS_DAX(file_inode(iocb->ki_filp)) &&
-+		(iocb->ki_flags & IOCB_DAX);
-+}
-+
-+static inline bool iocb_is_direct(struct kiocb *iocb)
-+{
-+	return iocb->ki_flags & IOCB_DIRECT;
- }
- 
- static inline int iocb_flags(struct file *file)
-@@ -2940,8 +2947,10 @@ static inline int iocb_flags(struct file *file)
- 	int res = 0;
- 	if (file->f_flags & O_APPEND)
- 		res |= IOCB_APPEND;
--	if (io_is_direct(file))
-+	if (file->f_flags & O_DIRECT)
- 		res |= IOCB_DIRECT;
-+	if (IS_DAX(file_inode(file)))
-+		res |= IOCB_DAX;
- 	return res;
- }
- 
-diff --git a/mm/filemap.c b/mm/filemap.c
-index 3effd5c..b959acf 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -1849,7 +1849,7 @@ generic_file_read_iter(struct kiocb *iocb, struct iov_iter *iter)
- 	if (!count)
- 		goto out; /* skip atime */
- 
--	if (iocb->ki_flags & IOCB_DIRECT) {
-+	if (iocb->ki_flags & (IOCB_DIRECT | IOCB_DAX)) {
- 		struct address_space *mapping = file->f_mapping;
- 		struct inode *inode = mapping->host;
- 		loff_t size;
-@@ -2719,7 +2719,7 @@ ssize_t __generic_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
- 	if (err)
- 		goto out;
- 
--	if (iocb->ki_flags & IOCB_DIRECT) {
-+	if (iocb->ki_flags & (IOCB_DIRECT | IOCB_DAX)) {
- 		loff_t pos, endbyte;
- 
- 		written = generic_file_direct_write(iocb, from, iocb->ki_pos);
+The only functional change is iterate_bvec():lib/iov_iter.c
+
+xfstests(-a auto) over loop aio is run for ext4/xfs to verify 
+the change and no regression found with this patchset.
+
+Jens, I am confidant this time, so please give it a go if no one
+objects. I appreciate someone(AI? or anyone) can give a review on
+the patch 4/8 about iterate_bvec() change.
+
+V5:
+	- use bvec's iterator to figure new base vec address and
+	update 'skip' correctly
+	- run xfstests(-a auto) on loop aio/dio for verifying
+	the change in iterate_bvec(), and no regression reported
+	- use stree-ng to trigger heavy swap over swapfile to verify
+	change in iterate_bvec() too, looks everything is fine
+V4:
+	- make xfstests cover xfs
+	- rebase on for-next of block tree
+V3:
+	- include kenrel.h & bug.h in bvec.h for fix comiling failure on arm
+	as reported by 0day ktest
+	- build test on arm & arm64
+
+V2:
+	- rename bvec_iter.h as bvec.h
+	- always include bvec.h into blk_types.h as suggested by Christoph
+
+V1:
+	- don't move BIO_MAX_* to bvec_iter.h as pointed out by Christoph
+	- run xfstests against v4.6-rc1-next-20160329
+	- add Reviewed-by
+	- for 1,4 and 5, Reviewd-by not added, Christoph still expressed
+	'this looks fine to me.'
+
+
+Ming Lei (8):
+  block: move bvec iterator into include/linux/bvec.h
+  block: move two bvec structure into bvec.h
+  block: mark 1st parameter of bvec_iter_advance as const
+  iov_iter: use bvec iterator to implement iterate_bvec()
+  fs: xfs: replace BIO_MAX_SECTORS with BIO_MAX_PAGES
+  block: bio: remove BIO_MAX_SECTORS
+  block: drbd: avoid to use BIO_MAX_SIZE
+  block: bio: remove BIO_MAX_SIZE
+
+ drivers/block/drbd/drbd_int.h |  4 +-
+ fs/xfs/xfs_buf.c              |  4 +-
+ include/linux/bio.h           | 52 -----------------------
+ include/linux/blk_types.h     | 22 +---------
+ include/linux/bvec.h          | 96 +++++++++++++++++++++++++++++++++++++++++++
+ lib/iov_iter.c                | 45 +++++++-------------
+ 6 files changed, 115 insertions(+), 108 deletions(-)
+ create mode 100644 include/linux/bvec.h
+
 -- 
-2.5.5
+1.9.1
 
