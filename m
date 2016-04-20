@@ -1,110 +1,102 @@
-Return-Path: <klimov.linux@gmail.com>
+Return-Path: <vkuznets@redhat.com>
+From: Vitaly Kuznetsov <vkuznets@redhat.com>
+To: Ming Lei <tom.leiming@gmail.com>
+Cc: Keith Busch <keith.busch@intel.com>, linux-block@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>, Dan Williams <dan.j.williams@intel.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Sagi Grimberg <sagig@mellanox.com>, Mike Snitzer <snitzer@redhat.com>,
+        "K. Y. Srinivasan" <kys@microsoft.com>,
+        Cathy Avery <cavery@redhat.com>
+Subject: Re: [PATCH RFC] block: fix bio merge checks when virt_boundary is set
+References: <1458055076-2175-1-git-send-email-vkuznets@redhat.com>
+	<CACVXFVMs-fOaNVUyedg66T83MiOc7a+op3LeHVt6ogVBQnYdeQ@mail.gmail.com>
+	<87oaae4cej.fsf@vitty.brq.redhat.com>
+	<20160316223804.GA6217@localhost.lm.intel.com>
+	<87egb94agz.fsf@vitty.brq.redhat.com>
+	<20160317163946.GC6217@localhost.lm.intel.com>
+	<CACVXFVNrHJcNxcm3+ieOM8f3GzKtTgu38HndWd19ehVDZBev_g@mail.gmail.com>
+	<CACVXFVO37O2Yp60E82U_YWCe2yUqsEn1ojMb6kpTDmhBk94dQA@mail.gmail.com>
+Date: Wed, 20 Apr 2016 15:48:10 +0200
+In-Reply-To: <CACVXFVO37O2Yp60E82U_YWCe2yUqsEn1ojMb6kpTDmhBk94dQA@mail.gmail.com>
+	(Ming Lei's message of "Wed, 30 Mar 2016 21:07:19 +0800")
+Message-ID: <87shyg1jdx.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <x49r3h2ag8y.fsf@segfault.boston.devel.redhat.com>
-References: <1452822371-4967-1-git-send-email-klimov.linux@gmail.com>
-	<x49r3h2ag8y.fsf@segfault.boston.devel.redhat.com>
-Date: Thu, 31 Mar 2016 00:31:58 +0100
-Message-ID: <CALW4P++6YkPidw33i5x1zMoC4VvZ6uJT2=E4EZD_WHztsRZxGQ@mail.gmail.com>
-Subject: Re: [PATCH] elevator: remove second argument in elevator_init()
-From: Alexey Klimov <klimov.linux@gmail.com>
-To: axboe@kernel.dk, linux-block@vger.kernel.org
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Jeff Moyer <jmoyer@redhat.com>,
-	Yury Norov <yury.norov@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-Hi all,
+Ming Lei <tom.leiming@gmail.com> writes:
 
-On Wed, Jan 27, 2016 at 9:01 PM, Jeff Moyer <jmoyer@redhat.com> wrote:
-> Alexey Klimov <klimov.linux@gmail.com> writes:
+> On Fri, Mar 18, 2016 at 10:59 AM, Ming Lei <tom.leiming@gmail.com> wrote:
+>> On Fri, Mar 18, 2016 at 12:39 AM, Keith Busch <keith.busch@intel.com> wrote:
+>>> On Thu, Mar 17, 2016 at 12:20:28PM +0100, Vitaly Kuznetsov wrote:
+>>>> Keith Busch <keith.busch@intel.com> writes:
+>>>> > been combined. In any case, I think you can get what you're after just
+>>>> > by moving the gap check after BIOVEC_PHYS_MERGABLE. Does the following
+>>>> > look ok to you?
+>>>> >
+>>>>
+>>>> Thanks, it does.
+>>>
+>>> Cool, thanks for confirming.
+>>>
+>>>> Will you send it or would you like me to do that with your Suggested-by?
+>>>
+>>> I'm not confident yet this doesn't break anything, particularly since
+>>> we moved the gap check after the length check. Just wanted to confirm
+>>> the concept addressed your concern, but still need to take a closer look
+>>> and test before submitting.
+>>
+>> IMO, the change on blk_bio_segment_split() is correct, because actually it
+>> is a sg gap and the check should have been done between segments
+>> instead of bvecs. So it is reasonable to move the check just before populating
+>> a new segment.
 >
->> Last user of elevator_init() with non-NULL name as second argument
->> that supposed to be s390 dasd driver has gone few releases ago.
->> Drivers rely on elevator_change(), elevator_switch() and friends
->> for example. Right now elevator_init() is always called as
->> elevator_init(q, NULL).
->>
->> Patch removes passing of second name argument and its usage.
->>
->> While we're at it fix following if-check after removed lines. We know
->> that elevator_type e is initialized by NULL and need to check only
->> chosen_elevator.
->>
->> Signed-off-by: Alexey Klimov <klimov.linux@gmail.com>
+> Thinking of the 1st part change further, looks it is just correct in concept,
+> but wrong from current implementation. Because of bios/reqs merge,
+> blk_rq_map_sg() may end one segment in any bvec in theroy, so I guess
+> that is why each non-1st bvec need the check to make sure no sg gap.
+> Looks a very crazy limit, :-)
 >
-> Reviewed-by: Jeff Moyer <jmoyer@redhat.com>
-
-
-what is the status of this patch? Is it that wrong and are there some
-concerns or do I need to resend it?
-
-
-Best regards,
-Alexey
-
-
->> ---
->>  block/blk-core.c         |  2 +-
->>  block/elevator.c         | 10 ++--------
->>  include/linux/elevator.h |  2 +-
->>  3 files changed, 4 insertions(+), 10 deletions(-)
 >>
->> diff --git a/block/blk-core.c b/block/blk-core.c
->> index 33e2f62..f742ef4 100644
->> --- a/block/blk-core.c
->> +++ b/block/blk-core.c
->> @@ -861,7 +861,7 @@ blk_init_allocated_queue(struct request_queue *q, request_fn_proc *rfn,
->>       mutex_lock(&q->sysfs_lock);
->>
->>       /* init elevator */
->> -     if (elevator_init(q, NULL)) {
->> +     if (elevator_init(q)) {
->>               mutex_unlock(&q->sysfs_lock);
->>               goto fail;
->>       }
->> diff --git a/block/elevator.c b/block/elevator.c
->> index c3555c9..ff5c830 100644
->> --- a/block/elevator.c
->> +++ b/block/elevator.c
->> @@ -177,7 +177,7 @@ static void elevator_release(struct kobject *kobj)
->>       kfree(e);
->>  }
->>
->> -int elevator_init(struct request_queue *q, char *name)
->> +int elevator_init(struct request_queue *q)
->>  {
->>       struct elevator_type *e = NULL;
->>       int err;
->> @@ -196,18 +196,12 @@ int elevator_init(struct request_queue *q, char *name)
->>       q->end_sector = 0;
->>       q->boundary_rq = NULL;
->>
->> -     if (name) {
->> -             e = elevator_get(name, true);
->> -             if (!e)
->> -                     return -EINVAL;
->> -     }
->> -
->>       /*
->>        * Use the default elevator specified by config boot param or
->>        * config option.  Don't try to load modules as we could be running
->>        * off async and request_module() isn't allowed from async.
->>        */
->> -     if (!e && *chosen_elevator) {
->> +     if (*chosen_elevator) {
->>               e = elevator_get(chosen_elevator, false);
->>               if (!e)
->>                       printk(KERN_ERR "I/O scheduler %s not found\n",
->> diff --git a/include/linux/elevator.h b/include/linux/elevator.h
->> index 638b324..0ae0efd 100644
->> --- a/include/linux/elevator.h
->> +++ b/include/linux/elevator.h
->> @@ -154,7 +154,7 @@ extern void elv_unregister(struct elevator_type *);
->>  extern ssize_t elv_iosched_show(struct request_queue *, char *);
->>  extern ssize_t elv_iosched_store(struct request_queue *, const char *, size_t);
->>
->> -extern int elevator_init(struct request_queue *, char *);
->> +extern int elevator_init(struct request_queue *);
->>  extern void elevator_exit(struct elevator_queue *);
->>  extern int elevator_change(struct request_queue *, const char *);
->>  extern bool elv_rq_merge_ok(struct request *, struct bio *);
+>> But for the 2nd change in bio_will_gap(), which should fix Vitaly's problem, I
+>> am still not sure if it is completely correct. bio_will_gap() is used
+>> to check if two
+>> bios may be merged. Suppose two bios are continues physically, the last bvec
+>> in 1st bio and the first bvec in 2nd bio might not be in one same segment
+>> because of segment size limit.
+>
+> How about the attached patch?
+>
+
+I just wanted to revive the discussion as the issue persists. I
+re-tested your patch against 4.6-rc4 and it efficiently solves the
+issue.
+
+pre-patch:
+# time mkfs.ntfs /dev/sdb1
+Cluster size has been automatically set to 4096 bytes.
+Initializing device with zeroes: 100% - Done.
+Creating NTFS volume structures.
+mkntfs completed successfully. Have a nice day.
+
+real8m10.977s
+user0m0.115s
+sys0m12.672s
+
+post-patch:
+# time mkfs.ntfs /dev/sdb1
+Cluster size has been automatically set to 4096 bytes.
+Initializing device with zeroes: 100% - Done.
+Creating NTFS volume structures.
+mkntfs completed successfully. Have a nice day.
+
+real0m42.430s
+user0m0.171s
+sys0m7.675s
+
+Will you send this patch? Please let me know if I can further
+assist. Thanks!
+
+-- 
+  Vitaly
