@@ -1,97 +1,129 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-yw0-f194.google.com ([209.85.161.194]:32993 "EHLO
-	mail-yw0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751306AbcDQVav (ORCPT
-	<rfc822;linux-block@vger.kernel.org>);
-	Sun, 17 Apr 2016 17:30:51 -0400
-From: Ming Lei <ming.lei@canonical.com>
-To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-	Al Viro <viro@zeniv.linux.org.uk>,
-	Ming Lei <ming.lei@canonical.com>,
-	drbd-dev@lists.linbit.com (open list:DRBD DRIVER),
-	Jan Kara <jack@suse.cz>, Keith Busch <keith.busch@intel.com>,
-	Kent Overstreet <kent.overstreet@gmail.com>,
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-	Mike Snitzer <snitzer@redhat.com>, Shaohua Li <shli@fb.com>,
-	Tejun Heo <tj@kernel.org>,
-	xfs@oss.sgi.com (open list:XFS FILESYSTEM)
-Subject: [PATCH v5 0/8] block: prepare for multipage bvecs
-Date: Mon, 18 Apr 2016 05:29:49 +0800
-Message-Id: <1460928615-20894-1-git-send-email-ming.lei@canonical.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCHSET v5] Make background writeback great again for the first
+ time
+To: Jan Kara <jack@suse.cz>
+References: <1461686131-22999-1-git-send-email-axboe@fb.com>
+ <20160427180105.GA17362@quack2.suse.cz> <5721021E.8060006@fb.com>
+ <20160427203708.GA25397@kernel.dk> <20160427205915.GC25397@kernel.dk>
+ <20160428115401.GD17362@quack2.suse.cz>
+Cc: linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ linux-block@vger.kernel.org, dchinner@redhat.com, sedat.dilek@gmail.com
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <57225A91.50002@kernel.dk>
+Date: Thu, 28 Apr 2016 12:46:41 -0600
+MIME-Version: 1.0
+In-Reply-To: <20160428115401.GD17362@quack2.suse.cz>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+List-ID: <linux-block@vger.kernel.org>
 
-Hi,
+On 04/28/2016 05:54 AM, Jan Kara wrote:
+> On Wed 27-04-16 14:59:15, Jens Axboe wrote:
+>> On Wed, Apr 27 2016, Jens Axboe wrote:
+>>> On Wed, Apr 27 2016, Jens Axboe wrote:
+>>>> On 04/27/2016 12:01 PM, Jan Kara wrote:
+>>>>> Hi,
+>>>>>
+>>>>> On Tue 26-04-16 09:55:23, Jens Axboe wrote:
+>>>>>> Since the dawn of time, our background buffered writeback has sucked.
+>>>>>> When we do background buffered writeback, it should have little impact
+>>>>>> on foreground activity. That's the definition of background activity...
+>>>>>> But for as long as I can remember, heavy buffered writers have not
+>>>>>> behaved like that. For instance, if I do something like this:
+>>>>>>
+>>>>>> $ dd if=/dev/zero of=foo bs=1M count=10k
+>>>>>>
+>>>>>> on my laptop, and then try and start chrome, it basically won't start
+>>>>>> before the buffered writeback is done. Or, for server oriented
+>>>>>> workloads, where installation of a big RPM (or similar) adversely
+>>>>>> impacts database reads or sync writes. When that happens, I get people
+>>>>>> yelling at me.
+>>>>>>
+>>>>>> I have posted plenty of results previously, I'll keep it shorter
+>>>>>> this time. Here's a run on my laptop, using read-to-pipe-async for
+>>>>>> reading a 5g file, and rewriting it. You can find this test program
+>>>>>> in the fio git repo.
+>>>>>
+>>>>> I have tested your patchset on my test system. Generally I have observed
+>>>>> noticeable drop in average throughput for heavy background writes without
+>>>>> any other disk activity and also somewhat increased variance in the
+>>>>> runtimes. It is most visible on this simple testcases:
+>>>>>
+>>>>> dd if=/dev/zero of=/mnt/file bs=1M count=10000
+>>>>>
+>>>>> and
+>>>>>
+>>>>> dd if=/dev/zero of=/mnt/file bs=1M count=10000 conv=fsync
+>>>>>
+>>>>> The machine has 4GB of ram, /mnt is an ext3 filesystem that is freshly
+>>>>> created before each dd run on a dedicated disk.
+>>>>>
+>>>>> Without your patches I get pretty stable dd runtimes for both cases:
+>>>>>
+>>>>> dd if=/dev/zero of=/mnt/file bs=1M count=10000
+>>>>> Runtimes: 87.9611 87.3279 87.2554
+>>>>>
+>>>>> dd if=/dev/zero of=/mnt/file bs=1M count=10000 conv=fsync
+>>>>> Runtimes: 93.3502 93.2086 93.541
+>>>>>
+>>>>> With your patches the numbers look like:
+>>>>>
+>>>>> dd if=/dev/zero of=/mnt/file bs=1M count=10000
+>>>>> Runtimes: 108.183, 97.184, 99.9587
+>>>>>
+>>>>> dd if=/dev/zero of=/mnt/file bs=1M count=10000 conv=fsync
+>>>>> Runtimes: 104.9, 102.775, 102.892
+>>>>>
+>>>>> I have checked whether the variance is due to some interaction with CFQ
+>>>>> which is used for the disk. When I switched the disk to deadline, I still
+>>>>> get some variance although, the throughput is still ~10% lower:
+>>>>>
+>>>>> dd if=/dev/zero of=/mnt/file bs=1M count=10000
+>>>>> Runtimes: 100.417 100.643 100.866
+>>>>>
+>>>>> dd if=/dev/zero of=/mnt/file bs=1M count=10000 conv=fsync
+>>>>> Runtimes: 104.208 106.341 105.483
+>>>>>
+>>>>> The disk is rotational SATA drive with writeback cache, queue depth of the
+>>>>> disk reported in /sys/block/sdb/device/queue_depth is 1.
+>>>>>
+>>>>> So I think we still need some tweaking on the low end of the storage
+>>>>> spectrum so that we don't lose 10% of throughput for simple cases like
+>>>>> this.
+>>>>
+>>>> Thanks for testing, Jan! I haven't tried old QD=1 SATA. I wonder if
+>>>> you are seeing smaller requests, and that is why it both varies and
+>>>> you get lower throughput? I'll try and setup a test here similar to
+>>>> yours.
+>>>
+>>> Jan, care to try the below patch? I can't fully reproduce your issue on
+>>> a SCSI disk limited to QD=1, but I have a feeling this might help. It's
+>>> a bit of a hack, but the general idea is to allow one more request to
+>>> build up for QD=1 devices. That eliminates wait time between one request
+>>> finishing, and the next being submitted.
+>>
+>> That accidentally added a potentially stall, this one is both cleaner
+>> and should have that fixed.
+>>
+> ..
+>> -	rwb->wb_max = 1 + ((depth - 1) >> min(31U, rwb->scale_step));
+>> -	rwb->wb_normal = (rwb->wb_max + 1) / 2;
+>> -	rwb->wb_background = (rwb->wb_max + 3) / 4;
+>> +	if (rwb->queue_depth == 1) {
+>> +		rwb->wb_max = rwb->wb_normal = 2;
+>> +		rwb->wb_background = 1;
+>
+> This breaks the detection of too big scale_step in scale_up() where we key
+> of wb_max == 1 value. However even with that fixed no luck :(:
 
-Interests[1] have been shown in multipage bvecs, so this patchset
-try to prepare for the support and do two things:
+Yeah, I need to look at that. For QD=1, I think the only sensible values 
+for max/normal/bg is 2/2/1 and 1/1/1 if we step down.
 
-1) the 1st 4 patches use bvec iterator to implement iterate_bvec(),
-then we can drop the non-standard way for iterating bvec, which
-can be thought as a good cleanup for lib/iov_iter.c
+> dd if=/dev/zero of=/mnt/file bs=1M count=10000 conv=fsync
+> Runtime: 105.126 107.125 105.641
+>
+> So about the same as before. I'll try to debug this later today...
 
-2) remove BIO_MAX_SECTORS & BIO_MAX_SIZE, and now there is only
-one user for each. Once multipage bvecs is introduced, one bio
-may hold lots of sectors, and we should always use sort of BIO_MAX_VECS
-which should be introduced in future and is similiar with current
-BIO_MAX_PAGES.
-
-The only functional change is iterate_bvec():lib/iov_iter.c
-
-xfstests(-a auto) over loop aio is run for ext4/xfs to verify 
-the change and no regression found with this patchset.
-
-Jens, I am confidant this time, so please give it a go if no one
-objects. I appreciate someone(AI? or anyone) can give a review on
-the patch 4/8 about iterate_bvec() change.
-
-V5:
-	- use bvec's iterator to figure new base vec address and
-	update 'skip' correctly
-	- run xfstests(-a auto) on loop aio/dio for verifying
-	the change in iterate_bvec(), and no regression reported
-	- use stree-ng to trigger heavy swap over swapfile to verify
-	change in iterate_bvec() too, looks everything is fine
-V4:
-	- make xfstests cover xfs
-	- rebase on for-next of block tree
-V3:
-	- include kenrel.h & bug.h in bvec.h for fix comiling failure on arm
-	as reported by 0day ktest
-	- build test on arm & arm64
-
-V2:
-	- rename bvec_iter.h as bvec.h
-	- always include bvec.h into blk_types.h as suggested by Christoph
-
-V1:
-	- don't move BIO_MAX_* to bvec_iter.h as pointed out by Christoph
-	- run xfstests against v4.6-rc1-next-20160329
-	- add Reviewed-by
-	- for 1,4 and 5, Reviewd-by not added, Christoph still expressed
-	'this looks fine to me.'
-
-
-Ming Lei (8):
-  block: move bvec iterator into include/linux/bvec.h
-  block: move two bvec structure into bvec.h
-  block: mark 1st parameter of bvec_iter_advance as const
-  iov_iter: use bvec iterator to implement iterate_bvec()
-  fs: xfs: replace BIO_MAX_SECTORS with BIO_MAX_PAGES
-  block: bio: remove BIO_MAX_SECTORS
-  block: drbd: avoid to use BIO_MAX_SIZE
-  block: bio: remove BIO_MAX_SIZE
-
- drivers/block/drbd/drbd_int.h |  4 +-
- fs/xfs/xfs_buf.c              |  4 +-
- include/linux/bio.h           | 52 -----------------------
- include/linux/blk_types.h     | 22 +---------
- include/linux/bvec.h          | 96 +++++++++++++++++++++++++++++++++++++++++++
- lib/iov_iter.c                | 45 +++++++-------------
- 6 files changed, 115 insertions(+), 108 deletions(-)
- create mode 100644 include/linux/bvec.h
+Thanks, I'm very interested in what you find!
 
 -- 
-1.9.1
-
+Jens Axboe
