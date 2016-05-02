@@ -1,57 +1,70 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-Date: Thu, 5 May 2016 07:24:33 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Boaz Harrosh <boaz@plexistor.com>
-Cc: Vishal Verma <vishal.l.verma@intel.com>, linux-nvdimm@ml01.01.org,
-	Jens Axboe <axboe@fb.com>, Jan Kara <jack@suse.cz>,
-	Andrew Morton <akpm@linux-foundation.org>,
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f46.google.com ([74.125.82.46]:37757 "EHLO
+	mail-wm0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754677AbcEBTWO (ORCPT
+	<rfc822;linux-block@vger.kernel.org>); Mon, 2 May 2016 15:22:14 -0400
+Received: by mail-wm0-f46.google.com with SMTP id a17so2462851wme.0
+        for <linux-block@vger.kernel.org>; Mon, 02 May 2016 12:22:13 -0700 (PDT)
+Message-ID: <5727A8E2.8000507@plexistor.com>
+Date: Mon, 02 May 2016 22:22:10 +0300
+From: Boaz Harrosh <boaz@plexistor.com>
+MIME-Version: 1.0
+To: Dan Williams <dan.j.williams@intel.com>
+CC: Vishal Verma <vishal.l.verma@intel.com>,
+	"linux-nvdimm@lists.01.org" <linux-nvdimm@lists.01.org>,
+	linux-block@vger.kernel.org, Jan Kara <jack@suse.cz>,
 	Matthew Wilcox <matthew@wil.cx>,
 	Dave Chinner <david@fromorbit.com>,
-	linux-kernel@vger.kernel.org, xfs@oss.sgi.com,
-	linux-block@vger.kernel.org, linux-mm@kvack.org,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	XFS Developers <xfs@oss.sgi.com>, Jens Axboe <axboe@fb.com>,
+	Linux MM <linux-mm@kvack.org>,
 	Al Viro <viro@zeniv.linux.org.uk>,
 	Christoph Hellwig <hch@infradead.org>,
-	linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org
+	linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-ext4 <linux-ext4@vger.kernel.org>
 Subject: Re: [PATCH v4 5/7] fs: prioritize and separate direct_io from dax_io
-Message-ID: <20160505142433.GA4557@infradead.org>
-References: <1461878218-3844-1-git-send-email-vishal.l.verma@intel.com>
- <1461878218-3844-6-git-send-email-vishal.l.verma@intel.com>
- <5727753F.6090104@plexistor.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <5727753F.6090104@plexistor.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+References: <1461878218-3844-1-git-send-email-vishal.l.verma@intel.com>	<1461878218-3844-6-git-send-email-vishal.l.verma@intel.com>	<5727753F.6090104@plexistor.com>	<CAPcyv4jWPTDbbw6uMFEEt2Kazgw+wb5Pfwroej--uQPE+AtUbA@mail.gmail.com>	<57277EDA.9000803@plexistor.com>	<CAPcyv4jnz69a3S+XZgLaLojHZmpfoVXGDkJkt_1Q=8kk0gik9w@mail.gmail.com>	<572791E1.7000103@plexistor.com>	<CAPcyv4hGV07gpADT32xn=3brEq75P4RJA592vp-1A+jXMQCeOQ@mail.gmail.com>	<57279D57.5020800@plexistor.com> <CAPcyv4i3QteM508fVams8DxzoPTo5AXT6RQQ4=gR-iAN-B4-6g@mail.gmail.com>
+In-Reply-To: <CAPcyv4i3QteM508fVams8DxzoPTo5AXT6RQQ4=gR-iAN-B4-6g@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Mon, May 02, 2016 at 06:41:51PM +0300, Boaz Harrosh wrote:
-> > All IO in a dax filesystem used to go through dax_do_io, which cannot
-> > handle media errors, and thus cannot provide a recovery path that can
-> > send a write through the driver to clear errors.
-> > 
-> > Add a new iocb flag for DAX, and set it only for DAX mounts. In the IO
-> > path for DAX filesystems, use the same direct_IO path for both DAX and
-> > direct_io iocbs, but use the flags to identify when we are in O_DIRECT
-> > mode vs non O_DIRECT with DAX, and for O_DIRECT, use the conventional
-> > direct_IO path instead of DAX.
-> > 
+On 05/02/2016 09:48 PM, Dan Williams wrote:
+<>
+>> And then it keeps broken the aligned buffered writes, which are still
+>> broken after this set.
 > 
-> Really? What are your thinking here?
+> ...identical to the current situation with a traditional disk.
 > 
-> What about all the current users of O_DIRECT, you have just made them
-> 4 times slower and "less concurrent*" then "buffred io" users. Since
-> direct_IO path will queue an IO request and all.
-> (And if it is not so slow then why do we need dax_do_io at all? [Rhetorical])
+
+Not true!! please see what I wrote "aligned buffered writes"
+If there are no reads involved then there are no errors returned
+to application.
+
+>> I have by now read the v2 patches. And I think you guys did not yet try
+>> the proper fix for dax_do_io. I think you need to go deeper into the loops
+>> and selectively call bdev_* when error on a specific page copy. No need to
+>> go through direct_IO path at all.
 > 
-> I hate it that you overload the semantics of a known and expected
-> O_DIRECT flag, for special pmem quirks. This is an incompatible
-> and unrelated overload of the semantics of O_DIRECT.
+> We still reach a point where the minimum granularity of
+> bdev_direct_access() is larger than a sector, so you end up still
+> needing to have the application understand how to send a properly
+> aligned I/O.  The semantics of how to send a properly aligned
+> direct-I/O are already well understood, so we simply reuse that path.
+> 
 
-Agreed - makig O_DIRECT less direct than not having it is plain stupid,
-and I somehow missed this initially.
+You are making a mountain out of a mouse. The simple copy of a file
+from start (offset ZERO) to end-of-file which is the most common usage
+on earth is perfectly aligned and needs not any O_DIRECT and is what is used
+everywhere.
 
-This whole DAX story turns into a major nightmare, and I fear all our
-hodge podge tweaks to the semantics aren't helping it.
+>> Do you need that I send you a patch to demonstrate what I mean?
+> 
+> I remain skeptical of what you are proposing, but yes, a patch has a
+> better chance to move the discussion forward.
+> 
 
-It seems like we simply need an explicit O_DAX for the read/write
-bypass if can't sort out the semantics (error, writer synchronization)
-just as we need a special flag for MMAP..
+Sigh! OK
+Boaz
+
