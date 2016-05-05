@@ -1,14 +1,12 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.9]:45350 "EHLO
-	bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750722AbcEHJBQ (ORCPT
-	<rfc822;linux-block@vger.kernel.org>); Sun, 8 May 2016 05:01:16 -0400
-Date: Sun, 8 May 2016 02:01:15 -0700
-From: "hch@infradead.org" <hch@infradead.org>
-To: "Verma, Vishal L" <vishal.l.verma@intel.com>
-Cc: "Williams, Dan J" <dan.j.williams@intel.com>,
-	"hch@infradead.org" <hch@infradead.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+Received: from mga09.intel.com ([134.134.136.24]:16008 "EHLO mga09.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1756390AbcEEVpK (ORCPT <rfc822;linux-block@vger.kernel.org>);
+	Thu, 5 May 2016 17:45:10 -0400
+From: "Verma, Vishal L" <vishal.l.verma@intel.com>
+To: "Williams, Dan J" <dan.j.williams@intel.com>,
+	"hch@infradead.org" <hch@infradead.org>
+CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
 	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
 	"xfs@oss.sgi.com" <xfs@oss.sgi.com>,
 	"linux-nvdimm@ml01.01.org" <linux-nvdimm@ml01.01.org>,
@@ -21,28 +19,46 @@ Cc: "Williams, Dan J" <dan.j.williams@intel.com>,
 	"david@fromorbit.com" <david@fromorbit.com>,
 	"jack@suse.cz" <jack@suse.cz>, "matthew@wil.cx" <matthew@wil.cx>
 Subject: Re: [PATCH v4 5/7] fs: prioritize and separate direct_io from dax_io
-Message-ID: <20160508090115.GE15458@infradead.org>
+Date: Thu, 5 May 2016 21:45:07 +0000
+Message-ID: <1462484695.29294.7.camel@intel.com>
 References: <1461878218-3844-1-git-send-email-vishal.l.verma@intel.com>
- <1461878218-3844-6-git-send-email-vishal.l.verma@intel.com>
- <5727753F.6090104@plexistor.com>
- <20160505142433.GA4557@infradead.org>
- <CAPcyv4gdmo5m=Arf5sp5izJfNaaAkaaMbOzud8KRcBEC8RRu1Q@mail.gmail.com>
- <20160505152230.GA3994@infradead.org>
- <1462484695.29294.7.camel@intel.com>
+	 <1461878218-3844-6-git-send-email-vishal.l.verma@intel.com>
+	 <5727753F.6090104@plexistor.com> <20160505142433.GA4557@infradead.org>
+	 <CAPcyv4gdmo5m=Arf5sp5izJfNaaAkaaMbOzud8KRcBEC8RRu1Q@mail.gmail.com>
+	 <20160505152230.GA3994@infradead.org>
+In-Reply-To: <20160505152230.GA3994@infradead.org>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1462484695.29294.7.camel@intel.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Thu, May 05, 2016 at 09:45:07PM +0000, Verma, Vishal L wrote:
-> I'm not sure I completely understand how this will work? Can you explain
-> a bit? Would we have to export rw_bytes up to layers above the pmem
-> driver? Where does get_user_pages come in?
-
-A DAX filesystem can directly use the nvdimm layer the same way btt
-doe,s what's the problem?
-
-Re get_user_pages my idea was to simply use that to lock down the user
-pages so that we can call rw_bytes on it.  How else would you do it?  Do
-a kmalloc, copy_from_user and then another memcpy?
+T24gVGh1LCAyMDE2LTA1LTA1IGF0IDA4OjIyIC0wNzAwLCBDaHJpc3RvcGggSGVsbHdpZyB3cm90
+ZToNCj4gT24gVGh1LCBNYXkgMDUsIDIwMTYgYXQgMDg6MTU6MzJBTSAtMDcwMCwgRGFuIFdpbGxp
+YW1zIHdyb3RlOg0KPiA+IA0KPiA+ID4gDQo+ID4gPiBBZ3JlZWQgLSBtYWtpZyBPX0RJUkVDVCBs
+ZXNzIGRpcmVjdCB0aGFuIG5vdCBoYXZpbmcgaXQgaXMgcGxhaW4NCj4gPiA+IHN0dXBpZCwNCj4g
+PiA+IGFuZCBJIHNvbWVob3cgbWlzc2VkIHRoaXMgaW5pdGlhbGx5Lg0KPiA+IE9mIGNvdXJzZSBJ
+IGRpc2FncmVlIGJlY2F1c2UgbGlrZSBEYXZlIGFyZ3VlcyBpbiB0aGUgbXN5bmMgY2FzZSB3ZQ0K
+PiA+IHNob3VsZCBkbyB0aGUgY29ycmVjdCB0aGluZyBmaXJzdCBhbmQgbWFrZSBpdCBmYXN0IGxh
+dGVyLCBidXQgYWxzbw0KPiA+IGxpa2UgRGF2ZSB0aGlzIGFyZ3VpbmcgaW4gY2lyY2xlcyBpcyBn
+ZXR0aW5nIHRpcmVzb21lLg0KPiBXZSBzaG91bGQgZG8gdGhlIHJpZ2h0IHRoaW5nIGZpcnN0LCBh
+bmQgbWFrZSBpdCBmYXN0IGxhdGVyLsKgwqBCdXQgdGhpcw0KPiBwcm9wb3NhbCBpcyBub3QgZ2V0
+dGluZyBpdCByaWdodCAtIGl0IHN0aWxsIGRvZXMgbm90IGhhbmRsZSBlcnJvcnMNCj4gZm9yIHRo
+ZSBmYXN0IHBhdGgsIGJ1dCBtYWdpY2FsbHkgbWFrZXMgaXQgd29yayBmb3IgZGlyZWN0IEkvTyBi
+eQ0KPiBpbiBnZW5lcmFsIHVzaW5nIGEgbGVzcyBvcHRpb25hbCBwYXRoIGZvciBPX0RJUkVDVC7C
+oMKgSXQncyBnZXR0aW5nIHRoZQ0KPiB3b3JzdCBvZiBhbGwgY2hvaWNlcy4NCj4gDQo+IEFzIGZh
+ciBhcyBJIGNhbiB0ZWxsIHRoZSBvbmx5IHNlbnNpYmxlIG9wdGlvbiBpcyB0bzoNCj4gDQo+IMKg
+LSBhbHdheXMgdHJ5IGRheC1saWtlIEkvTyBmaXJzdA0KPiDCoC0gaGF2ZSBhIGN1c3RvbSBnZXRf
+dXNlcl9wYWdlcyArIHJ3X2J5dGVzIGZhbGxiYWNrIGhhbmRsZXMgYmFkIGJsb2Nrcw0KPiDCoMKg
+wqB3aGVuIGhpdHRpbmcgRUlPDQoNCkknbSBub3Qgc3VyZSBJIGNvbXBsZXRlbHkgdW5kZXJzdGFu
+ZCBob3cgdGhpcyB3aWxsIHdvcms/IENhbiB5b3UgZXhwbGFpbg0KYSBiaXQ/IFdvdWxkIHdlIGhh
+dmUgdG8gZXhwb3J0IHJ3X2J5dGVzIHVwIHRvIGxheWVycyBhYm92ZSB0aGUgcG1lbQ0KZHJpdmVy
+PyBXaGVyZSBkb2VzIGdldF91c2VyX3BhZ2VzIGNvbWUgaW4/DQoNCj4gDQo+IEFuZCB0aGVuIHdl
+IG5lZWQgdG8gc29ydCBvdXQgdGhlIGNvbmN1cnJlbnQgd3JpdGUgc3luY2hyb25pemF0aW9uLg0K
+PiBBZ2FpbiB0aGVyZSBJIHRoaW5rIHdlIGFic29sdXRlbHkgaGF2ZSB0byBvYmV5IFBvc2l4IGZv
+ciB0aGUgIU9fRElSRUNUDQo+IGNhc2UgYW5kIGNhbiBhdm9pZCBpdCBmb3IgT19ESVJFQ1QsIHNp
+bWlsYXIgdG8gdGhlIGV4aXN0aW5nIG5vbi1EQVgNCj4gc2VtYW50aWNzLsKgwqBJZiB3ZSB3YW50
+IGFueSBzcGVjaWFsIGFkZGl0aW9uYWwgc2VtYW50aWNzIHdlIF93aWxsXyBuZWVkDQo+IGEgc3Bl
+Y2lhbCBPX0RBWCBmbGFnLg0KPiBfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fXw0KPiBMaW51eC1udmRpbW0gbWFpbGluZyBsaXN0DQo+IExpbnV4LW52ZGltbUBs
+aXN0cy4wMS5vcmcNCj4gaHR0cHM6Ly9saXN0cy4wMS5vcmcvbWFpbG1hbi9saXN0aW5mby9saW51
+eC1udmRpbW0=
