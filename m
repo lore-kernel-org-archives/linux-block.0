@@ -1,61 +1,70 @@
 Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: "Verma, Vishal L" <vishal.l.verma@intel.com>
-To: "hch@infradead.org" <hch@infradead.org>,
-	"boaz@plexistor.com" <boaz@plexistor.com>
-CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-nvdimm@ml01.01.org" <linux-nvdimm@ml01.01.org>,
-	"xfs@oss.sgi.com" <xfs@oss.sgi.com>,
-	"linux-mm@kvack.org" <linux-mm@kvack.org>,
-	"viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-	"axboe@fb.com" <axboe@fb.com>,
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-	"linux-ext4@vger.kernel.org" <linux-ext4@vger.kernel.org>,
-	"david@fromorbit.com" <david@fromorbit.com>,
-	"jack@suse.cz" <jack@suse.cz>, "matthew@wil.cx" <matthew@wil.cx>
-Subject: Re: [PATCH v4 5/7] fs: prioritize and separate direct_io from dax_io
-Date: Thu, 5 May 2016 21:39:14 +0000
-Message-ID: <1462484343.29294.1.camel@intel.com>
-References: <1461878218-3844-1-git-send-email-vishal.l.verma@intel.com>
-	 <1461878218-3844-6-git-send-email-vishal.l.verma@intel.com>
-	 <5727753F.6090104@plexistor.com> <20160505142433.GA4557@infradead.org>
-In-Reply-To: <20160505142433.GA4557@infradead.org>
-Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
+In-Reply-To: <20160505152230.GA3994@infradead.org>
+References: <1461878218-3844-1-git-send-email-vishal.l.verma@intel.com>
+	<1461878218-3844-6-git-send-email-vishal.l.verma@intel.com>
+	<5727753F.6090104@plexistor.com>
+	<20160505142433.GA4557@infradead.org>
+	<CAPcyv4gdmo5m=Arf5sp5izJfNaaAkaaMbOzud8KRcBEC8RRu1Q@mail.gmail.com>
+	<20160505152230.GA3994@infradead.org>
+Date: Thu, 5 May 2016 09:24:20 -0700
+Message-ID: <CAPcyv4i1wRv56C=0uAz83ANZL=zv-LpbTuSPnMFo7baZXwWSLg@mail.gmail.com>
+Subject: Re: [PATCH v4 5/7] fs: prioritize and separate direct_io from dax_io
+From: Dan Williams <dan.j.williams@intel.com>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Boaz Harrosh <boaz@plexistor.com>, linux-block@vger.kernel.org,
+	linux-ext4 <linux-ext4@vger.kernel.org>, Jan Kara <jack@suse.cz>,
+	Matthew Wilcox <matthew@wil.cx>,
+	Dave Chinner <david@fromorbit.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	XFS Developers <xfs@oss.sgi.com>, Jens Axboe <axboe@fb.com>,
+	Linux MM <linux-mm@kvack.org>,
+	Al Viro <viro@zeniv.linux.org.uk>,
+	linux-nvdimm <linux-nvdimm@ml01.01.org>,
+	linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-T24gVGh1LCAyMDE2LTA1LTA1IGF0IDA3OjI0IC0wNzAwLCBDaHJpc3RvcGggSGVsbHdpZyB3cm90
-ZToNCj4gT24gTW9uLCBNYXkgMDIsIDIwMTYgYXQgMDY6NDE6NTFQTSArMDMwMCwgQm9heiBIYXJy
-b3NoIHdyb3RlOg0KPiA+IA0KPiA+ID4gDQo+ID4gPiBBbGwgSU8gaW4gYSBkYXggZmlsZXN5c3Rl
-bSB1c2VkIHRvIGdvIHRocm91Z2ggZGF4X2RvX2lvLCB3aGljaA0KPiA+ID4gY2Fubm90DQo+ID4g
-PiBoYW5kbGUgbWVkaWEgZXJyb3JzLCBhbmQgdGh1cyBjYW5ub3QgcHJvdmlkZSBhIHJlY292ZXJ5
-IHBhdGggdGhhdA0KPiA+ID4gY2FuDQo+ID4gPiBzZW5kIGEgd3JpdGUgdGhyb3VnaCB0aGUgZHJp
-dmVyIHRvIGNsZWFyIGVycm9ycy4NCj4gPiA+IA0KPiA+ID4gQWRkIGEgbmV3IGlvY2IgZmxhZyBm
-b3IgREFYLCBhbmQgc2V0IGl0IG9ubHkgZm9yIERBWCBtb3VudHMuIEluDQo+ID4gPiB0aGUgSU8N
-Cj4gPiA+IHBhdGggZm9yIERBWCBmaWxlc3lzdGVtcywgdXNlIHRoZSBzYW1lIGRpcmVjdF9JTyBw
-YXRoIGZvciBib3RoIERBWA0KPiA+ID4gYW5kDQo+ID4gPiBkaXJlY3RfaW8gaW9jYnMsIGJ1dCB1
-c2UgdGhlIGZsYWdzIHRvIGlkZW50aWZ5IHdoZW4gd2UgYXJlIGluDQo+ID4gPiBPX0RJUkVDVA0K
-PiA+ID4gbW9kZSB2cyBub24gT19ESVJFQ1Qgd2l0aCBEQVgsIGFuZCBmb3IgT19ESVJFQ1QsIHVz
-ZSB0aGUNCj4gPiA+IGNvbnZlbnRpb25hbA0KPiA+ID4gZGlyZWN0X0lPIHBhdGggaW5zdGVhZCBv
-ZiBEQVguDQo+ID4gPiANCj4gPiBSZWFsbHk/IFdoYXQgYXJlIHlvdXIgdGhpbmtpbmcgaGVyZT8N
-Cj4gPiANCj4gPiBXaGF0IGFib3V0IGFsbCB0aGUgY3VycmVudCB1c2VycyBvZiBPX0RJUkVDVCwg
-eW91IGhhdmUganVzdCBtYWRlDQo+ID4gdGhlbQ0KPiA+IDQgdGltZXMgc2xvd2VyIGFuZCAibGVz
-cyBjb25jdXJyZW50KiIgdGhlbiAiYnVmZnJlZCBpbyIgdXNlcnMuIFNpbmNlDQo+ID4gZGlyZWN0
-X0lPIHBhdGggd2lsbCBxdWV1ZSBhbiBJTyByZXF1ZXN0IGFuZCBhbGwuDQo+ID4gKEFuZCBpZiBp
-dCBpcyBub3Qgc28gc2xvdyB0aGVuIHdoeSBkbyB3ZSBuZWVkIGRheF9kb19pbyBhdCBhbGw/DQo+
-ID4gW1JoZXRvcmljYWxdKQ0KPiA+IA0KPiA+IEkgaGF0ZSBpdCB0aGF0IHlvdSBvdmVybG9hZCB0
-aGUgc2VtYW50aWNzIG9mIGEga25vd24gYW5kIGV4cGVjdGVkDQo+ID4gT19ESVJFQ1QgZmxhZywg
-Zm9yIHNwZWNpYWwgcG1lbSBxdWlya3MuIFRoaXMgaXMgYW4gaW5jb21wYXRpYmxlDQo+ID4gYW5k
-IHVucmVsYXRlZCBvdmVybG9hZCBvZiB0aGUgc2VtYW50aWNzIG9mIE9fRElSRUNULg0KPiBBZ3Jl
-ZWQgLSBtYWtpZyBPX0RJUkVDVCBsZXNzIGRpcmVjdCB0aGFuIG5vdCBoYXZpbmcgaXQgaXMgcGxh
-aW4NCj4gc3R1cGlkLA0KPiBhbmQgSSBzb21laG93IG1pc3NlZCB0aGlzIGluaXRpYWxseS4NCg0K
-SG93IGlzIGl0IGFueSAnbGVzcyBkaXJlY3QnPyBBbGwgaXQgZG9lcyBub3cgaXMgZm9sbG93IHRo
-ZSBibG9ja2Rldg0KT19ESVJFQ1QgcGF0aC4gVGhlcmUgc3RpbGwgaXNuJ3QgYW55IHBhZ2UgY2Fj
-aGUgaW52b2x2ZWQuLg0KDQo+IA0KPiBUaGlzIHdob2xlIERBWCBzdG9yeSB0dXJucyBpbnRvIGEg
-bWFqb3IgbmlnaHRtYXJlLCBhbmQgSSBmZWFyIGFsbCBvdXINCj4gaG9kZ2UgcG9kZ2UgdHdlYWtz
-IHRvIHRoZSBzZW1hbnRpY3MgYXJlbid0IGhlbHBpbmcgaXQuDQo+IA0KPiBJdCBzZWVtcyBsaWtl
-IHdlIHNpbXBseSBuZWVkIGFuIGV4cGxpY2l0IE9fREFYIGZvciB0aGUgcmVhZC93cml0ZQ0KPiBi
-eXBhc3MgaWYgY2FuJ3Qgc29ydCBvdXQgdGhlIHNlbWFudGljcyAoZXJyb3IsIHdyaXRlciBzeW5j
-aHJvbml6YXRpb24pDQo+IGp1c3QgYXMgd2UgbmVlZCBhIHNwZWNpYWwgZmxhZyBmb3IgTU1BUC4u
+On Thu, May 5, 2016 at 8:22 AM, Christoph Hellwig <hch@infradead.org> wrote:
+> On Thu, May 05, 2016 at 08:15:32AM -0700, Dan Williams wrote:
+>> > Agreed - makig O_DIRECT less direct than not having it is plain stupid,
+>> > and I somehow missed this initially.
+>>
+>> Of course I disagree because like Dave argues in the msync case we
+>> should do the correct thing first and make it fast later, but also
+>> like Dave this arguing in circles is getting tiresome.
+>
+> We should do the right thing first, and make it fast later.  But this
+> proposal is not getting it right - it still does not handle errors
+> for the fast path, but magically makes it work for direct I/O by
+> in general using a less optional path for O_DIRECT.  It's getting the
+> worst of all choices.
+>
+> As far as I can tell the only sensible option is to:
+>
+>  - always try dax-like I/O first
+>  - have a custom get_user_pages + rw_bytes fallback handles bad blocks
+>    when hitting EIO
+
+If you're on board with more special fallbacks for dax-capable block
+devices that indeed opens up the thinking.  The O_DIRECT approach was
+meant to keep the error clearing model close to the traditional block
+device case, but yes that does constrain the implementation in
+sub-optimal ways.
+
+However, we still have the alignment problem in the rw_bytes case, how
+do we communicate to the application that only writes with a certain
+size/alignment will clear errors?  That forced alignment assumption
+was the other appeal of O_DIRECT.  Perhaps we can at least start with
+hole punching and block reallocation as the error clearing method
+while we think more about the write-to-clear case?
+
+> And then we need to sort out the concurrent write synchronization.
+> Again there I think we absolutely have to obey Posix for the !O_DIRECT
+> case and can avoid it for O_DIRECT, similar to the existing non-DAX
+> semantics.  If we want any special additional semantics we _will_ need
+> a special O_DAX flag.
+
+Ok, makes sense.
