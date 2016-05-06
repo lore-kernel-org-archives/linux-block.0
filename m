@@ -1,38 +1,52 @@
-Return-Path: <jmoyer@redhat.com>
-From: Jeff Moyer <jmoyer@redhat.com>
-To: Paolo Valente <paolo.valente@linaro.org>
-Cc: Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        ulf.hansson@linaro.org, linus.walleij@linaro.org, broonie@kernel.org,
-        stable@vger.kernel.org
-Subject: Re: [PATCH BUGFIX] block: add missing group association in bio_split
-References: <1462567512-3007-1-git-send-email-paolo.valente@linaro.org>
-Date: Mon, 09 May 2016 10:19:33 -0400
-In-Reply-To: <1462567512-3007-1-git-send-email-paolo.valente@linaro.org>
-	(Paolo Valente's message of "Fri, 6 May 2016 22:45:12 +0200")
-Message-ID: <x49bn4f71qi.fsf@segfault.boston.devel.redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Return-Path: <paolo.valente@linaro.org>
+From: Paolo Valente <paolo.valente@linaro.org>
+To: Jens Axboe <axboe@kernel.dk>,
+	Tejun Heo <tj@kernel.org>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ulf.hansson@linaro.org,
+	linus.walleij@linaro.org,
+	broonie@kernel.org,
+	stable@vger.kernel.org,
+	Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH BUGFIX] block: add missing group association in bio_split
+Date: Fri,  6 May 2016 22:45:12 +0200
+Message-Id: <1462567512-3007-1-git-send-email-paolo.valente@linaro.org>
 List-ID: <linux-block@vger.kernel.org>
 
-Paolo Valente <paolo.valente@linaro.org> writes:
+When a bio is split, the newly created bio must be associated with the
+same blkcg as the original bio (if BLK_CGROUP is enabled). If this
+operation is not performed, then the new bio is not associated with
+any group, and the group of the current task is returned when the
+group of the bio is requested.
 
-> @@ -1811,6 +1811,11 @@ struct bio *bio_split(struct bio *bio, int sectors,
->  
->  	bio_advance(bio, split->bi_iter.bi_size);
->  
-> +#ifdef CONFIG_BLK_CGROUP
-> +	if (bio->bi_css)
-> +		bio_associate_blkcg(split, bio->bi_css);
-> +#endif
-> +
->  	return split;
->  }
->  EXPORT_SYMBOL(bio_split);
+Depending on the frequency of splits, this may cause a large
+percentage of the bios belonging to a given group to be treated as if
+belonging to other groups (in most cases as if belonging to the root
+group). The expected group isolation may thereby be then broken.
 
-Get rid of the #ifdefery.  This should be just:
+This commit adds the missing association in bio_split.
 
-bio_associate_blkcg(split, bio->bi_css);
+Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+---
+ block/bio.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-Cheers,
-Jeff
+diff --git a/block/bio.c b/block/bio.c
+index 807d25e..c4a3834 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1811,6 +1811,11 @@ struct bio *bio_split(struct bio *bio, int sectors,
+ 
+ 	bio_advance(bio, split->bi_iter.bi_size);
+ 
++#ifdef CONFIG_BLK_CGROUP
++	if (bio->bi_css)
++		bio_associate_blkcg(split, bio->bi_css);
++#endif
++
+ 	return split;
+ }
+ EXPORT_SYMBOL(bio_split);
+-- 
+1.9.1
