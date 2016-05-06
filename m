@@ -1,14 +1,9 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:49863 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751010AbcEJO3m (ORCPT <rfc822;linux-block@vger.kernel.org>);
-	Tue, 10 May 2016 10:29:42 -0400
-Date: Tue, 10 May 2016 16:29:36 +0200
-From: Jan Kara <jack@suse.cz>
-To: Vishal Verma <vishal.l.verma@intel.com>
-Cc: linux-nvdimm@lists.01.org, linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org, xfs@oss.sgi.com,
-	linux-ext4@vger.kernel.org, linux-mm@kvack.org,
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Vishal Verma <vishal.l.verma@intel.com>
+To: linux-nvdimm@lists.01.org
+Cc: Vishal Verma <vishal.l.verma@intel.com>,
+	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+	xfs@oss.sgi.com, linux-ext4@vger.kernel.org, linux-mm@kvack.org,
 	Ross Zwisler <ross.zwisler@linux.intel.com>,
 	Dan Williams <dan.j.williams@intel.com>,
 	Dave Chinner <david@fromorbit.com>, Jan Kara <jack@suse.cz>,
@@ -19,34 +14,58 @@ Cc: linux-nvdimm@lists.01.org, linux-fsdevel@vger.kernel.org,
 	Jeff Moyer <jmoyer@redhat.com>,
 	Boaz Harrosh <boaz@plexistor.com>,
 	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: Re: [PATCH v5 5/5] dax: fix a comment in dax_zero_page_range and
- dax_truncate_page
-Message-ID: <20160510142936.GO11897@quack2.suse.cz>
+Subject: [PATCH v5 5/5] dax: fix a comment in dax_zero_page_range and dax_truncate_page
+Date: Fri,  6 May 2016 15:53:11 -0600
+Message-Id: <1462571591-3361-6-git-send-email-vishal.l.verma@intel.com>
+In-Reply-To: <1462571591-3361-1-git-send-email-vishal.l.verma@intel.com>
 References: <1462571591-3361-1-git-send-email-vishal.l.verma@intel.com>
- <1462571591-3361-6-git-send-email-vishal.l.verma@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1462571591-3361-6-git-send-email-vishal.l.verma@intel.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-On Fri 06-05-16 15:53:11, Vishal Verma wrote:
-> The distinction between PAGE_SIZE and PAGE_CACHE_SIZE was removed in
-> 
-> 09cbfea mm, fs: get rid of PAGE_CACHE_* and page_cache_{get,release}
-> macros
-> 
-> The comments for the above functions described a distinction between
-> those, that is now redundant, so remove those paragraphs
-> 
-> Cc: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
-> Signed-off-by: Vishal Verma <vishal.l.verma@intel.com>
+The distinction between PAGE_SIZE and PAGE_CACHE_SIZE was removed in
 
-Looks good. You can add:
+09cbfea mm, fs: get rid of PAGE_CACHE_* and page_cache_{get,release}
+macros
 
-Reviewed-by: Jan Kara <jack@suse.cz>
+The comments for the above functions described a distinction between
+those, that is now redundant, so remove those paragraphs
 
-								Honza
+Cc: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+Signed-off-by: Vishal Verma <vishal.l.verma@intel.com>
+---
+ fs/dax.c | 12 ------------
+ 1 file changed, 12 deletions(-)
+
+diff --git a/fs/dax.c b/fs/dax.c
+index d8c974e..b8fa85a 100644
+--- a/fs/dax.c
++++ b/fs/dax.c
+@@ -1221,12 +1221,6 @@ static bool dax_range_is_aligned(struct block_device *bdev,
+  * page in a DAX file.  This is intended for hole-punch operations.  If
+  * you are truncating a file, the helper function dax_truncate_page() may be
+  * more convenient.
+- *
+- * We work in terms of PAGE_SIZE here for commonality with
+- * block_truncate_page(), but we could go down to PAGE_SIZE if the filesystem
+- * took care of disposing of the unnecessary blocks.  Even if the filesystem
+- * block size is smaller than PAGE_SIZE, we have to zero the rest of the page
+- * since the file might be mmapped.
+  */
+ int dax_zero_page_range(struct inode *inode, loff_t from, unsigned length,
+ 							get_block_t get_block)
+@@ -1279,12 +1273,6 @@ EXPORT_SYMBOL_GPL(dax_zero_page_range);
+  *
+  * Similar to block_truncate_page(), this function can be called by a
+  * filesystem when it is truncating a DAX file to handle the partial page.
+- *
+- * We work in terms of PAGE_SIZE here for commonality with
+- * block_truncate_page(), but we could go down to PAGE_SIZE if the filesystem
+- * took care of disposing of the unnecessary blocks.  Even if the filesystem
+- * block size is smaller than PAGE_SIZE, we have to zero the rest of the page
+- * since the file might be mmapped.
+  */
+ int dax_truncate_page(struct inode *inode, loff_t from, get_block_t get_block)
+ {
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+2.5.5
+
