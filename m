@@ -1,9 +1,11 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-Date: Mon, 9 May 2016 08:55:27 -0600
-From: Ross Zwisler <ross.zwisler@linux.intel.com>
-To: "Verma, Vishal L" <vishal.l.verma@intel.com>
-Cc: "hch@infradead.org" <hch@infradead.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga01.intel.com ([192.55.52.88]:50557 "EHLO mga01.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750863AbcEHSqP (ORCPT <rfc822;linux-block@vger.kernel.org>);
+	Sun, 8 May 2016 14:46:15 -0400
+From: "Verma, Vishal L" <vishal.l.verma@intel.com>
+To: "hch@infradead.org" <hch@infradead.org>
+CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
 	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
 	"xfs@oss.sgi.com" <xfs@oss.sgi.com>,
 	"linux-nvdimm@ml01.01.org" <linux-nvdimm@ml01.01.org>,
@@ -21,45 +23,33 @@ Cc: "hch@infradead.org" <hch@infradead.org>,
 	"jack@suse.cz" <jack@suse.cz>
 Subject: Re: [PATCH v5 3/5] dax: use sb_issue_zerout instead of calling
  dax_clear_sectors
-Message-ID: <20160509145527.GA31079@linux.intel.com>
+Date: Sun, 8 May 2016 18:46:13 +0000
+Message-ID: <1462733173.3006.7.camel@intel.com>
 References: <1462571591-3361-1-git-send-email-vishal.l.verma@intel.com>
- <1462571591-3361-4-git-send-email-vishal.l.verma@intel.com>
- <20160508085203.GA10160@infradead.org>
- <1462733173.3006.7.camel@intel.com>
+	 <1462571591-3361-4-git-send-email-vishal.l.verma@intel.com>
+	 <20160508085203.GA10160@infradead.org>
+In-Reply-To: <20160508085203.GA10160@infradead.org>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1462733173.3006.7.camel@intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Sun, May 08, 2016 at 06:46:13PM +0000, Verma, Vishal L wrote:
-> On Sun, 2016-05-08 at 01:52 -0700, Christoph Hellwig wrote:
-> > On Fri, May 06, 2016 at 03:53:09PM -0600, Vishal Verma wrote:
-> > > 
-> > > From: Matthew Wilcox <matthew.r.wilcox@intel.com>
-> > > 
-> > > dax_clear_sectors() cannot handle poisoned blocks.��These must be
-> > > zeroed using the BIO interface instead.��Convert ext2 and XFS to
-> > > use
-> > > only sb_issue_zerout().
-> > > 
-> > > Signed-off-by: Matthew Wilcox <matthew.r.wilcox@intel.com>
-> > > [vishal: Also remove the dax_clear_sectors function entirely]
-> > > Signed-off-by: Vishal Verma <vishal.l.verma@intel.com>
-> > Just to make sure:��the existing sb_issue_zerout as in 4.6-rc
-> > is already doing the right thing for DAX?��I've got a pending
-> > patchset
-> > for XFS that introduces another dax_clear_sectors users, but if it's
-> > already safe to use blkdev_issue_zeroout I can switch to that and
-> > avoid
-> > the merge conflict.
-> 
-> I believe so - Jan has moved all unwritten extent conversions out of
-> DAX with his patch set, and I believe zeroing through the driver is
-> always fine. Ross or Jan could confirm though.�
-
-Yep, I believe that the existing sb_issue_zeroout() as of v4.6-rc* does the
-right thing.  We'll end up calling sb_issue_zeroout() => blkdev_issue_zeroout()
-=> __blkdev_issue_zeroout() because we don't have support for discard or
-write_same in PMEM.  This will send zero page BIOs to the PMEM driver, which
-will do the zeroing as normal writes.
+T24gU3VuLCAyMDE2LTA1LTA4IGF0IDAxOjUyIC0wNzAwLCBDaHJpc3RvcGggSGVsbHdpZyB3cm90
+ZToNCj4gT24gRnJpLCBNYXkgMDYsIDIwMTYgYXQgMDM6NTM6MDlQTSAtMDYwMCwgVmlzaGFsIFZl
+cm1hIHdyb3RlOg0KPiA+IA0KPiA+IEZyb206IE1hdHRoZXcgV2lsY294IDxtYXR0aGV3LnIud2ls
+Y294QGludGVsLmNvbT4NCj4gPiANCj4gPiBkYXhfY2xlYXJfc2VjdG9ycygpIGNhbm5vdCBoYW5k
+bGUgcG9pc29uZWQgYmxvY2tzLsKgwqBUaGVzZSBtdXN0IGJlDQo+ID4gemVyb2VkIHVzaW5nIHRo
+ZSBCSU8gaW50ZXJmYWNlIGluc3RlYWQuwqDCoENvbnZlcnQgZXh0MiBhbmQgWEZTIHRvDQo+ID4g
+dXNlDQo+ID4gb25seSBzYl9pc3N1ZV96ZXJvdXQoKS4NCj4gPiANCj4gPiBTaWduZWQtb2ZmLWJ5
+OiBNYXR0aGV3IFdpbGNveCA8bWF0dGhldy5yLndpbGNveEBpbnRlbC5jb20+DQo+ID4gW3Zpc2hh
+bDogQWxzbyByZW1vdmUgdGhlIGRheF9jbGVhcl9zZWN0b3JzIGZ1bmN0aW9uIGVudGlyZWx5XQ0K
+PiA+IFNpZ25lZC1vZmYtYnk6IFZpc2hhbCBWZXJtYSA8dmlzaGFsLmwudmVybWFAaW50ZWwuY29t
+Pg0KPiBKdXN0IHRvIG1ha2Ugc3VyZTrCoMKgdGhlIGV4aXN0aW5nIHNiX2lzc3VlX3plcm91dCBh
+cyBpbiA0LjYtcmMNCj4gaXMgYWxyZWFkeSBkb2luZyB0aGUgcmlnaHQgdGhpbmcgZm9yIERBWD/C
+oMKgSSd2ZSBnb3QgYSBwZW5kaW5nDQo+IHBhdGNoc2V0DQo+IGZvciBYRlMgdGhhdCBpbnRyb2R1
+Y2VzIGFub3RoZXIgZGF4X2NsZWFyX3NlY3RvcnMgdXNlcnMsIGJ1dCBpZiBpdCdzDQo+IGFscmVh
+ZHkgc2FmZSB0byB1c2UgYmxrZGV2X2lzc3VlX3plcm9vdXQgSSBjYW4gc3dpdGNoIHRvIHRoYXQg
+YW5kDQo+IGF2b2lkDQo+IHRoZSBtZXJnZSBjb25mbGljdC4NCg0KSSBiZWxpZXZlIHNvIC0gSmFu
+IGhhcyBtb3ZlZCBhbGwgdW53cml0dGVuIGV4dGVudCBjb252ZXJzaW9ucyBvdXQgb2YNCkRBWCB3
+aXRoIGhpcyBwYXRjaCBzZXQsIGFuZCBJIGJlbGlldmUgemVyb2luZyB0aHJvdWdoIHRoZSBkcml2
+ZXIgaXMNCmFsd2F5cyBmaW5lLiBSb3NzIG9yIEphbiBjb3VsZCBjb25maXJtIHRob3VnaC7CoA==
