@@ -1,65 +1,59 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:52732 "EHLO
-	mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1753094AbcEKARE (ORCPT
-	<rfc822;linux-block@vger.kernel.org>);
-	Tue, 10 May 2016 20:17:04 -0400
-Received: from pps.filterd (m0044008.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.16.0.11/8.16.0.11) with SMTP id u4B0Gvbs018072
-	for <linux-block@vger.kernel.org>; Tue, 10 May 2016 17:16:59 -0700
-Received: from mail.thefacebook.com ([199.201.64.23])
-	by mx0a-00082601.pphosted.com with ESMTP id 22usuar1v4-6
-	(version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT)
-	for <linux-block@vger.kernel.org>; Tue, 10 May 2016 17:16:59 -0700
-Received: from facebook.com (2401:db00:11:d0a2:face:0:39:0)	by
- mx-out.facebook.com (10.212.236.89) with ESMTP	id
- a426851c170d11e6a00f0002c95209d8-9c4f7c50 for <linux-block@vger.kernel.org>;
-	Tue, 10 May 2016 17:16:43 -0700
-From: Shaohua Li <shli@fb.com>
-To: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <tj@kernel.org>, <vgoyal@redhat.com>, <axboe@fb.com>,
-	<jmoyer@redhat.com>, <Kernel-team@fb.com>
-Subject: [PATCH 09/10] blk-throttle: make sure expire time isn't too big
-Date: Tue, 10 May 2016 17:16:39 -0700
-Message-ID: <40b42ff504ad8f54251ca4b8c088f217410aa791.1462923578.git.shli@fb.com>
-In-Reply-To: <cover.1462923578.git.shli@fb.com>
-References: <cover.1462923578.git.shli@fb.com>
+Received: from mga02.intel.com ([134.134.136.20]:3834 "EHLO mga02.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750852AbcEHSmv (ORCPT <rfc822;linux-block@vger.kernel.org>);
+	Sun, 8 May 2016 14:42:51 -0400
+From: "Verma, Vishal L" <vishal.l.verma@intel.com>
+To: "hch@infradead.org" <hch@infradead.org>
+CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"xfs@oss.sgi.com" <xfs@oss.sgi.com>,
+	"linux-nvdimm@ml01.01.org" <linux-nvdimm@ml01.01.org>,
+	"linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
+	"Williams, Dan J" <dan.j.williams@intel.com>,
+	"axboe@fb.com" <axboe@fb.com>,
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+	"linux-ext4@vger.kernel.org" <linux-ext4@vger.kernel.org>,
+	"david@fromorbit.com" <david@fromorbit.com>,
+	"jack@suse.cz" <jack@suse.cz>, "matthew@wil.cx" <matthew@wil.cx>
+Subject: Re: [PATCH v4 5/7] fs: prioritize and separate direct_io from dax_io
+Date: Sun, 8 May 2016 18:42:37 +0000
+Message-ID: <1462732956.3006.4.camel@intel.com>
+References: <1461878218-3844-1-git-send-email-vishal.l.verma@intel.com>
+	 <1461878218-3844-6-git-send-email-vishal.l.verma@intel.com>
+	 <5727753F.6090104@plexistor.com> <20160505142433.GA4557@infradead.org>
+	 <CAPcyv4gdmo5m=Arf5sp5izJfNaaAkaaMbOzud8KRcBEC8RRu1Q@mail.gmail.com>
+	 <20160505152230.GA3994@infradead.org> <1462484695.29294.7.camel@intel.com>
+	 <20160508090115.GE15458@infradead.org>
+In-Reply-To: <20160508090115.GE15458@infradead.org>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-cgroup could be throttled to a limit but when other cgroups are idle,
-queue enters a higher state and so the group should be throttled to a
-higher limit. It's possible the cgroup is sleeping because of throttle
-and other cgroups don't dispatch IO any more. In this case, nobody can
-trigger current downgrade/upgrade logic. To fix this issue, we could
-either set up a timer to wakeup the cgroup if other cgroups are idle or
-make sure this cgroup doesn't sleep too long. Setting up a timer means
-we must change the timer very frequently. This patch chooses the latter.
-Making cgroup sleep time not too big wouldn't change cgroup bps/iops,
-but could make it wakeup more frequently, which isn't a big issue
-because cg_check_time * 8 is already quite big.
-
-Signed-off-by: Shaohua Li <shli@fb.com>
----
- block/blk-throttle.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 0aed049..a5f3435 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -632,6 +632,9 @@ static void throtl_dequeue_tg(struct throtl_grp *tg)
- static void throtl_schedule_pending_timer(struct throtl_service_queue *sq,
- 					  unsigned long expires)
- {
-+	unsigned long max_expire = jiffies + 8 * cg_check_time;
-+	if (time_after(expires, max_expire))
-+		expires = max_expire;
- 	mod_timer(&sq->pending_timer, expires);
- 	throtl_log(sq, "schedule timer. delay=%lu jiffies=%lu",
- 		   expires - jiffies, jiffies);
--- 
-2.8.0.rc2
-
+T24gU3VuLCAyMDE2LTA1LTA4IGF0IDAyOjAxIC0wNzAwLCBoY2hAaW5mcmFkZWFkLm9yZyB3cm90
+ZToNCj4gT24gVGh1LCBNYXkgMDUsIDIwMTYgYXQgMDk6NDU6MDdQTSArMDAwMCwgVmVybWEsIFZp
+c2hhbCBMIHdyb3RlOg0KPiA+IA0KPiA+IEknbSBub3Qgc3VyZSBJIGNvbXBsZXRlbHkgdW5kZXJz
+dGFuZCBob3cgdGhpcyB3aWxsIHdvcms/IENhbiB5b3UNCj4gPiBleHBsYWluDQo+ID4gYSBiaXQ/
+IFdvdWxkIHdlIGhhdmUgdG8gZXhwb3J0IHJ3X2J5dGVzIHVwIHRvIGxheWVycyBhYm92ZSB0aGUg
+cG1lbQ0KPiA+IGRyaXZlcj8gV2hlcmUgZG9lcyBnZXRfdXNlcl9wYWdlcyBjb21lIGluPw0KPiBB
+IERBWCBmaWxlc3lzdGVtIGNhbiBkaXJlY3RseSB1c2UgdGhlIG52ZGltbSBsYXllciB0aGUgc2Ft
+ZSB3YXkgYnR0DQo+IGRvZSxzIHdoYXQncyB0aGUgcHJvYmxlbT8NCg0KVGhlIEJUVCBkb2VzIHJ3
+X2J5dGVzIHRocm91Z2ggYW4gaW50ZXJuYWwtdG8tbGlibnZkaW1tIG1lY2hhbmlzbSwgYnV0DQpy
+d19ieXRlcyBpc24ndCBleHBvcnRlZCB0byB0aGUgZmlsZXN5c3RlbSwgY3VycmVudGx5Li4gVG8g
+ZG8gdGhpcyB3ZSdkDQpoYXZlIHRvIGVpdGhlciBhZGQgYW4gcndfYnl0ZXMgdG8gYmxvY2sgZGV2
+aWNlIG9wZXJhdGlvbnMuLi5vcg0Kc29tZXRoaW5nLg0KDQpBbm90aGVyIHRoaW5nIGlzIHJ3X2J5
+dGVzIGN1cnJlbnRseSBkb2Vzbid0IGRvIGVycm9yIGNsZWFyaW5nIGVpdGhlci4NCldlIHN0b3Jl
+IGJhZGJsb2NrcyBhdCBzZWN0b3IgZ3JhbnVsYXJpdHksIGFuZCBsaWtlIERhbiBzYWlkIGVhcmxp
+ZXIsDQp0aGF0IGhpZGVzIHRoZSBjbGVhcl9lcnJvciBhbGlnbm1lbnQgcmVxdWlyZW1lbnRzIGFu
+ZCB1cHBlciBsYXllcnMNCmRvbid0IGhhdmUgdG8gYmUgYXdhcmUgb2YgaXQuIFRvIG1ha2Ugcndf
+Ynl0ZXMgY2xlYXIgc3ViLXNlY3RvciBlcnJvcnMsDQp3ZSdkIGhhdmUgdG8gY2hhbmdlIHRoZSBn
+cmFudWxhcml0eSBvZiBiYWQtYmxvY2tzLCBhbmQgbWFrZSB1cHBlcg0KbGF5ZXJzIGF3YXJlIG9m
+IHRoZSBjbGVhcmluZyBhbGlnbm1lbnQgcmVxdWlyZW1lbnRzLg0KDQpVc2luZyBhIGJsb2NrLXdy
+aXRlIHNlbWFudGljIGZvciBjbGVhcmluZyBoaWRlcyBhbGwgdGhpcyBhd2F5Lg0KDQo+IA0KPiBS
+ZSBnZXRfdXNlcl9wYWdlcyBteSBpZGVhIHdhcyB0byBzaW1wbHkgdXNlIHRoYXQgdG8gbG9jayBk
+b3duIHRoZQ0KPiB1c2VyDQo+IHBhZ2VzIHNvIHRoYXQgd2UgY2FuIGNhbGwgcndfYnl0ZXMgb24g
+aXQuwqDCoEhvdyBlbHNlIHdvdWxkIHlvdSBkbw0KPiBpdD/CoMKgRG8NCj4gYSBrbWFsbG9jLCBj
+b3B5X2Zyb21fdXNlciBhbmQgdGhlbiBhbm90aGVyIG1lbWNweT8=
