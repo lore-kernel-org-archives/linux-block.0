@@ -1,52 +1,32 @@
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>,
-	Tejun Heo <tj@kernel.org>
-Cc: linux-block@vger.kernel.org,
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([198.137.202.9]:45024 "EHLO
+	bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750701AbcEHIzk (ORCPT
+	<rfc822;linux-block@vger.kernel.org>); Sun, 8 May 2016 04:55:40 -0400
+Date: Sun, 8 May 2016 01:55:39 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Vishal Verma <vishal.l.verma@intel.com>
+Cc: linux-nvdimm@ml01.01.org, linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org, xfs@oss.sgi.com,
+	linux-ext4@vger.kernel.org, linux-mm@kvack.org,
+	Ross Zwisler <ross.zwisler@linux.intel.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Dave Chinner <david@fromorbit.com>, Jan Kara <jack@suse.cz>,
+	Jens Axboe <axboe@fb.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
 	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	linus.walleij@linaro.org,
-	broonie@kernel.org,
-	stable@vger.kernel.org,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH BUGFIX] block: add missing group association in bio_split
-Date: Fri,  6 May 2016 22:45:12 +0200
-Message-Id: <1462567512-3007-1-git-send-email-paolo.valente@linaro.org>
-List-ID: <linux-block@vger.kernel.org>
+	Christoph Hellwig <hch@infradead.org>,
+	Jeff Moyer <jmoyer@redhat.com>,
+	Boaz Harrosh <boaz@plexistor.com>
+Subject: Re: [PATCH v5 0/5] dax: handling media errors (clear-on-zero only)
+Message-ID: <20160508085539.GA15429@infradead.org>
+References: <1462571591-3361-1-git-send-email-vishal.l.verma@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1462571591-3361-1-git-send-email-vishal.l.verma@intel.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-When a bio is split, the newly created bio must be associated with the
-same blkcg as the original bio (if BLK_CGROUP is enabled). If this
-operation is not performed, then the new bio is not associated with
-any group, and the group of the current task is returned when the
-group of the bio is requested.
+This series looks fine to me:
 
-Depending on the frequency of splits, this may cause a large
-percentage of the bios belonging to a given group to be treated as if
-belonging to other groups (in most cases as if belonging to the root
-group). The expected group isolation may thereby be then broken.
-
-This commit adds the missing association in bio_split.
-
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
----
- block/bio.c | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/block/bio.c b/block/bio.c
-index 807d25e..c4a3834 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1811,6 +1811,11 @@ struct bio *bio_split(struct bio *bio, int sectors,
- 
- 	bio_advance(bio, split->bi_iter.bi_size);
- 
-+#ifdef CONFIG_BLK_CGROUP
-+	if (bio->bi_css)
-+		bio_associate_blkcg(split, bio->bi_css);
-+#endif
-+
- 	return split;
- }
- EXPORT_SYMBOL(bio_split);
--- 
-1.9.1
+Reviewed-by: Christoph Hellwig <hch@lst.de>
