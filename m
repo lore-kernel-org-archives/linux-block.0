@@ -1,130 +1,42 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-Subject: Re: [PATCH RFC 10/22] block, bfq: add full hierarchical scheduling and cgroups support
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Content-Type: text/plain; charset=windows-1252
-From: Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <571E7E63.6010103@linaro.org>
-Date: Fri, 6 May 2016 22:20:18 +0200
-Cc: Jens Axboe <axboe@kernel.dk>,
- Fabio Checconi <fchecconi@gmail.com>,
- Arianna Avanzini <avanzini.arianna@gmail.com>,
- linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org,
- ulf.hansson@linaro.org,
- linus.walleij@linaro.org,
- broonie@kernel.org
-Message-Id: <2D83ACA0-2513-4019-9A0D-3166FDDE7485@linaro.org>
-References: <1454364778-25179-1-git-send-email-paolo.valente@linaro.org> <1454364778-25179-11-git-send-email-paolo.valente@linaro.org> <20160211222824.GD3741@mtj.duckdns.org> <57174CA7.5000706@linaro.org> <20160422181321.GV7822@mtj.duckdns.org> <ABE90C54-FE45-4713-87D8-6CD591CB04A2@linaro.org> <20160422184110.GX7822@mtj.duckdns.org> <C1A89D63-CBC4-4C92-8D5A-9FB55A53FBCF@linaro.org> <20160422193221.GY7822@mtj.duckdns.org> <57F65679-CD8E-43BA-8C46-C165B4C20677@linaro.org> <20160425192436.GE7822@mtj.duckdns.org> <571E7E63.6010103@linaro.org>
-To: Tejun Heo <tj@kernel.org>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([198.137.202.9]:48014 "EHLO
+	bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750703AbcEHJ3S (ORCPT
+	<rfc822;linux-block@vger.kernel.org>); Sun, 8 May 2016 05:29:18 -0400
+Date: Sun, 8 May 2016 02:29:14 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: "Michael Kerrisk (man-pages)" <mtk.manpages@gmail.com>
+Cc: Christoph Hellwig <hch@infradead.org>,
+	Christoph Hellwig <hch@lst.de>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Jens Axboe <axboe@fb.com>, Milosz Tanski <milosz@adfin.com>,
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+	linux-block@vger.kernel.org, Linux API <linux-api@vger.kernel.org>
+Subject: Re: [PATCH 2/6] vfs: vfs: Define new syscalls preadv2,pwritev2
+Message-ID: <20160508092914.GA30173@infradead.org>
+References: <1457017443-17662-1-git-send-email-hch@lst.de>
+ <1457017443-17662-3-git-send-email-hch@lst.de>
+ <56E1B9A8.3070904@gmail.com>
+ <20160311095357.GA29350@lst.de>
+ <5714E676.4090007@gmail.com>
+ <20160425084715.GA29255@infradead.org>
+ <CAKgNAki1ph1fV9EB9aARR1n8f6k=_KvHRiaPCAvetwigdKSpmw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CAKgNAki1ph1fV9EB9aARR1n8f6k=_KvHRiaPCAvetwigdKSpmw@mail.gmail.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
+On Mon, Apr 25, 2016 at 07:35:36PM +0200, Michael Kerrisk (man-pages) wrote:
+> > I'd rather update the man page - EOPNOTSUPP is a much more descriptive
+> > error code for this case.  I'll send you a patch.
+> 
+> Unless I'm misunderstanding something here, you're proposing something
+> very inconsistent. The standard error for unknown flag bits is EINVAL.
+> This is so for dozens of systems calls (check the man pages; you might
+> find a rare exception, but that's the point, they are exceptions). It
+> seems to me here that it's really the implementation that needs
+> fixing, not the man page!
 
-Il giorno 25/apr/2016, alle ore 22:30, Paolo <paolo.valente@linaro.org> =
-ha scritto:
-
-> Il 25/04/2016 21:24, Tejun Heo ha scritto:
->> Hello, Paolo.
->>=20
->=20
-> Hi
->=20
->> On Sat, Apr 23, 2016 at 09:07:47AM +0200, Paolo Valente wrote:
->>> There is certainly something I don=92t know here, because I don=92t
->>> understand why there is also a workqueue containing root-group I/O
->>> all the time, if the only process doing I/O belongs to a different
->>> (sub)group.
->>=20
->> Hmmm... maybe metadata updates?
->>=20
->=20
-> That's what I thought in the first place. But one half or one third of
-> the IOs sounded too much for metadata (the percentage varies over time
-> during the test). And root-group IOs are apparently large. Here is an
-> excerpt from the output of
->=20
-> grep -B 1 insert_request trace
->=20
->    kworker/u8:4-116   [002] d...   124.349971:   8,0    I   W 3903488 =
-+ 1024 [kworker/u8:4]
->    kworker/u8:4-116   [002] d...   124.349978:   8,0    m   N cfq409A  =
-/ insert_request
-> --
->    kworker/u8:4-116   [002] d...   124.350770:   8,0    I   W 3904512 =
-+ 1200 [kworker/u8:4]
->    kworker/u8:4-116   [002] d...   124.350780:   8,0    m   N cfq96A =
-/seq_write insert_request
-> --
->    kworker/u8:4-116   [002] d...   124.363911:   8,0    I   W 3905712 =
-+ 1888 [kworker/u8:4]
->    kworker/u8:4-116   [002] d...   124.363916:   8,0    m   N cfq409A  =
-/ insert_request
-> --
->    kworker/u8:4-116   [002] d...   124.364467:   8,0    I   W 3907600 =
-+ 352 [kworker/u8:4]
->    kworker/u8:4-116   [002] d...   124.364474:   8,0    m   N cfq96A =
-/seq_write insert_request
-> --
->    kworker/u8:4-116   [002] d...   124.369435:   8,0    I   W 3907952 =
-+ 1680 [kworker/u8:4]
->    kworker/u8:4-116   [002] d...   124.369439:   8,0    m   N cfq96A =
-/seq_write insert_request
-> --
->    kworker/u8:4-116   [002] d...   124.369441:   8,0    I   W 3909632 =
-+ 560 [kworker/u8:4]
->    kworker/u8:4-116   [002] d...   124.369442:   8,0    m   N cfq96A =
-/seq_write insert_request
-> --
->    kworker/u8:4-116   [002] d...   124.373299:   8,0    I   W 3910192 =
-+ 1760 [kworker/u8:4]
->    kworker/u8:4-116   [002] d...   124.373301:   8,0    m   N cfq409A  =
-/ insert_request
-> --
->    kworker/u8:4-116   [002] d...   124.373519:   8,0    I   W 3911952 =
-+ 480 [kworker/u8:4]
->    kworker/u8:4-116   [002] d...   124.373522:   8,0    m   N cfq96A =
-/seq_write insert_request
-> --
->    kworker/u8:4-116   [002] d...   124.381936:   8,0    I   W 3912432 =
-+ 1728 [kworker/u8:4]
->    kworker/u8:4-116   [002] d...   124.381937:   8,0    m   N cfq409A =
-/ insert_request
->=20
->=20
->>> Anyway, if this is expected, then there is no reason to bother you
->>> further on it. In contrast, the actual problem I see is the
->>> following. If one third or half of the bios belong to a different
->>> group than the writer that one wants to isolate, then, whatever
->>> weight is assigned to the writer group, we will never be able to let
->>> the writer get the desired share of the time (or of the bandwidth
->>> with bfq and all quasi-sequential workloads). For instance, in the
->>> scenario that you told me to try, the writer will never get 50% of
->>> the time, with any scheduler. Am I missing something also on this?
->>=20
->> While a worker may jump across different cgroups, the IOs are still
->> coming from somewhere and if the only IO generator on the machine is
->> the test dd, the bios from that cgroup should dominate the IOs.  I
->> think it'd be helpful to investigate who's issuing the root cgroup
->> IOs.
->>=20
->=20
-
-I can now confirm that, because of a little bug, a fraction ranging
-from one third to half of the writeback bios for the writer is wrongly
-associated with the root group. I'm sending a bugfix.
-
-I'm retesting BFQ after this blk fix. If I understand correctly, now
-you agree that BFQ is well suited for cgroups too, at least in
-principle. So I will apply all your suggestions and corrections, and
-submit a fresh patchset.
-
-Thanks,
-Paolo
-
-> Ok (if there is some quick way to get this information without
-> instrumenting the code, then any suggestion or pointer is welcome).
->=20
-> Thanks,
-> Paolo
->=20
->> Thanks.
+For new filesystem calls we try to use EOPNOTSUPP as much as possible,
+e.g. fallocate.
