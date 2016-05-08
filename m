@@ -1,85 +1,38 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.9]:57757 "EHLO
+Received: from bombadil.infradead.org ([198.137.202.9]:47584 "EHLO
 	bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752211AbcEBO4I (ORCPT
-	<rfc822;linux-block@vger.kernel.org>); Mon, 2 May 2016 10:56:08 -0400
-Date: Mon, 2 May 2016 07:56:06 -0700
+	with ESMTP id S1750703AbcEHJ2A (ORCPT
+	<rfc822;linux-block@vger.kernel.org>); Sun, 8 May 2016 05:28:00 -0400
+Date: Sun, 8 May 2016 02:27:58 -0700
 From: Christoph Hellwig <hch@infradead.org>
-To: Vishal Verma <vishal.l.verma@intel.com>
-Cc: linux-nvdimm@ml01.01.org, linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org, xfs@oss.sgi.com,
-	linux-ext4@vger.kernel.org, linux-mm@kvack.org,
-	Matthew Wilcox <matthew@wil.cx>,
-	Ross Zwisler <ross.zwisler@linux.intel.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Dave Chinner <david@fromorbit.com>, Jan Kara <jack@suse.cz>,
-	Jens Axboe <axboe@fb.com>, Al Viro <viro@zeniv.linux.org.uk>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-kernel@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Jeff Moyer <jmoyer@redhat.com>
-Subject: Re: [PATCH v4 5/7] fs: prioritize and separate direct_io from dax_io
-Message-ID: <20160502145606.GD20589@infradead.org>
-References: <1461878218-3844-1-git-send-email-vishal.l.verma@intel.com>
- <1461878218-3844-6-git-send-email-vishal.l.verma@intel.com>
+To: Ming Lei <ming.lei@canonical.com>
+Cc: Jens Axboe <axboe@fb.com>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+	Al Viro <viro@zeniv.linux.org.uk>,
+	"open list:DRBD DRIVER" <drbd-dev@lists.linbit.com>,
+	Jan Kara <jack@suse.cz>, Keith Busch <keith.busch@intel.com>,
+	Kent Overstreet <kent.overstreet@gmail.com>,
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+	Mike Snitzer <snitzer@redhat.com>, Shaohua Li <shli@fb.com>,
+	Tejun Heo <tj@kernel.org>,
+	"open list:XFS FILESYSTEM" <xfs@oss.sgi.com>
+Subject: Re: [PATCH v5 0/8] block: prepare for multipage bvecs
+Message-ID: <20160508092758.GA29621@infradead.org>
+References: <1460928615-20894-1-git-send-email-ming.lei@canonical.com>
+ <CACVXFVOw2dnO0tw5n2dPXUQh_tkGLCo742AXpJ8mMQG6LQZVUA@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1461878218-3844-6-git-send-email-vishal.l.verma@intel.com>
+In-Reply-To: <CACVXFVOw2dnO0tw5n2dPXUQh_tkGLCo742AXpJ8mMQG6LQZVUA@mail.gmail.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-> index 79defba..97a1f5f 100644
-> --- a/fs/block_dev.c
-> +++ b/fs/block_dev.c
-> @@ -167,12 +167,21 @@ blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, loff_t offset)
->  	struct file *file = iocb->ki_filp;
->  	struct inode *inode = bdev_file_inode(file);
->  
-> -	if (IS_DAX(inode))
-> +	if (iocb_is_direct(iocb))
-> +		return __blockdev_direct_IO(iocb, inode, I_BDEV(inode), iter,
-> +					    offset, blkdev_get_block, NULL,
-> +					    NULL, DIO_SKIP_DIO_COUNT);
-> +	else if (iocb_is_dax(iocb))
->  		return dax_do_io(iocb, inode, iter, offset, blkdev_get_block,
->  				NULL, DIO_SKIP_DIO_COUNT);
-> -	return __blockdev_direct_IO(iocb, inode, I_BDEV(inode), iter, offset,
-> -				    blkdev_get_block, NULL, NULL,
-> -				    DIO_SKIP_DIO_COUNT);
-> +	else {
-> +		/*
-> +		 * If we're in the direct_IO path, either the IOCB_DIRECT or
-> +		 * IOCB_DAX flags must be set.
-> +		 */
-> +		WARN_ONCE(1, "Kernel Bug with iocb flags\n");
-> +		return -ENXIO;
-> +	}
+On Tue, May 03, 2016 at 09:03:58AM +0800, Ming Lei wrote:
+> Any possibility to make v5 into v4.7 so that we can move on about
+> multipage bvecs?
+> 
+> BTW, even though not considering mp bvecs, this patchset is still a
+> good cleanup.
 
-DAX should not even end up in ->direct_IO.
-
-> --- a/fs/xfs/xfs_file.c
-> +++ b/fs/xfs/xfs_file.c
-> @@ -300,7 +300,7 @@ xfs_file_read_iter(
->  
->  	XFS_STATS_INC(mp, xs_read_calls);
->  
-> -	if (unlikely(iocb->ki_flags & IOCB_DIRECT))
-> +	if (unlikely(iocb->ki_flags & (IOCB_DIRECT | IOCB_DAX)))
->  		ioflags |= XFS_IO_ISDIRECT;
-
-please also add a XFS_IO_ISDAX flag to propagate the information
-properly and allow tracing to display the actual I/O type.
-
-> +static inline bool iocb_is_dax(struct kiocb *iocb)
->  {
-> +	return IS_DAX(file_inode(iocb->ki_filp)) &&
-> +		(iocb->ki_flags & IOCB_DAX);
-> +}
-> +
-> +static inline bool iocb_is_direct(struct kiocb *iocb)
-> +{
-> +	return iocb->ki_flags & IOCB_DIRECT;
->  }
-
-No need for these helpers - especially as IOCB_DAX should never be set
-if IS_DAX is false.
+Agreed.  I'm fine with the series and it looks harmless enough for
+4.7.
