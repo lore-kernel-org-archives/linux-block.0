@@ -10,14 +10,14 @@ Cc: Roman Pen <roman.penyaev@profitbricks.com>,
 	Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org,
 	Kamal Mostafa <kamal@canonical.com>
-Subject: [PATCH 3.19.y-ckt 26/54] workqueue: fix ghost PENDING flag while doing MQ IO
-Date: Mon,  9 May 2016 17:04:45 -0700
-Message-Id: <1462838713-31343-27-git-send-email-kamal@canonical.com>
-In-Reply-To: <1462838713-31343-1-git-send-email-kamal@canonical.com>
-References: <1462838713-31343-1-git-send-email-kamal@canonical.com>
+Subject: [PATCH 4.2.y-ckt 15/59] workqueue: fix ghost PENDING flag while doing MQ IO
+Date: Mon,  9 May 2016 12:55:33 -0700
+Message-Id: <1462823777-8384-16-git-send-email-kamal@canonical.com>
+In-Reply-To: <1462823777-8384-1-git-send-email-kamal@canonical.com>
+References: <1462823777-8384-1-git-send-email-kamal@canonical.com>
 List-ID: <linux-block@vger.kernel.org>
 
-3.19.8-ckt21 -stable review patch.  If anyone has any objections, please let me know.
+4.2.8-ckt10 -stable review patch.  If anyone has any objections, please let me know.
 
 ---8<------------------------------------------------------------
 
@@ -141,10 +141,10 @@ Signed-off-by: Kamal Mostafa <kamal@canonical.com>
  1 file changed, 29 insertions(+)
 
 diff --git a/kernel/workqueue.c b/kernel/workqueue.c
-index 1cf1b72..b838f171 100644
+index c743abf..a2a7ac1 100644
 --- a/kernel/workqueue.c
 +++ b/kernel/workqueue.c
-@@ -633,6 +633,35 @@ static void set_work_pool_and_clear_pending(struct work_struct *work,
+@@ -649,6 +649,35 @@ static void set_work_pool_and_clear_pending(struct work_struct *work,
  	 */
  	smp_wmb();
  	set_work_data(work, (unsigned long)pool_id << WORK_OFFQ_POOL_SHIFT, 0);
