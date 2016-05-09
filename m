@@ -1,41 +1,202 @@
-Return-Path: <mingli199x@qq.com>
-From: "=?ISO-8859-1?B?TWluZyBMaQ==?=" <mingli199x@qq.com>
-To: "=?ISO-8859-1?B?SmVucyBBeGJvZQ==?=" <axboe@kernel.dk>
-Cc: "=?ISO-8859-1?B?bGludXgtYmxvY2s=?=" <linux-block@vger.kernel.org>, "=?ISO-8859-1?B?bGludXgta2VybmVs?=" <linux-kernel@vger.kernel.org>
-Subject: [PATCH] block/deadline-iosched.c: fix deadline_dispatch_requests name
-Mime-Version: 1.0
-Content-Type: text/plain;
-	charset="ISO-8859-1"
-Date: Mon, 16 May 2016 19:18:33 +0800
-Message-ID: <tencent_40E22AAA2AB956D37E8D6DAF@qq.com>
+Return-Path: <kamal@canonical.com>
+From: Kamal Mostafa <kamal@canonical.com>
+To: Roman Pen <roman.penyaev@profitbricks.com>
+Cc: Gioh Kim <gi-oh.kim@profitbricks.com>,
+	Michael Wang <yun.wang@profitbricks.com>,
+	Tejun Heo <tj@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Kamal Mostafa <kamal@canonical.com>,
+	kernel-team@lists.ubuntu.com
+Subject: [4.2.y-ckt stable] Patch "workqueue: fix ghost PENDING flag while doing MQ IO" has been added to the 4.2.y-ckt tree
+Date: Mon,  9 May 2016 12:43:32 -0700
+Message-Id: <1462823012-5575-1-git-send-email-kamal@canonical.com>
 List-ID: <linux-block@vger.kernel.org>
 
-aGksIGRlYWRsaW5lX2Rpc3BhdGNoX3JlcXVlc3RzIHdvdWxkIG9ubHkgY2hvb3NlIHRvIG1v
-dmUgb25lIHJlcXVlc3QgdG8gZGlzcGF0Y2ggcXVldWUsIGJ1dCB0aGUgbWVhbmluZyBvZiBm
-dW5jdGlvbidzIG5hbWUgd291bGQgbW92ZSBzZXZlcmFsIHJlcXVlc3RzIHRvIGRpc3BhdGNo
-IHF1ZXVlLiBzbyBpIGNoYW5nZSBkZWFkbGluZV9kaXNwYXRjaF9yZXF1ZXN0cyB0byBkZWFk
-bGluZV9kaXNwYXRjaF9yZXF1ZXN0LgoKcmVnYXJkcywKCgpTaWduZWQtb2ZmLWJ5OiBNaW5n
-IExpIDxtaW5nbGkxOTl4QHFxLmNvbT4KCi0tLQpibG9jay9kZWFkbGluZS1pb3NjaGVkLmMg
-fCA2ICsrKy0tLQoxIGZpbGUgY2hhbmdlZCwgMyBpbnNlcnRpb25zKCspLCAzIGRlbGV0aW9u
-cygtKQoKZGlmZiAtLWdpdCBhL2Jsb2NrL2RlYWRsaW5lLWlvc2NoZWQuYyBiL2Jsb2NrL2Rl
-YWRsaW5lLWlvc2NoZWQuYwppbmRleCBkMGRkNzg4Li4zOGFlZWNkIDEwMDY0NAotLS0gYS9i
-bG9jay9kZWFkbGluZS1pb3NjaGVkLmMKKysrIGIvYmxvY2svZGVhZGxpbmUtaW9zY2hlZC5j
-CkBAIC0yMzQsMTAgKzIzNCwxMCBAQCBzdGF0aWMgaW5saW5lIGludCBkZWFkbGluZV9jaGVj
-a19maWZvKHN0cnVjdCBkZWFkbGluZV9kYXRhICpkZCwgaW50IGRkaXIpCn0KCi8qCi0gKiBk
-ZWFkbGluZV9kaXNwYXRjaF9yZXF1ZXN0cyBzZWxlY3RzIHRoZSBiZXN0IHJlcXVlc3QgYWNj
-b3JkaW5nIHRvCisgKiBkZWFkbGluZV9kaXNwYXRjaF9yZXF1ZXN0IHNlbGVjdHMgdGhlIGJl
-c3QgcmVxdWVzdCBhY2NvcmRpbmcgdG8KKiByZWFkL3dyaXRlIGV4cGlyZSwgZmlmb19iYXRj
-aCwgZXRjCiovCi1zdGF0aWMgaW50IGRlYWRsaW5lX2Rpc3BhdGNoX3JlcXVlc3RzKHN0cnVj
-dCByZXF1ZXN0X3F1ZXVlICpxLCBpbnQgZm9yY2UpCitzdGF0aWMgaW50IGRlYWRsaW5lX2Rp
-c3BhdGNoX3JlcXVlc3Qoc3RydWN0IHJlcXVlc3RfcXVldWUgKnEsIGludCBmb3JjZSkKewpz
-dHJ1Y3QgZGVhZGxpbmVfZGF0YSAqZGQgPSBxLT5lbGV2YXRvci0+ZWxldmF0b3JfZGF0YTsK
-Y29uc3QgaW50IHJlYWRzID0gIWxpc3RfZW1wdHkoJmRkLT5maWZvX2xpc3RbUkVBRF0pOwpA
-QCAtNDQyLDcgKzQ0Miw3IEBAIHN0YXRpYyBzdHJ1Y3QgZWxldmF0b3JfdHlwZSBpb3NjaGVk
-X2RlYWRsaW5lID0gewouZWxldmF0b3JfbWVyZ2VfZm4gPSBkZWFkbGluZV9tZXJnZSwKLmVs
-ZXZhdG9yX21lcmdlZF9mbiA9ZGVhZGxpbmVfbWVyZ2VkX3JlcXVlc3QsCi5lbGV2YXRvcl9t
-ZXJnZV9yZXFfZm4gPSBkZWFkbGluZV9tZXJnZWRfcmVxdWVzdHMsCi0uZWxldmF0b3JfZGlz
-cGF0Y2hfZm4gPWRlYWRsaW5lX2Rpc3BhdGNoX3JlcXVlc3RzLAorLmVsZXZhdG9yX2Rpc3Bh
-dGNoX2ZuID1kZWFkbGluZV9kaXNwYXRjaF9yZXF1ZXN0LAouZWxldmF0b3JfYWRkX3JlcV9m
-biA9ZGVhZGxpbmVfYWRkX3JlcXVlc3QsCi5lbGV2YXRvcl9mb3JtZXJfcmVxX2ZuID0gZWx2
-X3JiX2Zvcm1lcl9yZXF1ZXN0LAouZWxldmF0b3JfbGF0dGVyX3JlcV9mbiA9IGVsdl9yYl9s
-YXR0ZXJfcmVxdWVzdCwKLS0gCjEuOC4zLjE=
+This is a note to let you know that I have just added a patch titled
+
+    workqueue: fix ghost PENDING flag while doing MQ IO
+
+to the linux-4.2.y-queue branch of the 4.2.y-ckt extended stable tree 
+which can be found at:
+
+    https://git.launchpad.net/~canonical-kernel/linux/+git/linux-stable-ckt/log/?h=linux-4.2.y-queue
+
+This patch is scheduled to be released in version 4.2.8-ckt10.
+
+If you, or anyone else, feels it should not be added to this tree, please 
+reply to this email.
+
+For more information about the 4.2.y-ckt tree, see
+https://wiki.ubuntu.com/Kernel/Dev/ExtendedStable
+
+Thanks.
+-Kamal
+
+---8<------------------------------------------------------------
+
+>From ce75b13eb20cd45a5dc1592905bb6890103aae32 Mon Sep 17 00:00:00 2001
+From: Roman Pen <roman.penyaev@profitbricks.com>
+Date: Tue, 26 Apr 2016 13:15:35 +0200
+Subject: workqueue: fix ghost PENDING flag while doing MQ IO
+
+commit 346c09f80459a3ad97df1816d6d606169a51001a upstream.
+
+The bug in a workqueue leads to a stalled IO request in MQ ctx->rq_list
+with the following backtrace:
+
+[  601.347452] INFO: task kworker/u129:5:1636 blocked for more than 120 seconds.
+[  601.347574]       Tainted: G           O    4.4.5-1-storage+ #6
+[  601.347651] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+[  601.348142] kworker/u129:5  D ffff880803077988     0  1636      2 0x00000000
+[  601.348519] Workqueue: ibnbd_server_fileio_wq ibnbd_dev_file_submit_io_worker [ibnbd_server]
+[  601.348999]  ffff880803077988 ffff88080466b900 ffff8808033f9c80 ffff880803078000
+[  601.349662]  ffff880807c95000 7fffffffffffffff ffffffff815b0920 ffff880803077ad0
+[  601.350333]  ffff8808030779a0 ffffffff815b01d5 0000000000000000 ffff880803077a38
+[  601.350965] Call Trace:
+[  601.351203]  [<ffffffff815b0920>] ? bit_wait+0x60/0x60
+[  601.351444]  [<ffffffff815b01d5>] schedule+0x35/0x80
+[  601.351709]  [<ffffffff815b2dd2>] schedule_timeout+0x192/0x230
+[  601.351958]  [<ffffffff812d43f7>] ? blk_flush_plug_list+0xc7/0x220
+[  601.352208]  [<ffffffff810bd737>] ? ktime_get+0x37/0xa0
+[  601.352446]  [<ffffffff815b0920>] ? bit_wait+0x60/0x60
+[  601.352688]  [<ffffffff815af784>] io_schedule_timeout+0xa4/0x110
+[  601.352951]  [<ffffffff815b3a4e>] ? _raw_spin_unlock_irqrestore+0xe/0x10
+[  601.353196]  [<ffffffff815b093b>] bit_wait_io+0x1b/0x70
+[  601.353440]  [<ffffffff815b056d>] __wait_on_bit+0x5d/0x90
+[  601.353689]  [<ffffffff81127bd0>] wait_on_page_bit+0xc0/0xd0
+[  601.353958]  [<ffffffff81096db0>] ? autoremove_wake_function+0x40/0x40
+[  601.354200]  [<ffffffff81127cc4>] __filemap_fdatawait_range+0xe4/0x140
+[  601.354441]  [<ffffffff81127d34>] filemap_fdatawait_range+0x14/0x30
+[  601.354688]  [<ffffffff81129a9f>] filemap_write_and_wait_range+0x3f/0x70
+[  601.354932]  [<ffffffff811ced3b>] blkdev_fsync+0x1b/0x50
+[  601.355193]  [<ffffffff811c82d9>] vfs_fsync_range+0x49/0xa0
+[  601.355432]  [<ffffffff811cf45a>] blkdev_write_iter+0xca/0x100
+[  601.355679]  [<ffffffff81197b1a>] __vfs_write+0xaa/0xe0
+[  601.355925]  [<ffffffff81198379>] vfs_write+0xa9/0x1a0
+[  601.356164]  [<ffffffff811c59d8>] kernel_write+0x38/0x50
+
+The underlying device is a null_blk, with default parameters:
+
+  queue_mode    = MQ
+  submit_queues = 1
+
+Verification that nullb0 has something inflight:
+
+root@pserver8:~# cat /sys/block/nullb0/inflight
+       0        1
+root@pserver8:~# find /sys/block/nullb0/mq/0/cpu* -name rq_list -print -exec cat {} \;
+...
+/sys/block/nullb0/mq/0/cpu2/rq_list
+CTX pending:
+        ffff8838038e2400
+...
+
+During debug it became clear that stalled request is always inserted in
+the rq_list from the following path:
+
+   save_stack_trace_tsk + 34
+   blk_mq_insert_requests + 231
+   blk_mq_flush_plug_list + 281
+   blk_flush_plug_list + 199
+   wait_on_page_bit + 192
+   __filemap_fdatawait_range + 228
+   filemap_fdatawait_range + 20
+   filemap_write_and_wait_range + 63
+   blkdev_fsync + 27
+   vfs_fsync_range + 73
+   blkdev_write_iter + 202
+   __vfs_write + 170
+   vfs_write + 169
+   kernel_write + 56
+
+So blk_flush_plug_list() was called with from_schedule == true.
+
+If from_schedule is true, that means that finally blk_mq_insert_requests()
+offloads execution of __blk_mq_run_hw_queue() and uses kblockd workqueue,
+i.e. it calls kblockd_schedule_delayed_work_on().
+
+That means, that we race with another CPU, which is about to execute
+__blk_mq_run_hw_queue() work.
+
+Further debugging shows the following traces from different CPUs:
+
+  CPU#0                                  CPU#1
+  ----------------------------------     -------------------------------
+  reqeust A inserted
+  STORE hctx->ctx_map[0] bit marked
+  kblockd_schedule...() returns 1
+  <schedule to kblockd workqueue>
+                                         request B inserted
+                                         STORE hctx->ctx_map[1] bit marked
+                                         kblockd_schedule...() returns 0
+  *** WORK PENDING bit is cleared ***
+  flush_busy_ctxs() is executed, but
+  bit 1, set by CPU#1, is not observed
+
+As a result request B pended forever.
+
+This behaviour can be explained by speculative LOAD of hctx->ctx_map on
+CPU#0, which is reordered with clear of PENDING bit and executed _before_
+actual STORE of bit 1 on CPU#1.
+
+The proper fix is an explicit full barrier <mfence>, which guarantees
+that clear of PENDING bit is to be executed before all possible
+speculative LOADS or STORES inside actual work function.
+
+Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
+Cc: Gioh Kim <gi-oh.kim@profitbricks.com>
+Cc: Michael Wang <yun.wang@profitbricks.com>
+Cc: Tejun Heo <tj@kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Signed-off-by: Tejun Heo <tj@kernel.org>
+Signed-off-by: Kamal Mostafa <kamal@canonical.com>
+---
+ kernel/workqueue.c | 29 +++++++++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
+
+diff --git a/kernel/workqueue.c b/kernel/workqueue.c
+index c743abf..a2a7ac1 100644
+--- a/kernel/workqueue.c
++++ b/kernel/workqueue.c
+@@ -649,6 +649,35 @@ static void set_work_pool_and_clear_pending(struct work_struct *work,
+ 	 */
+ 	smp_wmb();
+ 	set_work_data(work, (unsigned long)pool_id << WORK_OFFQ_POOL_SHIFT, 0);
++	/*
++	 * The following mb guarantees that previous clear of a PENDING bit
++	 * will not be reordered with any speculative LOADS or STORES from
++	 * work->current_func, which is executed afterwards.  This possible
++	 * reordering can lead to a missed execution on attempt to qeueue
++	 * the same @work.  E.g. consider this case:
++	 *
++	 *   CPU#0                         CPU#1
++	 *   ----------------------------  --------------------------------
++	 *
++	 * 1  STORE event_indicated
++	 * 2  queue_work_on() {
++	 * 3    test_and_set_bit(PENDING)
++	 * 4 }                             set_..._and_clear_pending() {
++	 * 5                                 set_work_data() # clear bit
++	 * 6                                 smp_mb()
++	 * 7                               work->current_func() {
++	 * 8				      LOAD event_indicated
++	 *				   }
++	 *
++	 * Without an explicit full barrier speculative LOAD on line 8 can
++	 * be executed before CPU#0 does STORE on line 1.  If that happens,
++	 * CPU#0 observes the PENDING bit is still set and new execution of
++	 * a @work is not queued in a hope, that CPU#1 will eventually
++	 * finish the queued @work.  Meanwhile CPU#1 does not see
++	 * event_indicated is set, because speculative LOAD was executed
++	 * before actual STORE.
++	 */
++	smp_mb();
+ }
+
+ static void clear_work_data(struct work_struct *work)
+--
+2.7.4
