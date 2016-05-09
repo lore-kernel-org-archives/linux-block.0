@@ -1,51 +1,65 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:49130 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751448AbcEJOQo (ORCPT <rfc822;linux-block@vger.kernel.org>);
-	Tue, 10 May 2016 10:16:44 -0400
-Date: Tue, 10 May 2016 16:16:41 +0200
-From: Jan Kara <jack@suse.cz>
-To: Vishal Verma <vishal.l.verma@intel.com>
-Cc: linux-nvdimm@lists.01.org,
-	Matthew Wilcox <matthew.r.wilcox@intel.com>,
-	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-	xfs@oss.sgi.com, linux-ext4@vger.kernel.org, linux-mm@kvack.org,
-	Ross Zwisler <ross.zwisler@linux.intel.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Dave Chinner <david@fromorbit.com>, Jan Kara <jack@suse.cz>,
-	Jens Axboe <axboe@fb.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-kernel@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Jeff Moyer <jmoyer@redhat.com>,
-	Boaz Harrosh <boaz@plexistor.com>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Date: Mon, 9 May 2016 08:55:27 -0600
+From: Ross Zwisler <ross.zwisler@linux.intel.com>
+To: "Verma, Vishal L" <vishal.l.verma@intel.com>
+Cc: "hch@infradead.org" <hch@infradead.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"xfs@oss.sgi.com" <xfs@oss.sgi.com>,
+	"linux-nvdimm@ml01.01.org" <linux-nvdimm@ml01.01.org>,
+	"jmoyer@redhat.com" <jmoyer@redhat.com>,
+	"linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"Williams, Dan J" <dan.j.williams@intel.com>,
+	"axboe@fb.com" <axboe@fb.com>,
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+	"ross.zwisler@linux.intel.com" <ross.zwisler@linux.intel.com>,
+	"linux-ext4@vger.kernel.org" <linux-ext4@vger.kernel.org>,
+	"boaz@plexistor.com" <boaz@plexistor.com>,
+	"Wilcox, Matthew R" <matthew.r.wilcox@intel.com>,
+	"david@fromorbit.com" <david@fromorbit.com>,
+	"jack@suse.cz" <jack@suse.cz>
 Subject: Re: [PATCH v5 3/5] dax: use sb_issue_zerout instead of calling
  dax_clear_sectors
-Message-ID: <20160510141641.GM11897@quack2.suse.cz>
+Message-ID: <20160509145527.GA31079@linux.intel.com>
 References: <1462571591-3361-1-git-send-email-vishal.l.verma@intel.com>
  <1462571591-3361-4-git-send-email-vishal.l.verma@intel.com>
+ <20160508085203.GA10160@infradead.org>
+ <1462733173.3006.7.camel@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1462571591-3361-4-git-send-email-vishal.l.verma@intel.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <1462733173.3006.7.camel@intel.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-On Fri 06-05-16 15:53:09, Vishal Verma wrote:
-> From: Matthew Wilcox <matthew.r.wilcox@intel.com>
+On Sun, May 08, 2016 at 06:46:13PM +0000, Verma, Vishal L wrote:
+> On Sun, 2016-05-08 at 01:52 -0700, Christoph Hellwig wrote:
+> > On Fri, May 06, 2016 at 03:53:09PM -0600, Vishal Verma wrote:
+> > > 
+> > > From: Matthew Wilcox <matthew.r.wilcox@intel.com>
+> > > 
+> > > dax_clear_sectors() cannot handle poisoned blocks.��These must be
+> > > zeroed using the BIO interface instead.��Convert ext2 and XFS to
+> > > use
+> > > only sb_issue_zerout().
+> > > 
+> > > Signed-off-by: Matthew Wilcox <matthew.r.wilcox@intel.com>
+> > > [vishal: Also remove the dax_clear_sectors function entirely]
+> > > Signed-off-by: Vishal Verma <vishal.l.verma@intel.com>
+> > Just to make sure:��the existing sb_issue_zerout as in 4.6-rc
+> > is already doing the right thing for DAX?��I've got a pending
+> > patchset
+> > for XFS that introduces another dax_clear_sectors users, but if it's
+> > already safe to use blkdev_issue_zeroout I can switch to that and
+> > avoid
+> > the merge conflict.
 > 
-> dax_clear_sectors() cannot handle poisoned blocks.  These must be
-> zeroed using the BIO interface instead.  Convert ext2 and XFS to use
-> only sb_issue_zerout().
-> 
-> Signed-off-by: Matthew Wilcox <matthew.r.wilcox@intel.com>
-> [vishal: Also remove the dax_clear_sectors function entirely]
-> Signed-off-by: Vishal Verma <vishal.l.verma@intel.com>
+> I believe so - Jan has moved all unwritten extent conversions out of
+> DAX with his patch set, and I believe zeroing through the driver is
+> always fine. Ross or Jan could confirm though.�
 
-The patch looks good. You can add:
-
-Reviewed-by: Jan Kara <jack@suse.cz>
-
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Yep, I believe that the existing sb_issue_zeroout() as of v4.6-rc* does the
+right thing.  We'll end up calling sb_issue_zeroout() => blkdev_issue_zeroout()
+=> __blkdev_issue_zeroout() because we don't have support for discard or
+write_same in PMEM.  This will send zero page BIOs to the PMEM driver, which
+will do the zeroing as normal writes.
