@@ -1,89 +1,36 @@
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>,
-	Tejun Heo <tj@kernel.org>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	linus.walleij@linaro.org,
-	broonie@kernel.org,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH BUGFIX] block: add missing group association in bio_split
-Date: Tue, 10 May 2016 11:08:42 +0200
-Message-Id: <1462871322-13217-1-git-send-email-paolo.valente@linaro.org>
-In-Reply-To: <5730CFC5.80201@kernel.dk>
-References: <5730CFC5.80201@kernel.dk>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH BUGFIX] block: add missing group association in bio_split
+To: Mark Brown <broonie@kernel.org>, Paolo <paolo.valente@linaro.org>
+References: <1462567512-3007-1-git-send-email-paolo.valente@linaro.org>
+ <x49bn4f71qi.fsf@segfault.boston.devel.redhat.com>
+ <x4937pr70z5.fsf@segfault.boston.devel.redhat.com>
+ <5730A108.1000703@linaro.org> <20160509145647.GB3458@sirena.org.uk>
+Cc: Jeff Moyer <jmoyer@redhat.com>, Tejun Heo <tj@kernel.org>,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ ulf.hansson@linaro.org, linus.walleij@linaro.org, stable@vger.kernel.org
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <5730CFC5.80201@kernel.dk>
+Date: Mon, 9 May 2016 11:58:29 -0600
+MIME-Version: 1.0
+In-Reply-To: <20160509145647.GB3458@sirena.org.uk>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-When a bio is split, the newly created bio must be associated with the
-same blkcg as the original bio (if BLK_CGROUP is enabled). If this
-operation is not performed, then the new bio is not associated with
-any group, and the group of the current task is returned when the
-group of the bio is requested.
+On 05/09/2016 08:56 AM, Mark Brown wrote:
+> On Mon, May 09, 2016 at 04:39:04PM +0200, Paolo wrote:
+>> Il 09/05/2016 16:35, Jeff Moyer ha scritto:
+>
+>>> Gah, I see that the bi_css member is only present for CONFIG_BLK_CGROUP.
+>>> I guess we'll have to live with the ifdef.
+>
+>> We have already tried to remove it, but it seems it would require other
+>> major changes.
+>
+> It probably should get fixed, but separately to the bug fix.
 
-Depending on the frequency of splits, this may cause a large
-percentage of the bios belonging to a given group to be treated as if
-belonging to other groups (in most cases as if belonging to the root
-group). The expected group isolation may thereby be then broken.
+It's a minor tweak, might as well submit them together. Because if you 
+don't, it has a tendency to be forgotten once the original issue is 
+resolved.
 
-This commit adds the missing association in bio_split.
-
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
----
- block/bio.c         | 15 +++++++++++++++
- include/linux/bio.h |  2 ++
- 2 files changed, 17 insertions(+)
-
-diff --git a/block/bio.c b/block/bio.c
-index 807d25e..20795eb 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1811,6 +1811,8 @@ struct bio *bio_split(struct bio *bio, int sectors,
- 
- 	bio_advance(bio, split->bi_iter.bi_size);
- 
-+	bio_clone_blkcg_association(split, bio);
-+
- 	return split;
- }
- EXPORT_SYMBOL(bio_split);
-@@ -2016,6 +2018,19 @@ void bio_disassociate_task(struct bio *bio)
- 	}
- }
- 
-+/**
-+ * bio_clone_blkcg_association - clone blkcg association from src to dst bio
-+ * @dst: destination bio
-+ * @src: source bio
-+ */
-+int bio_clone_blkcg_association(struct bio *dst, struct bio *src)
-+{
-+	if (src->bi_css)
-+		return bio_associate_blkcg(dst, src->bi_css);
-+
-+	return 0;
-+}
-+
- #endif /* CONFIG_BLK_CGROUP */
- 
- static void __init biovec_init_slabs(void)
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 6b7481f..8535f81 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -527,11 +527,13 @@ extern unsigned int bvec_nr_vecs(unsigned short idx);
- int bio_associate_blkcg(struct bio *bio, struct cgroup_subsys_state *blkcg_css);
- int bio_associate_current(struct bio *bio);
- void bio_disassociate_task(struct bio *bio);
-+int bio_clone_blkcg_association(struct bio *dst, struct bio *src);
- #else	/* CONFIG_BLK_CGROUP */
- static inline int bio_associate_blkcg(struct bio *bio,
- 			struct cgroup_subsys_state *blkcg_css) { return 0; }
- static inline int bio_associate_current(struct bio *bio) { return -ENOENT; }
- static inline void bio_disassociate_task(struct bio *bio) { }
-+int bio_clone_blkcg_association(struct bio *dst, struct bio *src) { return 0; }
- #endif	/* CONFIG_BLK_CGROUP */
- 
- #ifdef CONFIG_HIGHMEM
 -- 
-1.9.1
+Jens Axboe
