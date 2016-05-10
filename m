@@ -1,203 +1,49 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lf0-f68.google.com ([209.85.215.68]:35892 "EHLO
-	mail-lf0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750800AbcEQVub (ORCPT
-	<rfc822;linux-block@vger.kernel.org>);
-	Tue, 17 May 2016 17:50:31 -0400
-Received: by mail-lf0-f68.google.com with SMTP id y84so2051169lfc.3
-        for <linux-block@vger.kernel.org>; Tue, 17 May 2016 14:50:30 -0700 (PDT)
+Received: from mx1.redhat.com ([209.132.183.28]:59787 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751723AbcEJPpu (ORCPT <rfc822;linux-block@vger.kernel.org>);
+	Tue, 10 May 2016 11:45:50 -0400
+From: Jeff Moyer <jmoyer@redhat.com>
+To: Shaohua Li <shli@fb.com>
+Cc: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>, <axboe@fb.com>,
+	<Kernel-team@fb.com>
+Subject: Re: [PATCH 2/3] blktrace: add missed mask name
+References: <2c3ee532132f8925dd0be1178e8dee0bba6b448c.1462838969.git.shli@fb.com>
+	<ea5ffed7a013bf524d3576cdff8ad00d11a68bf2.1462838969.git.shli@fb.com>
+Date: Tue, 10 May 2016 11:45:47 -0400
+In-Reply-To: <ea5ffed7a013bf524d3576cdff8ad00d11a68bf2.1462838969.git.shli@fb.com>
+	(Shaohua Li's message of "Mon, 9 May 2016 17:22:14 -0700")
+Message-ID: <x49eg997w7o.fsf@segfault.boston.devel.redhat.com>
 MIME-Version: 1.0
-Date: Tue, 17 May 2016 15:50:29 -0600
-Message-ID: <CADm5WxMxEakm6KCnrnf35UDv3Abo5-Pa7tAS8rvU1CiuCiLv1Q@mail.gmail.com>
-Subject: [PATCH v2 2/4] Define and use STAT_READ and STAT_WRITE
-From: Michael Callahan <coder.callahan@gmail.com>
-To: linux-block@vger.kernel.org
-Cc: Michael Callahan <michaelcallahan@fb.com>,
-	Jens Axboe <axboe@fb.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Add defines for STAT_READ and STAT_WRITE for indexing the partition stat
-entries.  This clarifies some fs/ code which has hardcoded 1 for
-STAT_WRITE and will make it easier to extend the stats with additional
-fields.
+Shaohua Li <shli@fb.com> writes:
 
-Signed-off-by: Michael Callahan <michaelcallahan@fb.com>
+> BLK_TC_NOTIFY is missed in mask_maps, so we can't print out notify or
+> set mask with 'notify' name.
 
- block/genhd.c             | 16 ++++++++--------
- block/partition-generic.c | 16 ++++++++--------
- fs/ext4/super.c           |  5 +++--
- fs/ext4/sysfs.c           |  6 ++++--
- fs/f2fs/f2fs.h            |  2 +-
- fs/f2fs/super.c           |  3 ++-
- include/linux/genhd.h     |  9 ++++++---
- 7 files changed, 32 insertions(+), 25 deletions(-)
----
-diff --git a/block/genhd.c b/block/genhd.c
-index 9f42526..b6f1dee 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -1199,14 +1199,14 @@ static int diskstats_show(struct seq_file
-*seqf, void *v)
-                           "%u %lu %lu %lu %u %u %u %u\n",
-                           MAJOR(part_devt(hd)), MINOR(part_devt(hd)),
-                           disk_name(gp, hd->partno, buf),
--                          part_stat_read(hd, ios[READ]),
--                          part_stat_read(hd, merges[READ]),
--                          part_stat_read(hd, sectors[READ]),
--                          jiffies_to_msecs(part_stat_read(hd, ticks[READ])),
--                          part_stat_read(hd, ios[WRITE]),
--                          part_stat_read(hd, merges[WRITE]),
--                          part_stat_read(hd, sectors[WRITE]),
--                          jiffies_to_msecs(part_stat_read(hd, ticks[WRITE])),
-+                          part_stat_read(hd, ios[STAT_READ]),
-+                          part_stat_read(hd, merges[STAT_READ]),
-+                          part_stat_read(hd, sectors[STAT_READ]),
-+                          jiffies_to_msecs(part_stat_read(hd,
-ticks[STAT_READ])),
-+                          part_stat_read(hd, ios[STAT_WRITE]),
-+                          part_stat_read(hd, merges[STAT_WRITE]),
-+                          part_stat_read(hd, sectors[STAT_WRITE]),
-+                          jiffies_to_msecs(part_stat_read(hd,
-ticks[STAT_WRITE])),
-                           part_in_flight(hd),
-                           jiffies_to_msecs(part_stat_read(hd, io_ticks)),
-                           jiffies_to_msecs(part_stat_read(hd, time_in_queue))
-diff --git a/block/partition-generic.c b/block/partition-generic.c
-index d7eb77e..15bf298 100644
---- a/block/partition-generic.c
-+++ b/block/partition-generic.c
-@@ -123,14 +123,14 @@ ssize_t part_stat_show(struct device *dev,
-                "%8lu %8lu %8llu %8u "
-                "%8u %8u %8u"
-                "\n",
--               part_stat_read(p, ios[READ]),
--               part_stat_read(p, merges[READ]),
--               (unsigned long long)part_stat_read(p, sectors[READ]),
--               jiffies_to_msecs(part_stat_read(p, ticks[READ])),
--               part_stat_read(p, ios[WRITE]),
--               part_stat_read(p, merges[WRITE]),
--               (unsigned long long)part_stat_read(p, sectors[WRITE]),
--               jiffies_to_msecs(part_stat_read(p, ticks[WRITE])),
-+               part_stat_read(p, ios[STAT_READ]),
-+               part_stat_read(p, merges[STAT_READ]),
-+               (unsigned long long)part_stat_read(p, sectors[STAT_READ]),
-+               jiffies_to_msecs(part_stat_read(p, ticks[STAT_READ])),
-+               part_stat_read(p, ios[STAT_WRITE]),
-+               part_stat_read(p, merges[STAT_WRITE]),
-+               (unsigned long long)part_stat_read(p, sectors[STAT_WRITE]),
-+               jiffies_to_msecs(part_stat_read(p, ticks[STAT_WRITE])),
-                part_in_flight(p),
-                jiffies_to_msecs(part_stat_read(p, io_ticks)),
-                jiffies_to_msecs(part_stat_read(p, time_in_queue)));
-diff --git a/fs/ext4/super.c b/fs/ext4/super.c
-index 304c712..3e7f205 100644
---- a/fs/ext4/super.c
-+++ b/fs/ext4/super.c
-@@ -3182,7 +3182,7 @@ static int ext4_fill_super(struct super_block
-*sb, void *data, int silent)
-        sbi->s_sb_block = sb_block;
-        if (sb->s_bdev->bd_part)
-                sbi->s_sectors_written_start =
--                       part_stat_read(sb->s_bdev->bd_part, sectors[1]);
-+                       part_stat_read(sb->s_bdev->bd_part,
-sectors[STAT_WRITE]);
+For the text-based interface, yeah.
 
-        /* Cleanup superblock name */
-        strreplace(sb->s_id, '/', '!');
-@@ -4359,7 +4359,8 @@ static int ext4_commit_super(struct super_block
-*sb, int sync)
-        if (sb->s_bdev->bd_part)
-                es->s_kbytes_written =
-                        cpu_to_le64(EXT4_SB(sb)->s_kbytes_written +
--                           ((part_stat_read(sb->s_bdev->bd_part, sectors[1]) -
-+                           ((part_stat_read(sb->s_bdev->bd_part,
-+                                            sectors[STAT_WRITE]) -
-                              EXT4_SB(sb)->s_sectors_written_start) >> 1));
-        else
-                es->s_kbytes_written =
-diff --git a/fs/ext4/sysfs.c b/fs/ext4/sysfs.c
-index 1420a3c..10ad87e 100644
---- a/fs/ext4/sysfs.c
-+++ b/fs/ext4/sysfs.c
-@@ -55,7 +55,8 @@ static ssize_t session_write_kbytes_show(struct ext4_attr *a,
-        if (!sb->s_bdev->bd_part)
-                return snprintf(buf, PAGE_SIZE, "0\n");
-        return snprintf(buf, PAGE_SIZE, "%lu\n",
--                       (part_stat_read(sb->s_bdev->bd_part, sectors[1]) -
-+                       (part_stat_read(sb->s_bdev->bd_part,
-+                                       sectors[STAT_WRITE]) -
-                         sbi->s_sectors_written_start) >> 1);
- }
-@@ -68,7 +69,8 @@ static ssize_t lifetime_write_kbytes_show(struct ext4_attr *a,
-                return snprintf(buf, PAGE_SIZE, "0\n");
-        return snprintf(buf, PAGE_SIZE, "%llu\n",
-                        (unsigned long long)(sbi->s_kbytes_written +
--                       ((part_stat_read(sb->s_bdev->bd_part, sectors[1]) -
-+                       ((part_stat_read(sb->s_bdev->bd_part,
-+                                        sectors[STAT_WRITE]) -
-                          EXT4_SB(sb)->s_sectors_written_start) >> 1)));
- }
+Reviewed-by: Jeff Moyer <jmoyer@redhat.com>
 
-diff --git a/fs/f2fs/f2fs.h b/fs/f2fs/f2fs.h
-index 7a4558d..2b29afa 100644
---- a/fs/f2fs/f2fs.h
-+++ b/fs/f2fs/f2fs.h
-@@ -808,7 +808,7 @@ struct f2fs_sb_info {
-  * and the return value is in kbytes. s is of struct f2fs_sb_info.
-  */
- #define BD_PART_WRITTEN(s)                                              \
--(((u64)part_stat_read(s->sb->s_bdev->bd_part, sectors[1]) -             \
-+(((u64)part_stat_read(s->sb->s_bdev->bd_part, sectors[STAT_WRITE]) -    \
-                s->sectors_written_start) >> 1)
-
- static inline void f2fs_update_time(struct f2fs_sb_info *sbi, int type)
-diff --git a/fs/f2fs/super.c b/fs/f2fs/super.c
-index 006f87d..d5da3cc 100644
---- a/fs/f2fs/super.c
-+++ b/fs/f2fs/super.c
-@@ -1464,7 +1464,8 @@ try_onemore:
-        /* For write statistics */
-        if (sb->s_bdev->bd_part)
-                sbi->sectors_written_start =
--                       (u64)part_stat_read(sb->s_bdev->bd_part, sectors[1]);
-+                       (u64)part_stat_read(sb->s_bdev->bd_part,
-+                                           sectors[STAT_WRITE]);
-
-        /* Read accumulated write IO statistics if exists */
-        seg_i = CURSEG_I(sbi, CURSEG_HOT_NODE);
-diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index b73559a..19e809c 100644
---- a/include/linux/genhd.h
-+++ b/include/linux/genhd.h
-@@ -59,6 +59,9 @@ enum {
- #define DISK_MAX_PARTS                 256
- #define DISK_NAME_LEN                  32
-
-+#define STAT_READ                      0
-+#define STAT_WRITE                     1
-+
- #include <linux/major.h>
- #include <linux/device.h>
- #include <linux/smp.h>
-@@ -80,7 +83,7 @@ struct partition {
- } __attribute__((packed));
-
- struct disk_stats {
--       unsigned long sectors[2];       /* READs and WRITEs */
-+       unsigned long sectors[2];       /* STAT_READs and STAT_WRITEs */
-        unsigned long ios[2];
-        unsigned long merges[2];
-        unsigned long ticks[2];
-@@ -382,8 +385,8 @@ static inline void free_part_stats(struct hd_struct *part)
- #endif /* CONFIG_SMP */
-
- #define part_stat_read_accum(part, field)                              \
--       (part_stat_read(part, field[0]) +                               \
--        part_stat_read(part, field[1]))
-+       (part_stat_read(part, field[STAT_READ]) +                       \
-+        part_stat_read(part, field[STAT_WRITE]))
-
- #define part_stat_add(cpu, part, field, addnd) do {                    \
-        __part_stat_add((cpu), (part), field, addnd);                   \
+>
+> Signed-off-by: Shaohua Li <shli@fb.com>
+> ---
+>  kernel/trace/blktrace.c | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+> index 8ae9ea2..9aef865 100644
+> --- a/kernel/trace/blktrace.c
+> +++ b/kernel/trace/blktrace.c
+> @@ -1552,6 +1552,7 @@ static const struct {
+>  	{ BLK_TC_COMPLETE,	"complete"	},
+>  	{ BLK_TC_FS,		"fs"		},
+>  	{ BLK_TC_PC,		"pc"		},
+> +	{ BLK_TC_NOTIFY,	"notify"	},
+>  	{ BLK_TC_AHEAD,		"ahead"		},
+>  	{ BLK_TC_META,		"meta"		},
+>  	{ BLK_TC_DISCARD,	"discard"	},
