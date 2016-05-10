@@ -1,244 +1,184 @@
-Return-Path: <jack@suse.cz>
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH 3/3] iowatcher: Add sample script to tag IO by process and allow grouping
-Date: Fri, 20 May 2016 13:54:59 +0200
-Message-Id: <1463745299-5951-4-git-send-email-jack@suse.cz>
-In-Reply-To: <1463745299-5951-1-git-send-email-jack@suse.cz>
-References: <1463745299-5951-1-git-send-email-jack@suse.cz>
+Return-Path: <kamal@canonical.com>
+From: Kamal Mostafa <kamal@canonical.com>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org,
+	kernel-team@lists.ubuntu.com
+Cc: Roman Pen <roman.penyaev@profitbricks.com>,
+	Gioh Kim <gi-oh.kim@profitbricks.com>,
+	Michael Wang <yun.wang@profitbricks.com>,
+	Tejun Heo <tj@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org,
+	Kamal Mostafa <kamal@canonical.com>
+Subject: [PATCH 3.19.y-ckt 26/54] workqueue: fix ghost PENDING flag while doing MQ IO
+Date: Mon,  9 May 2016 17:04:45 -0700
+Message-Id: <1462838713-31343-27-git-send-email-kamal@canonical.com>
+In-Reply-To: <1462838713-31343-1-git-send-email-kamal@canonical.com>
+References: <1462838713-31343-1-git-send-email-kamal@canonical.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Add a python module iowatcher.py that implements communication with
-the main iowatcher program. Also add a simple python script that tags
-IO by process ID and also allows grouping of processes into groups
-to demonstrate the use of the script.
+3.19.8-ckt21 -stable review patch.  If anyone has any objections, please let me know.
 
-Signed-off-by: Jan Kara <jack@suse.cz>
+---8<------------------------------------------------------------
+
+From: Roman Pen <roman.penyaev@profitbricks.com>
+
+commit 346c09f80459a3ad97df1816d6d606169a51001a upstream.
+
+The bug in a workqueue leads to a stalled IO request in MQ ctx->rq_list
+with the following backtrace:
+
+[  601.347452] INFO: task kworker/u129:5:1636 blocked for more than 120 seconds.
+[  601.347574]       Tainted: G           O    4.4.5-1-storage+ #6
+[  601.347651] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+[  601.348142] kworker/u129:5  D ffff880803077988     0  1636      2 0x00000000
+[  601.348519] Workqueue: ibnbd_server_fileio_wq ibnbd_dev_file_submit_io_worker [ibnbd_server]
+[  601.348999]  ffff880803077988 ffff88080466b900 ffff8808033f9c80 ffff880803078000
+[  601.349662]  ffff880807c95000 7fffffffffffffff ffffffff815b0920 ffff880803077ad0
+[  601.350333]  ffff8808030779a0 ffffffff815b01d5 0000000000000000 ffff880803077a38
+[  601.350965] Call Trace:
+[  601.351203]  [<ffffffff815b0920>] ? bit_wait+0x60/0x60
+[  601.351444]  [<ffffffff815b01d5>] schedule+0x35/0x80
+[  601.351709]  [<ffffffff815b2dd2>] schedule_timeout+0x192/0x230
+[  601.351958]  [<ffffffff812d43f7>] ? blk_flush_plug_list+0xc7/0x220
+[  601.352208]  [<ffffffff810bd737>] ? ktime_get+0x37/0xa0
+[  601.352446]  [<ffffffff815b0920>] ? bit_wait+0x60/0x60
+[  601.352688]  [<ffffffff815af784>] io_schedule_timeout+0xa4/0x110
+[  601.352951]  [<ffffffff815b3a4e>] ? _raw_spin_unlock_irqrestore+0xe/0x10
+[  601.353196]  [<ffffffff815b093b>] bit_wait_io+0x1b/0x70
+[  601.353440]  [<ffffffff815b056d>] __wait_on_bit+0x5d/0x90
+[  601.353689]  [<ffffffff81127bd0>] wait_on_page_bit+0xc0/0xd0
+[  601.353958]  [<ffffffff81096db0>] ? autoremove_wake_function+0x40/0x40
+[  601.354200]  [<ffffffff81127cc4>] __filemap_fdatawait_range+0xe4/0x140
+[  601.354441]  [<ffffffff81127d34>] filemap_fdatawait_range+0x14/0x30
+[  601.354688]  [<ffffffff81129a9f>] filemap_write_and_wait_range+0x3f/0x70
+[  601.354932]  [<ffffffff811ced3b>] blkdev_fsync+0x1b/0x50
+[  601.355193]  [<ffffffff811c82d9>] vfs_fsync_range+0x49/0xa0
+[  601.355432]  [<ffffffff811cf45a>] blkdev_write_iter+0xca/0x100
+[  601.355679]  [<ffffffff81197b1a>] __vfs_write+0xaa/0xe0
+[  601.355925]  [<ffffffff81198379>] vfs_write+0xa9/0x1a0
+[  601.356164]  [<ffffffff811c59d8>] kernel_write+0x38/0x50
+
+The underlying device is a null_blk, with default parameters:
+
+  queue_mode    = MQ
+  submit_queues = 1
+
+Verification that nullb0 has something inflight:
+
+root@pserver8:~# cat /sys/block/nullb0/inflight
+       0        1
+root@pserver8:~# find /sys/block/nullb0/mq/0/cpu* -name rq_list -print -exec cat {} \;
+...
+/sys/block/nullb0/mq/0/cpu2/rq_list
+CTX pending:
+        ffff8838038e2400
+...
+
+During debug it became clear that stalled request is always inserted in
+the rq_list from the following path:
+
+   save_stack_trace_tsk + 34
+   blk_mq_insert_requests + 231
+   blk_mq_flush_plug_list + 281
+   blk_flush_plug_list + 199
+   wait_on_page_bit + 192
+   __filemap_fdatawait_range + 228
+   filemap_fdatawait_range + 20
+   filemap_write_and_wait_range + 63
+   blkdev_fsync + 27
+   vfs_fsync_range + 73
+   blkdev_write_iter + 202
+   __vfs_write + 170
+   vfs_write + 169
+   kernel_write + 56
+
+So blk_flush_plug_list() was called with from_schedule == true.
+
+If from_schedule is true, that means that finally blk_mq_insert_requests()
+offloads execution of __blk_mq_run_hw_queue() and uses kblockd workqueue,
+i.e. it calls kblockd_schedule_delayed_work_on().
+
+That means, that we race with another CPU, which is about to execute
+__blk_mq_run_hw_queue() work.
+
+Further debugging shows the following traces from different CPUs:
+
+  CPU#0                                  CPU#1
+  ----------------------------------     -------------------------------
+  reqeust A inserted
+  STORE hctx->ctx_map[0] bit marked
+  kblockd_schedule...() returns 1
+  <schedule to kblockd workqueue>
+                                         request B inserted
+                                         STORE hctx->ctx_map[1] bit marked
+                                         kblockd_schedule...() returns 0
+  *** WORK PENDING bit is cleared ***
+  flush_busy_ctxs() is executed, but
+  bit 1, set by CPU#1, is not observed
+
+As a result request B pended forever.
+
+This behaviour can be explained by speculative LOAD of hctx->ctx_map on
+CPU#0, which is reordered with clear of PENDING bit and executed _before_
+actual STORE of bit 1 on CPU#1.
+
+The proper fix is an explicit full barrier <mfence>, which guarantees
+that clear of PENDING bit is to be executed before all possible
+speculative LOADS or STORES inside actual work function.
+
+Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
+Cc: Gioh Kim <gi-oh.kim@profitbricks.com>
+Cc: Michael Wang <yun.wang@profitbricks.com>
+Cc: Tejun Heo <tj@kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Signed-off-by: Tejun Heo <tj@kernel.org>
+Signed-off-by: Kamal Mostafa <kamal@canonical.com>
 ---
- iowatcher/iowatcher.py  | 141 ++++++++++++++++++++++++++++++++++++++++++++++++
- iowatcher/tag-by-pid.py |  64 ++++++++++++++++++++++
- 2 files changed, 205 insertions(+)
- create mode 100755 iowatcher/iowatcher.py
- create mode 100755 iowatcher/tag-by-pid.py
+ kernel/workqueue.c | 29 +++++++++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
 
-diff --git a/iowatcher/iowatcher.py b/iowatcher/iowatcher.py
-new file mode 100755
-index 000000000000..bfc6e01f8744
---- /dev/null
-+++ b/iowatcher/iowatcher.py
-@@ -0,0 +1,141 @@
-+import struct
-+import os
-+import sys
-+
-+"""
-+We read input in the following form:
-+struct blk_io_trace {
-+        __u32 magic;            /* MAGIC << 8 | version */
-+        __u32 sequence;         /* event number */
-+        __u64 time;             /* in nanoseconds */
-+        __u64 sector;           /* disk offset */
-+        __u32 bytes;            /* transfer length */
-+        __u32 action;           /* what happened */
-+        __u32 pid;              /* who did it */
-+        __u32 device;           /* device identifier (dev_t) */
-+        __u32 cpu;              /* on what cpu did it happen */
-+        __u16 error;            /* completion error */
-+        __u16 pdu_len;          /* length of data after this trace */
-+}; => size 48 bytes
-+"""
-+
-+# Basic trace action constants
-+__BLK_TA_QUEUE = 1
-+__BLK_TA_BACKMERGE = 2
-+__BLK_TA_FRONTMERGE = 3
-+__BLK_TA_GETRQ = 4
-+__BLK_TA_SLEEPRQ = 5
-+__BLK_TA_REQUEUE = 6
-+__BLK_TA_ISSUE = 7
-+__BLK_TA_COMPLETE = 8
-+__BLK_TA_PLUG = 9
-+__BLK_TA_UNPLUG_IO = 10
-+__BLK_TA_UNPLUG_TIMER = 11
-+__BLK_TA_INSERT = 12
-+__BLK_TA_SPLIT = 13
-+__BLK_TA_BOUNCE = 14
-+__BLK_TA_REMAP = 15
-+__BLK_TA_ABORT = 16
-+__BLK_TA_DRV_DATA = 17
-+
-+# Notification events constants
-+__BLK_TN_PROCESS = 0
-+__BLK_TN_TIMESTAMP = 1
-+__BLK_TN_MESSAGE = 2
-+
-+# Trace categories
-+BLK_TC_READ     = 1 << 0
-+BLK_TC_WRITE    = 1 << 1
-+BLK_TC_FLUSH    = 1 << 2
-+BLK_TC_SYNC     = 1 << 3
-+BLK_TC_QUEUE    = 1 << 4
-+BLK_TC_REQUEUE  = 1 << 5
-+BLK_TC_ISSUE    = 1 << 6
-+BLK_TC_COMPLETE = 1 << 7
-+BLK_TC_FS       = 1 << 8
-+BLK_TC_PC       = 1 << 9
-+BLK_TC_NOTIFY   = 1 << 10
-+BLK_TC_AHEAD    = 1 << 11
-+BLK_TC_META     = 1 << 12
-+BLK_TC_DISCARD  = 1 << 13
-+BLK_TC_DRV_DATA = 1 << 14
-+BLK_TC_FUA      = 1 << 15
-+
-+BLK_TC_SHIFT = 16
-+BLK_TA_MASK = (1 << BLK_TC_SHIFT) - 1
-+
-+def BLK_TC_ACT(act):
-+	return act << BLK_TC_SHIFT
-+
-+def BLK_DATADIR(action):
-+	return (action >> BLK_TC_SHIFT) & (BLK_TC_READ | BLK_TC_WRITE)
-+
-+# Trace actions in full
-+BLK_TA_QUEUE =		__BLK_TA_QUEUE | BLK_TC_ACT(BLK_TC_QUEUE)
-+BLK_TA_BACKMERGE =	__BLK_TA_BACKMERGE | BLK_TC_ACT(BLK_TC_QUEUE)
-+BLK_TA_FRONTMERGE =	__BLK_TA_FRONTMERGE | BLK_TC_ACT(BLK_TC_QUEUE)
-+BLK_TA_GETRQ =		__BLK_TA_GETRQ | BLK_TC_ACT(BLK_TC_QUEUE)
-+BLK_TA_SLEEPRQ =	__BLK_TA_SLEEPRQ | BLK_TC_ACT(BLK_TC_QUEUE)
-+BLK_TA_REQUEUE =	__BLK_TA_REQUEUE | BLK_TC_ACT(BLK_TC_REQUEUE)
-+BLK_TA_ISSUE =		__BLK_TA_ISSUE | BLK_TC_ACT(BLK_TC_ISSUE)
-+BLK_TA_COMPLETE =	__BLK_TA_COMPLETE| BLK_TC_ACT(BLK_TC_COMPLETE)
-+BLK_TA_PLUG =		__BLK_TA_PLUG | BLK_TC_ACT(BLK_TC_QUEUE)
-+BLK_TA_UNPLUG_IO =	__BLK_TA_UNPLUG_IO | BLK_TC_ACT(BLK_TC_QUEUE)
-+BLK_TA_UNPLUG_TIMER =	__BLK_TA_UNPLUG_TIMER | BLK_TC_ACT(BLK_TC_QUEUE)
-+BLK_TA_INSERT =		__BLK_TA_INSERT | BLK_TC_ACT(BLK_TC_QUEUE)
-+BLK_TA_SPLIT =		__BLK_TA_SPLIT
-+BLK_TA_BOUNCE =		__BLK_TA_BOUNCE
-+BLK_TA_REMAP =		__BLK_TA_REMAP | BLK_TC_ACT(BLK_TC_QUEUE)
-+BLK_TA_ABORT =		__BLK_TA_ABORT | BLK_TC_ACT(BLK_TC_QUEUE)
-+BLK_TA_DRV_DATA =	__BLK_TA_DRV_DATA | BLK_TC_ACT(BLK_TC_DRV_DATA)
-+
-+BLK_TN_PROCESS =	__BLK_TN_PROCESS | BLK_TC_ACT(BLK_TC_NOTIFY)
-+BLK_TN_TIMESTAMP =	__BLK_TN_TIMESTAMP | BLK_TC_ACT(BLK_TC_NOTIFY)
-+BLK_TN_MESSAGE =	__BLK_TN_MESSAGE | BLK_TC_ACT(BLK_TC_NOTIFY)
-+
-+# Responses to iowatcher process
-+TAG_RESP_END = 0
-+TAG_RESP_NEW_TAG = 1
-+TAG_RESP_TAG_IO = 2
-+
-+def safe_read(count):
-+	buf = ''
-+	while count > 0:
-+		newbuf = os.read(0, count)
-+		if len(newbuf) == 0:
-+			return ''
-+		count -= len(newbuf)
-+		buf += newbuf
-+	return buf
-+
-+
-+def read_event():
-+	buf = safe_read(48)
-+	# EOF?
-+	if len(buf) == 0:
-+		return ()
-+	fields = struct.unpack('=IIQQIIIIIHH', buf)
-+	pdu_len = fields[10]
-+	if pdu_len > 0:
-+		buf = safe_read(pdu_len)
-+		if len(buf) == 0:
-+			return ()
-+		fields += (buf,)
-+	else:
-+		fields += ('',)
-+	return fields
-+
-+def write_response_end():
-+	buf = struct.pack('=I', TAG_RESP_END)
-+	os.write(1, buf)
-+
-+def write_response_iotag(tag):
-+	buf = struct.pack('=II', TAG_RESP_TAG_IO, tag)
-+	os.write(1, buf)
-+
-+def write_response_newtag(tag, label):
-+	label += '\0'
-+	plen = len(label)
-+	buf = struct.pack('=III', TAG_RESP_NEW_TAG, tag, plen)
-+	os.write(1, buf)
-+	os.write(1, label)
-diff --git a/iowatcher/tag-by-pid.py b/iowatcher/tag-by-pid.py
-new file mode 100755
-index 000000000000..21d1d3351cac
---- /dev/null
-+++ b/iowatcher/tag-by-pid.py
-@@ -0,0 +1,64 @@
-+#!/usr/bin/python
-+
-+from __future__ import print_function
-+import sys
-+import iowatcher
-+import getopt
-+
-+pid_hash = {}
-+group_hash = {}
-+cur_tag = 0
-+cur_group = 0
-+
-+try:
-+	opts, args = getopt.getopt(sys.argv[1:], 'g:')
-+except getopt.GetoptError:
-+	print('tag-by-pid.py [-g group_name:pid[,pid...]] ...', file=sys.stderr)
-+	sys.exit(1)
-+
-+for opt, arg in opts:
-+	if opt == '-g':
-+		try:
-+			name_end = arg.find(':')
-+		except ValueError:
-+			print('Cannot find end of group name in group description \'' + arg + '\'\n', file=sys.stderr)
-+			sys.exit(1)
-+		name = arg[:name_end]
-+		arg = arg[name_end + 1:]
-+		pids = arg.split(',')
-+		group_id = 'g' + str(cur_group)
-+		for pid in pids:
-+			group_hash[int(pid)] = group_id
-+		pid_hash[group_id] = (name, -1)
-+		cur_group += 1
-+
-+while True:
-+	fields = iowatcher.read_event()
-+	if fields == ():
-+		break
-+	magic, sequence, time, sector, bytelen, action, pid, device, cpu, error, pdu_len, payload = fields;
-+	if action == iowatcher.BLK_TN_PROCESS:
-+		if not pid in group_hash:
-+			# Trim to the first \0
-+			payload = payload[0:payload.index('\0')]
-+			payload += ' (' + str(pid) + ')'
-+			pid_hash[pid] = (payload, -1)
-+	elif action & iowatcher.BLK_TC_ACT(iowatcher.BLK_TC_NOTIFY):
-+		iowatcher.write_response_end()
-+		continue
-+	elif (action & iowatcher.BLK_TA_MASK == iowatcher.__BLK_TA_QUEUE) or \
-+	      (action & iowatcher.BLK_TA_MASK == iowatcher.__BLK_TA_ISSUE):
-+		if pid in group_hash:
-+			pid = group_hash[pid]
-+		if pid in pid_hash:
-+			comm, tag = pid_hash[pid]
-+		else:
-+			comm = '? (' + str(pid) + ')'
-+			tag = -1
-+		if tag == -1:
-+			tag = cur_tag
-+			cur_tag += 1
-+			iowatcher.write_response_newtag(tag, comm)
-+			pid_hash[pid] = (comm, tag)
-+		iowatcher.write_response_iotag(tag)
-+	iowatcher.write_response_end()
+diff --git a/kernel/workqueue.c b/kernel/workqueue.c
+index 1cf1b72..b838f171 100644
+--- a/kernel/workqueue.c
++++ b/kernel/workqueue.c
+@@ -633,6 +633,35 @@ static void set_work_pool_and_clear_pending(struct work_struct *work,
+ 	 */
+ 	smp_wmb();
+ 	set_work_data(work, (unsigned long)pool_id << WORK_OFFQ_POOL_SHIFT, 0);
++	/*
++	 * The following mb guarantees that previous clear of a PENDING bit
++	 * will not be reordered with any speculative LOADS or STORES from
++	 * work->current_func, which is executed afterwards.  This possible
++	 * reordering can lead to a missed execution on attempt to qeueue
++	 * the same @work.  E.g. consider this case:
++	 *
++	 *   CPU#0                         CPU#1
++	 *   ----------------------------  --------------------------------
++	 *
++	 * 1  STORE event_indicated
++	 * 2  queue_work_on() {
++	 * 3    test_and_set_bit(PENDING)
++	 * 4 }                             set_..._and_clear_pending() {
++	 * 5                                 set_work_data() # clear bit
++	 * 6                                 smp_mb()
++	 * 7                               work->current_func() {
++	 * 8				      LOAD event_indicated
++	 *				   }
++	 *
++	 * Without an explicit full barrier speculative LOAD on line 8 can
++	 * be executed before CPU#0 does STORE on line 1.  If that happens,
++	 * CPU#0 observes the PENDING bit is still set and new execution of
++	 * a @work is not queued in a hope, that CPU#1 will eventually
++	 * finish the queued @work.  Meanwhile CPU#1 does not see
++	 * event_indicated is set, because speculative LOAD was executed
++	 * before actual STORE.
++	 */
++	smp_mb();
+ }
+ 
+ static void clear_work_data(struct work_struct *work)
 -- 
-2.6.6
+2.7.4
