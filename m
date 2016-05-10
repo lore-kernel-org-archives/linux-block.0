@@ -1,99 +1,69 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga14.intel.com ([192.55.52.115]:10182 "EHLO mga14.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1758265AbcEFVxj (ORCPT <rfc822;linux-block@vger.kernel.org>);
-	Fri, 6 May 2016 17:53:39 -0400
-From: Vishal Verma <vishal.l.verma@intel.com>
-To: linux-nvdimm@lists.01.org
-Cc: Vishal Verma <vishal.l.verma@intel.com>,
-	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-	xfs@oss.sgi.com, linux-ext4@vger.kernel.org, linux-mm@kvack.org,
-	Ross Zwisler <ross.zwisler@linux.intel.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Dave Chinner <david@fromorbit.com>, Jan Kara <jack@suse.cz>,
-	Jens Axboe <axboe@fb.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-kernel@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Jeff Moyer <jmoyer@redhat.com>,
-	Boaz Harrosh <boaz@plexistor.com>
-Subject: [PATCH v5 0/5] dax: handling media errors (clear-on-zero only)
-Date: Fri,  6 May 2016 15:53:06 -0600
-Message-Id: <1462571591-3361-1-git-send-email-vishal.l.verma@intel.com>
+Received: from g9t1613g.houston.hp.com ([15.240.0.71]:50389 "EHLO
+	g9t1613g.houston.hp.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752465AbcEJQdN (ORCPT
+	<rfc822;linux-block@vger.kernel.org>);
+	Tue, 10 May 2016 12:33:13 -0400
+Received: from g1t5424.austin.hp.com (g1t5424.austin.hp.com [15.216.225.54])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by g9t1613g.houston.hp.com (Postfix) with ESMTPS id 2D91761232
+	for <linux-block@vger.kernel.org>; Tue, 10 May 2016 16:33:12 +0000 (UTC)
+From: Toshi Kani <toshi.kani@hpe.com>
+To: dan.j.williams@intel.com, jack@suse.cz, david@fromorbit.com,
+	viro@zeniv.linux.org.uk
+Cc: axboe@fb.com, hch@infradead.org, boaz@plexistor.com, tytso@mit.edu,
+	adilger.kernel@dilger.ca, ross.zwisler@linux.intel.com,
+	toshi.kani@hpe.com, micah.parrish@hpe.com,
+	linux-nvdimm@lists.01.org, linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH v4 5/6] xfs: Add alignment check for DAX mount
+Date: Tue, 10 May 2016 10:23:56 -0600
+Message-Id: <1462897437-16626-6-git-send-email-toshi.kani@hpe.com>
+In-Reply-To: <1462897437-16626-1-git-send-email-toshi.kani@hpe.com>
+References: <1462897437-16626-1-git-send-email-toshi.kani@hpe.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Until now, dax has been disabled if media errors were found on
-any device. This series attempts to address that.
+When a partition is not aligned by 4KB, mount -o dax succeeds,
+but any read/write access to the filesystem fails, except for
+metadata update.
 
-The first two patches from Dan re-enable dax even when media
-errors are present.
+Call bdev_dax_supported() to perform proper precondition checks
+which includes this partition alignment check.
 
-The third patch from Matthew removes the zeroout path from dax
-entirely, making zeroout operations always go through the driver
-(The motivation is that if a backing device has media errors,
-and we create a sparse file on it, we don't want the initial
-zeroing to happen via dax, we want to give the block driver a
-chance to clear the errors).
+Signed-off-by: Toshi Kani <toshi.kani@hpe.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Cc: Dave Chinner <david@fromorbit.com>
+Cc: Dan Williams <dan.j.williams@intel.com>
+Cc: Ross Zwisler <ross.zwisler@linux.intel.com>
+Cc: Christoph Hellwig <hch@infradead.org>
+Cc: Boaz Harrosh <boaz@plexistor.com>
+---
+ fs/xfs/xfs_super.c |   12 +++++-------
+ 1 file changed, 5 insertions(+), 7 deletions(-)
 
-Patch 4 reduces our calls to clear_pmem from dax in the
-truncate/hole-punch cases. We check if the range being truncated
-is sector aligned/sized, and if so, send blkdev_issue_zeroout
-instead of clear_pmem so that errors can be handled better by
-the driver.
-
-Patch 5 fixes a redundant comment in DAX and is mostly unrelated
-to the rest of this series.
-
-This series also depends on/is based on Jan Kara's DAX Locking
-fixes series [1].
-
-
-[1]: http://www.spinics.net/lists/linux-mm/msg105819.html
-
-v5:
- - Drop the patch that attempts to clear-errors-on-write till we
-   reach consensus on how to handle that.
- - Don't pass blk_dax_ctl to direct_access, instead pass in all the
-   required arguments individually (Christoph, Dan)
-
-v4:
- - Remove the dax->direct_IO fallbacks entirely. Instead, go through
-   the usual direct_IO path when we're in O_DIRECT, and use dax_IO
-   for other, non O_DIRECT IO. (Dan, Christoph)
-
-v3:
- - Wrapper-ize the direct_IO fallback again and make an exception
-   for -EIOCBQUEUED (Jeff, Dan)
- - Reduce clear_pmem usage in DAX to the minimum
-
-
-Dan Williams (2):
-  dax: fallback from pmd to pte on error
-  dax: enable dax in the presence of known media errors (badblocks)
-
-Matthew Wilcox (1):
-  dax: use sb_issue_zerout instead of calling dax_clear_sectors
-
-Vishal Verma (2):
-  dax: for truncate/hole-punch, do zeroing through the driver if
-    possible
-  dax: fix a comment in dax_zero_page_range and dax_truncate_page
-
- Documentation/filesystems/dax.txt | 32 ++++++++++++++++
- arch/powerpc/sysdev/axonram.c     |  2 +-
- block/ioctl.c                     |  9 -----
- drivers/block/brd.c               |  2 +-
- drivers/nvdimm/pmem.c             | 10 ++++-
- drivers/s390/block/dcssblk.c      |  2 +-
- fs/block_dev.c                    |  2 +-
- fs/dax.c                          | 78 ++++++++++++++-------------------------
- fs/ext2/inode.c                   |  7 ++--
- fs/xfs/xfs_bmap_util.c            | 15 ++------
- include/linux/blkdev.h            |  2 +-
- include/linux/dax.h               |  1 -
- 12 files changed, 80 insertions(+), 82 deletions(-)
-
--- 
-2.5.5
-
+diff --git a/fs/xfs/xfs_super.c b/fs/xfs/xfs_super.c
+index 187e14b..39f4e6a 100644
+--- a/fs/xfs/xfs_super.c
++++ b/fs/xfs/xfs_super.c
+@@ -1558,14 +1558,12 @@ xfs_fs_fill_super(
+ 
+ 	if (mp->m_flags & XFS_MOUNT_DAX) {
+ 		xfs_warn(mp,
+-	"DAX enabled. Warning: EXPERIMENTAL, use at your own risk");
+-		if (sb->s_blocksize != PAGE_SIZE) {
+-			xfs_alert(mp,
+-		"Filesystem block size invalid for DAX Turning DAX off.");
+-			mp->m_flags &= ~XFS_MOUNT_DAX;
+-		} else if (!sb->s_bdev->bd_disk->fops->direct_access) {
++		"DAX enabled. Warning: EXPERIMENTAL, use at your own risk");
++
++		error = bdev_dax_supported(sb, sb->s_blocksize);
++		if (error) {
+ 			xfs_alert(mp,
+-		"Block device does not support DAX Turning DAX off.");
++			"DAX unsupported by block device. Turning off DAX.");
+ 			mp->m_flags &= ~XFS_MOUNT_DAX;
+ 		}
+ 	}
