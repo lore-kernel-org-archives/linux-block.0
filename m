@@ -1,57 +1,42 @@
-Return-Path: <jmoyer@redhat.com>
-From: Jeff Moyer <jmoyer@redhat.com>
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Tue, 10 May 2016 17:03:50 -0400
+From: Tejun Heo <tj@kernel.org>
 To: Paolo Valente <paolo.valente@linaro.org>
-Cc: Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        ulf.hansson@linaro.org, linus.walleij@linaro.org, broonie@kernel.org,
-        stable@vger.kernel.org
-Subject: Re: [PATCH BUGFIX V2] block: add missing group association in bio-cloning functions
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, ulf.hansson@linaro.org,
+	linus.walleij@linaro.org, broonie@kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH BUGFIX V2] block: add missing group association in
+ bio-cloning functions
+Message-ID: <20160510210350.GO7110@mtj.duckdns.org>
 References: <20160510204435.GN7110@mtj.duckdns.org>
-	<1462914132-4479-1-git-send-email-paolo.valente@linaro.org>
-Date: Tue, 10 May 2016 17:34:50 -0400
-In-Reply-To: <1462914132-4479-1-git-send-email-paolo.valente@linaro.org>
-	(Paolo Valente's message of "Tue, 10 May 2016 23:02:12 +0200")
-Message-ID: <x49eg9961hh.fsf@segfault.boston.devel.redhat.com>
+ <1462914132-4479-1-git-send-email-paolo.valente@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1462914132-4479-1-git-send-email-paolo.valente@linaro.org>
 List-ID: <linux-block@vger.kernel.org>
 
-Paolo Valente <paolo.valente@linaro.org> writes:
+On Tue, May 10, 2016 at 11:02:12PM +0200, Paolo Valente wrote:
+> When a bio is cloned, the newly created bio must be associated with
+> the same blkcg as the original bio (if BLK_CGROUP is enabled). If
+> this operation is not performed, then the new bio is not associated
+> with any group, and the group of the current task is returned when
+> the group of the bio is requested.
+> 
+> Depending on the cloning frequency, this may cause a large
+> percentage of the bios belonging to a given group to be treated
+> as if belonging to other groups (in most cases as if belonging to
+> the root group). The expected group isolation may thereby be broken.
+> 
+> This commit adds the missing association in bio-cloning functions.
+> 
+> Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
 
-> diff --git a/block/bio.c b/block/bio.c
-> index 807d25e..e9b136a 100644
-> --- a/block/bio.c
-> +++ b/block/bio.c
-> @@ -622,6 +622,8 @@ struct bio *bio_clone_fast(struct bio *bio, gfp_t gfp_mask, struct bio_set *bs)
->  		}
->  	}
->  
-> +	bio_clone_blkcg_association(b, bio);
-> +
->  	return b;
->  }
->  EXPORT_SYMBOL(bio_clone_fast);
-> @@ -695,6 +697,8 @@ integrity_clone:
->  		}
->  	}
->  
-> +	bio_clone_blkcg_association(bio, bio_src);
-> +
->  	return bio;
->  }
->  EXPORT_SYMBOL(bio_clone_bioset);
-> @@ -1811,6 +1815,8 @@ struct bio *bio_split(struct bio *bio, int sectors,
->  
->  	bio_advance(bio, split->bi_iter.bi_size);
->  
-> +	bio_clone_blkcg_association(split, bio);
-> +
+Acked-by: Tejun Heo <tj@kernel.org>
 
-Hi, Paolo,
+Thanks.
 
-Did you test this?  bio_split calls bio_clone_bioset or bio_clone_fast,
-so I'd be surprised if you didn't trigger that newly added warning.  :-)
-Please remove the bio_split call site.
-
-Cheers,
-Jeff
+-- 
+tejun
