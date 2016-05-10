@@ -1,105 +1,110 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:53509 "EHLO mga01.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751630AbcEOG1G (ORCPT <rfc822;linux-block@vger.kernel.org>);
-	Sun, 15 May 2016 02:27:06 -0400
-Subject: [PATCH v2 0/3] "Device DAX" for persistent memory
-From: Dan Williams <dan.j.williams@intel.com>
-To: linux-nvdimm@lists.01.org
-Cc: Dave Hansen <dave.hansen@linux.intel.com>,
-	Dave Chinner <david@fromorbit.com>,
-	linux-kernel@vger.kernel.org, hch@lst.de,
-	linux-block@vger.kernel.org, Jeff Moyer <jmoyer@redhat.com>,
-	Jan Kara <jack@suse.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Ross Zwisler <ross.zwisler@linux.intel.com>
-Date: Sat, 14 May 2016 23:26:18 -0700
-Message-ID: <146329357870.17948.14240958684074905846.stgit@dwillia2-desk3.amr.corp.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Toshi Kani <toshi.kani@hpe.com>
+To: dan.j.williams@intel.com, jack@suse.cz, david@fromorbit.com,
+	viro@zeniv.linux.org.uk
+Cc: axboe@fb.com, hch@infradead.org, boaz@plexistor.com, tytso@mit.edu,
+	adilger.kernel@dilger.ca, ross.zwisler@linux.intel.com,
+	toshi.kani@hpe.com, micah.parrish@hpe.com,
+	linux-nvdimm@lists.01.org, linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH v4 2/6] block: Add bdev_dax_supported() for dax mount checks
+Date: Tue, 10 May 2016 10:23:53 -0600
+Message-Id: <1462897437-16626-3-git-send-email-toshi.kani@hpe.com>
+In-Reply-To: <1462897437-16626-1-git-send-email-toshi.kani@hpe.com>
+References: <1462897437-16626-1-git-send-email-toshi.kani@hpe.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Changes since v1: [1]
+DAX imposes additional requirements to a device.  Add
+bdev_dax_supported() which performs all the precondition checks
+necessary for filesystem to mount the device with dax option.
 
-1/ Dropped the lead in cleanup patches from this posting as they appear
-on the libnvdimm-for-next branch.
+Also add a new check to verify if a partition is aligned by 4KB.
+When a partition is unaligned, any dax read/write access fails,
+except for metadata update.
 
-2/ Fixed the needlessly overweight fault locking by replacing it with
-rcu_read_lock() and drop taking the i_mmap_lock since it has no effect
-or purpose.  Unlike block devices the vfs does not arrange for character
-device inodes to share the same address_space.
-
-3/ Fixed the device release path since the class release method is not
-called when the device is created by device_create_with_groups().
-
-4/ Cleanups resulting from the switch to carry (struct dax_dev *) in
-filp->private_date.
-
-
+Signed-off-by: Toshi Kani <toshi.kani@hpe.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>
+Cc: Jens Axboe <axboe@fb.com>
+Cc: "Theodore Ts'o" <tytso@mit.edu>
+Cc: Andreas Dilger <adilger.kernel@dilger.ca>
+Cc: Jan Kara <jack@suse.cz>
+Cc: Dave Chinner <david@fromorbit.com>
+Cc: Dan Williams <dan.j.williams@intel.com>
+Cc: Ross Zwisler <ross.zwisler@linux.intel.com>
+Cc: Christoph Hellwig <hch@infradead.org>
+Cc: Boaz Harrosh <boaz@plexistor.com>
 ---
+ fs/block_dev.c         |   45 +++++++++++++++++++++++++++++++++++++++++++++
+ include/linux/blkdev.h |    1 +
+ 2 files changed, 46 insertions(+)
 
-Device DAX is the device-centric analogue of Filesystem DAX
-(CONFIG_FS_DAX).  It allows memory ranges to be allocated and mapped
-without need of an intervening file system or being bound to block
-device semantics.
-
-Why "Device DAX"?
-
-1/ As I mentioned at LSF [2] we are starting to see platforms with
-performance and feature differentiated memory ranges.  Environments like
-high-performance-computing and usages like in-memory databases want
-exclusive allocation of a memory range with zero conflicting
-kernel/metadata allocations.  For dedicated applications of high
-bandwidth or low latency memory device-DAX provides a predictable direct
-map mechanism.
-
-Note that this is only for the small number of "crazy" applications that
-are willing to re-write to get every bit of performance.  For everyone
-else we, Dave Hansen and I, are looking to add a mechanism to hot-plug
-device-DAX ranges into the mm to get general memory management services
-(oversubscribe / migration, etc) with the understanding that it may
-sacrifice some predictability.
-
-2/ For persistent memory there are similar applications that are willing
-to re-write to take full advantage of byte-addressable persistence.
-This mechanism satisfies those usages that only need a pre-allocated
-file to mmap.
-
-3/ It answers Dave Chinner's call to start thinking about pmem-native
-solutions.  Device DAX specifically avoids block-device and file system
-conflicts.
-
-
-[1]: https://lists.01.org/pipermail/linux-nvdimm/2016-May/005660.html
-[2]: https://lwn.net/Articles/685107/
-
----
-
-Dan Williams (3):
-      /dev/dax, pmem: direct access to persistent memory
-      /dev/dax, core: file operations and dax-mmap
-      Revert "block: enable dax for raw block devices"
-
-
- block/ioctl.c                       |   32 --
- drivers/Kconfig                     |    2 
- drivers/Makefile                    |    1 
- drivers/dax/Kconfig                 |   26 ++
- drivers/dax/Makefile                |    4 
- drivers/dax/dax.c                   |  568 +++++++++++++++++++++++++++++++++++
- drivers/dax/dax.h                   |   24 +
- drivers/dax/pmem.c                  |  168 ++++++++++
- fs/block_dev.c                      |   96 ++----
- include/linux/fs.h                  |    8 
- include/uapi/linux/fs.h             |    1 
- mm/huge_memory.c                    |    1 
- mm/hugetlb.c                        |    1 
- tools/testing/nvdimm/Kbuild         |    9 +
- tools/testing/nvdimm/config_check.c |    2 
- 15 files changed, 835 insertions(+), 108 deletions(-)
- create mode 100644 drivers/dax/Kconfig
- create mode 100644 drivers/dax/Makefile
- create mode 100644 drivers/dax/dax.c
- create mode 100644 drivers/dax/dax.h
- create mode 100644 drivers/dax/pmem.c
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index 7be17c4..db55638 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -509,6 +509,51 @@ long bdev_direct_access(struct block_device *bdev, struct blk_dax_ctl *dax)
+ }
+ EXPORT_SYMBOL_GPL(bdev_direct_access);
+ 
++/**
++ * bdev_dax_supported() - Check if the device supports dax for filesystem
++ * @sb: The superblock of the device
++ * @blocksize: The block size of the device
++ *
++ * This is a library function for filesystems to check if the block device
++ * can be mounted with dax option.
++ *
++ * Return: negative errno if unsupported, 0 if supported.
++ */
++int bdev_dax_supported(struct super_block *sb, int blocksize)
++{
++	struct blk_dax_ctl dax = {
++		.sector = 0,
++		.size = PAGE_SIZE,
++	};
++	int err;
++
++	if (blocksize != PAGE_SIZE) {
++		vfs_msg(sb, KERN_ERR, "error: unsupported blocksize for dax");
++		return -EINVAL;
++	}
++
++	err = bdev_direct_access(sb->s_bdev, &dax);
++	if (err < 0) {
++		switch (err) {
++		case -EOPNOTSUPP:
++			vfs_msg(sb, KERN_ERR,
++				"error: device does not support dax");
++			break;
++		case -EINVAL:
++			vfs_msg(sb, KERN_ERR,
++				"error: unaligned partition for dax");
++			break;
++		default:
++			vfs_msg(sb, KERN_ERR,
++				"error: dax access failed (%d)", err);
++		}
++		return err;
++	}
++
++	return 0;
++}
++EXPORT_SYMBOL_GPL(bdev_dax_supported);
++
+ /*
+  * pseudo-fs
+  */
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 78c48ab..71231a5 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1688,6 +1688,7 @@ extern int bdev_read_page(struct block_device *, sector_t, struct page *);
+ extern int bdev_write_page(struct block_device *, sector_t, struct page *,
+ 						struct writeback_control *);
+ extern long bdev_direct_access(struct block_device *, struct blk_dax_ctl *);
++extern int bdev_dax_supported(struct super_block *, int);
+ #else /* CONFIG_BLOCK */
+ 
+ struct block_device;
