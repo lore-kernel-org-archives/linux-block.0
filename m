@@ -1,48 +1,23 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pa0-f67.google.com ([209.85.220.67]:35755 "EHLO
-	mail-pa0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1161219AbcE3Ngi (ORCPT
+Received: from mail-pa0-f68.google.com ([209.85.220.68]:35148 "EHLO
+	mail-pa0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750934AbcEJE23 (ORCPT
 	<rfc822;linux-block@vger.kernel.org>);
-	Mon, 30 May 2016 09:36:38 -0400
-From: Ming Lei <ming.lei@canonical.com>
-To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-	Ming Lei <ming.lei@canonical.com>,
-	Dave Chinner <david@fromorbit.com>,
-	xfs@oss.sgi.com (supporter:XFS FILESYSTEM)
-Subject: [PATCH v6 5/8] fs: xfs: replace BIO_MAX_SECTORS with BIO_MAX_PAGES
-Date: Mon, 30 May 2016 21:34:33 +0800
-Message-Id: <1464615294-9946-6-git-send-email-ming.lei@canonical.com>
-In-Reply-To: <1464615294-9946-1-git-send-email-ming.lei@canonical.com>
-References: <1464615294-9946-1-git-send-email-ming.lei@canonical.com>
+	Tue, 10 May 2016 00:28:29 -0400
+Received: by mail-pa0-f68.google.com with SMTP id zy2so115330pac.2
+        for <linux-block@vger.kernel.org>; Mon, 09 May 2016 21:28:29 -0700 (PDT)
+Received: from [192.168.0.109] (c-98-234-107-37.hsd1.ca.comcast.net. [98.234.107.37])
+        by smtp.gmail.com with ESMTPSA id q186sm300487pfq.96.2016.05.09.21.28.27
+        for <linux-block@vger.kernel.org>
+        (version=TLS1 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+        Mon, 09 May 2016 21:28:27 -0700 (PDT)
+From: Heiner Litz <heinerlitz@gmail.com>
+Content-Type: text/plain
+Subject: auth 9ef68953 subscribe linux-block heinerlitz@gmail.com 
+Message-Id: <AC38F8B8-5DE2-46F4-AFDE-5CE7BE0E7091@gmail.com>
+Date: Mon, 9 May 2016 21:28:26 -0700
+To: linux-block@vger.kernel.org
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
-
-BIO_MAX_PAGES is used as maximum count of bvecs, so
-replace BIO_MAX_SECTORS with BIO_MAX_PAGES since
-BIO_MAX_SECTORS is to be removed.
-
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Ming Lei <ming.lei@canonical.com>
----
- fs/xfs/xfs_buf.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
-
-diff --git a/fs/xfs/xfs_buf.c b/fs/xfs/xfs_buf.c
-index e71cfbd..e5d713b 100644
---- a/fs/xfs/xfs_buf.c
-+++ b/fs/xfs/xfs_buf.c
-@@ -1157,9 +1157,7 @@ xfs_buf_ioapply_map(
- 
- next_chunk:
- 	atomic_inc(&bp->b_io_remaining);
--	nr_pages = BIO_MAX_SECTORS >> (PAGE_SHIFT - BBSHIFT);
--	if (nr_pages > total_nr_pages)
--		nr_pages = total_nr_pages;
-+	nr_pages = min(total_nr_pages, BIO_MAX_PAGES);
- 
- 	bio = bio_alloc(GFP_NOIO, nr_pages);
- 	bio->bi_bdev = bp->b_target->bt_bdev;
--- 
-1.9.1
 
