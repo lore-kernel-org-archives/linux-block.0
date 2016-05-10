@@ -1,249 +1,118 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:22031 "EHLO mga09.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754037AbcEOG1X (ORCPT <rfc822;linux-block@vger.kernel.org>);
-	Sun, 15 May 2016 02:27:23 -0400
-Subject: [PATCH v2 3/3] Revert "block: enable dax for raw block devices"
-From: Dan Williams <dan.j.williams@intel.com>
-To: linux-nvdimm@lists.01.org
-Cc: Jan Kara <jack@suse.com>, Dave Chinner <david@fromorbit.com>,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	Jeff Moyer <jmoyer@redhat.com>,
-	Ross Zwisler <ross.zwisler@linux.intel.com>,
-	Andrew Morton <akpm@linux-foundation.org>, hch@lst.de
-Date: Sat, 14 May 2016 23:26:35 -0700
-Message-ID: <146329359490.17948.11004673325781380645.stgit@dwillia2-desk3.amr.corp.intel.com>
-In-Reply-To: <146329357870.17948.14240958684074905846.stgit@dwillia2-desk3.amr.corp.intel.com>
-References: <146329357870.17948.14240958684074905846.stgit@dwillia2-desk3.amr.corp.intel.com>
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+Subject: Re: [PATCH BUGFIX] block: add missing group association in bio_split
+To: Jeff Moyer <jmoyer@redhat.com>
+References: <5730CFC5.80201@kernel.dk>
+ <1462871322-13217-1-git-send-email-paolo.valente@linaro.org>
+ <x4960ul7uyw.fsf@segfault.boston.devel.redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ ulf.hansson@linaro.org, linus.walleij@linaro.org, broonie@kernel.org
+From: Paolo <paolo.valente@linaro.org>
+Message-ID: <57321581.6040100@linaro.org>
+Date: Tue, 10 May 2016 19:08:17 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <x4960ul7uyw.fsf@segfault.boston.devel.redhat.com>
+Content-Type: text/plain; charset=iso-8859-15; format=flowed
+List-ID: <linux-block@vger.kernel.org>
 
-This reverts commit 5a023cdba50c5f5f2bc351783b3131699deb3937.
+Il 10/05/2016 18:12, Jeff Moyer ha scritto:
+> Paolo Valente <paolo.valente@linaro.org> writes:
+>
+>> When a bio is split, the newly created bio must be associated with the
+>> same blkcg as the original bio (if BLK_CGROUP is enabled). If this
+>> operation is not performed, then the new bio is not associated with
+>> any group, and the group of the current task is returned when the
+>> group of the bio is requested.
+>>
+>> Depending on the frequency of splits, this may cause a large
+>> percentage of the bios belonging to a given group to be treated as if
+>> belonging to other groups (in most cases as if belonging to the root
+>> group). The expected group isolation may thereby be then broken.
+>>
+>> This commit adds the missing association in bio_split.
+>>
+>> Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+>> ---
+>>   block/bio.c         | 15 +++++++++++++++
+>>   include/linux/bio.h |  2 ++
+>>   2 files changed, 17 insertions(+)
+>>
+>> diff --git a/block/bio.c b/block/bio.c
+>> index 807d25e..20795eb 100644
+>> --- a/block/bio.c
+>> +++ b/block/bio.c
+>> @@ -1811,6 +1811,8 @@ struct bio *bio_split(struct bio *bio, int sectors,
+>>
+>>   	bio_advance(bio, split->bi_iter.bi_size);
+>>
+>> +	bio_clone_blkcg_association(split, bio);
+>> +
+>
+> First, I think this should be done inside of bio_clone_fast and
+> bio_clone_bioset instead of in bio_split.  Otherwise you miss other
+> places where bios are cloned, and I'm guessing that's bad.  You could
+> also then get rid of this code in btrfs/extent_io.c:
+>
+> #ifdef CONFIG_BLK_CGROUP
+>                  /* FIXME, put this into bio_clone_bioset */
+>                  if (bio->bi_css)
+>                          bio_associate_blkcg(new, bio->bi_css);
+> #endif
+>
+> Next, you went to the trouble of propagating the return value from
+> bio_associate_blkcg, and then it goes unchecked here in the only caller
+> of your new function.  Since bio_associate_blkcg should not fail when
+> cloning (right?), I'd change bio_clone_blkcg_association to return void
+> and to WARN_ON a failure return from bio_associate_blkcg.
+>
 
-The functionality is superseded by the new "Device DAX" facility.
+Changing as suggested.
 
-Cc: Jeff Moyer <jmoyer@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Dave Chinner <david@fromorbit.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>
-Cc: Ross Zwisler <ross.zwisler@linux.intel.com>
-Cc: Jan Kara <jack@suse.com>
-Signed-off-by: Dan Williams <dan.j.williams@intel.com>
----
- block/ioctl.c           |   32 ----------------
- fs/block_dev.c          |   96 ++++++++++++++---------------------------------
- include/linux/fs.h      |    8 ----
- include/uapi/linux/fs.h |    1 
- 4 files changed, 29 insertions(+), 108 deletions(-)
+Thanks,
+Paolo
 
-diff --git a/block/ioctl.c b/block/ioctl.c
-index 4ff1f92f89ca..698c7933d582 100644
---- a/block/ioctl.c
-+++ b/block/ioctl.c
-@@ -407,35 +407,6 @@ static inline int is_unrecognized_ioctl(int ret)
- 		ret == -ENOIOCTLCMD;
- }
- 
--#ifdef CONFIG_FS_DAX
--bool blkdev_dax_capable(struct block_device *bdev)
--{
--	struct gendisk *disk = bdev->bd_disk;
--
--	if (!disk->fops->direct_access)
--		return false;
--
--	/*
--	 * If the partition is not aligned on a page boundary, we can't
--	 * do dax I/O to it.
--	 */
--	if ((bdev->bd_part->start_sect % (PAGE_SIZE / 512))
--			|| (bdev->bd_part->nr_sects % (PAGE_SIZE / 512)))
--		return false;
--
--	/*
--	 * If the device has known bad blocks, force all I/O through the
--	 * driver / page cache.
--	 *
--	 * TODO: support finer grained dax error handling
--	 */
--	if (disk->bb && disk->bb->count)
--		return false;
--
--	return true;
--}
--#endif
--
- static int blkdev_flushbuf(struct block_device *bdev, fmode_t mode,
- 		unsigned cmd, unsigned long arg)
- {
-@@ -598,9 +569,6 @@ int blkdev_ioctl(struct block_device *bdev, fmode_t mode, unsigned cmd,
- 	case BLKTRACESETUP:
- 	case BLKTRACETEARDOWN:
- 		return blk_trace_ioctl(bdev, cmd, argp);
--	case BLKDAXGET:
--		return put_int(arg, !!(bdev->bd_inode->i_flags & S_DAX));
--		break;
- 	case IOC_PR_REGISTER:
- 		return blkdev_pr_register(bdev, argp);
- 	case IOC_PR_RESERVE:
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 20a2c02b77c4..36ee10ca503e 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -29,6 +29,7 @@
- #include <linux/log2.h>
- #include <linux/cleancache.h>
- #include <linux/dax.h>
-+#include <linux/badblocks.h>
- #include <asm/uaccess.h>
- #include "internal.h"
- 
-@@ -1159,6 +1160,33 @@ void bd_set_size(struct block_device *bdev, loff_t size)
- }
- EXPORT_SYMBOL(bd_set_size);
- 
-+static bool blkdev_dax_capable(struct block_device *bdev)
-+{
-+	struct gendisk *disk = bdev->bd_disk;
-+
-+	if (!disk->fops->direct_access || !IS_ENABLED(CONFIG_FS_DAX))
-+		return false;
-+
-+	/*
-+	 * If the partition is not aligned on a page boundary, we can't
-+	 * do dax I/O to it.
-+	 */
-+	if ((bdev->bd_part->start_sect % (PAGE_SIZE / 512))
-+			|| (bdev->bd_part->nr_sects % (PAGE_SIZE / 512)))
-+		return false;
-+
-+	/*
-+	 * If the device has known bad blocks, force all I/O through the
-+	 * driver / page cache.
-+	 *
-+	 * TODO: support finer grained dax error handling
-+	 */
-+	if (disk->bb && disk->bb->count)
-+		return false;
-+
-+	return true;
-+}
-+
- static void __blkdev_put(struct block_device *bdev, fmode_t mode, int for_part);
- 
- /*
-@@ -1724,79 +1752,13 @@ static const struct address_space_operations def_blk_aops = {
- 	.is_dirty_writeback = buffer_check_dirty_writeback,
- };
- 
--#ifdef CONFIG_FS_DAX
--/*
-- * In the raw block case we do not need to contend with truncation nor
-- * unwritten file extents.  Without those concerns there is no need for
-- * additional locking beyond the mmap_sem context that these routines
-- * are already executing under.
-- *
-- * Note, there is no protection if the block device is dynamically
-- * resized (partition grow/shrink) during a fault. A stable block device
-- * size is already not enforced in the blkdev_direct_IO path.
-- *
-- * For DAX, it is the responsibility of the block device driver to
-- * ensure the whole-disk device size is stable while requests are in
-- * flight.
-- *
-- * Finally, unlike the filemap_page_mkwrite() case there is no
-- * filesystem superblock to sync against freezing.  We still include a
-- * pfn_mkwrite callback for dax drivers to receive write fault
-- * notifications.
-- */
--static int blkdev_dax_fault(struct vm_area_struct *vma, struct vm_fault *vmf)
--{
--	return __dax_fault(vma, vmf, blkdev_get_block, NULL);
--}
--
--static int blkdev_dax_pfn_mkwrite(struct vm_area_struct *vma,
--		struct vm_fault *vmf)
--{
--	return dax_pfn_mkwrite(vma, vmf);
--}
--
--static int blkdev_dax_pmd_fault(struct vm_area_struct *vma, unsigned long addr,
--		pmd_t *pmd, unsigned int flags)
--{
--	return __dax_pmd_fault(vma, addr, pmd, flags, blkdev_get_block, NULL);
--}
--
--static const struct vm_operations_struct blkdev_dax_vm_ops = {
--	.fault		= blkdev_dax_fault,
--	.pmd_fault	= blkdev_dax_pmd_fault,
--	.pfn_mkwrite	= blkdev_dax_pfn_mkwrite,
--};
--
--static const struct vm_operations_struct blkdev_default_vm_ops = {
--	.fault		= filemap_fault,
--	.map_pages	= filemap_map_pages,
--};
--
--static int blkdev_mmap(struct file *file, struct vm_area_struct *vma)
--{
--	struct inode *bd_inode = bdev_file_inode(file);
--
--	file_accessed(file);
--	if (IS_DAX(bd_inode)) {
--		vma->vm_ops = &blkdev_dax_vm_ops;
--		vma->vm_flags |= VM_MIXEDMAP | VM_HUGEPAGE;
--	} else {
--		vma->vm_ops = &blkdev_default_vm_ops;
--	}
--
--	return 0;
--}
--#else
--#define blkdev_mmap generic_file_mmap
--#endif
--
- const struct file_operations def_blk_fops = {
- 	.open		= blkdev_open,
- 	.release	= blkdev_close,
- 	.llseek		= block_llseek,
- 	.read_iter	= blkdev_read_iter,
- 	.write_iter	= blkdev_write_iter,
--	.mmap		= blkdev_mmap,
-+	.mmap		= generic_file_mmap,
- 	.fsync		= blkdev_fsync,
- 	.unlocked_ioctl	= block_ioctl,
- #ifdef CONFIG_COMPAT
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 70e61b58baaf..8363a10660f6 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -2320,14 +2320,6 @@ extern struct super_block *freeze_bdev(struct block_device *);
- extern void emergency_thaw_all(void);
- extern int thaw_bdev(struct block_device *bdev, struct super_block *sb);
- extern int fsync_bdev(struct block_device *);
--#ifdef CONFIG_FS_DAX
--extern bool blkdev_dax_capable(struct block_device *bdev);
--#else
--static inline bool blkdev_dax_capable(struct block_device *bdev)
--{
--	return false;
--}
--#endif
- 
- extern struct super_block *blockdev_superblock;
- 
-diff --git a/include/uapi/linux/fs.h b/include/uapi/linux/fs.h
-index a079d50376e1..fbff8b28aa35 100644
---- a/include/uapi/linux/fs.h
-+++ b/include/uapi/linux/fs.h
-@@ -222,7 +222,6 @@ struct fsxattr {
- #define BLKSECDISCARD _IO(0x12,125)
- #define BLKROTATIONAL _IO(0x12,126)
- #define BLKZEROOUT _IO(0x12,127)
--#define BLKDAXGET _IO(0x12,129)
- 
- #define BMAP_IOCTL 1		/* obsolete - kept for compatibility */
- #define FIBMAP	   _IO(0x00,1)	/* bmap access */
-
+> Cheers,
+> Jeff
+>
+>>   	return split;
+>>   }
+>>   EXPORT_SYMBOL(bio_split);
+>> @@ -2016,6 +2018,19 @@ void bio_disassociate_task(struct bio *bio)
+>>   	}
+>>   }
+>>
+>> +/**
+>> + * bio_clone_blkcg_association - clone blkcg association from src to dst bio
+>> + * @dst: destination bio
+>> + * @src: source bio
+>> + */
+>> +int bio_clone_blkcg_association(struct bio *dst, struct bio *src)
+>> +{
+>> +	if (src->bi_css)
+>> +		return bio_associate_blkcg(dst, src->bi_css);
+>> +
+>> +	return 0;
+>> +}
+>> +
+>>   #endif /* CONFIG_BLK_CGROUP */
+>>
+>>   static void __init biovec_init_slabs(void)
+>> diff --git a/include/linux/bio.h b/include/linux/bio.h
+>> index 6b7481f..8535f81 100644
+>> --- a/include/linux/bio.h
+>> +++ b/include/linux/bio.h
+>> @@ -527,11 +527,13 @@ extern unsigned int bvec_nr_vecs(unsigned short idx);
+>>   int bio_associate_blkcg(struct bio *bio, struct cgroup_subsys_state *blkcg_css);
+>>   int bio_associate_current(struct bio *bio);
+>>   void bio_disassociate_task(struct bio *bio);
+>> +int bio_clone_blkcg_association(struct bio *dst, struct bio *src);
+>>   #else	/* CONFIG_BLK_CGROUP */
+>>   static inline int bio_associate_blkcg(struct bio *bio,
+>>   			struct cgroup_subsys_state *blkcg_css) { return 0; }
+>>   static inline int bio_associate_current(struct bio *bio) { return -ENOENT; }
+>>   static inline void bio_disassociate_task(struct bio *bio) { }
+>> +int bio_clone_blkcg_association(struct bio *dst, struct bio *src) { return 0; }
+>>   #endif	/* CONFIG_BLK_CGROUP */
+>>
+>>   #ifdef CONFIG_HIGHMEM
