@@ -1,86 +1,202 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:9601 "EHLO mga11.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753270AbcERU5U (ORCPT <rfc822;linux-block@vger.kernel.org>);
-	Wed, 18 May 2016 16:57:20 -0400
-Subject: [PATCH v3 5/5] libnvdimm: release ida resources
-From: Dan Williams <dan.j.williams@intel.com>
-To: linux-nvdimm@lists.01.org
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	hch@lst.de, Johannes Thumshirn <jthumshirn@suse.de>
-Date: Wed, 18 May 2016 13:56:33 -0700
-Message-ID: <146360499323.37439.11321597319333400688.stgit@dwillia2-desk3.amr.corp.intel.com>
-In-Reply-To: <146360496572.37439.6497663679891935585.stgit@dwillia2-desk3.amr.corp.intel.com>
-References: <146360496572.37439.6497663679891935585.stgit@dwillia2-desk3.amr.corp.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <kamal@canonical.com>
+From: Kamal Mostafa <kamal@canonical.com>
+To: Roman Pen <roman.penyaev@profitbricks.com>
+Cc: Gioh Kim <gi-oh.kim@profitbricks.com>,
+	Michael Wang <yun.wang@profitbricks.com>,
+	Tejun Heo <tj@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Kamal Mostafa <kamal@canonical.com>,
+	kernel-team@lists.ubuntu.com
+Subject: [3.19.y-ckt stable] Patch "workqueue: fix ghost PENDING flag while doing MQ IO" has been added to the 3.19.y-ckt tree
+Date: Mon,  9 May 2016 17:03:11 -0700
+Message-Id: <1462838591-29588-1-git-send-email-kamal@canonical.com>
+List-ID: <linux-block@vger.kernel.org>
 
-ida instances allocate some internal memory for ->free_bitmap in
-addition to the base 'struct ida'.  Use ida_destroy() to release that
-memory at module_exit().
+This is a note to let you know that I have just added a patch titled
 
-Reported-by: Johannes Thumshirn <jthumshirn@suse.de>
-Signed-off-by: Dan Williams <dan.j.williams@intel.com>
+    workqueue: fix ghost PENDING flag while doing MQ IO
+
+to the linux-3.19.y-queue branch of the 3.19.y-ckt extended stable tree 
+which can be found at:
+
+    https://git.launchpad.net/~canonical-kernel/linux/+git/linux-stable-ckt/log/?h=linux-3.19.y-queue
+
+This patch is scheduled to be released in version 3.19.8-ckt21.
+
+If you, or anyone else, feels it should not be added to this tree, please 
+reply to this email.
+
+For more information about the 3.19.y-ckt tree, see
+https://wiki.ubuntu.com/Kernel/Dev/ExtendedStable
+
+Thanks.
+-Kamal
+
+---8<------------------------------------------------------------
+
+>From 8a9e2c025a54fc1993841459cfa2ea8cf9ece68e Mon Sep 17 00:00:00 2001
+From: Roman Pen <roman.penyaev@profitbricks.com>
+Date: Tue, 26 Apr 2016 13:15:35 +0200
+Subject: workqueue: fix ghost PENDING flag while doing MQ IO
+
+commit 346c09f80459a3ad97df1816d6d606169a51001a upstream.
+
+The bug in a workqueue leads to a stalled IO request in MQ ctx->rq_list
+with the following backtrace:
+
+[  601.347452] INFO: task kworker/u129:5:1636 blocked for more than 120 seconds.
+[  601.347574]       Tainted: G           O    4.4.5-1-storage+ #6
+[  601.347651] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+[  601.348142] kworker/u129:5  D ffff880803077988     0  1636      2 0x00000000
+[  601.348519] Workqueue: ibnbd_server_fileio_wq ibnbd_dev_file_submit_io_worker [ibnbd_server]
+[  601.348999]  ffff880803077988 ffff88080466b900 ffff8808033f9c80 ffff880803078000
+[  601.349662]  ffff880807c95000 7fffffffffffffff ffffffff815b0920 ffff880803077ad0
+[  601.350333]  ffff8808030779a0 ffffffff815b01d5 0000000000000000 ffff880803077a38
+[  601.350965] Call Trace:
+[  601.351203]  [<ffffffff815b0920>] ? bit_wait+0x60/0x60
+[  601.351444]  [<ffffffff815b01d5>] schedule+0x35/0x80
+[  601.351709]  [<ffffffff815b2dd2>] schedule_timeout+0x192/0x230
+[  601.351958]  [<ffffffff812d43f7>] ? blk_flush_plug_list+0xc7/0x220
+[  601.352208]  [<ffffffff810bd737>] ? ktime_get+0x37/0xa0
+[  601.352446]  [<ffffffff815b0920>] ? bit_wait+0x60/0x60
+[  601.352688]  [<ffffffff815af784>] io_schedule_timeout+0xa4/0x110
+[  601.352951]  [<ffffffff815b3a4e>] ? _raw_spin_unlock_irqrestore+0xe/0x10
+[  601.353196]  [<ffffffff815b093b>] bit_wait_io+0x1b/0x70
+[  601.353440]  [<ffffffff815b056d>] __wait_on_bit+0x5d/0x90
+[  601.353689]  [<ffffffff81127bd0>] wait_on_page_bit+0xc0/0xd0
+[  601.353958]  [<ffffffff81096db0>] ? autoremove_wake_function+0x40/0x40
+[  601.354200]  [<ffffffff81127cc4>] __filemap_fdatawait_range+0xe4/0x140
+[  601.354441]  [<ffffffff81127d34>] filemap_fdatawait_range+0x14/0x30
+[  601.354688]  [<ffffffff81129a9f>] filemap_write_and_wait_range+0x3f/0x70
+[  601.354932]  [<ffffffff811ced3b>] blkdev_fsync+0x1b/0x50
+[  601.355193]  [<ffffffff811c82d9>] vfs_fsync_range+0x49/0xa0
+[  601.355432]  [<ffffffff811cf45a>] blkdev_write_iter+0xca/0x100
+[  601.355679]  [<ffffffff81197b1a>] __vfs_write+0xaa/0xe0
+[  601.355925]  [<ffffffff81198379>] vfs_write+0xa9/0x1a0
+[  601.356164]  [<ffffffff811c59d8>] kernel_write+0x38/0x50
+
+The underlying device is a null_blk, with default parameters:
+
+  queue_mode    = MQ
+  submit_queues = 1
+
+Verification that nullb0 has something inflight:
+
+root@pserver8:~# cat /sys/block/nullb0/inflight
+       0        1
+root@pserver8:~# find /sys/block/nullb0/mq/0/cpu* -name rq_list -print -exec cat {} \;
+...
+/sys/block/nullb0/mq/0/cpu2/rq_list
+CTX pending:
+        ffff8838038e2400
+...
+
+During debug it became clear that stalled request is always inserted in
+the rq_list from the following path:
+
+   save_stack_trace_tsk + 34
+   blk_mq_insert_requests + 231
+   blk_mq_flush_plug_list + 281
+   blk_flush_plug_list + 199
+   wait_on_page_bit + 192
+   __filemap_fdatawait_range + 228
+   filemap_fdatawait_range + 20
+   filemap_write_and_wait_range + 63
+   blkdev_fsync + 27
+   vfs_fsync_range + 73
+   blkdev_write_iter + 202
+   __vfs_write + 170
+   vfs_write + 169
+   kernel_write + 56
+
+So blk_flush_plug_list() was called with from_schedule == true.
+
+If from_schedule is true, that means that finally blk_mq_insert_requests()
+offloads execution of __blk_mq_run_hw_queue() and uses kblockd workqueue,
+i.e. it calls kblockd_schedule_delayed_work_on().
+
+That means, that we race with another CPU, which is about to execute
+__blk_mq_run_hw_queue() work.
+
+Further debugging shows the following traces from different CPUs:
+
+  CPU#0                                  CPU#1
+  ----------------------------------     -------------------------------
+  reqeust A inserted
+  STORE hctx->ctx_map[0] bit marked
+  kblockd_schedule...() returns 1
+  <schedule to kblockd workqueue>
+                                         request B inserted
+                                         STORE hctx->ctx_map[1] bit marked
+                                         kblockd_schedule...() returns 0
+  *** WORK PENDING bit is cleared ***
+  flush_busy_ctxs() is executed, but
+  bit 1, set by CPU#1, is not observed
+
+As a result request B pended forever.
+
+This behaviour can be explained by speculative LOAD of hctx->ctx_map on
+CPU#0, which is reordered with clear of PENDING bit and executed _before_
+actual STORE of bit 1 on CPU#1.
+
+The proper fix is an explicit full barrier <mfence>, which guarantees
+that clear of PENDING bit is to be executed before all possible
+speculative LOADS or STORES inside actual work function.
+
+Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
+Cc: Gioh Kim <gi-oh.kim@profitbricks.com>
+Cc: Michael Wang <yun.wang@profitbricks.com>
+Cc: Tejun Heo <tj@kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Signed-off-by: Tejun Heo <tj@kernel.org>
+Signed-off-by: Kamal Mostafa <kamal@canonical.com>
 ---
- drivers/nvdimm/core.c        |    3 +++
- drivers/nvdimm/dimm_devs.c   |    5 +++++
- drivers/nvdimm/nd-core.h     |    2 ++
- drivers/nvdimm/region_devs.c |    5 +++++
- 4 files changed, 15 insertions(+)
+ kernel/workqueue.c | 29 +++++++++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
 
-diff --git a/drivers/nvdimm/core.c b/drivers/nvdimm/core.c
-index 182a93fe3712..847532de087a 100644
---- a/drivers/nvdimm/core.c
-+++ b/drivers/nvdimm/core.c
-@@ -648,6 +648,9 @@ static __exit void libnvdimm_exit(void)
- 	nd_region_exit();
- 	nvdimm_exit();
- 	nvdimm_bus_exit();
-+	nd_region_devs_exit();
-+	nvdimm_devs_exit();
-+	ida_destroy(&nd_ida);
+diff --git a/kernel/workqueue.c b/kernel/workqueue.c
+index 1cf1b72..b838f171 100644
+--- a/kernel/workqueue.c
++++ b/kernel/workqueue.c
+@@ -633,6 +633,35 @@ static void set_work_pool_and_clear_pending(struct work_struct *work,
+ 	 */
+ 	smp_wmb();
+ 	set_work_data(work, (unsigned long)pool_id << WORK_OFFQ_POOL_SHIFT, 0);
++	/*
++	 * The following mb guarantees that previous clear of a PENDING bit
++	 * will not be reordered with any speculative LOADS or STORES from
++	 * work->current_func, which is executed afterwards.  This possible
++	 * reordering can lead to a missed execution on attempt to qeueue
++	 * the same @work.  E.g. consider this case:
++	 *
++	 *   CPU#0                         CPU#1
++	 *   ----------------------------  --------------------------------
++	 *
++	 * 1  STORE event_indicated
++	 * 2  queue_work_on() {
++	 * 3    test_and_set_bit(PENDING)
++	 * 4 }                             set_..._and_clear_pending() {
++	 * 5                                 set_work_data() # clear bit
++	 * 6                                 smp_mb()
++	 * 7                               work->current_func() {
++	 * 8				      LOAD event_indicated
++	 *				   }
++	 *
++	 * Without an explicit full barrier speculative LOAD on line 8 can
++	 * be executed before CPU#0 does STORE on line 1.  If that happens,
++	 * CPU#0 observes the PENDING bit is still set and new execution of
++	 * a @work is not queued in a hope, that CPU#1 will eventually
++	 * finish the queued @work.  Meanwhile CPU#1 does not see
++	 * event_indicated is set, because speculative LOAD was executed
++	 * before actual STORE.
++	 */
++	smp_mb();
  }
- 
- MODULE_LICENSE("GPL v2");
-diff --git a/drivers/nvdimm/dimm_devs.c b/drivers/nvdimm/dimm_devs.c
-index c56f88217924..6cca03eaa345 100644
---- a/drivers/nvdimm/dimm_devs.c
-+++ b/drivers/nvdimm/dimm_devs.c
-@@ -546,3 +546,8 @@ int nvdimm_bus_check_dimm_count(struct nvdimm_bus *nvdimm_bus, int dimm_count)
- 	return 0;
- }
- EXPORT_SYMBOL_GPL(nvdimm_bus_check_dimm_count);
-+
-+void __exit nvdimm_devs_exit(void)
-+{
-+	ida_destroy(&dimm_ida);
-+}
-diff --git a/drivers/nvdimm/nd-core.h b/drivers/nvdimm/nd-core.h
-index cb65308c0329..4136c1a82539 100644
---- a/drivers/nvdimm/nd-core.h
-+++ b/drivers/nvdimm/nd-core.h
-@@ -49,6 +49,8 @@ bool is_nd_blk(struct device *dev);
- struct nvdimm_bus *walk_to_nvdimm_bus(struct device *nd_dev);
- int __init nvdimm_bus_init(void);
- void nvdimm_bus_exit(void);
-+void nvdimm_devs_exit(void);
-+void nd_region_devs_exit(void);
- void nd_region_probe_success(struct nvdimm_bus *nvdimm_bus, struct device *dev);
- struct nd_region;
- void nd_region_create_blk_seed(struct nd_region *nd_region);
-diff --git a/drivers/nvdimm/region_devs.c b/drivers/nvdimm/region_devs.c
-index 9e1b054e0e61..40fcfea26fbb 100644
---- a/drivers/nvdimm/region_devs.c
-+++ b/drivers/nvdimm/region_devs.c
-@@ -793,3 +793,8 @@ struct nd_region *nvdimm_volatile_region_create(struct nvdimm_bus *nvdimm_bus,
- 			__func__);
- }
- EXPORT_SYMBOL_GPL(nvdimm_volatile_region_create);
-+
-+void __exit nd_region_devs_exit(void)
-+{
-+	ida_destroy(&region_ida);
-+}
 
+ static void clear_work_data(struct work_struct *work)
+--
+2.7.4
