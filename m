@@ -1,10 +1,9 @@
 Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-Date: Thu, 12 May 2016 10:41:38 +0200
-From: Jan Kara <jack@suse.cz>
-To: Vishal Verma <vishal.l.verma@intel.com>
-Cc: linux-nvdimm@lists.01.org, Christoph Hellwig <hch@lst.de>,
-	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-	xfs@oss.sgi.com, linux-ext4@vger.kernel.org, linux-mm@kvack.org,
+From: Vishal Verma <vishal.l.verma@intel.com>
+To: linux-nvdimm@lists.01.org
+Cc: Christoph Hellwig <hch@lst.de>, linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org, xfs@oss.sgi.com,
+	linux-ext4@vger.kernel.org, linux-mm@kvack.org,
 	Ross Zwisler <ross.zwisler@linux.intel.com>,
 	Dan Williams <dan.j.williams@intel.com>,
 	Dave Chinner <david@fromorbit.com>, Jan Kara <jack@suse.cz>,
@@ -14,35 +13,105 @@ Cc: linux-nvdimm@lists.01.org, Christoph Hellwig <hch@lst.de>,
 	Christoph Hellwig <hch@infradead.org>,
 	Jeff Moyer <jmoyer@redhat.com>,
 	Boaz Harrosh <boaz@plexistor.com>
-Subject: Re: [PATCH v7 4/6] dax: export a low-level __dax_zero_page_range
- helper
-Message-ID: <20160512084138.GC10306@quack2.suse.cz>
+Subject: [PATCH v7 4/6] dax: export a low-level __dax_zero_page_range helper
+Date: Wed, 11 May 2016 15:08:50 -0600
+Message-Id: <1463000932-31680-5-git-send-email-vishal.l.verma@intel.com>
+In-Reply-To: <1463000932-31680-1-git-send-email-vishal.l.verma@intel.com>
 References: <1463000932-31680-1-git-send-email-vishal.l.verma@intel.com>
- <1463000932-31680-5-git-send-email-vishal.l.verma@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1463000932-31680-5-git-send-email-vishal.l.verma@intel.com>
 Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed 11-05-16 15:08:50, Vishal Verma wrote:
-> From: Christoph Hellwig <hch@lst.de>
-> 
-> This allows XFS to perform zeroing using the iomap infrastructure and
-> avoid buffer heads.
-> 
-> [vishal: fix conflicts with dax-error-handling]
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+From: Christoph Hellwig <hch@lst.de>
 
-Looks good. You can add:
+This allows XFS to perform zeroing using the iomap infrastructure and
+avoid buffer heads.
 
-Reviewed-by: Jan Kara <jack@suse.cz>
+[vishal: fix conflicts with dax-error-handling]
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ fs/dax.c            | 35 ++++++++++++++++++++---------------
+ include/linux/dax.h |  7 +++++++
+ 2 files changed, 27 insertions(+), 15 deletions(-)
 
-BTW: You are supposed to add your Signed-off-by when forwarding patches
-like this...
-
-								Honza
-
+diff --git a/fs/dax.c b/fs/dax.c
+index 0abbbb6..651d4b1 100644
+--- a/fs/dax.c
++++ b/fs/dax.c
+@@ -947,6 +947,23 @@ int dax_pfn_mkwrite(struct vm_area_struct *vma, struct vm_fault *vmf)
+ }
+ EXPORT_SYMBOL_GPL(dax_pfn_mkwrite);
+ 
++int __dax_zero_page_range(struct block_device *bdev, sector_t sector,
++		unsigned int offset, unsigned int length)
++{
++	struct blk_dax_ctl dax = {
++		.sector		= sector,
++		.size		= PAGE_SIZE,
++	};
++
++	if (dax_map_atomic(bdev, &dax) < 0)
++		return PTR_ERR(dax.addr);
++	clear_pmem(dax.addr + offset, length);
++	wmb_pmem();
++	dax_unmap_atomic(bdev, &dax);
++	return 0;
++}
++EXPORT_SYMBOL_GPL(__dax_zero_page_range);
++
+ /**
+  * dax_zero_page_range - zero a range within a page of a DAX file
+  * @inode: The file being truncated
+@@ -982,23 +999,11 @@ int dax_zero_page_range(struct inode *inode, loff_t from, unsigned length,
+ 	bh.b_bdev = inode->i_sb->s_bdev;
+ 	bh.b_size = PAGE_SIZE;
+ 	err = get_block(inode, index, &bh, 0);
+-	if (err < 0)
++	if (err < 0 || !buffer_written(&bh))
+ 		return err;
+-	if (buffer_written(&bh)) {
+-		struct block_device *bdev = bh.b_bdev;
+-		struct blk_dax_ctl dax = {
+-			.sector = to_sector(&bh, inode),
+-			.size = PAGE_SIZE,
+-		};
+ 
+-		if (dax_map_atomic(bdev, &dax) < 0)
+-			return PTR_ERR(dax.addr);
+-		clear_pmem(dax.addr + offset, length);
+-		wmb_pmem();
+-		dax_unmap_atomic(bdev, &dax);
+-	}
+-
+-	return 0;
++	return __dax_zero_page_range(bh.b_bdev, to_sector(&bh, inode),
++			offset, length);
+ }
+ EXPORT_SYMBOL_GPL(dax_zero_page_range);
+ 
+diff --git a/include/linux/dax.h b/include/linux/dax.h
+index 7f853ff..90fbc99 100644
+--- a/include/linux/dax.h
++++ b/include/linux/dax.h
+@@ -14,12 +14,19 @@ int __dax_fault(struct vm_area_struct *, struct vm_fault *, get_block_t);
+ 
+ #ifdef CONFIG_FS_DAX
+ struct page *read_dax_sector(struct block_device *bdev, sector_t n);
++int __dax_zero_page_range(struct block_device *bdev, sector_t sector,
++		unsigned int offset, unsigned int length);
+ #else
+ static inline struct page *read_dax_sector(struct block_device *bdev,
+ 		sector_t n)
+ {
+ 	return ERR_PTR(-ENXIO);
+ }
++static inline int __dax_zero_page_range(struct block_device *bdev,
++		sector_t sector, unsigned int offset, unsigned int length)
++{
++	return -ENXIO;
++}
+ #endif
+ 
+ #ifdef CONFIG_TRANSPARENT_HUGEPAGE
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+2.5.5
+
