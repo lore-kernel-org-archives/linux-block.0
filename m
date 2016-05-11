@@ -1,63 +1,65 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:34062 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752761AbcEZCi6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-	Wed, 25 May 2016 22:38:58 -0400
-Date: Wed, 25 May 2016 22:38:56 -0400
-From: Mike Snitzer <snitzer@redhat.com>
-To: James Bottomley <James.Bottomley@HansenPartnership.com>
-Cc: linux-block@vger.kernel.org, lsf@lists.linux-foundation.org,
-	device-mapper development <dm-devel@redhat.com>,
-	linux-scsi <linux-scsi@vger.kernel.org>, hch@lst.de
-Subject: bio-based DM multipath is back from the dead [was: Re: Notes from
- the four separate IO track sessions at LSF/MM]
-Message-ID: <20160526023855.GA20659@redhat.com>
-References: <1461800389.2311.70.camel@HansenPartnership.com>
- <20160428121108.GA9903@redhat.com>
- <1461858038.2307.16.camel@HansenPartnership.com>
+Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:52732 "EHLO
+	mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1753094AbcEKARE (ORCPT
+	<rfc822;linux-block@vger.kernel.org>);
+	Tue, 10 May 2016 20:17:04 -0400
+Received: from pps.filterd (m0044008.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.16.0.11/8.16.0.11) with SMTP id u4B0Gvbs018072
+	for <linux-block@vger.kernel.org>; Tue, 10 May 2016 17:16:59 -0700
+Received: from mail.thefacebook.com ([199.201.64.23])
+	by mx0a-00082601.pphosted.com with ESMTP id 22usuar1v4-6
+	(version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT)
+	for <linux-block@vger.kernel.org>; Tue, 10 May 2016 17:16:59 -0700
+Received: from facebook.com (2401:db00:11:d0a2:face:0:39:0)	by
+ mx-out.facebook.com (10.212.236.89) with ESMTP	id
+ a426851c170d11e6a00f0002c95209d8-9c4f7c50 for <linux-block@vger.kernel.org>;
+	Tue, 10 May 2016 17:16:43 -0700
+From: Shaohua Li <shli@fb.com>
+To: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <tj@kernel.org>, <vgoyal@redhat.com>, <axboe@fb.com>,
+	<jmoyer@redhat.com>, <Kernel-team@fb.com>
+Subject: [PATCH 09/10] blk-throttle: make sure expire time isn't too big
+Date: Tue, 10 May 2016 17:16:39 -0700
+Message-ID: <40b42ff504ad8f54251ca4b8c088f217410aa791.1462923578.git.shli@fb.com>
+In-Reply-To: <cover.1462923578.git.shli@fb.com>
+References: <cover.1462923578.git.shli@fb.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1461858038.2307.16.camel@HansenPartnership.com>
+Content-Type: text/plain
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Thu, Apr 28 2016 at 11:40am -0400,
-James Bottomley <James.Bottomley@HansenPartnership.com> wrote:
+cgroup could be throttled to a limit but when other cgroups are idle,
+queue enters a higher state and so the group should be throttled to a
+higher limit. It's possible the cgroup is sleeping because of throttle
+and other cgroups don't dispatch IO any more. In this case, nobody can
+trigger current downgrade/upgrade logic. To fix this issue, we could
+either set up a timer to wakeup the cgroup if other cgroups are idle or
+make sure this cgroup doesn't sleep too long. Setting up a timer means
+we must change the timer very frequently. This patch chooses the latter.
+Making cgroup sleep time not too big wouldn't change cgroup bps/iops,
+but could make it wakeup more frequently, which isn't a big issue
+because cg_check_time * 8 is already quite big.
 
-> On Thu, 2016-04-28 at 08:11 -0400, Mike Snitzer wrote:
-> > Full disclosure: I'll be looking at reinstating bio-based DM multipath to
-> > regain efficiencies that now really matter when issuing IO to extremely
-> > fast devices (e.g. NVMe).  bio cloning is now very cheap (due to
-> > immutable biovecs), coupled with the emerging multipage biovec work that
-> > will help construct larger bios, so I think it is worth pursuing to at
-> > least keep our options open.
+Signed-off-by: Shaohua Li <shli@fb.com>
+---
+ block/blk-throttle.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Please see the 4 topmost commits I've published here:
-https://git.kernel.org/cgit/linux/kernel/git/device-mapper/linux-dm.git/log/?h=dm-4.8
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index 0aed049..a5f3435 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -632,6 +632,9 @@ static void throtl_dequeue_tg(struct throtl_grp *tg)
+ static void throtl_schedule_pending_timer(struct throtl_service_queue *sq,
+ 					  unsigned long expires)
+ {
++	unsigned long max_expire = jiffies + 8 * cg_check_time;
++	if (time_after(expires, max_expire))
++		expires = max_expire;
+ 	mod_timer(&sq->pending_timer, expires);
+ 	throtl_log(sq, "schedule timer. delay=%lu jiffies=%lu",
+ 		   expires - jiffies, jiffies);
+-- 
+2.8.0.rc2
 
-All request-based DM multipath support/advances have been completly
-preserved.  I've just made it so that we can now have bio-based DM
-multipath too.
-
-All of the various modes have been tested using mptest:
-https://github.com/snitm/mptest
-
-> OK, but remember the reason we moved from bio to request was partly to
-> be nearer to the device but also because at that time requests were
-> accumulations of bios which had to be broken out, go back up the stack
-> individually and be re-elevated, which adds to the inefficiency.  In
-> theory the bio splitting work will mean that we only have one or two
-> split bios per request (because they were constructed from a split up
-> huge bio), but when we send them back to the top to be reconstructed as
-> requests there's no guarantee that the split will be correct a second
-> time around and we might end up resplitting the already split bios.  If
-> you do reassembly into the huge bio again before resend down the next
-> queue, that's starting to look like quite a lot of work as well.
-
-I've not even delved into the level you're laser-focused on here.
-But I'm struggling to grasp why multipath is any different than any
-other bio-based device...
-
-FYI, the paper I reference in my "dm mpath: reinstate bio-based support"
-commit gets into what I've always thought the real justification was for
-the transition from bio-based to request-based.
