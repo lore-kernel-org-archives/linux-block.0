@@ -1,634 +1,281 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:36769 "EHLO mga09.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753270AbcERU5E (ORCPT <rfc822;linux-block@vger.kernel.org>);
-	Wed, 18 May 2016 16:57:04 -0400
-Subject: [PATCH v3 2/5] /dev/dax, pmem: direct access to persistent memory
-From: Dan Williams <dan.j.williams@intel.com>
-To: linux-nvdimm@lists.01.org
-Cc: Dave Hansen <dave.hansen@linux.intel.com>,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	Jeff Moyer <jmoyer@redhat.com>,
-	Ross Zwisler <ross.zwisler@linux.intel.com>,
-	Andrew Morton <akpm@linux-foundation.org>, hch@lst.de
-Date: Wed, 18 May 2016 13:56:16 -0700
-Message-ID: <146360497642.37439.12866290214925858506.stgit@dwillia2-desk3.amr.corp.intel.com>
-In-Reply-To: <146360496572.37439.6497663679891935585.stgit@dwillia2-desk3.amr.corp.intel.com>
-References: <146360496572.37439.6497663679891935585.stgit@dwillia2-desk3.amr.corp.intel.com>
+Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:1646 "EHLO
+	mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752092AbcEKAQo (ORCPT
+	<rfc822;linux-block@vger.kernel.org>);
+	Tue, 10 May 2016 20:16:44 -0400
+Received: from pps.filterd (m0044010.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.16.0.11/8.16.0.11) with SMTP id u4B0CNDY026368
+	for <linux-block@vger.kernel.org>; Tue, 10 May 2016 17:16:43 -0700
+Received: from mail.thefacebook.com ([199.201.64.23])
+	by mx0a-00082601.pphosted.com with ESMTP id 22usxn80xx-1
+	(version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT)
+	for <linux-block@vger.kernel.org>; Tue, 10 May 2016 17:16:43 -0700
+Received: from facebook.com (2401:db00:11:d0a2:face:0:39:0)	by
+ mx-out.facebook.com (10.212.232.59) with ESMTP	id
+ a31b948c170d11e685ef0002c991e86a-d70e2c50 for <linux-block@vger.kernel.org>;
+	Tue, 10 May 2016 17:16:42 -0700
+From: Shaohua Li <shli@fb.com>
+To: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <tj@kernel.org>, <vgoyal@redhat.com>, <axboe@fb.com>,
+	<jmoyer@redhat.com>, <Kernel-team@fb.com>
+Subject: [PATCH 02/10] block-throttle: add .low interface
+Date: Tue, 10 May 2016 17:16:32 -0700
+Message-ID: <1ef5e2908cacd9fad68fbacddddfbba7c86176b3.1462923578.git.shli@fb.com>
+In-Reply-To: <cover.1462923578.git.shli@fb.com>
+References: <cover.1462923578.git.shli@fb.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Device DAX is the device-centric analogue of Filesystem DAX
-(CONFIG_FS_DAX).  It allows memory ranges to be allocated and mapped
-without need of an intervening file system.  Device DAX is strict,
-precise and predictable.  Specifically this interface:
+Add low limit for cgroup and corresponding cgroup interface.
 
-1/ Guarantees fault granularity with respect to a given page size (pte,
-pmd, or pud) set at configuration time.
-
-2/ Enforces deterministic behavior by being strict about what fault
-scenarios are supported.
-
-For example, by forcing MADV_DONTFORK semantics and omitting MAP_PRIVATE
-support device-dax guarantees that a mapping always behaves/performs the
-same once established.  It is the "what you see is what you get" access
-mechanism to differentiated memory vs filesystem DAX which has
-filesystem specific implementation semantics.
-
-Persistent memory is the first target, but the mechanism is also
-targeted for exclusive allocations of performance differentiated memory
-ranges.
-
-This commit is limited to the base device driver infrastructure to
-associate a dax device with pmem range.
-
-Cc: Jeff Moyer <jmoyer@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Andrew Morton <akpm@linux-foundation.org>
-Cc: Dave Hansen <dave.hansen@linux.intel.com>
-Cc: Ross Zwisler <ross.zwisler@linux.intel.com>
-Signed-off-by: Dan Williams <dan.j.williams@intel.com>
+Signed-off-by: Shaohua Li <shli@fb.com>
 ---
- drivers/Kconfig                     |    2 
- drivers/Makefile                    |    1 
- drivers/dax/Kconfig                 |   25 +++
- drivers/dax/Makefile                |    4 +
- drivers/dax/dax.c                   |  253 +++++++++++++++++++++++++++++++++++
- drivers/dax/dax.h                   |   24 +++
- drivers/dax/pmem.c                  |  158 ++++++++++++++++++++++
- tools/testing/nvdimm/Kbuild         |    9 +
- tools/testing/nvdimm/config_check.c |    2 
- 9 files changed, 478 insertions(+)
- create mode 100644 drivers/dax/Kconfig
- create mode 100644 drivers/dax/Makefile
- create mode 100644 drivers/dax/dax.c
- create mode 100644 drivers/dax/dax.h
- create mode 100644 drivers/dax/pmem.c
+ block/blk-throttle.c | 142 +++++++++++++++++++++++++++++++++++++++------------
+ 1 file changed, 110 insertions(+), 32 deletions(-)
 
-diff --git a/drivers/Kconfig b/drivers/Kconfig
-index d2ac339de85f..8298eab84a6f 100644
---- a/drivers/Kconfig
-+++ b/drivers/Kconfig
-@@ -190,6 +190,8 @@ source "drivers/android/Kconfig"
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index 162d54c..e69a3db 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -84,8 +84,9 @@ enum tg_state_flags {
+ #define rb_entry_tg(node)	rb_entry((node), struct throtl_grp, rb_node)
  
- source "drivers/nvdimm/Kconfig"
+ enum {
+-	LIMIT_MAX = 0,
+-	LIMIT_CNT = 1,
++	LIMIT_LOW = 0,
++	LIMIT_MAX = 1,
++	LIMIT_CNT = 2,
+ };
  
-+source "drivers/dax/Kconfig"
-+
- source "drivers/nvmem/Kconfig"
+ struct throtl_grp {
+@@ -358,7 +359,7 @@ static struct blkg_policy_data *throtl_pd_alloc(gfp_t gfp, int node)
  
- source "drivers/hwtracing/stm/Kconfig"
-diff --git a/drivers/Makefile b/drivers/Makefile
-index 8f5d076baeb0..0b6f3d60193d 100644
---- a/drivers/Makefile
-+++ b/drivers/Makefile
-@@ -66,6 +66,7 @@ obj-$(CONFIG_PARPORT)		+= parport/
- obj-$(CONFIG_NVM)		+= lightnvm/
- obj-y				+= base/ block/ misc/ mfd/ nfc/
- obj-$(CONFIG_LIBNVDIMM)		+= nvdimm/
-+obj-$(CONFIG_DEV_DAX)		+= dax/
- obj-$(CONFIG_DMA_SHARED_BUFFER) += dma-buf/
- obj-$(CONFIG_NUBUS)		+= nubus/
- obj-y				+= macintosh/
-diff --git a/drivers/dax/Kconfig b/drivers/dax/Kconfig
-new file mode 100644
-index 000000000000..86ffbaa891ad
---- /dev/null
-+++ b/drivers/dax/Kconfig
-@@ -0,0 +1,25 @@
-+menuconfig DEV_DAX
-+	tristate "DAX: direct access to differentiated memory"
-+	default m if NVDIMM_DAX
-+	help
-+	  Support raw access to differentiated (persistence, bandwidth,
-+	  latency...) memory via an mmap(2) capable character
-+	  device.  Platform firmware or a device driver may identify a
-+	  platform memory resource that is differentiated from the
-+	  baseline memory pool.  Mappings of a /dev/daxX.Y device impose
-+	  restrictions that make the mapping behavior deterministic.
-+
-+if DEV_DAX
-+
-+config DEV_DAX_PMEM
-+	tristate "PMEM DAX: direct access to persistent memory"
-+	depends on NVDIMM_DAX
-+	default DEV_DAX
-+	help
-+	  Support raw access to persistent memory.  Note that this
-+	  driver consumes memory ranges allocated and exported by the
-+	  libnvdimm sub-system.
-+
-+	  Say Y if unsure
-+
-+endif
-diff --git a/drivers/dax/Makefile b/drivers/dax/Makefile
-new file mode 100644
-index 000000000000..27c54e38478a
---- /dev/null
-+++ b/drivers/dax/Makefile
-@@ -0,0 +1,4 @@
-+obj-$(CONFIG_DEV_DAX) += dax.o
-+obj-$(CONFIG_DEV_DAX_PMEM) += dax_pmem.o
-+
-+dax_pmem-y := pmem.o
-diff --git a/drivers/dax/dax.c b/drivers/dax/dax.c
-new file mode 100644
-index 000000000000..4c22a40f2335
---- /dev/null
-+++ b/drivers/dax/dax.c
-@@ -0,0 +1,253 @@
-+/*
-+ * Copyright(c) 2016 Intel Corporation. All rights reserved.
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of version 2 of the GNU General Public License as
-+ * published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful, but
-+ * WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * General Public License for more details.
-+ */
-+#include <linux/pagemap.h>
-+#include <linux/module.h>
-+#include <linux/device.h>
-+#include <linux/pfn_t.h>
-+#include <linux/slab.h>
-+#include <linux/dax.h>
-+#include <linux/fs.h>
-+#include <linux/mm.h>
-+
-+static int dax_major;
-+static struct class *dax_class;
-+static DEFINE_IDA(dax_minor_ida);
-+
-+/**
-+ * struct dax_region - mapping infrastructure for dax devices
-+ * @id: kernel-wide unique region for a memory range
-+ * @base: linear address corresponding to @res
-+ * @kref: to pin while other agents have a need to do lookups
-+ * @dev: parent device backing this region
-+ * @align: allocation and mapping alignment for child dax devices
-+ * @res: physical address range of the region
-+ * @pfn_flags: identify whether the pfns are paged back or not
-+ */
-+struct dax_region {
-+	int id;
-+	struct ida ida;
-+	void *base;
-+	struct kref kref;
-+	struct device *dev;
-+	unsigned int align;
-+	struct resource res;
-+	unsigned long pfn_flags;
-+};
-+
-+/**
-+ * struct dax_dev - subdivision of a dax region
-+ * @region - parent region
-+ * @dev - device backing the character device
-+ * @kref - enable this data to be tracked in filp->private_data
-+ * @id - child id in the region
-+ * @num_resources - number of physical address extents in this device
-+ * @res - array of physical address ranges
-+ */
-+struct dax_dev {
-+	struct dax_region *region;
-+	struct device *dev;
-+	struct kref kref;
-+	int id;
-+	int num_resources;
-+	struct resource res[0];
-+};
-+
-+static void dax_region_free(struct kref *kref)
-+{
-+	struct dax_region *dax_region;
-+
-+	dax_region = container_of(kref, struct dax_region, kref);
-+	kfree(dax_region);
-+}
-+
-+void dax_region_put(struct dax_region *dax_region)
-+{
-+	kref_put(&dax_region->kref, dax_region_free);
-+}
-+EXPORT_SYMBOL_GPL(dax_region_put);
-+
-+static void dax_dev_free(struct kref *kref)
-+{
-+	struct dax_dev *dax_dev;
-+
-+	dax_dev = container_of(kref, struct dax_dev, kref);
-+	dax_region_put(dax_dev->region);
-+	kfree(dax_dev);
-+}
-+
-+static void dax_dev_put(struct dax_dev *dax_dev)
-+{
-+	kref_put(&dax_dev->kref, dax_dev_free);
-+}
-+
-+struct dax_region *alloc_dax_region(struct device *parent, int region_id,
-+		struct resource *res, unsigned int align, void *addr,
-+		unsigned long pfn_flags)
-+{
-+	struct dax_region *dax_region;
-+
-+	dax_region = kzalloc(sizeof(*dax_region), GFP_KERNEL);
-+
-+	if (!dax_region)
-+		return NULL;
-+
-+	memcpy(&dax_region->res, res, sizeof(*res));
-+	dax_region->pfn_flags = pfn_flags;
-+	kref_init(&dax_region->kref);
-+	dax_region->id = region_id;
-+	ida_init(&dax_region->ida);
-+	dax_region->align = align;
-+	dax_region->dev = parent;
-+	dax_region->base = addr;
-+
-+	return dax_region;
-+}
-+EXPORT_SYMBOL_GPL(alloc_dax_region);
-+
-+static ssize_t size_show(struct device *dev,
-+		struct device_attribute *attr, char *buf)
-+{
-+	struct dax_dev *dax_dev = dev_get_drvdata(dev);
-+	unsigned long long size = 0;
-+	int i;
-+
-+	for (i = 0; i < dax_dev->num_resources; i++)
-+		size += resource_size(&dax_dev->res[i]);
-+
-+	return sprintf(buf, "%llu\n", size);
-+}
-+static DEVICE_ATTR_RO(size);
-+
-+static struct attribute *dax_device_attributes[] = {
-+	&dev_attr_size.attr,
-+	NULL,
-+};
-+
-+static const struct attribute_group dax_device_attribute_group = {
-+	.attrs = dax_device_attributes,
-+};
-+
-+static const struct attribute_group *dax_attribute_groups[] = {
-+	&dax_device_attribute_group,
-+	NULL,
-+};
-+
-+static void unregister_dax_dev(void *_dev)
-+{
-+	struct device *dev = _dev;
-+	struct dax_dev *dax_dev = dev_get_drvdata(dev);
-+	struct dax_region *dax_region = dax_dev->region;
-+
-+	dev_dbg(dev, "%s\n", __func__);
-+
-+	get_device(dev);
-+	device_unregister(dev);
-+	ida_simple_remove(&dax_region->ida, dax_dev->id);
-+	ida_simple_remove(&dax_minor_ida, MINOR(dev->devt));
-+	put_device(dev);
-+	dax_dev_put(dax_dev);
-+}
-+
-+int devm_create_dax_dev(struct dax_region *dax_region, struct resource *res,
-+		int count)
-+{
-+	struct device *parent = dax_region->dev;
-+	struct dax_dev *dax_dev;
-+	struct device *dev;
-+	int rc, minor;
-+	dev_t dev_t;
-+
-+	dax_dev = kzalloc(sizeof(*dax_dev) + sizeof(*res) * count, GFP_KERNEL);
-+	if (!dax_dev)
-+		return -ENOMEM;
-+	memcpy(dax_dev->res, res, sizeof(*res) * count);
-+	dax_dev->num_resources = count;
-+	kref_init(&dax_dev->kref);
-+	dax_dev->region = dax_region;
-+	kref_get(&dax_region->kref);
-+
-+	dax_dev->id = ida_simple_get(&dax_region->ida, 0, 0, GFP_KERNEL);
-+	if (dax_dev->id < 0) {
-+		rc = dax_dev->id;
-+		goto err_id;
-+	}
-+
-+	minor = ida_simple_get(&dax_minor_ida, 0, 0, GFP_KERNEL);
-+	if (minor < 0) {
-+		rc = minor;
-+		goto err_minor;
-+	}
-+
-+	dev_t = MKDEV(dax_major, minor);
-+	dev = device_create_with_groups(dax_class, parent, dev_t, dax_dev,
-+			dax_attribute_groups, "dax%d.%d", dax_region->id,
-+			dax_dev->id);
-+	if (IS_ERR(dev)) {
-+		rc = PTR_ERR(dev);
-+		goto err_create;
-+	}
-+	dax_dev->dev = dev;
-+
-+	rc = devm_add_action(dax_region->dev, unregister_dax_dev, dev);
-+	if (rc) {
-+		unregister_dax_dev(dev);
-+		return rc;
-+	}
-+
-+	return 0;
-+
-+ err_create:
-+	ida_simple_remove(&dax_minor_ida, minor);
-+ err_minor:
-+	ida_simple_remove(&dax_region->ida, dax_dev->id);
-+ err_id:
-+	dax_dev_put(dax_dev);
-+
-+	return rc;
-+}
-+EXPORT_SYMBOL_GPL(devm_create_dax_dev);
-+
-+static const struct file_operations dax_fops = {
-+	.llseek = noop_llseek,
-+	.owner = THIS_MODULE,
-+};
-+
-+static int __init dax_init(void)
-+{
-+	int rc;
-+
-+	rc = register_chrdev(0, "dax", &dax_fops);
-+	if (rc < 0)
-+		return rc;
-+	dax_major = rc;
-+
-+	dax_class = class_create(THIS_MODULE, "dax");
-+	if (IS_ERR(dax_class)) {
-+		unregister_chrdev(dax_major, "dax");
-+		return PTR_ERR(dax_class);
-+	}
-+
-+	return 0;
-+}
-+
-+static void __exit dax_exit(void)
-+{
-+	class_destroy(dax_class);
-+	unregister_chrdev(dax_major, "dax");
-+	ida_destroy(&dax_minor_ida);
-+}
-+
-+MODULE_AUTHOR("Intel Corporation");
-+MODULE_LICENSE("GPL v2");
-+subsys_initcall(dax_init);
-+module_exit(dax_exit);
-diff --git a/drivers/dax/dax.h b/drivers/dax/dax.h
-new file mode 100644
-index 000000000000..d8b8f1f25054
---- /dev/null
-+++ b/drivers/dax/dax.h
-@@ -0,0 +1,24 @@
-+/*
-+ * Copyright(c) 2016 Intel Corporation. All rights reserved.
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of version 2 of the GNU General Public License as
-+ * published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful, but
-+ * WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * General Public License for more details.
-+ */
-+#ifndef __DAX_H__
-+#define __DAX_H__
-+struct device;
-+struct resource;
-+struct dax_region;
-+void dax_region_put(struct dax_region *dax_region);
-+struct dax_region *alloc_dax_region(struct device *parent,
-+		int region_id, struct resource *res, unsigned int align,
-+		void *addr, unsigned long flags);
-+int devm_create_dax_dev(struct dax_region *dax_region, struct resource *res,
-+		int count);
-+#endif /* __DAX_H__ */
-diff --git a/drivers/dax/pmem.c b/drivers/dax/pmem.c
-new file mode 100644
-index 000000000000..55d510e36cd1
---- /dev/null
-+++ b/drivers/dax/pmem.c
-@@ -0,0 +1,158 @@
-+/*
-+ * Copyright(c) 2016 Intel Corporation. All rights reserved.
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of version 2 of the GNU General Public License as
-+ * published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful, but
-+ * WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * General Public License for more details.
-+ */
-+#include <linux/percpu-refcount.h>
-+#include <linux/memremap.h>
-+#include <linux/module.h>
-+#include <linux/pfn_t.h>
-+#include "../nvdimm/pfn.h"
-+#include "../nvdimm/nd.h"
-+#include "dax.h"
-+
-+struct dax_pmem {
-+	struct device *dev;
-+	struct percpu_ref ref;
-+	struct completion cmp;
-+};
-+
-+struct dax_pmem *to_dax_pmem(struct percpu_ref *ref)
-+{
-+	return container_of(ref, struct dax_pmem, ref);
-+}
-+
-+static void dax_pmem_percpu_release(struct percpu_ref *ref)
-+{
-+	struct dax_pmem *dax_pmem = to_dax_pmem(ref);
-+
-+	dev_dbg(dax_pmem->dev, "%s\n", __func__);
-+	complete(&dax_pmem->cmp);
-+}
-+
-+static void dax_pmem_percpu_exit(void *data)
-+{
-+	struct percpu_ref *ref = data;
-+	struct dax_pmem *dax_pmem = to_dax_pmem(ref);
-+
-+	dev_dbg(dax_pmem->dev, "%s\n", __func__);
-+	percpu_ref_exit(ref);
-+	wait_for_completion(&dax_pmem->cmp);
-+}
-+
-+static void dax_pmem_percpu_kill(void *data)
-+{
-+	struct percpu_ref *ref = data;
-+	struct dax_pmem *dax_pmem = to_dax_pmem(ref);
-+
-+	dev_dbg(dax_pmem->dev, "%s\n", __func__);
-+	percpu_ref_kill(ref);
-+}
-+
-+static int dax_pmem_probe(struct device *dev)
-+{
-+	int rc;
-+	void *addr;
-+	struct resource res;
-+	struct nd_pfn_sb *pfn_sb;
-+	struct dax_pmem *dax_pmem;
-+	struct nd_region *nd_region;
-+	struct nd_namespace_io *nsio;
-+	struct dax_region *dax_region;
-+	struct nd_namespace_common *ndns;
-+	struct nd_dax *nd_dax = to_nd_dax(dev);
-+	struct nd_pfn *nd_pfn = &nd_dax->nd_pfn;
-+	struct vmem_altmap __altmap, *altmap = NULL;
-+
-+	ndns = nvdimm_namespace_common_probe(dev);
-+	if (IS_ERR(ndns))
-+		return PTR_ERR(ndns);
-+	nsio = to_nd_namespace_io(&ndns->dev);
-+
-+	/* parse the 'pfn' info block via ->rw_bytes */
-+	devm_nsio_enable(dev, nsio);
-+	altmap = nvdimm_setup_pfn(nd_pfn, &res, &__altmap);
-+	if (IS_ERR(altmap))
-+		return PTR_ERR(altmap);
-+	devm_nsio_disable(dev, nsio);
-+
-+	pfn_sb = nd_pfn->pfn_sb;
-+
-+	if (!devm_request_mem_region(dev, nsio->res.start,
-+				resource_size(&nsio->res), dev_name(dev))) {
-+		dev_warn(dev, "could not reserve region %pR\n", &nsio->res);
-+		return -EBUSY;
-+	}
-+
-+	dax_pmem = devm_kzalloc(dev, sizeof(*dax_pmem), GFP_KERNEL);
-+	if (!dax_pmem)
-+		return -ENOMEM;
-+
-+	dax_pmem->dev = dev;
-+	init_completion(&dax_pmem->cmp);
-+	rc = percpu_ref_init(&dax_pmem->ref, dax_pmem_percpu_release, 0,
-+			GFP_KERNEL);
-+	if (rc)
-+		return rc;
-+
-+	rc = devm_add_action(dev, dax_pmem_percpu_exit, &dax_pmem->ref);
-+	if (rc) {
-+		dax_pmem_percpu_exit(&dax_pmem->ref);
-+		return rc;
-+	}
-+
-+	addr = devm_memremap_pages(dev, &res, &dax_pmem->ref, altmap);
-+	if (IS_ERR(addr))
-+		return PTR_ERR(addr);
-+
-+	rc = devm_add_action(dev, dax_pmem_percpu_kill, &dax_pmem->ref);
-+	if (rc) {
-+		dax_pmem_percpu_kill(&dax_pmem->ref);
-+		return rc;
-+	}
-+
-+	nd_region = to_nd_region(dev->parent);
-+	dax_region = alloc_dax_region(dev, nd_region->id, &res,
-+			le32_to_cpu(pfn_sb->align), addr, PFN_DEV|PFN_MAP);
-+	if (!dax_region)
-+		return -ENOMEM;
-+
-+	/* TODO: support for subdividing a dax region... */
-+	rc = devm_create_dax_dev(dax_region, &res, 1);
-+
-+	/* child dax_dev instances now own the lifetime of the dax_region */
-+	dax_region_put(dax_region);
-+
-+	return rc;
-+}
-+
-+static struct nd_device_driver dax_pmem_driver = {
-+	.probe = dax_pmem_probe,
-+	.drv = {
-+		.name = "dax_pmem",
-+	},
-+	.type = ND_DRIVER_DAX_PMEM,
-+};
-+
-+static int __init dax_pmem_init(void)
-+{
-+	return nd_driver_register(&dax_pmem_driver);
-+}
-+module_init(dax_pmem_init);
-+
-+static void __exit dax_pmem_exit(void)
-+{
-+	driver_unregister(&dax_pmem_driver.drv);
-+}
-+module_exit(dax_pmem_exit);
-+
-+MODULE_LICENSE("GPL v2");
-+MODULE_AUTHOR("Intel Corporation");
-+MODULE_ALIAS_ND_DEVICE(ND_DEVICE_DAX_PMEM);
-diff --git a/tools/testing/nvdimm/Kbuild b/tools/testing/nvdimm/Kbuild
-index 5ff6d3c126a9..785985677159 100644
---- a/tools/testing/nvdimm/Kbuild
-+++ b/tools/testing/nvdimm/Kbuild
-@@ -16,6 +16,7 @@ ldflags-y += --wrap=phys_to_pfn_t
- DRIVERS := ../../../drivers
- NVDIMM_SRC := $(DRIVERS)/nvdimm
- ACPI_SRC := $(DRIVERS)/acpi
-+DAX_SRC := $(DRIVERS)/dax
- 
- obj-$(CONFIG_LIBNVDIMM) += libnvdimm.o
- obj-$(CONFIG_BLK_DEV_PMEM) += nd_pmem.o
-@@ -23,6 +24,8 @@ obj-$(CONFIG_ND_BTT) += nd_btt.o
- obj-$(CONFIG_ND_BLK) += nd_blk.o
- obj-$(CONFIG_X86_PMEM_LEGACY) += nd_e820.o
- obj-$(CONFIG_ACPI_NFIT) += nfit.o
-+obj-$(CONFIG_DEV_DAX) += dax.o
-+obj-$(CONFIG_DEV_DAX_PMEM) += dax_pmem.o
- 
- nfit-y := $(ACPI_SRC)/nfit.o
- nfit-y += config_check.o
-@@ -39,6 +42,12 @@ nd_blk-y += config_check.o
- nd_e820-y := $(NVDIMM_SRC)/e820.o
- nd_e820-y += config_check.o
- 
-+dax-y := $(DAX_SRC)/dax.o
-+dax-y += config_check.o
-+
-+dax_pmem-y := $(DAX_SRC)/pmem.o
-+dax_pmem-y += config_check.o
-+
- libnvdimm-y := $(NVDIMM_SRC)/core.o
- libnvdimm-y += $(NVDIMM_SRC)/bus.o
- libnvdimm-y += $(NVDIMM_SRC)/dimm_devs.o
-diff --git a/tools/testing/nvdimm/config_check.c b/tools/testing/nvdimm/config_check.c
-index f2c7615554eb..adf18bfeca00 100644
---- a/tools/testing/nvdimm/config_check.c
-+++ b/tools/testing/nvdimm/config_check.c
-@@ -12,4 +12,6 @@ void check(void)
- 	BUILD_BUG_ON(!IS_MODULE(CONFIG_ND_BTT));
- 	BUILD_BUG_ON(!IS_MODULE(CONFIG_ND_BLK));
- 	BUILD_BUG_ON(!IS_MODULE(CONFIG_ACPI_NFIT));
-+	BUILD_BUG_ON(!IS_MODULE(CONFIG_DEV_DAX));
-+	BUILD_BUG_ON(!IS_MODULE(CONFIG_DEV_DAX_PMEM));
+ 	RB_CLEAR_NODE(&tg->rb_node);
+ 	for (rw = READ; rw <= WRITE; rw++) {
+-		for (index = 0; index < LIMIT_CNT; index++) {
++		for (index = LIMIT_MAX; index < LIMIT_CNT; index++) {
+ 			tg->bps[rw][index] = -1;
+ 			tg->iops[rw][index] = -1;
+ 		}
+@@ -420,6 +421,44 @@ static void throtl_pd_online(struct blkg_policy_data *pd)
+ 	tg_update_has_rules(pd_to_tg(pd));
  }
+ 
++static void blk_throtl_update_valid_limit(struct throtl_data *td)
++{
++	struct cgroup_subsys_state *pos_css;
++	struct blkcg_gq *blkg;
++	bool low_valid = false;
++
++	blkg_for_each_descendant_post(blkg, pos_css, td->queue->root_blkg) {
++		struct throtl_grp *tg = blkg_to_tg(blkg);
++
++		if (tg->bps[READ][LIMIT_LOW] ||
++		    tg->bps[WRITE][LIMIT_LOW] ||
++		    tg->iops[READ][LIMIT_LOW] ||
++		    tg->iops[WRITE][LIMIT_LOW])
++			low_valid = true;
++	}
++
++	if (low_valid)
++		td->limit_valid[LIMIT_LOW] = true;
++	else
++		td->limit_valid[LIMIT_LOW] = false;
++}
++
++static void throtl_pd_offline(struct blkg_policy_data *pd)
++{
++	struct throtl_grp *tg = pd_to_tg(pd);
++
++	tg->bps[READ][LIMIT_LOW] = 0;
++	tg->bps[WRITE][LIMIT_LOW] = 0;
++	tg->iops[READ][LIMIT_LOW] = 0;
++	tg->iops[WRITE][LIMIT_LOW] = 0;
++
++	blk_throtl_update_valid_limit(tg->td);
++
++	if (tg->td->limit_index == LIMIT_LOW &&
++	    !tg->td->limit_valid[LIMIT_LOW])
++		tg->td->limit_index = LIMIT_MAX;
++}
++
+ static void throtl_pd_free(struct blkg_policy_data *pd)
+ {
+ 	struct throtl_grp *tg = pd_to_tg(pd);
+@@ -1287,45 +1326,50 @@ static struct cftype throtl_legacy_files[] = {
+ 	{ }	/* terminate */
+ };
+ 
+-static u64 tg_prfill_max(struct seq_file *sf, struct blkg_policy_data *pd,
++static u64 tg_prfill_limit(struct seq_file *sf, struct blkg_policy_data *pd,
+ 			 int off)
+ {
+ 	struct throtl_grp *tg = pd_to_tg(pd);
+ 	const char *dname = blkg_dev_name(pd->blkg);
+ 	char bufs[4][21] = { "max", "max", "max", "max" };
++	uint64_t target = -1;
+ 
+ 	if (!dname)
+ 		return 0;
+-	if (tg->bps[READ][LIMIT_MAX] == -1 && tg->bps[WRITE][LIMIT_MAX] == -1 &&
+-	    tg->iops[READ][LIMIT_MAX] == -1 && tg->iops[WRITE][LIMIT_MAX] == -1)
++	if (off == LIMIT_LOW) {
++		int i;
++		for (i = 0; i < 4; i++)
++			strcpy(bufs[i], "0");
++		target = 0;
++	}
++
++	if (tg->bps[READ][off] == target && tg->bps[WRITE][off] == target &&
++	    tg->iops[READ][off] == (unsigned int)target &&
++	    tg->iops[WRITE][off] == (unsigned int)target)
+ 		return 0;
+ 
+-	if (tg->bps[READ][LIMIT_MAX] != -1)
+-		snprintf(bufs[0], sizeof(bufs[0]), "%llu",
+-			tg->bps[READ][LIMIT_MAX]);
+-	if (tg->bps[WRITE][LIMIT_MAX] != -1)
+-		snprintf(bufs[1], sizeof(bufs[1]), "%llu",
+-			tg->bps[WRITE][LIMIT_MAX]);
+-	if (tg->iops[READ][LIMIT_MAX] != -1)
+-		snprintf(bufs[2], sizeof(bufs[2]), "%u",
+-			tg->iops[READ][LIMIT_MAX]);
+-	if (tg->iops[WRITE][LIMIT_MAX] != -1)
+-		snprintf(bufs[3], sizeof(bufs[3]), "%u",
+-			tg->iops[WRITE][LIMIT_MAX]);
++	if (tg->bps[READ][off] != target)
++		snprintf(bufs[0], sizeof(bufs[0]), "%llu", tg->bps[READ][off]);
++	if (tg->bps[WRITE][off] != target)
++		snprintf(bufs[1], sizeof(bufs[1]), "%llu", tg->bps[WRITE][off]);
++	if (tg->iops[READ][off] != (unsigned int)target)
++		snprintf(bufs[2], sizeof(bufs[2]), "%u", tg->iops[READ][off]);
++	if (tg->iops[WRITE][off] != (unsigned int)target)
++		snprintf(bufs[3], sizeof(bufs[3]), "%u", tg->iops[WRITE][off]);
+ 
+ 	seq_printf(sf, "%s rbps=%s wbps=%s riops=%s wiops=%s\n",
+ 		   dname, bufs[0], bufs[1], bufs[2], bufs[3]);
+ 	return 0;
+ }
+ 
+-static int tg_print_max(struct seq_file *sf, void *v)
++static int tg_print_limit(struct seq_file *sf, void *v)
+ {
+-	blkcg_print_blkgs(sf, css_to_blkcg(seq_css(sf)), tg_prfill_max,
++	blkcg_print_blkgs(sf, css_to_blkcg(seq_css(sf)), tg_prfill_limit,
+ 			  &blkcg_policy_throtl, seq_cft(sf)->private, false);
+ 	return 0;
+ }
+ 
+-static ssize_t tg_set_max(struct kernfs_open_file *of,
++static ssize_t tg_set_limit(struct kernfs_open_file *of,
+ 			  char *buf, size_t nbytes, loff_t off)
+ {
+ 	struct blkcg *blkcg = css_to_blkcg(of_css(of));
+@@ -1333,6 +1377,7 @@ static ssize_t tg_set_max(struct kernfs_open_file *of,
+ 	struct throtl_grp *tg;
+ 	u64 v[4];
+ 	int ret;
++	int index = of_cft(of)->private;
+ 
+ 	ret = blkg_conf_prep(blkcg, &blkcg_policy_throtl, buf, &ctx);
+ 	if (ret)
+@@ -1340,10 +1385,10 @@ static ssize_t tg_set_max(struct kernfs_open_file *of,
+ 
+ 	tg = blkg_to_tg(ctx.blkg);
+ 
+-	v[0] = tg->bps[READ][LIMIT_MAX];
+-	v[1] = tg->bps[WRITE][LIMIT_MAX];
+-	v[2] = tg->iops[READ][LIMIT_MAX];
+-	v[3] = tg->iops[WRITE][LIMIT_MAX];
++	v[0] = tg->bps[READ][index];
++	v[1] = tg->bps[WRITE][index];
++	v[2] = tg->iops[READ][index];
++	v[3] = tg->iops[WRITE][index];
+ 
+ 	while (true) {
+ 		char tok[27];	/* wiops=18446744073709551616 */
+@@ -1380,11 +1425,33 @@ static ssize_t tg_set_max(struct kernfs_open_file *of,
+ 			goto out_finish;
+ 	}
+ 
+-	tg->bps[READ][LIMIT_MAX] = v[0];
+-	tg->bps[WRITE][LIMIT_MAX] = v[1];
+-	tg->iops[READ][LIMIT_MAX] = v[2];
+-	tg->iops[WRITE][LIMIT_MAX] = v[3];
+-
++	if (index == LIMIT_MAX) {
++		if (v[0] < tg->bps[READ][LIMIT_LOW] ||
++		    v[1] < tg->bps[WRITE][LIMIT_LOW] ||
++		    v[2] < tg->iops[READ][LIMIT_LOW] ||
++		    v[3] < tg->iops[WRITE][LIMIT_LOW]) {
++			ret = -EINVAL;
++			goto out_finish;
++		}
++	} else if (index == LIMIT_LOW) {
++		if (v[0] > tg->bps[READ][LIMIT_MAX] ||
++		    v[1] > tg->bps[WRITE][LIMIT_MAX] ||
++		    v[2] > tg->iops[READ][LIMIT_MAX] ||
++		    v[3] > tg->iops[WRITE][LIMIT_MAX]) {
++			ret = -EINVAL;
++			goto out_finish;
++		}
++	}
++	tg->bps[READ][index] = v[0];
++	tg->bps[WRITE][index] = v[1];
++	tg->iops[READ][index] = v[2];
++	tg->iops[WRITE][index] = v[3];
++
++	if (index == LIMIT_LOW) {
++		blk_throtl_update_valid_limit(tg->td);
++		if (tg->td->limit_valid[LIMIT_LOW])
++			tg->td->limit_index = LIMIT_LOW;
++	}
+ 	tg_conf_updated(tg);
+ 	ret = 0;
+ out_finish:
+@@ -1394,10 +1461,18 @@ static ssize_t tg_set_max(struct kernfs_open_file *of,
+ 
+ static struct cftype throtl_files[] = {
+ 	{
++		.name = "low",
++		.flags = CFTYPE_NOT_ON_ROOT,
++		.seq_show = tg_print_limit,
++		.write = tg_set_limit,
++		.private = LIMIT_LOW,
++	},
++	{
+ 		.name = "max",
+ 		.flags = CFTYPE_NOT_ON_ROOT,
+-		.seq_show = tg_print_max,
+-		.write = tg_set_max,
++		.seq_show = tg_print_limit,
++		.write = tg_set_limit,
++		.private = LIMIT_MAX,
+ 	},
+ 	{ }	/* terminate */
+ };
+@@ -1416,6 +1491,7 @@ static struct blkcg_policy blkcg_policy_throtl = {
+ 	.pd_alloc_fn		= throtl_pd_alloc,
+ 	.pd_init_fn		= throtl_pd_init,
+ 	.pd_online_fn		= throtl_pd_online,
++	.pd_offline_fn		= throtl_pd_offline,
+ 	.pd_free_fn		= throtl_pd_free,
+ };
+ 
+@@ -1593,7 +1669,9 @@ int blk_throtl_init(struct request_queue *q)
+ 	q->td = td;
+ 	td->queue = q;
+ 
++	td->limit_valid[LIMIT_LOW] = false;
+ 	td->limit_valid[LIMIT_MAX] = true;
++	td->limit_index = LIMIT_MAX;
+ 	/* activate policy */
+ 	ret = blkcg_activate_policy(q, &blkcg_policy_throtl);
+ 	if (ret)
+-- 
+2.8.0.rc2
 
