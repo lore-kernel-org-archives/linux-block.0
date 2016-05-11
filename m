@@ -1,449 +1,209 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:46418 "EHLO mga11.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752600AbcEOG1Q (ORCPT <rfc822;linux-block@vger.kernel.org>);
-	Sun, 15 May 2016 02:27:16 -0400
-Subject: [PATCH v2 2/3] /dev/dax, core: file operations and dax-mmap
-From: Dan Williams <dan.j.williams@intel.com>
-To: linux-nvdimm@lists.01.org
-Cc: Dave Hansen <dave.hansen@linux.intel.com>,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	Jeff Moyer <jmoyer@redhat.com>,
-	Ross Zwisler <ross.zwisler@linux.intel.com>,
-	Andrew Morton <akpm@linux-foundation.org>, hch@lst.de
-Date: Sat, 14 May 2016 23:26:29 -0700
-Message-ID: <146329358943.17948.12857084981536373315.stgit@dwillia2-desk3.amr.corp.intel.com>
-In-Reply-To: <146329357870.17948.14240958684074905846.stgit@dwillia2-desk3.amr.corp.intel.com>
-References: <146329357870.17948.14240958684074905846.stgit@dwillia2-desk3.amr.corp.intel.com>
+Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:36335 "EHLO
+	mx0b-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752803AbcEKAQq (ORCPT
+	<rfc822;linux-block@vger.kernel.org>);
+	Tue, 10 May 2016 20:16:46 -0400
+Received: from pps.filterd (m0089730.ppops.net [127.0.0.1])
+	by m0089730.ppops.net (8.16.0.11/8.16.0.11) with SMTP id u4B0FgWF017994
+	for <linux-block@vger.kernel.org>; Tue, 10 May 2016 17:16:45 -0700
+Received: from mail.thefacebook.com ([199.201.64.23])
+	by m0089730.ppops.net with ESMTP id 22ur09gj36-2
+	(version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT)
+	for <linux-block@vger.kernel.org>; Tue, 10 May 2016 17:16:45 -0700
+Received: from facebook.com (2401:db00:11:d0a2:face:0:39:0)	by
+ mx-out.facebook.com (10.212.236.87) with ESMTP	id
+ a42b830a170d11e686830002c9521c9e-7ddfcc50 for <linux-block@vger.kernel.org>;
+	Tue, 10 May 2016 17:16:44 -0700
+From: Shaohua Li <shli@fb.com>
+To: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <tj@kernel.org>, <vgoyal@redhat.com>, <axboe@fb.com>,
+	<jmoyer@redhat.com>, <Kernel-team@fb.com>
+Subject: [PATCH 07/10] block-throttle: add .high interface
+Date: Tue, 10 May 2016 17:16:37 -0700
+Message-ID: <9e2fe776af3949942833f0040fc19e5797b5fc9c.1462923578.git.shli@fb.com>
+In-Reply-To: <cover.1462923578.git.shli@fb.com>
+References: <cover.1462923578.git.shli@fb.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-The "Device DAX" core enables dax mappings of performance / feature
-differentiated memory.  An open mapping or file handle keeps the backing
-struct device live, but new mappings are only possible while the device
-is enabled.   Faults are handled under rcu_read_lock to synchronize
-with the enabled state of the device.
+Add high limit for cgroup and corresponding cgroup interface.
 
-Similar to the filesystem-dax case the backing memory may optionally
-have struct page entries.  However, unlike fs-dax there is no support
-for private mappings, or mappings that are not backed by media (see
-use of zero-page in fs-dax).
-
-Mappings are always guaranteed to match the alignment of the dax_region.
-If the dax_region is configured to have a 2MB alignment, all mappings
-are guaranteed to be backed by a pmd entry.  Contrast this determinism
-with the fs-dax case where pmd mappings are opportunistic.  If userspace
-attempts to force a misaligned mapping, the driver will fail the mmap
-attempt.  See dax_dev_check_vma() for other scenarios that are rejected,
-like MAP_PRIVATE mappings.
-
-Cc: Jeff Moyer <jmoyer@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Andrew Morton <akpm@linux-foundation.org>
-Cc: Dave Hansen <dave.hansen@linux.intel.com>
-Cc: Ross Zwisler <ross.zwisler@linux.intel.com>
-Signed-off-by: Dan Williams <dan.j.williams@intel.com>
+Signed-off-by: Shaohua Li <shli@fb.com>
 ---
- drivers/dax/Kconfig |    1 
- drivers/dax/dax.c   |  316 +++++++++++++++++++++++++++++++++++++++++++++++++++
- mm/huge_memory.c    |    1 
- mm/hugetlb.c        |    1 
- 4 files changed, 319 insertions(+)
+ block/blk-throttle.c | 74 ++++++++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 69 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/dax/Kconfig b/drivers/dax/Kconfig
-index 86ffbaa891ad..cedab7572de3 100644
---- a/drivers/dax/Kconfig
-+++ b/drivers/dax/Kconfig
-@@ -1,6 +1,7 @@
- menuconfig DEV_DAX
- 	tristate "DAX: direct access to differentiated memory"
- 	default m if NVDIMM_DAX
-+	depends on TRANSPARENT_HUGEPAGE
- 	help
- 	  Support raw access to differentiated (persistence, bandwidth,
- 	  latency...) memory via an mmap(2) capable character
-diff --git a/drivers/dax/dax.c b/drivers/dax/dax.c
-index 8207fb33a992..b2fe8a0ce866 100644
---- a/drivers/dax/dax.c
-+++ b/drivers/dax/dax.c
-@@ -49,6 +49,7 @@ struct dax_region {
-  * @region - parent region
-  * @dev - device backing the character device
-  * @kref - enable this data to be tracked in filp->private_data
-+ * @alive - !alive + rcu grace period == no new mappings can be established
-  * @id - child id in the region
-  * @num_resources - number of physical address extents in this device
-  * @res - array of physical address ranges
-@@ -57,6 +58,7 @@ struct dax_dev {
- 	struct dax_region *region;
- 	struct device *dev;
- 	struct kref kref;
-+	bool alive;
- 	int id;
- 	int num_resources;
- 	struct resource res[0];
-@@ -150,6 +152,10 @@ static void destroy_dax_dev(void *_dev)
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index a462e2f..5736d1b 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -87,8 +87,9 @@ enum tg_state_flags {
  
- 	dev_dbg(dev, "%s\n", __func__);
- 
-+	/* disable and flush fault handlers, TODO unmap inodes */
-+	dax_dev->alive = false;
-+	synchronize_rcu();
-+
- 	get_device(dev);
- 	device_unregister(dev);
- 	ida_simple_remove(&dax_region->ida, dax_dev->id);
-@@ -173,6 +179,7 @@ int devm_create_dax_dev(struct dax_region *dax_region, struct resource *res,
- 	memcpy(dax_dev->res, res, sizeof(*res) * count);
- 	dax_dev->num_resources = count;
- 	kref_init(&dax_dev->kref);
-+	dax_dev->alive = true;
- 	dax_dev->region = dax_region;
- 	kref_get(&dax_region->kref);
- 
-@@ -217,9 +224,318 @@ int devm_create_dax_dev(struct dax_region *dax_region, struct resource *res,
- }
- EXPORT_SYMBOL_GPL(devm_create_dax_dev);
- 
-+/* return an unmapped area aligned to the dax region specified alignment */
-+static unsigned long dax_dev_get_unmapped_area(struct file *filp,
-+		unsigned long addr, unsigned long len, unsigned long pgoff,
-+		unsigned long flags)
-+{
-+	unsigned long off, off_end, off_align, len_align, addr_align, align;
-+	struct dax_dev *dax_dev = filp ? filp->private_data : NULL;
-+	struct dax_region *dax_region;
-+
-+	if (!dax_dev || addr)
-+		goto out;
-+
-+	dax_region = dax_dev->region;
-+	align = dax_region->align;
-+	off = pgoff << PAGE_SHIFT;
-+	off_end = off + len;
-+	off_align = round_up(off, align);
-+
-+	if ((off_end <= off_align) || ((off_end - off_align) < align))
-+		goto out;
-+
-+	len_align = len + align;
-+	if ((off + len_align) < off)
-+		goto out;
-+
-+	addr_align = current->mm->get_unmapped_area(filp, addr, len_align,
-+			pgoff, flags);
-+	if (!IS_ERR_VALUE(addr_align)) {
-+		addr_align += (off - addr_align) & (align - 1);
-+		return addr_align;
-+	}
-+ out:
-+	return current->mm->get_unmapped_area(filp, addr, len, pgoff, flags);
-+}
-+
-+static int __match_devt(struct device *dev, const void *data)
-+{
-+	const dev_t *devt = data;
-+
-+	return dev->devt == *devt;
-+}
-+
-+static struct device *dax_dev_find(dev_t dev_t)
-+{
-+	return class_find_device(dax_class, NULL, &dev_t, __match_devt);
-+}
-+
-+static int dax_dev_open(struct inode *inode, struct file *filp)
-+{
-+	struct dax_dev *dax_dev = NULL;
-+	struct device *dev;
-+
-+	dev = dax_dev_find(inode->i_rdev);
-+	if (!dev)
-+		return -ENXIO;
-+
-+	device_lock(dev);
-+	dax_dev = dev_get_drvdata(dev);
-+	if (dax_dev) {
-+		dev_dbg(dev, "%s\n", __func__);
-+		filp->private_data = dax_dev;
-+		kref_get(&dax_dev->kref);
-+		inode->i_flags = S_DAX;
-+	}
-+	device_unlock(dev);
-+
-+	if (!dax_dev) {
-+		put_device(dev);
-+		return -ENXIO;
-+	}
-+	return 0;
-+}
-+
-+static int dax_dev_release(struct inode *inode, struct file *filp)
-+{
-+	struct dax_dev *dax_dev = filp->private_data;
-+	struct device *dev = dax_dev->dev;
-+
-+	dev_dbg(dax_dev->dev, "%s\n", __func__);
-+	dax_dev_put(dax_dev);
-+	put_device(dev);
-+
-+	return 0;
-+}
-+
-+static int check_vma(struct dax_dev *dax_dev, struct vm_area_struct *vma,
-+		const char *func)
-+{
-+	struct dax_region *dax_region = dax_dev->region;
-+	struct device *dev = dax_dev->dev;
-+	unsigned long mask;
-+
-+	if (!dax_dev->alive)
-+		return -ENXIO;
-+
-+	/* prevent private / writable mappings from being established */
-+	if ((vma->vm_flags & (VM_NORESERVE|VM_SHARED|VM_WRITE)) == VM_WRITE) {
-+		dev_dbg(dev, "%s: %s: fail, attempted private mapping\n",
-+				current->comm, func);
-+		return -EINVAL;
-+	}
-+
-+	mask = dax_region->align - 1;
-+	if (vma->vm_start & mask || vma->vm_end & mask) {
-+		dev_dbg(dev, "%s: %s: fail, unaligned vma (%#lx - %#lx, %#lx)\n",
-+				current->comm, func, vma->vm_start, vma->vm_end,
-+				mask);
-+		return -EINVAL;
-+	}
-+
-+	if ((dax_region->pfn_flags & (PFN_DEV|PFN_MAP)) == PFN_DEV
-+			&& (vma->vm_flags & VM_DONTCOPY) == 0) {
-+		dev_dbg(dev, "%s: %s: fail, dax range requires MADV_DONTFORK\n",
-+				current->comm, func);
-+		return -EINVAL;
-+	}
-+
-+	if (!vma_is_dax(vma)) {
-+		dev_dbg(dev, "%s: %s: fail, vma is not DAX capable\n",
-+				current->comm, func);
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+static phys_addr_t pgoff_to_phys(struct dax_dev *dax_dev, pgoff_t pgoff,
-+		unsigned long size)
-+{
-+	struct resource *res;
-+	phys_addr_t phys;
-+	int i;
-+
-+	for (i = 0; i < dax_dev->num_resources; i++) {
-+		res = &dax_dev->res[i];
-+		phys = pgoff * PAGE_SIZE + res->start;
-+		if (phys >= res->start && phys <= res->end)
-+			break;
-+		pgoff -= PHYS_PFN(resource_size(res));
-+	}
-+
-+	if (i < dax_dev->num_resources) {
-+		res = &dax_dev->res[i];
-+		if (phys + size - 1 <= res->end)
-+			return phys;
-+	}
-+
-+	return -1;
-+}
-+
-+static int __dax_dev_fault(struct dax_dev *dax_dev, struct vm_area_struct *vma,
-+		struct vm_fault *vmf)
-+{
-+	unsigned long vaddr = (unsigned long) vmf->virtual_address;
-+	struct device *dev = dax_dev->dev;
-+	struct dax_region *dax_region;
-+	int rc = VM_FAULT_SIGBUS;
-+	phys_addr_t phys;
-+	pfn_t pfn;
-+
-+	if (check_vma(dax_dev, vma, __func__))
-+		return VM_FAULT_SIGBUS;
-+
-+	dax_region = dax_dev->region;
-+	if (dax_region->align > PAGE_SIZE) {
-+		dev_dbg(dev, "%s: alignment > fault size\n", __func__);
-+		return VM_FAULT_SIGBUS;
-+	}
-+
-+	phys = pgoff_to_phys(dax_dev, vmf->pgoff, PAGE_SIZE);
-+	if (phys == -1) {
-+		dev_dbg(dev, "%s: phys_to_pgoff(%#lx) failed\n", __func__,
-+				vmf->pgoff);
-+		return VM_FAULT_SIGBUS;
-+	}
-+
-+	pfn = phys_to_pfn_t(phys, dax_region->pfn_flags);
-+
-+	rc = vm_insert_mixed(vma, vaddr, pfn);
-+
-+	if (rc == -ENOMEM)
-+		return VM_FAULT_OOM;
-+	if (rc < 0 && rc != -EBUSY)
-+		return VM_FAULT_SIGBUS;
-+
-+	return VM_FAULT_NOPAGE;
-+}
-+
-+static int dax_dev_fault(struct vm_area_struct *vma, struct vm_fault *vmf)
-+{
-+	int rc;
-+	struct file *filp = vma->vm_file;
-+	struct dax_dev *dax_dev = filp->private_data;
-+
-+	dev_dbg(dax_dev->dev, "%s: %s: %s (%#lx - %#lx)\n", __func__,
-+			current->comm, (vmf->flags & FAULT_FLAG_WRITE)
-+			? "write" : "read", vma->vm_start, vma->vm_end);
-+	rcu_read_lock();
-+	rc = __dax_dev_fault(dax_dev, vma, vmf);
-+	rcu_read_unlock();
-+
-+	return rc;
-+}
-+
-+static int __dax_dev_pmd_fault(struct dax_dev *dax_dev,
-+		struct vm_area_struct *vma, unsigned long addr, pmd_t *pmd,
-+		unsigned int flags)
-+{
-+	unsigned long pmd_addr = addr & PMD_MASK;
-+	struct device *dev = dax_dev->dev;
-+	struct dax_region *dax_region;
-+	phys_addr_t phys;
-+	pgoff_t pgoff;
-+	pfn_t pfn;
-+
-+	if (check_vma(dax_dev, vma, __func__))
-+		return VM_FAULT_SIGBUS;
-+
-+	dax_region = dax_dev->region;
-+	if (dax_region->align > PMD_SIZE) {
-+		dev_dbg(dev, "%s: alignment > fault size\n", __func__);
-+		return VM_FAULT_SIGBUS;
-+	}
-+
-+	/* dax pmd mappings require pfn_t_devmap() */
-+	if ((dax_region->pfn_flags & (PFN_DEV|PFN_MAP)) != (PFN_DEV|PFN_MAP)) {
-+		dev_dbg(dev, "%s: alignment > fault size\n", __func__);
-+		return VM_FAULT_SIGBUS;
-+	}
-+
-+	pgoff = linear_page_index(vma, pmd_addr);
-+	phys = pgoff_to_phys(dax_dev, pgoff, PAGE_SIZE);
-+	if (phys == -1) {
-+		dev_dbg(dev, "%s: phys_to_pgoff(%#lx) failed\n", __func__,
-+				pgoff);
-+		return VM_FAULT_SIGBUS;
-+	}
-+
-+	pfn = phys_to_pfn_t(phys, dax_region->pfn_flags);
-+
-+	return vmf_insert_pfn_pmd(vma, addr, pmd, pfn,
-+			flags & FAULT_FLAG_WRITE);
-+}
-+
-+static int dax_dev_pmd_fault(struct vm_area_struct *vma, unsigned long addr,
-+		pmd_t *pmd, unsigned int flags)
-+{
-+	int rc;
-+	struct file *filp = vma->vm_file;
-+	struct dax_dev *dax_dev = filp->private_data;
-+
-+	dev_dbg(dax_dev->dev, "%s: %s: %s (%#lx - %#lx)\n", __func__,
-+			current->comm, (flags & FAULT_FLAG_WRITE)
-+			? "write" : "read", vma->vm_start, vma->vm_end);
-+
-+	rcu_read_lock();
-+	rc = __dax_dev_pmd_fault(dax_dev, vma, addr, pmd, flags);
-+	rcu_read_unlock();
-+
-+	return rc;
-+}
-+
-+static void dax_dev_vm_open(struct vm_area_struct *vma)
-+{
-+	struct file *filp = vma->vm_file;
-+	struct dax_dev *dax_dev = filp->private_data;
-+
-+	dev_dbg(dax_dev->dev, "%s\n", __func__);
-+	kref_get(&dax_dev->kref);
-+}
-+
-+static void dax_dev_vm_close(struct vm_area_struct *vma)
-+{
-+	struct file *filp = vma->vm_file;
-+	struct dax_dev *dax_dev = filp->private_data;
-+
-+	dev_dbg(dax_dev->dev, "%s\n", __func__);
-+	dax_dev_put(dax_dev);
-+}
-+
-+static const struct vm_operations_struct dax_dev_vm_ops = {
-+	.fault = dax_dev_fault,
-+	.pmd_fault = dax_dev_pmd_fault,
-+	.open = dax_dev_vm_open,
-+	.close = dax_dev_vm_close,
-+};
-+
-+static int dax_dev_mmap(struct file *filp, struct vm_area_struct *vma)
-+{
-+	struct dax_dev *dax_dev = filp->private_data;
-+	int rc;
-+
-+	dev_dbg(dax_dev->dev, "%s\n", __func__);
-+
-+	rc = check_vma(dax_dev, vma, __func__);
-+	if (rc)
-+		return rc;
-+
-+	kref_get(&dax_dev->kref);
-+	vma->vm_ops = &dax_dev_vm_ops;
-+	vma->vm_flags |= VM_MIXEDMAP | VM_HUGEPAGE;
-+	return 0;
-+
-+}
-+
- static const struct file_operations dax_fops = {
- 	.llseek = noop_llseek,
- 	.owner = THIS_MODULE,
-+	.open = dax_dev_open,
-+	.release = dax_dev_release,
-+	.get_unmapped_area = dax_dev_get_unmapped_area,
-+	.mmap = dax_dev_mmap,
+ enum {
+ 	LIMIT_LOW = 0,
+-	LIMIT_MAX = 1,
+-	LIMIT_CNT = 2,
++	LIMIT_HIGH = 1,
++	LIMIT_MAX = 2,
++	LIMIT_CNT = 3,
  };
  
- static int __init dax_init(void)
-diff --git a/mm/huge_memory.c b/mm/huge_memory.c
-index 86f9f8b82f8e..52ea012d8a80 100644
---- a/mm/huge_memory.c
-+++ b/mm/huge_memory.c
-@@ -1013,6 +1013,7 @@ int vmf_insert_pfn_pmd(struct vm_area_struct *vma, unsigned long addr,
- 	insert_pfn_pmd(vma, addr, pmd, pfn, pgprot, write);
- 	return VM_FAULT_NOPAGE;
- }
-+EXPORT_SYMBOL_GPL(vmf_insert_pfn_pmd);
+ struct throtl_grp {
+@@ -240,6 +241,8 @@ static uint64_t tg_bps_limit(struct throtl_grp *tg, int rw)
+ 		/* assign a small default */
+ 		return 64 * 1024;
+ 	}
++	if (ret == -1 && tg->td->limit_index == LIMIT_HIGH)
++		return tg->bps[rw][LIMIT_MAX];
  
- static void touch_pmd(struct vm_area_struct *vma, unsigned long addr,
- 		pmd_t *pmd)
-diff --git a/mm/hugetlb.c b/mm/hugetlb.c
-index 19d0d08b396f..b14e98129b07 100644
---- a/mm/hugetlb.c
-+++ b/mm/hugetlb.c
-@@ -624,6 +624,7 @@ pgoff_t linear_hugepage_index(struct vm_area_struct *vma,
- {
- 	return vma_hugecache_offset(hstate_vma(vma), vma, address);
+ 	return ret;
  }
-+EXPORT_SYMBOL_GPL(linear_hugepage_index);
+@@ -258,6 +261,8 @@ static unsigned int tg_iops_limit(struct throtl_grp *tg, int rw)
+ 		/* assign a small default */
+ 		return 16;
+ 	}
++	if (ret == -1 && tg->td->limit_index == LIMIT_HIGH)
++		return tg->iops[rw][LIMIT_MAX];
+ 	return ret;
+ }
  
- /*
-  * Return the size of the pages allocated when backing a VMA. In the majority
+@@ -399,7 +404,7 @@ static struct blkg_policy_data *throtl_pd_alloc(gfp_t gfp, int node)
+ 
+ 	RB_CLEAR_NODE(&tg->rb_node);
+ 	for (rw = READ; rw <= WRITE; rw++) {
+-		for (index = LIMIT_MAX; index < LIMIT_CNT; index++) {
++		for (index = LIMIT_HIGH; index < LIMIT_CNT; index++) {
+ 			tg->bps[rw][index] = -1;
+ 			tg->iops[rw][index] = -1;
+ 		}
+@@ -466,6 +471,7 @@ static void blk_throtl_update_valid_limit(struct throtl_data *td)
+ 	struct cgroup_subsys_state *pos_css;
+ 	struct blkcg_gq *blkg;
+ 	bool low_valid = false;
++	bool high_valid = false;
+ 
+ 	blkg_for_each_descendant_post(blkg, pos_css, td->queue->root_blkg) {
+ 		struct throtl_grp *tg = blkg_to_tg(blkg);
+@@ -475,12 +481,21 @@ static void blk_throtl_update_valid_limit(struct throtl_data *td)
+ 		    tg->iops[READ][LIMIT_LOW] ||
+ 		    tg->iops[WRITE][LIMIT_LOW])
+ 			low_valid = true;
++		if (tg->bps[READ][LIMIT_HIGH] != -1 ||
++		    tg->bps[WRITE][LIMIT_HIGH] != -1 ||
++		    tg->iops[READ][LIMIT_HIGH] != -1 ||
++		    tg->iops[WRITE][LIMIT_HIGH] != -1)
++			high_valid = true;
+ 	}
+ 
+ 	if (low_valid)
+ 		td->limit_valid[LIMIT_LOW] = true;
+ 	else
+ 		td->limit_valid[LIMIT_LOW] = false;
++	if (high_valid)
++		td->limit_valid[LIMIT_HIGH] = true;
++	else
++		td->limit_valid[LIMIT_HIGH] = false;
+ }
+ 
+ static void throtl_upgrade_state(struct throtl_data *td);
+@@ -492,6 +507,10 @@ static void throtl_pd_offline(struct blkg_policy_data *pd)
+ 	tg->bps[WRITE][LIMIT_LOW] = 0;
+ 	tg->iops[READ][LIMIT_LOW] = 0;
+ 	tg->iops[WRITE][LIMIT_LOW] = 0;
++	tg->bps[READ][LIMIT_HIGH] = -1;
++	tg->bps[WRITE][LIMIT_HIGH] = -1;
++	tg->iops[READ][LIMIT_HIGH] = -1;
++	tg->iops[WRITE][LIMIT_HIGH] = -1;
+ 
+ 	blk_throtl_update_valid_limit(tg->td);
+ 
+@@ -1476,7 +1495,15 @@ static ssize_t tg_set_limit(struct kernfs_open_file *of,
+ 		if (v[0] < tg->bps[READ][LIMIT_LOW] ||
+ 		    v[1] < tg->bps[WRITE][LIMIT_LOW] ||
+ 		    v[2] < tg->iops[READ][LIMIT_LOW] ||
+-		    v[3] < tg->iops[WRITE][LIMIT_LOW]) {
++		    v[3] < tg->iops[WRITE][LIMIT_LOW] ||
++		    (tg->bps[READ][LIMIT_HIGH] != -1 &&
++		     v[0] < tg->bps[READ][LIMIT_HIGH]) ||
++		    (tg->bps[WRITE][LIMIT_HIGH] != -1 &&
++		     v[1] < tg->bps[WRITE][LIMIT_HIGH]) ||
++		    (tg->iops[READ][LIMIT_HIGH] != -1 &&
++		     v[2] < tg->iops[READ][LIMIT_HIGH]) ||
++		    (tg->iops[WRITE][LIMIT_HIGH] != -1 &&
++		     v[3] < tg->iops[WRITE][LIMIT_HIGH])) {
+ 			ret = -EINVAL;
+ 			goto out_finish;
+ 		}
+@@ -1484,7 +1511,27 @@ static ssize_t tg_set_limit(struct kernfs_open_file *of,
+ 		if (v[0] > tg->bps[READ][LIMIT_MAX] ||
+ 		    v[1] > tg->bps[WRITE][LIMIT_MAX] ||
+ 		    v[2] > tg->iops[READ][LIMIT_MAX] ||
+-		    v[3] > tg->iops[WRITE][LIMIT_MAX]) {
++		    v[3] > tg->iops[WRITE][LIMIT_MAX] ||
++		    (tg->bps[READ][LIMIT_HIGH] != -1 &&
++		     v[0] > tg->bps[READ][LIMIT_HIGH]) ||
++		    (tg->bps[WRITE][LIMIT_HIGH] != -1 &&
++		     v[1] > tg->bps[WRITE][LIMIT_HIGH]) ||
++		    (tg->iops[READ][LIMIT_HIGH] != -1 &&
++		     v[2] > tg->iops[READ][LIMIT_HIGH]) ||
++		    (tg->iops[WRITE][LIMIT_HIGH] != -1 &&
++		     v[3] > tg->iops[WRITE][LIMIT_HIGH])) {
++			ret = -EINVAL;
++			goto out_finish;
++		}
++	} else if (index == LIMIT_HIGH) {
++		if ((v[0] != -1 && (v[0] < tg->bps[READ][LIMIT_LOW] ||
++				    v[0] > tg->bps[READ][LIMIT_MAX])) ||
++		    (v[1] != -1 && (v[1] < tg->bps[WRITE][LIMIT_LOW] ||
++				    v[1] > tg->bps[WRITE][LIMIT_MAX])) ||
++		    (v[2] != -1 && (v[2] < tg->iops[READ][LIMIT_LOW] ||
++				    v[2] > tg->iops[READ][LIMIT_MAX])) ||
++		    (v[3] != -1 && (v[3] < tg->iops[WRITE][LIMIT_LOW] ||
++				    v[3] > tg->iops[WRITE][LIMIT_MAX]))) {
+ 			ret = -EINVAL;
+ 			goto out_finish;
+ 		}
+@@ -1499,6 +1546,15 @@ static ssize_t tg_set_limit(struct kernfs_open_file *of,
+ 		if (tg->td->limit_valid[LIMIT_LOW])
+ 			tg->td->limit_index = LIMIT_LOW;
+ 	}
++	if (index == LIMIT_HIGH) {
++		blk_throtl_update_valid_limit(tg->td);
++		if (tg->td->limit_valid[LIMIT_HIGH] &&
++		    tg->td->limit_index == LIMIT_MAX)
++			tg->td->limit_index = LIMIT_HIGH;
++	}
++	if (index == LIMIT_MAX && tg->td->limit_index == LIMIT_MAX &&
++	    tg->td->limit_valid[LIMIT_HIGH])
++		tg->td->limit_index = LIMIT_HIGH;
+ 	tg_conf_updated(tg);
+ 	ret = 0;
+ out_finish:
+@@ -1515,6 +1571,13 @@ static struct cftype throtl_files[] = {
+ 		.private = LIMIT_LOW,
+ 	},
+ 	{
++		.name = "high",
++		.flags = CFTYPE_NOT_ON_ROOT,
++		.seq_show = tg_print_limit,
++		.write = tg_set_limit,
++		.private = LIMIT_HIGH,
++	},
++	{
+ 		.name = "max",
+ 		.flags = CFTYPE_NOT_ON_ROOT,
+ 		.seq_show = tg_print_limit,
+@@ -1988,6 +2051,7 @@ int blk_throtl_init(struct request_queue *q)
+ 	td->queue = q;
+ 
+ 	td->limit_valid[LIMIT_LOW] = false;
++	td->limit_valid[LIMIT_HIGH] = false;
+ 	td->limit_valid[LIMIT_MAX] = true;
+ 	td->limit_index = LIMIT_MAX;
+ 	td->low_upgrade_time = jiffies;
+-- 
+2.8.0.rc2
 
