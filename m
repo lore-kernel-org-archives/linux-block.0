@@ -1,85 +1,117 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from m50-138.163.com ([123.125.50.138]:34535 "EHLO m50-138.163.com"
+Received: from mga09.intel.com ([134.134.136.24]:62461 "EHLO mga09.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753475AbcEWJK7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-	Mon, 23 May 2016 05:10:59 -0400
-From: Wenwei Tao <wwtao0320@163.com>
-To: mb@lightnvm.io
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	ww.tao0320@gmail.com
-Subject: [PATCH v2 1/2] lightnvm: hold lock until finish the target creation
-Date: Mon, 23 May 2016 17:13:33 +0800
-Message-Id: <1463994814-3388-1-git-send-email-wwtao0320@163.com>
+	id S1750984AbcEKVJf (ORCPT <rfc822;linux-block@vger.kernel.org>);
+	Wed, 11 May 2016 17:09:35 -0400
+From: Vishal Verma <vishal.l.verma@intel.com>
+To: linux-nvdimm@lists.01.org
+Cc: Vishal Verma <vishal.l.verma@intel.com>,
+	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+	xfs@oss.sgi.com, linux-ext4@vger.kernel.org, linux-mm@kvack.org,
+	Ross Zwisler <ross.zwisler@linux.intel.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Dave Chinner <david@fromorbit.com>, Jan Kara <jack@suse.cz>,
+	Jens Axboe <axboe@fb.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-kernel@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>,
+	Jeff Moyer <jmoyer@redhat.com>,
+	Boaz Harrosh <boaz@plexistor.com>
+Subject: [PATCH v7 0/6] dax: handling media errors (clear-on-zero only)
+Date: Wed, 11 May 2016 15:08:46 -0600
+Message-Id: <1463000932-31680-1-git-send-email-vishal.l.verma@intel.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Wenwei Tao <ww.tao0320@gmail.com>
+Until now, dax has been disabled if media errors were found on
+any device. This series attempts to address that.
 
-When create a target, we check whether the target is
-already exist first. If the answer is no, we release
-the lock and continue the creation. This cannot prevent
-concurrent creation of the same target, so hold the lock
-until finish the target creation.
+The first two patches from Dan re-enable dax even when media
+errors are present.
 
-Signed-off-by: Wenwei Tao <ww.tao0320@gmail.com>
----
-Changes since v1
--rebase to for-4.8/core
+The third patch from Matthew removes the zeroout path from dax
+entirely, making zeroout operations always go through the driver
+(The motivation is that if a backing device has media errors,
+and we create a sparse file on it, we don't want the initial
+zeroing to happen via dax, we want to give the block driver a
+chance to clear the errors).
 
- drivers/lightnvm/gennvm.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+Patch 4 from Christoph exports a low level dax helper for zeroing
 
-diff --git a/drivers/lightnvm/gennvm.c b/drivers/lightnvm/gennvm.c
-index c65fb67..39ff0af 100644
---- a/drivers/lightnvm/gennvm.c
-+++ b/drivers/lightnvm/gennvm.c
-@@ -44,6 +44,7 @@ static int gen_create_tgt(struct nvm_dev *dev, struct nvm_ioctl_create *create)
- 	struct nvm_tgt_type *tt;
- 	struct nvm_target *t;
- 	void *targetdata;
-+	int ret = -ENOMEM;
- 
- 	tt = nvm_find_target_type(create->tgttype, 1);
- 	if (!tt) {
-@@ -55,14 +56,13 @@ static int gen_create_tgt(struct nvm_dev *dev, struct nvm_ioctl_create *create)
- 	t = gen_find_target(gn, create->tgtname);
- 	if (t) {
- 		pr_err("nvm: target name already exists.\n");
--		mutex_unlock(&gn->lock);
--		return -EINVAL;
-+		ret = -EINVAL;
-+		goto err_unlock;
- 	}
--	mutex_unlock(&gn->lock);
- 
- 	t = kmalloc(sizeof(struct nvm_target), GFP_KERNEL);
- 	if (!t)
--		return -ENOMEM;
-+		goto err_unlock;
- 
- 	tqueue = blk_alloc_queue_node(GFP_KERNEL, dev->q->node);
- 	if (!tqueue)
-@@ -95,8 +95,6 @@ static int gen_create_tgt(struct nvm_dev *dev, struct nvm_ioctl_create *create)
- 	t->type = tt;
- 	t->disk = tdisk;
- 	t->dev = dev;
--
--	mutex_lock(&gn->lock);
- 	list_add_tail(&t->list, &gn->targets);
- 	mutex_unlock(&gn->lock);
- 
-@@ -107,7 +105,9 @@ err_queue:
- 	blk_cleanup_queue(tqueue);
- err_t:
- 	kfree(t);
--	return -ENOMEM;
-+err_unlock:
-+	mutex_unlock(&gn->lock);
-+	return ret;
- }
- 
- static void __gen_remove_target(struct nvm_target *t)
+Patch 5 reduces our calls to clear_pmem from dax in the
+truncate/hole-punch cases. We check if the range being truncated
+is sector aligned/sized, and if so, send blkdev_issue_zeroout
+instead of clear_pmem so that errors can be handled better by
+the driver.
+
+Patch 6 fixes a redundant comment in DAX and is mostly unrelated
+to the rest of this series.
+
+This series also depends on/is based on Jan Kara's Ext4 and DAX
+fixups series:
+http://marc.info/?l=linux-ext4&m=146295959100848&w=2
+http://marc.info/?l=linux-ext4&m=146296078001307&w=2
+
+v7:
+ - Fix the dax alignment check to only check 'offset' and 'length'
+   for alignment as that's all that is needed. (Jan)
+ - Fix the blockdev_issue_zeroout call to zero the correct sector
+ - Rebase to v4.6-rc7 + the two patch-series from Jan linked above
+ - Add a patch from Christoph's iomap series:
+   http://www.spinics.net/lists/xfs/msg39656.html
+
+v6:
+ - Use IS_ALIGNED in dax_range_is_aligned instead of open coding
+   an alignment check (Jan)
+ - Collect all Reveiwed-by tags so far.
+
+v5:
+ - Drop the patch that attempts to clear-errors-on-write till we
+   reach consensus on how to handle that.
+ - Don't pass blk_dax_ctl to direct_access, instead pass in all the
+   required arguments individually (Christoph, Dan)
+
+v4:
+ - Remove the dax->direct_IO fallbacks entirely. Instead, go through
+   the usual direct_IO path when we're in O_DIRECT, and use dax_IO
+   for other, non O_DIRECT IO. (Dan, Christoph)
+
+v3:
+ - Wrapper-ize the direct_IO fallback again and make an exception
+   for -EIOCBQUEUED (Jeff, Dan)
+ - Reduce clear_pmem usage in DAX to the minimum
+
+
+
+Christoph Hellwig (1):
+  dax: export a low-level __dax_zero_page_range helper
+
+Dan Williams (2):
+  dax: fallback from pmd to pte on error
+  dax: enable dax in the presence of known media errors (badblocks)
+
+Matthew Wilcox (1):
+  dax: use sb_issue_zerout instead of calling dax_clear_sectors
+
+Vishal Verma (2):
+  dax: for truncate/hole-punch, do zeroing through the driver if
+    possible
+  dax: fix a comment in dax_zero_page_range and dax_truncate_page
+
+ Documentation/filesystems/dax.txt |  32 ++++++++++++
+ arch/powerpc/sysdev/axonram.c     |   2 +-
+ block/ioctl.c                     |   9 ----
+ drivers/block/brd.c               |   2 +-
+ drivers/nvdimm/pmem.c             |  10 +++-
+ drivers/s390/block/dcssblk.c      |   2 +-
+ fs/block_dev.c                    |   2 +-
+ fs/dax.c                          | 104 ++++++++++++++++----------------------
+ fs/ext2/inode.c                   |   7 ++-
+ fs/xfs/xfs_bmap_util.c            |  15 ++----
+ include/linux/blkdev.h            |   2 +-
+ include/linux/dax.h               |   8 ++-
+ 12 files changed, 103 insertions(+), 92 deletions(-)
+
 -- 
-1.8.3.1
-
+2.5.5
 
