@@ -1,77 +1,82 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:46823 "EHLO mga09.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752253AbcEJSto (ORCPT <rfc822;linux-block@vger.kernel.org>);
-	Tue, 10 May 2016 14:49:44 -0400
-From: Vishal Verma <vishal.l.verma@intel.com>
-To: linux-nvdimm@lists.01.org
-Cc: Vishal Verma <vishal.l.verma@intel.com>,
-	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-	xfs@oss.sgi.com, linux-ext4@vger.kernel.org, linux-mm@kvack.org,
-	Ross Zwisler <ross.zwisler@linux.intel.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Dave Chinner <david@fromorbit.com>, Jan Kara <jack@suse.cz>,
-	Jens Axboe <axboe@fb.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-kernel@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Jeff Moyer <jmoyer@redhat.com>,
-	Boaz Harrosh <boaz@plexistor.com>,
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCH v6 5/5] dax: fix a comment in dax_zero_page_range and dax_truncate_page
-Date: Tue, 10 May 2016 12:49:16 -0600
-Message-Id: <1462906156-22303-6-git-send-email-vishal.l.verma@intel.com>
-In-Reply-To: <1462906156-22303-1-git-send-email-vishal.l.verma@intel.com>
-References: <1462906156-22303-1-git-send-email-vishal.l.verma@intel.com>
+Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:36834 "EHLO
+	mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751899AbcEKQyv (ORCPT
+	<rfc822;linux-block@vger.kernel.org>);
+	Wed, 11 May 2016 12:54:51 -0400
+Date: Wed, 11 May 2016 09:54:40 -0700
+From: Shaohua Li <shli@fb.com>
+To: Simon Guo <wei.guo.simon@gmail.com>
+CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>, <axboe@fb.com>,
+	<Kernel-team@fb.com>
+Subject: Re: [PATCH 3/3] blk-throttle: don't parse cgroup path if trace isn't
+ enabled
+Message-ID: <20160511165439.GA96558@devbig084.prn1.facebook.com>
+References: <2c3ee532132f8925dd0be1178e8dee0bba6b448c.1462838969.git.shli@fb.com>
+ <b395946862a1a963e6d74b70349322eceb5d42d4.1462838969.git.shli@fb.com>
+ <20160510054613.GA12366@simonLocalRHEL7.x64>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <20160510054613.GA12366@simonLocalRHEL7.x64>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-The distinction between PAGE_SIZE and PAGE_CACHE_SIZE was removed in
+On Tue, May 10, 2016 at 01:46:13PM +0800, Simon Guo wrote:
+> Hi, 
+> On Mon, May 09, 2016 at 05:22:15PM -0700, Shaohua Li wrote:
+> > if trace isn't enabled, parsing cgroup path just wastes cpu
+> > 
+> > Signed-off-by: Shaohua Li <shli@fb.com>
+> > ---
+> >  block/blk-throttle.c         | 5 ++---
+> >  include/linux/blktrace_api.h | 9 +++++++++
+> >  2 files changed, 11 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+> > index 2149a1d..47a3e54 100644
+> > --- a/block/blk-throttle.c
+> > +++ b/block/blk-throttle.c
+> > @@ -211,15 +211,14 @@ static struct throtl_data *sq_to_td(struct throtl_service_queue *sq)
+> >   *
+> >   * The messages are prefixed with "throtl BLKG_NAME" if @sq belongs to a
+> >   * throtl_grp; otherwise, just "throtl".
+> > - *
+> > - * TODO: this should be made a function and name formatting should happen
+> > - * after testing whether blktrace is enabled.
+> >   */
+> >  #define throtl_log(sq, fmt, args...)	do {				\
+> >  	struct throtl_grp *__tg = sq_to_tg((sq));			\
+> >  	struct throtl_data *__td = sq_to_td((sq));			\
+> >  									\
+> >  	(void)__td;							\
+> > +	if (likely(!blk_trace_note_message_enabled(__td->queue)))	\
+> > +		break;							\
+> >  	if ((__tg)) {							\
+> >  		char __pbuf[128];					\
+> >  									\
+> > diff --git a/include/linux/blktrace_api.h b/include/linux/blktrace_api.h
+> > index afc1343..0f3172b 100644
+> > --- a/include/linux/blktrace_api.h
+> > +++ b/include/linux/blktrace_api.h
+> > @@ -57,6 +57,14 @@ void __trace_note_message(struct blk_trace *, const char *fmt, ...);
+> >  	} while (0)
+> >  #define BLK_TN_MAX_MSG		128
+> >  
+> > +static inline bool blk_trace_note_message_enabled(struct request_queue *q)
+> > +{
+> > +	struct blk_trace *bt = q->blk_trace;
+> > +	if (likely(!bt))
+> > +		return false;
+> > +	return bt->act_mask & BLK_TC_NOTIFY;
+> > +}
+> Is there any reason to skip following condition?
+>         if (unlikely(bt->trace_state != Blktrace_running &&
+>                      !blk_tracer_enabled))
 
-09cbfea mm, fs: get rid of PAGE_CACHE_* and page_cache_{get,release}
-macros
+It's marked unlikely and to add the check we must export
+blk_tracer_enabled, so I ignored it. Though I don't know how unlikely it
+is.
 
-The comments for the above functions described a distinction between
-those, that is now redundant, so remove those paragraphs
-
-Cc: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Jan Kara <jack@suse.cz>
-Signed-off-by: Vishal Verma <vishal.l.verma@intel.com>
----
- fs/dax.c | 12 ------------
- 1 file changed, 12 deletions(-)
-
-diff --git a/fs/dax.c b/fs/dax.c
-index 0167cde..afa289c 100644
---- a/fs/dax.c
-+++ b/fs/dax.c
-@@ -1221,12 +1221,6 @@ static bool dax_range_is_aligned(struct block_device *bdev,
-  * page in a DAX file.  This is intended for hole-punch operations.  If
-  * you are truncating a file, the helper function dax_truncate_page() may be
-  * more convenient.
-- *
-- * We work in terms of PAGE_SIZE here for commonality with
-- * block_truncate_page(), but we could go down to PAGE_SIZE if the filesystem
-- * took care of disposing of the unnecessary blocks.  Even if the filesystem
-- * block size is smaller than PAGE_SIZE, we have to zero the rest of the page
-- * since the file might be mmapped.
-  */
- int dax_zero_page_range(struct inode *inode, loff_t from, unsigned length,
- 							get_block_t get_block)
-@@ -1278,12 +1272,6 @@ EXPORT_SYMBOL_GPL(dax_zero_page_range);
-  *
-  * Similar to block_truncate_page(), this function can be called by a
-  * filesystem when it is truncating a DAX file to handle the partial page.
-- *
-- * We work in terms of PAGE_SIZE here for commonality with
-- * block_truncate_page(), but we could go down to PAGE_SIZE if the filesystem
-- * took care of disposing of the unnecessary blocks.  Even if the filesystem
-- * block size is smaller than PAGE_SIZE, we have to zero the rest of the page
-- * since the file might be mmapped.
-  */
- int dax_truncate_page(struct inode *inode, loff_t from, get_block_t get_block)
- {
--- 
-2.5.5
-
+Thanks,
+Shaohua
