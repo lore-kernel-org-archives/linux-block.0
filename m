@@ -1,120 +1,76 @@
 Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>,
-	Tejun Heo <tj@kernel.org>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	linus.walleij@linaro.org,
-	broonie@kernel.org,
-	stable@vger.kernel.org,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH BUGFIX V4] block: add missing group association in bio-cloning functions
-Date: Wed, 11 May 2016 11:28:04 +0200
-Message-Id: <1462958884-9457-1-git-send-email-paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+Subject: Re: [PATCH BUGFIX V3] block: add missing group association in
+ bio-cloning functions
+To: Nikolay Borisov <kernel@kyup.com>, Jens Axboe <axboe@kernel.dk>,
+ Tejun Heo <tj@kernel.org>
+References: <x49eg9961hh.fsf@segfault.boston.devel.redhat.com>
+ <1462917696-5237-1-git-send-email-paolo.valente@linaro.org>
+ <5732D364.2020905@kyup.com> <5732D47A.4090706@kyup.com>
+From: Paolo <paolo.valente@linaro.org>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ ulf.hansson@linaro.org, linus.walleij@linaro.org, broonie@kernel.org,
+ stable@vger.kernel.org
+Message-ID: <5732F607.3030504@linaro.org>
+Date: Wed, 11 May 2016 11:06:15 +0200
+MIME-Version: 1.0
 In-Reply-To: <5732D47A.4090706@kyup.com>
-References: <5732D47A.4090706@kyup.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-When a bio is cloned, the newly created bio must be associated with
-the same blkcg as the original bio (if BLK_CGROUP is enabled). If
-this operation is not performed, then the new bio is not associated
-with any group, and the group of the current task is returned when
-the group of the bio is requested.
+Il 11/05/2016 08:43, Nikolay Borisov ha scritto:
+>
+>
+> On 05/11/2016 09:38 AM, Nikolay Borisov wrote:
+>>
+>>
+>> On 05/11/2016 01:01 AM, Paolo Valente wrote:
+>>> When a bio is cloned, the newly created bio must be associated with
+>>> the same blkcg as the original bio (if BLK_CGROUP is enabled). If
+>>> this operation is not performed, then the new bio is not associated
+>>> with any group, and the group of the current task is returned when
+>>> the group of the bio is requested.
+>>>
+>>> Depending on the cloning frequency, this may cause a large
+>>> percentage of the bios belonging to a given group to be treated
+>>> as if belonging to other groups (in most cases as if belonging to
+>>> the root group). The expected group isolation may thereby be broken.
+>>>
+>>> This commit adds the missing association in bio-cloning functions.
+>>>
+>>> Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+>>> ---
+>>>   block/bio.c          | 15 +++++++++++++++
+>>>   fs/btrfs/extent_io.c |  6 ------
+>>>   include/linux/bio.h  |  3 +++
+>>>   3 files changed, 18 insertions(+), 6 deletions(-)
+>>>
+>>
+>> Just for reference something like that was already proposed (and tested)
+>> before, though it never got merged :
+>>
+>> https://www.redhat.com/archives/dm-devel/2016-March/msg00007.html
+>>
+>> So you might also want to patch __bio_clone_fast to also apply this for
+>> dm backed devices.
+>
+> Right, to correct myself: You might want to move the association to
+> __blk_clone_fast that way you are also covering dm devices as well as
+> users of bio_clone_fast.
+>
 
-Depending on the cloning frequency, this may cause a large
-percentage of the bios belonging to a given group to be treated
-as if belonging to other groups (in most cases as if belonging to
-the root group). The expected group isolation may thereby be broken.
+Definitely (I didn't do that in the first place, because I worried
+only about doing the association when bio_clone_fast was certainly
+successful).
 
-This commit adds the missing association in bio-cloning functions.
+I'm sending a fresh patch.
 
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
-Reviewed-by: Nikolay Borisov <kernel@kyup.com>
----
-Tejun: I didn't add also your Ack, just because this version is slightly
-different from the one you acked.
----
- block/bio.c          | 15 +++++++++++++++
- fs/btrfs/extent_io.c |  6 ------
- include/linux/bio.h  |  3 +++
- 3 files changed, 18 insertions(+), 6 deletions(-)
+Thanks,
+Paolo
 
-diff --git a/block/bio.c b/block/bio.c
-index 807d25e..89f517c 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -590,6 +590,8 @@ void __bio_clone_fast(struct bio *bio, struct bio *bio_src)
- 	bio->bi_rw = bio_src->bi_rw;
- 	bio->bi_iter = bio_src->bi_iter;
- 	bio->bi_io_vec = bio_src->bi_io_vec;
-+
-+	bio_clone_blkcg_association(bio, bio_src);
- }
- EXPORT_SYMBOL(__bio_clone_fast);
- 
-@@ -695,6 +697,8 @@ integrity_clone:
- 		}
- 	}
- 
-+	bio_clone_blkcg_association(bio, bio_src);
-+
- 	return bio;
- }
- EXPORT_SYMBOL(bio_clone_bioset);
-@@ -2016,6 +2020,17 @@ void bio_disassociate_task(struct bio *bio)
- 	}
- }
- 
-+/**
-+ * bio_clone_blkcg_association - clone blkcg association from src to dst bio
-+ * @dst: destination bio
-+ * @src: source bio
-+ */
-+void bio_clone_blkcg_association(struct bio *dst, struct bio *src)
-+{
-+	if (src->bi_css)
-+		WARN_ON(bio_associate_blkcg(dst, src->bi_css));
-+}
-+
- #endif /* CONFIG_BLK_CGROUP */
- 
- static void __init biovec_init_slabs(void)
-diff --git a/fs/btrfs/extent_io.c b/fs/btrfs/extent_io.c
-index d247fc0..19f6739 100644
---- a/fs/btrfs/extent_io.c
-+++ b/fs/btrfs/extent_io.c
-@@ -2686,12 +2686,6 @@ struct bio *btrfs_bio_clone(struct bio *bio, gfp_t gfp_mask)
- 		btrfs_bio->csum = NULL;
- 		btrfs_bio->csum_allocated = NULL;
- 		btrfs_bio->end_io = NULL;
--
--#ifdef CONFIG_BLK_CGROUP
--		/* FIXME, put this into bio_clone_bioset */
--		if (bio->bi_css)
--			bio_associate_blkcg(new, bio->bi_css);
--#endif
- 	}
- 	return new;
- }
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 6b7481f..16cbe59 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -527,11 +527,14 @@ extern unsigned int bvec_nr_vecs(unsigned short idx);
- int bio_associate_blkcg(struct bio *bio, struct cgroup_subsys_state *blkcg_css);
- int bio_associate_current(struct bio *bio);
- void bio_disassociate_task(struct bio *bio);
-+void bio_clone_blkcg_association(struct bio *dst, struct bio *src);
- #else	/* CONFIG_BLK_CGROUP */
- static inline int bio_associate_blkcg(struct bio *bio,
- 			struct cgroup_subsys_state *blkcg_css) { return 0; }
- static inline int bio_associate_current(struct bio *bio) { return -ENOENT; }
- static inline void bio_disassociate_task(struct bio *bio) { }
-+static inline void bio_clone_blkcg_association(struct bio *dst,
-+			struct bio *src) { return 0; }
- #endif	/* CONFIG_BLK_CGROUP */
- 
- #ifdef CONFIG_HIGHMEM
--- 
-1.9.1
+>
+>>
+>> Otherwise:
+>>
+>> Reviewed-by: Nikolay Borisov <kernel@kyup.com>
+>>
