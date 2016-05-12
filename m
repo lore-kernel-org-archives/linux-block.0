@@ -1,202 +1,150 @@
-Return-Path: <kamal@canonical.com>
-From: Kamal Mostafa <kamal@canonical.com>
-To: Roman Pen <roman.penyaev@profitbricks.com>
-Cc: Gioh Kim <gi-oh.kim@profitbricks.com>,
-	Michael Wang <yun.wang@profitbricks.com>,
-	Tejun Heo <tj@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Kamal Mostafa <kamal@canonical.com>,
-	kernel-team@lists.ubuntu.com
-Subject: [4.2.y-ckt stable] Patch "workqueue: fix ghost PENDING flag while doing MQ IO" has been added to the 4.2.y-ckt tree
-Date: Mon,  9 May 2016 12:43:32 -0700
-Message-Id: <1462823012-5575-1-git-send-email-kamal@canonical.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga04.intel.com ([192.55.52.120]:18569 "EHLO mga04.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S932076AbcELRpV (ORCPT <rfc822;linux-block@vger.kernel.org>);
+	Thu, 12 May 2016 13:45:21 -0400
+From: Jon Derrick <jonathan.derrick@intel.com>
+To: linux-block@vger.kernel.org
+Cc: Jon Derrick <jonathan.derrick@intel.com>,
+	"Jens Axboe" <axboe@fb.com>,
+	"Alexander Viro" <viro@zeniv.linux.org.uk>,
+	linux-fsdevel@vger.kernel.org,
+	"Dan Williams" <dan.j.williams@intel.com>,
+	"Jeff Moyer" <jmoyer@redhat.com>,
+	"Stephen Bates" <stephen.bates@microsemi.com>,
+	"Keith Busch" <keith.busch@intel.com>,
+	linux-nvme@lists.infradead.org,
+	"Christoph Hellwig" <hch@infradead.org>
+Subject: [RFC 2/2] block: Introduce S_HIPRI inode flag
+Date: Thu, 12 May 2016 11:43:06 -0600
+Message-Id: <1463074986-3070-3-git-send-email-jonathan.derrick@intel.com>
+In-Reply-To: <1463074986-3070-1-git-send-email-jonathan.derrick@intel.com>
+References: <1463074986-3070-1-git-send-email-jonathan.derrick@intel.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This is a note to let you know that I have just added a patch titled
+S_HIPRI is a hint that indicates the file (currently only block devices)
+is a high priority file. This hint allows direct-io to the block device
+to poll for completions if polling is available to the block device.
 
-    workqueue: fix ghost PENDING flag while doing MQ IO
+The motivation for this patch comes from tiered caching solutions. A
+user may wish to have low-latency block devices act as a cache for
+higher-latency storage media.
 
-to the linux-4.2.y-queue branch of the 4.2.y-ckt extended stable tree 
-which can be found at:
+With the introduction of block polling, polling could be enabled on a
+queue of a block device. The preadv2/pwritev2 sets allowed a user to
+specify per-io polling, but removed the ability to poll per-queue.
 
-    https://git.launchpad.net/~canonical-kernel/linux/+git/linux-stable-ckt/log/?h=linux-4.2.y-queue
+Instead of having a user modify their software to use preadv2/pwritev2,
+this patch allows a user to set S_HIPRI on a block device file to request
+all direct-io for this file to be polled.
 
-This patch is scheduled to be released in version 4.2.8-ckt10.
-
-If you, or anyone else, feels it should not be added to this tree, please 
-reply to this email.
-
-For more information about the 4.2.y-ckt tree, see
-https://wiki.ubuntu.com/Kernel/Dev/ExtendedStable
-
-Thanks.
--Kamal
-
----8<------------------------------------------------------------
-
->From ce75b13eb20cd45a5dc1592905bb6890103aae32 Mon Sep 17 00:00:00 2001
-From: Roman Pen <roman.penyaev@profitbricks.com>
-Date: Tue, 26 Apr 2016 13:15:35 +0200
-Subject: workqueue: fix ghost PENDING flag while doing MQ IO
-
-commit 346c09f80459a3ad97df1816d6d606169a51001a upstream.
-
-The bug in a workqueue leads to a stalled IO request in MQ ctx->rq_list
-with the following backtrace:
-
-[  601.347452] INFO: task kworker/u129:5:1636 blocked for more than 120 seconds.
-[  601.347574]       Tainted: G           O    4.4.5-1-storage+ #6
-[  601.347651] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-[  601.348142] kworker/u129:5  D ffff880803077988     0  1636      2 0x00000000
-[  601.348519] Workqueue: ibnbd_server_fileio_wq ibnbd_dev_file_submit_io_worker [ibnbd_server]
-[  601.348999]  ffff880803077988 ffff88080466b900 ffff8808033f9c80 ffff880803078000
-[  601.349662]  ffff880807c95000 7fffffffffffffff ffffffff815b0920 ffff880803077ad0
-[  601.350333]  ffff8808030779a0 ffffffff815b01d5 0000000000000000 ffff880803077a38
-[  601.350965] Call Trace:
-[  601.351203]  [<ffffffff815b0920>] ? bit_wait+0x60/0x60
-[  601.351444]  [<ffffffff815b01d5>] schedule+0x35/0x80
-[  601.351709]  [<ffffffff815b2dd2>] schedule_timeout+0x192/0x230
-[  601.351958]  [<ffffffff812d43f7>] ? blk_flush_plug_list+0xc7/0x220
-[  601.352208]  [<ffffffff810bd737>] ? ktime_get+0x37/0xa0
-[  601.352446]  [<ffffffff815b0920>] ? bit_wait+0x60/0x60
-[  601.352688]  [<ffffffff815af784>] io_schedule_timeout+0xa4/0x110
-[  601.352951]  [<ffffffff815b3a4e>] ? _raw_spin_unlock_irqrestore+0xe/0x10
-[  601.353196]  [<ffffffff815b093b>] bit_wait_io+0x1b/0x70
-[  601.353440]  [<ffffffff815b056d>] __wait_on_bit+0x5d/0x90
-[  601.353689]  [<ffffffff81127bd0>] wait_on_page_bit+0xc0/0xd0
-[  601.353958]  [<ffffffff81096db0>] ? autoremove_wake_function+0x40/0x40
-[  601.354200]  [<ffffffff81127cc4>] __filemap_fdatawait_range+0xe4/0x140
-[  601.354441]  [<ffffffff81127d34>] filemap_fdatawait_range+0x14/0x30
-[  601.354688]  [<ffffffff81129a9f>] filemap_write_and_wait_range+0x3f/0x70
-[  601.354932]  [<ffffffff811ced3b>] blkdev_fsync+0x1b/0x50
-[  601.355193]  [<ffffffff811c82d9>] vfs_fsync_range+0x49/0xa0
-[  601.355432]  [<ffffffff811cf45a>] blkdev_write_iter+0xca/0x100
-[  601.355679]  [<ffffffff81197b1a>] __vfs_write+0xaa/0xe0
-[  601.355925]  [<ffffffff81198379>] vfs_write+0xa9/0x1a0
-[  601.356164]  [<ffffffff811c59d8>] kernel_write+0x38/0x50
-
-The underlying device is a null_blk, with default parameters:
-
-  queue_mode    = MQ
-  submit_queues = 1
-
-Verification that nullb0 has something inflight:
-
-root@pserver8:~# cat /sys/block/nullb0/inflight
-       0        1
-root@pserver8:~# find /sys/block/nullb0/mq/0/cpu* -name rq_list -print -exec cat {} \;
-...
-/sys/block/nullb0/mq/0/cpu2/rq_list
-CTX pending:
-        ffff8838038e2400
-...
-
-During debug it became clear that stalled request is always inserted in
-the rq_list from the following path:
-
-   save_stack_trace_tsk + 34
-   blk_mq_insert_requests + 231
-   blk_mq_flush_plug_list + 281
-   blk_flush_plug_list + 199
-   wait_on_page_bit + 192
-   __filemap_fdatawait_range + 228
-   filemap_fdatawait_range + 20
-   filemap_write_and_wait_range + 63
-   blkdev_fsync + 27
-   vfs_fsync_range + 73
-   blkdev_write_iter + 202
-   __vfs_write + 170
-   vfs_write + 169
-   kernel_write + 56
-
-So blk_flush_plug_list() was called with from_schedule == true.
-
-If from_schedule is true, that means that finally blk_mq_insert_requests()
-offloads execution of __blk_mq_run_hw_queue() and uses kblockd workqueue,
-i.e. it calls kblockd_schedule_delayed_work_on().
-
-That means, that we race with another CPU, which is about to execute
-__blk_mq_run_hw_queue() work.
-
-Further debugging shows the following traces from different CPUs:
-
-  CPU#0                                  CPU#1
-  ----------------------------------     -------------------------------
-  reqeust A inserted
-  STORE hctx->ctx_map[0] bit marked
-  kblockd_schedule...() returns 1
-  <schedule to kblockd workqueue>
-                                         request B inserted
-                                         STORE hctx->ctx_map[1] bit marked
-                                         kblockd_schedule...() returns 0
-  *** WORK PENDING bit is cleared ***
-  flush_busy_ctxs() is executed, but
-  bit 1, set by CPU#1, is not observed
-
-As a result request B pended forever.
-
-This behaviour can be explained by speculative LOAD of hctx->ctx_map on
-CPU#0, which is reordered with clear of PENDING bit and executed _before_
-actual STORE of bit 1 on CPU#1.
-
-The proper fix is an explicit full barrier <mfence>, which guarantees
-that clear of PENDING bit is to be executed before all possible
-speculative LOADS or STORES inside actual work function.
-
-Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
-Cc: Gioh Kim <gi-oh.kim@profitbricks.com>
-Cc: Michael Wang <yun.wang@profitbricks.com>
-Cc: Tejun Heo <tj@kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Signed-off-by: Tejun Heo <tj@kernel.org>
-Signed-off-by: Kamal Mostafa <kamal@canonical.com>
+Signed-off-by: Jon Derrick <jonathan.derrick@intel.com>
 ---
- kernel/workqueue.c | 29 +++++++++++++++++++++++++++++
- 1 file changed, 29 insertions(+)
+ block/ioctl.c           | 33 +++++++++++++++++++++++++++++++++
+ fs/block_dev.c          |  3 +++
+ include/linux/fs.h      |  2 ++
+ include/uapi/linux/fs.h |  2 ++
+ 4 files changed, 40 insertions(+)
 
-diff --git a/kernel/workqueue.c b/kernel/workqueue.c
-index c743abf..a2a7ac1 100644
---- a/kernel/workqueue.c
-+++ b/kernel/workqueue.c
-@@ -649,6 +649,35 @@ static void set_work_pool_and_clear_pending(struct work_struct *work,
- 	 */
- 	smp_wmb();
- 	set_work_data(work, (unsigned long)pool_id << WORK_OFFQ_POOL_SHIFT, 0);
-+	/*
-+	 * The following mb guarantees that previous clear of a PENDING bit
-+	 * will not be reordered with any speculative LOADS or STORES from
-+	 * work->current_func, which is executed afterwards.  This possible
-+	 * reordering can lead to a missed execution on attempt to qeueue
-+	 * the same @work.  E.g. consider this case:
-+	 *
-+	 *   CPU#0                         CPU#1
-+	 *   ----------------------------  --------------------------------
-+	 *
-+	 * 1  STORE event_indicated
-+	 * 2  queue_work_on() {
-+	 * 3    test_and_set_bit(PENDING)
-+	 * 4 }                             set_..._and_clear_pending() {
-+	 * 5                                 set_work_data() # clear bit
-+	 * 6                                 smp_mb()
-+	 * 7                               work->current_func() {
-+	 * 8				      LOAD event_indicated
-+	 *				   }
-+	 *
-+	 * Without an explicit full barrier speculative LOAD on line 8 can
-+	 * be executed before CPU#0 does STORE on line 1.  If that happens,
-+	 * CPU#0 observes the PENDING bit is still set and new execution of
-+	 * a @work is not queued in a hope, that CPU#1 will eventually
-+	 * finish the queued @work.  Meanwhile CPU#1 does not see
-+	 * event_indicated is set, because speculative LOAD was executed
-+	 * before actual STORE.
-+	 */
-+	smp_mb();
+diff --git a/block/ioctl.c b/block/ioctl.c
+index 4ff1f92..5c7f1bd 100644
+--- a/block/ioctl.c
++++ b/block/ioctl.c
+@@ -520,6 +520,35 @@ static int blkdev_bszset(struct block_device *bdev, fmode_t mode,
+ 	return ret;
  }
+ 
++/* set the hipri flag */
++static int blkdev_hipriset(struct block_device *bdev, fmode_t mode,
++		int __user *argp)
++{
++	int n;
++
++	if (!capable(CAP_SYS_ADMIN))
++		return -EACCES;
++	if (!argp)
++		return -EINVAL;
++	if (get_user(n, argp))
++		return -EFAULT;
++
++	if (!(mode & FMODE_EXCL)) {
++		bdgrab(bdev);
++		if (blkdev_get(bdev, mode | FMODE_EXCL, &bdev) < 0)
++			return -EBUSY;
++	}
++
++	if (n)
++		bdev->bd_inode->i_flags |= S_HIPRI;
++	else
++		bdev->bd_inode->i_flags &= ~S_HIPRI;
++
++	if (!(mode & FMODE_EXCL))
++		blkdev_put(bdev, mode | FMODE_EXCL);
++	return 0;
++}
++
+ /*
+  * always keep this in sync with compat_blkdev_ioctl()
+  */
+@@ -601,6 +630,10 @@ int blkdev_ioctl(struct block_device *bdev, fmode_t mode, unsigned cmd,
+ 	case BLKDAXGET:
+ 		return put_int(arg, !!(bdev->bd_inode->i_flags & S_DAX));
+ 		break;
++	case BLKHIPRISET:
++		return blkdev_hipriset(bdev, mode, argp);
++	case BLKHIPRIGET:
++		return put_int(arg, !!(bdev->bd_inode->i_flags & S_HIPRI));
+ 	case IOC_PR_REGISTER:
+ 		return blkdev_pr_register(bdev, argp);
+ 	case IOC_PR_RESERVE:
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index d4fa725..6fa81c0 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -170,6 +170,9 @@ blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, loff_t offset)
+ 	if (IS_DAX(inode))
+ 		return dax_do_io(iocb, inode, iter, offset, blkdev_get_block,
+ 				NULL, DIO_SKIP_DIO_COUNT);
++
++	if (IS_HIPRI(inode))
++		iocb->ki_flags |= IOCB_HIPRI;
+ 	return __blockdev_direct_IO(iocb, inode, I_BDEV(inode), iter, offset,
+ 				    blkdev_get_block, NULL, NULL,
+ 				    DIO_SKIP_DIO_COUNT);
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index 70e61b5..8ae39ea 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -1788,6 +1788,7 @@ struct super_operations {
+ #else
+ #define S_DAX		0	/* Make all the DAX code disappear */
+ #endif
++#define S_HIPRI		16384	/* IO for this file has high priority */
+ 
+ /*
+  * Note that nosuid etc flags are inode-specific: setting some file-system
+@@ -1826,6 +1827,7 @@ struct super_operations {
+ #define IS_AUTOMOUNT(inode)	((inode)->i_flags & S_AUTOMOUNT)
+ #define IS_NOSEC(inode)		((inode)->i_flags & S_NOSEC)
+ #define IS_DAX(inode)		((inode)->i_flags & S_DAX)
++#define IS_HIPRI(inode)		((inode)->i_flags & S_HIPRI)
+ 
+ #define IS_WHITEOUT(inode)	(S_ISCHR(inode->i_mode) && \
+ 				 (inode)->i_rdev == WHITEOUT_DEV)
+diff --git a/include/uapi/linux/fs.h b/include/uapi/linux/fs.h
+index a079d50..d6e262c 100644
+--- a/include/uapi/linux/fs.h
++++ b/include/uapi/linux/fs.h
+@@ -223,6 +223,8 @@ struct fsxattr {
+ #define BLKROTATIONAL _IO(0x12,126)
+ #define BLKZEROOUT _IO(0x12,127)
+ #define BLKDAXGET _IO(0x12,129)
++#define BLKHIPRISET _IOW(0x12,130,int)
++#define BLKHIPRIGET _IO(0x12,131)
+ 
+ #define BMAP_IOCTL 1		/* obsolete - kept for compatibility */
+ #define FIBMAP	   _IO(0x00,1)	/* bmap access */
+-- 
+1.8.3.1
 
- static void clear_work_data(struct work_struct *work)
---
-2.7.4
