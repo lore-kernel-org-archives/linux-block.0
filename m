@@ -1,58 +1,57 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Toshi Kani <toshi.kani@hpe.com>
-To: dan.j.williams@intel.com, jack@suse.cz, david@fromorbit.com,
-	viro@zeniv.linux.org.uk
-Cc: axboe@fb.com, hch@infradead.org, boaz@plexistor.com, tytso@mit.edu,
-	adilger.kernel@dilger.ca, ross.zwisler@linux.intel.com,
-	toshi.kani@hpe.com, micah.parrish@hpe.com,
-	linux-nvdimm@lists.01.org, linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v4 4/6] ext2: Add alignment check for DAX mount
-Date: Tue, 10 May 2016 10:23:55 -0600
-Message-Id: <1462897437-16626-5-git-send-email-toshi.kani@hpe.com>
-In-Reply-To: <1462897437-16626-1-git-send-email-toshi.kani@hpe.com>
-References: <1462897437-16626-1-git-send-email-toshi.kani@hpe.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:34259 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751646AbcELIi5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+	Thu, 12 May 2016 04:38:57 -0400
+Date: Thu, 12 May 2016 10:38:52 +0200
+From: Jan Kara <jack@suse.cz>
+To: Vishal Verma <vishal.l.verma@intel.com>
+Cc: linux-nvdimm@lists.01.org, linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org, xfs@oss.sgi.com,
+	linux-ext4@vger.kernel.org, linux-mm@kvack.org,
+	Ross Zwisler <ross.zwisler@linux.intel.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Dave Chinner <david@fromorbit.com>, Jan Kara <jack@suse.cz>,
+	Jens Axboe <axboe@fb.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-kernel@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>,
+	Jeff Moyer <jmoyer@redhat.com>,
+	Boaz Harrosh <boaz@plexistor.com>
+Subject: Re: [PATCH v7 5/6] dax: for truncate/hole-punch, do zeroing through
+ the driver if possible
+Message-ID: <20160512083852.GB10306@quack2.suse.cz>
+References: <1463000932-31680-1-git-send-email-vishal.l.verma@intel.com>
+ <1463000932-31680-6-git-send-email-vishal.l.verma@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1463000932-31680-6-git-send-email-vishal.l.verma@intel.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-When a partition is not aligned by 4KB, mount -o dax succeeds,
-but any read/write access to the filesystem fails, except for
-metadata update.
+On Wed 11-05-16 15:08:51, Vishal Verma wrote:
+> In the truncate or hole-punch path in dax, we clear out sub-page ranges.
+> If these sub-page ranges are sector aligned and sized, we can do the
+> zeroing through the driver instead so that error-clearing is handled
+> automatically.
+> 
+> For sub-sector ranges, we still have to rely on clear_pmem and have the
+> possibility of tripping over errors.
+> 
+> Cc: Dan Williams <dan.j.williams@intel.com>
+> Cc: Ross Zwisler <ross.zwisler@linux.intel.com>
+> Cc: Jeff Moyer <jmoyer@redhat.com>
+> Cc: Christoph Hellwig <hch@infradead.org>
+> Cc: Dave Chinner <david@fromorbit.com>
+> Cc: Jan Kara <jack@suse.cz>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Signed-off-by: Vishal Verma <vishal.l.verma@intel.com>
 
-Call bdev_dax_supported() to perform proper precondition checks
-which includes this partition alignment check.
+The patch looks good to me now. Feel free to add:
 
-Signed-off-by: Toshi Kani <toshi.kani@hpe.com>
 Reviewed-by: Jan Kara <jack@suse.cz>
-Cc: Jan Kara <jack@suse.cz>
-Cc: Dan Williams <dan.j.williams@intel.com>
-Cc: Ross Zwisler <ross.zwisler@linux.intel.com>
-Cc: Christoph Hellwig <hch@infradead.org>
-Cc: Boaz Harrosh <boaz@plexistor.com>
----
- fs/ext2/super.c |   11 ++---------
- 1 file changed, 2 insertions(+), 9 deletions(-)
 
-diff --git a/fs/ext2/super.c b/fs/ext2/super.c
-index b78caf2..1d93795 100644
---- a/fs/ext2/super.c
-+++ b/fs/ext2/super.c
-@@ -922,16 +922,9 @@ static int ext2_fill_super(struct super_block *sb, void *data, int silent)
- 	blocksize = BLOCK_SIZE << le32_to_cpu(sbi->s_es->s_log_block_size);
- 
- 	if (sbi->s_mount_opt & EXT2_MOUNT_DAX) {
--		if (blocksize != PAGE_SIZE) {
--			ext2_msg(sb, KERN_ERR,
--					"error: unsupported blocksize for dax");
-+		err = bdev_dax_supported(sb, blocksize);
-+		if (err)
- 			goto failed_mount;
--		}
--		if (!sb->s_bdev->bd_disk->fops->direct_access) {
--			ext2_msg(sb, KERN_ERR,
--					"error: device does not support dax");
--			goto failed_mount;
--		}
- 	}
- 
- 	/* If the blocksize doesn't match, re-read the thing.. */
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
