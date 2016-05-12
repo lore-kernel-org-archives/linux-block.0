@@ -1,70 +1,76 @@
-Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
-From: Stephen Bates <stephen.bates@microsemi.com>
-To: Jon Derrick <jonathan.derrick@intel.com>, "axboe@fb.com" <axboe@fb.com>
-Subject: RE: [PATCH 0/2] Block: Give option to force io polling
-Date: Thu, 5 May 2016 19:44:29 +0000
-Message-ID: <D87A37E7A4AA544D853031D9A919C70B168FDA58@avsrvexchmbx2.microsemi.net>
-References: <1459455554-2794-1-git-send-email-jonathan.derrick@intel.com>
-In-Reply-To: <1459455554-2794-1-git-send-email-jonathan.derrick@intel.com>
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+From: Paolo <paolo.valente@linaro.org>
+Subject: Re: [PATCH RFC 10/22] block, bfq: add full hierarchical scheduling
+ and cgroups support
+To: Tejun Heo <tj@kernel.org>
+References: <1454364778-25179-1-git-send-email-paolo.valente@linaro.org>
+ <1454364778-25179-11-git-send-email-paolo.valente@linaro.org>
+ <20160211222824.GD3741@mtj.duckdns.org> <57174CA7.5000706@linaro.org>
+ <20160422181321.GV7822@mtj.duckdns.org>
+ <ABE90C54-FE45-4713-87D8-6CD591CB04A2@linaro.org>
+ <20160422184110.GX7822@mtj.duckdns.org>
+ <C1A89D63-CBC4-4C92-8D5A-9FB55A53FBCF@linaro.org>
+ <20160422193221.GY7822@mtj.duckdns.org>
+ <57F65679-CD8E-43BA-8C46-C165B4C20677@linaro.org>
+ <20160425192436.GE7822@mtj.duckdns.org> <571E7E63.6010103@linaro.org>
+ <2D83ACA0-2513-4019-9A0D-3166FDDE7485@linaro.org>
+Cc: Jens Axboe <axboe@kernel.dk>, Fabio Checconi <fchecconi@gmail.com>,
+ Arianna Avanzini <avanzini.arianna@gmail.com>, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, ulf.hansson@linaro.org,
+ linus.walleij@linaro.org, broonie@kernel.org, Jeff Moyer <jmoyer@redhat.com>
+Message-ID: <5734810E.3060001@linaro.org>
+Date: Thu, 12 May 2016 15:11:42 +0200
 MIME-Version: 1.0
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
-List-Post: <mailto:linux-nvme@lists.infradead.org>
-List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "keith.busch@intel.com" <keith.busch@intel.com>,
- Stephen Bates <stephen.bates@microsemi.com>,
- "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
- "hch@infradead.org" <hch@infradead.org>
-Content-Type: text/plain; charset="us-ascii"
-Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
-Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
+In-Reply-To: <2D83ACA0-2513-4019-9A0D-3166FDDE7485@linaro.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-> 
-> In 4.6, enabling io polling in direct-io was switched to a per-io flag.
-> This had an unintended result of giving a significant difference when doing
-> benchmarks between 4.5 and 4.6, using fio's sync engine.
-> 
-> I was able to regain the performance by getting the pvsync2 engine working
-> with the new p{read,write}v2 syscalls, but this patchset allows polling to be
-> tried in the direct-io path with the other syscalls.
-> 
-> Rather than having to convert applications to prwv2 syscalls, users can enable
-> this knob that let's them see the same performance as they may have seen
-> in 4.5 when it always polled.
-> 
-> Jon Derrick (2):
->   block: add queue flag to always poll
->   block: add forced polling sysfs controls
-> 
->  block/blk-core.c       |  8 ++++++++
->  block/blk-sysfs.c      | 38 ++++++++++++++++++++++++++++++++++++++
->  fs/direct-io.c         |  7 ++++++-
->  include/linux/blkdev.h |  2 ++
->  4 files changed, 54 insertions(+), 1 deletion(-)
-> 
+Il 06/05/2016 22:20, Paolo Valente ha scritto:
+>
+> ...
+>
+> I can now confirm that, because of a little bug, a fraction ranging
+> from one third to half of the writeback bios for the writer is wrongly
+> associated with the root group. I'm sending a bugfix.
+>
+> I'm retesting BFQ after this blk fix. If I understand correctly, now
+> you agree that BFQ is well suited for cgroups too, at least in
+> principle. So I will apply all your suggestions and corrections, and
+> submit a fresh patchset.
+>
 
-Hi
+Hi,
+this is just to report another apparently important blkio malfunction
+(unless what I describe below is, for some reason, normal). This time
+the malfunction is related to CFQ.
 
-Revisiting this discussion from late March...
+Even after applying my fix for bio cloning, CFQ may fail to guarantee
+the expected resource-time sharing. It happens, for example, in the
+following simple scenario with one sequential writer, in a group, and
+one sequential reader, in another group. Both groups have the same
+weight (and are memory.high limited to 16MB). Yet the writer is served
+for only about 4% of the time, instead of 50%. Its bw is consequently
+very low. Being this an unwanted accident, this percentage probably
+varies with the characteristics of the system at hand.
 
-I am very interested in seeing this added. There are use cases involving super-low latency (non-NAND based) NVMe devices and they want the fastest possible IO response times for ALL IO to that device. They also have no desire to wait for the new system calls and glibc updates needed to tie their applications into polling or to rewrite their applications to avail of those new calls. I have done some testing on Jon's "big hammer" and it seems to work well for this use case and applied cleanly against v4.6-rc6.
+The causes of the problem seem to be buried in CFQ logic, and do not
+seem trivial. So I guess that solving this problem is not worth the
+effort, as BFQ seems to have hope to replace CFQ altogether. I'm then
+focusing on BFQ: it suffers from a similar problem, but because of a
+rather simple reason.
 
-For the series...
+Thanks,
+Paolo
 
-Reviewed-by: Stephen Bates <stephen.bates@microsemi.com>
-Tested-by: Stephen Bates <stephen.bates@microsemi.com>
-
-Cheers
-
-Stephen
-
-
-_______________________________________________
-Linux-nvme mailing list
-Linux-nvme@lists.infradead.org
-http://lists.infradead.org/mailman/listinfo/linux-nvme
+> Thanks,
+> Paolo
+>
+>> Ok (if there is some quick way to get this information without
+>> instrumenting the code, then any suggestion or pointer is welcome).
+>>
+>> Thanks,
+>> Paolo
+>>
+>>> Thanks.
+>
