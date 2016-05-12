@@ -1,94 +1,67 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lf0-f66.google.com ([209.85.215.66]:34440 "EHLO
-	mail-lf0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751597AbcEQVrX (ORCPT
+Received: from mga14.intel.com ([192.55.52.115]:29797 "EHLO mga14.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S932164AbcELRfC convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-block@vger.kernel.org>);
-	Tue, 17 May 2016 17:47:23 -0400
-Received: by mail-lf0-f66.google.com with SMTP id m101so2046869lfi.1
-        for <linux-block@vger.kernel.org>; Tue, 17 May 2016 14:47:22 -0700 (PDT)
+	Thu, 12 May 2016 13:35:02 -0400
+From: "Derrick, Jonathan" <jonathan.derrick@intel.com>
+To: Stephen Bates <stephen.bates@microsemi.com>,
+	"hch@infradead.org" <hch@infradead.org>
+CC: "axboe@fb.com" <axboe@fb.com>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"Busch, Keith" <keith.busch@intel.com>,
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+Subject: RE: [PATCH 0/2] Block: Give option to force io polling
+Date: Thu, 12 May 2016 17:34:03 +0000
+Message-ID: <8D943B239464E04C9184454D8B3F5CFF0AD29ACE@ORSMSX101.amr.corp.intel.com>
+References: <1459455554-2794-1-git-send-email-jonathan.derrick@intel.com>
+ <D87A37E7A4AA544D853031D9A919C70B168FDA58@avsrvexchmbx2.microsemi.net>
+ <20160508090257.GG15458@infradead.org>
+ <D87A37E7A4AA544D853031D9A919C70B16901010@avsrvexchmbx2.microsemi.net>
+ <20160512070805.GE20802@infradead.org>
+ <D87A37E7A4AA544D853031D9A919C70B16905A94@avsrvexchmbx2.microsemi.net>
+In-Reply-To: <D87A37E7A4AA544D853031D9A919C70B16905A94@avsrvexchmbx2.microsemi.net>
+Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
-Date: Tue, 17 May 2016 15:47:20 -0600
-Message-ID: <CADm5WxP9ZaQvk1=LEQ-=m_-LQpXNv6m+Tcg66u_S959KbpZpZA@mail.gmail.com>
-Subject: [PATCH v2 1/4] block: Add part_stat_read_accum to read across field entries.
-From: Michael Callahan <coder.callahan@gmail.com>
-To: linux-block@vger.kernel.org
-Cc: Michael Callahan <michaelcallahan@fb.com>,
-	Jens Axboe <axboe@fb.com>
-Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Add a part_stat_read_accum macro to genhd.h to read and sum across field
-entries.  For example to sum up the number read and write sectors
-completed.  In addition to being ar reasonable cleanup by itself this
-will make it easier to add new stat fields in the future.
+Hi Stephen,
 
-Signed-off-by: Michael Callahan <michaelcallahan@fb.com>
+I've got a patch I'm going to send out shortly which does it for a block-device file (as Jeff suggested). It's still Mj�lnir but seems to be more in the right place.
 
- drivers/block/drbd/drbd_receiver.c | 3 +--
- drivers/block/drbd/drbd_worker.c   | 4 +---
- drivers/md/md.c                    | 3 +--
- include/linux/genhd.h              | 4 ++++
- 4 files changed, 7 insertions(+), 7 deletions(-)
----
-diff --git a/drivers/block/drbd/drbd_receiver.c
-b/drivers/block/drbd/drbd_receiver.c
-index 050aaa1..3d490a7 100644
---- a/drivers/block/drbd/drbd_receiver.c
-+++ b/drivers/block/drbd/drbd_receiver.c
-@@ -2504,8 +2504,7 @@ bool drbd_rs_c_min_rate_throttle(struct
-drbd_device *device)
-        if (c_min_rate == 0)
-                return false;
+-----Original Message-----
+From: Stephen Bates [mailto:stephen.bates@microsemi.com] 
+Sent: Thursday, May 12, 2016 11:28 AM
+To: hch@infradead.org
+Cc: axboe@fb.com; linux-block@vger.kernel.org; Busch, Keith <keith.busch@intel.com>; linux-nvme@lists.infradead.org; Derrick, Jonathan <jonathan.derrick@intel.com>
+Subject: RE: [PATCH 0/2] Block: Give option to force io polling
 
--       curr_events = (int)part_stat_read(&disk->part0, sectors[0]) +
--                     (int)part_stat_read(&disk->part0, sectors[1]) -
-+       curr_events = (int)part_stat_read_accum(&disk->part0, sectors) -
-                        atomic_read(&device->rs_sect_ev);
+> 
+> 
+> On Mon, May 09, 2016 at 02:53:30PM +0000, Stephen Bates wrote:
+> > Christoph, this is a DRAM based NVMe device, the code for polling in
+> NVMe was merged in 4.5 right? We are using the inbox NVMe driver. Here 
+> is some performance data:
+> >
+> > QD=1, single thread, random 4KB reads
+> >
+> > Polling Off: 12us Avg / 40us 99.99% ; Polling On: 9.5us Avg / 25us 
+> > 99.99%
+> >
+> > Both the average and 99.99% reduction are of interest.
+> 
+> How does CPU usage look for common workloads with polling force enabled?
 
-        if (atomic_read(&device->ap_actlog_cnt)
-diff --git a/drivers/block/drbd/drbd_worker.c b/drivers/block/drbd/drbd_worker.c
-index 4d87499..3e56209 100644
---- a/drivers/block/drbd/drbd_worker.c
-+++ b/drivers/block/drbd/drbd_worker.c
-@@ -1591,9 +1591,7 @@ void drbd_rs_controller_reset(struct drbd_device *device)
-        atomic_set(&device->rs_sect_in, 0);
-        atomic_set(&device->rs_sect_ev, 0);
-        device->rs_in_flight = 0;
--       device->rs_last_events =
--               (int)part_stat_read(&disk->part0, sectors[0]) +
--               (int)part_stat_read(&disk->part0, sectors[1]);
-+       device->rs_last_events =
-(int)part_stat_read_accum(&disk->part0, sectors);
+Christoph, CPU load added. 
 
-        /* Updating the RCU protected object in place is necessary since
-           this function gets called from atomic context.
-diff --git a/drivers/md/md.c b/drivers/md/md.c
-index 14d3b37..9fc8d1e 100644
---- a/drivers/md/md.c
-+++ b/drivers/md/md.c
-@@ -7626,8 +7626,7 @@ static int is_mddev_idle(struct mddev *mddev, int init)
-        rcu_read_lock();
-        rdev_for_each_rcu(rdev, mddev) {
-                struct gendisk *disk = rdev->bdev->bd_contains->bd_disk;
--               curr_events = (int)part_stat_read(&disk->part0, sectors[0]) +
--                             (int)part_stat_read(&disk->part0, sectors[1]) -
-+               curr_events = (int)part_stat_read_accum(&disk->part0, sectors) -
-                              atomic_read(&disk->sync_io);
-                /* sync IO will cause sync_io to increase before the disk_stats
-                 * as sync_io is counted when a request starts, and
-diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index 5c70676..b73559a 100644
---- a/include/linux/genhd.h
-+++ b/include/linux/genhd.h
-@@ -381,6 +381,10 @@ static inline void free_part_stats(struct hd_struct *part)
+Polling Off: 12us Avg / 40us 99.99% ; CPU 0.39 H/W Threads Polling On: 9.5us Avg / 25us 99.99% ; CPU 0.98 H/W Threads
 
- #endif /* CONFIG_SMP */
+> If it's really an overall win we should just add a quirk to the NVMe 
+> driver to always force polling for this device based on the PCI ID.
 
-+#define part_stat_read_accum(part, field)                              \
-+       (part_stat_read(part, field[0]) +                               \
-+        part_stat_read(part, field[1]))
-+
- #define part_stat_add(cpu, part, field, addnd) do {                    \
-        __part_stat_add((cpu), (part), field, addnd);                   \
-        if ((part)->partno)                                             \
+While I like the "big hammer" approach I think we have to have some control over when it is swung ;-). Always turning on polling for a specific device seems a bit too Mj�lnir [1] of a solution. The bonus of polling is only when QD and/or thread-count is low and not everyone will use the device that way.  I also suspect other low latency NVMe devices are coming and having a quirk for each and every one of them does not make sense. We could use a module param or sysfs entry in the NVMe driver itself if we want to avoid having this control in the block layer?
+
+Stephen
+
+[1] Mj�lnir = Thor's Hammer ;-).
