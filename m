@@ -1,131 +1,126 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f195.google.com ([209.85.192.195]:33645 "EHLO
-	mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1161230AbcE3NgV (ORCPT
-	<rfc822;linux-block@vger.kernel.org>);
-	Mon, 30 May 2016 09:36:21 -0400
-From: Ming Lei <ming.lei@canonical.com>
-To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-	Ming Lei <ming.lei@canonical.com>,
-	Keith Busch <keith.busch@intel.com>,
-	Kent Overstreet <kent.overstreet@gmail.com>,
-	Michal Hocko <mhocko@suse.com>,
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-	Tejun Heo <tj@kernel.org>, Mike Snitzer <snitzer@redhat.com>,
-	Jan Kara <jack@suse.cz>, Shaohua Li <shli@fb.com>
-Subject: [PATCH v6 2/8] block: move two bvec structure into bvec.h
-Date: Mon, 30 May 2016 21:34:30 +0800
-Message-Id: <1464615294-9946-3-git-send-email-ming.lei@canonical.com>
-In-Reply-To: <1464615294-9946-1-git-send-email-ming.lei@canonical.com>
-References: <1464615294-9946-1-git-send-email-ming.lei@canonical.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jmoyer@redhat.com>
+From: Jeff Moyer <jmoyer@redhat.com>
+To: Paolo Valente <paolo.valente@linaro.org>
+Cc: Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        ulf.hansson@linaro.org, linus.walleij@linaro.org, broonie@kernel.org,
+        stable@vger.kernel.org
+Subject: Re: [PATCH BUGFIX V4] block: add missing group association in bio-cloning functions
+References: <5732D47A.4090706@kyup.com>
+	<1462958884-9457-1-git-send-email-paolo.valente@linaro.org>
+Date: Fri, 13 May 2016 16:42:52 -0400
+In-Reply-To: <1462958884-9457-1-git-send-email-paolo.valente@linaro.org>
+	(Paolo Valente's message of "Wed, 11 May 2016 11:28:04 +0200")
+Message-ID: <x49vb2h7kqb.fsf@segfault.boston.devel.redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+List-ID: <linux-block@vger.kernel.org>
 
-This patch moves 'struct bio_vec' and 'struct bvec_iter'
-into 'include/linux/bvec.h', then always include this header
-into 'include/linux/blk_types.h'.
+Paolo Valente <paolo.valente@linaro.org> writes:
 
-With this change, both 'struct bvec_iter' and bvec iterator
-helpers don't depend on CONFIG_BLOCK any more, then we can
-use bvec iterator to implement iterate_bvec(): lib/iov_iter.c.
+> When a bio is cloned, the newly created bio must be associated with
+> the same blkcg as the original bio (if BLK_CGROUP is enabled). If
+> this operation is not performed, then the new bio is not associated
+> with any group, and the group of the current task is returned when
+> the group of the bio is requested.
+>
+> Depending on the cloning frequency, this may cause a large
+> percentage of the bios belonging to a given group to be treated
+> as if belonging to other groups (in most cases as if belonging to
+> the root group). The expected group isolation may thereby be broken.
+>
+> This commit adds the missing association in bio-cloning functions.
+>
+> Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+> Reviewed-by: Nikolay Borisov <kernel@kyup.com>
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Suggested-by: Christoph Hellwig <hch@infradead.org>
-Signed-off-by: Ming Lei <ming.lei@canonical.com>
----
- include/linux/bio.h       |  1 -
- include/linux/blk_types.h | 22 +---------------------
- include/linux/bvec.h      | 23 ++++++++++++++++++++++-
- 3 files changed, 23 insertions(+), 23 deletions(-)
+I think this one's golden!  Thanks, Paolo!
 
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index ed4bfb9..8555b90 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -31,7 +31,6 @@
- 
- /* struct bio, bio_vec and BIO_* flags are defined in blk_types.h */
- #include <linux/blk_types.h>
--#include <linux/bvec.h>
- 
- #define BIO_DEBUG
- 
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 77e5d81..dadc240 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -6,6 +6,7 @@
- #define __LINUX_BLK_TYPES_H
- 
- #include <linux/types.h>
-+#include <linux/bvec.h>
- 
- struct bio_set;
- struct bio;
-@@ -17,28 +18,7 @@ struct cgroup_subsys_state;
- typedef void (bio_end_io_t) (struct bio *);
- typedef void (bio_destructor_t) (struct bio *);
- 
--/*
-- * was unsigned short, but we might as well be ready for > 64kB I/O pages
-- */
--struct bio_vec {
--	struct page	*bv_page;
--	unsigned int	bv_len;
--	unsigned int	bv_offset;
--};
--
- #ifdef CONFIG_BLOCK
--
--struct bvec_iter {
--	sector_t		bi_sector;	/* device address in 512 byte
--						   sectors */
--	unsigned int		bi_size;	/* residual I/O count */
--
--	unsigned int		bi_idx;		/* current index into bvl_vec */
--
--	unsigned int            bi_bvec_done;	/* number of bytes completed in
--						   current bvec */
--};
--
- /*
-  * main unit of I/O for the block layer and lower layers (ie drivers and
-  * stacking drivers)
-diff --git a/include/linux/bvec.h b/include/linux/bvec.h
-index 29c459d..096efd2 100644
---- a/include/linux/bvec.h
-+++ b/include/linux/bvec.h
-@@ -20,7 +20,28 @@
- #ifndef __LINUX_BVEC_ITER_H
- #define __LINUX_BVEC_ITER_H
- 
--#include <linux/blk_types.h>
-+#include <linux/kernel.h>
-+#include <linux/bug.h>
-+
-+/*
-+ * was unsigned short, but we might as well be ready for > 64kB I/O pages
-+ */
-+struct bio_vec {
-+	struct page	*bv_page;
-+	unsigned int	bv_len;
-+	unsigned int	bv_offset;
-+};
-+
-+struct bvec_iter {
-+	sector_t		bi_sector;	/* device address in 512 byte
-+						   sectors */
-+	unsigned int		bi_size;	/* residual I/O count */
-+
-+	unsigned int		bi_idx;		/* current index into bvl_vec */
-+
-+	unsigned int            bi_bvec_done;	/* number of bytes completed in
-+						   current bvec */
-+};
- 
- /*
-  * various member access, note that bio_data should of course not be used
--- 
-1.9.1
+Reviewed-by: Jeff Moyer <jmoyer@redhat.com>
 
+
+> ---
+> Tejun: I didn't add also your Ack, just because this version is slightly
+> different from the one you acked.
+> ---
+>  block/bio.c          | 15 +++++++++++++++
+>  fs/btrfs/extent_io.c |  6 ------
+>  include/linux/bio.h  |  3 +++
+>  3 files changed, 18 insertions(+), 6 deletions(-)
+>
+> diff --git a/block/bio.c b/block/bio.c
+> index 807d25e..89f517c 100644
+> --- a/block/bio.c
+> +++ b/block/bio.c
+> @@ -590,6 +590,8 @@ void __bio_clone_fast(struct bio *bio, struct bio *bio_src)
+>  	bio->bi_rw = bio_src->bi_rw;
+>  	bio->bi_iter = bio_src->bi_iter;
+>  	bio->bi_io_vec = bio_src->bi_io_vec;
+> +
+> +	bio_clone_blkcg_association(bio, bio_src);
+>  }
+>  EXPORT_SYMBOL(__bio_clone_fast);
+>  
+> @@ -695,6 +697,8 @@ integrity_clone:
+>  		}
+>  	}
+>  
+> +	bio_clone_blkcg_association(bio, bio_src);
+> +
+>  	return bio;
+>  }
+>  EXPORT_SYMBOL(bio_clone_bioset);
+> @@ -2016,6 +2020,17 @@ void bio_disassociate_task(struct bio *bio)
+>  	}
+>  }
+>  
+> +/**
+> + * bio_clone_blkcg_association - clone blkcg association from src to dst bio
+> + * @dst: destination bio
+> + * @src: source bio
+> + */
+> +void bio_clone_blkcg_association(struct bio *dst, struct bio *src)
+> +{
+> +	if (src->bi_css)
+> +		WARN_ON(bio_associate_blkcg(dst, src->bi_css));
+> +}
+> +
+>  #endif /* CONFIG_BLK_CGROUP */
+>  
+>  static void __init biovec_init_slabs(void)
+> diff --git a/fs/btrfs/extent_io.c b/fs/btrfs/extent_io.c
+> index d247fc0..19f6739 100644
+> --- a/fs/btrfs/extent_io.c
+> +++ b/fs/btrfs/extent_io.c
+> @@ -2686,12 +2686,6 @@ struct bio *btrfs_bio_clone(struct bio *bio, gfp_t gfp_mask)
+>  		btrfs_bio->csum = NULL;
+>  		btrfs_bio->csum_allocated = NULL;
+>  		btrfs_bio->end_io = NULL;
+> -
+> -#ifdef CONFIG_BLK_CGROUP
+> -		/* FIXME, put this into bio_clone_bioset */
+> -		if (bio->bi_css)
+> -			bio_associate_blkcg(new, bio->bi_css);
+> -#endif
+>  	}
+>  	return new;
+>  }
+> diff --git a/include/linux/bio.h b/include/linux/bio.h
+> index 6b7481f..16cbe59 100644
+> --- a/include/linux/bio.h
+> +++ b/include/linux/bio.h
+> @@ -527,11 +527,14 @@ extern unsigned int bvec_nr_vecs(unsigned short idx);
+>  int bio_associate_blkcg(struct bio *bio, struct cgroup_subsys_state *blkcg_css);
+>  int bio_associate_current(struct bio *bio);
+>  void bio_disassociate_task(struct bio *bio);
+> +void bio_clone_blkcg_association(struct bio *dst, struct bio *src);
+>  #else	/* CONFIG_BLK_CGROUP */
+>  static inline int bio_associate_blkcg(struct bio *bio,
+>  			struct cgroup_subsys_state *blkcg_css) { return 0; }
+>  static inline int bio_associate_current(struct bio *bio) { return -ENOENT; }
+>  static inline void bio_disassociate_task(struct bio *bio) { }
+> +static inline void bio_clone_blkcg_association(struct bio *dst,
+> +			struct bio *src) { return 0; }
+>  #endif	/* CONFIG_BLK_CGROUP */
+>  
+>  #ifdef CONFIG_HIGHMEM
