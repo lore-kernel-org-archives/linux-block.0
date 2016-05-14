@@ -1,153 +1,47 @@
 Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Vishal Verma <vishal.l.verma@intel.com>
-To: linux-nvdimm@lists.01.org
-Cc: Matthew Wilcox <matthew.r.wilcox@intel.com>,
-	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-	xfs@oss.sgi.com, linux-ext4@vger.kernel.org, linux-mm@kvack.org,
-	Ross Zwisler <ross.zwisler@linux.intel.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Dave Chinner <david@fromorbit.com>, Jan Kara <jack@suse.cz>,
-	Jens Axboe <axboe@fb.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-kernel@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
+MIME-Version: 1.0
+In-Reply-To: <1463184168-3381-4-git-send-email-jonathan.derrick@intel.com>
+References: <1463184168-3381-1-git-send-email-jonathan.derrick@intel.com>
+	<1463184168-3381-4-git-send-email-jonathan.derrick@intel.com>
+Date: Sat, 14 May 2016 07:22:29 -0700
+Message-ID: <CAPcyv4ibBEh7xm8jUX-aq0a2ecqbZugDa_L1K=dbFujbKaDVVw@mail.gmail.com>
+Subject: Re: [RFCv2 3/3] block: Introduce S_HIPRI inode flag
+From: Dan Williams <dan.j.williams@intel.com>
+To: Jon Derrick <jonathan.derrick@intel.com>
+Cc: linux-block@vger.kernel.org, Jens Axboe <axboe@fb.com>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	linux-fsdevel <linux-fsdevel@vger.kernel.org>,
 	Jeff Moyer <jmoyer@redhat.com>,
-	Boaz Harrosh <boaz@plexistor.com>,
-	Vishal Verma <vishal.l.verma@intel.com>
-Subject: [PATCH v6 3/5] dax: use sb_issue_zerout instead of calling dax_clear_sectors
-Date: Tue, 10 May 2016 12:49:14 -0600
-Message-Id: <1462906156-22303-4-git-send-email-vishal.l.verma@intel.com>
-In-Reply-To: <1462906156-22303-1-git-send-email-vishal.l.verma@intel.com>
-References: <1462906156-22303-1-git-send-email-vishal.l.verma@intel.com>
+	Stephen Bates <stephen.bates@microsemi.com>,
+	Keith Busch <keith.busch@intel.com>,
+	linux-nvme@lists.infradead.org,
+	Christoph Hellwig <hch@infradead.org>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-From: Matthew Wilcox <matthew.r.wilcox@intel.com>
+[ adding Martin, given his hint infrastructure that is in the works... ]
 
-dax_clear_sectors() cannot handle poisoned blocks.  These must be
-zeroed using the BIO interface instead.  Convert ext2 and XFS to use
-only sb_issue_zerout().
 
-Reviewed-by: Jeff Moyer <jmoyer@redhat.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Jan Kara <jack@suse.cz>
-Signed-off-by: Matthew Wilcox <matthew.r.wilcox@intel.com>
-[vishal: Also remove the dax_clear_sectors function entirely]
-Signed-off-by: Vishal Verma <vishal.l.verma@intel.com>
----
- fs/dax.c               | 32 --------------------------------
- fs/ext2/inode.c        |  7 +++----
- fs/xfs/xfs_bmap_util.c | 15 ++++-----------
- include/linux/dax.h    |  1 -
- 4 files changed, 7 insertions(+), 48 deletions(-)
+On Fri, May 13, 2016 at 5:02 PM, Jon Derrick <jonathan.derrick@intel.com> wrote:
+> S_HIPRI is a hint that indicates the file (currently only block devices)
+> is a high priority file. This hint allows direct-io to the block device
+> to poll for completions if polling is available to the block device.
+>
+> The motivation for this patch comes from tiered caching solutions. A
+> user may wish to have low-latency block devices act as a cache for
+> higher-latency storage media.
+>
+> With the introduction of block polling, polling could be enabled on a
+> queue of a block device. The preadv2/pwritev2 sets allowed a user to
+> specify per-io polling, but removed the ability to poll per-queue.
+>
+> Instead of having a user modify their software to use preadv2/pwritev2,
+> this patch allows a user to set S_HIPRI on a block device file to request
+> all direct-io for this file to be polled.
 
-diff --git a/fs/dax.c b/fs/dax.c
-index 52f0044..5948d9b 100644
---- a/fs/dax.c
-+++ b/fs/dax.c
-@@ -116,38 +116,6 @@ struct page *read_dax_sector(struct block_device *bdev, sector_t n)
- 	return page;
- }
- 
--/*
-- * dax_clear_sectors() is called from within transaction context from XFS,
-- * and hence this means the stack from this point must follow GFP_NOFS
-- * semantics for all operations.
-- */
--int dax_clear_sectors(struct block_device *bdev, sector_t _sector, long _size)
--{
--	struct blk_dax_ctl dax = {
--		.sector = _sector,
--		.size = _size,
--	};
--
--	might_sleep();
--	do {
--		long count, sz;
--
--		count = dax_map_atomic(bdev, &dax);
--		if (count < 0)
--			return count;
--		sz = min_t(long, count, SZ_128K);
--		clear_pmem(dax.addr, sz);
--		dax.size -= sz;
--		dax.sector += sz / 512;
--		dax_unmap_atomic(bdev, &dax);
--		cond_resched();
--	} while (dax.size);
--
--	wmb_pmem();
--	return 0;
--}
--EXPORT_SYMBOL_GPL(dax_clear_sectors);
--
- static bool buffer_written(struct buffer_head *bh)
- {
- 	return buffer_mapped(bh) && !buffer_unwritten(bh);
-diff --git a/fs/ext2/inode.c b/fs/ext2/inode.c
-index 1f07b75..35f2b0bf 100644
---- a/fs/ext2/inode.c
-+++ b/fs/ext2/inode.c
-@@ -26,6 +26,7 @@
- #include <linux/highuid.h>
- #include <linux/pagemap.h>
- #include <linux/dax.h>
-+#include <linux/blkdev.h>
- #include <linux/quotaops.h>
- #include <linux/writeback.h>
- #include <linux/buffer_head.h>
-@@ -737,10 +738,8 @@ static int ext2_get_blocks(struct inode *inode,
- 		 * so that it's not found by another thread before it's
- 		 * initialised
- 		 */
--		err = dax_clear_sectors(inode->i_sb->s_bdev,
--				le32_to_cpu(chain[depth-1].key) <<
--				(inode->i_blkbits - 9),
--				1 << inode->i_blkbits);
-+		err = sb_issue_zeroout(inode->i_sb,
-+				le32_to_cpu(chain[depth-1].key), 1, GFP_NOFS);
- 		if (err) {
- 			mutex_unlock(&ei->truncate_mutex);
- 			goto cleanup;
-diff --git a/fs/xfs/xfs_bmap_util.c b/fs/xfs/xfs_bmap_util.c
-index 3b63098..930ac6a 100644
---- a/fs/xfs/xfs_bmap_util.c
-+++ b/fs/xfs/xfs_bmap_util.c
-@@ -72,18 +72,11 @@ xfs_zero_extent(
- 	struct xfs_mount *mp = ip->i_mount;
- 	xfs_daddr_t	sector = xfs_fsb_to_db(ip, start_fsb);
- 	sector_t	block = XFS_BB_TO_FSBT(mp, sector);
--	ssize_t		size = XFS_FSB_TO_B(mp, count_fsb);
--
--	if (IS_DAX(VFS_I(ip)))
--		return dax_clear_sectors(xfs_find_bdev_for_inode(VFS_I(ip)),
--				sector, size);
--
--	/*
--	 * let the block layer decide on the fastest method of
--	 * implementing the zeroing.
--	 */
--	return sb_issue_zeroout(mp->m_super, block, count_fsb, GFP_NOFS);
- 
-+	return blkdev_issue_zeroout(xfs_find_bdev_for_inode(VFS_I(ip)),
-+		block << (mp->m_super->s_blocksize_bits - 9),
-+		count_fsb << (mp->m_super->s_blocksize_bits - 9),
-+		GFP_NOFS, true);
- }
- 
- /*
-diff --git a/include/linux/dax.h b/include/linux/dax.h
-index ef94fa7..426841a 100644
---- a/include/linux/dax.h
-+++ b/include/linux/dax.h
-@@ -11,7 +11,6 @@
- 
- ssize_t dax_do_io(struct kiocb *, struct inode *, struct iov_iter *, loff_t,
- 		  get_block_t, dio_iodone_t, int flags);
--int dax_clear_sectors(struct block_device *bdev, sector_t _sector, long _size);
- int dax_zero_page_range(struct inode *, loff_t from, unsigned len, get_block_t);
- int dax_truncate_page(struct inode *, loff_t from, get_block_t);
- int dax_fault(struct vm_area_struct *, struct vm_fault *, get_block_t);
--- 
-2.5.5
-
+Setting aside whether this should be a per-task ioprio hint vs a block
+device inode hint, this single flag loses the granularity of whether
+reads or writes are polled.  Low latency reads with posted writes
+seems a valid configuration.
