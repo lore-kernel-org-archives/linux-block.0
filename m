@@ -1,142 +1,105 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-From: mchristi@redhat.com
-To: linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-	target-devel@vger.kernel.org
-Cc: Mike Christie <mchristi@redhat.com>
-Subject: [PATCH 3/5] target: call queue reset if supported
-Date: Wed, 25 May 2016 02:55:01 -0500
-Message-Id: <1464162903-14735-4-git-send-email-mchristi@redhat.com>
-In-Reply-To: <1464162903-14735-1-git-send-email-mchristi@redhat.com>
-References: <1464162903-14735-1-git-send-email-mchristi@redhat.com>
-Sender: linux-scsi-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga01.intel.com ([192.55.52.88]:53509 "EHLO mga01.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751630AbcEOG1G (ORCPT <rfc822;linux-block@vger.kernel.org>);
+	Sun, 15 May 2016 02:27:06 -0400
+Subject: [PATCH v2 0/3] "Device DAX" for persistent memory
+From: Dan Williams <dan.j.williams@intel.com>
+To: linux-nvdimm@lists.01.org
+Cc: Dave Hansen <dave.hansen@linux.intel.com>,
+	Dave Chinner <david@fromorbit.com>,
+	linux-kernel@vger.kernel.org, hch@lst.de,
+	linux-block@vger.kernel.org, Jeff Moyer <jmoyer@redhat.com>,
+	Jan Kara <jack@suse.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Ross Zwisler <ross.zwisler@linux.intel.com>
+Date: Sat, 14 May 2016 23:26:18 -0700
+Message-ID: <146329357870.17948.14240958684074905846.stgit@dwillia2-desk3.amr.corp.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Mike Christie <mchristi@redhat.com>
+Changes since v1: [1]
 
-Instead of waiting for commands, map the lun reset operation
-to a queue reset.
+1/ Dropped the lead in cleanup patches from this posting as they appear
+on the libnvdimm-for-next branch.
 
-We do not check the result of blk_reset_queue because if
-it works then we need to wait for the bio/request completions
-and if it failed we might as wait and hope like we did before.
+2/ Fixed the needlessly overweight fault locking by replacing it with
+rcu_read_lock() and drop taking the i_mmap_lock since it has no effect
+or purpose.  Unlike block devices the vfs does not arrange for character
+device inodes to share the same address_space.
 
-Signed-off-by: Mike Christie <mchristi@redhat.com>
+3/ Fixed the device release path since the class release method is not
+called when the device is created by device_create_with_groups().
+
+4/ Cleanups resulting from the switch to carry (struct dax_dev *) in
+filp->private_date.
+
+
 ---
- drivers/target/target_core_file.c    | 12 ++++++++++++
- drivers/target/target_core_iblock.c  |  8 ++++++++
- drivers/target/target_core_pscsi.c   |  8 ++++++++
- drivers/target/target_core_tmr.c     |  3 +++
- include/target/target_core_backend.h |  1 +
- 5 files changed, 32 insertions(+)
 
-diff --git a/drivers/target/target_core_file.c b/drivers/target/target_core_file.c
-index 75f0f08..d6af1f2 100644
---- a/drivers/target/target_core_file.c
-+++ b/drivers/target/target_core_file.c
-@@ -97,6 +97,17 @@ static struct se_device *fd_alloc_device(struct se_hba *hba, const char *name)
- 	return &fd_dev->dev;
- }
- 
-+static int fd_reset_device(struct se_device *dev)
-+{
-+	struct fd_dev *fd_dev = FD_DEV(dev);
-+	struct inode *inode;
-+
-+	inode = fd_dev->fd_file->f_mapping->host;
-+	if (!S_ISBLK(inode->i_mode))
-+		return -EOPNOTSUPP;
-+	return blk_reset_queue(bdev_get_queue(inode->i_bdev));
-+}
-+
- static int fd_configure_device(struct se_device *dev)
- {
- 	struct fd_dev *fd_dev = FD_DEV(dev);
-@@ -813,6 +824,7 @@ static const struct target_backend_ops fileio_ops = {
- 	.attach_hba		= fd_attach_hba,
- 	.detach_hba		= fd_detach_hba,
- 	.alloc_device		= fd_alloc_device,
-+	.reset_device		= fd_reset_device,
- 	.configure_device	= fd_configure_device,
- 	.free_device		= fd_free_device,
- 	.parse_cdb		= fd_parse_cdb,
-diff --git a/drivers/target/target_core_iblock.c b/drivers/target/target_core_iblock.c
-index 7c4efb4..0a7dd59 100644
---- a/drivers/target/target_core_iblock.c
-+++ b/drivers/target/target_core_iblock.c
-@@ -79,6 +79,13 @@ static struct se_device *iblock_alloc_device(struct se_hba *hba, const char *nam
- 	return &ib_dev->dev;
- }
- 
-+static int iblock_reset_device(struct se_device *dev)
-+{
-+	struct iblock_dev *ib_dev = IBLOCK_DEV(dev);
-+
-+	return blk_reset_queue(bdev_get_queue(ib_dev->ibd_bd));
-+}
-+
- static int iblock_configure_device(struct se_device *dev)
- {
- 	struct iblock_dev *ib_dev = IBLOCK_DEV(dev);
-@@ -848,6 +855,7 @@ static const struct target_backend_ops iblock_ops = {
- 	.detach_hba		= iblock_detach_hba,
- 	.alloc_device		= iblock_alloc_device,
- 	.configure_device	= iblock_configure_device,
-+	.reset_device		= iblock_reset_device,
- 	.free_device		= iblock_free_device,
- 	.parse_cdb		= iblock_parse_cdb,
- 	.set_configfs_dev_params = iblock_set_configfs_dev_params,
-diff --git a/drivers/target/target_core_pscsi.c b/drivers/target/target_core_pscsi.c
-index de18790..fa0505b 100644
---- a/drivers/target/target_core_pscsi.c
-+++ b/drivers/target/target_core_pscsi.c
-@@ -455,6 +455,13 @@ static int pscsi_create_type_other(struct se_device *dev,
- 	return 0;
- }
- 
-+static int pscsi_reset_device(struct se_device *dev)
-+{
-+	struct pscsi_dev_virt *pdv = PSCSI_DEV(dev);
-+
-+	return blk_reset_queue(pdv->pdv_sd->request_queue);
-+}
-+
- static int pscsi_configure_device(struct se_device *dev)
- {
- 	struct se_hba *hba = dev->se_hba;
-@@ -1131,6 +1138,7 @@ static const struct target_backend_ops pscsi_ops = {
- 	.detach_hba		= pscsi_detach_hba,
- 	.pmode_enable_hba	= pscsi_pmode_enable_hba,
- 	.alloc_device		= pscsi_alloc_device,
-+	.reset_device		= pscsi_reset_device,
- 	.configure_device	= pscsi_configure_device,
- 	.free_device		= pscsi_free_device,
- 	.transport_complete	= pscsi_transport_complete,
-diff --git a/drivers/target/target_core_tmr.c b/drivers/target/target_core_tmr.c
-index 4f229e7..609ec53 100644
---- a/drivers/target/target_core_tmr.c
-+++ b/drivers/target/target_core_tmr.c
-@@ -431,6 +431,9 @@ int core_tmr_lun_reset(
- 		(preempt_and_abort_list) ? "Preempt" : "TMR",
- 		dev->transport->name, tas);
- 
-+	if (dev->transport->reset_device(dev))
-+		dev->transport->reset_device(dev);
-+
- 	core_tmr_drain_tmr_list(dev, tmr, preempt_and_abort_list);
- 	core_tmr_drain_state_list(dev, prout_cmd, tmr_sess, tas,
- 				preempt_and_abort_list);
-diff --git a/include/target/target_core_backend.h b/include/target/target_core_backend.h
-index 28ee5c2..a055e4f 100644
---- a/include/target/target_core_backend.h
-+++ b/include/target/target_core_backend.h
-@@ -17,6 +17,7 @@ struct target_backend_ops {
- 
- 	struct se_device *(*alloc_device)(struct se_hba *, const char *);
- 	int (*configure_device)(struct se_device *);
-+	int (*reset_device)(struct se_device *);
- 	void (*free_device)(struct se_device *device);
- 
- 	ssize_t (*set_configfs_dev_params)(struct se_device *,
--- 
-2.7.2
+Device DAX is the device-centric analogue of Filesystem DAX
+(CONFIG_FS_DAX).  It allows memory ranges to be allocated and mapped
+without need of an intervening file system or being bound to block
+device semantics.
 
+Why "Device DAX"?
+
+1/ As I mentioned at LSF [2] we are starting to see platforms with
+performance and feature differentiated memory ranges.  Environments like
+high-performance-computing and usages like in-memory databases want
+exclusive allocation of a memory range with zero conflicting
+kernel/metadata allocations.  For dedicated applications of high
+bandwidth or low latency memory device-DAX provides a predictable direct
+map mechanism.
+
+Note that this is only for the small number of "crazy" applications that
+are willing to re-write to get every bit of performance.  For everyone
+else we, Dave Hansen and I, are looking to add a mechanism to hot-plug
+device-DAX ranges into the mm to get general memory management services
+(oversubscribe / migration, etc) with the understanding that it may
+sacrifice some predictability.
+
+2/ For persistent memory there are similar applications that are willing
+to re-write to take full advantage of byte-addressable persistence.
+This mechanism satisfies those usages that only need a pre-allocated
+file to mmap.
+
+3/ It answers Dave Chinner's call to start thinking about pmem-native
+solutions.  Device DAX specifically avoids block-device and file system
+conflicts.
+
+
+[1]: https://lists.01.org/pipermail/linux-nvdimm/2016-May/005660.html
+[2]: https://lwn.net/Articles/685107/
+
+---
+
+Dan Williams (3):
+      /dev/dax, pmem: direct access to persistent memory
+      /dev/dax, core: file operations and dax-mmap
+      Revert "block: enable dax for raw block devices"
+
+
+ block/ioctl.c                       |   32 --
+ drivers/Kconfig                     |    2 
+ drivers/Makefile                    |    1 
+ drivers/dax/Kconfig                 |   26 ++
+ drivers/dax/Makefile                |    4 
+ drivers/dax/dax.c                   |  568 +++++++++++++++++++++++++++++++++++
+ drivers/dax/dax.h                   |   24 +
+ drivers/dax/pmem.c                  |  168 ++++++++++
+ fs/block_dev.c                      |   96 ++----
+ include/linux/fs.h                  |    8 
+ include/uapi/linux/fs.h             |    1 
+ mm/huge_memory.c                    |    1 
+ mm/hugetlb.c                        |    1 
+ tools/testing/nvdimm/Kbuild         |    9 +
+ tools/testing/nvdimm/config_check.c |    2 
+ 15 files changed, 835 insertions(+), 108 deletions(-)
+ create mode 100644 drivers/dax/Kconfig
+ create mode 100644 drivers/dax/Makefile
+ create mode 100644 drivers/dax/dax.c
+ create mode 100644 drivers/dax/dax.h
+ create mode 100644 drivers/dax/pmem.c
