@@ -1,91 +1,49 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:24495 "EHLO
-	mx0b-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1753924AbcEJAWU (ORCPT
-	<rfc822;linux-block@vger.kernel.org>);
-	Mon, 9 May 2016 20:22:20 -0400
-Received: from pps.filterd (m0001303.ppops.net [127.0.0.1])
-	by m0001303.ppops.net (8.16.0.11/8.16.0.11) with SMTP id u4A0LnTq022553
-	for <linux-block@vger.kernel.org>; Mon, 9 May 2016 17:22:19 -0700
-Received: from mail.thefacebook.com ([199.201.64.23])
-	by m0001303.ppops.net with ESMTP id 22u4gm04dw-1
-	(version=TLSv1 cipher=AES128-SHA bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Mon, 09 May 2016 17:22:19 -0700
-Received: from facebook.com (2401:db00:11:d0a2:face:0:39:0)	by
- mx-out.facebook.com (10.223.101.97) with ESMTP	id
- 40166f6a164511e68ba924be0595f910-ce7d6c50 for <linux-block@vger.kernel.org>;
-	Mon, 09 May 2016 17:22:16 -0700
-From: Shaohua Li <shli@fb.com>
-To: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: Steven Rostedt <rostedt@goodmis.org>, <axboe@fb.com>,
-	<Kernel-team@fb.com>
-Subject: [PATCH 3/3] blk-throttle: don't parse cgroup path if trace isn't enabled
-Date: Mon, 9 May 2016 17:22:15 -0700
-Message-ID: <b395946862a1a963e6d74b70349322eceb5d42d4.1462838969.git.shli@fb.com>
-In-Reply-To: <2c3ee532132f8925dd0be1178e8dee0bba6b448c.1462838969.git.shli@fb.com>
-References: <2c3ee532132f8925dd0be1178e8dee0bba6b448c.1462838969.git.shli@fb.com>
+Return-Path: <jack@suse.cz>
+Date: Mon, 16 May 2016 09:47:41 +0200
+From: Jan Kara <jack@suse.cz>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Jan Kara <jack@suse.cz>, linux-kernel@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+	dchinner@redhat.com, sedat.dilek@gmail.com
+Subject: Re: [PATCHSET v5] Make background writeback great again for the
+ first time
+Message-ID: <20160516074741.GA12026@quack2.suse.cz>
+References: <1461686131-22999-1-git-send-email-axboe@fb.com>
+ <20160427180105.GA17362@quack2.suse.cz>
+ <5721021E.8060006@fb.com>
+ <20160427203708.GA25397@kernel.dk>
+ <20160427205915.GC25397@kernel.dk>
+ <20160428115401.GD17362@quack2.suse.cz>
+ <57225A91.50002@kernel.dk>
+ <20160503121719.GA25436@quack2.suse.cz>
+ <20160511163608.GG14744@quack2.suse.cz>
+ <57361CF6.3040202@kernel.dk>
 MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <57361CF6.3040202@kernel.dk>
+List-ID: <linux-block@vger.kernel.org>
 
-if trace isn't enabled, parsing cgroup path just wastes cpu
+On Fri 13-05-16 12:29:10, Jens Axboe wrote:
+> Thanks Jan, this is great and super useful! I'm revamping certain parts of
+> it to deal with write back caching better, and I'll take a look at the
+> regressions that you reported.
+> 
+> What kind of SSD is this? I'm assuming it's SATA (QD=32), and then it would
+> probably be a safe assumption that it's flagging itself as having a volatile
+> write back cache, would that be a correct assumption?
 
-Signed-off-by: Shaohua Li <shli@fb.com>
----
- block/blk-throttle.c         | 5 ++---
- include/linux/blktrace_api.h | 9 +++++++++
- 2 files changed, 11 insertions(+), 3 deletions(-)
+Yes, it is SATA with writeback cache.
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 2149a1d..47a3e54 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -211,15 +211,14 @@ static struct throtl_data *sq_to_td(struct throtl_service_queue *sq)
-  *
-  * The messages are prefixed with "throtl BLKG_NAME" if @sq belongs to a
-  * throtl_grp; otherwise, just "throtl".
-- *
-- * TODO: this should be made a function and name formatting should happen
-- * after testing whether blktrace is enabled.
-  */
- #define throtl_log(sq, fmt, args...)	do {				\
- 	struct throtl_grp *__tg = sq_to_tg((sq));			\
- 	struct throtl_data *__td = sq_to_td((sq));			\
- 									\
- 	(void)__td;							\
-+	if (likely(!blk_trace_note_message_enabled(__td->queue)))	\
-+		break;							\
- 	if ((__tg)) {							\
- 		char __pbuf[128];					\
- 									\
-diff --git a/include/linux/blktrace_api.h b/include/linux/blktrace_api.h
-index afc1343..0f3172b 100644
---- a/include/linux/blktrace_api.h
-+++ b/include/linux/blktrace_api.h
-@@ -57,6 +57,14 @@ void __trace_note_message(struct blk_trace *, const char *fmt, ...);
- 	} while (0)
- #define BLK_TN_MAX_MSG		128
- 
-+static inline bool blk_trace_note_message_enabled(struct request_queue *q)
-+{
-+	struct blk_trace *bt = q->blk_trace;
-+	if (likely(!bt))
-+		return false;
-+	return bt->act_mask & BLK_TC_NOTIFY;
-+}
-+
- extern void blk_add_driver_data(struct request_queue *q, struct request *rq,
- 				void *data, size_t len);
- extern int blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
-@@ -79,6 +87,7 @@ extern struct attribute_group blk_trace_attr_group;
- # define blk_trace_remove(q)				(-ENOTTY)
- # define blk_add_trace_msg(q, fmt, ...)			do { } while (0)
- # define blk_trace_remove_sysfs(dev)			do { } while (0)
-+# define blk_trace_note_message_enabled(q)		(false)
- static inline int blk_trace_init_sysfs(struct device *dev)
- {
- 	return 0;
+> Are you using scsi-mq, or do you have an IO scheduler attached to it?
+
+The disk was using IO scheduler, however at this point I'm not 100% sure
+which scheduler (deadline or cfq) was the default one for the distro that
+was installed. The machine is currently testing something else so I cannot
+reinstall it and check. Maybe I can rerun some tests later in the week when
+the machine gets freed with scsi-mq or deadline IO scheduler so that we
+have 100% certain config.
+
+								Honza
 -- 
-2.8.0.rc2
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
