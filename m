@@ -1,160 +1,115 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Vishal Verma <vishal.l.verma@intel.com>
-To: linux-nvdimm@lists.01.org
-Cc: Dan Williams <dan.j.williams@intel.com>,
-	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-	xfs@oss.sgi.com, linux-ext4@vger.kernel.org, linux-mm@kvack.org,
-	Ross Zwisler <ross.zwisler@linux.intel.com>,
-	Dave Chinner <david@fromorbit.com>, Jan Kara <jack@suse.cz>,
-	Jens Axboe <axboe@fb.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-kernel@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Jeff Moyer <jmoyer@redhat.com>,
-	Boaz Harrosh <boaz@plexistor.com>,
-	Vishal Verma <vishal.l.verma@intel.com>
-Subject: [PATCH v5 2/5] dax: enable dax in the presence of known media errors (badblocks)
-Date: Fri,  6 May 2016 15:53:08 -0600
-Message-Id: <1462571591-3361-3-git-send-email-vishal.l.verma@intel.com>
-In-Reply-To: <1462571591-3361-1-git-send-email-vishal.l.verma@intel.com>
-References: <1462571591-3361-1-git-send-email-vishal.l.verma@intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-lb0-f196.google.com ([209.85.217.196]:35914 "EHLO
+	mail-lb0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751597AbcEQVo6 (ORCPT
+	<rfc822;linux-block@vger.kernel.org>);
+	Tue, 17 May 2016 17:44:58 -0400
+Received: by mail-lb0-f196.google.com with SMTP id r5so1734741lbj.3
+        for <linux-block@vger.kernel.org>; Tue, 17 May 2016 14:44:57 -0700 (PDT)
+MIME-Version: 1.0
+Date: Tue, 17 May 2016 15:44:56 -0600
+Message-ID: <CADm5WxPvYdy9bBr3aY3irAktm+05=Y+dvGE-i+XsesGpZUMo9A@mail.gmail.com>
+Subject: [PATCH v2 0/4] block: Separating discards from writes in Linux IO statistics
+From: Michael Callahan <coder.callahan@gmail.com>
+To: linux-block@vger.kernel.org
+Cc: Michael Callahan <michaelcallahan@fb.com>,
+	Jens Axboe <axboe@fb.com>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Dan Williams <dan.j.williams@intel.com>
+This patch set separates block layer statistics for discards from
+writes.  Discards are currently bundled with writes in the
+various /sys/block/*/stat files as well as in /proc/diskstats.
+However discards are nearly always used to mark storage that is
+no longer in use.  There are many reasons having discard not
+counted with writes is useful:
 
-1/ If a mapping overlaps a bad sector fail the request.
+1) For many non volatile memory devices it is just nice to know
+   that discards are enabled and working properly.
 
-2/ Do not opportunistically report more dax-capable capacity than is
-   requested when errors present.
+2) Discards have different performance characteristics than
+   writes.  They are generally much faster and larger and bundling
+   them makes performance statistics less meaningful.
 
-Signed-off-by: Dan Williams <dan.j.williams@intel.com>
-[vishal: fix a conflict with system RAM collision patches]
-[vishal: add a 'size' parameter to ->direct_access]
-Signed-off-by: Vishal Verma <vishal.l.verma@intel.com>
----
- arch/powerpc/sysdev/axonram.c |  2 +-
- block/ioctl.c                 |  9 ---------
- drivers/block/brd.c           |  2 +-
- drivers/nvdimm/pmem.c         | 10 +++++++++-
- drivers/s390/block/dcssblk.c  |  2 +-
- fs/block_dev.c                |  2 +-
- include/linux/blkdev.h        |  2 +-
- 7 files changed, 14 insertions(+), 15 deletions(-)
+3) Discards are not writes in terms of tracking device lifetime.
+   If a device supports six device writes per day it is nice to know
+   how many writes have actually been written to the device as
+   discards do not count against that total.
 
-diff --git a/arch/powerpc/sysdev/axonram.c b/arch/powerpc/sysdev/axonram.c
-index 0d112b9..ff75d70 100644
---- a/arch/powerpc/sysdev/axonram.c
-+++ b/arch/powerpc/sysdev/axonram.c
-@@ -143,7 +143,7 @@ axon_ram_make_request(struct request_queue *queue, struct bio *bio)
-  */
- static long
- axon_ram_direct_access(struct block_device *device, sector_t sector,
--		       void __pmem **kaddr, pfn_t *pfn)
-+		       void __pmem **kaddr, pfn_t *pfn, long size)
- {
- 	struct axon_ram_bank *bank = device->bd_disk->private_data;
- 	loff_t offset = (loff_t)sector << AXON_RAM_SECTOR_SHIFT;
-diff --git a/block/ioctl.c b/block/ioctl.c
-index 4ff1f92..bf80bfd 100644
---- a/block/ioctl.c
-+++ b/block/ioctl.c
-@@ -423,15 +423,6 @@ bool blkdev_dax_capable(struct block_device *bdev)
- 			|| (bdev->bd_part->nr_sects % (PAGE_SIZE / 512)))
- 		return false;
- 
--	/*
--	 * If the device has known bad blocks, force all I/O through the
--	 * driver / page cache.
--	 *
--	 * TODO: support finer grained dax error handling
--	 */
--	if (disk->bb && disk->bb->count)
--		return false;
--
- 	return true;
- }
- #endif
-diff --git a/drivers/block/brd.c b/drivers/block/brd.c
-index 51a071e..c04bd9b 100644
---- a/drivers/block/brd.c
-+++ b/drivers/block/brd.c
-@@ -381,7 +381,7 @@ static int brd_rw_page(struct block_device *bdev, sector_t sector,
- 
- #ifdef CONFIG_BLK_DEV_RAM_DAX
- static long brd_direct_access(struct block_device *bdev, sector_t sector,
--			void __pmem **kaddr, pfn_t *pfn)
-+			void __pmem **kaddr, pfn_t *pfn, long size)
- {
- 	struct brd_device *brd = bdev->bd_disk->private_data;
- 	struct page *page;
-diff --git a/drivers/nvdimm/pmem.c b/drivers/nvdimm/pmem.c
-index f798899..c447579 100644
---- a/drivers/nvdimm/pmem.c
-+++ b/drivers/nvdimm/pmem.c
-@@ -182,14 +182,22 @@ static int pmem_rw_page(struct block_device *bdev, sector_t sector,
- }
- 
- static long pmem_direct_access(struct block_device *bdev, sector_t sector,
--		      void __pmem **kaddr, pfn_t *pfn)
-+		      void __pmem **kaddr, pfn_t *pfn, long size)
- {
- 	struct pmem_device *pmem = bdev->bd_disk->private_data;
- 	resource_size_t offset = sector * 512 + pmem->data_offset;
- 
-+	if (unlikely(is_bad_pmem(&pmem->bb, sector, size)))
-+		return -EIO;
- 	*kaddr = pmem->virt_addr + offset;
- 	*pfn = phys_to_pfn_t(pmem->phys_addr + offset, pmem->pfn_flags);
- 
-+	/*
-+	 * If badblocks are present, limit known good range to the
-+	 * requested range.
-+	 */
-+	if (unlikely(pmem->bb.count))
-+		return size;
- 	return pmem->size - pmem->pfn_pad - offset;
- }
- 
-diff --git a/drivers/s390/block/dcssblk.c b/drivers/s390/block/dcssblk.c
-index b839086..c45d538 100644
---- a/drivers/s390/block/dcssblk.c
-+++ b/drivers/s390/block/dcssblk.c
-@@ -884,7 +884,7 @@ fail:
- 
- static long
- dcssblk_direct_access (struct block_device *bdev, sector_t secnum,
--			void __pmem **kaddr, pfn_t *pfn)
-+			void __pmem **kaddr, pfn_t *pfn, long size)
- {
- 	struct dcssblk_dev_info *dev_info;
- 	unsigned long offset, dev_sz;
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index b25bb23..02c68c4 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -488,7 +488,7 @@ long bdev_direct_access(struct block_device *bdev, struct blk_dax_ctl *dax)
- 	sector += get_start_sect(bdev);
- 	if (sector % (PAGE_SIZE / 512))
- 		return -EINVAL;
--	avail = ops->direct_access(bdev, sector, &dax->addr, &dax->pfn);
-+	avail = ops->direct_access(bdev, sector, &dax->addr, &dax->pfn, size);
- 	if (!avail)
- 		return -ERANGE;
- 	if (avail > 0 && avail & ~PAGE_MASK)
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 669e419..55ed530 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1657,7 +1657,7 @@ struct block_device_operations {
- 	int (*ioctl) (struct block_device *, fmode_t, unsigned, unsigned long);
- 	int (*compat_ioctl) (struct block_device *, fmode_t, unsigned, unsigned long);
- 	long (*direct_access)(struct block_device *, sector_t, void __pmem **,
--			pfn_t *);
-+			pfn_t *, long);
- 	unsigned int (*check_events) (struct gendisk *disk,
- 				      unsigned int clearing);
- 	/* ->media_changed() is DEPRECATED, use ->check_events() instead */
--- 
-2.5.5
+Separation of discard statistics is accomplished by expanding the
+struct diskstat arrays to 3 entries for STAT_READ, STAT_WRITE,
+and STAT_DISCARD.  A new rw_stat_group function is then used to
+convert from rw_flags (cmd_flags from requests, bi_rw from bios)
+into the appropriate stat group which is then tracked as before.
+Lastly the new statistics are appended to the current
+/sys/bloc/*/stat and /proc/diskstats on output such that they are
+the last four entries of each.  These are analogous to the four
+read and write statistics.
 
+ * Number of discard ios completed
+ * Number of discard ios merged
+ * Number of discard sectors completed
+ * Milliseconds spent on discard requests.
+
+[before ~]# cat sys/block/nvme0/stat
+296550701        0 2372405688 67317193 19672752        0 7972237312
+9375167        0  2787238 79718726
+
+[after ~]# cat sys/block/nvme0/stat
+296550701        0 2372405688 67317193 18034352        0 4616794112
+9125902        0  2787238 79718726  1638400        0 3355443200
+249265
+
+Note that the discards have moved out of the write fields to the
+end and that the write fields are now smaller by the difference.
+
+Adding the new statistics to the end of /sys/block/*/stat and
+/proc/diskstats is backwards compatible with both iostat and
+vmstat which pick up just the old fields:
+
+[root@after ~]# iostat -x
+Linux 4.5.0_68319_ge5065f4-dirty (##hostname###)        05/17/2016
+ _x86_64_        (48 CPU)
+
+avg-cpu:  %user   %nice %system %iowait  %steal   %idle
+           0.41    0.00    0.23    0.01    0.00   99.35
+
+Device:         rrqm/s   wrqm/s     r/s     w/s   rsec/s   wsec/s
+avgrq-sz avgqu-sz   await  svctm  %util
+sda               0.01     7.50    0.20    3.61    16.65   708.41
+190.03     0.09   22.53   1.16   0.44
+nvme0n1           0.00     0.00  587.03   35.70  4696.25  9139.08
+22.22     0.16    0.24   0.01   0.55
+
+
+[root@after ~]# vmstat -d
+disk- ------------reads------------ ------------writes----------- -----IO------
+       total merged sectors      ms  total merged sectors      ms    cur    sec
+ram0       0      0       0       0      0      0       0       0      0      0
+ram1       0      0       0       0      0      0       0       0      0      0
+ram2       0      0       0       0      0      0       0       0      0      0
+ram3       0      0       0       0      0      0       0       0      0      0
+ram4       0      0       0       0      0      0       0       0      0      0
+ram5       0      0       0       0      0      0       0       0      0      0
+ram6       0      0       0       0      0      0       0       0      0      0
+ram7       0      0       0       0      0      0       0       0      0      0
+ram8       0      0       0       0      0      0       0       0      0      0
+ram9       0      0       0       0      0      0       0       0      0      0
+ram10      0      0       0       0      0      0       0       0      0      0
+ram11      0      0       0       0      0      0       0       0      0      0
+ram12      0      0       0       0      0      0       0       0      0      0
+ram13      0      0       0       0      0      0       0       0      0      0
+ram14      0      0       0       0      0      0       0       0      0      0
+ram15      0      0       0       0      0      0       0       0      0      0
+sda   102903   5247 8408420   47424 1820306 3782041 357153613 43320121
+     0   2228
+nvme0n1 145633279      0 1165066312 18981333 13107200      0
+3355443200 6663655      0   1796
+loop0      0      0       0       0      0      0       0       0      0      0
+loop1      0      0       0       0      0      0       0       0      0      0
+  [chop rest of loop devices]
+
+Comments and suggestions welcome.
+
+Signed-off-by: Michael Callahan<michaelcallahan@fb.com>
