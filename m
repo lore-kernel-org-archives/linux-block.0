@@ -1,483 +1,394 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:39558 "EHLO
-	mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752403AbcEKAQo (ORCPT
+Received: from mail-lf0-f68.google.com ([209.85.215.68]:33267 "EHLO
+	mail-lf0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752055AbcEQVxz (ORCPT
 	<rfc822;linux-block@vger.kernel.org>);
-	Tue, 10 May 2016 20:16:44 -0400
-Received: from pps.filterd (m0044010.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.16.0.11/8.16.0.11) with SMTP id u4B0CNDb026368
-	for <linux-block@vger.kernel.org>; Tue, 10 May 2016 17:16:44 -0700
-Received: from mail.thefacebook.com ([199.201.64.23])
-	by mx0a-00082601.pphosted.com with ESMTP id 22usxn80xx-4
-	(version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT)
-	for <linux-block@vger.kernel.org>; Tue, 10 May 2016 17:16:44 -0700
-Received: from facebook.com (2401:db00:11:d0a2:face:0:39:0)	by
- mx-out.facebook.com (10.212.232.59) with ESMTP	id
- a3c8e218170d11e6b52d0002c991e86a-d50dec50 for <linux-block@vger.kernel.org>;
-	Tue, 10 May 2016 17:16:43 -0700
-From: Shaohua Li <shli@fb.com>
-To: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <tj@kernel.org>, <vgoyal@redhat.com>, <axboe@fb.com>,
-	<jmoyer@redhat.com>, <Kernel-team@fb.com>
-Subject: [PATCH 08/10] block-throttle: handle high limit
-Date: Tue, 10 May 2016 17:16:38 -0700
-Message-ID: <097677a8a1e3e2bf89da63e35dc7314126cc9791.1462923578.git.shli@fb.com>
-In-Reply-To: <cover.1462923578.git.shli@fb.com>
-References: <cover.1462923578.git.shli@fb.com>
+	Tue, 17 May 2016 17:53:55 -0400
+Received: by mail-lf0-f68.google.com with SMTP id j8so2043651lfd.0
+        for <linux-block@vger.kernel.org>; Tue, 17 May 2016 14:53:54 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
+Date: Tue, 17 May 2016 15:53:53 -0600
+Message-ID: <CADm5WxNoroL1h09sxksym_imvQCxLNZ1zmTjH-RhOgGQYSyf5A@mail.gmail.com>
+Subject: [PATCH v2 3/4] block: Add and use a rw_stat_group function for
+ indexing partition stat fields.
+From: Michael Callahan <coder.callahan@gmail.com>
+To: linux-block@vger.kernel.org
+Cc: Michael Callahan <michaelcallahan@fb.com>,
+	Jens Axboe <axboe@fb.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Handle high limit like we handle low limit including
-downgrade/upgrade/idle detection logic. If cgroup has high limit, its
-throttling limit is high limit. Otherwise the throttling limit is max
-limit.
+Add and use a new rw_stat_group function for indexing partition stat
+fields rather than indexing them by rq_data_dir or bio_data_dir.  This
+function works similarly to rw_is_sync in that it takes the
+request::cmd_flags or bio::bi_rw flags and determines which stats should
+et updated.
 
-queue downgrades from LIMIT_HIGH/LIMIT_MAX to LIMIT_LOW if cgroup is below
-low limit. queue upgrades from LIMIT_HIGH to LIMIT_MAX if all cgroups
-reach high limit (max limit if no high limit). queue downgrades from
-LIMIT_MAX to LIMIT_HIGH if cgroup is below high limit.
+In addition the first parameter to generic_start_io_acct and
+generic_end_io_acct is now a stat group rather than simply a read or
+write bit.  STAT_READ and STAT_WRITE have been defined such that this
+is backwards compatible but callers who want to track new stats should
+be updated to pass the extended parameter.  This has been done by this
+patch for all current consumers of these two functions.
 
-Signed-off-by: Shaohua Li <shli@fb.com>
+Note that the partition in_flight counts are not part of the per-cpu
+statistics and as such are not indexed via this function.  An additional
+stat_group_to_rw helper macro has been added to more cleanly handle that
+case.
+
+Signed-off-by: Michael Callahan <michaelcallahan@fb.com>
 ---
- block/blk-throttle.c | 278 ++++++++++++++++++++++++++++++++++++++++++---------
- 1 file changed, 230 insertions(+), 48 deletions(-)
+diff --git a/block/bio.c b/block/bio.c
+index 807d25e..79db488 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1678,27 +1678,31 @@ void bio_check_pages_dirty(struct bio *bio)
+        }
+ }
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 5736d1b..0aed049 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -140,6 +140,7 @@ struct throtl_grp {
- 	unsigned int io_disp[2];
- 
- 	unsigned long last_low_overflow_time[2];
-+	unsigned long last_high_overflow_time[2];
- 
- 	uint64_t last_bytes_disp[2];
- 	unsigned int last_io_disp[2];
-@@ -176,6 +177,12 @@ struct throtl_data
- 	unsigned char low_history;
- 	unsigned int low_upgrade_interval;
- 	unsigned int low_downgrade_interval;
-+
-+	unsigned long high_upgrade_time;
-+	unsigned long high_downgrade_time;
-+	unsigned char high_history;
-+	unsigned int high_upgrade_interval;
-+	unsigned int high_downgrade_interval;
- };
- 
- static void throtl_pending_timer_fn(unsigned long arg);
-@@ -1637,6 +1644,52 @@ static unsigned long tg_last_low_overflow_time(struct throtl_grp *tg)
- 	return ret;
- }
- 
-+static unsigned long __tg_last_high_overflow_time(struct throtl_grp *tg)
-+{
-+	unsigned long rtime = -1, wtime = -1;
-+	if (tg->bps[READ][LIMIT_HIGH] != -1 || tg->iops[READ][LIMIT_HIGH] != -1 ||
-+	    tg->bps[READ][LIMIT_MAX] != -1 || tg->iops[READ][LIMIT_MAX] != -1)
-+		rtime = tg->last_high_overflow_time[READ];
-+	if (tg->bps[WRITE][LIMIT_HIGH] != -1 || tg->iops[WRITE][LIMIT_HIGH] != -1 ||
-+	    tg->bps[WRITE][LIMIT_MAX] != -1 || tg->iops[WRITE][LIMIT_MAX] != -1)
-+		wtime = tg->last_high_overflow_time[WRITE];
-+	return min(rtime, wtime);
-+}
-+
-+static unsigned long tg_last_high_overflow_time(struct throtl_grp *tg)
-+{
-+	struct throtl_service_queue *parent_sq;
-+	struct throtl_grp *parent = tg;
-+	unsigned long ret = __tg_last_high_overflow_time(tg);
-+
-+	while (true) {
-+		parent_sq = parent->service_queue.parent_sq;
-+		parent = sq_to_tg(parent_sq);
-+		if (!parent)
-+			break;
-+		if (((parent->bps[READ][LIMIT_HIGH] != -1 &&
-+		      parent->bps[READ][LIMIT_HIGH] > tg->bps[READ][LIMIT_HIGH]) ||
-+		     (parent->bps[READ][LIMIT_HIGH] == -1 &&
-+		      parent->bps[READ][LIMIT_MAX] > tg->bps[READ][LIMIT_HIGH])) &&
-+		    ((parent->bps[WRITE][LIMIT_HIGH] != -1 &&
-+		      parent->bps[WRITE][LIMIT_HIGH] > tg->bps[WRITE][LIMIT_HIGH]) ||
-+		     (parent->bps[WRITE][LIMIT_HIGH] == -1 &&
-+		      parent->bps[WRITE][LIMIT_MAX] > tg->bps[WRITE][LIMIT_HIGH])) &&
-+		    ((parent->iops[READ][LIMIT_HIGH] != -1 &&
-+		      parent->iops[READ][LIMIT_HIGH] > tg->iops[READ][LIMIT_HIGH]) ||
-+		     (parent->iops[READ][LIMIT_HIGH] == -1 &&
-+		      parent->iops[READ][LIMIT_MAX] > tg->iops[READ][LIMIT_HIGH])) &&
-+		    ((parent->iops[WRITE][LIMIT_HIGH] != -1 &&
-+		      parent->iops[WRITE][LIMIT_HIGH] > tg->iops[WRITE][LIMIT_HIGH]) ||
-+		     (parent->iops[WRITE][LIMIT_HIGH] == -1 &&
-+		      parent->iops[WRITE][LIMIT_MAX] > tg->iops[WRITE][LIMIT_HIGH])))
-+			break;
-+		if (time_after(__tg_last_high_overflow_time(parent), ret))
-+			ret = __tg_last_high_overflow_time(parent);
-+	}
-+	return ret;
-+}
-+
- static void throtl_calculate_low_interval(struct throtl_data *td)
+-void generic_start_io_acct(int rw, unsigned long sectors,
++void generic_start_io_acct(int rw_flags, unsigned long sectors,
+                           struct hd_struct *part)
  {
- 	unsigned long history = td->low_history;
-@@ -1656,10 +1709,32 @@ static void throtl_calculate_low_interval(struct throtl_data *td)
- 	}
- }
- 
-+static void throtl_calculate_high_interval(struct throtl_data *td)
-+{
-+	unsigned long history = td->high_history;
-+	unsigned int ubits = bitmap_weight(&history,
-+		sizeof(td->high_history) * 8);
-+	unsigned int dbits = sizeof(td->high_history) * 8 - ubits;
-+
-+	ubits = max(1U, ubits);
-+	dbits = max(1U, dbits);
-+
-+	if (ubits >= dbits) {
-+		td->high_upgrade_interval = ubits / dbits * cg_check_time;
-+		td->high_downgrade_interval = cg_check_time;
-+	} else {
-+		td->high_upgrade_interval = cg_check_time;
-+		td->high_downgrade_interval = dbits / ubits * cg_check_time;
-+	}
-+}
-+
- static bool throtl_upgrade_check_one(struct throtl_grp *tg, bool *idle)
- {
- 	struct throtl_service_queue *sq = &tg->service_queue;
- 
-+	if (tg->td->limit_index == LIMIT_HIGH)
-+		goto check_high;
-+
- 	if (!tg->bps[READ][LIMIT_LOW] && !tg->bps[WRITE][LIMIT_LOW] &&
- 	    !tg->iops[READ][LIMIT_LOW] && !tg->iops[WRITE][LIMIT_LOW])
- 		return true;
-@@ -1680,6 +1755,18 @@ static bool throtl_upgrade_check_one(struct throtl_grp *tg, bool *idle)
- 	if (tg->iops[WRITE][LIMIT_LOW] != 0 && !sq->nr_queued[WRITE])
- 		return false;
- 	return true;
-+check_high:
-+	/* if cgroup is below high limit for a long time, consider it idle */
-+	if (time_after(jiffies,
-+	    tg_last_high_overflow_time(tg) + tg->td->high_upgrade_interval)) {
-+		*idle = true;
-+		return true;
-+	}
-+
-+	/* if cgroup reaches high/max limit, it's ok to next limit */
-+	if (sq->nr_queued[READ] || sq->nr_queued[WRITE])
-+		return true;
-+	return false;
- }
- 
- static bool throtl_upgrade_check_hierarchy(struct throtl_grp *tg, bool *idle)
-@@ -1704,11 +1791,15 @@ static bool throtl_can_upgrade(struct throtl_data *td,
- 	struct blkcg_gq *blkg;
- 	bool idle = false;
- 
--	if (td->limit_index != LIMIT_LOW)
-+	if (td->limit_index != LIMIT_LOW && td->limit_index != LIMIT_HIGH)
- 		return false;
- 
--	if (td->limit_index == LIMIT_LOW && time_before(jiffies,
--	    td->low_downgrade_time + td->low_upgrade_interval))
-+	if ((td->limit_index == LIMIT_LOW &&
-+	     time_before(jiffies,
-+	      td->low_downgrade_time + td->low_upgrade_interval)) ||
-+	    (td->limit_index == LIMIT_HIGH &&
-+	     time_before(jiffies,
-+	      td->high_downgrade_time + td->high_upgrade_interval)))
- 		return false;
- 
- 	blkg_for_each_descendant_post(blkg, pos_css, td->queue->root_blkg) {
-@@ -1726,6 +1817,11 @@ static bool throtl_can_upgrade(struct throtl_data *td,
- 		if (!idle)
- 			td->low_history |= 1;
- 		throtl_calculate_low_interval(td);
-+	} else {
-+		td->high_history <<= 1;
-+		if (!idle)
-+			td->high_history |= 1;
-+		throtl_calculate_high_interval(td);
- 	}
- 	return true;
- }
-@@ -1734,9 +1830,21 @@ static void throtl_upgrade_state(struct throtl_data *td)
- {
- 	struct cgroup_subsys_state *pos_css;
- 	struct blkcg_gq *blkg;
-+	int old = td->limit_index;
- 
--	td->limit_index = LIMIT_MAX;
-+	td->limit_index++;
-+	while (!td->limit_valid[td->limit_index])
-+		td->limit_index++;
- 	td->low_upgrade_time = jiffies;
-+	if (td->limit_index == LIMIT_HIGH)
-+		td->high_downgrade_time = jiffies;
-+	if (td->limit_index >= LIMIT_HIGH)
-+		td->high_upgrade_time = jiffies;
-+	/* high to max */
-+	if (td->limit_index == LIMIT_MAX && old == LIMIT_HIGH) {
-+		td->low_history = DEFAULT_HISTORY;
-+		throtl_calculate_low_interval(td);
-+	}
- 	blkg_for_each_descendant_post(blkg, pos_css, td->queue->root_blkg) {
- 		struct throtl_grp *tg = blkg_to_tg(blkg);
- 		struct throtl_service_queue *sq = &tg->service_queue;
-@@ -1752,13 +1860,18 @@ static void throtl_upgrade_state(struct throtl_data *td)
- 
- static void throtl_upgrade_check(struct throtl_grp *tg)
- {
--	if (tg->td->limit_index != LIMIT_LOW)
-+	if (tg->td->limit_index != LIMIT_LOW &&
-+	    tg->td->limit_index != LIMIT_HIGH)
- 		return;
- 
--	if (!(tg->bps[READ][LIMIT_LOW] || tg->bps[WRITE][LIMIT_LOW] ||
--	      tg->iops[READ][LIMIT_LOW] || tg->iops[WRITE][LIMIT_LOW]) ||
--	    !time_after(jiffies,
--	     tg_last_low_overflow_time(tg) + tg->td->low_upgrade_interval))
-+	if ((tg->td->limit_index == LIMIT_LOW &&
-+	     (!(tg->bps[READ][LIMIT_LOW] || tg->bps[WRITE][LIMIT_LOW] ||
-+	        tg->iops[READ][LIMIT_LOW] || tg->iops[WRITE][LIMIT_LOW]) ||
-+	      !time_after(jiffies,
-+	       tg_last_low_overflow_time(tg) + tg->td->low_upgrade_interval))) ||
-+	    (tg->td->limit_index == LIMIT_HIGH &&
-+	     !time_after(jiffies,
-+	      tg_last_high_overflow_time(tg) + tg->td->high_upgrade_interval)))
- 		return;
- 
- 	if (throtl_can_upgrade(tg->td, NULL))
-@@ -1767,11 +1880,32 @@ static void throtl_upgrade_check(struct throtl_grp *tg)
- 
- static void throtl_downgrade_state(struct throtl_data *td, int new)
- {
-+	int old = td->limit_index;
-+
- 	td->limit_index = new;
-+	/* max crosses high to low */
-+	if (new == LIMIT_LOW && old == LIMIT_MAX && td->limit_valid[LIMIT_HIGH]) {
-+		td->low_downgrade_time = jiffies;
-+		td->low_upgrade_time = jiffies;
-+		td->low_history = 0xFF; /* do less upgrade later */
-+		throtl_calculate_low_interval(td);
-+
-+		td->high_downgrade_time = jiffies;
-+		td->high_upgrade_time = jiffies;
-+		td->high_history = 0xFF; /* do less upgrade later */
-+		throtl_calculate_high_interval(td);
-+		return;
-+	}
-+	/* max to high */
-+	if (new == LIMIT_HIGH) {
-+		td->high_downgrade_time = jiffies;
-+		return;
-+	}
-+
- 	td->low_downgrade_time = jiffies;
- }
- 
--static bool throtl_downgrade_check_one(struct throtl_grp *tg)
-+static bool throtl_downgrade_check_one(struct throtl_grp *tg, bool check_low)
- {
- 	struct throtl_data *td = tg->td;
- 	unsigned long now = jiffies;
-@@ -1780,24 +1914,30 @@ static bool throtl_downgrade_check_one(struct throtl_grp *tg)
- 	 * If cgroup is below low limit, consider downgrade and throttle other
- 	 * cgroups
- 	 */
--	if (time_after(now,
--	     td->low_upgrade_time + td->low_downgrade_interval) &&
--	    time_after(now,
--	     tg_last_low_overflow_time(tg) + td->low_downgrade_interval))
-+	if ((check_low &&
-+	     time_after(now,
-+	      td->low_upgrade_time + td->low_downgrade_interval) &&
-+	     time_after(now,
-+	      tg_last_low_overflow_time(tg) + td->low_downgrade_interval)) ||
-+	    (!check_low &&
-+	     time_after(now,
-+	      td->high_upgrade_time + td->high_downgrade_interval) &&
-+	     time_after(now,
-+	      tg_last_high_overflow_time(tg) + td->high_downgrade_interval)))
- 		return true;
- 	return false;
- }
- 
--static bool throtl_downgrade_check_hierarchy(struct throtl_grp *tg)
-+static bool throtl_downgrade_check_hierarchy(struct throtl_grp *tg, bool check_low)
- {
--	if (!throtl_downgrade_check_one(tg))
-+	if (!throtl_downgrade_check_one(tg, check_low))
- 		return false;
- 	while (true) {
- 		if (!tg || (cgroup_subsys_on_dfl(io_cgrp_subsys) &&
- 			    !tg_to_blkg(tg)->parent))
- 			break;
- 
--		if (!throtl_downgrade_check_one(tg))
-+		if (!throtl_downgrade_check_one(tg, check_low))
- 			return false;
- 		tg = sq_to_tg(tg->service_queue.parent_sq);
- 	}
-@@ -1810,52 +1950,84 @@ static void throtl_downgrade_check(struct throtl_grp *tg)
- 	unsigned int iops;
- 	unsigned long elapsed_time;
- 	unsigned long now = jiffies;
-+	bool check_low;
-+	bool check_high;
- 
--	if (tg->td->limit_index != LIMIT_MAX)
-+	if (tg->td->limit_index == LIMIT_LOW)
- 		return;
--	if (!(tg->bps[READ][LIMIT_LOW] ||
--	      tg->bps[WRITE][LIMIT_LOW] ||
--	      tg->iops[WRITE][LIMIT_LOW] ||
--	      tg->iops[READ][LIMIT_LOW]))
-+	if (!tg->td->limit_valid[LIMIT_LOW] && !tg->td->limit_valid[LIMIT_HIGH])
- 		return;
--
- 	if (time_after(tg->last_check_time + throtl_slice, now))
- 		return;
-+	check_low = tg->bps[READ][LIMIT_LOW] ||
-+		    tg->bps[WRITE][LIMIT_LOW] ||
-+		    tg->iops[READ][LIMIT_LOW] ||
-+		    tg->iops[WRITE][LIMIT_LOW];
-+	check_high = tg->bps[READ][LIMIT_HIGH] != -1 ||
-+		     tg->bps[WRITE][LIMIT_HIGH] != -1 ||
-+		     tg->iops[READ][LIMIT_HIGH] != -1 ||
-+		     tg->iops[WRITE][LIMIT_HIGH] != -1 ||
-+		     (tg->td->limit_valid[LIMIT_HIGH] &&
-+		      (tg->bps[READ][LIMIT_MAX] != -1 ||
-+		       tg->bps[WRITE][LIMIT_MAX] != -1 ||
-+		       tg->iops[READ][LIMIT_MAX] != -1 ||
-+		       tg->iops[WRITE][LIMIT_MAX] != -1) &&
-+		      time_before(now, tg_last_high_overflow_time(tg) +
-+		       tg->td->high_downgrade_interval));
-+
- 	elapsed_time = now - tg->last_check_time;
- 	tg->last_check_time = now;
- 
--	if (tg->bps[READ][LIMIT_LOW]) {
--		bps = tg->last_bytes_disp[READ] * HZ;
--		do_div(bps, elapsed_time);
--		if (bps >= tg->bps[READ][LIMIT_LOW])
--			tg->last_low_overflow_time[READ] = now;
--	}
--
--	if (tg->bps[WRITE][LIMIT_LOW]) {
--		bps = tg->last_bytes_disp[WRITE] * HZ;
--		do_div(bps, elapsed_time);
--		if (bps >= tg->bps[WRITE][LIMIT_LOW])
--			tg->last_low_overflow_time[WRITE] = now;
--	}
--
--	if (tg->iops[READ][LIMIT_LOW]) {
--		iops = tg->last_io_disp[READ] * HZ / elapsed_time;
--		if (iops >= tg->iops[READ][LIMIT_LOW])
--			tg->last_low_overflow_time[READ] = now;
--	}
-+	if (!check_low && !check_high)
-+		return;
- 
--	if (tg->iops[WRITE][LIMIT_LOW]) {
--		iops = tg->last_io_disp[WRITE] * HZ / elapsed_time;
--		if (iops >= tg->iops[WRITE][LIMIT_LOW])
--			tg->last_low_overflow_time[WRITE] = now;
--	}
-+	bps = tg->last_bytes_disp[READ] * HZ;
-+	do_div(bps, elapsed_time);
-+	if (tg->bps[READ][LIMIT_LOW] != 0 &&
-+	    bps >= tg->bps[READ][LIMIT_LOW])
-+		tg->last_low_overflow_time[READ] = now;
-+	if ((tg->bps[READ][LIMIT_HIGH] != -1 &&
-+	     bps >= tg->bps[READ][LIMIT_HIGH]) ||
-+	    bps >= tg->bps[READ][LIMIT_MAX])
-+		tg->last_high_overflow_time[READ] = now;
-+
-+	bps = tg->last_bytes_disp[WRITE] * HZ;
-+	do_div(bps, elapsed_time);
-+	if (tg->bps[WRITE][LIMIT_LOW] != 0 &&
-+	    bps >= tg->bps[WRITE][LIMIT_LOW])
-+		tg->last_low_overflow_time[WRITE] = now;
-+	if ((tg->bps[WRITE][LIMIT_HIGH] != -1 &&
-+	     bps >= tg->bps[WRITE][LIMIT_HIGH]) ||
-+	    bps >= tg->bps[WRITE][LIMIT_MAX])
-+		tg->last_high_overflow_time[WRITE] = now;
-+
-+	iops = tg->last_io_disp[READ] * HZ / elapsed_time;
-+	if (tg->iops[READ][LIMIT_LOW] != 0 &&
-+	    iops >= tg->iops[READ][LIMIT_LOW])
-+		tg->last_low_overflow_time[READ] = now;
-+	if ((tg->iops[READ][LIMIT_HIGH] != -1 &&
-+	     iops >= tg->iops[READ][LIMIT_HIGH]) ||
-+	    iops >= tg->iops[READ][LIMIT_MAX])
-+		tg->last_high_overflow_time[READ] = now;
-+
-+	iops = tg->last_io_disp[WRITE] * HZ / elapsed_time;
-+	if (tg->iops[WRITE][LIMIT_LOW] != 0 &&
-+	    iops >= tg->iops[WRITE][LIMIT_LOW])
-+		tg->last_low_overflow_time[WRITE] = now;
-+	if ((tg->iops[WRITE][LIMIT_HIGH] != -1 &&
-+	     iops >= tg->iops[WRITE][LIMIT_HIGH]) ||
-+	    iops >= tg->iops[WRITE][LIMIT_MAX])
-+		tg->last_high_overflow_time[WRITE] = now;
- 
- 	/*
- 	 * If cgroup is below low limit, consider downgrade and throttle other
- 	 * cgroups
- 	 */
--	if (throtl_downgrade_check_hierarchy(tg))
-+	if (check_low && throtl_downgrade_check_hierarchy(tg, true))
- 		throtl_downgrade_state(tg->td, LIMIT_LOW);
-+	else if (tg->td->limit_index == LIMIT_MAX && check_high &&
-+		   throtl_downgrade_check_hierarchy(tg, false))
-+		throtl_downgrade_state(tg->td, LIMIT_HIGH);
- 
- 	tg->last_bytes_disp[READ] = 0;
- 	tg->last_bytes_disp[WRITE] = 0;
-@@ -1889,6 +2061,8 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
- 	while (true) {
- 		if (tg->last_low_overflow_time[rw] == 0)
- 			tg->last_low_overflow_time[rw] = jiffies;
-+		if (tg->last_high_overflow_time[rw] == 0)
-+			tg->last_high_overflow_time[rw] = jiffies;
- 		throtl_downgrade_check(tg);
- 		throtl_upgrade_check(tg);
- 		/* throtl is FIFO - if bios are already queued, should queue */
-@@ -1898,6 +2072,8 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
- 		/* if above limits, break to queue */
- 		if (!tg_may_dispatch(tg, bio, NULL)) {
- 			tg->last_low_overflow_time[rw] = jiffies;
-+			if (tg->td->limit_index >= LIMIT_HIGH)
-+				tg->last_high_overflow_time[rw] = jiffies;
- 			if (throtl_can_upgrade(tg->td, tg)) {
- 				throtl_upgrade_state(tg->td);
- 				goto again;
-@@ -1941,6 +2117,8 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
- 		   sq->nr_queued[READ], sq->nr_queued[WRITE]);
- 
- 	tg->last_low_overflow_time[rw] = jiffies;
-+	if (tg->td->limit_index >= LIMIT_HIGH)
-+		tg->last_high_overflow_time[rw] = jiffies;
- 
- 	bio_associate_current(bio);
- 	tg->td->nr_queued[rw]++;
-@@ -2058,6 +2236,10 @@ int blk_throtl_init(struct request_queue *q)
- 	td->low_downgrade_time = jiffies;
- 	td->low_history = DEFAULT_HISTORY;
- 	throtl_calculate_low_interval(td);
-+	td->high_upgrade_time = jiffies;
-+	td->high_downgrade_time = jiffies;
-+	td->high_history = DEFAULT_HISTORY;
-+	throtl_calculate_high_interval(td);
- 	/* activate policy */
- 	ret = blkcg_activate_policy(q, &blkcg_policy_throtl);
- 	if (ret)
--- 
-2.8.0.rc2
++       const int sgrp = rw_stat_group(rw_flags);
++       const int rw = (rw_flags & REQ_WRITE) != 0;
+        int cpu = part_stat_lock();
 
+        part_round_stats(cpu, part);
+-       part_stat_inc(cpu, part, ios[rw]);
+-       part_stat_add(cpu, part, sectors[rw], sectors);
++       part_stat_inc(cpu, part, ios[sgrp]);
++       part_stat_add(cpu, part, sectors[sgrp], sectors);
+        part_inc_in_flight(part, rw);
+
+        part_stat_unlock();
+ }
+ EXPORT_SYMBOL(generic_start_io_acct);
+
+-void generic_end_io_acct(int rw, struct hd_struct *part,
++void generic_end_io_acct(int rw_flags, struct hd_struct *part,
+                         unsigned long start_time)
+ {
+        unsigned long duration = jiffies - start_time;
++       const int sgrp = rw_stat_group(rw_flags);
++       const int rw = (rw_flags & REQ_WRITE) != 0;
+        int cpu = part_stat_lock();
+
+-       part_stat_add(cpu, part, ticks[rw], duration);
++       part_stat_add(cpu, part, ticks[sgrp], duration);
+        part_round_stats(cpu, part);
+        part_dec_in_flight(part, rw);
+
+diff --git a/block/blk-core.c b/block/blk-core.c
+index b60537b..1459e9c 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -2273,13 +2273,13 @@ EXPORT_SYMBOL_GPL(blk_rq_err_bytes);
+ void blk_account_io_completion(struct request *req, unsigned int bytes)
+ {
+        if (blk_do_io_stat(req)) {
+-               const int rw = rq_data_dir(req);
++               const int sgrp = rw_stat_group(req->cmd_flags);
+                struct hd_struct *part;
+                int cpu;
+
+                cpu = part_stat_lock();
+                part = req->part;
+-               part_stat_add(cpu, part, sectors[rw], bytes >> 9);
++               part_stat_add(cpu, part, sectors[sgrp], bytes >> 9);
+                part_stat_unlock();
+        }
+ }
+@@ -2293,6 +2293,7 @@ void blk_account_io_done(struct request *req)
+         */
+        if (blk_do_io_stat(req) && !(req->cmd_flags & REQ_FLUSH_SEQ)) {
+                unsigned long duration = jiffies - req->start_time;
++               const int sgrp = rw_stat_group(req->cmd_flags);
+                const int rw = rq_data_dir(req);
+                struct hd_struct *part;
+                int cpu;
+@@ -2300,8 +2301,8 @@ void blk_account_io_done(struct request *req)
+                cpu = part_stat_lock();
+                part = req->part;
+
+-               part_stat_inc(cpu, part, ios[rw]);
+-               part_stat_add(cpu, part, ticks[rw], duration);
++               part_stat_inc(cpu, part, ios[sgrp]);
++               part_stat_add(cpu, part, ticks[sgrp], duration);
+                part_round_stats(cpu, part);
+                part_dec_in_flight(part, rw);
+
+diff --git a/drivers/block/drbd/drbd_req.c b/drivers/block/drbd/drbd_req.c
+index 2255dcf..6f31f67 100644
+--- a/drivers/block/drbd/drbd_req.c
++++ b/drivers/block/drbd/drbd_req.c
+@@ -36,14 +36,14 @@ static bool drbd_may_do_local_read(struct
+drbd_device *device, sector_t sector,
+ /* Update disk stats at start of I/O request */
+ static void _drbd_start_io_acct(struct drbd_device *device, struct
+drbd_request *req)
+ {
+-       generic_start_io_acct(bio_data_dir(req->master_bio), req->i.size >> 9,
++       generic_start_io_acct(req->master_bio->bi_rw, req->i.size >> 9,
+                              &device->vdisk->part0);
+ }
+
+ /* Update disk stats when completing request upwards */
+ static void _drbd_end_io_acct(struct drbd_device *device, struct
+drbd_request *req)
+ {
+-       generic_end_io_acct(bio_data_dir(req->master_bio),
++       generic_end_io_acct(req->master_bio->bi_rw,
+                            &device->vdisk->part0, req->start_jif);
+ }
+
+diff --git a/drivers/block/rsxx/dev.c b/drivers/block/rsxx/dev.c
+index e1b8b70..17ab33f 100644
+--- a/drivers/block/rsxx/dev.c
++++ b/drivers/block/rsxx/dev.c
+@@ -112,7 +112,7 @@ static const struct block_device_operations rsxx_fops = {
+
+ static void disk_stats_start(struct rsxx_cardinfo *card, struct bio *bio)
+ {
+-       generic_start_io_acct(bio_data_dir(bio), bio_sectors(bio),
++       generic_start_io_acct(bio->bi_rw, bio_sectors(bio),
+                             &card->gendisk->part0);
+ }
+
+@@ -120,8 +120,7 @@ static void disk_stats_complete(struct rsxx_cardinfo *card,
+                                struct bio *bio,
+                                unsigned long start_time)
+ {
+-       generic_end_io_acct(bio_data_dir(bio), &card->gendisk->part0,
+-                          start_time);
++       generic_end_io_acct(bio->bi_rw, &card->gendisk->part0, start_time);
+ }
+
+ static void bio_dma_done_cb(struct rsxx_cardinfo *card,
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index 370c2f7..31811a0 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -810,12 +810,12 @@ static void zram_bio_discard(struct zram *zram, u32 index,
+ }
+
+ static int zram_bvec_rw(struct zram *zram, struct bio_vec *bvec, u32 index,
+-                       int offset, int rw)
++                       int offset, int rw, int rw_flags)
+ {
+        unsigned long start_time = jiffies;
+        int ret;
+
+-       generic_start_io_acct(rw, bvec->bv_len >> SECTOR_SHIFT,
++       generic_start_io_acct(rw_flags, bvec->bv_len >> SECTOR_SHIFT,
+                        &zram->disk->part0);
+
+        if (rw == READ) {
+@@ -826,7 +826,7 @@ static int zram_bvec_rw(struct zram *zram, struct
+bio_vec *bvec, u32 index,
+                ret = zram_bvec_write(zram, bvec, index, offset);
+        }
+
+-       generic_end_io_acct(rw, &zram->disk->part0, start_time);
++       generic_end_io_acct(rw_flags, &zram->disk->part0, start_time);
+
+        if (unlikely(ret)) {
+                if (rw == READ)
+@@ -870,15 +870,15 @@ static void __zram_make_request(struct zram
+*zram, struct bio *bio)
+                        bv.bv_len = max_transfer_size;
+                        bv.bv_offset = bvec.bv_offset;
+
+-                       if (zram_bvec_rw(zram, &bv, index, offset, rw) < 0)
++                       if (zram_bvec_rw(zram, &bv, index, offset, rw,
+bio->bi_rw) < 0)
+                                goto out;
+
+                        bv.bv_len = bvec.bv_len - max_transfer_size;
+                        bv.bv_offset += max_transfer_size;
+-                       if (zram_bvec_rw(zram, &bv, index + 1, 0, rw) < 0)
++                       if (zram_bvec_rw(zram, &bv, index + 1, 0, rw,
+bio->bi_rw) < 0)
+                                goto out;
+                } else
+-                       if (zram_bvec_rw(zram, &bvec, index, offset, rw) < 0)
++                       if (zram_bvec_rw(zram, &bvec, index, offset,
+rw, bio->bi_rw) < 0)
+                                goto out;
+
+                update_position(&index, &offset, &bvec);
+@@ -959,7 +959,7 @@ static int zram_rw_page(struct block_device *bdev,
+sector_t sector,
+        bv.bv_len = PAGE_SIZE;
+        bv.bv_offset = 0;
+
+-       err = zram_bvec_rw(zram, &bv, index, offset, rw);
++       err = zram_bvec_rw(zram, &bv, index, offset, rw, rw ? REQ_WRITE : 0);
+ put_zram:
+        zram_meta_put(zram);
+ out:
+diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
+index 25fa844..3319ce1 100644
+--- a/drivers/md/bcache/request.c
++++ b/drivers/md/bcache/request.c
+@@ -609,7 +609,7 @@ static void request_endio(struct bio *bio)
+ static void bio_complete(struct search *s)
+ {
+        if (s->orig_bio) {
+-               generic_end_io_acct(bio_data_dir(s->orig_bio),
++               generic_end_io_acct(s->orig_bio->bi_rw,
+                                    &s->d->disk->part0, s->start_time);
+
+                trace_bcache_request_end(s->d, s->orig_bio);
+@@ -964,9 +964,9 @@ static blk_qc_t cached_dev_make_request(struct
+request_queue *q,
+        struct search *s;
+        struct bcache_device *d = bio->bi_bdev->bd_disk->private_data;
+        struct cached_dev *dc = container_of(d, struct cached_dev, disk);
+-       int rw = bio_data_dir(bio);
++       const int rw = bio_data_dir(bio);
+
+-       generic_start_io_acct(rw, bio_sectors(bio), &d->disk->part0);
++       generic_start_io_acct(bio->bi_rw, bio_sectors(bio), &d->disk->part0);
+
+        bio->bi_bdev = dc->bdev;
+        bio->bi_iter.bi_sector += dc->sb.data_offset;
+@@ -1079,9 +1079,9 @@ static blk_qc_t flash_dev_make_request(struct
+request_queue *q,
+        struct search *s;
+        struct closure *cl;
+        struct bcache_device *d = bio->bi_bdev->bd_disk->private_data;
+-       int rw = bio_data_dir(bio);
++       const int rw = bio_data_dir(bio);
+
+-       generic_start_io_acct(rw, bio_sectors(bio), &d->disk->part0);
++       generic_start_io_acct(bio->bi_rw, bio_sectors(bio), &d->disk->part0);
+
+        s = search_alloc(bio, d);
+        cl = &s->cl;
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index 3d3ac13..d692c23 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -733,9 +733,9 @@ static void end_io_acct(struct dm_io *io)
+        struct bio *bio = io->bio;
+        unsigned long duration = jiffies - io->start_time;
+        int pending;
+-       int rw = bio_data_dir(bio);
++       const int rw = bio_data_dir(bio);
+
+-       generic_end_io_acct(rw, &dm_disk(md)->part0, io->start_time);
++       generic_end_io_acct(bio->bi_rw, &dm_disk(md)->part0, io->start_time);
+
+        if (unlikely(dm_stats_used(&md->stats)))
+                dm_stats_account_io(&md->stats, bio->bi_rw,
+bio->bi_iter.bi_sector,
+@@ -1820,14 +1820,13 @@ static void __split_and_process_bio(struct
+mapped_device *md,
+  */
+ static blk_qc_t dm_make_request(struct request_queue *q, struct bio *bio)
+ {
+-       int rw = bio_data_dir(bio);
+        struct mapped_device *md = q->queuedata;
+        int srcu_idx;
+        struct dm_table *map;
+
+        map = dm_get_live_table(md, &srcu_idx);
+
+-       generic_start_io_acct(rw, bio_sectors(bio), &dm_disk(md)->part0);
++       generic_start_io_acct(bio->bi_rw, bio_sectors(bio),
+&dm_disk(md)->part0);
+
+        /* if we're suspended, we have to queue this io for later */
+        if (unlikely(test_bit(DMF_BLOCK_IO_FOR_SUSPEND, &md->flags))) {
+diff --git a/drivers/md/md.c b/drivers/md/md.c
+index 9fc8d1e..fd83843 100644
+--- a/drivers/md/md.c
++++ b/drivers/md/md.c
+@@ -245,6 +245,7 @@ static DEFINE_SPINLOCK(all_mddevs_lock);
+ static blk_qc_t md_make_request(struct request_queue *q, struct bio *bio)
+ {
+        const int rw = bio_data_dir(bio);
++       const int sgrp = rw_stat_group(bio->bi_rw);
+        struct mddev *mddev = q->queuedata;
+        unsigned int sectors;
+        int cpu;
+@@ -289,8 +290,8 @@ static blk_qc_t md_make_request(struct
+request_queue *q, struct bio *bio)
+        mddev->pers->make_request(mddev, bio);
+
+        cpu = part_stat_lock();
+-       part_stat_inc(cpu, &mddev->gendisk->part0, ios[rw]);
+-       part_stat_add(cpu, &mddev->gendisk->part0, sectors[rw], sectors);
++       part_stat_inc(cpu, &mddev->gendisk->part0, ios[sgrp]);
++       part_stat_add(cpu, &mddev->gendisk->part0, sectors[sgrp], sectors);
+        part_stat_unlock();
+
+        if (atomic_dec_and_test(&mddev->active_io) && mddev->suspended)
+diff --git a/drivers/nvdimm/core.c b/drivers/nvdimm/core.c
+index 182a93f..7e6ab85 100644
+--- a/drivers/nvdimm/core.c
++++ b/drivers/nvdimm/core.c
+@@ -219,12 +219,13 @@ void __nd_iostat_start(struct bio *bio, unsigned
+long *start)
+ {
+        struct gendisk *disk = bio->bi_bdev->bd_disk;
+        const int rw = bio_data_dir(bio);
++       const int sgrp = rw_stat_group(bio->bi_rw);
+        int cpu = part_stat_lock();
+
+        *start = jiffies;
+        part_round_stats(cpu, &disk->part0);
+-       part_stat_inc(cpu, &disk->part0, ios[rw]);
+-       part_stat_add(cpu, &disk->part0, sectors[rw], bio_sectors(bio));
++       part_stat_inc(cpu, &disk->part0, ios[sgrp]);
++       part_stat_add(cpu, &disk->part0, sectors[sgrp], bio_sectors(bio));
+        part_inc_in_flight(&disk->part0, rw);
+        part_stat_unlock();
+ }
+@@ -234,10 +235,11 @@ void nd_iostat_end(struct bio *bio, unsigned long start)
+ {
+        struct gendisk *disk = bio->bi_bdev->bd_disk;
+        unsigned long duration = jiffies - start;
++       const int sgrp = rw_stat_group(bio->bi_rw);
+        const int rw = bio_data_dir(bio);
+        int cpu = part_stat_lock();
+
+-       part_stat_add(cpu, &disk->part0, ticks[rw], duration);
++       part_stat_add(cpu, &disk->part0, ticks[sgrp], duration);
+        part_round_stats(cpu, &disk->part0);
+        part_dec_in_flight(&disk->part0, rw);
+        part_stat_unlock();
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index 6b7481f..a13ac5a 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -494,9 +494,9 @@ extern struct bio *bio_copy_kern(struct
+request_queue *, void *, unsigned int,
+ extern void bio_set_pages_dirty(struct bio *bio);
+ extern void bio_check_pages_dirty(struct bio *bio);
+
+-void generic_start_io_acct(int rw, unsigned long sectors,
++void generic_start_io_acct(int rw_flags, unsigned long sectors,
+                           struct hd_struct *part);
+-void generic_end_io_acct(int rw, struct hd_struct *part,
++void generic_end_io_acct(int rw_flags, struct hd_struct *part,
+                         unsigned long start_time);
+
+ #ifndef ARCH_IMPLEMENTS_FLUSH_DCACHE_PAGE
+diff --git a/include/linux/genhd.h b/include/linux/genhd.h
+index 19e809c..db96322 100644
+--- a/include/linux/genhd.h
++++ b/include/linux/genhd.h
+@@ -434,6 +434,11 @@ static inline void free_part_info(struct hd_struct *part)
+        kfree(part->info);
+ }
+
++static inline int rw_stat_group(unsigned int rw_flags)
++{
++       return (rw_flags & REQ_WRITE) != 0;
++}
++
+ /* block/blk-core.c */
+ extern void part_round_stats(int cpu, struct hd_struct *part);
