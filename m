@@ -1,185 +1,249 @@
-Return-Path: <jslaby@suse.cz>
-From: Jiri Slaby <jslaby@suse.cz>
-To: stable@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	Roman Pen <roman.penyaev@profitbricks.com>,
-	Gioh Kim <gi-oh.kim@profitbricks.com>,
-	Michael Wang <yun.wang@profitbricks.com>,
-	Tejun Heo <tj@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	Jiri Slaby <jslaby@suse.cz>
-Subject: [PATCH 3.12 14/76] workqueue: fix ghost PENDING flag while doing MQ IO
-Date: Thu, 19 May 2016 11:07:36 +0200
-Message-Id: <4aa63af38d182aa029283e109b0e3b390b3fb7c3.1463648873.git.jslaby@suse.cz>
-In-Reply-To: <c4ec97c341630e22e546c1a628a3664f17f7ffc8.1463648873.git.jslaby@suse.cz>
-References: <c4ec97c341630e22e546c1a628a3664f17f7ffc8.1463648873.git.jslaby@suse.cz>
-In-Reply-To: <cover.1463648873.git.jslaby@suse.cz>
-References: <cover.1463648873.git.jslaby@suse.cz>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga01.intel.com ([192.55.52.88]:25906 "EHLO mga01.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754133AbcERU5P (ORCPT <rfc822;linux-block@vger.kernel.org>);
+	Wed, 18 May 2016 16:57:15 -0400
+Subject: [PATCH v3 4/5] Revert "block: enable dax for raw block devices"
+From: Dan Williams <dan.j.williams@intel.com>
+To: linux-nvdimm@lists.01.org
+Cc: Jan Kara <jack@suse.com>, Dave Chinner <david@fromorbit.com>,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	Jeff Moyer <jmoyer@redhat.com>,
+	Ross Zwisler <ross.zwisler@linux.intel.com>,
+	Andrew Morton <akpm@linux-foundation.org>, hch@lst.de
+Date: Wed, 18 May 2016 13:56:27 -0700
+Message-ID: <146360498783.37439.985952081949861861.stgit@dwillia2-desk3.amr.corp.intel.com>
+In-Reply-To: <146360496572.37439.6497663679891935585.stgit@dwillia2-desk3.amr.corp.intel.com>
+References: <146360496572.37439.6497663679891935585.stgit@dwillia2-desk3.amr.corp.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Roman Pen <roman.penyaev@profitbricks.com>
+This reverts commit 5a023cdba50c5f5f2bc351783b3131699deb3937.
 
-3.12-stable review patch.  If anyone has any objections, please let me know.
+The functionality is superseded by the new "Device DAX" facility.
 
-===============
-
-commit 346c09f80459a3ad97df1816d6d606169a51001a upstream.
-
-The bug in a workqueue leads to a stalled IO request in MQ ctx->rq_list
-with the following backtrace:
-
-[  601.347452] INFO: task kworker/u129:5:1636 blocked for more than 120 seconds.
-[  601.347574]       Tainted: G           O    4.4.5-1-storage+ #6
-[  601.347651] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-[  601.348142] kworker/u129:5  D ffff880803077988     0  1636      2 0x00000000
-[  601.348519] Workqueue: ibnbd_server_fileio_wq ibnbd_dev_file_submit_io_worker [ibnbd_server]
-[  601.348999]  ffff880803077988 ffff88080466b900 ffff8808033f9c80 ffff880803078000
-[  601.349662]  ffff880807c95000 7fffffffffffffff ffffffff815b0920 ffff880803077ad0
-[  601.350333]  ffff8808030779a0 ffffffff815b01d5 0000000000000000 ffff880803077a38
-[  601.350965] Call Trace:
-[  601.351203]  [<ffffffff815b0920>] ? bit_wait+0x60/0x60
-[  601.351444]  [<ffffffff815b01d5>] schedule+0x35/0x80
-[  601.351709]  [<ffffffff815b2dd2>] schedule_timeout+0x192/0x230
-[  601.351958]  [<ffffffff812d43f7>] ? blk_flush_plug_list+0xc7/0x220
-[  601.352208]  [<ffffffff810bd737>] ? ktime_get+0x37/0xa0
-[  601.352446]  [<ffffffff815b0920>] ? bit_wait+0x60/0x60
-[  601.352688]  [<ffffffff815af784>] io_schedule_timeout+0xa4/0x110
-[  601.352951]  [<ffffffff815b3a4e>] ? _raw_spin_unlock_irqrestore+0xe/0x10
-[  601.353196]  [<ffffffff815b093b>] bit_wait_io+0x1b/0x70
-[  601.353440]  [<ffffffff815b056d>] __wait_on_bit+0x5d/0x90
-[  601.353689]  [<ffffffff81127bd0>] wait_on_page_bit+0xc0/0xd0
-[  601.353958]  [<ffffffff81096db0>] ? autoremove_wake_function+0x40/0x40
-[  601.354200]  [<ffffffff81127cc4>] __filemap_fdatawait_range+0xe4/0x140
-[  601.354441]  [<ffffffff81127d34>] filemap_fdatawait_range+0x14/0x30
-[  601.354688]  [<ffffffff81129a9f>] filemap_write_and_wait_range+0x3f/0x70
-[  601.354932]  [<ffffffff811ced3b>] blkdev_fsync+0x1b/0x50
-[  601.355193]  [<ffffffff811c82d9>] vfs_fsync_range+0x49/0xa0
-[  601.355432]  [<ffffffff811cf45a>] blkdev_write_iter+0xca/0x100
-[  601.355679]  [<ffffffff81197b1a>] __vfs_write+0xaa/0xe0
-[  601.355925]  [<ffffffff81198379>] vfs_write+0xa9/0x1a0
-[  601.356164]  [<ffffffff811c59d8>] kernel_write+0x38/0x50
-
-The underlying device is a null_blk, with default parameters:
-
-  queue_mode    = MQ
-  submit_queues = 1
-
-Verification that nullb0 has something inflight:
-
-root@pserver8:~# cat /sys/block/nullb0/inflight
-       0        1
-root@pserver8:~# find /sys/block/nullb0/mq/0/cpu* -name rq_list -print -exec cat {} \;
-...
-/sys/block/nullb0/mq/0/cpu2/rq_list
-CTX pending:
-        ffff8838038e2400
-...
-
-During debug it became clear that stalled request is always inserted in
-the rq_list from the following path:
-
-   save_stack_trace_tsk + 34
-   blk_mq_insert_requests + 231
-   blk_mq_flush_plug_list + 281
-   blk_flush_plug_list + 199
-   wait_on_page_bit + 192
-   __filemap_fdatawait_range + 228
-   filemap_fdatawait_range + 20
-   filemap_write_and_wait_range + 63
-   blkdev_fsync + 27
-   vfs_fsync_range + 73
-   blkdev_write_iter + 202
-   __vfs_write + 170
-   vfs_write + 169
-   kernel_write + 56
-
-So blk_flush_plug_list() was called with from_schedule == true.
-
-If from_schedule is true, that means that finally blk_mq_insert_requests()
-offloads execution of __blk_mq_run_hw_queue() and uses kblockd workqueue,
-i.e. it calls kblockd_schedule_delayed_work_on().
-
-That means, that we race with another CPU, which is about to execute
-__blk_mq_run_hw_queue() work.
-
-Further debugging shows the following traces from different CPUs:
-
-  CPU#0                                  CPU#1
-  ----------------------------------     -------------------------------
-  reqeust A inserted
-  STORE hctx->ctx_map[0] bit marked
-  kblockd_schedule...() returns 1
-  <schedule to kblockd workqueue>
-                                         request B inserted
-                                         STORE hctx->ctx_map[1] bit marked
-                                         kblockd_schedule...() returns 0
-  *** WORK PENDING bit is cleared ***
-  flush_busy_ctxs() is executed, but
-  bit 1, set by CPU#1, is not observed
-
-As a result request B pended forever.
-
-This behaviour can be explained by speculative LOAD of hctx->ctx_map on
-CPU#0, which is reordered with clear of PENDING bit and executed _before_
-actual STORE of bit 1 on CPU#1.
-
-The proper fix is an explicit full barrier <mfence>, which guarantees
-that clear of PENDING bit is to be executed before all possible
-speculative LOADS or STORES inside actual work function.
-
-Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
-Cc: Gioh Kim <gi-oh.kim@profitbricks.com>
-Cc: Michael Wang <yun.wang@profitbricks.com>
-Cc: Tejun Heo <tj@kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Signed-off-by: Tejun Heo <tj@kernel.org>
-Signed-off-by: Jiri Slaby <jslaby@suse.cz>
+Cc: Jeff Moyer <jmoyer@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Dave Chinner <david@fromorbit.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>
+Cc: Ross Zwisler <ross.zwisler@linux.intel.com>
+Cc: Jan Kara <jack@suse.com>
+Signed-off-by: Dan Williams <dan.j.williams@intel.com>
 ---
- kernel/workqueue.c | 29 +++++++++++++++++++++++++++++
- 1 file changed, 29 insertions(+)
+ block/ioctl.c           |   32 ----------------
+ fs/block_dev.c          |   96 ++++++++++++++---------------------------------
+ include/linux/fs.h      |    8 ----
+ include/uapi/linux/fs.h |    1 
+ 4 files changed, 29 insertions(+), 108 deletions(-)
 
-diff --git a/kernel/workqueue.c b/kernel/workqueue.c
-index bb5f920268d7..2bc1257e420f 100644
---- a/kernel/workqueue.c
-+++ b/kernel/workqueue.c
-@@ -622,6 +622,35 @@ static void set_work_pool_and_clear_pending(struct work_struct *work,
- 	 */
- 	smp_wmb();
- 	set_work_data(work, (unsigned long)pool_id << WORK_OFFQ_POOL_SHIFT, 0);
-+	/*
-+	 * The following mb guarantees that previous clear of a PENDING bit
-+	 * will not be reordered with any speculative LOADS or STORES from
-+	 * work->current_func, which is executed afterwards.  This possible
-+	 * reordering can lead to a missed execution on attempt to qeueue
-+	 * the same @work.  E.g. consider this case:
-+	 *
-+	 *   CPU#0                         CPU#1
-+	 *   ----------------------------  --------------------------------
-+	 *
-+	 * 1  STORE event_indicated
-+	 * 2  queue_work_on() {
-+	 * 3    test_and_set_bit(PENDING)
-+	 * 4 }                             set_..._and_clear_pending() {
-+	 * 5                                 set_work_data() # clear bit
-+	 * 6                                 smp_mb()
-+	 * 7                               work->current_func() {
-+	 * 8				      LOAD event_indicated
-+	 *				   }
-+	 *
-+	 * Without an explicit full barrier speculative LOAD on line 8 can
-+	 * be executed before CPU#0 does STORE on line 1.  If that happens,
-+	 * CPU#0 observes the PENDING bit is still set and new execution of
-+	 * a @work is not queued in a hope, that CPU#1 will eventually
-+	 * finish the queued @work.  Meanwhile CPU#1 does not see
-+	 * event_indicated is set, because speculative LOAD was executed
-+	 * before actual STORE.
-+	 */
-+	smp_mb();
+diff --git a/block/ioctl.c b/block/ioctl.c
+index 4ff1f92f89ca..698c7933d582 100644
+--- a/block/ioctl.c
++++ b/block/ioctl.c
+@@ -407,35 +407,6 @@ static inline int is_unrecognized_ioctl(int ret)
+ 		ret == -ENOIOCTLCMD;
  }
  
- static void clear_work_data(struct work_struct *work)
--- 
-2.8.2
+-#ifdef CONFIG_FS_DAX
+-bool blkdev_dax_capable(struct block_device *bdev)
+-{
+-	struct gendisk *disk = bdev->bd_disk;
+-
+-	if (!disk->fops->direct_access)
+-		return false;
+-
+-	/*
+-	 * If the partition is not aligned on a page boundary, we can't
+-	 * do dax I/O to it.
+-	 */
+-	if ((bdev->bd_part->start_sect % (PAGE_SIZE / 512))
+-			|| (bdev->bd_part->nr_sects % (PAGE_SIZE / 512)))
+-		return false;
+-
+-	/*
+-	 * If the device has known bad blocks, force all I/O through the
+-	 * driver / page cache.
+-	 *
+-	 * TODO: support finer grained dax error handling
+-	 */
+-	if (disk->bb && disk->bb->count)
+-		return false;
+-
+-	return true;
+-}
+-#endif
+-
+ static int blkdev_flushbuf(struct block_device *bdev, fmode_t mode,
+ 		unsigned cmd, unsigned long arg)
+ {
+@@ -598,9 +569,6 @@ int blkdev_ioctl(struct block_device *bdev, fmode_t mode, unsigned cmd,
+ 	case BLKTRACESETUP:
+ 	case BLKTRACETEARDOWN:
+ 		return blk_trace_ioctl(bdev, cmd, argp);
+-	case BLKDAXGET:
+-		return put_int(arg, !!(bdev->bd_inode->i_flags & S_DAX));
+-		break;
+ 	case IOC_PR_REGISTER:
+ 		return blkdev_pr_register(bdev, argp);
+ 	case IOC_PR_RESERVE:
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index 20a2c02b77c4..36ee10ca503e 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -29,6 +29,7 @@
+ #include <linux/log2.h>
+ #include <linux/cleancache.h>
+ #include <linux/dax.h>
++#include <linux/badblocks.h>
+ #include <asm/uaccess.h>
+ #include "internal.h"
+ 
+@@ -1159,6 +1160,33 @@ void bd_set_size(struct block_device *bdev, loff_t size)
+ }
+ EXPORT_SYMBOL(bd_set_size);
+ 
++static bool blkdev_dax_capable(struct block_device *bdev)
++{
++	struct gendisk *disk = bdev->bd_disk;
++
++	if (!disk->fops->direct_access || !IS_ENABLED(CONFIG_FS_DAX))
++		return false;
++
++	/*
++	 * If the partition is not aligned on a page boundary, we can't
++	 * do dax I/O to it.
++	 */
++	if ((bdev->bd_part->start_sect % (PAGE_SIZE / 512))
++			|| (bdev->bd_part->nr_sects % (PAGE_SIZE / 512)))
++		return false;
++
++	/*
++	 * If the device has known bad blocks, force all I/O through the
++	 * driver / page cache.
++	 *
++	 * TODO: support finer grained dax error handling
++	 */
++	if (disk->bb && disk->bb->count)
++		return false;
++
++	return true;
++}
++
+ static void __blkdev_put(struct block_device *bdev, fmode_t mode, int for_part);
+ 
+ /*
+@@ -1724,79 +1752,13 @@ static const struct address_space_operations def_blk_aops = {
+ 	.is_dirty_writeback = buffer_check_dirty_writeback,
+ };
+ 
+-#ifdef CONFIG_FS_DAX
+-/*
+- * In the raw block case we do not need to contend with truncation nor
+- * unwritten file extents.  Without those concerns there is no need for
+- * additional locking beyond the mmap_sem context that these routines
+- * are already executing under.
+- *
+- * Note, there is no protection if the block device is dynamically
+- * resized (partition grow/shrink) during a fault. A stable block device
+- * size is already not enforced in the blkdev_direct_IO path.
+- *
+- * For DAX, it is the responsibility of the block device driver to
+- * ensure the whole-disk device size is stable while requests are in
+- * flight.
+- *
+- * Finally, unlike the filemap_page_mkwrite() case there is no
+- * filesystem superblock to sync against freezing.  We still include a
+- * pfn_mkwrite callback for dax drivers to receive write fault
+- * notifications.
+- */
+-static int blkdev_dax_fault(struct vm_area_struct *vma, struct vm_fault *vmf)
+-{
+-	return __dax_fault(vma, vmf, blkdev_get_block, NULL);
+-}
+-
+-static int blkdev_dax_pfn_mkwrite(struct vm_area_struct *vma,
+-		struct vm_fault *vmf)
+-{
+-	return dax_pfn_mkwrite(vma, vmf);
+-}
+-
+-static int blkdev_dax_pmd_fault(struct vm_area_struct *vma, unsigned long addr,
+-		pmd_t *pmd, unsigned int flags)
+-{
+-	return __dax_pmd_fault(vma, addr, pmd, flags, blkdev_get_block, NULL);
+-}
+-
+-static const struct vm_operations_struct blkdev_dax_vm_ops = {
+-	.fault		= blkdev_dax_fault,
+-	.pmd_fault	= blkdev_dax_pmd_fault,
+-	.pfn_mkwrite	= blkdev_dax_pfn_mkwrite,
+-};
+-
+-static const struct vm_operations_struct blkdev_default_vm_ops = {
+-	.fault		= filemap_fault,
+-	.map_pages	= filemap_map_pages,
+-};
+-
+-static int blkdev_mmap(struct file *file, struct vm_area_struct *vma)
+-{
+-	struct inode *bd_inode = bdev_file_inode(file);
+-
+-	file_accessed(file);
+-	if (IS_DAX(bd_inode)) {
+-		vma->vm_ops = &blkdev_dax_vm_ops;
+-		vma->vm_flags |= VM_MIXEDMAP | VM_HUGEPAGE;
+-	} else {
+-		vma->vm_ops = &blkdev_default_vm_ops;
+-	}
+-
+-	return 0;
+-}
+-#else
+-#define blkdev_mmap generic_file_mmap
+-#endif
+-
+ const struct file_operations def_blk_fops = {
+ 	.open		= blkdev_open,
+ 	.release	= blkdev_close,
+ 	.llseek		= block_llseek,
+ 	.read_iter	= blkdev_read_iter,
+ 	.write_iter	= blkdev_write_iter,
+-	.mmap		= blkdev_mmap,
++	.mmap		= generic_file_mmap,
+ 	.fsync		= blkdev_fsync,
+ 	.unlocked_ioctl	= block_ioctl,
+ #ifdef CONFIG_COMPAT
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index 70e61b58baaf..8363a10660f6 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -2320,14 +2320,6 @@ extern struct super_block *freeze_bdev(struct block_device *);
+ extern void emergency_thaw_all(void);
+ extern int thaw_bdev(struct block_device *bdev, struct super_block *sb);
+ extern int fsync_bdev(struct block_device *);
+-#ifdef CONFIG_FS_DAX
+-extern bool blkdev_dax_capable(struct block_device *bdev);
+-#else
+-static inline bool blkdev_dax_capable(struct block_device *bdev)
+-{
+-	return false;
+-}
+-#endif
+ 
+ extern struct super_block *blockdev_superblock;
+ 
+diff --git a/include/uapi/linux/fs.h b/include/uapi/linux/fs.h
+index a079d50376e1..fbff8b28aa35 100644
+--- a/include/uapi/linux/fs.h
++++ b/include/uapi/linux/fs.h
+@@ -222,7 +222,6 @@ struct fsxattr {
+ #define BLKSECDISCARD _IO(0x12,125)
+ #define BLKROTATIONAL _IO(0x12,126)
+ #define BLKZEROOUT _IO(0x12,127)
+-#define BLKDAXGET _IO(0x12,129)
+ 
+ #define BMAP_IOCTL 1		/* obsolete - kept for compatibility */
+ #define FIBMAP	   _IO(0x00,1)	/* bmap access */
+
