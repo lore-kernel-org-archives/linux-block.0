@@ -1,124 +1,185 @@
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>,
-	Tejun Heo <tj@kernel.org>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	linus.walleij@linaro.org,
-	broonie@kernel.org,
-	stable@vger.kernel.org,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH BUGFIX] block: add missing group association in bio-cloning functions
-Date: Tue, 10 May 2016 22:23:41 +0200
-Message-Id: <1462911821-7354-1-git-send-email-paolo.valente@linaro.org>
-In-Reply-To: <x4960ul7uyw.fsf@segfault.boston.devel.redhat.com>
-References: <x4960ul7uyw.fsf@segfault.boston.devel.redhat.com>
+Return-Path: <jslaby@suse.cz>
+From: Jiri Slaby <jslaby@suse.cz>
+To: stable@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	Roman Pen <roman.penyaev@profitbricks.com>,
+	Gioh Kim <gi-oh.kim@profitbricks.com>,
+	Michael Wang <yun.wang@profitbricks.com>,
+	Tejun Heo <tj@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org,
+	Jiri Slaby <jslaby@suse.cz>
+Subject: [PATCH 3.12 14/76] workqueue: fix ghost PENDING flag while doing MQ IO
+Date: Thu, 19 May 2016 11:07:36 +0200
+Message-Id: <4aa63af38d182aa029283e109b0e3b390b3fb7c3.1463648873.git.jslaby@suse.cz>
+In-Reply-To: <c4ec97c341630e22e546c1a628a3664f17f7ffc8.1463648873.git.jslaby@suse.cz>
+References: <c4ec97c341630e22e546c1a628a3664f17f7ffc8.1463648873.git.jslaby@suse.cz>
+In-Reply-To: <cover.1463648873.git.jslaby@suse.cz>
+References: <cover.1463648873.git.jslaby@suse.cz>
 List-ID: <linux-block@vger.kernel.org>
 
-When a bio is cloned, the newly created bio must be associated with
-the same blkcg as the original bio (if BLK_CGROUP is enabled). If
-this operation is not performed, then the new bio is not associated
-with any group, and the group of the current task is returned when
-the group of the bio is requested.
+From: Roman Pen <roman.penyaev@profitbricks.com>
 
-Depending on the cloning frequency, this may cause a large
-percentage of the bios belonging to a given group to be treated
-as if belonging to other groups (in most cases as if belonging to
-the root group). The expected group isolation may thereby be broken.
+3.12-stable review patch.  If anyone has any objections, please let me know.
 
-This commit adds the missing association in bio-cloning functions.
+===============
 
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+commit 346c09f80459a3ad97df1816d6d606169a51001a upstream.
+
+The bug in a workqueue leads to a stalled IO request in MQ ctx->rq_list
+with the following backtrace:
+
+[  601.347452] INFO: task kworker/u129:5:1636 blocked for more than 120 seconds.
+[  601.347574]       Tainted: G           O    4.4.5-1-storage+ #6
+[  601.347651] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+[  601.348142] kworker/u129:5  D ffff880803077988     0  1636      2 0x00000000
+[  601.348519] Workqueue: ibnbd_server_fileio_wq ibnbd_dev_file_submit_io_worker [ibnbd_server]
+[  601.348999]  ffff880803077988 ffff88080466b900 ffff8808033f9c80 ffff880803078000
+[  601.349662]  ffff880807c95000 7fffffffffffffff ffffffff815b0920 ffff880803077ad0
+[  601.350333]  ffff8808030779a0 ffffffff815b01d5 0000000000000000 ffff880803077a38
+[  601.350965] Call Trace:
+[  601.351203]  [<ffffffff815b0920>] ? bit_wait+0x60/0x60
+[  601.351444]  [<ffffffff815b01d5>] schedule+0x35/0x80
+[  601.351709]  [<ffffffff815b2dd2>] schedule_timeout+0x192/0x230
+[  601.351958]  [<ffffffff812d43f7>] ? blk_flush_plug_list+0xc7/0x220
+[  601.352208]  [<ffffffff810bd737>] ? ktime_get+0x37/0xa0
+[  601.352446]  [<ffffffff815b0920>] ? bit_wait+0x60/0x60
+[  601.352688]  [<ffffffff815af784>] io_schedule_timeout+0xa4/0x110
+[  601.352951]  [<ffffffff815b3a4e>] ? _raw_spin_unlock_irqrestore+0xe/0x10
+[  601.353196]  [<ffffffff815b093b>] bit_wait_io+0x1b/0x70
+[  601.353440]  [<ffffffff815b056d>] __wait_on_bit+0x5d/0x90
+[  601.353689]  [<ffffffff81127bd0>] wait_on_page_bit+0xc0/0xd0
+[  601.353958]  [<ffffffff81096db0>] ? autoremove_wake_function+0x40/0x40
+[  601.354200]  [<ffffffff81127cc4>] __filemap_fdatawait_range+0xe4/0x140
+[  601.354441]  [<ffffffff81127d34>] filemap_fdatawait_range+0x14/0x30
+[  601.354688]  [<ffffffff81129a9f>] filemap_write_and_wait_range+0x3f/0x70
+[  601.354932]  [<ffffffff811ced3b>] blkdev_fsync+0x1b/0x50
+[  601.355193]  [<ffffffff811c82d9>] vfs_fsync_range+0x49/0xa0
+[  601.355432]  [<ffffffff811cf45a>] blkdev_write_iter+0xca/0x100
+[  601.355679]  [<ffffffff81197b1a>] __vfs_write+0xaa/0xe0
+[  601.355925]  [<ffffffff81198379>] vfs_write+0xa9/0x1a0
+[  601.356164]  [<ffffffff811c59d8>] kernel_write+0x38/0x50
+
+The underlying device is a null_blk, with default parameters:
+
+  queue_mode    = MQ
+  submit_queues = 1
+
+Verification that nullb0 has something inflight:
+
+root@pserver8:~# cat /sys/block/nullb0/inflight
+       0        1
+root@pserver8:~# find /sys/block/nullb0/mq/0/cpu* -name rq_list -print -exec cat {} \;
+...
+/sys/block/nullb0/mq/0/cpu2/rq_list
+CTX pending:
+        ffff8838038e2400
+...
+
+During debug it became clear that stalled request is always inserted in
+the rq_list from the following path:
+
+   save_stack_trace_tsk + 34
+   blk_mq_insert_requests + 231
+   blk_mq_flush_plug_list + 281
+   blk_flush_plug_list + 199
+   wait_on_page_bit + 192
+   __filemap_fdatawait_range + 228
+   filemap_fdatawait_range + 20
+   filemap_write_and_wait_range + 63
+   blkdev_fsync + 27
+   vfs_fsync_range + 73
+   blkdev_write_iter + 202
+   __vfs_write + 170
+   vfs_write + 169
+   kernel_write + 56
+
+So blk_flush_plug_list() was called with from_schedule == true.
+
+If from_schedule is true, that means that finally blk_mq_insert_requests()
+offloads execution of __blk_mq_run_hw_queue() and uses kblockd workqueue,
+i.e. it calls kblockd_schedule_delayed_work_on().
+
+That means, that we race with another CPU, which is about to execute
+__blk_mq_run_hw_queue() work.
+
+Further debugging shows the following traces from different CPUs:
+
+  CPU#0                                  CPU#1
+  ----------------------------------     -------------------------------
+  reqeust A inserted
+  STORE hctx->ctx_map[0] bit marked
+  kblockd_schedule...() returns 1
+  <schedule to kblockd workqueue>
+                                         request B inserted
+                                         STORE hctx->ctx_map[1] bit marked
+                                         kblockd_schedule...() returns 0
+  *** WORK PENDING bit is cleared ***
+  flush_busy_ctxs() is executed, but
+  bit 1, set by CPU#1, is not observed
+
+As a result request B pended forever.
+
+This behaviour can be explained by speculative LOAD of hctx->ctx_map on
+CPU#0, which is reordered with clear of PENDING bit and executed _before_
+actual STORE of bit 1 on CPU#1.
+
+The proper fix is an explicit full barrier <mfence>, which guarantees
+that clear of PENDING bit is to be executed before all possible
+speculative LOADS or STORES inside actual work function.
+
+Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
+Cc: Gioh Kim <gi-oh.kim@profitbricks.com>
+Cc: Michael Wang <yun.wang@profitbricks.com>
+Cc: Tejun Heo <tj@kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Signed-off-by: Tejun Heo <tj@kernel.org>
+Signed-off-by: Jiri Slaby <jslaby@suse.cz>
 ---
- block/bio.c          | 17 +++++++++++++++++
- fs/btrfs/extent_io.c |  6 ------
- include/linux/bio.h  |  2 ++
- 3 files changed, 19 insertions(+), 6 deletions(-)
+ kernel/workqueue.c | 29 +++++++++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
 
-diff --git a/block/bio.c b/block/bio.c
-index 807d25e..e9b136a 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -622,6 +622,8 @@ struct bio *bio_clone_fast(struct bio *bio, gfp_t gfp_mask, struct bio_set *bs)
- 		}
- 	}
- 
-+	bio_clone_blkcg_association(b, bio);
-+
- 	return b;
+diff --git a/kernel/workqueue.c b/kernel/workqueue.c
+index bb5f920268d7..2bc1257e420f 100644
+--- a/kernel/workqueue.c
++++ b/kernel/workqueue.c
+@@ -622,6 +622,35 @@ static void set_work_pool_and_clear_pending(struct work_struct *work,
+ 	 */
+ 	smp_wmb();
+ 	set_work_data(work, (unsigned long)pool_id << WORK_OFFQ_POOL_SHIFT, 0);
++	/*
++	 * The following mb guarantees that previous clear of a PENDING bit
++	 * will not be reordered with any speculative LOADS or STORES from
++	 * work->current_func, which is executed afterwards.  This possible
++	 * reordering can lead to a missed execution on attempt to qeueue
++	 * the same @work.  E.g. consider this case:
++	 *
++	 *   CPU#0                         CPU#1
++	 *   ----------------------------  --------------------------------
++	 *
++	 * 1  STORE event_indicated
++	 * 2  queue_work_on() {
++	 * 3    test_and_set_bit(PENDING)
++	 * 4 }                             set_..._and_clear_pending() {
++	 * 5                                 set_work_data() # clear bit
++	 * 6                                 smp_mb()
++	 * 7                               work->current_func() {
++	 * 8				      LOAD event_indicated
++	 *				   }
++	 *
++	 * Without an explicit full barrier speculative LOAD on line 8 can
++	 * be executed before CPU#0 does STORE on line 1.  If that happens,
++	 * CPU#0 observes the PENDING bit is still set and new execution of
++	 * a @work is not queued in a hope, that CPU#1 will eventually
++	 * finish the queued @work.  Meanwhile CPU#1 does not see
++	 * event_indicated is set, because speculative LOAD was executed
++	 * before actual STORE.
++	 */
++	smp_mb();
  }
- EXPORT_SYMBOL(bio_clone_fast);
-@@ -695,6 +697,8 @@ integrity_clone:
- 		}
- 	}
  
-+	bio_clone_blkcg_association(bio, bio_src);
-+
- 	return bio;
- }
- EXPORT_SYMBOL(bio_clone_bioset);
-@@ -1811,6 +1815,8 @@ struct bio *bio_split(struct bio *bio, int sectors,
- 
- 	bio_advance(bio, split->bi_iter.bi_size);
- 
-+	bio_clone_blkcg_association(split, bio);
-+
- 	return split;
- }
- EXPORT_SYMBOL(bio_split);
-@@ -2016,6 +2022,17 @@ void bio_disassociate_task(struct bio *bio)
- 	}
- }
- 
-+/**
-+ * bio_clone_blkcg_association - clone blkcg association from src to dst bio
-+ * @dst: destination bio
-+ * @src: source bio
-+ */
-+void bio_clone_blkcg_association(struct bio *dst, struct bio *src)
-+{
-+	if (src->bi_css)
-+		WARN_ON(bio_associate_blkcg(dst, src->bi_css));
-+}
-+
- #endif /* CONFIG_BLK_CGROUP */
- 
- static void __init biovec_init_slabs(void)
-diff --git a/fs/btrfs/extent_io.c b/fs/btrfs/extent_io.c
-index d247fc0..19f6739 100644
---- a/fs/btrfs/extent_io.c
-+++ b/fs/btrfs/extent_io.c
-@@ -2686,12 +2686,6 @@ struct bio *btrfs_bio_clone(struct bio *bio, gfp_t gfp_mask)
- 		btrfs_bio->csum = NULL;
- 		btrfs_bio->csum_allocated = NULL;
- 		btrfs_bio->end_io = NULL;
--
--#ifdef CONFIG_BLK_CGROUP
--		/* FIXME, put this into bio_clone_bioset */
--		if (bio->bi_css)
--			bio_associate_blkcg(new, bio->bi_css);
--#endif
- 	}
- 	return new;
- }
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 6b7481f..a9ff116 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -527,11 +527,13 @@ extern unsigned int bvec_nr_vecs(unsigned short idx);
- int bio_associate_blkcg(struct bio *bio, struct cgroup_subsys_state *blkcg_css);
- int bio_associate_current(struct bio *bio);
- void bio_disassociate_task(struct bio *bio);
-+void bio_clone_blkcg_association(struct bio *dst, struct bio *src);
- #else	/* CONFIG_BLK_CGROUP */
- static inline int bio_associate_blkcg(struct bio *bio,
- 			struct cgroup_subsys_state *blkcg_css) { return 0; }
- static inline int bio_associate_current(struct bio *bio) { return -ENOENT; }
- static inline void bio_disassociate_task(struct bio *bio) { }
-+void bio_clone_blkcg_association(struct bio *dst, struct bio *src) { return 0; }
- #endif	/* CONFIG_BLK_CGROUP */
- 
- #ifdef CONFIG_HIGHMEM
+ static void clear_work_data(struct work_struct *work)
 -- 
-1.9.1
+2.8.2
