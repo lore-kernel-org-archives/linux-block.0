@@ -6,16 +6,16 @@ Cc: Roman Pen <roman.penyaev@profitbricks.com>,
         Michael Wang <yun.wang@profitbricks.com>, Tejun Heo <tj@kernel.org>,
         Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, Sasha Levin <sasha.levin@oracle.com>
-Subject: [added to the 4.1 stable tree] workqueue: fix ghost PENDING flag while doing MQ IO
-Date: Thu, 19 May 2016 00:19:15 -0400
-Message-Id: <1463631606-32540-16-git-send-email-sasha.levin@oracle.com>
-In-Reply-To: <1463631606-32540-1-git-send-email-sasha.levin@oracle.com>
-References: <1463631606-32540-1-git-send-email-sasha.levin@oracle.com>
+Subject: [added to the 3.18 stable tree] workqueue: fix ghost PENDING flag while doing MQ IO
+Date: Thu, 19 May 2016 00:15:04 -0400
+Message-Id: <1463631350-32182-15-git-send-email-sasha.levin@oracle.com>
+In-Reply-To: <1463631350-32182-1-git-send-email-sasha.levin@oracle.com>
+References: <1463631350-32182-1-git-send-email-sasha.levin@oracle.com>
 List-ID: <linux-block@vger.kernel.org>
 
 From: Roman Pen <roman.penyaev@profitbricks.com>
 
-This patch has been added to the 4.1 stable tree. If you have any
+This patch has been added to the 3.18 stable tree. If you have any
 objections, please let us know.
 
 ===============
@@ -139,10 +139,10 @@ Signed-off-by: Sasha Levin <sasha.levin@oracle.com>
  1 file changed, 29 insertions(+)
 
 diff --git a/kernel/workqueue.c b/kernel/workqueue.c
-index 6d63116..32152a4 100644
+index 2273f53..fabb96d 100644
 --- a/kernel/workqueue.c
 +++ b/kernel/workqueue.c
-@@ -654,6 +654,35 @@ static void set_work_pool_and_clear_pending(struct work_struct *work,
+@@ -623,6 +623,35 @@ static void set_work_pool_and_clear_pending(struct work_struct *work,
  	 */
  	smp_wmb();
  	set_work_data(work, (unsigned long)pool_id << WORK_OFFQ_POOL_SHIFT, 0);
