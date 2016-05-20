@@ -1,67 +1,80 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:56815 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756181AbcECUoI (ORCPT <rfc822;linux-block@vger.kernel.org>);
-	Tue, 3 May 2016 16:44:08 -0400
-From: Jeff Moyer <jmoyer@redhat.com>
-To: mchristi@redhat.com
-Cc: linux-f2fs-devel@lists.sourceforge.net, linux-ext4@vger.kernel.org,
-	konrad.wilk@oracle.com, drbd-dev@lists.linbit.com,
-	philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
-	linux-raid@vger.kernel.org, dm-devel@redhat.com,
-	linux-fsdevel@vger.kernel.org, linux-bcache@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linux-mtd@lists.infradead.org,
-	target-devel@vger.kernel.org, linux-btrfs@vger.kernel.org,
-	osd-dev@open-osd.org, xfs@oss.sgi.com, ocfs2-devel@oss.oracle.com
-Subject: Re: [PATCH 00/42] v7: separate operations from flags in the bio/request structs
-References: <1460747777-8479-1-git-send-email-mchristi@redhat.com>
-Date: Tue, 03 May 2016 16:44:02 -0400
-In-Reply-To: <1460747777-8479-1-git-send-email-mchristi@redhat.com>
-	(mchristi@redhat.com's message of "Fri, 15 Apr 2016 14:15:35 -0500")
-Message-ID: <x49d1p2c1nx.fsf@segfault.boston.devel.redhat.com>
+Received: from mail-bn1bon0148.outbound.protection.outlook.com ([157.56.111.148]:47808
+	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1754462AbcETPs2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+	Fri, 20 May 2016 11:48:28 -0400
+From: "Kani, Toshimitsu" <toshi.kani@hpe.com>
+To: "lkp@intel.com" <lkp@intel.com>, "arnd@arndb.de" <arnd@arndb.de>
+CC: "Parrish, Micah (HP Servers Linux R&D)" <micah.parrish@hpe.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"hch@infradead.org" <hch@infradead.org>,
+	"adilger.kernel@dilger.ca" <adilger.kernel@dilger.ca>,
+	"viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
+	"dan.j.williams@intel.com" <dan.j.williams@intel.com>,
+	"axboe@fb.com" <axboe@fb.com>,
+	"linux-nvdimm@lists.01.org" <linux-nvdimm@lists.01.org>,
+	"kbuild-all@01.org" <kbuild-all@01.org>,
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+	"ross.zwisler@linux.intel.com" <ross.zwisler@linux.intel.com>,
+	"tytso@mit.edu" <tytso@mit.edu>,
+	"boaz@plexistor.com" <boaz@plexistor.com>,
+	"david@fromorbit.com" <david@fromorbit.com>,
+	"jack@suse.cz" <jack@suse.cz>
+Subject: Re: [PATCH] remove unused blkdev_dax_capable() function
+Date: Fri, 20 May 2016 15:48:23 +0000
+Message-ID: <1463758753.32042.26.camel@hpe.com>
+References: <201605201900.FlOCWSKP%fengguang.wu@intel.com>
+In-Reply-To: <201605201900.FlOCWSKP%fengguang.wu@intel.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-mchristi@redhat.com writes:
-
-> The following patches begin to cleanup the request->cmd_flags and
-> bio->bi_rw mess. We currently use cmd_flags to specify the operation,
-> attributes and state of the request. For bi_rw we use it for similar
-> info and also the priority but then also have another bi_flags field
-> for state. At some point, we abused them so much we just made cmd_flags
-> 64 bits, so we could add more.
->
-> The following patches seperate the operation (read, write discard,
-> flush, etc) from cmd_flags/bi_rw.
->
-> This patchset was made against linux-next from today April 15
-> (git tag next-20160415).
->
-> I put a git tree here:
-> https://github.com/mikechristie/linux-kernel.git
-> The patches are in the op branch.
-
-Hi, Mike,
-
-That git tree doesn't seem to exist.  I did manage to apply your patch
-set on top of next-20160415, though.
-
-So... what testing did you do? ;-) I ran into the following problems:
-- git clone fails
-- yum segfaults
-- many blktrace/blkparse issues, including incorrect cpu recorded in
-  traces, null task names, and blkparse outputting nothing for a trace
-  file several gigabytes in size.
-
-After that, I decided to back out your patches and test the base
-linux-next kernel.  That kernel has none of those issues.
-
-So, either I'm missing some dependencies, or I think we've got some
-issues to iron out before this thing goes in.  Before I dig any further,
-am I missing something?
-
-Cheers,
-Jeff
+RllJLCBmcy9ibG9ja19kZXYuYyBoYXMgbXVsdGlwbGUgdXBkYXRlcyBzaW5jZSB0aGVuIGluY2x1
+ZGluZyB0aGUgY29kZSBpbg0KcXVlc3Rpb24uIEkganVzdCBidWlsdCB0b3QgLW5leHQgbTY0IGtl
+cm5lbCB3aXRoIHRoZSBhdHRhY2hlZCBjb25maWcgZmlsZSwNCmFuZCBjb25maXJtZWQgbm8gY29t
+cGlsZSBlcnJvciBvbiB0aGUgZmlsZS4NCi1Ub3NoaQ0KDQpPbiBGcmksIDIwMTYtMDUtMjAgYXQg
+MTk6MzIgKzA4MDAsIGtidWlsZCB0ZXN0IHJvYm90IHdyb3RlOg0KPiBIaSwNCj4gDQo+IFthdXRv
+IGJ1aWxkIHRlc3QgRVJST1Igb24gbmV4dC0yMDE2MDUxN10NCj4gW2Nhbm5vdCBhcHBseSB0byB2
+NC42LXJjNyB2NC42LXJjNiB2NC42LXJjNSB2NC42XQ0KPiBbaWYgeW91ciBwYXRjaCBpcyBhcHBs
+aWVkIHRvIHRoZSB3cm9uZyBnaXQgdHJlZSwgcGxlYXNlIGRyb3AgdXMgYSBub3RlIHRvDQo+IGhl
+bHAgaW1wcm92ZSB0aGUgc3lzdGVtXQ0KPiANCj4gdXJsOsKgwqDCoMKgaHR0cHM6Ly9naXRodWIu
+Y29tLzBkYXktY2kvbGludXgvY29tbWl0cy9Bcm5kLUJlcmdtYW5uL3JlbW92ZS11bnUNCj4gc2Vk
+LWJsa2Rldl9kYXhfY2FwYWJsZS1mdW5jdGlvbi8yMDE2MDUxOC0xNTU3MjkNCj4gY29uZmlnOiBt
+NjhrLWFsbHllc2NvbmZpZyAoYXR0YWNoZWQgYXMgLmNvbmZpZykNCj4gY29tcGlsZXI6IG02OGst
+bGludXgtZ2NjIChHQ0MpIDQuOS4wDQo+IHJlcHJvZHVjZToNCj4gwqDCoMKgwqDCoMKgwqDCoHdn
+ZXQgaHR0cHM6Ly9naXQua2VybmVsLm9yZy9jZ2l0L2xpbnV4L2tlcm5lbC9naXQvd2ZnL2xrcC10
+ZXN0cy5nDQo+IGl0L3BsYWluL3NiaW4vbWFrZS5jcm9zcyAtTyB+L2Jpbi9tYWtlLmNyb3NzDQo+
+IMKgwqDCoMKgwqDCoMKgwqBjaG1vZCAreCB+L2Jpbi9tYWtlLmNyb3NzDQo+IMKgwqDCoMKgwqDC
+oMKgwqAjIHNhdmUgdGhlIGF0dGFjaGVkIC5jb25maWcgdG8gbGludXggYnVpbGQgdHJlZQ0KPiDC
+oMKgwqDCoMKgwqDCoMKgbWFrZS5jcm9zcyBBUkNIPW02OGvCoA0KPiANCj4gQWxsIGVycm9ycyAo
+bmV3IG9uZXMgcHJlZml4ZWQgYnkgPj4pOg0KPiANCj4gwqDCoMKgZnMvYmxvY2tfZGV2LmM6IElu
+IGZ1bmN0aW9uICdfX2Jsa2Rldl9nZXQnOg0KPiA+IA0KPiA+ID4gDQo+ID4gPiBmcy9ibG9ja19k
+ZXYuYzoxMjQyOjU6IGVycm9yOiBpbXBsaWNpdCBkZWNsYXJhdGlvbiBvZiBmdW5jdGlvbg0KPiA+
+ID4gJ2Jsa2Rldl9kYXhfY2FwYWJsZScgWy1XZXJyb3I9aW1wbGljaXQtZnVuY3Rpb24tZGVjbGFy
+YXRpb25dDQo+IMKgwqDCoMKgwqDCoMKgwqBpZiAoIWJsa2Rldl9kYXhfY2FwYWJsZShiZGV2KSkN
+Cj4gwqDCoMKgwqDCoMKgwqDCoF4NCj4gwqDCoMKgY2MxOiBzb21lIHdhcm5pbmdzIGJlaW5nIHRy
+ZWF0ZWQgYXMgZXJyb3JzDQo+IA0KPiB2aW0gKy9ibGtkZXZfZGF4X2NhcGFibGUgKzEyNDIgZnMv
+YmxvY2tfZGV2LmMNCj4gDQo+IGQzMzc0ODI1IE5laWxCcm93bsKgwqDCoMKgMjAwOS0wMS0wOcKg
+wqAxMjM2wqDCoAkJCQkJDQo+IGdvdG8gcmVzdGFydDsNCj4gZDMzNzQ4MjUgTmVpbEJyb3duwqDC
+oMKgwqAyMDA5LTAxLTA5wqDCoDEyMzfCoMKgCQkJCX0NCj4gMTE5NmY4YjggVGVqdW4gSGVvwqDC
+oMKgwqAyMDExLTA0LTIxwqDCoDEyMzjCoMKgCQkJfQ0KPiA3ZTY5NzIzZiBUZWp1biBIZW/CoMKg
+wqDCoDIwMTEtMDUtMjPCoMKgMTIzOcKgwqANCj4gNWEwMjNjZGIgRGFuIFdpbGxpYW1zIDIwMTUt
+MTEtMzDCoMKgMTI0MMKgwqAJCQlpZiAoIXJldCkNCj4gew0KPiA3ZTY5NzIzZiBUZWp1biBIZW/C
+oMKgwqDCoDIwMTEtMDUtMjPCoMKgMTI0McKgwqAJCQkJYg0KPiBkX3NldF9zaXplKGJkZXYsKGxv
+ZmZfdClnZXRfY2FwYWNpdHkoZGlzayk8PDkpOw0KPiA1YTAyM2NkYiBEYW4gV2lsbGlhbXMgMjAx
+NS0xMS0zMCBAMTI0MsKgwqAJCQkJaQ0KPiBmICghYmxrZGV2X2RheF9jYXBhYmxlKGJkZXYpKQ0K
+PiA1YTAyM2NkYiBEYW4gV2lsbGlhbXMgMjAxNS0xMS0zMMKgwqAxMjQzwqDCoAkJCQkJDQo+IGJk
+ZXYtPmJkX2lub2RlLT5pX2ZsYWdzICY9IH5TX0RBWDsNCj4gNWEwMjNjZGIgRGFuIFdpbGxpYW1z
+IDIwMTUtMTEtMzDCoMKgMTI0NMKgwqAJCQl9DQo+IDdlNjk3MjNmIFRlanVuIEhlb8KgwqDCoMKg
+MjAxMS0wNS0yM8KgwqAxMjQ1wqDCoA0KPiANCj4gOjo6Ojo6IFRoZSBjb2RlIGF0IGxpbmUgMTI0
+MiB3YXMgZmlyc3QgaW50cm9kdWNlZCBieSBjb21taXQNCj4gOjo6Ojo6IDVhMDIzY2RiYTUwYzVm
+NWYyYmMzNTE3ODNiMzEzMTY5OWRlYjM5MzcgYmxvY2s6IGVuYWJsZSBkYXggZm9yIHJhdw0KPiBi
+bG9jayBkZXZpY2VzDQo+IA0KPiA6Ojo6OjogVE86IERhbiBXaWxsaWFtcyA8ZGFuLmoud2lsbGlh
+bXNAaW50ZWwuY29tPg0KPiA6Ojo6OjogQ0M6IERhbiBXaWxsaWFtcyA8ZGFuLmoud2lsbGlhbXNA
+aW50ZWwuY29tPg0KPiANCj4gLS0tDQo+IDAtREFZIGtlcm5lbCB0ZXN0IGluZnJhc3RydWN0dXJl
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBPcGVuIFNvdXJjZSBUZWNobm9sb2d5DQo+
+IENlbnRlcg0KPiBodHRwczovL2xpc3RzLjAxLm9yZy9waXBlcm1haWwva2J1aWxkLWFsbMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgSW50ZWwNCj4gQ29ycG9yYXRpb24=
