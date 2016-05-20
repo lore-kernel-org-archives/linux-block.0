@@ -1,56 +1,52 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mailout1.samsung.com ([203.254.224.24]:58617 "EHLO
-	mailout1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751254AbcEZGYv (ORCPT
-	<rfc822;linux-block@vger.kernel.org>);
-	Thu, 26 May 2016 02:24:51 -0400
-From: Ming Lin <mlin@kernel.org>
-To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Cc: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@lst.de>
-Subject: [PATCH] blk-mq: clear q->mq_ops if init fail
-Date: Wed, 25 May 2016 23:23:27 -0700
-Message-id: <1464243807-27526-1-git-send-email-mlin@kernel.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: "Kani, Toshimitsu" <toshi.kani@hpe.com>
+To: "dan.j.williams@intel.com" <dan.j.williams@intel.com>,
+	"viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
+	"jack@suse.cz" <jack@suse.cz>,
+	"david@fromorbit.com" <david@fromorbit.com>,
+	"sandeen@sandeen.net" <sandeen@sandeen.net>,
+	"vishal.l.verma@intel.com" <vishal.l.verma@intel.com>
+CC: "Parrish, Micah (HP Servers Linux R&D)" <micah.parrish@hpe.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"hch@infradead.org" <hch@infradead.org>,
+	"adilger.kernel@dilger.ca" <adilger.kernel@dilger.ca>,
+	"axboe@fb.com" <axboe@fb.com>,
+	"linux-nvdimm@lists.01.org" <linux-nvdimm@lists.01.org>,
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+	"ross.zwisler@linux.intel.com" <ross.zwisler@linux.intel.com>,
+	"tytso@mit.edu" <tytso@mit.edu>,
+	"boaz@plexistor.com" <boaz@plexistor.com>
+Subject: Re: [PATCH v4 0/6] Add alignment check for DAX mount
+Date: Fri, 20 May 2016 17:49:51 +0000
+Message-ID: <1463766042.32042.34.camel@hpe.com>
+References: <1462897437-16626-1-git-send-email-toshi.kani@hpe.com>
+	 <f265e4ce-9271-1d83-35bc-794f2e2129df@sandeen.net>
+	 <1463755257.32042.15.camel@hpe.com> <1463765696.3005.2.camel@intel.com>
+In-Reply-To: <1463765696.3005.2.camel@intel.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-From: Ming Lin <ming.l@samsung.com>
-
-blk_mq_init_queue() calls blk_mq_init_allocated_queue(), but q->mq_ops
-was not cleared when blk_mq_init_allocated_queue() fails.
-Then blk_cleanup_queue() calls blk_mq_free_queue() which will crash because:
-- q->all_q_node is not added to all_q_list yet
-- q->tag_set is NULL
-- hctx was not setup yet or already freed
-
-Fixed it by clearing q->mq_ops on error path.
-
-Signed-off-by: Ming Lin <ming.l@samsung.com>
----
- block/blk-mq.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 67bf8ed..86f08b1 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2054,7 +2054,7 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
- 
- 	q->queue_ctx = alloc_percpu(struct blk_mq_ctx);
- 	if (!q->queue_ctx)
--		return ERR_PTR(-ENOMEM);
-+		goto err_exit;
- 
- 	q->queue_hw_ctx = kzalloc_node(nr_cpu_ids * sizeof(*(q->queue_hw_ctx)),
- 						GFP_KERNEL, set->numa_node);
-@@ -2118,6 +2118,8 @@ err_map:
- 	kfree(q->queue_hw_ctx);
- err_percpu:
- 	free_percpu(q->queue_ctx);
-+err_exit:
-+	q->mq_ops = NULL;
- 	return ERR_PTR(-ENOMEM);
- }
- EXPORT_SYMBOL(blk_mq_init_allocated_queue);
--- 
-1.9.1
-
+T24gRnJpLCAyMDE2LTA1LTIwIGF0IDE3OjM0ICswMDAwLCBWZXJtYSwgVmlzaGFsIEwgd3JvdGU6
+DQo+IE9uIEZyaSwgMjAxNi0wNS0yMCBhdCAxNDo1MCArMDAwMCwgS2FuaSwgVG9zaGltaXRzdSB3
+cm90ZToNCj4gPiBPbiBUaHUsIDIwMTYtMDUtMTkgYXQgMTg6MzcgLTA1MDAsIEVyaWMgU2FuZGVl
+biB3cm90ZToNCj4gPiA+IE9uIDUvMTAvMTYgMTE6MjMgQU0sIFRvc2hpIEthbmkgd3JvdGU6DQo+
+ID4gPiA+wqANCj4gPiA+ID4gV2hlbiBhIHBhcnRpdGlvbiBpcyBub3QgYWxpZ25lZCBieSA0S0Is
+IG1vdW50IC1vIGRheCBzdWNjZWVkcywNCj4gPiA+DQo+ID4gPiBTb3JyeSBmb3IgYmVpbmcgbGF0
+ZSwgYnV0IC0NCj4gPiA+IA0KPiA+ID4gU2hvdWxkbid0IHRoaXMgYW5kIGFsbCBzdWJzZXF1ZW50
+IHBhdGNoIGNvbW1pdHMgcmVmZXIgdG8NCj4gPiA+IFBBR0VfU0laRSwgcmF0aGVyIHRoYW4gIjRr
+Qj8iDQo+ID4NCj4gPiBSaWdodCwgdGhlIHBhdGNoIGNvbW1pdHMgc2hvdWxkIHJlZmVyIHRvIFBB
+R0VfU0laRSB0byBtYXRjaCB3aXRoIHRoZQ0KPiA+IGNvZGUgY2hhbmdlcy7CoMKgSSBhbSBhZnJh
+aWQgaXQgbWF5IGJlIGEgYml0IHRvbyBsYXRlIHRvIHVwZGF0ZSwNCj4gPiB0aG91Z2guLi4NCj4g
+PiANCj4gPiBWaXNoYWwsIGRvIHlvdSB0aGluayB5b3UgY2FuIHR3ZWFrIHRoZSBsb2dzLCAiNEtC
+IiB0byAiUEFHRV9TSVpFIj8NCj4gPiANCj4gPiBUaGFua3MsDQo+ID4gLVRvc2hpDQo+DQo+IEhp
+IFRvc2hpLA0KPiANCj4gSXMgaXQganVzdCBjb21taXQgbWVzc2FnZSBjaGFuZ2VzPyBJZiBzbyBJ
+J20gbm90IHN1cmUgaXQgaXMgd29ydGh3aGlsZQ0KPiB0byByZWJhc2UgZXZlcnl0aGluZyBmb3Ig
+dGhhdCAtIGkuZS4gbXkgZGF4IGVycm9yIGhhbmRsaW5nIHNlcmllcyBhbmQNCj4gUm9zcycgZGF4
+LWxvY2tpbmcgYnJhbmNoIHdvdWxkIGJvdGggaGF2ZSB0byBiZSByZWJhc2VkLi4NCj4gDQo+IElm
+IHRoZXJlIGFyZSBhbmQgZml4ZXMgZm9yIGNvZGUsIHdlIGNhbiBkbyB0aGVtIGFzIGFuIGFkZC1v
+biBwYXRjaA0KPiB0aG91Z2guDQoNCkhpIFZpc2hhbCwNCg0KWWVzLCBpdCBpcyBqdXN0IGNvbW1p
+dCBtZXNzYWdlcywgYW5kIGl0J3MgT0sgbm90IHRvIG1ha2UgdGhpcyBjaGFuZ2UuDQoNClRoYW5r
+cywNCi1Ub3NoaQ==
