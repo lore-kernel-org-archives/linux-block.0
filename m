@@ -1,55 +1,67 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Vishal Verma <vishal.l.verma@intel.com>
-To: linux-nvdimm@lists.01.org
-Cc: Dan Williams <dan.j.williams@intel.com>,
-	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-	xfs@oss.sgi.com, linux-ext4@vger.kernel.org, linux-mm@kvack.org,
-	Ross Zwisler <ross.zwisler@linux.intel.com>,
-	Dave Chinner <david@fromorbit.com>, Jan Kara <jack@suse.cz>,
-	Jens Axboe <axboe@fb.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-kernel@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Jeff Moyer <jmoyer@redhat.com>,
-	Boaz Harrosh <boaz@plexistor.com>
-Subject: [PATCH v6 1/5] dax: fallback from pmd to pte on error
-Date: Tue, 10 May 2016 12:49:12 -0600
-Message-Id: <1462906156-22303-2-git-send-email-vishal.l.verma@intel.com>
-In-Reply-To: <1462906156-22303-1-git-send-email-vishal.l.verma@intel.com>
-References: <1462906156-22303-1-git-send-email-vishal.l.verma@intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:44898 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S932526AbcETJlw (ORCPT <rfc822;linux-block@vger.kernel.org>);
+	Fri, 20 May 2016 05:41:52 -0400
+Date: Fri, 20 May 2016 17:41:48 +0800
+From: Xiong Zhou <xzhou@redhat.com>
+To: Dan Williams <dan.j.williams@intel.com>
+Cc: linux-nvdimm@ml01.01.org,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	linux-kernel@vger.kernel.org, hch@lst.de,
+	linux-block@vger.kernel.org,
+	Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH v3 2/5] /dev/dax, pmem: direct access to persistent memory
+Message-ID: <20160520094148.GE5035@dhcp12-144.nay.redhat.com>
+References: <146360496572.37439.6497663679891935585.stgit@dwillia2-desk3.amr.corp.intel.com>
+ <146360497642.37439.12866290214925858506.stgit@dwillia2-desk3.amr.corp.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <146360497642.37439.12866290214925858506.stgit@dwillia2-desk3.amr.corp.intel.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Dan Williams <dan.j.williams@intel.com>
+On Wed, May 18, 2016 at 01:56:16PM -0700, Dan Williams wrote:
+> Device DAX is the device-centric analogue of Filesystem DAX
+> (CONFIG_FS_DAX).  It allows memory ranges to be allocated and mapped
+> without need of an intervening file system.  Device DAX is strict,
+> precise and predictable.  Specifically this interface:
+> 
+> 1/ Guarantees fault granularity with respect to a given page size (pte,
+> pmd, or pud) set at configuration time.
+> 
+> 2/ Enforces deterministic behavior by being strict about what fault
+> scenarios are supported.
+> 
+> For example, by forcing MADV_DONTFORK semantics and omitting MAP_PRIVATE
+> support device-dax guarantees that a mapping always behaves/performs the
+> same once established.  It is the "what you see is what you get" access
+> mechanism to differentiated memory vs filesystem DAX which has
+> filesystem specific implementation semantics.
+> 
+> Persistent memory is the first target, but the mechanism is also
+> targeted for exclusive allocations of performance differentiated memory
+> ranges.
+> 
+> This commit is limited to the base device driver infrastructure to
+> associate a dax device with pmem range.
+> 
+> Cc: Jeff Moyer <jmoyer@redhat.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Andrew Morton <akpm@linux-foundation.org>
+> Cc: Dave Hansen <dave.hansen@linux.intel.com>
+> Cc: Ross Zwisler <ross.zwisler@linux.intel.com>
+> Signed-off-by: Dan Williams <dan.j.williams@intel.com>
+> ---
+>  drivers/Kconfig                     |    2 
+>  drivers/Makefile                    |    1 
+>  drivers/dax/Kconfig                 |   25 +++
+>  drivers/dax/Makefile                |    4 +
+>  drivers/dax/dax.c                   |  253 +++++++++++++++++++++++++++++++++++
+>  drivers/dax/dax.h                   |   24 +++
+>  drivers/dax/pmem.c                  |  158 ++++++++++++++++++++++
 
-In preparation for consulting a badblocks list in pmem_direct_access(),
-teach dax_pmd_fault() to fallback rather than fail immediately upon
-encountering an error.  The thought being that reducing the span of the
-dax request may avoid the error region.
+An entry in MAINTAINERS for these new files ?
 
-Reviewed-by: Jeff Moyer <jmoyer@redhat.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Jan Kara <jack@suse.cz>
-Signed-off-by: Dan Williams <dan.j.williams@intel.com>
----
- fs/dax.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/fs/dax.c b/fs/dax.c
-index 5a34f08..52f0044 100644
---- a/fs/dax.c
-+++ b/fs/dax.c
-@@ -1111,8 +1111,8 @@ int __dax_pmd_fault(struct vm_area_struct *vma, unsigned long address,
- 		long length = dax_map_atomic(bdev, &dax);
- 
- 		if (length < 0) {
--			result = VM_FAULT_SIGBUS;
--			goto out;
-+			dax_pmd_dbg(&bh, address, "dax-error fallback");
-+			goto fallback;
- 		}
- 		if (length < PMD_SIZE) {
- 			dax_pmd_dbg(&bh, address, "dax-length too small");
--- 
-2.5.5
-
+Thanks,
+Xiong
