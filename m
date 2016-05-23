@@ -1,96 +1,99 @@
-Return-Path: <baolin.wang@linaro.org>
-Return-Path: <baolin.wang@linaro.org>
-From: Baolin Wang <baolin.wang@linaro.org>
-To: axboe@kernel.dk,
-	agk@redhat.com,
-	snitzer@redhat.com,
-	dm-devel@redhat.com,
-	herbert@gondor.apana.org.au,
-	davem@davemloft.net
-Cc: ebiggers3@gmail.com,
-	js1304@gmail.com,
-	tadeusz.struk@intel.com,
-	smueller@chronox.de,
-	standby24x7@gmail.com,
-	shli@kernel.org,
-	dan.j.williams@intel.com,
-	martin.petersen@oracle.com,
-	sagig@mellanox.com,
-	kent.overstreet@gmail.com,
-	keith.busch@intel.com,
-	tj@kernel.org,
-	ming.lei@canonical.com,
-	broonie@kernel.org,
-	arnd@arndb.de,
-	linux-crypto@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-raid@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	baolin.wang@linaro.org
-Subject: [RFC v3 2/4] crypto: Introduce CRYPTO_ALG_BULK flag
-Date: Wed,  1 Jun 2016 12:58:05 +0800
-Message-Id: <47e9ddd8c9ea9ad9e29c8cb027d19d8459ea1479.1464756501.git.baolin.wang@linaro.org>
-In-Reply-To: <cover.1464756501.git.baolin.wang@linaro.org>
-References: <cover.1464756501.git.baolin.wang@linaro.org>
-In-Reply-To: <cover.1464756501.git.baolin.wang@linaro.org>
-References: <cover.1464756501.git.baolin.wang@linaro.org>
+Return-Path: <jmoyer@redhat.com>
+From: Jeff Moyer <jmoyer@redhat.com>
+To: Mike Danese <mikedanese@google.com>
+Cc: kernel-janitors@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org (open list:BLOCK LAYER),
+        linux-kernel@vger.kernel.org (open list)
+Subject: Re: [PATCH] blk: remove NULL check before freeing functions
+In-Reply-To: <1463987633-125741-1-git-send-email-mikedanese@google.com> (Mike
+	Danese's message of "Mon, 23 May 2016 00:13:53 -0700")
+References: <1463987633-125741-1-git-send-email-mikedanese@google.com>
+Date: Mon, 23 May 2016 11:20:19 -0400
+Message-ID: <x4937p86bt8.fsf@segfault.boston.devel.redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-Now some cipher hardware engines prefer to handle bulk block rather than one
-sector (512 bytes) created by dm-crypt, cause these cipher engines can handle
-the intermediate values (IV) by themselves in one bulk block. This means we
-can increase the size of the request by merging request rather than always 512
-bytes and thus increase the hardware engine processing speed.
+Mike Danese <mikedanese@google.com> writes:
 
-So introduce 'CRYPTO_ALG_BULK' flag to indicate this cipher can support bulk
-mode.
+> Coccinelle complains:
+>
+> WARNING: NULL check before freeing functions like kfree, debugfs_remove,
+> debugfs_remove_recursive or usb_free_urb is not needed. Maybe consider
+> reorganizing relevant code to avoid passing NULL values.
+>
+> Signed-off-by: Mike Danese <mikedanese@google.com>
 
-Signed-off-by: Baolin Wang <baolin.wang@linaro.org>
----
- include/crypto/skcipher.h |    7 +++++++
- include/linux/crypto.h    |    6 ++++++
- 2 files changed, 13 insertions(+)
+Acked-by: Jeff Moyer <jmoyer@redhat.com>
 
-diff --git a/include/crypto/skcipher.h b/include/crypto/skcipher.h
-index 0f987f5..d89d29a 100644
---- a/include/crypto/skcipher.h
-+++ b/include/crypto/skcipher.h
-@@ -519,5 +519,12 @@ static inline void skcipher_request_set_crypt(
- 	req->iv = iv;
- }
- 
-+static inline unsigned int skcipher_is_bulk_mode(struct crypto_skcipher *sk_tfm)
-+{
-+	struct crypto_tfm *tfm = crypto_skcipher_tfm(sk_tfm);
-+
-+	return crypto_tfm_alg_bulk(tfm);
-+}
-+
- #endif	/* _CRYPTO_SKCIPHER_H */
- 
-diff --git a/include/linux/crypto.h b/include/linux/crypto.h
-index 6e28c89..a315487 100644
---- a/include/linux/crypto.h
-+++ b/include/linux/crypto.h
-@@ -63,6 +63,7 @@
- #define CRYPTO_ALG_DEAD			0x00000020
- #define CRYPTO_ALG_DYING		0x00000040
- #define CRYPTO_ALG_ASYNC		0x00000080
-+#define CRYPTO_ALG_BULK			0x00000100
- 
- /*
-  * Set this bit if and only if the algorithm requires another algorithm of
-@@ -623,6 +624,11 @@ static inline u32 crypto_tfm_alg_type(struct crypto_tfm *tfm)
- 	return tfm->__crt_alg->cra_flags & CRYPTO_ALG_TYPE_MASK;
- }
- 
-+static inline unsigned int crypto_tfm_alg_bulk(struct crypto_tfm *tfm)
-+{
-+	return tfm->__crt_alg->cra_flags & CRYPTO_ALG_BULK;
-+}
-+
- static inline unsigned int crypto_tfm_alg_blocksize(struct crypto_tfm *tfm)
- {
- 	return tfm->__crt_alg->cra_blocksize;
--- 
-1.7.9.5
+> ---
+>  block/bio-integrity.c | 7 ++-----
+>  block/bio.c           | 7 ++-----
+>  block/blk-core.c      | 3 +--
+>  block/elevator.c      | 3 +--
+>  4 files changed, 6 insertions(+), 14 deletions(-)
+>
+> diff --git a/block/bio-integrity.c b/block/bio-integrity.c
+> index 711e4d8d..27bf4e7 100644
+> --- a/block/bio-integrity.c
+> +++ b/block/bio-integrity.c
+> @@ -499,11 +499,8 @@ EXPORT_SYMBOL(bioset_integrity_create);
+>  
+>  void bioset_integrity_free(struct bio_set *bs)
+>  {
+> -	if (bs->bio_integrity_pool)
+> -		mempool_destroy(bs->bio_integrity_pool);
+> -
+> -	if (bs->bvec_integrity_pool)
+> -		mempool_destroy(bs->bvec_integrity_pool);
+> +	mempool_destroy(bs->bio_integrity_pool);
+> +	mempool_destroy(bs->bvec_integrity_pool);
+>  }
+>  EXPORT_SYMBOL(bioset_integrity_free);
+>  
+> diff --git a/block/bio.c b/block/bio.c
+> index 0e4aa42..e1e1773 100644
+> --- a/block/bio.c
+> +++ b/block/bio.c
+> @@ -1844,11 +1844,8 @@ void bioset_free(struct bio_set *bs)
+>  	if (bs->rescue_workqueue)
+>  		destroy_workqueue(bs->rescue_workqueue);
+>  
+> -	if (bs->bio_pool)
+> -		mempool_destroy(bs->bio_pool);
+> -
+> -	if (bs->bvec_pool)
+> -		mempool_destroy(bs->bvec_pool);
+> +	mempool_destroy(bs->bio_pool);
+> +	mempool_destroy(bs->bvec_pool);
+>  
+>  	bioset_integrity_free(bs);
+>  	bio_put_slab(bs);
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index 2475b1c7..916e7c3 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -636,8 +636,7 @@ int blk_init_rl(struct request_list *rl, struct request_queue *q,
+>  
+>  void blk_exit_rl(struct request_list *rl)
+>  {
+> -	if (rl->rq_pool)
+> -		mempool_destroy(rl->rq_pool);
+> +	mempool_destroy(rl->rq_pool);
+>  }
+>  
+>  struct request_queue *blk_alloc_queue(gfp_t gfp_mask)
+> diff --git a/block/elevator.c b/block/elevator.c
+> index c3555c9..5dc91ca 100644
+> --- a/block/elevator.c
+> +++ b/block/elevator.c
+> @@ -847,8 +847,7 @@ int elv_register(struct elevator_type *e)
+>  	spin_lock(&elv_list_lock);
+>  	if (elevator_find(e->elevator_name)) {
+>  		spin_unlock(&elv_list_lock);
+> -		if (e->icq_cache)
+> -			kmem_cache_destroy(e->icq_cache);
+> +		kmem_cache_destroy(e->icq_cache);
+>  		return -EBUSY;
+>  	}
+>  	list_add_tail(&e->list, &elv_list);
