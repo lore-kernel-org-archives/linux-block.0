@@ -1,184 +1,155 @@
-Return-Path: <kamal@canonical.com>
-From: Kamal Mostafa <kamal@canonical.com>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org,
-	kernel-team@lists.ubuntu.com
-Cc: Roman Pen <roman.penyaev@profitbricks.com>,
-	Gioh Kim <gi-oh.kim@profitbricks.com>,
-	Michael Wang <yun.wang@profitbricks.com>,
-	Tejun Heo <tj@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	Kamal Mostafa <kamal@canonical.com>
-Subject: [PATCH 4.2.y-ckt 15/59] workqueue: fix ghost PENDING flag while doing MQ IO
-Date: Mon,  9 May 2016 12:55:33 -0700
-Message-Id: <1462823777-8384-16-git-send-email-kamal@canonical.com>
-In-Reply-To: <1462823777-8384-1-git-send-email-kamal@canonical.com>
-References: <1462823777-8384-1-git-send-email-kamal@canonical.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-ig0-f194.google.com ([209.85.213.194]:35642 "EHLO
+	mail-ig0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932744AbcEXOiK convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-block@vger.kernel.org>);
+	Tue, 24 May 2016 10:38:10 -0400
+MIME-Version: 1.0
+In-Reply-To: <57446273.70509@lightnvm.io>
+References: <1463994814-3388-1-git-send-email-wwtao0320@163.com>
+	<1463994814-3388-2-git-send-email-wwtao0320@163.com>
+	<5742CA7F.4030000@lightnvm.io>
+	<CACygaLCjhH=JKMJ=cML=LUb4=jvwqq_9P2ay-YGr376aLgZiVg@mail.gmail.com>
+	<5742F686.7050408@lightnvm.io>
+	<CACygaLCVipKvso0=w57V+ML6HXsC9rjfspYy6JT6Z5Me0uswPw@mail.gmail.com>
+	<57446273.70509@lightnvm.io>
+Date: Tue, 24 May 2016 22:38:09 +0800
+Message-ID: <CACygaLBMt-p0seDRE4r3ZOoAbccyfgGy4fndY1bLv8Sk-ic9Zg@mail.gmail.com>
+Subject: Re: [RFC PATCH 2/2] lightnvm: Append device name to target name
+From: Wenwei Tao <ww.tao0320@gmail.com>
+To: =?UTF-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>
+Cc: Wenwei Tao <wwtao0320@163.com>, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-4.2.8-ckt10 -stable review patch.  If anyone has any objections, please let me know.
+It's fine to allow the user to define a device name as long as hold
+the global lock and link the targets into a global list but that may
+against the idea to move the target management into media mgr.
 
----8<------------------------------------------------------------
-
-From: Roman Pen <roman.penyaev@profitbricks.com>
-
-commit 346c09f80459a3ad97df1816d6d606169a51001a upstream.
-
-The bug in a workqueue leads to a stalled IO request in MQ ctx->rq_list
-with the following backtrace:
-
-[  601.347452] INFO: task kworker/u129:5:1636 blocked for more than 120 seconds.
-[  601.347574]       Tainted: G           O    4.4.5-1-storage+ #6
-[  601.347651] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-[  601.348142] kworker/u129:5  D ffff880803077988     0  1636      2 0x00000000
-[  601.348519] Workqueue: ibnbd_server_fileio_wq ibnbd_dev_file_submit_io_worker [ibnbd_server]
-[  601.348999]  ffff880803077988 ffff88080466b900 ffff8808033f9c80 ffff880803078000
-[  601.349662]  ffff880807c95000 7fffffffffffffff ffffffff815b0920 ffff880803077ad0
-[  601.350333]  ffff8808030779a0 ffffffff815b01d5 0000000000000000 ffff880803077a38
-[  601.350965] Call Trace:
-[  601.351203]  [<ffffffff815b0920>] ? bit_wait+0x60/0x60
-[  601.351444]  [<ffffffff815b01d5>] schedule+0x35/0x80
-[  601.351709]  [<ffffffff815b2dd2>] schedule_timeout+0x192/0x230
-[  601.351958]  [<ffffffff812d43f7>] ? blk_flush_plug_list+0xc7/0x220
-[  601.352208]  [<ffffffff810bd737>] ? ktime_get+0x37/0xa0
-[  601.352446]  [<ffffffff815b0920>] ? bit_wait+0x60/0x60
-[  601.352688]  [<ffffffff815af784>] io_schedule_timeout+0xa4/0x110
-[  601.352951]  [<ffffffff815b3a4e>] ? _raw_spin_unlock_irqrestore+0xe/0x10
-[  601.353196]  [<ffffffff815b093b>] bit_wait_io+0x1b/0x70
-[  601.353440]  [<ffffffff815b056d>] __wait_on_bit+0x5d/0x90
-[  601.353689]  [<ffffffff81127bd0>] wait_on_page_bit+0xc0/0xd0
-[  601.353958]  [<ffffffff81096db0>] ? autoremove_wake_function+0x40/0x40
-[  601.354200]  [<ffffffff81127cc4>] __filemap_fdatawait_range+0xe4/0x140
-[  601.354441]  [<ffffffff81127d34>] filemap_fdatawait_range+0x14/0x30
-[  601.354688]  [<ffffffff81129a9f>] filemap_write_and_wait_range+0x3f/0x70
-[  601.354932]  [<ffffffff811ced3b>] blkdev_fsync+0x1b/0x50
-[  601.355193]  [<ffffffff811c82d9>] vfs_fsync_range+0x49/0xa0
-[  601.355432]  [<ffffffff811cf45a>] blkdev_write_iter+0xca/0x100
-[  601.355679]  [<ffffffff81197b1a>] __vfs_write+0xaa/0xe0
-[  601.355925]  [<ffffffff81198379>] vfs_write+0xa9/0x1a0
-[  601.356164]  [<ffffffff811c59d8>] kernel_write+0x38/0x50
-
-The underlying device is a null_blk, with default parameters:
-
-  queue_mode    = MQ
-  submit_queues = 1
-
-Verification that nullb0 has something inflight:
-
-root@pserver8:~# cat /sys/block/nullb0/inflight
-       0        1
-root@pserver8:~# find /sys/block/nullb0/mq/0/cpu* -name rq_list -print -exec cat {} \;
-...
-/sys/block/nullb0/mq/0/cpu2/rq_list
-CTX pending:
-        ffff8838038e2400
-...
-
-During debug it became clear that stalled request is always inserted in
-the rq_list from the following path:
-
-   save_stack_trace_tsk + 34
-   blk_mq_insert_requests + 231
-   blk_mq_flush_plug_list + 281
-   blk_flush_plug_list + 199
-   wait_on_page_bit + 192
-   __filemap_fdatawait_range + 228
-   filemap_fdatawait_range + 20
-   filemap_write_and_wait_range + 63
-   blkdev_fsync + 27
-   vfs_fsync_range + 73
-   blkdev_write_iter + 202
-   __vfs_write + 170
-   vfs_write + 169
-   kernel_write + 56
-
-So blk_flush_plug_list() was called with from_schedule == true.
-
-If from_schedule is true, that means that finally blk_mq_insert_requests()
-offloads execution of __blk_mq_run_hw_queue() and uses kblockd workqueue,
-i.e. it calls kblockd_schedule_delayed_work_on().
-
-That means, that we race with another CPU, which is about to execute
-__blk_mq_run_hw_queue() work.
-
-Further debugging shows the following traces from different CPUs:
-
-  CPU#0                                  CPU#1
-  ----------------------------------     -------------------------------
-  reqeust A inserted
-  STORE hctx->ctx_map[0] bit marked
-  kblockd_schedule...() returns 1
-  <schedule to kblockd workqueue>
-                                         request B inserted
-                                         STORE hctx->ctx_map[1] bit marked
-                                         kblockd_schedule...() returns 0
-  *** WORK PENDING bit is cleared ***
-  flush_busy_ctxs() is executed, but
-  bit 1, set by CPU#1, is not observed
-
-As a result request B pended forever.
-
-This behaviour can be explained by speculative LOAD of hctx->ctx_map on
-CPU#0, which is reordered with clear of PENDING bit and executed _before_
-actual STORE of bit 1 on CPU#1.
-
-The proper fix is an explicit full barrier <mfence>, which guarantees
-that clear of PENDING bit is to be executed before all possible
-speculative LOADS or STORES inside actual work function.
-
-Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
-Cc: Gioh Kim <gi-oh.kim@profitbricks.com>
-Cc: Michael Wang <yun.wang@profitbricks.com>
-Cc: Tejun Heo <tj@kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Signed-off-by: Tejun Heo <tj@kernel.org>
-Signed-off-by: Kamal Mostafa <kamal@canonical.com>
----
- kernel/workqueue.c | 29 +++++++++++++++++++++++++++++
- 1 file changed, 29 insertions(+)
-
-diff --git a/kernel/workqueue.c b/kernel/workqueue.c
-index c743abf..a2a7ac1 100644
---- a/kernel/workqueue.c
-+++ b/kernel/workqueue.c
-@@ -649,6 +649,35 @@ static void set_work_pool_and_clear_pending(struct work_struct *work,
- 	 */
- 	smp_wmb();
- 	set_work_data(work, (unsigned long)pool_id << WORK_OFFQ_POOL_SHIFT, 0);
-+	/*
-+	 * The following mb guarantees that previous clear of a PENDING bit
-+	 * will not be reordered with any speculative LOADS or STORES from
-+	 * work->current_func, which is executed afterwards.  This possible
-+	 * reordering can lead to a missed execution on attempt to qeueue
-+	 * the same @work.  E.g. consider this case:
-+	 *
-+	 *   CPU#0                         CPU#1
-+	 *   ----------------------------  --------------------------------
-+	 *
-+	 * 1  STORE event_indicated
-+	 * 2  queue_work_on() {
-+	 * 3    test_and_set_bit(PENDING)
-+	 * 4 }                             set_..._and_clear_pending() {
-+	 * 5                                 set_work_data() # clear bit
-+	 * 6                                 smp_mb()
-+	 * 7                               work->current_func() {
-+	 * 8				      LOAD event_indicated
-+	 *				   }
-+	 *
-+	 * Without an explicit full barrier speculative LOAD on line 8 can
-+	 * be executed before CPU#0 does STORE on line 1.  If that happens,
-+	 * CPU#0 observes the PENDING bit is still set and new execution of
-+	 * a @work is not queued in a hope, that CPU#1 will eventually
-+	 * finish the queued @work.  Meanwhile CPU#1 does not see
-+	 * event_indicated is set, because speculative LOAD was executed
-+	 * before actual STORE.
-+	 */
-+	smp_mb();
- }
- 
- static void clear_work_data(struct work_struct *work)
--- 
-2.7.4
+2016-05-24 22:17 GMT+08:00 Matias Bjørling <mb@lightnvm.io>:
+> On 05/23/2016 03:31 PM, Wenwei Tao wrote:
+>>
+>> Eh.. my lock patch can only prevent concurrent creation of the same
+>> name target on the same backend device, not the concurrent creation of
+>> same name target on different backend devices, since target management
+>> is protect by per  device's gn->lock not
+>> the global nvm_lock now.
+>>
+>> 2016-05-23 20:24 GMT+08:00 Matias Bjørling <mb@lightnvm.io>:
+>>>
+>>> On 05/23/2016 01:05 PM, Wenwei Tao wrote:
+>>>>
+>>>>
+>>>> 2016-05-23 17:16 GMT+08:00 Matias Bjørling <mb@lightnvm.io>:
+>>>>>
+>>>>>
+>>>>> On 05/23/2016 11:13 AM, Wenwei Tao wrote:
+>>>>>>
+>>>>>>
+>>>>>>
+>>>>>> From: Wenwei Tao <ww.tao0320@gmail.com>
+>>>>>>
+>>>>>> We may create targets with same name on different
+>>>>>> backend devices, this is not what we want, so append
+>>>>>> the device name to target name to make the new target
+>>>>>> name unique in the system.
+>>>>>>
+>>>>>> Signed-off-by: Wenwei Tao <ww.tao0320@gmail.com>
+>>>>>> ---
+>>>>>>     drivers/lightnvm/gennvm.c | 13 +++++++++++--
+>>>>>>     1 file changed, 11 insertions(+), 2 deletions(-)
+>>>>>>
+>>>>>> diff --git a/drivers/lightnvm/gennvm.c b/drivers/lightnvm/gennvm.c
+>>>>>> index 39ff0af..ecb09cb 100644
+>>>>>> --- a/drivers/lightnvm/gennvm.c
+>>>>>> +++ b/drivers/lightnvm/gennvm.c
+>>>>>> @@ -43,9 +43,18 @@ static int gen_create_tgt(struct nvm_dev *dev,
+>>>>>> struct
+>>>>>> nvm_ioctl_create *create)
+>>>>>>           struct gendisk *tdisk;
+>>>>>>           struct nvm_tgt_type *tt;
+>>>>>>           struct nvm_target *t;
+>>>>>> +       char tgtname[DISK_NAME_LEN];
+>>>>>>           void *targetdata;
+>>>>>>           int ret = -ENOMEM;
+>>>>>>
+>>>>>> +       if (strlen(dev->name) + strlen(create->tgtname) + 1 >
+>>>>>> DISK_NAME_LEN) {
+>>>>>> +               pr_err("nvm: target name too long. %s:%s\n",
+>>>>>> +                               dev->name, create->tgtname);
+>>>>>> +               return -EINVAL;
+>>>>>> +       }
+>>>>>> +
+>>>>>> +       sprintf(tgtname, "%s%s", dev->name, create->tgtname);
+>>>>>> +
+>>>>>>           tt = nvm_find_target_type(create->tgttype, 1);
+>>>>>>           if (!tt) {
+>>>>>>                   pr_err("nvm: target type %s not found\n",
+>>>>>> create->tgttype);
+>>>>>> @@ -53,7 +62,7 @@ static int gen_create_tgt(struct nvm_dev *dev,
+>>>>>> struct
+>>>>>> nvm_ioctl_create *create)
+>>>>>>           }
+>>>>>>
+>>>>>>           mutex_lock(&gn->lock);
+>>>>>> -       t = gen_find_target(gn, create->tgtname);
+>>>>>> +       t = gen_find_target(gn, tgtname);
+>>>>>>           if (t) {
+>>>>>>                   pr_err("nvm: target name already exists.\n");
+>>>>>>                   ret = -EINVAL;
+>>>>>> @@ -73,7 +82,7 @@ static int gen_create_tgt(struct nvm_dev *dev,
+>>>>>> struct
+>>>>>> nvm_ioctl_create *create)
+>>>>>>           if (!tdisk)
+>>>>>>                   goto err_queue;
+>>>>>>
+>>>>>> -       sprintf(tdisk->disk_name, "%s", create->tgtname);
+>>>>>> +       sprintf(tdisk->disk_name, "%s", tgtname);
+>>>>>>           tdisk->flags = GENHD_FL_EXT_DEVT;
+>>>>>>           tdisk->major = 0;
+>>>>>>           tdisk->first_minor = 0;
+>>>>>>
+>>>>>
+>>>>> Hi Wenwei, what about the case where a target instance has multiple
+>>>>> devices
+>>>>> associated?
+>>>>>
+>>>> You mean a target may be build on multiple backend devices ?
+>>>
+>>>
+>>>
+>>> Yes. Over time, we want a single target to manage many devices.
+>>>
+>>>>
+>>>>> I am okay with having the user choosing a unique name for the target to
+>>>>> be
+>>>>> exposed.
+>>>>
+>>>>
+>>>> You mean user should check the name before create the target?
+>>>
+>>>
+>>>
+>>> Sure. It is him that decides the name of the device. Your lock patch
+>>> fixes
+>>> the panic that could happen. I am happy with that.
+>>>
+>>>
+>>>> Before move target mgmt into media mgr, that would be okay(after apply
+>>>> lightnvm: hold lock until finish the target creation), since all
+>>>> targets are in the global list.
+>>>> Now consider below case:
+>>>> There are two users A and B. A want to create target test0 upon
+>>>> device0 B want to create test0 upon device1,
+>>>> before creation they both check whether test0 is exist (e.g. by list
+>>>> /dev/test0) , they all find test0 is not exist now, and they continue
+>>>> their
+>>>> creation. Both of them use disk name test0 to call add_disk, that
+>>>> would cause panic.
+>>>>
+>>>
+>
+> You are right. The right way is properly to not allow the user to define a
+> device name, and instead rely on generic naming and UUID.
