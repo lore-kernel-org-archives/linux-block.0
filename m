@@ -1,100 +1,87 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:29942 "EHLO mga11.intel.com"
+Received: from mx1.redhat.com ([209.132.183.28]:44120 "EHLO mx1.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750822AbcEHWf6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-	Sun, 8 May 2016 18:35:58 -0400
-Subject: [PATCH 0/7] "Device DAX" for persistent memory
-From: Dan Williams <dan.j.williams@intel.com>
-To: linux-nvdimm@lists.01.org
-Cc: Dave Hansen <dave.hansen@linux.intel.com>,
-	Dave Chinner <david@fromorbit.com>,
-	linux-kernel@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-	linux-block@vger.kernel.org, Jeff Moyer <jmoyer@redhat.com>,
-	Jan Kara <jack@suse.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Ross Zwisler <ross.zwisler@linux.intel.com>
-Date: Sun, 08 May 2016 15:35:10 -0700
-Message-ID: <146274690999.10891.10714722986208180484.stgit@dwillia2-desk3.amr.corp.intel.com>
+	id S1751513AbcEYTUr (ORCPT <rfc822;linux-block@vger.kernel.org>);
+	Wed, 25 May 2016 15:20:47 -0400
+Subject: Re: [PATCH 1/5] blk mq: take ref to q when running it
+To: Bart Van Assche <bart.vanassche@sandisk.com>,
+	linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+	target-devel@vger.kernel.org
+References: <1464162903-14735-1-git-send-email-mchristi@redhat.com>
+ <1464162903-14735-2-git-send-email-mchristi@redhat.com>
+ <8cab029e-fac5-b4cb-8e80-707abe50ab09@sandisk.com>
+ <5745F9B7.5070703@redhat.com>
+From: Mike Christie <mchristi@redhat.com>
+Message-ID: <5745FB0C.8000100@redhat.com>
+Date: Wed, 25 May 2016 14:20:44 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <5745F9B7.5070703@redhat.com>
+Content-Type: text/plain; charset=windows-1252
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Device DAX is the device-centric analogue of Filesystem DAX
-(CONFIG_FS_DAX).  It allows memory ranges to be allocated and mapped
-without need of an intervening file system or being bound to block
-device semantics.  Device DAX is strict and predictable.  Specifically
-this interface:
+On 05/25/2016 02:15 PM, Mike Christie wrote:
+> On 05/25/2016 10:53 AM, Bart Van Assche wrote:
+>> On 05/25/2016 12:54 AM, mchristi@redhat.com wrote:
+>>> If the __blk_mq_run_hw_queue is a result of a async run or retry
+>>> then we do not have a reference to the queue. At this time,
+>>> blk_cleanup_queue could begin tearing it down while the queue_rq
+>>> function is being run.
+>>>
+>>> This patch just has us do a blk_queue_enter call.
+>>>
+>>> Signed-off-by: Mike Christie <mchristi@redhat.com>
+>>> ---
+>>>  block/blk-mq.c | 10 +++++++++-
+>>>  1 file changed, 9 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/block/blk-mq.c b/block/blk-mq.c
+>>> index 7df9c92..5958a02 100644
+>>> --- a/block/blk-mq.c
+>>> +++ b/block/blk-mq.c
+>>> @@ -738,8 +738,13 @@ static void __blk_mq_run_hw_queue(struct
+>>> blk_mq_hw_ctx *hctx)
+>>>
+>>>      WARN_ON(!cpumask_test_cpu(raw_smp_processor_id(), hctx->cpumask));
+>>>
+>>> -    if (unlikely(test_bit(BLK_MQ_S_STOPPED, &hctx->state)))
+>>> +    if (blk_queue_enter(q, false)) {
+>>> +        blk_mq_run_hw_queue(hctx, true);
+>>>          return;
+>>> +    }
+>>> +
+>>> +    if (unlikely(test_bit(BLK_MQ_S_STOPPED, &hctx->state)))
+>>> +        goto exit_queue;
+>>>
+>>>      hctx->run++;
+>>>
+>>> @@ -832,6 +837,9 @@ static void __blk_mq_run_hw_queue(struct
+>>> blk_mq_hw_ctx *hctx)
+>>>           **/
+>>>          blk_mq_run_hw_queue(hctx, true);
+>>>      }
+>>> +
+>>> +exit_queue:
+>>> +    blk_queue_exit(q);
+>>>  }
+>>
+>> Hello Mike,
+>>
+>> blk_cleanup_queue() waits until delay_work and run_work have finished
+>> inside blk_sync_queue(). The code in blk_cleanup_queue() before the
+>> blk_sync_queue() call should be safe to execute concurrently with
+>> queue_rq(). Or did I perhaps miss something?
+>>
+> 
+> My concern was when blk_mq_run_hw_queue is run with async=false then we
+> are not always run from the work queue or a under another
+> blk_queue_enter call already.
+> 
+> For example, in the scsi cases where we call
+> scsi_run_queue->blk_mq_start_stopped_hw_queues we can be in soft irq
+> context, some driver thread or the scsi eh thread.
 
-1/ Guarantees fault granularity with respect to a given page size (pte,
-pmd, or pud) set at configuration time.
+Doh, ok. I guess if my analysis of the code is correct, then I should
+just move the blk_queue_enter call into blk_mq_run_hw_queue's
+async=false code path. I am not sure what I was thinking.
 
-2/ Enforces deterministic behavior by being strict about what fault
-scenarios are supported.
-
-This first implementation, for persistent memory, is targeted at
-applications like hypervisors and some databases that only need an
-allocate + map mechanism from the kernel.  Later this mechanism can be
-used to enable direct access to other performance/feature differentiated
-memory ranges.
-
-This series is built on "[PATCH 00/13] prep for device-dax, untangle
-pfn-device setup" [1], posted at the end of March.
-
-A libnvdimm pmem namespace can be switched from its default /dev/pmemX
-(block device) interface to /dev/daxX.Y with the ndctl utility:
-
-    ndctl create-namespace -m dax -e namespace0.0 -f
-
-This implementation passes a basic setup, map, fault, and shutdown
-sequence.
-
-[1]: https://lists.01.org/pipermail/linux-nvdimm/2016-March/005086.html
-
----
-
-Dan Williams (7):
-      libnvdimm: cleanup nvdimm_namespace_common_probe(), kill 'host'
-      libnvdimm, dax: introduce device-dax infrastructure
-      libnvdimm, dax: reserve space to store labels for device-dax
-      libnvdimm, dax: record the specified alignment of a dax-device instance
-      /dev/dax, pmem: direct access to persistent memory
-      /dev/dax, core: file operations and dax-mmap
-      Revert "block: enable dax for raw block devices"
-
-
- block/ioctl.c                       |   32 --
- drivers/Kconfig                     |    2 
- drivers/Makefile                    |    1 
- drivers/dax/Kconfig                 |   25 ++
- drivers/dax/Makefile                |    4 
- drivers/dax/dax.c                   |  543 +++++++++++++++++++++++++++++++++++
- drivers/dax/dax.h                   |   24 ++
- drivers/dax/pmem.c                  |  168 +++++++++++
- drivers/nvdimm/Kconfig              |   13 +
- drivers/nvdimm/Makefile             |    1 
- drivers/nvdimm/bus.c                |    4 
- drivers/nvdimm/claim.c              |    2 
- drivers/nvdimm/dax_devs.c           |   99 ++++++
- drivers/nvdimm/namespace_devs.c     |   38 ++
- drivers/nvdimm/nd-core.h            |    1 
- drivers/nvdimm/nd.h                 |   25 ++
- drivers/nvdimm/pfn.h                |    4 
- drivers/nvdimm/pfn_devs.c           |  116 +++++--
- drivers/nvdimm/region.c             |    2 
- drivers/nvdimm/region_devs.c        |   29 ++
- fs/block_dev.c                      |   96 ++----
- include/linux/fs.h                  |    8 -
- include/uapi/linux/fs.h             |    1 
- include/uapi/linux/ndctl.h          |    2 
- mm/huge_memory.c                    |    1 
- mm/hugetlb.c                        |    1 
- tools/testing/nvdimm/Kbuild         |   10 +
- tools/testing/nvdimm/config_check.c |    2 
- 28 files changed, 1094 insertions(+), 160 deletions(-)
- create mode 100644 drivers/dax/Kconfig
- create mode 100644 drivers/dax/Makefile
- create mode 100644 drivers/dax/dax.c
- create mode 100644 drivers/dax/dax.h
- create mode 100644 drivers/dax/pmem.c
- create mode 100644 drivers/nvdimm/dax_devs.c
