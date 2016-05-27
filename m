@@ -1,160 +1,264 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:60633 "EHLO mga02.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932069AbcENAEa (ORCPT <rfc822;linux-block@vger.kernel.org>);
-	Fri, 13 May 2016 20:04:30 -0400
-From: Jon Derrick <jonathan.derrick@intel.com>
-To: linux-block@vger.kernel.org
-Cc: Jon Derrick <jonathan.derrick@intel.com>,
-	"Jens Axboe" <axboe@fb.com>,
-	"Alexander Viro" <viro@zeniv.linux.org.uk>,
-	linux-fsdevel@vger.kernel.org,
-	"Dan Williams" <dan.j.williams@intel.com>,
-	"Jeff Moyer" <jmoyer@redhat.com>,
-	"Stephen Bates" <stephen.bates@microsemi.com>,
-	"Keith Busch" <keith.busch@intel.com>,
-	linux-nvme@lists.infradead.org,
-	"Christoph Hellwig" <hch@infradead.org>
-Subject: [RFCv2 3/3] block: Introduce S_HIPRI inode flag
-Date: Fri, 13 May 2016 18:02:48 -0600
-Message-Id: <1463184168-3381-4-git-send-email-jonathan.derrick@intel.com>
-In-Reply-To: <1463184168-3381-1-git-send-email-jonathan.derrick@intel.com>
-References: <1463184168-3381-1-git-send-email-jonathan.derrick@intel.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <baolin.wang@linaro.org>
+Return-Path: <baolin.wang@linaro.org>
+From: Baolin Wang <baolin.wang@linaro.org>
+To: axboe@kernel.dk,
+	agk@redhat.com,
+	snitzer@redhat.com,
+	dm-devel@redhat.com,
+	herbert@gondor.apana.org.au,
+	davem@davemloft.net
+Cc: ebiggers3@gmail.com,
+	js1304@gmail.com,
+	tadeusz.struk@intel.com,
+	smueller@chronox.de,
+	standby24x7@gmail.com,
+	shli@kernel.org,
+	dan.j.williams@intel.com,
+	martin.petersen@oracle.com,
+	sagig@mellanox.com,
+	kent.overstreet@gmail.com,
+	keith.busch@intel.com,
+	tj@kernel.org,
+	ming.lei@canonical.com,
+	broonie@kernel.org,
+	arnd@arndb.de,
+	linux-crypto@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-raid@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	baolin.wang@linaro.org
+Subject: [RFC v2 3/3] md: dm-crypt: Introduce the bulk mode method when sending request
+Date: Fri, 27 May 2016 19:11:24 +0800
+Message-Id: <afa4ebdae7f8cb364d7563e8d32f064c0aa0111f.1464346333.git.baolin.wang@linaro.org>
+In-Reply-To: <cover.1464346333.git.baolin.wang@linaro.org>
+References: <cover.1464346333.git.baolin.wang@linaro.org>
+In-Reply-To: <cover.1464346333.git.baolin.wang@linaro.org>
+References: <cover.1464346333.git.baolin.wang@linaro.org>
+List-ID: <linux-block@vger.kernel.org>
 
-S_HIPRI is a hint that indicates the file (currently only block devices)
-is a high priority file. This hint allows direct-io to the block device
-to poll for completions if polling is available to the block device.
+In now dm-crypt code, it is ineffective to map one segment (always one
+sector) of one bio with just only one scatterlist at one time for hardware
+crypto engine. Especially for some encryption mode (like ecb or xts mode)
+cooperating with the crypto engine, they just need one initial IV or null
+IV instead of different IV for each sector. In this situation We can consider
+to use multiple scatterlists to map the whole bio and send all scatterlists
+of one bio to crypto engine to encrypt or decrypt, which can improve the
+hardware engine's efficiency.
 
-The motivation for this patch comes from tiered caching solutions. A
-user may wish to have low-latency block devices act as a cache for
-higher-latency storage media.
+With this optimization, On my test setup (beaglebone black board) using 64KB
+I/Os on an eMMC storage device I saw about 60% improvement in throughput for
+encrypted writes, and about 100% improvement for encrypted reads. But this
+is not fit for other modes which need different IV for each sector.
 
-With the introduction of block polling, polling could be enabled on a
-queue of a block device. The preadv2/pwritev2 sets allowed a user to
-specify per-io polling, but removed the ability to poll per-queue.
-
-Instead of having a user modify their software to use preadv2/pwritev2,
-this patch allows a user to set S_HIPRI on a block device file to request
-all direct-io for this file to be polled.
-
-Signed-off-by: Jon Derrick <jonathan.derrick@intel.com>
+Signed-off-by: Baolin Wang <baolin.wang@linaro.org>
 ---
- block/ioctl.c           | 43 +++++++++++++++++++++++++++++++++++++++++++
- fs/block_dev.c          |  3 +++
- include/linux/fs.h      |  2 ++
- include/uapi/linux/fs.h |  2 ++
- 4 files changed, 50 insertions(+)
+ drivers/md/dm-crypt.c |  145 ++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 144 insertions(+), 1 deletion(-)
 
-diff --git a/block/ioctl.c b/block/ioctl.c
-index 4ff1f92..1b50fef 100644
---- a/block/ioctl.c
-+++ b/block/ioctl.c
-@@ -520,6 +520,45 @@ static int blkdev_bszset(struct block_device *bdev, fmode_t mode,
- 	return ret;
+diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
+index 4f3cb35..2101f35 100644
+--- a/drivers/md/dm-crypt.c
++++ b/drivers/md/dm-crypt.c
+@@ -33,6 +33,7 @@
+ #include <linux/device-mapper.h>
+ 
+ #define DM_MSG_PREFIX "crypt"
++#define DM_MAX_SG_LIST	1024
+ 
+ /*
+  * context holding the current state of a multi-part conversion
+@@ -142,6 +143,9 @@ struct crypt_config {
+ 	char *cipher;
+ 	char *cipher_string;
+ 
++	struct sg_table sgt_in;
++	struct sg_table sgt_out;
++
+ 	struct crypt_iv_operations *iv_gen_ops;
+ 	union {
+ 		struct iv_essiv_private essiv;
+@@ -837,6 +841,129 @@ static u8 *iv_of_dmreq(struct crypt_config *cc,
+ 		crypto_skcipher_alignmask(any_tfm(cc)) + 1);
  }
  
-+static int blkdev_hipriget(struct block_device *bdev)
++static void crypt_init_sg_table(struct scatterlist *sgl)
 +{
-+	return !!(bdev->bd_inode->i_flags & S_HIPRI);
-+}
++	struct scatterlist *sg;
++	int i;
 +
-+static int blkdev_hipriset(struct block_device *bdev, fmode_t mode,
-+		int __user *argp)
-+{
-+	int n;
-+
-+	if (!capable(CAP_SYS_ADMIN))
-+		return -EACCES;
-+	if (!argp)
-+		return -EINVAL;
-+	if (get_user(n, argp))
-+		return -EFAULT;
-+
-+	n = !!n;
-+	if (n == blkdev_hipriget(bdev))
-+		return 0;
-+
-+	if (!(mode & FMODE_EXCL)) {
-+		bdgrab(bdev);
-+		if (blkdev_get(bdev, mode | FMODE_EXCL, &bdev) < 0)
-+			return -EBUSY;
++	for_each_sg(sgl, sg, DM_MAX_SG_LIST, i) {
++		if (i < DM_MAX_SG_LIST - 1 && sg_is_last(sg))
++			sg_unmark_end(sg);
++		else if (i == DM_MAX_SG_LIST - 1)
++			sg_mark_end(sg);
 +	}
 +
-+	inode_lock(bdev->bd_inode);
-+	if (n)
-+		bdev->bd_inode->i_flags |= S_HIPRI;
-+	else
-+		bdev->bd_inode->i_flags &= ~S_HIPRI;
-+	inode_unlock(bdev->bd_inode);
++	for_each_sg(sgl, sg, DM_MAX_SG_LIST, i) {
++		memset(sg, 0, sizeof(struct scatterlist));
 +
-+	if (!(mode & FMODE_EXCL))
-+		blkdev_put(bdev, mode | FMODE_EXCL);
-+	return 0;
++		if (i == DM_MAX_SG_LIST - 1)
++			sg_mark_end(sg);
++	}
 +}
 +
- /*
-  * always keep this in sync with compat_blkdev_ioctl()
-  */
-@@ -601,6 +640,10 @@ int blkdev_ioctl(struct block_device *bdev, fmode_t mode, unsigned cmd,
- 	case BLKDAXGET:
- 		return put_int(arg, !!(bdev->bd_inode->i_flags & S_DAX));
- 		break;
-+	case BLKHIPRISET:
-+		return blkdev_hipriset(bdev, mode, argp);
-+	case BLKHIPRIGET:
-+		return put_int(arg, blkdev_hipriget(bdev));
- 	case IOC_PR_REGISTER:
- 		return blkdev_pr_register(bdev, argp);
- 	case IOC_PR_RESERVE:
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 252e459..ede8325 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -170,6 +170,9 @@ blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, loff_t offset)
- 	if (IS_DAX(inode))
- 		return dax_do_io(iocb, inode, iter, offset, blkdev_get_block,
- 				NULL, DIO_SKIP_DIO_COUNT);
++static void crypt_reinit_sg_table(struct crypt_config *cc)
++{
++	if (!cc->sgt_in.orig_nents || !cc->sgt_out.orig_nents)
++		return;
 +
-+	if (IS_HIPRI(inode))
-+		iocb->ki_flags |= IOCB_HIPRI;
- 	return __blockdev_direct_IO(iocb, inode, I_BDEV(inode), iter, offset,
- 				    blkdev_get_block, NULL, NULL,
- 				    DIO_SKIP_DIO_COUNT);
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 70e61b5..8ae39ea 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -1788,6 +1788,7 @@ struct super_operations {
- #else
- #define S_DAX		0	/* Make all the DAX code disappear */
- #endif
-+#define S_HIPRI		16384	/* IO for this file has high priority */
++	crypt_init_sg_table(cc->sgt_in.sgl);
++	crypt_init_sg_table(cc->sgt_out.sgl);
++}
++
++static int crypt_alloc_sg_table(struct crypt_config *cc)
++{
++	unsigned int bulk_mode = skcipher_is_bulk_mode(any_tfm(cc));
++	int ret = 0;
++
++	if (!bulk_mode)
++		goto out_skip_alloc;
++
++	ret = sg_alloc_table(&cc->sgt_in, DM_MAX_SG_LIST, GFP_KERNEL);
++	if (ret)
++		goto out_skip_alloc;
++
++	ret = sg_alloc_table(&cc->sgt_out, DM_MAX_SG_LIST, GFP_KERNEL);
++	if (ret)
++		goto out_free_table;
++
++	return 0;
++
++out_free_table:
++	sg_free_table(&cc->sgt_in);
++out_skip_alloc:
++	cc->sgt_in.orig_nents = 0;
++	cc->sgt_out.orig_nents = 0;
++
++	return ret;
++}
++
++static int crypt_convert_bulk_block(struct crypt_config *cc,
++				    struct convert_context *ctx,
++				    struct skcipher_request *req)
++{
++	struct bio *bio_in = ctx->bio_in;
++	struct bio *bio_out = ctx->bio_out;
++	unsigned int total_bytes = bio_in->bi_iter.bi_size;
++	unsigned int total_sg_in, total_sg_out;
++	struct scatterlist *sg_in, *sg_out;
++	struct dm_crypt_request *dmreq;
++	u8 *iv;
++	int r;
++
++	if (!cc->sgt_in.orig_nents || !cc->sgt_out.orig_nents)
++		return -EINVAL;
++
++	dmreq = dmreq_of_req(cc, req);
++	iv = iv_of_dmreq(cc, dmreq);
++	dmreq->iv_sector = ctx->cc_sector;
++	dmreq->ctx = ctx;
++
++	total_sg_in = blk_bio_map_sg(bdev_get_queue(bio_in->bi_bdev),
++				     bio_in, cc->sgt_in.sgl);
++	if ((total_sg_in <= 0) || (total_sg_in > DM_MAX_SG_LIST)) {
++		DMERR("%s in sg map error %d, sg table nents[%d]\n",
++		      __func__, total_sg_in, cc->sgt_in.orig_nents);
++		return -EINVAL;
++	}
++
++	ctx->iter_in.bi_size -= total_bytes;
++	sg_in = cc->sgt_in.sgl;
++	sg_out = cc->sgt_in.sgl;
++
++	if (bio_data_dir(bio_in) == READ)
++		goto set_crypt;
++
++	total_sg_out = blk_bio_map_sg(bdev_get_queue(bio_out->bi_bdev),
++				      bio_out, cc->sgt_out.sgl);
++	if ((total_sg_out <= 0) || (total_sg_out > DM_MAX_SG_LIST)) {
++		DMERR("%s out sg map error %d, sg table nents[%d]\n",
++		      __func__, total_sg_out, cc->sgt_out.orig_nents);
++		return -EINVAL;
++	}
++
++	ctx->iter_out.bi_size -= total_bytes;
++	sg_out = cc->sgt_out.sgl;
++
++set_crypt:
++	if (cc->iv_gen_ops) {
++		r = cc->iv_gen_ops->generator(cc, iv, dmreq);
++		if (r < 0)
++			return r;
++	}
++
++	skcipher_request_set_crypt(req, sg_in, sg_out, total_bytes, iv);
++
++	if (bio_data_dir(ctx->bio_in) == WRITE)
++		r = crypto_skcipher_encrypt(req);
++	else
++		r = crypto_skcipher_decrypt(req);
++
++	if (!r && cc->iv_gen_ops && cc->iv_gen_ops->post)
++		r = cc->iv_gen_ops->post(cc, iv, dmreq);
++
++	return r;
++}
++
+ static int crypt_convert_block(struct crypt_config *cc,
+ 			       struct convert_context *ctx,
+ 			       struct skcipher_request *req)
+@@ -920,6 +1047,7 @@ static void crypt_free_req(struct crypt_config *cc,
+ static int crypt_convert(struct crypt_config *cc,
+ 			 struct convert_context *ctx)
+ {
++	unsigned int bulk_mode;
+ 	int r;
  
- /*
-  * Note that nosuid etc flags are inode-specific: setting some file-system
-@@ -1826,6 +1827,7 @@ struct super_operations {
- #define IS_AUTOMOUNT(inode)	((inode)->i_flags & S_AUTOMOUNT)
- #define IS_NOSEC(inode)		((inode)->i_flags & S_NOSEC)
- #define IS_DAX(inode)		((inode)->i_flags & S_DAX)
-+#define IS_HIPRI(inode)		((inode)->i_flags & S_HIPRI)
+ 	atomic_set(&ctx->cc_pending, 1);
+@@ -930,7 +1058,14 @@ static int crypt_convert(struct crypt_config *cc,
  
- #define IS_WHITEOUT(inode)	(S_ISCHR(inode->i_mode) && \
- 				 (inode)->i_rdev == WHITEOUT_DEV)
-diff --git a/include/uapi/linux/fs.h b/include/uapi/linux/fs.h
-index a079d50..d6e262c 100644
---- a/include/uapi/linux/fs.h
-+++ b/include/uapi/linux/fs.h
-@@ -223,6 +223,8 @@ struct fsxattr {
- #define BLKROTATIONAL _IO(0x12,126)
- #define BLKZEROOUT _IO(0x12,127)
- #define BLKDAXGET _IO(0x12,129)
-+#define BLKHIPRISET _IOW(0x12,130,int)
-+#define BLKHIPRIGET _IO(0x12,131)
+ 		atomic_inc(&ctx->cc_pending);
  
- #define BMAP_IOCTL 1		/* obsolete - kept for compatibility */
- #define FIBMAP	   _IO(0x00,1)	/* bmap access */
+-		r = crypt_convert_block(cc, ctx, ctx->req);
++		bulk_mode = skcipher_is_bulk_mode(any_tfm(cc));
++		if (!bulk_mode) {
++			r = crypt_convert_block(cc, ctx, ctx->req);
++		} else {
++			r = crypt_convert_bulk_block(cc, ctx, ctx->req);
++			if (r == -EINVAL)
++				r = crypt_convert_block(cc, ctx, ctx->req);
++		}
+ 
+ 		switch (r) {
+ 		/*
+@@ -1081,6 +1216,7 @@ static void crypt_dec_pending(struct dm_crypt_io *io)
+ 	if (io->ctx.req)
+ 		crypt_free_req(cc, io->ctx.req, base_bio);
+ 
++	crypt_reinit_sg_table(cc);
+ 	base_bio->bi_error = error;
+ 	bio_endio(base_bio);
+ }
+@@ -1563,6 +1699,9 @@ static void crypt_dtr(struct dm_target *ti)
+ 	kzfree(cc->cipher);
+ 	kzfree(cc->cipher_string);
+ 
++	sg_free_table(&cc->sgt_in);
++	sg_free_table(&cc->sgt_out);
++
+ 	/* Must zero key material before freeing */
+ 	kzfree(cc);
+ }
+@@ -1718,6 +1857,10 @@ static int crypt_ctr_cipher(struct dm_target *ti,
+ 		}
+ 	}
+ 
++	ret = crypt_alloc_sg_table(cc);
++	if (ret)
++		DMWARN("Allocate sg table for bulk mode failed");
++
+ 	ret = 0;
+ bad:
+ 	kfree(cipher_api);
 -- 
-1.8.3.1
-
+1.7.9.5
