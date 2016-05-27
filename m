@@ -1,63 +1,36 @@
-Return-Path: <baolin.wang@linaro.org>
-Return-Path: <baolin.wang@linaro.org>
-From: Baolin Wang <baolin.wang@linaro.org>
-To: axboe@kernel.dk,
-	agk@redhat.com,
-	snitzer@redhat.com,
-	dm-devel@redhat.com,
-	herbert@gondor.apana.org.au,
-	davem@davemloft.net
-Cc: ebiggers3@gmail.com,
-	js1304@gmail.com,
-	tadeusz.struk@intel.com,
-	smueller@chronox.de,
-	standby24x7@gmail.com,
-	shli@kernel.org,
-	dan.j.williams@intel.com,
-	martin.petersen@oracle.com,
-	sagig@mellanox.com,
-	kent.overstreet@gmail.com,
-	keith.busch@intel.com,
-	tj@kernel.org,
-	ming.lei@canonical.com,
-	broonie@kernel.org,
-	arnd@arndb.de,
-	linux-crypto@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-raid@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	baolin.wang@linaro.org
-Subject: [RFC v3 4/4] crypto: Add the CRYPTO_ALG_BULK flag for ecb(aes) cipher
-Date: Wed,  1 Jun 2016 12:58:07 +0800
-Message-Id: <957907cb21cf096815c1defc4c95d88471eba1b2.1464756501.git.baolin.wang@linaro.org>
-In-Reply-To: <cover.1464756501.git.baolin.wang@linaro.org>
-References: <cover.1464756501.git.baolin.wang@linaro.org>
-In-Reply-To: <cover.1464756501.git.baolin.wang@linaro.org>
-References: <cover.1464756501.git.baolin.wang@linaro.org>
+Return-Path: <m@bjorling.me>
+Return-Path: <m@bjorling.me>
+Subject: Re: gendisk and lightnvm
+To: Dan Williams <dan.j.williams@gmail.com>
+References: <5742B023.2040503@bjorling.me>
+ <CAA9_cmfVKoEw1XpJJ4j4+QHWB29-cRvdDp1hmtyegxSpBy0fNw@mail.gmail.com>
+ <57473C2D.2060700@bjorling.me>
+ <CAA9_cmeVeQzL7kJS1s--N9r-9Pap=KWz42Pmwd1r_4Bd03cL0g@mail.gmail.com>
+ <57476FC1.6020702@bjorling.me>
+ <CAA9_cmczkSBgLj5BwjVRVAq5b3SYGHbNSyu2qO1_TRguYRQ1pg@mail.gmail.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@infradead.org>,
+ Keith Busch <keith.busch@intel.com>, Simon Lund <slund@cnexlabs.com>,
+ linux-block@vger.kernel.org
+From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <m@bjorling.me>
+Message-ID: <57488327.8080104@bjorling.me>
+Date: Fri, 27 May 2016 19:25:59 +0200
+MIME-Version: 1.0
+In-Reply-To: <CAA9_cmczkSBgLj5BwjVRVAq5b3SYGHbNSyu2qO1_TRguYRQ1pg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-Since the ecb(aes) cipher does not need to handle the IV things for encryption
-or decryption, that means it can support for bulk block when handling data.
-Thus this patch adds the CRYPTO_ALG_BULK flag for ecb(aes) cipher to improve
-the hardware aes engine's efficiency.
+On 05/27/2016 12:06 AM, Dan Williams wrote:
+> On Thu, May 26, 2016 at 2:50 PM, Matias Bjørling <m@bjorling.me> wrote:
+>> On 05/26/2016 09:05 PM, Dan Williams wrote:
+> [..]
+>> In that case, the holder kobject is maintained by the request queue. That
+>> moves the block device naming earlier in the initialization process, and the
+>> request queue would properly need to hold the (struct gendisk)->diskname. I
+>> wonder if there is a better way.
+>
+> I don't see why it is necessary to move the block device naming
+> earlier.  The block device kobject can link to the mq/ kobject created
+> by lightnvm rather than include it as a child of the gendisk.
+>
 
-Signed-off-by: Baolin Wang <baolin.wang@linaro.org>
----
- drivers/crypto/omap-aes.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
-index ce174d3..ab09429 100644
---- a/drivers/crypto/omap-aes.c
-+++ b/drivers/crypto/omap-aes.c
-@@ -804,7 +804,7 @@ static struct crypto_alg algs_ecb_cbc[] = {
- 	.cra_priority		= 300,
- 	.cra_flags		= CRYPTO_ALG_TYPE_ABLKCIPHER |
- 				  CRYPTO_ALG_KERN_DRIVER_ONLY |
--				  CRYPTO_ALG_ASYNC,
-+				  CRYPTO_ALG_ASYNC | CRYPTO_ALG_BULK,
- 	.cra_blocksize		= AES_BLOCK_SIZE,
- 	.cra_ctxsize		= sizeof(struct omap_aes_ctx),
- 	.cra_alignmask		= 0,
--- 
-1.7.9.5
+You're right. I'll cook up some RFC patches with the changes. Thanks.
