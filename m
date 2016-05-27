@@ -1,93 +1,96 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f47.google.com ([74.125.82.47]:36373 "EHLO
-	mail-wm0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755867AbcEFSDf (ORCPT
-	<rfc822;linux-block@vger.kernel.org>); Fri, 6 May 2016 14:03:35 -0400
-Received: by mail-wm0-f47.google.com with SMTP id n129so67100199wmn.1
-        for <linux-block@vger.kernel.org>; Fri, 06 May 2016 11:03:34 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	axboe@fb.com
-Cc: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [PATCH 00/28] LightNVM fixes for 4.7
-Date: Fri,  6 May 2016 20:02:53 +0200
-Message-Id: <1462557801-24974-1-git-send-email-m@bjorling.me>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <baolin.wang@linaro.org>
+Return-Path: <baolin.wang@linaro.org>
+From: Baolin Wang <baolin.wang@linaro.org>
+To: axboe@kernel.dk,
+	agk@redhat.com,
+	snitzer@redhat.com,
+	dm-devel@redhat.com,
+	herbert@gondor.apana.org.au,
+	davem@davemloft.net
+Cc: ebiggers3@gmail.com,
+	js1304@gmail.com,
+	tadeusz.struk@intel.com,
+	smueller@chronox.de,
+	standby24x7@gmail.com,
+	shli@kernel.org,
+	dan.j.williams@intel.com,
+	martin.petersen@oracle.com,
+	sagig@mellanox.com,
+	kent.overstreet@gmail.com,
+	keith.busch@intel.com,
+	tj@kernel.org,
+	ming.lei@canonical.com,
+	broonie@kernel.org,
+	arnd@arndb.de,
+	linux-crypto@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-raid@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	baolin.wang@linaro.org
+Subject: [RFC v2 2/3] crypto: Introduce CRYPTO_ALG_BULK flag
+Date: Fri, 27 May 2016 19:11:23 +0800
+Message-Id: <47e9ddd8c9ea9ad9e29c8cb027d19d8459ea1479.1464346333.git.baolin.wang@linaro.org>
+In-Reply-To: <cover.1464346333.git.baolin.wang@linaro.org>
+References: <cover.1464346333.git.baolin.wang@linaro.org>
+In-Reply-To: <cover.1464346333.git.baolin.wang@linaro.org>
+References: <cover.1464346333.git.baolin.wang@linaro.org>
+List-ID: <linux-block@vger.kernel.org>
 
-Hi Jens,
+Now some cipher hardware engines prefer to handle bulk block rather than one
+sector (512 bytes) created by dm-crypt, cause these cipher engines can handle
+the intermediate values (IV) by themselves in one bulk block. This means we
+can increase the size of the request by merging request rather than always 512
+bytes and thus increase the hardware engine processing speed.
 
-A collection of fixes and features destined for 4.7. They contain:
+So introduce 'CRYPTO_ALG_BULK' flag to indicate this cipher can support bulk
+mode.
 
-  Fixes all over the place from Arnd, Jeff, Sagi, Wenwei, Javier and me.
+Signed-off-by: Baolin Wang <baolin.wang@linaro.org>
+---
+ include/crypto/skcipher.h |    7 +++++++
+ include/linux/crypto.h    |    6 ++++++
+ 2 files changed, 13 insertions(+)
 
-  Preparation patches from Simon to enable sysfs support. The final
-  patch is delayed to 4.8. We need to integrate it correctly with
-  device drivers.
-
-  A patch from Javier to allow a target to access the metadata field.
-  Typically it maps to the flash page out of band area.
-
-  Preparation patches for pblk and persistent block management
-  information from me.
-
-Please pick up.
-
--Matias
-
-Arnd Bergmann (1):
-  lightnvm: pass dma address to hardware rather than pointer
-
-Javier González (6):
-  lightnvm: do not free unused metadata on rrpc
-  lightnvm: enable metadata to be sent to device
-  lightnvm: rename dma helper functions
-  lightnvm: do not assume sequential lun alloc.
-  lightnvm: rename nr_pages to nr_ppas on nvm_rq
-  lightnvm: reserved space calculation incorrect
-
-Jeff Mahoney (1):
-  lightnvm: fix "warning: ‘ret’ may be used uninitialized"
-
-Matias Bjørling (15):
-  lightnvm: handle submit_io failure
-  lightnvm: implement nvm_submit_ppa_list
-  lightnvm: add fpg_size and pfpg_size to struct nvm_dev
-  lightnvm: move block fold outside of get_bb_tbl()
-  lightnvm: avoid memory leak when lun_map kcalloc fails
-  lightnvm: introduce nvm_for_each_lun_ppa() macro
-  lightnvm: refactor device ops->get_bb_tbl()
-  lightnvm: remove struct factory_blks
-  lightnvm: make nvm_set_rqd_ppalist() aware of vblks
-  lightnvm: move responsibility for bad blk mgmt to target
-  lightnvm: refactor set_bb_tbl for accepting ppa list
-  lightnvm: fix out of bound ppa lun id on bb tbl
-  lightnvm: remove mgt targets on mgt removal
-  lightnvm: expose gennvm_mark_blk to targets
-  lightnvm: add is_cached entry to struct ppa_addr
-
-Sagi Grimberg (1):
-  nvme/lightnvm: Log using the ctrl named device
-
-Simon A. F. Lund (2):
-  lightnvm: rename nvm_targets to nvm_tgt_type
-  lightnvm: refactor dev->online_target to global nvm_targets
-
-Wenwei Tao (2):
-  lightnvm: calculate rrpc total blocks and sectors up front
-  lightnvm: store rrpc->soffset in device sector size
-
- drivers/lightnvm/core.c      | 370 +++++++++++++++++++++++++++++--------------
- drivers/lightnvm/gennvm.c    | 100 ++++++------
- drivers/lightnvm/rrpc.c      |  42 +++--
- drivers/lightnvm/rrpc.h      |   2 +-
- drivers/lightnvm/sysblk.c    | 276 ++++++++++++++++----------------
- drivers/nvme/host/lightnvm.c |  82 +++-------
- include/linux/lightnvm.h     |  48 ++++--
- 7 files changed, 521 insertions(+), 399 deletions(-)
-
+diff --git a/include/crypto/skcipher.h b/include/crypto/skcipher.h
+index 0f987f5..d89d29a 100644
+--- a/include/crypto/skcipher.h
++++ b/include/crypto/skcipher.h
+@@ -519,5 +519,12 @@ static inline void skcipher_request_set_crypt(
+ 	req->iv = iv;
+ }
+ 
++static inline unsigned int skcipher_is_bulk_mode(struct crypto_skcipher *sk_tfm)
++{
++	struct crypto_tfm *tfm = crypto_skcipher_tfm(sk_tfm);
++
++	return crypto_tfm_alg_bulk(tfm);
++}
++
+ #endif	/* _CRYPTO_SKCIPHER_H */
+ 
+diff --git a/include/linux/crypto.h b/include/linux/crypto.h
+index 6e28c89..a315487 100644
+--- a/include/linux/crypto.h
++++ b/include/linux/crypto.h
+@@ -63,6 +63,7 @@
+ #define CRYPTO_ALG_DEAD			0x00000020
+ #define CRYPTO_ALG_DYING		0x00000040
+ #define CRYPTO_ALG_ASYNC		0x00000080
++#define CRYPTO_ALG_BULK			0x00000100
+ 
+ /*
+  * Set this bit if and only if the algorithm requires another algorithm of
+@@ -623,6 +624,11 @@ static inline u32 crypto_tfm_alg_type(struct crypto_tfm *tfm)
+ 	return tfm->__crt_alg->cra_flags & CRYPTO_ALG_TYPE_MASK;
+ }
+ 
++static inline unsigned int crypto_tfm_alg_bulk(struct crypto_tfm *tfm)
++{
++	return tfm->__crt_alg->cra_flags & CRYPTO_ALG_BULK;
++}
++
+ static inline unsigned int crypto_tfm_alg_blocksize(struct crypto_tfm *tfm)
+ {
+ 	return tfm->__crt_alg->cra_blocksize;
 -- 
-2.1.4
-
+1.7.9.5
