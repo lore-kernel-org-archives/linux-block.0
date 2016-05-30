@@ -1,117 +1,111 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Vishal Verma <vishal.l.verma@intel.com>
-To: linux-nvdimm@lists.01.org
-Cc: Christoph Hellwig <hch@lst.de>, linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org, xfs@oss.sgi.com,
-	linux-ext4@vger.kernel.org, linux-mm@kvack.org,
-	Ross Zwisler <ross.zwisler@linux.intel.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Dave Chinner <david@fromorbit.com>, Jan Kara <jack@suse.cz>,
-	Jens Axboe <axboe@fb.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-kernel@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Jeff Moyer <jmoyer@redhat.com>,
-	Boaz Harrosh <boaz@plexistor.com>
-Subject: [PATCH v7 4/6] dax: export a low-level __dax_zero_page_range helper
-Date: Wed, 11 May 2016 15:08:50 -0600
-Message-Id: <1463000932-31680-5-git-send-email-vishal.l.verma@intel.com>
-In-Reply-To: <1463000932-31680-1-git-send-email-vishal.l.verma@intel.com>
-References: <1463000932-31680-1-git-send-email-vishal.l.verma@intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pa0-f68.google.com ([209.85.220.68]:33098 "EHLO
+	mail-pa0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1161219AbcE3Ngf (ORCPT
+	<rfc822;linux-block@vger.kernel.org>);
+	Mon, 30 May 2016 09:36:35 -0400
+From: Ming Lei <ming.lei@canonical.com>
+To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+	Ming Lei <ming.lei@canonical.com>,
+	Al Viro <viro@zeniv.linux.org.uk>
+Subject: [PATCH v6 4/8] iov_iter: use bvec iterator to implement iterate_bvec()
+Date: Mon, 30 May 2016 21:34:32 +0800
+Message-Id: <1464615294-9946-5-git-send-email-ming.lei@canonical.com>
+In-Reply-To: <1464615294-9946-1-git-send-email-ming.lei@canonical.com>
+References: <1464615294-9946-1-git-send-email-ming.lei@canonical.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Christoph Hellwig <hch@lst.de>
+bvec has one native/mature iterator for long time, so not
+necessary to use the reinvented wheel for iterating bvecs
+in lib/iov_iter.c.
 
-This allows XFS to perform zeroing using the iomap infrastructure and
-avoid buffer heads.
+Two ITER_BVEC test cases are run:
+	- xfstest(-g auto) on loop dio/aio, no regression found
+	- swap file works well under extreme stress(stress-ng --all 64 -t
+	  800 -v), and lots of OOMs are triggerd, and the whole
+	system still survives
 
-[vishal: fix conflicts with dax-error-handling]
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Ming Lei <ming.lei@canonical.com>
 ---
- fs/dax.c            | 35 ++++++++++++++++++++---------------
- include/linux/dax.h |  7 +++++++
- 2 files changed, 27 insertions(+), 15 deletions(-)
+ lib/iov_iter.c | 45 +++++++++++++++------------------------------
+ 1 file changed, 15 insertions(+), 30 deletions(-)
 
-diff --git a/fs/dax.c b/fs/dax.c
-index 0abbbb6..651d4b1 100644
---- a/fs/dax.c
-+++ b/fs/dax.c
-@@ -947,6 +947,23 @@ int dax_pfn_mkwrite(struct vm_area_struct *vma, struct vm_fault *vmf)
+diff --git a/lib/iov_iter.c b/lib/iov_iter.c
+index 0cd5227..d67c828 100644
+--- a/lib/iov_iter.c
++++ b/lib/iov_iter.c
+@@ -56,37 +56,24 @@
+ 	n = wanted;					\
  }
- EXPORT_SYMBOL_GPL(dax_pfn_mkwrite);
  
-+int __dax_zero_page_range(struct block_device *bdev, sector_t sector,
-+		unsigned int offset, unsigned int length)
-+{
-+	struct blk_dax_ctl dax = {
-+		.sector		= sector,
-+		.size		= PAGE_SIZE,
-+	};
-+
-+	if (dax_map_atomic(bdev, &dax) < 0)
-+		return PTR_ERR(dax.addr);
-+	clear_pmem(dax.addr + offset, length);
-+	wmb_pmem();
-+	dax_unmap_atomic(bdev, &dax);
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(__dax_zero_page_range);
-+
- /**
-  * dax_zero_page_range - zero a range within a page of a DAX file
-  * @inode: The file being truncated
-@@ -982,23 +999,11 @@ int dax_zero_page_range(struct inode *inode, loff_t from, unsigned length,
- 	bh.b_bdev = inode->i_sb->s_bdev;
- 	bh.b_size = PAGE_SIZE;
- 	err = get_block(inode, index, &bh, 0);
--	if (err < 0)
-+	if (err < 0 || !buffer_written(&bh))
- 		return err;
--	if (buffer_written(&bh)) {
--		struct block_device *bdev = bh.b_bdev;
--		struct blk_dax_ctl dax = {
--			.sector = to_sector(&bh, inode),
--			.size = PAGE_SIZE,
--		};
- 
--		if (dax_map_atomic(bdev, &dax) < 0)
--			return PTR_ERR(dax.addr);
--		clear_pmem(dax.addr + offset, length);
--		wmb_pmem();
--		dax_unmap_atomic(bdev, &dax);
--	}
--
--	return 0;
-+	return __dax_zero_page_range(bh.b_bdev, to_sector(&bh, inode),
-+			offset, length);
+-#define iterate_bvec(i, n, __v, __p, skip, STEP) {	\
+-	size_t wanted = n;				\
+-	__p = i->bvec;					\
+-	__v.bv_len = min_t(size_t, n, __p->bv_len - skip);	\
+-	if (likely(__v.bv_len)) {			\
+-		__v.bv_page = __p->bv_page;		\
+-		__v.bv_offset = __p->bv_offset + skip; 	\
+-		(void)(STEP);				\
+-		skip += __v.bv_len;			\
+-		n -= __v.bv_len;			\
+-	}						\
+-	while (unlikely(n)) {				\
+-		__p++;					\
+-		__v.bv_len = min_t(size_t, n, __p->bv_len);	\
+-		if (unlikely(!__v.bv_len))		\
++#define iterate_bvec(i, n, __v, __bi, skip, STEP) {	\
++	struct bvec_iter __start;			\
++	__start.bi_size = n;				\
++	__start.bi_bvec_done = skip;			\
++	__start.bi_idx = 0;				\
++	for_each_bvec(__v, i->bvec, __bi, __start) {	\
++		if (!__v.bv_len)			\
+ 			continue;			\
+-		__v.bv_page = __p->bv_page;		\
+-		__v.bv_offset = __p->bv_offset;		\
+ 		(void)(STEP);				\
+-		skip = __v.bv_len;			\
+-		n -= __v.bv_len;			\
+ 	}						\
+-	n = wanted;					\
  }
- EXPORT_SYMBOL_GPL(dax_zero_page_range);
  
-diff --git a/include/linux/dax.h b/include/linux/dax.h
-index 7f853ff..90fbc99 100644
---- a/include/linux/dax.h
-+++ b/include/linux/dax.h
-@@ -14,12 +14,19 @@ int __dax_fault(struct vm_area_struct *, struct vm_fault *, get_block_t);
- 
- #ifdef CONFIG_FS_DAX
- struct page *read_dax_sector(struct block_device *bdev, sector_t n);
-+int __dax_zero_page_range(struct block_device *bdev, sector_t sector,
-+		unsigned int offset, unsigned int length);
- #else
- static inline struct page *read_dax_sector(struct block_device *bdev,
- 		sector_t n)
- {
- 	return ERR_PTR(-ENXIO);
- }
-+static inline int __dax_zero_page_range(struct block_device *bdev,
-+		sector_t sector, unsigned int offset, unsigned int length)
-+{
-+	return -ENXIO;
-+}
- #endif
- 
- #ifdef CONFIG_TRANSPARENT_HUGEPAGE
+ #define iterate_all_kinds(i, n, v, I, B, K) {			\
+ 	size_t skip = i->iov_offset;				\
+ 	if (unlikely(i->type & ITER_BVEC)) {			\
+-		const struct bio_vec *bvec;			\
+ 		struct bio_vec v;				\
+-		iterate_bvec(i, n, v, bvec, skip, (B))		\
++		struct bvec_iter __bi;				\
++		iterate_bvec(i, n, v, __bi, skip, (B))		\
+ 	} else if (unlikely(i->type & ITER_KVEC)) {		\
+ 		const struct kvec *kvec;			\
+ 		struct kvec v;					\
+@@ -104,15 +91,13 @@
+ 	if (i->count) {						\
+ 		size_t skip = i->iov_offset;			\
+ 		if (unlikely(i->type & ITER_BVEC)) {		\
+-			const struct bio_vec *bvec;		\
++			const struct bio_vec *bvec = i->bvec;	\
+ 			struct bio_vec v;			\
+-			iterate_bvec(i, n, v, bvec, skip, (B))	\
+-			if (skip == bvec->bv_len) {		\
+-				bvec++;				\
+-				skip = 0;			\
+-			}					\
+-			i->nr_segs -= bvec - i->bvec;		\
+-			i->bvec = bvec;				\
++			struct bvec_iter __bi;			\
++			iterate_bvec(i, n, v, __bi, skip, (B))	\
++			i->bvec = __bvec_iter_bvec(i->bvec, __bi);	\
++			i->nr_segs -= i->bvec - bvec;		\
++			skip = __bi.bi_bvec_done;		\
+ 		} else if (unlikely(i->type & ITER_KVEC)) {	\
+ 			const struct kvec *kvec;		\
+ 			struct kvec v;				\
 -- 
-2.5.5
+1.9.1
 
