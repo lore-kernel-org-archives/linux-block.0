@@ -1,56 +1,53 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Toshi Kani <toshi.kani@hpe.com>
-To: dan.j.williams@intel.com, jack@suse.cz, david@fromorbit.com,
-	viro@zeniv.linux.org.uk
-Cc: axboe@fb.com, hch@infradead.org, boaz@plexistor.com, tytso@mit.edu,
-	adilger.kernel@dilger.ca, ross.zwisler@linux.intel.com,
-	toshi.kani@hpe.com, micah.parrish@hpe.com,
-	linux-nvdimm@lists.01.org, linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v4 0/6] Add alignment check for DAX mount
-Date: Tue, 10 May 2016 10:23:51 -0600
-Message-Id: <1462897437-16626-1-git-send-email-toshi.kani@hpe.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pf0-f196.google.com ([209.85.192.196]:34233 "EHLO
+	mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1161537AbcE3Ngq (ORCPT
+	<rfc822;linux-block@vger.kernel.org>);
+	Mon, 30 May 2016 09:36:46 -0400
+From: Ming Lei <ming.lei@canonical.com>
+To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+	Ming Lei <ming.lei@canonical.com>,
+	Philipp Reisner <philipp.reisner@linbit.com>,
+	Lars Ellenberg <lars.ellenberg@linbit.com>,
+	drbd-dev@lists.linbit.com (open list:DRBD DRIVER)
+Subject: [PATCH v6 7/8] block: drbd: avoid to use BIO_MAX_SIZE
+Date: Mon, 30 May 2016 21:34:35 +0800
+Message-Id: <1464615294-9946-8-git-send-email-ming.lei@canonical.com>
+In-Reply-To: <1464615294-9946-1-git-send-email-ming.lei@canonical.com>
+References: <1464615294-9946-1-git-send-email-ming.lei@canonical.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-When a partition is not aligned by 4KB, mount -o dax succeeds,
-but any read/write access to the filesystem fails, except for
-metadata update.  Add alignment check to ext4, ext2, and xfs.
+Use BIO_MAX_PAGES instead and we will remove BIO_MAX_SIZE.
 
-- Patch 1-2 add bdev_dax_supported() which performs all the checks
-  necessary for dax mount.
-- Patch 3-5 change fillesystems to call bdev_dax_supported().
-- Patch 6 is a cleanup to keep dax capability checks consistent.
-
-v4:
- - blkdev_dax_capable() is similar to bdev_dax_supported().
-   Manage them consistently. (Dan Williams, Dave Chinner)
-
-v3:
- - Remove boilerplate code from filesytems (Christoph Hellwig)
- - Add a helper function to perform all checks (Dave Chinner)
-
-v2:
- - Use a helper function via ->direct_access for the check.
-   (Christoph Hellwig)
- - Call bdev_direct_access() with sector 0 for the check.
-   (Boaz Harrosh)
-
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Ming Lei <ming.lei@canonical.com>
 ---
-Toshi Kani (6):
- 1/6 block: Add vfs_msg() interface
- 2/6 block: Add bdev_dax_supported() for dax mount checks
- 3/6 ext4: Add alignment check for DAX mount
- 4/6 ext2: Add alignment check for DAX mount
- 5/6 xfs: Add alignment check for DAX mount
- 6/6 block: Update blkdev_dax_capable() for consistency
+ drivers/block/drbd/drbd_int.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
----
- block/ioctl.c          | 30 ----------------
- fs/block_dev.c         | 96 ++++++++++++++++++++++++++++++++++++++++++++++++--
- fs/ext2/super.c        | 11 ++----
- fs/ext4/super.c        | 11 ++----
- fs/xfs/xfs_super.c     | 12 +++----
- include/linux/blkdev.h | 13 +++++++
- include/linux/fs.h     |  8 -----
- 7 files changed, 116 insertions(+), 65 deletions(-)
+diff --git a/drivers/block/drbd/drbd_int.h b/drivers/block/drbd/drbd_int.h
+index 7a1cf7e..e6e4b08 100644
+--- a/drivers/block/drbd/drbd_int.h
++++ b/drivers/block/drbd/drbd_int.h
+@@ -1327,14 +1327,14 @@ struct bm_extent {
+ #endif
+ #endif
+ 
+-/* BIO_MAX_SIZE is 256 * PAGE_SIZE,
++/* Estimate max bio size as 256 * PAGE_SIZE,
+  * so for typical PAGE_SIZE of 4k, that is (1<<20) Byte.
+  * Since we may live in a mixed-platform cluster,
+  * we limit us to a platform agnostic constant here for now.
+  * A followup commit may allow even bigger BIO sizes,
+  * once we thought that through. */
+ #define DRBD_MAX_BIO_SIZE (1U << 20)
+-#if DRBD_MAX_BIO_SIZE > BIO_MAX_SIZE
++#if DRBD_MAX_BIO_SIZE > (BIO_MAX_PAGES << PAGE_SHIFT)
+ #error Architecture not supported: DRBD_MAX_BIO_SIZE > BIO_MAX_SIZE
+ #endif
+ #define DRBD_MAX_BIO_SIZE_SAFE (1U << 12)       /* Works always = 4k */
+-- 
+1.9.1
+
