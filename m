@@ -1,57 +1,78 @@
-Return-Path: <m@bjorling.me>
-Return-Path: <m@bjorling.me>
-To: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@infradead.org>,
- Keith Busch <keith.busch@intel.com>, Simon Lund <slund@cnexlabs.com>
-From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <m@bjorling.me>
-Subject: gendisk and lightnvm
-Cc: linux-block@vger.kernel.org
-Message-ID: <5742B023.2040503@bjorling.me>
-Date: Mon, 23 May 2016 09:24:19 +0200
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:46425 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755696AbcEaUe5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+	Tue, 31 May 2016 16:34:57 -0400
+Subject: Re: [PATCH 4/5] scsi: add new async device reset support
+To: Hannes Reinecke <hare@suse.de>, linux-scsi@vger.kernel.org,
+	linux-block@vger.kernel.org, target-devel@vger.kernel.org
+References: <1464162903-14735-1-git-send-email-mchristi@redhat.com>
+ <1464162903-14735-5-git-send-email-mchristi@redhat.com>
+ <574BDD49.6070205@suse.de> <574DE828.2090604@redhat.com>
+From: Mike Christie <mchristi@redhat.com>
+Message-ID: <574DF56F.1050703@redhat.com>
+Date: Tue, 31 May 2016 15:34:55 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <574DE828.2090604@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Hi Jens, Christoph, and Keith,
+On 05/31/2016 02:38 PM, Mike Christie wrote:
+> On 05/30/2016 01:27 AM, Hannes Reinecke wrote:
+>> On 05/25/2016 09:55 AM, mchristi@redhat.com wrote:
+>>> From: Mike Christie <mchristi@redhat.com>
+>>>
+>>> Currently, if the SCSI eh runs then before we do a LUN_RESET
+>>> we stop the host. This patch and the block layer one before it
+>>> begin to add infrastructure to be able to do a LUN_RESET and
+>>> eventually do a transport level recovery without having to stop the
+>>> host.
+>>>
+>>> For LUn-reset, this patch adds a new callout, eh_async_device_reset_handler,
+>>> which works similar to how LLDs handle SG_SCSI_RESET_DEVICE where the
+>>> LLD manages the commands that are affected.
+>>>
+>>> eh_async_device_reset_handler:
+>>>
+>>> The LLD should perform a LUN RESET that affects all commands
+>>> that have been accepted by its queuecommand callout for the
+>>> device passed in to the callout. While the reset handler is running,
+>>> queuecommand will not be running or called for the device.
+>>>
+>>> Unlike eh_device_reset_handler, queuecommand may still be
+>>> called for other devices, and the LLD must call scsi_done for the
+>>> commands that have been affected by the reset.
+>>>
+>>> If SUCCESS or FAST_IO_FAIL is returned, the scsi_cmnds cleaned up
+>>> must be failed with DID_ABORT.
+>>>
+>> Hmm. With this patch you essentially just replaced the existing
+>> eh_device_reset_handler() with eh_async_device_request_handler().
+>> So how does this differ from the original behaviour?
+> 
+> 
+> 1. LLD must call scsi_done and set host byte on each command affected by
+> the reset. This is what they have to do for the SG ioctl reset, but for
+> the scsi eh reset, LLDs do not have to because scsi-ml manages the
+> commands for them.
+> 
+> When doing a SG ioctl based reset or if the reset is called from the
+> target like in the last patch it is not possible to have scsi-ml track
+> the outstanding commands like we do today based on timeouts.
+> 
+> 2. LLDs have to support commands to other luns during device resets, so
+> they cannot have any sort of host wide device resource lock/resource
+> that they can rely on. It has to be per device.
+> 
+> 3. We can now support being able to do a lun reset without having to
+> stop then entire host.
+> 
 
-I have been pondering for a couple of weeks on how to integrate lightnvm 
-into the sysfs stack. Lightnvm does not currently expose a "physical" 
-device. During device registration, the block device name is simply 
-stored, which the user may then use as an id later, and expose through a 
-target implementation.
-
-Until then, the device is left "dangling" in the kernel, without any 
-good way to reference it other than asking the lightnvm manager. This 
-also includes device driver specific configuration, such as power and mq 
-sysfs entries.
-
-It would be great to have a common way to expose the lightnvm subsystem 
-through the block storage stack.
-
-With block devices, the device driver centric information includes:
-
-/sys/block/*/
-   inflight
-   removable
-   serial
-   /mq
-   /power
-
-Simon has currently built an RFC patch that wires lightnvm devices up in 
-/sys/devices/virtual/misc/lightnvm/*, without any access to the above 
-entries.
-
-What would be the best way to approach this?
-
-1. Simply set genhd device capacity to 0, and let entries and block 
-device be exposed through the common stack.
-
-2. Add a GENHD_FL_BLKLESS_DEV flag, and use it in genhd.c and block 
-layer to filter out block device specific entries.
-
-3. Write a shim layer that exposes a semi genhd, with only the device 
-driver sysfs entries exposed.
-
-4. Any other?
-
-Thank you,
-Matias
+One other difference is that for the SG ioctl reset case, it is a pain
+to handle the race where queuecommand and eh_device_reset_handler are
+running while also trying to remove locks and atomics from the LLD and
+move to mq. Probably when the SG reset code was made we had the
+host_lock taken in queuecommand, so it was simple to handle. If we stop
+the queue like in the second patch then the LLD at least does not have
+to worry about this.
