@@ -1,120 +1,31 @@
-Return-Path: <baolin.wang@linaro.org>
-Return-Path: <baolin.wang@linaro.org>
-From: Baolin Wang <baolin.wang@linaro.org>
-To: axboe@kernel.dk,
-	agk@redhat.com,
-	snitzer@redhat.com,
-	dm-devel@redhat.com,
-	herbert@gondor.apana.org.au,
-	davem@davemloft.net
-Cc: ebiggers3@gmail.com,
-	js1304@gmail.com,
-	tadeusz.struk@intel.com,
-	smueller@chronox.de,
-	standby24x7@gmail.com,
-	shli@kernel.org,
-	dan.j.williams@intel.com,
-	martin.petersen@oracle.com,
-	sagig@mellanox.com,
-	kent.overstreet@gmail.com,
-	keith.busch@intel.com,
-	tj@kernel.org,
-	ming.lei@canonical.com,
-	broonie@kernel.org,
-	arnd@arndb.de,
-	linux-crypto@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-raid@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	baolin.wang@linaro.org
-Subject: [RFC 1/3] block: Introduce blk_bio_map_sg() to map one bio
-Date: Wed, 25 May 2016 14:12:29 +0800
-Message-Id: <abe693fad3abb0adfc0cf9ca5b3d287fdb0f2d5b.1464144791.git.baolin.wang@linaro.org>
-In-Reply-To: <cover.1464144790.git.baolin.wang@linaro.org>
-References: <cover.1464144790.git.baolin.wang@linaro.org>
-In-Reply-To: <cover.1464144790.git.baolin.wang@linaro.org>
-References: <cover.1464144790.git.baolin.wang@linaro.org>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH v6 8/8] block: mark BIO_MAX_SIZE as obsolete
+To: Ming Lei <ming.lei@canonical.com>, Jens Axboe <axboe@fb.com>,
+ linux-kernel@vger.kernel.org
+References: <1464615294-9946-1-git-send-email-ming.lei@canonical.com>
+ <1464615294-9946-9-git-send-email-ming.lei@canonical.com>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+ Keith Busch <keith.busch@intel.com>,
+ "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+ Kent Overstreet <kent.overstreet@gmail.com>,
+ Mike Snitzer <snitzer@redhat.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <574DB6D6.20103@kernel.dk>
+Date: Tue, 31 May 2016 10:07:50 -0600
+MIME-Version: 1.0
+In-Reply-To: <1464615294-9946-9-git-send-email-ming.lei@canonical.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-In dm-crypt, it need to map one bio to scatterlist for improving the
-hardware engine encryption efficiency. Thus this patch introduces the
-blk_bio_map_sg() function to map one bio with scatterlists.
+On 05/30/2016 07:34 AM, Ming Lei wrote:
+> Some in-tree drivers may use big bio which size is more
+> than BIO_MAX_SIZE, also the macro is seldom used in tree.
+>
+> So mark it as obsolete now, and it doesn't make sense
+> after multipage bvec is introduced.
 
-Signed-off-by: Baolin Wang <baolin.wang@linaro.org>
----
- block/blk-merge.c      |   45 +++++++++++++++++++++++++++++++++++++++++++++
- include/linux/blkdev.h |    3 +++
- 2 files changed, 48 insertions(+)
+Is it used in the tree after the patchset? If not, kill it, there's no 
+such thing as a deprecated/obsolete define.
 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 2613531..9b92af4 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -417,6 +417,51 @@ single_segment:
- }
- 
- /*
-+ * map a bio to scatterlist, return number of sg entries setup.
-+ */
-+int blk_bio_map_sg(struct request_queue *q, struct bio *bio,
-+		   struct scatterlist *sglist,
-+		   struct scatterlist **sg)
-+{
-+	struct bio_vec bvec, bvprv = { NULL };
-+	struct bvec_iter iter;
-+	int nsegs, cluster;
-+
-+	nsegs = 0;
-+	cluster = blk_queue_cluster(q);
-+
-+	if (bio->bi_rw & REQ_DISCARD) {
-+		/*
-+		 * This is a hack - drivers should be neither modifying the
-+		 * biovec, nor relying on bi_vcnt - but because of
-+		 * blk_add_request_payload(), a discard bio may or may not have
-+		 * a payload we need to set up here (thank you Christoph) and
-+		 * bi_vcnt is really the only way of telling if we need to.
-+		 */
-+
-+		if (bio->bi_vcnt)
-+			goto single_segment;
-+
-+		return 0;
-+	}
-+
-+	if (bio->bi_rw & REQ_WRITE_SAME) {
-+single_segment:
-+		*sg = sglist;
-+		bvec = bio_iovec(bio);
-+		sg_set_page(*sg, bvec.bv_page, bvec.bv_len, bvec.bv_offset);
-+		return 1;
-+	}
-+
-+	bio_for_each_segment(bvec, bio, iter)
-+		__blk_segment_map_sg(q, &bvec, sglist, &bvprv, sg,
-+				     &nsegs, &cluster);
-+
-+	return nsegs;
-+}
-+EXPORT_SYMBOL(blk_bio_map_sg);
-+
-+/*
-  * map a request to scatterlist, return number of sg entries setup. Caller
-  * must make sure sg can hold rq->nr_phys_segments entries
-  */
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 1fd8fdf..e5de4f8 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1013,6 +1013,9 @@ extern void blk_queue_write_cache(struct request_queue *q, bool enabled, bool fu
- extern struct backing_dev_info *blk_get_backing_dev_info(struct block_device *bdev);
- 
- extern int blk_rq_map_sg(struct request_queue *, struct request *, struct scatterlist *);
-+extern int blk_bio_map_sg(struct request_queue *q, struct bio *bio,
-+			  struct scatterlist *sglist,
-+			  struct scatterlist **sg);
- extern void blk_dump_rq_flags(struct request *, char *);
- extern long nr_blockdev_pages(void);
- 
 -- 
-1.7.9.5
+Jens Axboe
