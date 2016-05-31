@@ -1,8 +1,4 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:46425 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755696AbcEaUe5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-	Tue, 31 May 2016 16:34:57 -0400
+Return-Path: <linux-scsi-owner@vger.kernel.org>
 Subject: Re: [PATCH 4/5] scsi: add new async device reset support
 To: Hannes Reinecke <hare@suse.de>, linux-scsi@vger.kernel.org,
 	linux-block@vger.kernel.org, target-devel@vger.kernel.org
@@ -10,13 +6,13 @@ References: <1464162903-14735-1-git-send-email-mchristi@redhat.com>
  <1464162903-14735-5-git-send-email-mchristi@redhat.com>
  <574BDD49.6070205@suse.de> <574DE828.2090604@redhat.com>
 From: Mike Christie <mchristi@redhat.com>
-Message-ID: <574DF56F.1050703@redhat.com>
-Date: Tue, 31 May 2016 15:34:55 -0500
+Message-ID: <574DED38.80209@redhat.com>
+Date: Tue, 31 May 2016 14:59:52 -0500
 MIME-Version: 1.0
 In-Reply-To: <574DE828.2090604@redhat.com>
 Content-Type: text/plain; charset=windows-1252
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Sender: linux-scsi-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
 On 05/31/2016 02:38 PM, Mike Christie wrote:
 > On 05/30/2016 01:27 AM, Hannes Reinecke wrote:
@@ -68,11 +64,25 @@ On 05/31/2016 02:38 PM, Mike Christie wrote:
 > 3. We can now support being able to do a lun reset without having to
 > stop then entire host.
 > 
+>> By the time we're calling it the SCSI host is already in EH, ie all
+>> commands have been completed or failed, so why again do we need to
+>> wait for the queue to be empty?
+> 
+> I am not sure what you mean here. The patches in this set never go into
+> host reset or even target level reset handling. For this set, we only
+> want to drivers to be able to do a device/lun reset whenever they are
+> asked to do so.
+> 
+>>
+>> And how exactly can queuecommand be called for other devices, as the
+>> host is already in EH?
+>>
+> 
+> Where in this patchset do we stop the host?
+> 
 
-One other difference is that for the SG ioctl reset case, it is a pain
-to handle the race where queuecommand and eh_device_reset_handler are
-running while also trying to remove locks and atomics from the LLD and
-move to mq. Probably when the SG reset code was made we had the
-host_lock taken in queuecommand, so it was simple to handle. If we stop
-the queue like in the second patch then the LLD at least does not have
-to worry about this.
+Oh yeah, I mean new entry points I am adding in this set. In the 3rd
+patch, we never start the scsi eh and we never stop the host. The target
+layer just calls the new callout through the block layer helper added in
+the 2nd patch.
+
