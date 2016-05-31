@@ -1,87 +1,99 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:56271 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750859AbcEHVrO (ORCPT <rfc822;linux-block@vger.kernel.org>);
-	Sun, 8 May 2016 17:47:14 -0400
-From: NeilBrown <neilb@suse.com>
-To: Christoph Hellwig <hch@lst.de>, viro@zeniv.linux.org.uk,
-	axboe@fb.com
-Date: Mon, 09 May 2016 07:47:04 +1000
-Cc: milosz@adfin.com, linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-api@vger.kernel.org
-Subject: Re: [PATCH 4/6] vfs: add the RWF_HIPRI flag for preadv2/pwritev2
-In-Reply-To: <1457017443-17662-5-git-send-email-hch@lst.de>
-References: <1457017443-17662-1-git-send-email-hch@lst.de> <1457017443-17662-5-git-send-email-hch@lst.de>
-Message-ID: <874ma8usrr.fsf@notabene.neil.brown.name>
+Received: from aserp1040.oracle.com ([141.146.126.69]:41040 "EHLO
+	aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751249AbcEaLHY (ORCPT
+	<rfc822;linux-block@vger.kernel.org>);
+	Tue, 31 May 2016 07:07:24 -0400
+Date: Tue, 31 May 2016 14:07:11 +0300
+From: Dan Carpenter <dan.carpenter@oracle.com>
+To: m@bjorling.me
+Cc: linux-block@vger.kernel.org
+Subject: re: lightnvm: core on-disk initialization
+Message-ID: <20160531110711.GA16633@mwanda>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha256; protocol="application/pgp-signature"
+Content-Type: text/plain; charset=iso-8859-1
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
---=-=-=
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+Hello Matias Bj�rling,
 
-On Fri, Mar 04 2016, Christoph Hellwig wrote:
+The patch e3eb3799f7e0: "lightnvm: core on-disk initialization" from
+Jan 12, 2016, leads to the following static checker warning:
 
-> This adds a flag that tells the file system that this is a high priority
-> request for which it's worth to poll the hardware.  The flag is purely
-> advisory and can be ignored if not supported.
+	drivers/lightnvm/sysblk.c:422 nvm_get_sysblock()
+	warn: missing error code here? 'kzalloc()' failed.
 
-Here you say the flag is "advice".
+drivers/lightnvm/sysblk.c
+   390  int nvm_get_sysblock(struct nvm_dev *dev, struct nvm_sb_info *info)
+   391  {
+   392          struct ppa_addr sysblk_ppas[MAX_SYSBLKS];
+   393          struct sysblk_scan s;
+   394          struct nvm_system_block *cur;
+   395          int i, j, found = 0;
+   396          int ret = -ENOMEM;
+                    ^^^^^^^^^^^^^
+Not useful.
 
->=20=20
-> +/* flags for preadv2/pwritev2: */
-> +#define RWF_HIPRI			0x00000001 /* high priority request, poll if possibl=
-e */
+   397  
+   398          /*
+   399           * 1. setup sysblk locations
+   400           * 2. get bad block list
+   401           * 3. filter on host-specific (type 3)
+   402           * 4. iterate through all and find the highest seq nr.
+   403           * 5. return superblock information
+   404           */
+   405  
+   406          if (!dev->ops->get_bb_tbl)
+   407                  return -EINVAL;
+   408  
+   409          nvm_setup_sysblk_scan(dev, &s, sysblk_ppas);
+   410  
+   411          mutex_lock(&dev->mlock);
+   412          ret = nvm_get_all_sysblks(dev, &s, sysblk_ppas, 0);
+   413          if (ret)
+   414                  goto err_sysblk;
+   415  
+   416          /* no sysblocks initialized */
+   417          if (!s.nr_ppas)
+   418                  goto err_sysblk;
 
-This text makes it sound like a firm "request" ("if possible").
+Should this be an error?  Presumably no.
 
-In the man page posted separately it says:
+   419  
+   420          cur = kzalloc(sizeof(struct nvm_system_block), GFP_KERNEL);
+   421          if (!cur)
+   422                  goto err_sysblk;
 
-+.BR RWF_HIPRI " (since Linux 4.6)"
-+High priority read/write.  Allows block based filesystems to use polling o=
-f the
-+device, which provides lower latency, but may use additional ressources.  =
-(Currently
-+only usable on a file descriptor opened using the
-+.BR O_DIRECT " flag)."
+This definitely should be.
 
-So now it "allows", which is different again.
+   423  
+   424          /* find the latest block across all sysblocks */
+   425          for (i = 0; i < s.nr_rows; i++) {
+   426                  for (j = 0; j < MAX_BLKS_PR_SYSBLK; j++) {
+   427                          struct ppa_addr ppa = s.ppas[scan_ppa_idx(i, j)];
+   428  
+   429                          ret = nvm_scan_block(dev, &ppa, cur);
+   430                          if (ret > 0)
+   431                                  found = 1;
+   432                          else if (ret < 0)
+   433                                  break;
+   434                  }
+   435          }
+   436  
+   437          nvm_sysblk_to_cpu(info, cur);
+   438  
+   439          kfree(cur);
+   440  err_sysblk:
 
-The differences may be subtle, but consistency is nice.
+This label name is confusing.  Better to call it something like
+err_unlock.
 
-Also in that man page fragment:
+   441          mutex_unlock(&dev->mlock);
+   442  
+   443          if (found)
+   444                  return 1;
+   445          return ret;
+   446  }
 
-> provides lower latency, but may use additional ressources
-
-Is this a "latency vs throughput" trade-off, or something more subtle?
-It would be nice to make the decision process as obvious as possible for
-the developer considering the use of this flag.
-
-(and s/ressources/resources/)
-
-NeilBrown
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJXL7PYAAoJEDnsnt1WYoG5wE8P+gOn2RRXDO0ZyV5HO5yrL0xA
-BnUEZvK+iCjsggVDem+lsoawdx0RxjL8XIom8MqwaNsvTQKO2qsOEq+aMgbx0gyS
-u+FTZu8xnJ2AHgcPq2Rvcqh8KMq4e59H7XyEJi6cMiw3fhlI0JXx1ze4ldR0Juk/
-XSbDzh9Gjj/g4A7xY6caGLyBEN0kssWsqfDD2K06pLRgo+yUwoNLS9UAH+sc6Nnk
-oymT/f7tvwLusEbNnJEi+B0SEtbLaTiyRaiNBUpCQOQjb/Sb+XpYFIiE3jUW5wII
-ZSu8GKcJzQko1+DRmLsgg6yTEPTBuP4y4sNslZBM0Zw46rqHZw3XuF7v9P4pZous
-rPM/mSr7OeolraKIQ17jbgaxT5oCXOb1pS6lyrrRoGZWFDq/5HnOJpDIWH/dN8I3
-+JdtH9WD+Bw92WTWHtJkYgIxVWgZpyNy6cUF3MKWoSIKjTxIQLDvMRBNcKpnTmbl
-7iA9JvIG94tUfmSuhl+Q8NphFR+UngoFsDA6EmBwRFAmdkdynyEY26Q1v3mGfLWY
-2ZkY85m+puD2lr8lz//Ni1Nn5QcCqz+cHiKCcPoLNdWCjWIKv2a73FE+ntNpF7BH
-bungow73ZD5LcCYEQ7GZxKTS4leVDXj7SjmFd7sr/+tZ+yG272Lt6Nz4koAAKjqG
-JfacBkwOQYvZn+AppQRX
-=xLQf
------END PGP SIGNATURE-----
---=-=-=--
+regards,
+dan carpenter
