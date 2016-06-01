@@ -1,84 +1,96 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Arnd Bergmann <arnd@arndb.de>
-To: Toshi Kani <toshi.kani@hpe.com>
-Cc: dan.j.williams@intel.com, jack@suse.cz, david@fromorbit.com,
-	viro@zeniv.linux.org.uk, axboe@fb.com, hch@infradead.org,
-	boaz@plexistor.com, tytso@mit.edu, adilger.kernel@dilger.ca,
-	ross.zwisler@linux.intel.com, micah.parrish@hpe.com,
-	linux-nvdimm@lists.01.org, linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] remove unused blkdev_dax_capable() function
-Date: Wed, 18 May 2016 09:54:08 +0200
-Message-ID: <3280835.MNk2ItMooy@wuerfel>
-In-Reply-To: <1462897437-16626-7-git-send-email-toshi.kani@hpe.com>
-References: <1462897437-16626-1-git-send-email-toshi.kani@hpe.com> <1462897437-16626-7-git-send-email-toshi.kani@hpe.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <baolin.wang@linaro.org>
+Return-Path: <baolin.wang@linaro.org>
+From: Baolin Wang <baolin.wang@linaro.org>
+To: axboe@kernel.dk,
+	agk@redhat.com,
+	snitzer@redhat.com,
+	dm-devel@redhat.com,
+	herbert@gondor.apana.org.au,
+	davem@davemloft.net
+Cc: ebiggers3@gmail.com,
+	js1304@gmail.com,
+	tadeusz.struk@intel.com,
+	smueller@chronox.de,
+	standby24x7@gmail.com,
+	shli@kernel.org,
+	dan.j.williams@intel.com,
+	martin.petersen@oracle.com,
+	sagig@mellanox.com,
+	kent.overstreet@gmail.com,
+	keith.busch@intel.com,
+	tj@kernel.org,
+	ming.lei@canonical.com,
+	broonie@kernel.org,
+	arnd@arndb.de,
+	linux-crypto@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-raid@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	baolin.wang@linaro.org
+Subject: [RFC v3 2/4] crypto: Introduce CRYPTO_ALG_BULK flag
+Date: Wed,  1 Jun 2016 12:58:05 +0800
+Message-Id: <47e9ddd8c9ea9ad9e29c8cb027d19d8459ea1479.1464756501.git.baolin.wang@linaro.org>
+In-Reply-To: <cover.1464756501.git.baolin.wang@linaro.org>
+References: <cover.1464756501.git.baolin.wang@linaro.org>
+In-Reply-To: <cover.1464756501.git.baolin.wang@linaro.org>
+References: <cover.1464756501.git.baolin.wang@linaro.org>
 List-ID: <linux-block@vger.kernel.org>
 
-The change from blkdev_dax_capable() to bdev_dax_capable() removed the only user
-of the former, so we now get a build warning:
+Now some cipher hardware engines prefer to handle bulk block rather than one
+sector (512 bytes) created by dm-crypt, cause these cipher engines can handle
+the intermediate values (IV) by themselves in one bulk block. This means we
+can increase the size of the request by merging request rather than always 512
+bytes and thus increase the hardware engine processing speed.
 
-fs/block_dev.c:1244:13: error: 'blkdev_dax_capable' defined but not used [-Werror=unused-function]
- static bool blkdev_dax_capable(struct block_device *bdev)
+So introduce 'CRYPTO_ALG_BULK' flag to indicate this cipher can support bulk
+mode.
 
-This removes the now-unused function.
-
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-Fixes: a8078b1fc616 ("block: Update blkdev_dax_capable() for consistency")
+Signed-off-by: Baolin Wang <baolin.wang@linaro.org>
 ---
-On Tuesday 10 May 2016 10:23:57 Toshi Kani wrote:
-> @@ -1295,7 +1330,7 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
->  
->                         if (!ret) {
->                                 bd_set_size(bdev,(loff_t)get_capacity(disk)<<9);
-> -                               if (!blkdev_dax_capable(bdev))
-> +                               if (!bdev_dax_capable(bdev))
->                                         bdev->bd_inode->i_flags &= ~S_DAX;
-> 
+ include/crypto/skcipher.h |    7 +++++++
+ include/linux/crypto.h    |    6 ++++++
+ 2 files changed, 13 insertions(+)
 
-It's not entirely from the patch description what the intention was here
-in keeping two slightly different implementations of the same function
-in one file, my best guess is that it was not intentional and we should
-just remove this.
-
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 97f324642b5f..dad77225a721 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -1241,33 +1241,6 @@ void bd_set_size(struct block_device *bdev, loff_t size)
+diff --git a/include/crypto/skcipher.h b/include/crypto/skcipher.h
+index 0f987f5..d89d29a 100644
+--- a/include/crypto/skcipher.h
++++ b/include/crypto/skcipher.h
+@@ -519,5 +519,12 @@ static inline void skcipher_request_set_crypt(
+ 	req->iv = iv;
  }
- EXPORT_SYMBOL(bd_set_size);
  
--static bool blkdev_dax_capable(struct block_device *bdev)
--{
--	struct gendisk *disk = bdev->bd_disk;
--
--	if (!disk->fops->direct_access || !IS_ENABLED(CONFIG_FS_DAX))
--		return false;
--
--	/*
--	 * If the partition is not aligned on a page boundary, we can't
--	 * do dax I/O to it.
--	 */
--	if ((bdev->bd_part->start_sect % (PAGE_SIZE / 512))
--			|| (bdev->bd_part->nr_sects % (PAGE_SIZE / 512)))
--		return false;
--
--	/*
--	 * If the device has known bad blocks, force all I/O through the
--	 * driver / page cache.
--	 *
--	 * TODO: support finer grained dax error handling
--	 */
--	if (disk->bb && disk->bb->count)
--		return false;
--
--	return true;
--}
--
- static void __blkdev_put(struct block_device *bdev, fmode_t mode, int for_part);
++static inline unsigned int skcipher_is_bulk_mode(struct crypto_skcipher *sk_tfm)
++{
++	struct crypto_tfm *tfm = crypto_skcipher_tfm(sk_tfm);
++
++	return crypto_tfm_alg_bulk(tfm);
++}
++
+ #endif	/* _CRYPTO_SKCIPHER_H */
+ 
+diff --git a/include/linux/crypto.h b/include/linux/crypto.h
+index 6e28c89..a315487 100644
+--- a/include/linux/crypto.h
++++ b/include/linux/crypto.h
+@@ -63,6 +63,7 @@
+ #define CRYPTO_ALG_DEAD			0x00000020
+ #define CRYPTO_ALG_DYING		0x00000040
+ #define CRYPTO_ALG_ASYNC		0x00000080
++#define CRYPTO_ALG_BULK			0x00000100
  
  /*
-
+  * Set this bit if and only if the algorithm requires another algorithm of
+@@ -623,6 +624,11 @@ static inline u32 crypto_tfm_alg_type(struct crypto_tfm *tfm)
+ 	return tfm->__crt_alg->cra_flags & CRYPTO_ALG_TYPE_MASK;
+ }
+ 
++static inline unsigned int crypto_tfm_alg_bulk(struct crypto_tfm *tfm)
++{
++	return tfm->__crt_alg->cra_flags & CRYPTO_ALG_BULK;
++}
++
+ static inline unsigned int crypto_tfm_alg_blocksize(struct crypto_tfm *tfm)
+ {
+ 	return tfm->__crt_alg->cra_blocksize;
+-- 
+1.7.9.5
