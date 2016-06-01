@@ -1,72 +1,67 @@
-Return-Path: <jack@suse.cz>
-Date: Tue, 3 May 2016 14:17:19 +0200
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Jan Kara <jack@suse.cz>, linux-kernel@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-	dchinner@redhat.com, sedat.dilek@gmail.com
-Subject: Re: [PATCHSET v5] Make background writeback great again for the
- first time
-Message-ID: <20160503121719.GA25436@quack2.suse.cz>
-References: <1461686131-22999-1-git-send-email-axboe@fb.com>
- <20160427180105.GA17362@quack2.suse.cz>
- <5721021E.8060006@fb.com>
- <20160427203708.GA25397@kernel.dk>
- <20160427205915.GC25397@kernel.dk>
- <20160428115401.GD17362@quack2.suse.cz>
- <57225A91.50002@kernel.dk>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <57225A91.50002@kernel.dk>
+Return-Path: <baolin.wang@linaro.org>
+Return-Path: <baolin.wang@linaro.org>
+From: Baolin Wang <baolin.wang@linaro.org>
+To: axboe@kernel.dk,
+	agk@redhat.com,
+	snitzer@redhat.com,
+	dm-devel@redhat.com,
+	herbert@gondor.apana.org.au,
+	davem@davemloft.net
+Cc: ebiggers3@gmail.com,
+	js1304@gmail.com,
+	tadeusz.struk@intel.com,
+	smueller@chronox.de,
+	standby24x7@gmail.com,
+	shli@kernel.org,
+	dan.j.williams@intel.com,
+	martin.petersen@oracle.com,
+	sagig@mellanox.com,
+	kent.overstreet@gmail.com,
+	keith.busch@intel.com,
+	tj@kernel.org,
+	ming.lei@canonical.com,
+	broonie@kernel.org,
+	arnd@arndb.de,
+	linux-crypto@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-raid@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	baolin.wang@linaro.org
+Subject: [RFC v3 0/4] Introduce the bulk mode method when sending request to crypto layer
+Date: Wed,  1 Jun 2016 12:58:03 +0800
+Message-Id: <cover.1464756501.git.baolin.wang@linaro.org>
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu 28-04-16 12:46:41, Jens Axboe wrote:
-> >>-	rwb->wb_max = 1 + ((depth - 1) >> min(31U, rwb->scale_step));
-> >>-	rwb->wb_normal = (rwb->wb_max + 1) / 2;
-> >>-	rwb->wb_background = (rwb->wb_max + 3) / 4;
-> >>+	if (rwb->queue_depth == 1) {
-> >>+		rwb->wb_max = rwb->wb_normal = 2;
-> >>+		rwb->wb_background = 1;
-> >
-> >This breaks the detection of too big scale_step in scale_up() where we key
-> >of wb_max == 1 value. However even with that fixed no luck :(:
-> 
-> Yeah, I need to look at that. For QD=1, I think the only sensible values for
-> max/normal/bg is 2/2/1 and 1/1/1 if we step down.
-> 
-> >dd if=/dev/zero of=/mnt/file bs=1M count=10000 conv=fsync
-> >Runtime: 105.126 107.125 105.641
-> >
-> >So about the same as before. I'll try to debug this later today...
-> 
-> Thanks, I'm very interested in what you find!
+This patchset will check if the cipher can support bulk mode, then dm-crypt
+will handle different ways to send requests to crypto layer according to
+cipher mode. For bulk mode, we can use sg table to map the whole bio and
+send all scatterlists of one bio to crypto engine to encrypt or decrypt,
+which can improve the hardware engine's efficiency.
 
-OK, so the reason was relatively standard in the end. I was using ext3 (or
-more exactly ext4 without delayed allocation) for the test. The throttling
-of background writes gave more priority to writes from the journalling
-thread which happen with WRITE_SYNC and thus are not throttled. Thus the
-journalling thread ended up having to do more data writeback to be able to
-commit a transaction (due to requirements of data=ordered mode) and it is
-less efficient at that than the normal flusher thread.
+Changes since v2:
+ - Add one cipher user with CRYPTO_ALG_BULK flag to support bulk mode.
+ - Add one atomic variable to avoid the sg table race.
 
-So this is an example where throttling background writeback effectively
-just pushes more work into another context which does it less efficiently
-and indirectly makes everyone wait for it. ext3 has been always sensitive to
-issues like this. ext4 is using delayed allocation and thus only data
-writes into holes end up being part of a transaction -> simple dd test case
-doesn't hit that path. And indeed when I repeat the same test with ext4,
-the numbers with and without your patch are exactly the same.
+Changes since v1:
+ - Refactor the blk_bio_map_sg() function to avoid duplicated code.
+ - Move the sg table allocation to crypt_ctr_cipher() function to avoid memory
+   allocation in the IO path.
+ - Remove the crypt_sg_entry() function.
+ - Other optimization.
 
-The question remains how common a pattern where throttling of background
-writeback delays also something else is. I'll schedule a couple of
-benchmarks to measure impact of your patches for a wider range of workloads
-(but sadly pretty limited set of hw). If ext3 is the only one seeing
-issues, I would be willing to accept that ext3 takes the hit since it is
-doing something rather stupid (but inherent in its journal design) and we
-have a way to deal with this either by enabling delayed allocation or by
-turning off the writeback throttling...
+Baolin Wang (4):
+  block: Introduce blk_bio_map_sg() to map one bio
+  crypto: Introduce CRYPTO_ALG_BULK flag
+  md: dm-crypt: Introduce the bulk mode method when sending request
+  crypto: Add the CRYPTO_ALG_BULK flag for ecb(aes) cipher
 
-								Honza
+ block/blk-merge.c         |   36 ++++++++--
+ drivers/crypto/omap-aes.c |    2 +-
+ drivers/md/dm-crypt.c     |  159 ++++++++++++++++++++++++++++++++++++++++++++-
+ include/crypto/skcipher.h |    7 ++
+ include/linux/blkdev.h    |    2 +
+ include/linux/crypto.h    |    6 ++
+ 6 files changed, 205 insertions(+), 7 deletions(-)
+
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+1.7.9.5
