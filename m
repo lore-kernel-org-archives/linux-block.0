@@ -1,232 +1,131 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:61743 "EHLO
-	mx0b-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752720AbcEKAQp (ORCPT
-	<rfc822;linux-block@vger.kernel.org>);
-	Tue, 10 May 2016 20:16:45 -0400
-Received: from pps.filterd (m0089730.ppops.net [127.0.0.1])
-	by m0089730.ppops.net (8.16.0.11/8.16.0.11) with SMTP id u4B0FgWC017994
-	for <linux-block@vger.kernel.org>; Tue, 10 May 2016 17:16:45 -0700
-Received: from mail.thefacebook.com ([199.201.64.23])
-	by m0089730.ppops.net with ESMTP id 22ur09gj36-1
-	(version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT)
-	for <linux-block@vger.kernel.org>; Tue, 10 May 2016 17:16:45 -0700
-Received: from facebook.com (2401:db00:11:d0a2:face:0:39:0)	by
- mx-out.facebook.com (10.212.236.89) with ESMTP	id
- a3a50d2a170d11e6a00f0002c95209d8-9c4f7c50 for <linux-block@vger.kernel.org>;
-	Tue, 10 May 2016 17:16:43 -0700
-From: Shaohua Li <shli@fb.com>
-To: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <tj@kernel.org>, <vgoyal@redhat.com>, <axboe@fb.com>,
-	<jmoyer@redhat.com>, <Kernel-team@fb.com>
-Subject: [PATCH 06/10] block-throttle: idle detection
-Date: Tue, 10 May 2016 17:16:36 -0700
-Message-ID: <e135c0f296be44a42644cc743f1b37aa20d1fedc.1462923578.git.shli@fb.com>
-In-Reply-To: <cover.1462923578.git.shli@fb.com>
-References: <cover.1462923578.git.shli@fb.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <baolin.wang@linaro.org>
+Return-Path: <baolin.wang@linaro.org>
+From: Baolin Wang <baolin.wang@linaro.org>
+To: axboe@kernel.dk,
+	agk@redhat.com,
+	snitzer@redhat.com,
+	dm-devel@redhat.com,
+	herbert@gondor.apana.org.au,
+	davem@davemloft.net
+Cc: ebiggers3@gmail.com,
+	js1304@gmail.com,
+	tadeusz.struk@intel.com,
+	smueller@chronox.de,
+	standby24x7@gmail.com,
+	shli@kernel.org,
+	dan.j.williams@intel.com,
+	martin.petersen@oracle.com,
+	sagig@mellanox.com,
+	kent.overstreet@gmail.com,
+	keith.busch@intel.com,
+	tj@kernel.org,
+	ming.lei@canonical.com,
+	broonie@kernel.org,
+	arnd@arndb.de,
+	linux-crypto@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-raid@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	baolin.wang@linaro.org
+Subject: [RFC v3 1/4] block: Introduce blk_bio_map_sg() to map one bio
+Date: Wed,  1 Jun 2016 12:58:04 +0800
+Message-Id: <2f0f6811938dafd14c6c7b1dbe8fbabfdcbb19c1.1464756501.git.baolin.wang@linaro.org>
+In-Reply-To: <cover.1464756501.git.baolin.wang@linaro.org>
+References: <cover.1464756501.git.baolin.wang@linaro.org>
+In-Reply-To: <cover.1464756501.git.baolin.wang@linaro.org>
+References: <cover.1464756501.git.baolin.wang@linaro.org>
+List-ID: <linux-block@vger.kernel.org>
 
-A cgroup gets assigned a low limit, but the cgroup could never dispatch
-enough IO to cross the low limit. In such case, the queue state machine
-will remain in LIMIT_LOW state and all other cgroups will be throttled
-according to low limit. This is unfair for other cgroups. We will treat
-the cgroup idle and upgrade the state machine to higher state.
+In dm-crypt, it need to map one bio to scatterlist for improving the
+hardware engine encryption efficiency. Thus this patch introduces the
+blk_bio_map_sg() function to map one bio with scatterlists.
 
-We also have a downgrade logic. If the state machine upgrades because of
-cgroup idle (real idle), the state machine will downgrade soon as the
-cgroup is below its low limit. This isn't what we want. A more
-complicated case is cgroup isn't idle when queue is in LIMIT_LOW. But
-when queue gets upgraded to higher state, other cgroups could dispatch
-more IO and this cgroup can't dispatch enough IO, so the cgroup is below
-its low limit and looks like idle (fake idle). In this case, the queue
-should downgrade soon. The key to determine if we should do downgrade is
-to detect if cgroup is truely idle.
+For avoiding the duplicated code in __blk_bios_map_sg() function, add
+one parameter to distinguish bio map or request map.
 
-Unfortunately I can't find a good way to destinguish the two kinds of
-idle. One possible way is the think time check of CFQ. CFQ checks
-request submit time and last request completion time and if the
-difference of the time (think time) is positive the cgroup is idle.
-This technique doesn't work for high queue depth disk. For example, a
-workload with io depth 8 has disk utilization 100%, hence think time is
-0, eg, not idle. But the workload can run higher bandwidth with io depth
-16. Compared to io depth 16, the io depth 8 workload is idle. Think time
-can't be used to detect idle here. Another possible way is detecting if
-disk reaches maximum bandwidth (then we can detect fake idle). But
-detecting maximum bandwidth is hard since maximum bandwidth isn't fixed
-for a specific workload. we could only use a feedback system to detect
-the maximum bandwidth, which isn't suitable for a limit based
-scheduling.
-
-This patch doesn't try to precisely detect idle, because if we wrongly
-detect idle, the queue will never get downgrade/upgrade, hence we can't
-guarantee low limit or sacrifice performance. If cgroup is below its low
-limit, the queue state machine will do upgrade/downgrade continuously.
-But we will make the upgrade/downgrade time interval adaptive. We
-maintain a history of disk upgrade. If queue upgrades because cgroup
-hits low limit, future downgrade is likely because of fake idle, hence
-future upgrade should run slowly and future downgrade should run
-quickly. Otherwise future downgrade is likely because of real idle,
-hence future upgrade should run quickly and future downgrade should run
-slowly. The adaptive upgrade/downgrade time means disk downgrade in real
-idle happens rarely and disk upgrade in fake idle happens rarely. But we
-will still see cgroup throughput jump up and down if some cgroups run
-below their low limit.
-
-Signed-off-by: Shaohua Li <shli@fb.com>
+Signed-off-by: Baolin Wang <baolin.wang@linaro.org>
 ---
- block/blk-throttle.c | 69 ++++++++++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 62 insertions(+), 7 deletions(-)
+ block/blk-merge.c      |   36 +++++++++++++++++++++++++++++++-----
+ include/linux/blkdev.h |    2 ++
+ 2 files changed, 33 insertions(+), 5 deletions(-)
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 5806507..a462e2f 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -12,6 +12,7 @@
- #include <linux/blk-cgroup.h>
- #include "blk.h"
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index 2613531..badae44 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -376,7 +376,7 @@ new_segment:
  
-+#define DEFAULT_HISTORY (0xAA) /* 0/1 bits are equal */
- /* Max dispatch from a group in 1 round */
- static int throtl_grp_quantum = 8;
+ static int __blk_bios_map_sg(struct request_queue *q, struct bio *bio,
+ 			     struct scatterlist *sglist,
+-			     struct scatterlist **sg)
++			     struct scatterlist **sg, bool single_bio)
+ {
+ 	struct bio_vec bvec, bvprv = { NULL };
+ 	struct bvec_iter iter;
+@@ -408,13 +408,39 @@ single_segment:
+ 		return 1;
+ 	}
  
-@@ -171,6 +172,7 @@ struct throtl_data
- 
- 	unsigned long low_upgrade_time;
- 	unsigned long low_downgrade_time;
-+	unsigned char low_history;
- 	unsigned int low_upgrade_interval;
- 	unsigned int low_downgrade_interval;
- };
-@@ -1572,10 +1574,40 @@ static unsigned long tg_last_low_overflow_time(struct throtl_grp *tg)
- 	return ret;
- }
- 
--static bool throtl_upgrade_check_one(struct throtl_grp *tg)
-+static void throtl_calculate_low_interval(struct throtl_data *td)
-+{
-+	unsigned long history = td->low_history;
-+	unsigned int ubits = bitmap_weight(&history,
-+		sizeof(td->low_history) * 8);
-+	unsigned int dbits = sizeof(td->low_history) * 8 - ubits;
-+
-+	ubits = max(1U, ubits);
-+	dbits = max(1U, dbits);
-+
-+	if (ubits >= dbits) {
-+		td->low_upgrade_interval = ubits / dbits * cg_check_time;
-+		td->low_downgrade_interval = cg_check_time;
+-	for_each_bio(bio)
++	if (!single_bio) {
++		for_each_bio(bio)
++			bio_for_each_segment(bvec, bio, iter)
++				__blk_segment_map_sg(q, &bvec, sglist, &bvprv,
++						     sg, &nsegs, &cluster);
 +	} else {
-+		td->low_upgrade_interval = cg_check_time;
-+		td->low_downgrade_interval = dbits / ubits * cg_check_time;
+ 		bio_for_each_segment(bvec, bio, iter)
+-			__blk_segment_map_sg(q, &bvec, sglist, &bvprv, sg,
+-					     &nsegs, &cluster);
++			__blk_segment_map_sg(q, &bvec, sglist, &bvprv,
++					     sg, &nsegs, &cluster);
 +	}
++
++	return nsegs;
 +}
 +
-+static bool throtl_upgrade_check_one(struct throtl_grp *tg, bool *idle)
- {
- 	struct throtl_service_queue *sq = &tg->service_queue;
- 
-+	if (!tg->bps[READ][LIMIT_LOW] && !tg->bps[WRITE][LIMIT_LOW] &&
-+	    !tg->iops[READ][LIMIT_LOW] && !tg->iops[WRITE][LIMIT_LOW])
-+		return true;
-+
-+	/* if cgroup is below low limit for a long time, consider it idle */
-+	if (time_after(jiffies,
-+	    tg_last_low_overflow_time(tg) + tg->td->low_upgrade_interval)) {
-+		*idle = true;
-+		return true;
-+	}
-+
- 	if (tg->bps[READ][LIMIT_LOW] != 0 && !sq->nr_queued[READ])
- 		return false;
- 	if (tg->bps[WRITE][LIMIT_LOW] != 0 && !sq->nr_queued[WRITE])
-@@ -1587,15 +1619,15 @@ static bool throtl_upgrade_check_one(struct throtl_grp *tg)
- 	return true;
- }
- 
--static bool throtl_upgrade_check_hierarchy(struct throtl_grp *tg)
-+static bool throtl_upgrade_check_hierarchy(struct throtl_grp *tg, bool *idle)
- {
--	if (throtl_upgrade_check_one(tg))
-+	if (throtl_upgrade_check_one(tg, idle))
- 		return true;
- 	while (true) {
- 		if (!tg || (cgroup_subsys_on_dfl(io_cgrp_subsys) &&
- 				!tg_to_blkg(tg)->parent))
- 			return false;
--		if (throtl_upgrade_check_one(tg))
-+		if (throtl_upgrade_check_one(tg, idle))
- 			return true;
- 		tg = sq_to_tg(tg->service_queue.parent_sq);
- 	}
-@@ -1607,6 +1639,7 @@ static bool throtl_can_upgrade(struct throtl_data *td,
- {
- 	struct cgroup_subsys_state *pos_css;
- 	struct blkcg_gq *blkg;
-+	bool idle = false;
- 
- 	if (td->limit_index != LIMIT_LOW)
- 		return false;
-@@ -1622,9 +1655,15 @@ static bool throtl_can_upgrade(struct throtl_data *td,
- 			continue;
- 		if (!list_empty(&tg_to_blkg(tg)->blkcg->css.children))
- 			continue;
--		if (!throtl_upgrade_check_hierarchy(tg))
-+		if (!throtl_upgrade_check_hierarchy(tg, &idle))
- 			return false;
- 	}
-+	if (td->limit_index == LIMIT_LOW) {
-+		td->low_history <<= 1;
-+		if (!idle)
-+			td->low_history |= 1;
-+		throtl_calculate_low_interval(td);
-+	}
- 	return true;
- }
- 
-@@ -1648,6 +1687,21 @@ static void throtl_upgrade_state(struct throtl_data *td)
- 	queue_work(kthrotld_workqueue, &td->dispatch_work);
- }
- 
-+static void throtl_upgrade_check(struct throtl_grp *tg)
++/*
++ * Map a bio to scatterlist, return number of sg entries setup. Caller must
++ * make sure sg can hold bio segments entries.
++ */
++int blk_bio_map_sg(struct request_queue *q, struct bio *bio,
++		   struct scatterlist *sglist)
 +{
-+	if (tg->td->limit_index != LIMIT_LOW)
-+		return;
++	struct scatterlist *sg = NULL;
++	int nsegs = 0;
 +
-+	if (!(tg->bps[READ][LIMIT_LOW] || tg->bps[WRITE][LIMIT_LOW] ||
-+	      tg->iops[READ][LIMIT_LOW] || tg->iops[WRITE][LIMIT_LOW]) ||
-+	    !time_after(jiffies,
-+	     tg_last_low_overflow_time(tg) + tg->td->low_upgrade_interval))
-+		return;
++	if (bio)
++		nsegs = __blk_bios_map_sg(q, bio, sglist, &sg, true);
 +
-+	if (throtl_can_upgrade(tg->td, NULL))
-+		throtl_upgrade_state(tg->td);
-+}
-+
- static void throtl_downgrade_state(struct throtl_data *td, int new)
- {
- 	td->limit_index = new;
-@@ -1773,6 +1827,7 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
- 		if (tg->last_low_overflow_time[rw] == 0)
- 			tg->last_low_overflow_time[rw] = jiffies;
- 		throtl_downgrade_check(tg);
-+		throtl_upgrade_check(tg);
- 		/* throtl is FIFO - if bios are already queued, should queue */
- 		if (sq->nr_queued[rw])
- 			break;
-@@ -1937,8 +1992,8 @@ int blk_throtl_init(struct request_queue *q)
- 	td->limit_index = LIMIT_MAX;
- 	td->low_upgrade_time = jiffies;
- 	td->low_downgrade_time = jiffies;
--	td->low_upgrade_interval = cg_check_time;
--	td->low_downgrade_interval = cg_check_time;
-+	td->low_history = DEFAULT_HISTORY;
-+	throtl_calculate_low_interval(td);
- 	/* activate policy */
- 	ret = blkcg_activate_policy(q, &blkcg_policy_throtl);
- 	if (ret)
++	if (sg)
++		sg_mark_end(sg);
+ 
+ 	return nsegs;
+ }
++EXPORT_SYMBOL(blk_bio_map_sg);
+ 
+ /*
+  * map a request to scatterlist, return number of sg entries setup. Caller
+@@ -427,7 +453,7 @@ int blk_rq_map_sg(struct request_queue *q, struct request *rq,
+ 	int nsegs = 0;
+ 
+ 	if (rq->bio)
+-		nsegs = __blk_bios_map_sg(q, rq->bio, sglist, &sg);
++		nsegs = __blk_bios_map_sg(q, rq->bio, sglist, &sg, false);
+ 
+ 	if (unlikely(rq->cmd_flags & REQ_COPY_USER) &&
+ 	    (blk_rq_bytes(rq) & q->dma_pad_mask)) {
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 1fd8fdf..5868062 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1013,6 +1013,8 @@ extern void blk_queue_write_cache(struct request_queue *q, bool enabled, bool fu
+ extern struct backing_dev_info *blk_get_backing_dev_info(struct block_device *bdev);
+ 
+ extern int blk_rq_map_sg(struct request_queue *, struct request *, struct scatterlist *);
++extern int blk_bio_map_sg(struct request_queue *q, struct bio *bio,
++			  struct scatterlist *sglist);
+ extern void blk_dump_rq_flags(struct request *, char *);
+ extern long nr_blockdev_pages(void);
+ 
 -- 
-2.8.0.rc2
-
+1.7.9.5
