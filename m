@@ -1,53 +1,63 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f196.google.com ([209.85.192.196]:34233 "EHLO
-	mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1161537AbcE3Ngq (ORCPT
-	<rfc822;linux-block@vger.kernel.org>);
-	Mon, 30 May 2016 09:36:46 -0400
-From: Ming Lei <ming.lei@canonical.com>
-To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-	Ming Lei <ming.lei@canonical.com>,
-	Philipp Reisner <philipp.reisner@linbit.com>,
-	Lars Ellenberg <lars.ellenberg@linbit.com>,
-	drbd-dev@lists.linbit.com (open list:DRBD DRIVER)
-Subject: [PATCH v6 7/8] block: drbd: avoid to use BIO_MAX_SIZE
-Date: Mon, 30 May 2016 21:34:35 +0800
-Message-Id: <1464615294-9946-8-git-send-email-ming.lei@canonical.com>
-In-Reply-To: <1464615294-9946-1-git-send-email-ming.lei@canonical.com>
-References: <1464615294-9946-1-git-send-email-ming.lei@canonical.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <baolin.wang@linaro.org>
+Return-Path: <baolin.wang@linaro.org>
+From: Baolin Wang <baolin.wang@linaro.org>
+To: axboe@kernel.dk,
+	agk@redhat.com,
+	snitzer@redhat.com,
+	dm-devel@redhat.com,
+	herbert@gondor.apana.org.au,
+	davem@davemloft.net
+Cc: ebiggers3@gmail.com,
+	js1304@gmail.com,
+	tadeusz.struk@intel.com,
+	smueller@chronox.de,
+	standby24x7@gmail.com,
+	shli@kernel.org,
+	dan.j.williams@intel.com,
+	martin.petersen@oracle.com,
+	sagig@mellanox.com,
+	kent.overstreet@gmail.com,
+	keith.busch@intel.com,
+	tj@kernel.org,
+	ming.lei@canonical.com,
+	broonie@kernel.org,
+	arnd@arndb.de,
+	linux-crypto@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-raid@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	baolin.wang@linaro.org
+Subject: [RFC v3 4/4] crypto: Add the CRYPTO_ALG_BULK flag for ecb(aes) cipher
+Date: Wed,  1 Jun 2016 12:58:07 +0800
+Message-Id: <957907cb21cf096815c1defc4c95d88471eba1b2.1464756501.git.baolin.wang@linaro.org>
+In-Reply-To: <cover.1464756501.git.baolin.wang@linaro.org>
+References: <cover.1464756501.git.baolin.wang@linaro.org>
+In-Reply-To: <cover.1464756501.git.baolin.wang@linaro.org>
+References: <cover.1464756501.git.baolin.wang@linaro.org>
+List-ID: <linux-block@vger.kernel.org>
 
-Use BIO_MAX_PAGES instead and we will remove BIO_MAX_SIZE.
+Since the ecb(aes) cipher does not need to handle the IV things for encryption
+or decryption, that means it can support for bulk block when handling data.
+Thus this patch adds the CRYPTO_ALG_BULK flag for ecb(aes) cipher to improve
+the hardware aes engine's efficiency.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Ming Lei <ming.lei@canonical.com>
+Signed-off-by: Baolin Wang <baolin.wang@linaro.org>
 ---
- drivers/block/drbd/drbd_int.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/crypto/omap-aes.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/block/drbd/drbd_int.h b/drivers/block/drbd/drbd_int.h
-index 7a1cf7e..e6e4b08 100644
---- a/drivers/block/drbd/drbd_int.h
-+++ b/drivers/block/drbd/drbd_int.h
-@@ -1327,14 +1327,14 @@ struct bm_extent {
- #endif
- #endif
- 
--/* BIO_MAX_SIZE is 256 * PAGE_SIZE,
-+/* Estimate max bio size as 256 * PAGE_SIZE,
-  * so for typical PAGE_SIZE of 4k, that is (1<<20) Byte.
-  * Since we may live in a mixed-platform cluster,
-  * we limit us to a platform agnostic constant here for now.
-  * A followup commit may allow even bigger BIO sizes,
-  * once we thought that through. */
- #define DRBD_MAX_BIO_SIZE (1U << 20)
--#if DRBD_MAX_BIO_SIZE > BIO_MAX_SIZE
-+#if DRBD_MAX_BIO_SIZE > (BIO_MAX_PAGES << PAGE_SHIFT)
- #error Architecture not supported: DRBD_MAX_BIO_SIZE > BIO_MAX_SIZE
- #endif
- #define DRBD_MAX_BIO_SIZE_SAFE (1U << 12)       /* Works always = 4k */
+diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
+index ce174d3..ab09429 100644
+--- a/drivers/crypto/omap-aes.c
++++ b/drivers/crypto/omap-aes.c
+@@ -804,7 +804,7 @@ static struct crypto_alg algs_ecb_cbc[] = {
+ 	.cra_priority		= 300,
+ 	.cra_flags		= CRYPTO_ALG_TYPE_ABLKCIPHER |
+ 				  CRYPTO_ALG_KERN_DRIVER_ONLY |
+-				  CRYPTO_ALG_ASYNC,
++				  CRYPTO_ALG_ASYNC | CRYPTO_ALG_BULK,
+ 	.cra_blocksize		= AES_BLOCK_SIZE,
+ 	.cra_ctxsize		= sizeof(struct omap_aes_ctx),
+ 	.cra_alignmask		= 0,
 -- 
-1.9.1
-
+1.7.9.5
