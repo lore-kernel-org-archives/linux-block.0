@@ -1,546 +1,1806 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:59973 "EHLO mga11.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751211AbcFEUoW (ORCPT <rfc822;linux-block@vger.kernel.org>);
-	Sun, 5 Jun 2016 16:44:22 -0400
-Date: Mon, 6 Jun 2016 04:30:07 +0800
-From: kbuild test robot <lkp@intel.com>
-To: mchristi@redhat.com
-Cc: kbuild-all@01.org, linux-f2fs-devel@lists.sourceforge.net,
-	linux-ext4@vger.kernel.org, konrad.wilk@oracle.com,
-	drbd-dev@lists.linbit.com, philipp.reisner@linbit.com,
-	lars.ellenberg@linbit.com, linux-raid@vger.kernel.org,
-	dm-devel@redhat.com, linux-fsdevel@vger.kernel.org,
-	linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
-	linux-mtd@lists.infradead.org, target-devel@vger.kernel.org,
-	linux-btrfs@vger.kernel.org, osd-dev@open-osd.org, xfs@oss.sgi.com,
-	ocfs2-devel@oss.oracle.com, Mike Christie <mchristi@redhat.com>
-Subject: Re: [PATCH 01/45] block/fs/drivers: remove rw argument from
- submit_bio
-Message-ID: <201606060411.oSFVvcx1%fengguang.wu@intel.com>
-MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="J/dobhs11T7y2rNN"
-In-Reply-To: <1465155145-10812-2-git-send-email-mchristi@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: mchristi@redhat.com
+To: linux-f2fs-devel@lists.sourceforge.net, linux-ext4@vger.kernel.org,
+	konrad.wilk@oracle.com, drbd-dev@lists.linbit.com,
+	philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
+	linux-raid@vger.kernel.org, dm-devel@redhat.com,
+	linux-fsdevel@vger.kernel.org, linux-bcache@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-scsi@vger.kernel.org, linux-mtd@lists.infradead.org,
+	target-devel@vger.kernel.org, linux-btrfs@vger.kernel.org,
+	osd-dev@open-osd.org, xfs@oss.sgi.com, ocfs2-devel@oss.oracle.com
+Cc: Mike Christie <mchristi@redhat.com>
+Subject: [PATCH 01/45] block/fs/drivers: remove rw argument from submit_bio
+Date: Sun,  5 Jun 2016 14:31:41 -0500
+Message-Id: <1465155145-10812-2-git-send-email-mchristi@redhat.com>
+In-Reply-To: <1465155145-10812-1-git-send-email-mchristi@redhat.com>
+References: <1465155145-10812-1-git-send-email-mchristi@redhat.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
+From: Mike Christie <mchristi@redhat.com>
 
---J/dobhs11T7y2rNN
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+This has callers of submit_bio/submit_bio_wait set the bio->bi_rw
+instead of passing it in. This makes that use the same as
+generic_make_request and how we set the other bio fields.
 
-Hi,
-
-[auto build test ERROR on v4.7-rc1]
-[cannot apply to dm/for-next md/for-next next-20160603]
-[if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
-
-url:    https://github.com/0day-ci/linux/commits/mchristi-redhat-com/v8-separate-operations-from-flags-in-the-bio-request-structs/20160606-040240
-config: x86_64-randconfig-i0-201623 (attached as .config)
-compiler: gcc-6 (Debian 6.1.1-1) 6.1.1 20160430
-reproduce:
-        # save the attached .config to linux build tree
-        make ARCH=x86_64 
-
-All error/warnings (new ones prefixed by >>):
-
-   In file included from include/linux/fs.h:31:0,
-                    from include/linux/genhd.h:67,
-                    from include/linux/blkdev.h:9,
-                    from fs/ext4/ext4.h:20,
-                    from fs/ext4/ext4_extents.h:22,
-                    from fs/ext4/crypto.c:37:
-   fs/ext4/crypto.c: In function 'ext4_encrypted_zeroout':
-   include/linux/blk_types.h:194:20: warning: passing argument 1 of 'submit_bio_wait' makes pointer from integer without a cast [-Wint-conversion]
-    #define REQ_WRITE  (1ULL << __REQ_WRITE)
-                       ^
-   include/linux/fs.h:196:19: note: in expansion of macro 'REQ_WRITE'
-    #define RW_MASK   REQ_WRITE
-                      ^~~~~~~~~
->> include/linux/fs.h:200:17: note: in expansion of macro 'RW_MASK'
-    #define WRITE   RW_MASK
-                    ^~~~~~~
->> fs/ext4/crypto.c:442:25: note: in expansion of macro 'WRITE'
-      err = submit_bio_wait(WRITE, bio);
-                            ^~~~~
-   In file included from include/linux/blkdev.h:19:0,
-                    from fs/ext4/ext4.h:20,
-                    from fs/ext4/ext4_extents.h:22,
-                    from fs/ext4/crypto.c:37:
-   include/linux/bio.h:476:12: note: expected 'struct bio *' but argument is of type 'long long unsigned int'
-    extern int submit_bio_wait(struct bio *bio);
-               ^~~~~~~~~~~~~~~
->> fs/ext4/crypto.c:442:9: error: too many arguments to function 'submit_bio_wait'
-      err = submit_bio_wait(WRITE, bio);
-            ^~~~~~~~~~~~~~~
-   In file included from include/linux/blkdev.h:19:0,
-                    from fs/ext4/ext4.h:20,
-                    from fs/ext4/ext4_extents.h:22,
-                    from fs/ext4/crypto.c:37:
-   include/linux/bio.h:476:12: note: declared here
-    extern int submit_bio_wait(struct bio *bio);
-               ^~~~~~~~~~~~~~~
-
-vim +/submit_bio_wait +442 fs/ext4/crypto.c
-
-36086d43 Theodore Ts'o   2015-10-03  436  				 "bio_add_page failed: %d", ret);
-36086d43 Theodore Ts'o   2015-10-03  437  			WARN_ON(1);
-b30ab0e0 Michael Halcrow 2015-04-12  438  			bio_put(bio);
-36086d43 Theodore Ts'o   2015-10-03  439  			err = -EIO;
-b30ab0e0 Michael Halcrow 2015-04-12  440  			goto errout;
-b30ab0e0 Michael Halcrow 2015-04-12  441  		}
-b30ab0e0 Michael Halcrow 2015-04-12 @442  		err = submit_bio_wait(WRITE, bio);
-36086d43 Theodore Ts'o   2015-10-03  443  		if ((err == 0) && bio->bi_error)
-36086d43 Theodore Ts'o   2015-10-03  444  			err = -EIO;
-95ea68b4 Theodore Ts'o   2015-05-31  445  		bio_put(bio);
-
-:::::: The code at line 442 was first introduced by commit
-:::::: b30ab0e03407d2aa2d9316cba199c757e4bfc8ad ext4 crypto: add ext4 encryption facilities
-
-:::::: TO: Michael Halcrow <mhalcrow@google.com>
-:::::: CC: Theodore Ts'o <tytso@mit.edu>
-
+Signed-off-by: Mike Christie <mchristi@redhat.com>
 ---
-0-DAY kernel test infrastructure                Open Source Technology Center
-https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
 
---J/dobhs11T7y2rNN
-Content-Type: application/octet-stream
-Content-Disposition: attachment; filename=".config.gz"
-Content-Transfer-Encoding: base64
+v8:
+1. Fix bug in xfs code introduced in v6 due to ioend changes.
+2. Dropped signed-offs due to so many upstream changes since
+last review.
 
-H4sICEGLVFcAAy5jb25maWcAlFxfd9s4rn+fT+HTuQ+7D22TNJPpnHvyQEuUzbEkKiTl2HnR
-ySRuJ2eSuGs7s+23vwApWSQFeff2oa0AkOIfEPgBhPzzTz9P2Nth+3J/eHq4f37+Mfm6ed3s
-7g+bx8mXp+fN/05SOSmlmfBUmA8gnD+9vn3/+P3zVXN1Obn88OuHs/e7h/PJYrN73TxPku3r
-l6evb9D+afv6088/JbLMxAxEp8Jc/+geV7Z18Nw/iFIbVSdGyLJJeSJTrnqmrE1VmyaTqmDm
-+t3m+cvV5XsYzPury3edDFPJHFpm7vH63f3u4U8c8McHO7h9O/jmcfPFUY4tc5ksUl41uq4q
-qbwBa8OShVEs4UNeUdT9g313UbCqUWXawKR1U4jy+uLzKQG2uv50QQsksqiY6Tsa6ScQg+7O
-rzq5kvO0SQvWoChMw/B+sJanZ5ad83Jm5j1vxkuuRNIIzZA/ZEzrGUlsFM+ZEUveVFKUhis9
-FJvfcjGbm3jZ2LqZM2yYNFma9Fx1q3nRrJL5jKVpw/KZVMLMi2G/CcvFVMEcYftzto76nzPd
-JFVtB7iieCyZ8yYXJWyyuPPWyQ5Kc1NXTcWV7YMpzqKF7Fi8mMJTJpQ2TTKvy8WIXMVmnBZz
-IxJTrkpmj0EltRbTnEciutYVh90fYd+y0jTzGt5SFbDPcxgzJWEXj+VW0uTTXuROwkrA3n+6
-8JrVYAZs48FY7LHQjayMKGD5UjjIsJainI1JphzVBZeB5XDy4vk7HWmSLGczff3u/Rc0T+/3
-939vHt/vHp8mIWEfEx6/R4SHmPA5ev4tej4/iwnn7+iZ1JWSU+4peiZWDWcqX8NzU3BPVd2k
-lUyZ8RSomhkGGwincMlzfX3ZS2edaRIa7N3H56c/Pr5sH9+eN/uP/1OXrOCozpxp/vFDZMzg
-H2dIpX8EhbppbqXytG1aizyFPeMNX7lRaGffwHz/PJlZb/A82W8Ob996gz5VcsHLBmani8q3
-3aAdvFzC+uCQCzD6vWVLFOipNVUCdPXdO+j9OFRLawzXZvK0n7xuD/hCzyyzfAmWBM4CtiPI
-oJhGRid2AeeH583sTlQ0ZwqcC5qV3/k2z+es7sZajLw/v0NPd5yrNyp/qjHfju2UAI7wFH91
-R6xkMNZhj5dEE1BBVudgSKQ2qG/X7/7xun3d/NPbPn3L6LnotV6KKiF5YLTgkBQ3Na858Vqn
-LHB0pFo3zID/9SxONmdl6tu7WnOw/JGZirbDHlnLgGGB5uSROE0FG2kCY2eJRnHenRA4UZP9
-2x/7H/vD5qU/IUcHCgfOmgfCtwJLz+VteDpTWTDw9AQNfAJYapjG2t89j2+NC7GYKAKQKQGj
-bObgudLAKuuKKc1RqKclCIW0rKGNW4FUxnbcFwmtmc9ZgktO0SPnDB3dOsmJhbDWZznYgKNb
-x/7AMpaGwBIeE60SSxN40WkxAFINS3+vSblCoj1PHVCyG2yeXja7PbXH8zv05kKmIvF3pJTI
-EaChpOZbNsmZg8cDe67tgijty9iRAGz4aO73f00OMKTJ/evjZH+4P+wn9w8P27fXw9Pr135s
-RiQLB1WSRNalcVt+fNVSKBOxcQ3IYaH62C3qZQklm+oUFT3hcG5B0Phvi3nN8hPRg2F6gRBV
-+02R6OCcbTnSrFm1r/RpQoaTt2uoknqih1sJIusGeB7qTADLrWB//TggkLDjHTaCKeQ5+rRC
-lsFMwGhYARtIEBNB3sIdUFgtIa/P+sbdaMD68GYqJbUQ1pNDEFBeeGBKLNo4yDcZi84Iw56Q
-Dhc7y8A4icxcn/96xK+FiHmfAhtbA+RwEAKgdOoO3Rj8K2sIO6YsZ2VyAiRCCHF+8dmzLTMl
-68qzAxZG203240RwHInX5zRftC1jJEZx3HNzC1EGnzJ/Bi3Hzs5zR0yohuQkGRgl8FW3IrXB
-Vb+dxm9Anrr2XZVI9Sl+Blp1xxXlQitwi77JxN3G/lrOYFopX4qE+8NsGSA/cva6QXKVEd25
-GLHvbc6ThY0K0cgBLh2xj4AywCeBsSBe6BQL0V63aT7ayDCqqBRPwHyn1AkLw0LcfJi0ha3K
-2zb7zArozXkxD3SqNAKUQIhwJFBC+AgEHzVavoyevWxIkhyDKPTadnEx31FGexOJYcxKLRh4
-VeOjmhLQsihl6scrTggMTMIrG3FaExUBqCrR1QKGA+E9jsdbxsrb/NhkFgAeBaibdzg1BJoF
-GuiBx3db2JP9vcUBthwK2QJZrwtvTh2librq6VMt8xrMKQwYNPxEp3CGNT8mNvwDBbq8iJ/R
-TPrhVXAGeJ6BtRrR/GiFKROPA8lqf80ymIKXzuCVDFZUzEqWZ55yW2zhEywqsoTeX1cZtdb9
-dszBwBLDY8LTa5YuBYy27Sdw6qgPNqzIqFNaJaK5qYVaeLsJ75sypYSvRzbTkvr21ukp9N3E
-cNES4bXNsuiyDRYOtHnLarP7st293L8+bCb8780rgCoG8CpBWAXgr8cJZOdtJmP4ih5uFa5R
-56ko09Yl8fzgXOdsGpyDvJ7SO5LLKXX6ob11EZg/aBS4IllE58rwwuL3BkJpkYnEppxo9VQy
-EzmN/qzBsLbdP4J8xROr7tEWSdeVR+4oFmNYFfW6OaZXjkP5vS4qCCmmnLIFYBaHLdocDY27
-cUw2Rw3GAg4MepgEwSrRuZXlGSyUwP2sy7BFhGNQHRCWAbwEEAxxsjcrxU2cN7KdC1gvzNYC
-M45hF2SD0Z78hSC6wfRNRln6wID1wbMVnUu5iJiYP4ZnI2a1rIkQTcNeYTTUBp/REmESEtz2
-Gtw+hoLWL9i8VfQWxWdgs8vUJePb5W5YFQ8VRwPUI/zwefNbOF6cORAS8Qqxgl3s2dq+MRJC
-wwV0U6sS4jgD58VX1Nj8EAtpuUTHnfFQ7fTSuoizVna1esWPlrHbuEazDABxUWG+POqhpbrM
-2QgvlXWQSu5frXmCJqqBY2oGswY0YgeOSssx5xhBlZBJWb9YBta3jAFPJAHrWOdM0fB4IA1a
-JUnb5SYACsxXxir5IghILHskXo6P7jBSHjlIJWZdeJugxxiGkrPJe/AmpCZomZkmhWF5gLaQ
-aZ3DwUazg0gDIQsxRL4CS4cwEBNQhg1iNLwNsc2tvxjehQwvsSIB+wLytIet+nuxdg+qddus
-MXncqTsYbUJJhLG1t2ZMz2mFgM0rpWe6s2yYYZklcvn+j/v95nHyl0MG33bbL0/PQWoFhdqk
-KbFwltt5swh7xjxyoFbI3XDaQCflqMCE3vqCn5rLwYta1mXz67jX62y0s+Fzjjo5giNEmflR
-iwFoDyfGdy4WnWpEP9dnkUrGOurykWCJfA1pWXVJkl2LI/M4D2C3twC0d2+ba5UcLwtGVr6T
-FJSVaJloApVz9HG7jjVI7o+I+UFhd3JtkigHH+snJKZhHqULW6d6RhKDVHgf4xo+U8IEueOO
-CWdOGjMC7WyKpEjtxahNFasOPFf3u8MT3vRPzI9vm73LUbZYkSkjbCgJYQCGrhTQL3QqdS/q
-IftMBGSXaJcT/fDnBi+/fEQupMsJlFL6N1EtNQVbgiO/fok5Sebnu7ObNiHTsv1V6q5AQOjE
-BUn4/o7adffudbv91l8f6vK8H1Fd2qtSULwKYCIq+HjWjBmJMEkVt5EEmnx7mZLabmwKflxE
-3UYCbRrpuLO77cNmv9/uJgfYWZtq/rK5P7ztwl3urojpkKSgDgHWfmScAYLiLtPTj8Gy8Jqg
-4+N9YHDQUGJ1AeiOylois6ishnoYVOZpJvQ8fAs4el6meBnfJzOCl3TNyImhAB6nHDAjnbvr
-JfJK01YJRVjRj6DNvlG3N1JnTTEVgXJbSoxxsc+jprR3ZxkTea0CIOX0H/QIVlrhFXJbqUFB
-ozUAUwjjAT7Nau5fmMA6MwRFfscdbXgR1U87vGPoYiGIj7v++0TNsmgj64xewuPr/vPlxFE0
-SkkDIMBkurui7+354jPtHypNX2YWGOPS17UFnljKeXcXTlUdbqDdCszPtQUpLtF+5Yvk5+M8
-o5OwvxbYR/VWeNG1DCmFKEVRFxYoZRCM5evrq0tfwG5GYvJCe+i/vdZBfM1z7kdt2I9Gi4oH
-IQDyLQPUn05bW24CSITVfpxRcROnBlIbYPU9s3zGQOmFLAoqoadvhQxqXKxgM+d55fda2god
-fX3eT5LzojKDkKSjL2UOqgdvHsmbWClKLdv2VnP799cY4hlu89DhHtnIDcPbaJPxqqsKbyGR
-rDj4NOPyw23JBqo7An8qt2G1IMwytyS3iaOGDCXo3ezb/+6Uw7kXL932sn19Omx3AcL2Y2hn
-R+syTCMNJRSr8lP8pKt+85Jyn69Ghnx+NShY5LrKxCo+Rt2tdcOLOmchihGfPUsDXhtOChxr
-gjQ8Ij2LXtaeD47KmYwsyOPYdYdz+hJuFKi1oPqz+KCarwFgpKlqTFyx6WoqMbMyznZ1BGBK
-G14yolrtyG6xUcy35qNzW4CH/ehK5Dmfgea3ngqjwJpfn31/3Nw/nnl/jgf9VGf9SApW1ozi
-xLkh1w/Cdu4fVG/KK0DuBadYS/gLo954VXoJmy5u3ICqxsgZN3MeZFAGvY2lMTBPHrq4gNxY
-xxJkFNzWCtBilRLN26kDBMjpqLv1nw2Gh7Z72g26bubSVDlZo6KrHPBIZeworfW9DEboVq8T
-Q+BkyIFOcTH9U9gSXHo9CU8oRSvETEUH+cTBcPgDUEQdANWFpnx+FxRYdXBVKKm6vjz77So8
-Cf8ZwoUccsWpJBMxpqAmdeEpfpJziNsQZng0/1oTHmIAeiRlOiRivay+PhYS3FVS5n0AdDet
-U99S3X3KwKyRs7rT7nLlBKKyhZddFn0sjoKt4EphsGRzza6MoPW3fZ0EJq0tp8sKjplOCK20
-K99ZwmxdyeowNVQt+HoQz1R4eNC6JesRZ2TvzZspoH68S1F1FZ9DFMJjiCi36HSjF3UdjHSO
-Jk0tMedwi3Cv1zCj6MSqnY3LDI7iAU1bKC9wqrwrS4/c2Vmbs8WhxyvGM0EHmy45TSe67prz
-s7Mx1sUvo6xPYauguzPPwt5dIyEOsOYKa7BGajRXnFJhd2EW3ow5mr2cW2NqKsC7ium5vSug
-wCVYLYFwEYAPxGln389bH9lXoXDEk7Zi51R7e8MF7S+i5k5pewhU2utxqp4oEnRYKTBog74A
-adNp3DYTBfpO3f2Bq8d1ylMzrC6w7iqHIVZRTafnX0I/dcSr239vdhPAq/dfNy+b14NNiLCk
-EpPtN8x/eemotijfc/NtlX6fYYkYeiEqGGzpQfqqaHTOeRVQMBc8pN6yBY9yOT61rcI+76FR
-wJ0FLw1Cm2K0nPT2BnDYLbiMPpc+hHSJfzGHT90WW3XTgxynux2wJf8umY9NKv8zEEtpL6zd
-+y2i194nOb2RSrobwBmZ13B9tYsZtsKANtPuDWMtFV82Eo6kEin3P78Ie4Jj2zrDsX5YPL0p
-MwBv1zG1NsbHI5aYsXI4Y0naecuzYb3isHfBLXU3ZRfDi6CsOmQO3iaqgjbGUadsNlOw9/S9
-n5VFuFv4QNyNuNZGghpqOMxZ/M1ALDHatT3WdQWgLh1u0Xiiys0hQS0hiy2d6z7mI6JxydIw
-sFKjE27tC6CUOGx3mjmlM16u7UjBoL8iBUQQ8oQYIJ8ay8HnAPpvAZw1sszp5IUVh/9Ra9Af
-VFbxQclAR29vwcMekTH+PoimcknvS4XpbwmR2GysTEWHEKGrnJ5ku82/3javDz8m+4f78Eav
-OxtxlsqeF7QyI3kqy+9Q/Qzv9kZq9UhZtDCaLUf8HNUECwRsaeR/30SWKeDgcqTGlGoBPISE
-Y8782GY4X1KimyW5Hv+PSf33kzk1iaM2fIm1YfK4e/rb3SwRefzK+ppRwFslNpOLrx/P9rdW
-+KQQQAKegotz+U8lSjlmey5dLhsAD4ROdtD7P+93m8chJAn7xdvBl34dxOPzJjwIoQ/oKHZV
-cwhYQ3MXsAte1vShRueOkabuGySyrvIRU+bWPP6Cwo652Lxsdz8m3ywi29//DTvnXwb+Cpjd
-9Q+mFb+sZGVwTd8LdIswfdt3Szb5Bxj8yebw8OGfXi4y8SwbOoRUKB5+3oDUonAPI/WM7gsd
-HbdKyunFWc5dueNITajgiG6mNYUisA/gxMmJcGSatrR2WKP+D7nKfZnZYWMEoKOy2tRUAeLc
-tB8WBcJCLkc7qtT4cCumyfQl8rqiqD6Aa30s7mmsRUj7c7s/TB62r4fd9vkZlIk4/7j4TXpr
-L+momzn3cXRYhAamgPnF5FVSJIKFK4AUW/vQJIIsBYUeXEapHe37h/vd4+SP3dPj1/AGdo23
-JPR6pVe/XvxGH6/PF2e/0ddVCuaSijGjg/XZ025U/Pvm4e1w/8fzxv5SwMRm9A/7yccJf3l7
-vo+MEJaPFAbLivqlgYcwq98K6USJKtBjhyhkbchBt80KoamgGl/RltP1K8A+XfQp+1FrvPp0
-MbISWDWBWy+Db1GKxF7QezdJ/HjnUW4O/97u/kJP01to7y4zWXBKx+pSrPyR4zOYIEafWngf
-pkxGjCr5AqDiB8GYQSmYCr5Wx3wsOKKcQYCTBYUjXaNqvrYQGLxjUUX5MV/Y1QxSaNgUfR4Q
-HuAY+8Ua2lT9wxTCrRmPn5slNGmLEof1djiJVHtZSyv9+ezi/MbPOPbUZrZUdBrJkykimVYi
-5Unpf1fjnht7B+cF/nme+O+GR/osimpFrhjLF357VEVWgS9FBqWuF7/0a5azyrv+rOYSB9zX
-xnDOcYa/BMVkPbUp8/Y/9jMP2HiwPlQaxmui8cNL7x0FS46v8DStq7qxh+LmbfO2gZPysS34
-CcB6K90k05tIJS15big/dORmOlj8jg6qd6KV/RovHq77tIUcgyLLnTqus6ED4k2/Rh3R8Juc
-oE4zagqz029NtT3eg97g37D64dhAUQf2OPkbuyjEOJK5XIx82dVK3JCFVMf27W3doFl243gn
-+85obH3c/3l2ap8Fp2YEZkXRXwMcG2KysEPVz/f7/dOXp4foR3BQNvGrWlsClk1GHxC3DJMI
-CHhWoxNCmex2ZFjIrD9d9BveErqP9XoI39JRPU70pfSyCrWno14NyRleJwyo7YeWL8NZTKux
-bel6C+ozgA5xYJDE7WltSXP/wxMeK/Gr6j16OV2Hv4xz5ARL6NELMLckA6vIh1NnfmUMEhle
-OskcP7iM1gM5M0ZW/HbsQuDd1bDDklFvwY+GqZdoMXJhchRYTLHtiYGgTwwni9Tgg8COKLJo
-gYGAbxiCjpbRGt2BrojylJnLhF+lnCaeqU1L/KZDS/zREL/jKRh/ZgtViX6Xzn+FxzYX5cKC
-MM+tVfHRRkoz095oLAXRAOKUY8u5X06l7fV3+wFt+KsKjmhRWeCOPIaDapFiqBWGiOsm/DBw
-ehPYWPzi7/dwq33UOjls9uHvC8xZoVhqx9HWAj/8tTlM1P3j0xaL5g/bh+2zh/9ZAEPwCeYH
-AFrnbBkqhpIeJFRSHyN1tvpw8cvktR3R4+bvp4cNFbUVCzFSdHmFMJsOIaobW3RBaMCUrRNZ
-NPhtTpauPPjZ0+cEvWKqp61Z4Z/AhFFVkEKlrFtOsUtZsIw9GlM5G/udhgjhexz8OYIRVsoa
-ADKKDfbejoGIVWyT9teysFw31yO//2IFbUXvyF2yFRjkINzLX7/sMJ31/tt2dxhutpXRQp1Q
-A6GMwRtTNeg73b5+hYB1//YNO+96y6jeOrXUeC0bWI1bUU5laX/piypnKfD3XZJBK5aLuIUX
-YOgBs2MJZnvydGhK2eVMTBsVfm9xK/AXojRBwTS7R8Wvn8Jw3JLwHici6Wo9EBJeNWmS/R9j
-19bbuM20/4rxXnxogXdRS7Zj+6IX1Mlio1NE2Vb2RkgT92vQZHexyaLtv385JCWR1FBOge6u
-Z4YH8Tgczjw8gIqvubjLc4MnPLrz0ryI6aXhIBNnJfiinEkNyGGoaaSXDuO6GeJVu7LQIw8H
-oTrmP+IsgzCxLlXRqdOSQUzAwoFDsKN3tGpKW3nlwGUY5SZ3f1Mh6e1LMqhChB1cxu+FuTJB
-HxzYZ6MzMxrIHphQeD73VcPFKycvNLQki9ncUsOSMrBdt8XqvOdNToCe8ImptcE1MOoQ3KNY
-U+umW4zbpYaZCBU5pdhM0UUHv6zZMvs77v+8Pn95e/9+een+fP/PRDCP9WCDgZzFEUNr6r4h
-1rNkvROSYeEwMxHmd7SMopQBJnOFcJ0o4Hut7dE1ViLLR+a0CK5zzxiTxx5HYgNsmTIMnLWg
-AWMztajYRyrB1bDrtYBY/NTdGuk5RxBOjFEgfDo+VB8QDtmHGlDIfuwzmyhD5LCOg5hJwA2V
-uJfLcZ8ALNFX46caagKocEQjrZNbqiuX8vdk0CsyLaqj61CxNxYXSRFOlhS/elAS7uYICUWP
-lol54k54T9EDxa1ZwC1CapyhJKk7khpXuUAgRW4eisvD90XyfHkBdInX1x9flJ1g8RNP8bNS
-QAw9BnLiRzVHvZKosuvFSR318UgV4FfFZrWaleAaG3zcnEjRViDjzmKVnOti48wjOzdHuJpD
-mRFgxYGC6exzrivAIQwd2fci0k1JWPbgWB10ej07kgpfZCqWAvXy+VGRF+VUBz5KOA8ZOYKa
-gk9NXiXG8O9pXQ7hHrjvQkOKiGQlulZXtSyUK4K5cNoQgF/jByZncaekW0oGUVpMIpbBZZ0M
-EhrG0ZCPBCSwo2NQNlfzs0yBZWnKblaehX26v4PBe1ssKRFXIWNc9VIC8al2AHiwe6aFqqEi
-WryVCrXD9lxdCq47LeRGrqQZPsXyd5fnpqUCLoYE3m4EUGmJ66sg5DqfHrvgQnpcBvplrOST
-ReEqDMMBrmYtKJq8iYwfKobyVSfxeokoIIiwNZMOLHnHLfzphZf9J8+ZgYBAEX6kZtTsVBDi
-+m0/I01YizG2q0XqrSIrU8DxjU/LXALhCqSe5vvDlzd56bjIHv41Dm+QQ5Dd8l5n+lIpybjH
-3MDr6nJsvKTJzLW2Qe8+CkuuTqLOEh1HLksi7NKS5ao0rUIlXDZaHzBESfOxlvOTdjw97dYk
-/6Uu81+Sl4e3PxePfz5/m55vRfsn1Gz13+IoDq0ZAHQ+SQZIU6MyPAewoglcMisaX5OCGROQ
-4rYTqHidZ2Zucf1Z7tqugcV3hHEilbj5qCR6I9x/PLU+RtB8rJno2lmgYLtrLtjgH8PX75mq
-kJxvopMJCRy+x5CZhMeGZtaiQHKLoFvoxPwMRFyUmpz5w7dvmkMVOAbIYffwCEHl1qgruToe
-t9DMcIFsTXzwQYcV9xUhKsAsNMHg874z48J0kSwufkUZ0NsSsdE3PjKPtjdtXVqNQcNUEY2W
-jlng144QCfHdt7vlup2TYGHgQyiJIwodRLgm9H55cXRmtl4vD+1kwTB1NoNjO6qMVAEbeM/1
-FgfERhMpn60T4PZgCpHIKyOAq2hXKRP3JuDCNFm72OXlj0/go/Pw/OXytODSc3ZfKCIPNxvP
-UT7LkNKrlBNdS1UT2YMfImyasoGwCjgs6cFbihvXAgYFuN4IcKOYfKaAw7gO7TrsNT583sRW
-+fz216fyy6cQJtBEWzUyicrwgOHqipECyFlxGNpf39PBYOkeZgS9chF7UhED15wSitgHrQgg
-VXtc9TJK43KW3cuVDQqpokn4LexKB9lhom2yCsbU/8m//QUfyotX6T6IboBCzPySOxHViG52
-DPyiHcom8I8BfjgqseOoHf1QhbCzm6Y+F4EL673aU7luTtHT7JjMuizTGOwogK31b9a4ck1A
-v66XOjiQEno+aXe77R7fdXsZPnswRPqq0CNgimqwfgkr2eg0N72D4sJmXIrCvzEuwhQkTnHM
-MviB3xYpoQR3X+UfQB1xsH1K8CxkDFYYWq38Fr/jF8g71R04CbIuwhu8zzAi4f4Gj2TrRY4W
-aOdEIOSnNYlbPSuWcUV0uk7VAV+bn9/AH/Bp8fvl8eHH22UhzigJW3ANQLifySQvl8f3y5O+
-fA2tHuAt2vPZ7RV+iytOPd9a6kcrUVTDld1tE0YnR9hEQ0TITxc3+H4sjVRXh0w6/wE1mxkL
-ooVOOeIU/fz2iJmOuFbGz8MQBMZW2WnpOz4t2vibtosqNNCFH9vze9uJlwZ8K2N4W1YpKRqH
-XsMO4Pwb4spvQ5PcDY5LQ7Zf+Wy99FB2XIRZyQA1CPz+7eP9IJZWHc1wUyKpIrbfLX2S4Ukp
-y/z9crmaYfr4BOy7oeFCG0e4aS8TpN52d11kOy8ivmW/xIdSmoc3qw3ucxgx72aHs4K8Wu7c
-Br0jCwBfBVS5hJH9eofFzjJDnaoIGKRejZ/DNre0yAoxdqMvs8AAF/9D3C//2A2ab12Zid98
-XPO6kLrzvc2y3zPiuAKNfLwYHoeX4PBVwMfHruJP47htiZy0N7vtBqmnEtivwvbGcBYItt5y
-Mi/k0xSXfx7eFhSuo368CtRiFQPyDuYQcXP+whVnWJcfn7/BP12rg92t0uHi5f3y/WGRVAey
-+OP5++vfPO/F09e/v7x8fXhayHeI9AwJ+OASOHtVuLWjj/LGNaOB2+WOJWAQaFpc4iStnacc
-sbzTL3BWyrmuCRY2qUMb/gIK0gueMZsiQ7KQJo6EwELTnPg+iSfhHDTFWMcUohOGhBYzhGgA
-kynq55T/+m0AdGPvD+8XfkYfYpl/CkuW/2ybwKHu03pzbf18hzd9HKb4uhq2mUCGdDLV+0Ok
-wocFiMRxiswYCWhqehNYipdqG0b7c+M4t4feYxTCxo2LKkIjeHUIxemGBJrDFiSXL+RpA4LT
-lJsYvkyLMoewO0chndKe+tVJfIaqv8Tl+4lP7L/+u3h/+Hb57yKMPvH142dMrWKOiLm0lmz8
-MqJnlwx9lmvI3HRLGaj8+FdEONZvX+7BWOd6aoj1tWiQEN40I4bBW9Cz8nAw3zQCKgvBq09F
-1o8t2PRr45s1COBEJzpdr5XgJOF0NJgSVPx5RYgR9hGRjAb8L1cbsLoaamm2wVneyuqTQXCE
-CV48reAuNyhaX4rje3/szzBVl6/OXcv/E7PHXVJaMQdeJHB5HvvWoQL3AlbjmHwCsVMzbBLO
-V4/QcDtbARDYXxHYr+cE8tPsF+SnoyOuXq41VcM3a3ypleUD4Crv7hmJOswZbrkQ/JjXz3dY
-NriCI1bHIj673osaZGa0oUFmvimqZnVNwJ+ZK8eEpWE0mc6SbJtCcRnkLQ57PPNjn+P9OzGz
-jowvTxRXmpW+Up2ck0vO+cKRXu0+7crbezODOiaOIEG5uh0F2qoMUXWLHSLHybdfAGc+gDqc
-5SSzoC73jp5PPBSKR+6SFbGWQprnkz6nn2nVxVXlYZB/owSDG+uwqSfbOWscgRiSe59vVuGO
-L3742Uk1wsycuxODBGxejpOdFCIzi7QcDOFqv/lnZu5DRfdb/BQjJM7R1ttjkWcyf9vnSfZB
-fmVZrfLdconZ5QVX2k4cG9p4MdGf+9SVREq8jW9ccChOMh3KpoBsbO3kKcmyFzfLpVWTKLX1
-vbSrIx28paemfASdJ63DGXGO3vIqLsmOxMqsZJGcGMR6TGHgHjPMKD+wI/EakTjkxSOS6cg2
-PdtkqIFh7SqkshVZ+6km0fsMxnWtOyYAS9lZx1oD8XNVRo4xAuwqn5oVwyE++23x9/P7n5z7
-5RNLksWXh3d+OFk8w/s8fzw8mgdbUYPUtSD13CuLO4jxHgi9G98x8+WHAm7ifGGMZj5myRa8
-JBm0U/5Zj/b3Pv54e//6uhAg29i3VhHXTZ0Q3FDCHWsc1xSyci2+FgAvyCPEQaWi5aevX17+
-tStsxjM34N0S3ayXzn1WyOQVpXjzCnbBdtu1hy+JQgB8DbCJLgaUvXAIIgL5LRj1ZwBIm3xt
-7wv2x8PLy+8Pj38tflm8XP7/4fFfFDAAMppTe/Dh35D6EDdu22dyZFaYujzgx3G88Fb79eKn
-5Pn75cz//3l6wE1oHYPLv/7BPa0rU/Q+eOCzoPL1FXZgFCVDHXnARbkpAZVO+HPZTs8QdA/X
-yHHQYOszPzQr5yztHo6anpdIQ/VDtjbjr+VvvqcuvSlxuZkSa6JFLSpaqLsf9LQy3y//+WeS
-XtHNuNg+b5p3WFOPSf3l0l8iKXuW4+7elgq1kyFE1CMdIchg13fMfBGGTxwATQ0A/Lp5MELA
-i95x0wIin61oa4PJV1xw3nDyadRst77DfA0CJA8IYyRyLHogkpY1/ey45RJl4Mup+DxAel8u
-8Xkq8nazWJmVyKu+4KE8GmwnV9MneHq7Mwa2JJlwB4Kmd7IUkg9px0VESYGsTL2Pwfv3599/
-vF+eFozvOo9/Lsj3xz+f3y+P8OTDtEoiVM6oUR5Ng8Gl/adbhSgAviZBIlI1sQmDJknCjwdG
-1JUMDrG5vsWNt/IwHVZPlDVxaWHoxa6DljJtNw4zpp6tY43XRWpMGdQFoH1La8pmriGf4Tdi
-wHCNxcxzfea1RjtyVU/bUuXvrgh2Ox0SVS6cUWzhoPENAH++UCtBPuJ9bchwqdAC9AsKzK1N
-SxOSEz0a+36THgtwZOa93pkR6KjI6bpIcMCVmYzeHR3AOnoN0zhjptuFInUN3skDG1fiRvbJ
-FWDfF83PlUbBzqkQth08sItkFxlgIlrmUTzBN2iOGfpIkp5K+e8P6aLMd9jTeQcABt18foD3
-ExtgOkHsO0FxhlSfw5RaqAE9qyXm0cx3mDFO7eHqupEcf6MNw16t0IRSIzwmrXCziJZg8rJA
-jCeJBaTxq/Eztn936Vk3vdNDoEHHHALOtp4850THnKHtAYt2BLL+VhP8RLIV5MixltD18spA
-oDt/0xoD4bf8SpKc1KfYfMwtP+WRo7/zE08Kxyd8tN46RgO7vce8i/Vq8DqQojTqnmftunOZ
-YoHnPFZw7maWy85utl4rGtaOSJ4kJllxZU8pCN9WTYxQRcILZrvVzuFpoecKSAJFea1jd6v9
-0jgKKuNS64qlL2L/1qGJq7RV6FoHixPfAwxDi3jULrJ8iqYJy1vtyhGwXUMzfwkfxkfBgZov
-1KSE77kp3pD3McTnJKihTCtbGcu0TO8ysnLdkdxloWvjuMvcq2AbF50znRPXqK/hkWTgt4Yu
-0gBi2MRmXFKD2+t3/CwdullNic/2eufd7OdrWMcFXKrgFYyMxq1vluurg7sGUBIXPJOSYSTn
-+6J+KSqWTT560LHJ4vgOrR+jmQk1zcK9v1xhxlwjlaG+8p97BwY/Z3l7Byu5oiizXH/uqjfj
-5uHe43XUzyNxRUPXIwCQyd7zHEY+YK6vLzesEW/yXKnu0Xo/paru85g4QoN45zkcNkOAeXGc
-wQt6RYdg90VZsXt8MDZxemyMpVhS5rO0UgDMLd86SIZP98YFYKLleKJXlPkz/WwcQOXv7rzx
-lsZ6PtBXjt5XAoCiKqPekHI1GVpM8V81Nilwm4pW81agseC7ZRQ5OhXQjQLbPtkP+/RePvkp
-fUEpXXCKE8qE8NWyaGCbSnWc+Wa3XLWCNhqP8sgUUkqQIo5qOT9XCcSbFLMI3sFGbuaTAWKI
-TggpP8wRs/QTbWLGYrswOIbz1qAhc5QHE9bMKQhzuUnKdtLwI+VJU0mPp4IwBxcAR/6cu9u2
-rZ2IhlV2nNRpXNXlLuTIsxAgJiQzW4U1XO1uNesj4MPEjbf0vNDqGKGAmV8dVVxNWu9MQUG8
-2ZqS8jExfsgxyYl4EN0sJwIPZ9oExIChAOpwuNaJZWibWARZHZgdFnIogvfYsaBcdcGGe6Yf
-x6rKiH/nP7uARfZbMBo3ihPx+IiVyIlQCsy8qrRTiaAA9qN9PuWMEgeSBM6kSOGahN9sVPJF
-kK5p8OHE8MMzy9Kwj8IDB8JPb89Pl8WRBYPbGKS5XJ4uTyIqDzg9whd5evj2Dpja9v3B2dr+
-4fdoucv5qMaM0k2qQgk0AAk9YaM/wDJF2gAS4J3E4sU3ZjIArie6Lwj4aooYdCBM0H1QSUAN
-EjHRLrBanmqDGxkEx2WDb9L9LT+o6pZ3oAxNoOfC6UETlnHbw/m4MrRzk1DkVlYkxY/BkjsH
-QqQkEtZjKaF6tpLijWi8Siyo5/I8rZBE+XDmpCDZxRsZErPISl/xpsHmEOfe3GZGm/DfHbMs
-z4rsAj5R7AmWjqIDDJNwHjD39+zG97Ctl6fylrdW8ZziHibAnPhQ6HT8tRgpgNVaJNT70Kh5
-WKxuWuz8bU7G3DQSCcKVRP3uqUVTrVfa5rpewTJODHbHWGASAvFyWiDeiIO3kAR/3IkNCXQQ
-jyI8LbZdcz7Aw4vXk6wXahUPTBwm38id4Wbb/gO7SgdjFFmaFlxBSu879G11xSusHDgpq7BM
-UCwrYCqsHY0yGWWc6HxnLqjDXER+63oQuAniezCwEs6yxYE2abCpBES/OXLVxriRLgrw9Vof
-ksKGfVVq8pStQ6ZmeiA8XKbp0B/y9wif4mJ0xUnGvIynPilQZY7oHMVGFxDFDI2NDh5PQtFM
-qs0a2YGA6rBfcY6N2VTVlOUbzHtFby/EPMpVbb4iOZw3eyZXBWkBTYXrgmdY0PBmys/ZDlM8
-jFrFESWW7Ufn18SBIWQITe1HdZPtPDS+iXPE4w2GC7kQ3/uOB24U13GxqLiOaFLgbv0VmeUG
-MznvdvFsuTPcne85yjVaz+GrqMs4wg90keZ6Lp/vI9QRWBmFanIf6k81SOo5W22WKDThmdG8
-V6XPzzlpF+Be83J5e1sE378+PP0OTwCOIZcyfOyLeA1D17ffv/K6XFQOwECchs44GuwIod97
-cOjHzZGbwGt+uA6o7pQ6RzAkZRFq+z2ZePAn91OAwDvEBaR41Wl1XQ0HEfrl2493Z/iNAIMz
-LneAIJYhrFEEM0ngnUYBavpqcgDjGAK6X+385APKt/i7pFIkJ01N21sJNzKgDL1APw+ed29W
-xTvhy4SW2HO6ipEjpoFZYowf4eOia3/1lv56Xub+1+3NzhT5rbxHaxGfONlZeHwKRtx62U8T
-iAkjwW18H5TyeZuhoJ7GD4PVZrPDA7AtIcxcPoo0twFewl3jLR2Rr5qM7zkC4QeZ7PbWEWg+
-iDQhuVk7YIF0od3au/LFWb5b+XjUsCGzuiLDV5DtaoO/6DMKhfhUHwWq2vNxX4JBpojPjcM7
-apApq7gAxflKcYcyixLKUgVUNi/MmvJMzgQ3eYxSx+Jq77WNS0SbUc5pwScTg7d7jRtiRePH
-FGK9TTiRWEXjujRSI4pQwzKoiT5tB84h8THVZOTXtMITckaHmr9GkSM/ocd52SA1EqovPFcw
-ZTEaxWd4kqJGmE0ehVh24oYTrahkdT4KqTVIcSW6piVWYk4O4joczVy8KFjW2JHQlIH34bFv
-BQsR/qFnGvEfCOdzGhfpkSCcKNjjfUXyOCyxTXgs7lgHgGqTtGgOhHEFBruLGyRga4Dnr7DU
-bUXmpol4PBV9+Uyyy2OYyj1p1Kw0IgSwVmCW0N15dT6Jtrut0TJTrhNwwBAFg0WXt7gmqUsG
-R99behhMki4V3jcNqyQcuqN2SsSqnVNw/YHM1h/IDQxxVV26MkpJXrGUOnw2dMk4Rm/1DJED
-AUx0iSTkKhHxW0LlaEZ5y+OHOV3ucCw+f6D2Gao0myJaRJHOOBO49DlDQJLro6TIR0Ye35U9
-fhbEd1RDMOQz1XEHacjlzPMcACm6WJwl/Pyc0wo7mxuS4ofrS2kRt6h9y8jiduv5rhy4IuAG
-tDU6BN5xbjbtEteqdFHx7xrwsK7UTPyb70nOytE2dAD6G/0dNeJS7yM9DkAncL9UMtpgOsSk
-epRrpCt8KDYsFNPLOZ+5gL9cXh8OUm57VY41nrXf4mLt7mbzgVIrdrNZbq9P6rpMc7n0+tjS
-q5QyqjtzSBrfA7y1BkKuU6G3pieeICfeBrPNqCPPql32D6pPz2w51+cdAD1KojqulrMSpCIu
-WGsl0GR84gZN4TiUKyF4fpVraLHjbcD+OMZ1mEJJzgm2zW+Ot0DVufkML7DP5nEfT8xllkSY
-e0vsZCe5R3nUnzR6FSa7zRZbxfrObrMVNgYEGR8EYU5WrsVWSnBVlvcUYELyfwWOeBMpGtUn
-/+ZmA+464HdwVXKLSSq5OqdTTUAQ8a1fsPxIYfWMs0PQE/HAh5lN4mHatGStBqCj9OH7k0Dz
-ob+UCxsLIzael0KgCS0J8bOju+Xat4n8TxN8SZLD/1F2Ld1t20z7r3jZLvpW1IWiF1nwJgk1
-QTIEZUnd6LiOk/g0iXOc5P2af//NALwA5AzZdxHnaOYhAIK4DIDBM3WwjLeec9nJaMqw4lZu
-DSAWpaJe0agzEYF6mJ9zr8uImgsdBBhEeLo/FEM9aHSXzrEduJvfaMvrl7VeqpVdc7XZBESp
-O0C2Jp9L5dFb3NHWRQfayYEBYnYXPz68Pjzikf6ITbyuHZ+aey7w7G1wLevLkMS+rJXxfygx
-zLa+JEyzqZvTpjaJkRBDgOf1m+XGdz9ymHF3j/s9yeLPgnMPvu4ZYjrtTwCLWGYM67YqOKcL
-eHWOQRFUdwNdw1/7+vzwaeyE1bxmGlbZJS5yt62BIlhuFqQQciqrVJOttzTbNM6wZA7rVat2
-uMSn9hZsEIhUYQeCdwphn+s6uboeCk6CJEuHBcgrHU1DvVlT2gqaipBpByHzSM91midMUHmn
-ChTjc2m/5GkWUtXLICCpEiyQFAlXJ7I4j69X5y9ffkMtSHTj0ecIBCVdkxBWSEZbog3CDepl
-Ca2PPEz1D6YPNWoVx/mZIT1pEZ4v1JbjwTGgZhD+ow73bCAVFzoLqxiiFKOuSoafw6ihWVyz
-ks0D48lpVgV6ANEqxq2tLAf78P3ga3hDm09BWUGlFDD15kmWOkxbWg7Wn2iiQHCPmgvVZl9v
-F8b29RpUKzESGMLjlp3MGf4NQpExdbTuhGTeSbEflxRNzGJHXwc6nGCOzhP61t/9gLW7Wt36
-DGdBWWZi4FxrKAsMY/EjMSX2beCSxzqwJ2Pi4bkuxgld0164vXq9cGusjbdHpipPYFSRGjBa
-poKiHEpyZw7ZMONDihuHMFxaFmMdw7/Svf6IIkGXq9GhWTp2ByJReJCfp8y5gQ3Mj/cFd76A
-uFyRm2Bx45fkLJXj/Xy+cUWfjtZpFjPxP9DKMXZrhz6LLLuQnI1guI+PNZfWZji+tD6XQDZx
-a4UL4i6GQd9eUHoAMDNeoF7SB4qgaaLxoDeTm1GY7YtIdDEasNDdIgA5KgfBMMv4RkmUf0Qe
-yp7kgwy0qZMX3ma1YUus9T7DndvqzxN6mWw39L5Row48jzaTddvkdui0csA4OFBKJqYqKJG7
-hB6JdDvX5xvM+n2JQb1gUXDL1xno/RWzhjXqW5+eXlF9z5AYNLrSvati+F7jUnAfWMWSoFTF
-pv/z2/enzzd/YdSiJuDHL5+h0Xz6efP0+a+nd+hr/HuD+g1MG4wE8usw9SRVYp8bLjSGLQZh
-BX/iqD9HHE5z+mjQOZzMQwlZp7QRgeozen2fRzWR/gOzyhew1gDzu+k5D41DNVOhDc8xX86G
-BT8b7oI6qDosFEz/4xmv+P4R8u5LY32f0aetj8xNWlRm3PxkvhtS7/Oc3R0Eh58ZSMQEF1EM
-L6wqJekiZ7OzHjT9ZT/yms0PJQa0Rb340zPSKNs1hEngeDy2KUo1HvdLN0RTSYVqbO2autTw
-n31yTfaUtY8pgXmC8d/u9MzOmJkdKksEF4OhBxGNcAzal3qboyvlB2REevj+8jqeNeoS3uHl
-8W+iYuBtvU0QXPWU2ybXeEyZmzk36GqTp/WpqPRFGW3BqDqUGBio9aSCZg09690zRvqC7qZz
-+/Yf63oTbledQii2WR6DVY/lNxek+rW+ERHvfXK21E4eGuajT+/99n/PzbwpH2BgG/hzeU0o
-Lu1SVNBDdA9K1HIdUDtaNsQ7dVFNmszVp4f/2ns6gNZ99YrcIZZXdidXMnXM6E6BBVhQm1MO
-wj7CcB/1BzXWq8jNfgex8oiSasWKTXW1ApOOMhFt1NZf0OXdBqyCKUuQLtbEI9Hb5dYhTdAr
-HH2nI7PuTNnSsU92idfeEEFZvND4jdJyqw9raBCX0Rva8oCTO03b0TCM/w1ERfTI3OqxJrj7
-4C0Gz0m33M3mAYguDQ7Ce92pzsEtE4ahxWRlsF3Sp2EtBAq9BpNzEgNT52pNJ9MWeR8e9+k1
-q+Pl7Zpyw+hwze6i8/F10wCLhlzJGW14b23wtUwY9k8w5pKhqJmWDW+J2VQydImEBdCFjIDV
-wXF/rKjbwyPMyt0yarTJds2cXDsQ2l+uh0hvwXiouRjacnYx9JLBxdAHYw5mNVue2yXTtntM
-zTIZupi5vADjc9tYFmYuRIjGzNShirf+zLe4C+qUCezaQbzFLAa3blIuCFlfnoi9xN9C6nM5
-XeBE+TNxWjAIypIkq20BeAtaSUn1ArG5Qwq6yQx2Wy9YbKg9NBsRLHd794Ss1W1W2w1jLLcY
-WNMyRGQtZJ9tvIDd5u0wy8UcBiYihn60R0y314M4+B6z1O3qNZIheS/QApTpmaowsdnMtBpc
-wQyb6DCROthSif8RM/NVC4BxvPKWM00OI9+GHC1Qi9GTzHSP1RiOTaPHwMw33UkQs/Rm81ov
-l9MvrzHzZV4vGZdtFzNdZrQe/IU/nZkGedNDvsb409MUYm5p08CC+P5qNivfn2lAGjMTNkpj
-5suz8rYzjUPG5Wpu+s0ks5PXA7azgJk2IbfTLwOA6Q+UyZkwWuhzPweYK2QwV8i5rgh2wxxg
-rpC3m+Vq2urSmPXcN0UMFZeqG8fiYLvynWPpXrFebseKvI7NalQgBbXtgdHo4xq6GWlLomo7
-00YAA2ud6fpDzC3jP9eXfxdsbunqKSW7LdU8rQ71THcBRDyDmNgJ7mwOmXrb1XR7S2XsrZml
-kYVZevMY/7Sk+frbIksVr7fSoz5eq5tp2wYWrWaGLbBkNv75PBWZsk9R+jPjf5jE3jJIgtlV
-iPIWM/MfYGDlPJMO1GQw0z5EHi4X09MEQtij9Ca4YMwFdWgBBxnPzCK1LL2ZDqUh060HIFyU
-RhsyaWHfi/Aal0e0yagWBmo/8CmKqA5Re0uPbJ33dbCcWc+dgtU24AKqWBg26IqNYaJuOpjp
-CtWQ6bYIkGwbbJgbVi7KZ6hPLJS/3B6mlicGkh662AXc0VHXD0A/3ugiVm93C49k2tDzSGhd
-yG8EY3bQVoFhp/H+yrWuBuFnBsDGz+G6LzAUWlpeT0KlVIo2cBeKCkb2kLtpQTyiCWj0naN/
-/UizB5RlRRxyURza5/hSEcDJ90QAUjzpP7N5/svX+l9fB9l6NS0WiTLBGnV6cRYyewsGpIr4
-mtSqTdhG9k0XoKv14ozHC6+fHY89OzWEUOm4hYoPXWu1t9sbxxiqV6kIg8IrEWlfLOM5+PLl
-+fHbjXr+9Pz48uUmenj8++unBx3As3/KMqkw+irGD7WsMBDpuPKOry5mFQtNDW9lOdYO0mlY
-VKJKJPvRA+hbM5liC3DlyBMyfKwfESwAPWQgQGQDxydHzZ28aZ32rOnoX+iSuyCLXkXzvgy+
-mKYFeHz5fPPt69Pj8/vnxxuMRNB/rwEbDiYx+jxaauoE49OMCuXond38TgHNndqGRn3/OoMU
-G8UeuVlimQ+1zaGFoRf88en78/sfXx7xAI4lGZS7pHU77IqIMkhvc7tgLBkEhOdyueDv4eh0
-Kzzy5vVJeLtg9ps6NT3fNmqPsZJQDQY2Ut8y3vpg6F/LUInYWdNkZXwVjIsJ6jj3E8zPDClZ
-qcwU+m9wnHMDwv4I8z/hCxcscTVg7sDmymibBdVBoGN5zehpa0XXYHjebn3G4mkAwa17lcnW
-1j4sGOyBVUvTfLf0Imb7GBFVWtN3FFEJK8ANNAq+TFUSr5YMQ6zW1+o8WfFVvVlMpZ9vap9Z
-kqBeifXWP09wdSNGbhirW2vvLoG33lDnzGF03iwWAzdh/cxFxQP6RpDWGERutdqc8dIZLKfY
-LLNydbum3xkvjnkL5vRt8laZLoEGBPTZTgdYevS60gLwFa4Bt95yciQ6Zd5yu5r+KplcbSY+
-fC0neuL9OdjwHSnUMWzC6RLK4PaWXhZW6R4NLMYK09RJFD+hiYn1+vD1I5onhKNKuKd20e/3
-IRTYIn9rBNjbr/vyqN541i0QVJpY8mnFkG4n1djnCUbIm1/CH++eX27il7KNeP0rBpF7//zh
-x+sDzlmtr8ru9eHz081fP96/f3ptWE+sCWwXDaJeGTIvqBWKI3EXYayzzHCv97K8qMXOuWkD
-woTpMaDSgXrvU0VWvJUV/NuJLNM0xJ8HirgoL1DScKQQSJcQZcK5n9ToKqSpEec0w52Ga3Qh
-bxMADgYEOmdUkDmjgssZQymJfd4EJ5rIsSiVkyiskNKqSmHWKwaVq6DlDPx6bDXYNzD3MR6E
-+AHC+G7kb2c9Ds82HrbK+dA12KH4grUhrhu3r4+tqy2xrsBvIKqK2WYEbSlpawYfvERptaQd
-0kEdVvGgzqF+yAiooDpiyxvA8zXJLQGaw9790B0fzCAF5SUeGywAc9AhETgt2KWsTmyZE3fQ
-ZSmYIMwBgW4HrF8WZhomnDs51ml98ZhNP6PlVIqeBVAT3nNnf6hlPPSx8tIC+pZgB5S7S0WP
-nqBbJTu2Bu6LIikK2phAdR34DKMRdgZYI3KrMt0m6dszuqGzicZhJWF4pduiiOR1f67XTuRW
-kHc+N4M+IKr6yJDuY+OgAoc4gAhen2/RmhhVHVLSqQcr4Fhc7zxYBTllbaWLQWFbOfsxlNyS
-V367seyaxUk7oVjXMEEYZ6FSzf0gi2XcCnvt8Ht2CdrPkcWCUUbV3G3yrNhTfBOqOOYWb5L+
-ecXYdYPra478ipchs1DY2x5OKjka99IVVOFJisQJKolilb49YsAyyhVPmTxxT8rJ6Sph1qxQ
-NcqzETpZNGKo3uNeMPf/Wxzv5IuIltQaOkVRkTcr8+6jX6EbXMNSuCUvqyK+7pQrbCP6opLX
-4Q04Z68mT/i9FtRJsGj20XE3fKj5Elj17JsWZbbCa91zoPUsSEXhKZ1ENLetJzENGSPzqsML
-sDky3nlBwBzvoDpTwxtlrl6JA+cBj+paCO4mZqfWlgvjxYOgYxBwnmmNmnNfadSc7w6qT8yB
-EugiZF1htXG48BiuGK2Wgltx6yZxvuyZqFj6abVeBswpkFH73IEbquvzjs86CassnKixvT7x
-Y9VZeJl83CTPHPa1yfNqkzyvl0XOuHPp8Y7XpfGhWDFHS3miI6cwl0B6NbMa7gHJH7Mp8J+t
-TYJHpLnyVpznZKfn282IisHRHhLFd1VU8n0UplpvO/HV9AZgcOZL3gL4LO6Kau8tPb67ZkXG
-f/3s7K/9NbO2aqZK9vI2qHO5ZC74mXH1fOBnw0qUtWA4krVepgzpUaO95XPWWibcsDEbmEt4
-es4UYcAe3Pf6mfFZG6yF4rvG/Zn1wwPtRe4GA6W575T8pvdKnONa3Q5DliO91ZfIip0VeFvu
-z/SNvx50giZIODtHNmHZB+9QYlAzvoGUSXhMBNgl/Kcgjz6MxQhWi0wJ89Ix0bRQ04SIXFDm
-u0Ek0maCN7L7kUnZJCaoq7pGKR2z0YjK49ompG4KH46ApVt03PjXtihZOajV5D24w8QWxzlP
-1JKLXAXecihFfgQ/2CyG8jCFEczzLXHs+240LiNB/kmqFEYZJ3iMuaakUajSNws317vwkGnO
-TdOoRTK+ewbCvlDwo7/YUldpvq+dSxmgB7OUKN7RJGMDkfs6rdz1tzm9xSPAh0+6OKPDMXww
-XNdpfHBLFcbV8TzMQQuvHG0CAtBxniiu1h2xnw7ePc3uXL48lOJOa0V9FKMU8OvipgNLhEQg
-AZkrjvXO8UB2gfFCDYBQy/sir9AFwSpLLx28s/VkKhUoh2+AsTtI/git/BNK6ua/T2UkqkHD
-2O8q6UrguZY/0ZZe0mH+pzCrC3p21ylfqpE3g6UWOpr1IMn6JPIDuTNqSpYrAa3XDrGE8iwe
-3BnTwjQv7ouBrNiLcStspfijtIOPtfKds4xDcXWUUZaWYbLkGiqi9rfrBf1RUXs6pLj9rBO3
-SqO3tzRb87BydNQyVexIEgyhzVjo48OvrnmriA8Ky+T0btDAwxzdOLLCbiSWcFTWMq3D7JKP
-unAJvSeLqXMDrc0gyarIRayGHUzI8OzKVChG5WzjfLrCMk1N/GxXXGMtw5Dl7tNq1THHCHZM
-KSspBj0FeR1hbersGHfCqQFLSZg/YAaYyK0Ww7YKXUvBGw2EB2j/ctRrDtVR1ebmLJO+pncd
-dWAhhiyKlvYscjko059pVeBL2Am1sqkKwEgV0Ha5fm184a6HYzT4dkYew8sVsvnl0Hk4U1+X
-o2YFIU+tkMi0OMTiiicXWdqcw/RtGvWjfUMU6jvWhxBsitihtjq6EZhMDAWQaQarfhrs5OXH
-n9+eH2GazB5+0kQJmBsXUjEvSq0/g7VGU6Wgdh8me3In9nhyboTDz+vpQIbFkdI5RYGf490u
-4xsj499V8ruOfxQ/vL4bR1HAZ6PmAvxQ1OzlvQnGmggsndh1j8IwiSxRFT6Jt4cnS4gBAvFo
-tGV2IQurEqiT4dtrIe/u0CGGHivjJLJ6J4epnyLFeJ/gW4kdtH2qNaOW2vA3uYGRVhw4ZieE
-xNGW2QJDLbojq0RKan2B+iO8j/CrIlsMs64LdRDRiHLEQsjaCSAnwbxBbnYCnaenQZwv/GW2
-462JupNdd/D30I4RIKe6mIZrLwX69Vs9d0tJ68s4vN0wS2yTAPqC0LsXjX6zYdzkez19OtTp
-GaevRh9w3jGtPmCuoDX1md4XYI0I+tiorwTGp6UD+KsJQJQsuQstWt84tKr1ktkw1igMXbJh
-uKANIIs3tx6zLdG1h80/o+Gjb0I6fOhfn56//P2L96sezKt9pPXwzI8v7wBBrIFufumn7V9H
-jTBCe2Xs1YGJ1q/PHz44g5N5kUrs9+YwfvCGRjFxiOLAijxVB3Jl7MBknbA5HVIYjKM0nE2k
-O0azO72DiEvqDr4DaX3Ete2va+n563ekUvl2891UVf8d8qfv758/IRPRo/aDufkFa/T7w+uH
-p+/jj9DVXBXC8oI7x3XLG0IlU3cxHFSJTIUWrXAcp+jdKsD4sNgyUjCNriEYOAL9IqtjNFD1
-9khXFpQTmVd1fB2wvqBID4wEPJGhOdB02W47KTPlA2DsPITnXWm+d9yBUNYcPLchUJWrxdnS
-pj/Hri5A4a8dejgjL8I6kVSdv8XABQd87ir30jLcekU/VSQnzDkeEVI3cqqamifK2F4PqGND
-CdvVSdwRKbXf28QzPrvcsQlyjquOlQ5+RsfdzctXdNQakTOi6xFlnofHcyIUrKOsdnSnFt4i
-6Itofl9121n8s9oGA0WS4uPLVhrvwr23DPy1ZYP3smuFAaSX3UbU0eXvPyKdJ8mQiZoyqe5x
-30hUb/u0UZHAzN8rnNRCxt35aCi244LxLTkawmxqm8rB5GlNTwY6AVhO0XYTauXOZ04lsLVP
-nJYa3tP2y98/v8I3p+yThh+Vtp8aJcbwKVxC/0ajedn5B6V0P50lbj36Gj+HMe+jfH58ffn2
-8v77zeHn16fX3+5vPvx4ApOaWIMdLmVaUWHYVB3uB8FOFTKYkkMUdODU3WM2EvbsvVObyQK6
-lt6vv95F0HjXwQRMhmcbuRhlibEaqI87xAkV/hsYNlK+qXQgHbOxj4boquPomoTK86+xouoo
-VNDNSRLqBpEj6O11i5vN49QbLSyclmtGn4VRGTM63aDGmrfHUO+pQdIlpQ+WmzUl3JDCqwpH
-8jvzP86EXJEpRW0z21d15jxvfl/j6lLW8FqxLDldfSdY3Sl1YlK1EUfJZlLVarNc0F5397Xv
-M27Sxj2Kuc4ByvN+fCwGZuvD3z++orH07eXTE97meXr86MxFptMaH+nR8+GXd68vz+8cD8/m
-POxqaKaJJthxz+sjLssLv7ZC6OVh7tifyT6nh/Q9rPzKfcgc9jTVr+5S9xjgmAt1URgok1qo
-Fsry+MVfjc3QzsFCXmMTgdKSNGR+rnDg6HVIJPQq6YQXQhl9w+Yc+J1z2pUw2MI4rQ4JNfc2
-nD2RKJzhoREXAXenRQOqqGYcQpsIq+NIaX2RpMiKa7W7Exm9eDyU2hpmlRR/dNsUWwKdJHSJ
-J42ZKNM8K2ga+1AdFZmyVZWluJ6YKAu4H1uHFQwgJXfq0e58RPXUy7eoQ1hOFAOGGIaSVb+n
-PuIZcqAPTWYm/ebSpownaEwjicMTfe5sdt+vb5ndI5N8xVxibBb0uCMOkjyNaVh5r1dPM+UX
-TB2po+Z9xxO7VRP6iGhKTTowCtSYksOW2Y5AHBdGByhFSVno8aGCmaXruE6PNbpCEU1piCiR
-RsRZqOi7gHcRnm8ltPe+G+5GfX3+ovlJB7vRsRaqlx+v1G3GOLtL76FWYI5d9WMzSKMs6aR9
-g9WxCEvBeDIczKYENOkZgKyPjE9Hi6glfaUtbbxHMYglNZaHIouKs8NEGFODbRNzQSK4JzMv
-pDxa63BzIQgpYZ8fb7Typnz48KR3I24UcT/o/ys7suXGcdyvpOZpt2pnJnHS6eRhHiiJstXW
-FUrykRdVJu1Np2YTdzlO7fTfL0CKEg/Q6a2aqbQB8BAJgiAIgEWi6vBmSexe9sfd98P+kcwk
-0HLlJtML9E71S39/eXty5xU9Qv7RqAzV1etZjLmnp/jchGilKzdZ3whGZhqr0ABtpPaUW1Aq
-+N149FU/z+Z7qPh1bzLRgFLR91mBb+dUJXyO2tQJIjgy4GLBx3WME7tJgNe8DVtxujzG5cuw
-fHu7M8qzpsns5M7WRxDDM31x8M0JvkFRps91/O8jhq97r0pPvCrJQbze3H6+pL3LBpKm+PTp
-nPJ0h3NzJawwqyzgRli2dGjQCoRTSLbVa4oVGKgfc/S/Zpu+FH9cjKsDBnyJdVnB2eqxaDjk
-hOy2w/sjWV3FbSAyQaYJxWzErajyPGDVTAt/YeD9WfP+p8rAPvHjYBPA6zWDoxdbmSB9dlMW
-mPnaOBtYqK6JDLegKC76JYYiIlhWaOfEjU13qWFDZHVuBZbG/tVhvTv8e394eXgFznnZvz4f
-9wfqcC1Y4AWLRYdPFUdV7m8IhJIO61BUGX3zBKeWcgVKKv08icqrPIopMxahhfXSFcXWBoEG
-jA8fx94TSxNuNCcbglcOnO2spGEB88iIVj5OLrQhoaDP+I32desZJwFqpQbAM4cda2nIf82g
-QGOEzsGvvpiL/n5b3mmcquv58CJ3bEpkJGQMpo7RhOlQ/nmuCk9Z1ZM4iUznuqTI7OeaEnzv
-ZtuktM0YcDHDR2DjBZqKShBTPM36lOU5aiPWVDVxk4Eqmbb4ABfNZ+m6j9N5sL15Vc1h29Bf
-Om6++/0T7LXEkNnlYGA0y73oUcYDrhQM5k4Vw+fwfo0+LspMb5nbN+2sJ7sHmEsromQAYB6L
-bANV5T6q4XEn7BuATXulajGbvMLtDCNGZft041fhtq5OtMVLeSLOTD8qXcTA2YU04w+wL1Ey
-M3uMv4NmOai3iOQYTxUInsEekGLiVsNeooHyQR/rJkNjZBQPPm5A3YBMdfYb1raCbM4aMb8B
-Y9xIlv0iaUjUxkNpfkybmfWhGGw0QMbSGtZXs5jetUcKjDWju6BIVDrsgjXLvKLjE0w6sstR
-O07OtK237giSdY9k6lkmlJ1zdzhdUtGBvgNHvnYr/ThsbUIShZhLYUGz46bXTpnl7pinM/VB
-ZgD1bBhMegyGEiMv2eU+HAdNdZKdJJEaqJN9sBamXTqrlAt3sLS0cmflFzhtu+VhXBnlrx0S
-LHgGMiUe3lD1MqmPbdRHLR9zLWwtCrohSuakzZhLQAtpF5ApgFT7jYLMpbvrqpY5P9FQJ58+
-mx6JMw+HGPA3EMK+U2aBpGCKIsSYCtsKbki9u7Ro+5Xh7q4AM6d7cWsMOj5tlTZXNi/LzcE0
-nzsOo9WKi5xtHZ5SSsXD4zcr80OjRbPBFmpHDMsZTbHATKdz+vSoabw3IDSiipAlQdkMGIsk
-FfIP8RHJr6Iqfk9WidzTvS09a6rb6+tzZ71/qfIsYLS8hxIBsd4lKTWOSdX8nrL2dzgUkl1I
-pVgxTNsNlHA6tEqDsgcQ+oIqrhJeszn/4+rys3m287YbdYp4271/3Z/9m+rTFANrMDuAlq4p
-0ERiVhyTISUQ+4Mux1lbCa86UA7zRHDK6rbkorQCbVH1s8IRujmszSgwFwNWNk/ebOEfT87L
-yzvJSNum5QVdtX6IJ0CnqUwvBvihJ+mPX57f9jc3n25/vfjFROu562HuzC5ZuFCaW5voM5Ws
-2CJRMSp08ZtASJdD9BNtfLYHYMKYuZIdzEUQMwuOyo2dtYwmuTpR/ONvub4O9us2WPHtJZVQ
-xCb5dH6iOKXO2yRXt5Not/v12ftgEFzIdz31oJFV9sJ6Y9lFXdgtsibOMpeZdFNUihQTP7Ob
-0eBLuwkNDn4RfcdpUoQmQuM/0x25pTtycRnqSeCVF4skxG3LKrvphTuUEkod0BGJDkewvZm+
-6Roc87zNYrefCgO6TCeog9FIIirWosv7i4fZiizPTfOXxswZp+Gg2Cx9cAYddK5tR1TZBe4I
-rG+mUyNpkrYTS/WqkIHo2vRGH/GXu8Pr7j9n3x4e/3p+fZq2PvUYeibu0pzNG9ee//3w/Hr8
-Sz7I9vVl9/ZkuGSZSqF6ZNbY03nT4PrJ0d6w4mMuW/O9bpnkaigtva7oW9chvwXtdRfvX77D
-fv7r8flldwbq2+Nfb7Kvjwp+oDzI1OEucFTmpcwUjNqt8cK6oekrfNE17XgY15oJaHuqpHKq
-MS4sRFaD4ChgUw/ssYKzRFbMGkpj7EpQYzENXxFVua2l4ChX65KMcNHHWCM6CdrhonG7rggb
-dQ5CraDAHLWWM5KDUyNUlTl1ep2e3lNjUlfyONG4YzXATbsnGs1XLM8S5h7Jho/Bl1T7NWdL
-vBZxPWSNYxba5EFbEXfBcUGNi+ea0Yvdy/7w4yzZ/fn+9GQtEDnE8kH5xjqKqVoQKyOggwjN
-M3oJuLMHo9BUwbPUVBkwCe3OgATqyNC4nRjAMH15Kv0rvQHVFCmIrY9qV5eJwUakh0cAJ+JO
-Ml+4AzCdMJuw9Xbu2+kkuTOoF261Tc6oVx1l8PMw/wUvcmAkv0sac2JCFKd2TShdl6JaUYt5
-QCkXYL9xdYnVB+LOjf7LLuB5Ns2rtbeWaaQsLpcnfqMjBcZoLjj1rMyO4e9TY7HI7GWmjoG4
-ks7y/eNf79+VUF48vD7ZESdVvOxqqKWFKa3oOUcUnG5K2KhYY7GXOgOOKMmcVQesMPnj4hZT
-M5A1Blltu58HSVAMdXy60FvfTU/aW0sYaUEyVhWZW97CD3We20jd8SmeHSYm8c0DCuxuXDY6
-bJlQpRXf8jJRW0CQPbFPS85rx3ylvQmcRlR4BnpOjPLz7B9vg4vF27/OXt6Pu7938I/d8fG3
-3377p78dixb21JZvOHm9otgMOiMj5hxWH8r5K2m9VjiQBdW6Zu0iWLWMrXOkOBzYV6YJz+BZ
-UAxsgBwRvwMDbbBZHd6Qc7PCqSz6FrI6G6W3Hd6C7cKqAcWPezF+pG7n7LMSSQg/JWFPrPeB
-okeXMdaEdw34f0gVRgxNyLY17HfZRxQNZVpUKGnozIiNKhYcExJmLB8fW4Z9idzz5eQD0uUH
-3McErzlqhbnlaoD+ko0iGPQaakKM+TIuYbAMiOpTYLwJkFuejbcqNJ1oHZxcA5itxd1XPigR
-2IZo4hj4oezqcA8tsiHU4tIkRg0AmDPPR6E4u7AqG3jWAPG7xheVgwC4G/RFEdYUB1aVqwmU
-PPRqCZzFBq7quRCVmK4NaDOwfbVA+xIAD5XxlnZ1G/divZ2LDFacfGED0+sq6W0wuHp7Y1zW
-frg2BklLlHC0gbQrlWp/GjsXrF78FE1aO3ysdJbhHJc6U0gg+3XWLjAtdeM2pNCF1BGBIMaM
-DDYJ2mQl+yClXIdeJSABxNYBxkNtquoJqRqM7W1HoFyOujQ1R0J6QUl6a7uAPy2ylUpi7Y2f
-R6+dcQKE/ry64+lP58SU1FySrAk7RlOl6SkSpU6cIBgma5iQgGeOLN43JasDYZeqkkiwEkYP
-RHCa5Y5KYuGk50XAYC/RrIR1jMJ7KMddm7+iAg7S+ECnJA9MVdidcWdPaV3+jEQ5mj5W5E3l
-pH1DryJ+wq25+4jAwNPzYK8/6tZFs84wQjZfDTPdMpD0taeLTIfyIqvCn4k3ZmMcb5hb5Jru
-I5CciyKUQdhYoP8H5Yf9V5/Jy67oC1Z7QYhKn3h/lbaodvd2VBrFJO+XSUundpNbI+o7fUPn
-elcs0JieABYbTWIfNMWQMigivHN1ZLNUVOBU0k+4yWVPnchd1UJprddXo1pKrRD8ogXfJJ39
-bJtSAlo57EP+9FDpJZC10jnZhEp7YepVGWUtTEmoKgEb6UIGZkwfp3rI7BQRqONlCZfJUC4u
-b69kOG5ABYq6LIdDWhU3wjI7ywjeOhyLpyZ7WThdGbd2Bx7VqQMZvb6cCpQ6Zd7u8eLU9OCZ
-Bdb8kLlrEuwMXZLJhDyT8WCeWPHU+PuUEtNFwLmKezGYEMSrobkgzvnpkk6iTmJZns3LgvY6
-NhQn9Mfss0Ye7NamEXfQphSFWT1G0Zo4on6MO9IJkNF2YKq7nIl8S6RFNuF9EpHvYsh4phbX
-i5PnekLY7tvy1FwlDH0p6FkelGDLv19belt0oe9gqxNVSfm5DCepjSMSkqqDVeTZMQebQR6l
-edfQbxgN0QKtoOOXJG+NGwQV3Y/jkHC8mROnJA/GT+NC6Nttzfvzzc35ZFdxccATFzSuc8LA
-bSzqGHBuMdlGYbG5wNePFJzyWR3x/ioeUQHNRhvCrC5Cz90TjrxtQUNXIP62DnvsVDWcxnA1
-ZiVoX47+paqXSvWJA1ZZZOSsOdMrTfxk1gsVj4R7j+1r3Owe3w/Pxx/+xZQUbNPxHbYa2GFR
-SQcEbkCW5tdiqjAus/yRHq3KFWsgsEQf3/bJAl+9UGn9Qu9uKlc3jO1vpAu/FDMnaYluaFRq
-mTbU/E9NsDiM/eOX0QtjA6dYee413aVkSKge2/jw4/txf/a4P+zO9oezb7v/fN8djGgoFT/K
-8rmVU94Cz3y4ugXwgT4pqMdxVi9MTdrF+IXknk4BfVJhndRGGEloXN84XTd6Mq2moVxDZeYY
-kAUr2Zz4tgHu98J26LOp+yRr1Bung53QppqnF7Mb682CAVF2OQ30m8frnbuOd9zDyD/+pBYD
-/MUdsa5dwIIixisg03U5PC4prdH/wLzTL/KgKNEczN6P33agkT8+HHdfz/jrI3I0xiP89/n4
-7Yy9ve0fnyUqeTg+eJwdx4XfkPmIhKZbMPhvdl5X+fbi8vyTV6jhd9nKg3IoBOJ0pTsbydjD
-l/1X0wtRNxHF/rC3/jjExOTzOPJguVh7sBobcb9tQ1QIMm8tZGTFEFT59i3U7YL5/V5QwI36
-QpcjVk72GXW19PwExyu/MRFfzqhKFCKYy9qkIngboDA0ObV6ANlenCdZGsboou64zkk5FeQg
-jZD75PWVHfqqVltC++KMaMoPRyMzYEUME8+o4RNF4jx05OOvz+mCoVTuE8XljHqzSi+cBbsg
-vhXBfdM0nM52M1FB8z6dR/XpYqaovFmSDRURBYeq/XUu6/Ko27m4uCUEak0RS8boJdNg/g3J
-tNqHJ37+/s0OSNbbp79IAaaZhUKNVXvIsosyojoR+xWB+rAe0izSCEwkUtj5eFwK1ccTy5IV
-PM/NTNIOIvSVIx4+F76WrTYTpSchPNrZT3QMfYDU9/ltN62/iCXU7Ij/SU3rc5WE2v23CRJi
-+gF22fOEh785lX/D37dcsHvm794NyxvY64gKB8zHAzdsl/6HDojQ8NiJf0egqHnp62UDHBY2
-n4UHQVNNo3tSokzUH/NHyxnB9+26QrY/UUwRTCuHRgeGyEb3l2u2DdJYjDi60x12b2/qdUyX
-oVK8sfJqy+8rD3Zz5cu1/N5nXIAtYq1GiIfXr/uXs/L95c/dQSUS0O90uhKqyeC8SmnviYjQ
-7lV2NGbQPNw5UTgWsFyYRKByhWcOKbx2v2T4wgAej9G2R6n0w4tcbnsa5XUsQNbos5I78COF
-sA/uLhrPYOF25K6Evie+OudrkninUbPEvjbzceS+ZeJhPyWWEFLEMZ1rxiC5w0iRxc3tp79j
-Oh2KQxsHX6d0Ca9nP0WnG1/RGcCp5n+SFDqwonwBWbMt8NVCZdZVlqAfBLLuonygabpIko1c
-s/l0ftvHXOBtNzq/9tKvwWCrehk3n0cP3xGrBMjucMSMGnCmepOZYd+en14fju+HwTvXcrJQ
-wSSm6UVYd6E+vjHMFwOWb1rBzP565T0K9VbN1fnttWFXqcqEiW24M9JAuVwZB8LBgy+7Z3aI
-XpSVWNN4U6Gco57/PDwcfpwd9u/H51fzpCRYllz3tZEDMspawTGzneU3M1nfJzx1yyN7wwy9
-Tl8pN60o43rbp6IqHFuCSZLzMoAtedt3bWYG+mgUBrLjxYS6ivHxmNYvq6zXcjQqCDY4F78a
-I/viot7EC+X7JHjqUKDVP0WlTL7tUOeZbSeIQWiAMLZAF9c2hX+ag560XW+Xso+JeD6k/GsH
-DCw0Hm3pjHUWSUjzkCRMrBn5JIHCW4MOoM9GFvAsGg/GE8GNdaPXJWhbxTEEraMGCXMqT6hg
-ZVIVxkcTvQIFQFZlv/aCUDThu/B7TAYIe0tuLV8J9bQOUDemmn+YUKNmA35FUoPaQcPJWjb3
-CHZ/D3YmGybTnNQ+bcZMvX0AMlFQsHbRFZGHQP8yv94o/mJdkiho8EJIf1s/v88sl8MREQFi
-RmLyeyth74TY3AfoqwD8yl/u0vmSqZjJAYV+Mw1HrqRg/dJMNmnAo4IEp40Bt269zR2yqeIM
-BKiUtIJZXkIYT66uCy2QfFfVkmDy8tEaqjtTGudVZP8yhccALnM7S8Mo3sa7d8lTqYxFx+4a
-azu/xxyEBqASiRmnlCRGxZm4Q9OS0b+itlOEVvjmC59nDTpNmdfE6PGY02+jYbafKie6Dxhp
-8yRQNV7WWvcII0om4ZU3i4D8H6gwKNOoagEA
+v5:
+1. Missed crypto fs submit_bio_wait call.
 
---J/dobhs11T7y2rNN--
+v2:
+
+1. Set bi_rw instead of ORing it. For cloned bios, I still OR it
+to keep the old behavior incase there bits we wanted to keep.
+
+ block/bio.c                         |  7 +++----
+ block/blk-core.c                    | 11 ++++-------
+ block/blk-flush.c                   |  3 ++-
+ block/blk-lib.c                     | 20 +++++++++++---------
+ drivers/block/drbd/drbd_actlog.c    |  2 +-
+ drivers/block/drbd/drbd_bitmap.c    |  4 ++--
+ drivers/block/floppy.c              |  3 ++-
+ drivers/block/xen-blkback/blkback.c |  4 +++-
+ drivers/block/xen-blkfront.c        |  4 ++--
+ drivers/md/bcache/debug.c           |  6 ++++--
+ drivers/md/bcache/journal.c         |  2 +-
+ drivers/md/bcache/super.c           |  4 ++--
+ drivers/md/dm-bufio.c               |  3 ++-
+ drivers/md/dm-io.c                  |  3 ++-
+ drivers/md/dm-log-writes.c          |  9 ++++++---
+ drivers/md/dm-thin.c                |  3 ++-
+ drivers/md/md.c                     | 10 +++++++---
+ drivers/md/raid1.c                  |  3 ++-
+ drivers/md/raid10.c                 |  4 +++-
+ drivers/md/raid5-cache.c            |  7 ++++---
+ drivers/target/target_core_iblock.c | 24 +++++++++++++-----------
+ fs/btrfs/check-integrity.c          | 18 ++++++++++--------
+ fs/btrfs/check-integrity.h          |  4 ++--
+ fs/btrfs/disk-io.c                  |  3 ++-
+ fs/btrfs/extent_io.c                |  7 ++++---
+ fs/btrfs/raid56.c                   | 17 ++++++++++++-----
+ fs/btrfs/scrub.c                    | 15 ++++++++++-----
+ fs/btrfs/volumes.c                  | 14 +++++++-------
+ fs/buffer.c                         |  3 ++-
+ fs/crypto/crypto.c                  |  3 ++-
+ fs/direct-io.c                      |  3 ++-
+ fs/ext4/page-io.c                   |  3 ++-
+ fs/ext4/readpage.c                  |  9 +++++----
+ fs/f2fs/data.c                      |  4 +++-
+ fs/f2fs/segment.c                   |  6 ++++--
+ fs/gfs2/lops.c                      |  3 ++-
+ fs/gfs2/meta_io.c                   |  3 ++-
+ fs/gfs2/ops_fstype.c                |  3 ++-
+ fs/hfsplus/wrapper.c                |  3 ++-
+ fs/jfs/jfs_logmgr.c                 |  6 ++++--
+ fs/jfs/jfs_metapage.c               | 10 ++++++----
+ fs/logfs/dev_bdev.c                 | 15 ++++++++++-----
+ fs/mpage.c                          |  3 ++-
+ fs/nfs/blocklayout/blocklayout.c    | 22 ++++++++++++----------
+ fs/nilfs2/segbuf.c                  |  3 ++-
+ fs/ocfs2/cluster/heartbeat.c        | 12 +++++++-----
+ fs/xfs/xfs_aops.c                   | 15 ++++++++++-----
+ fs/xfs/xfs_buf.c                    |  4 ++--
+ include/linux/bio.h                 |  2 +-
+ include/linux/fs.h                  |  2 +-
+ kernel/power/swap.c                 |  5 +++--
+ mm/page_io.c                        | 10 ++++++----
+ 52 files changed, 219 insertions(+), 147 deletions(-)
+
+diff --git a/block/bio.c b/block/bio.c
+index 0e4aa42..fc779eb 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -854,21 +854,20 @@ static void submit_bio_wait_endio(struct bio *bio)
+ 
+ /**
+  * submit_bio_wait - submit a bio, and wait until it completes
+- * @rw: whether to %READ or %WRITE, or maybe to %READA (read ahead)
+  * @bio: The &struct bio which describes the I/O
+  *
+  * Simple wrapper around submit_bio(). Returns 0 on success, or the error from
+  * bio_endio() on failure.
+  */
+-int submit_bio_wait(int rw, struct bio *bio)
++int submit_bio_wait(struct bio *bio)
+ {
+ 	struct submit_bio_ret ret;
+ 
+-	rw |= REQ_SYNC;
+ 	init_completion(&ret.event);
+ 	bio->bi_private = &ret;
+ 	bio->bi_end_io = submit_bio_wait_endio;
+-	submit_bio(rw, bio);
++	bio->bi_rw |= REQ_SYNC;
++	submit_bio(bio);
+ 	wait_for_completion_io(&ret.event);
+ 
+ 	return ret.error;
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 2475b1c7..e953407 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -2094,7 +2094,6 @@ EXPORT_SYMBOL(generic_make_request);
+ 
+ /**
+  * submit_bio - submit a bio to the block device layer for I/O
+- * @rw: whether to %READ or %WRITE, or maybe to %READA (read ahead)
+  * @bio: The &struct bio which describes the I/O
+  *
+  * submit_bio() is very similar in purpose to generic_make_request(), and
+@@ -2102,10 +2101,8 @@ EXPORT_SYMBOL(generic_make_request);
+  * interfaces; @bio must be presetup and ready for I/O.
+  *
+  */
+-blk_qc_t submit_bio(int rw, struct bio *bio)
++blk_qc_t submit_bio(struct bio *bio)
+ {
+-	bio->bi_rw |= rw;
+-
+ 	/*
+ 	 * If it's a regular read/write or a barrier with data attached,
+ 	 * go through the normal accounting stuff before submission.
+@@ -2113,12 +2110,12 @@ blk_qc_t submit_bio(int rw, struct bio *bio)
+ 	if (bio_has_data(bio)) {
+ 		unsigned int count;
+ 
+-		if (unlikely(rw & REQ_WRITE_SAME))
++		if (unlikely(bio->bi_rw & REQ_WRITE_SAME))
+ 			count = bdev_logical_block_size(bio->bi_bdev) >> 9;
+ 		else
+ 			count = bio_sectors(bio);
+ 
+-		if (rw & WRITE) {
++		if (bio->bi_rw & WRITE) {
+ 			count_vm_events(PGPGOUT, count);
+ 		} else {
+ 			task_io_account_read(bio->bi_iter.bi_size);
+@@ -2129,7 +2126,7 @@ blk_qc_t submit_bio(int rw, struct bio *bio)
+ 			char b[BDEVNAME_SIZE];
+ 			printk(KERN_DEBUG "%s(%d): %s block %Lu on %s (%u sectors)\n",
+ 			current->comm, task_pid_nr(current),
+-				(rw & WRITE) ? "WRITE" : "READ",
++				(bio->bi_rw & WRITE) ? "WRITE" : "READ",
+ 				(unsigned long long)bio->bi_iter.bi_sector,
+ 				bdevname(bio->bi_bdev, b),
+ 				count);
+diff --git a/block/blk-flush.c b/block/blk-flush.c
+index b1c91d2..3af4a5a 100644
+--- a/block/blk-flush.c
++++ b/block/blk-flush.c
+@@ -485,8 +485,9 @@ int blkdev_issue_flush(struct block_device *bdev, gfp_t gfp_mask,
+ 
+ 	bio = bio_alloc(gfp_mask, 0);
+ 	bio->bi_bdev = bdev;
++	bio->bi_rw = WRITE_FLUSH;
+ 
+-	ret = submit_bio_wait(WRITE_FLUSH, bio);
++	ret = submit_bio_wait(bio);
+ 
+ 	/*
+ 	 * The driver must store the error location in ->bi_sector, if
+diff --git a/block/blk-lib.c b/block/blk-lib.c
+index 23d7f30..1f6dec5 100644
+--- a/block/blk-lib.c
++++ b/block/blk-lib.c
+@@ -9,14 +9,14 @@
+ 
+ #include "blk.h"
+ 
+-static struct bio *next_bio(struct bio *bio, int rw, unsigned int nr_pages,
++static struct bio *next_bio(struct bio *bio, unsigned int nr_pages,
+ 		gfp_t gfp)
+ {
+ 	struct bio *new = bio_alloc(gfp, nr_pages);
+ 
+ 	if (bio) {
+ 		bio_chain(bio, new);
+-		submit_bio(rw, bio);
++		submit_bio(bio);
+ 	}
+ 
+ 	return new;
+@@ -62,9 +62,10 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
+ 			req_sects = end_sect - sector;
+ 		}
+ 
+-		bio = next_bio(bio, type, 1, gfp_mask);
++		bio = next_bio(bio, 1, gfp_mask);
+ 		bio->bi_iter.bi_sector = sector;
+ 		bio->bi_bdev = bdev;
++		bio->bi_rw = type;
+ 
+ 		bio->bi_iter.bi_size = req_sects << 9;
+ 		nr_sects -= req_sects;
+@@ -110,7 +111,7 @@ int blkdev_issue_discard(struct block_device *bdev, sector_t sector,
+ 	ret = __blkdev_issue_discard(bdev, sector, nr_sects, gfp_mask, type,
+ 			&bio);
+ 	if (!ret && bio) {
+-		ret = submit_bio_wait(type, bio);
++		ret = submit_bio_wait(bio);
+ 		if (ret == -EOPNOTSUPP)
+ 			ret = 0;
+ 	}
+@@ -147,13 +148,14 @@ int blkdev_issue_write_same(struct block_device *bdev, sector_t sector,
+ 	max_write_same_sectors = UINT_MAX >> 9;
+ 
+ 	while (nr_sects) {
+-		bio = next_bio(bio, REQ_WRITE | REQ_WRITE_SAME, 1, gfp_mask);
++		bio = next_bio(bio, 1, gfp_mask);
+ 		bio->bi_iter.bi_sector = sector;
+ 		bio->bi_bdev = bdev;
+ 		bio->bi_vcnt = 1;
+ 		bio->bi_io_vec->bv_page = page;
+ 		bio->bi_io_vec->bv_offset = 0;
+ 		bio->bi_io_vec->bv_len = bdev_logical_block_size(bdev);
++		bio->bi_rw = REQ_WRITE | REQ_WRITE_SAME;
+ 
+ 		if (nr_sects > max_write_same_sectors) {
+ 			bio->bi_iter.bi_size = max_write_same_sectors << 9;
+@@ -166,7 +168,7 @@ int blkdev_issue_write_same(struct block_device *bdev, sector_t sector,
+ 	}
+ 
+ 	if (bio)
+-		ret = submit_bio_wait(REQ_WRITE | REQ_WRITE_SAME, bio);
++		ret = submit_bio_wait(bio);
+ 	return ret != -EOPNOTSUPP ? ret : 0;
+ }
+ EXPORT_SYMBOL(blkdev_issue_write_same);
+@@ -190,11 +192,11 @@ static int __blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
+ 	unsigned int sz;
+ 
+ 	while (nr_sects != 0) {
+-		bio = next_bio(bio, WRITE,
+-				min(nr_sects, (sector_t)BIO_MAX_PAGES),
++		bio = next_bio(bio, min(nr_sects, (sector_t)BIO_MAX_PAGES),
+ 				gfp_mask);
+ 		bio->bi_iter.bi_sector = sector;
+ 		bio->bi_bdev   = bdev;
++		bio->bi_rw = REQ_WRITE;
+ 
+ 		while (nr_sects != 0) {
+ 			sz = min((sector_t) PAGE_SIZE >> 9 , nr_sects);
+@@ -207,7 +209,7 @@ static int __blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
+ 	}
+ 
+ 	if (bio)
+-		return submit_bio_wait(WRITE, bio);
++		return submit_bio_wait(bio);
+ 	return 0;
+ }
+ 
+diff --git a/drivers/block/drbd/drbd_actlog.c b/drivers/block/drbd/drbd_actlog.c
+index 10459a1..6069e15 100644
+--- a/drivers/block/drbd/drbd_actlog.c
++++ b/drivers/block/drbd/drbd_actlog.c
+@@ -177,7 +177,7 @@ static int _drbd_md_sync_page_io(struct drbd_device *device,
+ 	if (drbd_insert_fault(device, (rw & WRITE) ? DRBD_FAULT_MD_WR : DRBD_FAULT_MD_RD))
+ 		bio_io_error(bio);
+ 	else
+-		submit_bio(rw, bio);
++		submit_bio(bio);
+ 	wait_until_done_or_force_detached(device, bdev, &device->md_io.done);
+ 	if (!bio->bi_error)
+ 		err = device->md_io.error;
+diff --git a/drivers/block/drbd/drbd_bitmap.c b/drivers/block/drbd/drbd_bitmap.c
+index 92d6fc0..e8959fe 100644
+--- a/drivers/block/drbd/drbd_bitmap.c
++++ b/drivers/block/drbd/drbd_bitmap.c
+@@ -1011,12 +1011,12 @@ static void bm_page_io_async(struct drbd_bm_aio_ctx *ctx, int page_nr) __must_ho
+ 	bio_add_page(bio, page, len, 0);
+ 	bio->bi_private = ctx;
+ 	bio->bi_end_io = drbd_bm_endio;
++	bio->bi_rw = rw;
+ 
+ 	if (drbd_insert_fault(device, (rw & WRITE) ? DRBD_FAULT_MD_WR : DRBD_FAULT_MD_RD)) {
+-		bio->bi_rw |= rw;
+ 		bio_io_error(bio);
+ 	} else {
+-		submit_bio(rw, bio);
++		submit_bio(bio);
+ 		/* this should not count as user activity and cause the
+ 		 * resync to throttle -- see drbd_rs_should_slow_down(). */
+ 		atomic_add(len >> 9, &device->rs_sect_ev);
+diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
+index 84708a5..73ded25 100644
+--- a/drivers/block/floppy.c
++++ b/drivers/block/floppy.c
+@@ -3822,8 +3822,9 @@ static int __floppy_read_block_0(struct block_device *bdev, int drive)
+ 	bio.bi_flags |= (1 << BIO_QUIET);
+ 	bio.bi_private = &cbdata;
+ 	bio.bi_end_io = floppy_rb0_cb;
++	bio.bi_rw = READ;
+ 
+-	submit_bio(READ, &bio);
++	submit_bio(&bio);
+ 	process_fd_request();
+ 
+ 	init_completion(&cbdata.complete);
+diff --git a/drivers/block/xen-blkback/blkback.c b/drivers/block/xen-blkback/blkback.c
+index 4809c15..79fe493 100644
+--- a/drivers/block/xen-blkback/blkback.c
++++ b/drivers/block/xen-blkback/blkback.c
+@@ -1369,6 +1369,7 @@ static int dispatch_rw_block_io(struct xen_blkif_ring *ring,
+ 			bio->bi_private = pending_req;
+ 			bio->bi_end_io  = end_block_io_op;
+ 			bio->bi_iter.bi_sector  = preq.sector_number;
++			bio->bi_rw	= operation;
+ 		}
+ 
+ 		preq.sector_number += seg[i].nsec;
+@@ -1386,13 +1387,14 @@ static int dispatch_rw_block_io(struct xen_blkif_ring *ring,
+ 		bio->bi_bdev    = preq.bdev;
+ 		bio->bi_private = pending_req;
+ 		bio->bi_end_io  = end_block_io_op;
++		bio->bi_rw	= operation;
+ 	}
+ 
+ 	atomic_set(&pending_req->pendcnt, nbio);
+ 	blk_start_plug(&plug);
+ 
+ 	for (i = 0; i < nbio; i++)
+-		submit_bio(operation, biolist[i]);
++		submit_bio(biolist[i]);
+ 
+ 	/* Let the I/Os go.. */
+ 	blk_finish_plug(&plug);
+diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
+index ca13df8..52963a2 100644
+--- a/drivers/block/xen-blkfront.c
++++ b/drivers/block/xen-blkfront.c
+@@ -2114,7 +2114,7 @@ static int blkif_recover(struct blkfront_info *info)
+ 				bio_trim(cloned_bio, offset, size);
+ 				cloned_bio->bi_private = split_bio;
+ 				cloned_bio->bi_end_io = split_bio_end;
+-				submit_bio(cloned_bio->bi_rw, cloned_bio);
++				submit_bio(cloned_bio);
+ 			}
+ 			/*
+ 			 * Now we have to wait for all those smaller bios to
+@@ -2123,7 +2123,7 @@ static int blkif_recover(struct blkfront_info *info)
+ 			continue;
+ 		}
+ 		/* We don't need to split this bio */
+-		submit_bio(bio->bi_rw, bio);
++		submit_bio(bio);
+ 	}
+ 
+ 	return 0;
+diff --git a/drivers/md/bcache/debug.c b/drivers/md/bcache/debug.c
+index 8b1f1d5..52b6bcf 100644
+--- a/drivers/md/bcache/debug.c
++++ b/drivers/md/bcache/debug.c
+@@ -52,9 +52,10 @@ void bch_btree_verify(struct btree *b)
+ 	bio->bi_bdev		= PTR_CACHE(b->c, &b->key, 0)->bdev;
+ 	bio->bi_iter.bi_sector	= PTR_OFFSET(&b->key, 0);
+ 	bio->bi_iter.bi_size	= KEY_SIZE(&v->key) << 9;
++	bio->bi_rw		= REQ_META|READ_SYNC;
+ 	bch_bio_map(bio, sorted);
+ 
+-	submit_bio_wait(REQ_META|READ_SYNC, bio);
++	submit_bio_wait(bio);
+ 	bch_bbio_free(bio, b->c);
+ 
+ 	memcpy(ondisk, sorted, KEY_SIZE(&v->key) << 9);
+@@ -113,11 +114,12 @@ void bch_data_verify(struct cached_dev *dc, struct bio *bio)
+ 	check = bio_clone(bio, GFP_NOIO);
+ 	if (!check)
+ 		return;
++	check->bi_rw |= READ_SYNC;
+ 
+ 	if (bio_alloc_pages(check, GFP_NOIO))
+ 		goto out_put;
+ 
+-	submit_bio_wait(READ_SYNC, check);
++	submit_bio_wait(check);
+ 
+ 	bio_for_each_segment(bv, bio, iter) {
+ 		void *p1 = kmap_atomic(bv.bv_page);
+diff --git a/drivers/md/bcache/journal.c b/drivers/md/bcache/journal.c
+index 29eba72..af3f9f7 100644
+--- a/drivers/md/bcache/journal.c
++++ b/drivers/md/bcache/journal.c
+@@ -418,7 +418,7 @@ static void journal_discard_work(struct work_struct *work)
+ 	struct journal_device *ja =
+ 		container_of(work, struct journal_device, discard_work);
+ 
+-	submit_bio(0, &ja->discard_bio);
++	submit_bio(&ja->discard_bio);
+ }
+ 
+ static void do_journal_discard(struct cache *ca)
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index f5dbb4e..1eb526a7 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -212,7 +212,7 @@ static void __write_super(struct cache_sb *sb, struct bio *bio)
+ 	unsigned i;
+ 
+ 	bio->bi_iter.bi_sector	= SB_SECTOR;
+-	bio->bi_rw		= REQ_SYNC|REQ_META;
++	bio->bi_rw		= REQ_WRITE|REQ_SYNC|REQ_META;
+ 	bio->bi_iter.bi_size	= SB_SIZE;
+ 	bch_bio_map(bio, NULL);
+ 
+@@ -238,7 +238,7 @@ static void __write_super(struct cache_sb *sb, struct bio *bio)
+ 	pr_debug("ver %llu, flags %llu, seq %llu",
+ 		 sb->version, sb->flags, sb->seq);
+ 
+-	submit_bio(REQ_WRITE, bio);
++	submit_bio(bio);
+ }
+ 
+ static void bch_write_bdev_super_unlock(struct closure *cl)
+diff --git a/drivers/md/dm-bufio.c b/drivers/md/dm-bufio.c
+index cd77216..9d3ee7f 100644
+--- a/drivers/md/dm-bufio.c
++++ b/drivers/md/dm-bufio.c
+@@ -634,6 +634,7 @@ static void use_inline_bio(struct dm_buffer *b, int rw, sector_t block,
+ 	 * the dm_buffer's inline bio is local to bufio.
+ 	 */
+ 	b->bio.bi_private = end_io;
++	b->bio.bi_rw = rw;
+ 
+ 	/*
+ 	 * We assume that if len >= PAGE_SIZE ptr is page-aligned.
+@@ -660,7 +661,7 @@ static void use_inline_bio(struct dm_buffer *b, int rw, sector_t block,
+ 		ptr += PAGE_SIZE;
+ 	} while (len > 0);
+ 
+-	submit_bio(rw, &b->bio);
++	submit_bio(&b->bio);
+ }
+ 
+ static void submit_io(struct dm_buffer *b, int rw, sector_t block,
+diff --git a/drivers/md/dm-io.c b/drivers/md/dm-io.c
+index 06d426e..50f17e3 100644
+--- a/drivers/md/dm-io.c
++++ b/drivers/md/dm-io.c
+@@ -322,6 +322,7 @@ static void do_region(int rw, unsigned region, struct dm_io_region *where,
+ 		bio->bi_iter.bi_sector = where->sector + (where->count - remaining);
+ 		bio->bi_bdev = where->bdev;
+ 		bio->bi_end_io = endio;
++		bio->bi_rw = rw;
+ 		store_io_and_region_in_bio(bio, io, region);
+ 
+ 		if (rw & REQ_DISCARD) {
+@@ -355,7 +356,7 @@ static void do_region(int rw, unsigned region, struct dm_io_region *where,
+ 		}
+ 
+ 		atomic_inc(&io->count);
+-		submit_bio(rw, bio);
++		submit_bio(bio);
+ 	} while (remaining);
+ }
+ 
+diff --git a/drivers/md/dm-log-writes.c b/drivers/md/dm-log-writes.c
+index 608302e..addcc4b 100644
+--- a/drivers/md/dm-log-writes.c
++++ b/drivers/md/dm-log-writes.c
+@@ -205,6 +205,7 @@ static int write_metadata(struct log_writes_c *lc, void *entry,
+ 	bio->bi_bdev = lc->logdev->bdev;
+ 	bio->bi_end_io = log_end_io;
+ 	bio->bi_private = lc;
++	bio->bi_rw = WRITE;
+ 
+ 	page = alloc_page(GFP_KERNEL);
+ 	if (!page) {
+@@ -226,7 +227,7 @@ static int write_metadata(struct log_writes_c *lc, void *entry,
+ 		DMERR("Couldn't add page to the log block");
+ 		goto error_bio;
+ 	}
+-	submit_bio(WRITE, bio);
++	submit_bio(bio);
+ 	return 0;
+ error_bio:
+ 	bio_put(bio);
+@@ -269,6 +270,7 @@ static int log_one_block(struct log_writes_c *lc,
+ 	bio->bi_bdev = lc->logdev->bdev;
+ 	bio->bi_end_io = log_end_io;
+ 	bio->bi_private = lc;
++	bio->bi_rw = WRITE;
+ 
+ 	for (i = 0; i < block->vec_cnt; i++) {
+ 		/*
+@@ -279,7 +281,7 @@ static int log_one_block(struct log_writes_c *lc,
+ 				   block->vecs[i].bv_len, 0);
+ 		if (ret != block->vecs[i].bv_len) {
+ 			atomic_inc(&lc->io_blocks);
+-			submit_bio(WRITE, bio);
++			submit_bio(bio);
+ 			bio = bio_alloc(GFP_KERNEL, block->vec_cnt - i);
+ 			if (!bio) {
+ 				DMERR("Couldn't alloc log bio");
+@@ -290,6 +292,7 @@ static int log_one_block(struct log_writes_c *lc,
+ 			bio->bi_bdev = lc->logdev->bdev;
+ 			bio->bi_end_io = log_end_io;
+ 			bio->bi_private = lc;
++			bio->bi_rw = WRITE;
+ 
+ 			ret = bio_add_page(bio, block->vecs[i].bv_page,
+ 					   block->vecs[i].bv_len, 0);
+@@ -301,7 +304,7 @@ static int log_one_block(struct log_writes_c *lc,
+ 		}
+ 		sector += block->vecs[i].bv_len >> SECTOR_SHIFT;
+ 	}
+-	submit_bio(WRITE, bio);
++	submit_bio(bio);
+ out:
+ 	kfree(block->data);
+ 	kfree(block);
+diff --git a/drivers/md/dm-thin.c b/drivers/md/dm-thin.c
+index fc803d5..8c070ee 100644
+--- a/drivers/md/dm-thin.c
++++ b/drivers/md/dm-thin.c
+@@ -371,7 +371,8 @@ static void end_discard(struct discard_op *op, int r)
+ 		 * need to wait for the chain to complete.
+ 		 */
+ 		bio_chain(op->bio, op->parent_bio);
+-		submit_bio(REQ_WRITE | REQ_DISCARD, op->bio);
++		op->bio->bi_rw = REQ_WRITE | REQ_DISCARD;
++		submit_bio(op->bio);
+ 	}
+ 
+ 	blk_finish_plug(&op->plug);
+diff --git a/drivers/md/md.c b/drivers/md/md.c
+index 866825f..fb3950b 100644
+--- a/drivers/md/md.c
++++ b/drivers/md/md.c
+@@ -394,8 +394,9 @@ static void submit_flushes(struct work_struct *ws)
+ 			bi->bi_end_io = md_end_flush;
+ 			bi->bi_private = rdev;
+ 			bi->bi_bdev = rdev->bdev;
++			bi->bi_rw = WRITE_FLUSH;
+ 			atomic_inc(&mddev->flush_pending);
+-			submit_bio(WRITE_FLUSH, bi);
++			submit_bio(bi);
+ 			rcu_read_lock();
+ 			rdev_dec_pending(rdev, mddev);
+ 		}
+@@ -742,9 +743,10 @@ void md_super_write(struct mddev *mddev, struct md_rdev *rdev,
+ 	bio_add_page(bio, page, size, 0);
+ 	bio->bi_private = rdev;
+ 	bio->bi_end_io = super_written;
++	bio->bi_rw = WRITE_FLUSH_FUA;
+ 
+ 	atomic_inc(&mddev->pending_writes);
+-	submit_bio(WRITE_FLUSH_FUA, bio);
++	submit_bio(bio);
+ }
+ 
+ void md_super_wait(struct mddev *mddev)
+@@ -761,6 +763,7 @@ int sync_page_io(struct md_rdev *rdev, sector_t sector, int size,
+ 
+ 	bio->bi_bdev = (metadata_op && rdev->meta_bdev) ?
+ 		rdev->meta_bdev : rdev->bdev;
++	bio->bi_rw = rw;
+ 	if (metadata_op)
+ 		bio->bi_iter.bi_sector = sector + rdev->sb_start;
+ 	else if (rdev->mddev->reshape_position != MaxSector &&
+@@ -770,7 +773,8 @@ int sync_page_io(struct md_rdev *rdev, sector_t sector, int size,
+ 	else
+ 		bio->bi_iter.bi_sector = sector + rdev->data_offset;
+ 	bio_add_page(bio, page, size, 0);
+-	submit_bio_wait(rw, bio);
++
++	submit_bio_wait(bio);
+ 
+ 	ret = !bio->bi_error;
+ 	bio_put(bio);
+diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
+index c7c8cde..bc95d4d 100644
+--- a/drivers/md/raid1.c
++++ b/drivers/md/raid1.c
+@@ -2208,7 +2208,8 @@ static int narrow_write_error(struct r1bio *r1_bio, int i)
+ 		bio_trim(wbio, sector - r1_bio->sector, sectors);
+ 		wbio->bi_iter.bi_sector += rdev->data_offset;
+ 		wbio->bi_bdev = rdev->bdev;
+-		if (submit_bio_wait(WRITE, wbio) < 0)
++
++		if (submit_bio_wait(wbio) < 0)
+ 			/* failure! */
+ 			ok = rdev_set_badblocks(rdev, sector,
+ 						sectors, 0)
+diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
+index c7de2a5..0be6497 100644
+--- a/drivers/md/raid10.c
++++ b/drivers/md/raid10.c
+@@ -2474,7 +2474,9 @@ static int narrow_write_error(struct r10bio *r10_bio, int i)
+ 				   choose_data_offset(r10_bio, rdev) +
+ 				   (sector - r10_bio->sector));
+ 		wbio->bi_bdev = rdev->bdev;
+-		if (submit_bio_wait(WRITE, wbio) < 0)
++		wbio->bi_rw = WRITE;
++
++		if (submit_bio_wait(wbio) < 0)
+ 			/* Failure! */
+ 			ok = rdev_set_badblocks(rdev, sector,
+ 						sectors, 0)
+diff --git a/drivers/md/raid5-cache.c b/drivers/md/raid5-cache.c
+index e889e2d..0b01453 100644
+--- a/drivers/md/raid5-cache.c
++++ b/drivers/md/raid5-cache.c
+@@ -254,7 +254,7 @@ static void r5l_submit_current_io(struct r5l_log *log)
+ 	__r5l_set_io_unit_state(io, IO_UNIT_IO_START);
+ 	spin_unlock_irqrestore(&log->io_list_lock, flags);
+ 
+-	submit_bio(WRITE, io->current_bio);
++	submit_bio(io->current_bio);
+ }
+ 
+ static struct bio *r5l_bio_alloc(struct r5l_log *log)
+@@ -373,7 +373,7 @@ static void r5l_append_payload_page(struct r5l_log *log, struct page *page)
+ 		io->current_bio = r5l_bio_alloc(log);
+ 		bio_chain(io->current_bio, prev);
+ 
+-		submit_bio(WRITE, prev);
++		submit_bio(prev);
+ 	}
+ 
+ 	if (!bio_add_page(io->current_bio, page, PAGE_SIZE, 0))
+@@ -686,7 +686,8 @@ void r5l_flush_stripe_to_raid(struct r5l_log *log)
+ 	bio_reset(&log->flush_bio);
+ 	log->flush_bio.bi_bdev = log->rdev->bdev;
+ 	log->flush_bio.bi_end_io = r5l_log_flush_endio;
+-	submit_bio(WRITE_FLUSH, &log->flush_bio);
++	log->flush_bio.bi_rw = WRITE_FLUSH;
++	submit_bio(&log->flush_bio);
+ }
+ 
+ static void r5l_write_super(struct r5l_log *log, sector_t cp);
+diff --git a/drivers/target/target_core_iblock.c b/drivers/target/target_core_iblock.c
+index 7c4efb4..c25109c 100644
+--- a/drivers/target/target_core_iblock.c
++++ b/drivers/target/target_core_iblock.c
+@@ -312,7 +312,7 @@ static void iblock_bio_done(struct bio *bio)
+ }
+ 
+ static struct bio *
+-iblock_get_bio(struct se_cmd *cmd, sector_t lba, u32 sg_num)
++iblock_get_bio(struct se_cmd *cmd, sector_t lba, u32 sg_num, int rw)
+ {
+ 	struct iblock_dev *ib_dev = IBLOCK_DEV(cmd->se_dev);
+ 	struct bio *bio;
+@@ -334,18 +334,19 @@ iblock_get_bio(struct se_cmd *cmd, sector_t lba, u32 sg_num)
+ 	bio->bi_private = cmd;
+ 	bio->bi_end_io = &iblock_bio_done;
+ 	bio->bi_iter.bi_sector = lba;
++	bio->bi_rw = rw;
+ 
+ 	return bio;
+ }
+ 
+-static void iblock_submit_bios(struct bio_list *list, int rw)
++static void iblock_submit_bios(struct bio_list *list)
+ {
+ 	struct blk_plug plug;
+ 	struct bio *bio;
+ 
+ 	blk_start_plug(&plug);
+ 	while ((bio = bio_list_pop(list)))
+-		submit_bio(rw, bio);
++		submit_bio(bio);
+ 	blk_finish_plug(&plug);
+ }
+ 
+@@ -387,9 +388,10 @@ iblock_execute_sync_cache(struct se_cmd *cmd)
+ 	bio = bio_alloc(GFP_KERNEL, 0);
+ 	bio->bi_end_io = iblock_end_io_flush;
+ 	bio->bi_bdev = ib_dev->ibd_bd;
++	bio->bi_rw = WRITE_FLUSH;
+ 	if (!immed)
+ 		bio->bi_private = cmd;
+-	submit_bio(WRITE_FLUSH, bio);
++	submit_bio(bio);
+ 	return 0;
+ }
+ 
+@@ -478,7 +480,7 @@ iblock_execute_write_same(struct se_cmd *cmd)
+ 		goto fail;
+ 	cmd->priv = ibr;
+ 
+-	bio = iblock_get_bio(cmd, block_lba, 1);
++	bio = iblock_get_bio(cmd, block_lba, 1, WRITE);
+ 	if (!bio)
+ 		goto fail_free_ibr;
+ 
+@@ -491,7 +493,7 @@ iblock_execute_write_same(struct se_cmd *cmd)
+ 		while (bio_add_page(bio, sg_page(sg), sg->length, sg->offset)
+ 				!= sg->length) {
+ 
+-			bio = iblock_get_bio(cmd, block_lba, 1);
++			bio = iblock_get_bio(cmd, block_lba, 1, WRITE);
+ 			if (!bio)
+ 				goto fail_put_bios;
+ 
+@@ -504,7 +506,7 @@ iblock_execute_write_same(struct se_cmd *cmd)
+ 		sectors -= 1;
+ 	}
+ 
+-	iblock_submit_bios(&list, WRITE);
++	iblock_submit_bios(&list);
+ 	return 0;
+ 
+ fail_put_bios:
+@@ -712,7 +714,7 @@ iblock_execute_rw(struct se_cmd *cmd, struct scatterlist *sgl, u32 sgl_nents,
+ 		return 0;
+ 	}
+ 
+-	bio = iblock_get_bio(cmd, block_lba, sgl_nents);
++	bio = iblock_get_bio(cmd, block_lba, sgl_nents, rw);
+ 	if (!bio)
+ 		goto fail_free_ibr;
+ 
+@@ -732,11 +734,11 @@ iblock_execute_rw(struct se_cmd *cmd, struct scatterlist *sgl, u32 sgl_nents,
+ 		while (bio_add_page(bio, sg_page(sg), sg->length, sg->offset)
+ 				!= sg->length) {
+ 			if (bio_cnt >= IBLOCK_MAX_BIO_PER_TASK) {
+-				iblock_submit_bios(&list, rw);
++				iblock_submit_bios(&list);
+ 				bio_cnt = 0;
+ 			}
+ 
+-			bio = iblock_get_bio(cmd, block_lba, sg_num);
++			bio = iblock_get_bio(cmd, block_lba, sg_num, rw);
+ 			if (!bio)
+ 				goto fail_put_bios;
+ 
+@@ -756,7 +758,7 @@ iblock_execute_rw(struct se_cmd *cmd, struct scatterlist *sgl, u32 sgl_nents,
+ 			goto fail_put_bios;
+ 	}
+ 
+-	iblock_submit_bios(&list, rw);
++	iblock_submit_bios(&list);
+ 	iblock_complete_cmd(cmd);
+ 	return 0;
+ 
+diff --git a/fs/btrfs/check-integrity.c b/fs/btrfs/check-integrity.c
+index b677a6e..50f8191 100644
+--- a/fs/btrfs/check-integrity.c
++++ b/fs/btrfs/check-integrity.c
+@@ -1673,6 +1673,7 @@ static int btrfsic_read_block(struct btrfsic_state *state,
+ 		}
+ 		bio->bi_bdev = block_ctx->dev->bdev;
+ 		bio->bi_iter.bi_sector = dev_bytenr >> 9;
++		bio->bi_rw = READ;
+ 
+ 		for (j = i; j < num_pages; j++) {
+ 			ret = bio_add_page(bio, block_ctx->pagev[j],
+@@ -1685,7 +1686,7 @@ static int btrfsic_read_block(struct btrfsic_state *state,
+ 			       "btrfsic: error, failed to add a single page!\n");
+ 			return -1;
+ 		}
+-		if (submit_bio_wait(READ, bio)) {
++		if (submit_bio_wait(bio)) {
+ 			printk(KERN_INFO
+ 			       "btrfsic: read error at logical %llu dev %s!\n",
+ 			       block_ctx->start, block_ctx->dev->name);
+@@ -2918,9 +2919,10 @@ int btrfsic_submit_bh(int rw, struct buffer_head *bh)
+ 	return submit_bh(rw, bh);
+ }
+ 
+-static void __btrfsic_submit_bio(int rw, struct bio *bio)
++static void __btrfsic_submit_bio(struct bio *bio)
+ {
+ 	struct btrfsic_dev_state *dev_state;
++	int rw = bio->bi_rw;
+ 
+ 	if (!btrfsic_is_initialized)
+ 		return;
+@@ -3016,16 +3018,16 @@ leave:
+ 	mutex_unlock(&btrfsic_mutex);
+ }
+ 
+-void btrfsic_submit_bio(int rw, struct bio *bio)
++void btrfsic_submit_bio(struct bio *bio)
+ {
+-	__btrfsic_submit_bio(rw, bio);
+-	submit_bio(rw, bio);
++	__btrfsic_submit_bio(bio);
++	submit_bio(bio);
+ }
+ 
+-int btrfsic_submit_bio_wait(int rw, struct bio *bio)
++int btrfsic_submit_bio_wait(struct bio *bio)
+ {
+-	__btrfsic_submit_bio(rw, bio);
+-	return submit_bio_wait(rw, bio);
++	__btrfsic_submit_bio(bio);
++	return submit_bio_wait(bio);
+ }
+ 
+ int btrfsic_mount(struct btrfs_root *root,
+diff --git a/fs/btrfs/check-integrity.h b/fs/btrfs/check-integrity.h
+index 13b8566..c04e249 100644
+--- a/fs/btrfs/check-integrity.h
++++ b/fs/btrfs/check-integrity.h
+@@ -21,8 +21,8 @@
+ 
+ #ifdef CONFIG_BTRFS_FS_CHECK_INTEGRITY
+ int btrfsic_submit_bh(int rw, struct buffer_head *bh);
+-void btrfsic_submit_bio(int rw, struct bio *bio);
+-int btrfsic_submit_bio_wait(int rw, struct bio *bio);
++void btrfsic_submit_bio(struct bio *bio);
++int btrfsic_submit_bio_wait(struct bio *bio);
+ #else
+ #define btrfsic_submit_bh submit_bh
+ #define btrfsic_submit_bio submit_bio
+diff --git a/fs/btrfs/disk-io.c b/fs/btrfs/disk-io.c
+index 6628fca..3666558 100644
+--- a/fs/btrfs/disk-io.c
++++ b/fs/btrfs/disk-io.c
+@@ -3486,12 +3486,13 @@ static int write_dev_flush(struct btrfs_device *device, int wait)
+ 
+ 	bio->bi_end_io = btrfs_end_empty_barrier;
+ 	bio->bi_bdev = device->bdev;
++	bio->bi_rw = WRITE_FLUSH;
+ 	init_completion(&device->flush_wait);
+ 	bio->bi_private = &device->flush_wait;
+ 	device->flush_bio = bio;
+ 
+ 	bio_get(bio);
+-	btrfsic_submit_bio(WRITE_FLUSH, bio);
++	btrfsic_submit_bio(bio);
+ 
+ 	return 0;
+ }
+diff --git a/fs/btrfs/extent_io.c b/fs/btrfs/extent_io.c
+index 3cd5782..c1e6f20 100644
+--- a/fs/btrfs/extent_io.c
++++ b/fs/btrfs/extent_io.c
+@@ -2041,9 +2041,10 @@ int repair_io_failure(struct inode *inode, u64 start, u64 length, u64 logical,
+ 		return -EIO;
+ 	}
+ 	bio->bi_bdev = dev->bdev;
++	bio->bi_rw = WRITE_SYNC;
+ 	bio_add_page(bio, page, length, pg_offset);
+ 
+-	if (btrfsic_submit_bio_wait(WRITE_SYNC, bio)) {
++	if (btrfsic_submit_bio_wait(bio)) {
+ 		/* try to remap that extent elsewhere? */
+ 		bio_put(bio);
+ 		btrfs_dev_stat_inc_and_print(dev, BTRFS_DEV_STAT_WRITE_ERRS);
+@@ -2725,14 +2726,14 @@ static int __must_check submit_one_bio(int rw, struct bio *bio,
+ 	start = page_offset(page) + bvec->bv_offset;
+ 
+ 	bio->bi_private = NULL;
+-
++	bio->bi_rw = rw;
+ 	bio_get(bio);
+ 
+ 	if (tree->ops && tree->ops->submit_bio_hook)
+ 		ret = tree->ops->submit_bio_hook(page->mapping->host, rw, bio,
+ 					   mirror_num, bio_flags, start);
+ 	else
+-		btrfsic_submit_bio(rw, bio);
++		btrfsic_submit_bio(bio);
+ 
+ 	bio_put(bio);
+ 	return ret;
+diff --git a/fs/btrfs/raid56.c b/fs/btrfs/raid56.c
+index f8b6d41..36d5bf7 100644
+--- a/fs/btrfs/raid56.c
++++ b/fs/btrfs/raid56.c
+@@ -1320,7 +1320,9 @@ write_data:
+ 
+ 		bio->bi_private = rbio;
+ 		bio->bi_end_io = raid_write_end_io;
+-		submit_bio(WRITE, bio);
++		bio->bi_rw = WRITE;
++
++		submit_bio(bio);
+ 	}
+ 	return;
+ 
+@@ -1573,11 +1575,12 @@ static int raid56_rmw_stripe(struct btrfs_raid_bio *rbio)
+ 
+ 		bio->bi_private = rbio;
+ 		bio->bi_end_io = raid_rmw_end_io;
++		bio->bi_rw = READ;
+ 
+ 		btrfs_bio_wq_end_io(rbio->fs_info, bio,
+ 				    BTRFS_WQ_ENDIO_RAID56);
+ 
+-		submit_bio(READ, bio);
++		submit_bio(bio);
+ 	}
+ 	/* the actual write will happen once the reads are done */
+ 	return 0;
+@@ -2097,11 +2100,12 @@ static int __raid56_parity_recover(struct btrfs_raid_bio *rbio)
+ 
+ 		bio->bi_private = rbio;
+ 		bio->bi_end_io = raid_recover_end_io;
++		bio->bi_rw = READ;
+ 
+ 		btrfs_bio_wq_end_io(rbio->fs_info, bio,
+ 				    BTRFS_WQ_ENDIO_RAID56);
+ 
+-		submit_bio(READ, bio);
++		submit_bio(bio);
+ 	}
+ out:
+ 	return 0;
+@@ -2433,7 +2437,9 @@ submit_write:
+ 
+ 		bio->bi_private = rbio;
+ 		bio->bi_end_io = raid_write_end_io;
+-		submit_bio(WRITE, bio);
++		bio->bi_rw = WRITE;
++
++		submit_bio(bio);
+ 	}
+ 	return;
+ 
+@@ -2610,11 +2616,12 @@ static void raid56_parity_scrub_stripe(struct btrfs_raid_bio *rbio)
+ 
+ 		bio->bi_private = rbio;
+ 		bio->bi_end_io = raid56_parity_scrub_end_io;
++		bio->bi_rw = READ;
+ 
+ 		btrfs_bio_wq_end_io(rbio->fs_info, bio,
+ 				    BTRFS_WQ_ENDIO_RAID56);
+ 
+-		submit_bio(READ, bio);
++		submit_bio(bio);
+ 	}
+ 	/* the actual write will happen once the reads are done */
+ 	return;
+diff --git a/fs/btrfs/scrub.c b/fs/btrfs/scrub.c
+index 46d847f..44da605 100644
+--- a/fs/btrfs/scrub.c
++++ b/fs/btrfs/scrub.c
+@@ -1504,8 +1504,9 @@ static void scrub_recheck_block(struct btrfs_fs_info *fs_info,
+ 				sblock->no_io_error_seen = 0;
+ 		} else {
+ 			bio->bi_iter.bi_sector = page->physical >> 9;
++			bio->bi_rw = READ;
+ 
+-			if (btrfsic_submit_bio_wait(READ, bio))
++			if (btrfsic_submit_bio_wait(bio))
+ 				sblock->no_io_error_seen = 0;
+ 		}
+ 
+@@ -1583,6 +1584,7 @@ static int scrub_repair_page_from_good_copy(struct scrub_block *sblock_bad,
+ 			return -EIO;
+ 		bio->bi_bdev = page_bad->dev->bdev;
+ 		bio->bi_iter.bi_sector = page_bad->physical >> 9;
++		bio->bi_rw = WRITE;
+ 
+ 		ret = bio_add_page(bio, page_good->page, PAGE_SIZE, 0);
+ 		if (PAGE_SIZE != ret) {
+@@ -1590,7 +1592,7 @@ static int scrub_repair_page_from_good_copy(struct scrub_block *sblock_bad,
+ 			return -EIO;
+ 		}
+ 
+-		if (btrfsic_submit_bio_wait(WRITE, bio)) {
++		if (btrfsic_submit_bio_wait(bio)) {
+ 			btrfs_dev_stat_inc_and_print(page_bad->dev,
+ 				BTRFS_DEV_STAT_WRITE_ERRS);
+ 			btrfs_dev_replace_stats_inc(
+@@ -1684,6 +1686,7 @@ again:
+ 		bio->bi_end_io = scrub_wr_bio_end_io;
+ 		bio->bi_bdev = sbio->dev->bdev;
+ 		bio->bi_iter.bi_sector = sbio->physical >> 9;
++		bio->bi_rw = WRITE;
+ 		sbio->err = 0;
+ 	} else if (sbio->physical + sbio->page_count * PAGE_SIZE !=
+ 		   spage->physical_for_dev_replace ||
+@@ -1731,7 +1734,7 @@ static void scrub_wr_submit(struct scrub_ctx *sctx)
+ 	 * orders the requests before sending them to the driver which
+ 	 * doubled the write performance on spinning disks when measured
+ 	 * with Linux 3.5 */
+-	btrfsic_submit_bio(WRITE, sbio->bio);
++	btrfsic_submit_bio(sbio->bio);
+ }
+ 
+ static void scrub_wr_bio_end_io(struct bio *bio)
+@@ -2041,7 +2044,7 @@ static void scrub_submit(struct scrub_ctx *sctx)
+ 	sbio = sctx->bios[sctx->curr];
+ 	sctx->curr = -1;
+ 	scrub_pending_bio_inc(sctx);
+-	btrfsic_submit_bio(READ, sbio->bio);
++	btrfsic_submit_bio(sbio->bio);
+ }
+ 
+ static int scrub_add_page_to_rd_bio(struct scrub_ctx *sctx,
+@@ -2088,6 +2091,7 @@ again:
+ 		bio->bi_end_io = scrub_bio_end_io;
+ 		bio->bi_bdev = sbio->dev->bdev;
+ 		bio->bi_iter.bi_sector = sbio->physical >> 9;
++		bio->bi_rw = READ;
+ 		sbio->err = 0;
+ 	} else if (sbio->physical + sbio->page_count * PAGE_SIZE !=
+ 		   spage->physical ||
+@@ -4392,6 +4396,7 @@ static int write_page_nocow(struct scrub_ctx *sctx,
+ 	bio->bi_iter.bi_size = 0;
+ 	bio->bi_iter.bi_sector = physical_for_dev_replace >> 9;
+ 	bio->bi_bdev = dev->bdev;
++	bio->bi_rw = WRITE_SYNC;
+ 	ret = bio_add_page(bio, page, PAGE_SIZE, 0);
+ 	if (ret != PAGE_SIZE) {
+ leave_with_eio:
+@@ -4400,7 +4405,7 @@ leave_with_eio:
+ 		return -EIO;
+ 	}
+ 
+-	if (btrfsic_submit_bio_wait(WRITE_SYNC, bio))
++	if (btrfsic_submit_bio_wait(bio))
+ 		goto leave_with_eio;
+ 
+ 	bio_put(bio);
+diff --git a/fs/btrfs/volumes.c b/fs/btrfs/volumes.c
+index bdc6256..d549f23 100644
+--- a/fs/btrfs/volumes.c
++++ b/fs/btrfs/volumes.c
+@@ -462,7 +462,7 @@ loop_lock:
+ 			sync_pending = 0;
+ 		}
+ 
+-		btrfsic_submit_bio(cur->bi_rw, cur);
++		btrfsic_submit_bio(cur);
+ 		num_run++;
+ 		batch_run++;
+ 
+@@ -5988,7 +5988,7 @@ static void btrfs_end_bio(struct bio *bio)
+  */
+ static noinline void btrfs_schedule_bio(struct btrfs_root *root,
+ 					struct btrfs_device *device,
+-					int rw, struct bio *bio)
++					struct bio *bio)
+ {
+ 	int should_queue = 1;
+ 	struct btrfs_pending_bios *pending_bios;
+@@ -5999,9 +5999,9 @@ static noinline void btrfs_schedule_bio(struct btrfs_root *root,
+ 	}
+ 
+ 	/* don't bother with additional async steps for reads, right now */
+-	if (!(rw & REQ_WRITE)) {
++	if (!(bio->bi_rw & REQ_WRITE)) {
+ 		bio_get(bio);
+-		btrfsic_submit_bio(rw, bio);
++		btrfsic_submit_bio(bio);
+ 		bio_put(bio);
+ 		return;
+ 	}
+@@ -6015,7 +6015,6 @@ static noinline void btrfs_schedule_bio(struct btrfs_root *root,
+ 	atomic_inc(&root->fs_info->nr_async_bios);
+ 	WARN_ON(bio->bi_next);
+ 	bio->bi_next = NULL;
+-	bio->bi_rw |= rw;
+ 
+ 	spin_lock(&device->io_lock);
+ 	if (bio->bi_rw & REQ_SYNC)
+@@ -6049,6 +6048,7 @@ static void submit_stripe_bio(struct btrfs_root *root, struct btrfs_bio *bbio,
+ 	btrfs_io_bio(bio)->stripe_index = dev_nr;
+ 	bio->bi_end_io = btrfs_end_bio;
+ 	bio->bi_iter.bi_sector = physical >> 9;
++	bio->bi_rw |= rw;
+ #ifdef DEBUG
+ 	{
+ 		struct rcu_string *name;
+@@ -6067,9 +6067,9 @@ static void submit_stripe_bio(struct btrfs_root *root, struct btrfs_bio *bbio,
+ 	btrfs_bio_counter_inc_noblocked(root->fs_info);
+ 
+ 	if (async)
+-		btrfs_schedule_bio(root, dev, rw, bio);
++		btrfs_schedule_bio(root, dev, bio);
+ 	else
+-		btrfsic_submit_bio(rw, bio);
++		btrfsic_submit_bio(bio);
+ }
+ 
+ static void bbio_error(struct btrfs_bio *bbio, struct bio *bio, u64 logical)
+diff --git a/fs/buffer.c b/fs/buffer.c
+index 754813a..9a55e7f 100644
+--- a/fs/buffer.c
++++ b/fs/buffer.c
+@@ -3030,8 +3030,9 @@ static int submit_bh_wbc(int rw, struct buffer_head *bh,
+ 		rw |= REQ_META;
+ 	if (buffer_prio(bh))
+ 		rw |= REQ_PRIO;
++	bio->bi_rw = rw;
+ 
+-	submit_bio(rw, bio);
++	submit_bio(bio);
+ 	return 0;
+ }
+ 
+diff --git a/fs/crypto/crypto.c b/fs/crypto/crypto.c
+index 2fc8c43..5b75856 100644
+--- a/fs/crypto/crypto.c
++++ b/fs/crypto/crypto.c
+@@ -318,6 +318,7 @@ int fscrypt_zeroout_range(struct inode *inode, pgoff_t lblk,
+ 		bio->bi_bdev = inode->i_sb->s_bdev;
+ 		bio->bi_iter.bi_sector =
+ 			pblk << (inode->i_sb->s_blocksize_bits - 9);
++		bio->bi_rw = WRITE;
+ 		ret = bio_add_page(bio, ciphertext_page,
+ 					inode->i_sb->s_blocksize, 0);
+ 		if (ret != inode->i_sb->s_blocksize) {
+@@ -327,7 +328,7 @@ int fscrypt_zeroout_range(struct inode *inode, pgoff_t lblk,
+ 			err = -EIO;
+ 			goto errout;
+ 		}
+-		err = submit_bio_wait(WRITE, bio);
++		err = submit_bio_wait(bio);
+ 		if ((err == 0) && bio->bi_error)
+ 			err = -EIO;
+ 		bio_put(bio);
+diff --git a/fs/direct-io.c b/fs/direct-io.c
+index f3b4408..1bcdd5d 100644
+--- a/fs/direct-io.c
++++ b/fs/direct-io.c
+@@ -375,6 +375,7 @@ dio_bio_alloc(struct dio *dio, struct dio_submit *sdio,
+ 
+ 	bio->bi_bdev = bdev;
+ 	bio->bi_iter.bi_sector = first_sector;
++	bio->bi_rw = dio->rw;
+ 	if (dio->is_async)
+ 		bio->bi_end_io = dio_bio_end_aio;
+ 	else
+@@ -412,7 +413,7 @@ static inline void dio_bio_submit(struct dio *dio, struct dio_submit *sdio)
+ 			       sdio->logical_offset_in_bio);
+ 		dio->bio_cookie = BLK_QC_T_NONE;
+ 	} else
+-		dio->bio_cookie = submit_bio(dio->rw, bio);
++		dio->bio_cookie = submit_bio(bio);
+ 
+ 	sdio->bio = NULL;
+ 	sdio->boundary = 0;
+diff --git a/fs/ext4/page-io.c b/fs/ext4/page-io.c
+index 2a01df9..a72dbcc 100644
+--- a/fs/ext4/page-io.c
++++ b/fs/ext4/page-io.c
+@@ -342,7 +342,8 @@ void ext4_io_submit(struct ext4_io_submit *io)
+ 	if (bio) {
+ 		int io_op = io->io_wbc->sync_mode == WB_SYNC_ALL ?
+ 			    WRITE_SYNC : WRITE;
+-		submit_bio(io_op, io->io_bio);
++		io->io_bio->bi_rw = io_op;
++		submit_bio(io->io_bio);
+ 	}
+ 	io->io_bio = NULL;
+ }
+diff --git a/fs/ext4/readpage.c b/fs/ext4/readpage.c
+index dc54a4b..130bd45 100644
+--- a/fs/ext4/readpage.c
++++ b/fs/ext4/readpage.c
+@@ -271,7 +271,7 @@ int ext4_mpage_readpages(struct address_space *mapping,
+ 		 */
+ 		if (bio && (last_block_in_bio != blocks[0] - 1)) {
+ 		submit_and_realloc:
+-			submit_bio(READ, bio);
++			submit_bio(bio);
+ 			bio = NULL;
+ 		}
+ 		if (bio == NULL) {
+@@ -294,6 +294,7 @@ int ext4_mpage_readpages(struct address_space *mapping,
+ 			bio->bi_iter.bi_sector = blocks[0] << (blkbits - 9);
+ 			bio->bi_end_io = mpage_end_io;
+ 			bio->bi_private = ctx;
++			bio->bi_rw = READ;
+ 		}
+ 
+ 		length = first_hole << blkbits;
+@@ -303,14 +304,14 @@ int ext4_mpage_readpages(struct address_space *mapping,
+ 		if (((map.m_flags & EXT4_MAP_BOUNDARY) &&
+ 		     (relative_block == map.m_len)) ||
+ 		    (first_hole != blocks_per_page)) {
+-			submit_bio(READ, bio);
++			submit_bio(bio);
+ 			bio = NULL;
+ 		} else
+ 			last_block_in_bio = blocks[blocks_per_page - 1];
+ 		goto next_page;
+ 	confused:
+ 		if (bio) {
+-			submit_bio(READ, bio);
++			submit_bio(bio);
+ 			bio = NULL;
+ 		}
+ 		if (!PageUptodate(page))
+@@ -323,6 +324,6 @@ int ext4_mpage_readpages(struct address_space *mapping,
+ 	}
+ 	BUG_ON(pages && !list_empty(pages));
+ 	if (bio)
+-		submit_bio(READ, bio);
++		submit_bio(bio);
+ 	return 0;
+ }
+diff --git a/fs/f2fs/data.c b/fs/f2fs/data.c
+index 9a8bbc1..c595c8f 100644
+--- a/fs/f2fs/data.c
++++ b/fs/f2fs/data.c
+@@ -102,7 +102,8 @@ static inline void __submit_bio(struct f2fs_sb_info *sbi, int rw,
+ {
+ 	if (!is_read_io(rw))
+ 		atomic_inc(&sbi->nr_wb_bios);
+-	submit_bio(rw, bio);
++	bio->bi_rw = rw;
++	submit_bio(bio);
+ }
+ 
+ static void __submit_merged_bio(struct f2fs_bio_info *io)
+@@ -1080,6 +1081,7 @@ submit_and_realloc:
+ 			bio->bi_iter.bi_sector = SECTOR_FROM_BLOCK(block_nr);
+ 			bio->bi_end_io = f2fs_read_end_io;
+ 			bio->bi_private = ctx;
++			bio->bi_rw = READ;
+ 		}
+ 
+ 		if (bio_add_page(bio, page, blocksize, 0) < blocksize)
+diff --git a/fs/f2fs/segment.c b/fs/f2fs/segment.c
+index 2e6f537..3fe2fab 100644
+--- a/fs/f2fs/segment.c
++++ b/fs/f2fs/segment.c
+@@ -406,7 +406,8 @@ repeat:
+ 		fcc->dispatch_list = llist_reverse_order(fcc->dispatch_list);
+ 
+ 		bio->bi_bdev = sbi->sb->s_bdev;
+-		ret = submit_bio_wait(WRITE_FLUSH, bio);
++		bio->bi_rw = WRITE_FLUSH;
++		ret = submit_bio_wait(bio);
+ 
+ 		llist_for_each_entry_safe(cmd, next,
+ 					  fcc->dispatch_list, llnode) {
+@@ -438,7 +439,8 @@ int f2fs_issue_flush(struct f2fs_sb_info *sbi)
+ 		int ret;
+ 
+ 		bio->bi_bdev = sbi->sb->s_bdev;
+-		ret = submit_bio_wait(WRITE_FLUSH, bio);
++		bio->bi_rw = WRITE_FLUSH;
++		ret = submit_bio_wait(bio);
+ 		bio_put(bio);
+ 		return ret;
+ 	}
+diff --git a/fs/gfs2/lops.c b/fs/gfs2/lops.c
+index d5369a1..ce28242 100644
+--- a/fs/gfs2/lops.c
++++ b/fs/gfs2/lops.c
+@@ -240,7 +240,8 @@ void gfs2_log_flush_bio(struct gfs2_sbd *sdp, int rw)
+ {
+ 	if (sdp->sd_log_bio) {
+ 		atomic_inc(&sdp->sd_log_in_flight);
+-		submit_bio(rw, sdp->sd_log_bio);
++		sdp->sd_log_bio->bi_rw = rw;
++		submit_bio(sdp->sd_log_bio);
+ 		sdp->sd_log_bio = NULL;
+ 	}
+ }
+diff --git a/fs/gfs2/meta_io.c b/fs/gfs2/meta_io.c
+index 8eaadab..66670e1 100644
+--- a/fs/gfs2/meta_io.c
++++ b/fs/gfs2/meta_io.c
+@@ -230,7 +230,8 @@ static void gfs2_submit_bhs(int rw, struct buffer_head *bhs[], int num)
+ 		bio_add_page(bio, bh->b_page, bh->b_size, bh_offset(bh));
+ 	}
+ 	bio->bi_end_io = gfs2_meta_read_endio;
+-	submit_bio(rw, bio);
++	bio->bi_rw = rw;
++	submit_bio(bio);
+ }
+ 
+ /**
+diff --git a/fs/gfs2/ops_fstype.c b/fs/gfs2/ops_fstype.c
+index 4546360..d9e19f6 100644
+--- a/fs/gfs2/ops_fstype.c
++++ b/fs/gfs2/ops_fstype.c
+@@ -246,7 +246,8 @@ static int gfs2_read_super(struct gfs2_sbd *sdp, sector_t sector, int silent)
+ 
+ 	bio->bi_end_io = end_bio_io_page;
+ 	bio->bi_private = page;
+-	submit_bio(READ_SYNC | REQ_META, bio);
++	bio->bi_rw = READ_SYNC | REQ_META;
++	submit_bio(bio);
+ 	wait_on_page_locked(page);
+ 	bio_put(bio);
+ 	if (!PageUptodate(page)) {
+diff --git a/fs/hfsplus/wrapper.c b/fs/hfsplus/wrapper.c
+index cc62356..d026bb3 100644
+--- a/fs/hfsplus/wrapper.c
++++ b/fs/hfsplus/wrapper.c
+@@ -65,6 +65,7 @@ int hfsplus_submit_bio(struct super_block *sb, sector_t sector,
+ 	bio = bio_alloc(GFP_NOIO, 1);
+ 	bio->bi_iter.bi_sector = sector;
+ 	bio->bi_bdev = sb->s_bdev;
++	bio->bi_rw = rw;
+ 
+ 	if (!(rw & WRITE) && data)
+ 		*data = (u8 *)buf + offset;
+@@ -83,7 +84,7 @@ int hfsplus_submit_bio(struct super_block *sb, sector_t sector,
+ 		buf = (u8 *)buf + len;
+ 	}
+ 
+-	ret = submit_bio_wait(rw, bio);
++	ret = submit_bio_wait(bio);
+ out:
+ 	bio_put(bio);
+ 	return ret < 0 ? ret : 0;
+diff --git a/fs/jfs/jfs_logmgr.c b/fs/jfs/jfs_logmgr.c
+index 63759d7..3ee3f32 100644
+--- a/fs/jfs/jfs_logmgr.c
++++ b/fs/jfs/jfs_logmgr.c
+@@ -2002,12 +2002,13 @@ static int lbmRead(struct jfs_log * log, int pn, struct lbuf ** bpp)
+ 
+ 	bio->bi_end_io = lbmIODone;
+ 	bio->bi_private = bp;
++	bio->bi_rw = READ_SYNC;
+ 	/*check if journaling to disk has been disabled*/
+ 	if (log->no_integrity) {
+ 		bio->bi_iter.bi_size = 0;
+ 		lbmIODone(bio);
+ 	} else {
+-		submit_bio(READ_SYNC, bio);
++		submit_bio(bio);
+ 	}
+ 
+ 	wait_event(bp->l_ioevent, (bp->l_flag != lbmREAD));
+@@ -2145,13 +2146,14 @@ static void lbmStartIO(struct lbuf * bp)
+ 
+ 	bio->bi_end_io = lbmIODone;
+ 	bio->bi_private = bp;
++	bio->bi_rw = WRITE_SYNC;
+ 
+ 	/* check if journaling to disk has been disabled */
+ 	if (log->no_integrity) {
+ 		bio->bi_iter.bi_size = 0;
+ 		lbmIODone(bio);
+ 	} else {
+-		submit_bio(WRITE_SYNC, bio);
++		submit_bio(bio);
+ 		INCREMENT(lmStat.submitted);
+ 	}
+ }
+diff --git a/fs/jfs/jfs_metapage.c b/fs/jfs/jfs_metapage.c
+index b60e015..9725443 100644
+--- a/fs/jfs/jfs_metapage.c
++++ b/fs/jfs/jfs_metapage.c
+@@ -411,7 +411,7 @@ static int metapage_writepage(struct page *page, struct writeback_control *wbc)
+ 			inc_io(page);
+ 			if (!bio->bi_iter.bi_size)
+ 				goto dump_bio;
+-			submit_bio(WRITE, bio);
++			submit_bio(bio);
+ 			nr_underway++;
+ 			bio = NULL;
+ 		} else
+@@ -434,6 +434,7 @@ static int metapage_writepage(struct page *page, struct writeback_control *wbc)
+ 		bio->bi_iter.bi_sector = pblock << (inode->i_blkbits - 9);
+ 		bio->bi_end_io = metapage_write_end_io;
+ 		bio->bi_private = page;
++		bio->bi_rw = WRITE;
+ 
+ 		/* Don't call bio_add_page yet, we may add to this vec */
+ 		bio_offset = offset;
+@@ -448,7 +449,7 @@ static int metapage_writepage(struct page *page, struct writeback_control *wbc)
+ 		if (!bio->bi_iter.bi_size)
+ 			goto dump_bio;
+ 
+-		submit_bio(WRITE, bio);
++		submit_bio(bio);
+ 		nr_underway++;
+ 	}
+ 	if (redirty)
+@@ -506,7 +507,7 @@ static int metapage_readpage(struct file *fp, struct page *page)
+ 				insert_metapage(page, NULL);
+ 			inc_io(page);
+ 			if (bio)
+-				submit_bio(READ, bio);
++				submit_bio(bio);
+ 
+ 			bio = bio_alloc(GFP_NOFS, 1);
+ 			bio->bi_bdev = inode->i_sb->s_bdev;
+@@ -514,6 +515,7 @@ static int metapage_readpage(struct file *fp, struct page *page)
+ 				pblock << (inode->i_blkbits - 9);
+ 			bio->bi_end_io = metapage_read_end_io;
+ 			bio->bi_private = page;
++			bio->bi_rw = READ;
+ 			len = xlen << inode->i_blkbits;
+ 			offset = block_offset << inode->i_blkbits;
+ 			if (bio_add_page(bio, page, len, offset) < len)
+@@ -523,7 +525,7 @@ static int metapage_readpage(struct file *fp, struct page *page)
+ 			block_offset++;
+ 	}
+ 	if (bio)
+-		submit_bio(READ, bio);
++		submit_bio(bio);
+ 	else
+ 		unlock_page(page);
+ 
+diff --git a/fs/logfs/dev_bdev.c b/fs/logfs/dev_bdev.c
+index cc26f8f..29704bd 100644
+--- a/fs/logfs/dev_bdev.c
++++ b/fs/logfs/dev_bdev.c
+@@ -29,8 +29,9 @@ static int sync_request(struct page *page, struct block_device *bdev, int rw)
+ 	bio.bi_bdev = bdev;
+ 	bio.bi_iter.bi_sector = page->index * (PAGE_SIZE >> 9);
+ 	bio.bi_iter.bi_size = PAGE_SIZE;
++	bio.bi_rw = rw;
+ 
+-	return submit_bio_wait(rw, &bio);
++	return submit_bio_wait(&bio);
+ }
+ 
+ static int bdev_readpage(void *_sb, struct page *page)
+@@ -95,8 +96,9 @@ static int __bdev_writeseg(struct super_block *sb, u64 ofs, pgoff_t index,
+ 			bio->bi_iter.bi_sector = ofs >> 9;
+ 			bio->bi_private = sb;
+ 			bio->bi_end_io = writeseg_end_io;
++			bio->bi_rw = WRITE;
+ 			atomic_inc(&super->s_pending_writes);
+-			submit_bio(WRITE, bio);
++			submit_bio(bio);
+ 
+ 			ofs += i * PAGE_SIZE;
+ 			index += i;
+@@ -122,8 +124,9 @@ static int __bdev_writeseg(struct super_block *sb, u64 ofs, pgoff_t index,
+ 	bio->bi_iter.bi_sector = ofs >> 9;
+ 	bio->bi_private = sb;
+ 	bio->bi_end_io = writeseg_end_io;
++	bio->bi_rw = WRITE;
+ 	atomic_inc(&super->s_pending_writes);
+-	submit_bio(WRITE, bio);
++	submit_bio(bio);
+ 	return 0;
+ }
+ 
+@@ -185,8 +188,9 @@ static int do_erase(struct super_block *sb, u64 ofs, pgoff_t index,
+ 			bio->bi_iter.bi_sector = ofs >> 9;
+ 			bio->bi_private = sb;
+ 			bio->bi_end_io = erase_end_io;
++			bio->bi_rw = WRITE;
+ 			atomic_inc(&super->s_pending_writes);
+-			submit_bio(WRITE, bio);
++			submit_bio(bio);
+ 
+ 			ofs += i * PAGE_SIZE;
+ 			index += i;
+@@ -206,8 +210,9 @@ static int do_erase(struct super_block *sb, u64 ofs, pgoff_t index,
+ 	bio->bi_iter.bi_sector = ofs >> 9;
+ 	bio->bi_private = sb;
+ 	bio->bi_end_io = erase_end_io;
++	bio->bi_rw = WRITE;
+ 	atomic_inc(&super->s_pending_writes);
+-	submit_bio(WRITE, bio);
++	submit_bio(bio);
+ 	return 0;
+ }
+ 
+diff --git a/fs/mpage.c b/fs/mpage.c
+index eedc644..2c251ec 100644
+--- a/fs/mpage.c
++++ b/fs/mpage.c
+@@ -59,8 +59,9 @@ static void mpage_end_io(struct bio *bio)
+ static struct bio *mpage_bio_submit(int rw, struct bio *bio)
+ {
+ 	bio->bi_end_io = mpage_end_io;
++	bio->bi_rw = rw;
+ 	guard_bio_eod(rw, bio);
+-	submit_bio(rw, bio);
++	submit_bio(bio);
+ 	return NULL;
+ }
+ 
+diff --git a/fs/nfs/blocklayout/blocklayout.c b/fs/nfs/blocklayout/blocklayout.c
+index 17a42e4..4c79f4d 100644
+--- a/fs/nfs/blocklayout/blocklayout.c
++++ b/fs/nfs/blocklayout/blocklayout.c
+@@ -102,14 +102,15 @@ static inline void put_parallel(struct parallel_io *p)
+ }
+ 
+ static struct bio *
+-bl_submit_bio(int rw, struct bio *bio)
++bl_submit_bio(struct bio *bio)
+ {
+ 	if (bio) {
+ 		get_parallel(bio->bi_private);
+ 		dprintk("%s submitting %s bio %u@%llu\n", __func__,
+-			rw == READ ? "read" : "write", bio->bi_iter.bi_size,
++			bio->bi_rw == READ ? "read" : "write",
++			bio->bi_iter.bi_size,
+ 			(unsigned long long)bio->bi_iter.bi_sector);
+-		submit_bio(rw, bio);
++		submit_bio(bio);
+ 	}
+ 	return NULL;
+ }
+@@ -158,7 +159,7 @@ do_add_page_to_bio(struct bio *bio, int npg, int rw, sector_t isect,
+ 	if (disk_addr < map->start || disk_addr >= map->start + map->len) {
+ 		if (!dev->map(dev, disk_addr, map))
+ 			return ERR_PTR(-EIO);
+-		bio = bl_submit_bio(rw, bio);
++		bio = bl_submit_bio(bio);
+ 	}
+ 	disk_addr += map->disk_offset;
+ 	disk_addr -= map->start;
+@@ -174,9 +175,10 @@ retry:
+ 				disk_addr >> SECTOR_SHIFT, end_io, par);
+ 		if (!bio)
+ 			return ERR_PTR(-ENOMEM);
++		bio->bi_rw = rw;
+ 	}
+ 	if (bio_add_page(bio, page, *len, offset) < *len) {
+-		bio = bl_submit_bio(rw, bio);
++		bio = bl_submit_bio(bio);
+ 		goto retry;
+ 	}
+ 	return bio;
+@@ -252,7 +254,7 @@ bl_read_pagelist(struct nfs_pgio_header *header)
+ 	for (i = pg_index; i < header->page_array.npages; i++) {
+ 		if (extent_length <= 0) {
+ 			/* We've used up the previous extent */
+-			bio = bl_submit_bio(READ, bio);
++			bio = bl_submit_bio(bio);
+ 
+ 			/* Get the next one */
+ 			if (!ext_tree_lookup(bl, isect, &be, false)) {
+@@ -273,7 +275,7 @@ bl_read_pagelist(struct nfs_pgio_header *header)
+ 		}
+ 
+ 		if (is_hole(&be)) {
+-			bio = bl_submit_bio(READ, bio);
++			bio = bl_submit_bio(bio);
+ 			/* Fill hole w/ zeroes w/o accessing device */
+ 			dprintk("%s Zeroing page for hole\n", __func__);
+ 			zero_user_segment(pages[i], pg_offset, pg_len);
+@@ -306,7 +308,7 @@ bl_read_pagelist(struct nfs_pgio_header *header)
+ 		header->res.count = (isect << SECTOR_SHIFT) - header->args.offset;
+ 	}
+ out:
+-	bl_submit_bio(READ, bio);
++	bl_submit_bio(bio);
+ 	blk_finish_plug(&plug);
+ 	put_parallel(par);
+ 	return PNFS_ATTEMPTED;
+@@ -398,7 +400,7 @@ bl_write_pagelist(struct nfs_pgio_header *header, int sync)
+ 	for (i = pg_index; i < header->page_array.npages; i++) {
+ 		if (extent_length <= 0) {
+ 			/* We've used up the previous extent */
+-			bio = bl_submit_bio(WRITE, bio);
++			bio = bl_submit_bio(bio);
+ 			/* Get the next one */
+ 			if (!ext_tree_lookup(bl, isect, &be, true)) {
+ 				header->pnfs_error = -EINVAL;
+@@ -427,7 +429,7 @@ bl_write_pagelist(struct nfs_pgio_header *header, int sync)
+ 
+ 	header->res.count = header->args.count;
+ out:
+-	bl_submit_bio(WRITE, bio);
++	bl_submit_bio(bio);
+ 	blk_finish_plug(&plug);
+ 	put_parallel(par);
+ 	return PNFS_ATTEMPTED;
+diff --git a/fs/nilfs2/segbuf.c b/fs/nilfs2/segbuf.c
+index bf36df1..0f62909 100644
+--- a/fs/nilfs2/segbuf.c
++++ b/fs/nilfs2/segbuf.c
+@@ -364,7 +364,8 @@ static int nilfs_segbuf_submit_bio(struct nilfs_segment_buffer *segbuf,
+ 
+ 	bio->bi_end_io = nilfs_end_bio_write;
+ 	bio->bi_private = segbuf;
+-	submit_bio(mode, bio);
++	bio->bi_rw = mode;
++	submit_bio(bio);
+ 	segbuf->sb_nbio++;
+ 
+ 	wi->bio = NULL;
+diff --git a/fs/ocfs2/cluster/heartbeat.c b/fs/ocfs2/cluster/heartbeat.c
+index 6aaf3e3..8b1d86e 100644
+--- a/fs/ocfs2/cluster/heartbeat.c
++++ b/fs/ocfs2/cluster/heartbeat.c
+@@ -530,7 +530,7 @@ static void o2hb_bio_end_io(struct bio *bio)
+ static struct bio *o2hb_setup_one_bio(struct o2hb_region *reg,
+ 				      struct o2hb_bio_wait_ctxt *wc,
+ 				      unsigned int *current_slot,
+-				      unsigned int max_slots)
++				      unsigned int max_slots, int rw)
+ {
+ 	int len, current_page;
+ 	unsigned int vec_len, vec_start;
+@@ -556,6 +556,7 @@ static struct bio *o2hb_setup_one_bio(struct o2hb_region *reg,
+ 	bio->bi_bdev = reg->hr_bdev;
+ 	bio->bi_private = wc;
+ 	bio->bi_end_io = o2hb_bio_end_io;
++	bio->bi_rw = rw;
+ 
+ 	vec_start = (cs << bits) % PAGE_SIZE;
+ 	while(cs < max_slots) {
+@@ -591,7 +592,8 @@ static int o2hb_read_slots(struct o2hb_region *reg,
+ 	o2hb_bio_wait_init(&wc);
+ 
+ 	while(current_slot < max_slots) {
+-		bio = o2hb_setup_one_bio(reg, &wc, &current_slot, max_slots);
++		bio = o2hb_setup_one_bio(reg, &wc, &current_slot, max_slots,
++					 READ);
+ 		if (IS_ERR(bio)) {
+ 			status = PTR_ERR(bio);
+ 			mlog_errno(status);
+@@ -599,7 +601,7 @@ static int o2hb_read_slots(struct o2hb_region *reg,
+ 		}
+ 
+ 		atomic_inc(&wc.wc_num_reqs);
+-		submit_bio(READ, bio);
++		submit_bio(bio);
+ 	}
+ 
+ 	status = 0;
+@@ -623,7 +625,7 @@ static int o2hb_issue_node_write(struct o2hb_region *reg,
+ 
+ 	slot = o2nm_this_node();
+ 
+-	bio = o2hb_setup_one_bio(reg, write_wc, &slot, slot+1);
++	bio = o2hb_setup_one_bio(reg, write_wc, &slot, slot+1, WRITE_SYNC);
+ 	if (IS_ERR(bio)) {
+ 		status = PTR_ERR(bio);
+ 		mlog_errno(status);
+@@ -631,7 +633,7 @@ static int o2hb_issue_node_write(struct o2hb_region *reg,
+ 	}
+ 
+ 	atomic_inc(&write_wc->wc_num_reqs);
+-	submit_bio(WRITE_SYNC, bio);
++	submit_bio(bio);
+ 
+ 	status = 0;
+ bail:
+diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
+index 4c463b9..0cd1603 100644
+--- a/fs/xfs/xfs_aops.c
++++ b/fs/xfs/xfs_aops.c
+@@ -438,7 +438,10 @@ xfs_submit_ioend(
+ 
+ 	ioend->io_bio->bi_private = ioend;
+ 	ioend->io_bio->bi_end_io = xfs_end_bio;
+-
++	if (wbc->sync_mode == WB_SYNC_ALL)
++		ioend->io_bio->bi_rw = WRITE_SYNC;
++	else
++		ioend->io_bio->bi_rw = WRITE;
+ 	/*
+ 	 * If we are failing the IO now, just mark the ioend with an
+ 	 * error and finish it. This will run IO completion immediately
+@@ -451,8 +454,7 @@ xfs_submit_ioend(
+ 		return status;
+ 	}
+ 
+-	submit_bio(wbc->sync_mode == WB_SYNC_ALL ? WRITE_SYNC : WRITE,
+-		   ioend->io_bio);
++	submit_bio(ioend->io_bio);
+ 	return 0;
+ }
+ 
+@@ -510,8 +512,11 @@ xfs_chain_bio(
+ 
+ 	bio_chain(ioend->io_bio, new);
+ 	bio_get(ioend->io_bio);		/* for xfs_destroy_ioend */
+-	submit_bio(wbc->sync_mode == WB_SYNC_ALL ? WRITE_SYNC : WRITE,
+-		   ioend->io_bio);
++	if (wbc->sync_mode == WB_SYNC_ALL)
++		ioend->io_bio->bi_rw = WRITE_SYNC;
++	else
++		ioend->io_bio->bi_rw = WRITE;
++	submit_bio(ioend->io_bio);
+ 	ioend->io_bio = new;
+ }
+ 
+diff --git a/fs/xfs/xfs_buf.c b/fs/xfs/xfs_buf.c
+index e71cfbd..0777c67 100644
+--- a/fs/xfs/xfs_buf.c
++++ b/fs/xfs/xfs_buf.c
+@@ -1166,7 +1166,7 @@ next_chunk:
+ 	bio->bi_iter.bi_sector = sector;
+ 	bio->bi_end_io = xfs_buf_bio_end_io;
+ 	bio->bi_private = bp;
+-
++	bio->bi_rw = rw;
+ 
+ 	for (; size && nr_pages; nr_pages--, page_index++) {
+ 		int	rbytes, nbytes = PAGE_SIZE - offset;
+@@ -1190,7 +1190,7 @@ next_chunk:
+ 			flush_kernel_vmap_range(bp->b_addr,
+ 						xfs_buf_vmap_len(bp));
+ 		}
+-		submit_bio(rw, bio);
++		submit_bio(bio);
+ 		if (size)
+ 			goto next_chunk;
+ 	} else {
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index 9faebf7..3bde942 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -473,7 +473,7 @@ static inline void bio_io_error(struct bio *bio)
+ struct request_queue;
+ extern int bio_phys_segments(struct request_queue *, struct bio *);
+ 
+-extern int submit_bio_wait(int rw, struct bio *bio);
++extern int submit_bio_wait(struct bio *bio);
+ extern void bio_advance(struct bio *, unsigned);
+ 
+ extern void bio_init(struct bio *);
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index dd28814..65e4c51 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -2747,7 +2747,7 @@ static inline void remove_inode_hash(struct inode *inode)
+ extern void inode_sb_list_add(struct inode *inode);
+ 
+ #ifdef CONFIG_BLOCK
+-extern blk_qc_t submit_bio(int, struct bio *);
++extern blk_qc_t submit_bio(struct bio *);
+ extern int bdev_read_only(struct block_device *);
+ #endif
+ extern int set_blocksize(struct block_device *, int);
+diff --git a/kernel/power/swap.c b/kernel/power/swap.c
+index 160e100..be227f5 100644
+--- a/kernel/power/swap.c
++++ b/kernel/power/swap.c
+@@ -271,6 +271,7 @@ static int hib_submit_io(int rw, pgoff_t page_off, void *addr,
+ 	bio = bio_alloc(__GFP_RECLAIM | __GFP_HIGH, 1);
+ 	bio->bi_iter.bi_sector = page_off * (PAGE_SIZE >> 9);
+ 	bio->bi_bdev = hib_resume_bdev;
++	bio->bi_rw = rw;
+ 
+ 	if (bio_add_page(bio, page, PAGE_SIZE, 0) < PAGE_SIZE) {
+ 		printk(KERN_ERR "PM: Adding page to bio failed at %llu\n",
+@@ -283,9 +284,9 @@ static int hib_submit_io(int rw, pgoff_t page_off, void *addr,
+ 		bio->bi_end_io = hib_end_io;
+ 		bio->bi_private = hb;
+ 		atomic_inc(&hb->count);
+-		submit_bio(rw, bio);
++		submit_bio(bio);
+ 	} else {
+-		error = submit_bio_wait(rw, bio);
++		error = submit_bio_wait(bio);
+ 		bio_put(bio);
+ 	}
+ 
+diff --git a/mm/page_io.c b/mm/page_io.c
+index 242dba0..5a5fd66 100644
+--- a/mm/page_io.c
++++ b/mm/page_io.c
+@@ -259,7 +259,7 @@ int __swap_writepage(struct page *page, struct writeback_control *wbc,
+ 		bio_end_io_t end_write_func)
+ {
+ 	struct bio *bio;
+-	int ret, rw = WRITE;
++	int ret;
+ 	struct swap_info_struct *sis = page_swap_info(page);
+ 
+ 	if (sis->flags & SWP_FILE) {
+@@ -317,12 +317,13 @@ int __swap_writepage(struct page *page, struct writeback_control *wbc,
+ 		ret = -ENOMEM;
+ 		goto out;
+ 	}
++	bio->bi_rw = WRITE;
+ 	if (wbc->sync_mode == WB_SYNC_ALL)
+-		rw |= REQ_SYNC;
++		bio->bi_rw |= REQ_SYNC;
+ 	count_vm_event(PSWPOUT);
+ 	set_page_writeback(page);
+ 	unlock_page(page);
+-	submit_bio(rw, bio);
++	submit_bio(bio);
+ out:
+ 	return ret;
+ }
+@@ -369,8 +370,9 @@ int swap_readpage(struct page *page)
+ 		ret = -ENOMEM;
+ 		goto out;
+ 	}
++	bio->bi_rw = READ;
+ 	count_vm_event(PSWPIN);
+-	submit_bio(READ, bio);
++	submit_bio(bio);
+ out:
+ 	return ret;
+ }
+-- 
+2.7.2
+
