@@ -1,57 +1,57 @@
-Return-Path: <jack@suse.cz>
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Jeff Moyer <jmoyer@redhat.com>,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH 3/4] cfq-iosched: Fix regression in bonnie++ rewrite performance
-Date: Tue, 28 Jun 2016 09:04:01 +0200
-Message-Id: <1467097442-5400-4-git-send-email-jack@suse.cz>
-In-Reply-To: <1467097442-5400-1-git-send-email-jack@suse.cz>
-References: <1467097442-5400-1-git-send-email-jack@suse.cz>
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+From: mchristi@redhat.com
+To: linux-f2fs-devel@lists.sourceforge.net, linux-ext4@vger.kernel.org,
+	konrad.wilk@oracle.com, drbd-dev@lists.linbit.com,
+	philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
+	linux-raid@vger.kernel.org, dm-devel@redhat.com,
+	linux-fsdevel@vger.kernel.org, linux-bcache@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-scsi@vger.kernel.org, linux-mtd@lists.infradead.org,
+	target-devel@vger.kernel.org, linux-btrfs@vger.kernel.org,
+	osd-dev@open-osd.org, xfs@oss.sgi.com, ocfs2-devel@oss.oracle.com
+Cc: Mike Christie <mchristi@redhat.com>
+Subject: [PATCH 30/45] block: copy bio op to request op
+Date: Sun,  5 Jun 2016 14:32:10 -0500
+Message-Id: <1465155145-10812-31-git-send-email-mchristi@redhat.com>
+In-Reply-To: <1465155145-10812-1-git-send-email-mchristi@redhat.com>
+References: <1465155145-10812-1-git-send-email-mchristi@redhat.com>
+Sender: linux-scsi-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Commit 9a7f38c42c2 (cfq-iosched: Convert from jiffies to nanoseconds)
-broke the condition for detecting starved sync IO in
-cfq_completed_request() because rq->start_time remained in jiffies but
-we compared it with nanosecond values. This manifested as a regression
-in bonnie++ rewrite performance because we always ended up considering
-sync IO starved and thus never increased async IO queue depth.
+From: Mike Christie <mchristi@redhat.com>
 
-Since rq->start_time is used in a lot of places, converting it to ns
-values would be non-trivial. So just revert the condition in CFQ to use
-comparison with jiffies. This will lead to suboptimal results if
-cfq_fifo_expire[1] will ever come close to 1 jiffie but so far we are
-relatively far from that with the storage used with CFQ (the default
-value is 128 ms).
+The bio users should now always be setting up the bio op. This patch
+has the block layer copy that to the request.
 
-Fixes: 9a7f38c42c2b92391d9dabaf9f51df7cfe5608e4
-Signed-off-by: Jan Kara <jack@suse.cz>
+Signed-off-by: Mike Christie <mchristi@redhat.com>
 ---
- block/cfq-iosched.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+ block/blk-core.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
-index 98cece4e62a9..e074dd4f1384 100644
---- a/block/cfq-iosched.c
-+++ b/block/cfq-iosched.c
-@@ -4233,7 +4233,16 @@ static void cfq_completed_request(struct request_queue *q, struct request *rq)
- 					cfqq_type(cfqq));
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 7e943dc..3c45254 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -2976,8 +2976,7 @@ EXPORT_SYMBOL_GPL(__blk_end_request_err);
+ void blk_rq_bio_prep(struct request_queue *q, struct request *rq,
+ 		     struct bio *bio)
+ {
+-	/* Bit 0 (R/W) is identical in rq->cmd_flags and bio->bi_rw */
+-	rq->cmd_flags |= bio->bi_rw & REQ_WRITE;
++	req_set_op(rq, bio_op(bio));
  
- 		st->ttime.last_end_request = now;
--		if (!(rq->start_time + cfqd->cfq_fifo_expire[1] > now))
-+		/*
-+		 * We have to do this check in jiffies since start_time is in
-+		 * jiffies and it is not trivial to convert to ns. If
-+		 * cfq_fifo_expire[1] ever comes close to 1 jiffie, this test
-+		 * will become problematic but so far we are fine (the default
-+		 * is 128 ms).
-+		 */
-+		if (!time_after(rq->start_time +
-+				  nsecs_to_jiffies(cfqd->cfq_fifo_expire[1]),
-+				jiffies))
- 			cfqd->last_delayed_sync = now;
- 	}
- 
+ 	if (bio_has_data(bio))
+ 		rq->nr_phys_segments = bio_phys_segments(q, bio);
+@@ -3062,7 +3061,8 @@ EXPORT_SYMBOL_GPL(blk_rq_unprep_clone);
+ static void __blk_rq_prep_clone(struct request *dst, struct request *src)
+ {
+ 	dst->cpu = src->cpu;
+-	dst->cmd_flags |= (src->cmd_flags & REQ_CLONE_MASK) | REQ_NOMERGE;
++	req_set_op_attrs(dst, req_op(src),
++			 (src->cmd_flags & REQ_CLONE_MASK) | REQ_NOMERGE);
+ 	dst->cmd_type = src->cmd_type;
+ 	dst->__sector = blk_rq_pos(src);
+ 	dst->__data_len = blk_rq_bytes(src);
 -- 
-2.6.6
+2.7.2
+
