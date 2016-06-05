@@ -1,98 +1,54 @@
-Return-Path: <BATV+65f7e0ff3112b2479d70+4670+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk,
-	keith.busch@intel.com
-Cc: linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Sagi Grimberg <sagi@grimberg.me>
-Subject: [PATCH 1/5] blk-mq: Introduce blk_mq_reinit_tagset
-Date: Mon,  6 Jun 2016 23:23:31 +0200
-Message-Id: <1465248215-18186-2-git-send-email-hch@lst.de>
-In-Reply-To: <1465248215-18186-1-git-send-email-hch@lst.de>
-References: <1465248215-18186-1-git-send-email-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:39408 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752279AbcFETeC (ORCPT <rfc822;linux-block@vger.kernel.org>);
+	Sun, 5 Jun 2016 15:34:02 -0400
+From: mchristi@redhat.com
+To: linux-f2fs-devel@lists.sourceforge.net, linux-ext4@vger.kernel.org,
+	konrad.wilk@oracle.com, drbd-dev@lists.linbit.com,
+	philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
+	linux-raid@vger.kernel.org, dm-devel@redhat.com,
+	linux-fsdevel@vger.kernel.org, linux-bcache@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-scsi@vger.kernel.org, linux-mtd@lists.infradead.org,
+	target-devel@vger.kernel.org, linux-btrfs@vger.kernel.org,
+	osd-dev@open-osd.org, xfs@oss.sgi.com, ocfs2-devel@oss.oracle.com
+Cc: Mike Christie <mchristi@redhat.com>
+Subject: [PATCH 39/45] ide cd: do not set REQ_WRITE on requests.
+Date: Sun,  5 Jun 2016 14:32:19 -0500
+Message-Id: <1465155145-10812-40-git-send-email-mchristi@redhat.com>
+In-Reply-To: <1465155145-10812-1-git-send-email-mchristi@redhat.com>
+References: <1465155145-10812-1-git-send-email-mchristi@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Sagi Grimberg <sagi@grimberg.me>
+From: Mike Christie <mchristi@redhat.com>
 
-The new nvme-rdma driver will need to reinitialize all the tags as part of
-the error recovery procedure (realloc the tag memory region). Add a helper
-in blk-mq for it that can iterate over all requests in a tagset to make
-this easier.
+The block layer will set the correct READ/WRITE operation flags/fields
+when creating a request, so there is not need for drivers to set the
+REQ_WRITE flag.
 
-Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
-Tested-by: Ming Lin <ming.l@ssi.samsung.com>
-Reviewed-by: Stephen Bates <Stephen.Bates@pmcs.com>
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Mike Christie <mchristi@redhat.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 ---
- block/blk-mq-tag.c     | 26 ++++++++++++++++++++++++++
- include/linux/blk-mq.h |  3 +++
- 2 files changed, 29 insertions(+)
+ drivers/ide/ide-cd_ioctl.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index 56a0c37..729bac3 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -485,6 +485,32 @@ void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
- }
- EXPORT_SYMBOL(blk_mq_tagset_busy_iter);
+diff --git a/drivers/ide/ide-cd_ioctl.c b/drivers/ide/ide-cd_ioctl.c
+index 474173e..5887a7a 100644
+--- a/drivers/ide/ide-cd_ioctl.c
++++ b/drivers/ide/ide-cd_ioctl.c
+@@ -459,9 +459,6 @@ int ide_cdrom_packet(struct cdrom_device_info *cdi,
+ 	   layer. the packet must be complete, as we do not
+ 	   touch it at all. */
  
-+int blk_mq_reinit_tagset(struct blk_mq_tag_set *set)
-+{
-+	int i, j, ret = 0;
-+
-+	if (!set->ops->reinit_request)
-+		goto out;
-+
-+	for (i = 0; i < set->nr_hw_queues; i++) {
-+		struct blk_mq_tags *tags = set->tags[i];
-+
-+		for (j = 0; j < tags->nr_tags; j++) {
-+			if (!tags->rqs[j])
-+				continue;
-+
-+			ret = set->ops->reinit_request(set->driver_data,
-+						tags->rqs[j]);
-+			if (ret)
-+				goto out;
-+		}
-+	}
-+
-+out:
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(blk_mq_reinit_tagset);
-+
- void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_iter_fn *fn,
- 		void *priv)
- {
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 6bf8735..9a5d581 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -96,6 +96,7 @@ typedef int (init_request_fn)(void *, struct request *, unsigned int,
- 		unsigned int, unsigned int);
- typedef void (exit_request_fn)(void *, struct request *, unsigned int,
- 		unsigned int);
-+typedef int (reinit_request_fn)(void *, struct request *);
- 
- typedef void (busy_iter_fn)(struct blk_mq_hw_ctx *, struct request *, void *,
- 		bool);
-@@ -145,6 +146,7 @@ struct blk_mq_ops {
- 	 */
- 	init_request_fn		*init_request;
- 	exit_request_fn		*exit_request;
-+	reinit_request_fn	*reinit_request;
- };
- 
- enum {
-@@ -245,6 +247,7 @@ void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
- void blk_mq_freeze_queue(struct request_queue *q);
- void blk_mq_unfreeze_queue(struct request_queue *q);
- void blk_mq_freeze_queue_start(struct request_queue *q);
-+int blk_mq_reinit_tagset(struct blk_mq_tag_set *set);
- 
- void blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set, int nr_hw_queues);
+-	if (cgc->data_direction == CGC_DATA_WRITE)
+-		flags |= REQ_WRITE;
+-
+ 	if (cgc->sense)
+ 		memset(cgc->sense, 0, sizeof(struct request_sense));
  
 -- 
-2.1.4
+2.7.2
+
