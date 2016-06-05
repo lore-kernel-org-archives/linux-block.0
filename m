@@ -1,4 +1,4 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
 From: mchristi@redhat.com
 To: linux-f2fs-devel@lists.sourceforge.net, linux-ext4@vger.kernel.org,
 	konrad.wilk@oracle.com, drbd-dev@lists.linbit.com,
@@ -10,155 +10,68 @@ To: linux-f2fs-devel@lists.sourceforge.net, linux-ext4@vger.kernel.org,
 	target-devel@vger.kernel.org, linux-btrfs@vger.kernel.org,
 	osd-dev@open-osd.org, xfs@oss.sgi.com, ocfs2-devel@oss.oracle.com
 Cc: Mike Christie <mchristi@redhat.com>
-Subject: [PATCH 02/45] block: add REQ_OP definitions and helpers
-Date: Sun,  5 Jun 2016 14:31:42 -0500
-Message-Id: <1465155145-10812-3-git-send-email-mchristi@redhat.com>
+Subject: [PATCH 21/45] ocfs2: use bio op accessors
+Date: Sun,  5 Jun 2016 14:32:01 -0500
+Message-Id: <1465155145-10812-22-git-send-email-mchristi@redhat.com>
 In-Reply-To: <1465155145-10812-1-git-send-email-mchristi@redhat.com>
 References: <1465155145-10812-1-git-send-email-mchristi@redhat.com>
-Sender: linux-scsi-owner@vger.kernel.org
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
 From: Mike Christie <mchristi@redhat.com>
 
-The following patches separate the operation (WRITE, READ, DISCARD,
-etc) from the rq_flag_bits flags. This patch adds definitions for
-request/bio operations (REQ_OPs) and adds request/bio accessors to
-get/set the op.
-
-In this patch the REQ_OPs match the REQ rq_flag_bits ones
-for compat reasons while all the code is converted to use the
-op accessors in the set. In the last patches the op will become a
-number and the accessors and helpers in this patch will be dropped
-or updated.
+Separate the op from the rq_flag_bits and have ocfs2
+set/get the bio using bio_set_op_attrs/bio_op.
 
 Signed-off-by: Mike Christie <mchristi@redhat.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 ---
- include/linux/bio.h       |  3 +++
- include/linux/blk_types.h | 24 ++++++++++++++++++++++++
- include/linux/blkdev.h    | 10 +++++++++-
- include/linux/fs.h        | 26 ++++++++++++++++++++++++--
- 4 files changed, 60 insertions(+), 3 deletions(-)
+ fs/ocfs2/cluster/heartbeat.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 3bde942..09c5308 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -44,6 +44,9 @@
- #define BIO_MAX_SIZE		(BIO_MAX_PAGES << PAGE_SHIFT)
- #define BIO_MAX_SECTORS		(BIO_MAX_SIZE >> 9)
- 
-+#define bio_op(bio)				(op_from_rq_bits((bio)->bi_rw))
-+#define bio_set_op_attrs(bio, op, flags)	((bio)->bi_rw |= (op | flags))
-+
- /*
-  * upper 16 bits of bi_rw define the io priority of this bio
-  */
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 77e5d81..6e60baa 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -242,6 +242,30 @@ enum rq_flag_bits {
- #define REQ_HASHED		(1ULL << __REQ_HASHED)
- #define REQ_MQ_INFLIGHT		(1ULL << __REQ_MQ_INFLIGHT)
- 
-+enum req_op {
-+	REQ_OP_READ,
-+	REQ_OP_WRITE		= REQ_WRITE,
-+	REQ_OP_DISCARD		= REQ_DISCARD,
-+	REQ_OP_WRITE_SAME	= REQ_WRITE_SAME,
-+};
-+
-+/*
-+ * tmp cpmpat. Users used to set the write bit for all non reads, but
-+ * we will be dropping the bitmap use for ops. Support both until
-+ * the end of the patchset.
-+ */
-+static inline int op_from_rq_bits(u64 flags)
-+{
-+	if (flags & REQ_OP_DISCARD)
-+		return REQ_OP_DISCARD;
-+	else if (flags & REQ_OP_WRITE_SAME)
-+		return REQ_OP_WRITE_SAME;
-+	else if (flags & REQ_OP_WRITE)
-+		return REQ_OP_WRITE;
-+	else
-+		return REQ_OP_READ;
-+}
-+
- typedef unsigned int blk_qc_t;
- #define BLK_QC_T_NONE	-1U
- #define BLK_QC_T_SHIFT	16
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 3d9cf32..49c2dbc 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -200,6 +200,13 @@ struct request {
- 	struct request *next_rq;
- };
- 
-+#define req_op(req)		(op_from_rq_bits((req)->cmd_flags))
-+#define req_set_op(req, op)	((req)->cmd_flags |= op)
-+#define req_set_op_attrs(req, op, flags) do {	\
-+	req_set_op(req, op);			\
-+	(req)->cmd_flags |= flags;		\
-+} while (0)
-+
- static inline unsigned short req_get_ioprio(struct request *req)
+diff --git a/fs/ocfs2/cluster/heartbeat.c b/fs/ocfs2/cluster/heartbeat.c
+index 8b1d86e..636abcb 100644
+--- a/fs/ocfs2/cluster/heartbeat.c
++++ b/fs/ocfs2/cluster/heartbeat.c
+@@ -530,7 +530,8 @@ static void o2hb_bio_end_io(struct bio *bio)
+ static struct bio *o2hb_setup_one_bio(struct o2hb_region *reg,
+ 				      struct o2hb_bio_wait_ctxt *wc,
+ 				      unsigned int *current_slot,
+-				      unsigned int max_slots, int rw)
++				      unsigned int max_slots, int op,
++				      int op_flags)
  {
- 	return req->ioprio;
-@@ -597,7 +604,8 @@ static inline void queue_flag_clear(unsigned int flag, struct request_queue *q)
+ 	int len, current_page;
+ 	unsigned int vec_len, vec_start;
+@@ -556,7 +557,7 @@ static struct bio *o2hb_setup_one_bio(struct o2hb_region *reg,
+ 	bio->bi_bdev = reg->hr_bdev;
+ 	bio->bi_private = wc;
+ 	bio->bi_end_io = o2hb_bio_end_io;
+-	bio->bi_rw = rw;
++	bio_set_op_attrs(bio, op, op_flags);
  
- #define list_entry_rq(ptr)	list_entry((ptr), struct request, queuelist)
+ 	vec_start = (cs << bits) % PAGE_SIZE;
+ 	while(cs < max_slots) {
+@@ -593,7 +594,7 @@ static int o2hb_read_slots(struct o2hb_region *reg,
  
--#define rq_data_dir(rq)		((int)((rq)->cmd_flags & 1))
-+#define rq_data_dir(rq) \
-+	(op_is_write(op_from_rq_bits(rq->cmd_flags)) ? WRITE : READ)
+ 	while(current_slot < max_slots) {
+ 		bio = o2hb_setup_one_bio(reg, &wc, &current_slot, max_slots,
+-					 READ);
++					 REQ_OP_READ, 0);
+ 		if (IS_ERR(bio)) {
+ 			status = PTR_ERR(bio);
+ 			mlog_errno(status);
+@@ -625,7 +626,8 @@ static int o2hb_issue_node_write(struct o2hb_region *reg,
  
- /*
-  * Driver can handle struct request, if it either has an old style
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 65e4c51..62ca2f9 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -2465,14 +2465,36 @@ extern bool is_bad_inode(struct inode *);
+ 	slot = o2nm_this_node();
  
- #ifdef CONFIG_BLOCK
- /*
-+ * tmp cpmpat. Users used to set the write bit for all non reads, but
-+ * we will be dropping the bitmap use for ops. Support both until
-+ * the end of the patchset.
-+ */
-+static inline bool op_is_write(unsigned long flags)
-+{
-+	if (flags & (REQ_OP_WRITE | REQ_OP_WRITE_SAME | REQ_OP_DISCARD))
-+		return true;
-+	else
-+		return false;
-+}
-+
-+/*
-  * return READ, READA, or WRITE
-  */
--#define bio_rw(bio)		((bio)->bi_rw & (RW_MASK | RWA_MASK))
-+static inline int bio_rw(struct bio *bio)
-+{
-+	if (op_is_write(op_from_rq_bits(bio->bi_rw)))
-+		return WRITE;
-+
-+	return bio->bi_rw & RWA_MASK;
-+}
- 
- /*
-  * return data direction, READ or WRITE
-  */
--#define bio_data_dir(bio)	((bio)->bi_rw & 1)
-+static inline int bio_data_dir(struct bio *bio)
-+{
-+	return op_is_write(op_from_rq_bits(bio->bi_rw)) ? WRITE : READ;
-+}
- 
- extern void check_disk_size_change(struct gendisk *disk,
- 				   struct block_device *bdev);
+-	bio = o2hb_setup_one_bio(reg, write_wc, &slot, slot+1, WRITE_SYNC);
++	bio = o2hb_setup_one_bio(reg, write_wc, &slot, slot+1, REQ_OP_WRITE,
++				 WRITE_SYNC);
+ 	if (IS_ERR(bio)) {
+ 		status = PTR_ERR(bio);
+ 		mlog_errno(status);
 -- 
 2.7.2
 
