@@ -1,4 +1,8 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:39322 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752221AbcFETdO (ORCPT <rfc822;linux-block@vger.kernel.org>);
+	Sun, 5 Jun 2016 15:33:14 -0400
 From: mchristi@redhat.com
 To: linux-f2fs-devel@lists.sourceforge.net, linux-ext4@vger.kernel.org,
 	konrad.wilk@oracle.com, drbd-dev@lists.linbit.com,
@@ -10,68 +14,143 @@ To: linux-f2fs-devel@lists.sourceforge.net, linux-ext4@vger.kernel.org,
 	target-devel@vger.kernel.org, linux-btrfs@vger.kernel.org,
 	osd-dev@open-osd.org, xfs@oss.sgi.com, ocfs2-devel@oss.oracle.com
 Cc: Mike Christie <mchristi@redhat.com>
-Subject: [PATCH 21/45] ocfs2: use bio op accessors
-Date: Sun,  5 Jun 2016 14:32:01 -0500
-Message-Id: <1465155145-10812-22-git-send-email-mchristi@redhat.com>
+Subject: [PATCH 18/45] hfsplus: use bio op accessors
+Date: Sun,  5 Jun 2016 14:31:58 -0500
+Message-Id: <1465155145-10812-19-git-send-email-mchristi@redhat.com>
 In-Reply-To: <1465155145-10812-1-git-send-email-mchristi@redhat.com>
 References: <1465155145-10812-1-git-send-email-mchristi@redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
 From: Mike Christie <mchristi@redhat.com>
 
-Separate the op from the rq_flag_bits and have ocfs2
+Separate the op from the rq_flag_bits and have gfs2
 set/get the bio using bio_set_op_attrs/bio_op.
 
 Signed-off-by: Mike Christie <mchristi@redhat.com>
 Reviewed-by: Christoph Hellwig <hch@lst.de>
 Reviewed-by: Hannes Reinecke <hare@suse.com>
 ---
- fs/ocfs2/cluster/heartbeat.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+ fs/hfsplus/hfsplus_fs.h |  2 +-
+ fs/hfsplus/part_tbl.c   |  5 +++--
+ fs/hfsplus/super.c      |  6 ++++--
+ fs/hfsplus/wrapper.c    | 14 ++++++++------
+ 4 files changed, 16 insertions(+), 11 deletions(-)
 
-diff --git a/fs/ocfs2/cluster/heartbeat.c b/fs/ocfs2/cluster/heartbeat.c
-index 8b1d86e..636abcb 100644
---- a/fs/ocfs2/cluster/heartbeat.c
-+++ b/fs/ocfs2/cluster/heartbeat.c
-@@ -530,7 +530,8 @@ static void o2hb_bio_end_io(struct bio *bio)
- static struct bio *o2hb_setup_one_bio(struct o2hb_region *reg,
- 				      struct o2hb_bio_wait_ctxt *wc,
- 				      unsigned int *current_slot,
--				      unsigned int max_slots, int rw)
-+				      unsigned int max_slots, int op,
-+				      int op_flags)
+diff --git a/fs/hfsplus/hfsplus_fs.h b/fs/hfsplus/hfsplus_fs.h
+index fdc3446..047245b 100644
+--- a/fs/hfsplus/hfsplus_fs.h
++++ b/fs/hfsplus/hfsplus_fs.h
+@@ -526,7 +526,7 @@ int hfsplus_compare_dentry(const struct dentry *parent,
+ 
+ /* wrapper.c */
+ int hfsplus_submit_bio(struct super_block *sb, sector_t sector, void *buf,
+-		       void **data, int rw);
++		       void **data, int op, int op_flags);
+ int hfsplus_read_wrapper(struct super_block *sb);
+ 
+ /* time macros */
+diff --git a/fs/hfsplus/part_tbl.c b/fs/hfsplus/part_tbl.c
+index eb355d8..63164eb 100644
+--- a/fs/hfsplus/part_tbl.c
++++ b/fs/hfsplus/part_tbl.c
+@@ -112,7 +112,8 @@ static int hfs_parse_new_pmap(struct super_block *sb, void *buf,
+ 		if ((u8 *)pm - (u8 *)buf >= buf_size) {
+ 			res = hfsplus_submit_bio(sb,
+ 						 *part_start + HFS_PMAP_BLK + i,
+-						 buf, (void **)&pm, READ);
++						 buf, (void **)&pm, REQ_OP_READ,
++						 0);
+ 			if (res)
+ 				return res;
+ 		}
+@@ -136,7 +137,7 @@ int hfs_part_find(struct super_block *sb,
+ 		return -ENOMEM;
+ 
+ 	res = hfsplus_submit_bio(sb, *part_start + HFS_PMAP_BLK,
+-				 buf, &data, READ);
++				 buf, &data, REQ_OP_READ, 0);
+ 	if (res)
+ 		goto out;
+ 
+diff --git a/fs/hfsplus/super.c b/fs/hfsplus/super.c
+index 755bf30..11854dd 100644
+--- a/fs/hfsplus/super.c
++++ b/fs/hfsplus/super.c
+@@ -220,7 +220,8 @@ static int hfsplus_sync_fs(struct super_block *sb, int wait)
+ 
+ 	error2 = hfsplus_submit_bio(sb,
+ 				   sbi->part_start + HFSPLUS_VOLHEAD_SECTOR,
+-				   sbi->s_vhdr_buf, NULL, WRITE_SYNC);
++				   sbi->s_vhdr_buf, NULL, REQ_OP_WRITE,
++				   WRITE_SYNC);
+ 	if (!error)
+ 		error = error2;
+ 	if (!write_backup)
+@@ -228,7 +229,8 @@ static int hfsplus_sync_fs(struct super_block *sb, int wait)
+ 
+ 	error2 = hfsplus_submit_bio(sb,
+ 				  sbi->part_start + sbi->sect_count - 2,
+-				  sbi->s_backup_vhdr_buf, NULL, WRITE_SYNC);
++				  sbi->s_backup_vhdr_buf, NULL, REQ_OP_WRITE,
++				  WRITE_SYNC);
+ 	if (!error)
+ 		error2 = error;
+ out:
+diff --git a/fs/hfsplus/wrapper.c b/fs/hfsplus/wrapper.c
+index d026bb3..ebb85e5 100644
+--- a/fs/hfsplus/wrapper.c
++++ b/fs/hfsplus/wrapper.c
+@@ -30,7 +30,8 @@ struct hfsplus_wd {
+  * @sector: block to read or write, for blocks of HFSPLUS_SECTOR_SIZE bytes
+  * @buf: buffer for I/O
+  * @data: output pointer for location of requested data
+- * @rw: direction of I/O
++ * @op: direction of I/O
++ * @op_flags: request op flags
+  *
+  * The unit of I/O is hfsplus_min_io_size(sb), which may be bigger than
+  * HFSPLUS_SECTOR_SIZE, and @buf must be sized accordingly. On reads
+@@ -44,7 +45,7 @@ struct hfsplus_wd {
+  * will work correctly.
+  */
+ int hfsplus_submit_bio(struct super_block *sb, sector_t sector,
+-		void *buf, void **data, int rw)
++		       void *buf, void **data, int op, int op_flags)
  {
- 	int len, current_page;
- 	unsigned int vec_len, vec_start;
-@@ -556,7 +557,7 @@ static struct bio *o2hb_setup_one_bio(struct o2hb_region *reg,
- 	bio->bi_bdev = reg->hr_bdev;
- 	bio->bi_private = wc;
- 	bio->bi_end_io = o2hb_bio_end_io;
+ 	struct bio *bio;
+ 	int ret = 0;
+@@ -65,9 +66,9 @@ int hfsplus_submit_bio(struct super_block *sb, sector_t sector,
+ 	bio = bio_alloc(GFP_NOIO, 1);
+ 	bio->bi_iter.bi_sector = sector;
+ 	bio->bi_bdev = sb->s_bdev;
 -	bio->bi_rw = rw;
 +	bio_set_op_attrs(bio, op, op_flags);
  
- 	vec_start = (cs << bits) % PAGE_SIZE;
- 	while(cs < max_slots) {
-@@ -593,7 +594,7 @@ static int o2hb_read_slots(struct o2hb_region *reg,
+-	if (!(rw & WRITE) && data)
++	if (op != WRITE && data)
+ 		*data = (u8 *)buf + offset;
  
- 	while(current_slot < max_slots) {
- 		bio = o2hb_setup_one_bio(reg, &wc, &current_slot, max_slots,
--					 READ);
-+					 REQ_OP_READ, 0);
- 		if (IS_ERR(bio)) {
- 			status = PTR_ERR(bio);
- 			mlog_errno(status);
-@@ -625,7 +626,8 @@ static int o2hb_issue_node_write(struct o2hb_region *reg,
+ 	while (io_size > 0) {
+@@ -182,7 +183,7 @@ int hfsplus_read_wrapper(struct super_block *sb)
+ reread:
+ 	error = hfsplus_submit_bio(sb, part_start + HFSPLUS_VOLHEAD_SECTOR,
+ 				   sbi->s_vhdr_buf, (void **)&sbi->s_vhdr,
+-				   READ);
++				   REQ_OP_READ, 0);
+ 	if (error)
+ 		goto out_free_backup_vhdr;
  
- 	slot = o2nm_this_node();
+@@ -214,7 +215,8 @@ reread:
  
--	bio = o2hb_setup_one_bio(reg, write_wc, &slot, slot+1, WRITE_SYNC);
-+	bio = o2hb_setup_one_bio(reg, write_wc, &slot, slot+1, REQ_OP_WRITE,
-+				 WRITE_SYNC);
- 	if (IS_ERR(bio)) {
- 		status = PTR_ERR(bio);
- 		mlog_errno(status);
+ 	error = hfsplus_submit_bio(sb, part_start + part_size - 2,
+ 				   sbi->s_backup_vhdr_buf,
+-				   (void **)&sbi->s_backup_vhdr, READ);
++				   (void **)&sbi->s_backup_vhdr, REQ_OP_READ,
++				   0);
+ 	if (error)
+ 		goto out_free_backup_vhdr;
+ 
 -- 
 2.7.2
 
