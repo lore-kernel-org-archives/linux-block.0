@@ -1,211 +1,142 @@
 Return-Path: <linux-scsi-owner@vger.kernel.org>
-From: Shaun Tancheff <shaun@tancheff.com>
-To: linux-ide@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org
-Cc: Shaun Tancheff <shaun@tancheff.com>,
-	Shaun Tancheff <shaun.tancheff@seagate.com>
-Subject: [PATCH 4/4] Add ata pass-through path for ZAC commands.
-Date: Mon,  6 Jun 2016 10:39:31 -0500
-Message-Id: <1465227572-27149-5-git-send-email-shaun@tancheff.com>
-In-Reply-To: <1465227572-27149-1-git-send-email-shaun@tancheff.com>
-References: <1465227572-27149-1-git-send-email-shaun@tancheff.com>
+From: mchristi@redhat.com
+To: linux-f2fs-devel@lists.sourceforge.net, linux-ext4@vger.kernel.org,
+	konrad.wilk@oracle.com, drbd-dev@lists.linbit.com,
+	philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
+	linux-raid@vger.kernel.org, dm-devel@redhat.com,
+	linux-fsdevel@vger.kernel.org, linux-bcache@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-scsi@vger.kernel.org, linux-mtd@lists.infradead.org,
+	target-devel@vger.kernel.org, linux-btrfs@vger.kernel.org,
+	osd-dev@open-osd.org, xfs@oss.sgi.com, ocfs2-devel@oss.oracle.com
+Cc: Mike Christie <mchristi@redhat.com>
+Subject: [PATCH 23/45] dm: pass dm stats data dir instead of bi_rw
+Date: Sun,  5 Jun 2016 14:32:03 -0500
+Message-Id: <1465155145-10812-24-git-send-email-mchristi@redhat.com>
+In-Reply-To: <1465155145-10812-1-git-send-email-mchristi@redhat.com>
+References: <1465155145-10812-1-git-send-email-mchristi@redhat.com>
 Sender: linux-scsi-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-The current generation of HBA SAS adapters support connecting SATA
-drives and perform SCSI<->ATA translations in hardware.
-Unfortunately the ZBC commands are not being translate (yet).
+From: Mike Christie <mchristi@redhat.com>
 
-Currently users of SAS controllers can only send ZAC commands via
-ata pass-through.
+It looks like dm stats cares about the data direction
+(READ vs WRITE) and does not need the bio/request flags.
+Commands like REQ_FLUSH, REQ_DISCARD and REQ_WRITE_SAME
+are currently always set with REQ_WRITE, so the extra check for
+REQ_DISCARD in dm_stats_account_io is not needed.
 
-This method overloads the meaning of REQ_META to direct ZBC commands
-to construct ZAC equivalent ATA pass through commands.
-Note also that this approach expects the initiator to deal with the
-little endian result due to bypassing the normal translation layers.
+This patch has it use the bio and request data_dir helpers
+instead of accessing the bi_rw/cmd_flags directly. This makes
+the next patches that remove the operation from the cmd_flags
+and bi_rw easier, because we will no longer have the REQ_WRITE
+bit set for operations like discards.
 
-Signed-off-by: Shaun Tancheff <shaun.tancheff@seagate.com>
+Signed-off-by: Mike Christie <mchristi@redhat.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 ---
- block/ioctl.c       | 29 ++++++++++++++++++++++
- drivers/scsi/sd.c   | 70 +++++++++++++++++++++++++++++++++++++++++------------
- include/linux/ata.h | 15 ++++++++++++
- 3 files changed, 99 insertions(+), 15 deletions(-)
+v2:
 
-diff --git a/block/ioctl.c b/block/ioctl.c
-index 46a8553..03a5808 100644
---- a/block/ioctl.c
-+++ b/block/ioctl.c
-@@ -284,6 +284,35 @@ static int blk_zoned_action_ioctl(struct block_device *bdev, fmode_t mode,
- 		return -EFAULT;
- 	}
+1. Merged Mike Snitzer's fixes to pass in int instead of
+unsigned long.
+
+2. Fix 80 char col issues.
+
+ drivers/md/dm-stats.c |  9 ++++-----
+ drivers/md/dm.c       | 21 ++++++++++++---------
+ 2 files changed, 16 insertions(+), 14 deletions(-)
+
+diff --git a/drivers/md/dm-stats.c b/drivers/md/dm-stats.c
+index 8289804..4fba26c 100644
+--- a/drivers/md/dm-stats.c
++++ b/drivers/md/dm-stats.c
+@@ -514,11 +514,10 @@ static void dm_stat_round(struct dm_stat *s, struct dm_stat_shared *shared,
+ }
  
-+	/*
-+	 * When the low bit is set force ATA passthrough try to work around
-+	 * older SAS HBA controllers that don't support ZBC to ZAC translation.
-+	 *
-+	 * When the low bit is clear follow the normal path but also correct
-+	 * for ~0ul LBA means 'for all lbas'.
-+	 *
-+	 * NB: We should do extra checking here to see if the user specified
-+	 *     the entire block device as opposed to a partition of the
-+	 *     device....
-+	 */
-+	if (arg & 1) {
-+		bi_rw |= REQ_META;
-+		if (arg != ~0ul)
-+			arg &= ~1ul; /* ~1 :: 0xFF...FE */
-+	} else {
-+		if (arg == ~1ul)
-+			arg = ~0ul;
-+	}
-+
-+	/*
-+	 * When acting on zones we explicitly disallow using a partition.
-+	 */
-+	if (bdev != bdev->bd_contains) {
-+		pr_err("%s: All zone operations disallowed on this device\n",
-+			__func__);
-+		return -EFAULT;
-+	}
-+
- 	switch (cmd) {
- 	case BLKOPENZONE:
- 		bi_rw |= REQ_OPEN_ZONE;
-diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
-index 372b5e2..177d5fb 100644
---- a/drivers/scsi/sd.c
-+++ b/drivers/scsi/sd.c
-@@ -53,6 +53,7 @@
- #include <linux/pm_runtime.h>
- #include <linux/pr.h>
- #include <linux/blkzoned_api.h>
-+#include <linux/ata.h>
- #include <asm/uaccess.h>
- #include <asm/unaligned.h>
- 
-@@ -1182,12 +1183,29 @@ static int sd_setup_zoned_cmnd(struct scsi_cmnd *cmd)
- 
- 		cmd->cmd_len = 16;
- 		memset(cmd->cmnd, 0, cmd->cmd_len);
--		cmd->cmnd[0] = ZBC_IN;
--		cmd->cmnd[1] = ZI_REPORT_ZONES;
--		put_unaligned_be64(sector, &cmd->cmnd[2]);
--		put_unaligned_be32(nr_bytes, &cmd->cmnd[10]);
--		/* FUTURE ... when streamid is available */
--		/* cmd->cmnd[14] = bio_get_streamid(bio); */
-+		if (rq->cmd_flags & REQ_META) {
-+			cmd->cmnd[0] = ATA_16;
-+			cmd->cmnd[1] = (0x6 << 1) | 1;
-+			cmd->cmnd[2] = 0x0e;
-+			/* FUTURE ... when streamid is available */
-+			/* cmd->cmnd[3] = bio_get_streamid(bio); */
-+			cmd->cmnd[4] = ATA_SUBCMD_ZAC_MGMT_IN_REPORT_ZONES;
-+			cmd->cmnd[5] = ((nr_bytes / 512) >> 8) & 0xff;
-+			cmd->cmnd[6] = (nr_bytes / 512) & 0xff;
-+
-+			_lba_to_cmd_ata(&cmd->cmnd[7], sector);
-+
-+			cmd->cmnd[13] = 1 << 6;
-+			cmd->cmnd[14] = ATA_CMD_ZAC_MGMT_IN;
-+		} else {
-+			cmd->cmnd[0] = ZBC_IN;
-+			cmd->cmnd[1] = ZI_REPORT_ZONES;
-+			put_unaligned_be64(sector, &cmd->cmnd[2]);
-+			put_unaligned_be32(nr_bytes, &cmd->cmnd[10]);
-+			/* FUTURE ... when streamid is available */
-+			/* cmd->cmnd[14] = bio_get_streamid(bio); */
-+		}
-+
- 		cmd->sc_data_direction = DMA_FROM_DEVICE;
- 		cmd->sdb.length = nr_bytes;
- 		cmd->transfersize = sdp->sector_size;
-@@ -1208,14 +1226,29 @@ static int sd_setup_zoned_cmnd(struct scsi_cmnd *cmd)
- 	cmd->cmd_len = 16;
- 	memset(cmd->cmnd, 0, cmd->cmd_len);
- 	memset(&cmd->sdb, 0, sizeof(cmd->sdb));
--	cmd->cmnd[0] = ZBC_OUT;
--	cmd->cmnd[1] = ZO_OPEN_ZONE;
--	if (rq->cmd_flags & REQ_CLOSE_ZONE)
--		cmd->cmnd[1] = ZO_CLOSE_ZONE;
--	if (rq->cmd_flags & REQ_RESET_ZONE)
--		cmd->cmnd[1] = ZO_RESET_WRITE_POINTER;
--	cmd->cmnd[14] = allbit;
--	put_unaligned_be64(sector, &cmd->cmnd[2]);
-+	if (rq->cmd_flags & REQ_META) {
-+		cmd->cmnd[0] = ATA_16;
-+		cmd->cmnd[1] = (3 << 1) | 1;
-+		cmd->cmnd[3] = allbit;
-+		cmd->cmnd[4] = ATA_SUBCMD_ZAC_MGMT_OUT_RESET_WRITE_POINTER;
-+		if (rq->cmd_flags & REQ_OPEN_ZONE)
-+			cmd->cmnd[4] = ATA_SUBCMD_ZAC_MGMT_OUT_OPEN_ZONE;
-+		if (rq->cmd_flags & REQ_CLOSE_ZONE)
-+			cmd->cmnd[4] = ATA_SUBCMD_ZAC_MGMT_OUT_CLOSE_ZONE;
-+		_lba_to_cmd_ata(&cmd->cmnd[7], sector);
-+		cmd->cmnd[13] = 1 << 6;
-+		cmd->cmnd[14] = ATA_CMD_ZAC_MGMT_OUT;
-+	} else {
-+		cmd->cmnd[0] = ZBC_OUT;
-+		cmd->cmnd[1] = ZO_OPEN_ZONE;
-+		if (rq->cmd_flags & REQ_CLOSE_ZONE)
-+			cmd->cmnd[1] = ZO_CLOSE_ZONE;
-+		if (rq->cmd_flags & REQ_RESET_ZONE)
-+			cmd->cmnd[1] = ZO_RESET_WRITE_POINTER;
-+		cmd->cmnd[14] = allbit;
-+		put_unaligned_be64(sector, &cmd->cmnd[2]);
-+	}
-+
- 	cmd->transfersize = 0;
- 	cmd->underflow = 0;
- 	cmd->allowed = SD_MAX_RETRIES;
-@@ -2806,7 +2839,7 @@ static void sd_read_block_characteristics(struct scsi_disk *sdkp)
+ static void dm_stat_for_entry(struct dm_stat *s, size_t entry,
+-			      unsigned long bi_rw, sector_t len,
++			      int idx, sector_t len,
+ 			      struct dm_stats_aux *stats_aux, bool end,
+ 			      unsigned long duration_jiffies)
  {
- 	unsigned char *buffer;
- 	u16 rot;
--	const int vpd_len = 64;
-+	const int vpd_len = 512;
+-	unsigned long idx = bi_rw & REQ_WRITE;
+ 	struct dm_stat_shared *shared = &s->stat_shared[entry];
+ 	struct dm_stat_percpu *p;
  
- 	buffer = kmalloc(vpd_len, GFP_KERNEL);
- 
-@@ -2823,6 +2856,13 @@ static void sd_read_block_characteristics(struct scsi_disk *sdkp)
- 	}
- 
- 	sdkp->zoned = (buffer[8] >> 4) & 3;
-+	if (sdkp->zoned != 1) {
-+		struct scsi_device *sdev = sdkp->device;
-+
-+		/* buf size is 512, page is 60 + 512, we need page 206 */
-+		if (!scsi_get_vpd_page(sdev, 0x89, buffer, SD_BUF_SIZE))
-+			sdkp->zoned = ata_id_zoned_cap((u16 *)&buffer[60]);
-+	}
- 
-  out:
- 	kfree(buffer);
-diff --git a/include/linux/ata.h b/include/linux/ata.h
-index 99346be..5cc1a85 100644
---- a/include/linux/ata.h
-+++ b/include/linux/ata.h
-@@ -1060,6 +1060,21 @@ static inline void ata_id_to_hd_driveid(u16 *id)
+@@ -584,7 +583,7 @@ static void dm_stat_for_entry(struct dm_stat *s, size_t entry,
  #endif
  }
  
-+/**
-+ * _lba_to_cmd_ata() - Copy lba48 to ATA command
-+ * @cmd: ATA command as an array of bytes
-+ * @_lba: lba48 in the low 48 bits
-+ */
-+static inline void _lba_to_cmd_ata(u8 *cmd, u64 _lba)
-+{
-+	cmd[1] =  _lba	      & 0xff;
-+	cmd[3] = (_lba >>  8) & 0xff;
-+	cmd[5] = (_lba >> 16) & 0xff;
-+	cmd[0] = (_lba >> 24) & 0xff;
-+	cmd[2] = (_lba >> 32) & 0xff;
-+	cmd[4] = (_lba >> 40) & 0xff;
-+}
-+
- /*
-  * Write LBA Range Entries to the buffer that will cover the extent from
-  * sector to sector + count.  This is used for TRIM and for ADD LBA(S)
+-static void __dm_stat_bio(struct dm_stat *s, unsigned long bi_rw,
++static void __dm_stat_bio(struct dm_stat *s, int bi_rw,
+ 			  sector_t bi_sector, sector_t end_sector,
+ 			  bool end, unsigned long duration_jiffies,
+ 			  struct dm_stats_aux *stats_aux)
+@@ -645,8 +644,8 @@ void dm_stats_account_io(struct dm_stats *stats, unsigned long bi_rw,
+ 		last = raw_cpu_ptr(stats->last);
+ 		stats_aux->merged =
+ 			(bi_sector == (ACCESS_ONCE(last->last_sector) &&
+-				       ((bi_rw & (REQ_WRITE | REQ_DISCARD)) ==
+-					(ACCESS_ONCE(last->last_rw) & (REQ_WRITE | REQ_DISCARD)))
++				       ((bi_rw == WRITE) ==
++					(ACCESS_ONCE(last->last_rw) == WRITE))
+ 				       ));
+ 		ACCESS_ONCE(last->last_sector) = end_sector;
+ 		ACCESS_ONCE(last->last_rw) = bi_rw;
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index 1b2f962..f5ac0a3 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -723,8 +723,9 @@ static void start_io_acct(struct dm_io *io)
+ 		atomic_inc_return(&md->pending[rw]));
+ 
+ 	if (unlikely(dm_stats_used(&md->stats)))
+-		dm_stats_account_io(&md->stats, bio->bi_rw, bio->bi_iter.bi_sector,
+-				    bio_sectors(bio), false, 0, &io->stats_aux);
++		dm_stats_account_io(&md->stats, bio_data_dir(bio),
++				    bio->bi_iter.bi_sector, bio_sectors(bio),
++				    false, 0, &io->stats_aux);
+ }
+ 
+ static void end_io_acct(struct dm_io *io)
+@@ -738,8 +739,9 @@ static void end_io_acct(struct dm_io *io)
+ 	generic_end_io_acct(rw, &dm_disk(md)->part0, io->start_time);
+ 
+ 	if (unlikely(dm_stats_used(&md->stats)))
+-		dm_stats_account_io(&md->stats, bio->bi_rw, bio->bi_iter.bi_sector,
+-				    bio_sectors(bio), true, duration, &io->stats_aux);
++		dm_stats_account_io(&md->stats, bio_data_dir(bio),
++				    bio->bi_iter.bi_sector, bio_sectors(bio),
++				    true, duration, &io->stats_aux);
+ 
+ 	/*
+ 	 * After this is decremented the bio must not be touched if it is
+@@ -1121,9 +1123,9 @@ static void rq_end_stats(struct mapped_device *md, struct request *orig)
+ 	if (unlikely(dm_stats_used(&md->stats))) {
+ 		struct dm_rq_target_io *tio = tio_from_request(orig);
+ 		tio->duration_jiffies = jiffies - tio->duration_jiffies;
+-		dm_stats_account_io(&md->stats, orig->cmd_flags, blk_rq_pos(orig),
+-				    tio->n_sectors, true, tio->duration_jiffies,
+-				    &tio->stats_aux);
++		dm_stats_account_io(&md->stats, rq_data_dir(orig),
++				    blk_rq_pos(orig), tio->n_sectors, true,
++				    tio->duration_jiffies, &tio->stats_aux);
+ 	}
+ }
+ 
+@@ -2082,8 +2084,9 @@ static void dm_start_request(struct mapped_device *md, struct request *orig)
+ 		struct dm_rq_target_io *tio = tio_from_request(orig);
+ 		tio->duration_jiffies = jiffies;
+ 		tio->n_sectors = blk_rq_sectors(orig);
+-		dm_stats_account_io(&md->stats, orig->cmd_flags, blk_rq_pos(orig),
+-				    tio->n_sectors, false, 0, &tio->stats_aux);
++		dm_stats_account_io(&md->stats, rq_data_dir(orig),
++				    blk_rq_pos(orig), tio->n_sectors, false, 0,
++				    &tio->stats_aux);
+ 	}
+ 
+ 	/*
 -- 
-2.8.1
+2.7.2
 
