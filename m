@@ -1,200 +1,145 @@
-Return-Path: <shaun@helios.aeonazure.com>
-From: Shaun Tancheff <shaun@tancheff.com>
-To: linux-ide@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org
-Cc: Shaun Tancheff <shaun@tancheff.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	"James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	Jeff Layton <jlayton@poochiereds.net>,
-	"J . Bruce Fields" <bfields@fieldses.org>,
-	Shaun Tancheff <shaun.tancheff@seagate.com>
-Subject: [PATCH v2 3/4] Add ioctl to issue ZBC/ZAC commands via block layer
-Date: Tue,  7 Jun 2016 15:02:31 -0500
-Message-Id: <1465329752-9262-4-git-send-email-shaun@tancheff.com>
-In-Reply-To: <1465329752-9262-1-git-send-email-shaun@tancheff.com>
-References: <1465329752-9262-1-git-send-email-shaun@tancheff.com>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: mchristi@redhat.com
+To: linux-f2fs-devel@lists.sourceforge.net, linux-ext4@vger.kernel.org,
+	konrad.wilk@oracle.com, drbd-dev@lists.linbit.com,
+	philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
+	linux-raid@vger.kernel.org, dm-devel@redhat.com,
+	linux-fsdevel@vger.kernel.org, linux-bcache@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-scsi@vger.kernel.org, linux-mtd@lists.infradead.org,
+	target-devel@vger.kernel.org, linux-btrfs@vger.kernel.org,
+	osd-dev@open-osd.org, xfs@oss.sgi.com, ocfs2-devel@oss.oracle.com
+Cc: Mike Christie <mchristi@redhat.com>
+Subject: [PATCH 29/45] xen: use bio op accessors
+Date: Sun,  5 Jun 2016 14:32:09 -0500
+Message-Id: <1465155145-10812-30-git-send-email-mchristi@redhat.com>
+In-Reply-To: <1465155145-10812-1-git-send-email-mchristi@redhat.com>
+References: <1465155145-10812-1-git-send-email-mchristi@redhat.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Add New ioctl types
-    BLKREPORT    - Issue Report Zones to device.
-    BLKOPENZONE  - Issue an Zone Action: Open Zone command.
-    BLKCLOSEZONE - Issue an Zone Action: Close Zone command.
-    BLKRESETZONE - Issue an Zone Action: Reset Zone command.
+From: Mike Christie <mchristi@redhat.com>
 
-Signed-off-by: Shaun Tancheff <shaun.tancheff@seagate.com>
+Separate the op from the rq_flag_bits and have xen
+set/get the bio using bio_set_op_attrs/bio_op.
+
+Signed-off-by: Mike Christie <mchristi@redhat.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 ---
-V2:
- - Added include/uapi/linux/fs.h
- - Removed REQ_META flag from this patch.
+ drivers/block/xen-blkback/blkback.c | 27 +++++++++++++++------------
+ 1 file changed, 15 insertions(+), 12 deletions(-)
 
- block/ioctl.c                     | 110 ++++++++++++++++++++++++++++++++++++++
- include/uapi/linux/blkzoned_api.h |   6 +++
- include/uapi/linux/fs.h           |   1 +
- 3 files changed, 117 insertions(+)
-
-diff --git a/block/ioctl.c b/block/ioctl.c
-index ed2397f..97f45f5 100644
---- a/block/ioctl.c
-+++ b/block/ioctl.c
-@@ -7,6 +7,7 @@
- #include <linux/backing-dev.h>
- #include <linux/fs.h>
- #include <linux/blktrace_api.h>
-+#include <linux/blkzoned_api.h>
- #include <linux/pr.h>
- #include <asm/uaccess.h>
+diff --git a/drivers/block/xen-blkback/blkback.c b/drivers/block/xen-blkback/blkback.c
+index 79fe493..4a80ee7 100644
+--- a/drivers/block/xen-blkback/blkback.c
++++ b/drivers/block/xen-blkback/blkback.c
+@@ -501,7 +501,7 @@ static int xen_vbd_translate(struct phys_req *req, struct xen_blkif *blkif,
+ 	struct xen_vbd *vbd = &blkif->vbd;
+ 	int rc = -EACCES;
  
-@@ -194,6 +195,109 @@ int blkdev_reread_part(struct block_device *bdev)
- }
- EXPORT_SYMBOL(blkdev_reread_part);
+-	if ((operation != READ) && vbd->readonly)
++	if ((operation != REQ_OP_READ) && vbd->readonly)
+ 		goto out;
  
-+static int blk_zoned_report_ioctl(struct block_device *bdev, fmode_t mode,
-+		void __user *parg)
-+{
-+	int error = -EFAULT;
-+	gfp_t gfp = GFP_KERNEL;
-+	struct bdev_zone_report_io *zone_iodata = NULL;
-+	int order = 0;
-+	struct page *pgs = NULL;
-+	u32 alloc_size = PAGE_SIZE;
-+	unsigned long op_flags = 0;
-+	u8 opt = 0;
-+
-+	if (!(mode & FMODE_READ))
-+		return -EBADF;
-+
-+	zone_iodata = (void *)get_zeroed_page(gfp);
-+	if (!zone_iodata) {
-+		error = -ENOMEM;
-+		goto report_zones_out;
-+	}
-+	if (copy_from_user(zone_iodata, parg, sizeof(*zone_iodata))) {
-+		error = -EFAULT;
-+		goto report_zones_out;
-+	}
-+	if (zone_iodata->data.in.return_page_count > alloc_size) {
-+		int npages;
-+
-+		alloc_size = zone_iodata->data.in.return_page_count;
-+		npages = (alloc_size + PAGE_SIZE - 1) / PAGE_SIZE;
-+		order =  ilog2(roundup_pow_of_two(npages));
-+		pgs = alloc_pages(gfp, order);
-+		if (pgs) {
-+			void *mem = page_address(pgs);
-+
-+			if (!mem) {
-+				error = -ENOMEM;
-+				goto report_zones_out;
-+			}
-+			memset(mem, 0, alloc_size);
-+			memcpy(mem, zone_iodata, sizeof(*zone_iodata));
-+			free_page((unsigned long)zone_iodata);
-+			zone_iodata = mem;
-+		} else {
-+			/* Result requires DMA capable memory */
-+			pr_err("Not enough memory available for request.\n");
-+			error = -ENOMEM;
-+			goto report_zones_out;
-+		}
-+	}
-+	opt = zone_iodata->data.in.report_option & 0x7F;
-+	error = blkdev_issue_zone_report(bdev, op_flags,
-+			zone_iodata->data.in.zone_locator_lba, opt,
-+			pgs ? pgs : virt_to_page(zone_iodata),
-+			alloc_size, GFP_KERNEL);
-+
-+	if (error)
-+		goto report_zones_out;
-+
-+	if (copy_to_user(parg, zone_iodata, alloc_size))
-+		error = -EFAULT;
-+
-+report_zones_out:
-+	if (pgs)
-+		__free_pages(pgs, order);
-+	else if (zone_iodata)
-+		free_page((unsigned long)zone_iodata);
-+	return error;
-+}
-+
-+static int blk_zoned_action_ioctl(struct block_device *bdev, fmode_t mode,
-+				  unsigned int cmd, unsigned long arg)
-+{
-+	unsigned long op_flags = 0;
-+
-+	if (!(mode & FMODE_WRITE))
-+		return -EBADF;
-+
-+	/*
-+	 * When acting on zones we explicitly disallow using a partition.
-+	 */
-+	if (bdev != bdev->bd_contains) {
-+		pr_err("%s: All zone operations disallowed on this device\n",
-+			__func__);
-+		return -EFAULT;
-+	}
-+
-+	switch (cmd) {
-+	case BLKOPENZONE:
-+		op_flags |= REQ_OPEN_ZONE;
-+		break;
-+	case BLKCLOSEZONE:
-+		op_flags |= REQ_CLOSE_ZONE;
-+		break;
-+	case BLKRESETZONE:
-+		op_flags |= REQ_RESET_ZONE;
-+		break;
-+	default:
-+		pr_err("%s: Unknown action: %u\n", __func__, cmd);
-+		WARN_ON(1);
-+	}
-+	return blkdev_issue_zone_action(bdev, op_flags, arg, GFP_KERNEL);
-+}
-+
- static int blk_ioctl_discard(struct block_device *bdev, fmode_t mode,
- 		unsigned long arg, unsigned long flags)
- {
-@@ -568,6 +672,12 @@ int blkdev_ioctl(struct block_device *bdev, fmode_t mode, unsigned cmd,
- 	case BLKTRACESETUP:
- 	case BLKTRACETEARDOWN:
- 		return blk_trace_ioctl(bdev, cmd, argp);
-+	case BLKREPORT:
-+		return blk_zoned_report_ioctl(bdev, mode, argp);
-+	case BLKOPENZONE:
-+	case BLKCLOSEZONE:
-+	case BLKRESETZONE:
-+		return blk_zoned_action_ioctl(bdev, mode, cmd, arg);
- 	case IOC_PR_REGISTER:
- 		return blkdev_pr_register(bdev, argp);
- 	case IOC_PR_RESERVE:
-diff --git a/include/uapi/linux/blkzoned_api.h b/include/uapi/linux/blkzoned_api.h
-index 189e925..2007b56 100644
---- a/include/uapi/linux/blkzoned_api.h
-+++ b/include/uapi/linux/blkzoned_api.h
-@@ -212,4 +212,10 @@ struct bdev_zone_report_io {
- 	} data;
- } __packed;
+ 	if (likely(req->nr_sects)) {
+@@ -1014,7 +1014,7 @@ static int dispatch_discard_io(struct xen_blkif_ring *ring,
+ 	preq.sector_number = req->u.discard.sector_number;
+ 	preq.nr_sects      = req->u.discard.nr_sectors;
  
-+/* continuing from uapi/linux/fs.h: */
-+#define BLKREPORT	_IOWR(0x12, 130, struct bdev_zone_report_io)
-+#define BLKOPENZONE	_IO(0x12, 131)
-+#define BLKCLOSEZONE	_IO(0x12, 132)
-+#define BLKRESETZONE	_IO(0x12, 133)
-+
- #endif /* _UAPI_BLKZONED_API_H */
-diff --git a/include/uapi/linux/fs.h b/include/uapi/linux/fs.h
-index 3b00f7c..c0b565b 100644
---- a/include/uapi/linux/fs.h
-+++ b/include/uapi/linux/fs.h
-@@ -222,6 +222,7 @@ struct fsxattr {
- #define BLKSECDISCARD _IO(0x12,125)
- #define BLKROTATIONAL _IO(0x12,126)
- #define BLKZEROOUT _IO(0x12,127)
-+/* A jump here: See blkzoned_api.h, Reserving 130 to 133. */
+-	err = xen_vbd_translate(&preq, blkif, WRITE);
++	err = xen_vbd_translate(&preq, blkif, REQ_OP_WRITE);
+ 	if (err) {
+ 		pr_warn("access denied: DISCARD [%llu->%llu] on dev=%04x\n",
+ 			preq.sector_number,
+@@ -1229,6 +1229,7 @@ static int dispatch_rw_block_io(struct xen_blkif_ring *ring,
+ 	struct bio **biolist = pending_req->biolist;
+ 	int i, nbio = 0;
+ 	int operation;
++	int operation_flags = 0;
+ 	struct blk_plug plug;
+ 	bool drain = false;
+ 	struct grant_page **pages = pending_req->segments;
+@@ -1247,17 +1248,19 @@ static int dispatch_rw_block_io(struct xen_blkif_ring *ring,
+ 	switch (req_operation) {
+ 	case BLKIF_OP_READ:
+ 		ring->st_rd_req++;
+-		operation = READ;
++		operation = REQ_OP_READ;
+ 		break;
+ 	case BLKIF_OP_WRITE:
+ 		ring->st_wr_req++;
+-		operation = WRITE_ODIRECT;
++		operation = REQ_OP_WRITE;
++		operation_flags = WRITE_ODIRECT;
+ 		break;
+ 	case BLKIF_OP_WRITE_BARRIER:
+ 		drain = true;
+ 	case BLKIF_OP_FLUSH_DISKCACHE:
+ 		ring->st_f_req++;
+-		operation = WRITE_FLUSH;
++		operation = REQ_OP_WRITE;
++		operation_flags = WRITE_FLUSH;
+ 		break;
+ 	default:
+ 		operation = 0; /* make gcc happy */
+@@ -1269,7 +1272,7 @@ static int dispatch_rw_block_io(struct xen_blkif_ring *ring,
+ 	nseg = req->operation == BLKIF_OP_INDIRECT ?
+ 	       req->u.indirect.nr_segments : req->u.rw.nr_segments;
  
- #define BMAP_IOCTL 1		/* obsolete - kept for compatibility */
- #define FIBMAP	   _IO(0x00,1)	/* bmap access */
+-	if (unlikely(nseg == 0 && operation != WRITE_FLUSH) ||
++	if (unlikely(nseg == 0 && operation_flags != WRITE_FLUSH) ||
+ 	    unlikely((req->operation != BLKIF_OP_INDIRECT) &&
+ 		     (nseg > BLKIF_MAX_SEGMENTS_PER_REQUEST)) ||
+ 	    unlikely((req->operation == BLKIF_OP_INDIRECT) &&
+@@ -1310,7 +1313,7 @@ static int dispatch_rw_block_io(struct xen_blkif_ring *ring,
+ 
+ 	if (xen_vbd_translate(&preq, ring->blkif, operation) != 0) {
+ 		pr_debug("access denied: %s of [%llu,%llu] on dev=%04x\n",
+-			 operation == READ ? "read" : "write",
++			 operation == REQ_OP_READ ? "read" : "write",
+ 			 preq.sector_number,
+ 			 preq.sector_number + preq.nr_sects,
+ 			 ring->blkif->vbd.pdevice);
+@@ -1369,7 +1372,7 @@ static int dispatch_rw_block_io(struct xen_blkif_ring *ring,
+ 			bio->bi_private = pending_req;
+ 			bio->bi_end_io  = end_block_io_op;
+ 			bio->bi_iter.bi_sector  = preq.sector_number;
+-			bio->bi_rw	= operation;
++			bio_set_op_attrs(bio, operation, operation_flags);
+ 		}
+ 
+ 		preq.sector_number += seg[i].nsec;
+@@ -1377,7 +1380,7 @@ static int dispatch_rw_block_io(struct xen_blkif_ring *ring,
+ 
+ 	/* This will be hit if the operation was a flush or discard. */
+ 	if (!bio) {
+-		BUG_ON(operation != WRITE_FLUSH);
++		BUG_ON(operation_flags != WRITE_FLUSH);
+ 
+ 		bio = bio_alloc(GFP_KERNEL, 0);
+ 		if (unlikely(bio == NULL))
+@@ -1387,7 +1390,7 @@ static int dispatch_rw_block_io(struct xen_blkif_ring *ring,
+ 		bio->bi_bdev    = preq.bdev;
+ 		bio->bi_private = pending_req;
+ 		bio->bi_end_io  = end_block_io_op;
+-		bio->bi_rw	= operation;
++		bio_set_op_attrs(bio, operation, operation_flags);
+ 	}
+ 
+ 	atomic_set(&pending_req->pendcnt, nbio);
+@@ -1399,9 +1402,9 @@ static int dispatch_rw_block_io(struct xen_blkif_ring *ring,
+ 	/* Let the I/Os go.. */
+ 	blk_finish_plug(&plug);
+ 
+-	if (operation == READ)
++	if (operation == REQ_OP_READ)
+ 		ring->st_rd_sect += preq.nr_sects;
+-	else if (operation & WRITE)
++	else if (operation == REQ_OP_WRITE)
+ 		ring->st_wr_sect += preq.nr_sects;
+ 
+ 	return 0;
 -- 
-2.8.1
+2.7.2
+
