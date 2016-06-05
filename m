@@ -1,40 +1,124 @@
-Return-Path: <BATV+b9eeede57ded57779fe4+4685+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk,
-	keith.busch@intel.com
-Cc: linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	Sagi Grimberg <sagi@grimberg.me>
-Subject: [PATCH 1/3] block: Export blk_poll
-Date: Tue, 21 Jun 2016 18:04:19 +0200
-Message-Id: <1466525061-3686-2-git-send-email-hch@lst.de>
-In-Reply-To: <1466525061-3686-1-git-send-email-hch@lst.de>
-References: <1466525061-3686-1-git-send-email-hch@lst.de>
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+From: mchristi@redhat.com
+To: linux-f2fs-devel@lists.sourceforge.net, linux-ext4@vger.kernel.org,
+	konrad.wilk@oracle.com, drbd-dev@lists.linbit.com,
+	philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
+	linux-raid@vger.kernel.org, dm-devel@redhat.com,
+	linux-fsdevel@vger.kernel.org, linux-bcache@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-scsi@vger.kernel.org, linux-mtd@lists.infradead.org,
+	target-devel@vger.kernel.org, linux-btrfs@vger.kernel.org,
+	osd-dev@open-osd.org, xfs@oss.sgi.com, ocfs2-devel@oss.oracle.com
+Cc: Mike Christie <mchristi@redhat.com>
+Subject: [PATCH 33/45] block: prepare elevator to use REQ_OPs.
+Date: Sun,  5 Jun 2016 14:32:13 -0500
+Message-Id: <1465155145-10812-34-git-send-email-mchristi@redhat.com>
+In-Reply-To: <1465155145-10812-1-git-send-email-mchristi@redhat.com>
+References: <1465155145-10812-1-git-send-email-mchristi@redhat.com>
+Sender: linux-scsi-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-From: Sagi Grimberg <sagi@grimberg.me>
+From: Mike Christie <mchristi@redhat.com>
 
-The new NVMe over fabrics target will make use of this outside from a
-module.
+This patch converts the elevator code to use separate variables
+for the operation and flags, and to check req_op for the REQ_OP.
 
-Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Mike Christie <mchristi@redhat.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 ---
- block/blk-core.c | 1 +
- 1 file changed, 1 insertion(+)
+ block/blk-core.c         | 2 +-
+ block/cfq-iosched.c      | 4 ++--
+ block/elevator.c         | 7 +++----
+ include/linux/elevator.h | 4 ++--
+ 4 files changed, 8 insertions(+), 9 deletions(-)
 
 diff --git a/block/blk-core.c b/block/blk-core.c
-index c94c7ad..d66509f 100644
+index a68dc07..090e55d 100644
 --- a/block/blk-core.c
 +++ b/block/blk-core.c
-@@ -3390,6 +3390,7 @@ bool blk_poll(struct request_queue *q, blk_qc_t cookie)
+@@ -1081,7 +1081,7 @@ static struct request *__get_request(struct request_list *rl, int op,
+ 	if (unlikely(blk_queue_dying(q)))
+ 		return ERR_PTR(-ENODEV);
  
- 	return false;
+-	may_queue = elv_may_queue(q, op | op_flags);
++	may_queue = elv_may_queue(q, op, op_flags);
+ 	if (may_queue == ELV_MQUEUE_NO)
+ 		goto rq_starved;
+ 
+diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
+index 4a34978..3fcc598 100644
+--- a/block/cfq-iosched.c
++++ b/block/cfq-iosched.c
+@@ -4285,7 +4285,7 @@ static inline int __cfq_may_queue(struct cfq_queue *cfqq)
+ 	return ELV_MQUEUE_MAY;
  }
-+EXPORT_SYMBOL_GPL(blk_poll);
  
- #ifdef CONFIG_PM
- /**
+-static int cfq_may_queue(struct request_queue *q, int rw)
++static int cfq_may_queue(struct request_queue *q, int op, int op_flags)
+ {
+ 	struct cfq_data *cfqd = q->elevator->elevator_data;
+ 	struct task_struct *tsk = current;
+@@ -4302,7 +4302,7 @@ static int cfq_may_queue(struct request_queue *q, int rw)
+ 	if (!cic)
+ 		return ELV_MQUEUE_MAY;
+ 
+-	cfqq = cic_to_cfqq(cic, rw_is_sync(rw));
++	cfqq = cic_to_cfqq(cic, rw_is_sync(op | op_flags));
+ 	if (cfqq) {
+ 		cfq_init_prio_data(cfqq, cic);
+ 
+diff --git a/block/elevator.c b/block/elevator.c
+index c3555c9..ea9319d 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -366,8 +366,7 @@ void elv_dispatch_sort(struct request_queue *q, struct request *rq)
+ 	list_for_each_prev(entry, &q->queue_head) {
+ 		struct request *pos = list_entry_rq(entry);
+ 
+-		if ((rq->cmd_flags & REQ_DISCARD) !=
+-		    (pos->cmd_flags & REQ_DISCARD))
++		if ((req_op(rq) == REQ_OP_DISCARD) != (req_op(pos) == REQ_OP_DISCARD))
+ 			break;
+ 		if (rq_data_dir(rq) != rq_data_dir(pos))
+ 			break;
+@@ -717,12 +716,12 @@ void elv_put_request(struct request_queue *q, struct request *rq)
+ 		e->type->ops.elevator_put_req_fn(rq);
+ }
+ 
+-int elv_may_queue(struct request_queue *q, int rw)
++int elv_may_queue(struct request_queue *q, int op, int op_flags)
+ {
+ 	struct elevator_queue *e = q->elevator;
+ 
+ 	if (e->type->ops.elevator_may_queue_fn)
+-		return e->type->ops.elevator_may_queue_fn(q, rw);
++		return e->type->ops.elevator_may_queue_fn(q, op, op_flags);
+ 
+ 	return ELV_MQUEUE_MAY;
+ }
+diff --git a/include/linux/elevator.h b/include/linux/elevator.h
+index 638b324..953d286 100644
+--- a/include/linux/elevator.h
++++ b/include/linux/elevator.h
+@@ -26,7 +26,7 @@ typedef int (elevator_dispatch_fn) (struct request_queue *, int);
+ typedef void (elevator_add_req_fn) (struct request_queue *, struct request *);
+ typedef struct request *(elevator_request_list_fn) (struct request_queue *, struct request *);
+ typedef void (elevator_completed_req_fn) (struct request_queue *, struct request *);
+-typedef int (elevator_may_queue_fn) (struct request_queue *, int);
++typedef int (elevator_may_queue_fn) (struct request_queue *, int, int);
+ 
+ typedef void (elevator_init_icq_fn) (struct io_cq *);
+ typedef void (elevator_exit_icq_fn) (struct io_cq *);
+@@ -134,7 +134,7 @@ extern struct request *elv_former_request(struct request_queue *, struct request
+ extern struct request *elv_latter_request(struct request_queue *, struct request *);
+ extern int elv_register_queue(struct request_queue *q);
+ extern void elv_unregister_queue(struct request_queue *q);
+-extern int elv_may_queue(struct request_queue *, int);
++extern int elv_may_queue(struct request_queue *, int, int);
+ extern void elv_completed_request(struct request_queue *, struct request *);
+ extern int elv_set_request(struct request_queue *q, struct request *rq,
+ 			   struct bio *bio, gfp_t gfp_mask);
 -- 
-2.1.4
+2.7.2
+
