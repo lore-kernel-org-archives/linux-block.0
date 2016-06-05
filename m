@@ -1,59 +1,84 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:46130 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750911AbcFFGQr (ORCPT <rfc822;linux-block@vger.kernel.org>);
-	Mon, 6 Jun 2016 02:16:47 -0400
-Subject: Re: [PATCH 07/45] bcache: use op_is_write instead of checking for
- REQ_WRITE
-To: mchristi@redhat.com, linux-f2fs-devel@lists.sourceforge.net,
-	linux-ext4@vger.kernel.org, konrad.wilk@oracle.com,
-	drbd-dev@lists.linbit.com, philipp.reisner@linbit.com,
-	lars.ellenberg@linbit.com, linux-raid@vger.kernel.org,
-	dm-devel@redhat.com, linux-fsdevel@vger.kernel.org,
-	linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
-	linux-mtd@lists.infradead.org, target-devel@vger.kernel.org,
-	linux-btrfs@vger.kernel.org, osd-dev@open-osd.org, xfs@oss.sgi.com,
-	ocfs2-devel@oss.oracle.com
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: mchristi@redhat.com
+To: linux-f2fs-devel@lists.sourceforge.net, linux-ext4@vger.kernel.org,
+	konrad.wilk@oracle.com, drbd-dev@lists.linbit.com,
+	philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
+	linux-raid@vger.kernel.org, dm-devel@redhat.com,
+	linux-fsdevel@vger.kernel.org, linux-bcache@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-scsi@vger.kernel.org, linux-mtd@lists.infradead.org,
+	target-devel@vger.kernel.org, linux-btrfs@vger.kernel.org,
+	osd-dev@open-osd.org, xfs@oss.sgi.com, ocfs2-devel@oss.oracle.com
+Cc: Mike Christie <mchristi@redhat.com>
+Subject: [PATCH 07/45] bcache: use op_is_write instead of checking for REQ_WRITE
+Date: Sun,  5 Jun 2016 14:31:47 -0500
+Message-Id: <1465155145-10812-8-git-send-email-mchristi@redhat.com>
+In-Reply-To: <1465155145-10812-1-git-send-email-mchristi@redhat.com>
 References: <1465155145-10812-1-git-send-email-mchristi@redhat.com>
- <1465155145-10812-8-git-send-email-mchristi@redhat.com>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <5755154C.7030007@suse.de>
-Date: Mon, 6 Jun 2016 08:16:44 +0200
-MIME-Version: 1.0
-In-Reply-To: <1465155145-10812-8-git-send-email-mchristi@redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-On 06/05/2016 09:31 PM, mchristi@redhat.com wrote:
-> From: Mike Christie <mchristi@redhat.com>
-> 
-> We currently set REQ_WRITE/WRITE for all non READ IOs
-> like discard, flush, writesame, etc. In the next patches where we
-> no longer set up the op as a bitmap, we will not be able to
-> detect a operation direction like writesame by testing if REQ_WRITE is
-> set.
-> 
-> This has bcache use the op_is_write helper which will do the right
-> thing.
-> 
-> Signed-off-by: Mike Christie <mchristi@redhat.com>
-> ---
->  drivers/md/bcache/io.c      | 2 +-
->  drivers/md/bcache/request.c | 6 +++---
->  2 files changed, 4 insertions(+), 4 deletions(-)
-> 
-(Could probably folded together with the two previous patches)
+From: Mike Christie <mchristi@redhat.com>
 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+We currently set REQ_WRITE/WRITE for all non READ IOs
+like discard, flush, writesame, etc. In the next patches where we
+no longer set up the op as a bitmap, we will not be able to
+detect a operation direction like writesame by testing if REQ_WRITE is
+set.
 
-Cheers,
+This has bcache use the op_is_write helper which will do the right
+thing.
 
-Hannes
+Signed-off-by: Mike Christie <mchristi@redhat.com>
+---
+ drivers/md/bcache/io.c      | 2 +-
+ drivers/md/bcache/request.c | 6 +++---
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/md/bcache/io.c b/drivers/md/bcache/io.c
+index 86a0bb8..fd885cc 100644
+--- a/drivers/md/bcache/io.c
++++ b/drivers/md/bcache/io.c
+@@ -111,7 +111,7 @@ void bch_bbio_count_io_errors(struct cache_set *c, struct bio *bio,
+ 	struct bbio *b = container_of(bio, struct bbio, bio);
+ 	struct cache *ca = PTR_CACHE(c, &b->key, 0);
+ 
+-	unsigned threshold = bio->bi_rw & REQ_WRITE
++	unsigned threshold = op_is_write(bio_op(bio))
+ 		? c->congested_write_threshold_us
+ 		: c->congested_read_threshold_us;
+ 
+diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
+index 25fa844..6b85a23 100644
+--- a/drivers/md/bcache/request.c
++++ b/drivers/md/bcache/request.c
+@@ -383,7 +383,7 @@ static bool check_should_bypass(struct cached_dev *dc, struct bio *bio)
+ 
+ 	if (mode == CACHE_MODE_NONE ||
+ 	    (mode == CACHE_MODE_WRITEAROUND &&
+-	     (bio->bi_rw & REQ_WRITE)))
++	     op_is_write(bio_op(bio))))
+ 		goto skip;
+ 
+ 	if (bio->bi_iter.bi_sector & (c->sb.block_size - 1) ||
+@@ -404,7 +404,7 @@ static bool check_should_bypass(struct cached_dev *dc, struct bio *bio)
+ 
+ 	if (!congested &&
+ 	    mode == CACHE_MODE_WRITEBACK &&
+-	    (bio->bi_rw & REQ_WRITE) &&
++	    op_is_write(bio_op(bio)) &&
+ 	    (bio->bi_rw & REQ_SYNC))
+ 		goto rescale;
+ 
+@@ -657,7 +657,7 @@ static inline struct search *search_alloc(struct bio *bio,
+ 	s->cache_miss		= NULL;
+ 	s->d			= d;
+ 	s->recoverable		= 1;
+-	s->write		= (bio->bi_rw & REQ_WRITE) != 0;
++	s->write		= op_is_write(bio_op(bio));
+ 	s->read_dirty_data	= 0;
+ 	s->start_time		= jiffies;
+ 
 -- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: F. Imend�rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG N�rnberg)
+2.7.2
+
