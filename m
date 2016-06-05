@@ -1,71 +1,141 @@
-Return-Path: <arvindkumar@vmware.com>
-From: Arvind Kumar <arvindkumar@vmware.com>
-To: Sitsofe Wheeler <sitsofe@gmail.com>, Tom Yan <tom.ty89@gmail.com>
-CC: "Darrick J. Wong" <darrick.wong@oracle.com>, Shaohua Li <shli@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>, VMware PV-Drivers <pv-drivers@vmware.com>,
-	"linux-raid@vger.kernel.org" <linux-raid@vger.kernel.org>,
-	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Petr Vandrovec
-	<petr@vmware.com>
-Subject: Re: BLKZEROOUT not zeroing md dev on VMDK
-Date: Wed, 15 Jun 2016 18:17:37 +0000
-Message-ID: <1466014718999.6976@vmware.com>
-References: <20160518223616.GA409@sucs.org>
-	<20160527041824.GC9418@birch.djwong.org>
-	<CALjAwxgkgPZdXFkOuD-7Dsbxf9oVEGuXTDLnyqu8rTrJio_4mA@mail.gmail.com>
-	<CAGnHSEn0ntEw_dwFNqG6CdgwcpHzQie88jgA21uioKhBbcByTg@mail.gmail.com>,<CALjAwxgdr1zSgZZzNA9BQ8Ta+UuutJ6iuBnqZfmV-BTCDL2PbA@mail.gmail.com>
-In-Reply-To: <CALjAwxgdr1zSgZZzNA9BQ8Ta+UuutJ6iuBnqZfmV-BTCDL2PbA@mail.gmail.com>
-Content-Type: text/plain; charset="iso-8859-1"
-MIME-Version: 1.0
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+From: mchristi@redhat.com
+To: linux-f2fs-devel@lists.sourceforge.net, linux-ext4@vger.kernel.org,
+	konrad.wilk@oracle.com, drbd-dev@lists.linbit.com,
+	philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
+	linux-raid@vger.kernel.org, dm-devel@redhat.com,
+	linux-fsdevel@vger.kernel.org, linux-bcache@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-scsi@vger.kernel.org, linux-mtd@lists.infradead.org,
+	target-devel@vger.kernel.org, linux-btrfs@vger.kernel.org,
+	osd-dev@open-osd.org, xfs@oss.sgi.com, ocfs2-devel@oss.oracle.com
+Cc: Mike Christie <mchristi@redhat.com>
+Subject: [PATCH 22/45] pm: use bio op accessors
+Date: Sun,  5 Jun 2016 14:32:02 -0500
+Message-Id: <1465155145-10812-23-git-send-email-mchristi@redhat.com>
+In-Reply-To: <1465155145-10812-1-git-send-email-mchristi@redhat.com>
+References: <1465155145-10812-1-git-send-email-mchristi@redhat.com>
+Sender: linux-scsi-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-It is possibly some race. We saw a WRITE SAME related issue in past for whi=
-ch Petr sent out a patch but looks like the patch didn't make it. :(=0A=
-=0A=
-https://groups.google.com/forum/#!topic/linux.kernel/1WGDSlyY0y0=0A=
-=0A=
-Thanks!=0A=
-Arvind=0A=
-________________________________________=0A=
-From: Sitsofe Wheeler <sitsofe@gmail.com>=0A=
-Sent: Tuesday, May 31, 2016 10:04 PM=0A=
-To: Tom Yan=0A=
-Cc: Darrick J. Wong; Shaohua Li; Jens Axboe; Arvind Kumar; VMware PV-Driver=
-s; linux-raid@vger.kernel.org; linux-scsi@vger.kernel.org; linux-block@vger=
-.kernel.org; linux-kernel@vger.kernel.org=0A=
-Subject: Re: BLKZEROOUT not zeroing md dev on VMDK=0A=
-=0A=
-On 27 May 2016 at 10:30, Tom Yan <tom.ty89@gmail.com> wrote:=0A=
-> There seems to be some sort of race condition between=0A=
-> blkdev_issue_zeroout() and the scsi disk driver (disabling write same=0A=
-> after an illegal request). On my UAS drive, sometimes `blkdiscard -z=0A=
-> /dev/sdX` will return right away, even though if I then check=0A=
-> `write_same_max_bytes` it has turned 0. Sometimes it will just write=0A=
-> zero with SCSI WRITE even if `write_same_max_bytes` is 33553920 before=0A=
-> I issue `blkdiscard -z` (`write_same_max_bytes` also turned 0, as=0A=
-> expected).=0A=
->=0A=
-> Not sure if it is directly related to the case here though.=0A=
-=0A=
-I'm not aware of hitting that particular problem myself directly on=0A=
-the underlying "SCSI" device but the patch on=0A=
-https://urldefense.proofpoint.com/v2/url?u=3Dhttps-3A__patchwork.kernel.org=
-_patch_9137311_&d=3DCwIBaQ&c=3DSqcl0Ez6M0X8aeM67LKIiDJAXVeAw-YihVMNtXt-uEs&=
-r=3DbUMaNc7nC9xbXtaMJrOvIIPNpPH0chY2kdRsskQn6GY&m=3Drx_5ntfhkt2GOpfjpiQjoCb=
-5n4gCY7jKznXO0gKYcVI&s=3DW1F45VBu8NDxu2ImcbKM5b3d6UnUCLGgH8xEM9e6JQk&e=3D  =
-should be able to resolve=0A=
-that issue. Could you test it and follow up on=0A=
-https://urldefense.proofpoint.com/v2/url?u=3Dhttp-3A__permalink.gmane.org_g=
-mane.linux.kernel_2229377&d=3DCwIBaQ&c=3DSqcl0Ez6M0X8aeM67LKIiDJAXVeAw-YihV=
-MNtXt-uEs&r=3DbUMaNc7nC9xbXtaMJrOvIIPNpPH0chY2kdRsskQn6GY&m=3Drx_5ntfhkt2GO=
-pfjpiQjoCb5n4gCY7jKznXO0gKYcVI&s=3D9ekqmTk18vzcwcY0SSMF8AZnJ_lWezFIM8tDvQqe=
-DHI&e=3D  ? I'm hoping=0A=
-more testing reports will lead to the patch being reviewed and=0A=
-accepted sooner rather than later as it's currently stalled...=0A=
-=0A=
---=0A=
-Sitsofe | https://urldefense.proofpoint.com/v2/url?u=3Dhttp-3A__sucs.org_-7=
-Esits_&d=3DCwIBaQ&c=3DSqcl0Ez6M0X8aeM67LKIiDJAXVeAw-YihVMNtXt-uEs&r=3DbUMaN=
-c7nC9xbXtaMJrOvIIPNpPH0chY2kdRsskQn6GY&m=3Drx_5ntfhkt2GOpfjpiQjoCb5n4gCY7jK=
-znXO0gKYcVI&s=3DarwniVbdl5KJZfyreWLhq-WUlgvKAf_eW1i6D2GbFGQ&e=3D=0A=
+From: Mike Christie <mchristi@redhat.com>
+
+Separate the op from the rq_flag_bits and have the pm code
+set/get the bio using bio_set_op_attrs/bio_op.
+
+Signed-off-by: Mike Christie <mchristi@redhat.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+---
+ kernel/power/swap.c | 30 ++++++++++++++++++------------
+ 1 file changed, 18 insertions(+), 12 deletions(-)
+
+diff --git a/kernel/power/swap.c b/kernel/power/swap.c
+index be227f5..c1aaac4 100644
+--- a/kernel/power/swap.c
++++ b/kernel/power/swap.c
+@@ -261,7 +261,7 @@ static void hib_end_io(struct bio *bio)
+ 	bio_put(bio);
+ }
+ 
+-static int hib_submit_io(int rw, pgoff_t page_off, void *addr,
++static int hib_submit_io(int op, int op_flags, pgoff_t page_off, void *addr,
+ 		struct hib_bio_batch *hb)
+ {
+ 	struct page *page = virt_to_page(addr);
+@@ -271,7 +271,7 @@ static int hib_submit_io(int rw, pgoff_t page_off, void *addr,
+ 	bio = bio_alloc(__GFP_RECLAIM | __GFP_HIGH, 1);
+ 	bio->bi_iter.bi_sector = page_off * (PAGE_SIZE >> 9);
+ 	bio->bi_bdev = hib_resume_bdev;
+-	bio->bi_rw = rw;
++	bio_set_op_attrs(bio, op, op_flags);
+ 
+ 	if (bio_add_page(bio, page, PAGE_SIZE, 0) < PAGE_SIZE) {
+ 		printk(KERN_ERR "PM: Adding page to bio failed at %llu\n",
+@@ -307,7 +307,8 @@ static int mark_swapfiles(struct swap_map_handle *handle, unsigned int flags)
+ {
+ 	int error;
+ 
+-	hib_submit_io(READ_SYNC, swsusp_resume_block, swsusp_header, NULL);
++	hib_submit_io(REQ_OP_READ, READ_SYNC, swsusp_resume_block,
++		      swsusp_header, NULL);
+ 	if (!memcmp("SWAP-SPACE",swsusp_header->sig, 10) ||
+ 	    !memcmp("SWAPSPACE2",swsusp_header->sig, 10)) {
+ 		memcpy(swsusp_header->orig_sig,swsusp_header->sig, 10);
+@@ -316,8 +317,8 @@ static int mark_swapfiles(struct swap_map_handle *handle, unsigned int flags)
+ 		swsusp_header->flags = flags;
+ 		if (flags & SF_CRC32_MODE)
+ 			swsusp_header->crc32 = handle->crc32;
+-		error = hib_submit_io(WRITE_SYNC, swsusp_resume_block,
+-					swsusp_header, NULL);
++		error = hib_submit_io(REQ_OP_WRITE, WRITE_SYNC,
++				      swsusp_resume_block, swsusp_header, NULL);
+ 	} else {
+ 		printk(KERN_ERR "PM: Swap header not found!\n");
+ 		error = -ENODEV;
+@@ -390,7 +391,7 @@ static int write_page(void *buf, sector_t offset, struct hib_bio_batch *hb)
+ 	} else {
+ 		src = buf;
+ 	}
+-	return hib_submit_io(WRITE_SYNC, offset, src, hb);
++	return hib_submit_io(REQ_OP_WRITE, WRITE_SYNC, offset, src, hb);
+ }
+ 
+ static void release_swap_writer(struct swap_map_handle *handle)
+@@ -993,7 +994,8 @@ static int get_swap_reader(struct swap_map_handle *handle,
+ 			return -ENOMEM;
+ 		}
+ 
+-		error = hib_submit_io(READ_SYNC, offset, tmp->map, NULL);
++		error = hib_submit_io(REQ_OP_READ, READ_SYNC, offset,
++				      tmp->map, NULL);
+ 		if (error) {
+ 			release_swap_reader(handle);
+ 			return error;
+@@ -1017,7 +1019,7 @@ static int swap_read_page(struct swap_map_handle *handle, void *buf,
+ 	offset = handle->cur->entries[handle->k];
+ 	if (!offset)
+ 		return -EFAULT;
+-	error = hib_submit_io(READ_SYNC, offset, buf, hb);
++	error = hib_submit_io(REQ_OP_READ, READ_SYNC, offset, buf, hb);
+ 	if (error)
+ 		return error;
+ 	if (++handle->k >= MAP_PAGE_ENTRIES) {
+@@ -1526,7 +1528,8 @@ int swsusp_check(void)
+ 	if (!IS_ERR(hib_resume_bdev)) {
+ 		set_blocksize(hib_resume_bdev, PAGE_SIZE);
+ 		clear_page(swsusp_header);
+-		error = hib_submit_io(READ_SYNC, swsusp_resume_block,
++		error = hib_submit_io(REQ_OP_READ, READ_SYNC,
++					swsusp_resume_block,
+ 					swsusp_header, NULL);
+ 		if (error)
+ 			goto put;
+@@ -1534,7 +1537,8 @@ int swsusp_check(void)
+ 		if (!memcmp(HIBERNATE_SIG, swsusp_header->sig, 10)) {
+ 			memcpy(swsusp_header->sig, swsusp_header->orig_sig, 10);
+ 			/* Reset swap signature now */
+-			error = hib_submit_io(WRITE_SYNC, swsusp_resume_block,
++			error = hib_submit_io(REQ_OP_WRITE, WRITE_SYNC,
++						swsusp_resume_block,
+ 						swsusp_header, NULL);
+ 		} else {
+ 			error = -EINVAL;
+@@ -1578,10 +1582,12 @@ int swsusp_unmark(void)
+ {
+ 	int error;
+ 
+-	hib_submit_io(READ_SYNC, swsusp_resume_block, swsusp_header, NULL);
++	hib_submit_io(REQ_OP_READ, READ_SYNC, swsusp_resume_block,
++		      swsusp_header, NULL);
+ 	if (!memcmp(HIBERNATE_SIG,swsusp_header->sig, 10)) {
+ 		memcpy(swsusp_header->sig,swsusp_header->orig_sig, 10);
+-		error = hib_submit_io(WRITE_SYNC, swsusp_resume_block,
++		error = hib_submit_io(REQ_OP_WRITE, WRITE_SYNC,
++					swsusp_resume_block,
+ 					swsusp_header, NULL);
+ 	} else {
+ 		printk(KERN_ERR "PM: Cannot find swsusp signature!\n");
+-- 
+2.7.2
+
