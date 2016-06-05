@@ -1,176 +1,148 @@
-Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: tglx@linutronix.de,
-	axboe@fb.com
-Subject: [PATCH 04/13] irq: Use affinity hint in irqdesc allocation
-Date: Tue, 14 Jun 2016 21:58:57 +0200
-Message-Id: <1465934346-20648-5-git-send-email-hch@lst.de>
-In-Reply-To: <1465934346-20648-1-git-send-email-hch@lst.de>
-References: <1465934346-20648-1-git-send-email-hch@lst.de>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
-List-Post: <mailto:linux-nvme@lists.infradead.org>
-List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
-Cc: linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
-Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+From: mchristi@redhat.com
+To: linux-f2fs-devel@lists.sourceforge.net, linux-ext4@vger.kernel.org,
+	konrad.wilk@oracle.com, drbd-dev@lists.linbit.com,
+	philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
+	linux-raid@vger.kernel.org, dm-devel@redhat.com,
+	linux-fsdevel@vger.kernel.org, linux-bcache@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-scsi@vger.kernel.org, linux-mtd@lists.infradead.org,
+	target-devel@vger.kernel.org, linux-btrfs@vger.kernel.org,
+	osd-dev@open-osd.org, xfs@oss.sgi.com, ocfs2-devel@oss.oracle.com
+Cc: Mike Christie <mchristi@redhat.com>
+Subject: [PATCH 17/45] xfs: use bio op accessors
+Date: Sun,  5 Jun 2016 14:31:57 -0500
+Message-Id: <1465155145-10812-18-git-send-email-mchristi@redhat.com>
+In-Reply-To: <1465155145-10812-1-git-send-email-mchristi@redhat.com>
+References: <1465155145-10812-1-git-send-email-mchristi@redhat.com>
+Sender: linux-scsi-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Use the affinity hint in the irqdesc allocator. The hint is used to determine
-the node for the allocation and to set the affinity of the interrupt.
+From: Mike Christie <mchristi@redhat.com>
 
-If multiple interrupts are allocated (multi-MSI) then the allocator iterates
-over the cpumask and for each set cpu it allocates on their node and sets the
-initial affinity to that cpu.
+Separate the op from the rq_flag_bits and have xfs
+set/get the bio using bio_set_op_attrs/bio_op.
 
-If a single interrupt is allocated (MSI-X) then the allocator uses the first
-cpu in the mask to compute the allocation node and uses the mask for the
-initial affinity setting.
-
-Interrupts set up this way are marked with the AFFINITY_MANAGED flag to
-prevent userspace from messing with their affinity settings.
-
-Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+Signed-off-by: Mike Christie <mchristi@redhat.com>
 ---
- kernel/irq/irqdesc.c | 51 +++++++++++++++++++++++++++++++++++++++------------
- 1 file changed, 39 insertions(+), 12 deletions(-)
 
-diff --git a/kernel/irq/irqdesc.c b/kernel/irq/irqdesc.c
-index b8df4fc..a623b44 100644
---- a/kernel/irq/irqdesc.c
-+++ b/kernel/irq/irqdesc.c
-@@ -68,9 +68,13 @@ static int alloc_masks(struct irq_desc *desc, gfp_t gfp, int node)
- 	return 0;
+v8:
+1. Handled changes due to rebase and dropped signed offs due to
+upstream changes since last review.
+
+ fs/xfs/xfs_aops.c | 12 ++++--------
+ fs/xfs/xfs_buf.c  | 26 ++++++++++++++------------
+ 2 files changed, 18 insertions(+), 20 deletions(-)
+
+diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
+index 0cd1603..87d2b21 100644
+--- a/fs/xfs/xfs_aops.c
++++ b/fs/xfs/xfs_aops.c
+@@ -438,10 +438,8 @@ xfs_submit_ioend(
+ 
+ 	ioend->io_bio->bi_private = ioend;
+ 	ioend->io_bio->bi_end_io = xfs_end_bio;
+-	if (wbc->sync_mode == WB_SYNC_ALL)
+-		ioend->io_bio->bi_rw = WRITE_SYNC;
+-	else
+-		ioend->io_bio->bi_rw = WRITE;
++	bio_set_op_attrs(ioend->io_bio, REQ_OP_WRITE,
++			 (wbc->sync_mode == WB_SYNC_ALL) ? WRITE_SYNC : 0);
+ 	/*
+ 	 * If we are failing the IO now, just mark the ioend with an
+ 	 * error and finish it. This will run IO completion immediately
+@@ -512,10 +510,8 @@ xfs_chain_bio(
+ 
+ 	bio_chain(ioend->io_bio, new);
+ 	bio_get(ioend->io_bio);		/* for xfs_destroy_ioend */
+-	if (wbc->sync_mode == WB_SYNC_ALL)
+-		ioend->io_bio->bi_rw = WRITE_SYNC;
+-	else
+-		ioend->io_bio->bi_rw = WRITE;
++	bio_set_op_attrs(ioend->io_bio, REQ_OP_WRITE,
++			  (wbc->sync_mode == WB_SYNC_ALL) ? WRITE_SYNC : 0);
+ 	submit_bio(ioend->io_bio);
+ 	ioend->io_bio = new;
  }
- 
--static void desc_smp_init(struct irq_desc *desc, int node)
-+static void desc_smp_init(struct irq_desc *desc, int node,
-+			  const struct cpumask *affinity)
+diff --git a/fs/xfs/xfs_buf.c b/fs/xfs/xfs_buf.c
+index 0777c67..d8acd37 100644
+--- a/fs/xfs/xfs_buf.c
++++ b/fs/xfs/xfs_buf.c
+@@ -1127,7 +1127,8 @@ xfs_buf_ioapply_map(
+ 	int		map,
+ 	int		*buf_offset,
+ 	int		*count,
+-	int		rw)
++	int		op,
++	int		op_flags)
  {
--	cpumask_copy(desc->irq_common_data.affinity, irq_default_affinity);
-+	if (!affinity)
-+		affinity = irq_default_affinity;
-+	cpumask_copy(desc->irq_common_data.affinity, affinity);
-+
- #ifdef CONFIG_GENERIC_PENDING_IRQ
- 	cpumask_clear(desc->pending_mask);
- #endif
-@@ -82,11 +86,12 @@ static void desc_smp_init(struct irq_desc *desc, int node)
- #else
- static inline int
- alloc_masks(struct irq_desc *desc, gfp_t gfp, int node) { return 0; }
--static inline void desc_smp_init(struct irq_desc *desc, int node) { }
-+static inline void
-+desc_smp_init(struct irq_desc *desc, int node, const struct cpumask *affinity) { }
- #endif
+ 	int		page_index;
+ 	int		total_nr_pages = bp->b_page_count;
+@@ -1166,7 +1167,7 @@ next_chunk:
+ 	bio->bi_iter.bi_sector = sector;
+ 	bio->bi_end_io = xfs_buf_bio_end_io;
+ 	bio->bi_private = bp;
+-	bio->bi_rw = rw;
++	bio_set_op_attrs(bio, op, op_flags);
  
- static void desc_set_defaults(unsigned int irq, struct irq_desc *desc, int node,
--		struct module *owner)
-+			      const struct cpumask *affinity, struct module *owner)
+ 	for (; size && nr_pages; nr_pages--, page_index++) {
+ 		int	rbytes, nbytes = PAGE_SIZE - offset;
+@@ -1210,7 +1211,8 @@ _xfs_buf_ioapply(
+ 	struct xfs_buf	*bp)
  {
- 	int cpu;
+ 	struct blk_plug	plug;
+-	int		rw;
++	int		op;
++	int		op_flags = 0;
+ 	int		offset;
+ 	int		size;
+ 	int		i;
+@@ -1229,14 +1231,13 @@ _xfs_buf_ioapply(
+ 		bp->b_ioend_wq = bp->b_target->bt_mount->m_buf_workqueue;
  
-@@ -107,7 +112,7 @@ static void desc_set_defaults(unsigned int irq, struct irq_desc *desc, int node,
- 	desc->owner = owner;
- 	for_each_possible_cpu(cpu)
- 		*per_cpu_ptr(desc->kstat_irqs, cpu) = 0;
--	desc_smp_init(desc, node);
-+	desc_smp_init(desc, node, affinity);
- }
+ 	if (bp->b_flags & XBF_WRITE) {
++		op = REQ_OP_WRITE;
+ 		if (bp->b_flags & XBF_SYNCIO)
+-			rw = WRITE_SYNC;
+-		else
+-			rw = WRITE;
++			op_flags = WRITE_SYNC;
+ 		if (bp->b_flags & XBF_FUA)
+-			rw |= REQ_FUA;
++			op_flags |= REQ_FUA;
+ 		if (bp->b_flags & XBF_FLUSH)
+-			rw |= REQ_FLUSH;
++			op_flags |= REQ_FLUSH;
  
- int nr_irqs = NR_IRQS;
-@@ -158,7 +163,9 @@ void irq_unlock_sparse(void)
- 	mutex_unlock(&sparse_irq_lock);
- }
- 
--static struct irq_desc *alloc_desc(int irq, int node, struct module *owner)
-+static struct irq_desc *alloc_desc(int irq, int node, unsigned int flags,
-+				   const struct cpumask *affinity,
-+				   struct module *owner)
- {
- 	struct irq_desc *desc;
- 	gfp_t gfp = GFP_KERNEL;
-@@ -178,7 +185,8 @@ static struct irq_desc *alloc_desc(int irq, int node, struct module *owner)
- 	lockdep_set_class(&desc->lock, &irq_desc_lock_class);
- 	init_rcu_head(&desc->rcu);
- 
--	desc_set_defaults(irq, desc, node, owner);
-+	desc_set_defaults(irq, desc, node, affinity, owner);
-+	irqd_set(&desc->irq_data, flags);
- 
- 	return desc;
- 
-@@ -225,11 +233,30 @@ static void free_desc(unsigned int irq)
- static int alloc_descs(unsigned int start, unsigned int cnt, int node,
- 		       const struct cpumask *affinity, struct module *owner)
- {
-+	const struct cpumask *mask = NULL;
- 	struct irq_desc *desc;
--	int i;
-+	unsigned int flags;
-+	int i, cpu = -1;
-+
-+	if (affinity && cpumask_empty(affinity))
-+		return -EINVAL;
-+
-+	flags = affinity ? IRQD_AFFINITY_MANAGED : 0;
- 
- 	for (i = 0; i < cnt; i++) {
--		desc = alloc_desc(start + i, node, owner);
-+		if (affinity) {
-+			cpu = cpumask_next(cpu, affinity);
-+			if (cpu >= nr_cpu_ids)
-+				cpu = cpumask_first(affinity);
-+			node = cpu_to_node(cpu);
-+
-+			/*
-+			 * For single allocations we use the caller provided
-+			 * mask otherwise we use the mask of the target cpu
-+			 */
-+			mask = cnt == 1 ? affinity : cpumask_of(cpu);
-+		}
-+		desc = alloc_desc(start + i, node, flags, mask, owner);
- 		if (!desc)
- 			goto err;
- 		mutex_lock(&sparse_irq_lock);
-@@ -277,7 +304,7 @@ int __init early_irq_init(void)
- 		nr_irqs = initcnt;
- 
- 	for (i = 0; i < initcnt; i++) {
--		desc = alloc_desc(i, node, NULL);
-+		desc = alloc_desc(i, node, 0, NULL, NULL);
- 		set_bit(i, allocated_irqs);
- 		irq_insert_desc(i, desc);
+ 		/*
+ 		 * Run the write verifier callback function if it exists. If
+@@ -1266,13 +1267,14 @@ _xfs_buf_ioapply(
+ 			}
+ 		}
+ 	} else if (bp->b_flags & XBF_READ_AHEAD) {
+-		rw = READA;
++		op = REQ_OP_READ;
++		op_flags = REQ_RAHEAD;
+ 	} else {
+-		rw = READ;
++		op = REQ_OP_READ;
  	}
-@@ -311,7 +338,7 @@ int __init early_irq_init(void)
- 		alloc_masks(&desc[i], GFP_KERNEL, node);
- 		raw_spin_lock_init(&desc[i].lock);
- 		lockdep_set_class(&desc[i].lock, &irq_desc_lock_class);
--		desc_set_defaults(i, &desc[i], node, NULL);
-+		desc_set_defaults(i, &desc[i], node, NULL, NULL);
- 	}
- 	return arch_early_irq_init();
- }
-@@ -328,7 +355,7 @@ static void free_desc(unsigned int irq)
- 	unsigned long flags;
  
- 	raw_spin_lock_irqsave(&desc->lock, flags);
--	desc_set_defaults(irq, desc, irq_desc_get_node(desc), NULL);
-+	desc_set_defaults(irq, desc, irq_desc_get_node(desc), NULL, NULL);
- 	raw_spin_unlock_irqrestore(&desc->lock, flags);
- }
+ 	/* we only use the buffer cache for meta-data */
+-	rw |= REQ_META;
++	op_flags |= REQ_META;
  
+ 	/*
+ 	 * Walk all the vectors issuing IO on them. Set up the initial offset
+@@ -1284,7 +1286,7 @@ _xfs_buf_ioapply(
+ 	size = BBTOB(bp->b_io_length);
+ 	blk_start_plug(&plug);
+ 	for (i = 0; i < bp->b_map_count; i++) {
+-		xfs_buf_ioapply_map(bp, i, &offset, &size, rw);
++		xfs_buf_ioapply_map(bp, i, &offset, &size, op, op_flags);
+ 		if (bp->b_error)
+ 			break;
+ 		if (size <= 0)
 -- 
-2.1.4
+2.7.2
 
-
-_______________________________________________
-Linux-nvme mailing list
-Linux-nvme@lists.infradead.org
-http://lists.infradead.org/mailman/listinfo/linux-nvme
