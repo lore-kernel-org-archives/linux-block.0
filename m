@@ -1,107 +1,224 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.136]:60164 "EHLO mail.kernel.org"
+Received: from mx1.redhat.com ([209.132.183.28]:46663 "EHLO mx1.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1425804AbcFHTtE (ORCPT <rfc822;linux-block@vger.kernel.org>);
-	Wed, 8 Jun 2016 15:49:04 -0400
-From: Ming Lin <mlin@kernel.org>
-To: linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
-Cc: Christoph Hellwig <hch@lst.de>,
-	Keith Busch <keith.busch@intel.com>, Jens Axboe <axboe@fb.com>,
-	James Smart <james.smart@broadcom.com>
-Subject: [PATCH 2/2] nvme-rdma: check the number of hw queues mapped
-Date: Wed,  8 Jun 2016 15:48:12 -0400
-Message-Id: <1465415292-9416-3-git-send-email-mlin@kernel.org>
-In-Reply-To: <1465415292-9416-1-git-send-email-mlin@kernel.org>
-References: <1465415292-9416-1-git-send-email-mlin@kernel.org>
+	id S1752762AbcFETdu (ORCPT <rfc822;linux-block@vger.kernel.org>);
+	Sun, 5 Jun 2016 15:33:50 -0400
+From: mchristi@redhat.com
+To: linux-f2fs-devel@lists.sourceforge.net, linux-ext4@vger.kernel.org,
+	konrad.wilk@oracle.com, drbd-dev@lists.linbit.com,
+	philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
+	linux-raid@vger.kernel.org, dm-devel@redhat.com,
+	linux-fsdevel@vger.kernel.org, linux-bcache@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-scsi@vger.kernel.org, linux-mtd@lists.infradead.org,
+	target-devel@vger.kernel.org, linux-btrfs@vger.kernel.org,
+	osd-dev@open-osd.org, xfs@oss.sgi.com, ocfs2-devel@oss.oracle.com
+Cc: Mike Christie <mchristi@redhat.com>
+Subject: [PATCH 34/45] blkg_rwstat: separate op from flags
+Date: Sun,  5 Jun 2016 14:32:14 -0500
+Message-Id: <1465155145-10812-35-git-send-email-mchristi@redhat.com>
+In-Reply-To: <1465155145-10812-1-git-send-email-mchristi@redhat.com>
+References: <1465155145-10812-1-git-send-email-mchristi@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Ming Lin <ming.l@samsung.com>
+From: Mike Christie <mchristi@redhat.com>
 
-The connect_q requires all blk-mq hw queues being mapped to cpu
-sw queues. Otherwise, we got below crash.
+The bio and request operation and flags are going to be separate
+definitions, so we cannot pass them in as a bitmap. This patch
+converts the blkg_rwstat code and its caller, cfq, to pass in the
+values separately.
 
-[42139.726531] BUG: unable to handle kernel NULL pointer dereference at 0000000000000004
-[42139.734962] IP: [<ffffffff8130e3b5>] blk_mq_get_tag+0x65/0xb0
-
-[42139.977715] Stack:
-[42139.980382]  0000000081306e9b ffff880035dbc380 ffff88006f71bbf8 ffffffff8130a016
-[42139.988436]  ffff880035dbc380 0000000000000000 0000000000000001 ffff88011887f000
-[42139.996497]  ffff88006f71bc50 ffffffff8130bc2a ffff880035dbc380 ffff880000000002
-[42140.004560] Call Trace:
-[42140.007681]  [<ffffffff8130a016>] __blk_mq_alloc_request+0x16/0x200
-[42140.014584]  [<ffffffff8130bc2a>] blk_mq_alloc_request_hctx+0x8a/0xd0
-[42140.021662]  [<ffffffffc087f28e>] nvme_alloc_request+0x2e/0xa0 [nvme_core]
-[42140.029171]  [<ffffffffc087f32c>] __nvme_submit_sync_cmd+0x2c/0xc0 [nvme_core]
-[42140.037024]  [<ffffffffc08d514a>] nvmf_connect_io_queue+0x10a/0x160 [nvme_fabrics]
-[42140.045228]  [<ffffffffc08de255>] nvme_rdma_connect_io_queues+0x35/0x50 [nvme_rdma]
-[42140.053517]  [<ffffffffc08e0690>] nvme_rdma_create_ctrl+0x490/0x6f0 [nvme_rdma]
-[42140.061464]  [<ffffffffc08d4e48>] nvmf_dev_write+0x728/0x920 [nvme_fabrics]
-[42140.069072]  [<ffffffff81197da3>] __vfs_write+0x23/0x120
-[42140.075049]  [<ffffffff812de193>] ? apparmor_file_permission+0x13/0x20
-[42140.082225]  [<ffffffff812a3ab8>] ? security_file_permission+0x38/0xc0
-[42140.089391]  [<ffffffff81198744>] ? rw_verify_area+0x44/0xb0
-[42140.095706]  [<ffffffff8119898d>] vfs_write+0xad/0x1a0
-[42140.101508]  [<ffffffff81199c71>] SyS_write+0x41/0xa0
-[42140.107213]  [<ffffffff816f1af6>] entry_SYSCALL_64_fastpath+0x1e/0xa8
-
-Say, on a machine with 8 CPUs, we create 6 io queues,
-
-echo "transport=rdma,traddr=192.168.2.2,nqn=testiqn,nr_io_queues=6" \
-		> /dev/nvme-fabrics
-
-Then actually only 4 hw queues were mapped to CPU sw queues.
-
-HW Queue 1 <-> CPU 0,4
-HW Queue 2 <-> CPU 1,5
-HW Queue 3 <-> None
-HW Queue 4 <-> CPU 2,6
-HW Queue 5 <-> CPU 3,7
-HW Queue 6 <-> None
-
-So when connecting to IO queue 3, it will crash in blk_mq_get_tag()
-because hctx->tags is NULL.
-
-This patches doesn't really fix the hw/sw queues mapping, but it returns
-error if not all hw queues were mapped.
-
-"nvme nvme4: 6 hw queues created, but only 4 were mapped to sw queues"
-
-Reported-by: James Smart <james.smart@broadcom.com>
-Signed-off-by: Ming Lin <ming.l@samsung.com>
+Signed-off-by: Mike Christie <mchristi@redhat.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 ---
- drivers/nvme/host/rdma.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ block/cfq-iosched.c        | 49 +++++++++++++++++++++++++++-------------------
+ include/linux/blk-cgroup.h | 13 ++++++------
+ 2 files changed, 36 insertions(+), 26 deletions(-)
 
-diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
-index 4edc912..2e8f556 100644
---- a/drivers/nvme/host/rdma.c
-+++ b/drivers/nvme/host/rdma.c
-@@ -1771,6 +1771,7 @@ static const struct nvme_ctrl_ops nvme_rdma_ctrl_ops = {
- static int nvme_rdma_create_io_queues(struct nvme_rdma_ctrl *ctrl)
- {
- 	struct nvmf_ctrl_options *opts = ctrl->ctrl.opts;
-+	int hw_queue_mapped;
- 	int ret;
+diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
+index 3fcc598..3dafdba 100644
+--- a/block/cfq-iosched.c
++++ b/block/cfq-iosched.c
+@@ -667,9 +667,10 @@ static inline void cfqg_put(struct cfq_group *cfqg)
+ } while (0)
  
- 	ret = nvme_set_queue_count(&ctrl->ctrl, &opts->nr_io_queues);
-@@ -1819,6 +1820,16 @@ static int nvme_rdma_create_io_queues(struct nvme_rdma_ctrl *ctrl)
- 		goto out_free_tag_set;
+ static inline void cfqg_stats_update_io_add(struct cfq_group *cfqg,
+-					    struct cfq_group *curr_cfqg, int rw)
++					    struct cfq_group *curr_cfqg, int op,
++					    int op_flags)
+ {
+-	blkg_rwstat_add(&cfqg->stats.queued, rw, 1);
++	blkg_rwstat_add(&cfqg->stats.queued, op, op_flags, 1);
+ 	cfqg_stats_end_empty_time(&cfqg->stats);
+ 	cfqg_stats_set_start_group_wait_time(cfqg, curr_cfqg);
+ }
+@@ -683,26 +684,30 @@ static inline void cfqg_stats_update_timeslice_used(struct cfq_group *cfqg,
+ #endif
+ }
+ 
+-static inline void cfqg_stats_update_io_remove(struct cfq_group *cfqg, int rw)
++static inline void cfqg_stats_update_io_remove(struct cfq_group *cfqg, int op,
++					       int op_flags)
+ {
+-	blkg_rwstat_add(&cfqg->stats.queued, rw, -1);
++	blkg_rwstat_add(&cfqg->stats.queued, op, op_flags, -1);
+ }
+ 
+-static inline void cfqg_stats_update_io_merged(struct cfq_group *cfqg, int rw)
++static inline void cfqg_stats_update_io_merged(struct cfq_group *cfqg, int op,
++					       int op_flags)
+ {
+-	blkg_rwstat_add(&cfqg->stats.merged, rw, 1);
++	blkg_rwstat_add(&cfqg->stats.merged, op, op_flags, 1);
+ }
+ 
+ static inline void cfqg_stats_update_completion(struct cfq_group *cfqg,
+-			uint64_t start_time, uint64_t io_start_time, int rw)
++			uint64_t start_time, uint64_t io_start_time, int op,
++			int op_flags)
+ {
+ 	struct cfqg_stats *stats = &cfqg->stats;
+ 	unsigned long long now = sched_clock();
+ 
+ 	if (time_after64(now, io_start_time))
+-		blkg_rwstat_add(&stats->service_time, rw, now - io_start_time);
++		blkg_rwstat_add(&stats->service_time, op, op_flags,
++				now - io_start_time);
+ 	if (time_after64(io_start_time, start_time))
+-		blkg_rwstat_add(&stats->wait_time, rw,
++		blkg_rwstat_add(&stats->wait_time, op, op_flags,
+ 				io_start_time - start_time);
+ }
+ 
+@@ -781,13 +786,16 @@ static inline void cfqg_put(struct cfq_group *cfqg) { }
+ #define cfq_log_cfqg(cfqd, cfqg, fmt, args...)		do {} while (0)
+ 
+ static inline void cfqg_stats_update_io_add(struct cfq_group *cfqg,
+-			struct cfq_group *curr_cfqg, int rw) { }
++			struct cfq_group *curr_cfqg, int op, int op_flags) { }
+ static inline void cfqg_stats_update_timeslice_used(struct cfq_group *cfqg,
+ 			unsigned long time, unsigned long unaccounted_time) { }
+-static inline void cfqg_stats_update_io_remove(struct cfq_group *cfqg, int rw) { }
+-static inline void cfqg_stats_update_io_merged(struct cfq_group *cfqg, int rw) { }
++static inline void cfqg_stats_update_io_remove(struct cfq_group *cfqg, int op,
++			int op_flags) { }
++static inline void cfqg_stats_update_io_merged(struct cfq_group *cfqg, int op,
++			int op_flags) { }
+ static inline void cfqg_stats_update_completion(struct cfq_group *cfqg,
+-			uint64_t start_time, uint64_t io_start_time, int rw) { }
++			uint64_t start_time, uint64_t io_start_time, int op,
++			int op_flags) { }
+ 
+ #endif	/* CONFIG_CFQ_GROUP_IOSCHED */
+ 
+@@ -2461,10 +2469,10 @@ static void cfq_reposition_rq_rb(struct cfq_queue *cfqq, struct request *rq)
+ {
+ 	elv_rb_del(&cfqq->sort_list, rq);
+ 	cfqq->queued[rq_is_sync(rq)]--;
+-	cfqg_stats_update_io_remove(RQ_CFQG(rq), rq->cmd_flags);
++	cfqg_stats_update_io_remove(RQ_CFQG(rq), req_op(rq), rq->cmd_flags);
+ 	cfq_add_rq_rb(rq);
+ 	cfqg_stats_update_io_add(RQ_CFQG(rq), cfqq->cfqd->serving_group,
+-				 rq->cmd_flags);
++				 req_op(rq), rq->cmd_flags);
+ }
+ 
+ static struct request *
+@@ -2517,7 +2525,7 @@ static void cfq_remove_request(struct request *rq)
+ 	cfq_del_rq_rb(rq);
+ 
+ 	cfqq->cfqd->rq_queued--;
+-	cfqg_stats_update_io_remove(RQ_CFQG(rq), rq->cmd_flags);
++	cfqg_stats_update_io_remove(RQ_CFQG(rq), req_op(rq), rq->cmd_flags);
+ 	if (rq->cmd_flags & REQ_PRIO) {
+ 		WARN_ON(!cfqq->prio_pending);
+ 		cfqq->prio_pending--;
+@@ -2552,7 +2560,7 @@ static void cfq_merged_request(struct request_queue *q, struct request *req,
+ static void cfq_bio_merged(struct request_queue *q, struct request *req,
+ 				struct bio *bio)
+ {
+-	cfqg_stats_update_io_merged(RQ_CFQG(req), bio->bi_rw);
++	cfqg_stats_update_io_merged(RQ_CFQG(req), bio_op(bio), bio->bi_rw);
+ }
+ 
+ static void
+@@ -2575,7 +2583,7 @@ cfq_merged_requests(struct request_queue *q, struct request *rq,
+ 	if (cfqq->next_rq == next)
+ 		cfqq->next_rq = rq;
+ 	cfq_remove_request(next);
+-	cfqg_stats_update_io_merged(RQ_CFQG(rq), next->cmd_flags);
++	cfqg_stats_update_io_merged(RQ_CFQG(rq), req_op(next), next->cmd_flags);
+ 
+ 	cfqq = RQ_CFQQ(next);
+ 	/*
+@@ -4108,7 +4116,7 @@ static void cfq_insert_request(struct request_queue *q, struct request *rq)
+ 	rq->fifo_time = jiffies + cfqd->cfq_fifo_expire[rq_is_sync(rq)];
+ 	list_add_tail(&rq->queuelist, &cfqq->fifo);
+ 	cfq_add_rq_rb(rq);
+-	cfqg_stats_update_io_add(RQ_CFQG(rq), cfqd->serving_group,
++	cfqg_stats_update_io_add(RQ_CFQG(rq), cfqd->serving_group, req_op(rq),
+ 				 rq->cmd_flags);
+ 	cfq_rq_enqueued(cfqd, cfqq, rq);
+ }
+@@ -4206,7 +4214,8 @@ static void cfq_completed_request(struct request_queue *q, struct request *rq)
+ 	cfqq->dispatched--;
+ 	(RQ_CFQG(rq))->dispatched--;
+ 	cfqg_stats_update_completion(cfqq->cfqg, rq_start_time_ns(rq),
+-				     rq_io_start_time_ns(rq), rq->cmd_flags);
++				     rq_io_start_time_ns(rq), req_op(rq),
++				     rq->cmd_flags);
+ 
+ 	cfqd->rq_in_flight[cfq_cfqq_sync(cfqq)]--;
+ 
+diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
+index 04f9c8d..f77150a 100644
+--- a/include/linux/blk-cgroup.h
++++ b/include/linux/blk-cgroup.h
+@@ -590,25 +590,26 @@ static inline void blkg_rwstat_exit(struct blkg_rwstat *rwstat)
+ /**
+  * blkg_rwstat_add - add a value to a blkg_rwstat
+  * @rwstat: target blkg_rwstat
+- * @rw: mask of REQ_{WRITE|SYNC}
++ * @op: REQ_OP
++ * @op_flags: rq_flag_bits
+  * @val: value to add
+  *
+  * Add @val to @rwstat.  The counters are chosen according to @rw.  The
+  * caller is responsible for synchronizing calls to this function.
+  */
+ static inline void blkg_rwstat_add(struct blkg_rwstat *rwstat,
+-				   int rw, uint64_t val)
++				   int op, int op_flags, uint64_t val)
+ {
+ 	struct percpu_counter *cnt;
+ 
+-	if (op_is_write(rw))
++	if (op_is_write(op))
+ 		cnt = &rwstat->cpu_cnt[BLKG_RWSTAT_WRITE];
+ 	else
+ 		cnt = &rwstat->cpu_cnt[BLKG_RWSTAT_READ];
+ 
+ 	__percpu_counter_add(cnt, val, BLKG_STAT_CPU_BATCH);
+ 
+-	if (rw & REQ_SYNC)
++	if (op_flags & REQ_SYNC)
+ 		cnt = &rwstat->cpu_cnt[BLKG_RWSTAT_SYNC];
+ 	else
+ 		cnt = &rwstat->cpu_cnt[BLKG_RWSTAT_ASYNC];
+@@ -713,9 +714,9 @@ static inline bool blkcg_bio_issue_check(struct request_queue *q,
+ 
+ 	if (!throtl) {
+ 		blkg = blkg ?: q->root_blkg;
+-		blkg_rwstat_add(&blkg->stat_bytes, bio->bi_rw,
++		blkg_rwstat_add(&blkg->stat_bytes, bio_op(bio), bio->bi_rw,
+ 				bio->bi_iter.bi_size);
+-		blkg_rwstat_add(&blkg->stat_ios, bio->bi_rw, 1);
++		blkg_rwstat_add(&blkg->stat_ios, bio_op(bio), bio->bi_rw, 1);
  	}
  
-+	hw_queue_mapped = blk_mq_hctx_mapped(ctrl->ctrl.connect_q);
-+	if (hw_queue_mapped < ctrl->ctrl.connect_q->nr_hw_queues) {
-+		dev_err(ctrl->ctrl.device,
-+			"%d hw queues created, but only %d were mapped to sw queues\n",
-+			ctrl->ctrl.connect_q->nr_hw_queues,
-+			hw_queue_mapped);
-+		ret = -EINVAL;
-+		goto out_cleanup_connect_q;
-+	}
-+
- 	ret = nvme_rdma_connect_io_queues(ctrl);
- 	if (ret)
- 		goto out_cleanup_connect_q;
+ 	rcu_read_unlock();
 -- 
-1.9.1
+2.7.2
 
