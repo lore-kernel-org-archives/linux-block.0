@@ -1,84 +1,79 @@
-Return-Path: <shaun@helios.aeonazure.com>
-From: Shaun Tancheff <shaun@tancheff.com>
-To: linux-ide@vger.kernel.org,
+Return-Path: <BATV+65f7e0ff3112b2479d70+4670+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk,
+	keith.busch@intel.com
+Cc: linux-nvme@lists.infradead.org,
 	linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org
-Cc: Shaun Tancheff <shaun@tancheff.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>,
-	"James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	Jeff Layton <jlayton@poochiereds.net>,
-	"J . Bruce Fields" <bfields@fieldses.org>
-Subject: [PATCH v5 0/2] Block layer support ZAC/ZBC commands
-Date: Mon, 20 Jun 2016 16:18:34 -0500
-Message-Id: <1466457516-21843-1-git-send-email-shaun@tancheff.com>
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 2/5] nvme: add new reconnecting controller state
+Date: Mon,  6 Jun 2016 23:23:32 +0200
+Message-Id: <1465248215-18186-3-git-send-email-hch@lst.de>
+In-Reply-To: <1465248215-18186-1-git-send-email-hch@lst.de>
+References: <1465248215-18186-1-git-send-email-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Jens,
+The nvme fabric (RDMA, FC, etc...) can introduce port, link or node
+failures that may require a reconnect to re-establish the connection.
 
-This series is on linux-next tag next-20160617.
+Add a new reconnecting state that will initially be used by the RDMA
+driver.
 
-As Host Aware drives are becoming available we would like to be able
-to make use of such drives. This series is also intended to be suitable
-for use by Host Managed drives.
+Reviewed-by: Jay Freyensee <james.p.freyensee@intel.com>
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/nvme/host/core.c | 12 ++++++++++++
+ drivers/nvme/host/nvme.h |  1 +
+ 2 files changed, 13 insertions(+)
 
-ZAC/ZBC drives add new commands for discovering and working with Zones.
-
-This extends the ZAC/ZBC support up to the block layer.
-
-Patches for util-linux can be found here:
-https://github.com/Seagate/ZDM-Device-Mapper/tree/master/patches/util-linux
-
-Using BIOs to issue ZBC commands allows DM targets (such as ZDM) or
-file-systems such as f2fs, btrfs or nilfs2 to extend their block
-allocation schemes and/or issue discards that are zone aligned.
-
-A perhaps non-obvious approach is that a conventional drive will 
-returns a zone report descriptor with a single large conventional zone.
-
-This patch is also at
-https://github.com/stancheff/linux.git
-git@github.com:stancheff/linux.git
-branch: next-20160617+bio.zbc.v5
-
-v5:
- - In sd_setup_zone_action_cmnd, remove unused vars and fix switch indent
- - In blk-lib fix documentation
-v4:
- - Rebase on linux-next tag next-20160617.
- - Change bio flags to bio op's
- - Dropped ata16 hackery
-V3:
- - Rebase on Mike Cristie's separate bio operations
- - Update blkzoned_api.h to include report zones PARTIAL bit.
- - Use zoned report reserved bit for ata-passthrough flag.
-
-V2:
- - Changed bi_rw to op_flags clarify sepeartion of bio op from flags.
- - Fixed memory leak in blkdev_issue_zone_report failing to put_bio().
- - Documented opt in blkdev_issue_zone_report.
- - Moved include/uapi/linux/fs.h changes to patch 3
- - Fixed commit message for first patch in series.
-
-Shaun Tancheff (2):
-  Add bio/request flags for using ZBC/ZAC commands
-  Add ioctl to issue ZBC/ZAC commands via block layer
-
- MAINTAINERS                       |   9 ++
- block/blk-lib.c                   |  98 +++++++++++++++++
- block/ioctl.c                     | 110 +++++++++++++++++++
- drivers/scsi/sd.c                 | 118 ++++++++++++++++++++
- drivers/scsi/sd.h                 |   1 +
- include/linux/bio.h               |   7 +-
- include/linux/blk_types.h         |   6 +-
- include/linux/blkzoned_api.h      |  25 +++++
- include/uapi/linux/Kbuild         |   1 +
- include/uapi/linux/blkzoned_api.h | 220 ++++++++++++++++++++++++++++++++++++++
- include/uapi/linux/fs.h           |   1 +
- 11 files changed, 594 insertions(+), 2 deletions(-)
- create mode 100644 include/linux/blkzoned_api.h
- create mode 100644 include/uapi/linux/blkzoned_api.h
-
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 6f4361b..5bd5de1 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -88,6 +88,7 @@ bool nvme_change_ctrl_state(struct nvme_ctrl *ctrl,
+ 		switch (old_state) {
+ 		case NVME_CTRL_NEW:
+ 		case NVME_CTRL_RESETTING:
++		case NVME_CTRL_RECONNECTING:
+ 			changed = true;
+ 			/* FALLTHRU */
+ 		default:
+@@ -98,6 +99,16 @@ bool nvme_change_ctrl_state(struct nvme_ctrl *ctrl,
+ 		switch (old_state) {
+ 		case NVME_CTRL_NEW:
+ 		case NVME_CTRL_LIVE:
++		case NVME_CTRL_RECONNECTING:
++			changed = true;
++			/* FALLTHRU */
++		default:
++			break;
++		}
++		break;
++	case NVME_CTRL_RECONNECTING:
++		switch (old_state) {
++		case NVME_CTRL_LIVE:
+ 			changed = true;
+ 			/* FALLTHRU */
+ 		default:
+@@ -108,6 +119,7 @@ bool nvme_change_ctrl_state(struct nvme_ctrl *ctrl,
+ 		switch (old_state) {
+ 		case NVME_CTRL_LIVE:
+ 		case NVME_CTRL_RESETTING:
++		case NVME_CTRL_RECONNECTING:
+ 			changed = true;
+ 			/* FALLTHRU */
+ 		default:
+diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+index d25eaab..a288974 100644
+--- a/drivers/nvme/host/nvme.h
++++ b/drivers/nvme/host/nvme.h
+@@ -74,6 +74,7 @@ enum nvme_ctrl_state {
+ 	NVME_CTRL_NEW,
+ 	NVME_CTRL_LIVE,
+ 	NVME_CTRL_RESETTING,
++	NVME_CTRL_RECONNECTING,
+ 	NVME_CTRL_DELETING,
+ 	NVME_CTRL_DEAD,
+ };
 -- 
-2.8.1
+2.1.4
