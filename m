@@ -1,146 +1,199 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:28694 "EHLO
-	mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751194AbcFHUvj (ORCPT
-	<rfc822;linux-block@vger.kernel.org>);
-	Wed, 8 Jun 2016 16:51:39 -0400
-From: Michael Callahan <michaelcallahan@fb.com>
-To: <linux-block@vger.kernel.org>
-CC: Michael Callahan <michaelcallahan@fb.com>, <axboe@fb.com>,
-	<coder.callahan@gmail.com>, <kernel-team@fb.com>
-Subject: [PATCH 0/4] block: Separating discards from writes in Linux IO statistics
-Date: Wed, 8 Jun 2016 16:50:51 -0400
-Message-ID: <cover.1464912896.git.michaelcallahan@fb.com>
+Received: from mail-wm0-f68.google.com ([74.125.82.68]:34622 "EHLO
+	mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752513AbcFFOqO (ORCPT
+	<rfc822;linux-block@vger.kernel.org>); Mon, 6 Jun 2016 10:46:14 -0400
+Received: by mail-wm0-f68.google.com with SMTP id n184so17078144wmn.1
+        for <linux-block@vger.kernel.org>; Mon, 06 Jun 2016 07:46:13 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Simon Lund <slund@cnexlabs.com>,
+	=?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+Subject: [RFC PATCH 6/6] lightnvm: expose gennvm target type through sysfs
+Date: Mon,  6 Jun 2016 16:46:03 +0200
+Message-Id: <1465224363-25797-7-git-send-email-m@bjorling.me>
+In-Reply-To: <1465224363-25797-1-git-send-email-m@bjorling.me>
+References: <1465224363-25797-1-git-send-email-m@bjorling.me>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-This patch set separates block layer statistics for discards from
-writes.  Discards are currently bundled with writes in the
-various /sys/block/*/stat files as well as in /proc/diskstats.
-However discards are nearly always used to mark storage that is
-no longer in use.  There are many reasons having discard not
-counted with writes is useful:
+From: Simon Lund <slund@cnexlabs.com>
 
-1) For many non volatile memory devices it is just nice to know
-   that discards are enabled and working properly.
+Create a sysfs directory for targets to expose their internal statistics
+and knobs. The entries is exposed through the
+/sys/block/<disk>/lightnvm/* directory.
 
-2) Discards have different performance characteristics than
-   writes.  They are generally much faster and larger and bundling
-   them makes performance statistics less meaningful.
+It currently holds a single sysfs entry "type", which exports the target
+type name.
 
-3) Discards are not writes in terms of tracking device lifetime.
-   If a device supports six device writes per day it is nice to know
-   how many writes have actually been written to the device as
-   discards do not count against that total.
+Signed-off-by: Simon Lund <slund@cnexlabs.com>
+Signed-off-by: Matias Bjørling <m@bjorling.me>
+---
+ drivers/lightnvm/gennvm.c | 109 ++++++++++++++++++++++++++++++++++++++--------
+ include/linux/lightnvm.h  |   2 +
+ 2 files changed, 94 insertions(+), 17 deletions(-)
 
-Separation of discard statistics is accomplished by expanding the
-struct diskstat arrays to 3 entries for STAT_READ, STAT_WRITE,
-and STAT_DISCARD.  A new rw_stat_group function is then used to
-convert from rw_flags (cmd_flags from requests, bi_rw from bios)
-into the appropriate stat group which is then tracked as before.
-Lastly the new statistics are appended to the current
-/sys/bloc/*/stat and /proc/diskstats on output such that they are
-the last four entries of each.  These are analogous to the four
-read and write statistics.
-
- * Number of discard ios completed
- * Number of discard ios merged
- * Number of discard sectors completed
- * Milliseconds spent on discard requests.
-
-[before ~]# cat sys/block/nvme0/stat
-296550701        0 2372405688 67317193 19672752        0 7972237312
-9375167        0  2787238 79718726
-
-[after ~]# cat sys/block/nvme0/stat
-296550701        0 2372405688 67317193 18034352        0 4616794112
-9125902        0  2787238 79718726  1638400        0 3355443200
-249265
-
-Note that the discards have moved out of the write fields to the
-end and that the write fields are now smaller by the difference.
-
-Adding the new statistics to the end of /sys/block/*/stat and
-/proc/diskstats is backwards compatible with both iostat and
-vmstat which pick up just the old fields:
-
-[root@after ~]# iostat -x
-Linux 4.5.0_68319_ge5065f4-dirty (##hostname###)        05/17/2016
- _x86_64_        (48 CPU)
-
-avg-cpu:  %user   %nice %system %iowait  %steal   %idle
-           0.41    0.00    0.23    0.01    0.00   99.35
-
-Device:         rrqm/s   wrqm/s     r/s     w/s   rsec/s   wsec/s
-avgrq-sz avgqu-sz   await  svctm  %util
-sda               0.01     7.50    0.20    3.61    16.65   708.41
-190.03     0.09   22.53   1.16   0.44
-nvme0n1           0.00     0.00  587.03   35.70  4696.25  9139.08
-22.22     0.16    0.24   0.01   0.55
-
-
-[root@after ~]# vmstat -d
-disk- ------------reads------------ ------------writes----------- -----IO------
-       total merged sectors      ms  total merged sectors      ms    cur    sec
-ram0       0      0       0       0      0      0       0       0      0      0
-ram1       0      0       0       0      0      0       0       0      0      0
-ram2       0      0       0       0      0      0       0       0      0      0
-ram3       0      0       0       0      0      0       0       0      0      0
-ram4       0      0       0       0      0      0       0       0      0      0
-ram5       0      0       0       0      0      0       0       0      0      0
-ram6       0      0       0       0      0      0       0       0      0      0
-ram7       0      0       0       0      0      0       0       0      0      0
-ram8       0      0       0       0      0      0       0       0      0      0
-ram9       0      0       0       0      0      0       0       0      0      0
-ram10      0      0       0       0      0      0       0       0      0      0
-ram11      0      0       0       0      0      0       0       0      0      0
-ram12      0      0       0       0      0      0       0       0      0      0
-ram13      0      0       0       0      0      0       0       0      0      0
-ram14      0      0       0       0      0      0       0       0      0      0
-ram15      0      0       0       0      0      0       0       0      0      0
-sda   102903   5247 8408420   47424 1820306 3782041 357153613 43320121
-     0   2228
-nvme0n1 145633279      0 1165066312 18981333 13107200      0
-3355443200 6663655      0   1796
-loop0      0      0       0       0      0      0       0       0      0      0
-loop1      0      0       0       0      0      0       0       0      0      0
-  [chop rest of loop devices]
-
-Comments and suggestions welcome.
-
-Michael Callahan (4):
-  block: Add part_stat_read_accum to read across field entries.
-  block: Define and use STAT_READ and STAT_WRITE
-  block: Add and use a rw_stat_group function for indexing disk_stat
-    fields.
-  block: Track DISCARD statistics and output them in stat and diskstat.
-
- Documentation/ABI/testing/procfs-diskstats | 10 ++++++++++
- Documentation/block/stat.txt               | 28 ++++++++++++++++------------
- Documentation/iostats.txt                  | 15 ++++++++++++++-
- block/bio.c                                | 14 +++++++++-----
- block/blk-core.c                           |  9 +++++----
- block/genhd.c                              | 30 +++++++++++++++++++-----------
- block/partition-generic.c                  | 25 +++++++++++++++----------
- drivers/block/drbd/drbd_receiver.c         |  3 +--
- drivers/block/drbd/drbd_req.c              |  4 ++--
- drivers/block/drbd/drbd_worker.c           |  4 +---
- drivers/block/rsxx/dev.c                   |  5 ++---
- drivers/block/zram/zram_drv.c              | 14 +++++++-------
- drivers/md/bcache/request.c                | 10 +++++-----
- drivers/md/dm.c                            |  7 +++----
- drivers/md/md.c                            |  8 ++++----
- drivers/nvdimm/core.c                      |  8 +++++---
- fs/ext4/super.c                            |  5 +++--
- fs/ext4/sysfs.c                            |  6 ++++--
- fs/f2fs/f2fs.h                             |  2 +-
- fs/f2fs/super.c                            |  3 ++-
- include/linux/bio.h                        |  4 ++--
- include/linux/genhd.h                      | 24 ++++++++++++++++++++----
- 22 files changed, 150 insertions(+), 88 deletions(-)
-
+diff --git a/drivers/lightnvm/gennvm.c b/drivers/lightnvm/gennvm.c
+index b74174c..c48bc9c 100644
+--- a/drivers/lightnvm/gennvm.c
++++ b/drivers/lightnvm/gennvm.c
+@@ -20,6 +20,90 @@
+ 
+ #include "gennvm.h"
+ 
++#define GEN_TARGET_ATTR_RO(_name)					\
++	static struct attribute gen_target_##_name##_attr = {		\
++	.name = __stringify(_name),					\
++	.mode = S_IRUGO							\
++	}
++
++#define GEN_TARGET_ATTR_LIST(_name) (&gen_target_##_name##_attr)
++
++GEN_TARGET_ATTR_RO(type);
++
++static struct attribute *gen_target_attrs[] = {
++	GEN_TARGET_ATTR_LIST(type),
++	NULL,
++};
++
++static ssize_t gen_target_attr_show(struct kobject *kobj,
++				struct attribute *attr,
++				char *page)
++{
++	struct nvm_target *t = container_of(kobj, struct nvm_target, kobj);
++
++	if (strcmp(attr->name, "type") == 0) {
++		return scnprintf(page, PAGE_SIZE, "%s\n", t->type->name);
++	} else {
++		return scnprintf(page, PAGE_SIZE,
++			"Unhandled attr(%s) in `nvm_target_attr_show`\n",
++			attr->name);
++	}
++}
++
++static const struct sysfs_ops target_sysfs_ops = {
++	.show = gen_target_attr_show,
++};
++
++static void gen_target_release(struct kobject *kobj)
++{
++	struct nvm_target *t = container_of(kobj, struct nvm_target, kobj);
++	struct nvm_tgt_type *tt = t->type;
++	struct gendisk *tdisk = t->disk;
++	struct request_queue *q = tdisk->queue;
++
++	pr_debug("gen: `gen_target_release`\n");
++
++	del_gendisk(tdisk);
++	blk_cleanup_queue(q);
++	put_disk(tdisk);
++
++	if (tt->exit)
++		tt->exit(tdisk->private_data);
++
++	kfree(t);
++}
++
++static struct kobj_type nvm_target_type = {
++	.sysfs_ops	= &target_sysfs_ops,
++	.default_attrs	= gen_target_attrs,
++	.release	= gen_target_release
++};
++
++void gen_unregister_target(struct nvm_target *t)
++{
++	kobject_uevent(&t->kobj, KOBJ_REMOVE);
++	kobject_del(&t->kobj);
++	kobject_put(&t->kobj);
++}
++
++int gen_register_target(struct nvm_target *t)
++{
++	struct gendisk *disk = t->disk;
++	struct device *dev = disk_to_dev(disk);
++	int ret;
++
++	ret = kobject_init_and_add(&t->kobj, &nvm_target_type,
++				   kobject_get(&dev->kobj), "%s", "lightnvm");
++	if (ret < 0) {
++		pr_err("gen: `_register_target` failed.\n");
++		kobject_put(&t->kobj);
++		return ret;
++	}
++
++	kobject_uevent(&t->kobj, KOBJ_ADD);
++	return 0;
++}
++
+ static struct nvm_target *gen_find_target(struct gen_dev *gn, const char *name)
+ {
+ 	struct nvm_target *tgt;
+@@ -60,7 +144,7 @@ static int gen_create_tgt(struct nvm_dev *dev, struct nvm_ioctl_create *create)
+ 	}
+ 	mutex_unlock(&gn->lock);
+ 
+-	t = kmalloc(sizeof(struct nvm_target), GFP_KERNEL);
++	t = kzalloc(sizeof(struct nvm_target), GFP_KERNEL);
+ 	if (!t)
+ 		return -ENOMEM;
+ 
+@@ -89,13 +173,16 @@ static int gen_create_tgt(struct nvm_dev *dev, struct nvm_ioctl_create *create)
+ 
+ 	blk_queue_max_hw_sectors(tqueue, 8 * dev->ops->max_phys_sect);
+ 
+-	set_capacity(tdisk, tt->capacity(targetdata));
+-	add_disk(tdisk);
+-
+ 	t->type = tt;
+ 	t->disk = tdisk;
+ 	t->dev = dev;
+ 
++	set_capacity(tdisk, tt->capacity(targetdata));
++	add_disk(tdisk);
++
++	if (gen_register_target(t))
++		goto err_init;
++
+ 	mutex_lock(&gn->lock);
+ 	list_add_tail(&t->list, &gn->targets);
+ 	mutex_unlock(&gn->lock);
+@@ -112,20 +199,8 @@ err_t:
+ 
+ static void __gen_remove_target(struct nvm_target *t)
+ {
+-	struct nvm_tgt_type *tt = t->type;
+-	struct gendisk *tdisk = t->disk;
+-	struct request_queue *q = tdisk->queue;
+-
+-	del_gendisk(tdisk);
+-	blk_cleanup_queue(q);
+-
+-	if (tt->exit)
+-		tt->exit(tdisk->private_data);
+-
+-	put_disk(tdisk);
+-
+ 	list_del(&t->list);
+-	kfree(t);
++	gen_unregister_target(t);
+ }
+ 
+ /**
+diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
+index d190786..646ca24 100644
+--- a/include/linux/lightnvm.h
++++ b/include/linux/lightnvm.h
+@@ -211,6 +211,8 @@ struct nvm_target {
+ 	struct nvm_dev *dev;
+ 	struct nvm_tgt_type *type;
+ 	struct gendisk *disk;
++
++	struct kobject kobj;
+ };
+ 
+ struct nvm_tgt_instance {
 -- 
-1.9.3
+2.1.4
 
