@@ -1,36 +1,88 @@
-Return-Path: <keith.busch@intel.com>
-Date: Tue, 7 Jun 2016 10:57:36 -0400
-From: Keith Busch <keith.busch@intel.com>
-To: Christoph Hellwig <hch@lst.de>
-Cc: axboe@kernel.dk, linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+Return-Path: <BATV+65f7e0ff3112b2479d70+4670+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk,
+	keith.busch@intel.com
+Cc: linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
 	Ming Lin <ming.l@ssi.samsung.com>
-Subject: Re: [PATCH 1/8] blk-mq: add blk_mq_alloc_request_hctx
-Message-ID: <20160607145736.GB28414@localhost.localdomain>
+Subject: [PATCH 1/8] blk-mq: add blk_mq_alloc_request_hctx
+Date: Mon,  6 Jun 2016 23:21:52 +0200
+Message-Id: <1465248119-17875-2-git-send-email-hch@lst.de>
+In-Reply-To: <1465248119-17875-1-git-send-email-hch@lst.de>
 References: <1465248119-17875-1-git-send-email-hch@lst.de>
- <1465248119-17875-2-git-send-email-hch@lst.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1465248119-17875-2-git-send-email-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Jun 06, 2016 at 11:21:52PM +0200, Christoph Hellwig wrote:
-> +struct request *blk_mq_alloc_request_hctx(struct request_queue *q, int rw,
-> +		unsigned int flags, unsigned int hctx_idx)
-> +{
-> +	struct blk_mq_hw_ctx *hctx;
-> +	struct blk_mq_ctx *ctx;
-> +	struct request *rq;
-> +	struct blk_mq_alloc_data alloc_data;
-> +	int ret;
-> +
-> +	ret = blk_queue_enter(q, flags & BLK_MQ_REQ_NOWAIT);
-> +	if (ret)
-> +		return ERR_PTR(ret);
-> +
-> +	hctx = q->queue_hw_ctx[hctx_idx];
+From: Ming Lin <ming.l@ssi.samsung.com>
 
-We probably want to check 'if (hctx_idx < q->nr_hw_queues)' before
-getting the hctx. Even if hctx_idx was origially valid, it's possible
-(though unlikely) blk_queue_enter waits on reallocating h/w contexts,
-which can make hctx_idx invalid.
+For some protocols like NVMe over Fabrics we need to be able to send
+initialization commands to a specific queue.
+
+Based on an earlier patch from Christoph Hellwig <hch@lst.de>.
+
+Signed-off-by: Ming Lin <ming.l@ssi.samsung.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ block/blk-mq.c         | 33 +++++++++++++++++++++++++++++++++
+ include/linux/blk-mq.h |  2 ++
+ 2 files changed, 35 insertions(+)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 29cbc1b..7bb45ed 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -266,6 +266,39 @@ struct request *blk_mq_alloc_request(struct request_queue *q, int rw,
+ }
+ EXPORT_SYMBOL(blk_mq_alloc_request);
+ 
++struct request *blk_mq_alloc_request_hctx(struct request_queue *q, int rw,
++		unsigned int flags, unsigned int hctx_idx)
++{
++	struct blk_mq_hw_ctx *hctx;
++	struct blk_mq_ctx *ctx;
++	struct request *rq;
++	struct blk_mq_alloc_data alloc_data;
++	int ret;
++
++	ret = blk_queue_enter(q, flags & BLK_MQ_REQ_NOWAIT);
++	if (ret)
++		return ERR_PTR(ret);
++
++	hctx = q->queue_hw_ctx[hctx_idx];
++	ctx = __blk_mq_get_ctx(q, cpumask_first(hctx->cpumask));
++
++	blk_mq_set_alloc_data(&alloc_data, q, flags, ctx, hctx);
++
++	rq = __blk_mq_alloc_request(&alloc_data, rw);
++	if (!rq && !(flags & BLK_MQ_REQ_NOWAIT)) {
++		__blk_mq_run_hw_queue(hctx);
++
++		rq =  __blk_mq_alloc_request(&alloc_data, rw);
++	}
++	if (!rq) {
++		blk_queue_exit(q);
++		return ERR_PTR(-EWOULDBLOCK);
++	}
++
++	return rq;
++}
++EXPORT_SYMBOL(blk_mq_alloc_request_hctx);
++
+ static void __blk_mq_free_request(struct blk_mq_hw_ctx *hctx,
+ 				  struct blk_mq_ctx *ctx, struct request *rq)
+ {
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 2498fdf..6bf8735 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -196,6 +196,8 @@ enum {
+ 
+ struct request *blk_mq_alloc_request(struct request_queue *q, int rw,
+ 		unsigned int flags);
++struct request *blk_mq_alloc_request_hctx(struct request_queue *q, int rw,
++		unsigned int flags, unsigned int hctx_idx);
+ struct request *blk_mq_tag_to_rq(struct blk_mq_tags *tags, unsigned int tag);
+ struct cpumask *blk_mq_tags_cpumask(struct blk_mq_tags *tags);
+ 
+-- 
+2.1.4
