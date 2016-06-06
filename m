@@ -1,30 +1,52 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.9]:51340 "EHLO
-	bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750833AbcFXHBA (ORCPT
-	<rfc822;linux-block@vger.kernel.org>);
-	Fri, 24 Jun 2016 03:01:00 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@fb.com
-Cc: shli@fb.com, martin.petersen@oracle.com, snitzer@redhat.com,
-	sitsofe@yahoo.com, linux-block@vger.kernel.org
-Subject: zeroout fixes
-Date: Fri, 24 Jun 2016 09:00:49 +0200
-Message-Id: <1466751651-9900-1-git-send-email-hch@lst.de>
+Received: from mx2.suse.de ([195.135.220.15]:46386 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750914AbcFFGVM (ORCPT <rfc822;linux-block@vger.kernel.org>);
+	Mon, 6 Jun 2016 02:21:12 -0400
+Subject: Re: [PATCH 09/45] block discard: use bio set op accessor
+To: mchristi@redhat.com, linux-f2fs-devel@lists.sourceforge.net,
+	linux-ext4@vger.kernel.org, konrad.wilk@oracle.com,
+	drbd-dev@lists.linbit.com, philipp.reisner@linbit.com,
+	lars.ellenberg@linbit.com, linux-raid@vger.kernel.org,
+	dm-devel@redhat.com, linux-fsdevel@vger.kernel.org,
+	linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
+	linux-mtd@lists.infradead.org, target-devel@vger.kernel.org,
+	linux-btrfs@vger.kernel.org, osd-dev@open-osd.org, xfs@oss.sgi.com,
+	ocfs2-devel@oss.oracle.com
+References: <1465155145-10812-1-git-send-email-mchristi@redhat.com>
+ <1465155145-10812-10-git-send-email-mchristi@redhat.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <57551655.3020306@suse.de>
+Date: Mon, 6 Jun 2016 08:21:09 +0200
+MIME-Version: 1.0
+In-Reply-To: <1465155145-10812-10-git-send-email-mchristi@redhat.com>
+Content-Type: text/plain; charset=windows-1252
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-The first one is a repost of my BLKDEV_DISCARD_ZERO with the spelling
-fixes suggest from Martin, the second one just drops the -EOPNOTSUPP
-special casing in blkdev_issue_write_same.
+On 06/05/2016 09:31 PM, mchristi@redhat.com wrote:
+> From: Mike Christie <mchristi@redhat.com>
+> 
+> This converts the block issue discard helper and users to use
+> the bio_set_op_attrs accessor and only pass in the operation flags
+> like REQ_SEQURE.
+> 
+> Signed-off-by: Mike Christie <mchristi@redhat.com>
+> ---
+>  block/blk-lib.c        | 13 +++++++------
+>  drivers/md/dm-thin.c   |  2 +-
+>  include/linux/blkdev.h |  3 ++-
+>  3 files changed, 10 insertions(+), 8 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Note that the patches are against the block for-next tree, and
-unfortunately we have diverged significantly from 4.7 in this area:
-4.7 has the missing bio_put for the sumbmit_bio_wait callers, and
-4.8 has the various req_op changes, including a new calling
-convention for __blkdev_issue_zeroout.  I'm not sure how to best
-sort this mess out, but I really think we need the bio_put in the
-for-4.8 tree as well, and we should probably bring the changed
-__blkdev_issue_discard calling convention into 4.7 as well.
-Suggestion for how to best handle this?
+Cheers,
 
+Hannes
+-- 
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: F. Imend�rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG N�rnberg)
