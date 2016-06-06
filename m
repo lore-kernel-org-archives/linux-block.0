@@ -1,53 +1,187 @@
-Return-Path: <BATV+1815987b1c14acf14571+4678+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: mst@redhat.com,
-	ooo@electrozaur.com,
-	nab@linux-iscsi.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH 1/7] memstick: don't allow REQ_TYPE_BLOCK_PC requests
-Date: Tue, 14 Jun 2016 19:15:58 +0200
-Message-Id: <1465924564-14503-2-git-send-email-hch@lst.de>
-In-Reply-To: <1465924564-14503-1-git-send-email-hch@lst.de>
-References: <1465924564-14503-1-git-send-email-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from smtp81.mediacombb.net ([68.66.77.81]:47255 "EHLO
+	dsmdc-mail-smtp.mcomdc.com" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1752461AbcFFPpB (ORCPT
+	<rfc822;linux-block@vger.kernel.org>);
+	Mon, 6 Jun 2016 11:45:01 -0400
+From: Shaun Tancheff <shaun@tancheff.com>
+To: linux-ide@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org
+Cc: Shaun Tancheff <shaun@tancheff.com>,
+	Shaun Tancheff <shaun.tancheff@seagate.com>
+Subject: [PATCH 3/4] Add ioctl to issue ZBC/ZAC commands via block layer
+Date: Mon,  6 Jun 2016 10:39:30 -0500
+Message-Id: <1465227572-27149-4-git-send-email-shaun@tancheff.com>
+In-Reply-To: <1465227572-27149-1-git-send-email-shaun@tancheff.com>
+References: <1465227572-27149-1-git-send-email-shaun@tancheff.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-There is no code to issue or handle REQ_TYPE_BLOCK_PC request in the
-memstick drivers, so remove the bogus conditional.
+Add New ioctl types
+    BLKREPORT    - Issue Report Zones to device.
+    BLKOPENZONE  - Issue an Zone Action: Open Zone command.
+    BLKCLOSEZONE - Issue an Zone Action: Close Zone command.
+    BLKRESETZONE - Issue an Zone Action: Reset Zone command.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Shaun Tancheff <shaun.tancheff@seagate.com>
 ---
- drivers/memstick/core/ms_block.c    | 3 +--
- drivers/memstick/core/mspro_block.c | 3 +--
- 2 files changed, 2 insertions(+), 4 deletions(-)
+ block/ioctl.c                     | 113 ++++++++++++++++++++++++++++++++++++++
+ include/uapi/linux/blkzoned_api.h |   6 ++
+ 2 files changed, 119 insertions(+)
 
-diff --git a/drivers/memstick/core/ms_block.c b/drivers/memstick/core/ms_block.c
-index 3cd6815..21cc231 100644
---- a/drivers/memstick/core/ms_block.c
-+++ b/drivers/memstick/core/ms_block.c
-@@ -2002,8 +2002,7 @@ static int msb_bd_getgeo(struct block_device *bdev,
+diff --git a/block/ioctl.c b/block/ioctl.c
+index ed2397f..46a8553 100644
+--- a/block/ioctl.c
++++ b/block/ioctl.c
+@@ -7,6 +7,7 @@
+ #include <linux/backing-dev.h>
+ #include <linux/fs.h>
+ #include <linux/blktrace_api.h>
++#include <linux/blkzoned_api.h>
+ #include <linux/pr.h>
+ #include <asm/uaccess.h>
  
- static int msb_prepare_req(struct request_queue *q, struct request *req)
- {
--	if (req->cmd_type != REQ_TYPE_FS &&
--				req->cmd_type != REQ_TYPE_BLOCK_PC) {
-+	if (req->cmd_type != REQ_TYPE_FS) {
- 		blk_dump_rq_flags(req, "MS unsupported request");
- 		return BLKPREP_KILL;
- 	}
-diff --git a/drivers/memstick/core/mspro_block.c b/drivers/memstick/core/mspro_block.c
-index 0fb27d3..586fb8d 100644
---- a/drivers/memstick/core/mspro_block.c
-+++ b/drivers/memstick/core/mspro_block.c
-@@ -829,8 +829,7 @@ static void mspro_block_start(struct memstick_dev *card)
+@@ -194,6 +195,112 @@ int blkdev_reread_part(struct block_device *bdev)
+ }
+ EXPORT_SYMBOL(blkdev_reread_part);
  
- static int mspro_block_prepare_req(struct request_queue *q, struct request *req)
++static int blk_zoned_report_ioctl(struct block_device *bdev, fmode_t mode,
++		void __user *parg)
++{
++	int error = -EFAULT;
++	gfp_t gfp = GFP_KERNEL;
++	struct bdev_zone_report_io *zone_iodata = NULL;
++	int order = 0;
++	struct page *pgs = NULL;
++	u32 alloc_size = PAGE_SIZE;
++	unsigned long bi_rw = 0;
++	u8 opt = 0;
++
++	if (!(mode & FMODE_READ))
++		return -EBADF;
++
++	zone_iodata = (void *)get_zeroed_page(gfp);
++	if (!zone_iodata) {
++		error = -ENOMEM;
++		goto report_zones_out;
++	}
++	if (copy_from_user(zone_iodata, parg, sizeof(*zone_iodata))) {
++		error = -EFAULT;
++		goto report_zones_out;
++	}
++	if (zone_iodata->data.in.return_page_count > alloc_size) {
++		int npages;
++
++		alloc_size = zone_iodata->data.in.return_page_count;
++		npages = (alloc_size + PAGE_SIZE - 1) / PAGE_SIZE;
++		order =  ilog2(roundup_pow_of_two(npages));
++		pgs = alloc_pages(gfp, order);
++		if (pgs) {
++			void *mem = page_address(pgs);
++
++			if (!mem) {
++				error = -ENOMEM;
++				goto report_zones_out;
++			}
++			memset(mem, 0, alloc_size);
++			memcpy(mem, zone_iodata, sizeof(*zone_iodata));
++			free_page((unsigned long)zone_iodata);
++			zone_iodata = mem;
++		} else {
++			/* Result requires DMA capable memory */
++			pr_err("Not enough memory available for request.\n");
++			error = -ENOMEM;
++			goto report_zones_out;
++		}
++	}
++	opt = zone_iodata->data.in.report_option & 0x7F;
++	if (zone_iodata->data.in.report_option & ZOPT_USE_ATA_PASS)
++		bi_rw |= REQ_META;
++
++	error = blkdev_issue_zone_report(bdev, bi_rw,
++			zone_iodata->data.in.zone_locator_lba, opt,
++			pgs ? pgs : virt_to_page(zone_iodata),
++			alloc_size, GFP_KERNEL);
++
++	if (error)
++		goto report_zones_out;
++
++	if (copy_to_user(parg, zone_iodata, alloc_size))
++		error = -EFAULT;
++
++report_zones_out:
++	if (pgs)
++		__free_pages(pgs, order);
++	else if (zone_iodata)
++		free_page((unsigned long)zone_iodata);
++	return error;
++}
++
++static int blk_zoned_action_ioctl(struct block_device *bdev, fmode_t mode,
++				  unsigned int cmd, unsigned long arg)
++{
++	unsigned long bi_rw = 0;
++
++	if (!(mode & FMODE_WRITE))
++		return -EBADF;
++
++	/*
++	 * When acting on zones we explicitly disallow using a partition.
++	 */
++	if (bdev != bdev->bd_contains) {
++		pr_err("%s: All zone operations disallowed on this device\n",
++			__func__);
++		return -EFAULT;
++	}
++
++	switch (cmd) {
++	case BLKOPENZONE:
++		bi_rw |= REQ_OPEN_ZONE;
++		break;
++	case BLKCLOSEZONE:
++		bi_rw |= REQ_CLOSE_ZONE;
++		break;
++	case BLKRESETZONE:
++		bi_rw |= REQ_RESET_ZONE;
++		break;
++	default:
++		pr_err("%s: Unknown action: %u\n", __func__, cmd);
++		WARN_ON(1);
++	}
++	return blkdev_issue_zone_action(bdev, bi_rw, arg, GFP_KERNEL);
++}
++
+ static int blk_ioctl_discard(struct block_device *bdev, fmode_t mode,
+ 		unsigned long arg, unsigned long flags)
  {
--	if (req->cmd_type != REQ_TYPE_FS &&
--	    req->cmd_type != REQ_TYPE_BLOCK_PC) {
-+	if (req->cmd_type != REQ_TYPE_FS) {
- 		blk_dump_rq_flags(req, "MSPro unsupported request");
- 		return BLKPREP_KILL;
- 	}
+@@ -568,6 +675,12 @@ int blkdev_ioctl(struct block_device *bdev, fmode_t mode, unsigned cmd,
+ 	case BLKTRACESETUP:
+ 	case BLKTRACETEARDOWN:
+ 		return blk_trace_ioctl(bdev, cmd, argp);
++	case BLKREPORT:
++		return blk_zoned_report_ioctl(bdev, mode, argp);
++	case BLKOPENZONE:
++	case BLKCLOSEZONE:
++	case BLKRESETZONE:
++		return blk_zoned_action_ioctl(bdev, mode, cmd, arg);
+ 	case IOC_PR_REGISTER:
+ 		return blkdev_pr_register(bdev, argp);
+ 	case IOC_PR_RESERVE:
+diff --git a/include/uapi/linux/blkzoned_api.h b/include/uapi/linux/blkzoned_api.h
+index 189e925..2007b56 100644
+--- a/include/uapi/linux/blkzoned_api.h
++++ b/include/uapi/linux/blkzoned_api.h
+@@ -212,4 +212,10 @@ struct bdev_zone_report_io {
+ 	} data;
+ } __packed;
+ 
++/* continuing from uapi/linux/fs.h: */
++#define BLKREPORT	_IOWR(0x12, 130, struct bdev_zone_report_io)
++#define BLKOPENZONE	_IO(0x12, 131)
++#define BLKCLOSEZONE	_IO(0x12, 132)
++#define BLKRESETZONE	_IO(0x12, 133)
++
+ #endif /* _UAPI_BLKZONED_API_H */
 -- 
-2.1.4
+2.8.1
+
