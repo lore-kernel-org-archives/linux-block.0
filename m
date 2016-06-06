@@ -1,79 +1,191 @@
-Return-Path: <BATV+65f7e0ff3112b2479d70+4670+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk,
-	keith.busch@intel.com
-Cc: linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 2/5] nvme: add new reconnecting controller state
-Date: Mon,  6 Jun 2016 23:23:32 +0200
-Message-Id: <1465248215-18186-3-git-send-email-hch@lst.de>
-In-Reply-To: <1465248215-18186-1-git-send-email-hch@lst.de>
-References: <1465248215-18186-1-git-send-email-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f66.google.com ([74.125.82.66]:32866 "EHLO
+	mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753094AbcFFOqL (ORCPT
+	<rfc822;linux-block@vger.kernel.org>); Mon, 6 Jun 2016 10:46:11 -0400
+Received: by mail-wm0-f66.google.com with SMTP id c74so8854370wme.0
+        for <linux-block@vger.kernel.org>; Mon, 06 Jun 2016 07:46:10 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+Subject: [RFC PATCH 2/6] null_blk: refactor to support non-gendisk devices
+Date: Mon,  6 Jun 2016 16:45:59 +0200
+Message-Id: <1465224363-25797-3-git-send-email-m@bjorling.me>
+In-Reply-To: <1465224363-25797-1-git-send-email-m@bjorling.me>
+References: <1465224363-25797-1-git-send-email-m@bjorling.me>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-The nvme fabric (RDMA, FC, etc...) can introduce port, link or node
-failures that may require a reconnect to re-establish the connection.
+With LightNVM enabled devices, the gendisk structure is not exposed
+to the user. This hides the device driver specific sysfs entries, and
+prevents binding of LightNVM geometry information to the device.
 
-Add a new reconnecting state that will initially be used by the RDMA
-driver.
+Refactor the device registration process, so that gendisk and
+non-gendisk devices are easily managed.
 
-Reviewed-by: Jay Freyensee <james.p.freyensee@intel.com>
-Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Matias Bjørling <m@bjorling.me>
 ---
- drivers/nvme/host/core.c | 12 ++++++++++++
- drivers/nvme/host/nvme.h |  1 +
- 2 files changed, 13 insertions(+)
+ drivers/block/null_blk.c | 111 ++++++++++++++++++++++++++---------------------
+ 1 file changed, 62 insertions(+), 49 deletions(-)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 6f4361b..5bd5de1 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -88,6 +88,7 @@ bool nvme_change_ctrl_state(struct nvme_ctrl *ctrl,
- 		switch (old_state) {
- 		case NVME_CTRL_NEW:
- 		case NVME_CTRL_RESETTING:
-+		case NVME_CTRL_RECONNECTING:
- 			changed = true;
- 			/* FALLTHRU */
- 		default:
-@@ -98,6 +99,16 @@ bool nvme_change_ctrl_state(struct nvme_ctrl *ctrl,
- 		switch (old_state) {
- 		case NVME_CTRL_NEW:
- 		case NVME_CTRL_LIVE:
-+		case NVME_CTRL_RECONNECTING:
-+			changed = true;
-+			/* FALLTHRU */
-+		default:
-+			break;
-+		}
-+		break;
-+	case NVME_CTRL_RECONNECTING:
-+		switch (old_state) {
-+		case NVME_CTRL_LIVE:
- 			changed = true;
- 			/* FALLTHRU */
- 		default:
-@@ -108,6 +119,7 @@ bool nvme_change_ctrl_state(struct nvme_ctrl *ctrl,
- 		switch (old_state) {
- 		case NVME_CTRL_LIVE:
- 		case NVME_CTRL_RESETTING:
-+		case NVME_CTRL_RECONNECTING:
- 			changed = true;
- 			/* FALLTHRU */
- 		default:
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index d25eaab..a288974 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -74,6 +74,7 @@ enum nvme_ctrl_state {
- 	NVME_CTRL_NEW,
- 	NVME_CTRL_LIVE,
- 	NVME_CTRL_RESETTING,
-+	NVME_CTRL_RECONNECTING,
- 	NVME_CTRL_DELETING,
- 	NVME_CTRL_DEAD,
+diff --git a/drivers/block/null_blk.c b/drivers/block/null_blk.c
+index cab9759..1ffbf4d 100644
+--- a/drivers/block/null_blk.c
++++ b/drivers/block/null_blk.c
+@@ -414,23 +414,6 @@ static void cleanup_queues(struct nullb *nullb)
+ 	kfree(nullb->queues);
+ }
+ 
+-static void null_del_dev(struct nullb *nullb)
+-{
+-	list_del_init(&nullb->list);
+-
+-	if (use_lightnvm)
+-		nvm_unregister(nullb->disk_name);
+-	else
+-		del_gendisk(nullb->disk);
+-	blk_cleanup_queue(nullb->q);
+-	if (queue_mode == NULL_Q_MQ)
+-		blk_mq_free_tag_set(&nullb->tag_set);
+-	if (!use_lightnvm)
+-		put_disk(nullb->disk);
+-	cleanup_queues(nullb);
+-	kfree(nullb);
+-}
+-
+ #ifdef CONFIG_NVM
+ 
+ static void null_lnvm_end_io(struct request *rq, int error)
+@@ -564,10 +547,41 @@ static struct nvm_dev_ops null_lnvm_dev_ops = {
+ 	/* Simulate nvme protocol restriction */
+ 	.max_phys_sect		= 64,
  };
++
++static int null_nvm_register(struct nullb *nullb)
++{
++	return nvm_register(nullb->q, nullb->disk_name, &null_lnvm_dev_ops);
++}
++
++static void null_nvm_unregister(struct nullb *nullb)
++{
++	nvm_unregister(nullb->disk_name);
++}
+ #else
+-static struct nvm_dev_ops null_lnvm_dev_ops;
++static int null_nvm_register(struct nullb *nullb)
++{
++	return -EINVAL;
++}
++static void null_nvm_unregister(struct nullb *nullb) {}
+ #endif /* CONFIG_NVM */
+ 
++static void null_del_dev(struct nullb *nullb)
++{
++	list_del_init(&nullb->list);
++
++	if (use_lightnvm)
++		null_nvm_unregister(nullb);
++	else
++		del_gendisk(nullb->disk);
++	blk_cleanup_queue(nullb->q);
++	if (queue_mode == NULL_Q_MQ)
++		blk_mq_free_tag_set(&nullb->tag_set);
++	if (!use_lightnvm)
++		put_disk(nullb->disk);
++	cleanup_queues(nullb);
++	kfree(nullb);
++}
++
+ static int null_open(struct block_device *bdev, fmode_t mode)
+ {
+ 	return 0;
+@@ -640,11 +654,33 @@ static int init_driver_queues(struct nullb *nullb)
+ 	return 0;
+ }
+ 
+-static int null_add_dev(void)
++static int null_gendisk_register(struct nullb *nullb)
+ {
+ 	struct gendisk *disk;
+-	struct nullb *nullb;
+ 	sector_t size;
++
++	disk = nullb->disk = alloc_disk_node(1, home_node);
++	if (!disk) {
++		return -ENOMEM;
++	}
++	size = gb * 1024 * 1024 * 1024ULL;
++	set_capacity(disk, size >> 9);
++
++	disk->flags |= GENHD_FL_EXT_DEVT | GENHD_FL_SUPPRESS_PARTITION_INFO;
++	disk->major		= null_major;
++	disk->first_minor	= nullb->index;
++	disk->fops		= &null_fops;
++	disk->private_data	= nullb;
++	disk->queue		= nullb->q;
++	strncpy(disk->disk_name, nullb->disk_name, DISK_NAME_LEN);
++
++	add_disk(disk);
++	return 0;
++}
++
++static int null_add_dev(void)
++{
++	struct nullb *nullb;
+ 	int rv;
+ 
+ 	nullb = kzalloc_node(sizeof(*nullb), GFP_KERNEL, home_node);
+@@ -716,42 +752,19 @@ static int null_add_dev(void)
+ 
+ 	sprintf(nullb->disk_name, "nullb%d", nullb->index);
+ 
+-	if (use_lightnvm) {
+-		rv = nvm_register(nullb->q, nullb->disk_name,
+-							&null_lnvm_dev_ops);
+-		if (rv)
+-			goto out_cleanup_blk_queue;
+-		goto done;
+-	}
++	if (use_lightnvm)
++		rv = null_nvm_register(nullb);
++	else
++		rv = null_gendisk_register(nullb);
+ 
+-	disk = nullb->disk = alloc_disk_node(1, home_node);
+-	if (!disk) {
+-		rv = -ENOMEM;
+-		goto out_cleanup_lightnvm;
+-	}
+-	size = gb * 1024 * 1024 * 1024ULL;
+-	set_capacity(disk, size >> 9);
++	if (rv)
++		goto out_cleanup_blk_queue;
+ 
+-	disk->flags |= GENHD_FL_EXT_DEVT | GENHD_FL_SUPPRESS_PARTITION_INFO;
+-	disk->major		= null_major;
+-	disk->first_minor	= nullb->index;
+-	disk->fops		= &null_fops;
+-	disk->private_data	= nullb;
+-	disk->queue		= nullb->q;
+-	strncpy(disk->disk_name, nullb->disk_name, DISK_NAME_LEN);
+-
+-	add_disk(disk);
+-
+-done:
+ 	mutex_lock(&lock);
+ 	list_add_tail(&nullb->list, &nullb_list);
+ 	mutex_unlock(&lock);
+ 
+ 	return 0;
+-
+-out_cleanup_lightnvm:
+-	if (use_lightnvm)
+-		nvm_unregister(nullb->disk_name);
+ out_cleanup_blk_queue:
+ 	blk_cleanup_queue(nullb->q);
+ out_cleanup_tags:
 -- 
 2.1.4
+
