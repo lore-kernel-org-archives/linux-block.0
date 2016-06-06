@@ -1,38 +1,43 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:45254 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932368AbcFGLFj (ORCPT <rfc822;linux-block@vger.kernel.org>);
-	Tue, 7 Jun 2016 07:05:39 -0400
-Date: Tue, 7 Jun 2016 13:05:34 +0200
-From: Karel Zak <kzak@redhat.com>
-To: Shaun Tancheff <shaun@tancheff.com>
-Cc: util-linux@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH] Zoned block device support
-Message-ID: <20160607110534.lyhrwy2drpe6wbz7@ws.net.home>
-References: <1465229095-27651-1-git-send-email-shaun@tancheff.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1465229095-27651-1-git-send-email-shaun@tancheff.com>
+Received: from smtp81.mediacombb.net ([68.66.77.81]:47886 "EHLO
+	dsmdc-mail-smtp.mcomdc.com" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1750788AbcFFQFt (ORCPT
+	<rfc822;linux-block@vger.kernel.org>);
+	Mon, 6 Jun 2016 12:05:49 -0400
+From: Shaun Tancheff <shaun@tancheff.com>
+To: util-linux@vger.kernel.org, linux-block@vger.kernel.org
+Cc: Shaun Tancheff <shaun@tancheff.com>
+Subject: [PATCH] Zoned block device support
+Date: Mon,  6 Jun 2016 11:04:54 -0500
+Message-Id: <1465229095-27651-1-git-send-email-shaun@tancheff.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Mon, Jun 06, 2016 at 11:04:54AM -0500, Shaun Tancheff wrote:
-> ZBC/ZAC compliant devices such as Host Aware drives are now available.
-> 
-> This patch follows the pattern of blkdiscard to and zoned device
-> commands Open, Close and Reset as well as Report zones.
+ZBC/ZAC compliant devices such as Host Aware drives are now available.
 
-It seems it would be possible to merge all to the command 
+This patch follows the pattern of blkdiscard to and zoned device
+commands Open, Close and Reset as well as Report zones.
 
-    blkzone <command> --zone <offset> [options]
+Note that this interface depends on Block layer support ZAC/ZBC commands
+https://lkml.kernel.org/r/1465227572-27149-1-git-send-email-shaun@tancheff.com
 
-where <command> is "report", "open", "close" and "reset".
+Shaun Tancheff (1):
+  Add blkzonecmd and blkreport ZAC/ZBC drives
 
-What is difference between zone "reset" and blkdiscard(8)?
-
-    Karel
-
+ configure.ac            |  14 ++
+ include/strutils.h      |   1 +
+ lib/strutils.c          |   6 +-
+ sys-utils/Makemodule.am |  14 ++
+ sys-utils/blkreport.8   |  96 +++++++++
+ sys-utils/blkreport.c   | 546 ++++++++++++++++++++++++++++++++++++++++++++++++
+ sys-utils/blkzonecmd.8  |  78 +++++++
+ sys-utils/blkzonecmd.c  | 239 +++++++++++++++++++++
+ 8 files changed, 993 insertions(+), 1 deletion(-)
+ create mode 100644 sys-utils/blkreport.8
+ create mode 100644 sys-utils/blkreport.c
+ create mode 100644 sys-utils/blkzonecmd.8
+ create mode 100644 sys-utils/blkzonecmd.c
 
 -- 
- Karel Zak  <kzak@redhat.com>
- http://karelzak.blogspot.com
+2.8.1
+
