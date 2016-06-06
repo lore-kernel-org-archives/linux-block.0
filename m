@@ -1,279 +1,543 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:46439 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750956AbcFETce (ORCPT <rfc822;linux-block@vger.kernel.org>);
-	Sun, 5 Jun 2016 15:32:34 -0400
-From: mchristi@redhat.com
-To: linux-f2fs-devel@lists.sourceforge.net, linux-ext4@vger.kernel.org,
-	konrad.wilk@oracle.com, drbd-dev@lists.linbit.com,
-	philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
-	linux-raid@vger.kernel.org, dm-devel@redhat.com,
-	linux-fsdevel@vger.kernel.org, linux-bcache@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linux-mtd@lists.infradead.org,
-	target-devel@vger.kernel.org, linux-btrfs@vger.kernel.org,
-	osd-dev@open-osd.org, xfs@oss.sgi.com, ocfs2-devel@oss.oracle.com
-Subject: [PATCH 00/45] v8: separate operations from flags in the bio/request structs 
-Date: Sun,  5 Jun 2016 14:31:40 -0500
-Message-Id: <1465155145-10812-1-git-send-email-mchristi@redhat.com>
+Received: from mail-wm0-f65.google.com ([74.125.82.65]:34615 "EHLO
+	mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753167AbcFFOqN (ORCPT
+	<rfc822;linux-block@vger.kernel.org>); Mon, 6 Jun 2016 10:46:13 -0400
+Received: by mail-wm0-f65.google.com with SMTP id n184so17077980wmn.1
+        for <linux-block@vger.kernel.org>; Mon, 06 Jun 2016 07:46:13 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Simon Lund <slund@cnexlabs.com>,
+	=?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+Subject: [RFC PATCH 5/6] lightnvm: expose device geometry through sysfs
+Date: Mon,  6 Jun 2016 16:46:02 +0200
+Message-Id: <1465224363-25797-6-git-send-email-m@bjorling.me>
+In-Reply-To: <1465224363-25797-1-git-send-email-m@bjorling.me>
+References: <1465224363-25797-1-git-send-email-m@bjorling.me>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-The following patches begin to cleanup the request->cmd_flags and
-bio->bi_rw mess. We currently use cmd_flags to specify the operation,
-attributes and state of the request. For bi_rw we use it for similar
-info and also the priority but then also have another bi_flags field
-for state. At some point, we abused them so much we just made cmd_flags
-64 bits, so we could add more.
+From: Simon Lund <slund@cnexlabs.com>
 
-The following patches seperate the operation (read, write discard,
-flush, etc) from cmd_flags/bi_rw. They were made against Linus's
-tree.
+For a host to access an Open-Channel SSD, it has to know its geometry,
+so that it writes and reads at the appropriate device bounds.
 
-I put a git tree here:
+The geometry information is kept within the kernel, and not
+exported to user-space for consumption. This patch exposes the
+configuration through sysfs and enables user-space libraries, such as
+liblightnvm, to use the sysfs implementation to get the geometry of an
+Open-Channel SSD.
 
-https://github.com/mikechristie/linux-kernel/tree/op
+The sysfs entries are stored within the device hierarchy, and can be
+found using the "lightnvm" device type.
 
-The patches are in the op branch.
+An example configuration looks like this:
 
-Note that I made it against linus's tree, but right now the only
-major conflicts with -next are in the dm tree from the dm-rq related
-changes. I have patches for that and can submit them. I was just not
-sure how to coordinate everything.
+/sys/class/nvme/
+└── nvme0n1
+   ├── capabilities: 3
+   ├── device_mode: 1
+   ├── channel_parallelism: 0
+   ├── erase_max: 1000000
+   ├── erase_typ: 1000000
+   ├── flash_media_type: 0
+   ├── media_capabilities: 0x00000001
+   ├── media_type: 0
+   ├── multiplane: 0x00010101
+   ├── num_blocks: 1022
+   ├── num_channels: 1
+   ├── num_luns: 4
+   ├── num_pages: 64
+   ├── num_planes: 1
+   ├── page_size: 4096
+   ├── prog_max: 100000
+   ├── prog_typ: 100000
+   ├── read_max: 10000
+   ├── read_typ: 10000
+   ├── sector_oob_size: 0
+   ├── sector_size: 4096
+   ├── media_manager: gennvm
+   ├── num_groups: 1
+   ├── ppa_format: 0x380830082808001010102008
+   ├── vendor_opcode: 0
+   └── version: 1
 
-v8:
-1. Handle Jens's review comments from LSF.  Instead of adding a op
-field, store the value in bi_rw/cmd_flags and access via accessors.
+Signed-off-by: Simon Lund <slund@cnexlabs.com>
+Signed-off-by: Matias Bjørling <m@bjorling.me>
+---
+ drivers/lightnvm/Makefile    |   2 +-
+ drivers/lightnvm/core.c      |  20 +++--
+ drivers/lightnvm/lightnvm.h  |  35 ++++++++
+ drivers/lightnvm/sysfs.c     | 200 +++++++++++++++++++++++++++++++++++++++++++
+ drivers/nvme/host/core.c     |  13 +--
+ drivers/nvme/host/lightnvm.c |  12 ++-
+ drivers/nvme/host/nvme.h     |   6 +-
+ include/linux/lightnvm.h     |   3 +
+ 8 files changed, 274 insertions(+), 17 deletions(-)
+ create mode 100644 drivers/lightnvm/lightnvm.h
+ create mode 100644 drivers/lightnvm/sysfs.c
 
-v7:
-1. Fix broken feature_flush/fua use.
-
-v6 and maybe hopfully the last version:
-1. Adapt patch 41 to Jens's QUEUE_FLAG_WC/FUA patchset.
-
-v5:
-1. Missed crypto fs submit_bio_wait call.
-2. Change nfs bi_rw check to bi_op.
-3. btrfs. Convert finish_parity_scrub.
-4. Reworked against Jens's QUEUE_FLAG patches so I could drop my similar
-code.
-5. Separated the core block layer change into multiple patches for
-merging, elevator, stats, mq and non mq request allocation to try
-and make it easier to read.
-
-v4:
-1. Rebased to current linux-next tree.
-
-v3:
-
-1. Used "=" instead of "|="  to setup bio bi_rw.
-2. Removed __get_request cmd_flags compat code.
-3. Merged initial dm related changes requested by Mike Snitzer.
-4. Fixed ubd kbuild errors in flush related patches.
-5. Fix 80 char col issues in several patches.
-6. Fix issue with one of the btrfs patches where it looks like I reverted
-a patch when trying to fix a merge error.
-
-v2
-
-1. Dropped arguments from submit_bio, and had callers setup
-bio.
-2. Add REQ_OP_FLUSH for request_fn users and renamed REQ_FLUSH
-to REQ_PREFLUSH for make_request_fn users.
-3. Dropped bio/rq_data_dir functions, and added a op_is_write
-function instead.
-
-
-
-Diffstat for the set:
-
-Documentation/block/writeback_cache_control.txt |   28 +++---
- Documentation/device-mapper/log-writes.txt      |   10 +-
- arch/um/drivers/ubd_kern.c                      |    2
- block/bio.c                                     |   20 ++--
- block/blk-core.c                                |  105 +++++++++++------------
- block/blk-flush.c                               |   25 ++---
- block/blk-lib.c                                 |   37 ++++----
- block/blk-map.c                                 |    2
- block/blk-merge.c                               |   24 ++---
- block/blk-mq.c                                  |   42 ++++-----
- block/cfq-iosched.c                             |   55 +++++++-----
- block/elevator.c                                |    7 -
- drivers/ata/libata-scsi.c                       |    2
- drivers/block/brd.c                             |    2
- drivers/block/drbd/drbd_actlog.c                |   34 ++++---
- drivers/block/drbd/drbd_bitmap.c                |   10 +-
- drivers/block/drbd/drbd_int.h                   |    4
- drivers/block/drbd/drbd_main.c                  |   22 ++--
- drivers/block/drbd/drbd_protocol.h              |    2
- drivers/block/drbd/drbd_receiver.c              |   38 +++++---
- drivers/block/drbd/drbd_req.c                   |    2
- drivers/block/drbd/drbd_worker.c                |    7 -
- drivers/block/floppy.c                          |    5 -
- drivers/block/loop.c                            |   16 +--
- drivers/block/mtip32xx/mtip32xx.c               |    2
- drivers/block/nbd.c                             |    4
- drivers/block/osdblk.c                          |    2
- drivers/block/pktcdvd.c                         |    4
- drivers/block/ps3disk.c                         |    4
- drivers/block/rbd.c                             |    4
- drivers/block/rsxx/dma.c                        |    2
- drivers/block/skd_main.c                        |    2
- drivers/block/umem.c                            |    2
- drivers/block/virtio_blk.c                      |    2
- drivers/block/xen-blkback/blkback.c             |   31 ++++--
- drivers/block/xen-blkfront.c                    |   67 +++++++--------
- drivers/block/zram/zram_drv.c                   |    2
- drivers/ide/ide-cd_ioctl.c                      |    3
- drivers/ide/ide-disk.c                          |    2
- drivers/ide/ide-floppy.c                        |    2
- drivers/lightnvm/rrpc.c                         |    6 -
- drivers/md/bcache/btree.c                       |    4
- drivers/md/bcache/debug.c                       |   10 +-
- drivers/md/bcache/io.c                          |    2
- drivers/md/bcache/journal.c                     |   11 +-
- drivers/md/bcache/movinggc.c                    |    2
- drivers/md/bcache/request.c                     |   28 +++---
- drivers/md/bcache/super.c                       |   28 +++---
- drivers/md/bcache/writeback.c                   |    4
- drivers/md/bitmap.c                             |    6 -
- drivers/md/dm-bufio.c                           |   11 +-
- drivers/md/dm-cache-target.c                    |   22 ++--
- drivers/md/dm-crypt.c                           |   15 +--
- drivers/md/dm-era-target.c                      |    4
- drivers/md/dm-flakey.c                          |    2
- drivers/md/dm-io.c                              |   65 +++++++-------
- drivers/md/dm-kcopyd.c                          |   11 +-
- drivers/md/dm-log-writes.c                      |   19 ++--
- drivers/md/dm-log.c                             |    5 -
- drivers/md/dm-raid.c                            |    5 -
- drivers/md/dm-raid1.c                           |   24 +++--
- drivers/md/dm-region-hash.c                     |    8 -
- drivers/md/dm-snap-persistent.c                 |   24 ++---
- drivers/md/dm-snap.c                            |    6 -
- drivers/md/dm-stats.c                           |    9 --
- drivers/md/dm-stripe.c                          |    6 -
- drivers/md/dm-thin.c                            |   30 +++---
- drivers/md/dm.c                                 |   45 +++++-----
- drivers/md/linear.c                             |    4
- drivers/md/md.c                                 |   24 +++--
- drivers/md/md.h                                 |    5 -
- drivers/md/multipath.c                          |    2
- drivers/md/raid0.c                              |    4
- drivers/md/raid1.c                              |   38 ++++----
- drivers/md/raid10.c                             |   54 ++++++------
- drivers/md/raid5-cache.c                        |   35 ++++---
- drivers/md/raid5.c                              |   48 +++++-----
- drivers/mmc/card/block.c                        |   13 +-
- drivers/mmc/card/queue.c                        |    6 -
- drivers/mmc/card/queue.h                        |    8 +
- drivers/mtd/mtd_blkdevs.c                       |    4
- drivers/nvme/host/core.c                        |    4
- drivers/nvme/host/nvme.h                        |    4
- drivers/scsi/osd/osd_initiator.c                |   12 +-
- drivers/scsi/sd.c                               |   34 ++++---
- drivers/staging/lustre/lustre/llite/lloop.c     |    6 -
- drivers/target/target_core_iblock.c             |   53 ++++++-----
- drivers/target/target_core_pscsi.c              |    2
- fs/btrfs/check-integrity.c                      |   73 ++++++++--------
- fs/btrfs/check-integrity.h                      |    6 -
- fs/btrfs/compression.c                          |   17 ++-
- fs/btrfs/ctree.h                                |    2
- fs/btrfs/disk-io.c                              |   45 ++++------
- fs/btrfs/disk-io.h                              |    2
- fs/btrfs/extent-tree.c                          |    2
- fs/btrfs/extent_io.c                            |  107 +++++++++++-------------
- fs/btrfs/extent_io.h                            |    8 -
- fs/btrfs/inode.c                                |   74 ++++++++--------
- fs/btrfs/raid56.c                               |   27 +++---
- fs/btrfs/scrub.c                                |   25 +++--
- fs/btrfs/volumes.c                              |   95 +++++++++++----------
- fs/btrfs/volumes.h                              |    6 -
- fs/buffer.c                                     |   75 ++++++++--------
- fs/crypto/crypto.c                              |    5 -
- fs/direct-io.c                                  |   37 ++++----
- fs/exofs/ore.c                                  |    2
- fs/ext4/balloc.c                                |    2
- fs/ext4/ialloc.c                                |    2
- fs/ext4/inode.c                                 |    8 -
- fs/ext4/mmp.c                                   |    4
- fs/ext4/namei.c                                 |    3
- fs/ext4/page-io.c                               |    9 +-
- fs/ext4/readpage.c                              |   11 +-
- fs/ext4/super.c                                 |    2
- fs/f2fs/checkpoint.c                            |   10 +-
- fs/f2fs/data.c                                  |   51 ++++++-----
- fs/f2fs/f2fs.h                                  |    5 -
- fs/f2fs/gc.c                                    |    9 +-
- fs/f2fs/inline.c                                |    3
- fs/f2fs/node.c                                  |    8 +
- fs/f2fs/segment.c                               |   18 ++--
- fs/f2fs/trace.c                                 |    7 -
- fs/fat/misc.c                                   |    2
- fs/gfs2/bmap.c                                  |    4
- fs/gfs2/dir.c                                   |    2
- fs/gfs2/log.c                                   |    8 -
- fs/gfs2/lops.c                                  |   14 +--
- fs/gfs2/lops.h                                  |    2
- fs/gfs2/meta_io.c                               |   20 ++--
- fs/gfs2/ops_fstype.c                            |    5 -
- fs/gfs2/quota.c                                 |    2
- fs/hfsplus/hfsplus_fs.h                         |    2
- fs/hfsplus/part_tbl.c                           |    5 -
- fs/hfsplus/super.c                              |    6 -
- fs/hfsplus/wrapper.c                            |   17 ++-
- fs/isofs/compress.c                             |    2
- fs/jbd2/commit.c                                |    6 -
- fs/jbd2/journal.c                               |   12 +-
- fs/jbd2/recovery.c                              |    4
- fs/jfs/jfs_logmgr.c                             |   10 +-
- fs/jfs/jfs_metapage.c                           |   14 +--
- fs/logfs/dev_bdev.c                             |   27 +++---
- fs/mpage.c                                      |   43 ++++-----
- fs/nfs/blocklayout/blocklayout.c                |   26 +++--
- fs/nilfs2/btnode.c                              |    6 -
- fs/nilfs2/btnode.h                              |    2
- fs/nilfs2/btree.c                               |    6 -
- fs/nilfs2/gcinode.c                             |    5 -
- fs/nilfs2/mdt.c                                 |   11 +-
- fs/nilfs2/segbuf.c                              |   20 ++--
- fs/ntfs/aops.c                                  |    6 -
- fs/ntfs/compress.c                              |    2
- fs/ntfs/file.c                                  |    2
- fs/ntfs/logfile.c                               |    2
- fs/ntfs/mft.c                                   |    4
- fs/ocfs2/aops.c                                 |    2
- fs/ocfs2/buffer_head_io.c                       |    8 -
- fs/ocfs2/cluster/heartbeat.c                    |   22 ++--
- fs/ocfs2/super.c                                |    2
- fs/reiserfs/inode.c                             |    4
- fs/reiserfs/journal.c                           |   14 +--
- fs/reiserfs/stree.c                             |    4
- fs/reiserfs/super.c                             |    2
- fs/squashfs/block.c                             |    4
- fs/udf/dir.c                                    |    2
- fs/udf/directory.c                              |    2
- fs/udf/inode.c                                  |    2
- fs/ufs/balloc.c                                 |    2
- fs/ufs/util.c                                   |    2
- fs/xfs/xfs_aops.c                               |   27 +++---
- fs/xfs/xfs_buf.c                                |   32 +++----
- include/linux/bio.h                             |   37 +++-----
- include/linux/blk-cgroup.h                      |   15 +--
- include/linux/blk_types.h                       |   94 +++++++++++----------
- include/linux/blkdev.h                          |   56 ++++++++----
- include/linux/blktrace_api.h                    |    2
- include/linux/buffer_head.h                     |   11 +-
- include/linux/dm-io.h                           |    3
- include/linux/elevator.h                        |    4
- include/linux/fs.h                              |   71 +++++++++------
- include/trace/events/bcache.h                   |   12 +-
- include/trace/events/block.h                    |   31 ++++--
- include/trace/events/f2fs.h                     |   37 ++++----
- kernel/power/swap.c                             |   35 ++++---
- kernel/trace/blktrace.c                         |   72 +++++++++-------
- mm/page_io.c                                    |   14 +--
- 186 files changed, 1679 insertions(+), 1413 deletions(-)
-
-
+diff --git a/drivers/lightnvm/Makefile b/drivers/lightnvm/Makefile
+index a7a0a22..1f6b652 100644
+--- a/drivers/lightnvm/Makefile
++++ b/drivers/lightnvm/Makefile
+@@ -2,6 +2,6 @@
+ # Makefile for Open-Channel SSDs.
+ #
+ 
+-obj-$(CONFIG_NVM)		:= core.o sysblk.o
++obj-$(CONFIG_NVM)		:= core.o sysblk.o sysfs.o
+ obj-$(CONFIG_NVM_GENNVM) 	+= gennvm.o
+ obj-$(CONFIG_NVM_RRPC)		+= rrpc.o
+diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+index 5736c59..f71fbb9 100644
+--- a/drivers/lightnvm/core.c
++++ b/drivers/lightnvm/core.c
+@@ -27,6 +27,8 @@
+ #include <linux/lightnvm.h>
+ #include <linux/sched/sysctl.h>
+ 
++#include "lightnvm.h"
++
+ static LIST_HEAD(nvm_tgt_types);
+ static DECLARE_RWSEM(nvm_tgtt_lock);
+ static LIST_HEAD(nvm_mgrs);
+@@ -593,15 +595,19 @@ static void nvm_free_mgr(struct nvm_dev *dev)
+ 	dev->mt = NULL;
+ }
+ 
+-static void nvm_free(struct nvm_dev *dev)
++void nvm_free(struct nvm_dev *dev)
+ {
+ 	if (!dev)
+ 		return;
+ 
+ 	nvm_free_mgr(dev);
+ 
++	if (dev->dma_pool)
++		dev->ops->destroy_dma_pool(dev->dma_pool);
++
+ 	kfree(dev->lptbl);
+ 	kfree(dev->lun_map);
++	kfree(dev);
+ }
+ 
+ static int nvm_init(struct nvm_dev *dev)
+@@ -648,11 +654,7 @@ err:
+ 
+ static void nvm_exit(struct nvm_dev *dev)
+ {
+-	if (dev->dma_pool)
+-		dev->ops->destroy_dma_pool(dev->dma_pool);
+-	nvm_free(dev);
+-
+-	pr_info("nvm: successfully unloaded\n");
++	nvm_sysfs_unregister_dev(dev);
+ }
+ 
+ struct nvm_dev *nvm_alloc_dev(int node)
+@@ -683,6 +685,10 @@ int nvm_register(struct nvm_dev *dev)
+ 		}
+ 	}
+ 
++	ret = nvm_sysfs_register_dev(dev);
++	if (ret)
++		goto err_ppalist;
++
+ 	if (dev->identity.cap & NVM_ID_DCAP_BBLKMGMT) {
+ 		ret = nvm_get_sysblock(dev, &dev->sb);
+ 		if (!ret)
+@@ -699,6 +705,8 @@ int nvm_register(struct nvm_dev *dev)
+ 	up_write(&nvm_lock);
+ 
+ 	return 0;
++err_ppalist:
++	dev->ops->destroy_dma_pool(dev->dma_pool);
+ err_init:
+ 	kfree(dev->lun_map);
+ 	return ret;
+diff --git a/drivers/lightnvm/lightnvm.h b/drivers/lightnvm/lightnvm.h
+new file mode 100644
+index 0000000..93f1aac
+--- /dev/null
++++ b/drivers/lightnvm/lightnvm.h
+@@ -0,0 +1,35 @@
++/*
++ * Copyright (C) 2016 CNEX Labs. All rights reserved.
++ * Initial release: Matias Bjorling <matias@cnexlabs.com>
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License version
++ * 2 as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; see the file COPYING.  If not, write to
++ * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139,
++ * USA.
++ *
++ */
++
++#ifndef LIGHTNVM_H
++#define LIGHTNVM_H
++
++#include <linux/lightnvm.h>
++
++/* core -> sysfs.c */
++int nvm_sysfs_register_dev(struct nvm_dev *);
++void nvm_sysfs_unregister_dev(struct nvm_dev *);
++int nvm_sysfs_register(void);
++void nvm_sysfs_unregister(void);
++
++/* sysfs > core */
++void nvm_free(struct nvm_dev *);
++
++#endif
+diff --git a/drivers/lightnvm/sysfs.c b/drivers/lightnvm/sysfs.c
+new file mode 100644
+index 0000000..82d340a
+--- /dev/null
++++ b/drivers/lightnvm/sysfs.c
+@@ -0,0 +1,200 @@
++#include <linux/kernel.h>
++#include <linux/lightnvm.h>
++#include <linux/miscdevice.h>
++#include <linux/kobject.h>
++#include <linux/blk-mq.h>
++
++#include "lightnvm.h"
++
++static ssize_t nvm_dev_attr_show(struct device *dev,
++				 struct device_attribute *dattr, char *page)
++{
++	struct nvm_dev *ndev = container_of(dev, struct nvm_dev, dev);
++	struct nvm_id *id = &ndev->identity;
++	struct nvm_id_group *grp = &id->groups[0];
++	struct attribute *attr = &dattr->attr;
++
++	if (strcmp(attr->name, "version") == 0) {
++		return scnprintf(page, PAGE_SIZE, "%u\n", id->ver_id);
++	} else if (strcmp(attr->name, "vendor_opcode") == 0) {
++		return scnprintf(page, PAGE_SIZE, "%u\n", id->vmnt);
++	} else if (strcmp(attr->name, "num_groups") == 0) {
++		return scnprintf(page, PAGE_SIZE, "%u\n", id->cgrps);
++	} else if (strcmp(attr->name, "capabilities") == 0) {
++		return scnprintf(page, PAGE_SIZE, "%u\n", id->cap);
++	} else if (strcmp(attr->name, "device_mode") == 0) {
++		return scnprintf(page, PAGE_SIZE, "%u\n", id->dom);
++	} else if (strcmp(attr->name, "media_manager") == 0) {
++		if (!ndev->mt)
++			return scnprintf(page, PAGE_SIZE, "%s\n", "none");
++		return scnprintf(page, PAGE_SIZE, "%s\n", ndev->mt->name);
++	} else if (strcmp(attr->name, "ppa_format") == 0) {
++		return scnprintf(page, PAGE_SIZE,
++			"0x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x\n",
++			id->ppaf.ch_offset, id->ppaf.ch_len,
++			id->ppaf.lun_offset, id->ppaf.lun_len,
++			id->ppaf.pln_offset, id->ppaf.pln_len,
++			id->ppaf.blk_offset, id->ppaf.blk_len,
++			id->ppaf.pg_offset, id->ppaf.pg_len,
++			id->ppaf.sect_offset, id->ppaf.sect_len);
++	} else if (strcmp(attr->name, "media_type") == 0) {	/* u8 */
++		return scnprintf(page, PAGE_SIZE, "%u\n", grp->mtype);
++	} else if (strcmp(attr->name, "flash_media_type") == 0) {
++		return scnprintf(page, PAGE_SIZE, "%u\n", grp->fmtype);
++	} else if (strcmp(attr->name, "num_channels") == 0) {
++		return scnprintf(page, PAGE_SIZE, "%u\n", grp->num_ch);
++	} else if (strcmp(attr->name, "num_luns") == 0) {
++		return scnprintf(page, PAGE_SIZE, "%u\n", grp->num_lun);
++	} else if (strcmp(attr->name, "num_planes") == 0) {
++		return scnprintf(page, PAGE_SIZE, "%u\n", grp->num_pln);
++	} else if (strcmp(attr->name, "num_blocks") == 0) {	/* u16 */
++		return scnprintf(page, PAGE_SIZE, "%u\n", grp->num_blk);
++	} else if (strcmp(attr->name, "num_pages") == 0) {
++		return scnprintf(page, PAGE_SIZE, "%u\n", grp->num_pg);
++	} else if (strcmp(attr->name, "page_size") == 0) {
++		return scnprintf(page, PAGE_SIZE, "%u\n", grp->fpg_sz);
++	} else if (strcmp(attr->name, "hw_sector_size") == 0) {
++		return scnprintf(page, PAGE_SIZE, "%u\n", grp->csecs);
++	} else if (strcmp(attr->name, "oob_sector_size") == 0) {/* u32 */
++		return scnprintf(page, PAGE_SIZE, "%u\n", grp->sos);
++	} else if (strcmp(attr->name, "read_typ") == 0) {
++		return scnprintf(page, PAGE_SIZE, "%u\n", grp->trdt);
++	} else if (strcmp(attr->name, "read_max") == 0) {
++		return scnprintf(page, PAGE_SIZE, "%u\n", grp->trdm);
++	} else if (strcmp(attr->name, "prog_typ") == 0) {
++		return scnprintf(page, PAGE_SIZE, "%u\n", grp->tprt);
++	} else if (strcmp(attr->name, "prog_max") == 0) {
++		return scnprintf(page, PAGE_SIZE, "%u\n", grp->tprm);
++	} else if (strcmp(attr->name, "erase_typ") == 0) {
++		return scnprintf(page, PAGE_SIZE, "%u\n", grp->tbet);
++	} else if (strcmp(attr->name, "erase_max") == 0) {
++		return scnprintf(page, PAGE_SIZE, "%u\n", grp->tbem);
++	} else if (strcmp(attr->name, "multiplane_modes") == 0) {
++		return scnprintf(page, PAGE_SIZE, "0x%08x\n", grp->mpos);
++	} else if (strcmp(attr->name, "media_capabilities") == 0) {
++		return scnprintf(page, PAGE_SIZE, "0x%08x\n", grp->mccap);
++	} else if (strcmp(attr->name, "channel_parallelism") == 0) {/* u16 */
++		return scnprintf(page, PAGE_SIZE, "%u\n", grp->cpar);
++	} else {
++		return scnprintf(page,
++				 PAGE_SIZE,
++				 "Unhandled attr(%s) in `nvm_dev_attr_show`\n",
++				 attr->name);
++	}
++}
++
++#define NVM_DEV_ATTR_RO(_name) 					\
++static DEVICE_ATTR(_name, S_IRUGO, nvm_dev_attr_show, NULL);
++
++NVM_DEV_ATTR_RO(version);
++NVM_DEV_ATTR_RO(vendor_opcode);
++NVM_DEV_ATTR_RO(num_groups);
++NVM_DEV_ATTR_RO(capabilities);
++NVM_DEV_ATTR_RO(device_mode);
++NVM_DEV_ATTR_RO(ppa_format);
++NVM_DEV_ATTR_RO(media_manager);
++
++NVM_DEV_ATTR_RO(media_type);
++NVM_DEV_ATTR_RO(flash_media_type);
++NVM_DEV_ATTR_RO(num_channels);
++NVM_DEV_ATTR_RO(num_luns);
++NVM_DEV_ATTR_RO(num_planes);
++NVM_DEV_ATTR_RO(num_blocks);
++NVM_DEV_ATTR_RO(num_pages);
++NVM_DEV_ATTR_RO(page_size);
++NVM_DEV_ATTR_RO(hw_sector_size);
++NVM_DEV_ATTR_RO(oob_sector_size);
++NVM_DEV_ATTR_RO(read_typ);
++NVM_DEV_ATTR_RO(read_max);
++NVM_DEV_ATTR_RO(prog_typ);
++NVM_DEV_ATTR_RO(prog_max);
++NVM_DEV_ATTR_RO(erase_typ);
++NVM_DEV_ATTR_RO(erase_max);
++NVM_DEV_ATTR_RO(multiplane_modes);
++NVM_DEV_ATTR_RO(media_capabilities);
++NVM_DEV_ATTR_RO(channel_parallelism);
++
++#define NVM_DEV_ATTR(_name) (dev_attr_##_name##)
++
++static struct attribute *nvm_dev_attrs[] = {
++	&dev_attr_version.attr,
++	&dev_attr_vendor_opcode.attr,
++	&dev_attr_num_groups.attr,
++	&dev_attr_capabilities.attr,
++	&dev_attr_device_mode.attr,
++	&dev_attr_media_manager.attr,
++
++	&dev_attr_ppa_format.attr,
++	&dev_attr_media_type.attr,
++	&dev_attr_flash_media_type.attr,
++	&dev_attr_num_channels.attr,
++	&dev_attr_num_luns.attr,
++	&dev_attr_num_planes.attr,
++	&dev_attr_num_blocks.attr,
++	&dev_attr_num_pages.attr,
++	&dev_attr_page_size.attr,
++	&dev_attr_hw_sector_size.attr,
++	&dev_attr_oob_sector_size.attr,
++	&dev_attr_read_typ.attr,
++	&dev_attr_read_max.attr,
++	&dev_attr_prog_typ.attr,
++	&dev_attr_prog_max.attr,
++	&dev_attr_erase_typ.attr,
++	&dev_attr_erase_max.attr,
++	&dev_attr_multiplane_modes.attr,
++	&dev_attr_media_capabilities.attr,
++	&dev_attr_channel_parallelism.attr,
++	NULL,
++};
++
++static struct attribute_group nvm_dev_attr_group = {
++	.name = "lightnvm",
++	.attrs = nvm_dev_attrs,
++};
++
++
++const static struct attribute_group *nvm_dev_attr_groups[] = {
++	&nvm_dev_attr_group,
++	NULL,
++};
++
++static void nvm_dev_release(struct device *device)
++{
++	struct nvm_dev *dev = container_of(device, struct nvm_dev, dev);
++	struct request_queue *q = dev->q;
++
++	pr_debug("nvm/sysfs: `nvm_dev_release`\n");
++
++	blk_mq_unregister_dev(device, q);
++
++	nvm_free(dev);
++}
++
++static struct device_type nvm_type = {
++	.name		= "lightnvm",
++	.groups		= nvm_dev_attr_groups,
++	.release	= nvm_dev_release,
++};
++
++int nvm_sysfs_register_dev(struct nvm_dev *dev)
++{
++	if (!dev->parent_dev)
++		return 0;
++
++	dev->dev.parent = dev->parent_dev;
++	dev_set_name(&dev->dev, "%s", dev->name);
++	dev->dev.class = dev->parent_dev->class;
++	dev->dev.type = &nvm_type;
++	device_initialize(&dev->dev);
++	device_add(&dev->dev);
++
++	blk_mq_register_dev(&dev->dev, dev->q);
++
++	return 0;
++}
++
++void nvm_sysfs_unregister_dev(struct nvm_dev *dev)
++{
++	if (dev && dev->parent_dev)
++		kobject_put(&dev->dev.kobj);
++}
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index ff20f1c..0e63546 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -1095,7 +1095,7 @@ static DEVICE_ATTR(reset_controller, S_IWUSR, NULL, nvme_sysfs_reset);
+ static ssize_t wwid_show(struct device *dev, struct device_attribute *attr,
+ 								char *buf)
+ {
+-	struct nvme_ns *ns = dev_to_disk(dev)->private_data;
++	struct nvme_ns *ns = nvme_get_ns_from_dev(dev);
+ 	struct nvme_ctrl *ctrl = ns->ctrl;
+ 	int serial_len = sizeof(ctrl->serial);
+ 	int model_len = sizeof(ctrl->model);
+@@ -1119,7 +1119,7 @@ static DEVICE_ATTR(wwid, S_IRUGO, wwid_show, NULL);
+ static ssize_t uuid_show(struct device *dev, struct device_attribute *attr,
+ 								char *buf)
+ {
+-	struct nvme_ns *ns = dev_to_disk(dev)->private_data;
++	struct nvme_ns *ns = nvme_get_ns_from_dev(dev);
+ 	return sprintf(buf, "%pU\n", ns->uuid);
+ }
+ static DEVICE_ATTR(uuid, S_IRUGO, uuid_show, NULL);
+@@ -1127,7 +1127,7 @@ static DEVICE_ATTR(uuid, S_IRUGO, uuid_show, NULL);
+ static ssize_t eui_show(struct device *dev, struct device_attribute *attr,
+ 								char *buf)
+ {
+-	struct nvme_ns *ns = dev_to_disk(dev)->private_data;
++	struct nvme_ns *ns = nvme_get_ns_from_dev(dev);
+ 	return sprintf(buf, "%8phd\n", ns->eui);
+ }
+ static DEVICE_ATTR(eui, S_IRUGO, eui_show, NULL);
+@@ -1135,7 +1135,7 @@ static DEVICE_ATTR(eui, S_IRUGO, eui_show, NULL);
+ static ssize_t nsid_show(struct device *dev, struct device_attribute *attr,
+ 								char *buf)
+ {
+-	struct nvme_ns *ns = dev_to_disk(dev)->private_data;
++	struct nvme_ns *ns = nvme_get_ns_from_dev(dev);
+ 	return sprintf(buf, "%d\n", ns->ns_id);
+ }
+ static DEVICE_ATTR(nsid, S_IRUGO, nsid_show, NULL);
+@@ -1152,7 +1152,7 @@ static umode_t nvme_attrs_are_visible(struct kobject *kobj,
+ 		struct attribute *a, int n)
+ {
+ 	struct device *dev = container_of(kobj, struct device, kobj);
+-	struct nvme_ns *ns = dev_to_disk(dev)->private_data;
++	struct nvme_ns *ns = nvme_get_ns_from_dev(dev);
+ 
+ 	if (a == &dev_attr_uuid.attr) {
+ 		if (!memchr_inv(ns->uuid, 0, sizeof(ns->uuid)))
+@@ -1272,7 +1272,8 @@ static void nvme_alloc_ns(struct nvme_ctrl *ctrl, unsigned nsid)
+ 	sprintf(disk_name, "nvme%dn%d", ctrl->instance, ns->instance);
+ 
+ 	if (nvme_nvm_ns_supported(ns, id)) {
+-		if (nvme_nvm_register(ns, disk_name, node)) {
++		if (nvme_nvm_register(ns, disk_name, node,
++							&nvme_ns_attr_group)) {
+ 			dev_warn(ctrl->dev, "%s: LightNVM init failure\n",
+ 								__func__);
+ 			goto out_free_id;
+diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
+index cd406c5..c9c7189 100644
+--- a/drivers/nvme/host/lightnvm.c
++++ b/drivers/nvme/host/lightnvm.c
+@@ -592,10 +592,12 @@ static struct nvm_dev_ops nvme_nvm_dev_ops = {
+ 	.max_phys_sect		= 64,
+ };
+ 
+-int nvme_nvm_register(struct nvme_ns *ns, char *disk_name, int node)
++int nvme_nvm_register(struct nvme_ns *ns, char *disk_name, int node,
++		      const struct attribute_group *attrs)
+ {
+ 	struct request_queue *q = ns->queue;
+ 	struct nvm_dev *dev;
++	int ret;
+ 
+ 	dev = nvm_alloc_dev(node);
+ 	if (!dev)
+@@ -604,9 +606,15 @@ int nvme_nvm_register(struct nvme_ns *ns, char *disk_name, int node)
+ 	dev->q = q;
+ 	memcpy(dev->name, disk_name, DISK_NAME_LEN);
+ 	dev->ops = &nvme_nvm_dev_ops;
++	dev->parent_dev = ns->ctrl->device;
++	dev->private_data = ns;
+ 	ns->ndev = dev;
+ 
+-	return nvm_register(dev);
++	ret = nvm_register(dev);
++	if (sysfs_create_group(&dev->dev.kobj, attrs))
++		pr_warn("%s: failed to create sysfs group for identification\n",
++			ns->disk->disk_name);
++	return ret;
+ }
+ 
+ void nvme_nvm_unregister(struct nvme_ns *ns)
+diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+index d62c6fd..d7f1afc 100644
+--- a/drivers/nvme/host/nvme.h
++++ b/drivers/nvme/host/nvme.h
+@@ -292,7 +292,8 @@ int nvme_sg_get_version_num(int __user *ip);
+ 
+ #ifdef CONFIG_NVM
+ int nvme_nvm_ns_supported(struct nvme_ns *ns, struct nvme_id_ns *id);
+-int nvme_nvm_register(struct nvme_ns *ns, char *disk_name, int node);
++int nvme_nvm_register(struct nvme_ns *ns, char *disk_name, int node,
++		      const struct attribute_group *attrs);
+ void nvme_nvm_unregister(struct nvme_ns *ns);
+ 
+ static inline struct nvme_ns *nvme_get_ns_from_dev(struct device *dev)
+@@ -304,7 +305,8 @@ static inline struct nvme_ns *nvme_get_ns_from_dev(struct device *dev)
+ }
+ #else
+ static inline int nvme_nvm_register(struct nvme_ns *ns, char *disk_name,
+-								int node)
++				    int node,
++				    const struct attribute_group *attrs)
+ {
+ 	return 0;
+ }
+diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
+index 5afc263..d190786 100644
+--- a/include/linux/lightnvm.h
++++ b/include/linux/lightnvm.h
+@@ -352,7 +352,10 @@ struct nvm_dev {
+ 
+ 	/* Backend device */
+ 	struct request_queue *q;
++	struct device dev;
++	struct device *parent_dev;
+ 	char name[DISK_NAME_LEN];
++	void *private_data;
+ 
+ 	struct mutex mlock;
+ 	spinlock_t lock;
+-- 
+2.1.4
 
