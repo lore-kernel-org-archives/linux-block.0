@@ -1,62 +1,54 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:2475 "EHLO mga11.intel.com"
+Received: from mx2.suse.de ([195.135.220.15]:45829 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752182AbcF0Taq (ORCPT <rfc822;linux-block@vger.kernel.org>);
-	Mon, 27 Jun 2016 15:30:46 -0400
-Subject: [PATCH v5 2/5] mmc: move 'parent' tracking to mmc_blk_data
-From: Dan Williams <dan.j.williams@intel.com>
-To: axboe@fb.com
-Cc: Ulf Hansson <ulf.hansson@linaro.org>, linux-nvdimm@lists.01.org,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	Bart Van Assche <bart.vanassche@sandisk.com>, hch@lst.de
-Date: Mon, 27 Jun 2016 12:30:03 -0700
-Message-ID: <146705580308.39775.10937037092465199137.stgit@dwillia2-desk3.amr.corp.intel.com>
-In-Reply-To: <146705579255.39775.12551436695635245858.stgit@dwillia2-desk3.amr.corp.intel.com>
-References: <146705579255.39775.12551436695635245858.stgit@dwillia2-desk3.amr.corp.intel.com>
+	id S1751091AbcFFGNn (ORCPT <rfc822;linux-block@vger.kernel.org>);
+	Mon, 6 Jun 2016 02:13:43 -0400
+Subject: Re: [PATCH 02/45] block: add REQ_OP definitions and helpers
+To: mchristi@redhat.com, linux-f2fs-devel@lists.sourceforge.net,
+	linux-ext4@vger.kernel.org, konrad.wilk@oracle.com,
+	drbd-dev@lists.linbit.com, philipp.reisner@linbit.com,
+	lars.ellenberg@linbit.com, linux-raid@vger.kernel.org,
+	dm-devel@redhat.com, linux-fsdevel@vger.kernel.org,
+	linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
+	linux-mtd@lists.infradead.org, target-devel@vger.kernel.org,
+	linux-btrfs@vger.kernel.org, osd-dev@open-osd.org, xfs@oss.sgi.com,
+	ocfs2-devel@oss.oracle.com
+References: <1465155145-10812-1-git-send-email-mchristi@redhat.com>
+ <1465155145-10812-3-git-send-email-mchristi@redhat.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <57551493.5050300@suse.de>
+Date: Mon, 6 Jun 2016 08:13:39 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <1465155145-10812-3-git-send-email-mchristi@redhat.com>
+Content-Type: text/plain; charset=windows-1252
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-In preparation for the removal of 'driverfs_dev' from 'struct gendisk',
-carry this data in mmc_blk_data. It is used for registration of parent
-disks and partitions.
+On 06/05/2016 09:31 PM, mchristi@redhat.com wrote:
+> From: Mike Christie <mchristi@redhat.com>
+> 
+> The following patches separate the operation (WRITE, READ, DISCARD,
+> etc) from the rq_flag_bits flags. This patch adds definitions for
+> request/bio operations (REQ_OPs) and adds request/bio accessors to
+> get/set the op.
+> 
+> In this patch the REQ_OPs match the REQ rq_flag_bits ones
+> for compat reasons while all the code is converted to use the
+> op accessors in the set. In the last patches the op will become a
+> number and the accessors and helpers in this patch will be dropped
+> or updated.
+> 
+> Signed-off-by: Mike Christie <mchristi@redhat.com>
+> ---
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Cc: Ulf Hansson <ulf.hansson@linaro.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>
-Signed-off-by: Dan Williams <dan.j.williams@intel.com>
----
- drivers/mmc/card/block.c |    5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+Cheers,
 
-diff --git a/drivers/mmc/card/block.c b/drivers/mmc/card/block.c
-index 383184743f9a..d1733424bf6e 100644
---- a/drivers/mmc/card/block.c
-+++ b/drivers/mmc/card/block.c
-@@ -93,6 +93,7 @@ static DEFINE_SPINLOCK(mmc_blk_lock);
-  */
- struct mmc_blk_data {
- 	spinlock_t	lock;
-+	struct device	*parent;
- 	struct gendisk	*disk;
- 	struct mmc_queue queue;
- 	struct list_head part;
-@@ -2270,7 +2271,7 @@ again:
- 	md->disk->fops = &mmc_bdops;
- 	md->disk->private_data = md;
- 	md->disk->queue = md->queue.queue;
--	md->disk->driverfs_dev = parent;
-+	md->parent = parent;
- 	set_disk_ro(md->disk, md->read_only || default_ro);
- 	md->disk->flags = GENHD_FL_EXT_DEVT;
- 	if (area_type & (MMC_BLK_DATA_AREA_RPMB | MMC_BLK_DATA_AREA_BOOT))
-@@ -2458,7 +2459,7 @@ static int mmc_add_disk(struct mmc_blk_data *md)
- 	int ret;
- 	struct mmc_card *card = md->queue.card;
- 
--	add_disk(md->disk);
-+	device_add_disk(md->parent, md->disk);
- 	md->force_ro.show = force_ro_show;
- 	md->force_ro.store = force_ro_store;
- 	sysfs_attr_init(&md->force_ro.attr);
-
+Hannes
+-- 
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: F. Imend�rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG N�rnberg)
