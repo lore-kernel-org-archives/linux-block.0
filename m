@@ -1,677 +1,203 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0a-00003501.pphosted.com ([67.231.144.15]:28751 "EHLO
-	mx0a-000cda01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1751660AbcFFT0s convert rfc822-to-8bit
-	(ORCPT <rfc822;linux-block@vger.kernel.org>);
-	Mon, 6 Jun 2016 15:26:48 -0400
-Received: from pps.filterd (m0075552.ppops.net [127.0.0.1])
-	by mx0a-00003501.pphosted.com (8.16.0.11/8.16.0.11) with SMTP id u56JQlrF027989
-	for <linux-block@vger.kernel.org>; Mon, 6 Jun 2016 15:26:47 -0400
-Received: from mail-qk0-f199.google.com (mail-qk0-f199.google.com [209.85.220.199])
-	by mx0a-00003501.pphosted.com with ESMTP id 23df8y80c1-17
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Mon, 06 Jun 2016 15:26:47 -0400
-Received: by mail-qk0-f199.google.com with SMTP id l185so283218464qkc.0
-        for <linux-block@vger.kernel.org>; Mon, 06 Jun 2016 12:26:47 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <1465227572-27149-3-git-send-email-shaun@tancheff.com>
-References: <1465227572-27149-1-git-send-email-shaun@tancheff.com> <1465227572-27149-3-git-send-email-shaun@tancheff.com>
-From: Shaun Tancheff <shaun.tancheff@seagate.com>
-Date: Mon, 6 Jun 2016 14:26:26 -0500
-Message-ID: <CAJVOszDS4WytywHfTjqs9udcPpuMXTTRA7cithmTnbMfgvJkNw@mail.gmail.com>
-Subject: Re: [PATCH 2/4] Add bio/request flags for using ZBC/ZAC commands
+Received: from mga04.intel.com ([192.55.52.120]:33458 "EHLO mga04.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751973AbcFFQcE (ORCPT <rfc822;linux-block@vger.kernel.org>);
+	Mon, 6 Jun 2016 12:32:04 -0400
+Date: Mon, 6 Jun 2016 23:23:33 +0800
+From: kbuild test robot <lkp@intel.com>
 To: Shaun Tancheff <shaun@tancheff.com>
-Cc: linux-ide@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Cc: kbuild-all@01.org, linux-ide@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+	Shaun Tancheff <shaun@tancheff.com>,
+	Shaun Tancheff <shaun.tancheff@seagate.com>
+Subject: Re: [PATCH 2/4] Add bio/request flags for using ZBC/ZAC commands
+Message-ID: <201606062332.aehMXEu0%fengguang.wu@intel.com>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="W/nzBZO5zC0uMSeA"
+In-Reply-To: <1465227572-27149-3-git-send-email-shaun@tancheff.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Mon, Jun 6, 2016 at 10:39 AM, Shaun Tancheff <shaun@tancheff.com> wrote:
->
-> T10 ZBC and T13 ZAC specify operations for Zoned devices.
->
-> To be able to access the zone information and open and close zones
-> adding flags for the report zones command (REQ_REPORT_ZONES) and for
-> Open and Close zone (REQ_OPEN_ZONE and REQ_CLOSE_ZONE) can be added
-> for use by struct bio's bi_rw and by struct request's cmd_flags.
->
-> To reduce the number of additional flags needed REQ_RESET_ZONE shares
-> the same flag as REQ_REPORT_ZONES and is differentiated by direction.
-> Report zones is a device read that requires a buffer. Reset is a device
-> command (WRITE) that has no associated data transfer.
->
-> The Finish zone command is intentionally not implimented as there is no
-> current use case for that operation.
->
-> Report zones currently defaults to reporting on all zones. It expected
-> that support for the zone option flag will piggy back on streamid
-> support. The report option is useful as it can reduce the number of
-> zones in each report, but not critical.
->
-> Signed-off-by: Shaun Tancheff <shaun.tancheff@seagate.com>
-> ---
->  MAINTAINERS                       |   9 ++
->  block/blk-lib.c                   |  96 +++++++++++++++++
->  drivers/scsi/sd.c                 |  99 +++++++++++++++++-
->  drivers/scsi/sd.h                 |   1 +
->  include/linux/blk_types.h         |  19 +++-
->  include/linux/blkzoned_api.h      |  25 +++++
->  include/uapi/linux/Kbuild         |   1 +
->  include/uapi/linux/blkzoned_api.h | 215 ++++++++++++++++++++++++++++++++++++++
->  include/uapi/linux/fs.h           |   1 +
->  9 files changed, 461 insertions(+), 5 deletions(-)
->  create mode 100644 include/linux/blkzoned_api.h
->  create mode 100644 include/uapi/linux/blkzoned_api.h
->
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 7304d2e..0b71a3c 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -12660,6 +12660,15 @@ F:     Documentation/networking/z8530drv.txt
->  F:     drivers/net/hamradio/*scc.c
->  F:     drivers/net/hamradio/z8530.h
->
-> +ZBC AND ZBC BLOCK DEVICES
-> +M:     Shaun Tancheff <shaun.tancheff@seagate.com>
-> +W:     http://seagate.com
-> +W:     https://urldefense.proofpoint.com/v2/url?u=https-3A__github.com_Seagate_ZDM-2DDevice-2DMapper&d=CwIBAg&c=IGDlg0lD0b-nebmJJ0Kp8A&r=Wg5NqlNlVTT7Ugl8V50qIHLe856QW0qfG3WVYGOrWzA&m=NgIOfWitaBWSqZoCVyVSkoMDm3cP1ofhQL7wPM1Z-xA&s=gEau_a22IpcIHd6A3J6ovk5P_nay7XAov8OoSfJdTXs&e=
-> +L:     linux-block@vger.kernel.org
-> +S:     Maintained
-> +F:     include/linux/blkzoned_api.h
-> +F:     include/uapi/linux/blkzoned_api.h
-> +
->  ZBUD COMPRESSED PAGE ALLOCATOR
->  M:     Seth Jennings <sjenning@redhat.com>
->  L:     linux-mm@kvack.org
-> diff --git a/block/blk-lib.c b/block/blk-lib.c
-> index 23d7f30..a7f047c 100644
-> --- a/block/blk-lib.c
-> +++ b/block/blk-lib.c
-> @@ -6,6 +6,7 @@
->  #include <linux/bio.h>
->  #include <linux/blkdev.h>
->  #include <linux/scatterlist.h>
-> +#include <linux/blkzoned_api.h>
->
->  #include "blk.h"
->
-> @@ -249,3 +250,98 @@ int blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
->         return __blkdev_issue_zeroout(bdev, sector, nr_sects, gfp_mask);
->  }
->  EXPORT_SYMBOL(blkdev_issue_zeroout);
-> +
-> +/**
-> + * blkdev_issue_zone_report - queue a report zones operation
-> + * @bdev:      target blockdev
-> + * @bi_rw:     extra bio rw flags. If unsure, use 0.
-> + * @sector:    starting sector (report will include this sector).
 
-Missing:
-  * @opt: See: zone_report_option, default is 0 (all zones)
+--W/nzBZO5zC0uMSeA
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-> + * @page:      one or more contiguous pages.
-> + * @pgsz:      up to size of page in bytes, size of report.
-> + * @gfp_mask:  memory allocation flags (for bio_alloc)
-> + *
-> + * Description:
-> + *    Issue a zone report request for the sectors in question.
-> + */
-> +int blkdev_issue_zone_report(struct block_device *bdev, unsigned int bi_rw,
-> +                            sector_t sector, u8 opt, struct page *page,
-> +                            size_t pgsz, gfp_t gfp_mask)
-> +{
-> +       struct bdev_zone_report *conv = page_address(page);
-> +       struct bio *bio;
-> +       unsigned int nr_iovecs = 1;
-> +       int ret = 0;
-> +
-> +       if (pgsz < (sizeof(struct bdev_zone_report) +
-> +                   sizeof(struct bdev_zone_descriptor)))
-> +               return -EINVAL;
-> +
-> +       bio = bio_alloc(gfp_mask, nr_iovecs);
-> +       if (!bio)
-> +               return -ENOMEM;
-> +
-> +       conv->descriptor_count = 0;
-> +       bio->bi_iter.bi_sector = sector;
-> +       bio->bi_bdev = bdev;
-> +       bio->bi_vcnt = 0;
-> +       bio->bi_iter.bi_size = 0;
-> +
-> +       bi_rw |= REQ_REPORT_ZONES;
-> +
-> +       /* FUTURE ... when streamid is available: */
-> +       /* bio_set_streamid(bio, opt); */
-> +
-> +       bio_add_page(bio, page, pgsz, 0);
-> +       ret = submit_bio_wait(READ | bi_rw, bio);
-> +
-> +       /*
-> +        * When our request it nak'd the underlying device maybe conventional
-> +        * so ... report a single conventional zone the size of the device.
-> +        */
-> +       if (ret == -EIO && conv->descriptor_count) {
-> +               /* Adjust the conventional to the size of the partition ... */
-> +               __be64 blksz = cpu_to_be64(bdev->bd_part->nr_sects);
-> +
-> +               conv->maximum_lba = blksz;
-> +               conv->descriptors[0].type = ZTYP_CONVENTIONAL;
-> +               conv->descriptors[0].flags = ZCOND_CONVENTIONAL << 4;
-> +               conv->descriptors[0].length = blksz;
-> +               conv->descriptors[0].lba_start = 0;
-> +               conv->descriptors[0].lba_wptr = blksz;
-> +               return 0;
+Hi,
 
-Memory leak here ... return should be to fall through and put bio.
+[auto build test WARNING on scsi/for-next]
+[also build test WARNING on v4.7-rc2 next-20160606]
+[cannot apply to block/for-next]
+[if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
 
-                    ret = 0;
->
-> +       }
-> +       bio_put(bio);
-> +       return ret;
-> +}
-> +EXPORT_SYMBOL(blkdev_issue_zone_report);
-> +
-> +/**
-> + * blkdev_issue_zone_action - queue a report zones operation
-> + * @bdev:      target blockdev
-> + * @bi_rw:     REQ_OPEN_ZONE, REQ_CLOSE_ZONE, or REQ_RESET_ZONE.
-> + * @sector:    starting lba of sector
-> + * @gfp_mask:  memory allocation flags (for bio_alloc)
-> + *
-> + * Description:
-> + *    Issue a zone report request for the sectors in question.
-> + */
-> +int blkdev_issue_zone_action(struct block_device *bdev, unsigned int bi_rw,
-> +                            sector_t sector, gfp_t gfp_mask)
-> +{
-> +       int ret;
-> +       struct bio *bio;
-> +
-> +       bio = bio_alloc(gfp_mask, 1);
-> +       if (!bio)
-> +               return -ENOMEM;
-> +
-> +       bio->bi_iter.bi_sector = sector;
-> +       bio->bi_bdev = bdev;
-> +       bio->bi_vcnt = 0;
-> +       bio->bi_iter.bi_size = 0;
-> +
-> +       ret = submit_bio_wait(WRITE | bi_rw, bio);
-> +       bio_put(bio);
-> +       return ret;
-> +}
-> +EXPORT_SYMBOL(blkdev_issue_zone_action);
-> diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
-> index 428c03e..372b5e2 100644
-> --- a/drivers/scsi/sd.c
-> +++ b/drivers/scsi/sd.c
-> @@ -52,6 +52,7 @@
->  #include <linux/slab.h>
->  #include <linux/pm_runtime.h>
->  #include <linux/pr.h>
-> +#include <linux/blkzoned_api.h>
->  #include <asm/uaccess.h>
->  #include <asm/unaligned.h>
->
-> @@ -1133,11 +1134,105 @@ static int sd_setup_read_write_cmnd(struct scsi_cmnd *SCpnt)
->         return ret;
->  }
->
-> +static int sd_setup_zoned_cmnd(struct scsi_cmnd *cmd)
-> +{
-> +       struct request *rq = cmd->request;
-> +       struct scsi_device *sdp = cmd->device;
-> +       struct scsi_disk *sdkp = scsi_disk(rq->rq_disk);
-> +       struct bio *bio = rq->bio;
-> +       sector_t sector = blk_rq_pos(rq);
-> +       struct gendisk *disk = rq->rq_disk;
-> +       unsigned int nr_bytes = blk_rq_bytes(rq);
-> +       int ret = BLKPREP_KILL;
-> +       u8 allbit = 0;
-> +
-> +       if (rq->cmd_flags & REQ_REPORT_ZONES && rq_data_dir(rq) == READ) {
-> +               WARN_ON(nr_bytes == 0);
-> +
-> +               /*
-> +                * For conventional drives generate a report that shows a
-> +                * large single convetional zone the size of the block device
-> +                */
-> +               if (sdkp->zoned != 1 && sdkp->device->type != TYPE_ZBC) {
-> +                       void *src;
-> +                       struct bdev_zone_report *conv;
-> +
-> +                       if (nr_bytes < sizeof(struct bdev_zone_report))
-> +                               goto out;
-> +
-> +                       src = kmap_atomic(bio->bi_io_vec->bv_page);
-> +                       conv = src + bio->bi_io_vec->bv_offset;
-> +                       conv->descriptor_count = cpu_to_be32(1);
-> +                       conv->same_field = ZS_ALL_SAME;
-> +                       conv->maximum_lba = cpu_to_be64(disk->part0.nr_sects);
-> +                       kunmap_atomic(src);
-> +                       goto out;
-> +               }
-> +
-> +               ret = scsi_init_io(cmd);
-> +               if (ret != BLKPREP_OK)
-> +                       goto out;
-> +
-> +               cmd = rq->special;
-> +               if (sdp->changed) {
-> +                       pr_err("SCSI disk has been changed or is not present.");
-> +                       ret = BLKPREP_KILL;
-> +                       goto out;
-> +               }
-> +
-> +               cmd->cmd_len = 16;
-> +               memset(cmd->cmnd, 0, cmd->cmd_len);
-> +               cmd->cmnd[0] = ZBC_IN;
-> +               cmd->cmnd[1] = ZI_REPORT_ZONES;
-> +               put_unaligned_be64(sector, &cmd->cmnd[2]);
-> +               put_unaligned_be32(nr_bytes, &cmd->cmnd[10]);
-> +               /* FUTURE ... when streamid is available */
-> +               /* cmd->cmnd[14] = bio_get_streamid(bio); */
-> +               cmd->sc_data_direction = DMA_FROM_DEVICE;
-> +               cmd->sdb.length = nr_bytes;
-> +               cmd->transfersize = sdp->sector_size;
-> +               cmd->underflow = 0;
-> +               cmd->allowed = SD_MAX_RETRIES;
-> +               ret = BLKPREP_OK;
-> +               goto out;
-> +       }
-> +
-> +       if (sdkp->zoned != 1 && sdkp->device->type != TYPE_ZBC)
-> +               goto out;
-> +
-> +       if (sector == ~0ul) {
-> +               allbit = 1;
-> +               sector = 0;
-> +       }
-> +
-> +       cmd->cmd_len = 16;
-> +       memset(cmd->cmnd, 0, cmd->cmd_len);
-> +       memset(&cmd->sdb, 0, sizeof(cmd->sdb));
-> +       cmd->cmnd[0] = ZBC_OUT;
-> +       cmd->cmnd[1] = ZO_OPEN_ZONE;
-> +       if (rq->cmd_flags & REQ_CLOSE_ZONE)
-> +               cmd->cmnd[1] = ZO_CLOSE_ZONE;
-> +       if (rq->cmd_flags & REQ_RESET_ZONE)
-> +               cmd->cmnd[1] = ZO_RESET_WRITE_POINTER;
-> +       cmd->cmnd[14] = allbit;
-> +       put_unaligned_be64(sector, &cmd->cmnd[2]);
-> +       cmd->transfersize = 0;
-> +       cmd->underflow = 0;
-> +       cmd->allowed = SD_MAX_RETRIES;
-> +       cmd->sc_data_direction = DMA_NONE;
-> +
-> +       ret = BLKPREP_OK;
-> +out:
-> +       return ret;
-> +}
-> +
->  static int sd_init_command(struct scsi_cmnd *cmd)
->  {
->         struct request *rq = cmd->request;
->
-> -       if (rq->cmd_flags & REQ_DISCARD)
-> +       if (rq->cmd_flags & REQ_ZONED_CMDS)
-> +               return sd_setup_zoned_cmnd(cmd);
-> +       else if (rq->cmd_flags & REQ_DISCARD)
->                 return sd_setup_discard_cmnd(cmd);
->         else if (rq->cmd_flags & REQ_WRITE_SAME)
->                 return sd_setup_write_same_cmnd(cmd);
-> @@ -2727,6 +2822,8 @@ static void sd_read_block_characteristics(struct scsi_disk *sdkp)
->                 queue_flag_clear_unlocked(QUEUE_FLAG_ADD_RANDOM, sdkp->disk->queue);
->         }
->
-> +       sdkp->zoned = (buffer[8] >> 4) & 3;
-> +
->   out:
->         kfree(buffer);
->  }
-> diff --git a/drivers/scsi/sd.h b/drivers/scsi/sd.h
-> index 654630b..e012175 100644
-> --- a/drivers/scsi/sd.h
-> +++ b/drivers/scsi/sd.h
-> @@ -94,6 +94,7 @@ struct scsi_disk {
->         unsigned        lbpvpd : 1;
->         unsigned        ws10 : 1;
->         unsigned        ws16 : 1;
-> +       unsigned        zoned: 2;
->  };
->  #define to_scsi_disk(obj) container_of(obj,struct scsi_disk,dev)
->
-> diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-> index 77e5d81..d2943e4 100644
-> --- a/include/linux/blk_types.h
-> +++ b/include/linux/blk_types.h
-> @@ -162,6 +162,10 @@ enum rq_flag_bits {
->         __REQ_FUA,              /* forced unit access */
->         __REQ_FLUSH,            /* request for cache flush */
->
-> +       __REQ_REPORT_ZONES,     /* Zoned device: Report Zones */
-> +       __REQ_OPEN_ZONE,        /* Zoned device: Open Zone */
-> +       __REQ_CLOSE_ZONE,       /* Zoned device: Close Zone */
-> +
->         /* bio only flags */
->         __REQ_RAHEAD,           /* read ahead, can fail anytime */
->         __REQ_THROTTLED,        /* This bio has already been subjected to
-> @@ -202,20 +206,27 @@ enum rq_flag_bits {
->  #define REQ_WRITE_SAME         (1ULL << __REQ_WRITE_SAME)
->  #define REQ_NOIDLE             (1ULL << __REQ_NOIDLE)
->  #define REQ_INTEGRITY          (1ULL << __REQ_INTEGRITY)
-> +#define REQ_REPORT_ZONES       (1ULL << __REQ_REPORT_ZONES)
-> +#define REQ_OPEN_ZONE          (1ULL << __REQ_OPEN_ZONE)
-> +#define REQ_CLOSE_ZONE         (1ULL << __REQ_CLOSE_ZONE)
-> +#define REQ_RESET_ZONE         (REQ_REPORT_ZONES)
-> +#define REQ_ZONED_CMDS \
-> +       (REQ_OPEN_ZONE | REQ_CLOSE_ZONE | REQ_RESET_ZONE | REQ_REPORT_ZONES)
->
->  #define REQ_FAILFAST_MASK \
->         (REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT | REQ_FAILFAST_DRIVER)
->  #define REQ_COMMON_MASK \
->         (REQ_WRITE | REQ_FAILFAST_MASK | REQ_SYNC | REQ_META | REQ_PRIO | \
->          REQ_DISCARD | REQ_WRITE_SAME | REQ_NOIDLE | REQ_FLUSH | REQ_FUA | \
-> -        REQ_SECURE | REQ_INTEGRITY | REQ_NOMERGE)
-> +        REQ_SECURE | REQ_INTEGRITY | REQ_NOMERGE | REQ_ZONED_CMDS)
->  #define REQ_CLONE_MASK         REQ_COMMON_MASK
-> -
-> -#define BIO_NO_ADVANCE_ITER_MASK       (REQ_DISCARD|REQ_WRITE_SAME)
-> +#define BIO_NO_ADVANCE_ITER_MASK \
-> +       (REQ_DISCARD | REQ_WRITE_SAME | REQ_ZONED_CMDS)
->
->  /* This mask is used for both bio and request merge checking */
->  #define REQ_NOMERGE_FLAGS \
-> -       (REQ_NOMERGE | REQ_STARTED | REQ_SOFTBARRIER | REQ_FLUSH | REQ_FUA | REQ_FLUSH_SEQ)
-> +       (REQ_NOMERGE | REQ_STARTED | REQ_SOFTBARRIER | \
-> +        REQ_FLUSH | REQ_FUA | REQ_FLUSH_SEQ | REQ_ZONED_CMDS)
->
->  #define REQ_RAHEAD             (1ULL << __REQ_RAHEAD)
->  #define REQ_THROTTLED          (1ULL << __REQ_THROTTLED)
-> diff --git a/include/linux/blkzoned_api.h b/include/linux/blkzoned_api.h
-> new file mode 100644
-> index 0000000..6061983
-> --- /dev/null
-> +++ b/include/linux/blkzoned_api.h
-> @@ -0,0 +1,25 @@
-> +/*
-> + * Functions for zone based SMR devices.
-> + *
-> + * Copyright (C) 2015 Seagate Technology PLC
-> + *
-> + * Written by:
-> + * Shaun Tancheff <shaun.tancheff@seagate.com>
-> + *
-> + * This file is licensed under  the terms of the GNU General Public
-> + * License version 2. This program is licensed "as is" without any
-> + * warranty of any kind, whether express or implied.
-> + */
-> +
-> +#ifndef _BLKZONED_API_H
-> +#define _BLKZONED_API_H
-> +
-> +#include <uapi/linux/blkzoned_api.h>
-> +
-> +extern int blkdev_issue_zone_action(struct block_device *, unsigned int bi_rw,
-> +                                   sector_t, gfp_t);
-> +extern int blkdev_issue_zone_report(struct block_device *, unsigned int bi_rw,
-> +                                   sector_t, u8 opt, struct page *, size_t,
-> +                                   gfp_t);
-> +
-> +#endif /* _BLKZONED_API_H */
-> diff --git a/include/uapi/linux/Kbuild b/include/uapi/linux/Kbuild
-> index 8bdae34..5152fa4 100644
-> --- a/include/uapi/linux/Kbuild
-> +++ b/include/uapi/linux/Kbuild
-> @@ -70,6 +70,7 @@ header-y += bfs_fs.h
->  header-y += binfmts.h
->  header-y += blkpg.h
->  header-y += blktrace_api.h
-> +header-y += blkzoned_api.h
->  header-y += bpf_common.h
->  header-y += bpf.h
->  header-y += bpqether.h
-> diff --git a/include/uapi/linux/blkzoned_api.h b/include/uapi/linux/blkzoned_api.h
-> new file mode 100644
-> index 0000000..189e925
-> --- /dev/null
-> +++ b/include/uapi/linux/blkzoned_api.h
-> @@ -0,0 +1,215 @@
-> +/*
-> + * Functions for zone based SMR devices.
-> + *
-> + * Copyright (C) 2015 Seagate Technology PLC
-> + *
-> + * Written by:
-> + * Shaun Tancheff <shaun.tancheff@seagate.com>
-> + *
-> + * This file is licensed under  the terms of the GNU General Public
-> + * License version 2. This program is licensed "as is" without any
-> + * warranty of any kind, whether express or implied.
-> + */
-> +
-> +#ifndef _UAPI_BLKZONED_API_H
-> +#define _UAPI_BLKZONED_API_H
-> +
-> +#include <linux/types.h>
-> +
-> +/**
-> + * enum zone_report_option - Report Zones types to be included.
-> + *
-> + * @ZOPT_NON_SEQ_AND_RESET: Default (all zones).
-> + * @ZOPT_ZC1_EMPTY: Zones which are empty.
-> + * @ZOPT_ZC2_OPEN_IMPLICIT: Zones open but not explicitly opened
-> + * @ZOPT_ZC3_OPEN_EXPLICIT: Zones opened explicitly
-> + * @ZOPT_ZC4_CLOSED: Zones closed for writing.
-> + * @ZOPT_ZC5_FULL: Zones that are full.
-> + * @ZOPT_ZC6_READ_ONLY: Zones that are read-only
-> + * @ZOPT_ZC7_OFFLINE: Zones that are offline
-> + * @ZOPT_RESET: Zones that are empty
-> + * @ZOPT_NON_SEQ: Zones that have HA media-cache writes pending
-> + * @ZOPT_NON_WP_ZONES: Zones that do not have Write Pointers (conventional)
-> + *
-> + * @ZOPT_USE_ATA_PASS: Flag used in kernel to service command I/O
-> + *
-> + * Used by Report Zones in bdev_zone_get_report: report_option
-> + */
-> +enum zone_report_option {
-> +       ZOPT_NON_SEQ_AND_RESET   = 0x00,
-> +       ZOPT_ZC1_EMPTY,
-> +       ZOPT_ZC2_OPEN_IMPLICIT,
-> +       ZOPT_ZC3_OPEN_EXPLICIT,
-> +       ZOPT_ZC4_CLOSED,
-> +       ZOPT_ZC5_FULL,
-> +       ZOPT_ZC6_READ_ONLY,
-> +       ZOPT_ZC7_OFFLINE,
-> +       ZOPT_RESET               = 0x10,
-> +       ZOPT_NON_SEQ             = 0x11,
-> +       ZOPT_NON_WP_ZONES        = 0x3f,
-> +       ZOPT_USE_ATA_PASS        = 0x80,
-> +};
-> +
-> +/**
-> + * enum bdev_zone_type - Type of zone in descriptor
-> + *
-> + * @ZTYP_RESERVED: Reserved
-> + * @ZTYP_CONVENTIONAL: Conventional random write zone (No Write Pointer)
-> + * @ZTYP_SEQ_WRITE_REQUIRED: Non-sequential writes are rejected.
-> + * @ZTYP_SEQ_WRITE_PREFERRED: Non-sequential writes allowed but discouraged.
-> + *
-> + * Returned from Report Zones. See bdev_zone_descriptor* type.
-> + */
-> +enum bdev_zone_type {
-> +       ZTYP_RESERVED            = 0,
-> +       ZTYP_CONVENTIONAL        = 1,
-> +       ZTYP_SEQ_WRITE_REQUIRED  = 2,
-> +       ZTYP_SEQ_WRITE_PREFERRED = 3,
-> +};
-> +
-> +
-> +/**
-> + * enum bdev_zone_condition - Condition of zone in descriptor
-> + *
-> + * @ZCOND_CONVENTIONAL: N/A
-> + * @ZCOND_ZC1_EMPTY: Empty
-> + * @ZCOND_ZC2_OPEN_IMPLICIT: Opened via write to zone.
-> + * @ZCOND_ZC3_OPEN_EXPLICIT: Opened via open zone command.
-> + * @ZCOND_ZC4_CLOSED: Closed
-> + * @ZCOND_ZC6_READ_ONLY:
-> + * @ZCOND_ZC5_FULL: No remaining space in zone.
-> + * @ZCOND_ZC7_OFFLINE: Offline
-> + *
-> + * Returned from Report Zones. See bdev_zone_descriptor* flags.
-> + */
-> +enum bdev_zone_condition {
-> +       ZCOND_CONVENTIONAL       = 0,
-> +       ZCOND_ZC1_EMPTY          = 1,
-> +       ZCOND_ZC2_OPEN_IMPLICIT  = 2,
-> +       ZCOND_ZC3_OPEN_EXPLICIT  = 3,
-> +       ZCOND_ZC4_CLOSED         = 4,
-> +       /* 0x5 to 0xC are reserved */
-> +       ZCOND_ZC6_READ_ONLY      = 0xd,
-> +       ZCOND_ZC5_FULL           = 0xe,
-> +       ZCOND_ZC7_OFFLINE        = 0xf,
-> +};
-> +
-> +
-> +/**
-> + * enum bdev_zone_same - Report Zones same code.
-> + *
-> + * @ZS_ALL_DIFFERENT: All zones differ in type and size.
-> + * @ZS_ALL_SAME: All zones are the same size and type.
-> + * @ZS_LAST_DIFFERS: All zones are the same size and type except the last zone.
-> + * @ZS_SAME_LEN_DIFF_TYPES: All zones are the same length but types differ.
-> + *
-> + * Returned from Report Zones. See bdev_zone_report* same_field.
-> + */
-> +enum bdev_zone_same {
-> +       ZS_ALL_DIFFERENT        = 0,
-> +       ZS_ALL_SAME             = 1,
-> +       ZS_LAST_DIFFERS         = 2,
-> +       ZS_SAME_LEN_DIFF_TYPES  = 3,
-> +};
-> +
-> +
-> +/**
-> + * struct bdev_zone_get_report - ioctl: Report Zones request
-> + *
-> + * @zone_locator_lba: starting lba for first [reported] zone
-> + * @return_page_count: number of *bytes* allocated for result
-> + * @report_option: see: zone_report_option enum
-> + *
-> + * Used to issue report zones command to connected device
-> + */
-> +struct bdev_zone_get_report {
-> +       __u64 zone_locator_lba;
-> +       __u32 return_page_count;
-> +       __u8  report_option;
-> +} __packed;
-> +
-> +/**
-> + * struct bdev_zone_descriptor_le - See: bdev_zone_descriptor
-> + */
-> +struct bdev_zone_descriptor_le {
-> +       __u8 type;
-> +       __u8 flags;
-> +       __u8 reserved1[6];
-> +       __le64 length;
-> +       __le64 lba_start;
-> +       __le64 lba_wptr;
-> +       __u8 reserved[32];
-> +} __packed;
-> +
-> +
-> +/**
-> + * struct bdev_zone_report_le - See: bdev_zone_report
-> + */
-> +struct bdev_zone_report_le {
-> +       __le32 descriptor_count;
-> +       __u8 same_field;
-> +       __u8 reserved1[3];
-> +       __le64 maximum_lba;
-> +       __u8 reserved2[48];
-> +       struct bdev_zone_descriptor_le descriptors[0];
-> +} __packed;
-> +
-> +
-> +/**
-> + * struct bdev_zone_descriptor - A Zone descriptor entry from report zones
-> + *
-> + * @type: see zone_type enum
-> + * @flags: Bits 0:reset, 1:non-seq, 2-3: resv, 4-7: see zone_condition enum
-> + * @reserved1: padding
-> + * @length: length of zone in sectors
-> + * @lba_start: lba where the zone starts.
-> + * @lba_wptr: lba of the current write pointer.
-> + * @reserved: padding
-> + *
-> + */
-> +struct bdev_zone_descriptor {
-> +       __u8 type;
-> +       __u8 flags;
-> +       __u8  reserved1[6];
-> +       __be64 length;
-> +       __be64 lba_start;
-> +       __be64 lba_wptr;
-> +       __u8 reserved[32];
-> +} __packed;
-> +
-> +
-> +/**
-> + * struct bdev_zone_report - Report Zones result
-> + *
-> + * @descriptor_count: Number of descriptor entries that follow
-> + * @same_field: bits 0-3: enum zone_same (MASK: 0x0F)
-> + * @reserved1: padding
-> + * @maximum_lba: LBA of the last logical sector on the device, inclusive
-> + *               of all logical sectors in all zones.
-> + * @reserved2: padding
-> + * @descriptors: array of descriptors follows.
-> + */
-> +struct bdev_zone_report {
-> +       __be32 descriptor_count;
-> +       __u8 same_field;
-> +       __u8 reserved1[3];
-> +       __be64 maximum_lba;
-> +       __u8 reserved2[48];
-> +       struct bdev_zone_descriptor descriptors[0];
-> +} __packed;
-> +
-> +
-> +/**
-> + * struct bdev_zone_report_io - Report Zones ioctl argument.
-> + *
-> + * @in: Report Zones inputs
-> + * @out: Report Zones output
-> + */
-> +struct bdev_zone_report_io {
-> +       union {
-> +               struct bdev_zone_get_report in;
-> +               struct bdev_zone_report out;
-> +       } data;
-> +} __packed;
-> +
-> +#endif /* _UAPI_BLKZONED_API_H */
-> diff --git a/include/uapi/linux/fs.h b/include/uapi/linux/fs.h
-> index 3b00f7c..c0b565b 100644
-> --- a/include/uapi/linux/fs.h
-> +++ b/include/uapi/linux/fs.h
-> @@ -222,6 +222,7 @@ struct fsxattr {
->  #define BLKSECDISCARD _IO(0x12,125)
->  #define BLKROTATIONAL _IO(0x12,126)
->  #define BLKZEROOUT _IO(0x12,127)
-> +/* A jump here: See blkzoned_api.h, Reserving 130 to 133. */
->
->  #define BMAP_IOCTL 1           /* obsolete - kept for compatibility */
->  #define FIBMAP    _IO(0x00,1)  /* bmap access */
-> --
-> 2.8.1
->
+url:    https://github.com/0day-ci/linux/commits/Shaun-Tancheff/Block-layer-support-ZAC-ZBC-commands/20160606-234756
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/jejb/scsi.git for-next
+reproduce: make htmldocs
 
+All warnings (new ones prefixed by >>):
 
+   lib/crc32.c:148: warning: No description found for parameter 'tab)[256]'
+   lib/crc32.c:148: warning: Excess function parameter 'tab' description in 'crc32_le_generic'
+   lib/crc32.c:293: warning: No description found for parameter 'tab)[256]'
+   lib/crc32.c:293: warning: Excess function parameter 'tab' description in 'crc32_be_generic'
+   lib/crc32.c:1: warning: no structured comments found
+   mm/memory.c:2881: warning: No description found for parameter 'old'
+>> block/blk-lib.c:269: warning: No description found for parameter 'opt'
 
--- 
-Shaun Tancheff
+vim +/opt +269 block/blk-lib.c
+
+   253	
+   254	/**
+   255	 * blkdev_issue_zone_report - queue a report zones operation
+   256	 * @bdev:	target blockdev
+   257	 * @bi_rw:	extra bio rw flags. If unsure, use 0.
+   258	 * @sector:	starting sector (report will include this sector).
+   259	 * @page:	one or more contiguous pages.
+   260	 * @pgsz:	up to size of page in bytes, size of report.
+   261	 * @gfp_mask:	memory allocation flags (for bio_alloc)
+   262	 *
+   263	 * Description:
+   264	 *    Issue a zone report request for the sectors in question.
+   265	 */
+   266	int blkdev_issue_zone_report(struct block_device *bdev, unsigned int bi_rw,
+   267				     sector_t sector, u8 opt, struct page *page,
+   268				     size_t pgsz, gfp_t gfp_mask)
+ > 269	{
+   270		struct bdev_zone_report *conv = page_address(page);
+   271		struct bio *bio;
+   272		unsigned int nr_iovecs = 1;
+   273		int ret = 0;
+   274	
+   275		if (pgsz < (sizeof(struct bdev_zone_report) +
+   276			    sizeof(struct bdev_zone_descriptor)))
+   277			return -EINVAL;
+
+---
+0-DAY kernel test infrastructure                Open Source Technology Center
+https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
+
+--W/nzBZO5zC0uMSeA
+Content-Type: application/octet-stream
+Content-Disposition: attachment; filename=".config.gz"
+Content-Transfer-Encoding: base64
+
+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
+
+--W/nzBZO5zC0uMSeA--
