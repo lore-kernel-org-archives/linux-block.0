@@ -1,187 +1,77 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from smtp81.mediacombb.net ([68.66.77.81]:47255 "EHLO
-	dsmdc-mail-smtp.mcomdc.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1752461AbcFFPpB (ORCPT
-	<rfc822;linux-block@vger.kernel.org>);
-	Mon, 6 Jun 2016 11:45:01 -0400
-From: Shaun Tancheff <shaun@tancheff.com>
-To: linux-ide@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org
-Cc: Shaun Tancheff <shaun@tancheff.com>,
-	Shaun Tancheff <shaun.tancheff@seagate.com>
-Subject: [PATCH 3/4] Add ioctl to issue ZBC/ZAC commands via block layer
-Date: Mon,  6 Jun 2016 10:39:30 -0500
-Message-Id: <1465227572-27149-4-git-send-email-shaun@tancheff.com>
-In-Reply-To: <1465227572-27149-1-git-send-email-shaun@tancheff.com>
-References: <1465227572-27149-1-git-send-email-shaun@tancheff.com>
+Received: from mail-wm0-f68.google.com ([74.125.82.68]:35621 "EHLO
+	mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751376AbcFFHHy (ORCPT
+	<rfc822;linux-block@vger.kernel.org>); Mon, 6 Jun 2016 03:07:54 -0400
+Received: by mail-wm0-f68.google.com with SMTP id k184so7573564wme.2
+        for <linux-block@vger.kernel.org>; Mon, 06 Jun 2016 00:07:53 -0700 (PDT)
+Subject: Re: [PATCH] lightnvm: Make functions not used by ouside static
+To: Johannes Thumshirn <jthumshirn@suse.de>
+References: <1464963006-22721-1-git-send-email-jthumshirn@suse.de>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <m@bjorling.me>
+Message-ID: <57552146.4010300@bjorling.me>
+Date: Mon, 6 Jun 2016 09:07:50 +0200
+MIME-Version: 1.0
+In-Reply-To: <1464963006-22721-1-git-send-email-jthumshirn@suse.de>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Add New ioctl types
-    BLKREPORT    - Issue Report Zones to device.
-    BLKOPENZONE  - Issue an Zone Action: Open Zone command.
-    BLKCLOSEZONE - Issue an Zone Action: Close Zone command.
-    BLKRESETZONE - Issue an Zone Action: Reset Zone command.
-
-Signed-off-by: Shaun Tancheff <shaun.tancheff@seagate.com>
----
- block/ioctl.c                     | 113 ++++++++++++++++++++++++++++++++++++++
- include/uapi/linux/blkzoned_api.h |   6 ++
- 2 files changed, 119 insertions(+)
-
-diff --git a/block/ioctl.c b/block/ioctl.c
-index ed2397f..46a8553 100644
---- a/block/ioctl.c
-+++ b/block/ioctl.c
-@@ -7,6 +7,7 @@
- #include <linux/backing-dev.h>
- #include <linux/fs.h>
- #include <linux/blktrace_api.h>
-+#include <linux/blkzoned_api.h>
- #include <linux/pr.h>
- #include <asm/uaccess.h>
- 
-@@ -194,6 +195,112 @@ int blkdev_reread_part(struct block_device *bdev)
- }
- EXPORT_SYMBOL(blkdev_reread_part);
- 
-+static int blk_zoned_report_ioctl(struct block_device *bdev, fmode_t mode,
-+		void __user *parg)
-+{
-+	int error = -EFAULT;
-+	gfp_t gfp = GFP_KERNEL;
-+	struct bdev_zone_report_io *zone_iodata = NULL;
-+	int order = 0;
-+	struct page *pgs = NULL;
-+	u32 alloc_size = PAGE_SIZE;
-+	unsigned long bi_rw = 0;
-+	u8 opt = 0;
-+
-+	if (!(mode & FMODE_READ))
-+		return -EBADF;
-+
-+	zone_iodata = (void *)get_zeroed_page(gfp);
-+	if (!zone_iodata) {
-+		error = -ENOMEM;
-+		goto report_zones_out;
-+	}
-+	if (copy_from_user(zone_iodata, parg, sizeof(*zone_iodata))) {
-+		error = -EFAULT;
-+		goto report_zones_out;
-+	}
-+	if (zone_iodata->data.in.return_page_count > alloc_size) {
-+		int npages;
-+
-+		alloc_size = zone_iodata->data.in.return_page_count;
-+		npages = (alloc_size + PAGE_SIZE - 1) / PAGE_SIZE;
-+		order =  ilog2(roundup_pow_of_two(npages));
-+		pgs = alloc_pages(gfp, order);
-+		if (pgs) {
-+			void *mem = page_address(pgs);
-+
-+			if (!mem) {
-+				error = -ENOMEM;
-+				goto report_zones_out;
-+			}
-+			memset(mem, 0, alloc_size);
-+			memcpy(mem, zone_iodata, sizeof(*zone_iodata));
-+			free_page((unsigned long)zone_iodata);
-+			zone_iodata = mem;
-+		} else {
-+			/* Result requires DMA capable memory */
-+			pr_err("Not enough memory available for request.\n");
-+			error = -ENOMEM;
-+			goto report_zones_out;
-+		}
-+	}
-+	opt = zone_iodata->data.in.report_option & 0x7F;
-+	if (zone_iodata->data.in.report_option & ZOPT_USE_ATA_PASS)
-+		bi_rw |= REQ_META;
-+
-+	error = blkdev_issue_zone_report(bdev, bi_rw,
-+			zone_iodata->data.in.zone_locator_lba, opt,
-+			pgs ? pgs : virt_to_page(zone_iodata),
-+			alloc_size, GFP_KERNEL);
-+
-+	if (error)
-+		goto report_zones_out;
-+
-+	if (copy_to_user(parg, zone_iodata, alloc_size))
-+		error = -EFAULT;
-+
-+report_zones_out:
-+	if (pgs)
-+		__free_pages(pgs, order);
-+	else if (zone_iodata)
-+		free_page((unsigned long)zone_iodata);
-+	return error;
-+}
-+
-+static int blk_zoned_action_ioctl(struct block_device *bdev, fmode_t mode,
-+				  unsigned int cmd, unsigned long arg)
-+{
-+	unsigned long bi_rw = 0;
-+
-+	if (!(mode & FMODE_WRITE))
-+		return -EBADF;
-+
-+	/*
-+	 * When acting on zones we explicitly disallow using a partition.
-+	 */
-+	if (bdev != bdev->bd_contains) {
-+		pr_err("%s: All zone operations disallowed on this device\n",
-+			__func__);
-+		return -EFAULT;
-+	}
-+
-+	switch (cmd) {
-+	case BLKOPENZONE:
-+		bi_rw |= REQ_OPEN_ZONE;
-+		break;
-+	case BLKCLOSEZONE:
-+		bi_rw |= REQ_CLOSE_ZONE;
-+		break;
-+	case BLKRESETZONE:
-+		bi_rw |= REQ_RESET_ZONE;
-+		break;
-+	default:
-+		pr_err("%s: Unknown action: %u\n", __func__, cmd);
-+		WARN_ON(1);
-+	}
-+	return blkdev_issue_zone_action(bdev, bi_rw, arg, GFP_KERNEL);
-+}
-+
- static int blk_ioctl_discard(struct block_device *bdev, fmode_t mode,
- 		unsigned long arg, unsigned long flags)
- {
-@@ -568,6 +675,12 @@ int blkdev_ioctl(struct block_device *bdev, fmode_t mode, unsigned cmd,
- 	case BLKTRACESETUP:
- 	case BLKTRACETEARDOWN:
- 		return blk_trace_ioctl(bdev, cmd, argp);
-+	case BLKREPORT:
-+		return blk_zoned_report_ioctl(bdev, mode, argp);
-+	case BLKOPENZONE:
-+	case BLKCLOSEZONE:
-+	case BLKRESETZONE:
-+		return blk_zoned_action_ioctl(bdev, mode, cmd, arg);
- 	case IOC_PR_REGISTER:
- 		return blkdev_pr_register(bdev, argp);
- 	case IOC_PR_RESERVE:
-diff --git a/include/uapi/linux/blkzoned_api.h b/include/uapi/linux/blkzoned_api.h
-index 189e925..2007b56 100644
---- a/include/uapi/linux/blkzoned_api.h
-+++ b/include/uapi/linux/blkzoned_api.h
-@@ -212,4 +212,10 @@ struct bdev_zone_report_io {
- 	} data;
- } __packed;
- 
-+/* continuing from uapi/linux/fs.h: */
-+#define BLKREPORT	_IOWR(0x12, 130, struct bdev_zone_report_io)
-+#define BLKOPENZONE	_IO(0x12, 131)
-+#define BLKCLOSEZONE	_IO(0x12, 132)
-+#define BLKRESETZONE	_IO(0x12, 133)
-+
- #endif /* _UAPI_BLKZONED_API_H */
--- 
-2.8.1
-
+On 06/03/2016 04:10 PM, Johannes Thumshirn wrote:
+> Mark functions not used by ouside of thier implementing file as static.
+>
+> Signed-off-by: Johannes Thumshirn <jthumshirn@suse.de>
+> ---
+>   drivers/lightnvm/core.c   | 2 +-
+>   drivers/lightnvm/sysblk.c | 8 +++++---
+>   2 files changed, 6 insertions(+), 4 deletions(-)
+>
+> diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+> index 0dc9a80..19577df 100644
+> --- a/drivers/lightnvm/core.c
+> +++ b/drivers/lightnvm/core.c
+> @@ -98,7 +98,7 @@ static struct nvmm_type *nvm_find_mgr_type(const char *name)
+>   	return NULL;
+>   }
+>
+> -struct nvmm_type *nvm_init_mgr(struct nvm_dev *dev)
+> +static struct nvmm_type *nvm_init_mgr(struct nvm_dev *dev)
+>   {
+>   	struct nvmm_type *mt;
+>   	int ret;
+> diff --git a/drivers/lightnvm/sysblk.c b/drivers/lightnvm/sysblk.c
+> index b1e1404..ba2afe9 100644
+> --- a/drivers/lightnvm/sysblk.c
+> +++ b/drivers/lightnvm/sysblk.c
+> @@ -39,7 +39,8 @@ static inline int scan_ppa_idx(int row, int blkid)
+>   	return (row * MAX_BLKS_PR_SYSBLK) + blkid;
+>   }
+>
+> -void nvm_sysblk_to_cpu(struct nvm_sb_info *info, struct nvm_system_block *sb)
+> +static void nvm_sysblk_to_cpu(struct nvm_sb_info *info,
+> +			      struct nvm_system_block *sb)
+>   {
+>   	info->seqnr = be32_to_cpu(sb->seqnr);
+>   	info->erase_cnt = be32_to_cpu(sb->erase_cnt);
+> @@ -48,7 +49,8 @@ void nvm_sysblk_to_cpu(struct nvm_sb_info *info, struct nvm_system_block *sb)
+>   	info->fs_ppa.ppa = be64_to_cpu(sb->fs_ppa);
+>   }
+>
+> -void nvm_cpu_to_sysblk(struct nvm_system_block *sb, struct nvm_sb_info *info)
+> +static void nvm_cpu_to_sysblk(struct nvm_system_block *sb,
+> +			      struct nvm_sb_info *info)
+>   {
+>   	sb->magic = cpu_to_be32(NVM_SYSBLK_MAGIC);
+>   	sb->seqnr = cpu_to_be32(info->seqnr);
+> @@ -86,7 +88,7 @@ static int nvm_setup_sysblks(struct nvm_dev *dev, struct ppa_addr *sysblk_ppas)
+>   	return nr_rows;
+>   }
+>
+> -void nvm_setup_sysblk_scan(struct nvm_dev *dev, struct sysblk_scan *s,
+> +static void nvm_setup_sysblk_scan(struct nvm_dev *dev, struct sysblk_scan *s,
+>   						struct ppa_addr *sysblk_ppas)
+>   {
+>   	memset(s, 0, sizeof(struct sysblk_scan));
+>
+Thanks Johannes. Applied for 4.8.
