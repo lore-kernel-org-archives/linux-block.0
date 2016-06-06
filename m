@@ -1,228 +1,94 @@
-Return-Path: <shaun@helios.aeonazure.com>
-From: Shaun Tancheff <shaun@tancheff.com>
-To: linux-ide@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org
-Cc: Shaun Tancheff <shaun@tancheff.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	"James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	Jeff Layton <jlayton@poochiereds.net>,
-	"J . Bruce Fields" <bfields@fieldses.org>,
-	Shaun Tancheff <shaun.tancheff@seagate.com>
-Subject: [PATCH v2 4/4] Add ata pass-through path for ZAC commands.
-Date: Tue,  7 Jun 2016 15:02:32 -0500
-Message-Id: <1465329752-9262-5-git-send-email-shaun@tancheff.com>
-In-Reply-To: <1465329752-9262-1-git-send-email-shaun@tancheff.com>
-References: <1465329752-9262-1-git-send-email-shaun@tancheff.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:48157 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751805AbcFFGvF (ORCPT <rfc822;linux-block@vger.kernel.org>);
+	Mon, 6 Jun 2016 02:51:05 -0400
+Subject: Re: [PATCH 40/45] block: move bio io prio to a new field
+To: mchristi@redhat.com, linux-f2fs-devel@lists.sourceforge.net,
+	linux-ext4@vger.kernel.org, konrad.wilk@oracle.com,
+	drbd-dev@lists.linbit.com, philipp.reisner@linbit.com,
+	lars.ellenberg@linbit.com, linux-raid@vger.kernel.org,
+	dm-devel@redhat.com, linux-fsdevel@vger.kernel.org,
+	linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
+	linux-mtd@lists.infradead.org, target-devel@vger.kernel.org,
+	linux-btrfs@vger.kernel.org, osd-dev@open-osd.org, xfs@oss.sgi.com,
+	ocfs2-devel@oss.oracle.com
+References: <1465155145-10812-1-git-send-email-mchristi@redhat.com>
+ <1465155145-10812-41-git-send-email-mchristi@redhat.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <57551D55.8070200@suse.de>
+Date: Mon, 6 Jun 2016 08:51:01 +0200
+MIME-Version: 1.0
+In-Reply-To: <1465155145-10812-41-git-send-email-mchristi@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-The current generation of HBA SAS adapters support connecting SATA
-drives and perform SCSI<->ATA translations in hardware.
-Unfortunately the ZBC commands are not being translate (yet).
+On 06/05/2016 09:32 PM, mchristi@redhat.com wrote:
+> From: Mike Christie <mchristi@redhat.com>
+> 
+> In the next patch, we move drop the compat code and make
+> the op a separate value that is hidden in bi_rw. To give
+> the op and rq bits flags room to grow this moves prio to
+> its own field.
+> 
+> Signed-off-by: Mike Christie <mchristi@redhat.com>
+> ---
+>  include/linux/bio.h       | 14 ++------------
+>  include/linux/blk_types.h |  5 ++---
+>  2 files changed, 4 insertions(+), 15 deletions(-)
+> 
+> diff --git a/include/linux/bio.h b/include/linux/bio.h
+> index 4568647..35108c2 100644
+> --- a/include/linux/bio.h
+> +++ b/include/linux/bio.h
+> @@ -47,18 +47,8 @@
+>  #define bio_op(bio)				(op_from_rq_bits((bio)->bi_rw))
+>  #define bio_set_op_attrs(bio, op, flags)	((bio)->bi_rw |= (op | flags))
+>  
+> -/*
+> - * upper 16 bits of bi_rw define the io priority of this bio
+> - */
+> -#define BIO_PRIO_SHIFT	(8 * sizeof(unsigned long) - IOPRIO_BITS)
+> -#define bio_prio(bio)	((bio)->bi_rw >> BIO_PRIO_SHIFT)
+> -#define bio_prio_valid(bio)	ioprio_valid(bio_prio(bio))
+> -
+> -#define bio_set_prio(bio, prio)		do {			\
+> -	WARN_ON(prio >= (1 << IOPRIO_BITS));			\
+> -	(bio)->bi_rw &= ((1UL << BIO_PRIO_SHIFT) - 1);		\
+> -	(bio)->bi_rw |= ((unsigned long) (prio) << BIO_PRIO_SHIFT);	\
+> -} while (0)
+> +#define bio_prio(bio)			(bio)->bi_ioprio
+> +#define bio_set_prio(bio, prio)		((bio)->bi_ioprio = prio)
+>  
+>  /*
+>   * various member access, note that bio_data should of course not be used
+> diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+> index 6e60baa..2738413 100644
+> --- a/include/linux/blk_types.h
+> +++ b/include/linux/blk_types.h
+> @@ -48,9 +48,8 @@ struct bio {
+>  	struct block_device	*bi_bdev;
+>  	unsigned int		bi_flags;	/* status, command, etc */
+>  	int			bi_error;
+> -	unsigned long		bi_rw;		/* bottom bits READ/WRITE,
+> -						 * top bits priority
+> -						 */
+> +	unsigned long		bi_rw;		/* READ/WRITE */
+> +	unsigned short		bi_ioprio;
+>  
+>  	struct bvec_iter	bi_iter;
+>  
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Currently users of SAS controllers can only send ZAC commands via
-ata pass-through.
+Cheers,
 
-This method overloads the meaning of REQ_META to direct ZBC commands
-to construct ZAC equivalent ATA pass through commands.
-Note also that this approach expects the initiator to deal with the
-little endian result due to bypassing the normal translation layers.
-
-Signed-off-by: Shaun Tancheff <shaun.tancheff@seagate.com>
----
-v2:
- - Added REQ_META to op_flags if high bit is set in opt.
-
- block/ioctl.c       | 32 ++++++++++++++++++++++++
- drivers/scsi/sd.c   | 70 +++++++++++++++++++++++++++++++++++++++++------------
- include/linux/ata.h | 15 ++++++++++++
- 3 files changed, 102 insertions(+), 15 deletions(-)
-
-diff --git a/block/ioctl.c b/block/ioctl.c
-index 97f45f5..c853c6f 100644
---- a/block/ioctl.c
-+++ b/block/ioctl.c
-@@ -245,6 +245,9 @@ static int blk_zoned_report_ioctl(struct block_device *bdev, fmode_t mode,
- 		}
- 	}
- 	opt = zone_iodata->data.in.report_option & 0x7F;
-+	if (zone_iodata->data.in.report_option & ZOPT_USE_ATA_PASS)
-+		op_flags |= REQ_META;
-+
- 	error = blkdev_issue_zone_report(bdev, op_flags,
- 			zone_iodata->data.in.zone_locator_lba, opt,
- 			pgs ? pgs : virt_to_page(zone_iodata),
-@@ -281,6 +284,35 @@ static int blk_zoned_action_ioctl(struct block_device *bdev, fmode_t mode,
- 		return -EFAULT;
- 	}
- 
-+	/*
-+	 * When the low bit is set force ATA passthrough try to work around
-+	 * older SAS HBA controllers that don't support ZBC to ZAC translation.
-+	 *
-+	 * When the low bit is clear follow the normal path but also correct
-+	 * for ~0ul LBA means 'for all lbas'.
-+	 *
-+	 * NB: We should do extra checking here to see if the user specified
-+	 *     the entire block device as opposed to a partition of the
-+	 *     device....
-+	 */
-+	if (arg & 1) {
-+		op_flags |= REQ_META;
-+		if (arg != ~0ul)
-+			arg &= ~1ul; /* ~1 :: 0xFF...FE */
-+	} else {
-+		if (arg == ~1ul)
-+			arg = ~0ul;
-+	}
-+
-+	/*
-+	 * When acting on zones we explicitly disallow using a partition.
-+	 */
-+	if (bdev != bdev->bd_contains) {
-+		pr_err("%s: All zone operations disallowed on this device\n",
-+			__func__);
-+		return -EFAULT;
-+	}
-+
- 	switch (cmd) {
- 	case BLKOPENZONE:
- 		op_flags |= REQ_OPEN_ZONE;
-diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
-index 06b54d5..cf96f01 100644
---- a/drivers/scsi/sd.c
-+++ b/drivers/scsi/sd.c
-@@ -53,6 +53,7 @@
- #include <linux/pm_runtime.h>
- #include <linux/pr.h>
- #include <linux/blkzoned_api.h>
-+#include <linux/ata.h>
- #include <asm/uaccess.h>
- #include <asm/unaligned.h>
- 
-@@ -1182,12 +1183,29 @@ static int sd_setup_zoned_cmnd(struct scsi_cmnd *cmd)
- 
- 		cmd->cmd_len = 16;
- 		memset(cmd->cmnd, 0, cmd->cmd_len);
--		cmd->cmnd[0] = ZBC_IN;
--		cmd->cmnd[1] = ZI_REPORT_ZONES;
--		put_unaligned_be64(sector, &cmd->cmnd[2]);
--		put_unaligned_be32(nr_bytes, &cmd->cmnd[10]);
--		/* FUTURE ... when streamid is available */
--		/* cmd->cmnd[14] = bio_get_streamid(bio); */
-+		if (rq->cmd_flags & REQ_META) {
-+			cmd->cmnd[0] = ATA_16;
-+			cmd->cmnd[1] = (0x6 << 1) | 1;
-+			cmd->cmnd[2] = 0x0e;
-+			/* FUTURE ... when streamid is available */
-+			/* cmd->cmnd[3] = bio_get_streamid(bio); */
-+			cmd->cmnd[4] = ATA_SUBCMD_ZAC_MGMT_IN_REPORT_ZONES;
-+			cmd->cmnd[5] = ((nr_bytes / 512) >> 8) & 0xff;
-+			cmd->cmnd[6] = (nr_bytes / 512) & 0xff;
-+
-+			_lba_to_cmd_ata(&cmd->cmnd[7], sector);
-+
-+			cmd->cmnd[13] = 1 << 6;
-+			cmd->cmnd[14] = ATA_CMD_ZAC_MGMT_IN;
-+		} else {
-+			cmd->cmnd[0] = ZBC_IN;
-+			cmd->cmnd[1] = ZI_REPORT_ZONES;
-+			put_unaligned_be64(sector, &cmd->cmnd[2]);
-+			put_unaligned_be32(nr_bytes, &cmd->cmnd[10]);
-+			/* FUTURE ... when streamid is available */
-+			/* cmd->cmnd[14] = bio_get_streamid(bio); */
-+		}
-+
- 		cmd->sc_data_direction = DMA_FROM_DEVICE;
- 		cmd->sdb.length = nr_bytes;
- 		cmd->transfersize = sdp->sector_size;
-@@ -1208,14 +1226,29 @@ static int sd_setup_zoned_cmnd(struct scsi_cmnd *cmd)
- 	cmd->cmd_len = 16;
- 	memset(cmd->cmnd, 0, cmd->cmd_len);
- 	memset(&cmd->sdb, 0, sizeof(cmd->sdb));
--	cmd->cmnd[0] = ZBC_OUT;
--	cmd->cmnd[1] = ZO_OPEN_ZONE;
--	if (rq->cmd_flags & REQ_CLOSE_ZONE)
--		cmd->cmnd[1] = ZO_CLOSE_ZONE;
--	if (rq->cmd_flags & REQ_RESET_ZONE)
--		cmd->cmnd[1] = ZO_RESET_WRITE_POINTER;
--	cmd->cmnd[14] = allbit;
--	put_unaligned_be64(sector, &cmd->cmnd[2]);
-+	if (rq->cmd_flags & REQ_META) {
-+		cmd->cmnd[0] = ATA_16;
-+		cmd->cmnd[1] = (3 << 1) | 1;
-+		cmd->cmnd[3] = allbit;
-+		cmd->cmnd[4] = ATA_SUBCMD_ZAC_MGMT_OUT_RESET_WRITE_POINTER;
-+		if (rq->cmd_flags & REQ_OPEN_ZONE)
-+			cmd->cmnd[4] = ATA_SUBCMD_ZAC_MGMT_OUT_OPEN_ZONE;
-+		if (rq->cmd_flags & REQ_CLOSE_ZONE)
-+			cmd->cmnd[4] = ATA_SUBCMD_ZAC_MGMT_OUT_CLOSE_ZONE;
-+		_lba_to_cmd_ata(&cmd->cmnd[7], sector);
-+		cmd->cmnd[13] = 1 << 6;
-+		cmd->cmnd[14] = ATA_CMD_ZAC_MGMT_OUT;
-+	} else {
-+		cmd->cmnd[0] = ZBC_OUT;
-+		cmd->cmnd[1] = ZO_OPEN_ZONE;
-+		if (rq->cmd_flags & REQ_CLOSE_ZONE)
-+			cmd->cmnd[1] = ZO_CLOSE_ZONE;
-+		if (rq->cmd_flags & REQ_RESET_ZONE)
-+			cmd->cmnd[1] = ZO_RESET_WRITE_POINTER;
-+		cmd->cmnd[14] = allbit;
-+		put_unaligned_be64(sector, &cmd->cmnd[2]);
-+	}
-+
- 	cmd->transfersize = 0;
- 	cmd->underflow = 0;
- 	cmd->allowed = SD_MAX_RETRIES;
-@@ -2811,7 +2844,7 @@ static void sd_read_block_characteristics(struct scsi_disk *sdkp)
- {
- 	unsigned char *buffer;
- 	u16 rot;
--	const int vpd_len = 64;
-+	const int vpd_len = 512;
- 
- 	buffer = kmalloc(vpd_len, GFP_KERNEL);
- 
-@@ -2828,6 +2861,13 @@ static void sd_read_block_characteristics(struct scsi_disk *sdkp)
- 	}
- 
- 	sdkp->zoned = (buffer[8] >> 4) & 3;
-+	if (sdkp->zoned != 1) {
-+		struct scsi_device *sdev = sdkp->device;
-+
-+		/* buf size is 512, page is 60 + 512, we need page 206 */
-+		if (!scsi_get_vpd_page(sdev, 0x89, buffer, SD_BUF_SIZE))
-+			sdkp->zoned = ata_id_zoned_cap((u16 *)&buffer[60]);
-+	}
- 
-  out:
- 	kfree(buffer);
-diff --git a/include/linux/ata.h b/include/linux/ata.h
-index 99346be..5cc1a85 100644
---- a/include/linux/ata.h
-+++ b/include/linux/ata.h
-@@ -1060,6 +1060,21 @@ static inline void ata_id_to_hd_driveid(u16 *id)
- #endif
- }
- 
-+/**
-+ * _lba_to_cmd_ata() - Copy lba48 to ATA command
-+ * @cmd: ATA command as an array of bytes
-+ * @_lba: lba48 in the low 48 bits
-+ */
-+static inline void _lba_to_cmd_ata(u8 *cmd, u64 _lba)
-+{
-+	cmd[1] =  _lba	      & 0xff;
-+	cmd[3] = (_lba >>  8) & 0xff;
-+	cmd[5] = (_lba >> 16) & 0xff;
-+	cmd[0] = (_lba >> 24) & 0xff;
-+	cmd[2] = (_lba >> 32) & 0xff;
-+	cmd[4] = (_lba >> 40) & 0xff;
-+}
-+
- /*
-  * Write LBA Range Entries to the buffer that will cover the extent from
-  * sector to sector + count.  This is used for TRIM and for ADD LBA(S)
+Hannes
 -- 
-2.8.1
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: F. Imend�rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG N�rnberg)
