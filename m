@@ -1,42 +1,59 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.9]:51349 "EHLO
-	bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750891AbcFXHBE (ORCPT
-	<rfc822;linux-block@vger.kernel.org>);
-	Fri, 24 Jun 2016 03:01:04 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@fb.com
-Cc: shli@fb.com, martin.petersen@oracle.com, snitzer@redhat.com,
-	sitsofe@yahoo.com, linux-block@vger.kernel.org
-Subject: [PATCH 2/2] block: don't ignore -EOPNOTSUPP blkdev_issue_write_same
-Date: Fri, 24 Jun 2016 09:00:51 +0200
-Message-Id: <1466751651-9900-3-git-send-email-hch@lst.de>
-In-Reply-To: <1466751651-9900-1-git-send-email-hch@lst.de>
-References: <1466751651-9900-1-git-send-email-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+Subject: Re: [PATCH 37/45] drivers: use req op accessor
+To: mchristi@redhat.com, linux-f2fs-devel@lists.sourceforge.net,
+	linux-ext4@vger.kernel.org, konrad.wilk@oracle.com,
+	drbd-dev@lists.linbit.com, philipp.reisner@linbit.com,
+	lars.ellenberg@linbit.com, linux-raid@vger.kernel.org,
+	dm-devel@redhat.com, linux-fsdevel@vger.kernel.org,
+	linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
+	linux-mtd@lists.infradead.org, target-devel@vger.kernel.org,
+	linux-btrfs@vger.kernel.org, osd-dev@open-osd.org, xfs@oss.sgi.com,
+	ocfs2-devel@oss.oracle.com
+References: <1465155145-10812-1-git-send-email-mchristi@redhat.com>
+ <1465155145-10812-38-git-send-email-mchristi@redhat.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <57551D2B.1090707@suse.de>
+Date: Mon, 6 Jun 2016 08:50:19 +0200
+MIME-Version: 1.0
+In-Reply-To: <1465155145-10812-38-git-send-email-mchristi@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Sender: linux-scsi-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-WRITE SAME is a data integrity operation and we can't simply ignore
-errors.
+On 06/05/2016 09:32 PM, mchristi@redhat.com wrote:
+> From: Mike Christie <mchristi@redhat.com>
+> 
+> The req operation REQ_OP is separated from the rq_flag_bits
+> definition. This converts the block layer drivers to
+> use req_op to get the op from the request struct.
+> 
+> Signed-off-by: Mike Christie <mchristi@redhat.com>
+> ---
+>  drivers/block/loop.c              |  6 +++---
+>  drivers/block/mtip32xx/mtip32xx.c |  2 +-
+>  drivers/block/nbd.c               |  2 +-
+>  drivers/block/rbd.c               |  4 ++--
+>  drivers/block/xen-blkfront.c      |  8 +++++---
+>  drivers/ide/ide-floppy.c          |  2 +-
+>  drivers/md/dm.c                   |  2 +-
+>  drivers/mmc/card/block.c          |  7 +++----
+>  drivers/mmc/card/queue.c          |  6 ++----
+>  drivers/mmc/card/queue.h          |  5 ++++-
+>  drivers/mtd/mtd_blkdevs.c         |  2 +-
+>  drivers/nvme/host/core.c          |  2 +-
+>  drivers/nvme/host/nvme.h          |  4 ++--
+>  drivers/scsi/sd.c                 | 25 ++++++++++++++++---------
+>  14 files changed, 43 insertions(+), 34 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-lib.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Cheers,
 
-diff --git a/block/blk-lib.c b/block/blk-lib.c
-index 45b35b1..e371f83 100644
---- a/block/blk-lib.c
-+++ b/block/blk-lib.c
-@@ -178,7 +178,7 @@ int blkdev_issue_write_same(struct block_device *bdev, sector_t sector,
- 
- 	if (bio)
- 		ret = submit_bio_wait(bio);
--	return ret != -EOPNOTSUPP ? ret : 0;
-+	return ret;
- }
- EXPORT_SYMBOL(blkdev_issue_write_same);
- 
+Hannes
 -- 
-2.1.4
-
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: F. Imend�rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG N�rnberg)
