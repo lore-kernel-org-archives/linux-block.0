@@ -1,70 +1,56 @@
-Return-Path: <BATV+65f7e0ff3112b2479d70+4670+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk,
-	keith.busch@intel.com
-Cc: linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: NVMe over Fabrics target implementation
-Date: Mon,  6 Jun 2016 23:22:54 +0200
-Message-Id: <1465248177-17970-1-git-send-email-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:46001 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751017AbcFFGPw (ORCPT <rfc822;linux-block@vger.kernel.org>);
+	Mon, 6 Jun 2016 02:15:52 -0400
+Subject: Re: [PATCH 06/45] dm: use op_is_write instead of checking for
+ REQ_WRITE
+To: mchristi@redhat.com, linux-f2fs-devel@lists.sourceforge.net,
+	linux-ext4@vger.kernel.org, konrad.wilk@oracle.com,
+	drbd-dev@lists.linbit.com, philipp.reisner@linbit.com,
+	lars.ellenberg@linbit.com, linux-raid@vger.kernel.org,
+	dm-devel@redhat.com, linux-fsdevel@vger.kernel.org,
+	linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
+	linux-mtd@lists.infradead.org, target-devel@vger.kernel.org,
+	linux-btrfs@vger.kernel.org, osd-dev@open-osd.org, xfs@oss.sgi.com,
+	ocfs2-devel@oss.oracle.com
+References: <1465155145-10812-1-git-send-email-mchristi@redhat.com>
+ <1465155145-10812-7-git-send-email-mchristi@redhat.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <57551515.8060205@suse.de>
+Date: Mon, 6 Jun 2016 08:15:49 +0200
+MIME-Version: 1.0
+In-Reply-To: <1465155145-10812-7-git-send-email-mchristi@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This patch set adds a generic NVMe over Fabrics target. The
-implementation conforms to the NVMe 1.2b specification (which
-includes Fabrics) and provides the NVMe over Fabrics access
-to Linux block devices.
+On 06/05/2016 09:31 PM, mchristi@redhat.com wrote:
+> From: Mike Christie <mchristi@redhat.com>
+> 
+> We currently set REQ_WRITE/WRITE for all non READ IOs
+> like discard, flush, writesame, etc. In the next patches where we
+> no longer set up the op as a bitmap, we will not be able to
+> detect a operation direction like writesame by testing if REQ_WRITE is
+> set.
+> 
+> This has dm use the op_is_write helper which will do the right
+> thing.
+> 
+> Signed-off-by: Mike Christie <mchristi@redhat.com>
+> ---
 
-The target implementation consists of several elements:
+(Could probably be folded into the previous patch)
 
-- NVMe target core: defines and manages the NVMe entities (subsystems,
-  controllers, namespaces, ...) and their allocation, responsible
-  for initial commands processing and correct orchestration of
-  the stack setup and tear down.
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-- NVMe admin command implementation: responsible for parsing and
-  servicing admin commands such as controller identify, set features,
-  keep-alive, log page, ...).
+Cheers,
 
-- NVMe I/O command implementation: responsible for performing the actual
-  I/O (Read, Write, Flush, Deallocate (aka Discard).  It is a very thin
-  layer on top of the block layer and implements no logic of it's own.
-  To support exporting file systems please use the loopback block driver
-  in direct I/O mode, which gives very good performance.
-
-- NVMe over Fabrics support: responsible for servicing Fabrics commands
-  (connect, property get/set).
-
-- NVMe over Fabrics discovery service: responsible to serve the Discovery
-  log page through a special cut down Discovery controller.
-
-The target is configured using configfs, and configurable entities are:
-
- - NVMe subsystems and namespaces
- - NVMe over Fabrics ports and referrals
- - Host ACLs for primitive access control - NVMe over Fabrics access
-   control is still work in progress at the specification level and
-   will be implemented once that work has finished.
-
-To configure the target use the nvmetcli tool from
-http://git.infradead.org/users/hch/nvmetcli.git, which includes detailed
-setup documentation.
-
-In addition to the Fabrics target implementation we provide a loopback
-driver which also conforms the NVMe over Fabrics specification and allows
-evaluation of the target stack with local access without requiring a real
-fabric.
-
-Various test cases are provided for this implementation: nvmetcli
-contains a python testsuite that mostly stresses the configfs interface
-of the target, and we have various integration tests prepared for the
-kernel host and target which are available at:
-
-	git://git.infradead.org/nvme-fabrics.git nvmf-selftests
-
-Gitweb:
-
-	http://git.infradead.org/nvme-fabrics.git/shortlog/refs/heads/nvmf-selftests
-
-This repository also contains patches from all the series posted today
-in case you prefer using a git repository over collecting patches.
+Hannes
+-- 
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: F. Imend�rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG N�rnberg)
