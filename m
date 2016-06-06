@@ -1,125 +1,138 @@
-Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: tglx@linutronix.de,
-	axboe@fb.com
-Subject: [PATCH 08/13] pci: spread interrupt vectors in pci_alloc_irq_vectors
-Date: Tue, 14 Jun 2016 21:59:01 +0200
-Message-Id: <1465934346-20648-9-git-send-email-hch@lst.de>
-In-Reply-To: <1465934346-20648-1-git-send-email-hch@lst.de>
-References: <1465934346-20648-1-git-send-email-hch@lst.de>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
-List-Post: <mailto:linux-nvme@lists.infradead.org>
-List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
-Cc: linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f65.google.com ([74.125.82.65]:35815 "EHLO
+	mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753100AbcFFOqM (ORCPT
+	<rfc822;linux-block@vger.kernel.org>); Mon, 6 Jun 2016 10:46:12 -0400
+Received: by mail-wm0-f65.google.com with SMTP id k184so10680413wme.2
+        for <linux-block@vger.kernel.org>; Mon, 06 Jun 2016 07:46:11 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+Subject: [RFC PATCH 3/6] blk-mq: register device instead of disk
+Date: Mon,  6 Jun 2016 16:46:00 +0200
+Message-Id: <1465224363-25797-4-git-send-email-m@bjorling.me>
+In-Reply-To: <1465224363-25797-1-git-send-email-m@bjorling.me>
+References: <1465224363-25797-1-git-send-email-m@bjorling.me>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
-Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Set the affinity_mask before allocating vectors.
+Enable devices without a gendisk instance to register itself with blk-mq
+and expose the associated multi-queue sysfs entries.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Matias Bjørling <m@bjorling.me>
 ---
- drivers/pci/msi.c   | 26 ++++++++++++++++++++++++--
- include/linux/pci.h |  1 +
- 2 files changed, 25 insertions(+), 2 deletions(-)
+ block/blk-mq-sysfs.c   | 13 +++++--------
+ block/blk-sysfs.c      |  4 ++--
+ drivers/md/dm.c        |  2 +-
+ include/linux/blk-mq.h |  4 ++--
+ 4 files changed, 10 insertions(+), 13 deletions(-)
 
-diff --git a/drivers/pci/msi.c b/drivers/pci/msi.c
-index a33adec..50d694c 100644
---- a/drivers/pci/msi.c
-+++ b/drivers/pci/msi.c
-@@ -568,6 +568,7 @@ static struct msi_desc *msi_setup_entry(struct pci_dev *dev, int nvec)
- 	entry->msi_attrib.multi_cap	= (control & PCI_MSI_FLAGS_QMASK) >> 1;
- 	entry->msi_attrib.multiple	= ilog2(__roundup_pow_of_two(nvec));
- 	entry->nvec_used		= nvec;
-+	entry->affinity			= dev->irq_affinity;
- 
- 	if (control & PCI_MSI_FLAGS_64BIT)
- 		entry->mask_pos = dev->msi_cap + PCI_MSI_MASK_64;
-@@ -679,10 +680,18 @@ static void __iomem *msix_map_region(struct pci_dev *dev, unsigned nr_entries)
- static int msix_setup_entries(struct pci_dev *dev, void __iomem *base,
- 			      struct msix_entry *entries, int nvec)
- {
-+	const struct cpumask *mask = NULL;
- 	struct msi_desc *entry;
--	int i;
-+	int cpu = -1, i;
- 
- 	for (i = 0; i < nvec; i++) {
-+		if (dev->irq_affinity) {
-+			cpu = cpumask_next(cpu, dev->irq_affinity);
-+			if (cpu >= nr_cpu_ids)
-+				cpu = cpumask_first(dev->irq_affinity);
-+			mask = cpumask_of(cpu);
-+		}
-+
- 		entry = alloc_msi_entry(&dev->dev);
- 		if (!entry) {
- 			if (!i)
-@@ -699,6 +708,7 @@ static int msix_setup_entries(struct pci_dev *dev, void __iomem *base,
- 		entry->msi_attrib.default_irq	= dev->irq;
- 		entry->mask_base		= base;
- 		entry->nvec_used		= 1;
-+		entry->affinity			= mask;
- 
- 		list_add_tail(&entry->list, dev_to_msi_list(&dev->dev));
- 	}
-@@ -1176,12 +1186,20 @@ int pci_alloc_irq_vectors(struct pci_dev *dev, unsigned int min_vecs,
- {
- 	unsigned int vecs, i;
- 	u32 *irqs;
-+	int ret;
- 
- 	max_vecs = min(max_vecs, pci_nr_irq_vectors(dev));
- 
-+	ret = irq_create_affinity_mask(&dev->irq_affinity, &max_vecs);
-+	if (ret)
-+		return ret;
-+	if (max_vecs < min_vecs)
-+		return -ENOSPC;
-+
-+	ret = -ENOMEM;
- 	irqs = kcalloc(max_vecs, sizeof(u32), GFP_KERNEL);
- 	if (!irqs)
--		return -ENOMEM;
-+		goto out_free_affinity;
- 
- 	if (!(flags & PCI_IRQ_NOMSIX)) {
- 		vecs = pci_enable_msix_range_wrapper(dev, irqs, min_vecs,
-@@ -1208,6 +1226,10 @@ int pci_alloc_irq_vectors(struct pci_dev *dev, unsigned int min_vecs,
- done:
- 	dev->irqs = irqs;
- 	return vecs;
-+out_free_affinity:
-+	kfree(dev->irq_affinity);
-+	dev->irq_affinity = NULL;
-+	return ret;
+diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
+index 4ea4dd8..f67b5c1 100644
+--- a/block/blk-mq-sysfs.c
++++ b/block/blk-mq-sysfs.c
+@@ -380,9 +380,8 @@ static int blk_mq_register_hctx(struct blk_mq_hw_ctx *hctx)
+ 	return ret;
  }
- EXPORT_SYMBOL(pci_alloc_irq_vectors);
  
-diff --git a/include/linux/pci.h b/include/linux/pci.h
-index 84a20fc..f474611 100644
---- a/include/linux/pci.h
-+++ b/include/linux/pci.h
-@@ -321,6 +321,7 @@ struct pci_dev {
- 	 */
- 	unsigned int	irq;
- 	unsigned int	*irqs;
-+	struct cpumask	*irq_affinity;
- 	struct resource resource[DEVICE_COUNT_RESOURCE]; /* I/O and memory regions + expansion ROMs */
+-void blk_mq_unregister_disk(struct gendisk *disk)
++void blk_mq_unregister_dev(struct device *dev, struct request_queue *q)
+ {
+-	struct request_queue *q = disk->queue;
+ 	struct blk_mq_hw_ctx *hctx;
+ 	struct blk_mq_ctx *ctx;
+ 	int i, j;
+@@ -402,7 +401,7 @@ void blk_mq_unregister_disk(struct gendisk *disk)
+ 	kobject_del(&q->mq_kobj);
+ 	kobject_put(&q->mq_kobj);
  
- 	bool match_driver;		/* Skip attaching driver */
+-	kobject_put(&disk_to_dev(disk)->kobj);
++	kobject_put(&dev->kobj);
+ 
+ 	q->mq_sysfs_init_done = false;
+ 	blk_mq_enable_hotplug();
+@@ -426,10 +425,8 @@ static void blk_mq_sysfs_init(struct request_queue *q)
+ 	}
+ }
+ 
+-int blk_mq_register_disk(struct gendisk *disk)
++int blk_mq_register_dev(struct device *dev, struct request_queue *q)
+ {
+-	struct device *dev = disk_to_dev(disk);
+-	struct request_queue *q = disk->queue;
+ 	struct blk_mq_hw_ctx *hctx;
+ 	int ret, i;
+ 
+@@ -450,7 +447,7 @@ int blk_mq_register_disk(struct gendisk *disk)
+ 	}
+ 
+ 	if (ret)
+-		blk_mq_unregister_disk(disk);
++		blk_mq_unregister_dev(dev, q);
+ 	else
+ 		q->mq_sysfs_init_done = true;
+ out:
+@@ -458,7 +455,7 @@ out:
+ 
+ 	return ret;
+ }
+-EXPORT_SYMBOL_GPL(blk_mq_register_disk);
++EXPORT_SYMBOL_GPL(blk_mq_register_dev);
+ 
+ void blk_mq_sysfs_unregister(struct request_queue *q)
+ {
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index 995b58d..a998c54 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -654,7 +654,7 @@ int blk_register_queue(struct gendisk *disk)
+ 	kobject_uevent(&q->kobj, KOBJ_ADD);
+ 
+ 	if (q->mq_ops)
+-		blk_mq_register_disk(disk);
++		blk_mq_register_dev(disk_to_dev(disk), q);
+ 
+ 	if (!q->request_fn)
+ 		return 0;
+@@ -679,7 +679,7 @@ void blk_unregister_queue(struct gendisk *disk)
+ 		return;
+ 
+ 	if (q->mq_ops)
+-		blk_mq_unregister_disk(disk);
++		blk_mq_unregister_dev(disk_to_dev(disk), q);
+ 
+ 	if (q->request_fn)
+ 		elv_unregister_queue(q);
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index 3d3ac13..6a4b596 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -2797,7 +2797,7 @@ static int dm_mq_init_request_queue(struct mapped_device *md,
+ 	dm_init_md_queue(md);
+ 
+ 	/* backfill 'mq' sysfs registration normally done in blk_register_queue */
+-	blk_mq_register_disk(md->disk);
++	blk_mq_register_dev(disk_to_dev(md->disk), q);
+ 
+ 	return 0;
+ 
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 9ac9799..9a37515 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -176,8 +176,8 @@ enum {
+ struct request_queue *blk_mq_init_queue(struct blk_mq_tag_set *);
+ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+ 						  struct request_queue *q);
+-int blk_mq_register_disk(struct gendisk *);
+-void blk_mq_unregister_disk(struct gendisk *);
++int blk_mq_register_dev(struct device *, struct request_queue *);
++void blk_mq_unregister_dev(struct device *, struct request_queue *);
+ 
+ int blk_mq_alloc_tag_set(struct blk_mq_tag_set *set);
+ void blk_mq_free_tag_set(struct blk_mq_tag_set *set);
 -- 
 2.1.4
 
-
-_______________________________________________
-Linux-nvme mailing list
-Linux-nvme@lists.infradead.org
-http://lists.infradead.org/mailman/listinfo/linux-nvme
