@@ -1,11 +1,11 @@
 Return-Path: <baolin.wang@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <57519670.6050306@kernel.dk>
+In-Reply-To: <575195CD.6090607@kernel.dk>
 References: <cover.1464346333.git.baolin.wang@linaro.org> <2f0f6811938dafd14c6c7b1dbe8fbabfdcbb19c1.1464346333.git.baolin.wang@linaro.org>
- <57519670.6050306@kernel.dk>
+ <575195CD.6090607@kernel.dk>
 From: Baolin Wang <baolin.wang@linaro.org>
-Date: Mon, 6 Jun 2016 13:04:17 +0800
-Message-ID: <CAMz4kuL6PFANg=f0t7mCAk=CqJisdmZyxcUqWf8ZUj0mRLQrXQ@mail.gmail.com>
+Date: Mon, 6 Jun 2016 13:03:22 +0800
+Message-ID: <CAMz4kuK0_G2sdSzrWLkrCbCmCk1RUH8jjEmXXFU1_mZye5KF4Q@mail.gmail.com>
 Subject: Re: [RFC v2 1/3] block: Introduce blk_bio_map_sg() to map one bio
 To: Jens Axboe <axboe@kernel.dk>
 Cc: Alasdair G Kergon <agk@redhat.com>, Mike Snitzer <snitzer@redhat.com>,
@@ -22,34 +22,28 @@ Cc: Alasdair G Kergon <agk@redhat.com>, Mike Snitzer <snitzer@redhat.com>,
 Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 3 June 2016 at 22:38, Jens Axboe <axboe@kernel.dk> wrote:
+On 3 June 2016 at 22:35, Jens Axboe <axboe@kernel.dk> wrote:
 > On 05/27/2016 05:11 AM, Baolin Wang wrote:
 >>
->> +/*
->> + * Map a bio to scatterlist, return number of sg entries setup. Caller
->> must
->> + * make sure sg can hold bio segments entries.
->> + */
->> +int blk_bio_map_sg(struct request_queue *q, struct bio *bio,
->> +                  struct scatterlist *sglist)
->> +{
->> +       struct scatterlist *sg = NULL;
->> +       int nsegs = 0;
->> +
->> +       if (bio)
->> +               nsegs = __blk_bios_map_sg(q, bio, sglist, &sg, true);
->> +
->> +       if (sg)
->> +               sg_mark_end(sg);
+>> In dm-crypt, it need to map one bio to scatterlist for improving the
+>> hardware engine encryption efficiency. Thus this patch introduces the
+>> blk_bio_map_sg() function to map one bio with scatterlists.
+>>
+>> For avoiding the duplicated code in __blk_bios_map_sg() function, add
+>> one parameter to distinguish bio map or request map.
 >
 >
-> Put that if (sg) inside the if (bio) section, 'sg' isn't going to be
-> non-NULL outside of that.
->
-> Additionally, who would call this with a NULL bio? That seems odd, I'd
-> get rid of that check completely.
+> Just detach the bio in blk_bio_map_sg() instead of adding a separate case
+> (and argument) for it in __blk_bios_map_sg().
 
-OK. I'll fix these in next version. Thanks for your comments.
+Make sense.
+
+>
+> --
+> Jens Axboe
+>
+
+
 
 -- 
 Baolin.wang
