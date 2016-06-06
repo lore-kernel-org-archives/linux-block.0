@@ -1,265 +1,59 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:58023 "EHLO
-	mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1161441AbcFHUvl (ORCPT
-	<rfc822;linux-block@vger.kernel.org>);
-	Wed, 8 Jun 2016 16:51:41 -0400
-From: Michael Callahan <michaelcallahan@fb.com>
-To: <linux-block@vger.kernel.org>
-CC: Michael Callahan <michaelcallahan@fb.com>, <axboe@fb.com>,
-	<coder.callahan@gmail.com>, <kernel-team@fb.com>
-Subject: [PATCH 4/4] block: Track DISCARD statistics and output them in stat and diskstat.
-Date: Wed, 8 Jun 2016 16:50:55 -0400
-Message-ID: <083ce34e493bda0fda085f90a953bcc7862f23e9.1464912896.git.michaelcallahan@fb.com>
-In-Reply-To: <cover.1464912896.git.michaelcallahan@fb.com>
-References: <cover.1464912896.git.michaelcallahan@fb.com>
+Received: from mx2.suse.de ([195.135.220.15]:46130 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750911AbcFFGQr (ORCPT <rfc822;linux-block@vger.kernel.org>);
+	Mon, 6 Jun 2016 02:16:47 -0400
+Subject: Re: [PATCH 07/45] bcache: use op_is_write instead of checking for
+ REQ_WRITE
+To: mchristi@redhat.com, linux-f2fs-devel@lists.sourceforge.net,
+	linux-ext4@vger.kernel.org, konrad.wilk@oracle.com,
+	drbd-dev@lists.linbit.com, philipp.reisner@linbit.com,
+	lars.ellenberg@linbit.com, linux-raid@vger.kernel.org,
+	dm-devel@redhat.com, linux-fsdevel@vger.kernel.org,
+	linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
+	linux-mtd@lists.infradead.org, target-devel@vger.kernel.org,
+	linux-btrfs@vger.kernel.org, osd-dev@open-osd.org, xfs@oss.sgi.com,
+	ocfs2-devel@oss.oracle.com
+References: <1465155145-10812-1-git-send-email-mchristi@redhat.com>
+ <1465155145-10812-8-git-send-email-mchristi@redhat.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <5755154C.7030007@suse.de>
+Date: Mon, 6 Jun 2016 08:16:44 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <1465155145-10812-8-git-send-email-mchristi@redhat.com>
+Content-Type: text/plain; charset=windows-1252
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Add tracking of REQ_DISCARD ios to the partition statistics and append
-them to the various stat files in /sys as well as /proc/diskstats.
-These are tracked with the same four stats as reads and writes:
+On 06/05/2016 09:31 PM, mchristi@redhat.com wrote:
+> From: Mike Christie <mchristi@redhat.com>
+> 
+> We currently set REQ_WRITE/WRITE for all non READ IOs
+> like discard, flush, writesame, etc. In the next patches where we
+> no longer set up the op as a bitmap, we will not be able to
+> detect a operation direction like writesame by testing if REQ_WRITE is
+> set.
+> 
+> This has bcache use the op_is_write helper which will do the right
+> thing.
+> 
+> Signed-off-by: Mike Christie <mchristi@redhat.com>
+> ---
+>  drivers/md/bcache/io.c      | 2 +-
+>  drivers/md/bcache/request.c | 6 +++---
+>  2 files changed, 4 insertions(+), 4 deletions(-)
+> 
+(Could probably folded together with the two previous patches)
 
-Number of discard ios completed.
-Number of discard ios merged
-Number of discard sectors completed
-Milliseconds spent on discard requests
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-This is done via adding a new STAT_DISCARD define to genhd.h and then
-using it to index that stat field for discard requests.
+Cheers,
 
-Signed-off-by: Michael Callahan <michaelcallahan@fb.com>
----
- Documentation/ABI/testing/procfs-diskstats | 10 ++++++++++
- Documentation/block/stat.txt               | 28 ++++++++++++++++------------
- Documentation/iostats.txt                  | 15 ++++++++++++++-
- block/genhd.c                              | 14 +++++++++++---
- block/partition-generic.c                  |  9 +++++++--
- include/linux/genhd.h                      | 14 +++++++++-----
- 6 files changed, 67 insertions(+), 23 deletions(-)
-
-diff --git a/Documentation/ABI/testing/procfs-diskstats b/Documentation/ABI/testing/procfs-diskstats
-index f91a973..59616c6 100644
---- a/Documentation/ABI/testing/procfs-diskstats
-+++ b/Documentation/ABI/testing/procfs-diskstats
-@@ -5,6 +5,7 @@ Description:
- 		The /proc/diskstats file displays the I/O statistics
- 		of block devices. Each line contains the following 14
- 		fields:
-+
- 		 1 - major number
- 		 2 - minor mumber
- 		 3 - device name
-@@ -19,4 +20,13 @@ Description:
- 		12 - I/Os currently in progress
- 		13 - time spent doing I/Os (ms)
- 		14 - weighted time spent doing I/Os (ms)
-+
-+		Kernel 4.8 appends four more fields for discard tracking
-+		putting the total at 18:
-+
-+		15 - discards completed successfully
-+		16 - discards merged
-+		17 - sectors discarded
-+		18 - time spent discarding
-+
- 		For more details refer to Documentation/iostats.txt
-diff --git a/Documentation/block/stat.txt b/Documentation/block/stat.txt
-index 0dbc946..0aace9c 100644
---- a/Documentation/block/stat.txt
-+++ b/Documentation/block/stat.txt
-@@ -31,28 +31,32 @@ write ticks     milliseconds  total wait time for write requests
- in_flight       requests      number of I/Os currently in flight
- io_ticks        milliseconds  total time this block device has been active
- time_in_queue   milliseconds  total wait time for all requests
-+discard I/Os    requests      number of discard I/Os processed
-+discard merges  requests      number of discard I/Os merged with in-queue I/O
-+discard sectors sectors       number of sectors discarded
-+discard ticks   milliseconds  total wait time for discard requests
- 
--read I/Os, write I/Os
--=====================
-+read I/Os, write I/Os, discard I/0s
-+===================================
- 
- These values increment when an I/O request completes.
- 
--read merges, write merges
--=========================
-+read merges, write merges, discard merges
-+=========================================
- 
- These values increment when an I/O request is merged with an
- already-queued I/O request.
- 
--read sectors, write sectors
--===========================
-+read sectors, write sectors, discard_sectors
-+============================================
- 
--These values count the number of sectors read from or written to this
--block device.  The "sectors" in question are the standard UNIX 512-byte
--sectors, not any device- or filesystem-specific block size.  The
--counters are incremented when the I/O completes.
-+These values count the number of sectors read from, written to, or
-+discarded from this block device.  The "sectors" in question are the
-+standard UNIX 512-byte sectors, not any device- or filesystem-specific
-+block size.  The counters are incremented when the I/O completes.
- 
--read ticks, write ticks
--=======================
-+read ticks, write ticks, discard ticks
-+======================================
- 
- These values count the number of milliseconds that I/O requests have
- waited on this block device.  If there are multiple I/O requests waiting,
-diff --git a/Documentation/iostats.txt b/Documentation/iostats.txt
-index 65f694f..e6e2795 100644
---- a/Documentation/iostats.txt
-+++ b/Documentation/iostats.txt
-@@ -22,7 +22,6 @@ Here are examples of these different formats:
-    3     0   39082680 hda 446216 784926 9550688 4382310 424847 312726 5922052 19310380 0 3376340 23705160
-    3     1    9221278 hda1 35486 0 35496 38030 0 0 0 0 0 38030 38030
- 
--
- 2.6 sysfs:
-    446216 784926 9550688 4382310 424847 312726 5922052 19310380 0 3376340 23705160
-    35486    38030    38030    38030
-@@ -31,6 +30,9 @@ Here are examples of these different formats:
-    3    0   hda 446216 784926 9550688 4382310 424847 312726 5922052 19310380 0 3376340 23705160
-    3    1   hda1 35486 38030 38030 38030
- 
-+4.8 diskstats:
-+   3    0   hda 446216 784926 9550688 4382310 424847 312726 5922052 19310380 0 3376340 23705160 0 0 0 0
-+
- On 2.4 you might execute "grep 'hda ' /proc/partitions". On 2.6, you have
- a choice of "cat /sys/block/hda/stat" or "grep 'hda ' /proc/diskstats".
- The advantage of one over the other is that the sysfs choice works well
-@@ -90,6 +92,17 @@ Field 11 -- weighted # of milliseconds spent doing I/Os
-     last update of this field.  This can provide an easy measure of both
-     I/O completion time and the backlog that may be accumulating.
- 
-+In 4.8 the following four fields are appended for discard tracking:
-+
-+Field 12 -- # of discards completed
-+    This is the total number of discards completed successfully.
-+Field 13 -- # of discards merged
-+    See the description of field 2
-+Field 14 -- # of sectors discarded
-+    This is the total number of sectors discarded successfully.
-+Field 15 -- # of milliseconds spent discarding
-+    This is the total number of milliseconds spent by all discards (as
-+    measured from __make_request() to end_that_request_last()).
- 
- To avoid introducing performance bottlenecks, no locks are held while
- modifying these counters.  This implies that minor inaccuracies may be
-diff --git a/block/genhd.c b/block/genhd.c
-index b6f1dee..1b558dc 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -1195,8 +1195,12 @@ static int diskstats_show(struct seq_file *seqf, void *v)
- 		cpu = part_stat_lock();
- 		part_round_stats(cpu, hd);
- 		part_stat_unlock();
--		seq_printf(seqf, "%4d %7d %s %lu %lu %lu "
--			   "%u %lu %lu %lu %u %u %u %u\n",
-+		seq_printf(seqf, "%4d %7d %s "
-+			   "%lu %lu %lu %u "
-+			   "%lu %lu %lu %u "
-+			   "%u %u %u "
-+			   "%lu %lu %lu %u"
-+			   "\n",
- 			   MAJOR(part_devt(hd)), MINOR(part_devt(hd)),
- 			   disk_name(gp, hd->partno, buf),
- 			   part_stat_read(hd, ios[STAT_READ]),
-@@ -1209,7 +1213,11 @@ static int diskstats_show(struct seq_file *seqf, void *v)
- 			   jiffies_to_msecs(part_stat_read(hd, ticks[STAT_WRITE])),
- 			   part_in_flight(hd),
- 			   jiffies_to_msecs(part_stat_read(hd, io_ticks)),
--			   jiffies_to_msecs(part_stat_read(hd, time_in_queue))
-+			   jiffies_to_msecs(part_stat_read(hd, time_in_queue)),
-+			   part_stat_read(hd, ios[STAT_DISCARD]),
-+			   part_stat_read(hd, merges[STAT_DISCARD]),
-+			   part_stat_read(hd, sectors[STAT_DISCARD]),
-+			   jiffies_to_msecs(part_stat_read(hd, ticks[STAT_DISCARD]))
- 			);
- 	}
- 	disk_part_iter_exit(&piter);
-diff --git a/block/partition-generic.c b/block/partition-generic.c
-index 15bf298..0f18368 100644
---- a/block/partition-generic.c
-+++ b/block/partition-generic.c
-@@ -121,7 +121,8 @@ ssize_t part_stat_show(struct device *dev,
- 	return sprintf(buf,
- 		"%8lu %8lu %8llu %8u "
- 		"%8lu %8lu %8llu %8u "
--		"%8u %8u %8u"
-+		"%8u %8u %8u "
-+		"%8lu %8lu %8llu %8u"
- 		"\n",
- 		part_stat_read(p, ios[STAT_READ]),
- 		part_stat_read(p, merges[STAT_READ]),
-@@ -133,7 +134,11 @@ ssize_t part_stat_show(struct device *dev,
- 		jiffies_to_msecs(part_stat_read(p, ticks[STAT_WRITE])),
- 		part_in_flight(p),
- 		jiffies_to_msecs(part_stat_read(p, io_ticks)),
--		jiffies_to_msecs(part_stat_read(p, time_in_queue)));
-+		jiffies_to_msecs(part_stat_read(p, time_in_queue)),
-+		part_stat_read(p, ios[STAT_DISCARD]),
-+		part_stat_read(p, merges[STAT_DISCARD]),
-+		(unsigned long long)part_stat_read(p, sectors[STAT_DISCARD]),
-+		jiffies_to_msecs(part_stat_read(p, ticks[STAT_DISCARD])));
- }
- 
- ssize_t part_inflight_show(struct device *dev,
-diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index b9250a3..977b0e0 100644
---- a/include/linux/genhd.h
-+++ b/include/linux/genhd.h
-@@ -62,6 +62,7 @@ enum {
- 
- #define STAT_READ			0
- #define STAT_WRITE			1
-+#define STAT_DISCARD			2
- 
- #include <linux/major.h>
- #include <linux/device.h>
-@@ -84,10 +85,10 @@ struct partition {
- } __attribute__((packed));
- 
- struct disk_stats {
--	unsigned long sectors[2];	/* STAT_READs and STAT_WRITEs */
--	unsigned long ios[2];
--	unsigned long merges[2];
--	unsigned long ticks[2];
-+	unsigned long sectors[3];	/* STAT_READ, STAT_WRITE, STAT_DISCARD */
-+	unsigned long ios[3];
-+	unsigned long merges[3];
-+	unsigned long ticks[3];
- 	unsigned long io_ticks;
- 	unsigned long time_in_queue;
- };
-@@ -369,7 +370,8 @@ static inline void free_part_stats(struct hd_struct *part)
- 
- #define part_stat_read_accum(part, field)				\
- 	(part_stat_read(part, field[STAT_READ]) +			\
--	 part_stat_read(part, field[STAT_WRITE]))
-+	 part_stat_read(part, field[STAT_WRITE]) +			\
-+	 part_stat_read(part, field[STAT_DISCARD]))
- 
- #define part_stat_add(cpu, part, field, addnd)	do {			\
- 	__part_stat_add((cpu), (part), field, addnd);			\
-@@ -419,6 +421,8 @@ static inline void free_part_info(struct hd_struct *part)
- 
- static inline int rw_stat_group(unsigned int rw_flags)
- {
-+	if (rw_flags & REQ_DISCARD)
-+		return STAT_DISCARD;
- 	return (rw_flags & REQ_WRITE) != 0;
- }
- 
+Hannes
 -- 
-1.9.3
-
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: F. Imend�rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG N�rnberg)
