@@ -1,70 +1,51 @@
-Return-Path: <baolin.wang@linaro.org>
-Return-Path: <baolin.wang@linaro.org>
-From: Baolin Wang <baolin.wang@linaro.org>
-To: axboe@kernel.dk,
-	agk@redhat.com,
-	snitzer@redhat.com,
-	dm-devel@redhat.com,
-	herbert@gondor.apana.org.au,
-	davem@davemloft.net
-Cc: ebiggers3@gmail.com,
-	js1304@gmail.com,
-	tadeusz.struk@intel.com,
-	smueller@chronox.de,
-	standby24x7@gmail.com,
-	shli@kernel.org,
-	dan.j.williams@intel.com,
-	martin.petersen@oracle.com,
-	sagig@mellanox.com,
-	kent.overstreet@gmail.com,
-	keith.busch@intel.com,
-	tj@kernel.org,
-	ming.lei@canonical.com,
-	broonie@kernel.org,
-	arnd@arndb.de,
-	linux-crypto@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-raid@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	baolin.wang@linaro.org
-Subject: [RFC v4 0/4] Introduce the bulk mode method when sending request to crypto layer
-Date: Tue,  7 Jun 2016 20:17:03 +0800
-Message-Id: <cover.1465301616.git.baolin.wang@linaro.org>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Subject: Re: [PATCH 25/45] bcache: use bio op accessors
+To: mchristi@redhat.com, linux-f2fs-devel@lists.sourceforge.net,
+	linux-ext4@vger.kernel.org, konrad.wilk@oracle.com,
+	drbd-dev@lists.linbit.com, philipp.reisner@linbit.com,
+	lars.ellenberg@linbit.com, linux-raid@vger.kernel.org,
+	dm-devel@redhat.com, linux-fsdevel@vger.kernel.org,
+	linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
+	linux-mtd@lists.infradead.org, target-devel@vger.kernel.org,
+	linux-btrfs@vger.kernel.org, osd-dev@open-osd.org, xfs@oss.sgi.com,
+	ocfs2-devel@oss.oracle.com
+References: <1465155145-10812-1-git-send-email-mchristi@redhat.com>
+ <1465155145-10812-26-git-send-email-mchristi@redhat.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <57551BF2.6060000@suse.de>
+Date: Mon, 6 Jun 2016 08:45:06 +0200
+MIME-Version: 1.0
+In-Reply-To: <1465155145-10812-26-git-send-email-mchristi@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-This patchset will check if the cipher can support bulk mode, then dm-crypt
-will handle different ways to send requests to crypto layer according to
-cipher mode. For bulk mode, we can use sg table to map the whole bio and
-send all scatterlists of one bio to crypto engine to encrypt or decrypt,
-which can improve the hardware engine's efficiency.
+On 06/05/2016 09:32 PM, mchristi@redhat.com wrote:
+> From: Mike Christie <mchristi@redhat.com>
+> 
+> Separate the op from the rq_flag_bits and have bcache
+> set/get the bio using bio_set_op_attrs/bio_op.
+> 
+> Signed-off-by: Mike Christie <mchristi@redhat.com>
+> ---
+>  drivers/md/bcache/btree.c     |  4 ++--
+>  drivers/md/bcache/debug.c     |  4 ++--
+>  drivers/md/bcache/journal.c   |  7 ++++---
+>  drivers/md/bcache/movinggc.c  |  2 +-
+>  drivers/md/bcache/request.c   | 14 +++++++-------
+>  drivers/md/bcache/super.c     | 24 +++++++++++++-----------
+>  drivers/md/bcache/writeback.c |  4 ++--
+>  7 files changed, 31 insertions(+), 28 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Changes since v3:
- - Some optimization for blk_bio_map_sg() function.
+Cheers,
 
-Changes since v2:
- - Add one cipher user with CRYPTO_ALG_BULK flag to support bulk mode.
- - Add one atomic variable to avoid the sg table race.
-
-Changes since v1:
- - Refactor the blk_bio_map_sg() function to avoid duplicated code.
- - Move the sg table allocation to crypt_ctr_cipher() function to avoid memory
- allocation in the IO path.
- - Remove the crypt_sg_entry() function.
- - Other optimization.
-
-Baolin Wang (4):
-  block: Introduce blk_bio_map_sg() to map one bio
-  crypto: Introduce CRYPTO_ALG_BULK flag
-  md: dm-crypt: Introduce the bulk mode method when sending request
-  crypto: Add the CRYPTO_ALG_BULK flag for ecb(aes) cipher
-
- block/blk-merge.c         |   19 ++++++
- drivers/crypto/omap-aes.c |    2 +-
- drivers/md/dm-crypt.c     |  159 ++++++++++++++++++++++++++++++++++++++++++++-
- include/crypto/skcipher.h |    7 ++
- include/linux/blkdev.h    |    2 +
- include/linux/crypto.h    |    6 ++
- 6 files changed, 193 insertions(+), 2 deletions(-)
-
+Hannes
 -- 
-1.7.9.5
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: F. Imend�rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG N�rnberg)
