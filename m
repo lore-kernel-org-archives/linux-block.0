@@ -1,76 +1,1120 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f65.google.com ([74.125.82.65]:36274 "EHLO
-	mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752744AbcF2OmX (ORCPT
+Received: from smtp81.mediacombb.net ([68.66.77.81]:39374 "EHLO
+	dsmdc-mail-smtp.mcomdc.com" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1751217AbcFFQFw (ORCPT
 	<rfc822;linux-block@vger.kernel.org>);
-	Wed, 29 Jun 2016 10:42:23 -0400
-Received: by mail-wm0-f65.google.com with SMTP id c82so14900674wme.3
-        for <linux-block@vger.kernel.org>; Wed, 29 Jun 2016 07:42:17 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [RFC PATCH 10/11] lightnvm: make ppa_list const in nvm_set_rqd_list
-Date: Wed, 29 Jun 2016 16:41:55 +0200
-Message-Id: <1467211316-22373-11-git-send-email-m@bjorling.me>
-In-Reply-To: <1467211316-22373-1-git-send-email-m@bjorling.me>
-References: <1467211316-22373-1-git-send-email-m@bjorling.me>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+	Mon, 6 Jun 2016 12:05:52 -0400
+From: Shaun Tancheff <shaun@tancheff.com>
+To: util-linux@vger.kernel.org, linux-block@vger.kernel.org
+Cc: Shaun Tancheff <shaun@tancheff.com>,
+	Shaun Tancheff <shaun.tancheff@seagate.com>
+Subject: [PATCH] Add blkzonecmd and blkreport ZAC/ZBC drives
+Date: Mon,  6 Jun 2016 11:04:55 -0500
+Message-Id: <1465229095-27651-2-git-send-email-shaun@tancheff.com>
+In-Reply-To: <1465229095-27651-1-git-send-email-shaun@tancheff.com>
+References: <1465229095-27651-1-git-send-email-shaun@tancheff.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-The passed by reference ppa list in nvm_set_rqd_list() is updated when
-multiple planes are available. In that case, each PPA plane is
-incremented when the device side PPA list is created. This prevents the
-caller to rely on the PPA list to be unmodified after a call.
+This patch adds blkzonecmd to issue zone commands:
+  Reset (Write Pointer)
+  Open Zone
+  Close Zone
 
-Signed-off-by: Matias Bjørling <m@bjorling.me>
+and blkreport to retrieve drive zone information.
+
+Signed-off-by: Shaun Tancheff <shaun.tancheff@seagate.com>
 ---
- drivers/lightnvm/core.c  | 8 +++++---
- include/linux/lightnvm.h | 2 +-
- 2 files changed, 6 insertions(+), 4 deletions(-)
+ configure.ac            |  14 ++
+ include/strutils.h      |   1 +
+ lib/strutils.c          |   6 +-
+ sys-utils/Makemodule.am |  14 ++
+ sys-utils/blkreport.8   |  96 +++++++++
+ sys-utils/blkreport.c   | 546 ++++++++++++++++++++++++++++++++++++++++++++++++
+ sys-utils/blkzonecmd.8  |  78 +++++++
+ sys-utils/blkzonecmd.c  | 239 +++++++++++++++++++++
+ 8 files changed, 993 insertions(+), 1 deletion(-)
+ create mode 100644 sys-utils/blkreport.8
+ create mode 100644 sys-utils/blkreport.c
+ create mode 100644 sys-utils/blkzonecmd.8
+ create mode 100644 sys-utils/blkzonecmd.c
 
-diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-index ddc8098..00b64f7 100644
---- a/drivers/lightnvm/core.c
-+++ b/drivers/lightnvm/core.c
-@@ -237,9 +237,10 @@ void nvm_generic_to_addr_mode(struct nvm_dev *dev, struct nvm_rq *rqd)
- EXPORT_SYMBOL(nvm_generic_to_addr_mode);
+diff --git a/configure.ac b/configure.ac
+index 31a1911..5b83956 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -270,6 +270,12 @@ AC_CHECK_HEADERS([security/pam_misc.h],
+ #endif
+ ])
  
- int nvm_set_rqd_ppalist(struct nvm_dev *dev, struct nvm_rq *rqd,
--				struct ppa_addr *ppas, int nr_ppas, int vblk)
-+			const struct ppa_addr *ppas, int nr_ppas, int vblk)
++AC_CHECK_HEADERS([linux/blkzoned_api.h], [], [], [
++#ifdef HAVE_BLKZONED_API_H
++#include <linux/blkzoned_api.h>
++#endif
++])
++
+ AC_CHECK_HEADERS([security/openpam.h], [], [], [
+ #ifdef HAVE_SECURITY_PAM_APPL_H
+ #include <security/pam_appl.h>
+@@ -1496,6 +1502,14 @@ UL_BUILD_INIT([blkdiscard], [check])
+ UL_REQUIRES_LINUX([blkdiscard])
+ AM_CONDITIONAL([BUILD_BLKDISCARD], [test "x$build_blkdiscard" = xyes])
+ 
++UL_BUILD_INIT([blkreport], [check])
++UL_REQUIRES_LINUX([blkreport])
++AM_CONDITIONAL([BUILD_BLKREPORT], [test "x$build_blkreport" = xyes])
++
++UL_BUILD_INIT([blkzonecmd], [check])
++UL_REQUIRES_LINUX([blkzonecmd])
++AM_CONDITIONAL([BUILD_BLKZONECMD], [test "x$build_blkzonecmd" = xyes])
++
+ UL_BUILD_INIT([ldattach], [check])
+ UL_REQUIRES_LINUX([ldattach])
+ AM_CONDITIONAL([BUILD_LDATTACH], [test "x$build_ldattach" = xyes])
+diff --git a/include/strutils.h b/include/strutils.h
+index e9f7921..9130268 100644
+--- a/include/strutils.h
++++ b/include/strutils.h
+@@ -26,6 +26,7 @@ extern uint32_t strtou32_or_err(const char *str, const char *errmesg);
+ 
+ extern int64_t strtos64_or_err(const char *str, const char *errmesg);
+ extern uint64_t strtou64_or_err(const char *str, const char *errmesg);
++extern uint64_t strtou64_base_or_err(int base, const char *str, const char *errmesg);
+ 
+ extern double strtod_or_err(const char *str, const char *errmesg);
+ 
+diff --git a/lib/strutils.c b/lib/strutils.c
+index 5a6be2d..bdc94ef 100644
+--- a/lib/strutils.c
++++ b/lib/strutils.c
+@@ -329,7 +329,7 @@ err:
+ 	errx(STRTOXX_EXIT_CODE, "%s: '%s'", errmesg, str);
+ }
+ 
+-uint64_t strtou64_or_err(const char *str, const char *errmesg)
++uint64_t strtou64_base_or_err(int base, const char *str, const char *errmesg)
  {
- 	int i, plane_cnt, pl_idx;
-+	struct ppa_addr ppa;
+ 	uintmax_t num;
+ 	char *end = NULL;
+@@ -350,6 +350,10 @@ err:
+ 	errx(STRTOXX_EXIT_CODE, "%s: '%s'", errmesg, str);
+ }
  
- 	if ((!vblk || dev->plane_mode == NVM_PLANE_SINGLE) && nr_ppas == 1) {
- 		rqd->nr_ppas = nr_ppas;
-@@ -264,8 +265,9 @@ int nvm_set_rqd_ppalist(struct nvm_dev *dev, struct nvm_rq *rqd,
++uint64_t strtou64_or_err(const char *str, const char *errmesg)
++{
++	return strtou64_base_or_err(10, str, errmesg);
++}
  
- 		for (i = 0; i < nr_ppas; i++) {
- 			for (pl_idx = 0; pl_idx < plane_cnt; pl_idx++) {
--				ppas[i].g.pl = pl_idx;
--				rqd->ppa_list[(pl_idx * nr_ppas) + i] = ppas[i];
-+				ppa = ppas[i];
-+				ppa.g.pl = pl_idx;
-+				rqd->ppa_list[(pl_idx * nr_ppas) + i] = ppa;
- 			}
- 		}
- 	}
-diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
-index e9836cf..ba78b83 100644
---- a/include/linux/lightnvm.h
-+++ b/include/linux/lightnvm.h
-@@ -534,7 +534,7 @@ extern int nvm_submit_io(struct nvm_dev *, struct nvm_rq *);
- extern void nvm_generic_to_addr_mode(struct nvm_dev *, struct nvm_rq *);
- extern void nvm_addr_to_generic_mode(struct nvm_dev *, struct nvm_rq *);
- extern int nvm_set_rqd_ppalist(struct nvm_dev *, struct nvm_rq *,
--						struct ppa_addr *, int, int);
-+					const struct ppa_addr *, int, int);
- extern void nvm_free_rqd_ppalist(struct nvm_dev *, struct nvm_rq *);
- extern int nvm_erase_ppa(struct nvm_dev *, struct ppa_addr *, int);
- extern int nvm_erase_blk(struct nvm_dev *, struct nvm_block *);
+ double strtod_or_err(const char *str, const char *errmesg)
+ {
+diff --git a/sys-utils/Makemodule.am b/sys-utils/Makemodule.am
+index ad60360..42d4623 100644
+--- a/sys-utils/Makemodule.am
++++ b/sys-utils/Makemodule.am
+@@ -111,6 +111,20 @@ blkdiscard_SOURCES = sys-utils/blkdiscard.c lib/monotonic.c
+ blkdiscard_LDADD = $(LDADD) libcommon.la $(REALTIME_LIBS)
+ endif
+ 
++if BUILD_BLKREPORT
++sbin_PROGRAMS += blkreport
++dist_man_MANS += sys-utils/blkreport.8
++blkreport_SOURCES = sys-utils/blkreport.c
++blkreport_LDADD = $(LDADD) libcommon.la $(REALTIME_LIBS)
++endif
++
++if BUILD_BLKZONECMD
++sbin_PROGRAMS += blkzonecmd
++dist_man_MANS += sys-utils/blkzonecmd.8
++blkzonecmd_SOURCES = sys-utils/blkzonecmd.c
++blkzonecmd_LDADD = $(LDADD) libcommon.la $(REALTIME_LIBS)
++endif
++
+ if BUILD_LDATTACH
+ usrsbin_exec_PROGRAMS += ldattach
+ dist_man_MANS += sys-utils/ldattach.8
+diff --git a/sys-utils/blkreport.8 b/sys-utils/blkreport.8
+new file mode 100644
+index 0000000..c76b095
+--- /dev/null
++++ b/sys-utils/blkreport.8
+@@ -0,0 +1,96 @@
++.TH BLKREPORT 5 "March 2016" "util-linux" "System Administration"
++.SH NAME
++blkreport \- report zones on a device
++.SH SYNOPSIS
++.B blkreport
++[options]
++.RB [ \-o
++.IR offset ]
++.RB [ \-l
++.IR report length ]
++.I device
++.SH DESCRIPTION
++.B blkreport
++is used to report device zone information.  This is useful for
++zoned devices that support the ZAC or ZBC command set.
++Unlike
++.BR sg_rep_zones (8) ,
++this command is can be used on any block device.
++.PP
++By default,
++.B blkreport
++will report from the start of the block device upto 512k bytes of the
++zone report (~8160 zones].  Options may be used to modify
++this behavior based on the starting zone or size of the report,
++as explained below.
++.PP
++The
++.I device
++argument is the pathname of the block device.
++.PP
++.SH OPTIONS
++The
++.I offset
++and
++.I length
++arguments may be followed by the multiplicative suffixes KiB (=1024),
++MiB (=1024*1024), and so on for GiB, TiB, PiB, EiB, ZiB and YiB (the "iB" is
++optional, e.g., "K" has the same meaning as "KiB") or the suffixes
++KB (=1000), MB (=1000*1000), and so on for GB, TB, PB, EB, ZB and YB.
++.TP
++.BR \-o , " \-\-zone \fIzone-lba"
++Byte offset into the device from which to start the block report.
++The provided value will be aligned to the device sector size.
++The default value is zero.
++.TP
++.BR \-l , " \-\-length \fIlength"
++The number of bytes to allocate for the report from the block device.
++The provided value will be aligned to the device sector size.
++If the specified value will be limited to the range of 512 bytes to 512 k-bytes.
++.TP
++.BR \-a , " \-\-ata"
++Issue ATA passthrough commands to the connected device. This option is to
++enable retrieving zone reports from SATA devices connected via SAS HBA's
++which have old firmware and will not translate ZBC commands to ZAC commands
++internally.
++Note that the resulting report will be little-endian and should be properly
++detected by
++.B blkreport.
++.TP
++.BR \-r , " \-\-option"
++Zoned devices support various reports. The default report lists all zones,
++however more specific reports can be specified. Available reports are:
++.BR 0 \- non seq. and reset (default)
++.BR 1 \- empty
++.BR 2 \- open implicit
++.BR 3 \- open explicit
++.BR 4 \- closed
++.BR 5 \- full
++.BR 6 \- read only
++.BR 7 \- offline
++.BR 0x10 \- reset
++.BR 0x11 \- non sequential
++.BR 0x3f \- non write pointer zones
++.TP
++.BR \-v , " \-\-verbose"
++Display the aligned values of
++.I offset
++and
++.IR length .
++.TP
++.BR \-V , " \-\-version"
++Display version information and exit.
++.TP
++.BR \-h , " \-\-help"
++Display help text and exit.
++.SH AUTHOR
++.MT shaun.tancheff@seagate.com
++Shaun Tancheff
++.ME
++.SH SEE ALSO
++.BR sg_rep_zones (8)
++.SH AVAILABILITY
++The blkreport command is part of the util-linux package and is available
++.UR ftp://\:ftp.kernel.org\:/pub\:/linux\:/utils\:/util-linux/
++Linux Kernel Archive
++.UE .
+diff --git a/sys-utils/blkreport.c b/sys-utils/blkreport.c
+new file mode 100644
+index 0000000..efbb382
+--- /dev/null
++++ b/sys-utils/blkreport.c
+@@ -0,0 +1,546 @@
++/*
++ * blkreport.c -- request a zone report on part (or all) of the block device.
++ *
++ * Copyright (C) 2015 Seagate Technology PLC
++ * Written by Shaun Tancheff <shaun.tancheff@seagate.com>
++ *
++ * This program is free software: you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation, either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
++ *
++ * This program uses BLKREPORT ioctl to query zone information about part of
++ * or a whole block device, if the device supports it.
++ * You can specify range (start and length) to be queried.
++ */
++
++#include <string.h>
++#include <unistd.h>
++#include <stdlib.h>
++#include <stdio.h>
++#include <stdint.h>
++#include <fcntl.h>
++#include <limits.h>
++#include <getopt.h>
++#include <time.h>
++
++#include <sys/ioctl.h>
++#include <sys/stat.h>
++#include <sys/time.h>
++#include <linux/fs.h>
++
++#ifdef HAVE_BLKZONED_API_H
++#include <linux/blkzoned_api.h>
++#endif
++
++#include "nls.h"
++#include "strutils.h"
++#include "c.h"
++#include "closestream.h"
++#include "monotonic.h"
++
++#ifndef HAVE_BLKZONED_API_H
++/**
++ * enum zone_report_option - Report Zones types to be included.
++ *
++ * @ZOPT_NON_SEQ_AND_RESET: Default (all zones).
++ * @ZOPT_ZC1_EMPTY: Zones which are empty.
++ * @ZOPT_ZC2_OPEN_IMPLICIT: Zones open but not explicitly opened
++ * @ZOPT_ZC3_OPEN_EXPLICIT: Zones opened explicitly
++ * @ZOPT_ZC4_CLOSED: Zones closed for writing.
++ * @ZOPT_ZC5_FULL: Zones that are full.
++ * @ZOPT_ZC6_READ_ONLY: Zones that are read-only
++ * @ZOPT_ZC7_OFFLINE: Zones that are offline
++ * @ZOPT_RESET: Zones that are empty
++ * @ZOPT_NON_SEQ: Zones that have cache writes pending
++ * @ZOPT_NON_WP_ZONES: Zones that do not have Write Pointers (conventional)
++ *
++ * @ZOPT_USE_ATA_PASS: Flag used in kernel to service command I/O
++ *
++ * Used by Report Zones in bdev_zone_get_report: report_option
++ */
++enum zone_report_option {
++	ZOPT_NON_SEQ_AND_RESET   = 0x00,
++	ZOPT_ZC1_EMPTY,
++	ZOPT_ZC2_OPEN_IMPLICIT,
++	ZOPT_ZC3_OPEN_EXPLICIT,
++	ZOPT_ZC4_CLOSED,
++	ZOPT_ZC5_FULL,
++	ZOPT_ZC6_READ_ONLY,
++	ZOPT_ZC7_OFFLINE,
++	ZOPT_RESET               = 0x10,
++	ZOPT_NON_SEQ             = 0x11,
++	ZOPT_NON_WP_ZONES        = 0x3f,
++	ZOPT_USE_ATA_PASS        = 0x80,
++};
++
++/**
++ * enum bdev_zone_type - Type of zone in descriptor
++ *
++ * @ZTYP_RESERVED: Reserved
++ * @ZTYP_CONVENTIONAL: Conventional random write zone (No Write Pointer)
++ * @ZTYP_SEQ_WRITE_REQUIRED: Non-sequential writes are rejected.
++ * @ZTYP_SEQ_WRITE_PREFERRED: Non-sequential writes allowed but discouraged.
++ *
++ * Returned from Report Zones. See bdev_zone_descriptor* type.
++ */
++enum bdev_zone_type {
++	ZTYP_RESERVED            = 0,
++	ZTYP_CONVENTIONAL        = 1,
++	ZTYP_SEQ_WRITE_REQUIRED  = 2,
++	ZTYP_SEQ_WRITE_PREFERRED = 3,
++};
++
++
++/**
++ * enum bdev_zone_condition - Condition of zone in descriptor
++ *
++ * @ZCOND_CONVENTIONAL: N/A
++ * @ZCOND_ZC1_EMPTY: Empty
++ * @ZCOND_ZC2_OPEN_IMPLICIT: Opened via write to zone.
++ * @ZCOND_ZC3_OPEN_EXPLICIT: Opened via open zone command.
++ * @ZCOND_ZC4_CLOSED: Closed
++ * @ZCOND_ZC6_READ_ONLY:
++ * @ZCOND_ZC5_FULL: No remaining space in zone.
++ * @ZCOND_ZC7_OFFLINE: Offline
++ *
++ * Returned from Report Zones. See bdev_zone_descriptor* flags.
++ */
++enum bdev_zone_condition {
++	ZCOND_CONVENTIONAL       = 0,
++	ZCOND_ZC1_EMPTY          = 1,
++	ZCOND_ZC2_OPEN_IMPLICIT  = 2,
++	ZCOND_ZC3_OPEN_EXPLICIT  = 3,
++	ZCOND_ZC4_CLOSED         = 4,
++	/* 0x5 to 0xC are reserved */
++	ZCOND_ZC6_READ_ONLY      = 0xd,
++	ZCOND_ZC5_FULL           = 0xe,
++	ZCOND_ZC7_OFFLINE        = 0xf,
++};
++
++
++/**
++ * enum bdev_zone_same - Report Zones same code.
++ *
++ * @ZS_ALL_DIFFERENT: All zones differ in type and size.
++ * @ZS_ALL_SAME: All zones are the same size and type.
++ * @ZS_LAST_DIFFERS: All zones are the same size and type except the last zone.
++ * @ZS_SAME_LEN_DIFF_TYPES: All zones are the same length but types differ.
++ *
++ * Returned from Report Zones. See bdev_zone_report* same_field.
++ */
++enum bdev_zone_same {
++	ZS_ALL_DIFFERENT        = 0,
++	ZS_ALL_SAME             = 1,
++	ZS_LAST_DIFFERS         = 2,
++	ZS_SAME_LEN_DIFF_TYPES  = 3,
++};
++
++
++/**
++ * struct bdev_zone_get_report - ioctl: Report Zones request
++ *
++ * @zone_locator_lba: starting lba for first [reported] zone
++ * @return_page_count: number of *bytes* allocated for result
++ * @report_option: see: zone_report_option enum
++ *
++ * Used to issue report zones command to connected device
++ */
++struct bdev_zone_get_report {
++	__u64 zone_locator_lba;
++	__u32 return_page_count;
++	__u8  report_option;
++} __attribute__((packed));
++
++/**
++ * struct bdev_zone_descriptor_le - See: bdev_zone_descriptor
++ */
++struct bdev_zone_descriptor_le {
++	__u8 type;
++	__u8 flags;
++	__u8 reserved1[6];
++	__le64 length;
++	__le64 lba_start;
++	__le64 lba_wptr;
++	__u8 reserved[32];
++} __attribute__((packed));
++
++
++/**
++ * struct bdev_zone_report_le - See: bdev_zone_report
++ */
++struct bdev_zone_report_le {
++	__le32 descriptor_count;
++	__u8 same_field;
++	__u8 reserved1[3];
++	__le64 maximum_lba;
++	__u8 reserved2[48];
++	struct bdev_zone_descriptor_le descriptors[0];
++} __attribute__((packed));
++
++
++/**
++ * struct bdev_zone_descriptor - A Zone descriptor entry from report zones
++ *
++ * @type: see zone_type enum
++ * @flags: Bits 0:reset, 1:non-seq, 2-3: resv, 4-7: see zone_condition enum
++ * @reserved1: padding
++ * @length: length of zone in sectors
++ * @lba_start: lba where the zone starts.
++ * @lba_wptr: lba of the current write pointer.
++ * @reserved: padding
++ *
++ */
++struct bdev_zone_descriptor {
++	__u8 type;
++	__u8 flags;
++	__u8  reserved1[6];
++	__be64 length;
++	__be64 lba_start;
++	__be64 lba_wptr;
++	__u8 reserved[32];
++} __attribute__((packed));
++
++
++/**
++ * struct bdev_zone_report - Report Zones result
++ *
++ * @descriptor_count: Number of descriptor entries that follow
++ * @same_field: bits 0-3: enum zone_same (MASK: 0x0F)
++ * @reserved1: padding
++ * @maximum_lba: LBA of the last logical sector on the device, inclusive
++ *               of all logical sectors in all zones.
++ * @reserved2: padding
++ * @descriptors: array of descriptors follows.
++ */
++struct bdev_zone_report {
++	__be32 descriptor_count;
++	__u8 same_field;
++	__u8 reserved1[3];
++	__be64 maximum_lba;
++	__u8 reserved2[48];
++	struct bdev_zone_descriptor descriptors[0];
++} __attribute__((packed));
++
++
++/**
++ * struct bdev_zone_report_io - Report Zones ioctl argument.
++ *
++ * @in: Report Zones inputs
++ * @out: Report Zones output
++ */
++struct bdev_zone_report_io {
++	union {
++		struct bdev_zone_get_report in;
++		struct bdev_zone_report out;
++	} data;
++} __attribute__((packed));
++
++#endif
++
++#ifndef BLKREPORT
++# define BLKREPORT	_IOWR(0x12, 130, struct bdev_zone_report_io)
++#endif
++
++static const char * same_text[] = {
++	"all zones are different",
++	"all zones are same size",
++	"last zone differs by size",
++	"all zones same size - different types",
++};
++
++static const char * type_text[] = {
++	"RESERVED",
++	"CONVENTIONAL",
++	"SEQ_WRITE_REQUIRED",
++	"SEQ_WRITE_PREFERRED",
++};
++
++#define ARRAY_COUNT(x) (sizeof((x))/sizeof((*x)))
++
++int fix_endian = 0;
++
++static inline uint64_t endian64(uint64_t in)
++{
++	return fix_endian ? be64toh(in) : in;
++}
++
++static inline uint32_t endian32(uint32_t in)
++{
++	return fix_endian ? be32toh(in) : in;
++}
++
++static inline uint16_t endian16(uint16_t in)
++{
++	return fix_endian ? be16toh(in) : in;
++}
++
++static void test_endian(struct bdev_zone_report * info)
++{
++	struct bdev_zone_descriptor * entry = &info->descriptors[0];
++	uint64_t be_len;
++	be_len = be64toh(entry->length);
++	if ( be_len == 0x080000 ||
++             be_len == 0x100000 ||
++             be_len == 0x200000 ||
++             be_len == 0x300000 ||
++             be_len == 0x400000 ||
++             be_len == 0x800000 ) {
++		fprintf(stdout, "*** RESULTS are BIG ENDIAN ****\n");
++		fix_endian = 1;
++	} else {
++		fprintf(stdout, "*** RESULTS are LITTLE ENDIAN ****\n");
++	}
++}
++
++const char * condition_str[] = {
++	"cv", /* conventional zone */
++	"e0", /* empty */
++	"Oi", /* open implicit */
++	"Oe", /* open explicit */
++	"Cl", /* closed */
++	"x5", "x6", "x7", "x8", "x9", "xA", "xB", /* xN: reserved */
++	"ro", /* read only */
++	"fu", /* full */
++	"OL"  /* offline */
++	};
++
++static const char * zone_condition_str(uint8_t cond)
++{
++	return condition_str[cond & 0x0f];
++}
++
++static void print_zones(struct bdev_zone_report * info, uint32_t size)
++{
++	uint32_t count = endian32(info->descriptor_count);
++	uint32_t max_count;
++	uint32_t iter;
++	int same_code = info->same_field & 0x0f;
++
++	fprintf(stdout, "  count: %u, same %u (%s), max_lba %lu\n",
++		count,
++		same_code, same_text[same_code],
++		endian64(info->maximum_lba & (~0ul >> 16)) );
++
++	max_count = (size - sizeof(struct bdev_zone_report))
++                        / sizeof(struct bdev_zone_descriptor);
++	if (count > max_count) {
++		fprintf(stdout, "Truncating report to %d of %d zones.\n",
++			max_count, count );
++		count = max_count;
++	}
++
++	for (iter = 0; iter < count; iter++ ) {
++		struct bdev_zone_descriptor * entry = &info->descriptors[iter];
++		unsigned int type  = entry->type & 0xF;
++		unsigned int flags = entry->flags;
++		uint64_t start = endian64(entry->lba_start);
++		uint64_t wp = endian64(entry->lba_wptr);
++		uint8_t cond = (flags & 0xF0) >> 4;
++		uint64_t len = endian64(entry->length);
++
++		if (!len) {
++			break;
++		}
++		fprintf(stdout,
++			"  start: %9lx, len %7lx, wptr %8lx"
++			" reset:%u non-seq:%u, zcond:%2u(%s) [type: %u(%s)]\n",
++		start, len, wp - start, flags & 0x01, (flags & 0x02) >> 1,
++		cond, zone_condition_str(cond), type, type_text[type]);
++	}
++}
++
++static inline int is_report_option_valid(uint64_t ropt)
++{
++	return (ropt <= ZOPT_ZC7_OFFLINE || ropt == ZOPT_RESET ||
++		ropt == ZOPT_NON_SEQ || ropt == ZOPT_NON_WP_ZONES);
++}
++
++static int do_report(int fd, uint64_t lba, uint64_t len, uint8_t ropt, int do_ata, int verbose)
++{
++	int rc = -4;
++	struct bdev_zone_report_io * zone_info;
++
++	zone_info = malloc(len);
++	if (zone_info) {
++		memset(zone_info, 0, len);
++		zone_info->data.in.report_option     = ropt;
++		zone_info->data.in.return_page_count = len;
++		zone_info->data.in.zone_locator_lba  = lba;
++
++		if (do_ata) {
++			zone_info->data.in.report_option |= 0x80;
++		}
++
++		rc = ioctl(fd, BLKREPORT, zone_info);
++		if (rc != -1) {
++			test_endian(&zone_info->data.out);
++
++			if (verbose)
++				fprintf(stdout, "Found %d zones\n",
++					endian32(zone_info->data.out.descriptor_count));
++
++			print_zones(&zone_info->data.out, len);
++		} else {
++			fprintf(stderr, "ERR: %d -> %s\n\n", errno, strerror(errno));
++		}
++	}
++
++	return rc;
++}
++
++static void __attribute__((__noreturn__)) usage(FILE *out)
++{
++	fputs(USAGE_HEADER, out);
++	fprintf(out,
++	      _(" %s [options] <device>\n"), program_invocation_short_name);
++
++	fputs(USAGE_SEPARATOR, out);
++	fputs(_("Discard the content of sectors on a device.\n"), out);
++
++	fputs(USAGE_OPTIONS, out);
++	fputs(_(" -z, --zone <num>  zone lba in bytes to report from\n"
++		" -l, --length <num>  length of report (512 bytes to 512k bytes)\n"
++		" -r, --option <report> report option\n"
++		"    report is the numeric value from \"enum zone_report_option\".\n"
++		"             0 - non seq. and reset (default)\n"
++		"             1 - empty\n"
++		"             2 - open implicit\n"
++		"             3 - open explicit\n"
++		"             4 - closed\n"
++		"             5 - full\n"
++		"             6 - read only\n"
++		"             7 - offline\n"
++		"          0x10 - reset\n"
++		"          0x11 - non sequential\n"
++		"          0x3f - non write pointer zones\n"
++		" -a, --ata use ATA passthrough to workaround FW in old SAS HBAs\n"
++		" -v, --verbose       print aligned length and offset\n"),
++		out);
++	fputs(USAGE_SEPARATOR, out);
++	fputs(USAGE_HELP, out);
++	fputs(USAGE_VERSION, out);
++	fprintf(out, USAGE_MAN_TAIL("blkreport(8)"));
++	exit(out == stderr ? EXIT_FAILURE : EXIT_SUCCESS);
++}
++
++
++#define MAX_REPORT_LEN (1 << 19) /* 512k */
++
++int main(int argc, char **argv)
++{
++	char *path;
++	int c;
++	int fd;
++	int secsize;
++	uint64_t blksize;
++	struct stat sb;
++	int verbose = 0;
++	uint64_t ropt = ZOPT_NON_SEQ_AND_RESET;
++	uint64_t offset = 0ul;
++	uint32_t length = MAX_REPORT_LEN;
++	int ata = 0;
++
++	static const struct option longopts[] = {
++	    { "help",      0, 0, 'h' },
++	    { "version",   0, 0, 'V' },
++	    { "zone",      1, 0, 'z' }, /* starting LBA */
++	    { "length",    1, 0, 'l' }, /* max #of bytes for result */
++	    { "option",    1, 0, 'r' }, /* report option */
++	    { "ata",       0, 0, 'a' }, /* use ATA passthrough */
++	    { "verbose",   0, 0, 'v' },
++	    { NULL,        0, 0, 0 }
++	};
++
++	setlocale(LC_ALL, "");
++	bindtextdomain(PACKAGE, LOCALEDIR);
++	textdomain(PACKAGE);
++	atexit(close_stdout);
++
++	while ((c = getopt_long(argc, argv, "ahVsvz:l:r:", longopts, NULL)) != -1) {
++		switch(c) {
++		case 'h':
++			usage(stdout);
++			break;
++		case 'V':
++			printf(UTIL_LINUX_VERSION);
++			return EXIT_SUCCESS;
++		case 'l':
++			length = strtou64_base_or_err(0, optarg,
++					_("failed to parse length"));
++			break;
++		case 'z':
++			offset = strtou64_base_or_err(0, optarg,
++					_("failed to parse offset"));
++			break;
++		case 'r':
++			ropt = strtou64_base_or_err(0, optarg,
++					_("failed to parse report option"));
++			break;
++		case 'a':
++			ata = 1;
++		case 'v':
++			verbose = 1;
++			break;
++		default:
++			usage(stderr);
++			break;
++		}
++	}
++
++	if (optind == argc)
++		errx(EXIT_FAILURE, _("no device specified"));
++
++	path = argv[optind++];
++
++	if (optind != argc) {
++		warnx(_("unexpected number of arguments"));
++		usage(stderr);
++	}
++
++	fd = open(path, O_RDWR);
++	if (fd < 0)
++		err(EXIT_FAILURE, _("cannot open %s"), path);
++
++	if (fstat(fd, &sb) == -1)
++		err(EXIT_FAILURE, _("stat of %s failed"), path);
++	if (!S_ISBLK(sb.st_mode))
++		errx(EXIT_FAILURE, _("%s: not a block device"), path);
++
++	if (ioctl(fd, BLKGETSIZE64, &blksize))
++		err(EXIT_FAILURE, _("%s: BLKGETSIZE64 ioctl failed"), path);
++	if (ioctl(fd, BLKSSZGET, &secsize))
++		err(EXIT_FAILURE, _("%s: BLKSSZGET ioctl failed"), path);
++
++	/* check offset alignment to the sector size */
++	if (offset % secsize)
++		errx(EXIT_FAILURE, _("%s: offset %" PRIu64 " is not aligned "
++			 "to sector size %i"), path, offset, secsize);
++
++	/* is the range end behind the end of the device ?*/
++	if (offset > blksize)
++		errx(EXIT_FAILURE, _("%s: offset is greater than device size"), path);
++
++	length = (length / 512) * 512;
++	if (length < 512)
++		length = 512;
++	if (length > MAX_REPORT_LEN)
++		length = MAX_REPORT_LEN;
++
++	if (!is_report_option_valid(ropt))
++		errx(EXIT_FAILURE, _("%s: invalid report option for device"), path);
++
++	if (do_report(fd, offset, length, ropt & 0xFF, ata, verbose))
++		 err(EXIT_FAILURE, _("%s: BLKREPORT ioctl failed"), path);
++
++	close(fd);
++	return EXIT_SUCCESS;
++}
+diff --git a/sys-utils/blkzonecmd.8 b/sys-utils/blkzonecmd.8
+new file mode 100644
+index 0000000..6aef31a
+--- /dev/null
++++ b/sys-utils/blkzonecmd.8
+@@ -0,0 +1,78 @@
++.TH BLKZONECMD 5 "March 2016" "util-linux" "System Administration"
++.SH NAME
++blkzonecmd \- report zones on a device
++.SH SYNOPSIS
++.B blkzonecmd
++[options]
++.RB [ \-z
++.IR zone ]
++.I [\-o] or [\-c] or [\-r]
++.I device
++.SH DESCRIPTION
++.B blkzonecmd
++is used to modify the state of a zone.  This is useful for
++zoned devices that support the ZAC or ZBC command set.
++Unlike
++.BR sg_zone (8) ,
++this command is can be used on any block device.
++.PP
++By default,
++.B blkzonecmd
++will open the zone at the start of the block device. Options may be used to
++modify this behavior based on the starting zone or size of the report,
++as explained below.
++.PP
++The
++.I device
++argument is the pathname of the block device.
++.PP
++.SH OPTIONS
++The
++.I zone
++argument may be followed by the multiplicative suffixes KiB (=1024),
++MiB (=1024*1024), and so on for GiB, TiB, PiB, EiB, ZiB and YiB (the "iB" is
++optional, e.g., "K" has the same meaning as "KiB") or the suffixes
++KB (=1000), MB (=1000*1000), and so on for GB, TB, PB, EB, ZB and YB.
++.TP
++.BR \-z , " \-\-zone \fIoffset"
++Byte offset into the device on which to perform the zone command.
++The provided value will be aligned to the device sector size.
++The default value is zero.
++.TP
++.BR \-o , " \-\-open"
++Send an Open Zone command.
++.TP
++.BR \-c , " \-\-close"
++Send an Close Zone command.
++.TP
++.BR \-r , " \-\-reset"
++Send a Reset Zone command. On success all data in the zone will be
++deleted.
++.TP
++.BR \-a , " \-\-ata"
++Issue ATA passthrough commands to the connected device. This option is to
++enable retrieving zone reports from SATA devices connected via SAS HBA's
++which have old firmware and will not translate ZBC commands to ZAC commands
++internally.
++.B blkzonecmd.
++.TP
++.BR \-v , " \-\-verbose"
++Display the aligned values of
++.I zone
++.TP
++.BR \-V , " \-\-version"
++Display version information and exit.
++.TP
++.BR \-h , " \-\-help"
++Display help text and exit.
++.SH AUTHOR
++.MT shaun.tancheff@seagate.com
++Shaun Tancheff
++.ME
++.SH SEE ALSO
++.BR sg_zone (8)
++.SH AVAILABILITY
++The blkzonecmd command is part of the util-linux package and is available
++.UR ftp://\:ftp.kernel.org\:/pub\:/linux\:/utils\:/util-linux/
++Linux Kernel Archive
++.UE .
+diff --git a/sys-utils/blkzonecmd.c b/sys-utils/blkzonecmd.c
+new file mode 100644
+index 0000000..2da405d
+--- /dev/null
++++ b/sys-utils/blkzonecmd.c
+@@ -0,0 +1,239 @@
++/*
++ * blkreport.c -- request a zone report on part (or all) of the block device.
++ *
++ * Copyright (C) 2015 Seagate Technology PLC
++ * Written by Shaun Tancheff <shaun.tancheff@seagate.com>
++ *
++ * This program is free software: you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation, either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
++ *
++ * This program uses BLKREPORT ioctl to query zone information about part of
++ * or a whole block device, if the device supports it.
++ * You can specify range (start and length) to be queried.
++ */
++
++#include <string.h>
++#include <unistd.h>
++#include <stdlib.h>
++#include <stdio.h>
++#include <stdint.h>
++#include <fcntl.h>
++#include <limits.h>
++#include <getopt.h>
++#include <time.h>
++
++#include <sys/ioctl.h>
++#include <sys/stat.h>
++#include <sys/time.h>
++#include <linux/fs.h>
++
++#ifdef HAVE_BLKZONED_API_H
++#include <linux/blkzoned_api.h>
++#endif
++
++#include "nls.h"
++#include "strutils.h"
++#include "c.h"
++#include "closestream.h"
++#include "monotonic.h"
++
++#ifndef BLKDISCARD
++# define BLKDISCARD	_IO(0x12,119)
++#endif
++
++#ifndef BLKOPENZONE
++# define BLKOPENZONE	_IO(0x12, 131)
++#endif
++
++#ifndef BLKCLOSEZONE
++# define BLKCLOSEZONE	_IO(0x12, 132)
++#endif
++
++#ifndef BLKRESETZONE
++# define BLKRESETZONE	_IO(0x12, 133)
++#endif
++
++enum {
++	ACT_OPEN_ZONE = 0,
++	ACT_CLOSE_ZONE,
++	ACT_RESET_ZONE,
++};
++
++static void print_stats(int act, char *path, uint64_t lba)
++{
++	switch (act) {
++	case ACT_RESET_ZONE:
++		printf(_("%s: Reset Zone %" PRIu64 "\n"), path, lba);
++		break;
++	case ACT_OPEN_ZONE:
++		printf(_("%s: Open Zone %" PRIu64 "\n"), path, lba);
++		break;
++	case ACT_CLOSE_ZONE:
++		printf(_("%s: Close Zone %" PRIu64 "\n"), path, lba);
++		break;
++	default:
++		printf(_("%s: Unknown Action on %" PRIu64 "\n"), path, lba);
++		break;
++	}
++}
++
++static void __attribute__((__noreturn__)) usage(FILE *out)
++{
++	fputs(USAGE_HEADER, out);
++	fprintf(out,
++	      _(" %s [options] <device>\n"), program_invocation_short_name);
++
++	fputs(USAGE_SEPARATOR, out);
++	fputs(_("Discard the content of sectors on a device.\n"), out);
++
++	fputs(USAGE_OPTIONS, out);
++	fputs(_(" -z, --zone <num>    lba of start of zone to act upon\n"
++		" -o, --open          open zone\n"
++		" -c, --close         close zone\n"
++		" -r, --reset         reset zone\n"
++		" -a, --ata           use ata passthrough\n"
++		" -v, --verbose       print aligned length and offset\n"),
++		out);
++	fputs(USAGE_SEPARATOR, out);
++	fputs(USAGE_HELP, out);
++	fputs(USAGE_VERSION, out);
++	fprintf(out, USAGE_MAN_TAIL("blkzonecmd(8)"));
++	exit(out == stderr ? EXIT_FAILURE : EXIT_SUCCESS);
++}
++
++
++int main(int argc, char **argv)
++{
++	char *path;
++	int c, fd, verbose = 0, secsize;
++	uint64_t blksize;
++	struct stat sb;
++	uint64_t zone_lba = 0ul;
++	int ata = 0;
++	int act = ACT_OPEN_ZONE;
++
++	static const struct option longopts[] = {
++	    { "help",      0, 0, 'h' },
++	    { "version",   0, 0, 'V' },
++	    { "zone",      1, 0, 'z' },
++	    { "open",      0, 0, 'o' },
++	    { "close",     0, 0, 'c' },
++	    { "reset",     0, 0, 'r' },
++	    { "ata",       0, 0, 'a' },
++	    { "verbose",   0, 0, 'v' },
++	    { NULL,        0, 0, 0 }
++	};
++
++	setlocale(LC_ALL, "");
++	bindtextdomain(PACKAGE, LOCALEDIR);
++	textdomain(PACKAGE);
++	atexit(close_stdout);
++
++	zone_lba = 0;
++
++	while ((c = getopt_long(argc, argv, "hVaocrz:", longopts, NULL)) != -1) {
++		switch(c) {
++		case 'h':
++			usage(stdout);
++			break;
++		case 'V':
++			printf(UTIL_LINUX_VERSION);
++			return EXIT_SUCCESS;
++		case 'z':
++			zone_lba = strtou64_base_or_err(0, optarg,
++					_("failed to parse length"));
++			break;
++		case 'a':
++			ata = 1;
++			break;
++		case 'o':
++			act = ACT_OPEN_ZONE;
++			break;
++		case 'c':
++			act = ACT_CLOSE_ZONE;
++			break;
++		case 'r':
++			act = ACT_RESET_ZONE;
++			break;
++		case 'v':
++			verbose = 1;
++			break;
++		default:
++			usage(stderr);
++			break;
++		}
++	}
++
++	if (optind == argc)
++		errx(EXIT_FAILURE, _("no device specified"));
++
++	path = argv[optind++];
++
++	if (optind != argc) {
++		warnx(_("unexpected number of arguments"));
++		usage(stderr);
++	}
++
++	fd = open(path, O_WRONLY);
++	if (fd < 0)
++		err(EXIT_FAILURE, _("cannot open %s"), path);
++
++	if (fstat(fd, &sb) == -1)
++		err(EXIT_FAILURE, _("stat of %s failed"), path);
++	if (!S_ISBLK(sb.st_mode))
++		errx(EXIT_FAILURE, _("%s: not a block device"), path);
++
++	if (ioctl(fd, BLKGETSIZE64, &blksize))
++		err(EXIT_FAILURE, _("%s: BLKGETSIZE64 ioctl failed"), path);
++	if (ioctl(fd, BLKSSZGET, &secsize))
++		err(EXIT_FAILURE, _("%s: BLKSSZGET ioctl failed"), path);
++
++	if (zone_lba != ~0ul) {
++		/* check offset alignment to the sector size */
++		if (zone_lba % secsize)
++			errx(EXIT_FAILURE, _("%s: offset %" PRIu64 " is not aligned "
++				 "to sector size %i"), path, zone_lba, secsize);
++
++		/* is the range end behind the end of the device ?*/
++		if (zone_lba > blksize)
++			errx(EXIT_FAILURE, _("%s: offset is greater than device size"), path);
++	}
++
++	if (ata) {
++		zone_lba |= 1ul; /* ensure low bit is set */
++	} else {
++		zone_lba &= ~1ul; /* ensure low bit is clear */
++	}
++
++	switch (act) {
++	case ACT_OPEN_ZONE:
++		if (ioctl(fd, BLKOPENZONE, zone_lba))
++			 err(EXIT_FAILURE, _("%s: BLKOPENZONE ioctl failed"), path);
++		break;
++	case ACT_CLOSE_ZONE:
++		if (ioctl(fd, BLKCLOSEZONE, zone_lba))
++			err(EXIT_FAILURE, _("%s: BLKCLOSEZONE ioctl failed"), path);
++		break;
++
++	case ACT_RESET_ZONE:
++		if (ioctl(fd, BLKRESETZONE, zone_lba))
++			err(EXIT_FAILURE, _("%s: BLKRESETZONE ioctl failed"), path);
++		break;
++	}
++
++	if (verbose && zone_lba)
++		print_stats(act, path, zone_lba);
++
++	close(fd);
++	return EXIT_SUCCESS;
++}
 -- 
-2.1.4
+2.8.1
 
