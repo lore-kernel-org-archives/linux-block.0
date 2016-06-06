@@ -5,180 +5,76 @@ To: axboe@kernel.dk,
 Cc: linux-nvme@lists.infradead.org,
 	linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 3/8] nvme: Modify and export sync command submission for fabrics
-Date: Mon,  6 Jun 2016 23:21:54 +0200
-Message-Id: <1465248119-17875-4-git-send-email-hch@lst.de>
-In-Reply-To: <1465248119-17875-1-git-send-email-hch@lst.de>
-References: <1465248119-17875-1-git-send-email-hch@lst.de>
+Subject: [PATCH 08/10] nvme: move the workaround for I/O queue-less controllers from PCIe to core
+Date: Mon,  6 Jun 2016 23:20:50 +0200
+Message-Id: <1465248052-17811-9-git-send-email-hch@lst.de>
+In-Reply-To: <1465248052-17811-1-git-send-email-hch@lst.de>
+References: <1465248052-17811-1-git-send-email-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-NVMe over fabrics will use __nvme_submit_sync_cmd in the the
-transport and require a few tweaks to it.  For that we export it
-and add a few more paramters:
-
-1. allow passing a queue ID to the block layer
-
-   For the NVMe over Fabrics connect command we need to able to specify a
-   queue ID that we want to send the command on.  Add a qid parameter to
-   the relevant functions to enable this behavior.
-
-2. allow submitting at_head commands
-
-   In cases where we want to (re)connect to a controller
-   where we have inflight queued commands we want to first
-   connect and only then allow the other queued commands to
-   be kicked. This will prevents failures in controller resets
-   and reconnects.
-
-3. allow passing flags to blk_mq_allocate_request
-
-   Both for Fabrics connect the the keep-alive feature in NVMe 1.2.1 we
-   want to be able to use reserved requests.
+We want to apply this to Fabrics drivers as well, so move it to common
+code.
 
 Reviewed-by: Jay Freyensee <james.p.freyensee@intel.com>
 Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
 Tested-by: Ming Lin <ming.l@ssi.samsung.com>
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/nvme/host/core.c | 27 ++++++++++++++++++---------
- drivers/nvme/host/nvme.h |  5 +++--
- drivers/nvme/host/pci.c  |  4 ++--
- 3 files changed, 23 insertions(+), 13 deletions(-)
+ drivers/nvme/host/core.c | 17 ++++++++++++++---
+ drivers/nvme/host/pci.c  | 10 +---------
+ 2 files changed, 15 insertions(+), 12 deletions(-)
 
 diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 025ac8f..08d8b3b 100644
+index ffd9910..972029a 100644
 --- a/drivers/nvme/host/core.c
 +++ b/drivers/nvme/host/core.c
-@@ -192,11 +192,16 @@ void nvme_requeue_req(struct request *req)
- EXPORT_SYMBOL_GPL(nvme_requeue_req);
+@@ -557,11 +557,22 @@ int nvme_set_queue_count(struct nvme_ctrl *ctrl, int *count)
  
- struct request *nvme_alloc_request(struct request_queue *q,
--		struct nvme_command *cmd, unsigned int flags)
-+		struct nvme_command *cmd, unsigned int flags, int qid)
- {
- 	struct request *req;
+ 	status = nvme_set_features(ctrl, NVME_FEAT_NUM_QUEUES, q_count, 0,
+ 			&result);
+-	if (status)
++	if (status < 0)
+ 		return status;
  
--	req = blk_mq_alloc_request(q, nvme_is_write(cmd), flags);
-+	if (qid == NVME_QID_ANY) {
-+		req = blk_mq_alloc_request(q, nvme_is_write(cmd), flags);
+-	nr_io_queues = min(result & 0xffff, result >> 16) + 1;
+-	*count = min(*count, nr_io_queues);
++	/*
++	 * Degraded controllers might return an error when setting the queue
++	 * count.  We still want to be able to bring them online and offer
++	 * access to the admin queue, as that might be only way to fix them up.
++	 */
++	if (status > 0) {
++		dev_err(ctrl->dev, "Could not set queue count (%d)\n", status);
++		*count = 0;
 +	} else {
-+		req = blk_mq_alloc_request_hctx(q, nvme_is_write(cmd), flags,
-+				qid ? qid - 1 : 0);
++		nr_io_queues = min(result & 0xffff, result >> 16) + 1;
++		*count = min(*count, nr_io_queues);
 +	}
- 	if (IS_ERR(req))
- 		return req;
- 
-@@ -324,12 +329,12 @@ EXPORT_SYMBOL_GPL(nvme_setup_cmd);
-  */
- int __nvme_submit_sync_cmd(struct request_queue *q, struct nvme_command *cmd,
- 		struct nvme_completion *cqe, void *buffer, unsigned bufflen,
--		unsigned timeout)
-+		unsigned timeout, int qid, int at_head, int flags)
- {
- 	struct request *req;
- 	int ret;
- 
--	req = nvme_alloc_request(q, cmd, 0);
-+	req = nvme_alloc_request(q, cmd, flags, qid);
- 	if (IS_ERR(req))
- 		return PTR_ERR(req);
- 
-@@ -342,17 +347,19 @@ int __nvme_submit_sync_cmd(struct request_queue *q, struct nvme_command *cmd,
- 			goto out;
- 	}
- 
--	blk_execute_rq(req->q, NULL, req, 0);
-+	blk_execute_rq(req->q, NULL, req, at_head);
- 	ret = req->errors;
-  out:
- 	blk_mq_free_request(req);
- 	return ret;
++
+ 	return 0;
  }
-+EXPORT_SYMBOL_GPL(__nvme_submit_sync_cmd);
- 
- int nvme_submit_sync_cmd(struct request_queue *q, struct nvme_command *cmd,
- 		void *buffer, unsigned bufflen)
- {
--	return __nvme_submit_sync_cmd(q, cmd, NULL, buffer, bufflen, 0);
-+	return __nvme_submit_sync_cmd(q, cmd, NULL, buffer, bufflen, 0,
-+			NVME_QID_ANY, 0, 0);
- }
- EXPORT_SYMBOL_GPL(nvme_submit_sync_cmd);
- 
-@@ -370,7 +377,7 @@ int __nvme_submit_user_cmd(struct request_queue *q, struct nvme_command *cmd,
- 	void *meta = NULL;
- 	int ret;
- 
--	req = nvme_alloc_request(q, cmd, 0);
-+	req = nvme_alloc_request(q, cmd, 0, NVME_QID_ANY);
- 	if (IS_ERR(req))
- 		return PTR_ERR(req);
- 
-@@ -520,7 +527,8 @@ int nvme_get_features(struct nvme_ctrl *dev, unsigned fid, unsigned nsid,
- 	c.features.prp1 = cpu_to_le64(dma_addr);
- 	c.features.fid = cpu_to_le32(fid);
- 
--	ret = __nvme_submit_sync_cmd(dev->admin_q, &c, &cqe, NULL, 0, 0);
-+	ret = __nvme_submit_sync_cmd(dev->admin_q, &c, &cqe, NULL, 0, 0,
-+			NVME_QID_ANY, 0, 0);
- 	if (ret >= 0)
- 		*result = le32_to_cpu(cqe.result);
- 	return ret;
-@@ -539,7 +547,8 @@ int nvme_set_features(struct nvme_ctrl *dev, unsigned fid, unsigned dword11,
- 	c.features.fid = cpu_to_le32(fid);
- 	c.features.dword11 = cpu_to_le32(dword11);
- 
--	ret = __nvme_submit_sync_cmd(dev->admin_q, &c, &cqe, NULL, 0, 0);
-+	ret = __nvme_submit_sync_cmd(dev->admin_q, &c, &cqe, NULL, 0, 0,
-+			NVME_QID_ANY, 0, 0);
- 	if (ret >= 0)
- 		*result = le32_to_cpu(cqe.result);
- 	return ret;
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index bb7f001..180669c 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -231,8 +231,9 @@ void nvme_stop_queues(struct nvme_ctrl *ctrl);
- void nvme_start_queues(struct nvme_ctrl *ctrl);
- void nvme_kill_queues(struct nvme_ctrl *ctrl);
- 
-+#define NVME_QID_ANY -1
- struct request *nvme_alloc_request(struct request_queue *q,
--		struct nvme_command *cmd, unsigned int flags);
-+		struct nvme_command *cmd, unsigned int flags, int qid);
- void nvme_requeue_req(struct request *req);
- int nvme_setup_cmd(struct nvme_ns *ns, struct request *req,
- 		struct nvme_command *cmd);
-@@ -240,7 +241,7 @@ int nvme_submit_sync_cmd(struct request_queue *q, struct nvme_command *cmd,
- 		void *buf, unsigned bufflen);
- int __nvme_submit_sync_cmd(struct request_queue *q, struct nvme_command *cmd,
- 		struct nvme_completion *cqe, void *buffer, unsigned bufflen,
--		unsigned timeout);
-+		unsigned timeout, int qid, int at_head, int flags);
- int nvme_submit_user_cmd(struct request_queue *q, struct nvme_command *cmd,
- 		void __user *ubuffer, unsigned bufflen, u32 *result,
- 		unsigned timeout);
+ EXPORT_SYMBOL_GPL(nvme_set_queue_count);
 diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index 2c3019a..571faa2 100644
+index 78dca31..cf7ea73 100644
 --- a/drivers/nvme/host/pci.c
 +++ b/drivers/nvme/host/pci.c
-@@ -901,7 +901,7 @@ static enum blk_eh_timer_return nvme_timeout(struct request *req, bool reserved)
- 		 req->tag, nvmeq->qid);
+@@ -1399,16 +1399,8 @@ static int nvme_setup_io_queues(struct nvme_dev *dev)
+ 	if (result < 0)
+ 		return result;
  
- 	abort_req = nvme_alloc_request(dev->ctrl.admin_q, &cmd,
--			BLK_MQ_REQ_NOWAIT);
-+			BLK_MQ_REQ_NOWAIT, NVME_QID_ANY);
- 	if (IS_ERR(abort_req)) {
- 		atomic_inc(&dev->ctrl.abort_limit);
- 		return BLK_EH_RESET_TIMER;
-@@ -1512,7 +1512,7 @@ static int nvme_delete_queue(struct nvme_queue *nvmeq, u8 opcode)
- 	cmd.delete_queue.opcode = opcode;
- 	cmd.delete_queue.qid = cpu_to_le16(nvmeq->qid);
+-	/*
+-	 * Degraded controllers might return an error when setting the queue
+-	 * count.  We still want to be able to bring them online and offer
+-	 * access to the admin queue, as that might be only way to fix them up.
+-	 */
+-	if (result > 0) {
+-		dev_err(dev->ctrl.device,
+-			"Could not set queue count (%d)\n", result);
++	if (nr_io_queues == 0)
+ 		return 0;
+-	}
  
--	req = nvme_alloc_request(q, &cmd, BLK_MQ_REQ_NOWAIT);
-+	req = nvme_alloc_request(q, &cmd, BLK_MQ_REQ_NOWAIT, NVME_QID_ANY);
- 	if (IS_ERR(req))
- 		return PTR_ERR(req);
- 
+ 	if (dev->cmb && NVME_CMB_SQS(dev->cmbsz)) {
+ 		result = nvme_cmb_qdepth(dev, nr_io_queues,
 -- 
 2.1.4
