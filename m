@@ -1,114 +1,98 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga03.intel.com ([134.134.136.65]:22516 "EHLO mga03.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751564AbcFUUtT (ORCPT <rfc822;linux-block@vger.kernel.org>);
-	Tue, 21 Jun 2016 16:49:19 -0400
-Subject: [PATCH v4 1/5] block: introduce device_add_disk()
-From: Dan Williams <dan.j.williams@intel.com>
-To: axboe@fb.com
-Cc: linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
+Return-Path: <BATV+65f7e0ff3112b2479d70+4670+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk,
+	keith.busch@intel.com
+Cc: linux-nvme@lists.infradead.org,
 	linux-block@vger.kernel.org,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Bart Van Assche <bart.vanassche@sandisk.com>, hch@lst.de
-Date: Tue, 21 Jun 2016 13:46:06 -0700
-Message-ID: <146654196648.34694.7534782194559024977.stgit@dwillia2-desk3.amr.corp.intel.com>
-In-Reply-To: <146654196111.34694.7735150373057824399.stgit@dwillia2-desk3.amr.corp.intel.com>
-References: <146654196111.34694.7735150373057824399.stgit@dwillia2-desk3.amr.corp.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+	linux-kernel@vger.kernel.org,
+	Sagi Grimberg <sagi@grimberg.me>
+Subject: [PATCH 1/5] blk-mq: Introduce blk_mq_reinit_tagset
+Date: Mon,  6 Jun 2016 23:23:31 +0200
+Message-Id: <1465248215-18186-2-git-send-email-hch@lst.de>
+In-Reply-To: <1465248215-18186-1-git-send-email-hch@lst.de>
+References: <1465248215-18186-1-git-send-email-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-In preparation for removing the ->driverfs_dev member of a gendisk, add
-an api that takes the parent device as a parameter to add_disk().  For
-now this maintains the status quo of WARN()ing on failure, but not
-return a error code.
+From: Sagi Grimberg <sagi@grimberg.me>
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
-Reviewed-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Signed-off-by: Dan Williams <dan.j.williams@intel.com>
+The new nvme-rdma driver will need to reinitialize all the tags as part of
+the error recovery procedure (realloc the tag memory region). Add a helper
+in blk-mq for it that can iterate over all requests in a tagset to make
+this easier.
+
+Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
+Tested-by: Ming Lin <ming.l@ssi.samsung.com>
+Reviewed-by: Stephen Bates <Stephen.Bates@pmcs.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/genhd.c         |   13 +++++++------
- include/linux/genhd.h |    8 +++++++-
- 2 files changed, 14 insertions(+), 7 deletions(-)
+ block/blk-mq-tag.c     | 26 ++++++++++++++++++++++++++
+ include/linux/blk-mq.h |  3 +++
+ 2 files changed, 29 insertions(+)
 
-diff --git a/block/genhd.c b/block/genhd.c
-index 9f42526b4d62..932e70c113d0 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -506,7 +506,7 @@ static int exact_lock(dev_t devt, void *data)
- 	return 0;
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index 56a0c37..729bac3 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -485,6 +485,32 @@ void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
  }
+ EXPORT_SYMBOL(blk_mq_tagset_busy_iter);
  
--static void register_disk(struct gendisk *disk)
-+static void register_disk(struct device *parent, struct gendisk *disk)
- {
- 	struct device *ddev = disk_to_dev(disk);
- 	struct block_device *bdev;
-@@ -514,7 +514,7 @@ static void register_disk(struct gendisk *disk)
- 	struct hd_struct *part;
- 	int err;
- 
--	ddev->parent = disk->driverfs_dev;
-+	ddev->parent = parent;
- 
- 	dev_set_name(ddev, "%s", disk->disk_name);
- 
-@@ -573,7 +573,8 @@ exit:
- }
- 
- /**
-- * add_disk - add partitioning information to kernel list
-+ * device_add_disk - add partitioning information to kernel list
-+ * @parent: parent device for the disk
-  * @disk: per-device partitioning information
-  *
-  * This function registers the partitioning information in @disk
-@@ -581,7 +582,7 @@ exit:
-  *
-  * FIXME: error handling
-  */
--void add_disk(struct gendisk *disk)
-+void device_add_disk(struct device *parent, struct gendisk *disk)
- {
- 	struct backing_dev_info *bdi;
- 	dev_t devt;
-@@ -617,7 +618,7 @@ void add_disk(struct gendisk *disk)
- 
- 	blk_register_region(disk_devt(disk), disk->minors, NULL,
- 			    exact_match, exact_lock, disk);
--	register_disk(disk);
-+	register_disk(parent, disk);
- 	blk_register_queue(disk);
- 
- 	/*
-@@ -633,7 +634,7 @@ void add_disk(struct gendisk *disk)
- 	disk_add_events(disk);
- 	blk_integrity_add(disk);
- }
--EXPORT_SYMBOL(add_disk);
-+EXPORT_SYMBOL(device_add_disk);
- 
- void del_gendisk(struct gendisk *disk)
- {
-diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index 359a8e4bd44d..df1dabbfd388 100644
---- a/include/linux/genhd.h
-+++ b/include/linux/genhd.h
-@@ -414,7 +414,13 @@ static inline void free_part_info(struct hd_struct *part)
- extern void part_round_stats(int cpu, struct hd_struct *part);
- 
- /* block/genhd.c */
--extern void add_disk(struct gendisk *disk);
-+extern void device_add_disk(struct device *parent, struct gendisk *disk);
-+static inline void add_disk(struct gendisk *disk)
++int blk_mq_reinit_tagset(struct blk_mq_tag_set *set)
 +{
-+	/* temporary while we convert callers to device_add_disk */
-+	device_add_disk(disk->driverfs_dev, disk);
-+}
++	int i, j, ret = 0;
 +
- extern void del_gendisk(struct gendisk *gp);
- extern struct gendisk *get_gendisk(dev_t dev, int *partno);
- extern struct block_device *bdget_disk(struct gendisk *disk, int partno);
-
++	if (!set->ops->reinit_request)
++		goto out;
++
++	for (i = 0; i < set->nr_hw_queues; i++) {
++		struct blk_mq_tags *tags = set->tags[i];
++
++		for (j = 0; j < tags->nr_tags; j++) {
++			if (!tags->rqs[j])
++				continue;
++
++			ret = set->ops->reinit_request(set->driver_data,
++						tags->rqs[j]);
++			if (ret)
++				goto out;
++		}
++	}
++
++out:
++	return ret;
++}
++EXPORT_SYMBOL_GPL(blk_mq_reinit_tagset);
++
+ void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_iter_fn *fn,
+ 		void *priv)
+ {
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 6bf8735..9a5d581 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -96,6 +96,7 @@ typedef int (init_request_fn)(void *, struct request *, unsigned int,
+ 		unsigned int, unsigned int);
+ typedef void (exit_request_fn)(void *, struct request *, unsigned int,
+ 		unsigned int);
++typedef int (reinit_request_fn)(void *, struct request *);
+ 
+ typedef void (busy_iter_fn)(struct blk_mq_hw_ctx *, struct request *, void *,
+ 		bool);
+@@ -145,6 +146,7 @@ struct blk_mq_ops {
+ 	 */
+ 	init_request_fn		*init_request;
+ 	exit_request_fn		*exit_request;
++	reinit_request_fn	*reinit_request;
+ };
+ 
+ enum {
+@@ -245,6 +247,7 @@ void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
+ void blk_mq_freeze_queue(struct request_queue *q);
+ void blk_mq_unfreeze_queue(struct request_queue *q);
+ void blk_mq_freeze_queue_start(struct request_queue *q);
++int blk_mq_reinit_tagset(struct blk_mq_tag_set *set);
+ 
+ void blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set, int nr_hw_queues);
+ 
+-- 
+2.1.4
