@@ -1,23 +1,36 @@
-Return-Path: <hch@lst.de>
-Date: Tue, 7 Jun 2016 19:31:05 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Christoph Hellwig <hch@lst.de>, axboe@kernel.dk, keith.busch@intel.com,
-	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
+Return-Path: <Bart.VanAssche@sandisk.com>
 Subject: Re: NVMe over Fabrics target implementation
-Message-ID: <20160607173105.GA13935@lst.de>
-References: <1465248177-17970-1-git-send-email-hch@lst.de> <6abd6fd0-3a75-8569-95a4-174d856d0043@sandisk.com>
+To: Christoph Hellwig <hch@lst.de>, <axboe@kernel.dk>, <keith.busch@intel.com>
+References: <1465248177-17970-1-git-send-email-hch@lst.de>
+CC: <linux-nvme@lists.infradead.org>, <linux-block@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+From: Bart Van Assche <bart.vanassche@sandisk.com>
+Message-ID: <6abd6fd0-3a75-8569-95a4-174d856d0043@sandisk.com>
+Date: Tue, 7 Jun 2016 10:01:01 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <6abd6fd0-3a75-8569-95a4-174d856d0043@sandisk.com>
+In-Reply-To: <1465248177-17970-1-git-send-email-hch@lst.de>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Return-Path: Bart.VanAssche@sandisk.com
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Bart,
+On 06/06/2016 02:22 PM, Christoph Hellwig wrote:
+> The target is configured using configfs, and configurable entities are:
+>  - NVMe subsystems and namespaces
+>  - NVMe over Fabrics ports and referrals
+>  - Host ACLs for primitive access control - NVMe over Fabrics access
+>    control is still work in progress at the specification level and
+>    will be implemented once that work has finished.
 
-> As you know with configfs it is not allowed to create directories in the 
-> configfs hierarchy from inside the kernel.
+Hello Christoph,
 
-Of course you can, and every user of configfs relies on being able
-to create directories from the kernel using either the default_groups
-list, or through the use of configfs_register_group().
+As you know with configfs it is not allowed to create directories in the 
+configfs hierarchy from inside the kernel. This means that users will 
+have to create one directory per fabric port before configuring a target 
+port. Other virtual filesystems, e.g. sysfs, allow directory creation by 
+kernel drivers. This means that with sysfs the fabric port directory 
+could be created by the nvmet driver. Is this how you want the nvmet 
+driver to work?
+
+Thanks,
+
+Bart.
