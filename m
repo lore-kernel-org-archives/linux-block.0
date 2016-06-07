@@ -1,74 +1,80 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f67.google.com ([74.125.82.67]:32853 "EHLO
-	mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752878AbcFFOqK (ORCPT
-	<rfc822;linux-block@vger.kernel.org>); Mon, 6 Jun 2016 10:46:10 -0400
-Received: by mail-wm0-f67.google.com with SMTP id c74so8854223wme.0
-        for <linux-block@vger.kernel.org>; Mon, 06 Jun 2016 07:46:09 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [RFC PATCH 0/6] sysfs support for LightNVM
-Date: Mon,  6 Jun 2016 16:45:57 +0200
-Message-Id: <1465224363-25797-1-git-send-email-m@bjorling.me>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <shaun@helios.aeonazure.com>
+From: Shaun Tancheff <shaun@tancheff.com>
+To: linux-ide@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org
+Cc: Shaun Tancheff <shaun@tancheff.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	"James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	Jeff Layton <jlayton@poochiereds.net>,
+	"J . Bruce Fields" <bfields@fieldses.org>
+Subject: [PATCH v2 0/4] Block layer support ZAC/ZBC commands
+Date: Tue,  7 Jun 2016 15:02:28 -0500
+Message-Id: <1465329752-9262-1-git-send-email-shaun@tancheff.com>
+List-ID: <linux-block@vger.kernel.org>
 
-The common way to expose a storage device is to export it through the
-gendisk structure, which takes care of handling the visibility lifetime
-of the device to user-space and carries device driver and block layer
-specific sysfs entries.
+As Host Aware drives are becoming available we would like to be able
+to make use of such drives. This series is also intended to be suitable
+for use by Host Managed drives.
 
-For LightNVM, no gendisk is exposed, which hides these entries.
+ZAC/ZBC drives add new commands for discovering and working with Zones.
 
-This patchset enables LightNVM to expose a subset of the gendisk entries
-by implementing a new non-gendisk device that only exposes the sysfs
-entries that are relevant to the device driver and LightNVM. For example
-/mq and the NVMe sysfs entries.
+This extends the ZAC/ZBC support up to the block layer.
 
-The new non-gendisk exposes itself in place of the original gendisk.
-Thus, a gendisk device exposed through /sys/class/nvme/nvme0n1, will
-still be exposed through the same directory, although only with the /mq,
-lightnvm and nvme specific entries.
+Thie first patch in the series is a place-holder for Mike Christi's
+separate operations from flags ...
+https://lkml.kernel.org/r/1465155145-10812-1-git-send-email-mchristi@redhat.com
+Once that work is completed the first patch can be dropped.
 
-The LightNVM storage device can be found through sysfs by searching
-for devices that has the "lightnvm" dev type.
+Patches for util-linux can be found here:
+https://github.com/Seagate/ZDM-Device-Mapper/tree/master/patches/util-linux
 
-Any feedback is appreciated.
+Using BIOs to issue ZBC commands allows DM targets (such as ZDM) or
+file-systems such as btrfs or nilfs2 to extend their block allocation
+schemes and issue discards that are zone aware.
 
-Thank you,
-Matias
+A perhaps non-obvious approach is that a conventional drive will 
+returns a descriptor with a single large conventional zone.
 
-Matias Bjørling (4):
-  nvme: refactor namespaces to support non-gendisk devices
-  null_blk: refactor to support non-gendisk devices
-  blk-mq: register device instead of disk
-  lightnvm: let drivers control the lifetime of nvm_dev
+This patch is also at
+https://github.com/stancheff/linux.git
+git@github.com:stancheff/linux.git
+branch: v4.7-rc2+bio.zbc.v2
 
-Simon Lund (2):
-  lightnvm: expose device geometry through sysfs
-  lightnvm: expose gennvm target type through sysfs
+V2:
+ - Changed bi_rw to op_flags clarify sepeartion of bio op from flags.
+ - Fixed memory leak in blkdev_issue_zone_report failing to put_bio().
+ - Documented opt in blkdev_issue_zone_report.
+ - Moved include/uapi/linux/fs.h changes to patch 3
+ - Fixed commit message for first patch in series.
 
- block/blk-mq-sysfs.c         |  13 ++-
- block/blk-sysfs.c            |   4 +-
- drivers/block/null_blk.c     | 129 +++++++++++++++++-----------
- drivers/lightnvm/Makefile    |   2 +-
- drivers/lightnvm/core.c      |  52 +++++------
- drivers/lightnvm/gennvm.c    | 109 +++++++++++++++++++----
- drivers/lightnvm/lightnvm.h  |  35 ++++++++
- drivers/lightnvm/sysfs.c     | 200 +++++++++++++++++++++++++++++++++++++++++++
- drivers/md/dm.c              |   2 +-
- drivers/nvme/host/core.c     | 165 ++++++++++++++++++++---------------
- drivers/nvme/host/lightnvm.c |  29 ++++++-
- drivers/nvme/host/nvme.h     |  26 ++++--
- include/linux/blk-mq.h       |   4 +-
- include/linux/lightnvm.h     |  20 +++--
- 14 files changed, 593 insertions(+), 197 deletions(-)
- create mode 100644 drivers/lightnvm/lightnvm.h
- create mode 100644 drivers/lightnvm/sysfs.c
+Shaun Tancheff (4):
+  Losing bits on request.cmd_flags
+  Add bio/request flags for using ZBC/ZAC commands
+  Add ioctl to issue ZBC/ZAC commands via block layer
+  Add ata pass-through path for ZAC commands.
+
+ MAINTAINERS                       |   9 ++
+ block/blk-core.c                  |  17 +--
+ block/blk-lib.c                   |  97 +++++++++++++++++
+ block/blk-merge.c                 |   2 +-
+ block/blk-mq.c                    |   2 +-
+ block/cfq-iosched.c               |   2 +-
+ block/elevator.c                  |   4 +-
+ block/ioctl.c                     | 142 ++++++++++++++++++++++++
+ drivers/scsi/sd.c                 | 141 +++++++++++++++++++++++-
+ drivers/scsi/sd.h                 |   1 +
+ include/linux/ata.h               |  15 +++
+ include/linux/blk_types.h         |  19 +++-
+ include/linux/blkzoned_api.h      |  25 +++++
+ include/linux/elevator.h          |   4 +-
+ include/uapi/linux/Kbuild         |   1 +
+ include/uapi/linux/blkzoned_api.h | 221 ++++++++++++++++++++++++++++++++++++++
+ include/uapi/linux/fs.h           |   1 +
+ 17 files changed, 683 insertions(+), 20 deletions(-)
+ create mode 100644 include/linux/blkzoned_api.h
+ create mode 100644 include/uapi/linux/blkzoned_api.h
 
 -- 
-2.1.4
-
+2.8.1
