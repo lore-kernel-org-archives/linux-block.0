@@ -1,27 +1,20 @@
-Return-Path: <robert.j.woodruff@intel.com>
-From: "Woodruff, Robert J" <robert.j.woodruff@intel.com>
-To: Sagi Grimberg <sagi@grimberg.me>, Christoph Hellwig <hch@lst.de>,
-	"axboe@kernel.dk" <axboe@kernel.dk>, "Busch, Keith" <keith.busch@intel.com>
-CC: "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+Return-Path: <hch@lst.de>
+Date: Tue, 7 Jun 2016 14:01:30 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Sagi Grimberg <sagi@grimberg.me>
+Cc: Christoph Hellwig <hch@lst.de>, axboe@kernel.dk, keith.busch@intel.com,
+	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
 	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
-Subject: RE: NVMe over Fabrics RDMA transport drivers
-Date: Tue, 7 Jun 2016 14:55:00 +0000
-Message-ID: <9C6B67F36DCAFC479B1CF6A967258A8C7DDCB23D@ORSMSX115.amr.corp.intel.com>
-References: <1465248215-18186-1-git-send-email-hch@lst.de>
- <5756B695.5020305@grimberg.me>
-In-Reply-To: <5756B695.5020305@grimberg.me>
-Content-Type: text/plain; charset="us-ascii"
+Subject: Re: NVMe over Fabrics RDMA transport drivers
+Message-ID: <20160607120130.GA19755@lst.de>
+References: <1465248215-18186-1-git-send-email-hch@lst.de> <5756B695.5020305@grimberg.me>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <5756B695.5020305@grimberg.me>
 List-ID: <linux-block@vger.kernel.org>
 
-Sagi Grimberg wrote,
+On Tue, Jun 07, 2016 at 02:57:09PM +0300, Sagi Grimberg wrote:
+> We forgot to CC Linux-rdma, CC'ing...
 
->We forgot to CC Linux-rdma, CC'ing...
-
-Are you planning on sending the patch set to the linux-rdma list for commen=
-ts as well ?
-It might be good to do so if you want review from the rdma subsystem expert=
-s, as many of them do not subscribe to the other
-lists.
+D'oh - thanks for catching this.
