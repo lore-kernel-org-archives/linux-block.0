@@ -1,39 +1,30 @@
-Return-Path: <agrover@redhat.com>
+Return-Path: <Bart.VanAssche@sandisk.com>
 Subject: Re: NVMe over Fabrics target implementation
-To: "Nicholas A. Bellinger" <nab@linux-iscsi.org>,
-        Christoph Hellwig <hch@lst.de>
+To: Christoph Hellwig <hch@lst.de>
 References: <1465248177-17970-1-git-send-email-hch@lst.de>
- <1465280632.5365.58.camel@haakon3.risingtidesystems.com>
-Cc: axboe@kernel.dk, keith.busch@intel.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        target-devel <target-devel@vger.kernel.org>,
-        linux-scsi <linux-scsi@vger.kernel.org>
-From: Andy Grover <agrover@redhat.com>
-Message-ID: <9352d5f2-b75f-9cc6-9a93-2e49c0883e84@redhat.com>
-Date: Tue, 7 Jun 2016 14:02:09 -0700
+ <6abd6fd0-3a75-8569-95a4-174d856d0043@sandisk.com>
+ <20160607173105.GA13935@lst.de>
+CC: "axboe@kernel.dk" <axboe@kernel.dk>, "keith.busch@intel.com"
+	<keith.busch@intel.com>, "linux-nvme@lists.infradead.org"
+	<linux-nvme@lists.infradead.org>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>
+From: Bart Van Assche <bart.vanassche@sandisk.com>
+Message-ID: <abd1bf65-dc98-7119-b6ff-97bb939e0780@sandisk.com>
+Date: Tue, 7 Jun 2016 11:11:28 -0700
 MIME-Version: 1.0
-In-Reply-To: <1465280632.5365.58.camel@haakon3.risingtidesystems.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20160607173105.GA13935@lst.de>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Return-Path: Bart.VanAssche@sandisk.com
 List-ID: <linux-block@vger.kernel.org>
 
-On 06/06/2016 11:23 PM, Nicholas A. Bellinger wrote:
-> Hi HCH & Co,
->
-> On Mon, 2016-06-06 at 23:22 +0200, Christoph Hellwig wrote:
->> This patch set adds a generic NVMe over Fabrics target. The
->> implementation conforms to the NVMe 1.2b specification (which
->> includes Fabrics) and provides the NVMe over Fabrics access
->> to Linux block devices.
->>
->
-> Thanks for all of the development work by the fabric_linux_driver team
-> (HCH, Sagi, Ming, James F., James S., and Dave M.) over the last year.
->
-> Very excited to see this code get a public release now that NVMf
-> specification is out.  Now that it's in the wild, it's a good
-> opportunity to discuss some of the more interesting implementation
-> details, beyond the new NVMf wire-protocol itself.
+On 06/07/2016 10:31 AM, Christoph Hellwig wrote:
+> Of course you can, and every user of configfs relies on being able
+> to create directories from the kernel using either the default_groups
+> list, or through the use of configfs_register_group().
 
-I'm sorry but I missed it, can you repeat the link to the NVMe spec(s)?
+Apparently configfs_register_group() has been added last year (Nov 2015; 
+commit 5cf6a51e6062)? This is interesting and I think this functionality 
+would also useful for LIO target drivers, e.g. ib_srpt and tcm_qla2xxx.
 
-Thanks -- Andy
+Bart.
