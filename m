@@ -1,84 +1,44 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f65.google.com ([74.125.82.65]:36040 "EHLO
-	mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752785AbcFJMV3 (ORCPT
-	<rfc822;linux-block@vger.kernel.org>);
-	Fri, 10 Jun 2016 08:21:29 -0400
-Received: by mail-wm0-f65.google.com with SMTP id m124so17504417wme.3
-        for <linux-block@vger.kernel.org>; Fri, 10 Jun 2016 05:21:28 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	axboe@fb.com, keith.busch@intel.com, linux-nvme@lists.infradead.org
-Cc: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [PATCH 0/6] sysfs support for LightNVM
-Date: Fri, 10 Jun 2016 14:20:56 +0200
-Message-Id: <1465561262-13789-1-git-send-email-m@bjorling.me>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <nab@linux-iscsi.org>
+Message-ID: <1465282193.5365.59.camel@haakon3.risingtidesystems.com>
+Subject: Re: [PATCH 1/3] block: Export blk_poll
+From: "Nicholas A. Bellinger" <nab@linux-iscsi.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: axboe@kernel.dk, keith.busch@intel.com, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org, Sagi Grimberg
+	 <sagi@grimberg.me>
+Date: Mon, 06 Jun 2016 23:49:53 -0700
+In-Reply-To: <1465248177-17970-2-git-send-email-hch@lst.de>
+References: <1465248177-17970-1-git-send-email-hch@lst.de>
+	 <1465248177-17970-2-git-send-email-hch@lst.de>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+List-ID: <linux-block@vger.kernel.org>
 
-Hi Jens and Keith,
+On Mon, 2016-06-06 at 23:22 +0200, Christoph Hellwig wrote:
+> From: Sagi Grimberg <sagi@grimberg.me>
+> 
+> The new NVMe over fabrics target will make use of this outside from a
+> module.
+> 
+> Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  block/blk-core.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index 2475b1c7..ad5270e 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -3377,6 +3377,7 @@ bool blk_poll(struct request_queue *q, blk_qc_t cookie)
+>  
+>  	return false;
+>  }
+> +EXPORT_SYMBOL_GPL(blk_poll);
+>  
+>  #ifdef CONFIG_PM
+>  /**
 
-If the patches look good to you, would you pick them up through your
-tree?
+Looks good.
 
-The common way to expose a storage device is to export it through the
-gendisk structure, which takes care of handling the visibility lifetime
-of the device to user-space and carries device driver and block layer
-specific sysfs entries.
-
-For LightNVM, no gendisk is exposed, which hides these entries.
-
-This patchset enables LightNVM to expose a subset of the gendisk entries
-by implementing a new non-gendisk device that only exposes the sysfs
-entries that are relevant to the device driver and LightNVM. For example
-/mq and the NVMe sysfs entries.
-
-The new non-gendisk exposes itself in place of the original gendisk.
-Thus, a gendisk device exposed through /sys/class/nvme/nvme0n1, will
-still be exposed through the same directory, although only with the /mq,
-lightnvm, and nvme specific entries.
-
-The LightNVM storage device can be found through sysfs by searching
-for devices that has the "lightnvm" dev type.
-
-v2:
- - Updated "expose gennvm target type" to expose its own kobject, which
-   pblk and others can hook into.
- - Fixed missing disk_name in null_blk patch on lightnvm device
-
-Thanks,
-Matias
-
-Matias Bjørling (4):
-  nvme: refactor namespaces to support non-gendisk devices
-  null_blk: refactor to support non-gendisk devices
-  blk-mq: register device instead of disk
-  lightnvm: let drivers control the lifetime of nvm_dev
-
-Simon A. F. Lund (2):
-  lightnvm: expose device geometry through sysfs
-  lightnvm: expose gennvm target type through sysfs
-
- block/blk-mq-sysfs.c         |  13 ++-
- block/blk-sysfs.c            |   4 +-
- drivers/block/null_blk.c     | 128 +++++++++++++++++-----------
- drivers/lightnvm/Makefile    |   2 +-
- drivers/lightnvm/core.c      |  52 +++++-------
- drivers/lightnvm/gennvm.c    | 112 +++++++++++++++++++++----
- drivers/lightnvm/lightnvm.h  |  35 ++++++++
- drivers/lightnvm/sysfs.c     | 195 +++++++++++++++++++++++++++++++++++++++++++
- drivers/md/dm.c              |   2 +-
- drivers/nvme/host/core.c     | 165 ++++++++++++++++++++----------------
- drivers/nvme/host/lightnvm.c |  29 ++++++-
- drivers/nvme/host/nvme.h     |  26 ++++--
- include/linux/blk-mq.h       |   4 +-
- include/linux/lightnvm.h     |  28 +++++--
- 14 files changed, 597 insertions(+), 198 deletions(-)
- create mode 100644 drivers/lightnvm/lightnvm.h
- create mode 100644 drivers/lightnvm/sysfs.c
-
--- 
-2.1.4
-
+Reviewed-by: Nicholas Bellinger <nab@linux-iscsi.org>
