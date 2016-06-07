@@ -1,36 +1,31 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
+Return-Path: <hch@lst.de>
+Date: Tue, 7 Jun 2016 12:55:50 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: "Nicholas A. Bellinger" <nab@linux-iscsi.org>
+Cc: Christoph Hellwig <hch@lst.de>, axboe@kernel.dk, keith.busch@intel.com,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	target-devel <target-devel@vger.kernel.org>,
+	linux-scsi <linux-scsi@vger.kernel.org>
 Subject: Re: NVMe over Fabrics target implementation
-To: Christoph Hellwig <hch@lst.de>, <axboe@kernel.dk>, <keith.busch@intel.com>
-References: <1465248177-17970-1-git-send-email-hch@lst.de>
-CC: <linux-nvme@lists.infradead.org>, <linux-block@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-Message-ID: <6abd6fd0-3a75-8569-95a4-174d856d0043@sandisk.com>
-Date: Tue, 7 Jun 2016 10:01:01 -0700
+Message-ID: <20160607105550.GB17113@lst.de>
+References: <1465248177-17970-1-git-send-email-hch@lst.de> <1465280632.5365.58.camel@haakon3.risingtidesystems.com>
 MIME-Version: 1.0
-In-Reply-To: <1465248177-17970-1-git-send-email-hch@lst.de>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Return-Path: Bart.VanAssche@sandisk.com
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1465280632.5365.58.camel@haakon3.risingtidesystems.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On 06/06/2016 02:22 PM, Christoph Hellwig wrote:
-> The target is configured using configfs, and configurable entities are:
->  - NVMe subsystems and namespaces
->  - NVMe over Fabrics ports and referrals
->  - Host ACLs for primitive access control - NVMe over Fabrics access
->    control is still work in progress at the specification level and
->    will be implemented once that work has finished.
+There is absolutely no point in dragging in an overcomplicated configfs 
+structure for a very simple protocol which also is very different from
+SCSI in it's nitty gritty details.  Keeping the nvme target self contains
+allows it to be both much simpler and much easier to understand, as well
+as much better testable - see the amount of test coverage we could easily
+add for example.
 
-Hello Christoph,
+Or to put it the other way around - if there was any major synergy in
+reusing the SCSI target code that just shows we're missing functionality
+in the block layer or configfs.
 
-As you know with configfs it is not allowed to create directories in the 
-configfs hierarchy from inside the kernel. This means that users will 
-have to create one directory per fabric port before configuring a target 
-port. Other virtual filesystems, e.g. sysfs, allow directory creation by 
-kernel drivers. This means that with sysfs the fabric port directory 
-could be created by the nvmet driver. Is this how you want the nvmet 
-driver to work?
-
-Thanks,
-
-Bart.
+The only thing where this is the case mid-term is persistent reservations,
+but Mike Christie already has a plan for a pluggable PR API, which I'm
+very interested in.
