@@ -27,37 +27,44 @@ Cc: ebiggers3@gmail.com,
 	linux-raid@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	baolin.wang@linaro.org
-Subject: [RFC v4 4/4] crypto: Add the CRYPTO_ALG_BULK flag for ecb(aes) cipher
-Date: Tue,  7 Jun 2016 20:17:07 +0800
-Message-Id: <1c7f3a872ce0382add0d5fc88b797eb3c2ab37f5.1465301616.git.baolin.wang@linaro.org>
-In-Reply-To: <cover.1465301616.git.baolin.wang@linaro.org>
-References: <cover.1465301616.git.baolin.wang@linaro.org>
-In-Reply-To: <cover.1465301616.git.baolin.wang@linaro.org>
-References: <cover.1465301616.git.baolin.wang@linaro.org>
+Subject: [RFC v4 0/4] Introduce the bulk mode method when sending request to crypto layer
+Date: Tue,  7 Jun 2016 20:17:03 +0800
+Message-Id: <cover.1465301616.git.baolin.wang@linaro.org>
 List-ID: <linux-block@vger.kernel.org>
 
-Since the ecb(aes) cipher does not need to handle the IV things for encryption
-or decryption, that means it can support for bulk block when handling data.
-Thus this patch adds the CRYPTO_ALG_BULK flag for ecb(aes) cipher to improve
-the hardware aes engine's efficiency.
+This patchset will check if the cipher can support bulk mode, then dm-crypt
+will handle different ways to send requests to crypto layer according to
+cipher mode. For bulk mode, we can use sg table to map the whole bio and
+send all scatterlists of one bio to crypto engine to encrypt or decrypt,
+which can improve the hardware engine's efficiency.
 
-Signed-off-by: Baolin Wang <baolin.wang@linaro.org>
----
+Changes since v3:
+ - Some optimization for blk_bio_map_sg() function.
+
+Changes since v2:
+ - Add one cipher user with CRYPTO_ALG_BULK flag to support bulk mode.
+ - Add one atomic variable to avoid the sg table race.
+
+Changes since v1:
+ - Refactor the blk_bio_map_sg() function to avoid duplicated code.
+ - Move the sg table allocation to crypt_ctr_cipher() function to avoid memory
+ allocation in the IO path.
+ - Remove the crypt_sg_entry() function.
+ - Other optimization.
+
+Baolin Wang (4):
+  block: Introduce blk_bio_map_sg() to map one bio
+  crypto: Introduce CRYPTO_ALG_BULK flag
+  md: dm-crypt: Introduce the bulk mode method when sending request
+  crypto: Add the CRYPTO_ALG_BULK flag for ecb(aes) cipher
+
+ block/blk-merge.c         |   19 ++++++
  drivers/crypto/omap-aes.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/md/dm-crypt.c     |  159 ++++++++++++++++++++++++++++++++++++++++++++-
+ include/crypto/skcipher.h |    7 ++
+ include/linux/blkdev.h    |    2 +
+ include/linux/crypto.h    |    6 ++
+ 6 files changed, 193 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
-index ce174d3..ab09429 100644
---- a/drivers/crypto/omap-aes.c
-+++ b/drivers/crypto/omap-aes.c
-@@ -804,7 +804,7 @@ static struct crypto_alg algs_ecb_cbc[] = {
- 	.cra_priority		= 300,
- 	.cra_flags		= CRYPTO_ALG_TYPE_ABLKCIPHER |
- 				  CRYPTO_ALG_KERN_DRIVER_ONLY |
--				  CRYPTO_ALG_ASYNC,
-+				  CRYPTO_ALG_ASYNC | CRYPTO_ALG_BULK,
- 	.cra_blocksize		= AES_BLOCK_SIZE,
- 	.cra_ctxsize		= sizeof(struct omap_aes_ctx),
- 	.cra_alignmask		= 0,
 -- 
 1.7.9.5
