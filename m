@@ -1,79 +1,58 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH 1/8] blk-mq: add blk_mq_alloc_request_hctx
-To: Christoph Hellwig <hch@lst.de>, keith.busch@intel.com
-References: <1465248119-17875-1-git-send-email-hch@lst.de>
- <1465248119-17875-2-git-send-email-hch@lst.de>
-Cc: linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, Ming Lin <ming.l@ssi.samsung.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <5757A3D2.1030003@kernel.dk>
-Date: Tue, 7 Jun 2016 22:49:22 -0600
+Return-Path: <mlin@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <1465248119-17875-2-git-send-email-hch@lst.de>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+In-Reply-To: <CAF1ivSYpbzPF+5_e+hEKZ_-t7=UhijULbkvF=SodSF7FD5YS-A@mail.gmail.com>
+References: <1465248119-17875-1-git-send-email-hch@lst.de> <1465248119-17875-2-git-send-email-hch@lst.de>
+ <20160607145736.GB28414@localhost.localdomain> <CAF1ivSYpbzPF+5_e+hEKZ_-t7=UhijULbkvF=SodSF7FD5YS-A@mail.gmail.com>
+From: Ming Lin <mlin@kernel.org>
+Date: Tue, 7 Jun 2016 16:21:53 -0700
+Message-ID: <CAF1ivSYD88gsiAWQkcH-af07-HCVYzQrFcxpGhejLxcmr0WHrw@mail.gmail.com>
+Subject: Re: [PATCH 1/8] blk-mq: add blk_mq_alloc_request_hctx
+To: Keith Busch <keith.busch@intel.com>
+Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>, linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org, lkml <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 06/06/2016 03:21 PM, Christoph Hellwig wrote:
-> From: Ming Lin <ming.l@ssi.samsung.com>
+On Tue, Jun 7, 2016 at 8:27 AM, Ming Lin <mlin@kernel.org> wrote:
+> On Tue, Jun 7, 2016 at 7:57 AM, Keith Busch <keith.busch@intel.com> wrote:
+>> On Mon, Jun 06, 2016 at 11:21:52PM +0200, Christoph Hellwig wrote:
+>>> +struct request *blk_mq_alloc_request_hctx(struct request_queue *q, int rw,
+>>> +             unsigned int flags, unsigned int hctx_idx)
+>>> +{
+>>> +     struct blk_mq_hw_ctx *hctx;
+>>> +     struct blk_mq_ctx *ctx;
+>>> +     struct request *rq;
+>>> +     struct blk_mq_alloc_data alloc_data;
+>>> +     int ret;
+>>> +
+>>> +     ret = blk_queue_enter(q, flags & BLK_MQ_REQ_NOWAIT);
+>>> +     if (ret)
+>>> +             return ERR_PTR(ret);
+>>> +
+>>> +     hctx = q->queue_hw_ctx[hctx_idx];
+>>
+>> We probably want to check 'if (hctx_idx < q->nr_hw_queues)' before
+>> getting the hctx. Even if hctx_idx was origially valid, it's possible
+>> (though unlikely) blk_queue_enter waits on reallocating h/w contexts,
+>> which can make hctx_idx invalid.
 >
-> For some protocols like NVMe over Fabrics we need to be able to send
-> initialization commands to a specific queue.
->
-> Based on an earlier patch from Christoph Hellwig <hch@lst.de>.
->
-> Signed-off-by: Ming Lin <ming.l@ssi.samsung.com>
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->   block/blk-mq.c         | 33 +++++++++++++++++++++++++++++++++
->   include/linux/blk-mq.h |  2 ++
->   2 files changed, 35 insertions(+)
->
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 29cbc1b..7bb45ed 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -266,6 +266,39 @@ struct request *blk_mq_alloc_request(struct request_queue *q, int rw,
->   }
->   EXPORT_SYMBOL(blk_mq_alloc_request);
->
-> +struct request *blk_mq_alloc_request_hctx(struct request_queue *q, int rw,
-> +		unsigned int flags, unsigned int hctx_idx)
-> +{
-> +	struct blk_mq_hw_ctx *hctx;
-> +	struct blk_mq_ctx *ctx;
-> +	struct request *rq;
-> +	struct blk_mq_alloc_data alloc_data;
-> +	int ret;
-> +
-> +	ret = blk_queue_enter(q, flags & BLK_MQ_REQ_NOWAIT);
-> +	if (ret)
-> +		return ERR_PTR(ret);
-> +
-> +	hctx = q->queue_hw_ctx[hctx_idx];
-> +	ctx = __blk_mq_get_ctx(q, cpumask_first(hctx->cpumask));
-> +
-> +	blk_mq_set_alloc_data(&alloc_data, q, flags, ctx, hctx);
-> +
-> +	rq = __blk_mq_alloc_request(&alloc_data, rw);
-> +	if (!rq && !(flags & BLK_MQ_REQ_NOWAIT)) {
-> +		__blk_mq_run_hw_queue(hctx);
-> +
-> +		rq =  __blk_mq_alloc_request(&alloc_data, rw);
-> +	}
+> Yes, I'll update it.
 
-Why are we duplicating this code here? If NOWAIT isn't set, then we'll
-always return a request. bt_get() will run the queue for us, if it needs
-to. blk_mq_alloc_request() does this too, and I'm guessing that code was
-just copied. I'll fix that up. Looks like this should just be:
+How about this?
 
-	rq = __blk_mq_alloc_request(&alloc_data, rw);
-	if (rq)
-		return rq;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 7bb45ed..b59d2ef 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -279,6 +279,11 @@ struct request *blk_mq_alloc_request_hctx(struct
+request_queue *q, int rw,
+        if (ret)
+                return ERR_PTR(ret);
 
-	blk_queue_exit(q);
-	return ERR_PTR(-EWOULDBLOCK);
-
-for this case.
-
--- 
-Jens Axboe
++       if (hctx_idx >= q->nr_hw_queues) {
++               blk_queue_exit(q);
++               return ERR_PTR(-EINVAL);
++       }
++
+        hctx = q->queue_hw_ctx[hctx_idx];
+        ctx = __blk_mq_get_ctx(q, cpumask_first(hctx->cpumask));
