@@ -10,196 +10,191 @@ Cc: Shaun Tancheff <shaun@tancheff.com>,
 	Jeff Layton <jlayton@poochiereds.net>,
 	"J . Bruce Fields" <bfields@fieldses.org>,
 	Shaun Tancheff <shaun.tancheff@seagate.com>
-Subject: [PATCH v2 1/4] Losing bits on request.cmd_flags
-Date: Tue,  7 Jun 2016 15:02:29 -0500
-Message-Id: <1465329752-9262-2-git-send-email-shaun@tancheff.com>
+Subject: [PATCH v2 3/4] Add ioctl to issue ZBC/ZAC commands via block layer
+Date: Tue,  7 Jun 2016 15:02:31 -0500
+Message-Id: <1465329752-9262-4-git-send-email-shaun@tancheff.com>
 In-Reply-To: <1465329752-9262-1-git-send-email-shaun@tancheff.com>
 References: <1465329752-9262-1-git-send-email-shaun@tancheff.com>
 List-ID: <linux-block@vger.kernel.org>
 
-In a few places a temporary value smaller than a cmd_flags
-is used to test for bits and or build up a new cmd_flags.
-
-Change to use explict u64 values where appropriate.
-
-This patch is place holder for: Mike Christie's separate operations ... series
-https://lkml.kernel.org/r/1465155145-10812-1-git-send-email-mchristi@redhat.com
-
-Once Mike's patches are stablized this patch can be dropped.
+Add New ioctl types
+    BLKREPORT    - Issue Report Zones to device.
+    BLKOPENZONE  - Issue an Zone Action: Open Zone command.
+    BLKCLOSEZONE - Issue an Zone Action: Close Zone command.
+    BLKRESETZONE - Issue an Zone Action: Reset Zone command.
 
 Signed-off-by: Shaun Tancheff <shaun.tancheff@seagate.com>
 ---
+V2:
+ - Added include/uapi/linux/fs.h
+ - Removed REQ_META flag from this patch.
 
-v2:
- - Fixed commit message
+ block/ioctl.c                     | 110 ++++++++++++++++++++++++++++++++++++++
+ include/uapi/linux/blkzoned_api.h |   6 +++
+ include/uapi/linux/fs.h           |   1 +
+ 3 files changed, 117 insertions(+)
 
- block/blk-core.c         | 17 ++++++++++-------
- block/blk-merge.c        |  2 +-
- block/blk-mq.c           |  2 +-
- block/cfq-iosched.c      |  2 +-
- block/elevator.c         |  4 ++--
- include/linux/elevator.h |  4 ++--
- 6 files changed, 17 insertions(+), 14 deletions(-)
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 2475b1c7..945e564 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -959,7 +959,7 @@ static void __freed_request(struct request_list *rl, int sync)
-  * A request has just been released.  Account for it, update the full and
-  * congestion status, wake up any waiters.   Called under q->queue_lock.
-  */
--static void freed_request(struct request_list *rl, unsigned int flags)
-+static void freed_request(struct request_list *rl, u64 flags)
- {
- 	struct request_queue *q = rl->q;
- 	int sync = rw_is_sync(flags);
-@@ -1054,7 +1054,7 @@ static struct io_context *rq_ioc(struct bio *bio)
- /**
-  * __get_request - get a free request
-  * @rl: request list to allocate from
-- * @rw_flags: RW and SYNC flags
-+ * @rw: RW and SYNC flags
-  * @bio: bio to allocate request for (can be %NULL)
-  * @gfp_mask: allocation mask
-  *
-@@ -1065,7 +1065,7 @@ static struct io_context *rq_ioc(struct bio *bio)
-  * Returns ERR_PTR on failure, with @q->queue_lock held.
-  * Returns request pointer on success, with @q->queue_lock *not held*.
-  */
--static struct request *__get_request(struct request_list *rl, int rw_flags,
-+static struct request *__get_request(struct request_list *rl, unsigned long rw,
- 				     struct bio *bio, gfp_t gfp_mask)
- {
- 	struct request_queue *q = rl->q;
-@@ -1073,6 +1073,7 @@ static struct request *__get_request(struct request_list *rl, int rw_flags,
- 	struct elevator_type *et = q->elevator->type;
- 	struct io_context *ioc = rq_ioc(bio);
- 	struct io_cq *icq = NULL;
-+	u64 rw_flags = rw;
- 	const bool is_sync = rw_is_sync(rw_flags) != 0;
- 	int may_queue;
+diff --git a/block/ioctl.c b/block/ioctl.c
+index ed2397f..97f45f5 100644
+--- a/block/ioctl.c
++++ b/block/ioctl.c
+@@ -7,6 +7,7 @@
+ #include <linux/backing-dev.h>
+ #include <linux/fs.h>
+ #include <linux/blktrace_api.h>
++#include <linux/blkzoned_api.h>
+ #include <linux/pr.h>
+ #include <asm/uaccess.h>
  
-@@ -1237,7 +1238,8 @@ rq_starved:
-  * Returns ERR_PTR on failure, with @q->queue_lock held.
-  * Returns request pointer on success, with @q->queue_lock *not held*.
-  */
--static struct request *get_request(struct request_queue *q, int rw_flags,
-+static struct request *get_request(struct request_queue *q,
-+				   unsigned long rw_flags,
- 				   struct bio *bio, gfp_t gfp_mask)
- {
- 	const bool is_sync = rw_is_sync(rw_flags) != 0;
-@@ -1490,7 +1492,7 @@ void __blk_put_request(struct request_queue *q, struct request *req)
- 	 * it didn't come out of our reserved rq pools
- 	 */
- 	if (req->cmd_flags & REQ_ALLOCED) {
--		unsigned int flags = req->cmd_flags;
-+		u64 flags = req->cmd_flags;
- 		struct request_list *rl = blk_rq_rl(req);
- 
- 		BUG_ON(!list_empty(&req->queuelist));
-@@ -1712,7 +1714,8 @@ static blk_qc_t blk_queue_bio(struct request_queue *q, struct bio *bio)
- {
- 	const bool sync = !!(bio->bi_rw & REQ_SYNC);
- 	struct blk_plug *plug;
--	int el_ret, rw_flags, where = ELEVATOR_INSERT_SORT;
-+	u64 rw_flags;
-+	int el_ret, where = ELEVATOR_INSERT_SORT;
- 	struct request *req;
- 	unsigned int request_count = 0;
- 
-@@ -2246,7 +2249,7 @@ EXPORT_SYMBOL_GPL(blk_insert_cloned_request);
-  */
- unsigned int blk_rq_err_bytes(const struct request *rq)
- {
--	unsigned int ff = rq->cmd_flags & REQ_FAILFAST_MASK;
-+	u64 ff = rq->cmd_flags & REQ_FAILFAST_MASK;
- 	unsigned int bytes = 0;
- 	struct bio *bio;
- 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 2613531..fec37e1 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -604,7 +604,7 @@ static int ll_merge_requests_fn(struct request_queue *q, struct request *req,
-  */
- void blk_rq_set_mixed_merge(struct request *rq)
- {
--	unsigned int ff = rq->cmd_flags & REQ_FAILFAST_MASK;
-+	u64 ff = rq->cmd_flags & REQ_FAILFAST_MASK;
- 	struct bio *bio;
- 
- 	if (rq->cmd_flags & REQ_MIXED_MERGE)
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 29cbc1b..db962bc 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -159,7 +159,7 @@ bool blk_mq_can_queue(struct blk_mq_hw_ctx *hctx)
- EXPORT_SYMBOL(blk_mq_can_queue);
- 
- static void blk_mq_rq_ctx_init(struct request_queue *q, struct blk_mq_ctx *ctx,
--			       struct request *rq, unsigned int rw_flags)
-+			       struct request *rq, u64 rw_flags)
- {
- 	if (blk_queue_io_stat(q))
- 		rw_flags |= REQ_IO_STAT;
-diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
-index 4a34978..2722345 100644
---- a/block/cfq-iosched.c
-+++ b/block/cfq-iosched.c
-@@ -4285,7 +4285,7 @@ static inline int __cfq_may_queue(struct cfq_queue *cfqq)
- 	return ELV_MQUEUE_MAY;
+@@ -194,6 +195,109 @@ int blkdev_reread_part(struct block_device *bdev)
  }
+ EXPORT_SYMBOL(blkdev_reread_part);
  
--static int cfq_may_queue(struct request_queue *q, int rw)
-+static int cfq_may_queue(struct request_queue *q, u64 rw)
++static int blk_zoned_report_ioctl(struct block_device *bdev, fmode_t mode,
++		void __user *parg)
++{
++	int error = -EFAULT;
++	gfp_t gfp = GFP_KERNEL;
++	struct bdev_zone_report_io *zone_iodata = NULL;
++	int order = 0;
++	struct page *pgs = NULL;
++	u32 alloc_size = PAGE_SIZE;
++	unsigned long op_flags = 0;
++	u8 opt = 0;
++
++	if (!(mode & FMODE_READ))
++		return -EBADF;
++
++	zone_iodata = (void *)get_zeroed_page(gfp);
++	if (!zone_iodata) {
++		error = -ENOMEM;
++		goto report_zones_out;
++	}
++	if (copy_from_user(zone_iodata, parg, sizeof(*zone_iodata))) {
++		error = -EFAULT;
++		goto report_zones_out;
++	}
++	if (zone_iodata->data.in.return_page_count > alloc_size) {
++		int npages;
++
++		alloc_size = zone_iodata->data.in.return_page_count;
++		npages = (alloc_size + PAGE_SIZE - 1) / PAGE_SIZE;
++		order =  ilog2(roundup_pow_of_two(npages));
++		pgs = alloc_pages(gfp, order);
++		if (pgs) {
++			void *mem = page_address(pgs);
++
++			if (!mem) {
++				error = -ENOMEM;
++				goto report_zones_out;
++			}
++			memset(mem, 0, alloc_size);
++			memcpy(mem, zone_iodata, sizeof(*zone_iodata));
++			free_page((unsigned long)zone_iodata);
++			zone_iodata = mem;
++		} else {
++			/* Result requires DMA capable memory */
++			pr_err("Not enough memory available for request.\n");
++			error = -ENOMEM;
++			goto report_zones_out;
++		}
++	}
++	opt = zone_iodata->data.in.report_option & 0x7F;
++	error = blkdev_issue_zone_report(bdev, op_flags,
++			zone_iodata->data.in.zone_locator_lba, opt,
++			pgs ? pgs : virt_to_page(zone_iodata),
++			alloc_size, GFP_KERNEL);
++
++	if (error)
++		goto report_zones_out;
++
++	if (copy_to_user(parg, zone_iodata, alloc_size))
++		error = -EFAULT;
++
++report_zones_out:
++	if (pgs)
++		__free_pages(pgs, order);
++	else if (zone_iodata)
++		free_page((unsigned long)zone_iodata);
++	return error;
++}
++
++static int blk_zoned_action_ioctl(struct block_device *bdev, fmode_t mode,
++				  unsigned int cmd, unsigned long arg)
++{
++	unsigned long op_flags = 0;
++
++	if (!(mode & FMODE_WRITE))
++		return -EBADF;
++
++	/*
++	 * When acting on zones we explicitly disallow using a partition.
++	 */
++	if (bdev != bdev->bd_contains) {
++		pr_err("%s: All zone operations disallowed on this device\n",
++			__func__);
++		return -EFAULT;
++	}
++
++	switch (cmd) {
++	case BLKOPENZONE:
++		op_flags |= REQ_OPEN_ZONE;
++		break;
++	case BLKCLOSEZONE:
++		op_flags |= REQ_CLOSE_ZONE;
++		break;
++	case BLKRESETZONE:
++		op_flags |= REQ_RESET_ZONE;
++		break;
++	default:
++		pr_err("%s: Unknown action: %u\n", __func__, cmd);
++		WARN_ON(1);
++	}
++	return blkdev_issue_zone_action(bdev, op_flags, arg, GFP_KERNEL);
++}
++
+ static int blk_ioctl_discard(struct block_device *bdev, fmode_t mode,
+ 		unsigned long arg, unsigned long flags)
  {
- 	struct cfq_data *cfqd = q->elevator->elevator_data;
- 	struct task_struct *tsk = current;
-diff --git a/block/elevator.c b/block/elevator.c
-index c3555c9..7c0a59c 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -511,7 +511,7 @@ void elv_merge_requests(struct request_queue *q, struct request *rq,
- 			     struct request *next)
- {
- 	struct elevator_queue *e = q->elevator;
--	const int next_sorted = next->cmd_flags & REQ_SORTED;
-+	const int next_sorted = !!(next->cmd_flags & REQ_SORTED);
+@@ -568,6 +672,12 @@ int blkdev_ioctl(struct block_device *bdev, fmode_t mode, unsigned cmd,
+ 	case BLKTRACESETUP:
+ 	case BLKTRACETEARDOWN:
+ 		return blk_trace_ioctl(bdev, cmd, argp);
++	case BLKREPORT:
++		return blk_zoned_report_ioctl(bdev, mode, argp);
++	case BLKOPENZONE:
++	case BLKCLOSEZONE:
++	case BLKRESETZONE:
++		return blk_zoned_action_ioctl(bdev, mode, cmd, arg);
+ 	case IOC_PR_REGISTER:
+ 		return blkdev_pr_register(bdev, argp);
+ 	case IOC_PR_RESERVE:
+diff --git a/include/uapi/linux/blkzoned_api.h b/include/uapi/linux/blkzoned_api.h
+index 189e925..2007b56 100644
+--- a/include/uapi/linux/blkzoned_api.h
++++ b/include/uapi/linux/blkzoned_api.h
+@@ -212,4 +212,10 @@ struct bdev_zone_report_io {
+ 	} data;
+ } __packed;
  
- 	if (next_sorted && e->type->ops.elevator_merge_req_fn)
- 		e->type->ops.elevator_merge_req_fn(q, rq, next);
-@@ -717,7 +717,7 @@ void elv_put_request(struct request_queue *q, struct request *rq)
- 		e->type->ops.elevator_put_req_fn(rq);
- }
++/* continuing from uapi/linux/fs.h: */
++#define BLKREPORT	_IOWR(0x12, 130, struct bdev_zone_report_io)
++#define BLKOPENZONE	_IO(0x12, 131)
++#define BLKCLOSEZONE	_IO(0x12, 132)
++#define BLKRESETZONE	_IO(0x12, 133)
++
+ #endif /* _UAPI_BLKZONED_API_H */
+diff --git a/include/uapi/linux/fs.h b/include/uapi/linux/fs.h
+index 3b00f7c..c0b565b 100644
+--- a/include/uapi/linux/fs.h
++++ b/include/uapi/linux/fs.h
+@@ -222,6 +222,7 @@ struct fsxattr {
+ #define BLKSECDISCARD _IO(0x12,125)
+ #define BLKROTATIONAL _IO(0x12,126)
+ #define BLKZEROOUT _IO(0x12,127)
++/* A jump here: See blkzoned_api.h, Reserving 130 to 133. */
  
--int elv_may_queue(struct request_queue *q, int rw)
-+int elv_may_queue(struct request_queue *q, u64 rw)
- {
- 	struct elevator_queue *e = q->elevator;
- 
-diff --git a/include/linux/elevator.h b/include/linux/elevator.h
-index 638b324..a06cca4 100644
---- a/include/linux/elevator.h
-+++ b/include/linux/elevator.h
-@@ -26,7 +26,7 @@ typedef int (elevator_dispatch_fn) (struct request_queue *, int);
- typedef void (elevator_add_req_fn) (struct request_queue *, struct request *);
- typedef struct request *(elevator_request_list_fn) (struct request_queue *, struct request *);
- typedef void (elevator_completed_req_fn) (struct request_queue *, struct request *);
--typedef int (elevator_may_queue_fn) (struct request_queue *, int);
-+typedef int (elevator_may_queue_fn) (struct request_queue *, u64);
- 
- typedef void (elevator_init_icq_fn) (struct io_cq *);
- typedef void (elevator_exit_icq_fn) (struct io_cq *);
-@@ -134,7 +134,7 @@ extern struct request *elv_former_request(struct request_queue *, struct request
- extern struct request *elv_latter_request(struct request_queue *, struct request *);
- extern int elv_register_queue(struct request_queue *q);
- extern void elv_unregister_queue(struct request_queue *q);
--extern int elv_may_queue(struct request_queue *, int);
-+extern int elv_may_queue(struct request_queue *, u64);
- extern void elv_completed_request(struct request_queue *, struct request *);
- extern int elv_set_request(struct request_queue *q, struct request *rq,
- 			   struct bio *bio, gfp_t gfp_mask);
+ #define BMAP_IOCTL 1		/* obsolete - kept for compatibility */
+ #define FIBMAP	   _IO(0x00,1)	/* bmap access */
 -- 
 2.8.1
