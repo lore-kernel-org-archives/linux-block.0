@@ -1,54 +1,135 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:39408 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752279AbcFETeC (ORCPT <rfc822;linux-block@vger.kernel.org>);
-	Sun, 5 Jun 2016 15:34:02 -0400
-From: mchristi@redhat.com
-To: linux-f2fs-devel@lists.sourceforge.net, linux-ext4@vger.kernel.org,
-	konrad.wilk@oracle.com, drbd-dev@lists.linbit.com,
-	philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
-	linux-raid@vger.kernel.org, dm-devel@redhat.com,
-	linux-fsdevel@vger.kernel.org, linux-bcache@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linux-mtd@lists.infradead.org,
-	target-devel@vger.kernel.org, linux-btrfs@vger.kernel.org,
-	osd-dev@open-osd.org, xfs@oss.sgi.com, ocfs2-devel@oss.oracle.com
-Cc: Mike Christie <mchristi@redhat.com>
-Subject: [PATCH 39/45] ide cd: do not set REQ_WRITE on requests.
-Date: Sun,  5 Jun 2016 14:32:19 -0500
-Message-Id: <1465155145-10812-40-git-send-email-mchristi@redhat.com>
-In-Reply-To: <1465155145-10812-1-git-send-email-mchristi@redhat.com>
-References: <1465155145-10812-1-git-send-email-mchristi@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+Subject: Re: [PATCH BUGFIX V4] block: add missing group association in
+ bio-cloning functions
+To: Jeff Moyer <jmoyer@redhat.com>
+References: <5732D47A.4090706@kyup.com>
+ <1462958884-9457-1-git-send-email-paolo.valente@linaro.org>
+ <x49vb2h7kqb.fsf@segfault.boston.devel.redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ ulf.hansson@linaro.org, linus.walleij@linaro.org, broonie@kernel.org,
+ stable@vger.kernel.org
+From: Paolo <paolo.valente@linaro.org>
+Message-ID: <57567314.8000507@linaro.org>
+Date: Tue, 7 Jun 2016 09:09:08 +0200
+MIME-Version: 1.0
+In-Reply-To: <x49vb2h7kqb.fsf@segfault.boston.devel.redhat.com>
+Content-Type: text/plain; charset=iso-8859-15; format=flowed
+List-ID: <linux-block@vger.kernel.org>
 
-From: Mike Christie <mchristi@redhat.com>
+Jens,
+are you picking this fix?
 
-The block layer will set the correct READ/WRITE operation flags/fields
-when creating a request, so there is not need for drivers to set the
-REQ_WRITE flag.
+Thanks,
+Paolo
 
-Signed-off-by: Mike Christie <mchristi@redhat.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
----
- drivers/ide/ide-cd_ioctl.c | 3 ---
- 1 file changed, 3 deletions(-)
-
-diff --git a/drivers/ide/ide-cd_ioctl.c b/drivers/ide/ide-cd_ioctl.c
-index 474173e..5887a7a 100644
---- a/drivers/ide/ide-cd_ioctl.c
-+++ b/drivers/ide/ide-cd_ioctl.c
-@@ -459,9 +459,6 @@ int ide_cdrom_packet(struct cdrom_device_info *cdi,
- 	   layer. the packet must be complete, as we do not
- 	   touch it at all. */
- 
--	if (cgc->data_direction == CGC_DATA_WRITE)
--		flags |= REQ_WRITE;
--
- 	if (cgc->sense)
- 		memset(cgc->sense, 0, sizeof(struct request_sense));
- 
--- 
-2.7.2
-
+Il 13/05/2016 22:42, Jeff Moyer ha scritto:
+> Paolo Valente <paolo.valente@linaro.org> writes:
+>
+>> When a bio is cloned, the newly created bio must be associated with
+>> the same blkcg as the original bio (if BLK_CGROUP is enabled). If
+>> this operation is not performed, then the new bio is not associated
+>> with any group, and the group of the current task is returned when
+>> the group of the bio is requested.
+>>
+>> Depending on the cloning frequency, this may cause a large
+>> percentage of the bios belonging to a given group to be treated
+>> as if belonging to other groups (in most cases as if belonging to
+>> the root group). The expected group isolation may thereby be broken.
+>>
+>> This commit adds the missing association in bio-cloning functions.
+>>
+>> Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+>> Reviewed-by: Nikolay Borisov <kernel@kyup.com>
+>
+> I think this one's golden!  Thanks, Paolo!
+>
+> Reviewed-by: Jeff Moyer <jmoyer@redhat.com>
+>
+>
+>> ---
+>> Tejun: I didn't add also your Ack, just because this version is slightly
+>> different from the one you acked.
+>> ---
+>>   block/bio.c          | 15 +++++++++++++++
+>>   fs/btrfs/extent_io.c |  6 ------
+>>   include/linux/bio.h  |  3 +++
+>>   3 files changed, 18 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/block/bio.c b/block/bio.c
+>> index 807d25e..89f517c 100644
+>> --- a/block/bio.c
+>> +++ b/block/bio.c
+>> @@ -590,6 +590,8 @@ void __bio_clone_fast(struct bio *bio, struct bio *bio_src)
+>>   	bio->bi_rw = bio_src->bi_rw;
+>>   	bio->bi_iter = bio_src->bi_iter;
+>>   	bio->bi_io_vec = bio_src->bi_io_vec;
+>> +
+>> +	bio_clone_blkcg_association(bio, bio_src);
+>>   }
+>>   EXPORT_SYMBOL(__bio_clone_fast);
+>>
+>> @@ -695,6 +697,8 @@ integrity_clone:
+>>   		}
+>>   	}
+>>
+>> +	bio_clone_blkcg_association(bio, bio_src);
+>> +
+>>   	return bio;
+>>   }
+>>   EXPORT_SYMBOL(bio_clone_bioset);
+>> @@ -2016,6 +2020,17 @@ void bio_disassociate_task(struct bio *bio)
+>>   	}
+>>   }
+>>
+>> +/**
+>> + * bio_clone_blkcg_association - clone blkcg association from src to dst bio
+>> + * @dst: destination bio
+>> + * @src: source bio
+>> + */
+>> +void bio_clone_blkcg_association(struct bio *dst, struct bio *src)
+>> +{
+>> +	if (src->bi_css)
+>> +		WARN_ON(bio_associate_blkcg(dst, src->bi_css));
+>> +}
+>> +
+>>   #endif /* CONFIG_BLK_CGROUP */
+>>
+>>   static void __init biovec_init_slabs(void)
+>> diff --git a/fs/btrfs/extent_io.c b/fs/btrfs/extent_io.c
+>> index d247fc0..19f6739 100644
+>> --- a/fs/btrfs/extent_io.c
+>> +++ b/fs/btrfs/extent_io.c
+>> @@ -2686,12 +2686,6 @@ struct bio *btrfs_bio_clone(struct bio *bio, gfp_t gfp_mask)
+>>   		btrfs_bio->csum = NULL;
+>>   		btrfs_bio->csum_allocated = NULL;
+>>   		btrfs_bio->end_io = NULL;
+>> -
+>> -#ifdef CONFIG_BLK_CGROUP
+>> -		/* FIXME, put this into bio_clone_bioset */
+>> -		if (bio->bi_css)
+>> -			bio_associate_blkcg(new, bio->bi_css);
+>> -#endif
+>>   	}
+>>   	return new;
+>>   }
+>> diff --git a/include/linux/bio.h b/include/linux/bio.h
+>> index 6b7481f..16cbe59 100644
+>> --- a/include/linux/bio.h
+>> +++ b/include/linux/bio.h
+>> @@ -527,11 +527,14 @@ extern unsigned int bvec_nr_vecs(unsigned short idx);
+>>   int bio_associate_blkcg(struct bio *bio, struct cgroup_subsys_state *blkcg_css);
+>>   int bio_associate_current(struct bio *bio);
+>>   void bio_disassociate_task(struct bio *bio);
+>> +void bio_clone_blkcg_association(struct bio *dst, struct bio *src);
+>>   #else	/* CONFIG_BLK_CGROUP */
+>>   static inline int bio_associate_blkcg(struct bio *bio,
+>>   			struct cgroup_subsys_state *blkcg_css) { return 0; }
+>>   static inline int bio_associate_current(struct bio *bio) { return -ENOENT; }
+>>   static inline void bio_disassociate_task(struct bio *bio) { }
+>> +static inline void bio_clone_blkcg_association(struct bio *dst,
+>> +			struct bio *src) { return 0; }
+>>   #endif	/* CONFIG_BLK_CGROUP */
+>>
+>>   #ifdef CONFIG_HIGHMEM
