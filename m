@@ -1,261 +1,205 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f66.google.com ([74.125.82.66]:32857 "EHLO
-	mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753092AbcFFOqK (ORCPT
-	<rfc822;linux-block@vger.kernel.org>); Mon, 6 Jun 2016 10:46:10 -0400
-Received: by mail-wm0-f66.google.com with SMTP id c74so8854278wme.0
-        for <linux-block@vger.kernel.org>; Mon, 06 Jun 2016 07:46:10 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [RFC PATCH 1/6] nvme: refactor namespaces to support non-gendisk devices
-Date: Mon,  6 Jun 2016 16:45:58 +0200
-Message-Id: <1465224363-25797-2-git-send-email-m@bjorling.me>
-In-Reply-To: <1465224363-25797-1-git-send-email-m@bjorling.me>
-References: <1465224363-25797-1-git-send-email-m@bjorling.me>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <shaun@helios.aeonazure.com>
+From: Shaun Tancheff <shaun@tancheff.com>
+To: linux-ide@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org
+Cc: Shaun Tancheff <shaun@tancheff.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	"James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	Jeff Layton <jlayton@poochiereds.net>,
+	"J . Bruce Fields" <bfields@fieldses.org>,
+	Shaun Tancheff <shaun.tancheff@seagate.com>
+Subject: [PATCH v2 1/4] Losing bits on request.cmd_flags
+Date: Tue,  7 Jun 2016 15:02:29 -0500
+Message-Id: <1465329752-9262-2-git-send-email-shaun@tancheff.com>
+In-Reply-To: <1465329752-9262-1-git-send-email-shaun@tancheff.com>
+References: <1465329752-9262-1-git-send-email-shaun@tancheff.com>
+List-ID: <linux-block@vger.kernel.org>
 
-With LightNVM enabled namespaces, the gendisk structure is not exposed
-to the user. This prevents LightNVM users from accessing the NVMe device
-driver specific sysfs entries, and LightNVM namespace geometry.
+In a few places a temporary value smaller than a cmd_flags
+is used to test for bits and or build up a new cmd_flags.
 
-Refactor the revalidation process, so that a namespace, instead of a
-gendisk, is revalidated. This later allows patches to wire up the sysfs
-entries up to a non-gendisk namespace.
+Change to use explict u64 values where appropriate.
 
-Signed-off-by: Matias Bjørling <m@bjorling.me>
+This patch is place holder for: Mike Christie's separate operations ... series
+https://lkml.kernel.org/r/1465155145-10812-1-git-send-email-mchristi@redhat.com
+
+Once Mike's patches are stablized this patch can be dropped.
+
+Signed-off-by: Shaun Tancheff <shaun.tancheff@seagate.com>
 ---
- drivers/nvme/host/core.c | 134 +++++++++++++++++++++++++++++------------------
- drivers/nvme/host/nvme.h |  16 +++++-
- 2 files changed, 96 insertions(+), 54 deletions(-)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 643f457..f488729 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -601,42 +601,33 @@ static void nvme_config_discard(struct nvme_ns *ns)
- 	queue_flag_set_unlocked(QUEUE_FLAG_DISCARD, ns->queue);
+v2:
+ - Fixed commit message
+
+ block/blk-core.c         | 17 ++++++++++-------
+ block/blk-merge.c        |  2 +-
+ block/blk-mq.c           |  2 +-
+ block/cfq-iosched.c      |  2 +-
+ block/elevator.c         |  4 ++--
+ include/linux/elevator.h |  4 ++--
+ 6 files changed, 17 insertions(+), 14 deletions(-)
+
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 2475b1c7..945e564 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -959,7 +959,7 @@ static void __freed_request(struct request_list *rl, int sync)
+  * A request has just been released.  Account for it, update the full and
+  * congestion status, wake up any waiters.   Called under q->queue_lock.
+  */
+-static void freed_request(struct request_list *rl, unsigned int flags)
++static void freed_request(struct request_list *rl, u64 flags)
+ {
+ 	struct request_queue *q = rl->q;
+ 	int sync = rw_is_sync(flags);
+@@ -1054,7 +1054,7 @@ static struct io_context *rq_ioc(struct bio *bio)
+ /**
+  * __get_request - get a free request
+  * @rl: request list to allocate from
+- * @rw_flags: RW and SYNC flags
++ * @rw: RW and SYNC flags
+  * @bio: bio to allocate request for (can be %NULL)
+  * @gfp_mask: allocation mask
+  *
+@@ -1065,7 +1065,7 @@ static struct io_context *rq_ioc(struct bio *bio)
+  * Returns ERR_PTR on failure, with @q->queue_lock held.
+  * Returns request pointer on success, with @q->queue_lock *not held*.
+  */
+-static struct request *__get_request(struct request_list *rl, int rw_flags,
++static struct request *__get_request(struct request_list *rl, unsigned long rw,
+ 				     struct bio *bio, gfp_t gfp_mask)
+ {
+ 	struct request_queue *q = rl->q;
+@@ -1073,6 +1073,7 @@ static struct request *__get_request(struct request_list *rl, int rw_flags,
+ 	struct elevator_type *et = q->elevator->type;
+ 	struct io_context *ioc = rq_ioc(bio);
+ 	struct io_cq *icq = NULL;
++	u64 rw_flags = rw;
+ 	const bool is_sync = rw_is_sync(rw_flags) != 0;
+ 	int may_queue;
+ 
+@@ -1237,7 +1238,8 @@ rq_starved:
+  * Returns ERR_PTR on failure, with @q->queue_lock held.
+  * Returns request pointer on success, with @q->queue_lock *not held*.
+  */
+-static struct request *get_request(struct request_queue *q, int rw_flags,
++static struct request *get_request(struct request_queue *q,
++				   unsigned long rw_flags,
+ 				   struct bio *bio, gfp_t gfp_mask)
+ {
+ 	const bool is_sync = rw_is_sync(rw_flags) != 0;
+@@ -1490,7 +1492,7 @@ void __blk_put_request(struct request_queue *q, struct request *req)
+ 	 * it didn't come out of our reserved rq pools
+ 	 */
+ 	if (req->cmd_flags & REQ_ALLOCED) {
+-		unsigned int flags = req->cmd_flags;
++		u64 flags = req->cmd_flags;
+ 		struct request_list *rl = blk_rq_rl(req);
+ 
+ 		BUG_ON(!list_empty(&req->queuelist));
+@@ -1712,7 +1714,8 @@ static blk_qc_t blk_queue_bio(struct request_queue *q, struct bio *bio)
+ {
+ 	const bool sync = !!(bio->bi_rw & REQ_SYNC);
+ 	struct blk_plug *plug;
+-	int el_ret, rw_flags, where = ELEVATOR_INSERT_SORT;
++	u64 rw_flags;
++	int el_ret, where = ELEVATOR_INSERT_SORT;
+ 	struct request *req;
+ 	unsigned int request_count = 0;
+ 
+@@ -2246,7 +2249,7 @@ EXPORT_SYMBOL_GPL(blk_insert_cloned_request);
+  */
+ unsigned int blk_rq_err_bytes(const struct request *rq)
+ {
+-	unsigned int ff = rq->cmd_flags & REQ_FAILFAST_MASK;
++	u64 ff = rq->cmd_flags & REQ_FAILFAST_MASK;
+ 	unsigned int bytes = 0;
+ 	struct bio *bio;
+ 
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index 2613531..fec37e1 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -604,7 +604,7 @@ static int ll_merge_requests_fn(struct request_queue *q, struct request *req,
+  */
+ void blk_rq_set_mixed_merge(struct request *rq)
+ {
+-	unsigned int ff = rq->cmd_flags & REQ_FAILFAST_MASK;
++	u64 ff = rq->cmd_flags & REQ_FAILFAST_MASK;
+ 	struct bio *bio;
+ 
+ 	if (rq->cmd_flags & REQ_MIXED_MERGE)
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 29cbc1b..db962bc 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -159,7 +159,7 @@ bool blk_mq_can_queue(struct blk_mq_hw_ctx *hctx)
+ EXPORT_SYMBOL(blk_mq_can_queue);
+ 
+ static void blk_mq_rq_ctx_init(struct request_queue *q, struct blk_mq_ctx *ctx,
+-			       struct request *rq, unsigned int rw_flags)
++			       struct request *rq, u64 rw_flags)
+ {
+ 	if (blk_queue_io_stat(q))
+ 		rw_flags |= REQ_IO_STAT;
+diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
+index 4a34978..2722345 100644
+--- a/block/cfq-iosched.c
++++ b/block/cfq-iosched.c
+@@ -4285,7 +4285,7 @@ static inline int __cfq_may_queue(struct cfq_queue *cfqq)
+ 	return ELV_MQUEUE_MAY;
  }
  
--static int nvme_revalidate_disk(struct gendisk *disk)
-+static int nvme_revalidate_ns(struct nvme_ns *ns, struct nvme_id_ns **id)
+-static int cfq_may_queue(struct request_queue *q, int rw)
++static int cfq_may_queue(struct request_queue *q, u64 rw)
  {
--	struct nvme_ns *ns = disk->private_data;
--	struct nvme_id_ns *id;
--	u8 lbaf, pi_type;
--	u16 old_ms;
--	unsigned short bs;
--
--	if (test_bit(NVME_NS_DEAD, &ns->flags)) {
--		set_capacity(disk, 0);
--		return -ENODEV;
--	}
--	if (nvme_identify_ns(ns->ctrl, ns->ns_id, &id)) {
-+	if (nvme_identify_ns(ns->ctrl, ns->ns_id, id)) {
- 		dev_warn(disk_to_dev(ns->disk), "%s: Identify failure\n",
- 				__func__);
- 		return -ENODEV;
- 	}
--	if (id->ncap == 0) {
--		kfree(id);
--		return -ENODEV;
--	}
+ 	struct cfq_data *cfqd = q->elevator->elevator_data;
+ 	struct task_struct *tsk = current;
+diff --git a/block/elevator.c b/block/elevator.c
+index c3555c9..7c0a59c 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -511,7 +511,7 @@ void elv_merge_requests(struct request_queue *q, struct request *rq,
+ 			     struct request *next)
+ {
+ 	struct elevator_queue *e = q->elevator;
+-	const int next_sorted = next->cmd_flags & REQ_SORTED;
++	const int next_sorted = !!(next->cmd_flags & REQ_SORTED);
  
--	if (nvme_nvm_ns_supported(ns, id) && ns->type != NVME_NS_LIGHTNVM) {
--		if (nvme_nvm_register(ns->queue, disk->disk_name)) {
--			dev_warn(disk_to_dev(ns->disk),
--				"%s: LightNVM init failure\n", __func__);
--			kfree(id);
--			return -ENODEV;
--		}
--		ns->type = NVME_NS_LIGHTNVM;
-+	if ((*id)->ncap == 0) {
-+		kfree(*id);
-+		return -ENODEV;
- 	}
- 
- 	if (ns->ctrl->vs >= NVME_VS(1, 1))
--		memcpy(ns->eui, id->eui64, sizeof(ns->eui));
-+		memcpy(ns->eui, (*id)->eui64, sizeof(ns->eui));
- 	if (ns->ctrl->vs >= NVME_VS(1, 2))
--		memcpy(ns->uuid, id->nguid, sizeof(ns->uuid));
-+		memcpy(ns->uuid, (*id)->nguid, sizeof(ns->uuid));
-+
-+	return 0;
-+}
-+
-+static void __nvme_revalidate_disk(struct gendisk *disk, struct nvme_id_ns *id)
-+{
-+	struct nvme_ns *ns = disk->private_data;
-+	u8 lbaf, pi_type;
-+	u16 old_ms;
-+	unsigned short bs;
- 
- 	old_ms = ns->ms;
- 	lbaf = id->flbas & NVME_NS_FLBAS_LBA_MASK;
-@@ -675,8 +666,26 @@ static int nvme_revalidate_disk(struct gendisk *disk)
- 	if (ns->ctrl->oncs & NVME_CTRL_ONCS_DSM)
- 		nvme_config_discard(ns);
- 	blk_mq_unfreeze_queue(disk->queue);
-+}
- 
-+static int nvme_revalidate_disk(struct gendisk *disk)
-+{
-+	struct nvme_ns *ns = disk->private_data;
-+	struct nvme_id_ns *id = NULL;
-+	int ret;
-+
-+	if (test_bit(NVME_NS_DEAD, &ns->flags)) {
-+		set_capacity(disk, 0);
-+		return -ENODEV;
-+	}
-+
-+	ret = nvme_revalidate_ns(ns, &id);
-+	if (ret)
-+		return ret;
-+
-+	__nvme_revalidate_disk(disk, id);
- 	kfree(id);
-+
- 	return 0;
+ 	if (next_sorted && e->type->ops.elevator_merge_req_fn)
+ 		e->type->ops.elevator_merge_req_fn(q, rq, next);
+@@ -717,7 +717,7 @@ void elv_put_request(struct request_queue *q, struct request *rq)
+ 		e->type->ops.elevator_put_req_fn(rq);
  }
  
-@@ -1228,6 +1237,8 @@ static void nvme_alloc_ns(struct nvme_ctrl *ctrl, unsigned nsid)
+-int elv_may_queue(struct request_queue *q, int rw)
++int elv_may_queue(struct request_queue *q, u64 rw)
  {
- 	struct nvme_ns *ns;
- 	struct gendisk *disk;
-+	struct nvme_id_ns *id;
-+	char disk_name[DISK_NAME_LEN];
- 	int node = dev_to_node(ctrl->dev);
+ 	struct elevator_queue *e = q->elevator;
  
- 	lockdep_assert_held(&ctrl->namespaces_mutex);
-@@ -1247,44 +1258,63 @@ static void nvme_alloc_ns(struct nvme_ctrl *ctrl, unsigned nsid)
- 	ns->queue->queuedata = ns;
- 	ns->ctrl = ctrl;
+diff --git a/include/linux/elevator.h b/include/linux/elevator.h
+index 638b324..a06cca4 100644
+--- a/include/linux/elevator.h
++++ b/include/linux/elevator.h
+@@ -26,7 +26,7 @@ typedef int (elevator_dispatch_fn) (struct request_queue *, int);
+ typedef void (elevator_add_req_fn) (struct request_queue *, struct request *);
+ typedef struct request *(elevator_request_list_fn) (struct request_queue *, struct request *);
+ typedef void (elevator_completed_req_fn) (struct request_queue *, struct request *);
+-typedef int (elevator_may_queue_fn) (struct request_queue *, int);
++typedef int (elevator_may_queue_fn) (struct request_queue *, u64);
  
--	disk = alloc_disk_node(0, node);
--	if (!disk)
--		goto out_free_queue;
--
- 	kref_init(&ns->kref);
- 	ns->ns_id = nsid;
--	ns->disk = disk;
- 	ns->lba_shift = 9; /* set to a default value for 512 until disk is validated */
- 
--
- 	blk_queue_logical_block_size(ns->queue, 1 << ns->lba_shift);
- 	nvme_set_queue_limits(ctrl, ns->queue);
- 
--	disk->major = nvme_major;
--	disk->first_minor = 0;
--	disk->fops = &nvme_fops;
--	disk->private_data = ns;
--	disk->queue = ns->queue;
--	disk->driverfs_dev = ctrl->device;
--	disk->flags = GENHD_FL_EXT_DEVT;
--	sprintf(disk->disk_name, "nvme%dn%d", ctrl->instance, ns->instance);
--
--	if (nvme_revalidate_disk(ns->disk))
--		goto out_free_disk;
-+	if (nvme_revalidate_ns(ns, &id))
-+		goto out_free_queue;
-+
-+	sprintf(disk_name, "nvme%dn%d", ctrl->instance, ns->instance);
-+
-+	if (nvme_nvm_ns_supported(ns, id)) {
-+		if (nvme_nvm_register(ns->queue, disk_name)) {
-+			dev_warn(ctrl->dev,
-+				"%s: LightNVM init failure\n", __func__);
-+			goto out_free_id;
-+		}
-+
-+		disk = alloc_disk_node(0, node);
-+		if (!disk)
-+			goto out_free_id;
-+		memcpy(disk->disk_name, disk_name, DISK_NAME_LEN);
-+		ns->disk = disk;
-+		ns->type = NVME_NS_LIGHTNVM;
-+	} else {
-+		disk = alloc_disk_node(0, node);
-+		if (!disk)
-+			goto out_free_id;
-+
-+		disk->major = nvme_major;
-+		disk->first_minor = 0;
-+		disk->fops = &nvme_fops;
-+		disk->private_data = ns;
-+		disk->queue = ns->queue;
-+		disk->driverfs_dev = ctrl->device;
-+		disk->flags = GENHD_FL_EXT_DEVT;
-+		memcpy(disk->disk_name, disk_name, DISK_NAME_LEN);
-+		ns->disk = disk;
-+
-+		__nvme_revalidate_disk(disk, id);
-+
-+		add_disk(ns->disk);
-+
-+		if (sysfs_create_group(&disk_to_dev(ns->disk)->kobj,
-+							&nvme_ns_attr_group))
-+			pr_warn("%s: failed to create sysfs group for identification\n",
-+				ns->disk->disk_name);
-+	}
- 
- 	list_add_tail(&ns->list, &ctrl->namespaces);
- 	kref_get(&ctrl->kref);
--	if (ns->type == NVME_NS_LIGHTNVM)
--		return;
- 
--	add_disk(ns->disk);
--	if (sysfs_create_group(&disk_to_dev(ns->disk)->kobj,
--					&nvme_ns_attr_group))
--		pr_warn("%s: failed to create sysfs group for identification\n",
--			ns->disk->disk_name);
-+	kfree(id);
- 	return;
-- out_free_disk:
--	kfree(disk);
-+ out_free_id:
-+	kfree(id);
-  out_free_queue:
- 	blk_cleanup_queue(ns->queue);
-  out_release_instance:
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index f846da4..0d0c81d 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -291,8 +291,16 @@ int nvme_sg_get_version_num(int __user *ip);
- 
- #ifdef CONFIG_NVM
- int nvme_nvm_ns_supported(struct nvme_ns *ns, struct nvme_id_ns *id);
--int nvme_nvm_register(struct request_queue *q, char *disk_name);
--void nvme_nvm_unregister(struct request_queue *q, char *disk_name);
-+int nvme_nvm_register(struct nvme_ns *ns, char *disk_name, int node);
-+void nvme_nvm_unregister(struct nvme_ns *ns);
-+
-+static inline struct nvme_ns *nvme_get_ns_from_dev(struct device *dev)
-+{
-+	if (dev->type->devnode)
-+		return dev_to_disk(dev)->private_data;
-+
-+	return (container_of(dev, struct nvm_dev, dev))->private_data;
-+}
- #else
- static inline int nvme_nvm_register(struct request_queue *q, char *disk_name)
- {
-@@ -305,6 +313,10 @@ static inline int nvme_nvm_ns_supported(struct nvme_ns *ns, struct nvme_id_ns *i
- {
- 	return 0;
- }
-+static inline struct nvme_ns *nvme_get_ns_from_dev(struct device *dev)
-+{
-+	return dev_to_disk(dev)->private_data;
-+}
- #endif /* CONFIG_NVM */
- 
- int __init nvme_core_init(void);
+ typedef void (elevator_init_icq_fn) (struct io_cq *);
+ typedef void (elevator_exit_icq_fn) (struct io_cq *);
+@@ -134,7 +134,7 @@ extern struct request *elv_former_request(struct request_queue *, struct request
+ extern struct request *elv_latter_request(struct request_queue *, struct request *);
+ extern int elv_register_queue(struct request_queue *q);
+ extern void elv_unregister_queue(struct request_queue *q);
+-extern int elv_may_queue(struct request_queue *, int);
++extern int elv_may_queue(struct request_queue *, u64);
+ extern void elv_completed_request(struct request_queue *, struct request *);
+ extern int elv_set_request(struct request_queue *q, struct request *rq,
+ 			   struct bio *bio, gfp_t gfp_mask);
 -- 
-2.1.4
-
+2.8.1
