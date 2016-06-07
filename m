@@ -1,71 +1,63 @@
-Return-Path: <shaun@helios.aeonazure.com>
-From: Shaun Tancheff <shaun@tancheff.com>
-To: linux-ide@vger.kernel.org,
+Return-Path: <baolin.wang@linaro.org>
+Return-Path: <baolin.wang@linaro.org>
+From: Baolin Wang <baolin.wang@linaro.org>
+To: axboe@kernel.dk,
+	agk@redhat.com,
+	snitzer@redhat.com,
+	dm-devel@redhat.com,
+	herbert@gondor.apana.org.au,
+	davem@davemloft.net
+Cc: ebiggers3@gmail.com,
+	js1304@gmail.com,
+	tadeusz.struk@intel.com,
+	smueller@chronox.de,
+	standby24x7@gmail.com,
+	shli@kernel.org,
+	dan.j.williams@intel.com,
+	martin.petersen@oracle.com,
+	sagig@mellanox.com,
+	kent.overstreet@gmail.com,
+	keith.busch@intel.com,
+	tj@kernel.org,
+	ming.lei@canonical.com,
+	broonie@kernel.org,
+	arnd@arndb.de,
+	linux-crypto@vger.kernel.org,
 	linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org
-Cc: Shaun Tancheff <shaun@tancheff.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	"James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Jeff Layton <jlayton@poochiereds.net>,
-	"J. Bruce Fields" <bfields@fieldses.org>
-Subject: [PATCH 0/4] Block layer support ZAC/ZBC commands
-Date: Mon,  6 Jun 2016 10:39:27 -0500
-Message-Id: <1465227572-27149-1-git-send-email-shaun@tancheff.com>
+	linux-raid@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	baolin.wang@linaro.org
+Subject: [RFC v4 4/4] crypto: Add the CRYPTO_ALG_BULK flag for ecb(aes) cipher
+Date: Tue,  7 Jun 2016 20:17:07 +0800
+Message-Id: <1c7f3a872ce0382add0d5fc88b797eb3c2ab37f5.1465301616.git.baolin.wang@linaro.org>
+In-Reply-To: <cover.1465301616.git.baolin.wang@linaro.org>
+References: <cover.1465301616.git.baolin.wang@linaro.org>
+In-Reply-To: <cover.1465301616.git.baolin.wang@linaro.org>
+References: <cover.1465301616.git.baolin.wang@linaro.org>
 List-ID: <linux-block@vger.kernel.org>
 
-As Host Aware drives are becoming available we would like to be able
-to make use of such drives. This series is also intended to be suitable
-for use by Host Managed drives.
+Since the ecb(aes) cipher does not need to handle the IV things for encryption
+or decryption, that means it can support for bulk block when handling data.
+Thus this patch adds the CRYPTO_ALG_BULK flag for ecb(aes) cipher to improve
+the hardware aes engine's efficiency.
 
-ZAC/ZBC drives add new commands for discovering and working with Zones.
+Signed-off-by: Baolin Wang <baolin.wang@linaro.org>
+---
+ drivers/crypto/omap-aes.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-This extends the ZAC/ZBC support up to the block layer.
-
-Thie first patch in the series is a place-holder for Mike Christi's 
-separate operations from flags ...
-https://lkml.kernel.org/r/1460716802-2294-1-git-send-email-mchristi@redhat.com
-Once that work is completed the first patch can be dropped.
-
-Patches for util-linux can be found here:
-https://github.com/Seagate/ZDM-Device-Mapper/tree/master/patches/util-linux
-
-Using BIOs to issue ZBC commands allows DM targets (such as ZDM) or
-file-systems such as btrfs or nilfs2 to extend their block allocation 
-schemes and issue discards that are zone aware.
-
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: Jeff Layton <jlayton@poochiereds.net>
-Cc: "J. Bruce Fields" <bfields@fieldses.org>
-
-Shaun Tancheff (4):
-  Losing bits on request.cmd_flags
-  Add bio/request flags for using ZBC/ZAC commands
-  dd ioctl to issue ZBC/ZAC commands via block layer
-  Add ata pass-through path for ZAC commands.
-
- MAINTAINERS                       |   9 ++
- block/blk-core.c                  |  17 +--
- block/blk-lib.c                   |  96 +++++++++++++++++
- block/blk-merge.c                 |   2 +-
- block/blk-mq.c                    |   2 +-
- block/cfq-iosched.c               |   2 +-
- block/elevator.c                  |   4 +-
- block/ioctl.c                     | 142 ++++++++++++++++++++++++
- drivers/scsi/sd.c                 | 142 +++++++++++++++++++++++-
- drivers/scsi/sd.h                 |   1 +
- include/linux/ata.h               |  15 +++
- include/linux/blk_types.h         |  19 +++-
- include/linux/blkzoned_api.h      |  25 +++++
- include/linux/elevator.h          |   4 +-
- include/uapi/linux/Kbuild         |   1 +
- include/uapi/linux/blkzoned_api.h | 221 ++++++++++++++++++++++++++++++++++++++
- include/uapi/linux/fs.h           |   1 +
- 17 files changed, 683 insertions(+), 20 deletions(-)
- create mode 100644 include/linux/blkzoned_api.h
- create mode 100644 include/uapi/linux/blkzoned_api.h
-
+diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
+index ce174d3..ab09429 100644
+--- a/drivers/crypto/omap-aes.c
++++ b/drivers/crypto/omap-aes.c
+@@ -804,7 +804,7 @@ static struct crypto_alg algs_ecb_cbc[] = {
+ 	.cra_priority		= 300,
+ 	.cra_flags		= CRYPTO_ALG_TYPE_ABLKCIPHER |
+ 				  CRYPTO_ALG_KERN_DRIVER_ONLY |
+-				  CRYPTO_ALG_ASYNC,
++				  CRYPTO_ALG_ASYNC | CRYPTO_ALG_BULK,
+ 	.cra_blocksize		= AES_BLOCK_SIZE,
+ 	.cra_ctxsize		= sizeof(struct omap_aes_ctx),
+ 	.cra_alignmask		= 0,
 -- 
-2.8.1
+1.7.9.5
