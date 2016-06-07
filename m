@@ -1,186 +1,116 @@
-Return-Path: <BATV+a67a43e55467fd1c3dfd+4677+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: mst@redhat.com,
-	ooo@electrozaur.com,
-	bhalevy@primarydata.com,
-	nab@linux-iscsi.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH 5/7] target: stop using blk_make_request
-Date: Mon, 13 Jun 2016 17:21:16 +0200
-Message-Id: <1465831278-23653-6-git-send-email-hch@lst.de>
-In-Reply-To: <1465831278-23653-1-git-send-email-hch@lst.de>
-References: <1465831278-23653-1-git-send-email-hch@lst.de>
+Return-Path: <sagi@lightbitslabs.com>
+Return-Path: <sagi@lightbitslabs.com>
+Subject: Re: [PATCH 3/5] nvme-rdma.h: Add includes for nvme rdma_cm
+ negotiation
+To: Christoph Hellwig <hch@lst.de>, axboe@kernel.dk, keith.busch@intel.com
+References: <1465248215-18186-1-git-send-email-hch@lst.de>
+ <1465248215-18186-4-git-send-email-hch@lst.de>
+Cc: linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Jay Freyensee <james.p.freyensee@intel.com>,
+ Ming Lin <ming.l@ssi.samsung.com>,
+ "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
+From: Sagi Grimberg <sagi@lightbits.io>
+Message-ID: <5756B73E.4050907@lightbits.io>
+Date: Tue, 7 Jun 2016 14:59:58 +0300
+MIME-Version: 1.0
+In-Reply-To: <1465248215-18186-4-git-send-email-hch@lst.de>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-Using blk_rq_append_bio allows to append the bios to the request
-directly instead of having to build up a list first, and also
-allows to have a single code path for requests with or without
-data attached to them.
+We forgot to CC Linux-rdma, CC'ing...
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/target/target_core_pscsi.c | 87 +++++++++++++++-----------------------
- 1 file changed, 34 insertions(+), 53 deletions(-)
-
-diff --git a/drivers/target/target_core_pscsi.c b/drivers/target/target_core_pscsi.c
-index 1f30179..93da16d 100644
---- a/drivers/target/target_core_pscsi.c
-+++ b/drivers/target/target_core_pscsi.c
-@@ -876,19 +876,19 @@ static inline struct bio *pscsi_get_bio(int nr_vecs)
- 
- static sense_reason_t
- pscsi_map_sg(struct se_cmd *cmd, struct scatterlist *sgl, u32 sgl_nents,
--		enum dma_data_direction data_direction, struct bio **hbio)
-+		struct request *req)
- {
- 	struct pscsi_dev_virt *pdv = PSCSI_DEV(cmd->se_dev);
--	struct bio *bio = NULL, *tbio = NULL;
-+	struct bio *bio = NULL;
- 	struct page *page;
- 	struct scatterlist *sg;
- 	u32 data_len = cmd->data_length, i, len, bytes, off;
- 	int nr_pages = (cmd->data_length + sgl[0].offset +
- 			PAGE_SIZE - 1) >> PAGE_SHIFT;
- 	int nr_vecs = 0, rc;
--	int rw = (data_direction == DMA_TO_DEVICE);
-+	int rw = (cmd->data_direction == DMA_TO_DEVICE);
- 
--	*hbio = NULL;
-+	BUG_ON(!cmd->data_length);
- 
- 	pr_debug("PSCSI: nr_pages: %d\n", nr_pages);
- 
-@@ -927,16 +927,6 @@ pscsi_map_sg(struct se_cmd *cmd, struct scatterlist *sgl, u32 sgl_nents,
- 				pr_debug("PSCSI: Allocated bio: %p,"
- 					" dir: %s nr_vecs: %d\n", bio,
- 					(rw) ? "rw" : "r", nr_vecs);
--				/*
--				 * Set *hbio pointer to handle the case:
--				 * nr_pages > BIO_MAX_PAGES, where additional
--				 * bios need to be added to complete a given
--				 * command.
--				 */
--				if (!*hbio)
--					*hbio = tbio = bio;
--				else
--					tbio = tbio->bi_next = bio;
- 			}
- 
- 			pr_debug("PSCSI: Calling bio_add_pc_page() i: %d"
-@@ -955,11 +945,16 @@ pscsi_map_sg(struct se_cmd *cmd, struct scatterlist *sgl, u32 sgl_nents,
- 				pr_debug("PSCSI: Reached bio->bi_vcnt max:"
- 					" %d i: %d bio: %p, allocating another"
- 					" bio\n", bio->bi_vcnt, i, bio);
-+
-+				rc = blk_rq_append_bio(req, bio);
-+				if (rc) {
-+					pr_err("pSCSI: failed to append bio\n");
-+					goto fail;
-+				}
-+
- 				/*
- 				 * Clear the pointer so that another bio will
--				 * be allocated with pscsi_get_bio() above, the
--				 * current bio has already been set *tbio and
--				 * bio->bi_next.
-+				 * be allocated with pscsi_get_bio() above.
- 				 */
- 				bio = NULL;
- 			}
-@@ -968,13 +963,16 @@ pscsi_map_sg(struct se_cmd *cmd, struct scatterlist *sgl, u32 sgl_nents,
- 		}
- 	}
- 
-+	if (bio) {
-+		rc = blk_rq_append_bio(req, bio);
-+		if (rc) {
-+			pr_err("pSCSI: failed to append bio\n");
-+			goto fail;
-+		}
-+	}
-+
- 	return 0;
- fail:
--	while (*hbio) {
--		bio = *hbio;
--		*hbio = (*hbio)->bi_next;
--		bio_endio(bio);
--	}
- 	return TCM_LOGICAL_UNIT_COMMUNICATION_FAILURE;
- }
- 
-@@ -992,11 +990,9 @@ pscsi_execute_cmd(struct se_cmd *cmd)
- {
- 	struct scatterlist *sgl = cmd->t_data_sg;
- 	u32 sgl_nents = cmd->t_data_nents;
--	enum dma_data_direction data_direction = cmd->data_direction;
- 	struct pscsi_dev_virt *pdv = PSCSI_DEV(cmd->se_dev);
- 	struct pscsi_plugin_task *pt;
- 	struct request *req;
--	struct bio *hbio;
- 	sense_reason_t ret;
- 
- 	/*
-@@ -1012,31 +1008,21 @@ pscsi_execute_cmd(struct se_cmd *cmd)
- 	memcpy(pt->pscsi_cdb, cmd->t_task_cdb,
- 		scsi_command_size(cmd->t_task_cdb));
- 
--	if (!sgl) {
--		req = blk_get_request(pdv->pdv_sd->request_queue,
--				(data_direction == DMA_TO_DEVICE),
--				GFP_KERNEL);
--		if (IS_ERR(req)) {
--			pr_err("PSCSI: blk_get_request() failed\n");
--			ret = TCM_LOGICAL_UNIT_COMMUNICATION_FAILURE;
--			goto fail;
--		}
-+	req = blk_get_request(pdv->pdv_sd->request_queue,
-+			(cmd->data_direction == DMA_TO_DEVICE),
-+			GFP_KERNEL);
-+	if (IS_ERR(req)) {
-+		pr_err("PSCSI: blk_get_request() failed\n");
-+		ret = TCM_LOGICAL_UNIT_COMMUNICATION_FAILURE;
-+		goto fail;
-+	}
- 
--		req->cmd_type = REQ_TYPE_BLOCK_PC;
--	} else {
--		BUG_ON(!cmd->data_length);
-+	req->cmd_type = REQ_TYPE_BLOCK_PC;
- 
--		ret = pscsi_map_sg(cmd, sgl, sgl_nents, data_direction, &hbio);
-+	if (sgl) {
-+		ret = pscsi_map_sg(cmd, sgl, sgl_nents, req);
- 		if (ret)
--			goto fail;
--
--		req = blk_make_request(pdv->pdv_sd->request_queue, hbio,
--				       GFP_KERNEL);
--		if (IS_ERR(req)) {
--			pr_err("pSCSI: blk_make_request() failed\n");
--			ret = TCM_LOGICAL_UNIT_COMMUNICATION_FAILURE;
--			goto fail_free_bio;
--		}
-+			goto fail_put_request;
- 	}
- 
- 	req->end_io = pscsi_req_done;
-@@ -1057,13 +1043,8 @@ pscsi_execute_cmd(struct se_cmd *cmd)
- 
- 	return 0;
- 
--fail_free_bio:
--	while (hbio) {
--		struct bio *bio = hbio;
--		hbio = hbio->bi_next;
--		bio_endio(bio);
--	}
--	ret = TCM_LOGICAL_UNIT_COMMUNICATION_FAILURE;
-+fail_put_request:
-+	blk_put_request(req);
- fail:
- 	kfree(pt);
- 	return ret;
--- 
-2.1.4
+On 07/06/16 00:23, Christoph Hellwig wrote:
+> From: Sagi Grimberg <sagi@grimberg.me>
+>
+> NVMe over Fabrics RDMA transport defines a connection establishment
+> protocol over the RDMA connection manager. This header will be used by
+> both the host and target drivers to negotiate the connection
+> establishment parameters.
+>
+> Signed-off-by: Jay Freyensee <james.p.freyensee@intel.com>
+> Signed-off-by: Ming Lin <ming.l@ssi.samsung.com>
+> Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>   include/linux/nvme-rdma.h | 71 +++++++++++++++++++++++++++++++++++++++++++++++
+>   1 file changed, 71 insertions(+)
+>   create mode 100644 include/linux/nvme-rdma.h
+>
+> diff --git a/include/linux/nvme-rdma.h b/include/linux/nvme-rdma.h
+> new file mode 100644
+> index 0000000..bf240a3
+> --- /dev/null
+> +++ b/include/linux/nvme-rdma.h
+> @@ -0,0 +1,71 @@
+> +/*
+> + * Copyright (c) 2015 Mellanox Technologies. All rights reserved.
+> + *
+> + * This program is free software; you can redistribute it and/or modify it
+> + * under the terms and conditions of the GNU General Public License,
+> + * version 2, as published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope it will be useful, but WITHOUT
+> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+> + * more details.
+> + */
+> +
+> +#ifndef _LINUX_NVME_RDMA_H
+> +#define _LINUX_NVME_RDMA_H
+> +
+> +enum nvme_rdma_cm_fmt {
+> +	NVME_RDMA_CM_FMT_1_0 = 0x0,
+> +};
+> +
+> +enum nvme_rdma_cm_status {
+> +	NVME_RDMA_CM_INVALID_LEN	= 0x01,
+> +	NVME_RDMA_CM_INVALID_RECFMT	= 0x02,
+> +	NVME_RDMA_CM_INVALID_QID	= 0x03,
+> +	NVME_RDMA_CM_INVALID_HSQSIZE	= 0x04,
+> +	NVME_RDMA_CM_INVALID_HRQSIZE	= 0x05,
+> +	NVME_RDMA_CM_NO_RSC		= 0x06,
+> +	NVME_RDMA_CM_INVALID_IRD	= 0x07,
+> +	NVME_RDMA_CM_INVALID_ORD	= 0x08,
+> +};
+> +
+> +/**
+> + * struct nvme_rdma_cm_req - rdma connect request
+> + *
+> + * @recfmt:        format of the RDMA Private Data
+> + * @qid:           queue Identifier for the Admin or I/O Queue
+> + * @hrqsize:       host receive queue size to be created
+> + * @hsqsize:       host send queue size to be created
+> + */
+> +struct nvme_rdma_cm_req {
+> +	__le16		recfmt;
+> +	__le16		qid;
+> +	__le16		hrqsize;
+> +	__le16		hsqsize;
+> +	u8		rsvd[24];
+> +};
+> +
+> +/**
+> + * struct nvme_rdma_cm_rep - rdma connect reply
+> + *
+> + * @recfmt:        format of the RDMA Private Data
+> + * @crqsize:       controller receive queue size
+> + */
+> +struct nvme_rdma_cm_rep {
+> +	__le16		recfmt;
+> +	__le16		crqsize;
+> +	u8		rsvd[28];
+> +};
+> +
+> +/**
+> + * struct nvme_rdma_cm_rej - rdma connect reject
+> + *
+> + * @recfmt:        format of the RDMA Private Data
+> + * @fsts:          error status for the associated connect request
+> + */
+> +struct nvme_rdma_cm_rej {
+> +	__le16		recfmt;
+> +	__le16		sts;
+> +};
+> +
+> +#endif /* _LINUX_NVME_RDMA_H */
+>
