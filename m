@@ -1,88 +1,63 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:24391 "EHLO mga02.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751667AbcFUUtT (ORCPT <rfc822;linux-block@vger.kernel.org>);
-	Tue, 21 Jun 2016 16:49:19 -0400
-Subject: [PATCH v4 5/5] block: remove ->driverfs_dev
-From: Dan Williams <dan.j.williams@intel.com>
-To: axboe@fb.com
-Cc: linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Ross Zwisler <ross.zwisler@linux.intel.com>, hch@lst.de
-Date: Tue, 21 Jun 2016 13:46:28 -0700
-Message-ID: <146654198805.34694.479574401248740417.stgit@dwillia2-desk3.amr.corp.intel.com>
-In-Reply-To: <146654196111.34694.7735150373057824399.stgit@dwillia2-desk3.amr.corp.intel.com>
-References: <146654196111.34694.7735150373057824399.stgit@dwillia2-desk3.amr.corp.intel.com>
+Received: from mx0b-00003501.pphosted.com ([67.231.152.68]:49197 "EHLO
+	mx0a-000cda01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1751973AbcFGPMC convert rfc822-to-8bit
+	(ORCPT <rfc822;linux-block@vger.kernel.org>);
+	Tue, 7 Jun 2016 11:12:02 -0400
+Received: from pps.filterd (m0075030.ppops.net [127.0.0.1])
+	by mx0b-00003501.pphosted.com (8.16.0.11/8.16.0.11) with SMTP id u57F9ic5004223
+	for <linux-block@vger.kernel.org>; Tue, 7 Jun 2016 11:11:59 -0400
+Received: from mail-qk0-f198.google.com (mail-qk0-f198.google.com [209.85.220.198])
+	by mx0b-00003501.pphosted.com with ESMTP id 23e0nvg0as-3
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <linux-block@vger.kernel.org>; Tue, 07 Jun 2016 11:11:59 -0400
+Received: by mail-qk0-f198.google.com with SMTP id t65so163830309qkh.3
+        for <linux-block@vger.kernel.org>; Tue, 07 Jun 2016 08:11:59 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20160607114039.urf62b6gqgxsrxuv@ws.net.home>
+References: <1465229095-27651-1-git-send-email-shaun@tancheff.com>
+ <20160607110534.lyhrwy2drpe6wbz7@ws.net.home> <20160607114039.urf62b6gqgxsrxuv@ws.net.home>
+From: Shaun Tancheff <shaun.tancheff@seagate.com>
+Date: Tue, 7 Jun 2016 10:11:39 -0500
+Message-ID: <CAJVOszAGyCQC6-GF-WoL01DTBHduORH8+a0sKwFy7ZhTn0wswQ@mail.gmail.com>
+Subject: Re: [PATCH] Zoned block device support
+To: Karel Zak <kzak@redhat.com>
+Cc: Shaun Tancheff <shaun@tancheff.com>, util-linux@vger.kernel.org,
+	linux-block@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Now that all drivers that specify a ->driverfs_dev have been converted
-to device_add_disk(), the pointer can be removed from struct gendisk.
+On Tue, Jun 7, 2016 at 6:40 AM, Karel Zak <kzak@redhat.com> wrote:
+> On Tue, Jun 07, 2016 at 01:05:34PM +0200, Karel Zak wrote:
+>> On Mon, Jun 06, 2016 at 11:04:54AM -0500, Shaun Tancheff wrote:
+>> > ZBC/ZAC compliant devices such as Host Aware drives are now available.
+>> >
+>> > This patch follows the pattern of blkdiscard to and zoned device
+>> > commands Open, Close and Reset as well as Report zones.
+>>
+>> What is difference between zone "reset" and blkdiscard(8)?
+>
+> Well, I read something more about SMR, it makes more sense now :-)
+>
+> Maybe you can explain all the zones concept in the man page to make it
+> more usable for end-users.
 
-Cc: Jens Axboe <axboe@fb.com>
-Cc: Ross Zwisler <ross.zwisler@linux.intel.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
-Signed-off-by: Dan Williams <dan.j.williams@intel.com>
----
- block/genhd.c         |    5 ++---
- drivers/nvdimm/bus.c  |    2 +-
- include/linux/genhd.h |    4 +---
- 3 files changed, 4 insertions(+), 7 deletions(-)
+Yes that would be good. I will update the man pages.
 
-diff --git a/block/genhd.c b/block/genhd.c
-index 932e70c113d0..a18d35390f1d 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -800,10 +800,9 @@ void __init printk_all_partitions(void)
- 			       , disk_name(disk, part->partno, name_buf),
- 			       part->info ? part->info->uuid : "");
- 			if (is_part0) {
--				if (disk->driverfs_dev != NULL &&
--				    disk->driverfs_dev->driver != NULL)
-+				if (dev->parent && dev->parent->driver)
- 					printk(" driver: %s\n",
--					      disk->driverfs_dev->driver->name);
-+					      dev->parent->driver->name);
- 				else
- 					printk(" (driver?)\n");
- 			} else
-diff --git a/drivers/nvdimm/bus.c b/drivers/nvdimm/bus.c
-index f085f8bceae8..5e4e5c772ea5 100644
---- a/drivers/nvdimm/bus.c
-+++ b/drivers/nvdimm/bus.c
-@@ -312,7 +312,7 @@ EXPORT_SYMBOL(__nd_driver_register);
- 
- int nvdimm_revalidate_disk(struct gendisk *disk)
- {
--	struct device *dev = disk->driverfs_dev;
-+	struct device *dev = disk_to_dev(disk)->parent;
- 	struct nd_region *nd_region = to_nd_region(dev->parent);
- 	const char *pol = nd_region->ro ? "only" : "write";
- 
-diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index df1dabbfd388..1dbf52f9c24b 100644
---- a/include/linux/genhd.h
-+++ b/include/linux/genhd.h
-@@ -205,7 +205,6 @@ struct gendisk {
- 	void *private_data;
- 
- 	int flags;
--	struct device *driverfs_dev;  // FIXME: remove
- 	struct kobject *slave_dir;
- 
- 	struct timer_rand_state *random;
-@@ -417,8 +416,7 @@ extern void part_round_stats(int cpu, struct hd_struct *part);
- extern void device_add_disk(struct device *parent, struct gendisk *disk);
- static inline void add_disk(struct gendisk *disk)
- {
--	/* temporary while we convert callers to device_add_disk */
--	device_add_disk(disk->driverfs_dev, disk);
-+	device_add_disk(NULL, disk);
- }
- 
- extern void del_gendisk(struct gendisk *gp);
+Thanks!
+>
+>     Karel
+>
+> --
+>  Karel Zak  <kzak@redhat.com>
+>  https://urldefense.proofpoint.com/v2/url?u=http-3A__karelzak.blogspot.com&d=CwIBAg&c=IGDlg0lD0b-nebmJJ0Kp8A&r=Wg5NqlNlVTT7Ugl8V50qIHLe856QW0qfG3WVYGOrWzA&m=RU2eUqouhMtoA5UFmcTyuV7sBBQKdrVNjwaWvP8bo7I&s=wAwv18Fm_nJYMAZ5ARznRUfvTkAX_YZEVuAu2O0w9OI&e=
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-block" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  https://urldefense.proofpoint.com/v2/url?u=http-3A__vger.kernel.org_majordomo-2Dinfo.html&d=CwIBAg&c=IGDlg0lD0b-nebmJJ0Kp8A&r=Wg5NqlNlVTT7Ugl8V50qIHLe856QW0qfG3WVYGOrWzA&m=RU2eUqouhMtoA5UFmcTyuV7sBBQKdrVNjwaWvP8bo7I&s=rLqg3KxoFebUGJrz0CS4wxG0BgLiF2wfqHu7U41opRI&e=
 
+
+
+-- 
+Shaun Tancheff
