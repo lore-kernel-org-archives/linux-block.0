@@ -1,25 +1,20 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH 0/2] linux-block for-next REQ_OP fixes
-To: mchristi@redhat.com, linux-ext4@vger.kernel.org,
- linux-block@vger.kernel.org
-References: <1465418981-7360-1-git-send-email-mchristi@redhat.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <5758877B.5060007@kernel.dk>
-Date: Wed, 8 Jun 2016 15:00:43 -0600
-MIME-Version: 1.0
-In-Reply-To: <1465418981-7360-1-git-send-email-mchristi@redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:36902 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1425274AbcFHUtq (ORCPT <rfc822;linux-block@vger.kernel.org>);
+	Wed, 8 Jun 2016 16:49:46 -0400
+From: mchristi@redhat.com
+To: linux-ext4@vger.kernel.org, linux-block@vger.kernel.org
+Subject: [PATCH 0/2] linux-block for-next REQ_OP fixes
+Date: Wed,  8 Jun 2016 15:49:39 -0500
+Message-Id: <1465418981-7360-1-git-send-email-mchristi@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On 06/08/2016 02:49 PM, mchristi@redhat.com wrote:
-> Hi Jens,
->
-> The following patches fix 2 issues from the REQ_OP patch
-> merge.
->
-> They were made over your for-next branch.
+Hi Jens,
 
-Added, thanks.
+The following patches fix 2 issues from the REQ_OP patch
+merge.
 
--- 
-Jens Axboe
+They were made over your for-next branch.
+
