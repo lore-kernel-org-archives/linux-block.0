@@ -1,353 +1,146 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f67.google.com ([74.125.82.67]:32882 "EHLO
-	mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753137AbcFFOqM (ORCPT
-	<rfc822;linux-block@vger.kernel.org>); Mon, 6 Jun 2016 10:46:12 -0400
-Received: by mail-wm0-f67.google.com with SMTP id c74so8854603wme.0
-        for <linux-block@vger.kernel.org>; Mon, 06 Jun 2016 07:46:12 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [RFC PATCH 4/6] lightnvm: let drivers control the lifetime of nvm_dev
-Date: Mon,  6 Jun 2016 16:46:01 +0200
-Message-Id: <1465224363-25797-5-git-send-email-m@bjorling.me>
-In-Reply-To: <1465224363-25797-1-git-send-email-m@bjorling.me>
-References: <1465224363-25797-1-git-send-email-m@bjorling.me>
+Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:28694 "EHLO
+	mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751194AbcFHUvj (ORCPT
+	<rfc822;linux-block@vger.kernel.org>);
+	Wed, 8 Jun 2016 16:51:39 -0400
+From: Michael Callahan <michaelcallahan@fb.com>
+To: <linux-block@vger.kernel.org>
+CC: Michael Callahan <michaelcallahan@fb.com>, <axboe@fb.com>,
+	<coder.callahan@gmail.com>, <kernel-team@fb.com>
+Subject: [PATCH 0/4] block: Separating discards from writes in Linux IO statistics
+Date: Wed, 8 Jun 2016 16:50:51 -0400
+Message-ID: <cover.1464912896.git.michaelcallahan@fb.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-LightNVM does not currently expose the device driver sysfs specific
-entries to user-space, as the device driver skips the initialization of
-gendisk.
+This patch set separates block layer statistics for discards from
+writes.  Discards are currently bundled with writes in the
+various /sys/block/*/stat files as well as in /proc/diskstats.
+However discards are nearly always used to mark storage that is
+no longer in use.  There are many reasons having discard not
+counted with writes is useful:
 
-To enable a device driver sysfs entries to be exposed, we need a struct
-device to attach it to. To allow both the device driver and LightNVM to
-access the same struct device, we need the device driver to track the
-lifetime of the nvm_dev structure.
+1) For many non volatile memory devices it is just nice to know
+   that discards are enabled and working properly.
 
-This patch refactors the two users of LightNVM (NVMe and null_blk),
-enables them to allocate and free nvm_dev, and at last removes gendisk
-usage when a LightNVM device is used.
+2) Discards have different performance characteristics than
+   writes.  They are generally much faster and larger and bundling
+   them makes performance statistics less meaningful.
 
-Signed-off-by: Matias Bjørling <m@bjorling.me>
----
- drivers/block/null_blk.c     | 22 ++++++++++++++++++++--
- drivers/lightnvm/core.c      | 34 +++++++---------------------------
- drivers/nvme/host/core.c     | 34 ++++++++++++++--------------------
- drivers/nvme/host/lightnvm.c | 21 +++++++++++++++++----
- drivers/nvme/host/nvme.h     |  8 +++++---
- include/linux/lightnvm.h     | 15 +++++++++------
- 6 files changed, 72 insertions(+), 62 deletions(-)
+3) Discards are not writes in terms of tracking device lifetime.
+   If a device supports six device writes per day it is nice to know
+   how many writes have actually been written to the device as
+   discards do not count against that total.
 
-diff --git a/drivers/block/null_blk.c b/drivers/block/null_blk.c
-index 1ffbf4d..55b52d8 100644
---- a/drivers/block/null_blk.c
-+++ b/drivers/block/null_blk.c
-@@ -34,6 +34,7 @@ struct nullb {
- 	unsigned int index;
- 	struct request_queue *q;
- 	struct gendisk *disk;
-+	struct nvm_dev *ndev;
- 	struct blk_mq_tag_set tag_set;
- 	struct hrtimer timer;
- 	unsigned int queue_depth;
-@@ -550,12 +551,29 @@ static struct nvm_dev_ops null_lnvm_dev_ops = {
- 
- static int null_nvm_register(struct nullb *nullb)
- {
--	return nvm_register(nullb->q, nullb->disk_name, &null_lnvm_dev_ops);
-+	struct nvm_dev *dev;
-+	int rv;
-+
-+	dev = nvm_alloc_dev(0);
-+	if (!dev)
-+		return -ENOMEM;
-+
-+	dev->q = nullb->q;
-+	memcpy(dev->name, disk_name, DISK_NAME_LEN);
-+	dev->ops = &null_lnvm_dev_ops;
-+
-+	rv = nvm_register(dev);
-+	if (rv) {
-+		kfree(dev);
-+		return rv;
-+	}
-+	nullb->ndev = dev;
-+	return 0;
- }
- 
- static void null_nvm_unregister(struct nullb *nullb)
- {
--	nvm_unregister(nullb->disk_name);
-+	nvm_unregister(nullb->ndev);
- }
- #else
- static int null_nvm_register(struct nullb *nullb)
-diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-index 8a5c2b2..5736c59 100644
---- a/drivers/lightnvm/core.c
-+++ b/drivers/lightnvm/core.c
-@@ -655,23 +655,15 @@ static void nvm_exit(struct nvm_dev *dev)
- 	pr_info("nvm: successfully unloaded\n");
- }
- 
--int nvm_register(struct request_queue *q, char *disk_name,
--							struct nvm_dev_ops *ops)
-+struct nvm_dev *nvm_alloc_dev(int node)
-+{
-+	return kzalloc_node(sizeof(struct nvm_dev), GFP_KERNEL, node);
-+}
-+
-+int nvm_register(struct nvm_dev *dev)
- {
--	struct nvm_dev *dev;
- 	int ret;
- 
--	if (!ops->identity)
--		return -EINVAL;
--
--	dev = kzalloc(sizeof(struct nvm_dev), GFP_KERNEL);
--	if (!dev)
--		return -ENOMEM;
--
--	dev->q = q;
--	dev->ops = ops;
--	strncpy(dev->name, disk_name, DISK_NAME_LEN);
--
- 	ret = nvm_init(dev);
- 	if (ret)
- 		goto err_init;
-@@ -709,29 +701,17 @@ int nvm_register(struct request_queue *q, char *disk_name,
- 	return 0;
- err_init:
- 	kfree(dev->lun_map);
--	kfree(dev);
- 	return ret;
- }
- EXPORT_SYMBOL(nvm_register);
- 
--void nvm_unregister(char *disk_name)
-+void nvm_unregister(struct nvm_dev *dev)
- {
--	struct nvm_dev *dev;
--
- 	down_write(&nvm_lock);
--	dev = nvm_find_nvm_dev(disk_name);
--	if (!dev) {
--		pr_err("nvm: could not find device %s to unregister\n",
--								disk_name);
--		up_write(&nvm_lock);
--		return;
--	}
--
- 	list_del(&dev->devices);
- 	up_write(&nvm_lock);
- 
- 	nvm_exit(dev);
--	kfree(dev);
- }
- EXPORT_SYMBOL(nvm_unregister);
- 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index f488729..ff20f1c 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -62,12 +62,14 @@ static void nvme_free_ns(struct kref *kref)
- {
- 	struct nvme_ns *ns = container_of(kref, struct nvme_ns, kref);
- 
--	if (ns->type == NVME_NS_LIGHTNVM)
--		nvme_nvm_unregister(ns->queue, ns->disk->disk_name);
-+	if (ns->ndev)
-+		nvme_nvm_unregister(ns);
- 
--	spin_lock(&dev_list_lock);
--	ns->disk->private_data = NULL;
--	spin_unlock(&dev_list_lock);
-+	if (ns->disk) {
-+		spin_lock(&dev_list_lock);
-+		ns->disk->private_data = NULL;
-+		spin_unlock(&dev_list_lock);
-+	}
- 
- 	put_disk(ns->disk);
- 	ida_simple_remove(&ns->ctrl->ns_ida, ns->instance);
-@@ -604,8 +606,7 @@ static void nvme_config_discard(struct nvme_ns *ns)
- static int nvme_revalidate_ns(struct nvme_ns *ns, struct nvme_id_ns **id)
- {
- 	if (nvme_identify_ns(ns->ctrl, ns->ns_id, id)) {
--		dev_warn(disk_to_dev(ns->disk), "%s: Identify failure\n",
--				__func__);
-+		dev_warn(ns->ctrl->dev, "%s: Identify failure\n", __func__);
- 		return -ENODEV;
- 	}
- 
-@@ -1271,18 +1272,11 @@ static void nvme_alloc_ns(struct nvme_ctrl *ctrl, unsigned nsid)
- 	sprintf(disk_name, "nvme%dn%d", ctrl->instance, ns->instance);
- 
- 	if (nvme_nvm_ns_supported(ns, id)) {
--		if (nvme_nvm_register(ns->queue, disk_name)) {
--			dev_warn(ctrl->dev,
--				"%s: LightNVM init failure\n", __func__);
-+		if (nvme_nvm_register(ns, disk_name, node)) {
-+			dev_warn(ctrl->dev, "%s: LightNVM init failure\n",
-+								__func__);
- 			goto out_free_id;
- 		}
--
--		disk = alloc_disk_node(0, node);
--		if (!disk)
--			goto out_free_id;
--		memcpy(disk->disk_name, disk_name, DISK_NAME_LEN);
--		ns->disk = disk;
--		ns->type = NVME_NS_LIGHTNVM;
- 	} else {
- 		disk = alloc_disk_node(0, node);
- 		if (!disk)
-@@ -1328,7 +1322,7 @@ static void nvme_ns_remove(struct nvme_ns *ns)
- 	if (test_and_set_bit(NVME_NS_REMOVING, &ns->flags))
- 		return;
- 
--	if (ns->disk->flags & GENHD_FL_UP) {
-+	if (ns->disk && ns->disk->flags & GENHD_FL_UP) {
- 		if (blk_get_integrity(ns->disk))
- 			blk_integrity_unregister(ns->disk);
- 		sysfs_remove_group(&disk_to_dev(ns->disk)->kobj,
-@@ -1349,7 +1343,7 @@ static void nvme_validate_ns(struct nvme_ctrl *ctrl, unsigned nsid)
- 
- 	ns = nvme_find_ns(ctrl, nsid);
- 	if (ns) {
--		if (revalidate_disk(ns->disk))
-+		if (ns->disk && revalidate_disk(ns->disk))
- 			nvme_ns_remove(ns);
- 	} else
- 		nvme_alloc_ns(ctrl, nsid);
-@@ -1559,7 +1553,7 @@ void nvme_kill_queues(struct nvme_ctrl *ctrl)
- 		 * Revalidating a dead namespace sets capacity to 0. This will
- 		 * end buffered writers dirtying pages that can't be synced.
- 		 */
--		if (!test_and_set_bit(NVME_NS_DEAD, &ns->flags))
-+		if (ns->disk && !test_and_set_bit(NVME_NS_DEAD, &ns->flags))
- 			revalidate_disk(ns->disk);
- 
- 		blk_set_queue_dying(ns->queue);
-diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
-index a0af055..cd406c5 100644
---- a/drivers/nvme/host/lightnvm.c
-+++ b/drivers/nvme/host/lightnvm.c
-@@ -592,14 +592,27 @@ static struct nvm_dev_ops nvme_nvm_dev_ops = {
- 	.max_phys_sect		= 64,
- };
- 
--int nvme_nvm_register(struct request_queue *q, char *disk_name)
-+int nvme_nvm_register(struct nvme_ns *ns, char *disk_name, int node)
- {
--	return nvm_register(q, disk_name, &nvme_nvm_dev_ops);
-+	struct request_queue *q = ns->queue;
-+	struct nvm_dev *dev;
-+
-+	dev = nvm_alloc_dev(node);
-+	if (!dev)
-+		return -ENOMEM;
-+
-+	dev->q = q;
-+	memcpy(dev->name, disk_name, DISK_NAME_LEN);
-+	dev->ops = &nvme_nvm_dev_ops;
-+	ns->ndev = dev;
-+
-+	return nvm_register(dev);
- }
- 
--void nvme_nvm_unregister(struct request_queue *q, char *disk_name)
-+void nvme_nvm_unregister(struct nvme_ns *ns)
- {
--	nvm_unregister(disk_name);
-+	nvm_unregister(ns->ndev);
-+	kfree(ns->ndev);
- }
- 
- /* move to shared place when used in multiple places. */
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index 0d0c81d..d62c6fd 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -18,6 +18,7 @@
- #include <linux/pci.h>
- #include <linux/kref.h>
- #include <linux/blk-mq.h>
-+#include <linux/lightnvm.h>
- 
- enum {
- 	/*
-@@ -110,6 +111,7 @@ struct nvme_ns {
- 	struct nvme_ctrl *ctrl;
- 	struct request_queue *queue;
- 	struct gendisk *disk;
-+	struct nvm_dev *ndev;
- 	struct kref kref;
- 	int instance;
- 
-@@ -121,7 +123,6 @@ struct nvme_ns {
- 	u16 ms;
- 	bool ext;
- 	u8 pi_type;
--	int type;
- 	unsigned long flags;
- 
- #define NVME_NS_REMOVING 0
-@@ -302,12 +303,13 @@ static inline struct nvme_ns *nvme_get_ns_from_dev(struct device *dev)
- 	return (container_of(dev, struct nvm_dev, dev))->private_data;
- }
- #else
--static inline int nvme_nvm_register(struct request_queue *q, char *disk_name)
-+static inline int nvme_nvm_register(struct nvme_ns *ns, char *disk_name,
-+								int node)
- {
- 	return 0;
- }
- 
--static inline void nvme_nvm_unregister(struct request_queue *q, char *disk_name) {};
-+static inline void nvme_nvm_unregister(struct nvme_ns *ns) {};
- 
- static inline int nvme_nvm_ns_supported(struct nvme_ns *ns, struct nvme_id_ns *id)
- {
-diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
-index ba78b83..5afc263 100644
---- a/include/linux/lightnvm.h
-+++ b/include/linux/lightnvm.h
-@@ -524,9 +524,9 @@ extern struct nvm_block *nvm_get_blk(struct nvm_dev *, struct nvm_lun *,
- 								unsigned long);
- extern void nvm_put_blk(struct nvm_dev *, struct nvm_block *);
- 
--extern int nvm_register(struct request_queue *, char *,
--						struct nvm_dev_ops *);
--extern void nvm_unregister(char *);
-+extern struct nvm_dev *nvm_alloc_dev(int);
-+extern int nvm_register(struct nvm_dev *);
-+extern void nvm_unregister(struct nvm_dev *);
- 
- void nvm_mark_blk(struct nvm_dev *dev, struct ppa_addr ppa, int type);
- 
-@@ -575,11 +575,14 @@ extern int nvm_dev_factory(struct nvm_dev *, int flags);
- #else /* CONFIG_NVM */
- struct nvm_dev_ops;
- 
--static inline int nvm_register(struct request_queue *q, char *disk_name,
--							struct nvm_dev_ops *ops)
-+static inline struct nvm_dev *nvm_alloc_dev(int node)
-+{
-+	return ERR_PTR(-EINVAL);
-+}
-+static inline int nvm_register(struct nvm_dev *dev)
- {
- 	return -EINVAL;
- }
--static inline void nvm_unregister(char *disk_name) {}
-+static inline void nvm_unregister(struct nvm_dev *dev) {}
- #endif /* CONFIG_NVM */
- #endif /* LIGHTNVM.H */
+Separation of discard statistics is accomplished by expanding the
+struct diskstat arrays to 3 entries for STAT_READ, STAT_WRITE,
+and STAT_DISCARD.  A new rw_stat_group function is then used to
+convert from rw_flags (cmd_flags from requests, bi_rw from bios)
+into the appropriate stat group which is then tracked as before.
+Lastly the new statistics are appended to the current
+/sys/bloc/*/stat and /proc/diskstats on output such that they are
+the last four entries of each.  These are analogous to the four
+read and write statistics.
+
+ * Number of discard ios completed
+ * Number of discard ios merged
+ * Number of discard sectors completed
+ * Milliseconds spent on discard requests.
+
+[before ~]# cat sys/block/nvme0/stat
+296550701        0 2372405688 67317193 19672752        0 7972237312
+9375167        0  2787238 79718726
+
+[after ~]# cat sys/block/nvme0/stat
+296550701        0 2372405688 67317193 18034352        0 4616794112
+9125902        0  2787238 79718726  1638400        0 3355443200
+249265
+
+Note that the discards have moved out of the write fields to the
+end and that the write fields are now smaller by the difference.
+
+Adding the new statistics to the end of /sys/block/*/stat and
+/proc/diskstats is backwards compatible with both iostat and
+vmstat which pick up just the old fields:
+
+[root@after ~]# iostat -x
+Linux 4.5.0_68319_ge5065f4-dirty (##hostname###)        05/17/2016
+ _x86_64_        (48 CPU)
+
+avg-cpu:  %user   %nice %system %iowait  %steal   %idle
+           0.41    0.00    0.23    0.01    0.00   99.35
+
+Device:         rrqm/s   wrqm/s     r/s     w/s   rsec/s   wsec/s
+avgrq-sz avgqu-sz   await  svctm  %util
+sda               0.01     7.50    0.20    3.61    16.65   708.41
+190.03     0.09   22.53   1.16   0.44
+nvme0n1           0.00     0.00  587.03   35.70  4696.25  9139.08
+22.22     0.16    0.24   0.01   0.55
+
+
+[root@after ~]# vmstat -d
+disk- ------------reads------------ ------------writes----------- -----IO------
+       total merged sectors      ms  total merged sectors      ms    cur    sec
+ram0       0      0       0       0      0      0       0       0      0      0
+ram1       0      0       0       0      0      0       0       0      0      0
+ram2       0      0       0       0      0      0       0       0      0      0
+ram3       0      0       0       0      0      0       0       0      0      0
+ram4       0      0       0       0      0      0       0       0      0      0
+ram5       0      0       0       0      0      0       0       0      0      0
+ram6       0      0       0       0      0      0       0       0      0      0
+ram7       0      0       0       0      0      0       0       0      0      0
+ram8       0      0       0       0      0      0       0       0      0      0
+ram9       0      0       0       0      0      0       0       0      0      0
+ram10      0      0       0       0      0      0       0       0      0      0
+ram11      0      0       0       0      0      0       0       0      0      0
+ram12      0      0       0       0      0      0       0       0      0      0
+ram13      0      0       0       0      0      0       0       0      0      0
+ram14      0      0       0       0      0      0       0       0      0      0
+ram15      0      0       0       0      0      0       0       0      0      0
+sda   102903   5247 8408420   47424 1820306 3782041 357153613 43320121
+     0   2228
+nvme0n1 145633279      0 1165066312 18981333 13107200      0
+3355443200 6663655      0   1796
+loop0      0      0       0       0      0      0       0       0      0      0
+loop1      0      0       0       0      0      0       0       0      0      0
+  [chop rest of loop devices]
+
+Comments and suggestions welcome.
+
+Michael Callahan (4):
+  block: Add part_stat_read_accum to read across field entries.
+  block: Define and use STAT_READ and STAT_WRITE
+  block: Add and use a rw_stat_group function for indexing disk_stat
+    fields.
+  block: Track DISCARD statistics and output them in stat and diskstat.
+
+ Documentation/ABI/testing/procfs-diskstats | 10 ++++++++++
+ Documentation/block/stat.txt               | 28 ++++++++++++++++------------
+ Documentation/iostats.txt                  | 15 ++++++++++++++-
+ block/bio.c                                | 14 +++++++++-----
+ block/blk-core.c                           |  9 +++++----
+ block/genhd.c                              | 30 +++++++++++++++++++-----------
+ block/partition-generic.c                  | 25 +++++++++++++++----------
+ drivers/block/drbd/drbd_receiver.c         |  3 +--
+ drivers/block/drbd/drbd_req.c              |  4 ++--
+ drivers/block/drbd/drbd_worker.c           |  4 +---
+ drivers/block/rsxx/dev.c                   |  5 ++---
+ drivers/block/zram/zram_drv.c              | 14 +++++++-------
+ drivers/md/bcache/request.c                | 10 +++++-----
+ drivers/md/dm.c                            |  7 +++----
+ drivers/md/md.c                            |  8 ++++----
+ drivers/nvdimm/core.c                      |  8 +++++---
+ fs/ext4/super.c                            |  5 +++--
+ fs/ext4/sysfs.c                            |  6 ++++--
+ fs/f2fs/f2fs.h                             |  2 +-
+ fs/f2fs/super.c                            |  3 ++-
+ include/linux/bio.h                        |  4 ++--
+ include/linux/genhd.h                      | 24 ++++++++++++++++++++----
+ 22 files changed, 150 insertions(+), 88 deletions(-)
+
 -- 
-2.1.4
+1.9.3
 
