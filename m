@@ -1,97 +1,393 @@
-Return-Path: <jack@suse.cz>
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Jeff Moyer <jmoyer@redhat.com>,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH 2/3] cfq-iosched: Expose microsecond interfaces
-Date: Wed,  8 Jun 2016 15:11:38 +0200
-Message-Id: <1465391499-27867-3-git-send-email-jack@suse.cz>
-In-Reply-To: <1465391499-27867-1-git-send-email-jack@suse.cz>
-References: <1465391499-27867-1-git-send-email-jack@suse.cz>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:54228 "EHLO
+	mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751521AbcFHUvj (ORCPT
+	<rfc822;linux-block@vger.kernel.org>);
+	Wed, 8 Jun 2016 16:51:39 -0400
+From: Michael Callahan <michaelcallahan@fb.com>
+To: <linux-block@vger.kernel.org>
+CC: Michael Callahan <michaelcallahan@fb.com>, <axboe@fb.com>,
+	<coder.callahan@gmail.com>, <kernel-team@fb.com>
+Subject: [PATCH 3/4] block: Add and use a rw_stat_group function for indexing disk_stat fields.
+Date: Wed, 8 Jun 2016 16:50:54 -0400
+Message-ID: <8db0106162af25b2def9ca86cb0ca36565ec6dfc.1464912896.git.michaelcallahan@fb.com>
+In-Reply-To: <cover.1464912896.git.michaelcallahan@fb.com>
+References: <cover.1464912896.git.michaelcallahan@fb.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Jeff Moyer <jmoyer@redhat.com>
+Add and use a new rw_stat_group function for indexing partition stat
+fields rather than indexing them by rq_data_dir or bio_data_dir.  This
+function works similarly to rw_is_sync in that it takes the
+request::cmd_flags or bio::bi_rw flags and determines which stats should
+et updated.
 
-Expose interfaces to tune time slices of CFQ IO scheduler in
-microseconds.
+In addition the first parameter to generic_start_io_acct and
+generic_end_io_acct is now a stat group rather than simply a read or
+write bit.  STAT_READ and STAT_WRITE have been defined such that this
+is backwards compatible but callers who want to track new stats should
+be updated to pass the extended parameter.  This has been done by this
+patch for all current consumers of these two functions.
 
-Signed-off-by: Jeff Moyer <jmoyer@redhat.com>
-Signed-off-by: Jan Kara <jack@suse.cz>
+Note that the partition in_flight counts are not part of the per-cpu
+statistics and as such are not indexed via this function.  An additional
+stat_group_to_rw helper macro has been added to more cleanly handle that
+case.
+
+Signed-off-by: Michael Callahan <michaelcallahan@fb.com>
 ---
- block/cfq-iosched.c | 40 ++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 40 insertions(+)
+ block/bio.c                   | 14 +++++++++-----
+ block/blk-core.c              |  9 +++++----
+ drivers/block/drbd/drbd_req.c |  4 ++--
+ drivers/block/rsxx/dev.c      |  5 ++---
+ drivers/block/zram/zram_drv.c | 14 +++++++-------
+ drivers/md/bcache/request.c   | 10 +++++-----
+ drivers/md/dm.c               |  7 +++----
+ drivers/md/md.c               |  5 +++--
+ drivers/nvdimm/core.c         |  8 +++++---
+ include/linux/bio.h           |  4 ++--
+ include/linux/genhd.h         |  5 +++++
+ 11 files changed, 48 insertions(+), 37 deletions(-)
 
-diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
-index 228ff138a66b..afba86813f2a 100644
---- a/block/cfq-iosched.c
-+++ b/block/cfq-iosched.c
-@@ -4681,6 +4681,21 @@ SHOW_FUNCTION(cfq_low_latency_show, cfqd->cfq_latency, 0);
- SHOW_FUNCTION(cfq_target_latency_show, cfqd->cfq_target_latency, 1);
- #undef SHOW_FUNCTION
+diff --git a/block/bio.c b/block/bio.c
+index 0e4aa42..dca7b95 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1667,27 +1667,31 @@ void bio_check_pages_dirty(struct bio *bio)
+ 	}
+ }
  
-+#define USEC_SHOW_FUNCTION(__FUNC, __VAR)				\
-+static ssize_t __FUNC(struct elevator_queue *e, char *page)		\
-+{									\
-+	struct cfq_data *cfqd = e->elevator_data;			\
-+	u64 __data = __VAR;						\
-+	__data = div_u64(__data, NSEC_PER_USEC);			\
-+	return cfq_var_show(__data, (page));				\
+-void generic_start_io_acct(int rw, unsigned long sectors,
++void generic_start_io_acct(int rw_flags, unsigned long sectors,
+ 			   struct hd_struct *part)
+ {
++	const int sgrp = rw_stat_group(rw_flags);
++	const int rw = (rw_flags & REQ_WRITE) != 0;
+ 	int cpu = part_stat_lock();
+ 
+ 	part_round_stats(cpu, part);
+-	part_stat_inc(cpu, part, ios[rw]);
+-	part_stat_add(cpu, part, sectors[rw], sectors);
++	part_stat_inc(cpu, part, ios[sgrp]);
++	part_stat_add(cpu, part, sectors[sgrp], sectors);
+ 	part_inc_in_flight(part, rw);
+ 
+ 	part_stat_unlock();
+ }
+ EXPORT_SYMBOL(generic_start_io_acct);
+ 
+-void generic_end_io_acct(int rw, struct hd_struct *part,
++void generic_end_io_acct(int rw_flags, struct hd_struct *part,
+ 			 unsigned long start_time)
+ {
+ 	unsigned long duration = jiffies - start_time;
++	const int sgrp = rw_stat_group(rw_flags);
++	const int rw = (rw_flags & REQ_WRITE) != 0;
+ 	int cpu = part_stat_lock();
+ 
+-	part_stat_add(cpu, part, ticks[rw], duration);
++	part_stat_add(cpu, part, ticks[sgrp], duration);
+ 	part_round_stats(cpu, part);
+ 	part_dec_in_flight(part, rw);
+ 
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 2475b1c7..123bf60 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -2275,13 +2275,13 @@ EXPORT_SYMBOL_GPL(blk_rq_err_bytes);
+ void blk_account_io_completion(struct request *req, unsigned int bytes)
+ {
+ 	if (blk_do_io_stat(req)) {
+-		const int rw = rq_data_dir(req);
++		const int sgrp = rw_stat_group(req->cmd_flags);
+ 		struct hd_struct *part;
+ 		int cpu;
+ 
+ 		cpu = part_stat_lock();
+ 		part = req->part;
+-		part_stat_add(cpu, part, sectors[rw], bytes >> 9);
++		part_stat_add(cpu, part, sectors[sgrp], bytes >> 9);
+ 		part_stat_unlock();
+ 	}
+ }
+@@ -2295,6 +2295,7 @@ void blk_account_io_done(struct request *req)
+ 	 */
+ 	if (blk_do_io_stat(req) && !(req->cmd_flags & REQ_FLUSH_SEQ)) {
+ 		unsigned long duration = jiffies - req->start_time;
++		const int sgrp = rw_stat_group(req->cmd_flags);
+ 		const int rw = rq_data_dir(req);
+ 		struct hd_struct *part;
+ 		int cpu;
+@@ -2302,8 +2303,8 @@ void blk_account_io_done(struct request *req)
+ 		cpu = part_stat_lock();
+ 		part = req->part;
+ 
+-		part_stat_inc(cpu, part, ios[rw]);
+-		part_stat_add(cpu, part, ticks[rw], duration);
++		part_stat_inc(cpu, part, ios[sgrp]);
++		part_stat_add(cpu, part, ticks[sgrp], duration);
+ 		part_round_stats(cpu, part);
+ 		part_dec_in_flight(part, rw);
+ 
+diff --git a/drivers/block/drbd/drbd_req.c b/drivers/block/drbd/drbd_req.c
+index 2255dcf..6f31f67 100644
+--- a/drivers/block/drbd/drbd_req.c
++++ b/drivers/block/drbd/drbd_req.c
+@@ -36,14 +36,14 @@ static bool drbd_may_do_local_read(struct drbd_device *device, sector_t sector,
+ /* Update disk stats at start of I/O request */
+ static void _drbd_start_io_acct(struct drbd_device *device, struct drbd_request *req)
+ {
+-	generic_start_io_acct(bio_data_dir(req->master_bio), req->i.size >> 9,
++	generic_start_io_acct(req->master_bio->bi_rw, req->i.size >> 9,
+ 			      &device->vdisk->part0);
+ }
+ 
+ /* Update disk stats when completing request upwards */
+ static void _drbd_end_io_acct(struct drbd_device *device, struct drbd_request *req)
+ {
+-	generic_end_io_acct(bio_data_dir(req->master_bio),
++	generic_end_io_acct(req->master_bio->bi_rw,
+ 			    &device->vdisk->part0, req->start_jif);
+ }
+ 
+diff --git a/drivers/block/rsxx/dev.c b/drivers/block/rsxx/dev.c
+index e1b8b70..17ab33f 100644
+--- a/drivers/block/rsxx/dev.c
++++ b/drivers/block/rsxx/dev.c
+@@ -112,7 +112,7 @@ static const struct block_device_operations rsxx_fops = {
+ 
+ static void disk_stats_start(struct rsxx_cardinfo *card, struct bio *bio)
+ {
+-	generic_start_io_acct(bio_data_dir(bio), bio_sectors(bio),
++	generic_start_io_acct(bio->bi_rw, bio_sectors(bio),
+ 			     &card->gendisk->part0);
+ }
+ 
+@@ -120,8 +120,7 @@ static void disk_stats_complete(struct rsxx_cardinfo *card,
+ 				struct bio *bio,
+ 				unsigned long start_time)
+ {
+-	generic_end_io_acct(bio_data_dir(bio), &card->gendisk->part0,
+-			   start_time);
++	generic_end_io_acct(bio->bi_rw, &card->gendisk->part0, start_time);
+ }
+ 
+ static void bio_dma_done_cb(struct rsxx_cardinfo *card,
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index 8fcad8b..e7dd54b 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -835,12 +835,12 @@ static void zram_bio_discard(struct zram *zram, u32 index,
+ }
+ 
+ static int zram_bvec_rw(struct zram *zram, struct bio_vec *bvec, u32 index,
+-			int offset, int rw)
++			int offset, int rw, int rw_flags)
+ {
+ 	unsigned long start_time = jiffies;
+ 	int ret;
+ 
+-	generic_start_io_acct(rw, bvec->bv_len >> SECTOR_SHIFT,
++	generic_start_io_acct(rw_flags, bvec->bv_len >> SECTOR_SHIFT,
+ 			&zram->disk->part0);
+ 
+ 	if (rw == READ) {
+@@ -851,7 +851,7 @@ static int zram_bvec_rw(struct zram *zram, struct bio_vec *bvec, u32 index,
+ 		ret = zram_bvec_write(zram, bvec, index, offset);
+ 	}
+ 
+-	generic_end_io_acct(rw, &zram->disk->part0, start_time);
++	generic_end_io_acct(rw_flags, &zram->disk->part0, start_time);
+ 
+ 	if (unlikely(ret)) {
+ 		if (rw == READ)
+@@ -895,15 +895,15 @@ static void __zram_make_request(struct zram *zram, struct bio *bio)
+ 			bv.bv_len = max_transfer_size;
+ 			bv.bv_offset = bvec.bv_offset;
+ 
+-			if (zram_bvec_rw(zram, &bv, index, offset, rw) < 0)
++			if (zram_bvec_rw(zram, &bv, index, offset, rw, bio->bi_rw) < 0)
+ 				goto out;
+ 
+ 			bv.bv_len = bvec.bv_len - max_transfer_size;
+ 			bv.bv_offset += max_transfer_size;
+-			if (zram_bvec_rw(zram, &bv, index + 1, 0, rw) < 0)
++			if (zram_bvec_rw(zram, &bv, index + 1, 0, rw, bio->bi_rw) < 0)
+ 				goto out;
+ 		} else
+-			if (zram_bvec_rw(zram, &bvec, index, offset, rw) < 0)
++			if (zram_bvec_rw(zram, &bvec, index, offset, rw, bio->bi_rw) < 0)
+ 				goto out;
+ 
+ 		update_position(&index, &offset, &bvec);
+@@ -984,7 +984,7 @@ static int zram_rw_page(struct block_device *bdev, sector_t sector,
+ 	bv.bv_len = PAGE_SIZE;
+ 	bv.bv_offset = 0;
+ 
+-	err = zram_bvec_rw(zram, &bv, index, offset, rw);
++	err = zram_bvec_rw(zram, &bv, index, offset, rw, rw ? REQ_WRITE : 0);
+ put_zram:
+ 	zram_meta_put(zram);
+ out:
+diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
+index 25fa844..3319ce1 100644
+--- a/drivers/md/bcache/request.c
++++ b/drivers/md/bcache/request.c
+@@ -609,7 +609,7 @@ static void request_endio(struct bio *bio)
+ static void bio_complete(struct search *s)
+ {
+ 	if (s->orig_bio) {
+-		generic_end_io_acct(bio_data_dir(s->orig_bio),
++		generic_end_io_acct(s->orig_bio->bi_rw,
+ 				    &s->d->disk->part0, s->start_time);
+ 
+ 		trace_bcache_request_end(s->d, s->orig_bio);
+@@ -964,9 +964,9 @@ static blk_qc_t cached_dev_make_request(struct request_queue *q,
+ 	struct search *s;
+ 	struct bcache_device *d = bio->bi_bdev->bd_disk->private_data;
+ 	struct cached_dev *dc = container_of(d, struct cached_dev, disk);
+-	int rw = bio_data_dir(bio);
++	const int rw = bio_data_dir(bio);
+ 
+-	generic_start_io_acct(rw, bio_sectors(bio), &d->disk->part0);
++	generic_start_io_acct(bio->bi_rw, bio_sectors(bio), &d->disk->part0);
+ 
+ 	bio->bi_bdev = dc->bdev;
+ 	bio->bi_iter.bi_sector += dc->sb.data_offset;
+@@ -1079,9 +1079,9 @@ static blk_qc_t flash_dev_make_request(struct request_queue *q,
+ 	struct search *s;
+ 	struct closure *cl;
+ 	struct bcache_device *d = bio->bi_bdev->bd_disk->private_data;
+-	int rw = bio_data_dir(bio);
++	const int rw = bio_data_dir(bio);
+ 
+-	generic_start_io_acct(rw, bio_sectors(bio), &d->disk->part0);
++	generic_start_io_acct(bio->bi_rw, bio_sectors(bio), &d->disk->part0);
+ 
+ 	s = search_alloc(bio, d);
+ 	cl = &s->cl;
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index 1b2f962..883544a1 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -733,9 +733,9 @@ static void end_io_acct(struct dm_io *io)
+ 	struct bio *bio = io->bio;
+ 	unsigned long duration = jiffies - io->start_time;
+ 	int pending;
+-	int rw = bio_data_dir(bio);
++	const int rw = bio_data_dir(bio);
+ 
+-	generic_end_io_acct(rw, &dm_disk(md)->part0, io->start_time);
++	generic_end_io_acct(bio->bi_rw, &dm_disk(md)->part0, io->start_time);
+ 
+ 	if (unlikely(dm_stats_used(&md->stats)))
+ 		dm_stats_account_io(&md->stats, bio->bi_rw, bio->bi_iter.bi_sector,
+@@ -1818,14 +1818,13 @@ static void __split_and_process_bio(struct mapped_device *md,
+  */
+ static blk_qc_t dm_make_request(struct request_queue *q, struct bio *bio)
+ {
+-	int rw = bio_data_dir(bio);
+ 	struct mapped_device *md = q->queuedata;
+ 	int srcu_idx;
+ 	struct dm_table *map;
+ 
+ 	map = dm_get_live_table(md, &srcu_idx);
+ 
+-	generic_start_io_acct(rw, bio_sectors(bio), &dm_disk(md)->part0);
++	generic_start_io_acct(bio->bi_rw, bio_sectors(bio), &dm_disk(md)->part0);
+ 
+ 	/* if we're suspended, we have to queue this io for later */
+ 	if (unlikely(test_bit(DMF_BLOCK_IO_FOR_SUSPEND, &md->flags))) {
+diff --git a/drivers/md/md.c b/drivers/md/md.c
+index 38f819c..fcd85f5 100644
+--- a/drivers/md/md.c
++++ b/drivers/md/md.c
+@@ -245,6 +245,7 @@ static DEFINE_SPINLOCK(all_mddevs_lock);
+ static blk_qc_t md_make_request(struct request_queue *q, struct bio *bio)
+ {
+ 	const int rw = bio_data_dir(bio);
++	const int sgrp = rw_stat_group(bio->bi_rw);
+ 	struct mddev *mddev = q->queuedata;
+ 	unsigned int sectors;
+ 	int cpu;
+@@ -289,8 +290,8 @@ static blk_qc_t md_make_request(struct request_queue *q, struct bio *bio)
+ 	mddev->pers->make_request(mddev, bio);
+ 
+ 	cpu = part_stat_lock();
+-	part_stat_inc(cpu, &mddev->gendisk->part0, ios[rw]);
+-	part_stat_add(cpu, &mddev->gendisk->part0, sectors[rw], sectors);
++	part_stat_inc(cpu, &mddev->gendisk->part0, ios[sgrp]);
++	part_stat_add(cpu, &mddev->gendisk->part0, sectors[sgrp], sectors);
+ 	part_stat_unlock();
+ 
+ 	if (atomic_dec_and_test(&mddev->active_io) && mddev->suspended)
+diff --git a/drivers/nvdimm/core.c b/drivers/nvdimm/core.c
+index be89764..c1435a2 100644
+--- a/drivers/nvdimm/core.c
++++ b/drivers/nvdimm/core.c
+@@ -219,12 +219,13 @@ void __nd_iostat_start(struct bio *bio, unsigned long *start)
+ {
+ 	struct gendisk *disk = bio->bi_bdev->bd_disk;
+ 	const int rw = bio_data_dir(bio);
++	const int sgrp = rw_stat_group(bio->bi_rw);
+ 	int cpu = part_stat_lock();
+ 
+ 	*start = jiffies;
+ 	part_round_stats(cpu, &disk->part0);
+-	part_stat_inc(cpu, &disk->part0, ios[rw]);
+-	part_stat_add(cpu, &disk->part0, sectors[rw], bio_sectors(bio));
++	part_stat_inc(cpu, &disk->part0, ios[sgrp]);
++	part_stat_add(cpu, &disk->part0, sectors[sgrp], bio_sectors(bio));
+ 	part_inc_in_flight(&disk->part0, rw);
+ 	part_stat_unlock();
+ }
+@@ -234,10 +235,11 @@ void nd_iostat_end(struct bio *bio, unsigned long start)
+ {
+ 	struct gendisk *disk = bio->bi_bdev->bd_disk;
+ 	unsigned long duration = jiffies - start;
++	const int sgrp = rw_stat_group(bio->bi_rw);
+ 	const int rw = bio_data_dir(bio);
+ 	int cpu = part_stat_lock();
+ 
+-	part_stat_add(cpu, &disk->part0, ticks[rw], duration);
++	part_stat_add(cpu, &disk->part0, ticks[sgrp], duration);
+ 	part_round_stats(cpu, &disk->part0);
+ 	part_dec_in_flight(&disk->part0, rw);
+ 	part_stat_unlock();
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index 9faebf7..8bb1ca4 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -494,9 +494,9 @@ extern struct bio *bio_copy_kern(struct request_queue *, void *, unsigned int,
+ extern void bio_set_pages_dirty(struct bio *bio);
+ extern void bio_check_pages_dirty(struct bio *bio);
+ 
+-void generic_start_io_acct(int rw, unsigned long sectors,
++void generic_start_io_acct(int rw_flags, unsigned long sectors,
+ 			   struct hd_struct *part);
+-void generic_end_io_acct(int rw, struct hd_struct *part,
++void generic_end_io_acct(int rw_flags, struct hd_struct *part,
+ 			 unsigned long start_time);
+ 
+ #ifndef ARCH_IMPLEMENTS_FLUSH_DCACHE_PAGE
+diff --git a/include/linux/genhd.h b/include/linux/genhd.h
+index 17f1c09..b9250a3 100644
+--- a/include/linux/genhd.h
++++ b/include/linux/genhd.h
+@@ -417,6 +417,11 @@ static inline void free_part_info(struct hd_struct *part)
+ 	kfree(part->info);
+ }
+ 
++static inline int rw_stat_group(unsigned int rw_flags)
++{
++	return (rw_flags & REQ_WRITE) != 0;
 +}
-+USEC_SHOW_FUNCTION(cfq_slice_idle_us_show, cfqd->cfq_slice_idle);
-+USEC_SHOW_FUNCTION(cfq_group_idle_us_show, cfqd->cfq_group_idle);
-+USEC_SHOW_FUNCTION(cfq_slice_sync_us_show, cfqd->cfq_slice[1]);
-+USEC_SHOW_FUNCTION(cfq_slice_async_us_show, cfqd->cfq_slice[0]);
-+USEC_SHOW_FUNCTION(cfq_target_latency_us_show, cfqd->cfq_target_latency);
-+#undef USEC_SHOW_FUNCTION
 +
- #define STORE_FUNCTION(__FUNC, __PTR, MIN, MAX, __CONV)			\
- static ssize_t __FUNC(struct elevator_queue *e, const char *page, size_t count)	\
- {									\
-@@ -4715,6 +4730,26 @@ STORE_FUNCTION(cfq_low_latency_store, &cfqd->cfq_latency, 0, 1, 0);
- STORE_FUNCTION(cfq_target_latency_store, &cfqd->cfq_target_latency, 1, UINT_MAX, 1);
- #undef STORE_FUNCTION
- 
-+#define USEC_STORE_FUNCTION(__FUNC, __PTR, MIN, MAX)			\
-+static ssize_t __FUNC(struct elevator_queue *e, const char *page, size_t count)	\
-+{									\
-+	struct cfq_data *cfqd = e->elevator_data;			\
-+	unsigned int __data;						\
-+	int ret = cfq_var_store(&__data, (page), count);		\
-+	if (__data < (MIN))						\
-+		__data = (MIN);						\
-+	else if (__data > (MAX))					\
-+		__data = (MAX);						\
-+	*(__PTR) = (u64)__data * NSEC_PER_USEC;				\
-+	return ret;							\
-+}
-+USEC_STORE_FUNCTION(cfq_slice_idle_us_store, &cfqd->cfq_slice_idle, 0, UINT_MAX);
-+USEC_STORE_FUNCTION(cfq_group_idle_us_store, &cfqd->cfq_group_idle, 0, UINT_MAX);
-+USEC_STORE_FUNCTION(cfq_slice_sync_us_store, &cfqd->cfq_slice[1], 1, UINT_MAX);
-+USEC_STORE_FUNCTION(cfq_slice_async_us_store, &cfqd->cfq_slice[0], 1, UINT_MAX);
-+USEC_STORE_FUNCTION(cfq_target_latency_us_store, &cfqd->cfq_target_latency, 1, UINT_MAX);
-+#undef USEC_STORE_FUNCTION
-+
- #define CFQ_ATTR(name) \
- 	__ATTR(name, S_IRUGO|S_IWUSR, cfq_##name##_show, cfq_##name##_store)
- 
-@@ -4725,12 +4760,17 @@ static struct elv_fs_entry cfq_attrs[] = {
- 	CFQ_ATTR(back_seek_max),
- 	CFQ_ATTR(back_seek_penalty),
- 	CFQ_ATTR(slice_sync),
-+	CFQ_ATTR(slice_sync_us),
- 	CFQ_ATTR(slice_async),
-+	CFQ_ATTR(slice_async_us),
- 	CFQ_ATTR(slice_async_rq),
- 	CFQ_ATTR(slice_idle),
-+	CFQ_ATTR(slice_idle_us),
- 	CFQ_ATTR(group_idle),
-+	CFQ_ATTR(group_idle_us),
- 	CFQ_ATTR(low_latency),
- 	CFQ_ATTR(target_latency),
-+	CFQ_ATTR(target_latency_us),
- 	__ATTR_NULL
- };
+ /* block/blk-core.c */
+ extern void part_round_stats(int cpu, struct hd_struct *part);
  
 -- 
-2.6.6
+1.9.3
+
