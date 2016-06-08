@@ -1,34 +1,25 @@
-Return-Path: <BATV+10e0b2ba6b8830823af0+4672+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: keith.busch@intel.com,
-	axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	sagi@lightbits.io,
-	ming.l@ssi.samsung.com
-Subject: [PATCH 05/11] nvme-loop: set SGL flag on AER
-Date: Wed,  8 Jun 2016 14:31:00 +0200
-Message-Id: <1465389066-19119-6-git-send-email-hch@lst.de>
-In-Reply-To: <1465389066-19119-1-git-send-email-hch@lst.de>
-References: <1465389066-19119-1-git-send-email-hch@lst.de>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 0/3 v2] cfq: High precision slice tuning
+To: Jan Kara <jack@suse.cz>
+References: <1465391499-27867-1-git-send-email-jack@suse.cz>
+Cc: linux-block@vger.kernel.org, Jeff Moyer <jmoyer@redhat.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <575834D3.6050406@kernel.dk>
+Date: Wed, 8 Jun 2016 09:08:03 -0600
+MIME-Version: 1.0
+In-Reply-To: <1465391499-27867-1-git-send-email-jack@suse.cz>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/nvme/target/loop.c | 1 +
- 1 file changed, 1 insertion(+)
+On 06/08/2016 07:11 AM, Jan Kara wrote:
+> Hi,
+>
+> since Jens didn't merge the patches yet, I'm sending v2 of the series. Since
+> v1 I have added Jeff's Reviewed-by tag and also fixed two 32-bit issues
+> (possible overflow when computing cfq_latency_target and 64-bit division using
+> '/' in choose_wl_class_and_type()). Jens, please merge these patches. Thanks!
 
-diff --git a/drivers/nvme/target/loop.c b/drivers/nvme/target/loop.c
-index 08b4fbb..94e7829 100644
---- a/drivers/nvme/target/loop.c
-+++ b/drivers/nvme/target/loop.c
-@@ -209,6 +209,7 @@ static void nvme_loop_submit_async_event(struct nvme_ctrl *arg, int aer_idx)
- 	memset(&iod->cmd, 0, sizeof(iod->cmd));
- 	iod->cmd.common.opcode = nvme_admin_async_event;
- 	iod->cmd.common.command_id = NVME_LOOP_AQ_BLKMQ_DEPTH;
-+	iod->cmd.common.flags |= NVME_CMD_SGL_METABUF;
- 
- 	if (!nvmet_req_init(&iod->req, &queue->nvme_cq, &queue->nvme_sq,
- 			&nvme_loop_ops)) {
+Added for 4.8, thanks guys.
+
 -- 
-2.1.4
+Jens Axboe
