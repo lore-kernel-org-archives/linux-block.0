@@ -1,19 +1,30 @@
-Return-Path: <BATV+10e0b2ba6b8830823af0+4672+infradead.org+hch@bombadil.srs.infradead.org>
+Return-Path: <hch@lst.de>
+Date: Wed, 8 Jun 2016 13:56:33 +0200
 From: Christoph Hellwig <hch@lst.de>
-To: keith.busch@intel.com,
-	axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	sagi@lightbits.io,
-	ming.l@ssi.samsung.com
-Subject: [PATCH 02/11] blk-mq: add blk_mq_alloc_request_hctx
-Date: Wed,  8 Jun 2016 14:30:57 +0200
-Message-Id: <1465389066-19119-3-git-send-email-hch@lst.de>
-In-Reply-To: <1465389066-19119-1-git-send-email-hch@lst.de>
-References: <1465389066-19119-1-git-send-email-hch@lst.de>
+To: Ming Lin <mlin@kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+	keith.busch@intel.com, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org
+Subject: Re: [PATCH 1/8] blk-mq: add blk_mq_alloc_request_hctx
+Message-ID: <20160608115633.GB30912@lst.de>
+References: <1465248119-17875-1-git-send-email-hch@lst.de> <1465248119-17875-2-git-send-email-hch@lst.de> <5757A3D2.1030003@kernel.dk> <1465363236.10841.13.camel@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1465363236.10841.13.camel@kernel.org>
 List-ID: <linux-block@vger.kernel.org>
 
+What we really nee to do is to always set the NOWAIT flag (we have a
+reserved tag for connect anyway), and thus never trigger the code
+deep down in bt_get that might switch to a different hctx.
+
+Below is the version that I've tested together with the NVMe change
+to use the NOWAIT flag:
+
+---
+>From 2346a4fdcc57c70a671e1329f7550d91d4e9d8a8 Mon Sep 17 00:00:00 2001
 From: Ming Lin <ming.l@ssi.samsung.com>
+Date: Mon, 30 Nov 2015 19:45:48 +0100
+Subject: blk-mq: add blk_mq_alloc_request_hctx
 
 For some protocols like NVMe over Fabrics we need to be able to send
 initialization commands to a specific queue.
