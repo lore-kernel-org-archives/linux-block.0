@@ -1,59 +1,36 @@
-Return-Path: <BATV+a67a43e55467fd1c3dfd+4677+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk,
-	keith.busch@intel.com
-Cc: linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-rdma@vger.kernel.org,
-	Sagi Grimberg <sagi@grimberg.me>
-Subject: [PATCH 7/8] nvme.h: Add keep-alive opcode and identify controller attribute
-Date: Mon, 13 Jun 2016 16:45:27 +0200
-Message-Id: <1465829128-22993-8-git-send-email-hch@lst.de>
-In-Reply-To: <1465829128-22993-1-git-send-email-hch@lst.de>
-References: <1465829128-22993-1-git-send-email-hch@lst.de>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 1/2] ext4: use bio op helprs in ext4 crypto code
+To: mchristi@redhat.com, linux-ext4@vger.kernel.org,
+ linux-block@vger.kernel.org
+References: <1465418981-7360-1-git-send-email-mchristi@redhat.com>
+ <1465418981-7360-2-git-send-email-mchristi@redhat.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <57588771.4050905@kernel.dk>
+Date: Wed, 8 Jun 2016 15:00:33 -0600
+MIME-Version: 1.0
+In-Reply-To: <1465418981-7360-2-git-send-email-mchristi@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-From: Sagi Grimberg <sagi@grimberg.me>
+On 06/08/2016 02:49 PM, mchristi@redhat.com wrote:
+> From: Mike Christie <mchristi@redhat.com>
+>
+> This was missed from my last patchset.
+>
+> This patch has ext4 crypto code use the bio op helper
+> to set the operation. The operation (discard, write, writesame,
+> etc) is now defined seperately from the other REQ bits. They
+> still share the bi_rw field to save space, so we use these
+> helpers so modules do not have to worry about setting/overwriting
+> info.
+>
+> Jens, I am not sure how you handle patches on top of patches
+> in the next branches. If you merge patches that fix issues
+> in previous patches in next, then this patch could be part
+> of
 
-KAS: keep-alive support and granularity of kato in units of 100 ms
-nvme_admin_keep_alive opcode: 0x18
+Since it's all merged, there's only one way to handle it - and that's to 
+apply this on top. I can't fold patches at this point.
 
-Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- include/linux/nvme.h | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
-
-diff --git a/include/linux/nvme.h b/include/linux/nvme.h
-index 7525030..d8b37ba 100644
---- a/include/linux/nvme.h
-+++ b/include/linux/nvme.h
-@@ -202,7 +202,9 @@ struct nvme_id_ctrl {
- 	__u8			apsta;
- 	__le16			wctemp;
- 	__le16			cctemp;
--	__u8			rsvd270[242];
-+	__u8			rsvd270[50];
-+	__le16			kas;
-+	__u8			rsvd322[190];
- 	__u8			sqes;
- 	__u8			cqes;
- 	__le16			maxcmd;
-@@ -556,6 +558,7 @@ enum nvme_admin_opcode {
- 	nvme_admin_async_event		= 0x0c,
- 	nvme_admin_activate_fw		= 0x10,
- 	nvme_admin_download_fw		= 0x11,
-+	nvme_admin_keep_alive		= 0x18,
- 	nvme_admin_format_nvm		= 0x80,
- 	nvme_admin_security_send	= 0x81,
- 	nvme_admin_security_recv	= 0x82,
-@@ -580,6 +583,7 @@ enum {
- 	NVME_FEAT_WRITE_ATOMIC	= 0x0a,
- 	NVME_FEAT_ASYNC_EVENT	= 0x0b,
- 	NVME_FEAT_AUTO_PST	= 0x0c,
-+	NVME_FEAT_KATO		= 0x0f,
- 	NVME_FEAT_SW_PROGRESS	= 0x80,
- 	NVME_FEAT_HOST_ID	= 0x81,
- 	NVME_FEAT_RESV_MASK	= 0x82,
 -- 
-2.1.4
+Jens Axboe
