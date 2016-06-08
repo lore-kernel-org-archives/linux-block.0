@@ -1,102 +1,67 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: mchristi@redhat.com
-To: linux-f2fs-devel@lists.sourceforge.net, linux-ext4@vger.kernel.org,
-	konrad.wilk@oracle.com, drbd-dev@lists.linbit.com,
-	philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
-	linux-raid@vger.kernel.org, dm-devel@redhat.com,
-	linux-fsdevel@vger.kernel.org, linux-bcache@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linux-mtd@lists.infradead.org,
-	target-devel@vger.kernel.org, linux-btrfs@vger.kernel.org,
-	osd-dev@open-osd.org, xfs@oss.sgi.com, ocfs2-devel@oss.oracle.com
-Cc: Mike Christie <mchristi@redhat.com>
-Subject: [PATCH 20/45] nilfs: use bio op accessors
-Date: Sun,  5 Jun 2016 14:32:00 -0500
-Message-Id: <1465155145-10812-21-git-send-email-mchristi@redhat.com>
-In-Reply-To: <1465155145-10812-1-git-send-email-mchristi@redhat.com>
-References: <1465155145-10812-1-git-send-email-mchristi@redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail.kernel.org ([198.145.29.136]:60142 "EHLO mail.kernel.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1425774AbcFHTtD (ORCPT <rfc822;linux-block@vger.kernel.org>);
+	Wed, 8 Jun 2016 15:49:03 -0400
+From: Ming Lin <mlin@kernel.org>
+To: linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
+Cc: Christoph Hellwig <hch@lst.de>,
+	Keith Busch <keith.busch@intel.com>, Jens Axboe <axboe@fb.com>,
+	James Smart <james.smart@broadcom.com>
+Subject: [PATCH 1/2] blk-mq: add a function to return number of hw queues mapped
+Date: Wed,  8 Jun 2016 15:48:11 -0400
+Message-Id: <1465415292-9416-2-git-send-email-mlin@kernel.org>
+In-Reply-To: <1465415292-9416-1-git-send-email-mlin@kernel.org>
+References: <1465415292-9416-1-git-send-email-mlin@kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Mike Christie <mchristi@redhat.com>
+From: Ming Lin <ming.l@samsung.com>
 
-Separate the op from the rq_flag_bits and have nilfs
-set/get the bio using bio_set_op_attrs/bio_op.
-
-Signed-off-by: Mike Christie <mchristi@redhat.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Acked-by: Ryusuke Konishi <konishi.ryusuke@lab.ntt.co.jp>
+Signed-off-by: Ming Lin <ming.l@samsung.com>
 ---
- fs/nilfs2/segbuf.c | 17 +++++++++--------
- 1 file changed, 9 insertions(+), 8 deletions(-)
+ block/blk-mq.c         | 15 +++++++++++++++
+ include/linux/blk-mq.h |  1 +
+ 2 files changed, 16 insertions(+)
 
-diff --git a/fs/nilfs2/segbuf.c b/fs/nilfs2/segbuf.c
-index 0f62909..a962d7d 100644
---- a/fs/nilfs2/segbuf.c
-+++ b/fs/nilfs2/segbuf.c
-@@ -346,7 +346,8 @@ static void nilfs_end_bio_write(struct bio *bio)
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index b59d2ef..4c80046 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1888,6 +1888,21 @@ static void blk_mq_map_swqueue(struct request_queue *q,
+ 	}
  }
  
- static int nilfs_segbuf_submit_bio(struct nilfs_segment_buffer *segbuf,
--				   struct nilfs_write_info *wi, int mode)
-+				   struct nilfs_write_info *wi, int mode,
-+				   int mode_flags)
++/* The number of hw queues that are mapped by sw queues */
++int blk_mq_hctx_mapped(struct request_queue *q)
++{
++	struct blk_mq_hw_ctx *hctx;
++	unsigned int i;
++	int mapped = 0;
++
++	queue_for_each_hw_ctx(q, hctx, i)
++		if (blk_mq_hw_queue_mapped(hctx))
++			mapped++;
++
++	return mapped;
++}
++EXPORT_SYMBOL_GPL(blk_mq_hctx_mapped);
++
+ static void queue_set_hctx_shared(struct request_queue *q, bool shared)
  {
- 	struct bio *bio = wi->bio;
- 	int err;
-@@ -364,7 +365,7 @@ static int nilfs_segbuf_submit_bio(struct nilfs_segment_buffer *segbuf,
+ 	struct blk_mq_hw_ctx *hctx;
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 9a5d581..7cc4d51 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -250,6 +250,7 @@ void blk_mq_freeze_queue_start(struct request_queue *q);
+ int blk_mq_reinit_tagset(struct blk_mq_tag_set *set);
  
- 	bio->bi_end_io = nilfs_end_bio_write;
- 	bio->bi_private = segbuf;
--	bio->bi_rw = mode;
-+	bio_set_op_attrs(bio, mode, mode_flags);
- 	submit_bio(bio);
- 	segbuf->sb_nbio++;
+ void blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set, int nr_hw_queues);
++int blk_mq_hctx_mapped(struct request_queue *q);
  
-@@ -438,7 +439,7 @@ static int nilfs_segbuf_submit_bh(struct nilfs_segment_buffer *segbuf,
- 		return 0;
- 	}
- 	/* bio is FULL */
--	err = nilfs_segbuf_submit_bio(segbuf, wi, mode);
-+	err = nilfs_segbuf_submit_bio(segbuf, wi, mode, 0);
- 	/* never submit current bh */
- 	if (likely(!err))
- 		goto repeat;
-@@ -462,19 +463,19 @@ static int nilfs_segbuf_write(struct nilfs_segment_buffer *segbuf,
- {
- 	struct nilfs_write_info wi;
- 	struct buffer_head *bh;
--	int res = 0, rw = WRITE;
-+	int res = 0;
- 
- 	wi.nilfs = nilfs;
- 	nilfs_segbuf_prepare_write(segbuf, &wi);
- 
- 	list_for_each_entry(bh, &segbuf->sb_segsum_buffers, b_assoc_buffers) {
--		res = nilfs_segbuf_submit_bh(segbuf, &wi, bh, rw);
-+		res = nilfs_segbuf_submit_bh(segbuf, &wi, bh, REQ_OP_WRITE);
- 		if (unlikely(res))
- 			goto failed_bio;
- 	}
- 
- 	list_for_each_entry(bh, &segbuf->sb_payload_buffers, b_assoc_buffers) {
--		res = nilfs_segbuf_submit_bh(segbuf, &wi, bh, rw);
-+		res = nilfs_segbuf_submit_bh(segbuf, &wi, bh, REQ_OP_WRITE);
- 		if (unlikely(res))
- 			goto failed_bio;
- 	}
-@@ -484,8 +485,8 @@ static int nilfs_segbuf_write(struct nilfs_segment_buffer *segbuf,
- 		 * Last BIO is always sent through the following
- 		 * submission.
- 		 */
--		rw |= REQ_SYNC;
--		res = nilfs_segbuf_submit_bio(segbuf, &wi, rw);
-+		res = nilfs_segbuf_submit_bio(segbuf, &wi, REQ_OP_WRITE,
-+					      REQ_SYNC);
- 	}
- 
-  failed_bio:
+ /*
+  * Driver command data is immediately after the request. So subtract request
 -- 
-2.7.2
+1.9.1
 
