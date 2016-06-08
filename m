@@ -1,20 +1,25 @@
-Return-Path: <BATV+65f7e0ff3112b2479d70+4670+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk,
-	keith.busch@intel.com
-Cc: linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: general preparation for NVMe over Fabrics support
-Date: Mon,  6 Jun 2016 23:20:42 +0200
-Message-Id: <1465248052-17811-1-git-send-email-hch@lst.de>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 0/2] linux-block for-next REQ_OP fixes
+To: mchristi@redhat.com, linux-ext4@vger.kernel.org,
+ linux-block@vger.kernel.org
+References: <1465418981-7360-1-git-send-email-mchristi@redhat.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <5758877B.5060007@kernel.dk>
+Date: Wed, 8 Jun 2016 15:00:43 -0600
+MIME-Version: 1.0
+In-Reply-To: <1465418981-7360-1-git-send-email-mchristi@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-This patch set adds some needed preparations for the upcoming NVMe over
-Fabrics support.
+On 06/08/2016 02:49 PM, mchristi@redhat.com wrote:
+> Hi Jens,
+>
+> The following patches fix 2 issues from the REQ_OP patch
+> merge.
+>
+> They were made over your for-next branch.
 
-Contains:
-- Allow transfer size limitations for NVMe transports
-- Add the get_log_page command definition required by the NVMe target
-- more helpers in core code that can be used by various transports
-- add some missing constants and identify attributes
+Added, thanks.
+
+-- 
+Jens Axboe
