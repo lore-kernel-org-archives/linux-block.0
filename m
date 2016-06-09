@@ -1,131 +1,59 @@
-Return-Path: <famz@redhat.com>
-From: Fam Zheng <famz@redhat.com>
-To: linux-kernel@vger.kernel.org
-Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        Michael Ellerman <mpe@ellerman.id.au>, Jens Axboe <axboe@kernel.dk>,
-        "Ed L. Cashin" <ed.cashin@acm.org>, Jiri Kosina <jikos@kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Minchan Kim <minchan@kernel.org>, Nitin Gupta <ngupta@vflare.org>,
-        Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
-        Shaohua Li <shli@kernel.org>, Ulf Hansson <ulf.hansson@linaro.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Brian Norris <computersforpeace@gmail.com>,
-        Keith Busch <keith.busch@intel.com>, linuxppc-dev@lists.ozlabs.org,
-        linux-block@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        linux-raid@vger.kernel.org, linux-mmc@vger.kernel.org,
-        linux-mtd@lists.infradead.org, linux-nvme@lists.infradead.org,
-        Christoph Hellwig <hch@infradead.org>, famz@redhat.com
-Subject: [PATCH v2 00/12] gendisk: Generate uevent after attribute available
-Date: Thu, 30 Jun 2016 09:59:41 +0800
-Message-Id: <20160630015953.6888-1-famz@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail.kernel.org ([198.145.29.136]:36826 "EHLO mail.kernel.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750851AbcFITnz (ORCPT <rfc822;linux-block@vger.kernel.org>);
+	Thu, 9 Jun 2016 15:43:55 -0400
+Received: from mail.kernel.org (localhost [127.0.0.1])
+	by mail.kernel.org (Postfix) with ESMTP id 0ACF020384
+	for <linux-block@vger.kernel.org>; Thu,  9 Jun 2016 19:43:54 +0000 (UTC)
+Received: from mail-vk0-f54.google.com (mail-vk0-f54.google.com [209.85.213.54])
+	(using TLSv1.2 with cipher AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by mail.kernel.org (Postfix) with ESMTPSA id 9881D20397
+	for <linux-block@vger.kernel.org>; Thu,  9 Jun 2016 19:43:52 +0000 (UTC)
+Received: by mail-vk0-f54.google.com with SMTP id d127so69588325vkh.2
+        for <linux-block@vger.kernel.org>; Thu, 09 Jun 2016 12:43:52 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20160609140909.GA30293@lst.de>
+References: <1465415292-9416-1-git-send-email-mlin@kernel.org> <20160609140909.GA30293@lst.de>
+From: Ming Lin <mlin@kernel.org>
+Date: Thu, 9 Jun 2016 12:43:51 -0700
+Message-ID: <CAF1ivSaJUPQg2uTQVZLGL36yERF6eGFF6_jot7DsSZ=D3uPqPQ@mail.gmail.com>
+Subject: Re: [PATCH 0/2] check the number of hw queues mapped to sw queues
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+	Keith Busch <keith.busch@intel.com>, Jens Axboe <axboe@fb.com>,
+	James Smart <james.smart@broadcom.com>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-The race condition is noticed between disk_add() and disk attributes, on
-virtio-blk hotplug.
+On Thu, Jun 9, 2016 at 7:09 AM, Christoph Hellwig <hch@lst.de> wrote:
+> On Wed, Jun 08, 2016 at 03:48:10PM -0400, Ming Lin wrote:
+>> It adds check code to blk_mq_update_queue_map().
+>> But it seems too aggresive because it's not an error that some hw queues
+>> were not mapped to sw queues.
+>>
+>> So this series just add a new function blk_mq_hctx_mapped() to check
+>> how many hw queues were mapped. And the driver(for example, nvme-rdma)
+>> that cares about it will do the check.
+>
+> I think it would be better to have this number available a structure
+> field.  Any reason not to update nr_hw_queues in the tag set
+> with the actual number of queues?
 
-Userspace listens to the KOBJ_ADD uevent generated in add_disk(). At that
-point we haven't created the serial attribute file, therefore depending
-on how fast udev reacts, the /dev/disk/by-id/ entry doesn't always get
-created.
+One reason is we don't know which hctx(s) not mapped.
 
-As pointed out by Christoph Hellwig in the specific fix [1], virtio-blk is not
-the only driver that suffers from this, so we cannot count on every driver to
-send events manually. Moreover as suggested in uevent documentation, it is
-advised to defer the KOBJ_ADD event until all attributes are ready:
+HW Queue 1 <-> CPU 0,4
+HW Queue 2 <-> CPU 1,5
+HW Queue 3 <-> None
+HW Queue 4 <-> CPU 2,6
+HW Queue 5 <-> CPU 3,7
+HW Queue 6 <-> None
 
-Documentation/kobject.txt:
-> Use the KOBJ_ADD action for when the kobject is first added to the kernel.
-> This should be done only after any attributes or children of the kobject
-> have been initialized properly, as userspace will instantly start to look
-> for them when this call happens.
+If we updated nr_hw_queues from 6 to 4,
+then queue_for_each_hw_ctx will not work.
 
-Unfortunately it seems impossible to fix this generally without touching the
-offending callers.  The approach I'm proposing here is adding a flag to
-suppress uevent in add_disk(), which is patch 1, then in later patches, convert
-any caller to only trigger the uevent when attributes are added.
-
-[1] https://lkml.org/lkml/2016/6/28/550
-
-Fam Zheng (12):
-  genhd: Add "gen_uevent" parameter to add_disk
-  genhd: Honor gen_uevent and add disk_gen_uevents
-  virtio-blk: Generate uevent after attribute available
-  axonrom: Generate uevent after attribute available
-  aoeblk: Generate uevent after attribute available
-  mtip32xx: Generate uevent after attribute available
-  pktcdvd: Generate uevent after attribute available
-  zram: Generate uevent after attribute available
-  md: Generate uevent after attribute available
-  mmc: Generate uevent after attribute available
-  mtd: Generate uevent after attribute available
-  nvme: Generate uevent after attribute available
-
- arch/m68k/emu/nfblock.c                     |  2 +-
- arch/powerpc/sysdev/axonram.c               |  3 ++-
- arch/um/drivers/ubd_kern.c                  |  2 +-
- arch/xtensa/platforms/iss/simdisk.c         |  2 +-
- block/genhd.c                               | 26 +++++++++++++++++++++-----
- drivers/block/DAC960.c                      |  2 +-
- drivers/block/amiflop.c                     |  2 +-
- drivers/block/aoe/aoeblk.c                  |  3 ++-
- drivers/block/ataflop.c                     |  2 +-
- drivers/block/brd.c                         |  4 ++--
- drivers/block/cciss.c                       |  2 +-
- drivers/block/drbd/drbd_main.c              |  2 +-
- drivers/block/floppy.c                      |  2 +-
- drivers/block/hd.c                          |  2 +-
- drivers/block/loop.c                        |  2 +-
- drivers/block/mg_disk.c                     |  2 +-
- drivers/block/mtip32xx/mtip32xx.c           |  3 ++-
- drivers/block/nbd.c                         |  2 +-
- drivers/block/null_blk.c                    |  2 +-
- drivers/block/osdblk.c                      |  2 +-
- drivers/block/paride/pcd.c                  |  2 +-
- drivers/block/paride/pd.c                   |  2 +-
- drivers/block/paride/pf.c                   |  2 +-
- drivers/block/pktcdvd.c                     |  4 +++-
- drivers/block/ps3disk.c                     |  2 +-
- drivers/block/ps3vram.c                     |  2 +-
- drivers/block/rbd.c                         |  2 +-
- drivers/block/rsxx/dev.c                    |  2 +-
- drivers/block/skd_main.c                    |  2 +-
- drivers/block/sunvdc.c                      |  2 +-
- drivers/block/swim.c                        |  2 +-
- drivers/block/swim3.c                       |  2 +-
- drivers/block/sx8.c                         |  2 +-
- drivers/block/umem.c                        |  2 +-
- drivers/block/virtio_blk.c                  |  3 ++-
- drivers/block/xen-blkfront.c                |  2 +-
- drivers/block/xsysace.c                     |  2 +-
- drivers/block/z2ram.c                       |  2 +-
- drivers/block/zram/zram_drv.c               |  3 ++-
- drivers/cdrom/gdrom.c                       |  2 +-
- drivers/ide/ide-cd.c                        |  2 +-
- drivers/ide/ide-gd.c                        |  2 +-
- drivers/lightnvm/core.c                     |  2 +-
- drivers/md/bcache/super.c                   |  4 ++--
- drivers/md/dm.c                             |  2 +-
- drivers/md/md.c                             |  3 ++-
- drivers/memstick/core/ms_block.c            |  2 +-
- drivers/memstick/core/mspro_block.c         |  2 +-
- drivers/mmc/card/block.c                    |  3 ++-
- drivers/mtd/mtd_blkdevs.c                   |  3 ++-
- drivers/mtd/ubi/block.c                     |  2 +-
- drivers/nvdimm/blk.c                        |  2 +-
- drivers/nvdimm/btt.c                        |  2 +-
- drivers/nvdimm/pmem.c                       |  2 +-
- drivers/nvme/host/core.c                    |  3 ++-
- drivers/s390/block/dasd_genhd.c             |  2 +-
- drivers/s390/block/dcssblk.c                |  2 +-
- drivers/s390/block/scm_blk.c                |  2 +-
- drivers/s390/block/xpram.c                  |  2 +-
- drivers/sbus/char/jsflash.c                 |  2 +-
- drivers/scsi/sd.c                           |  2 +-
- drivers/scsi/sr.c                           |  2 +-
- drivers/staging/lustre/lustre/llite/lloop.c |  2 +-
- include/linux/genhd.h                       |  3 ++-
- 64 files changed, 98 insertions(+), 70 deletions(-)
-
--- 
-2.9.0
+#define queue_for_each_hw_ctx(q, hctx, i)                               \
+        for ((i) = 0; (i) < (q)->nr_hw_queues &&                        \
+             ({ hctx = (q)->queue_hw_ctx[i]; 1; }); (i)++)
