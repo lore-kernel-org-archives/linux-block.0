@@ -1,57 +1,49 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-From: mchristi@redhat.com
-To: linux-f2fs-devel@lists.sourceforge.net, linux-ext4@vger.kernel.org,
-	konrad.wilk@oracle.com, drbd-dev@lists.linbit.com,
-	philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
-	linux-raid@vger.kernel.org, dm-devel@redhat.com,
-	linux-fsdevel@vger.kernel.org, linux-bcache@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linux-mtd@lists.infradead.org,
-	target-devel@vger.kernel.org, linux-btrfs@vger.kernel.org,
-	osd-dev@open-osd.org, xfs@oss.sgi.com, ocfs2-devel@oss.oracle.com
-Cc: Mike Christie <mchristi@redhat.com>
-Subject: [PATCH 30/45] block: copy bio op to request op
-Date: Sun,  5 Jun 2016 14:32:10 -0500
-Message-Id: <1465155145-10812-31-git-send-email-mchristi@redhat.com>
-In-Reply-To: <1465155145-10812-1-git-send-email-mchristi@redhat.com>
-References: <1465155145-10812-1-git-send-email-mchristi@redhat.com>
-Sender: linux-scsi-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail.kernel.org ([198.145.29.136]:37526 "EHLO mail.kernel.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751802AbcFITr6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+	Thu, 9 Jun 2016 15:47:58 -0400
+Received: from mail.kernel.org (localhost [127.0.0.1])
+	by mail.kernel.org (Postfix) with ESMTP id EC3DC203A0
+	for <linux-block@vger.kernel.org>; Thu,  9 Jun 2016 19:47:56 +0000 (UTC)
+Received: from mail-vk0-f50.google.com (mail-vk0-f50.google.com [209.85.213.50])
+	(using TLSv1.2 with cipher AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by mail.kernel.org (Postfix) with ESMTPSA id 300CF20384
+	for <linux-block@vger.kernel.org>; Thu,  9 Jun 2016 19:47:56 +0000 (UTC)
+Received: by mail-vk0-f50.google.com with SMTP id d127so69733929vkh.2
+        for <linux-block@vger.kernel.org>; Thu, 09 Jun 2016 12:47:56 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20160609141012.GB30293@lst.de>
+References: <1465415292-9416-1-git-send-email-mlin@kernel.org>
+ <1465415292-9416-3-git-send-email-mlin@kernel.org> <575950DB.6080701@lightbits.io>
+ <20160609141012.GB30293@lst.de>
+From: Ming Lin <mlin@kernel.org>
+Date: Thu, 9 Jun 2016 12:47:54 -0700
+Message-ID: <CAF1ivSbkU2q4bUReMHo0W=wCYs2rO8ZWEFQYyH1qtzjftJrkug@mail.gmail.com>
+Subject: Re: [PATCH 2/2] nvme-rdma: check the number of hw queues mapped
+To: Christoph Hellwig <hch@lst.de>
+Cc: Sagi Grimberg <sagi@lightbits.io>, linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org, Keith Busch <keith.busch@intel.com>,
+	Jens Axboe <axboe@fb.com>,
+	James Smart <james.smart@broadcom.com>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Mike Christie <mchristi@redhat.com>
+On Thu, Jun 9, 2016 at 7:10 AM, Christoph Hellwig <hch@lst.de> wrote:
+> On Thu, Jun 09, 2016 at 02:19:55PM +0300, Sagi Grimberg wrote:
+>> This needs documentation in the form of:
+>>
+>> /*
+>>  * XXX: blk-mq might not map all our hw contexts but this is a must for
+>>  * us for fabric connects. So until we can fix blk-mq we check that.
+>>  */
+>
+> I think the right thing to do is to have a member of actually mapped
+> queues in the block layer, and I also don't think we need the XXX comment
+> as there are valid reasons for not mapping all queues.
 
-The bio users should now always be setting up the bio op. This patch
-has the block layer copy that to the request.
-
-Signed-off-by: Mike Christie <mchristi@redhat.com>
----
- block/blk-core.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 7e943dc..3c45254 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -2976,8 +2976,7 @@ EXPORT_SYMBOL_GPL(__blk_end_request_err);
- void blk_rq_bio_prep(struct request_queue *q, struct request *rq,
- 		     struct bio *bio)
- {
--	/* Bit 0 (R/W) is identical in rq->cmd_flags and bio->bi_rw */
--	rq->cmd_flags |= bio->bi_rw & REQ_WRITE;
-+	req_set_op(rq, bio_op(bio));
- 
- 	if (bio_has_data(bio))
- 		rq->nr_phys_segments = bio_phys_segments(q, bio);
-@@ -3062,7 +3061,8 @@ EXPORT_SYMBOL_GPL(blk_rq_unprep_clone);
- static void __blk_rq_prep_clone(struct request *dst, struct request *src)
- {
- 	dst->cpu = src->cpu;
--	dst->cmd_flags |= (src->cmd_flags & REQ_CLONE_MASK) | REQ_NOMERGE;
-+	req_set_op_attrs(dst, req_op(src),
-+			 (src->cmd_flags & REQ_CLONE_MASK) | REQ_NOMERGE);
- 	dst->cmd_type = src->cmd_type;
- 	dst->__sector = blk_rq_pos(src);
- 	dst->__data_len = blk_rq_bytes(src);
--- 
-2.7.2
-
+I think it is a rare case that we need all hw contexts mapped.
+Seems unnecessary to add a new field to "struct request_queue" for the
+rare case.
