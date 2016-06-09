@@ -1,57 +1,38 @@
-Return-Path: <famz@redhat.com>
-From: Fam Zheng <famz@redhat.com>
-To: linux-kernel@vger.kernel.org
-Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        Michael Ellerman <mpe@ellerman.id.au>, Jens Axboe <axboe@kernel.dk>,
-        "Ed L. Cashin" <ed.cashin@acm.org>, Jiri Kosina <jikos@kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Minchan Kim <minchan@kernel.org>, Nitin Gupta <ngupta@vflare.org>,
-        Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
-        Shaohua Li <shli@kernel.org>, Ulf Hansson <ulf.hansson@linaro.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Brian Norris <computersforpeace@gmail.com>,
-        Keith Busch <keith.busch@intel.com>, linuxppc-dev@lists.ozlabs.org,
-        linux-block@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        linux-raid@vger.kernel.org, linux-mmc@vger.kernel.org,
-        linux-mtd@lists.infradead.org, linux-nvme@lists.infradead.org,
-        Christoph Hellwig <hch@infradead.org>, famz@redhat.com
-Subject: [PATCH v2 09/12] md: Generate uevent after attribute available
-Date: Thu, 30 Jun 2016 09:59:50 +0800
-Message-Id: <20160630015953.6888-10-famz@redhat.com>
-In-Reply-To: <20160630015953.6888-1-famz@redhat.com>
-References: <20160630015953.6888-1-famz@redhat.com>
+Return-Path: <hch@lst.de>
+Date: Thu, 9 Jun 2016 15:46:03 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: "Nicholas A. Bellinger" <nab@linux-iscsi.org>
+Cc: Sagi Grimberg <sagi@lightbits.io>, Christoph Hellwig <hch@lst.de>,
+	axboe@kernel.dk, linux-block@vger.kernel.org,
+	linux-scsi <linux-scsi@vger.kernel.org>,
+	linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+	keith.busch@intel.com, target-devel <target-devel@vger.kernel.org>
+Subject: Re: NVMe over Fabrics target implementation
+Message-ID: <20160609134603.GA29820@lst.de>
+References: <1465248177-17970-1-git-send-email-hch@lst.de> <1465280632.5365.58.camel@haakon3.risingtidesystems.com> <20160607105550.GB17113@lst.de> <1465363301.5365.81.camel@haakon3.risingtidesystems.com> <20160608121932.GA31316@lst.de> <575819BB.7010209@lightbits.io> <1465446975.5365.123.camel@haakon3.risingtidesystems.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1465446975.5365.123.camel@haakon3.risingtidesystems.com>
 List-ID: <linux-block@vger.kernel.org>
 
-It is documented that KOBJ_ADD should be generated after the object's
-attributes and children are ready.  We can achieve this with the new
-disk_gen_uevents interface.
+On Wed, Jun 08, 2016 at 09:36:15PM -0700, Nicholas A. Bellinger wrote:
+> The configfs ABI should not dictate a single backend use-case.
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
----
- drivers/md/md.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+And it doesn't.  I actually had a file backend implemented to
+benchmark it against the loopback driver.  It needed absolutely
+zero new configfs interface.  And if we at some point want
+different backends using different attributes we can trivially
+add them using configfs_register_group.
 
-diff --git a/drivers/md/md.c b/drivers/md/md.c
-index 1391c72..dcd09ea 100644
---- a/drivers/md/md.c
-+++ b/drivers/md/md.c
-@@ -5055,7 +5055,7 @@ static int md_alloc(dev_t dev, char *name)
- 	 * through to md_open, so make sure it doesn't get too far
- 	 */
- 	mutex_lock(&mddev->open_mutex);
--	add_disk(disk, true);
-+	add_disk(disk, false);
- 
- 	error = kobject_init_and_add(&mddev->kobj, &md_ktype,
- 				     &disk_to_dev(disk)->kobj, "%s", "md");
-@@ -5070,6 +5070,7 @@ static int md_alloc(dev_t dev, char *name)
- 	if (mddev->kobj.sd &&
- 	    sysfs_create_group(&mddev->kobj, &md_bitmap_group))
- 		printk(KERN_DEBUG "pointless warning\n");
-+	disk_gen_uevents(disk);
- 	mutex_unlock(&mddev->open_mutex);
-  abort:
- 	mutex_unlock(&disks_mutex);
--- 
-2.9.0
+> Along with having common code and existing configfs
+> ABI, we also get a proper starting point for target-core
+> features that span across endpoints, and are defined for
+> both scsi and nvme.  PR APTPL immediately comes to mind.
+
+PRs are a useful feature on the road map.  However we need a separate
+pluggable backend anyway for distributed backends like RBD or Bart's
+DLM implementation.  Also the current LIO PR implementation will need
+a lot of work to be usable for NVMe while actually following the
+spec in all it's details and to be power ѕafe.   The right way to
+go here is a PR API that allows different backends, and the existing
+LIO one might be one of them after it's got the needed attention.
