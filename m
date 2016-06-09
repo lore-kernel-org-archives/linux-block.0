@@ -1,124 +1,52 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-From: mchristi@redhat.com
-To: linux-f2fs-devel@lists.sourceforge.net, linux-ext4@vger.kernel.org,
-	konrad.wilk@oracle.com, drbd-dev@lists.linbit.com,
-	philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
-	linux-raid@vger.kernel.org, dm-devel@redhat.com,
-	linux-fsdevel@vger.kernel.org, linux-bcache@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linux-mtd@lists.infradead.org,
-	target-devel@vger.kernel.org, linux-btrfs@vger.kernel.org,
-	osd-dev@open-osd.org, xfs@oss.sgi.com, ocfs2-devel@oss.oracle.com
-Cc: Mike Christie <mchristi@redhat.com>
-Subject: [PATCH 33/45] block: prepare elevator to use REQ_OPs.
-Date: Sun,  5 Jun 2016 14:32:13 -0500
-Message-Id: <1465155145-10812-34-git-send-email-mchristi@redhat.com>
-In-Reply-To: <1465155145-10812-1-git-send-email-mchristi@redhat.com>
-References: <1465155145-10812-1-git-send-email-mchristi@redhat.com>
-Sender: linux-scsi-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
-
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:45393 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751663AbcFIWnS (ORCPT <rfc822;linux-block@vger.kernel.org>);
+	Thu, 9 Jun 2016 18:43:18 -0400
+Subject: Re: [PATCH 1/2] block: better packing for struct request
+To: Christoph Hellwig <hch@lst.de>, axboe@fb.com
+References: <1465480836-32093-1-git-send-email-hch@lst.de>
+ <1465480836-32093-2-git-send-email-hch@lst.de>
+Cc: linux-block@vger.kernel.org
 From: Mike Christie <mchristi@redhat.com>
+Message-ID: <5759F104.8090505@redhat.com>
+Date: Thu, 9 Jun 2016 17:43:16 -0500
+MIME-Version: 1.0
+In-Reply-To: <1465480836-32093-2-git-send-email-hch@lst.de>
+Content-Type: text/plain; charset=windows-1252
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This patch converts the elevator code to use separate variables
-for the operation and flags, and to check req_op for the REQ_OP.
+On 06/09/2016 09:00 AM, Christoph Hellwig wrote:
+> Keep the 32-bit CPU and cmd_type flags together to avoid holes on 64-bit
+> architectures.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  include/linux/blkdev.h | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
+> 
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index 0c9f879..9746d22 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -96,12 +96,11 @@ struct request {
+>  	struct request_queue *q;
+>  	struct blk_mq_ctx *mq_ctx;
+>  
+> -	u64 cmd_flags;
+> +	int cpu;
+>  	unsigned cmd_type;
+> +	u64 cmd_flags;
+>  	unsigned long atomic_flags;
+>  
+> -	int cpu;
+> -
+>  	/* the following two fields are internal, NEVER access directly */
+>  	unsigned int __data_len;	/* total data len */
+>  	sector_t __sector;		/* sector cursor */
+> 
 
-Signed-off-by: Mike Christie <mchristi@redhat.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
----
- block/blk-core.c         | 2 +-
- block/cfq-iosched.c      | 4 ++--
- block/elevator.c         | 7 +++----
- include/linux/elevator.h | 4 ++--
- 4 files changed, 8 insertions(+), 9 deletions(-)
+Looks ok to me.
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index a68dc07..090e55d 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1081,7 +1081,7 @@ static struct request *__get_request(struct request_list *rl, int op,
- 	if (unlikely(blk_queue_dying(q)))
- 		return ERR_PTR(-ENODEV);
- 
--	may_queue = elv_may_queue(q, op | op_flags);
-+	may_queue = elv_may_queue(q, op, op_flags);
- 	if (may_queue == ELV_MQUEUE_NO)
- 		goto rq_starved;
- 
-diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
-index 4a34978..3fcc598 100644
---- a/block/cfq-iosched.c
-+++ b/block/cfq-iosched.c
-@@ -4285,7 +4285,7 @@ static inline int __cfq_may_queue(struct cfq_queue *cfqq)
- 	return ELV_MQUEUE_MAY;
- }
- 
--static int cfq_may_queue(struct request_queue *q, int rw)
-+static int cfq_may_queue(struct request_queue *q, int op, int op_flags)
- {
- 	struct cfq_data *cfqd = q->elevator->elevator_data;
- 	struct task_struct *tsk = current;
-@@ -4302,7 +4302,7 @@ static int cfq_may_queue(struct request_queue *q, int rw)
- 	if (!cic)
- 		return ELV_MQUEUE_MAY;
- 
--	cfqq = cic_to_cfqq(cic, rw_is_sync(rw));
-+	cfqq = cic_to_cfqq(cic, rw_is_sync(op | op_flags));
- 	if (cfqq) {
- 		cfq_init_prio_data(cfqq, cic);
- 
-diff --git a/block/elevator.c b/block/elevator.c
-index c3555c9..ea9319d 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -366,8 +366,7 @@ void elv_dispatch_sort(struct request_queue *q, struct request *rq)
- 	list_for_each_prev(entry, &q->queue_head) {
- 		struct request *pos = list_entry_rq(entry);
- 
--		if ((rq->cmd_flags & REQ_DISCARD) !=
--		    (pos->cmd_flags & REQ_DISCARD))
-+		if ((req_op(rq) == REQ_OP_DISCARD) != (req_op(pos) == REQ_OP_DISCARD))
- 			break;
- 		if (rq_data_dir(rq) != rq_data_dir(pos))
- 			break;
-@@ -717,12 +716,12 @@ void elv_put_request(struct request_queue *q, struct request *rq)
- 		e->type->ops.elevator_put_req_fn(rq);
- }
- 
--int elv_may_queue(struct request_queue *q, int rw)
-+int elv_may_queue(struct request_queue *q, int op, int op_flags)
- {
- 	struct elevator_queue *e = q->elevator;
- 
- 	if (e->type->ops.elevator_may_queue_fn)
--		return e->type->ops.elevator_may_queue_fn(q, rw);
-+		return e->type->ops.elevator_may_queue_fn(q, op, op_flags);
- 
- 	return ELV_MQUEUE_MAY;
- }
-diff --git a/include/linux/elevator.h b/include/linux/elevator.h
-index 638b324..953d286 100644
---- a/include/linux/elevator.h
-+++ b/include/linux/elevator.h
-@@ -26,7 +26,7 @@ typedef int (elevator_dispatch_fn) (struct request_queue *, int);
- typedef void (elevator_add_req_fn) (struct request_queue *, struct request *);
- typedef struct request *(elevator_request_list_fn) (struct request_queue *, struct request *);
- typedef void (elevator_completed_req_fn) (struct request_queue *, struct request *);
--typedef int (elevator_may_queue_fn) (struct request_queue *, int);
-+typedef int (elevator_may_queue_fn) (struct request_queue *, int, int);
- 
- typedef void (elevator_init_icq_fn) (struct io_cq *);
- typedef void (elevator_exit_icq_fn) (struct io_cq *);
-@@ -134,7 +134,7 @@ extern struct request *elv_former_request(struct request_queue *, struct request
- extern struct request *elv_latter_request(struct request_queue *, struct request *);
- extern int elv_register_queue(struct request_queue *q);
- extern void elv_unregister_queue(struct request_queue *q);
--extern int elv_may_queue(struct request_queue *, int);
-+extern int elv_may_queue(struct request_queue *, int, int);
- extern void elv_completed_request(struct request_queue *, struct request *);
- extern int elv_set_request(struct request_queue *q, struct request *rq,
- 			   struct bio *bio, gfp_t gfp_mask);
--- 
-2.7.2
-
+Reviewed-by: Mike Christie <mchristi@redhat.com>
