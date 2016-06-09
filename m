@@ -1,60 +1,57 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:53052 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751179AbcFIV2r (ORCPT <rfc822;linux-block@vger.kernel.org>);
-	Thu, 9 Jun 2016 17:28:47 -0400
+Return-Path: <jmoyer@redhat.com>
 From: Jeff Moyer <jmoyer@redhat.com>
-To: Jens Axboe <axboe@fb.com>
-Cc: <linux-block@vger.kernel.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
 Subject: Re: [PATCH] cfq: priority boost on meta/prio marked IO
 References: <20160608204347.GA30146@kernel.dk>
-Date: Thu, 09 Jun 2016 17:28:45 -0400
-In-Reply-To: <20160608204347.GA30146@kernel.dk> (Jens Axboe's message of "Wed,
-	8 Jun 2016 14:43:47 -0600")
-Message-ID: <x4937omxd9u.fsf@segfault.boston.devel.redhat.com>
+	<x49k2hyz78z.fsf@segfault.boston.devel.redhat.com>
+	<57599734.40607@kernel.dk>
+	<x49y46exlh0.fsf@segfault.boston.devel.redhat.com>
+	<5759CE16.905@kernel.dk>
+Date: Thu, 09 Jun 2016 17:08:02 -0400
+In-Reply-To: <5759CE16.905@kernel.dk> (Jens Axboe's message of "Thu, 9 Jun
+	2016 14:14:14 -0600")
+Message-ID: <x497fdyxe8d.fsf@segfault.boston.devel.redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Jens Axboe <axboe@fb.com> writes:
+Jens Axboe <axboe@kernel.dk> writes:
 
-> At Facebook, we have a number of cases where people use ionice to set a
-> lower priority, then end up having tasks stuck for a long time because
-> eg meta data updates from an idle priority tasks is blocking out higher
-> priority processes. It's bad enough that it will trigger the softlockup
-> warning.
+>> I was curious about writes.  ;-)  Anyway, it's good to validate that the
+>> read case is also relevant.
 >
-> This patch adds code to CFQ that bumps the priority class and data for
-> an idle task, if is doing IO marked as PRIO or META. With this, we no
-> longer see the softlockups.
->
-> Signed-off-by: Jens Axboe <axboe@fb.com>
->
-> diff --git a/block/blk-core.c b/block/blk-core.c
-> index 32a283eb7274..3cfd67d006fb 100644
-> --- a/block/blk-core.c
-> +++ b/block/blk-core.c
-> @@ -1781,6 +1781,11 @@ get_rq:
->  		rw_flags |= REQ_SYNC;
->  
->  	/*
-> +	 * Add in META/PRIO flags, if set, before we get to the IO scheduler
-> +	 */
-> +	rw_flags |= (bio->bi_rw & (REQ_META | REQ_PRIO));
-> +
-> +	/*
+> You mean O_DIRECT writes? Most of the buffered writes will come out of
+> the associated threads, so I don't think it's a big of an issue
+> there. We've only seen it for reads.
 
-This needs a docbook update.  It now reads:
+Well, you had me confused with your initial report:
 
- * @rw_flags: RW and SYNC flags
+"... because eg meta data updates..."
 
-so whatever flags we're adding should be specified, I guess.
+So I assumed that meant REQ_META WRITES.  My bad.
 
-Speaking of which, after much waffling, I think I've decided it would be
-cleaner to limit the priority boost to REQ_PRIO requests only.
+[snip]
 
-Other than that, I think this looks fine.
+>> Interesting.  I would have thought that the cfqd->active_queue would
+>> have been preempted by a request marked with REQ_PRIO.  But you're
+>> suggesting that did not happen?
 
-Cheers,
-Jeff
+[snip]
+
+> We seem to handily mostly ignore prio_pending for the idle class. If
+
+Right, I forgot we were talking about idle class.  Sorry.
+
+> the new queue is idle, then we don't look at prio pending. I'd rather
+> make this more explicit, the patch is pretty similar to what we had in
+> the past. It's somewhat of a regression caused by commit 4aede84b33d,
+> except I like using the request flags for this a lot more than the old
+> current->fs_excl. REQ_PRIO should always be set for cases where we
+> hold fs (or even directory) specific resources.
+
+Ah, thanks for the reference!  Now I'll go back and finish reviewing the
+actual patch.
+
+-Jeff
