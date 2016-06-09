@@ -1,57 +1,63 @@
-Return-Path: <arnd@arndb.de>
-From: Arnd Bergmann <arnd@arndb.de>
-To: Jens Axboe <axboe@kernel.dk>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Ingo Molnar <mingo@redhat.com>
-Cc: y2038@lists.linaro.org,
-	Arnd Bergmann <arnd@arndb.de>,
-	Hannes Reinecke <hare@suse.com>,
-	Mike Christie <mchristi@redhat.com>,
-	Shaohua Li <shli@fb.com>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] blktrace: avoid using timespec
-Date: Fri, 17 Jun 2016 16:58:26 +0200
-Message-Id: <20160617145849.3771756-1-arnd@arndb.de>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] cfq: priority boost on meta/prio marked IO
+To: Jeff Moyer <jmoyer@redhat.com>
+References: <20160608204347.GA30146@kernel.dk>
+ <x4937omxd9u.fsf@segfault.boston.devel.redhat.com>
+ <5759E177.9040307@kernel.dk> <5759E299.2060200@kernel.dk>
+ <x49mvmuvx2n.fsf@segfault.boston.devel.redhat.com>
+ <5759E820.1010609@kernel.dk>
+ <x49inxivwur.fsf@segfault.boston.devel.redhat.com>
+Cc: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <5759EA89.90104@kernel.dk>
+Date: Thu, 9 Jun 2016 16:15:37 -0600
+MIME-Version: 1.0
+In-Reply-To: <x49inxivwur.fsf@segfault.boston.devel.redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-The blktrace code stores the current time in a 32-bit word in its
-user interface. This is a bad idea because 32-bit seconds overflow
-at some point.
+On 06/09/2016 04:08 PM, Jeff Moyer wrote:
+> Jens Axboe <axboe@kernel.dk> writes:
+>
+>> On 06/09/2016 04:04 PM, Jeff Moyer wrote:
+>>> Jens Axboe <axboe@kernel.dk> writes:
+>>>
+>>>>> I went and checked, but I don't see it. Where is this?
+>>>>
+>>>> Ah now I see, you're looking at current -git. The patch is against
+>>>> for-4.8/core.
+>>>
+>>> Ah, right, Mike's patches went in.
+>>>
+>>>> Updated version below, dropping REQ_META and changing the naming
+>>>> s/meta/prio.
+>>>>
+>>>> diff --git a/block/blk-core.c b/block/blk-core.c
+>>>> index 32a283eb7274..3cfd67d006fb 100644
+>>>> --- a/block/blk-core.c
+>>>> +++ b/block/blk-core.c
+>>>> @@ -1781,6 +1781,11 @@ get_rq:
+>>>>    		rw_flags |= REQ_SYNC;
+>>>>
+>>>>    	/*
+>>>> +	 * Add in META/PRIO flags, if set, before we get to the IO scheduler
+>>>> +	 */
+>>>> +	rw_flags |= (bio->bi_rw & (REQ_META | REQ_PRIO));
+>>>> +
+>>>> +	/*
+>>>
+>>> Do we still need to pass in META here?
+>>
+>> We don't have to, but it doesn't really hurt. Frankly, we should pass
+>> in the whole damn thing.
+>
+> Heh, okay.
+>
+> Fine by me, Jens.  :)
+>
+> Reviewed-by: Jeff Moyer <jmoyer@redhat.com>
 
-We probably have until 2106 before this one overflows, as it seems
-to use an 'unsigned' variable, but we should confirm that user
-space treats it the same way.
+Thanks Jeff, added for 4.8.
 
-Aside from this, we want to stop using 'struct timespec' here,
-so I'm adding a comment about the overflow and change the code
-to use timespec64 instead to make the loss of range more obvious.
-
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- kernel/trace/blktrace.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
-
-diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-index ef86b965ade3..b0816e4a61a5 100644
---- a/kernel/trace/blktrace.c
-+++ b/kernel/trace/blktrace.c
-@@ -127,12 +127,13 @@ static void trace_note_tsk(struct task_struct *tsk)
- 
- static void trace_note_time(struct blk_trace *bt)
- {
--	struct timespec now;
-+	struct timespec64 now;
- 	unsigned long flags;
- 	u32 words[2];
- 
--	getnstimeofday(&now);
--	words[0] = now.tv_sec;
-+	/* need to check user space to see if this breaks in y2038 or y2106 */
-+	ktime_get_real_ts64(&now);
-+	words[0] = (u32)now.tv_sec;
- 	words[1] = now.tv_nsec;
- 
- 	local_irq_save(flags);
 -- 
-2.9.0
+Jens Axboe
