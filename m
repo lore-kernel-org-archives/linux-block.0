@@ -1,53 +1,58 @@
-Return-Path: <hare@suse.de>
-Subject: Re: block: don't check request size in blk_cloned_rq_check_limits()
-To: Mike Snitzer <snitzer@redhat.com>
-References: <1464593093-93527-1-git-send-email-hare@suse.de>
- <20160610131901.GA28570@redhat.com>
+Return-Path: <msnitzer@redhat.com>
+Date: Fri, 10 Jun 2016 09:19:01 -0400
+From: Mike Snitzer <snitzer@redhat.com>
+To: Hannes Reinecke <hare@suse.de>
 Cc: Jens Axboe <axboe@kernel.dk>, Brian King <brking@us.ibm.com>,
- linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
- mark.bergman@uphs.upenn.edu, "Martin K. Petersen"
- <martin.petersen@oracle.com>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <575AC10F.7020504@suse.de>
-Date: Fri, 10 Jun 2016 15:30:55 +0200
+        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        mark.bergman@uphs.upenn.edu,
+        "Martin K. Petersen" <martin.petersen@oracle.com>
+Subject: Re: block: don't check request size in blk_cloned_rq_check_limits()
+Message-ID: <20160610131901.GA28570@redhat.com>
+References: <1464593093-93527-1-git-send-email-hare@suse.de>
 MIME-Version: 1.0
-In-Reply-To: <20160610131901.GA28570@redhat.com>
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1464593093-93527-1-git-send-email-hare@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
-On 06/10/2016 03:19 PM, Mike Snitzer wrote:
-> On Mon, May 30 2016 at  3:24am -0400,
-> Hannes Reinecke <hare@suse.de> wrote:
-> 
->> When checking a cloned request there is no need to check
->> the overall request size; this won't have changed even
->> when resubmitting to another queue.
->> Without this patch ppc64le on ibmvfc fails to boot.
-> 
-> By simply removing the check aren't you papering over the real problem?
-> Looking at Martin's commit f31dc1cd490539 (which introduced the current
-> variant of the limits check) I'm not convinced it is equivalent to what
-> he replaced.  I'll look closer in a bit.
-> 
-The check itself is wrong, as we need (at least) to check the
-max_hw_sectors here; the request is already fully assembled, so there is
-a really good chance he's going beyond the max_sectors.
-But trying the error still was found to be present.
-So I decided to rip it out, as the overall value of this check is zero.
+On Mon, May 30 2016 at  3:24am -0400,
+Hannes Reinecke <hare@suse.de> wrote:
 
-> Also you categorized your fix was for "ppc64le on ibmvfc"; whereas Mark
-> has reported this issue (off-list) against x86_64.  By making it seem
-> ppc64le specific I didn't take this patch to be generally applicable.
+> When checking a cloned request there is no need to check
+> the overall request size; this won't have changed even
+> when resubmitting to another queue.
+> Without this patch ppc64le on ibmvfc fails to boot.
+
+By simply removing the check aren't you papering over the real problem?
+Looking at Martin's commit f31dc1cd490539 (which introduced the current
+variant of the limits check) I'm not convinced it is equivalent to what
+he replaced.  I'll look closer in a bit.
+
+Also you categorized your fix was for "ppc64le on ibmvfc"; whereas Mark
+has reported this issue (off-list) against x86_64.  By making it seem
+ppc64le specific I didn't take this patch to be generally applicable.
+
+Mike
+
+> ---
+>  block/blk-core.c | 5 -----
+>  1 file changed, 5 deletions(-)
 > 
-Well, it has been observed on ppc64. That doesn't mean _only_ ppc64 is
-affected. If it were ppc64 only it should've been marked as such, right?
-
-Cheers,
-
-Hannes
--- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: F. Imend�rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG N�rnberg)
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index 2475b1c7..e108bf0 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -2160,11 +2160,6 @@ EXPORT_SYMBOL(submit_bio);
+>  static int blk_cloned_rq_check_limits(struct request_queue *q,
+>  				      struct request *rq)
+>  {
+> -	if (blk_rq_sectors(rq) > blk_queue_get_max_sectors(q, rq->cmd_flags)) {
+> -		printk(KERN_ERR "%s: over max size limit.\n", __func__);
+> -		return -EIO;
+> -	}
+> -
+>  	/*
+>  	 * queue's settings related to segment counting like q->bounce_pfn
+>  	 * may differ from that of other stacking queues.
+> -- 
+> 1.8.5.6
+> 
