@@ -1,99 +1,66 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.9]:55478 "EHLO
-	bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752471AbcFTK3B (ORCPT
-	<rfc822;linux-block@vger.kernel.org>);
-	Mon, 20 Jun 2016 06:29:01 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@fb.com
-Cc: shli@fb.com, martin.petersen@oracle.com, snitzer@redhat.com,
-	sitsofe@yahoo.com, linux-block@vger.kernel.org
-Subject: [PATCH] block: introduce BLKDEV_DISCARD_ZERO to fix zeroout
-Date: Mon, 20 Jun 2016 12:28:43 +0200
-Message-Id: <1466418523-22552-1-git-send-email-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <ming.lei@canonical.com>
+MIME-Version: 1.0
+In-Reply-To: <575993EA.3010005@kernel.dk>
+References: <1464615294-9946-1-git-send-email-ming.lei@canonical.com> <575993EA.3010005@kernel.dk>
+From: Ming Lei <ming.lei@canonical.com>
+Date: Fri, 10 Jun 2016 10:44:34 +0800
+Message-ID: <CACVXFVMbvqyEeX4NsuZLANCCQyxwr2_cjLrLT8tR9LUZkwejdg@mail.gmail.com>
+Subject: Re: [PATCH v6 0/8] block: prepare for multipage bvecs
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Jens Axboe <axboe@fb.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+	Al Viro <viro@zeniv.linux.org.uk>,
+	"open list:DRBD DRIVER" <drbd-dev@lists.linbit.com>, Jan Kara <jack@suse.cz>, Joe Thornber <ejt@redhat.com>,
+	Keith Busch <keith.busch@intel.com>, Kent Overstreet <kent.overstreet@gmail.com>,
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>, Michal Hocko <mhocko@suse.com>,
+	Mike Snitzer <snitzer@redhat.com>, NeilBrown <neilb@suse.com>, Sagi Grimberg <sagig@mellanox.com>,
+	Shaohua Li <shli@fb.com>, Steven Whitehouse <swhiteho@redhat.com>, Tejun Heo <tj@kernel.org>,
+	"open list:XFS FILESYSTEM" <xfs@oss.sgi.com>
+Content-Type: text/plain; charset=UTF-8
+List-ID: <linux-block@vger.kernel.org>
 
-Currently blkdev_issue_zeroout cascades down from discards (if the driver
-gurantees that discards zero data), to WRITE SAME and then to a loop
-writing zeroes.  Unfortunately we ignore tun-time EOPNOTSUPP errors in the
-block layer blkdev_issue_discard helper to work around DM volumes that
-may have mixed discard support underneath.
+On Fri, Jun 10, 2016 at 12:06 AM, Jens Axboe <axboe@kernel.dk> wrote:
+> On 05/30/2016 07:34 AM, Ming Lei wrote:
+>>
+>> Hi,
+>>
+>> Interests[1] have been shown in multipage bvecs, so this patchset
+>> try to prepare for the support and do two things:
+>>
+>> 1) the 1st 4 patches use bvec iterator to implement iterate_bvec(),
+>> then we can drop the non-standard way for iterating bvec, which
+>> can be thought as a good cleanup for lib/iov_iter.c
+>>
+>> 2) remove BIO_MAX_SECTORS and makre BIO_MAX_SIZE as obsolete, and
+>> now there is only one user for each. Once multipage bvecs is introduced,
+>> one bio may hold lots of sectors, and we should always use sort of
+>> BIO_MAX_VECS which should be introduced in future and is similiar
+>> with current BIO_MAX_PAGES.
+>>
+>> The only functional change is iterate_bvec():lib/iov_iter.c
+>>
+>> xfstests(-a auto) over loop aio is run for ext4/xfs to verify
+>> the change and no regression found with this patchset.
+>
+>
+> Added patches 1-7, still waiting for an answer on my reply to #8.
 
-This path intoroduces a new BLKDEV_DISCARD_ZERO flag to
-blkdev_issue_discard that indicates we are called for zeroing operation.
-This allows both to ignore the EOPNOTSUPP hack and actually consolidating
-the discard_zeroes_data check into the function.
+Thanks for adding patches 1-7, and now I just found the added
+BIO_MAX_SIZE usage in dm-crypt.c is droped from next, so it is
+safe to kill it now.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-lib.c        | 17 +++++++++++------
- include/linux/blkdev.h |  4 +++-
- 2 files changed, 14 insertions(+), 7 deletions(-)
+I will send a new patch #8 against for-4.8/core.
 
-diff --git a/block/blk-lib.c b/block/blk-lib.c
-index 78626c2..45b35b1 100644
---- a/block/blk-lib.c
-+++ b/block/blk-lib.c
-@@ -36,12 +36,17 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
- 		return -ENXIO;
- 
- 	if (flags & BLKDEV_DISCARD_SECURE) {
-+		if (flags & BLKDEV_DISCARD_ZERO)
-+			return -EOPNOTSUPP;
- 		if (!blk_queue_secure_erase(q))
- 			return -EOPNOTSUPP;
- 		op = REQ_OP_SECURE_ERASE;
- 	} else {
- 		if (!blk_queue_discard(q))
- 			return -EOPNOTSUPP;
-+		if ((flags & BLKDEV_DISCARD_ZERO) &&
-+		    !q->limits.discard_zeroes_data)
-+			return -EOPNOTSUPP;
- 		op = REQ_OP_DISCARD;
- 	}
- 
-@@ -116,7 +121,7 @@ int blkdev_issue_discard(struct block_device *bdev, sector_t sector,
- 			&bio);
- 	if (!ret && bio) {
- 		ret = submit_bio_wait(bio);
--		if (ret == -EOPNOTSUPP)
-+		if (ret == -EOPNOTSUPP && !(flags & BLKDEV_DISCARD_ZERO))
- 			ret = 0;
- 	}
- 	blk_finish_plug(&plug);
-@@ -241,11 +246,11 @@ static int __blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
- int blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
- 			 sector_t nr_sects, gfp_t gfp_mask, bool discard)
- {
--	struct request_queue *q = bdev_get_queue(bdev);
--
--	if (discard && blk_queue_discard(q) && q->limits.discard_zeroes_data &&
--	    blkdev_issue_discard(bdev, sector, nr_sects, gfp_mask, 0) == 0)
--		return 0;
-+	if (discard) {
-+		if (!blkdev_issue_discard(bdev, sector, nr_sects, gfp_mask,
-+				BLKDEV_DISCARD_ZERO))
-+			return 0;
-+	}
- 
- 	if (bdev_write_same(bdev) &&
- 	    blkdev_issue_write_same(bdev, sector, nr_sects, gfp_mask,
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 9d1e0a4..b65ca66 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1136,7 +1136,9 @@ static inline struct request *blk_map_queue_find_tag(struct blk_queue_tag *bqt,
- 	return bqt->tag_index[tag];
- }
- 
--#define BLKDEV_DISCARD_SECURE  0x01    /* secure discard */
-+
-+#define BLKDEV_DISCARD_SECURE	(1 << 0)	/* issue a secure erase */
-+#define BLKDEV_DISCARD_ZERO	(1 << 1)	/* must reliably zero data */
- 
- extern int blkdev_issue_flush(struct block_device *, gfp_t, sector_t *);
- extern int blkdev_issue_discard(struct block_device *bdev, sector_t sector,
--- 
-2.1.4
+Thanks,
+Ming
 
+>
+> --
+> Jens Axboe
+>
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-block" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
