@@ -1,82 +1,101 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from youngberry.canonical.com ([91.189.89.112]:52377 "EHLO
-	youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752530AbcFAMio (ORCPT
-	<rfc822;linux-block@vger.kernel.org>); Wed, 1 Jun 2016 08:38:44 -0400
+Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, axboe@fb.com,
+ keith.busch@intel.com, linux-nvme@lists.infradead.org
+Subject: [PATCH 2/6] null_blk: refactor to support non-gendisk devices
+Date: Fri, 10 Jun 2016 14:20:58 +0200
+Message-Id: <1465561262-13789-3-git-send-email-m@bjorling.me>
+In-Reply-To: <1465561262-13789-1-git-send-email-m@bjorling.me>
+References: <1465561262-13789-1-git-send-email-m@bjorling.me>
 MIME-Version: 1.0
-In-Reply-To: <20160531155348.GA24840@redhat.com>
-References: <1464615294-9946-1-git-send-email-ming.lei@canonical.com>
-	<20160531155348.GA24840@redhat.com>
-Date: Wed, 1 Jun 2016 20:38:41 +0800
-Message-ID: <CACVXFVM9FqZFkMat_4ysJ8_vFd1FFnf6Bd9sHDDoCK=v93wViQ@mail.gmail.com>
-Subject: Re: [PATCH v6 0/8] block: prepare for multipage bvecs
-From: Ming Lei <ming.lei@canonical.com>
-To: Mike Snitzer <snitzer@redhat.com>
-Cc: Jens Axboe <axboe@fb.com>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-	Al Viro <viro@zeniv.linux.org.uk>,
-	"open list:DRBD DRIVER" <drbd-dev@lists.linbit.com>,
-	Jan Kara <jack@suse.cz>, Joe Thornber <ejt@redhat.com>,
-	Keith Busch <keith.busch@intel.com>,
-	Kent Overstreet <kent.overstreet@gmail.com>,
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Michal Hocko <mhocko@suse.com>, NeilBrown <neilb@suse.com>,
-	Sagi Grimberg <sagig@mellanox.com>, Shaohua Li <shli@fb.com>,
-	Steven Whitehouse <swhiteho@redhat.com>,
-	Tejun Heo <tj@kernel.org>,
-	"open list:XFS FILESYSTEM" <xfs@oss.sgi.com>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
+List-Post: <mailto:linux-nvme@lists.infradead.org>
+List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
+Cc: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+Content-Type: text/plain; charset="utf-8"
+Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
+Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
+List-ID: <linux-block@vger.kernel.org>
 
-On Tue, May 31, 2016 at 11:53 PM, Mike Snitzer <snitzer@redhat.com> wrote:
-> On Mon, May 30 2016 at  9:34am -0400,
-> Ming Lei <ming.lei@canonical.com> wrote:
->
->>
->> Hi,
->>
->> Interests[1] have been shown in multipage bvecs, so this patchset
->> try to prepare for the support and do two things:
->>
->> 1) the 1st 4 patches use bvec iterator to implement iterate_bvec(),
->> then we can drop the non-standard way for iterating bvec, which
->> can be thought as a good cleanup for lib/iov_iter.c
->>
->> 2) remove BIO_MAX_SECTORS and makre BIO_MAX_SIZE as obsolete, and
->> now there is only one user for each. Once multipage bvecs is introduced,
->> one bio may hold lots of sectors, and we should always use sort of
->> BIO_MAX_VECS which should be introduced in future and is similiar
->> with current BIO_MAX_PAGES.
->>
->> The only functional change is iterate_bvec():lib/iov_iter.c
->>
->> xfstests(-a auto) over loop aio is run for ext4/xfs to verify
->> the change and no regression found with this patchset.
->>
->> V6:
->>       - rebased on v4.7-rc1
->>       - add reviewed-by tag
->>       - mark BIO_MAX_SIZE as obsolete instead of removing because
->>       dm-tree adds one usage now
->
-> Not sure what you're referring to here with "dm-tree" (since "dm-tree"
-> doesn't exist).  But only direct user of "BIO_MAX_SIZE" in DM appears to
-
-Looks it is from crypto tree:
-
-   git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6
-
-> be dm-crypt.c.  Maybe you've identified some indirect use of
-> BIO_MAX_SIZE?
-
-I mean the recently introduced BIO_MAX_SIZE in -next tree:
-
-https://git.kernel.org/cgit/linux/kernel/git/next/linux-next.git/commit/drivers/md/dm-crypt.c?id=4ed89c97b0706477b822ea2182827640c0cec486
-
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-block" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+V2l0aCBMaWdodE5WTSBlbmFibGVkIGRldmljZXMsIHRoZSBnZW5kaXNrIHN0cnVjdHVyZSBpcyBu
+b3QgZXhwb3NlZAp0byB0aGUgdXNlci4gVGhpcyBoaWRlcyB0aGUgZGV2aWNlIGRyaXZlciBzcGVj
+aWZpYyBzeXNmcyBlbnRyaWVzLCBhbmQKcHJldmVudHMgYmluZGluZyBvZiBMaWdodE5WTSBnZW9t
+ZXRyeSBpbmZvcm1hdGlvbiB0byB0aGUgZGV2aWNlLgoKUmVmYWN0b3IgdGhlIGRldmljZSByZWdp
+c3RyYXRpb24gcHJvY2Vzcywgc28gdGhhdCBnZW5kaXNrIGFuZApub24tZ2VuZGlzayBkZXZpY2Vz
+IGFyZSBlYXNpbHkgbWFuYWdlZC4KClNpZ25lZC1vZmYtYnk6IE1hdGlhcyBCasO4cmxpbmcgPG1A
+YmpvcmxpbmcubWU+Ci0tLQogZHJpdmVycy9ibG9jay9udWxsX2Jsay5jIHwgMTEwICsrKysrKysr
+KysrKysrKysrKysrKysrKysrLS0tLS0tLS0tLS0tLS0tLS0tLS0tCiAxIGZpbGUgY2hhbmdlZCwg
+NjEgaW5zZXJ0aW9ucygrKSwgNDkgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvZHJpdmVycy9i
+bG9jay9udWxsX2Jsay5jIGIvZHJpdmVycy9ibG9jay9udWxsX2Jsay5jCmluZGV4IGNhYjk3NTku
+LjMxMTdkZjEgMTAwNjQ0Ci0tLSBhL2RyaXZlcnMvYmxvY2svbnVsbF9ibGsuYworKysgYi9kcml2
+ZXJzL2Jsb2NrL251bGxfYmxrLmMKQEAgLTQxNCwyMyArNDE0LDYgQEAgc3RhdGljIHZvaWQgY2xl
+YW51cF9xdWV1ZXMoc3RydWN0IG51bGxiICpudWxsYikKIAlrZnJlZShudWxsYi0+cXVldWVzKTsK
+IH0KIAotc3RhdGljIHZvaWQgbnVsbF9kZWxfZGV2KHN0cnVjdCBudWxsYiAqbnVsbGIpCi17Ci0J
+bGlzdF9kZWxfaW5pdCgmbnVsbGItPmxpc3QpOwotCi0JaWYgKHVzZV9saWdodG52bSkKLQkJbnZt
+X3VucmVnaXN0ZXIobnVsbGItPmRpc2tfbmFtZSk7Ci0JZWxzZQotCQlkZWxfZ2VuZGlzayhudWxs
+Yi0+ZGlzayk7Ci0JYmxrX2NsZWFudXBfcXVldWUobnVsbGItPnEpOwotCWlmIChxdWV1ZV9tb2Rl
+ID09IE5VTExfUV9NUSkKLQkJYmxrX21xX2ZyZWVfdGFnX3NldCgmbnVsbGItPnRhZ19zZXQpOwot
+CWlmICghdXNlX2xpZ2h0bnZtKQotCQlwdXRfZGlzayhudWxsYi0+ZGlzayk7Ci0JY2xlYW51cF9x
+dWV1ZXMobnVsbGIpOwotCWtmcmVlKG51bGxiKTsKLX0KLQogI2lmZGVmIENPTkZJR19OVk0KIAog
+c3RhdGljIHZvaWQgbnVsbF9sbnZtX2VuZF9pbyhzdHJ1Y3QgcmVxdWVzdCAqcnEsIGludCBlcnJv
+cikKQEAgLTU2NCwxMCArNTQ3LDQxIEBAIHN0YXRpYyBzdHJ1Y3QgbnZtX2Rldl9vcHMgbnVsbF9s
+bnZtX2Rldl9vcHMgPSB7CiAJLyogU2ltdWxhdGUgbnZtZSBwcm90b2NvbCByZXN0cmljdGlvbiAq
+LwogCS5tYXhfcGh5c19zZWN0CQk9IDY0LAogfTsKKworc3RhdGljIGludCBudWxsX252bV9yZWdp
+c3RlcihzdHJ1Y3QgbnVsbGIgKm51bGxiKQoreworCXJldHVybiBudm1fcmVnaXN0ZXIobnVsbGIt
+PnEsIG51bGxiLT5kaXNrX25hbWUsICZudWxsX2xudm1fZGV2X29wcyk7Cit9CisKK3N0YXRpYyB2
+b2lkIG51bGxfbnZtX3VucmVnaXN0ZXIoc3RydWN0IG51bGxiICpudWxsYikKK3sKKwludm1fdW5y
+ZWdpc3RlcihudWxsYi0+ZGlza19uYW1lKTsKK30KICNlbHNlCi1zdGF0aWMgc3RydWN0IG52bV9k
+ZXZfb3BzIG51bGxfbG52bV9kZXZfb3BzOworc3RhdGljIGludCBudWxsX252bV9yZWdpc3Rlcihz
+dHJ1Y3QgbnVsbGIgKm51bGxiKQoreworCXJldHVybiAtRUlOVkFMOworfQorc3RhdGljIHZvaWQg
+bnVsbF9udm1fdW5yZWdpc3RlcihzdHJ1Y3QgbnVsbGIgKm51bGxiKSB7fQogI2VuZGlmIC8qIENP
+TkZJR19OVk0gKi8KIAorc3RhdGljIHZvaWQgbnVsbF9kZWxfZGV2KHN0cnVjdCBudWxsYiAqbnVs
+bGIpCit7CisJbGlzdF9kZWxfaW5pdCgmbnVsbGItPmxpc3QpOworCisJaWYgKHVzZV9saWdodG52
+bSkKKwkJbnVsbF9udm1fdW5yZWdpc3RlcihudWxsYik7CisJZWxzZQorCQlkZWxfZ2VuZGlzayhu
+dWxsYi0+ZGlzayk7CisJYmxrX2NsZWFudXBfcXVldWUobnVsbGItPnEpOworCWlmIChxdWV1ZV9t
+b2RlID09IE5VTExfUV9NUSkKKwkJYmxrX21xX2ZyZWVfdGFnX3NldCgmbnVsbGItPnRhZ19zZXQp
+OworCWlmICghdXNlX2xpZ2h0bnZtKQorCQlwdXRfZGlzayhudWxsYi0+ZGlzayk7CisJY2xlYW51
+cF9xdWV1ZXMobnVsbGIpOworCWtmcmVlKG51bGxiKTsKK30KKwogc3RhdGljIGludCBudWxsX29w
+ZW4oc3RydWN0IGJsb2NrX2RldmljZSAqYmRldiwgZm1vZGVfdCBtb2RlKQogewogCXJldHVybiAw
+OwpAQCAtNjQwLDExICs2NTQsMzIgQEAgc3RhdGljIGludCBpbml0X2RyaXZlcl9xdWV1ZXMoc3Ry
+dWN0IG51bGxiICpudWxsYikKIAlyZXR1cm4gMDsKIH0KIAotc3RhdGljIGludCBudWxsX2FkZF9k
+ZXYodm9pZCkKK3N0YXRpYyBpbnQgbnVsbF9nZW5kaXNrX3JlZ2lzdGVyKHN0cnVjdCBudWxsYiAq
+bnVsbGIpCiB7CiAJc3RydWN0IGdlbmRpc2sgKmRpc2s7Ci0Jc3RydWN0IG51bGxiICpudWxsYjsK
+IAlzZWN0b3JfdCBzaXplOworCisJZGlzayA9IG51bGxiLT5kaXNrID0gYWxsb2NfZGlza19ub2Rl
+KDEsIGhvbWVfbm9kZSk7CisJaWYgKCFkaXNrKQorCQlyZXR1cm4gLUVOT01FTTsKKwlzaXplID0g
+Z2IgKiAxMDI0ICogMTAyNCAqIDEwMjRVTEw7CisJc2V0X2NhcGFjaXR5KGRpc2ssIHNpemUgPj4g
+OSk7CisKKwlkaXNrLT5mbGFncyB8PSBHRU5IRF9GTF9FWFRfREVWVCB8IEdFTkhEX0ZMX1NVUFBS
+RVNTX1BBUlRJVElPTl9JTkZPOworCWRpc2stPm1ham9yCQk9IG51bGxfbWFqb3I7CisJZGlzay0+
+Zmlyc3RfbWlub3IJPSBudWxsYi0+aW5kZXg7CisJZGlzay0+Zm9wcwkJPSAmbnVsbF9mb3BzOwor
+CWRpc2stPnByaXZhdGVfZGF0YQk9IG51bGxiOworCWRpc2stPnF1ZXVlCQk9IG51bGxiLT5xOwor
+CXN0cm5jcHkoZGlzay0+ZGlza19uYW1lLCBudWxsYi0+ZGlza19uYW1lLCBESVNLX05BTUVfTEVO
+KTsKKworCWFkZF9kaXNrKGRpc2spOworCXJldHVybiAwOworfQorCitzdGF0aWMgaW50IG51bGxf
+YWRkX2Rldih2b2lkKQoreworCXN0cnVjdCBudWxsYiAqbnVsbGI7CiAJaW50IHJ2OwogCiAJbnVs
+bGIgPSBremFsbG9jX25vZGUoc2l6ZW9mKCpudWxsYiksIEdGUF9LRVJORUwsIGhvbWVfbm9kZSk7
+CkBAIC03MTYsNDIgKzc1MSwxOSBAQCBzdGF0aWMgaW50IG51bGxfYWRkX2Rldih2b2lkKQogCiAJ
+c3ByaW50ZihudWxsYi0+ZGlza19uYW1lLCAibnVsbGIlZCIsIG51bGxiLT5pbmRleCk7CiAKLQlp
+ZiAodXNlX2xpZ2h0bnZtKSB7Ci0JCXJ2ID0gbnZtX3JlZ2lzdGVyKG51bGxiLT5xLCBudWxsYi0+
+ZGlza19uYW1lLAotCQkJCQkJCSZudWxsX2xudm1fZGV2X29wcyk7Ci0JCWlmIChydikKLQkJCWdv
+dG8gb3V0X2NsZWFudXBfYmxrX3F1ZXVlOwotCQlnb3RvIGRvbmU7Ci0JfQorCWlmICh1c2VfbGln
+aHRudm0pCisJCXJ2ID0gbnVsbF9udm1fcmVnaXN0ZXIobnVsbGIpOworCWVsc2UKKwkJcnYgPSBu
+dWxsX2dlbmRpc2tfcmVnaXN0ZXIobnVsbGIpOwogCi0JZGlzayA9IG51bGxiLT5kaXNrID0gYWxs
+b2NfZGlza19ub2RlKDEsIGhvbWVfbm9kZSk7Ci0JaWYgKCFkaXNrKSB7Ci0JCXJ2ID0gLUVOT01F
+TTsKLQkJZ290byBvdXRfY2xlYW51cF9saWdodG52bTsKLQl9Ci0Jc2l6ZSA9IGdiICogMTAyNCAq
+IDEwMjQgKiAxMDI0VUxMOwotCXNldF9jYXBhY2l0eShkaXNrLCBzaXplID4+IDkpOworCWlmIChy
+dikKKwkJZ290byBvdXRfY2xlYW51cF9ibGtfcXVldWU7CiAKLQlkaXNrLT5mbGFncyB8PSBHRU5I
+RF9GTF9FWFRfREVWVCB8IEdFTkhEX0ZMX1NVUFBSRVNTX1BBUlRJVElPTl9JTkZPOwotCWRpc2st
+Pm1ham9yCQk9IG51bGxfbWFqb3I7Ci0JZGlzay0+Zmlyc3RfbWlub3IJPSBudWxsYi0+aW5kZXg7
+Ci0JZGlzay0+Zm9wcwkJPSAmbnVsbF9mb3BzOwotCWRpc2stPnByaXZhdGVfZGF0YQk9IG51bGxi
+OwotCWRpc2stPnF1ZXVlCQk9IG51bGxiLT5xOwotCXN0cm5jcHkoZGlzay0+ZGlza19uYW1lLCBu
+dWxsYi0+ZGlza19uYW1lLCBESVNLX05BTUVfTEVOKTsKLQotCWFkZF9kaXNrKGRpc2spOwotCi1k
+b25lOgogCW11dGV4X2xvY2soJmxvY2spOwogCWxpc3RfYWRkX3RhaWwoJm51bGxiLT5saXN0LCAm
+bnVsbGJfbGlzdCk7CiAJbXV0ZXhfdW5sb2NrKCZsb2NrKTsKIAogCXJldHVybiAwOwotCi1vdXRf
+Y2xlYW51cF9saWdodG52bToKLQlpZiAodXNlX2xpZ2h0bnZtKQotCQludm1fdW5yZWdpc3Rlcihu
+dWxsYi0+ZGlza19uYW1lKTsKIG91dF9jbGVhbnVwX2Jsa19xdWV1ZToKIAlibGtfY2xlYW51cF9x
+dWV1ZShudWxsYi0+cSk7CiBvdXRfY2xlYW51cF90YWdzOgotLSAKMi4xLjQKCgpfX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpMaW51eC1udm1lIG1haWxpbmcg
+bGlzdApMaW51eC1udm1lQGxpc3RzLmluZnJhZGVhZC5vcmcKaHR0cDovL2xpc3RzLmluZnJhZGVh
+ZC5vcmcvbWFpbG1hbi9saXN0aW5mby9saW51eC1udm1lCg==
