@@ -1,35 +1,81 @@
-Return-Path: <martin.petersen@oracle.com>
-To: Hannes Reinecke <hare@suse.de>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Mike Snitzer <snitzer@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        Brian King <brking@us.ibm.com>, linux-scsi@vger.kernel.org,
-        linux-block@vger.kernel.org, mark.bergman@uphs.upenn.edu
+Return-Path: <hare@suse.de>
 Subject: Re: block: don't check request size in blk_cloned_rq_check_limits()
-From: "Martin K. Petersen" <martin.petersen@oracle.com>
+To: Mike Snitzer <snitzer@redhat.com>
 References: <1464593093-93527-1-git-send-email-hare@suse.de>
-	<20160610131901.GA28570@redhat.com>
-	<yq160tgfoqr.fsf@sermon.lab.mkp.net> <575BE182.5010304@suse.de>
-Date: Sat, 11 Jun 2016 07:06:49 -0400
-In-Reply-To: <575BE182.5010304@suse.de> (Hannes Reinecke's message of "Sat, 11
-	Jun 2016 12:01:38 +0200")
-Message-ID: <yq11t44f0hi.fsf@sermon.lab.mkp.net>
+ <20160610131901.GA28570@redhat.com> <575AC10F.7020504@suse.de>
+ <20160610141852.GA28876@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Brian King <brking@us.ibm.com>,
+ linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+ mark.bergman@uphs.upenn.edu, "Martin K. Petersen"
+ <martin.petersen@oracle.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <575BE259.4080901@suse.de>
+Date: Sat, 11 Jun 2016 12:05:13 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20160610141852.GA28876@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
->>>>> "Hannes" == Hannes Reinecke <hare@suse.de> writes:
+On 06/10/2016 04:18 PM, Mike Snitzer wrote:
+> On Fri, Jun 10 2016 at  9:30am -0400,
+> Hannes Reinecke <hare@suse.de> wrote:
+>
+>> On 06/10/2016 03:19 PM, Mike Snitzer wrote:
+>>> On Mon, May 30 2016 at  3:24am -0400,
+>>> Hannes Reinecke <hare@suse.de> wrote:
+>>>
+>>>> When checking a cloned request there is no need to check
+>>>> the overall request size; this won't have changed even
+>>>> when resubmitting to another queue.
+>>>> Without this patch ppc64le on ibmvfc fails to boot.
+>>>
+>>> By simply removing the check aren't you papering over the real problem?
+>>> Looking at Martin's commit f31dc1cd490539 (which introduced the current
+>>> variant of the limits check) I'm not convinced it is equivalent to what
+>>> he replaced.  I'll look closer in a bit.
+>>>
+>> The check itself is wrong, as we need (at least) to check the
+>> max_hw_sectors here; the request is already fully assembled, so there is
+>> a really good chance he's going beyond the max_sectors.
+>> But trying the error still was found to be present.
+>> So I decided to rip it out, as the overall value of this check is zero.
+>
+> fine, any chance you can improve the header to include these details.
+> At least mention that commit f31dc1cd490539 incorrectly removed the
+> max_hw_sectors checking.  And then please add these tags to a v2 repost:
+>
+> Fixes: f31dc1cd490539 ("block: Consolidate command flag and queue limit checks for merges")
+> Reported-by: Mark Bergman <mark.bergman@uphs.upenn.edu>
+> Acked-by: Mike Snitzer <snitzer@redhat.com>
+> Cc: stable@vger.kernel.org # 3.7+
+>
+Okay, will be doing for a repost.
 
-Hannes> Because we're checking the wrong limit.
+>>> Also you categorized your fix was for "ppc64le on ibmvfc"; whereas Mark
+>>> has reported this issue (off-list) against x86_64.  By making it seem
+>>> ppc64le specific I didn't take this patch to be generally applicable.
+>>>
+>> Well, it has been observed on ppc64. That doesn't mean _only_ ppc64 is
+>> affected. If it were ppc64 only it should've been marked as such, right?
+>
+> If it is a generic problem, being specific about the hardware you saw it
+> on leads idiots like me to filter unnecessarily ;)
+>
+> Though I'm curious what you mean by "it should've been marked as
+> such".. "it" being what?  The patch?  And how would it have been marked
+> as ppc64 only?
+Exactly my point.
+I was just trying to figure out what caused you to ignore the patch.
 
-The original code checked that the request was smaller than both
-max_sectors and max_hw_sectors so it would have failed here as well.
+Anyway.
 
-Hannes> blk_queue_get_max_sectors() is checking limits.max_sectors(),
-Hannes> but the requests are already fully formed and can extend up to
-Hannes> limits.max_hw_sectors().
+Will be reposting a v2 once Martin is happy.
 
-We should not be issuing REQ_TYPE_FS requests larger than max_sectors.
-How did we get here?
+Cheers,
 
+Hannes
 -- 
-Martin K. Petersen	Oracle Linux Engineering
+Dr. Hannes Reinecke		      zSeries & Storage
+hare@suse.de			      +49 911 74053 688
+SUSE LINUX Products GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: J. Hawn, J. Guild, F. Imend�rffer, HRB 16746 (AG N�rnberg)
