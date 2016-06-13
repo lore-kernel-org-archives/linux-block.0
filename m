@@ -1,70 +1,126 @@
-Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
+Return-Path: <BATV+a67a43e55467fd1c3dfd+4677+infradead.org+hch@bombadil.srs.infradead.org>
 From: Christoph Hellwig <hch@lst.de>
-To: tglx@linutronix.de,
-	axboe@fb.com
-Subject: [PATCH 09/13] blk-mq: don't redistribute hardware queues on a CPU
- hotplug event
-Date: Tue, 14 Jun 2016 21:59:02 +0200
-Message-Id: <1465934346-20648-10-git-send-email-hch@lst.de>
-In-Reply-To: <1465934346-20648-1-git-send-email-hch@lst.de>
-References: <1465934346-20648-1-git-send-email-hch@lst.de>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
-List-Post: <mailto:linux-nvme@lists.infradead.org>
-List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
-Cc: linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
-Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
+To: axboe@kernel.dk
+Cc: mst@redhat.com,
+	ooo@electrozaur.com,
+	bhalevy@primarydata.com,
+	nab@linux-iscsi.org,
+	linux-block@vger.kernel.org
+Subject: [PATCH 4/7] block: simplify and export blk_rq_append_bio
+Date: Mon, 13 Jun 2016 17:21:15 +0200
+Message-Id: <1465831278-23653-5-git-send-email-hch@lst.de>
+In-Reply-To: <1465831278-23653-1-git-send-email-hch@lst.de>
+References: <1465831278-23653-1-git-send-email-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Currently blk-mq will totally remap hardware context when a CPU hotplug
-even happened, which causes major havoc for drivers, as they are never
-told about this remapping.  E.g. any carefully sorted out CPU affinity
-will just be completely messed up.
+The target SCSI passthrough backend is much better served with the low-level
+blk_rq_append_bio construct then the helpers built on top of it, so export it.
 
-The rebuild also doesn't really help for the common case of cpu
-hotplug, which is soft onlining / offlining of cpus - in this case we
-should just leave the queue and irq mapping as is.  If it actually
-worked it would have helped in the case of physical cpu hotplug,
-although for that we'd need a way to actually notify the driver.
-Note that drivers may already be able to accommodate such a topology
-change on their own, e.g. using the reset_controller sysfs file in NVMe
-will cause the driver to get things right for this case.
-
-With the rebuild removed we will simplify retain the queue mapping for
-a soft offlined CPU that will work when it comes back online, and will
-map any newly onlined CPU to queue NULL until the driver initiates
-a rebuild of the queue map.
+Also use the opportunity to remove the pointless request_queue argument and
+make the code flow a little more readable.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-mq.c | 2 --
- 1 file changed, 2 deletions(-)
+ block/blk-core.c       |  2 +-
+ block/blk-map.c        | 25 +++++++++++++++----------
+ block/blk.h            |  2 --
+ include/linux/blkdev.h |  1 +
+ 4 files changed, 17 insertions(+), 13 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index bc7166d..f972d32 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2114,8 +2114,6 @@ static void blk_mq_queue_reinit(struct request_queue *q,
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 2b179cd..ceefa48 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -1364,7 +1364,7 @@ struct request *blk_make_request(struct request_queue *q, struct bio *bio,
+ 		int ret;
  
- 	blk_mq_sysfs_unregister(q);
+ 		blk_queue_bounce(q, &bounce_bio);
+-		ret = blk_rq_append_bio(q, rq, bounce_bio);
++		ret = blk_rq_append_bio(rq, bounce_bio);
+ 		if (unlikely(ret)) {
+ 			blk_put_request(rq);
+ 			return ERR_PTR(ret);
+diff --git a/block/blk-map.c b/block/blk-map.c
+index 61733a6..b8657fa 100644
+--- a/block/blk-map.c
++++ b/block/blk-map.c
+@@ -9,21 +9,26 @@
  
--	blk_mq_update_queue_map(q->mq_map, q->nr_hw_queues, online_mask);
+ #include "blk.h"
+ 
+-int blk_rq_append_bio(struct request_queue *q, struct request *rq,
+-		      struct bio *bio)
++/*
++ * Append a bio to a passthrough request.  Only works can be merged into
++ * the request based on the driver constraints.
++ */
++int blk_rq_append_bio(struct request *rq, struct bio *bio)
+ {
+-	if (!rq->bio)
+-		blk_rq_bio_prep(q, rq, bio);
+-	else if (!ll_back_merge_fn(q, rq, bio))
+-		return -EINVAL;
+-	else {
++	if (!rq->bio) {
++		blk_rq_bio_prep(rq->q, rq, bio);
++	} else {
++		if (!ll_back_merge_fn(rq->q, rq, bio))
++			return -EINVAL;
++
+ 		rq->biotail->bi_next = bio;
+ 		rq->biotail = bio;
 -
- 	/*
- 	 * redo blk_mq_init_cpu_queues and blk_mq_init_hw_queues. FIXME: maybe
- 	 * we should change hctx numa_node according to new topology (this
+ 		rq->__data_len += bio->bi_iter.bi_size;
+ 	}
++
+ 	return 0;
+ }
++EXPORT_SYMBOL(blk_rq_append_bio);
+ 
+ static int __blk_rq_unmap_user(struct bio *bio)
+ {
+@@ -71,7 +76,7 @@ static int __blk_rq_map_user_iov(struct request *rq,
+ 	 */
+ 	bio_get(bio);
+ 
+-	ret = blk_rq_append_bio(q, rq, bio);
++	ret = blk_rq_append_bio(rq, bio);
+ 	if (ret) {
+ 		bio_endio(bio);
+ 		__blk_rq_unmap_user(orig_bio);
+@@ -229,7 +234,7 @@ int blk_rq_map_kern(struct request_queue *q, struct request *rq, void *kbuf,
+ 	if (do_copy)
+ 		rq->cmd_flags |= REQ_COPY_USER;
+ 
+-	ret = blk_rq_append_bio(q, rq, bio);
++	ret = blk_rq_append_bio(rq, bio);
+ 	if (unlikely(ret)) {
+ 		/* request is too big */
+ 		bio_put(bio);
+diff --git a/block/blk.h b/block/blk.h
+index 70e4aee..c37492f 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -64,8 +64,6 @@ void blk_exit_rl(struct request_list *rl);
+ void init_request_from_bio(struct request *req, struct bio *bio);
+ void blk_rq_bio_prep(struct request_queue *q, struct request *rq,
+ 			struct bio *bio);
+-int blk_rq_append_bio(struct request_queue *q, struct request *rq,
+-		      struct bio *bio);
+ void blk_queue_bypass_start(struct request_queue *q);
+ void blk_queue_bypass_end(struct request_queue *q);
+ void blk_dequeue_request(struct request *rq);
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 472b527..998fbe0 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -800,6 +800,7 @@ extern int blk_rq_prep_clone(struct request *rq, struct request *rq_src,
+ extern void blk_rq_unprep_clone(struct request *rq);
+ extern int blk_insert_cloned_request(struct request_queue *q,
+ 				     struct request *rq);
++extern int blk_rq_append_bio(struct request *rq, struct bio *bio);
+ extern void blk_delay_queue(struct request_queue *, unsigned long);
+ extern void blk_queue_split(struct request_queue *, struct bio **,
+ 			    struct bio_set *);
 -- 
 2.1.4
-
-
-_______________________________________________
-Linux-nvme mailing list
-Linux-nvme@lists.infradead.org
-http://lists.infradead.org/mailman/listinfo/linux-nvme
