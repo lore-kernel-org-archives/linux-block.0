@@ -1,30 +1,58 @@
-Return-Path: <jthumshirn@suse.de>
-Date: Mon, 20 Jun 2016 15:29:41 +0200
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Christoph Hellwig <hch@lst.de>
-Cc: axboe@kernel.dk, mchristi@redhat.com, linux-block@vger.kernel.org
-Subject: Re: [PATCH 3/3] block: shrink bio size again
-Message-ID: <20160620132941.hk7ua35vk7mgg44l@c203.arch.suse.de>
+Return-Path: <BATV+a67a43e55467fd1c3dfd+4677+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk
+Cc: mchristi@redhat.com,
+	linux-block@vger.kernel.org
+Subject: [PATCH 3/3] block: shrink bio size again
+Date: Mon, 13 Jun 2016 16:48:35 +0200
+Message-Id: <1465829315-23137-4-git-send-email-hch@lst.de>
+In-Reply-To: <1465829315-23137-1-git-send-email-hch@lst.de>
 References: <1465829315-23137-1-git-send-email-hch@lst.de>
- <1465829315-23137-4-git-send-email-hch@lst.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1465829315-23137-4-git-send-email-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Jun 13, 2016 at 04:48:35PM +0200, Christoph Hellwig wrote:
-> The recent ops split grew the bio by adding the new ioprio field.
-> Shrink it again by using a 16-bit field for the bi_flags value and
-> filling the holes near the beginning of the structure.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+The recent ops split grew the bio by adding the new ioprio field.
+Shrink it again by using a 16-bit field for the bi_flags value and
+filling the holes near the beginning of the structure.
 
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ include/linux/blk_types.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index 4494b6c..f254eb2 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -26,11 +26,11 @@ typedef void (bio_destructor_t) (struct bio *);
+ struct bio {
+ 	struct bio		*bi_next;	/* request queue link */
+ 	struct block_device	*bi_bdev;
+-	unsigned int		bi_flags;	/* status, command, etc */
+ 	int			bi_error;
+ 	unsigned int		bi_rw;		/* bottom bits req flags,
+ 						 * top bits REQ_OP
+ 						 */
++	unsigned short		bi_flags;	/* status, command, etc */
+ 	unsigned short		bi_ioprio;
+ 
+ 	struct bvec_iter	bi_iter;
+@@ -116,7 +116,7 @@ struct bio {
+  * Flags starting here get preserved by bio_reset() - this includes
+  * BVEC_POOL_IDX()
+  */
+-#define BIO_RESET_BITS	13
++#define BIO_RESET_BITS	10
+ 
+ /*
+  * We support 6 different bvec pools, the last one is magic in that it
+@@ -131,7 +131,7 @@ struct bio {
+  * freed.
+  */
+ #define BVEC_POOL_BITS		(4)
+-#define BVEC_POOL_OFFSET	(32 - BVEC_POOL_BITS)
++#define BVEC_POOL_OFFSET	(16 - BVEC_POOL_BITS)
+ #define BVEC_POOL_IDX(bio)	((bio)->bi_flags >> BVEC_POOL_OFFSET)
+ 
+ #endif /* CONFIG_BLOCK */
 -- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: Felix Imend�rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N�rnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+2.1.4
