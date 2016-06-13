@@ -1,75 +1,95 @@
-Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
+Return-Path: <BATV+a67a43e55467fd1c3dfd+4677+infradead.org+hch@bombadil.srs.infradead.org>
 From: Christoph Hellwig <hch@lst.de>
-To: tglx@linutronix.de,
-	axboe@fb.com
-Subject: [PATCH 05/13] irq/msi: Make use of affinity aware allocations
-Date: Tue, 14 Jun 2016 21:58:58 +0200
-Message-Id: <1465934346-20648-6-git-send-email-hch@lst.de>
-In-Reply-To: <1465934346-20648-1-git-send-email-hch@lst.de>
-References: <1465934346-20648-1-git-send-email-hch@lst.de>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
-List-Post: <mailto:linux-nvme@lists.infradead.org>
-List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
-Cc: linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
-Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
+To: axboe@kernel.dk,
+	keith.busch@intel.com
+Cc: linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	linux-rdma@vger.kernel.org,
+	Ming Lin <ming.l@ssi.samsung.com>
+Subject: [PATCH 1/8] blk-mq: add blk_mq_alloc_request_hctx
+Date: Mon, 13 Jun 2016 16:45:21 +0200
+Message-Id: <1465829128-22993-2-git-send-email-hch@lst.de>
+In-Reply-To: <1465829128-22993-1-git-send-email-hch@lst.de>
+References: <1465829128-22993-1-git-send-email-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Thomas Gleixner <tglx@linutronix.de>
+From: Ming Lin <ming.l@ssi.samsung.com>
 
-Allow the MSI code to provide affinity hints per MSI descriptor.
+For some protocols like NVMe over Fabrics we need to be able to send
+initialization commands to a specific queue.
 
-Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+Based on an earlier patch from Christoph Hellwig <hch@lst.de>.
+
+Signed-off-by: Ming Lin <ming.l@ssi.samsung.com>
+[hch: disallow sleeping allocation, req_op fixes]
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- include/linux/msi.h | 2 ++
- kernel/irq/msi.c    | 2 +-
- 2 files changed, 3 insertions(+), 1 deletion(-)
+ block/blk-mq.c         | 39 +++++++++++++++++++++++++++++++++++++++
+ include/linux/blk-mq.h |  2 ++
+ 2 files changed, 41 insertions(+)
 
-diff --git a/include/linux/msi.h b/include/linux/msi.h
-index c33abfa..4f0bfe5 100644
---- a/include/linux/msi.h
-+++ b/include/linux/msi.h
-@@ -47,6 +47,7 @@ struct fsl_mc_msi_desc {
-  * @nvec_used:	The number of vectors used
-  * @dev:	Pointer to the device which uses this descriptor
-  * @msg:	The last set MSI message cached for reuse
-+ * @affinity:	Optional pointer to a cpu affinity mask for this descriptor
-  *
-  * @masked:	[PCI MSI/X] Mask bits
-  * @is_msix:	[PCI MSI/X] True if MSI-X
-@@ -67,6 +68,7 @@ struct msi_desc {
- 	unsigned int			nvec_used;
- 	struct device			*dev;
- 	struct msi_msg			msg;
-+	const struct cpumask		*affinity;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index bc7166d..5e0fe60 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -267,6 +267,45 @@ struct request *blk_mq_alloc_request(struct request_queue *q, int rw,
+ }
+ EXPORT_SYMBOL(blk_mq_alloc_request);
  
- 	union {
- 		/* PCI MSI/X specific data */
-diff --git a/kernel/irq/msi.c b/kernel/irq/msi.c
-index 58dbbac..0e2a736 100644
---- a/kernel/irq/msi.c
-+++ b/kernel/irq/msi.c
-@@ -335,7 +335,7 @@ int msi_domain_alloc_irqs(struct irq_domain *domain, struct device *dev,
++struct request *blk_mq_alloc_request_hctx(struct request_queue *q, int rw,
++		unsigned int flags, unsigned int hctx_idx)
++{
++	struct blk_mq_hw_ctx *hctx;
++	struct blk_mq_ctx *ctx;
++	struct request *rq;
++	struct blk_mq_alloc_data alloc_data;
++	int ret;
++
++	/*
++	 * If the tag allocator sleeps we could get an allocation for a
++	 * different hardware context.  No need to complicate the low level
++	 * allocator for this for the rare use case of a command tied to
++	 * a specific queue.
++	 */
++	if (WARN_ON_ONCE(!(flags & BLK_MQ_REQ_NOWAIT)))
++		return ERR_PTR(-EINVAL);
++
++	if (hctx_idx >= q->nr_hw_queues)
++		return ERR_PTR(-EIO);
++
++	ret = blk_queue_enter(q, true);
++	if (ret)
++		return ERR_PTR(ret);
++
++	hctx = q->queue_hw_ctx[hctx_idx];
++	ctx = __blk_mq_get_ctx(q, cpumask_first(hctx->cpumask));
++
++	blk_mq_set_alloc_data(&alloc_data, q, flags, ctx, hctx);
++	rq = __blk_mq_alloc_request(&alloc_data, rw, 0);
++	if (!rq) {
++		blk_queue_exit(q);
++		return ERR_PTR(-EWOULDBLOCK);
++	}
++
++	return rq;
++}
++EXPORT_SYMBOL_GPL(blk_mq_alloc_request_hctx);
++
+ static void __blk_mq_free_request(struct blk_mq_hw_ctx *hctx,
+ 				  struct blk_mq_ctx *ctx, struct request *rq)
+ {
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 2498fdf..cbfd8ca 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -196,6 +196,8 @@ enum {
  
- 		virq = __irq_domain_alloc_irqs(domain, -1, desc->nvec_used,
- 					       dev_to_node(dev), &arg, false,
--					       NULL);
-+					       desc->affinity);
- 		if (virq < 0) {
- 			ret = -ENOSPC;
- 			if (ops->handle_error)
+ struct request *blk_mq_alloc_request(struct request_queue *q, int rw,
+ 		unsigned int flags);
++struct request *blk_mq_alloc_request_hctx(struct request_queue *q, int op,
++		unsigned int flags, unsigned int hctx_idx);
+ struct request *blk_mq_tag_to_rq(struct blk_mq_tags *tags, unsigned int tag);
+ struct cpumask *blk_mq_tags_cpumask(struct blk_mq_tags *tags);
+ 
 -- 
 2.1.4
-
-
-_______________________________________________
-Linux-nvme mailing list
-Linux-nvme@lists.infradead.org
-http://lists.infradead.org/mailman/listinfo/linux-nvme
