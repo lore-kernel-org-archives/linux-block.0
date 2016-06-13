@@ -1,47 +1,35 @@
-Return-Path: <keith.busch@intel.com>
-Date: Wed, 15 Jun 2016 15:54:01 -0400
-From: Keith Busch <keith.busch@intel.com>
-To: Christoph Hellwig <hch@lst.de>
-Cc: axboe@kernel.dk, linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org, linux-rdma@vger.kernel.org
-Subject: Re: generic NVMe over Fabrics library support V2
-Message-ID: <20160615195401.GA7637@localhost.localdomain>
-References: <1465829128-22993-1-git-send-email-hch@lst.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1465829128-22993-1-git-send-email-hch@lst.de>
+Return-Path: <BATV+a67a43e55467fd1c3dfd+4677+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk,
+	keith.busch@intel.com
+Cc: linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	linux-rdma@vger.kernel.org
+Subject: generic NVMe over Fabrics library support V2
+Date: Mon, 13 Jun 2016 16:45:20 +0200
+Message-Id: <1465829128-22993-1-git-send-email-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Jun 13, 2016 at 04:45:20PM +0200, Christoph Hellwig wrote:
-> This patch set adds the necessary infrastructure for the NVMe over
-> Fabrics functionality and the NVMe over Fabrics library itself.
-> 
-> First we add some needed parameters to NVMe request allocation such as flags
-> (for reserved commands - connect and keep-alive), also support tag
-> allocation of a given queue ID (for connect to be executed per-queue)
-> and allow request to be queued at the head of the request queue (so
-> reconnects can pass in flight I/O).
-> 
-> Second, we add support for additional sysfs attributes that are needed
-> or useful for the Fabrics driver.
-> 
-> Third we add the NVMe over Fabrics related header definitions and the
-> Fabrics library itself which is transport independent and handles
-> Fabrics specific commands and variables.
-> 
-> Last, we add support for periodic keep-alive mechanism which is mandatory
-> for Fabrics.
-> 
-> Changes from V1:
->  - don't directly free host->opts on connect failure (Sagi)
->  - blk_mq_alloc_request_hctx improvements (Ming and me)
->  - keep alive should not use blk_mq_alloc_request_hctx (me)
+This patch set adds the necessary infrastructure for the NVMe over
+Fabrics functionality and the NVMe over Fabrics library itself.
 
-I only had the one comment, and Sagi says you guys already considered
-it but was more complicated than it was worth. Looking at the patches
-that follow, I tend to agree.
+First we add some needed parameters to NVMe request allocation such as flags
+(for reserved commands - connect and keep-alive), also support tag
+allocation of a given queue ID (for connect to be executed per-queue)
+and allow request to be queued at the head of the request queue (so
+reconnects can pass in flight I/O).
 
-The rest looks great, and passes all the sanity tests I can run. This
-time with correct email spelling:
+Second, we add support for additional sysfs attributes that are needed
+or useful for the Fabrics driver.
 
-Reviewed-by: Keith Busch <keith.busch@intel.com>
+Third we add the NVMe over Fabrics related header definitions and the
+Fabrics library itself which is transport independent and handles
+Fabrics specific commands and variables.
+
+Last, we add support for periodic keep-alive mechanism which is mandatory
+for Fabrics.
+
+Changes from V1:
+ - don't directly free host->opts on connect failure (Sagi)
+ - blk_mq_alloc_request_hctx improvements (Ming and me)
+ - keep alive should not use blk_mq_alloc_request_hctx (me)
