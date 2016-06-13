@@ -1,67 +1,184 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.136]:60142 "EHLO mail.kernel.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1425774AbcFHTtD (ORCPT <rfc822;linux-block@vger.kernel.org>);
-	Wed, 8 Jun 2016 15:49:03 -0400
-From: Ming Lin <mlin@kernel.org>
-To: linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
-Cc: Christoph Hellwig <hch@lst.de>,
-	Keith Busch <keith.busch@intel.com>, Jens Axboe <axboe@fb.com>,
-	James Smart <james.smart@broadcom.com>
-Subject: [PATCH 1/2] blk-mq: add a function to return number of hw queues mapped
-Date: Wed,  8 Jun 2016 15:48:11 -0400
-Message-Id: <1465415292-9416-2-git-send-email-mlin@kernel.org>
-In-Reply-To: <1465415292-9416-1-git-send-email-mlin@kernel.org>
-References: <1465415292-9416-1-git-send-email-mlin@kernel.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <BATV+a67a43e55467fd1c3dfd+4677+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk,
+	keith.busch@intel.com
+Cc: linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	linux-rdma@vger.kernel.org
+Subject: [PATCH 3/8] nvme: Modify and export sync command submission for fabrics
+Date: Mon, 13 Jun 2016 16:45:23 +0200
+Message-Id: <1465829128-22993-4-git-send-email-hch@lst.de>
+In-Reply-To: <1465829128-22993-1-git-send-email-hch@lst.de>
+References: <1465829128-22993-1-git-send-email-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Ming Lin <ming.l@samsung.com>
+NVMe over fabrics will use __nvme_submit_sync_cmd in the the
+transport and require a few tweaks to it.  For that we export it
+and add a few more paramters:
 
-Signed-off-by: Ming Lin <ming.l@samsung.com>
+1. allow passing a queue ID to the block layer
+
+   For the NVMe over Fabrics connect command we need to able to specify a
+   queue ID that we want to send the command on.  Add a qid parameter to
+   the relevant functions to enable this behavior.
+
+2. allow submitting at_head commands
+
+   In cases where we want to (re)connect to a controller
+   where we have inflight queued commands we want to first
+   connect and only then allow the other queued commands to
+   be kicked. This will prevents failures in controller resets
+   and reconnects.
+
+3. allow passing flags to blk_mq_allocate_request
+
+   Both for Fabrics connect the the keep-alive feature in NVMe 1.2.1 we
+   want to be able to use reserved requests.
+
+Reviewed-by: Jay Freyensee <james.p.freyensee@intel.com>
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+Tested-by: Ming Lin <ming.l@ssi.samsung.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-mq.c         | 15 +++++++++++++++
- include/linux/blk-mq.h |  1 +
- 2 files changed, 16 insertions(+)
+ drivers/nvme/host/core.c | 27 ++++++++++++++++++---------
+ drivers/nvme/host/nvme.h |  5 +++--
+ drivers/nvme/host/pci.c  |  4 ++--
+ 3 files changed, 23 insertions(+), 13 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index b59d2ef..4c80046 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1888,6 +1888,21 @@ static void blk_mq_map_swqueue(struct request_queue *q,
- 	}
- }
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index f874c0e..bd04ec6 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -192,11 +192,16 @@ void nvme_requeue_req(struct request *req)
+ EXPORT_SYMBOL_GPL(nvme_requeue_req);
  
-+/* The number of hw queues that are mapped by sw queues */
-+int blk_mq_hctx_mapped(struct request_queue *q)
-+{
-+	struct blk_mq_hw_ctx *hctx;
-+	unsigned int i;
-+	int mapped = 0;
-+
-+	queue_for_each_hw_ctx(q, hctx, i)
-+		if (blk_mq_hw_queue_mapped(hctx))
-+			mapped++;
-+
-+	return mapped;
-+}
-+EXPORT_SYMBOL_GPL(blk_mq_hctx_mapped);
-+
- static void queue_set_hctx_shared(struct request_queue *q, bool shared)
+ struct request *nvme_alloc_request(struct request_queue *q,
+-		struct nvme_command *cmd, unsigned int flags)
++		struct nvme_command *cmd, unsigned int flags, int qid)
  {
- 	struct blk_mq_hw_ctx *hctx;
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 9a5d581..7cc4d51 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -250,6 +250,7 @@ void blk_mq_freeze_queue_start(struct request_queue *q);
- int blk_mq_reinit_tagset(struct blk_mq_tag_set *set);
+ 	struct request *req;
  
- void blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set, int nr_hw_queues);
-+int blk_mq_hctx_mapped(struct request_queue *q);
+-	req = blk_mq_alloc_request(q, nvme_is_write(cmd), flags);
++	if (qid == NVME_QID_ANY) {
++		req = blk_mq_alloc_request(q, nvme_is_write(cmd), flags);
++	} else {
++		req = blk_mq_alloc_request_hctx(q, nvme_is_write(cmd), flags,
++				qid ? qid - 1 : 0);
++	}
+ 	if (IS_ERR(req))
+ 		return req;
  
- /*
-  * Driver command data is immediately after the request. So subtract request
+@@ -324,12 +329,12 @@ EXPORT_SYMBOL_GPL(nvme_setup_cmd);
+  */
+ int __nvme_submit_sync_cmd(struct request_queue *q, struct nvme_command *cmd,
+ 		struct nvme_completion *cqe, void *buffer, unsigned bufflen,
+-		unsigned timeout)
++		unsigned timeout, int qid, int at_head, int flags)
+ {
+ 	struct request *req;
+ 	int ret;
+ 
+-	req = nvme_alloc_request(q, cmd, 0);
++	req = nvme_alloc_request(q, cmd, flags, qid);
+ 	if (IS_ERR(req))
+ 		return PTR_ERR(req);
+ 
+@@ -342,17 +347,19 @@ int __nvme_submit_sync_cmd(struct request_queue *q, struct nvme_command *cmd,
+ 			goto out;
+ 	}
+ 
+-	blk_execute_rq(req->q, NULL, req, 0);
++	blk_execute_rq(req->q, NULL, req, at_head);
+ 	ret = req->errors;
+  out:
+ 	blk_mq_free_request(req);
+ 	return ret;
+ }
++EXPORT_SYMBOL_GPL(__nvme_submit_sync_cmd);
+ 
+ int nvme_submit_sync_cmd(struct request_queue *q, struct nvme_command *cmd,
+ 		void *buffer, unsigned bufflen)
+ {
+-	return __nvme_submit_sync_cmd(q, cmd, NULL, buffer, bufflen, 0);
++	return __nvme_submit_sync_cmd(q, cmd, NULL, buffer, bufflen, 0,
++			NVME_QID_ANY, 0, 0);
+ }
+ EXPORT_SYMBOL_GPL(nvme_submit_sync_cmd);
+ 
+@@ -370,7 +377,7 @@ int __nvme_submit_user_cmd(struct request_queue *q, struct nvme_command *cmd,
+ 	void *meta = NULL;
+ 	int ret;
+ 
+-	req = nvme_alloc_request(q, cmd, 0);
++	req = nvme_alloc_request(q, cmd, 0, NVME_QID_ANY);
+ 	if (IS_ERR(req))
+ 		return PTR_ERR(req);
+ 
+@@ -520,7 +527,8 @@ int nvme_get_features(struct nvme_ctrl *dev, unsigned fid, unsigned nsid,
+ 	c.features.prp1 = cpu_to_le64(dma_addr);
+ 	c.features.fid = cpu_to_le32(fid);
+ 
+-	ret = __nvme_submit_sync_cmd(dev->admin_q, &c, &cqe, NULL, 0, 0);
++	ret = __nvme_submit_sync_cmd(dev->admin_q, &c, &cqe, NULL, 0, 0,
++			NVME_QID_ANY, 0, 0);
+ 	if (ret >= 0)
+ 		*result = le32_to_cpu(cqe.result);
+ 	return ret;
+@@ -539,7 +547,8 @@ int nvme_set_features(struct nvme_ctrl *dev, unsigned fid, unsigned dword11,
+ 	c.features.fid = cpu_to_le32(fid);
+ 	c.features.dword11 = cpu_to_le32(dword11);
+ 
+-	ret = __nvme_submit_sync_cmd(dev->admin_q, &c, &cqe, NULL, 0, 0);
++	ret = __nvme_submit_sync_cmd(dev->admin_q, &c, &cqe, NULL, 0, 0,
++			NVME_QID_ANY, 0, 0);
+ 	if (ret >= 0)
+ 		*result = le32_to_cpu(cqe.result);
+ 	return ret;
+diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+index 282421f..68a67ac 100644
+--- a/drivers/nvme/host/nvme.h
++++ b/drivers/nvme/host/nvme.h
+@@ -231,8 +231,9 @@ void nvme_stop_queues(struct nvme_ctrl *ctrl);
+ void nvme_start_queues(struct nvme_ctrl *ctrl);
+ void nvme_kill_queues(struct nvme_ctrl *ctrl);
+ 
++#define NVME_QID_ANY -1
+ struct request *nvme_alloc_request(struct request_queue *q,
+-		struct nvme_command *cmd, unsigned int flags);
++		struct nvme_command *cmd, unsigned int flags, int qid);
+ void nvme_requeue_req(struct request *req);
+ int nvme_setup_cmd(struct nvme_ns *ns, struct request *req,
+ 		struct nvme_command *cmd);
+@@ -240,7 +241,7 @@ int nvme_submit_sync_cmd(struct request_queue *q, struct nvme_command *cmd,
+ 		void *buf, unsigned bufflen);
+ int __nvme_submit_sync_cmd(struct request_queue *q, struct nvme_command *cmd,
+ 		struct nvme_completion *cqe, void *buffer, unsigned bufflen,
+-		unsigned timeout);
++		unsigned timeout, int qid, int at_head, int flags);
+ int nvme_submit_user_cmd(struct request_queue *q, struct nvme_command *cmd,
+ 		void __user *ubuffer, unsigned bufflen, u32 *result,
+ 		unsigned timeout);
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index dc39924..db6fdee 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -901,7 +901,7 @@ static enum blk_eh_timer_return nvme_timeout(struct request *req, bool reserved)
+ 		 req->tag, nvmeq->qid);
+ 
+ 	abort_req = nvme_alloc_request(dev->ctrl.admin_q, &cmd,
+-			BLK_MQ_REQ_NOWAIT);
++			BLK_MQ_REQ_NOWAIT, NVME_QID_ANY);
+ 	if (IS_ERR(abort_req)) {
+ 		atomic_inc(&dev->ctrl.abort_limit);
+ 		return BLK_EH_RESET_TIMER;
+@@ -1512,7 +1512,7 @@ static int nvme_delete_queue(struct nvme_queue *nvmeq, u8 opcode)
+ 	cmd.delete_queue.opcode = opcode;
+ 	cmd.delete_queue.qid = cpu_to_le16(nvmeq->qid);
+ 
+-	req = nvme_alloc_request(q, &cmd, BLK_MQ_REQ_NOWAIT);
++	req = nvme_alloc_request(q, &cmd, BLK_MQ_REQ_NOWAIT, NVME_QID_ANY);
+ 	if (IS_ERR(req))
+ 		return PTR_ERR(req);
+ 
 -- 
-1.9.1
-
+2.1.4
