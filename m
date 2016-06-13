@@ -1,66 +1,65 @@
-Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
+Return-Path: <BATV+a67a43e55467fd1c3dfd+4677+infradead.org+hch@bombadil.srs.infradead.org>
 From: Christoph Hellwig <hch@lst.de>
-To: tglx@linutronix.de,
-	axboe@fb.com
-Subject: [PATCH 13/13] nvme: remove the post_scan callout
-Date: Tue, 14 Jun 2016 21:59:06 +0200
-Message-Id: <1465934346-20648-14-git-send-email-hch@lst.de>
-In-Reply-To: <1465934346-20648-1-git-send-email-hch@lst.de>
-References: <1465934346-20648-1-git-send-email-hch@lst.de>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
-List-Post: <mailto:linux-nvme@lists.infradead.org>
-List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
-Cc: linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
-Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
+To: axboe@kernel.dk
+Cc: mst@redhat.com,
+	ooo@electrozaur.com,
+	bhalevy@primarydata.com,
+	nab@linux-iscsi.org,
+	linux-block@vger.kernel.org
+Subject: [PATCH 2/7] virtio_blk: use blk_rq_map_kern
+Date: Mon, 13 Jun 2016 17:21:13 +0200
+Message-Id: <1465831278-23653-3-git-send-email-hch@lst.de>
+In-Reply-To: <1465831278-23653-1-git-send-email-hch@lst.de>
+References: <1465831278-23653-1-git-send-email-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-No need now that we don't have to reverse engineer the irq affinity.
+Similar to how SCSI and NVMe prepare passthrough requests.  This avoids
+poking into request internals too much.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/nvme/host/core.c | 3 ---
- drivers/nvme/host/nvme.h | 1 -
- 2 files changed, 4 deletions(-)
+ drivers/block/virtio_blk.c | 22 ++++++++++------------
+ 1 file changed, 10 insertions(+), 12 deletions(-)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 9d7cee4..b100cce 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -1627,9 +1627,6 @@ static void nvme_scan_work(struct work_struct *work)
- 	list_sort(NULL, &ctrl->namespaces, ns_cmp);
- 	mutex_unlock(&ctrl->namespaces_mutex);
- 	kfree(id);
--
--	if (ctrl->ops->post_scan)
--		ctrl->ops->post_scan(ctrl);
- }
+diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+index 18e4069..963a130 100644
+--- a/drivers/block/virtio_blk.c
++++ b/drivers/block/virtio_blk.c
+@@ -236,25 +236,23 @@ static int virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
+ static int virtblk_get_id(struct gendisk *disk, char *id_str)
+ {
+ 	struct virtio_blk *vblk = disk->private_data;
++	struct request_queue *q = vblk->disk->queue;
+ 	struct request *req;
+-	struct bio *bio;
+ 	int err;
  
- void nvme_queue_scan(struct nvme_ctrl *ctrl)
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index 282421f..bb343b3 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -150,7 +150,6 @@ struct nvme_ctrl_ops {
- 	int (*reg_read64)(struct nvme_ctrl *ctrl, u32 off, u64 *val);
- 	int (*reset_ctrl)(struct nvme_ctrl *ctrl);
- 	void (*free_ctrl)(struct nvme_ctrl *ctrl);
--	void (*post_scan)(struct nvme_ctrl *ctrl);
- 	void (*submit_async_event)(struct nvme_ctrl *ctrl, int aer_idx);
- };
+-	bio = bio_map_kern(vblk->disk->queue, id_str, VIRTIO_BLK_ID_BYTES,
+-			   GFP_KERNEL);
+-	if (IS_ERR(bio))
+-		return PTR_ERR(bio);
+-
+-	req = blk_make_request(vblk->disk->queue, bio, GFP_KERNEL);
+-	if (IS_ERR(req)) {
+-		bio_put(bio);
++	req = blk_get_request(q, READ, GFP_KERNEL);
++	if (IS_ERR(req))
+ 		return PTR_ERR(req);
+-	}
+-
++	blk_rq_set_block_pc(req);
+ 	req->cmd_type = REQ_TYPE_DRV_PRIV;
++
++	err = blk_rq_map_kern(q, req, id_str, VIRTIO_BLK_ID_BYTES, GFP_KERNEL);
++	if (err)
++		goto out;
++
+ 	err = blk_execute_rq(vblk->disk->queue, vblk->disk, req, false);
++out:
+ 	blk_put_request(req);
+-
+ 	return err;
+ }
  
 -- 
 2.1.4
-
-
-_______________________________________________
-Linux-nvme mailing list
-Linux-nvme@lists.infradead.org
-http://lists.infradead.org/mailman/listinfo/linux-nvme
