@@ -1,245 +1,185 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:53572 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752658AbcFETdo (ORCPT <rfc822;linux-block@vger.kernel.org>);
-	Sun, 5 Jun 2016 15:33:44 -0400
-From: mchristi@redhat.com
-To: linux-f2fs-devel@lists.sourceforge.net, linux-ext4@vger.kernel.org,
-	konrad.wilk@oracle.com, drbd-dev@lists.linbit.com,
-	philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
-	linux-raid@vger.kernel.org, dm-devel@redhat.com,
-	linux-fsdevel@vger.kernel.org, linux-bcache@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linux-mtd@lists.infradead.org,
-	target-devel@vger.kernel.org, linux-btrfs@vger.kernel.org,
-	osd-dev@open-osd.org, xfs@oss.sgi.com, ocfs2-devel@oss.oracle.com
-Cc: Mike Christie <mchristi@redhat.com>
-Subject: [PATCH 31/45] block: prepare request creation/destruction code to use REQ_OPs
-Date: Sun,  5 Jun 2016 14:32:11 -0500
-Message-Id: <1465155145-10812-32-git-send-email-mchristi@redhat.com>
-In-Reply-To: <1465155145-10812-1-git-send-email-mchristi@redhat.com>
-References: <1465155145-10812-1-git-send-email-mchristi@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <BATV+1815987b1c14acf14571+4678+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk
+Cc: mst@redhat.com,
+	ooo@electrozaur.com,
+	nab@linux-iscsi.org,
+	linux-block@vger.kernel.org
+Subject: [PATCH 5/7] target: stop using blk_make_request
+Date: Tue, 14 Jun 2016 19:16:02 +0200
+Message-Id: <1465924564-14503-6-git-send-email-hch@lst.de>
+In-Reply-To: <1465924564-14503-1-git-send-email-hch@lst.de>
+References: <1465924564-14503-1-git-send-email-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Mike Christie <mchristi@redhat.com>
+Using blk_rq_append_bio allows to append the bios to the request
+directly instead of having to build up a list first, and also
+allows to have a single code path for requests with or without
+data attached to them.
 
-This patch prepares *_get_request/*_put_request and freed_request,
-to use separate variables for the operation and flags. In the
-next patches the struct request users will be converted like
-was done for bios where the op and flags are set separately.
-
-Signed-off-by: Mike Christie <mchristi@redhat.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-core.c | 54 +++++++++++++++++++++++++++++-------------------------
- 1 file changed, 29 insertions(+), 25 deletions(-)
+ drivers/target/target_core_pscsi.c | 87 +++++++++++++++-----------------------
+ 1 file changed, 34 insertions(+), 53 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 3c45254..a68dc07 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -959,10 +959,10 @@ static void __freed_request(struct request_list *rl, int sync)
-  * A request has just been released.  Account for it, update the full and
-  * congestion status, wake up any waiters.   Called under q->queue_lock.
-  */
--static void freed_request(struct request_list *rl, unsigned int flags)
-+static void freed_request(struct request_list *rl, int op, unsigned int flags)
+diff --git a/drivers/target/target_core_pscsi.c b/drivers/target/target_core_pscsi.c
+index 81564c8..9125d93 100644
+--- a/drivers/target/target_core_pscsi.c
++++ b/drivers/target/target_core_pscsi.c
+@@ -876,19 +876,19 @@ static inline struct bio *pscsi_get_bio(int nr_vecs)
+ 
+ static sense_reason_t
+ pscsi_map_sg(struct se_cmd *cmd, struct scatterlist *sgl, u32 sgl_nents,
+-		enum dma_data_direction data_direction, struct bio **hbio)
++		struct request *req)
  {
- 	struct request_queue *q = rl->q;
--	int sync = rw_is_sync(flags);
-+	int sync = rw_is_sync(op | flags);
+ 	struct pscsi_dev_virt *pdv = PSCSI_DEV(cmd->se_dev);
+-	struct bio *bio = NULL, *tbio = NULL;
++	struct bio *bio = NULL;
+ 	struct page *page;
+ 	struct scatterlist *sg;
+ 	u32 data_len = cmd->data_length, i, len, bytes, off;
+ 	int nr_pages = (cmd->data_length + sgl[0].offset +
+ 			PAGE_SIZE - 1) >> PAGE_SHIFT;
+ 	int nr_vecs = 0, rc;
+-	int rw = (data_direction == DMA_TO_DEVICE);
++	int rw = (cmd->data_direction == DMA_TO_DEVICE);
  
- 	q->nr_rqs[sync]--;
- 	rl->count[sync]--;
-@@ -1054,7 +1054,8 @@ static struct io_context *rq_ioc(struct bio *bio)
- /**
-  * __get_request - get a free request
-  * @rl: request list to allocate from
-- * @rw_flags: RW and SYNC flags
-+ * @op: REQ_OP_READ/REQ_OP_WRITE
-+ * @op_flags: rq_flag_bits
-  * @bio: bio to allocate request for (can be %NULL)
-  * @gfp_mask: allocation mask
-  *
-@@ -1065,21 +1066,22 @@ static struct io_context *rq_ioc(struct bio *bio)
-  * Returns ERR_PTR on failure, with @q->queue_lock held.
-  * Returns request pointer on success, with @q->queue_lock *not held*.
-  */
--static struct request *__get_request(struct request_list *rl, int rw_flags,
--				     struct bio *bio, gfp_t gfp_mask)
-+static struct request *__get_request(struct request_list *rl, int op,
-+				     int op_flags, struct bio *bio,
-+				     gfp_t gfp_mask)
- {
- 	struct request_queue *q = rl->q;
- 	struct request *rq;
- 	struct elevator_type *et = q->elevator->type;
- 	struct io_context *ioc = rq_ioc(bio);
- 	struct io_cq *icq = NULL;
--	const bool is_sync = rw_is_sync(rw_flags) != 0;
-+	const bool is_sync = rw_is_sync(op | op_flags) != 0;
- 	int may_queue;
+-	*hbio = NULL;
++	BUG_ON(!cmd->data_length);
  
- 	if (unlikely(blk_queue_dying(q)))
- 		return ERR_PTR(-ENODEV);
+ 	pr_debug("PSCSI: nr_pages: %d\n", nr_pages);
  
--	may_queue = elv_may_queue(q, rw_flags);
-+	may_queue = elv_may_queue(q, op | op_flags);
- 	if (may_queue == ELV_MQUEUE_NO)
- 		goto rq_starved;
+@@ -927,16 +927,6 @@ pscsi_map_sg(struct se_cmd *cmd, struct scatterlist *sgl, u32 sgl_nents,
+ 				pr_debug("PSCSI: Allocated bio: %p,"
+ 					" dir: %s nr_vecs: %d\n", bio,
+ 					(rw) ? "rw" : "r", nr_vecs);
+-				/*
+-				 * Set *hbio pointer to handle the case:
+-				 * nr_pages > BIO_MAX_PAGES, where additional
+-				 * bios need to be added to complete a given
+-				 * command.
+-				 */
+-				if (!*hbio)
+-					*hbio = tbio = bio;
+-				else
+-					tbio = tbio->bi_next = bio;
+ 			}
  
-@@ -1123,7 +1125,7 @@ static struct request *__get_request(struct request_list *rl, int rw_flags,
- 
- 	/*
- 	 * Decide whether the new request will be managed by elevator.  If
--	 * so, mark @rw_flags and increment elvpriv.  Non-zero elvpriv will
-+	 * so, mark @op_flags and increment elvpriv.  Non-zero elvpriv will
- 	 * prevent the current elevator from being destroyed until the new
- 	 * request is freed.  This guarantees icq's won't be destroyed and
- 	 * makes creating new ones safe.
-@@ -1132,14 +1134,14 @@ static struct request *__get_request(struct request_list *rl, int rw_flags,
- 	 * it will be created after releasing queue_lock.
- 	 */
- 	if (blk_rq_should_init_elevator(bio) && !blk_queue_bypass(q)) {
--		rw_flags |= REQ_ELVPRIV;
-+		op_flags |= REQ_ELVPRIV;
- 		q->nr_rqs_elvpriv++;
- 		if (et->icq_cache && ioc)
- 			icq = ioc_lookup_icq(ioc, q);
+ 			pr_debug("PSCSI: Calling bio_add_pc_page() i: %d"
+@@ -955,11 +945,16 @@ pscsi_map_sg(struct se_cmd *cmd, struct scatterlist *sgl, u32 sgl_nents,
+ 				pr_debug("PSCSI: Reached bio->bi_vcnt max:"
+ 					" %d i: %d bio: %p, allocating another"
+ 					" bio\n", bio->bi_vcnt, i, bio);
++
++				rc = blk_rq_append_bio(req, bio);
++				if (rc) {
++					pr_err("pSCSI: failed to append bio\n");
++					goto fail;
++				}
++
+ 				/*
+ 				 * Clear the pointer so that another bio will
+-				 * be allocated with pscsi_get_bio() above, the
+-				 * current bio has already been set *tbio and
+-				 * bio->bi_next.
++				 * be allocated with pscsi_get_bio() above.
+ 				 */
+ 				bio = NULL;
+ 			}
+@@ -968,13 +963,16 @@ pscsi_map_sg(struct se_cmd *cmd, struct scatterlist *sgl, u32 sgl_nents,
+ 		}
  	}
  
- 	if (blk_queue_io_stat(q))
--		rw_flags |= REQ_IO_STAT;
-+		op_flags |= REQ_IO_STAT;
- 	spin_unlock_irq(q->queue_lock);
- 
- 	/* allocate and init request */
-@@ -1149,10 +1151,10 @@ static struct request *__get_request(struct request_list *rl, int rw_flags,
- 
- 	blk_rq_init(q, rq);
- 	blk_rq_set_rl(rq, rl);
--	rq->cmd_flags = rw_flags | REQ_ALLOCED;
-+	req_set_op_attrs(rq, op, op_flags | REQ_ALLOCED);
- 
- 	/* init elvpriv */
--	if (rw_flags & REQ_ELVPRIV) {
-+	if (op_flags & REQ_ELVPRIV) {
- 		if (unlikely(et->icq_cache && !icq)) {
- 			if (ioc)
- 				icq = ioc_create_icq(ioc, q, gfp_mask);
-@@ -1178,7 +1180,7 @@ out:
- 	if (ioc_batching(q, ioc))
- 		ioc->nr_batch_requests--;
- 
--	trace_block_getrq(q, bio, rw_flags & 1);
-+	trace_block_getrq(q, bio, op);
- 	return rq;
- 
- fail_elvpriv:
-@@ -1208,7 +1210,7 @@ fail_alloc:
- 	 * queue, but this is pretty rare.
- 	 */
- 	spin_lock_irq(q->queue_lock);
--	freed_request(rl, rw_flags);
-+	freed_request(rl, op, op_flags);
- 
- 	/*
- 	 * in the very unlikely event that allocation failed and no
-@@ -1226,7 +1228,8 @@ rq_starved:
- /**
-  * get_request - get a free request
-  * @q: request_queue to allocate request from
-- * @rw_flags: RW and SYNC flags
-+ * @op: REQ_OP_READ/REQ_OP_WRITE
-+ * @op_flags: rq_flag_bits
-  * @bio: bio to allocate request for (can be %NULL)
-  * @gfp_mask: allocation mask
-  *
-@@ -1237,17 +1240,18 @@ rq_starved:
-  * Returns ERR_PTR on failure, with @q->queue_lock held.
-  * Returns request pointer on success, with @q->queue_lock *not held*.
-  */
--static struct request *get_request(struct request_queue *q, int rw_flags,
--				   struct bio *bio, gfp_t gfp_mask)
-+static struct request *get_request(struct request_queue *q, int op,
-+				   int op_flags, struct bio *bio,
-+				   gfp_t gfp_mask)
- {
--	const bool is_sync = rw_is_sync(rw_flags) != 0;
-+	const bool is_sync = rw_is_sync(op | op_flags) != 0;
- 	DEFINE_WAIT(wait);
- 	struct request_list *rl;
- 	struct request *rq;
- 
- 	rl = blk_get_rl(q, bio);	/* transferred to @rq on success */
- retry:
--	rq = __get_request(rl, rw_flags, bio, gfp_mask);
-+	rq = __get_request(rl, op, op_flags, bio, gfp_mask);
- 	if (!IS_ERR(rq))
- 		return rq;
- 
-@@ -1260,7 +1264,7 @@ retry:
- 	prepare_to_wait_exclusive(&rl->wait[is_sync], &wait,
- 				  TASK_UNINTERRUPTIBLE);
- 
--	trace_block_sleeprq(q, bio, rw_flags & 1);
-+	trace_block_sleeprq(q, bio, op);
- 
- 	spin_unlock_irq(q->queue_lock);
- 	io_schedule();
-@@ -1289,7 +1293,7 @@ static struct request *blk_old_get_request(struct request_queue *q, int rw,
- 	create_io_context(gfp_mask, q->node);
- 
- 	spin_lock_irq(q->queue_lock);
--	rq = get_request(q, rw, NULL, gfp_mask);
-+	rq = get_request(q, rw, 0, NULL, gfp_mask);
- 	if (IS_ERR(rq))
- 		spin_unlock_irq(q->queue_lock);
- 	/* q->queue_lock is unlocked at this point */
-@@ -1491,13 +1495,14 @@ void __blk_put_request(struct request_queue *q, struct request *req)
- 	 */
- 	if (req->cmd_flags & REQ_ALLOCED) {
- 		unsigned int flags = req->cmd_flags;
-+		int op = req_op(req);
- 		struct request_list *rl = blk_rq_rl(req);
- 
- 		BUG_ON(!list_empty(&req->queuelist));
- 		BUG_ON(ELV_ON_HASH(req));
- 
- 		blk_free_request(rl, req);
--		freed_request(rl, flags);
-+		freed_request(rl, op, flags);
- 		blk_put_rl(rl);
- 	}
++	if (bio) {
++		rc = blk_rq_append_bio(req, bio);
++		if (rc) {
++			pr_err("pSCSI: failed to append bio\n");
++			goto fail;
++		}
++	}
++
+ 	return 0;
+ fail:
+-	while (*hbio) {
+-		bio = *hbio;
+-		*hbio = (*hbio)->bi_next;
+-		bio_endio(bio);
+-	}
+ 	return TCM_LOGICAL_UNIT_COMMUNICATION_FAILURE;
  }
-@@ -1712,7 +1717,7 @@ static blk_qc_t blk_queue_bio(struct request_queue *q, struct bio *bio)
+ 
+@@ -992,11 +990,9 @@ pscsi_execute_cmd(struct se_cmd *cmd)
  {
- 	const bool sync = !!(bio->bi_rw & REQ_SYNC);
- 	struct blk_plug *plug;
--	int el_ret, rw_flags, where = ELEVATOR_INSERT_SORT;
-+	int el_ret, rw_flags = 0, where = ELEVATOR_INSERT_SORT;
+ 	struct scatterlist *sgl = cmd->t_data_sg;
+ 	u32 sgl_nents = cmd->t_data_nents;
+-	enum dma_data_direction data_direction = cmd->data_direction;
+ 	struct pscsi_dev_virt *pdv = PSCSI_DEV(cmd->se_dev);
+ 	struct pscsi_plugin_task *pt;
  	struct request *req;
- 	unsigned int request_count = 0;
+-	struct bio *hbio;
+ 	sense_reason_t ret;
  
-@@ -1772,7 +1777,6 @@ get_rq:
- 	 * but we need to set it earlier to expose the sync flag to the
- 	 * rq allocator and io schedulers.
- 	 */
--	rw_flags = bio_data_dir(bio);
- 	if (sync)
- 		rw_flags |= REQ_SYNC;
+ 	/*
+@@ -1012,31 +1008,21 @@ pscsi_execute_cmd(struct se_cmd *cmd)
+ 	memcpy(pt->pscsi_cdb, cmd->t_task_cdb,
+ 		scsi_command_size(cmd->t_task_cdb));
  
-@@ -1780,7 +1784,7 @@ get_rq:
- 	 * Grab a free request. This is might sleep but can not fail.
- 	 * Returns with the queue unlocked.
- 	 */
--	req = get_request(q, rw_flags, bio, GFP_NOIO);
-+	req = get_request(q, bio_data_dir(bio), rw_flags, bio, GFP_NOIO);
- 	if (IS_ERR(req)) {
- 		bio->bi_error = PTR_ERR(req);
- 		bio_endio(bio);
+-	if (!sgl) {
+-		req = blk_get_request(pdv->pdv_sd->request_queue,
+-				(data_direction == DMA_TO_DEVICE),
+-				GFP_KERNEL);
+-		if (IS_ERR(req)) {
+-			pr_err("PSCSI: blk_get_request() failed\n");
+-			ret = TCM_LOGICAL_UNIT_COMMUNICATION_FAILURE;
+-			goto fail;
+-		}
++	req = blk_get_request(pdv->pdv_sd->request_queue,
++			(cmd->data_direction == DMA_TO_DEVICE),
++			GFP_KERNEL);
++	if (IS_ERR(req)) {
++		pr_err("PSCSI: blk_get_request() failed\n");
++		ret = TCM_LOGICAL_UNIT_COMMUNICATION_FAILURE;
++		goto fail;
++	}
+ 
+-		blk_rq_set_block_pc(req);
+-	} else {
+-		BUG_ON(!cmd->data_length);
++	blk_rq_set_block_pc(req);
+ 
+-		ret = pscsi_map_sg(cmd, sgl, sgl_nents, data_direction, &hbio);
++	if (sgl) {
++		ret = pscsi_map_sg(cmd, sgl, sgl_nents, req);
+ 		if (ret)
+-			goto fail;
+-
+-		req = blk_make_request(pdv->pdv_sd->request_queue, hbio,
+-				       GFP_KERNEL);
+-		if (IS_ERR(req)) {
+-			pr_err("pSCSI: blk_make_request() failed\n");
+-			ret = TCM_LOGICAL_UNIT_COMMUNICATION_FAILURE;
+-			goto fail_free_bio;
+-		}
++			goto fail_put_request;
+ 	}
+ 
+ 	req->end_io = pscsi_req_done;
+@@ -1057,13 +1043,8 @@ pscsi_execute_cmd(struct se_cmd *cmd)
+ 
+ 	return 0;
+ 
+-fail_free_bio:
+-	while (hbio) {
+-		struct bio *bio = hbio;
+-		hbio = hbio->bi_next;
+-		bio_endio(bio);
+-	}
+-	ret = TCM_LOGICAL_UNIT_COMMUNICATION_FAILURE;
++fail_put_request:
++	blk_put_request(req);
+ fail:
+ 	kfree(pt);
+ 	return ret;
 -- 
-2.7.2
-
+2.1.4
