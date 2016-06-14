@@ -1,75 +1,125 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f66.google.com ([74.125.82.66]:33051 "EHLO
-	mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752413AbcF2OmX (ORCPT
-	<rfc822;linux-block@vger.kernel.org>);
-	Wed, 29 Jun 2016 10:42:23 -0400
-Received: by mail-wm0-f66.google.com with SMTP id r201so14878139wme.0
-        for <linux-block@vger.kernel.org>; Wed, 29 Jun 2016 07:42:11 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [RFC PATCH 01/11] lightnvm: remove checkpatch warning for unsigned ints
-Date: Wed, 29 Jun 2016 16:41:46 +0200
-Message-Id: <1467211316-22373-2-git-send-email-m@bjorling.me>
-In-Reply-To: <1467211316-22373-1-git-send-email-m@bjorling.me>
-References: <1467211316-22373-1-git-send-email-m@bjorling.me>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <BATV+1815987b1c14acf14571+4678+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk
+Cc: mst@redhat.com,
+	ooo@electrozaur.com,
+	nab@linux-iscsi.org,
+	linux-block@vger.kernel.org
+Subject: [PATCH 4/7] block: simplify and export blk_rq_append_bio
+Date: Tue, 14 Jun 2016 19:16:01 +0200
+Message-Id: <1465924564-14503-5-git-send-email-hch@lst.de>
+In-Reply-To: <1465924564-14503-1-git-send-email-hch@lst.de>
+References: <1465924564-14503-1-git-send-email-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-Checkpatch found two incidents where the type was preferred to be
-written out in full.
+The target SCSI passthrough backend is much better served with the low-level
+blk_rq_append_bio construct then the helpers built on top of it, so export it.
 
-./drivers/lightnvm/rrpc.h:184: WARNING: Prefer 'unsigned int' to bare
-use of 'unsigned'
-./drivers/lightnvm/rrpc.h:209: WARNING: Prefer 'unsigned int' to bare
-use of 'unsigned'
-./drivers/lightnvm/rrpc.c:51: WARNING: Prefer 'unsigned int' to bare use
-of 'unsigned'
+Also use the opportunity to remove the pointless request_queue argument and
+make the code flow a little more readable.
 
-Signed-off-by: Matias Bjørling <m@bjorling.me>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/lightnvm/rrpc.c | 2 +-
- drivers/lightnvm/rrpc.h | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ block/blk-core.c       |  2 +-
+ block/blk-map.c        | 25 +++++++++++++++----------
+ block/blk.h            |  2 --
+ include/linux/blkdev.h |  1 +
+ 4 files changed, 17 insertions(+), 13 deletions(-)
 
-diff --git a/drivers/lightnvm/rrpc.c b/drivers/lightnvm/rrpc.c
-index 736e669..90c7cb4 100644
---- a/drivers/lightnvm/rrpc.c
-+++ b/drivers/lightnvm/rrpc.c
-@@ -48,7 +48,7 @@ static void rrpc_page_invalidate(struct rrpc *rrpc, struct rrpc_addr *a)
- }
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 37852ec..2c4c021 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -1364,7 +1364,7 @@ struct request *blk_make_request(struct request_queue *q, struct bio *bio,
+ 		int ret;
  
- static void rrpc_invalidate_range(struct rrpc *rrpc, sector_t slba,
--								unsigned len)
-+							unsigned int len)
+ 		blk_queue_bounce(q, &bounce_bio);
+-		ret = blk_rq_append_bio(q, rq, bounce_bio);
++		ret = blk_rq_append_bio(rq, bounce_bio);
+ 		if (unlikely(ret)) {
+ 			blk_put_request(rq);
+ 			return ERR_PTR(ret);
+diff --git a/block/blk-map.c b/block/blk-map.c
+index 61733a6..b8657fa 100644
+--- a/block/blk-map.c
++++ b/block/blk-map.c
+@@ -9,21 +9,26 @@
+ 
+ #include "blk.h"
+ 
+-int blk_rq_append_bio(struct request_queue *q, struct request *rq,
+-		      struct bio *bio)
++/*
++ * Append a bio to a passthrough request.  Only works can be merged into
++ * the request based on the driver constraints.
++ */
++int blk_rq_append_bio(struct request *rq, struct bio *bio)
  {
- 	sector_t i;
- 
-diff --git a/drivers/lightnvm/rrpc.h b/drivers/lightnvm/rrpc.h
-index 87e84b5..5797343 100644
---- a/drivers/lightnvm/rrpc.h
-+++ b/drivers/lightnvm/rrpc.h
-@@ -188,7 +188,7 @@ static inline int request_intersects(struct rrpc_inflight_rq *r,
+-	if (!rq->bio)
+-		blk_rq_bio_prep(q, rq, bio);
+-	else if (!ll_back_merge_fn(q, rq, bio))
+-		return -EINVAL;
+-	else {
++	if (!rq->bio) {
++		blk_rq_bio_prep(rq->q, rq, bio);
++	} else {
++		if (!ll_back_merge_fn(rq->q, rq, bio))
++			return -EINVAL;
++
+ 		rq->biotail->bi_next = bio;
+ 		rq->biotail = bio;
+-
+ 		rq->__data_len += bio->bi_iter.bi_size;
+ 	}
++
+ 	return 0;
  }
++EXPORT_SYMBOL(blk_rq_append_bio);
  
- static int __rrpc_lock_laddr(struct rrpc *rrpc, sector_t laddr,
--			     unsigned pages, struct rrpc_inflight_rq *r)
-+			     unsigned int pages, struct rrpc_inflight_rq *r)
+ static int __blk_rq_unmap_user(struct bio *bio)
  {
- 	sector_t laddr_end = laddr + pages - 1;
- 	struct rrpc_inflight_rq *rtmp;
-@@ -213,7 +213,7 @@ static int __rrpc_lock_laddr(struct rrpc *rrpc, sector_t laddr,
- }
+@@ -71,7 +76,7 @@ static int __blk_rq_map_user_iov(struct request *rq,
+ 	 */
+ 	bio_get(bio);
  
- static inline int rrpc_lock_laddr(struct rrpc *rrpc, sector_t laddr,
--				 unsigned pages,
-+				 unsigned int pages,
- 				 struct rrpc_inflight_rq *r)
- {
- 	BUG_ON((laddr + pages) > rrpc->nr_sects);
+-	ret = blk_rq_append_bio(q, rq, bio);
++	ret = blk_rq_append_bio(rq, bio);
+ 	if (ret) {
+ 		bio_endio(bio);
+ 		__blk_rq_unmap_user(orig_bio);
+@@ -229,7 +234,7 @@ int blk_rq_map_kern(struct request_queue *q, struct request *rq, void *kbuf,
+ 	if (do_copy)
+ 		rq->cmd_flags |= REQ_COPY_USER;
+ 
+-	ret = blk_rq_append_bio(q, rq, bio);
++	ret = blk_rq_append_bio(rq, bio);
+ 	if (unlikely(ret)) {
+ 		/* request is too big */
+ 		bio_put(bio);
+diff --git a/block/blk.h b/block/blk.h
+index 70e4aee..c37492f 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -64,8 +64,6 @@ void blk_exit_rl(struct request_list *rl);
+ void init_request_from_bio(struct request *req, struct bio *bio);
+ void blk_rq_bio_prep(struct request_queue *q, struct request *rq,
+ 			struct bio *bio);
+-int blk_rq_append_bio(struct request_queue *q, struct request *rq,
+-		      struct bio *bio);
+ void blk_queue_bypass_start(struct request_queue *q);
+ void blk_queue_bypass_end(struct request_queue *q);
+ void blk_dequeue_request(struct request *rq);
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 9d1e0a4..07176f4 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -801,6 +801,7 @@ extern int blk_rq_prep_clone(struct request *rq, struct request *rq_src,
+ extern void blk_rq_unprep_clone(struct request *rq);
+ extern int blk_insert_cloned_request(struct request_queue *q,
+ 				     struct request *rq);
++extern int blk_rq_append_bio(struct request *rq, struct bio *bio);
+ extern void blk_delay_queue(struct request_queue *, unsigned long);
+ extern void blk_queue_split(struct request_queue *, struct bio **,
+ 			    struct bio_set *);
 -- 
 2.1.4
-
