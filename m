@@ -1,51 +1,29 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f66.google.com ([74.125.82.66]:35264 "EHLO
-	mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752404AbcF2OmX (ORCPT
-	<rfc822;linux-block@vger.kernel.org>);
-	Wed, 29 Jun 2016 10:42:23 -0400
-Received: by mail-wm0-f66.google.com with SMTP id a66so14846126wme.2
-        for <linux-block@vger.kernel.org>; Wed, 29 Jun 2016 07:42:08 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [RFC PATCH 00/11] Small fixes for LightNVM
-Date: Wed, 29 Jun 2016 16:41:45 +0200
-Message-Id: <1467211316-22373-1-git-send-email-m@bjorling.me>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 0/3] Three minor patches for kernel v4.8
+To: Bart Van Assche <bart.vanassche@sandisk.com>, Jens Axboe <axboe@fb.com>
+References: <25262742-283b-fc4d-30df-d6a9196c85a5@sandisk.com>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <57601E4F.8000202@kernel.dk>
+Date: Tue, 14 Jun 2016 09:10:07 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <25262742-283b-fc4d-30df-d6a9196c85a5@sandisk.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+List-ID: <linux-block@vger.kernel.org>
 
-A collection of small fixes destined for the 4.8 kernel.
+On 06/14/2016 09:01 AM, Bart Van Assche wrote:
+> Hello Jens,
+>
+> The three patches in this series are what I came up with after having
+> analyzed the output of building the block layer with make options W=1
+> and C=2. It would be appreciated if you would consider these patches for
+> inclusion in kernel v4.8. These three patches are:
+>
+> 0001-block-partition-generic.c-Remove-a-set-but-not-used-.patch
+> 0002-block-bio-integrity.c-Add-include-blk.h.patch
+> 0003-block-blk-cgroup.c-Declare-local-symbols-static.patch
 
-Most notably is the move of the target management into the general media
-manager. The concept of targets is media manager specific, therefore
-this should be managed by itself. Core may only pass thetarget requests
-along to the appropriate media manager.
-
-Matias Bjørling (11):
-  lightnvm: remove checkpatch warning for unsigned ints
-  lightnvm: fix checkpatch terse errors
-  lightnvm: remove open/close statistics for gennvm
-  lightnvm: rename gennvm and update description
-  lightnvm: move target mgmt into media mgr
-  lightnvm: remove nested lock conflict with mm
-  lightnvm: remove unused lists from struct rrpc_block
-  lightnvm: remove _unlocked variant of [get/put]_blk
-  lightnvm: fix lun offset calculation for mark blk
-  lightnvm: make ppa_list const in nvm_set_rqd_list
-  lightnvm: make __nvm_submit_ppa static
-
- drivers/lightnvm/Kconfig  |  10 +-
- drivers/lightnvm/core.c   | 234 +++++++---------------------
- drivers/lightnvm/gennvm.c | 385 +++++++++++++++++++++++++++++-----------------
- drivers/lightnvm/gennvm.h |  10 +-
- drivers/lightnvm/rrpc.c   |  30 +---
- drivers/lightnvm/rrpc.h   |  12 +-
- include/linux/lightnvm.h  |  33 ++--
- 7 files changed, 333 insertions(+), 381 deletions(-)
+Thanks Bart, looks nice'n simple. Added for 4.8.
 
 -- 
-2.1.4
-
+Jens Axboe
