@@ -1,60 +1,48 @@
-Return-Path: <openosd@gmail.com>
-Return-Path: <openosd@gmail.com>
-Message-ID: <5761266F.1030704@electrozaur.com>
-Date: Wed, 15 Jun 2016 12:57:03 +0300
-From: Boaz Harrosh <ooo@electrozaur.com>
-MIME-Version: 1.0
-To: Christoph Hellwig <hch@lst.de>, axboe@kernel.dk
-CC: mst@redhat.com, bhalevy@primarydata.com, nab@linux-iscsi.org,
- linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
 Subject: Re: [PATCH 3/7] block: ensure bios return from blk_get_request are
  properly initialized
-References: <1465831278-23653-1-git-send-email-hch@lst.de> <1465831278-23653-4-git-send-email-hch@lst.de>
-In-Reply-To: <1465831278-23653-4-git-send-email-hch@lst.de>
-Content-Type: text/plain; charset=utf-8
+To: Christoph Hellwig <hch@lst.de>
+References: <1465831278-23653-1-git-send-email-hch@lst.de>
+ <1465831278-23653-4-git-send-email-hch@lst.de> <575F6942.5060406@kernel.dk>
+ <20160614134312.GA28373@lst.de>
+Cc: mst@redhat.com, ooo@electrozaur.com, bhalevy@primarydata.com,
+ nab@linux-iscsi.org, linux-block@vger.kernel.org
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <57601CF7.9050509@kernel.dk>
+Date: Tue, 14 Jun 2016 09:04:23 -0600
+MIME-Version: 1.0
+In-Reply-To: <20160614134312.GA28373@lst.de>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-On 06/13/2016 06:21 PM, Christoph Hellwig wrote:
-> blk_get_request is used for BLOCK_PC and similar pass through requests.
-> Currently we always need to call blk_rq_set_block_pc or an opencoded
-> version of it to allow appending bios using the request mapping helpers
-> later on, which is a somewhat awkward API.  Instead move the
-> initialization part of blk_rq_set_block_pc into blk_get_request, so that
-> we always have a safe to use request.  blk_rq_set_block_pc now goes away
-> in favor of just setting cmd_type to REQ_TYPE_BLOCK_PC, or nothing in case
-> it was overriden with a different type a little later (or earlier in case
-> of the SCSI OSD code..)
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
+On 06/14/2016 07:43 AM, Christoph Hellwig wrote:
+> On Mon, Jun 13, 2016 at 08:17:38PM -0600, Jens Axboe wrote:
+>> It may be awkward, but we have those to avoid doing things like this:
+>>
+>> +	rq->__data_len = 0;
+>> +	rq->__sector = (sector_t) -1;
+>> +	rq->bio = rq->biotail = NULL;
+>> +	memset(rq->__cmd, 0, sizeof(rq->__cmd));
+>>
+>> for every request we allocate, when we don't use ->cmd at all. Honest, I'd
+>> rather have
+>>
+>> struct request *blk_get_pc_request();
+>>
+>> and similar helpers around this, so we don't have to do extra
+>> initialization when we don't need it.
+>
+> I'm working on resurrecting my patch to remove rq->cmd and friends from
+> the common request structure,
 
-Is good thanks.
-Review-by: Boaz harrosh <ooo@electrozaur.com>
+That'd be great! And then we can unify the request setup after that.
 
-<>
-> diff --git a/drivers/scsi/osd/osd_initiator.c b/drivers/scsi/osd/osd_initiator.c
-> index daa4dc1..868ae29d 100644
-> --- a/drivers/scsi/osd/osd_initiator.c
-> +++ b/drivers/scsi/osd/osd_initiator.c
-> @@ -1567,7 +1567,7 @@ static struct request *_make_request(struct request_queue *q, bool has_write,
->  		if (IS_ERR(req))
->  			return req;
->  
-> -		blk_rq_set_block_pc(req);
-> +		req->cmd_type = REQ_TYPE_BLOCK_PC;
->  		return req;
->  	}
->  }
-> @@ -1605,7 +1605,6 @@ static int _init_blk_request(struct osd_request *or,
->  				ret = PTR_ERR(req);
->  				goto out;
->  			}
-> -			blk_rq_set_block_pc(req);
->  			or->in.req = or->request->next_rq = req;
+> but the full patch is something I'd rather
+> do after the initial NVMe over Fabrics merge.  If you're fine with the
+> rest of the series I'll respin it to keep blk_set_block_pc for now which
+> will only do the zeroing and setting cmd_type.
 
-Yes this is the bidi part of the request it need not be of any type.
-Only properly initialized.
+Yes that sounds good, the rest looks fine to me.
 
->  		}
->  	} else if (has_in)
-<>
+-- 
+Jens Axboe
