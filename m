@@ -1,52 +1,18 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:17226 "EHLO
-	mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1161516AbcFBQ7J (ORCPT
-	<rfc822;linux-block@vger.kernel.org>);
-	Thu, 2 Jun 2016 12:59:09 -0400
-Date: Thu, 2 Jun 2016 09:58:13 -0700
-From: Shaohua Li <shli@fb.com>
-To: Sitsofe Wheeler <sitsofe@gmail.com>, <axboe@fb.com>
-CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<snitzer@redhat.com>, <axboe@fb.com>, <martin.petersen@oracle.com>,
-	<Kernel-team@fb.com>
-Subject: Re: [PATCH] block: correctly fallback for zeroout
-Message-ID: <20160602165813.GA18527@shli-mbp.local>
-References: <20160527054918.GA9521@sucs.org>
- <20160528092755.GB938@sucs.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-In-Reply-To: <20160528092755.GB938@sucs.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <BATV+1815987b1c14acf14571+4678+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk
+Cc: mst@redhat.com,
+	ooo@electrozaur.com,
+	nab@linux-iscsi.org,
+	linux-block@vger.kernel.org
+Subject: a few passthrough request improvements V2
+Date: Tue, 14 Jun 2016 19:15:57 +0200
+Message-Id: <1465924564-14503-1-git-send-email-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-On Sat, May 28, 2016 at 10:27:55AM +0100, Sitsofe Wheeler wrote:
-> On Sat, May 28, 2016 at 08:55:43AM +0000, Sitsofe Wheeler wrote:
-> > On Thu, May 26, 2016 at 11:08:14AM -0700, Shaohua Li wrote:
-> > > blkdev_issue_zeroout try discard/writesame first, if they fail, zeroout
-> > > fallback to regular write. The problem is discard/writesame doesn't
-> > > return error for -EOPNOTSUPP, then zeroout can't do fallback and leave
-> > > disk data not changed. zeroout should have guaranteed zero-fill
-> > > behavior.
-> > 
-> > It sounds like at least this patch should go in so BLKZEROOUT can always
-> > fall back (since those zeros are essential) but it would still be nice
-> > to see the disabling of write same being copied up to md device's
-> > write_same_max_bytes so everyone knows not to try using it in the future
-> > but perhaps someone will say "what if I re-enable it on the device
-> > below?" etc.
-> 
-> I've tested Shaohua's original patch on top of Linus' tree and even
-> without the suggested changes (above and below) it at least resolves the
-> success being returned but data not being zeroed (with both PVSCSI and
-> scsi_debug underlying devices) issue so:
-> 
-> Tested-by: Sitsofe Wheeler <sitsofe@yahoo.com>
+These days we have a lot more users of struct request for driver internal
+use than just REQ_TYPE_BLOCK_PC, so let's polish this infrastructure
+up a bit.
 
-Jens,
-
-any chance you could merge this one? I'll fix the MD part later and make sure
-write_same_max_bytes sets to 0 after IO failure.
-
-Thanks,
-Shaohua
+Changes since V1:
+ - keep blk_rq_set_block_pc for now and leave zeroing ->cmd in it
