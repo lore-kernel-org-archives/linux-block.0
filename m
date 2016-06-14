@@ -1,77 +1,52 @@
-Return-Path: <shaun@helios.aeonazure.com>
-From: Shaun Tancheff <shaun@tancheff.com>
-To: linux-ide@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org
-Cc: Shaun Tancheff <shaun@tancheff.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	"James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	Jeff Layton <jlayton@poochiereds.net>,
-	"J . Bruce Fields" <bfields@fieldses.org>
-Subject: [PATCH v3 0/3] Block layer support ZAC/ZBC commands
-Date: Fri, 10 Jun 2016 02:10:23 -0500
-Message-Id: <1465542626-26536-1-git-send-email-shaun@tancheff.com>
+Return-Path: <BATV+1815987b1c14acf14571+4678+infradead.org+hch@bombadil.srs.infradead.org>
+Date: Tue, 14 Jun 2016 07:27:21 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: keith.busch@intel.com, axboe@kernel.dk, linux-block@vger.kernel.org,
+	ming.l@ssi.samsung.com, linux-nvme@lists.infradead.org,
+	sagi@lightbits.io
+Subject: Re: [PATCH 04/11] nvmet: update for req_op changes
+Message-ID: <20160614142721.GA17219@infradead.org>
+References: <1465389066-19119-1-git-send-email-hch@lst.de>
+ <1465389066-19119-5-git-send-email-hch@lst.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1465389066-19119-5-git-send-email-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Jens,
+FYI, this missed half of the fixups, here is the other half:
 
-This series is on your for-next branch.
+---
+>From c5caa4c7c3ad5f9648e18f42687c0b63885f428d Mon Sep 17 00:00:00 2001
+From: Christoph Hellwig <hch@lst.de>
+Date: Tue, 14 Jun 2016 09:27:53 +0200
+Subject: nvmet: more fixups for the op vs flags split
 
-As Host Aware drives are becoming available we would like to be able
-to make use of such drives. This series is also intended to be suitable
-for use by Host Managed drives.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/nvme/target/io-cmd.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-ZAC/ZBC drives add new commands for discovering and working with Zones.
-
-This extends the ZAC/ZBC support up to the block layer.
-
-Patches for util-linux can be found here:
-https://github.com/Seagate/ZDM-Device-Mapper/tree/master/patches/util-linux
-
-Using BIOs to issue ZBC commands allows DM targets (such as ZDM) or
-file-systems such as btrfs or nilfs2 to extend their block allocation
-schemes and issue discards that are zone aware.
-
-A perhaps non-obvious approach is that a conventional drive will 
-returns a descriptor with a single large conventional zone.
-
-The last patch dealing with ata16 passthrough is to workaround HBA SAS 
-controllers that don't support ZBC. It will be dropped now that firmware
-updates are starting to appear.
-
-V3:
- - Rebase on Mike Cristie's separate bio operations
- - Update blkzoned_api.h to include report zones PARTIAL bit.
- - Use zoned report reserved bit for ata-passthrough flag.
-
-V2:
- - Changed bi_rw to op_flags clarify sepeartion of bio op from flags.
- - Fixed memory leak in blkdev_issue_zone_report failing to put_bio().
- - Documented opt in blkdev_issue_zone_report.
- - Moved include/uapi/linux/fs.h changes to patch 3
- - Fixed commit message for first patch in series.
-
-Shaun Tancheff (3):
-  Add bio/request flags for using ZBC/ZAC commands
-  Add ioctl to issue ZBC/ZAC commands via block layer
-  Add ata pass-through path for ZAC commands.
-
- MAINTAINERS                       |   9 ++
- block/blk-lib.c                   |  98 +++++++++++++++++
- block/ioctl.c                     | 142 ++++++++++++++++++++++++
- drivers/scsi/sd.c                 | 139 ++++++++++++++++++++++-
- drivers/scsi/sd.h                 |   1 +
- include/linux/ata.h               |  15 +++
- include/linux/bio.h               |   4 +-
- include/linux/blk_types.h         |  16 ++-
- include/linux/blkzoned_api.h      |  25 +++++
- include/uapi/linux/Kbuild         |   1 +
- include/uapi/linux/blkzoned_api.h | 224 ++++++++++++++++++++++++++++++++++++++
- include/uapi/linux/fs.h           |   1 +
- 12 files changed, 671 insertions(+), 4 deletions(-)
- create mode 100644 include/linux/blkzoned_api.h
- create mode 100644 include/uapi/linux/blkzoned_api.h
-
+diff --git a/drivers/nvme/target/io-cmd.c b/drivers/nvme/target/io-cmd.c
+index 4cfd481..2cd069b6 100644
+--- a/drivers/nvme/target/io-cmd.c
++++ b/drivers/nvme/target/io-cmd.c
+@@ -73,6 +73,7 @@ static void nvmet_execute_rw(struct nvmet_req *req)
+ 	bio->bi_iter.bi_sector = sector;
+ 	bio->bi_private = req;
+ 	bio->bi_end_io = nvmet_bio_done;
++	bio_set_op_attrs(bio, op, op_flags);
+ 
+ 	for_each_sg(req->sg, sg, req->sg_cnt, i) {
+ 		while (bio_add_page(bio, sg_page(sg), sg->length, sg->offset)
+@@ -107,7 +108,7 @@ static void nvmet_execute_flush(struct nvmet_req *req)
+ 	bio->bi_bdev = req->ns->bdev;
+ 	bio->bi_private = req;
+ 	bio->bi_end_io = nvmet_bio_done;
+-	bio->bi_rw = WRITE_FLUSH;
++	bio_set_op_attrs(bio, REQ_OP_WRITE, WRITE_FLUSH);
+ 
+ 	submit_bio(bio);
+ }
 -- 
-2.8.1
+2.1.4
