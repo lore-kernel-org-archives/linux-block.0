@@ -1,140 +1,75 @@
-Return-Path: <tom.leiming@gmail.com>
-Return-Path: <tom.leiming@gmail.com>
-From: Ming Lei <ming.lei@canonical.com>
-To: Jens Axboe <axboe@fb.com>,
-	linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Kent Overstreet <kent.overstreet@gmail.com>,
-	Ming Lei <ming.lei@canonical.com>,
-	stable@vger.kernel.org (4.3+),
-	Shaohua Li <shli@fb.com>,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH v2] block: make sure big bio is splitted into at most 256 bvecs
-Date: Fri, 10 Jun 2016 19:07:38 +0800
-Message-Id: <1465556858-30949-1-git-send-email-ming.lei@canonical.com>
+Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: tglx@linutronix.de,
+	axboe@fb.com
+Subject: [PATCH 05/13] irq/msi: Make use of affinity aware allocations
+Date: Tue, 14 Jun 2016 21:58:58 +0200
+Message-Id: <1465934346-20648-6-git-send-email-hch@lst.de>
+In-Reply-To: <1465934346-20648-1-git-send-email-hch@lst.de>
+References: <1465934346-20648-1-git-send-email-hch@lst.de>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
+List-Post: <mailto:linux-nvme@lists.infradead.org>
+List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
+Cc: linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
+Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
 List-ID: <linux-block@vger.kernel.org>
 
-After arbitrary bio size is supported, the incoming bio may
-be very big. We have to split the bio into small bios so that
-each holds at most BIO_MAX_PAGES bvecs for safety reason, such
-as bio_clone().
+From: Thomas Gleixner <tglx@linutronix.de>
 
-This patch fixes the following kernel crash:
+Allow the MSI code to provide affinity hints per MSI descriptor.
 
-> [  172.660142] BUG: unable to handle kernel NULL pointer dereference at 0000000000000028
-> [  172.660229] IP: [<ffffffff811e53b4>] bio_trim+0xf/0x2a
-> [  172.660289] PGD 7faf3e067 PUD 7f9279067 PMD 0
-> [  172.660399] Oops: 0000 [#1] SMP
-> [...]
-> [  172.664780] Call Trace:
-> [  172.664813]  [<ffffffffa007f3be>] ? raid1_make_request+0x2e8/0xad7 [raid1]
-> [  172.664846]  [<ffffffff811f07da>] ? blk_queue_split+0x377/0x3d4
-> [  172.664880]  [<ffffffffa005fb5f>] ? md_make_request+0xf6/0x1e9 [md_mod]
-> [  172.664912]  [<ffffffff811eb860>] ? generic_make_request+0xb5/0x155
-> [  172.664947]  [<ffffffffa0445c89>] ? prio_io+0x85/0x95 [bcache]
-> [  172.664981]  [<ffffffffa0448252>] ? register_cache_set+0x355/0x8d0 [bcache]
-> [  172.665016]  [<ffffffffa04497d3>] ? register_bcache+0x1006/0x1174 [bcache]
-
-The issue can be reproduced by the following steps:
-	- create one raid1 over two virtio-blk
-	- build bcache device over the above raid1 and another cache device
-	and bucket size is set as 2Mbytes
-	- set cache mode as writeback
-	- run random write over ext4 on the bcache device
-
-Fixes: 54efd50(block: make generic_make_request handle arbitrarily sized bios)
-Reported-by: Sebastian Roesner <sroesner-kernelorg@roesner-online.de>
-Reported-by: Eric Wheeler <bcache@lists.ewheeler.net>
-Cc: stable@vger.kernel.org (4.3+)
-Cc: Shaohua Li <shli@fb.com>
-Acked-by: Kent Overstreet <kent.overstreet@gmail.com>
-Signed-off-by: Ming Lei <ming.lei@canonical.com>
+Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
 ---
-V2:
-	- don't mark as REQ_NOMERGE in case the bio is splitted
-	for reaching the limit of bvecs count
-V1:
-        - Kent pointed out that using max io size can't cover
-        the case of non-full bvecs/pages
- block/blk-merge.c | 35 ++++++++++++++++++++++++++++++++---
- 1 file changed, 32 insertions(+), 3 deletions(-)
+ include/linux/msi.h | 2 ++
+ kernel/irq/msi.c    | 2 +-
+ 2 files changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index c265348..839529b 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -85,7 +85,8 @@ static inline unsigned get_max_io_size(struct request_queue *q,
- static struct bio *blk_bio_segment_split(struct request_queue *q,
- 					 struct bio *bio,
- 					 struct bio_set *bs,
--					 unsigned *segs)
-+					 unsigned *segs,
-+					 bool *no_merge)
- {
- 	struct bio_vec bv, bvprv, *bvprvp = NULL;
- 	struct bvec_iter iter;
-@@ -94,9 +95,34 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
- 	bool do_split = true;
- 	struct bio *new = NULL;
- 	const unsigned max_sectors = get_max_io_size(q, bio);
-+	unsigned bvecs = 0;
-+
-+	*no_merge = true;
+diff --git a/include/linux/msi.h b/include/linux/msi.h
+index c33abfa..4f0bfe5 100644
+--- a/include/linux/msi.h
++++ b/include/linux/msi.h
+@@ -47,6 +47,7 @@ struct fsl_mc_msi_desc {
+  * @nvec_used:	The number of vectors used
+  * @dev:	Pointer to the device which uses this descriptor
+  * @msg:	The last set MSI message cached for reuse
++ * @affinity:	Optional pointer to a cpu affinity mask for this descriptor
+  *
+  * @masked:	[PCI MSI/X] Mask bits
+  * @is_msix:	[PCI MSI/X] True if MSI-X
+@@ -67,6 +68,7 @@ struct msi_desc {
+ 	unsigned int			nvec_used;
+ 	struct device			*dev;
+ 	struct msi_msg			msg;
++	const struct cpumask		*affinity;
  
- 	bio_for_each_segment(bv, bio, iter) {
- 		/*
-+		 * With arbitrary bio size, the incoming bio may be very
-+		 * big. We have to split the bio into small bios so that
-+		 * each holds at most BIO_MAX_PAGES bvecs because
-+		 * bio_clone() can fail to allocate big bvecs.
-+		 *
-+		 * It should have been better to apply the limit per
-+		 * request queue in which bio_clone() is involved,
-+		 * instead of globally. The biggest blocker is
-+		 * bio_clone() in bio bounce.
-+		 *
-+		 * If bio is splitted by this reason, we should allow
-+		 * to continue bios merging.
-+		 *
-+		 * TODO: deal with bio bounce's bio_clone() gracefully
-+		 * and convert the global limit into per-queue limit.
-+		 */
-+		if (bvecs++ >= BIO_MAX_PAGES) {
-+			*no_merge = false;
-+			goto split;
-+		}
-+
-+		/*
- 		 * If the queue doesn't support SG gaps and adding this
- 		 * offset would create a gap, disallow it.
- 		 */
-@@ -171,13 +197,15 @@ void blk_queue_split(struct request_queue *q, struct bio **bio,
- {
- 	struct bio *split, *res;
- 	unsigned nsegs;
-+	bool no_merge_for_split = true;
+ 	union {
+ 		/* PCI MSI/X specific data */
+diff --git a/kernel/irq/msi.c b/kernel/irq/msi.c
+index 58dbbac..0e2a736 100644
+--- a/kernel/irq/msi.c
++++ b/kernel/irq/msi.c
+@@ -335,7 +335,7 @@ int msi_domain_alloc_irqs(struct irq_domain *domain, struct device *dev,
  
- 	if (bio_op(*bio) == REQ_OP_DISCARD)
- 		split = blk_bio_discard_split(q, *bio, bs, &nsegs);
- 	else if (bio_op(*bio) == REQ_OP_WRITE_SAME)
- 		split = blk_bio_write_same_split(q, *bio, bs, &nsegs);
- 	else
--		split = blk_bio_segment_split(q, *bio, q->bio_split, &nsegs);
-+		split = blk_bio_segment_split(q, *bio, q->bio_split, &nsegs,
-+				&no_merge_for_split);
- 
- 	/* physical segments can be figured out during splitting */
- 	res = split ? split : *bio;
-@@ -186,7 +214,8 @@ void blk_queue_split(struct request_queue *q, struct bio **bio,
- 
- 	if (split) {
- 		/* there isn't chance to merge the splitted bio */
--		split->bi_rw |= REQ_NOMERGE;
-+		if (no_merge_for_split)
-+			split->bi_rw |= REQ_NOMERGE;
- 
- 		bio_chain(split, *bio);
- 		trace_block_split(q, split, (*bio)->bi_iter.bi_sector);
+ 		virq = __irq_domain_alloc_irqs(domain, -1, desc->nvec_used,
+ 					       dev_to_node(dev), &arg, false,
+-					       NULL);
++					       desc->affinity);
+ 		if (virq < 0) {
+ 			ret = -ENOSPC;
+ 			if (ops->handle_error)
 -- 
-1.9.1
+2.1.4
+
+
+_______________________________________________
+Linux-nvme mailing list
+Linux-nvme@lists.infradead.org
+http://lists.infradead.org/mailman/listinfo/linux-nvme
