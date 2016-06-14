@@ -1,76 +1,123 @@
-Return-Path: <shaun@helios.aeonazure.com>
-From: Shaun Tancheff <shaun@tancheff.com>
-To: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org
-Cc: Shaun Tancheff <shaun@tancheff.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>,
-	"James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	Jeff Layton <jlayton@poochiereds.net>,
-	"J . Bruce Fields" <bfields@fieldses.org>,
-	Hannes Reinecke <hare@suse.de>
-Subject: [PATCH v4 0/2] Block layer support ZAC/ZBC commands
-Date: Sun, 19 Jun 2016 13:00:46 -0500
-Message-Id: <1466359248-10544-1-git-send-email-shaun@tancheff.com>
+Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: tglx@linutronix.de,
+	axboe@fb.com
+Subject: [PATCH 10/13] blk-mq: only allocate a single mq_map per tag_set
+Date: Tue, 14 Jun 2016 21:59:03 +0200
+Message-Id: <1465934346-20648-11-git-send-email-hch@lst.de>
+In-Reply-To: <1465934346-20648-1-git-send-email-hch@lst.de>
+References: <1465934346-20648-1-git-send-email-hch@lst.de>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
+List-Post: <mailto:linux-nvme@lists.infradead.org>
+List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
+Cc: linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
+Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Jens,
+The mapping is identical for all queues in a tag_set, so stop wasting
+memory for building multiple.  Note that for now I've kept the mq_map
+pointer in the request_queue, but we'll need to investigate if we can
+remove it without suffering from the additional indirection.  The same
+would apply to the mq_ops pointer as well.
 
-This series is on linux-next tag next-20160617.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ block/blk-mq.c         | 22 ++++++++++++++--------
+ include/linux/blk-mq.h |  1 +
+ 2 files changed, 15 insertions(+), 8 deletions(-)
 
-As Host Aware drives are becoming available we would like to be able
-to make use of such drives. This series is also intended to be suitable
-for use by Host Managed drives.
-
-ZAC/ZBC drives add new commands for discovering and working with Zones.
-
-This extends the ZAC/ZBC support up to the block layer.
-
-Patches for util-linux can be found here:
-https://github.com/Seagate/ZDM-Device-Mapper/tree/master/patches/util-linux
-
-Using BIOs to issue ZBC commands allows DM targets (such as ZDM) or
-file-systems such as f2fs, btrfs or nilfs2 to extend their block
-allocation schemes and/or issue discards that are zone aligned.
-
-A perhaps non-obvious approach is that a conventional drive will 
-returns a zone report descriptor with a single large conventional zone.
-
-v4:
- - Rebase on linux-next tag next-20160617.
- - Change bio flags to bio op's
- - Dropped ata16 hackery
-V3:
- - Rebase on Mike Cristie's separate bio operations
- - Update blkzoned_api.h to include report zones PARTIAL bit.
- - Use zoned report reserved bit for ata-passthrough flag.
-
-V2:
- - Changed bi_rw to op_flags clarify sepeartion of bio op from flags.
- - Fixed memory leak in blkdev_issue_zone_report failing to put_bio().
- - Documented opt in blkdev_issue_zone_report.
- - Moved include/uapi/linux/fs.h changes to patch 3
- - Fixed commit message for first patch in series.
-
-Shaun Tancheff (2):
-  Add bio/request flags for using ZBC/ZAC commands
-  Add ioctl to issue ZBC/ZAC commands via block layer
-
- MAINTAINERS                       |   9 ++
- block/blk-lib.c                   |  97 +++++++++++++++++
- block/ioctl.c                     | 110 +++++++++++++++++++
- drivers/scsi/sd.c                 | 122 +++++++++++++++++++++
- drivers/scsi/sd.h                 |   1 +
- include/linux/bio.h               |   7 +-
- include/linux/blk_types.h         |   6 +-
- include/linux/blkzoned_api.h      |  25 +++++
- include/uapi/linux/Kbuild         |   1 +
- include/uapi/linux/blkzoned_api.h | 220 ++++++++++++++++++++++++++++++++++++++
- include/uapi/linux/fs.h           |   1 +
- 11 files changed, 597 insertions(+), 2 deletions(-)
- create mode 100644 include/linux/blkzoned_api.h
- create mode 100644 include/uapi/linux/blkzoned_api.h
-
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index f972d32..622cb22 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1930,7 +1930,6 @@ void blk_mq_release(struct request_queue *q)
+ 		kfree(hctx);
+ 	}
+ 
+-	kfree(q->mq_map);
+ 	q->mq_map = NULL;
+ 
+ 	kfree(q->queue_hw_ctx);
+@@ -2029,9 +2028,7 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+ 	if (!q->queue_hw_ctx)
+ 		goto err_percpu;
+ 
+-	q->mq_map = blk_mq_make_queue_map(set);
+-	if (!q->mq_map)
+-		goto err_map;
++	q->mq_map = set->mq_map;
+ 
+ 	blk_mq_realloc_hw_ctxs(set, q);
+ 	if (!q->nr_hw_queues)
+@@ -2081,8 +2078,6 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+ 	return q;
+ 
+ err_hctxs:
+-	kfree(q->mq_map);
+-err_map:
+ 	kfree(q->queue_hw_ctx);
+ err_percpu:
+ 	free_percpu(q->queue_ctx);
+@@ -2304,14 +2299,22 @@ int blk_mq_alloc_tag_set(struct blk_mq_tag_set *set)
+ 	if (!set->tags)
+ 		return -ENOMEM;
+ 
++	set->mq_map = blk_mq_make_queue_map(set);
++	if (!set->mq_map)
++		goto out_free_tags;
++
+ 	if (blk_mq_alloc_rq_maps(set))
+-		goto enomem;
++		goto out_free_mq_map;
+ 
+ 	mutex_init(&set->tag_list_lock);
+ 	INIT_LIST_HEAD(&set->tag_list);
+ 
+ 	return 0;
+-enomem:
++
++out_free_mq_map:
++	kfree(set->mq_map);
++	set->mq_map = NULL;
++out_free_tags:
+ 	kfree(set->tags);
+ 	set->tags = NULL;
+ 	return -ENOMEM;
+@@ -2327,6 +2330,9 @@ void blk_mq_free_tag_set(struct blk_mq_tag_set *set)
+ 			blk_mq_free_rq_map(set, set->tags[i], i);
+ 	}
+ 
++	kfree(set->mq_map);
++	set->mq_map = NULL;
++
+ 	kfree(set->tags);
+ 	set->tags = NULL;
+ }
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 2498fdf..0a3b138 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -65,6 +65,7 @@ struct blk_mq_hw_ctx {
+ };
+ 
+ struct blk_mq_tag_set {
++	unsigned int		*mq_map;
+ 	struct blk_mq_ops	*ops;
+ 	unsigned int		nr_hw_queues;
+ 	unsigned int		queue_depth;	/* max hw supported */
 -- 
-2.8.1
+2.1.4
+
+
+_______________________________________________
+Linux-nvme mailing list
+Linux-nvme@lists.infradead.org
+http://lists.infradead.org/mailman/listinfo/linux-nvme
