@@ -1,125 +1,64 @@
-Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, axboe@fb.com,
- keith.busch@intel.com, linux-nvme@lists.infradead.org
-Subject: [PATCH 1/6] nvme: refactor namespaces to support non-gendisk devices
-Date: Fri, 10 Jun 2016 14:20:57 +0200
-Message-Id: <1465561262-13789-2-git-send-email-m@bjorling.me>
-In-Reply-To: <1465561262-13789-1-git-send-email-m@bjorling.me>
-References: <1465561262-13789-1-git-send-email-m@bjorling.me>
-MIME-Version: 1.0
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
-List-Post: <mailto:linux-nvme@lists.infradead.org>
-List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
-Cc: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Content-Type: text/plain; charset="utf-8"
-Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
-Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
+Return-Path: <BATV+1815987b1c14acf14571+4678+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk
+Cc: mst@redhat.com,
+	ooo@electrozaur.com,
+	nab@linux-iscsi.org,
+	linux-block@vger.kernel.org
+Subject: [PATCH 2/7] virtio_blk: use blk_rq_map_kern
+Date: Tue, 14 Jun 2016 19:15:59 +0200
+Message-Id: <1465924564-14503-3-git-send-email-hch@lst.de>
+In-Reply-To: <1465924564-14503-1-git-send-email-hch@lst.de>
+References: <1465924564-14503-1-git-send-email-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-V2l0aCBMaWdodE5WTSBlbmFibGVkIG5hbWVzcGFjZXMsIHRoZSBnZW5kaXNrIHN0cnVjdHVyZSBp
-cyBub3QgZXhwb3NlZAp0byB0aGUgdXNlci4gVGhpcyBwcmV2ZW50cyBMaWdodE5WTSB1c2VycyBm
-cm9tIGFjY2Vzc2luZyB0aGUgTlZNZSBkZXZpY2UKZHJpdmVyIHNwZWNpZmljIHN5c2ZzIGVudHJp
-ZXMsIGFuZCBMaWdodE5WTSBuYW1lc3BhY2UgZ2VvbWV0cnkuCgpSZWZhY3RvciB0aGUgcmV2YWxp
-ZGF0aW9uIHByb2Nlc3MsIHNvIHRoYXQgYSBuYW1lc3BhY2UsIGluc3RlYWQgb2YgYQpnZW5kaXNr
-LCBpcyByZXZhbGlkYXRlZC4gVGhpcyBsYXRlciBhbGxvd3MgcGF0Y2hlcyB0byB3aXJlIHVwIHRo
-ZQpzeXNmcyBlbnRyaWVzIHVwIHRvIGEgbm9uLWdlbmRpc2sgbmFtZXNwYWNlLgoKU2lnbmVkLW9m
-Zi1ieTogTWF0aWFzIEJqw7hybGluZyA8bUBiam9ybGluZy5tZT4KLS0tCiBkcml2ZXJzL252bWUv
-aG9zdC9jb3JlLmMgfCAxMzQgKysrKysrKysrKysrKysrKysrKysrKysrKysrKystLS0tLS0tLS0t
-LS0tLS0tLS0KIDEgZmlsZSBjaGFuZ2VkLCA4MiBpbnNlcnRpb25zKCspLCA1MiBkZWxldGlvbnMo
-LSkKCmRpZmYgLS1naXQgYS9kcml2ZXJzL252bWUvaG9zdC9jb3JlLmMgYi9kcml2ZXJzL252bWUv
-aG9zdC9jb3JlLmMKaW5kZXggNjg0MDYyYS4uZjYxNWI2YiAxMDA2NDQKLS0tIGEvZHJpdmVycy9u
-dm1lL2hvc3QvY29yZS5jCisrKyBiL2RyaXZlcnMvbnZtZS9ob3N0L2NvcmUuYwpAQCAtNzg1LDQy
-ICs3ODUsMzMgQEAgc3RhdGljIHZvaWQgbnZtZV9jb25maWdfZGlzY2FyZChzdHJ1Y3QgbnZtZV9u
-cyAqbnMpCiAJcXVldWVfZmxhZ19zZXRfdW5sb2NrZWQoUVVFVUVfRkxBR19ESVNDQVJELCBucy0+
-cXVldWUpOwogfQogCi1zdGF0aWMgaW50IG52bWVfcmV2YWxpZGF0ZV9kaXNrKHN0cnVjdCBnZW5k
-aXNrICpkaXNrKQorc3RhdGljIGludCBudm1lX3JldmFsaWRhdGVfbnMoc3RydWN0IG52bWVfbnMg
-Km5zLCBzdHJ1Y3QgbnZtZV9pZF9ucyAqKmlkKQogewotCXN0cnVjdCBudm1lX25zICpucyA9IGRp
-c2stPnByaXZhdGVfZGF0YTsKLQlzdHJ1Y3QgbnZtZV9pZF9ucyAqaWQ7Ci0JdTggbGJhZiwgcGlf
-dHlwZTsKLQl1MTYgb2xkX21zOwotCXVuc2lnbmVkIHNob3J0IGJzOwotCi0JaWYgKHRlc3RfYml0
-KE5WTUVfTlNfREVBRCwgJm5zLT5mbGFncykpIHsKLQkJc2V0X2NhcGFjaXR5KGRpc2ssIDApOwot
-CQlyZXR1cm4gLUVOT0RFVjsKLQl9Ci0JaWYgKG52bWVfaWRlbnRpZnlfbnMobnMtPmN0cmwsIG5z
-LT5uc19pZCwgJmlkKSkgeworCWlmIChudm1lX2lkZW50aWZ5X25zKG5zLT5jdHJsLCBucy0+bnNf
-aWQsIGlkKSkgewogCQlkZXZfd2FybihkaXNrX3RvX2Rldihucy0+ZGlzayksICIlczogSWRlbnRp
-ZnkgZmFpbHVyZVxuIiwKIAkJCQlfX2Z1bmNfXyk7CiAJCXJldHVybiAtRU5PREVWOwogCX0KLQlp
-ZiAoaWQtPm5jYXAgPT0gMCkgewotCQlrZnJlZShpZCk7Ci0JCXJldHVybiAtRU5PREVWOwotCX0K
-IAotCWlmIChudm1lX252bV9uc19zdXBwb3J0ZWQobnMsIGlkKSAmJiBucy0+dHlwZSAhPSBOVk1F
-X05TX0xJR0hUTlZNKSB7Ci0JCWlmIChudm1lX252bV9yZWdpc3Rlcihucy0+cXVldWUsIGRpc2st
-PmRpc2tfbmFtZSkpIHsKLQkJCWRldl93YXJuKGRpc2tfdG9fZGV2KG5zLT5kaXNrKSwKLQkJCQki
-JXM6IExpZ2h0TlZNIGluaXQgZmFpbHVyZVxuIiwgX19mdW5jX18pOwotCQkJa2ZyZWUoaWQpOwot
-CQkJcmV0dXJuIC1FTk9ERVY7Ci0JCX0KLQkJbnMtPnR5cGUgPSBOVk1FX05TX0xJR0hUTlZNOwor
-CWlmICgoKmlkKS0+bmNhcCA9PSAwKSB7CisJCWtmcmVlKCppZCk7CisJCXJldHVybiAtRU5PREVW
-OwogCX0KIAogCWlmIChucy0+Y3RybC0+dnMgPj0gTlZNRV9WUygxLCAxKSkKLQkJbWVtY3B5KG5z
-LT5ldWksIGlkLT5ldWk2NCwgc2l6ZW9mKG5zLT5ldWkpKTsKKwkJbWVtY3B5KG5zLT5ldWksICgq
-aWQpLT5ldWk2NCwgc2l6ZW9mKG5zLT5ldWkpKTsKIAlpZiAobnMtPmN0cmwtPnZzID49IE5WTUVf
-VlMoMSwgMikpCi0JCW1lbWNweShucy0+dXVpZCwgaWQtPm5ndWlkLCBzaXplb2YobnMtPnV1aWQp
-KTsKKwkJbWVtY3B5KG5zLT51dWlkLCAoKmlkKS0+bmd1aWQsIHNpemVvZihucy0+dXVpZCkpOwor
-CisJcmV0dXJuIDA7Cit9CisKK3N0YXRpYyB2b2lkIF9fbnZtZV9yZXZhbGlkYXRlX2Rpc2soc3Ry
-dWN0IGdlbmRpc2sgKmRpc2ssIHN0cnVjdCBudm1lX2lkX25zICppZCkKK3sKKwlzdHJ1Y3QgbnZt
-ZV9ucyAqbnMgPSBkaXNrLT5wcml2YXRlX2RhdGE7CisJdTggbGJhZiwgcGlfdHlwZTsKKwl1MTYg
-b2xkX21zOworCXVuc2lnbmVkIHNob3J0IGJzOwogCiAJb2xkX21zID0gbnMtPm1zOwogCWxiYWYg
-PSBpZC0+ZmxiYXMgJiBOVk1FX05TX0ZMQkFTX0xCQV9NQVNLOwpAQCAtODU5LDggKzg1MCwyNiBA
-QCBzdGF0aWMgaW50IG52bWVfcmV2YWxpZGF0ZV9kaXNrKHN0cnVjdCBnZW5kaXNrICpkaXNrKQog
-CWlmIChucy0+Y3RybC0+b25jcyAmIE5WTUVfQ1RSTF9PTkNTX0RTTSkKIAkJbnZtZV9jb25maWdf
-ZGlzY2FyZChucyk7CiAJYmxrX21xX3VuZnJlZXplX3F1ZXVlKGRpc2stPnF1ZXVlKTsKK30KIAor
-c3RhdGljIGludCBudm1lX3JldmFsaWRhdGVfZGlzayhzdHJ1Y3QgZ2VuZGlzayAqZGlzaykKK3sK
-KwlzdHJ1Y3QgbnZtZV9ucyAqbnMgPSBkaXNrLT5wcml2YXRlX2RhdGE7CisJc3RydWN0IG52bWVf
-aWRfbnMgKmlkID0gTlVMTDsKKwlpbnQgcmV0OworCisJaWYgKHRlc3RfYml0KE5WTUVfTlNfREVB
-RCwgJm5zLT5mbGFncykpIHsKKwkJc2V0X2NhcGFjaXR5KGRpc2ssIDApOworCQlyZXR1cm4gLUVO
-T0RFVjsKKwl9CisKKwlyZXQgPSBudm1lX3JldmFsaWRhdGVfbnMobnMsICZpZCk7CisJaWYgKHJl
-dCkKKwkJcmV0dXJuIHJldDsKKworCV9fbnZtZV9yZXZhbGlkYXRlX2Rpc2soZGlzaywgaWQpOwog
-CWtmcmVlKGlkKTsKKwogCXJldHVybiAwOwogfQogCkBAIC0xNDMwLDYgKzE0MzksOCBAQCBzdGF0
-aWMgdm9pZCBudm1lX2FsbG9jX25zKHN0cnVjdCBudm1lX2N0cmwgKmN0cmwsIHVuc2lnbmVkIG5z
-aWQpCiB7CiAJc3RydWN0IG52bWVfbnMgKm5zOwogCXN0cnVjdCBnZW5kaXNrICpkaXNrOworCXN0
-cnVjdCBudm1lX2lkX25zICppZDsKKwljaGFyIGRpc2tfbmFtZVtESVNLX05BTUVfTEVOXTsKIAlp
-bnQgbm9kZSA9IGRldl90b19ub2RlKGN0cmwtPmRldik7CiAKIAlsb2NrZGVwX2Fzc2VydF9oZWxk
-KCZjdHJsLT5uYW1lc3BhY2VzX211dGV4KTsKQEAgLTE0NDksNDQgKzE0NjAsNjMgQEAgc3RhdGlj
-IHZvaWQgbnZtZV9hbGxvY19ucyhzdHJ1Y3QgbnZtZV9jdHJsICpjdHJsLCB1bnNpZ25lZCBuc2lk
-KQogCW5zLT5xdWV1ZS0+cXVldWVkYXRhID0gbnM7CiAJbnMtPmN0cmwgPSBjdHJsOwogCi0JZGlz
-ayA9IGFsbG9jX2Rpc2tfbm9kZSgwLCBub2RlKTsKLQlpZiAoIWRpc2spCi0JCWdvdG8gb3V0X2Zy
-ZWVfcXVldWU7Ci0KIAlrcmVmX2luaXQoJm5zLT5rcmVmKTsKIAlucy0+bnNfaWQgPSBuc2lkOwot
-CW5zLT5kaXNrID0gZGlzazsKIAlucy0+bGJhX3NoaWZ0ID0gOTsgLyogc2V0IHRvIGEgZGVmYXVs
-dCB2YWx1ZSBmb3IgNTEyIHVudGlsIGRpc2sgaXMgdmFsaWRhdGVkICovCiAKLQogCWJsa19xdWV1
-ZV9sb2dpY2FsX2Jsb2NrX3NpemUobnMtPnF1ZXVlLCAxIDw8IG5zLT5sYmFfc2hpZnQpOwogCW52
-bWVfc2V0X3F1ZXVlX2xpbWl0cyhjdHJsLCBucy0+cXVldWUpOwogCi0JZGlzay0+bWFqb3IgPSBu
-dm1lX21ham9yOwotCWRpc2stPmZpcnN0X21pbm9yID0gMDsKLQlkaXNrLT5mb3BzID0gJm52bWVf
-Zm9wczsKLQlkaXNrLT5wcml2YXRlX2RhdGEgPSBuczsKLQlkaXNrLT5xdWV1ZSA9IG5zLT5xdWV1
-ZTsKLQlkaXNrLT5kcml2ZXJmc19kZXYgPSBjdHJsLT5kZXZpY2U7Ci0JZGlzay0+ZmxhZ3MgPSBH
-RU5IRF9GTF9FWFRfREVWVDsKLQlzcHJpbnRmKGRpc2stPmRpc2tfbmFtZSwgIm52bWUlZG4lZCIs
-IGN0cmwtPmluc3RhbmNlLCBucy0+aW5zdGFuY2UpOwotCi0JaWYgKG52bWVfcmV2YWxpZGF0ZV9k
-aXNrKG5zLT5kaXNrKSkKLQkJZ290byBvdXRfZnJlZV9kaXNrOworCWlmIChudm1lX3JldmFsaWRh
-dGVfbnMobnMsICZpZCkpCisJCWdvdG8gb3V0X2ZyZWVfcXVldWU7CisKKwlzcHJpbnRmKGRpc2tf
-bmFtZSwgIm52bWUlZG4lZCIsIGN0cmwtPmluc3RhbmNlLCBucy0+aW5zdGFuY2UpOworCisJaWYg
-KG52bWVfbnZtX25zX3N1cHBvcnRlZChucywgaWQpKSB7CisJCWlmIChudm1lX252bV9yZWdpc3Rl
-cihucy0+cXVldWUsIGRpc2tfbmFtZSkpIHsKKwkJCWRldl93YXJuKGN0cmwtPmRldiwKKwkJCQki
-JXM6IExpZ2h0TlZNIGluaXQgZmFpbHVyZVxuIiwgX19mdW5jX18pOworCQkJZ290byBvdXRfZnJl
-ZV9pZDsKKwkJfQorCisJCWRpc2sgPSBhbGxvY19kaXNrX25vZGUoMCwgbm9kZSk7CisJCWlmICgh
-ZGlzaykKKwkJCWdvdG8gb3V0X2ZyZWVfaWQ7CisJCW1lbWNweShkaXNrLT5kaXNrX25hbWUsIGRp
-c2tfbmFtZSwgRElTS19OQU1FX0xFTik7CisJCW5zLT5kaXNrID0gZGlzazsKKwkJbnMtPnR5cGUg
-PSBOVk1FX05TX0xJR0hUTlZNOworCX0gZWxzZSB7CisJCWRpc2sgPSBhbGxvY19kaXNrX25vZGUo
-MCwgbm9kZSk7CisJCWlmICghZGlzaykKKwkJCWdvdG8gb3V0X2ZyZWVfaWQ7CisKKwkJZGlzay0+
-bWFqb3IgPSBudm1lX21ham9yOworCQlkaXNrLT5maXJzdF9taW5vciA9IDA7CisJCWRpc2stPmZv
-cHMgPSAmbnZtZV9mb3BzOworCQlkaXNrLT5wcml2YXRlX2RhdGEgPSBuczsKKwkJZGlzay0+cXVl
-dWUgPSBucy0+cXVldWU7CisJCWRpc2stPmRyaXZlcmZzX2RldiA9IGN0cmwtPmRldmljZTsKKwkJ
-ZGlzay0+ZmxhZ3MgPSBHRU5IRF9GTF9FWFRfREVWVDsKKwkJbWVtY3B5KGRpc2stPmRpc2tfbmFt
-ZSwgZGlza19uYW1lLCBESVNLX05BTUVfTEVOKTsKKwkJbnMtPmRpc2sgPSBkaXNrOworCisJCV9f
-bnZtZV9yZXZhbGlkYXRlX2Rpc2soZGlzaywgaWQpOworCisJCWFkZF9kaXNrKG5zLT5kaXNrKTsK
-KworCQlpZiAoc3lzZnNfY3JlYXRlX2dyb3VwKCZkaXNrX3RvX2Rldihucy0+ZGlzayktPmtvYmos
-CisJCQkJCQkJJm52bWVfbnNfYXR0cl9ncm91cCkpCisJCQlwcl93YXJuKCIlczogZmFpbGVkIHRv
-IGNyZWF0ZSBzeXNmcyBncm91cCBmb3IgaWRlbnRpZmljYXRpb25cbiIsCisJCQkJbnMtPmRpc2st
-PmRpc2tfbmFtZSk7CisJfQogCiAJbGlzdF9hZGRfdGFpbF9yY3UoJm5zLT5saXN0LCAmY3RybC0+
-bmFtZXNwYWNlcyk7CiAJa3JlZl9nZXQoJmN0cmwtPmtyZWYpOwotCWlmIChucy0+dHlwZSA9PSBO
-Vk1FX05TX0xJR0hUTlZNKQotCQlyZXR1cm47CiAKLQlhZGRfZGlzayhucy0+ZGlzayk7Ci0JaWYg
-KHN5c2ZzX2NyZWF0ZV9ncm91cCgmZGlza190b19kZXYobnMtPmRpc2spLT5rb2JqLAotCQkJCQkm
-bnZtZV9uc19hdHRyX2dyb3VwKSkKLQkJcHJfd2FybigiJXM6IGZhaWxlZCB0byBjcmVhdGUgc3lz
-ZnMgZ3JvdXAgZm9yIGlkZW50aWZpY2F0aW9uXG4iLAotCQkJbnMtPmRpc2stPmRpc2tfbmFtZSk7
-CisJa2ZyZWUoaWQpOwogCXJldHVybjsKLSBvdXRfZnJlZV9kaXNrOgotCWtmcmVlKGRpc2spOwor
-IG91dF9mcmVlX2lkOgorCWtmcmVlKGlkKTsKICBvdXRfZnJlZV9xdWV1ZToKIAlibGtfY2xlYW51
-cF9xdWV1ZShucy0+cXVldWUpOwogIG91dF9yZWxlYXNlX2luc3RhbmNlOgotLSAKMi4xLjQKCgpf
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpMaW51eC1udm1l
-IG1haWxpbmcgbGlzdApMaW51eC1udm1lQGxpc3RzLmluZnJhZGVhZC5vcmcKaHR0cDovL2xpc3Rz
-LmluZnJhZGVhZC5vcmcvbWFpbG1hbi9saXN0aW5mby9saW51eC1udm1lCg==
+Similar to how SCSI and NVMe prepare passthrough requests.  This avoids
+poking into request internals too much.
+
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/block/virtio_blk.c | 22 ++++++++++------------
+ 1 file changed, 10 insertions(+), 12 deletions(-)
+
+diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+index 18e4069..963a130 100644
+--- a/drivers/block/virtio_blk.c
++++ b/drivers/block/virtio_blk.c
+@@ -236,25 +236,23 @@ static int virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
+ static int virtblk_get_id(struct gendisk *disk, char *id_str)
+ {
+ 	struct virtio_blk *vblk = disk->private_data;
++	struct request_queue *q = vblk->disk->queue;
+ 	struct request *req;
+-	struct bio *bio;
+ 	int err;
+ 
+-	bio = bio_map_kern(vblk->disk->queue, id_str, VIRTIO_BLK_ID_BYTES,
+-			   GFP_KERNEL);
+-	if (IS_ERR(bio))
+-		return PTR_ERR(bio);
+-
+-	req = blk_make_request(vblk->disk->queue, bio, GFP_KERNEL);
+-	if (IS_ERR(req)) {
+-		bio_put(bio);
++	req = blk_get_request(q, READ, GFP_KERNEL);
++	if (IS_ERR(req))
+ 		return PTR_ERR(req);
+-	}
+-
++	blk_rq_set_block_pc(req);
+ 	req->cmd_type = REQ_TYPE_DRV_PRIV;
++
++	err = blk_rq_map_kern(q, req, id_str, VIRTIO_BLK_ID_BYTES, GFP_KERNEL);
++	if (err)
++		goto out;
++
+ 	err = blk_execute_rq(vblk->disk->queue, vblk->disk, req, false);
++out:
+ 	blk_put_request(req);
+-
+ 	return err;
+ }
+ 
+-- 
+2.1.4
