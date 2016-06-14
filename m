@@ -1,311 +1,337 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-From: mchristi@redhat.com
-To: linux-f2fs-devel@lists.sourceforge.net, linux-ext4@vger.kernel.org,
-	konrad.wilk@oracle.com, drbd-dev@lists.linbit.com,
-	philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
-	linux-raid@vger.kernel.org, dm-devel@redhat.com,
-	linux-fsdevel@vger.kernel.org, linux-bcache@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linux-mtd@lists.infradead.org,
-	target-devel@vger.kernel.org, linux-btrfs@vger.kernel.org,
-	osd-dev@open-osd.org, xfs@oss.sgi.com, ocfs2-devel@oss.oracle.com
-Cc: Mike Christie <mchristi@redhat.com>
-Subject: [PATCH 42/45] block, fs, drivers: remove REQ_OP compat defs and related code
-Date: Sun,  5 Jun 2016 14:32:22 -0500
-Message-Id: <1465155145-10812-43-git-send-email-mchristi@redhat.com>
-In-Reply-To: <1465155145-10812-1-git-send-email-mchristi@redhat.com>
-References: <1465155145-10812-1-git-send-email-mchristi@redhat.com>
-Sender: linux-scsi-owner@vger.kernel.org
+Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: tglx@linutronix.de,
+	axboe@fb.com
+Subject: [PATCH 11/13] blk-mq: allow the driver to pass in an affinity mask
+Date: Tue, 14 Jun 2016 21:59:04 +0200
+Message-Id: <1465934346-20648-12-git-send-email-hch@lst.de>
+In-Reply-To: <1465934346-20648-1-git-send-email-hch@lst.de>
+References: <1465934346-20648-1-git-send-email-hch@lst.de>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
+List-Post: <mailto:linux-nvme@lists.infradead.org>
+List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
+Cc: linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
+Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
 List-ID: <linux-block@vger.kernel.org>
 
-From: Mike Christie <mchristi@redhat.com>
+Allow drivers to pass in the affinity mask from the generic interrupt
+layer, and spread queues based on that.  If the driver doesn't pass in
+a mask we will create it using the genirq helper.  As this helper was
+modelled after the blk-mq algorithm there should be no change in
+behavior.
 
-This patch drops the compat definition of req_op where it matches
-the rq_flag_bits definitions, and drops the related old and compat
-code that allowed users to set either the op or flags for the operation.
-
-We also then store the operation in the bi_rw/cmd_flags field similar
-to how we used to store the bio ioprio where it sat in the upper bits
-of the field.
-
-Signed-off-by: Mike Christie <mchristi@redhat.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/scsi/sd.c           |  2 +-
- include/linux/bio.h         |  3 ---
- include/linux/blk_types.h   | 52 +++++++++++++++++----------------------------
- include/linux/blkdev.h      | 14 ++++++++----
- include/linux/fs.h          | 37 +++++++++++++-------------------
- include/trace/events/f2fs.h |  1 -
- 6 files changed, 46 insertions(+), 63 deletions(-)
+ block/Makefile         |   2 +-
+ block/blk-mq-cpumap.c  | 120 -------------------------------------------------
+ block/blk-mq.c         |  72 ++++++++++++++++++++++++++---
+ block/blk-mq.h         |   8 ----
+ include/linux/blk-mq.h |   1 +
+ 5 files changed, 69 insertions(+), 134 deletions(-)
+ delete mode 100644 block/blk-mq-cpumap.c
 
-diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
-index c8dc221..fad86ad 100644
---- a/drivers/scsi/sd.c
-+++ b/drivers/scsi/sd.c
-@@ -1012,7 +1012,7 @@ static int sd_setup_read_write_cmnd(struct scsi_cmnd *SCpnt)
- 	} else if (rq_data_dir(rq) == READ) {
- 		SCpnt->cmnd[0] = READ_6;
- 	} else {
--		scmd_printk(KERN_ERR, SCpnt, "Unknown command %d,%llx\n",
-+		scmd_printk(KERN_ERR, SCpnt, "Unknown command %llu,%llx\n",
- 			    req_op(rq), (unsigned long long) rq->cmd_flags);
- 		goto out;
- 	}
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 35108c2..0bbb2e3 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -44,9 +44,6 @@
- #define BIO_MAX_SIZE		(BIO_MAX_PAGES << PAGE_SHIFT)
- #define BIO_MAX_SECTORS		(BIO_MAX_SIZE >> 9)
+diff --git a/block/Makefile b/block/Makefile
+index 9eda232..aeb318d 100644
+--- a/block/Makefile
++++ b/block/Makefile
+@@ -6,7 +6,7 @@ obj-$(CONFIG_BLOCK) := bio.o elevator.o blk-core.o blk-tag.o blk-sysfs.o \
+ 			blk-flush.o blk-settings.o blk-ioc.o blk-map.o \
+ 			blk-exec.o blk-merge.o blk-softirq.o blk-timeout.o \
+ 			blk-lib.o blk-mq.o blk-mq-tag.o \
+-			blk-mq-sysfs.o blk-mq-cpu.o blk-mq-cpumap.o ioctl.o \
++			blk-mq-sysfs.o blk-mq-cpu.o ioctl.o \
+ 			genhd.o scsi_ioctl.o partition-generic.o ioprio.o \
+ 			badblocks.o partitions/
  
--#define bio_op(bio)				(op_from_rq_bits((bio)->bi_rw))
--#define bio_set_op_attrs(bio, op, flags)	((bio)->bi_rw |= (op | flags))
--
- #define bio_prio(bio)			(bio)->bi_ioprio
- #define bio_set_prio(bio, prio)		((bio)->bi_ioprio = prio)
- 
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 5efb6f1..23c1ab2 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -48,7 +48,9 @@ struct bio {
- 	struct block_device	*bi_bdev;
- 	unsigned int		bi_flags;	/* status, command, etc */
- 	int			bi_error;
--	unsigned int		bi_rw;		/* READ/WRITE */
-+	unsigned int		bi_rw;		/* bottom bits req flags,
-+						 * top bits REQ_OP
-+						 */
- 	unsigned short		bi_ioprio;
- 
- 	struct bvec_iter	bi_iter;
-@@ -106,6 +108,16 @@ struct bio {
- 	struct bio_vec		bi_inline_vecs[0];
- };
- 
-+#define BIO_OP_SHIFT	(8 * sizeof(unsigned int) - REQ_OP_BITS)
-+#define bio_op(bio)	((bio)->bi_rw >> BIO_OP_SHIFT)
-+
-+#define bio_set_op_attrs(bio, op, op_flags) do {		\
-+	WARN_ON(op >= (1 << REQ_OP_BITS));			\
-+	(bio)->bi_rw &= ((1 << BIO_OP_SHIFT) - 1);		\
-+	(bio)->bi_rw |= ((unsigned int) (op) << BIO_OP_SHIFT);	\
-+	(bio)->bi_rw |= op_flags;				\
-+} while (0)
-+
- #define BIO_RESET_BYTES		offsetof(struct bio, bi_max_vecs)
- 
- /*
-@@ -144,7 +156,6 @@ struct bio {
-  */
- enum rq_flag_bits {
- 	/* common flags */
--	__REQ_WRITE,		/* not set, read. set, write */
- 	__REQ_FAILFAST_DEV,	/* no driver retries of device errors */
- 	__REQ_FAILFAST_TRANSPORT, /* no driver retries of transport errors */
- 	__REQ_FAILFAST_DRIVER,	/* no driver retries of driver errors */
-@@ -152,9 +163,7 @@ enum rq_flag_bits {
- 	__REQ_SYNC,		/* request is sync (sync write or read) */
- 	__REQ_META,		/* metadata io request */
- 	__REQ_PRIO,		/* boost priority in cfq */
--	__REQ_DISCARD,		/* request to discard sectors */
--	__REQ_SECURE,		/* secure discard (used with __REQ_DISCARD) */
--	__REQ_WRITE_SAME,	/* write same block many times */
-+	__REQ_SECURE,		/* secure discard (used with REQ_OP_DISCARD) */
- 
- 	__REQ_NOIDLE,		/* don't anticipate more IO after this one */
- 	__REQ_INTEGRITY,	/* I/O includes block integrity payload */
-@@ -190,28 +199,22 @@ enum rq_flag_bits {
- 	__REQ_NR_BITS,		/* stops here */
- };
- 
--#define REQ_WRITE		(1ULL << __REQ_WRITE)
- #define REQ_FAILFAST_DEV	(1ULL << __REQ_FAILFAST_DEV)
- #define REQ_FAILFAST_TRANSPORT	(1ULL << __REQ_FAILFAST_TRANSPORT)
- #define REQ_FAILFAST_DRIVER	(1ULL << __REQ_FAILFAST_DRIVER)
- #define REQ_SYNC		(1ULL << __REQ_SYNC)
- #define REQ_META		(1ULL << __REQ_META)
- #define REQ_PRIO		(1ULL << __REQ_PRIO)
--#define REQ_DISCARD		(1ULL << __REQ_DISCARD)
--#define REQ_WRITE_SAME		(1ULL << __REQ_WRITE_SAME)
- #define REQ_NOIDLE		(1ULL << __REQ_NOIDLE)
- #define REQ_INTEGRITY		(1ULL << __REQ_INTEGRITY)
- 
- #define REQ_FAILFAST_MASK \
- 	(REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT | REQ_FAILFAST_DRIVER)
- #define REQ_COMMON_MASK \
--	(REQ_WRITE | REQ_FAILFAST_MASK | REQ_SYNC | REQ_META | REQ_PRIO | \
--	 REQ_DISCARD | REQ_WRITE_SAME | REQ_NOIDLE | REQ_FLUSH | REQ_FUA | \
--	 REQ_SECURE | REQ_INTEGRITY | REQ_NOMERGE)
-+	(REQ_FAILFAST_MASK | REQ_SYNC | REQ_META | REQ_PRIO | REQ_NOIDLE | \
-+	 REQ_FLUSH | REQ_FUA | REQ_SECURE | REQ_INTEGRITY | REQ_NOMERGE)
- #define REQ_CLONE_MASK		REQ_COMMON_MASK
- 
--#define BIO_NO_ADVANCE_ITER_MASK	(REQ_DISCARD|REQ_WRITE_SAME)
--
- /* This mask is used for both bio and request merge checking */
- #define REQ_NOMERGE_FLAGS \
- 	(REQ_NOMERGE | REQ_STARTED | REQ_SOFTBARRIER | REQ_FLUSH | REQ_FUA | REQ_FLUSH_SEQ)
-@@ -243,27 +246,12 @@ enum rq_flag_bits {
- 
- enum req_op {
- 	REQ_OP_READ,
--	REQ_OP_WRITE		= REQ_WRITE,
--	REQ_OP_DISCARD		= REQ_DISCARD,
--	REQ_OP_WRITE_SAME	= REQ_WRITE_SAME,
-+	REQ_OP_WRITE,
-+	REQ_OP_DISCARD,		/* request to discard sectors */
-+	REQ_OP_WRITE_SAME,	/* write same block many times */
- };
- 
+diff --git a/block/blk-mq-cpumap.c b/block/blk-mq-cpumap.c
+deleted file mode 100644
+index d0634bc..0000000
+--- a/block/blk-mq-cpumap.c
++++ /dev/null
+@@ -1,120 +0,0 @@
 -/*
-- * tmp cpmpat. Users used to set the write bit for all non reads, but
-- * we will be dropping the bitmap use for ops. Support both until
-- * the end of the patchset.
+- * CPU <-> hardware queue mapping helpers
+- *
+- * Copyright (C) 2013-2014 Jens Axboe
 - */
--static inline int op_from_rq_bits(u64 flags)
+-#include <linux/kernel.h>
+-#include <linux/threads.h>
+-#include <linux/module.h>
+-#include <linux/mm.h>
+-#include <linux/smp.h>
+-#include <linux/cpu.h>
+-
+-#include <linux/blk-mq.h>
+-#include "blk.h"
+-#include "blk-mq.h"
+-
+-static int cpu_to_queue_index(unsigned int nr_cpus, unsigned int nr_queues,
+-			      const int cpu)
 -{
--	if (flags & REQ_OP_DISCARD)
--		return REQ_OP_DISCARD;
--	else if (flags & REQ_OP_WRITE_SAME)
--		return REQ_OP_WRITE_SAME;
--	else if (flags & REQ_OP_WRITE)
--		return REQ_OP_WRITE;
--	else
--		return REQ_OP_READ;
+-	return cpu * nr_queues / nr_cpus;
 -}
-+#define REQ_OP_BITS 2
- 
- typedef unsigned int blk_qc_t;
- #define BLK_QC_T_NONE	-1U
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 4937c05..78ae3db 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -200,8 +200,15 @@ struct request {
- 	struct request *next_rq;
- };
- 
--#define req_op(req)		(op_from_rq_bits((req)->cmd_flags))
--#define req_set_op(req, op)	((req)->cmd_flags |= op)
-+#define REQ_OP_SHIFT (8 * sizeof(u64) - REQ_OP_BITS)
-+#define req_op(req)  ((req)->cmd_flags >> REQ_OP_SHIFT)
-+
-+#define req_set_op(req, op) do {				\
-+	WARN_ON(op >= (1 << REQ_OP_BITS));			\
-+	(req)->cmd_flags &= ((1ULL << REQ_OP_SHIFT) - 1);	\
-+	(req)->cmd_flags |= ((u64) (op) << REQ_OP_SHIFT);	\
-+} while (0)
-+
- #define req_set_op_attrs(req, op, flags) do {	\
- 	req_set_op(req, op);			\
- 	(req)->cmd_flags |= flags;		\
-@@ -604,8 +611,7 @@ static inline void queue_flag_clear(unsigned int flag, struct request_queue *q)
- 
- #define list_entry_rq(ptr)	list_entry((ptr), struct request, queuelist)
- 
--#define rq_data_dir(rq) \
--	(op_is_write(op_from_rq_bits(rq->cmd_flags)) ? WRITE : READ)
-+#define rq_data_dir(rq)		(op_is_write(req_op(rq)) ? WRITE : READ)
- 
- /*
-  * Driver can handle struct request, if it either has an old style
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index af6f3c7..ccd1664 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -152,9 +152,10 @@ typedef int (dio_iodone_t)(struct kiocb *iocb, loff_t offset,
- #define CHECK_IOVEC_ONLY -1
- 
- /*
-- * The below are the various read and write types that we support. Some of
-+ * The below are the various read and write flags that we support. Some of
-  * them include behavioral modifiers that send information down to the
-- * block layer and IO scheduler. Terminology:
-+ * block layer and IO scheduler. They should be used along with a req_op.
-+ * Terminology:
-  *
-  *	The block layer uses device plugging to defer IO a little bit, in
-  *	the hope that we will see more IO very shortly. This increases
-@@ -193,19 +194,19 @@ typedef int (dio_iodone_t)(struct kiocb *iocb, loff_t offset,
-  *			non-volatile media on completion.
-  *
-  */
--#define RW_MASK			REQ_WRITE
-+#define RW_MASK			REQ_OP_WRITE
- #define RWA_MASK		REQ_RAHEAD
- 
--#define READ			0
-+#define READ			REQ_OP_READ
- #define WRITE			RW_MASK
- #define READA			RWA_MASK
- 
--#define READ_SYNC		(READ | REQ_SYNC)
--#define WRITE_SYNC		(WRITE | REQ_SYNC | REQ_NOIDLE)
--#define WRITE_ODIRECT		(WRITE | REQ_SYNC)
--#define WRITE_FLUSH		(WRITE | REQ_SYNC | REQ_NOIDLE | REQ_FLUSH)
--#define WRITE_FUA		(WRITE | REQ_SYNC | REQ_NOIDLE | REQ_FUA)
--#define WRITE_FLUSH_FUA		(WRITE | REQ_SYNC | REQ_NOIDLE | REQ_FLUSH | REQ_FUA)
-+#define READ_SYNC		REQ_SYNC
-+#define WRITE_SYNC		(REQ_SYNC | REQ_NOIDLE)
-+#define WRITE_ODIRECT		REQ_SYNC
-+#define WRITE_FLUSH		(REQ_SYNC | REQ_NOIDLE | REQ_FLUSH)
-+#define WRITE_FUA		(REQ_SYNC | REQ_NOIDLE | REQ_FUA)
-+#define WRITE_FLUSH_FUA		(REQ_SYNC | REQ_NOIDLE | REQ_FLUSH | REQ_FUA)
- 
- /*
-  * Attribute flags.  These should be or-ed together to figure out what
-@@ -2464,17 +2465,9 @@ extern void make_bad_inode(struct inode *);
- extern bool is_bad_inode(struct inode *);
- 
- #ifdef CONFIG_BLOCK
+-
+-static int get_first_sibling(unsigned int cpu)
+-{
+-	unsigned int ret;
+-
+-	ret = cpumask_first(topology_sibling_cpumask(cpu));
+-	if (ret < nr_cpu_ids)
+-		return ret;
+-
+-	return cpu;
+-}
+-
+-int blk_mq_update_queue_map(unsigned int *map, unsigned int nr_queues,
+-			    const struct cpumask *online_mask)
+-{
+-	unsigned int i, nr_cpus, nr_uniq_cpus, queue, first_sibling;
+-	cpumask_var_t cpus;
+-
+-	if (!alloc_cpumask_var(&cpus, GFP_ATOMIC))
+-		return 1;
+-
+-	cpumask_clear(cpus);
+-	nr_cpus = nr_uniq_cpus = 0;
+-	for_each_cpu(i, online_mask) {
+-		nr_cpus++;
+-		first_sibling = get_first_sibling(i);
+-		if (!cpumask_test_cpu(first_sibling, cpus))
+-			nr_uniq_cpus++;
+-		cpumask_set_cpu(i, cpus);
+-	}
+-
+-	queue = 0;
+-	for_each_possible_cpu(i) {
+-		if (!cpumask_test_cpu(i, online_mask)) {
+-			map[i] = 0;
+-			continue;
+-		}
+-
+-		/*
+-		 * Easy case - we have equal or more hardware queues. Or
+-		 * there are no thread siblings to take into account. Do
+-		 * 1:1 if enough, or sequential mapping if less.
+-		 */
+-		if (nr_queues >= nr_cpus || nr_cpus == nr_uniq_cpus) {
+-			map[i] = cpu_to_queue_index(nr_cpus, nr_queues, queue);
+-			queue++;
+-			continue;
+-		}
+-
+-		/*
+-		 * Less then nr_cpus queues, and we have some number of
+-		 * threads per cores. Map sibling threads to the same
+-		 * queue.
+-		 */
+-		first_sibling = get_first_sibling(i);
+-		if (first_sibling == i) {
+-			map[i] = cpu_to_queue_index(nr_uniq_cpus, nr_queues,
+-							queue);
+-			queue++;
+-		} else
+-			map[i] = map[first_sibling];
+-	}
+-
+-	free_cpumask_var(cpus);
+-	return 0;
+-}
+-
+-unsigned int *blk_mq_make_queue_map(struct blk_mq_tag_set *set)
+-{
+-	unsigned int *map;
+-
+-	/* If cpus are offline, map them to first hctx */
+-	map = kzalloc_node(sizeof(*map) * nr_cpu_ids, GFP_KERNEL,
+-				set->numa_node);
+-	if (!map)
+-		return NULL;
+-
+-	if (!blk_mq_update_queue_map(map, set->nr_hw_queues, cpu_online_mask))
+-		return map;
+-
+-	kfree(map);
+-	return NULL;
+-}
+-
 -/*
-- * tmp cpmpat. Users used to set the write bit for all non reads, but
-- * we will be dropping the bitmap use for ops. Support both until
-- * the end of the patchset.
+- * We have no quick way of doing reverse lookups. This is only used at
+- * queue init time, so runtime isn't important.
 - */
--static inline bool op_is_write(unsigned long flags)
-+static inline bool op_is_write(unsigned int op)
- {
--	if (flags & (REQ_OP_WRITE | REQ_OP_WRITE_SAME | REQ_OP_DISCARD))
--		return true;
--	else
--		return false;
-+	return op == REQ_OP_READ ? false : true;
+-int blk_mq_hw_queue_to_node(unsigned int *mq_map, unsigned int index)
+-{
+-	int i;
+-
+-	for_each_possible_cpu(i) {
+-		if (index == mq_map[i])
+-			return local_memory_node(cpu_to_node(i));
+-	}
+-
+-	return NUMA_NO_NODE;
+-}
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 622cb22..6027a49 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -22,6 +22,7 @@
+ #include <linux/sched/sysctl.h>
+ #include <linux/delay.h>
+ #include <linux/crash_dump.h>
++#include <linux/interrupt.h>
+ 
+ #include <trace/events/block.h>
+ 
+@@ -1954,6 +1955,22 @@ struct request_queue *blk_mq_init_queue(struct blk_mq_tag_set *set)
  }
+ EXPORT_SYMBOL(blk_mq_init_queue);
+ 
++/*
++ * We have no quick way of doing reverse lookups. This is only used at
++ * queue init time, so runtime isn't important.
++ */
++static int blk_mq_hw_queue_to_node(unsigned int *mq_map, unsigned int index)
++{
++	int i;
++
++	for_each_possible_cpu(i) {
++		if (index == mq_map[i])
++			return local_memory_node(cpu_to_node(i));
++	}
++
++	return NUMA_NO_NODE;
++}
++
+ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
+ 						struct request_queue *q)
+ {
+@@ -2253,6 +2270,30 @@ struct cpumask *blk_mq_tags_cpumask(struct blk_mq_tags *tags)
+ }
+ EXPORT_SYMBOL_GPL(blk_mq_tags_cpumask);
+ 
++static int blk_mq_create_mq_map(struct blk_mq_tag_set *set,
++		const struct cpumask *affinity_mask)
++{
++	int queue = -1, cpu = 0;
++
++	set->mq_map = kzalloc_node(sizeof(*set->mq_map) * nr_cpu_ids,
++			GFP_KERNEL, set->numa_node);
++	if (!set->mq_map)
++		return -ENOMEM;
++
++	if (!affinity_mask)
++		return 0;	/* map all cpus to queue 0 */
++
++	/* If cpus are offline, map them to first hctx */
++	for_each_online_cpu(cpu) {
++		if (cpumask_test_cpu(cpu, affinity_mask))
++			queue++;
++		if (queue > 0)
++			set->mq_map[cpu] = queue;
++	}
++
++	return 0;
++}
++
+ /*
+  * Alloc a tag set to be associated with one or more request queues.
+  * May fail with EINVAL for various error conditions. May adjust the
+@@ -2261,6 +2302,8 @@ EXPORT_SYMBOL_GPL(blk_mq_tags_cpumask);
+  */
+ int blk_mq_alloc_tag_set(struct blk_mq_tag_set *set)
+ {
++	int ret;
++
+ 	BUILD_BUG_ON(BLK_MQ_MAX_DEPTH > 1 << BLK_MQ_UNIQUE_TAG_BITS);
+ 
+ 	if (!set->nr_hw_queues)
+@@ -2299,11 +2342,30 @@ int blk_mq_alloc_tag_set(struct blk_mq_tag_set *set)
+ 	if (!set->tags)
+ 		return -ENOMEM;
+ 
+-	set->mq_map = blk_mq_make_queue_map(set);
+-	if (!set->mq_map)
+-		goto out_free_tags;
++	/*
++	 * Use the passed in affinity mask if the driver provided one.
++	 */
++	if (set->affinity_mask) {
++		ret = blk_mq_create_mq_map(set, set->affinity_mask);
++		if (!set->mq_map)
++			goto out_free_tags;
++	} else {
++		struct cpumask *affinity_mask;
+ 
+-	if (blk_mq_alloc_rq_maps(set))
++		ret = irq_create_affinity_mask(&affinity_mask,
++					       &set->nr_hw_queues);
++		if (ret)
++			goto out_free_tags;
++
++		ret = blk_mq_create_mq_map(set, affinity_mask);
++		kfree(affinity_mask);
++
++		if (!set->mq_map)
++			goto out_free_tags;
++	}
++
++	ret = blk_mq_alloc_rq_maps(set);
++	if (ret)
+ 		goto out_free_mq_map;
+ 
+ 	mutex_init(&set->tag_list_lock);
+@@ -2317,7 +2379,7 @@ out_free_mq_map:
+ out_free_tags:
+ 	kfree(set->tags);
+ 	set->tags = NULL;
+-	return -ENOMEM;
++	return ret;
+ }
+ EXPORT_SYMBOL(blk_mq_alloc_tag_set);
+ 
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index 9087b11..fe7e21f 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -45,14 +45,6 @@ void blk_mq_enable_hotplug(void);
+ void blk_mq_disable_hotplug(void);
  
  /*
-@@ -2482,7 +2475,7 @@ static inline bool op_is_write(unsigned long flags)
+- * CPU -> queue mappings
+- */
+-extern unsigned int *blk_mq_make_queue_map(struct blk_mq_tag_set *set);
+-extern int blk_mq_update_queue_map(unsigned int *map, unsigned int nr_queues,
+-				   const struct cpumask *online_mask);
+-extern int blk_mq_hw_queue_to_node(unsigned int *map, unsigned int);
+-
+-/*
+  * sysfs helpers
   */
- static inline int bio_rw(struct bio *bio)
- {
--	if (op_is_write(op_from_rq_bits(bio->bi_rw)))
-+	if (op_is_write(bio_op(bio)))
- 		return WRITE;
+ extern int blk_mq_sysfs_register(struct request_queue *q);
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 0a3b138..404cc86 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -75,6 +75,7 @@ struct blk_mq_tag_set {
+ 	unsigned int		timeout;
+ 	unsigned int		flags;		/* BLK_MQ_F_* */
+ 	void			*driver_data;
++	struct cpumask		*affinity_mask;
  
- 	return bio->bi_rw & RWA_MASK;
-@@ -2493,7 +2486,7 @@ static inline int bio_rw(struct bio *bio)
-  */
- static inline int bio_data_dir(struct bio *bio)
- {
--	return op_is_write(op_from_rq_bits(bio->bi_rw)) ? WRITE : READ;
-+	return op_is_write(bio_op(bio)) ? WRITE : READ;
- }
+ 	struct blk_mq_tags	**tags;
  
- extern void check_disk_size_change(struct gendisk *disk,
-diff --git a/include/trace/events/f2fs.h b/include/trace/events/f2fs.h
-index 733b896..30efa44 100644
---- a/include/trace/events/f2fs.h
-+++ b/include/trace/events/f2fs.h
-@@ -31,7 +31,6 @@ TRACE_DEFINE_ENUM(BG_GC);
- TRACE_DEFINE_ENUM(LFS);
- TRACE_DEFINE_ENUM(SSR);
- TRACE_DEFINE_ENUM(__REQ_RAHEAD);
--TRACE_DEFINE_ENUM(__REQ_WRITE);
- TRACE_DEFINE_ENUM(__REQ_SYNC);
- TRACE_DEFINE_ENUM(__REQ_NOIDLE);
- TRACE_DEFINE_ENUM(__REQ_FLUSH);
 -- 
-2.7.2
+2.1.4
 
+
+_______________________________________________
+Linux-nvme mailing list
+Linux-nvme@lists.infradead.org
+http://lists.infradead.org/mailman/listinfo/linux-nvme
