@@ -1,106 +1,37 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f67.google.com ([74.125.82.67]:35368 "EHLO
-	mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752757AbcF2OmX (ORCPT
-	<rfc822;linux-block@vger.kernel.org>);
-	Wed, 29 Jun 2016 10:42:23 -0400
-Received: by mail-wm0-f67.google.com with SMTP id a66so14846963wme.2
-        for <linux-block@vger.kernel.org>; Wed, 29 Jun 2016 07:42:20 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [RFC PATCH 07/11] lightnvm: remove unused lists from struct rrpc_block
-Date: Wed, 29 Jun 2016 16:41:52 +0200
-Message-Id: <1467211316-22373-8-git-send-email-m@bjorling.me>
-In-Reply-To: <1467211316-22373-1-git-send-email-m@bjorling.me>
-References: <1467211316-22373-1-git-send-email-m@bjorling.me>
+Return-Path: <sagigrim@gmail.com>
+Return-Path: <sagigrim@gmail.com>
+Subject: Re: [PATCH 4/5] nvmet-rdma: add a NVMe over Fabrics RDMA target
+ driver
+To: Steve Wise <swise@opengridcomputing.com>,
+ 'Sagi Grimberg' <sagi@lightbits.io>, 'Christoph Hellwig' <hch@lst.de>,
+ axboe@kernel.dk, keith.busch@intel.com, sean.hefty@intel.com
+References: <1465248215-18186-1-git-send-email-hch@lst.de>
+ <1465248215-18186-5-git-send-email-hch@lst.de>
+ <5756B75C.9000409@lightbits.io>
+ <057a01d1c2a3$3082eec0$9188cc40$@opengridcomputing.com>
+ <00f501d1c657$483a74e0$d8af5ea0$@opengridcomputing.com>
+ <00f701d1c658$efd720d0$cf856270$@opengridcomputing.com>
+Cc: linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, 'Armen Baloyan' <armenx.baloyan@intel.com>,
+ 'Jay Freyensee' <james.p.freyensee@intel.com>,
+ 'Ming Lin' <ming.l@ssi.samsung.com>, linux-rdma@vger.kernel.org
+From: Sagi Grimberg <sagigrim@gmail.com>
+Message-ID: <57619F3E.6070903@gmail.com>
+Date: Wed, 15 Jun 2016 21:32:30 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <00f701d1c658$efd720d0$cf856270$@opengridcomputing.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+List-ID: <linux-block@vger.kernel.org>
 
-The ->list, ->open_list, and ->closed_list lists were previously used
-for statistics. However, their usage have been removed, and thus these
-can safely be removed.
 
-Signed-off-by: Matias Bjørling <m@bjorling.me>
----
- drivers/lightnvm/rrpc.c | 9 ---------
- drivers/lightnvm/rrpc.h | 8 --------
- 2 files changed, 17 deletions(-)
+> Looking at rdma_destroy_id(), I think it is invalid to call it from the event
+> handler:
 
-diff --git a/drivers/lightnvm/rrpc.c b/drivers/lightnvm/rrpc.c
-index c3a6f34..10ed22b 100644
---- a/drivers/lightnvm/rrpc.c
-+++ b/drivers/lightnvm/rrpc.c
-@@ -205,7 +205,6 @@ static struct rrpc_block *rrpc_get_blk(struct rrpc *rrpc, struct rrpc_lun *rlun,
- 	}
- 
- 	rblk = rrpc_get_rblk(rlun, blk->id);
--	list_add_tail(&rblk->list, &rlun->open_list);
- 	spin_unlock(&lun->lock);
- 
- 	blk->priv = rblk;
-@@ -224,7 +223,6 @@ static void rrpc_put_blk(struct rrpc *rrpc, struct rrpc_block *rblk)
- 
- 	spin_lock(&lun->lock);
- 	nvm_put_blk_unlocked(rrpc->dev, rblk->parent);
--	list_del(&rblk->list);
- 	spin_unlock(&lun->lock);
- }
- 
-@@ -511,16 +509,11 @@ static void rrpc_gc_queue(struct work_struct *work)
- 	struct rrpc *rrpc = gcb->rrpc;
- 	struct rrpc_block *rblk = gcb->rblk;
- 	struct rrpc_lun *rlun = rblk->rlun;
--	struct nvm_lun *lun = rblk->parent->lun;
- 
- 	spin_lock(&rlun->lock);
- 	list_add_tail(&rblk->prio, &rlun->prio_list);
- 	spin_unlock(&rlun->lock);
- 
--	spin_lock(&lun->lock);
--	list_move_tail(&rblk->list, &rlun->closed_list);
--	spin_unlock(&lun->lock);
--
- 	mempool_free(gcb, rrpc->gcb_pool);
- 	pr_debug("nvm: block '%lu' is full, allow GC (sched)\n",
- 							rblk->parent->id);
-@@ -1194,8 +1187,6 @@ static int rrpc_luns_init(struct rrpc *rrpc, int lun_begin, int lun_end)
- 
- 		rlun->rrpc = rrpc;
- 		INIT_LIST_HEAD(&rlun->prio_list);
--		INIT_LIST_HEAD(&rlun->open_list);
--		INIT_LIST_HEAD(&rlun->closed_list);
- 
- 		INIT_WORK(&rlun->ws_gc, rrpc_lun_gc);
- 		spin_lock_init(&rlun->lock);
-diff --git a/drivers/lightnvm/rrpc.h b/drivers/lightnvm/rrpc.h
-index 5797343..448e39a 100644
---- a/drivers/lightnvm/rrpc.h
-+++ b/drivers/lightnvm/rrpc.h
-@@ -56,7 +56,6 @@ struct rrpc_block {
- 	struct nvm_block *parent;
- 	struct rrpc_lun *rlun;
- 	struct list_head prio;
--	struct list_head list;
- 
- #define MAX_INVALID_PAGES_STORAGE 8
- 	/* Bitmap for invalid page intries */
-@@ -77,13 +76,6 @@ struct rrpc_lun {
- 	struct rrpc_block *blocks;	/* Reference to block allocation */
- 
- 	struct list_head prio_list;	/* Blocks that may be GC'ed */
--	struct list_head open_list;	/* In-use open blocks. These are blocks
--					 * that can be both written to and read
--					 * from
--					 */
--	struct list_head closed_list;	/* In-use closed blocks. These are
--					 * blocks that can _only_ be read from
--					 */
- 
- 	struct work_struct ws_gc;
- 
--- 
-2.1.4
+...
 
+>
+> So I withdraw my comment about nvmet.  I think the code is fine as-is.  The 2nd
+> reject results in a no-op since the connection request was rejected by nvmet.
+
+I was just catching up on this after a short vacation, just what I was
+about to comment, thanks Steve :)
