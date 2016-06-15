@@ -1,57 +1,35 @@
-Return-Path: <famz@redhat.com>
-From: Fam Zheng <famz@redhat.com>
-To: linux-kernel@vger.kernel.org
-Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        Michael Ellerman <mpe@ellerman.id.au>, Jens Axboe <axboe@kernel.dk>,
-        "Ed L. Cashin" <ed.cashin@acm.org>, Jiri Kosina <jikos@kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Minchan Kim <minchan@kernel.org>, Nitin Gupta <ngupta@vflare.org>,
-        Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
-        Shaohua Li <shli@kernel.org>, Ulf Hansson <ulf.hansson@linaro.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Brian Norris <computersforpeace@gmail.com>,
-        Keith Busch <keith.busch@intel.com>, linuxppc-dev@lists.ozlabs.org,
-        linux-block@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        linux-raid@vger.kernel.org, linux-mmc@vger.kernel.org,
-        linux-mtd@lists.infradead.org, linux-nvme@lists.infradead.org,
-        Christoph Hellwig <hch@infradead.org>, famz@redhat.com
-Subject: [PATCH v2 06/12] mtip32xx: Generate uevent after attribute available
-Date: Thu, 30 Jun 2016 09:59:47 +0800
-Message-Id: <20160630015953.6888-7-famz@redhat.com>
-In-Reply-To: <20160630015953.6888-1-famz@redhat.com>
-References: <20160630015953.6888-1-famz@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-qk0-f193.google.com ([209.85.220.193]:32973 "EHLO
+	mail-qk0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752137AbcFOSUE (ORCPT
+	<rfc822;linux-block@vger.kernel.org>);
+	Wed, 15 Jun 2016 14:20:04 -0400
+Received: by mail-qk0-f193.google.com with SMTP id a186so4323834qkf.0
+        for <linux-block@vger.kernel.org>; Wed, 15 Jun 2016 11:20:03 -0700 (PDT)
+Date: Wed, 15 Jun 2016 14:19:52 -0400
+From: Tejun Heo <tj@kernel.org>
+To: Bart Van Assche <bart.vanassche@sandisk.com>
+Cc: Jens Axboe <axboe@fb.com>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH 3/3] block/blk-cgroup.c: Declare local symbols static
+Message-ID: <20160615181515.GI24102@mtj.duckdns.org>
+References: <25262742-283b-fc4d-30df-d6a9196c85a5@sandisk.com>
+ <298984df-eb0b-4643-5f2b-b19f8bd9c3d9@sandisk.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <298984df-eb0b-4643-5f2b-b19f8bd9c3d9@sandisk.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-It is documented that KOBJ_ADD should be generated after the object's
-attributes and children are ready.  We can achieve this with the new
-disk_gen_uevents interface.
+On Tue, Jun 14, 2016 at 05:04:32PM +0200, Bart Van Assche wrote:
+> Detected by sparse.
+> 
+> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+> Cc: Tejun Heo <tj@kernel.org>
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
----
- drivers/block/mtip32xx/mtip32xx.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Acked-by: Tejun Heo <tj@kernel.org>
 
-diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/mtip32xx.c
-index 2d09fae..8c1cf03 100644
---- a/drivers/block/mtip32xx/mtip32xx.c
-+++ b/drivers/block/mtip32xx/mtip32xx.c
-@@ -4042,7 +4042,7 @@ skip_create_disk:
- 	set_capacity(dd->disk, capacity);
- 
- 	/* Enable the block device and add it to /dev */
--	add_disk(dd->disk, true);
-+	add_disk(dd->disk, false);
- 
- 	dd->bdev = bdget_disk(dd->disk, 0);
- 	/*
-@@ -4054,6 +4054,7 @@ skip_create_disk:
- 		mtip_hw_sysfs_init(dd, kobj);
- 		kobject_put(kobj);
- 	}
-+	disk_gen_uevents(dd->disk);
- 
- 	if (dd->mtip_svc_handler) {
- 		set_bit(MTIP_DDF_INIT_DONE_BIT, &dd->dd_flag);
+Thanks.
+
 -- 
-2.9.0
+tejun
