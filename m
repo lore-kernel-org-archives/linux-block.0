@@ -1,69 +1,47 @@
-Return-Path: <msnitzer@redhat.com>
-Date: Thu, 30 Jun 2016 15:40:24 -0400
-From: Mike Snitzer <snitzer@redhat.com>
-To: Mikulas Patocka <mpatocka@redhat.com>,
-        Lars Ellenberg <lars.ellenberg@linbit.com>, axboe@kernel.dk
-Cc: "Alasdair G. Kergon" <agk@redhat.com>,
-        Zdenek Kabelac <zkabelac@redhat.com>, dm-devel@redhat.com,
-        linux-block@vger.kernel.org,
-        Roland Kammerer <roland.kammerer@linbit.com>
-Subject: Re: [PATCH 0/3] offload bios to a thread
-Message-ID: <20160630194023.GA21338@redhat.com>
-References: <alpine.LRH.2.02.1606282014380.7298@file01.intranet.prod.int.rdu2.redhat.com>
+Return-Path: <keith.busch@intel.com>
+Date: Wed, 15 Jun 2016 15:54:01 -0400
+From: Keith Busch <keith.busch@intel.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org, linux-rdma@vger.kernel.org
+Subject: Re: generic NVMe over Fabrics library support V2
+Message-ID: <20160615195401.GA7637@localhost.localdomain>
+References: <1465829128-22993-1-git-send-email-hch@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <alpine.LRH.2.02.1606282014380.7298@file01.intranet.prod.int.rdu2.redhat.com>
+In-Reply-To: <1465829128-22993-1-git-send-email-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-[cc'ing linux-block and drbd folks]
-
-On Tue, Jun 28 2016 at  8:16pm -0400,
-Mikulas Patocka <mpatocka@redhat.com> wrote:
-
-> Hi
+On Mon, Jun 13, 2016 at 04:45:20PM +0200, Christoph Hellwig wrote:
+> This patch set adds the necessary infrastructure for the NVMe over
+> Fabrics functionality and the NVMe over Fabrics library itself.
 > 
-> Here I'm sending three patches to fix the deadlocks in snapshot and 
-> snapshot-merge.
+> First we add some needed parameters to NVMe request allocation such as flags
+> (for reserved commands - connect and keep-alive), also support tag
+> allocation of a given queue ID (for connect to be executed per-queue)
+> and allow request to be queued at the head of the request queue (so
+> reconnects can pass in flight I/O).
 > 
-> The first patch fixes the deadlock, the following 2 patches introduce a 
-> timer, so that bios are not offloaded immediatelly, they are offloaded 
-> after a specified timeout, because immediate offloading can change order 
-> of bios and it could theoretically produce regressions. I don't know if 
-> these regressions really exist or not.
+> Second, we add support for additional sysfs attributes that are needed
+> or useful for the Fabrics driver.
 > 
-> If there is some way to push the patches upstream, try it.
+> Third we add the NVMe over Fabrics related header definitions and the
+> Fabrics library itself which is transport independent and handles
+> Fabrics specific commands and variables.
+> 
+> Last, we add support for periodic keep-alive mechanism which is mandatory
+> for Fabrics.
+> 
+> Changes from V1:
+>  - don't directly free host->opts on connect failure (Sagi)
+>  - blk_mq_alloc_request_hctx improvements (Ming and me)
+>  - keep alive should not use blk_mq_alloc_request_hctx (me)
 
-Some fix must happen before the more recent upstream kernels can be
-reliably used in stacked bio-based workloads (in production).  We simply
-cannot ignore this issue any more.
+I only had the one comment, and Sagi says you guys already considered
+it but was more complicated than it was worth. Looking at the patches
+that follow, I tend to agree.
 
-drbd is also hitting the same generic_make_request (current->bio_list)
-problem, see:
-https://www.redhat.com/archives/dm-devel/2016-June/msg00326.html
+The rest looks great, and passes all the sanity tests I can run. This
+time with correct email spelling:
 
-Mikulas, I've taken your 3 proposed patches patches and refactored them
-some to split out intermediate patches that hopefully make review
-easier.  Nothing other than variable names and some other style stuff
-was changed -- headers were tweaked some to help with clarity.
-
-Please see the 5 topmost "block: ..." patches here:
-http://git.kernel.org/cgit/linux/kernel/git/snitzer/linux.git/log/?h=wip
-
-It should be noted that Jens had a quick look at this set and wanted to
-throw up a little when he saw the (ab)use of a timer to defer punting to
-the workqueue.  I explained that without the timer, always punting to
-the workqueue, we could hurt performance by reordering IO or crippling
-onstack plugging.  He said he'd try to think of a cleaner way forward.
-
-Lars, please feel free to see if this set addresses the similar deadlock
-you saw/fixed with drbd.  We need to converge on an acceptable fix for
-this problem -- preferably sooner rather than later!
-
-Conversely, Mikulas: if you can easily reproduce the dm-snapshot
-deadlock please try Lars' fix to see if it is workable for our DM needs.
-
-Thanks,
-Mike
-
-p.s. I'm on holiday until next Wednesday (7/6).. so may be slow to
-     respond until then.
+Reviewed-by: Keith Busch <keith.busch@intel.com>
