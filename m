@@ -1,59 +1,54 @@
-Return-Path: <BATV+65f7e0ff3112b2479d70+4670+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk,
-	keith.busch@intel.com
-Cc: linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Sagi Grimberg <sagi@grimberg.me>
-Subject: [PATCH 7/8] nvme.h: Add keep-alive opcode and identify controller attribute
-Date: Mon,  6 Jun 2016 23:21:58 +0200
-Message-Id: <1465248119-17875-8-git-send-email-hch@lst.de>
-In-Reply-To: <1465248119-17875-1-git-send-email-hch@lst.de>
-References: <1465248119-17875-1-git-send-email-hch@lst.de>
+Return-Path: <baolin.wang@linaro.org>
+MIME-Version: 1.0
+In-Reply-To: <20160615073951.GA14986@gondor.apana.org.au>
+References: <cover.1465301616.git.baolin.wang@linaro.org> <238ce3d506051c863300b90720c3e103175747cc.1465301616.git.baolin.wang@linaro.org>
+ <20160607141613.GA2237@gondor.apana.org.au> <CAMz4kuLsAyo7pO3VhCV9QdyHJ8njc6dfvORf55Nc_JTDVR-inQ@mail.gmail.com>
+ <CAMz4kuKXJ5xUXj111VBb9hMH=kT3Y5P3_iVtgeS8kidbLZ+6TA@mail.gmail.com>
+ <20160615064939.GA14227@gondor.apana.org.au> <CAMz4ku+s-6MQWHhnaau9fK9ssYJNpS9UFvgASoacP0e3vj-zzg@mail.gmail.com>
+ <20160615073951.GA14986@gondor.apana.org.au>
+From: Baolin Wang <baolin.wang@linaro.org>
+Date: Wed, 15 Jun 2016 16:48:19 +0800
+Message-ID: <CAMz4kuLc4gdx2EJ=dy8OvBY3J_3OTHX0xi=Ps4YoaO3X-cE-zQ@mail.gmail.com>
+Subject: Re: [RFC v4 2/4] crypto: Introduce CRYPTO_ALG_BULK flag
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Jens Axboe <axboe@kernel.dk>, Alasdair G Kergon <agk@redhat.com>, Mike Snitzer <snitzer@redhat.com>,
+	"open list:DEVICE-MAPPER (LVM)" <dm-devel@redhat.com>, David Miller <davem@davemloft.net>,
+	Eric Biggers <ebiggers3@gmail.com>, Joonsoo Kim <js1304@gmail.com>, tadeusz.struk@intel.com,
+	smueller@chronox.de, Masanari Iida <standby24x7@gmail.com>, Shaohua Li <shli@kernel.org>,
+	Dan Williams <dan.j.williams@intel.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>, Sagi Grimberg <sagig@mellanox.com>,
+	Kent Overstreet <kent.overstreet@gmail.com>, Keith Busch <keith.busch@intel.com>,
+	Tejun Heo <tj@kernel.org>, Ming Lei <ming.lei@canonical.com>, Mark Brown <broonie@kernel.org>,
+	Arnd Bergmann <arnd@arndb.de>, linux-crypto@vger.kernel.org, linux-block@vger.kernel.org,
+	"open list:SOFTWARE RAID (Multiple Disks) SUPPORT" <linux-raid@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
-From: Sagi Grimberg <sagi@grimberg.me>
+On 15 June 2016 at 15:39, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> On Wed, Jun 15, 2016 at 03:38:02PM +0800, Baolin Wang wrote:
+>>
+>> But that means we should divide the bulk request into 512-byte size
+>> requests and break up the mapped sg table for each request. Another
+>> hand we should allocate memory for each request in crypto layer, which
+>> dm-crypt have supplied one high efficiency way. I think these are
+>> really top level how to use the crypro APIs, does that need to move
+>> into crypto laryer? Thanks.
+>
+> I have already explained to you how you can piggy-back off dm-crypt's
+> allocation, so what's the problem?
 
-KAS: keep-alive support and granularity of kato in units of 100 ms
-nvme_admin_keep_alive opcode: 0x18
+Because the request created in dm-crypt is connecting with dm-crypt
+closely, I am worried if it can work or introduce other issues if we
+move these top level things into crypto layer. Anyway I will try to do
+that. Thanks.
 
-Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- include/linux/nvme.h | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+> --
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
 
-diff --git a/include/linux/nvme.h b/include/linux/nvme.h
-index 7525030..d8b37ba 100644
---- a/include/linux/nvme.h
-+++ b/include/linux/nvme.h
-@@ -202,7 +202,9 @@ struct nvme_id_ctrl {
- 	__u8			apsta;
- 	__le16			wctemp;
- 	__le16			cctemp;
--	__u8			rsvd270[242];
-+	__u8			rsvd270[50];
-+	__le16			kas;
-+	__u8			rsvd322[190];
- 	__u8			sqes;
- 	__u8			cqes;
- 	__le16			maxcmd;
-@@ -556,6 +558,7 @@ enum nvme_admin_opcode {
- 	nvme_admin_async_event		= 0x0c,
- 	nvme_admin_activate_fw		= 0x10,
- 	nvme_admin_download_fw		= 0x11,
-+	nvme_admin_keep_alive		= 0x18,
- 	nvme_admin_format_nvm		= 0x80,
- 	nvme_admin_security_send	= 0x81,
- 	nvme_admin_security_recv	= 0x82,
-@@ -580,6 +583,7 @@ enum {
- 	NVME_FEAT_WRITE_ATOMIC	= 0x0a,
- 	NVME_FEAT_ASYNC_EVENT	= 0x0b,
- 	NVME_FEAT_AUTO_PST	= 0x0c,
-+	NVME_FEAT_KATO		= 0x0f,
- 	NVME_FEAT_SW_PROGRESS	= 0x80,
- 	NVME_FEAT_HOST_ID	= 0x81,
- 	NVME_FEAT_RESV_MASK	= 0x82,
+
+
 -- 
-2.1.4
+Baolin.wang
+Best Regards
