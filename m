@@ -1,53 +1,56 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-bl2on0099.outbound.protection.outlook.com ([65.55.169.99]:32024
-	"EHLO na01-bl2-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1750985AbcFNPEo (ORCPT <rfc822;linux-block@vger.kernel.org>);
-	Tue, 14 Jun 2016 11:04:44 -0400
-Subject: [PATCH 3/3] block/blk-cgroup.c: Declare local symbols static
-To: Jens Axboe <axboe@fb.com>
-References: <25262742-283b-fc4d-30df-d6a9196c85a5@sandisk.com>
-CC: Tejun Heo <tj@kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-Message-ID: <298984df-eb0b-4643-5f2b-b19f8bd9c3d9@sandisk.com>
-Date: Tue, 14 Jun 2016 17:04:32 +0200
+Return-Path: <sagigrim@gmail.com>
+Return-Path: <sagigrim@gmail.com>
+Subject: Re: [PATCH 6/8] nvme-fabrics: add a generic NVMe over Fabrics library
+To: Keith Busch <keith.busch@intel.com>, Christoph Hellwig <hch@lst.de>
+References: <1465829128-22993-1-git-send-email-hch@lst.de>
+ <1465829128-22993-7-git-send-email-hch@lst.de>
+ <20160615191603.GC1919@localhost.localdomain>
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org,
+ linux-nvme@lists.infradead.org, linux-rdma@vger.kernel.org,
+ Armen Baloyan <armenx.baloyan@intel.com>,
+ Jay Freyensee <james.p.freyensee@intel.com>,
+ Ming Lin <ming.l@ssi.samsung.com>
+From: Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <5761A983.6020807@grimberg.me>
+Date: Wed, 15 Jun 2016 22:16:19 +0300
 MIME-Version: 1.0
-In-Reply-To: <25262742-283b-fc4d-30df-d6a9196c85a5@sandisk.com>
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <20160615191603.GC1919@localhost.localdomain>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+List-ID: <linux-block@vger.kernel.org>
 
-Detected by sparse.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Tejun Heo <tj@kernel.org>
----
- block/blk-cgroup.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+>> @@ -107,10 +108,19 @@ struct nvme_ctrl {
+>>   	u8 event_limit;
+>>   	u8 vwc;
+>>   	u32 vs;
+>> +	u32 sgls;
+>>   	bool subsystem;
+>>   	unsigned long quirks;
+>>   	struct work_struct scan_work;
+>>   	struct work_struct async_event_work;
+>> +
+>> +	/* Fabrics only */
+>> +	u16 sqsize;
+>> +	u32 ioccsz;
+>> +	u32 iorcsz;
+>> +	u16 icdoff;
+>> +	u16 maxcmd;
+>> +	struct nvmf_ctrl_options *opts;
+>>   };
+>
+> The pci only stuff goes in 'struct nvme_dev' and embeds 'struct
+> nvme_ctrl', but fabrics gets to use nvme_ctrl directly?
+>
+> If we need transport specifics for anything, like you have during
+> nvme_init_identify, I think we should add function callbacks to
+> nvme_ctrl_ops to set up those specifics, then we don't need 'is_fabrics'
+> checks.
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 66e6f1a..dd38e5c 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -905,7 +905,7 @@ static int blkcg_print_stat(struct seq_file *sf, void *v)
- 	return 0;
- }
- 
--struct cftype blkcg_files[] = {
-+static struct cftype blkcg_files[] = {
- 	{
- 		.name = "stat",
- 		.flags = CFTYPE_NOT_ON_ROOT,
-@@ -914,7 +914,7 @@ struct cftype blkcg_files[] = {
- 	{ }	/* terminate */
- };
- 
--struct cftype blkcg_legacy_files[] = {
-+static struct cftype blkcg_legacy_files[] = {
- 	{
- 		.name = "reset_stats",
- 		.write_u64 = blkcg_reset_stats,
--- 
-2.8.4
+That's where we started off from :)
 
+But we got to a point where it started getting convoluted for generic
+nvme optional features which are mandatory for fabrics (like keep-alive
+support) that are detected in different forms (controller identify and
+fabric admin connect). Anyway we thought it'd be cleaner to have it
+directly in nvme_ctrl and centralize their assignments in a single
+location.
