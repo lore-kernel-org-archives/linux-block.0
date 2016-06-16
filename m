@@ -1,43 +1,64 @@
-Return-Path: <herbert@gondor.apana.org.au>
-Date: Thu, 2 Jun 2016 16:26:06 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Baolin Wang <baolin.wang@linaro.org>
-Cc: axboe@kernel.dk, agk@redhat.com, snitzer@redhat.com,
-	dm-devel@redhat.com, davem@davemloft.net, ebiggers3@gmail.com,
-	js1304@gmail.com, tadeusz.struk@intel.com, smueller@chronox.de,
-	standby24x7@gmail.com, shli@kernel.org, dan.j.williams@intel.com,
-	martin.petersen@oracle.com, sagig@mellanox.com,
-	kent.overstreet@gmail.com, keith.busch@intel.com, tj@kernel.org,
-	ming.lei@canonical.com, broonie@kernel.org, arnd@arndb.de,
-	linux-crypto@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-raid@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC v2 2/3] crypto: Introduce CRYPTO_ALG_BULK flag
-Message-ID: <20160602082606.GA15226@gondor.apana.org.au>
-References: <cover.1464346333.git.baolin.wang@linaro.org>
- <47e9ddd8c9ea9ad9e29c8cb027d19d8459ea1479.1464346333.git.baolin.wang@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <47e9ddd8c9ea9ad9e29c8cb027d19d8459ea1479.1464346333.git.baolin.wang@linaro.org>
+Return-Path: <BATV+d68c80116f0bf241093e+4680+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk
+Cc: mst@redhat.com,
+	ooo@electrozaur.com,
+	nab@linux-iscsi.org,
+	linux-block@vger.kernel.org
+Subject: [PATCH 2/7] virtio_blk: use blk_rq_map_kern
+Date: Thu, 16 Jun 2016 11:14:26 +0200
+Message-Id: <1466068471-15746-3-git-send-email-hch@lst.de>
+In-Reply-To: <1466068471-15746-1-git-send-email-hch@lst.de>
+References: <1466068471-15746-1-git-send-email-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-On Fri, May 27, 2016 at 07:11:23PM +0800, Baolin Wang wrote:
-> Now some cipher hardware engines prefer to handle bulk block rather than one
-> sector (512 bytes) created by dm-crypt, cause these cipher engines can handle
-> the intermediate values (IV) by themselves in one bulk block. This means we
-> can increase the size of the request by merging request rather than always 512
-> bytes and thus increase the hardware engine processing speed.
-> 
-> So introduce 'CRYPTO_ALG_BULK' flag to indicate this cipher can support bulk
-> mode.
-> 
-> Signed-off-by: Baolin Wang <baolin.wang@linaro.org>
+Similar to how SCSI and NVMe prepare passthrough requests.  This avoids
+poking into request internals too much.
 
-I think a better aproach would be to explicitly move the IV generation
-into the crypto API, similar to how we handle IPsec.  Once you do
-that then every algorithm can be handled through the bulk interface.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/block/virtio_blk.c | 22 ++++++++++------------
+ 1 file changed, 10 insertions(+), 12 deletions(-)
 
-Cheers,
+diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+index 18e4069..963a130 100644
+--- a/drivers/block/virtio_blk.c
++++ b/drivers/block/virtio_blk.c
+@@ -236,25 +236,23 @@ static int virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
+ static int virtblk_get_id(struct gendisk *disk, char *id_str)
+ {
+ 	struct virtio_blk *vblk = disk->private_data;
++	struct request_queue *q = vblk->disk->queue;
+ 	struct request *req;
+-	struct bio *bio;
+ 	int err;
+ 
+-	bio = bio_map_kern(vblk->disk->queue, id_str, VIRTIO_BLK_ID_BYTES,
+-			   GFP_KERNEL);
+-	if (IS_ERR(bio))
+-		return PTR_ERR(bio);
+-
+-	req = blk_make_request(vblk->disk->queue, bio, GFP_KERNEL);
+-	if (IS_ERR(req)) {
+-		bio_put(bio);
++	req = blk_get_request(q, READ, GFP_KERNEL);
++	if (IS_ERR(req))
+ 		return PTR_ERR(req);
+-	}
+-
++	blk_rq_set_block_pc(req);
+ 	req->cmd_type = REQ_TYPE_DRV_PRIV;
++
++	err = blk_rq_map_kern(q, req, id_str, VIRTIO_BLK_ID_BYTES, GFP_KERNEL);
++	if (err)
++		goto out;
++
+ 	err = blk_execute_rq(vblk->disk->queue, vblk->disk, req, false);
++out:
+ 	blk_put_request(req);
+-
+ 	return err;
+ }
+ 
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.1.4
