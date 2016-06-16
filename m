@@ -1,106 +1,105 @@
-Return-Path: <famz@redhat.com>
-From: Fam Zheng <famz@redhat.com>
-To: linux-kernel@vger.kernel.org
-Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        Michael Ellerman <mpe@ellerman.id.au>, Jens Axboe <axboe@kernel.dk>,
-        "Ed L. Cashin" <ed.cashin@acm.org>, Jiri Kosina <jikos@kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Minchan Kim <minchan@kernel.org>, Nitin Gupta <ngupta@vflare.org>,
-        Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
-        Shaohua Li <shli@kernel.org>, Ulf Hansson <ulf.hansson@linaro.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Brian Norris <computersforpeace@gmail.com>,
-        Keith Busch <keith.busch@intel.com>, linuxppc-dev@lists.ozlabs.org,
-        linux-block@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        linux-raid@vger.kernel.org, linux-mmc@vger.kernel.org,
-        linux-mtd@lists.infradead.org, linux-nvme@lists.infradead.org,
-        Christoph Hellwig <hch@infradead.org>, famz@redhat.com
-Subject: [PATCH v2 02/12] genhd: Honor gen_uevent and add disk_gen_uevents
-Date: Thu, 30 Jun 2016 09:59:43 +0800
-Message-Id: <20160630015953.6888-3-famz@redhat.com>
-In-Reply-To: <20160630015953.6888-1-famz@redhat.com>
-References: <20160630015953.6888-1-famz@redhat.com>
+Return-Path: <BATV+d68c80116f0bf241093e+4680+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk
+Cc: mst@redhat.com,
+	ooo@electrozaur.com,
+	nab@linux-iscsi.org,
+	linux-block@vger.kernel.org
+Subject: [PATCH 3/7] block: ensure bios return from blk_get_request are properly initialized
+Date: Thu, 16 Jun 2016 11:14:27 +0200
+Message-Id: <1466068471-15746-4-git-send-email-hch@lst.de>
+In-Reply-To: <1466068471-15746-1-git-send-email-hch@lst.de>
+References: <1466068471-15746-1-git-send-email-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-In add_disk(), don't send uevent to userspace when gen_uevent is true;
-also export the refactored function disk_gen_uevents for later use.
+blk_get_request is used for BLOCK_PC and similar passthrough requests.
+Currently we always need to call blk_rq_set_block_pc or an open coded
+version of it to allow appending bios using the request mapping helpers
+later on, which is a somewhat awkward API.  Instead move the
+initialization part of blk_rq_set_block_pc into blk_get_request, so that
+we always have a safe to use request.
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/genhd.c         | 23 +++++++++++++++++++----
- include/linux/genhd.h |  1 +
- 2 files changed, 20 insertions(+), 4 deletions(-)
+ block/blk-core.c           | 12 +++++++-----
+ block/blk-mq.c             |  4 ++++
+ drivers/block/virtio_blk.c |  1 -
+ drivers/nvme/host/core.c   |  4 ----
+ 4 files changed, 11 insertions(+), 10 deletions(-)
 
-diff --git a/block/genhd.c b/block/genhd.c
-index 8e1bfa1..9b66953 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -506,12 +506,10 @@ static int exact_lock(dev_t devt, void *data)
- 	return 0;
+diff --git a/block/blk-core.c b/block/blk-core.c
+index c94c7ad..8416c4a 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -1294,10 +1294,15 @@ static struct request *blk_old_get_request(struct request_queue *q, int rw,
+ 
+ 	spin_lock_irq(q->queue_lock);
+ 	rq = get_request(q, rw, 0, NULL, gfp_mask);
+-	if (IS_ERR(rq))
++	if (IS_ERR(rq)) {
+ 		spin_unlock_irq(q->queue_lock);
+-	/* q->queue_lock is unlocked at this point */
++		return rq;
++	}
+ 
++	/* q->queue_lock is unlocked at this point */
++	rq->__data_len = 0;
++	rq->__sector = (sector_t) -1;
++	rq->bio = rq->biotail = NULL;
+ 	return rq;
  }
  
--static void register_disk(struct gendisk *disk)
-+static void register_disk(struct gendisk *disk, bool gen_uevent)
+@@ -1377,9 +1382,6 @@ EXPORT_SYMBOL(blk_make_request);
+ void blk_rq_set_block_pc(struct request *rq)
  {
- 	struct device *ddev = disk_to_dev(disk);
- 	struct block_device *bdev;
--	struct disk_part_iter piter;
--	struct hd_struct *part;
- 	int err;
- 
- 	ddev->parent = disk->driverfs_dev;
-@@ -563,6 +561,22 @@ static void register_disk(struct gendisk *disk)
- exit:
- 	/* announce disk after possible partitions are created */
- 	dev_set_uevent_suppress(ddev, 0);
-+	if (gen_uevent)
-+		disk_gen_uevents(disk);
-+}
-+
-+/**
-+ * disk_gen_uevents
-+ * @disk - the disk to generate uevent
-+ *
-+ * Generate KOBJ_ADD uevents on the disk and partitions.
-+ */
-+void disk_gen_uevents(struct gendisk *disk)
-+{
-+	struct device *ddev = disk_to_dev(disk);
-+	struct disk_part_iter piter;
-+	struct hd_struct *part;
-+
- 	kobject_uevent(&ddev->kobj, KOBJ_ADD);
- 
- 	/* announce possible partitions */
-@@ -571,6 +585,7 @@ exit:
- 		kobject_uevent(&part_to_dev(part)->kobj, KOBJ_ADD);
- 	disk_part_iter_exit(&piter);
+ 	rq->cmd_type = REQ_TYPE_BLOCK_PC;
+-	rq->__data_len = 0;
+-	rq->__sector = (sector_t) -1;
+-	rq->bio = rq->biotail = NULL;
+ 	memset(rq->__cmd, 0, sizeof(rq->__cmd));
  }
-+EXPORT_SYMBOL(disk_gen_uevents);
+ EXPORT_SYMBOL(blk_rq_set_block_pc);
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index bc7166d..b5606dc 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -263,6 +263,10 @@ struct request *blk_mq_alloc_request(struct request_queue *q, int rw,
+ 		blk_queue_exit(q);
+ 		return ERR_PTR(-EWOULDBLOCK);
+ 	}
++
++	rq->__data_len = 0;
++	rq->__sector = (sector_t) -1;
++	rq->bio = rq->biotail = NULL;
+ 	return rq;
+ }
+ EXPORT_SYMBOL(blk_mq_alloc_request);
+diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+index 963a130..0be7dd6 100644
+--- a/drivers/block/virtio_blk.c
++++ b/drivers/block/virtio_blk.c
+@@ -243,7 +243,6 @@ static int virtblk_get_id(struct gendisk *disk, char *id_str)
+ 	req = blk_get_request(q, READ, GFP_KERNEL);
+ 	if (IS_ERR(req))
+ 		return PTR_ERR(req);
+-	blk_rq_set_block_pc(req);
+ 	req->cmd_type = REQ_TYPE_DRV_PRIV;
  
- /**
-  * add_disk - add partitioning information to kernel list
-@@ -618,7 +633,7 @@ void add_disk(struct gendisk *disk, bool gen_uevent)
+ 	err = blk_rq_map_kern(q, req, id_str, VIRTIO_BLK_ID_BYTES, GFP_KERNEL);
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 9d7cee4..cb8ca1b 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -201,10 +201,6 @@ struct request *nvme_alloc_request(struct request_queue *q,
  
- 	blk_register_region(disk_devt(disk), disk->minors, NULL,
- 			    exact_match, exact_lock, disk);
--	register_disk(disk);
-+	register_disk(disk, gen_uevent);
- 	blk_register_queue(disk);
- 
- 	/*
-diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index 038be80..87ad9e5 100644
---- a/include/linux/genhd.h
-+++ b/include/linux/genhd.h
-@@ -416,6 +416,7 @@ extern void part_round_stats(int cpu, struct hd_struct *part);
- /* block/genhd.c */
- extern void add_disk(struct gendisk *disk, bool gen_uevent);
- extern void del_gendisk(struct gendisk *gp);
-+extern void disk_gen_uevents(struct gendisk *disk);
- extern struct gendisk *get_gendisk(dev_t dev, int *partno);
- extern struct block_device *bdget_disk(struct gendisk *disk, int partno);
+ 	req->cmd_type = REQ_TYPE_DRV_PRIV;
+ 	req->cmd_flags |= REQ_FAILFAST_DRIVER;
+-	req->__data_len = 0;
+-	req->__sector = (sector_t) -1;
+-	req->bio = req->biotail = NULL;
+-
+ 	req->cmd = (unsigned char *)cmd;
+ 	req->cmd_len = sizeof(struct nvme_command);
  
 -- 
-2.9.0
+2.1.4
