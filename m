@@ -1,14 +1,13 @@
 Return-Path: <jikos@kernel.org>
-Date: Thu, 30 Jun 2016 13:18:00 +0200 (CEST)
+Date: Thu, 16 Jun 2016 09:53:58 +0200 (CEST)
 From: Jiri Kosina <jikos@kernel.org>
-To: Jens Axboe <axboe@kernel.dk>
-cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-    Wim Osterholt <wim@djo.tudelft.nl>
-Subject: [PATCH RESEND] floppy: fix open(O_ACCMODE) for ioctl-only open
-In-Reply-To: <alpine.LNX.2.00.1606160946000.6874@cbobk.fhfr.pm>
-Message-ID: <alpine.LNX.2.00.1606301317290.6874@cbobk.fhfr.pm>
+To: Wim Osterholt <wim@djo.tudelft.nl>, Jens Axboe <axboe@kernel.dk>
+cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: [PATCH] floppy: fix open(O_ACCMODE) for ioctl-only open
+In-Reply-To: <20160615224722.GA9545@djo.tudelft.nl>
+Message-ID: <alpine.LNX.2.00.1606160946000.6874@cbobk.fhfr.pm>
 References: <20160610230255.GA27770@djo.tudelft.nl> <alpine.LNX.2.00.1606131414420.6874@cbobk.fhfr.pm> <20160614184308.GA6188@djo.tudelft.nl> <alpine.LNX.2.00.1606150906320.6874@cbobk.fhfr.pm> <20160615132040.GZ14480@ZenIV.linux.org.uk>
- <alpine.LNX.2.00.1606151610420.6874@cbobk.fhfr.pm> <20160615224722.GA9545@djo.tudelft.nl> <alpine.LNX.2.00.1606160946000.6874@cbobk.fhfr.pm>
+ <alpine.LNX.2.00.1606151610420.6874@cbobk.fhfr.pm> <20160615224722.GA9545@djo.tudelft.nl>
 MIME-Version: 1.0
 Content-Type: TEXT/PLAIN; charset=US-ASCII
 List-ID: <linux-block@vger.kernel.org>
