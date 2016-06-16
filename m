@@ -1,85 +1,154 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f66.google.com ([74.125.82.66]:33106 "EHLO
-	mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752661AbcF2OmX (ORCPT
-	<rfc822;linux-block@vger.kernel.org>);
-	Wed, 29 Jun 2016 10:42:23 -0400
-Received: by mail-wm0-f66.google.com with SMTP id r201so14878683wme.0
-        for <linux-block@vger.kernel.org>; Wed, 29 Jun 2016 07:42:15 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [RFC PATCH 06/11] lightnvm: remove nested lock conflict with mm
-Date: Wed, 29 Jun 2016 16:41:51 +0200
-Message-Id: <1467211316-22373-7-git-send-email-m@bjorling.me>
-In-Reply-To: <1467211316-22373-1-git-send-email-m@bjorling.me>
-References: <1467211316-22373-1-git-send-email-m@bjorling.me>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <BATV+d68c80116f0bf241093e+4680+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk
+Cc: mst@redhat.com,
+	ooo@electrozaur.com,
+	nab@linux-iscsi.org,
+	linux-block@vger.kernel.org
+Subject: [PATCH 6/7] scsi/osd: open code blk_make_request
+Date: Thu, 16 Jun 2016 11:14:30 +0200
+Message-Id: <1466068471-15746-7-git-send-email-hch@lst.de>
+In-Reply-To: <1466068471-15746-1-git-send-email-hch@lst.de>
+References: <1466068471-15746-1-git-send-email-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-If a media manager tries to initialize it targets upon media manager
-initialization, the media manager will need to know which target types
-are available in LightNVM. The lists of which managers and target types
-are available shares the same lock.
+I wish the OSD code could simply use blk_rq_map_* helpers like
+everyone else, but the complex nature of deciding if we have
+DATA IN and/or DATA OUT buffers might make this impossible
+(at least for a mere human like me).
 
-Therefore, on initialization, the nvm_lock is taken by LightNVM core,
-which later leads to a deadlock when target types are enumerated by the
-media manager.
+But using blk_rq_append_bio at least allows sharing the setup code
+between request with or without dat a buffers, and given that this
+is the last user of blk_make_request it allows getting rid of that
+somewhat awkward interface.
 
-Add an exclusive lock for target types to resolve this conflict.
-
-Signed-off-by: Matias Bjørling <m@bjorling.me>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Acked-by: Boaz Harrosh <ooo@electrozaur.com>
 ---
- drivers/lightnvm/core.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+ block/blk-core.c                 | 57 ----------------------------------------
+ drivers/scsi/osd/osd_initiator.c | 25 +++++++++++-------
+ include/linux/blkdev.h           |  2 --
+ 3 files changed, 16 insertions(+), 68 deletions(-)
 
-diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-index 8afb04c..04469e0 100644
---- a/drivers/lightnvm/core.c
-+++ b/drivers/lightnvm/core.c
-@@ -28,6 +28,7 @@
- #include <linux/sched/sysctl.h>
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 1952c52..85fdb99 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -1318,63 +1318,6 @@ struct request *blk_get_request(struct request_queue *q, int rw, gfp_t gfp_mask)
+ EXPORT_SYMBOL(blk_get_request);
  
- static LIST_HEAD(nvm_tgt_types);
-+static DECLARE_RWSEM(nvm_tgtt_lock);
- static LIST_HEAD(nvm_mgrs);
- static LIST_HEAD(nvm_devices);
- static DECLARE_RWSEM(nvm_lock);
-@@ -37,7 +38,7 @@ struct nvm_tgt_type *nvm_find_target_type(const char *name, int lock)
- 	struct nvm_tgt_type *tmp, *tt = NULL;
- 
- 	if (lock)
--		down_write(&nvm_lock);
-+		down_write(&nvm_tgtt_lock);
- 
- 	list_for_each_entry(tmp, &nvm_tgt_types, list)
- 		if (!strcmp(name, tmp->name)) {
-@@ -46,7 +47,7 @@ struct nvm_tgt_type *nvm_find_target_type(const char *name, int lock)
- 		}
- 
- 	if (lock)
--		up_write(&nvm_lock);
-+		up_write(&nvm_tgtt_lock);
- 	return tt;
- }
- EXPORT_SYMBOL(nvm_find_target_type);
-@@ -55,12 +56,12 @@ int nvm_register_tgt_type(struct nvm_tgt_type *tt)
+ /**
+- * blk_make_request - given a bio, allocate a corresponding struct request.
+- * @q: target request queue
+- * @bio:  The bio describing the memory mappings that will be submitted for IO.
+- *        It may be a chained-bio properly constructed by block/bio layer.
+- * @gfp_mask: gfp flags to be used for memory allocation
+- *
+- * blk_make_request is the parallel of generic_make_request for BLOCK_PC
+- * type commands. Where the struct request needs to be farther initialized by
+- * the caller. It is passed a &struct bio, which describes the memory info of
+- * the I/O transfer.
+- *
+- * The caller of blk_make_request must make sure that bi_io_vec
+- * are set to describe the memory buffers. That bio_data_dir() will return
+- * the needed direction of the request. (And all bio's in the passed bio-chain
+- * are properly set accordingly)
+- *
+- * If called under none-sleepable conditions, mapped bio buffers must not
+- * need bouncing, by calling the appropriate masked or flagged allocator,
+- * suitable for the target device. Otherwise the call to blk_queue_bounce will
+- * BUG.
+- *
+- * WARNING: When allocating/cloning a bio-chain, careful consideration should be
+- * given to how you allocate bios. In particular, you cannot use
+- * __GFP_DIRECT_RECLAIM for anything but the first bio in the chain. Otherwise
+- * you risk waiting for IO completion of a bio that hasn't been submitted yet,
+- * thus resulting in a deadlock. Alternatively bios should be allocated using
+- * bio_kmalloc() instead of bio_alloc(), as that avoids the mempool deadlock.
+- * If possible a big IO should be split into smaller parts when allocation
+- * fails. Partial allocation should not be an error, or you risk a live-lock.
+- */
+-struct request *blk_make_request(struct request_queue *q, struct bio *bio,
+-				 gfp_t gfp_mask)
+-{
+-	struct request *rq = blk_get_request(q, bio_data_dir(bio), gfp_mask);
+-
+-	if (IS_ERR(rq))
+-		return rq;
+-
+-	blk_rq_set_block_pc(rq);
+-
+-	for_each_bio(bio) {
+-		struct bio *bounce_bio = bio;
+-		int ret;
+-
+-		blk_queue_bounce(q, &bounce_bio);
+-		ret = blk_rq_append_bio(rq, bounce_bio);
+-		if (unlikely(ret)) {
+-			blk_put_request(rq);
+-			return ERR_PTR(ret);
+-		}
+-	}
+-
+-	return rq;
+-}
+-EXPORT_SYMBOL(blk_make_request);
+-
+-/**
+  * blk_rq_set_block_pc - initialize a request to type BLOCK_PC
+  * @rq:		request to be initialized
+  *
+diff --git a/drivers/scsi/osd/osd_initiator.c b/drivers/scsi/osd/osd_initiator.c
+index daa4dc1..2f2a991 100644
+--- a/drivers/scsi/osd/osd_initiator.c
++++ b/drivers/scsi/osd/osd_initiator.c
+@@ -1558,18 +1558,25 @@ static int _osd_req_finalize_data_integrity(struct osd_request *or,
+ static struct request *_make_request(struct request_queue *q, bool has_write,
+ 			      struct _osd_io_info *oii, gfp_t flags)
  {
- 	int ret = 0;
+-	if (oii->bio)
+-		return blk_make_request(q, oii->bio, flags);
+-	else {
+-		struct request *req;
+-
+-		req = blk_get_request(q, has_write ? WRITE : READ, flags);
+-		if (IS_ERR(req))
+-			return req;
++	struct request *req;
++	struct bio *bio = oii->bio;
++	int ret;
  
--	down_write(&nvm_lock);
-+	down_write(&nvm_tgtt_lock);
- 	if (nvm_find_target_type(tt->name, 0))
- 		ret = -EEXIST;
- 	else
- 		list_add(&tt->list, &nvm_tgt_types);
--	up_write(&nvm_lock);
-+	up_write(&nvm_tgtt_lock);
- 
- 	return ret;
+-		blk_rq_set_block_pc(req);
++	req = blk_get_request(q, has_write ? WRITE : READ, flags);
++	if (IS_ERR(req))
+ 		return req;
++	blk_rq_set_block_pc(req);
++
++	for_each_bio(bio) {
++		struct bio *bounce_bio = bio;
++
++		blk_queue_bounce(req->q, &bounce_bio);
++		ret = blk_rq_append_bio(req, bounce_bio);
++		if (ret)
++			return ERR_PTR(ret);
+ 	}
++
++	return req;
  }
+ 
+ static int _init_blk_request(struct osd_request *or,
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 07176f4..3be95eb 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -787,8 +787,6 @@ extern void blk_rq_init(struct request_queue *q, struct request *rq);
+ extern void blk_put_request(struct request *);
+ extern void __blk_put_request(struct request_queue *, struct request *);
+ extern struct request *blk_get_request(struct request_queue *, int, gfp_t);
+-extern struct request *blk_make_request(struct request_queue *, struct bio *,
+-					gfp_t);
+ extern void blk_rq_set_block_pc(struct request *);
+ extern void blk_requeue_request(struct request_queue *, struct request *);
+ extern void blk_add_request_payload(struct request *rq, struct page *page,
 -- 
 2.1.4
-
