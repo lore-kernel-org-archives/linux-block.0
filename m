@@ -1,42 +1,35 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:59513 "EHLO mx1.redhat.com"
+Received: from verein.lst.de ([213.95.11.211]:55604 "EHLO newverein.lst.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751390AbcFZThT (ORCPT <rfc822;linux-block@vger.kernel.org>);
-	Sun, 26 Jun 2016 15:37:19 -0400
-Date: Sun, 26 Jun 2016 21:40:23 +0200
-From: Alexander Gordeev <agordeev@redhat.com>
-To: Christoph Hellwig <hch@lst.de>
-Cc: tglx@linutronix.de, axboe@fb.com, linux-block@vger.kernel.org,
-	linux-pci@vger.kernel.org, linux-nvme@lists.infradead.org,
-	linux-kernel@vger.kernel.org
+	id S1754501AbcFPPWo (ORCPT <rfc822;linux-block@vger.kernel.org>);
+	Thu, 16 Jun 2016 11:22:44 -0400
+Date: Thu, 16 Jun 2016 17:22:37 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Bart Van Assche <bart.vanassche@sandisk.com>
+Cc: Christoph Hellwig <hch@lst.de>, tglx@linutronix.de, axboe@fb.com,
+	linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
+	linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org
 Subject: Re: automatic interrupt affinity for MSI/MSI-X capable devices V2
-Message-ID: <20160626194023.GB20915@agordeev.lab.eng.brq.redhat.com>
-References: <1465934346-20648-1-git-send-email-hch@lst.de>
+Message-ID: <20160616152237.GB13615@lst.de>
+References: <1465934346-20648-1-git-send-email-hch@lst.de> <b8cdfc80-fa77-b7cc-69b8-fb6037114087@sandisk.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1465934346-20648-1-git-send-email-hch@lst.de>
+In-Reply-To: <b8cdfc80-fa77-b7cc-69b8-fb6037114087@sandisk.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Tue, Jun 14, 2016 at 09:58:53PM +0200, Christoph Hellwig wrote:
-> This series enhances the irq and PCI code to allow spreading around MSI and
-> MSI-X vectors so that they have per-cpu affinity if possible, or at least
-> per-node.  For that it takes the algorithm from blk-mq, moves it to
-> a common place, and makes it available through a vastly simplified PCI
-> interrupt allocation API.  It then switches blk-mq to be able to pick up
-> the queue mapping from the device if available, and demonstrates all this
-> using the NVMe driver.
+On Thu, Jun 16, 2016 at 11:45:55AM +0200, Bart Van Assche wrote:
+> Is my interpretation correct that for an adapter that supports two 
+> interrupts and on a system with eight CPU cores and no hyperthreading this 
+> patch series will assign interrupt vector 0 to CPU 0 and interrupt vector 1 
+> to CPU 1?
 
-Hi Christoph,
+Yes - same as the existing blk-mq queue distribution.
 
-One general comment. As result of this series there will be
-three locations to store/point to affinities: IRQ descriptor,
-MSI descriptor and PCI device descriptor.
+> Are you aware that drivers like ib_srp assume that interrupts 
+> have been spread evenly, that means assigning vector 0 to CPU 0 and vector 
+> 1 to CPU 4?
 
-IRQ and MSI descriptors merely refer to duplicate masks while
-the PCI device mask is the sum of all its MSI interrupts' masks.
-
-Besides, MSI descriptors and PCI device affinity masks are only
-used just once - at MSI initialization.
-
-Overall, it looks like some cleanup is possible here.
+which will make them run into a conflict with the current blk-mq
+assignment.  That's exactly the point why we're trying to move things
+to a core location so that everyone can use the same mapping.
