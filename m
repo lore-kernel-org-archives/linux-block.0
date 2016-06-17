@@ -1,141 +1,165 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: mchristi@redhat.com
-To: linux-f2fs-devel@lists.sourceforge.net, linux-ext4@vger.kernel.org,
-	konrad.wilk@oracle.com, drbd-dev@lists.linbit.com,
-	philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
-	linux-raid@vger.kernel.org, dm-devel@redhat.com,
-	linux-fsdevel@vger.kernel.org, linux-bcache@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linux-mtd@lists.infradead.org,
-	target-devel@vger.kernel.org, linux-btrfs@vger.kernel.org,
-	osd-dev@open-osd.org, xfs@oss.sgi.com, ocfs2-devel@oss.oracle.com
-Cc: Mike Christie <mchristi@redhat.com>
-Subject: [PATCH 28/45] target: use bio op accessors
-Date: Sun,  5 Jun 2016 14:32:08 -0500
-Message-Id: <1465155145-10812-29-git-send-email-mchristi@redhat.com>
-In-Reply-To: <1465155145-10812-1-git-send-email-mchristi@redhat.com>
-References: <1465155145-10812-1-git-send-email-mchristi@redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <darrick.wong@oracle.com>
+Subject: [PATCH 3/3] block: implement (some of) fallocate for block devices
+From: "Darrick J. Wong" <darrick.wong@oracle.com>
+To: axboe@kernel.dk, darrick.wong@oracle.com
+Cc: linux-block@vger.kernel.org, tytso@mit.edu, martin.petersen@oracle.com,
+        snitzer@redhat.com, linux-api@vger.kernel.org, bfoster@redhat.com,
+        xfs@oss.sgi.com, hch@infradead.org, dm-devel@redhat.com,
+        linux-fsdevel@vger.kernel.org
+Date: Thu, 16 Jun 2016 18:17:47 -0700
+Message-ID: <146612626773.12764.9800994140955661542.stgit@birch.djwong.org>
+In-Reply-To: <146612624734.12764.4316680863289411106.stgit@birch.djwong.org>
+References: <146612624734.12764.4316680863289411106.stgit@birch.djwong.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 List-ID: <linux-block@vger.kernel.org>
 
-From: Mike Christie <mchristi@redhat.com>
+After much discussion, it seems that the fallocate feature flag
+FALLOC_FL_ZERO_RANGE maps nicely to SCSI WRITE SAME; and the feature
+FALLOC_FL_PUNCH_HOLE maps nicely to the devices that have been
+whitelisted for zeroing SCSI UNMAP.  Punch still requires that
+FALLOC_FL_KEEP_SIZE is set.  A length that goes past the end of the
+device will be clamped to the device size if KEEP_SIZE is set; or will
+return -EINVAL if not.  Both start and length must be aligned to the
+device's logical block size.
 
-Separate the op from the rq_flag_bits and have the target layer
-set/get the bio using bio_set_op_attrs/bio_op.
+Since the semantics of fallocate are fairly well established already,
+wire up the two pieces.  The other fallocate variants (collapse range,
+insert range, and allocate blocks) are not supported.
 
-Signed-off-by: Mike Christie <mchristi@redhat.com>
+v2: Incorporate feedback from Christoph & Linus.  Tentatively add
+a requirement that the fallocate arguments be aligned to logical block
+size, and put in a few XXX comments ahead of LSF discussion.
+
+v3: Forward port to 4.7.
+
+Signed-off-by: Darrick J. Wong <darrick.wong@oracle.com>
 ---
- drivers/target/target_core_iblock.c | 29 ++++++++++++++---------------
- drivers/target/target_core_pscsi.c  |  2 +-
- 2 files changed, 15 insertions(+), 16 deletions(-)
+ fs/block_dev.c |   84 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ fs/open.c      |    3 +-
+ 2 files changed, 86 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/target/target_core_iblock.c b/drivers/target/target_core_iblock.c
-index c25109c..22af12f 100644
---- a/drivers/target/target_core_iblock.c
-+++ b/drivers/target/target_core_iblock.c
-@@ -312,7 +312,8 @@ static void iblock_bio_done(struct bio *bio)
- }
- 
- static struct bio *
--iblock_get_bio(struct se_cmd *cmd, sector_t lba, u32 sg_num, int rw)
-+iblock_get_bio(struct se_cmd *cmd, sector_t lba, u32 sg_num, int op,
-+	       int op_flags)
- {
- 	struct iblock_dev *ib_dev = IBLOCK_DEV(cmd->se_dev);
- 	struct bio *bio;
-@@ -334,7 +335,7 @@ iblock_get_bio(struct se_cmd *cmd, sector_t lba, u32 sg_num, int rw)
- 	bio->bi_private = cmd;
- 	bio->bi_end_io = &iblock_bio_done;
- 	bio->bi_iter.bi_sector = lba;
--	bio->bi_rw = rw;
-+	bio_set_op_attrs(bio, op, op_flags);
- 
- 	return bio;
- }
-@@ -480,7 +481,7 @@ iblock_execute_write_same(struct se_cmd *cmd)
- 		goto fail;
- 	cmd->priv = ibr;
- 
--	bio = iblock_get_bio(cmd, block_lba, 1, WRITE);
-+	bio = iblock_get_bio(cmd, block_lba, 1, REQ_OP_WRITE, 0);
- 	if (!bio)
- 		goto fail_free_ibr;
- 
-@@ -493,7 +494,8 @@ iblock_execute_write_same(struct se_cmd *cmd)
- 		while (bio_add_page(bio, sg_page(sg), sg->length, sg->offset)
- 				!= sg->length) {
- 
--			bio = iblock_get_bio(cmd, block_lba, 1, WRITE);
-+			bio = iblock_get_bio(cmd, block_lba, 1, REQ_OP_WRITE,
-+					     0);
- 			if (!bio)
- 				goto fail_put_bios;
- 
-@@ -679,8 +681,7 @@ iblock_execute_rw(struct se_cmd *cmd, struct scatterlist *sgl, u32 sgl_nents,
- 	struct scatterlist *sg;
- 	u32 sg_num = sgl_nents;
- 	unsigned bio_cnt;
--	int rw = 0;
--	int i;
-+	int i, op, op_flags = 0;
- 
- 	if (data_direction == DMA_TO_DEVICE) {
- 		struct iblock_dev *ib_dev = IBLOCK_DEV(dev);
-@@ -689,18 +690,15 @@ iblock_execute_rw(struct se_cmd *cmd, struct scatterlist *sgl, u32 sgl_nents,
- 		 * Force writethrough using WRITE_FUA if a volatile write cache
- 		 * is not enabled, or if initiator set the Force Unit Access bit.
- 		 */
-+		op = REQ_OP_WRITE;
- 		if (test_bit(QUEUE_FLAG_FUA, &q->queue_flags)) {
- 			if (cmd->se_cmd_flags & SCF_FUA)
--				rw = WRITE_FUA;
-+				op_flags = WRITE_FUA;
- 			else if (!test_bit(QUEUE_FLAG_WC, &q->queue_flags))
--				rw = WRITE_FUA;
--			else
--				rw = WRITE;
--		} else {
--			rw = WRITE;
-+				op_flags = WRITE_FUA;
- 		}
- 	} else {
--		rw = READ;
-+		op = REQ_OP_READ;
- 	}
- 
- 	ibr = kzalloc(sizeof(struct iblock_req), GFP_KERNEL);
-@@ -714,7 +712,7 @@ iblock_execute_rw(struct se_cmd *cmd, struct scatterlist *sgl, u32 sgl_nents,
- 		return 0;
- 	}
- 
--	bio = iblock_get_bio(cmd, block_lba, sgl_nents, rw);
-+	bio = iblock_get_bio(cmd, block_lba, sgl_nents, op, op_flags);
- 	if (!bio)
- 		goto fail_free_ibr;
- 
-@@ -738,7 +736,8 @@ iblock_execute_rw(struct se_cmd *cmd, struct scatterlist *sgl, u32 sgl_nents,
- 				bio_cnt = 0;
- 			}
- 
--			bio = iblock_get_bio(cmd, block_lba, sg_num, rw);
-+			bio = iblock_get_bio(cmd, block_lba, sg_num, op,
-+					     op_flags);
- 			if (!bio)
- 				goto fail_put_bios;
- 
-diff --git a/drivers/target/target_core_pscsi.c b/drivers/target/target_core_pscsi.c
-index de18790..81564c8 100644
---- a/drivers/target/target_core_pscsi.c
-+++ b/drivers/target/target_core_pscsi.c
-@@ -922,7 +922,7 @@ pscsi_map_sg(struct se_cmd *cmd, struct scatterlist *sgl, u32 sgl_nents,
- 					goto fail;
- 
- 				if (rw)
--					bio->bi_rw |= REQ_WRITE;
-+					bio_set_op_attrs(bio, REQ_OP_WRITE, 0);
- 
- 				pr_debug("PSCSI: Allocated bio: %p,"
- 					" dir: %s nr_vecs: %d\n", bio,
--- 
-2.7.2
 
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index 71ccab1..a3975c4 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -30,6 +30,7 @@
+ #include <linux/cleancache.h>
+ #include <linux/dax.h>
+ #include <linux/badblocks.h>
++#include <linux/falloc.h>
+ #include <asm/uaccess.h>
+ #include "internal.h"
+ 
+@@ -1802,6 +1803,88 @@ static const struct address_space_operations def_blk_aops = {
+ 	.is_dirty_writeback = buffer_check_dirty_writeback,
+ };
+ 
++#define	BLKDEV_FALLOC_FL_SUPPORTED					\
++		(FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE |		\
++		 FALLOC_FL_ZERO_RANGE | FALLOC_FL_NO_HIDE_STALE)
++
++static long blkdev_fallocate(struct file *file, int mode, loff_t start,
++			     loff_t len)
++{
++	struct block_device *bdev = I_BDEV(bdev_file_inode(file));
++	struct request_queue *q = bdev_get_queue(bdev);
++	struct address_space *mapping;
++	loff_t end = start + len - 1;
++	loff_t isize;
++	int error;
++
++	/* Fail if we don't recognize the flags. */
++	if (mode & ~BLKDEV_FALLOC_FL_SUPPORTED)
++		return -EOPNOTSUPP;
++
++	/* Don't go off the end of the device. */
++	isize = i_size_read(bdev->bd_inode);
++	if (start >= isize)
++		return -EINVAL;
++	if (end > isize) {
++		if (mode & FALLOC_FL_KEEP_SIZE) {
++			len = isize - start;
++			end = start + len - 1;
++		} else
++			return -EINVAL;
++	}
++
++	/*
++	 * Don't allow IO that isn't aligned to logical block size.
++	 */
++	if ((start | len) & (bdev_logical_block_size(bdev) - 1))
++		return -EINVAL;
++
++	/* Invalidate the page cache, including dirty pages. */
++	mapping = bdev->bd_inode->i_mapping;
++	truncate_inode_pages_range(mapping, start, end);
++
++	switch (mode) {
++	case FALLOC_FL_ZERO_RANGE:
++	case FALLOC_FL_ZERO_RANGE | FALLOC_FL_KEEP_SIZE:
++		error = blkdev_issue_zeroout(bdev, start >> 9, len >> 9,
++					    GFP_KERNEL, false);
++		if (error)
++			return error;
++		break;
++	case FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE:
++		/* Only punch if the device can do zeroing discard. */
++		if (!blk_queue_discard(q) || !q->limits.discard_zeroes_data)
++			return -EOPNOTSUPP;
++		error = blkdev_issue_discard(bdev, start >> 9, len >> 9,
++					     GFP_KERNEL, 0);
++		if (error)
++			return error;
++		break;
++	case FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE | FALLOC_FL_NO_HIDE_STALE:
++		/*
++		 * XXX: a well known search engine vendor interprets this
++		 * flag (in other circumstances) to mean "I don't care if
++		 * we can read stale contents later".  Is it appropriate
++		 * to wire this up to the non-zeroing discard?
++		 */
++		error = blkdev_issue_discard(bdev, start >> 9, len >> 9,
++					     GFP_KERNEL, 0);
++		if (error)
++			return error;
++		break;
++	default:
++		return -EOPNOTSUPP;
++	}
++
++	/*
++	 * Invalidate again; if someone wandered in and dirtied a page,
++	 * the caller will be given -EBUSY;
++	 */
++	return invalidate_inode_pages2_range(mapping,
++					     start >> PAGE_SHIFT,
++					     end >> PAGE_SHIFT);
++}
++
+ const struct file_operations def_blk_fops = {
+ 	.open		= blkdev_open,
+ 	.release	= blkdev_close,
+@@ -1816,6 +1899,7 @@ const struct file_operations def_blk_fops = {
+ #endif
+ 	.splice_read	= generic_file_splice_read,
+ 	.splice_write	= iter_file_splice_write,
++	.fallocate	= blkdev_fallocate,
+ };
+ 
+ int ioctl_by_bdev(struct block_device *bdev, unsigned cmd, unsigned long arg)
+diff --git a/fs/open.c b/fs/open.c
+index 93ae3cd..b2dbda4 100644
+--- a/fs/open.c
++++ b/fs/open.c
+@@ -289,7 +289,8 @@ int vfs_fallocate(struct file *file, int mode, loff_t offset, loff_t len)
+ 	 * Let individual file system decide if it supports preallocation
+ 	 * for directories or not.
+ 	 */
+-	if (!S_ISREG(inode->i_mode) && !S_ISDIR(inode->i_mode))
++	if (!S_ISREG(inode->i_mode) && !S_ISDIR(inode->i_mode) &&
++	    !S_ISBLK(inode->i_mode))
+ 		return -ENODEV;
+ 
+ 	/* Check for wrap through zero too */
