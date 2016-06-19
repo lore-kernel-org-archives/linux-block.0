@@ -1,52 +1,76 @@
-Return-Path: <famz@redhat.com>
-From: Fam Zheng <famz@redhat.com>
-To: linux-kernel@vger.kernel.org
-Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        Michael Ellerman <mpe@ellerman.id.au>, Jens Axboe <axboe@kernel.dk>,
-        "Ed L. Cashin" <ed.cashin@acm.org>, Jiri Kosina <jikos@kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Minchan Kim <minchan@kernel.org>, Nitin Gupta <ngupta@vflare.org>,
-        Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
-        Shaohua Li <shli@kernel.org>, Ulf Hansson <ulf.hansson@linaro.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Brian Norris <computersforpeace@gmail.com>,
-        Keith Busch <keith.busch@intel.com>, linuxppc-dev@lists.ozlabs.org,
-        linux-block@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        linux-raid@vger.kernel.org, linux-mmc@vger.kernel.org,
-        linux-mtd@lists.infradead.org, linux-nvme@lists.infradead.org,
-        Christoph Hellwig <hch@infradead.org>, famz@redhat.com
-Subject: [PATCH v2 05/12] aoeblk: Generate uevent after attribute available
-Date: Thu, 30 Jun 2016 09:59:46 +0800
-Message-Id: <20160630015953.6888-6-famz@redhat.com>
-In-Reply-To: <20160630015953.6888-1-famz@redhat.com>
-References: <20160630015953.6888-1-famz@redhat.com>
+Return-Path: <shaun@helios.aeonazure.com>
+From: Shaun Tancheff <shaun@tancheff.com>
+To: linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org
+Cc: Shaun Tancheff <shaun@tancheff.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>,
+	"James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	Jeff Layton <jlayton@poochiereds.net>,
+	"J . Bruce Fields" <bfields@fieldses.org>,
+	Hannes Reinecke <hare@suse.de>
+Subject: [PATCH v4 0/2] Block layer support ZAC/ZBC commands
+Date: Sun, 19 Jun 2016 13:00:46 -0500
+Message-Id: <1466359248-10544-1-git-send-email-shaun@tancheff.com>
 List-ID: <linux-block@vger.kernel.org>
 
-It is documented that KOBJ_ADD should be generated after the object's
-attributes and children are ready.  We can achieve this with the new
-disk_gen_uevents interface.
+Hi Jens,
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
----
- drivers/block/aoe/aoeblk.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+This series is on linux-next tag next-20160617.
 
-diff --git a/drivers/block/aoe/aoeblk.c b/drivers/block/aoe/aoeblk.c
-index e91c5f1..f0cf4d6 100644
---- a/drivers/block/aoe/aoeblk.c
-+++ b/drivers/block/aoe/aoeblk.c
-@@ -417,9 +417,10 @@ aoeblk_gdalloc(void *vp)
- 
- 	spin_unlock_irqrestore(&d->lock, flags);
- 
--	add_disk(gd, true);
-+	add_disk(gd, false);
- 	aoedisk_add_sysfs(d);
- 	aoedisk_add_debugfs(d);
-+	disk_gen_uevents(gd);
- 
- 	spin_lock_irqsave(&d->lock, flags);
- 	WARN_ON(!(d->flags & DEVFL_GD_NOW));
+As Host Aware drives are becoming available we would like to be able
+to make use of such drives. This series is also intended to be suitable
+for use by Host Managed drives.
+
+ZAC/ZBC drives add new commands for discovering and working with Zones.
+
+This extends the ZAC/ZBC support up to the block layer.
+
+Patches for util-linux can be found here:
+https://github.com/Seagate/ZDM-Device-Mapper/tree/master/patches/util-linux
+
+Using BIOs to issue ZBC commands allows DM targets (such as ZDM) or
+file-systems such as f2fs, btrfs or nilfs2 to extend their block
+allocation schemes and/or issue discards that are zone aligned.
+
+A perhaps non-obvious approach is that a conventional drive will 
+returns a zone report descriptor with a single large conventional zone.
+
+v4:
+ - Rebase on linux-next tag next-20160617.
+ - Change bio flags to bio op's
+ - Dropped ata16 hackery
+V3:
+ - Rebase on Mike Cristie's separate bio operations
+ - Update blkzoned_api.h to include report zones PARTIAL bit.
+ - Use zoned report reserved bit for ata-passthrough flag.
+
+V2:
+ - Changed bi_rw to op_flags clarify sepeartion of bio op from flags.
+ - Fixed memory leak in blkdev_issue_zone_report failing to put_bio().
+ - Documented opt in blkdev_issue_zone_report.
+ - Moved include/uapi/linux/fs.h changes to patch 3
+ - Fixed commit message for first patch in series.
+
+Shaun Tancheff (2):
+  Add bio/request flags for using ZBC/ZAC commands
+  Add ioctl to issue ZBC/ZAC commands via block layer
+
+ MAINTAINERS                       |   9 ++
+ block/blk-lib.c                   |  97 +++++++++++++++++
+ block/ioctl.c                     | 110 +++++++++++++++++++
+ drivers/scsi/sd.c                 | 122 +++++++++++++++++++++
+ drivers/scsi/sd.h                 |   1 +
+ include/linux/bio.h               |   7 +-
+ include/linux/blk_types.h         |   6 +-
+ include/linux/blkzoned_api.h      |  25 +++++
+ include/uapi/linux/Kbuild         |   1 +
+ include/uapi/linux/blkzoned_api.h | 220 ++++++++++++++++++++++++++++++++++++++
+ include/uapi/linux/fs.h           |   1 +
+ 11 files changed, 597 insertions(+), 2 deletions(-)
+ create mode 100644 include/linux/blkzoned_api.h
+ create mode 100644 include/uapi/linux/blkzoned_api.h
+
 -- 
-2.9.0
+2.8.1
