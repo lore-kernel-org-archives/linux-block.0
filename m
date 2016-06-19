@@ -1,171 +1,201 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: mchristi@redhat.com
-To: linux-f2fs-devel@lists.sourceforge.net, linux-ext4@vger.kernel.org,
-	konrad.wilk@oracle.com, drbd-dev@lists.linbit.com,
-	philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
-	linux-raid@vger.kernel.org, dm-devel@redhat.com,
-	linux-fsdevel@vger.kernel.org, linux-bcache@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linux-mtd@lists.infradead.org,
-	target-devel@vger.kernel.org, linux-btrfs@vger.kernel.org,
-	osd-dev@open-osd.org, xfs@oss.sgi.com, ocfs2-devel@oss.oracle.com
-Cc: Mike Christie <mchristi@redhat.com>,
-	Juergen Gross <kernel@pfupf.net>
-Subject: [PATCH 44/45] block: do not use REQ_FLUSH for tracking flush support
-Date: Sun,  5 Jun 2016 14:32:24 -0500
-Message-Id: <1465155145-10812-45-git-send-email-mchristi@redhat.com>
-In-Reply-To: <1465155145-10812-1-git-send-email-mchristi@redhat.com>
-References: <1465155145-10812-1-git-send-email-mchristi@redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <shaun@helios.aeonazure.com>
+From: Shaun Tancheff <shaun@tancheff.com>
+To: linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org
+Cc: Shaun Tancheff <shaun@tancheff.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>,
+	"James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	Jeff Layton <jlayton@poochiereds.net>,
+	"J . Bruce Fields" <bfields@fieldses.org>,
+	Hannes Reinecke <hare@suse.de>,
+	Shaun Tancheff <shaun.tancheff@seagate.com>
+Subject: [PATCH v4 2/2] Add ioctl to issue ZBC/ZAC commands via block layer
+Date: Sun, 19 Jun 2016 13:00:48 -0500
+Message-Id: <1466359248-10544-3-git-send-email-shaun@tancheff.com>
+In-Reply-To: <1466359248-10544-1-git-send-email-shaun@tancheff.com>
+References: <1466359248-10544-1-git-send-email-shaun@tancheff.com>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Mike Christie <mchristi@redhat.com>
+Add New ioctl types
+    BLKREPORT    - Issue Report Zones to device.
+    BLKOPENZONE  - Issue an Zone Action: Open Zone command.
+    BLKCLOSEZONE - Issue an Zone Action: Close Zone command.
+    BLKRESETZONE - Issue an Zone Action: Reset Zone command.
 
-The last patch added a REQ_OP_FLUSH for request_fn drivers
-and the next patch renames REQ_FLUSH to REQ_PREFLUSH which
-will be used by file systems and make_request_fn drivers so
-they can send a write/flush combo.
-
-This patch drops xen's use of REQ_FLUSH to track if it supports
-REQ_OP_FLUSH requests, so REQ_FLUSH can be deleted.
-
-Signed-off-by: Mike Christie <mchristi@redhat.com>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Signed-off-by: Juergen Gross <kernel@pfupf.net>
+Signed-off-by: Shaun Tancheff <shaun.tancheff@seagate.com>
 ---
+v4:
+ - Rebase on linux-next tag next-20160617.
+ - Change bio flags to bio op's
+---
+ block/ioctl.c                     | 110 ++++++++++++++++++++++++++++++++++++++
+ include/uapi/linux/blkzoned_api.h |   6 +++
+ include/uapi/linux/fs.h           |   1 +
+ 3 files changed, 117 insertions(+)
 
-v7:
-- Fix feature_flush/fua use.
-
-v6:
-- Dropped parts of patch handled by Jens's QUEUE_FLAG_WC/FUA
-patches and modified patch to check feature_flush/fua bits.
-
- drivers/block/xen-blkfront.c | 47 ++++++++++++++++++++++----------------------
- 1 file changed, 24 insertions(+), 23 deletions(-)
-
-diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
-index 3aeb25b..343ef7a 100644
---- a/drivers/block/xen-blkfront.c
-+++ b/drivers/block/xen-blkfront.c
-@@ -196,6 +196,7 @@ struct blkfront_info
- 	unsigned int nr_ring_pages;
- 	struct request_queue *rq;
- 	unsigned int feature_flush;
-+	unsigned int feature_fua;
- 	unsigned int feature_discard:1;
- 	unsigned int feature_secdiscard:1;
- 	unsigned int discard_granularity;
-@@ -763,19 +764,14 @@ static int blkif_queue_rw_req(struct request *req, struct blkfront_ring_info *ri
- 			 * implement it the same way.  (It's also a FLUSH+FUA,
- 			 * since it is guaranteed ordered WRT previous writes.)
- 			 */
--			switch (info->feature_flush &
--				((REQ_FLUSH|REQ_FUA))) {
--			case REQ_FLUSH|REQ_FUA:
-+			if (info->feature_flush && info->feature_fua)
- 				ring_req->operation =
- 					BLKIF_OP_WRITE_BARRIER;
--				break;
--			case REQ_FLUSH:
-+			else if (info->feature_flush)
- 				ring_req->operation =
- 					BLKIF_OP_FLUSH_DISKCACHE;
--				break;
--			default:
-+			else
- 				ring_req->operation = 0;
--			}
- 		}
- 		ring_req->u.rw.nr_segments = num_grant;
- 		if (unlikely(require_extra_req)) {
-@@ -866,9 +862,9 @@ static inline bool blkif_request_flush_invalid(struct request *req,
- {
- 	return ((req->cmd_type != REQ_TYPE_FS) ||
- 		((req_op(req) == REQ_OP_FLUSH) &&
--		 !(info->feature_flush & REQ_FLUSH)) ||
-+		 !info->feature_flush) ||
- 		((req->cmd_flags & REQ_FUA) &&
--		 !(info->feature_flush & REQ_FUA)));
-+		 !info->feature_fua));
+diff --git a/block/ioctl.c b/block/ioctl.c
+index ed2397f..97e685e 100644
+--- a/block/ioctl.c
++++ b/block/ioctl.c
+@@ -7,6 +7,7 @@
+ #include <linux/backing-dev.h>
+ #include <linux/fs.h>
+ #include <linux/blktrace_api.h>
++#include <linux/blkzoned_api.h>
+ #include <linux/pr.h>
+ #include <asm/uaccess.h>
+ 
+@@ -194,6 +195,109 @@ int blkdev_reread_part(struct block_device *bdev)
  }
+ EXPORT_SYMBOL(blkdev_reread_part);
  
- static int blkif_queue_rq(struct blk_mq_hw_ctx *hctx,
-@@ -985,24 +981,22 @@ static int xlvbd_init_blk_queue(struct gendisk *gd, u16 sector_size,
- 	return 0;
- }
- 
--static const char *flush_info(unsigned int feature_flush)
-+static const char *flush_info(struct blkfront_info *info)
- {
--	switch (feature_flush & ((REQ_FLUSH | REQ_FUA))) {
--	case REQ_FLUSH|REQ_FUA:
-+	if (info->feature_flush && info->feature_fua)
- 		return "barrier: enabled;";
--	case REQ_FLUSH:
-+	else if (info->feature_flush)
- 		return "flush diskcache: enabled;";
--	default:
-+	else
- 		return "barrier or flush: disabled;";
--	}
- }
- 
- static void xlvbd_flush(struct blkfront_info *info)
- {
--	blk_queue_write_cache(info->rq, info->feature_flush & REQ_FLUSH,
--				info->feature_flush & REQ_FUA);
-+	blk_queue_write_cache(info->rq, info->feature_flush ? true : false,
-+			      info->feature_fua ? true : false);
- 	pr_info("blkfront: %s: %s %s %s %s %s\n",
--		info->gd->disk_name, flush_info(info->feature_flush),
-+		info->gd->disk_name, flush_info(info),
- 		"persistent grants:", info->feature_persistent ?
- 		"enabled;" : "disabled;", "indirect descriptors:",
- 		info->max_indirect_segments ? "enabled;" : "disabled;");
-@@ -1621,6 +1615,7 @@ static irqreturn_t blkif_interrupt(int irq, void *dev_id)
- 			if (unlikely(error)) {
- 				if (error == -EOPNOTSUPP)
- 					error = 0;
-+				info->feature_fua = 0;
- 				info->feature_flush = 0;
- 				xlvbd_flush(info);
- 			}
-@@ -2315,6 +2310,7 @@ static void blkfront_gather_backend_features(struct blkfront_info *info)
- 	unsigned int indirect_segments;
- 
- 	info->feature_flush = 0;
-+	info->feature_fua = 0;
- 
- 	err = xenbus_gather(XBT_NIL, info->xbdev->otherend,
- 			"feature-barrier", "%d", &barrier,
-@@ -2327,8 +2323,11 @@ static void blkfront_gather_backend_features(struct blkfront_info *info)
- 	 *
- 	 * If there are barriers, then we use flush.
- 	 */
--	if (!err && barrier)
--		info->feature_flush = REQ_FLUSH | REQ_FUA;
-+	if (!err && barrier) {
-+		info->feature_flush = 1;
-+		info->feature_fua = 1;
++static int blk_zoned_report_ioctl(struct block_device *bdev, fmode_t mode,
++		void __user *parg)
++{
++	int error = -EFAULT;
++	gfp_t gfp = GFP_KERNEL;
++	struct bdev_zone_report_io *zone_iodata = NULL;
++	int order = 0;
++	struct page *pgs = NULL;
++	u32 alloc_size = PAGE_SIZE;
++	unsigned long op_flags = 0;
++	u8 opt = 0;
++
++	if (!(mode & FMODE_READ))
++		return -EBADF;
++
++	zone_iodata = (void *)get_zeroed_page(gfp);
++	if (!zone_iodata) {
++		error = -ENOMEM;
++		goto report_zones_out;
++	}
++	if (copy_from_user(zone_iodata, parg, sizeof(*zone_iodata))) {
++		error = -EFAULT;
++		goto report_zones_out;
++	}
++	if (zone_iodata->data.in.return_page_count > alloc_size) {
++		int npages;
++
++		alloc_size = zone_iodata->data.in.return_page_count;
++		npages = (alloc_size + PAGE_SIZE - 1) / PAGE_SIZE;
++		order =  ilog2(roundup_pow_of_two(npages));
++		pgs = alloc_pages(gfp, order);
++		if (pgs) {
++			void *mem = page_address(pgs);
++
++			if (!mem) {
++				error = -ENOMEM;
++				goto report_zones_out;
++			}
++			memset(mem, 0, alloc_size);
++			memcpy(mem, zone_iodata, sizeof(*zone_iodata));
++			free_page((unsigned long)zone_iodata);
++			zone_iodata = mem;
++		} else {
++			/* Result requires DMA capable memory */
++			pr_err("Not enough memory available for request.\n");
++			error = -ENOMEM;
++			goto report_zones_out;
++		}
++	}
++	opt = zone_iodata->data.in.report_option;
++	error = blkdev_issue_zone_report(bdev, op_flags,
++			zone_iodata->data.in.zone_locator_lba, opt,
++			pgs ? pgs : virt_to_page(zone_iodata),
++			alloc_size, GFP_KERNEL);
++
++	if (error)
++		goto report_zones_out;
++
++	if (copy_to_user(parg, zone_iodata, alloc_size))
++		error = -EFAULT;
++
++report_zones_out:
++	if (pgs)
++		__free_pages(pgs, order);
++	else if (zone_iodata)
++		free_page((unsigned long)zone_iodata);
++	return error;
++}
++
++static int blk_zoned_action_ioctl(struct block_device *bdev, fmode_t mode,
++				  unsigned int cmd, unsigned long arg)
++{
++	unsigned int op = 0;
++
++	if (!(mode & FMODE_WRITE))
++		return -EBADF;
++
++	/*
++	 * When acting on zones we explicitly disallow using a partition.
++	 */
++	if (bdev != bdev->bd_contains) {
++		pr_err("%s: All zone operations disallowed on this device\n",
++			__func__);
++		return -EFAULT;
 +	}
 +
- 	/*
- 	 * And if there is "feature-flush-cache" use that above
- 	 * barriers.
-@@ -2337,8 +2336,10 @@ static void blkfront_gather_backend_features(struct blkfront_info *info)
- 			"feature-flush-cache", "%d", &flush,
- 			NULL);
- 
--	if (!err && flush)
--		info->feature_flush = REQ_FLUSH;
-+	if (!err && flush) {
-+		info->feature_flush = 1;
-+		info->feature_fua = 0;
++	switch (cmd) {
++	case BLKOPENZONE:
++		op = REQ_OP_ZONE_OPEN;
++		break;
++	case BLKCLOSEZONE:
++		op = REQ_OP_ZONE_CLOSE;
++		break;
++	case BLKRESETZONE:
++		op = REQ_OP_ZONE_RESET;
++		break;
++	default:
++		pr_err("%s: Unknown action: %u\n", __func__, cmd);
++		return -EINVAL;
 +	}
++	return blkdev_issue_zone_action(bdev, op, 0, arg, GFP_KERNEL);
++}
++
+ static int blk_ioctl_discard(struct block_device *bdev, fmode_t mode,
+ 		unsigned long arg, unsigned long flags)
+ {
+@@ -568,6 +672,12 @@ int blkdev_ioctl(struct block_device *bdev, fmode_t mode, unsigned cmd,
+ 	case BLKTRACESETUP:
+ 	case BLKTRACETEARDOWN:
+ 		return blk_trace_ioctl(bdev, cmd, argp);
++	case BLKREPORT:
++		return blk_zoned_report_ioctl(bdev, mode, argp);
++	case BLKOPENZONE:
++	case BLKCLOSEZONE:
++	case BLKRESETZONE:
++		return blk_zoned_action_ioctl(bdev, mode, cmd, arg);
+ 	case IOC_PR_REGISTER:
+ 		return blkdev_pr_register(bdev, argp);
+ 	case IOC_PR_RESERVE:
+diff --git a/include/uapi/linux/blkzoned_api.h b/include/uapi/linux/blkzoned_api.h
+index 48c17ad..3566de0 100644
+--- a/include/uapi/linux/blkzoned_api.h
++++ b/include/uapi/linux/blkzoned_api.h
+@@ -211,4 +211,10 @@ struct bdev_zone_report_io {
+ 	} data;
+ } __packed;
  
- 	err = xenbus_gather(XBT_NIL, info->xbdev->otherend,
- 			"feature-discard", "%d", &discard,
++/* continuing from uapi/linux/fs.h: */
++#define BLKREPORT	_IOWR(0x12, 130, struct bdev_zone_report_io)
++#define BLKOPENZONE	_IO(0x12, 131)
++#define BLKCLOSEZONE	_IO(0x12, 132)
++#define BLKRESETZONE	_IO(0x12, 133)
++
+ #endif /* _UAPI_BLKZONED_API_H */
+diff --git a/include/uapi/linux/fs.h b/include/uapi/linux/fs.h
+index 3b00f7c..c0b565b 100644
+--- a/include/uapi/linux/fs.h
++++ b/include/uapi/linux/fs.h
+@@ -222,6 +222,7 @@ struct fsxattr {
+ #define BLKSECDISCARD _IO(0x12,125)
+ #define BLKROTATIONAL _IO(0x12,126)
+ #define BLKZEROOUT _IO(0x12,127)
++/* A jump here: See blkzoned_api.h, Reserving 130 to 133. */
+ 
+ #define BMAP_IOCTL 1		/* obsolete - kept for compatibility */
+ #define FIBMAP	   _IO(0x00,1)	/* bmap access */
 -- 
-2.7.2
-
+2.8.1
