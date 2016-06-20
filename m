@@ -1,61 +1,64 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:47479 "EHLO mga11.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751768AbcFUUyN (ORCPT <rfc822;linux-block@vger.kernel.org>);
-	Tue, 21 Jun 2016 16:54:13 -0400
-Subject: [PATCH v4 3/5] um: track 'parent' device in a local variable
-From: Dan Williams <dan.j.williams@intel.com>
-To: axboe@fb.com
-Cc: linux-nvdimm@lists.01.org, Richard Weinberger <richard@nod.at>,
-	Jeff Dike <jdike@addtoit.com>, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	Bart Van Assche <bart.vanassche@sandisk.com>, hch@lst.de
-Date: Tue, 21 Jun 2016 13:46:17 -0700
-Message-ID: <146654197737.34694.9376917839573236856.stgit@dwillia2-desk3.amr.corp.intel.com>
-In-Reply-To: <146654196111.34694.7735150373057824399.stgit@dwillia2-desk3.amr.corp.intel.com>
-References: <146654196111.34694.7735150373057824399.stgit@dwillia2-desk3.amr.corp.intel.com>
+Return-Path: <jmoyer@redhat.com>
+From: Jeff Moyer <jmoyer@redhat.com>
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Jens Axboe <axboe@kernel.dk>, y2038@lists.linaro.org,
+        Steven Rostedt <rostedt@goodmis.org>, Ingo Molnar <mingo@redhat.com>,
+        Hannes Reinecke <hare@suse.com>, Mike Christie <mchristi@redhat.com>,
+        Shaohua Li <shli@fb.com>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] blktrace: reword comment about time overflow
+References: <20160620200040.2813298-1-arnd@arndb.de>
+Date: Mon, 20 Jun 2016 16:36:58 -0400
+In-Reply-To: <20160620200040.2813298-1-arnd@arndb.de> (Arnd Bergmann's message
+	of "Mon, 20 Jun 2016 22:00:12 +0200")
+Message-ID: <x49porbr40l.fsf@segfault.boston.devel.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain
+List-ID: <linux-block@vger.kernel.org>
 
-In preparation for the removal of 'driverfs_dev' from 'struct gendisk'
-use a local variable to track the parented vs un-parented case in
-ubd_disk_register().
+Arnd Bergmann <arnd@arndb.de> writes:
 
-Cc: Jeff Dike <jdike@addtoit.com>
-Cc: Richard Weinberger <richard@nod.at>
-Reported-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Signed-off-by: Dan Williams <dan.j.williams@intel.com>
----
- arch/um/drivers/ubd_kern.c |    5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+> Jeff Moyer looked up the blktrace source to see if an overflow might
+> happen. The situation is as follows:
+>
+> - The time stamp is not used by the program itself, only for
+>   printing human-readable output.
+> - We normally don't print the timestamp at all, except when an
+>   undocumented format option is given to blkparse.
+> - The assumption is that no other program besides blktrace
+>   even looks at this data, but of course cannot be sure.
+> - On 64-bit systems, the time gets read from the unsigned
+>   32-bit kernel structure into a timespec in a way that will
+>   work correctly until 2106, so there is no 2038 problem.
+> - On 32-bit systems that have a new (future) libc build with
+>   a 64-bit time_t type, it will work the same way.
+> - On current 32-bit systems, the time is passed into localtime(),
+>   at which point the overflow happens, but those systems are
+>   already broken.
+>
+> In short, it's good enough for now, so update the comment.
+>
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> Fixes: 59a37f8baeb2 ("blktrace: avoid using timespec")
+> Cc: Jeff Moyer <jmoyer@redhat.com>
 
-diff --git a/arch/um/drivers/ubd_kern.c b/arch/um/drivers/ubd_kern.c
-index ef6b4d960bad..8ec7b4112f55 100644
---- a/arch/um/drivers/ubd_kern.c
-+++ b/arch/um/drivers/ubd_kern.c
-@@ -801,6 +801,7 @@ static void ubd_device_release(struct device *dev)
- static int ubd_disk_register(int major, u64 size, int unit,
- 			     struct gendisk **disk_out)
- {
-+	struct device *dev = NULL;
- 	struct gendisk *disk;
- 
- 	disk = alloc_disk(1 << UBD_SHIFT);
-@@ -823,12 +824,12 @@ static int ubd_disk_register(int major, u64 size, int unit,
- 		ubd_devs[unit].pdev.dev.release = ubd_device_release;
- 		dev_set_drvdata(&ubd_devs[unit].pdev.dev, &ubd_devs[unit]);
- 		platform_device_register(&ubd_devs[unit].pdev);
--		disk->driverfs_dev = &ubd_devs[unit].pdev.dev;
-+		dev = &ubd_devs[unit].pdev.dev;
- 	}
- 
- 	disk->private_data = &ubd_devs[unit];
- 	disk->queue = ubd_devs[unit].queue;
--	add_disk(disk);
-+	device_add_disk(dev, disk);
- 
- 	*disk_out = disk;
- 	return 0;
+Acked-by: Jeff Moyer <jmoyer@redhat.com>
 
+> ---
+>  kernel/trace/blktrace.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+> index b0816e4a61a5..4a3666779589 100644
+> --- a/kernel/trace/blktrace.c
+> +++ b/kernel/trace/blktrace.c
+> @@ -131,7 +131,8 @@ static void trace_note_time(struct blk_trace *bt)
+>  	unsigned long flags;
+>  	u32 words[2];
+>  
+> -	/* need to check user space to see if this breaks in y2038 or y2106 */
+> +	/* blktrace converts this to a time_t and will overflow in
+> +	   2106, not in 2038 */
+>  	ktime_get_real_ts64(&now);
+>  	words[0] = (u32)now.tv_sec;
+>  	words[1] = now.tv_nsec;
