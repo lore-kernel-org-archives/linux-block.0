@@ -1,126 +1,84 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:40277 "EHLO
-	mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1750886AbcFFWet (ORCPT
-	<rfc822;linux-block@vger.kernel.org>);
-	Mon, 6 Jun 2016 18:34:49 -0400
-Date: Mon, 6 Jun 2016 15:33:58 -0700
-From: Shaohua Li <shli@fb.com>
-To: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <axboe@fb.com>, <sitsofe@yahoo.com>, <snitzer@redhat.com>,
-	<martin.petersen@oracle.com>, <hch@infradead.org>,
-	<Kernel-team@fb.com>
-Subject: [PATCH V2] block: correctly fallback for zeroout
-Message-ID: <20160606223357.GA52883@shli-mbp.local>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <shaun@helios.aeonazure.com>
+From: Shaun Tancheff <shaun@tancheff.com>
+To: linux-ide@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org
+Cc: Shaun Tancheff <shaun@tancheff.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>,
+	"James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	Jeff Layton <jlayton@poochiereds.net>,
+	"J . Bruce Fields" <bfields@fieldses.org>
+Subject: [PATCH v5 0/2] Block layer support ZAC/ZBC commands
+Date: Mon, 20 Jun 2016 16:18:34 -0500
+Message-Id: <1466457516-21843-1-git-send-email-shaun@tancheff.com>
+List-ID: <linux-block@vger.kernel.org>
 
-blkdev_issue_zeroout try discard/writesame first, if they fail, zeroout
-fallback to regular write. The problem is discard/writesame doesn't
-return error for -EOPNOTSUPP, then zeroout can't do fallback and leave
-disk data not changed. zeroout should have guaranteed zero-fill
-behavior.
+Hi Jens,
 
-https://bugzilla.kernel.org/show_bug.cgi?id=118581
+This series is on linux-next tag next-20160617.
 
-V2: move the return value policy to blkdev_issue_discard and
-delete the policy for blkdev_issue_write_same (Martin)
+As Host Aware drives are becoming available we would like to be able
+to make use of such drives. This series is also intended to be suitable
+for use by Host Managed drives.
 
-Cc: Sitsofe Wheeler <sitsofe@yahoo.com>
-Cc: Mike Snitzer <snitzer@redhat.com>
-Cc: Jens Axboe <axboe@fb.com>
-Cc: Martin K. Petersen <martin.petersen@oracle.com>
-Signed-off-by: Shaohua Li <shli@fb.com>
----
- block/blk-lib.c | 49 +++++++++++++++++++++++++++++++------------------
- 1 file changed, 31 insertions(+), 18 deletions(-)
+ZAC/ZBC drives add new commands for discovering and working with Zones.
 
-diff --git a/block/blk-lib.c b/block/blk-lib.c
-index 23d7f30..a3a26c8 100644
---- a/block/blk-lib.c
-+++ b/block/blk-lib.c
-@@ -84,6 +84,28 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
- }
- EXPORT_SYMBOL(__blkdev_issue_discard);
- 
-+static int do_blkdev_issue_discard(struct block_device *bdev, sector_t sector,
-+		sector_t nr_sects, gfp_t gfp_mask, unsigned long flags,
-+		int *io_err)
-+{
-+	int type = REQ_WRITE | REQ_DISCARD;
-+	struct bio *bio = NULL;
-+	struct blk_plug plug;
-+	int ret;
-+
-+	if (flags & BLKDEV_DISCARD_SECURE)
-+		type |= REQ_SECURE;
-+
-+	blk_start_plug(&plug);
-+	ret = __blkdev_issue_discard(bdev, sector, nr_sects, gfp_mask, type,
-+			&bio);
-+	if (!ret && bio)
-+		*io_err = submit_bio_wait(type, bio);
-+	blk_finish_plug(&plug);
-+
-+	return ret;
-+}
-+
- /**
-  * blkdev_issue_discard - queue a discard
-  * @bdev:	blockdev to issue discard for
-@@ -98,23 +120,12 @@ EXPORT_SYMBOL(__blkdev_issue_discard);
- int blkdev_issue_discard(struct block_device *bdev, sector_t sector,
- 		sector_t nr_sects, gfp_t gfp_mask, unsigned long flags)
- {
--	int type = REQ_WRITE | REQ_DISCARD;
--	struct bio *bio = NULL;
--	struct blk_plug plug;
--	int ret;
-+	int ret, io_err;
- 
--	if (flags & BLKDEV_DISCARD_SECURE)
--		type |= REQ_SECURE;
--
--	blk_start_plug(&plug);
--	ret = __blkdev_issue_discard(bdev, sector, nr_sects, gfp_mask, type,
--			&bio);
--	if (!ret && bio) {
--		ret = submit_bio_wait(type, bio);
--		if (ret == -EOPNOTSUPP)
--			ret = 0;
--	}
--	blk_finish_plug(&plug);
-+	ret = do_blkdev_issue_discard(bdev, sector, nr_sects, gfp_mask,
-+		flags, &io_err);
-+	if (!ret && io_err != -EOPNOTSUPP)
-+		ret = io_err;
- 
- 	return ret;
- }
-@@ -167,7 +178,7 @@ int blkdev_issue_write_same(struct block_device *bdev, sector_t sector,
- 
- 	if (bio)
- 		ret = submit_bio_wait(REQ_WRITE | REQ_WRITE_SAME, bio);
--	return ret != -EOPNOTSUPP ? ret : 0;
-+	return ret;
- }
- EXPORT_SYMBOL(blkdev_issue_write_same);
- 
-@@ -236,9 +247,11 @@ int blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
- 			 sector_t nr_sects, gfp_t gfp_mask, bool discard)
- {
- 	struct request_queue *q = bdev_get_queue(bdev);
-+	int io_err = 0;
- 
- 	if (discard && blk_queue_discard(q) && q->limits.discard_zeroes_data &&
--	    blkdev_issue_discard(bdev, sector, nr_sects, gfp_mask, 0) == 0)
-+	    (do_blkdev_issue_discard(bdev, sector, nr_sects, gfp_mask, 0,
-+				     &io_err) == 0 && io_err == 0))
- 		return 0;
- 
- 	if (bdev_write_same(bdev) &&
+This extends the ZAC/ZBC support up to the block layer.
+
+Patches for util-linux can be found here:
+https://github.com/Seagate/ZDM-Device-Mapper/tree/master/patches/util-linux
+
+Using BIOs to issue ZBC commands allows DM targets (such as ZDM) or
+file-systems such as f2fs, btrfs or nilfs2 to extend their block
+allocation schemes and/or issue discards that are zone aligned.
+
+A perhaps non-obvious approach is that a conventional drive will 
+returns a zone report descriptor with a single large conventional zone.
+
+This patch is also at
+https://github.com/stancheff/linux.git
+git@github.com:stancheff/linux.git
+branch: next-20160617+bio.zbc.v5
+
+v5:
+ - In sd_setup_zone_action_cmnd, remove unused vars and fix switch indent
+ - In blk-lib fix documentation
+v4:
+ - Rebase on linux-next tag next-20160617.
+ - Change bio flags to bio op's
+ - Dropped ata16 hackery
+V3:
+ - Rebase on Mike Cristie's separate bio operations
+ - Update blkzoned_api.h to include report zones PARTIAL bit.
+ - Use zoned report reserved bit for ata-passthrough flag.
+
+V2:
+ - Changed bi_rw to op_flags clarify sepeartion of bio op from flags.
+ - Fixed memory leak in blkdev_issue_zone_report failing to put_bio().
+ - Documented opt in blkdev_issue_zone_report.
+ - Moved include/uapi/linux/fs.h changes to patch 3
+ - Fixed commit message for first patch in series.
+
+Shaun Tancheff (2):
+  Add bio/request flags for using ZBC/ZAC commands
+  Add ioctl to issue ZBC/ZAC commands via block layer
+
+ MAINTAINERS                       |   9 ++
+ block/blk-lib.c                   |  98 +++++++++++++++++
+ block/ioctl.c                     | 110 +++++++++++++++++++
+ drivers/scsi/sd.c                 | 118 ++++++++++++++++++++
+ drivers/scsi/sd.h                 |   1 +
+ include/linux/bio.h               |   7 +-
+ include/linux/blk_types.h         |   6 +-
+ include/linux/blkzoned_api.h      |  25 +++++
+ include/uapi/linux/Kbuild         |   1 +
+ include/uapi/linux/blkzoned_api.h | 220 ++++++++++++++++++++++++++++++++++++++
+ include/uapi/linux/fs.h           |   1 +
+ 11 files changed, 594 insertions(+), 2 deletions(-)
+ create mode 100644 include/linux/blkzoned_api.h
+ create mode 100644 include/uapi/linux/blkzoned_api.h
+
 -- 
-2.8.0.rc2
-
+2.8.1
