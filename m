@@ -1,6 +1,9 @@
 Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
+Date: Mon, 20 Jun 2016 14:22:19 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Bart Van Assche <bart.vanassche@sandisk.com>
 Subject: Re: [PATCH 02/13] irq: Introduce IRQD_AFFINITY_MANAGED flag
-To: Christoph Hellwig <hch@lst.de>
+Message-ID: <20160620122219.GA29059@lst.de>
 References: <1465934346-20648-3-git-send-email-hch@lst.de>
  <0412b942-ea0d-d4eb-c724-8243d12ff6f3@sandisk.com>
  <20160615102311.GA16619@lst.de>
@@ -11,12 +14,8 @@ References: <1465934346-20648-3-git-send-email-hch@lst.de>
  <86aa652b-48d0-a7bb-683e-bf43939aa811@sandisk.com>
  <20160616152006.GA13615@lst.de>
  <f22e87c1-6875-9a59-94db-42a6f71663b8@sandisk.com>
- <20160620122219.GA29059@lst.de>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-Message-ID: <066e6b9d-34a8-5917-4ad8-cb466d3389c3@sandisk.com>
-Date: Mon, 20 Jun 2016 15:21:47 +0200
 MIME-Version: 1.0
-In-Reply-To: <20160620122219.GA29059@lst.de>
+In-Reply-To: <f22e87c1-6875-9a59-94db-42a6f71663b8@sandisk.com>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
  <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
@@ -30,44 +29,51 @@ Cc: "axboe@fb.com" <axboe@fb.com>,
  "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
  Keith Busch <keith.busch@intel.com>,
  "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "tglx@linutronix.de" <tglx@linutronix.de>
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+ "tglx@linutronix.de" <tglx@linutronix.de>, Christoph Hellwig <hch@lst.de>
+Content-Type: text/plain; charset="us-ascii"
 Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
 Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
 List-ID: <linux-block@vger.kernel.org>
 
-On 06/20/2016 02:22 PM, Christoph Hellwig wrote:
-> On Thu, Jun 16, 2016 at 05:39:07PM +0200, Bart Van Assche wrote:
->> On 06/16/2016 05:20 PM, Christoph Hellwig wrote:
->>> On Wed, Jun 15, 2016 at 09:36:54PM +0200, Bart Van Assche wrote:
->> My concern
->> is that I doubt that there is an interrupt assignment scheme that works
->> optimally for all workloads. Hence my request to preserve the ability to
->> modify interrupt affinity from user space.
+On Thu, Jun 16, 2016 at 05:39:07PM +0200, Bart Van Assche wrote:
+> On 06/16/2016 05:20 PM, Christoph Hellwig wrote:
+>> On Wed, Jun 15, 2016 at 09:36:54PM +0200, Bart Van Assche wrote:
+>>> Do you agree that - ignoring other interrupt assignments - that the latter
+>>> interrupt assignment scheme would result in higher throughput and lower
+>>> interrupt processing latency?
+>>
+>> Probably.  Once we've got it in the core IRQ code we can tweak the
+>> algorithm to be optimal.
 >
-> I'd say let's do such an interface incrementally based on the use
-> case - especially after we get networking over to use common code
-> to distribute the interrupts.  If you were doing something like this
-> with the current blk-mq code it wouldn't work very well due to the
-> fact that you'd have a mismatch between the assigned interrupt and
-> the blk-mq queue mapping anyway.
->
-> It might be a good idea to start brainstorming how we'd want to handle
-> this change - we'd basically need a per-device notification that the
-> interrupt mapping changes so that we can rebuild the queue mapping,
-> which is somewhat similar to the lib/cpu_rmap.c code used by a few
-> networking drivers.  This would also help with dealing with cpu
-> hotplug events that change the cpu mapping.
+> Sorry but I'm afraid that we are embedding policy in the kernel, something 
+> we should not do. I know that there are workloads for which dedicating some 
+> CPU cores to interrupt processing and other CPU cores to running kernel 
+> threads improves throughput, probably because this results in less cache 
+> eviction on the CPU cores that run kernel threads and some degree of 
+> interrupt coalescing on the CPU cores that process interrupts.
 
-A notification mechanism that reports interrupt mapping changes will 
-definitely help. What would also help is an API that allows drivers to 
-query the MSI-X IRQ of an adapter that is nearest given a cpumask, e.g. 
-hctx->cpumask. Another function can then map that IRQ into an index in 
-the range 0..n-1 where n is the number of MSI-X interrupts for that 
-adapter. Every blk-mq/scsi-mq driver will need this functionality to 
-decide which IRQ to associate with a block layer hctx.
+And you can still easily set this use case up by chosing less queues
+(aka interrupts) than CPUs and assining your workload to the other
+cores.
 
-Bart.
+> My concern 
+> is that I doubt that there is an interrupt assignment scheme that works 
+> optimally for all workloads. Hence my request to preserve the ability to 
+> modify interrupt affinity from user space.
+
+I'd say let's do such an interface incrementall based on the use
+case - especially after we get networking over to use common code
+to distribute the interrupts.  If you were doing something like this
+with the current blk-mq code it wouldn't work very well due to the
+fact that you'd have a mismatch between the assigned interrupt and
+the blk-mq queue mapping anyway.
+
+It might be a good idea to start brainstorming how we'd want to handle
+this change - we'd basically need a per-device notification that the
+interrupt mapping changes so that we can rebuild the queue mapping,
+which is somewhat similar to the lib/cpu_rmap.c code used by a few
+networking drivers.  This would also help with dealing with cpu
+hotplug events that change the cpu mapping.
 
 _______________________________________________
 Linux-nvme mailing list
