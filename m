@@ -1,58 +1,68 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.136]:60156 "EHLO mail.kernel.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1425802AbcFHTtD (ORCPT <rfc822;linux-block@vger.kernel.org>);
-	Wed, 8 Jun 2016 15:49:03 -0400
-From: Ming Lin <mlin@kernel.org>
-To: linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
-Cc: Christoph Hellwig <hch@lst.de>,
-	Keith Busch <keith.busch@intel.com>, Jens Axboe <axboe@fb.com>,
-	James Smart <james.smart@broadcom.com>
-Subject: [PATCH 0/2] check the number of hw queues mapped to sw queues
-Date: Wed,  8 Jun 2016 15:48:10 -0400
-Message-Id: <1465415292-9416-1-git-send-email-mlin@kernel.org>
+Received: from mail-io0-f180.google.com ([209.85.223.180]:34998 "EHLO
+	mail-io0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751687AbcFTPKm (ORCPT
+	<rfc822;linux-block@vger.kernel.org>);
+	Mon, 20 Jun 2016 11:10:42 -0400
+Received: by mail-io0-f180.google.com with SMTP id f30so124534837ioj.2
+        for <linux-block@vger.kernel.org>; Mon, 20 Jun 2016 08:10:42 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <8dc61bb4-fc9f-a855-d792-37e4e6a02db9@sandisk.com>
+References: <146618127395.31030.11800447312061202344.stgit@dwillia2-desk3.amr.corp.intel.com>
+	<146618128465.31030.12159307386730181867.stgit@dwillia2-desk3.amr.corp.intel.com>
+	<8dc61bb4-fc9f-a855-d792-37e4e6a02db9@sandisk.com>
+Date: Mon, 20 Jun 2016 07:43:27 -0700
+Message-ID: <CAPcyv4hHkMuj+E5_VZihi92fdimmzLk=ciryBrhR2ZfmK9SEKw@mail.gmail.com>
+Subject: Re: [PATCH v3 2/3] block: convert to device_add_disk()
+From: Dan Williams <dan.j.williams@intel.com>
+To: Bart Van Assche <bart.vanassche@sandisk.com>
+Cc: linux-block@vger.kernel.org,
+	James Bottomley <James.Bottomley@hansenpartnership.com>,
+	Ulf Hansson <ulf.hansson@linaro.org>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+	Jens Axboe <axboe@fb.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Keith Busch <keith.busch@intel.com>,
+	"linux-nvdimm@lists.01.org" <linux-nvdimm@lists.01.org>,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	Ross Zwisler <ross.zwisler@linux.intel.com>,
+	David Woodhouse <dwmw2@infradead.org>,
+	Christoph Hellwig <hch@lst.de>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Ming Lin <ming.l@samsung.com>
+On Mon, Jun 20, 2016 at 6:33 AM, Bart Van Assche
+<bart.vanassche@sandisk.com> wrote:
+> On 06/17/2016 06:34 PM, Dan Williams wrote:
+>>
+>> diff --git a/arch/um/drivers/ubd_kern.c b/arch/um/drivers/ubd_kern.c
+>> index ef6b4d960bad..4e7cb5df8e43 100644
+>> --- a/arch/um/drivers/ubd_kern.c
+>> +++ b/arch/um/drivers/ubd_kern.c
+>> @@ -823,12 +823,11 @@ static int ubd_disk_register(int major, u64 size,
+>> int unit,
+>>                 ubd_devs[unit].pdev.dev.release = ubd_device_release;
+>>                 dev_set_drvdata(&ubd_devs[unit].pdev.dev,
+>> &ubd_devs[unit]);
+>>                 platform_device_register(&ubd_devs[unit].pdev);
+>> -               disk->driverfs_dev = &ubd_devs[unit].pdev.dev;
+>>         }
+>>
+>>         disk->private_data = &ubd_devs[unit];
+>>         disk->queue = ubd_devs[unit].queue;
+>> -       add_disk(disk);
+>> +       device_add_disk(&ubd_devs[unit].pdev.dev, disk);
+>>
+>>         *disk_out = disk;
+>>         return 0;
+>
+>
+> Have you reviewed this patch yourself? I think the above change is an
+> unintended behavior change.
 
-Please see patch 2 for detail bug description.
-
-Say, on a machine with 8 CPUs, we create 6 io queues(blk-mq hw queues)
-    
-echo "transport=rdma,traddr=192.168.2.2,nqn=testiqn,nr_io_queues=6" \
-            > /dev/nvme-fabrics
-    
-Then actually only 4 hw queues were mapped to CPU sw queues.
-    
-HW Queue 1 <-> CPU 0,4
-HW Queue 2 <-> CPU 1,5
-HW Queue 3 <-> None
-HW Queue 4 <-> CPU 2,6
-HW Queue 5 <-> CPU 3,7
-HW Queue 6 <-> None
-
-Back to Jan 2016, I send a patch:
-[PATCH] blk-mq: check if all HW queues are mapped to cpu
-http://www.spinics.net/lists/linux-block/msg01038.html
-
-It adds check code to blk_mq_update_queue_map().
-But it seems too aggresive because it's not an error that some hw queues
-were not mapped to sw queues.
-
-So this series just add a new function blk_mq_hctx_mapped() to check
-how many hw queues were mapped. And the driver(for example, nvme-rdma)
-that cares about it will do the check.
-
-Ming Lin (2):
-  blk-mq: add a function to return number of hw queues mapped
-  nvme-rdma: check the number of hw queues mapped
-
- block/blk-mq.c           | 15 +++++++++++++++
- drivers/nvme/host/rdma.c | 11 +++++++++++
- include/linux/blk-mq.h   |  1 +
- 3 files changed, 27 insertions(+)
-
--- 
-1.9.1
-
+Good catch! You are correct, this driver emits both parented an
+un-parented disks.  I'll fix this up and re-check the others.
