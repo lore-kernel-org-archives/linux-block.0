@@ -1,31 +1,37 @@
-Return-Path: <martin.petersen@oracle.com>
-To: "Darrick J. Wong" <darrick.wong@oracle.com>
-Cc: axboe@kernel.dk, hch@infradead.org, tytso@mit.edu,
-        martin.petersen@oracle.com, snitzer@redhat.com,
-        linux-api@vger.kernel.org, bfoster@redhat.com, xfs@oss.sgi.com,
-        linux-block@vger.kernel.org, dm-devel@redhat.com,
-        linux-fsdevel@vger.kernel.org, Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH 2/3] block: require write_same and discard requests align to logical block size
-From: "Martin K. Petersen" <martin.petersen@oracle.com>
+Return-Path: <bart.vanassche@gmail.com>
+Return-Path: <bart.vanassche@gmail.com>
+From: Bart Van Assche <bart.vanassche@gmail.com>
+Subject: Re: [PATCH 2/3] block: require write_same and discard requests align
+ to logical block size
+To: "Darrick J. Wong" <darrick.wong@oracle.com>,
+ "axboe@kernel.dk" <axboe@kernel.dk>
 References: <146612624734.12764.4316680863289411106.stgit@birch.djwong.org>
-	<146612626092.12764.773833541076937471.stgit@birch.djwong.org>
-Date: Wed, 29 Jun 2016 00:58:06 -0400
-In-Reply-To: <146612626092.12764.773833541076937471.stgit@birch.djwong.org>
-	(Darrick J. Wong's message of "Thu, 16 Jun 2016 18:17:41 -0700")
-Message-ID: <yq1oa6ksiap.fsf@sermon.lab.mkp.net>
+ <146612626092.12764.773833541076937471.stgit@birch.djwong.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "tytso@mit.edu" <tytso@mit.edu>,
+ "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+ "snitzer@redhat.com" <snitzer@redhat.com>,
+ "linux-api@vger.kernel.org" <linux-api@vger.kernel.org>,
+ "bfoster@redhat.com" <bfoster@redhat.com>, "xfs@oss.sgi.com"
+ <xfs@oss.sgi.com>, "hch@infradead.org" <hch@infradead.org>,
+ "dm-devel@redhat.com" <dm-devel@redhat.com>,
+ "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+ Christoph Hellwig <hch@lst.de>, Bart Van Assche <Bart.VanAssche@sandisk.com>
+Message-ID: <3470c511-59f5-ff7d-b4b0-22d7d8a2a6e7@acm.org>
+Date: Mon, 20 Jun 2016 14:37:06 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <146612626092.12764.773833541076937471.stgit@birch.djwong.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
->>>>> "Darrick" == Darrick J Wong <darrick.wong@oracle.com> writes:
+On 06/17/2016 03:19 AM, Darrick J. Wong wrote:
+> Make sure that the offset and length arguments that we're using to
+> construct WRITE SAME and DISCARD requests are actually aligned to the
+> logical block size.  Failure to do this causes other errors in other
+> parts of the block layer or the SCSI layer because disks don't support
+> partial logical block writes.
+>
+> Signed-off-by: Darrick J. Wong <darrick.wong@oracle.com>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
 
-Darrick> Make sure that the offset and length arguments that we're using
-Darrick> to construct WRITE SAME and DISCARD requests are actually
-Darrick> aligned to the logical block size.  Failure to do this causes
-Darrick> other errors in other parts of the block layer or the SCSI
-Darrick> layer because disks don't support partial logical block writes.
-
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-
--- 
-Martin K. Petersen	Oracle Linux Engineering
+Reviewed-by: Bart Van Assche <bart.vanassche@sandisk.com>
