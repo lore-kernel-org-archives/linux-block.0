@@ -1,56 +1,28 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-From: Arnd Bergmann <arnd@arndb.de>
-To: Jens Axboe <axboe@fb.com>
-Cc: "Nicholas A . Bellinger" <nab@linux-iscsi.org>,
-	Mike Christie <mchristi@redhat.com>,
-	Andy Grover <agrover@redhat.com>,
-	Hannes Reinecke <hare@suse.com>, linux-scsi@vger.kernel.org,
-	target-devel@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Davidlohr Bueso <dave@stgolabs.net>, linux-efi@vger.kernel.org,
-	linux-block@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH v2 2/3] partition/efi: use bdev_logical_block_count()
-Date: Thu, 23 Jun 2016 15:30:15 +0200
-Message-Id: <20160623133016.3781907-2-arnd@arndb.de>
-In-Reply-To: <20160623133016.3781907-1-arnd@arndb.de>
-References: <20160623133016.3781907-1-arnd@arndb.de>
-Sender: linux-scsi-owner@vger.kernel.org
+Return-Path: <mchristi@redhat.com>
+Subject: Re: [PATCH 1/3] block: get rid of bio_rw and READA
+To: Christoph Hellwig <hch@lst.de>, axboe@kernel.dk
+References: <1465829315-23137-1-git-send-email-hch@lst.de>
+ <1465829315-23137-2-git-send-email-hch@lst.de>
+Cc: linux-block@vger.kernel.org
+From: Mike Christie <mchristi@redhat.com>
+Message-ID: <05f0ea82-c0b0-79a3-5204-cd600e575471@redhat.com>
+Date: Mon, 20 Jun 2016 19:34:13 -0500
+MIME-Version: 1.0
+In-Reply-To: <1465829315-23137-2-git-send-email-hch@lst.de>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-block@vger.kernel.org>
 
-Enabling CONFIG_UBSAN_SANITIZE_ALL on ARM caused a link error:
+On 06/13/2016 09:48 AM, Christoph Hellwig wrote:
+> These two are confusing leftover of the old world order, combining
+> values of the REQ_OP_ and REQ_ namespaces.  For callers that don't
+> special case we mostly just replace bi_rw with bio_data_dir or
+> op_is_write, except for the few cases where a switch over the REQ_OP_
+> values makes more sense.  Any check for READA is replaced with an
+> explicit check for REQ_RAHEAD.  Also remove the READA alias for
+> REQ_RAHEAD.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-last_lba.part.0':
-:(.text+0xc3440): undefined reference to `____ilog2_NaN'
-:(.text+0xc3538): undefined reference to `__aeabi_uldivmod'
-:(.text+0xc38e8): undefined reference to `__aeabi_uldivmod'
+Nice. Sorry for the delay. I was moving. Looks ok to me.
 
-This is caused by gcc not behaving in the expected ways with __builtin_constant_p(),
-but it also points to somewhat inefficient code based on a 64-bit
-division.
-
-I have introduced a better bdev_logical_block_count() now, so we
-can use that here.
-
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- block/partitions/efi.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/block/partitions/efi.c b/block/partitions/efi.c
-index bcd86e5cd546..7b1a62073d34 100644
---- a/block/partitions/efi.c
-+++ b/block/partitions/efi.c
-@@ -149,8 +149,8 @@ static u64 last_lba(struct block_device *bdev)
- {
- 	if (!bdev || !bdev->bd_inode)
- 		return 0;
--	return div_u64(bdev->bd_inode->i_size,
--		       bdev_logical_block_size(bdev)) - 1ULL;
-+
-+	return bdev_logical_block_count(bdev) - 1;
- }
- 
- static inline int pmbr_part_valid(gpt_mbr_record *part)
--- 
-2.9.0
-
+Reviewed-by: Mike Christie <mchristi@redhat.com>
