@@ -1,32 +1,40 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f54.google.com ([74.125.82.54]:36487 "EHLO
-	mail-wm0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752061AbcF3Uyu (ORCPT
-	<rfc822;linux-block@vger.kernel.org>);
-	Thu, 30 Jun 2016 16:54:50 -0400
-MIME-Version: 1.0
-From: Amir Goldstein <amir73il@gmail.com>
-Date: Thu, 30 Jun 2016 23:54:48 +0300
-Message-ID: <CAOQ4uxhEzr=yaFPO4ZVzndct84VC6c57W5DNEtqUHUcBjdTjQg@mail.gmail.com>
-Subject: Question about loop device DIO/AIO and FLUSH
-To: Ming Lei <ming.lei@canonical.com>
-Cc: linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-	linux-block <linux-block@vger.kernel.org>,
-	Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@fb.com>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <BATV+b9eeede57ded57779fe4+4685+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk,
+	keith.busch@intel.com
+Cc: linux-block@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	Sagi Grimberg <sagi@grimberg.me>
+Subject: [PATCH 1/3] block: Export blk_poll
+Date: Tue, 21 Jun 2016 18:04:19 +0200
+Message-Id: <1466525061-3686-2-git-send-email-hch@lst.de>
+In-Reply-To: <1466525061-3686-1-git-send-email-hch@lst.de>
+References: <1466525061-3686-1-git-send-email-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-Hi Ming,
+From: Sagi Grimberg <sagi@grimberg.me>
 
-I was reading through the code of loop DIO/AIO
-and I was wondering whether lo_req_flush() really
-honors REQ_FLUSH by calling  vfs_fsync() on a backing file
-that is open with O_DIRECT?
+The new NVMe over fabrics target will make use of this outside from a
+module.
 
-Shouldn't lo_req_flush() actually wait for completion of
-all the in-flight loop AIO requests to complete?
-Am I missing something?
+Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ block/blk-core.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Thanks,
-Amir.
+diff --git a/block/blk-core.c b/block/blk-core.c
+index c94c7ad..d66509f 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -3390,6 +3390,7 @@ bool blk_poll(struct request_queue *q, blk_qc_t cookie)
+ 
+ 	return false;
+ }
++EXPORT_SYMBOL_GPL(blk_poll);
+ 
+ #ifdef CONFIG_PM
+ /**
+-- 
+2.1.4
