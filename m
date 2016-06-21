@@ -1,28 +1,30 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from verein.lst.de ([213.95.11.211]:46973 "EHLO newverein.lst.de"
+Received: from verein.lst.de ([213.95.11.211]:46974 "EHLO newverein.lst.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752062AbcFUMtQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+	id S1752057AbcFUMtQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
 	Tue, 21 Jun 2016 08:49:16 -0400
-Date: Tue, 21 Jun 2016 14:39:34 +0200
+Date: Tue, 21 Jun 2016 14:40:59 +0200
 From: Christoph Hellwig <hch@lst.de>
-To: Jeff Moyer <jmoyer@redhat.com>
+To: "Martin K. Petersen" <martin.petersen@oracle.com>
 Cc: Christoph Hellwig <hch@lst.de>, axboe@fb.com, shli@fb.com,
-	martin.petersen@oracle.com, snitzer@redhat.com, sitsofe@yahoo.com,
-	linux-block@vger.kernel.org
+	snitzer@redhat.com, sitsofe@yahoo.com, linux-block@vger.kernel.org
 Subject: Re: [PATCH] block: introduce BLKDEV_DISCARD_ZERO to fix zeroout
-Message-ID: <20160621123934.GA1689@lst.de>
-References: <1466418523-22552-1-git-send-email-hch@lst.de> <x49d1nbsohs.fsf@segfault.boston.devel.redhat.com>
+Message-ID: <20160621124059.GC1689@lst.de>
+References: <1466418523-22552-1-git-send-email-hch@lst.de> <yq1r3br5q25.fsf@sermon.lab.mkp.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <x49d1nbsohs.fsf@segfault.boston.devel.redhat.com>
+In-Reply-To: <yq1r3br5q25.fsf@sermon.lab.mkp.net>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-> >  	if (flags & BLKDEV_DISCARD_SECURE) {
-> > +		if (flags & BLKDEV_DISCARD_ZERO)
-> > +			return -EOPNOTSUPP;
+On Mon, Jun 20, 2016 at 08:44:02PM -0400, Martin K. Petersen wrote:
+> Christoph> operation.  This allows both to ignore the EOPNOTSUPP hack
+> Christoph> and actually consolidating the discard_zeroes_data check into
+> Christoph> the function.
 > 
-> Should this be -EINVAL?
+> I like this better than the I/O error tracking approach. The
+> blkdev_issue_write_same() -EOPNOTSUPP regression is still present,
+> though.
 
-BLKDEV_DISCARD_SECURE | BLKDEV_DISCARD_ZERO seems like a theoretically
-possible case, but I don't really care..
+Which one?  Can't think of how that has anything to do with
+blkdev_issue_discard.
