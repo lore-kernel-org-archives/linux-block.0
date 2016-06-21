@@ -1,34 +1,22 @@
-Return-Path: <konrad.wilk@oracle.com>
-Date: Wed, 29 Jun 2016 12:39:49 -0400
-From: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-To: axboe@kernel.dk, linux-kernel@vger.kernel.org,
-        xen-devel@lists.xensource.com, linux-block@vger.kernel.org
-Cc: bob.liu@oracle.com
-Subject: [GIT PULL] (Xen) stable/for-jens-4.7 for v4.7-rc5
-Message-ID: <20160629163949.GA5631@char.us.oracle.com>
+Return-Path: <mchristi@redhat.com>
+Subject: Re: [PATCH 3/3] block: shrink bio size again
+To: Christoph Hellwig <hch@lst.de>, axboe@kernel.dk
+References: <1465829315-23137-1-git-send-email-hch@lst.de>
+ <1465829315-23137-4-git-send-email-hch@lst.de>
+Cc: linux-block@vger.kernel.org
+From: Mike Christie <mchristi@redhat.com>
+Message-ID: <19114e2d-a827-2a15-f56e-2e787d0e5599@redhat.com>
+Date: Mon, 20 Jun 2016 19:35:06 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1465829315-23137-4-git-send-email-hch@lst.de>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-block@vger.kernel.org>
 
-Hey Jens,
+On 06/13/2016 09:48 AM, Christoph Hellwig wrote:
+> The recent ops split grew the bio by adding the new ioprio field.
+> Shrink it again by using a 16-bit field for the bi_flags value and
+> filling the holes near the beginning of the structure.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-Please git pull the 'stable/for-jens-4.7' branch which is based on your
-'for-4.7/drivers' branch. It will nicely merge in your 'for-linus' branch:
-
-git pull git://git.kernel.org/pub/scm/linux/kernel/git/konrad/xen.git stable/for-jens-4.7
-
-which has one fix for migration of guest. We found that if we migrate the
-guest from a host that has multi-queue to an older (or vice-versa) we would
-lose outstanding I/Os as we did not recreate all the queues properly and lost
-the I/Os.
-
-Please pull!
-
-P.S.
-I've also also put stable@vger.kernel.org on the patch.
-
- drivers/block/xen-blkfront.c | 91 +++++++++++++++++++-------------------------
- 1 file changed, 40 insertions(+), 51 deletions(-)
-
-Bob Liu (1):
-      xen-blkfront: save uncompleted reqs in blkfront_resume()
+Reviewed-by: Mike Christie <mchristi@redhat.com>
