@@ -1,55 +1,23 @@
-Return-Path: <famz@redhat.com>
-From: Fam Zheng <famz@redhat.com>
-To: linux-kernel@vger.kernel.org
-Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        Michael Ellerman <mpe@ellerman.id.au>, Jens Axboe <axboe@kernel.dk>,
-        "Ed L. Cashin" <ed.cashin@acm.org>, Jiri Kosina <jikos@kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Minchan Kim <minchan@kernel.org>, Nitin Gupta <ngupta@vflare.org>,
-        Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
-        Shaohua Li <shli@kernel.org>, Ulf Hansson <ulf.hansson@linaro.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Brian Norris <computersforpeace@gmail.com>,
-        Keith Busch <keith.busch@intel.com>, linuxppc-dev@lists.ozlabs.org,
-        linux-block@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        linux-raid@vger.kernel.org, linux-mmc@vger.kernel.org,
-        linux-mtd@lists.infradead.org, linux-nvme@lists.infradead.org,
-        Christoph Hellwig <hch@infradead.org>, famz@redhat.com
-Subject: [PATCH v2 07/12] pktcdvd: Generate uevent after attribute available
-Date: Thu, 30 Jun 2016 09:59:48 +0800
-Message-Id: <20160630015953.6888-8-famz@redhat.com>
-In-Reply-To: <20160630015953.6888-1-famz@redhat.com>
-References: <20160630015953.6888-1-famz@redhat.com>
+Return-Path: <mchristi@redhat.com>
+Subject: Re: [PATCH 2/3] block: simplify and cleanup bvec pool handling
+To: Christoph Hellwig <hch@lst.de>, axboe@kernel.dk
+References: <1465829315-23137-1-git-send-email-hch@lst.de>
+ <1465829315-23137-3-git-send-email-hch@lst.de>
+Cc: linux-block@vger.kernel.org
+From: Mike Christie <mchristi@redhat.com>
+Message-ID: <2e78bda0-0b38-55bf-7d12-363e212bf76f@redhat.com>
+Date: Mon, 20 Jun 2016 19:36:55 -0500
+MIME-Version: 1.0
+In-Reply-To: <1465829315-23137-3-git-send-email-hch@lst.de>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-block@vger.kernel.org>
 
-It is documented that KOBJ_ADD should be generated after the object's
-attributes and children are ready.  We can achieve this with the new
-disk_gen_uevents interface.
+On 06/13/2016 09:48 AM, Christoph Hellwig wrote:
+> Instead of a flag and an index just make sure an index of 0 means
+> no need to free the bvec array.  Also move the constants related
+> to the bvec pools together and use a consistent naming scheme for
+> them.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
----
- drivers/block/pktcdvd.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
-index 00928406..a4e6bb7 100644
---- a/drivers/block/pktcdvd.c
-+++ b/drivers/block/pktcdvd.c
-@@ -2785,11 +2785,13 @@ static int pkt_setup_dev(dev_t dev, dev_t* pkt_dev)
- 	disk->events = pd->bdev->bd_disk->events;
- 	disk->async_events = pd->bdev->bd_disk->async_events;
- 
--	add_disk(disk, true);
-+	add_disk(disk, false);
- 
- 	pkt_sysfs_dev_new(pd);
- 	pkt_debugfs_dev_new(pd);
- 
-+	disk_gen_uevents(disk);
-+
- 	pkt_devs[idx] = pd;
- 	if (pkt_dev)
- 		*pkt_dev = pd->pkt_dev;
--- 
-2.9.0
+Reviewed-by: Mike Christie <mchristi@redhat.com>
