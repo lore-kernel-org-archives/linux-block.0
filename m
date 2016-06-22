@@ -1,41 +1,80 @@
-Return-Path: <jack@suse.cz>
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Jeff Moyer <jmoyer@redhat.com>,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH 4/4] cfq-iosched: Charge at least 1 jiffie instead of 1 ns
-Date: Tue, 28 Jun 2016 09:04:02 +0200
-Message-Id: <1467097442-5400-5-git-send-email-jack@suse.cz>
-In-Reply-To: <1467097442-5400-1-git-send-email-jack@suse.cz>
-References: <1467097442-5400-1-git-send-email-jack@suse.cz>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-oi0-f45.google.com ([209.85.218.45]:35332 "EHLO
+	mail-oi0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752895AbcFVRDM (ORCPT
+	<rfc822;linux-block@vger.kernel.org>);
+	Wed, 22 Jun 2016 13:03:12 -0400
+Received: by mail-oi0-f45.google.com with SMTP id r2so31548256oih.2
+        for <linux-block@vger.kernel.org>; Wed, 22 Jun 2016 10:03:12 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <87fd92ea-5b21-1590-9842-1d33669e6da7@sandisk.com>
+References: <146654196111.34694.7735150373057824399.stgit@dwillia2-desk3.amr.corp.intel.com>
+ <146654197196.34694.11595948607042214658.stgit@dwillia2-desk3.amr.corp.intel.com>
+ <87fd92ea-5b21-1590-9842-1d33669e6da7@sandisk.com>
+From: Dan Williams <dan.j.williams@intel.com>
+Date: Wed, 22 Jun 2016 10:03:11 -0700
+Message-ID: <CAPcyv4gxTj7zC+i2Wn3GHF-twpkVMJSwJ=A7wWuHLRNwjUGLUg@mail.gmail.com>
+Subject: Re: [PATCH v4 2/5] mmc: move 'parent' tracking to mmc_blk_data
+To: Bart Van Assche <bart.vanassche@sandisk.com>
+Cc: Jens Axboe <axboe@fb.com>, Ulf Hansson <ulf.hansson@linaro.org>,
+	"linux-nvdimm@lists.01.org" <linux-nvdimm@lists.01.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Commit 9a7f38c42c2b (cfq-iosched: Convert from jiffies to nanoseconds)
-could result in charging just 1 ns to a cgroup submitting IO instead of 1
-jiffie we always charged before. It is arguable what is the right amount
-to change but for now lets retain the old behavior of always charging at
-least one jiffie.
+On Tue, Jun 21, 2016 at 11:38 PM, Bart Van Assche
+<bart.vanassche@sandisk.com> wrote:
+> On 06/21/2016 10:46 PM, Dan Williams wrote:
+>>
+>> In preparation for the removal of 'driverfs_dev' from 'struct gendisk',
+>> carry this data in mmc_blk_data. It is used for registration of parent
+>> disks and partitions.
+>>
+>> Cc: Ulf Hansson <ulf.hansson@linaro.org>
+>> Reported-by: Bart Van Assche <bart.vanassche@sandisk.com>
+>> Signed-off-by: Dan Williams <dan.j.williams@intel.com>
+>> ---
+>>  drivers/mmc/card/block.c |    5 +++--
+>>  1 file changed, 3 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/drivers/mmc/card/block.c b/drivers/mmc/card/block.c
+>> index 383184743f9a..d1733424bf6e 100644
+>> --- a/drivers/mmc/card/block.c
+>> +++ b/drivers/mmc/card/block.c
+>> @@ -93,6 +93,7 @@ static DEFINE_SPINLOCK(mmc_blk_lock);
+>>   */
+>>  struct mmc_blk_data {
+>>         spinlock_t      lock;
+>> +       struct device   *parent;
+>>         struct gendisk  *disk;
+>>         struct mmc_queue queue;
+>>         struct list_head part;
+>> @@ -2270,7 +2271,7 @@ again:
+>>         md->disk->fops = &mmc_bdops;
+>>         md->disk->private_data = md;
+>>         md->disk->queue = md->queue.queue;
+>> -       md->disk->driverfs_dev = parent;
+>> +       md->parent = parent;
+>>         set_disk_ro(md->disk, md->read_only || default_ro);
+>>         md->disk->flags = GENHD_FL_EXT_DEVT;
+>>         if (area_type & (MMC_BLK_DATA_AREA_RPMB | MMC_BLK_DATA_AREA_BOOT))
+>> @@ -2458,7 +2459,7 @@ static int mmc_add_disk(struct mmc_blk_data *md)
+>>         int ret;
+>>         struct mmc_card *card = md->queue.card;
+>>
+>> -       add_disk(md->disk);
+>> +       device_add_disk(md->parent, md->disk);
+>>         md->force_ro.show = force_ro_show;
+>>         md->force_ro.store = force_ro_store;
+>>         sysfs_attr_init(&md->force_ro.attr);
+>
+>
+> What will the impact be of this patch on code that accesses driverfs_dev
+> like printk_all_partitions()? Will this patch hurt bisectability?
 
-Fixes: 9a7f38c42c2b92391d9dabaf9f51df7cfe5608e4
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- block/cfq-iosched.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
-index e074dd4f1384..81accf9c4eaf 100644
---- a/block/cfq-iosched.c
-+++ b/block/cfq-iosched.c
-@@ -1455,7 +1455,8 @@ static inline u64 cfq_cfqq_slice_usage(struct cfq_queue *cfqq,
- 		 * a single request on seeky media and cause lots of seek time
- 		 * and group will never know it.
- 		 */
--		slice_used = max_t(u64, (now - cfqq->dispatch_start), 1);
-+		slice_used = max_t(u64, (now - cfqq->dispatch_start),
-+					jiffies_to_nsecs(1));
- 	} else {
- 		slice_used = now - cfqq->slice_start;
- 		if (slice_used > cfqq->allocated_slice) {
--- 
-2.6.6
+Hmm, yes there will be a point in the history where
+printk_all_partitions() will print " (driver?)" for mmc devices
+instead of " driver: %s".  I would not classify that as breaking
+bisection, but it's easy enough to fix up in v5.
