@@ -1,56 +1,55 @@
-Return-Path: <famz@redhat.com>
-From: Fam Zheng <famz@redhat.com>
-To: linux-kernel@vger.kernel.org
-Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        Michael Ellerman <mpe@ellerman.id.au>, Jens Axboe <axboe@kernel.dk>,
-        "Ed L. Cashin" <ed.cashin@acm.org>, Jiri Kosina <jikos@kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Minchan Kim <minchan@kernel.org>, Nitin Gupta <ngupta@vflare.org>,
-        Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
-        Shaohua Li <shli@kernel.org>, Ulf Hansson <ulf.hansson@linaro.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Brian Norris <computersforpeace@gmail.com>,
-        Keith Busch <keith.busch@intel.com>, linuxppc-dev@lists.ozlabs.org,
-        linux-block@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        linux-raid@vger.kernel.org, linux-mmc@vger.kernel.org,
-        linux-mtd@lists.infradead.org, linux-nvme@lists.infradead.org,
-        Christoph Hellwig <hch@infradead.org>, famz@redhat.com
-Subject: [PATCH v2 11/12] mtd: Generate uevent after attribute available
-Date: Thu, 30 Jun 2016 09:59:52 +0800
-Message-Id: <20160630015953.6888-12-famz@redhat.com>
-In-Reply-To: <20160630015953.6888-1-famz@redhat.com>
-References: <20160630015953.6888-1-famz@redhat.com>
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+From: Arnd Bergmann <arnd@arndb.de>
+To: Jens Axboe <axboe@fb.com>
+Cc: "Nicholas A . Bellinger" <nab@linux-iscsi.org>,
+	Mike Christie <mchristi@redhat.com>,
+	Andy Grover <agrover@redhat.com>,
+	Hannes Reinecke <hare@suse.com>, linux-scsi@vger.kernel.org,
+	target-devel@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>,
+	Davidlohr Bueso <dave@stgolabs.net>, linux-efi@vger.kernel.org,
+	linux-block@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH v2 3/3] target/iblock: use bdev_logical_block_count()
+Date: Thu, 23 Jun 2016 15:30:16 +0200
+Message-Id: <20160623133016.3781907-3-arnd@arndb.de>
+In-Reply-To: <20160623133016.3781907-1-arnd@arndb.de>
+References: <20160623133016.3781907-1-arnd@arndb.de>
+Sender: linux-scsi-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-It is documented that KOBJ_ADD should be generated after the object's
-attributes and children are ready.  We can achieve this with the new
-disk_gen_uevents interface.
+Enabling CONFIG_UBSAN_SANITIZE_ALL on ARM caused a link error:
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
+drivers/target/built-in.o: In function `iblock_emulate_read_cap_with_block_size.constprop.1':
+target_core_iblock.c:(.text+0xc2774): undefined reference to `____ilog2_NaN'
+target_core_iblock.c:(.text+0xc27f8): undefined reference to `__aeabi_uldivmod'
+target_core_iblock.c:(.text+0xc299c): undefined reference to `__aeabi_uldivmod'
+
+This is caused by gcc not behaving in the expected ways with __builtin_constant_p(),
+but it also points to somewhat inefficient code based on an expensive 64-bit
+division.
+
+I have introduced a better bdev_logical_block_count() now, so we can use that here.
+
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
- drivers/mtd/mtd_blkdevs.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/target/target_core_iblock.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/drivers/mtd/mtd_blkdevs.c b/drivers/mtd/mtd_blkdevs.c
-index ab3bc22..6848141 100644
---- a/drivers/mtd/mtd_blkdevs.c
-+++ b/drivers/mtd/mtd_blkdevs.c
-@@ -436,13 +436,14 @@ int add_mtd_blktrans_dev(struct mtd_blktrans_dev *new)
- 	if (new->readonly)
- 		set_disk_ro(gd, 1);
+diff --git a/drivers/target/target_core_iblock.c b/drivers/target/target_core_iblock.c
+index 22af12f8b8eb..2dc0129553e1 100644
+--- a/drivers/target/target_core_iblock.c
++++ b/drivers/target/target_core_iblock.c
+@@ -201,9 +201,8 @@ static unsigned long long iblock_emulate_read_cap_with_block_size(
+ 	struct block_device *bd,
+ 	struct request_queue *q)
+ {
+-	unsigned long long blocks_long = (div_u64(i_size_read(bd->bd_inode),
+-					bdev_logical_block_size(bd)) - 1);
+ 	u32 block_size = bdev_logical_block_size(bd);
++	unsigned long long blocks_long = bdev_logical_block_count(bd) - 1;
  
--	add_disk(gd, true);
-+	add_disk(gd, false);
- 
- 	if (new->disk_attributes) {
- 		ret = sysfs_create_group(&disk_to_dev(gd)->kobj,
- 					new->disk_attributes);
- 		WARN_ON(ret);
- 	}
-+	disk_gen_uevents(gd);
- 	return 0;
- error4:
- 	blk_cleanup_queue(new->rq);
+ 	if (block_size == dev->dev_attrib.block_size)
+ 		return blocks_long;
 -- 
 2.9.0
+
