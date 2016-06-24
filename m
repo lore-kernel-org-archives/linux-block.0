@@ -1,31 +1,42 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from userp1040.oracle.com ([156.151.31.81]:30003 "EHLO
-	userp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750873AbcF2FEO (ORCPT
+Received: from bombadil.infradead.org ([198.137.202.9]:51349 "EHLO
+	bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750891AbcFXHBE (ORCPT
 	<rfc822;linux-block@vger.kernel.org>);
-	Wed, 29 Jun 2016 01:04:14 -0400
-To: Christoph Hellwig <hch@lst.de>
-Cc: axboe@fb.com, shli@fb.com, martin.petersen@oracle.com,
-	snitzer@redhat.com, sitsofe@yahoo.com, linux-block@vger.kernel.org
-Subject: Re: [PATCH 2/2] block: don't ignore -EOPNOTSUPP blkdev_issue_write_same
-From: "Martin K. Petersen" <martin.petersen@oracle.com>
+	Fri, 24 Jun 2016 03:01:04 -0400
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@fb.com
+Cc: shli@fb.com, martin.petersen@oracle.com, snitzer@redhat.com,
+	sitsofe@yahoo.com, linux-block@vger.kernel.org
+Subject: [PATCH 2/2] block: don't ignore -EOPNOTSUPP blkdev_issue_write_same
+Date: Fri, 24 Jun 2016 09:00:51 +0200
+Message-Id: <1466751651-9900-3-git-send-email-hch@lst.de>
+In-Reply-To: <1466751651-9900-1-git-send-email-hch@lst.de>
 References: <1466751651-9900-1-git-send-email-hch@lst.de>
-	<1466751651-9900-3-git-send-email-hch@lst.de>
-Date: Wed, 29 Jun 2016 01:04:02 -0400
-In-Reply-To: <1466751651-9900-3-git-send-email-hch@lst.de> (Christoph
-	Hellwig's message of "Fri, 24 Jun 2016 09:00:51 +0200")
-Message-ID: <yq1furwsi0t.fsf@sermon.lab.mkp.net>
-MIME-Version: 1.0
-Content-Type: text/plain
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
->>>>> "Christoph" == Christoph Hellwig <hch@lst.de> writes:
+WRITE SAME is a data integrity operation and we can't simply ignore
+errors.
 
-Christoph> WRITE SAME is a data integrity operation and we can't simply
-Christoph> ignore errors.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ block/blk-lib.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-
+diff --git a/block/blk-lib.c b/block/blk-lib.c
+index 45b35b1..e371f83 100644
+--- a/block/blk-lib.c
++++ b/block/blk-lib.c
+@@ -178,7 +178,7 @@ int blkdev_issue_write_same(struct block_device *bdev, sector_t sector,
+ 
+ 	if (bio)
+ 		ret = submit_bio_wait(bio);
+-	return ret != -EOPNOTSUPP ? ret : 0;
++	return ret;
+ }
+ EXPORT_SYMBOL(blkdev_issue_write_same);
+ 
 -- 
-Martin K. Petersen	Oracle Linux Engineering
+2.1.4
+
