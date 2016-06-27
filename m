@@ -1,121 +1,118 @@
-Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, axboe@fb.com,
- keith.busch@intel.com, linux-nvme@lists.infradead.org, dm-devel@redhat.com
-Subject: [PATCH 6/6] lightnvm: expose gennvm target type through sysfs
-Date: Wed, 29 Jun 2016 16:51:41 +0200
-Message-Id: <1467211901-26707-7-git-send-email-m@bjorling.me>
-In-Reply-To: <1467211901-26707-1-git-send-email-m@bjorling.me>
-References: <1467211901-26707-1-git-send-email-m@bjorling.me>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga14.intel.com ([192.55.52.115]:64841 "EHLO mga14.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752437AbcF0Tal (ORCPT <rfc822;linux-block@vger.kernel.org>);
+	Mon, 27 Jun 2016 15:30:41 -0400
+Subject: [PATCH v5 1/5] block: introduce device_add_disk()
+From: Dan Williams <dan.j.williams@intel.com>
+To: axboe@fb.com
+Cc: linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	Bart Van Assche <bart.vanassche@sandisk.com>, hch@lst.de
+Date: Mon, 27 Jun 2016 12:29:58 -0700
+Message-ID: <146705579791.39775.15665203168655855394.stgit@dwillia2-desk3.amr.corp.intel.com>
+In-Reply-To: <146705579255.39775.12551436695635245858.stgit@dwillia2-desk3.amr.corp.intel.com>
+References: <146705579255.39775.12551436695635245858.stgit@dwillia2-desk3.amr.corp.intel.com>
 MIME-Version: 1.0
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
-List-Post: <mailto:linux-nvme@lists.infradead.org>
-List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
-Cc: "Simon A. F. Lund" <slund@cnexlabs.com>,
- =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
 Content-Type: text/plain; charset="utf-8"
-Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
-Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-RnJvbTogIlNpbW9uIEEuIEYuIEx1bmQiIDxzbHVuZEBjbmV4bGFicy5jb20+CgpDcmVhdGUgYSBz
-eXNmcyBkaXJlY3RvcnkgZm9yIHRhcmdldHMgdG8gZXhwb3NlIHRoZWlyIGludGVybmFsIHN0YXRp
-c3RpY3MKYW5kIGtub2JzLiBUaGUgZW50cmllcyBpcyBleHBvc2VkIHRocm91Z2ggdGhlCi9zeXMv
-YmxvY2svPGRpc2s+L2xpZ2h0bnZtLyogZGlyZWN0b3J5LgoKSXQgY3VycmVudGx5IGhvbGRzIGEg
-c2luZ2xlIHN5c2ZzIGVudHJ5ICJ0eXBlIiwgd2hpY2ggZXhwb3J0cyB0aGUgdGFyZ2V0CnR5cGUg
-bmFtZS4KClNpZ25lZC1vZmYtYnk6IFNpbW9uIEEuIEYuIEx1bmQgPHNsdW5kQGNuZXhsYWJzLmNv
-bT4KU2lnbmVkLW9mZi1ieTogTWF0aWFzIEJqw7hybGluZyA8bUBiam9ybGluZy5tZT4KLS0tCiBk
-cml2ZXJzL2xpZ2h0bnZtL2dlbm52bS5jIHwgMTEyICsrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKysrLS0tLS0tLS0KIGluY2x1ZGUvbGludXgvbGlnaHRudm0uaCAgfCAgMTAgKysr
-KysKIDIgZmlsZXMgY2hhbmdlZCwgMTA0IGluc2VydGlvbnMoKyksIDE4IGRlbGV0aW9ucygtKQoK
-ZGlmZiAtLWdpdCBhL2RyaXZlcnMvbGlnaHRudm0vZ2VubnZtLmMgYi9kcml2ZXJzL2xpZ2h0bnZt
-L2dlbm52bS5jCmluZGV4IGI3NDE3NGMuLmJmZGFkM2MgMTAwNjQ0Ci0tLSBhL2RyaXZlcnMvbGln
-aHRudm0vZ2VubnZtLmMKKysrIGIvZHJpdmVycy9saWdodG52bS9nZW5udm0uYwpAQCAtMjAsNiAr
-MjAsODcgQEAKIAogI2luY2x1ZGUgImdlbm52bS5oIgogCitzdGF0aWMgc3RydWN0IGF0dHJpYnV0
-ZSBnZW5fdHlwZV9hdHRyID0geworCS5uYW1lID0gInR5cGUiLAorCS5tb2RlID0gU19JUlVHTwor
-fTsKKworc3RhdGljIHN0cnVjdCBhdHRyaWJ1dGUgKmdlbl90YXJnZXRfYXR0cnNbXSA9IHsKKwkm
-Z2VuX3R5cGVfYXR0ciwKKwlOVUxMLAorfTsKKworc3RhdGljIHNzaXplX3QgZ2VuX3RhcmdldF9h
-dHRyX3Nob3coc3RydWN0IGtvYmplY3QgKmtvYmosCisJCQkJc3RydWN0IGF0dHJpYnV0ZSAqYXR0
-ciwKKwkJCQljaGFyICpwYWdlKQoreworCXN0cnVjdCBudm1fdGFyZ2V0ICp0ID0gY29udGFpbmVy
-X29mKGtvYmosIHN0cnVjdCBudm1fdGFyZ2V0LCBrb2JqKTsKKworCWlmIChzdHJjbXAoYXR0ci0+
-bmFtZSwgInR5cGUiKSA9PSAwKQorCQlyZXR1cm4gc2NucHJpbnRmKHBhZ2UsIFBBR0VfU0laRSwg
-IiVzXG4iLCB0LT50eXBlLT5uYW1lKTsKKworCWlmICh0LT50eXBlLT5zeXNmc19zaG93KQorCQly
-ZXR1cm4gdC0+dHlwZS0+c3lzZnNfc2hvdyh0LCBhdHRyLCBwYWdlKTsKKworCXJldHVybiBzY25w
-cmludGYocGFnZSwgUEFHRV9TSVpFLAorCQkJIlVuaGFuZGxlZCBhdHRyKCVzKSBpbiBgbnZtX3Rh
-cmdldF9hdHRyX3Nob3dgXG4iLAorCQkJYXR0ci0+bmFtZSk7Cit9CisKK3N0YXRpYyBjb25zdCBz
-dHJ1Y3Qgc3lzZnNfb3BzIHRhcmdldF9zeXNmc19vcHMgPSB7CisJLnNob3cgPSBnZW5fdGFyZ2V0
-X2F0dHJfc2hvdywKK307CisKK3N0YXRpYyB2b2lkIGdlbl90YXJnZXRfcmVsZWFzZShzdHJ1Y3Qg
-a29iamVjdCAqa29iaikKK3sKKwlzdHJ1Y3QgbnZtX3RhcmdldCAqdCA9IGNvbnRhaW5lcl9vZihr
-b2JqLCBzdHJ1Y3QgbnZtX3RhcmdldCwga29iaik7CisJc3RydWN0IG52bV90Z3RfdHlwZSAqdHQg
-PSB0LT50eXBlOworCXN0cnVjdCBnZW5kaXNrICp0ZGlzayA9IHQtPmRpc2s7CisJc3RydWN0IHJl
-cXVlc3RfcXVldWUgKnEgPSB0ZGlzay0+cXVldWU7CisKKwlwcl9kZWJ1ZygiZ2VuOiBgZ2VuX3Rh
-cmdldF9yZWxlYXNlYFxuIik7CisKKwlkZWxfZ2VuZGlzayh0ZGlzayk7CisJYmxrX2NsZWFudXBf
-cXVldWUocSk7CisJcHV0X2Rpc2sodGRpc2spOworCisJaWYgKHR0LT5leGl0KQorCQl0dC0+ZXhp
-dCh0ZGlzay0+cHJpdmF0ZV9kYXRhKTsKKworCWtmcmVlKHQpOworfQorCitzdGF0aWMgc3RydWN0
-IGtvYmpfdHlwZSBudm1fdGFyZ2V0X3R5cGUgPSB7CisJLnN5c2ZzX29wcwk9ICZ0YXJnZXRfc3lz
-ZnNfb3BzLAorCS5kZWZhdWx0X2F0dHJzCT0gZ2VuX3RhcmdldF9hdHRycywKKwkucmVsZWFzZQk9
-IGdlbl90YXJnZXRfcmVsZWFzZQorfTsKKwordm9pZCBnZW5fdW5yZWdpc3Rlcl90YXJnZXQoc3Ry
-dWN0IG52bV90YXJnZXQgKnQpCit7CisJa29iamVjdF91ZXZlbnQoJnQtPmtvYmosIEtPQkpfUkVN
-T1ZFKTsKKwlrb2JqZWN0X2RlbCgmdC0+a29iaik7CisJa29iamVjdF9wdXQoJnQtPmtvYmopOwor
-fQorCitpbnQgZ2VuX3JlZ2lzdGVyX3RhcmdldChzdHJ1Y3QgbnZtX3RhcmdldCAqdCkKK3sKKwlz
-dHJ1Y3QgZ2VuZGlzayAqZGlzayA9IHQtPmRpc2s7CisJc3RydWN0IGRldmljZSAqZGV2ID0gZGlz
-a190b19kZXYoZGlzayk7CisJaW50IHJldDsKKworCXJldCA9IGtvYmplY3RfaW5pdF9hbmRfYWRk
-KCZ0LT5rb2JqLCAmbnZtX3RhcmdldF90eXBlLAorCQkJCSAgIGtvYmplY3RfZ2V0KCZkZXYtPmtv
-YmopLCAiJXMiLCAibGlnaHRudm0iKTsKKwlpZiAocmV0IDwgMCkgeworCQlwcl9lcnIoImdlbjog
-YF9yZWdpc3Rlcl90YXJnZXRgIGZhaWxlZC5cbiIpOworCQlrb2JqZWN0X3B1dCgmdC0+a29iaik7
-CisJCXJldHVybiByZXQ7CisJfQorCisJa29iamVjdF91ZXZlbnQoJnQtPmtvYmosIEtPQkpfQURE
-KTsKKwlyZXR1cm4gMDsKK30KKwogc3RhdGljIHN0cnVjdCBudm1fdGFyZ2V0ICpnZW5fZmluZF90
-YXJnZXQoc3RydWN0IGdlbl9kZXYgKmduLCBjb25zdCBjaGFyICpuYW1lKQogewogCXN0cnVjdCBu
-dm1fdGFyZ2V0ICp0Z3Q7CkBAIC02MCw3ICsxNDEsNyBAQCBzdGF0aWMgaW50IGdlbl9jcmVhdGVf
-dGd0KHN0cnVjdCBudm1fZGV2ICpkZXYsIHN0cnVjdCBudm1faW9jdGxfY3JlYXRlICpjcmVhdGUp
-CiAJfQogCW11dGV4X3VubG9jaygmZ24tPmxvY2spOwogCi0JdCA9IGttYWxsb2Moc2l6ZW9mKHN0
-cnVjdCBudm1fdGFyZ2V0KSwgR0ZQX0tFUk5FTCk7CisJdCA9IGt6YWxsb2Moc2l6ZW9mKHN0cnVj
-dCBudm1fdGFyZ2V0KSwgR0ZQX0tFUk5FTCk7CiAJaWYgKCF0KQogCQlyZXR1cm4gLUVOT01FTTsK
-IApAQCAtODksMTMgKzE3MCwxOSBAQCBzdGF0aWMgaW50IGdlbl9jcmVhdGVfdGd0KHN0cnVjdCBu
-dm1fZGV2ICpkZXYsIHN0cnVjdCBudm1faW9jdGxfY3JlYXRlICpjcmVhdGUpCiAKIAlibGtfcXVl
-dWVfbWF4X2h3X3NlY3RvcnModHF1ZXVlLCA4ICogZGV2LT5vcHMtPm1heF9waHlzX3NlY3QpOwog
-Ci0Jc2V0X2NhcGFjaXR5KHRkaXNrLCB0dC0+Y2FwYWNpdHkodGFyZ2V0ZGF0YSkpOwotCWFkZF9k
-aXNrKHRkaXNrKTsKLQogCXQtPnR5cGUgPSB0dDsKIAl0LT5kaXNrID0gdGRpc2s7CiAJdC0+ZGV2
-ID0gZGV2OwogCisJc2V0X2NhcGFjaXR5KHRkaXNrLCB0dC0+Y2FwYWNpdHkodGFyZ2V0ZGF0YSkp
-OworCWFkZF9kaXNrKHRkaXNrKTsKKworCWlmIChnZW5fcmVnaXN0ZXJfdGFyZ2V0KHQpKQorCQln
-b3RvIGVycl9pbml0OworCisJaWYgKHR0LT5zeXNmc19pbml0KQorCQl0dC0+c3lzZnNfaW5pdCh0
-KTsKKwogCW11dGV4X2xvY2soJmduLT5sb2NrKTsKIAlsaXN0X2FkZF90YWlsKCZ0LT5saXN0LCAm
-Z24tPnRhcmdldHMpOwogCW11dGV4X3VubG9jaygmZ24tPmxvY2spOwpAQCAtMTEyLDIwICsxOTks
-MTAgQEAgZXJyX3Q6CiAKIHN0YXRpYyB2b2lkIF9fZ2VuX3JlbW92ZV90YXJnZXQoc3RydWN0IG52
-bV90YXJnZXQgKnQpCiB7Ci0Jc3RydWN0IG52bV90Z3RfdHlwZSAqdHQgPSB0LT50eXBlOwotCXN0
-cnVjdCBnZW5kaXNrICp0ZGlzayA9IHQtPmRpc2s7Ci0Jc3RydWN0IHJlcXVlc3RfcXVldWUgKnEg
-PSB0ZGlzay0+cXVldWU7Ci0KLQlkZWxfZ2VuZGlzayh0ZGlzayk7Ci0JYmxrX2NsZWFudXBfcXVl
-dWUocSk7Ci0KLQlpZiAodHQtPmV4aXQpCi0JCXR0LT5leGl0KHRkaXNrLT5wcml2YXRlX2RhdGEp
-OwotCi0JcHV0X2Rpc2sodGRpc2spOwotCiAJbGlzdF9kZWwoJnQtPmxpc3QpOwotCWtmcmVlKHQp
-OworCWlmICh0LT50eXBlLT5zeXNmc19leGl0KQorCQl0LT50eXBlLT5zeXNmc19leGl0KHQpOwor
-CWdlbl91bnJlZ2lzdGVyX3RhcmdldCh0KTsKIH0KIAogLyoqCkBAIC02MjcsNyArNzA0LDYgQEAg
-c3RhdGljIHZvaWQgZ2VuX2x1bl9pbmZvX3ByaW50KHN0cnVjdCBudm1fZGV2ICpkZXYpCiAJc3Ry
-dWN0IGdlbl9sdW4gKmx1bjsKIAl1bnNpZ25lZCBpbnQgaTsKIAotCiAJZ2VuX2Zvcl9lYWNoX2x1
-bihnbiwgbHVuLCBpKSB7CiAJCXNwaW5fbG9jaygmbHVuLT52bHVuLmxvY2spOwogCmRpZmYgLS1n
-aXQgYS9pbmNsdWRlL2xpbnV4L2xpZ2h0bnZtLmggYi9pbmNsdWRlL2xpbnV4L2xpZ2h0bnZtLmgK
-aW5kZXggZDE5MDc4Ni4uMzgyMzg5MSAxMDA2NDQKLS0tIGEvaW5jbHVkZS9saW51eC9saWdodG52
-bS5oCisrKyBiL2luY2x1ZGUvbGludXgvbGlnaHRudm0uaApAQCAtMjExLDYgKzIxMSw4IEBAIHN0
-cnVjdCBudm1fdGFyZ2V0IHsKIAlzdHJ1Y3QgbnZtX2RldiAqZGV2OwogCXN0cnVjdCBudm1fdGd0
-X3R5cGUgKnR5cGU7CiAJc3RydWN0IGdlbmRpc2sgKmRpc2s7CisKKwlzdHJ1Y3Qga29iamVjdCBr
-b2JqOwogfTsKIAogc3RydWN0IG52bV90Z3RfaW5zdGFuY2UgewpAQCAtNDM0LDYgKzQzNiwxMCBA
-QCB0eXBlZGVmIGJsa19xY190IChudm1fdGd0X21ha2VfcnFfZm4pKHN0cnVjdCByZXF1ZXN0X3F1
-ZXVlICosIHN0cnVjdCBiaW8gKik7CiB0eXBlZGVmIHNlY3Rvcl90IChudm1fdGd0X2NhcGFjaXR5
-X2ZuKSh2b2lkICopOwogdHlwZWRlZiB2b2lkICoobnZtX3RndF9pbml0X2ZuKShzdHJ1Y3QgbnZt
-X2RldiAqLCBzdHJ1Y3QgZ2VuZGlzayAqLCBpbnQsIGludCk7CiB0eXBlZGVmIHZvaWQgKG52bV90
-Z3RfZXhpdF9mbikodm9pZCAqKTsKK3R5cGVkZWYgdm9pZCAobnZtX3RndF9zeXNmc19pbml0X2Zu
-KShzdHJ1Y3QgbnZtX3RhcmdldCAqKTsKK3R5cGVkZWYgdm9pZCAobnZtX3RndF9zeXNmc19leGl0
-X2ZuKShzdHJ1Y3QgbnZtX3RhcmdldCAqKTsKK3R5cGVkZWYgc3NpemVfdChudm1fdGd0X3N5c2Zz
-X3Nob3dfZm4pKHN0cnVjdCBudm1fdGFyZ2V0ICosCisJCQkJICAgICBzdHJ1Y3QgYXR0cmlidXRl
-ICosIGNoYXIgKik7CiAKIHN0cnVjdCBudm1fdGd0X3R5cGUgewogCWNvbnN0IGNoYXIgKm5hbWU7
-CkBAIC00NDgsNiArNDU0LDEwIEBAIHN0cnVjdCBudm1fdGd0X3R5cGUgewogCW52bV90Z3RfaW5p
-dF9mbiAqaW5pdDsKIAludm1fdGd0X2V4aXRfZm4gKmV4aXQ7CiAKKwludm1fdGd0X3N5c2ZzX2lu
-aXRfZm4gKnN5c2ZzX2luaXQ7CisJbnZtX3RndF9zeXNmc19leGl0X2ZuICpzeXNmc19leGl0Owor
-CW52bV90Z3Rfc3lzZnNfc2hvd19mbiAqc3lzZnNfc2hvdzsKKwogCS8qIEZvciBpbnRlcm5hbCB1
-c2UgKi8KIAlzdHJ1Y3QgbGlzdF9oZWFkIGxpc3Q7CiB9OwotLSAKMi4xLjQKCgpfX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpMaW51eC1udm1lIG1haWxpbmcg
-bGlzdApMaW51eC1udm1lQGxpc3RzLmluZnJhZGVhZC5vcmcKaHR0cDovL2xpc3RzLmluZnJhZGVh
-ZC5vcmcvbWFpbG1hbi9saXN0aW5mby9saW51eC1udm1lCg==
+In preparation for removing the ->driverfs_dev member of a gendisk, add
+an api that takes the parent device as a parameter to add_disk().  For
+now this maintains the status quo of WARN()ing on failure, but not
+return a error code.
+
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Reviewed-by: Bart Van Assche <bart.vanassche@sandisk.com>
+Signed-off-by: Dan Williams <dan.j.williams@intel.com>
+---
+ block/genhd.c         |   17 +++++++++++------
+ include/linux/genhd.h |    8 +++++++-
+ 2 files changed, 18 insertions(+), 7 deletions(-)
+
+diff --git a/block/genhd.c b/block/genhd.c
+index 9f42526b4d62..fb2d9aeb75a5 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -506,7 +506,7 @@ static int exact_lock(dev_t devt, void *data)
+ 	return 0;
+ }
+ 
+-static void register_disk(struct gendisk *disk)
++static void register_disk(struct device *parent, struct gendisk *disk)
+ {
+ 	struct device *ddev = disk_to_dev(disk);
+ 	struct block_device *bdev;
+@@ -514,7 +514,7 @@ static void register_disk(struct gendisk *disk)
+ 	struct hd_struct *part;
+ 	int err;
+ 
+-	ddev->parent = disk->driverfs_dev;
++	ddev->parent = parent;
+ 
+ 	dev_set_name(ddev, "%s", disk->disk_name);
+ 
+@@ -573,7 +573,8 @@ exit:
+ }
+ 
+ /**
+- * add_disk - add partitioning information to kernel list
++ * device_add_disk - add partitioning information to kernel list
++ * @parent: parent device for the disk
+  * @disk: per-device partitioning information
+  *
+  * This function registers the partitioning information in @disk
+@@ -581,7 +582,7 @@ exit:
+  *
+  * FIXME: error handling
+  */
+-void add_disk(struct gendisk *disk)
++void device_add_disk(struct device *parent, struct gendisk *disk)
+ {
+ 	struct backing_dev_info *bdi;
+ 	dev_t devt;
+@@ -617,7 +618,11 @@ void add_disk(struct gendisk *disk)
+ 
+ 	blk_register_region(disk_devt(disk), disk->minors, NULL,
+ 			    exact_match, exact_lock, disk);
+-	register_disk(disk);
++
++	/* temporary while we convert usages to use disk_to_dev(disk)->parent */
++	disk->driverfs_dev = parent;
++
++	register_disk(parent, disk);
+ 	blk_register_queue(disk);
+ 
+ 	/*
+@@ -633,7 +638,7 @@ void add_disk(struct gendisk *disk)
+ 	disk_add_events(disk);
+ 	blk_integrity_add(disk);
+ }
+-EXPORT_SYMBOL(add_disk);
++EXPORT_SYMBOL(device_add_disk);
+ 
+ void del_gendisk(struct gendisk *disk)
+ {
+diff --git a/include/linux/genhd.h b/include/linux/genhd.h
+index 359a8e4bd44d..df1dabbfd388 100644
+--- a/include/linux/genhd.h
++++ b/include/linux/genhd.h
+@@ -414,7 +414,13 @@ static inline void free_part_info(struct hd_struct *part)
+ extern void part_round_stats(int cpu, struct hd_struct *part);
+ 
+ /* block/genhd.c */
+-extern void add_disk(struct gendisk *disk);
++extern void device_add_disk(struct device *parent, struct gendisk *disk);
++static inline void add_disk(struct gendisk *disk)
++{
++	/* temporary while we convert callers to device_add_disk */
++	device_add_disk(disk->driverfs_dev, disk);
++}
++
+ extern void del_gendisk(struct gendisk *gp);
+ extern struct gendisk *get_gendisk(dev_t dev, int *partno);
+ extern struct block_device *bdget_disk(struct gendisk *disk, int partno);
+
