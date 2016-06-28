@@ -1,51 +1,67 @@
-Return-Path: <darrick.wong@oracle.com>
-Subject: [PATCH v9 0/3] fallocate for block devices
-From: "Darrick J. Wong" <darrick.wong@oracle.com>
-To: axboe@kernel.dk, darrick.wong@oracle.com
-Cc: linux-block@vger.kernel.org, tytso@mit.edu, martin.petersen@oracle.com,
-        snitzer@redhat.com, linux-api@vger.kernel.org, bfoster@redhat.com,
-        xfs@oss.sgi.com, hch@infradead.org, dm-devel@redhat.com,
-        linux-fsdevel@vger.kernel.org
-Date: Thu, 16 Jun 2016 18:17:27 -0700
-Message-ID: <146612624734.12764.4316680863289411106.stgit@birch.djwong.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Return-Path: <jack@suse.cz>
+From: Jan Kara <jack@suse.cz>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Jeff Moyer <jmoyer@redhat.com>,
+	Jan Kara <jack@suse.cz>
+Subject: [PATCH 1/4] block: Convert fifo_time from ulong to u64
+Date: Tue, 28 Jun 2016 09:03:59 +0200
+Message-Id: <1467097442-5400-2-git-send-email-jack@suse.cz>
+In-Reply-To: <1467097442-5400-1-git-send-email-jack@suse.cz>
+References: <1467097442-5400-1-git-send-email-jack@suse.cz>
 List-ID: <linux-block@vger.kernel.org>
 
-Hi,
+Currently rq->fifo_time is unsigned long but CFQ stores nanosecond
+timestamp in it which would overflow on 32-bit archs. Convert it to u64
+to avoid the overflow. Since the rq->fifo_time is unioned with struct
+call_single_data(), this does not change the size of struct request in
+any way.
 
-This is a redesign of the patch series that fixes various interface
-problems with the existing "zero out this part of a block device"
-code.  BLKZEROOUT2 is gone.
+We have to slightly fixup block/deadline-iosched.c so that comparison
+happens in the right types.
 
-The first patch is still a fix to the existing BLKZEROOUT ioctl to
-invalidate the page cache if the zeroing command to the underlying
-device succeeds.  Without this patch we still have the pagecache
-coherence bug that's been in the kernel forever.
+Fixes: 9a7f38c42c2b92391d9dabaf9f51df7cfe5608e4
+Signed-off-by: Jan Kara <jack@suse.cz>
+---
+ block/deadline-iosched.c | 5 +++--
+ include/linux/blkdev.h   | 2 +-
+ 2 files changed, 4 insertions(+), 3 deletions(-)
 
-The second patch changes the internal block device functions to reject
-attempts to discard or zeroout that are not aligned to the logical
-block size.  Previously, we only checked that the start/len parameters
-were 512-byte aligned, which caused kernel BUG_ONs for unaligned IOs
-to 4k-LBA devices.
-
-The third patch creates an fallocate handler for block devices, wires
-up the FALLOC_FL_PUNCH_HOLE flag to zeroing-discard, and connects
-FALLOC_FL_ZERO_RANGE to write-same so that we can have a consistent
-fallocate interface between files and block devices.  It also allows
-the combination of PUNCH_HOLE and NO_HIDE_STALE to invoke non-zeroing
-discard.
-
-Test cases for the new block device fallocate are now in xfstests as
-generic/349-351.
-
-Comments and questions are, as always, welcome.  Patches are against
-4.7-rc3.
-
-v7: Strengthen parameter checking and fix various code issues pointed
-out by Linus and Christoph.
-v8: More code rearranging, rebase to 4.6-rc3, and dig into alignment
-issues.
-v9: Forward port to 4.7.
-
---D
+diff --git a/block/deadline-iosched.c b/block/deadline-iosched.c
+index d0dd7882d8c7..26a9d3c8057a 100644
+--- a/block/deadline-iosched.c
++++ b/block/deadline-iosched.c
+@@ -173,7 +173,8 @@ deadline_merged_requests(struct request_queue *q, struct request *req,
+ 	 * and move into next position (next will be deleted) in fifo
+ 	 */
+ 	if (!list_empty(&req->queuelist) && !list_empty(&next->queuelist)) {
+-		if (time_before(next->fifo_time, req->fifo_time)) {
++		if (time_before((unsigned long)next->fifo_time,
++				(unsigned long)req->fifo_time)) {
+ 			list_move(&req->queuelist, &next->queuelist);
+ 			req->fifo_time = next->fifo_time;
+ 		}
+@@ -227,7 +228,7 @@ static inline int deadline_check_fifo(struct deadline_data *dd, int ddir)
+ 	/*
+ 	 * rq is expired!
+ 	 */
+-	if (time_after_eq(jiffies, rq->fifo_time))
++	if (time_after_eq(jiffies, (unsigned long)rq->fifo_time))
+ 		return 1;
+ 
+ 	return 0;
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 3d9cf326574f..1bef2c3b59be 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -90,7 +90,7 @@ struct request {
+ 	struct list_head queuelist;
+ 	union {
+ 		struct call_single_data csd;
+-		unsigned long fifo_time;
++		u64 fifo_time;
+ 	};
+ 
+ 	struct request_queue *q;
+-- 
+2.6.6
