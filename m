@@ -1,64 +1,57 @@
-Return-Path: <BATV+d68c80116f0bf241093e+4680+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: mst@redhat.com,
-	ooo@electrozaur.com,
-	nab@linux-iscsi.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH 2/7] virtio_blk: use blk_rq_map_kern
-Date: Thu, 16 Jun 2016 11:14:26 +0200
-Message-Id: <1466068471-15746-3-git-send-email-hch@lst.de>
-In-Reply-To: <1466068471-15746-1-git-send-email-hch@lst.de>
-References: <1466068471-15746-1-git-send-email-hch@lst.de>
+Return-Path: <jack@suse.cz>
+From: Jan Kara <jack@suse.cz>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Jeff Moyer <jmoyer@redhat.com>,
+	Jan Kara <jack@suse.cz>
+Subject: [PATCH 3/4] cfq-iosched: Fix regression in bonnie++ rewrite performance
+Date: Tue, 28 Jun 2016 09:04:01 +0200
+Message-Id: <1467097442-5400-4-git-send-email-jack@suse.cz>
+In-Reply-To: <1467097442-5400-1-git-send-email-jack@suse.cz>
+References: <1467097442-5400-1-git-send-email-jack@suse.cz>
 List-ID: <linux-block@vger.kernel.org>
 
-Similar to how SCSI and NVMe prepare passthrough requests.  This avoids
-poking into request internals too much.
+Commit 9a7f38c42c2 (cfq-iosched: Convert from jiffies to nanoseconds)
+broke the condition for detecting starved sync IO in
+cfq_completed_request() because rq->start_time remained in jiffies but
+we compared it with nanosecond values. This manifested as a regression
+in bonnie++ rewrite performance because we always ended up considering
+sync IO starved and thus never increased async IO queue depth.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Since rq->start_time is used in a lot of places, converting it to ns
+values would be non-trivial. So just revert the condition in CFQ to use
+comparison with jiffies. This will lead to suboptimal results if
+cfq_fifo_expire[1] will ever come close to 1 jiffie but so far we are
+relatively far from that with the storage used with CFQ (the default
+value is 128 ms).
+
+Fixes: 9a7f38c42c2b92391d9dabaf9f51df7cfe5608e4
+Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- drivers/block/virtio_blk.c | 22 ++++++++++------------
- 1 file changed, 10 insertions(+), 12 deletions(-)
+ block/cfq-iosched.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index 18e4069..963a130 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -236,25 +236,23 @@ static int virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
- static int virtblk_get_id(struct gendisk *disk, char *id_str)
- {
- 	struct virtio_blk *vblk = disk->private_data;
-+	struct request_queue *q = vblk->disk->queue;
- 	struct request *req;
--	struct bio *bio;
- 	int err;
+diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
+index 98cece4e62a9..e074dd4f1384 100644
+--- a/block/cfq-iosched.c
++++ b/block/cfq-iosched.c
+@@ -4233,7 +4233,16 @@ static void cfq_completed_request(struct request_queue *q, struct request *rq)
+ 					cfqq_type(cfqq));
  
--	bio = bio_map_kern(vblk->disk->queue, id_str, VIRTIO_BLK_ID_BYTES,
--			   GFP_KERNEL);
--	if (IS_ERR(bio))
--		return PTR_ERR(bio);
--
--	req = blk_make_request(vblk->disk->queue, bio, GFP_KERNEL);
--	if (IS_ERR(req)) {
--		bio_put(bio);
-+	req = blk_get_request(q, READ, GFP_KERNEL);
-+	if (IS_ERR(req))
- 		return PTR_ERR(req);
--	}
--
-+	blk_rq_set_block_pc(req);
- 	req->cmd_type = REQ_TYPE_DRV_PRIV;
-+
-+	err = blk_rq_map_kern(q, req, id_str, VIRTIO_BLK_ID_BYTES, GFP_KERNEL);
-+	if (err)
-+		goto out;
-+
- 	err = blk_execute_rq(vblk->disk->queue, vblk->disk, req, false);
-+out:
- 	blk_put_request(req);
--
- 	return err;
- }
+ 		st->ttime.last_end_request = now;
+-		if (!(rq->start_time + cfqd->cfq_fifo_expire[1] > now))
++		/*
++		 * We have to do this check in jiffies since start_time is in
++		 * jiffies and it is not trivial to convert to ns. If
++		 * cfq_fifo_expire[1] ever comes close to 1 jiffie, this test
++		 * will become problematic but so far we are fine (the default
++		 * is 128 ms).
++		 */
++		if (!time_after(rq->start_time +
++				  nsecs_to_jiffies(cfqd->cfq_fifo_expire[1]),
++				jiffies))
+ 			cfqd->last_delayed_sync = now;
+ 	}
  
 -- 
-2.1.4
+2.6.6
