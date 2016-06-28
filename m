@@ -1,88 +1,25 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:33725 "EHLO mga11.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752024AbcFQQfe (ORCPT <rfc822;linux-block@vger.kernel.org>);
-	Fri, 17 Jun 2016 12:35:34 -0400
-Subject: [PATCH v3 3/3] block: remove ->driverfs_dev
-From: Dan Williams <dan.j.williams@intel.com>
-To: linux-block@vger.kernel.org
-Cc: linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
-	axboe@fb.com, Johannes Thumshirn <jthumshirn@suse.de>,
-	Ross Zwisler <ross.zwisler@linux.intel.com>,
-	Christoph Hellwig <hch@lst.de>
-Date: Fri, 17 Jun 2016 09:34:49 -0700
-Message-ID: <146618128983.31030.5935615517632155377.stgit@dwillia2-desk3.amr.corp.intel.com>
-In-Reply-To: <146618127395.31030.11800447312061202344.stgit@dwillia2-desk3.amr.corp.intel.com>
-References: <146618127395.31030.11800447312061202344.stgit@dwillia2-desk3.amr.corp.intel.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] mg_disk: fix error path in mg_probe()
+To: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
+References: <1467121361-21632-1-git-send-email-b.zolnierkie@samsung.com>
+Cc: unsik Kim <donari75@gmail.com>, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <5772AD7E.1020006@kernel.dk>
+Date: Tue, 28 Jun 2016 11:01:50 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <1467121361-21632-1-git-send-email-b.zolnierkie@samsung.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+List-ID: <linux-block@vger.kernel.org>
 
-Now that all drivers that specify a ->driverfs_dev have been converted
-to device_add_disk(), the pointer can be removed from struct gendisk.
+On 06/28/2016 07:42 AM, Bartlomiej Zolnierkiewicz wrote:
+> MG_DISK_MAJ is defined as 0 so dynamic block major number
+> allocation is used by the driver and the assigned major
+> number is stored in host->major.  This patch fixes error
+> path in mg_probe() to use host->major instead of using
+> MG_DISK_MAJ.
 
-Cc: Jens Axboe <axboe@fb.com>
-Cc: Ross Zwisler <ross.zwisler@linux.intel.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
-Signed-off-by: Dan Williams <dan.j.williams@intel.com>
----
- block/genhd.c         |    5 ++---
- drivers/nvdimm/bus.c  |    2 +-
- include/linux/genhd.h |    4 +---
- 3 files changed, 4 insertions(+), 7 deletions(-)
+Added, thanks Bart.
 
-diff --git a/block/genhd.c b/block/genhd.c
-index 932e70c113d0..a18d35390f1d 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -800,10 +800,9 @@ void __init printk_all_partitions(void)
- 			       , disk_name(disk, part->partno, name_buf),
- 			       part->info ? part->info->uuid : "");
- 			if (is_part0) {
--				if (disk->driverfs_dev != NULL &&
--				    disk->driverfs_dev->driver != NULL)
-+				if (dev->parent && dev->parent->driver)
- 					printk(" driver: %s\n",
--					      disk->driverfs_dev->driver->name);
-+					      dev->parent->driver->name);
- 				else
- 					printk(" (driver?)\n");
- 			} else
-diff --git a/drivers/nvdimm/bus.c b/drivers/nvdimm/bus.c
-index f085f8bceae8..5e4e5c772ea5 100644
---- a/drivers/nvdimm/bus.c
-+++ b/drivers/nvdimm/bus.c
-@@ -312,7 +312,7 @@ EXPORT_SYMBOL(__nd_driver_register);
- 
- int nvdimm_revalidate_disk(struct gendisk *disk)
- {
--	struct device *dev = disk->driverfs_dev;
-+	struct device *dev = disk_to_dev(disk)->parent;
- 	struct nd_region *nd_region = to_nd_region(dev->parent);
- 	const char *pol = nd_region->ro ? "only" : "write";
- 
-diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index df1dabbfd388..1dbf52f9c24b 100644
---- a/include/linux/genhd.h
-+++ b/include/linux/genhd.h
-@@ -205,7 +205,6 @@ struct gendisk {
- 	void *private_data;
- 
- 	int flags;
--	struct device *driverfs_dev;  // FIXME: remove
- 	struct kobject *slave_dir;
- 
- 	struct timer_rand_state *random;
-@@ -417,8 +416,7 @@ extern void part_round_stats(int cpu, struct hd_struct *part);
- extern void device_add_disk(struct device *parent, struct gendisk *disk);
- static inline void add_disk(struct gendisk *disk)
- {
--	/* temporary while we convert callers to device_add_disk */
--	device_add_disk(disk->driverfs_dev, disk);
-+	device_add_disk(NULL, disk);
- }
- 
- extern void del_gendisk(struct gendisk *gp);
-
+-- 
+Jens Axboe
