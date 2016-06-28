@@ -1,19 +1,50 @@
-Return-Path: <BATV+a67a43e55467fd1c3dfd+4677+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: mchristi@redhat.com,
-	linux-block@vger.kernel.org
-Subject: a few more fixups for the ops vs flags split
-Date: Mon, 13 Jun 2016 16:48:32 +0200
-Message-Id: <1465829315-23137-1-git-send-email-hch@lst.de>
+Return-Path: <jack@suse.cz>
+From: Jan Kara <jack@suse.cz>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Jeff Moyer <jmoyer@redhat.com>,
+	Jan Kara <jack@suse.cz>
+Subject: [PATCH 2/4] cfq-iosched: Convert slice_resid from u64 to s64
+Date: Tue, 28 Jun 2016 09:04:00 +0200
+Message-Id: <1467097442-5400-3-git-send-email-jack@suse.cz>
+In-Reply-To: <1467097442-5400-1-git-send-email-jack@suse.cz>
+References: <1467097442-5400-1-git-send-email-jack@suse.cz>
 List-ID: <linux-block@vger.kernel.org>
 
-Get rid of the very confusing bio_rw helper, which mixes OPs and flags,
-and shrink the bio back to it's original size.
+slice_resid can be both positive and negative. Commit 9a7f38c42c2b
+(cfq-iosched: Convert from jiffies to nanoseconds) converted it from
+long to u64. Although this did not introduce any functional regression
+(the operations just overflow and the result was fine), it is certainly
+wrong and could cause issues in future. So convert the type to more
+appropriate s64.
 
-Btw, I'm not really sure if having bi_rw and bi_flags really is the
-right thing in the long run, it seem rather confusing for users.
+Fixes: 9a7f38c42c2b92391d9dabaf9f51df7cfe5608e4
+Signed-off-by: Jan Kara <jack@suse.cz>
+---
+ block/cfq-iosched.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Maybe it's time to give up the shared REQ_* flags again now that the
-ops are split out and there are only about two hand full of common flags
-left?
+diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
+index dab606852e24..98cece4e62a9 100644
+--- a/block/cfq-iosched.c
++++ b/block/cfq-iosched.c
+@@ -132,7 +132,7 @@ struct cfq_queue {
+ 	/* time when first request from queue completed and slice started. */
+ 	u64 slice_start;
+ 	u64 slice_end;
+-	u64 slice_resid;
++	s64 slice_resid;
+ 
+ 	/* pending priority requests */
+ 	int prio_pending;
+@@ -2681,7 +2681,7 @@ __cfq_slice_expired(struct cfq_data *cfqd, struct cfq_queue *cfqq,
+ 			cfqq->slice_resid = cfq_scaled_cfqq_slice(cfqd, cfqq);
+ 		else
+ 			cfqq->slice_resid = cfqq->slice_end - ktime_get_ns();
+-		cfq_log_cfqq(cfqd, cfqq, "resid=%llu", cfqq->slice_resid);
++		cfq_log_cfqq(cfqd, cfqq, "resid=%lld", cfqq->slice_resid);
+ 	}
+ 
+ 	cfq_group_served(cfqd, cfqq->cfqg, cfqq);
+-- 
+2.6.6
