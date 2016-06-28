@@ -1,25 +1,35 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from verein.lst.de ([213.95.11.211]:50185 "EHLO newverein.lst.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752537AbcF1L60 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-	Tue, 28 Jun 2016 07:58:26 -0400
-Date: Tue, 28 Jun 2016 13:58:20 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Dan Williams <dan.j.williams@intel.com>
-Cc: axboe@fb.com, linux-nvdimm@lists.01.org,
-	Richard Weinberger <richard@nod.at>,
-	Jeff Dike <jdike@addtoit.com>, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	Bart Van Assche <bart.vanassche@sandisk.com>, hch@lst.de
+Received: from b.ns.miles-group.at ([95.130.255.144]:44723 "EHLO radon.swed.at"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1752109AbcF1IOP (ORCPT <rfc822;linux-block@vger.kernel.org>);
+	Tue, 28 Jun 2016 04:14:15 -0400
 Subject: Re: [PATCH v5 3/5] um: track 'parent' device in a local variable
-Message-ID: <20160628115820.GB28578@lst.de>
-References: <146705579255.39775.12551436695635245858.stgit@dwillia2-desk3.amr.corp.intel.com> <146705580842.39775.16180359577535598750.stgit@dwillia2-desk3.amr.corp.intel.com>
+To: Bart Van Assche <bart.vanassche@sandisk.com>,
+	Dan Williams <dan.j.williams@intel.com>, axboe@fb.com
+References: <146705579255.39775.12551436695635245858.stgit@dwillia2-desk3.amr.corp.intel.com>
+ <146705580842.39775.16180359577535598750.stgit@dwillia2-desk3.amr.corp.intel.com>
+ <5965be1f-6b0b-d6f7-f6b0-d73b9be87267@sandisk.com>
+Cc: linux-nvdimm@lists.01.org, Jeff Dike <jdike@addtoit.com>,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	hch@lst.de
+From: Richard Weinberger <richard@nod.at>
+Message-ID: <577231CF.6000301@nod.at>
+Date: Tue, 28 Jun 2016 10:14:07 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <146705580842.39775.16180359577535598750.stgit@dwillia2-desk3.amr.corp.intel.com>
+In-Reply-To: <5965be1f-6b0b-d6f7-f6b0-d73b9be87267@sandisk.com>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Looks fine,
+Am 28.06.2016 um 09:23 schrieb Bart Van Assche:
+> On 06/27/2016 09:30 PM, Dan Williams wrote:
+>> In preparation for the removal of 'driverfs_dev' from 'struct gendisk'
+>> use a local variable to track the parented vs un-parented case in
+>> ubd_disk_register().
+> 
+> Reviewed-by: Bart Van Assche <bart.vanassche@sandisk.com>
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Acked-by: Richard Weinberger <richard@nod.at>
+
+Thanks,
+//richard
