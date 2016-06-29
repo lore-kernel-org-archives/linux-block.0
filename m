@@ -1,88 +1,34 @@
-Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, axboe@fb.com,
- keith.busch@intel.com, linux-nvme@lists.infradead.org, dm-devel@redhat.com
-Subject: [PATCH 3/6] blk-mq: register device instead of disk
-Date: Wed, 29 Jun 2016 16:51:38 +0200
-Message-Id: <1467211901-26707-4-git-send-email-m@bjorling.me>
-In-Reply-To: <1467211901-26707-1-git-send-email-m@bjorling.me>
-References: <1467211901-26707-1-git-send-email-m@bjorling.me>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [GIT PULL] (Xen) stable/for-jens-4.7 for v4.7-rc5
+To: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+ linux-kernel@vger.kernel.org, xen-devel@lists.xensource.com,
+ linux-block@vger.kernel.org
+References: <20160629163949.GA5631@char.us.oracle.com>
+Cc: bob.liu@oracle.com
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <57741E63.7050003@kernel.dk>
+Date: Wed, 29 Jun 2016 13:15:47 -0600
 MIME-Version: 1.0
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
-List-Post: <mailto:linux-nvme@lists.infradead.org>
-List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
-Cc: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Content-Type: text/plain; charset="utf-8"
-Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
-Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
+In-Reply-To: <20160629163949.GA5631@char.us.oracle.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-RW5hYmxlIGRldmljZXMgd2l0aG91dCBhIGdlbmRpc2sgaW5zdGFuY2UgdG8gcmVnaXN0ZXIgaXRz
-ZWxmIHdpdGggYmxrLW1xCmFuZCBleHBvc2UgdGhlIGFzc29jaWF0ZWQgbXVsdGktcXVldWUgc3lz
-ZnMgZW50cmllcy4KClNpZ25lZC1vZmYtYnk6IE1hdGlhcyBCasO4cmxpbmcgPG1AYmpvcmxpbmcu
-bWU+Ci0tLQogYmxvY2svYmxrLW1xLXN5c2ZzLmMgICB8IDEzICsrKysrLS0tLS0tLS0KIGJsb2Nr
-L2Jsay1zeXNmcy5jICAgICAgfCAgNCArKy0tCiBkcml2ZXJzL21kL2RtLmMgICAgICAgIHwgIDIg
-Ky0KIGluY2x1ZGUvbGludXgvYmxrLW1xLmggfCAgNCArKy0tCiA0IGZpbGVzIGNoYW5nZWQsIDEw
-IGluc2VydGlvbnMoKyksIDEzIGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2Jsb2NrL2Jsay1t
-cS1zeXNmcy5jIGIvYmxvY2svYmxrLW1xLXN5c2ZzLmMKaW5kZXggNGVhNGRkOC4uZjY3YjVjMSAx
-MDA2NDQKLS0tIGEvYmxvY2svYmxrLW1xLXN5c2ZzLmMKKysrIGIvYmxvY2svYmxrLW1xLXN5c2Zz
-LmMKQEAgLTM4MCw5ICszODAsOCBAQCBzdGF0aWMgaW50IGJsa19tcV9yZWdpc3Rlcl9oY3R4KHN0
-cnVjdCBibGtfbXFfaHdfY3R4ICpoY3R4KQogCXJldHVybiByZXQ7CiB9CiAKLXZvaWQgYmxrX21x
-X3VucmVnaXN0ZXJfZGlzayhzdHJ1Y3QgZ2VuZGlzayAqZGlzaykKK3ZvaWQgYmxrX21xX3VucmVn
-aXN0ZXJfZGV2KHN0cnVjdCBkZXZpY2UgKmRldiwgc3RydWN0IHJlcXVlc3RfcXVldWUgKnEpCiB7
-Ci0Jc3RydWN0IHJlcXVlc3RfcXVldWUgKnEgPSBkaXNrLT5xdWV1ZTsKIAlzdHJ1Y3QgYmxrX21x
-X2h3X2N0eCAqaGN0eDsKIAlzdHJ1Y3QgYmxrX21xX2N0eCAqY3R4OwogCWludCBpLCBqOwpAQCAt
-NDAyLDcgKzQwMSw3IEBAIHZvaWQgYmxrX21xX3VucmVnaXN0ZXJfZGlzayhzdHJ1Y3QgZ2VuZGlz
-ayAqZGlzaykKIAlrb2JqZWN0X2RlbCgmcS0+bXFfa29iaik7CiAJa29iamVjdF9wdXQoJnEtPm1x
-X2tvYmopOwogCi0Ja29iamVjdF9wdXQoJmRpc2tfdG9fZGV2KGRpc2spLT5rb2JqKTsKKwlrb2Jq
-ZWN0X3B1dCgmZGV2LT5rb2JqKTsKIAogCXEtPm1xX3N5c2ZzX2luaXRfZG9uZSA9IGZhbHNlOwog
-CWJsa19tcV9lbmFibGVfaG90cGx1ZygpOwpAQCAtNDI2LDEwICs0MjUsOCBAQCBzdGF0aWMgdm9p
-ZCBibGtfbXFfc3lzZnNfaW5pdChzdHJ1Y3QgcmVxdWVzdF9xdWV1ZSAqcSkKIAl9CiB9CiAKLWlu
-dCBibGtfbXFfcmVnaXN0ZXJfZGlzayhzdHJ1Y3QgZ2VuZGlzayAqZGlzaykKK2ludCBibGtfbXFf
-cmVnaXN0ZXJfZGV2KHN0cnVjdCBkZXZpY2UgKmRldiwgc3RydWN0IHJlcXVlc3RfcXVldWUgKnEp
-CiB7Ci0Jc3RydWN0IGRldmljZSAqZGV2ID0gZGlza190b19kZXYoZGlzayk7Ci0Jc3RydWN0IHJl
-cXVlc3RfcXVldWUgKnEgPSBkaXNrLT5xdWV1ZTsKIAlzdHJ1Y3QgYmxrX21xX2h3X2N0eCAqaGN0
-eDsKIAlpbnQgcmV0LCBpOwogCkBAIC00NTAsNyArNDQ3LDcgQEAgaW50IGJsa19tcV9yZWdpc3Rl
-cl9kaXNrKHN0cnVjdCBnZW5kaXNrICpkaXNrKQogCX0KIAogCWlmIChyZXQpCi0JCWJsa19tcV91
-bnJlZ2lzdGVyX2Rpc2soZGlzayk7CisJCWJsa19tcV91bnJlZ2lzdGVyX2RldihkZXYsIHEpOwog
-CWVsc2UKIAkJcS0+bXFfc3lzZnNfaW5pdF9kb25lID0gdHJ1ZTsKIG91dDoKQEAgLTQ1OCw3ICs0
-NTUsNyBAQCBvdXQ6CiAKIAlyZXR1cm4gcmV0OwogfQotRVhQT1JUX1NZTUJPTF9HUEwoYmxrX21x
-X3JlZ2lzdGVyX2Rpc2spOworRVhQT1JUX1NZTUJPTF9HUEwoYmxrX21xX3JlZ2lzdGVyX2Rldik7
-CiAKIHZvaWQgYmxrX21xX3N5c2ZzX3VucmVnaXN0ZXIoc3RydWN0IHJlcXVlc3RfcXVldWUgKnEp
-CiB7CmRpZmYgLS1naXQgYS9ibG9jay9ibGstc3lzZnMuYyBiL2Jsb2NrL2Jsay1zeXNmcy5jCmlu
-ZGV4IDk5MjA1OTYuLjUyMjNjNWYgMTAwNjQ0Ci0tLSBhL2Jsb2NrL2Jsay1zeXNmcy5jCisrKyBi
-L2Jsb2NrL2Jsay1zeXNmcy5jCkBAIC02OTMsNyArNjkzLDcgQEAgaW50IGJsa19yZWdpc3Rlcl9x
-dWV1ZShzdHJ1Y3QgZ2VuZGlzayAqZGlzaykKIAlrb2JqZWN0X3VldmVudCgmcS0+a29iaiwgS09C
-Sl9BREQpOwogCiAJaWYgKHEtPm1xX29wcykKLQkJYmxrX21xX3JlZ2lzdGVyX2Rpc2soZGlzayk7
-CisJCWJsa19tcV9yZWdpc3Rlcl9kZXYoZGlza190b19kZXYoZGlzayksIHEpOwogCiAJaWYgKCFx
-LT5yZXF1ZXN0X2ZuKQogCQlyZXR1cm4gMDsKQEAgLTcxOCw3ICs3MTgsNyBAQCB2b2lkIGJsa191
-bnJlZ2lzdGVyX3F1ZXVlKHN0cnVjdCBnZW5kaXNrICpkaXNrKQogCQlyZXR1cm47CiAKIAlpZiAo
-cS0+bXFfb3BzKQotCQlibGtfbXFfdW5yZWdpc3Rlcl9kaXNrKGRpc2spOworCQlibGtfbXFfdW5y
-ZWdpc3Rlcl9kZXYoZGlza190b19kZXYoZGlzayksIHEpOwogCiAJaWYgKHEtPnJlcXVlc3RfZm4p
-CiAJCWVsdl91bnJlZ2lzdGVyX3F1ZXVlKHEpOwpkaWZmIC0tZ2l0IGEvZHJpdmVycy9tZC9kbS5j
-IGIvZHJpdmVycy9tZC9kbS5jCmluZGV4IGFiYTdlZDkuLjlkZTNhOWMgMTAwNjQ0Ci0tLSBhL2Ry
-aXZlcnMvbWQvZG0uYworKysgYi9kcml2ZXJzL21kL2RtLmMKQEAgLTI3OTgsNyArMjc5OCw3IEBA
-IHN0YXRpYyBpbnQgZG1fbXFfaW5pdF9yZXF1ZXN0X3F1ZXVlKHN0cnVjdCBtYXBwZWRfZGV2aWNl
-ICptZCwKIAlkbV9pbml0X21kX3F1ZXVlKG1kKTsKIAogCS8qIGJhY2tmaWxsICdtcScgc3lzZnMg
-cmVnaXN0cmF0aW9uIG5vcm1hbGx5IGRvbmUgaW4gYmxrX3JlZ2lzdGVyX3F1ZXVlICovCi0JYmxr
-X21xX3JlZ2lzdGVyX2Rpc2sobWQtPmRpc2spOworCWJsa19tcV9yZWdpc3Rlcl9kZXYoZGlza190
-b19kZXYobWQtPmRpc2spLCBxKTsKIAogCXJldHVybiAwOwogCmRpZmYgLS1naXQgYS9pbmNsdWRl
-L2xpbnV4L2Jsay1tcS5oIGIvaW5jbHVkZS9saW51eC9ibGstbXEuaAppbmRleCAyNDk4ZmRmLi5h
-YjZmYjMyIDEwMDY0NAotLS0gYS9pbmNsdWRlL2xpbnV4L2Jsay1tcS5oCisrKyBiL2luY2x1ZGUv
-bGludXgvYmxrLW1xLmgKQEAgLTE3Niw4ICsxNzYsOCBAQCBlbnVtIHsKIHN0cnVjdCByZXF1ZXN0
-X3F1ZXVlICpibGtfbXFfaW5pdF9xdWV1ZShzdHJ1Y3QgYmxrX21xX3RhZ19zZXQgKik7CiBzdHJ1
-Y3QgcmVxdWVzdF9xdWV1ZSAqYmxrX21xX2luaXRfYWxsb2NhdGVkX3F1ZXVlKHN0cnVjdCBibGtf
-bXFfdGFnX3NldCAqc2V0LAogCQkJCQkJICBzdHJ1Y3QgcmVxdWVzdF9xdWV1ZSAqcSk7Ci1pbnQg
-YmxrX21xX3JlZ2lzdGVyX2Rpc2soc3RydWN0IGdlbmRpc2sgKik7Ci12b2lkIGJsa19tcV91bnJl
-Z2lzdGVyX2Rpc2soc3RydWN0IGdlbmRpc2sgKik7CitpbnQgYmxrX21xX3JlZ2lzdGVyX2Rldihz
-dHJ1Y3QgZGV2aWNlICosIHN0cnVjdCByZXF1ZXN0X3F1ZXVlICopOwordm9pZCBibGtfbXFfdW5y
-ZWdpc3Rlcl9kZXYoc3RydWN0IGRldmljZSAqLCBzdHJ1Y3QgcmVxdWVzdF9xdWV1ZSAqKTsKIAog
-aW50IGJsa19tcV9hbGxvY190YWdfc2V0KHN0cnVjdCBibGtfbXFfdGFnX3NldCAqc2V0KTsKIHZv
-aWQgYmxrX21xX2ZyZWVfdGFnX3NldChzdHJ1Y3QgYmxrX21xX3RhZ19zZXQgKnNldCk7Ci0tIAoy
-LjEuNAoKCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCkxp
-bnV4LW52bWUgbWFpbGluZyBsaXN0CkxpbnV4LW52bWVAbGlzdHMuaW5mcmFkZWFkLm9yZwpodHRw
-Oi8vbGlzdHMuaW5mcmFkZWFkLm9yZy9tYWlsbWFuL2xpc3RpbmZvL2xpbnV4LW52bWUK
+On 06/29/2016 10:39 AM, Konrad Rzeszutek Wilk wrote:
+> Hey Jens,
+>
+> Please git pull the 'stable/for-jens-4.7' branch which is based on your
+> 'for-4.7/drivers' branch. It will nicely merge in your 'for-linus' branch:
+>
+> git pull git://git.kernel.org/pub/scm/linux/kernel/git/konrad/xen.git stable/for-jens-4.7
+>
+> which has one fix for migration of guest. We found that if we migrate the
+> guest from a host that has multi-queue to an older (or vice-versa) we would
+> lose outstanding I/Os as we did not recreate all the queues properly and lost
+> the I/Os.
+>
+> Please pull!
+
+Pulled, thanks.
+
+-- 
+Jens Axboe
