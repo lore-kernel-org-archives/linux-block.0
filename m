@@ -1,54 +1,47 @@
-Return-Path: <famz@redhat.com>
-From: Fam Zheng <famz@redhat.com>
-To: linux-kernel@vger.kernel.org
-Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        Michael Ellerman <mpe@ellerman.id.au>, Jens Axboe <axboe@kernel.dk>,
-        "Ed L. Cashin" <ed.cashin@acm.org>, Jiri Kosina <jikos@kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Minchan Kim <minchan@kernel.org>, Nitin Gupta <ngupta@vflare.org>,
-        Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
-        Shaohua Li <shli@kernel.org>, Ulf Hansson <ulf.hansson@linaro.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Brian Norris <computersforpeace@gmail.com>,
-        Keith Busch <keith.busch@intel.com>, linuxppc-dev@lists.ozlabs.org,
-        linux-block@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        linux-raid@vger.kernel.org, linux-mmc@vger.kernel.org,
-        linux-mtd@lists.infradead.org, linux-nvme@lists.infradead.org,
-        Christoph Hellwig <hch@infradead.org>, famz@redhat.com
-Subject: [PATCH v2 12/12] nvme: Generate uevent after attribute available
-Date: Thu, 30 Jun 2016 09:59:53 +0800
-Message-Id: <20160630015953.6888-13-famz@redhat.com>
-In-Reply-To: <20160630015953.6888-1-famz@redhat.com>
-References: <20160630015953.6888-1-famz@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f67.google.com ([74.125.82.67]:35394 "EHLO
+	mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752725AbcF2OmX (ORCPT
+	<rfc822;linux-block@vger.kernel.org>);
+	Wed, 29 Jun 2016 10:42:23 -0400
+Received: by mail-wm0-f67.google.com with SMTP id a66so14847123wme.2
+        for <linux-block@vger.kernel.org>; Wed, 29 Jun 2016 07:42:17 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+Subject: [RFC PATCH 09/11] lightnvm: fix lun offset calculation for mark blk
+Date: Wed, 29 Jun 2016 16:41:54 +0200
+Message-Id: <1467211316-22373-10-git-send-email-m@bjorling.me>
+In-Reply-To: <1467211316-22373-1-git-send-email-m@bjorling.me>
+References: <1467211316-22373-1-git-send-email-m@bjorling.me>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-It is documented that KOBJ_ADD should be generated after the object's
-attributes and children are ready.  We can achieve this with the new
-disk_gen_uevents interface.
+The gen_mark_blk_bad function marks the wrong block when a block is on
+a different channel. Fix the index calculation, so that it updates the
+correct block.
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
+Reported-by: Javier Gonzalez <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <m@bjorling.me>
 ---
- drivers/nvme/host/core.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/lightnvm/gennvm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index fd70894..2655521 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -1462,11 +1462,12 @@ static void nvme_alloc_ns(struct nvme_ctrl *ctrl, unsigned nsid)
- 	if (ns->type == NVME_NS_LIGHTNVM)
+diff --git a/drivers/lightnvm/gennvm.c b/drivers/lightnvm/gennvm.c
+index c65fb67..b74174c 100644
+--- a/drivers/lightnvm/gennvm.c
++++ b/drivers/lightnvm/gennvm.c
+@@ -542,7 +542,7 @@ static void gen_mark_blk(struct nvm_dev *dev, struct ppa_addr ppa, int type)
  		return;
+ 	}
  
--	add_disk(ns->disk, true);
-+	add_disk(ns->disk, false);
- 	if (sysfs_create_group(&disk_to_dev(ns->disk)->kobj,
- 					&nvme_ns_attr_group))
- 		pr_warn("%s: failed to create sysfs group for identification\n",
- 			ns->disk->disk_name);
-+	disk_gen_uevents(ns->disk);
- 	return;
-  out_free_disk:
- 	kfree(disk);
+-	lun = &gn->luns[ppa.g.lun * ppa.g.ch];
++	lun = &gn->luns[(dev->luns_per_chnl * ppa.g.ch) + ppa.g.lun];
+ 	blk = &lun->vlun.blocks[ppa.g.blk];
+ 
+ 	/* will be moved to bb list on put_blk from target */
 -- 
-2.9.0
+2.1.4
+
