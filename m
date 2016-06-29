@@ -1,107 +1,51 @@
-Return-Path: <BATV+1815987b1c14acf14571+4678+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: mst@redhat.com,
-	ooo@electrozaur.com,
-	nab@linux-iscsi.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH 3/7] block: ensure bios return from blk_get_request are properly initialized
-Date: Tue, 14 Jun 2016 19:16:00 +0200
-Message-Id: <1465924564-14503-4-git-send-email-hch@lst.de>
-In-Reply-To: <1465924564-14503-1-git-send-email-hch@lst.de>
-References: <1465924564-14503-1-git-send-email-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f66.google.com ([74.125.82.66]:35264 "EHLO
+	mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752404AbcF2OmX (ORCPT
+	<rfc822;linux-block@vger.kernel.org>);
+	Wed, 29 Jun 2016 10:42:23 -0400
+Received: by mail-wm0-f66.google.com with SMTP id a66so14846126wme.2
+        for <linux-block@vger.kernel.org>; Wed, 29 Jun 2016 07:42:08 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+Subject: [RFC PATCH 00/11] Small fixes for LightNVM
+Date: Wed, 29 Jun 2016 16:41:45 +0200
+Message-Id: <1467211316-22373-1-git-send-email-m@bjorling.me>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-blk_get_request is used for BLOCK_PC and similar passthrough requests.
-Currently we always need to call blk_rq_set_block_pc or an open coded
-version of it to allow appending bios using the request mapping helpers
-later on, which is a somewhat awkward API.  Instead move the
-initialization part of blk_rq_set_block_pc into blk_get_request, so that
-we always have a safe to use request.
+A collection of small fixes destined for the 4.8 kernel.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-core.c           | 13 ++++++++-----
- block/blk-mq.c             |  5 +++++
- drivers/block/virtio_blk.c |  1 -
- drivers/nvme/host/core.c   |  4 ----
- 4 files changed, 13 insertions(+), 10 deletions(-)
+Most notably is the move of the target management into the general media
+manager. The concept of targets is media manager specific, therefore
+this should be managed by itself. Core may only pass thetarget requests
+along to the appropriate media manager.
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index c94c7ad..37852ec 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1294,10 +1294,16 @@ static struct request *blk_old_get_request(struct request_queue *q, int rw,
- 
- 	spin_lock_irq(q->queue_lock);
- 	rq = get_request(q, rw, 0, NULL, gfp_mask);
--	if (IS_ERR(rq))
-+	if (IS_ERR(rq)) {
- 		spin_unlock_irq(q->queue_lock);
--	/* q->queue_lock is unlocked at this point */
-+		return rq;
-+	}
- 
-+	/* q->queue_lock is unlocked at this point */
-+	rq->__data_len = 0;
-+	rq->__sector = (sector_t) -1;
-+	rq->bio = rq->biotail = NULL;
-+	memset(rq->__cmd, 0, sizeof(rq->__cmd));
- 	return rq;
- }
- 
-@@ -1377,9 +1383,6 @@ EXPORT_SYMBOL(blk_make_request);
- void blk_rq_set_block_pc(struct request *rq)
- {
- 	rq->cmd_type = REQ_TYPE_BLOCK_PC;
--	rq->__data_len = 0;
--	rq->__sector = (sector_t) -1;
--	rq->bio = rq->biotail = NULL;
- 	memset(rq->__cmd, 0, sizeof(rq->__cmd));
- }
- EXPORT_SYMBOL(blk_rq_set_block_pc);
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index bc7166d..80dce26 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -263,6 +263,11 @@ struct request *blk_mq_alloc_request(struct request_queue *q, int rw,
- 		blk_queue_exit(q);
- 		return ERR_PTR(-EWOULDBLOCK);
- 	}
-+
-+	rq->__data_len = 0;
-+	rq->__sector = (sector_t) -1;
-+	rq->bio = rq->biotail = NULL;
-+	memset(rq->__cmd, 0, sizeof(rq->__cmd));
- 	return rq;
- }
- EXPORT_SYMBOL(blk_mq_alloc_request);
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index 963a130..0be7dd6 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -243,7 +243,6 @@ static int virtblk_get_id(struct gendisk *disk, char *id_str)
- 	req = blk_get_request(q, READ, GFP_KERNEL);
- 	if (IS_ERR(req))
- 		return PTR_ERR(req);
--	blk_rq_set_block_pc(req);
- 	req->cmd_type = REQ_TYPE_DRV_PRIV;
- 
- 	err = blk_rq_map_kern(q, req, id_str, VIRTIO_BLK_ID_BYTES, GFP_KERNEL);
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 9d7cee4..cb8ca1b 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -201,10 +201,6 @@ struct request *nvme_alloc_request(struct request_queue *q,
- 
- 	req->cmd_type = REQ_TYPE_DRV_PRIV;
- 	req->cmd_flags |= REQ_FAILFAST_DRIVER;
--	req->__data_len = 0;
--	req->__sector = (sector_t) -1;
--	req->bio = req->biotail = NULL;
--
- 	req->cmd = (unsigned char *)cmd;
- 	req->cmd_len = sizeof(struct nvme_command);
- 
+Matias Bjørling (11):
+  lightnvm: remove checkpatch warning for unsigned ints
+  lightnvm: fix checkpatch terse errors
+  lightnvm: remove open/close statistics for gennvm
+  lightnvm: rename gennvm and update description
+  lightnvm: move target mgmt into media mgr
+  lightnvm: remove nested lock conflict with mm
+  lightnvm: remove unused lists from struct rrpc_block
+  lightnvm: remove _unlocked variant of [get/put]_blk
+  lightnvm: fix lun offset calculation for mark blk
+  lightnvm: make ppa_list const in nvm_set_rqd_list
+  lightnvm: make __nvm_submit_ppa static
+
+ drivers/lightnvm/Kconfig  |  10 +-
+ drivers/lightnvm/core.c   | 234 +++++++---------------------
+ drivers/lightnvm/gennvm.c | 385 +++++++++++++++++++++++++++++-----------------
+ drivers/lightnvm/gennvm.h |  10 +-
+ drivers/lightnvm/rrpc.c   |  30 +---
+ drivers/lightnvm/rrpc.h   |  12 +-
+ include/linux/lightnvm.h  |  33 ++--
+ 7 files changed, 333 insertions(+), 381 deletions(-)
+
 -- 
 2.1.4
+
