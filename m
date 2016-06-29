@@ -1,82 +1,75 @@
-Return-Path: <BATV+10e0b2ba6b8830823af0+4672+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: keith.busch@intel.com,
-	axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	sagi@lightbits.io,
-	ming.l@ssi.samsung.com
-Subject: [PATCH 01/11] Revert "blk-mq: add blk_mq_alloc_request_hctx"
-Date: Wed,  8 Jun 2016 14:30:56 +0200
-Message-Id: <1465389066-19119-2-git-send-email-hch@lst.de>
-In-Reply-To: <1465389066-19119-1-git-send-email-hch@lst.de>
-References: <1465389066-19119-1-git-send-email-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f66.google.com ([74.125.82.66]:33051 "EHLO
+	mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752413AbcF2OmX (ORCPT
+	<rfc822;linux-block@vger.kernel.org>);
+	Wed, 29 Jun 2016 10:42:23 -0400
+Received: by mail-wm0-f66.google.com with SMTP id r201so14878139wme.0
+        for <linux-block@vger.kernel.org>; Wed, 29 Jun 2016 07:42:11 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+Subject: [RFC PATCH 01/11] lightnvm: remove checkpatch warning for unsigned ints
+Date: Wed, 29 Jun 2016 16:41:46 +0200
+Message-Id: <1467211316-22373-2-git-send-email-m@bjorling.me>
+In-Reply-To: <1467211316-22373-1-git-send-email-m@bjorling.me>
+References: <1467211316-22373-1-git-send-email-m@bjorling.me>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Just for book keeping. The next patch brings it back with some changes.
+Checkpatch found two incidents where the type was preferred to be
+written out in full.
 
-This reverts commit 98878e0f0b80520575b31147f7cff28e28d9a725.
+./drivers/lightnvm/rrpc.h:184: WARNING: Prefer 'unsigned int' to bare
+use of 'unsigned'
+./drivers/lightnvm/rrpc.h:209: WARNING: Prefer 'unsigned int' to bare
+use of 'unsigned'
+./drivers/lightnvm/rrpc.c:51: WARNING: Prefer 'unsigned int' to bare use
+of 'unsigned'
+
+Signed-off-by: Matias Bjørling <m@bjorling.me>
 ---
- block/blk-mq.c         | 33 ---------------------------------
- include/linux/blk-mq.h |  2 --
- 2 files changed, 35 deletions(-)
+ drivers/lightnvm/rrpc.c | 2 +-
+ drivers/lightnvm/rrpc.h | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 049356d..13f4603 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -267,39 +267,6 @@ struct request *blk_mq_alloc_request(struct request_queue *q, int rw,
+diff --git a/drivers/lightnvm/rrpc.c b/drivers/lightnvm/rrpc.c
+index 736e669..90c7cb4 100644
+--- a/drivers/lightnvm/rrpc.c
++++ b/drivers/lightnvm/rrpc.c
+@@ -48,7 +48,7 @@ static void rrpc_page_invalidate(struct rrpc *rrpc, struct rrpc_addr *a)
  }
- EXPORT_SYMBOL(blk_mq_alloc_request);
  
--struct request *blk_mq_alloc_request_hctx(struct request_queue *q, int rw,
--		unsigned int flags, unsigned int hctx_idx)
--{
--	struct blk_mq_hw_ctx *hctx;
--	struct blk_mq_ctx *ctx;
--	struct request *rq;
--	struct blk_mq_alloc_data alloc_data;
--	int ret;
--
--	ret = blk_queue_enter(q, flags & BLK_MQ_REQ_NOWAIT);
--	if (ret)
--		return ERR_PTR(ret);
--
--	hctx = q->queue_hw_ctx[hctx_idx];
--	ctx = __blk_mq_get_ctx(q, cpumask_first(hctx->cpumask));
--
--	blk_mq_set_alloc_data(&alloc_data, q, flags, ctx, hctx);
--
--	rq = __blk_mq_alloc_request(&alloc_data, rw);
--	if (!rq && !(flags & BLK_MQ_REQ_NOWAIT)) {
--		__blk_mq_run_hw_queue(hctx);
--
--		rq =  __blk_mq_alloc_request(&alloc_data, rw);
--	}
--	if (!rq) {
--		blk_queue_exit(q);
--		return ERR_PTR(-EWOULDBLOCK);
--	}
--
--	return rq;
--}
--EXPORT_SYMBOL(blk_mq_alloc_request_hctx);
--
- static void __blk_mq_free_request(struct blk_mq_hw_ctx *hctx,
- 				  struct blk_mq_ctx *ctx, struct request *rq)
+ static void rrpc_invalidate_range(struct rrpc *rrpc, sector_t slba,
+-								unsigned len)
++							unsigned int len)
  {
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 9a5d581..faa7d5c2 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -198,8 +198,6 @@ enum {
+ 	sector_t i;
  
- struct request *blk_mq_alloc_request(struct request_queue *q, int rw,
- 		unsigned int flags);
--struct request *blk_mq_alloc_request_hctx(struct request_queue *q, int rw,
--		unsigned int flags, unsigned int hctx_idx);
- struct request *blk_mq_tag_to_rq(struct blk_mq_tags *tags, unsigned int tag);
- struct cpumask *blk_mq_tags_cpumask(struct blk_mq_tags *tags);
+diff --git a/drivers/lightnvm/rrpc.h b/drivers/lightnvm/rrpc.h
+index 87e84b5..5797343 100644
+--- a/drivers/lightnvm/rrpc.h
++++ b/drivers/lightnvm/rrpc.h
+@@ -188,7 +188,7 @@ static inline int request_intersects(struct rrpc_inflight_rq *r,
+ }
  
+ static int __rrpc_lock_laddr(struct rrpc *rrpc, sector_t laddr,
+-			     unsigned pages, struct rrpc_inflight_rq *r)
++			     unsigned int pages, struct rrpc_inflight_rq *r)
+ {
+ 	sector_t laddr_end = laddr + pages - 1;
+ 	struct rrpc_inflight_rq *rtmp;
+@@ -213,7 +213,7 @@ static int __rrpc_lock_laddr(struct rrpc *rrpc, sector_t laddr,
+ }
+ 
+ static inline int rrpc_lock_laddr(struct rrpc *rrpc, sector_t laddr,
+-				 unsigned pages,
++				 unsigned int pages,
+ 				 struct rrpc_inflight_rq *r)
+ {
+ 	BUG_ON((laddr + pages) > rrpc->nr_sects);
 -- 
 2.1.4
+
