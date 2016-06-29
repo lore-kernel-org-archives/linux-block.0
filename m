@@ -1,46 +1,31 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.9]:57693 "EHLO
-	bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751898AbcFIOAo (ORCPT
-	<rfc822;linux-block@vger.kernel.org>); Thu, 9 Jun 2016 10:00:44 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@fb.com, mchristi@redhat.com
-Cc: linux-block@vger.kernel.org
-Subject: [PATCH 1/2] block: better packing for struct request
-Date: Thu,  9 Jun 2016 16:00:35 +0200
-Message-Id: <1465480836-32093-2-git-send-email-hch@lst.de>
-In-Reply-To: <1465480836-32093-1-git-send-email-hch@lst.de>
-References: <1465480836-32093-1-git-send-email-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <martin.petersen@oracle.com>
+To: "Darrick J. Wong" <darrick.wong@oracle.com>
+Cc: axboe@kernel.dk, hch@infradead.org, tytso@mit.edu,
+        martin.petersen@oracle.com, snitzer@redhat.com,
+        linux-api@vger.kernel.org, bfoster@redhat.com, xfs@oss.sgi.com,
+        linux-block@vger.kernel.org, dm-devel@redhat.com,
+        linux-fsdevel@vger.kernel.org, Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH 2/3] block: require write_same and discard requests align to logical block size
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <146612624734.12764.4316680863289411106.stgit@birch.djwong.org>
+	<146612626092.12764.773833541076937471.stgit@birch.djwong.org>
+Date: Wed, 29 Jun 2016 00:58:06 -0400
+In-Reply-To: <146612626092.12764.773833541076937471.stgit@birch.djwong.org>
+	(Darrick J. Wong's message of "Thu, 16 Jun 2016 18:17:41 -0700")
+Message-ID: <yq1oa6ksiap.fsf@sermon.lab.mkp.net>
+MIME-Version: 1.0
+Content-Type: text/plain
+List-ID: <linux-block@vger.kernel.org>
 
-Keep the 32-bit CPU and cmd_type flags together to avoid holes on 64-bit
-architectures.
+>>>>> "Darrick" == Darrick J Wong <darrick.wong@oracle.com> writes:
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- include/linux/blkdev.h | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+Darrick> Make sure that the offset and length arguments that we're using
+Darrick> to construct WRITE SAME and DISCARD requests are actually
+Darrick> aligned to the logical block size.  Failure to do this causes
+Darrick> other errors in other parts of the block layer or the SCSI
+Darrick> layer because disks don't support partial logical block writes.
 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 0c9f879..9746d22 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -96,12 +96,11 @@ struct request {
- 	struct request_queue *q;
- 	struct blk_mq_ctx *mq_ctx;
- 
--	u64 cmd_flags;
-+	int cpu;
- 	unsigned cmd_type;
-+	u64 cmd_flags;
- 	unsigned long atomic_flags;
- 
--	int cpu;
--
- 	/* the following two fields are internal, NEVER access directly */
- 	unsigned int __data_len;	/* total data len */
- 	sector_t __sector;		/* sector cursor */
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+
 -- 
-2.1.4
-
+Martin K. Petersen	Oracle Linux Engineering
