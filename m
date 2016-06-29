@@ -1,41 +1,28 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.9]:37777 "EHLO
-	bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751392AbcFNT7L (ORCPT
-	<rfc822;linux-block@vger.kernel.org>);
-	Tue, 14 Jun 2016 15:59:11 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: tglx@linutronix.de, axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
-	linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: automatic interrupt affinity for MSI/MSI-X capable devices V2
-Date: Tue, 14 Jun 2016 21:58:53 +0200
-Message-Id: <1465934346-20648-1-git-send-email-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <martin.petersen@oracle.com>
+To: "Darrick J. Wong" <darrick.wong@oracle.com>
+Cc: axboe@kernel.dk, hch@infradead.org, tytso@mit.edu,
+        martin.petersen@oracle.com, snitzer@redhat.com,
+        linux-api@vger.kernel.org, bfoster@redhat.com, xfs@oss.sgi.com,
+        linux-block@vger.kernel.org, dm-devel@redhat.com,
+        linux-fsdevel@vger.kernel.org, Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH 1/3] block: invalidate the page cache when issuing BLKZEROOUT.
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <146612624734.12764.4316680863289411106.stgit@birch.djwong.org>
+	<146612625412.12764.6647932282740152837.stgit@birch.djwong.org>
+Date: Wed, 29 Jun 2016 00:57:27 -0400
+In-Reply-To: <146612625412.12764.6647932282740152837.stgit@birch.djwong.org>
+	(Darrick J. Wong's message of "Thu, 16 Jun 2016 18:17:34 -0700")
+Message-ID: <yq1shvwsibs.fsf@sermon.lab.mkp.net>
+MIME-Version: 1.0
+Content-Type: text/plain
+List-ID: <linux-block@vger.kernel.org>
 
-This series enhances the irq and PCI code to allow spreading around MSI and
-MSI-X vectors so that they have per-cpu affinity if possible, or at least
-per-node.  For that it takes the algorithm from blk-mq, moves it to
-a common place, and makes it available through a vastly simplified PCI
-interrupt allocation API.  It then switches blk-mq to be able to pick up
-the queue mapping from the device if available, and demonstrates all this
-using the NVMe driver.
+>>>>> "Darrick" == Darrick J Wong <darrick.wong@oracle.com> writes:
 
-There also is a git tree available at:
+Darrick> Invalidate the page cache (as a regular O_DIRECT write would
+Darrick> do) to avoid returning stale cache contents at a later time.
 
-   git://git.infradead.org/users/hch/block.git
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
 
-Gitweb:
-
-   http://git.infradead.org/users/hch/block.git/shortlog/refs/heads/msix-spreading.4
-
-Changes since V1:
- - irq core improvements to properly assign the affinity before
-   request_irq (tglx)
- - better handling of the MSI vs MSI-X differences in the low level
-   MSI allocator (hch and tglx)
- - various improvements to pci_alloc_irq_vectors (hch)
- - remove blk-mq hardware queue reassigned on hotplug cpu events (hch)
- - forward ported to Jens' current for-next tree (hch)
-
+-- 
+Martin K. Petersen	Oracle Linux Engineering
