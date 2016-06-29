@@ -1,165 +1,101 @@
-Return-Path: <darrick.wong@oracle.com>
-Subject: [PATCH 3/3] block: implement (some of) fallocate for block devices
-From: "Darrick J. Wong" <darrick.wong@oracle.com>
-To: axboe@kernel.dk, darrick.wong@oracle.com
-Cc: linux-block@vger.kernel.org, tytso@mit.edu, martin.petersen@oracle.com,
-        snitzer@redhat.com, linux-api@vger.kernel.org, bfoster@redhat.com,
-        xfs@oss.sgi.com, hch@infradead.org, dm-devel@redhat.com,
-        linux-fsdevel@vger.kernel.org
-Date: Thu, 16 Jun 2016 18:17:47 -0700
-Message-ID: <146612626773.12764.9800994140955661542.stgit@birch.djwong.org>
-In-Reply-To: <146612624734.12764.4316680863289411106.stgit@birch.djwong.org>
-References: <146612624734.12764.4316680863289411106.stgit@birch.djwong.org>
+Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, axboe@fb.com,
+ keith.busch@intel.com, linux-nvme@lists.infradead.org, dm-devel@redhat.com
+Subject: [PATCH 2/6] null_blk: refactor to support non-gendisk devices
+Date: Wed, 29 Jun 2016 16:51:37 +0200
+Message-Id: <1467211901-26707-3-git-send-email-m@bjorling.me>
+In-Reply-To: <1467211901-26707-1-git-send-email-m@bjorling.me>
+References: <1467211901-26707-1-git-send-email-m@bjorling.me>
 MIME-Version: 1.0
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
+List-Post: <mailto:linux-nvme@lists.infradead.org>
+List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
+Cc: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
 Content-Type: text/plain; charset="utf-8"
+Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
+Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
 List-ID: <linux-block@vger.kernel.org>
 
-After much discussion, it seems that the fallocate feature flag
-FALLOC_FL_ZERO_RANGE maps nicely to SCSI WRITE SAME; and the feature
-FALLOC_FL_PUNCH_HOLE maps nicely to the devices that have been
-whitelisted for zeroing SCSI UNMAP.  Punch still requires that
-FALLOC_FL_KEEP_SIZE is set.  A length that goes past the end of the
-device will be clamped to the device size if KEEP_SIZE is set; or will
-return -EINVAL if not.  Both start and length must be aligned to the
-device's logical block size.
-
-Since the semantics of fallocate are fairly well established already,
-wire up the two pieces.  The other fallocate variants (collapse range,
-insert range, and allocate blocks) are not supported.
-
-v2: Incorporate feedback from Christoph & Linus.  Tentatively add
-a requirement that the fallocate arguments be aligned to logical block
-size, and put in a few XXX comments ahead of LSF discussion.
-
-v3: Forward port to 4.7.
-
-Signed-off-by: Darrick J. Wong <darrick.wong@oracle.com>
----
- fs/block_dev.c |   84 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- fs/open.c      |    3 +-
- 2 files changed, 86 insertions(+), 1 deletion(-)
-
-
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 71ccab1..a3975c4 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -30,6 +30,7 @@
- #include <linux/cleancache.h>
- #include <linux/dax.h>
- #include <linux/badblocks.h>
-+#include <linux/falloc.h>
- #include <asm/uaccess.h>
- #include "internal.h"
- 
-@@ -1802,6 +1803,88 @@ static const struct address_space_operations def_blk_aops = {
- 	.is_dirty_writeback = buffer_check_dirty_writeback,
- };
- 
-+#define	BLKDEV_FALLOC_FL_SUPPORTED					\
-+		(FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE |		\
-+		 FALLOC_FL_ZERO_RANGE | FALLOC_FL_NO_HIDE_STALE)
-+
-+static long blkdev_fallocate(struct file *file, int mode, loff_t start,
-+			     loff_t len)
-+{
-+	struct block_device *bdev = I_BDEV(bdev_file_inode(file));
-+	struct request_queue *q = bdev_get_queue(bdev);
-+	struct address_space *mapping;
-+	loff_t end = start + len - 1;
-+	loff_t isize;
-+	int error;
-+
-+	/* Fail if we don't recognize the flags. */
-+	if (mode & ~BLKDEV_FALLOC_FL_SUPPORTED)
-+		return -EOPNOTSUPP;
-+
-+	/* Don't go off the end of the device. */
-+	isize = i_size_read(bdev->bd_inode);
-+	if (start >= isize)
-+		return -EINVAL;
-+	if (end > isize) {
-+		if (mode & FALLOC_FL_KEEP_SIZE) {
-+			len = isize - start;
-+			end = start + len - 1;
-+		} else
-+			return -EINVAL;
-+	}
-+
-+	/*
-+	 * Don't allow IO that isn't aligned to logical block size.
-+	 */
-+	if ((start | len) & (bdev_logical_block_size(bdev) - 1))
-+		return -EINVAL;
-+
-+	/* Invalidate the page cache, including dirty pages. */
-+	mapping = bdev->bd_inode->i_mapping;
-+	truncate_inode_pages_range(mapping, start, end);
-+
-+	switch (mode) {
-+	case FALLOC_FL_ZERO_RANGE:
-+	case FALLOC_FL_ZERO_RANGE | FALLOC_FL_KEEP_SIZE:
-+		error = blkdev_issue_zeroout(bdev, start >> 9, len >> 9,
-+					    GFP_KERNEL, false);
-+		if (error)
-+			return error;
-+		break;
-+	case FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE:
-+		/* Only punch if the device can do zeroing discard. */
-+		if (!blk_queue_discard(q) || !q->limits.discard_zeroes_data)
-+			return -EOPNOTSUPP;
-+		error = blkdev_issue_discard(bdev, start >> 9, len >> 9,
-+					     GFP_KERNEL, 0);
-+		if (error)
-+			return error;
-+		break;
-+	case FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE | FALLOC_FL_NO_HIDE_STALE:
-+		/*
-+		 * XXX: a well known search engine vendor interprets this
-+		 * flag (in other circumstances) to mean "I don't care if
-+		 * we can read stale contents later".  Is it appropriate
-+		 * to wire this up to the non-zeroing discard?
-+		 */
-+		error = blkdev_issue_discard(bdev, start >> 9, len >> 9,
-+					     GFP_KERNEL, 0);
-+		if (error)
-+			return error;
-+		break;
-+	default:
-+		return -EOPNOTSUPP;
-+	}
-+
-+	/*
-+	 * Invalidate again; if someone wandered in and dirtied a page,
-+	 * the caller will be given -EBUSY;
-+	 */
-+	return invalidate_inode_pages2_range(mapping,
-+					     start >> PAGE_SHIFT,
-+					     end >> PAGE_SHIFT);
-+}
-+
- const struct file_operations def_blk_fops = {
- 	.open		= blkdev_open,
- 	.release	= blkdev_close,
-@@ -1816,6 +1899,7 @@ const struct file_operations def_blk_fops = {
- #endif
- 	.splice_read	= generic_file_splice_read,
- 	.splice_write	= iter_file_splice_write,
-+	.fallocate	= blkdev_fallocate,
- };
- 
- int ioctl_by_bdev(struct block_device *bdev, unsigned cmd, unsigned long arg)
-diff --git a/fs/open.c b/fs/open.c
-index 93ae3cd..b2dbda4 100644
---- a/fs/open.c
-+++ b/fs/open.c
-@@ -289,7 +289,8 @@ int vfs_fallocate(struct file *file, int mode, loff_t offset, loff_t len)
- 	 * Let individual file system decide if it supports preallocation
- 	 * for directories or not.
- 	 */
--	if (!S_ISREG(inode->i_mode) && !S_ISDIR(inode->i_mode))
-+	if (!S_ISREG(inode->i_mode) && !S_ISDIR(inode->i_mode) &&
-+	    !S_ISBLK(inode->i_mode))
- 		return -ENODEV;
- 
- 	/* Check for wrap through zero too */
+V2l0aCBMaWdodE5WTSBlbmFibGVkIGRldmljZXMsIHRoZSBnZW5kaXNrIHN0cnVjdHVyZSBpcyBu
+b3QgZXhwb3NlZAp0byB0aGUgdXNlci4gVGhpcyBoaWRlcyB0aGUgZGV2aWNlIGRyaXZlciBzcGVj
+aWZpYyBzeXNmcyBlbnRyaWVzLCBhbmQKcHJldmVudHMgYmluZGluZyBvZiBMaWdodE5WTSBnZW9t
+ZXRyeSBpbmZvcm1hdGlvbiB0byB0aGUgZGV2aWNlLgoKUmVmYWN0b3IgdGhlIGRldmljZSByZWdp
+c3RyYXRpb24gcHJvY2Vzcywgc28gdGhhdCBnZW5kaXNrIGFuZApub24tZ2VuZGlzayBkZXZpY2Vz
+IGFyZSBlYXNpbHkgbWFuYWdlZC4KClNpZ25lZC1vZmYtYnk6IE1hdGlhcyBCasO4cmxpbmcgPG1A
+YmpvcmxpbmcubWU+Ci0tLQogZHJpdmVycy9ibG9jay9udWxsX2Jsay5jIHwgMTEwICsrKysrKysr
+KysrKysrKysrKysrKysrKysrLS0tLS0tLS0tLS0tLS0tLS0tLS0tCiAxIGZpbGUgY2hhbmdlZCwg
+NjEgaW5zZXJ0aW9ucygrKSwgNDkgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvZHJpdmVycy9i
+bG9jay9udWxsX2Jsay5jIGIvZHJpdmVycy9ibG9jay9udWxsX2Jsay5jCmluZGV4IGNhYjk3NTku
+LjMxMTdkZjEgMTAwNjQ0Ci0tLSBhL2RyaXZlcnMvYmxvY2svbnVsbF9ibGsuYworKysgYi9kcml2
+ZXJzL2Jsb2NrL251bGxfYmxrLmMKQEAgLTQxNCwyMyArNDE0LDYgQEAgc3RhdGljIHZvaWQgY2xl
+YW51cF9xdWV1ZXMoc3RydWN0IG51bGxiICpudWxsYikKIAlrZnJlZShudWxsYi0+cXVldWVzKTsK
+IH0KIAotc3RhdGljIHZvaWQgbnVsbF9kZWxfZGV2KHN0cnVjdCBudWxsYiAqbnVsbGIpCi17Ci0J
+bGlzdF9kZWxfaW5pdCgmbnVsbGItPmxpc3QpOwotCi0JaWYgKHVzZV9saWdodG52bSkKLQkJbnZt
+X3VucmVnaXN0ZXIobnVsbGItPmRpc2tfbmFtZSk7Ci0JZWxzZQotCQlkZWxfZ2VuZGlzayhudWxs
+Yi0+ZGlzayk7Ci0JYmxrX2NsZWFudXBfcXVldWUobnVsbGItPnEpOwotCWlmIChxdWV1ZV9tb2Rl
+ID09IE5VTExfUV9NUSkKLQkJYmxrX21xX2ZyZWVfdGFnX3NldCgmbnVsbGItPnRhZ19zZXQpOwot
+CWlmICghdXNlX2xpZ2h0bnZtKQotCQlwdXRfZGlzayhudWxsYi0+ZGlzayk7Ci0JY2xlYW51cF9x
+dWV1ZXMobnVsbGIpOwotCWtmcmVlKG51bGxiKTsKLX0KLQogI2lmZGVmIENPTkZJR19OVk0KIAog
+c3RhdGljIHZvaWQgbnVsbF9sbnZtX2VuZF9pbyhzdHJ1Y3QgcmVxdWVzdCAqcnEsIGludCBlcnJv
+cikKQEAgLTU2NCwxMCArNTQ3LDQxIEBAIHN0YXRpYyBzdHJ1Y3QgbnZtX2Rldl9vcHMgbnVsbF9s
+bnZtX2Rldl9vcHMgPSB7CiAJLyogU2ltdWxhdGUgbnZtZSBwcm90b2NvbCByZXN0cmljdGlvbiAq
+LwogCS5tYXhfcGh5c19zZWN0CQk9IDY0LAogfTsKKworc3RhdGljIGludCBudWxsX252bV9yZWdp
+c3RlcihzdHJ1Y3QgbnVsbGIgKm51bGxiKQoreworCXJldHVybiBudm1fcmVnaXN0ZXIobnVsbGIt
+PnEsIG51bGxiLT5kaXNrX25hbWUsICZudWxsX2xudm1fZGV2X29wcyk7Cit9CisKK3N0YXRpYyB2
+b2lkIG51bGxfbnZtX3VucmVnaXN0ZXIoc3RydWN0IG51bGxiICpudWxsYikKK3sKKwludm1fdW5y
+ZWdpc3RlcihudWxsYi0+ZGlza19uYW1lKTsKK30KICNlbHNlCi1zdGF0aWMgc3RydWN0IG52bV9k
+ZXZfb3BzIG51bGxfbG52bV9kZXZfb3BzOworc3RhdGljIGludCBudWxsX252bV9yZWdpc3Rlcihz
+dHJ1Y3QgbnVsbGIgKm51bGxiKQoreworCXJldHVybiAtRUlOVkFMOworfQorc3RhdGljIHZvaWQg
+bnVsbF9udm1fdW5yZWdpc3RlcihzdHJ1Y3QgbnVsbGIgKm51bGxiKSB7fQogI2VuZGlmIC8qIENP
+TkZJR19OVk0gKi8KIAorc3RhdGljIHZvaWQgbnVsbF9kZWxfZGV2KHN0cnVjdCBudWxsYiAqbnVs
+bGIpCit7CisJbGlzdF9kZWxfaW5pdCgmbnVsbGItPmxpc3QpOworCisJaWYgKHVzZV9saWdodG52
+bSkKKwkJbnVsbF9udm1fdW5yZWdpc3RlcihudWxsYik7CisJZWxzZQorCQlkZWxfZ2VuZGlzayhu
+dWxsYi0+ZGlzayk7CisJYmxrX2NsZWFudXBfcXVldWUobnVsbGItPnEpOworCWlmIChxdWV1ZV9t
+b2RlID09IE5VTExfUV9NUSkKKwkJYmxrX21xX2ZyZWVfdGFnX3NldCgmbnVsbGItPnRhZ19zZXQp
+OworCWlmICghdXNlX2xpZ2h0bnZtKQorCQlwdXRfZGlzayhudWxsYi0+ZGlzayk7CisJY2xlYW51
+cF9xdWV1ZXMobnVsbGIpOworCWtmcmVlKG51bGxiKTsKK30KKwogc3RhdGljIGludCBudWxsX29w
+ZW4oc3RydWN0IGJsb2NrX2RldmljZSAqYmRldiwgZm1vZGVfdCBtb2RlKQogewogCXJldHVybiAw
+OwpAQCAtNjQwLDExICs2NTQsMzIgQEAgc3RhdGljIGludCBpbml0X2RyaXZlcl9xdWV1ZXMoc3Ry
+dWN0IG51bGxiICpudWxsYikKIAlyZXR1cm4gMDsKIH0KIAotc3RhdGljIGludCBudWxsX2FkZF9k
+ZXYodm9pZCkKK3N0YXRpYyBpbnQgbnVsbF9nZW5kaXNrX3JlZ2lzdGVyKHN0cnVjdCBudWxsYiAq
+bnVsbGIpCiB7CiAJc3RydWN0IGdlbmRpc2sgKmRpc2s7Ci0Jc3RydWN0IG51bGxiICpudWxsYjsK
+IAlzZWN0b3JfdCBzaXplOworCisJZGlzayA9IG51bGxiLT5kaXNrID0gYWxsb2NfZGlza19ub2Rl
+KDEsIGhvbWVfbm9kZSk7CisJaWYgKCFkaXNrKQorCQlyZXR1cm4gLUVOT01FTTsKKwlzaXplID0g
+Z2IgKiAxMDI0ICogMTAyNCAqIDEwMjRVTEw7CisJc2V0X2NhcGFjaXR5KGRpc2ssIHNpemUgPj4g
+OSk7CisKKwlkaXNrLT5mbGFncyB8PSBHRU5IRF9GTF9FWFRfREVWVCB8IEdFTkhEX0ZMX1NVUFBS
+RVNTX1BBUlRJVElPTl9JTkZPOworCWRpc2stPm1ham9yCQk9IG51bGxfbWFqb3I7CisJZGlzay0+
+Zmlyc3RfbWlub3IJPSBudWxsYi0+aW5kZXg7CisJZGlzay0+Zm9wcwkJPSAmbnVsbF9mb3BzOwor
+CWRpc2stPnByaXZhdGVfZGF0YQk9IG51bGxiOworCWRpc2stPnF1ZXVlCQk9IG51bGxiLT5xOwor
+CXN0cm5jcHkoZGlzay0+ZGlza19uYW1lLCBudWxsYi0+ZGlza19uYW1lLCBESVNLX05BTUVfTEVO
+KTsKKworCWFkZF9kaXNrKGRpc2spOworCXJldHVybiAwOworfQorCitzdGF0aWMgaW50IG51bGxf
+YWRkX2Rldih2b2lkKQoreworCXN0cnVjdCBudWxsYiAqbnVsbGI7CiAJaW50IHJ2OwogCiAJbnVs
+bGIgPSBremFsbG9jX25vZGUoc2l6ZW9mKCpudWxsYiksIEdGUF9LRVJORUwsIGhvbWVfbm9kZSk7
+CkBAIC03MTYsNDIgKzc1MSwxOSBAQCBzdGF0aWMgaW50IG51bGxfYWRkX2Rldih2b2lkKQogCiAJ
+c3ByaW50ZihudWxsYi0+ZGlza19uYW1lLCAibnVsbGIlZCIsIG51bGxiLT5pbmRleCk7CiAKLQlp
+ZiAodXNlX2xpZ2h0bnZtKSB7Ci0JCXJ2ID0gbnZtX3JlZ2lzdGVyKG51bGxiLT5xLCBudWxsYi0+
+ZGlza19uYW1lLAotCQkJCQkJCSZudWxsX2xudm1fZGV2X29wcyk7Ci0JCWlmIChydikKLQkJCWdv
+dG8gb3V0X2NsZWFudXBfYmxrX3F1ZXVlOwotCQlnb3RvIGRvbmU7Ci0JfQorCWlmICh1c2VfbGln
+aHRudm0pCisJCXJ2ID0gbnVsbF9udm1fcmVnaXN0ZXIobnVsbGIpOworCWVsc2UKKwkJcnYgPSBu
+dWxsX2dlbmRpc2tfcmVnaXN0ZXIobnVsbGIpOwogCi0JZGlzayA9IG51bGxiLT5kaXNrID0gYWxs
+b2NfZGlza19ub2RlKDEsIGhvbWVfbm9kZSk7Ci0JaWYgKCFkaXNrKSB7Ci0JCXJ2ID0gLUVOT01F
+TTsKLQkJZ290byBvdXRfY2xlYW51cF9saWdodG52bTsKLQl9Ci0Jc2l6ZSA9IGdiICogMTAyNCAq
+IDEwMjQgKiAxMDI0VUxMOwotCXNldF9jYXBhY2l0eShkaXNrLCBzaXplID4+IDkpOworCWlmIChy
+dikKKwkJZ290byBvdXRfY2xlYW51cF9ibGtfcXVldWU7CiAKLQlkaXNrLT5mbGFncyB8PSBHRU5I
+RF9GTF9FWFRfREVWVCB8IEdFTkhEX0ZMX1NVUFBSRVNTX1BBUlRJVElPTl9JTkZPOwotCWRpc2st
+Pm1ham9yCQk9IG51bGxfbWFqb3I7Ci0JZGlzay0+Zmlyc3RfbWlub3IJPSBudWxsYi0+aW5kZXg7
+Ci0JZGlzay0+Zm9wcwkJPSAmbnVsbF9mb3BzOwotCWRpc2stPnByaXZhdGVfZGF0YQk9IG51bGxi
+OwotCWRpc2stPnF1ZXVlCQk9IG51bGxiLT5xOwotCXN0cm5jcHkoZGlzay0+ZGlza19uYW1lLCBu
+dWxsYi0+ZGlza19uYW1lLCBESVNLX05BTUVfTEVOKTsKLQotCWFkZF9kaXNrKGRpc2spOwotCi1k
+b25lOgogCW11dGV4X2xvY2soJmxvY2spOwogCWxpc3RfYWRkX3RhaWwoJm51bGxiLT5saXN0LCAm
+bnVsbGJfbGlzdCk7CiAJbXV0ZXhfdW5sb2NrKCZsb2NrKTsKIAogCXJldHVybiAwOwotCi1vdXRf
+Y2xlYW51cF9saWdodG52bToKLQlpZiAodXNlX2xpZ2h0bnZtKQotCQludm1fdW5yZWdpc3Rlcihu
+dWxsYi0+ZGlza19uYW1lKTsKIG91dF9jbGVhbnVwX2Jsa19xdWV1ZToKIAlibGtfY2xlYW51cF9x
+dWV1ZShudWxsYi0+cSk7CiBvdXRfY2xlYW51cF90YWdzOgotLSAKMi4xLjQKCgpfX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpMaW51eC1udm1lIG1haWxpbmcg
+bGlzdApMaW51eC1udm1lQGxpc3RzLmluZnJhZGVhZC5vcmcKaHR0cDovL2xpc3RzLmluZnJhZGVh
+ZC5vcmcvbWFpbG1hbi9saXN0aW5mby9saW51eC1udm1lCg==
