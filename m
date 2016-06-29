@@ -1,833 +1,213 @@
-Return-Path: <BATV+b9eeede57ded57779fe4+4685+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk,
-	keith.busch@intel.com
-Cc: linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	Jay Freyensee <james.p.freyensee@intel.com>,
-	Ming Lin <ming.l@ssi.samsung.com>,
-	Sagi Grimberg <sagi@grimberg.me>
-Subject: [PATCH 3/3] nvme-loop: add a NVMe loopback host driver
-Date: Tue, 21 Jun 2016 18:04:21 +0200
-Message-Id: <1466525061-3686-4-git-send-email-hch@lst.de>
-In-Reply-To: <1466525061-3686-1-git-send-email-hch@lst.de>
-References: <1466525061-3686-1-git-send-email-hch@lst.de>
+Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, axboe@fb.com,
+ keith.busch@intel.com, linux-nvme@lists.infradead.org, dm-devel@redhat.com
+Subject: [PATCH 4/6] lightnvm: let drivers control the lifetime of nvm_dev
+Date: Wed, 29 Jun 2016 16:51:39 +0200
+Message-Id: <1467211901-26707-5-git-send-email-m@bjorling.me>
+In-Reply-To: <1467211901-26707-1-git-send-email-m@bjorling.me>
+References: <1467211901-26707-1-git-send-email-m@bjorling.me>
+MIME-Version: 1.0
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
+List-Post: <mailto:linux-nvme@lists.infradead.org>
+List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
+Cc: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+Content-Type: text/plain; charset="utf-8"
+Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
+Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
 List-ID: <linux-block@vger.kernel.org>
 
-This patch implements adds nvme-loop which allows to access local devices
-exported as NVMe over Fabrics namespaces. This module can be useful for
-easy evaluation, testing and also feature experimentation.
-
-To createa nvme-loop device you need to configure the NVMe target to
-export a loop port (see the nvmetcli documentaton for that) and then
-connect to it using
-
-	nvme connect-all -t loop
-
-which requires the very latest nvme-cli version with Fabrics support.
-
-Signed-off-by: Jay Freyensee <james.p.freyensee@intel.com>
-Signed-off-by: Ming Lin <ming.l@ssi.samsung.com>
-Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/nvme/target/Kconfig  |  10 +
- drivers/nvme/target/Makefile |   2 +
- drivers/nvme/target/loop.c   | 754 +++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 766 insertions(+)
- create mode 100644 drivers/nvme/target/loop.c
-
-diff --git a/drivers/nvme/target/Kconfig b/drivers/nvme/target/Kconfig
-index acf0c07..b77ce43 100644
---- a/drivers/nvme/target/Kconfig
-+++ b/drivers/nvme/target/Kconfig
-@@ -13,4 +13,14 @@ config NVME_TARGET
- 	  To configure the NVMe target you probably want to use the nvmetcli
- 	  tool from http://git.infradead.org/users/hch/nvmetcli.git.
- 
-+config NVME_TARGET_LOOP
-+	tristate "NVMe loopback device support"
-+	depends on BLK_DEV_NVME
-+	select NVME_TARGET
-+	select NVME_FABRICS
-+	select SG_POOL
-+	help
-+	  This enables the NVMe loopback device support, which can be useful
-+	  to test NVMe host and target side features.
-+
- 	  If unsure, say N.
-diff --git a/drivers/nvme/target/Makefile b/drivers/nvme/target/Makefile
-index b4600b6..e49ba60 100644
---- a/drivers/nvme/target/Makefile
-+++ b/drivers/nvme/target/Makefile
-@@ -1,5 +1,7 @@
- 
- obj-$(CONFIG_NVME_TARGET)		+= nvmet.o
-+obj-$(CONFIG_NVME_TARGET_LOOP)		+= nvme-loop.o
- 
- nvmet-y		+= core.o configfs.o admin-cmd.o io-cmd.o fabrics-cmd.o \
- 			discovery.o
-+nvme-loop-y	+= loop.o
-diff --git a/drivers/nvme/target/loop.c b/drivers/nvme/target/loop.c
-new file mode 100644
-index 0000000..94e7829
---- /dev/null
-+++ b/drivers/nvme/target/loop.c
-@@ -0,0 +1,754 @@
-+/*
-+ * NVMe over Fabrics loopback device.
-+ * Copyright (c) 2015-2016 HGST, a Western Digital Company.
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-+ * more details.
-+ */
-+#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
-+#include <linux/scatterlist.h>
-+#include <linux/delay.h>
-+#include <linux/blk-mq.h>
-+#include <linux/nvme.h>
-+#include <linux/module.h>
-+#include <linux/parser.h>
-+#include <linux/t10-pi.h>
-+#include "nvmet.h"
-+#include "../host/nvme.h"
-+#include "../host/fabrics.h"
-+
-+#define NVME_LOOP_AQ_DEPTH		256
-+
-+#define NVME_LOOP_MAX_SEGMENTS		256
-+
-+/*
-+ * We handle AEN commands ourselves and don't even let the
-+ * block layer know about them.
-+ */
-+#define NVME_LOOP_NR_AEN_COMMANDS	1
-+#define NVME_LOOP_AQ_BLKMQ_DEPTH	\
-+	(NVME_LOOP_AQ_DEPTH - NVME_LOOP_NR_AEN_COMMANDS)
-+
-+struct nvme_loop_iod {
-+	struct nvme_command	cmd;
-+	struct nvme_completion	rsp;
-+	struct nvmet_req	req;
-+	struct nvme_loop_queue	*queue;
-+	struct work_struct	work;
-+	struct sg_table		sg_table;
-+	struct scatterlist	first_sgl[];
-+};
-+
-+struct nvme_loop_ctrl {
-+	spinlock_t		lock;
-+	struct nvme_loop_queue	*queues;
-+	u32			queue_count;
-+
-+	struct blk_mq_tag_set	admin_tag_set;
-+
-+	struct list_head	list;
-+	u64			cap;
-+	struct blk_mq_tag_set	tag_set;
-+	struct nvme_loop_iod	async_event_iod;
-+	struct nvme_ctrl	ctrl;
-+
-+	struct nvmet_ctrl	*target_ctrl;
-+	struct work_struct	delete_work;
-+	struct work_struct	reset_work;
-+};
-+
-+static inline struct nvme_loop_ctrl *to_loop_ctrl(struct nvme_ctrl *ctrl)
-+{
-+	return container_of(ctrl, struct nvme_loop_ctrl, ctrl);
-+}
-+
-+struct nvme_loop_queue {
-+	struct nvmet_cq		nvme_cq;
-+	struct nvmet_sq		nvme_sq;
-+	struct nvme_loop_ctrl	*ctrl;
-+};
-+
-+static struct nvmet_port *nvmet_loop_port;
-+
-+static LIST_HEAD(nvme_loop_ctrl_list);
-+static DEFINE_MUTEX(nvme_loop_ctrl_mutex);
-+
-+static void nvme_loop_queue_response(struct nvmet_req *nvme_req);
-+static void nvme_loop_delete_ctrl(struct nvmet_ctrl *ctrl);
-+
-+static struct nvmet_fabrics_ops nvme_loop_ops;
-+
-+static inline int nvme_loop_queue_idx(struct nvme_loop_queue *queue)
-+{
-+	return queue - queue->ctrl->queues;
-+}
-+
-+static void nvme_loop_complete_rq(struct request *req)
-+{
-+	struct nvme_loop_iod *iod = blk_mq_rq_to_pdu(req);
-+	int error = 0;
-+
-+	nvme_cleanup_cmd(req);
-+	sg_free_table_chained(&iod->sg_table, true);
-+
-+	if (unlikely(req->errors)) {
-+		if (nvme_req_needs_retry(req, req->errors)) {
-+			nvme_requeue_req(req);
-+			return;
-+		}
-+
-+		if (req->cmd_type == REQ_TYPE_DRV_PRIV)
-+			error = req->errors;
-+		else
-+			error = nvme_error_status(req->errors);
-+	}
-+
-+	blk_mq_end_request(req, error);
-+}
-+
-+static void nvme_loop_queue_response(struct nvmet_req *nvme_req)
-+{
-+	struct nvme_loop_iod *iod =
-+		container_of(nvme_req, struct nvme_loop_iod, req);
-+	struct nvme_completion *cqe = &iod->rsp;
-+
-+	/*
-+	 * AEN requests are special as they don't time out and can
-+	 * survive any kind of queue freeze and often don't respond to
-+	 * aborts.  We don't even bother to allocate a struct request
-+	 * for them but rather special case them here.
-+	 */
-+	if (unlikely(nvme_loop_queue_idx(iod->queue) == 0 &&
-+			cqe->command_id >= NVME_LOOP_AQ_BLKMQ_DEPTH)) {
-+		nvme_complete_async_event(&iod->queue->ctrl->ctrl, cqe);
-+	} else {
-+		struct request *req = blk_mq_rq_from_pdu(iod);
-+
-+		if (req->cmd_type == REQ_TYPE_DRV_PRIV && req->special)
-+			memcpy(req->special, cqe, sizeof(*cqe));
-+		blk_mq_complete_request(req, le16_to_cpu(cqe->status) >> 1);
-+	}
-+}
-+
-+static void nvme_loop_execute_work(struct work_struct *work)
-+{
-+	struct nvme_loop_iod *iod =
-+		container_of(work, struct nvme_loop_iod, work);
-+
-+	iod->req.execute(&iod->req);
-+}
-+
-+static enum blk_eh_timer_return
-+nvme_loop_timeout(struct request *rq, bool reserved)
-+{
-+	struct nvme_loop_iod *iod = blk_mq_rq_to_pdu(rq);
-+
-+	/* queue error recovery */
-+	schedule_work(&iod->queue->ctrl->reset_work);
-+
-+	/* fail with DNR on admin cmd timeout */
-+	rq->errors = NVME_SC_ABORT_REQ | NVME_SC_DNR;
-+
-+	return BLK_EH_HANDLED;
-+}
-+
-+static int nvme_loop_queue_rq(struct blk_mq_hw_ctx *hctx,
-+		const struct blk_mq_queue_data *bd)
-+{
-+	struct nvme_ns *ns = hctx->queue->queuedata;
-+	struct nvme_loop_queue *queue = hctx->driver_data;
-+	struct request *req = bd->rq;
-+	struct nvme_loop_iod *iod = blk_mq_rq_to_pdu(req);
-+	int ret;
-+
-+	ret = nvme_setup_cmd(ns, req, &iod->cmd);
-+	if (ret)
-+		return ret;
-+
-+	iod->cmd.common.flags |= NVME_CMD_SGL_METABUF;
-+	iod->req.port = nvmet_loop_port;
-+	if (!nvmet_req_init(&iod->req, &queue->nvme_cq,
-+			&queue->nvme_sq, &nvme_loop_ops)) {
-+		nvme_cleanup_cmd(req);
-+		blk_mq_start_request(req);
-+		nvme_loop_queue_response(&iod->req);
-+		return 0;
-+	}
-+
-+	if (blk_rq_bytes(req)) {
-+		iod->sg_table.sgl = iod->first_sgl;
-+		ret = sg_alloc_table_chained(&iod->sg_table,
-+			req->nr_phys_segments, iod->sg_table.sgl);
-+		if (ret)
-+			return BLK_MQ_RQ_QUEUE_BUSY;
-+
-+		iod->req.sg = iod->sg_table.sgl;
-+		iod->req.sg_cnt = blk_rq_map_sg(req->q, req, iod->sg_table.sgl);
-+		BUG_ON(iod->req.sg_cnt > req->nr_phys_segments);
-+	}
-+
-+	iod->cmd.common.command_id = req->tag;
-+	blk_mq_start_request(req);
-+
-+	schedule_work(&iod->work);
-+	return 0;
-+}
-+
-+static void nvme_loop_submit_async_event(struct nvme_ctrl *arg, int aer_idx)
-+{
-+	struct nvme_loop_ctrl *ctrl = to_loop_ctrl(arg);
-+	struct nvme_loop_queue *queue = &ctrl->queues[0];
-+	struct nvme_loop_iod *iod = &ctrl->async_event_iod;
-+
-+	memset(&iod->cmd, 0, sizeof(iod->cmd));
-+	iod->cmd.common.opcode = nvme_admin_async_event;
-+	iod->cmd.common.command_id = NVME_LOOP_AQ_BLKMQ_DEPTH;
-+	iod->cmd.common.flags |= NVME_CMD_SGL_METABUF;
-+
-+	if (!nvmet_req_init(&iod->req, &queue->nvme_cq, &queue->nvme_sq,
-+			&nvme_loop_ops)) {
-+		dev_err(ctrl->ctrl.device, "failed async event work\n");
-+		return;
-+	}
-+
-+	schedule_work(&iod->work);
-+}
-+
-+static int nvme_loop_init_iod(struct nvme_loop_ctrl *ctrl,
-+		struct nvme_loop_iod *iod, unsigned int queue_idx)
-+{
-+	BUG_ON(queue_idx >= ctrl->queue_count);
-+
-+	iod->req.cmd = &iod->cmd;
-+	iod->req.rsp = &iod->rsp;
-+	iod->queue = &ctrl->queues[queue_idx];
-+	INIT_WORK(&iod->work, nvme_loop_execute_work);
-+	return 0;
-+}
-+
-+static int nvme_loop_init_request(void *data, struct request *req,
-+				unsigned int hctx_idx, unsigned int rq_idx,
-+				unsigned int numa_node)
-+{
-+	return nvme_loop_init_iod(data, blk_mq_rq_to_pdu(req), hctx_idx + 1);
-+}
-+
-+static int nvme_loop_init_admin_request(void *data, struct request *req,
-+				unsigned int hctx_idx, unsigned int rq_idx,
-+				unsigned int numa_node)
-+{
-+	return nvme_loop_init_iod(data, blk_mq_rq_to_pdu(req), 0);
-+}
-+
-+static int nvme_loop_init_hctx(struct blk_mq_hw_ctx *hctx, void *data,
-+		unsigned int hctx_idx)
-+{
-+	struct nvme_loop_ctrl *ctrl = data;
-+	struct nvme_loop_queue *queue = &ctrl->queues[hctx_idx + 1];
-+
-+	BUG_ON(hctx_idx >= ctrl->queue_count);
-+
-+	hctx->driver_data = queue;
-+	return 0;
-+}
-+
-+static int nvme_loop_init_admin_hctx(struct blk_mq_hw_ctx *hctx, void *data,
-+		unsigned int hctx_idx)
-+{
-+	struct nvme_loop_ctrl *ctrl = data;
-+	struct nvme_loop_queue *queue = &ctrl->queues[0];
-+
-+	BUG_ON(hctx_idx != 0);
-+
-+	hctx->driver_data = queue;
-+	return 0;
-+}
-+
-+static struct blk_mq_ops nvme_loop_mq_ops = {
-+	.queue_rq	= nvme_loop_queue_rq,
-+	.complete	= nvme_loop_complete_rq,
-+	.map_queue	= blk_mq_map_queue,
-+	.init_request	= nvme_loop_init_request,
-+	.init_hctx	= nvme_loop_init_hctx,
-+	.timeout	= nvme_loop_timeout,
-+};
-+
-+static struct blk_mq_ops nvme_loop_admin_mq_ops = {
-+	.queue_rq	= nvme_loop_queue_rq,
-+	.complete	= nvme_loop_complete_rq,
-+	.map_queue	= blk_mq_map_queue,
-+	.init_request	= nvme_loop_init_admin_request,
-+	.init_hctx	= nvme_loop_init_admin_hctx,
-+	.timeout	= nvme_loop_timeout,
-+};
-+
-+static void nvme_loop_destroy_admin_queue(struct nvme_loop_ctrl *ctrl)
-+{
-+	blk_cleanup_queue(ctrl->ctrl.admin_q);
-+	blk_mq_free_tag_set(&ctrl->admin_tag_set);
-+	nvmet_sq_destroy(&ctrl->queues[0].nvme_sq);
-+}
-+
-+static void nvme_loop_free_ctrl(struct nvme_ctrl *nctrl)
-+{
-+	struct nvme_loop_ctrl *ctrl = to_loop_ctrl(nctrl);
-+
-+	if (list_empty(&ctrl->list))
-+		goto free_ctrl;
-+
-+	mutex_lock(&nvme_loop_ctrl_mutex);
-+	list_del(&ctrl->list);
-+	mutex_unlock(&nvme_loop_ctrl_mutex);
-+
-+	if (nctrl->tagset) {
-+		blk_cleanup_queue(ctrl->ctrl.connect_q);
-+		blk_mq_free_tag_set(&ctrl->tag_set);
-+	}
-+	kfree(ctrl->queues);
-+	nvmf_free_options(nctrl->opts);
-+free_ctrl:
-+	kfree(ctrl);
-+}
-+
-+static int nvme_loop_configure_admin_queue(struct nvme_loop_ctrl *ctrl)
-+{
-+	int error;
-+
-+	memset(&ctrl->admin_tag_set, 0, sizeof(ctrl->admin_tag_set));
-+	ctrl->admin_tag_set.ops = &nvme_loop_admin_mq_ops;
-+	ctrl->admin_tag_set.queue_depth = NVME_LOOP_AQ_BLKMQ_DEPTH;
-+	ctrl->admin_tag_set.reserved_tags = 2; /* connect + keep-alive */
-+	ctrl->admin_tag_set.numa_node = NUMA_NO_NODE;
-+	ctrl->admin_tag_set.cmd_size = sizeof(struct nvme_loop_iod) +
-+		SG_CHUNK_SIZE * sizeof(struct scatterlist);
-+	ctrl->admin_tag_set.driver_data = ctrl;
-+	ctrl->admin_tag_set.nr_hw_queues = 1;
-+	ctrl->admin_tag_set.timeout = ADMIN_TIMEOUT;
-+
-+	ctrl->queues[0].ctrl = ctrl;
-+	error = nvmet_sq_init(&ctrl->queues[0].nvme_sq);
-+	if (error)
-+		return error;
-+	ctrl->queue_count = 1;
-+
-+	error = blk_mq_alloc_tag_set(&ctrl->admin_tag_set);
-+	if (error)
-+		goto out_free_sq;
-+
-+	ctrl->ctrl.admin_q = blk_mq_init_queue(&ctrl->admin_tag_set);
-+	if (IS_ERR(ctrl->ctrl.admin_q)) {
-+		error = PTR_ERR(ctrl->ctrl.admin_q);
-+		goto out_free_tagset;
-+	}
-+
-+	error = nvmf_connect_admin_queue(&ctrl->ctrl);
-+	if (error)
-+		goto out_cleanup_queue;
-+
-+	error = nvmf_reg_read64(&ctrl->ctrl, NVME_REG_CAP, &ctrl->cap);
-+	if (error) {
-+		dev_err(ctrl->ctrl.device,
-+			"prop_get NVME_REG_CAP failed\n");
-+		goto out_cleanup_queue;
-+	}
-+
-+	ctrl->ctrl.sqsize =
-+		min_t(int, NVME_CAP_MQES(ctrl->cap) + 1, ctrl->ctrl.sqsize);
-+
-+	error = nvme_enable_ctrl(&ctrl->ctrl, ctrl->cap);
-+	if (error)
-+		goto out_cleanup_queue;
-+
-+	ctrl->ctrl.max_hw_sectors =
-+		(NVME_LOOP_MAX_SEGMENTS - 1) << (PAGE_SHIFT - 9);
-+
-+	error = nvme_init_identify(&ctrl->ctrl);
-+	if (error)
-+		goto out_cleanup_queue;
-+
-+	nvme_start_keep_alive(&ctrl->ctrl);
-+
-+	return 0;
-+
-+out_cleanup_queue:
-+	blk_cleanup_queue(ctrl->ctrl.admin_q);
-+out_free_tagset:
-+	blk_mq_free_tag_set(&ctrl->admin_tag_set);
-+out_free_sq:
-+	nvmet_sq_destroy(&ctrl->queues[0].nvme_sq);
-+	return error;
-+}
-+
-+static void nvme_loop_shutdown_ctrl(struct nvme_loop_ctrl *ctrl)
-+{
-+	int i;
-+
-+	nvme_stop_keep_alive(&ctrl->ctrl);
-+
-+	if (ctrl->queue_count > 1) {
-+		nvme_stop_queues(&ctrl->ctrl);
-+		blk_mq_tagset_busy_iter(&ctrl->tag_set,
-+					nvme_cancel_request, &ctrl->ctrl);
-+
-+		for (i = 1; i < ctrl->queue_count; i++)
-+			nvmet_sq_destroy(&ctrl->queues[i].nvme_sq);
-+	}
-+
-+	if (ctrl->ctrl.state == NVME_CTRL_LIVE)
-+		nvme_shutdown_ctrl(&ctrl->ctrl);
-+
-+	blk_mq_stop_hw_queues(ctrl->ctrl.admin_q);
-+	blk_mq_tagset_busy_iter(&ctrl->admin_tag_set,
-+				nvme_cancel_request, &ctrl->ctrl);
-+	nvme_loop_destroy_admin_queue(ctrl);
-+}
-+
-+static void nvme_loop_del_ctrl_work(struct work_struct *work)
-+{
-+	struct nvme_loop_ctrl *ctrl = container_of(work,
-+				struct nvme_loop_ctrl, delete_work);
-+
-+	nvme_remove_namespaces(&ctrl->ctrl);
-+	nvme_loop_shutdown_ctrl(ctrl);
-+	nvme_uninit_ctrl(&ctrl->ctrl);
-+	nvme_put_ctrl(&ctrl->ctrl);
-+}
-+
-+static int __nvme_loop_del_ctrl(struct nvme_loop_ctrl *ctrl)
-+{
-+	if (!nvme_change_ctrl_state(&ctrl->ctrl, NVME_CTRL_DELETING))
-+		return -EBUSY;
-+
-+	if (!schedule_work(&ctrl->delete_work))
-+		return -EBUSY;
-+
-+	return 0;
-+}
-+
-+static int nvme_loop_del_ctrl(struct nvme_ctrl *nctrl)
-+{
-+	struct nvme_loop_ctrl *ctrl = to_loop_ctrl(nctrl);
-+	int ret;
-+
-+	ret = __nvme_loop_del_ctrl(ctrl);
-+	if (ret)
-+		return ret;
-+
-+	flush_work(&ctrl->delete_work);
-+
-+	return 0;
-+}
-+
-+static void nvme_loop_delete_ctrl(struct nvmet_ctrl *nctrl)
-+{
-+	struct nvme_loop_ctrl *ctrl;
-+
-+	mutex_lock(&nvme_loop_ctrl_mutex);
-+	list_for_each_entry(ctrl, &nvme_loop_ctrl_list, list) {
-+		if (ctrl->ctrl.cntlid == nctrl->cntlid)
-+			__nvme_loop_del_ctrl(ctrl);
-+	}
-+	mutex_unlock(&nvme_loop_ctrl_mutex);
-+}
-+
-+static void nvme_loop_reset_ctrl_work(struct work_struct *work)
-+{
-+	struct nvme_loop_ctrl *ctrl = container_of(work,
-+					struct nvme_loop_ctrl, reset_work);
-+	bool changed;
-+	int i, ret;
-+
-+	nvme_loop_shutdown_ctrl(ctrl);
-+
-+	ret = nvme_loop_configure_admin_queue(ctrl);
-+	if (ret)
-+		goto out_disable;
-+
-+	for (i = 1; i <= ctrl->ctrl.opts->nr_io_queues; i++) {
-+		ctrl->queues[i].ctrl = ctrl;
-+		ret = nvmet_sq_init(&ctrl->queues[i].nvme_sq);
-+		if (ret)
-+			goto out_free_queues;
-+
-+		ctrl->queue_count++;
-+	}
-+
-+	for (i = 1; i <= ctrl->ctrl.opts->nr_io_queues; i++) {
-+		ret = nvmf_connect_io_queue(&ctrl->ctrl, i);
-+		if (ret)
-+			goto out_free_queues;
-+	}
-+
-+	changed = nvme_change_ctrl_state(&ctrl->ctrl, NVME_CTRL_LIVE);
-+	WARN_ON_ONCE(!changed);
-+
-+	nvme_queue_scan(&ctrl->ctrl);
-+	nvme_queue_async_events(&ctrl->ctrl);
-+
-+	nvme_start_queues(&ctrl->ctrl);
-+
-+	return;
-+
-+out_free_queues:
-+	for (i = 1; i < ctrl->queue_count; i++)
-+		nvmet_sq_destroy(&ctrl->queues[i].nvme_sq);
-+	nvme_loop_destroy_admin_queue(ctrl);
-+out_disable:
-+	dev_warn(ctrl->ctrl.device, "Removing after reset failure\n");
-+	nvme_remove_namespaces(&ctrl->ctrl);
-+	nvme_uninit_ctrl(&ctrl->ctrl);
-+	nvme_put_ctrl(&ctrl->ctrl);
-+}
-+
-+static int nvme_loop_reset_ctrl(struct nvme_ctrl *nctrl)
-+{
-+	struct nvme_loop_ctrl *ctrl = to_loop_ctrl(nctrl);
-+
-+	if (!nvme_change_ctrl_state(&ctrl->ctrl, NVME_CTRL_RESETTING))
-+		return -EBUSY;
-+
-+	if (!schedule_work(&ctrl->reset_work))
-+		return -EBUSY;
-+
-+	flush_work(&ctrl->reset_work);
-+
-+	return 0;
-+}
-+
-+static const struct nvme_ctrl_ops nvme_loop_ctrl_ops = {
-+	.name			= "loop",
-+	.module			= THIS_MODULE,
-+	.is_fabrics		= true,
-+	.reg_read32		= nvmf_reg_read32,
-+	.reg_read64		= nvmf_reg_read64,
-+	.reg_write32		= nvmf_reg_write32,
-+	.reset_ctrl		= nvme_loop_reset_ctrl,
-+	.free_ctrl		= nvme_loop_free_ctrl,
-+	.submit_async_event	= nvme_loop_submit_async_event,
-+	.delete_ctrl		= nvme_loop_del_ctrl,
-+	.get_subsysnqn		= nvmf_get_subsysnqn,
-+};
-+
-+static int nvme_loop_create_io_queues(struct nvme_loop_ctrl *ctrl)
-+{
-+	struct nvmf_ctrl_options *opts = ctrl->ctrl.opts;
-+	int ret, i;
-+
-+	ret = nvme_set_queue_count(&ctrl->ctrl, &opts->nr_io_queues);
-+	if (ret || !opts->nr_io_queues)
-+		return ret;
-+
-+	dev_info(ctrl->ctrl.device, "creating %d I/O queues.\n",
-+		opts->nr_io_queues);
-+
-+	for (i = 1; i <= opts->nr_io_queues; i++) {
-+		ctrl->queues[i].ctrl = ctrl;
-+		ret = nvmet_sq_init(&ctrl->queues[i].nvme_sq);
-+		if (ret)
-+			goto out_destroy_queues;
-+
-+		ctrl->queue_count++;
-+	}
-+
-+	memset(&ctrl->tag_set, 0, sizeof(ctrl->tag_set));
-+	ctrl->tag_set.ops = &nvme_loop_mq_ops;
-+	ctrl->tag_set.queue_depth = ctrl->ctrl.sqsize;
-+	ctrl->tag_set.reserved_tags = 1; /* fabric connect */
-+	ctrl->tag_set.numa_node = NUMA_NO_NODE;
-+	ctrl->tag_set.flags = BLK_MQ_F_SHOULD_MERGE;
-+	ctrl->tag_set.cmd_size = sizeof(struct nvme_loop_iod) +
-+		SG_CHUNK_SIZE * sizeof(struct scatterlist);
-+	ctrl->tag_set.driver_data = ctrl;
-+	ctrl->tag_set.nr_hw_queues = ctrl->queue_count - 1;
-+	ctrl->tag_set.timeout = NVME_IO_TIMEOUT;
-+	ctrl->ctrl.tagset = &ctrl->tag_set;
-+
-+	ret = blk_mq_alloc_tag_set(&ctrl->tag_set);
-+	if (ret)
-+		goto out_destroy_queues;
-+
-+	ctrl->ctrl.connect_q = blk_mq_init_queue(&ctrl->tag_set);
-+	if (IS_ERR(ctrl->ctrl.connect_q)) {
-+		ret = PTR_ERR(ctrl->ctrl.connect_q);
-+		goto out_free_tagset;
-+	}
-+
-+	for (i = 1; i <= opts->nr_io_queues; i++) {
-+		ret = nvmf_connect_io_queue(&ctrl->ctrl, i);
-+		if (ret)
-+			goto out_cleanup_connect_q;
-+	}
-+
-+	return 0;
-+
-+out_cleanup_connect_q:
-+	blk_cleanup_queue(ctrl->ctrl.connect_q);
-+out_free_tagset:
-+	blk_mq_free_tag_set(&ctrl->tag_set);
-+out_destroy_queues:
-+	for (i = 1; i < ctrl->queue_count; i++)
-+		nvmet_sq_destroy(&ctrl->queues[i].nvme_sq);
-+	return ret;
-+}
-+
-+static struct nvme_ctrl *nvme_loop_create_ctrl(struct device *dev,
-+		struct nvmf_ctrl_options *opts)
-+{
-+	struct nvme_loop_ctrl *ctrl;
-+	bool changed;
-+	int ret;
-+
-+	ctrl = kzalloc(sizeof(*ctrl), GFP_KERNEL);
-+	if (!ctrl)
-+		return ERR_PTR(-ENOMEM);
-+	ctrl->ctrl.opts = opts;
-+	INIT_LIST_HEAD(&ctrl->list);
-+
-+	INIT_WORK(&ctrl->delete_work, nvme_loop_del_ctrl_work);
-+	INIT_WORK(&ctrl->reset_work, nvme_loop_reset_ctrl_work);
-+
-+	ret = nvme_init_ctrl(&ctrl->ctrl, dev, &nvme_loop_ctrl_ops,
-+				0 /* no quirks, we're perfect! */);
-+	if (ret)
-+		goto out_put_ctrl;
-+
-+	spin_lock_init(&ctrl->lock);
-+
-+	ret = -ENOMEM;
-+
-+	ctrl->ctrl.sqsize = opts->queue_size;
-+	ctrl->ctrl.kato = opts->kato;
-+
-+	ctrl->queues = kcalloc(opts->nr_io_queues + 1, sizeof(*ctrl->queues),
-+			GFP_KERNEL);
-+	if (!ctrl->queues)
-+		goto out_uninit_ctrl;
-+
-+	ret = nvme_loop_configure_admin_queue(ctrl);
-+	if (ret)
-+		goto out_free_queues;
-+
-+	if (opts->queue_size > ctrl->ctrl.maxcmd) {
-+		/* warn if maxcmd is lower than queue_size */
-+		dev_warn(ctrl->ctrl.device,
-+			"queue_size %zu > ctrl maxcmd %u, clamping down\n",
-+			opts->queue_size, ctrl->ctrl.maxcmd);
-+		opts->queue_size = ctrl->ctrl.maxcmd;
-+	}
-+
-+	if (opts->nr_io_queues) {
-+		ret = nvme_loop_create_io_queues(ctrl);
-+		if (ret)
-+			goto out_remove_admin_queue;
-+	}
-+
-+	nvme_loop_init_iod(ctrl, &ctrl->async_event_iod, 0);
-+
-+	dev_info(ctrl->ctrl.device,
-+		 "new ctrl: \"%s\"\n", ctrl->ctrl.opts->subsysnqn);
-+
-+	kref_get(&ctrl->ctrl.kref);
-+
-+	changed = nvme_change_ctrl_state(&ctrl->ctrl, NVME_CTRL_LIVE);
-+	WARN_ON_ONCE(!changed);
-+
-+	mutex_lock(&nvme_loop_ctrl_mutex);
-+	list_add_tail(&ctrl->list, &nvme_loop_ctrl_list);
-+	mutex_unlock(&nvme_loop_ctrl_mutex);
-+
-+	if (opts->nr_io_queues) {
-+		nvme_queue_scan(&ctrl->ctrl);
-+		nvme_queue_async_events(&ctrl->ctrl);
-+	}
-+
-+	return &ctrl->ctrl;
-+
-+out_remove_admin_queue:
-+	nvme_loop_destroy_admin_queue(ctrl);
-+out_free_queues:
-+	kfree(ctrl->queues);
-+out_uninit_ctrl:
-+	nvme_uninit_ctrl(&ctrl->ctrl);
-+out_put_ctrl:
-+	nvme_put_ctrl(&ctrl->ctrl);
-+	if (ret > 0)
-+		ret = -EIO;
-+	return ERR_PTR(ret);
-+}
-+
-+static int nvme_loop_add_port(struct nvmet_port *port)
-+{
-+	/*
-+	 * XXX: disalow adding more than one port so
-+	 * there is no connection rejections when a
-+	 * a subsystem is assigned to a port for which
-+	 * loop doesn't have a pointer.
-+	 * This scenario would be possible if we allowed
-+	 * more than one port to be added and a subsystem
-+	 * was assigned to a port other than nvmet_loop_port.
-+	 */
-+
-+	if (nvmet_loop_port)
-+		return -EPERM;
-+
-+	nvmet_loop_port = port;
-+	return 0;
-+}
-+
-+static void nvme_loop_remove_port(struct nvmet_port *port)
-+{
-+	if (port == nvmet_loop_port)
-+		nvmet_loop_port = NULL;
-+}
-+
-+static struct nvmet_fabrics_ops nvme_loop_ops = {
-+	.owner		= THIS_MODULE,
-+	.type		= NVMF_TRTYPE_LOOP,
-+	.add_port	= nvme_loop_add_port,
-+	.remove_port	= nvme_loop_remove_port,
-+	.queue_response = nvme_loop_queue_response,
-+	.delete_ctrl	= nvme_loop_delete_ctrl,
-+};
-+
-+static struct nvmf_transport_ops nvme_loop_transport = {
-+	.name		= "loop",
-+	.create_ctrl	= nvme_loop_create_ctrl,
-+};
-+
-+static int __init nvme_loop_init_module(void)
-+{
-+	int ret;
-+
-+	ret = nvmet_register_transport(&nvme_loop_ops);
-+	if (ret)
-+		return ret;
-+	nvmf_register_transport(&nvme_loop_transport);
-+	return 0;
-+}
-+
-+static void __exit nvme_loop_cleanup_module(void)
-+{
-+	struct nvme_loop_ctrl *ctrl, *next;
-+
-+	nvmf_unregister_transport(&nvme_loop_transport);
-+	nvmet_unregister_transport(&nvme_loop_ops);
-+
-+	mutex_lock(&nvme_loop_ctrl_mutex);
-+	list_for_each_entry_safe(ctrl, next, &nvme_loop_ctrl_list, list)
-+		__nvme_loop_del_ctrl(ctrl);
-+	mutex_unlock(&nvme_loop_ctrl_mutex);
-+
-+	flush_scheduled_work();
-+}
-+
-+module_init(nvme_loop_init_module);
-+module_exit(nvme_loop_cleanup_module);
-+
-+MODULE_LICENSE("GPL v2");
-+MODULE_ALIAS("nvmet-transport-254"); /* 254 == NVMF_TRTYPE_LOOP */
--- 
-2.1.4
+TGlnaHROVk0gZG9lcyBub3QgY3VycmVudGx5IGV4cG9zZSB0aGUgZGV2aWNlIGRyaXZlciBzeXNm
+cyBzcGVjaWZpYwplbnRyaWVzIHRvIHVzZXItc3BhY2UsIGFzIHRoZSBkZXZpY2UgZHJpdmVyIHNr
+aXBzIHRoZSBpbml0aWFsaXphdGlvbiBvZgpnZW5kaXNrLgoKVG8gZW5hYmxlIGEgZGV2aWNlIGRy
+aXZlciBzeXNmcyBlbnRyaWVzIHRvIGJlIGV4cG9zZWQsIHdlIG5lZWQgYSBzdHJ1Y3QKZGV2aWNl
+IHRvIGF0dGFjaCBpdCB0by4gVG8gYWxsb3cgYm90aCB0aGUgZGV2aWNlIGRyaXZlciBhbmQgTGln
+aHROVk0gdG8KYWNjZXNzIHRoZSBzYW1lIHN0cnVjdCBkZXZpY2UsIHdlIG5lZWQgdGhlIGRldmlj
+ZSBkcml2ZXIgdG8gdHJhY2sgdGhlCmxpZmV0aW1lIG9mIHRoZSBudm1fZGV2IHN0cnVjdHVyZS4K
+ClRoaXMgcGF0Y2ggcmVmYWN0b3JzIHRoZSB0d28gdXNlcnMgb2YgTGlnaHROVk0gKE5WTWUgYW5k
+IG51bGxfYmxrKSwKZW5hYmxlcyB0aGVtIHRvIGFsbG9jYXRlIGFuZCBmcmVlIG52bV9kZXYsIGFu
+ZCBhdCBsYXN0IHJlbW92ZXMgZ2VuZGlzawp1c2FnZSB3aGVuIGEgTGlnaHROVk0gZGV2aWNlIGlz
+IHVzZWQuCgpTaWduZWQtb2ZmLWJ5OiBNYXRpYXMgQmrDuHJsaW5nIDxtQGJqb3JsaW5nLm1lPgot
+LS0KIGRyaXZlcnMvYmxvY2svbnVsbF9ibGsuYyAgICAgfCAyMiArKysrKysrKysrKysrKysrKysr
+Ky0tCiBkcml2ZXJzL2xpZ2h0bnZtL2NvcmUuYyAgICAgIHwgMzQgKysrKysrKy0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLQogZHJpdmVycy9udm1lL2hvc3QvY29yZS5jICAgICB8IDM0ICsrKysr
+KysrKysrKysrLS0tLS0tLS0tLS0tLS0tLS0tLS0KIGRyaXZlcnMvbnZtZS9ob3N0L2xpZ2h0bnZt
+LmMgfCAzMyArKysrKysrKysrKysrKysrKysrKysrKysrKy0tLS0tLS0KIGRyaXZlcnMvbnZtZS9o
+b3N0L252bWUuaCAgICAgfCAgOCArKysrKy0tLQogaW5jbHVkZS9saW51eC9saWdodG52bS5oICAg
+ICB8IDE1ICsrKysrKysrKy0tLS0tLQogNiBmaWxlcyBjaGFuZ2VkLCA4MSBpbnNlcnRpb25zKCsp
+LCA2NSBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9kcml2ZXJzL2Jsb2NrL251bGxfYmxrLmMg
+Yi9kcml2ZXJzL2Jsb2NrL251bGxfYmxrLmMKaW5kZXggMzExN2RmMS4uNWEwZGE4YiAxMDA2NDQK
+LS0tIGEvZHJpdmVycy9ibG9jay9udWxsX2Jsay5jCisrKyBiL2RyaXZlcnMvYmxvY2svbnVsbF9i
+bGsuYwpAQCAtMzQsNiArMzQsNyBAQCBzdHJ1Y3QgbnVsbGIgewogCXVuc2lnbmVkIGludCBpbmRl
+eDsKIAlzdHJ1Y3QgcmVxdWVzdF9xdWV1ZSAqcTsKIAlzdHJ1Y3QgZ2VuZGlzayAqZGlzazsKKwlz
+dHJ1Y3QgbnZtX2RldiAqbmRldjsKIAlzdHJ1Y3QgYmxrX21xX3RhZ19zZXQgdGFnX3NldDsKIAlz
+dHJ1Y3QgaHJ0aW1lciB0aW1lcjsKIAl1bnNpZ25lZCBpbnQgcXVldWVfZGVwdGg7CkBAIC01NTAs
+MTIgKzU1MSwyOSBAQCBzdGF0aWMgc3RydWN0IG52bV9kZXZfb3BzIG51bGxfbG52bV9kZXZfb3Bz
+ID0gewogCiBzdGF0aWMgaW50IG51bGxfbnZtX3JlZ2lzdGVyKHN0cnVjdCBudWxsYiAqbnVsbGIp
+CiB7Ci0JcmV0dXJuIG52bV9yZWdpc3RlcihudWxsYi0+cSwgbnVsbGItPmRpc2tfbmFtZSwgJm51
+bGxfbG52bV9kZXZfb3BzKTsKKwlzdHJ1Y3QgbnZtX2RldiAqZGV2OworCWludCBydjsKKworCWRl
+diA9IG52bV9hbGxvY19kZXYoMCk7CisJaWYgKCFkZXYpCisJCXJldHVybiAtRU5PTUVNOworCisJ
+ZGV2LT5xID0gbnVsbGItPnE7CisJbWVtY3B5KGRldi0+bmFtZSwgbnVsbGItPmRpc2tfbmFtZSwg
+RElTS19OQU1FX0xFTik7CisJZGV2LT5vcHMgPSAmbnVsbF9sbnZtX2Rldl9vcHM7CisKKwlydiA9
+IG52bV9yZWdpc3RlcihkZXYpOworCWlmIChydikgeworCQlrZnJlZShkZXYpOworCQlyZXR1cm4g
+cnY7CisJfQorCW51bGxiLT5uZGV2ID0gZGV2OworCXJldHVybiAwOwogfQogCiBzdGF0aWMgdm9p
+ZCBudWxsX252bV91bnJlZ2lzdGVyKHN0cnVjdCBudWxsYiAqbnVsbGIpCiB7Ci0JbnZtX3VucmVn
+aXN0ZXIobnVsbGItPmRpc2tfbmFtZSk7CisJbnZtX3VucmVnaXN0ZXIobnVsbGItPm5kZXYpOwog
+fQogI2Vsc2UKIHN0YXRpYyBpbnQgbnVsbF9udm1fcmVnaXN0ZXIoc3RydWN0IG51bGxiICpudWxs
+YikKZGlmZiAtLWdpdCBhL2RyaXZlcnMvbGlnaHRudm0vY29yZS5jIGIvZHJpdmVycy9saWdodG52
+bS9jb3JlLmMKaW5kZXggMjVjNWRmOS4uMDY1NGMwNiAxMDA2NDQKLS0tIGEvZHJpdmVycy9saWdo
+dG52bS9jb3JlLmMKKysrIGIvZHJpdmVycy9saWdodG52bS9jb3JlLmMKQEAgLTY2MCwyMyArNjYw
+LDE1IEBAIHN0YXRpYyB2b2lkIG52bV9leGl0KHN0cnVjdCBudm1fZGV2ICpkZXYpCiAJcHJfaW5m
+bygibnZtOiBzdWNjZXNzZnVsbHkgdW5sb2FkZWRcbiIpOwogfQogCi1pbnQgbnZtX3JlZ2lzdGVy
+KHN0cnVjdCByZXF1ZXN0X3F1ZXVlICpxLCBjaGFyICpkaXNrX25hbWUsCi0JCQkJCQkJc3RydWN0
+IG52bV9kZXZfb3BzICpvcHMpCitzdHJ1Y3QgbnZtX2RldiAqbnZtX2FsbG9jX2RldihpbnQgbm9k
+ZSkKK3sKKwlyZXR1cm4ga3phbGxvY19ub2RlKHNpemVvZihzdHJ1Y3QgbnZtX2RldiksIEdGUF9L
+RVJORUwsIG5vZGUpOworfQorCitpbnQgbnZtX3JlZ2lzdGVyKHN0cnVjdCBudm1fZGV2ICpkZXYp
+CiB7Ci0Jc3RydWN0IG52bV9kZXYgKmRldjsKIAlpbnQgcmV0OwogCi0JaWYgKCFvcHMtPmlkZW50
+aXR5KQotCQlyZXR1cm4gLUVJTlZBTDsKLQotCWRldiA9IGt6YWxsb2Moc2l6ZW9mKHN0cnVjdCBu
+dm1fZGV2KSwgR0ZQX0tFUk5FTCk7Ci0JaWYgKCFkZXYpCi0JCXJldHVybiAtRU5PTUVNOwotCi0J
+ZGV2LT5xID0gcTsKLQlkZXYtPm9wcyA9IG9wczsKLQlzdHJuY3B5KGRldi0+bmFtZSwgZGlza19u
+YW1lLCBESVNLX05BTUVfTEVOKTsKLQogCXJldCA9IG52bV9pbml0KGRldik7CiAJaWYgKHJldCkK
+IAkJZ290byBlcnJfaW5pdDsKQEAgLTcxNCwyOSArNzA2LDE3IEBAIGludCBudm1fcmVnaXN0ZXIo
+c3RydWN0IHJlcXVlc3RfcXVldWUgKnEsIGNoYXIgKmRpc2tfbmFtZSwKIAlyZXR1cm4gMDsKIGVy
+cl9pbml0OgogCWtmcmVlKGRldi0+bHVuX21hcCk7Ci0Ja2ZyZWUoZGV2KTsKIAlyZXR1cm4gcmV0
+OwogfQogRVhQT1JUX1NZTUJPTChudm1fcmVnaXN0ZXIpOwogCi12b2lkIG52bV91bnJlZ2lzdGVy
+KGNoYXIgKmRpc2tfbmFtZSkKK3ZvaWQgbnZtX3VucmVnaXN0ZXIoc3RydWN0IG52bV9kZXYgKmRl
+dikKIHsKLQlzdHJ1Y3QgbnZtX2RldiAqZGV2OwotCiAJZG93bl93cml0ZSgmbnZtX2xvY2spOwot
+CWRldiA9IG52bV9maW5kX252bV9kZXYoZGlza19uYW1lKTsKLQlpZiAoIWRldikgewotCQlwcl9l
+cnIoIm52bTogY291bGQgbm90IGZpbmQgZGV2aWNlICVzIHRvIHVucmVnaXN0ZXJcbiIsCi0JCQkJ
+CQkJCWRpc2tfbmFtZSk7Ci0JCXVwX3dyaXRlKCZudm1fbG9jayk7Ci0JCXJldHVybjsKLQl9Ci0K
+IAlsaXN0X2RlbCgmZGV2LT5kZXZpY2VzKTsKIAl1cF93cml0ZSgmbnZtX2xvY2spOwogCiAJbnZt
+X2V4aXQoZGV2KTsKLQlrZnJlZShkZXYpOwogfQogRVhQT1JUX1NZTUJPTChudm1fdW5yZWdpc3Rl
+cik7CiAKZGlmZiAtLWdpdCBhL2RyaXZlcnMvbnZtZS9ob3N0L2NvcmUuYyBiL2RyaXZlcnMvbnZt
+ZS9ob3N0L2NvcmUuYwppbmRleCBmNjE1YjZiLi5mZTEzNWQ5IDEwMDY0NAotLS0gYS9kcml2ZXJz
+L252bWUvaG9zdC9jb3JlLmMKKysrIGIvZHJpdmVycy9udm1lL2hvc3QvY29yZS5jCkBAIC0xMzcs
+MTIgKzEzNywxNCBAQCBzdGF0aWMgdm9pZCBudm1lX2ZyZWVfbnMoc3RydWN0IGtyZWYgKmtyZWYp
+CiB7CiAJc3RydWN0IG52bWVfbnMgKm5zID0gY29udGFpbmVyX29mKGtyZWYsIHN0cnVjdCBudm1l
+X25zLCBrcmVmKTsKIAotCWlmIChucy0+dHlwZSA9PSBOVk1FX05TX0xJR0hUTlZNKQotCQludm1l
+X252bV91bnJlZ2lzdGVyKG5zLT5xdWV1ZSwgbnMtPmRpc2stPmRpc2tfbmFtZSk7CisJaWYgKG5z
+LT5uZGV2KQorCQludm1lX252bV91bnJlZ2lzdGVyKG5zKTsKIAotCXNwaW5fbG9jaygmZGV2X2xp
+c3RfbG9jayk7Ci0JbnMtPmRpc2stPnByaXZhdGVfZGF0YSA9IE5VTEw7Ci0Jc3Bpbl91bmxvY2so
+JmRldl9saXN0X2xvY2spOworCWlmIChucy0+ZGlzaykgeworCQlzcGluX2xvY2soJmRldl9saXN0
+X2xvY2spOworCQlucy0+ZGlzay0+cHJpdmF0ZV9kYXRhID0gTlVMTDsKKwkJc3Bpbl91bmxvY2so
+JmRldl9saXN0X2xvY2spOworCX0KIAogCXB1dF9kaXNrKG5zLT5kaXNrKTsKIAlpZGFfc2ltcGxl
+X3JlbW92ZSgmbnMtPmN0cmwtPm5zX2lkYSwgbnMtPmluc3RhbmNlKTsKQEAgLTc4OCw4ICs3OTAs
+NyBAQCBzdGF0aWMgdm9pZCBudm1lX2NvbmZpZ19kaXNjYXJkKHN0cnVjdCBudm1lX25zICpucykK
+IHN0YXRpYyBpbnQgbnZtZV9yZXZhbGlkYXRlX25zKHN0cnVjdCBudm1lX25zICpucywgc3RydWN0
+IG52bWVfaWRfbnMgKippZCkKIHsKIAlpZiAobnZtZV9pZGVudGlmeV9ucyhucy0+Y3RybCwgbnMt
+Pm5zX2lkLCBpZCkpIHsKLQkJZGV2X3dhcm4oZGlza190b19kZXYobnMtPmRpc2spLCAiJXM6IElk
+ZW50aWZ5IGZhaWx1cmVcbiIsCi0JCQkJX19mdW5jX18pOworCQlkZXZfd2Fybihucy0+Y3RybC0+
+ZGV2LCAiJXM6IElkZW50aWZ5IGZhaWx1cmVcbiIsIF9fZnVuY19fKTsKIAkJcmV0dXJuIC1FTk9E
+RVY7CiAJfQogCkBAIC0xNDczLDE4ICsxNDc0LDExIEBAIHN0YXRpYyB2b2lkIG52bWVfYWxsb2Nf
+bnMoc3RydWN0IG52bWVfY3RybCAqY3RybCwgdW5zaWduZWQgbnNpZCkKIAlzcHJpbnRmKGRpc2tf
+bmFtZSwgIm52bWUlZG4lZCIsIGN0cmwtPmluc3RhbmNlLCBucy0+aW5zdGFuY2UpOwogCiAJaWYg
+KG52bWVfbnZtX25zX3N1cHBvcnRlZChucywgaWQpKSB7Ci0JCWlmIChudm1lX252bV9yZWdpc3Rl
+cihucy0+cXVldWUsIGRpc2tfbmFtZSkpIHsKLQkJCWRldl93YXJuKGN0cmwtPmRldiwKLQkJCQki
+JXM6IExpZ2h0TlZNIGluaXQgZmFpbHVyZVxuIiwgX19mdW5jX18pOworCQlpZiAobnZtZV9udm1f
+cmVnaXN0ZXIobnMsIGRpc2tfbmFtZSwgbm9kZSkpIHsKKwkJCWRldl93YXJuKGN0cmwtPmRldiwg
+IiVzOiBMaWdodE5WTSBpbml0IGZhaWx1cmVcbiIsCisJCQkJCQkJCV9fZnVuY19fKTsKIAkJCWdv
+dG8gb3V0X2ZyZWVfaWQ7CiAJCX0KLQotCQlkaXNrID0gYWxsb2NfZGlza19ub2RlKDAsIG5vZGUp
+OwotCQlpZiAoIWRpc2spCi0JCQlnb3RvIG91dF9mcmVlX2lkOwotCQltZW1jcHkoZGlzay0+ZGlz
+a19uYW1lLCBkaXNrX25hbWUsIERJU0tfTkFNRV9MRU4pOwotCQlucy0+ZGlzayA9IGRpc2s7Ci0J
+CW5zLT50eXBlID0gTlZNRV9OU19MSUdIVE5WTTsKIAl9IGVsc2UgewogCQlkaXNrID0gYWxsb2Nf
+ZGlza19ub2RlKDAsIG5vZGUpOwogCQlpZiAoIWRpc2spCkBAIC0xNTMyLDcgKzE1MjYsNyBAQCBz
+dGF0aWMgdm9pZCBudm1lX25zX3JlbW92ZShzdHJ1Y3QgbnZtZV9ucyAqbnMpCiAJaWYgKHRlc3Rf
+YW5kX3NldF9iaXQoTlZNRV9OU19SRU1PVklORywgJm5zLT5mbGFncykpCiAJCXJldHVybjsKIAot
+CWlmIChucy0+ZGlzay0+ZmxhZ3MgJiBHRU5IRF9GTF9VUCkgeworCWlmIChucy0+ZGlzayAmJiBu
+cy0+ZGlzay0+ZmxhZ3MgJiBHRU5IRF9GTF9VUCkgewogCQlpZiAoYmxrX2dldF9pbnRlZ3JpdHko
+bnMtPmRpc2spKQogCQkJYmxrX2ludGVncml0eV91bnJlZ2lzdGVyKG5zLT5kaXNrKTsKIAkJc3lz
+ZnNfcmVtb3ZlX2dyb3VwKCZkaXNrX3RvX2Rldihucy0+ZGlzayktPmtvYmosCkBAIC0xNTUyLDcg
+KzE1NDYsNyBAQCBzdGF0aWMgdm9pZCBudm1lX3ZhbGlkYXRlX25zKHN0cnVjdCBudm1lX2N0cmwg
+KmN0cmwsIHVuc2lnbmVkIG5zaWQpCiAKIAlucyA9IG52bWVfZmluZF9ucyhjdHJsLCBuc2lkKTsK
+IAlpZiAobnMpIHsKLQkJaWYgKHJldmFsaWRhdGVfZGlzayhucy0+ZGlzaykpCisJCWlmIChucy0+
+ZGlzayAmJiByZXZhbGlkYXRlX2Rpc2sobnMtPmRpc2spKQogCQkJbnZtZV9uc19yZW1vdmUobnMp
+OwogCX0gZWxzZQogCQludm1lX2FsbG9jX25zKGN0cmwsIG5zaWQpOwpAQCAtMTg1Niw3ICsxODUw
+LDcgQEAgdm9pZCBudm1lX2tpbGxfcXVldWVzKHN0cnVjdCBudm1lX2N0cmwgKmN0cmwpCiAJCSAq
+IFJldmFsaWRhdGluZyBhIGRlYWQgbmFtZXNwYWNlIHNldHMgY2FwYWNpdHkgdG8gMC4gVGhpcyB3
+aWxsCiAJCSAqIGVuZCBidWZmZXJlZCB3cml0ZXJzIGRpcnR5aW5nIHBhZ2VzIHRoYXQgY2FuJ3Qg
+YmUgc3luY2VkLgogCQkgKi8KLQkJaWYgKCF0ZXN0X2FuZF9zZXRfYml0KE5WTUVfTlNfREVBRCwg
+Jm5zLT5mbGFncykpCisJCWlmIChucy0+ZGlzayAmJiAhdGVzdF9hbmRfc2V0X2JpdChOVk1FX05T
+X0RFQUQsICZucy0+ZmxhZ3MpKQogCQkJcmV2YWxpZGF0ZV9kaXNrKG5zLT5kaXNrKTsKIAogCQli
+bGtfc2V0X3F1ZXVlX2R5aW5nKG5zLT5xdWV1ZSk7CmRpZmYgLS1naXQgYS9kcml2ZXJzL252bWUv
+aG9zdC9saWdodG52bS5jIGIvZHJpdmVycy9udm1lL2hvc3QvbGlnaHRudm0uYwppbmRleCBiYTUx
+NjAyLi5lYjc4MGVmIDEwMDY0NAotLS0gYS9kcml2ZXJzL252bWUvaG9zdC9saWdodG52bS5jCisr
+KyBiL2RyaXZlcnMvbnZtZS9ob3N0L2xpZ2h0bnZtLmMKQEAgLTQ3NCw5ICs0NzQsOCBAQCBzdGF0
+aWMgaW5saW5lIHZvaWQgbnZtZV9udm1fcnF0b2NtZChzdHJ1Y3QgcmVxdWVzdCAqcnEsIHN0cnVj
+dCBudm1fcnEgKnJxZCwKIAljLT5waF9ydy5sZW5ndGggPSBjcHVfdG9fbGUxNihycWQtPm5yX3Bw
+YXMgLSAxKTsKIAogCWlmIChycWQtPm9wY29kZSA9PSBOVk1fT1BfSEJXUklURSB8fCBycWQtPm9w
+Y29kZSA9PSBOVk1fT1BfSEJSRUFEKQotCQkvKiBtb21lbnRhcmlseSBoYXJkY29kZSB0aGUgc2hp
+ZnQgY29uZmlndXJhdGlvbi4gbGJhX3NoaWZ0IGZyb20KLQkJICogbnZtX2RldiB3aWxsIGJlIGF2
+YWlsYWJsZSBpbiBhIGZvbGxvdy11cCBwYXRjaCAqLwotCQljLT5oYl9ydy5zbGJhID0gY3B1X3Rv
+X2xlNjQocnFkLT5iaW8tPmJpX2l0ZXIuYmlfc2VjdG9yID4+IDMpOworCQljLT5oYl9ydy5zbGJh
+ID0gY3B1X3RvX2xlNjQobnZtZV9ibG9ja19ucihucywKKwkJCQkJcnFkLT5iaW8tPmJpX2l0ZXIu
+Ymlfc2VjdG9yKSk7CiB9CiAKIHN0YXRpYyB2b2lkIG52bWVfbnZtX2VuZF9pbyhzdHJ1Y3QgcmVx
+dWVzdCAqcnEsIGludCBlcnJvcikKQEAgLTU5MywxNCArNTkyLDM0IEBAIHN0YXRpYyBzdHJ1Y3Qg
+bnZtX2Rldl9vcHMgbnZtZV9udm1fZGV2X29wcyA9IHsKIAkubWF4X3BoeXNfc2VjdAkJPSA2NCwK
+IH07CiAKLWludCBudm1lX252bV9yZWdpc3RlcihzdHJ1Y3QgcmVxdWVzdF9xdWV1ZSAqcSwgY2hh
+ciAqZGlza19uYW1lKQoraW50IG52bWVfbnZtX3JlZ2lzdGVyKHN0cnVjdCBudm1lX25zICpucywg
+Y2hhciAqZGlza19uYW1lLCBpbnQgbm9kZSkKIHsKLQlyZXR1cm4gbnZtX3JlZ2lzdGVyKHEsIGRp
+c2tfbmFtZSwgJm52bWVfbnZtX2Rldl9vcHMpOworCXN0cnVjdCByZXF1ZXN0X3F1ZXVlICpxID0g
+bnMtPnF1ZXVlOworCXN0cnVjdCBudm1fZGV2ICpkZXY7CisKKwlkZXYgPSBudm1fYWxsb2NfZGV2
+KG5vZGUpOworCWlmICghZGV2KQorCQlyZXR1cm4gLUVOT01FTTsKKworCWRldi0+cSA9IHE7CisJ
+bWVtY3B5KGRldi0+bmFtZSwgZGlza19uYW1lLCBESVNLX05BTUVfTEVOKTsKKwlkZXYtPm9wcyA9
+ICZudm1lX252bV9kZXZfb3BzOworCW5zLT5uZGV2ID0gZGV2OworCisJcmV0ID0gbnZtX3JlZ2lz
+dGVyKGRldik7CisKKwlucy0+bGJhX3NoaWZ0ID0gaWxvZzIoZGV2LT5zZWNfc2l6ZSkgLSA5Owor
+CisJaWYgKHN5c2ZzX2NyZWF0ZV9ncm91cCgmZGV2LT5kZXYua29iaiwgYXR0cnMpKQorCQlwcl93
+YXJuKCIlczogZmFpbGVkIHRvIGNyZWF0ZSBzeXNmcyBncm91cCBmb3IgaWRlbnRpZmljYXRpb25c
+biIsCisJCQlucy0+ZGlzay0+ZGlza19uYW1lKTsKKwlyZXR1cm4gcmV0OwogfQogCi12b2lkIG52
+bWVfbnZtX3VucmVnaXN0ZXIoc3RydWN0IHJlcXVlc3RfcXVldWUgKnEsIGNoYXIgKmRpc2tfbmFt
+ZSkKK3ZvaWQgbnZtZV9udm1fdW5yZWdpc3RlcihzdHJ1Y3QgbnZtZV9ucyAqbnMpCiB7Ci0JbnZt
+X3VucmVnaXN0ZXIoZGlza19uYW1lKTsKKwludm1fdW5yZWdpc3Rlcihucy0+bmRldik7CisJa2Zy
+ZWUobnMtPm5kZXYpOwogfQogCiAvKiBtb3ZlIHRvIHNoYXJlZCBwbGFjZSB3aGVuIHVzZWQgaW4g
+bXVsdGlwbGUgcGxhY2VzLiAqLwpkaWZmIC0tZ2l0IGEvZHJpdmVycy9udm1lL2hvc3QvbnZtZS5o
+IGIvZHJpdmVycy9udm1lL2hvc3QvbnZtZS5oCmluZGV4IDI4MjQyMWYuLjdiNDliNDUgMTAwNjQ0
+Ci0tLSBhL2RyaXZlcnMvbnZtZS9ob3N0L252bWUuaAorKysgYi9kcml2ZXJzL252bWUvaG9zdC9u
+dm1lLmgKQEAgLTE4LDYgKzE4LDcgQEAKICNpbmNsdWRlIDxsaW51eC9wY2kuaD4KICNpbmNsdWRl
+IDxsaW51eC9rcmVmLmg+CiAjaW5jbHVkZSA8bGludXgvYmxrLW1xLmg+CisjaW5jbHVkZSA8bGlu
+dXgvbGlnaHRudm0uaD4KIAogZW51bSB7CiAJLyoKQEAgLTEyMiw2ICsxMjMsNyBAQCBzdHJ1Y3Qg
+bnZtZV9ucyB7CiAJc3RydWN0IG52bWVfY3RybCAqY3RybDsKIAlzdHJ1Y3QgcmVxdWVzdF9xdWV1
+ZSAqcXVldWU7CiAJc3RydWN0IGdlbmRpc2sgKmRpc2s7CisJc3RydWN0IG52bV9kZXYgKm5kZXY7
+CiAJc3RydWN0IGtyZWYga3JlZjsKIAlpbnQgaW5zdGFuY2U7CiAKQEAgLTEzMyw3ICsxMzUsNiBA
+QCBzdHJ1Y3QgbnZtZV9ucyB7CiAJdTE2IG1zOwogCWJvb2wgZXh0OwogCXU4IHBpX3R5cGU7Ci0J
+aW50IHR5cGU7CiAJdW5zaWduZWQgbG9uZyBmbGFnczsKIAogI2RlZmluZSBOVk1FX05TX1JFTU9W
+SU5HIDAKQEAgLTI2OSwxMiArMjcwLDEzIEBAIGludCBudm1lX252bV9uc19zdXBwb3J0ZWQoc3Ry
+dWN0IG52bWVfbnMgKm5zLCBzdHJ1Y3QgbnZtZV9pZF9ucyAqaWQpOwogaW50IG52bWVfbnZtX3Jl
+Z2lzdGVyKHN0cnVjdCByZXF1ZXN0X3F1ZXVlICpxLCBjaGFyICpkaXNrX25hbWUpOwogdm9pZCBu
+dm1lX252bV91bnJlZ2lzdGVyKHN0cnVjdCByZXF1ZXN0X3F1ZXVlICpxLCBjaGFyICpkaXNrX25h
+bWUpOwogI2Vsc2UKLXN0YXRpYyBpbmxpbmUgaW50IG52bWVfbnZtX3JlZ2lzdGVyKHN0cnVjdCBy
+ZXF1ZXN0X3F1ZXVlICpxLCBjaGFyICpkaXNrX25hbWUpCitzdGF0aWMgaW5saW5lIGludCBudm1l
+X252bV9yZWdpc3RlcihzdHJ1Y3QgbnZtZV9ucyAqbnMsIGNoYXIgKmRpc2tfbmFtZSwKKwkJCQkJ
+CQkJaW50IG5vZGUpCiB7CiAJcmV0dXJuIDA7CiB9CiAKLXN0YXRpYyBpbmxpbmUgdm9pZCBudm1l
+X252bV91bnJlZ2lzdGVyKHN0cnVjdCByZXF1ZXN0X3F1ZXVlICpxLCBjaGFyICpkaXNrX25hbWUp
+IHt9Oworc3RhdGljIGlubGluZSB2b2lkIG52bWVfbnZtX3VucmVnaXN0ZXIoc3RydWN0IG52bWVf
+bnMgKm5zKSB7fTsKIAogc3RhdGljIGlubGluZSBpbnQgbnZtZV9udm1fbnNfc3VwcG9ydGVkKHN0
+cnVjdCBudm1lX25zICpucywgc3RydWN0IG52bWVfaWRfbnMgKmlkKQogewpkaWZmIC0tZ2l0IGEv
+aW5jbHVkZS9saW51eC9saWdodG52bS5oIGIvaW5jbHVkZS9saW51eC9saWdodG52bS5oCmluZGV4
+IGJhNzhiODMuLjVhZmMyNjMgMTAwNjQ0Ci0tLSBhL2luY2x1ZGUvbGludXgvbGlnaHRudm0uaAor
+KysgYi9pbmNsdWRlL2xpbnV4L2xpZ2h0bnZtLmgKQEAgLTUyNCw5ICs1MjQsOSBAQCBleHRlcm4g
+c3RydWN0IG52bV9ibG9jayAqbnZtX2dldF9ibGsoc3RydWN0IG52bV9kZXYgKiwgc3RydWN0IG52
+bV9sdW4gKiwKIAkJCQkJCQkJdW5zaWduZWQgbG9uZyk7CiBleHRlcm4gdm9pZCBudm1fcHV0X2Js
+ayhzdHJ1Y3QgbnZtX2RldiAqLCBzdHJ1Y3QgbnZtX2Jsb2NrICopOwogCi1leHRlcm4gaW50IG52
+bV9yZWdpc3RlcihzdHJ1Y3QgcmVxdWVzdF9xdWV1ZSAqLCBjaGFyICosCi0JCQkJCQlzdHJ1Y3Qg
+bnZtX2Rldl9vcHMgKik7Ci1leHRlcm4gdm9pZCBudm1fdW5yZWdpc3RlcihjaGFyICopOworZXh0
+ZXJuIHN0cnVjdCBudm1fZGV2ICpudm1fYWxsb2NfZGV2KGludCk7CitleHRlcm4gaW50IG52bV9y
+ZWdpc3RlcihzdHJ1Y3QgbnZtX2RldiAqKTsKK2V4dGVybiB2b2lkIG52bV91bnJlZ2lzdGVyKHN0
+cnVjdCBudm1fZGV2ICopOwogCiB2b2lkIG52bV9tYXJrX2JsayhzdHJ1Y3QgbnZtX2RldiAqZGV2
+LCBzdHJ1Y3QgcHBhX2FkZHIgcHBhLCBpbnQgdHlwZSk7CiAKQEAgLTU3NSwxMSArNTc1LDE0IEBA
+IGV4dGVybiBpbnQgbnZtX2Rldl9mYWN0b3J5KHN0cnVjdCBudm1fZGV2ICosIGludCBmbGFncyk7
+CiAjZWxzZSAvKiBDT05GSUdfTlZNICovCiBzdHJ1Y3QgbnZtX2Rldl9vcHM7CiAKLXN0YXRpYyBp
+bmxpbmUgaW50IG52bV9yZWdpc3RlcihzdHJ1Y3QgcmVxdWVzdF9xdWV1ZSAqcSwgY2hhciAqZGlz
+a19uYW1lLAotCQkJCQkJCXN0cnVjdCBudm1fZGV2X29wcyAqb3BzKQorc3RhdGljIGlubGluZSBz
+dHJ1Y3QgbnZtX2RldiAqbnZtX2FsbG9jX2RldihpbnQgbm9kZSkKK3sKKwlyZXR1cm4gRVJSX1BU
+UigtRUlOVkFMKTsKK30KK3N0YXRpYyBpbmxpbmUgaW50IG52bV9yZWdpc3RlcihzdHJ1Y3QgbnZt
+X2RldiAqZGV2KQogewogCXJldHVybiAtRUlOVkFMOwogfQotc3RhdGljIGlubGluZSB2b2lkIG52
+bV91bnJlZ2lzdGVyKGNoYXIgKmRpc2tfbmFtZSkge30KK3N0YXRpYyBpbmxpbmUgdm9pZCBudm1f
+dW5yZWdpc3RlcihzdHJ1Y3QgbnZtX2RldiAqZGV2KSB7fQogI2VuZGlmIC8qIENPTkZJR19OVk0g
+Ki8KICNlbmRpZiAvKiBMSUdIVE5WTS5IICovCi0tIAoyLjEuNAoKCl9fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCkxpbnV4LW52bWUgbWFpbGluZyBsaXN0Ckxp
+bnV4LW52bWVAbGlzdHMuaW5mcmFkZWFkLm9yZwpodHRwOi8vbGlzdHMuaW5mcmFkZWFkLm9yZy9t
+YWlsbWFuL2xpc3RpbmZvL2xpbnV4LW52bWUK
