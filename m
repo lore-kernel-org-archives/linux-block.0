@@ -1,76 +1,31 @@
-Return-Path: <BATV+b9eeede57ded57779fe4+4685+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk,
-	keith.busch@intel.com
-Cc: linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-nvme@lists.infradead.org
-Subject: NVMe over Fabrics target implementation V2
-Date: Tue, 21 Jun 2016 18:04:18 +0200
-Message-Id: <1466525061-3686-1-git-send-email-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from userp1040.oracle.com ([156.151.31.81]:30003 "EHLO
+	userp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750873AbcF2FEO (ORCPT
+	<rfc822;linux-block@vger.kernel.org>);
+	Wed, 29 Jun 2016 01:04:14 -0400
+To: Christoph Hellwig <hch@lst.de>
+Cc: axboe@fb.com, shli@fb.com, martin.petersen@oracle.com,
+	snitzer@redhat.com, sitsofe@yahoo.com, linux-block@vger.kernel.org
+Subject: Re: [PATCH 2/2] block: don't ignore -EOPNOTSUPP blkdev_issue_write_same
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <1466751651-9900-1-git-send-email-hch@lst.de>
+	<1466751651-9900-3-git-send-email-hch@lst.de>
+Date: Wed, 29 Jun 2016 01:04:02 -0400
+In-Reply-To: <1466751651-9900-3-git-send-email-hch@lst.de> (Christoph
+	Hellwig's message of "Fri, 24 Jun 2016 09:00:51 +0200")
+Message-ID: <yq1furwsi0t.fsf@sermon.lab.mkp.net>
+MIME-Version: 1.0
+Content-Type: text/plain
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This patch set adds a generic NVMe over Fabrics target. The
-implementation conforms to the NVMe 1.2b specification (which
-includes Fabrics) and provides the NVMe over Fabrics access
-to Linux block devices.
+>>>>> "Christoph" == Christoph Hellwig <hch@lst.de> writes:
 
-The target implementation consists of several elements:
+Christoph> WRITE SAME is a data integrity operation and we can't simply
+Christoph> ignore errors.
 
-- NVMe target core: defines and manages the NVMe entities (subsystems,
-  controllers, namespaces, ...) and their allocation, responsible
-  for initial commands processing and correct orchestration of
-  the stack setup and tear down.
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
 
-- NVMe admin command implementation: responsible for parsing and
-  servicing admin commands such as controller identify, set features,
-  keep-alive, log page, ...).
-
-- NVMe I/O command implementation: responsible for performing the actual
-  I/O (Read, Write, Flush, Deallocate (aka Discard).  It is a very thin
-  layer on top of the block layer and implements no logic of it's own.
-  To support exporting file systems please use the loopback block driver
-  in direct I/O mode, which gives very good performance.
-
-- NVMe over Fabrics support: responsible for servicing Fabrics commands
-  (connect, property get/set).
-
-- NVMe over Fabrics discovery service: responsible to serve the Discovery
-  log page through a special cut down Discovery controller.
-
-The target is configured using configfs, and configurable entities are:
-
- - NVMe subsystems and namespaces
- - NVMe over Fabrics ports and referrals
- - Host ACLs for primitive access control - NVMe over Fabrics access
-   control is still work in progress at the specification level and
-   will be implemented once that work has finished.
-
-To configure the target use the nvmetcli tool from
-http://git.infradead.org/users/hch/nvmetcli.git, which includes detailed
-setup documentation.
-
-In addition to the Fabrics target implementation we provide a loopback
-driver which also conforms the NVMe over Fabrics specification and allows
-evaluation of the target stack with local access without requiring a real
-fabric.
-
-Various test cases are provided for this implementation: nvmetcli
-contains a python testsuite that mostly stresses the configfs interface
-of the target, and we have various integration tests prepared for the
-kernel host and target which are available at:
-
-	git://git.infradead.org/nvme-fabrics.git nvmf-submit.2
-
-Gitweb:
-
-	http://git.infradead.org/nvme-fabrics.git/shortlog/refs/heads/nvmf-submit.2
-
-This series depends on the "generic NVMe over Fabrics library support V2"
-series submitted last week.
-
-Changes since V1:
- - rebased to the req_op changes in the block tree (me)
- - fix a 64-bit division (me)
- - properly set the SGL flag for AER requests in nvme-loop (me)
- - fix use of ERR_PTR (buildbot)
+-- 
+Martin K. Petersen	Oracle Linux Engineering
