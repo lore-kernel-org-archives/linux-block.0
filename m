@@ -1,46 +1,41 @@
-Return-Path: <BATV+10e0b2ba6b8830823af0+4672+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: keith.busch@intel.com,
-	axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	sagi@lightbits.io,
-	ming.l@ssi.samsung.com
-Subject: [PATCH 07/11] nvmet: fix 64-bit division in nvmet_set_features
-Date: Wed,  8 Jun 2016 14:31:02 +0200
-Message-Id: <1465389066-19119-8-git-send-email-hch@lst.de>
-In-Reply-To: <1465389066-19119-1-git-send-email-hch@lst.de>
-References: <1465389066-19119-1-git-send-email-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from userp1040.oracle.com ([156.151.31.81]:29865 "EHLO
+	userp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750873AbcF2FDu (ORCPT
+	<rfc822;linux-block@vger.kernel.org>);
+	Wed, 29 Jun 2016 01:03:50 -0400
+To: Christoph Hellwig <hch@lst.de>
+Cc: axboe@fb.com, shli@fb.com, martin.petersen@oracle.com,
+	snitzer@redhat.com, sitsofe@yahoo.com, linux-block@vger.kernel.org
+Subject: Re: [PATCH 1/2] block: introduce BLKDEV_DISCARD_ZERO to fix zeroout
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <1466751651-9900-1-git-send-email-hch@lst.de>
+	<1466751651-9900-2-git-send-email-hch@lst.de>
+Date: Wed, 29 Jun 2016 01:03:38 -0400
+In-Reply-To: <1466751651-9900-2-git-send-email-hch@lst.de> (Christoph
+	Hellwig's message of "Fri, 24 Jun 2016 09:00:50 +0200")
+Message-ID: <yq1k2h8si1h.fsf@sermon.lab.mkp.net>
+MIME-Version: 1.0
+Content-Type: text/plain
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-As it makes 32-bit builds unhappy.
+>>>>> "Christoph" == Christoph Hellwig <hch@lst.de> writes:
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/nvme/target/admin-cmd.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Christoph> Currently blkdev_issue_zeroout cascades down from discards
+Christoph> (if the driver guarantees that discards zero data), to WRITE
+Christoph> SAME and then to a loop writing zeroes.  Unfortunately we
+Christoph> ignore run-time EOPNOTSUPP errors in the block layer
+Christoph> blkdev_issue_discard helper to work around DM volumes that
+Christoph> may have mixed discard support underneath.
 
-diff --git a/drivers/nvme/target/admin-cmd.c b/drivers/nvme/target/admin-cmd.c
-index 240e323..2fac17a 100644
---- a/drivers/nvme/target/admin-cmd.c
-+++ b/drivers/nvme/target/admin-cmd.c
-@@ -298,6 +298,7 @@ static void nvmet_execute_set_features(struct nvmet_req *req)
- 	struct nvmet_subsys *subsys = req->sq->ctrl->subsys;
- 	u32 cdw10 = le32_to_cpu(req->cmd->common.cdw10[0]);
- 	u64 val;
-+	u32 val32;
- 	u16 status = 0;
- 
- 	switch (cdw10 & 0xf) {
-@@ -307,7 +308,8 @@ static void nvmet_execute_set_features(struct nvmet_req *req)
- 		break;
- 	case NVME_FEAT_KATO:
- 		val = le64_to_cpu(req->cmd->prop_set.value);
--		req->sq->ctrl->kato = (u32)DIV_ROUND_UP(val & 0xffff, 1000);
-+		val32 = val & 0xffff;
-+		req->sq->ctrl->kato = DIV_ROUND_UP(val32, 1000);
- 		nvmet_set_result(req, req->sq->ctrl->kato);
- 		break;
- 	default:
+Christoph> This patch intoroduces a new BLKDEV_DISCARD_ZERO flag to
+Christoph> blkdev_issue_discard that indicates we are called for zeroing
+Christoph> operation.  This allows both to ignore the EOPNOTSUPP hack
+Christoph> and actually consolidating the discard_zeroes_data check into
+Christoph> the function.
+
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+
 -- 
-2.1.4
+Martin K. Petersen	Oracle Linux Engineering
