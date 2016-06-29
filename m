@@ -1,153 +1,106 @@
-Return-Path: <BATV+1815987b1c14acf14571+4678+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: mst@redhat.com,
-	ooo@electrozaur.com,
-	nab@linux-iscsi.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH 6/7] scsi/osd: open code blk_make_request
-Date: Tue, 14 Jun 2016 19:16:03 +0200
-Message-Id: <1465924564-14503-7-git-send-email-hch@lst.de>
-In-Reply-To: <1465924564-14503-1-git-send-email-hch@lst.de>
-References: <1465924564-14503-1-git-send-email-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f67.google.com ([74.125.82.67]:35368 "EHLO
+	mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752757AbcF2OmX (ORCPT
+	<rfc822;linux-block@vger.kernel.org>);
+	Wed, 29 Jun 2016 10:42:23 -0400
+Received: by mail-wm0-f67.google.com with SMTP id a66so14846963wme.2
+        for <linux-block@vger.kernel.org>; Wed, 29 Jun 2016 07:42:20 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+Subject: [RFC PATCH 07/11] lightnvm: remove unused lists from struct rrpc_block
+Date: Wed, 29 Jun 2016 16:41:52 +0200
+Message-Id: <1467211316-22373-8-git-send-email-m@bjorling.me>
+In-Reply-To: <1467211316-22373-1-git-send-email-m@bjorling.me>
+References: <1467211316-22373-1-git-send-email-m@bjorling.me>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-I wish the OSD code could simply use blk_rq_map_* helpers like
-everyone else, but the complex nature of deciding if we have
-DATA IN and/or DATA OUT buffers might make this impossible
-(at least for a mere human like me).
+The ->list, ->open_list, and ->closed_list lists were previously used
+for statistics. However, their usage have been removed, and thus these
+can safely be removed.
 
-But using blk_rq_append_bio at least allows sharing the setup code
-between request with or without dat a buffers, and given that this
-is the last user of blk_make_request it allows getting rid of that
-somewhat awkward interface.
-
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Matias Bjørling <m@bjorling.me>
 ---
- block/blk-core.c                 | 57 ----------------------------------------
- drivers/scsi/osd/osd_initiator.c | 25 +++++++++++-------
- include/linux/blkdev.h           |  2 --
- 3 files changed, 16 insertions(+), 68 deletions(-)
+ drivers/lightnvm/rrpc.c | 9 ---------
+ drivers/lightnvm/rrpc.h | 8 --------
+ 2 files changed, 17 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 2c4c021..ecf7e49 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1319,63 +1319,6 @@ struct request *blk_get_request(struct request_queue *q, int rw, gfp_t gfp_mask)
- EXPORT_SYMBOL(blk_get_request);
- 
- /**
-- * blk_make_request - given a bio, allocate a corresponding struct request.
-- * @q: target request queue
-- * @bio:  The bio describing the memory mappings that will be submitted for IO.
-- *        It may be a chained-bio properly constructed by block/bio layer.
-- * @gfp_mask: gfp flags to be used for memory allocation
-- *
-- * blk_make_request is the parallel of generic_make_request for BLOCK_PC
-- * type commands. Where the struct request needs to be farther initialized by
-- * the caller. It is passed a &struct bio, which describes the memory info of
-- * the I/O transfer.
-- *
-- * The caller of blk_make_request must make sure that bi_io_vec
-- * are set to describe the memory buffers. That bio_data_dir() will return
-- * the needed direction of the request. (And all bio's in the passed bio-chain
-- * are properly set accordingly)
-- *
-- * If called under none-sleepable conditions, mapped bio buffers must not
-- * need bouncing, by calling the appropriate masked or flagged allocator,
-- * suitable for the target device. Otherwise the call to blk_queue_bounce will
-- * BUG.
-- *
-- * WARNING: When allocating/cloning a bio-chain, careful consideration should be
-- * given to how you allocate bios. In particular, you cannot use
-- * __GFP_DIRECT_RECLAIM for anything but the first bio in the chain. Otherwise
-- * you risk waiting for IO completion of a bio that hasn't been submitted yet,
-- * thus resulting in a deadlock. Alternatively bios should be allocated using
-- * bio_kmalloc() instead of bio_alloc(), as that avoids the mempool deadlock.
-- * If possible a big IO should be split into smaller parts when allocation
-- * fails. Partial allocation should not be an error, or you risk a live-lock.
-- */
--struct request *blk_make_request(struct request_queue *q, struct bio *bio,
--				 gfp_t gfp_mask)
--{
--	struct request *rq = blk_get_request(q, bio_data_dir(bio), gfp_mask);
--
--	if (IS_ERR(rq))
--		return rq;
--
--	blk_rq_set_block_pc(rq);
--
--	for_each_bio(bio) {
--		struct bio *bounce_bio = bio;
--		int ret;
--
--		blk_queue_bounce(q, &bounce_bio);
--		ret = blk_rq_append_bio(rq, bounce_bio);
--		if (unlikely(ret)) {
--			blk_put_request(rq);
--			return ERR_PTR(ret);
--		}
--	}
--
--	return rq;
--}
--EXPORT_SYMBOL(blk_make_request);
--
--/**
-  * blk_rq_set_block_pc - initialize a request to type BLOCK_PC
-  * @rq:		request to be initialized
-  *
-diff --git a/drivers/scsi/osd/osd_initiator.c b/drivers/scsi/osd/osd_initiator.c
-index daa4dc1..2f2a991 100644
---- a/drivers/scsi/osd/osd_initiator.c
-+++ b/drivers/scsi/osd/osd_initiator.c
-@@ -1558,18 +1558,25 @@ static int _osd_req_finalize_data_integrity(struct osd_request *or,
- static struct request *_make_request(struct request_queue *q, bool has_write,
- 			      struct _osd_io_info *oii, gfp_t flags)
- {
--	if (oii->bio)
--		return blk_make_request(q, oii->bio, flags);
--	else {
--		struct request *req;
--
--		req = blk_get_request(q, has_write ? WRITE : READ, flags);
--		if (IS_ERR(req))
--			return req;
-+	struct request *req;
-+	struct bio *bio = oii->bio;
-+	int ret;
- 
--		blk_rq_set_block_pc(req);
-+	req = blk_get_request(q, has_write ? WRITE : READ, flags);
-+	if (IS_ERR(req))
- 		return req;
-+	blk_rq_set_block_pc(req);
-+
-+	for_each_bio(bio) {
-+		struct bio *bounce_bio = bio;
-+
-+		blk_queue_bounce(req->q, &bounce_bio);
-+		ret = blk_rq_append_bio(req, bounce_bio);
-+		if (ret)
-+			return ERR_PTR(ret);
+diff --git a/drivers/lightnvm/rrpc.c b/drivers/lightnvm/rrpc.c
+index c3a6f34..10ed22b 100644
+--- a/drivers/lightnvm/rrpc.c
++++ b/drivers/lightnvm/rrpc.c
+@@ -205,7 +205,6 @@ static struct rrpc_block *rrpc_get_blk(struct rrpc *rrpc, struct rrpc_lun *rlun,
  	}
-+
-+	return req;
+ 
+ 	rblk = rrpc_get_rblk(rlun, blk->id);
+-	list_add_tail(&rblk->list, &rlun->open_list);
+ 	spin_unlock(&lun->lock);
+ 
+ 	blk->priv = rblk;
+@@ -224,7 +223,6 @@ static void rrpc_put_blk(struct rrpc *rrpc, struct rrpc_block *rblk)
+ 
+ 	spin_lock(&lun->lock);
+ 	nvm_put_blk_unlocked(rrpc->dev, rblk->parent);
+-	list_del(&rblk->list);
+ 	spin_unlock(&lun->lock);
  }
  
- static int _init_blk_request(struct osd_request *or,
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 07176f4..3be95eb 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -787,8 +787,6 @@ extern void blk_rq_init(struct request_queue *q, struct request *rq);
- extern void blk_put_request(struct request *);
- extern void __blk_put_request(struct request_queue *, struct request *);
- extern struct request *blk_get_request(struct request_queue *, int, gfp_t);
--extern struct request *blk_make_request(struct request_queue *, struct bio *,
--					gfp_t);
- extern void blk_rq_set_block_pc(struct request *);
- extern void blk_requeue_request(struct request_queue *, struct request *);
- extern void blk_add_request_payload(struct request *rq, struct page *page,
+@@ -511,16 +509,11 @@ static void rrpc_gc_queue(struct work_struct *work)
+ 	struct rrpc *rrpc = gcb->rrpc;
+ 	struct rrpc_block *rblk = gcb->rblk;
+ 	struct rrpc_lun *rlun = rblk->rlun;
+-	struct nvm_lun *lun = rblk->parent->lun;
+ 
+ 	spin_lock(&rlun->lock);
+ 	list_add_tail(&rblk->prio, &rlun->prio_list);
+ 	spin_unlock(&rlun->lock);
+ 
+-	spin_lock(&lun->lock);
+-	list_move_tail(&rblk->list, &rlun->closed_list);
+-	spin_unlock(&lun->lock);
+-
+ 	mempool_free(gcb, rrpc->gcb_pool);
+ 	pr_debug("nvm: block '%lu' is full, allow GC (sched)\n",
+ 							rblk->parent->id);
+@@ -1194,8 +1187,6 @@ static int rrpc_luns_init(struct rrpc *rrpc, int lun_begin, int lun_end)
+ 
+ 		rlun->rrpc = rrpc;
+ 		INIT_LIST_HEAD(&rlun->prio_list);
+-		INIT_LIST_HEAD(&rlun->open_list);
+-		INIT_LIST_HEAD(&rlun->closed_list);
+ 
+ 		INIT_WORK(&rlun->ws_gc, rrpc_lun_gc);
+ 		spin_lock_init(&rlun->lock);
+diff --git a/drivers/lightnvm/rrpc.h b/drivers/lightnvm/rrpc.h
+index 5797343..448e39a 100644
+--- a/drivers/lightnvm/rrpc.h
++++ b/drivers/lightnvm/rrpc.h
+@@ -56,7 +56,6 @@ struct rrpc_block {
+ 	struct nvm_block *parent;
+ 	struct rrpc_lun *rlun;
+ 	struct list_head prio;
+-	struct list_head list;
+ 
+ #define MAX_INVALID_PAGES_STORAGE 8
+ 	/* Bitmap for invalid page intries */
+@@ -77,13 +76,6 @@ struct rrpc_lun {
+ 	struct rrpc_block *blocks;	/* Reference to block allocation */
+ 
+ 	struct list_head prio_list;	/* Blocks that may be GC'ed */
+-	struct list_head open_list;	/* In-use open blocks. These are blocks
+-					 * that can be both written to and read
+-					 * from
+-					 */
+-	struct list_head closed_list;	/* In-use closed blocks. These are
+-					 * blocks that can _only_ be read from
+-					 */
+ 
+ 	struct work_struct ws_gc;
+ 
 -- 
 2.1.4
+
