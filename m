@@ -1,50 +1,54 @@
-Return-Path: <jack@suse.cz>
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Jeff Moyer <jmoyer@redhat.com>,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH 2/4] cfq-iosched: Convert slice_resid from u64 to s64
-Date: Tue, 28 Jun 2016 09:04:00 +0200
-Message-Id: <1467097442-5400-3-git-send-email-jack@suse.cz>
-In-Reply-To: <1467097442-5400-1-git-send-email-jack@suse.cz>
-References: <1467097442-5400-1-git-send-email-jack@suse.cz>
+Return-Path: <famz@redhat.com>
+From: Fam Zheng <famz@redhat.com>
+To: linux-kernel@vger.kernel.org
+Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        Michael Ellerman <mpe@ellerman.id.au>, Jens Axboe <axboe@kernel.dk>,
+        "Ed L. Cashin" <ed.cashin@acm.org>, Jiri Kosina <jikos@kernel.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Minchan Kim <minchan@kernel.org>, Nitin Gupta <ngupta@vflare.org>,
+        Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
+        Shaohua Li <shli@kernel.org>, Ulf Hansson <ulf.hansson@linaro.org>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Brian Norris <computersforpeace@gmail.com>,
+        Keith Busch <keith.busch@intel.com>, linuxppc-dev@lists.ozlabs.org,
+        linux-block@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        linux-raid@vger.kernel.org, linux-mmc@vger.kernel.org,
+        linux-mtd@lists.infradead.org, linux-nvme@lists.infradead.org,
+        Christoph Hellwig <hch@infradead.org>, famz@redhat.com
+Subject: [PATCH v2 12/12] nvme: Generate uevent after attribute available
+Date: Thu, 30 Jun 2016 09:59:53 +0800
+Message-Id: <20160630015953.6888-13-famz@redhat.com>
+In-Reply-To: <20160630015953.6888-1-famz@redhat.com>
+References: <20160630015953.6888-1-famz@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-slice_resid can be both positive and negative. Commit 9a7f38c42c2b
-(cfq-iosched: Convert from jiffies to nanoseconds) converted it from
-long to u64. Although this did not introduce any functional regression
-(the operations just overflow and the result was fine), it is certainly
-wrong and could cause issues in future. So convert the type to more
-appropriate s64.
+It is documented that KOBJ_ADD should be generated after the object's
+attributes and children are ready.  We can achieve this with the new
+disk_gen_uevents interface.
 
-Fixes: 9a7f38c42c2b92391d9dabaf9f51df7cfe5608e4
-Signed-off-by: Jan Kara <jack@suse.cz>
+Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- block/cfq-iosched.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/nvme/host/core.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
-index dab606852e24..98cece4e62a9 100644
---- a/block/cfq-iosched.c
-+++ b/block/cfq-iosched.c
-@@ -132,7 +132,7 @@ struct cfq_queue {
- 	/* time when first request from queue completed and slice started. */
- 	u64 slice_start;
- 	u64 slice_end;
--	u64 slice_resid;
-+	s64 slice_resid;
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index fd70894..2655521 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -1462,11 +1462,12 @@ static void nvme_alloc_ns(struct nvme_ctrl *ctrl, unsigned nsid)
+ 	if (ns->type == NVME_NS_LIGHTNVM)
+ 		return;
  
- 	/* pending priority requests */
- 	int prio_pending;
-@@ -2681,7 +2681,7 @@ __cfq_slice_expired(struct cfq_data *cfqd, struct cfq_queue *cfqq,
- 			cfqq->slice_resid = cfq_scaled_cfqq_slice(cfqd, cfqq);
- 		else
- 			cfqq->slice_resid = cfqq->slice_end - ktime_get_ns();
--		cfq_log_cfqq(cfqd, cfqq, "resid=%llu", cfqq->slice_resid);
-+		cfq_log_cfqq(cfqd, cfqq, "resid=%lld", cfqq->slice_resid);
- 	}
- 
- 	cfq_group_served(cfqd, cfqq->cfqg, cfqq);
+-	add_disk(ns->disk, true);
++	add_disk(ns->disk, false);
+ 	if (sysfs_create_group(&disk_to_dev(ns->disk)->kobj,
+ 					&nvme_ns_attr_group))
+ 		pr_warn("%s: failed to create sysfs group for identification\n",
+ 			ns->disk->disk_name);
++	disk_gen_uevents(ns->disk);
+ 	return;
+  out_free_disk:
+ 	kfree(disk);
 -- 
-2.6.6
+2.9.0
