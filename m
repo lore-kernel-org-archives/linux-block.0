@@ -1,36 +1,72 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-Date: Wed, 22 Jun 2016 14:52:40 +0300 (EEST)
-From: Meelis Roos <mroos@linux.ee>
-To: John David Anglin <dave.anglin@bell.net>
-cc: Helge Deller <deller@gmx.de>, linux-parisc@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
-Subject: Re: parisc late boot crash in 4.4-rc, scsi-related
-In-Reply-To: <9d1ae51e-69c3-c3f6-60aa-e5238dd18241@bell.net>
-Message-ID: <alpine.LRH.2.20.1606221451310.11869@math.ut.ee>
-References: <alpine.LRH.2.20.1601082329270.23187@math.ut.ee> <56902D77.1020200@gmx.de> <alpine.LRH.2.20.1605162336050.12607@math.ut.ee> <9d1ae51e-69c3-c3f6-60aa-e5238dd18241@bell.net>
+Return-Path: <msnitzer@redhat.com>
+Date: Thu, 30 Jun 2016 19:15:18 -0400
+From: Mike Snitzer <snitzer@redhat.com>
+To: Mikulas Patocka <mpatocka@redhat.com>,
+        Lars Ellenberg <lars.ellenberg@linbit.com>, axboe@kernel.dk
+Cc: linux-block@vger.kernel.org, dm-devel@redhat.com,
+        Roland Kammerer <roland.kammerer@linbit.com>,
+        "Alasdair G. Kergon" <agk@redhat.com>,
+        Zdenek Kabelac <zkabelac@redhat.com>
+Subject: Re: [PATCH 0/3] offload bios to a thread
+Message-ID: <20160630231518.GA22518@redhat.com>
+References: <alpine.LRH.2.02.1606282014380.7298@file01.intranet.prod.int.rdu2.redhat.com>
+ <20160630194023.GA21338@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Sender: linux-scsi-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20160630194023.GA21338@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-> > > > I noticed on RP3440 and A500 that recent 4.4-rc* crashes on boot.
-> > > >
-> > > >I've not seen it with 4.4-rc yet, but I've seen it on debian kernel
-> > > >4.3.3:
-> > This is still present in 4.6, just tested. All my pariscs are broken
-> > - A500, RP3410, RP3440. 4.3 is the latest working release for me. If
-> > 4.3.3 is broken, it might be possible to bisect more easily.
+On Thu, Jun 30 2016 at  3:40pm -0400,
+Mike Snitzer <snitzer@redhat.com> wrote:
+
+> [cc'ing linux-block and drbd folks]
 > 
-> I believe this is fixed in current gcc versions (4.9 and latter). It was
-> exposed by a blk-merge
-> change.  It was fixed by this change:
+> On Tue, Jun 28 2016 at  8:16pm -0400,
+> Mikulas Patocka <mpatocka@redhat.com> wrote:
+> 
+> > Hi
+> > 
+> > Here I'm sending three patches to fix the deadlocks in snapshot and 
+> > snapshot-merge.
+> > 
+> > The first patch fixes the deadlock, the following 2 patches introduce a 
+> > timer, so that bios are not offloaded immediatelly, they are offloaded 
+> > after a specified timeout, because immediate offloading can change order 
+> > of bios and it could theoretically produce regressions. I don't know if 
+> > these regressions really exist or not.
+> > 
+> > If there is some way to push the patches upstream, try it.
+> 
+> Some fix must happen before the more recent upstream kernels can be
+> reliably used in stacked bio-based workloads (in production).  We simply
+> cannot ignore this issue any more.
+> 
+> drbd is also hitting the same generic_make_request (current->bio_list)
+> problem, see:
+> https://www.redhat.com/archives/dm-devel/2016-June/msg00326.html
+> 
+> Mikulas, I've taken your 3 proposed patches patches and refactored them
+> some to split out intermediate patches that hopefully make review
+> easier.  Nothing other than variable names and some other style stuff
+> was changed -- headers were tweaked some to help with clarity.
+> 
+> Please see the 5 topmost "block: ..." patches here:
+> http://git.kernel.org/cgit/linux/kernel/git/snitzer/linux.git/log/?h=wip
+> 
+> It should be noted that Jens had a quick look at this set and wanted to
+> throw up a little when he saw the (ab)use of a timer to defer punting to
+> the workqueue.  I explained that without the timer, always punting to
+> the workqueue, we could hurt performance by reordering IO or crippling
+> onstack plugging.  He said he'd try to think of a cleaner way forward.
+> 
+> Lars, please feel free to see if this set addresses the similar deadlock
+> you saw/fixed with drbd.  We need to converge on an acceptable fix for
+> this problem -- preferably sooner rather than later!
+> 
+> Conversely, Mikulas: if you can easily reproduce the dm-snapshot
+> deadlock please try Lars' fix to see if it is workable for our DM needs.
 
-Out of interest, how do other parisc users get the new compiler?
-
-What distro are you using?
-
-My pariscs are gentoo and still only the old versions are available on 
-hppa.
-
--- 
-Meelis Roos (mroos@linux.ee)
+I hadn't reviewed Lars' patch yet but Mikulas pointed out to me that
+Lars' patch is focused on the blk_queue_split() path -- and given that
+DM doesn't use this function (nor do DM devices even have a 'bio_split'
+bioset, see commit dbba42d8a9e) it won't fix the DM (snapshot) deadlock.
