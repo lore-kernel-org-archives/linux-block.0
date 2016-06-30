@@ -1,184 +1,39 @@
-Return-Path: <BATV+a67a43e55467fd1c3dfd+4677+infradead.org+hch@bombadil.srs.infradead.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from verein.lst.de ([213.95.11.211]:33395 "EHLO newverein.lst.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751523AbcF3RfL (ORCPT <rfc822;linux-block@vger.kernel.org>);
+	Thu, 30 Jun 2016 13:35:11 -0400
+Date: Thu, 30 Jun 2016 19:35:08 +0200
 From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk,
-	keith.busch@intel.com
-Cc: linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-rdma@vger.kernel.org
-Subject: [PATCH 3/8] nvme: Modify and export sync command submission for fabrics
-Date: Mon, 13 Jun 2016 16:45:23 +0200
-Message-Id: <1465829128-22993-4-git-send-email-hch@lst.de>
-In-Reply-To: <1465829128-22993-1-git-send-email-hch@lst.de>
-References: <1465829128-22993-1-git-send-email-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+To: Alexander Gordeev <agordeev@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>, tglx@linutronix.de, axboe@fb.com,
+	linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
+	linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 07/13] pci: Provide sensible irq vector alloc/free
+	routines
+Message-ID: <20160630173508.GA23378@lst.de>
+References: <1465934346-20648-1-git-send-email-hch@lst.de> <1465934346-20648-8-git-send-email-hch@lst.de> <20160623111610.GA28861@dhcp-27-118.brq.redhat.com> <20160630165417.GA21787@lst.de> <20160630172808.GB9247@agordeev.lab.eng.brq.redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20160630172808.GB9247@agordeev.lab.eng.brq.redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-NVMe over fabrics will use __nvme_submit_sync_cmd in the the
-transport and require a few tweaks to it.  For that we export it
-and add a few more paramters:
+On Thu, Jun 30, 2016 at 07:28:09PM +0200, Alexander Gordeev wrote:
+> I think I need to look at the updated version :)
 
-1. allow passing a queue ID to the block layer
+I've astarted processing the comments for the whole series and plan
+to post an update tomorrow.
 
-   For the NVMe over Fabrics connect command we need to able to specify a
-   queue ID that we want to send the command on.  Add a qid parameter to
-   the relevant functions to enable this behavior.
+> > > > +#define PCI_IRQ_NOMSIX		(1 << 0) /* don't try to use MSI-X interrupts */
+> > > 
+> > > BTW, why PCI_IRQ_NOMSIX only and no PCI_IRQ_NOMSI?
+> > 
+> > Because there is no need to call this API if your device only supports
+> > a single legacy vector anyway.
+> 
+> What if a device reports (up to 32) MSIs and MSI-X allocation failed? The
+> driver might prefer the legacy single (i.e. due to errata in MSI), but
+> there is no flag to ask for it.
 
-2. allow submitting at_head commands
-
-   In cases where we want to (re)connect to a controller
-   where we have inflight queued commands we want to first
-   connect and only then allow the other queued commands to
-   be kicked. This will prevents failures in controller resets
-   and reconnects.
-
-3. allow passing flags to blk_mq_allocate_request
-
-   Both for Fabrics connect the the keep-alive feature in NVMe 1.2.1 we
-   want to be able to use reserved requests.
-
-Reviewed-by: Jay Freyensee <james.p.freyensee@intel.com>
-Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
-Tested-by: Ming Lin <ming.l@ssi.samsung.com>
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/nvme/host/core.c | 27 ++++++++++++++++++---------
- drivers/nvme/host/nvme.h |  5 +++--
- drivers/nvme/host/pci.c  |  4 ++--
- 3 files changed, 23 insertions(+), 13 deletions(-)
-
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index f874c0e..bd04ec6 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -192,11 +192,16 @@ void nvme_requeue_req(struct request *req)
- EXPORT_SYMBOL_GPL(nvme_requeue_req);
- 
- struct request *nvme_alloc_request(struct request_queue *q,
--		struct nvme_command *cmd, unsigned int flags)
-+		struct nvme_command *cmd, unsigned int flags, int qid)
- {
- 	struct request *req;
- 
--	req = blk_mq_alloc_request(q, nvme_is_write(cmd), flags);
-+	if (qid == NVME_QID_ANY) {
-+		req = blk_mq_alloc_request(q, nvme_is_write(cmd), flags);
-+	} else {
-+		req = blk_mq_alloc_request_hctx(q, nvme_is_write(cmd), flags,
-+				qid ? qid - 1 : 0);
-+	}
- 	if (IS_ERR(req))
- 		return req;
- 
-@@ -324,12 +329,12 @@ EXPORT_SYMBOL_GPL(nvme_setup_cmd);
-  */
- int __nvme_submit_sync_cmd(struct request_queue *q, struct nvme_command *cmd,
- 		struct nvme_completion *cqe, void *buffer, unsigned bufflen,
--		unsigned timeout)
-+		unsigned timeout, int qid, int at_head, int flags)
- {
- 	struct request *req;
- 	int ret;
- 
--	req = nvme_alloc_request(q, cmd, 0);
-+	req = nvme_alloc_request(q, cmd, flags, qid);
- 	if (IS_ERR(req))
- 		return PTR_ERR(req);
- 
-@@ -342,17 +347,19 @@ int __nvme_submit_sync_cmd(struct request_queue *q, struct nvme_command *cmd,
- 			goto out;
- 	}
- 
--	blk_execute_rq(req->q, NULL, req, 0);
-+	blk_execute_rq(req->q, NULL, req, at_head);
- 	ret = req->errors;
-  out:
- 	blk_mq_free_request(req);
- 	return ret;
- }
-+EXPORT_SYMBOL_GPL(__nvme_submit_sync_cmd);
- 
- int nvme_submit_sync_cmd(struct request_queue *q, struct nvme_command *cmd,
- 		void *buffer, unsigned bufflen)
- {
--	return __nvme_submit_sync_cmd(q, cmd, NULL, buffer, bufflen, 0);
-+	return __nvme_submit_sync_cmd(q, cmd, NULL, buffer, bufflen, 0,
-+			NVME_QID_ANY, 0, 0);
- }
- EXPORT_SYMBOL_GPL(nvme_submit_sync_cmd);
- 
-@@ -370,7 +377,7 @@ int __nvme_submit_user_cmd(struct request_queue *q, struct nvme_command *cmd,
- 	void *meta = NULL;
- 	int ret;
- 
--	req = nvme_alloc_request(q, cmd, 0);
-+	req = nvme_alloc_request(q, cmd, 0, NVME_QID_ANY);
- 	if (IS_ERR(req))
- 		return PTR_ERR(req);
- 
-@@ -520,7 +527,8 @@ int nvme_get_features(struct nvme_ctrl *dev, unsigned fid, unsigned nsid,
- 	c.features.prp1 = cpu_to_le64(dma_addr);
- 	c.features.fid = cpu_to_le32(fid);
- 
--	ret = __nvme_submit_sync_cmd(dev->admin_q, &c, &cqe, NULL, 0, 0);
-+	ret = __nvme_submit_sync_cmd(dev->admin_q, &c, &cqe, NULL, 0, 0,
-+			NVME_QID_ANY, 0, 0);
- 	if (ret >= 0)
- 		*result = le32_to_cpu(cqe.result);
- 	return ret;
-@@ -539,7 +547,8 @@ int nvme_set_features(struct nvme_ctrl *dev, unsigned fid, unsigned dword11,
- 	c.features.fid = cpu_to_le32(fid);
- 	c.features.dword11 = cpu_to_le32(dword11);
- 
--	ret = __nvme_submit_sync_cmd(dev->admin_q, &c, &cqe, NULL, 0, 0);
-+	ret = __nvme_submit_sync_cmd(dev->admin_q, &c, &cqe, NULL, 0, 0,
-+			NVME_QID_ANY, 0, 0);
- 	if (ret >= 0)
- 		*result = le32_to_cpu(cqe.result);
- 	return ret;
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index 282421f..68a67ac 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -231,8 +231,9 @@ void nvme_stop_queues(struct nvme_ctrl *ctrl);
- void nvme_start_queues(struct nvme_ctrl *ctrl);
- void nvme_kill_queues(struct nvme_ctrl *ctrl);
- 
-+#define NVME_QID_ANY -1
- struct request *nvme_alloc_request(struct request_queue *q,
--		struct nvme_command *cmd, unsigned int flags);
-+		struct nvme_command *cmd, unsigned int flags, int qid);
- void nvme_requeue_req(struct request *req);
- int nvme_setup_cmd(struct nvme_ns *ns, struct request *req,
- 		struct nvme_command *cmd);
-@@ -240,7 +241,7 @@ int nvme_submit_sync_cmd(struct request_queue *q, struct nvme_command *cmd,
- 		void *buf, unsigned bufflen);
- int __nvme_submit_sync_cmd(struct request_queue *q, struct nvme_command *cmd,
- 		struct nvme_completion *cqe, void *buffer, unsigned bufflen,
--		unsigned timeout);
-+		unsigned timeout, int qid, int at_head, int flags);
- int nvme_submit_user_cmd(struct request_queue *q, struct nvme_command *cmd,
- 		void __user *ubuffer, unsigned bufflen, u32 *result,
- 		unsigned timeout);
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index dc39924..db6fdee 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -901,7 +901,7 @@ static enum blk_eh_timer_return nvme_timeout(struct request *req, bool reserved)
- 		 req->tag, nvmeq->qid);
- 
- 	abort_req = nvme_alloc_request(dev->ctrl.admin_q, &cmd,
--			BLK_MQ_REQ_NOWAIT);
-+			BLK_MQ_REQ_NOWAIT, NVME_QID_ANY);
- 	if (IS_ERR(abort_req)) {
- 		atomic_inc(&dev->ctrl.abort_limit);
- 		return BLK_EH_RESET_TIMER;
-@@ -1512,7 +1512,7 @@ static int nvme_delete_queue(struct nvme_queue *nvmeq, u8 opcode)
- 	cmd.delete_queue.opcode = opcode;
- 	cmd.delete_queue.qid = cpu_to_le16(nvmeq->qid);
- 
--	req = nvme_alloc_request(q, &cmd, BLK_MQ_REQ_NOWAIT);
-+	req = nvme_alloc_request(q, &cmd, BLK_MQ_REQ_NOWAIT, NVME_QID_ANY);
- 	if (IS_ERR(req))
- 		return PTR_ERR(req);
- 
--- 
-2.1.4
+Ok, I'll add it for now.
