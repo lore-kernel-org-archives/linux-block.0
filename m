@@ -1,67 +1,57 @@
-Return-Path: <jack@suse.cz>
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Jeff Moyer <jmoyer@redhat.com>,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH 1/4] block: Convert fifo_time from ulong to u64
-Date: Tue, 28 Jun 2016 09:03:59 +0200
-Message-Id: <1467097442-5400-2-git-send-email-jack@suse.cz>
-In-Reply-To: <1467097442-5400-1-git-send-email-jack@suse.cz>
-References: <1467097442-5400-1-git-send-email-jack@suse.cz>
+Return-Path: <famz@redhat.com>
+From: Fam Zheng <famz@redhat.com>
+To: linux-kernel@vger.kernel.org
+Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        Michael Ellerman <mpe@ellerman.id.au>, Jens Axboe <axboe@kernel.dk>,
+        "Ed L. Cashin" <ed.cashin@acm.org>, Jiri Kosina <jikos@kernel.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Minchan Kim <minchan@kernel.org>, Nitin Gupta <ngupta@vflare.org>,
+        Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
+        Shaohua Li <shli@kernel.org>, Ulf Hansson <ulf.hansson@linaro.org>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Brian Norris <computersforpeace@gmail.com>,
+        Keith Busch <keith.busch@intel.com>, linuxppc-dev@lists.ozlabs.org,
+        linux-block@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        linux-raid@vger.kernel.org, linux-mmc@vger.kernel.org,
+        linux-mtd@lists.infradead.org, linux-nvme@lists.infradead.org,
+        Christoph Hellwig <hch@infradead.org>, famz@redhat.com
+Subject: [PATCH v2 08/12] zram: Generate uevent after attribute available
+Date: Thu, 30 Jun 2016 09:59:49 +0800
+Message-Id: <20160630015953.6888-9-famz@redhat.com>
+In-Reply-To: <20160630015953.6888-1-famz@redhat.com>
+References: <20160630015953.6888-1-famz@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Currently rq->fifo_time is unsigned long but CFQ stores nanosecond
-timestamp in it which would overflow on 32-bit archs. Convert it to u64
-to avoid the overflow. Since the rq->fifo_time is unioned with struct
-call_single_data(), this does not change the size of struct request in
-any way.
+It is documented that KOBJ_ADD should be generated after the object's
+attributes and children are ready.  We can achieve this with the new
+disk_gen_uevents interface.
 
-We have to slightly fixup block/deadline-iosched.c so that comparison
-happens in the right types.
-
-Fixes: 9a7f38c42c2b92391d9dabaf9f51df7cfe5608e4
-Signed-off-by: Jan Kara <jack@suse.cz>
+Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- block/deadline-iosched.c | 5 +++--
- include/linux/blkdev.h   | 2 +-
- 2 files changed, 4 insertions(+), 3 deletions(-)
+ drivers/block/zram/zram_drv.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/block/deadline-iosched.c b/block/deadline-iosched.c
-index d0dd7882d8c7..26a9d3c8057a 100644
---- a/block/deadline-iosched.c
-+++ b/block/deadline-iosched.c
-@@ -173,7 +173,8 @@ deadline_merged_requests(struct request_queue *q, struct request *req,
- 	 * and move into next position (next will be deleted) in fifo
- 	 */
- 	if (!list_empty(&req->queuelist) && !list_empty(&next->queuelist)) {
--		if (time_before(next->fifo_time, req->fifo_time)) {
-+		if (time_before((unsigned long)next->fifo_time,
-+				(unsigned long)req->fifo_time)) {
- 			list_move(&req->queuelist, &next->queuelist);
- 			req->fifo_time = next->fifo_time;
- 		}
-@@ -227,7 +228,7 @@ static inline int deadline_check_fifo(struct deadline_data *dd, int ddir)
- 	/*
- 	 * rq is expired!
- 	 */
--	if (time_after_eq(jiffies, rq->fifo_time))
-+	if (time_after_eq(jiffies, (unsigned long)rq->fifo_time))
- 		return 1;
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index d735513..83f10a0 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -1287,7 +1287,7 @@ static int zram_add(void)
+ 		zram->disk->queue->limits.discard_zeroes_data = 0;
+ 	queue_flag_set_unlocked(QUEUE_FLAG_DISCARD, zram->disk->queue);
  
- 	return 0;
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 3d9cf326574f..1bef2c3b59be 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -90,7 +90,7 @@ struct request {
- 	struct list_head queuelist;
- 	union {
- 		struct call_single_data csd;
--		unsigned long fifo_time;
-+		u64 fifo_time;
- 	};
+-	add_disk(zram->disk, true);
++	add_disk(zram->disk, false);
  
- 	struct request_queue *q;
+ 	ret = sysfs_create_group(&disk_to_dev(zram->disk)->kobj,
+ 				&zram_disk_attr_group);
+@@ -1296,6 +1296,7 @@ static int zram_add(void)
+ 				device_id);
+ 		goto out_free_disk;
+ 	}
++	disk_gen_uevents(zram->disk);
+ 	strlcpy(zram->compressor, default_compressor, sizeof(zram->compressor));
+ 	zram->meta = NULL;
+ 
 -- 
-2.6.6
+2.9.0
