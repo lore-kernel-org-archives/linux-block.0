@@ -1,131 +1,77 @@
-Return-Path: <baolin.wang@linaro.org>
-Return-Path: <baolin.wang@linaro.org>
-From: Baolin Wang <baolin.wang@linaro.org>
-To: axboe@kernel.dk,
-	agk@redhat.com,
-	snitzer@redhat.com,
-	dm-devel@redhat.com,
-	herbert@gondor.apana.org.au,
-	davem@davemloft.net
-Cc: ebiggers3@gmail.com,
-	js1304@gmail.com,
-	tadeusz.struk@intel.com,
-	smueller@chronox.de,
-	standby24x7@gmail.com,
-	shli@kernel.org,
-	dan.j.williams@intel.com,
-	martin.petersen@oracle.com,
-	sagig@mellanox.com,
-	kent.overstreet@gmail.com,
-	keith.busch@intel.com,
-	tj@kernel.org,
-	ming.lei@canonical.com,
-	broonie@kernel.org,
-	arnd@arndb.de,
-	linux-crypto@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-raid@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	baolin.wang@linaro.org
-Subject: [RFC v2 1/3] block: Introduce blk_bio_map_sg() to map one bio
-Date: Fri, 27 May 2016 19:11:22 +0800
-Message-Id: <2f0f6811938dafd14c6c7b1dbe8fbabfdcbb19c1.1464346333.git.baolin.wang@linaro.org>
-In-Reply-To: <cover.1464346333.git.baolin.wang@linaro.org>
-References: <cover.1464346333.git.baolin.wang@linaro.org>
-In-Reply-To: <cover.1464346333.git.baolin.wang@linaro.org>
-References: <cover.1464346333.git.baolin.wang@linaro.org>
+Return-Path: <jikos@kernel.org>
+Date: Thu, 30 Jun 2016 13:18:00 +0200 (CEST)
+From: Jiri Kosina <jikos@kernel.org>
+To: Jens Axboe <axboe@kernel.dk>
+cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+    Wim Osterholt <wim@djo.tudelft.nl>
+Subject: [PATCH RESEND] floppy: fix open(O_ACCMODE) for ioctl-only open
+In-Reply-To: <alpine.LNX.2.00.1606160946000.6874@cbobk.fhfr.pm>
+Message-ID: <alpine.LNX.2.00.1606301317290.6874@cbobk.fhfr.pm>
+References: <20160610230255.GA27770@djo.tudelft.nl> <alpine.LNX.2.00.1606131414420.6874@cbobk.fhfr.pm> <20160614184308.GA6188@djo.tudelft.nl> <alpine.LNX.2.00.1606150906320.6874@cbobk.fhfr.pm> <20160615132040.GZ14480@ZenIV.linux.org.uk>
+ <alpine.LNX.2.00.1606151610420.6874@cbobk.fhfr.pm> <20160615224722.GA9545@djo.tudelft.nl> <alpine.LNX.2.00.1606160946000.6874@cbobk.fhfr.pm>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 List-ID: <linux-block@vger.kernel.org>
 
-In dm-crypt, it need to map one bio to scatterlist for improving the
-hardware engine encryption efficiency. Thus this patch introduces the
-blk_bio_map_sg() function to map one bio with scatterlists.
+From: Jiri Kosina <jkosina@suse.cz>
 
-For avoiding the duplicated code in __blk_bios_map_sg() function, add
-one parameter to distinguish bio map or request map.
+Commit 09954bad4 ("floppy: refactor open() flags handling"), as a 
+side-effect, causes open(/dev/fdX, O_ACCMODE) to fail. It turns out that 
+this is being used setfdprm userspace for ioctl-only open().
 
-Signed-off-by: Baolin Wang <baolin.wang@linaro.org>
+Reintroduce back the original behavior wrt !(FMODE_READ|FMODE_WRITE) 
+modes, while still keeping the original O_NDELAY bug fixed.
+
+Cc: stable@vger.kernel.org # v4.5+
+Reported-by: Wim Osterholt <wim@djo.tudelft.nl>
+Tested-by: Wim Osterholt <wim@djo.tudelft.nl>
+Signed-off-by: Jiri Kosina <jkosina@suse.cz>
 ---
- block/blk-merge.c      |   36 +++++++++++++++++++++++++++++++-----
- include/linux/blkdev.h |    2 ++
- 2 files changed, 33 insertions(+), 5 deletions(-)
 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 2613531..badae44 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -376,7 +376,7 @@ new_segment:
+Jens, this should preferably go into 4.7-rcX and to -stable as well.
+
+ drivers/block/floppy.c | 21 +++++++++------------
+ 1 file changed, 9 insertions(+), 12 deletions(-)
+
+diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
+index 84708a5..a1dcf12 100644
+--- a/drivers/block/floppy.c
++++ b/drivers/block/floppy.c
+@@ -3663,11 +3663,6 @@ static int floppy_open(struct block_device *bdev, fmode_t mode)
  
- static int __blk_bios_map_sg(struct request_queue *q, struct bio *bio,
- 			     struct scatterlist *sglist,
--			     struct scatterlist **sg)
-+			     struct scatterlist **sg, bool single_bio)
- {
- 	struct bio_vec bvec, bvprv = { NULL };
- 	struct bvec_iter iter;
-@@ -408,13 +408,39 @@ single_segment:
- 		return 1;
- 	}
+ 	opened_bdev[drive] = bdev;
  
--	for_each_bio(bio)
-+	if (!single_bio) {
-+		for_each_bio(bio)
-+			bio_for_each_segment(bvec, bio, iter)
-+				__blk_segment_map_sg(q, &bvec, sglist, &bvprv,
-+						     sg, &nsegs, &cluster);
-+	} else {
- 		bio_for_each_segment(bvec, bio, iter)
--			__blk_segment_map_sg(q, &bvec, sglist, &bvprv, sg,
--					     &nsegs, &cluster);
-+			__blk_segment_map_sg(q, &bvec, sglist, &bvprv,
-+					     sg, &nsegs, &cluster);
+-	if (!(mode & (FMODE_READ|FMODE_WRITE))) {
+-		res = -EINVAL;
+-		goto out;
+-	}
+-
+ 	res = -ENXIO;
+ 
+ 	if (!floppy_track_buffer) {
+@@ -3711,13 +3706,15 @@ static int floppy_open(struct block_device *bdev, fmode_t mode)
+ 	if (UFDCS->rawcmd == 1)
+ 		UFDCS->rawcmd = 2;
+ 
+-	UDRS->last_checked = 0;
+-	clear_bit(FD_OPEN_SHOULD_FAIL_BIT, &UDRS->flags);
+-	check_disk_change(bdev);
+-	if (test_bit(FD_DISK_CHANGED_BIT, &UDRS->flags))
+-		goto out;
+-	if (test_bit(FD_OPEN_SHOULD_FAIL_BIT, &UDRS->flags))
+-		goto out;
++	if (mode & (FMODE_READ|FMODE_WRITE)) {
++		UDRS->last_checked = 0;
++		clear_bit(FD_OPEN_SHOULD_FAIL_BIT, &UDRS->flags);
++		check_disk_change(bdev);
++		if (test_bit(FD_DISK_CHANGED_BIT, &UDRS->flags))
++			goto out;
++		if (test_bit(FD_OPEN_SHOULD_FAIL_BIT, &UDRS->flags))
++			goto out;
 +	}
-+
-+	return nsegs;
-+}
-+
-+/*
-+ * Map a bio to scatterlist, return number of sg entries setup. Caller must
-+ * make sure sg can hold bio segments entries.
-+ */
-+int blk_bio_map_sg(struct request_queue *q, struct bio *bio,
-+		   struct scatterlist *sglist)
-+{
-+	struct scatterlist *sg = NULL;
-+	int nsegs = 0;
-+
-+	if (bio)
-+		nsegs = __blk_bios_map_sg(q, bio, sglist, &sg, true);
-+
-+	if (sg)
-+		sg_mark_end(sg);
  
- 	return nsegs;
- }
-+EXPORT_SYMBOL(blk_bio_map_sg);
- 
- /*
-  * map a request to scatterlist, return number of sg entries setup. Caller
-@@ -427,7 +453,7 @@ int blk_rq_map_sg(struct request_queue *q, struct request *rq,
- 	int nsegs = 0;
- 
- 	if (rq->bio)
--		nsegs = __blk_bios_map_sg(q, rq->bio, sglist, &sg);
-+		nsegs = __blk_bios_map_sg(q, rq->bio, sglist, &sg, false);
- 
- 	if (unlikely(rq->cmd_flags & REQ_COPY_USER) &&
- 	    (blk_rq_bytes(rq) & q->dma_pad_mask)) {
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 1fd8fdf..5868062 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1013,6 +1013,8 @@ extern void blk_queue_write_cache(struct request_queue *q, bool enabled, bool fu
- extern struct backing_dev_info *blk_get_backing_dev_info(struct block_device *bdev);
- 
- extern int blk_rq_map_sg(struct request_queue *, struct request *, struct scatterlist *);
-+extern int blk_bio_map_sg(struct request_queue *q, struct bio *bio,
-+			  struct scatterlist *sglist);
- extern void blk_dump_rq_flags(struct request *, char *);
- extern long nr_blockdev_pages(void);
+ 	res = -EROFS;
  
 -- 
-1.7.9.5
+Jiri Kosina
+SUSE Labs
