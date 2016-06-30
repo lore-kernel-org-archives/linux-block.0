@@ -1,58 +1,86 @@
-Return-Path: <BATV+a67a43e55467fd1c3dfd+4677+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: mchristi@redhat.com,
-	linux-block@vger.kernel.org
-Subject: [PATCH 3/3] block: shrink bio size again
-Date: Mon, 13 Jun 2016 16:48:35 +0200
-Message-Id: <1465829315-23137-4-git-send-email-hch@lst.de>
-In-Reply-To: <1465829315-23137-1-git-send-email-hch@lst.de>
-References: <1465829315-23137-1-git-send-email-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga03.intel.com ([134.134.136.65]:38638 "EHLO mga03.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751964AbcF3UBM (ORCPT <rfc822;linux-block@vger.kernel.org>);
+	Thu, 30 Jun 2016 16:01:12 -0400
+Message-ID: <1467316875.21253.24.camel@linux.intel.com>
+Subject: Re: [PATCH 5/6] lightnvm: expose device geometry through sysfs
+From: J Freyensee <james_p_freyensee@linux.intel.com>
+To: Matias =?ISO-8859-1?Q?Bj=F8rling?= <m@bjorling.me>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	axboe@fb.com, keith.busch@intel.com,
+	linux-nvme@lists.infradead.org, dm-devel@redhat.com
+Cc: "Simon A. F. Lund" <slund@cnexlabs.com>
+Date: Thu, 30 Jun 2016 13:01:15 -0700
+In-Reply-To: <1467211901-26707-6-git-send-email-m@bjorling.me>
+References: <1467211901-26707-1-git-send-email-m@bjorling.me>
+	 <1467211901-26707-6-git-send-email-m@bjorling.me>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-The recent ops split grew the bio by adding the new ioprio field.
-Shrink it again by using a 16-bit field for the bi_flags value and
-filling the holes near the beginning of the structure.
+On Wed, 2016-06-29 at 16:51 +0200, Matias Bjørling wrote:
+> From: "Simon A. F. Lund" <slund@cnexlabs.com>
+> 
+> For a host to access an Open-Channel SSD, it has to know its
+> geometry,
+> so that it writes and reads at the appropriate device bounds.
+> 
+> Currently, the geometry information is kept within the kernel, and
+> not
+> exported to user-space for consumption. This patch exposes the
+> configuration through sysfs and enables user-space libraries, such as
+> liblightnvm, to use the sysfs implementation to get the geometry of
+> an
+> Open-Channel SSD.
+> 
+> The sysfs entries are stored within the device hierarchy, and can be
+> found using the "lightnvm" device type.
+> 
+> An example configuration looks like this:
+> 
+> /sys/class/nvme/
+> └── nvme0n1
+>    ├── capabilities: 3
+>    ├── device_mode: 1
+>    ├── channel_parallelism: 0
+>    ├── erase_max: 1000000
+>    ├── erase_typ: 1000000
+>    ├── flash_media_type: 0
+>    ├── media_capabilities: 0x00000001
+>    ├── media_type: 0
+>    ├── multiplane: 0x00010101
+>    ├── num_blocks: 1022
+>    ├── num_channels: 1
+>    ├── num_luns: 4
+>    ├── num_pages: 64
+>    ├── num_planes: 1
+>    ├── page_size: 4096
+>    ├── prog_max: 100000
+>    ├── prog_typ: 100000
+>    ├── read_max: 10000
+>    ├── read_typ: 10000
+>    ├── sector_oob_size: 0
+>    ├── sector_size: 4096
+>    ├── media_manager: gennvm
+>    ├── ppa_format: 0x380830082808001010102008
+>    ├── vendor_opcode: 0
+>    └── version: 1
+> 
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- include/linux/blk_types.h | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+That is an awful lot of new things to add under nvme0n1-type sysfs
+entries when there is already a decent amount of stuff under it.
 
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 4494b6c..f254eb2 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -26,11 +26,11 @@ typedef void (bio_destructor_t) (struct bio *);
- struct bio {
- 	struct bio		*bi_next;	/* request queue link */
- 	struct block_device	*bi_bdev;
--	unsigned int		bi_flags;	/* status, command, etc */
- 	int			bi_error;
- 	unsigned int		bi_rw;		/* bottom bits req flags,
- 						 * top bits REQ_OP
- 						 */
-+	unsigned short		bi_flags;	/* status, command, etc */
- 	unsigned short		bi_ioprio;
- 
- 	struct bvec_iter	bi_iter;
-@@ -116,7 +116,7 @@ struct bio {
-  * Flags starting here get preserved by bio_reset() - this includes
-  * BVEC_POOL_IDX()
-  */
--#define BIO_RESET_BITS	13
-+#define BIO_RESET_BITS	10
- 
- /*
-  * We support 6 different bvec pools, the last one is magic in that it
-@@ -131,7 +131,7 @@ struct bio {
-  * freed.
-  */
- #define BVEC_POOL_BITS		(4)
--#define BVEC_POOL_OFFSET	(32 - BVEC_POOL_BITS)
-+#define BVEC_POOL_OFFSET	(16 - BVEC_POOL_BITS)
- #define BVEC_POOL_IDX(bio)	((bio)->bi_flags >> BVEC_POOL_OFFSET)
- 
- #endif /* CONFIG_BLOCK */
--- 
-2.1.4
+Any chance these new things could be stuck under a separate sysfs
+directory under each nvmeXnY device?  If these things are mainly
+beneficial to LightNVM, it will be easier for a LightNVM newbie to
+find, recognize, and consider all the important things in an Open
+Channel SSD solution if it's under a separate directory.  And for
+current SSD solutions that don't seem to need these things exposed in
+sysfs for operation, it will make what is directly under nvmeXnY
+directories less cluttered.
+
+Thanks,
+Jay
+
