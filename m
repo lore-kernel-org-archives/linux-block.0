@@ -1,75 +1,94 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx.ewheeler.net ([66.155.3.69]:34749 "EHLO mail.ewheeler.net"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1752684AbcG2Auc (ORCPT <rfc822;linux-block@vger.kernel.org>);
-	Thu, 28 Jul 2016 20:50:32 -0400
-Date: Thu, 28 Jul 2016 17:50:14 -0700 (PDT)
-From: Eric Wheeler <bcache@lists.ewheeler.net>
-To: linux-block@vger.kernel.org
-cc: dm-devel@redhat.com, linux-raid@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-bcache@vger.kernel.org
-Subject: To add, or not to add, a bio REQ_ROTATIONAL flag
-Message-ID: <alpine.LRH.2.11.1607281603530.10662@mail.ewheeler.net>
+Received: from mail-wm0-f65.google.com ([74.125.82.65]:36611 "EHLO
+	mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752151AbcGAHVA (ORCPT
+	<rfc822;linux-block@vger.kernel.org>); Fri, 1 Jul 2016 03:21:00 -0400
+Received: by mail-wm0-f65.google.com with SMTP id c82so3079186wme.3
+        for <linux-block@vger.kernel.org>; Fri, 01 Jul 2016 00:20:59 -0700 (PDT)
+Subject: Re: [PATCH 5/6] lightnvm: expose device geometry through sysfs
+To: J Freyensee <james_p_freyensee@linux.intel.com>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	axboe@fb.com, keith.busch@intel.com,
+	linux-nvme@lists.infradead.org, dm-devel@redhat.com
+References: <1467211901-26707-1-git-send-email-m@bjorling.me>
+ <1467211901-26707-6-git-send-email-m@bjorling.me>
+ <1467316875.21253.24.camel@linux.intel.com>
+Cc: "Simon A. F. Lund" <slund@cnexlabs.com>
+From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <m@bjorling.me>
+Message-ID: <577619D9.1080209@bjorling.me>
+Date: Fri, 1 Jul 2016 09:20:57 +0200
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+In-Reply-To: <1467316875.21253.24.camel@linux.intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hello all,
+On 06/30/2016 10:01 PM, J Freyensee wrote:
+> On Wed, 2016-06-29 at 16:51 +0200, Matias Bjørling wrote:
+>> From: "Simon A. F. Lund" <slund@cnexlabs.com>
+>>
+>> For a host to access an Open-Channel SSD, it has to know its
+>> geometry,
+>> so that it writes and reads at the appropriate device bounds.
+>>
+>> Currently, the geometry information is kept within the kernel, and
+>> not
+>> exported to user-space for consumption. This patch exposes the
+>> configuration through sysfs and enables user-space libraries, such as
+>> liblightnvm, to use the sysfs implementation to get the geometry of
+>> an
+>> Open-Channel SSD.
+>>
+>> The sysfs entries are stored within the device hierarchy, and can be
+>> found using the "lightnvm" device type.
+>>
+>> An example configuration looks like this:
+>>
+>> /sys/class/nvme/
+>> └── nvme0n1
+>>     ├── capabilities: 3
+>>     ├── device_mode: 1
+>>     ├── channel_parallelism: 0
+>>     ├── erase_max: 1000000
+>>     ├── erase_typ: 1000000
+>>     ├── flash_media_type: 0
+>>     ├── media_capabilities: 0x00000001
+>>     ├── media_type: 0
+>>     ├── multiplane: 0x00010101
+>>     ├── num_blocks: 1022
+>>     ├── num_channels: 1
+>>     ├── num_luns: 4
+>>     ├── num_pages: 64
+>>     ├── num_planes: 1
+>>     ├── page_size: 4096
+>>     ├── prog_max: 100000
+>>     ├── prog_typ: 100000
+>>     ├── read_max: 10000
+>>     ├── read_typ: 10000
+>>     ├── sector_oob_size: 0
+>>     ├── sector_size: 4096
+>>     ├── media_manager: gennvm
+>>     ├── ppa_format: 0x380830082808001010102008
+>>     ├── vendor_opcode: 0
+>>     └── version: 1
+>>
+>
+> That is an awful lot of new things to add under nvme0n1-type sysfs
+> entries when there is already a decent amount of stuff under it.
+>
 
-With the many SSD caching layers being developed (bcache, dm-cache, 
-dm-writeboost, etc), how could we flag a bio from userspace to indicate 
-whether the bio is preferred to hit spinning disks instead of an SSD?
+You are right. These are rightfully placed under /lightnvm in the sysfs 
+path. The description is wrong, will update it. Thanks Jay.
 
-Unnecessary promotions, evections, and writeback increase the write burden 
-on the caching layer and burns out SSDs too fast (TBW), thus requring 
-equipment replacement.
-
-Is there already a mechanism for this that could be added to the various 
-caching mechanisms' promote/demote/bypass logic?
-
-For example, I would like to prevent backups from influencing the cache 
-eviction logic. Neither do I wish to evict cache due to a bio from a 
-backup process, nor do I wish a bio from the backup process to be cached 
-on the SSD.  
-
-
-We would want to bypass the cache for IO that is somehow flagged to bypass 
-block-layer caches and use the rotational disk unless the referenced block 
-already exists on the SSD.
-
-There might be two cases here that would be ideal to unify without 
-touching filesystem code:
-
-  1) open() of a block device
-
-  2) open() on a file such that a filesystem must flag the bio
-
-I had considered writing something to detect FADV_SEQUENTIAL/FADV_NOREUSE 
-or `ionice -c3` on a process hitting bcache and modifying 
-check_should_bypass()/should_writeback() to behave as such.
-
-However, just because FADV_SEQUENTIAL is flagged doesn't mean the cache 
-should bypass.  Filesystems can fragment, and while the file being read 
-may be read sequentially, the blocks on which it resides may not be.  
-Same thing for higher-level block devices such as dm-thinp where one might 
-sequentially read a thin volume but its _tdata might not be in linear 
-order.  This may imply that we need a new way to flag cache bypass from 
-userspace that is neither io-priority nor fadvise driven.
-
-So what are our options?  What might be the best way to do this?
-
-If fadvise is the better option, how can a block device driver lookup the 
-fadvise advice from a given bio struct?  Can we add an FADV_NOSSD flag 
-since FADV_SEQUENTIAL may be insufficent?  Are FADV_NOREUSE/FADV_DONTNEED 
-reasonable candidates?
-
-Perhaps ionice could be used used, but the concept of "priority" 
-doesn't exactly encompass the concept of cache-bypass---so is something 
-else needed?
-
-Other ideas?  
-
-
---
-Eric Wheeler
+> Any chance these new things could be stuck under a separate sysfs
+> directory under each nvmeXnY device?  If these things are mainly
+> beneficial to LightNVM, it will be easier for a LightNVM newbie to
+> find, recognize, and consider all the important things in an Open
+> Channel SSD solution if it's under a separate directory.  And for
+> current SSD solutions that don't seem to need these things exposed in
+> sysfs for operation, it will make what is directly under nvmeXnY
+> directories less cluttered.
+>
+> Thanks,
+> Jay
+>
