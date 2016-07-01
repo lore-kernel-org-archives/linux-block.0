@@ -1,85 +1,37 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f67.google.com ([74.125.82.67]:35148 "EHLO
-	mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756626AbcGGHyr (ORCPT
-	<rfc822;linux-block@vger.kernel.org>); Thu, 7 Jul 2016 03:54:47 -0400
-Received: by mail-wm0-f67.google.com with SMTP id a66so3513886wme.2
-        for <linux-block@vger.kernel.org>; Thu, 07 Jul 2016 00:54:46 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	axboe@fb.com
-Cc: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [PATCH 11/17] lightnvm: remove nested lock conflict with mm
-Date: Thu,  7 Jul 2016 09:54:17 +0200
-Message-Id: <1467878063-22919-12-git-send-email-m@bjorling.me>
-In-Reply-To: <1467878063-22919-1-git-send-email-m@bjorling.me>
-References: <1467878063-22919-1-git-send-email-m@bjorling.me>
+Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:16778 "EHLO
+	mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752510AbcGAO0m (ORCPT
+	<rfc822;linux-block@vger.kernel.org>);
+	Fri, 1 Jul 2016 10:26:42 -0400
+Subject: Re: [PATCH] nbd: convert to blkmq
+To: Josef Bacik <jbacik@fb.com>, <mpa@pengutronix.de>,
+	<linux-kernel@vger.kernel.org>,
+	<nbd-general@lists.sourceforge.net>, <kernel-team@fb.com>,
+	<linux-block@vger.kernel.org>
+References: <1467382507-523615-1-git-send-email-jbacik@fb.com>
+From: Jens Axboe <axboe@fb.com>
+Message-ID: <57767D8E.40808@fb.com>
+Date: Fri, 1 Jul 2016 08:26:22 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <1467382507-523615-1-git-send-email-jbacik@fb.com>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-If a media manager tries to initialize it targets upon media manager
-initialization, the media manager will need to know which target types
-are available in LightNVM. The lists of which managers and target types
-are available shares the same lock.
+On 07/01/2016 08:15 AM, Josef Bacik wrote:
+> This moves NBD over to using blkmq, which allows us to get rid of the NBD
+> wide queue lock and the async submit kthread.  We will start with 1 hw
+> queue for now, but I plan to add multiple tcp connection support in the
+> future and we'll fix how we set the hwqueue's.
 
-Therefore, on initialization, the nvm_lock is taken by LightNVM core,
-which later leads to a deadlock when target types are enumerated by the
-media manager.
+Looks pretty clean. I'd get rid of that horrible nbd_find_request() as 
+well, though. Store the request tag in the reply.handle, and then just 
+lookup the request from the tag, if the tag is valid. The resulting 
+request can then be checked for proper state (started).
 
-Add an exclusive lock for target types to resolve this conflict.
+nbd->active_cmd needs to die as well.
 
-Signed-off-by: Matias Bjørling <m@bjorling.me>
----
- drivers/lightnvm/core.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-index 8afb04c..04469e0 100644
---- a/drivers/lightnvm/core.c
-+++ b/drivers/lightnvm/core.c
-@@ -28,6 +28,7 @@
- #include <linux/sched/sysctl.h>
- 
- static LIST_HEAD(nvm_tgt_types);
-+static DECLARE_RWSEM(nvm_tgtt_lock);
- static LIST_HEAD(nvm_mgrs);
- static LIST_HEAD(nvm_devices);
- static DECLARE_RWSEM(nvm_lock);
-@@ -37,7 +38,7 @@ struct nvm_tgt_type *nvm_find_target_type(const char *name, int lock)
- 	struct nvm_tgt_type *tmp, *tt = NULL;
- 
- 	if (lock)
--		down_write(&nvm_lock);
-+		down_write(&nvm_tgtt_lock);
- 
- 	list_for_each_entry(tmp, &nvm_tgt_types, list)
- 		if (!strcmp(name, tmp->name)) {
-@@ -46,7 +47,7 @@ struct nvm_tgt_type *nvm_find_target_type(const char *name, int lock)
- 		}
- 
- 	if (lock)
--		up_write(&nvm_lock);
-+		up_write(&nvm_tgtt_lock);
- 	return tt;
- }
- EXPORT_SYMBOL(nvm_find_target_type);
-@@ -55,12 +56,12 @@ int nvm_register_tgt_type(struct nvm_tgt_type *tt)
- {
- 	int ret = 0;
- 
--	down_write(&nvm_lock);
-+	down_write(&nvm_tgtt_lock);
- 	if (nvm_find_target_type(tt->name, 0))
- 		ret = -EEXIST;
- 	else
- 		list_add(&tt->list, &nvm_tgt_types);
--	up_write(&nvm_lock);
-+	up_write(&nvm_tgtt_lock);
- 
- 	return ret;
- }
 -- 
-2.1.4
+Jens Axboe
 
