@@ -1,142 +1,58 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-From: mchristi@redhat.com
-To: linux-f2fs-devel@lists.sourceforge.net, linux-ext4@vger.kernel.org,
-	konrad.wilk@oracle.com, drbd-dev@lists.linbit.com,
-	philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
-	linux-raid@vger.kernel.org, dm-devel@redhat.com,
-	linux-fsdevel@vger.kernel.org, linux-bcache@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linux-mtd@lists.infradead.org,
-	target-devel@vger.kernel.org, linux-btrfs@vger.kernel.org,
-	osd-dev@open-osd.org, xfs@oss.sgi.com, ocfs2-devel@oss.oracle.com
-Cc: Mike Christie <mchristi@redhat.com>
-Subject: [PATCH 23/45] dm: pass dm stats data dir instead of bi_rw
-Date: Sun,  5 Jun 2016 14:32:03 -0500
-Message-Id: <1465155145-10812-24-git-send-email-mchristi@redhat.com>
-In-Reply-To: <1465155145-10812-1-git-send-email-mchristi@redhat.com>
-References: <1465155145-10812-1-git-send-email-mchristi@redhat.com>
-Sender: linux-scsi-owner@vger.kernel.org
+Return-Path: <dan.j.williams@gmail.com>
+MIME-Version: 1.0
+Sender: dan.j.williams@gmail.com
+In-Reply-To: <20160701010113.GB10122@ad.usersys.redhat.com>
+References: <20160630015953.6888-1-famz@redhat.com> <20160630062442.GA19761@infradead.org>
+ <20160630063554.GE23296@ad.usersys.redhat.com> <20160630063839.GA17205@infradead.org>
+ <20160701010113.GB10122@ad.usersys.redhat.com>
+From: Dan Williams <dan.j.williams@intel.com>
+Date: Thu, 30 Jun 2016 18:29:31 -0700
+Message-ID: <CAA9_cmeb99S+UoZ7A-4HHmT_rFRgnSaBX=YszEk8+4_=n9cOnA@mail.gmail.com>
+Subject: Re: [PATCH v2 00/12] gendisk: Generate uevent after attribute available
+To: Fam Zheng <famz@redhat.com>
+Cc: Christoph Hellwig <hch@infradead.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Benjamin Herrenschmidt <benh@kernel.crashing.org>, Paul Mackerras <paulus@samba.org>,
+	Michael Ellerman <mpe@ellerman.id.au>, Jens Axboe <axboe@kernel.dk>, "Ed L. Cashin" <ed.cashin@acm.org>,
+	Jiri Kosina <jikos@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, Minchan Kim <minchan@kernel.org>,
+	Nitin Gupta <ngupta@vflare.org>, Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
+	Shaohua Li <shli@kernel.org>, Ulf Hansson <ulf.hansson@linaro.org>,
+	David Woodhouse <dwmw2@infradead.org>, Brian Norris <computersforpeace@gmail.com>,
+	Keith Busch <keith.busch@intel.com>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+	linux-block@vger.kernel.org, virtualization@lists.linux-foundation.org,
+	linux-raid <linux-raid@vger.kernel.org>,
+	"linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>, linux-mtd@lists.infradead.org,
+	linux-nvme@lists.infradead.org
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
-From: Mike Christie <mchristi@redhat.com>
+On Thu, Jun 30, 2016 at 6:01 PM, Fam Zheng <famz@redhat.com> wrote:
+> On Wed, 06/29 23:38, Christoph Hellwig wrote:
+>> On Thu, Jun 30, 2016 at 02:35:54PM +0800, Fam Zheng wrote:
+>> > also more code and less flexible IMO.  For example, we need at least two
+>> > variants, for attribute_group and device_attribute separately, right?
+>>
+>> Yes, or maybe just a calling convention that just passes both.
+>
+> OK, I can look into that, but I'm not sure about the error handling. Currently
+> add_disk returns void, do you have any plan on that too? should I change it in
+> v3 (to at least return the attribute creation failure)?
 
-It looks like dm stats cares about the data direction
-(READ vs WRITE) and does not need the bio/request flags.
-Commands like REQ_FLUSH, REQ_DISCARD and REQ_WRITE_SAME
-are currently always set with REQ_WRITE, so the extra check for
-REQ_DISCARD in dm_stats_account_io is not needed.
+I think we should only support a "groups" interface to
+device_add_disk() and convert all the drivers that currently do
+device_create_file() after add_disk() to pass in a group list instead.
+That way we follow the expectation that the only way to get an
+attribute for a device to show up before KOBJ_ADD, is to define a
+group:
 
-This patch has it use the bio and request data_dir helpers
-instead of accessing the bi_rw/cmd_flags directly. This makes
-the next patches that remove the operation from the cmd_flags
-and bi_rw easier, because we will no longer have the REQ_WRITE
-bit set for operations like discards.
+>From Documentation/driver-model/device.txt:
+    As explained in Documentation/kobject.txt, device attributes must be be
+    created before the KOBJ_ADD uevent is generated. The only way to realize
+    that is by defining an attribute group.
 
-Signed-off-by: Mike Christie <mchristi@redhat.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
----
-v2:
+Let's defer the return value fixing for now.
 
-1. Merged Mike Snitzer's fixes to pass in int instead of
-unsigned long.
+You can find the pending device_add_disk() patches in the nvdimm
+patchwork starting with "block: introduce device_add_disk()"
 
-2. Fix 80 char col issues.
-
- drivers/md/dm-stats.c |  9 ++++-----
- drivers/md/dm.c       | 21 ++++++++++++---------
- 2 files changed, 16 insertions(+), 14 deletions(-)
-
-diff --git a/drivers/md/dm-stats.c b/drivers/md/dm-stats.c
-index 8289804..4fba26c 100644
---- a/drivers/md/dm-stats.c
-+++ b/drivers/md/dm-stats.c
-@@ -514,11 +514,10 @@ static void dm_stat_round(struct dm_stat *s, struct dm_stat_shared *shared,
- }
- 
- static void dm_stat_for_entry(struct dm_stat *s, size_t entry,
--			      unsigned long bi_rw, sector_t len,
-+			      int idx, sector_t len,
- 			      struct dm_stats_aux *stats_aux, bool end,
- 			      unsigned long duration_jiffies)
- {
--	unsigned long idx = bi_rw & REQ_WRITE;
- 	struct dm_stat_shared *shared = &s->stat_shared[entry];
- 	struct dm_stat_percpu *p;
- 
-@@ -584,7 +583,7 @@ static void dm_stat_for_entry(struct dm_stat *s, size_t entry,
- #endif
- }
- 
--static void __dm_stat_bio(struct dm_stat *s, unsigned long bi_rw,
-+static void __dm_stat_bio(struct dm_stat *s, int bi_rw,
- 			  sector_t bi_sector, sector_t end_sector,
- 			  bool end, unsigned long duration_jiffies,
- 			  struct dm_stats_aux *stats_aux)
-@@ -645,8 +644,8 @@ void dm_stats_account_io(struct dm_stats *stats, unsigned long bi_rw,
- 		last = raw_cpu_ptr(stats->last);
- 		stats_aux->merged =
- 			(bi_sector == (ACCESS_ONCE(last->last_sector) &&
--				       ((bi_rw & (REQ_WRITE | REQ_DISCARD)) ==
--					(ACCESS_ONCE(last->last_rw) & (REQ_WRITE | REQ_DISCARD)))
-+				       ((bi_rw == WRITE) ==
-+					(ACCESS_ONCE(last->last_rw) == WRITE))
- 				       ));
- 		ACCESS_ONCE(last->last_sector) = end_sector;
- 		ACCESS_ONCE(last->last_rw) = bi_rw;
-diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index 1b2f962..f5ac0a3 100644
---- a/drivers/md/dm.c
-+++ b/drivers/md/dm.c
-@@ -723,8 +723,9 @@ static void start_io_acct(struct dm_io *io)
- 		atomic_inc_return(&md->pending[rw]));
- 
- 	if (unlikely(dm_stats_used(&md->stats)))
--		dm_stats_account_io(&md->stats, bio->bi_rw, bio->bi_iter.bi_sector,
--				    bio_sectors(bio), false, 0, &io->stats_aux);
-+		dm_stats_account_io(&md->stats, bio_data_dir(bio),
-+				    bio->bi_iter.bi_sector, bio_sectors(bio),
-+				    false, 0, &io->stats_aux);
- }
- 
- static void end_io_acct(struct dm_io *io)
-@@ -738,8 +739,9 @@ static void end_io_acct(struct dm_io *io)
- 	generic_end_io_acct(rw, &dm_disk(md)->part0, io->start_time);
- 
- 	if (unlikely(dm_stats_used(&md->stats)))
--		dm_stats_account_io(&md->stats, bio->bi_rw, bio->bi_iter.bi_sector,
--				    bio_sectors(bio), true, duration, &io->stats_aux);
-+		dm_stats_account_io(&md->stats, bio_data_dir(bio),
-+				    bio->bi_iter.bi_sector, bio_sectors(bio),
-+				    true, duration, &io->stats_aux);
- 
- 	/*
- 	 * After this is decremented the bio must not be touched if it is
-@@ -1121,9 +1123,9 @@ static void rq_end_stats(struct mapped_device *md, struct request *orig)
- 	if (unlikely(dm_stats_used(&md->stats))) {
- 		struct dm_rq_target_io *tio = tio_from_request(orig);
- 		tio->duration_jiffies = jiffies - tio->duration_jiffies;
--		dm_stats_account_io(&md->stats, orig->cmd_flags, blk_rq_pos(orig),
--				    tio->n_sectors, true, tio->duration_jiffies,
--				    &tio->stats_aux);
-+		dm_stats_account_io(&md->stats, rq_data_dir(orig),
-+				    blk_rq_pos(orig), tio->n_sectors, true,
-+				    tio->duration_jiffies, &tio->stats_aux);
- 	}
- }
- 
-@@ -2082,8 +2084,9 @@ static void dm_start_request(struct mapped_device *md, struct request *orig)
- 		struct dm_rq_target_io *tio = tio_from_request(orig);
- 		tio->duration_jiffies = jiffies;
- 		tio->n_sectors = blk_rq_sectors(orig);
--		dm_stats_account_io(&md->stats, orig->cmd_flags, blk_rq_pos(orig),
--				    tio->n_sectors, false, 0, &tio->stats_aux);
-+		dm_stats_account_io(&md->stats, rq_data_dir(orig),
-+				    blk_rq_pos(orig), tio->n_sectors, false, 0,
-+				    &tio->stats_aux);
- 	}
- 
- 	/*
--- 
-2.7.2
-
+https://patchwork.kernel.org/project/linux-nvdimm/list/
