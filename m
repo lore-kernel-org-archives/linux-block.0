@@ -1,182 +1,63 @@
-Return-Path: <BATV+a6fbff1bfc78a84bb09b+4713+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org
-Subject: [PATCH 5/7] target: stop using blk_make_request
-Date: Tue, 19 Jul 2016 11:31:52 +0200
-Message-Id: <1468920714-4304-6-git-send-email-hch@lst.de>
-In-Reply-To: <1468920714-4304-1-git-send-email-hch@lst.de>
-References: <1468920714-4304-1-git-send-email-hch@lst.de>
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <1467390990.2341.31.camel@HansenPartnership.com>
+References: <1467389699-10571-1-git-send-email-hcochran@kernelspring.com> <1467390990.2341.31.camel@HansenPartnership.com>
+From: Howard Cochran <hcochran@kernelspring.com>
+Date: Fri, 1 Jul 2016 13:34:33 -0400
+Message-ID: <CAEvdpX2Rv9f84tmwAeO0y+wj9609ucYV2tteJCZLoySidtO0JA@mail.gmail.com>
+Subject: Re: [PATCH] sd: Fix crash due to race when removing scsi disk
+To: James Bottomley <James.Bottomley@hansenpartnership.com>
+Cc: linux-scsi@vger.kernel.org, Howard Cochran <cochran@lexmark.com>,
+	Christoph Hellwig <hch@lst.de>,
+	James Bottomley <JBottomley@odin.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	linux-block@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-scsi-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Using blk_rq_append_bio allows to append the bios to the request
-directly instead of having to build up a list first, and also
-allows to have a single code path for requests with or without
-data attached to them.
+On Fri, Jul 1, 2016 at 12:36 PM, James Bottomley
+<James.Bottomley@hansenpartnership.com> wrote:
+> On Fri, 2016-07-01 at 12:14 -0400, Howard Cochran wrote:
+>>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/target/target_core_pscsi.c | 87 +++++++++++++++-----------------------
- 1 file changed, 34 insertions(+), 53 deletions(-)
+>> This patch fixes the race by making sd_remove() hold bd_mutex during
+>> the call to del_gendisk().
+>
+> OK, so this can't be the proper fix because it's a layering violation.
+>  You can see this if you consider what happens to any other block
+> device doing the same thing: they would oops in the same way, implying
+> that this fix would have to be replicated to every other block device
+> remove path.  Instead place to fix it should be somewhere inside the
+> block subsystem.  My suspicion is that it should probably be in
+> del_gendisk() because that will fix every device, but the block people
+> should think more about the problem (linux-block cc added).
+>
+> James
 
-diff --git a/drivers/target/target_core_pscsi.c b/drivers/target/target_core_pscsi.c
-index 81564c8..9125d93 100644
---- a/drivers/target/target_core_pscsi.c
-+++ b/drivers/target/target_core_pscsi.c
-@@ -876,19 +876,19 @@ static inline struct bio *pscsi_get_bio(int nr_vecs)
- 
- static sense_reason_t
- pscsi_map_sg(struct se_cmd *cmd, struct scatterlist *sgl, u32 sgl_nents,
--		enum dma_data_direction data_direction, struct bio **hbio)
-+		struct request *req)
- {
- 	struct pscsi_dev_virt *pdv = PSCSI_DEV(cmd->se_dev);
--	struct bio *bio = NULL, *tbio = NULL;
-+	struct bio *bio = NULL;
- 	struct page *page;
- 	struct scatterlist *sg;
- 	u32 data_len = cmd->data_length, i, len, bytes, off;
- 	int nr_pages = (cmd->data_length + sgl[0].offset +
- 			PAGE_SIZE - 1) >> PAGE_SHIFT;
- 	int nr_vecs = 0, rc;
--	int rw = (data_direction == DMA_TO_DEVICE);
-+	int rw = (cmd->data_direction == DMA_TO_DEVICE);
- 
--	*hbio = NULL;
-+	BUG_ON(!cmd->data_length);
- 
- 	pr_debug("PSCSI: nr_pages: %d\n", nr_pages);
- 
-@@ -927,16 +927,6 @@ pscsi_map_sg(struct se_cmd *cmd, struct scatterlist *sgl, u32 sgl_nents,
- 				pr_debug("PSCSI: Allocated bio: %p,"
- 					" dir: %s nr_vecs: %d\n", bio,
- 					(rw) ? "rw" : "r", nr_vecs);
--				/*
--				 * Set *hbio pointer to handle the case:
--				 * nr_pages > BIO_MAX_PAGES, where additional
--				 * bios need to be added to complete a given
--				 * command.
--				 */
--				if (!*hbio)
--					*hbio = tbio = bio;
--				else
--					tbio = tbio->bi_next = bio;
- 			}
- 
- 			pr_debug("PSCSI: Calling bio_add_pc_page() i: %d"
-@@ -955,11 +945,16 @@ pscsi_map_sg(struct se_cmd *cmd, struct scatterlist *sgl, u32 sgl_nents,
- 				pr_debug("PSCSI: Reached bio->bi_vcnt max:"
- 					" %d i: %d bio: %p, allocating another"
- 					" bio\n", bio->bi_vcnt, i, bio);
-+
-+				rc = blk_rq_append_bio(req, bio);
-+				if (rc) {
-+					pr_err("pSCSI: failed to append bio\n");
-+					goto fail;
-+				}
-+
- 				/*
- 				 * Clear the pointer so that another bio will
--				 * be allocated with pscsi_get_bio() above, the
--				 * current bio has already been set *tbio and
--				 * bio->bi_next.
-+				 * be allocated with pscsi_get_bio() above.
- 				 */
- 				bio = NULL;
- 			}
-@@ -968,13 +963,16 @@ pscsi_map_sg(struct se_cmd *cmd, struct scatterlist *sgl, u32 sgl_nents,
- 		}
- 	}
- 
-+	if (bio) {
-+		rc = blk_rq_append_bio(req, bio);
-+		if (rc) {
-+			pr_err("pSCSI: failed to append bio\n");
-+			goto fail;
-+		}
-+	}
-+
- 	return 0;
- fail:
--	while (*hbio) {
--		bio = *hbio;
--		*hbio = (*hbio)->bi_next;
--		bio_endio(bio);
--	}
- 	return TCM_LOGICAL_UNIT_COMMUNICATION_FAILURE;
- }
- 
-@@ -992,11 +990,9 @@ pscsi_execute_cmd(struct se_cmd *cmd)
- {
- 	struct scatterlist *sgl = cmd->t_data_sg;
- 	u32 sgl_nents = cmd->t_data_nents;
--	enum dma_data_direction data_direction = cmd->data_direction;
- 	struct pscsi_dev_virt *pdv = PSCSI_DEV(cmd->se_dev);
- 	struct pscsi_plugin_task *pt;
- 	struct request *req;
--	struct bio *hbio;
- 	sense_reason_t ret;
- 
- 	/*
-@@ -1012,31 +1008,21 @@ pscsi_execute_cmd(struct se_cmd *cmd)
- 	memcpy(pt->pscsi_cdb, cmd->t_task_cdb,
- 		scsi_command_size(cmd->t_task_cdb));
- 
--	if (!sgl) {
--		req = blk_get_request(pdv->pdv_sd->request_queue,
--				(data_direction == DMA_TO_DEVICE),
--				GFP_KERNEL);
--		if (IS_ERR(req)) {
--			pr_err("PSCSI: blk_get_request() failed\n");
--			ret = TCM_LOGICAL_UNIT_COMMUNICATION_FAILURE;
--			goto fail;
--		}
-+	req = blk_get_request(pdv->pdv_sd->request_queue,
-+			(cmd->data_direction == DMA_TO_DEVICE),
-+			GFP_KERNEL);
-+	if (IS_ERR(req)) {
-+		pr_err("PSCSI: blk_get_request() failed\n");
-+		ret = TCM_LOGICAL_UNIT_COMMUNICATION_FAILURE;
-+		goto fail;
-+	}
- 
--		blk_rq_set_block_pc(req);
--	} else {
--		BUG_ON(!cmd->data_length);
-+	blk_rq_set_block_pc(req);
- 
--		ret = pscsi_map_sg(cmd, sgl, sgl_nents, data_direction, &hbio);
-+	if (sgl) {
-+		ret = pscsi_map_sg(cmd, sgl, sgl_nents, req);
- 		if (ret)
--			goto fail;
--
--		req = blk_make_request(pdv->pdv_sd->request_queue, hbio,
--				       GFP_KERNEL);
--		if (IS_ERR(req)) {
--			pr_err("pSCSI: blk_make_request() failed\n");
--			ret = TCM_LOGICAL_UNIT_COMMUNICATION_FAILURE;
--			goto fail_free_bio;
--		}
-+			goto fail_put_request;
- 	}
- 
- 	req->end_io = pscsi_req_done;
-@@ -1057,13 +1043,8 @@ pscsi_execute_cmd(struct se_cmd *cmd)
- 
- 	return 0;
- 
--fail_free_bio:
--	while (hbio) {
--		struct bio *bio = hbio;
--		hbio = hbio->bi_next;
--		bio_endio(bio);
--	}
--	ret = TCM_LOGICAL_UNIT_COMMUNICATION_FAILURE;
-+fail_put_request:
-+	blk_put_request(req);
- fail:
- 	kfree(pt);
- 	return ret;
--- 
-2.1.4
+James,
+
+I originally attempted to fix this by grabbing bd_mutex inside
+del_gendisk(). However, I surveyed the kernel and found that some other
+block drivers already hold bd_mutex when calling del_gendisk(), so that
+would deadlock. For example: blkfront_closing() and blkfront_remove() in
+drivers/block/xen-blkfront.c
+
+Some of them ensure that there can be no dirty blocks in the same code
+path prior to calling del_gendisk() (e.g. zram_remove()).
+
+Other drivers (e.g. loop) appear to only allow removal via an ioctl(),
+which, by definition, means that you have an bd_openers, and therefore
+cannot have cleared the bdev->bd_disk pointer.
+
+In fact, it appeared that sd.c may have the only "out of band" way to
+remove a device via its "delete" node, but now I see that oasdblk.c has
+a "remove" node that appears susceptible to this problem.  Another may
+be mg_disk.c
+
+OK, so indeed, a more general solution is needed. But taking bd_mutex
+inside del_gendisk() does not appear to be it. Perhaps making
+mapping_cap_writeback_dirty() not have to dereference bdev->bd_disk
+would be better (as it didn't prior to de1414a654e6)?
+
+Howard
