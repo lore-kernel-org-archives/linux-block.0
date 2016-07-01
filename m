@@ -1,75 +1,26 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f68.google.com ([74.125.82.68]:33847 "EHLO
-	mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756266AbcGGHyk (ORCPT
-	<rfc822;linux-block@vger.kernel.org>); Thu, 7 Jul 2016 03:54:40 -0400
-Received: by mail-wm0-f68.google.com with SMTP id 187so3534407wmz.1
-        for <linux-block@vger.kernel.org>; Thu, 07 Jul 2016 00:54:40 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	axboe@fb.com
-Cc: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [PATCH 06/17] lightnvm: remove checkpatch warning for unsigned ints
-Date: Thu,  7 Jul 2016 09:54:12 +0200
-Message-Id: <1467878063-22919-7-git-send-email-m@bjorling.me>
-In-Reply-To: <1467878063-22919-1-git-send-email-m@bjorling.me>
-References: <1467878063-22919-1-git-send-email-m@bjorling.me>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] block: fix use-after-free in sys_ioprio_get()
+To: Omar Sandoval <osandov@osandov.com>, Jens Axboe <axboe@fb.com>
+References: <fa9c9a3ee7355f932d4f40322602aae5fb293f97.1467358615.git.osandov@fb.com>
+Cc: Dmitry Vyukov <dvyukov@google.com>, linux-block@vger.kernel.org,
+ kernel-team@fb.com, stable@vger.kernel.org
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <577680B8.4020003@kernel.dk>
+Date: Fri, 1 Jul 2016 08:39:52 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <fa9c9a3ee7355f932d4f40322602aae5fb293f97.1467358615.git.osandov@fb.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+List-ID: <linux-block@vger.kernel.org>
 
-Checkpatch found two incidents where the type was preferred to be
-written out in full.
+On 07/01/2016 01:39 AM, Omar Sandoval wrote:
+> From: Omar Sandoval <osandov@fb.com>
+>
+> get_task_ioprio() accesses the task->io_context without holding the task
+> lock and thus can race with exit_io_context(), leading to a
+> use-after-free. The reproducer below hits this within a few seconds on
+> my 4-core QEMU VM:
 
-./drivers/lightnvm/rrpc.h:184: WARNING: Prefer 'unsigned int' to bare
-use of 'unsigned'
-./drivers/lightnvm/rrpc.h:209: WARNING: Prefer 'unsigned int' to bare
-use of 'unsigned'
-./drivers/lightnvm/rrpc.c:51: WARNING: Prefer 'unsigned int' to bare use
-of 'unsigned'
+Thanks Omar, applied for this series.
 
-Signed-off-by: Matias Bjørling <m@bjorling.me>
----
- drivers/lightnvm/rrpc.c | 2 +-
- drivers/lightnvm/rrpc.h | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/lightnvm/rrpc.c b/drivers/lightnvm/rrpc.c
-index 736e669..90c7cb4 100644
---- a/drivers/lightnvm/rrpc.c
-+++ b/drivers/lightnvm/rrpc.c
-@@ -48,7 +48,7 @@ static void rrpc_page_invalidate(struct rrpc *rrpc, struct rrpc_addr *a)
- }
- 
- static void rrpc_invalidate_range(struct rrpc *rrpc, sector_t slba,
--								unsigned len)
-+							unsigned int len)
- {
- 	sector_t i;
- 
-diff --git a/drivers/lightnvm/rrpc.h b/drivers/lightnvm/rrpc.h
-index 87e84b5..5797343 100644
---- a/drivers/lightnvm/rrpc.h
-+++ b/drivers/lightnvm/rrpc.h
-@@ -188,7 +188,7 @@ static inline int request_intersects(struct rrpc_inflight_rq *r,
- }
- 
- static int __rrpc_lock_laddr(struct rrpc *rrpc, sector_t laddr,
--			     unsigned pages, struct rrpc_inflight_rq *r)
-+			     unsigned int pages, struct rrpc_inflight_rq *r)
- {
- 	sector_t laddr_end = laddr + pages - 1;
- 	struct rrpc_inflight_rq *rtmp;
-@@ -213,7 +213,7 @@ static int __rrpc_lock_laddr(struct rrpc *rrpc, sector_t laddr,
- }
- 
- static inline int rrpc_lock_laddr(struct rrpc *rrpc, sector_t laddr,
--				 unsigned pages,
-+				 unsigned int pages,
- 				 struct rrpc_inflight_rq *r)
- {
- 	BUG_ON((laddr + pages) > rrpc->nr_sects);
 -- 
-2.1.4
-
+Jens Axboe
