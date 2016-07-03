@@ -1,42 +1,80 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f194.google.com ([209.85.192.194]:33172 "EHLO
-	mail-pf0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750716AbcGMEr5 (ORCPT
-	<rfc822;linux-block@vger.kernel.org>);
-	Wed, 13 Jul 2016 00:47:57 -0400
-From: tom.ty89@gmail.com
-To: tj@kernel.org, martin.petersen@oracle.com
-Cc: linux-ide@vger.kernel.org, linux-scsi@vger.kernel.org,
-	linux-block@vger.kernel.org, Tom Yan <tom.ty89@gmail.com>
-Subject: [RFC 1/3] ata: bump ATA_MAX_SECTORS_LBA48 to 65536
-Date: Wed, 13 Jul 2016 12:47:06 +0800
-Message-Id: <1c10437e3cd9be8556e77462b40ad53be542dfba.1468384890.git.tom.ty89@gmail.com>
+Received: from silver.sucs.swan.ac.uk ([137.44.10.1]:34176 "EHLO
+	silver.sucs.swan.ac.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752850AbcGCTwk (ORCPT
+	<rfc822;linux-block@vger.kernel.org>); Sun, 3 Jul 2016 15:52:40 -0400
+Date: Sun, 3 Jul 2016 20:52:32 +0100
+From: Sitsofe Wheeler <sitsofe@gmail.com>
+To: "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: Christoph Hellwig <hch@lst.de>, axboe@fb.com, shli@fb.com,
+	snitzer@redhat.com, linux-block@vger.kernel.org
+Subject: Re: [PATCH 2/2] block: don't ignore -EOPNOTSUPP
+ blkdev_issue_write_same
+Message-ID: <20160703195232.GA15570@sucs.org>
+References: <1466751651-9900-1-git-send-email-hch@lst.de>
+ <1466751651-9900-3-git-send-email-hch@lst.de>
+ <yq1furwsi0t.fsf@sermon.lab.mkp.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <yq1furwsi0t.fsf@sermon.lab.mkp.net>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Tom Yan <tom.ty89@gmail.com>
+On Wed, Jun 29, 2016 at 01:04:02AM -0400, Martin K. Petersen wrote:
+> >>>>> "Christoph" == Christoph Hellwig <hch@lst.de> writes:
+> 
+> Christoph> WRITE SAME is a data integrity operation and we can't simply
+> Christoph> ignore errors.
+> 
+> Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+> 
+> -- 
+> Martin K. Petersen	Oracle Linux Engineering
 
-ATA_MAX_SECTORS_LBA48 is only used for setting the queue limit
-"max_hw_sectors", which only serves as the cap for "max_sectors",
-which is in turn the actual limit being used. Therefore, it should
-be alright for us to bump ATA_MAX_SECTORS_LBA48 to 65536. Also,
-lba_48_ok() has been accepting the number of blocks to be 65536.
+Along with the first patch this resolves the problems I was seeing when
+using the script below when applied atop of axboe/linux-block.git branch
+for-4.8/core (commit e118e4be8a96c6b89307ee3d360d954249981b8f).
 
-Signed-off-by: Tom Yan <tom.ty89@gmail.com>
+The only snag is that when userland manually disables
+max_write_same_blocks on the base device (by echoing 0 into it) stacked
+devices will not set their their own queue/write_same_max_bytes to 0
+when the BLKZEROOUT fails to use write same (but they do correctly zero
+the device). If the base device somehow internally toggles this to 0
+itself during a write same then dm devices seem to set
+queue/write_same_max_bytes to 0.
 
-diff --git a/include/linux/ata.h b/include/linux/ata.h
-index 99346be..24f886c 100644
---- a/include/linux/ata.h
-+++ b/include/linux/ata.h
-@@ -46,7 +46,7 @@ enum {
- 	ATA_MAX_SECTORS_128	= 128,
- 	ATA_MAX_SECTORS		= 256,
- 	ATA_MAX_SECTORS_1024    = 1024,
--	ATA_MAX_SECTORS_LBA48	= 65535,/* TODO: 65536? */
-+	ATA_MAX_SECTORS_LBA48	= 65536,
- 	ATA_MAX_SECTORS_TAPE	= 65535,
- 
- 	ATA_ID_WORDS		= 256,
+Tested-by: Sitsofe Wheeler <sitsofe@yahoo.com>
+
+#!/bin/bash
+# Check BLKZEROOUT behaviour
+
+modprobe scsi_debug write_same_length=131072
+dev=$(lsblk -n -p -S | awk '/scsi_debug/ { print $1 }')
+dev_kname=$(lsblk -n -S ${dev} | awk '{ print $1 }')
+sys_dev_mwsb_path=$(realpath
+/sys/block/"${dev_kname}"/device/scsi_disk/*/max_write_same_blocks)
+pvcreate ${dev}
+vgcreate vg ${dev}
+lvcreate -L4M -n lv vg
+lv_dev=/dev/mapper/vg-lv
+sys_lv_wsmb_path="/sys/block/$(lsblk -n -o KNAME
+"${lv_dev}")/queue/write_same_max_bytes"
+orig_max_ws=$(cat "${sys_dev_mwsb_path}")
+echo "Stacked device's write_same_max_bytes prior blkzeroout: $(cat
+${sys_lv_wsmb_path})"
+echo "Forcing base device's max_write_same_blocks to 0"
+echo 0 > "${sys_dev_mwsb_path}"
+size=$(blockdev --getsize64 "${lv_dev}")
+tr '\0' '\377' < /dev/zero | dd oflag=direct bs=64K of="${lv_dev}"
+count=$((${size} / (64 * 1024))) 
+status=none
+blkdiscard -v --zero "${lv_dev}"
+dd if="${lv_dev}" iflag=direct bs=64K status=none | cmp -b --bytes
+"${size}" /dev/zero -
+verification=$?
+echo "Stacked device's write_same_max_bytes after blkzeroout: $(cat
+${sys_lv_wsmb_path})"
+lvchange -a n "${lv_dev}"
+
 -- 
-2.9.0
-
+Sitsofe | http://sucs.org/~sits/
