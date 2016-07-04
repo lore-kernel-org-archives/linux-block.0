@@ -1,210 +1,75 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f66.google.com ([74.125.82.66]:35172 "EHLO
-	mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S933157AbcGGHyt (ORCPT
-	<rfc822;linux-block@vger.kernel.org>); Thu, 7 Jul 2016 03:54:49 -0400
-Received: by mail-wm0-f66.google.com with SMTP id a66so3514110wme.2
-        for <linux-block@vger.kernel.org>; Thu, 07 Jul 2016 00:54:48 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: tglx@linutronix.de,
 	axboe@fb.com
-Cc: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [PATCH 13/17] lightnvm: remove _unlocked variant of [get/put]_blk
-Date: Thu,  7 Jul 2016 09:54:19 +0200
-Message-Id: <1467878063-22919-14-git-send-email-m@bjorling.me>
-In-Reply-To: <1467878063-22919-1-git-send-email-m@bjorling.me>
-References: <1467878063-22919-1-git-send-email-m@bjorling.me>
+Subject: [PATCH 05/13] irq/msi: Make use of affinity aware allocations
+Date: Mon,  4 Jul 2016 17:39:26 +0900
+Message-Id: <1467621574-8277-6-git-send-email-hch@lst.de>
+In-Reply-To: <1467621574-8277-1-git-send-email-hch@lst.de>
+References: <1467621574-8277-1-git-send-email-hch@lst.de>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
+List-Post: <mailto:linux-nvme@lists.infradead.org>
+List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
+Cc: linux-block@vger.kernel.org, linux-pci@vger.kernel.org, agordeev@redhat.com,
+ linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
+Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
+List-ID: <linux-block@vger.kernel.org>
 
-The [get/put]_blk API enables targets to get ownership of blocks at
-runtime. This information is currently not recorded on disk, and the
-information is therefore lost on power failure. To restore the
-metadata, the [get/put]_blk must persist its metadata. In that case,
-we need to control the outer lock, so that we can disable them while
-updating the on-disk metadata. Fortunately, the _unlocked versions can
-be removed, which allows us to move the lock into the [get/put]_blk
-functions.
+From: Thomas Gleixner <tglx@linutronix.de>
 
-Signed-off-by: Matias Bjørling <m@bjorling.me>
+Allow the MSI code to provide affinity hints per MSI descriptor.
+
+Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
 ---
- drivers/lightnvm/core.c   | 14 --------------
- drivers/lightnvm/gennvm.c | 32 ++++----------------------------
- drivers/lightnvm/rrpc.c   | 14 ++------------
- include/linux/lightnvm.h  |  6 ------
- 4 files changed, 6 insertions(+), 60 deletions(-)
+ include/linux/msi.h | 2 ++
+ kernel/irq/msi.c    | 2 +-
+ 2 files changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-index 04469e0..ddc8098 100644
---- a/drivers/lightnvm/core.c
-+++ b/drivers/lightnvm/core.c
-@@ -176,20 +176,6 @@ static struct nvm_dev *nvm_find_nvm_dev(const char *name)
- 	return NULL;
- }
+diff --git a/include/linux/msi.h b/include/linux/msi.h
+index c33abfa..4f0bfe5 100644
+--- a/include/linux/msi.h
++++ b/include/linux/msi.h
+@@ -47,6 +47,7 @@ struct fsl_mc_msi_desc {
+  * @nvec_used:	The number of vectors used
+  * @dev:	Pointer to the device which uses this descriptor
+  * @msg:	The last set MSI message cached for reuse
++ * @affinity:	Optional pointer to a cpu affinity mask for this descriptor
+  *
+  * @masked:	[PCI MSI/X] Mask bits
+  * @is_msix:	[PCI MSI/X] True if MSI-X
+@@ -67,6 +68,7 @@ struct msi_desc {
+ 	unsigned int			nvec_used;
+ 	struct device			*dev;
+ 	struct msi_msg			msg;
++	const struct cpumask		*affinity;
  
--struct nvm_block *nvm_get_blk_unlocked(struct nvm_dev *dev, struct nvm_lun *lun,
--							unsigned long flags)
--{
--	return dev->mt->get_blk_unlocked(dev, lun, flags);
--}
--EXPORT_SYMBOL(nvm_get_blk_unlocked);
--
--/* Assumes that all valid pages have already been moved on release to bm */
--void nvm_put_blk_unlocked(struct nvm_dev *dev, struct nvm_block *blk)
--{
--	return dev->mt->put_blk_unlocked(dev, blk);
--}
--EXPORT_SYMBOL(nvm_put_blk_unlocked);
--
- struct nvm_block *nvm_get_blk(struct nvm_dev *dev, struct nvm_lun *lun,
- 							unsigned long flags)
- {
-diff --git a/drivers/lightnvm/gennvm.c b/drivers/lightnvm/gennvm.c
-index 41760b2..c65fb67 100644
---- a/drivers/lightnvm/gennvm.c
-+++ b/drivers/lightnvm/gennvm.c
-@@ -473,15 +473,14 @@ static void gen_unregister(struct nvm_dev *dev)
- 	module_put(THIS_MODULE);
- }
+ 	union {
+ 		/* PCI MSI/X specific data */
+diff --git a/kernel/irq/msi.c b/kernel/irq/msi.c
+index 58dbbac..0e2a736 100644
+--- a/kernel/irq/msi.c
++++ b/kernel/irq/msi.c
+@@ -335,7 +335,7 @@ int msi_domain_alloc_irqs(struct irq_domain *domain, struct device *dev,
  
--static struct nvm_block *gen_get_blk_unlocked(struct nvm_dev *dev,
-+static struct nvm_block *gen_get_blk(struct nvm_dev *dev,
- 				struct nvm_lun *vlun, unsigned long flags)
- {
- 	struct gen_lun *lun = container_of(vlun, struct gen_lun, vlun);
- 	struct nvm_block *blk = NULL;
- 	int is_gc = flags & NVM_IOTYPE_GC;
- 
--	assert_spin_locked(&vlun->lock);
--
-+	spin_lock(&vlun->lock);
- 	if (list_empty(&lun->free_list)) {
- 		pr_err_ratelimited("gen: lun %u have no free pages available",
- 								lun->vlun.id);
-@@ -496,29 +495,17 @@ static struct nvm_block *gen_get_blk_unlocked(struct nvm_dev *dev,
- 	list_move_tail(&blk->list, &lun->used_list);
- 	blk->state = NVM_BLK_ST_TGT;
- 	lun->vlun.nr_free_blocks--;
--
- out:
--	return blk;
--}
--
--static struct nvm_block *gen_get_blk(struct nvm_dev *dev,
--				struct nvm_lun *vlun, unsigned long flags)
--{
--	struct nvm_block *blk;
--
--	spin_lock(&vlun->lock);
--	blk = gen_get_blk_unlocked(dev, vlun, flags);
- 	spin_unlock(&vlun->lock);
- 	return blk;
- }
- 
--static void gen_put_blk_unlocked(struct nvm_dev *dev, struct nvm_block *blk)
-+static void gen_put_blk(struct nvm_dev *dev, struct nvm_block *blk)
- {
- 	struct nvm_lun *vlun = blk->lun;
- 	struct gen_lun *lun = container_of(vlun, struct gen_lun, vlun);
- 
--	assert_spin_locked(&vlun->lock);
--
-+	spin_lock(&vlun->lock);
- 	if (blk->state & NVM_BLK_ST_TGT) {
- 		list_move_tail(&blk->list, &lun->free_list);
- 		lun->vlun.nr_free_blocks++;
-@@ -532,14 +519,6 @@ static void gen_put_blk_unlocked(struct nvm_dev *dev, struct nvm_block *blk)
- 							blk->id, blk->state);
- 		list_move_tail(&blk->list, &lun->bb_list);
- 	}
--}
--
--static void gen_put_blk(struct nvm_dev *dev, struct nvm_block *blk)
--{
--	struct nvm_lun *vlun = blk->lun;
--
--	spin_lock(&vlun->lock);
--	gen_put_blk_unlocked(dev, blk);
- 	spin_unlock(&vlun->lock);
- }
- 
-@@ -669,9 +648,6 @@ static struct nvmm_type gen = {
- 	.create_tgt		= gen_create_tgt,
- 	.remove_tgt		= gen_remove_tgt,
- 
--	.get_blk_unlocked	= gen_get_blk_unlocked,
--	.put_blk_unlocked	= gen_put_blk_unlocked,
--
- 	.get_blk		= gen_get_blk,
- 	.put_blk		= gen_put_blk,
- 
-diff --git a/drivers/lightnvm/rrpc.c b/drivers/lightnvm/rrpc.c
-index 10ed22b..fa8d5be 100644
---- a/drivers/lightnvm/rrpc.c
-+++ b/drivers/lightnvm/rrpc.c
-@@ -192,21 +192,16 @@ static void rrpc_set_lun_cur(struct rrpc_lun *rlun, struct rrpc_block *rblk)
- static struct rrpc_block *rrpc_get_blk(struct rrpc *rrpc, struct rrpc_lun *rlun,
- 							unsigned long flags)
- {
--	struct nvm_lun *lun = rlun->parent;
- 	struct nvm_block *blk;
- 	struct rrpc_block *rblk;
- 
--	spin_lock(&lun->lock);
--	blk = nvm_get_blk_unlocked(rrpc->dev, rlun->parent, flags);
-+	blk = nvm_get_blk(rrpc->dev, rlun->parent, flags);
- 	if (!blk) {
- 		pr_err("nvm: rrpc: cannot get new block from media manager\n");
--		spin_unlock(&lun->lock);
- 		return NULL;
- 	}
- 
- 	rblk = rrpc_get_rblk(rlun, blk->id);
--	spin_unlock(&lun->lock);
--
- 	blk->priv = rblk;
- 	bitmap_zero(rblk->invalid_pages, rrpc->dev->sec_per_blk);
- 	rblk->next_page = 0;
-@@ -218,12 +213,7 @@ static struct rrpc_block *rrpc_get_blk(struct rrpc *rrpc, struct rrpc_lun *rlun,
- 
- static void rrpc_put_blk(struct rrpc *rrpc, struct rrpc_block *rblk)
- {
--	struct rrpc_lun *rlun = rblk->rlun;
--	struct nvm_lun *lun = rlun->parent;
--
--	spin_lock(&lun->lock);
--	nvm_put_blk_unlocked(rrpc->dev, rblk->parent);
--	spin_unlock(&lun->lock);
-+	nvm_put_blk(rrpc->dev, rblk->parent);
- }
- 
- static void rrpc_put_blks(struct rrpc *rrpc)
-diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
-index d619f6d..e9836cf 100644
---- a/include/linux/lightnvm.h
-+++ b/include/linux/lightnvm.h
-@@ -491,8 +491,6 @@ struct nvmm_type {
- 	nvmm_remove_tgt_fn *remove_tgt;
- 
- 	/* Block administration callbacks */
--	nvmm_get_blk_fn *get_blk_unlocked;
--	nvmm_put_blk_fn *put_blk_unlocked;
- 	nvmm_get_blk_fn *get_blk;
- 	nvmm_put_blk_fn *put_blk;
- 	nvmm_open_blk_fn *open_blk;
-@@ -522,10 +520,6 @@ struct nvmm_type {
- extern int nvm_register_mgr(struct nvmm_type *);
- extern void nvm_unregister_mgr(struct nvmm_type *);
- 
--extern struct nvm_block *nvm_get_blk_unlocked(struct nvm_dev *,
--					struct nvm_lun *, unsigned long);
--extern void nvm_put_blk_unlocked(struct nvm_dev *, struct nvm_block *);
--
- extern struct nvm_block *nvm_get_blk(struct nvm_dev *, struct nvm_lun *,
- 								unsigned long);
- extern void nvm_put_blk(struct nvm_dev *, struct nvm_block *);
+ 		virq = __irq_domain_alloc_irqs(domain, -1, desc->nvec_used,
+ 					       dev_to_node(dev), &arg, false,
+-					       NULL);
++					       desc->affinity);
+ 		if (virq < 0) {
+ 			ret = -ENOSPC;
+ 			if (ops->handle_error)
 -- 
 2.1.4
 
+
+_______________________________________________
+Linux-nvme mailing list
+Linux-nvme@lists.infradead.org
+http://lists.infradead.org/mailman/listinfo/linux-nvme
