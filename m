@@ -1,67 +1,76 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:38396 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753789AbcGSODF (ORCPT <rfc822;linux-block@vger.kernel.org>);
-	Tue, 19 Jul 2016 10:03:05 -0400
-From: Hannes Reinecke <hare@suse.de>
+Return-Path: <mpatocka@redhat.com>
+Date: Mon, 4 Jul 2016 18:45:35 -0400 (EDT)
+From: Mikulas Patocka <mpatocka@redhat.com>
 To: Mike Snitzer <snitzer@redhat.com>
-Cc: dm-devel-redhat.com@suse.de,
-	Damien Le Moal <damien.lemoal@hgst.com>,
-	linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@fb.com>,
-	Hannes Reinecke <hare@suse.de>
-Subject: [PATCH 1/3] block: add flag for single-threaded submission
-Date: Tue, 19 Jul 2016 16:02:56 +0200
-Message-Id: <1468936978-9124-2-git-send-email-hare@suse.de>
-In-Reply-To: <1468936978-9124-1-git-send-email-hare@suse.de>
-References: <1468936978-9124-1-git-send-email-hare@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+cc: Lars Ellenberg <lars.ellenberg@linbit.com>, axboe@kernel.dk,
+        "Alasdair G. Kergon" <agk@redhat.com>,
+        Zdenek Kabelac <zkabelac@redhat.com>, dm-devel@redhat.com,
+        linux-block@vger.kernel.org,
+        Roland Kammerer <roland.kammerer@linbit.com>
+Subject: Re: [PATCH 0/3] offload bios to a thread
+In-Reply-To: <20160630194023.GA21338@redhat.com>
+Message-ID: <alpine.LRH.2.02.1607041838310.16388@file01.intranet.prod.int.rdu2.redhat.com>
+References: <alpine.LRH.2.02.1606282014380.7298@file01.intranet.prod.int.rdu2.redhat.com> <20160630194023.GA21338@redhat.com>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+List-ID: <linux-block@vger.kernel.org>
 
-Some devices (most notably SMR drives) support only
-one I/O stream eg for ensuring ordered I/O submission.
-This patch adds a new block queue flag
-'BLK_QUEUE_SINGLE' to support these devices.
 
-Signed-off-by: Hannes Reinecke <hare@suse.de>
----
- block/blk-core.c       | 2 ++
- include/linux/blkdev.h | 2 ++
- 2 files changed, 4 insertions(+)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 4bcf30a..ff08d77 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -320,6 +320,8 @@ inline void __blk_run_queue_uncond(struct request_queue *q)
- 	 * number of active request_fn invocations such that blk_drain_queue()
- 	 * can wait until all these request_fn calls have finished.
- 	 */
-+	if (blk_queue_single(q) && q->request_fn_active)
-+		return;
- 	q->request_fn_active++;
- 	q->request_fn(q);
- 	q->request_fn_active--;
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index c351444..2f7775a 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -539,6 +539,7 @@ struct request_queue {
- #define QUEUE_FLAG_WC	       23	/* Write back caching */
- #define QUEUE_FLAG_FUA	       24	/* device supports FUA writes */
- #define QUEUE_FLAG_FLUSH_NQ    25	/* flush not queueuable */
-+#define QUEUE_FLAG_SINGLE      26	/* single-threaded submission only */
- 
- #define QUEUE_FLAG_DEFAULT	((1 << QUEUE_FLAG_IO_STAT) |		\
- 				 (1 << QUEUE_FLAG_STACKABLE)	|	\
-@@ -628,6 +629,7 @@ static inline void queue_flag_clear(unsigned int flag, struct request_queue *q)
- #define blk_queue_discard(q)	test_bit(QUEUE_FLAG_DISCARD, &(q)->queue_flags)
- #define blk_queue_secdiscard(q)	(blk_queue_discard(q) && \
- 	test_bit(QUEUE_FLAG_SECDISCARD, &(q)->queue_flags))
-+#define blk_queue_single(q)	test_bit(QUEUE_FLAG_SINGLE, &(q)->queue_flags)
- 
- #define blk_noretry_request(rq) \
- 	((rq)->cmd_flags & (REQ_FAILFAST_DEV|REQ_FAILFAST_TRANSPORT| \
--- 
-1.8.5.6
+On Thu, 30 Jun 2016, Mike Snitzer wrote:
 
+> [cc'ing linux-block and drbd folks]
+> 
+> On Tue, Jun 28 2016 at  8:16pm -0400,
+> Mikulas Patocka <mpatocka@redhat.com> wrote:
+> 
+> > Hi
+> > 
+> > Here I'm sending three patches to fix the deadlocks in snapshot and 
+> > snapshot-merge.
+> > 
+> > The first patch fixes the deadlock, the following 2 patches introduce a 
+> > timer, so that bios are not offloaded immediatelly, they are offloaded 
+> > after a specified timeout, because immediate offloading can change order 
+> > of bios and it could theoretically produce regressions. I don't know if 
+> > these regressions really exist or not.
+> > 
+> > If there is some way to push the patches upstream, try it.
+> 
+> Some fix must happen before the more recent upstream kernels can be
+> reliably used in stacked bio-based workloads (in production).  We simply
+> cannot ignore this issue any more.
+> 
+> drbd is also hitting the same generic_make_request (current->bio_list)
+> problem, see:
+> https://www.redhat.com/archives/dm-devel/2016-June/msg00326.html
+> 
+> Mikulas, I've taken your 3 proposed patches patches and refactored them
+> some to split out intermediate patches that hopefully make review
+> easier.  Nothing other than variable names and some other style stuff
+> was changed -- headers were tweaked some to help with clarity.
+> 
+> Please see the 5 topmost "block: ..." patches here:
+> http://git.kernel.org/cgit/linux/kernel/git/snitzer/linux.git/log/?h=wip
+
+I found a problem with the patches when using loop device - we must not 
+offload bios to the rescue thread if they are allocated from fs_bio_set. 
+I'll send a second version of the patches with this change. You can 
+incorporate that change to your git tree.
+
+> It should be noted that Jens had a quick look at this set and wanted to
+> throw up a little when he saw the (ab)use of a timer to defer punting to
+> the workqueue.  I explained that without the timer, always punting to
+> the workqueue, we could hurt performance by reordering IO or crippling
+> onstack plugging.  He said he'd try to think of a cleaner way forward.
+
+The behavior depends on the timer only in a situation when the deadlock 
+actually happens - the timer doesn't hurt performance on normal use. So, 
+it's better to have timed delay in bio processing than a deadlock :)
+
+The timer part can be dropped entirely if someone shows that offloading 
+bios on schedule doesn't hurt performance in any way. Does anyone have a 
+large collection of block layer performance tests that could be tried to 
+detect if the regression happens?
+
+Mikulas
