@@ -1,41 +1,89 @@
-Return-Path: <BATV+80a1e3aa0109c64edabc+4700+infradead.org+hch@bombadil.srs.infradead.org>
+Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
 From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk,
-	keith.busch@intel.com
-Cc: linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-nvme@lists.infradead.org
-Subject: NVMe over Fabrics RDMA transport drivers V2
-Date: Wed,  6 Jul 2016 21:55:47 +0900
-Message-Id: <1467809752-31320-1-git-send-email-hch@lst.de>
+To: tglx@linutronix.de,
+	axboe@fb.com
+Subject: [PATCH 01/13] irq/msi: Remove unused MSI_FLAG_IDENTITY_MAP
+Date: Mon,  4 Jul 2016 17:39:22 +0900
+Message-Id: <1467621574-8277-2-git-send-email-hch@lst.de>
+In-Reply-To: <1467621574-8277-1-git-send-email-hch@lst.de>
+References: <1467621574-8277-1-git-send-email-hch@lst.de>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
+List-Post: <mailto:linux-nvme@lists.infradead.org>
+List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
+Cc: linux-block@vger.kernel.org, linux-pci@vger.kernel.org, agordeev@redhat.com,
+ linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
+Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
 List-ID: <linux-block@vger.kernel.org>
 
-This patch set implements the NVMe over Fabrics RDMA host and the target
-drivers.
+From: Thomas Gleixner <tglx@linutronix.de>
 
-The host driver is tied into the NVMe host stack and implements the RDMA
-transport under the NVMe core and Fabrics modules. The NVMe over Fabrics
-RDMA host module is responsible for establishing a connection against a
-given target/controller, RDMA event handling and data-plane command
-processing.
+No user and we definitely don't want to grow one.
 
-The target driver hooks into the NVMe target core stack and implements
-the RDMA transport. The module is responsible for RDMA connection
-establishment, RDMA event handling and data-plane RDMA commands
-processing.
+Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+Reviewed-by: Bart Van Assche <bart.vanassche@sandisk.com>
+---
+ include/linux/msi.h | 6 ++----
+ kernel/irq/msi.c    | 8 ++------
+ 2 files changed, 4 insertions(+), 10 deletions(-)
 
-RDMA connection establishment is done using RDMA/CM and IP resolution.
-The data-plane command sequence follows the classic storage model where
-the target pushes/pulls the data.
+diff --git a/include/linux/msi.h b/include/linux/msi.h
+index 8b425c6..c33abfa 100644
+--- a/include/linux/msi.h
++++ b/include/linux/msi.h
+@@ -264,12 +264,10 @@ enum {
+ 	 * callbacks.
+ 	 */
+ 	MSI_FLAG_USE_DEF_CHIP_OPS	= (1 << 1),
+-	/* Build identity map between hwirq and irq */
+-	MSI_FLAG_IDENTITY_MAP		= (1 << 2),
+ 	/* Support multiple PCI MSI interrupts */
+-	MSI_FLAG_MULTI_PCI_MSI		= (1 << 3),
++	MSI_FLAG_MULTI_PCI_MSI		= (1 << 2),
+ 	/* Support PCI MSIX interrupts */
+-	MSI_FLAG_PCI_MSIX		= (1 << 4),
++	MSI_FLAG_PCI_MSIX		= (1 << 3),
+ };
+ 
+ int msi_domain_set_affinity(struct irq_data *data, const struct cpumask *mask,
+diff --git a/kernel/irq/msi.c b/kernel/irq/msi.c
+index 38e89ce..eb5bf2b 100644
+--- a/kernel/irq/msi.c
++++ b/kernel/irq/msi.c
+@@ -324,7 +324,7 @@ int msi_domain_alloc_irqs(struct irq_domain *domain, struct device *dev,
+ 	struct msi_domain_ops *ops = info->ops;
+ 	msi_alloc_info_t arg;
+ 	struct msi_desc *desc;
+-	int i, ret, virq = -1;
++	int i, ret, virq;
+ 
+ 	ret = msi_domain_prepare_irqs(domain, dev, nvec, &arg);
+ 	if (ret)
+@@ -332,12 +332,8 @@ int msi_domain_alloc_irqs(struct irq_domain *domain, struct device *dev,
+ 
+ 	for_each_msi_entry(desc, dev) {
+ 		ops->set_desc(&arg, desc);
+-		if (info->flags & MSI_FLAG_IDENTITY_MAP)
+-			virq = (int)ops->get_hwirq(info, &arg);
+-		else
+-			virq = -1;
+ 
+-		virq = __irq_domain_alloc_irqs(domain, virq, desc->nvec_used,
++		virq = __irq_domain_alloc_irqs(domain, -1, desc->nvec_used,
+ 					       dev_to_node(dev), &arg, false);
+ 		if (virq < 0) {
+ 			ret = -ENOSPC;
+-- 
+2.1.4
 
-Changes since V1:
- - updates for req_op changes in for-next (me)
- - validate adrfam in nvmet-rdma (Ming)
- - don't leak rsp structures on connect failure in nvmet-rdma (Steve)
- - don't use RDMA/CM errors codes in reject path in nvmet-rdma (Steve)
- - fix nvmet_rdma_delete_ctrl (me)
- - invoke fatal error on error completion in nvmet-rdma (Sagi)
- - don't leak rsp structure on disconnected queue in nvmet-rdma (Ming)
- - properly set the SGL flag on AERs in nvme-rdma (me)
- - correctly stop the keep alive timer on reconnect in nvme-rdma (Ming)
- - stop and drain queues before freeing the tagset in nvet-rdma (Steve)
+
+_______________________________________________
+Linux-nvme mailing list
+Linux-nvme@lists.infradead.org
+http://lists.infradead.org/mailman/listinfo/linux-nvme
