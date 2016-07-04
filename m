@@ -1,50 +1,45 @@
-Return-Path: <BATV+a6fbff1bfc78a84bb09b+4713+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org
-Subject: [PATCH 1/7] memstick: don't allow REQ_TYPE_BLOCK_PC requests
-Date: Tue, 19 Jul 2016 11:31:48 +0200
-Message-Id: <1468920714-4304-2-git-send-email-hch@lst.de>
-In-Reply-To: <1468920714-4304-1-git-send-email-hch@lst.de>
-References: <1468920714-4304-1-git-send-email-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from www.linutronix.de ([62.245.132.108]:58219 "EHLO
+	Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752661AbcGDKcQ (ORCPT
+	<rfc822;linux-block@vger.kernel.org>); Mon, 4 Jul 2016 06:32:16 -0400
+Date: Mon, 4 Jul 2016 12:30:05 +0200 (CEST)
+From: Thomas Gleixner <tglx@linutronix.de>
+To: Christoph Hellwig <hch@lst.de>
+cc: axboe@fb.com, agordeev@redhat.com, linux-block@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-nvme@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: automatic interrupt affinity for MSI/MSI-X capable devices V3
+In-Reply-To: <1467621574-8277-1-git-send-email-hch@lst.de>
+Message-ID: <alpine.DEB.2.11.1607041227340.4083@nanos>
+References: <1467621574-8277-1-git-send-email-hch@lst.de>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-There is no code to issue or handle REQ_TYPE_BLOCK_PC request in the
-memstick drivers, so remove the bogus conditional.
+On Mon, 4 Jul 2016, Christoph Hellwig wrote:
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/memstick/core/ms_block.c    | 3 +--
- drivers/memstick/core/mspro_block.c | 3 +--
- 2 files changed, 2 insertions(+), 4 deletions(-)
+> This series enhances the irq and PCI code to allow spreading around MSI and
+> MSI-X vectors so that they have per-cpu affinity if possible, or at least
+> per-node.  For that it takes the algorithm from blk-mq, moves it to
+> a common place, and makes it available through a vastly simplified PCI
+> interrupt allocation API.  It then switches blk-mq to be able to pick up
+> the queue mapping from the device if available, and demonstrates all this
+> using the NVMe driver.
+> 
+> Compared to the last posting the core IRQ changes are stable and it would
+> be great to get them merged int the tip tree.  The two PCI patches have
+> been completely rewritten after feedback from Alexander, while the block
+> changes have also been stable.
 
-diff --git a/drivers/memstick/core/ms_block.c b/drivers/memstick/core/ms_block.c
-index 0fc43c7..40bb8ae 100644
---- a/drivers/memstick/core/ms_block.c
-+++ b/drivers/memstick/core/ms_block.c
-@@ -2002,8 +2002,7 @@ static int msb_bd_getgeo(struct block_device *bdev,
- 
- static int msb_prepare_req(struct request_queue *q, struct request *req)
- {
--	if (req->cmd_type != REQ_TYPE_FS &&
--				req->cmd_type != REQ_TYPE_BLOCK_PC) {
-+	if (req->cmd_type != REQ_TYPE_FS) {
- 		blk_dump_rq_flags(req, "MS unsupported request");
- 		return BLKPREP_KILL;
- 	}
-diff --git a/drivers/memstick/core/mspro_block.c b/drivers/memstick/core/mspro_block.c
-index 25b66c5..c147227 100644
---- a/drivers/memstick/core/mspro_block.c
-+++ b/drivers/memstick/core/mspro_block.c
-@@ -829,8 +829,7 @@ static void mspro_block_start(struct memstick_dev *card)
- 
- static int mspro_block_prepare_req(struct request_queue *q, struct request *req)
- {
--	if (req->cmd_type != REQ_TYPE_FS &&
--	    req->cmd_type != REQ_TYPE_BLOCK_PC) {
-+	if (req->cmd_type != REQ_TYPE_FS) {
- 		blk_dump_rq_flags(req, "MSPro unsupported request");
- 		return BLKPREP_KILL;
- 	}
--- 
-2.1.4
+I applied the first 6 patches. They are available in a seperate branch:
+
+   git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git irq/for-block
+
+and integrated into the irq/core branch. irq/for-block can be pulled from the
+block folks if required.
+
+Thanks,
+
+	tglx
