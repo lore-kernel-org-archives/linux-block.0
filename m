@@ -1,44 +1,35 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from simcoe208srvr.owm.bell.net ([184.150.200.208]:43053 "EHLO
-	torfep02.bell.net" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1754212AbcGFNaX (ORCPT
-	<rfc822;linux-block@vger.kernel.org>); Wed, 6 Jul 2016 09:30:23 -0400
-Subject: Re: parisc late boot crash in 4.4-rc, scsi-related
-To: Meelis Roos <mroos@linux.ee>,
-	Rolf Eike Beer <eike-kernel@sf-tec.de>
-References: <alpine.LRH.2.20.1601082329270.23187@math.ut.ee>
- <9d1ae51e-69c3-c3f6-60aa-e5238dd18241@bell.net>
- <alpine.LRH.2.20.1606221451310.11869@math.ut.ee>
- <2098261.XbUFfohXuY@caliban.sf-tec.de>
- <alpine.LRH.2.20.1607060957560.8418@math.ut.ee>
-Cc: linux-parisc@vger.kernel.org, linux-block@vger.kernel.org,
+Received: from smtp2.it.da.ut.ee ([193.40.5.67]:38660 "EHLO smtp2.it.da.ut.ee"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750780AbcGFG5m (ORCPT <rfc822;linux-block@vger.kernel.org>);
+	Wed, 6 Jul 2016 02:57:42 -0400
+Date: Wed, 6 Jul 2016 09:59:24 +0300 (EEST)
+From: Meelis Roos <mroos@linux.ee>
+To: Rolf Eike Beer <eike-kernel@sf-tec.de>
+cc: linux-parisc@vger.kernel.org, linux-block@vger.kernel.org,
 	linux-scsi@vger.kernel.org
-From: John David Anglin <dave.anglin@bell.net>
-Message-ID: <ce0e6b44-c74a-c85e-51c0-3643b414e4d6@bell.net>
-Date: Wed, 6 Jul 2016 09:30:22 -0400
+Subject: Re: parisc late boot crash in 4.4-rc, scsi-related
+In-Reply-To: <2098261.XbUFfohXuY@caliban.sf-tec.de>
+Message-ID: <alpine.LRH.2.20.1607060957560.8418@math.ut.ee>
+References: <alpine.LRH.2.20.1601082329270.23187@math.ut.ee> <9d1ae51e-69c3-c3f6-60aa-e5238dd18241@bell.net> <alpine.LRH.2.20.1606221451310.11869@math.ut.ee> <2098261.XbUFfohXuY@caliban.sf-tec.de>
 MIME-Version: 1.0
-In-Reply-To: <alpine.LRH.2.20.1607060957560.8418@math.ut.ee>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 2016-07-06 2:59 AM, Meelis Roos wrote:
->>> What distro are you using?
->>>
->>> My pariscs are gentoo and still only the old versions are available on
->>> hppa.
->> Several newer versions (4.9, 5.3) are in portage, maybe they just need to be
->> unmasked.
-> 4.9.3 and 5.3.0 were too old.
-Correct.  4.9.4 will include fix if it is released.
->
-> However, at the end of June, 5.4.0 appeared masked. Unmasking kgcc64
-> 5.4.0 and building it made my pariscs work again, with 4.7-rc6 running
-> fine on all of them.
-Great!  Thanks for report.
+> > What distro are you using?
+> > 
+> > My pariscs are gentoo and still only the old versions are available on
+> > hppa.
+> 
+> Several newer versions (4.9, 5.3) are in portage, maybe they just need to be 
+> unmasked.
 
-Dave
+4.9.3 and 5.3.0 were too old.
+
+However, at the end of June, 5.4.0 appeared masked. Unmasking kgcc64 
+5.4.0 and building it made my pariscs work again, with 4.7-rc6 running 
+fine on all of them.
 
 -- 
-John David Anglin  dave.anglin@bell.net
-
+Meelis Roos (mroos@linux.ee)
