@@ -1,124 +1,60 @@
-Return-Path: <aaronlee0817@163.com>
-Date: Thu, 7 Jul 2016 21:48:04 +0800 (CST)
-From: aaronlee0817  <aaronlee0817@163.com>
-To: "Tejun Heo" <tj@kernel.org>
-Cc: "Ming Lei" <tom.leiming@gmail.com>, "Jens Axboe" <axboe@kernel.dk>,
-	"Ming Lin" <mlin@kernel.org>, "Shaohua Li" <shli@kernel.org>,
-	"Linux Kernel Mailing List" <linux-kernel@vger.kernel.org>,
-	cgroup@vger.kernel.org, jiale0817.li@samsung.com,
-	yanzi.zhang@samsung.com, zhen1.zhang@samsung.com,
-	linux-block <linux-block@vger.kernel.org>
-Subject: Re:Re: cgroup: Fix split bio been throttled more than once
-In-Reply-To: <20160706140919.GH3262@mtj.duckdns.org>
-References: <77238e99.142c5.155b660564f.Coremail.aaronlee0817@163.com>
- <CACVXFVPO-7EEK02SUH16NtnwpE807KuYQHybBYYqVbXGZSzX2A@mail.gmail.com>
- <20160706140919.GH3262@mtj.duckdns.org>
-Content-Type: multipart/alternative;
-	boundary="----=_Part_298381_763804126.1467899284003"
+Return-Path: <tom.leiming@gmail.com>
 MIME-Version: 1.0
-Message-ID: <27824f6f.127ab.155c59d8a24.Coremail.aaronlee0817@163.com>
+In-Reply-To: <20160706150629.GA31684@mtj.duckdns.org>
+References: <77238e99.142c5.155b660564f.Coremail.aaronlee0817@163.com>
+ <20160705222626.GC25394@htj.duckdns.org> <458d1946.12fa6.155c0b80d60.Coremail.aaronlee0817@163.com>
+ <20160706150629.GA31684@mtj.duckdns.org>
+From: Ming Lei <tom.leiming@gmail.com>
+Date: Wed, 6 Jul 2016 23:39:29 +0800
+Message-ID: <CACVXFVOr+nFvFge-VOR+Jsci2hp263r7F-NZ8N2d5wsfDDOpWg@mail.gmail.com>
+Subject: Re: Re: cgroup: Fix split bio been throttled more than once
+To: Tejun Heo <tj@kernel.org>
+Cc: aaronlee0817 <aaronlee0817@163.com>, Jens Axboe <axboe@kernel.dk>, Ming Lin <mlin@kernel.org>,
+	Shaohua Li <shli@kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, cgroup@vger.kernel.org,
+	jiale0817.li@samsung.com, yanzi.zhang@samsung.com, zhen1.zhang@samsung.com,
+	linux-block <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
-------=_Part_298381_763804126.1467899284003
-Content-Type: text/plain; charset=GBK
-Content-Transfer-Encoding: base64
+On Wed, Jul 6, 2016 at 11:06 PM, Tejun Heo <tj@kernel.org> wrote:
+> Hello,
+>
+> On Wed, Jul 06, 2016 at 10:58:55PM +0800, aaronlee0817 wrote:
+>> >But that said, can't we just copy BIO_THROTLED while splitting?
+>>
+>> In my opinion=EF=BC=8C copying BIO_THROTLED while splitting doesn't work
+>> with this, because, the bio within the limit will not set BIO_THROTLED
+>> but will be split, and back to call generic_make_request(), and will be
+>> count twice.
+>
+> I see.  It's just a bit weird that we're marking this from clone site
+> when it's an issue which is specific to throttling.  The thing is
+> depending on how bio clone is used, it could misbehave in the other
 
-PkF0IDIwMTYtMDctMDYgMjI6MDk6MTksICJUZWp1biBIZW8iIDx0akBrZXJuZWwub3JnPiB3cm90
-ZToKPkhlbGxvLCBNaW5nLgo+Cj5PbiBXZWQsIEp1bCAwNiwgMjAxNiBhdCAwOToxMDowMEFNICsw
-ODAwLCBNaW5nIExlaSB3cm90ZToKPj4gPiBUaGVuIHdlIGRpZCBzb21lIHJlc2VhcmNoIGFuZCBm
-aW5kIHRoYXQgaW4ga2VybmVsIHZlcnNpb24gNC4zIGJyb3VnaHQgaW4KPj4gPiBibGtfcXVldWVf
-c3BsaXQoKSBmdW5jdGlvbiB0byBzcGxpdCB0aGUgYmlnIHNpemUgYmlvIGludG8gc2V2ZXJhbCBw
-YXJ0cywKPj4gPiBhbmQgc29tZSBvZiB0aGVtIGFyZSBjYWxsaW5nIHRoZSBnZW5lcmljX21ha2Vf
-cmVxdWVzdCgpIGFnYWluLCB0aGlzIHJlc3VsdAo+PiA+IHRoZSBiaW8gYmVlbiB0aHJvdHRsZWQg
-bW9yZSB0aGFuIG9uY2UuIHNvIHRoZSBhY3R1YWwgYmlvIHNlbnQgdG8gZGV2aWNlIGlzCj4+ID4g
-bGVzcyB0aGFuIHdlIGV4cGVjdGVkLgo+PiAKPj4gRXhjZXB0IGZvciBibGtfcXVldWVfc3BsaXQo
-KSwgdGhlcmUgYXJlIG90aGVyKHN0YWNrZWQpIGRyaXZlcnMgd2hpY2ggY2FsbAo+PiBnZW5lcmlj
-X21ha2VfcmVxdWVzdCgpIHRvbywgc3VjaCBhcyBkcmJkLCBkbSwgbWQgYW5kIGJjYWNoZS4KPgo+
-U28sIGJsay10aHJvdGwgYWxyZWFkeSB1c2VzIFJFUV9USFJPVFRMRUQgdG8gYXZvaWQgdGhyb3R0
-bGluZyB0aGUgc2FtZQo+YmlvIG11bHRpcGxlIHRpbWVzLiAgVGhlIHByb2JsZW0gc2VlbXMgdGhh
-dCB0aGUgZmxhZyBpc24ndCBtYWludGFpbmVkCj50aHJvdWdoIGNsb25lLgoKWWVho6wgUkVRX1RI
-Uk9UVExFRCBpcyB1c2VkIHRvIGF2b2lkIHRocm90dGxpbmcgdGhlIHNhbWUgYmlvIG11bHRpcGxl
-IHRpbWVzLCAKYnV0IGNhbm5vdCBhdm9pZCBjb3VudGluZyB0aGUgc2FtZSBiaW8gbXVsdGlwbGUg
-dGltZXMsIHRoaXMgbWFrZXMgdGhlIGNvdW50cyBvZgpkaXNwYXRjaGVkIGJ5dGVzIG5vIHJlYWwu
-CkJlZm9yZSBicmluZ2luZyBpbiBzcGxpdHRpbmcsIGl0IHdvcmtzIHdlbGwuQnV0IG5vdywgdGhp
-cyBjYW5ub3QgY292ZXIgYWxsICBzY2VuYXJpb3MuCkZvciBleGFtcGxlOgoKCmdlbmVyaWNfbWFr
-ZV9yZXF1ZXN0KCkKYmxrX3Rocm90bF9iaW8KICAgIGJvb2wgdGhyb3R0bGVkID0gZmFsc2UKICAg
-IHRocm90bF9jaGFyZ2VfYmlvKCkgICAgICBjb3VudCB0aGUgYnl0ZXMsIHNldCBSRVFfVEhST1RU
-TEVECiAgICBnb3RvIG91dAogICAgaWYoIXRocm90dGxlZCkKICAgICAgICBjbGVhbiBSRVFfVEhS
-T1RUTEVEICAgICAgIAogICAgcmV0dXJuIAoKCkJlZm9yZSByZXR1cm4sIFJFUV9USFJPVFRMRUQg
-d2lsbCBiZSBjbGVhbmVkLgpXaGlsZSBzcGxpdHRpbmcgd2lsbCBjb3B5IGJpby0+cncsIGJ1dCBS
-RVFfVEhST1RUTEVEIGhhcyBiZWVuIGNsZWFuZWQuClNvIHRocm90dGxpbmcgZnVuY3Rpb24gd2ls
-bCBjb3VudCB0aGUgYnl0ZXMgYWdhaW4uIEluIHRoaXMgc2NlbmFyaW8gIGNhbm5vdCAKYXZvaWQg
-Y291bnRpbmcgdGhlIHNhbWUgYmlvIG11bHRpcGxlIHRpbWVzLiAgCgoKPgo+PiA+Cj4+ID4gV2Ug
-aGF2ZSBjaGVja2VkIHRoZSBuZXdlc3Qga2VybmVsIG9mIDQuNy1yYzUsIHRoaXMgcHJvYmxlbSBp
-cyBzdGlsbCBleGlzdC4KPj4gPgo+PiA+IEJhc2VkIG9uIHRoaXMga2luZCBvZiBzaXR1YXRpb24s
-IHdlIHByb3Bvc2UgYSBmaXggc29sdXRpb24gdG8gYWRkIGEgZmxhZyBiaXQKPj4gPiBpbiBiaW8g
-dG8gbGV0IHRoZSBzcGxpdGVkIGJpbyBieXBhc3MgdGhlIGJsa19xdWV1ZV9zcGxpdCgpLiBCZWxv
-dyBpcyB0aGUgcGF0Y2gKPj4gPiB3ZSB1c2VkIHRvIGZpeCB0aGlzIHByb2JsZW0uCj4+IAo+PiBU
-aGUgc3BsaXR0ZWQgYmlvIGlzIGp1c3QgYSBmYXN0LWNsb25lZCBiaW8oZXhjZXB0IGZvciBkaXNj
-YXJkIGJpbykgYW5kIG5vdCB2ZXJ5Cj4+IHNwZWNpYWwgY29tcGFyZWQgd2l0aCBvdGhlciBmYXN0
-LWNsb25lZCBiaW8sIHdoaWNoIGlzIHF1aXRlIGNvbW1vbiB1c2VkLgo+PiAKPj4gU28gSSBndWVz
-cyB3aGF0IHlvdSBuZWVkIGlzIHRvIGJ5cGFzcyBCSU9fQ0xPTkVEIGJpbyBmb3IgdGhpcyBwdXJw
-b3NlCj4+IHNpbmNlIGFsbCBmYXN0LWNsb25lZCBiaW8gc2hhcmVzIHRoZSBzYW1lIGJ2ZWMgdGFi
-bGUgb2YgdGhlIHNvdXJjZSBiaW8uCj4KPkRlcGVuZGluZyBvbiBob3cgYSBkZXZpY2UgaGFuZGxl
-cyBhIGJpbywgdGhhdCBjb3VsZCBhbGxvdyBiaW9zIHRvCj5ieXBhc3MgdGhyb3R0bGluZyBlbnRp
-cmVseSwgbm8/ICBXb3VsZG4ndCBhZGRpbmcgUkVRX1RIUk9UVExFRCB0bwo+UkVRX0NMT05FX01B
-U0sgd29yaz8KPgo+VGhhbmtzLgo+Cj4tLSAKPnRlanVuCg==
-------=_Part_298381_763804126.1467899284003
-Content-Type: text/html; charset=GBK
-Content-Transfer-Encoding: base64
+The cloned bio often need to be submitted via generic_make_request().
 
-PGRpdiBzdHlsZT0ibGluZS1oZWlnaHQ6MS43O2NvbG9yOiMwMDAwMDA7Zm9udC1zaXplOjE0cHg7
-Zm9udC1mYW1pbHk6QXJpYWwiPjxwcmU+Jmd0O0F0IDIwMTYtMDctMDYgMjI6MDk6MTksICJUZWp1
-biBIZW8iICZsdDt0akBrZXJuZWwub3JnJmd0OyB3cm90ZToKJmd0O0hlbGxvLCBNaW5nLgomZ3Q7
-CiZndDtPbiBXZWQsIEp1bCAwNiwgMjAxNiBhdCAwOToxMDowMEFNICswODAwLCBNaW5nIExlaSB3
-cm90ZToKJmd0OyZndDsgJmd0OyBUaGVuIHdlIGRpZCBzb21lIHJlc2VhcmNoIGFuZCBmaW5kIHRo
-YXQgaW4ga2VybmVsIHZlcnNpb24gNC4zIGJyb3VnaHQgaW4KJmd0OyZndDsgJmd0OyBibGtfcXVl
-dWVfc3BsaXQoKSBmdW5jdGlvbiB0byBzcGxpdCB0aGUgYmlnIHNpemUgYmlvIGludG8gc2V2ZXJh
-bCBwYXJ0cywKJmd0OyZndDsgJmd0OyBhbmQgc29tZSBvZiB0aGVtIGFyZSBjYWxsaW5nIHRoZSBn
-ZW5lcmljX21ha2VfcmVxdWVzdCgpIGFnYWluLCB0aGlzIHJlc3VsdAomZ3Q7Jmd0OyAmZ3Q7IHRo
-ZSBiaW8gYmVlbiB0aHJvdHRsZWQgbW9yZSB0aGFuIG9uY2UuIHNvIHRoZSBhY3R1YWwgYmlvIHNl
-bnQgdG8gZGV2aWNlIGlzCiZndDsmZ3Q7ICZndDsgbGVzcyB0aGFuIHdlIGV4cGVjdGVkLgomZ3Q7
-Jmd0OyAKJmd0OyZndDsgRXhjZXB0IGZvciBibGtfcXVldWVfc3BsaXQoKSwgdGhlcmUgYXJlIG90
-aGVyKHN0YWNrZWQpIGRyaXZlcnMgd2hpY2ggY2FsbAomZ3Q7Jmd0OyBnZW5lcmljX21ha2VfcmVx
-dWVzdCgpIHRvbywgc3VjaCBhcyBkcmJkLCBkbSwgbWQgYW5kIGJjYWNoZS4KJmd0OwomZ3Q7U28s
-IGJsay10aHJvdGwgYWxyZWFkeSB1c2VzIFJFUV9USFJPVFRMRUQgdG8gYXZvaWQgdGhyb3R0bGlu
-ZyB0aGUgc2FtZQomZ3Q7YmlvIG11bHRpcGxlIHRpbWVzLiAgVGhlIHByb2JsZW0gc2VlbXMgdGhh
-dCB0aGUgZmxhZyBpc24ndCBtYWludGFpbmVkCjxkaXY+Jmd0O3Rocm91Z2ggY2xvbmUuPC9kaXY+
-PGRpdj48YnI+PC9kaXY+PGRpdj5ZZWGjrCBSRVFfVEhST1RUTEVEIGlzIHVzZWQgdG8gYXZvaWQg
-dGhyb3R0bGluZyB0aGUgc2FtZSBiaW8gbXVsdGlwbGUgdGltZXMsIDwvZGl2PjxkaXY+YnV0IGNh
-bm5vdCBhdm9pZCBjb3VudGluZyB0aGUgc2FtZSBiaW8gbXVsdGlwbGUgdGltZXMsIHRoaXMgbWFr
-ZXMgdGhlIGNvdW50cyBvZjwvZGl2PjxkaXY+ZGlzcGF0Y2hlZCBieXRlcyBubyByZWFsLjwvZGl2
-PjxkaXY+QmVmb3JlIGJyaW5naW5nIGluIHNwbGl0dGluZywgaXQgd29ya3Mgd2VsbC5CdXQgbm93
-LCB0aGlzIGNhbm5vdCBjb3ZlciBhbGwgIHNjZW5hcmlvcy48L2Rpdj48ZGl2PkZvciBleGFtcGxl
-OjwvZGl2PjxkaXY+PGJyPjwvZGl2PjxkaXY+Z2VuZXJpY19tYWtlX3JlcXVlc3QoKTwvZGl2Pjxk
-aXY+YmxrX3Rocm90bF9iaW88L2Rpdj48ZGl2PiAgICBib29sIHRocm90dGxlZCA9IGZhbHNlPC9k
-aXY+PGRpdj4gICAgdGhyb3RsX2NoYXJnZV9iaW8oKSAgICAgIGNvdW50IHRoZSBieXRlcywgc2V0
-IFJFUV9USFJPVFRMRUQ8L2Rpdj48ZGl2PiAgICBnb3RvIG91dDwvZGl2PjxkaXY+Jm5ic3A7Jm5i
-c3A7Jm5ic3A7Jm5ic3A7aWYoIXRocm90dGxlZCk8L2Rpdj48ZGl2PiZuYnNwOyZuYnNwOyZuYnNw
-OyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwO2NsZWFuIFJFUV9USFJPVFRMRUQgICAgICAg
-PC9kaXY+PGRpdj4gICAgcmV0dXJuIDwvZGl2PjxkaXY+PGJyPjwvZGl2PjxkaXY+QmVmb3JlIHJl
-dHVybiwgUkVRX1RIUk9UVExFRCB3aWxsIGJlIGNsZWFuZWQuPC9kaXY+PGRpdj5XaGlsZSBzcGxp
-dHRpbmcgd2lsbCBjb3B5IGJpby0mZ3Q7cncsIGJ1dCBSRVFfVEhST1RUTEVEIGhhcyBiZWVuIGNs
-ZWFuZWQuPC9kaXY+PGRpdj5TbyB0aHJvdHRsaW5nIGZ1bmN0aW9uIHdpbGwgY291bnQgdGhlIGJ5
-dGVzIGFnYWluLiBJbiB0aGlzIHNjZW5hcmlvICBjYW5ub3QgPC9kaXY+PGRpdj5hdm9pZCBjb3Vu
-dGluZyB0aGUgc2FtZSBiaW8gbXVsdGlwbGUgdGltZXMuICA8L2Rpdj48ZGl2Pjxicj48L2Rpdj4m
-Z3Q7CiZndDsmZ3Q7ICZndDsKJmd0OyZndDsgJmd0OyBXZSBoYXZlIGNoZWNrZWQgdGhlIG5ld2Vz
-dCBrZXJuZWwgb2YgNC43LXJjNSwgdGhpcyBwcm9ibGVtIGlzIHN0aWxsIGV4aXN0LgomZ3Q7Jmd0
-OyAmZ3Q7CiZndDsmZ3Q7ICZndDsgQmFzZWQgb24gdGhpcyBraW5kIG9mIHNpdHVhdGlvbiwgd2Ug
-cHJvcG9zZSBhIGZpeCBzb2x1dGlvbiB0byBhZGQgYSBmbGFnIGJpdAomZ3Q7Jmd0OyAmZ3Q7IGlu
-IGJpbyB0byBsZXQgdGhlIHNwbGl0ZWQgYmlvIGJ5cGFzcyB0aGUgYmxrX3F1ZXVlX3NwbGl0KCku
-IEJlbG93IGlzIHRoZSBwYXRjaAomZ3Q7Jmd0OyAmZ3Q7IHdlIHVzZWQgdG8gZml4IHRoaXMgcHJv
-YmxlbS4KJmd0OyZndDsgCiZndDsmZ3Q7IFRoZSBzcGxpdHRlZCBiaW8gaXMganVzdCBhIGZhc3Qt
-Y2xvbmVkIGJpbyhleGNlcHQgZm9yIGRpc2NhcmQgYmlvKSBhbmQgbm90IHZlcnkKJmd0OyZndDsg
-c3BlY2lhbCBjb21wYXJlZCB3aXRoIG90aGVyIGZhc3QtY2xvbmVkIGJpbywgd2hpY2ggaXMgcXVp
-dGUgY29tbW9uIHVzZWQuCiZndDsmZ3Q7IAomZ3Q7Jmd0OyBTbyBJIGd1ZXNzIHdoYXQgeW91IG5l
-ZWQgaXMgdG8gYnlwYXNzIEJJT19DTE9ORUQgYmlvIGZvciB0aGlzIHB1cnBvc2UKJmd0OyZndDsg
-c2luY2UgYWxsIGZhc3QtY2xvbmVkIGJpbyBzaGFyZXMgdGhlIHNhbWUgYnZlYyB0YWJsZSBvZiB0
-aGUgc291cmNlIGJpby4KJmd0OwomZ3Q7RGVwZW5kaW5nIG9uIGhvdyBhIGRldmljZSBoYW5kbGVz
-IGEgYmlvLCB0aGF0IGNvdWxkIGFsbG93IGJpb3MgdG8KJmd0O2J5cGFzcyB0aHJvdHRsaW5nIGVu
-dGlyZWx5LCBubz8gIFdvdWxkbid0IGFkZGluZyBSRVFfVEhST1RUTEVEIHRvCiZndDtSRVFfQ0xP
-TkVfTUFTSyB3b3JrPwomZ3Q7CiZndDtUaGFua3MuCiZndDsKJmd0Oy0tIAomZ3Q7dGVqdW4KPC9w
-cmU+PC9kaXY+PGJyPjxicj48c3BhbiB0aXRsZT0ibmV0ZWFzZWZvb3RlciI+PHA+Jm5ic3A7PC9w
-Pjwvc3Bhbj4=
-------=_Part_298381_763804126.1467899284003--
+> direction (bio not accounted at all).  What we want to know is whether
+> a bio has been previously accounted or not, rather than whether a bio
+> is a result of splitting.  I think it'd be better to track that
+> instead.
+
+Looks the flag of BIO_THROTLED doesn't work well, and it should have
+been set if the bio is accounted, and seems not related with splitting.
+
+Thanks,
+Ming
+
+>
+> Thanks.
+>
+> --
+> tejun
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-block" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+--=20
+Ming Lei
