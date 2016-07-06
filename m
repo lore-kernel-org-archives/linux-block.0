@@ -1,74 +1,42 @@
-Return-Path: <aaronlee0817@163.com>
-Date: Wed, 6 Jul 2016 23:17:12 +0800 (CST)
-From: aaronlee0817  <aaronlee0817@163.com>
-To: "Tejun Heo" <tj@kernel.org>
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Wed, 6 Jul 2016 11:06:29 -0400
+From: Tejun Heo <tj@kernel.org>
+To: aaronlee0817 <aaronlee0817@163.com>
 Cc: axboe@kernel.dk, mlin@kernel.org, shli@kernel.org,
 	linux-kernel@vger.kernel.org, cgroup@vger.kernel.org,
 	jiale0817.li@samsung.com, yanzi.zhang@samsung.com,
 	zhen1.zhang@samsung.com, linux-block@vger.kernel.org
-Subject: Re:Re: Re: cgroup: Fix split bio been throttled more than once
-In-Reply-To: <20160706150629.GA31684@mtj.duckdns.org>
+Subject: Re: Re: cgroup: Fix split bio been throttled more than once
+Message-ID: <20160706150629.GA31684@mtj.duckdns.org>
 References: <77238e99.142c5.155b660564f.Coremail.aaronlee0817@163.com>
  <20160705222626.GC25394@htj.duckdns.org>
  <458d1946.12fa6.155c0b80d60.Coremail.aaronlee0817@163.com>
- <20160706150629.GA31684@mtj.duckdns.org>
-Content-Type: multipart/alternative;
-	boundary="----=_Part_308602_672983808.1467818232372"
 MIME-Version: 1.0
-Message-ID: <47bdfb31.1320b.155c0c8ca34.Coremail.aaronlee0817@163.com>
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <458d1946.12fa6.155c0b80d60.Coremail.aaronlee0817@163.com>
 List-ID: <linux-block@vger.kernel.org>
 
-------=_Part_308602_672983808.1467818232372
-Content-Type: text/plain; charset=GBK
-Content-Transfer-Encoding: base64
+Hello,
 
-Cj5BdCAyMDE2LTA3LTA2IDIzOjA2OjI5LCAiVGVqdW4gSGVvIiA8dGpAa2VybmVsLm9yZz4gd3Jv
-dGU6Cj5IZWxsbywKPgo+T24gV2VkLCBKdWwgMDYsIDIwMTYgYXQgMTA6NTg6NTVQTSArMDgwMCwg
-YWFyb25sZWUwODE3IHdyb3RlOgo+PiA+QnV0IHRoYXQgc2FpZCwgY2FuJ3Qgd2UganVzdCBjb3B5
-IEJJT19USFJPVExFRCB3aGlsZSBzcGxpdHRpbmc/Cj4+IAo+PiBJbiBteSBvcGluaW9uo6wgY29w
-eWluZyBCSU9fVEhST1RMRUQgd2hpbGUgc3BsaXR0aW5nIGRvZXNuJ3Qgd29yawo+PiB3aXRoIHRo
-aXMsIGJlY2F1c2UsIHRoZSBiaW8gd2l0aGluIHRoZSBsaW1pdCB3aWxsIG5vdCBzZXQgQklPX1RI
-Uk9UTEVECj4+IGJ1dCB3aWxsIGJlIHNwbGl0LCBhbmQgYmFjayB0byBjYWxsIGdlbmVyaWNfbWFr
-ZV9yZXF1ZXN0KCksIGFuZCB3aWxsIGJlIAo+PiBjb3VudCB0d2ljZS4KPgo+SSBzZWUuICBJdCdz
-IGp1c3QgYSBiaXQgd2VpcmQgdGhhdCB3ZSdyZSBtYXJraW5nIHRoaXMgZnJvbSBjbG9uZSBzaXRl
-Cj53aGVuIGl0J3MgYW4gaXNzdWUgd2hpY2ggaXMgc3BlY2lmaWMgdG8gdGhyb3R0bGluZy4gIFRo
-ZSB0aGluZyBpcwo+ZGVwZW5kaW5nIG9uIGhvdyBiaW8gY2xvbmUgaXMgdXNlZCwgaXQgY291bGQg
-bWlzYmVoYXZlIGluIHRoZSBvdGhlcgo+ZGlyZWN0aW9uIChiaW8gbm90IGFjY291bnRlZCBhdCBh
-bGwpLiAgV2hhdCB3ZSB3YW50IHRvIGtub3cgaXMgd2hldGhlcgo+YSBiaW8gaGFzIGJlZW4gcHJl
-dmlvdXNseSBhY2NvdW50ZWQgb3Igbm90LCByYXRoZXIgdGhhbiB3aGV0aGVyIGEgYmlvCj5pcyBh
-IHJlc3VsdCBvZiBzcGxpdHRpbmcuICBJIHRoaW5rIGl0J2QgYmUgYmV0dGVyIHRvIHRyYWNrIHRo
-YXQKCj5pbnN0ZWFkLgoKClllYSwgSSBhZ3JlZSB3aXRoIHlvdSwgd2Ugc2hvdWxkIGNvbnNpZGVy
-IHRoaXMgbW9yZSBjYXJlZnVsbHksIEkgd2lsbApjaGVjayBtb3JlIGFib3V0IHdoYXQgeW91IG1l
-bnRpb25lZCBhbmQgdG8gc2VlIGlmIHdlIGhhdmUgYmV0dGVyCndheSB0byBmaXggdGhpcy4KCgo+
-Cj5UaGFua3MuCj4KPi0tIAoKPnRlanVuCgoKVGhhbmtzLAoKCkppYWxl
-------=_Part_308602_672983808.1467818232372
-Content-Type: text/html; charset=GBK
-Content-Transfer-Encoding: base64
+On Wed, Jul 06, 2016 at 10:58:55PM +0800, aaronlee0817 wrote:
+> >But that said, can't we just copy BIO_THROTLED while splitting?
+> 
+> In my opinion， copying BIO_THROTLED while splitting doesn't work
+> with this, because, the bio within the limit will not set BIO_THROTLED
+> but will be split, and back to call generic_make_request(), and will be 
+> count twice.
 
-PGRpdiBzdHlsZT0ibGluZS1oZWlnaHQ6MS43O2NvbG9yOiMwMDAwMDA7Zm9udC1zaXplOjE0cHg7
-Zm9udC1mYW1pbHk6QXJpYWwiPjxwcmU+PGJyPiZndDtBdCAyMDE2LTA3LTA2IDIzOjA2OjI5LCAi
-VGVqdW4gSGVvIiAmbHQ7dGpAa2VybmVsLm9yZyZndDsgd3JvdGU6CiZndDtIZWxsbywKJmd0Owom
-Z3Q7T24gV2VkLCBKdWwgMDYsIDIwMTYgYXQgMTA6NTg6NTVQTSArMDgwMCwgYWFyb25sZWUwODE3
-IHdyb3RlOgomZ3Q7Jmd0OyAmZ3Q7QnV0IHRoYXQgc2FpZCwgY2FuJ3Qgd2UganVzdCBjb3B5IEJJ
-T19USFJPVExFRCB3aGlsZSBzcGxpdHRpbmc/CiZndDsmZ3Q7IAomZ3Q7Jmd0OyBJbiBteSBvcGlu
-aW9uo6wgY29weWluZyBCSU9fVEhST1RMRUQgd2hpbGUgc3BsaXR0aW5nIGRvZXNuJ3Qgd29yawom
-Z3Q7Jmd0OyB3aXRoIHRoaXMsIGJlY2F1c2UsIHRoZSBiaW8gd2l0aGluIHRoZSBsaW1pdCB3aWxs
-IG5vdCBzZXQgQklPX1RIUk9UTEVECiZndDsmZ3Q7IGJ1dCB3aWxsIGJlIHNwbGl0LCBhbmQgYmFj
-ayB0byBjYWxsIGdlbmVyaWNfbWFrZV9yZXF1ZXN0KCksIGFuZCB3aWxsIGJlIAomZ3Q7Jmd0OyBj
-b3VudCB0d2ljZS4KJmd0OwomZ3Q7SSBzZWUuICBJdCdzIGp1c3QgYSBiaXQgd2VpcmQgdGhhdCB3
-ZSdyZSBtYXJraW5nIHRoaXMgZnJvbSBjbG9uZSBzaXRlCiZndDt3aGVuIGl0J3MgYW4gaXNzdWUg
-d2hpY2ggaXMgc3BlY2lmaWMgdG8gdGhyb3R0bGluZy4gIFRoZSB0aGluZyBpcwomZ3Q7ZGVwZW5k
-aW5nIG9uIGhvdyBiaW8gY2xvbmUgaXMgdXNlZCwgaXQgY291bGQgbWlzYmVoYXZlIGluIHRoZSBv
-dGhlcgomZ3Q7ZGlyZWN0aW9uIChiaW8gbm90IGFjY291bnRlZCBhdCBhbGwpLiAgV2hhdCB3ZSB3
-YW50IHRvIGtub3cgaXMgd2hldGhlcgomZ3Q7YSBiaW8gaGFzIGJlZW4gcHJldmlvdXNseSBhY2Nv
-dW50ZWQgb3Igbm90LCByYXRoZXIgdGhhbiB3aGV0aGVyIGEgYmlvCiZndDtpcyBhIHJlc3VsdCBv
-ZiBzcGxpdHRpbmcuICBJIHRoaW5rIGl0J2QgYmUgYmV0dGVyIHRvIHRyYWNrIHRoYXQKPGRpdj4m
-Z3Q7aW5zdGVhZC48L2Rpdj48ZGl2Pjxicj48L2Rpdj48ZGl2PlllYSwgSSBhZ3JlZSB3aXRoIHlv
-dSwgd2Ugc2hvdWxkIGNvbnNpZGVyIHRoaXMgbW9yZSBjYXJlZnVsbHksIEkgd2lsbDwvZGl2Pjxk
-aXY+Y2hlY2sgbW9yZSBhYm91dCB3aGF0IHlvdSBtZW50aW9uZWQgYW5kIHRvIHNlZSBpZiB3ZSBo
-YXZlIGJldHRlcjwvZGl2PjxkaXY+d2F5IHRvIGZpeCB0aGlzLjwvZGl2PjxkaXY+PGJyPjwvZGl2
-PiZndDsKJmd0O1RoYW5rcy4KJmd0OwomZ3Q7LS0gCjxkaXY+Jmd0O3RlanVuPC9kaXY+PGRpdj48
-YnI+PC9kaXY+PGRpdj5UaGFua3MsPC9kaXY+PGRpdj48YnI+PC9kaXY+PGRpdj5KaWFsZTwvZGl2
-PjwvcHJlPjwvZGl2Pjxicj48YnI+PHNwYW4gdGl0bGU9Im5ldGVhc2Vmb290ZXIiPjxwPiZuYnNw
-OzwvcD48L3NwYW4+
-------=_Part_308602_672983808.1467818232372--
+I see.  It's just a bit weird that we're marking this from clone site
+when it's an issue which is specific to throttling.  The thing is
+depending on how bio clone is used, it could misbehave in the other
+direction (bio not accounted at all).  What we want to know is whether
+a bio has been previously accounted or not, rather than whether a bio
+is a result of splitting.  I think it'd be better to track that
+instead.
+
+Thanks.
+
+-- 
+tejun
