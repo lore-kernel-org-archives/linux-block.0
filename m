@@ -1,70 +1,71 @@
-Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: tglx@linutronix.de,
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f67.google.com ([74.125.82.67]:35051 "EHLO
+	mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756609AbcGGHyi (ORCPT
+	<rfc822;linux-block@vger.kernel.org>); Thu, 7 Jul 2016 03:54:38 -0400
+Received: by mail-wm0-f67.google.com with SMTP id a66so3512986wme.2
+        for <linux-block@vger.kernel.org>; Thu, 07 Jul 2016 00:54:36 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
 	axboe@fb.com
-Subject: [PATCH 09/13] blk-mq: don't redistribute hardware queues on a CPU
- hotplug event
-Date: Mon,  4 Jul 2016 17:39:30 +0900
-Message-Id: <1467621574-8277-10-git-send-email-hch@lst.de>
-In-Reply-To: <1467621574-8277-1-git-send-email-hch@lst.de>
-References: <1467621574-8277-1-git-send-email-hch@lst.de>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
-List-Post: <mailto:linux-nvme@lists.infradead.org>
-List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
-Cc: linux-block@vger.kernel.org, linux-pci@vger.kernel.org, agordeev@redhat.com,
- linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org
+Cc: =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <jg@lightnvm.io>,
+	=?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+	=?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+Subject: [PATCH 02/17] lightnvm: add media manager mark_blk helper
+Date: Thu,  7 Jul 2016 09:54:08 +0200
+Message-Id: <1467878063-22919-3-git-send-email-m@bjorling.me>
+In-Reply-To: <1467878063-22919-1-git-send-email-m@bjorling.me>
+References: <1467878063-22919-1-git-send-email-m@bjorling.me>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
-Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Currently blk-mq will totally remap hardware context when a CPU hotplug
-even happened, which causes major havoc for drivers, as they are never
-told about this remapping.  E.g. any carefully sorted out CPU affinity
-will just be completely messed up.
+From: Javier González <jg@lightnvm.io>
 
-The rebuild also doesn't really help for the common case of cpu
-hotplug, which is soft onlining / offlining of cpus - in this case we
-should just leave the queue and irq mapping as is.  If it actually
-worked it would have helped in the case of physical cpu hotplug,
-although for that we'd need a way to actually notify the driver.
-Note that drivers may already be able to accommodate such a topology
-change on their own, e.g. using the reset_controller sysfs file in NVMe
-will cause the driver to get things right for this case.
+Expose media manager mark_blk() to targets, as done for the rest of the
+media manager callback functions.
 
-With the rebuild removed we will simplify retain the queue mapping for
-a soft offlined CPU that will work when it comes back online, and will
-map any newly onlined CPU to queue NULL until the driver initiates
-a rebuild of the queue map.
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Updated description
+Signed-off-by: Matias Bjørling <m@bjorling.me>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Matias Bjørling <m@bjorling.me>
 ---
- block/blk-mq.c | 2 --
- 1 file changed, 2 deletions(-)
+ drivers/lightnvm/core.c  | 6 ++++++
+ include/linux/lightnvm.h | 2 ++
+ 2 files changed, 8 insertions(+)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index bc7166d..f972d32 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2114,8 +2114,6 @@ static void blk_mq_queue_reinit(struct request_queue *q,
+diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+index 160c1a6..13993c9 100644
+--- a/drivers/lightnvm/core.c
++++ b/drivers/lightnvm/core.c
+@@ -210,6 +210,12 @@ void nvm_put_blk(struct nvm_dev *dev, struct nvm_block *blk)
+ }
+ EXPORT_SYMBOL(nvm_put_blk);
  
- 	blk_mq_sysfs_unregister(q);
++void nvm_mark_blk(struct nvm_dev *dev, struct ppa_addr ppa, int type)
++{
++	return dev->mt->mark_blk(dev, ppa, type);
++}
++EXPORT_SYMBOL(nvm_mark_blk);
++
+ int nvm_submit_io(struct nvm_dev *dev, struct nvm_rq *rqd)
+ {
+ 	return dev->mt->submit_io(dev, rqd);
+diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
+index ef2c7d2..9c56148 100644
+--- a/include/linux/lightnvm.h
++++ b/include/linux/lightnvm.h
+@@ -532,6 +532,8 @@ extern int nvm_register(struct request_queue *, char *,
+ 						struct nvm_dev_ops *);
+ extern void nvm_unregister(char *);
  
--	blk_mq_update_queue_map(q->mq_map, q->nr_hw_queues, online_mask);
--
- 	/*
- 	 * redo blk_mq_init_cpu_queues and blk_mq_init_hw_queues. FIXME: maybe
- 	 * we should change hctx numa_node according to new topology (this
++void nvm_mark_blk(struct nvm_dev *dev, struct ppa_addr ppa, int type);
++
+ extern int nvm_submit_io(struct nvm_dev *, struct nvm_rq *);
+ extern void nvm_generic_to_addr_mode(struct nvm_dev *, struct nvm_rq *);
+ extern void nvm_addr_to_generic_mode(struct nvm_dev *, struct nvm_rq *);
 -- 
 2.1.4
 
-
-_______________________________________________
-Linux-nvme mailing list
-Linux-nvme@lists.infradead.org
-http://lists.infradead.org/mailman/listinfo/linux-nvme
