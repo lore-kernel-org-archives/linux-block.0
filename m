@@ -1,78 +1,48 @@
-Return-Path: <fangwei1@huawei.com>
-From: Wei Fang <fangwei1@huawei.com>
-To: <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Wei Fang <fangwei1@huawei.com>
-Subject: [PATCH] block: fix a type conversion error in __get_request()
-Date: Mon, 4 Jul 2016 21:03:40 +0800
-Message-ID: <1467637420-4967-1-git-send-email-fangwei1@huawei.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f65.google.com ([74.125.82.65]:33381 "EHLO
+	mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756594AbcGGHyi (ORCPT
+	<rfc822;linux-block@vger.kernel.org>); Thu, 7 Jul 2016 03:54:38 -0400
+Received: by mail-wm0-f65.google.com with SMTP id n127so996968wme.0
+        for <linux-block@vger.kernel.org>; Thu, 07 Jul 2016 00:54:37 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	axboe@fb.com
+Cc: =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+	=?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+Subject: [PATCH 03/17] lightnvm: initialize ppa_addr in dev_to_generic_addr()
+Date: Thu,  7 Jul 2016 09:54:09 +0200
+Message-Id: <1467878063-22919-4-git-send-email-m@bjorling.me>
+In-Reply-To: <1467878063-22919-1-git-send-email-m@bjorling.me>
+References: <1467878063-22919-1-git-send-email-m@bjorling.me>
 MIME-Version: 1.0
-Content-Type: text/plain
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Theoretically, request only flags in enum rq_flag_bits can bigger
-than 31 after we add some new flags in the future, so we can't
-store REQ_IO_STAT in op_flags which is a int type in __get_request().
-Actually, when REQ_IO_STAT become 31, the most-significant bit of
-op_flags will be 1, and OR it to ->cmd_flags will cause the top 32
-bits of ->cmd_flags become 1.
+From: Javier González <javier@cnexlabs.com>
 
-Fix it by using a u64-type object to store flags.
+The ->reserved bit is not initialized when allocated on stack.
+This may lead targets to misinterpret the PPA as cached.
 
-Signed-off-by: Wei Fang <fangwei1@huawei.com>
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <m@bjorling.me>
 ---
- block/blk-core.c |   11 ++++++-----
- 1 files changed, 6 insertions(+), 5 deletions(-)
+ include/linux/lightnvm.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index c94c7ad..3860b7d 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1077,6 +1077,7 @@ static struct request *__get_request(struct request_list *rl, int op,
- 	struct io_cq *icq = NULL;
- 	const bool is_sync = rw_is_sync(op, op_flags) != 0;
- 	int may_queue;
-+	u64 cmd_flags = (u64)(unsigned int)op_flags;
+diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
+index 9c56148..cee4c8d 100644
+--- a/include/linux/lightnvm.h
++++ b/include/linux/lightnvm.h
+@@ -385,6 +385,7 @@ static inline struct ppa_addr dev_to_generic_addr(struct nvm_dev *dev,
+ {
+ 	struct ppa_addr l;
  
- 	if (unlikely(blk_queue_dying(q)))
- 		return ERR_PTR(-ENODEV);
-@@ -1125,7 +1126,7 @@ static struct request *__get_request(struct request_list *rl, int op,
- 
++	l.ppa = 0;
  	/*
- 	 * Decide whether the new request will be managed by elevator.  If
--	 * so, mark @op_flags and increment elvpriv.  Non-zero elvpriv will
-+	 * so, mark @cmd_flags and increment elvpriv.  Non-zero elvpriv will
- 	 * prevent the current elevator from being destroyed until the new
- 	 * request is freed.  This guarantees icq's won't be destroyed and
- 	 * makes creating new ones safe.
-@@ -1134,14 +1135,14 @@ static struct request *__get_request(struct request_list *rl, int op,
- 	 * it will be created after releasing queue_lock.
+ 	 * (r.ppa << X offset) & X len bitmask. X eq. blk, pg, etc.
  	 */
- 	if (blk_rq_should_init_elevator(bio) && !blk_queue_bypass(q)) {
--		op_flags |= REQ_ELVPRIV;
-+		cmd_flags |= REQ_ELVPRIV;
- 		q->nr_rqs_elvpriv++;
- 		if (et->icq_cache && ioc)
- 			icq = ioc_lookup_icq(ioc, q);
- 	}
- 
- 	if (blk_queue_io_stat(q))
--		op_flags |= REQ_IO_STAT;
-+		cmd_flags |= REQ_IO_STAT;
- 	spin_unlock_irq(q->queue_lock);
- 
- 	/* allocate and init request */
-@@ -1151,10 +1152,10 @@ static struct request *__get_request(struct request_list *rl, int op,
- 
- 	blk_rq_init(q, rq);
- 	blk_rq_set_rl(rq, rl);
--	req_set_op_attrs(rq, op, op_flags | REQ_ALLOCED);
-+	req_set_op_attrs(rq, op, cmd_flags | REQ_ALLOCED);
- 
- 	/* init elvpriv */
--	if (op_flags & REQ_ELVPRIV) {
-+	if (cmd_flags & REQ_ELVPRIV) {
- 		if (unlikely(et->icq_cache && !icq)) {
- 			if (ioc)
- 				icq = ioc_create_icq(ioc, q, gfp_mask);
 -- 
-1.7.1
+2.1.4
+
