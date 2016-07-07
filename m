@@ -1,89 +1,82 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:13417 "EHLO
-	esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750767AbcGMFYX (ORCPT
-	<rfc822;linux-block@vger.kernel.org>);
-	Wed, 13 Jul 2016 01:24:23 -0400
-From: Damien Le Moal <damien.lemoal@hgst.com>
-To: <linux-block@vger.kernel.org>, <axboe@fb.com>, <hch@lst.de>,
-	<hare@suse.de>
-CC: Damien Le Moal <damien.lemoal@hgst.com>
-Subject: [PATCH] block: Fix front merge check
-Date: Wed, 13 Jul 2016 14:23:33 +0900
-Message-ID: <1468387413-2754-1-git-send-email-damien.lemoal@hgst.com>
+Received: from mail-wm0-f65.google.com ([74.125.82.65]:33397 "EHLO
+	mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756469AbcGGHyj (ORCPT
+	<rfc822;linux-block@vger.kernel.org>); Thu, 7 Jul 2016 03:54:39 -0400
+Received: by mail-wm0-f65.google.com with SMTP id n127so997100wme.0
+        for <linux-block@vger.kernel.org>; Thu, 07 Jul 2016 00:54:39 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	axboe@fb.com
+Cc: Johannes Thumshirn <jthumshirn@suse.de>,
+	=?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+Subject: [PATCH 05/17] lightnvm: Make functions not used by ouside static
+Date: Thu,  7 Jul 2016 09:54:11 +0200
+Message-Id: <1467878063-22919-6-git-send-email-m@bjorling.me>
+In-Reply-To: <1467878063-22919-1-git-send-email-m@bjorling.me>
+References: <1467878063-22919-1-git-send-email-m@bjorling.me>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-For a front merge, the maximum number of sectors of the
-request must be checked against the front merge BIO sector,
-not the current sector of the request.
+From: Johannes Thumshirn <jthumshirn@suse.de>
 
-Signed-off-by: Damien Le Moal <damien.lemoal@hgst.com>
+Mark functions not used by ouside of thier implementing file as static.
+
+Signed-off-by: Johannes Thumshirn <jthumshirn@suse.de>
+Signed-off-by: Matias Bjørling <m@bjorling.me>
 ---
- block/blk-merge.c      | 6 +++---
- include/linux/blkdev.h | 5 +++--
- 2 files changed, 6 insertions(+), 5 deletions(-)
+ drivers/lightnvm/core.c   | 2 +-
+ drivers/lightnvm/sysblk.c | 8 +++++---
+ 2 files changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 2613531..b736569 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -500,7 +500,7 @@ int ll_back_merge_fn(struct request_queue *q, struct request *req,
- 	    integrity_req_gap_back_merge(req, bio))
- 		return 0;
- 	if (blk_rq_sectors(req) + bio_sectors(bio) >
--	    blk_rq_get_max_sectors(req)) {
-+	    blk_rq_get_max_sectors(req, blk_rq_pos(req))) {
- 		req->cmd_flags |= REQ_NOMERGE;
- 		if (req == q->last_merge)
- 			q->last_merge = NULL;
-@@ -524,7 +524,7 @@ int ll_front_merge_fn(struct request_queue *q, struct request *req,
- 	    integrity_req_gap_front_merge(req, bio))
- 		return 0;
- 	if (blk_rq_sectors(req) + bio_sectors(bio) >
--	    blk_rq_get_max_sectors(req)) {
-+	    blk_rq_get_max_sectors(req, bio->bi_iter.bi_sector)) {
- 		req->cmd_flags |= REQ_NOMERGE;
- 		if (req == q->last_merge)
- 			q->last_merge = NULL;
-@@ -570,7 +570,7 @@ static int ll_merge_requests_fn(struct request_queue *q, struct request *req,
- 	 * Will it become too large?
- 	 */
- 	if ((blk_rq_sectors(req) + blk_rq_sectors(next)) >
--	    blk_rq_get_max_sectors(req))
-+	    blk_rq_get_max_sectors(req, blk_rq_pos(req)))
- 		return 0;
- 
- 	total_phys_segments = req->nr_phys_segments + next->nr_phys_segments;
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 3d9cf32..b99ef36 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -904,7 +904,8 @@ static inline unsigned int blk_max_size_offset(struct request_queue *q,
- 			(offset & (q->limits.chunk_sectors - 1));
+diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+index 13993c9..8beb9c0 100644
+--- a/drivers/lightnvm/core.c
++++ b/drivers/lightnvm/core.c
+@@ -110,7 +110,7 @@ static struct nvmm_type *nvm_find_mgr_type(const char *name)
+ 	return NULL;
  }
  
--static inline unsigned int blk_rq_get_max_sectors(struct request *rq)
-+static inline unsigned int blk_rq_get_max_sectors(struct request *rq,
-+						  sector_t offset)
+-struct nvmm_type *nvm_init_mgr(struct nvm_dev *dev)
++static struct nvmm_type *nvm_init_mgr(struct nvm_dev *dev)
  {
- 	struct request_queue *q = rq->q;
- 
-@@ -914,7 +915,7 @@ static inline unsigned int blk_rq_get_max_sectors(struct request *rq)
- 	if (!q->limits.chunk_sectors || (rq->cmd_flags & REQ_DISCARD))
- 		return blk_queue_get_max_sectors(q, rq->cmd_flags);
- 
--	return min(blk_max_size_offset(q, blk_rq_pos(rq)),
-+	return min(blk_max_size_offset(q, offset),
- 			blk_queue_get_max_sectors(q, rq->cmd_flags));
+ 	struct nvmm_type *mt;
+ 	int ret;
+diff --git a/drivers/lightnvm/sysblk.c b/drivers/lightnvm/sysblk.c
+index 994697a..a75bd28 100644
+--- a/drivers/lightnvm/sysblk.c
++++ b/drivers/lightnvm/sysblk.c
+@@ -39,7 +39,8 @@ static inline int scan_ppa_idx(int row, int blkid)
+ 	return (row * MAX_BLKS_PR_SYSBLK) + blkid;
  }
  
+-void nvm_sysblk_to_cpu(struct nvm_sb_info *info, struct nvm_system_block *sb)
++static void nvm_sysblk_to_cpu(struct nvm_sb_info *info,
++			      struct nvm_system_block *sb)
+ {
+ 	info->seqnr = be32_to_cpu(sb->seqnr);
+ 	info->erase_cnt = be32_to_cpu(sb->erase_cnt);
+@@ -48,7 +49,8 @@ void nvm_sysblk_to_cpu(struct nvm_sb_info *info, struct nvm_system_block *sb)
+ 	info->fs_ppa.ppa = be64_to_cpu(sb->fs_ppa);
+ }
+ 
+-void nvm_cpu_to_sysblk(struct nvm_system_block *sb, struct nvm_sb_info *info)
++static void nvm_cpu_to_sysblk(struct nvm_system_block *sb,
++			      struct nvm_sb_info *info)
+ {
+ 	sb->magic = cpu_to_be32(NVM_SYSBLK_MAGIC);
+ 	sb->seqnr = cpu_to_be32(info->seqnr);
+@@ -86,7 +88,7 @@ static int nvm_setup_sysblks(struct nvm_dev *dev, struct ppa_addr *sysblk_ppas)
+ 	return nr_rows;
+ }
+ 
+-void nvm_setup_sysblk_scan(struct nvm_dev *dev, struct sysblk_scan *s,
++static void nvm_setup_sysblk_scan(struct nvm_dev *dev, struct sysblk_scan *s,
+ 						struct ppa_addr *sysblk_ppas)
+ {
+ 	memset(s, 0, sizeof(struct sysblk_scan));
 -- 
-2.7.4
-
-Western Digital Corporation (and its subsidiaries) E-mail Confidentiality Notice & Disclaimer:
-
-This e-mail and any files transmitted with it may contain confidential or legally privileged information of WDC and/or its affiliates, and are intended solely for the use of the individual or entity to which they are addressed. If you are not the intended recipient, any disclosure, copying, distribution or any action taken or omitted to be taken in reliance on it, is prohibited. If you have received this e-mail in error, please notify the sender immediately and delete the e-mail in its entirety from your system.
+2.1.4
 
