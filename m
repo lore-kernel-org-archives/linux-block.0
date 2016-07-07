@@ -1,49 +1,75 @@
-Return-Path: <BATV+a6fbff1bfc78a84bb09b+4713+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org
-Subject: [PATCH 7/7] block: unexport various bio mapping helpers
-Date: Tue, 19 Jul 2016 11:31:54 +0200
-Message-Id: <1468920714-4304-8-git-send-email-hch@lst.de>
-In-Reply-To: <1468920714-4304-1-git-send-email-hch@lst.de>
-References: <1468920714-4304-1-git-send-email-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f68.google.com ([74.125.82.68]:33847 "EHLO
+	mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756266AbcGGHyk (ORCPT
+	<rfc822;linux-block@vger.kernel.org>); Thu, 7 Jul 2016 03:54:40 -0400
+Received: by mail-wm0-f68.google.com with SMTP id 187so3534407wmz.1
+        for <linux-block@vger.kernel.org>; Thu, 07 Jul 2016 00:54:40 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	axboe@fb.com
+Cc: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+Subject: [PATCH 06/17] lightnvm: remove checkpatch warning for unsigned ints
+Date: Thu,  7 Jul 2016 09:54:12 +0200
+Message-Id: <1467878063-22919-7-git-send-email-m@bjorling.me>
+In-Reply-To: <1467878063-22919-1-git-send-email-m@bjorling.me>
+References: <1467878063-22919-1-git-send-email-m@bjorling.me>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-They are unused and potential new users really should use the
-blk_rq_map* versions.
+Checkpatch found two incidents where the type was preferred to be
+written out in full.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+./drivers/lightnvm/rrpc.h:184: WARNING: Prefer 'unsigned int' to bare
+use of 'unsigned'
+./drivers/lightnvm/rrpc.h:209: WARNING: Prefer 'unsigned int' to bare
+use of 'unsigned'
+./drivers/lightnvm/rrpc.c:51: WARNING: Prefer 'unsigned int' to bare use
+of 'unsigned'
+
+Signed-off-by: Matias Bjørling <m@bjorling.me>
 ---
- block/bio.c | 3 ---
- 1 file changed, 3 deletions(-)
+ drivers/lightnvm/rrpc.c | 2 +-
+ drivers/lightnvm/rrpc.h | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index 848cd35..b88ed1c 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1097,7 +1097,6 @@ int bio_uncopy_user(struct bio *bio)
- 	bio_put(bio);
- 	return ret;
+diff --git a/drivers/lightnvm/rrpc.c b/drivers/lightnvm/rrpc.c
+index 736e669..90c7cb4 100644
+--- a/drivers/lightnvm/rrpc.c
++++ b/drivers/lightnvm/rrpc.c
+@@ -48,7 +48,7 @@ static void rrpc_page_invalidate(struct rrpc *rrpc, struct rrpc_addr *a)
  }
--EXPORT_SYMBOL(bio_uncopy_user);
  
- /**
-  *	bio_copy_user_iov	-	copy user data to bio
-@@ -1392,7 +1391,6 @@ void bio_unmap_user(struct bio *bio)
- 	__bio_unmap_user(bio);
- 	bio_put(bio);
- }
--EXPORT_SYMBOL(bio_unmap_user);
- 
- static void bio_map_kern_endio(struct bio *bio)
+ static void rrpc_invalidate_range(struct rrpc *rrpc, sector_t slba,
+-								unsigned len)
++							unsigned int len)
  {
-@@ -1538,7 +1536,6 @@ cleanup:
- 	bio_put(bio);
- 	return ERR_PTR(-ENOMEM);
- }
--EXPORT_SYMBOL(bio_copy_kern);
+ 	sector_t i;
  
- /*
-  * bio_set_pages_dirty() and bio_check_pages_dirty() are support functions
+diff --git a/drivers/lightnvm/rrpc.h b/drivers/lightnvm/rrpc.h
+index 87e84b5..5797343 100644
+--- a/drivers/lightnvm/rrpc.h
++++ b/drivers/lightnvm/rrpc.h
+@@ -188,7 +188,7 @@ static inline int request_intersects(struct rrpc_inflight_rq *r,
+ }
+ 
+ static int __rrpc_lock_laddr(struct rrpc *rrpc, sector_t laddr,
+-			     unsigned pages, struct rrpc_inflight_rq *r)
++			     unsigned int pages, struct rrpc_inflight_rq *r)
+ {
+ 	sector_t laddr_end = laddr + pages - 1;
+ 	struct rrpc_inflight_rq *rtmp;
+@@ -213,7 +213,7 @@ static int __rrpc_lock_laddr(struct rrpc *rrpc, sector_t laddr,
+ }
+ 
+ static inline int rrpc_lock_laddr(struct rrpc *rrpc, sector_t laddr,
+-				 unsigned pages,
++				 unsigned int pages,
+ 				 struct rrpc_inflight_rq *r)
+ {
+ 	BUG_ON((laddr + pages) > rrpc->nr_sects);
 -- 
 2.1.4
+
