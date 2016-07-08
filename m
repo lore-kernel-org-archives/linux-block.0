@@ -1,52 +1,38 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-From: Hannes Reinecke <hare@suse.de>
-To: Mike Snitzer <snitzer@redhat.com>
-Cc: dm-devel-redhat.com@suse.de,
-	Damien Le Moal <damien.lemoal@hgst.com>,
-	linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@fb.com>,
-	Hannes Reinecke <hare@suse.de>
-Subject: [PATCH 0/3] dm-zoned target for ZBC devices
-Date: Tue, 19 Jul 2016 16:02:55 +0200
-Message-Id: <1468936978-9124-1-git-send-email-hare@suse.de>
-Sender: linux-scsi-owner@vger.kernel.org
+Return-Path: <swise@opengridcomputing.com>
+From: "Steve Wise" <swise@opengridcomputing.com>
+To: "'Christoph Hellwig'" <hch@lst.de>,
+	<axboe@kernel.dk>,
+	<keith.busch@intel.com>
+Cc: <linux-block@vger.kernel.org>,
+	<linux-rdma@vger.kernel.org>,
+	<linux-nvme@lists.infradead.org>,
+	"'Armen Baloyan'" <armenx.baloyan@intel.com>,
+	"'Jay Freyensee'" <james.p.freyensee@intel.com>,
+	"'Ming Lin'" <ming.l@ssi.samsung.com>,
+	"'Sagi Grimberg'" <sagi@grimberg.me>
+References: <1467809752-31320-1-git-send-email-hch@lst.de> <1467809752-31320-5-git-send-email-hch@lst.de>
+In-Reply-To: <1467809752-31320-5-git-send-email-hch@lst.de>
+Subject: RE: [PATCH 4/5] nvmet-rdma: add a NVMe over Fabrics RDMA target driver
+Date: Fri, 8 Jul 2016 08:51:48 -0500
+Message-ID: <003a01d1d91f$df60ed60$9e22c820$@opengridcomputing.com>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="us-ascii"
 List-ID: <linux-block@vger.kernel.org>
 
-Hi all,
+> This patch implements the RDMA transport for the NVMe over Fabrics target,
+> which allows exporting NVMe over Fabrics functionality over RDMA fabrics
+> (Infiniband, RoCE, iWARP).
+> 
+> All NVMe logic is in the generic target and this module just provides a
+> small glue between it and the generic code in the RDMA subsystem.
+> 
+> Signed-off-by: Armen Baloyan <armenx.baloyan@intel.com>,
+> Signed-off-by: Jay Freyensee <james.p.freyensee@intel.com>
+> Signed-off-by: Ming Lin <ming.l@ssi.samsung.com>
+> Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-this patchset implements a 'dm-zoned' device-mapper target to handle
-ZBC host-managed (and host-aware) devices as 'normal' disks.
+Looks good.
 
-Patch has been made over Tejuns 'libata/for-4.8' repository.
-It relies on the patchsets "Support for zoned block devices" and
-"Add support for ZBC host-managed devices" posted earlier.
-
-As usual, comments and reviews are welcome.
-
-Damien Le Moal (1):
-  dm-zoned: New device mapper target for zoned block devices
-
-Hannes Reinecke (2):
-  block: add flag for single-threaded submission
-  sd: enable single-threaded I/O submission for zoned devices
-
- Documentation/device-mapper/dm-zoned.txt |  147 +++
- block/blk-core.c                         |    2 +
- drivers/md/Kconfig                       |   14 +
- drivers/md/Makefile                      |    2 +
- drivers/md/dm-zoned-io.c                 | 1186 ++++++++++++++++++
- drivers/md/dm-zoned-meta.c               | 1950 ++++++++++++++++++++++++++++++
- drivers/md/dm-zoned-reclaim.c            |  770 ++++++++++++
- drivers/md/dm-zoned.h                    |  687 +++++++++++
- drivers/scsi/sd.c                        |    1 +
- include/linux/blkdev.h                   |    2 +
- 10 files changed, 4761 insertions(+)
- create mode 100644 Documentation/device-mapper/dm-zoned.txt
- create mode 100644 drivers/md/dm-zoned-io.c
- create mode 100644 drivers/md/dm-zoned-meta.c
- create mode 100644 drivers/md/dm-zoned-reclaim.c
- create mode 100644 drivers/md/dm-zoned.h
-
--- 
-1.8.5.6
-
+Reviewed-by: Steve Wise <swise@opengridcomputing.com>
