@@ -1,84 +1,53 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: NVMe over Fabrics target implementation V2
-To: Christoph Hellwig <hch@lst.de>, keith.busch@intel.com
-References: <1466525061-3686-1-git-send-email-hch@lst.de>
-Cc: linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-nvme@lists.infradead.org
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <577BEEDE.8060607@kernel.dk>
-Date: Tue, 5 Jul 2016 11:31:10 -0600
+Return-Path: <swise@opengridcomputing.com>
+From: "Steve Wise" <swise@opengridcomputing.com>
+To: "'Christoph Hellwig'" <hch@lst.de>,
+	<axboe@kernel.dk>,
+	<keith.busch@intel.com>
+Cc: <linux-block@vger.kernel.org>,
+	<linux-rdma@vger.kernel.org>,
+	<linux-nvme@lists.infradead.org>,
+	"'Sagi Grimberg'" <sagi@grimberg.me>,
+	"'Jay Freyensee'" <james.p.freyensee@intel.com>,
+	"'Ming Lin'" <ming.l@ssi.samsung.com>
+References: <1467809752-31320-1-git-send-email-hch@lst.de> <1467809752-31320-4-git-send-email-hch@lst.de>
+In-Reply-To: <1467809752-31320-4-git-send-email-hch@lst.de>
+Subject: RE: [PATCH 3/5] nvme-rdma.h: Add includes for nvme rdma_cm negotiation
+Date: Fri, 8 Jul 2016 08:49:54 -0500
+Message-ID: <003801d1d91f$9b664740$d232d5c0$@opengridcomputing.com>
 MIME-Version: 1.0
-In-Reply-To: <1466525061-3686-1-git-send-email-hch@lst.de>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Type: text/plain;
+	charset="us-ascii"
 List-ID: <linux-block@vger.kernel.org>
 
-On 06/21/2016 10:04 AM, Christoph Hellwig wrote:
-> This patch set adds a generic NVMe over Fabrics target. The
-> implementation conforms to the NVMe 1.2b specification (which
-> includes Fabrics) and provides the NVMe over Fabrics access
-> to Linux block devices.
->
-> The target implementation consists of several elements:
->
-> - NVMe target core: defines and manages the NVMe entities (subsystems,
->    controllers, namespaces, ...) and their allocation, responsible
->    for initial commands processing and correct orchestration of
->    the stack setup and tear down.
->
-> - NVMe admin command implementation: responsible for parsing and
->    servicing admin commands such as controller identify, set features,
->    keep-alive, log page, ...).
->
-> - NVMe I/O command implementation: responsible for performing the actual
->    I/O (Read, Write, Flush, Deallocate (aka Discard).  It is a very thin
->    layer on top of the block layer and implements no logic of it's own.
->    To support exporting file systems please use the loopback block driver
->    in direct I/O mode, which gives very good performance.
->
-> - NVMe over Fabrics support: responsible for servicing Fabrics commands
->    (connect, property get/set).
->
-> - NVMe over Fabrics discovery service: responsible to serve the Discovery
->    log page through a special cut down Discovery controller.
->
-> The target is configured using configfs, and configurable entities are:
->
->   - NVMe subsystems and namespaces
->   - NVMe over Fabrics ports and referrals
->   - Host ACLs for primitive access control - NVMe over Fabrics access
->     control is still work in progress at the specification level and
->     will be implemented once that work has finished.
->
-> To configure the target use the nvmetcli tool from
-> http://git.infradead.org/users/hch/nvmetcli.git, which includes detailed
-> setup documentation.
->
-> In addition to the Fabrics target implementation we provide a loopback
-> driver which also conforms the NVMe over Fabrics specification and allows
-> evaluation of the target stack with local access without requiring a real
-> fabric.
->
-> Various test cases are provided for this implementation: nvmetcli
-> contains a python testsuite that mostly stresses the configfs interface
-> of the target, and we have various integration tests prepared for the
-> kernel host and target which are available at:
->
-> 	git://git.infradead.org/nvme-fabrics.git nvmf-submit.2
->
-> Gitweb:
->
-> 	http://git.infradead.org/nvme-fabrics.git/shortlog/refs/heads/nvmf-submit.2
->
-> This series depends on the "generic NVMe over Fabrics library support V2"
-> series submitted last week.
->
-> Changes since V1:
->   - rebased to the req_op changes in the block tree (me)
->   - fix a 64-bit division (me)
->   - properly set the SGL flag for AER requests in nvme-loop (me)
->   - fix use of ERR_PTR (buildbot)
+> From: Sagi Grimberg <sagi@grimberg.me>
+> 
+> NVMe over Fabrics RDMA transport defines a connection establishment
+> protocol over the RDMA connection manager. This header will be used by
+> both the host and target drivers to negotiate the connection
+> establishment parameters.
+> 
+> Signed-off-by: Jay Freyensee <james.p.freyensee@intel.com>
+> Signed-off-by: Ming Lin <ming.l@ssi.samsung.com>
+> Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  include/linux/nvme-rdma.h | 71
+> +++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 71 insertions(+)
+>  create mode 100644 include/linux/nvme-rdma.h
+> 
+> diff --git a/include/linux/nvme-rdma.h b/include/linux/nvme-rdma.h
+> new file mode 100644
+> index 0000000..bf240a3
+> --- /dev/null
+> +++ b/include/linux/nvme-rdma.h
+> @@ -0,0 +1,71 @@
+> +/*
+> + * Copyright (c) 2015 Mellanox Technologies. All rights reserved.
+> + *
 
-Applied for 4.8, thanks.
+Copyright should be 2016?
 
--- 
-Jens Axboe
+Otherwise looks good.
+
+Reviewed-by: Steve Wise <swise@opengridcomputing.com>
