@@ -1,53 +1,55 @@
 Return-Path: <lars.ellenberg@linbit.com>
+Date: Fri, 8 Jul 2016 15:59:39 +0200
 From: Lars Ellenberg <lars.ellenberg@linbit.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Lars Ellenberg <lars.ellenberg@linbit.com>,
-	NeilBrown <neilb@suse.com>,
-	linux-raid@vger.kernel.org,
+To: NeilBrown <neilb@suse.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-raid@vger.kernel.org,
 	"Martin K. Petersen" <martin.petersen@oracle.com>,
 	Mike Snitzer <snitzer@redhat.com>,
 	Peter Zijlstra <peterz@infradead.org>,
-	Jiri Kosina <jkosina@suse.cz>,
-	Ming Lei <ming.lei@canonical.com>,
-	linux-kernel@vger.kernel.org,
-	Zheng Liu <gnehzuil.liu@gmail.com>,
-	linux-block@vger.kernel.org,
-	Takashi Iwai <tiwai@suse.de>,
-	linux-bcache@vger.kernel.org,
-	Ingo Molnar <mingo@redhat.com>,
+	Jiri Kosina <jkosina@suse.cz>, Ming Lei <ming.lei@canonical.com>,
+	linux-kernel@vger.kernel.org, Zheng Liu <gnehzuil.liu@gmail.com>,
+	linux-block@vger.kernel.org, Takashi Iwai <tiwai@suse.de>,
+	linux-bcache@vger.kernel.org, Ingo Molnar <mingo@redhat.com>,
 	Alasdair Kergon <agk@redhat.com>,
-	Keith Busch <keith.busch@intel.com>,
-	dm-devel@redhat.com,
+	Keith Busch <keith.busch@intel.com>, dm-devel@redhat.com,
 	Shaohua Li <shli@kernel.org>,
 	Kent Overstreet <kent.overstreet@gmail.com>,
 	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
 	Roland Kammerer <roland.kammerer@linbit.com>
-Subject: [PATCH 0/1] block: fix blk_queue_split() resource exhaustion
-Date: Fri,  8 Jul 2016 17:04:02 +0200
-Message-Id: <1467990243-3531-1-git-send-email-lars.ellenberg@linbit.com>
+Subject: Re: [dm-devel] [RFC] block: fix blk_queue_split() resource	exhaustion
+Message-ID: <20160708135939.GX13335@soda.linbit>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1189799501.20160708192424@pvgoran.name>
+ <20160708130035.GW13335@soda.linbit>
 List-ID: <linux-block@vger.kernel.org>
 
-Result of RFC previously discussed here:
-https://lkml.org/lkml/2016/6/22/172
-[RFC] block: fix blk_queue_split() resource exhaustion
+On Fri, Jul 08, 2016 at 07:24:24PM +0600, Pavel Goran wrote:
+> Friday, July 8, 2016, 7:00:35 PM, you wrote:
+> > On Fri, Jul 08, 2016 at 07:39:36PM +1000, NeilBrown wrote:
+> >> I think we just might be in violent agreement.
+> 
+> > I thought so, too :-)
+> 
+> > Should I merge both patches,
+> > rename to ".queue" and ".tmp",
+> > and submit for inclusion?
+> 
+> Could you please *not* use ".tmp"? I have a feeling it's even worse than "X"
+> and "Y". :)
+> 
+> I suggest to leave it as ".recursion", or maybe use something like
+> ".downstream".
 
-Rebased to linux-block/for-4.8/core as of today.
-Would also need to go to Stable 4.3 and later.
+"Naming is hard" :-)
 
-Lars Ellenberg (1):
-  block: fix blk_queue_split() resource exhaustion
+.recursion and .queue, then,
+because .remainder does no longer fit.
 
- block/bio.c               | 27 +++++++++++++++++--------
- block/blk-core.c          | 50 +++++++++++++++++++++++++----------------------
- block/blk-merge.c         |  5 ++++-
- drivers/md/bcache/btree.c | 12 ++++++------
- drivers/md/dm-bufio.c     |  2 +-
- drivers/md/md.h           |  7 +++++++
- drivers/md/raid1.c        |  5 ++---
- drivers/md/raid10.c       |  5 ++---
- include/linux/bio.h       | 18 +++++++++++++++++
- include/linux/sched.h     |  4 ++--
- 10 files changed, 88 insertions(+), 47 deletions(-)
+Also, what about "Cc: Stable"?
+The patch does not strictly fall into the "stable" rules,
+(too many lines...).
+But it should go there anyways, I think.
+I'll just add those tags, and wait for the heat?
 
--- 
-1.9.1
+    Lars Ellenberg
