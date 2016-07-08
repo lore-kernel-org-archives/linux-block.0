@@ -1,40 +1,34 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.9]:33437 "EHLO
-	bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932411AbcGJL70 (ORCPT
-	<rfc822;linux-block@vger.kernel.org>);
-	Sun, 10 Jul 2016 07:59:26 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@fb.com
-Cc: agordeev@redhat.com, linux-block@vger.kernel.org
-Subject: blk-mq: allow passing in an external queue mapping
-Date: Sun, 10 Jul 2016 20:59:17 +0900
-Message-Id: <1468151960-7868-1-git-send-email-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <swise@opengridcomputing.com>
+From: "Steve Wise" <swise@opengridcomputing.com>
+To: "'Christoph Hellwig'" <hch@lst.de>,
+	<axboe@kernel.dk>,
+	<keith.busch@intel.com>
+Cc: <linux-block@vger.kernel.org>,
+	<linux-rdma@vger.kernel.org>,
+	<linux-nvme@lists.infradead.org>,
+	"'Sagi Grimberg'" <sagi@grimberg.me>
+References: <1467809752-31320-1-git-send-email-hch@lst.de> <1467809752-31320-2-git-send-email-hch@lst.de>
+In-Reply-To: <1467809752-31320-2-git-send-email-hch@lst.de>
+Subject: RE: [PATCH 1/5] blk-mq: Introduce blk_mq_reinit_tagset
+Date: Fri, 8 Jul 2016 08:46:41 -0500
+Message-ID: <003401d1d91f$28a153d0$79e3fb70$@opengridcomputing.com>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="us-ascii"
+List-ID: <linux-block@vger.kernel.org>
 
-This series is one third of the earlier "automatic interrupt affinity for
-MSI/MSI-X capable devices" series, and make uses of the new irq-level
-interrupt / queue mapping code in blk-mq, as well as allowing the driver
-to pass in such a mask obtained from the (PCI) interrupt code.  To fully
-support this feature in drivers the final third in the PCI layer will
-be needed as well.
+> From: Sagi Grimberg <sagi@grimberg.me>
+> 
+> The new nvme-rdma driver will need to reinitialize all the tags as part of
+> the error recovery procedure (realloc the tag memory region). Add a helper
+> in blk-mq for it that can iterate over all requests in a tagset to make
+> this easier.
+> 
+> Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
+> Tested-by: Ming Lin <ming.l@ssi.samsung.com>
+> Reviewed-by: Stephen Bates <Stephen.Bates@pmcs.com>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-For the patches to work you need to merge the irq/for-block branch of
+Looks fine.
 
-   https://git.kernel.org/pub/scm/linux/kernel/git/tip/tip
-
-first, which will cause a conflict in block/blk-lib.c due to the discard
-changes in 4.7 vs for-next.
-
-I've pre-merged the branches in the git tree available at:
-
-   git://git.infradead.org/users/hch/block.git queue-mapping
-
-Gitweb:
-
-   http://git.infradead.org/users/hch/block.git/shortlog/refs/heads/queue-mapping
-
-Changes since automatic interrupt affinity for MSI/MSI-X capable devices V3:
- - a trivial cleanup in blk_mq_create_mq_map pointed out by Alexander
-
+Reviewed-by: Steve Wise <swise@opengridcomputing.com>
