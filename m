@@ -1,100 +1,111 @@
-Return-Path: <krisman@linux.vnet.ibm.com>
-From: Gabriel Krisman Bertazi <krisman@linux.vnet.ibm.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Gabriel Krisman Bertazi <krisman@linux.vnet.ibm.com>,
-        Brian King <brking@linux.vnet.ibm.com>,
-        Keith Busch <keith.busch@intel.com>, Christoph Hellwig <hch@lst.de>,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
-Subject: [PATCH] blk-mq: Allow timeouts to run while queue is freezing
-Date: Fri, 29 Jul 2016 01:42:36 -0300
-Message-Id: <1469767356-25193-1-git-send-email-krisman@linux.vnet.ibm.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([198.137.202.9]:33443 "EHLO
+	bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932411AbcGJL7b (ORCPT
+	<rfc822;linux-block@vger.kernel.org>);
+	Sun, 10 Jul 2016 07:59:31 -0400
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@fb.com
+Cc: agordeev@redhat.com, linux-block@vger.kernel.org
+Subject: [PATCH 2/3] blk-mq: only allocate a single mq_map per tag_set
+Date: Sun, 10 Jul 2016 20:59:19 +0900
+Message-Id: <1468151960-7868-3-git-send-email-hch@lst.de>
+In-Reply-To: <1468151960-7868-1-git-send-email-hch@lst.de>
+References: <1468151960-7868-1-git-send-email-hch@lst.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-In case a submited request gets stuck for some reason, the block layer
-can prevent the request starvation by starting the scheduled timeout work.
-If this stuck request occurs at the same time another thread has started
-a queue freeze, the blk_mq_timeout_work will not be able to acquire the
-queue reference and will return silently, thus not issuing the timeout.
-But since the request is already holding a q_usage_counter reference and
-is unable to complete, it will never release its reference, preventing
-the queue from completing the freeze started by first thread.  This puts
-the request_queue in a hung state, forever waiting for the freeze
-completion.
+The mapping is identical for all queues in a tag_set, so stop wasting
+memory for building multiple.  Note that for now I've kept the mq_map
+pointer in the request_queue, but we'll need to investigate if we can
+remove it without suffering from the additional indirection.  The same
+would apply to the mq_ops pointer as well.
 
-This was observed while running IO to a NVMe device at the same time we
-toggled the CPU hotplug code. Eventually, once a request got stuck
-requiring a timeout during a queue freeze, we saw the CPU Hotplug
-notification code get stuck inside blk_mq_freeze_queue_wait, as shown in
-the trace below.
-
-[c000000deaf13690] [c000000deaf13738] 0xc000000deaf13738 (unreliable)
-[c000000deaf13860] [c000000000015ce8] __switch_to+0x1f8/0x350
-[c000000deaf138b0] [c000000000ade0e4] __schedule+0x314/0x990
-[c000000deaf13940] [c000000000ade7a8] schedule+0x48/0xc0
-[c000000deaf13970] [c0000000005492a4] blk_mq_freeze_queue_wait+0x74/0x110
-[c000000deaf139e0] [c00000000054b6a8] blk_mq_queue_reinit_notify+0x1a8/0x2e0
-[c000000deaf13a40] [c0000000000e7878] notifier_call_chain+0x98/0x100
-[c000000deaf13a90] [c0000000000b8e08] cpu_notify_nofail+0x48/0xa0
-[c000000deaf13ac0] [c0000000000b92f0] _cpu_down+0x2a0/0x400
-[c000000deaf13b90] [c0000000000b94a8] cpu_down+0x58/0xa0
-[c000000deaf13bc0] [c0000000006d5dcc] cpu_subsys_offline+0x2c/0x50
-[c000000deaf13bf0] [c0000000006cd244] device_offline+0x104/0x140
-[c000000deaf13c30] [c0000000006cd40c] online_store+0x6c/0xc0
-[c000000deaf13c80] [c0000000006c8c78] dev_attr_store+0x68/0xa0
-[c000000deaf13cc0] [c0000000003974d0] sysfs_kf_write+0x80/0xb0
-[c000000deaf13d00] [c0000000003963e8] kernfs_fop_write+0x188/0x200
-[c000000deaf13d50] [c0000000002e0f6c] __vfs_write+0x6c/0xe0
-[c000000deaf13d90] [c0000000002e1ca0] vfs_write+0xc0/0x230
-[c000000deaf13de0] [c0000000002e2cdc] SyS_write+0x6c/0x110
-[c000000deaf13e30] [c000000000009204] system_call+0x38/0xb4
-
-The fix is to allow the timeout work to execute in the window between
-dropping the initial refcount reference and the release of the last
-reference, which actually marks the freeze completion.  This can be
-achieved with percpu_refcount_tryget, which does not require the counter
-to be alive.  This way the timeout work can do it's job and terminate a
-stuck request even during a freeze, returning its reference and avoiding
-the deadlock.
-
-Allowing the timeout to run is just a part of the fix, since for some
-devices, we might get stuck again inside the device driver's timeout
-handler, should it attempt to allocate a new request in that path -
-which is a quite common action for Abort commands, which need to be sent
-after a timeout.  In NVMe, for instance, we call blk_mq_alloc_request
-from inside the timeout handler, which will fail during a freeze, since
-it also tries to acquire a queue reference.
-
-I considered a similar change to blk_mq_alloc_request as a generic
-solution for further device driver hangs, but we can't do that, since it
-would allow new requests to disturb the freeze process.  I thought about
-creating a new function in the block layer to support unfreezable
-requests for these occasions, but after working on it for a while, I
-feel like this should be handled in a per-driver basis.  I'm now
-experimenting with changes to the NVMe timeout path, but I'm open to
-suggestions of ways to make this generic.
-
-Signed-off-by: Gabriel Krisman Bertazi <krisman@linux.vnet.ibm.com>
-Cc: Brian King <brking@linux.vnet.ibm.com>
-Cc: Keith Busch <keith.busch@intel.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: linux-nvme@lists.infradead.org
-Cc: linux-block@vger.kernel.org
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-mq.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block/blk-mq.c         | 22 ++++++++++++++--------
+ include/linux/blk-mq.h |  1 +
+ 2 files changed, 15 insertions(+), 8 deletions(-)
 
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index e22a0f4..b1d87d2 100644
+index e163ea1..5ea0e22 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -672,7 +672,7 @@ static void blk_mq_timeout_work(struct work_struct *work)
- 	};
- 	int i;
+@@ -1968,7 +1968,6 @@ void blk_mq_release(struct request_queue *q)
+ 		kfree(hctx);
+ 	}
  
--	if (blk_queue_enter(q, true))
-+	if (!percpu_ref_tryget(&q->q_usage_counter))
- 		return;
+-	kfree(q->mq_map);
+ 	q->mq_map = NULL;
  
- 	blk_mq_queue_tag_busy_iter(q, blk_mq_check_expired, &data);
+ 	kfree(q->queue_hw_ctx);
+@@ -2067,9 +2066,7 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+ 	if (!q->queue_hw_ctx)
+ 		goto err_percpu;
+ 
+-	q->mq_map = blk_mq_make_queue_map(set);
+-	if (!q->mq_map)
+-		goto err_map;
++	q->mq_map = set->mq_map;
+ 
+ 	blk_mq_realloc_hw_ctxs(set, q);
+ 	if (!q->nr_hw_queues)
+@@ -2119,8 +2116,6 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+ 	return q;
+ 
+ err_hctxs:
+-	kfree(q->mq_map);
+-err_map:
+ 	kfree(q->queue_hw_ctx);
+ err_percpu:
+ 	free_percpu(q->queue_ctx);
+@@ -2342,14 +2337,22 @@ int blk_mq_alloc_tag_set(struct blk_mq_tag_set *set)
+ 	if (!set->tags)
+ 		return -ENOMEM;
+ 
++	set->mq_map = blk_mq_make_queue_map(set);
++	if (!set->mq_map)
++		goto out_free_tags;
++
+ 	if (blk_mq_alloc_rq_maps(set))
+-		goto enomem;
++		goto out_free_mq_map;
+ 
+ 	mutex_init(&set->tag_list_lock);
+ 	INIT_LIST_HEAD(&set->tag_list);
+ 
+ 	return 0;
+-enomem:
++
++out_free_mq_map:
++	kfree(set->mq_map);
++	set->mq_map = NULL;
++out_free_tags:
+ 	kfree(set->tags);
+ 	set->tags = NULL;
+ 	return -ENOMEM;
+@@ -2365,6 +2368,9 @@ void blk_mq_free_tag_set(struct blk_mq_tag_set *set)
+ 			blk_mq_free_rq_map(set, set->tags[i], i);
+ 	}
+ 
++	kfree(set->mq_map);
++	set->mq_map = NULL;
++
+ 	kfree(set->tags);
+ 	set->tags = NULL;
+ }
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index e43bbff..a572227 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -65,6 +65,7 @@ struct blk_mq_hw_ctx {
+ };
+ 
+ struct blk_mq_tag_set {
++	unsigned int		*mq_map;
+ 	struct blk_mq_ops	*ops;
+ 	unsigned int		nr_hw_queues;
+ 	unsigned int		queue_depth;	/* max hw supported */
 -- 
-2.7.4
+2.1.4
+
