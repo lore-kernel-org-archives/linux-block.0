@@ -1,84 +1,38 @@
-Return-Path: <linux-ide-owner@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:43411 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750743AbcGLGoq (ORCPT <rfc822;linux-block@vger.kernel.org>);
+	Tue, 12 Jul 2016 02:44:46 -0400
+Date: Tue, 12 Jul 2016 08:49:43 +0200
+From: Alexander Gordeev <agordeev@redhat.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: tglx@linutronix.de, axboe@fb.com, linux-block@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-nvme@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 08/13] pci: spread interrupt vectors in
+ pci_alloc_irq_vectors
+Message-ID: <20160712064943.GB26968@agordeev.lab.eng.brq.redhat.com>
+References: <1467621574-8277-1-git-send-email-hch@lst.de>
+ <1467621574-8277-9-git-send-email-hch@lst.de>
+ <20160707110501.GA4917@dhcp-27-118.brq.redhat.com>
+ <20160710035751.GC15720@lst.de>
 MIME-Version: 1.0
-From: Tom Yan <tom.ty89@gmail.com>
-Date: Fri, 15 Jul 2016 03:10:40 +0800
-Message-ID: <CAGnHSEkPkm3z3Aj+Aaj2p7ZK-UEo0dvXE+6Cj8SdKCt_L7Ei=w@mail.gmail.com>
-Subject: Fluctuating "acceptance" on requested data length in SATA/AHCI
-To: linux-scsi@vger.kernel.org, linux-ide@vger.kernel.org,
-	linux-block@vger.kernel.org, dgilbert@interlog.com,
-	Tejun Heo <tj@kernel.org>, martin.petersen@oracle.com
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-ide-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20160710035751.GC15720@lst.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-So I recently been doing some experiment on different storage hosts
-(AHCI and UAS) to see how certain block layer limits in the kernel and
-so matters on them. I notice some behavior in SATA/AHCI which bothers
-me a bit.
+On Sun, Jul 10, 2016 at 05:57:51AM +0200, Christoph Hellwig wrote:
+> On Thu, Jul 07, 2016 at 01:05:01PM +0200, Alexander Gordeev wrote:
+> > irq_create_affinity_mask() bails out with no affinity in case of single
+> > vector, but alloc_descs() (see below (*)) assigns the whole affinity
+> > mask. It should be consistent instead.
+> 
+> I don't understand the comment.  If we only have one vector (of any
+> kinds) there is no need to create an affinity mask, we'll leave the
+> interrupt to the existing irq balancing code.
 
-I have been testing with `sg_raw` by issuing READ (10/16) commands.
-But before that I needed to hack it a bit because it does a weird
-check on the allowed data length, where the allowed value is
-ridiculously small:
-
-diff --git a/sg_raw.c~ b/sg_raw.c
-...
--            if (n < 0 || n > MAX_SCSI_DXLEN) {
-+            if (n < 0) {
-...
--            if (n < 0 || n > MAX_SCSI_DXLEN) {
-+            if (n < 0) {
-...
-
-First I tested on the drive connected with an SATA/UAS adapter. The
-upper limit on the requested data length is CONSISTENTLY (I mean on
-the same adapter) 8192 * 512 bytes:
-
-
-[tom@localhost ~]$ sudo sg_raw -r 0x3ffe00 -o /dev/null /dev/sdc 88 00
-00 00 00 00 00 00 00 00 00 00 1f ff 00 00
-SCSI Status: Good
-
-Writing 4193792 bytes of data to /dev/null
-[tom@localhost ~]$ sudo sg_raw -r 0x400000 -o /dev/null /dev/sdc 88 00
-00 00 00 00 00 00 00 00 00 00 20 00 00 00
-SCSI Status: Good
-
-Writing 4194304 bytes of data to /dev/null
-[tom@localhost ~]$ sudo sg_raw -r 0x400200 -o /dev/null /dev/sdc 88 00
-00 00 00 00 00 00 00 00 00 00 20 01 00 00
-do_scsi_pt: Invalid argument
-
-
-I had to hacked the kernel by changing SCSI_DEFAULT_MAX_SECTORS, which
-currently determines "max_hw_sectors" of UAS device, from 1024 to
-65535, otherwise the allowed length will be bounded by
-"max_hw_sectors". See the sg_io() in block/scsi_ioctl.c.
-("max_sectors" was hence allowed to bump to 65535 by the Optimal
-Transfer Length reported in the adapter's VPD.)
-
-However, when I test on the exact same drive (which is the "system
-drive", btw), with it connected to a AHCI SATA port on my motherboard
-(Intel H87), the allowed requested length would be fluctuating:
-
-...
-[tom@localhost ~]$ sudo sg_raw -r 0x140000 -o /dev/null /dev/sda 88 00
-00 00 00 00 00 00 00 00 00 00 0a 00 00 00
-do_scsi_pt: Invalid argument
-[tom@localhost ~]$ sudo sg_raw -r 0x140000 -o /dev/null /dev/sda 88 00
-00 00 00 00 00 00 00 00 00 00 0a 00 00 00
-SCSI Status: Good
-
-Writing 1310720 bytes of data to /dev/null
-...
-
-
-I hadn't been able to "locate" a sensible and/or solid point where the
-fluctuation start, but I did notice that the chance of "failure" would
-rise with the requested length. Also, if I boot with
-`libata.force=noncq`, the failure seems to start off from a lower
-point.
-
-So is that an expected characteristic of SATA/AHCI? Or does that hint
-that there is something wrong in the kernel? And btw, should any block
-limit be set according to this? For example, max_sectors?
+I got impression the affinity mask is assigned differently i.e. for
+single MSI mode vs legacy mode. But I might be wrong here - I have to
+look into the code again. Anyway, if it is the case it could be
+addressed afterwards IMHO.
