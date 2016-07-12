@@ -1,124 +1,77 @@
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>,
-	Tejun Heo <tj@kernel.org>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	linus.walleij@linaro.org,
-	broonie@kernel.org,
-	stable@vger.kernel.org,
-	jmoyer@redhat.com,
-	Nikolay Borisov <kernel@kyup.com>,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH BUGFIX V4] block: add missing group association in bio-cloning functions
-Date: Tue, 26 Jul 2016 18:14:49 +0200
-Message-Id: <1469549700-9732-1-git-send-email-paolo.valente@linaro.org>
-In-Reply-To: <x49vb2h7kqb.fsf@segfault.boston.devel.redhat.com>
-References: <x49vb2h7kqb.fsf@segfault.boston.devel.redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f45.google.com ([74.125.82.45]:36098 "EHLO
+	mail-wm0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750922AbcGLNvg (ORCPT
+	<rfc822;linux-block@vger.kernel.org>);
+	Tue, 12 Jul 2016 09:51:36 -0400
+Received: by mail-wm0-f45.google.com with SMTP id f126so128446619wma.1
+        for <linux-block@vger.kernel.org>; Tue, 12 Jul 2016 06:51:35 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <146705580308.39775.10937037092465199137.stgit@dwillia2-desk3.amr.corp.intel.com>
+References: <146705579255.39775.12551436695635245858.stgit@dwillia2-desk3.amr.corp.intel.com>
+ <146705580308.39775.10937037092465199137.stgit@dwillia2-desk3.amr.corp.intel.com>
+From: Ulf Hansson <ulf.hansson@linaro.org>
+Date: Tue, 12 Jul 2016 15:51:32 +0200
+Message-ID: <CAPDyKFqKQd2KcCAW=Qy3qaoi3sfUMoiq0u8QSUf1n=hFiDebiA@mail.gmail.com>
+Subject: Re: [PATCH v5 2/5] mmc: move 'parent' tracking to mmc_blk_data
+To: Dan Williams <dan.j.williams@intel.com>
+Cc: Jens Axboe <axboe@fb.com>, linux-nvdimm@lists.01.org,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	linux-block@vger.kernel.org,
+	Bart Van Assche <bart.vanassche@sandisk.com>,
+	Christoph Hellwig <hch@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-When a bio is cloned, the newly created bio must be associated with
-the same blkcg as the original bio (if BLK_CGROUP is enabled). If
-this operation is not performed, then the new bio is not associated
-with any group, and the group of the current task is returned when
-the group of the bio is requested.
+On 27 June 2016 at 21:30, Dan Williams <dan.j.williams@intel.com> wrote:
+> In preparation for the removal of 'driverfs_dev' from 'struct gendisk',
+> carry this data in mmc_blk_data. It is used for registration of parent
+> disks and partitions.
+>
+> Cc: Ulf Hansson <ulf.hansson@linaro.org>
+> Cc: Bart Van Assche <bart.vanassche@sandisk.com>
+> Signed-off-by: Dan Williams <dan.j.williams@intel.com>
 
-Depending on the cloning frequency, this may cause a large
-percentage of the bios belonging to a given group to be treated
-as if belonging to other groups (in most cases as if belonging to
-the root group). The expected group isolation may thereby be broken.
+If not too late (sorry for the delay):
 
-This commit adds the missing association in bio-cloning functions.
+Acked-by: Ulf Hansson <ulf.hansson@linaro.org>
 
-Fixes: da2f0f74cf7d ("Btrfs: add support for blkio controllers")
-Cc: stable@vger.kernel.org # v4.3+
+Kind regards
+Uffe
 
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
-Reviewed-by: Nikolay Borisov <kernel@kyup.com>
-Reviewed-by: Jeff Moyer <jmoyer@redhat.com>
-Acked-by: Tejun Heo <tj@kernel.org>
----
- block/bio.c          | 15 +++++++++++++++
- fs/btrfs/extent_io.c |  6 ------
- include/linux/bio.h  |  3 +++
- 3 files changed, 18 insertions(+), 6 deletions(-)
-
-diff --git a/block/bio.c b/block/bio.c
-index 0e4aa42..4623869 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -579,6 +579,8 @@ void __bio_clone_fast(struct bio *bio, struct bio *bio_src)
- 	bio->bi_rw = bio_src->bi_rw;
- 	bio->bi_iter = bio_src->bi_iter;
- 	bio->bi_io_vec = bio_src->bi_io_vec;
-+
-+	bio_clone_blkcg_association(bio, bio_src);
- }
- EXPORT_SYMBOL(__bio_clone_fast);
- 
-@@ -684,6 +686,8 @@ integrity_clone:
- 		}
- 	}
- 
-+	bio_clone_blkcg_association(bio, bio_src);
-+
- 	return bio;
- }
- EXPORT_SYMBOL(bio_clone_bioset);
-@@ -2005,6 +2009,17 @@ void bio_disassociate_task(struct bio *bio)
- 	}
- }
- 
-+/**
-+ * bio_clone_blkcg_association - clone blkcg association from src to dst bio
-+ * @dst: destination bio
-+ * @src: source bio
-+ */
-+void bio_clone_blkcg_association(struct bio *dst, struct bio *src)
-+{
-+	if (src->bi_css)
-+		WARN_ON(bio_associate_blkcg(dst, src->bi_css));
-+}
-+
- #endif /* CONFIG_BLK_CGROUP */
- 
- static void __init biovec_init_slabs(void)
-diff --git a/fs/btrfs/extent_io.c b/fs/btrfs/extent_io.c
-index 75533ad..92fe3f8 100644
---- a/fs/btrfs/extent_io.c
-+++ b/fs/btrfs/extent_io.c
-@@ -2696,12 +2696,6 @@ struct bio *btrfs_bio_clone(struct bio *bio, gfp_t gfp_mask)
- 		btrfs_bio->csum = NULL;
- 		btrfs_bio->csum_allocated = NULL;
- 		btrfs_bio->end_io = NULL;
--
--#ifdef CONFIG_BLK_CGROUP
--		/* FIXME, put this into bio_clone_bioset */
--		if (bio->bi_css)
--			bio_associate_blkcg(new, bio->bi_css);
--#endif
- 	}
- 	return new;
- }
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 9faebf7..c9403b7 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -527,11 +527,14 @@ extern unsigned int bvec_nr_vecs(unsigned short idx);
- int bio_associate_blkcg(struct bio *bio, struct cgroup_subsys_state *blkcg_css);
- int bio_associate_current(struct bio *bio);
- void bio_disassociate_task(struct bio *bio);
-+void bio_clone_blkcg_association(struct bio *dst, struct bio *src);
- #else	/* CONFIG_BLK_CGROUP */
- static inline int bio_associate_blkcg(struct bio *bio,
- 			struct cgroup_subsys_state *blkcg_css) { return 0; }
- static inline int bio_associate_current(struct bio *bio) { return -ENOENT; }
- static inline void bio_disassociate_task(struct bio *bio) { }
-+static inline void bio_clone_blkcg_association(struct bio *dst,
-+			struct bio *src) { return 0; }
- #endif	/* CONFIG_BLK_CGROUP */
- 
- #ifdef CONFIG_HIGHMEM
--- 
-1.9.1
+> ---
+>  drivers/mmc/card/block.c |    5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+>
+> diff --git a/drivers/mmc/card/block.c b/drivers/mmc/card/block.c
+> index 383184743f9a..d1733424bf6e 100644
+> --- a/drivers/mmc/card/block.c
+> +++ b/drivers/mmc/card/block.c
+> @@ -93,6 +93,7 @@ static DEFINE_SPINLOCK(mmc_blk_lock);
+>   */
+>  struct mmc_blk_data {
+>         spinlock_t      lock;
+> +       struct device   *parent;
+>         struct gendisk  *disk;
+>         struct mmc_queue queue;
+>         struct list_head part;
+> @@ -2270,7 +2271,7 @@ again:
+>         md->disk->fops = &mmc_bdops;
+>         md->disk->private_data = md;
+>         md->disk->queue = md->queue.queue;
+> -       md->disk->driverfs_dev = parent;
+> +       md->parent = parent;
+>         set_disk_ro(md->disk, md->read_only || default_ro);
+>         md->disk->flags = GENHD_FL_EXT_DEVT;
+>         if (area_type & (MMC_BLK_DATA_AREA_RPMB | MMC_BLK_DATA_AREA_BOOT))
+> @@ -2458,7 +2459,7 @@ static int mmc_add_disk(struct mmc_blk_data *md)
+>         int ret;
+>         struct mmc_card *card = md->queue.card;
+>
+> -       add_disk(md->disk);
+> +       device_add_disk(md->parent, md->disk);
+>         md->force_ro.show = force_ro_show;
+>         md->force_ro.store = force_ro_store;
+>         sysfs_attr_init(&md->force_ro.attr);
+>
