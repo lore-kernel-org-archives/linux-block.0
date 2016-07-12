@@ -1,49 +1,65 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-	Andreas Dilger <adilger.kernel@dilger.ca>,
-	Jan Kara <jack@suse.com>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-	Hugh Dickins <hughd@google.com>,
-	Andrea Arcangeli <aarcange@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Dave Hansen <dave.hansen@intel.com>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	Matthew Wilcox <willy@infradead.org>,
-	Ross Zwisler <ross.zwisler@linux.intel.com>,
-	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	linux-block@vger.kernel.org,
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv1, RFC 30/33] ext4: relax assert in ext4_da_page_release_reservation()
-Date: Tue, 26 Jul 2016 03:35:32 +0300
-Message-Id: <1469493335-3622-31-git-send-email-kirill.shutemov@linux.intel.com>
-In-Reply-To: <1469493335-3622-1-git-send-email-kirill.shutemov@linux.intel.com>
-References: <1469493335-3622-1-git-send-email-kirill.shutemov@linux.intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:57805 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S933170AbcGLMlG (ORCPT <rfc822;linux-block@vger.kernel.org>);
+	Tue, 12 Jul 2016 08:41:06 -0400
+Date: Tue, 12 Jul 2016 14:46:03 +0200
+From: Alexander Gordeev <agordeev@redhat.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: tglx@linutronix.de, axboe@fb.com, linux-block@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-nvme@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 07/13] pci: Provide sensible irq vector alloc/free
+ routines
+Message-ID: <20160712124603.GB26969@agordeev.lab.eng.brq.redhat.com>
+References: <1467621574-8277-1-git-send-email-hch@lst.de>
+ <1467621574-8277-8-git-send-email-hch@lst.de>
+ <20160706080545.GA14583@dhcp-27-118.brq.redhat.com>
+ <20160710034737.GB15720@lst.de>
+ <20160711104340.GB21169@agordeev.lab.eng.brq.redhat.com>
+ <20160712091300.GA4845@lst.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20160712091300.GA4845@lst.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-For huge pages 'stop' must be within HPAGE_PMD_SIZE.
-Let's use hpage_size() in the BUG_ON().
+On Tue, Jul 12, 2016 at 11:13:00AM +0200, Christoph Hellwig wrote:
+> On Mon, Jul 11, 2016 at 12:43:41PM +0200, Alexander Gordeev wrote:
+> > > I diagreed - if we deprecated functions the only thing that should
+> > > be mentioned is a "don't use these". 
+> > 
+> > I will try to paraphrase myself. The new API deprecates pci_enable_msi*_range
+> > functions, but I am not that sure about others. Certainly, pci_msi*_vec__ount
+> > and pci_enable_msi*_exact could have (and AFAIR do have) uses that can not be
+> > covered by automatic initialization of pci_alloc_irq_vectors().
+> 
+> pci_enable_msi*_exact is the equivalent of pci_enable_msi*_range
+> with minvecs == maxvecs and treating any return value >= 0 as 0.
 
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
----
- fs/ext4/inode.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Right. And people asked explicitly to introduce these helpers when
+range functions were introduced in the first place. Since there is
+handful of drivers that do use pci_enable_msi*_exact() I suppose a
+need for them persists.
 
-diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
-index 744bba046268..2e22f62f007b 100644
---- a/fs/ext4/inode.c
-+++ b/fs/ext4/inode.c
-@@ -1550,7 +1550,7 @@ static void ext4_da_page_release_reservation(struct page *page,
- 	int num_clusters;
- 	ext4_fsblk_t lblk;
- 
--	BUG_ON(stop > PAGE_SIZE || stop < length);
-+	BUG_ON(stop > hpage_size(page) || stop < length);
- 
- 	head = page_buffers(page);
- 	bh = head;
--- 
-2.8.1
+> I've updated the documentation so that the old usage examples are kept
+> around, but now use pci_alloc_irq_vectors.  I've also added a more detaild
+> blurb on pci_msi*_vec_count - I think there is no need for them, but
+> if I'm proven wrong we'll have to add a pci_irq_vector_count that handles
+> all interrupt types later.
 
+I guess, it is up to Bjorn. But.
+
+Your proposed pci_nr_irq_vectors() function (a) is not a replacement for
+pci_msi*_vec_count() and (b) would be useless if I read its description
+properly:
+
+(a) Functions pci_msi*_vec_count() return number of vectors reported by
+a PCI device. It is a constant for the device and a driver may make an
+assumption based on this number;
+
+(b) A number returned by pci_nr_irq_vectors() is not guaranteed what a
+following call to pci_alloc_irq_vectors() can return (since the number
+of actually allocated vectors might change between the two calls).
+Therefore, a value returned by pci_nr_irq_vectors() can not be used for
+anything.
