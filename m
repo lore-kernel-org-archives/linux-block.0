@@ -1,36 +1,42 @@
-Return-Path: <linux-ide-owner@vger.kernel.org>
-Date: Wed, 13 Jul 2016 13:03:08 -0400
-From: Tejun Heo <tj@kernel.org>
-To: tom.ty89@gmail.com
-Cc: martin.petersen@oracle.com, linux-ide@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [RFC 1/3] ata: bump ATA_MAX_SECTORS_LBA48 to 65536
-Message-ID: <20160713170308.GF4065@mtj.duckdns.org>
-References: <1c10437e3cd9be8556e77462b40ad53be542dfba.1468384890.git.tom.ty89@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1c10437e3cd9be8556e77462b40ad53be542dfba.1468384890.git.tom.ty89@gmail.com>
-Sender: linux-ide-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pf0-f194.google.com ([209.85.192.194]:33172 "EHLO
+	mail-pf0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750716AbcGMEr5 (ORCPT
+	<rfc822;linux-block@vger.kernel.org>);
+	Wed, 13 Jul 2016 00:47:57 -0400
+From: tom.ty89@gmail.com
+To: tj@kernel.org, martin.petersen@oracle.com
+Cc: linux-ide@vger.kernel.org, linux-scsi@vger.kernel.org,
+	linux-block@vger.kernel.org, Tom Yan <tom.ty89@gmail.com>
+Subject: [RFC 1/3] ata: bump ATA_MAX_SECTORS_LBA48 to 65536
+Date: Wed, 13 Jul 2016 12:47:06 +0800
+Message-Id: <1c10437e3cd9be8556e77462b40ad53be542dfba.1468384890.git.tom.ty89@gmail.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Hello,
+From: Tom Yan <tom.ty89@gmail.com>
 
-On Wed, Jul 13, 2016 at 12:47:06PM +0800, tom.ty89@gmail.com wrote:
-> From: Tom Yan <tom.ty89@gmail.com>
-> 
-> ATA_MAX_SECTORS_LBA48 is only used for setting the queue limit
-> "max_hw_sectors", which only serves as the cap for "max_sectors",
-> which is in turn the actual limit being used. Therefore, it should
+ATA_MAX_SECTORS_LBA48 is only used for setting the queue limit
+"max_hw_sectors", which only serves as the cap for "max_sectors",
+which is in turn the actual limit being used. Therefore, it should
+be alright for us to bump ATA_MAX_SECTORS_LBA48 to 65536. Also,
+lba_48_ok() has been accepting the number of blocks to be 65536.
 
-It's used to device max_sectors.
+Signed-off-by: Tom Yan <tom.ty89@gmail.com>
 
-> be alright for us to bump ATA_MAX_SECTORS_LBA48 to 65536. Also,
-> lba_48_ok() has been accepting the number of blocks to be 65536.
-
-This is way too gratuitous.  There's no rationale for it while it has
-actual real-world risks.  max_sectors is staying at 65535.
-
-Thanks.
-
+diff --git a/include/linux/ata.h b/include/linux/ata.h
+index 99346be..24f886c 100644
+--- a/include/linux/ata.h
++++ b/include/linux/ata.h
+@@ -46,7 +46,7 @@ enum {
+ 	ATA_MAX_SECTORS_128	= 128,
+ 	ATA_MAX_SECTORS		= 256,
+ 	ATA_MAX_SECTORS_1024    = 1024,
+-	ATA_MAX_SECTORS_LBA48	= 65535,/* TODO: 65536? */
++	ATA_MAX_SECTORS_LBA48	= 65536,
+ 	ATA_MAX_SECTORS_TAPE	= 65535,
+ 
+ 	ATA_ID_WORDS		= 256,
 -- 
-tejun
+2.9.0
+
