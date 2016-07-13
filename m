@@ -1,40 +1,47 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-yw0-f178.google.com ([209.85.161.178]:36342 "EHLO
-	mail-yw0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750739AbcGMRFO (ORCPT
-	<rfc822;linux-block@vger.kernel.org>);
-	Wed, 13 Jul 2016 13:05:14 -0400
-Date: Wed, 13 Jul 2016 13:04:26 -0400
-From: Tejun Heo <tj@kernel.org>
-To: tom.ty89@gmail.com
-Cc: martin.petersen@oracle.com, linux-ide@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [RFC 3/3] libata-scsi: add optimal transfer length to block
- limits VPD
-Message-ID: <20160713170426.GG4065@mtj.duckdns.org>
+Return-Path: <linux-ide-owner@vger.kernel.org>
+From: tom.ty89@gmail.com
+To: tj@kernel.org, martin.petersen@oracle.com
+Cc: linux-ide@vger.kernel.org, linux-scsi@vger.kernel.org,
+	linux-block@vger.kernel.org, Tom Yan <tom.ty89@gmail.com>
+Subject: [RFC 3/3] libata-scsi: add optimal transfer length to block limits VPD
+Date: Wed, 13 Jul 2016 12:47:08 +0800
+Message-Id: <5659242e8546753768944757fc86988f1986585c.1468384890.git.tom.ty89@gmail.com>
+In-Reply-To: <1c10437e3cd9be8556e77462b40ad53be542dfba.1468384890.git.tom.ty89@gmail.com>
 References: <1c10437e3cd9be8556e77462b40ad53be542dfba.1468384890.git.tom.ty89@gmail.com>
- <5659242e8546753768944757fc86988f1986585c.1468384890.git.tom.ty89@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <5659242e8546753768944757fc86988f1986585c.1468384890.git.tom.ty89@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Sender: linux-ide-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-On Wed, Jul 13, 2016 at 12:47:08PM +0800, tom.ty89@gmail.com wrote:
-> From: Tom Yan <tom.ty89@gmail.com>
-> 
-> As of commit 6b7e9cde4969 ("sd: Fix rw_max for devices that report
-> an optimal xfer size"), the scsi disk driver (correctly) derive both
-> of the queue limits "io_opt" and "max_sectors" from the optimal
-> transfer length field.
-> 
-> In case we would like the two limits to be derived from a value
-> other than BLK_DEF_MAX_SECTORS for ATA disks in the future, this
-> patch has made it easy.
+From: Tom Yan <tom.ty89@gmail.com>
 
-What's the actual impact of this patch at this point?
+As of commit 6b7e9cde4969 ("sd: Fix rw_max for devices that report
+an optimal xfer size"), the scsi disk driver (correctly) derive both
+of the queue limits "io_opt" and "max_sectors" from the optimal
+transfer length field.
 
-Thanks.
+In case we would like the two limits to be derived from a value
+other than BLK_DEF_MAX_SECTORS for ATA disks in the future, this
+patch has made it easy.
 
+Signed-off-by: Tom Yan <tom.ty89@gmail.com>
+
+diff --git a/drivers/ata/libata-scsi.c b/drivers/ata/libata-scsi.c
+index bfec66f..ab75b5e 100644
+--- a/drivers/ata/libata-scsi.c
++++ b/drivers/ata/libata-scsi.c
+@@ -2305,6 +2305,13 @@ static unsigned int ata_scsiop_inq_b0(struct ata_scsi_args *args, u8 *rbuf)
+ 	put_unaligned_be16(min_io_sectors, &rbuf[6]);
+ 
+ 	/*
++	 * Optimal transfer length.
++	 *
++	 * This is used to derive the queue limit "max_sector" and "io_opt".
++	 */
++	put_unaligned_be32(BLK_DEF_MAX_SECTORS, &rbuf[12]);
++
++	/*
+ 	 * Optimal unmap granularity.
+ 	 *
+ 	 * The ATA spec doesn't even know about a granularity or alignment
 -- 
-tejun
+2.9.0
+
