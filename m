@@ -1,38 +1,36 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-qt0-f178.google.com ([209.85.216.178]:33212 "EHLO
-	mail-qt0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751197AbcGNSWx (ORCPT
-	<rfc822;linux-block@vger.kernel.org>);
-	Thu, 14 Jul 2016 14:22:53 -0400
-MIME-Version: 1.0
-In-Reply-To: <20160713170308.GF4065@mtj.duckdns.org>
-References: <1c10437e3cd9be8556e77462b40ad53be542dfba.1468384890.git.tom.ty89@gmail.com>
- <20160713170308.GF4065@mtj.duckdns.org>
-From: Tom Yan <tom.ty89@gmail.com>
-Date: Fri, 15 Jul 2016 02:22:52 +0800
-Message-ID: <CAGnHSE=0Bwg6NcBRfcixSncT7-7y5Z6hBfjireSr1MawShHVVA@mail.gmail.com>
-Subject: Re: [RFC 1/3] ata: bump ATA_MAX_SECTORS_LBA48 to 65536
-To: Tejun Heo <tj@kernel.org>
+Return-Path: <linux-ide-owner@vger.kernel.org>
+Date: Wed, 13 Jul 2016 13:03:08 -0400
+From: Tejun Heo <tj@kernel.org>
+To: tom.ty89@gmail.com
 Cc: martin.petersen@oracle.com, linux-ide@vger.kernel.org,
 	linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Subject: Re: [RFC 1/3] ata: bump ATA_MAX_SECTORS_LBA48 to 65536
+Message-ID: <20160713170308.GF4065@mtj.duckdns.org>
+References: <1c10437e3cd9be8556e77462b40ad53be542dfba.1468384890.git.tom.ty89@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1c10437e3cd9be8556e77462b40ad53be542dfba.1468384890.git.tom.ty89@gmail.com>
+Sender: linux-ide-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-On 14 July 2016 at 01:03, Tejun Heo <tj@kernel.org> wrote:
->
-> It's used to device max_sectors.
->
+Hello,
 
-Not really. "max_sectors" of ATA drives have been set to
-BLK_DEF_MAX_SECTORS, for at least quite some time.
+On Wed, Jul 13, 2016 at 12:47:06PM +0800, tom.ty89@gmail.com wrote:
+> From: Tom Yan <tom.ty89@gmail.com>
+> 
+> ATA_MAX_SECTORS_LBA48 is only used for setting the queue limit
+> "max_hw_sectors", which only serves as the cap for "max_sectors",
+> which is in turn the actual limit being used. Therefore, it should
 
->
-> This is way too gratuitous.  There's no rationale for it while it has
-> actual real-world risks.  max_sectors is staying at 65535.
->
+It's used to device max_sectors.
 
-That's alright. I don't have strong opinion on whether we should bump
-this anyway. So I suppose we should replace the TODO comment with
-something like "avoid count to be 0000h"? And maybe also change
-ATA_MAX_SECTORS to 255 (with comment "avoid count to be 00h")?
+> be alright for us to bump ATA_MAX_SECTORS_LBA48 to 65536. Also,
+> lba_48_ok() has been accepting the number of blocks to be 65536.
+
+This is way too gratuitous.  There's no rationale for it while it has
+actual real-world risks.  max_sectors is staying at 65535.
+
+Thanks.
+
+-- 
+tejun
