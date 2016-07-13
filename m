@@ -1,75 +1,45 @@
-Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: tglx@linutronix.de,
-	axboe@fb.com
-Subject: [PATCH 05/13] irq/msi: Make use of affinity aware allocations
-Date: Mon,  4 Jul 2016 17:39:26 +0900
-Message-Id: <1467621574-8277-6-git-send-email-hch@lst.de>
-In-Reply-To: <1467621574-8277-1-git-send-email-hch@lst.de>
-References: <1467621574-8277-1-git-send-email-hch@lst.de>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
-List-Post: <mailto:linux-nvme@lists.infradead.org>
-List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
-Cc: linux-block@vger.kernel.org, linux-pci@vger.kernel.org, agordeev@redhat.com,
- linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
-Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pf0-f193.google.com ([209.85.192.193]:36320 "EHLO
+	mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750716AbcGMEsJ (ORCPT
+	<rfc822;linux-block@vger.kernel.org>);
+	Wed, 13 Jul 2016 00:48:09 -0400
+From: tom.ty89@gmail.com
+To: tj@kernel.org, martin.petersen@oracle.com
+Cc: linux-ide@vger.kernel.org, linux-scsi@vger.kernel.org,
+	linux-block@vger.kernel.org, Tom Yan <tom.ty89@gmail.com>
+Subject: [RFC 2/3] ata: make lba_{28,48}_ok() use ATA_MAX_SECTORS{,_LBA48}
+Date: Wed, 13 Jul 2016 12:47:07 +0800
+Message-Id: <91a6bb6f4c04eb617a49d9a51f261b661c179de0.1468384890.git.tom.ty89@gmail.com>
+In-Reply-To: <1c10437e3cd9be8556e77462b40ad53be542dfba.1468384890.git.tom.ty89@gmail.com>
+References: <1c10437e3cd9be8556e77462b40ad53be542dfba.1468384890.git.tom.ty89@gmail.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Thomas Gleixner <tglx@linutronix.de>
+From: Tom Yan <tom.ty89@gmail.com>
 
-Allow the MSI code to provide affinity hints per MSI descriptor.
+Signed-off-by: Tom Yan <tom.ty89@gmail.com>
 
-Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
----
- include/linux/msi.h | 2 ++
- kernel/irq/msi.c    | 2 +-
- 2 files changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/include/linux/msi.h b/include/linux/msi.h
-index c33abfa..4f0bfe5 100644
---- a/include/linux/msi.h
-+++ b/include/linux/msi.h
-@@ -47,6 +47,7 @@ struct fsl_mc_msi_desc {
-  * @nvec_used:	The number of vectors used
-  * @dev:	Pointer to the device which uses this descriptor
-  * @msg:	The last set MSI message cached for reuse
-+ * @affinity:	Optional pointer to a cpu affinity mask for this descriptor
-  *
-  * @masked:	[PCI MSI/X] Mask bits
-  * @is_msix:	[PCI MSI/X] True if MSI-X
-@@ -67,6 +68,7 @@ struct msi_desc {
- 	unsigned int			nvec_used;
- 	struct device			*dev;
- 	struct msi_msg			msg;
-+	const struct cpumask		*affinity;
+diff --git a/include/linux/ata.h b/include/linux/ata.h
+index 24f886c..d4bb802 100644
+--- a/include/linux/ata.h
++++ b/include/linux/ata.h
+@@ -1095,13 +1095,13 @@ static inline bool ata_ok(u8 status)
+ static inline bool lba_28_ok(u64 block, u32 n_block)
+ {
+ 	/* check the ending block number: must be LESS THAN 0x0fffffff */
+-	return ((block + n_block) < ((1 << 28) - 1)) && (n_block <= 256);
++	return ((block + n_block) < ((1 << 28) - 1)) && (n_block <= ATA_MAX_SECTORS);
+ }
  
- 	union {
- 		/* PCI MSI/X specific data */
-diff --git a/kernel/irq/msi.c b/kernel/irq/msi.c
-index 58dbbac..0e2a736 100644
---- a/kernel/irq/msi.c
-+++ b/kernel/irq/msi.c
-@@ -335,7 +335,7 @@ int msi_domain_alloc_irqs(struct irq_domain *domain, struct device *dev,
+ static inline bool lba_48_ok(u64 block, u32 n_block)
+ {
+ 	/* check the ending block number */
+-	return ((block + n_block - 1) < ((u64)1 << 48)) && (n_block <= 65536);
++	return ((block + n_block - 1) < ((u64)1 << 48)) && (n_block <= ATA_MAX_SECTORS_LBA48);
+ }
  
- 		virq = __irq_domain_alloc_irqs(domain, -1, desc->nvec_used,
- 					       dev_to_node(dev), &arg, false,
--					       NULL);
-+					       desc->affinity);
- 		if (virq < 0) {
- 			ret = -ENOSPC;
- 			if (ops->handle_error)
+ #define sata_pmp_gscr_vendor(gscr)	((gscr)[SATA_PMP_GSCR_PROD_ID] & 0xffff)
 -- 
-2.1.4
+2.9.0
 
-
-_______________________________________________
-Linux-nvme mailing list
-Linux-nvme@lists.infradead.org
-http://lists.infradead.org/mailman/listinfo/linux-nvme
