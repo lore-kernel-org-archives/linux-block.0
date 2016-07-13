@@ -1,17 +1,20 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH] block: atari: Return early for unsupported sector size
-To: Gabriel Krisman Bertazi <krisman@linux.vnet.ibm.com>
-References: <1467736712-11825-1-git-send-email-krisman@linux.vnet.ibm.com>
+Return-Path: <krisman@linux.vnet.ibm.com>
+From: Gabriel Krisman Bertazi <krisman@linux.vnet.ibm.com>
+To: axboe@kernel.dk
 Cc: linux-block@vger.kernel.org
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <57866D0B.2020608@kernel.dk>
-Date: Wed, 13 Jul 2016 09:32:11 -0700
-MIME-Version: 1.0
+Subject: Re: [PATCH] block: atari: Return early for unsupported sector size
+References: <1467736712-11825-1-git-send-email-krisman@linux.vnet.ibm.com>
+Date: Tue, 12 Jul 2016 22:42:30 -0300
 In-Reply-To: <1467736712-11825-1-git-send-email-krisman@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+	(Gabriel Krisman Bertazi's message of "Tue, 5 Jul 2016 13:38:32
+	-0300")
+MIME-Version: 1.0
+Content-Type: text/plain
+Message-Id: <87inwa9uux.fsf@linux.vnet.ibm.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On 07/05/2016 09:38 AM, Gabriel Krisman Bertazi wrote:
+Gabriel Krisman Bertazi <krisman@linux.vnet.ibm.com> writes:
+
 > For 4K LBA or very large disks, atari_partition can easily get tricked
 > into thinking it has found an Atari partition table.  Depending on the
 > data in the disk, it ends up creating partitions with awkward lengths.
@@ -29,8 +32,12 @@ On 07/05/2016 09:38 AM, Gabriel Krisman Bertazi wrote:
 > Since the atari partition, according to the spec, doesn't even support
 > sector sizes with more than 512, a quick sanity check is reasonable to
 > just bail out early, before even attempting to read sector 0.
+>
+> Signed-off-by: Gabriel Krisman Bertazi <krisman@linux.vnet.ibm.com>
+> ---
 
-Added for 4.8, thanks.
+Hi Jens,
 
+Any thoughts on this?  Do you think we can get it queued for 4.8?
 -- 
-Jens Axboe
+Gabriel Krisman Bertazi
