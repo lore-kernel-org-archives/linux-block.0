@@ -1,98 +1,50 @@
-Return-Path: <BATV+80a1e3aa0109c64edabc+4700+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk,
-	keith.busch@intel.com
-Cc: linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	Sagi Grimberg <sagi@grimberg.me>
-Subject: [PATCH 1/5] blk-mq: Introduce blk_mq_reinit_tagset
-Date: Wed,  6 Jul 2016 21:55:48 +0900
-Message-Id: <1467809752-31320-2-git-send-email-hch@lst.de>
-In-Reply-To: <1467809752-31320-1-git-send-email-hch@lst.de>
-References: <1467809752-31320-1-git-send-email-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-yw0-f169.google.com ([209.85.161.169]:35867 "EHLO
+	mail-yw0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751098AbcGNS0N (ORCPT
+	<rfc822;linux-block@vger.kernel.org>);
+	Thu, 14 Jul 2016 14:26:13 -0400
+Date: Thu, 14 Jul 2016 14:26:10 -0400
+From: Tejun Heo <tj@kernel.org>
+To: Tom Yan <tom.ty89@gmail.com>
+Cc: martin.petersen@oracle.com, linux-ide@vger.kernel.org,
+	linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [RFC 1/3] ata: bump ATA_MAX_SECTORS_LBA48 to 65536
+Message-ID: <20160714182610.GP15005@htj.duckdns.org>
+References: <1c10437e3cd9be8556e77462b40ad53be542dfba.1468384890.git.tom.ty89@gmail.com>
+ <20160713170308.GF4065@mtj.duckdns.org>
+ <CAGnHSE=0Bwg6NcBRfcixSncT7-7y5Z6hBfjireSr1MawShHVVA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CAGnHSE=0Bwg6NcBRfcixSncT7-7y5Z6hBfjireSr1MawShHVVA@mail.gmail.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Sagi Grimberg <sagi@grimberg.me>
+On Fri, Jul 15, 2016 at 02:22:52AM +0800, Tom Yan wrote:
+> On 14 July 2016 at 01:03, Tejun Heo <tj@kernel.org> wrote:
+> >
+> > It's used to device max_sectors.
+> >
+> 
+> Not really. "max_sectors" of ATA drives have been set to
+> BLK_DEF_MAX_SECTORS, for at least quite some time.
+> 
+> >
+> > This is way too gratuitous.  There's no rationale for it while it has
+> > actual real-world risks.  max_sectors is staying at 65535.
+> >
+> 
+> That's alright. I don't have strong opinion on whether we should bump
+> this anyway. So I suppose we should replace the TODO comment with
+> something like "avoid count to be 0000h"? And maybe also change
+> ATA_MAX_SECTORS to 255 (with comment "avoid count to be 00h")?
 
-The new nvme-rdma driver will need to reinitialize all the tags as part of
-the error recovery procedure (realloc the tag memory region). Add a helper
-in blk-mq for it that can iterate over all requests in a tagset to make
-this easier.
+I'd just leave both alone.  It's one sector difference one way or the
+other and those numbers have a pretty long history.  There's no reason
+to disturb them at this point.  There's no actual gain whatsoever but
+there is some actual risk.
 
-Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
-Tested-by: Ming Lin <ming.l@ssi.samsung.com>
-Reviewed-by: Stephen Bates <Stephen.Bates@pmcs.com>
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-mq-tag.c     | 26 ++++++++++++++++++++++++++
- include/linux/blk-mq.h |  3 +++
- 2 files changed, 29 insertions(+)
+Thanks.
 
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index 56a0c37..729bac3 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -485,6 +485,32 @@ void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
- }
- EXPORT_SYMBOL(blk_mq_tagset_busy_iter);
- 
-+int blk_mq_reinit_tagset(struct blk_mq_tag_set *set)
-+{
-+	int i, j, ret = 0;
-+
-+	if (!set->ops->reinit_request)
-+		goto out;
-+
-+	for (i = 0; i < set->nr_hw_queues; i++) {
-+		struct blk_mq_tags *tags = set->tags[i];
-+
-+		for (j = 0; j < tags->nr_tags; j++) {
-+			if (!tags->rqs[j])
-+				continue;
-+
-+			ret = set->ops->reinit_request(set->driver_data,
-+						tags->rqs[j]);
-+			if (ret)
-+				goto out;
-+		}
-+	}
-+
-+out:
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(blk_mq_reinit_tagset);
-+
- void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_iter_fn *fn,
- 		void *priv)
- {
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index cbfd8ca..e43bbff 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -96,6 +96,7 @@ typedef int (init_request_fn)(void *, struct request *, unsigned int,
- 		unsigned int, unsigned int);
- typedef void (exit_request_fn)(void *, struct request *, unsigned int,
- 		unsigned int);
-+typedef int (reinit_request_fn)(void *, struct request *);
- 
- typedef void (busy_iter_fn)(struct blk_mq_hw_ctx *, struct request *, void *,
- 		bool);
-@@ -145,6 +146,7 @@ struct blk_mq_ops {
- 	 */
- 	init_request_fn		*init_request;
- 	exit_request_fn		*exit_request;
-+	reinit_request_fn	*reinit_request;
- };
- 
- enum {
-@@ -245,6 +247,7 @@ void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
- void blk_mq_freeze_queue(struct request_queue *q);
- void blk_mq_unfreeze_queue(struct request_queue *q);
- void blk_mq_freeze_queue_start(struct request_queue *q);
-+int blk_mq_reinit_tagset(struct blk_mq_tag_set *set);
- 
- void blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set, int nr_hw_queues);
- 
 -- 
-2.1.4
+tejun
