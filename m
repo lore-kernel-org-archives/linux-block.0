@@ -1,45 +1,58 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f193.google.com ([209.85.192.193]:36320 "EHLO
-	mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750716AbcGMEsJ (ORCPT
+Received: from mail-qk0-f182.google.com ([209.85.220.182]:36441 "EHLO
+	mail-qk0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751098AbcGNSN6 (ORCPT
 	<rfc822;linux-block@vger.kernel.org>);
-	Wed, 13 Jul 2016 00:48:09 -0400
-From: tom.ty89@gmail.com
-To: tj@kernel.org, martin.petersen@oracle.com
-Cc: linux-ide@vger.kernel.org, linux-scsi@vger.kernel.org,
-	linux-block@vger.kernel.org, Tom Yan <tom.ty89@gmail.com>
-Subject: [RFC 2/3] ata: make lba_{28,48}_ok() use ATA_MAX_SECTORS{,_LBA48}
-Date: Wed, 13 Jul 2016 12:47:07 +0800
-Message-Id: <91a6bb6f4c04eb617a49d9a51f261b661c179de0.1468384890.git.tom.ty89@gmail.com>
-In-Reply-To: <1c10437e3cd9be8556e77462b40ad53be542dfba.1468384890.git.tom.ty89@gmail.com>
+	Thu, 14 Jul 2016 14:13:58 -0400
+MIME-Version: 1.0
+In-Reply-To: <20160713170426.GG4065@mtj.duckdns.org>
 References: <1c10437e3cd9be8556e77462b40ad53be542dfba.1468384890.git.tom.ty89@gmail.com>
+ <5659242e8546753768944757fc86988f1986585c.1468384890.git.tom.ty89@gmail.com> <20160713170426.GG4065@mtj.duckdns.org>
+From: Tom Yan <tom.ty89@gmail.com>
+Date: Fri, 15 Jul 2016 02:13:56 +0800
+Message-ID: <CAGnHSEm40pLyvy=kU4yVEmQ_t7dQtv2+vXg5VDvrkP_ExFfgaw@mail.gmail.com>
+Subject: Re: [RFC 3/3] libata-scsi: add optimal transfer length to block
+ limits VPD
+To: Tejun Heo <tj@kernel.org>
+Cc: martin.petersen@oracle.com, linux-ide@vger.kernel.org,
+	linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Tom Yan <tom.ty89@gmail.com>
+Well it's mainly to "pre-de-couple" BLK_DEF_MAX_SECTORS from ATA
+drives. If we left the field unset, the scsi disk driver will fall
+back to BLK_DEF_MAX_SECTORS when setting the block limit "max_sectors"
+(while its cap "max_hw_sectors" is set by libata depending on whether
+the drive supports LBA48 or so). So by filling in this field, we can
+set an optimal value for the ATA drives specifically, while the block
+layer devs will have less to concern when they determine the value of
+the macro (which should be hardware-neutural, sort of).
 
-Signed-off-by: Tom Yan <tom.ty89@gmail.com>
+A "side-effect" of this is, the scsi disk driver will also use this
+field to set the block limit "io_opt", which we had left it unset all
+the time. I am not sure about if there are any pros and cons in
+setting the limit, that's why I sent this as an RFC and to the
+linux-block mailing list as well. By looking at what the scsi disk
+driver do, it appears that it's a sensible thing to set the limit to a
+value that matches with the other limit "max_sectors", though.
 
-diff --git a/include/linux/ata.h b/include/linux/ata.h
-index 24f886c..d4bb802 100644
---- a/include/linux/ata.h
-+++ b/include/linux/ata.h
-@@ -1095,13 +1095,13 @@ static inline bool ata_ok(u8 status)
- static inline bool lba_28_ok(u64 block, u32 n_block)
- {
- 	/* check the ending block number: must be LESS THAN 0x0fffffff */
--	return ((block + n_block) < ((1 << 28) - 1)) && (n_block <= 256);
-+	return ((block + n_block) < ((1 << 28) - 1)) && (n_block <= ATA_MAX_SECTORS);
- }
- 
- static inline bool lba_48_ok(u64 block, u32 n_block)
- {
- 	/* check the ending block number */
--	return ((block + n_block - 1) < ((u64)1 << 48)) && (n_block <= 65536);
-+	return ((block + n_block - 1) < ((u64)1 << 48)) && (n_block <= ATA_MAX_SECTORS_LBA48);
- }
- 
- #define sata_pmp_gscr_vendor(gscr)	((gscr)[SATA_PMP_GSCR_PROD_ID] & 0xffff)
--- 
-2.9.0
-
+On 14 July 2016 at 01:04, Tejun Heo <tj@kernel.org> wrote:
+> On Wed, Jul 13, 2016 at 12:47:08PM +0800, tom.ty89@gmail.com wrote:
+>> From: Tom Yan <tom.ty89@gmail.com>
+>>
+>> As of commit 6b7e9cde4969 ("sd: Fix rw_max for devices that report
+>> an optimal xfer size"), the scsi disk driver (correctly) derive both
+>> of the queue limits "io_opt" and "max_sectors" from the optimal
+>> transfer length field.
+>>
+>> In case we would like the two limits to be derived from a value
+>> other than BLK_DEF_MAX_SECTORS for ATA disks in the future, this
+>> patch has made it easy.
+>
+> What's the actual impact of this patch at this point?
+>
+> Thanks.
+>
+> --
+> tejun
