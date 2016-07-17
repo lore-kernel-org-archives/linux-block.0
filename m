@@ -1,56 +1,33 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.9]:55062 "EHLO
-	bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751588AbcGUJY2 (ORCPT
-	<rfc822;linux-block@vger.kernel.org>);
-	Thu, 21 Jul 2016 05:24:28 -0400
+Received: from verein.lst.de ([213.95.11.211]:44160 "EHLO newverein.lst.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751819AbcGQB2M (ORCPT <rfc822;linux-block@vger.kernel.org>);
+	Sat, 16 Jul 2016 21:28:12 -0400
+Date: Sun, 17 Jul 2016 03:28:10 +0200
 From: Christoph Hellwig <hch@lst.de>
-To: axboe@fb.com, agordeev@redhat.com, linux-block@vger.kernel.org
-Subject: [PATCH 1/3] blk-mq: don't redistribute hardware queues on a CPU hotplug event
-Date: Thu, 21 Jul 2016 11:24:17 +0200
-Message-Id: <1469093059-24594-2-git-send-email-hch@lst.de>
-In-Reply-To: <1469093059-24594-1-git-send-email-hch@lst.de>
-References: <1469093059-24594-1-git-send-email-hch@lst.de>
+To: Mike Snitzer <snitzer@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	linux-block@vger.kernel.org, dm-devel@redhat.com,
+	linux-scsi@vger.kernel.org
+Subject: Re: PR API fixes for multipathing
+Message-ID: <20160717012809.GB10263@lst.de>
+References: <1467980631-18945-1-git-send-email-hch@lst.de> <yq1y452iuzp.fsf@sermon.lab.mkp.net> <20160716010844.GA29087@lst.de> <20160716181007.GA14215@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20160716181007.GA14215@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Currently blk-mq will totally remap hardware context when a CPU hotplug
-even happened, which causes major havoc for drivers, as they are never
-told about this remapping.  E.g. any carefully sorted out CPU affinity
-will just be completely messed up.
+On Sat, Jul 16, 2016 at 02:10:07PM -0400, Mike Snitzer wrote:
+> Christoph, I had to fix this:
+> 
+> drivers/md/dm.c:2564:12: warning: context imbalance in 'dm_call_pr' - different lock contexts for basic block
 
-The rebuild also doesn't really help for the common case of cpu
-hotplug, which is soft onlining / offlining of cpus - in this case we
-should just leave the queue and irq mapping as is.  If it actually
-worked it would have helped in the case of physical cpu hotplug,
-although for that we'd need a way to actually notify the driver.
-Note that drivers may already be able to accommodate such a topology
-change on their own, e.g. using the reset_controller sysfs file in NVMe
-will cause the driver to get things right for this case.
+That's coming from sparse?  Guess I need to update my sparse version..
 
-With the rebuild removed we will simplify retain the queue mapping for
-a soft offlined CPU that will work when it comes back online, and will
-map any newly onlined CPU to queue NULL until the driver initiates
-a rebuild of the queue map.
+> here is the incremental I folded in to the dm patch:
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-mq.c | 2 --
- 1 file changed, 2 deletions(-)
+Looks fine,
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 576e711..6e88e2c 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2156,8 +2156,6 @@ static void blk_mq_queue_reinit(struct request_queue *q,
- 
- 	blk_mq_sysfs_unregister(q);
- 
--	blk_mq_update_queue_map(q->mq_map, q->nr_hw_queues, online_mask);
--
- 	/*
- 	 * redo blk_mq_init_cpu_queues and blk_mq_init_hw_queues. FIXME: maybe
- 	 * we should change hctx numa_node according to new topology (this
--- 
-2.1.4
-
+Reviewed-by: Christoph Hellwig <hch@lst.de>
