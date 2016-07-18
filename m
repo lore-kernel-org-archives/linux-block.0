@@ -1,47 +1,24 @@
-Return-Path: <linux-ide-owner@vger.kernel.org>
-From: tom.ty89@gmail.com
-To: tj@kernel.org, martin.petersen@oracle.com
-Cc: linux-ide@vger.kernel.org, linux-scsi@vger.kernel.org,
-	linux-block@vger.kernel.org, Tom Yan <tom.ty89@gmail.com>
-Subject: [RFC 3/3] libata-scsi: add optimal transfer length to block limits VPD
-Date: Wed, 13 Jul 2016 12:47:08 +0800
-Message-Id: <5659242e8546753768944757fc86988f1986585c.1468384890.git.tom.ty89@gmail.com>
-In-Reply-To: <1c10437e3cd9be8556e77462b40ad53be542dfba.1468384890.git.tom.ty89@gmail.com>
-References: <1c10437e3cd9be8556e77462b40ad53be542dfba.1468384890.git.tom.ty89@gmail.com>
-Sender: linux-ide-owner@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH next] Btrfs: fix comparison in __btrfs_map_block()
+To: =?UTF-8?Q?Vincent_Stehl=c3=a9?= <vincent.stehle@intel.com>,
+ linux-btrfs@vger.kernel.org
+References: <1465155145-10812-14-git-send-email-mchristi@redhat.com>
+ <1468595001-4270-1-git-send-email-vincent.stehle@intel.com>
+Cc: linux-block@vger.kernel.org, dm-devel@redhat.com,
+ Mike Christie <mchristi@redhat.com>, Jens Axboe <axboe@fb.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <17530fad-226a-77e7-ff76-3fca3b1ffc97@kernel.dk>
+Date: Mon, 18 Jul 2016 15:28:52 -0600
+MIME-Version: 1.0
+In-Reply-To: <1468595001-4270-1-git-send-email-vincent.stehle@intel.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-From: Tom Yan <tom.ty89@gmail.com>
+On 07/15/2016 09:03 AM, Vincent Stehl� wrote:
+> Add missing comparison to op in expression, which was forgotten when doing
+> the REQ_OP transition.
 
-As of commit 6b7e9cde4969 ("sd: Fix rw_max for devices that report
-an optimal xfer size"), the scsi disk driver (correctly) derive both
-of the queue limits "io_opt" and "max_sectors" from the optimal
-transfer length field.
+Thanks, added to the 4.8 branch.
 
-In case we would like the two limits to be derived from a value
-other than BLK_DEF_MAX_SECTORS for ATA disks in the future, this
-patch has made it easy.
-
-Signed-off-by: Tom Yan <tom.ty89@gmail.com>
-
-diff --git a/drivers/ata/libata-scsi.c b/drivers/ata/libata-scsi.c
-index bfec66f..ab75b5e 100644
---- a/drivers/ata/libata-scsi.c
-+++ b/drivers/ata/libata-scsi.c
-@@ -2305,6 +2305,13 @@ static unsigned int ata_scsiop_inq_b0(struct ata_scsi_args *args, u8 *rbuf)
- 	put_unaligned_be16(min_io_sectors, &rbuf[6]);
- 
- 	/*
-+	 * Optimal transfer length.
-+	 *
-+	 * This is used to derive the queue limit "max_sector" and "io_opt".
-+	 */
-+	put_unaligned_be32(BLK_DEF_MAX_SECTORS, &rbuf[12]);
-+
-+	/*
- 	 * Optimal unmap granularity.
- 	 *
- 	 * The ATA spec doesn't even know about a granularity or alignment
 -- 
-2.9.0
-
+Jens Axboe
