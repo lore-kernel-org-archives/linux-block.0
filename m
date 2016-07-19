@@ -1,52 +1,59 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f47.google.com ([74.125.82.47]:38229 "EHLO
-	mail-wm0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750944AbcGCI0G (ORCPT
-	<rfc822;linux-block@vger.kernel.org>); Sun, 3 Jul 2016 04:26:06 -0400
-MIME-Version: 1.0
-In-Reply-To: <CACVXFVOFpJqPLjw2z8jKEg_2XD2AEc8_wyQTEv2M9rz2xTqt2g@mail.gmail.com>
-References: <CAOQ4uxhEzr=yaFPO4ZVzndct84VC6c57W5DNEtqUHUcBjdTjQg@mail.gmail.com>
- <CACVXFVOFpJqPLjw2z8jKEg_2XD2AEc8_wyQTEv2M9rz2xTqt2g@mail.gmail.com>
-From: Amir Goldstein <amir73il@gmail.com>
-Date: Sun, 3 Jul 2016 11:26:03 +0300
-Message-ID: <CAOQ4uxjsWJkgr1sJ3_PaZiCswzuwSDPfcHA6z3yWk6EdcO9quQ@mail.gmail.com>
-Subject: Re: Question about loop device DIO/AIO and FLUSH
-To: Ming Lei <ming.lei@canonical.com>
-Cc: linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-	linux-block <linux-block@vger.kernel.org>,
-	Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@fb.com>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <BATV+a6fbff1bfc78a84bb09b+4713+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org
+Subject: [PATCH 3/3] block: shrink bio size again
+Date: Tue, 19 Jul 2016 11:28:43 +0200
+Message-Id: <1468920523-3189-4-git-send-email-hch@lst.de>
+In-Reply-To: <1468920523-3189-1-git-send-email-hch@lst.de>
+References: <1468920523-3189-1-git-send-email-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-On Fri, Jul 1, 2016 at 9:57 AM, Ming Lei <ming.lei@canonical.com> wrote:
-> On Fri, Jul 1, 2016 at 4:54 AM, Amir Goldstein <amir73il@gmail.com> wrote:
->> Hi Ming,
->>
->> I was reading through the code of loop DIO/AIO
->> and I was wondering whether lo_req_flush() really
->> honors REQ_FLUSH by calling  vfs_fsync() on a backing file
->> that is open with O_DIRECT?
->
-> From view of device, REQ_FLUSH just flushs the cache inside
-> drive to medium.
->
->>
->> Shouldn't lo_req_flush() actually wait for completion of
->> all the in-flight loop AIO requests to complete?
->
-> I think it isn't needed, just like the flush handling in blk-flush.c, and
-> it just works for completed I/O.
+The recent ops split grew the bio by adding the new ioprio field.
+Shrink it again by using a 16-bit field for the bi_flags value and
+filling the holes near the beginning of the structure.
 
-Thanks Ming and Christoph.
-I see what I was missing.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Reviewed-by: Mike Christie <mchristi@redhat.com>
+---
+ include/linux/blk_types.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
->
->> Am I missing something?
->>
->> Thanks,
->> Amir.
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-block" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index 4494b6c..f254eb2 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -26,11 +26,11 @@ typedef void (bio_destructor_t) (struct bio *);
+ struct bio {
+ 	struct bio		*bi_next;	/* request queue link */
+ 	struct block_device	*bi_bdev;
+-	unsigned int		bi_flags;	/* status, command, etc */
+ 	int			bi_error;
+ 	unsigned int		bi_rw;		/* bottom bits req flags,
+ 						 * top bits REQ_OP
+ 						 */
++	unsigned short		bi_flags;	/* status, command, etc */
+ 	unsigned short		bi_ioprio;
+ 
+ 	struct bvec_iter	bi_iter;
+@@ -116,7 +116,7 @@ struct bio {
+  * Flags starting here get preserved by bio_reset() - this includes
+  * BVEC_POOL_IDX()
+  */
+-#define BIO_RESET_BITS	13
++#define BIO_RESET_BITS	10
+ 
+ /*
+  * We support 6 different bvec pools, the last one is magic in that it
+@@ -131,7 +131,7 @@ struct bio {
+  * freed.
+  */
+ #define BVEC_POOL_BITS		(4)
+-#define BVEC_POOL_OFFSET	(32 - BVEC_POOL_BITS)
++#define BVEC_POOL_OFFSET	(16 - BVEC_POOL_BITS)
+ #define BVEC_POOL_IDX(bio)	((bio)->bi_flags >> BVEC_POOL_OFFSET)
+ 
+ #endif /* CONFIG_BLOCK */
+-- 
+2.1.4
