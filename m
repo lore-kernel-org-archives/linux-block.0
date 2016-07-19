@@ -1,82 +1,182 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f65.google.com ([74.125.82.65]:33397 "EHLO
-	mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756469AbcGGHyj (ORCPT
-	<rfc822;linux-block@vger.kernel.org>); Thu, 7 Jul 2016 03:54:39 -0400
-Received: by mail-wm0-f65.google.com with SMTP id n127so997100wme.0
-        for <linux-block@vger.kernel.org>; Thu, 07 Jul 2016 00:54:39 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	axboe@fb.com
-Cc: Johannes Thumshirn <jthumshirn@suse.de>,
-	=?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [PATCH 05/17] lightnvm: Make functions not used by ouside static
-Date: Thu,  7 Jul 2016 09:54:11 +0200
-Message-Id: <1467878063-22919-6-git-send-email-m@bjorling.me>
-In-Reply-To: <1467878063-22919-1-git-send-email-m@bjorling.me>
-References: <1467878063-22919-1-git-send-email-m@bjorling.me>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <BATV+a6fbff1bfc78a84bb09b+4713+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org
+Subject: [PATCH 5/7] target: stop using blk_make_request
+Date: Tue, 19 Jul 2016 11:31:52 +0200
+Message-Id: <1468920714-4304-6-git-send-email-hch@lst.de>
+In-Reply-To: <1468920714-4304-1-git-send-email-hch@lst.de>
+References: <1468920714-4304-1-git-send-email-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Johannes Thumshirn <jthumshirn@suse.de>
+Using blk_rq_append_bio allows to append the bios to the request
+directly instead of having to build up a list first, and also
+allows to have a single code path for requests with or without
+data attached to them.
 
-Mark functions not used by ouside of thier implementing file as static.
-
-Signed-off-by: Johannes Thumshirn <jthumshirn@suse.de>
-Signed-off-by: Matias Bjørling <m@bjorling.me>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/lightnvm/core.c   | 2 +-
- drivers/lightnvm/sysblk.c | 8 +++++---
- 2 files changed, 6 insertions(+), 4 deletions(-)
+ drivers/target/target_core_pscsi.c | 87 +++++++++++++++-----------------------
+ 1 file changed, 34 insertions(+), 53 deletions(-)
 
-diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-index 13993c9..8beb9c0 100644
---- a/drivers/lightnvm/core.c
-+++ b/drivers/lightnvm/core.c
-@@ -110,7 +110,7 @@ static struct nvmm_type *nvm_find_mgr_type(const char *name)
- 	return NULL;
+diff --git a/drivers/target/target_core_pscsi.c b/drivers/target/target_core_pscsi.c
+index 81564c8..9125d93 100644
+--- a/drivers/target/target_core_pscsi.c
++++ b/drivers/target/target_core_pscsi.c
+@@ -876,19 +876,19 @@ static inline struct bio *pscsi_get_bio(int nr_vecs)
+ 
+ static sense_reason_t
+ pscsi_map_sg(struct se_cmd *cmd, struct scatterlist *sgl, u32 sgl_nents,
+-		enum dma_data_direction data_direction, struct bio **hbio)
++		struct request *req)
+ {
+ 	struct pscsi_dev_virt *pdv = PSCSI_DEV(cmd->se_dev);
+-	struct bio *bio = NULL, *tbio = NULL;
++	struct bio *bio = NULL;
+ 	struct page *page;
+ 	struct scatterlist *sg;
+ 	u32 data_len = cmd->data_length, i, len, bytes, off;
+ 	int nr_pages = (cmd->data_length + sgl[0].offset +
+ 			PAGE_SIZE - 1) >> PAGE_SHIFT;
+ 	int nr_vecs = 0, rc;
+-	int rw = (data_direction == DMA_TO_DEVICE);
++	int rw = (cmd->data_direction == DMA_TO_DEVICE);
+ 
+-	*hbio = NULL;
++	BUG_ON(!cmd->data_length);
+ 
+ 	pr_debug("PSCSI: nr_pages: %d\n", nr_pages);
+ 
+@@ -927,16 +927,6 @@ pscsi_map_sg(struct se_cmd *cmd, struct scatterlist *sgl, u32 sgl_nents,
+ 				pr_debug("PSCSI: Allocated bio: %p,"
+ 					" dir: %s nr_vecs: %d\n", bio,
+ 					(rw) ? "rw" : "r", nr_vecs);
+-				/*
+-				 * Set *hbio pointer to handle the case:
+-				 * nr_pages > BIO_MAX_PAGES, where additional
+-				 * bios need to be added to complete a given
+-				 * command.
+-				 */
+-				if (!*hbio)
+-					*hbio = tbio = bio;
+-				else
+-					tbio = tbio->bi_next = bio;
+ 			}
+ 
+ 			pr_debug("PSCSI: Calling bio_add_pc_page() i: %d"
+@@ -955,11 +945,16 @@ pscsi_map_sg(struct se_cmd *cmd, struct scatterlist *sgl, u32 sgl_nents,
+ 				pr_debug("PSCSI: Reached bio->bi_vcnt max:"
+ 					" %d i: %d bio: %p, allocating another"
+ 					" bio\n", bio->bi_vcnt, i, bio);
++
++				rc = blk_rq_append_bio(req, bio);
++				if (rc) {
++					pr_err("pSCSI: failed to append bio\n");
++					goto fail;
++				}
++
+ 				/*
+ 				 * Clear the pointer so that another bio will
+-				 * be allocated with pscsi_get_bio() above, the
+-				 * current bio has already been set *tbio and
+-				 * bio->bi_next.
++				 * be allocated with pscsi_get_bio() above.
+ 				 */
+ 				bio = NULL;
+ 			}
+@@ -968,13 +963,16 @@ pscsi_map_sg(struct se_cmd *cmd, struct scatterlist *sgl, u32 sgl_nents,
+ 		}
+ 	}
+ 
++	if (bio) {
++		rc = blk_rq_append_bio(req, bio);
++		if (rc) {
++			pr_err("pSCSI: failed to append bio\n");
++			goto fail;
++		}
++	}
++
+ 	return 0;
+ fail:
+-	while (*hbio) {
+-		bio = *hbio;
+-		*hbio = (*hbio)->bi_next;
+-		bio_endio(bio);
+-	}
+ 	return TCM_LOGICAL_UNIT_COMMUNICATION_FAILURE;
  }
  
--struct nvmm_type *nvm_init_mgr(struct nvm_dev *dev)
-+static struct nvmm_type *nvm_init_mgr(struct nvm_dev *dev)
+@@ -992,11 +990,9 @@ pscsi_execute_cmd(struct se_cmd *cmd)
  {
- 	struct nvmm_type *mt;
- 	int ret;
-diff --git a/drivers/lightnvm/sysblk.c b/drivers/lightnvm/sysblk.c
-index 994697a..a75bd28 100644
---- a/drivers/lightnvm/sysblk.c
-+++ b/drivers/lightnvm/sysblk.c
-@@ -39,7 +39,8 @@ static inline int scan_ppa_idx(int row, int blkid)
- 	return (row * MAX_BLKS_PR_SYSBLK) + blkid;
- }
+ 	struct scatterlist *sgl = cmd->t_data_sg;
+ 	u32 sgl_nents = cmd->t_data_nents;
+-	enum dma_data_direction data_direction = cmd->data_direction;
+ 	struct pscsi_dev_virt *pdv = PSCSI_DEV(cmd->se_dev);
+ 	struct pscsi_plugin_task *pt;
+ 	struct request *req;
+-	struct bio *hbio;
+ 	sense_reason_t ret;
  
--void nvm_sysblk_to_cpu(struct nvm_sb_info *info, struct nvm_system_block *sb)
-+static void nvm_sysblk_to_cpu(struct nvm_sb_info *info,
-+			      struct nvm_system_block *sb)
- {
- 	info->seqnr = be32_to_cpu(sb->seqnr);
- 	info->erase_cnt = be32_to_cpu(sb->erase_cnt);
-@@ -48,7 +49,8 @@ void nvm_sysblk_to_cpu(struct nvm_sb_info *info, struct nvm_system_block *sb)
- 	info->fs_ppa.ppa = be64_to_cpu(sb->fs_ppa);
- }
+ 	/*
+@@ -1012,31 +1008,21 @@ pscsi_execute_cmd(struct se_cmd *cmd)
+ 	memcpy(pt->pscsi_cdb, cmd->t_task_cdb,
+ 		scsi_command_size(cmd->t_task_cdb));
  
--void nvm_cpu_to_sysblk(struct nvm_system_block *sb, struct nvm_sb_info *info)
-+static void nvm_cpu_to_sysblk(struct nvm_system_block *sb,
-+			      struct nvm_sb_info *info)
- {
- 	sb->magic = cpu_to_be32(NVM_SYSBLK_MAGIC);
- 	sb->seqnr = cpu_to_be32(info->seqnr);
-@@ -86,7 +88,7 @@ static int nvm_setup_sysblks(struct nvm_dev *dev, struct ppa_addr *sysblk_ppas)
- 	return nr_rows;
- }
+-	if (!sgl) {
+-		req = blk_get_request(pdv->pdv_sd->request_queue,
+-				(data_direction == DMA_TO_DEVICE),
+-				GFP_KERNEL);
+-		if (IS_ERR(req)) {
+-			pr_err("PSCSI: blk_get_request() failed\n");
+-			ret = TCM_LOGICAL_UNIT_COMMUNICATION_FAILURE;
+-			goto fail;
+-		}
++	req = blk_get_request(pdv->pdv_sd->request_queue,
++			(cmd->data_direction == DMA_TO_DEVICE),
++			GFP_KERNEL);
++	if (IS_ERR(req)) {
++		pr_err("PSCSI: blk_get_request() failed\n");
++		ret = TCM_LOGICAL_UNIT_COMMUNICATION_FAILURE;
++		goto fail;
++	}
  
--void nvm_setup_sysblk_scan(struct nvm_dev *dev, struct sysblk_scan *s,
-+static void nvm_setup_sysblk_scan(struct nvm_dev *dev, struct sysblk_scan *s,
- 						struct ppa_addr *sysblk_ppas)
- {
- 	memset(s, 0, sizeof(struct sysblk_scan));
+-		blk_rq_set_block_pc(req);
+-	} else {
+-		BUG_ON(!cmd->data_length);
++	blk_rq_set_block_pc(req);
+ 
+-		ret = pscsi_map_sg(cmd, sgl, sgl_nents, data_direction, &hbio);
++	if (sgl) {
++		ret = pscsi_map_sg(cmd, sgl, sgl_nents, req);
+ 		if (ret)
+-			goto fail;
+-
+-		req = blk_make_request(pdv->pdv_sd->request_queue, hbio,
+-				       GFP_KERNEL);
+-		if (IS_ERR(req)) {
+-			pr_err("pSCSI: blk_make_request() failed\n");
+-			ret = TCM_LOGICAL_UNIT_COMMUNICATION_FAILURE;
+-			goto fail_free_bio;
+-		}
++			goto fail_put_request;
+ 	}
+ 
+ 	req->end_io = pscsi_req_done;
+@@ -1057,13 +1043,8 @@ pscsi_execute_cmd(struct se_cmd *cmd)
+ 
+ 	return 0;
+ 
+-fail_free_bio:
+-	while (hbio) {
+-		struct bio *bio = hbio;
+-		hbio = hbio->bi_next;
+-		bio_endio(bio);
+-	}
+-	ret = TCM_LOGICAL_UNIT_COMMUNICATION_FAILURE;
++fail_put_request:
++	blk_put_request(req);
+ fail:
+ 	kfree(pt);
+ 	return ret;
 -- 
 2.1.4
-
