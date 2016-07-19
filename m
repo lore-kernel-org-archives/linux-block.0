@@ -1,49 +1,76 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:48752 "EHLO
-	esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752618AbcGTBLY convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-block@vger.kernel.org>);
-	Tue, 19 Jul 2016 21:11:24 -0400
-Subject: Re: [PATCH 6/6] block: Add 'BLK_MQ_RQ_QUEUE_DONE' return value
-To: Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@fb.com>
+Received: from mx2.suse.de ([195.135.220.15]:59824 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753254AbcGSNUn (ORCPT <rfc822;linux-block@vger.kernel.org>);
+	Tue, 19 Jul 2016 09:20:43 -0400
+From: Hannes Reinecke <hare@suse.de>
+To: Jens Axboe <axboe@fb.com>
+Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+	Damien Le Moal <damien.lemoal@hgst.com>,
+	Hannes Reinecke <hare@suse.de>, Hannes Reinecke <hare@suse.com>
+Subject: [PATCH 6/6] block: Add 'BLK_MQ_RQ_QUEUE_DONE' return value
+Date: Tue, 19 Jul 2016 15:20:39 +0200
+Message-Id: <1468934439-93579-7-git-send-email-hare@suse.de>
+In-Reply-To: <1468934439-93579-1-git-send-email-hare@suse.de>
 References: <1468934439-93579-1-git-send-email-hare@suse.de>
- <1468934439-93579-7-git-send-email-hare@suse.de>
-CC: <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
-	Hannes Reinecke <hare@suse.com>
-From: Damien Le Moal <damien.lemoal@hgst.com>
-Message-ID: <b4fcf45d-91f0-6633-b6aa-28a96850e873@hgst.com>
-Date: Wed, 20 Jul 2016 10:11:11 +0900
-MIME-Version: 1.0
-In-Reply-To: <1468934439-93579-7-git-send-email-hare@suse.de>
-Content-Type: text/plain; charset="windows-1252"; format="flowed"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
+Add a return value BLK_MQ_RQ_QUEUE_DONE to terminate a request
+without error.
 
-On 7/19/16 22:20, Hannes Reinecke wrote:
-> Add a return value BLK_MQ_RQ_QUEUE_DONE to terminate a request
-> without error.
->
-> Signed-off-by: Hannes Reinecke <hare@suse.com>
-> ---
->  block/blk-mq.c          | 1 +
->  drivers/scsi/scsi_lib.c | 3 +++
->  include/linux/blk-mq.h  | 1 +
->  3 files changed, 5 insertions(+)
+Signed-off-by: Hannes Reinecke <hare@suse.com>
+---
+ block/blk-mq.c          | 1 +
+ drivers/scsi/scsi_lib.c | 3 +++
+ include/linux/blk-mq.h  | 1 +
+ 3 files changed, 5 insertions(+)
 
-Reviewed-by: Damien Le Moal <damien.lemoal@hgst.com>
-Tested-by: Damien Le Moal <damien.lemoal@hgst.com>
-
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 7df9c92..cd25d68 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -793,6 +793,7 @@ static void __blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx)
+ 			pr_err("blk-mq: bad return on queue: %d\n", ret);
+ 		case BLK_MQ_RQ_QUEUE_ERROR:
+ 			rq->errors = -EIO;
++		case BLK_MQ_RQ_QUEUE_DONE:
+ 			blk_mq_end_request(rq, rq->errors);
+ 			break;
+ 		}
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index f112926..d74108b 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -1802,6 +1802,8 @@ static inline int prep_to_mq(int ret)
+ 		return 0;
+ 	case BLKPREP_DEFER:
+ 		return BLK_MQ_RQ_QUEUE_BUSY;
++	case BLKPREP_DONE:
++		return BLK_MQ_RQ_QUEUE_DONE;
+ 	default:
+ 		return BLK_MQ_RQ_QUEUE_ERROR;
+ 	}
+@@ -1945,6 +1947,7 @@ out:
+ 			blk_mq_delay_queue(hctx, SCSI_QUEUE_DELAY);
+ 		break;
+ 	case BLK_MQ_RQ_QUEUE_ERROR:
++	case BLK_MQ_RQ_QUEUE_DONE:
+ 		/*
+ 		 * Make sure to release all allocated ressources when
+ 		 * we hit an error, as we will never see this command
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 2498fdf..f7a9e97 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -151,6 +151,7 @@ enum {
+ 	BLK_MQ_RQ_QUEUE_OK	= 0,	/* queued fine */
+ 	BLK_MQ_RQ_QUEUE_BUSY	= 1,	/* requeue IO for later */
+ 	BLK_MQ_RQ_QUEUE_ERROR	= 2,	/* end IO with error */
++	BLK_MQ_RQ_QUEUE_DONE	= 3,	/* end IO w/o error */
+ 
+ 	BLK_MQ_F_SHOULD_MERGE	= 1 << 0,
+ 	BLK_MQ_F_TAG_SHARED	= 1 << 1,
 -- 
-Damien Le Moal, Ph.D.
-Sr. Manager, System Software Group, HGST Research,
-HGST, a Western Digital brand
-Damien.LeMoal@hgst.com
-(+81) 0466-98-3593 (ext. 513593)
-1 kirihara-cho, Fujisawa,
-Kanagawa, 252-0888 Japan
-www.hgst.com
-Western Digital Corporation (and its subsidiaries) E-mail Confidentiality Notice & Disclaimer:
-
-This e-mail and any files transmitted with it may contain confidential or legally privileged information of WDC and/or its affiliates, and are intended solely for the use of the individual or entity to which they are addressed. If you are not the intended recipient, any disclosure, copying, distribution or any action taken or omitted to be taken in reliance on it, is prohibited. If you have received this e-mail in error, please notify the sender immediately and delete the e-mail in its entirety from your system.
+1.8.5.6
 
