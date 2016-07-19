@@ -1,48 +1,61 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-	Andreas Dilger <adilger.kernel@dilger.ca>,
-	Jan Kara <jack@suse.com>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-	Hugh Dickins <hughd@google.com>,
-	Andrea Arcangeli <aarcange@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Dave Hansen <dave.hansen@intel.com>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	Matthew Wilcox <willy@infradead.org>,
-	Ross Zwisler <ross.zwisler@linux.intel.com>,
-	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	linux-block@vger.kernel.org,
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv1, RFC 11/33] thp: allow splitting non-shmem file-backed THPs
-Date: Tue, 26 Jul 2016 03:35:13 +0300
-Message-Id: <1469493335-3622-12-git-send-email-kirill.shutemov@linux.intel.com>
-In-Reply-To: <1469493335-3622-1-git-send-email-kirill.shutemov@linux.intel.com>
-References: <1469493335-3622-1-git-send-email-kirill.shutemov@linux.intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <BATV+a6fbff1bfc78a84bb09b+4713+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org
+Subject: [PATCH 2/7] virtio_blk: use blk_rq_map_kern
+Date: Tue, 19 Jul 2016 11:31:49 +0200
+Message-Id: <1468920714-4304-3-git-send-email-hch@lst.de>
+In-Reply-To: <1468920714-4304-1-git-send-email-hch@lst.de>
+References: <1468920714-4304-1-git-send-email-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-split_huge_page() is ready to handle file-backed huge pages, we only
-need to remove one guarding VM_BUG_ON_PAGE().
+Similar to how SCSI and NVMe prepare passthrough requests.  This avoids
+poking into request internals too much.
 
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- mm/huge_memory.c | 1 -
- 1 file changed, 1 deletion(-)
+ drivers/block/virtio_blk.c | 22 ++++++++++------------
+ 1 file changed, 10 insertions(+), 12 deletions(-)
 
-diff --git a/mm/huge_memory.c b/mm/huge_memory.c
-index c1444a99a583..7f1271c38cb9 100644
---- a/mm/huge_memory.c
-+++ b/mm/huge_memory.c
-@@ -2004,7 +2004,6 @@ int split_huge_page_to_list(struct page *page, struct list_head *list)
+diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+index 5fd2e0a..a85a143 100644
+--- a/drivers/block/virtio_blk.c
++++ b/drivers/block/virtio_blk.c
+@@ -236,25 +236,23 @@ static int virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
+ static int virtblk_get_id(struct gendisk *disk, char *id_str)
+ {
+ 	struct virtio_blk *vblk = disk->private_data;
++	struct request_queue *q = vblk->disk->queue;
+ 	struct request *req;
+-	struct bio *bio;
+ 	int err;
  
- 	VM_BUG_ON_PAGE(is_huge_zero_page(page), page);
- 	VM_BUG_ON_PAGE(!PageLocked(page), page);
--	VM_BUG_ON_PAGE(!PageSwapBacked(page), page);
- 	VM_BUG_ON_PAGE(!PageCompound(page), page);
+-	bio = bio_map_kern(vblk->disk->queue, id_str, VIRTIO_BLK_ID_BYTES,
+-			   GFP_KERNEL);
+-	if (IS_ERR(bio))
+-		return PTR_ERR(bio);
+-
+-	req = blk_make_request(vblk->disk->queue, bio, GFP_KERNEL);
+-	if (IS_ERR(req)) {
+-		bio_put(bio);
++	req = blk_get_request(q, READ, GFP_KERNEL);
++	if (IS_ERR(req))
+ 		return PTR_ERR(req);
+-	}
+-
++	blk_rq_set_block_pc(req);
+ 	req->cmd_type = REQ_TYPE_DRV_PRIV;
++
++	err = blk_rq_map_kern(q, req, id_str, VIRTIO_BLK_ID_BYTES, GFP_KERNEL);
++	if (err)
++		goto out;
++
+ 	err = blk_execute_rq(vblk->disk->queue, vblk->disk, req, false);
++out:
+ 	blk_put_request(req);
+-
+ 	return err;
+ }
  
- 	if (PageAnon(head)) {
 -- 
-2.8.1
-
+2.1.4
