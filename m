@@ -1,46 +1,100 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:32961 "EHLO
-	esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752859AbcGTBH3 convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-block@vger.kernel.org>);
-	Tue, 19 Jul 2016 21:07:29 -0400
-Subject: Re: [PATCH 4/6] block: Add 'zoned' sysfs queue attribute
-To: Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@fb.com>
+Received: from mx2.suse.de ([195.135.220.15]:59851 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753408AbcGSNUp (ORCPT <rfc822;linux-block@vger.kernel.org>);
+	Tue, 19 Jul 2016 09:20:45 -0400
+From: Hannes Reinecke <hare@suse.de>
+To: Jens Axboe <axboe@fb.com>
+Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+	Damien Le Moal <damien.lemoal@hgst.com>,
+	Hannes Reinecke <hare@suse.de>
+Subject: [PATCH 4/6] block: Add 'zoned' sysfs queue attribute
+Date: Tue, 19 Jul 2016 15:20:37 +0200
+Message-Id: <1468934439-93579-5-git-send-email-hare@suse.de>
+In-Reply-To: <1468934439-93579-1-git-send-email-hare@suse.de>
 References: <1468934439-93579-1-git-send-email-hare@suse.de>
- <1468934439-93579-5-git-send-email-hare@suse.de>
-CC: <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>
-From: Damien Le Moal <damien.lemoal@hgst.com>
-Message-ID: <d8b161de-7178-48c6-45d0-1c5f1d834f58@hgst.com>
-Date: Wed, 20 Jul 2016 10:07:17 +0900
-MIME-Version: 1.0
-In-Reply-To: <1468934439-93579-5-git-send-email-hare@suse.de>
-Content-Type: text/plain; charset="windows-1252"; format="flowed"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
+Add a sysfs queue attribute 'zoned' to display the zone layout
+for zoned devices.
 
-On 7/19/16 22:20, Hannes Reinecke wrote:
-> Add a sysfs queue attribute 'zoned' to display the zone layout
-> for zoned devices.
->
-> Signed-off-by: Hannes Reinecke <hare@suse.de>
-> ---
->  block/blk-sysfs.c | 46 ++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 46 insertions(+)
+Signed-off-by: Hannes Reinecke <hare@suse.de>
+---
+ block/blk-sysfs.c | 46 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 46 insertions(+)
 
-Reviewed-by: Damien Le Moal <damien.lemoal@hgst.com>
-Tested-by: Damien Le Moal <damien.lemoal@hgst.com>
-
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index 73200b8..7ffbc44 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -229,6 +229,42 @@ static ssize_t queue_max_hw_sectors_show(struct request_queue *q, char *page)
+ 	return queue_var_show(max_hw_sectors_kb, (page));
+ }
+ 
++#ifdef CONFIG_BLK_DEV_ZONED
++static ssize_t queue_zoned_show(struct request_queue *q, char *page)
++{
++	struct rb_node *node;
++	struct blk_zone *zone;
++	ssize_t offset = 0, end = 0;
++	size_t size = 0, num = 0;
++	enum blk_zone_type type = BLK_ZONE_TYPE_UNKNOWN;
++
++	for (node = rb_first(&q->zones); node; node = rb_next(node)) {
++		zone = rb_entry(node, struct blk_zone, node);
++		if (zone->type != type ||
++		    zone->len != size ||
++		    end != zone->start) {
++			if (size != 0)
++				offset += sprintf(page + offset, "%zu\n", num);
++			/* We can only store one page ... */
++			if (offset + 42 > PAGE_SIZE) {
++				offset += sprintf(page + offset, "...\n");
++				return offset;
++			}
++			size = zone->len;
++			type = zone->type;
++			offset += sprintf(page + offset, "%zu %zu %d ",
++					  zone->start, size, type);
++			num = 0;
++			end = zone->start + size;
++		} else
++			end += zone->len;
++		num++;
++	}
++	offset += sprintf(page + offset, "%zu\n", num);
++	return offset;
++}
++#endif
++
+ #define QUEUE_SYSFS_BIT_FNS(name, flag, neg)				\
+ static ssize_t								\
+ queue_show_##name(struct request_queue *q, char *page)			\
+@@ -484,6 +520,13 @@ static struct queue_sysfs_entry queue_write_same_max_entry = {
+ 	.show = queue_write_same_max_show,
+ };
+ 
++#ifdef CONFIG_BLK_DEV_ZONED
++static struct queue_sysfs_entry queue_zoned_entry = {
++	.attr = {.name = "zoned", .mode = S_IRUGO },
++	.show = queue_zoned_show,
++};
++#endif
++
+ static struct queue_sysfs_entry queue_nonrot_entry = {
+ 	.attr = {.name = "rotational", .mode = S_IRUGO | S_IWUSR },
+ 	.show = queue_show_nonrot,
+@@ -547,6 +590,9 @@ static struct attribute *default_attrs[] = {
+ 	&queue_discard_zeroes_data_entry.attr,
+ 	&queue_write_same_max_entry.attr,
+ 	&queue_nonrot_entry.attr,
++#ifdef CONFIG_BLK_DEV_ZONED
++	&queue_zoned_entry.attr,
++#endif
+ 	&queue_nomerges_entry.attr,
+ 	&queue_rq_affinity_entry.attr,
+ 	&queue_iostats_entry.attr,
 -- 
-Damien Le Moal, Ph.D.
-Sr. Manager, System Software Group, HGST Research,
-HGST, a Western Digital brand
-Damien.LeMoal@hgst.com
-(+81) 0466-98-3593 (ext. 513593)
-1 kirihara-cho, Fujisawa,
-Kanagawa, 252-0888 Japan
-www.hgst.com
-Western Digital Corporation (and its subsidiaries) E-mail Confidentiality Notice & Disclaimer:
-
-This e-mail and any files transmitted with it may contain confidential or legally privileged information of WDC and/or its affiliates, and are intended solely for the use of the individual or entity to which they are addressed. If you are not the intended recipient, any disclosure, copying, distribution or any action taken or omitted to be taken in reliance on it, is prohibited. If you have received this e-mail in error, please notify the sender immediately and delete the e-mail in its entirety from your system.
+1.8.5.6
 
