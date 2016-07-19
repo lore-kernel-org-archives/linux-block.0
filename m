@@ -1,121 +1,52 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga03.intel.com ([134.134.136.65]:35093 "EHLO mga03.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755378AbcGZAgF (ORCPT <rfc822;linux-block@vger.kernel.org>);
-	Mon, 25 Jul 2016 20:36:05 -0400
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-	Andreas Dilger <adilger.kernel@dilger.ca>,
-	Jan Kara <jack@suse.com>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-	Hugh Dickins <hughd@google.com>,
-	Andrea Arcangeli <aarcange@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Dave Hansen <dave.hansen@intel.com>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	Matthew Wilcox <willy@infradead.org>,
-	Ross Zwisler <ross.zwisler@linux.intel.com>,
-	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	linux-block@vger.kernel.org,
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv1, RFC 19/33] mm: make write_cache_pages() work on huge pages
-Date: Tue, 26 Jul 2016 03:35:21 +0300
-Message-Id: <1469493335-3622-20-git-send-email-kirill.shutemov@linux.intel.com>
-In-Reply-To: <1469493335-3622-1-git-send-email-kirill.shutemov@linux.intel.com>
-References: <1469493335-3622-1-git-send-email-kirill.shutemov@linux.intel.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+From: Hannes Reinecke <hare@suse.de>
+To: Mike Snitzer <snitzer@redhat.com>
+Cc: dm-devel-redhat.com@suse.de,
+	Damien Le Moal <damien.lemoal@hgst.com>,
+	linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@fb.com>,
+	Hannes Reinecke <hare@suse.de>
+Subject: [PATCH 0/3] dm-zoned target for ZBC devices
+Date: Tue, 19 Jul 2016 16:02:55 +0200
+Message-Id: <1468936978-9124-1-git-send-email-hare@suse.de>
+Sender: linux-scsi-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-We writeback whole huge page a time. Let's adjust iteration this way.
+Hi all,
 
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
----
- include/linux/mm.h      |  1 +
- include/linux/pagemap.h |  1 +
- mm/page-writeback.c     | 17 ++++++++++++-----
- 3 files changed, 14 insertions(+), 5 deletions(-)
+this patchset implements a 'dm-zoned' device-mapper target to handle
+ZBC host-managed (and host-aware) devices as 'normal' disks.
 
-diff --git a/include/linux/mm.h b/include/linux/mm.h
-index 08ed53eeedd5..b68d77912313 100644
---- a/include/linux/mm.h
-+++ b/include/linux/mm.h
-@@ -1054,6 +1054,7 @@ struct address_space *page_file_mapping(struct page *page)
-  */
- static inline pgoff_t page_index(struct page *page)
- {
-+	page = compound_head(page);
- 	if (unlikely(PageSwapCache(page)))
- 		return page_private(page);
- 	return page->index;
-diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
-index d9cf4e0f35dc..24e14ef1cfe5 100644
---- a/include/linux/pagemap.h
-+++ b/include/linux/pagemap.h
-@@ -518,6 +518,7 @@ static inline void wait_on_page_locked(struct page *page)
-  */
- static inline void wait_on_page_writeback(struct page *page)
- {
-+	page = compound_head(page);
- 	if (PageWriteback(page))
- 		wait_on_page_bit(page, PG_writeback);
- }
-diff --git a/mm/page-writeback.c b/mm/page-writeback.c
-index 573d138fa7a5..48409726d226 100644
---- a/mm/page-writeback.c
-+++ b/mm/page-writeback.c
-@@ -2246,7 +2246,7 @@ retry:
- 			 * mapping. However, page->index will not change
- 			 * because we have a reference on the page.
- 			 */
--			if (page->index > end) {
-+			if (page_to_pgoff(page) > end) {
- 				/*
- 				 * can't be range_cyclic (1st pass) because
- 				 * end == -1 in that case.
-@@ -2255,7 +2255,12 @@ retry:
- 				break;
- 			}
- 
--			done_index = page->index;
-+			done_index = page_to_pgoff(page);
-+			if (PageTransCompound(page)) {
-+				index = round_up(index + 1, HPAGE_PMD_NR);
-+				i += HPAGE_PMD_NR -
-+					done_index % HPAGE_PMD_NR - 1;
-+			}
- 
- 			lock_page(page);
- 
-@@ -2267,7 +2272,7 @@ retry:
- 			 * even if there is now a new, dirty page at the same
- 			 * pagecache address.
- 			 */
--			if (unlikely(page->mapping != mapping)) {
-+			if (unlikely(page_mapping(page) != mapping)) {
- continue_unlock:
- 				unlock_page(page);
- 				continue;
-@@ -2305,7 +2310,8 @@ continue_unlock:
- 					 * not be suitable for data integrity
- 					 * writeout).
- 					 */
--					done_index = page->index + 1;
-+					done_index = compound_head(page)->index
-+						+ hpage_nr_pages(page);
- 					done = 1;
- 					break;
- 				}
-@@ -2317,7 +2323,8 @@ continue_unlock:
- 			 * keep going until we have written all the pages
- 			 * we tagged for writeback prior to entering this loop.
- 			 */
--			if (--wbc->nr_to_write <= 0 &&
-+			wbc->nr_to_write -= hpage_nr_pages(page);
-+			if (wbc->nr_to_write <= 0 &&
- 			    wbc->sync_mode == WB_SYNC_NONE) {
- 				done = 1;
- 				break;
+Patch has been made over Tejuns 'libata/for-4.8' repository.
+It relies on the patchsets "Support for zoned block devices" and
+"Add support for ZBC host-managed devices" posted earlier.
+
+As usual, comments and reviews are welcome.
+
+Damien Le Moal (1):
+  dm-zoned: New device mapper target for zoned block devices
+
+Hannes Reinecke (2):
+  block: add flag for single-threaded submission
+  sd: enable single-threaded I/O submission for zoned devices
+
+ Documentation/device-mapper/dm-zoned.txt |  147 +++
+ block/blk-core.c                         |    2 +
+ drivers/md/Kconfig                       |   14 +
+ drivers/md/Makefile                      |    2 +
+ drivers/md/dm-zoned-io.c                 | 1186 ++++++++++++++++++
+ drivers/md/dm-zoned-meta.c               | 1950 ++++++++++++++++++++++++++++++
+ drivers/md/dm-zoned-reclaim.c            |  770 ++++++++++++
+ drivers/md/dm-zoned.h                    |  687 +++++++++++
+ drivers/scsi/sd.c                        |    1 +
+ include/linux/blkdev.h                   |    2 +
+ 10 files changed, 4761 insertions(+)
+ create mode 100644 Documentation/device-mapper/dm-zoned.txt
+ create mode 100644 drivers/md/dm-zoned-io.c
+ create mode 100644 drivers/md/dm-zoned-meta.c
+ create mode 100644 drivers/md/dm-zoned-reclaim.c
+ create mode 100644 drivers/md/dm-zoned.h
+
 -- 
-2.8.1
+1.8.5.6
 
