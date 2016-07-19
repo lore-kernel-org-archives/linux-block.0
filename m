@@ -1,94 +1,49 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f65.google.com ([74.125.82.65]:36611 "EHLO
-	mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752151AbcGAHVA (ORCPT
-	<rfc822;linux-block@vger.kernel.org>); Fri, 1 Jul 2016 03:21:00 -0400
-Received: by mail-wm0-f65.google.com with SMTP id c82so3079186wme.3
-        for <linux-block@vger.kernel.org>; Fri, 01 Jul 2016 00:20:59 -0700 (PDT)
-Subject: Re: [PATCH 5/6] lightnvm: expose device geometry through sysfs
-To: J Freyensee <james_p_freyensee@linux.intel.com>,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	axboe@fb.com, keith.busch@intel.com,
-	linux-nvme@lists.infradead.org, dm-devel@redhat.com
-References: <1467211901-26707-1-git-send-email-m@bjorling.me>
- <1467211901-26707-6-git-send-email-m@bjorling.me>
- <1467316875.21253.24.camel@linux.intel.com>
-Cc: "Simon A. F. Lund" <slund@cnexlabs.com>
-From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <m@bjorling.me>
-Message-ID: <577619D9.1080209@bjorling.me>
-Date: Fri, 1 Jul 2016 09:20:57 +0200
-MIME-Version: 1.0
-In-Reply-To: <1467316875.21253.24.camel@linux.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <BATV+a6fbff1bfc78a84bb09b+4713+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org
+Subject: [PATCH 7/7] block: unexport various bio mapping helpers
+Date: Tue, 19 Jul 2016 11:31:54 +0200
+Message-Id: <1468920714-4304-8-git-send-email-hch@lst.de>
+In-Reply-To: <1468920714-4304-1-git-send-email-hch@lst.de>
+References: <1468920714-4304-1-git-send-email-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-On 06/30/2016 10:01 PM, J Freyensee wrote:
-> On Wed, 2016-06-29 at 16:51 +0200, Matias Bjørling wrote:
->> From: "Simon A. F. Lund" <slund@cnexlabs.com>
->>
->> For a host to access an Open-Channel SSD, it has to know its
->> geometry,
->> so that it writes and reads at the appropriate device bounds.
->>
->> Currently, the geometry information is kept within the kernel, and
->> not
->> exported to user-space for consumption. This patch exposes the
->> configuration through sysfs and enables user-space libraries, such as
->> liblightnvm, to use the sysfs implementation to get the geometry of
->> an
->> Open-Channel SSD.
->>
->> The sysfs entries are stored within the device hierarchy, and can be
->> found using the "lightnvm" device type.
->>
->> An example configuration looks like this:
->>
->> /sys/class/nvme/
->> └── nvme0n1
->>     ├── capabilities: 3
->>     ├── device_mode: 1
->>     ├── channel_parallelism: 0
->>     ├── erase_max: 1000000
->>     ├── erase_typ: 1000000
->>     ├── flash_media_type: 0
->>     ├── media_capabilities: 0x00000001
->>     ├── media_type: 0
->>     ├── multiplane: 0x00010101
->>     ├── num_blocks: 1022
->>     ├── num_channels: 1
->>     ├── num_luns: 4
->>     ├── num_pages: 64
->>     ├── num_planes: 1
->>     ├── page_size: 4096
->>     ├── prog_max: 100000
->>     ├── prog_typ: 100000
->>     ├── read_max: 10000
->>     ├── read_typ: 10000
->>     ├── sector_oob_size: 0
->>     ├── sector_size: 4096
->>     ├── media_manager: gennvm
->>     ├── ppa_format: 0x380830082808001010102008
->>     ├── vendor_opcode: 0
->>     └── version: 1
->>
->
-> That is an awful lot of new things to add under nvme0n1-type sysfs
-> entries when there is already a decent amount of stuff under it.
->
+They are unused and potential new users really should use the
+blk_rq_map* versions.
 
-You are right. These are rightfully placed under /lightnvm in the sysfs 
-path. The description is wrong, will update it. Thanks Jay.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ block/bio.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-> Any chance these new things could be stuck under a separate sysfs
-> directory under each nvmeXnY device?  If these things are mainly
-> beneficial to LightNVM, it will be easier for a LightNVM newbie to
-> find, recognize, and consider all the important things in an Open
-> Channel SSD solution if it's under a separate directory.  And for
-> current SSD solutions that don't seem to need these things exposed in
-> sysfs for operation, it will make what is directly under nvmeXnY
-> directories less cluttered.
->
-> Thanks,
-> Jay
->
+diff --git a/block/bio.c b/block/bio.c
+index 848cd35..b88ed1c 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1097,7 +1097,6 @@ int bio_uncopy_user(struct bio *bio)
+ 	bio_put(bio);
+ 	return ret;
+ }
+-EXPORT_SYMBOL(bio_uncopy_user);
+ 
+ /**
+  *	bio_copy_user_iov	-	copy user data to bio
+@@ -1392,7 +1391,6 @@ void bio_unmap_user(struct bio *bio)
+ 	__bio_unmap_user(bio);
+ 	bio_put(bio);
+ }
+-EXPORT_SYMBOL(bio_unmap_user);
+ 
+ static void bio_map_kern_endio(struct bio *bio)
+ {
+@@ -1538,7 +1536,6 @@ cleanup:
+ 	bio_put(bio);
+ 	return ERR_PTR(-ENOMEM);
+ }
+-EXPORT_SYMBOL(bio_copy_kern);
+ 
+ /*
+  * bio_set_pages_dirty() and bio_check_pages_dirty() are support functions
+-- 
+2.1.4
