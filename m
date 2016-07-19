@@ -1,48 +1,74 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:18200 "EHLO
-	esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752583AbcGTBKr convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-block@vger.kernel.org>);
-	Tue, 19 Jul 2016 21:10:47 -0400
-Subject: Re: [PATCH 5/6] block: Introduce BLKPREP_DONE
-To: Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@fb.com>
+Received: from mx2.suse.de ([195.135.220.15]:59826 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753408AbcGSNUn (ORCPT <rfc822;linux-block@vger.kernel.org>);
+	Tue, 19 Jul 2016 09:20:43 -0400
+From: Hannes Reinecke <hare@suse.de>
+To: Jens Axboe <axboe@fb.com>
+Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+	Damien Le Moal <damien.lemoal@hgst.com>,
+	Hannes Reinecke <hare@suse.de>
+Subject: [PATCH 5/6] block: Introduce BLKPREP_DONE
+Date: Tue, 19 Jul 2016 15:20:38 +0200
+Message-Id: <1468934439-93579-6-git-send-email-hare@suse.de>
+In-Reply-To: <1468934439-93579-1-git-send-email-hare@suse.de>
 References: <1468934439-93579-1-git-send-email-hare@suse.de>
- <1468934439-93579-6-git-send-email-hare@suse.de>
-CC: <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>
-From: Damien Le Moal <damien.lemoal@hgst.com>
-Message-ID: <29a17032-fe25-6a26-98a9-5fbab5e530ab@hgst.com>
-Date: Wed, 20 Jul 2016 10:10:35 +0900
-MIME-Version: 1.0
-In-Reply-To: <1468934439-93579-6-git-send-email-hare@suse.de>
-Content-Type: text/plain; charset="windows-1252"; format="flowed"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
+Add a new blkprep return code BLKPREP_DONE to signal completion
+without I/O error.
 
-On 7/19/16 22:20, Hannes Reinecke wrote:
-> Add a new blkprep return code BLKPREP_DONE to signal completion
-> without I/O error.
->
-> Signed-off-by: Hannes Reinecke <hare@suse.de>
-> ---
->  block/blk-core.c        | 6 +++++-
->  drivers/scsi/scsi_lib.c | 1 +
->  include/linux/blkdev.h  | 1 +
->  3 files changed, 7 insertions(+), 1 deletion(-)
+Signed-off-by: Hannes Reinecke <hare@suse.de>
+---
+ block/blk-core.c        | 6 +++++-
+ drivers/scsi/scsi_lib.c | 1 +
+ include/linux/blkdev.h  | 1 +
+ 3 files changed, 7 insertions(+), 1 deletion(-)
 
-Reviewed-by: Damien Le Moal <damien.lemoal@hgst.com>
-Tested-by: Damien Le Moal <damien.lemoal@hgst.com>
-
+diff --git a/block/blk-core.c b/block/blk-core.c
+index e273194..4bcf30a 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -2462,9 +2462,13 @@ struct request *blk_peek_request(struct request_queue *q)
+ 
+ 			rq = NULL;
+ 			break;
+-		} else if (ret == BLKPREP_KILL || ret == BLKPREP_INVALID) {
++		} else if (ret == BLKPREP_KILL || ret == BLKPREP_INVALID ||
++			   ret == BLKPREP_DONE) {
+ 			int err = (ret == BLKPREP_INVALID) ? -EREMOTEIO : -EIO;
+ 
++			if (ret == BLKPREP_DONE)
++				err = 0;
++
+ 			rq->cmd_flags |= REQ_QUIET;
+ 			/*
+ 			 * Mark this request as started so we don't trigger
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index b2e332a..f112926 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -1257,6 +1257,7 @@ scsi_prep_return(struct request_queue *q, struct request *req, int ret)
+ 	case BLKPREP_KILL:
+ 	case BLKPREP_INVALID:
+ 		req->errors = DID_NO_CONNECT << 16;
++	case BLKPREP_DONE:
+ 		/* release the command and kill it */
+ 		if (req->special) {
+ 			struct scsi_cmnd *cmd = req->special;
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index d5e3d8b..c351444 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -736,6 +736,7 @@ enum {
+ 	BLKPREP_KILL,		/* fatal error, kill, return -EIO */
+ 	BLKPREP_DEFER,		/* leave on queue */
+ 	BLKPREP_INVALID,	/* invalid command, kill, return -EREMOTEIO */
++	BLKPREP_DONE,		/* complete w/o error */
+ };
+ 
+ extern unsigned long blk_max_low_pfn, blk_max_pfn;
 -- 
-Damien Le Moal, Ph.D.
-Sr. Manager, System Software Group, HGST Research,
-HGST, a Western Digital brand
-Damien.LeMoal@hgst.com
-(+81) 0466-98-3593 (ext. 513593)
-1 kirihara-cho, Fujisawa,
-Kanagawa, 252-0888 Japan
-www.hgst.com
-Western Digital Corporation (and its subsidiaries) E-mail Confidentiality Notice & Disclaimer:
-
-This e-mail and any files transmitted with it may contain confidential or legally privileged information of WDC and/or its affiliates, and are intended solely for the use of the individual or entity to which they are addressed. If you are not the intended recipient, any disclosure, copying, distribution or any action taken or omitted to be taken in reliance on it, is prohibited. If you have received this e-mail in error, please notify the sender immediately and delete the e-mail in its entirety from your system.
+1.8.5.6
 
