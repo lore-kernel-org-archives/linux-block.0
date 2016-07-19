@@ -1,45 +1,41 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:61028 "EHLO
-	esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752915AbcGTBF2 convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-block@vger.kernel.org>);
-	Tue, 19 Jul 2016 21:05:28 -0400
-Subject: Re: [PATCH 2/6] block: update chunk_sectors in blk_stack_limits()
-To: Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@fb.com>
+Received: from mx2.suse.de ([195.135.220.15]:59850 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753215AbcGSNUp (ORCPT <rfc822;linux-block@vger.kernel.org>);
+	Tue, 19 Jul 2016 09:20:45 -0400
+From: Hannes Reinecke <hare@suse.de>
+To: Jens Axboe <axboe@fb.com>
+Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+	Damien Le Moal <damien.lemoal@hgst.com>,
+	Hannes Reinecke <hare@suse.de>, Hannes Reinecke <hare@suse.com>
+Subject: [PATCH 2/6] block: update chunk_sectors in blk_stack_limits()
+Date: Tue, 19 Jul 2016 15:20:35 +0200
+Message-Id: <1468934439-93579-3-git-send-email-hare@suse.de>
+In-Reply-To: <1468934439-93579-1-git-send-email-hare@suse.de>
 References: <1468934439-93579-1-git-send-email-hare@suse.de>
- <1468934439-93579-3-git-send-email-hare@suse.de>
-CC: <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
-	Hannes Reinecke <hare@suse.com>
-From: Damien Le Moal <damien.lemoal@hgst.com>
-Message-ID: <9e493a0d-2f25-e35d-580b-65284b88216b@hgst.com>
-Date: Wed, 20 Jul 2016 10:05:16 +0900
-MIME-Version: 1.0
-In-Reply-To: <1468934439-93579-3-git-send-email-hare@suse.de>
-Content-Type: text/plain; charset="windows-1252"; format="flowed"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
+Signed-off-by: Hannes Reinecke <hare@suse.com>
+---
+ block/blk-settings.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-
-On 7/19/16 22:20, Hannes Reinecke wrote:
-> Signed-off-by: Hannes Reinecke <hare@suse.com>
-> ---
->  block/blk-settings.c | 4 ++++
->  1 file changed, 4 insertions(+)
-
-Reviewed-by: Damien Le Moal <damien.lemoal@hgst.com>
-Tested-by: Damien Le Moal <damien.lemoal@hgst.com>
-
+diff --git a/block/blk-settings.c b/block/blk-settings.c
+index f679ae1..bfaf579 100644
+--- a/block/blk-settings.c
++++ b/block/blk-settings.c
+@@ -630,6 +630,10 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
+ 			t->discard_granularity;
+ 	}
+ 
++	if (b->chunk_sectors)
++		t->chunk_sectors = min_not_zero(t->chunk_sectors,
++						b->chunk_sectors);
++
+ 	return ret;
+ }
+ EXPORT_SYMBOL(blk_stack_limits);
 -- 
-Damien Le Moal, Ph.D.
-Sr. Manager, System Software Group, HGST Research,
-HGST, a Western Digital brand
-Damien.LeMoal@hgst.com
-(+81) 0466-98-3593 (ext. 513593)
-1 kirihara-cho, Fujisawa,
-Kanagawa, 252-0888 Japan
-www.hgst.com
-Western Digital Corporation (and its subsidiaries) E-mail Confidentiality Notice & Disclaimer:
-
-This e-mail and any files transmitted with it may contain confidential or legally privileged information of WDC and/or its affiliates, and are intended solely for the use of the individual or entity to which they are addressed. If you are not the intended recipient, any disclosure, copying, distribution or any action taken or omitted to be taken in reliance on it, is prohibited. If you have received this e-mail in error, please notify the sender immediately and delete the e-mail in its entirety from your system.
+1.8.5.6
 
