@@ -1,48 +1,43 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:39566 "EHLO
-	esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752746AbcGTBPY convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-block@vger.kernel.org>);
-	Tue, 19 Jul 2016 21:15:24 -0400
-Subject: Re: [PATCH 2/3] sd: enable single-threaded I/O submission for zoned
- devices
-To: Hannes Reinecke <hare@suse.de>, Mike Snitzer <snitzer@redhat.com>
+Received: from mx2.suse.de ([195.135.220.15]:38393 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753658AbcGSODF (ORCPT <rfc822;linux-block@vger.kernel.org>);
+	Tue, 19 Jul 2016 10:03:05 -0400
+From: Hannes Reinecke <hare@suse.de>
+To: Mike Snitzer <snitzer@redhat.com>
+Cc: dm-devel-redhat.com@suse.de,
+	Damien Le Moal <damien.lemoal@hgst.com>,
+	linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@fb.com>,
+	Hannes Reinecke <hare@suse.de>
+Subject: [PATCH 2/3] sd: enable single-threaded I/O submission for zoned devices
+Date: Tue, 19 Jul 2016 16:02:57 +0200
+Message-Id: <1468936978-9124-3-git-send-email-hare@suse.de>
+In-Reply-To: <1468936978-9124-1-git-send-email-hare@suse.de>
 References: <1468936978-9124-1-git-send-email-hare@suse.de>
- <1468936978-9124-3-git-send-email-hare@suse.de>
-CC: <linux-scsi@vger.kernel.org>, <linux-block@vger.kernel.org>,
-	Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@fb.com>
-From: Damien Le Moal <damien.lemoal@hgst.com>
-Message-ID: <e873ab94-40fd-1c35-378a-2074d58548fe@hgst.com>
-Date: Wed, 20 Jul 2016 10:15:12 +0900
-MIME-Version: 1.0
-In-Reply-To: <1468936978-9124-3-git-send-email-hare@suse.de>
-Content-Type: text/plain; charset="windows-1252"; format="flowed"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
+zoned devices require single-thread I/O submission to guarantee
+sequential I/O, so enable the block layer flag for it.
 
-On 7/19/16 23:02, Hannes Reinecke wrote:
-> zoned devices require single-thread I/O submission to guarantee
-> sequential I/O, so enable the block layer flag for it.
->
-> Signed-off-by: Hannes Reinecke <hare@suse.de>
-> ---
->  drivers/scsi/sd.c | 1 +
->  1 file changed, 1 insertion(+)
+Signed-off-by: Hannes Reinecke <hare@suse.de>
+---
+ drivers/scsi/sd.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Reviewed-by: Damien Le Moal <damien.lemoal@hgst.com>
-Tested-by: Damien Le Moal <damien.lemoal@hgst.com>
-
+diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
+index 4b704b0..44960fd 100644
+--- a/drivers/scsi/sd.c
++++ b/drivers/scsi/sd.c
+@@ -2154,6 +2154,7 @@ static void sd_read_zones(struct scsi_disk *sdkp, unsigned char *buffer)
+ 	blk_queue_chunk_sectors(sdkp->disk->queue,
+ 				logical_to_sectors(sdkp->device, zone_len));
+ 	sd_config_discard(sdkp, SD_ZBC_RESET_WP);
++	queue_flag_set_unlocked(QUEUE_FLAG_SINGLE, sdkp->disk->queue);
+ 
+ 	sd_zbc_setup(sdkp, buffer, SD_BUF_SIZE);
+ }
 -- 
-Damien Le Moal, Ph.D.
-Sr. Manager, System Software Group, HGST Research,
-HGST, a Western Digital brand
-Damien.LeMoal@hgst.com
-(+81) 0466-98-3593 (ext. 513593)
-1 kirihara-cho, Fujisawa,
-Kanagawa, 252-0888 Japan
-www.hgst.com
-Western Digital Corporation (and its subsidiaries) E-mail Confidentiality Notice & Disclaimer:
-
-This e-mail and any files transmitted with it may contain confidential or legally privileged information of WDC and/or its affiliates, and are intended solely for the use of the individual or entity to which they are addressed. If you are not the intended recipient, any disclosure, copying, distribution or any action taken or omitted to be taken in reliance on it, is prohibited. If you have received this e-mail in error, please notify the sender immediately and delete the e-mail in its entirety from your system.
+1.8.5.6
 
