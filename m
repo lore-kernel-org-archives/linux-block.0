@@ -1,33 +1,53 @@
-Return-Path: <hch@lst.de>
-Date: Fri, 8 Jul 2016 11:36:50 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: mst@redhat.com, ooo@electrozaur.com, nab@linux-iscsi.org,
-	linux-block@vger.kernel.org
-Subject: Re: passthrough request improvements V3
-Message-ID: <20160708093650.GB8682@lst.de>
-References: <1466068471-15746-1-git-send-email-hch@lst.de>
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Wed, 20 Jul 2016 11:30:52 -0400
+From: Tejun Heo <tj@kernel.org>
+To: =?utf-8?B?5byg55yf?= <zhangzhen507@163.com>
+Cc: aaronlee0817@163.com, axboe@kernel.dk, mlin@kernel.org, shli@kernel.org,
+	linux-kernel@vger.kernel.org, cgroup@vger.kernel.org,
+	linux-block@vger.kernel.org, zhen1.zhang@samsung.com,
+	yanzi.zhang@samsung.com, jiale0817.li@samsung.com
+Subject: Re: Cgroup: iops throttle problem
+Message-ID: <20160720153052.GE4574@htj.duckdns.org>
+References: <3aad6640.14fc7.155fe37ba10.Coremail.zhangzhen507@163.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1466068471-15746-1-git-send-email-hch@lst.de>
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <3aad6640.14fc7.155fe37ba10.Coremail.zhangzhen507@163.com>
 List-ID: <linux-block@vger.kernel.org>
 
-ping?  Seems like you were mostly happy with the previous versions,
-and I should have addressed all comments.
+Hello,
 
-On Thu, Jun 16, 2016 at 11:14:24AM +0200, Christoph Hellwig wrote:
-> These days we have a lot more users of struct request for driver internal
-> use than just REQ_TYPE_BLOCK_PC, so let's polish this infrastructure
-> up a bit.
+On Mon, Jul 18, 2016 at 09:35:12PM +0800, 张真 wrote:
+> Hello
+> My name is Zhen Zhang , me and Jiale Li recently test and analyze the cgroup
+> blkio functions.
+> We tested the buffered read a file using bio when the 
+> blkio.throttle.read_iops_device is set 1000.
+> The fio result file displays the iops is 13720 larger than 1000 when blocksize 
+> is 4K in fio.
+
+blk-throttle does allow bursts so the iops might go over the set limit
+for a short period.  Over time, it shouldn't be over the set limit.
+
+> We set different blocksize in fio:
+> 4K, 8K , 16K, 32K, 64K, 128K, 256K, 512K, 1024K
 > 
-> Changes since V2:
->  - really drop zeroing ->cmd from blk_get_request
->  - add ACK from Boaz
-> Changes since V1:
->  - keep blk_rq_set_block_pc for now and leave zeroing ->cmd in it
+> The iops in fio:
+> 13035, 7258, 3711, 1698, 907, 460, 228, 102, 54
+
+Looks like you were hitting the natural bandwidth limit of the device.
+
+> When bs is less than 64K, the iops is larger than 1000, when bs is larger than
+> 64K, the iops is less than 1000.
+> We tested it on ubuntu 16.04 with kernel 4.4.0
 > 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-block" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
----end quoted text---
+> Dose this a problem of blkio iops throttle?
+
+I don't know how the test was run but consistently going over the set
+limit isn't the expected behavior.
+
+Thanks.
+
+-- 
+tejun
