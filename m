@@ -1,38 +1,51 @@
-Return-Path: <houtao1@huawei.com>
-From: Hou Tao <houtao1@huawei.com>
-To: <linux-block@vger.kernel.org>
-CC: <axboe@kernel.dk>
-Subject: [PATCH] blkcg: kill unused field nr_undestroyed_grps
-Date: Tue, 26 Jul 2016 17:13:42 +0800
-Message-ID: <1469524422-63439-1-git-send-email-houtao1@huawei.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:22877 "EHLO
+	esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752495AbcGTBGN convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-block@vger.kernel.org>);
+	Tue, 19 Jul 2016 21:06:13 -0400
+Subject: Re: [PATCH 3/6] block: Implement support for zoned block devices
+To: Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@fb.com>
+References: <1468934439-93579-1-git-send-email-hare@suse.de>
+ <1468934439-93579-4-git-send-email-hare@suse.de>
+CC: <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>
+From: Damien Le Moal <damien.lemoal@hgst.com>
+Message-ID: <b5872a34-2729-85c5-8c49-486d31bb2d92@hgst.com>
+Date: Wed, 20 Jul 2016 10:05:58 +0900
 MIME-Version: 1.0
-Content-Type: text/plain
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <1468934439-93579-4-git-send-email-hare@suse.de>
+Content-Type: text/plain; charset="windows-1252"; format="flowed"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-'nr_undestroyed_grps' in struct throtl_data was used to count
-the number of throtl_grp related with throtl_data, but now
-throtl_grp is tracked by blkcg_gq, so it is useless anymore.
 
-Signed-off-by: Hou Tao <houtao1@huawei.com>
----
- block/blk-throttle.c | 5 -----
- 1 file changed, 5 deletions(-)
+On 7/19/16 22:20, Hannes Reinecke wrote:
+> Implement a RB-Tree holding the zone information and
+> add support functions for maintaining the RB-Tree.
+>
+> Signed-off-by: Hannes Reinecke <hare@suse.de>
+> ---
+>  block/Kconfig          |  9 +++++++
+>  block/Makefile         |  1 +
+>  block/blk-core.c       |  5 ++++
+>  block/blk-zoned.c      | 70 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>  include/linux/blkdev.h | 47 +++++++++++++++++++++++++++++++++
+>  5 files changed, 132 insertions(+)
+>  create mode 100644 block/blk-zoned.c
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 47a3e54..c5494e4 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -145,11 +145,6 @@ struct throtl_data
- 	/* Total Number of queued bios on READ and WRITE lists */
- 	unsigned int nr_queued[2];
- 
--	/*
--	 * number of total undestroyed groups
--	 */
--	unsigned int nr_undestroyed_grps;
--
- 	/* Work for dispatching throttled bios */
- 	struct work_struct dispatch_work;
- };
+Reviewed-by: Damien Le Moal <damien.lemoal@hgst.com>
+Tested-by: Damien Le Moal <damien.lemoal@hgst.com>
+
 -- 
-2.5.5
+Damien Le Moal, Ph.D.
+Sr. Manager, System Software Group, HGST Research,
+HGST, a Western Digital brand
+Damien.LeMoal@hgst.com
+(+81) 0466-98-3593 (ext. 513593)
+1 kirihara-cho, Fujisawa,
+Kanagawa, 252-0888 Japan
+www.hgst.com
+Western Digital Corporation (and its subsidiaries) E-mail Confidentiality Notice & Disclaimer:
+
+This e-mail and any files transmitted with it may contain confidential or legally privileged information of WDC and/or its affiliates, and are intended solely for the use of the individual or entity to which they are addressed. If you are not the intended recipient, any disclosure, copying, distribution or any action taken or omitted to be taken in reliance on it, is prohibited. If you have received this e-mail in error, please notify the sender immediately and delete the e-mail in its entirety from your system.
+
