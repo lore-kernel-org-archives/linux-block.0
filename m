@@ -1,30 +1,46 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.9]:45130 "EHLO
-	bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750917AbcGUF7g (ORCPT
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:57956 "EHLO
+	esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752338AbcGTBDE convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-block@vger.kernel.org>);
-	Thu, 21 Jul 2016 01:59:36 -0400
-Date: Wed, 20 Jul 2016 22:59:35 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Hannes Reinecke <hare@suse.de>
-Cc: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org, Damien Le Moal <damien.lemoal@hgst.com>
+	Tue, 19 Jul 2016 21:03:04 -0400
 Subject: Re: [PATCH 1/6] blk-sysfs: Add 'chunk_sectors' to sysfs attributes
-Message-ID: <20160721055935.GD14568@infradead.org>
+To: Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@fb.com>
 References: <1468934439-93579-1-git-send-email-hare@suse.de>
  <1468934439-93579-2-git-send-email-hare@suse.de>
+CC: <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>
+From: Damien Le Moal <damien.lemoal@hgst.com>
+Message-ID: <1413b8ac-1b6b-2b7f-b0ec-5ab5b0e412b4@hgst.com>
+Date: Wed, 20 Jul 2016 10:02:52 +0900
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <1468934439-93579-2-git-send-email-hare@suse.de>
+Content-Type: text/plain; charset="windows-1252"; format="flowed"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Tue, Jul 19, 2016 at 03:20:34PM +0200, Hannes Reinecke wrote:
+
+On 7/19/16 22:20, Hannes Reinecke wrote:
 > The queue limits already have a 'chunk_sectors' setting, so
 > we should be presenting it via sysfs.
-> 
+>
 > Signed-off-by: Hannes Reinecke <hare@suse.de>
+> ---
+>  block/blk-sysfs.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
 
-Looks fine for 4.8 independent of any ZBC implications:
+Reviewed-by: Damien Le Moal <damien.lemoal@hgst.com>
+Tested-by: Damien Le Moal <damien.lemoal@hgst.com>
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+-- 
+Damien Le Moal, Ph.D.
+Sr. Manager, System Software Group, HGST Research,
+HGST, a Western Digital brand
+Damien.LeMoal@hgst.com
+(+81) 0466-98-3593 (ext. 513593)
+1 kirihara-cho, Fujisawa,
+Kanagawa, 252-0888 Japan
+www.hgst.com
+Western Digital Corporation (and its subsidiaries) E-mail Confidentiality Notice & Disclaimer:
+
+This e-mail and any files transmitted with it may contain confidential or legally privileged information of WDC and/or its affiliates, and are intended solely for the use of the individual or entity to which they are addressed. If you are not the intended recipient, any disclosure, copying, distribution or any action taken or omitted to be taken in reliance on it, is prohibited. If you have received this e-mail in error, please notify the sender immediately and delete the e-mail in its entirety from your system.
+
