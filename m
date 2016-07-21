@@ -1,66 +1,47 @@
-Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: tglx@linutronix.de,
-	axboe@fb.com
-Subject: [PATCH 13/13] nvme: remove the post_scan callout
-Date: Mon,  4 Jul 2016 17:39:34 +0900
-Message-Id: <1467621574-8277-14-git-send-email-hch@lst.de>
-In-Reply-To: <1467621574-8277-1-git-send-email-hch@lst.de>
-References: <1467621574-8277-1-git-send-email-hch@lst.de>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
-List-Post: <mailto:linux-nvme@lists.infradead.org>
-List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
-Cc: linux-block@vger.kernel.org, linux-pci@vger.kernel.org, agordeev@redhat.com,
- linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] block: Fix front merge check
+To: Damien Le Moal <damien.lemoal@hgst.com>, Jens Axboe <axboe@fb.com>,
+ linux-block@vger.kernel.org, hch@lst.de, hare@suse.de
+References: <1468387413-2754-1-git-send-email-damien.lemoal@hgst.com>
+ <57866A2B.5000403@fb.com> <8a365634-e2e7-45d9-a86d-10894212a4d2@hgst.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <9cc4fbbe-4cdd-d9b0-41ca-5dcb13cc6409@kernel.dk>
+Date: Wed, 20 Jul 2016 21:38:43 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
-Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
+In-Reply-To: <8a365634-e2e7-45d9-a86d-10894212a4d2@hgst.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-No need now that we don't have to reverse engineer the irq affinity.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/nvme/host/core.c | 3 ---
- drivers/nvme/host/nvme.h | 1 -
- 2 files changed, 4 deletions(-)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 9d7cee4..b100cce 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -1627,9 +1627,6 @@ static void nvme_scan_work(struct work_struct *work)
- 	list_sort(NULL, &ctrl->namespaces, ns_cmp);
- 	mutex_unlock(&ctrl->namespaces_mutex);
- 	kfree(id);
--
--	if (ctrl->ops->post_scan)
--		ctrl->ops->post_scan(ctrl);
- }
- 
- void nvme_queue_scan(struct nvme_ctrl *ctrl)
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index 282421f..bb343b3 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -150,7 +150,6 @@ struct nvme_ctrl_ops {
- 	int (*reg_read64)(struct nvme_ctrl *ctrl, u32 off, u64 *val);
- 	int (*reset_ctrl)(struct nvme_ctrl *ctrl);
- 	void (*free_ctrl)(struct nvme_ctrl *ctrl);
--	void (*post_scan)(struct nvme_ctrl *ctrl);
- 	void (*submit_async_event)(struct nvme_ctrl *ctrl, int aer_idx);
- };
- 
+On 07/13/2016 07:23 PM, Damien Le Moal wrote:
+>
+> Jens,
+>
+> On 7/14/16 01:19, Jens Axboe wrote:
+>> On 07/12/2016 10:23 PM, Damien Le Moal wrote:
+>>> For a front merge, the maximum number of sectors of the
+>>> request must be checked against the front merge BIO sector,
+>>> not the current sector of the request.
+>>
+>> Why does this matter? The merging should only happen before we start the
+>> request, hence rq pos and first bio should be one and the same.
+>
+> The block device of SMR drives is set up as chunked with the chunk size
+> equal to the drive zone size. Since write requests directed to
+> sequential zones cannot cross zone boundaries, both the front merge code
+> and the back merge code must ensure that requests resulting from a merge
+> do not cross chunk boundaries.
+>
+> The back merge code does this well, but the front merge code fails to
+> prevent merging when the BIO is the last write in a zone and the request
+> is the first write in the following (empty) zone. The check against the
+> request LBA does not prevent the merge as the request+bio size fit in
+> the empty zone. The check must be against the BIO LBA to detect the
+> chunk boundary crossing.
+
+Ah that makes sense, it's on adding the new bio, not against the 
+existing rq->bio. Applied for 4.8.
+
 -- 
-2.1.4
-
-
-_______________________________________________
-Linux-nvme mailing list
-Linux-nvme@lists.infradead.org
-http://lists.infradead.org/mailman/listinfo/linux-nvme
+Jens Axboe
