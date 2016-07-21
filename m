@@ -1,94 +1,129 @@
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>,
-	Tejun Heo <tj@kernel.org>
-Cc: Fabio Checconi <fchecconi@gmail.com>,
-	Arianna Avanzini <avanzini.arianna@gmail.com>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	linus.walleij@linaro.org,
-	broonie@kernel.org,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH RFC V8 04/22] block, cfq: remove SSD-related logic
-Date: Wed, 27 Jul 2016 18:13:20 +0200
-Message-Id: <1469636018-31247-5-git-send-email-paolo.valente@linaro.org>
-In-Reply-To: <1469636018-31247-1-git-send-email-paolo.valente@linaro.org>
-References: <2D83ACA0-2513-4019-9A0D-3166FDDE7485@linaro.org>
- <1469636018-31247-1-git-send-email-paolo.valente@linaro.org>
+Return-Path: <florian-ewald.mueller@profitbricks.com>
+MIME-Version: 1.0
+In-Reply-To: <3e8dcc7f-8502-b0b2-3c0a-43db0c3d7433@kernel.dk>
+References: <CAHJVUej82MtyPdVXdU82Hj=HgdXRuqng5nQxgrznUBq8rB0Rng@mail.gmail.com>
+ <3e8dcc7f-8502-b0b2-3c0a-43db0c3d7433@kernel.dk>
+From: =?UTF-8?Q?Florian=2DEwald_M=C3=BCller?= <florian-ewald.mueller@profitbricks.com>
+Date: Thu, 21 Jul 2016 20:59:14 +0200
+Message-ID: <CAHJVUeiS+dHTqPRzL2bwJr9RMFXcrpwJ2O6kt6KtHni8sSTnYA@mail.gmail.com>
+Subject: Re: [PATCH linux-4.7-rc7] blk_stack_limits() setting discard_granularity
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org
+Content-Type: multipart/alternative; boundary=001a1142d01c27c5cc053829eb5b
 List-ID: <linux-block@vger.kernel.org>
 
-From: Arianna Avanzini <avanzini.arianna@gmail.com>
+--001a1142d01c27c5cc053829eb5b
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-CFQ disables idling for SSD devices to achieve a higher throughput. As
-for seeky queues (see the previous commit), BFQ makes idling decisions
-for SSD devices in a more complex way, according to a unified strategy
-for boosting the throughput while at the same preserving strong
-throughput-distribution and latency guarantees. This commit then
-removes the CFQ mechanism.
+Hi,
 
-Signed-off-by: Arianna Avanzini <avanzini.arianna@gmail.com>
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
----
- block/cfq-iosched.c | 18 ++----------------
- 1 file changed, 2 insertions(+), 16 deletions(-)
+Ok, no problem.
 
-diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
-index 870d1ba..fc53555 100644
---- a/block/cfq-iosched.c
-+++ b/block/cfq-iosched.c
-@@ -51,7 +51,6 @@ static const int cfq_hist_divisor = 4;
- 
- #define CFQQ_SEEK_THR		(sector_t)(8 * 100)
- #define CFQQ_CLOSE_THR		(sector_t)(8 * 1024)
--#define CFQQ_SECT_THR_NONROT	(sector_t)(2 * 32)
- #define CFQQ_SEEKY(cfqq)	(hweight32(cfqq->seek_history) > 32/8)
- 
- #define RQ_CIC(rq)		icq_to_cic((rq)->elv.icq)
-@@ -2695,8 +2694,7 @@ static bool cfq_should_idle(struct cfq_data *cfqd, struct cfq_queue *cfqq)
- 		return false;
- 
- 	/* We do for queues that were marked with idle window flag. */
--	if (cfq_cfqq_idle_window(cfqq) &&
--	   !(blk_queue_nonrot(cfqd->queue) && cfqd->hw_tag))
-+	if (cfq_cfqq_idle_window(cfqq))
- 		return true;
- 
- 	/*
-@@ -2717,14 +2715,6 @@ static void cfq_arm_slice_timer(struct cfq_data *cfqd)
- 	struct cfq_io_cq *cic;
- 	unsigned long sl, group_idle = 0;
- 
--	/*
--	 * SSD device without seek penalty, disable idling. But only do so
--	 * for devices that support queuing, otherwise we still have a problem
--	 * with sync vs async workloads.
--	 */
--	if (blk_queue_nonrot(cfqd->queue) && cfqd->hw_tag)
--		return;
--
- 	WARN_ON(!RB_EMPTY_ROOT(&cfqq->sort_list));
- 	WARN_ON(cfq_cfqq_slice_new(cfqq));
- 
-@@ -3585,7 +3575,6 @@ cfq_update_io_seektime(struct cfq_data *cfqd, struct cfq_queue *cfqq,
- 		       struct request *rq)
- {
- 	sector_t sdist = 0;
--	sector_t n_sec = blk_rq_sectors(rq);
- 	if (cfqq->last_request_pos) {
- 		if (cfqq->last_request_pos < blk_rq_pos(rq))
- 			sdist = blk_rq_pos(rq) - cfqq->last_request_pos;
-@@ -3594,10 +3583,7 @@ cfq_update_io_seektime(struct cfq_data *cfqd, struct cfq_queue *cfqq,
- 	}
- 
- 	cfqq->seek_history <<= 1;
--	if (blk_queue_nonrot(cfqd->queue))
--		cfqq->seek_history |= (n_sec < CFQQ_SECT_THR_NONROT);
--	else
--		cfqq->seek_history |= (sdist > CFQQ_SEEK_THR);
-+	cfqq->seek_history |= (sdist > CFQQ_SEEK_THR);
- }
- 
- /*
--- 
-1.9.1
+Thanks for the quick answer,
+Florian
+
+On Thu, Jul 21, 2016 at 8:56 PM, Jens Axboe <axboe@kernel.dk> wrote:
+
+> On 07/21/2016 12:09 PM, Florian-Ewald M=C3=BCller wrote:
+>
+>> blk_stack_limits() can set discard_granularity bigger than
+>> max_discard_sectors (in bytes).
+>> This makes blk_bio_discard_split() non-functional and can lead to data
+>> corruption.
+>>
+>
+> Let's get rid of the unlikely(), this isn't a hot path.
+>
+> --
+> Jens Axboe
+>
+>
+
+
+--=20
+
+Florian-Ewald Mueller
+
+Architecture Board
+
+
+*ProfitBricks GmbH*
+Greifswalder Str. 207
+D - 10405 Berlin
+
+
+Tel:       +49 30 577 008 331
+Fax:      +49 30 577 008 598
+Email:   florian-ewald.mueller@profitbricks.com
+<firstname.lastname@profitbricks.com>
+URL:     http://www.profitbricks.de <https://www.profitbricks.de/>
+
+Sitz der Gesellschaft: Berlin.
+Registergericht: Amtsgericht Charlottenburg, HRB 125506 B.
+Gesch=C3=A4ftsf=C3=BChrer: Andreas Gauger, Achim Weiss.
+
+Please consider the environment before printing this email.
+
+--001a1142d01c27c5cc053829eb5b
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr">Hi,<div><br></div><div>Ok, no problem.</div><div><br></div=
+><div>Thanks for the quick answer,</div><div>Florian</div></div><div class=
+=3D"gmail_extra"><br><div class=3D"gmail_quote">On Thu, Jul 21, 2016 at 8:5=
+6 PM, Jens Axboe <span dir=3D"ltr">&lt;<a href=3D"mailto:axboe@kernel.dk" t=
+arget=3D"_blank">axboe@kernel.dk</a>&gt;</span> wrote:<br><blockquote class=
+=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padd=
+ing-left:1ex"><span class=3D"">On 07/21/2016 12:09 PM, Florian-Ewald M=C3=
+=BCller wrote:<br>
+<blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1p=
+x #ccc solid;padding-left:1ex">
+blk_stack_limits() can set discard_granularity bigger than<br>
+max_discard_sectors (in bytes).<br>
+This makes blk_bio_discard_split() non-functional and can lead to data<br>
+corruption.<br>
+</blockquote>
+<br></span>
+Let&#39;s get rid of the unlikely(), this isn&#39;t a hot path.<span class=
+=3D"HOEnZb"><font color=3D"#888888"><br>
+<br>
+-- <br>
+Jens Axboe<br>
+<br>
+</font></span></blockquote></div><br><br clear=3D"all"><div><br></div>-- <b=
+r><div class=3D"gmail_signature" data-smartmail=3D"gmail_signature"><div di=
+r=3D"ltr"><span><div><p style=3D"margin-top:0cm;margin-right:0cm;margin-bot=
+tom:0.0001pt;margin-left:0cm;font-size:12pt;font-family:&#39;Times New Roma=
+n&#39;,serif"><span lang=3D"EN-US" style=3D"font-size:10pt">Florian-Ewald M=
+ueller</span></p></div><div><p style=3D"margin-top:0cm;margin-right:0cm;mar=
+gin-bottom:0.0001pt;margin-left:0cm;font-size:12pt;font-family:&#39;Times N=
+ew Roman&#39;,serif"><font size=3D"3"><span style=3D"font-size:13px">Archit=
+ecture Board</span></font></p></div><div><p style=3D"margin-top:0cm;margin-=
+right:0cm;margin-bottom:0.0001pt;margin-left:0cm;font-size:12pt;font-family=
+:&#39;Times New Roman&#39;,serif"><span lang=3D"EN-US" style=3D"font-size:8=
+pt;color:rgb(34,34,34)"><br></span><b><span style=3D"font-size:8pt;color:rg=
+b(34,34,34)">ProfitBricks GmbH</span></b><span style=3D"font-size:8pt;color=
+:rgb(34,34,34)"><br>Greifswalder Str. 207<br>D - 10405 Berlin</span><span s=
+tyle=3D"color:rgb(34,34,34)"><u></u><u></u></span></p></div><div><p style=
+=3D"margin-top:0cm;margin-right:0cm;margin-bottom:0.0001pt;margin-left:0cm;=
+font-size:12pt;font-family:&#39;Times New Roman&#39;,serif"><span style=3D"=
+font-size:8pt;color:rgb(34,34,34)"><br>Tel: =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=
++49 30 577 008 331<br>Fax: =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0+49 30 577 008 598=
+<br>Email: =C2=A0=C2=A0</span><a href=3D"mailto:firstname.lastname@profitbr=
+icks.com" style=3D"color:rgb(17,85,204)" target=3D"_blank">florian-ewald.mu=
+eller@profitbricks.com</a><span style=3D"font-size:8pt;color:rgb(34,34,34)"=
+><br>URL: =C2=A0 =C2=A0=C2=A0</span><a href=3D"https://www.profitbricks.de/=
+" style=3D"color:rgb(17,85,204)" target=3D"_blank">http://www.profitbricks.=
+de</a><span style=3D"font-size:8pt;color:rgb(34,34,34)"><br><br>Sitz der Ge=
+sellschaft: Berlin.<br>Registergericht: Amtsgericht Charlottenburg, HRB 125=
+506 B.<br>Gesch=C3=A4ftsf=C3=BChrer: Andreas Gauger, Achim Weiss.<br><br></=
+span><span lang=3D"EN-US" style=3D"font-size:8pt;color:green">Please consid=
+er the environment before printing this email.<u></u><u></u></span></p><p s=
+tyle=3D"margin-top:0cm;margin-right:0cm;margin-bottom:0.0001pt;margin-left:=
+0cm;font-size:12pt;font-family:&#39;Times New Roman&#39;,serif"><span lang=
+=3D"EN-US" style=3D"font-size:8pt;color:green"><u></u>=C2=A0</span></p></di=
+v></span></div></div>
+</div>
+
+--001a1142d01c27c5cc053829eb5b--
