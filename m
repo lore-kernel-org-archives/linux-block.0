@@ -1,116 +1,19 @@
-Return-Path: <vegard.nossum@oracle.com>
-From: Vegard Nossum <vegard.nossum@oracle.com>
+Return-Path: <hch@lst.de>
+Date: Thu, 21 Jul 2016 07:47:04 +0200
+From: Christoph Hellwig <hch@lst.de>
 To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Vegard Nossum <vegard.nossum@oracle.com>, Tejun Heo <tj@kernel.org>,
-        stable@vger.kernel.org
-Subject: [PATCH] block: fix use-after-free in seq file
-Date: Fri, 29 Jul 2016 10:40:31 +0200
-Message-Id: <1469781631-23207-1-git-send-email-vegard.nossum@oracle.com>
+Cc: Christoph Hellwig <hch@lst.de>, shli@fb.com, martin.petersen@oracle.com,
+	snitzer@redhat.com, sitsofe@yahoo.com, linux-block@vger.kernel.org
+Subject: Re: resend: zeroout fixes
+Message-ID: <20160721054704.GA18157@lst.de>
+References: <1468920214-32400-1-git-send-email-hch@lst.de> <5c685f2e-59e5-18e6-5205-7bf9193fbac3@kernel.dk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <5c685f2e-59e5-18e6-5205-7bf9193fbac3@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-I got a KASAN report of use-after-free:
+On Wed, Jul 20, 2016 at 05:36:32PM -0600, Jens Axboe wrote:
+> I think we should leave 4.7 as-is. The put issue being fixed is the most 
+> important one, so just roll a separate 4.8 patch for that.
 
-    ==================================================================
-    BUG: KASAN: use-after-free in klist_iter_exit+0x61/0x70 at addr ffff8800b6581508
-    Read of size 8 by task trinity-c1/315
-    =============================================================================
-    BUG kmalloc-32 (Not tainted): kasan: bad access detected
-    -----------------------------------------------------------------------------
-
-    Disabling lock debugging due to kernel taint
-    INFO: Allocated in disk_seqf_start+0x66/0x110 age=144 cpu=1 pid=315
-            ___slab_alloc+0x4f1/0x520
-            __slab_alloc.isra.58+0x56/0x80
-            kmem_cache_alloc_trace+0x260/0x2a0
-            disk_seqf_start+0x66/0x110
-            traverse+0x176/0x860
-            seq_read+0x7e3/0x11a0
-            proc_reg_read+0xbc/0x180
-            do_loop_readv_writev+0x134/0x210
-            do_readv_writev+0x565/0x660
-            vfs_readv+0x67/0xa0
-            do_preadv+0x126/0x170
-            SyS_preadv+0xc/0x10
-            do_syscall_64+0x1a1/0x460
-            return_from_SYSCALL_64+0x0/0x6a
-    INFO: Freed in disk_seqf_stop+0x42/0x50 age=160 cpu=1 pid=315
-            __slab_free+0x17a/0x2c0
-            kfree+0x20a/0x220
-            disk_seqf_stop+0x42/0x50
-            traverse+0x3b5/0x860
-            seq_read+0x7e3/0x11a0
-            proc_reg_read+0xbc/0x180
-            do_loop_readv_writev+0x134/0x210
-            do_readv_writev+0x565/0x660
-            vfs_readv+0x67/0xa0
-            do_preadv+0x126/0x170
-            SyS_preadv+0xc/0x10
-            do_syscall_64+0x1a1/0x460
-            return_from_SYSCALL_64+0x0/0x6a
-
-    CPU: 1 PID: 315 Comm: trinity-c1 Tainted: G    B           4.7.0+ #62
-    Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Ubuntu-1.8.2-1ubuntu1 04/01/2014
-     ffffea0002d96000 ffff880119b9f918 ffffffff81d6ce81 ffff88011a804480
-     ffff8800b6581500 ffff880119b9f948 ffffffff8146c7bd ffff88011a804480
-     ffffea0002d96000 ffff8800b6581500 fffffffffffffff4 ffff880119b9f970
-    Call Trace:
-     [<ffffffff81d6ce81>] dump_stack+0x65/0x84
-     [<ffffffff8146c7bd>] print_trailer+0x10d/0x1a0
-     [<ffffffff814704ff>] object_err+0x2f/0x40
-     [<ffffffff814754d1>] kasan_report_error+0x221/0x520
-     [<ffffffff8147590e>] __asan_report_load8_noabort+0x3e/0x40
-     [<ffffffff83888161>] klist_iter_exit+0x61/0x70
-     [<ffffffff82404389>] class_dev_iter_exit+0x9/0x10
-     [<ffffffff81d2e8ea>] disk_seqf_stop+0x3a/0x50
-     [<ffffffff8151f812>] seq_read+0x4b2/0x11a0
-     [<ffffffff815f8fdc>] proc_reg_read+0xbc/0x180
-     [<ffffffff814b24e4>] do_loop_readv_writev+0x134/0x210
-     [<ffffffff814b4c45>] do_readv_writev+0x565/0x660
-     [<ffffffff814b8a17>] vfs_readv+0x67/0xa0
-     [<ffffffff814b8de6>] do_preadv+0x126/0x170
-     [<ffffffff814b92ec>] SyS_preadv+0xc/0x10
-
-This problem can occur in the following situation:
-
-open()
- - pread()
-    - .seq_start()
-       - iter = kmalloc() // succeeds
-       - seqf->private = iter
-    - .seq_stop()
-       - kfree(seqf->private)
- - pread()
-    - .seq_start()
-       - iter = kmalloc() // fails
-    - .seq_stop()
-       - class_dev_iter_exit(seqf->private) // boom! old pointer
-
-As the comment in disk_seqf_stop() says, stop is called even if start
-failed, so we need to reinitialise the private pointer to NULL when seq
-iteration stops.
-
-An alternative would be to set the private pointer to NULL when the
-kmalloc() in disk_seqf_start() fails.
-
-Cc: Tejun Heo <tj@kernel.org>
-Cc: stable@vger.kernel.org
-Signed-off-by: Vegard Nossum <vegard.nossum@oracle.com>
----
- block/genhd.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/block/genhd.c b/block/genhd.c
-index 3c9dede..0ad8796 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -856,6 +856,7 @@ static void disk_seqf_stop(struct seq_file *seqf, void *v)
- 	if (iter) {
- 		class_dev_iter_exit(iter);
- 		kfree(iter);
-+		seqf->private = NULL;
- 	}
- }
- 
--- 
-1.9.1
+Ok, in that case just merge this series as-is for now.
