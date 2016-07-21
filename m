@@ -1,35 +1,35 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from smtp2.it.da.ut.ee ([193.40.5.67]:38660 "EHLO smtp2.it.da.ut.ee"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750780AbcGFG5m (ORCPT <rfc822;linux-block@vger.kernel.org>);
-	Wed, 6 Jul 2016 02:57:42 -0400
-Date: Wed, 6 Jul 2016 09:59:24 +0300 (EEST)
-From: Meelis Roos <mroos@linux.ee>
-To: Rolf Eike Beer <eike-kernel@sf-tec.de>
-cc: linux-parisc@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org
-Subject: Re: parisc late boot crash in 4.4-rc, scsi-related
-In-Reply-To: <2098261.XbUFfohXuY@caliban.sf-tec.de>
-Message-ID: <alpine.LRH.2.20.1607060957560.8418@math.ut.ee>
-References: <alpine.LRH.2.20.1601082329270.23187@math.ut.ee> <9d1ae51e-69c3-c3f6-60aa-e5238dd18241@bell.net> <alpine.LRH.2.20.1606221451310.11869@math.ut.ee> <2098261.XbUFfohXuY@caliban.sf-tec.de>
+Received: from bombadil.infradead.org ([198.137.202.9]:36520 "EHLO
+	bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751429AbcGUOjH (ORCPT
+	<rfc822;linux-block@vger.kernel.org>);
+	Thu, 21 Jul 2016 10:39:07 -0400
+Date: Thu, 21 Jul 2016 07:38:08 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Hannes Reinecke <hare@suse.de>
+Cc: Christoph Hellwig <hch@infradead.org>,
+	Mike Snitzer <snitzer@redhat.com>, dm-devel-redhat.com@suse.de,
+	Damien Le Moal <damien.lemoal@hgst.com>,
+	linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+	Jens Axboe <axboe@fb.com>
+Subject: Re: [PATCH 1/3] block: add flag for single-threaded submission
+Message-ID: <20160721143808.GA29902@infradead.org>
+References: <1468936978-9124-1-git-send-email-hare@suse.de>
+ <1468936978-9124-2-git-send-email-hare@suse.de>
+ <20160721055431.GB14568@infradead.org>
+ <2cef3971-54cc-73d6-dbff-acd1379d19d5@suse.de>
+ <0030fdc3-bd7d-2e91-56ae-c20086a55d22@suse.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <0030fdc3-bd7d-2e91-56ae-c20086a55d22@suse.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-> > What distro are you using?
-> > 
-> > My pariscs are gentoo and still only the old versions are available on
-> > hppa.
-> 
-> Several newer versions (4.9, 5.3) are in portage, maybe they just need to be 
-> unmasked.
+On Thu, Jul 21, 2016 at 08:37:10AM +0200, Hannes Reinecke wrote:
+> Looking closer do I _really_ need that for blk-mq?
+> >From my understanding any hctx can only run on one dedicated cpu, to
+> which the hctx is bound.
 
-4.9.3 and 5.3.0 were too old.
-
-However, at the end of June, 5.4.0 appeared masked. Unmasking kgcc64 
-5.4.0 and building it made my pariscs work again, with 4.7-rc6 running 
-fine on all of them.
-
--- 
-Meelis Roos (mroos@linux.ee)
+That's not the case.  A hctx exists for each hardware queue, and a CPU
+must be mapped to a hctx.  So if you have less hctx than CPUs (e.g. just
+one) you have multiple CPUs that could submit on a hctx.
