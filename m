@@ -1,132 +1,42 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.9]:52025 "EHLO
-	bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754180AbcGHMYO (ORCPT
-	<rfc822;linux-block@vger.kernel.org>); Fri, 8 Jul 2016 08:24:14 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: dm-devel@redhat.com, linux-scsi@vger.kernel.org
-Cc: linux-block@vger.kernel.org
-Subject: [PATCH 2/2] dm: call PR reserve/unreserve on each underlying device
-Date: Fri,  8 Jul 2016 21:23:51 +0900
-Message-Id: <1467980631-18945-3-git-send-email-hch@lst.de>
-In-Reply-To: <1467980631-18945-1-git-send-email-hch@lst.de>
-References: <1467980631-18945-1-git-send-email-hch@lst.de>
+Received: from mx2.suse.de ([195.135.220.15]:56833 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750955AbcGUGAq (ORCPT <rfc822;linux-block@vger.kernel.org>);
+	Thu, 21 Jul 2016 02:00:46 -0400
+Subject: Re: [PATCH 6/6] block: Add 'BLK_MQ_RQ_QUEUE_DONE' return value
+To: Christoph Hellwig <hch@infradead.org>
+References: <1468934439-93579-1-git-send-email-hare@suse.de>
+ <1468934439-93579-7-git-send-email-hare@suse.de>
+ <20160721055351.GA14568@infradead.org>
+Cc: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	Damien Le Moal <damien.lemoal@hgst.com>,
+	Hannes Reinecke <hare@suse.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <24e83314-a4fa-76de-04ee-43b7b50cbbd2@suse.de>
+Date: Thu, 21 Jul 2016 08:00:43 +0200
+MIME-Version: 1.0
+In-Reply-To: <20160721055351.GA14568@infradead.org>
+Content-Type: text/plain; charset=windows-1252
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-So far we tried to rely on the SCSI 'all target ports' bit to register
-all path, but for many setups this didn't work properly as the different
-path aren seen as separate initiators to the target instead of multiple
-ports of the same initiator.  Because of that we'll stop setting the
-'all target ports' bit in SCSI, and let device mapper handle iterating
-over the device for each path and register it manually.
+On 07/21/2016 07:53 AM, Christoph Hellwig wrote:
+> On Tue, Jul 19, 2016 at 03:20:39PM +0200, Hannes Reinecke wrote:
+>> Add a return value BLK_MQ_RQ_QUEUE_DONE to terminate a request
+>> without error.
+> 
+> NAK.  You can just do a blk_mq_end_request on the request and return
+> 0 from ->queue_rq.
+> 
+Okay, will be doing so.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/md/dm.c | 85 +++++++++++++++++++++++++++++++++++++++++++++++----------
- 1 file changed, 70 insertions(+), 15 deletions(-)
+Cheers,
 
-diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index 1b2f962..e4e98b7 100644
---- a/drivers/md/dm.c
-+++ b/drivers/md/dm.c
-@@ -3601,26 +3601,81 @@ void dm_free_md_mempools(struct dm_md_mempools *pools)
- 	kfree(pools);
- }
- 
--static int dm_pr_register(struct block_device *bdev, u64 old_key, u64 new_key,
--			  u32 flags)
-+struct dm_pr {
-+	u64	old_key;
-+	u64	new_key;
-+	u32	flags;
-+	bool	fail_early;
-+};
-+
-+static int dm_call_pr(struct block_device *bdev, iterate_devices_callout_fn fn,
-+		void *data)
- {
- 	struct mapped_device *md = bdev->bd_disk->private_data;
--	const struct pr_ops *ops;
--	fmode_t mode;
--	int r;
-+	struct dm_table *table;
-+	struct dm_target *ti;
-+	int ret = 0, srcu_idx;
- 
--	r = dm_grab_bdev_for_ioctl(md, &bdev, &mode);
--	if (r < 0)
--		return r;
-+	table = dm_get_live_table(md, &srcu_idx);
-+	if (!table || !dm_table_get_size(table))
-+		return -ENOTTY;
- 
--	ops = bdev->bd_disk->fops->pr_ops;
--	if (ops && ops->pr_register)
--		r = ops->pr_register(bdev, old_key, new_key, flags);
--	else
--		r = -EOPNOTSUPP;
-+	/* We only support devices that have a single target */
-+	ret = -ENOTTY;
-+	if (dm_table_get_num_targets(table) != 1)
-+		goto out;
-+	ti = dm_table_get_target(table, 0);
- 
--	bdput(bdev);
--	return r;
-+	ret = -EINVAL;
-+	if (!ti->type->iterate_devices)
-+		goto out;
-+
-+	ret = ti->type->iterate_devices(ti, fn, data);
-+	if (ret)
-+		goto out;
-+
-+	ret = 0;
-+out:
-+	dm_put_live_table(md, srcu_idx);
-+	return ret;
-+}
-+
-+/*
-+ * For register / unregister we need to manually call out to every path.
-+ */
-+static int __dm_pr_register(struct dm_target *ti, struct dm_dev *dev,
-+		sector_t start, sector_t len, void *data)
-+{
-+	struct dm_pr *pr = data;
-+	const struct pr_ops *ops = dev->bdev->bd_disk->fops->pr_ops;
-+
-+	if (!ops || !ops->pr_register)
-+		return -EOPNOTSUPP;
-+	return ops->pr_register(dev->bdev, pr->old_key, pr->new_key, pr->flags);
-+}
-+
-+static int dm_pr_register(struct block_device *bdev, u64 old_key, u64 new_key,
-+			  u32 flags)
-+{
-+	struct dm_pr pr = {
-+		.old_key	= old_key,
-+		.new_key	= new_key,
-+		.flags		= flags,
-+		.fail_early	= true,
-+	};
-+	int ret;
-+
-+	ret = dm_call_pr(bdev, __dm_pr_register, &pr);
-+	if (ret && new_key) {
-+		/* unregister all paths if we failed to register any path */
-+		pr.old_key = new_key;
-+		pr.new_key = 0;
-+		pr.flags = 0;
-+		pr.fail_early = false;
-+		dm_call_pr(bdev, __dm_pr_register, &pr);
-+	}
-+
-+	return ret;
- }
- 
- static int dm_pr_reserve(struct block_device *bdev, u64 key, enum pr_type type,
+Hannes
 -- 
-2.1.4
-
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: F. Imend�rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG N�rnberg)
