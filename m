@@ -1,320 +1,99 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.9]:55329 "EHLO
-	bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751656AbcGUJYf (ORCPT
-	<rfc822;linux-block@vger.kernel.org>);
-	Thu, 21 Jul 2016 05:24:35 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@fb.com, agordeev@redhat.com, linux-block@vger.kernel.org
-Subject: [PATCH 3/3] blk-mq: allow the driver to pass in an affinity mask
-Date: Thu, 21 Jul 2016 11:24:19 +0200
-Message-Id: <1469093059-24594-4-git-send-email-hch@lst.de>
-In-Reply-To: <1469093059-24594-1-git-send-email-hch@lst.de>
-References: <1469093059-24594-1-git-send-email-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <elfring@users.sourceforge.net>
+Subject: [PATCH] block: Delete unnecessary checks before the function call
+ "mempool_destroy"
+To: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+References: <5307CAA2.8060406@users.sourceforge.net>
+ <alpine.DEB.2.02.1402212321410.2043@localhost6.localdomain6>
+ <530A086E.8010901@users.sourceforge.net>
+ <alpine.DEB.2.02.1402231635510.1985@localhost6.localdomain6>
+ <530A72AA.3000601@users.sourceforge.net>
+ <alpine.DEB.2.02.1402240658210.2090@localhost6.localdomain6>
+ <530B5FB6.6010207@users.sourceforge.net>
+ <alpine.DEB.2.10.1402241710370.2074@hadrien>
+ <530C5E18.1020800@users.sourceforge.net>
+ <alpine.DEB.2.10.1402251014170.2080@hadrien>
+ <530CD2C4.4050903@users.sourceforge.net>
+ <alpine.DEB.2.10.1402251840450.7035@hadrien>
+ <530CF8FF.8080600@users.sourceforge.net>
+ <alpine.DEB.2.02.1402252117150.2047@localhost6.localdomain6>
+ <530DD06F.4090703@users.sourceforge.net>
+ <alpine.DEB.2.02.1402262129250.2221@localhost6.localdomain6>
+ <5317A59D.4@users.sourceforge.net>
+Cc: LKML <linux-kernel@vger.kernel.org>, kernel-janitors@vger.kernel.org,
+ Julia Lawall <julia.lawall@lip6.fr>
+From: SF Markus Elfring <elfring@users.sourceforge.net>
+Message-ID: <01dfd682-7b3e-c847-3e67-d859db3341cc@users.sourceforge.net>
+Date: Fri, 22 Jul 2016 21:51:26 +0200
+MIME-Version: 1.0
+In-Reply-To: <5317A59D.4@users.sourceforge.net>
+Content-Type: text/plain; charset=windows-1252
+List-ID: <linux-block@vger.kernel.org>
 
-Allow drivers to pass in the affinity mask from the generic interrupt
-layer, and spread queues based on that.  If the driver doesn't pass in
-a mask we will create it using the genirq helper.  As this helper was
-modelled after the blk-mq algorithm there should be no change in
-behavior.
+From: Markus Elfring <elfring@users.sourceforge.net>
+Date: Fri, 22 Jul 2016 21:45:26 +0200
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+The mempool_destroy() function tests whether its argument is NULL
+and then returns immediately. Thus the test around the calls is not needed.
+
+This issue was detected by using the Coccinelle software.
+
+Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
 ---
- block/Makefile         |   2 +-
- block/blk-mq-cpumap.c  | 120 -------------------------------------------------
- block/blk-mq.c         |  68 +++++++++++++++++++++++++---
- block/blk-mq.h         |   8 ----
- include/linux/blk-mq.h |   1 +
- 5 files changed, 65 insertions(+), 134 deletions(-)
- delete mode 100644 block/blk-mq-cpumap.c
+ block/bio-integrity.c | 7 ++-----
+ block/bio.c           | 8 ++------
+ block/blk-core.c      | 3 +--
+ 3 files changed, 5 insertions(+), 13 deletions(-)
 
-diff --git a/block/Makefile b/block/Makefile
-index 9eda232..aeb318d 100644
---- a/block/Makefile
-+++ b/block/Makefile
-@@ -6,7 +6,7 @@ obj-$(CONFIG_BLOCK) := bio.o elevator.o blk-core.o blk-tag.o blk-sysfs.o \
- 			blk-flush.o blk-settings.o blk-ioc.o blk-map.o \
- 			blk-exec.o blk-merge.o blk-softirq.o blk-timeout.o \
- 			blk-lib.o blk-mq.o blk-mq-tag.o \
--			blk-mq-sysfs.o blk-mq-cpu.o blk-mq-cpumap.o ioctl.o \
-+			blk-mq-sysfs.o blk-mq-cpu.o ioctl.o \
- 			genhd.o scsi_ioctl.o partition-generic.o ioprio.o \
- 			badblocks.o partitions/
+diff --git a/block/bio-integrity.c b/block/bio-integrity.c
+index f70cc3b..7506a3e 100644
+--- a/block/bio-integrity.c
++++ b/block/bio-integrity.c
+@@ -499,11 +499,8 @@ EXPORT_SYMBOL(bioset_integrity_create);
  
-diff --git a/block/blk-mq-cpumap.c b/block/blk-mq-cpumap.c
-deleted file mode 100644
-index d0634bc..0000000
---- a/block/blk-mq-cpumap.c
-+++ /dev/null
-@@ -1,120 +0,0 @@
--/*
-- * CPU <-> hardware queue mapping helpers
-- *
-- * Copyright (C) 2013-2014 Jens Axboe
-- */
--#include <linux/kernel.h>
--#include <linux/threads.h>
--#include <linux/module.h>
--#include <linux/mm.h>
--#include <linux/smp.h>
--#include <linux/cpu.h>
--
--#include <linux/blk-mq.h>
--#include "blk.h"
--#include "blk-mq.h"
--
--static int cpu_to_queue_index(unsigned int nr_cpus, unsigned int nr_queues,
--			      const int cpu)
--{
--	return cpu * nr_queues / nr_cpus;
--}
--
--static int get_first_sibling(unsigned int cpu)
--{
--	unsigned int ret;
--
--	ret = cpumask_first(topology_sibling_cpumask(cpu));
--	if (ret < nr_cpu_ids)
--		return ret;
--
--	return cpu;
--}
--
--int blk_mq_update_queue_map(unsigned int *map, unsigned int nr_queues,
--			    const struct cpumask *online_mask)
--{
--	unsigned int i, nr_cpus, nr_uniq_cpus, queue, first_sibling;
--	cpumask_var_t cpus;
--
--	if (!alloc_cpumask_var(&cpus, GFP_ATOMIC))
--		return 1;
--
--	cpumask_clear(cpus);
--	nr_cpus = nr_uniq_cpus = 0;
--	for_each_cpu(i, online_mask) {
--		nr_cpus++;
--		first_sibling = get_first_sibling(i);
--		if (!cpumask_test_cpu(first_sibling, cpus))
--			nr_uniq_cpus++;
--		cpumask_set_cpu(i, cpus);
--	}
--
--	queue = 0;
--	for_each_possible_cpu(i) {
--		if (!cpumask_test_cpu(i, online_mask)) {
--			map[i] = 0;
--			continue;
--		}
--
--		/*
--		 * Easy case - we have equal or more hardware queues. Or
--		 * there are no thread siblings to take into account. Do
--		 * 1:1 if enough, or sequential mapping if less.
--		 */
--		if (nr_queues >= nr_cpus || nr_cpus == nr_uniq_cpus) {
--			map[i] = cpu_to_queue_index(nr_cpus, nr_queues, queue);
--			queue++;
--			continue;
--		}
--
--		/*
--		 * Less then nr_cpus queues, and we have some number of
--		 * threads per cores. Map sibling threads to the same
--		 * queue.
--		 */
--		first_sibling = get_first_sibling(i);
--		if (first_sibling == i) {
--			map[i] = cpu_to_queue_index(nr_uniq_cpus, nr_queues,
--							queue);
--			queue++;
--		} else
--			map[i] = map[first_sibling];
--	}
--
--	free_cpumask_var(cpus);
--	return 0;
--}
--
--unsigned int *blk_mq_make_queue_map(struct blk_mq_tag_set *set)
--{
--	unsigned int *map;
--
--	/* If cpus are offline, map them to first hctx */
--	map = kzalloc_node(sizeof(*map) * nr_cpu_ids, GFP_KERNEL,
--				set->numa_node);
--	if (!map)
--		return NULL;
--
--	if (!blk_mq_update_queue_map(map, set->nr_hw_queues, cpu_online_mask))
--		return map;
--
--	kfree(map);
--	return NULL;
--}
--
--/*
-- * We have no quick way of doing reverse lookups. This is only used at
-- * queue init time, so runtime isn't important.
-- */
--int blk_mq_hw_queue_to_node(unsigned int *mq_map, unsigned int index)
--{
--	int i;
--
--	for_each_possible_cpu(i) {
--		if (index == mq_map[i])
--			return local_memory_node(cpu_to_node(i));
--	}
--
--	return NUMA_NO_NODE;
--}
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index c4adaa2..1053b7b 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -22,6 +22,7 @@
- #include <linux/sched/sysctl.h>
- #include <linux/delay.h>
- #include <linux/crash_dump.h>
-+#include <linux/interrupt.h>
- 
- #include <trace/events/block.h>
- 
-@@ -1996,6 +1997,22 @@ struct request_queue *blk_mq_init_queue(struct blk_mq_tag_set *set)
- }
- EXPORT_SYMBOL(blk_mq_init_queue);
- 
-+/*
-+ * We have no quick way of doing reverse lookups. This is only used at
-+ * queue init time, so runtime isn't important.
-+ */
-+static int blk_mq_hw_queue_to_node(unsigned int *mq_map, unsigned int index)
-+{
-+	int i;
-+
-+	for_each_possible_cpu(i) {
-+		if (index == mq_map[i])
-+			return local_memory_node(cpu_to_node(i));
-+	}
-+
-+	return NUMA_NO_NODE;
-+}
-+
- static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
- 						struct request_queue *q)
+ void bioset_integrity_free(struct bio_set *bs)
  {
-@@ -2295,6 +2312,30 @@ struct cpumask *blk_mq_tags_cpumask(struct blk_mq_tags *tags)
- }
- EXPORT_SYMBOL_GPL(blk_mq_tags_cpumask);
- 
-+static int blk_mq_create_mq_map(struct blk_mq_tag_set *set,
-+		const struct cpumask *affinity_mask)
-+{
-+	int queue = -1, cpu = 0;
-+
-+	set->mq_map = kzalloc_node(sizeof(*set->mq_map) * nr_cpu_ids,
-+			GFP_KERNEL, set->numa_node);
-+	if (!set->mq_map)
-+		return -ENOMEM;
-+
-+	if (!affinity_mask)
-+		return 0;	/* map all cpus to queue 0 */
-+
-+	/* If cpus are offline, map them to first hctx */
-+	for_each_online_cpu(cpu) {
-+		if (cpumask_test_cpu(cpu, affinity_mask))
-+			queue++;
-+		if (queue >= 0)
-+			set->mq_map[cpu] = queue;
-+	}
-+
-+	return 0;
-+}
-+
- /*
-  * Alloc a tag set to be associated with one or more request queues.
-  * May fail with EINVAL for various error conditions. May adjust the
-@@ -2303,6 +2344,8 @@ EXPORT_SYMBOL_GPL(blk_mq_tags_cpumask);
-  */
- int blk_mq_alloc_tag_set(struct blk_mq_tag_set *set)
- {
-+	int ret;
-+
- 	BUILD_BUG_ON(BLK_MQ_MAX_DEPTH > 1 << BLK_MQ_UNIQUE_TAG_BITS);
- 
- 	if (!set->nr_hw_queues)
-@@ -2341,11 +2384,26 @@ int blk_mq_alloc_tag_set(struct blk_mq_tag_set *set)
- 	if (!set->tags)
- 		return -ENOMEM;
- 
--	set->mq_map = blk_mq_make_queue_map(set);
--	if (!set->mq_map)
--		goto out_free_tags;
-+	/*
-+	 * Use the passed in affinity mask if the driver provided one.
-+	 */
-+	if (set->affinity_mask) {
-+		ret = blk_mq_create_mq_map(set, set->affinity_mask);
-+		if (!set->mq_map)
-+			goto out_free_tags;
-+	} else {
-+		struct cpumask *affinity_mask;
-+
-+		affinity_mask = irq_create_affinity_mask(&set->nr_hw_queues);
-+		ret = blk_mq_create_mq_map(set, affinity_mask);
-+		kfree(affinity_mask);
-+
-+		if (!set->mq_map)
-+			goto out_free_tags;
-+	}
- 
--	if (blk_mq_alloc_rq_maps(set))
-+	ret = blk_mq_alloc_rq_maps(set);
-+	if (ret)
- 		goto out_free_mq_map;
- 
- 	mutex_init(&set->tag_list_lock);
-@@ -2359,7 +2417,7 @@ out_free_mq_map:
- out_free_tags:
- 	kfree(set->tags);
- 	set->tags = NULL;
--	return -ENOMEM;
-+	return ret;
- }
- EXPORT_SYMBOL(blk_mq_alloc_tag_set);
- 
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 9087b11..fe7e21f 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -45,14 +45,6 @@ void blk_mq_enable_hotplug(void);
- void blk_mq_disable_hotplug(void);
- 
- /*
-- * CPU -> queue mappings
-- */
--extern unsigned int *blk_mq_make_queue_map(struct blk_mq_tag_set *set);
--extern int blk_mq_update_queue_map(unsigned int *map, unsigned int nr_queues,
--				   const struct cpumask *online_mask);
--extern int blk_mq_hw_queue_to_node(unsigned int *map, unsigned int);
+-	if (bs->bio_integrity_pool)
+-		mempool_destroy(bs->bio_integrity_pool);
 -
--/*
-  * sysfs helpers
-  */
- extern int blk_mq_sysfs_register(struct request_queue *q);
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index a572227..0809966 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -75,6 +75,7 @@ struct blk_mq_tag_set {
- 	unsigned int		timeout;
- 	unsigned int		flags;		/* BLK_MQ_F_* */
- 	void			*driver_data;
-+	struct cpumask		*affinity_mask;
+-	if (bs->bvec_integrity_pool)
+-		mempool_destroy(bs->bvec_integrity_pool);
++	mempool_destroy(bs->bio_integrity_pool);
++	mempool_destroy(bs->bvec_integrity_pool);
+ }
+ EXPORT_SYMBOL(bioset_integrity_free);
  
- 	struct blk_mq_tags	**tags;
+diff --git a/block/bio.c b/block/bio.c
+index 54ee384..21a2222 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1843,12 +1843,8 @@ void bioset_free(struct bio_set *bs)
+ 	if (bs->rescue_workqueue)
+ 		destroy_workqueue(bs->rescue_workqueue);
  
+-	if (bs->bio_pool)
+-		mempool_destroy(bs->bio_pool);
+-
+-	if (bs->bvec_pool)
+-		mempool_destroy(bs->bvec_pool);
+-
++	mempool_destroy(bs->bio_pool);
++	mempool_destroy(bs->bvec_pool);
+ 	bioset_integrity_free(bs);
+ 	bio_put_slab(bs);
+ 
+diff --git a/block/blk-core.c b/block/blk-core.c
+index a687e9c..db8c6b4 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -636,8 +636,7 @@ int blk_init_rl(struct request_list *rl, struct request_queue *q,
+ 
+ void blk_exit_rl(struct request_list *rl)
+ {
+-	if (rl->rq_pool)
+-		mempool_destroy(rl->rq_pool);
++	mempool_destroy(rl->rq_pool);
+ }
+ 
+ struct request_queue *blk_alloc_queue(gfp_t gfp_mask)
 -- 
-2.1.4
-
+2.9.2
