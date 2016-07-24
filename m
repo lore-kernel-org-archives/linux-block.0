@@ -1,9 +1,9 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:19327 "EHLO
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:27688 "EHLO
 	esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752559AbcGXXW1 convert rfc822-to-8bit (ORCPT
+	with ESMTP id S1752233AbcGXXQv convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-block@vger.kernel.org>);
-	Sun, 24 Jul 2016 19:22:27 -0400
+	Sun, 24 Jul 2016 19:16:51 -0400
 From: Damien Le Moal <Damien.LeMoal@hgst.com>
 To: Bart Van Assche <Bart.VanAssche@sandisk.com>
 CC: Hannes Reinecke <hare@suse.de>,
@@ -12,8 +12,8 @@ CC: Hannes Reinecke <hare@suse.de>,
 	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
 	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>
 Subject: Re: [PATCH 4/6] block: Add 'zoned' sysfs queue attribute
-Date: Sun, 24 Jul 2016 23:22:24 +0000
-Message-ID: <54A01E4C-1818-4CFD-820C-12F49ECA80C3@hgst.com>
+Date: Sun, 24 Jul 2016 23:16:47 +0000
+Message-ID: <94DE32E6-4D08-44D6-B8CA-566FA1BDEBFB@hgst.com>
 References: <1468934439-93579-1-git-send-email-hare@suse.de>
  <1468934439-93579-5-git-send-email-hare@suse.de>
  <yq1wpkd9zbc.fsf@sermon.lab.mkp.net>
@@ -21,32 +21,31 @@ References: <1468934439-93579-1-git-send-email-hare@suse.de>
  <1dc7f9d7-5a91-b160-7031-8d69ede5567b@sandisk.com>
  <13b63331-f920-0904-b8f7-c3a2ea8270d6@suse.de>
  <836c9ee7-3d1e-7336-342c-ce0efee12422@sandisk.com>
- <65e6de30-4811-969b-6c9e-312104e1ae6a@sandisk.com>
-In-Reply-To: <65e6de30-4811-969b-6c9e-312104e1ae6a@sandisk.com>
-Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <836c9ee7-3d1e-7336-342c-ce0efee12422@sandisk.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="windows-1252"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
 Bart,
 
 
-> On Jul 24, 2016, at 22:51, Bart Van Assche <bart.vanassche@sandisk.com> wrote:
+> On Jul 24, 2016, at 22:37, Bart Van Assche <bart.vanassche@sandisk.com> wrote:
 > 
-> Something I should have asked before: is the zone information intended for end users or rather for software developers? In the latter case, have you considered to use debugfs instead of sysfs to export this information? From Documentation/filesystems/debugfs.txt: "Unlike /proc, which is only meant for information about a process, or sysfs, which has strict one-value-per-file rules, debugfs has no rules at all."
+> If there are 10K zones and since queue_zoned_show() is limited to one page then only a very small fraction of the zone information will be available through sysfs. I remember from your presentations that reading the zone information is slow. Is 10K zones a typical value or a worst case value?
 
-I think that the zone information will definitively be of higher value
-for software developers rather than end users. But that information must
-be available at run time for things like mkfs.xxx and having to mount
-debugfs on a production system to be able to run mkfs on an SMR disk
-(or initialize an application using the raw block device) does not sound
-ideal.
+Our 10 TB drive with 256 MB zones has 37256 zones. A drive with the same capacity
+and 128 MB zones will double that (there are some out there with 128 MB zones).
+And higher capacities are coming. So 100K+ zones is not unrealistic in the very
+near future.
 
-Back to my previous reply, having the sysfs zoned file specifying just the
-disk zone size and having an ioctl to retrieve the detailed zone information
-looks to me much more sensible.
+I think that what Hannes proposed, i.e. to have the zoned file only specify the
+zone size (so only one value), is OK as long as we also add an ioctl to get the
+detailed zone information, which would be much faster for applications than using
+something like libzbc which will be sending SG_IOs to retrieve the zone information
+from the disk.
 
-Best regards. 
+Best regards.
 
 ------------------------
 Damien Le Moal, Ph.D.
@@ -57,7 +56,6 @@ Damien.LeMoal@hgst.com
 1 kirihara-cho, Fujisawa, 
 Kanagawa, 252-0888 Japan
 www.hgst.com 
-
 Western Digital Corporation (and its subsidiaries) E-mail Confidentiality Notice & Disclaimer:
 
 This e-mail and any files transmitted with it may contain confidential or legally privileged information of WDC and/or its affiliates, and are intended solely for the use of the individual or entity to which they are addressed. If you are not the intended recipient, any disclosure, copying, distribution or any action taken or omitted to be taken in reliance on it, is prohibited. If you have received this e-mail in error, please notify the sender immediately and delete the e-mail in its entirety from your system.
