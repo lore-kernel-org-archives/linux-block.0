@@ -1,39 +1,41 @@
-Return-Path: <BATV+a6fbff1bfc78a84bb09b+4713+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: shli@fb.com,
-	martin.petersen@oracle.com,
-	snitzer@redhat.com,
-	sitsofe@yahoo.com,
-	linux-block@vger.kernel.org
-Subject: [PATCH 2/2] block: don't ignore -EOPNOTSUPP blkdev_issue_write_same
-Date: Tue, 19 Jul 2016 11:23:34 +0200
-Message-Id: <1468920214-32400-3-git-send-email-hch@lst.de>
-In-Reply-To: <1468920214-32400-1-git-send-email-hch@lst.de>
-References: <1468920214-32400-1-git-send-email-hch@lst.de>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH RESEND] floppy: fix open(O_ACCMODE) for ioctl-only open
+To: Jiri Kosina <jikos@kernel.org>
+References: <20160610230255.GA27770@djo.tudelft.nl>
+ <alpine.LNX.2.00.1606131414420.6874@cbobk.fhfr.pm>
+ <20160614184308.GA6188@djo.tudelft.nl>
+ <alpine.LNX.2.00.1606150906320.6874@cbobk.fhfr.pm>
+ <20160615132040.GZ14480@ZenIV.linux.org.uk>
+ <alpine.LNX.2.00.1606151610420.6874@cbobk.fhfr.pm>
+ <20160615224722.GA9545@djo.tudelft.nl>
+ <alpine.LNX.2.00.1606160946000.6874@cbobk.fhfr.pm>
+ <alpine.LNX.2.00.1606301317290.6874@cbobk.fhfr.pm>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+ Wim Osterholt <wim@djo.tudelft.nl>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <9c713fa8-9da1-47b5-0d5d-92f4cd13493a@kernel.dk>
+Date: Mon, 25 Jul 2016 14:48:54 -0600
+MIME-Version: 1.0
+In-Reply-To: <alpine.LNX.2.00.1606301317290.6874@cbobk.fhfr.pm>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-WRITE SAME is a data integrity operation and we can't simply ignore
-errors.
+On 06/30/2016 05:18 AM, Jiri Kosina wrote:
+> From: Jiri Kosina <jkosina@suse.cz>
+>
+> Commit 09954bad4 ("floppy: refactor open() flags handling"), as a
+> side-effect, causes open(/dev/fdX, O_ACCMODE) to fail. It turns out that
+> this is being used setfdprm userspace for ioctl-only open().
+>
+> Reintroduce back the original behavior wrt !(FMODE_READ|FMODE_WRITE)
+> modes, while still keeping the original O_NDELAY bug fixed.
+>
+> Cc: stable@vger.kernel.org # v4.5+
+> Reported-by: Wim Osterholt <wim@djo.tudelft.nl>
+> Tested-by: Wim Osterholt <wim@djo.tudelft.nl>
+> Signed-off-by: Jiri Kosina <jkosina@suse.cz>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
----
- block/blk-lib.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Added for this series, thanks.
 
-diff --git a/block/blk-lib.c b/block/blk-lib.c
-index 45b35b1..e371f83 100644
---- a/block/blk-lib.c
-+++ b/block/blk-lib.c
-@@ -178,7 +178,7 @@ int blkdev_issue_write_same(struct block_device *bdev, sector_t sector,
- 
- 	if (bio)
- 		ret = submit_bio_wait(bio);
--	return ret != -EOPNOTSUPP ? ret : 0;
-+	return ret;
- }
- EXPORT_SYMBOL(blkdev_issue_write_same);
- 
 -- 
-2.1.4
+Jens Axboe
