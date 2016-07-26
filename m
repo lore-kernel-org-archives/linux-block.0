@@ -1,207 +1,155 @@
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>,
-	Tejun Heo <tj@kernel.org>
-Cc: Fabio Checconi <fchecconi@gmail.com>,
-	Arianna Avanzini <avanzini.arianna@gmail.com>,
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+	Andreas Dilger <adilger.kernel@dilger.ca>,
+	Jan Kara <jack@suse.com>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+	Hugh Dickins <hughd@google.com>,
+	Andrea Arcangeli <aarcange@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Dave Hansen <dave.hansen@intel.com>,
+	Vlastimil Babka <vbabka@suse.cz>,
+	Matthew Wilcox <willy@infradead.org>,
+	Ross Zwisler <ross.zwisler@linux.intel.com>,
+	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
 	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	linus.walleij@linaro.org,
-	broonie@kernel.org,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH RFC V8 11/22] block, bfq: improve throughput boosting
-Date: Wed, 27 Jul 2016 18:13:27 +0200
-Message-Id: <1469636018-31247-12-git-send-email-paolo.valente@linaro.org>
-In-Reply-To: <1469636018-31247-1-git-send-email-paolo.valente@linaro.org>
-References: <2D83ACA0-2513-4019-9A0D-3166FDDE7485@linaro.org>
- <1469636018-31247-1-git-send-email-paolo.valente@linaro.org>
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv1, RFC 33/33] ext4, vfs: add huge= mount option
+Date: Tue, 26 Jul 2016 03:35:35 +0300
+Message-Id: <1469493335-3622-34-git-send-email-kirill.shutemov@linux.intel.com>
+In-Reply-To: <1469493335-3622-1-git-send-email-kirill.shutemov@linux.intel.com>
+References: <1469493335-3622-1-git-send-email-kirill.shutemov@linux.intel.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-The feedback-loop algorithm used by BFQ to compute queue (process)
-budgets is basically a set of three update rules, one for each of the
-main reasons why a queue may be expired. If many processes suddenly
-switch from sporadic I/O to greedy and sequential I/O, then these
-rules are quite slow to assign large budgets to these processes, and
-hence to achieve a high throughput. On the opposite side, BFQ assigns
-the maximum possible budget B_max to a just-created queue. This allows
-a high throughput to be achieved immediately if the associated process
-is I/O-bound and performs sequential I/O from the beginning. But it
-also increases the worst-case latency experienced by the first
-requests issued by the process, because the larger the budget of a
-queue waiting for service is, the later the queue will be served by
-B-WF2Q+ (Subsec 3.3 in [1]). This is detrimental for an interactive or
-soft real-time application.
+The same four values as in tmpfs case.
 
-To tackle these throughput and latency problems, on one hand this
-patch changes the initial budget value to B_max/2. On the other hand,
-it re-tunes the three rules, adopting a more aggressive,
-multiplicative increase/linear decrease scheme. This scheme trades
-latency for throughput more than before, and tends to assign large
-budgets quickly to processes that are or become I/O-bound. For two of
-the expiration reasons, the new version of the rules also contains
-some more little improvements, briefly described below.
-
-*No more backlog.* In this case, the budget was larger than the number
-of sectors actually read/written by the process before it stopped
-doing I/O. Hence, to reduce latency for the possible future I/O
-requests of the process, the old rule simply set the next budget to
-the number of sectors actually consumed by the process. However, if
-there are still outstanding requests, then the process may have not
-yet issued its next request just because it is still waiting for the
-completion of some of the still outstanding ones. If this sub-case
-holds true, then the new rule, instead of decreasing the budget,
-doubles it, proactively, in the hope that: 1) a larger budget will fit
-the actual needs of the process, and 2) the process is sequential and
-hence a higher throughput will be achieved by serving the process
-longer after granting it access to the device.
-
-*Budget timeout*. The original rule set the new budget to the maximum
-value B_max, to maximize throughput and let all processes experiencing
-budget timeouts receive the same share of the device time. In our
-experiments we verified that this sudden jump to B_max did not provide
-sensible benefits; rather it increased the latency of processes
-performing sporadic and short I/O. The new rule only doubles the
-budget.
-
-[1] P. Valente and M. Andreolini, "Improving Application
-    Responsiveness with the BFQ Disk I/O Scheduler", Proceedings of
-    the 5th Annual International Systems and Storage Conference
-    (SYSTOR '12), June 2012.
-    Slightly extended version:
-    http://algogroup.unimore.it/people/paolo/disk_sched/bfq-v1-suite-
-							results.pdf
-
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
-Signed-off-by: Arianna Avanzini <avanzini.arianna@gmail.com>
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- block/cfq-iosched.c | 83 ++++++++++++++++++++++++++---------------------------
- 1 file changed, 41 insertions(+), 42 deletions(-)
+ fs/ext4/ext4.h  |  5 +++++
+ fs/ext4/inode.c | 26 +++++++++++++++++++++-----
+ fs/ext4/super.c | 19 +++++++++++++++++++
+ 3 files changed, 45 insertions(+), 5 deletions(-)
 
-diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
-index ea63a7a..eed1628 100644
---- a/block/cfq-iosched.c
-+++ b/block/cfq-iosched.c
-@@ -693,9 +693,6 @@ struct kmem_cache *bfq_pool;
- #define BFQQ_SEEK_THR		(sector_t)(8 * 100)
- #define BFQQ_SEEKY(bfqq)	(hweight32(bfqq->seek_history) > 32/8)
+diff --git a/fs/ext4/ext4.h b/fs/ext4/ext4.h
+index ea31931386ec..feece2d1f646 100644
+--- a/fs/ext4/ext4.h
++++ b/fs/ext4/ext4.h
+@@ -1123,6 +1123,11 @@ struct ext4_inode_info {
+ #define EXT4_MOUNT_DIOREAD_NOLOCK	0x400000 /* Enable support for dio read nolocking */
+ #define EXT4_MOUNT_JOURNAL_CHECKSUM	0x800000 /* Journal checksums */
+ #define EXT4_MOUNT_JOURNAL_ASYNC_COMMIT	0x1000000 /* Journal Async Commit */
++#define EXT4_MOUNT_HUGE_MODE		0x6000000 /* Huge support mode: */
++#define EXT4_MOUNT_HUGE_NEVER		0x0000000
++#define EXT4_MOUNT_HUGE_ALWAYS		0x2000000
++#define EXT4_MOUNT_HUGE_WITHIN_SIZE	0x4000000
++#define EXT4_MOUNT_HUGE_ADVISE		0x6000000
+ #define EXT4_MOUNT_DELALLOC		0x8000000 /* Delalloc support */
+ #define EXT4_MOUNT_DATA_ERR_ABORT	0x10000000 /* Abort on file data write */
+ #define EXT4_MOUNT_BLOCK_VALIDITY	0x20000000 /* Block validity checking */
+diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
+index 7c53e490849f..9219734fc7cd 100644
+--- a/fs/ext4/inode.c
++++ b/fs/ext4/inode.c
+@@ -4348,7 +4348,7 @@ int ext4_get_inode_loc(struct inode *inode, struct ext4_iloc *iloc)
+ void ext4_set_inode_flags(struct inode *inode)
+ {
+ 	unsigned int flags = EXT4_I(inode)->i_flags;
+-	unsigned int new_fl = 0;
++	unsigned int mask, new_fl = 0;
  
--/* Budget feedback step. */
--#define BFQ_BUDGET_STEP         128
--
- /* Min samples used for peak rate estimation (for autotuning). */
- #define BFQ_PEAK_RATE_SAMPLES	32
- 
-@@ -3585,36 +3582,6 @@ static struct bfq_queue *bfq_set_in_service_queue(struct bfq_data *bfqd)
- 	return bfqq;
+ 	if (flags & EXT4_SYNC_FL)
+ 		new_fl |= S_SYNC;
+@@ -4360,10 +4360,26 @@ void ext4_set_inode_flags(struct inode *inode)
+ 		new_fl |= S_NOATIME;
+ 	if (flags & EXT4_DIRSYNC_FL)
+ 		new_fl |= S_DIRSYNC;
+-	if (test_opt(inode->i_sb, DAX) && S_ISREG(inode->i_mode))
+-		new_fl |= S_DAX;
+-	inode_set_flags(inode, new_fl,
+-			S_SYNC|S_APPEND|S_IMMUTABLE|S_NOATIME|S_DIRSYNC|S_DAX);
++	if (S_ISREG(inode->i_mode)) {
++		if (test_opt(inode->i_sb, DAX))
++			new_fl |= S_DAX;
++		switch (test_opt(inode->i_sb, HUGE_MODE)) {
++		case EXT4_MOUNT_HUGE_NEVER:
++			break;
++		case EXT4_MOUNT_HUGE_ALWAYS:
++			new_fl |= S_HUGE_ALWAYS;
++			break;
++		case EXT4_MOUNT_HUGE_WITHIN_SIZE:
++			new_fl |= S_HUGE_WITHIN_SIZE;
++			break;
++		case EXT4_MOUNT_HUGE_ADVISE:
++			new_fl |= S_HUGE_ADVISE;
++			break;
++		}
++	}
++	mask = S_SYNC | S_APPEND | S_IMMUTABLE | S_NOATIME |
++		S_DIRSYNC | S_DAX | S_HUGE_MODE;
++	inode_set_flags(inode, new_fl, mask);
  }
  
--/*
-- * bfq_default_budget - return the default budget for @bfqq on @bfqd.
-- * @bfqd: the device descriptor.
-- * @bfqq: the queue to consider.
-- *
-- * We use 3/4 of the @bfqd maximum budget as the default value
-- * for the max_budget field of the queues.  This lets the feedback
-- * mechanism to start from some middle ground, then the behavior
-- * of the process will drive the heuristics towards high values, if
-- * it behaves as a greedy sequential reader, or towards small values
-- * if it shows a more intermittent behavior.
-- */
--static unsigned long bfq_default_budget(struct bfq_data *bfqd,
--					struct bfq_queue *bfqq)
--{
--	unsigned long budget;
--
--	/*
--	 * When we need an estimate of the peak rate we need to avoid
--	 * to give budgets that are too short due to previous measurements.
--	 * So, in the first 10 assignments use a ``safe'' budget value.
--	 */
--	if (bfqd->budgets_assigned < 194 && bfqd->bfq_user_max_budget == 0)
--		budget = bfq_default_max_budget;
--	else
--		budget = bfqd->bfq_max_budget;
--
--	return budget - budget / 4;
--}
--
- static void bfq_arm_slice_timer(struct bfq_data *bfqd)
- {
- 	struct bfq_queue *bfqq = bfqd->in_service_queue;
-@@ -3757,13 +3724,47 @@ static void __bfq_bfqq_recalc_budget(struct bfq_data *bfqd,
- 		 * for throughput.
- 		 */
- 		case BFQ_BFQQ_TOO_IDLE:
--			if (budget > min_budget + BFQ_BUDGET_STEP)
--				budget -= BFQ_BUDGET_STEP;
--			else
--				budget = min_budget;
-+			/*
-+			 * This is the only case where we may reduce
-+			 * the budget: if there is no request of the
-+			 * process still waiting for completion, then
-+			 * we assume (tentatively) that the timer has
-+			 * expired because the batch of requests of
-+			 * the process could have been served with a
-+			 * smaller budget.  Hence, betting that
-+			 * process will behave in the same way when it
-+			 * becomes backlogged again, we reduce its
-+			 * next budget.  As long as we guess right,
-+			 * this budget cut reduces the latency
-+			 * experienced by the process.
-+			 *
-+			 * However, if there are still outstanding
-+			 * requests, then the process may have not yet
-+			 * issued its next request just because it is
-+			 * still waiting for the completion of some of
-+			 * the still outstanding ones.  So in this
-+			 * subcase we do not reduce its budget, on the
-+			 * contrary we increase it to possibly boost
-+			 * the throughput, as discussed in the
-+			 * comments to the BUDGET_TIMEOUT case.
-+			 */
-+			if (bfqq->dispatched > 0) /* still outstanding reqs */
-+				budget = min(budget * 2, bfqd->bfq_max_budget);
-+			else {
-+				if (budget > 5 * min_budget)
-+					budget -= 4 * min_budget;
-+				else
-+					budget = min_budget;
-+			}
- 			break;
- 		case BFQ_BFQQ_BUDGET_TIMEOUT:
--			budget = bfq_default_budget(bfqd, bfqq);
-+			/*
-+			 * We double the budget here because it gives
-+			 * the chance to boost the throughput if this
-+			 * is not a seeky process (and has bumped into
-+			 * this timeout because of, e.g., ZBR).
-+			 */
-+			budget = min(budget * 2, bfqd->bfq_max_budget);
- 			break;
- 		case BFQ_BFQQ_BUDGET_EXHAUSTED:
- 			/*
-@@ -3775,8 +3776,7 @@ static void __bfq_bfqq_recalc_budget(struct bfq_data *bfqd,
- 			 * definitely increase the budget of this good
- 			 * candidate to boost the disk throughput.
- 			 */
--			budget = min(budget + 8 * BFQ_BUDGET_STEP,
--				     bfqd->bfq_max_budget);
-+			budget = min(budget * 4, bfqd->bfq_max_budget);
- 			break;
- 		case BFQ_BFQQ_NO_MORE_REQUESTS:
- 			/*
-@@ -4501,9 +4501,8 @@ static void bfq_init_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq,
- 	bfqq->pid = pid;
+ /* Propagate flags from i_flags to EXT4_I(inode)->i_flags */
+diff --git a/fs/ext4/super.c b/fs/ext4/super.c
+index 1c593aa0218e..0c6ae81f6c1c 100644
+--- a/fs/ext4/super.c
++++ b/fs/ext4/super.c
+@@ -1275,6 +1275,7 @@ enum {
+ 	Opt_dioread_nolock, Opt_dioread_lock,
+ 	Opt_discard, Opt_nodiscard, Opt_init_itable, Opt_noinit_itable,
+ 	Opt_max_dir_size_kb, Opt_nojournal_checksum,
++	Opt_huge_never, Opt_huge_always, Opt_huge_within_size, Opt_huge_advise,
+ };
  
- 	/* Tentative initial value to trade off between thr and lat */
--	bfqq->max_budget = bfq_default_budget(bfqd, bfqq);
-+	bfqq->max_budget = (2 * bfq_max_budget(bfqd)) / 3;
- 	bfqq->budget_timeout = bfq_smallest_from_now();
--	bfqq->pid = pid;
+ static const match_table_t tokens = {
+@@ -1354,6 +1355,10 @@ static const match_table_t tokens = {
+ 	{Opt_init_itable, "init_itable"},
+ 	{Opt_noinit_itable, "noinit_itable"},
+ 	{Opt_max_dir_size_kb, "max_dir_size_kb=%u"},
++	{Opt_huge_never, "huge=never"},
++	{Opt_huge_always, "huge=always"},
++	{Opt_huge_within_size, "huge=within_size"},
++	{Opt_huge_advise, "huge=advise"},
+ 	{Opt_test_dummy_encryption, "test_dummy_encryption"},
+ 	{Opt_removed, "check=none"},	/* mount option from ext2/3 */
+ 	{Opt_removed, "nocheck"},	/* mount option from ext2/3 */
+@@ -1472,6 +1477,11 @@ static int clear_qf_name(struct super_block *sb, int qtype)
+ #define MOPT_NO_EXT3	0x0200
+ #define MOPT_EXT4_ONLY	(MOPT_NO_EXT2 | MOPT_NO_EXT3)
+ #define MOPT_STRING	0x0400
++#ifdef CONFIG_TRANSPARENT_HUGE_PAGECACHE
++#define MOPT_HUGE	0x1000
++#else
++#define MOPT_HUGE	MOPT_NOSUPPORT
++#endif
  
- 	/* first request is almost certainly seeky */
- 	bfqq->seek_history = 1;
+ static const struct mount_opts {
+ 	int	token;
+@@ -1556,6 +1566,10 @@ static const struct mount_opts {
+ 	{Opt_jqfmt_vfsv0, QFMT_VFS_V0, MOPT_QFMT},
+ 	{Opt_jqfmt_vfsv1, QFMT_VFS_V1, MOPT_QFMT},
+ 	{Opt_max_dir_size_kb, 0, MOPT_GTE0},
++	{Opt_huge_never, EXT4_MOUNT_HUGE_NEVER, MOPT_HUGE},
++	{Opt_huge_always, EXT4_MOUNT_HUGE_ALWAYS, MOPT_HUGE},
++	{Opt_huge_within_size, EXT4_MOUNT_HUGE_WITHIN_SIZE, MOPT_HUGE},
++	{Opt_huge_advise, EXT4_MOUNT_HUGE_ADVISE, MOPT_HUGE},
+ 	{Opt_test_dummy_encryption, 0, MOPT_GTE0},
+ 	{Opt_err, 0, 0}
+ };
+@@ -1637,6 +1651,11 @@ static int handle_mount_opt(struct super_block *sb, char *opt, int token,
+ 		} else
+ 			return -1;
+ 	}
++	if (MOPT_HUGE != MOPT_NOSUPPORT && m->flags & MOPT_HUGE) {
++		sbi->s_mount_opt &= ~EXT4_MOUNT_HUGE_MODE;
++		sbi->s_mount_opt |= m->mount_opt;
++		return 1;
++	}
+ 	if (m->flags & MOPT_CLEAR_ERR)
+ 		clear_opt(sb, ERRORS_MASK);
+ 	if (token == Opt_noquota && sb_any_quota_loaded(sb)) {
 -- 
-1.9.1
+2.8.1
+
