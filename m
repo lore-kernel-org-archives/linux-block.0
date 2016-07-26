@@ -1,39 +1,138 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.9]:54927 "EHLO
-	bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751570AbcGUJY0 (ORCPT
-	<rfc822;linux-block@vger.kernel.org>);
-	Thu, 21 Jul 2016 05:24:26 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@fb.com, agordeev@redhat.com, linux-block@vger.kernel.org
-Subject: resend: blk-mq: allow passing in an external queue mapping
-Date: Thu, 21 Jul 2016 11:24:16 +0200
-Message-Id: <1469093059-24594-1-git-send-email-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+	Andreas Dilger <adilger.kernel@dilger.ca>,
+	Jan Kara <jack@suse.com>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+	Hugh Dickins <hughd@google.com>,
+	Andrea Arcangeli <aarcange@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Dave Hansen <dave.hansen@intel.com>,
+	Vlastimil Babka <vbabka@suse.cz>,
+	Matthew Wilcox <willy@infradead.org>,
+	Ross Zwisler <ross.zwisler@linux.intel.com>,
+	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+	linux-block@vger.kernel.org,
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv1, RFC 31/33] WIP: ext4: handle writeback with huge pages
+Date: Tue, 26 Jul 2016 03:35:33 +0300
+Message-Id: <1469493335-3622-32-git-send-email-kirill.shutemov@linux.intel.com>
+In-Reply-To: <1469493335-3622-1-git-send-email-kirill.shutemov@linux.intel.com>
+References: <1469493335-3622-1-git-send-email-kirill.shutemov@linux.intel.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-This series is one third of the earlier "automatic interrupt affinity for
-MSI/MSI-X capable devices" series, and make uses of the new irq-level
-interrupt / queue mapping code in blk-mq, as well as allowing the driver
-to pass in such a mask obtained from the (PCI) interrupt code.  To fully
-support this feature in drivers the final third in the PCI layer will
-be needed as well.
+Modify mpage_map_and_submit_buffers() to do writeback with huge pages.
 
-For the patches to work you need to merge the irq/for-block branch of
+This is somewhat unstable. I have hard time see full picture yet.
+More work is required.
 
-   https://git.kernel.org/pub/scm/linux/kernel/git/tip/tip
+Not-yet-signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+---
+ fs/ext4/inode.c | 40 ++++++++++++++++++++++++++--------------
+ 1 file changed, 26 insertions(+), 14 deletions(-)
 
-first, which will cause a conflict in block/blk-lib.c due to the discard
-changes in 4.7 vs for-next.
-
-I've pre-merged the branches in the git tree available at:
-
-   git://git.infradead.org/users/hch/block.git queue-mapping
-
-Gitweb:
-
-   http://git.infradead.org/users/hch/block.git/shortlog/refs/heads/queue-mapping
-
-Changes since automatic interrupt affinity for MSI/MSI-X capable devices V3:
- - a trivial cleanup in blk_mq_create_mq_map pointed out by Alexander
+diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
+index 2e22f62f007b..29133e4550fc 100644
+--- a/fs/ext4/inode.c
++++ b/fs/ext4/inode.c
+@@ -2088,16 +2088,16 @@ static int mpage_submit_page(struct mpage_da_data *mpd, struct page *page)
+ 	loff_t size = i_size_read(mpd->inode);
+ 	int err;
+ 
+-	BUG_ON(page->index != mpd->first_page);
+-	if (page->index == size >> PAGE_SHIFT)
+-		len = size & ~PAGE_MASK;
+-	else
+-		len = PAGE_SIZE;
++	page = compound_head(page);
++	len = hpage_size(page);
++	if (page->index + hpage_nr_pages(page) - 1 == size >> PAGE_SHIFT)
++		len = size & ~hpage_mask(page);
++
+ 	clear_page_dirty_for_io(page);
+ 	err = ext4_bio_write_page(&mpd->io_submit, page, len, mpd->wbc, false);
+ 	if (!err)
+-		mpd->wbc->nr_to_write--;
+-	mpd->first_page++;
++		mpd->wbc->nr_to_write -= hpage_nr_pages(page);
++	mpd->first_page = round_up(mpd->first_page + 1, hpage_nr_pages(page));
+ 
+ 	return err;
+ }
+@@ -2245,12 +2245,16 @@ static int mpage_map_and_submit_buffers(struct mpage_da_data *mpd)
+ 			break;
+ 		for (i = 0; i < nr_pages; i++) {
+ 			struct page *page = pvec.pages[i];
++			unsigned long diff;
+ 
+-			if (page->index > end)
++			if (page_to_pgoff(page) > end)
+ 				break;
+ 			/* Up to 'end' pages must be contiguous */
+-			BUG_ON(page->index != start);
++			BUG_ON(page_to_pgoff(page) != start);
++			diff = (page - compound_head(page)) << bpp_bits;
+ 			bh = head = page_buffers(page);
++			while (diff--)
++				bh = bh->b_this_page;
+ 			do {
+ 				if (lblk < mpd->map.m_lblk)
+ 					continue;
+@@ -2287,7 +2291,10 @@ static int mpage_map_and_submit_buffers(struct mpage_da_data *mpd)
+ 			 * supports blocksize < pagesize as we will try to
+ 			 * convert potentially unmapped parts of inode.
+ 			 */
+-			mpd->io_submit.io_end->size += PAGE_SIZE;
++			if (PageTransCompound(page))
++				mpd->io_submit.io_end->size += HPAGE_PMD_SIZE;
++			else
++				mpd->io_submit.io_end->size += PAGE_SIZE;
+ 			/* Page fully mapped - let IO run! */
+ 			err = mpage_submit_page(mpd, page);
+ 			if (err < 0) {
+@@ -2295,6 +2302,10 @@ static int mpage_map_and_submit_buffers(struct mpage_da_data *mpd)
+ 				return err;
+ 			}
+ 			start++;
++			if (PageTransCompound(page)) {
++				start = round_up(start, HPAGE_PMD_NR);
++				break;
++			}
+ 		}
+ 		pagevec_release(&pvec);
+ 	}
+@@ -2534,7 +2545,7 @@ static int mpage_prepare_extent_to_map(struct mpage_da_data *mpd)
+ 			 * mapping. However, page->index will not change
+ 			 * because we have a reference on the page.
+ 			 */
+-			if (page->index > end)
++			if (page_to_pgoff(page) > end)
+ 				goto out;
+ 
+ 			/*
+@@ -2563,7 +2574,7 @@ static int mpage_prepare_extent_to_map(struct mpage_da_data *mpd)
+ 			if (!PageDirty(page) ||
+ 			    (PageWriteback(page) &&
+ 			     (mpd->wbc->sync_mode == WB_SYNC_NONE)) ||
+-			    unlikely(page->mapping != mapping)) {
++			    unlikely(page_mapping(page) != mapping)) {
+ 				unlock_page(page);
+ 				continue;
+ 			}
+@@ -2572,8 +2583,9 @@ static int mpage_prepare_extent_to_map(struct mpage_da_data *mpd)
+ 			BUG_ON(PageWriteback(page));
+ 
+ 			if (mpd->map.m_len == 0)
+-				mpd->first_page = page->index;
+-			mpd->next_page = page->index + 1;
++				mpd->first_page = page_to_pgoff(page);
++			mpd->next_page = round_up(mpd->first_page + 1,
++					hpage_nr_pages(compound_head(page)));
+ 			/* Add all dirty buffers to mpd */
+ 			lblk = ((ext4_lblk_t)page->index) <<
+ 				(PAGE_SHIFT - blkbits);
+-- 
+2.8.1
 
