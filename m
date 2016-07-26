@@ -1,60 +1,73 @@
-Return-Path: <elfring@users.sourceforge.net>
-Subject: [PATCH] block: Delete an unnecessary check before the function call
- "kmem_cache_destroy"
-To: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-References: <5307CAA2.8060406@users.sourceforge.net>
- <alpine.DEB.2.02.1402212321410.2043@localhost6.localdomain6>
- <530A086E.8010901@users.sourceforge.net>
- <alpine.DEB.2.02.1402231635510.1985@localhost6.localdomain6>
- <530A72AA.3000601@users.sourceforge.net>
- <alpine.DEB.2.02.1402240658210.2090@localhost6.localdomain6>
- <530B5FB6.6010207@users.sourceforge.net>
- <alpine.DEB.2.10.1402241710370.2074@hadrien>
- <530C5E18.1020800@users.sourceforge.net>
- <alpine.DEB.2.10.1402251014170.2080@hadrien>
- <530CD2C4.4050903@users.sourceforge.net>
- <alpine.DEB.2.10.1402251840450.7035@hadrien>
- <530CF8FF.8080600@users.sourceforge.net>
- <alpine.DEB.2.02.1402252117150.2047@localhost6.localdomain6>
- <530DD06F.4090703@users.sourceforge.net>
- <alpine.DEB.2.02.1402262129250.2221@localhost6.localdomain6>
- <5317A59D.4@users.sourceforge.net>
-Cc: LKML <linux-kernel@vger.kernel.org>, kernel-janitors@vger.kernel.org,
- Julia Lawall <julia.lawall@lip6.fr>
-From: SF Markus Elfring <elfring@users.sourceforge.net>
-Message-ID: <21c3d738-2da9-884d-1703-98cba826e0f0@users.sourceforge.net>
-Date: Fri, 22 Jul 2016 21:21:26 +0200
-MIME-Version: 1.0
-In-Reply-To: <5317A59D.4@users.sourceforge.net>
-Content-Type: text/plain; charset=windows-1252
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga02.intel.com ([134.134.136.20]:14905 "EHLO mga02.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755290AbcGZAgA (ORCPT <rfc822;linux-block@vger.kernel.org>);
+	Mon, 25 Jul 2016 20:36:00 -0400
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+	Andreas Dilger <adilger.kernel@dilger.ca>,
+	Jan Kara <jack@suse.com>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+	Hugh Dickins <hughd@google.com>,
+	Andrea Arcangeli <aarcange@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Dave Hansen <dave.hansen@intel.com>,
+	Vlastimil Babka <vbabka@suse.cz>,
+	Matthew Wilcox <willy@infradead.org>,
+	Ross Zwisler <ross.zwisler@linux.intel.com>,
+	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+	linux-block@vger.kernel.org,
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv1, RFC 14/33] filemap: handle huge pages in do_generic_file_read()
+Date: Tue, 26 Jul 2016 03:35:16 +0300
+Message-Id: <1469493335-3622-15-git-send-email-kirill.shutemov@linux.intel.com>
+In-Reply-To: <1469493335-3622-1-git-send-email-kirill.shutemov@linux.intel.com>
+References: <1469493335-3622-1-git-send-email-kirill.shutemov@linux.intel.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Markus Elfring <elfring@users.sourceforge.net>
-Date: Fri, 22 Jul 2016 21:07:37 +0200
+Most of work happans on head page. Only when we need to do copy data to
+userspace we find relevant subpage.
 
-The kmem_cache_destroy() function tests whether its argument is NULL
-and then returns immediately. Thus the test around the call is not needed.
+We are still limited by PAGE_SIZE per iteration. Lifting this limitation
+would require some more work.
 
-This issue was detected by using the Coccinelle software.
-
-Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- block/elevator.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ mm/filemap.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/block/elevator.c b/block/elevator.c
-index 7096c22..29dc177 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -846,8 +846,7 @@ int elv_register(struct elevator_type *e)
- 	spin_lock(&elv_list_lock);
- 	if (elevator_find(e->elevator_name)) {
- 		spin_unlock(&elv_list_lock);
--		if (e->icq_cache)
--			kmem_cache_destroy(e->icq_cache);
-+		kmem_cache_destroy(e->icq_cache);
- 		return -EBUSY;
- 	}
- 	list_add_tail(&e->list, &elv_list);
+diff --git a/mm/filemap.c b/mm/filemap.c
+index a3183e688718..566c7e6ca423 100644
+--- a/mm/filemap.c
++++ b/mm/filemap.c
+@@ -1819,6 +1819,7 @@ find_page:
+ 			if (unlikely(page == NULL))
+ 				goto no_cached_page;
+ 		}
++		page = compound_head(page);
+ 		if (PageReadahead(page)) {
+ 			page_cache_async_readahead(mapping,
+ 					ra, filp, page,
+@@ -1895,7 +1896,8 @@ page_ok:
+ 		 * now we can copy it to user space...
+ 		 */
+ 
+-		ret = copy_page_to_iter(page, offset, nr, iter);
++		ret = copy_page_to_iter(page + index - page->index, offset,
++				nr, iter);
+ 		offset += ret;
+ 		index += offset >> PAGE_SHIFT;
+ 		offset &= ~PAGE_MASK;
+@@ -2315,6 +2317,7 @@ page_not_uptodate:
+ 	 * because there really aren't any performance issues here
+ 	 * and we need to check for errors.
+ 	 */
++	page = compound_head(page);
+ 	ClearPageError(page);
+ 	error = mapping->a_ops->readpage(file, page);
+ 	if (!error) {
 -- 
-2.9.2
+2.8.1
+
