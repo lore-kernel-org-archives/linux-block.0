@@ -1,16 +1,140 @@
-Return-Path: <BATV+a6fbff1bfc78a84bb09b+4713+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org
-Subject: resend: a few more fixups for the ops vs flags split
-Date: Tue, 19 Jul 2016 11:28:40 +0200
-Message-Id: <1468920523-3189-1-git-send-email-hch@lst.de>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+	Andreas Dilger <adilger.kernel@dilger.ca>,
+	Jan Kara <jack@suse.com>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+	Hugh Dickins <hughd@google.com>,
+	Andrea Arcangeli <aarcange@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Dave Hansen <dave.hansen@intel.com>,
+	Vlastimil Babka <vbabka@suse.cz>,
+	Matthew Wilcox <willy@infradead.org>,
+	Ross Zwisler <ross.zwisler@linux.intel.com>,
+	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+	linux-block@vger.kernel.org,
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv1, RFC 22/33] fs: make block_write_{begin,end}() be able to handle huge pages
+Date: Tue, 26 Jul 2016 03:35:24 +0300
+Message-Id: <1469493335-3622-23-git-send-email-kirill.shutemov@linux.intel.com>
+In-Reply-To: <1469493335-3622-1-git-send-email-kirill.shutemov@linux.intel.com>
+References: <1469493335-3622-1-git-send-email-kirill.shutemov@linux.intel.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Get rid of the very confusing bio_rw helper, which mixes OPs and flags,
-and shrink the bio back to it's original size.
+It's more or less straight-forward.
 
-Btw, I'm not really sure if having bi_rw and bi_flags really is the
-right thing in the long run, it seem rather confusing for users.
+Most changes are around getting offset/len withing page right and zero
+out desired part of the page.
 
-Compared to the last posting on June 13 this just adds Reviewed-by tags.
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+---
+ fs/buffer.c | 53 +++++++++++++++++++++++++++++++----------------------
+ 1 file changed, 31 insertions(+), 22 deletions(-)
+
+diff --git a/fs/buffer.c b/fs/buffer.c
+index 9ca197a924eb..edd0971f9f95 100644
+--- a/fs/buffer.c
++++ b/fs/buffer.c
+@@ -1870,21 +1870,21 @@ void page_zero_new_buffers(struct page *page, unsigned from, unsigned to)
+ 	do {
+ 		block_end = block_start + bh->b_size;
+ 
+-		if (buffer_new(bh)) {
+-			if (block_end > from && block_start < to) {
+-				if (!PageUptodate(page)) {
+-					unsigned start, size;
++		if (buffer_new(bh) && block_end > from && block_start < to) {
++			if (!PageUptodate(page)) {
++				unsigned start, size;
+ 
+-					start = max(from, block_start);
+-					size = min(to, block_end) - start;
++				start = max(from, block_start);
++				size = min(to, block_end) - start;
+ 
+-					zero_user(page, start, size);
+-					set_buffer_uptodate(bh);
+-				}
+-
+-				clear_buffer_new(bh);
+-				mark_buffer_dirty(bh);
++				zero_user(page + block_start / PAGE_SIZE,
++						start % PAGE_SIZE,
++						size % PAGE_SIZE);
++				set_buffer_uptodate(bh);
+ 			}
++
++			clear_buffer_new(bh);
++			mark_buffer_dirty(bh);
+ 		}
+ 
+ 		block_start = block_end;
+@@ -1950,18 +1950,20 @@ iomap_to_bh(struct inode *inode, sector_t block, struct buffer_head *bh,
+ int __block_write_begin_int(struct page *page, loff_t pos, unsigned len,
+ 		get_block_t *get_block, struct iomap *iomap)
+ {
+-	unsigned from = pos & (PAGE_SIZE - 1);
+-	unsigned to = from + len;
+-	struct inode *inode = page->mapping->host;
++	unsigned from, to;
++	struct inode *inode = page_mapping(page)->host;
+ 	unsigned block_start, block_end;
+ 	sector_t block;
+ 	int err = 0;
+ 	unsigned blocksize, bbits;
+ 	struct buffer_head *bh, *head, *wait[2], **wait_bh=wait;
+ 
++	page = compound_head(page);
++	from = pos & ~hpage_mask(page);
++	to = from + len;
+ 	BUG_ON(!PageLocked(page));
+-	BUG_ON(from > PAGE_SIZE);
+-	BUG_ON(to > PAGE_SIZE);
++	BUG_ON(from > hpage_size(page));
++	BUG_ON(to > hpage_size(page));
+ 	BUG_ON(from > to);
+ 
+ 	head = create_page_buffers(page, inode, 0);
+@@ -2001,10 +2003,15 @@ int __block_write_begin_int(struct page *page, loff_t pos, unsigned len,
+ 					mark_buffer_dirty(bh);
+ 					continue;
+ 				}
+-				if (block_end > to || block_start < from)
+-					zero_user_segments(page,
+-						to, block_end,
+-						block_start, from);
++				if (block_end > to || block_start < from) {
++					BUG_ON(to - from  > PAGE_SIZE);
++					zero_user_segments(page +
++							block_start / PAGE_SIZE,
++						to % PAGE_SIZE,
++						block_end % PAGE_SIZE,
++						block_start % PAGE_SIZE,
++						from % PAGE_SIZE);
++				}
+ 				continue;
+ 			}
+ 		}
+@@ -2048,6 +2055,7 @@ static int __block_commit_write(struct inode *inode, struct page *page,
+ 	unsigned blocksize;
+ 	struct buffer_head *bh, *head;
+ 
++	VM_BUG_ON_PAGE(PageTail(page), page);
+ 	bh = head = page_buffers(page);
+ 	blocksize = bh->b_size;
+ 
+@@ -2114,7 +2122,8 @@ int block_write_end(struct file *file, struct address_space *mapping,
+ 	struct inode *inode = mapping->host;
+ 	unsigned start;
+ 
+-	start = pos & (PAGE_SIZE - 1);
++	page = compound_head(page);
++	start = pos & ~hpage_mask(page);
+ 
+ 	if (unlikely(copied < len)) {
+ 		/*
+-- 
+2.8.1
+
