@@ -1,151 +1,115 @@
-Return-Path: <BATV+a6fbff1bfc78a84bb09b+4713+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org
-Subject: [PATCH 6/7] scsi/osd: open code blk_make_request
-Date: Tue, 19 Jul 2016 11:31:53 +0200
-Message-Id: <1468920714-4304-7-git-send-email-hch@lst.de>
-In-Reply-To: <1468920714-4304-1-git-send-email-hch@lst.de>
-References: <1468920714-4304-1-git-send-email-hch@lst.de>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+	Andreas Dilger <adilger.kernel@dilger.ca>,
+	Jan Kara <jack@suse.com>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+	Hugh Dickins <hughd@google.com>,
+	Andrea Arcangeli <aarcange@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Dave Hansen <dave.hansen@intel.com>,
+	Vlastimil Babka <vbabka@suse.cz>,
+	Matthew Wilcox <willy@infradead.org>,
+	Ross Zwisler <ross.zwisler@linux.intel.com>,
+	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+	linux-block@vger.kernel.org,
+	Matthew Wilcox <willy@linux.intel.com>,
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv1, RFC 02/33] radix tree test suite: Allow GFP_ATOMIC allocations to fail
+Date: Tue, 26 Jul 2016 03:35:04 +0300
+Message-Id: <1469493335-3622-3-git-send-email-kirill.shutemov@linux.intel.com>
+In-Reply-To: <1469493335-3622-1-git-send-email-kirill.shutemov@linux.intel.com>
+References: <1469493335-3622-1-git-send-email-kirill.shutemov@linux.intel.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-I wish the OSD code could simply use blk_rq_map_* helpers like
-everyone else, but the complex nature of deciding if we have
-DATA IN and/or DATA OUT buffers might make this impossible
-(at least for a mere human like me).
+From: Matthew Wilcox <willy@linux.intel.com>
 
-But using blk_rq_append_bio at least allows sharing the setup code
-between request with or without dat a buffers, and given that this
-is the last user of blk_make_request it allows getting rid of that
-somewhat awkward interface.
+In order to test the preload code, it is necessary to fail GFP_ATOMIC
+allocations, which requires defining GFP_KERNEL and GFP_ATOMIC properly.
+Remove the obsolete __GFP_WAIT and copy the definitions of the __GFP
+flags which are used from the kernel include files.  We also need the
+real definition of gfpflags_allow_blocking() to persuade the radix tree
+to actually use its preallocated nodes.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Acked-by: Boaz Harrosh <ooo@electrozaur.com>
+Signed-off-by: Matthew Wilcox <willy@linux.intel.com>
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- block/blk-core.c                 | 57 ----------------------------------------
- drivers/scsi/osd/osd_initiator.c | 25 +++++++++++-------
- include/linux/blkdev.h           |  2 --
- 3 files changed, 16 insertions(+), 68 deletions(-)
+ tools/testing/radix-tree/linux.c      |  7 ++++++-
+ tools/testing/radix-tree/linux/gfp.h  | 24 ++++++++++++++++++++----
+ tools/testing/radix-tree/linux/slab.h |  5 -----
+ 3 files changed, 26 insertions(+), 10 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 0e8b00f..a687e9c 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1318,63 +1318,6 @@ struct request *blk_get_request(struct request_queue *q, int rw, gfp_t gfp_mask)
- EXPORT_SYMBOL(blk_get_request);
+diff --git a/tools/testing/radix-tree/linux.c b/tools/testing/radix-tree/linux.c
+index 154823737b20..3cfb04e98e2f 100644
+--- a/tools/testing/radix-tree/linux.c
++++ b/tools/testing/radix-tree/linux.c
+@@ -33,7 +33,12 @@ mempool_t *mempool_create(int min_nr, mempool_alloc_t *alloc_fn,
  
- /**
-- * blk_make_request - given a bio, allocate a corresponding struct request.
-- * @q: target request queue
-- * @bio:  The bio describing the memory mappings that will be submitted for IO.
-- *        It may be a chained-bio properly constructed by block/bio layer.
-- * @gfp_mask: gfp flags to be used for memory allocation
-- *
-- * blk_make_request is the parallel of generic_make_request for BLOCK_PC
-- * type commands. Where the struct request needs to be farther initialized by
-- * the caller. It is passed a &struct bio, which describes the memory info of
-- * the I/O transfer.
-- *
-- * The caller of blk_make_request must make sure that bi_io_vec
-- * are set to describe the memory buffers. That bio_data_dir() will return
-- * the needed direction of the request. (And all bio's in the passed bio-chain
-- * are properly set accordingly)
-- *
-- * If called under none-sleepable conditions, mapped bio buffers must not
-- * need bouncing, by calling the appropriate masked or flagged allocator,
-- * suitable for the target device. Otherwise the call to blk_queue_bounce will
-- * BUG.
-- *
-- * WARNING: When allocating/cloning a bio-chain, careful consideration should be
-- * given to how you allocate bios. In particular, you cannot use
-- * __GFP_DIRECT_RECLAIM for anything but the first bio in the chain. Otherwise
-- * you risk waiting for IO completion of a bio that hasn't been submitted yet,
-- * thus resulting in a deadlock. Alternatively bios should be allocated using
-- * bio_kmalloc() instead of bio_alloc(), as that avoids the mempool deadlock.
-- * If possible a big IO should be split into smaller parts when allocation
-- * fails. Partial allocation should not be an error, or you risk a live-lock.
-- */
--struct request *blk_make_request(struct request_queue *q, struct bio *bio,
--				 gfp_t gfp_mask)
--{
--	struct request *rq = blk_get_request(q, bio_data_dir(bio), gfp_mask);
--
--	if (IS_ERR(rq))
--		return rq;
--
--	blk_rq_set_block_pc(rq);
--
--	for_each_bio(bio) {
--		struct bio *bounce_bio = bio;
--		int ret;
--
--		blk_queue_bounce(q, &bounce_bio);
--		ret = blk_rq_append_bio(rq, bounce_bio);
--		if (unlikely(ret)) {
--			blk_put_request(rq);
--			return ERR_PTR(ret);
--		}
--	}
--
--	return rq;
--}
--EXPORT_SYMBOL(blk_make_request);
--
--/**
-  * blk_rq_set_block_pc - initialize a request to type BLOCK_PC
-  * @rq:		request to be initialized
-  *
-diff --git a/drivers/scsi/osd/osd_initiator.c b/drivers/scsi/osd/osd_initiator.c
-index daa4dc1..2f2a991 100644
---- a/drivers/scsi/osd/osd_initiator.c
-+++ b/drivers/scsi/osd/osd_initiator.c
-@@ -1558,18 +1558,25 @@ static int _osd_req_finalize_data_integrity(struct osd_request *or,
- static struct request *_make_request(struct request_queue *q, bool has_write,
- 			      struct _osd_io_info *oii, gfp_t flags)
+ void *kmem_cache_alloc(struct kmem_cache *cachep, int flags)
  {
--	if (oii->bio)
--		return blk_make_request(q, oii->bio, flags);
--	else {
--		struct request *req;
+-	void *ret = malloc(cachep->size);
++	void *ret;
++
++	if (flags & __GFP_NOWARN)
++		return NULL;
++
++	ret = malloc(cachep->size);
+ 	if (cachep->ctor)
+ 		cachep->ctor(ret);
+ 	uatomic_inc(&nr_allocated);
+diff --git a/tools/testing/radix-tree/linux/gfp.h b/tools/testing/radix-tree/linux/gfp.h
+index 0e37f7a760eb..5b09b2ce6c33 100644
+--- a/tools/testing/radix-tree/linux/gfp.h
++++ b/tools/testing/radix-tree/linux/gfp.h
+@@ -1,10 +1,26 @@
+ #ifndef _GFP_H
+ #define _GFP_H
+ 
+-#define __GFP_BITS_SHIFT 22
++#define __GFP_BITS_SHIFT 26
+ #define __GFP_BITS_MASK ((gfp_t)((1 << __GFP_BITS_SHIFT) - 1))
+-#define __GFP_WAIT 1
+-#define __GFP_ACCOUNT 0
+-#define __GFP_NOWARN 0
++
++#define __GFP_HIGH		0x20u
++#define __GFP_IO		0x40u
++#define __GFP_FS		0x80u
++#define __GFP_NOWARN		0x200u
++#define __GFP_ATOMIC		0x80000u
++#define __GFP_ACCOUNT		0x100000u
++#define __GFP_DIRECT_RECLAIM	0x400000u
++#define __GFP_KSWAPD_RECLAIM	0x2000000u
++
++#define __GFP_RECLAIM		(__GFP_DIRECT_RECLAIM|__GFP_KSWAPD_RECLAIM)
++
++#define GFP_ATOMIC		(__GFP_HIGH|__GFP_ATOMIC|__GFP_KSWAPD_RECLAIM)
++#define GFP_KERNEL		(__GFP_RECLAIM | __GFP_IO | __GFP_FS)
++
++static inline bool gfpflags_allow_blocking(const gfp_t gfp_flags)
++{
++	return !!(gfp_flags & __GFP_DIRECT_RECLAIM);
++}
+ 
+ #endif
+diff --git a/tools/testing/radix-tree/linux/slab.h b/tools/testing/radix-tree/linux/slab.h
+index 6d5a34770fd4..452e2bf502e3 100644
+--- a/tools/testing/radix-tree/linux/slab.h
++++ b/tools/testing/radix-tree/linux/slab.h
+@@ -7,11 +7,6 @@
+ #define SLAB_PANIC 2
+ #define SLAB_RECLAIM_ACCOUNT    0x00020000UL            /* Objects are reclaimable */
+ 
+-static inline int gfpflags_allow_blocking(gfp_t mask)
+-{
+-	return 1;
+-}
 -
--		req = blk_get_request(q, has_write ? WRITE : READ, flags);
--		if (IS_ERR(req))
--			return req;
-+	struct request *req;
-+	struct bio *bio = oii->bio;
-+	int ret;
- 
--		blk_rq_set_block_pc(req);
-+	req = blk_get_request(q, has_write ? WRITE : READ, flags);
-+	if (IS_ERR(req))
- 		return req;
-+	blk_rq_set_block_pc(req);
-+
-+	for_each_bio(bio) {
-+		struct bio *bounce_bio = bio;
-+
-+		blk_queue_bounce(req->q, &bounce_bio);
-+		ret = blk_rq_append_bio(req, bounce_bio);
-+		if (ret)
-+			return ERR_PTR(ret);
- 	}
-+
-+	return req;
- }
- 
- static int _init_blk_request(struct osd_request *or,
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index a029ad9..18e5e5a 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -787,8 +787,6 @@ extern void blk_rq_init(struct request_queue *q, struct request *rq);
- extern void blk_put_request(struct request *);
- extern void __blk_put_request(struct request_queue *, struct request *);
- extern struct request *blk_get_request(struct request_queue *, int, gfp_t);
--extern struct request *blk_make_request(struct request_queue *, struct bio *,
--					gfp_t);
- extern void blk_rq_set_block_pc(struct request *);
- extern void blk_requeue_request(struct request_queue *, struct request *);
- extern void blk_add_request_payload(struct request *rq, struct page *page,
+ struct kmem_cache {
+ 	int size;
+ 	void (*ctor)(void *);
 -- 
-2.1.4
+2.8.1
+
