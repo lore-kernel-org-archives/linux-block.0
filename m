@@ -1,70 +1,51 @@
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>,
-	Tejun Heo <tj@kernel.org>
-Cc: Fabio Checconi <fchecconi@gmail.com>,
-	Arianna Avanzini <avanzini.arianna@gmail.com>,
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+	Andreas Dilger <adilger.kernel@dilger.ca>,
+	Jan Kara <jack@suse.com>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+	Hugh Dickins <hughd@google.com>,
+	Andrea Arcangeli <aarcange@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Dave Hansen <dave.hansen@intel.com>,
+	Vlastimil Babka <vbabka@suse.cz>,
+	Matthew Wilcox <willy@infradead.org>,
+	Ross Zwisler <ross.zwisler@linux.intel.com>,
+	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
 	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	linus.walleij@linaro.org,
-	broonie@kernel.org,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH RFC V8 02/22] block, cfq: remove close-based preemption
-Date: Wed, 27 Jul 2016 18:13:18 +0200
-Message-Id: <1469636018-31247-3-git-send-email-paolo.valente@linaro.org>
-In-Reply-To: <1469636018-31247-1-git-send-email-paolo.valente@linaro.org>
-References: <2D83ACA0-2513-4019-9A0D-3166FDDE7485@linaro.org>
- <1469636018-31247-1-git-send-email-paolo.valente@linaro.org>
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv1, RFC 18/33] HACK: block: bump BIO_MAX_PAGES
+Date: Tue, 26 Jul 2016 03:35:20 +0300
+Message-Id: <1469493335-3622-19-git-send-email-kirill.shutemov@linux.intel.com>
+In-Reply-To: <1469493335-3622-1-git-send-email-kirill.shutemov@linux.intel.com>
+References: <1469493335-3622-1-git-send-email-kirill.shutemov@linux.intel.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-From: Arianna Avanzini <avanzini.arianna@gmail.com>
+We are going to do IO a huge page a time. For x86-64, it's 512 pages, so
+we need to double current BIO_MAX_PAGES.
 
-CFQ may preempt the queue currently in service if a new request, for a
-different queue, happens to be close to the last-dispatched
-request. This boosts the throughput with processes that issue close
-requests, but whose I/O patterns are not regularly interleaved enough
-to trigger the activation of the queue-merging heuristic removed in
-the previous commit. BFQ does not need to perform any such preemption,
-because the queue-merging mechanism of BFQ (EQM) is reactive enough to
-merge queues also in the presence of irregularly interleaved I/O.
+To be portable to other archtectures we need more generic solution.
 
-Signed-off-by: Arianna Avanzini <avanzini.arianna@gmail.com>
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- block/cfq-iosched.c | 13 -------------
- 1 file changed, 13 deletions(-)
+ include/linux/bio.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
-index 18a7291..1b9fa10 100644
---- a/block/cfq-iosched.c
-+++ b/block/cfq-iosched.c
-@@ -2677,12 +2677,6 @@ static inline sector_t cfq_dist_from_last(struct cfq_data *cfqd,
- 		return cfqd->last_position - blk_rq_pos(rq);
- }
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index b7e1a00810f2..e10c67f21366 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -40,7 +40,7 @@
+ #define BIO_BUG_ON
+ #endif
  
--static inline int cfq_rq_close(struct cfq_data *cfqd, struct cfq_queue *cfqq,
--			       struct request *rq)
--{
--	return cfq_dist_from_last(cfqd, rq) <= CFQQ_CLOSE_THR;
--}
--
- /*
-  * Determine whether we should enforce idle window for this queue.
-  */
-@@ -3724,13 +3718,6 @@ cfq_should_preempt(struct cfq_data *cfqd, struct cfq_queue *new_cfqq,
- 	if (!cfqd->active_cic || !cfq_cfqq_wait_request(cfqq))
- 		return false;
+-#define BIO_MAX_PAGES		256
++#define BIO_MAX_PAGES		512
  
--	/*
--	 * if this request is as-good as one we would expect from the
--	 * current cfqq, let it preempt
--	 */
--	if (cfq_rq_close(cfqd, cfqq, rq))
--		return true;
--
- 	return false;
- }
- 
+ #define bio_prio(bio)			(bio)->bi_ioprio
+ #define bio_set_prio(bio, prio)		((bio)->bi_ioprio = prio)
 -- 
-1.9.1
+2.8.1
+
