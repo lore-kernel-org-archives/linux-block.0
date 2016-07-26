@@ -1,106 +1,70 @@
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>,
-	Tejun Heo <tj@kernel.org>
-Cc: Fabio Checconi <fchecconi@gmail.com>,
-	Arianna Avanzini <avanzini.arianna@gmail.com>,
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga09.intel.com ([134.134.136.24]:24743 "EHLO mga09.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755511AbcGZAgM (ORCPT <rfc822;linux-block@vger.kernel.org>);
+	Mon, 25 Jul 2016 20:36:12 -0400
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+	Andreas Dilger <adilger.kernel@dilger.ca>,
+	Jan Kara <jack@suse.com>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+	Hugh Dickins <hughd@google.com>,
+	Andrea Arcangeli <aarcange@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Dave Hansen <dave.hansen@intel.com>,
+	Vlastimil Babka <vbabka@suse.cz>,
+	Matthew Wilcox <willy@infradead.org>,
+	Ross Zwisler <ross.zwisler@linux.intel.com>,
+	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
 	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	linus.walleij@linaro.org,
-	broonie@kernel.org,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH RFC V8 03/22] block, cfq: remove deep seek queues logic
-Date: Wed, 27 Jul 2016 18:13:19 +0200
-Message-Id: <1469636018-31247-4-git-send-email-paolo.valente@linaro.org>
-In-Reply-To: <1469636018-31247-1-git-send-email-paolo.valente@linaro.org>
-References: <2D83ACA0-2513-4019-9A0D-3166FDDE7485@linaro.org>
- <1469636018-31247-1-git-send-email-paolo.valente@linaro.org>
-List-ID: <linux-block@vger.kernel.org>
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv1, RFC 12/33] truncate: make sure invalidate_mapping_pages() can discard huge pages
+Date: Tue, 26 Jul 2016 03:35:14 +0300
+Message-Id: <1469493335-3622-13-git-send-email-kirill.shutemov@linux.intel.com>
+In-Reply-To: <1469493335-3622-1-git-send-email-kirill.shutemov@linux.intel.com>
+References: <1469493335-3622-1-git-send-email-kirill.shutemov@linux.intel.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Arianna Avanzini <avanzini.arianna@gmail.com>
+invalidate_inode_page() has expectation about page_count() of the page
+-- if it's not 2 (one to caller, one to radix-tree), it will not be
+dropped. That condition almost never met for THPs -- tail pages are
+pinned to the pagevec.
 
-CFQ implements a heuristic to identify seeky queues experiencing large
-queue depths (>= 4), and let them idle despite their seekiness.  This
-mechanism has no match in BFQ, where idling decisions are taken
-according to a unified global strategy. In this strategy, all actions
-are aimed at boosting the throughput, except for when
-throughput-boosting actions would jeopardize throughput-distribution
-and latency guarantees. Full details in the commits turning CFQ into
-BFQ.
+Let's drop them, before calling invalidate_inode_page().
 
-Signed-off-by: Arianna Avanzini <avanzini.arianna@gmail.com>
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- block/cfq-iosched.c | 21 ++++-----------------
- 1 file changed, 4 insertions(+), 17 deletions(-)
+ mm/truncate.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
-index 1b9fa10..870d1ba 100644
---- a/block/cfq-iosched.c
-+++ b/block/cfq-iosched.c
-@@ -411,7 +411,6 @@ enum cfqq_state_flags {
- 	CFQ_CFQQ_FLAG_prio_changed,	/* task priority has changed */
- 	CFQ_CFQQ_FLAG_slice_new,	/* no requests dispatched in slice */
- 	CFQ_CFQQ_FLAG_sync,		/* synchronous queue */
--	CFQ_CFQQ_FLAG_deep,		/* sync cfqq experienced large depth */
- 	CFQ_CFQQ_FLAG_wait_busy,	/* Waiting for next request */
- };
+diff --git a/mm/truncate.c b/mm/truncate.c
+index a01cce450a26..ce904e4b1708 100644
+--- a/mm/truncate.c
++++ b/mm/truncate.c
+@@ -504,10 +504,21 @@ unsigned long invalidate_mapping_pages(struct address_space *mapping,
+ 				/* 'end' is in the middle of THP */
+ 				if (index ==  round_down(end, HPAGE_PMD_NR))
+ 					continue;
++				/*
++				 * invalidate_inode_page() expects
++				 * page_count(page) == 2 to drop page from page
++				 * cache -- drop tail pages references.
++				 */
++				get_page(page);
++				pagevec_release(&pvec);
+ 			}
  
-@@ -438,7 +437,6 @@ CFQ_CFQQ_FNS(idle_window);
- CFQ_CFQQ_FNS(prio_changed);
- CFQ_CFQQ_FNS(slice_new);
- CFQ_CFQQ_FNS(sync);
--CFQ_CFQQ_FNS(deep);
- CFQ_CFQQ_FNS(wait_busy);
- #undef CFQ_CFQQ_FNS
- 
-@@ -3036,15 +3034,13 @@ static struct cfq_queue *cfq_select_queue(struct cfq_data *cfqd)
- 	}
- 
- 	/*
--	 * This is a deep seek queue, but the device is much faster than
--	 * the queue can deliver, don't idle
-+	 * The device is much faster than the queue can deliver: don't idle
- 	 **/
- 	if (CFQQ_SEEKY(cfqq) && cfq_cfqq_idle_window(cfqq) &&
- 	    (cfq_cfqq_slice_new(cfqq) ||
--	    (cfqq->slice_end - jiffies > jiffies - cfqq->slice_start))) {
--		cfq_clear_cfqq_deep(cfqq);
-+	     (time_after(cfqq->slice_end - jiffies,
-+			 jiffies - cfqq->slice_start))))
- 		cfq_clear_cfqq_idle_window(cfqq);
--	}
- 
- 	if (cfqq->dispatched && cfq_should_idle(cfqd, cfqq)) {
- 		cfqq = NULL;
-@@ -3622,14 +3618,10 @@ cfq_update_idle_window(struct cfq_data *cfqd, struct cfq_queue *cfqq,
- 
- 	enable_idle = old_idle = cfq_cfqq_idle_window(cfqq);
- 
--	if (cfqq->queued[0] + cfqq->queued[1] >= 4)
--		cfq_mark_cfqq_deep(cfqq);
--
- 	if (cfqq->next_rq && (cfqq->next_rq->cmd_flags & REQ_NOIDLE))
- 		enable_idle = 0;
- 	else if (!atomic_read(&cic->icq.ioc->active_ref) ||
--		 !cfqd->cfq_slice_idle ||
--		 (!cfq_cfqq_deep(cfqq) && CFQQ_SEEKY(cfqq)))
-+		 !cfqd->cfq_slice_idle || CFQQ_SEEKY(cfqq))
- 		enable_idle = 0;
- 	else if (sample_valid(cic->ttime.ttime_samples)) {
- 		if (cic->ttime.ttime_mean > cfqd->cfq_slice_idle)
-@@ -4128,11 +4120,6 @@ static void cfq_idle_slice_timer(unsigned long data)
- 		 */
- 		if (!RB_EMPTY_ROOT(&cfqq->sort_list))
- 			goto out_kick;
--
--		/*
--		 * Queue depth flag is reset only when the idle didn't succeed
--		 */
--		cfq_clear_cfqq_deep(cfqq);
- 	}
- expire:
- 	cfq_slice_expired(cfqd, timed_out);
+ 			ret = invalidate_inode_page(page);
+ 			unlock_page(page);
++
++			if (PageTransHuge(page))
++				put_page(page);
++
+ 			/*
+ 			 * Invalidation is a hint that the page is no longer
+ 			 * of interest and try to speed up its reclaim.
 -- 
-1.9.1
+2.8.1
+
