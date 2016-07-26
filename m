@@ -1,4 +1,8 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga03.intel.com ([134.134.136.65]:35093 "EHLO mga03.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755378AbcGZAgF (ORCPT <rfc822;linux-block@vger.kernel.org>);
+	Mon, 25 Jul 2016 20:36:05 -0400
 From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
 To: "Theodore Ts'o" <tytso@mit.edu>,
 	Andreas Dilger <adilger.kernel@dilger.ca>,
@@ -14,102 +18,104 @@ Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
 	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
 	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
 	linux-block@vger.kernel.org,
-	Matthew Wilcox <willy@linux.intel.com>,
-	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv1, RFC 02/33] radix tree test suite: Allow GFP_ATOMIC allocations to fail
-Date: Tue, 26 Jul 2016 03:35:04 +0300
-Message-Id: <1469493335-3622-3-git-send-email-kirill.shutemov@linux.intel.com>
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv1, RFC 19/33] mm: make write_cache_pages() work on huge pages
+Date: Tue, 26 Jul 2016 03:35:21 +0300
+Message-Id: <1469493335-3622-20-git-send-email-kirill.shutemov@linux.intel.com>
 In-Reply-To: <1469493335-3622-1-git-send-email-kirill.shutemov@linux.intel.com>
 References: <1469493335-3622-1-git-send-email-kirill.shutemov@linux.intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Matthew Wilcox <willy@linux.intel.com>
+We writeback whole huge page a time. Let's adjust iteration this way.
 
-In order to test the preload code, it is necessary to fail GFP_ATOMIC
-allocations, which requires defining GFP_KERNEL and GFP_ATOMIC properly.
-Remove the obsolete __GFP_WAIT and copy the definitions of the __GFP
-flags which are used from the kernel include files.  We also need the
-real definition of gfpflags_allow_blocking() to persuade the radix tree
-to actually use its preallocated nodes.
-
-Signed-off-by: Matthew Wilcox <willy@linux.intel.com>
 Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- tools/testing/radix-tree/linux.c      |  7 ++++++-
- tools/testing/radix-tree/linux/gfp.h  | 24 ++++++++++++++++++++----
- tools/testing/radix-tree/linux/slab.h |  5 -----
- 3 files changed, 26 insertions(+), 10 deletions(-)
+ include/linux/mm.h      |  1 +
+ include/linux/pagemap.h |  1 +
+ mm/page-writeback.c     | 17 ++++++++++++-----
+ 3 files changed, 14 insertions(+), 5 deletions(-)
 
-diff --git a/tools/testing/radix-tree/linux.c b/tools/testing/radix-tree/linux.c
-index 154823737b20..3cfb04e98e2f 100644
---- a/tools/testing/radix-tree/linux.c
-+++ b/tools/testing/radix-tree/linux.c
-@@ -33,7 +33,12 @@ mempool_t *mempool_create(int min_nr, mempool_alloc_t *alloc_fn,
- 
- void *kmem_cache_alloc(struct kmem_cache *cachep, int flags)
+diff --git a/include/linux/mm.h b/include/linux/mm.h
+index 08ed53eeedd5..b68d77912313 100644
+--- a/include/linux/mm.h
++++ b/include/linux/mm.h
+@@ -1054,6 +1054,7 @@ struct address_space *page_file_mapping(struct page *page)
+  */
+ static inline pgoff_t page_index(struct page *page)
  {
--	void *ret = malloc(cachep->size);
-+	void *ret;
-+
-+	if (flags & __GFP_NOWARN)
-+		return NULL;
-+
-+	ret = malloc(cachep->size);
- 	if (cachep->ctor)
- 		cachep->ctor(ret);
- 	uatomic_inc(&nr_allocated);
-diff --git a/tools/testing/radix-tree/linux/gfp.h b/tools/testing/radix-tree/linux/gfp.h
-index 0e37f7a760eb..5b09b2ce6c33 100644
---- a/tools/testing/radix-tree/linux/gfp.h
-+++ b/tools/testing/radix-tree/linux/gfp.h
-@@ -1,10 +1,26 @@
- #ifndef _GFP_H
- #define _GFP_H
++	page = compound_head(page);
+ 	if (unlikely(PageSwapCache(page)))
+ 		return page_private(page);
+ 	return page->index;
+diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
+index d9cf4e0f35dc..24e14ef1cfe5 100644
+--- a/include/linux/pagemap.h
++++ b/include/linux/pagemap.h
+@@ -518,6 +518,7 @@ static inline void wait_on_page_locked(struct page *page)
+  */
+ static inline void wait_on_page_writeback(struct page *page)
+ {
++	page = compound_head(page);
+ 	if (PageWriteback(page))
+ 		wait_on_page_bit(page, PG_writeback);
+ }
+diff --git a/mm/page-writeback.c b/mm/page-writeback.c
+index 573d138fa7a5..48409726d226 100644
+--- a/mm/page-writeback.c
++++ b/mm/page-writeback.c
+@@ -2246,7 +2246,7 @@ retry:
+ 			 * mapping. However, page->index will not change
+ 			 * because we have a reference on the page.
+ 			 */
+-			if (page->index > end) {
++			if (page_to_pgoff(page) > end) {
+ 				/*
+ 				 * can't be range_cyclic (1st pass) because
+ 				 * end == -1 in that case.
+@@ -2255,7 +2255,12 @@ retry:
+ 				break;
+ 			}
  
--#define __GFP_BITS_SHIFT 22
-+#define __GFP_BITS_SHIFT 26
- #define __GFP_BITS_MASK ((gfp_t)((1 << __GFP_BITS_SHIFT) - 1))
--#define __GFP_WAIT 1
--#define __GFP_ACCOUNT 0
--#define __GFP_NOWARN 0
-+
-+#define __GFP_HIGH		0x20u
-+#define __GFP_IO		0x40u
-+#define __GFP_FS		0x80u
-+#define __GFP_NOWARN		0x200u
-+#define __GFP_ATOMIC		0x80000u
-+#define __GFP_ACCOUNT		0x100000u
-+#define __GFP_DIRECT_RECLAIM	0x400000u
-+#define __GFP_KSWAPD_RECLAIM	0x2000000u
-+
-+#define __GFP_RECLAIM		(__GFP_DIRECT_RECLAIM|__GFP_KSWAPD_RECLAIM)
-+
-+#define GFP_ATOMIC		(__GFP_HIGH|__GFP_ATOMIC|__GFP_KSWAPD_RECLAIM)
-+#define GFP_KERNEL		(__GFP_RECLAIM | __GFP_IO | __GFP_FS)
-+
-+static inline bool gfpflags_allow_blocking(const gfp_t gfp_flags)
-+{
-+	return !!(gfp_flags & __GFP_DIRECT_RECLAIM);
-+}
+-			done_index = page->index;
++			done_index = page_to_pgoff(page);
++			if (PageTransCompound(page)) {
++				index = round_up(index + 1, HPAGE_PMD_NR);
++				i += HPAGE_PMD_NR -
++					done_index % HPAGE_PMD_NR - 1;
++			}
  
- #endif
-diff --git a/tools/testing/radix-tree/linux/slab.h b/tools/testing/radix-tree/linux/slab.h
-index 6d5a34770fd4..452e2bf502e3 100644
---- a/tools/testing/radix-tree/linux/slab.h
-+++ b/tools/testing/radix-tree/linux/slab.h
-@@ -7,11 +7,6 @@
- #define SLAB_PANIC 2
- #define SLAB_RECLAIM_ACCOUNT    0x00020000UL            /* Objects are reclaimable */
+ 			lock_page(page);
  
--static inline int gfpflags_allow_blocking(gfp_t mask)
--{
--	return 1;
--}
--
- struct kmem_cache {
- 	int size;
- 	void (*ctor)(void *);
+@@ -2267,7 +2272,7 @@ retry:
+ 			 * even if there is now a new, dirty page at the same
+ 			 * pagecache address.
+ 			 */
+-			if (unlikely(page->mapping != mapping)) {
++			if (unlikely(page_mapping(page) != mapping)) {
+ continue_unlock:
+ 				unlock_page(page);
+ 				continue;
+@@ -2305,7 +2310,8 @@ continue_unlock:
+ 					 * not be suitable for data integrity
+ 					 * writeout).
+ 					 */
+-					done_index = page->index + 1;
++					done_index = compound_head(page)->index
++						+ hpage_nr_pages(page);
+ 					done = 1;
+ 					break;
+ 				}
+@@ -2317,7 +2323,8 @@ continue_unlock:
+ 			 * keep going until we have written all the pages
+ 			 * we tagged for writeback prior to entering this loop.
+ 			 */
+-			if (--wbc->nr_to_write <= 0 &&
++			wbc->nr_to_write -= hpage_nr_pages(page);
++			if (wbc->nr_to_write <= 0 &&
+ 			    wbc->sync_mode == WB_SYNC_NONE) {
+ 				done = 1;
+ 				break;
 -- 
 2.8.1
 
