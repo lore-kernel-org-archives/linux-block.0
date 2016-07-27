@@ -1,138 +1,106 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-	Andreas Dilger <adilger.kernel@dilger.ca>,
-	Jan Kara <jack@suse.com>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-	Hugh Dickins <hughd@google.com>,
-	Andrea Arcangeli <aarcange@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Dave Hansen <dave.hansen@intel.com>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	Matthew Wilcox <willy@infradead.org>,
-	Ross Zwisler <ross.zwisler@linux.intel.com>,
-	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+Return-Path: <paolo.valente@linaro.org>
+From: Paolo Valente <paolo.valente@linaro.org>
+To: Jens Axboe <axboe@kernel.dk>,
+	Tejun Heo <tj@kernel.org>
+Cc: Fabio Checconi <fchecconi@gmail.com>,
+	Arianna Avanzini <avanzini.arianna@gmail.com>,
 	linux-block@vger.kernel.org,
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv1, RFC 31/33] WIP: ext4: handle writeback with huge pages
-Date: Tue, 26 Jul 2016 03:35:33 +0300
-Message-Id: <1469493335-3622-32-git-send-email-kirill.shutemov@linux.intel.com>
-In-Reply-To: <1469493335-3622-1-git-send-email-kirill.shutemov@linux.intel.com>
-References: <1469493335-3622-1-git-send-email-kirill.shutemov@linux.intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+	linux-kernel@vger.kernel.org,
+	ulf.hansson@linaro.org,
+	linus.walleij@linaro.org,
+	broonie@kernel.org,
+	Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH RFC V8 03/22] block, cfq: remove deep seek queues logic
+Date: Wed, 27 Jul 2016 18:13:19 +0200
+Message-Id: <1469636018-31247-4-git-send-email-paolo.valente@linaro.org>
+In-Reply-To: <1469636018-31247-1-git-send-email-paolo.valente@linaro.org>
+References: <2D83ACA0-2513-4019-9A0D-3166FDDE7485@linaro.org>
+ <1469636018-31247-1-git-send-email-paolo.valente@linaro.org>
 List-ID: <linux-block@vger.kernel.org>
 
-Modify mpage_map_and_submit_buffers() to do writeback with huge pages.
+From: Arianna Avanzini <avanzini.arianna@gmail.com>
 
-This is somewhat unstable. I have hard time see full picture yet.
-More work is required.
+CFQ implements a heuristic to identify seeky queues experiencing large
+queue depths (>= 4), and let them idle despite their seekiness.  This
+mechanism has no match in BFQ, where idling decisions are taken
+according to a unified global strategy. In this strategy, all actions
+are aimed at boosting the throughput, except for when
+throughput-boosting actions would jeopardize throughput-distribution
+and latency guarantees. Full details in the commits turning CFQ into
+BFQ.
 
-Not-yet-signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+Signed-off-by: Arianna Avanzini <avanzini.arianna@gmail.com>
+Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
 ---
- fs/ext4/inode.c | 40 ++++++++++++++++++++++++++--------------
- 1 file changed, 26 insertions(+), 14 deletions(-)
+ block/cfq-iosched.c | 21 ++++-----------------
+ 1 file changed, 4 insertions(+), 17 deletions(-)
 
-diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
-index 2e22f62f007b..29133e4550fc 100644
---- a/fs/ext4/inode.c
-+++ b/fs/ext4/inode.c
-@@ -2088,16 +2088,16 @@ static int mpage_submit_page(struct mpage_da_data *mpd, struct page *page)
- 	loff_t size = i_size_read(mpd->inode);
- 	int err;
+diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
+index 1b9fa10..870d1ba 100644
+--- a/block/cfq-iosched.c
++++ b/block/cfq-iosched.c
+@@ -411,7 +411,6 @@ enum cfqq_state_flags {
+ 	CFQ_CFQQ_FLAG_prio_changed,	/* task priority has changed */
+ 	CFQ_CFQQ_FLAG_slice_new,	/* no requests dispatched in slice */
+ 	CFQ_CFQQ_FLAG_sync,		/* synchronous queue */
+-	CFQ_CFQQ_FLAG_deep,		/* sync cfqq experienced large depth */
+ 	CFQ_CFQQ_FLAG_wait_busy,	/* Waiting for next request */
+ };
  
--	BUG_ON(page->index != mpd->first_page);
--	if (page->index == size >> PAGE_SHIFT)
--		len = size & ~PAGE_MASK;
--	else
--		len = PAGE_SIZE;
-+	page = compound_head(page);
-+	len = hpage_size(page);
-+	if (page->index + hpage_nr_pages(page) - 1 == size >> PAGE_SHIFT)
-+		len = size & ~hpage_mask(page);
-+
- 	clear_page_dirty_for_io(page);
- 	err = ext4_bio_write_page(&mpd->io_submit, page, len, mpd->wbc, false);
- 	if (!err)
--		mpd->wbc->nr_to_write--;
--	mpd->first_page++;
-+		mpd->wbc->nr_to_write -= hpage_nr_pages(page);
-+	mpd->first_page = round_up(mpd->first_page + 1, hpage_nr_pages(page));
+@@ -438,7 +437,6 @@ CFQ_CFQQ_FNS(idle_window);
+ CFQ_CFQQ_FNS(prio_changed);
+ CFQ_CFQQ_FNS(slice_new);
+ CFQ_CFQQ_FNS(sync);
+-CFQ_CFQQ_FNS(deep);
+ CFQ_CFQQ_FNS(wait_busy);
+ #undef CFQ_CFQQ_FNS
  
- 	return err;
- }
-@@ -2245,12 +2245,16 @@ static int mpage_map_and_submit_buffers(struct mpage_da_data *mpd)
- 			break;
- 		for (i = 0; i < nr_pages; i++) {
- 			struct page *page = pvec.pages[i];
-+			unsigned long diff;
- 
--			if (page->index > end)
-+			if (page_to_pgoff(page) > end)
- 				break;
- 			/* Up to 'end' pages must be contiguous */
--			BUG_ON(page->index != start);
-+			BUG_ON(page_to_pgoff(page) != start);
-+			diff = (page - compound_head(page)) << bpp_bits;
- 			bh = head = page_buffers(page);
-+			while (diff--)
-+				bh = bh->b_this_page;
- 			do {
- 				if (lblk < mpd->map.m_lblk)
- 					continue;
-@@ -2287,7 +2291,10 @@ static int mpage_map_and_submit_buffers(struct mpage_da_data *mpd)
- 			 * supports blocksize < pagesize as we will try to
- 			 * convert potentially unmapped parts of inode.
- 			 */
--			mpd->io_submit.io_end->size += PAGE_SIZE;
-+			if (PageTransCompound(page))
-+				mpd->io_submit.io_end->size += HPAGE_PMD_SIZE;
-+			else
-+				mpd->io_submit.io_end->size += PAGE_SIZE;
- 			/* Page fully mapped - let IO run! */
- 			err = mpage_submit_page(mpd, page);
- 			if (err < 0) {
-@@ -2295,6 +2302,10 @@ static int mpage_map_and_submit_buffers(struct mpage_da_data *mpd)
- 				return err;
- 			}
- 			start++;
-+			if (PageTransCompound(page)) {
-+				start = round_up(start, HPAGE_PMD_NR);
-+				break;
-+			}
- 		}
- 		pagevec_release(&pvec);
+@@ -3036,15 +3034,13 @@ static struct cfq_queue *cfq_select_queue(struct cfq_data *cfqd)
  	}
-@@ -2534,7 +2545,7 @@ static int mpage_prepare_extent_to_map(struct mpage_da_data *mpd)
- 			 * mapping. However, page->index will not change
- 			 * because we have a reference on the page.
- 			 */
--			if (page->index > end)
-+			if (page_to_pgoff(page) > end)
- 				goto out;
  
- 			/*
-@@ -2563,7 +2574,7 @@ static int mpage_prepare_extent_to_map(struct mpage_da_data *mpd)
- 			if (!PageDirty(page) ||
- 			    (PageWriteback(page) &&
- 			     (mpd->wbc->sync_mode == WB_SYNC_NONE)) ||
--			    unlikely(page->mapping != mapping)) {
-+			    unlikely(page_mapping(page) != mapping)) {
- 				unlock_page(page);
- 				continue;
- 			}
-@@ -2572,8 +2583,9 @@ static int mpage_prepare_extent_to_map(struct mpage_da_data *mpd)
- 			BUG_ON(PageWriteback(page));
+ 	/*
+-	 * This is a deep seek queue, but the device is much faster than
+-	 * the queue can deliver, don't idle
++	 * The device is much faster than the queue can deliver: don't idle
+ 	 **/
+ 	if (CFQQ_SEEKY(cfqq) && cfq_cfqq_idle_window(cfqq) &&
+ 	    (cfq_cfqq_slice_new(cfqq) ||
+-	    (cfqq->slice_end - jiffies > jiffies - cfqq->slice_start))) {
+-		cfq_clear_cfqq_deep(cfqq);
++	     (time_after(cfqq->slice_end - jiffies,
++			 jiffies - cfqq->slice_start))))
+ 		cfq_clear_cfqq_idle_window(cfqq);
+-	}
  
- 			if (mpd->map.m_len == 0)
--				mpd->first_page = page->index;
--			mpd->next_page = page->index + 1;
-+				mpd->first_page = page_to_pgoff(page);
-+			mpd->next_page = round_up(mpd->first_page + 1,
-+					hpage_nr_pages(compound_head(page)));
- 			/* Add all dirty buffers to mpd */
- 			lblk = ((ext4_lblk_t)page->index) <<
- 				(PAGE_SHIFT - blkbits);
+ 	if (cfqq->dispatched && cfq_should_idle(cfqd, cfqq)) {
+ 		cfqq = NULL;
+@@ -3622,14 +3618,10 @@ cfq_update_idle_window(struct cfq_data *cfqd, struct cfq_queue *cfqq,
+ 
+ 	enable_idle = old_idle = cfq_cfqq_idle_window(cfqq);
+ 
+-	if (cfqq->queued[0] + cfqq->queued[1] >= 4)
+-		cfq_mark_cfqq_deep(cfqq);
+-
+ 	if (cfqq->next_rq && (cfqq->next_rq->cmd_flags & REQ_NOIDLE))
+ 		enable_idle = 0;
+ 	else if (!atomic_read(&cic->icq.ioc->active_ref) ||
+-		 !cfqd->cfq_slice_idle ||
+-		 (!cfq_cfqq_deep(cfqq) && CFQQ_SEEKY(cfqq)))
++		 !cfqd->cfq_slice_idle || CFQQ_SEEKY(cfqq))
+ 		enable_idle = 0;
+ 	else if (sample_valid(cic->ttime.ttime_samples)) {
+ 		if (cic->ttime.ttime_mean > cfqd->cfq_slice_idle)
+@@ -4128,11 +4120,6 @@ static void cfq_idle_slice_timer(unsigned long data)
+ 		 */
+ 		if (!RB_EMPTY_ROOT(&cfqq->sort_list))
+ 			goto out_kick;
+-
+-		/*
+-		 * Queue depth flag is reset only when the idle didn't succeed
+-		 */
+-		cfq_clear_cfqq_deep(cfqq);
+ 	}
+ expire:
+ 	cfq_slice_expired(cfqd, timed_out);
 -- 
-2.8.1
-
+1.9.1
