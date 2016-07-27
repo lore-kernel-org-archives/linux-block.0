@@ -1,47 +1,70 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f68.google.com ([74.125.82.68]:33516 "EHLO
-	mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S933206AbcGGHyv (ORCPT
-	<rfc822;linux-block@vger.kernel.org>); Thu, 7 Jul 2016 03:54:51 -0400
-Received: by mail-wm0-f68.google.com with SMTP id n127so998056wme.0
-        for <linux-block@vger.kernel.org>; Thu, 07 Jul 2016 00:54:50 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	axboe@fb.com
-Cc: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [PATCH 15/17] lightnvm: fix lun offset calculation for mark blk
-Date: Thu,  7 Jul 2016 09:54:21 +0200
-Message-Id: <1467878063-22919-16-git-send-email-m@bjorling.me>
-In-Reply-To: <1467878063-22919-1-git-send-email-m@bjorling.me>
-References: <1467878063-22919-1-git-send-email-m@bjorling.me>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <paolo.valente@linaro.org>
+From: Paolo Valente <paolo.valente@linaro.org>
+To: Jens Axboe <axboe@kernel.dk>,
+	Tejun Heo <tj@kernel.org>
+Cc: Fabio Checconi <fchecconi@gmail.com>,
+	Arianna Avanzini <avanzini.arianna@gmail.com>,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ulf.hansson@linaro.org,
+	linus.walleij@linaro.org,
+	broonie@kernel.org,
+	Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH RFC V8 02/22] block, cfq: remove close-based preemption
+Date: Wed, 27 Jul 2016 18:13:18 +0200
+Message-Id: <1469636018-31247-3-git-send-email-paolo.valente@linaro.org>
+In-Reply-To: <1469636018-31247-1-git-send-email-paolo.valente@linaro.org>
+References: <2D83ACA0-2513-4019-9A0D-3166FDDE7485@linaro.org>
+ <1469636018-31247-1-git-send-email-paolo.valente@linaro.org>
+List-ID: <linux-block@vger.kernel.org>
 
-The gen_mark_blk_bad function marks the wrong block when a block is on
-a different channel. Fix the index calculation, so that it updates the
-correct block.
+From: Arianna Avanzini <avanzini.arianna@gmail.com>
 
-Reported-by: Javier Gonzalez <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <m@bjorling.me>
+CFQ may preempt the queue currently in service if a new request, for a
+different queue, happens to be close to the last-dispatched
+request. This boosts the throughput with processes that issue close
+requests, but whose I/O patterns are not regularly interleaved enough
+to trigger the activation of the queue-merging heuristic removed in
+the previous commit. BFQ does not need to perform any such preemption,
+because the queue-merging mechanism of BFQ (EQM) is reactive enough to
+merge queues also in the presence of irregularly interleaved I/O.
+
+Signed-off-by: Arianna Avanzini <avanzini.arianna@gmail.com>
+Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
 ---
- drivers/lightnvm/gennvm.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block/cfq-iosched.c | 13 -------------
+ 1 file changed, 13 deletions(-)
 
-diff --git a/drivers/lightnvm/gennvm.c b/drivers/lightnvm/gennvm.c
-index c65fb67..b74174c 100644
---- a/drivers/lightnvm/gennvm.c
-+++ b/drivers/lightnvm/gennvm.c
-@@ -542,7 +542,7 @@ static void gen_mark_blk(struct nvm_dev *dev, struct ppa_addr ppa, int type)
- 		return;
- 	}
+diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
+index 18a7291..1b9fa10 100644
+--- a/block/cfq-iosched.c
++++ b/block/cfq-iosched.c
+@@ -2677,12 +2677,6 @@ static inline sector_t cfq_dist_from_last(struct cfq_data *cfqd,
+ 		return cfqd->last_position - blk_rq_pos(rq);
+ }
  
--	lun = &gn->luns[ppa.g.lun * ppa.g.ch];
-+	lun = &gn->luns[(dev->luns_per_chnl * ppa.g.ch) + ppa.g.lun];
- 	blk = &lun->vlun.blocks[ppa.g.blk];
+-static inline int cfq_rq_close(struct cfq_data *cfqd, struct cfq_queue *cfqq,
+-			       struct request *rq)
+-{
+-	return cfq_dist_from_last(cfqd, rq) <= CFQQ_CLOSE_THR;
+-}
+-
+ /*
+  * Determine whether we should enforce idle window for this queue.
+  */
+@@ -3724,13 +3718,6 @@ cfq_should_preempt(struct cfq_data *cfqd, struct cfq_queue *new_cfqq,
+ 	if (!cfqd->active_cic || !cfq_cfqq_wait_request(cfqq))
+ 		return false;
  
- 	/* will be moved to bb list on put_blk from target */
+-	/*
+-	 * if this request is as-good as one we would expect from the
+-	 * current cfqq, let it preempt
+-	 */
+-	if (cfq_rq_close(cfqd, cfqq, rq))
+-		return true;
+-
+ 	return false;
+ }
+ 
 -- 
-2.1.4
-
+1.9.1
