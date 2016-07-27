@@ -1,164 +1,96 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-	Andreas Dilger <adilger.kernel@dilger.ca>,
-	Jan Kara <jack@suse.com>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-	Hugh Dickins <hughd@google.com>,
-	Andrea Arcangeli <aarcange@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Dave Hansen <dave.hansen@intel.com>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	Matthew Wilcox <willy@infradead.org>,
-	Ross Zwisler <ross.zwisler@linux.intel.com>,
-	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+Return-Path: <paolo.valente@linaro.org>
+From: Paolo Valente <paolo.valente@linaro.org>
+To: Jens Axboe <axboe@kernel.dk>,
+	Tejun Heo <tj@kernel.org>
+Cc: Fabio Checconi <fchecconi@gmail.com>,
+	Arianna Avanzini <avanzini.arianna@gmail.com>,
 	linux-block@vger.kernel.org,
-	Matthew Wilcox <willy@linux.intel.com>,
-	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv1, RFC 05/33] radix-tree: Add radix_tree_split_preload()
-Date: Tue, 26 Jul 2016 03:35:07 +0300
-Message-Id: <1469493335-3622-6-git-send-email-kirill.shutemov@linux.intel.com>
-In-Reply-To: <1469493335-3622-1-git-send-email-kirill.shutemov@linux.intel.com>
-References: <1469493335-3622-1-git-send-email-kirill.shutemov@linux.intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+	linux-kernel@vger.kernel.org,
+	ulf.hansson@linaro.org,
+	linus.walleij@linaro.org,
+	broonie@kernel.org,
+	Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH RFC V8 21/22] block, bfq: boost the throughput with random I/O on NCQ-capable HDDs
+Date: Wed, 27 Jul 2016 18:13:37 +0200
+Message-Id: <1469636018-31247-22-git-send-email-paolo.valente@linaro.org>
+In-Reply-To: <1469636018-31247-1-git-send-email-paolo.valente@linaro.org>
+References: <2D83ACA0-2513-4019-9A0D-3166FDDE7485@linaro.org>
+ <1469636018-31247-1-git-send-email-paolo.valente@linaro.org>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Matthew Wilcox <willy@linux.intel.com>
+This patch is basically the counterpart, for NCQ-capable rotational
+devices, of the previous patch. Exactly as the previous patch does on
+flash-based devices and for any workload, this patch disables device
+idling on rotational devices, but only for random I/O. In fact, only
+with these queues disabling idling boosts the throughput on
+NCQ-capable rotational devices. To not break service guarantees,
+idling is disabled for NCQ-enabled rotational devices only when the
+same symmetry conditions considered in the previous patches hold.
 
-Calculate how many nodes we need to allocate to split an old_order entry
-into multiple entries, each of size new_order.  The test suite checks that
-we allocated exactly the right number of nodes; neither too many (checked
-by rtp->nr == 0), nor too few (checked by comparing nr_allocated before
-and after the call to radix_tree_split()).
-
-Signed-off-by: Matthew Wilcox <willy@linux.intel.com>
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+Signed-off-by: Arianna Avanzini <avanzini.arianna@gmail.com>
 ---
- include/linux/radix-tree.h            |  1 +
- lib/radix-tree.c                      | 22 ++++++++++++++++++++++
- tools/testing/radix-tree/multiorder.c | 28 ++++++++++++++++++++++++++--
- tools/testing/radix-tree/test.h       |  9 +++++++++
- 4 files changed, 58 insertions(+), 2 deletions(-)
+ block/cfq-iosched.c | 22 ++++++++++------------
+ 1 file changed, 10 insertions(+), 12 deletions(-)
 
-diff --git a/include/linux/radix-tree.h b/include/linux/radix-tree.h
-index 7e906a270664..2f1404303bcc 100644
---- a/include/linux/radix-tree.h
-+++ b/include/linux/radix-tree.h
-@@ -318,6 +318,7 @@ static inline void radix_tree_preload_end(void)
- 	preempt_enable();
- }
+diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
+index 7fee23b..ae17421 100644
+--- a/block/cfq-iosched.c
++++ b/block/cfq-iosched.c
+@@ -38,7 +38,9 @@
+  * Even better for latency, BFQ explicitly privileges the I/O of two
+  * classes of time-sensitive applications: interactive and soft
+  * real-time. This feature enables BFQ to provide applications in
+- * these classes with a very low latency.
++ * these classes with a very low latency. Finally, BFQ also features
++ * additional heuristics for preserving both a low latency and a high
++ * throughput on NCQ-capable, rotational or flash-based devices.
+  *
+  * With respect to the version of BFQ presented in [1], and in the
+  * papers cited therein, this implementation adds a hierarchical
+@@ -5629,20 +5631,15 @@ static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
+ 	 * The next variable takes into account the cases where idling
+ 	 * boosts the throughput.
+ 	 *
+-	 * The value of the variable is computed considering that
+-	 * idling is usually beneficial for the throughput if:
++	 * The value of the variable is computed considering, first, that
++	 * idling is virtually always beneficial for the throughput if:
+ 	 * (a) the device is not NCQ-capable, or
+ 	 * (b) regardless of the presence of NCQ, the device is rotational
+-	 *     and the request pattern for bfqq is I/O-bound (possible
+-	 *     throughput losses caused by granting idling to seeky queues
+-	 *     are mitigated by the fact that, in all scenarios where
+-	 *     boosting throughput is the best thing to do, i.e., in all
+-	 *     symmetric scenarios, only a minimal idle time is allowed to
+-	 *     seeky queues).
++	 *     and the request pattern for bfqq is I/O-bound and sequential.
+ 	 *
+ 	 * Secondly, and in contrast to the above item (b), idling an
+ 	 * NCQ-capable flash-based device would not boost the
+-	 * throughput even with intense I/O; rather it would lower
++	 * throughput even with sequential I/O; rather it would lower
+ 	 * the throughput in proportion to how fast the device
+ 	 * is. Accordingly, the next variable is true if any of the
+ 	 * above conditions (a) and (b) is true, and, in particular,
+@@ -5650,7 +5647,8 @@ static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
+ 	 * device.
+ 	 */
+ 	idling_boosts_thr = !bfqd->hw_tag ||
+-		(!blk_queue_nonrot(bfqd->queue) && bfq_bfqq_IO_bound(bfqq));
++		(!blk_queue_nonrot(bfqd->queue) && bfq_bfqq_IO_bound(bfqq) &&
++		 bfq_bfqq_idle_window(bfqq));
  
-+int radix_tree_split_preload(unsigned old_order, unsigned new_order, gfp_t);
- int radix_tree_split(struct radix_tree_root *, unsigned long index,
- 			unsigned new_order);
- int radix_tree_join(struct radix_tree_root *, unsigned long index,
-diff --git a/lib/radix-tree.c b/lib/radix-tree.c
-index e69f1053cd78..e49f32f7c537 100644
---- a/lib/radix-tree.c
-+++ b/lib/radix-tree.c
-@@ -404,6 +404,28 @@ int radix_tree_maybe_preload(gfp_t gfp_mask)
- }
- EXPORT_SYMBOL(radix_tree_maybe_preload);
+ 	/*
+ 	 * The value of the next variable,
+@@ -7457,7 +7455,7 @@ static int __init bfq_init(void)
+ 	if (ret)
+ 		goto err_pol_unreg;
  
-+#ifdef CONFIG_RADIX_TREE_MULTIORDER
-+/*
-+ * Preload with enough objects to ensure that we can split a single entry
-+ * of order @old_order into many entries of size @new_order
-+ */
-+int radix_tree_split_preload(unsigned int old_order, unsigned int new_order,
-+							gfp_t gfp_mask)
-+{
-+	unsigned top = 1 << (old_order % RADIX_TREE_MAP_SHIFT);
-+	unsigned layers = (old_order / RADIX_TREE_MAP_SHIFT) -
-+				(new_order / RADIX_TREE_MAP_SHIFT);
-+	unsigned nr = 0;
-+
-+	WARN_ON_ONCE(!gfpflags_allow_blocking(gfp_mask));
-+	BUG_ON(new_order >= old_order);
-+
-+	while (layers--)
-+		nr = nr * RADIX_TREE_MAP_SIZE + 1;
-+	return __radix_tree_preload(gfp_mask, top * nr);
-+}
-+#endif
-+
- /*
-  * The same as function above, but preload number of nodes required to insert
-  * (1 << order) continuous naturally-aligned elements.
-diff --git a/tools/testing/radix-tree/multiorder.c b/tools/testing/radix-tree/multiorder.c
-index 9d27a4dd7b2a..5eda47dfe818 100644
---- a/tools/testing/radix-tree/multiorder.c
-+++ b/tools/testing/radix-tree/multiorder.c
-@@ -348,18 +348,42 @@ static void multiorder_join(void)
- 	}
- }
+-	pr_info("BFQ I/O-scheduler: v6");
++	pr_info("BFQ I/O-scheduler: v7r3");
  
-+static void check_mem(unsigned old_order, unsigned new_order, unsigned alloc)
-+{
-+	struct radix_tree_preload *rtp = &radix_tree_preloads;
-+	if (rtp->nr != 0)
-+		printf("split(%u %u) remaining %u\n", old_order, new_order,
-+							rtp->nr);
-+	/*
-+	 * Can't check for equality here as some nodes may have been
-+	 * RCU-freed while we ran.  But we should never finish with more
-+	 * nodes allocated since they should have all been preloaded.
-+	 */
-+	if (nr_allocated > alloc)
-+		printf("split(%u %u) allocated %u %u\n", old_order, new_order,
-+							alloc, nr_allocated);
-+}
-+
- static void __multiorder_split(int old_order, int new_order)
- {
--	RADIX_TREE(tree, GFP_KERNEL);
-+	RADIX_TREE(tree, GFP_ATOMIC);
- 	void **slot;
- 	struct radix_tree_iter iter;
-+	unsigned alloc;
+ 	return 0;
  
--	item_insert_order(&tree, 0, old_order);
-+	radix_tree_preload(GFP_KERNEL);
-+	assert(item_insert_order(&tree, 0, old_order) == 0);
-+	radix_tree_callback(NULL, CPU_DEAD, NULL);
- 	radix_tree_tag_set(&tree, 0, 2);
-+
-+	radix_tree_split_preload(old_order, new_order, GFP_KERNEL);
-+	alloc = nr_allocated;
- 	radix_tree_split(&tree, 0, new_order);
-+	check_mem(old_order, new_order, alloc);
- 	radix_tree_for_each_slot(slot, &tree, &iter, 0) {
- 		radix_tree_replace_slot(slot, item_create(iter.index));
- 	}
-+	radix_tree_preload_end();
- 
- 	item_kill_tree(&tree);
- }
-diff --git a/tools/testing/radix-tree/test.h b/tools/testing/radix-tree/test.h
-index e85131369723..55e6d095047b 100644
---- a/tools/testing/radix-tree/test.h
-+++ b/tools/testing/radix-tree/test.h
-@@ -2,6 +2,8 @@
- #include <linux/types.h>
- #include <linux/radix-tree.h>
- #include <linux/rcupdate.h>
-+#include <linux/notifier.h>
-+#include <linux/cpu.h>
- 
- struct item {
- 	unsigned long index;
-@@ -43,3 +45,10 @@ void radix_tree_dump(struct radix_tree_root *root);
- int root_tag_get(struct radix_tree_root *root, unsigned int tag);
- unsigned long node_maxindex(struct radix_tree_node *);
- unsigned long shift_maxindex(unsigned int shift);
-+int radix_tree_callback(struct notifier_block *nfb,
-+			unsigned long action, void *hcpu);
-+struct radix_tree_preload {
-+	unsigned nr;
-+	struct radix_tree_node *nodes;
-+};
-+extern struct radix_tree_preload radix_tree_preloads;
 -- 
-2.8.1
-
+1.9.1
