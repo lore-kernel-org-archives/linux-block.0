@@ -10,172 +10,264 @@ Cc: Fabio Checconi <fchecconi@gmail.com>,
 	linus.walleij@linaro.org,
 	broonie@kernel.org,
 	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH RFC V8 17/22] block, bfq: reduce latency during request-pool saturation
-Date: Wed, 27 Jul 2016 18:13:33 +0200
-Message-Id: <1469636018-31247-18-git-send-email-paolo.valente@linaro.org>
+Subject: [PATCH RFC V8 07/22] block, cfq: get rid of workload type
+Date: Wed, 27 Jul 2016 18:13:23 +0200
+Message-Id: <1469636018-31247-8-git-send-email-paolo.valente@linaro.org>
 In-Reply-To: <1469636018-31247-1-git-send-email-paolo.valente@linaro.org>
 References: <2D83ACA0-2513-4019-9A0D-3166FDDE7485@linaro.org>
  <1469636018-31247-1-git-send-email-paolo.valente@linaro.org>
 List-ID: <linux-block@vger.kernel.org>
 
-This patch introduces an heuristic that reduces latency when the
-I/O-request pool is saturated. This goal is achieved by disabling
-device idling, for non-weight-raised queues, when there are weight-
-raised queues with pending or in-flight requests. In fact, as
-explained in more detail in the comment on the function
-bfq_bfqq_may_idle(), this reduces the rate at which processes
-associated with non-weight-raised queues grab requests from the pool,
-thereby increasing the probability that processes associated with
-weight-raised queues get a request immediately (or at least soon) when
-they need one. Along the same line, if there are weight-raised queues,
-then this patch halves the service rate of async (write) requests for
-non-weight-raised queues.
+From: Arianna Avanzini <avanzini.arianna@gmail.com>
 
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+CFQ selects the queue to serve also according to the type of workload
+it is part of. This kind of heuristic has no match in BFQ, where a
+high throughput, and, at the same time, provable service guarantees
+are provided through a unified overall scheduling policy.
+
 Signed-off-by: Arianna Avanzini <avanzini.arianna@gmail.com>
+Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
 ---
- block/cfq-iosched.c | 66 ++++++++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 63 insertions(+), 3 deletions(-)
+ block/cfq-iosched.c | 131 +++++++++++-----------------------------------------
+ 1 file changed, 26 insertions(+), 105 deletions(-)
 
 diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
-index 5207ed8..980d321 100644
+index 174dc94..df8fb826 100644
 --- a/block/cfq-iosched.c
 +++ b/block/cfq-iosched.c
-@@ -368,6 +368,8 @@ struct bfq_data {
- 	 * queue in service, even if it is idling).
- 	 */
- 	int busy_queues;
-+	/* number of weight-raised busy @bfq_queues */
-+	int wr_busy_queues;
- 	/* number of queued requests */
- 	int queued;
- 	/* number of requests dispatched and waiting for completion */
-@@ -1980,6 +1982,9 @@ static void bfq_del_bfqq_busy(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+@@ -155,15 +155,6 @@ enum wl_class_t {
+ 	CFQ_PRIO_NR,
+ };
  
- 	bfqd->busy_queues--;
- 
-+	if (bfqq->wr_coeff > 1)
-+		bfqd->wr_busy_queues--;
-+
- 	bfqg_stats_update_dequeue(bfqq_group(bfqq));
- 
- 	bfq_deactivate_bfqq(bfqd, bfqq, requeue);
-@@ -1996,6 +2001,9 @@ static void bfq_add_bfqq_busy(struct bfq_data *bfqd, struct bfq_queue *bfqq)
- 
- 	bfq_mark_bfqq_busy(bfqq);
- 	bfqd->busy_queues++;
-+
-+	if (bfqq->wr_coeff > 1)
-+		bfqd->wr_busy_queues++;
- }
- 
- #if defined(CONFIG_CFQ_GROUP_IOSCHED) && defined(CONFIG_DEBUG_BLK_CGROUP)
-@@ -3287,7 +3295,16 @@ static unsigned long bfq_serv_to_charge(struct request *rq,
- 	if (bfq_bfqq_sync(bfqq) || bfqq->wr_coeff > 1)
- 		return blk_rq_sectors(rq);
- 
--	return blk_rq_sectors(rq) * bfq_async_charge_factor;
-+	/*
-+	 * If there are no weight-raised queues, then amplify service
-+	 * by just the async charge factor; otherwise amplify service
-+	 * by twice the async charge factor, to further reduce latency
-+	 * for weight-raised queues.
-+	 */
-+	if (bfqq->bfqd->wr_busy_queues == 0)
-+		return blk_rq_sectors(rq) * bfq_async_charge_factor;
-+
-+	return blk_rq_sectors(rq) * 2 * bfq_async_charge_factor;
- }
- 
- /**
-@@ -3749,6 +3766,7 @@ static void bfq_add_request(struct request *rq)
- 			bfqq->wr_coeff = bfqd->bfq_wr_coeff;
- 			bfqq->wr_cur_max_time = bfq_wr_duration(bfqd);
- 
-+			bfqd->wr_busy_queues++;
- 			bfqq->entity.prio_changed = 1;
- 		}
- 		if (prev != bfqq->next_rq)
-@@ -3947,6 +3965,8 @@ static void bfq_merged_requests(struct request_queue *q, struct request *rq,
- /* Must be called with bfqq != NULL */
- static void bfq_bfqq_end_wr(struct bfq_queue *bfqq)
- {
-+	if (bfq_bfqq_busy(bfqq))
-+		bfqq->bfqd->wr_busy_queues--;
- 	bfqq->wr_coeff = 1;
- 	bfqq->wr_cur_max_time = 0;
- 	/*
-@@ -4807,7 +4827,8 @@ static bool bfq_may_expire_for_budg_timeout(struct bfq_queue *bfqq)
- static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
- {
- 	struct bfq_data *bfqd = bfqq->bfqd;
--	bool idling_boosts_thr, asymmetric_scenario;
-+	bool idling_boosts_thr, idling_boosts_thr_without_issues,
-+		asymmetric_scenario;
- 
- 	if (bfqd->strict_guarantees)
- 		return true;
-@@ -4830,6 +4851,44 @@ static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
- 	idling_boosts_thr = !bfqd->hw_tag || bfq_bfqq_IO_bound(bfqq);
+-/*
+- * Second index in the service_trees.
+- */
+-enum wl_type_t {
+-	ASYNC_WORKLOAD = 0,
+-	SYNC_NOIDLE_WORKLOAD = 1,
+-	SYNC_WORKLOAD = 2
+-};
+-
+ struct cfq_io_cq {
+ 	struct io_cq		icq;		/* must be the first member */
+ 	struct cfq_queue	*cfqq[2];
+@@ -179,20 +170,16 @@ struct cfq_data {
  
  	/*
-+	 * The value of the next variable,
-+	 * idling_boosts_thr_without_issues, is equal to that of
-+	 * idling_boosts_thr, unless a special case holds. In this
-+	 * special case, described below, idling may cause problems to
-+	 * weight-raised queues.
-+	 *
-+	 * When the request pool is saturated (e.g., in the presence
-+	 * of write hogs), if the processes associated with
-+	 * non-weight-raised queues ask for requests at a lower rate,
-+	 * then processes associated with weight-raised queues have a
-+	 * higher probability to get a request from the pool
-+	 * immediately (or at least soon) when they need one. Thus
-+	 * they have a higher probability to actually get a fraction
-+	 * of the device throughput proportional to their high
-+	 * weight. This is especially true with NCQ-capable drives,
-+	 * which enqueue several requests in advance, and further
-+	 * reorder internally-queued requests.
-+	 *
-+	 * For this reason, we force to false the value of
-+	 * idling_boosts_thr_without_issues if there are weight-raised
-+	 * busy queues. In this case, and if bfqq is not weight-raised,
-+	 * this guarantees that the device is not idled for bfqq (if,
-+	 * instead, bfqq is weight-raised, then idling will be
-+	 * guaranteed by another variable, see below). Combined with
-+	 * the timestamping rules of BFQ (see [1] for details), this
-+	 * behavior causes bfqq, and hence any sync non-weight-raised
-+	 * queue, to get a lower number of requests served, and thus
-+	 * to ask for a lower number of requests from the request
-+	 * pool, before the busy weight-raised queues get served
-+	 * again. This often mitigates starvation problems in the
-+	 * presence of heavy write workloads and NCQ, thereby
-+	 * guaranteeing a higher application and system responsiveness
-+	 * in these hostile scenarios.
-+	 */
-+	idling_boosts_thr_without_issues = idling_boosts_thr &&
-+		bfqd->wr_busy_queues == 0;
-+
-+	/*
- 	 * There is then a case where idling must be performed not for
- 	 * throughput concerns, but to preserve service guarantees. To
- 	 * introduce it, we can note that allowing the drive to
-@@ -4903,7 +4962,7 @@ static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
- 	 *    is necessary to preserve service guarantees.
+ 	 * rr lists of queues with requests. We maintain service trees for
+-	 * RT and BE classes. These trees are subdivided in subclasses
+-	 * of SYNC, SYNC_NOIDLE and ASYNC based on workload type. For IDLE
+-	 * class there is no subclassification and all the cfq queues go on
+-	 * a single tree service_tree_idle.
++	 * RT and BE classes.
+ 	 * Counts are embedded in the cfq_rb_root
  	 */
- 	return bfq_bfqq_sync(bfqq) &&
--		(idling_boosts_thr || asymmetric_scenario);
-+		(idling_boosts_thr_without_issues || asymmetric_scenario);
+-	struct cfq_rb_root service_trees[2][3];
++	struct cfq_rb_root service_trees[2];
+ 	struct cfq_rb_root service_tree_idle;
+ 
+ 	/*
+ 	 * The priority currently being served
+ 	 */
+ 	enum wl_class_t serving_wl_class;
+-	enum wl_type_t serving_wl_type;
+ 	unsigned long workload_expires;
+ 
+ 	unsigned int busy_queues;
+@@ -291,9 +278,8 @@ CFQ_CFQQ_FNS(wait_busy);
+ #undef CFQ_CFQQ_FNS
+ 
+ #define cfq_log_cfqq(cfqd, cfqq, fmt, args...)	\
+-	blk_add_trace_msg((cfqd)->queue, "cfq%d%c%c " fmt, (cfqq)->pid,	\
++	blk_add_trace_msg((cfqd)->queue, "cfq%d%c " fmt, (cfqq)->pid,	\
+ 			cfq_cfqq_sync((cfqq)) ? 'S' : 'A',		\
+-			cfqq_type((cfqq)) == SYNC_NOIDLE_WORKLOAD ? 'N' : ' ',\
+ 				##args)
+ #define cfq_log(cfqd, fmt, args...)	\
+ 	blk_add_trace_msg((cfqd)->queue, "cfq " fmt, ##args)
+@@ -301,12 +287,12 @@ CFQ_CFQQ_FNS(wait_busy);
+ /* Traverses through cfq service trees */
+ #define for_each_st(cfqd, i, j, st) \
+ 	for (i = 0; i <= IDLE_WORKLOAD; i++) \
+-		for (j = 0, st = i < IDLE_WORKLOAD ? &cfqd->service_trees[i][j]\
++		for (j = 0, st = i < IDLE_WORKLOAD ? &cfqd->service_trees[i]\
+ 			: &cfqd->service_tree_idle; \
+-			(i < IDLE_WORKLOAD && j <= SYNC_WORKLOAD) || \
+-			(i == IDLE_WORKLOAD && j == 0); \
+-			j++, st = i < IDLE_WORKLOAD ? \
+-			&cfqd->service_trees[i][j] : NULL) \
++			(i < IDLE_WORKLOAD) || \
++			(i == IDLE_WORKLOAD); \
++			st = i < IDLE_WORKLOAD ? \
++			&cfqd->service_trees[i] : NULL) \
+ 
+ static inline bool cfq_io_thinktime_big(struct cfq_data *cfqd,
+ 	struct cfq_ttime *ttime)
+@@ -327,33 +313,6 @@ static inline enum wl_class_t cfqq_class(struct cfq_queue *cfqq)
+ 	return BE_WORKLOAD;
  }
  
+-
+-static enum wl_type_t cfqq_type(struct cfq_queue *cfqq)
+-{
+-	if (!cfq_cfqq_sync(cfqq))
+-		return ASYNC_WORKLOAD;
+-	if (!cfq_cfqq_idle_window(cfqq))
+-		return SYNC_NOIDLE_WORKLOAD;
+-	return SYNC_WORKLOAD;
+-}
+-
+-static inline int cfq_busy_queues_wl(enum wl_class_t wl_class,
+-					struct cfq_data *cfqd)
+-{
+-	if (wl_class == IDLE_WORKLOAD)
+-		return cfqd->service_tree_idle.count;
+-
+-	return cfqd->service_trees[wl_class][ASYNC_WORKLOAD].count +
+-		cfqd->service_trees[wl_class][SYNC_NOIDLE_WORKLOAD].count +
+-		cfqd->service_trees[wl_class][SYNC_WORKLOAD].count;
+-}
+-
+-static inline int cfq_busy_async_queues(struct cfq_data *cfqd)
+-{
+-	return cfqd->service_trees[RT_WORKLOAD][ASYNC_WORKLOAD].count +
+-		cfqd->service_trees[BE_WORKLOAD][ASYNC_WORKLOAD].count;
+-}
+-
+ static void cfq_dispatch_insert(struct request_queue *, struct request *);
+ static struct cfq_queue *cfq_get_queue(struct cfq_data *cfqd, bool is_sync,
+ 				       struct cfq_io_cq *cic, struct bio *bio);
+@@ -677,7 +636,7 @@ static void cfq_service_tree_add(struct cfq_data *cfqd, struct cfq_queue *cfqq,
+ 	int left;
+ 	int new_cfqq = 1;
+ 
+-	st = &cfqd->service_trees[cfqq_class(cfqq)][cfqq_type(cfqq)];
++	st = &cfqd->service_trees[cfqq_class(cfqq)];
+ 	if (cfq_class_idle(cfqq)) {
+ 		rb_key = CFQ_IDLE_DELAY;
+ 		parent = rb_last(&st->rb);
+@@ -999,8 +958,8 @@ static void __cfq_set_active_queue(struct cfq_data *cfqd,
+ 				   struct cfq_queue *cfqq)
+ {
+ 	if (cfqq) {
+-		cfq_log_cfqq(cfqd, cfqq, "set_active wl_class:%d wl_type:%d",
+-				cfqd->serving_wl_class, cfqd->serving_wl_type);
++		cfq_log_cfqq(cfqd, cfqq, "set_active wl_class:%d",
++				cfqd->serving_wl_class);
+ 		cfqq->slice_start = 0;
+ 		cfqq->dispatch_start = jiffies;
+ 		cfqq->allocated_slice = 0;
+@@ -1073,9 +1032,7 @@ static inline void cfq_slice_expired(struct cfq_data *cfqd, bool timed_out)
+  */
+ static struct cfq_queue *cfq_get_next_queue(struct cfq_data *cfqd)
+ {
+-	struct cfq_rb_root *st =
+-		&cfqd->service_trees[cfqd->serving_wl_class]
+-				    [cfqd->serving_wl_type];
++	struct cfq_rb_root *st = &cfqd->service_trees[cfqd->serving_wl_class];
+ 
+ 	if (!cfqd->rq_queued)
+ 		return NULL;
+@@ -1201,6 +1158,15 @@ static void cfq_arm_slice_timer(struct cfq_data *cfqd)
+ 	cfq_log_cfqq(cfqd, cfqq, "arm_idle: %lu", sl);
+ }
+ 
++static inline int cfq_busy_queues_wl(enum wl_class_t wl_class,
++				     struct cfq_data *cfqd)
++{
++	if (wl_class == IDLE_WORKLOAD)
++		return cfqd->service_tree_idle.count;
++
++	return cfqd->service_trees[wl_class].count;
++}
++
  /*
-@@ -6026,6 +6085,7 @@ static int bfq_init_queue(struct request_queue *q, struct elevator_type *e)
- 					      * high-definition compressed
- 					      * video.
- 					      */
-+	bfqd->wr_busy_queues = 0;
+  * Move request from internal lists to the request queue dispatch list.
+  */
+@@ -1253,29 +1219,6 @@ cfq_prio_to_maxrq(struct cfq_data *cfqd, struct cfq_queue *cfqq)
+ 	return 2 * base_rq * (IOPRIO_BE_NR - cfqq->ioprio);
+ }
+ 
+-static enum wl_type_t cfq_choose_wl_type(struct cfq_data *cfqd,
+-			enum wl_class_t wl_class)
+-{
+-	struct cfq_queue *queue;
+-	int i;
+-	bool key_valid = false;
+-	unsigned long lowest_key = 0;
+-	enum wl_type_t cur_best = SYNC_NOIDLE_WORKLOAD;
+-
+-	for (i = 0; i <= SYNC_WORKLOAD; ++i) {
+-		/* select the one with lowest rb_key */
+-		queue = cfq_rb_first(&cfqd->service_trees[wl_class][i]);
+-		if (queue &&
+-		    (!key_valid || time_before(queue->rb_key, lowest_key))) {
+-			lowest_key = queue->rb_key;
+-			cur_best = i;
+-			key_valid = true;
+-		}
+-	}
+-
+-	return cur_best;
+-}
+-
+ static void
+ choose_wl_class_and_type(struct cfq_data *cfqd)
+ {
+@@ -1298,13 +1241,7 @@ choose_wl_class_and_type(struct cfq_data *cfqd)
+ 	if (original_class != cfqd->serving_wl_class)
+ 		goto new_workload;
+ 
+-	/*
+-	 * For RT and BE, we have to choose also the type
+-	 * (SYNC, SYNC_NOIDLE, ASYNC), and to compute a workload
+-	 * expiration time
+-	 */
+-	st = &cfqd->service_trees[cfqd->serving_wl_class]
+-				 [cfqd->serving_wl_type];
++	st = &cfqd->service_trees[cfqd->serving_wl_class];
+ 	count = st->count;
  
  	/*
- 	 * Begin by assuming, optimistically, that the device is a
+@@ -1314,26 +1251,11 @@ choose_wl_class_and_type(struct cfq_data *cfqd)
+ 		return;
+ 
+ new_workload:
+-	/* otherwise select new workload type */
+-	cfqd->serving_wl_type = cfq_choose_wl_type(cfqd,
+-					cfqd->serving_wl_class);
+-	st = &cfqd->service_trees[cfqd->serving_wl_class]
+-				 [cfqd->serving_wl_type];
++	st = &cfqd->service_trees[cfqd->serving_wl_class];
+ 	count = st->count;
+ 
+-	if (cfqd->serving_wl_type == ASYNC_WORKLOAD) {
+-		slice = cfqd->cfq_target_latency *
+-			cfq_busy_async_queues(cfqd);
+-		slice = slice/cfqd->busy_queues;
+-
+-		/* async workload slice is scaled down according to
+-		 * the sync/async slice ratio. */
+-		slice = slice * cfqd->cfq_slice[0] / cfqd->cfq_slice[1];
+-	} else
+-		/* sync workload slice is 2 * cfq_slice_idle */
+-		slice = 2 * cfqd->cfq_slice_idle;
+-
+-	slice = max_t(unsigned, slice, CFQ_MIN_TT);
++	/* sync workload slice is 2 * cfq_slice_idle */
++	slice = max_t(unsigned int, 2 * cfqd->cfq_slice_idle, CFQ_MIN_TT);
+ 	cfq_log(cfqd, "workload slice:%d", slice);
+ 	cfqd->workload_expires = jiffies + slice;
+ }
+@@ -2078,8 +2000,7 @@ static void cfq_completed_request(struct request_queue *q, struct request *rq)
+ 		if (cfq_cfqq_on_rr(cfqq))
+ 			st = cfqq->service_tree;
+ 		else
+-			st = &cfqd->service_trees[cfqq_class(cfqq)]
+-						 [cfqq_type(cfqq)];
++			st = &cfqd->service_trees[cfqq_class(cfqq)];
+ 
+ 		st->ttime.last_end_request = now;
+ 		if (!time_after(rq->start_time + cfqd->cfq_fifo_expire[1], now))
 -- 
 1.9.1
