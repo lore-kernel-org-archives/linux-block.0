@@ -1,222 +1,227 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga04.intel.com ([192.55.52.120]:2682 "EHLO mga04.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755418AbcGZAgG (ORCPT <rfc822;linux-block@vger.kernel.org>);
-	Mon, 25 Jul 2016 20:36:06 -0400
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-	Andreas Dilger <adilger.kernel@dilger.ca>,
-	Jan Kara <jack@suse.com>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-	Hugh Dickins <hughd@google.com>,
-	Andrea Arcangeli <aarcange@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Dave Hansen <dave.hansen@intel.com>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	Matthew Wilcox <willy@infradead.org>,
-	Ross Zwisler <ross.zwisler@linux.intel.com>,
-	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	linux-block@vger.kernel.org,
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv1, RFC 32/33] mm, fs, ext4: expand use of page_mapping() and page_to_pgoff()
-Date: Tue, 26 Jul 2016 03:35:34 +0300
-Message-Id: <1469493335-3622-33-git-send-email-kirill.shutemov@linux.intel.com>
-In-Reply-To: <1469493335-3622-1-git-send-email-kirill.shutemov@linux.intel.com>
-References: <1469493335-3622-1-git-send-email-kirill.shutemov@linux.intel.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+Subject: Re: [PATCH RFC V8 00/22] Replace the CFQ I/O Scheduler with BFQ
+To: Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>
+References: <2D83ACA0-2513-4019-9A0D-3166FDDE7485@linaro.org>
+ <1469636018-31247-1-git-send-email-paolo.valente@linaro.org>
+Cc: Fabio Checconi <fchecconi@gmail.com>,
+ Arianna Avanzini <avanzini.arianna@gmail.com>, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, ulf.hansson@linaro.org,
+ linus.walleij@linaro.org, broonie@kernel.org
+From: Paolo <paolo.valente@linaro.org>
+Message-ID: <eff8f327-5b45-5d4e-b107-d2e30c61bac9@linaro.org>
+Date: Thu, 28 Jul 2016 18:50:13 +0200
+MIME-Version: 1.0
+In-Reply-To: <1469636018-31247-1-git-send-email-paolo.valente@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+List-ID: <linux-block@vger.kernel.org>
 
-With huge pages in page cache we see tail pages in more code paths.
-This patch replaces direct access to struct page fields with macros
-which can handle tail pages properly.
+Out of sync with HEAD (at the date of posting), sorry. Rebasing.
 
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
----
- fs/buffer.c         |  2 +-
- fs/ext4/inode.c     |  4 ++--
- mm/filemap.c        | 25 +++++++++++++------------
- mm/memory.c         |  4 ++--
- mm/page-writeback.c |  2 +-
- 5 files changed, 19 insertions(+), 18 deletions(-)
+Thanks,
+Paolo
 
-diff --git a/fs/buffer.c b/fs/buffer.c
-index e636dac53215..7ea11e6a8c1b 100644
---- a/fs/buffer.c
-+++ b/fs/buffer.c
-@@ -630,7 +630,7 @@ static void __set_page_dirty(struct page *page, struct address_space *mapping,
- 	unsigned long flags;
- 
- 	spin_lock_irqsave(&mapping->tree_lock, flags);
--	if (page->mapping) {	/* Race with truncate? */
-+	if (page_mapping(page)) {	/* Race with truncate? */
- 		WARN_ON_ONCE(warn && !PageUptodate(page));
- 		account_page_dirtied(page, mapping);
- 		radix_tree_tag_set(&mapping->page_tree,
-diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
-index 29133e4550fc..7c53e490849f 100644
---- a/fs/ext4/inode.c
-+++ b/fs/ext4/inode.c
-@@ -1215,7 +1215,7 @@ retry_journal:
- 	}
- 
- 	lock_page(page);
--	if (page->mapping != mapping) {
-+	if (page_mapping(page) != mapping) {
- 		/* The page got truncated from under us */
- 		unlock_page(page);
- 		put_page(page);
-@@ -2939,7 +2939,7 @@ retry_journal:
- 	}
- 
- 	lock_page(page);
--	if (page->mapping != mapping) {
-+	if (page_mapping(page) != mapping) {
- 		/* The page got truncated from under us */
- 		unlock_page(page);
- 		put_page(page);
-diff --git a/mm/filemap.c b/mm/filemap.c
-index 3d46db277e73..3d39a39d347f 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -368,7 +368,7 @@ static int __filemap_fdatawait_range(struct address_space *mapping,
- 			struct page *page = pvec.pages[i];
- 
- 			/* until radix tree lookup accepts end_index */
--			if (page->index > end)
-+			if (page_to_pgoff(page) > end)
- 				continue;
- 
- 			page = compound_head(page);
-@@ -1266,12 +1266,12 @@ repeat:
- 		}
- 
- 		/* Has the page been truncated? */
--		if (unlikely(page->mapping != mapping)) {
-+		if (unlikely(page_mapping(page) != mapping)) {
- 			unlock_page(page);
- 			put_page(page);
- 			goto repeat;
- 		}
--		VM_BUG_ON_PAGE(page->index != offset, page);
-+		VM_BUG_ON_PAGE(page_to_pgoff(page) != offset, page);
- 	}
- 
- 	if (page && (fgp_flags & FGP_ACCESSED))
-@@ -1560,7 +1560,8 @@ repeat:
- 		 * otherwise we can get both false positives and false
- 		 * negatives, which is just confusing to the caller.
- 		 */
--		if (page->mapping == NULL || page_to_pgoff(page) != iter.index) {
-+		if (page_mapping(page) == NULL ||
-+				page_to_pgoff(page) != iter.index) {
- 			put_page(page);
- 			break;
- 		}
-@@ -1859,7 +1860,7 @@ find_page:
- 			if (!trylock_page(page))
- 				goto page_not_up_to_date;
- 			/* Did it get truncated before we got the lock? */
--			if (!page->mapping)
-+			if (page_mapping(page))
- 				goto page_not_up_to_date_locked;
- 			if (!mapping->a_ops->is_partially_uptodate(page,
- 							offset, iter->count))
-@@ -1939,7 +1940,7 @@ page_not_up_to_date:
- 
- page_not_up_to_date_locked:
- 		/* Did it get truncated before we got the lock? */
--		if (!page->mapping) {
-+		if (!page_mapping(page)) {
- 			unlock_page(page);
- 			put_page(page);
- 			continue;
-@@ -1975,7 +1976,7 @@ readpage:
- 			if (unlikely(error))
- 				goto readpage_error;
- 			if (!PageUptodate(page)) {
--				if (page->mapping == NULL) {
-+				if (page_mapping(page) == NULL) {
- 					/*
- 					 * invalidate_mapping_pages got it
- 					 */
-@@ -2276,12 +2277,12 @@ retry_find:
- 	}
- 
- 	/* Did it get truncated? */
--	if (unlikely(page->mapping != mapping)) {
-+	if (unlikely(page_mapping(page) != mapping)) {
- 		unlock_page(page);
- 		put_page(page);
- 		goto retry_find;
- 	}
--	VM_BUG_ON_PAGE(page->index != offset, page);
-+	VM_BUG_ON_PAGE(page_to_pgoff(page) != offset, page);
- 
- 	/*
- 	 * We have a locked page in the page cache, now we need to check
-@@ -2456,7 +2457,7 @@ int filemap_page_mkwrite(struct vm_area_struct *vma, struct vm_fault *vmf)
- 	sb_start_pagefault(inode->i_sb);
- 	file_update_time(vma->vm_file);
- 	lock_page(page);
--	if (page->mapping != inode->i_mapping) {
-+	if (page_mapping(page) != inode->i_mapping) {
- 		unlock_page(page);
- 		ret = VM_FAULT_NOPAGE;
- 		goto out;
-@@ -2605,7 +2606,7 @@ filler:
- 	lock_page(page);
- 
- 	/* Case c or d, restart the operation */
--	if (!page->mapping) {
-+	if (!page_mapping(page)) {
- 		unlock_page(page);
- 		put_page(page);
- 		goto repeat;
-@@ -3061,7 +3062,7 @@ EXPORT_SYMBOL(generic_file_write_iter);
-  */
- int try_to_release_page(struct page *page, gfp_t gfp_mask)
- {
--	struct address_space * const mapping = page->mapping;
-+	struct address_space * const mapping = page_mapping(page);
- 
- 	BUG_ON(!PageLocked(page));
- 	if (PageWriteback(page))
-diff --git a/mm/memory.c b/mm/memory.c
-index 4425b6059339..a27023056531 100644
---- a/mm/memory.c
-+++ b/mm/memory.c
-@@ -2052,7 +2052,7 @@ static int do_page_mkwrite(struct vm_area_struct *vma, struct page *page,
- 		return ret;
- 	if (unlikely(!(ret & VM_FAULT_LOCKED))) {
- 		lock_page(page);
--		if (!page->mapping) {
-+		if (!page_mapping(page)) {
- 			unlock_page(page);
- 			return 0; /* retry */
- 		}
-@@ -2100,7 +2100,7 @@ static inline int wp_page_reuse(struct fault_env *fe, pte_t orig_pte,
- 
- 		dirtied = set_page_dirty(page);
- 		VM_BUG_ON_PAGE(PageAnon(page), page);
--		mapping = page->mapping;
-+		mapping = page_mapping(page);
- 		unlock_page(page);
- 		put_page(page);
- 
-diff --git a/mm/page-writeback.c b/mm/page-writeback.c
-index 48409726d226..86d90eeb0322 100644
---- a/mm/page-writeback.c
-+++ b/mm/page-writeback.c
-@@ -2877,7 +2877,7 @@ EXPORT_SYMBOL(mapping_tagged);
-  */
- void wait_for_stable_page(struct page *page)
- {
--	if (bdi_cap_stable_pages_required(inode_to_bdi(page->mapping->host)))
-+	if (bdi_cap_stable_pages_required(inode_to_bdi(page_mapping(page)->host)))
- 		wait_on_page_writeback(page);
- }
- EXPORT_SYMBOL_GPL(wait_for_stable_page);
--- 
-2.8.1
-
+Il 27/07/2016 18:13, Paolo Valente ha scritto:
+> Hi,
+> this new version of the patchset contains all the improvements and bug
+> fixes recommended by Tejun [7], plus new features of BFQ-v8. Details
+> about old and new features in patch descriptions. For your
+> convenience, here is the usual description of the overall patchset.
+>
+> This patchset replaces CFQ with the last version of BFQ (which is a
+> proportional-share I/O scheduler). To make a smooth transition, this
+> patchset first brings CFQ back to its state at the time when BFQ was
+> forked from CFQ. Basically, this reduces CFQ to its engine, by
+> removing every heuristic and improvement that has nothing to do with
+> any heuristic or improvement in BFQ, and every heuristic and
+> improvement whose goal is achieved in a different way in BFQ. Then,
+> the second part of the patchset starts by replacing CFQ's engine with
+> BFQ's engine, and goes on by adding current BFQ improvements and extra
+> heuristics. Here is the thread in which we agreed on both this first
+> step, and the second and last step: [1]. Moreover, here is a direct
+> link to the email describing both steps: [2].
+>
+> Some patch generates WARNINGS with checkpatch.pl, but these WARNINGS
+> seem to be either unavoidable for the involved pieces of code (which
+> the patch just extends), or false positives.
+>
+> Turning back to BFQ, its first version was submitted a few years ago
+> [3]. It is denoted as v0 in this patchset, to distinguish it from the
+> version I am submitting now, v8. In particular, the first two
+> patches concerned with BFQ introduce BFQ-v0, whereas the remaining
+> patches turn progressively BFQ-v0 into BFQ-v8. Here are some nice
+> features of BFQ-v8.
+>
+> Low latency for interactive applications
+>
+> According to our results, and regardless of the actual background
+> workload, for interactive tasks the storage device is virtually as
+> responsive as if it was idle. For example, even if one or more of the
+> following background workloads are being executed:
+> - one or more large files are being read or written,
+> - a tree of source files is being compiled,
+> - one or more virtual machines are performing I/O,
+> - a software update is in progress,
+> - indexing daemons are scanning filesystems and updating their
+>   databases,
+> starting an application or loading a file from within an application
+> takes about the same time as if the storage device was idle. As a
+> comparison, with CFQ, NOOP or DEADLINE, and in the same conditions,
+> applications experience high latencies, or even become unresponsive
+> until the background workload terminates (also on SSDs).
+>
+> Low latency for soft real-time applications
+>
+> Also soft real-time applications, such as audio and video
+> players/streamers, enjoy a low latency and a low drop rate, regardless
+> of the background I/O workload. As a consequence, these applications
+> do not suffer from almost any glitch due to the background workload.
+>
+> High throughput
+>
+> On hard disks, BFQ achieves up to 30% higher throughput than CFQ, and
+> up to 150% higher throughput than DEADLINE and NOOP, with half of the
+> parallel workloads considered in our tests. With the rest of the
+> workloads, and with all the workloads on flash-based devices, BFQ
+> achieves instead about the same throughput as the other schedulers.
+>
+> Strong fairness guarantees (already provided by BFQ-v0)
+>
+> As for long-term guarantees, BFQ distributes the device throughput
+> (and not just the device time) as desired among I/O-bound
+> applications, with any workload and regardless of the device
+> parameters.
+>
+>
+> BFQ achieves the above service properties thanks to the combination of
+> its accurate scheduling engine (patches 9-10), and a set of simple
+> heuristics and improvements (patches 11-22). Details on how BFQ and
+> its components work are provided in the descriptions of the
+> patches. In addition, an organic description of the main BFQ algorithm
+> and of most of its features can be found in this paper [4].
+>
+> What BFQ can do in practice is shown, e.g., in this 8-minute demo with
+> an SSD: [5]. I made this demo with an older version of BFQ (v7r6) and
+> under Linux 3.17.0, but, for the tests considered in the demo,
+> performance has remained about the same with more recent BFQ and
+> kernel versions. More details about this point can be found here [6],
+> together with graphs showing the performance of BFQ, as compared with
+> CFQ, DEADLINE and NOOP, and on: a fast and a slow hard disk, a RAID1,
+> an SSD, a microSDHC Card and an eMMC. As an example, our results on
+> the SSD are reported also in a table at the end of this email.
+>
+> Finally, as for testing in everyday use, BFQ is the default I/O
+> scheduler in, e.g., Manjaro, Sabayon, OpenMandriva and Arch Linux ARM,
+> plus several kernel forks for PCs and smartphones. In addition, BFQ is
+> optionally available in, e.g., Arch, PCLinuxOS and Gentoo, and we
+> record several downloads a day from people using other
+> distributions. The feedback received so far basically confirms the
+> expected latency drop and throughput boost.
+>
+> Paolo
+>
+> Results on a Plextor PX-256M5S SSD
+>
+> The first two rows of the next table report the aggregate throughput
+> achieved by BFQ, CFQ, DEADLINE and NOOP, while ten parallel processes
+> read, either sequentially or randomly, a separate portion of the
+> memory blocks each. These processes read directly from the device, and
+> no process performs writes, to avoid writing large files repeatedly
+> and wearing out the device during the many tests done. As can be seen,
+> all schedulers achieve about the same throughput with sequential
+> readers, whereas, with random readers, the throughput slightly grows
+> as the complexity, and hence the execution time, of the schedulers
+> decreases. In fact, with random readers, the number of IOPS is
+> extremely higher, and all CPUs spend all the time either executing
+> instructions or waiting for I/O (the total idle percentage is
+> 0). Therefore, the processing time of I/O requests influences the
+> maximum throughput achievable.
+>
+> The remaining rows report the cold-cache start-up time experienced by
+> various applications while one of the above two workloads is being
+> executed in parallel. In particular, "Start-up time 10 seq/rand"
+> stands for "Start-up time of the application at hand while 10
+> sequential/random readers are running". A timeout fires, and the test
+> is aborted, if the application does not start within 60 seconds; so,
+> in the table, '>60' means that the application did not start before
+> the timeout fired.
+>
+> With sequential readers, the performance gap between BFQ and the other
+> schedulers is remarkable. Background workloads are intentionally very
+> heavy, to show the performance of the schedulers in somewhat extreme
+> conditions. Differences are however still significant also with
+> lighter workloads, as shown, e.g., here [6] for slower devices.
+>
+> -----------------------------------------------------------------------------
+> |                      SCHEDULER                    |        Test           |
+> -----------------------------------------------------------------------------
+> |    BFQ     |    CFQ     |  DEADLINE  |    NOOP    |                       |
+> -----------------------------------------------------------------------------
+> |            |            |            |            | Aggregate Throughput  |
+> |            |            |            |            |       [MB/s]          |
+> |    399     |    400     |    400     |    400     |  10 raw seq. readers  |
+> |    191     |    193     |    202     |    203     | 10 raw random readers |
+> -----------------------------------------------------------------------------
+> |            |            |            |            | Start-up time 10 seq  |
+> |            |            |            |            |       [sec]           |
+> |    0.21    |    >60     |    1.91    |    1.88    |      xterm            |
+> |    0.93    |    >60     |    10.2    |    10.8    |     oowriter          |
+> |    0.89    |    >60     |    29.7    |    30.0    |      konsole          |
+> -----------------------------------------------------------------------------
+> |            |            |            |            | Start-up time 10 rand |
+> |            |            |            |            |       [sec]           |
+> |    0.20    |    0.30    |    0.21    |    0.21    |      xterm            |
+> |    0.81    |    3.28    |    0.80    |    0.81    |     oowriter          |
+> |    0.88    |    2.90    |    1.02    |    1.00    |      konsole          |
+> -----------------------------------------------------------------------------
+>
+>
+> [1] https://lkml.org/lkml/2014/5/27/314
+>
+> [2] https://lists.linux-foundation.org/pipermail/containers/2014-June/034704.html
+>
+> [3] https://lkml.org/lkml/2008/4/1/234
+>
+> [4] P. Valente, A. Avanzini, "Evolution of the BFQ Storage I/O
+>     Scheduler", Proceedings of the First Workshop on Mobile System
+>     Technologies (MST-2015), May 2015.
+>     http://algogroup.unimore.it/people/paolo/disk_sched/mst-2015.pdf
+>
+> [5] https://youtu.be/1cjZeaCXIyM
+>
+> [6] http://algogroup.unimore.it/people/paolo/disk_sched/results.php
+>
+> [7] https://lkml.org/lkml/2016/2/1/818
+>
+> Arianna Avanzini (11):
+>   block, cfq: remove queue merging for close cooperators
+>   block, cfq: remove close-based preemption
+>   block, cfq: remove deep seek queues logic
+>   block, cfq: remove SSD-related logic
+>   block, cfq: get rid of hierarchical support
+>   block, cfq: get rid of queue preemption
+>   block, cfq: get rid of workload type
+>   block, bfq: add full hierarchical scheduling and cgroups support
+>   block, bfq: add Early Queue Merge (EQM)
+>   block, bfq: reduce idling only in symmetric scenarios
+>   block, bfq: handle bursts of queue activations
+>
+> Fabio Checconi (1):
+>   block, cfq: replace CFQ with the BFQ-v0 I/O scheduler
+>
+> Paolo Valente (10):
+>   block, cfq: get rid of latency tunables
+>   block, bfq: improve throughput boosting
+>   block, bfq: modify the peak-rate estimator
+>   block, bfq: add more fairness with writes and slow processes
+>   block, bfq: improve responsiveness
+>   block, bfq: reduce I/O latency for soft real-time applications
+>   block, bfq: preserve a low latency also with NCQ-capable drives
+>   block, bfq: reduce latency during request-pool saturation
+>   block, bfq: boost the throughput on NCQ-capable flash-based devices
+>   block, bfq: boost the throughput with random I/O on NCQ-capable HDDs
+>
+>  block/Kconfig.iosched |    19 +-
+>  block/cfq-iosched.c   | 10173 +++++++++++++++++++++++++++++++-----------------
+>  2 files changed, 6610 insertions(+), 3582 deletions(-)
+>
