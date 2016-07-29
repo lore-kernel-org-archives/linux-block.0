@@ -1,74 +1,81 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:59826 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753408AbcGSNUn (ORCPT <rfc822;linux-block@vger.kernel.org>);
-	Tue, 19 Jul 2016 09:20:43 -0400
-From: Hannes Reinecke <hare@suse.de>
-To: Jens Axboe <axboe@fb.com>
-Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-	Damien Le Moal <damien.lemoal@hgst.com>,
-	Hannes Reinecke <hare@suse.de>
-Subject: [PATCH 5/6] block: Introduce BLKPREP_DONE
-Date: Tue, 19 Jul 2016 15:20:38 +0200
-Message-Id: <1468934439-93579-6-git-send-email-hare@suse.de>
-In-Reply-To: <1468934439-93579-1-git-send-email-hare@suse.de>
-References: <1468934439-93579-1-git-send-email-hare@suse.de>
+Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:44965 "EHLO
+	mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752852AbcG2ON4 (ORCPT
+	<rfc822;linux-block@vger.kernel.org>);
+	Fri, 29 Jul 2016 10:13:56 -0400
+Subject: Re: [PATCH] nbd: fix race in ioctl
+To: Vegard Nossum <vegard.nossum@oracle.com>,
+	Markus Pargmann <mpa@pengutronix.de>
+References: <1464346775-370-1-git-send-email-vegard.nossum@oracle.com>
+ <22193884.IvLroPXQMD@adelgunde> <579B3605.4010900@oracle.com>
+CC: Quentin Casasnovas <quentin.casasnovas@oracle.com>,
+	<linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	Paul Clements <paul.clements@steeleye.com>,
+	Pavel Machek <pavel@suse.cz>, Al Viro <viro@zeniv.linux.org.uk>
+From: Jens Axboe <axboe@fb.com>
+Message-ID: <eb6e149f-7c2b-1e42-3479-5d514f80a818@fb.com>
+Date: Fri, 29 Jul 2016 08:13:18 -0600
+MIME-Version: 1.0
+In-Reply-To: <579B3605.4010900@oracle.com>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Add a new blkprep return code BLKPREP_DONE to signal completion
-without I/O error.
+On 07/29/2016 04:55 AM, Vegard Nossum wrote:
+> On 05/30/2016 02:58 PM, Markus Pargmann wrote:
+>> Hi,
+>>
+>> On Friday 27 May 2016 12:59:35 Vegard Nossum wrote:
+>>> Quentin ran into this bug:
+>>>
+>>> WARNING: CPU: 64 PID: 10085 at fs/sysfs/dir.c:31
+>>> sysfs_warn_dup+0x65/0x80
+>
+> [...]
+>
+>>> It seems fairly obvious that device_create_file() is not being protected
+>>> from being run concurrently on the same nbd.
+>>>
+>>> Quentin found the following relevant commits:
+>>>
+>>> 1a2ad21 nbd: add locking to nbd_ioctl
+>>> 90b8f28 [PATCH] end of methods switch: remove the old ones
+>>> d4430d6 [PATCH] beginning of methods conversion
+>>> 08f8585 [PATCH] move block_device_operations to blkdev.h
+>>>
+>>> It would seem that the race was introduced in the process of moving nbd
+>>> from BKL to unlocked ioctls.
+>>>
+>>> By setting nbd->task_recv while the mutex is held, we can prevent other
+>>> processes from running concurrently (since nbd->task_recv is also
+>>> checked
+>>> while the mutex is held).
+>>>
+>>> Reported-and-tested-by: Quentin Casasnovas
+>>> <quentin.casasnovas@oracle.com>
+>>> Cc: Markus Pargmann <mpa@pengutronix.de>
+>>> Cc: Paul Clements <paul.clements@steeleye.com>
+>>> Cc: Pavel Machek <pavel@suse.cz>
+>>> Cc: Jens Axboe <axboe@fb.com>
+>>> Cc: Al Viro <viro@zeniv.linux.org.uk>
+>>> Signed-off-by: Vegard Nossum <vegard.nossum@oracle.com>
+>>
+>> Thanks, applied.
+>>
+>> Best Regards,
+>>
+>> Markus
+>
+> Hi,
+>
+> I didn't see this patch in the batch that went into 4.8, so I'm just
+> following up to make sure it doesn't get lost.
+>
+> Moreover, it should also probably go into stable.
 
-Signed-off-by: Hannes Reinecke <hare@suse.de>
----
- block/blk-core.c        | 6 +++++-
- drivers/scsi/scsi_lib.c | 1 +
- include/linux/blkdev.h  | 1 +
- 3 files changed, 7 insertions(+), 1 deletion(-)
+I have applied it for 4.8.
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index e273194..4bcf30a 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -2462,9 +2462,13 @@ struct request *blk_peek_request(struct request_queue *q)
- 
- 			rq = NULL;
- 			break;
--		} else if (ret == BLKPREP_KILL || ret == BLKPREP_INVALID) {
-+		} else if (ret == BLKPREP_KILL || ret == BLKPREP_INVALID ||
-+			   ret == BLKPREP_DONE) {
- 			int err = (ret == BLKPREP_INVALID) ? -EREMOTEIO : -EIO;
- 
-+			if (ret == BLKPREP_DONE)
-+				err = 0;
-+
- 			rq->cmd_flags |= REQ_QUIET;
- 			/*
- 			 * Mark this request as started so we don't trigger
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index b2e332a..f112926 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -1257,6 +1257,7 @@ scsi_prep_return(struct request_queue *q, struct request *req, int ret)
- 	case BLKPREP_KILL:
- 	case BLKPREP_INVALID:
- 		req->errors = DID_NO_CONNECT << 16;
-+	case BLKPREP_DONE:
- 		/* release the command and kill it */
- 		if (req->special) {
- 			struct scsi_cmnd *cmd = req->special;
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index d5e3d8b..c351444 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -736,6 +736,7 @@ enum {
- 	BLKPREP_KILL,		/* fatal error, kill, return -EIO */
- 	BLKPREP_DEFER,		/* leave on queue */
- 	BLKPREP_INVALID,	/* invalid command, kill, return -EREMOTEIO */
-+	BLKPREP_DONE,		/* complete w/o error */
- };
- 
- extern unsigned long blk_max_low_pfn, blk_max_pfn;
 -- 
-1.8.5.6
+Jens Axboe
 
