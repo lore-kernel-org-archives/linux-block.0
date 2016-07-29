@@ -1,49 +1,75 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from auth-4.ukservers.net ([217.10.138.158]:55358 "EHLO
-	auth-4.ukservers.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751975AbcG2BJ7 (ORCPT
-	<rfc822;linux-block@vger.kernel.org>);
-	Thu, 28 Jul 2016 21:09:59 -0400
-Subject: Re: To add, or not to add, a bio REQ_ROTATIONAL flag
-To: Eric Wheeler <bcache@lists.ewheeler.net>,
-	linux-block@vger.kernel.org
-References: <alpine.LRH.2.11.1607281603530.10662@mail.ewheeler.net>
-Cc: dm-devel@redhat.com, linux-raid@vger.kernel.org,
+Received: from mx.ewheeler.net ([66.155.3.69]:34749 "EHLO mail.ewheeler.net"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1752684AbcG2Auc (ORCPT <rfc822;linux-block@vger.kernel.org>);
+	Thu, 28 Jul 2016 20:50:32 -0400
+Date: Thu, 28 Jul 2016 17:50:14 -0700 (PDT)
+From: Eric Wheeler <bcache@lists.ewheeler.net>
+To: linux-block@vger.kernel.org
+cc: dm-devel@redhat.com, linux-raid@vger.kernel.org,
 	linux-kernel@vger.kernel.org, linux-bcache@vger.kernel.org
-From: Wols Lists <antlists@youngman.org.uk>
-Message-ID: <579AABAA.2020200@youngman.org.uk>
-Date: Fri, 29 Jul 2016 02:04:42 +0100
+Subject: To add, or not to add, a bio REQ_ROTATIONAL flag
+Message-ID: <alpine.LRH.2.11.1607281603530.10662@mail.ewheeler.net>
 MIME-Version: 1.0
-In-Reply-To: <alpine.LRH.2.11.1607281603530.10662@mail.ewheeler.net>
-Content-Type: text/plain; charset=windows-1252
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 29/07/16 01:50, Eric Wheeler wrote:
-> Hello all,
-> 
-> With the many SSD caching layers being developed (bcache, dm-cache, 
-> dm-writeboost, etc), how could we flag a bio from userspace to indicate 
-> whether the bio is preferred to hit spinning disks instead of an SSD?
-> 
-> Unnecessary promotions, evections, and writeback increase the write burden 
-> on the caching layer and burns out SSDs too fast (TBW), thus requring 
-> equipment replacement.
+Hello all,
 
-What's the spec of these devices? How long are they expected to last?
+With the many SSD caching layers being developed (bcache, dm-cache, 
+dm-writeboost, etc), how could we flag a bio from userspace to indicate 
+whether the bio is preferred to hit spinning disks instead of an SSD?
 
-Other recent posts on this (linux-raid) mailing list refer to tests on
-SSDs that indicates their typical life is way beyond their nominal life,
-and that in normal usage they are actually likely to outlive "spinning
-rust".
+Unnecessary promotions, evections, and writeback increase the write burden 
+on the caching layer and burns out SSDs too fast (TBW), thus requring 
+equipment replacement.
 
-http://techreport.com/review/24841/introducing-the-ssd-endurance-experiment
+Is there already a mechanism for this that could be added to the various 
+caching mechanisms' promote/demote/bypass logic?
 
-http://techreport.com/review/27909/the-ssd-endurance-experiment-theyre-all-dead/3
+For example, I would like to prevent backups from influencing the cache 
+eviction logic. Neither do I wish to evict cache due to a bio from a 
+backup process, nor do I wish a bio from the backup process to be cached 
+on the SSD.  
 
-Looking at the results, the FIRST drives only started failing once
-they'd written some 700 Terabytes. How long is it going to take you to
-write that much data over a SATA3 link?
 
-Cheers,
-Wol
+We would want to bypass the cache for IO that is somehow flagged to bypass 
+block-layer caches and use the rotational disk unless the referenced block 
+already exists on the SSD.
+
+There might be two cases here that would be ideal to unify without 
+touching filesystem code:
+
+  1) open() of a block device
+
+  2) open() on a file such that a filesystem must flag the bio
+
+I had considered writing something to detect FADV_SEQUENTIAL/FADV_NOREUSE 
+or `ionice -c3` on a process hitting bcache and modifying 
+check_should_bypass()/should_writeback() to behave as such.
+
+However, just because FADV_SEQUENTIAL is flagged doesn't mean the cache 
+should bypass.  Filesystems can fragment, and while the file being read 
+may be read sequentially, the blocks on which it resides may not be.  
+Same thing for higher-level block devices such as dm-thinp where one might 
+sequentially read a thin volume but its _tdata might not be in linear 
+order.  This may imply that we need a new way to flag cache bypass from 
+userspace that is neither io-priority nor fadvise driven.
+
+So what are our options?  What might be the best way to do this?
+
+If fadvise is the better option, how can a block device driver lookup the 
+fadvise advice from a given bio struct?  Can we add an FADV_NOSSD flag 
+since FADV_SEQUENTIAL may be insufficent?  Are FADV_NOREUSE/FADV_DONTNEED 
+reasonable candidates?
+
+Perhaps ionice could be used used, but the concept of "priority" 
+doesn't exactly encompass the concept of cache-bypass---so is something 
+else needed?
+
+Other ideas?  
+
+
+--
+Eric Wheeler
