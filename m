@@ -1,274 +1,152 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:60254 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753324AbcGaRTa (ORCPT <rfc822;linux-block@vger.kernel.org>);
-	Sun, 31 Jul 2016 13:19:30 -0400
+Received: from mail-oi0-f47.google.com ([209.85.218.47]:35105 "EHLO
+	mail-oi0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751014AbcG3Pw1 (ORCPT
+	<rfc822;linux-block@vger.kernel.org>);
+	Sat, 30 Jul 2016 11:52:27 -0400
+Received: by mail-oi0-f47.google.com with SMTP id l72so143477566oig.2
+        for <linux-block@vger.kernel.org>; Sat, 30 Jul 2016 08:52:26 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <CAPcyv4g5PpShWfXSV+KPJYW7GFrejUNjk=C1-ak=88iX8XczGA@mail.gmail.com>
+References: <622794958.9574724.1469674652262.JavaMail.zimbra@redhat.com>
+ <1762637089.9575520.1469676013321.JavaMail.zimbra@redhat.com> <CAPcyv4g5PpShWfXSV+KPJYW7GFrejUNjk=C1-ak=88iX8XczGA@mail.gmail.com>
+From: Dan Williams <dan.j.williams@intel.com>
+Date: Sat, 30 Jul 2016 08:52:23 -0700
+Message-ID: <CAPcyv4gGLfLbCWmzb5Yt+oVp2pKuGwVv6iY__O_DPmaV__OZDQ@mail.gmail.com>
 Subject: Re: [BUG] kernel NULL pointer dereference observed during pmem btt
  switch test
-To: Dan Williams <dan.j.williams@intel.com>
-References: <622794958.9574724.1469674652262.JavaMail.zimbra@redhat.com>
- <1762637089.9575520.1469676013321.JavaMail.zimbra@redhat.com>
- <CAPcyv4g5PpShWfXSV+KPJYW7GFrejUNjk=C1-ak=88iX8XczGA@mail.gmail.com>
- <CAPcyv4gGLfLbCWmzb5Yt+oVp2pKuGwVv6iY__O_DPmaV__OZDQ@mail.gmail.com>
+To: Yi Zhang <yizhan@redhat.com>
 Cc: linux-nvdimm <linux-nvdimm@ml01.01.org>,
 	linux-block@vger.kernel.org
-From: yizhan <yizhan@redhat.com>
-Message-ID: <d83eeac2-49dc-4c45-9aea-7d68da4fbf7d@redhat.com>
-Date: Mon, 1 Aug 2016 01:19:26 +0800
-MIME-Version: 1.0
-In-Reply-To: <CAPcyv4gGLfLbCWmzb5Yt+oVp2pKuGwVv6iY__O_DPmaV__OZDQ@mail.gmail.com>
-Content-Type: multipart/mixed;
- boundary="------------0DDD91E46F0304F1951B6921"
+Content-Type: multipart/mixed; boundary=001a11352e78831a750538dc5a69
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-This is a multi-part message in MIME format.
---------------0DDD91E46F0304F1951B6921
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
+--001a11352e78831a750538dc5a69
+Content-Type: text/plain; charset=UTF-8
 
-On 07/30/2016 11:52 PM, Dan Williams wrote:
-> On Thu, Jul 28, 2016 at 8:50 AM, Dan Williams <dan.j.williams@intel.com> wrote:
->> [ adding linux-block ]
+On Thu, Jul 28, 2016 at 8:50 AM, Dan Williams <dan.j.williams@intel.com> wrote:
+> [ adding linux-block ]
+>
+> On Wed, Jul 27, 2016 at 8:20 PM, Yi Zhang <yizhan@redhat.com> wrote:
+>> Hello everyone
 >>
->> On Wed, Jul 27, 2016 at 8:20 PM, Yi Zhang <yizhan@redhat.com> wrote:
->>> Hello everyone
->>>
->>> Could you help check this issue, thanks.
->>>
->>> Steps I used:
->>> 1. Reserve 4*8G of memory for pmem by add kernel parameter "memmap=8G!4G memmap=8G!12G memmap=8G!20G memmap=8G!28G"
->>> 2. Execute below script
->>> #!/bin/bash
->>> pmem_btt_switch() {
->>>          sector_size_list="512 520 528 4096 4104 4160 4224"
->>>          for sector_size in $sector_size_list; do
->>>                  ndctl create-namespace -f -e namespace${1}.0 --mode=sector -l $sector_size
->>>                  ndctl create-namespace -f -e namespace${1}.0 --mode=raw
->>>          done
->>> }
->>>
->>> for i in 0 1 2 3; do
->>>          pmem_btt_switch $i &
->>> done
->> Thanks for the report.  This looks like del_gendisk() frees the
->> previous usage of the devt before the bdi is unregistered.  This
->> appears to be a general problem with all block drivers, not just
->> libnvdimm, since blk_cleanup_queue() is typically called after
->> del_gendisk().  I.e. it will always be the case that the bdi
->> registered with the devt allocated at add_disk() will still be alive
->> when del_gendisk()->disk_release() frees the previous devt number.
+>> Could you help check this issue, thanks.
 >>
->> I *think* the path forward is to allow the bdi to hold a reference
->> against the blk_alloc_devt() allocation until it is done with it.  Any
->> other ideas on fixing this object lifetime problem?
-> Does the attached patch solve this for you?
-Hi Dan
-This patch works and the issue cannot be reproduced after several times' 
-test, thanks
+>> Steps I used:
+>> 1. Reserve 4*8G of memory for pmem by add kernel parameter "memmap=8G!4G memmap=8G!12G memmap=8G!20G memmap=8G!28G"
+>> 2. Execute below script
+>> #!/bin/bash
+>> pmem_btt_switch() {
+>>         sector_size_list="512 520 528 4096 4104 4160 4224"
+>>         for sector_size in $sector_size_list; do
+>>                 ndctl create-namespace -f -e namespace${1}.0 --mode=sector -l $sector_size
+>>                 ndctl create-namespace -f -e namespace${1}.0 --mode=raw
+>>         done
+>> }
+>>
+>> for i in 0 1 2 3; do
+>>         pmem_btt_switch $i &
+>> done
+>
+> Thanks for the report.  This looks like del_gendisk() frees the
+> previous usage of the devt before the bdi is unregistered.  This
+> appears to be a general problem with all block drivers, not just
+> libnvdimm, since blk_cleanup_queue() is typically called after
+> del_gendisk().  I.e. it will always be the case that the bdi
+> registered with the devt allocated at add_disk() will still be alive
+> when del_gendisk()->disk_release() frees the previous devt number.
+>
+> I *think* the path forward is to allow the bdi to hold a reference
+> against the blk_alloc_devt() allocation until it is done with it.  Any
+> other ideas on fixing this object lifetime problem?
 
-Another thing is during the bug verifying, I found below error message, 
-could you check whether it is reasonable:
-[  150.464620] Dev pmem1: unable to read RDB block 0
-[  150.486897]  pmem1: unable to read partition table
-[  150.486901] pmem1: partition table beyond EOD, truncated
-[  151.133287] Buffer I/O error on dev pmem3, logical block 2, async 
-page read
-[  151.164620] Buffer I/O error on dev pmem3, logical block 2, async 
-page read
+Does the attached patch solve this for you?
 
-
-Best Regards
-Yi Zhang
-
-
---------------0DDD91E46F0304F1951B6921
-Content-Type: text/x-log;
- name="dmesg.log"
-Content-Transfer-Encoding: 7bit
+--001a11352e78831a750538dc5a69
+Content-Type: text/x-patch; charset=US-ASCII;
+	name="0001-block-fix-bdi-vs-gendisk-lifetime-mismatch.patch"
 Content-Disposition: attachment;
- filename="dmesg.log"
+	filename="0001-block-fix-bdi-vs-gendisk-lifetime-mismatch.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_ir9cw9c30
 
-[  147.315954] nd_pmem btt0.1: No existing arenas
-[  147.315955] nd_pmem btt3.1: No existing arenas
-[  147.383257] pmem3s: detected capacity change from 0 to 8523182080
-[  147.388988] pmem0s: detected capacity change from 8589934592 to 8523182080
-[  147.396444] nd_pmem btt2.1: No existing arenas
-[  147.396445] nd_pmem btt1.1: No existing arenas
-[  147.430891] pmem2s: detected capacity change from 0 to 8523182080
-[  147.430900] pmem1s: detected capacity change from 0 to 8523182080
-[  147.478081] nd_pmem namespace2.0: unable to guarantee persistence of writes
-[  147.521249] pmem2: detected capacity change from 0 to 8589934592
-[  147.521487] nd_pmem namespace3.0: unable to guarantee persistence of writes
-[  147.554917] pmem3: detected capacity change from 0 to 8589934592
-[  147.580871] pmem2: detected capacity change from 8589934592 to 0
-[  147.602631] nd_pmem namespace1.0: unable to guarantee persistence of writes
-[  147.602635] nd_pmem namespace0.0: unable to guarantee persistence of writes
-[  147.603497] pmem0: detected capacity change from 0 to 8589934592
-[  147.666241] pmem1: detected capacity change from 0 to 8589934592
-[  147.672306] nd_pmem namespace2.0: unable to guarantee persistence of writes
-[  147.704536] pmem2: detected capacity change from 0 to 8589934592
-[  147.734077] nd_pmem namespace3.0: unable to guarantee persistence of writes
-[  147.766320] pmem3: detected capacity change from 0 to 8589934592
-[  147.772506] Dev pmem0: unable to read RDB block 0
-[  147.793773]  pmem0: unable to read partition table
-[  147.793780] pmem0: partition table beyond EOD, truncated
-[  147.865824] nd_pmem namespace0.0: unable to guarantee persistence of writes
-[  147.898198] pmem0: detected capacity change from 0 to 8589934592
-[  147.904714] nd_pmem namespace1.0: unable to guarantee persistence of writes
-[  147.936305] pmem1: detected capacity change from 0 to 8589934592
-[  147.971271] nd_pmem btt2.0: No existing arenas
-[  148.030303] pmem2s: detected capacity change from 0 to 7582678528
-[  148.041378] nd_pmem btt3.0: No existing arenas
-[  148.070593] pmem3s: detected capacity change from 0 to 7582678528
-[  148.135148] nd_pmem btt0.0: No existing arenas
-[  148.135152] nd_pmem btt1.0: No existing arenas
-[  148.167364] pmem1s: detected capacity change from 0 to 7582678528
-[  148.167374] pmem0s: detected capacity change from 0 to 7582678528
-[  148.176990] nd_pmem namespace2.0: unable to guarantee persistence of writes
-[  148.212944] pmem2: detected capacity change from 0 to 8589934592
-[  148.220145] nd_pmem namespace3.0: unable to guarantee persistence of writes
-[  148.254861] pmem3: detected capacity change from 0 to 8589934592
-[  148.261628] Dev pmem2: unable to read RDB block 0
-[  148.284163]  pmem2: unable to read partition table
-[  148.284166] pmem2: partition table beyond EOD, truncated
-[  148.351329] nd_pmem namespace2.0: unable to guarantee persistence of writes
-[  148.385262] pmem2: detected capacity change from 0 to 8589934592
-[  148.390936] nd_pmem namespace3.0: unable to guarantee persistence of writes
-[  148.423437] pmem3: detected capacity change from 0 to 8589934592
-[  148.460822] nd_pmem namespace1.0: unable to guarantee persistence of writes
-[  148.493065] pmem1: detected capacity change from 0 to 8589934592
-[  148.539448] nd_pmem btt3.1: No existing arenas
-[  148.611564] nd_pmem namespace0.0: unable to guarantee persistence of writes
-[  148.611634] nd_pmem btt2.1: No existing arenas
-[  148.644103] pmem0: detected capacity change from 0 to 8589934592
-[  148.677860] pmem2s: detected capacity change from 0 to 7582678528
-[  148.687916] nd_pmem namespace1.0: unable to guarantee persistence of writes
-[  148.723037] pmem1: detected capacity change from 0 to 8589934592
-[  148.730869] pmem0: detected capacity change from 8589934592 to 0
-[  148.752875] nd_pmem namespace0.0: unable to guarantee persistence of writes
-[  148.785398] pmem0: detected capacity change from 0 to 8589934592
-[  148.822240] nd_pmem namespace3.0: unable to guarantee persistence of writes
-[  148.854500] pmem3: detected capacity change from 0 to 8589934592
-[  148.869679] nd_pmem namespace2.0: unable to guarantee persistence of writes
-[  148.911291] pmem2: detected capacity change from 0 to 8589934592
-[  148.919034] nd_pmem btt0.1: No existing arenas
-[  148.948702] pmem0s: detected capacity change from 0 to 7582678528
-[  148.958829] nd_pmem btt1.1: No existing arenas
-[  149.019775] pmem1s: detected capacity change from 0 to 7582678528
-[  149.050136] nd_pmem namespace3.0: unable to guarantee persistence of writes
-[  149.082633] pmem3: detected capacity change from 0 to 8589934592
-[  149.103815] nd_pmem namespace2.0: unable to guarantee persistence of writes
-[  149.136176] pmem2: detected capacity change from 0 to 8589934592
-[  149.184799] nd_pmem namespace0.0: unable to guarantee persistence of writes
-[  149.218606] pmem0: detected capacity change from 0 to 8589934592
-[  149.224931] nd_pmem btt3.0: No existing arenas
-[  149.235318] pmem3s: detected capacity change from 8589934592 to 8580472832
-[  149.241427] nd_pmem namespace1.0: unable to guarantee persistence of writes
-[  149.241488] nd_pmem btt2.0: No existing arenas
-[  149.247017] pmem2s: detected capacity change from 0 to 8580472832
-[  149.277048] pmem1: detected capacity change from 0 to 8589934592
-[  149.307015] nd_pmem namespace0.0: unable to guarantee persistence of writes
-[  149.341856] pmem0: detected capacity change from 0 to 8589934592
-[  149.372847] nd_pmem namespace1.0: unable to guarantee persistence of writes
-[  149.405191] pmem1: detected capacity change from 0 to 8589934592
-[  149.439029] nd_pmem namespace3.0: unable to guarantee persistence of writes
-[  149.471169] pmem3: detected capacity change from 0 to 8589934592
-[  149.502574] nd_pmem namespace2.0: unable to guarantee persistence of writes
-[  149.534860] pmem2: detected capacity change from 0 to 8589934592
-[  149.542808] nd_pmem namespace3.0: unable to guarantee persistence of writes
-[  149.574676] pmem3: detected capacity change from 0 to 8589934592
-[  149.608027] nd_pmem namespace2.0: unable to guarantee persistence of writes
-[  149.640207] pmem2: detected capacity change from 0 to 8589934592
-[  149.702443] nd_pmem btt0.0: No existing arenas
-[  149.702445] nd_pmem btt1.0: No existing arenas
-[  149.715351] pmem0s: detected capacity change from 0 to 8580472832
-[  149.721028] pmem1s: detected capacity change from 8589934592 to 8580472832
-[  149.729324] nd_pmem btt2.1: No existing arenas
-[  149.729329] nd_pmem btt3.1: No existing arenas
-[  149.735004] pmem3s: detected capacity change from 0 to 8448573440
-[  149.739576] pmem2s: detected capacity change from 0 to 8448573440
-[  149.782024] nd_pmem namespace3.0: unable to guarantee persistence of writes
-[  149.829323] pmem3: detected capacity change from 0 to 8589934592
-[  149.829562] nd_pmem namespace1.0: unable to guarantee persistence of writes
-[  149.862662] pmem1: detected capacity change from 0 to 8589934592
-[  149.870267] nd_pmem namespace2.0: unable to guarantee persistence of writes
-[  149.902596] pmem2: detected capacity change from 0 to 8589934592
-[  149.937580] nd_pmem namespace0.0: unable to guarantee persistence of writes
-[  149.970071] pmem0: detected capacity change from 0 to 8589934592
-[  149.976675] nd_pmem namespace3.0: unable to guarantee persistence of writes
-[  150.008906] pmem3: detected capacity change from 0 to 8589934592
-[  150.032619] nd_pmem namespace1.0: unable to guarantee persistence of writes
-[  150.064691] pmem1: detected capacity change from 0 to 8589934592
-[  150.070176] nd_pmem namespace2.0: unable to guarantee persistence of writes
-[  150.102587] pmem2: detected capacity change from 0 to 8589934592
-[  150.129946] nd_pmem namespace0.0: unable to guarantee persistence of writes
-[  150.162165] pmem0: detected capacity change from 0 to 8589934592
-[  150.210180] nd_pmem btt2.0: No existing arenas
-[  150.210182] nd_pmem btt3.0: No existing arenas
-[  150.220950] pmem3s: detected capacity change from 0 to 8448573440
-[  150.229106] pmem2s: detected capacity change from 8589934592 to 8448573440
-[  150.237939] nd_pmem btt1.1: No existing arenas
-[  150.247641] pmem1s: detected capacity change from 0 to 8448573440
-[  150.258315] nd_pmem btt0.1: No existing arenas
-[  150.264070] pmem0s: detected capacity change from 0 to 8448573440
-[  150.319992] nd_pmem namespace1.0: unable to guarantee persistence of writes
-[  150.366356] pmem1: detected capacity change from 0 to 8589934592
-[  150.366678] nd_pmem namespace2.0: unable to guarantee persistence of writes
-[  150.402532] pmem2: detected capacity change from 0 to 8589934592
-[  150.407886] nd_pmem namespace3.0: unable to guarantee persistence of writes
-[  150.444465] pmem3: detected capacity change from 0 to 8589934592
-[  150.464620] Dev pmem1: unable to read RDB block 0
-[  150.486897]  pmem1: unable to read partition table
-[  150.486901] pmem1: partition table beyond EOD, truncated
-[  150.536626] nd_pmem namespace0.0: unable to guarantee persistence of writes
-[  150.568956] pmem0: detected capacity change from 0 to 8589934592
-[  150.590809] nd_pmem namespace1.0: unable to guarantee persistence of writes
-[  150.622145] nd_pmem namespace3.0: unable to guarantee persistence of writes
-[  150.623098] pmem1: detected capacity change from 0 to 8589934592
-[  150.654534] pmem3: detected capacity change from 0 to 8589934592
-[  150.660707] nd_pmem namespace2.0: unable to guarantee persistence of writes
-[  150.692821] pmem2: detected capacity change from 0 to 8589934592
-[  150.728067] nd_pmem namespace0.0: unable to guarantee persistence of writes
-[  150.760343] pmem0: detected capacity change from 0 to 8589934592
-[  150.798537] nd_pmem btt1.0: No existing arenas
-[  150.804651] pmem1s: detected capacity change from 0 to 8448573440
-[  150.829937] nd_pmem btt3.1: No existing arenas
-[  150.847261] pmem3s: detected capacity change from 8589934592 to 8320671744
-[  150.858221] nd_pmem btt0.0: No existing arenas
-[  150.867579] pmem0s: detected capacity change from 0 to 8448573440
-[  150.875491] nd_pmem btt2.1: No existing arenas
-[  150.881240] pmem2s: detected capacity change from 0 to 8320671744
-[  150.925384] nd_pmem namespace1.0: unable to guarantee persistence of writes
-[  150.962120] pmem1: detected capacity change from 0 to 8589934592
-[  150.985113] nd_pmem namespace2.0: unable to guarantee persistence of writes
-[  151.029504] pmem2: detected capacity change from 0 to 8589934592
-[  151.029861] nd_pmem namespace3.0: unable to guarantee persistence of writes
-[  151.061681] pmem3: detected capacity change from 0 to 8589934592
-[  151.093674] nd_pmem namespace1.0: unable to guarantee persistence of writes
-[  151.125684] pmem1: detected capacity change from 0 to 8589934592
-[  151.133287] Buffer I/O error on dev pmem3, logical block 2, async page read
-[  151.164620] Buffer I/O error on dev pmem3, logical block 2, async page read
-[  151.243026] nd_pmem namespace3.0: unable to guarantee persistence of writes
-[  151.275200] pmem3: detected capacity change from 0 to 8589934592
-[  151.288175] nd_pmem namespace2.0: unable to guarantee persistence of writes
-[  151.320536] pmem2: detected capacity change from 0 to 8589934592
-[  151.347556] nd_pmem namespace0.0: unable to guarantee persistence of writes
-[  151.379724] pmem0: detected capacity change from 0 to 8589934592
-[  151.407539] nd_pmem namespace0.0: unable to guarantee persistence of writes
-[  151.442647] pmem0: detected capacity change from 0 to 8589934592
-[  151.450053] nd_pmem btt1.1: No existing arenas
-[  151.456290] pmem1s: detected capacity change from 0 to 8320671744
-[  151.495572] nd_pmem namespace1.0: unable to guarantee persistence of writes
-[  151.540294] pmem1: detected capacity change from 0 to 8589934592
-[  151.546802] nd_pmem btt0.1: No existing arenas
-[  151.552513] pmem0s: detected capacity change from 0 to 8320671744
-[  151.563179] pmem1: detected capacity change from 8589934592 to 0
-[  151.590517] nd_pmem namespace1.0: unable to guarantee persistence of writes
-[  151.622554] pmem1: detected capacity change from 0 to 8589934592
-[  151.659503] nd_pmem namespace0.0: unable to guarantee persistence of writes
-[  151.691927] pmem0: detected capacity change from 0 to 8589934592
-[  151.720570] nd_pmem namespace0.0: unable to guarantee persistence of writes
-[  151.752515] pmem0: detected capacity change from 0 to 8589934592
-
---------------0DDD91E46F0304F1951B6921--
+RnJvbSA0NGJjYmY4YzUzMWU5MjQ5ZDA5ZTZiZjUwMmQzNjk2NjY4ZjNkMjJjIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBEYW4gV2lsbGlhbXMgPGRhbi5qLndpbGxpYW1zQGludGVsLmNv
+bT4KRGF0ZTogU2F0LCAzMCBKdWwgMjAxNiAwODoyMzowNiAtMDcwMApTdWJqZWN0OiBbUEFUQ0hd
+IGJsb2NrOiBmaXggYmRpIHZzIGdlbmRpc2sgbGlmZXRpbWUgbWlzbWF0Y2gKClRoZSBiZGkgZm9y
+IGdlbmRpc2sgaXMgbmFtZWQgYWZ0ZXIgdGhlIGdlbmRpc2suICBIb3dldmVyLCBzaW5jZSB0aGUK
+Z2VuZGlzayBpcyBkZXN0cm95ZWQgYmVmb3JlIHRoZSBiZGkgaXQgbGVhdmVzIGEgd2luZG93IHdo
+ZXJlIGEgbmV3CmdlbmRpc2sgY291bGQgZHluYW1pY2FsbHkgcmV1c2UgdGhlIHNhbWUgZGV2dCB3
+aGlsZSBhIGJkaSB3aGlsZSBhIGJkaQp3aXRoIHRoZSBzYW1lIG5hbWUgaXMgc3RpbGwgbGl2ZS4g
+IEFycmFuZ2UgZm9yIHRoZSBiZGkgdG8gaG9sZCBhCnJlZmVyZW5jZSBhZ2FpbnN0IGl0cyAib3du
+ZXIiIGRpc2sgZGV2aWNlIHdoaWxlIGl0IGlzIHJlZ2lzdGVyZWQuCk90aGVyd2lzZSB3ZSBjYW4g
+aGl0IHN5c2ZzIGR1cGxpY2F0ZSBuYW1lIGNvbGxpc2lvbnMgbGlrZSB0aGUgZm9sbG93aW5nOgoK
+IFdBUk5JTkc6IENQVTogMTAgUElEOiAyMDc4IGF0IGZzL3N5c2ZzL2Rpci5jOjMxIHN5c2ZzX3dh
+cm5fZHVwKzB4NjQvMHg4MAogc3lzZnM6IGNhbm5vdCBjcmVhdGUgZHVwbGljYXRlIGZpbGVuYW1l
+ICcvZGV2aWNlcy92aXJ0dWFsL2JkaS8yNTk6MScKCiBIYXJkd2FyZSBuYW1lOiBIUCBQcm9MaWFu
+dCBETDU4MCBHZW44LCBCSU9TIFA3OSAwNS8wNi8yMDE1CiAgMDAwMDAwMDAwMDAwMDI4NiAwMDAw
+MDAwMDAyYzA0YWQ1IGZmZmY4ODAwNmYyNGY5NzAgZmZmZmZmZmY4MTM0Y2FlYwogIGZmZmY4ODAw
+NmYyNGY5YzAgMDAwMDAwMDAwMDAwMDAwMCBmZmZmODgwMDZmMjRmOWIwIGZmZmZmZmZmODEwOGMz
+NTEKICAwMDAwMDAxZjAwMDAwMDBjIGZmZmY4ODEwNWQyMzYwMDAgZmZmZjg4MTA1ZDEwMzFlMCBm
+ZmZmODgwMDM1NzQyN2Y4CiBDYWxsIFRyYWNlOgogIFs8ZmZmZmZmZmY4MTM0Y2FlYz5dIGR1bXBf
+c3RhY2srMHg2My8weDg3CiAgWzxmZmZmZmZmZjgxMDhjMzUxPl0gX193YXJuKzB4ZDEvMHhmMAog
+IFs8ZmZmZmZmZmY4MTA4YzNjZj5dIHdhcm5fc2xvd3BhdGhfZm10KzB4NWYvMHg4MAogIFs8ZmZm
+ZmZmZmY4MTJhMGQzND5dIHN5c2ZzX3dhcm5fZHVwKzB4NjQvMHg4MAogIFs8ZmZmZmZmZmY4MTJh
+MGUxZT5dIHN5c2ZzX2NyZWF0ZV9kaXJfbnMrMHg3ZS8weDkwCiAgWzxmZmZmZmZmZjgxMzRmYWFh
+Pl0ga29iamVjdF9hZGRfaW50ZXJuYWwrMHhhYS8weDMyMAogIFs8ZmZmZmZmZmY4MTM1OGQ0ZT5d
+ID8gdnNucHJpbnRmKzB4MzRlLzB4NGQwCiAgWzxmZmZmZmZmZjgxMzRmZjU1Pl0ga29iamVjdF9h
+ZGQrMHg3NS8weGQwCiAgWzxmZmZmZmZmZjgxNmU2NmIyPl0gPyBtdXRleF9sb2NrKzB4MTIvMHgy
+ZgogIFs8ZmZmZmZmZmY4MTQ4YjBhNT5dIGRldmljZV9hZGQrMHgxMjUvMHg2MTAKICBbPGZmZmZm
+ZmZmODE0OGI3ODg+XSBkZXZpY2VfY3JlYXRlX2dyb3Vwc192YXJncysweGQ4LzB4MTAwCiAgWzxm
+ZmZmZmZmZjgxNDhiN2NjPl0gZGV2aWNlX2NyZWF0ZV92YXJncysweDFjLzB4MjAKICBbPGZmZmZm
+ZmZmODExYjc3NWM+XSBiZGlfcmVnaXN0ZXIrMHg4Yy8weDE4MAogIFs8ZmZmZmZmZmY4MTFiNzg3
+Nz5dIGJkaV9yZWdpc3Rlcl9kZXYrMHgyNy8weDMwCiAgWzxmZmZmZmZmZjgxMzMxN2Y1Pl0gYWRk
+X2Rpc2srMHgxNzUvMHg0YTAKClJlcG9ydGVkLWJ5OiBZaSBaaGFuZyA8eWl6aGFuQHJlZGhhdC5j
+b20+ClNpZ25lZC1vZmYtYnk6IERhbiBXaWxsaWFtcyA8ZGFuLmoud2lsbGlhbXNAaW50ZWwuY29t
+PgotLS0KIGJsb2NrL2dlbmhkLmMgICAgICAgICAgICAgICAgICAgIHwgIDIgKy0KIGluY2x1ZGUv
+bGludXgvYmFja2luZy1kZXYtZGVmcy5oIHwgIDEgKwogaW5jbHVkZS9saW51eC9iYWNraW5nLWRl
+di5oICAgICAgfCAgMSArCiBtbS9iYWNraW5nLWRldi5jICAgICAgICAgICAgICAgICB8IDE4ICsr
+KysrKysrKysrKysrKysrKwogNCBmaWxlcyBjaGFuZ2VkLCAyMSBpbnNlcnRpb25zKCspLCAxIGRl
+bGV0aW9uKC0pCgpkaWZmIC0tZ2l0IGEvYmxvY2svZ2VuaGQuYyBiL2Jsb2NrL2dlbmhkLmMKaW5k
+ZXggM2M5ZGVkZTRlMDRmLi5mNmY3ZmZjZDRlYWIgMTAwNjQ0Ci0tLSBhL2Jsb2NrL2dlbmhkLmMK
+KysrIGIvYmxvY2svZ2VuaGQuYwpAQCAtNjE0LDcgKzYxNCw3IEBAIHZvaWQgZGV2aWNlX2FkZF9k
+aXNrKHN0cnVjdCBkZXZpY2UgKnBhcmVudCwgc3RydWN0IGdlbmRpc2sgKmRpc2spCiAKIAkvKiBS
+ZWdpc3RlciBCREkgYmVmb3JlIHJlZmVyZW5jaW5nIGl0IGZyb20gYmRldiAqLwogCWJkaSA9ICZk
+aXNrLT5xdWV1ZS0+YmFja2luZ19kZXZfaW5mbzsKLQliZGlfcmVnaXN0ZXJfZGV2KGJkaSwgZGlz
+a19kZXZ0KGRpc2spKTsKKwliZGlfcmVnaXN0ZXJfb3duZXIoYmRpLCBkaXNrX3RvX2RldihkaXNr
+KSk7CiAKIAlibGtfcmVnaXN0ZXJfcmVnaW9uKGRpc2tfZGV2dChkaXNrKSwgZGlzay0+bWlub3Jz
+LCBOVUxMLAogCQkJICAgIGV4YWN0X21hdGNoLCBleGFjdF9sb2NrLCBkaXNrKTsKZGlmZiAtLWdp
+dCBhL2luY2x1ZGUvbGludXgvYmFja2luZy1kZXYtZGVmcy5oIGIvaW5jbHVkZS9saW51eC9iYWNr
+aW5nLWRldi1kZWZzLmgKaW5kZXggM2YxMDMwNzZkMGJmLi5jMzU3ZjI3ZDU0ODMgMTAwNjQ0Ci0t
+LSBhL2luY2x1ZGUvbGludXgvYmFja2luZy1kZXYtZGVmcy5oCisrKyBiL2luY2x1ZGUvbGludXgv
+YmFja2luZy1kZXYtZGVmcy5oCkBAIC0xNjMsNiArMTYzLDcgQEAgc3RydWN0IGJhY2tpbmdfZGV2
+X2luZm8gewogCXdhaXRfcXVldWVfaGVhZF90IHdiX3dhaXRxOwogCiAJc3RydWN0IGRldmljZSAq
+ZGV2OworCXN0cnVjdCBkZXZpY2UgKm93bmVyOwogCiAJc3RydWN0IHRpbWVyX2xpc3QgbGFwdG9w
+X21vZGVfd2JfdGltZXI7CiAKZGlmZiAtLWdpdCBhL2luY2x1ZGUvbGludXgvYmFja2luZy1kZXYu
+aCBiL2luY2x1ZGUvbGludXgvYmFja2luZy1kZXYuaAppbmRleCA0OTFhOTE3MTc3ODguLjQzYjkz
+YTk0N2U2MSAxMDA2NDQKLS0tIGEvaW5jbHVkZS9saW51eC9iYWNraW5nLWRldi5oCisrKyBiL2lu
+Y2x1ZGUvbGludXgvYmFja2luZy1kZXYuaApAQCAtMjQsNiArMjQsNyBAQCBfX3ByaW50ZigzLCA0
+KQogaW50IGJkaV9yZWdpc3RlcihzdHJ1Y3QgYmFja2luZ19kZXZfaW5mbyAqYmRpLCBzdHJ1Y3Qg
+ZGV2aWNlICpwYXJlbnQsCiAJCWNvbnN0IGNoYXIgKmZtdCwgLi4uKTsKIGludCBiZGlfcmVnaXN0
+ZXJfZGV2KHN0cnVjdCBiYWNraW5nX2Rldl9pbmZvICpiZGksIGRldl90IGRldik7CitpbnQgYmRp
+X3JlZ2lzdGVyX293bmVyKHN0cnVjdCBiYWNraW5nX2Rldl9pbmZvICpiZGksIHN0cnVjdCBkZXZp
+Y2UgKm93bmVyKTsKIHZvaWQgYmRpX3VucmVnaXN0ZXIoc3RydWN0IGJhY2tpbmdfZGV2X2luZm8g
+KmJkaSk7CiAKIGludCBfX211c3RfY2hlY2sgYmRpX3NldHVwX2FuZF9yZWdpc3RlcihzdHJ1Y3Qg
+YmFja2luZ19kZXZfaW5mbyAqLCBjaGFyICopOwpkaWZmIC0tZ2l0IGEvbW0vYmFja2luZy1kZXYu
+YyBiL21tL2JhY2tpbmctZGV2LmMKaW5kZXggZWZlMjM3NzQyMDc0Li43YjUxY2I3OTA1YmUgMTAw
+NjQ0Ci0tLSBhL21tL2JhY2tpbmctZGV2LmMKKysrIGIvbW0vYmFja2luZy1kZXYuYwpAQCAtODI1
+LDYgKzgyNSwxOSBAQCBpbnQgYmRpX3JlZ2lzdGVyX2RldihzdHJ1Y3QgYmFja2luZ19kZXZfaW5m
+byAqYmRpLCBkZXZfdCBkZXYpCiB9CiBFWFBPUlRfU1lNQk9MKGJkaV9yZWdpc3Rlcl9kZXYpOwog
+CitpbnQgYmRpX3JlZ2lzdGVyX293bmVyKHN0cnVjdCBiYWNraW5nX2Rldl9pbmZvICpiZGksIHN0
+cnVjdCBkZXZpY2UgKm93bmVyKQoreworCWludCByYzsKKworCXJjID0gYmRpX3JlZ2lzdGVyKGJk
+aSwgTlVMTCwgIiV1OiV1IiwgTUFKT1Iob3duZXItPmRldnQpLAorCQkJTUlOT1Iob3duZXItPmRl
+dnQpKTsKKwlpZiAocmMpCisJCXJldHVybiByYzsKKwliZGktPm93bmVyID0gb3duZXI7CisJZ2V0
+X2RldmljZShvd25lcik7Cit9CitFWFBPUlRfU1lNQk9MKGJkaV9yZWdpc3Rlcl9vd25lcik7CisK
+IC8qCiAgKiBSZW1vdmUgYmRpIGZyb20gYmRpX2xpc3QsIGFuZCBlbnN1cmUgdGhhdCBpdCBpcyBu
+byBsb25nZXIgdmlzaWJsZQogICovCkBAIC04NDksNiArODYyLDExIEBAIHZvaWQgYmRpX3VucmVn
+aXN0ZXIoc3RydWN0IGJhY2tpbmdfZGV2X2luZm8gKmJkaSkKIAkJZGV2aWNlX3VucmVnaXN0ZXIo
+YmRpLT5kZXYpOwogCQliZGktPmRldiA9IE5VTEw7CiAJfQorCisJaWYgKGJkaS0+b3duZXIpIHsK
+KwkJcHV0X2RldmljZShiZGktPm93bmVyKTsKKwkJYmRpLT5vd25lciA9IE5VTEw7CisJfQogfQog
+CiB2b2lkIGJkaV9leGl0KHN0cnVjdCBiYWNraW5nX2Rldl9pbmZvICpiZGkpCi0tIAoyLjUuNQoK
+--001a11352e78831a750538dc5a69--
