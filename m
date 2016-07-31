@@ -1,100 +1,133 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:59851 "EHLO mx2.suse.de"
+Received: from mga09.intel.com ([134.134.136.24]:47086 "EHLO mga09.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753408AbcGSNUp (ORCPT <rfc822;linux-block@vger.kernel.org>);
-	Tue, 19 Jul 2016 09:20:45 -0400
-From: Hannes Reinecke <hare@suse.de>
-To: Jens Axboe <axboe@fb.com>
-Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-	Damien Le Moal <damien.lemoal@hgst.com>,
-	Hannes Reinecke <hare@suse.de>
-Subject: [PATCH 4/6] block: Add 'zoned' sysfs queue attribute
-Date: Tue, 19 Jul 2016 15:20:37 +0200
-Message-Id: <1468934439-93579-5-git-send-email-hare@suse.de>
-In-Reply-To: <1468934439-93579-1-git-send-email-hare@suse.de>
-References: <1468934439-93579-1-git-send-email-hare@suse.de>
+	id S1751041AbcGaS37 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+	Sun, 31 Jul 2016 14:29:59 -0400
+Subject: [PATCH] block: fix bdi vs gendisk lifetime mismatch
+From: Dan Williams <dan.j.williams@intel.com>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-nvdimm@lists.01.org,
+	stable@vger.kernel.org, Yi Zhang <yizhan@redhat.com>
+Date: Sun, 31 Jul 2016 11:15:13 -0700
+Message-ID: <146998891350.29275.1589003488607819550.stgit@dwillia2-desk3.amr.corp.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Add a sysfs queue attribute 'zoned' to display the zone layout
-for zoned devices.
+The name for a bdi of a gendisk is derived from the gendisk's devt.
+However, since the gendisk is destroyed before the bdi it leaves a
+window where a new gendisk could dynamically reuse the same devt while a
+bdi with the same name is still live.  Arrange for the bdi to hold a
+reference against its "owner" disk device while it is registered.
+Otherwise we can hit sysfs duplicate name collisions like the following:
 
-Signed-off-by: Hannes Reinecke <hare@suse.de>
+ WARNING: CPU: 10 PID: 2078 at fs/sysfs/dir.c:31 sysfs_warn_dup+0x64/0x80
+ sysfs: cannot create duplicate filename '/devices/virtual/bdi/259:1'
+
+ Hardware name: HP ProLiant DL580 Gen8, BIOS P79 05/06/2015
+  0000000000000286 0000000002c04ad5 ffff88006f24f970 ffffffff8134caec
+  ffff88006f24f9c0 0000000000000000 ffff88006f24f9b0 ffffffff8108c351
+  0000001f0000000c ffff88105d236000 ffff88105d1031e0 ffff8800357427f8
+ Call Trace:
+  [<ffffffff8134caec>] dump_stack+0x63/0x87
+  [<ffffffff8108c351>] __warn+0xd1/0xf0
+  [<ffffffff8108c3cf>] warn_slowpath_fmt+0x5f/0x80
+  [<ffffffff812a0d34>] sysfs_warn_dup+0x64/0x80
+  [<ffffffff812a0e1e>] sysfs_create_dir_ns+0x7e/0x90
+  [<ffffffff8134faaa>] kobject_add_internal+0xaa/0x320
+  [<ffffffff81358d4e>] ? vsnprintf+0x34e/0x4d0
+  [<ffffffff8134ff55>] kobject_add+0x75/0xd0
+  [<ffffffff816e66b2>] ? mutex_lock+0x12/0x2f
+  [<ffffffff8148b0a5>] device_add+0x125/0x610
+  [<ffffffff8148b788>] device_create_groups_vargs+0xd8/0x100
+  [<ffffffff8148b7cc>] device_create_vargs+0x1c/0x20
+  [<ffffffff811b775c>] bdi_register+0x8c/0x180
+  [<ffffffff811b7877>] bdi_register_dev+0x27/0x30
+  [<ffffffff813317f5>] add_disk+0x175/0x4a0
+
+Cc: <stable@vger.kernel.org>
+Reported-by: Yi Zhang <yizhan@redhat.com>
+Tested-by: Yi Zhang <yizhan@redhat.com>
+Signed-off-by: Dan Williams <dan.j.williams@intel.com>
 ---
- block/blk-sysfs.c | 46 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 46 insertions(+)
+ block/genhd.c                    |    2 +-
+ include/linux/backing-dev-defs.h |    1 +
+ include/linux/backing-dev.h      |    1 +
+ mm/backing-dev.c                 |   18 ++++++++++++++++++
+ 4 files changed, 21 insertions(+), 1 deletion(-)
 
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 73200b8..7ffbc44 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -229,6 +229,42 @@ static ssize_t queue_max_hw_sectors_show(struct request_queue *q, char *page)
- 	return queue_var_show(max_hw_sectors_kb, (page));
+diff --git a/block/genhd.c b/block/genhd.c
+index 3c9dede4e04f..f6f7ffcd4eab 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -614,7 +614,7 @@ void device_add_disk(struct device *parent, struct gendisk *disk)
+ 
+ 	/* Register BDI before referencing it from bdev */
+ 	bdi = &disk->queue->backing_dev_info;
+-	bdi_register_dev(bdi, disk_devt(disk));
++	bdi_register_owner(bdi, disk_to_dev(disk));
+ 
+ 	blk_register_region(disk_devt(disk), disk->minors, NULL,
+ 			    exact_match, exact_lock, disk);
+diff --git a/include/linux/backing-dev-defs.h b/include/linux/backing-dev-defs.h
+index 3f103076d0bf..c357f27d5483 100644
+--- a/include/linux/backing-dev-defs.h
++++ b/include/linux/backing-dev-defs.h
+@@ -163,6 +163,7 @@ struct backing_dev_info {
+ 	wait_queue_head_t wb_waitq;
+ 
+ 	struct device *dev;
++	struct device *owner;
+ 
+ 	struct timer_list laptop_mode_wb_timer;
+ 
+diff --git a/include/linux/backing-dev.h b/include/linux/backing-dev.h
+index 491a91717788..43b93a947e61 100644
+--- a/include/linux/backing-dev.h
++++ b/include/linux/backing-dev.h
+@@ -24,6 +24,7 @@ __printf(3, 4)
+ int bdi_register(struct backing_dev_info *bdi, struct device *parent,
+ 		const char *fmt, ...);
+ int bdi_register_dev(struct backing_dev_info *bdi, dev_t dev);
++int bdi_register_owner(struct backing_dev_info *bdi, struct device *owner);
+ void bdi_unregister(struct backing_dev_info *bdi);
+ 
+ int __must_check bdi_setup_and_register(struct backing_dev_info *, char *);
+diff --git a/mm/backing-dev.c b/mm/backing-dev.c
+index efe237742074..7b51cb7905be 100644
+--- a/mm/backing-dev.c
++++ b/mm/backing-dev.c
+@@ -825,6 +825,19 @@ int bdi_register_dev(struct backing_dev_info *bdi, dev_t dev)
+ }
+ EXPORT_SYMBOL(bdi_register_dev);
+ 
++int bdi_register_owner(struct backing_dev_info *bdi, struct device *owner)
++{
++	int rc;
++
++	rc = bdi_register(bdi, NULL, "%u:%u", MAJOR(owner->devt),
++			MINOR(owner->devt));
++	if (rc)
++		return rc;
++	bdi->owner = owner;
++	get_device(owner);
++}
++EXPORT_SYMBOL(bdi_register_owner);
++
+ /*
+  * Remove bdi from bdi_list, and ensure that it is no longer visible
+  */
+@@ -849,6 +862,11 @@ void bdi_unregister(struct backing_dev_info *bdi)
+ 		device_unregister(bdi->dev);
+ 		bdi->dev = NULL;
+ 	}
++
++	if (bdi->owner) {
++		put_device(bdi->owner);
++		bdi->owner = NULL;
++	}
  }
  
-+#ifdef CONFIG_BLK_DEV_ZONED
-+static ssize_t queue_zoned_show(struct request_queue *q, char *page)
-+{
-+	struct rb_node *node;
-+	struct blk_zone *zone;
-+	ssize_t offset = 0, end = 0;
-+	size_t size = 0, num = 0;
-+	enum blk_zone_type type = BLK_ZONE_TYPE_UNKNOWN;
-+
-+	for (node = rb_first(&q->zones); node; node = rb_next(node)) {
-+		zone = rb_entry(node, struct blk_zone, node);
-+		if (zone->type != type ||
-+		    zone->len != size ||
-+		    end != zone->start) {
-+			if (size != 0)
-+				offset += sprintf(page + offset, "%zu\n", num);
-+			/* We can only store one page ... */
-+			if (offset + 42 > PAGE_SIZE) {
-+				offset += sprintf(page + offset, "...\n");
-+				return offset;
-+			}
-+			size = zone->len;
-+			type = zone->type;
-+			offset += sprintf(page + offset, "%zu %zu %d ",
-+					  zone->start, size, type);
-+			num = 0;
-+			end = zone->start + size;
-+		} else
-+			end += zone->len;
-+		num++;
-+	}
-+	offset += sprintf(page + offset, "%zu\n", num);
-+	return offset;
-+}
-+#endif
-+
- #define QUEUE_SYSFS_BIT_FNS(name, flag, neg)				\
- static ssize_t								\
- queue_show_##name(struct request_queue *q, char *page)			\
-@@ -484,6 +520,13 @@ static struct queue_sysfs_entry queue_write_same_max_entry = {
- 	.show = queue_write_same_max_show,
- };
- 
-+#ifdef CONFIG_BLK_DEV_ZONED
-+static struct queue_sysfs_entry queue_zoned_entry = {
-+	.attr = {.name = "zoned", .mode = S_IRUGO },
-+	.show = queue_zoned_show,
-+};
-+#endif
-+
- static struct queue_sysfs_entry queue_nonrot_entry = {
- 	.attr = {.name = "rotational", .mode = S_IRUGO | S_IWUSR },
- 	.show = queue_show_nonrot,
-@@ -547,6 +590,9 @@ static struct attribute *default_attrs[] = {
- 	&queue_discard_zeroes_data_entry.attr,
- 	&queue_write_same_max_entry.attr,
- 	&queue_nonrot_entry.attr,
-+#ifdef CONFIG_BLK_DEV_ZONED
-+	&queue_zoned_entry.attr,
-+#endif
- 	&queue_nomerges_entry.attr,
- 	&queue_rq_affinity_entry.attr,
- 	&queue_iostats_entry.attr,
--- 
-1.8.5.6
+ void bdi_exit(struct backing_dev_info *bdi)
 
