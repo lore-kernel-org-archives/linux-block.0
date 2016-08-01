@@ -1,83 +1,41 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-	Andreas Dilger <adilger.kernel@dilger.ca>,
-	Jan Kara <jack@suse.com>,
-	Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-	Hugh Dickins <hughd@google.com>,
-	Andrea Arcangeli <aarcange@redhat.com>,
-	Dave Hansen <dave.hansen@intel.com>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	Matthew Wilcox <willy@infradead.org>,
-	Ross Zwisler <ross.zwisler@linux.intel.com>,
-	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	linux-block@vger.kernel.org,
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv2 37/41] ext4: make EXT4_IOC_MOVE_EXT work with huge pages
-Date: Fri, 12 Aug 2016 21:38:20 +0300
-Message-Id: <1471027104-115213-38-git-send-email-kirill.shutemov@linux.intel.com>
-In-Reply-To: <1471027104-115213-1-git-send-email-kirill.shutemov@linux.intel.com>
-References: <1471027104-115213-1-git-send-email-kirill.shutemov@linux.intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH v2] blk-mq: Allow timeouts to run while queue is freezing
+To: Gabriel Krisman Bertazi <krisman@linux.vnet.ibm.com>
+References: <1469767356-25193-1-git-send-email-krisman@linux.vnet.ibm.com>
+ <81fa2a75-1da8-aeb6-dcce-3ae245810234@kernel.dk>
+ <8760rogwmp.fsf_-_@linux.vnet.ibm.com>
+Cc: Brian King <brking@linux.vnet.ibm.com>,
+ Keith Busch <keith.busch@intel.com>, Christoph Hellwig <hch@lst.de>,
+ linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <41acd9e9-cbcc-66db-144f-0aab0e150cc0@kernel.dk>
+Date: Mon, 1 Aug 2016 08:24:27 -0600
+MIME-Version: 1.0
+In-Reply-To: <8760rogwmp.fsf_-_@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-Adjust how we find relevant block within page and how we clear the
-required part of the page.
+On 07/29/2016 11:52 AM, Gabriel Krisman Bertazi wrote:
+> Jens Axboe <axboe@kernel.dk> writes:
+>
+>> I can see that is an issue. Did you consider the case where
+>> blk_mq_timeout_work() is entered, but we don't have any requests
+>> allocated that currently hold a reference? This could happen if
+>> completion races with a timeout.
+>
+> Hi Jens,
+>
+> That shouldn't be an issue, I think.  The only functional difference
+> should be during queue freezes, and in this case, if the request was
+> already completed by the time we touch it, we`ll only hold the queue
+> freeze for a little longer, until we release the reference by the end of
+> the timeout path.  should the final request be released before
+> blk_mq_timeout_work acquire it's reference, q_usage_counter will reach
+> zero, and the call to percpu_ref_tryget will fail the same way
+> percpu_ref_tryget_live would.
 
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
----
- fs/ext4/move_extent.c | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+Thanks, I'm happy with it, and the detailed comment is a good
+improvement. I have added it for this series.
 
-diff --git a/fs/ext4/move_extent.c b/fs/ext4/move_extent.c
-index a920c5d29fac..f3efdd0e0eaf 100644
---- a/fs/ext4/move_extent.c
-+++ b/fs/ext4/move_extent.c
-@@ -210,7 +210,9 @@ mext_page_mkuptodate(struct page *page, unsigned from, unsigned to)
- 				return err;
- 			}
- 			if (!buffer_mapped(bh)) {
--				zero_user(page, block_start, blocksize);
-+				zero_user(page + block_start / PAGE_SIZE,
-+						block_start % PAGE_SIZE,
-+						blocksize);
- 				set_buffer_uptodate(bh);
- 				continue;
- 			}
-@@ -267,10 +269,11 @@ move_extent_per_page(struct file *o_filp, struct inode *donor_inode,
- 	unsigned int tmp_data_size, data_size, replaced_size;
- 	int i, err2, jblocks, retries = 0;
- 	int replaced_count = 0;
--	int from = data_offset_in_page << orig_inode->i_blkbits;
-+	int from;
- 	int blocks_per_page = PAGE_SIZE >> orig_inode->i_blkbits;
- 	struct super_block *sb = orig_inode->i_sb;
- 	struct buffer_head *bh = NULL;
-+	int diff;
- 
- 	/*
- 	 * It needs twice the amount of ordinary journal buffers because
-@@ -355,6 +358,9 @@ again:
- 		goto unlock_pages;
- 	}
- data_copy:
-+	diff = (pagep[0] - compound_head(pagep[0])) * blocks_per_page;
-+	from = (data_offset_in_page + diff) << orig_inode->i_blkbits;
-+	pagep[0] = compound_head(pagep[0]);
- 	*err = mext_page_mkuptodate(pagep[0], from, from + replaced_size);
- 	if (*err)
- 		goto unlock_pages;
-@@ -384,7 +390,7 @@ data_copy:
- 	if (!page_has_buffers(pagep[0]))
- 		create_empty_buffers(pagep[0], 1 << orig_inode->i_blkbits, 0);
- 	bh = page_buffers(pagep[0]);
--	for (i = 0; i < data_offset_in_page; i++)
-+	for (i = 0; i < data_offset_in_page + diff; i++)
- 		bh = bh->b_this_page;
- 	for (i = 0; i < block_len_in_page; i++) {
- 		*err = ext4_get_block(orig_inode, orig_blk_offset + i, bh, 0);
 -- 
-2.8.1
-
+Jens Axboe
