@@ -1,432 +1,187 @@
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>,
-	Tejun Heo <tj@kernel.org>
-Cc: Fabio Checconi <fchecconi@gmail.com>,
-	Arianna Avanzini <avanzini.arianna@gmail.com>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	linus.walleij@linaro.org,
-	broonie@kernel.org,
-	Riccardo Pizzetti <riccardo.pizzetti@gmail.com>,
-	Samuele Zecchini <samuele.zecchini92@gmail.com>,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH RFC V8 19/22] block, bfq: reduce idling only in symmetric scenarios
-Date: Wed, 27 Jul 2016 18:13:35 +0200
-Message-Id: <1469636018-31247-20-git-send-email-paolo.valente@linaro.org>
-In-Reply-To: <1469636018-31247-1-git-send-email-paolo.valente@linaro.org>
-References: <2D83ACA0-2513-4019-9A0D-3166FDDE7485@linaro.org>
- <1469636018-31247-1-git-send-email-paolo.valente@linaro.org>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx.ewheeler.net ([66.155.3.69]:50768 "EHLO mail.ewheeler.net"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1751041AbcHAC6w (ORCPT <rfc822;linux-block@vger.kernel.org>);
+	Sun, 31 Jul 2016 22:58:52 -0400
+Date: Sun, 31 Jul 2016 19:58:50 -0700 (PDT)
+From: Eric Wheeler <bcache@lists.ewheeler.net>
+To: "Martin K. Petersen" <martin.petersen@oracle.com>
+cc: linux-block@vger.kernel.org, dm-devel@redhat.com,
+	linux-raid@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-bcache@vger.kernel.org, hurikhan77@gmail.com,
+	antlists@youngman.org.uk, Dan Williams <dan.j.williams@intel.com>,
+	"Jason B. Akers" <jason.b.akers@intel.com>,
+	Kapil Karkra <kapil.karkra@intel.com>,
+	Jens Axboe <axboe@fb.com>, Jeff Moyer <jmoyer@redhat.com>,
+	david@fromorbit.com
+Subject: Re: To add, or not to add, a bio REQ_ROTATIONAL flag
+In-Reply-To: <yq1y44l2qhr.fsf@sermon.lab.mkp.net>
+Message-ID: <alpine.LRH.2.11.1607291113060.10662@mail.ewheeler.net>
+References: <alpine.LRH.2.11.1607281603530.10662@mail.ewheeler.net> <yq1y44l2qhr.fsf@sermon.lab.mkp.net>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Arianna Avanzini <avanzini.arianna@gmail.com>
+[+cc from "Enable use of Solid State Hybrid Drives"
+	https://lkml.org/lkml/2014/10/29/698 ]
 
-A seeky queue (i..e, a queue containing random requests) is assigned a
-very small device-idling slice, for throughput issues. Unfortunately,
-given the process associated with a seeky queue, this behavior causes
-the following problem: if the process, say P, performs sync I/O and
-has a higher weight than some other processes doing I/O and associated
-with non-seeky queues, then BFQ may fail to guarantee to P its
-reserved share of the throughput. The reason is that idling is key
-for providing service guarantees to processes doing sync I/O [1].
+On Thu, 28 Jul 2016, Martin K. Petersen wrote:
+> >>>>> "Eric" == Eric Wheeler <bcache@lists.ewheeler.net> writes:
+> Eric> [...]  This may imply that
+> Eric> we need a new way to flag cache bypass from userspace [...]
+> Eric> So what are our options?  What might be the best way to do this?
+[...] 
+> Eric> Are FADV_NOREUSE/FADV_DONTNEED reasonable candidates?
+> 
+> FADV_DONTNEED was intended for this. There have been patches posted in
+> the past that tied the loop between the fadvise flags and the bio. I
+> would like to see those revived.
 
-This commit addresses this issue by allowing the device-idling slice
-to be reduced for a seeky queue only if the scenario happens to be
-symmetric, i.e., if all the queues are to receive the same share of
-the throughput.
+That sounds like a good start, this looks about right from 2014:
+	https://lkml.org/lkml/2014/10/29/698
+	https://lwn.net/Articles/619058/
 
-[1] P. Valente, A. Avanzini, "Evolution of the BFQ Storage I/O
-    Scheduler", Proceedings of the First Workshop on Mobile System
-    Technologies (MST-2015), May 2015.
-    http://algogroup.unimore.it/people/paolo/disk_sched/mst-2015.pdf
+I read through the thread and have summarized the relevant parts here 
+with additional commentary below the summary:
 
-Signed-off-by: Arianna Avanzini <avanzini.arianna@gmail.com>
-Signed-off-by: Riccardo Pizzetti <riccardo.pizzetti@gmail.com>
-Signed-off-by: Samuele Zecchini <samuele.zecchini92@gmail.com>
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
----
- block/cfq-iosched.c | 254 ++++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 248 insertions(+), 6 deletions(-)
+/* Summary 
 
-diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
-index 27b51a7..b505535 100644
---- a/block/cfq-iosched.c
-+++ b/block/cfq-iosched.c
-@@ -145,6 +145,20 @@ struct bfq_sched_data {
- };
- 
- /**
-+ * struct bfq_weight_counter - counter of the number of all active entities
-+ *                             with a given weight.
-+ */
-+struct bfq_weight_counter {
-+	short int weight; /* weight of the entities this counter refers to */
-+	unsigned int num_active; /* nr of active entities with this weight */
-+	/*
-+	 * Weights tree member (see bfq_data's @queue_weights_tree and
-+	 * @group_weights_tree)
-+	 */
-+	struct rb_node weights_node;
-+};
-+
-+/**
-  * struct bfq_entity - schedulable entity.
-  *
-  * A bfq_entity is used to represent either a bfq_queue (leaf node in the
-@@ -173,6 +187,8 @@ struct bfq_sched_data {
-  */
- struct bfq_entity {
- 	struct rb_node rb_node; /* service_tree member */
-+	/* pointer to the weight counter associated with this entity */
-+	struct bfq_weight_counter *weight_counter;
- 
- 	/*
- 	 * flag, true if the entity is on a tree (either the active or
-@@ -395,6 +411,25 @@ struct bfq_data {
- 	struct bfq_group *root_group;
- 
- 	/*
-+	 * rbtree of weight counters of @bfq_queues, sorted by
-+	 * weight. Used to keep track of whether all @bfq_queues have
-+	 * the same weight. The tree contains one counter for each
-+	 * distinct weight associated to some active and not
-+	 * weight-raised @bfq_queue (see the comments to the functions
-+	 * bfq_weights_tree_[add|remove] for further details).
-+	 */
-+	struct rb_root queue_weights_tree;
-+	/*
-+	 * rbtree of non-queue @bfq_entity weight counters, sorted by
-+	 * weight. Used to keep track of whether all @bfq_groups have
-+	 * the same weight. The tree contains one counter for each
-+	 * distinct weight associated to some active @bfq_group (see
-+	 * the comments to the functions bfq_weights_tree_[add|remove]
-+	 * for further details).
-+	 */
-+	struct rb_root group_weights_tree;
-+
-+	/*
- 	 * Number of bfq_queues containing requests (including the
- 	 * queue in service, even if it is idling).
- 	 */
-@@ -692,6 +727,11 @@ struct bfq_group_data {
-  *             to avoid too many special cases during group creation/
-  *             migration.
-  * @stats: stats for this bfqg.
-+ * @active_entities: number of active entities belonging to the group;
-+ *                   unused for the root group. Used to know whether there
-+ *                   are groups with more than one active @bfq_entity
-+ *                   (see the comments to the function
-+ *                   bfq_bfqq_may_idle()).
-  * @rq_pos_tree: rbtree sorted by next_request position, used when
-  *               determining if two or more queues have interleaving
-  *               requests (see bfq_find_close_cooperator()).
-@@ -719,6 +759,8 @@ struct bfq_group {
- 
- 	struct bfq_entity *my_entity;
- 
-+	int active_entities;
-+
- 	struct rb_root rq_pos_tree;
- 
- 	struct bfqg_stats stats;
-@@ -1224,6 +1266,15 @@ up:
- 	goto up;
- }
- 
-+static void bfq_weights_tree_add(struct bfq_data *bfqd,
-+				 struct bfq_entity *entity,
-+				 struct rb_root *root);
-+
-+static void bfq_weights_tree_remove(struct bfq_data *bfqd,
-+				    struct bfq_entity *entity,
-+				    struct rb_root *root);
-+
-+
- /**
-  * bfq_active_insert - insert an entity in the active tree of its
-  *                     group/device.
-@@ -1262,6 +1313,13 @@ static void bfq_active_insert(struct bfq_service_tree *st,
- #endif
- 	if (bfqq)
- 		list_add(&bfqq->bfqq_list, &bfqq->bfqd->active_list);
-+#ifdef CONFIG_CFQ_GROUP_IOSCHED
-+	else /* bfq_group */
-+		bfq_weights_tree_add(bfqd, entity, &bfqd->group_weights_tree);
-+
-+	if (bfqg != bfqd->root_group)
-+		bfqg->active_entities++;
-+#endif
- }
- 
- /**
-@@ -1357,6 +1415,14 @@ static void bfq_active_extract(struct bfq_service_tree *st,
- #endif
- 	if (bfqq)
- 		list_del(&bfqq->bfqq_list);
-+#ifdef CONFIG_CFQ_GROUP_IOSCHED
-+	else /* bfq_group */
-+		bfq_weights_tree_remove(bfqd, entity,
-+					&bfqd->group_weights_tree);
-+
-+	if (bfqg != bfqd->root_group)
-+		bfqg->active_entities--;
-+#endif
- }
- 
- /**
-@@ -1454,6 +1520,7 @@ __bfq_entity_update_weight_prio(struct bfq_service_tree *old_st,
- 		struct bfq_queue *bfqq = bfq_entity_to_bfqq(entity);
- 		unsigned short prev_weight, new_weight;
- 		struct bfq_data *bfqd = NULL;
-+		struct rb_root *root;
- #ifdef CONFIG_CFQ_GROUP_IOSCHED
- 		struct bfq_sched_data *sd;
- 		struct bfq_group *bfqg;
-@@ -1503,7 +1570,26 @@ __bfq_entity_update_weight_prio(struct bfq_service_tree *old_st,
- 		prev_weight = entity->weight;
- 		new_weight = entity->orig_weight *
- 			     (bfqq ? bfqq->wr_coeff : 1);
-+		/*
-+		 * If the weight of the entity changes, remove the entity
-+		 * from its old weight counter (if there is a counter
-+		 * associated with the entity), and add it to the counter
-+		 * associated with its new weight.
-+		 */
-+		if (prev_weight != new_weight) {
-+			root = bfqq ? &bfqd->queue_weights_tree :
-+				      &bfqd->group_weights_tree;
-+			bfq_weights_tree_remove(bfqd, entity, root);
-+		}
- 		entity->weight = new_weight;
-+		/*
-+		 * Add the entity to its weights tree only if it is
-+		 * not associated with a weight-raised queue.
-+		 */
-+		if (prev_weight != new_weight &&
-+		    (bfqq ? bfqq->wr_coeff == 1 : 1))
-+			/* If we get here, root has been initialized. */
-+			bfq_weights_tree_add(bfqd, entity, root);
- 
- 		new_st->wsum += entity->weight;
- 
-@@ -2044,6 +2130,10 @@ static void bfq_del_bfqq_busy(struct bfq_data *bfqd, struct bfq_queue *bfqq,
- 
- 	bfqd->busy_queues--;
- 
-+	if (!bfqq->dispatched)
-+		bfq_weights_tree_remove(bfqd, &bfqq->entity,
-+					&bfqd->queue_weights_tree);
-+
- 	if (bfqq->wr_coeff > 1)
- 		bfqd->wr_busy_queues--;
- 
-@@ -2064,6 +2154,11 @@ static void bfq_add_bfqq_busy(struct bfq_data *bfqd, struct bfq_queue *bfqq)
- 	bfq_mark_bfqq_busy(bfqq);
- 	bfqd->busy_queues++;
- 
-+	if (!bfqq->dispatched)
-+		if (bfqq->wr_coeff == 1)
-+			bfq_weights_tree_add(bfqd, &bfqq->entity,
-+					     &bfqd->queue_weights_tree);
-+
- 	if (bfqq->wr_coeff > 1)
- 		bfqd->wr_busy_queues++;
- }
-@@ -2490,6 +2585,7 @@ static void bfq_pd_init(struct blkg_policy_data *pd)
- 				   * in bfq_init_queue()
- 				   */
- 	bfqg->bfqd = bfqd;
-+	bfqg->active_entities = 0;
- 	bfqg->rq_pos_tree = RB_ROOT;
- }
- 
-@@ -3397,6 +3493,142 @@ static void bfq_pos_tree_add_move(struct bfq_data *bfqd, struct bfq_queue *bfqq)
- 		bfqq->pos_root = NULL;
- }
- 
-+/*
-+ * Tell whether there are active queues or groups with differentiated weights.
-+ */
-+static bool bfq_differentiated_weights(struct bfq_data *bfqd)
-+{
-+	/*
-+	 * For weights to differ, at least one of the trees must contain
-+	 * at least two nodes.
-+	 */
-+	return (!RB_EMPTY_ROOT(&bfqd->queue_weights_tree) &&
-+		(bfqd->queue_weights_tree.rb_node->rb_left ||
-+		 bfqd->queue_weights_tree.rb_node->rb_right)
-+#ifdef CONFIG_CFQ_GROUP_IOSCHED
-+	       ) ||
-+	       (!RB_EMPTY_ROOT(&bfqd->group_weights_tree) &&
-+		(bfqd->group_weights_tree.rb_node->rb_left ||
-+		 bfqd->group_weights_tree.rb_node->rb_right)
-+#endif
-+	       );
-+}
-+
-+/*
-+ * The following function returns true if every queue must receive the
-+ * same share of the throughput (this condition is used when deciding
-+ * whether idling may be disabled, see the comments in the function
-+ * bfq_bfqq_may_idle()).
-+ *
-+ * Such a scenario occurs when:
-+ * 1) all active queues have the same weight,
-+ * 2) all active groups at the same level in the groups tree have the same
-+ *    weight,
-+ * 3) all active groups at the same level in the groups tree have the same
-+ *    number of children.
-+ *
-+ * Unfortunately, keeping the necessary state for evaluating exactly the
-+ * above symmetry conditions would be quite complex and time-consuming.
-+ * Therefore this function evaluates, instead, the following stronger
-+ * sub-conditions, for which it is much easier to maintain the needed
-+ * state:
-+ * 1) all active queues have the same weight,
-+ * 2) all active groups have the same weight,
-+ * 3) all active groups have at most one active child each.
-+ * In particular, the last two conditions are always true if hierarchical
-+ * support and the cgroups interface are not enabled, thus no state needs
-+ * to be maintained in this case.
-+ */
-+static bool bfq_symmetric_scenario(struct bfq_data *bfqd)
-+{
-+	return !bfq_differentiated_weights(bfqd);
-+}
-+
-+/*
-+ * If the weight-counter tree passed as input contains no counter for
-+ * the weight of the input entity, then add that counter; otherwise just
-+ * increment the existing counter.
-+ *
-+ * Note that weight-counter trees contain few nodes in mostly symmetric
-+ * scenarios. For example, if all queues have the same weight, then the
-+ * weight-counter tree for the queues may contain at most one node.
-+ * This holds even if low_latency is on, because weight-raised queues
-+ * are not inserted in the tree.
-+ * In most scenarios, the rate at which nodes are created/destroyed
-+ * should be low too.
-+ */
-+static void bfq_weights_tree_add(struct bfq_data *bfqd,
-+				 struct bfq_entity *entity,
-+				 struct rb_root *root)
-+{
-+	struct rb_node **new = &(root->rb_node), *parent = NULL;
-+
-+	/*
-+	 * Do not insert if the entity is already associated with a
-+	 * counter, which happens if:
-+	 *   1) the entity is associated with a queue,
-+	 *   2) a request arrival has caused the queue to become both
-+	 *      non-weight-raised, and hence change its weight, and
-+	 *      backlogged; in this respect, each of the two events
-+	 *      causes an invocation of this function,
-+	 *   3) this is the invocation of this function caused by the
-+	 *      second event. This second invocation is actually useless,
-+	 *      and we handle this fact by exiting immediately. More
-+	 *      efficient or clearer solutions might possibly be adopted.
-+	 */
-+	if (entity->weight_counter)
-+		return;
-+
-+	while (*new) {
-+		struct bfq_weight_counter *__counter = container_of(*new,
-+						struct bfq_weight_counter,
-+						weights_node);
-+		parent = *new;
-+
-+		if (entity->weight == __counter->weight) {
-+			entity->weight_counter = __counter;
-+			goto inc_counter;
-+		}
-+		if (entity->weight < __counter->weight)
-+			new = &((*new)->rb_left);
-+		else
-+			new = &((*new)->rb_right);
-+	}
-+
-+	entity->weight_counter = kzalloc(sizeof(struct bfq_weight_counter),
-+					 GFP_ATOMIC);
-+	entity->weight_counter->weight = entity->weight;
-+	rb_link_node(&entity->weight_counter->weights_node, parent, new);
-+	rb_insert_color(&entity->weight_counter->weights_node, root);
-+
-+inc_counter:
-+	entity->weight_counter->num_active++;
-+}
-+
-+/*
-+ * Decrement the weight counter associated with the entity, and, if the
-+ * counter reaches 0, remove the counter from the tree.
-+ * See the comments to the function bfq_weights_tree_add() for considerations
-+ * about overhead.
-+ */
-+static void bfq_weights_tree_remove(struct bfq_data *bfqd,
-+				    struct bfq_entity *entity,
-+				    struct rb_root *root)
-+{
-+	if (!entity->weight_counter)
-+		return;
-+
-+	entity->weight_counter->num_active--;
-+	if (entity->weight_counter->num_active > 0)
-+		goto reset_entity_pointer;
-+
-+	rb_erase(&entity->weight_counter->weights_node, root);
-+	kfree(entity->weight_counter);
-+
-+reset_entity_pointer:
-+	entity->weight_counter = NULL;
-+}
-+
- static struct request *bfq_find_next_rq(struct bfq_data *bfqd,
- 					struct bfq_queue *bfqq,
- 					struct request *last)
-@@ -4676,13 +4908,17 @@ static void bfq_arm_slice_timer(struct bfq_data *bfqd)
- 	 */
- 	sl = bfqd->bfq_slice_idle;
- 	/*
--	 * Unless the queue is being weight-raised, grant only minimum
--	 * idle time if the queue is seeky. A long idling is preserved
--	 * for a weight-raised queue, because it is needed for
--	 * guaranteeing to the queue its reserved share of the
--	 * throughput.
-+	 * Unless the queue is being weight-raised or the scenario is
-+	 * asymmetric, grant only minimum idle time if the queue
-+	 * is seeky. A long idling is preserved for a weight-raised
-+	 * queue, or, more in general, in an asymemtric scenario,
-+	 * because a long idling is needed for guaranteeing to a queue
-+	 * its reserved share of the throughput (in particular, it is
-+	 * needed if the queue has a higher weight than some other
-+	 * queue).
- 	 */
--	if (BFQQ_SEEKY(bfqq) && bfqq->wr_coeff == 1)
-+	if (BFQQ_SEEKY(bfqq) && bfqq->wr_coeff == 1 &&
-+	    bfq_symmetric_scenario(bfqd))
- 		sl = min(sl, msecs_to_jiffies(BFQ_MIN_TT));
- 
- 	bfqd->last_idling_start = ktime_get();
-@@ -6326,6 +6562,9 @@ static void bfq_completed_request(struct request_queue *q, struct request *rq)
- 		 * mechanism).
- 		 */
- 		bfqq->budget_timeout = jiffies;
-+
-+		bfq_weights_tree_remove(bfqd, &bfqq->entity,
-+					&bfqd->queue_weights_tree);
- 	}
- 
- 	RQ_BIC(rq)->ttime.last_end_request = jiffies;
-@@ -6726,6 +6965,9 @@ static int bfq_init_queue(struct request_queue *q, struct elevator_type *e)
- 	bfqd->idle_slice_timer.function = bfq_idle_slice_timer;
- 	bfqd->idle_slice_timer.data = (unsigned long)bfqd;
- 
-+	bfqd->queue_weights_tree = RB_ROOT;
-+	bfqd->group_weights_tree = RB_ROOT;
-+
- 	INIT_WORK(&bfqd->unplug_work, bfq_kick_queue);
- 
- 	INIT_LIST_HEAD(&bfqd->active_list);
--- 
-1.9.1
+They were seeking to do basically the same in 2014 thing we want with 
+stacked block caching drivers today: hint to the IO layer so the (ATA 3.2) 
+driver can decide whether a block should hit the cache or spinning disk.  
+This was done by adding bitflags to ioprio for IOPRIO_ADV_ advice.
+
+There are two arguments throughout the thread: one that the cache hint 
+should be per-process (ionice) and the other, that hints should be per 
+inode via fadvise (and maybe madvise).  Dan Williams noted with respect to 
+fadvise for their implementation that "It's straightforward to add, but I 
+think "80%" of the benefit can be had by just having a per-thread cache 
+priority."
+
+Kapil Karkra extended the page flags so the ioprio advice bits can be 
+copied into bio->bi_rw, to which Jens said "is a bit...icky. I see why 
+it's done, though, it requires the least amount of plumbing."
+
+Martin K. Petersen provides a matrix of desires for actual use cases here:
+	https://lkml.org/lkml/2014/10/29/1014 
+and asks "Are there actually people asking for sub-file granularity? I 
+didn't get any requests for that in the survey I did this summer. [...] In 
+any case I thought it was interesting that pretty much every use case that 
+people came up with could be adequately described by a handful of I/O 
+classes."
+
+Further, Jens notes that "I think we've needed a proper API for passing in 
+appropriate hints on a per-io basis for a LONG time. [...] We've tried 
+(and failed) in the past to define a set of hints that make sense. It'd be 
+a shame to add something that's specific to a given transport/technology. 
+That said, this set of hints do seem pretty basic and would not 
+necessarily be a bad place to start. But they are still very specific to 
+this use case."
+*/
+
+
+So, perhaps it is time to plan the hint API and figure out how to plumb 
+it.  These are some design considerations based on the thread:
+
+a. People want per-process cache hinting (ionice, or some other tool).
+b. Per inode+range hinting would be useful to some (fadvise, ioctl, etc)
+c. Don't use page flags to convey cache hints---or find a clean way to do so.
+d. Per IO hints would be useful to both stacking and hardware drivers.
+e. Cache layers will implement their own device assignment choice based 
+on the caching hint; for example, an IO flagged to miss the cache might 
+hit if already in cache due to unrelated IO and such a determination would 
+be made per-cache-implementation.
+
+
+I can see this go two ways:
+
+1. A dedicated implementation for cache hinting.
+2. An API for generalized hinting, upon which cache hinting may be 
+implemented.
+
+To consider #2, what hinting is wanted from processes and inodes down to 
+bio's?  Does it justify an entire API for generalized hinting, or do we 
+just need a cache hinting implementation?  If we do want #2, then what are 
+all of the features wanted by the community so it can be designed as such?
+
+If #1 is sufficient, then what is the preferred mechanism and 
+implementation for cache hinting?
+
+In either direction, how can those hints pass down to bio's in an 
+appropriate way (ie, not page flags)?
+
+
+With the interest of a cache hinting implementation independent of 
+transport/technology, I have been playing with an idea to use two per-IO 
+"TTL" counters, both of which tend toward zero; I've not yet started an 
+implementation:
+
+cacheskip: 
+	Decrement until zero to skip cache layers (slow medium)
+	Ignore cachedepth until cacheskip==0.
+	
+cachedepth:
+	Initialize to positive, negative, or zero value.  Once zero, no 
+	special treatment is given to the IO.  When less than zero, prefer the 
+	slower medium.  When greater than zero, prefer the faster medium.  
+	Inc/decrement toward zero each time the IO passes through a 
+	caching layer.
+
+Independent of how we might apply these counters to a pid/inode, the cache 
+layers might look something like this:
+
+cachedepth	description
+  0		direct IO
++-1		pagecache
++-2		som arbitrary
++-3		caching
++-4		driver
++-n		...
+
+Layers beyond the pagecache are assigned arbitrarily by the driver 
+stacking order implemented by the end user. For example, if passing 
+through dm-cache, then dm-cache would use its own preference logic to 
+decide whether it should cache or not if cachedepth is zero.  If nonzero, 
+it would cache/bypass appropriately and then inc/decrements cachedepth 
+toward zero after making its decision.  Understandably, extenuating 
+circumstances may require a layer to ignore the hint---such as a 
+bypass-hinted IO that gets cached because it is already hot.
+
+Consider the following scenarios for this contrived cache stack:
+
+1. pagecache
+2. dm-cache
+3. bcache
+4. HBA supporting cache hints (ATA 3.2, perhaps)
+
+cacheskip	cachedepth	description
+-------------------------------------------
+	0		0	use pagecache; lower layers do what they want
+	1		0	skip pagecache (direct IO); lower layers do what they want
+	0		-1	same as previous
+	2		1	skip pagecache, dmcache; prefer bcache-ssd
+	0		-3	skip pagecache; dmcache bypass; bcache bypass
+	1		2	skip pagecache; prefer dmcache-ssd, prefer bcache-ssd
+	3		1	hint to prefer HBA cache only
+
+This would empower the user to decide where caching should begin, and for 
+how many layers caching should hint for slow(-) or fast(+) backing devices 
+before letting the IO stack make its own hintless choice.  Hopefully this 
+lets each layer make their own choices that best fit their implementation.
+
+Note that this would not support multi-device tiering as written.  If some 
+layer supports multiple IO performance tiers (more than 2) at the same 
+layer, then this hinting algorithm is insufficient unless a 
+cache-layer-specific datastructure could be passed with the IO hinting 
+request.  Also, an eviction hint is not supported by this model.
+
+
+Please comment with your thoughts.  I look forward to feedback and 
+implementation ideas for what would be the best way to plumb cache hinting 
+for whatever implementation is chosen.
+
+--
+Eric Wheeler
+
+
