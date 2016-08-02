@@ -1,309 +1,106 @@
-Return-Path: <shaun.tancheff@gmail.com>
-Return-Path: <shaun.tancheff@gmail.com>
-Sender: Shaun Tancheff <shaun.tancheff@gmail.com>
-From: Shaun Tancheff <shaun@tancheff.com>
-To: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Shaun Tancheff <shaun@tancheff.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>,
-	"James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	Damien Le Moal <damien.lemoal@hgst.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Josh Bingaman <josh.bingaman@seagate.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Geert Uytterhoeven <geert@linux-m68k.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Mauro Carvalho Chehab <mchehab@kernel.org>,
-	Guenter Roeck <linux@roeck-us.net>,
-	Ming Lei <ming.lei@canonical.com>,
-	Mike Christie <michaelc@cs.wisc.edu>,
-	Keith Busch <keith.busch@intel.com>,
-	Mike Snitzer <snitzer@redhat.com>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Shaohua Li <shli@fb.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	stephen hemminger <stephen@networkplumber.org>,
-	Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
-	Alexandre Bounine <alexandre.bounine@idt.com>,
-	Asias He <asias@redhat.com>,
-	Sabrina Dubroca <sd@queasysnail.net>,
-	Mike Frysinger <vapier@gentoo.org>,
-	Andrea Arcangeli <aarcange@redhat.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Jeff Layton <jlayton@poochiereds.net>,
-	"J . Bruce Fields" <bfields@fieldses.org>,
-	Shaun Tancheff <shaun.tancheff@seagate.com>
-Subject: [PATCH v8 2/2] Add ioctl to issue ZBC/ZAC commands via block layer
-Date: Sun, 21 Aug 2016 23:20:10 -0500
-Message-Id: <20160822042010.32416-3-shaun@tancheff.com>
-In-Reply-To: <20160822042010.32416-1-shaun@tancheff.com>
-References: <20160822042010.32416-1-shaun@tancheff.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-oi0-f52.google.com ([209.85.218.52]:32812 "EHLO
+	mail-oi0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754241AbcHBLdK convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-block@vger.kernel.org>); Tue, 2 Aug 2016 07:33:10 -0400
+Received: by mail-oi0-f52.google.com with SMTP id j185so231569934oih.0
+        for <linux-block@vger.kernel.org>; Tue, 02 Aug 2016 04:31:26 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <yq1mvkvzzvu.fsf@sermon.lab.mkp.net>
+References: <CAHJVUehBe1zKvp==CUs0YkmRt5sT8qOES6bPnaeNKKsfuZ3Zrw@mail.gmail.com>
+ <yq1shv1bh75.fsf@sermon.lab.mkp.net> <CAHJVUejnP=sxzrryZDPz4Y_PutF8yAV3LJSdQJGnvD+Cy==08g@mail.gmail.com>
+ <yq1oa5j7sqx.fsf@sermon.lab.mkp.net> <CAHJVUejV6d0qk-Yrjqu+OfUoLrus8JctXuzwsNgMyfumUs6_+g@mail.gmail.com>
+ <yq1h9b92pfc.fsf@sermon.lab.mkp.net> <CAHJVUeik5+3mYSFqaONu50XF9sV5+tMpTXqM-Kcijzwj+f6vDg@mail.gmail.com>
+ <yq1mvkvzzvu.fsf@sermon.lab.mkp.net>
+From: =?UTF-8?Q?Florian=2DEwald_M=C3=BCller?=
+	<florian-ewald.mueller@profitbricks.com>
+Date: Tue, 2 Aug 2016 13:31:05 +0200
+Message-ID: <CAHJVUegURaUeiDq-wx8bYYEO7jYw6z5-xJ7dvupoA8EtxaD8LQ@mail.gmail.com>
+Subject: Re: [PATCH linux-4.7-rc7] blk_stack_limits() setting discard_granularity
+To: "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Add support for ZBC ioctl's
-    BLKREPORT     - Issue Report Zones to device.
-    BLKZONEACTION - Issue a Zone Action (Close, Finish, Open, or Reset)
+Hi Martin,
 
-Signed-off-by: Shaun Tancheff <shaun.tancheff@seagate.com>
----
-v8:
- - Changed ioctl for zone actions to a single ioctl that takes 
-   a structure including the zone, zone action, all flag, and force option
- - Mapped REQ_META flag to 'force unit access' for zone operations
-v6:
- - Added GFP_DMA to gfp mask.
-v4:
- - Rebase on linux-next tag next-20160617.
- - Change bio flags to bio op's
+I totally agree with better having a common block layer infrastructure
+to handle such discard misfit cases.
+But, for now, I do not have a good idea of how to aggregate in the
+block layer discard chunks (< discard_granularity) and issue later
+only a big one (== discard_granularity) to underlying block device in
+a generic and persistent fashion.
 
- block/ioctl.c                     | 149 ++++++++++++++++++++++++++++++++++++++
- include/uapi/linux/blkzoned_api.h |  30 +++++++-
- include/uapi/linux/fs.h           |   1 +
- 3 files changed, 179 insertions(+), 1 deletion(-)
+For me, the current handling of discards by the block layer
+[blk_stack_limits() + blk_bio_discard_split()] seems to be
+inconsistent with the handling of normal (rd/wr) IO.
+It makes the life of block drivers developers harder as they can not
+rely on blk_queue_split() doing its job on discard bio's.
 
-diff --git a/block/ioctl.c b/block/ioctl.c
-index ed2397f..d760523 100644
---- a/block/ioctl.c
-+++ b/block/ioctl.c
-@@ -194,6 +194,151 @@ int blkdev_reread_part(struct block_device *bdev)
- }
- EXPORT_SYMBOL(blkdev_reread_part);
- 
-+static int blk_zoned_report_ioctl(struct block_device *bdev, fmode_t mode,
-+				  void __user *parg)
-+{
-+	int error = -EFAULT;
-+	gfp_t gfp = GFP_KERNEL | GFP_DMA;
-+	void *iopg = NULL;
-+	struct bdev_zone_report_io *bzrpt = NULL;
-+	int order = 0;
-+	struct page *pgs = NULL;
-+	u32 alloc_size = PAGE_SIZE;
-+	unsigned int op_flags = 0;
-+	u8 opt = 0;
-+
-+	if (!(mode & FMODE_READ))
-+		return -EBADF;
-+
-+	iopg = (void *)get_zeroed_page(gfp);
-+	if (!iopg) {
-+		error = -ENOMEM;
-+		goto report_zones_out;
-+	}
-+	bzrpt = iopg;
-+	if (copy_from_user(bzrpt, parg, sizeof(*bzrpt))) {
-+		error = -EFAULT;
-+		goto report_zones_out;
-+	}
-+	if (bzrpt->data.in.return_page_count > alloc_size) {
-+		int npages;
-+
-+		alloc_size = bzrpt->data.in.return_page_count;
-+		npages = (alloc_size + PAGE_SIZE - 1) >> PAGE_SHIFT;
-+		pgs = alloc_pages(gfp, ilog2(npages));
-+		if (pgs) {
-+			void *mem = page_address(pgs);
-+
-+			if (!mem) {
-+				error = -ENOMEM;
-+				goto report_zones_out;
-+			}
-+			order = ilog2(npages);
-+			memset(mem, 0, alloc_size);
-+			memcpy(mem, bzrpt, sizeof(*bzrpt));
-+			bzrpt = mem;
-+		} else {
-+			/* Result requires DMA capable memory */
-+			pr_err("Not enough memory available for request.\n");
-+			error = -ENOMEM;
-+			goto report_zones_out;
-+		}
-+	} else {
-+		alloc_size = bzrpt->data.in.return_page_count;
-+	}
-+	if (bzrpt->data.in.force_unit_access)
-+		op_flags |= REQ_META;
-+	opt = bzrpt->data.in.report_option;
-+	error = blkdev_issue_zone_report(bdev, op_flags,
-+			bzrpt->data.in.zone_locator_lba, opt,
-+			pgs ? pgs : virt_to_page(iopg),
-+			alloc_size, GFP_KERNEL);
-+	if (error)
-+		goto report_zones_out;
-+
-+	if (pgs) {
-+		void *src = bzrpt;
-+		u32 off = 0;
-+
-+		/*
-+		 * When moving a multi-order page with GFP_DMA
-+		 * the copy to user can trap "<spans multiple pages>"
-+		 * so instead we copy out 1 page at a time.
-+		 */
-+		while (off < alloc_size && !error) {
-+			u32 len = min_t(u32, PAGE_SIZE, alloc_size - off);
-+
-+			memcpy(iopg, src + off, len);
-+			if (copy_to_user(parg + off, iopg, len))
-+				error = -EFAULT;
-+			off += len;
-+		}
-+	} else {
-+		if (copy_to_user(parg, iopg, alloc_size))
-+			error = -EFAULT;
-+	}
-+
-+report_zones_out:
-+	if (pgs)
-+		__free_pages(pgs, order);
-+	if (iopg)
-+		free_page((unsigned long)iopg);
-+	return error;
-+}
-+
-+static int blk_zoned_action_ioctl(struct block_device *bdev, fmode_t mode,
-+				  void __user *parg)
-+{
-+	unsigned int op = 0;
-+	unsigned int op_flags = 0;
-+	sector_t lba;
-+	struct bdev_zone_action za;
-+
-+	if (!(mode & FMODE_WRITE))
-+		return -EBADF;
-+
-+	/* When acting on zones we explicitly disallow using a partition. */
-+	if (bdev != bdev->bd_contains) {
-+		pr_err("%s: All zone operations disallowed on this device\n",
-+			__func__);
-+		return -EFAULT;
-+	}
-+
-+	if (copy_from_user(&za, parg, sizeof(za)))
-+		return -EFAULT;
-+
-+	switch (za.action) {
-+	case ZONE_ACTION_CLOSE:
-+		op = REQ_OP_ZONE_CLOSE;
-+		break;
-+	case ZONE_ACTION_FINISH:
-+		op = REQ_OP_ZONE_FINISH;
-+		break;
-+	case ZONE_ACTION_OPEN:
-+		op = REQ_OP_ZONE_OPEN;
-+		break;
-+	case ZONE_ACTION_RESET:
-+		op = REQ_OP_ZONE_RESET;
-+		break;
-+	default:
-+		pr_err("%s: Unknown action: %u\n", __func__, za.action);
-+		return -EINVAL;
-+	}
-+
-+	lba = za.zone_locator_lba;
-+	if (za.all_zones) {
-+		if (lba) {
-+			pr_err("%s: if all_zones, LBA must be 0.\n", __func__);
-+			return -EINVAL;
-+		}
-+		lba = ~0ul;
-+	}
-+	if (za.force_unit_access || lba == ~0ul)
-+		op_flags |= REQ_META;
-+
-+	return blkdev_issue_zone_action(bdev, op, op_flags, lba, GFP_KERNEL);
-+}
-+
- static int blk_ioctl_discard(struct block_device *bdev, fmode_t mode,
- 		unsigned long arg, unsigned long flags)
- {
-@@ -568,6 +713,10 @@ int blkdev_ioctl(struct block_device *bdev, fmode_t mode, unsigned cmd,
- 	case BLKTRACESETUP:
- 	case BLKTRACETEARDOWN:
- 		return blk_trace_ioctl(bdev, cmd, argp);
-+	case BLKREPORT:
-+		return blk_zoned_report_ioctl(bdev, mode, argp);
-+	case BLKZONEACTION:
-+		return blk_zoned_action_ioctl(bdev, mode, argp);
- 	case IOC_PR_REGISTER:
- 		return blkdev_pr_register(bdev, argp);
- 	case IOC_PR_RESERVE:
-diff --git a/include/uapi/linux/blkzoned_api.h b/include/uapi/linux/blkzoned_api.h
-index d2bdba5..cd81a9f 100644
---- a/include/uapi/linux/blkzoned_api.h
-+++ b/include/uapi/linux/blkzoned_api.h
-@@ -115,6 +115,7 @@ enum bdev_zone_same {
-  * @zone_locator_lba: starting lba for first [reported] zone
-  * @return_page_count: number of *bytes* allocated for result
-  * @report_option: see: zone_report_option enum
-+ * @force_unit_access: Force report from media
-  *
-  * Used to issue report zones command to connected device
-  */
-@@ -122,6 +123,25 @@ struct bdev_zone_get_report {
- 	__u64 zone_locator_lba;
- 	__u32 return_page_count;
- 	__u8  report_option;
-+	__u8  force_unit_access;
-+} __packed;
-+
-+/**
-+ * struct bdev_zone_action - ioctl: Perform Zone Action
-+ *
-+ * @zone_locator_lba: starting lba for first [reported] zone
-+ * @return_page_count: number of *bytes* allocated for result
-+ * @action: One of the ZONE_ACTION_*'s Close,Finish,Open, or Reset
-+ * @all_zones: Flag to indicate if command should apply to all zones.
-+ * @force_unit_access: Force command to media and update zone cache on success
-+ *
-+ * Used to issue report zones command to connected device
-+ */
-+struct bdev_zone_action {
-+	__u64 zone_locator_lba;
-+	__u32 action;
-+	__u8  all_zones;
-+	__u8  force_unit_access;
- } __packed;
- 
- /**
-@@ -134,7 +154,6 @@ struct bdev_zone_get_report {
-  * @lba_start: lba where the zone starts.
-  * @lba_wptr: lba of the current write pointer.
-  * @reserved: padding
-- *
-  */
- struct bdev_zone_descriptor {
- 	__u8 type;
-@@ -179,4 +198,13 @@ struct bdev_zone_report_io {
- 	} data;
- } __packed;
- 
-+/* continuing from uapi/linux/fs.h: */
-+#define BLKREPORT	_IOWR(0x12, 130, struct bdev_zone_report_io)
-+#define BLKZONEACTION	_IOW(0x12, 131, struct bdev_zone_action)
-+
-+#define ZONE_ACTION_CLOSE	0x01
-+#define ZONE_ACTION_FINISH	0x02
-+#define ZONE_ACTION_OPEN	0x03
-+#define ZONE_ACTION_RESET	0x04
-+
- #endif /* _UAPI_BLKZONED_API_H */
-diff --git a/include/uapi/linux/fs.h b/include/uapi/linux/fs.h
-index 3b00f7c..350fb3f2 100644
---- a/include/uapi/linux/fs.h
-+++ b/include/uapi/linux/fs.h
-@@ -222,6 +222,7 @@ struct fsxattr {
- #define BLKSECDISCARD _IO(0x12,125)
- #define BLKROTATIONAL _IO(0x12,126)
- #define BLKZEROOUT _IO(0x12,127)
-+/* A jump here: See blkzoned_api.h, Reserving 130 and 131. */
- 
- #define BMAP_IOCTL 1		/* obsolete - kept for compatibility */
- #define FIBMAP	   _IO(0x00,1)	/* bmap access */
+Regards,
+Florian
+
+On Tue, Aug 2, 2016 at 4:08 AM, Martin K. Petersen
+<martin.petersen@oracle.com> wrote:
+>>>>>> Florian-Ewald Müller <florian-ewald.mueller@profitbricks.com> writes:
+>
+> Florian-Ewald,
+>
+>> Now my experiments show that, at least, dm-cache doesn't complain nor
+>> rejects those smaller discards than its discard_granularity, but
+>> possibly turning them into noop (?).
+>
+> Correct. Anything smaller than (an aligned) multiple of the discard
+> granularity will effectively be ignored.
+>
+> In practice this means that your device should allocate things in
+> aligned units of the underlying device's discard granularity.
+>
+>> May be that the needed functionality of accumulating small discards to
+>> a big one covering its own granularity (similar to SSDs block erasure)
+>> should be done at that driver level.
+>
+> Do you allocate blocks in a predictable pattern between your nodes?
+>
+> For MD RAID0, for instance, we issue many small discard requests. But
+> for I/Os that are bigger than the stripe width we'll wrap around and do
+> merging so that for instance blocks 0, n, 2*n, 3*n, etc. become part of
+> the same discard request sent to the device.
+>
+> If you want discards smaller than the underlying granularity to have an
+> effect then I'm afraid the burden is on you to maintain a bitmap of each
+> granularity sized region. And then issue a deferred discard when all
+> blocks inside that region have been discarded by the application or
+> filesystem above.
+>
+> If you want to pursue partial block tracking it would be good to come up
+> with a common block layer infrastructure for it. dm-thin could benefit
+> from it as well...
+>
+> --
+> Martin K. Petersen      Oracle Linux Engineering
+
+
+
 -- 
-2.9.3
+Florian-Ewald Mueller
+
+Architecture Board
+
+
+ProfitBricks GmbH
+Greifswalder Str. 207
+D - 10405 Berlin
+
+
+Tel:       +49 30 577 008 331
+Fax:      +49 30 577 008 598
+Email:   florian-ewald.mueller@profitbricks.com
+URL:     http://www.profitbricks.de
+
+Sitz der Gesellschaft: Berlin.
+Registergericht: Amtsgericht Charlottenburg, HRB 125506 B.
+Geschäftsführer: Andreas Gauger, Achim Weiss.
+
+Please consider the environment before printing this email.
