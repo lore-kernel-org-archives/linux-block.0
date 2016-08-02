@@ -1,77 +1,39 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:64597 "EHLO mga02.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752723AbcHLSi5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-	Fri, 12 Aug 2016 14:38:57 -0400
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-	Andreas Dilger <adilger.kernel@dilger.ca>,
-	Jan Kara <jack@suse.com>,
-	Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-	Hugh Dickins <hughd@google.com>,
-	Andrea Arcangeli <aarcange@redhat.com>,
-	Dave Hansen <dave.hansen@intel.com>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	Matthew Wilcox <willy@infradead.org>,
-	Ross Zwisler <ross.zwisler@linux.intel.com>,
-	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	linux-block@vger.kernel.org,
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv2 31/41] ext4: handle huge pages in ext4_page_mkwrite()
-Date: Fri, 12 Aug 2016 21:38:14 +0300
-Message-Id: <1471027104-115213-32-git-send-email-kirill.shutemov@linux.intel.com>
-In-Reply-To: <1471027104-115213-1-git-send-email-kirill.shutemov@linux.intel.com>
-References: <1471027104-115213-1-git-send-email-kirill.shutemov@linux.intel.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: Fixup direct bi_rw modifiers
+To: Christoph Hellwig <hch@infradead.org>
+References: <1469915148-20452-1-git-send-email-shaun@tancheff.com>
+ <20160801114713.GA16806@infradead.org>
+ <36734f69-33f5-c2fd-67da-d2d867741403@kernel.dk>
+ <a2fbb070-ad57-0015-45d0-2402368ba35e@kernel.dk>
+ <20160802123245.GA18679@infradead.org>
+Cc: Shaun Tancheff <shaun@tancheff.com>, linux-block@vger.kernel.org,
+ linux-btrfs@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Jens Axboe <axboe@fb.com>, Chris Mason <clm@fb.com>,
+ Josef Bacik <jbacik@fb.com>, David Sterba <dsterba@suse.com>,
+ Mike Christie <mchristi@redhat.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <111bfd53-d89d-d38f-32e5-5e83bad79dbc@kernel.dk>
+Date: Tue, 2 Aug 2016 11:09:23 -0700
+MIME-Version: 1.0
+In-Reply-To: <20160802123245.GA18679@infradead.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+List-ID: <linux-block@vger.kernel.org>
 
-Trivial: remove assumption on page size.
+On 08/02/2016 05:32 AM, Christoph Hellwig wrote:
+> On Mon, Aug 01, 2016 at 01:55:36PM -0600, Jens Axboe wrote:
+>>
+>> Set of three patches, where the target one is an actual bug fix...
+>> Temporary branch, I'll rebase it once -rc1 is out, if more
+>> changes/fixups need to be made in the next week until that happens.
+>>
+>> http://git.kernel.dk/cgit/linux-block/log/?h=for-4.8/bi_rwf
+>
+> Thanks.  Any chance to have a slightly better name for the field?
+> E.g. bi_opf or bi_op_flags if we want to be a bit more verbose.
 
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
----
- fs/ext4/inode.c | 13 +++++++------
- 1 file changed, 7 insertions(+), 6 deletions(-)
+bi_opf is fine with me as well, don't care too strongly about bi_rwf or 
+bi_opf. I don't like the longer variants.
 
-diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
-index f585f9160a96..cd435d4a10f0 100644
---- a/fs/ext4/inode.c
-+++ b/fs/ext4/inode.c
-@@ -5646,7 +5646,7 @@ static int ext4_bh_unmapped(handle_t *handle, struct buffer_head *bh)
- 
- int ext4_page_mkwrite(struct vm_area_struct *vma, struct vm_fault *vmf)
- {
--	struct page *page = vmf->page;
-+	struct page *page = compound_head(vmf->page);
- 	loff_t size;
- 	unsigned long len;
- 	int ret;
-@@ -5682,10 +5682,10 @@ int ext4_page_mkwrite(struct vm_area_struct *vma, struct vm_fault *vmf)
- 		goto out;
- 	}
- 
--	if (page->index == size >> PAGE_SHIFT)
--		len = size & ~PAGE_MASK;
--	else
--		len = PAGE_SIZE;
-+	len = hpage_size(page);
-+	if (page->index + hpage_nr_pages(page) - 1 == size >> PAGE_SHIFT)
-+		len = size & ~hpage_mask(page);
-+
- 	/*
- 	 * Return if we have all the buffers mapped. This avoids the need to do
- 	 * journal_start/journal_stop which can block and take a long time
-@@ -5716,7 +5716,8 @@ retry_alloc:
- 	ret = block_page_mkwrite(vma, vmf, get_block);
- 	if (!ret && ext4_should_journal_data(inode)) {
- 		if (ext4_walk_page_buffers(handle, page_buffers(page), 0,
--			  PAGE_SIZE, NULL, do_journal_get_write_access)) {
-+			  hpage_size(page), NULL,
-+			  do_journal_get_write_access)) {
- 			unlock_page(page);
- 			ret = VM_FAULT_SIGBUS;
- 			ext4_journal_stop(handle);
+
 -- 
-2.8.1
-
+Jens Axboe
