@@ -1,184 +1,122 @@
-Return-Path: <Damien.LeMoal@hgst.com>
-From: Damien Le Moal <Damien.LeMoal@hgst.com>
-To: Hannes Reinecke <hare@suse.de>
-CC: Shaun Tancheff <shaun.tancheff@seagate.com>, Christoph Hellwig
-	<hch@lst.de>, Shaun Tancheff <shaun@tancheff.com>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>, LKML
-	<linux-kernel@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>, Jens Axboe
-	<axboe@fb.com>, "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>, "Martin
- K . Petersen" <martin.petersen@oracle.com>, Jeff Layton
-	<jlayton@poochiereds.net>, "J . Bruce Fields" <bfields@fieldses.org>, "Josh
- Bingaman" <josh.bingaman@seagate.com>
+Return-Path: <hare@suse.de>
 Subject: Re: [PATCH v6 0/2] Block layer support ZAC/ZBC commands
-Date: Wed, 3 Aug 2016 01:29:27 +0000
-Message-ID: <C7B51F39-AC67-4D96-B1DE-45C70F99134D@hgst.com>
+To: Shaun Tancheff <shaun.tancheff@seagate.com>,
+ Christoph Hellwig <hch@lst.de>
 References: <1469818955-20568-1-git-send-email-shaun@tancheff.com>
  <20160801094116.GB14677@lst.de>
  <CAJVOszCAb4o5LWpJL8Yd66n9jPvy+EMQX2Xfr6awZCxfGJf_CA@mail.gmail.com>
- <6a4a27ac-009d-9825-bf77-0529da77cc36@suse.de>
-In-Reply-To: <6a4a27ac-009d-9825-bf77-0529da77cc36@suse.de>
-Content-Type: text/plain; charset="utf-8"
+Cc: Shaun Tancheff <shaun@tancheff.com>, linux-block@vger.kernel.org,
+ linux-scsi@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+ Jens Axboe <axboe@kernel.dk>, Jens Axboe <axboe@fb.com>,
+ "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
+ "Martin K . Petersen" <martin.petersen@oracle.com>,
+ Jeff Layton <jlayton@poochiereds.net>,
+ "J . Bruce Fields" <bfields@fieldses.org>,
+ Josh Bingaman <josh.bingaman@seagate.com>,
+ Damien Le Moal <damien.lemoal@hgst.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <6a4a27ac-009d-9825-bf77-0529da77cc36@suse.de>
+Date: Tue, 2 Aug 2016 16:35:40 +0200
 MIME-Version: 1.0
+In-Reply-To: <CAJVOszCAb4o5LWpJL8Yd66n9jPvy+EMQX2Xfr6awZCxfGJf_CA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-SGFubmVzLCBTaGF1biwNCg0KTGV0IG1lIGFkZCBzb21lIG1vcmUgY29tbWVudHMuDQoNCj4gT24g
-QXVnIDIsIDIwMTYsIGF0IDIzOjM1LCBIYW5uZXMgUmVpbmVja2UgPGhhcmVAc3VzZS5kZT4gd3Jv
-dGU6DQo+IA0KPiBPbiAwOC8wMS8yMDE2IDA3OjA3IFBNLCBTaGF1biBUYW5jaGVmZiB3cm90ZToN
-Cj4+IE9uIE1vbiwgQXVnIDEsIDIwMTYgYXQgNDo0MSBBTSwgQ2hyaXN0b3BoIEhlbGx3aWcgPGhj
-aEBsc3QuZGU+IHdyb3RlOg0KPj4+IA0KPj4+IENhbiB5b3UgcGxlYXNlIGludGVncmF0ZSB0aGlz
-IHdpdGggSGFubmVzIHNlcmllcyBzbyB0aGF0IGl0IHVzZXMNCj4+PiBoaXMgY2FjaGUgb2YgdGhl
-IHpvbmUgaW5mb3JtYXRpb24/DQo+PiANCj4+IEFkZGluZyBIYW5uZXMgYW5kIERhbWllbiB0byBD
-Yy4NCj4+IA0KPj4gQ2hyaXN0b3BoLA0KPj4gDQo+PiBJIGNhbiBtYWtlIGEgcGF0Y2ggdGhlIG1h
-cnNoYWwgSGFubmVzJyBSQi1UcmVlIGludG8gdG8gYSBibG9jayByZXBvcnQsIHRoYXQgaXMNCj4+
-IHF1aXRlIHNpbXBsZS4gSSBjYW4gZXZlbiBoYXZlIHRoZSBvcGVuL2Nsb3NlL3Jlc2V0IHpvbmUg
-Y29tbWFuZHMgdXBkYXRlIHRoZQ0KPj4gUkItVHJlZSAuLiB0aGUgbm9uLXByaXZhdGUgcGFydHMg
-YW55d2F5LiBJIHdvdWxkIHByZWZlciB0byBkbyB0aGlzIGFyb3VuZCB0aGUNCj4+IENPTkZJR19T
-RF9aQkMgc3VwcG9ydCwgb2ZmZXJpbmcgdGhlIGV4aXN0aW5nIHR5cGUgb2YgcGF0Y2ggZm9yIHNl
-dHVwcyB0aGF0IGRvDQo+PiBub3QgbmVlZCB0aGUgUkItVHJlZSB0byBmdW5jdGlvbiB3aXRoIHpv
-bmVkIG1lZGlhLg0KPj4gDQo+PiBJIGRvIHN0aWxsIGhhdmUgY29uY2VybnMgd2l0aCB0aGUgYXBw
-cm9hY2ggd2hpY2ggSSBoYXZlIHNoYXJlZCBpbiBzbWFsbGVyDQo+PiBmb3J1bXMgYnV0IHBlcmhh
-cHMgSSBoYXZlIHRvIGJyaW5nIHRoZW0gdG8gdGhpcyBncm91cC4NCj4+IA0KPj4gRmlyc3QgaXMg
-dGhlIG1lbW9yeSBjb25zdW1wdGlvbi4gVGhpcyBpc24ndCByZWFsbHkgbXVjaCBvZiBhIGNvbmNl
-cm4gZm9yIGxhcmdlDQo+PiBzZXJ2ZXJzIHdpdGggZmV3IGRyaXZlcyBidXQgSSB0aGluayB0aGUg
-ZW1iZWRkZWQgTkFTIG1hcmtldCB3aWxsIGdydW1ibGUgYXMNCj4+IHdlbGwgYXMgdGhlIGxhcmdl
-IGRhdGEgcG9kcyB0cnlpbmcgdG8gc3R1ZmYgMzAwKyBkcml2ZXMgaW4gYSBjaGFzc2lzLg0KPj4g
-DQo+PiBBcyBvZiBub3cgdGhlIFJCLVRyZWUgbmVlZHMgdG8gaG9sZCB+MzAwMDAgem9uZXMuDQo+
-PiBzaXplb2YoKSByZXBvcnRzIHN0cnVjdCBibGtfem9uZSB0byB1c2UgMTIwIGJ5dGVzIG9uIHg4
-Nl82NC4gVGhpcyB5aWVsZHMNCj4+IGFyb3VuZCAzLjUgTUIgcGVyIHpvbmVkIGRyaXZlIGF0dGFj
-aGVkLg0KPj4gV2hpY2ggaXMgZmluZSBpZiBpdCBpcyByZWFsbHkgbmVlZGVkLCBidXQgbW9zdCBv
-ZiBpdCBpcyBmaXhlZCBpbmZvcm1hdGlvbg0KPj4gYW5kIGl0IGNhbiBiZSBzaWduaWZpY2FudGx5
-IGNvbmRlbnNlZCAoSSBoYXZlIHByb3Bvc2VkIDggYnl0ZXMgcGVyIHpvbmUgaGVsZA0KPj4gaW4g
-YW4gYXJyYXkgYXMgbW9yZSB0aGFuIGFkZXF1YXRlKS4gV29yc2UgaXMgdGhhdCB0aGUgY3J1Y2lh
-bCBwaWVjZSBvZg0KPj4gaW5mb3JtYXRpb24sIHRoZSBjdXJyZW50IHdwIG5lZWRlZCBmb3Igc2No
-ZWR1bGluZyB0aGUgbmV4dCB3cml0ZSwgaXMgbW9zdGx5DQo+PiBvdXQgb2YgZGF0ZSBiZWNhdXNl
-IGl0IGlzIHVwZGF0ZWQgb25seSBhZnRlciB0aGUgd3JpdGUgY29tcGxldGVzIGFuZCB6b25lcw0K
-Pj4gYmVpbmcgYWN0aXZlbHkgd3JpdHRlbiB0byBtdXN0IHdvcmsgb2ZmIG9mIHRoZSBsYXN0IGxv
-Y2F0aW9uIC8gc2l6ZSB0aGF0IHdhcw0KPj4gc3VibWl0dGVkLCBub3QgY29tcGxldGVkLiBUaGUg
-d29yayBhcm91bmQgaXMgZm9yIHRoYXQgdHJhY2tpbmcgdG8gYmUgaGFuZGxlZA0KPj4gaW4gdGhl
-IHByaXZhdGVfZGF0YSBtZW1iZXIuIEkgYW0gbm90IHNheWluZyB0aGF0IHVwZGF0aW5nIHRoZSB3
-cCBvbg0KPj4gY29tcGxldGluZyBhIHdyaXRlIGlzbuKAmXQgaW1wb3J0YW50LCBJIGFtIHNheWlu
-ZyB0aGF0IHRoZSBiaV9lbmRfaW8gaG9vayBpcw0KPj4gdGhlIGV4aXN0aW5nIGhvb2sgdGhhdCB3
-b3JrcyBqdXN0IGZpbmUuDQo+PiANCj4gV2hpY2ggX2FjdHVhbGx5XyBpcyBub3QgdHJ1ZTsgd2l0
-aCBteSBwYXRjaGVzIEknbGwgdXBkYXRlIHRoZSB3cml0ZQ0KPiBwb2ludGVyIHByaW9yIHRvIHN1
-Ym1pdCB0aGUgSS9PIChvbiB0aGUgcmVhc29uaW5nIHRoYXQgbW9zdCBvZiB0aGUgdGltZQ0KPiBJ
-L08gd2lsbCBzdWNjZWVkKSBhbmQgcmUtcmVhZCB0aGUgem9uZSBpbmZvcm1hdGlvbiBpZiBhbiBJ
-L08gZmFpbGVkLg0KPiAoV2hpY2ggSSdsbCBoYXZlIHRvIGRvIGFueXdheSBhcyBhZnRlciBhbiBJ
-L08gZmFpbHVyZSB0aGUgd3JpdGUgcG9pbnRlcg0KPiBzdGF0dXMgaXMgbm90IGNsZWFybHkgZGVm
-aW5lZC4pDQo+IA0KPiBJIGhhdmUgdGhvdWdodCBhYm91dCBjb25kZW5zaW5nIHRoZSBSQiB0cmVl
-IGluZm9ybWF0aW9uLCBidXQgdGhlbiBJDQo+IGZpZ3VyZWQgdGhhdCBmb3IgJ3JlYWwnIFNNUiBo
-YW5kbGluZyB3ZSBjYW5ub3QgYXNzdW1lIGFsbCB6b25lcyBhcmUgb2YNCj4gZml4ZWQgc2l6ZSwg
-YW5kIGhlbmNlIHdlIG5lZWQgYWxsIHRoZSBpbmZvcm1hdGlvbiB0aGVyZS4NCj4gQW55IGNvbmRl
-bnNpbmcgbWV0aG9kIHdvdWxkIGFzc3VtZSBhIGdpdmVuIHN0cnVjdHVyZSBvZiB0aGUgem9uZXMs
-IHdoaWNoDQo+IHRoZSBzdGFuZGFyZCBqdXN0IGRvZXNuJ3QgcHJvdmlkZS4NCj4gT3IgYW0gSSBt
-aXNzaW5nIHNvbWV0aGluZyBoZXJlPw0KDQpJbmRlZWQsIHRoZSBzdGFuZGFyZHMgZG8gbm90IG1h
-bmRhdGUgYW55IHBhcnRpY3VsYXIgem9uZSBjb25maWd1cmF0aW9uLA0KY29uc3RhbnQgem9uZSBz
-aXplLCBldGMuIFNvIHdyaXRpbmcgY29kZSBzbyB0aGF0IGNhbiBiZSBoYW5kbGVkIGlzIGNlcnRh
-aW5seQ0KdGhlIHJpZ2h0IHdheSBvZiBkb2luZyB0aGluZ3MuIEhvd2V2ZXIsIGlmIHdlIGRlY2lk
-ZSB0byBnbyBmb3J3YXJkIHdpdGgNCm1hcHBpbmcgUkVTRVQgV1JJVEUgUE9JTlRFUiBjb21tYW5k
-IHRvIERJU0NBUkQsIHRoZW4gYXQgbGVhc3QgYSBjb25zdGFudA0Kem9uZSBzaXplIChtaW51cyB0
-aGUgbGFzdCB6b25lIGFzIHlvdSBzYWlkKSBtdXN0IGJlIGFzc3VtZWQsIGFuZCB0aGF0DQppbmZv
-cm1hdGlvbiBjYW4gYmUgcmVtb3ZlZCBmcm9tIHRoZSBlbnRyaWVzIGluIHRoZSBSQiB0cmVlIChh
-cyBpdCB3aWxsIGJlDQpzYXZlZCBmb3IgdGhlIHN5c2ZzICJ6b25lX3NpemUiIGZpbGUgYW55d2F5
-LiBBZGRpbmcgYSBsaXR0bGUgY29kZSB0byBoYW5kbGUNCnRoYXQgZXZlbnR1YWwgbGFzdCBydW50
-IHpvbmUgd2l0aCBhIGRpZmZlcmVudCBzaXplIGlzIG5vdCBhIGJpZyBwcm9ibGVtLg0KDQo+IA0K
-PiBBcyBmb3Igd3JpdGUgcG9pbnRlciBoYW5kbGluZzogeWVzLCB0aGUgd3JpdGUgcG9pbnRlciBv
-biB0aGUgem9uZXMgaXMNCj4gbm90IHJlYWxseSB1c2VmdWwgZm9yIHVwcGVyLWxldmVsIHVzYWdl
-Lg0KPiBXaGVyZSB3ZSBkbyBuZWVkIGl0IGlzIHRvIGRldGVjdCBJL08gd2hpY2ggaXMgY3Jvc3Np
-bmcgdGhlIHdyaXRlIHBvaW50ZXINCj4gKGVnIHdoZW4gZG9pbmcgcmVhZHMgb3ZlciB0aGUgZW50
-aXJlIHpvbmUpLg0KPiBBcyBwZXIgc3BlYyB5b3Ugd2lsbCBiZSBnZXR0aW5nIGFuIEkvTyBlcnJv
-ciBoZXJlLCBzbyB3ZSBuZWVkIHRvIHNwbGl0DQo+IHRoZSBJL08gb24gdGhlIHdyaXRlIHBvaW50
-ZXIgdG8gZ2V0IHZhbGlkIHJlc3VsdHMgYmFjay4NCg0KVG8gYmUgcHJlY2lzZSBoZXJlLCB0aGUg
-SS9PIHNwbGl0dGluZyB3aWxsIGJlIGhhbmRsZWQgYnkgdGhlIGJsb2NrIGxheWVyDQp0aGFua3Mg
-dG8gdGhlICJjaHVua19zZWN0b3JzIiBzZXR0aW5nLiBCdXQgdGhhdCByZWxpZXMgb24gYSBjb25z
-dGFudCB6b25lDQpzaXplIGFzc3VtcHRpb24gdG9vLg0KDQpUaGUgUkItdHJlZSBoZXJlIGlzIG1v
-c3QgdXNlZnVsIGZvciByZWFkcyBvdmVyIG9yIGFmdGVyIHRoZSB3cml0ZSBwb2ludGVyIGFzDQp0
-aGlzIGNhbiBoYXZlIGRpZmZlcmVudCBiZWhhdmlvciBvbiBkaWZmZXJlbnQgZHJpdmVzIChVUlNX
-UlogYml0KS4gVGhlIFJCLXRyZWUNCmFsbG93cyB1cyB0byBoaWRlIHRoZXNlIGRpZmZlcmVuY2Vz
-IHRvIHVwcGVyIGxheWVycyBhbmQgc2ltcGxpZnkgc3VwcG9ydCBhdA0KdGhvc2UgbGV2ZWxzLg0K
-DQpJIHRvbyBhZ3JlZSB0aGF0IHRoZSB3cml0ZSBwb2ludGVyIHZhbHVlIGlzIG5vdCB2ZXJ5IHVz
-ZWZ1bCB0byB1cHBlciBsYXllcnMNCihlLmcuIEZTKS4gV2hhdCBtYXR0ZXJzIG1vc3Qgb2YgdGhl
-IHRpbWVzIGZvciB0aGVzZSBsYXllcnMgaXMgYW4gImFsbG9jYXRpb24NCnBvaW50ZXIiIG9yICJz
-dWJtaXNzaW9uIHBvaW50ZXIiIHdoaWNoIGluZGljYXRlcyB0aGUgTEJBIHRvIHVzZSBmb3IgdGhl
-IG5leHQNCkJJTyBzdWJtaXNzaW9uLiBUaGF0IExCQSB3aWxsIG1vc3Qgb2YgdGhlIHRpbWUgYmUg
-aW4gYWR2YW5jZSBvZiB0aGUgem9uZSBXUA0KYmVjYXVzZSBvZiByZXF1ZXN0IHF1ZWluZyBpbiB0
-aGUgYmxvY2sgc2NoZWR1bGVyLg0KTm90ZSB0aGF0IGZyb20gd2hhdCB3ZSBoYXZlIGRvbmUgYWxy
-ZWFkeSwgaW4gbWFueSBjYXNlcywgdXBwZXIgbGF5ZXJzIGRvIG5vdA0KZXZlbiBuZWVkIHRoaXMg
-KGUuZy4gRjJGUywgYnRyZnMpIGFuZCB3b3JrIGZpbmUgd2l0aG91dCBuZWVkaW5nICphbnkqIA0K
-em9uZS0+cHJpdmF0ZV9kYXRhIGJlY2F1c2UgdGhhdCAiYWxsb2NhdGlvbiBwb2ludGVyIiBpbmZv
-cm1hdGlvbiBnZW5lcmFsbHkNCmFscmVhZHkgZXhpc3RzIGluIGEgZGlmZmVyZW50IGZvcm0gKGUu
-Zy4gYSBiaXQgaW4gYSBiaXRtYXApLg0KRm9yIHRoZXNlIGNhc2VzLCBub3QgaGF2aW5nIHRoZSBS
-Qi10cmVlIG9mIHpvbmVzIHdvdWxkIGZvcmNlIGEgbG90DQptb3JlIGNvZGUgdG8gYmUgYWRkZWQg
-dG8gZmlsZSBzeXN0ZW1zIGZvciBTTVIgc3VwcG9ydC4NCg0KPiANCj4+IFRoaXMgYWxsIHRhaWxz
-IGludG8gZG9tYWluIHJlc3BvbnNpYmlsaXR5LiBXaXRoIHRoZSBSQi1UcmVlIGRvaW5nIGhhbGYg
-b2YgdGhlDQo+PiB3b3JrIGFuZCB0aGUg4oCYcmVzcG9uc2libGXigJkgZG9tYWluIGhhbmRsaW5n
-IHRoZSBhY3RpdmUgcGF0aCB2aWEgcHJpdmF0ZV9kYXRhDQo+PiB3aHkgaGF2ZSB0aGUgc3BsaXQg
-YXQgYWxsPyBJdCBzZWVtcyB0byBiZSBhIGRvdWJsZSB3b3JrIHRvIGhhdmUgc2Vjb25kIG9iamVj
-dA0KPj4gdHJhY2tpbmcgdGhlIGZpcnN0IHNvIHRoYXQgSS9PIHNjaGVkdWxpbmcgY2FuIGZ1bmN0
-aW9uLg0KPj4gDQo+IFRyYWNraW5nIHRoZSB6b25lIHN0YXRlcyB2aWEgUkIgdHJlZXMgaXMgbWFp
-bmx5IHRvIGhhbmRseSBob3N0LW1hbmFnZWQNCj4gZHJpdmVzIHNlYW1sZXNzbHkuIFdpdGhvdXQg
-YW4gUkIgdHJlZSB3ZSB3aWxsIGJlIHN1YmplY3RlZCB0byBJL08gZXJyb3JzDQo+IGR1cmluZyBi
-b290LCBhcyBlZyB3aXRoIG5ldyBkcml2ZXMgd2UgaW5ldml0YWJseSB3aWxsIHRyeSB0byByZWFk
-IGJleW9uZA0KPiB0aGUgd3JpdGUgcG9pbnRlciwgd2hpY2ggaW4gdHVybiB3aWxsIGdlbmVyYXRl
-IEkvTyBlcnJvcnMgb24gY2VydGFpbiBkcml2ZXMuDQo+IEkgZG8gYWdyZWUgdGhhdCB0aGVyZSBp
-cyBubyBzdHJpY3QgbmVlZCB0byBzZXR1cCBhbiBSQiB0cmVlIGZvcg0KPiBob3N0LWF3YXJlIGRy
-aXZlczsgSSBjYW4gZWFzaWx5IGFkZCBhbiBhdHRyaWJ1dGUvZmxhZyB0byBkaXNhYmxlIFJCDQo+
-IHRyZWVzIGZvciB0aG9zZS4NCj4gSG93ZXZlciwgdHJhY2tpbmcgem9uZSBpbmZvcm1hdGlvbiBp
-biB0aGUgUkIgdHJlZSBfZHJhbWF0aWNhbGx5XyBzcGVlZHMNCj4gdXAgZGV2aWNlIGluaXRpYWxp
-c2F0aW9uOyBpc3N1aW5nIGEgYmxrZGV2X2Rpc2NhcmQoKSBmb3IgdGhlIGVudGlyZQ0KPiBkcml2
-ZSB3aWxsIHRha2UgX2FnZXNfIHdpdGhvdXQgaXQuDQoNCkFuZCB0aGUgUkItdHJlZSB3aWxsIGFs
-c28gYmUgdmVyeSB1c2VmdWwgZm9yIHNwZWVkaW5nIHVwIHJlcG9ydCB6b25lcw0KaW9jdGxzIHRv
-by4gVW5sZXNzIHdlIHdhbnQgdGhvc2UgdG8gZm9yY2UgYW4gdXBkYXRlIG9mIHRoZSBSQi10cmVl
-IGluZm9ybWF0aW9uID8NCg0KPiANCj4+IEZpbmFsbHkgaXMgdGhlIGVycm9yIGhhbmRsaW5nIHBh
-dGggd2hlbiB0aGUgUkItVHJlZSBlbmNvdW50ZXJzIGFuZCBlcnJvciBpdA0KPj4gYXR0ZW1wdHMg
-dG8gcmVxdWVyeSB0aGUgZHJpdmUgdG9wb2xvZ3kgdmlydHVhbGx5IGd1YXJhbnRlZWluZyB0aGF0
-IHRoZQ0KPj4gcHJpdmF0ZV9kYXRhIGlzIG5vdyBvdXQtb2Ytc3luYyB3aXRoIHRoZSBSQi1UcmVl
-LiBBZ2FpbiB0aGlzIGlzIHNvbWV0aGluZw0KPj4gdGhhdCBjYW4gYmUgYmV0dGVyIGVuY2Fwc3Vs
-YXRlZCBpbiB0aGUgYmlfZW5kX2lvIHRvIGJlIGluZm9ybWVkIG9mIHRoZQ0KPj4gZmFpbGVkIEkv
-TyBhbmQgc2NoZWR1bGUgdGhlIGFwcHJvcHJpYXRlIHJlY292ZXJ5IChpbmNsdWRpbmcgcmUtcXVl
-cnlpbmcgdGhlDQo+PiB6b25lIGluZm9ybWF0aW9uIG9mIHRoZSBhZmZlY3RlZCB6b25lKHMpKS4N
-Cj4+IA0KPiBXZWxsLCBpZiB3ZSBoYXZlIGFuIFJCIHRyZWUgd2l0aCB3cml0ZSBwb2ludGVycyBv
-ZiBjb3Vyc2Ugd2UgbmVlZCB0bw0KPiByZS1yZWFkIHRoZSB6b25lIGluZm9ybWF0aW9uIG9uIGZh
-aWx1cmUgKGFuZCBJIHRob3VnaHQgSSBkaWQgdGhhdD8pLg0KPiBQbHVzIHRoZSBlcnJvciBpbmZv
-cm1hdGlvbiB3aWxsIGJlIHByb3BhZ2F0ZWQgdmlhIHRoZSB1c3VhbCBtZWNoYW5pc20sDQo+IHNv
-IHRoZXkgbmVlZCB0byB0YWtlIGNhcmUgb2YgdXBkYXRpbmcgYW55IGluZm9ybWF0aW9uIGluIC0+
-cHJpdmF0ZV9kYXRhLg0KPiANCj4gSSdtIHBlcmZlY3RseSBmaW5lIHdpdGggaW50ZWdyYXRpbmcg
-eW91ciBwYXRjaGVzIGZvciB0aGUgdmFyaW91cw0KPiBibGtkZXZfWFggY2FsbG91dHMgYW5kIGFz
-c29jaWF0ZWQgaW9jdGxzOyBKZW5zIGZhdm91cnMgdGhhdCBhcHByb2FjaCwNCj4gdG9vLCBzbyB3
-ZSBzaG91bGQgYmUgY29tYmluaW5nIHRob3NlIGVmZm9ydHMuDQoNCkNhbiB3ZSBhZ3JlZSBvbiBh
-biBpbnRlcmZhY2UgPw0KU3VtbWFyaXppbmcgYWxsIHRoZSBkaXNjdXNzaW9ucyB3ZSBoYWQsIEkg
-YW0gYWxsIGluIGZhdm9yIG9mIHRoZSBmb2xsb3dpbmc6DQoNCjEpIEEgInpvbmVfc2l6ZSIgc3lz
-ZnMgYXR0cmlidXRlIHRvIGluZGljYXRlIHRoYXQgYSBkcml2ZSBpcyB6b25lZDoNClRoZSBhbHJl
-YWR5IGV4aXN0aW5nIGRldmljZSB0eXBlIGZpbGUgY2FuIHRlbGwgdXMgaWYgdGhpcyBpcyBhbiBo
-b3N0DQptYW5hZ2VkIGRpc2sgKHR5cGU9PTIwKSBvciBhIGhvc3QgYXdhcmUgZGlzayAodHlwZT09
-MCkuIERyaXZlIG1hbmFnZWQNCmRpc2tzIGNvdWxkIGFsc28gYmUgZGV0ZWN0ZWQsIGJ1dCBzaW5j
-ZSBubyBpbmZvcm1hdGlvbiBvbiB0aGVpciB6b25lDQpjb25maWd1cmF0aW9uIGNhbiBiZSBvYnRh
-aW5lZCwgbGV0cyB0cmVhdCB0aG9zZSBhcyByZWd1bGFyIGRyaXZlcy4NCg0KMikgQWRkIGlvY3Rs
-cyBmb3Igem9uZSBtYW5hZ2VtZW50Og0KUmVwb3J0IHpvbmVzIChnZXQgaW5mb3JtYXRpb24gZnJv
-bSBSQiB0cmVlKSwgcmVzZXQgem9uZSAoc2ltcGxlIHdyYXBwZXINCnRvIGlvY3RsIGZvciBibG9j
-ayBkaXNjYXJkKSwgb3BlbiB6b25lLCBjbG9zZSB6b25lIGFuZCBmaW5pc2ggem9uZS4gVGhhdA0K
-d2lsbCBhbGxvdyBta2ZzIGxpa2UgdG9vbHMgdG8gZ2V0IHpvbmUgaW5mb3JtYXRpb24gd2l0aG91
-dCBoYXZpbmcgdG8gcGFyc2UNCnRob3VzYW5kcyBvZiBzeXNmcyBmaWxlcyAoYW5kIGNhbiBhbHNv
-IGJlIGludGVncmF0ZWQgaW4gbGliemJjIGJsb2NrIGJhY2tlbmQNCmRyaXZlciBmb3IgYSB1bmlm
-aWVkIGludGVyZmFjZSB3aXRoIHRoZSBkaXJlY3QgU0dfSU8gcGF0aCBmb3Iga2VybmVscyB3aXRo
-b3V0DQp0aGUgWkJDIGNvZGUgZW5hYmxlZCkuDQoNCjMpIFRyeSB0byBjb25kZW5zZSB0aGUgYmxr
-em9uZSBkYXRhIHN0cnVjdHVyZSB0byBzYXZlIG1lbW9yeToNCkkgdGhpbmsgdGhhdCB3ZSBjYW4g
-YXQgdGhlIHZlcnkgbGVhc3QgcmVtb3ZlIHRoZSB6b25lIGxlbmd0aCwgYW5kIGFsc28NCm1heSBi
-ZSB0aGUgcGVyIHpvbmUgc3BpbmxvY2sgdG9vIChhIHNpbmdsZSBzcGlubG9jayBhbmQgcHJvcGVy
-IHN0YXRlIGZsYWdzIGNhbg0KYmUgdXNlZCkuDQoNCkJlc3QgcmVnYXJkcy4NCg0KLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tDQpEYW1pZW4gTGUgTW9hbCwgUGguRC4NClNyLiBNYW5hZ2VyLCBTeXN0
-ZW0gU29mdHdhcmUgR3JvdXAsIEhHU1QgUmVzZWFyY2gsDQpIR1NULCBhIFdlc3Rlcm4gRGlnaXRh
-bCBicmFuZA0KRGFtaWVuLkxlTW9hbEBoZ3N0LmNvbQ0KKCs4MSkgMDQ2Ni05OC0zNTkzIChleHQu
-IDUxMzU5MykNCjEga2lyaWhhcmEtY2hvLCBGdWppc2F3YSwgDQpLYW5hZ2F3YSwgMjUyLTA4ODgg
-SmFwYW4NCnd3dy5oZ3N0LmNvbSANCg0KV2VzdGVybiBEaWdpdGFsIENvcnBvcmF0aW9uIChhbmQg
-aXRzIHN1YnNpZGlhcmllcykgRS1tYWlsIENvbmZpZGVudGlhbGl0eSBOb3RpY2UgJiBEaXNjbGFp
-bWVyOgoKVGhpcyBlLW1haWwgYW5kIGFueSBmaWxlcyB0cmFuc21pdHRlZCB3aXRoIGl0IG1heSBj
-b250YWluIGNvbmZpZGVudGlhbCBvciBsZWdhbGx5IHByaXZpbGVnZWQgaW5mb3JtYXRpb24gb2Yg
-V0RDIGFuZC9vciBpdHMgYWZmaWxpYXRlcywgYW5kIGFyZSBpbnRlbmRlZCBzb2xlbHkgZm9yIHRo
-ZSB1c2Ugb2YgdGhlIGluZGl2aWR1YWwgb3IgZW50aXR5IHRvIHdoaWNoIHRoZXkgYXJlIGFkZHJl
-c3NlZC4gSWYgeW91IGFyZSBub3QgdGhlIGludGVuZGVkIHJlY2lwaWVudCwgYW55IGRpc2Nsb3N1
-cmUsIGNvcHlpbmcsIGRpc3RyaWJ1dGlvbiBvciBhbnkgYWN0aW9uIHRha2VuIG9yIG9taXR0ZWQg
-dG8gYmUgdGFrZW4gaW4gcmVsaWFuY2Ugb24gaXQsIGlzIHByb2hpYml0ZWQuIElmIHlvdSBoYXZl
-IHJlY2VpdmVkIHRoaXMgZS1tYWlsIGluIGVycm9yLCBwbGVhc2Ugbm90aWZ5IHRoZSBzZW5kZXIg
-aW1tZWRpYXRlbHkgYW5kIGRlbGV0ZSB0aGUgZS1tYWlsIGluIGl0cyBlbnRpcmV0eSBmcm9tIHlv
-dXIgc3lzdGVtLgo=
+On 08/01/2016 07:07 PM, Shaun Tancheff wrote:
+> On Mon, Aug 1, 2016 at 4:41 AM, Christoph Hellwig <hch@lst.de> wrote:
+>>
+>> Can you please integrate this with Hannes series so that it uses
+>> his cache of the zone information?
+> 
+> Adding Hannes and Damien to Cc.
+> 
+> Christoph,
+> 
+> I can make a patch the marshal Hannes' RB-Tree into to a block report, that is
+> quite simple. I can even have the open/close/reset zone commands update the
+> RB-Tree .. the non-private parts anyway. I would prefer to do this around the
+> CONFIG_SD_ZBC support, offering the existing type of patch for setups that do
+> not need the RB-Tree to function with zoned media.
+> 
+> I do still have concerns with the approach which I have shared in smaller
+> forums but perhaps I have to bring them to this group.
+> 
+> First is the memory consumption. This isn't really much of a concern for large
+> servers with few drives but I think the embedded NAS market will grumble as
+> well as the large data pods trying to stuff 300+ drives in a chassis.
+> 
+> As of now the RB-Tree needs to hold ~30000 zones.
+> sizeof() reports struct blk_zone to use 120 bytes on x86_64. This yields
+> around 3.5 MB per zoned drive attached.
+> Which is fine if it is really needed, but most of it is fixed information
+> and it can be significantly condensed (I have proposed 8 bytes per zone held
+> in an array as more than adequate). Worse is that the crucial piece of
+> information, the current wp needed for scheduling the next write, is mostly
+> out of date because it is updated only after the write completes and zones
+> being actively written to must work off of the last location / size that was
+> submitted, not completed. The work around is for that tracking to be handled
+> in the private_data member. I am not saying that updating the wp on
+> completing a write isn’t important, I am saying that the bi_end_io hook is
+> the existing hook that works just fine.
+> 
+Which _actually_ is not true; with my patches I'll update the write
+pointer prior to submit the I/O (on the reasoning that most of the time
+I/O will succeed) and re-read the zone information if an I/O failed.
+(Which I'll have to do anyway as after an I/O failure the write pointer
+status is not clearly defined.)
+
+I have thought about condensing the RB tree information, but then I
+figured that for 'real' SMR handling we cannot assume all zones are of
+fixed size, and hence we need all the information there.
+Any condensing method would assume a given structure of the zones, which
+the standard just doesn't provide.
+Or am I missing something here?
+
+As for write pointer handling: yes, the write pointer on the zones is
+not really useful for upper-level usage.
+Where we do need it is to detect I/O which is crossing the write pointer
+(eg when doing reads over the entire zone).
+As per spec you will be getting an I/O error here, so we need to split
+the I/O on the write pointer to get valid results back.
+
+> This all tails into domain responsibility. With the RB-Tree doing half of the
+> work and the ‘responsible’ domain handling the active path via private_data
+> why have the split at all? It seems to be a double work to have second object
+> tracking the first so that I/O scheduling can function.
+> 
+Tracking the zone states via RB trees is mainly to handly host-managed
+drives seamlessly. Without an RB tree we will be subjected to I/O errors
+during boot, as eg with new drives we inevitably will try to read beyond
+the write pointer, which in turn will generate I/O errors on certain drives.
+I do agree that there is no strict need to setup an RB tree for
+host-aware drives; I can easily add an attribute/flag to disable RB
+trees for those.
+However, tracking zone information in the RB tree _dramatically_ speeds
+up device initialisation; issuing a blkdev_discard() for the entire
+drive will take _ages_ without it.
+
+> Finally is the error handling path when the RB-Tree encounters and error it
+> attempts to requery the drive topology virtually guaranteeing that the
+> private_data is now out-of-sync with the RB-Tree. Again this is something
+> that can be better encapsulated in the bi_end_io to be informed of the
+> failed I/O and schedule the appropriate recovery (including re-querying the
+> zone information of the affected zone(s)).
+> 
+Well, if we have an RB tree with write pointers of course we need to
+re-read the zone information on failure (and I thought I did that?).
+Plus the error information will be propagated via the usual mechanism,
+so they need to take care of updating any information in ->private_data.
+
+I'm perfectly fine with integrating your patches for the various
+blkdev_XX callouts and associated ioctls; Jens favours that approach,
+too, so we should be combining those efforts.
+
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
