@@ -1,72 +1,60 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-	Andreas Dilger <adilger.kernel@dilger.ca>,
-	Jan Kara <jack@suse.com>,
-	Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-	Hugh Dickins <hughd@google.com>,
-	Andrea Arcangeli <aarcange@redhat.com>,
-	Dave Hansen <dave.hansen@intel.com>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	Matthew Wilcox <willy@infradead.org>,
-	Ross Zwisler <ross.zwisler@linux.intel.com>,
-	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	linux-block@vger.kernel.org,
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv2 25/41] fs: make block_page_mkwrite() aware about huge pages
-Date: Fri, 12 Aug 2016 21:38:08 +0300
-Message-Id: <1471027104-115213-26-git-send-email-kirill.shutemov@linux.intel.com>
-In-Reply-To: <1471027104-115213-1-git-send-email-kirill.shutemov@linux.intel.com>
-References: <1471027104-115213-1-git-send-email-kirill.shutemov@linux.intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <ming.lei@canonical.com>
+MIME-Version: 1.0
+In-Reply-To: <1470319801-20594-2-git-send-email-hch@lst.de>
+References: <1470319801-20594-1-git-send-email-hch@lst.de> <1470319801-20594-2-git-send-email-hch@lst.de>
+From: Ming Lei <ming.lei@canonical.com>
+Date: Thu, 4 Aug 2016 22:24:46 +0800
+Message-ID: <CACVXFVPLuXGG7y0U2_W-7mOAe8Ojy+uRfa3_cuhXYeXKpshQNg@mail.gmail.com>
+Subject: Re: [PATCH 1/2] loop: don't try to use AIO for discards
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Mike Christie <mchristi@redhat.com>,
+	Dave Chinner <david@fromorbit.com>, linux-block <linux-block@vger.kernel.org>,
+	Linux FS Devel <linux-fsdevel@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
-Adjust check on whether part of the page beyond file size and apply
-compound_head() and page_mapping() where appropriate.
+On Thu, Aug 4, 2016 at 10:10 PM, Christoph Hellwig <hch@lst.de> wrote:
+> Fix a fat-fingered conversion to the req_op accessors, and also
+> use a switch statement to make it more obvious what is being checked.
+>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Reported-by: Dave Chinner <david@fromorbit.com>
+> Fixes: c2df40 ("drivers: use req op accessor");
+> ---
+>  drivers/block/loop.c | 12 ++++++++----
+>  1 file changed, 8 insertions(+), 4 deletions(-)
+>
+> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> index 075377e..91c2c88 100644
+> --- a/drivers/block/loop.c
+> +++ b/drivers/block/loop.c
+> @@ -1659,11 +1659,15 @@ static int loop_queue_rq(struct blk_mq_hw_ctx *hctx,
+>         if (lo->lo_state != Lo_bound)
+>                 return -EIO;
+>
+> -       if (lo->use_dio && (req_op(cmd->rq) != REQ_OP_FLUSH ||
+> -           req_op(cmd->rq) == REQ_OP_DISCARD))
+> -               cmd->use_aio = true;
+> -       else
+> +       switch (req_op(cmd->rq)) {
+> +       case REQ_OP_FLUSH:
+> +       case REQ_OP_DISCARD:
+>                 cmd->use_aio = false;
+> +               break;
+> +       default:
+> +               cmd->use_aio = lo->use_dio;
+> +               break;
+> +       }
 
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
----
- fs/buffer.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+Reviewed-by: Ming Lei <ming.lei@canonical.com>
 
-diff --git a/fs/buffer.c b/fs/buffer.c
-index 7f50e5a63670..e53808e790e2 100644
---- a/fs/buffer.c
-+++ b/fs/buffer.c
-@@ -2502,7 +2502,7 @@ EXPORT_SYMBOL(block_commit_write);
- int block_page_mkwrite(struct vm_area_struct *vma, struct vm_fault *vmf,
- 			 get_block_t get_block)
- {
--	struct page *page = vmf->page;
-+	struct page *page = compound_head(vmf->page);
- 	struct inode *inode = file_inode(vma->vm_file);
- 	unsigned long end;
- 	loff_t size;
-@@ -2510,7 +2510,7 @@ int block_page_mkwrite(struct vm_area_struct *vma, struct vm_fault *vmf,
- 
- 	lock_page(page);
- 	size = i_size_read(inode);
--	if ((page->mapping != inode->i_mapping) ||
-+	if ((page_mapping(page) != inode->i_mapping) ||
- 	    (page_offset(page) > size)) {
- 		/* We overload EFAULT to mean page got truncated */
- 		ret = -EFAULT;
-@@ -2518,10 +2518,10 @@ int block_page_mkwrite(struct vm_area_struct *vma, struct vm_fault *vmf,
- 	}
- 
- 	/* page is wholly or partially inside EOF */
--	if (((page->index + 1) << PAGE_SHIFT) > size)
--		end = size & ~PAGE_MASK;
-+	if (((page->index + hpage_nr_pages(page)) << PAGE_SHIFT) > size)
-+		end = size & ~hpage_mask(page);
- 	else
--		end = PAGE_SIZE;
-+		end = hpage_size(page);
- 
- 	ret = __block_write_begin(page, 0, end, get_block);
- 	if (!ret)
--- 
-2.8.1
-
+>
+>         queue_kthread_work(&lo->worker, &cmd->work);
+>
+> --
+> 2.1.4
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-block" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
