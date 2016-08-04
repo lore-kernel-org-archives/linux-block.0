@@ -1,77 +1,102 @@
-Return-Path: <famz@redhat.com>
-From: Fam Zheng <famz@redhat.com>
-To: linux-kernel@vger.kernel.org
-Cc: linux-nvme@lists.infradead.org, Keith Busch <keith.busch@intel.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        linuxppc-dev@lists.ozlabs.org, "Michael S. Tsirkin" <mst@redhat.com>,
-        linux-block@vger.kernel.org,
-        Brian Norris <computersforpeace@gmail.com>,
-        Paul Mackerras <paulus@samba.org>, linux-mtd@lists.infradead.org,
-        "Ed L. Cashin" <ed.cashin@acm.org>, Jens Axboe <axboe@kernel.dk>,
-        Minchan Kim <minchan@kernel.org>,
-        virtualization@lists.linux-foundation.org,
-        Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
-        Nitin Gupta <ngupta@vflare.org>, David Woodhouse <dwmw2@infradead.org>
-Subject: [PATCH 04/15] block: Return error from blk_integrity_add
-Date: Wed, 17 Aug 2016 15:15:04 +0800
-Message-Id: <1471418115-3654-5-git-send-email-famz@redhat.com>
-In-Reply-To: <1471418115-3654-1-git-send-email-famz@redhat.com>
-References: <1471418115-3654-1-git-send-email-famz@redhat.com>
+Return-Path: <BATV+b244dc37f40e53d0e5a9+4729+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk
+Cc: ming.lei@canonical.com,
+	mchristi@redhat.com,
+	david@fromorbit.com,
+	linux-block@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org
+Subject: [PATCH 2/2] loop: make do_req_filebacked more robust
+Date: Thu,  4 Aug 2016 16:10:01 +0200
+Message-Id: <1470319801-20594-3-git-send-email-hch@lst.de>
+In-Reply-To: <1470319801-20594-1-git-send-email-hch@lst.de>
+References: <1470319801-20594-1-git-send-email-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-The kobject_init_and_add call in blk_integrity_add can fail, return the
-error code in this case, so that it can be handled in the caller.
-
-Signed-off-by: Fam Zheng <famz@redhat.com>
+Use a switch statement to iterate over the possible operations and
+error out if it's an incorrect one.
 ---
- block/blk-integrity.c | 12 ++++++++----
- include/linux/genhd.h |  4 ++--
- 2 files changed, 10 insertions(+), 6 deletions(-)
+ drivers/block/loop.c | 55 +++++++++++++++++++++-------------------------------
+ 1 file changed, 22 insertions(+), 33 deletions(-)
 
-diff --git a/block/blk-integrity.c b/block/blk-integrity.c
-index d69c5c7..437e09a 100644
---- a/block/blk-integrity.c
-+++ b/block/blk-integrity.c
-@@ -450,13 +450,17 @@ void blk_integrity_revalidate(struct gendisk *disk)
- 			~BDI_CAP_STABLE_WRITES;
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 91c2c88..c9f2107 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -510,14 +510,10 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
+ 	return 0;
  }
  
--void blk_integrity_add(struct gendisk *disk)
-+int blk_integrity_add(struct gendisk *disk)
+-
+-static inline int lo_rw_simple(struct loop_device *lo,
+-		struct request *rq, loff_t pos, bool rw)
++static int do_req_filebacked(struct loop_device *lo, struct request *rq)
  {
--	if (kobject_init_and_add(&disk->integrity_kobj, &integrity_ktype,
--				 &disk_to_dev(disk)->kobj, "%s", "integrity"))
--		return;
-+	int rc;
-+
-+	rc = kobject_init_and_add(&disk->integrity_kobj, &integrity_ktype,
-+				  &disk_to_dev(disk)->kobj, "%s", "integrity");
-+	if (rc)
-+		return rc;
+ 	struct loop_cmd *cmd = blk_mq_rq_to_pdu(rq);
+-
+-	if (cmd->use_aio)
+-		return lo_rw_aio(lo, cmd, pos, rw);
++	loff_t pos = ((loff_t) blk_rq_pos(rq) << 9) + lo->lo_offset;
  
- 	kobject_uevent(&disk->integrity_kobj, KOBJ_ADD);
-+	return 0;
+ 	/*
+ 	 * lo_write_simple and lo_read_simple should have been covered
+@@ -528,37 +524,30 @@ static inline int lo_rw_simple(struct loop_device *lo,
+ 	 * of the req at one time. And direct read IO doesn't need to
+ 	 * run flush_dcache_page().
+ 	 */
+-	if (rw == WRITE)
+-		return lo_write_simple(lo, rq, pos);
+-	else
+-		return lo_read_simple(lo, rq, pos);
+-}
+-
+-static int do_req_filebacked(struct loop_device *lo, struct request *rq)
+-{
+-	loff_t pos;
+-	int ret;
+-
+-	pos = ((loff_t) blk_rq_pos(rq) << 9) + lo->lo_offset;
+-
+-	if (op_is_write(req_op(rq))) {
+-		if (req_op(rq) == REQ_OP_FLUSH)
+-			ret = lo_req_flush(lo, rq);
+-		else if (req_op(rq) == REQ_OP_DISCARD)
+-			ret = lo_discard(lo, rq, pos);
+-		else if (lo->transfer)
+-			ret = lo_write_transfer(lo, rq, pos);
++	switch (req_op(rq)) {
++	case REQ_OP_FLUSH:
++		return lo_req_flush(lo, rq);
++	case REQ_OP_DISCARD:
++		return lo_discard(lo, rq, pos);
++	case REQ_OP_WRITE:
++		if (lo->transfer)
++			return lo_write_transfer(lo, rq, pos);
++		else if (cmd->use_aio)
++			return lo_rw_aio(lo, cmd, pos, WRITE);
+ 		else
+-			ret = lo_rw_simple(lo, rq, pos, WRITE);
+-
+-	} else {
++			return lo_write_simple(lo, rq, pos);
++	case REQ_OP_READ:
+ 		if (lo->transfer)
+-			ret = lo_read_transfer(lo, rq, pos);
++			return lo_read_transfer(lo, rq, pos);
++		else if (cmd->use_aio)
++			return lo_rw_aio(lo, cmd, pos, READ);
+ 		else
+-			ret = lo_rw_simple(lo, rq, pos, READ);
++			return lo_read_simple(lo, rq, pos);
++	default:
++		WARN_ON_ONCE(1);
++		return -EIO;
++		break;
+ 	}
+-
+-	return ret;
  }
  
- void blk_integrity_del(struct gendisk *disk)
-diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index b6fd666..85ce560 100644
---- a/include/linux/genhd.h
-+++ b/include/linux/genhd.h
-@@ -725,11 +725,11 @@ static inline void part_nr_sects_write(struct hd_struct *part, sector_t size)
- }
- 
- #if defined(CONFIG_BLK_DEV_INTEGRITY)
--extern void blk_integrity_add(struct gendisk *);
-+extern int blk_integrity_add(struct gendisk *);
- extern void blk_integrity_del(struct gendisk *);
- extern void blk_integrity_revalidate(struct gendisk *);
- #else	/* CONFIG_BLK_DEV_INTEGRITY */
--static inline void blk_integrity_add(struct gendisk *disk) { }
-+static inline int blk_integrity_add(struct gendisk *disk) { return 0; }
- static inline void blk_integrity_del(struct gendisk *disk) { }
- static inline void blk_integrity_revalidate(struct gendisk *disk) { }
- #endif	/* CONFIG_BLK_DEV_INTEGRITY */
+ struct switch_request {
 -- 
-2.7.4
+2.1.4
