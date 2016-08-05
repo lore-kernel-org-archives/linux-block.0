@@ -1,121 +1,118 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:35159 "EHLO mga09.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752429AbcHLSit (ORCPT <rfc822;linux-block@vger.kernel.org>);
-	Fri, 12 Aug 2016 14:38:49 -0400
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-	Andreas Dilger <adilger.kernel@dilger.ca>,
-	Jan Kara <jack@suse.com>,
-	Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-	Hugh Dickins <hughd@google.com>,
-	Andrea Arcangeli <aarcange@redhat.com>,
-	Dave Hansen <dave.hansen@intel.com>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	Matthew Wilcox <willy@infradead.org>,
-	Ross Zwisler <ross.zwisler@linux.intel.com>,
-	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	linux-block@vger.kernel.org,
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv2 20/41] mm: make write_cache_pages() work on huge pages
-Date: Fri, 12 Aug 2016 21:38:03 +0300
-Message-Id: <1471027104-115213-21-git-send-email-kirill.shutemov@linux.intel.com>
-In-Reply-To: <1471027104-115213-1-git-send-email-kirill.shutemov@linux.intel.com>
-References: <1471027104-115213-1-git-send-email-kirill.shutemov@linux.intel.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 4.8-rc1
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Message-ID: <0db36b42-0384-7bcd-395f-b510765c9f62@kernel.dk>
+Date: Fri, 5 Aug 2016 15:16:43 -0600
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8; format=flowed
+List-ID: <linux-block@vger.kernel.org>
 
-We writeback whole huge page a time. Let's adjust iteration this way.
+Hi Linus,
 
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
----
- include/linux/mm.h      |  1 +
- include/linux/pagemap.h |  1 +
- mm/page-writeback.c     | 17 ++++++++++++-----
- 3 files changed, 14 insertions(+), 5 deletions(-)
+Here's the 2nd round of block updates for this merge window. It's a mix
+of fixes for changes that went in previously in this round, and fixes in
+general. This pull request contains:
 
-diff --git a/include/linux/mm.h b/include/linux/mm.h
-index 08ed53eeedd5..b68d77912313 100644
---- a/include/linux/mm.h
-+++ b/include/linux/mm.h
-@@ -1054,6 +1054,7 @@ struct address_space *page_file_mapping(struct page *page)
-  */
- static inline pgoff_t page_index(struct page *page)
- {
-+	page = compound_head(page);
- 	if (unlikely(PageSwapCache(page)))
- 		return page_private(page);
- 	return page->index;
-diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
-index d9cf4e0f35dc..24e14ef1cfe5 100644
---- a/include/linux/pagemap.h
-+++ b/include/linux/pagemap.h
-@@ -518,6 +518,7 @@ static inline void wait_on_page_locked(struct page *page)
-  */
- static inline void wait_on_page_writeback(struct page *page)
- {
-+	page = compound_head(page);
- 	if (PageWriteback(page))
- 		wait_on_page_bit(page, PG_writeback);
- }
-diff --git a/mm/page-writeback.c b/mm/page-writeback.c
-index f4cd7d8005c9..6390c9488e29 100644
---- a/mm/page-writeback.c
-+++ b/mm/page-writeback.c
-@@ -2242,7 +2242,7 @@ retry:
- 			 * mapping. However, page->index will not change
- 			 * because we have a reference on the page.
- 			 */
--			if (page->index > end) {
-+			if (page_to_pgoff(page) > end) {
- 				/*
- 				 * can't be range_cyclic (1st pass) because
- 				 * end == -1 in that case.
-@@ -2251,7 +2251,12 @@ retry:
- 				break;
- 			}
- 
--			done_index = page->index;
-+			done_index = page_to_pgoff(page);
-+			if (PageTransCompound(page)) {
-+				index = round_up(index + 1, HPAGE_PMD_NR);
-+				i += HPAGE_PMD_NR -
-+					done_index % HPAGE_PMD_NR - 1;
-+			}
- 
- 			lock_page(page);
- 
-@@ -2263,7 +2268,7 @@ retry:
- 			 * even if there is now a new, dirty page at the same
- 			 * pagecache address.
- 			 */
--			if (unlikely(page->mapping != mapping)) {
-+			if (unlikely(page_mapping(page) != mapping)) {
- continue_unlock:
- 				unlock_page(page);
- 				continue;
-@@ -2301,7 +2306,8 @@ continue_unlock:
- 					 * not be suitable for data integrity
- 					 * writeout).
- 					 */
--					done_index = page->index + 1;
-+					done_index = compound_head(page)->index
-+						+ hpage_nr_pages(page);
- 					done = 1;
- 					break;
- 				}
-@@ -2313,7 +2319,8 @@ continue_unlock:
- 			 * keep going until we have written all the pages
- 			 * we tagged for writeback prior to entering this loop.
- 			 */
--			if (--wbc->nr_to_write <= 0 &&
-+			wbc->nr_to_write -= hpage_nr_pages(page);
-+			if (wbc->nr_to_write <= 0 &&
- 			    wbc->sync_mode == WB_SYNC_NONE) {
- 				done = 1;
- 				break;
+- Fixes for loop from Christoph
+
+- A bdi vs gendisk lifetime fix from Dan, worth two cookies.
+
+- A blk-mq timeout fix, when on frozen queues. From Gabriel.
+
+- Writeback fix from Jan, ensuring that __writeback_single_inode() does
+   the right thing.
+
+- Fix for bio->bi_rw usage in f2fs from me.
+
+- Error path deadlock fix in blk-mq sysfs registration from me.
+
+- Floppy O_ACCMODE fix from Jiri.
+
+- Fix to the new bio op methods from Mike. One more followup will be
+   coming here, ensuring that we don't propagate the block types outside
+   of block. That, and a rename of bio->bi_rw is coming right after -rc1
+   is cut.
+
+- Various little fixes
+
+Please pull!
+
+
+   git://git.kernel.dk/linux-block.git for-linus
+
+
+----------------------------------------------------------------
+Christoph Hellwig (2):
+       loop: don't try to use AIO for discards
+       loop: make do_req_filebacked more robust
+
+Dan Williams (1):
+       block: fix bdi vs gendisk lifetime mismatch
+
+Gabriel Krisman Bertazi (1):
+       blk-mq: Allow timeouts to run while queue is freezing
+
+Hou Tao (1):
+       blkcg: kill unused field nr_undestroyed_grps
+
+Jan Kara (1):
+       writeback: Write dirty times for WB_SYNC_ALL writeback
+
+Jens Axboe (2):
+       f2fs: drop bio->bi_rw manual assignment
+       blk-mq: fix deadlock in blk_mq_register_disk() error path
+
+Jiri Kosina (1):
+       floppy: fix open(O_ACCMODE) for ioctl-only open
+
+John Pittman (1):
+       Include: blkdev: Removed duplicate 'struct request;' declaration.
+
+Mike Christie (1):
+       mm/block: convert rw_page users to bio op use
+
+Paolo Valente (1):
+       block: add missing group association in bio-cloning functions
+
+Shaun Tancheff (1):
+       Fixup direct bi_rw modifiers
+
+Vegard Nossum (2):
+       block: fix use-after-free in seq file
+       nbd: fix race in ioctl
+
+  block/bio.c                      | 15 +++++++++
+  block/blk-mq-sysfs.c             | 12 ++++---
+  block/blk-mq.c                   | 15 ++++++++-
+  block/blk-throttle.c             |  5 ---
+  block/genhd.c                    |  3 +-
+  drivers/block/brd.c              | 17 +++++-----
+  drivers/block/floppy.c           | 21 ++++++-------
+  drivers/block/loop.c             | 67 
+++++++++++++++++++----------------------
+  drivers/block/nbd.c              | 12 +++----
+  drivers/block/zram/zram_drv.c    | 28 +++++++++--------
+  drivers/nvdimm/btt.c             | 18 +++++------
+  drivers/nvdimm/pmem.c            | 12 +++----
+  fs/block_dev.c                   |  7 +++--
+  fs/btrfs/extent_io.c             |  8 +----
+  fs/f2fs/data.c                   |  1 -
+  fs/fs-writeback.c                |  1 +
+  fs/mpage.c                       |  2 +-
+  include/linux/backing-dev-defs.h |  1 +
+  include/linux/backing-dev.h      |  1 +
+  include/linux/bio.h              |  3 ++
+  include/linux/blk_types.h        | 22 ++++++-------
+  include/linux/blkdev.h           |  3 +-
+  include/linux/fs.h               |  3 +-
+  include/linux/pagemap.h          |  2 +-
+  mm/backing-dev.c                 | 19 ++++++++++++
+  mm/filemap.c                     |  6 ++--
+  26 files changed, 168 insertions(+), 136 deletions(-)
+
+
 -- 
-2.8.1
-
+Jens Axboe
