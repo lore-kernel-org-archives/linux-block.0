@@ -1,38 +1,10 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:13486 "EHLO
-	mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1752072AbcHHQcl (ORCPT
-	<rfc822;linux-block@vger.kernel.org>);
-	Mon, 8 Aug 2016 12:32:41 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.11/8.16.0.11) with SMTP id u78GKFCq092220
-	for <linux-block@vger.kernel.org>; Mon, 8 Aug 2016 12:32:40 -0400
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 24nc1pyb34-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <linux-block@vger.kernel.org>; Mon, 08 Aug 2016 12:32:40 -0400
-Received: from localhost
-	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-	for <linux-block@vger.kernel.org> from <bblock@linux.vnet.ibm.com>;
-	Mon, 8 Aug 2016 17:32:39 +0100
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-	by d06dlp03.portsmouth.uk.ibm.com (Postfix) with ESMTP id 367D51B08023
-	for <linux-block@vger.kernel.org>; Mon,  8 Aug 2016 17:34:09 +0100 (BST)
-Received: from d06av05.portsmouth.uk.ibm.com (d06av05.portsmouth.uk.ibm.com [9.149.37.229])
-	by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id u78GWaEo8782222
-	for <linux-block@vger.kernel.org>; Mon, 8 Aug 2016 16:32:36 GMT
-Received: from d06av05.portsmouth.uk.ibm.com (localhost [127.0.0.1])
-	by d06av05.portsmouth.uk.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id u78GWapO029072
-	for <linux-block@vger.kernel.org>; Mon, 8 Aug 2016 10:32:36 -0600
-Received: from bblock-ThinkPad-W530 (dyn-9-152-212-142.boeblingen.de.ibm.com [9.152.212.142])
-	by d06av05.portsmouth.uk.ibm.com (8.14.4/8.14.4/NCO v10.0 AVin) with ESMTP id u78GWaJO029067
-	for <linux-block@vger.kernel.org>; Mon, 8 Aug 2016 10:32:36 -0600
-Date: Mon, 8 Aug 2016 18:32:36 +0200
+Return-Path: <bblock@linux.vnet.ibm.com>
+Date: Sun, 7 Aug 2016 17:49:30 +0200
 From: Benjamin Block <bblock@linux.vnet.ibm.com>
 To: Mike Snitzer <snitzer@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	dm-devel@redhat.com, linux-kernel@vger.kernel.org, hch@lst.de
-Subject: Re: [dm-devel] bug: using smp_processor_id() in preemptible code in
+Cc: Jens Axboe <axboe@kernel.dk>, dm-devel@redhat.com,
+        linux-kernel@vger.kernel.org, hch@lst.de, linux-block@vger.kernel.org
+Subject: Re: bug: using smp_processor_id() in preemptible code in
  rr_select_path()
 References: <20160803153545.GE20370@bblock-ThinkPad-W530>
  <20160805152705.GA17480@redhat.com>
@@ -43,9 +15,8 @@ References: <20160803153545.GE20370@bblock-ThinkPad-W530>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 In-Reply-To: <20160805160638.GA17651@redhat.com>
-Message-Id: <20160808163236.GB31352@bblock-ThinkPad-W530>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Message-Id: <20160807154930.GA31352@bblock-ThinkPad-W530>
+List-ID: <linux-block@vger.kernel.org>
 
 On 12:06 Fri 05 Aug     , Mike Snitzer wrote:
 > On Fri, Aug 05 2016 at 11:54am -0400,
@@ -91,7 +62,35 @@ On 12:06 Fri 05 Aug     , Mike Snitzer wrote:
 > > >>>>([<0000000000983784>] kernel_thread_starter+0x0/0xc)
 > > >>>>no locks held by kdmwork-252:0/881.
 > > >>>>
-[:snip:]
+> > >>>>
+> > >>>>There are several more of these warnings, but all have the same
+> > >>>>stack-trace (this is on s390x, but this looks like its only common code)
+> > >>>>- sometimes the process-context is multipath.
+> > >>>>
+> > >>>>Looking at the changes in this function, it rather looks like this is
+> > >>>>caused by changes made in commit
+> > >>>>b0b477c7e0dd93f8916d106018ded1331b81bf61 (dm round robin: use percpu
+> > >>>>'repeat_count' and 'current_path').
+> > >>>>
+> > >>>>The kernel is a stock v4.7 with some debug options enabled (prominently
+> > >>>>DEBUG_PREEMPT). Need any more info?
+> > >>>
+> > >>>As you can see from commit b0b477c7e0dd9 the round-robin path selector
+> > >>>is now using percpu data (pointer) and a percpu_counter.
+> > >>>
+> > >>>I'm really not sure how else to access this percpu data.
+> > >>>
+> > >>>Cc'ing LKML, linux-block, Jens and hch to cast a wider net in the hopes
+> > >>>of getting an answer to how to fix this.
+> > >>
+> > >>From a quick look, looks like you are using this_cpu_ptr() without
+> > >>having preemption disabled.
+> > >
+> > >Right, that is what it looked like to me too.
+> > >
+> > >I'm just not sure on what the proper pattern is to fix this.
+> > >
+> > >I'll look closer though.
 > > 
 > > I always forget the details (if this confuses lockdep or not), but you
 > > could potentially turn it into:
@@ -110,8 +109,12 @@ On 12:06 Fri 05 Aug     , Mike Snitzer wrote:
 > Benjamin, any chance you could test this against your v4.7 kernel and
 > report back?
 > 
-> Thanks,
-> Mike
+
+I will give it a go on Monday. Thx for the quick fix.
+
+
+- Benjamin
+
 > 
 > diff --git a/drivers/md/dm-round-robin.c b/drivers/md/dm-round-robin.c
 > index 4ace1da..ed446f8 100644
@@ -149,24 +152,8 @@ On 12:06 Fri 05 Aug     , Mike Snitzer wrote:
 >  }
 > 
 
-Ok, this works as far as the warnings don't appear anymore. But while
-applying the patch and thinking about it, why local_irq_save() and not
-preempt_disable()? "Sounds" like this is the function you want, and I
-also stumbled across this in Documentation/preempt-locking.txt:
-
-  But keep in mind that 'irqs disabled' is a fundamentally unsafe way of
-  disabling preemption - any spin_unlock() decreasing the preemption
-  count to 0 might trigger a reschedule. 
-
-The spinlock would do an other nested preempt_disable(), but those even
-out.
-
-
-                                                    Beste Gr��e / Best regards,
-                                                      - Benjamin Block
 -- 
 Linux on z Systems Development         /         IBM Systems & Technology Group
 		  IBM Deutschland Research & Development GmbH 
 Vorsitz. AufsR.: Martina Koederitz     /        Gesch�ftsf�hrung: Dirk Wittkopp
 Sitz der Gesellschaft: B�blingen / Registergericht: AmtsG Stuttgart, HRB 243294
-
