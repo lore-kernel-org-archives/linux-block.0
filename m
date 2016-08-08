@@ -1,69 +1,151 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-	Andreas Dilger <adilger.kernel@dilger.ca>,
-	Jan Kara <jack@suse.com>,
-	Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-	Hugh Dickins <hughd@google.com>,
-	Andrea Arcangeli <aarcange@redhat.com>,
-	Dave Hansen <dave.hansen@intel.com>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	Matthew Wilcox <willy@infradead.org>,
-	Ross Zwisler <ross.zwisler@linux.intel.com>,
-	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	linux-block@vger.kernel.org,
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv2 15/41] filemap: handle huge pages in do_generic_file_read()
-Date: Fri, 12 Aug 2016 21:37:58 +0300
-Message-Id: <1471027104-115213-16-git-send-email-kirill.shutemov@linux.intel.com>
-In-Reply-To: <1471027104-115213-1-git-send-email-kirill.shutemov@linux.intel.com>
-References: <1471027104-115213-1-git-send-email-kirill.shutemov@linux.intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <paolo.valente@linaro.org>
+From: Paolo Valente <paolo.valente@linaro.org>
+To: Jens Axboe <axboe@kernel.dk>,
+	Tejun Heo <tj@kernel.org>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ulf.hansson@linaro.org,
+	linus.walleij@linaro.org,
+	broonie@kernel.org,
+	Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH V2 08/22] block, cfq: get rid of latency tunables
+Date: Mon,  8 Aug 2016 13:15:03 +0200
+Message-Id: <1470654917-4280-9-git-send-email-paolo.valente@linaro.org>
+In-Reply-To: <1470654917-4280-1-git-send-email-paolo.valente@linaro.org>
+References: <1470654917-4280-1-git-send-email-paolo.valente@linaro.org>
 List-ID: <linux-block@vger.kernel.org>
 
-Most of work happans on head page. Only when we need to do copy data to
-userspace we find relevant subpage.
+BFQ guarantees a low latency for interactive applications in a
+completely different way with respect to CFQ. On the other hand, in
+terms of interface and exactly as CFQ does, BFQ exports a boolean
+low_latency tunable to switch low-latency heuristics on (in BFQ, these
+heuristics lowers latency for interactive and soft real-time
+applications). Finally, differently from CFQ, BFQ has not other
+latency tunable.
 
-We are still limited by PAGE_SIZE per iteration. Lifting this limitation
-would require some more work.
+Accordingly, this commit temporarily turns all latency tunables into
+fake tunables, by turning the functions for reading and writing these
+tunables into functions that just generate warnings. The commit
+introducing low-latency heuristics in BFQ then restores only the
+boolean low_latency tunable.
 
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
 ---
- mm/filemap.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ block/cfq-iosched.c | 36 ++++++++++++++++++++----------------
+ 1 file changed, 20 insertions(+), 16 deletions(-)
 
-diff --git a/mm/filemap.c b/mm/filemap.c
-index ae1d996fa089..9d7d70b265d4 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -1860,6 +1860,7 @@ find_page:
- 			if (unlikely(page == NULL))
- 				goto no_cached_page;
- 		}
-+		page = compound_head(page);
- 		if (PageReadahead(page)) {
- 			page_cache_async_readahead(mapping,
- 					ra, filp, page,
-@@ -1936,7 +1937,8 @@ page_ok:
- 		 * now we can copy it to user space...
- 		 */
+diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
+index 329ed2b..69c7c75 100644
+--- a/block/cfq-iosched.c
++++ b/block/cfq-iosched.c
+@@ -30,7 +30,6 @@ static const u64 cfq_slice_sync = NSEC_PER_SEC / 10;
+ static u64 cfq_slice_async = NSEC_PER_SEC / 25;
+ static const int cfq_slice_async_rq = 2;
+ static u64 cfq_slice_idle = NSEC_PER_SEC / 125;
+-static const u64 cfq_target_latency = (u64)NSEC_PER_SEC * 3/10; /* 300 ms */
+ static const int cfq_hist_divisor = 4;
  
--		ret = copy_page_to_iter(page, offset, nr, iter);
-+		ret = copy_page_to_iter(page + index - page->index, offset,
-+				nr, iter);
- 		offset += ret;
- 		index += offset >> PAGE_SHIFT;
- 		offset &= ~PAGE_MASK;
-@@ -2356,6 +2358,7 @@ page_not_uptodate:
- 	 * because there really aren't any performance issues here
- 	 * and we need to check for errors.
+ /*
+@@ -224,12 +223,9 @@ struct cfq_data {
+ 	unsigned int cfq_back_penalty;
+ 	unsigned int cfq_back_max;
+ 	unsigned int cfq_slice_async_rq;
+-	unsigned int cfq_latency;
+ 	u64 cfq_fifo_expire[2];
+ 	u64 cfq_slice[2];
+ 	u64 cfq_slice_idle;
+-	u64 cfq_group_idle;
+-	u64 cfq_target_latency;
+ 
+ 	/*
+ 	 * Fallback dummy cfqq for extreme OOM conditions
+@@ -1485,7 +1481,7 @@ static bool cfq_may_dispatch(struct cfq_data *cfqd, struct cfq_queue *cfqq)
+ 	 * We also ramp up the dispatch depth gradually for async IO,
+ 	 * based on the last sync IO we serviced
  	 */
-+	page = compound_head(page);
- 	ClearPageError(page);
- 	error = mapping->a_ops->readpage(file, page);
- 	if (!error) {
+-	if (!cfq_cfqq_sync(cfqq) && cfqd->cfq_latency) {
++	if (!cfq_cfqq_sync(cfqq)) {
+ 		u64 last_sync = ktime_get_ns() - cfqd->last_delayed_sync;
+ 		unsigned int depth;
+ 
+@@ -2323,10 +2319,8 @@ static int cfq_init_queue(struct request_queue *q, struct elevator_type *e)
+ 	cfqd->cfq_back_penalty = cfq_back_penalty;
+ 	cfqd->cfq_slice[0] = cfq_slice_async;
+ 	cfqd->cfq_slice[1] = cfq_slice_sync;
+-	cfqd->cfq_target_latency = cfq_target_latency;
+ 	cfqd->cfq_slice_async_rq = cfq_slice_async_rq;
+ 	cfqd->cfq_slice_idle = cfq_slice_idle;
+-	cfqd->cfq_latency = 1;
+ 	cfqd->hw_tag = -1;
+ 	/*
+ 	 * we optimistically start assuming sync ops weren't delayed in last
+@@ -2384,8 +2378,6 @@ SHOW_FUNCTION(cfq_slice_idle_show, cfqd->cfq_slice_idle, 1);
+ SHOW_FUNCTION(cfq_slice_sync_show, cfqd->cfq_slice[1], 1);
+ SHOW_FUNCTION(cfq_slice_async_show, cfqd->cfq_slice[0], 1);
+ SHOW_FUNCTION(cfq_slice_async_rq_show, cfqd->cfq_slice_async_rq, 0);
+-SHOW_FUNCTION(cfq_low_latency_show, cfqd->cfq_latency, 0);
+-SHOW_FUNCTION(cfq_target_latency_show, cfqd->cfq_target_latency, 1);
+ #undef SHOW_FUNCTION
+ 
+ #define USEC_SHOW_FUNCTION(__FUNC, __VAR)				\
+@@ -2399,7 +2391,6 @@ static ssize_t __FUNC(struct elevator_queue *e, char *page)		\
+ USEC_SHOW_FUNCTION(cfq_slice_idle_us_show, cfqd->cfq_slice_idle);
+ USEC_SHOW_FUNCTION(cfq_slice_sync_us_show, cfqd->cfq_slice[1]);
+ USEC_SHOW_FUNCTION(cfq_slice_async_us_show, cfqd->cfq_slice[0]);
+-USEC_SHOW_FUNCTION(cfq_target_latency_us_show, cfqd->cfq_target_latency);
+ #undef USEC_SHOW_FUNCTION
+ 
+ #define STORE_FUNCTION(__FUNC, __PTR, MIN, MAX, __CONV)			\
+@@ -2431,8 +2422,6 @@ STORE_FUNCTION(cfq_slice_sync_store, &cfqd->cfq_slice[1], 1, UINT_MAX, 1);
+ STORE_FUNCTION(cfq_slice_async_store, &cfqd->cfq_slice[0], 1, UINT_MAX, 1);
+ STORE_FUNCTION(cfq_slice_async_rq_store, &cfqd->cfq_slice_async_rq, 1,
+ 		UINT_MAX, 0);
+-STORE_FUNCTION(cfq_low_latency_store, &cfqd->cfq_latency, 0, 1, 0);
+-STORE_FUNCTION(cfq_target_latency_store, &cfqd->cfq_target_latency, 1, UINT_MAX, 1);
+ #undef STORE_FUNCTION
+ 
+ #define USEC_STORE_FUNCTION(__FUNC, __PTR, MIN, MAX)			\
+@@ -2451,12 +2440,27 @@ static ssize_t __FUNC(struct elevator_queue *e, const char *page, size_t count)
+ USEC_STORE_FUNCTION(cfq_slice_idle_us_store, &cfqd->cfq_slice_idle, 0, UINT_MAX);
+ USEC_STORE_FUNCTION(cfq_slice_sync_us_store, &cfqd->cfq_slice[1], 1, UINT_MAX);
+ USEC_STORE_FUNCTION(cfq_slice_async_us_store, &cfqd->cfq_slice[0], 1, UINT_MAX);
+-USEC_STORE_FUNCTION(cfq_target_latency_us_store, &cfqd->cfq_target_latency, 1, UINT_MAX);
+ #undef USEC_STORE_FUNCTION
+ 
++static ssize_t cfq_fake_lat_show(struct elevator_queue *e, char *page)
++{
++	pr_warn_once("CFQ I/O SCHED: tried to read removed latency tunable");
++	return sprintf(page, "0\n");
++}
++
++static ssize_t
++cfq_fake_lat_store(struct elevator_queue *e, const char *page, size_t count)
++{
++	pr_warn_once("CFQ I/O SCHED: tried to write removed latency tunable");
++	return count;
++}
++
+ #define CFQ_ATTR(name) \
+ 	__ATTR(name, S_IRUGO|S_IWUSR, cfq_##name##_show, cfq_##name##_store)
+ 
++#define CFQ_FAKE_LAT_ATTR(name) \
++	__ATTR(name, S_IRUGO|S_IWUSR, cfq_fake_lat_show, cfq_fake_lat_store)
++
+ static struct elv_fs_entry cfq_attrs[] = {
+ 	CFQ_ATTR(quantum),
+ 	CFQ_ATTR(fifo_expire_sync),
+@@ -2470,9 +2474,9 @@ static struct elv_fs_entry cfq_attrs[] = {
+ 	CFQ_ATTR(slice_async_rq),
+ 	CFQ_ATTR(slice_idle),
+ 	CFQ_ATTR(slice_idle_us),
+-	CFQ_ATTR(low_latency),
+-	CFQ_ATTR(target_latency),
+-	CFQ_ATTR(target_latency_us),
++	CFQ_FAKE_LAT_ATTR(low_latency),
++	CFQ_FAKE_LAT_ATTR(target_latency),
++	CFQ_FAKE_LAT_ATTR(target_latency_us),
+ 	__ATTR_NULL
+ };
+ 
 -- 
-2.8.1
-
+1.9.1
