@@ -1,283 +1,157 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:47101 "EHLO mga01.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752590AbcHOOMW (ORCPT <rfc822;linux-block@vger.kernel.org>);
-	Mon, 15 Aug 2016 10:12:22 -0400
-From: Adrian Hunter <adrian.hunter@intel.com>
-To: Jens Axboe <axboe@fb.com>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Ulf Hansson <ulf.hansson@linaro.org>,
-	linux-mmc@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] block: Fix secure erase
-Date: Mon, 15 Aug 2016 17:07:51 +0300
-Message-Id: <1471270071-28921-1-git-send-email-adrian.hunter@intel.com>
-In-Reply-To: <20160811140533.GA16543@lst.de>
-References: <20160811140533.GA16543@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <paolo.valente@linaro.org>
+From: Paolo Valente <paolo.valente@linaro.org>
+To: Jens Axboe <axboe@kernel.dk>,
+	Tejun Heo <tj@kernel.org>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ulf.hansson@linaro.org,
+	linus.walleij@linaro.org,
+	broonie@kernel.org,
+	Arianna Avanzini <avanzini.arianna@gmail.com>,
+	Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH V2 06/22] block, cfq: get rid of queue preemption
+Date: Mon,  8 Aug 2016 13:15:01 +0200
+Message-Id: <1470654917-4280-7-git-send-email-paolo.valente@linaro.org>
+In-Reply-To: <1470654917-4280-1-git-send-email-paolo.valente@linaro.org>
+References: <1470654917-4280-1-git-send-email-paolo.valente@linaro.org>
+List-ID: <linux-block@vger.kernel.org>
 
-Commit 288dab8a35a0 ("block: add a separate operation type for secure
-erase") split REQ_OP_SECURE_ERASE from REQ_OP_DISCARD without considering
-all the places REQ_OP_DISCARD was being used to mean either. Fix those.
+From: Arianna Avanzini <avanzini.arianna@gmail.com>
 
-Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
-Fixes: 288dab8a35a0 ("block: add a separate operation type for secure erase")
+CFQ implements a request-triggered queue preemption, based on the
+priority class of the queues, and aimed at reducing latencies. There
+is no such preemption in BFQ, where a low latency is guaranteed only
+by the overall request-scheduling policy.
+
+Signed-off-by: Arianna Avanzini <avanzini.arianna@gmail.com>
+Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
 ---
- block/bio.c              | 21 +++++++++++----------
- block/blk-merge.c        | 33 +++++++++++++++++++--------------
- block/elevator.c         |  5 ++++-
- drivers/mmc/card/block.c |  1 +
- drivers/mmc/card/queue.c |  3 ++-
- drivers/mmc/card/queue.h |  4 +++-
- include/linux/bio.h      | 10 ++++++++--
- include/linux/blkdev.h   |  6 ++++--
- kernel/trace/blktrace.c  |  2 +-
- 9 files changed, 53 insertions(+), 32 deletions(-)
+ block/cfq-iosched.c | 99 +----------------------------------------------------
+ 1 file changed, 1 insertion(+), 98 deletions(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index f39477538fef..aa7354088008 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -667,18 +667,19 @@ struct bio *bio_clone_bioset(struct bio *bio_src, gfp_t gfp_mask,
- 	bio->bi_iter.bi_sector	= bio_src->bi_iter.bi_sector;
- 	bio->bi_iter.bi_size	= bio_src->bi_iter.bi_size;
- 
--	if (bio_op(bio) == REQ_OP_DISCARD)
--		goto integrity_clone;
--
--	if (bio_op(bio) == REQ_OP_WRITE_SAME) {
-+	switch (bio_op(bio)) {
-+	case REQ_OP_DISCARD:
-+	case REQ_OP_SECURE_ERASE:
-+		break;
-+	case REQ_OP_WRITE_SAME:
- 		bio->bi_io_vec[bio->bi_vcnt++] = bio_src->bi_io_vec[0];
--		goto integrity_clone;
-+		break;
-+	default:
-+		bio_for_each_segment(bv, bio_src, iter)
-+			bio->bi_io_vec[bio->bi_vcnt++] = bv;
-+		break;
- 	}
- 
--	bio_for_each_segment(bv, bio_src, iter)
--		bio->bi_io_vec[bio->bi_vcnt++] = bv;
--
--integrity_clone:
- 	if (bio_integrity(bio_src)) {
- 		int ret;
- 
-@@ -1788,7 +1789,7 @@ struct bio *bio_split(struct bio *bio, int sectors,
- 	 * Discards need a mutable bio_vec to accommodate the payload
- 	 * required by the DSM TRIM and UNMAP commands.
- 	 */
--	if (bio_op(bio) == REQ_OP_DISCARD)
-+	if (bio_op(bio) == REQ_OP_DISCARD || bio_op(bio) == REQ_OP_SECURE_ERASE)
- 		split = bio_clone_bioset(bio, gfp, bs);
- 	else
- 		split = bio_clone_fast(bio, gfp, bs);
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 3eec75a9e91d..72627e3cf91e 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -172,12 +172,18 @@ void blk_queue_split(struct request_queue *q, struct bio **bio,
- 	struct bio *split, *res;
- 	unsigned nsegs;
- 
--	if (bio_op(*bio) == REQ_OP_DISCARD)
-+	switch (bio_op(*bio)) {
-+	case REQ_OP_DISCARD:
-+	case REQ_OP_SECURE_ERASE:
- 		split = blk_bio_discard_split(q, *bio, bs, &nsegs);
--	else if (bio_op(*bio) == REQ_OP_WRITE_SAME)
-+		break;
-+	case REQ_OP_WRITE_SAME:
- 		split = blk_bio_write_same_split(q, *bio, bs, &nsegs);
--	else
-+		break;
-+	default:
- 		split = blk_bio_segment_split(q, *bio, q->bio_split, &nsegs);
-+		break;
-+	}
- 
- 	/* physical segments can be figured out during splitting */
- 	res = split ? split : *bio;
-@@ -213,7 +219,7 @@ static unsigned int __blk_recalc_rq_segments(struct request_queue *q,
- 	 * This should probably be returning 0, but blk_add_request_payload()
- 	 * (Christoph!!!!)
- 	 */
--	if (bio_op(bio) == REQ_OP_DISCARD)
-+	if (bio_op(bio) == REQ_OP_DISCARD || bio_op(bio) == REQ_OP_SECURE_ERASE)
- 		return 1;
- 
- 	if (bio_op(bio) == REQ_OP_WRITE_SAME)
-@@ -385,7 +391,9 @@ static int __blk_bios_map_sg(struct request_queue *q, struct bio *bio,
- 	nsegs = 0;
- 	cluster = blk_queue_cluster(q);
- 
--	if (bio_op(bio) == REQ_OP_DISCARD) {
-+	switch (bio_op(bio)) {
-+	case REQ_OP_DISCARD:
-+	case REQ_OP_SECURE_ERASE:
- 		/*
- 		 * This is a hack - drivers should be neither modifying the
- 		 * biovec, nor relying on bi_vcnt - but because of
-@@ -393,19 +401,16 @@ static int __blk_bios_map_sg(struct request_queue *q, struct bio *bio,
- 		 * a payload we need to set up here (thank you Christoph) and
- 		 * bi_vcnt is really the only way of telling if we need to.
- 		 */
--
--		if (bio->bi_vcnt)
--			goto single_segment;
--
--		return 0;
--	}
--
--	if (bio_op(bio) == REQ_OP_WRITE_SAME) {
--single_segment:
-+		if (!bio->bi_vcnt)
-+			return 0;
-+		/* Fall through */
-+	case REQ_OP_WRITE_SAME:
- 		*sg = sglist;
- 		bvec = bio_iovec(bio);
- 		sg_set_page(*sg, bvec.bv_page, bvec.bv_len, bvec.bv_offset);
- 		return 1;
-+	default:
-+		break;
- 	}
- 
- 	for_each_bio(bio)
-diff --git a/block/elevator.c b/block/elevator.c
-index 7096c22041e7..e5924504aff6 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -366,7 +366,10 @@ void elv_dispatch_sort(struct request_queue *q, struct request *rq)
- 	list_for_each_prev(entry, &q->queue_head) {
- 		struct request *pos = list_entry_rq(entry);
- 
--		if ((req_op(rq) == REQ_OP_DISCARD) != (req_op(pos) == REQ_OP_DISCARD))
-+		if ((req_op(rq) == REQ_OP_DISCARD ||
-+		     req_op(rq) == REQ_OP_SECURE_ERASE) !=
-+		    (req_op(pos) == REQ_OP_DISCARD ||
-+		     req_op(pos) == REQ_OP_SECURE_ERASE))
- 			break;
- 		if (rq_data_dir(rq) != rq_data_dir(pos))
- 			break;
-diff --git a/drivers/mmc/card/block.c b/drivers/mmc/card/block.c
-index 48a5dd740f3b..82503e6f04b3 100644
---- a/drivers/mmc/card/block.c
-+++ b/drivers/mmc/card/block.c
-@@ -1726,6 +1726,7 @@ static u8 mmc_blk_prep_packed_list(struct mmc_queue *mq, struct request *req)
- 			break;
- 
- 		if (req_op(next) == REQ_OP_DISCARD ||
-+		    req_op(next) == REQ_OP_SECURE_ERASE ||
- 		    req_op(next) == REQ_OP_FLUSH)
- 			break;
- 
-diff --git a/drivers/mmc/card/queue.c b/drivers/mmc/card/queue.c
-index bf14642a576a..29578e98603d 100644
---- a/drivers/mmc/card/queue.c
-+++ b/drivers/mmc/card/queue.c
-@@ -33,7 +33,8 @@ static int mmc_prep_request(struct request_queue *q, struct request *req)
- 	/*
- 	 * We only like normal block requests and discards.
- 	 */
--	if (req->cmd_type != REQ_TYPE_FS && req_op(req) != REQ_OP_DISCARD) {
-+	if (req->cmd_type != REQ_TYPE_FS && req_op(req) != REQ_OP_DISCARD &&
-+	    req_op(req) != REQ_OP_SECURE_ERASE) {
- 		blk_dump_rq_flags(req, "MMC bad request");
- 		return BLKPREP_KILL;
- 	}
-diff --git a/drivers/mmc/card/queue.h b/drivers/mmc/card/queue.h
-index d62531124d54..fee5e1271465 100644
---- a/drivers/mmc/card/queue.h
-+++ b/drivers/mmc/card/queue.h
-@@ -4,7 +4,9 @@
- static inline bool mmc_req_is_special(struct request *req)
- {
- 	return req &&
--		(req_op(req) == REQ_OP_FLUSH || req_op(req) == REQ_OP_DISCARD);
-+		(req_op(req) == REQ_OP_FLUSH ||
-+		 req_op(req) == REQ_OP_DISCARD ||
-+		 req_op(req) == REQ_OP_SECURE_ERASE);
+diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
+index afe42fc..5e0daaf 100644
+--- a/block/cfq-iosched.c
++++ b/block/cfq-iosched.c
+@@ -1087,8 +1087,7 @@ static inline void cfq_slice_expired(struct cfq_data *cfqd, bool timed_out)
  }
  
- struct request;
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 59ffaa68b11b..23ddf4b46a9b 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -71,7 +71,8 @@ static inline bool bio_has_data(struct bio *bio)
+ /*
+- * Get next queue for service. Unless we have a queue preemption,
+- * we'll simply select the first cfqq in the service tree.
++ * Get next queue for service.
+  */
+ static struct cfq_queue *cfq_get_next_queue(struct cfq_data *cfqd)
  {
- 	if (bio &&
- 	    bio->bi_iter.bi_size &&
--	    bio_op(bio) != REQ_OP_DISCARD)
-+	    bio_op(bio) != REQ_OP_DISCARD &&
-+	    bio_op(bio) != REQ_OP_SECURE_ERASE)
- 		return true;
- 
- 	return false;
-@@ -79,7 +80,9 @@ static inline bool bio_has_data(struct bio *bio)
- 
- static inline bool bio_no_advance_iter(struct bio *bio)
- {
--	return bio_op(bio) == REQ_OP_DISCARD || bio_op(bio) == REQ_OP_WRITE_SAME;
-+	return bio_op(bio) == REQ_OP_DISCARD ||
-+	       bio_op(bio) == REQ_OP_SECURE_ERASE ||
-+	       bio_op(bio) == REQ_OP_WRITE_SAME;
+@@ -1953,93 +1952,6 @@ cfq_update_idle_window(struct cfq_data *cfqd, struct cfq_queue *cfqq,
  }
  
- static inline bool bio_is_rw(struct bio *bio)
-@@ -199,6 +202,9 @@ static inline unsigned bio_segments(struct bio *bio)
- 	if (bio_op(bio) == REQ_OP_DISCARD)
- 		return 1;
+ /*
+- * Check if new_cfqq should preempt the currently active queue. Return 0 for
+- * no or if we aren't sure, a 1 will cause a preempt.
+- */
+-static bool
+-cfq_should_preempt(struct cfq_data *cfqd, struct cfq_queue *new_cfqq,
+-		   struct request *rq)
+-{
+-	struct cfq_queue *cfqq;
+-
+-	cfqq = cfqd->active_queue;
+-	if (!cfqq)
+-		return false;
+-
+-	if (cfq_class_idle(new_cfqq))
+-		return false;
+-
+-	if (cfq_class_idle(cfqq))
+-		return true;
+-
+-	/*
+-	 * Don't allow a non-RT request to preempt an ongoing RT cfqq timeslice.
+-	 */
+-	if (cfq_class_rt(cfqq) && !cfq_class_rt(new_cfqq))
+-		return false;
+-
+-	/*
+-	 * if the new request is sync, but the currently running queue is
+-	 * not, let the sync request have priority.
+-	 */
+-	if (rq_is_sync(rq) && !cfq_cfqq_sync(cfqq))
+-		return true;
+-
+-	if (cfq_slice_used(cfqq))
+-		return true;
+-
+-	/*
+-	 * Allow an RT request to pre-empt an ongoing non-RT cfqq timeslice.
+-	 */
+-	if (cfq_class_rt(new_cfqq) && !cfq_class_rt(cfqq))
+-		return true;
+-
+-	WARN_ON_ONCE(cfqq->ioprio_class != new_cfqq->ioprio_class);
+-	/* Allow preemption only if we are idling on sync-noidle tree */
+-	if (cfqd->serving_wl_type == SYNC_NOIDLE_WORKLOAD &&
+-	    cfqq_type(new_cfqq) == SYNC_NOIDLE_WORKLOAD &&
+-	    RB_EMPTY_ROOT(&cfqq->sort_list))
+-		return true;
+-
+-	/*
+-	 * So both queues are sync. Let the new request get disk time if
+-	 * it's a metadata request and the current queue is doing regular IO.
+-	 */
+-	if ((rq->cmd_flags & REQ_PRIO) && !cfqq->prio_pending)
+-		return true;
+-
+-	/* An idle queue should not be idle now for some reason */
+-	if (RB_EMPTY_ROOT(&cfqq->sort_list) && !cfq_should_idle(cfqd, cfqq))
+-		return true;
+-
+-	if (!cfqd->active_cic || !cfq_cfqq_wait_request(cfqq))
+-		return false;
+-
+-	return false;
+-}
+-
+-/*
+- * cfqq preempts the active queue. if we allowed preempt with no slice left,
+- * let it have half of its nominal slice.
+- */
+-static void cfq_preempt_queue(struct cfq_data *cfqd, struct cfq_queue *cfqq)
+-{
+-	cfq_log_cfqq(cfqd, cfqq, "preempt");
+-	cfq_slice_expired(cfqd, 1);
+-
+-	/*
+-	 * Put the new queue at the front of the of the current list,
+-	 * so we know that it will be selected next.
+-	 */
+-	BUG_ON(!cfq_cfqq_on_rr(cfqq));
+-
+-	cfq_service_tree_add(cfqd, cfqq, 1);
+-
+-	cfqq->slice_end = 0;
+-	cfq_mark_cfqq_slice_new(cfqq);
+-}
+-
+-/*
+  * Called when a new fs request (rq) is added (to cfqq). Check if there's
+  * something we should do about it
+  */
+@@ -2079,15 +1991,6 @@ cfq_rq_enqueued(struct cfq_data *cfqd, struct cfq_queue *cfqq,
+ 			} else
+ 				cfq_mark_cfqq_must_dispatch(cfqq);
+ 		}
+-	} else if (cfq_should_preempt(cfqd, cfqq, rq)) {
+-		/*
+-		 * not the active queue - expire current slice if it is
+-		 * idle and has expired it's mean thinktime or this new queue
+-		 * has some old slice time left and is of higher priority or
+-		 * this new queue is RT and the current one is BE
+-		 */
+-		cfq_preempt_queue(cfqd, cfqq);
+-		__blk_run_queue(cfqd->queue);
+ 	}
+ }
  
-+	if (bio_op(bio) == REQ_OP_SECURE_ERASE)
-+		return 1;
-+
- 	if (bio_op(bio) == REQ_OP_WRITE_SAME)
- 		return 1;
- 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 2c210b6a7bcf..e79055c8b577 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -882,7 +882,7 @@ static inline unsigned int blk_rq_cur_sectors(const struct request *rq)
- static inline unsigned int blk_queue_get_max_sectors(struct request_queue *q,
- 						     int op)
- {
--	if (unlikely(op == REQ_OP_DISCARD))
-+	if (unlikely(op == REQ_OP_DISCARD || op == REQ_OP_SECURE_ERASE))
- 		return min(q->limits.max_discard_sectors, UINT_MAX >> 9);
- 
- 	if (unlikely(op == REQ_OP_WRITE_SAME))
-@@ -913,7 +913,9 @@ static inline unsigned int blk_rq_get_max_sectors(struct request *rq,
- 	if (unlikely(rq->cmd_type != REQ_TYPE_FS))
- 		return q->limits.max_hw_sectors;
- 
--	if (!q->limits.chunk_sectors || (req_op(rq) == REQ_OP_DISCARD))
-+	if (!q->limits.chunk_sectors ||
-+	    req_op(rq) == REQ_OP_DISCARD ||
-+	    req_op(rq) == REQ_OP_SECURE_ERASE)
- 		return blk_queue_get_max_sectors(q, req_op(rq));
- 
- 	return min(blk_max_size_offset(q, offset),
-diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-index 7598e6ca817a..dbafc5df03f3 100644
---- a/kernel/trace/blktrace.c
-+++ b/kernel/trace/blktrace.c
-@@ -223,7 +223,7 @@ static void __blk_add_trace(struct blk_trace *bt, sector_t sector, int bytes,
- 	what |= MASK_TC_BIT(op_flags, META);
- 	what |= MASK_TC_BIT(op_flags, PREFLUSH);
- 	what |= MASK_TC_BIT(op_flags, FUA);
--	if (op == REQ_OP_DISCARD)
-+	if (op == REQ_OP_DISCARD || op == REQ_OP_SECURE_ERASE)
- 		what |= BLK_TC_ACT(BLK_TC_DISCARD);
- 	if (op == REQ_OP_FLUSH)
- 		what |= BLK_TC_ACT(BLK_TC_FLUSH);
 -- 
 1.9.1
-
