@@ -1,875 +1,294 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-	Andreas Dilger <adilger.kernel@dilger.ca>,
-	Jan Kara <jack@suse.com>,
-	Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-	Hugh Dickins <hughd@google.com>,
-	Andrea Arcangeli <aarcange@redhat.com>,
-	Dave Hansen <dave.hansen@intel.com>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	Matthew Wilcox <willy@infradead.org>,
-	Ross Zwisler <ross.zwisler@linux.intel.com>,
-	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	linux-block@vger.kernel.org,
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv2 07/41] mm, shmem: swich huge tmpfs to multi-order radix-tree entries
-Date: Fri, 12 Aug 2016 21:37:50 +0300
-Message-Id: <1471027104-115213-8-git-send-email-kirill.shutemov@linux.intel.com>
-In-Reply-To: <1471027104-115213-1-git-send-email-kirill.shutemov@linux.intel.com>
-References: <1471027104-115213-1-git-send-email-kirill.shutemov@linux.intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <paolo.valente@linaro.org>
+From: Paolo Valente <paolo.valente@linaro.org>
+To: Jens Axboe <axboe@kernel.dk>,
+	Tejun Heo <tj@kernel.org>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ulf.hansson@linaro.org,
+	linus.walleij@linaro.org,
+	broonie@kernel.org,
+	Paolo Valente <paolo.valente@linaro.org>,
+	Arianna Avanzini <avanzini.arianna@gmail.com>
+Subject: [PATCH V2 12/22] block, bfq: modify the peak-rate estimator
+Date: Mon,  8 Aug 2016 13:15:07 +0200
+Message-Id: <1470654917-4280-13-git-send-email-paolo.valente@linaro.org>
+In-Reply-To: <1470654917-4280-1-git-send-email-paolo.valente@linaro.org>
+References: <1470654917-4280-1-git-send-email-paolo.valente@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
-We would need to use multi-order radix-tree entires for ext4 and other
-filesystems to have coherent view on tags (dirty/towrite) in the tree.
+Unless the maximum budget B_max that BFQ can assign to a queue is set
+explicitly by the user, BFQ automatically updates B_max. In
+particular, BFQ dynamically sets B_max to the number of sectors that
+can be read, at the current estimated peak rate, during the maximum
+time, T_max, allowed before a budget timeout occurs. In formulas, if
+we denote as R_est the estimated peak rate, then B_max = T_max ∗
+R_est. Hence, the higher R_est is with respect to the actual device
+peak rate, the higher the probability that processes incur budget
+timeouts unjustly is. Besides, a too high value of B_max unnecessarily
+increases the deviation from an ideal, smooth service.
 
-This patch converts huge tmpfs implementation to multi-order entries, so
-we will be able to use the same code patch for all filesystems.
+To filter out spikes, the estimated peak rate is updated only on the
+expiration of queues that have been served for a long-enough time.  As
+a first step, the estimator computes the device rate, R_meas, during
+the service of the queue. After that, if R_est < R_meas, then R_est is
+set to R_meas.
 
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+Unfortunately, our experiments highlighted the following two
+problems. First, because of ZBR, depending on the locality of the
+workload, the estimator may easily converge to a value that is
+appropriate only for part of a disk. Second, R_est may jump (and
+remain forever equal) to a much higher value than the actual device
+peak rate, in case of hits in the drive cache, which may let sectors
+be transferred in practice at bus rate.
+
+To try to converge to the actual average peak rate over the disk
+surface (in case of rotational devices), and to smooth the spikes
+caused by the drive cache, this patch changes the estimator as
+follows. In the description of the changes, we refer to a queue
+containing random requests as 'seeky', according to the terminology
+used in the code, and inherited from CFQ.
+
+- First, now R_est may be updated also in case the just-expired queue,
+  despite not being detected as seeky, has not been however able to
+  consume all of its budget within the maximum time slice T_max. In
+  fact, this is an indication that B_max is too large. Since B_max =
+  T_max ∗ R_est, R_est is then probably too large, and should be
+  reduced.
+
+- Second, to filter the spikes in R_meas, a discrete low-pass filter
+  is now used to update R_est instead of just keeping the highest rate
+  sampled. The rationale is that the average peak rate of a disk over
+  its surface is a relatively stable quantity, hence a low-pass filter
+  should converge more or less quickly to the right value.
+
+With the current values of the constants used in the filter, the
+latter seems to effectively smooth fluctuations and allow the
+estimator to converge to the actual peak rate with all the devices we
+tested.
+
+Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+Signed-off-by: Arianna Avanzini <avanzini.arianna@gmail.com>
 ---
- mm/filemap.c     | 320 +++++++++++++++++++++++++++++++++----------------------
- mm/huge_memory.c |  47 +++++---
- mm/khugepaged.c  |  26 ++---
- mm/shmem.c       |  36 ++-----
- 4 files changed, 247 insertions(+), 182 deletions(-)
+ block/cfq-iosched.c | 131 ++++++++++++++++++++++++++++++++++++----------------
+ 1 file changed, 92 insertions(+), 39 deletions(-)
 
-diff --git a/mm/filemap.c b/mm/filemap.c
-index 3083ded98b15..eca8740d2d02 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -114,7 +114,7 @@ static void page_cache_tree_delete(struct address_space *mapping,
- 				   struct page *page, void *shadow)
- {
- 	struct radix_tree_node *node;
--	int i, nr = PageHuge(page) ? 1 : hpage_nr_pages(page);
-+	int nr = PageHuge(page) ? 1 : hpage_nr_pages(page);
- 
- 	VM_BUG_ON_PAGE(!PageLocked(page), page);
- 	VM_BUG_ON_PAGE(PageTail(page), page);
-@@ -132,36 +132,32 @@ static void page_cache_tree_delete(struct address_space *mapping,
- 	}
- 	mapping->nrpages -= nr;
- 
--	for (i = 0; i < nr; i++) {
--		node = radix_tree_replace_clear_tags(&mapping->page_tree,
--				page->index + i, shadow);
--		if (!node) {
--			VM_BUG_ON_PAGE(nr != 1, page);
--			return;
--		}
-+	node = radix_tree_replace_clear_tags(&mapping->page_tree,
-+			page->index, shadow);
-+	if (!node)
-+		return;
- 
--		workingset_node_pages_dec(node);
--		if (shadow)
--			workingset_node_shadows_inc(node);
--		else
--			if (__radix_tree_delete_node(&mapping->page_tree, node))
--				continue;
-+	workingset_node_pages_dec(node);
-+	if (shadow)
-+		workingset_node_shadows_inc(node);
-+	else
-+		if (__radix_tree_delete_node(&mapping->page_tree, node))
-+			return;
- 
--		/*
--		 * Track node that only contains shadow entries. DAX mappings
--		 * contain no shadow entries and may contain other exceptional
--		 * entries so skip those.
--		 *
--		 * Avoid acquiring the list_lru lock if already tracked.
--		 * The list_empty() test is safe as node->private_list is
--		 * protected by mapping->tree_lock.
--		 */
--		if (!dax_mapping(mapping) && !workingset_node_pages(node) &&
--				list_empty(&node->private_list)) {
--			node->private_data = mapping;
--			list_lru_add(&workingset_shadow_nodes,
--					&node->private_list);
--		}
-+	/*
-+	 * Track node that only contains shadow entries. DAX mappings
-+	 * contain no shadow entries and may contain other exceptional
-+	 * entries so skip those.
-+	 *
-+	 * Avoid acquiring the list_lru lock if already tracked.
-+	 * The list_empty() test is safe as node->private_list is
-+	 * protected by mapping->tree_lock.
-+	 */
-+	if (!dax_mapping(mapping) && !workingset_node_pages(node) &&
-+			list_empty(&node->private_list)) {
-+		node->private_data = mapping;
-+		list_lru_add(&workingset_shadow_nodes,
-+				&node->private_list);
- 	}
+diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
+index f9612b8..e7fb5f5 100644
+--- a/block/cfq-iosched.c
++++ b/block/cfq-iosched.c
+@@ -3870,48 +3870,83 @@ static void __bfq_bfqq_recalc_budget(struct bfq_data *bfqd,
+ 			bfqq->entity.budget);
  }
  
-@@ -264,12 +260,7 @@ void delete_from_page_cache(struct page *page)
- 	if (freepage)
- 		freepage(page);
- 
--	if (PageTransHuge(page) && !PageHuge(page)) {
--		page_ref_sub(page, HPAGE_PMD_NR);
--		VM_BUG_ON_PAGE(page_count(page) <= 0, page);
--	} else {
--		put_page(page);
--	}
-+	put_page(page);
+-static unsigned long bfq_calc_max_budget(u64 peak_rate, u64 timeout)
++static unsigned long bfq_calc_max_budget(struct bfq_data *bfqd)
+ {
+-	unsigned long max_budget;
+-
+ 	/*
+ 	 * The max_budget calculated when autotuning is equal to the
+ 	 * amount of sectors transferred in timeout at the
+ 	 * estimated peak rate.
+ 	 */
+-	max_budget = (unsigned long)(peak_rate * 1000 *
+-				     timeout >> BFQ_RATE_SHIFT);
+-
+-	return max_budget;
++	return bfqd->peak_rate * 1000 * jiffies_to_msecs(bfqd->bfq_timeout) >>
++		BFQ_RATE_SHIFT;
  }
- EXPORT_SYMBOL(delete_from_page_cache);
  
-@@ -1073,7 +1064,7 @@ EXPORT_SYMBOL(page_cache_prev_hole);
- struct page *find_get_entry(struct address_space *mapping, pgoff_t offset)
- {
- 	void **pagep;
--	struct page *head, *page;
-+	struct page *page;
- 
- 	rcu_read_lock();
- repeat:
-@@ -1094,25 +1085,25 @@ repeat:
- 			goto out;
- 		}
- 
--		head = compound_head(page);
--		if (!page_cache_get_speculative(head))
-+		if (!page_cache_get_speculative(page))
- 			goto repeat;
- 
--		/* The page was split under us? */
--		if (compound_head(page) != head) {
--			put_page(head);
--			goto repeat;
--		}
--
- 		/*
- 		 * Has the page moved?
- 		 * This is part of the lockless pagecache protocol. See
- 		 * include/linux/pagemap.h for details.
- 		 */
- 		if (unlikely(page != *pagep)) {
--			put_page(head);
-+			put_page(page);
- 			goto repeat;
- 		}
-+
-+		/* For multi-order entries, find relevant subpage */
-+		if (PageTransHuge(page)) {
-+			VM_BUG_ON(offset - page->index < 0);
-+			VM_BUG_ON(offset - page->index >= HPAGE_PMD_NR);
-+			page += offset - page->index;
-+		}
- 	}
- out:
- 	rcu_read_unlock();
-@@ -1275,7 +1266,7 @@ unsigned find_get_entries(struct address_space *mapping,
- 			  struct page **entries, pgoff_t *indices)
- {
- 	void **slot;
--	unsigned int ret = 0;
-+	unsigned int refs, ret = 0;
- 	struct radix_tree_iter iter;
- 
- 	if (!nr_entries)
-@@ -1283,7 +1274,10 @@ unsigned find_get_entries(struct address_space *mapping,
- 
- 	rcu_read_lock();
- 	radix_tree_for_each_slot(slot, &mapping->page_tree, &iter, start) {
--		struct page *head, *page;
-+		struct page *page;
-+		unsigned long index = iter.index;
-+		if (index < start)
-+			index = start;
- repeat:
- 		page = radix_tree_deref_slot(slot);
- 		if (unlikely(!page))
-@@ -1301,26 +1295,38 @@ repeat:
- 			goto export;
- 		}
- 
--		head = compound_head(page);
--		if (!page_cache_get_speculative(head))
-+		if (!page_cache_get_speculative(page))
- 			goto repeat;
- 
--		/* The page was split under us? */
--		if (compound_head(page) != head) {
--			put_page(head);
--			goto repeat;
--		}
--
- 		/* Has the page moved? */
- 		if (unlikely(page != *slot)) {
--			put_page(head);
-+			put_page(page);
- 			goto repeat;
- 		}
-+
-+		/* For multi-order entries, find relevant subpage */
-+		if (PageTransHuge(page)) {
-+			VM_BUG_ON(index - page->index < 0);
-+			VM_BUG_ON(index - page->index >= HPAGE_PMD_NR);
-+			page += index - page->index;
-+		}
- export:
--		indices[ret] = iter.index;
-+		indices[ret] = index;
- 		entries[ret] = page;
- 		if (++ret == nr_entries)
- 			break;
-+		if (radix_tree_exception(page) || !PageTransCompound(page))
-+			continue;
-+		for (refs = 0; ret < nr_entries &&
-+				(index + 1) % HPAGE_PMD_NR;
-+				ret++, refs++) {
-+			indices[ret] = ++index;
-+			entries[ret] = ++page;
-+		}
-+		if (refs)
-+			page_ref_add(compound_head(page), refs);
-+		if (ret == nr_entries)
-+			break;
- 	}
- 	rcu_read_unlock();
- 	return ret;
-@@ -1347,14 +1353,17 @@ unsigned find_get_pages(struct address_space *mapping, pgoff_t start,
- {
- 	struct radix_tree_iter iter;
- 	void **slot;
--	unsigned ret = 0;
-+	unsigned refs, ret = 0;
- 
- 	if (unlikely(!nr_pages))
- 		return 0;
- 
- 	rcu_read_lock();
- 	radix_tree_for_each_slot(slot, &mapping->page_tree, &iter, start) {
--		struct page *head, *page;
-+		struct page *page;
-+		unsigned long index = iter.index;
-+		if (index < start)
-+			index = start;
- repeat:
- 		page = radix_tree_deref_slot(slot);
- 		if (unlikely(!page))
-@@ -1373,25 +1382,35 @@ repeat:
- 			continue;
- 		}
- 
--		head = compound_head(page);
--		if (!page_cache_get_speculative(head))
-+		if (!page_cache_get_speculative(page))
- 			goto repeat;
- 
--		/* The page was split under us? */
--		if (compound_head(page) != head) {
--			put_page(head);
--			goto repeat;
--		}
--
- 		/* Has the page moved? */
- 		if (unlikely(page != *slot)) {
--			put_page(head);
-+			put_page(page);
- 			goto repeat;
- 		}
- 
-+		/* For multi-order entries, find relevant subpage */
-+		if (PageTransHuge(page)) {
-+			VM_BUG_ON(index - page->index < 0);
-+			VM_BUG_ON(index - page->index >= HPAGE_PMD_NR);
-+			page += index - page->index;
-+		}
-+
- 		pages[ret] = page;
- 		if (++ret == nr_pages)
- 			break;
-+		if (!PageTransCompound(page))
-+			continue;
-+		for (refs = 0; ret < nr_pages &&
-+				(index + 1) % HPAGE_PMD_NR;
-+				ret++, refs++, index++)
-+			pages[ret] = ++page;
-+		if (refs)
-+			page_ref_add(compound_head(page), refs);
-+		if (ret == nr_pages)
-+			break;
- 	}
- 
- 	rcu_read_unlock();
-@@ -1410,19 +1429,22 @@ repeat:
-  *
-  * find_get_pages_contig() returns the number of pages which were found.
+ /*
+- * In addition to updating the peak rate, checks whether the process
+- * is "slow", and returns 1 if so. This slow flag is used, in addition
+- * to the budget timeout, to reduce the amount of service provided to
+- * seeky processes, and hence reduce their chances to lower the
+- * throughput. See the code for more details.
++ * Update the read peak rate (quantity used for auto-tuning) as a
++ * function of the rate at which bfqq has been served, and check
++ * whether the process associated with bfqq is "slow". Return true if
++ * the process is slow. The slow flag is used, in addition to the
++ * budget timeout, to reduce the amount of service provided to seeky
++ * processes, and hence reduce their chances to lower the
++ * throughput. More details in the body of the function.
++ *
++ * An important observation is in order: with devices with internal
++ * queues, it is hard if ever possible to know when and for how long
++ * an I/O request is processed by the device (apart from the trivial
++ * I/O pattern where a new request is dispatched only after the
++ * previous one has been completed). This makes it hard to evaluate
++ * the real rate at which the I/O requests of each bfq_queue are
++ * served.  In fact, for an I/O scheduler like BFQ, serving a
++ * bfq_queue means just dispatching its requests during its service
++ * slot, i.e., until the budget of the queue is exhausted, or the
++ * queue remains idle, or, finally, a timeout fires. But, during the
++ * service slot of a bfq_queue, the device may be still processing
++ * requests of bfq_queues served in previous service slots. On the
++ * opposite end, the requests of the in-service bfq_queue may be
++ * completed after the service slot of the queue finishes. Anyway,
++ * unless more sophisticated solutions are used (where possible), the
++ * sum of the sizes of the requests dispatched during the service slot
++ * of a bfq_queue is probably the only approximation available for
++ * the service received by the bfq_queue during its service slot. And,
++ * as written above, this sum is the quantity used in this function to
++ * evaluate the peak rate.
   */
--unsigned find_get_pages_contig(struct address_space *mapping, pgoff_t index,
-+unsigned find_get_pages_contig(struct address_space *mapping, pgoff_t start,
- 			       unsigned int nr_pages, struct page **pages)
+ static bool bfq_update_peak_rate(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+-				 bool compensate)
++				 bool compensate, enum bfqq_expiration reason,
++				 unsigned long *delta_ms)
  {
- 	struct radix_tree_iter iter;
- 	void **slot;
--	unsigned int ret = 0;
-+	unsigned int refs, ret = 0;
+-	u64 bw, usecs, expected, timeout;
+-	ktime_t delta;
++	u64 expected;
++	u64 bw, bwdiv10, delta_usecs, delta_ms_tmp;
++	ktime_t delta_ktime;
+ 	int update = 0;
++	bool slow = BFQQ_SEEKY(bfqq); /* if delta too short, use seekyness */
  
- 	if (unlikely(!nr_pages))
- 		return 0;
+-	if (!bfq_bfqq_sync(bfqq) || bfq_bfqq_budget_new(bfqq))
++	if (!bfq_bfqq_sync(bfqq))
+ 		return false;
  
- 	rcu_read_lock();
--	radix_tree_for_each_contig(slot, &mapping->page_tree, &iter, index) {
--		struct page *head, *page;
-+	radix_tree_for_each_contig(slot, &mapping->page_tree, &iter, start) {
-+		struct page *page;
-+		unsigned long index = iter.index;
-+		if (index < start)
-+			index = start;
- repeat:
- 		page = radix_tree_deref_slot(slot);
- 		/* The hole, there no reason to continue */
-@@ -1442,19 +1464,12 @@ repeat:
- 			break;
- 		}
+ 	if (compensate)
+-		delta = bfqd->last_idling_start;
++		delta_ktime = bfqd->last_idling_start;
+ 	else
+-		delta = ktime_get();
+-	delta = ktime_sub(delta, bfqd->last_budget_start);
+-	usecs = ktime_to_us(delta);
++		delta_ktime = ktime_get();
++	delta_ktime = ktime_sub(delta_ktime, bfqd->last_budget_start);
++	delta_usecs = ktime_to_us(delta_ktime);
  
--		head = compound_head(page);
--		if (!page_cache_get_speculative(head))
-+		if (!page_cache_get_speculative(page))
- 			goto repeat;
- 
--		/* The page was split under us? */
--		if (compound_head(page) != head) {
--			put_page(head);
--			goto repeat;
--		}
--
- 		/* Has the page moved? */
- 		if (unlikely(page != *slot)) {
--			put_page(head);
-+			put_page(page);
- 			goto repeat;
- 		}
- 
-@@ -1463,14 +1478,31 @@ repeat:
- 		 * otherwise we can get both false positives and false
- 		 * negatives, which is just confusing to the caller.
- 		 */
--		if (page->mapping == NULL || page_to_pgoff(page) != iter.index) {
-+		if (page->mapping == NULL || page_to_pgoff(page) != index) {
- 			put_page(page);
- 			break;
- 		}
- 
-+		/* For multi-order entries, find relevant subpage */
-+		if (PageTransHuge(page)) {
-+			VM_BUG_ON(index - page->index < 0);
-+			VM_BUG_ON(index - page->index >= HPAGE_PMD_NR);
-+			page += index - page->index;
-+		}
-+
- 		pages[ret] = page;
- 		if (++ret == nr_pages)
- 			break;
-+		if (!PageTransCompound(page))
-+			continue;
-+		for (refs = 0; ret < nr_pages &&
-+				(index + 1) % HPAGE_PMD_NR;
-+				ret++, refs++, index++)
-+			pages[ret] = ++page;
-+		if (refs)
-+			page_ref_add(compound_head(page), refs);
-+		if (ret == nr_pages)
-+			break;
- 	}
- 	rcu_read_unlock();
- 	return ret;
-@@ -1488,20 +1520,23 @@ EXPORT_SYMBOL(find_get_pages_contig);
-  * Like find_get_pages, except we only return pages which are tagged with
-  * @tag.   We update @index to index the next page for the traversal.
-  */
--unsigned find_get_pages_tag(struct address_space *mapping, pgoff_t *index,
-+unsigned find_get_pages_tag(struct address_space *mapping, pgoff_t *indexp,
- 			int tag, unsigned int nr_pages, struct page **pages)
- {
- 	struct radix_tree_iter iter;
- 	void **slot;
--	unsigned ret = 0;
-+	unsigned refs, ret = 0;
- 
- 	if (unlikely(!nr_pages))
- 		return 0;
- 
- 	rcu_read_lock();
- 	radix_tree_for_each_tagged(slot, &mapping->page_tree,
--				   &iter, *index, tag) {
--		struct page *head, *page;
-+				   &iter, *indexp, tag) {
-+		struct page *page;
-+		unsigned long index = iter.index;
-+		if (index < *indexp)
-+			index = *indexp;
- repeat:
- 		page = radix_tree_deref_slot(slot);
- 		if (unlikely(!page))
-@@ -1526,31 +1561,41 @@ repeat:
- 			continue;
- 		}
- 
--		head = compound_head(page);
--		if (!page_cache_get_speculative(head))
-+		if (!page_cache_get_speculative(page))
- 			goto repeat;
- 
--		/* The page was split under us? */
--		if (compound_head(page) != head) {
--			put_page(head);
--			goto repeat;
--		}
--
- 		/* Has the page moved? */
- 		if (unlikely(page != *slot)) {
--			put_page(head);
-+			put_page(page);
- 			goto repeat;
- 		}
- 
-+		/* For multi-order entries, find relevant subpage */
-+		if (PageTransHuge(page)) {
-+			VM_BUG_ON(index - page->index < 0);
-+			VM_BUG_ON(index - page->index >= HPAGE_PMD_NR);
-+			page += index - page->index;
-+		}
-+
- 		pages[ret] = page;
- 		if (++ret == nr_pages)
- 			break;
-+		if (!PageTransCompound(page))
-+			continue;
-+		for (refs = 0; ret < nr_pages &&
-+				(index + 1) % HPAGE_PMD_NR;
-+				ret++, refs++, index++)
-+			pages[ret] = ++page;
-+		if (refs)
-+			page_ref_add(compound_head(page), refs);
-+		if (ret == nr_pages)
-+			break;
- 	}
- 
- 	rcu_read_unlock();
- 
- 	if (ret)
--		*index = pages[ret - 1]->index + 1;
-+		*indexp = page_to_pgoff(pages[ret - 1]) + 1;
- 
- 	return ret;
- }
-@@ -1573,7 +1618,7 @@ unsigned find_get_entries_tag(struct address_space *mapping, pgoff_t start,
- 			struct page **entries, pgoff_t *indices)
- {
- 	void **slot;
--	unsigned int ret = 0;
-+	unsigned int refs, ret = 0;
- 	struct radix_tree_iter iter;
- 
- 	if (!nr_entries)
-@@ -1582,7 +1627,10 @@ unsigned find_get_entries_tag(struct address_space *mapping, pgoff_t start,
- 	rcu_read_lock();
- 	radix_tree_for_each_tagged(slot, &mapping->page_tree,
- 				   &iter, start, tag) {
--		struct page *head, *page;
-+		struct page *page;
-+		unsigned long index = iter.index;
-+		if (index < start)
-+			index = start;
- repeat:
- 		page = radix_tree_deref_slot(slot);
- 		if (unlikely(!page))
-@@ -1601,26 +1649,38 @@ repeat:
- 			goto export;
- 		}
- 
--		head = compound_head(page);
--		if (!page_cache_get_speculative(head))
-+		if (!page_cache_get_speculative(page))
- 			goto repeat;
- 
--		/* The page was split under us? */
--		if (compound_head(page) != head) {
--			put_page(head);
--			goto repeat;
--		}
--
- 		/* Has the page moved? */
- 		if (unlikely(page != *slot)) {
--			put_page(head);
-+			put_page(page);
- 			goto repeat;
- 		}
-+
-+		/* For multi-order entries, find relevant subpage */
-+		if (PageTransHuge(page)) {
-+			VM_BUG_ON(index - page->index < 0);
-+			VM_BUG_ON(index - page->index >= HPAGE_PMD_NR);
-+			page += index - page->index;
-+		}
- export:
--		indices[ret] = iter.index;
-+		indices[ret] = index;
- 		entries[ret] = page;
- 		if (++ret == nr_entries)
- 			break;
-+		if (radix_tree_exception(page) || !PageTransCompound(page))
-+			continue;
-+		for (refs = 0; ret < nr_entries &&
-+				(index + 1) % HPAGE_PMD_NR;
-+				ret++, refs++) {
-+			indices[ret] = ++index;
-+			entries[ret] = ++page;
-+		}
-+		if (refs)
-+			page_ref_add(compound_head(page), refs);
-+		if (ret == nr_entries)
-+			break;
- 	}
- 	rcu_read_unlock();
- 	return ret;
-@@ -2202,12 +2262,15 @@ void filemap_map_pages(struct fault_env *fe,
- 	struct address_space *mapping = file->f_mapping;
- 	pgoff_t last_pgoff = start_pgoff;
- 	loff_t size;
--	struct page *head, *page;
-+	struct page *page;
- 
- 	rcu_read_lock();
- 	radix_tree_for_each_slot(slot, &mapping->page_tree, &iter,
- 			start_pgoff) {
--		if (iter.index > end_pgoff)
-+		unsigned long index = iter.index;
-+		if (index < start_pgoff)
-+			index = start_pgoff;
-+		if (index > end_pgoff)
- 			break;
- repeat:
- 		page = radix_tree_deref_slot(slot);
-@@ -2218,25 +2281,26 @@ repeat:
- 				slot = radix_tree_iter_retry(&iter);
- 				continue;
- 			}
-+			page = NULL;
- 			goto next;
- 		}
- 
--		head = compound_head(page);
--		if (!page_cache_get_speculative(head))
-+		if (!page_cache_get_speculative(page))
- 			goto repeat;
- 
--		/* The page was split under us? */
--		if (compound_head(page) != head) {
--			put_page(head);
--			goto repeat;
--		}
--
- 		/* Has the page moved? */
- 		if (unlikely(page != *slot)) {
--			put_page(head);
-+			put_page(page);
- 			goto repeat;
- 		}
- 
-+		/* For multi-order entries, find relevant subpage */
-+		if (PageTransHuge(page)) {
-+			VM_BUG_ON(index - page->index < 0);
-+			VM_BUG_ON(index - page->index >= HPAGE_PMD_NR);
-+			page += index - page->index;
-+		}
-+
- 		if (!PageUptodate(page) ||
- 				PageReadahead(page) ||
- 				PageHWPoison(page))
-@@ -2244,20 +2308,20 @@ repeat:
- 		if (!trylock_page(page))
- 			goto skip;
- 
--		if (page->mapping != mapping || !PageUptodate(page))
-+		if (page_mapping(page) != mapping || !PageUptodate(page))
- 			goto unlock;
- 
- 		size = round_up(i_size_read(mapping->host), PAGE_SIZE);
--		if (page->index >= size >> PAGE_SHIFT)
-+		if (compound_head(page)->index >= size >> PAGE_SHIFT)
- 			goto unlock;
- 
- 		if (file->f_ra.mmap_miss > 0)
- 			file->f_ra.mmap_miss--;
- 
--		fe->address += (iter.index - last_pgoff) << PAGE_SHIFT;
-+		fe->address += (index - last_pgoff) << PAGE_SHIFT;
- 		if (fe->pte)
--			fe->pte += iter.index - last_pgoff;
--		last_pgoff = iter.index;
-+			fe->pte += index - last_pgoff;
-+		last_pgoff = index;
- 		if (alloc_set_pte(fe, NULL, page))
- 			goto unlock;
- 		unlock_page(page);
-@@ -2270,8 +2334,14 @@ next:
- 		/* Huge page is mapped? No need to proceed. */
- 		if (pmd_trans_huge(*fe->pmd))
- 			break;
--		if (iter.index == end_pgoff)
-+		if (index == end_pgoff)
- 			break;
-+		if (page && PageTransCompound(page) &&
-+				(index & (HPAGE_PMD_NR - 1)) !=
-+				HPAGE_PMD_NR - 1) {
-+			index++;
-+			goto repeat;
-+		}
- 	}
- 	rcu_read_unlock();
- }
-diff --git a/mm/huge_memory.c b/mm/huge_memory.c
-index 2373f0a7d340..7937f723c96e 100644
---- a/mm/huge_memory.c
-+++ b/mm/huge_memory.c
-@@ -1819,6 +1819,7 @@ static void __split_huge_page(struct page *page, struct list_head *list,
- 	struct page *head = compound_head(page);
- 	struct zone *zone = page_zone(head);
- 	struct lruvec *lruvec;
-+	struct page *subpage;
- 	pgoff_t end = -1;
- 	int i;
- 
-@@ -1827,8 +1828,26 @@ static void __split_huge_page(struct page *page, struct list_head *list,
- 	/* complete memcg works before add pages to LRU */
- 	mem_cgroup_split_huge_fixup(head);
- 
--	if (!PageAnon(page))
--		end = DIV_ROUND_UP(i_size_read(head->mapping->host), PAGE_SIZE);
-+	if (!PageAnon(head)) {
-+		struct address_space *mapping = head->mapping;
-+		struct radix_tree_iter iter;
-+		void **slot;
-+
-+		__dec_node_page_state(head, NR_SHMEM_THPS);
-+
-+		radix_tree_split(&mapping->page_tree, head->index, 0);
-+		radix_tree_for_each_slot(slot, &mapping->page_tree, &iter,
-+				head->index) {
-+			if (iter.index >= head->index + HPAGE_PMD_NR)
-+				break;
-+			subpage = head + iter.index - head->index;
-+			radix_tree_replace_slot(slot, subpage);
-+			VM_BUG_ON_PAGE(compound_head(subpage) != head, subpage);
-+		}
-+		radix_tree_preload_end();
-+
-+		end = DIV_ROUND_UP(i_size_read(mapping->host), PAGE_SIZE);
-+	}
- 
- 	for (i = HPAGE_PMD_NR - 1; i >= 1; i--) {
- 		__split_huge_page_tail(head, i, lruvec, list);
-@@ -1857,7 +1876,7 @@ static void __split_huge_page(struct page *page, struct list_head *list,
- 	unfreeze_page(head);
- 
- 	for (i = 0; i < HPAGE_PMD_NR; i++) {
--		struct page *subpage = head + i;
-+		subpage = head + i;
- 		if (subpage == page)
- 			continue;
- 		unlock_page(subpage);
-@@ -2014,8 +2033,8 @@ int split_huge_page_to_list(struct page *page, struct list_head *list)
- 			goto out;
- 		}
- 
--		/* Addidional pins from radix tree */
--		extra_pins = HPAGE_PMD_NR;
-+		/* Addidional pin from radix tree */
-+		extra_pins = 1;
- 		anon_vma = NULL;
- 		i_mmap_lock_read(mapping);
- 	}
-@@ -2037,6 +2056,12 @@ int split_huge_page_to_list(struct page *page, struct list_head *list)
- 	if (mlocked)
- 		lru_add_drain();
- 
-+	if (mapping && radix_tree_split_preload(HPAGE_PMD_ORDER, 0,
-+				GFP_KERNEL)) {
-+		ret = -ENOMEM;
-+		goto unfreeze;
+ 	/* Don't trust short/unrealistic values. */
+-	if (usecs < 100 || usecs >= LONG_MAX)
+-		return false;
++	if (delta_usecs < 1000 || delta_usecs >= LONG_MAX) {
++		if (blk_queue_nonrot(bfqd->queue))
++			*delta_ms = BFQ_MIN_TT; /*
++						 * provide same worst-case
++						 * guarantees as idling for
++						 * seeky
++						 */
++		else /* Charge at least one seek */
++			*delta_ms = jiffies_to_msecs(bfq_slice_idle);
++		return slow;
 +	}
 +
- 	/* prevent PageLRU to go away from under us, and freeze lru stats */
- 	spin_lock_irqsave(zone_lru_lock(page_zone(head)), flags);
++	delta_ms_tmp = delta_usecs;
++	do_div(delta_ms_tmp, 1000);
++	*delta_ms = delta_ms_tmp;
  
-@@ -2046,10 +2071,7 @@ int split_huge_page_to_list(struct page *page, struct list_head *list)
- 		spin_lock(&mapping->tree_lock);
- 		pslot = radix_tree_lookup_slot(&mapping->page_tree,
- 				page_index(head));
--		/*
--		 * Check if the head page is present in radix tree.
--		 * We assume all tail are present too, if head is there.
--		 */
-+		/* Check if the page is present in radix tree */
- 		if (radix_tree_deref_slot_protected(pslot,
- 					&mapping->tree_lock) != head)
- 			goto fail;
-@@ -2064,8 +2086,6 @@ int split_huge_page_to_list(struct page *page, struct list_head *list)
- 			pgdata->split_queue_len--;
- 			list_del(page_deferred_list(head));
- 		}
--		if (mapping)
--			__dec_node_page_state(page, NR_SHMEM_THPS);
- 		spin_unlock(&pgdata->split_queue_lock);
- 		__split_huge_page(page, list, flags);
- 		ret = 0;
-@@ -2079,9 +2099,12 @@ int split_huge_page_to_list(struct page *page, struct list_head *list)
- 			BUG();
- 		}
- 		spin_unlock(&pgdata->split_queue_lock);
--fail:		if (mapping)
-+fail:		if (mapping) {
- 			spin_unlock(&mapping->tree_lock);
-+			radix_tree_preload_end();
-+		}
- 		spin_unlock_irqrestore(zone_lru_lock(page_zone(head)), flags);
-+unfreeze:
- 		unfreeze_page(head);
- 		ret = -EBUSY;
- 	}
-diff --git a/mm/khugepaged.c b/mm/khugepaged.c
-index 79c52d0061af..9929414b170c 100644
---- a/mm/khugepaged.c
-+++ b/mm/khugepaged.c
-@@ -1348,10 +1348,8 @@ static void collapse_shmem(struct mm_struct *mm,
- 			break;
- 		}
- 		nr_none += n;
--		for (; index < min(iter.index, end); index++) {
--			radix_tree_insert(&mapping->page_tree, index,
--					new_page + (index % HPAGE_PMD_NR));
--		}
-+		for (; index < min(iter.index, end); index++)
-+			radix_tree_insert(&mapping->page_tree, index, new_page);
- 
- 		/* We are done. */
- 		if (index >= end)
-@@ -1420,8 +1418,7 @@ static void collapse_shmem(struct mm_struct *mm,
- 		list_add_tail(&page->lru, &pagelist);
- 
- 		/* Finally, replace with the new page. */
--		radix_tree_replace_slot(slot,
--				new_page + (index % HPAGE_PMD_NR));
-+		radix_tree_replace_slot(slot, new_page);
- 
- 		index++;
- 		continue;
-@@ -1438,24 +1435,17 @@ out_unlock:
- 		break;
- 	}
- 
--	/*
--	 * Handle hole in radix tree at the end of the range.
--	 * This code only triggers if there's nothing in radix tree
--	 * beyond 'end'.
--	 */
--	if (result == SCAN_SUCCEED && index < end) {
-+	if (result == SCAN_SUCCEED) {
- 		int n = end - index;
- 
--		if (!shmem_charge(mapping->host, n)) {
-+		if (n && !shmem_charge(mapping->host, n)) {
- 			result = SCAN_FAIL;
- 			goto tree_locked;
- 		}
+ 	/*
+ 	 * Calculate the bandwidth for the last slice.  We use a 64 bit
+@@ -3920,19 +3955,38 @@ static bool bfq_update_peak_rate(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+ 	 * and to avoid overflows.
+ 	 */
+ 	bw = (u64)bfqq->entity.service << BFQ_RATE_SHIFT;
+-	do_div(bw, (unsigned long)usecs);
 -
--		for (; index < end; index++) {
--			radix_tree_insert(&mapping->page_tree, index,
--					new_page + (index % HPAGE_PMD_NR));
--		}
- 		nr_none += n;
+-	timeout = jiffies_to_msecs(bfqd->bfq_timeout);
++	do_div(bw, (unsigned long)delta_usecs);
+ 
+ 	/*
+ 	 * Use only long (> 20ms) intervals to filter out spikes for
+ 	 * the peak rate estimation.
+ 	 */
+-	if (usecs > 20000) {
+-		if (bw > bfqd->peak_rate) {
+-			bfqd->peak_rate = bw;
++	if (delta_usecs > 20000) {
++		bool fully_sequential = bfqq->seek_history == 0;
++		bool consumed_large_budget =
++			reason == BFQ_BFQQ_BUDGET_EXHAUSTED &&
++			bfqq->entity.budget >= bfqd->bfq_max_budget * 2 / 3;
++		bool served_for_long_time =
++			reason == BFQ_BFQQ_BUDGET_TIMEOUT ||
++			consumed_large_budget;
 +
-+		radix_tree_join(&mapping->page_tree, start,
-+				HPAGE_PMD_ORDER, new_page);
++		if (bw > bfqd->peak_rate ||
++		    (bfq_bfqq_sync(bfqq) && fully_sequential &&
++		     served_for_long_time)) {
++			/*
++			 * To smooth oscillations use a low-pass filter with
++			 * alpha=9/10, i.e.,
++			 * new_rate = (9/10) * old_rate + (1/10) * bw
++			 */
++			bwdiv10 = bw;
++			do_div(bwdiv10, 10);
++			if (bwdiv10 == 0)
++				return false; /* bw too low to be used */
++			bfqd->peak_rate *= 9;
++			do_div(bfqd->peak_rate, 10);
++			bfqd->peak_rate += bwdiv10;
+ 			update = 1;
+-			bfq_log(bfqd, "new peak_rate=%llu", bw);
++			bfq_log(bfqd, "new peak_rate=%llu", bfqd->peak_rate);
+ 		}
+ 
+ 		update |= bfqd->peak_rate_samples == BFQ_PEAK_RATE_SAMPLES - 1;
+@@ -3942,10 +3996,8 @@ static bool bfq_update_peak_rate(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+ 
+ 		if (bfqd->peak_rate_samples == BFQ_PEAK_RATE_SAMPLES &&
+ 		    update && bfqd->bfq_user_max_budget == 0) {
+-			bfqd->bfq_max_budget =
+-				bfq_calc_max_budget(bfqd->peak_rate,
+-						    timeout);
+-			bfq_log(bfqd, "new max_budget=%d",
++			bfqd->bfq_max_budget = bfq_calc_max_budget(bfqd);
++			bfq_log(bfqd, "new max_budget = %d",
+ 				bfqd->bfq_max_budget);
+ 		}
  	}
+@@ -3958,7 +4010,8 @@ static bool bfq_update_peak_rate(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+ 	 * rate that would not be high enough to complete the budget
+ 	 * before the budget timeout expiration.
+ 	 */
+-	expected = bw * 1000 * timeout >> BFQ_RATE_SHIFT;
++	expected = bw * 1000 * jiffies_to_msecs(bfqd->bfq_timeout)
++		>> BFQ_RATE_SHIFT;
  
- tree_locked:
-diff --git a/mm/shmem.c b/mm/shmem.c
-index 812a17c6621d..d7f92ac93263 100644
---- a/mm/shmem.c
-+++ b/mm/shmem.c
-@@ -540,33 +540,14 @@ static int shmem_add_to_page_cache(struct page *page,
- 	VM_BUG_ON_PAGE(!PageSwapBacked(page), page);
- 	VM_BUG_ON(expected && PageTransHuge(page));
+ 	/*
+ 	 * Caveat: processes doing IO in the slower disk zones will
+@@ -4016,12 +4069,14 @@ static void bfq_bfqq_expire(struct bfq_data *bfqd,
+ 			    enum bfqq_expiration reason)
+ {
+ 	bool slow;
++	unsigned long delta = 0;
++	struct bfq_entity *entity = &bfqq->entity;
  
--	page_ref_add(page, nr);
-+	get_page(page);
- 	page->mapping = mapping;
- 	page->index = index;
+ 	/*
+ 	 * Update device peak rate for autotuning and check whether the
+ 	 * process is slow (see bfq_update_peak_rate).
+ 	 */
+-	slow = bfq_update_peak_rate(bfqd, bfqq, compensate);
++	slow = bfq_update_peak_rate(bfqd, bfqq, compensate, reason, &delta);
  
- 	spin_lock_irq(&mapping->tree_lock);
--	if (PageTransHuge(page)) {
--		void __rcu **results;
--		pgoff_t idx;
--		int i;
+ 	/*
+ 	 * As above explained, 'punish' slow (i.e., seeky), timed-out
+@@ -4031,7 +4086,7 @@ static void bfq_bfqq_expire(struct bfq_data *bfqd,
+ 		bfq_bfqq_charge_full_budget(bfqq);
+ 
+ 	if (reason == BFQ_BFQQ_TOO_IDLE &&
+-	    bfqq->entity.service <= 2 * bfqq->entity.budget / 10)
++	    entity->service <= 2 * entity->budget / 10)
+ 		bfq_clear_bfqq_IO_bound(bfqq);
+ 
+ 	bfq_log_bfqq(bfqd, bfqq,
+@@ -5318,10 +5373,8 @@ static ssize_t bfq_weights_store(struct elevator_queue *e,
+ 
+ static unsigned long bfq_estimated_max_budget(struct bfq_data *bfqd)
+ {
+-	u64 timeout = jiffies_to_msecs(bfqd->bfq_timeout);
 -
--		error = 0;
--		if (radix_tree_gang_lookup_slot(&mapping->page_tree,
--					&results, &idx, index, 1) &&
--				idx < index + HPAGE_PMD_NR) {
--			error = -EEXIST;
--		}
--
--		if (!error) {
--			for (i = 0; i < HPAGE_PMD_NR; i++) {
--				error = radix_tree_insert(&mapping->page_tree,
--						index + i, page + i);
--				VM_BUG_ON(error);
--			}
--			count_vm_event(THP_FILE_ALLOC);
--		}
--	} else if (!expected) {
--		error = radix_tree_insert(&mapping->page_tree, index, page);
-+	if (!expected) {
-+		error = __radix_tree_insert(&mapping->page_tree, index,
-+				compound_order(page), page);
- 	} else {
- 		error = shmem_radix_tree_replace(mapping, index, expected,
- 								 page);
-@@ -574,15 +555,17 @@ static int shmem_add_to_page_cache(struct page *page,
- 
- 	if (!error) {
- 		mapping->nrpages += nr;
--		if (PageTransHuge(page))
-+		if (PageTransHuge(page)) {
-+			count_vm_event(THP_FILE_ALLOC);
- 			__inc_node_page_state(page, NR_SHMEM_THPS);
-+		}
- 		__mod_node_page_state(page_pgdat(page), NR_FILE_PAGES, nr);
- 		__mod_node_page_state(page_pgdat(page), NR_SHMEM, nr);
- 		spin_unlock_irq(&mapping->tree_lock);
- 	} else {
- 		page->mapping = NULL;
- 		spin_unlock_irq(&mapping->tree_lock);
--		page_ref_sub(page, nr);
-+		put_page(page);
- 	}
- 	return error;
+ 	if (bfqd->peak_rate_samples >= BFQ_PEAK_RATE_SAMPLES)
+-		return bfq_calc_max_budget(bfqd->peak_rate, timeout);
++		return bfq_calc_max_budget(bfqd);
+ 	else
+ 		return bfq_default_max_budget;
  }
-@@ -1733,8 +1716,7 @@ alloc_nohuge:		page = shmem_alloc_and_acct_page(gfp, info, sbinfo,
- 				PageTransHuge(page));
- 		if (error)
- 			goto unacct;
--		error = radix_tree_maybe_preload_order(gfp & GFP_RECLAIM_MASK,
--				compound_order(page));
-+		error = radix_tree_maybe_preload(gfp & GFP_RECLAIM_MASK);
- 		if (!error) {
- 			error = shmem_add_to_page_cache(page, mapping, hindex,
- 							NULL);
 -- 
-2.8.1
-
+1.9.1
