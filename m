@@ -1,266 +1,244 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.9]:37372 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932244AbcH2Kxy (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 29 Aug 2016 06:53:54 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@fb.com
-Cc: keith.busch@intel.com, linux-block@vger.kernel.org,
-        linux-nvme@lists.infradead.org
-Subject: [PATCH 5/7] nvme: switch to use pci_alloc_irq_vectors
-Date: Mon, 29 Aug 2016 12:53:31 +0200
-Message-Id: <1472468013-29936-6-git-send-email-hch@lst.de>
-In-Reply-To: <1472468013-29936-1-git-send-email-hch@lst.de>
-References: <1472468013-29936-1-git-send-email-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <paolo.valente@linaro.org>
+From: Paolo Valente <paolo.valente@linaro.org>
+To: Jens Axboe <axboe@kernel.dk>,
+	Tejun Heo <tj@kernel.org>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ulf.hansson@linaro.org,
+	linus.walleij@linaro.org,
+	broonie@kernel.org,
+	Paolo Valente <paolo.valente@linaro.org>,
+	Arianna Avanzini <avanzini.arianna@gmail.com>
+Subject: [PATCH V2 20/22] block, bfq: boost the throughput on NCQ-capable flash-based devices
+Date: Mon,  8 Aug 2016 13:15:15 +0200
+Message-Id: <1470654917-4280-21-git-send-email-paolo.valente@linaro.org>
+In-Reply-To: <1470654917-4280-1-git-send-email-paolo.valente@linaro.org>
+References: <1470654917-4280-1-git-send-email-paolo.valente@linaro.org>
+List-ID: <linux-block@vger.kernel.org>
 
-Use the new helper to automatically select the right interrupt type, as
-well as to use the automatic interupt affinity assignment.
+This patch boosts the throughput on NCQ-capable flash-based devices,
+while still preserving latency guarantees for interactive and soft
+real-time applications. The throughput is boosted by just not idling
+the device when the in-service queue remains empty, even if the queue
+is sync and has a non-null idle window. This helps to keep the drive's
+internal queue full, which is necessary to achieve maximum
+performance. This solution to boost the throughput is a port of
+commits a68bbdd and f7d7b7a for CFQ.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+As already highlighted in a previous patch, allowing the device to
+prefetch and internally reorder requests trivially causes loss of
+control on the request service order, and hence on service guarantees.
+Fortunately, as discussed in detail in the comments on the function
+bfq_bfqq_may_idle(), if every process has to receive the same
+fraction of the throughput, then the service order enforced by the
+internal scheduler of a flash-based device is relatively close to that
+enforced by BFQ. In particular, it is close enough to let service
+guarantees be substantially preserved.
+
+Things change in an asymmetric scenario, i.e., if not every process
+has to receive the same fraction of the throughput. In this case, to
+guarantee the desired throughput distribution, the device must be
+prevented from prefetching requests. This is exactly what this patch
+does in asymmetric scenarios.
+
+Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+Signed-off-by: Arianna Avanzini <avanzini.arianna@gmail.com>
 ---
- drivers/nvme/host/pci.c | 99 ++++++++++++++-----------------------------------
- 1 file changed, 28 insertions(+), 71 deletions(-)
+ block/cfq-iosched.c | 154 ++++++++++++++++++++++++++++++++++++----------------
+ 1 file changed, 106 insertions(+), 48 deletions(-)
 
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index 086fd7e..50e9038 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -88,7 +88,6 @@ struct nvme_dev {
- 	unsigned max_qid;
- 	int q_depth;
- 	u32 db_stride;
--	struct msix_entry *entry;
- 	void __iomem *bar;
- 	struct work_struct reset_work;
- 	struct work_struct remove_work;
-@@ -201,6 +200,11 @@ static unsigned int nvme_cmd_size(struct nvme_dev *dev)
- 		nvme_iod_alloc_size(dev, NVME_INT_BYTES(dev), NVME_INT_PAGES);
- }
- 
-+static int nvmeq_irq(struct nvme_queue *nvmeq)
-+{
-+	return pci_irq_vector(to_pci_dev(nvmeq->dev->dev), nvmeq->cq_vector);
-+}
-+
- static int nvme_admin_init_hctx(struct blk_mq_hw_ctx *hctx, void *data,
- 				unsigned int hctx_idx)
- {
-@@ -960,7 +964,7 @@ static int nvme_suspend_queue(struct nvme_queue *nvmeq)
- 		spin_unlock_irq(&nvmeq->q_lock);
- 		return 1;
- 	}
--	vector = nvmeq->dev->entry[nvmeq->cq_vector].vector;
-+	vector = nvmeq_irq(nvmeq);
- 	nvmeq->dev->online_queues--;
- 	nvmeq->cq_vector = -1;
- 	spin_unlock_irq(&nvmeq->q_lock);
-@@ -968,7 +972,6 @@ static int nvme_suspend_queue(struct nvme_queue *nvmeq)
- 	if (!nvmeq->qid && nvmeq->dev->ctrl.admin_q)
- 		blk_mq_stop_hw_queues(nvmeq->dev->ctrl.admin_q);
- 
--	irq_set_affinity_hint(vector, NULL);
- 	free_irq(vector, nvmeq);
- 
- 	return 0;
-@@ -1075,15 +1078,14 @@ static struct nvme_queue *nvme_alloc_queue(struct nvme_dev *dev, int qid,
- 	return NULL;
- }
- 
--static int queue_request_irq(struct nvme_dev *dev, struct nvme_queue *nvmeq,
--							const char *name)
-+static int queue_request_irq(struct nvme_queue *nvmeq)
- {
- 	if (use_threaded_interrupts)
--		return request_threaded_irq(dev->entry[nvmeq->cq_vector].vector,
--					nvme_irq_check, nvme_irq, IRQF_SHARED,
--					name, nvmeq);
--	return request_irq(dev->entry[nvmeq->cq_vector].vector, nvme_irq,
--				IRQF_SHARED, name, nvmeq);
-+		return request_threaded_irq(nvmeq_irq(nvmeq), nvme_irq_check,
-+				nvme_irq, IRQF_SHARED, nvmeq->irqname, nvmeq);
-+	else
-+		return request_irq(nvmeq_irq(nvmeq), nvme_irq, IRQF_SHARED,
-+				nvmeq->irqname, nvmeq);
- }
- 
- static void nvme_init_queue(struct nvme_queue *nvmeq, u16 qid)
-@@ -1114,7 +1116,7 @@ static int nvme_create_queue(struct nvme_queue *nvmeq, int qid)
- 	if (result < 0)
- 		goto release_cq;
- 
--	result = queue_request_irq(dev, nvmeq, nvmeq->irqname);
-+	result = queue_request_irq(nvmeq);
- 	if (result < 0)
- 		goto release_sq;
- 
-@@ -1232,7 +1234,7 @@ static int nvme_configure_admin_queue(struct nvme_dev *dev)
- 		goto free_nvmeq;
- 
- 	nvmeq->cq_vector = 0;
--	result = queue_request_irq(dev, nvmeq, nvmeq->irqname);
-+	result = queue_request_irq(nvmeq);
- 	if (result) {
- 		nvmeq->cq_vector = -1;
- 		goto free_nvmeq;
-@@ -1380,7 +1382,7 @@ static int nvme_setup_io_queues(struct nvme_dev *dev)
- {
- 	struct nvme_queue *adminq = dev->queues[0];
- 	struct pci_dev *pdev = to_pci_dev(dev->dev);
--	int result, i, vecs, nr_io_queues, size;
-+	int result, nr_io_queues, size;
- 
- 	nr_io_queues = num_online_cpus();
- 	result = nvme_set_queue_count(&dev->ctrl, &nr_io_queues);
-@@ -1415,29 +1417,18 @@ static int nvme_setup_io_queues(struct nvme_dev *dev)
- 	}
- 
- 	/* Deregister the admin queue's interrupt */
--	free_irq(dev->entry[0].vector, adminq);
-+	free_irq(pci_irq_vector(pdev, 0), adminq);
+diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
+index ae524ae..c0469fd 100644
+--- a/block/cfq-iosched.c
++++ b/block/cfq-iosched.c
+@@ -5664,15 +5664,25 @@ static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
+ 	 * The value of the variable is computed considering that
+ 	 * idling is usually beneficial for the throughput if:
+ 	 * (a) the device is not NCQ-capable, or
+-	 * (b) regardless of the presence of NCQ, the request pattern
+-	 *     for bfqq is I/O-bound (possible throughput losses
+-	 *     caused by granting idling to seeky queues are mitigated
+-	 *     by the fact that, in all scenarios where boosting
+-	 *     throughput is the best thing to do, i.e., in all
+-	 *     symmetric scenarios, only a minimal idle time is
+-	 *     allowed to seeky queues).
++	 * (b) regardless of the presence of NCQ, the device is rotational
++	 *     and the request pattern for bfqq is I/O-bound (possible
++	 *     throughput losses caused by granting idling to seeky queues
++	 *     are mitigated by the fact that, in all scenarios where
++	 *     boosting throughput is the best thing to do, i.e., in all
++	 *     symmetric scenarios, only a minimal idle time is allowed to
++	 *     seeky queues).
++	 *
++	 * Secondly, and in contrast to the above item (b), idling an
++	 * NCQ-capable flash-based device would not boost the
++	 * throughput even with intense I/O; rather it would lower
++	 * the throughput in proportion to how fast the device
++	 * is. Accordingly, the next variable is true if any of the
++	 * above conditions (a) and (b) is true, and, in particular,
++	 * happens to be false if bfqd is an NCQ-capable flash-based
++	 * device.
+ 	 */
+-	idling_boosts_thr = !bfqd->hw_tag || bfq_bfqq_IO_bound(bfqq);
++	idling_boosts_thr = !bfqd->hw_tag ||
++		(!blk_queue_nonrot(bfqd->queue) && bfq_bfqq_IO_bound(bfqq));
  
  	/*
- 	 * If we enable msix early due to not intx, disable it again before
- 	 * setting up the full range we need.
- 	 */
--	if (pdev->msi_enabled)
--		pci_disable_msi(pdev);
--	else if (pdev->msix_enabled)
--		pci_disable_msix(pdev);
--
--	for (i = 0; i < nr_io_queues; i++)
--		dev->entry[i].entry = i;
--	vecs = pci_enable_msix_range(pdev, dev->entry, 1, nr_io_queues);
--	if (vecs < 0) {
--		vecs = pci_enable_msi_range(pdev, 1, min(nr_io_queues, 32));
--		if (vecs < 0) {
--			vecs = 1;
--		} else {
--			for (i = 0; i < vecs; i++)
--				dev->entry[i].vector = i + pdev->irq;
--		}
--	}
-+	pci_free_irq_vectors(pdev);
-+	nr_io_queues = pci_alloc_irq_vectors(pdev, 1, nr_io_queues,
-+			PCI_IRQ_ALL_TYPES | PCI_IRQ_AFFINITY);
-+	if (nr_io_queues <= 0)
-+		return -EIO;
-+	dev->max_qid = nr_io_queues;
+ 	 * The value of the next variable,
+@@ -5713,14 +5723,16 @@ static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
+ 		bfqd->wr_busy_queues == 0;
  
  	/*
- 	 * Should investigate if there's a performance win from allocating
-@@ -1445,10 +1436,8 @@ static int nvme_setup_io_queues(struct nvme_dev *dev)
- 	 * path to scale better, even if the receive path is limited by the
- 	 * number of interrupts.
+-	 * There is then a case where idling must be performed not for
+-	 * throughput concerns, but to preserve service guarantees. To
+-	 * introduce it, we can note that allowing the drive to
+-	 * enqueue more than one request at a time, and hence
++	 * There is then a case where idling must be performed not
++	 * for throughput concerns, but to preserve service
++	 * guarantees.
++	 *
++	 * To introduce this case, we can note that allowing the drive
++	 * to enqueue more than one request at a time, and hence
+ 	 * delegating de facto final scheduling decisions to the
+-	 * drive's internal scheduler, causes loss of control on the
++	 * drive's internal scheduler, entails loss of control on the
+ 	 * actual request service order. In particular, the critical
+-	 * situation is when requests from different processes happens
++	 * situation is when requests from different processes happen
+ 	 * to be present, at the same time, in the internal queue(s)
+ 	 * of the drive. In such a situation, the drive, by deciding
+ 	 * the service order of the internally-queued requests, does
+@@ -5731,51 +5743,97 @@ static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
+ 	 * the service distribution enforced by the drive's internal
+ 	 * scheduler is likely to coincide with the desired
+ 	 * device-throughput distribution only in a completely
+-	 * symmetric scenario where: (i) each of these processes must
+-	 * get the same throughput as the others; (ii) all these
+-	 * processes have the same I/O pattern (either sequential or
+-	 * random).  In fact, in such a scenario, the drive will tend
+-	 * to treat the requests of each of these processes in about
+-	 * the same way as the requests of the others, and thus to
+-	 * provide each of these processes with about the same
+-	 * throughput (which is exactly the desired throughput
+-	 * distribution). In contrast, in any asymmetric scenario,
+-	 * device idling is certainly needed to guarantee that bfqq
+-	 * receives its assigned fraction of the device throughput
+-	 * (see [1] for details).
++	 * symmetric scenario where:
++	 * (i)  each of these processes must get the same throughput as
++	 *      the others;
++	 * (ii) all these processes have the same I/O pattern
++		(either sequential or random).
++	 * In fact, in such a scenario, the drive will tend to treat
++	 * the requests of each of these processes in about the same
++	 * way as the requests of the others, and thus to provide
++	 * each of these processes with about the same throughput
++	 * (which is exactly the desired throughput distribution). In
++	 * contrast, in any asymmetric scenario, device idling is
++	 * certainly needed to guarantee that bfqq receives its
++	 * assigned fraction of the device throughput (see [1] for
++	 * details).
++	 *
++	 * We address this issue by controlling, actually, only the
++	 * symmetry sub-condition (i), i.e., provided that
++	 * sub-condition (i) holds, idling is not performed,
++	 * regardless of whether sub-condition (ii) holds. In other
++	 * words, only if sub-condition (i) holds, then idling is
++	 * allowed, and the device tends to be prevented from queueing
++	 * many requests, possibly of several processes. The reason
++	 * for not controlling also sub-condition (ii) is that we
++	 * exploit preemption to preserve guarantees in case of
++	 * symmetric scenarios, even if (ii) does not hold, as
++	 * explained in the next two paragraphs.
++	 *
++	 * Even if a queue, say Q, is expired when it remains idle, Q
++	 * can still preempt the new in-service queue if the next
++	 * request of Q arrives soon (see the comments on
++	 * bfq_bfqq_update_budg_for_activation). If all queues and
++	 * groups have the same weight, this form of preemption,
++	 * combined with the hole-recovery heuristic described in the
++	 * comments on function bfq_bfqq_update_budg_for_activation,
++	 * are enough to preserve a correct bandwidth distribution in
++	 * the mid term, even without idling. In fact, even if not
++	 * idling allows the internal queues of the device to contain
++	 * many requests, and thus to reorder requests, we can rather
++	 * safely assume that the internal scheduler still preserves a
++	 * minimum of mid-term fairness. The motivation for using
++	 * preemption instead of idling is that, by not idling,
++	 * service guarantees are preserved without minimally
++	 * sacrificing throughput. In other words, both a high
++	 * throughput and its desired distribution are obtained.
++	 *
++	 * More precisely, this preemption-based, idleless approach
++	 * provides fairness in terms of IOPS, and not sectors per
++	 * second. This can be seen with a simple example. Suppose
++	 * that there are two queues with the same weight, but that
++	 * the first queue receives requests of 8 sectors, while the
++	 * second queue receives requests of 1024 sectors. In
++	 * addition, suppose that each of the two queues contains at
++	 * most one request at a time, which implies that each queue
++	 * always remains idle after it is served. Finally, after
++	 * remaining idle, each queue receives very quickly a new
++	 * request. It follows that the two queues are served
++	 * alternatively, preempting each other if needed. This
++	 * implies that, although both queues have the same weight,
++	 * the queue with large requests receives a service that is
++	 * 1024/8 times as high as the service received by the other
++	 * queue.
+ 	 *
+-	 * As for sub-condition (i), actually we check only whether
+-	 * bfqq is being weight-raised. In fact, if bfqq is not being
+-	 * weight-raised, we have that:
+-	 * - if the process associated with bfqq is not I/O-bound, then
+-	 *   it is not either latency- or throughput-critical; therefore
+-	 *   idling is not needed for bfqq;
+-	 * - if the process asociated with bfqq is I/O-bound, then
+-	 *   idling is already granted with bfqq (see the comments on
+-	 *   idling_boosts_thr).
++	 * On the other hand, device idling is performed, and thus
++	 * pure sector-domain guarantees are provided, for the
++	 * following queues, which are likely to need stronger
++	 * throughput guarantees: weight-raised queues, and queues
++	 * with a higher weight than other queues. When such queues
++	 * are active, sub-condition (i) is false, which triggers
++	 * device idling.
+ 	 *
+-	 * We do not check sub-condition (ii) at all, i.e., the next
+-	 * variable is true if and only if bfqq is being
+-	 * weight-raised. We do not need to control sub-condition (ii)
+-	 * for the following reason:
+-	 * - if bfqq is being weight-raised, then idling is already
+-	 *   guaranteed to bfqq by sub-condition (i);
+-	 * - if bfqq is not being weight-raised, then idling is
+-	 *   already guaranteed to bfqq (only) if it matters, i.e., if
+-	 *   bfqq is associated to a currently I/O-bound process (see
+-	 *   the above comment on sub-condition (i)).
++	 * According to the above considerations, the next variable is
++	 * true (only) if sub-condition (i) holds. To compute the
++	 * value of this variable, we not only use the return value of
++	 * the function bfq_symmetric_scenario(), but also check
++	 * whether bfqq is being weight-raised, because
++	 * bfq_symmetric_scenario() does not take into account also
++	 * weight-raised queues (see comments on
++	 * bfq_weights_tree_add()).
+ 	 *
+ 	 * As a side note, it is worth considering that the above
+ 	 * device-idling countermeasures may however fail in the
+ 	 * following unlucky scenario: if idling is (correctly)
+-	 * disabled in a time period during which the symmetry
+-	 * sub-condition holds, and hence the device is allowed to
++	 * disabled in a time period during which all symmetry
++	 * sub-conditions hold, and hence the device is allowed to
+ 	 * enqueue many requests, but at some later point in time some
+ 	 * sub-condition stops to hold, then it may become impossible
+ 	 * to let requests be served in the desired order until all
+ 	 * the requests already queued in the device have been served.
  	 */
--	nr_io_queues = vecs;
--	dev->max_qid = nr_io_queues;
+-	asymmetric_scenario = bfqq->wr_coeff > 1;
++	asymmetric_scenario = bfqq->wr_coeff > 1 ||
++		!bfq_symmetric_scenario(bfqd);
  
--	result = queue_request_irq(dev, adminq, adminq->irqname);
-+	result = queue_request_irq(adminq);
- 	if (result) {
- 		adminq->cq_vector = -1;
- 		goto free_queues;
-@@ -1460,23 +1449,6 @@ static int nvme_setup_io_queues(struct nvme_dev *dev)
- 	return result;
- }
- 
--static void nvme_pci_post_scan(struct nvme_ctrl *ctrl)
--{
--	struct nvme_dev *dev = to_nvme_dev(ctrl);
--	struct nvme_queue *nvmeq;
--	int i;
--
--	for (i = 0; i < dev->online_queues; i++) {
--		nvmeq = dev->queues[i];
--
--		if (!nvmeq->tags || !(*nvmeq->tags))
--			continue;
--
--		irq_set_affinity_hint(dev->entry[nvmeq->cq_vector].vector,
--					blk_mq_tags_cpumask(*nvmeq->tags));
--	}
--}
--
- static void nvme_del_queue_end(struct request *req, int error)
- {
- 	struct nvme_queue *nvmeq = req->end_io_data;
-@@ -1574,6 +1546,7 @@ static int nvme_dev_add(struct nvme_dev *dev)
- 		dev->tagset.cmd_size = nvme_cmd_size(dev);
- 		dev->tagset.flags = BLK_MQ_F_SHOULD_MERGE;
- 		dev->tagset.driver_data = dev;
-+		dev->tagset.affinity_mask = to_pci_dev(dev->dev)->irq_affinity;
- 
- 		if (blk_mq_alloc_tag_set(&dev->tagset))
- 			return 0;
-@@ -1613,15 +1586,9 @@ static int nvme_pci_enable(struct nvme_dev *dev)
- 	 * interrupts. Pre-enable a single MSIX or MSI vec for setup. We'll
- 	 * adjust this later.
- 	 */
--	if (pci_enable_msix(pdev, dev->entry, 1)) {
--		pci_enable_msi(pdev);
--		dev->entry[0].vector = pdev->irq;
--	}
--
--	if (!dev->entry[0].vector) {
--		result = -ENODEV;
--		goto disable;
--	}
-+	result = pci_alloc_irq_vectors(pdev, 1, 1, PCI_IRQ_ALL_TYPES);
-+	if (result < 0)
-+		return result;
- 
- 	cap = lo_hi_readq(dev->bar + NVME_REG_CAP);
- 
-@@ -1663,10 +1630,7 @@ static void nvme_pci_disable(struct nvme_dev *dev)
- {
- 	struct pci_dev *pdev = to_pci_dev(dev->dev);
- 
--	if (pdev->msi_enabled)
--		pci_disable_msi(pdev);
--	else if (pdev->msix_enabled)
--		pci_disable_msix(pdev);
-+	pci_free_irq_vectors(pdev);
- 
- 	if (pci_is_enabled(pdev)) {
- 		pci_disable_pcie_error_reporting(pdev);
-@@ -1736,7 +1700,6 @@ static void nvme_pci_free_ctrl(struct nvme_ctrl *ctrl)
- 	if (dev->ctrl.admin_q)
- 		blk_put_queue(dev->ctrl.admin_q);
- 	kfree(dev->queues);
--	kfree(dev->entry);
- 	kfree(dev);
- }
- 
-@@ -1880,7 +1843,6 @@ static const struct nvme_ctrl_ops nvme_pci_ctrl_ops = {
- 	.reg_read64		= nvme_pci_reg_read64,
- 	.reset_ctrl		= nvme_pci_reset_ctrl,
- 	.free_ctrl		= nvme_pci_free_ctrl,
--	.post_scan		= nvme_pci_post_scan,
- 	.submit_async_event	= nvme_pci_submit_async_event,
- };
- 
-@@ -1913,10 +1875,6 @@ static int nvme_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 	dev = kzalloc_node(sizeof(*dev), GFP_KERNEL, node);
- 	if (!dev)
- 		return -ENOMEM;
--	dev->entry = kzalloc_node(num_possible_cpus() * sizeof(*dev->entry),
--							GFP_KERNEL, node);
--	if (!dev->entry)
--		goto free;
- 	dev->queues = kzalloc_node((num_possible_cpus() + 1) * sizeof(void *),
- 							GFP_KERNEL, node);
- 	if (!dev->queues)
-@@ -1957,7 +1915,6 @@ static int nvme_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 	nvme_dev_unmap(dev);
-  free:
- 	kfree(dev->queues);
--	kfree(dev->entry);
- 	kfree(dev);
- 	return result;
- }
+ 	/*
+ 	 * We have now all the components we need to compute the return
 -- 
-2.1.4
-
+1.9.1
