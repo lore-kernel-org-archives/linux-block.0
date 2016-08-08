@@ -1,417 +1,430 @@
-Return-Path: <shaun@helios.aeonazure.com>
-From: Shaun Tancheff <shaun@tancheff.com>
-To: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Shaun Tancheff <shaun@tancheff.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Jens Axboe <axboe@fb.com>,
-	Christoph Hellwig <hch@lst.de>,
-	"James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	Josh Bingaman <josh.bingaman@seagate.com>,
-	Shaun Tancheff <shaun.tancheff@seagate.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Damien Le Moal <damien.lemoal@hgst.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Sagi Grimberg <sagig@mellanox.com>,
-	Mike Christie <mchristi@redhat.com>,
-	Toshi Kani <toshi.kani@hpe.com>,
-	Kent Overstreet <kent.overstreet@gmail.com>,
-	Ming Lei <ming.lei@canonical.com>
-Subject: [PATCH 1/2] bio/zbc support for zone cache
-Date: Wed,  3 Aug 2016 14:06:44 -0500
-Message-Id: <1470251205-4916-2-git-send-email-shaun@tancheff.com>
-In-Reply-To: <1470251205-4916-1-git-send-email-shaun@tancheff.com>
-References: <1470251205-4916-1-git-send-email-shaun@tancheff.com>
+Return-Path: <paolo.valente@linaro.org>
+From: Paolo Valente <paolo.valente@linaro.org>
+To: Jens Axboe <axboe@kernel.dk>,
+	Tejun Heo <tj@kernel.org>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ulf.hansson@linaro.org,
+	linus.walleij@linaro.org,
+	broonie@kernel.org,
+	Arianna Avanzini <avanzini.arianna@gmail.com>,
+	Riccardo Pizzetti <riccardo.pizzetti@gmail.com>,
+	Samuele Zecchini <samuele.zecchini92@gmail.com>,
+	Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH V2 19/22] block, bfq: reduce idling only in symmetric scenarios
+Date: Mon,  8 Aug 2016 13:15:14 +0200
+Message-Id: <1470654917-4280-20-git-send-email-paolo.valente@linaro.org>
+In-Reply-To: <1470654917-4280-1-git-send-email-paolo.valente@linaro.org>
+References: <1470654917-4280-1-git-send-email-paolo.valente@linaro.org>
 List-ID: <linux-block@vger.kernel.org>
 
-Zone actions (Open/Close/Reset) update zone cache on success.
+From: Arianna Avanzini <avanzini.arianna@gmail.com>
 
-Add helpers for
-- Zone actions to update zone cache
-- Zone report to translate cache to ZBC format structs
+A seeky queue (i..e, a queue containing random requests) is assigned a
+very small device-idling slice, for throughput issues. Unfortunately,
+given the process associated with a seeky queue, this behavior causes
+the following problem: if the process, say P, performs sync I/O and
+has a higher weight than some other processes doing I/O and associated
+with non-seeky queues, then BFQ may fail to guarantee to P its
+reserved share of the throughput. The reason is that idling is key
+for providing service guarantees to processes doing sync I/O [1].
 
-Update blkreport to pull from zone cache instead of querying media.
+This commit addresses this issue by allowing the device-idling slice
+to be reduced for a seeky queue only if the scenario happens to be
+symmetric, i.e., if all the queues are to receive the same share of
+the throughput.
 
-Added open explicit and closed states for zone cache
+[1] P. Valente, A. Avanzini, "Evolution of the BFQ Storage I/O
+    Scheduler", Proceedings of the First Workshop on Mobile System
+    Technologies (MST-2015), May 2015.
+    http://algogroup.unimore.it/people/paolo/disk_sched/mst-2015.pdf
 
-Signed-off-by: Shaun Tancheff <shaun.tancheff@seagate.com>
-
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Damien Le Moal <damien.lemoal@hgst.com>
-Cc: Dan Williams <dan.j.williams@intel.com>
-Cc: Sagi Grimberg <sagig@mellanox.com>
-Cc: Mike Christie <mchristi@redhat.com>
-Cc: Toshi Kani <toshi.kani@hpe.com>
-Cc: Kent Overstreet <kent.overstreet@gmail.com>
-Cc: Ming Lei <ming.lei@canonical.com>
-
+Signed-off-by: Arianna Avanzini <avanzini.arianna@gmail.com>
+Signed-off-by: Riccardo Pizzetti <riccardo.pizzetti@gmail.com>
+Signed-off-by: Samuele Zecchini <samuele.zecchini92@gmail.com>
+Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
 ---
- block/blk-lib.c        |   3 +-
- block/blk-zoned.c      | 190 +++++++++++++++++++++++++++++++++++++++++++++++++
- block/ioctl.c          |  39 +++++++---
- include/linux/blkdev.h |  14 +++-
- 4 files changed, 234 insertions(+), 12 deletions(-)
+ block/cfq-iosched.c | 254 ++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 248 insertions(+), 6 deletions(-)
 
-diff --git a/block/blk-lib.c b/block/blk-lib.c
-index 6dcdcbf..92898ec 100644
---- a/block/blk-lib.c
-+++ b/block/blk-lib.c
-@@ -6,7 +6,6 @@
- #include <linux/bio.h>
- #include <linux/blkdev.h>
- #include <linux/scatterlist.h>
--#include <linux/blkzoned_api.h>
- 
- #include "blk.h"
- 
-@@ -358,6 +357,8 @@ int blkdev_issue_zone_action(struct block_device *bdev, unsigned int op,
- 	bio_set_op_attrs(bio, op, op_flags);
- 	ret = submit_bio_wait(bio);
- 	bio_put(bio);
-+	if (ret == 0)
-+		update_zone_state(bdev, sector, op);
- 	return ret;
- }
- EXPORT_SYMBOL(blkdev_issue_zone_action);
-diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index 975e863..799676b 100644
---- a/block/blk-zoned.c
-+++ b/block/blk-zoned.c
-@@ -68,3 +68,193 @@ void blk_drop_zones(struct request_queue *q)
- 	q->zones = RB_ROOT;
- }
- EXPORT_SYMBOL_GPL(blk_drop_zones);
-+
-+static void __set_zone_state(struct blk_zone *zone, int op)
-+{
-+	if (zone->type == BLK_ZONE_TYPE_CONVENTIONAL)
-+		return;
-+
-+	switch (op) {
-+	case REQ_OP_ZONE_OPEN:
-+		zone->state = BLK_ZONE_OPEN_EXPLICIT;
-+		break;
-+	case REQ_OP_ZONE_CLOSE:
-+		zone->state = BLK_ZONE_CLOSED;
-+		break;
-+	case REQ_OP_ZONE_RESET:
-+		zone->wp = zone->start;
-+		break;
-+	default:
-+		WARN_ONCE(1, "%s: invalid op code: %u\n", __func__, op);
-+	}
-+}
-+
-+void update_zone_state(struct block_device *bdev, sector_t lba, unsigned int op)
-+{
-+	struct request_queue *q = bdev_get_queue(bdev);
-+	struct blk_zone *zone = NULL;
-+
-+	if (lba == ~0ul) {
-+		struct rb_node *node;
-+
-+		for (node = rb_first(&q->zones); node; node = rb_next(node)) {
-+			zone = rb_entry(node, struct blk_zone, node);
-+			__set_zone_state(zone, op);
-+		}
-+		return;
-+	}
-+	zone = blk_lookup_zone(q, lba);
-+	if (zone)
-+		__set_zone_state(zone, op);
-+}
-+EXPORT_SYMBOL_GPL(update_zone_state);
-+
-+void bzrpt_fill(struct block_device *bdev, struct bdev_zone_report *bzrpt,
-+		size_t sz, sector_t lba, u8 opt)
-+{
-+	u64 clen = ~0ul;
-+	struct blk_zone *zone = NULL;
-+	struct rb_node *node = NULL;
-+	struct request_queue *q = bdev_get_queue(bdev);
-+	u32 max_entries = (sz - sizeof(struct bdev_zone_report))
-+			/  sizeof(struct bdev_zone_descriptor);
-+	u32 entry;
-+	int len_diffs = 0;
-+	int type_diffs = 0;
-+	u8 ctype;
-+	u8 same = 0;
-+
-+	zone = blk_lookup_zone(q, lba);
-+	if (zone)
-+		node = &zone->node;
-+
-+	for (entry = 0;
-+	     entry < max_entries && node;
-+	     entry++, node = rb_next(node)) {
-+		u64 wp;
-+		u8 cond = 0;
-+		u8 flgs = 0;
-+
-+		zone = rb_entry(node, struct blk_zone, node);
-+		if (blk_zone_is_cmr(zone))
-+			wp = zone->start + zone->len;
-+		else
-+			wp = zone->wp;
-+
-+		bzrpt->descriptors[entry].lba_start = cpu_to_be64(zone->start);
-+		bzrpt->descriptors[entry].length = cpu_to_be64(zone->len);
-+		bzrpt->descriptors[entry].type = zone->type;
-+		bzrpt->descriptors[entry].lba_wptr = cpu_to_be64(wp);
-+
-+		switch (zone->state) {
-+		case BLK_ZONE_NO_WP:
-+			cond = ZCOND_CONVENTIONAL;
-+			break;
-+		case BLK_ZONE_OPEN:
-+			cond = ZCOND_ZC2_OPEN_IMPLICIT;
-+			break;
-+		case BLK_ZONE_OPEN_EXPLICIT:
-+			cond = ZCOND_ZC3_OPEN_EXPLICIT;
-+			break;
-+		case BLK_ZONE_CLOSED:
-+			cond = ZCOND_ZC4_CLOSED;
-+			break;
-+		case BLK_ZONE_READONLY:
-+			cond = ZCOND_ZC6_READ_ONLY;
-+			break;
-+		case BLK_ZONE_OFFLINE:
-+			cond = ZCOND_ZC7_OFFLINE;
-+			break;
-+		default:
-+			cond = 5; /* not mapable */
-+			break;
-+		}
-+		if (zone->type == BLK_ZONE_TYPE_CONVENTIONAL)
-+			flgs |= 0x02;
-+		if (zone->wp == zone->start)
-+			flgs |= 0x01; /* flag as reset */
-+		bzrpt->descriptors[entry].flags = cond << 4 | flgs;
-+		bzrpt->descriptor_count = cpu_to_be32(entry+1);
-+
-+		switch (opt & 0x3f) {
-+		case ZOPT_RESET:
-+		case ZOPT_ZC1_EMPTY:
-+			if (zone->wp != zone->start)
-+				continue;
-+			break;
-+		case ZOPT_ZC5_FULL:
-+			if (zone->wp >= (zone->start + zone->len))
-+				continue;
-+			break;
-+		case ZOPT_ZC2_OPEN_IMPLICIT:
-+			if (zone->state != BLK_ZONE_OPEN)
-+				continue;
-+			break;
-+		case ZOPT_ZC3_OPEN_EXPLICIT:
-+			if (zone->state != BLK_ZONE_OPEN_EXPLICIT)
-+				continue;
-+			break;
-+		case ZOPT_ZC4_CLOSED:
-+			if (zone->state != BLK_ZONE_CLOSED)
-+				continue;
-+			break;
-+		case ZOPT_NON_SEQ:
-+		case ZOPT_NON_WP_ZONES:
-+			if (zone->state == BLK_ZONE_NO_WP)
-+				continue;
-+			break;
-+		case ZOPT_ZC6_READ_ONLY:
-+			if (zone->state == BLK_ZONE_READONLY)
-+				continue;
-+			break;
-+		case ZOPT_ZC7_OFFLINE:
-+			if (zone->state == BLK_ZONE_OFFLINE)
-+				continue;
-+			break;
-+		default:
-+			break;
-+		}
-+		/* if same code only applies to returned zones */
-+		if (opt & ZOPT_PARTIAL_FLAG) {
-+			if (clen != ~0ul) {
-+				clen = zone->len;
-+				ctype = zone->type;
-+			}
-+			if (zone->len != clen)
-+				len_diffs++;
-+			if (zone->type != ctype)
-+				type_diffs++;
-+			ctype = zone->type;
-+		}
-+	}
-+
-+	/* if same code only applies to all zones */
-+	if (!(opt & ZOPT_PARTIAL_FLAG)) {
-+		for (node = rb_first(&q->zones); node; node = rb_next(node)) {
-+			zone = rb_entry(node, struct blk_zone, node);
-+			if (clen != ~0ul) {
-+				clen = zone->len;
-+				ctype = zone->type;
-+			}
-+			if (zone->len != clen)
-+				len_diffs++;
-+			if (zone->type != ctype)
-+				type_diffs++;
-+			ctype = zone->type;
-+		}
-+	}
-+
-+	if (len_diffs == 0) {
-+		if (type_diffs == 0)
-+			same = ZS_ALL_SAME;
-+		else
-+			same = ZS_SAME_LEN_DIFF_TYPES;
-+	} else if (len_diffs == 1 && type_diffs == 0) {
-+		same = ZS_LAST_DIFFERS;
-+	} else {
-+		same = ZS_ALL_DIFFERENT;
-+	}
-+	bzrpt->same_field = same;
-+	bzrpt->maximum_lba = i_size_read(bdev->bd_inode);
-+}
-+EXPORT_SYMBOL_GPL(bzrpt_fill);
-diff --git a/block/ioctl.c b/block/ioctl.c
-index a2a6c2c..44c8cb7 100644
---- a/block/ioctl.c
-+++ b/block/ioctl.c
-@@ -7,7 +7,6 @@
- #include <linux/backing-dev.h>
- #include <linux/fs.h>
- #include <linux/blktrace_api.h>
--#include <linux/blkzoned_api.h>
- #include <linux/pr.h>
- #include <asm/uaccess.h>
- 
-@@ -201,11 +200,13 @@ static int blk_zoned_report_ioctl(struct block_device *bdev, fmode_t mode,
- 	int error = -EFAULT;
- 	gfp_t gfp = GFP_KERNEL | GFP_DMA;
- 	struct bdev_zone_report_io *zone_iodata = NULL;
-+	struct bdev_zone_report *bzrpt = NULL;
- 	int order = 0;
- 	struct page *pgs = NULL;
- 	u32 alloc_size = PAGE_SIZE;
- 	unsigned long op_flags = 0;
--	u8 opt = 0;
-+	sector_t lba = 0ul;
-+	u8 opt;
- 
- 	if (!(mode & FMODE_READ))
- 		return -EBADF;
-@@ -219,6 +220,30 @@ static int blk_zoned_report_ioctl(struct block_device *bdev, fmode_t mode,
- 		error = -EFAULT;
- 		goto report_zones_out;
- 	}
-+
-+	lba = zone_iodata->data.in.zone_locator_lba;
-+	opt = zone_iodata->data.in.report_option;
-+
-+#ifdef CONFIG_BLK_DEV_ZONED
-+	if (zone_iodata->data.in.return_page_count > alloc_size) {
-+		alloc_size = zone_iodata->data.in.return_page_count;
-+		bzrpt = kzalloc(alloc_size, GFP_KERNEL);
-+		if (bzrpt) {
-+			free_page((unsigned long)zone_iodata);
-+			zone_iodata = (void *)bzrpt;
-+		} else {
-+			/* Result requires DMA capable memory */
-+			pr_err("Not enough memory available for request.\n");
-+			error = -ENOMEM;
-+			goto report_zones_out;
-+		}
-+	}
-+	(void)op_flags;
-+	bzrpt_fill(bdev, &zone_iodata->data.out, alloc_size, lba, opt);
-+	error = 0;
-+	if (copy_to_user(parg, zone_iodata, alloc_size))
-+		error = -EFAULT;
-+#else
- 	if (zone_iodata->data.in.return_page_count > alloc_size) {
- 		int npages;
- 
-@@ -234,7 +259,6 @@ static int blk_zoned_report_ioctl(struct block_device *bdev, fmode_t mode,
- 			}
- 			order = ilog2(npages);
- 			memset(mem, 0, alloc_size);
--			memcpy(mem, zone_iodata, sizeof(*zone_iodata));
- 			free_page((unsigned long)zone_iodata);
- 			zone_iodata = mem;
- 		} else {
-@@ -244,21 +268,20 @@ static int blk_zoned_report_ioctl(struct block_device *bdev, fmode_t mode,
- 			goto report_zones_out;
- 		}
- 	}
--	opt = zone_iodata->data.in.report_option;
--	error = blkdev_issue_zone_report(bdev, op_flags,
--			zone_iodata->data.in.zone_locator_lba, opt,
-+	error = blkdev_issue_zone_report(bdev, op_flags, lba, opt,
- 			pgs ? pgs : virt_to_page(zone_iodata),
- 			alloc_size, GFP_KERNEL);
--
- 	if (error)
- 		goto report_zones_out;
--
- 	if (copy_to_user(parg, zone_iodata, alloc_size))
- 		error = -EFAULT;
-+#endif
- 
- report_zones_out:
- 	if (pgs)
- 		__free_pages(pgs, order);
-+	else if (bzrpt)
-+		kfree(bzrpt);
- 	else if (zone_iodata)
- 		free_page((unsigned long)zone_iodata);
- 	return error;
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 9b2f5e8..c1b4e2f 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -24,6 +24,7 @@
- #include <linux/rcupdate.h>
- #include <linux/percpu-refcount.h>
- #include <linux/scatterlist.h>
-+#include <linux/blkzoned_api.h>
- 
- struct module;
- struct scsi_ioctl_command;
-@@ -275,6 +276,8 @@ enum blk_zone_state {
- 	BLK_ZONE_UNKNOWN,
- 	BLK_ZONE_NO_WP,
- 	BLK_ZONE_OPEN,
-+	BLK_ZONE_OPEN_EXPLICIT,
-+	BLK_ZONE_CLOSED,
- 	BLK_ZONE_READONLY,
- 	BLK_ZONE_OFFLINE,
- 	BLK_ZONE_BUSY,
-@@ -291,9 +294,9 @@ struct blk_zone {
- 	void *private_data;
+diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
+index cb0b44b..ae524ae 100644
+--- a/block/cfq-iosched.c
++++ b/block/cfq-iosched.c
+@@ -152,6 +152,20 @@ struct bfq_sched_data {
  };
  
--#define blk_zone_is_smr(z) ((z)->type == BLK_ZONE_TYPE_SEQWRITE_REQ ||	\
--			    (z)->type == BLK_ZONE_TYPE_SEQWRITE_PREF)
--
-+#define blk_zone_is_seq_req(z) ((z)->type == BLK_ZONE_TYPE_SEQWRITE_REQ)
-+#define blk_zone_is_seq_pref(z) ((z)->type == BLK_ZONE_TYPE_SEQWRITE_PREF)
-+#define blk_zone_is_smr(z) (blk_zone_is_seq_req(z) || blk_zone_is_seq_pref(z))
- #define blk_zone_is_cmr(z) ((z)->type == BLK_ZONE_TYPE_CONVENTIONAL)
- #define blk_zone_is_full(z) ((z)->wp == (z)->start + (z)->len)
- #define blk_zone_is_empty(z) ((z)->wp == (z)->start)
-@@ -302,8 +305,13 @@ extern struct blk_zone *blk_lookup_zone(struct request_queue *, sector_t);
- extern struct blk_zone *blk_insert_zone(struct request_queue *,
- 					struct blk_zone *);
- extern void blk_drop_zones(struct request_queue *);
-+extern void update_zone_state(struct block_device *, sector_t, unsigned int);
-+extern void bzrpt_fill(struct block_device *, struct bdev_zone_report *, size_t,
-+		       sector_t, u8);
- #else
- static inline void blk_drop_zones(struct request_queue *q) { };
-+static inline void update_zone_state(struct block_device *bdev,
-+				     sector_t lba, unsigned int op) {}
- #endif
+ /**
++ * struct bfq_weight_counter - counter of the number of all active entities
++ *                             with a given weight.
++ */
++struct bfq_weight_counter {
++	unsigned int weight; /* weight of the entities this counter refers to */
++	unsigned int num_active; /* nr of active entities with this weight */
++	/*
++	 * Weights tree member (see bfq_data's @queue_weights_tree and
++	 * @group_weights_tree)
++	 */
++	struct rb_node weights_node;
++};
++
++/**
+  * struct bfq_entity - schedulable entity.
+  *
+  * A bfq_entity is used to represent either a bfq_queue (leaf node in the
+@@ -180,6 +194,8 @@ struct bfq_sched_data {
+  */
+ struct bfq_entity {
+ 	struct rb_node rb_node; /* service_tree member */
++	/* pointer to the weight counter associated with this entity */
++	struct bfq_weight_counter *weight_counter;
  
- struct queue_limits {
+ 	/*
+ 	 * flag, true if the entity is on a tree (either the active or
+@@ -402,6 +418,25 @@ struct bfq_data {
+ 	struct bfq_group *root_group;
+ 
+ 	/*
++	 * rbtree of weight counters of @bfq_queues, sorted by
++	 * weight. Used to keep track of whether all @bfq_queues have
++	 * the same weight. The tree contains one counter for each
++	 * distinct weight associated to some active and not
++	 * weight-raised @bfq_queue (see the comments to the functions
++	 * bfq_weights_tree_[add|remove] for further details).
++	 */
++	struct rb_root queue_weights_tree;
++	/*
++	 * rbtree of non-queue @bfq_entity weight counters, sorted by
++	 * weight. Used to keep track of whether all @bfq_groups have
++	 * the same weight. The tree contains one counter for each
++	 * distinct weight associated to some active @bfq_group (see
++	 * the comments to the functions bfq_weights_tree_[add|remove]
++	 * for further details).
++	 */
++	struct rb_root group_weights_tree;
++
++	/*
+ 	 * Number of bfq_queues containing requests (including the
+ 	 * queue in service, even if it is idling).
+ 	 */
+@@ -699,6 +734,11 @@ struct bfq_group_data {
+  *             to avoid too many special cases during group creation/
+  *             migration.
+  * @stats: stats for this bfqg.
++ * @active_entities: number of active entities belonging to the group;
++ *                   unused for the root group. Used to know whether there
++ *                   are groups with more than one active @bfq_entity
++ *                   (see the comments to the function
++ *                   bfq_bfqq_may_idle()).
+  * @rq_pos_tree: rbtree sorted by next_request position, used when
+  *               determining if two or more queues have interleaving
+  *               requests (see bfq_find_close_cooperator()).
+@@ -726,6 +766,8 @@ struct bfq_group {
+ 
+ 	struct bfq_entity *my_entity;
+ 
++	int active_entities;
++
+ 	struct rb_root rq_pos_tree;
+ 
+ 	struct bfqg_stats stats;
+@@ -1231,6 +1273,15 @@ up:
+ 	goto up;
+ }
+ 
++static void bfq_weights_tree_add(struct bfq_data *bfqd,
++				 struct bfq_entity *entity,
++				 struct rb_root *root);
++
++static void bfq_weights_tree_remove(struct bfq_data *bfqd,
++				    struct bfq_entity *entity,
++				    struct rb_root *root);
++
++
+ /**
+  * bfq_active_insert - insert an entity in the active tree of its
+  *                     group/device.
+@@ -1269,6 +1320,13 @@ static void bfq_active_insert(struct bfq_service_tree *st,
+ #endif
+ 	if (bfqq)
+ 		list_add(&bfqq->bfqq_list, &bfqq->bfqd->active_list);
++#ifdef CONFIG_CFQ_GROUP_IOSCHED
++	else /* bfq_group */
++		bfq_weights_tree_add(bfqd, entity, &bfqd->group_weights_tree);
++
++	if (bfqg != bfqd->root_group)
++		bfqg->active_entities++;
++#endif
+ }
+ 
+ /**
+@@ -1364,6 +1422,14 @@ static void bfq_active_extract(struct bfq_service_tree *st,
+ #endif
+ 	if (bfqq)
+ 		list_del(&bfqq->bfqq_list);
++#ifdef CONFIG_CFQ_GROUP_IOSCHED
++	else /* bfq_group */
++		bfq_weights_tree_remove(bfqd, entity,
++					&bfqd->group_weights_tree);
++
++	if (bfqg != bfqd->root_group)
++		bfqg->active_entities--;
++#endif
+ }
+ 
+ /**
+@@ -1461,6 +1527,7 @@ __bfq_entity_update_weight_prio(struct bfq_service_tree *old_st,
+ 		struct bfq_queue *bfqq = bfq_entity_to_bfqq(entity);
+ 		unsigned int prev_weight, new_weight;
+ 		struct bfq_data *bfqd = NULL;
++		struct rb_root *root;
+ #ifdef CONFIG_CFQ_GROUP_IOSCHED
+ 		struct bfq_sched_data *sd;
+ 		struct bfq_group *bfqg;
+@@ -1510,7 +1577,26 @@ __bfq_entity_update_weight_prio(struct bfq_service_tree *old_st,
+ 		prev_weight = entity->weight;
+ 		new_weight = entity->orig_weight *
+ 			     (bfqq ? bfqq->wr_coeff : 1);
++		/*
++		 * If the weight of the entity changes, remove the entity
++		 * from its old weight counter (if there is a counter
++		 * associated with the entity), and add it to the counter
++		 * associated with its new weight.
++		 */
++		if (prev_weight != new_weight) {
++			root = bfqq ? &bfqd->queue_weights_tree :
++				      &bfqd->group_weights_tree;
++			bfq_weights_tree_remove(bfqd, entity, root);
++		}
+ 		entity->weight = new_weight;
++		/*
++		 * Add the entity to its weights tree only if it is
++		 * not associated with a weight-raised queue.
++		 */
++		if (prev_weight != new_weight &&
++		    (bfqq ? bfqq->wr_coeff == 1 : 1))
++			/* If we get here, root has been initialized. */
++			bfq_weights_tree_add(bfqd, entity, root);
+ 
+ 		new_st->wsum += entity->weight;
+ 
+@@ -2057,6 +2143,10 @@ static void bfq_del_bfqq_busy(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+ 
+ 	bfqd->busy_queues--;
+ 
++	if (!bfqq->dispatched)
++		bfq_weights_tree_remove(bfqd, &bfqq->entity,
++					&bfqd->queue_weights_tree);
++
+ 	if (bfqq->wr_coeff > 1)
+ 		bfqd->wr_busy_queues--;
+ 
+@@ -2077,6 +2167,11 @@ static void bfq_add_bfqq_busy(struct bfq_data *bfqd, struct bfq_queue *bfqq)
+ 	bfq_mark_bfqq_busy(bfqq);
+ 	bfqd->busy_queues++;
+ 
++	if (!bfqq->dispatched)
++		if (bfqq->wr_coeff == 1)
++			bfq_weights_tree_add(bfqd, &bfqq->entity,
++					     &bfqd->queue_weights_tree);
++
+ 	if (bfqq->wr_coeff > 1)
+ 		bfqd->wr_busy_queues++;
+ }
+@@ -2507,6 +2602,7 @@ static void bfq_pd_init(struct blkg_policy_data *pd)
+ 				   * in bfq_init_queue()
+ 				   */
+ 	bfqg->bfqd = bfqd;
++	bfqg->active_entities = 0;
+ 	bfqg->rq_pos_tree = RB_ROOT;
+ }
+ 
+@@ -3415,6 +3511,142 @@ static void bfq_pos_tree_add_move(struct bfq_data *bfqd, struct bfq_queue *bfqq)
+ 		bfqq->pos_root = NULL;
+ }
+ 
++/*
++ * Tell whether there are active queues or groups with differentiated weights.
++ */
++static bool bfq_differentiated_weights(struct bfq_data *bfqd)
++{
++	/*
++	 * For weights to differ, at least one of the trees must contain
++	 * at least two nodes.
++	 */
++	return (!RB_EMPTY_ROOT(&bfqd->queue_weights_tree) &&
++		(bfqd->queue_weights_tree.rb_node->rb_left ||
++		 bfqd->queue_weights_tree.rb_node->rb_right)
++#ifdef CONFIG_CFQ_GROUP_IOSCHED
++	       ) ||
++	       (!RB_EMPTY_ROOT(&bfqd->group_weights_tree) &&
++		(bfqd->group_weights_tree.rb_node->rb_left ||
++		 bfqd->group_weights_tree.rb_node->rb_right)
++#endif
++	       );
++}
++
++/*
++ * The following function returns true if every queue must receive the
++ * same share of the throughput (this condition is used when deciding
++ * whether idling may be disabled, see the comments in the function
++ * bfq_bfqq_may_idle()).
++ *
++ * Such a scenario occurs when:
++ * 1) all active queues have the same weight,
++ * 2) all active groups at the same level in the groups tree have the same
++ *    weight,
++ * 3) all active groups at the same level in the groups tree have the same
++ *    number of children.
++ *
++ * Unfortunately, keeping the necessary state for evaluating exactly the
++ * above symmetry conditions would be quite complex and time-consuming.
++ * Therefore this function evaluates, instead, the following stronger
++ * sub-conditions, for which it is much easier to maintain the needed
++ * state:
++ * 1) all active queues have the same weight,
++ * 2) all active groups have the same weight,
++ * 3) all active groups have at most one active child each.
++ * In particular, the last two conditions are always true if hierarchical
++ * support and the cgroups interface are not enabled, thus no state needs
++ * to be maintained in this case.
++ */
++static bool bfq_symmetric_scenario(struct bfq_data *bfqd)
++{
++	return !bfq_differentiated_weights(bfqd);
++}
++
++/*
++ * If the weight-counter tree passed as input contains no counter for
++ * the weight of the input entity, then add that counter; otherwise just
++ * increment the existing counter.
++ *
++ * Note that weight-counter trees contain few nodes in mostly symmetric
++ * scenarios. For example, if all queues have the same weight, then the
++ * weight-counter tree for the queues may contain at most one node.
++ * This holds even if low_latency is on, because weight-raised queues
++ * are not inserted in the tree.
++ * In most scenarios, the rate at which nodes are created/destroyed
++ * should be low too.
++ */
++static void bfq_weights_tree_add(struct bfq_data *bfqd,
++				 struct bfq_entity *entity,
++				 struct rb_root *root)
++{
++	struct rb_node **new = &(root->rb_node), *parent = NULL;
++
++	/*
++	 * Do not insert if the entity is already associated with a
++	 * counter, which happens if:
++	 *   1) the entity is associated with a queue,
++	 *   2) a request arrival has caused the queue to become both
++	 *      non-weight-raised, and hence change its weight, and
++	 *      backlogged; in this respect, each of the two events
++	 *      causes an invocation of this function,
++	 *   3) this is the invocation of this function caused by the
++	 *      second event. This second invocation is actually useless,
++	 *      and we handle this fact by exiting immediately. More
++	 *      efficient or clearer solutions might possibly be adopted.
++	 */
++	if (entity->weight_counter)
++		return;
++
++	while (*new) {
++		struct bfq_weight_counter *__counter = container_of(*new,
++						struct bfq_weight_counter,
++						weights_node);
++		parent = *new;
++
++		if (entity->weight == __counter->weight) {
++			entity->weight_counter = __counter;
++			goto inc_counter;
++		}
++		if (entity->weight < __counter->weight)
++			new = &((*new)->rb_left);
++		else
++			new = &((*new)->rb_right);
++	}
++
++	entity->weight_counter = kzalloc(sizeof(struct bfq_weight_counter),
++					 GFP_ATOMIC);
++	entity->weight_counter->weight = entity->weight;
++	rb_link_node(&entity->weight_counter->weights_node, parent, new);
++	rb_insert_color(&entity->weight_counter->weights_node, root);
++
++inc_counter:
++	entity->weight_counter->num_active++;
++}
++
++/*
++ * Decrement the weight counter associated with the entity, and, if the
++ * counter reaches 0, remove the counter from the tree.
++ * See the comments to the function bfq_weights_tree_add() for considerations
++ * about overhead.
++ */
++static void bfq_weights_tree_remove(struct bfq_data *bfqd,
++				    struct bfq_entity *entity,
++				    struct rb_root *root)
++{
++	if (!entity->weight_counter)
++		return;
++
++	entity->weight_counter->num_active--;
++	if (entity->weight_counter->num_active > 0)
++		goto reset_entity_pointer;
++
++	rb_erase(&entity->weight_counter->weights_node, root);
++	kfree(entity->weight_counter);
++
++reset_entity_pointer:
++	entity->weight_counter = NULL;
++}
++
+ static struct request *bfq_find_next_rq(struct bfq_data *bfqd,
+ 					struct bfq_queue *bfqq,
+ 					struct request *last)
+@@ -4709,13 +4941,17 @@ static void bfq_arm_slice_timer(struct bfq_data *bfqd)
+ 	 */
+ 	sl = bfqd->bfq_slice_idle;
+ 	/*
+-	 * Unless the queue is being weight-raised, grant only minimum
+-	 * idle time if the queue is seeky. A long idling is preserved
+-	 * for a weight-raised queue, because it is needed for
+-	 * guaranteeing to the queue its reserved share of the
+-	 * throughput.
++	 * Unless the queue is being weight-raised or the scenario is
++	 * asymmetric, grant only minimum idle time if the queue
++	 * is seeky. A long idling is preserved for a weight-raised
++	 * queue, or, more in general, in an asymmetric scenario,
++	 * because a long idling is needed for guaranteeing to a queue
++	 * its reserved share of the throughput (in particular, it is
++	 * needed if the queue has a higher weight than some other
++	 * queue).
+ 	 */
+-	if (BFQQ_SEEKY(bfqq) && bfqq->wr_coeff == 1)
++	if (BFQQ_SEEKY(bfqq) && bfqq->wr_coeff == 1 &&
++	    bfq_symmetric_scenario(bfqd))
+ 		sl = min_t(u64, sl, BFQ_MIN_TT);
+ 
+ 	bfqd->last_idling_start = ktime_get();
+@@ -6357,6 +6593,9 @@ static void bfq_completed_request(struct request_queue *q, struct request *rq)
+ 		 * mechanism).
+ 		 */
+ 		bfqq->budget_timeout = jiffies;
++
++		bfq_weights_tree_remove(bfqd, &bfqq->entity,
++					&bfqd->queue_weights_tree);
+ 	}
+ 
+ 	RQ_BIC(rq)->ttime.last_end_request = ktime_get_ns();
+@@ -6759,6 +6998,9 @@ static int bfq_init_queue(struct request_queue *q, struct elevator_type *e)
+ 		     HRTIMER_MODE_REL);
+ 	bfqd->idle_slice_timer.function = bfq_idle_slice_timer;
+ 
++	bfqd->queue_weights_tree = RB_ROOT;
++	bfqd->group_weights_tree = RB_ROOT;
++
+ 	INIT_WORK(&bfqd->unplug_work, bfq_kick_queue);
+ 
+ 	INIT_LIST_HEAD(&bfqd->active_list);
 -- 
-2.8.1
+1.9.1
