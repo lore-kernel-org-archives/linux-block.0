@@ -1,50 +1,68 @@
 Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo <paolo.valente@linaro.org>
-Subject: [RFD] I/O scheduling in blk-mq
-To: Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
- Christoph Hellwig <hch@infradead.org>, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, Ulf Hansson <ulf.hansson@linaro.org>,
- Linus Walleij <linus.walleij@linaro.org>, broonie@kernel.org
-Message-ID: <42e6f39b-7b47-963f-69b8-2cf61e889339@linaro.org>
-Date: Mon, 8 Aug 2016 16:09:56 +0200
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15; format=flowed
+From: Paolo Valente <paolo.valente@linaro.org>
+To: Jens Axboe <axboe@kernel.dk>,
+	Tejun Heo <tj@kernel.org>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ulf.hansson@linaro.org,
+	linus.walleij@linaro.org,
+	broonie@kernel.org,
+	Arianna Avanzini <avanzini.arianna@gmail.com>,
+	Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH V2 02/22] block, cfq: remove close-based preemption
+Date: Mon,  8 Aug 2016 13:14:57 +0200
+Message-Id: <1470654917-4280-3-git-send-email-paolo.valente@linaro.org>
+In-Reply-To: <1470654917-4280-1-git-send-email-paolo.valente@linaro.org>
+References: <1470654917-4280-1-git-send-email-paolo.valente@linaro.org>
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Jens, Tejun, Christoph, all,
-AFAIK blk-mq does not yet feature I/O schedulers. In particular, there
-is no scheduler providing strong guarantees in terms of
-responsiveness, latency for time-sensitive applications and bandwidth
-distribution.
+From: Arianna Avanzini <avanzini.arianna@gmail.com>
 
-For this reason, I'm trying to port BFQ to blk-mq, or to develop
-something simpler if even a reduced version of BFQ proves to be too
-heavy (this project is supported by Linaro). If you are willing to
-provide some feedback in this respect, I would like to ask for
-opinions/suggestions on the following two matters, and possibly to
-open a more general discussion on I/O scheduling in blk-mq.
+CFQ may preempt the queue currently in service if a new request, for a
+different queue, happens to be close to the last-dispatched
+request. This boosts the throughput with processes that issue close
+requests, but whose I/O patterns are not regularly interleaved enough
+to trigger the activation of the queue-merging heuristic removed in
+the previous commit. BFQ does not need to perform any such preemption,
+because the queue-merging mechanism of BFQ (EQM) is reactive enough to
+merge queues also in the presence of irregularly interleaved I/O.
 
-1) My idea is to have an independent instance of BFQ, or in general of
-the I/O scheduler, executed for each software queue. Then there would
-be no global scheduling. The drawback of no global scheduling is that
-each process cannot get more than 1/M of the total throughput of the
-device, if M is the number of software queues. But, if I'm not
-mistaken, it is however unfeasible to give a process more than 1/M of
-the total throughput, without lowering the throughput itself. In fact,
-giving a process more than 1/M of the total throughput implies serving
-its software queue, say Q, more than the others.  The only way to do
-it is periodically stopping the service of the other software queues
-and dispatching only the requests in Q. But this would reduce
-parallelism, which is the main way how blk-mq achieves a very high
-throughput. Are these considerations, and, in particular, one
-independent I/O scheduler per software queue, sensible?
+Signed-off-by: Arianna Avanzini <avanzini.arianna@gmail.com>
+Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+---
+ block/cfq-iosched.c | 13 -------------
+ 1 file changed, 13 deletions(-)
 
-2) To provide per-process service guarantees, an I/O scheduler must
-create per-process internal queues. BFQ and CFQ use I/O contexts to
-achieve this goal. Is something like that (or exactly the same)
-available also in blk-mq? If so, do you have any suggestion, or link to
-documentation/code on how to use what is available in blk-mq?
-
-Thanks,
-Paolo
+diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
+index 10761b5..1ab8898 100644
+--- a/block/cfq-iosched.c
++++ b/block/cfq-iosched.c
+@@ -2696,12 +2696,6 @@ static inline sector_t cfq_dist_from_last(struct cfq_data *cfqd,
+ 		return cfqd->last_position - blk_rq_pos(rq);
+ }
+ 
+-static inline int cfq_rq_close(struct cfq_data *cfqd, struct cfq_queue *cfqq,
+-			       struct request *rq)
+-{
+-	return cfq_dist_from_last(cfqd, rq) <= CFQQ_CLOSE_THR;
+-}
+-
+ /*
+  * Determine whether we should enforce idle window for this queue.
+  */
+@@ -3751,13 +3745,6 @@ cfq_should_preempt(struct cfq_data *cfqd, struct cfq_queue *new_cfqq,
+ 	if (!cfqd->active_cic || !cfq_cfqq_wait_request(cfqq))
+ 		return false;
+ 
+-	/*
+-	 * if this request is as-good as one we would expect from the
+-	 * current cfqq, let it preempt
+-	 */
+-	if (cfq_rq_close(cfqd, cfqq, rq))
+-		return true;
+-
+ 	return false;
+ }
+ 
+-- 
+1.9.1
