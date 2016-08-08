@@ -1,82 +1,205 @@
-Return-Path: <aaronlee0817@163.com>
-Date: Mon, 29 Aug 2016 23:12:08 +0800 (CST)
-From: aaronlee0817 <aaronlee0817@163.com>
-To: tg <tg@kernel.org>, "jens axboe" <axboe@kernel.dk>,
-	"ming lin" <mlin@kernel.org>
-Cc: cgroup <cgroup@vger.kernel.org>, linux-block <linux-block@vger.kernel.org>,
-	"linux kernel mailing list" <linux-kernel@vger.kernel.org>,
-	"shaohua li" <shli@kernel.org>,
-	"yanzi.zhang" <yanzi.zhang@samsung.com>,
-	"zhen1.zhang" <zhen1.zhang@samsung.com>,
-	"jiale0817.li" <jiale0817.li@samsung.com>
-Subject: [AFC] cgroup: Fix block throttle bio more than once
-Content-Type: text/plain; charset=GBK
-MIME-Version: 1.0
-Message-ID: <335a26a9.11bb7.156d6db9097.Coremail.aaronlee0817@163.com>
+Return-Path: <paolo.valente@linaro.org>
+From: Paolo Valente <paolo.valente@linaro.org>
+To: Jens Axboe <axboe@kernel.dk>,
+	Tejun Heo <tj@kernel.org>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ulf.hansson@linaro.org,
+	linus.walleij@linaro.org,
+	broonie@kernel.org,
+	Paolo Valente <paolo.valente@linaro.org>,
+	Arianna Avanzini <avanzini.arianna@gmail.com>
+Subject: [PATCH V2 11/22] block, bfq: improve throughput boosting
+Date: Mon,  8 Aug 2016 13:15:06 +0200
+Message-Id: <1470654917-4280-12-git-send-email-paolo.valente@linaro.org>
+In-Reply-To: <1470654917-4280-1-git-send-email-paolo.valente@linaro.org>
+References: <1470654917-4280-1-git-send-email-paolo.valente@linaro.org>
 List-ID: <linux-block@vger.kernel.org>
 
-SGkgVGVqdW4sCgpGZXcgbW9udGhzIGFnbywgd2Ugc2VuZCBhbiBlbWFpbCB0byB0ZWxsIHRoZSBw
-cm9ibGVtIG9mIGJsa2lvIHRocm90dGxlIHRoZSBzcGxpdCBiaW8KbW9yZSB0aGFuIG9uY2UsIHdo
-aWNoIGxlYWRzIHRvIHRoZSBhY3R1YWwgYmFuZHdpZHRoIGlzIHNtYWxsZXIgdGhhbiB3ZSBoYXZl
-IHNldC4KQW5kIHdlIHRyeSB0byBmaXggdGhpcyBieSBhZGRpbmcgYSBmbGFnIGJpdCBCSU9fU1BM
-SVQgaW4gYmlvIGZsYWcgZmllbGQuIEFuZCB0aGVzZSBkYXlzCndlIGRpZCBzb21lIGVuaGFuY2Ug
-dGVzdCwgYW5kIGZvdW5kIHRoYXQgdGhlIGxhc3QgcGF0Y2ggd2Ugc2VudCB0byB5b3UgY2F1c2Vz
-IGFub3RoZXIKcHJvYmxlbSBvZiBpb3BzIHRocm90dGxlIHdoaWNoIHRocm90dGxlIHRoZSBpb3Bz
-IG11Y2ggdGhhbiB3aGF0IHdlIHNldC4gQmVjYXVzZSBzcGxpdApiaW8gc2hvdWxkIGJlIGNvdW50
-IG1vcmUgdGhhbiBvbmNlIG9mIGlvcHMsIG5vdCBvbmx5IG9uY2UuIAoKQWZ0ZXIgb3VyIHRlc3Rp
-bmcsIHdlIHByb3Bvc2UgdGhpcyBwYXRjaCB0byBmaXggYm90aCBicHMgYW5kIGlvcHMgdGhyb3R0
-bGUgcHJvYmxlbSBhbmQgCndhbnQgdG8gYXNrIGZvciB5b3VyIGNvbW1lbnQuIFRoYW5rcy4KCkZy
-b20gZWIxYjFjNzU0ZDRiMjY3NDA1YjVhMGQ2MmY4YjNmN2Y3Yjg1ZGY4ZCBNb24gU2VwIDE3IDAw
-OjAwOjAwIDIwMDEKRnJvbTogSmlhbGUgTGkgPGFhcm9ubGVlMDgxN0AxNjMuY29tPgpEYXRlOiBN
-b24sIDI5IEF1ZyAyMDE2IDEwOjI1OjQ3IC0wNDAwClN1YmplY3Q6IFtQQVRDSF0gRml4IGJsb2Nr
-IHRocm90dGxlIGJpbyBtb3JlIHRoYW4gb25jZQoKU2lnbmVkLW9mZi1ieTogSmlhbGUgTGkgPGFh
-cm9ubGVlMDgxN0AxNjMuY29tPgotLS0KIGJsb2NrL2Jsay1tZXJnZS5jICAgICAgICAgIHwgMSAr
-CiBibG9jay9ibGstdGhyb3R0bGUuYyAgICAgICB8IDkgKysrKysrKystCiBpbmNsdWRlL2xpbnV4
-L2Jsay1jZ3JvdXAuaCB8IDYgKysrKy0tCiBpbmNsdWRlL2xpbnV4L2Jsa190eXBlcy5oICB8IDEg
-KwogNCBmaWxlcyBjaGFuZ2VkLCAxNCBpbnNlcnRpb25zKCspLCAzIGRlbGV0aW9ucygtKQoKZGlm
-ZiAtLWdpdCBhL2Jsb2NrL2Jsay1tZXJnZS5jIGIvYmxvY2svYmxrLW1lcmdlLmMKaW5kZXggN2Ix
-N2E2NS4uMDc0ZjJiZCAxMDA2NDQKLS0tIGEvYmxvY2svYmxrLW1lcmdlLmMKKysrIGIvYmxvY2sv
-YmxrLW1lcmdlLmMKQEAgLTE5MCw3ICsxOTAsNyBAQCB2b2lkIGJsa19xdWV1ZV9zcGxpdChzdHJ1
-Y3QgcmVxdWVzdF9xdWV1ZSAqcSwgc3RydWN0IGJpbyAqKmJpbywKIAogCQliaW9fY2hhaW4oc3Bs
-aXQsICpiaW8pOwogCQl0cmFjZV9ibG9ja19zcGxpdChxLCBzcGxpdCwgKCpiaW8pLT5iaV9pdGVy
-LmJpX3NlY3Rvcik7CisJCWJpb19zZXRfZmxhZygqYmlvLCBCSU9fU1BMSVQpOwogCQlnZW5lcmlj
-X21ha2VfcmVxdWVzdCgqYmlvKTsKIAkJKmJpbyA9IHNwbGl0OwogCX0KZGlmZiAtLWdpdCBhL2Js
-b2NrL2Jsay10aHJvdHRsZS5jIGIvYmxvY2svYmxrLXRocm90dGxlLmMKaW5kZXggNGZmZGU5NS4u
-NTNhN2Q2NyAxMDA2NDQKLS0tIGEvYmxvY2svYmxrLXRocm90dGxlLmMKKysrIGIvYmxvY2svYmxr
-LXRocm90dGxlLmMKQEAgLTcyMSw2ICs3MjEsMTIgQEAgc3RhdGljIGJvb2wgdGdfd2l0aF9pbl9i
-cHNfbGltaXQoc3RydWN0IHRocm90bF9ncnAgKnRnLCBzdHJ1Y3QgYmlvICpiaW8sCiAJdTY0IGJ5
-dGVzX2FsbG93ZWQsIGV4dHJhX2J5dGVzLCB0bXA7CiAJdW5zaWduZWQgbG9uZyBqaWZmeV9lbGFw
-c2VkLCBqaWZmeV93YWl0LCBqaWZmeV9lbGFwc2VkX3JuZDsKIAorCWlmIChiaW9fZmxhZ2dlZChi
-aW8sIEJJT19TUExJVCkpIHsKKwkJaWYgKHdhaXQpCisJCQkqd2FpdCA9IDA7CisJCXJldHVybiB0
-cnVlOworCX0KKwogCWppZmZ5X2VsYXBzZWQgPSBqaWZmeV9lbGFwc2VkX3JuZCA9IGppZmZpZXMg
-LSB0Zy0+c2xpY2Vfc3RhcnRbcnddOwogCiAJLyogU2xpY2UgaGFzIGp1c3Qgc3RhcnRlZC4gQ29u
-c2lkZXIgb25lIHNsaWNlIGludGVydmFsICovCkBAIC04MTcsNyArODIzLDggQEAgc3RhdGljIHZv
-aWQgdGhyb3RsX2NoYXJnZV9iaW8oc3RydWN0IHRocm90bF9ncnAgKnRnLCBzdHJ1Y3QgYmlvICpi
-aW8pCiAJYm9vbCBydyA9IGJpb19kYXRhX2RpcihiaW8pOwogCiAJLyogQ2hhcmdlIHRoZSBiaW8g
-dG8gdGhlIGdyb3VwICovCi0JdGctPmJ5dGVzX2Rpc3BbcnddICs9IGJpby0+YmlfaXRlci5iaV9z
-aXplOworCWlmICghYmlvX2ZsYWdnZWQoYmlvLCBCSU9fU1BMSVQpKQorCQl0Zy0+Ynl0ZXNfZGlz
-cFtyd10gKz0gYmlvLT5iaV9pdGVyLmJpX3NpemU7CiAJdGctPmlvX2Rpc3BbcnddKys7CiAKIAkv
-KgpkaWZmIC0tZ2l0IGEvaW5jbHVkZS9saW51eC9ibGstY2dyb3VwLmggYi9pbmNsdWRlL2xpbnV4
-L2Jsay1jZ3JvdXAuaAppbmRleCBjMDJlNjY5Li4yNGRjMDliIDEwMDY0NAotLS0gYS9pbmNsdWRl
-L2xpbnV4L2Jsay1jZ3JvdXAuaAorKysgYi9pbmNsdWRlL2xpbnV4L2Jsay1jZ3JvdXAuaApAQCAt
-MTksNiArMTksNyBAQAogI2luY2x1ZGUgPGxpbnV4L3JhZGl4LXRyZWUuaD4KICNpbmNsdWRlIDxs
-aW51eC9ibGtkZXYuaD4KICNpbmNsdWRlIDxsaW51eC9hdG9taWMuaD4KKyNpbmNsdWRlIDxsaW51
-eC9ibGtfdHlwZXMuaD4KIAogLyogcGVyY3B1X2NvdW50ZXIgYmF0Y2ggZm9yIGJsa2dfW3J3XXN0
-YXRzLCBwZXItY3B1IGRyaWZ0IGRvZXNuJ3QgbWF0dGVyICovCiAjZGVmaW5lIEJMS0dfU1RBVF9D
-UFVfQkFUQ0gJKElOVF9NQVggLyAyKQpAQCAtNzEzLDggKzcxNCw5IEBAIHN0YXRpYyBpbmxpbmUg
-Ym9vbCBibGtjZ19iaW9faXNzdWVfY2hlY2soc3RydWN0IHJlcXVlc3RfcXVldWUgKnEsCiAKIAlp
-ZiAoIXRocm90bCkgewogCQlibGtnID0gYmxrZyA/OiBxLT5yb290X2Jsa2c7Ci0JCWJsa2dfcndz
-dGF0X2FkZCgmYmxrZy0+c3RhdF9ieXRlcywgYmlvLT5iaV9ydywKLQkJCQliaW8tPmJpX2l0ZXIu
-Ymlfc2l6ZSk7CisJCWlmICghYmlvX2ZsYWdnZWQoYmlvLCBCSU9fU1BMSVQpKQorCQkJYmxrZ19y
-d3N0YXRfYWRkKCZibGtnLT5zdGF0X2J5dGVzLCBiaW8tPmJpX3J3LAorCQkJCQliaW8tPmJpX2l0
-ZXIuYmlfc2l6ZSk7CiAJCWJsa2dfcndzdGF0X2FkZCgmYmxrZy0+c3RhdF9pb3MsIGJpby0+Ymlf
-cncsIDEpOwogCX0KIApkaWZmIC0tZ2l0IGEvaW5jbHVkZS9saW51eC9ibGtfdHlwZXMuaCBiL2lu
-Y2x1ZGUvbGludXgvYmxrX3R5cGVzLmgKaW5kZXggYjI5NDc4MC4uZTBlNDE4ZiAxMDA2NDQKLS0t
-IGEvaW5jbHVkZS9saW51eC9ibGtfdHlwZXMuaAorKysgYi9pbmNsdWRlL2xpbnV4L2Jsa190eXBl
-cy5oCkBAIC0xMjAsNyArMTIwLDcgQEAgc3RydWN0IGJpbyB7CiAjZGVmaW5lIEJJT19RVUlFVAk2
-CS8qIE1ha2UgQklPIFF1aWV0ICovCiAjZGVmaW5lIEJJT19DSEFJTgk3CS8qIGNoYWluZWQgYmlv
-LCAtPmJpX3JlbWFpbmluZyBpbiBlZmZlY3QgKi8KICNkZWZpbmUgQklPX1JFRkZFRAk4CS8qIGJp
-byBoYXMgZWxldmF0ZWQgLT5iaV9jbnQgKi8KKyNkZWZpbmUgQklPX1NQTElUICAgICAgIDkgICAg
-ICAgLyogYmlvIGhhcyBiZWVuIHNwbGl0ZWQgKi8KIAogLyoKICAqIEZsYWdzIHN0YXJ0aW5nIGhl
-cmUgZ2V0IHByZXNlcnZlZCBieSBiaW9fcmVzZXQoKSAtIHRoaXMgaW5jbHVkZXMKLS0gCjEuOS4x
-Cg==
+The feedback-loop algorithm used by BFQ to compute queue (process)
+budgets is basically a set of three update rules, one for each of the
+main reasons why a queue may be expired. If many processes suddenly
+switch from sporadic I/O to greedy and sequential I/O, then these
+rules are quite slow to assign large budgets to these processes, and
+hence to achieve a high throughput. On the opposite side, BFQ assigns
+the maximum possible budget B_max to a just-created queue. This allows
+a high throughput to be achieved immediately if the associated process
+is I/O-bound and performs sequential I/O from the beginning. But it
+also increases the worst-case latency experienced by the first
+requests issued by the process, because the larger the budget of a
+queue waiting for service is, the later the queue will be served by
+B-WF2Q+ (Subsec 3.3 in [1]). This is detrimental for an interactive or
+soft real-time application.
+
+To tackle these throughput and latency problems, on one hand this
+patch changes the initial budget value to B_max/2. On the other hand,
+it re-tunes the three rules, adopting a more aggressive,
+multiplicative increase/linear decrease scheme. This scheme trades
+latency for throughput more than before, and tends to assign large
+budgets quickly to processes that are or become I/O-bound. For two of
+the expiration reasons, the new version of the rules also contains
+some more little improvements, briefly described below.
+
+*No more backlog.* In this case, the budget was larger than the number
+of sectors actually read/written by the process before it stopped
+doing I/O. Hence, to reduce latency for the possible future I/O
+requests of the process, the old rule simply set the next budget to
+the number of sectors actually consumed by the process. However, if
+there are still outstanding requests, then the process may have not
+yet issued its next request just because it is still waiting for the
+completion of some of the still outstanding ones. If this sub-case
+holds true, then the new rule, instead of decreasing the budget,
+doubles it, proactively, in the hope that: 1) a larger budget will fit
+the actual needs of the process, and 2) the process is sequential and
+hence a higher throughput will be achieved by serving the process
+longer after granting it access to the device.
+
+*Budget timeout*. The original rule set the new budget to the maximum
+value B_max, to maximize throughput and let all processes experiencing
+budget timeouts receive the same share of the device time. In our
+experiments we verified that this sudden jump to B_max did not provide
+sensible benefits; rather it increased the latency of processes
+performing sporadic and short I/O. The new rule only doubles the
+budget.
+
+[1] P. Valente and M. Andreolini, "Improving Application
+    Responsiveness with the BFQ Disk I/O Scheduler", Proceedings of
+    the 5th Annual International Systems and Storage Conference
+    (SYSTOR '12), June 2012.
+    Slightly extended version:
+    http://algogroup.unimore.it/people/paolo/disk_sched/bfq-v1-suite-
+							results.pdf
+
+Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+Signed-off-by: Arianna Avanzini <avanzini.arianna@gmail.com>
+---
+ block/cfq-iosched.c | 83 ++++++++++++++++++++++++++---------------------------
+ 1 file changed, 41 insertions(+), 42 deletions(-)
+
+diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
+index ab6c875..f9612b8 100644
+--- a/block/cfq-iosched.c
++++ b/block/cfq-iosched.c
+@@ -693,9 +693,6 @@ struct kmem_cache *bfq_pool;
+ #define BFQQ_SEEK_THR		(sector_t)(8 * 100)
+ #define BFQQ_SEEKY(bfqq)	(hweight32(bfqq->seek_history) > 32/8)
+ 
+-/* Budget feedback step. */
+-#define BFQ_BUDGET_STEP         128
+-
+ /* Min samples used for peak rate estimation (for autotuning). */
+ #define BFQ_PEAK_RATE_SAMPLES	32
+ 
+@@ -3605,36 +3602,6 @@ static struct bfq_queue *bfq_set_in_service_queue(struct bfq_data *bfqd)
+ 	return bfqq;
+ }
+ 
+-/*
+- * bfq_default_budget - return the default budget for @bfqq on @bfqd.
+- * @bfqd: the device descriptor.
+- * @bfqq: the queue to consider.
+- *
+- * We use 3/4 of the @bfqd maximum budget as the default value
+- * for the max_budget field of the queues.  This lets the feedback
+- * mechanism to start from some middle ground, then the behavior
+- * of the process will drive the heuristics towards high values, if
+- * it behaves as a greedy sequential reader, or towards small values
+- * if it shows a more intermittent behavior.
+- */
+-static unsigned long bfq_default_budget(struct bfq_data *bfqd,
+-					struct bfq_queue *bfqq)
+-{
+-	unsigned long budget;
+-
+-	/*
+-	 * When we need an estimate of the peak rate we need to avoid
+-	 * to give budgets that are too short due to previous measurements.
+-	 * So, in the first 10 assignments use a ``safe'' budget value.
+-	 */
+-	if (bfqd->budgets_assigned < 194 && bfqd->bfq_user_max_budget == 0)
+-		budget = bfq_default_max_budget;
+-	else
+-		budget = bfqd->bfq_max_budget;
+-
+-	return budget - budget / 4;
+-}
+-
+ static void bfq_arm_slice_timer(struct bfq_data *bfqd)
+ {
+ 	struct bfq_queue *bfqq = bfqd->in_service_queue;
+@@ -3776,13 +3743,47 @@ static void __bfq_bfqq_recalc_budget(struct bfq_data *bfqd,
+ 		 * for throughput.
+ 		 */
+ 		case BFQ_BFQQ_TOO_IDLE:
+-			if (budget > min_budget + BFQ_BUDGET_STEP)
+-				budget -= BFQ_BUDGET_STEP;
+-			else
+-				budget = min_budget;
++			/*
++			 * This is the only case where we may reduce
++			 * the budget: if there is no request of the
++			 * process still waiting for completion, then
++			 * we assume (tentatively) that the timer has
++			 * expired because the batch of requests of
++			 * the process could have been served with a
++			 * smaller budget.  Hence, betting that
++			 * process will behave in the same way when it
++			 * becomes backlogged again, we reduce its
++			 * next budget.  As long as we guess right,
++			 * this budget cut reduces the latency
++			 * experienced by the process.
++			 *
++			 * However, if there are still outstanding
++			 * requests, then the process may have not yet
++			 * issued its next request just because it is
++			 * still waiting for the completion of some of
++			 * the still outstanding ones.  So in this
++			 * subcase we do not reduce its budget, on the
++			 * contrary we increase it to possibly boost
++			 * the throughput, as discussed in the
++			 * comments to the BUDGET_TIMEOUT case.
++			 */
++			if (bfqq->dispatched > 0) /* still outstanding reqs */
++				budget = min(budget * 2, bfqd->bfq_max_budget);
++			else {
++				if (budget > 5 * min_budget)
++					budget -= 4 * min_budget;
++				else
++					budget = min_budget;
++			}
+ 			break;
+ 		case BFQ_BFQQ_BUDGET_TIMEOUT:
+-			budget = bfq_default_budget(bfqd, bfqq);
++			/*
++			 * We double the budget here because it gives
++			 * the chance to boost the throughput if this
++			 * is not a seeky process (and has bumped into
++			 * this timeout because of, e.g., ZBR).
++			 */
++			budget = min(budget * 2, bfqd->bfq_max_budget);
+ 			break;
+ 		case BFQ_BFQQ_BUDGET_EXHAUSTED:
+ 			/*
+@@ -3794,8 +3795,7 @@ static void __bfq_bfqq_recalc_budget(struct bfq_data *bfqd,
+ 			 * definitely increase the budget of this good
+ 			 * candidate to boost the disk throughput.
+ 			 */
+-			budget = min(budget + 8 * BFQ_BUDGET_STEP,
+-				     bfqd->bfq_max_budget);
++			budget = min(budget * 4, bfqd->bfq_max_budget);
+ 			break;
+ 		case BFQ_BFQQ_NO_MORE_REQUESTS:
+ 			/*
+@@ -4516,9 +4516,8 @@ static void bfq_init_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+ 	bfqq->pid = pid;
+ 
+ 	/* Tentative initial value to trade off between thr and lat */
+-	bfqq->max_budget = bfq_default_budget(bfqd, bfqq);
++	bfqq->max_budget = (2 * bfq_max_budget(bfqd)) / 3;
+ 	bfqq->budget_timeout = bfq_smallest_from_now();
+-	bfqq->pid = pid;
+ 
+ 	/* first request is almost certainly seeky */
+ 	bfqq->seek_history = 1;
+-- 
+1.9.1
