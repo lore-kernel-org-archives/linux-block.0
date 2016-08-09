@@ -1,77 +1,200 @@
-Return-Path: <shaun.tancheff@seagate.com>
-MIME-Version: 1.0
-In-Reply-To: <2370d779-3f9b-28a2-7596-42b7b6a89c21@suse.de>
-References: <1469818955-20568-1-git-send-email-shaun@tancheff.com>
- <20160801094116.GB14677@lst.de> <CAJVOszCAb4o5LWpJL8Yd66n9jPvy+EMQX2Xfr6awZCxfGJf_CA@mail.gmail.com>
- <6a4a27ac-009d-9825-bf77-0529da77cc36@suse.de> <C7B51F39-AC67-4D96-B1DE-45C70F99134D@hgst.com>
- <CAJVOszDt5HfSKTk_8a3AkqjjAXV_9RaA2TxeqgY5Gp90w89-Lg@mail.gmail.com> <2370d779-3f9b-28a2-7596-42b7b6a89c21@suse.de>
-From: Shaun Tancheff <shaun.tancheff@seagate.com>
-Date: Tue, 9 Aug 2016 22:26:27 -0500
-Message-ID: <CAJVOszB4dfEFM+XxvDy4+7ue6au_RzjuOB-SSvYTh96H-UjZ1Q@mail.gmail.com>
-Subject: Re: [PATCH v6 0/2] Block layer support ZAC/ZBC commands
+Return-Path: <Damien.LeMoal@hgst.com>
+From: Damien Le Moal <Damien.LeMoal@hgst.com>
 To: Hannes Reinecke <hare@suse.de>
-Cc: Damien Le Moal <Damien.LeMoal@hgst.com>, Christoph Hellwig <hch@lst.de>,
-        Shaun Tancheff <shaun@tancheff.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        Jens Axboe <axboe@fb.com>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Jeff Layton <jlayton@poochiereds.net>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Josh Bingaman <josh.bingaman@seagate.com>
-Content-Type: text/plain; charset=UTF-8
+CC: Shaun Tancheff <shaun.tancheff@seagate.com>, Christoph Hellwig
+	<hch@lst.de>, Shaun Tancheff <shaun@tancheff.com>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>, LKML
+	<linux-kernel@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>, Jens Axboe
+	<axboe@fb.com>, "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>, "Martin
+ K . Petersen" <martin.petersen@oracle.com>, Jeff Layton
+	<jlayton@poochiereds.net>, "J . Bruce Fields" <bfields@fieldses.org>, "Josh
+ Bingaman" <josh.bingaman@seagate.com>
+Subject: Re: [PATCH v6 0/2] Block layer support ZAC/ZBC commands
+Date: Tue, 9 Aug 2016 08:09:49 +0000
+Message-ID: <D3D5E748-ADB9-4376-8969-623A8A815E36@hgst.com>
+References: <1469818955-20568-1-git-send-email-shaun@tancheff.com>
+ <20160801094116.GB14677@lst.de>
+ <CAJVOszCAb4o5LWpJL8Yd66n9jPvy+EMQX2Xfr6awZCxfGJf_CA@mail.gmail.com>
+ <6a4a27ac-009d-9825-bf77-0529da77cc36@suse.de>
+ <C7B51F39-AC67-4D96-B1DE-45C70F99134D@hgst.com>
+ <CAJVOszDt5HfSKTk_8a3AkqjjAXV_9RaA2TxeqgY5Gp90w89-Lg@mail.gmail.com>
+ <2370d779-3f9b-28a2-7596-42b7b6a89c21@suse.de>
+In-Reply-To: <2370d779-3f9b-28a2-7596-42b7b6a89c21@suse.de>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Aug 9, 2016 at 1:47 AM, Hannes Reinecke <hare@suse.de> wrote:
-> On 08/05/2016 10:35 PM, Shaun Tancheff wrote:
->> On Tue, Aug 2, 2016 at 8:29 PM, Damien Le Moal <Damien.LeMoal@hgst.com> wrote:
->>>> On Aug 2, 2016, at 23:35, Hannes Reinecke <hare@suse.de> wrote:
->>>> On 08/01/2016 07:07 PM, Shaun Tancheff wrote:
->>>>> On Mon, Aug 1, 2016 at 4:41 AM, Christoph Hellwig <hch@lst.de> wrote:
+Hannes,
 
-[trim]
->> Also the zone report is 'slow' in that there is an overhead for the
->> report itself but
->> the number of zones per query can be quite large so 4 or 5 I/Os that
->> run into the
->> hundreds if milliseconds to cache the entire drive isn't really unworkable for
->> something that is used infrequently.
->>
-> No, surely not.
-> But one of the _big_ advantages for the RB tree is blkdev_discard().
-> Without the RB tree any mkfs program will issue a 'discard' for every
-> sector. We will be able to coalesce those into one discard per zone, but
-> we still need to issue one for _every_ zone.
-> Which is (as indicated) really slow, and easily takes several minutes.
-> With the RB tree we can short-circuit discards to empty zones, and speed
-> up processing time dramatically.
-> Sure we could be moving the logic into mkfs and friends, but that would
-> require us to change the programs and agree on a library (libzbc?) which
-> should be handling that.
+> On Aug 9, 2016, at 15:47, Hannes Reinecke <hare@suse.de> wrote:
+[...]
+>>> =
 
-Adding an additional library dependency seems overkill for a program
-that is already doing ioctls and raw block I/O ... but I would leave that
-up to each file system. As it sits issuing the ioctl and walking the array
-of data returned [see blkreport.c] is already quite trivial.
+>>> Can we agree on an interface ?
+>>> Summarizing all the discussions we had, I am all in favor of the follow=
+ing:
+>>> =
 
-I believe the goal here is for F2FS, and perhaps NILFS? to "just
-work" with the DISCARD to Reset WP and zone cache in place.
+>>> 1) A "zone_size" sysfs attribute to indicate that a drive is zoned:
+>>> The already existing device type file can tell us if this is an host
+>>> managed disk (type=3D=3D20) or a host aware disk (type=3D=3D0). Drive m=
+anaged
+>>> disks could also be detected, but since no information on their zone
+>>> configuration can be obtained, lets treat those as regular drives.
+>> =
 
-Still quite skeptical about other common file systems
-"just working" without their respective mkfs et. al. being
-zone aware and handling the topology of the media at mkfs time.
-Perhaps there is something I am unaware of?
+>> Since disk type =3D=3D 0 for everything that isn't HM so I would prefer =
+the
+>> sysfs 'zoned' file just report if the drive is HA or HM.
+>> =
 
-[trim]
+> Okay. So let's put in the 'zoned' attribute the device type:
+> 'host-managed', 'host-aware', or 'device managed'.
 
->> I can add finish zone ... but I really can't think of a use for it, myself.
->>
+I hacked your patches and simply put a "0" or "1" in the sysfs zoned file.
+Any drive that has ZBC/ZAC command support gets a "1", "0" for everything
+else. This means that drive managed models are not exposed as zoned block
+devices. For HM vs HA differentiation, an application can look at the
+device type file since it is already present.
+
+We could indeed set the "zoned" file to the device type, but HM drives and
+regular drives will both have "0" in it, so no differentiation possible.
+The other choice could be the "zoned" bits defined by ZBC, but these
+do not define a value for host managed drives, and the drive managed value
+being not "0" could be confusing too. So I settled for a simple 0/1 boolean.
+
+> =
+
+>>> 2) Add ioctls for zone management:
+>>> Report zones (get information from RB tree), reset zone (simple wrapper
+>>> to ioctl for block discard), open zone, close zone and finish zone. That
+>>> will allow mkfs like tools to get zone information without having to pa=
+rse
+>>> thousands of sysfs files (and can also be integrated in libzbc block ba=
+ckend
+>>> driver for a unified interface with the direct SG_IO path for kernels w=
+ithout
+>>> the ZBC code enabled).
+>> =
+
+>> I can add finish zone ... but I really can't think of a use for it, myse=
+lf.
+>> =
+
 > Which is not the point. The standard defines this, so clearly someone
 > found it a reasonable addendum. So let's add this for completeness.
 
-Agreed and queued for the next version.
+Done: I hacked Shaun ioctl code and added finish zone too. The
+difference with Shaun initial code is that the ioctl are propagated down to
+the driver (__blkdev_driver_ioctl -> sd_ioctl) so that there is no need for
+BIO request definition for the zone operations. So a lot less code added.
+The ioctls do not mimic exactly the ZBC standard. For instance, there is no
+reporting options for report zones, nor is the "all" bit supported for open,
+close or finish zone commands. But the information provided on zones is com=
+plete
+and maps to the standard definitions.
 
-Regards,
-Shaun
+I also added a reset_wp ioctl for completeness, but this one simply calls
+blkdev_issue_discard internally, so it is in fact equivalent to the BLKDISC=
+ARD
+ioctl call with a range exactly aligned on a zone.
+
+> =
+
+>>> 3) Try to condense the blkzone data structure to save memory:
+>>> I think that we can at the very least remove the zone length, and also
+>>> may be the per zone spinlock too (a single spinlock and proper state fl=
+ags can
+>>> be used).
+>> =
+
+>> I have a variant that is an array of descriptors that roughly mimics the
+>> api from blk-zoned.c that I did a few months ago as an example.
+>> I should be able to update that to the current kernel + patches.
+>> =
+
+> Okay. If we restrict the in-kernel SMR drive handling to devices with
+> identical zone sizes of course we can remove the zone length.
+> And we can do away with the per-zone spinlock and use a global one instea=
+d.
+
+Did that too. The blk_zone struct is now exactly 64B. I removed the per zone
+spinlock and replaced it with a flag so that zones can still be locked
+independently using wait_on_bit_lock & friends (I added the functions
+blk_zone_lock, blk_zone_trylock and blk_zone_unlock to do that). This per z=
+one
+locking comes in handy to implement the ioctls code without stalling the co=
+mmand
+queue for read, writes and discard on different zones.
+
+I however kept the zone length in the structure. The reason for doing so is=
+ that
+this allows supporting drives with non-constant zone sizes, albeit with a m=
+ore
+limited interface since in such case the device chunk_sectors is not set (t=
+hat
+is how a user or application can detect that the zones are not constant siz=
+e).
+For these drives, the block layer may happily merge BIOs across zone bounda=
+ries
+and the discard code will not split and align calls on the zones. But upper=
+ layers
+(an FS or a device mapper) can still do all this by themselves if they want=
+/can
+support non-constant zone sizes.
+
+The only exception is drives like the Seagate one with only the last zone o=
+f a
+different size. This case is handled exactly as if all zones are the same s=
+ize
+simply because any operation on the last smaller zone will naturally align =
+as
+the checks of operation size against the drive capacity will do the right t=
+hings.
+
+The ioctls work for all cases (drive with constant zone size or not). This =
+is again
+to allow supporting eventual weird drives at application level. I integrate=
+d all
+these ioctl into libzbc block device backend driver and everything is fine.=
+ Can't
+tell the difference with direct-to-drive SG_IO accesses. But unlike these, =
+the zone
+ioctls keep the zone information RB-tree cache up to date.
+
+> =
+
+> I will be updating my patchset accordingly.
+
+I need to cleanup my code and rebase on top of 4.8-rc1. Let me do this and =
+I will send
+everything for review. If you have any comment on the above, please let me =
+know and
+I will be happy to incorporate changes.
+
+Best regards.
+
+
+------------------------
+Damien Le Moal, Ph.D.
+Sr. Manager, System Software Group, HGST Research,
+HGST, a Western Digital brand
+Damien.LeMoal@hgst.com
+(+81) 0466-98-3593 (ext. 513593)
+1 kirihara-cho, Fujisawa, =
+
+Kanagawa, 252-0888 Japan
+www.hgst.com =
+
+
+Western Digital Corporation (and its subsidiaries) E-mail Confidentiality N=
+otice & Disclaimer:
+
+This e-mail and any files transmitted with it may contain confidential or l=
+egally privileged information of WDC and/or its affiliates, and are intende=
+d solely for the use of the individual or entity to which they are addresse=
+d. If you are not the intended recipient, any disclosure, copying, distribu=
+tion or any action taken or omitted to be taken in reliance on it, is prohi=
+bited. If you have received this e-mail in error, please notify the sender =
+immediately and delete the e-mail in its entirety from your system.
