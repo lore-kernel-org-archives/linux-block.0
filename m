@@ -1,69 +1,43 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-	Andreas Dilger <adilger.kernel@dilger.ca>,
-	Jan Kara <jack@suse.com>,
-	Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-	Hugh Dickins <hughd@google.com>,
-	Andrea Arcangeli <aarcange@redhat.com>,
-	Dave Hansen <dave.hansen@intel.com>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	Matthew Wilcox <willy@infradead.org>,
-	Ross Zwisler <ross.zwisler@linux.intel.com>,
-	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	linux-block@vger.kernel.org,
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv2 22/41] thp: do not threat slab pages as huge in hpage_{nr_pages,size,mask}
-Date: Fri, 12 Aug 2016 21:38:05 +0300
-Message-Id: <1471027104-115213-23-git-send-email-kirill.shutemov@linux.intel.com>
-In-Reply-To: <1471027104-115213-1-git-send-email-kirill.shutemov@linux.intel.com>
-References: <1471027104-115213-1-git-send-email-kirill.shutemov@linux.intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pf0-f194.google.com ([209.85.192.194]:34429 "EHLO
+	mail-pf0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752429AbcHIOpy (ORCPT
+	<rfc822;linux-block@vger.kernel.org>); Tue, 9 Aug 2016 10:45:54 -0400
+From: tom.ty89@gmail.com
+To: tj@kernel.org
+Cc: linux-ide@vger.kernel.org, linux-scsi@vger.kernel.org,
+	linux-block@vger.kernel.org, Tom Yan <tom.ty89@gmail.com>
+Subject: [PATCH v2 1/2] libata-scsi: set max_hw_sectors again only when dev->max_sectors is set
+Date: Tue,  9 Aug 2016 22:45:46 +0800
+Message-Id: <5eceeb9ad825beb87db03b0989f746dfbe0cf3fe.1470753817.git.tom.ty89@gmail.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Slab pages can be compound, but we shouldn't threat them as THP for
-pupose of hpage_* helpers, otherwise it would lead to confusing results.
+From: Tom Yan <tom.ty89@gmail.com>
 
-For instance, ext4 uses slab pages for journal pages and we shouldn't
-confuse them with THPs. The easiest way is to exclude them in hpage_*
-helpers.
+When the request queue is initialized (see __scsi_init_queue() in
+scsi_lib.c), the block layer limit max_hw_sectors is set to
+shost->max_sectors, which will be set to the "machine infinity"
+SCSI_DEFAULT_MAX_SECTORS (currently 1024) if sht->max_sectors is
+not set (see scsi_host_alloc() in hosts.c).
 
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
----
- include/linux/huge_mm.h | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Therefore, if dev->max_sectors is not set (or, initialized to 0),
+we do not call blk_queue_max_hw_sectors() again with that.
 
-diff --git a/include/linux/huge_mm.h b/include/linux/huge_mm.h
-index de2789b4402c..5c5466ba37df 100644
---- a/include/linux/huge_mm.h
-+++ b/include/linux/huge_mm.h
-@@ -133,21 +133,21 @@ static inline spinlock_t *pmd_trans_huge_lock(pmd_t *pmd,
- }
- static inline int hpage_nr_pages(struct page *page)
- {
--	if (unlikely(PageTransHuge(page)))
-+	if (unlikely(!PageSlab(page) && PageTransHuge(page)))
- 		return HPAGE_PMD_NR;
- 	return 1;
- }
+diff --git a/drivers/ata/libata-scsi.c b/drivers/ata/libata-scsi.c
+index 2bdb5da..6fee950 100644
+--- a/drivers/ata/libata-scsi.c
++++ b/drivers/ata/libata-scsi.c
+@@ -1205,7 +1205,8 @@ static int ata_scsi_dev_config(struct scsi_device *sdev,
+ 		dev->flags |= ATA_DFLAG_NO_UNLOAD;
  
- static inline int hpage_size(struct page *page)
- {
--	if (unlikely(PageTransHuge(page)))
-+	if (unlikely(!PageSlab(page) && PageTransHuge(page)))
- 		return HPAGE_PMD_SIZE;
- 	return PAGE_SIZE;
- }
+ 	/* configure max sectors */
+-	blk_queue_max_hw_sectors(q, dev->max_sectors);
++	if (dev->max_sectors)
++		blk_queue_max_hw_sectors(q, dev->max_sectors);
  
- static inline unsigned long hpage_mask(struct page *page)
- {
--	if (unlikely(PageTransHuge(page)))
-+	if (unlikely(!PageSlab(page) && PageTransHuge(page)))
- 		return HPAGE_PMD_MASK;
- 	return PAGE_MASK;
- }
+ 	if (dev->class == ATA_DEV_ATAPI) {
+ 		void *buf;
 -- 
-2.8.1
+2.9.2
 
