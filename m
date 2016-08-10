@@ -1,380 +1,141 @@
-Return-Path: <shaun.tancheff@seagate.com>
-MIME-Version: 1.0
-In-Reply-To: <2370d779-3f9b-28a2-7596-42b7b6a89c21@suse.de>
-References: <1469818955-20568-1-git-send-email-shaun@tancheff.com>
- <20160801094116.GB14677@lst.de> <CAJVOszCAb4o5LWpJL8Yd66n9jPvy+EMQX2Xfr6awZCxfGJf_CA@mail.gmail.com>
- <6a4a27ac-009d-9825-bf77-0529da77cc36@suse.de> <C7B51F39-AC67-4D96-B1DE-45C70F99134D@hgst.com>
- <CAJVOszDt5HfSKTk_8a3AkqjjAXV_9RaA2TxeqgY5Gp90w89-Lg@mail.gmail.com> <2370d779-3f9b-28a2-7596-42b7b6a89c21@suse.de>
-From: Shaun Tancheff <shaun.tancheff@seagate.com>
-Date: Sat, 13 Aug 2016 19:09:06 -0500
-Message-ID: <CAJVOszAHL55uOuD4MbCG0gWs3ko7tZVwtAeRBXxDhD-GuD2kGA@mail.gmail.com>
+Return-Path: <Damien.LeMoal@hgst.com>
 Subject: Re: [PATCH v6 0/2] Block layer support ZAC/ZBC commands
-To: Hannes Reinecke <hare@suse.de>
-Cc: Damien Le Moal <Damien.LeMoal@hgst.com>, Christoph Hellwig <hch@lst.de>,
-        Shaun Tancheff <shaun@tancheff.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        Jens Axboe <axboe@fb.com>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Jeff Layton <jlayton@poochiereds.net>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Josh Bingaman <josh.bingaman@seagate.com>
-Content-Type: text/plain; charset=UTF-8
+To: Shaun Tancheff <shaun.tancheff@seagate.com>
+References: <1469818955-20568-1-git-send-email-shaun@tancheff.com>
+ <20160801094116.GB14677@lst.de>
+ <CAJVOszCAb4o5LWpJL8Yd66n9jPvy+EMQX2Xfr6awZCxfGJf_CA@mail.gmail.com>
+ <6a4a27ac-009d-9825-bf77-0529da77cc36@suse.de>
+ <C7B51F39-AC67-4D96-B1DE-45C70F99134D@hgst.com>
+ <CAJVOszDt5HfSKTk_8a3AkqjjAXV_9RaA2TxeqgY5Gp90w89-Lg@mail.gmail.com>
+ <2370d779-3f9b-28a2-7596-42b7b6a89c21@suse.de>
+ <D3D5E748-ADB9-4376-8969-623A8A815E36@hgst.com>
+ <CAJVOszDavBDA0hZTox-nNtPHCz-tWecOJCJ5R25u+AV6Wq3xwQ@mail.gmail.com>
+CC: Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>, Shaun
+ Tancheff <shaun@tancheff.com>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "linux-scsi@vger.kernel.org"
+	<linux-scsi@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Jens Axboe
+	<axboe@kernel.dk>, Jens Axboe <axboe@fb.com>, "James E . J . Bottomley"
+	<jejb@linux.vnet.ibm.com>, "Martin K . Petersen"
+	<martin.petersen@oracle.com>, Jeff Layton <jlayton@poochiereds.net>, "J .
+ Bruce Fields" <bfields@fieldses.org>, Josh Bingaman
+	<josh.bingaman@seagate.com>
+From: Damien Le Moal <damien.lemoal@hgst.com>
+Message-ID: <37fdd603-403d-84bf-9f3d-51e9791006c4@hgst.com>
+Date: Wed, 10 Aug 2016 13:38:04 +0900
+MIME-Version: 1.0
+In-Reply-To: <CAJVOszDavBDA0hZTox-nNtPHCz-tWecOJCJ5R25u+AV6Wq3xwQ@mail.gmail.com>
+Return-Path: damien.lemoal@hgst.com
+Content-Type: text/plain; charset="utf-8"; format="flowed"
 List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Aug 9, 2016 at 1:47 AM, Hannes Reinecke <hare@suse.de> wrote:
-> On 08/05/2016 10:35 PM, Shaun Tancheff wrote:
->> On Tue, Aug 2, 2016 at 8:29 PM, Damien Le Moal <Damien.LeMoal@hgst.com> =
-wrote:
->>> Hannes, Shaun,
->>>
->>> Let me add some more comments.
->>>
->>>> On Aug 2, 2016, at 23:35, Hannes Reinecke <hare@suse.de> wrote:
->>>>
->>>> On 08/01/2016 07:07 PM, Shaun Tancheff wrote:
->>>>> On Mon, Aug 1, 2016 at 4:41 AM, Christoph Hellwig <hch@lst.de> wrote:
->>>>>>
->>>>>> Can you please integrate this with Hannes series so that it uses
->>>>>> his cache of the zone information?
->>>>>
->>>>> Adding Hannes and Damien to Cc.
->>>>>
->>>>> Christoph,
->>>>>
->>>>> I can make a patch the marshal Hannes' RB-Tree into to a block report=
-, that is
->>>>> quite simple. I can even have the open/close/reset zone commands upda=
-te the
->>>>> RB-Tree .. the non-private parts anyway. I would prefer to do this ar=
-ound the
->>>>> CONFIG_SD_ZBC support, offering the existing type of patch for setups=
- that do
->>>>> not need the RB-Tree to function with zoned media.
->>
->> I have posted patches to integrate with the zone cache, hopefully they
->> make sense.
->>
-> [ .. ]
->>>> I have thought about condensing the RB tree information, but then I
->>>> figured that for 'real' SMR handling we cannot assume all zones are of
->>>> fixed size, and hence we need all the information there.
->>>> Any condensing method would assume a given structure of the zones, whi=
-ch
->>>> the standard just doesn't provide.
->>>> Or am I missing something here?
-
-Of course you can condense the zone cache without loosing any
-information. Here is the layout I used ... I haven't update the patch
-to the latest posted patches but this is the basic idea.
-
-[It was originally done as a follow on of making your zone cache work
- with Seagate's HA drive. I did not include the wp-in-arrays patch
- along with the HA drive support that I sent you in May as you were
- quite terse about RB trees when I tried to discuss this approach with
- you at Vault]
-
-struct blk_zone {
-        unsigned type:4;
-        unsigned state:5;
-        unsigned extra:7;
-        unsigned wp:40;
-        void *private_data;
-};
-
-struct contiguous_wps {
-        u64 start_lba;
-        u64 last_lba; /* or # of blocks */
-        u64 zone_size; /* size in blocks */
-        unsigned is_zoned:1;
-        u32 zone_count;
-        spinlock_t lock;
-        struct blk_zone zones[0];
-};
-
-struct zone_wps {
-        u32 wps_count;
-        struct contiguous_wps **wps;
-};
-
-Then in struct request_queue
--    struct rb_root zones;
-+   struct struct zone_wps *zones;
-
-For each contiguous chunk of zones you need a descriptor. In the current
-drives you need 1 or 2 descriptors.
-
-Here a conventional drive is encapsulated as zoned media with one
-drive sized conventional zone.
-
-I have not spent time building an ad-hoc LVM comprised of zoned and
-conventional media so it's not all ironed out yet.
-I think you can see the advantage of being able to put conventional space
-anywhere you would like to work around zoned media not being laid out
-the the best manner for your setup.
-
-Yes things start to break down if every other zone is a different size ..
-
-The point being that even with supporting zones that order 48 bytes.
-in size this saves a lot of space with no loss of information.
-I still kind of prefer pushing blk_zone down to a u32 by reducing
-the max zone size and dropping the private_data ... but that may
-be going a bit too far.
-
-blk_lookup_zone then has an [unfortunate] signature change:
-
-
-/**
- * blk_lookup_zone() - Lookup zones
- * @q: Request Queue
- * @sector: Location to lookup
- * @start: Starting location zone (OUT: Required)
- * @len: Length of zone (OUT: Required)
- * @lock: Spinlock of zones (OUT: Required)
- */
-struct blk_zone *blk_lookup_zone(struct request_queue *q, sector_t sector,
-                                 sector_t *start, sector_t *len,
-                                 spinlock_t **lock)
-{
-        int iter;
-        struct blk_zone *bzone =3D NULL;
-        struct zone_wps *zi =3D q->zones;
-
-        *start =3D 0;
-        *len =3D 0;
-        *lock =3D NULL;
-
-        if (!q->zones)
-                goto out;
-
-        for (iter =3D 0; iter < zi->wps_count; iter++) {
-                if (sector >=3D zi->wps[iter]->start_lba &&
-                    sector <  zi->wps[iter]->last_lba) {
-                        struct contiguous_wps *wp =3D zi->wps[iter];
-                        u64 index =3D (sector - wp->start_lba) / wp->zone_s=
-ize;
-
-                        BUG_ON(index >=3D wp->zone_count);
-
-                        bzone =3D &wp->zones[index];
-                        *len =3D wp->zone_size;
-                        *start =3D wp->start_lba + (index * wp->zone_size);
-                        *lock =3D &wp->lock;
-                }
-        }
-
-out:
-        return bzone;
-}
-
->>>
->>> Indeed, the standards do not mandate any particular zone configuration,
->>> constant zone size, etc. So writing code so that can be handled is cert=
-ainly
->>> the right way of doing things. However, if we decide to go forward with
->>> mapping RESET WRITE POINTER command to DISCARD, then at least a constan=
-t
->>> zone size (minus the last zone as you said) must be assumed, and that
->>> information can be removed from the entries in the RB tree (as it will =
-be
->>> saved for the sysfs "zone_size" file anyway. Adding a little code to ha=
-ndle
->>> that eventual last runt zone with a different size is not a big problem=
-.
->>
->>>> As for write pointer handling: yes, the write pointer on the zones is
->>>> not really useful for upper-level usage.
->>>> Where we do need it is to detect I/O which is crossing the write point=
-er
->>>> (eg when doing reads over the entire zone).
->>>> As per spec you will be getting an I/O error here, so we need to split
->>>> the I/O on the write pointer to get valid results back.
->>>
->>> To be precise here, the I/O splitting will be handled by the block laye=
-r
->>> thanks to the "chunk_sectors" setting. But that relies on a constant zo=
-ne
->>> size assumption too.
->>>
->>> The RB-tree here is most useful for reads over or after the write point=
-er as
->>> this can have different behavior on different drives (URSWRZ bit). The =
-RB-tree
->>> allows us to hide these differences to upper layers and simplify suppor=
-t at
->>> those levels.
->>
->> It is unfortunate that path was chosen rather than returning Made Up Dat=
-a.
-> But how would you return made up data without knowing that you _have_ to
-> generate some?
-> Of course it's trivial to generate made up data once an I/O error
-> occurred, but that's too late as the I/O error already happened.
->
-> The general idea behind this is that I _really_ do want to avoid
-> triggering an I/O error on initial access. This kind of thing really
-> tends to freak out users (connect a new drive and getting I/O errors;
-> not the best user experience ...)
->
->> However I don't think this is a file system or device mapper problem as
->> neither of those layers attempt to read blocks they have not written
->> (or discarded).
->> All I can think of something that probes the drive media for a partition=
- table
->> or other identification...isn't the conventional space sufficient to cov=
-er
->> those cases?
-> Upon device scan the kernel will attempt to read the partition tables,
-> which consists of reading the first few megabytes and the last sector
-> (for GPT shadow partition tables).
-> And depending on the driver manufacturer you might or might not have
-> enough conventional space at the right locations.
->
->> Anyway you could just handle the error and sense codes [CHECK CONDITION =
-/
->> ILLEGAL REQUEST / ATTEMPT TO READ INVALID DATA] and return MUD
->> when URSWRZ is 0. It would have the same effect as using the zone cache
->> without the possibility of the zone cache being out-of-sync.
->>
-> Yes, but then we would already have registered an I/O error.
-> And as indicated above, I really do _not_ want to handle all the
-> customer calls for supposed faulty new SMR drives.
-
-Fair enough. I just really want to be sure that all this memory locked
-to the zone cache is really being made useful.
-
->>> I too agree that the write pointer value is not very useful to upper la=
-yers
->>> (e.g. FS). What matters most of the times for these layers is an "alloc=
-ation
->>> pointer" or "submission pointer" which indicates the LBA to use for the=
- next
->>> BIO submission. That LBA will most of the time be in advance of the zon=
-e WP
->>> because of request queing in the block scheduler.
->>
->> Which is kind of my point.
->>
->>> Note that from what we have done already, in many cases, upper layers d=
-o not
->>> even need this (e.g. F2FS, btrfs) and work fine without needing *any*
->>> zone->private_data because that "allocation pointer" information genera=
-lly
->>> already exists in a different form (e.g. a bit in a bitmap).
->>
->> Agreed. Log structured and copy on write file systems are a natural fit =
-for
->> these types of drives
->>
->>> For these cases, not having the RB-tree of zones would force a lot
->>> more code to be added to file systems for SMR support.
->>
->> I don't understand how the zone cache (RB-tree) is "helping" F2FS or btr=
-fs.
->> Certainly any of these could trigger the zone cache to be loaded at mkfs
->> and/or mount time?
->>
->>>>> This all tails into domain responsibility. With the RB-Tree doing hal=
-f of the
->>>>> work and the =E2=80=98responsible=E2=80=99 domain handling the active=
- path via private_data
->>>>> why have the split at all? It seems to be a double work to have secon=
-d object
->>>>> tracking the first so that I/O scheduling can function.
->>>>>
->>>> Tracking the zone states via RB trees is mainly to handly host-managed
->>>> drives seamlessly. Without an RB tree we will be subjected to I/O erro=
-rs
->>>> during boot, as eg with new drives we inevitably will try to read beyo=
-nd
->>>> the write pointer, which in turn will generate I/O errors on certain d=
-rives.
->>
->> If the zone cache is needed to boot then clearly my objection to reading
->> in the zone report information on drive attach is unfounded. I was under
->> the impression that this was not the case.
->>
->>>> I do agree that there is no strict need to setup an RB tree for
->>>> host-aware drives; I can easily add an attribute/flag to disable RB
->>>> trees for those.
->>>> However, tracking zone information in the RB tree _dramatically_ speed=
-s
->>>> up device initialisation; issuing a blkdev_discard() for the entire
->>>> drive will take _ages_ without it.
->>>
->>> And the RB-tree will also be very useful for speeding up report zones
->>> ioctls too. Unless we want those to force an update of the RB-tree info=
-rmation ?
->>
->> That is debatable. I would tend to argue for both. *If* there must be
->> a zone cache then reading from the zone cache is a must. Forcing and
->> update of the zone cache from the media seems like a reasonable thing
->> to be able to do.
->>
->> Also the zone report is 'slow' in that there is an overhead for the
->> report itself but
->> the number of zones per query can be quite large so 4 or 5 I/Os that
->> run into the
->> hundreds if milliseconds to cache the entire drive isn't really unworkab=
-le for
->> something that is used infrequently.
->>
-> No, surely not.
-> But one of the _big_ advantages for the RB tree is blkdev_discard().
-> Without the RB tree any mkfs program will issue a 'discard' for every
-> sector. We will be able to coalesce those into one discard per zone, but
-> we still need to issue one for _every_ zone.
-
-How can you make coalesce work transparently in the
-sd layer _without_ keeping some sort of a discard cache along
-with the zone cache?
-
-Currently the block layer's blkdev_issue_discard() is breaking
-large discard's into nice granular and aligned chunks but it is
-not preventing small discards nor coalescing them.
-
-In the sd layer would there be way to persist or purge an
-overly large discard cache? What about honoring
-discard_zeroes_data? Once the discard is completed with
-discard_zeroes_data you have to return zeroes whenever
-a discarded sector is read. Isn't that a log more than just
-tracking a write pointer? Couldn't a zone have dozens of holes?
-
-> Which is (as indicated) really slow, and easily takes several minutes.
-> With the RB tree we can short-circuit discards to empty zones, and speed
-> up processing time dramatically.
-> Sure we could be moving the logic into mkfs and friends, but that would
-> require us to change the programs and agree on a library (libzbc?) which
-> should be handling that.
-
-F2FS's mkfs.f2fs is already reading the zone topology via SG_IO ...
-so I'm not sure your argument is valid here.
-
-[..]
-
->>> 3) Try to condense the blkzone data structure to save memory:
->>> I think that we can at the very least remove the zone length, and also
->>> may be the per zone spinlock too (a single spinlock and proper state fl=
-ags can
->>> be used).
->>
->> I have a variant that is an array of descriptors that roughly mimics the
->> api from blk-zoned.c that I did a few months ago as an example.
->> I should be able to update that to the current kernel + patches.
->>
-> Okay. If we restrict the in-kernel SMR drive handling to devices with
-> identical zone sizes of course we can remove the zone length.
-> And we can do away with the per-zone spinlock and use a global one instea=
-d.
-
-I don't think dropping the zone length is a reasonable thing to do.
-
-What I propose is an array of _descriptors_ it doesn't drop _any_
-of the zone information that you are holding in an RB tree, it is
-just a condensed format that _mostly_ plugs into your existing
-API.
-
---=20
-Shaun Tancheff
+U2hhdW4sCgpPbiA4LzEwLzE2IDEyOjU4LCBTaGF1biBUYW5jaGVmZiB3cm90ZToKPiBPbiBUdWUs
+IEF1ZyA5LCAyMDE2IGF0IDM6MDkgQU0sIERhbWllbiBMZSBNb2FsIDxEYW1pZW4uTGVNb2FsQGhn
+c3QuY29tPiB3cm90ZToKPj4+IE9uIEF1ZyA5LCAyMDE2LCBhdCAxNTo0NywgSGFubmVzIFJlaW5l
+Y2tlIDxoYXJlQHN1c2UuZGU+IHdyb3RlOgo+Cj4gW3RyaW1dCj4KPj4+PiBTaW5jZSBkaXNrIHR5
+cGUgPT0gMCBmb3IgZXZlcnl0aGluZyB0aGF0IGlzbid0IEhNIHNvIEkgd291bGQgcHJlZmVyIHRo
+ZQo+Pj4+IHN5c2ZzICd6b25lZCcgZmlsZSBqdXN0IHJlcG9ydCBpZiB0aGUgZHJpdmUgaXMgSEEg
+b3IgSE0uCj4+Pj4KPj4+IE9rYXkuIFNvIGxldCdzIHB1dCBpbiB0aGUgJ3pvbmVkJyBhdHRyaWJ1
+dGUgdGhlIGRldmljZSB0eXBlOgo+Pj4gJ2hvc3QtbWFuYWdlZCcsICdob3N0LWF3YXJlJywgb3Ig
+J2RldmljZSBtYW5hZ2VkJy4KPj4KPj4gSSBoYWNrZWQgeW91ciBwYXRjaGVzIGFuZCBzaW1wbHkg
+cHV0IGEgIjAiIG9yICIxIiBpbiB0aGUgc3lzZnMgem9uZWQgZmlsZS4KPj4gQW55IGRyaXZlIHRo
+YXQgaGFzIFpCQy9aQUMgY29tbWFuZCBzdXBwb3J0IGdldHMgYSAiMSIsICIwIiBmb3IgZXZlcnl0
+aGluZwo+PiBlbHNlLiBUaGlzIG1lYW5zIHRoYXQgZHJpdmUgbWFuYWdlZCBtb2RlbHMgYXJlIG5v
+dCBleHBvc2VkIGFzIHpvbmVkIGJsb2NrCj4+IGRldmljZXMuIEZvciBITSB2cyBIQSBkaWZmZXJl
+bnRpYXRpb24sIGFuIGFwcGxpY2F0aW9uIGNhbiBsb29rIGF0IHRoZQo+PiBkZXZpY2UgdHlwZSBm
+aWxlIHNpbmNlIGl0IGlzIGFscmVhZHkgcHJlc2VudC4KPj4KPj4gV2UgY291bGQgaW5kZWVkIHNl
+dCB0aGUgInpvbmVkIiBmaWxlIHRvIHRoZSBkZXZpY2UgdHlwZSwgYnV0IEhNIGRyaXZlcyBhbmQK
+Pj4gcmVndWxhciBkcml2ZXMgd2lsbCBib3RoIGhhdmUgIjAiIGluIGl0LCBzbyBubyBkaWZmZXJl
+bnRpYXRpb24gcG9zc2libGUuCj4+IFRoZSBvdGhlciBjaG9pY2UgY291bGQgYmUgdGhlICJ6b25l
+ZCIgYml0cyBkZWZpbmVkIGJ5IFpCQywgYnV0IHRoZXNlCj4+IGRvIG5vdCBkZWZpbmUgYSB2YWx1
+ZSBmb3IgaG9zdCBtYW5hZ2VkIGRyaXZlcywgYW5kIHRoZSBkcml2ZSBtYW5hZ2VkIHZhbHVlCj4+
+IGJlaW5nIG5vdCAiMCIgY291bGQgYmUgY29uZnVzaW5nIHRvby4gU28gSSBzZXR0bGVkIGZvciBh
+IHNpbXBsZSAwLzEgYm9vbGVhbi4KPgo+IFRoaXMgc2VlbXMgZ29vZCB0byBtZS4KCkFub3RoZXIg
+b3B0aW9uIEkgZm9yZ290IGlzIGZvciB0aGUgInpvbmVkIiBmaWxlIHRvIGluZGljYXRlIHRoZSB0
+b3RhbCAKbnVtYmVyIG9mIHpvbmVzIG9mIHRoZSBkZXZpY2UsIGFuZCAwIGZvciBhIG5vbiB6b25l
+ZCByZWd1bGFyIGJsb2NrIApkZXZpY2UuIFRoYXQgd291bGQgd29yayBhcyB3ZWxsLgoKWy4uLl0K
+Pj4gRG9uZTogSSBoYWNrZWQgU2hhdW4gaW9jdGwgY29kZSBhbmQgYWRkZWQgZmluaXNoIHpvbmUg
+dG9vLiBUaGUKPj4gZGlmZmVyZW5jZSB3aXRoIFNoYXVuIGluaXRpYWwgY29kZSBpcyB0aGF0IHRo
+ZSBpb2N0bCBhcmUgcHJvcGFnYXRlZCBkb3duIHRvCj4+IHRoZSBkcml2ZXIgKF9fYmxrZGV2X2Ry
+aXZlcl9pb2N0bCAtPiBzZF9pb2N0bCkgc28gdGhhdCB0aGVyZSBpcyBubyBuZWVkIGZvcgo+PiBC
+SU8gcmVxdWVzdCBkZWZpbml0aW9uIGZvciB0aGUgem9uZSBvcGVyYXRpb25zLiBTbyBhIGxvdCBs
+ZXNzIGNvZGUgYWRkZWQuCj4KPiBUaGUgcHVycG9zZSBvZiB0aGUgQklPIGZsYWdzIGlzIG5vdCB0
+byBlbmFibGUgdGhlIGlvY3RscyBzbyBtdWNoIGFzCj4gdGhlIG90aGVyIHdheSByb3VuZC4gQ3Jl
+YXRpbmcgQklPIG9wJ3MgaXMgdG8gZW5hYmxlIGlzc3VpbmcgWkJDCj4gY29tbWFuZHMgZnJvbSBk
+ZXZpY2UgbWFwcGVyIHRhcmdldHMgYW5kIGZpbGUgc3lzdGVtcyB3aXRob3V0IHNvbWUKPiBoZWlu
+b3VzIGlvY3RsIGhhY2tzLgo+IE1ha2luZyB0aGUgcmVzdWx0aW5nIGJsb2NrIGxheWVyIGludGVy
+ZmFjZXMgYXZhaWxhYmxlIHZpYSBpb2N0bHMgaXMganVzdCBhCj4gcmVhc29uYWJsZSB3YXkgdG8g
+ZXhlcmNpc2UgdGhlIGNvZGUgLi4uIG9yIHRoYXQgd2FzIG15IGludGVudC4KClllcywgSSB1bmRl
+cnN0b29kIHlvdXIgY29kZS4gSG93ZXZlciwgc2luY2UgKG9yIGlmKSB3ZSBrZWVwIHRoZSB6b25l
+IAppbmZvcm1hdGlvbiBpbiB0aGUgUkItdHJlZSBjYWNoZSwgdGhlcmUgaXMgbm8gbmVlZCBmb3Ig
+dGhlIHJlcG9ydCB6b25lIApvcGVyYXRpb24gQklPIGludGVyZmFjZS4gU2FtZSBmb3IgcmVzZXQg
+d3JpdGUgcG9pbnRlciBieSBrZWVwaW5nIHRoZSAKbWFwcGluZyB0byBkaXNjYXJkLiBibGtfbG9v
+a3VwX3pvbmUgY2FuIGJlIHVzZWQgaW4ga2VybmVsIGFzIGEgcmVwb3J0IAp6b25lIEJJTyByZXBs
+YWNlbWVudCBhbmQgd29ya3MgYXMgd2VsbCBmb3IgdGhlIHJlcG9ydCB6b25lIGlvY3RsIAppbXBs
+ZW1lbnRhdGlvbi4gRm9yIHJlc2V0LCB0aGVyZSBpcyBibGtkZXZfaXNzdWVfZGlzY3JhZCBpbiBr
+ZXJuZWwsIGFuZCAKdGhlIHJlc2V0IHpvbmUgaW9jdGwgYmVjb21lcyBlcXVpdmFsZW50IHRvIEJM
+S0RJU0NBUkQgaW9jdGwuIFRoZXNlIGFyZSAKc2ltcGxlLiBPcGVuLCBjbG9zZSBhbmQgZmluaXNo
+IHpvbmUgcmVtYWlucy4gRm9yIHRoZXNlLCBhZGRpbmcgdGhlIEJJTyAKaW50ZXJmYWNlIHNlZW1l
+ZCBhbiBvdmVya2lsbC4gSGVuY2UgbXkgY2hvaWNlIG9mIHByb3BhZ2F0aW5nIHRoZSBpb2N0bCAK
+dG8gdGhlIGRyaXZlci4KVGhpcyBpcyBkZWJhdGFibGUgb2YgY291cnNlLCBhbmQgYWRkaW5nIGFu
+IGluLWtlcm5lbCBpbnRlcmZhY2UgaXMgbm90IApoYXJkOiB3ZSBjYW4gaW1wbGVtZW50IGJsa19v
+cGVuX3pvbmUsIGJsa19jbG9zZV96b25lIGFuZCBibGtfZmluaXNoX3pvbmUgCnVzaW5nIF9fYmxr
+ZGV2X2RyaXZlcl9pb2N0bC4gVGhhdCBsb29rcyBjbGVhbiB0byBtZS4KCk92ZXJhbGwsIG15IGNv
+bmNlcm4gd2l0aCB0aGUgQklPIGJhc2VkIGludGVyZmFjZSBmb3IgdGhlIFpCQyBjb21tYW5kcyBp
+cyAKdGhhdCBpdCBhZGRzIG9uZSBmbGFnIGZvciBlYWNoIGNvbW1hbmQsIHdoaWNoIGlzIG5vdCBy
+ZWFsbHkgdGhlIApwaGlsb3NvcGh5IG9mIHRoZSBpbnRlcmZhY2UgYW5kIHBvdGVudGlhbGx5IG9w
+ZW5zIHRoZSBkb29yIGZvciBtb3JlIHN1Y2ggCmltcGxlbWVudGF0aW9ucyBpbiB0aGUgZnV0dXJl
+IHdpdGggbmV3IHN0YW5kYXJkcyBhbmQgbmV3IGNvbW1hbmRzIGNvbWluZyAKdXAuIENsZWFybHkg
+dGhhdCBpcyBub3QgYSBzdXN0YWluYWJsZSBwYXRoLiBTbyBJIHRoaW5rIHRoYXQgYSBtb3JlIApz
+cGVjaWZpYyBpbnRlcmZhY2UgZm9yIHRoZXNlIHpvbmUgb3BlcmF0aW9ucyBpcyBhIGJldHRlciBj
+aG9pY2UuIFRoYXQgaXMgCmNvbnNpc3RlbnQgd2l0aCB3aGF0IGhhcHBlbnMgd2l0aCB0aGUgdG9u
+cyBvZiBBVEEgYW5kIFNDU0kgY29tbWFuZHMgbm90IAphY3R1YWxseSBkb2luZyBkYXRhIEkvT3Mg
+KG1vZGUgc2Vuc2UsIGxvZyBwYWdlcywgU01BUlQsIGV0YykuIEFsbCB0aGVzZSAKZG8gbm90IHVz
+ZSBCSU9zIGFuZCBhcmUgcHJvY2Vzc2VkIGFzIHJlcXVlc3QgUkVRX1RZUEVfQkxPQ0tfUEMuCgo+
+PiBUaGUgaW9jdGxzIGRvIG5vdCBtaW1pYyBleGFjdGx5IHRoZSBaQkMgc3RhbmRhcmQuIEZvciBp
+bnN0YW5jZSwgdGhlcmUgaXMgbm8KPj4gcmVwb3J0aW5nIG9wdGlvbnMgZm9yIHJlcG9ydCB6b25l
+cywgbm9yIGlzIHRoZSAiYWxsIiBiaXQgc3VwcG9ydGVkIGZvciBvcGVuLAo+PiBjbG9zZSBvciBm
+aW5pc2ggem9uZSBjb21tYW5kcy4gQnV0IHRoZSBpbmZvcm1hdGlvbiBwcm92aWRlZCBvbiB6b25l
+cyBpcyBjb21wbGV0ZQo+PiBhbmQgbWFwcyB0byB0aGUgc3RhbmRhcmQgZGVmaW5pdGlvbnMuCj4K
+PiBGb3IgdGhlIHJlcG9ydGluZyBvcHRpb25zIEkgaGF2ZSBwbGFubmVkIHRvIHJldXNlIHRoZSBz
+dHJlYW1faWQgaW4KPiBzdHJ1Y3QgYmlvIHdoZW4gdGhhdCBpcyBmb3JtYWxpemVkLiBUaGVyZSBh
+cmUgY2VydGFpbmx5IG90aGVyIHBsYWNlcyBpbgo+IHN0cnVjdCBiaW8gdG8gc3R1ZmYgYSBmZXcg
+ZXh0cmEgYml0cyAuLi4KCldlIGNvdWxkIGFkZCByZXBvcnRpbmcgb3B0aW9ucyB0byBibGtfbG9v
+a3VwX3pvbmVzIHRvIGZpbHRlciB0aGUgcmVzdWx0IAphbmQgdXNlIHRoYXQgaW4gdGhlIGlvY3Rs
+IGltcGxlbWVudGF0aW9uIGFzIHdlbGwuIFRoaXMgY2FuIGJlIGFkZGVkIAp3aXRob3V0IGFueSBw
+cm9ibGVtLgoKPiBBcyBmYXIgYXMgdGhlIGFsbCBiaXQgLi4uIHRoaXMgaXMgYmVpbmcgaGFuZGxl
+ZCBieSBhbGwgdGhlIHpvbmUgYWN0aW9uCj4gY29tbWFuZHMuIEp1c3QgcGFzcyBhIHNlY3RvciBv
+ZiB+MHVsIGFuZCBpdCdzIGhhbmRsZWQgaW4gc2QuYyBieQo+IHNkX3NldHVwX3pvbmVfYWN0aW9u
+X2NtbmQoKS4KPgo+IEFwb2xvZ2llcyBhcyBhcHBhcmVudGx5IG15IGRvY3VtZW50YXRpb24gaGVy
+ZSBpcyBsYWNraW5nIDotKAoKWWVzLCBJIGdvdCBpdCAobGliemJjIGRvZXMgdGhlIHNhbWUgYWN0
+dWFsbHkpLiBJIGRpZCBub3QgYWRkIGl0IGZvciAKc2ltcGxpY2l0eS4gQnV0IGluZGVlZCBtYXkg
+YmUgaXQgc2hvdWxkIGJlLiBUaGUgc2FtZSB0cmljayBjYW4gYmUgdXNlZCAKd2l0aCB0aGUgaW9j
+dGwgdG8gZHJpdmVyIGludGVyZmFjZS4gTm8gcHJvYmxlbXMuCgo+PiBJIGFsc28gYWRkZWQgYSBy
+ZXNldF93cCBpb2N0bCBmb3IgY29tcGxldGVuZXNzLCBidXQgdGhpcyBvbmUgc2ltcGx5IGNhbGxz
+Cj4+IGJsa2Rldl9pc3N1ZV9kaXNjYXJkIGludGVybmFsbHksIHNvIGl0IGlzIGluIGZhY3QgZXF1
+aXZhbGVudCB0byB0aGUgQkxLRElTQ0FSRAo+PiBpb2N0bCBjYWxsIHdpdGggYSByYW5nZSBleGFj
+dGx5IGFsaWduZWQgb24gYSB6b25lLgo+Cj4gSSdtIGNvbmZ1c2VkIGFzIG15IHBhdGNoIHNldCBp
+bmNsdWRlcyBhIFJlc2V0IFdQIChCTEtSRVNFVFpPTkUpIHRoYXQKPiBjcmVhdGVzIGEgUkVRX09Q
+X1pPTkVfUkVTRVQgLi4gc2FtZSBhcyBvcGVuIGFuZCBjbG9zZS4gTXkKPiBleHBlY3RhdGlvbiBi
+ZWluZyB0aGF0IEJMS0RJU0NBUkQgZG9lc24ndCByZWFsbHkgbmVlZCB5ZXQgYW5vdGhlciBhbGlh
+cy4KClllcywgd2UgY291bGQgcmVtb3ZlIHRoZSBCTEtSRVNFVFpPTkUgaW9jdGwgYW5kIGhhdmUg
+YXBwbGljYXRpb25zIHVzZSAKdGhlIEJMS0RJU0NBUkQgaW9jdGwgaW5zdGVhZC4gSW4gdGhlIGtl
+cm5lbCwgYm90aCBnZW5lcmF0ZSAKYmxrZGV2X2lzc3VlX2Rpc2NhcmQgY2FsbHMgYW5kIGFyZSB0
+aHVzIGlkZW50aWNhbC4gT25seSB0aGUgaW9jdGwgCmludGVyZmFjZSBkaWZmZXJzIChzZWN0b3Ig
+dnMgcmFuZ2UgYXJndW1lbnQpLiBBZ2FpbiwgSSBhZGRlZCBpdCB0byBoYXZlIAp0aGUgZnVsbCBz
+ZXQgb2YgNSBaQkMvWkFDIG9wZXJhdGlvbnMgbWFwcGluZyB0byBvbmUgQkxLeHh4Wk9ORSBpb2N0
+bC4gCkJ1dCBncmFudGVkLCByZXNldCBpcyBvcHRpb25hbC4KCkJlc3QgcmVnYXJkcy4KCi0tIApE
+YW1pZW4gTGUgTW9hbCwgUGguRC4KU3IuIE1hbmFnZXIsIFN5c3RlbSBTb2Z0d2FyZSBHcm91cCwg
+SEdTVCBSZXNlYXJjaCwKSEdTVCwgYSBXZXN0ZXJuIERpZ2l0YWwgYnJhbmQKRGFtaWVuLkxlTW9h
+bEBoZ3N0LmNvbQooKzgxKSAwNDY2LTk4LTM1OTMgKGV4dC4gNTEzNTkzKQoxIGtpcmloYXJhLWNo
+bywgRnVqaXNhd2EsCkthbmFnYXdhLCAyNTItMDg4OCBKYXBhbgp3d3cuaGdzdC5jb20KV2VzdGVy
+biBEaWdpdGFsIENvcnBvcmF0aW9uIChhbmQgaXRzIHN1YnNpZGlhcmllcykgRS1tYWlsIENvbmZp
+ZGVudGlhbGl0eSBOb3RpY2UgJiBEaXNjbGFpbWVyOgoKVGhpcyBlLW1haWwgYW5kIGFueSBmaWxl
+cyB0cmFuc21pdHRlZCB3aXRoIGl0IG1heSBjb250YWluIGNvbmZpZGVudGlhbCBvciBsZWdhbGx5
+IHByaXZpbGVnZWQgaW5mb3JtYXRpb24gb2YgV0RDIGFuZC9vciBpdHMgYWZmaWxpYXRlcywgYW5k
+IGFyZSBpbnRlbmRlZCBzb2xlbHkgZm9yIHRoZSB1c2Ugb2YgdGhlIGluZGl2aWR1YWwgb3IgZW50
+aXR5IHRvIHdoaWNoIHRoZXkgYXJlIGFkZHJlc3NlZC4gSWYgeW91IGFyZSBub3QgdGhlIGludGVu
+ZGVkIHJlY2lwaWVudCwgYW55IGRpc2Nsb3N1cmUsIGNvcHlpbmcsIGRpc3RyaWJ1dGlvbiBvciBh
+bnkgYWN0aW9uIHRha2VuIG9yIG9taXR0ZWQgdG8gYmUgdGFrZW4gaW4gcmVsaWFuY2Ugb24gaXQs
+IGlzIHByb2hpYml0ZWQuIElmIHlvdSBoYXZlIHJlY2VpdmVkIHRoaXMgZS1tYWlsIGluIGVycm9y
+LCBwbGVhc2Ugbm90aWZ5IHRoZSBzZW5kZXIgaW1tZWRpYXRlbHkgYW5kIGRlbGV0ZSB0aGUgZS1t
+YWlsIGluIGl0cyBlbnRpcmV0eSBmcm9tIHlvdXIgc3lzdGVtLgo=
