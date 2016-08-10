@@ -1,141 +1,208 @@
-Return-Path: <Damien.LeMoal@hgst.com>
-Subject: Re: [PATCH v6 0/2] Block layer support ZAC/ZBC commands
-To: Shaun Tancheff <shaun.tancheff@seagate.com>
-References: <1469818955-20568-1-git-send-email-shaun@tancheff.com>
- <20160801094116.GB14677@lst.de>
- <CAJVOszCAb4o5LWpJL8Yd66n9jPvy+EMQX2Xfr6awZCxfGJf_CA@mail.gmail.com>
- <6a4a27ac-009d-9825-bf77-0529da77cc36@suse.de>
- <C7B51F39-AC67-4D96-B1DE-45C70F99134D@hgst.com>
- <CAJVOszDt5HfSKTk_8a3AkqjjAXV_9RaA2TxeqgY5Gp90w89-Lg@mail.gmail.com>
- <2370d779-3f9b-28a2-7596-42b7b6a89c21@suse.de>
- <D3D5E748-ADB9-4376-8969-623A8A815E36@hgst.com>
- <CAJVOszDavBDA0hZTox-nNtPHCz-tWecOJCJ5R25u+AV6Wq3xwQ@mail.gmail.com>
-CC: Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>, Shaun
- Tancheff <shaun@tancheff.com>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "linux-scsi@vger.kernel.org"
-	<linux-scsi@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Jens Axboe
-	<axboe@kernel.dk>, Jens Axboe <axboe@fb.com>, "James E . J . Bottomley"
-	<jejb@linux.vnet.ibm.com>, "Martin K . Petersen"
-	<martin.petersen@oracle.com>, Jeff Layton <jlayton@poochiereds.net>, "J .
- Bruce Fields" <bfields@fieldses.org>, Josh Bingaman
-	<josh.bingaman@seagate.com>
-From: Damien Le Moal <damien.lemoal@hgst.com>
-Message-ID: <37fdd603-403d-84bf-9f3d-51e9791006c4@hgst.com>
-Date: Wed, 10 Aug 2016 13:38:04 +0900
+Return-Path: <shaun.tancheff@seagate.com>
 MIME-Version: 1.0
-In-Reply-To: <CAJVOszDavBDA0hZTox-nNtPHCz-tWecOJCJ5R25u+AV6Wq3xwQ@mail.gmail.com>
-Return-Path: damien.lemoal@hgst.com
-Content-Type: text/plain; charset="utf-8"; format="flowed"
+In-Reply-To: <D3D5E748-ADB9-4376-8969-623A8A815E36@hgst.com>
+References: <1469818955-20568-1-git-send-email-shaun@tancheff.com>
+ <20160801094116.GB14677@lst.de> <CAJVOszCAb4o5LWpJL8Yd66n9jPvy+EMQX2Xfr6awZCxfGJf_CA@mail.gmail.com>
+ <6a4a27ac-009d-9825-bf77-0529da77cc36@suse.de> <C7B51F39-AC67-4D96-B1DE-45C70F99134D@hgst.com>
+ <CAJVOszDt5HfSKTk_8a3AkqjjAXV_9RaA2TxeqgY5Gp90w89-Lg@mail.gmail.com>
+ <2370d779-3f9b-28a2-7596-42b7b6a89c21@suse.de> <D3D5E748-ADB9-4376-8969-623A8A815E36@hgst.com>
+From: Shaun Tancheff <shaun.tancheff@seagate.com>
+Date: Tue, 9 Aug 2016 22:58:19 -0500
+Message-ID: <CAJVOszDavBDA0hZTox-nNtPHCz-tWecOJCJ5R25u+AV6Wq3xwQ@mail.gmail.com>
+Subject: Re: [PATCH v6 0/2] Block layer support ZAC/ZBC commands
+To: Damien Le Moal <Damien.LeMoal@hgst.com>
+Cc: Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>,
+        Shaun Tancheff <shaun@tancheff.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        Jens Axboe <axboe@fb.com>,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Jeff Layton <jlayton@poochiereds.net>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Josh Bingaman <josh.bingaman@seagate.com>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
-U2hhdW4sCgpPbiA4LzEwLzE2IDEyOjU4LCBTaGF1biBUYW5jaGVmZiB3cm90ZToKPiBPbiBUdWUs
-IEF1ZyA5LCAyMDE2IGF0IDM6MDkgQU0sIERhbWllbiBMZSBNb2FsIDxEYW1pZW4uTGVNb2FsQGhn
-c3QuY29tPiB3cm90ZToKPj4+IE9uIEF1ZyA5LCAyMDE2LCBhdCAxNTo0NywgSGFubmVzIFJlaW5l
-Y2tlIDxoYXJlQHN1c2UuZGU+IHdyb3RlOgo+Cj4gW3RyaW1dCj4KPj4+PiBTaW5jZSBkaXNrIHR5
-cGUgPT0gMCBmb3IgZXZlcnl0aGluZyB0aGF0IGlzbid0IEhNIHNvIEkgd291bGQgcHJlZmVyIHRo
-ZQo+Pj4+IHN5c2ZzICd6b25lZCcgZmlsZSBqdXN0IHJlcG9ydCBpZiB0aGUgZHJpdmUgaXMgSEEg
-b3IgSE0uCj4+Pj4KPj4+IE9rYXkuIFNvIGxldCdzIHB1dCBpbiB0aGUgJ3pvbmVkJyBhdHRyaWJ1
-dGUgdGhlIGRldmljZSB0eXBlOgo+Pj4gJ2hvc3QtbWFuYWdlZCcsICdob3N0LWF3YXJlJywgb3Ig
-J2RldmljZSBtYW5hZ2VkJy4KPj4KPj4gSSBoYWNrZWQgeW91ciBwYXRjaGVzIGFuZCBzaW1wbHkg
-cHV0IGEgIjAiIG9yICIxIiBpbiB0aGUgc3lzZnMgem9uZWQgZmlsZS4KPj4gQW55IGRyaXZlIHRo
-YXQgaGFzIFpCQy9aQUMgY29tbWFuZCBzdXBwb3J0IGdldHMgYSAiMSIsICIwIiBmb3IgZXZlcnl0
-aGluZwo+PiBlbHNlLiBUaGlzIG1lYW5zIHRoYXQgZHJpdmUgbWFuYWdlZCBtb2RlbHMgYXJlIG5v
-dCBleHBvc2VkIGFzIHpvbmVkIGJsb2NrCj4+IGRldmljZXMuIEZvciBITSB2cyBIQSBkaWZmZXJl
-bnRpYXRpb24sIGFuIGFwcGxpY2F0aW9uIGNhbiBsb29rIGF0IHRoZQo+PiBkZXZpY2UgdHlwZSBm
-aWxlIHNpbmNlIGl0IGlzIGFscmVhZHkgcHJlc2VudC4KPj4KPj4gV2UgY291bGQgaW5kZWVkIHNl
-dCB0aGUgInpvbmVkIiBmaWxlIHRvIHRoZSBkZXZpY2UgdHlwZSwgYnV0IEhNIGRyaXZlcyBhbmQK
-Pj4gcmVndWxhciBkcml2ZXMgd2lsbCBib3RoIGhhdmUgIjAiIGluIGl0LCBzbyBubyBkaWZmZXJl
-bnRpYXRpb24gcG9zc2libGUuCj4+IFRoZSBvdGhlciBjaG9pY2UgY291bGQgYmUgdGhlICJ6b25l
-ZCIgYml0cyBkZWZpbmVkIGJ5IFpCQywgYnV0IHRoZXNlCj4+IGRvIG5vdCBkZWZpbmUgYSB2YWx1
-ZSBmb3IgaG9zdCBtYW5hZ2VkIGRyaXZlcywgYW5kIHRoZSBkcml2ZSBtYW5hZ2VkIHZhbHVlCj4+
-IGJlaW5nIG5vdCAiMCIgY291bGQgYmUgY29uZnVzaW5nIHRvby4gU28gSSBzZXR0bGVkIGZvciBh
-IHNpbXBsZSAwLzEgYm9vbGVhbi4KPgo+IFRoaXMgc2VlbXMgZ29vZCB0byBtZS4KCkFub3RoZXIg
-b3B0aW9uIEkgZm9yZ290IGlzIGZvciB0aGUgInpvbmVkIiBmaWxlIHRvIGluZGljYXRlIHRoZSB0
-b3RhbCAKbnVtYmVyIG9mIHpvbmVzIG9mIHRoZSBkZXZpY2UsIGFuZCAwIGZvciBhIG5vbiB6b25l
-ZCByZWd1bGFyIGJsb2NrIApkZXZpY2UuIFRoYXQgd291bGQgd29yayBhcyB3ZWxsLgoKWy4uLl0K
-Pj4gRG9uZTogSSBoYWNrZWQgU2hhdW4gaW9jdGwgY29kZSBhbmQgYWRkZWQgZmluaXNoIHpvbmUg
-dG9vLiBUaGUKPj4gZGlmZmVyZW5jZSB3aXRoIFNoYXVuIGluaXRpYWwgY29kZSBpcyB0aGF0IHRo
-ZSBpb2N0bCBhcmUgcHJvcGFnYXRlZCBkb3duIHRvCj4+IHRoZSBkcml2ZXIgKF9fYmxrZGV2X2Ry
-aXZlcl9pb2N0bCAtPiBzZF9pb2N0bCkgc28gdGhhdCB0aGVyZSBpcyBubyBuZWVkIGZvcgo+PiBC
-SU8gcmVxdWVzdCBkZWZpbml0aW9uIGZvciB0aGUgem9uZSBvcGVyYXRpb25zLiBTbyBhIGxvdCBs
-ZXNzIGNvZGUgYWRkZWQuCj4KPiBUaGUgcHVycG9zZSBvZiB0aGUgQklPIGZsYWdzIGlzIG5vdCB0
-byBlbmFibGUgdGhlIGlvY3RscyBzbyBtdWNoIGFzCj4gdGhlIG90aGVyIHdheSByb3VuZC4gQ3Jl
-YXRpbmcgQklPIG9wJ3MgaXMgdG8gZW5hYmxlIGlzc3VpbmcgWkJDCj4gY29tbWFuZHMgZnJvbSBk
-ZXZpY2UgbWFwcGVyIHRhcmdldHMgYW5kIGZpbGUgc3lzdGVtcyB3aXRob3V0IHNvbWUKPiBoZWlu
-b3VzIGlvY3RsIGhhY2tzLgo+IE1ha2luZyB0aGUgcmVzdWx0aW5nIGJsb2NrIGxheWVyIGludGVy
-ZmFjZXMgYXZhaWxhYmxlIHZpYSBpb2N0bHMgaXMganVzdCBhCj4gcmVhc29uYWJsZSB3YXkgdG8g
-ZXhlcmNpc2UgdGhlIGNvZGUgLi4uIG9yIHRoYXQgd2FzIG15IGludGVudC4KClllcywgSSB1bmRl
-cnN0b29kIHlvdXIgY29kZS4gSG93ZXZlciwgc2luY2UgKG9yIGlmKSB3ZSBrZWVwIHRoZSB6b25l
-IAppbmZvcm1hdGlvbiBpbiB0aGUgUkItdHJlZSBjYWNoZSwgdGhlcmUgaXMgbm8gbmVlZCBmb3Ig
-dGhlIHJlcG9ydCB6b25lIApvcGVyYXRpb24gQklPIGludGVyZmFjZS4gU2FtZSBmb3IgcmVzZXQg
-d3JpdGUgcG9pbnRlciBieSBrZWVwaW5nIHRoZSAKbWFwcGluZyB0byBkaXNjYXJkLiBibGtfbG9v
-a3VwX3pvbmUgY2FuIGJlIHVzZWQgaW4ga2VybmVsIGFzIGEgcmVwb3J0IAp6b25lIEJJTyByZXBs
-YWNlbWVudCBhbmQgd29ya3MgYXMgd2VsbCBmb3IgdGhlIHJlcG9ydCB6b25lIGlvY3RsIAppbXBs
-ZW1lbnRhdGlvbi4gRm9yIHJlc2V0LCB0aGVyZSBpcyBibGtkZXZfaXNzdWVfZGlzY3JhZCBpbiBr
-ZXJuZWwsIGFuZCAKdGhlIHJlc2V0IHpvbmUgaW9jdGwgYmVjb21lcyBlcXVpdmFsZW50IHRvIEJM
-S0RJU0NBUkQgaW9jdGwuIFRoZXNlIGFyZSAKc2ltcGxlLiBPcGVuLCBjbG9zZSBhbmQgZmluaXNo
-IHpvbmUgcmVtYWlucy4gRm9yIHRoZXNlLCBhZGRpbmcgdGhlIEJJTyAKaW50ZXJmYWNlIHNlZW1l
-ZCBhbiBvdmVya2lsbC4gSGVuY2UgbXkgY2hvaWNlIG9mIHByb3BhZ2F0aW5nIHRoZSBpb2N0bCAK
-dG8gdGhlIGRyaXZlci4KVGhpcyBpcyBkZWJhdGFibGUgb2YgY291cnNlLCBhbmQgYWRkaW5nIGFu
-IGluLWtlcm5lbCBpbnRlcmZhY2UgaXMgbm90IApoYXJkOiB3ZSBjYW4gaW1wbGVtZW50IGJsa19v
-cGVuX3pvbmUsIGJsa19jbG9zZV96b25lIGFuZCBibGtfZmluaXNoX3pvbmUgCnVzaW5nIF9fYmxr
-ZGV2X2RyaXZlcl9pb2N0bC4gVGhhdCBsb29rcyBjbGVhbiB0byBtZS4KCk92ZXJhbGwsIG15IGNv
-bmNlcm4gd2l0aCB0aGUgQklPIGJhc2VkIGludGVyZmFjZSBmb3IgdGhlIFpCQyBjb21tYW5kcyBp
-cyAKdGhhdCBpdCBhZGRzIG9uZSBmbGFnIGZvciBlYWNoIGNvbW1hbmQsIHdoaWNoIGlzIG5vdCBy
-ZWFsbHkgdGhlIApwaGlsb3NvcGh5IG9mIHRoZSBpbnRlcmZhY2UgYW5kIHBvdGVudGlhbGx5IG9w
-ZW5zIHRoZSBkb29yIGZvciBtb3JlIHN1Y2ggCmltcGxlbWVudGF0aW9ucyBpbiB0aGUgZnV0dXJl
-IHdpdGggbmV3IHN0YW5kYXJkcyBhbmQgbmV3IGNvbW1hbmRzIGNvbWluZyAKdXAuIENsZWFybHkg
-dGhhdCBpcyBub3QgYSBzdXN0YWluYWJsZSBwYXRoLiBTbyBJIHRoaW5rIHRoYXQgYSBtb3JlIApz
-cGVjaWZpYyBpbnRlcmZhY2UgZm9yIHRoZXNlIHpvbmUgb3BlcmF0aW9ucyBpcyBhIGJldHRlciBj
-aG9pY2UuIFRoYXQgaXMgCmNvbnNpc3RlbnQgd2l0aCB3aGF0IGhhcHBlbnMgd2l0aCB0aGUgdG9u
-cyBvZiBBVEEgYW5kIFNDU0kgY29tbWFuZHMgbm90IAphY3R1YWxseSBkb2luZyBkYXRhIEkvT3Mg
-KG1vZGUgc2Vuc2UsIGxvZyBwYWdlcywgU01BUlQsIGV0YykuIEFsbCB0aGVzZSAKZG8gbm90IHVz
-ZSBCSU9zIGFuZCBhcmUgcHJvY2Vzc2VkIGFzIHJlcXVlc3QgUkVRX1RZUEVfQkxPQ0tfUEMuCgo+
-PiBUaGUgaW9jdGxzIGRvIG5vdCBtaW1pYyBleGFjdGx5IHRoZSBaQkMgc3RhbmRhcmQuIEZvciBp
-bnN0YW5jZSwgdGhlcmUgaXMgbm8KPj4gcmVwb3J0aW5nIG9wdGlvbnMgZm9yIHJlcG9ydCB6b25l
-cywgbm9yIGlzIHRoZSAiYWxsIiBiaXQgc3VwcG9ydGVkIGZvciBvcGVuLAo+PiBjbG9zZSBvciBm
-aW5pc2ggem9uZSBjb21tYW5kcy4gQnV0IHRoZSBpbmZvcm1hdGlvbiBwcm92aWRlZCBvbiB6b25l
-cyBpcyBjb21wbGV0ZQo+PiBhbmQgbWFwcyB0byB0aGUgc3RhbmRhcmQgZGVmaW5pdGlvbnMuCj4K
-PiBGb3IgdGhlIHJlcG9ydGluZyBvcHRpb25zIEkgaGF2ZSBwbGFubmVkIHRvIHJldXNlIHRoZSBz
-dHJlYW1faWQgaW4KPiBzdHJ1Y3QgYmlvIHdoZW4gdGhhdCBpcyBmb3JtYWxpemVkLiBUaGVyZSBh
-cmUgY2VydGFpbmx5IG90aGVyIHBsYWNlcyBpbgo+IHN0cnVjdCBiaW8gdG8gc3R1ZmYgYSBmZXcg
-ZXh0cmEgYml0cyAuLi4KCldlIGNvdWxkIGFkZCByZXBvcnRpbmcgb3B0aW9ucyB0byBibGtfbG9v
-a3VwX3pvbmVzIHRvIGZpbHRlciB0aGUgcmVzdWx0IAphbmQgdXNlIHRoYXQgaW4gdGhlIGlvY3Rs
-IGltcGxlbWVudGF0aW9uIGFzIHdlbGwuIFRoaXMgY2FuIGJlIGFkZGVkIAp3aXRob3V0IGFueSBw
-cm9ibGVtLgoKPiBBcyBmYXIgYXMgdGhlIGFsbCBiaXQgLi4uIHRoaXMgaXMgYmVpbmcgaGFuZGxl
-ZCBieSBhbGwgdGhlIHpvbmUgYWN0aW9uCj4gY29tbWFuZHMuIEp1c3QgcGFzcyBhIHNlY3RvciBv
-ZiB+MHVsIGFuZCBpdCdzIGhhbmRsZWQgaW4gc2QuYyBieQo+IHNkX3NldHVwX3pvbmVfYWN0aW9u
-X2NtbmQoKS4KPgo+IEFwb2xvZ2llcyBhcyBhcHBhcmVudGx5IG15IGRvY3VtZW50YXRpb24gaGVy
-ZSBpcyBsYWNraW5nIDotKAoKWWVzLCBJIGdvdCBpdCAobGliemJjIGRvZXMgdGhlIHNhbWUgYWN0
-dWFsbHkpLiBJIGRpZCBub3QgYWRkIGl0IGZvciAKc2ltcGxpY2l0eS4gQnV0IGluZGVlZCBtYXkg
-YmUgaXQgc2hvdWxkIGJlLiBUaGUgc2FtZSB0cmljayBjYW4gYmUgdXNlZCAKd2l0aCB0aGUgaW9j
-dGwgdG8gZHJpdmVyIGludGVyZmFjZS4gTm8gcHJvYmxlbXMuCgo+PiBJIGFsc28gYWRkZWQgYSBy
-ZXNldF93cCBpb2N0bCBmb3IgY29tcGxldGVuZXNzLCBidXQgdGhpcyBvbmUgc2ltcGx5IGNhbGxz
-Cj4+IGJsa2Rldl9pc3N1ZV9kaXNjYXJkIGludGVybmFsbHksIHNvIGl0IGlzIGluIGZhY3QgZXF1
-aXZhbGVudCB0byB0aGUgQkxLRElTQ0FSRAo+PiBpb2N0bCBjYWxsIHdpdGggYSByYW5nZSBleGFj
-dGx5IGFsaWduZWQgb24gYSB6b25lLgo+Cj4gSSdtIGNvbmZ1c2VkIGFzIG15IHBhdGNoIHNldCBp
-bmNsdWRlcyBhIFJlc2V0IFdQIChCTEtSRVNFVFpPTkUpIHRoYXQKPiBjcmVhdGVzIGEgUkVRX09Q
-X1pPTkVfUkVTRVQgLi4gc2FtZSBhcyBvcGVuIGFuZCBjbG9zZS4gTXkKPiBleHBlY3RhdGlvbiBi
-ZWluZyB0aGF0IEJMS0RJU0NBUkQgZG9lc24ndCByZWFsbHkgbmVlZCB5ZXQgYW5vdGhlciBhbGlh
-cy4KClllcywgd2UgY291bGQgcmVtb3ZlIHRoZSBCTEtSRVNFVFpPTkUgaW9jdGwgYW5kIGhhdmUg
-YXBwbGljYXRpb25zIHVzZSAKdGhlIEJMS0RJU0NBUkQgaW9jdGwgaW5zdGVhZC4gSW4gdGhlIGtl
-cm5lbCwgYm90aCBnZW5lcmF0ZSAKYmxrZGV2X2lzc3VlX2Rpc2NhcmQgY2FsbHMgYW5kIGFyZSB0
-aHVzIGlkZW50aWNhbC4gT25seSB0aGUgaW9jdGwgCmludGVyZmFjZSBkaWZmZXJzIChzZWN0b3Ig
-dnMgcmFuZ2UgYXJndW1lbnQpLiBBZ2FpbiwgSSBhZGRlZCBpdCB0byBoYXZlIAp0aGUgZnVsbCBz
-ZXQgb2YgNSBaQkMvWkFDIG9wZXJhdGlvbnMgbWFwcGluZyB0byBvbmUgQkxLeHh4Wk9ORSBpb2N0
-bC4gCkJ1dCBncmFudGVkLCByZXNldCBpcyBvcHRpb25hbC4KCkJlc3QgcmVnYXJkcy4KCi0tIApE
-YW1pZW4gTGUgTW9hbCwgUGguRC4KU3IuIE1hbmFnZXIsIFN5c3RlbSBTb2Z0d2FyZSBHcm91cCwg
-SEdTVCBSZXNlYXJjaCwKSEdTVCwgYSBXZXN0ZXJuIERpZ2l0YWwgYnJhbmQKRGFtaWVuLkxlTW9h
-bEBoZ3N0LmNvbQooKzgxKSAwNDY2LTk4LTM1OTMgKGV4dC4gNTEzNTkzKQoxIGtpcmloYXJhLWNo
-bywgRnVqaXNhd2EsCkthbmFnYXdhLCAyNTItMDg4OCBKYXBhbgp3d3cuaGdzdC5jb20KV2VzdGVy
-biBEaWdpdGFsIENvcnBvcmF0aW9uIChhbmQgaXRzIHN1YnNpZGlhcmllcykgRS1tYWlsIENvbmZp
-ZGVudGlhbGl0eSBOb3RpY2UgJiBEaXNjbGFpbWVyOgoKVGhpcyBlLW1haWwgYW5kIGFueSBmaWxl
-cyB0cmFuc21pdHRlZCB3aXRoIGl0IG1heSBjb250YWluIGNvbmZpZGVudGlhbCBvciBsZWdhbGx5
-IHByaXZpbGVnZWQgaW5mb3JtYXRpb24gb2YgV0RDIGFuZC9vciBpdHMgYWZmaWxpYXRlcywgYW5k
-IGFyZSBpbnRlbmRlZCBzb2xlbHkgZm9yIHRoZSB1c2Ugb2YgdGhlIGluZGl2aWR1YWwgb3IgZW50
-aXR5IHRvIHdoaWNoIHRoZXkgYXJlIGFkZHJlc3NlZC4gSWYgeW91IGFyZSBub3QgdGhlIGludGVu
-ZGVkIHJlY2lwaWVudCwgYW55IGRpc2Nsb3N1cmUsIGNvcHlpbmcsIGRpc3RyaWJ1dGlvbiBvciBh
-bnkgYWN0aW9uIHRha2VuIG9yIG9taXR0ZWQgdG8gYmUgdGFrZW4gaW4gcmVsaWFuY2Ugb24gaXQs
-IGlzIHByb2hpYml0ZWQuIElmIHlvdSBoYXZlIHJlY2VpdmVkIHRoaXMgZS1tYWlsIGluIGVycm9y
-LCBwbGVhc2Ugbm90aWZ5IHRoZSBzZW5kZXIgaW1tZWRpYXRlbHkgYW5kIGRlbGV0ZSB0aGUgZS1t
-YWlsIGluIGl0cyBlbnRpcmV0eSBmcm9tIHlvdXIgc3lzdGVtLgo=
+On Tue, Aug 9, 2016 at 3:09 AM, Damien Le Moal <Damien.LeMoal@hgst.com> wro=
+te:
+>> On Aug 9, 2016, at 15:47, Hannes Reinecke <hare@suse.de> wrote:
+
+[trim]
+
+>>> Since disk type =3D=3D 0 for everything that isn't HM so I would prefer=
+ the
+>>> sysfs 'zoned' file just report if the drive is HA or HM.
+>>>
+>> Okay. So let's put in the 'zoned' attribute the device type:
+>> 'host-managed', 'host-aware', or 'device managed'.
+>
+> I hacked your patches and simply put a "0" or "1" in the sysfs zoned file=
+.
+> Any drive that has ZBC/ZAC command support gets a "1", "0" for everything
+> else. This means that drive managed models are not exposed as zoned block
+> devices. For HM vs HA differentiation, an application can look at the
+> device type file since it is already present.
+>
+> We could indeed set the "zoned" file to the device type, but HM drives an=
+d
+> regular drives will both have "0" in it, so no differentiation possible.
+> The other choice could be the "zoned" bits defined by ZBC, but these
+> do not define a value for host managed drives, and the drive managed valu=
+e
+> being not "0" could be confusing too. So I settled for a simple 0/1 boole=
+an.
+
+This seems good to me.
+
+>>>> 2) Add ioctls for zone management:
+>>>> Report zones (get information from RB tree), reset zone (simple wrappe=
+r
+>>>> to ioctl for block discard), open zone, close zone and finish zone. Th=
+at
+>>>> will allow mkfs like tools to get zone information without having to p=
+arse
+>>>> thousands of sysfs files (and can also be integrated in libzbc block b=
+ackend
+>>>> driver for a unified interface with the direct SG_IO path for kernels =
+without
+>>>> the ZBC code enabled).
+>>>
+>>> I can add finish zone ... but I really can't think of a use for it, mys=
+elf.
+>>>
+>> Which is not the point. The standard defines this, so clearly someone
+>> found it a reasonable addendum. So let's add this for completeness.
+
+Agreed.
+
+> Done: I hacked Shaun ioctl code and added finish zone too. The
+> difference with Shaun initial code is that the ioctl are propagated down =
+to
+> the driver (__blkdev_driver_ioctl -> sd_ioctl) so that there is no need f=
+or
+> BIO request definition for the zone operations. So a lot less code added.
+
+The purpose of the BIO flags is not to enable the ioctls so much as
+the other way round. Creating BIO op's is to enable issuing ZBC
+commands from device mapper targets and file systems without some
+heinous ioctl hacks.
+Making the resulting block layer interfaces available via ioctls is just a
+reasonable way to exercise the code ... or that was my intent.
+
+> The ioctls do not mimic exactly the ZBC standard. For instance, there is =
+no
+> reporting options for report zones, nor is the "all" bit supported for op=
+en,
+> close or finish zone commands. But the information provided on zones is c=
+omplete
+> and maps to the standard definitions.
+
+For the reporting options I have planned to reuse the stream_id in
+struct bio when that is formalized. There are certainly other places in
+struct bio to stuff a few extra bits ...
+
+As far as the all bit ... this is being handled by all the zone action
+commands. Just pass a sector of ~0ul and it's handled in sd.c by
+sd_setup_zone_action_cmnd().
+
+Apologies as apparently my documentation here is lacking :-(
+
+> I also added a reset_wp ioctl for completeness, but this one simply calls
+> blkdev_issue_discard internally, so it is in fact equivalent to the BLKDI=
+SCARD
+> ioctl call with a range exactly aligned on a zone.
+
+I'm confused as my patch set includes a Reset WP (BLKRESETZONE) that
+creates a REQ_OP_ZONE_RESET .. same as open and close. My
+expectation being that BLKDISCARD doesn't really need yet another alias.
+
+[trim]
+
+> Did that too. The blk_zone struct is now exactly 64B. I removed the per z=
+one
+
+Thanks .. being a cache line is harder to whinge about...
+
+> spinlock and replaced it with a flag so that zones can still be locked
+> independently using wait_on_bit_lock & friends (I added the functions
+> blk_zone_lock, blk_zone_trylock and blk_zone_unlock to do that). This per=
+ zone
+> locking comes in handy to implement the ioctls code without stalling the =
+command
+> queue for read, writes and discard on different zones.
+>
+> I however kept the zone length in the structure. The reason for doing so =
+is that
+> this allows supporting drives with non-constant zone sizes, albeit with a=
+ more
+> limited interface since in such case the device chunk_sectors is not set =
+(that
+> is how a user or application can detect that the zones are not constant s=
+ize).
+> For these drives, the block layer may happily merge BIOs across zone boun=
+daries
+> and the discard code will not split and align calls on the zones. But upp=
+er layers
+> (an FS or a device mapper) can still do all this by themselves if they wa=
+nt/can
+> support non-constant zone sizes.
+>
+> The only exception is drives like the Seagate one with only the last zone=
+ of a
+> different size. This case is handled exactly as if all zones are the same=
+ size
+> simply because any operation on the last smaller zone will naturally alig=
+n as
+> the checks of operation size against the drive capacity will do the right=
+ things.
+>
+> The ioctls work for all cases (drive with constant zone size or not). Thi=
+s is again
+> to allow supporting eventual weird drives at application level. I integra=
+ted all
+> these ioctl into libzbc block device backend driver and everything is fin=
+e. Can't
+> tell the difference with direct-to-drive SG_IO accesses. But unlike these=
+, the zone
+> ioctls keep the zone information RB-tree cache up to date.
+>
+>>
+>> I will be updating my patchset accordingly.
+>
+> I need to cleanup my code and rebase on top of 4.8-rc1. Let me do this an=
+d I will send
+> everything for review. If you have any comment on the above, please let m=
+e know and
+> I will be happy to incorporate changes.
+>
+> Best regards.
+>
+>
+> ------------------------
+> Damien Le Moal, Ph.D.
+> Sr. Manager, System Software Group, HGST Research,
+> HGST, a Western Digital brand
+> Damien.LeMoal@hgst.com
+> (+81) 0466-98-3593 (ext. 513593)
+> 1 kirihara-cho, Fujisawa,
+> Kanagawa, 252-0888 Japan
+> www.hgst.com
+>
+> Western Digital Corporation (and its subsidiaries) E-mail Confidentiality=
+ Notice & Disclaimer:
+>
+> This e-mail and any files transmitted with it may contain confidential or=
+ legally privileged information of WDC and/or its affiliates, and are inten=
+ded solely for the use of the individual or entity to which they are addres=
+sed. If you are not the intended recipient, any disclosure, copying, distri=
+bution or any action taken or omitted to be taken in reliance on it, is pro=
+hibited. If you have received this e-mail in error, please notify the sende=
+r immediately and delete the e-mail in its entirety from your system.
+>
+
+
+
+--=20
+Shaun Tancheff
