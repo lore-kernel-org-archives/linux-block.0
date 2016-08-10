@@ -1,465 +1,326 @@
-Return-Path: <shaun@helios.aeonazure.com>
-From: Shaun Tancheff <shaun@tancheff.com>
-To: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Shaun Tancheff <shaun@tancheff.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Jens Axboe <axboe@fb.com>,
-	Christoph Hellwig <hch@lst.de>,
-	"James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	Josh Bingaman <josh.bingaman@seagate.com>,
-	Shaun Tancheff <shaun.tancheff@seagate.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Damien Le Moal <damien.lemoal@hgst.com>
-Subject: [PATCH 2/2] Enable support for Seagate HostAware drives (testing).
-Date: Wed,  3 Aug 2016 14:06:45 -0500
-Message-Id: <1470251205-4916-3-git-send-email-shaun@tancheff.com>
-In-Reply-To: <1470251205-4916-1-git-send-email-shaun@tancheff.com>
-References: <1470251205-4916-1-git-send-email-shaun@tancheff.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from TYO200.gate.nec.co.jp ([210.143.35.50]:47469 "EHLO
+	tyo200.gate.nec.co.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932681AbcHJA4Q convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-block@vger.kernel.org>); Tue, 9 Aug 2016 20:56:16 -0400
+From: Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>
+To: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+CC: "Theodore Ts'o" <tytso@mit.edu>,
+	Andreas Dilger <adilger.kernel@dilger.ca>,
+	Jan Kara <jack@suse.com>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	"Hugh Dickins" <hughd@google.com>,
+	Andrea Arcangeli <aarcange@redhat.com>,
+	"Andrew Morton" <akpm@linux-foundation.org>,
+	Dave Hansen <dave.hansen@intel.com>,
+	Vlastimil Babka <vbabka@suse.cz>,
+	Matthew Wilcox <willy@infradead.org>,
+	"Ross Zwisler" <ross.zwisler@linux.intel.com>,
+	"linux-ext4@vger.kernel.org" <linux-ext4@vger.kernel.org>,
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: [PATCH] mm, hugetlb: switch hugetlbfs to multi-order radix-tree
+ entries
+Date: Wed, 10 Aug 2016 00:54:14 +0000
+Message-ID: <20160810005413.GC28043@hori1.linux.bs1.fc.nec.co.jp>
+References: <1469493335-3622-1-git-send-email-kirill.shutemov@linux.intel.com>
+In-Reply-To: <1469493335-3622-1-git-send-email-kirill.shutemov@linux.intel.com>
+Content-Type: text/plain; charset="iso-2022-jp"
+MIME-Version: 1.0
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Seagate drives report a SAME code of 0 due to having:
-  - Zones of different types (CMR zones at the low LBA space).
-  - Zones of different size (A terminating 'runt' zone in the high lba space).
+Hi Kirill,
 
-Support loading the zone topology into the sd_zbc zone cache.
+I wrote a patch to switch hugetlbfs to multi-order radix tree.
+Hopefully it's queued to your series.
 
-Signed-off-by: Shaun Tancheff <shaun.tancheff@seagate.com>
-
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Damien Le Moal <damien.lemoal@hgst.com>
+Thanks,
+Naoya Horiguchi
 ---
-v1:
- - Updated kernel version / re-sync with Hannes' zac.v3 branch.
----
- drivers/scsi/sd.c     |  22 ++++----
- drivers/scsi/sd.h     |  20 +++++--
- drivers/scsi/sd_zbc.c | 150 ++++++++++++++++++++++++++++++++++++++++++--------
- 3 files changed, 155 insertions(+), 37 deletions(-)
+From: Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>
+Date: Wed, 10 Aug 2016 09:49:09 +0900
+Subject: [PATCH] mm, hugetlb: switch hugetlbfs to multi-order radix-tree
+ entries
 
-diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
-index 7c38975..5fbc599 100644
---- a/drivers/scsi/sd.c
-+++ b/drivers/scsi/sd.c
-@@ -694,8 +694,13 @@ static void sd_config_discard(struct scsi_disk *sdkp, unsigned int mode)
- 		break;
+Currently, hugetlb pages are linked to page cache on the basis of hugepage
+offset (derived from vma_hugecache_offset()) for historical reason, which
+doesn't match to the generic usage of page cache and requires some routines
+to covert page offset <=> hugepage offset in common path. This patch
+adjusts code for multi-order radix-tree to avoid the situation.
+
+Main change is on the behavior of page->index for hugetlbfs. Before this
+patch, it represented hugepage offset, but with this patch it represents
+page offset. So index-related code have to be updated.
+Note that hugetlb_fault_mutex_hash() and reservation region handling are
+still working with hugepage offset.
+
+Signed-off-by: Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>
+---
+ fs/hugetlbfs/inode.c    | 22 ++++++++++------------
+ include/linux/pagemap.h | 10 +---------
+ mm/filemap.c            | 26 +++++++++++++++-----------
+ mm/hugetlb.c            | 19 ++++++-------------
+ 4 files changed, 32 insertions(+), 45 deletions(-)
+
+diff --git a/fs/hugetlbfs/inode.c b/fs/hugetlbfs/inode.c
+index 4ea71eba40a5..fc918c0e33e9 100644
+--- a/fs/hugetlbfs/inode.c
++++ b/fs/hugetlbfs/inode.c
+@@ -388,8 +388,8 @@ static void remove_inode_hugepages(struct inode *inode, loff_t lstart,
+ {
+ 	struct hstate *h = hstate_inode(inode);
+ 	struct address_space *mapping = &inode->i_data;
+-	const pgoff_t start = lstart >> huge_page_shift(h);
+-	const pgoff_t end = lend >> huge_page_shift(h);
++	const pgoff_t start = lstart >> PAGE_SHIFT;
++	const pgoff_t end = lend >> PAGE_SHIFT;
+ 	struct vm_area_struct pseudo_vma;
+ 	struct pagevec pvec;
+ 	pgoff_t next;
+@@ -447,8 +447,7 @@ static void remove_inode_hugepages(struct inode *inode, loff_t lstart,
  
- 	case SD_ZBC_RESET_WP:
--		max_blocks = sdkp->unmap_granularity;
- 		q->limits.discard_zeroes_data = 1;
-+		q->limits.discard_granularity =
-+			sd_zbc_discard_granularity(sdkp);
-+
-+		max_blocks = min_not_zero(sdkp->unmap_granularity,
-+					  q->limits.discard_granularity >>
-+						ilog2(logical_block_size));
- 		break;
- 
- 	case SD_LBP_ZERO:
-@@ -1952,13 +1957,12 @@ static int sd_done(struct scsi_cmnd *SCpnt)
- 			good_bytes = blk_rq_bytes(req);
- 			scsi_set_resid(SCpnt, 0);
- 		} else {
--#ifdef CONFIG_SCSI_ZBC
- 			if (op == ZBC_OUT)
- 				/* RESET WRITE POINTER failed */
- 				sd_zbc_update_zones(sdkp,
- 						    blk_rq_pos(req),
--						    512, true);
--#endif
-+						    512, SD_ZBC_RESET_WP_ERR);
-+
- 			good_bytes = 0;
- 			scsi_set_resid(SCpnt, blk_rq_bytes(req));
- 		}
-@@ -2031,7 +2035,6 @@ static int sd_done(struct scsi_cmnd *SCpnt)
- 				good_bytes = blk_rq_bytes(req);
- 				scsi_set_resid(SCpnt, 0);
+ 				i_mmap_lock_write(mapping);
+ 				hugetlb_vmdelete_list(&mapping->i_mmap,
+-					next * pages_per_huge_page(h),
+-					(next + 1) * pages_per_huge_page(h));
++					next, next + 1);
+ 				i_mmap_unlock_write(mapping);
  			}
--#ifdef CONFIG_SCSI_ZBC
- 			/*
- 			 * ZBC: Unaligned write command.
- 			 * Write did not start a write pointer position.
-@@ -2039,8 +2042,7 @@ static int sd_done(struct scsi_cmnd *SCpnt)
- 			if (sshdr.ascq == 0x04)
- 				sd_zbc_update_zones(sdkp,
- 						    blk_rq_pos(req),
--						    512, true);
--#endif
-+						    512, SD_ZBC_WRITE_ERR);
- 		}
- 		break;
- 	default:
-@@ -2267,7 +2269,7 @@ static void sd_read_zones(struct scsi_disk *sdkp, unsigned char *buffer)
- 	 * supports equal zone sizes.
+ 
+@@ -467,7 +466,8 @@ static void remove_inode_hugepages(struct inode *inode, loff_t lstart,
+ 			freed++;
+ 			if (!truncate_op) {
+ 				if (unlikely(hugetlb_unreserve_pages(inode,
+-							next, next + 1, 1)))
++						(next) << huge_page_order(h),
++						(next + 1) << huge_page_order(h), 1)))
+ 					hugetlb_fix_reserve_counts(inode,
+ 								rsv_on_error);
+ 			}
+@@ -552,8 +552,6 @@ static long hugetlbfs_fallocate(struct file *file, int mode, loff_t offset,
+ 	struct hstate *h = hstate_inode(inode);
+ 	struct vm_area_struct pseudo_vma;
+ 	struct mm_struct *mm = current->mm;
+-	loff_t hpage_size = huge_page_size(h);
+-	unsigned long hpage_shift = huge_page_shift(h);
+ 	pgoff_t start, index, end;
+ 	int error;
+ 	u32 hash;
+@@ -569,8 +567,8 @@ static long hugetlbfs_fallocate(struct file *file, int mode, loff_t offset,
+ 	 * For this range, start is rounded down and end is rounded up
+ 	 * as well as being converted to page offsets.
  	 */
- 	same = buffer[4] & 0xf;
--	if (same == 0 || same > 3) {
-+	if (same > 3) {
- 		sd_printk(KERN_WARNING, sdkp,
- 			  "REPORT ZONES SAME type %d not supported\n", same);
- 		return;
-@@ -2279,9 +2281,9 @@ static void sd_read_zones(struct scsi_disk *sdkp, unsigned char *buffer)
- 	sdkp->unmap_granularity = zone_len;
- 	blk_queue_chunk_sectors(sdkp->disk->queue,
- 				logical_to_sectors(sdkp->device, zone_len));
--	sd_config_discard(sdkp, SD_ZBC_RESET_WP);
+-	start = offset >> hpage_shift;
+-	end = (offset + len + hpage_size - 1) >> hpage_shift;
++	start = offset >> PAGE_SHIFT;
++	end = (offset + len + huge_page_size(h) - 1) >> PAGE_SHIFT;
  
--	sd_zbc_setup(sdkp, buffer, SD_BUF_SIZE);
-+	sd_zbc_setup(sdkp, zone_len, buffer, SD_BUF_SIZE);
-+	sd_config_discard(sdkp, SD_ZBC_RESET_WP);
- }
+ 	inode_lock(inode);
  
- static void read_capacity_error(struct scsi_disk *sdkp, struct scsi_device *sdp,
-diff --git a/drivers/scsi/sd.h b/drivers/scsi/sd.h
-index 6ae4505..ef6c132 100644
---- a/drivers/scsi/sd.h
-+++ b/drivers/scsi/sd.h
-@@ -283,19 +283,24 @@ static inline void sd_dif_complete(struct scsi_cmnd *cmd, unsigned int a)
+@@ -588,7 +586,7 @@ static long hugetlbfs_fallocate(struct file *file, int mode, loff_t offset,
+ 	pseudo_vma.vm_flags = (VM_HUGETLB | VM_MAYSHARE | VM_SHARED);
+ 	pseudo_vma.vm_file = file;
  
- #endif /* CONFIG_BLK_DEV_INTEGRITY */
- 
-+
-+#define SD_ZBC_INIT		0
-+#define SD_ZBC_RESET_WP_ERR	1
-+#define SD_ZBC_WRITE_ERR	2
-+
- #ifdef CONFIG_SCSI_ZBC
- 
- extern int sd_zbc_report_zones(struct scsi_disk *, unsigned char *, int,
- 			       sector_t, enum zbc_zone_reporting_options, bool);
--extern int sd_zbc_setup(struct scsi_disk *, char *, int);
-+extern int sd_zbc_setup(struct scsi_disk *, u64 zlen, char *buf, int buf_len);
- extern void sd_zbc_remove(struct scsi_disk *);
- extern void sd_zbc_reset_zones(struct scsi_disk *);
- extern int sd_zbc_setup_discard(struct scsi_disk *, struct request *,
- 				sector_t, unsigned int);
- extern int sd_zbc_setup_read_write(struct scsi_disk *, struct request *,
- 				   sector_t, unsigned int *);
--extern void sd_zbc_update_zones(struct scsi_disk *, sector_t, int, bool);
--extern void sd_zbc_refresh_zone_work(struct work_struct *);
-+extern void sd_zbc_update_zones(struct scsi_disk *, sector_t, int, int reason);
-+extern unsigned int sd_zbc_discard_granularity(struct scsi_disk *sdkp);
- 
- #else /* CONFIG_SCSI_ZBC */
- 
-@@ -308,7 +313,7 @@ static inline int sd_zbc_report_zones(struct scsi_disk *sdkp,
- 	return -EOPNOTSUPP;
- }
- 
--static inline int sd_zbc_setup(struct scsi_disk *sdkp,
-+static inline int sd_zbc_setup(struct scsi_disk *sdkp, u64 zlen,
- 			       unsigned char *buf, int buf_len)
- {
- 	return 0;
-@@ -328,6 +333,13 @@ static inline int sd_zbc_setup_read_write(struct scsi_disk *sdkp,
- 	return BLKPREP_OK;
- }
- 
-+static inline unsigned int sd_zbc_discard_granularity(struct scsi_disk *sdkp)
-+{
-+	return sdkp->device->sector_size;
-+}
-+
-+static inline void sd_zbc_update_zones(struct scsi_disk *sdkp, sector_t s,
-+				       int buf_sz, int reason) {}
- static inline void sd_zbc_remove(struct scsi_disk *sdkp) {}
- #endif /* CONFIG_SCSI_ZBC */
- 
-diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
-index f953d16..91f4437 100644
---- a/drivers/scsi/sd_zbc.c
-+++ b/drivers/scsi/sd_zbc.c
-@@ -69,6 +69,7 @@ struct zbc_update_work {
- 	char		zone_buf[0];
- };
- 
-+static
- struct blk_zone *zbc_desc_to_zone(struct scsi_disk *sdkp, unsigned char *rec)
- {
- 	struct blk_zone *zone;
-@@ -122,7 +123,8 @@ struct blk_zone *zbc_desc_to_zone(struct scsi_disk *sdkp, unsigned char *rec)
- 	return zone;
- }
- 
--sector_t zbc_parse_zones(struct scsi_disk *sdkp, unsigned char *buf,
-+static
-+sector_t zbc_parse_zones(struct scsi_disk *sdkp, u64 zlen, unsigned char *buf,
- 			 unsigned int buf_len)
- {
- 	struct request_queue *q = sdkp->disk->queue;
-@@ -149,6 +151,11 @@ sector_t zbc_parse_zones(struct scsi_disk *sdkp, unsigned char *buf,
- 		if (!this)
- 			break;
- 
-+		if (same == 0 && this->len != zlen) {
-+			next_sector = this->start + this->len;
-+			break;
-+		}
-+
- 		next_sector = this->start + this->len;
- 		old = blk_insert_zone(q, this);
- 		if (old) {
-@@ -171,29 +178,58 @@ sector_t zbc_parse_zones(struct scsi_disk *sdkp, unsigned char *buf,
- 	return next_sector;
- }
- 
--void sd_zbc_refresh_zone_work(struct work_struct *work)
-+static void sd_zbc_refresh_zone_work(struct work_struct *work)
- {
- 	struct zbc_update_work *zbc_work =
- 		container_of(work, struct zbc_update_work, zone_work);
- 	struct scsi_disk *sdkp = zbc_work->sdkp;
- 	struct request_queue *q = sdkp->disk->queue;
--	unsigned int zone_buflen;
-+	unsigned char *zone_buf = zbc_work->zone_buf;
-+	unsigned int zone_buflen = zbc_work->zone_buflen;
- 	int ret;
-+	u8 same;
-+	u64 zlen = 0;
- 	sector_t last_sector;
- 	sector_t capacity = logical_to_sectors(sdkp->device, sdkp->capacity);
- 
--	zone_buflen = zbc_work->zone_buflen;
--	ret = sd_zbc_report_zones(sdkp, zbc_work->zone_buf, zone_buflen,
-+	ret = sd_zbc_report_zones(sdkp, zone_buf, zone_buflen,
- 				  zbc_work->zone_sector,
- 				  ZBC_ZONE_REPORTING_OPTION_ALL, true);
- 	if (ret)
- 		goto done_free;
- 
--	last_sector = zbc_parse_zones(sdkp, zbc_work->zone_buf, zone_buflen);
-+	/* this whole path is unlikely so extra reports shouldn't be a
-+	 * large impact */
-+	same = zone_buf[4] & 0xf;
-+	if (same == 0) {
-+		unsigned char *desc = &zone_buf[64];
-+		unsigned int blen = zone_buflen;
-+
-+		/* just pull the first zone */
-+		if (blen > 512)
-+			blen = 512;
-+		ret = sd_zbc_report_zones(sdkp, zone_buf, blen, 0,
-+					  ZBC_ZONE_REPORTING_OPTION_ALL, true);
-+		if (ret)
-+			goto done_free;
-+
-+		/* Read the zone length from the first zone descriptor */
-+		zlen = logical_to_sectors(sdkp->device,
-+					  get_unaligned_be64(&desc[8]));
-+
-+		ret = sd_zbc_report_zones(sdkp, zone_buf, zone_buflen,
-+					  zbc_work->zone_sector,
-+					  ZBC_ZONE_REPORTING_OPTION_ALL, true);
-+		if (ret)
-+			goto done_free;
-+	}
-+
-+	last_sector = zbc_parse_zones(sdkp, zlen, zone_buf, zone_buflen);
-+	capacity = logical_to_sectors(sdkp->device, sdkp->capacity);
- 	if (last_sector != -1 && last_sector < capacity) {
- 		if (test_bit(SD_ZBC_ZONE_RESET, &sdkp->zone_flags)) {
- 			sd_zbc_debug(sdkp,
--				     "zones in reset, cancelling refresh\n");
-+				     "zones in reset, canceling refresh\n");
- 			ret = -EAGAIN;
- 			goto done_free;
+-	for (index = start; index < end; index++) {
++	for (index = start; index < end; index += pages_per_huge_page(h)) {
+ 		/*
+ 		 * This is supposed to be the vaddr where the page is being
+ 		 * faulted in, but we have no vaddr here.
+@@ -609,10 +607,10 @@ static long hugetlbfs_fallocate(struct file *file, int mode, loff_t offset,
  		}
-@@ -207,7 +243,7 @@ done_free:
- 	kfree(zbc_work);
- 	if (test_and_clear_bit(SD_ZBC_ZONE_INIT, &sdkp->zone_flags) && ret) {
- 		sd_zbc_debug(sdkp,
--			     "Cancelling zone initialisation\n");
-+			     "Canceling zone initialization\n");
- 	}
- done_start_queue:
- 	if (q->mq_ops)
-@@ -226,10 +262,10 @@ done_start_queue:
-  * @sdkp: SCSI disk for which the zone information needs to be updated
-  * @sector: sector to be updated
-  * @bufsize: buffersize to be allocated
-- * @update: true if existing zones should be updated
-+ * @reason: non-zero if existing zones should be updated
+ 
+ 		/* Set numa allocation policy based on index */
+-		hugetlb_set_vma_policy(&pseudo_vma, inode, index);
++		hugetlb_set_vma_policy(&pseudo_vma, inode, index >> huge_page_order(h));
+ 
+ 		/* addr is the offset within the file (zero based) */
+-		addr = index * hpage_size;
++		addr = index << PAGE_SHIFT & ~huge_page_mask(h);
+ 
+ 		/* mutex taken here, fault path and hole punch */
+ 		hash = hugetlb_fault_mutex_hash(h, mm, &pseudo_vma, mapping,
+diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
+index d9cf4e0f35dc..e7b79ec9673d 100644
+--- a/include/linux/pagemap.h
++++ b/include/linux/pagemap.h
+@@ -380,15 +380,11 @@ static inline struct page *read_mapping_page(struct address_space *mapping,
+ 
+ /*
+  * Get the offset in PAGE_SIZE.
+- * (TODO: hugepage should have ->index in PAGE_SIZE)
   */
- void sd_zbc_update_zones(struct scsi_disk *sdkp, sector_t sector, int bufsize,
--			 bool update)
-+			 int reason)
+ static inline pgoff_t page_to_pgoff(struct page *page)
  {
- 	struct request_queue *q = sdkp->disk->queue;
- 	struct zbc_update_work *zbc_work;
-@@ -240,13 +276,24 @@ void sd_zbc_update_zones(struct scsi_disk *sdkp, sector_t sector, int bufsize,
+ 	pgoff_t pgoff;
  
- 	if (test_bit(SD_ZBC_ZONE_RESET, &sdkp->zone_flags)) {
- 		sd_zbc_debug(sdkp,
--			     "zones in reset, not starting update\n");
-+			     "zones in reset, not starting reason\n");
- 		return;
+-	if (unlikely(PageHeadHuge(page)))
+-		return page->index << compound_order(page);
+-
+ 	if (likely(!PageTransTail(page)))
+ 		return page->index;
+ 
+@@ -414,15 +410,11 @@ static inline loff_t page_file_offset(struct page *page)
+ 	return ((loff_t)page_file_index(page)) << PAGE_SHIFT;
+ }
+ 
+-extern pgoff_t linear_hugepage_index(struct vm_area_struct *vma,
+-				     unsigned long address);
+-
+ static inline pgoff_t linear_page_index(struct vm_area_struct *vma,
+ 					unsigned long address)
+ {
+ 	pgoff_t pgoff;
+-	if (unlikely(is_vm_hugetlb_page(vma)))
+-		return linear_hugepage_index(vma, address);
++
+ 	pgoff = (address - vma->vm_start) >> PAGE_SHIFT;
+ 	pgoff += vma->vm_pgoff;
+ 	return pgoff;
+diff --git a/mm/filemap.c b/mm/filemap.c
+index 3d46db277e73..f0bcb1329df4 100644
+--- a/mm/filemap.c
++++ b/mm/filemap.c
+@@ -114,7 +114,7 @@ static void page_cache_tree_delete(struct address_space *mapping,
+ 				   struct page *page, void *shadow)
+ {
+ 	struct radix_tree_node *node;
+-	int nr = PageHuge(page) ? 1 : hpage_nr_pages(page);
++	int nr = hpage_nr_pages(page);
+ 
+ 	VM_BUG_ON_PAGE(!PageLocked(page), page);
+ 	VM_BUG_ON_PAGE(PageTail(page), page);
+@@ -667,16 +667,20 @@ static int __add_to_page_cache_locked(struct page *page,
+ 	page->index = offset;
+ 
+ 	spin_lock_irq(&mapping->tree_lock);
+-	if (PageTransHuge(page)) {
++	if (PageCompound(page)) {
+ 		/* TODO: shadow handling */
+ 		error = __radix_tree_insert(&mapping->page_tree, offset,
+ 				compound_order(page), page);
+ 
+ 		if (!error) {
+-			count_vm_event(THP_FILE_ALLOC);
+-			mapping->nrpages += HPAGE_PMD_NR;
+-			*shadowp = NULL;
+-			__inc_node_page_state(page, NR_FILE_THPS);
++			if (hugetlb) {
++				mapping->nrpages += 1 << compound_order(page);
++			} else if (PageTransHuge(page)) {
++				count_vm_event(THP_FILE_ALLOC);
++				mapping->nrpages += HPAGE_PMD_NR;
++				*shadowp = NULL;
++				__inc_node_page_state(page, NR_FILE_THPS);
++			}
+ 		}
+ 	} else {
+ 		error = page_cache_tree_insert(mapping, page, shadowp);
+@@ -1118,9 +1122,9 @@ struct page *find_get_entry(struct address_space *mapping, pgoff_t offset)
+ 		}
+ 
+ 		/* For multi-order entries, find relevant subpage */
+-		if (PageTransHuge(page)) {
++		if (PageCompound(page)) {
+ 			VM_BUG_ON(offset - page->index < 0);
+-			VM_BUG_ON(offset - page->index >= HPAGE_PMD_NR);
++			VM_BUG_ON(offset - page->index >= 1 << compound_order(page));
+ 			page += offset - page->index;
+ 		}
  	}
+@@ -1475,16 +1479,16 @@ unsigned find_get_pages(struct address_space *mapping, pgoff_t start,
+ 		}
  
-+	if (reason != SD_ZBC_INIT) {
-+		/* lookup sector, is zone pref? then ignore */
-+		struct blk_zone *zone = blk_lookup_zone(q, sector);
-+
-+		if (reason == SD_ZBC_RESET_WP)
-+			sd_zbc_debug(sdkp, "RESET WP failed %lx\n", sector);
-+
-+		if (zone && blk_zone_is_seq_pref(zone))
-+			return;
-+	}
-+
+ 		/* For multi-order entries, find relevant subpage */
+-		if (PageTransHuge(page)) {
++		if (PageCompound(page)) {
+ 			VM_BUG_ON(iter.index - page->index < 0);
+-			VM_BUG_ON(iter.index - page->index >= HPAGE_PMD_NR);
++			VM_BUG_ON(iter.index - page->index >= 1 << compound_order(page));
+ 			page += iter.index - page->index;
+ 		}
+ 
+ 		pages[ret] = page;
+ 		if (++ret == nr_pages)
+ 			break;
+-		if (!PageTransCompound(page))
++		if (PageHuge(page) || !PageTransCompound(page))
+ 			continue;
+ 		for (refs = 0; ret < nr_pages &&
+ 				(iter.index + 1) % HPAGE_PMD_NR;
+diff --git a/mm/hugetlb.c b/mm/hugetlb.c
+index 51a04e5e9373..e4f1b9e84dda 100644
+--- a/mm/hugetlb.c
++++ b/mm/hugetlb.c
+@@ -622,13 +622,6 @@ static pgoff_t vma_hugecache_offset(struct hstate *h,
+ 			(vma->vm_pgoff >> huge_page_order(h));
+ }
+ 
+-pgoff_t linear_hugepage_index(struct vm_area_struct *vma,
+-				     unsigned long address)
+-{
+-	return vma_hugecache_offset(hstate_vma(vma), vma, address);
+-}
+-EXPORT_SYMBOL_GPL(linear_hugepage_index);
+-
+ /*
+  * Return the size of the pages allocated when backing a VMA. In the majority
+  * cases this will be same size as used by the page table entries.
+@@ -3486,7 +3479,7 @@ static struct page *hugetlbfs_pagecache_page(struct hstate *h,
+ 	pgoff_t idx;
+ 
+ 	mapping = vma->vm_file->f_mapping;
+-	idx = vma_hugecache_offset(h, vma, address);
++	idx = linear_page_index(vma, address);
+ 
+ 	return find_lock_page(mapping, idx);
+ }
+@@ -3503,7 +3496,7 @@ static bool hugetlbfs_pagecache_present(struct hstate *h,
+ 	struct page *page;
+ 
+ 	mapping = vma->vm_file->f_mapping;
+-	idx = vma_hugecache_offset(h, vma, address);
++	idx = linear_page_index(vma, address);
+ 
+ 	page = find_get_page(mapping, idx);
+ 	if (page)
+@@ -3558,7 +3551,7 @@ static int hugetlb_no_page(struct mm_struct *mm, struct vm_area_struct *vma,
  retry:
- 	zbc_work = kzalloc(sizeof(struct zbc_update_work) + bufsize,
--			   update ? GFP_NOWAIT : GFP_KERNEL);
-+			   reason != SD_ZBC_INIT ? GFP_NOWAIT : GFP_KERNEL);
- 	if (!zbc_work) {
- 		if (bufsize > 512) {
- 			sd_zbc_debug(sdkp,
-@@ -256,7 +303,7 @@ retry:
- 		}
- 		sd_zbc_debug(sdkp,
- 			     "failed to allocate %d bytes\n", bufsize);
--		if (!update)
-+		if (reason == SD_ZBC_INIT)
- 			clear_bit(SD_ZBC_ZONE_INIT, &sdkp->zone_flags);
- 		return;
+ 	page = find_lock_page(mapping, idx);
+ 	if (!page) {
+-		size = i_size_read(mapping->host) >> huge_page_shift(h);
++		size = i_size_read(mapping->host) >> PAGE_SHIFT;
+ 		if (idx >= size)
+ 			goto out;
+ 		page = alloc_huge_page(vma, address, 0);
+@@ -3620,7 +3613,7 @@ static int hugetlb_no_page(struct mm_struct *mm, struct vm_area_struct *vma,
+ 
+ 	ptl = huge_pte_lockptr(h, mm, ptep);
+ 	spin_lock(ptl);
+-	size = i_size_read(mapping->host) >> huge_page_shift(h);
++	size = i_size_read(mapping->host) >> PAGE_SHIFT;
+ 	if (idx >= size)
+ 		goto backout;
+ 
+@@ -3667,7 +3660,7 @@ u32 hugetlb_fault_mutex_hash(struct hstate *h, struct mm_struct *mm,
+ 
+ 	if (vma->vm_flags & VM_SHARED) {
+ 		key[0] = (unsigned long) mapping;
+-		key[1] = idx;
++		key[1] = idx >> huge_page_order(h);
+ 	} else {
+ 		key[0] = (unsigned long) mm;
+ 		key[1] = address >> huge_page_shift(h);
+@@ -3723,7 +3716,7 @@ int hugetlb_fault(struct mm_struct *mm, struct vm_area_struct *vma,
  	}
-@@ -269,7 +316,7 @@ retry:
+ 
+ 	mapping = vma->vm_file->f_mapping;
+-	idx = vma_hugecache_offset(h, vma, address);
++	idx = linear_page_index(vma, address);
+ 
  	/*
- 	 * Mark zones under update as BUSY
- 	 */
--	if (update) {
-+	if (reason != SD_ZBC_INIT) {
- 		for (node = rb_first(&q->zones); node; node = rb_next(node)) {
- 			unsigned long flags;
- 
-@@ -333,8 +380,7 @@ int sd_zbc_report_zones(struct scsi_disk *sdkp, unsigned char *buffer,
- 	if (!scsi_device_online(sdp))
- 		return -ENODEV;
- 
--	sd_zbc_debug(sdkp, "REPORT ZONES lba %zu len %d\n",
--		     start_lba, bufflen);
-+	sd_zbc_debug(sdkp, "REPORT ZONES lba %zu len %d\n", start_lba, bufflen);
- 
- 	memset(cmd, 0, 16);
- 	cmd[0] = ZBC_IN;
-@@ -460,8 +506,36 @@ int sd_zbc_setup_read_write(struct scsi_disk *sdkp, struct request *rq,
- 		goto out;
- 	}
- 
--	if (req_op(rq) == REQ_OP_WRITE || req_op(rq) == REQ_OP_WRITE_SAME) {
--		if (zone->type != BLK_ZONE_TYPE_SEQWRITE_REQ)
-+	if (blk_zone_is_cmr(zone))
-+		goto out;
-+
-+	if (blk_zone_is_seq_pref(zone) && op_is_write(req_op(rq))) {
-+		u64 nwp = sector + sectors;
-+
-+		while (nwp > (zone->start + zone->len)) {
-+			struct rb_node *node = rb_next(&zone->node);
-+
-+			zone->wp = zone->start + zone->len;
-+			sector = zone->wp;
-+			sectors = nwp - zone->wp;
-+			spin_unlock_irqrestore(&zone->lock, flags);
-+
-+			if (!node)
-+				return BLKPREP_OK;
-+			zone = rb_entry(node, struct blk_zone, node);
-+			if (!zone)
-+				return BLKPREP_OK;
-+
-+			spin_lock_irqsave(&zone->lock, flags);
-+			nwp = sector + sectors;
-+		}
-+		if (nwp > zone->wp)
-+			zone->wp = nwp;
-+		goto out;
-+	}
-+
-+	if (op_is_write(req_op(rq))) {
-+		if (!blk_zone_is_seq_req(zone))
- 			goto out;
- 		if (zone->state == BLK_ZONE_READONLY)
- 			goto out;
-@@ -480,7 +554,7 @@ int sd_zbc_setup_read_write(struct scsi_disk *sdkp, struct request *rq,
- 			goto out;
- 		}
- 		zone->wp += sectors;
--	} else if (zone->type == BLK_ZONE_TYPE_SEQWRITE_REQ &&
-+	} else if (blk_zone_is_seq_req(zone) &&
- 		   zone->wp <= sector + sectors) {
- 		if (zone->wp <= sector) {
- 			/* Read beyond WP: clear request buffer */
-@@ -513,14 +587,18 @@ out:
- 	return ret;
- }
- 
--int sd_zbc_setup(struct scsi_disk *sdkp, char *buf, int buf_len)
-+/**
-+ * sd_zbc_setup - Load zones of matching zlen size into rb tree.
-+ *
-+ */
-+int sd_zbc_setup(struct scsi_disk *sdkp, u64 zlen, char *buf, int buf_len)
- {
- 	sector_t capacity = logical_to_sectors(sdkp->device, sdkp->capacity);
- 	sector_t last_sector;
- 
- 	if (test_and_set_bit(SD_ZBC_ZONE_INIT, &sdkp->zone_flags)) {
- 		sdev_printk(KERN_WARNING, sdkp->device,
--			    "zone initialisation already running\n");
-+			    "zone initialization already running\n");
- 		return 0;
- 	}
- 
-@@ -539,15 +617,20 @@ int sd_zbc_setup(struct scsi_disk *sdkp, char *buf, int buf_len)
- 		clear_bit(SD_ZBC_ZONE_RESET, &sdkp->zone_flags);
- 	}
- 
--	last_sector = zbc_parse_zones(sdkp, buf, buf_len);
-+	last_sector = zbc_parse_zones(sdkp, zlen, buf, buf_len);
-+	capacity = logical_to_sectors(sdkp->device, sdkp->capacity);
- 	if (last_sector != -1 && last_sector < capacity) {
--		sd_zbc_update_zones(sdkp, last_sector, SD_ZBC_BUF_SIZE, false);
-+		sd_zbc_update_zones(sdkp, last_sector,
-+				    SD_ZBC_BUF_SIZE, SD_ZBC_INIT);
- 	} else
- 		clear_bit(SD_ZBC_ZONE_INIT, &sdkp->zone_flags);
- 
- 	return 0;
- }
- 
-+/**
-+ * sd_zbc_remove -
-+ */
- void sd_zbc_remove(struct scsi_disk *sdkp)
- {
- 	if (sdkp->zone_work_q) {
-@@ -557,3 +640,24 @@ void sd_zbc_remove(struct scsi_disk *sdkp)
- 		destroy_workqueue(sdkp->zone_work_q);
- 	}
- }
-+/**
-+ * sd_zbc_discard_granularity - Determine discard granularity.
-+ * @sdkp: SCSI disk used to calculate discard granularity.
-+ *
-+ * Discard granularity should match the (maximum non-CMR) zone
-+ * size reported on the drive.
-+ */
-+unsigned int sd_zbc_discard_granularity(struct scsi_disk *sdkp)
-+{
-+	unsigned int bytes = 1;
-+	struct request_queue *q = sdkp->disk->queue;
-+	struct rb_node *node = rb_first(&q->zones);
-+
-+	if (node) {
-+		struct blk_zone *zone = rb_entry(node, struct blk_zone, node);
-+
-+		bytes = zone->len;
-+	}
-+	bytes <<= ilog2(sdkp->device->sector_size);
-+	return bytes;
-+}
+ 	 * Serialize hugepage allocation and instantiation, so that we don't
 -- 
-2.8.1
+2.7.4
