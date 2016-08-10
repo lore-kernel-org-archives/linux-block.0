@@ -1,11 +1,10 @@
 Return-Path: <roman.penyaev@profitbricks.com>
 MIME-Version: 1.0
-In-Reply-To: <CAJrWOzCWfMN7qKipgWn2P0dfycu4y5DQysD+7Q1UANgXBgw0+g@mail.gmail.com>
-References: <20160808113908.5445-1-roman.penyaev@profitbricks.com>
- <20160810035542.GE25053@mtj.duckdns.org> <CAJrWOzCWfMN7qKipgWn2P0dfycu4y5DQysD+7Q1UANgXBgw0+g@mail.gmail.com>
+In-Reply-To: <20160810035542.GE25053@mtj.duckdns.org>
+References: <20160808113908.5445-1-roman.penyaev@profitbricks.com> <20160810035542.GE25053@mtj.duckdns.org>
 From: Roman Penyaev <roman.penyaev@profitbricks.com>
-Date: Wed, 10 Aug 2016 13:36:58 +0200
-Message-ID: <CAJrWOzCUzPiFUOS5HbToB1AdsMKFGG=UQHAr5=ZL5KYGyf2GLg@mail.gmail.com>
+Date: Wed, 10 Aug 2016 10:42:09 +0200
+Message-ID: <CAJrWOzCWfMN7qKipgWn2P0dfycu4y5DQysD+7Q1UANgXBgw0+g@mail.gmail.com>
 Subject: Re: [PATCH v2 1/1] blk-mq: fix hang caused by freeze/unfreeze sequence
 To: Tejun Heo <tj@kernel.org>
 Cc: Akinobu Mita <akinobu.mita@gmail.com>, Jens Axboe <axboe@kernel.dk>,
@@ -13,80 +12,59 @@ Cc: Akinobu Mita <akinobu.mita@gmail.com>, Jens Axboe <axboe@kernel.dk>,
 Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed, Aug 10, 2016 at 10:42 AM, Roman Penyaev
-<roman.penyaev@profitbricks.com> wrote:
-> Hi,
+Hi,
+
+On Wed, Aug 10, 2016 at 5:55 AM, Tejun Heo <tj@kernel.org> wrote:
+> Hello,
 >
-> On Wed, Aug 10, 2016 at 5:55 AM, Tejun Heo <tj@kernel.org> wrote:
->> Hello,
->>
->> On Mon, Aug 08, 2016 at 01:39:08PM +0200, Roman Pen wrote:
->>> Long time ago there was a similar fix proposed by Akinobu Mita[1],
->>> but it seems that time everyone decided to fix this subtle race in
->>> percpu-refcount and Tejun Heo[2] did an attempt (as I can see that
->>> patchset was not applied).
->>
->> So, I probably forgot about it while waiting for confirmation of fix.
->> Can you please verify that the patchset fixes the issue?  I can apply
->> the patchset right away.
+> On Mon, Aug 08, 2016 at 01:39:08PM +0200, Roman Pen wrote:
+>> Long time ago there was a similar fix proposed by Akinobu Mita[1],
+>> but it seems that time everyone decided to fix this subtle race in
+>> percpu-refcount and Tejun Heo[2] did an attempt (as I can see that
+>> patchset was not applied).
 >
-> I have not checked your patchset but according to my understanding
-> it should not fix *this* issue.
+> So, I probably forgot about it while waiting for confirmation of fix.
+> Can you please verify that the patchset fixes the issue?  I can apply
+> the patchset right away.
 
-So, your patchset does not help (but for sure it helps for keeping
-internal percpu-refcount members consistent, but that is not related
-to this issue).  That's the backtrace which I observe:
+I have not checked your patchset but according to my understanding
+it should not fix *this* issue.  What happens here is a wrong order
+of invocation of percpu_ref_reinit() and percpu_ref_kill().  So what
+was observed is the following:
 
-Call Trace:
- [<ffffffff810ba8df>] ? vprintk_default+0x1f/0x30
- [<ffffffff816a47f5>] schedule+0x35/0x80
- [<ffffffff81336154>] blk_mq_freeze_queue_wait+0x124/0x1a0
- [<ffffffff810a3f70>] ? wake_atomic_t_function+0x60/0x60
- [<ffffffff8133821a>] blk_mq_freeze_queue+0x1a/0x20
- [<ffffffff8133822e>] blk_freeze_queue+0xe/0x10
- [<ffffffff81329cc2>] blk_cleanup_queue+0xe2/0x280
+ CPU#0               CPU#1
+ ----------------    -----------------
+ percpu_ref_kill()
 
-To ease reproduction I do the following:
 
--------------------------------------------
-static int thread_fn(void *data)
-{
-    struct blk_mq_tag_set *tags = data;
-    struct request_queue *q;
 
-    while (!kthread_should_stop()) {
-        q = blk_mq_init_queue(tags);
-        BUG_ON(q == NULL);
-        /*
-         * That is done by blk_register_queue(), but here
-         * we are reproducing blk-mq bug and do not require
-         * gendisk and friends.  Just silently switch to percpu.
-         */
-        percpu_ref_switch_to_percpu(&q->q_usage_counter);
+                     percpu_ref_kill() << atomic reference does
+ percpu_ref_reinit()                   << not guarantee the order
 
-        msleep(prandom_u32_max(10));
-        blk_cleanup_queue(q);
-    }
 
-    return 0;
-}
--------------------------------------------
 
-o Start 2 threads (exactly 2, we need 2 queues for 1 shared tags)
-o Pass same shared tags pointer for each thread
-o Wait
-o PROFIT
 
-To make immediate reproduction this hunk can be applied:
+                     blk_mq_freeze_queue_wait() !! HANG HERE
 
-@@ -129,6 +142,7 @@ void blk_mq_unfreeze_queue(struct request_queue *q)
-        freeze_depth = atomic_dec_return(&q->mq_freeze_depth);
-        WARN_ON_ONCE(freeze_depth < 0);
-        if (!freeze_depth) {
-+               msleep(1000);
-                percpu_ref_reinit(&q->q_usage_counter);
-                wake_up_all(&q->mq_freeze_wq);
-        }
+                     percpu_ref_reinit()
+
+
+
+blk_mq_freeze_queue_wait() on CPU#1 expects percpu-refcount to be
+switched to ATOMIC mode (killed), but that does not happen, because
+CPU#2 was faster and has been switched percpu-refcount to PERCPU
+mode.
+
+This race happens inside blk-mq, because invocation of kill/reinit
+is controlled by the reference counter, which does not guarantee the
+order of the following functions calls (kill/reinit).
+
+So the fix is the same as originally proposed by Akinobu Mita, but
+the issue is different.
+
+But of course I can run tests on top of your series, just to verify
+that everything goes smoothly and internally percpu-refcount members
+are consistent.
 
 --
 Roman
