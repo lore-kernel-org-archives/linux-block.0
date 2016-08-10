@@ -1,67 +1,66 @@
-Return-Path: <linux-ide-owner@vger.kernel.org>
-Message-ID: <57AB4B43.2010705@redhat.com>
-Date: Wed, 10 Aug 2016 10:41:55 -0500
-From: David Milburn <dmilburn@redhat.com>
-MIME-Version: 1.0
-To: Tejun Heo <tj@kernel.org>
-CC: Tom Yan <tom.ty89@gmail.com>, linux-ide@vger.kernel.org,
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-yb0-f174.google.com ([209.85.213.174]:35553 "EHLO
+	mail-yb0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932581AbcHJDxQ (ORCPT
+	<rfc822;linux-block@vger.kernel.org>); Tue, 9 Aug 2016 23:53:16 -0400
+Date: Tue, 9 Aug 2016 23:26:13 -0400
+From: Tejun Heo <tj@kernel.org>
+To: Tom Yan <tom.ty89@gmail.com>
+Cc: linux-ide@vger.kernel.org, dmilburn@redhat.com,
 	linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org
 Subject: Re: Regarding AHCI_MAX_SG and (ATA_HORKAGE_MAX_SEC_1024)
-References: <CAGnHSEnsfmO8ydLZGBmEXgRCYTZfy+sR3knCWfBhCz6_vLZMEw@mail.gmail.com> <20160810032613.GA25053@mtj.duckdns.org> <CAGnHSEkp8EyCU+roKgwzVo2HcpQEGdrLv65h3Z+uD=4YTUn9qQ@mail.gmail.com> <20160810151447.GI25053@mtj.duckdns.org>
-In-Reply-To: <20160810151447.GI25053@mtj.duckdns.org>
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Sender: linux-ide-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Message-ID: <20160810032613.GA25053@mtj.duckdns.org>
+References: <CAGnHSEnsfmO8ydLZGBmEXgRCYTZfy+sR3knCWfBhCz6_vLZMEw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CAGnHSEnsfmO8ydLZGBmEXgRCYTZfy+sR3knCWfBhCz6_vLZMEw@mail.gmail.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Hi,
+Hello, Tom.
 
-On 08/10/2016 10:14 AM, Tejun Heo wrote:
-> Hello, Tom.
+On Sun, Aug 07, 2016 at 10:10:17PM +0800, Tom Yan wrote:
+> So the (not so) recent bump of BLK_DEF_MAX_SECTORS from 1024 to 2560
+> (commit d2be537c3ba3) seemed to have caused trouble to some of the ATA
+> devices, which were then worked around with ATA_HORKAGE_MAX_SEC_1024.
+> 
+> However, I am suspecting that the bump of BLK_DEF_MAX_SECTORS is not
+> the "real" cause of the trouble, but the fact that AHCI_MAX_SG has
+> been set to a weird value of 168 (with a comment "hardware max is
+> 64K", which neither seem to make any sense).
+
+Hmmm.. why not?  The hardware limit is 64k and the driver is using a
+lower limit of 168 most likely because it doesn't make noticeable
+difference beyond certain point and it determines the size of
+contiguous memory which has to be allocated for the command table.
+Each sg entry is 16 bytes.  Pushing it to the hardware limit would
+require an order 9 allocation for each port.
+
+> AHCI_MAX_SG is used to set the sg_tablesize (i.e. max_segments,
+> apparently), which is apparently used to derive the actual "request
+> size" (that is, if it is lower than max_sectors(_kb), it will be the
+> limiting factor instead).
 >
-> On Wed, Aug 10, 2016 at 06:04:10PM +0800, Tom Yan wrote:
->> On 10 August 2016 at 11:26, Tejun Heo <tj@kernel.org> wrote:
->>> Hmmm.. why not?  The hardware limit is 64k and the driver is using a
->>
->> Is that referring to the maximum number of entries allowed in the
->> PRDT, Physical Region Descriptor Table (which is, more precisely,
->> 65535)?
->
-> Yeap.
->
->>> Not necessarily.  A single sg entry can point to an area larger than
->>> PAGE_SIZE.
->>
->> You mean the 4MB limit of "Data Byte Count" in "DW3: Description
->> Information" of the PRDT? Is that what max_segment_size (which is set
->> to a general fallback of 65536:
->> http://lxr.free-electrons.com/ident?i=dma_get_max_seg_size) is about
->> in this case?
->
-> Ah, ahci isn't setting the hardware limit properly but yeah that's the
-> maximum segment size.
->
->> And my point was, it will be a multiple of 168 anyway, if 1344 is just
->> an example.
->>
->>> As written above, that probably makes the ahci command table size
->>> nicely aligned.
->>
->> I think that's what bothers me ultimately, cause I don't see how 168
->> makes it (more) nicely aligned (or even, aligned to what?).
->
-> Hmmm... Looked at the sizes and they don't seem to align to anything
-> meaningful.  No idea.
+> For example, no matter if the drive has max_sectors set to 2560, or to
+> 65535 (by adding it as the Optimal Transfer Length to libata's SATL,
+> which is also max_hw_sectors that is set from ATA_MAX_SECTORS_LBA48),
+> "avgrq-sz" in `iostat` will be capped at 1344 (168 * 8).
 
-The 168 makes AHCI_CMD_TBL_SZ equal to 2816
+Not necessarily.  A single sg entry can point to an area larger than
+PAGE_SIZE.
 
-AHCI_CMD_TBL_SZ = AHCI_CMD_TBL_HDR_SZ + (AHCI_MAX_SG * 16)
-AHCI_CMD_TBL_SZ = 128 + (168 * 16)
+> However, if I change AHCI_MAX_SG to 128 (which is also the
+> sg_tablesize set in libata.h from LIBATA_MAX_PRD), "avgrq-sz" in
+> `iostat` will be capped at 1024 (128 * 8), which should make
+> ATA_HORKAGE_MAX_SEC_1024 unnecessary.
+> 
+> So why has AHCI_MAX_SG been set to 168 anyway?
 
-I think if you add in AHCI_CMD_SLOT_SZ (1024) and AHCI_RX_FIS_SZ (256)
-the DMA is 4K aligned, I think that is where the 168 came from.
+As written above, that probably makes the ahci command table size
+nicely aligned.
 
-Thanks,
-David
+Thanks.
 
-
+-- 
+tejun
