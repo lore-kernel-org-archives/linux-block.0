@@ -1,157 +1,114 @@
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>,
-	Tejun Heo <tj@kernel.org>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	linus.walleij@linaro.org,
-	broonie@kernel.org,
-	Arianna Avanzini <avanzini.arianna@gmail.com>,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH V2 06/22] block, cfq: get rid of queue preemption
-Date: Mon,  8 Aug 2016 13:15:01 +0200
-Message-Id: <1470654917-4280-7-git-send-email-paolo.valente@linaro.org>
-In-Reply-To: <1470654917-4280-1-git-send-email-paolo.valente@linaro.org>
-References: <1470654917-4280-1-git-send-email-paolo.valente@linaro.org>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx.ewheeler.net ([66.155.3.69]:46524 "EHLO mail.ewheeler.net"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S932216AbcHKGwQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+	Thu, 11 Aug 2016 02:52:16 -0400
+Date: Wed, 10 Aug 2016 23:52:15 -0700 (PDT)
+From: Eric Wheeler <bcache@lists.ewheeler.net>
+To: Shaohua Li <shli@kernel.org>
+cc: Ming Lei <ming.lei@canonical.com>, linux-bcache@vger.kernel.org,
+	linux-raid@vger.kernel.org, Ming Lin <mlin@kernel.org>,
+	Vlad-Cosmin Miu <miuvlad@gmail.com>, rjones@redhat.com,
+	Kent Overstreet <kent.overstreet@gmail.com>, jmoyer@redhat.com,
+	axboe@fb.com,
+	Sebastian Roesner <sroesner-kernelorg@roesner-online.de>,
+	linux-block@vger.kernel.org
+Subject: Re: [PATCH] NULL pointer in raid1_make_request passed to bio_trim
+ when adding md as bcache caching dev
+In-Reply-To: <alpine.LRH.2.11.1608102035180.10662@mail.ewheeler.net>
+Message-ID: <alpine.LRH.2.11.1608102344080.10662@mail.ewheeler.net>
+References: <alpine.LRH.2.11.1608102035180.10662@mail.ewheeler.net>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Arianna Avanzini <avanzini.arianna@gmail.com>
+On Wed, 10 Aug 2016, Eric Wheeler wrote:
 
-CFQ implements a request-triggered queue preemption, based on the
-priority class of the queues, and aimed at reducing latencies. There
-is no such preemption in BFQ, where a low latency is guaranteed only
-by the overall request-scheduling policy.
+> On Sun, 10 Apr 2016 20:01:30 +0200, Sebastian Roesner wrote:
+> > Am 01.04.2016 um 20:14 schrieb Eric Wheeler:
+> > > On Mon, 28 Mar 2016, Shaohua Li wrote:
+> > > > On Sat, Mar 26, 2016 at 05:46:16PM +0100, Sebastian Roesner wrote:
+> > > > > Hello Ming, Eric,
+> > > > > 
+> > > > > Am 26.03.2016 um 16:40 schrieb Ming Lei:
+> > > > > I was able to reproduce it on a non-productive system, but only after
+> > > > > copying the bcache superblocks/partition starts from the original system,
+> > > > > with new created ones it worked fine.
+> > > >
+> > > > 320 bvecs exceeds what bio-clone_set can handle. Could you please try below patch?
+> > > >
+> > > Hey Sebastian,
+> > > 
+> > > Have you had a chance to test the patch below from Shaohua Li?
+> > 
+> > I just tried the patch and it did not crash anymore.
+>  
+> It doesn't look like this made it into v4.8-rc1 and it is known to fix at 
+> least Sebastian's issue.
+> 
+> commit 92761dad7ff6e1bf25de247e0064dd398e797599
+> Author: Shaohua Li <shli@fb.com>
+> Date:   Mon Mar 28 10:54:35 2016 -0700
+> 
+>     block: don't make BLK_DEF_MAX_SECTORS too big
+>     
+>     bio_alloc_bioset() allocates bvecs from bvec_slabs which can only allocate
+>     maximum 256 bvec (eg, 1M for 4k pages). We can't bump BLK_DEF_MAX_SECTORS to
+>     exceed this value otherwise bio_alloc_bioset will fail.
+>     
+>     This fixes commit 30e2bc08b2bb7c069. We probably should make the bvec_slabs
+>     hold bigger bvecs if bigger bio size is required.
+>     
+>     Signed-off-by: Shaohua Li <shli@fb.com>
+> 
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index 7e5d7e0..da64325 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -1153,7 +1153,11 @@ extern int blk_verify_command(unsigned char *cmd, fmode_t has_write_perm);
+>  enum blk_default_limits {
+>  	BLK_MAX_SEGMENTS	= 128,
+>  	BLK_SAFE_MAX_SECTORS	= 255,
+> -	BLK_DEF_MAX_SECTORS	= 2560,
+> +	/*
+> +	 * if you change this, please also change bvec_alloc and BIO_MAX_PAGES.
+> +	 * Otherwise bio_alloc_bioset will break.
+> +	 */
+> +	BLK_DEF_MAX_SECTORS	= BIO_MAX_SECTORS,
 
-Signed-off-by: Arianna Avanzini <avanzini.arianna@gmail.com>
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
----
- block/cfq-iosched.c | 99 +----------------------------------------------------
- 1 file changed, 1 insertion(+), 98 deletions(-)
 
-diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
-index afe42fc..5e0daaf 100644
---- a/block/cfq-iosched.c
-+++ b/block/cfq-iosched.c
-@@ -1087,8 +1087,7 @@ static inline void cfq_slice_expired(struct cfq_data *cfqd, bool timed_out)
- }
- 
- /*
-- * Get next queue for service. Unless we have a queue preemption,
-- * we'll simply select the first cfqq in the service tree.
-+ * Get next queue for service.
-  */
- static struct cfq_queue *cfq_get_next_queue(struct cfq_data *cfqd)
- {
-@@ -1953,93 +1952,6 @@ cfq_update_idle_window(struct cfq_data *cfqd, struct cfq_queue *cfqq,
- }
- 
- /*
-- * Check if new_cfqq should preempt the currently active queue. Return 0 for
-- * no or if we aren't sure, a 1 will cause a preempt.
-- */
--static bool
--cfq_should_preempt(struct cfq_data *cfqd, struct cfq_queue *new_cfqq,
--		   struct request *rq)
--{
--	struct cfq_queue *cfqq;
--
--	cfqq = cfqd->active_queue;
--	if (!cfqq)
--		return false;
--
--	if (cfq_class_idle(new_cfqq))
--		return false;
--
--	if (cfq_class_idle(cfqq))
--		return true;
--
--	/*
--	 * Don't allow a non-RT request to preempt an ongoing RT cfqq timeslice.
--	 */
--	if (cfq_class_rt(cfqq) && !cfq_class_rt(new_cfqq))
--		return false;
--
--	/*
--	 * if the new request is sync, but the currently running queue is
--	 * not, let the sync request have priority.
--	 */
--	if (rq_is_sync(rq) && !cfq_cfqq_sync(cfqq))
--		return true;
--
--	if (cfq_slice_used(cfqq))
--		return true;
--
--	/*
--	 * Allow an RT request to pre-empt an ongoing non-RT cfqq timeslice.
--	 */
--	if (cfq_class_rt(new_cfqq) && !cfq_class_rt(cfqq))
--		return true;
--
--	WARN_ON_ONCE(cfqq->ioprio_class != new_cfqq->ioprio_class);
--	/* Allow preemption only if we are idling on sync-noidle tree */
--	if (cfqd->serving_wl_type == SYNC_NOIDLE_WORKLOAD &&
--	    cfqq_type(new_cfqq) == SYNC_NOIDLE_WORKLOAD &&
--	    RB_EMPTY_ROOT(&cfqq->sort_list))
--		return true;
--
--	/*
--	 * So both queues are sync. Let the new request get disk time if
--	 * it's a metadata request and the current queue is doing regular IO.
--	 */
--	if ((rq->cmd_flags & REQ_PRIO) && !cfqq->prio_pending)
--		return true;
--
--	/* An idle queue should not be idle now for some reason */
--	if (RB_EMPTY_ROOT(&cfqq->sort_list) && !cfq_should_idle(cfqd, cfqq))
--		return true;
--
--	if (!cfqd->active_cic || !cfq_cfqq_wait_request(cfqq))
--		return false;
--
--	return false;
--}
--
--/*
-- * cfqq preempts the active queue. if we allowed preempt with no slice left,
-- * let it have half of its nominal slice.
-- */
--static void cfq_preempt_queue(struct cfq_data *cfqd, struct cfq_queue *cfqq)
--{
--	cfq_log_cfqq(cfqd, cfqq, "preempt");
--	cfq_slice_expired(cfqd, 1);
--
--	/*
--	 * Put the new queue at the front of the of the current list,
--	 * so we know that it will be selected next.
--	 */
--	BUG_ON(!cfq_cfqq_on_rr(cfqq));
--
--	cfq_service_tree_add(cfqd, cfqq, 1);
--
--	cfqq->slice_end = 0;
--	cfq_mark_cfqq_slice_new(cfqq);
--}
--
--/*
-  * Called when a new fs request (rq) is added (to cfqq). Check if there's
-  * something we should do about it
-  */
-@@ -2079,15 +1991,6 @@ cfq_rq_enqueued(struct cfq_data *cfqd, struct cfq_queue *cfqq,
- 			} else
- 				cfq_mark_cfqq_must_dispatch(cfqq);
- 		}
--	} else if (cfq_should_preempt(cfqd, cfqq, rq)) {
--		/*
--		 * not the active queue - expire current slice if it is
--		 * idle and has expired it's mean thinktime or this new queue
--		 * has some old slice time left and is of higher priority or
--		 * this new queue is RT and the current one is BE
--		 */
--		cfq_preempt_queue(cfqd, cfqq);
--		__blk_run_queue(cfqd->queue);
- 	}
- }
- 
--- 
-1.9.1
+It seems that I spoke too soon, as BIO_MAX_SECTORS was removed for v4.8.
+
+What should BLK_DEF_MAX_SECTORS be defined as?  
+
+Something like this?
+	-	BLK_DEF_MAX_SECTORS     = 2560,
+	+	BLK_DEF_MAX_SECTORS = (BIO_MAX_PAGES << (PAGE_SHIFT-9)
+
+Or was this issue patched by Shaohua Li solved in some other way?
+
+It appears that BLK_DEF_MAX_SECTORS is still used:
+
+$ git grep BLK_DEF_MAX_SECTORS
+block/blk-settings.c:   max_sectors = min_t(unsigned int, max_sectors, BLK_DEF_MAX_SECTORS);
+drivers/block/aoe/aoeblk.c:     blk_queue_max_hw_sectors(q, BLK_DEF_MAX_SECTORS);
+drivers/scsi/sd.c:              rw_max = BLK_DEF_MAX_SECTORS;
+
+
+--
+Eric Wheeler
+
+
+>  	BLK_MAX_SEGMENT_SIZE	= 65536,
+>  	BLK_SEG_BOUNDARY_MASK	= 0xFFFFFFFFUL,
+>  };
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bcache" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bcache" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 
