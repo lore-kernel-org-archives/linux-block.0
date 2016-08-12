@@ -1,44 +1,90 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from s3.sipsolutions.net ([5.9.151.49]:51304 "EHLO sipsolutions.net"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752259AbcHKIQC (ORCPT <rfc822;linux-block@vger.kernel.org>);
-	Thu, 11 Aug 2016 04:16:02 -0400
-From: Johannes Berg <johannes@sipsolutions.net>
-To: linux-block@vger.kernel.org
-Cc: Ming Lei <ming.lei@canonical.com>, Jens Axboe <axboe@fb.com>,
-	Johannes Berg <johannes.berg@intel.com>
-Subject: [PATCH] bvec: avoid variable shadowing warning
-Date: Thu, 11 Aug 2016 10:15:56 +0200
-Message-Id: <1470903356-22381-1-git-send-email-johannes@sipsolutions.net>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+	Andreas Dilger <adilger.kernel@dilger.ca>,
+	Jan Kara <jack@suse.com>,
+	Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+	Hugh Dickins <hughd@google.com>,
+	Andrea Arcangeli <aarcange@redhat.com>,
+	Dave Hansen <dave.hansen@intel.com>,
+	Vlastimil Babka <vbabka@suse.cz>,
+	Matthew Wilcox <willy@infradead.org>,
+	Ross Zwisler <ross.zwisler@linux.intel.com>,
+	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+	linux-block@vger.kernel.org,
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv2 18/41] HACK: readahead: alloc huge pages, if allowed
+Date: Fri, 12 Aug 2016 21:38:01 +0300
+Message-Id: <1471027104-115213-19-git-send-email-kirill.shutemov@linux.intel.com>
+In-Reply-To: <1471027104-115213-1-git-send-email-kirill.shutemov@linux.intel.com>
+References: <1471027104-115213-1-git-send-email-kirill.shutemov@linux.intel.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-From: Johannes Berg <johannes.berg@intel.com>
+Most page cache allocation happens via readahead (sync or async), so if
+we want to have significant number of huge pages in page cache we need
+to find a ways to allocate them from readahead.
 
-Due to the (indirect) nesting of min(..., min(...)), sparse will
-show a variable shadowing warning whenever bvec.h is included.
+Unfortunately, huge pages doesn't fit into current readahead design:
+128 max readahead window, assumption on page size, PageReadahead() to
+track hit/miss.
 
-Avoid that by assigning the inner min() to a temporary variable first.
+I haven't found a ways to get it right yet.
 
-Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+This patch just allocates huge page if allowed, but doesn't really
+provide any readahead if huge page is allocated. We read out 2M a time
+and I would expect spikes in latancy without readahead.
+
+Therefore HACK.
+
+Having that said, I don't think it should prevent huge page support to
+be applied. Future will show if lacking readahead is a big deal with
+huge pages in page cache.
+
+Any suggestions are welcome.
+
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- include/linux/bvec.h | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ mm/readahead.c | 17 ++++++++++++++++-
+ 1 file changed, 16 insertions(+), 1 deletion(-)
 
-diff --git a/include/linux/bvec.h b/include/linux/bvec.h
-index 701b64a3b7c5..89b65b82d98f 100644
---- a/include/linux/bvec.h
-+++ b/include/linux/bvec.h
-@@ -74,7 +74,8 @@ static inline void bvec_iter_advance(const struct bio_vec *bv,
- 		  "Attempted to advance past end of bvec iter\n");
+diff --git a/mm/readahead.c b/mm/readahead.c
+index 65ec288dc057..3cea3e8f1d3f 100644
+--- a/mm/readahead.c
++++ b/mm/readahead.c
+@@ -173,6 +173,21 @@ int __do_page_cache_readahead(struct address_space *mapping, struct file *filp,
+ 		if (page_offset > end_index)
+ 			break;
  
- 	while (bytes) {
--		unsigned len = min(bytes, bvec_iter_len(bv, *iter));
-+		unsigned iter_len = bvec_iter_len(bv, *iter);
-+		unsigned len = min(bytes, iter_len);
- 
- 		bytes -= len;
- 		iter->bi_size -= len;
++		if (IS_ENABLED(CONFIG_TRANSPARENT_HUGE_PAGECACHE) &&
++				(!page_idx || !(page_offset % HPAGE_PMD_NR)) &&
++				page_cache_allow_huge(mapping, page_offset)) {
++			page = __page_cache_alloc_order(gfp_mask | __GFP_COMP,
++					HPAGE_PMD_ORDER);
++			if (page) {
++				prep_transhuge_page(page);
++				page->index = round_down(page_offset,
++						HPAGE_PMD_NR);
++				list_add(&page->lru, &page_pool);
++				ret++;
++				goto start_io;
++			}
++		}
++
+ 		rcu_read_lock();
+ 		page = radix_tree_lookup(&mapping->page_tree, page_offset);
+ 		rcu_read_unlock();
+@@ -188,7 +203,7 @@ int __do_page_cache_readahead(struct address_space *mapping, struct file *filp,
+ 			SetPageReadahead(page);
+ 		ret++;
+ 	}
+-
++start_io:
+ 	/*
+ 	 * Now start the IO.  We ignore I/O errors - if the page is not
+ 	 * uptodate then the caller will launch readpage again, and
 -- 
 2.8.1
 
