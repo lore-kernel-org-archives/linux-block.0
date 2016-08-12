@@ -1,87 +1,119 @@
-Return-Path: <axboe@kernel.dk>
-To: torvalds@linuxfoundation.org
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 4.8-rc2
-Message-ID: <c5fd6d08-900d-e194-9309-539d098639fc@kernel.dk>
-Date: Fri, 12 Aug 2016 20:42:21 -0600
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga03.intel.com ([134.134.136.65]:56461 "EHLO mga03.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752305AbcHLSin (ORCPT <rfc822;linux-block@vger.kernel.org>);
+	Fri, 12 Aug 2016 14:38:43 -0400
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+	Andreas Dilger <adilger.kernel@dilger.ca>,
+	Jan Kara <jack@suse.com>,
+	Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+	Hugh Dickins <hughd@google.com>,
+	Andrea Arcangeli <aarcange@redhat.com>,
+	Dave Hansen <dave.hansen@intel.com>,
+	Vlastimil Babka <vbabka@suse.cz>,
+	Matthew Wilcox <willy@infradead.org>,
+	Ross Zwisler <ross.zwisler@linux.intel.com>,
+	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+	linux-block@vger.kernel.org,
+	Matthew Wilcox <willy@linux.intel.com>,
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv2 02/41] radix tree test suite: Allow GFP_ATOMIC allocations to fail
+Date: Fri, 12 Aug 2016 21:37:45 +0300
+Message-Id: <1471027104-115213-3-git-send-email-kirill.shutemov@linux.intel.com>
+In-Reply-To: <1471027104-115213-1-git-send-email-kirill.shutemov@linux.intel.com>
+References: <1471027104-115213-1-git-send-email-kirill.shutemov@linux.intel.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Hi Linus,
+From: Matthew Wilcox <willy@linux.intel.com>
 
-A set of fixes for 4.8-rc2. This pull request contains:
+In order to test the preload code, it is necessary to fail GFP_ATOMIC
+allocations, which requires defining GFP_KERNEL and GFP_ATOMIC properly.
+Remove the obsolete __GFP_WAIT and copy the definitions of the __GFP
+flags which are used from the kernel include files.  We also need the
+real definition of gfpflags_allow_blocking() to persuade the radix tree
+to actually use its preallocated nodes.
 
-- A NVMe fix from Gabriel, fixing a suspend/resume issue on some
-   setups.
+Signed-off-by: Matthew Wilcox <willy@linux.intel.com>
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+---
+ tools/testing/radix-tree/linux.c      |  7 ++++++-
+ tools/testing/radix-tree/linux/gfp.h  | 24 ++++++++++++++++++++----
+ tools/testing/radix-tree/linux/slab.h |  5 -----
+ 3 files changed, 26 insertions(+), 10 deletions(-)
 
-- Addition of a few missing entries in the block queue sysfs
-   documentation, from Joe.
-
-- A fix for a sparse shadow warning for the bvec iterator, from
-   Johannes.
-
-- A writeback deadlock involving raid issuing barriers, and not flushing
-   the plug when we wakeup the flusher threads. From Konstantin.
-
-- A set of patches for the NVMe target/loop/rdma code, from Roland and
-   Sagi.
-
-Please pull!
-
-
-   git://git.kernel.dk/linux-block.git for-linus
-
-
-----------------------------------------------------------------
-Gabriel Krisman Bertazi (1):
-       nvme: Suspend all queues before deletion
-
-Jens Axboe (1):
-       Merge branch 'nvmf-4.8-rc' of 
-git://git.infradead.org/nvme-fabrics into for-linus
-
-Joe Lawrence (1):
-       doc: update block/queue-sysfs.txt entries
-
-Johannes Berg (1):
-       bvec: avoid variable shadowing warning
-
-Konstantin Khlebnikov (1):
-       mm, writeback: flush plugged IO in wakeup_flusher_threads()
-
-Roland Dreier (1):
-       nvme-rdma: Don't leak uninitialized memory in connect request 
-private data
-
-Sagi Grimberg (11):
-       nvme-rdma: Queue ns scanning after a sucessful reconnection
-       nvme-rdma: Fix device removal handling
-       nvme-rdma: Remove duplicate call to nvme_remove_namespaces
-       nvme-rdma: Free the I/O tags when we delete the controller
-       nvme-loop: Remove duplicate call to nvme_remove_namespaces
-       nvme-rdma: Make sure to shutdown the controller if we can
-       nvmet-rdma: Correctly handle RDMA device hot removal
-       nvmet-rdma: Don't use the inline buffer in order to avoid 
-allocation for small reads
-       nvmet: Fix controller serial number inconsistency
-       nvme-rdma: start async event handler after reconnecting to a 
-controller
-       nvme-rdma: Remove unused includes
-
-  Documentation/block/queue-sysfs.txt |  18 +++++++
-  drivers/nvme/host/pci.c             |  20 +++-----
-  drivers/nvme/host/rdma.c            |  83 ++++++++++++++++--------------
-  drivers/nvme/target/admin-cmd.c     |   6 +--
-  drivers/nvme/target/core.c          |   4 ++
-  drivers/nvme/target/loop.c          |   4 +-
-  drivers/nvme/target/nvmet.h         |   1 +
-  drivers/nvme/target/rdma.c          | 100 
-++++++++++++++++++++++++++----------
-  fs/fs-writeback.c                   |   6 +++
-  include/linux/bvec.h                |   3 +-
-  10 files changed, 160 insertions(+), 85 deletions(-)
-
+diff --git a/tools/testing/radix-tree/linux.c b/tools/testing/radix-tree/linux.c
+index 154823737b20..3cfb04e98e2f 100644
+--- a/tools/testing/radix-tree/linux.c
++++ b/tools/testing/radix-tree/linux.c
+@@ -33,7 +33,12 @@ mempool_t *mempool_create(int min_nr, mempool_alloc_t *alloc_fn,
+ 
+ void *kmem_cache_alloc(struct kmem_cache *cachep, int flags)
+ {
+-	void *ret = malloc(cachep->size);
++	void *ret;
++
++	if (flags & __GFP_NOWARN)
++		return NULL;
++
++	ret = malloc(cachep->size);
+ 	if (cachep->ctor)
+ 		cachep->ctor(ret);
+ 	uatomic_inc(&nr_allocated);
+diff --git a/tools/testing/radix-tree/linux/gfp.h b/tools/testing/radix-tree/linux/gfp.h
+index 0e37f7a760eb..5b09b2ce6c33 100644
+--- a/tools/testing/radix-tree/linux/gfp.h
++++ b/tools/testing/radix-tree/linux/gfp.h
+@@ -1,10 +1,26 @@
+ #ifndef _GFP_H
+ #define _GFP_H
+ 
+-#define __GFP_BITS_SHIFT 22
++#define __GFP_BITS_SHIFT 26
+ #define __GFP_BITS_MASK ((gfp_t)((1 << __GFP_BITS_SHIFT) - 1))
+-#define __GFP_WAIT 1
+-#define __GFP_ACCOUNT 0
+-#define __GFP_NOWARN 0
++
++#define __GFP_HIGH		0x20u
++#define __GFP_IO		0x40u
++#define __GFP_FS		0x80u
++#define __GFP_NOWARN		0x200u
++#define __GFP_ATOMIC		0x80000u
++#define __GFP_ACCOUNT		0x100000u
++#define __GFP_DIRECT_RECLAIM	0x400000u
++#define __GFP_KSWAPD_RECLAIM	0x2000000u
++
++#define __GFP_RECLAIM		(__GFP_DIRECT_RECLAIM|__GFP_KSWAPD_RECLAIM)
++
++#define GFP_ATOMIC		(__GFP_HIGH|__GFP_ATOMIC|__GFP_KSWAPD_RECLAIM)
++#define GFP_KERNEL		(__GFP_RECLAIM | __GFP_IO | __GFP_FS)
++
++static inline bool gfpflags_allow_blocking(const gfp_t gfp_flags)
++{
++	return !!(gfp_flags & __GFP_DIRECT_RECLAIM);
++}
+ 
+ #endif
+diff --git a/tools/testing/radix-tree/linux/slab.h b/tools/testing/radix-tree/linux/slab.h
+index 6d5a34770fd4..452e2bf502e3 100644
+--- a/tools/testing/radix-tree/linux/slab.h
++++ b/tools/testing/radix-tree/linux/slab.h
+@@ -7,11 +7,6 @@
+ #define SLAB_PANIC 2
+ #define SLAB_RECLAIM_ACCOUNT    0x00020000UL            /* Objects are reclaimable */
+ 
+-static inline int gfpflags_allow_blocking(gfp_t mask)
+-{
+-	return 1;
+-}
+-
+ struct kmem_cache {
+ 	int size;
+ 	void (*ctor)(void *);
 -- 
-Jens Axboe
+2.8.1
+
