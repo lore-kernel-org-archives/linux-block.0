@@ -1,8 +1,4 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:64597 "EHLO mga02.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752657AbcHLSiz (ORCPT <rfc822;linux-block@vger.kernel.org>);
-	Fri, 12 Aug 2016 14:38:55 -0400
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
 From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
 To: "Theodore Ts'o" <tytso@mit.edu>,
 	Andreas Dilger <adilger.kernel@dilger.ca>,
@@ -19,186 +15,76 @@ Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
 	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
 	linux-block@vger.kernel.org,
 	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv2 26/41] truncate: make truncate_inode_pages_range() aware about huge pages
-Date: Fri, 12 Aug 2016 21:38:09 +0300
-Message-Id: <1471027104-115213-27-git-send-email-kirill.shutemov@linux.intel.com>
+Subject: [PATCHv2 39/41] ext4: make fallocate() operations work with huge pages
+Date: Fri, 12 Aug 2016 21:38:22 +0300
+Message-Id: <1471027104-115213-40-git-send-email-kirill.shutemov@linux.intel.com>
 In-Reply-To: <1471027104-115213-1-git-send-email-kirill.shutemov@linux.intel.com>
 References: <1471027104-115213-1-git-send-email-kirill.shutemov@linux.intel.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-As with shmem_undo_range(), truncate_inode_pages_range() removes huge
-pages, if it fully within range.
+__ext4_block_zero_page_range() adjusted to calculate starting iblock
+correctry for huge pages.
 
-Partial truncate of huge pages zero out this part of THP.
-
-Unlike with shmem, it doesn't prevent us having holes in the middle of
-huge page we still can skip writeback not touched buffers.
-
-With memory-mapped IO we would loose holes in some cases when we have
-THP in page cache, since we cannot track access on 4k level in this
-case.
+ext4_{collapse,insert}_range() requires page cache invalidation. We need
+the invalidation to be aligning to huge page border if huge pages are
+possible in page cache.
 
 Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- fs/buffer.c   |  2 +-
- mm/truncate.c | 95 ++++++++++++++++++++++++++++++++++++++++++++++++++++++-----
- 2 files changed, 88 insertions(+), 9 deletions(-)
+ fs/ext4/extents.c | 10 ++++++++--
+ fs/ext4/inode.c   |  3 +--
+ 2 files changed, 9 insertions(+), 4 deletions(-)
 
-diff --git a/fs/buffer.c b/fs/buffer.c
-index e53808e790e2..20898b051044 100644
---- a/fs/buffer.c
-+++ b/fs/buffer.c
-@@ -1534,7 +1534,7 @@ void block_invalidatepage(struct page *page, unsigned int offset,
- 	/*
- 	 * Check for overflow
+diff --git a/fs/ext4/extents.c b/fs/ext4/extents.c
+index d7ccb7f51dfc..d46aeda70fb0 100644
+--- a/fs/ext4/extents.c
++++ b/fs/ext4/extents.c
+@@ -5525,7 +5525,10 @@ int ext4_collapse_range(struct inode *inode, loff_t offset, loff_t len)
+ 	 * Need to round down offset to be aligned with page size boundary
+ 	 * for page size > block size.
  	 */
--	BUG_ON(stop > PAGE_SIZE || stop < length);
-+	BUG_ON(stop > hpage_size(page) || stop < length);
- 
- 	head = page_buffers(page);
- 	bh = head;
-diff --git a/mm/truncate.c b/mm/truncate.c
-index ce904e4b1708..9c339e6255f2 100644
---- a/mm/truncate.c
-+++ b/mm/truncate.c
-@@ -90,7 +90,7 @@ void do_invalidatepage(struct page *page, unsigned int offset,
- {
- 	void (*invalidatepage)(struct page *, unsigned int, unsigned int);
- 
--	invalidatepage = page->mapping->a_ops->invalidatepage;
-+	invalidatepage = page_mapping(page)->a_ops->invalidatepage;
- #ifdef CONFIG_BLOCK
- 	if (!invalidatepage)
- 		invalidatepage = block_invalidatepage;
-@@ -116,7 +116,7 @@ truncate_complete_page(struct address_space *mapping, struct page *page)
- 		return -EIO;
- 
- 	if (page_has_private(page))
--		do_invalidatepage(page, 0, PAGE_SIZE);
-+		do_invalidatepage(page, 0, hpage_size(page));
- 
+-	ioffset = round_down(offset, PAGE_SIZE);
++	if (IS_ENABLED(CONFIG_TRANSPARENT_HUGE_PAGECACHE))
++		ioffset = round_down(offset, HPAGE_PMD_SIZE);
++	else
++		ioffset = round_down(offset, PAGE_SIZE);
  	/*
- 	 * Some filesystems seem to re-dirty the page even after
-@@ -288,6 +288,36 @@ void truncate_inode_pages_range(struct address_space *mapping,
- 				unlock_page(page);
- 				continue;
- 			}
-+
-+			if (PageTransTail(page)) {
-+				/* Middle of THP: zero out the page */
-+				clear_highpage(page);
-+				if (page_has_private(page)) {
-+					int off = page - compound_head(page);
-+					do_invalidatepage(compound_head(page),
-+							off * PAGE_SIZE,
-+							PAGE_SIZE);
-+				}
-+				unlock_page(page);
-+				continue;
-+			} else if (PageTransHuge(page)) {
-+				if (index == round_down(end, HPAGE_PMD_NR)) {
-+					/*
-+					 * Range ends in the middle of THP:
-+					 * zero out the page
-+					 */
-+					clear_highpage(page);
-+					if (page_has_private(page)) {
-+						do_invalidatepage(page, 0,
-+								PAGE_SIZE);
-+					}
-+					unlock_page(page);
-+					continue;
-+				}
-+				index += HPAGE_PMD_NR - 1;
-+				i += HPAGE_PMD_NR - 1;
-+			}
-+
- 			truncate_inode_page(mapping, page);
- 			unlock_page(page);
- 		}
-@@ -309,9 +339,12 @@ void truncate_inode_pages_range(struct address_space *mapping,
- 			wait_on_page_writeback(page);
- 			zero_user_segment(page, partial_start, top);
- 			cleancache_invalidate_page(mapping, page);
--			if (page_has_private(page))
--				do_invalidatepage(page, partial_start,
--						  top - partial_start);
-+			if (page_has_private(page)) {
-+				int off = page - compound_head(page);
-+				do_invalidatepage(compound_head(page),
-+						off * PAGE_SIZE + partial_start,
-+						top - partial_start);
-+			}
- 			unlock_page(page);
- 			put_page(page);
- 		}
-@@ -322,9 +355,12 @@ void truncate_inode_pages_range(struct address_space *mapping,
- 			wait_on_page_writeback(page);
- 			zero_user_segment(page, 0, partial_end);
- 			cleancache_invalidate_page(mapping, page);
--			if (page_has_private(page))
--				do_invalidatepage(page, 0,
--						  partial_end);
-+			if (page_has_private(page)) {
-+				int off = page - compound_head(page);
-+				do_invalidatepage(compound_head(page),
-+						off * PAGE_SIZE,
-+						partial_end);
-+			}
- 			unlock_page(page);
- 			put_page(page);
- 		}
-@@ -373,6 +409,49 @@ void truncate_inode_pages_range(struct address_space *mapping,
- 			lock_page(page);
- 			WARN_ON(page_to_pgoff(page) != index);
- 			wait_on_page_writeback(page);
-+
-+			if (PageTransTail(page)) {
-+				/* Middle of THP: zero out the page */
-+				clear_highpage(page);
-+				if (page_has_private(page)) {
-+					int off = page - compound_head(page);
-+					do_invalidatepage(compound_head(page),
-+							off * PAGE_SIZE,
-+							PAGE_SIZE);
-+				}
-+				unlock_page(page);
-+				/*
-+				 * Partial thp truncate due 'start' in middle
-+				 * of THP: don't need to look on these pages
-+				 * again on !pvec.nr restart.
-+				 */
-+				if (index != round_down(end, HPAGE_PMD_NR))
-+					start++;
-+				continue;
-+			} else if (PageTransHuge(page)) {
-+				if (index == round_down(end, HPAGE_PMD_NR)) {
-+					/*
-+					 * Range ends in the middle of THP:
-+					 * zero out the page
-+					 */
-+					clear_highpage(page);
-+					if (page_has_private(page)) {
-+						do_invalidatepage(page, 0,
-+								PAGE_SIZE);
-+					}
-+					unlock_page(page);
-+					/*
-+					 * Partial thp truncate due 'end' in
-+					 * middle of THP: don't need to look on
-+					 * these pages again restart.
-+					 */
-+					start++;
-+					continue;
-+				}
-+				index += HPAGE_PMD_NR - 1;
-+				i += HPAGE_PMD_NR - 1;
-+			}
-+
- 			truncate_inode_page(mapping, page);
- 			unlock_page(page);
- 		}
+ 	 * Write tail of the last page before removed range since it will get
+ 	 * removed from the page cache below.
+@@ -5674,7 +5677,10 @@ int ext4_insert_range(struct inode *inode, loff_t offset, loff_t len)
+ 	 * Need to round down to align start offset to page size boundary
+ 	 * for page size > block size.
+ 	 */
+-	ioffset = round_down(offset, PAGE_SIZE);
++	if (IS_ENABLED(CONFIG_TRANSPARENT_HUGE_PAGECACHE))
++		ioffset = round_down(offset, HPAGE_PMD_SIZE);
++	else
++		ioffset = round_down(offset, PAGE_SIZE);
+ 	/* Write out all dirty pages */
+ 	ret = filemap_write_and_wait_range(inode->i_mapping, ioffset,
+ 			LLONG_MAX);
+diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
+index 0a3aee4a57f7..cd8d03559896 100644
+--- a/fs/ext4/inode.c
++++ b/fs/ext4/inode.c
+@@ -3712,7 +3712,6 @@ void ext4_set_aops(struct inode *inode)
+ static int __ext4_block_zero_page_range(handle_t *handle,
+ 		struct address_space *mapping, loff_t from, loff_t length)
+ {
+-	ext4_fsblk_t index = from >> PAGE_SHIFT;
+ 	unsigned offset;
+ 	unsigned blocksize, pos;
+ 	ext4_lblk_t iblock;
+@@ -3731,7 +3730,7 @@ static int __ext4_block_zero_page_range(handle_t *handle,
+ 
+ 	blocksize = inode->i_sb->s_blocksize;
+ 
+-	iblock = index << (PAGE_SHIFT - inode->i_sb->s_blocksize_bits);
++	iblock = page->index << (PAGE_SHIFT - inode->i_sb->s_blocksize_bits);
+ 
+ 	if (!page_has_buffers(page))
+ 		create_empty_buffers(page, blocksize, 0);
 -- 
 2.8.1
 
