@@ -1,37 +1,69 @@
-Return-Path: <jinpu.wang@profitbricks.com>
-MIME-Version: 1.0
-From: Jinpu Wang <jinpu.wang@profitbricks.com>
-Date: Tue, 2 Aug 2016 15:58:01 +0200
-Message-ID: <CAMGffEmw8ako59nAkDfpHWH06xAngkKR0YYpxF24LwZMjA9P2g@mail.gmail.com>
-Subject: [BUG] Deadlock in blk_mq_register_disk error path
-To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+	Andreas Dilger <adilger.kernel@dilger.ca>,
+	Jan Kara <jack@suse.com>,
+	Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+	Hugh Dickins <hughd@google.com>,
+	Andrea Arcangeli <aarcange@redhat.com>,
+	Dave Hansen <dave.hansen@intel.com>,
+	Vlastimil Babka <vbabka@suse.cz>,
+	Matthew Wilcox <willy@infradead.org>,
+	Ross Zwisler <ross.zwisler@linux.intel.com>,
+	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+	linux-block@vger.kernel.org,
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv2 22/41] thp: do not threat slab pages as huge in hpage_{nr_pages,size,mask}
+Date: Fri, 12 Aug 2016 21:38:05 +0300
+Message-Id: <1471027104-115213-23-git-send-email-kirill.shutemov@linux.intel.com>
+In-Reply-To: <1471027104-115213-1-git-send-email-kirill.shutemov@linux.intel.com>
+References: <1471027104-115213-1-git-send-email-kirill.shutemov@linux.intel.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Jens,
+Slab pages can be compound, but we shouldn't threat them as THP for
+pupose of hpage_* helpers, otherwise it would lead to confusing results.
 
-I found in blk_mq_register_disk, we blk_mq_disable_hotplug which in
-turn mutex_lock(&all_q_mutex);
-  queue_for_each_hw_ctx(q, hctx, i) {
-                ret =3D blk_mq_register_hctx(hctx);
-                if (ret)
-                        break; /// if about error out, we will call
-unregister below
-        }
+For instance, ext4 uses slab pages for journal pages and we shouldn't
+confuse them with THPs. The easiest way is to exclude them in hpage_*
+helpers.
 
-        if (ret)
-                blk_mq_unregister_disk(disk);
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+---
+ include/linux/huge_mm.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-In blk_mq_unregister_disk, we will try to disable_hotplug again, which
-leads to dead lock.
+diff --git a/include/linux/huge_mm.h b/include/linux/huge_mm.h
+index de2789b4402c..5c5466ba37df 100644
+--- a/include/linux/huge_mm.h
++++ b/include/linux/huge_mm.h
+@@ -133,21 +133,21 @@ static inline spinlock_t *pmd_trans_huge_lock(pmd_t *pmd,
+ }
+ static inline int hpage_nr_pages(struct page *page)
+ {
+-	if (unlikely(PageTransHuge(page)))
++	if (unlikely(!PageSlab(page) && PageTransHuge(page)))
+ 		return HPAGE_PMD_NR;
+ 	return 1;
+ }
+ 
+ static inline int hpage_size(struct page *page)
+ {
+-	if (unlikely(PageTransHuge(page)))
++	if (unlikely(!PageSlab(page) && PageTransHuge(page)))
+ 		return HPAGE_PMD_SIZE;
+ 	return PAGE_SIZE;
+ }
+ 
+ static inline unsigned long hpage_mask(struct page *page)
+ {
+-	if (unlikely(PageTransHuge(page)))
++	if (unlikely(!PageSlab(page) && PageTransHuge(page)))
+ 		return HPAGE_PMD_MASK;
+ 	return PAGE_MASK;
+ }
+-- 
+2.8.1
 
-Did I miss anything?
-
---=20
-Mit freundlichen Gr=C3=BC=C3=9Fen,
-Best Regards,
-
-Jack Wang
-
-Linux Kernel Developer Storage
-ProfitBricks GmbH  The IaaS-Company.
