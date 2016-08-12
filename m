@@ -1,42 +1,86 @@
-Return-Path: <linux-ide-owner@vger.kernel.org>
-From: tom.ty89@gmail.com
-To: tj@kernel.org, martin.petersen@oracle.com
-Cc: linux-ide@vger.kernel.org, linux-scsi@vger.kernel.org,
-	linux-block@vger.kernel.org, Tom Yan <tom.ty89@gmail.com>
-Subject: [PATCH 2/2] sd: check BLK_DEF_MAX_SECTORS against max_dev_sectors
-Date: Fri, 12 Aug 2016 19:56:07 +0800
-Message-Id: <0bc2e9a09870610a48e0033a0370941ad549ba6b.1471002480.git.tom.ty89@gmail.com>
-In-Reply-To: <911c68378b91bf275a4bbed5717b4639641d7029.1471002480.git.tom.ty89@gmail.com>
-References: <911c68378b91bf275a4bbed5717b4639641d7029.1471002480.git.tom.ty89@gmail.com>
-Sender: linux-ide-owner@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+	Andreas Dilger <adilger.kernel@dilger.ca>,
+	Jan Kara <jack@suse.com>,
+	Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+	Hugh Dickins <hughd@google.com>,
+	Andrea Arcangeli <aarcange@redhat.com>,
+	Dave Hansen <dave.hansen@intel.com>,
+	Vlastimil Babka <vbabka@suse.cz>,
+	Matthew Wilcox <willy@infradead.org>,
+	Ross Zwisler <ross.zwisler@linux.intel.com>,
+	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+	linux-block@vger.kernel.org,
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv2 16/41] filemap: allocate huge page in pagecache_get_page(), if allowed
+Date: Fri, 12 Aug 2016 21:37:59 +0300
+Message-Id: <1471027104-115213-17-git-send-email-kirill.shutemov@linux.intel.com>
+In-Reply-To: <1471027104-115213-1-git-send-email-kirill.shutemov@linux.intel.com>
+References: <1471027104-115213-1-git-send-email-kirill.shutemov@linux.intel.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-From: Tom Yan <tom.ty89@gmail.com>
+Write path allocate pages using pagecache_get_page(). We should be able
+to allocate huge pages there, if it's allowed. As usually, fallback to
+small pages, if failed.
 
-The SCSI disk driver sets max_sector to BLK_DEF_MAX_SECTORS when
-the device does not report Optimal Transfer Length. However, it
-checks only whether it is smaller than max_hw_sectors, but not
-max_dev_sectors.
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+---
+ mm/filemap.c | 18 ++++++++++++++++--
+ 1 file changed, 16 insertions(+), 2 deletions(-)
 
-Signed-off-by: Tom Yan <tom.ty89@gmail.com>
-
-diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
-index d3e852a..2b6da13 100644
---- a/drivers/scsi/sd.c
-+++ b/drivers/scsi/sd.c
-@@ -2875,8 +2875,11 @@ static int sd_revalidate_disk(struct gendisk *disk)
- 	    logical_to_bytes(sdp, sdkp->opt_xfer_blocks) >= PAGE_SIZE) {
- 		q->limits.io_opt = logical_to_bytes(sdp, sdkp->opt_xfer_blocks);
- 		rw_max = logical_to_sectors(sdp, sdkp->opt_xfer_blocks);
--	} else
-+	} else {
- 		rw_max = BLK_DEF_MAX_SECTORS;
-+		/* Combine with device limits */
-+		rw_max = min(rw_max, q->limits.max_dev_sectors);
-+	}
+diff --git a/mm/filemap.c b/mm/filemap.c
+index 9d7d70b265d4..93fa97f143ab 100644
+--- a/mm/filemap.c
++++ b/mm/filemap.c
+@@ -1310,13 +1310,16 @@ repeat:
  
- 	/* Combine with controller limits */
- 	q->limits.max_sectors = min(rw_max, queue_max_hw_sectors(q));
+ no_page:
+ 	if (!page && (fgp_flags & FGP_CREAT)) {
++		pgoff_t hoffset;
+ 		int err;
+ 		if ((fgp_flags & FGP_WRITE) && mapping_cap_account_dirty(mapping))
+ 			gfp_mask |= __GFP_WRITE;
+ 		if (fgp_flags & FGP_NOFS)
+ 			gfp_mask &= ~__GFP_FS;
+ 
+-		page = __page_cache_alloc(gfp_mask);
++		page = page_cache_alloc_huge(mapping, offset, gfp_mask);
++no_huge:	if (!page)
++			page = __page_cache_alloc(gfp_mask);
+ 		if (!page)
+ 			return NULL;
+ 
+@@ -1327,14 +1330,25 @@ no_page:
+ 		if (fgp_flags & FGP_ACCESSED)
+ 			__SetPageReferenced(page);
+ 
+-		err = add_to_page_cache_lru(page, mapping, offset,
++		if (PageTransHuge(page))
++			hoffset = round_down(offset, HPAGE_PMD_NR);
++		else
++			hoffset = offset;
++
++		err = add_to_page_cache_lru(page, mapping, hoffset,
+ 				gfp_mask & GFP_RECLAIM_MASK);
+ 		if (unlikely(err)) {
++			if (PageTransHuge(page)) {
++				put_page(page);
++				page = NULL;
++				goto no_huge;
++			}
+ 			put_page(page);
+ 			page = NULL;
+ 			if (err == -EEXIST)
+ 				goto repeat;
+ 		}
++		page += offset - hoffset;
+ 	}
+ 
+ 	return page;
 -- 
-2.9.2
+2.8.1
 
