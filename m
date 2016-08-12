@@ -1,172 +1,97 @@
-Return-Path: <roman.penyaev@profitbricks.com>
-Return-Path: <roman.penyaev@profitbricks.com>
-From: Roman Pen <roman.penyaev@profitbricks.com>
-To: 
-Cc: Roman Pen <roman.penyaev@profitbricks.com>,
-	Akinobu Mita <akinobu.mita@gmail.com>,
-	Tejun Heo <tj@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>,
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga11.intel.com ([192.55.52.93]:17252 "EHLO mga11.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752557AbcHLSiu (ORCPT <rfc822;linux-block@vger.kernel.org>);
+	Fri, 12 Aug 2016 14:38:50 -0400
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+	Andreas Dilger <adilger.kernel@dilger.ca>,
+	Jan Kara <jack@suse.com>,
+	Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+	Hugh Dickins <hughd@google.com>,
+	Andrea Arcangeli <aarcange@redhat.com>,
+	Dave Hansen <dave.hansen@intel.com>,
+	Vlastimil Babka <vbabka@suse.cz>,
+	Matthew Wilcox <willy@infradead.org>,
+	Ross Zwisler <ross.zwisler@linux.intel.com>,
+	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
 	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 1/1] blk-mq: fix hang caused by freeze/unfreeze sequence
-Date: Fri,  5 Aug 2016 19:41:30 +0200
-Message-Id: <20160805174131.22043-1-roman.penyaev@profitbricks.com>
-List-ID: <linux-block@vger.kernel.org>
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv2 27/41] truncate: make invalidate_inode_pages2_range() aware about huge pages
+Date: Fri, 12 Aug 2016 21:38:10 +0300
+Message-Id: <1471027104-115213-28-git-send-email-kirill.shutemov@linux.intel.com>
+In-Reply-To: <1471027104-115213-1-git-send-email-kirill.shutemov@linux.intel.com>
+References: <1471027104-115213-1-git-send-email-kirill.shutemov@linux.intel.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Long time ago there was a similar fix proposed by Akinobu Mita[1],
-but it seems that time everyone decided to fix this subtle race in
-percpu-refcount and Tejun Heo[2] did an attempt (as I can see that
-patchset was not applied).
+For huge pages we need to unmap whole range covered by the huge page.
 
-The following is a description of a queue hang - same fix but a bug
-from another angle.
-
-The hang happens on queue freeze because of a simultaneous calls of
-blk_mq_freeze_queue() and blk_mq_unfreeze_queue() from different threads,
-and because of a reference race percpu_ref_reinit() and percpu_ref_kill()
-swap.
-
- CPU#0             CPU#1
- ----------------  -----------------
- percpu_ref_kill()
- 
-                   percpu_ref_kill() << atomic reference does not
- percpu_ref_reinit()                 << guarantee the order
-
-                   blk_mq_freeze_queue_wait() << HANG HERE
-
-                   percpu_ref_reinit()
-
-Firstly this wrong sequence raises two kernel warnings:
-
-  1st. WARNING at lib/percpu-recount.c:309
-       percpu_ref_kill_and_confirm called more than once
-
-  2nd. WARNING at lib/percpu-refcount.c:331
-
-But the most unpleasant effect is a hang of a blk_mq_freeze_queue_wait(),
-which waits for a zero of a q_usage_counter, which never happens
-because percpu-ref was not reinited and stays in PERCPU state forever.
-
-The simplified sequence above is reproduced on shared tags, when one
-queue is going to die meanwhile another one is initing:
-
- CPU#0                           CPU#1
- ------------------------------- ------------------------------------
- q1 = blk_mq_init_queue(shared_tags)
-
-                                q2 = blk_mq_init_queue(shared_tags):
-                                  blk_mq_add_queue_tag_set(shared_tags):
-                                    blk_mq_update_tag_set_depth(shared_tags):
-                                      blk_mq_freeze_queue(q1)
- blk_cleanup_queue(q1)                 ...
-   blk_mq_freeze_queue(q1)   <<<->>>   blk_mq_unfreeze_queue(q1)
-
-[1] Message id: 1443287365-4244-7-git-send-email-akinobu.mita@gmail.com
-[2] Message id: 1443563240-29306-6-git-send-email-tj@kernel.org
-
-Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
-Cc: Akinobu Mita <akinobu.mita@gmail.com>
-Cc: Tejun Heo <tj@kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: linux-block@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- block/blk-core.c       |  1 +
- block/blk-mq.c         | 22 +++++++++++-----------
- include/linux/blkdev.h |  7 ++++++-
- 3 files changed, 18 insertions(+), 12 deletions(-)
+ mm/truncate.c | 27 +++++++++++++++++++--------
+ 1 file changed, 19 insertions(+), 8 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index ef78848..01dcb02 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -740,6 +740,7 @@ struct request_queue *blk_alloc_queue_node(gfp_t gfp_mask, int node_id)
- 	__set_bit(QUEUE_FLAG_BYPASS, &q->queue_flags);
- 
- 	init_waitqueue_head(&q->mq_freeze_wq);
-+	mutex_init(&q->mq_freeze_lock);
- 
- 	/*
- 	 * Init percpu_ref in atomic mode so that it's faster to shutdown.
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 6d6f8fe..1f3e81b 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -80,13 +80,13 @@ static void blk_mq_hctx_clear_pending(struct blk_mq_hw_ctx *hctx,
- 
- void blk_mq_freeze_queue_start(struct request_queue *q)
- {
--	int freeze_depth;
--
--	freeze_depth = atomic_inc_return(&q->mq_freeze_depth);
--	if (freeze_depth == 1) {
-+	mutex_lock(&q->mq_freeze_lock);
-+	if (++q->mq_freeze_depth == 1) {
- 		percpu_ref_kill(&q->q_usage_counter);
-+		mutex_unlock(&q->mq_freeze_lock);
- 		blk_mq_run_hw_queues(q, false);
--	}
-+	} else
-+		mutex_unlock(&q->mq_freeze_lock);
- }
- EXPORT_SYMBOL_GPL(blk_mq_freeze_queue_start);
- 
-@@ -124,14 +124,14 @@ EXPORT_SYMBOL_GPL(blk_mq_freeze_queue);
- 
- void blk_mq_unfreeze_queue(struct request_queue *q)
- {
--	int freeze_depth;
--
--	freeze_depth = atomic_dec_return(&q->mq_freeze_depth);
--	WARN_ON_ONCE(freeze_depth < 0);
--	if (!freeze_depth) {
-+	mutex_lock(&q->mq_freeze_lock);
-+	q->mq_freeze_depth--;
-+	WARN_ON_ONCE(q->mq_freeze_depth < 0);
-+	if (!q->mq_freeze_depth) {
- 		percpu_ref_reinit(&q->q_usage_counter);
- 		wake_up_all(&q->mq_freeze_wq);
- 	}
-+	mutex_unlock(&q->mq_freeze_lock);
- }
- EXPORT_SYMBOL_GPL(blk_mq_unfreeze_queue);
- 
-@@ -2105,7 +2105,7 @@ void blk_mq_free_queue(struct request_queue *q)
- static void blk_mq_queue_reinit(struct request_queue *q,
- 				const struct cpumask *online_mask)
- {
--	WARN_ON_ONCE(!atomic_read(&q->mq_freeze_depth));
-+	WARN_ON_ONCE(!q->mq_freeze_depth);
- 
- 	blk_mq_sysfs_unregister(q);
- 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index f6ff9d1..d692c16 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -445,7 +445,7 @@ struct request_queue {
- 	struct mutex		sysfs_lock;
- 
- 	int			bypass_depth;
--	atomic_t		mq_freeze_depth;
-+	int			mq_freeze_depth;
- 
- #if defined(CONFIG_BLK_DEV_BSG)
- 	bsg_job_fn		*bsg_job_fn;
-@@ -459,6 +459,11 @@ struct request_queue {
- #endif
- 	struct rcu_head		rcu_head;
- 	wait_queue_head_t	mq_freeze_wq;
-+	/*
-+	 * Protect concurrent access to q_usage_counter by
-+	 * percpu_ref_kill() and percpu_ref_reinit().
-+	 */
-+	struct mutex		mq_freeze_lock;
- 	struct percpu_ref	q_usage_counter;
- 	struct list_head	all_q_node;
- 
+diff --git a/mm/truncate.c b/mm/truncate.c
+index 9c339e6255f2..6a445278aaaf 100644
+--- a/mm/truncate.c
++++ b/mm/truncate.c
+@@ -708,27 +708,34 @@ int invalidate_inode_pages2_range(struct address_space *mapping,
+ 				continue;
+ 			}
+ 			wait_on_page_writeback(page);
++			page = compound_head(page);
++
+ 			if (page_mapped(page)) {
++				loff_t begin, len;
++
++				begin = page->index << PAGE_SHIFT;
++
+ 				if (!did_range_unmap) {
+ 					/*
+ 					 * Zap the rest of the file in one hit.
+ 					 */
++					len = (loff_t)(1 + end - page->index) <<
++						PAGE_SHIFT;
++					if (len < hpage_size(page))
++						len = hpage_size(page);
+ 					unmap_mapping_range(mapping,
+-					   (loff_t)index << PAGE_SHIFT,
+-					   (loff_t)(1 + end - index)
+-							 << PAGE_SHIFT,
+-							 0);
++							begin, len, 0);
+ 					did_range_unmap = 1;
+ 				} else {
+ 					/*
+ 					 * Just zap this page
+ 					 */
+-					unmap_mapping_range(mapping,
+-					   (loff_t)index << PAGE_SHIFT,
+-					   PAGE_SIZE, 0);
++					len = hpage_size(page);
++					unmap_mapping_range(mapping, begin,
++							len, 0 );
+ 				}
+ 			}
+-			BUG_ON(page_mapped(page));
++			VM_BUG_ON_PAGE(page_mapped(page), page);
+ 			ret2 = do_launder_page(mapping, page);
+ 			if (ret2 == 0) {
+ 				if (!invalidate_complete_page2(mapping, page))
+@@ -737,6 +744,10 @@ int invalidate_inode_pages2_range(struct address_space *mapping,
+ 			if (ret2 < 0)
+ 				ret = ret2;
+ 			unlock_page(page);
++			if (PageTransHuge(page)) {
++				index = page->index + HPAGE_PMD_NR - 1;
++				break;
++			}
+ 		}
+ 		pagevec_remove_exceptionals(&pvec);
+ 		pagevec_release(&pvec);
 -- 
-2.9.0
+2.8.1
+
