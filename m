@@ -1,4 +1,8 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga02.intel.com ([134.134.136.20]:14034 "EHLO mga02.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752710AbcHLSi5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+	Fri, 12 Aug 2016 14:38:57 -0400
 From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
 To: "Theodore Ts'o" <tytso@mit.edu>,
 	Andreas Dilger <adilger.kernel@dilger.ca>,
@@ -15,86 +19,54 @@ Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
 	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
 	linux-block@vger.kernel.org,
 	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv2 11/41] thp: try to free page's buffers before attempt split
-Date: Fri, 12 Aug 2016 21:37:54 +0300
-Message-Id: <1471027104-115213-12-git-send-email-kirill.shutemov@linux.intel.com>
+Subject: [PATCHv2 32/41] ext4: handle huge pages in __ext4_block_zero_page_range()
+Date: Fri, 12 Aug 2016 21:38:15 +0300
+Message-Id: <1471027104-115213-33-git-send-email-kirill.shutemov@linux.intel.com>
 In-Reply-To: <1471027104-115213-1-git-send-email-kirill.shutemov@linux.intel.com>
 References: <1471027104-115213-1-git-send-email-kirill.shutemov@linux.intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-We want page to be isolated from the rest of the system before spliting
-it. We rely on page count to be 2 for file pages to make sure nobody
-uses the page: one pin to caller, one to radix-tree.
-
-Filesystems with backing storage can have page count increased if it has
-buffers.
-
-Let's try to free them, before attempt split. And remove one guarding
-VM_BUG_ON_PAGE().
+As the function handles zeroing range only within one block, the
+required changes are trivial, just remove assuption on page size.
 
 Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- include/linux/buffer_head.h |  1 +
- mm/huge_memory.c            | 19 ++++++++++++++++++-
- 2 files changed, 19 insertions(+), 1 deletion(-)
+ fs/ext4/inode.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/include/linux/buffer_head.h b/include/linux/buffer_head.h
-index ebbacd14d450..006a8a42acfb 100644
---- a/include/linux/buffer_head.h
-+++ b/include/linux/buffer_head.h
-@@ -395,6 +395,7 @@ extern int __set_page_dirty_buffers(struct page *page);
- #else /* CONFIG_BLOCK */
+diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
+index cd435d4a10f0..bee21fffbfb9 100644
+--- a/fs/ext4/inode.c
++++ b/fs/ext4/inode.c
+@@ -3679,7 +3679,7 @@ static int __ext4_block_zero_page_range(handle_t *handle,
+ 		struct address_space *mapping, loff_t from, loff_t length)
+ {
+ 	ext4_fsblk_t index = from >> PAGE_SHIFT;
+-	unsigned offset = from & (PAGE_SIZE-1);
++	unsigned offset;
+ 	unsigned blocksize, pos;
+ 	ext4_lblk_t iblock;
+ 	struct inode *inode = mapping->host;
+@@ -3692,6 +3692,9 @@ static int __ext4_block_zero_page_range(handle_t *handle,
+ 	if (!page)
+ 		return -ENOMEM;
  
- static inline void buffer_init(void) {}
-+static inline int page_has_buffers(struct page *page) { return 0; }
- static inline int try_to_free_buffers(struct page *page) { return 1; }
- static inline int inode_has_buffers(struct inode *inode) { return 0; }
- static inline void invalidate_inode_buffers(struct inode *inode) {}
-diff --git a/mm/huge_memory.c b/mm/huge_memory.c
-index 73e80d49c32e..a8fcfa3010c8 100644
---- a/mm/huge_memory.c
-+++ b/mm/huge_memory.c
-@@ -30,6 +30,7 @@
- #include <linux/userfaultfd_k.h>
- #include <linux/page_idle.h>
- #include <linux/shmem_fs.h>
-+#include <linux/buffer_head.h>
- 
- #include <asm/tlb.h>
- #include <asm/pgalloc.h>
-@@ -2007,7 +2008,6 @@ int split_huge_page_to_list(struct page *page, struct list_head *list)
- 
- 	VM_BUG_ON_PAGE(is_huge_zero_page(page), page);
- 	VM_BUG_ON_PAGE(!PageLocked(page), page);
--	VM_BUG_ON_PAGE(!PageSwapBacked(page), page);
- 	VM_BUG_ON_PAGE(!PageCompound(page), page);
- 
- 	if (PageAnon(head)) {
-@@ -2036,6 +2036,23 @@ int split_huge_page_to_list(struct page *page, struct list_head *list)
- 			goto out;
- 		}
- 
-+		/* Try to free buffers before attempt split */
-+		if (!PageSwapBacked(head) && PagePrivate(page)) {
-+			/*
-+			 * We cannot trigger writeback from here due possible
-+			 * recursion if triggered from vmscan, only wait.
-+			 *
-+			 * Caller can trigger writeback it on its own, if safe.
-+			 */
-+			wait_on_page_writeback(head);
++	page = compound_head(page);
++	offset = from & ~hpage_mask(page);
 +
-+			if (page_has_buffers(head) &&
-+					!try_to_free_buffers(head)) {
-+				ret = -EBUSY;
-+				goto out;
-+			}
-+		}
-+
- 		/* Addidional pin from radix tree */
- 		extra_pins = 1;
- 		anon_vma = NULL;
+ 	blocksize = inode->i_sb->s_blocksize;
+ 
+ 	iblock = index << (PAGE_SHIFT - inode->i_sb->s_blocksize_bits);
+@@ -3746,7 +3749,7 @@ static int __ext4_block_zero_page_range(handle_t *handle,
+ 		if (err)
+ 			goto unlock;
+ 	}
+-	zero_user(page, offset, length);
++	zero_user(page + offset / PAGE_SIZE, offset % PAGE_SIZE, length);
+ 	BUFFER_TRACE(bh, "zeroed end of block");
+ 
+ 	if (ext4_should_journal_data(inode)) {
 -- 
 2.8.1
 
