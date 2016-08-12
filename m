@@ -1,53 +1,97 @@
-Return-Path: <darrick.wong@oracle.com>
-Subject: [PATCH v10 0/3] fallocate for block devices
-From: "Darrick J. Wong" <darrick.wong@oracle.com>
-To: axboe@kernel.dk, darrick.wong@oracle.com
-Cc: linux-block@vger.kernel.org, tytso@mit.edu, martin.petersen@oracle.com,
-        snitzer@redhat.com, linux-api@vger.kernel.org, bfoster@redhat.com,
-        xfs@oss.sgi.com, hch@infradead.org, dm-devel@redhat.com,
-        linux-fsdevel@vger.kernel.org, bart.vanassche@sandisk.com
-Date: Thu, 25 Aug 2016 17:02:01 -0700
-Message-ID: <147216972158.7860.13484490862091226290.stgit@birch.djwong.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+	Andreas Dilger <adilger.kernel@dilger.ca>,
+	Jan Kara <jack@suse.com>,
+	Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+	Hugh Dickins <hughd@google.com>,
+	Andrea Arcangeli <aarcange@redhat.com>,
+	Dave Hansen <dave.hansen@intel.com>,
+	Vlastimil Babka <vbabka@suse.cz>,
+	Matthew Wilcox <willy@infradead.org>,
+	Ross Zwisler <ross.zwisler@linux.intel.com>,
+	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+	linux-block@vger.kernel.org,
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv2 38/41] ext4: fix SEEK_DATA/SEEK_HOLE for huge pages
+Date: Fri, 12 Aug 2016 21:38:21 +0300
+Message-Id: <1471027104-115213-39-git-send-email-kirill.shutemov@linux.intel.com>
+In-Reply-To: <1471027104-115213-1-git-send-email-kirill.shutemov@linux.intel.com>
+References: <1471027104-115213-1-git-send-email-kirill.shutemov@linux.intel.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Hi,
+ext4_find_unwritten_pgoff() needs few tweaks to work with huge pages.
+Mostly trivial page_mapping()/page_to_pgoff() and adjustment to how we
+find relevant block.
 
-This is a redesign of the patch series that fixes various interface
-problems with the existing "zero out this part of a block device"
-code.  BLKZEROOUT2 is gone.
+Signe-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+---
+ fs/ext4/file.c | 18 ++++++++++++++----
+ 1 file changed, 14 insertions(+), 4 deletions(-)
 
-The first patch is still a fix to the existing BLKZEROOUT ioctl to
-invalidate the page cache if the zeroing command to the underlying
-device succeeds.  Without this patch we still have the pagecache
-coherence bug that's been in the kernel forever.
+diff --git a/fs/ext4/file.c b/fs/ext4/file.c
+index 261ac3734c58..2c3d6bb0edfe 100644
+--- a/fs/ext4/file.c
++++ b/fs/ext4/file.c
+@@ -473,7 +473,7 @@ static int ext4_find_unwritten_pgoff(struct inode *inode,
+ 			 * range, it will be a hole.
+ 			 */
+ 			if (lastoff < endoff && whence == SEEK_HOLE &&
+-			    page->index > end) {
++			    page_to_pgoff(page) > end) {
+ 				found = 1;
+ 				*offset = lastoff;
+ 				goto out;
+@@ -481,7 +481,7 @@ static int ext4_find_unwritten_pgoff(struct inode *inode,
+ 
+ 			lock_page(page);
+ 
+-			if (unlikely(page->mapping != inode->i_mapping)) {
++			if (unlikely(page_mapping(page) != inode->i_mapping)) {
+ 				unlock_page(page);
+ 				continue;
+ 			}
+@@ -492,8 +492,12 @@ static int ext4_find_unwritten_pgoff(struct inode *inode,
+ 			}
+ 
+ 			if (page_has_buffers(page)) {
++				int diff;
+ 				lastoff = page_offset(page);
+ 				bh = head = page_buffers(page);
++				diff = (page - compound_head(page)) << inode->i_blkbits;
++				while (diff--)
++					bh = bh->b_this_page;
+ 				do {
+ 					if (buffer_uptodate(bh) ||
+ 					    buffer_unwritten(bh)) {
+@@ -514,8 +518,12 @@ static int ext4_find_unwritten_pgoff(struct inode *inode,
+ 				} while (bh != head);
+ 			}
+ 
+-			lastoff = page_offset(page) + PAGE_SIZE;
++			lastoff = page_offset(page) + hpage_size(page);
+ 			unlock_page(page);
++			if (PageTransCompound(page)) {
++				i++;
++				break;
++			}
+ 		}
+ 
+ 		/*
+@@ -528,7 +536,9 @@ static int ext4_find_unwritten_pgoff(struct inode *inode,
+ 			break;
+ 		}
+ 
+-		index = pvec.pages[i - 1]->index + 1;
++		index = page_to_pgoff(pvec.pages[i - 1]) + 1;
++		if (PageTransCompound(pvec.pages[i - 1]))
++			index = round_up(index, HPAGE_PMD_NR);
+ 		pagevec_release(&pvec);
+ 	} while (index <= end);
+ 
+-- 
+2.8.1
 
-The second patch changes the internal block device functions to reject
-attempts to discard or zeroout that are not aligned to the logical
-block size.  Previously, we only checked that the start/len parameters
-were 512-byte aligned, which caused kernel BUG_ONs for unaligned IOs
-to 4k-LBA devices.
-
-The third patch creates an fallocate handler for block devices, wires
-up the FALLOC_FL_PUNCH_HOLE flag to zeroing-discard, and connects
-FALLOC_FL_ZERO_RANGE to write-same so that we can have a consistent
-fallocate interface between files and block devices.  It also allows
-the combination of PUNCH_HOLE and NO_HIDE_STALE to invoke non-zeroing
-discard.
-
-Test cases for the new block device fallocate are now in xfstests as
-generic/349-351.
-
-Comments and questions are, as always, welcome.  Patches are against
-4.8-rc3.
-
-v7: Strengthen parameter checking and fix various code issues pointed
-out by Linus and Christoph.
-v8: More code rearranging, rebase to 4.6-rc3, and dig into alignment
-issues.
-v9: Forward port to 4.7.
-v10: Forward port to 4.8.  Remove the extra call to
-invalidate_inode_pages2_range per Bart Van Assche's request.
-
---D
