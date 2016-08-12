@@ -1,92 +1,69 @@
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>,
-	Tejun Heo <tj@kernel.org>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	linus.walleij@linaro.org,
-	broonie@kernel.org,
-	Arianna Avanzini <avanzini.arianna@gmail.com>,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH V2 04/22] block, cfq: remove SSD-related logic
-Date: Mon,  8 Aug 2016 13:14:59 +0200
-Message-Id: <1470654917-4280-5-git-send-email-paolo.valente@linaro.org>
-In-Reply-To: <1470654917-4280-1-git-send-email-paolo.valente@linaro.org>
-References: <1470654917-4280-1-git-send-email-paolo.valente@linaro.org>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+	Andreas Dilger <adilger.kernel@dilger.ca>,
+	Jan Kara <jack@suse.com>,
+	Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+	Hugh Dickins <hughd@google.com>,
+	Andrea Arcangeli <aarcange@redhat.com>,
+	Dave Hansen <dave.hansen@intel.com>,
+	Vlastimil Babka <vbabka@suse.cz>,
+	Matthew Wilcox <willy@infradead.org>,
+	Ross Zwisler <ross.zwisler@linux.intel.com>,
+	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+	linux-block@vger.kernel.org,
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv2 15/41] filemap: handle huge pages in do_generic_file_read()
+Date: Fri, 12 Aug 2016 21:37:58 +0300
+Message-Id: <1471027104-115213-16-git-send-email-kirill.shutemov@linux.intel.com>
+In-Reply-To: <1471027104-115213-1-git-send-email-kirill.shutemov@linux.intel.com>
+References: <1471027104-115213-1-git-send-email-kirill.shutemov@linux.intel.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-From: Arianna Avanzini <avanzini.arianna@gmail.com>
+Most of work happans on head page. Only when we need to do copy data to
+userspace we find relevant subpage.
 
-CFQ disables idling for SSD devices to achieve a higher throughput. As
-for seeky queues (see the previous commit), BFQ makes idling decisions
-for SSD devices in a more complex way, according to a unified strategy
-for boosting the throughput while at the same preserving strong
-throughput-distribution and latency guarantees. This commit then
-removes the CFQ mechanism.
+We are still limited by PAGE_SIZE per iteration. Lifting this limitation
+would require some more work.
 
-Signed-off-by: Arianna Avanzini <avanzini.arianna@gmail.com>
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- block/cfq-iosched.c | 18 ++----------------
- 1 file changed, 2 insertions(+), 16 deletions(-)
+ mm/filemap.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
-index 04d2298..ef6b491 100644
---- a/block/cfq-iosched.c
-+++ b/block/cfq-iosched.c
-@@ -51,7 +51,6 @@ static const int cfq_hist_divisor = 4;
+diff --git a/mm/filemap.c b/mm/filemap.c
+index ae1d996fa089..9d7d70b265d4 100644
+--- a/mm/filemap.c
++++ b/mm/filemap.c
+@@ -1860,6 +1860,7 @@ find_page:
+ 			if (unlikely(page == NULL))
+ 				goto no_cached_page;
+ 		}
++		page = compound_head(page);
+ 		if (PageReadahead(page)) {
+ 			page_cache_async_readahead(mapping,
+ 					ra, filp, page,
+@@ -1936,7 +1937,8 @@ page_ok:
+ 		 * now we can copy it to user space...
+ 		 */
  
- #define CFQQ_SEEK_THR		(sector_t)(8 * 100)
- #define CFQQ_CLOSE_THR		(sector_t)(8 * 1024)
--#define CFQQ_SECT_THR_NONROT	(sector_t)(2 * 32)
- #define CFQQ_SEEKY(cfqq)	(hweight32(cfqq->seek_history) > 32/8)
- 
- #define RQ_CIC(rq)		icq_to_cic((rq)->elv.icq)
-@@ -2714,8 +2713,7 @@ static bool cfq_should_idle(struct cfq_data *cfqd, struct cfq_queue *cfqq)
- 		return false;
- 
- 	/* We do for queues that were marked with idle window flag. */
--	if (cfq_cfqq_idle_window(cfqq) &&
--	   !(blk_queue_nonrot(cfqd->queue) && cfqd->hw_tag))
-+	if (cfq_cfqq_idle_window(cfqq))
- 		return true;
- 
- 	/*
-@@ -2737,14 +2735,6 @@ static void cfq_arm_slice_timer(struct cfq_data *cfqd)
- 	u64 sl, group_idle = 0;
- 	u64 now = ktime_get_ns();
- 
--	/*
--	 * SSD device without seek penalty, disable idling. But only do so
--	 * for devices that support queuing, otherwise we still have a problem
--	 * with sync vs async workloads.
--	 */
--	if (blk_queue_nonrot(cfqd->queue) && cfqd->hw_tag)
--		return;
--
- 	WARN_ON(!RB_EMPTY_ROOT(&cfqq->sort_list));
- 	WARN_ON(cfq_cfqq_slice_new(cfqq));
- 
-@@ -3611,7 +3601,6 @@ cfq_update_io_seektime(struct cfq_data *cfqd, struct cfq_queue *cfqq,
- 		       struct request *rq)
- {
- 	sector_t sdist = 0;
--	sector_t n_sec = blk_rq_sectors(rq);
- 	if (cfqq->last_request_pos) {
- 		if (cfqq->last_request_pos < blk_rq_pos(rq))
- 			sdist = blk_rq_pos(rq) - cfqq->last_request_pos;
-@@ -3620,10 +3609,7 @@ cfq_update_io_seektime(struct cfq_data *cfqd, struct cfq_queue *cfqq,
- 	}
- 
- 	cfqq->seek_history <<= 1;
--	if (blk_queue_nonrot(cfqd->queue))
--		cfqq->seek_history |= (n_sec < CFQQ_SECT_THR_NONROT);
--	else
--		cfqq->seek_history |= (sdist > CFQQ_SEEK_THR);
-+	cfqq->seek_history |= (sdist > CFQQ_SEEK_THR);
- }
- 
- /*
+-		ret = copy_page_to_iter(page, offset, nr, iter);
++		ret = copy_page_to_iter(page + index - page->index, offset,
++				nr, iter);
+ 		offset += ret;
+ 		index += offset >> PAGE_SHIFT;
+ 		offset &= ~PAGE_MASK;
+@@ -2356,6 +2358,7 @@ page_not_uptodate:
+ 	 * because there really aren't any performance issues here
+ 	 * and we need to check for errors.
+ 	 */
++	page = compound_head(page);
+ 	ClearPageError(page);
+ 	error = mapping->a_ops->readpage(file, page);
+ 	if (!error) {
 -- 
-1.9.1
+2.8.1
+
