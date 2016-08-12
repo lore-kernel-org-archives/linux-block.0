@@ -1,52 +1,80 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-qk0-f193.google.com ([209.85.220.193]:33545 "EHLO
-	mail-qk0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751264AbcHLFSa (ORCPT
-	<rfc822;linux-block@vger.kernel.org>);
-	Fri, 12 Aug 2016 01:18:30 -0400
-MIME-Version: 1.0
-In-Reply-To: <yq1mvkipwx5.fsf@sermon.lab.mkp.net>
-References: <5eceeb9ad825beb87db03b0989f746dfbe0cf3fe.1470753817.git.tom.ty89@gmail.com>
- <10c4d38005e24bb477b5182d4fc17879139f14d9.1470753817.git.tom.ty89@gmail.com>
- <20160810041042.GH25053@mtj.duckdns.org> <CAGnHSE=z78AjDC13XKk_WnkQcjFHWGcatciwoJJYW-97a0qWjQ@mail.gmail.com>
- <yq1twesq8lm.fsf@sermon.lab.mkp.net> <CAGnHSEn3pXR33Ju+mr0DYdE0G7kNhxNCbvocX1pZXvYfxx5+3A@mail.gmail.com>
- <yq1mvkipwx5.fsf@sermon.lab.mkp.net>
-From: Tom Yan <tom.ty89@gmail.com>
-Date: Fri, 12 Aug 2016 13:18:28 +0800
-Message-ID: <CAGnHSEm0mGPG_y2a7hmCzQkwYE23Srozrm6eSPX8a3Q9a0y+7A@mail.gmail.com>
-Subject: Re: [PATCH v2 2/2] libata-core: do not set dev->max_sectors for LBA48 devices
-To: "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: Tejun Heo <tj@kernel.org>, jmoyer@redhat.com, axboe@fb.com,
+Return-Path: <linux-ide-owner@vger.kernel.org>
+To: Tom Yan <tom.ty89@gmail.com>
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
+	Tejun Heo <tj@kernel.org>, jmoyer@redhat.com, axboe@fb.com,
 	linux-ide@vger.kernel.org, linux-scsi@vger.kernel.org,
 	linux-block@vger.kernel.org,
 	Sergei Shtylyov <sergei.shtylyov@cogentembedded.com>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Subject: Re: [PATCH v2 2/2] libata-core: do not set dev->max_sectors for LBA48 devices
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <5eceeb9ad825beb87db03b0989f746dfbe0cf3fe.1470753817.git.tom.ty89@gmail.com>
+	<10c4d38005e24bb477b5182d4fc17879139f14d9.1470753817.git.tom.ty89@gmail.com>
+	<20160810041042.GH25053@mtj.duckdns.org>
+	<CAGnHSE=z78AjDC13XKk_WnkQcjFHWGcatciwoJJYW-97a0qWjQ@mail.gmail.com>
+	<yq1twesq8lm.fsf@sermon.lab.mkp.net>
+	<CAGnHSEn3pXR33Ju+mr0DYdE0G7kNhxNCbvocX1pZXvYfxx5+3A@mail.gmail.com>
+Date: Thu, 11 Aug 2016 22:01:58 -0400
+In-Reply-To: <CAGnHSEn3pXR33Ju+mr0DYdE0G7kNhxNCbvocX1pZXvYfxx5+3A@mail.gmail.com>
+	(Tom Yan's message of "Thu, 11 Aug 2016 17:30:59 +0800")
+Message-ID: <yq1mvkipwx5.fsf@sermon.lab.mkp.net>
+MIME-Version: 1.0
+Content-Type: text/plain
+Sender: linux-ide-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-On 12 August 2016 at 10:01, Martin K. Petersen
-<martin.petersen@oracle.com> wrote:
->
-> Again, the point of max_hw_sectors and max_dev_sectors is to enforce the
-> hard limits of controller and device respectively. Nothing else.
->
+>>>>> "Tom" == Tom Yan <tom.ty89@gmail.com> writes:
 
-Sounds like libata-scsi is doing something wrong then. It should not
-set max_hw_sectors to dev->max_sectors that is set by libata-core:
+Hey Tom,
 
-> blk_queue_max_hw_sectors(q, dev->max_sectors);
+Tom> Shouldn't we use Maximum Transfer Length to derive max_sectors (and
+Tom> get rid of the almost useless max_dev_sectors)?
 
-but instead it should report it as Maximum Transfer Length and let sd
-set it as max_dev_sectors:
+MAXIMUM TRANSFER LENGTH could be gigabytes. Some disks report it as the
+full capacity of the device.
 
-> put_unaligned_be32(dev->max_sectors, &rbuf[8]);
+Again, the point of max_hw_sectors and max_dev_sectors is to enforce the
+hard limits of controller and device respectively. Nothing else.
 
-While max_hw_sectors will be left untouched (in the case of AHCI, for
-example, since its SCSI host template does not have max_sectors set;
-so max_hw_sectors will be SCSI_DEFAULT_MAX_SECTORS).
+max_sectors is a soft limit for filesystem read/write requests and is
+chosen to be a sane default for common workloads. It can be bumped (up
+to the smaller of the hard limits) if the user so desires.
 
-Although that means setting dev->max_sectors to a value larger than
-1024 will probably be a no-op, if that's really an issue, we should
-have the host templates in libata updated.
+Tom> Honestly it looks pretty non-sensical to me that the SCSI disk
+Tom> driver uses Optimal Transfer Length for max_sectors.
 
-Make sense?
+OPTIMAL TRANSFER LENGTH is there to address a very specific problem,
+namely avoiding partial stripe writes on RAID arrays.
+
+For almost all other device classes it is not reported and it makes no
+sense to do so. For those remaining devices BLK_DEF_MAX_SECTORS comes
+into play.
+
+Tom> But the biggest problem isn't on bumping it, but the value picked
+Tom> is totally irrational for a general default. I mean, given that it
+Tom> was 1024 (512k), try to double it? Fine. Try to quadruple it?
+Tom> Alright.  We'll need to deal with some alignment / boundary issue
+Tom> (like the typical 65535 vs 65536 case)? Okay let's do it. But
+Tom> what's the sense in picking a random RAID configuartion as the base
+Tom> to decide the default?
+
+I agree that the new default is completely arbitrary. And I think there
+was a bit of controversy at the time. However, the numbers were
+compelling so the change went in.
+
+We are open to a discussion about what the default should be. But it
+involves backing the discussion up with solid data.
+
+Tom> So we should use also SCSI_DEFAULT_MAX_SECTORS in the SCSI disk
+Tom> driver as fallback for max_sectors. If the value is considered to
+Tom> low even as a safe fallback, then it should be bumped
+Tom> appropriately. (Or we might want to replace it with
+Tom> BLK_DEF_MAX_SECTORS everywhere in the SCSI layer, that said, after
+Tom> the value is fixed.)
+
+SCSI_DEFAULT_MAX_SECTORS is there to provide a safe max for legacy SCSI
+controller drivers that haven't been updated or tested with larger
+transfers. It has nothing to do with sd drive limits or block layer
+defaults.
+
+-- 
+Martin K. Petersen	Oracle Linux Engineering
