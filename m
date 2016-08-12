@@ -1,76 +1,72 @@
-Return-Path: <krisman@linux.vnet.ibm.com>
-From: Gabriel Krisman Bertazi <krisman@linux.vnet.ibm.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Gabriel Krisman Bertazi <krisman@linux.vnet.ibm.com>,
-        Brian King <brking@linux.vnet.ibm.com>, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org
-Subject: [RFC PATCH] blk-mq: Prevent round-robin from scheduling dead cpus
-Date: Tue,  2 Aug 2016 13:19:31 -0300
-Message-Id: <1470154771-22774-1-git-send-email-krisman@linux.vnet.ibm.com>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+	Andreas Dilger <adilger.kernel@dilger.ca>,
+	Jan Kara <jack@suse.com>,
+	Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+	Hugh Dickins <hughd@google.com>,
+	Andrea Arcangeli <aarcange@redhat.com>,
+	Dave Hansen <dave.hansen@intel.com>,
+	Vlastimil Babka <vbabka@suse.cz>,
+	Matthew Wilcox <willy@infradead.org>,
+	Ross Zwisler <ross.zwisler@linux.intel.com>,
+	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+	linux-block@vger.kernel.org,
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv2 25/41] fs: make block_page_mkwrite() aware about huge pages
+Date: Fri, 12 Aug 2016 21:38:08 +0300
+Message-Id: <1471027104-115213-26-git-send-email-kirill.shutemov@linux.intel.com>
+In-Reply-To: <1471027104-115213-1-git-send-email-kirill.shutemov@linux.intel.com>
+References: <1471027104-115213-1-git-send-email-kirill.shutemov@linux.intel.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Hi,
+Adjust check on whether part of the page beyond file size and apply
+compound_head() and page_mapping() where appropriate.
 
-I'm not completely sure I got the cause for this one completely right.
-Still, it does looks like the correct fix and a good improvement in the
-overall, so I'm making it an RFC for now to gather some feedback.
-
-Let me hear your thoughts.
-
--- >8 --
-
-When notifying blk-mq about CPU removals while running IO, we risk
-racing the hctx->cpumask update with blk_mq_hctx_next_cpu, and end up
-scheduling a dead cpu to execute hctx->run_{,delayed_}work.  As a
-result, kblockd_schedule_delayed_work_on() may schedule another cpu
-outside of hctx->cpumask, which triggers the following warning at
-__blk_mq_run_hw_queue:
-
-WARN_ON(!cpumask_test_cpu(raw_smp_processor_id(), hctx->cpumask));
-
-This patch makes the issue much more unlikely to happen, as it makes
-blk_mq_hctx_next_cpu aware of dead cpus, and triggers the round-robin
-code, despite of remaining batch processing time.  Thus, in case we
-offline a cpu in the middle of its batch processing time, we no longer
-waste time scheduling it here, and just move through to the next cpu in
-the mask.
-
-The warning may still be triggered, though, since this is not the only
-case that may cause the queue to schedule on a dead cpu.  But this fixes
-the common case, which is the remaining batch processing time of a
-sudden dead cpu, which makes the issue much more unlikely to happen.
-
-Signed-off-by: Gabriel Krisman Bertazi <krisman@linux.vnet.ibm.com>
-Cc: Brian King <brking@linux.vnet.ibm.com>
-Cc: linux-block@vger.kernel.org
-Cc: linux-scsi@vger.kernel.org
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- block/blk-mq.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ fs/buffer.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index c27bb37..a2cb64c 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -858,7 +858,8 @@ static int blk_mq_hctx_next_cpu(struct blk_mq_hw_ctx *hctx)
- 	if (hctx->queue->nr_hw_queues == 1)
- 		return WORK_CPU_UNBOUND;
+diff --git a/fs/buffer.c b/fs/buffer.c
+index 7f50e5a63670..e53808e790e2 100644
+--- a/fs/buffer.c
++++ b/fs/buffer.c
+@@ -2502,7 +2502,7 @@ EXPORT_SYMBOL(block_commit_write);
+ int block_page_mkwrite(struct vm_area_struct *vma, struct vm_fault *vmf,
+ 			 get_block_t get_block)
+ {
+-	struct page *page = vmf->page;
++	struct page *page = compound_head(vmf->page);
+ 	struct inode *inode = file_inode(vma->vm_file);
+ 	unsigned long end;
+ 	loff_t size;
+@@ -2510,7 +2510,7 @@ int block_page_mkwrite(struct vm_area_struct *vma, struct vm_fault *vmf,
  
--	if (--hctx->next_cpu_batch <= 0) {
-+	if (--hctx->next_cpu_batch <= 0 ||
-+	    !cpumask_test_cpu(hctx->next_cpu, cpu_online_mask)) {
- 		int cpu = hctx->next_cpu, next_cpu;
- 
- 		next_cpu = cpumask_next(hctx->next_cpu, hctx->cpumask);
-@@ -868,7 +869,8 @@ static int blk_mq_hctx_next_cpu(struct blk_mq_hw_ctx *hctx)
- 		hctx->next_cpu = next_cpu;
- 		hctx->next_cpu_batch = BLK_MQ_CPU_WORK_BATCH;
- 
--		return cpu;
-+		return (cpumask_test_cpu(cpu, cpu_online_mask)) ?
-+			cpu : blk_mq_hctx_next_cpu(hctx);
+ 	lock_page(page);
+ 	size = i_size_read(inode);
+-	if ((page->mapping != inode->i_mapping) ||
++	if ((page_mapping(page) != inode->i_mapping) ||
+ 	    (page_offset(page) > size)) {
+ 		/* We overload EFAULT to mean page got truncated */
+ 		ret = -EFAULT;
+@@ -2518,10 +2518,10 @@ int block_page_mkwrite(struct vm_area_struct *vma, struct vm_fault *vmf,
  	}
  
- 	return hctx->next_cpu;
+ 	/* page is wholly or partially inside EOF */
+-	if (((page->index + 1) << PAGE_SHIFT) > size)
+-		end = size & ~PAGE_MASK;
++	if (((page->index + hpage_nr_pages(page)) << PAGE_SHIFT) > size)
++		end = size & ~hpage_mask(page);
+ 	else
+-		end = PAGE_SIZE;
++		end = hpage_size(page);
+ 
+ 	ret = __block_write_begin(page, 0, end, get_block);
+ 	if (!ret)
 -- 
-2.7.4
+2.8.1
+
