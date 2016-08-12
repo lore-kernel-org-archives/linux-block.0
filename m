@@ -1,34 +1,66 @@
-Return-Path: <iamyooon@gmail.com>
-Return-Path: <iamyooon@gmail.com>
-From: "seokhoon.yoon" <iamyooon@gmail.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	iamyooon@gmail.com
-Subject: [PATCH 1/1] blkio: update cgroup's document path
-Date: Tue,  2 Aug 2016 23:31:31 +0900
-Message-Id: <1470148291-6269-1-git-send-email-iamyooon@gmail.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga14.intel.com ([192.55.52.115]:28738 "EHLO mga14.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752921AbcHLSjI (ORCPT <rfc822;linux-block@vger.kernel.org>);
+	Fri, 12 Aug 2016 14:39:08 -0400
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+	Andreas Dilger <adilger.kernel@dilger.ca>,
+	Jan Kara <jack@suse.com>,
+	Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+	Hugh Dickins <hughd@google.com>,
+	Andrea Arcangeli <aarcange@redhat.com>,
+	Dave Hansen <dave.hansen@intel.com>,
+	Vlastimil Babka <vbabka@suse.cz>,
+	Matthew Wilcox <willy@infradead.org>,
+	Ross Zwisler <ross.zwisler@linux.intel.com>,
+	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+	linux-block@vger.kernel.org,
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv2 12/41] thp: handle write-protection faults for file THP
+Date: Fri, 12 Aug 2016 21:37:55 +0300
+Message-Id: <1471027104-115213-13-git-send-email-kirill.shutemov@linux.intel.com>
+In-Reply-To: <1471027104-115213-1-git-send-email-kirill.shutemov@linux.intel.com>
+References: <1471027104-115213-1-git-send-email-kirill.shutemov@linux.intel.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-cgroup's document path is changed to "cgroup-v1". update it.
+For filesystems that wants to be write-notified (has mkwrite), we will
+encount write-protection faults for huge PMDs in shared mappings.
 
-Signed-off-by: seokhoon.yoon <iamyooon@gmail.com>
+The easiest way to handle them is to clear the PMD and let it refault as
+wriable.
+
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- block/Kconfig | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ mm/memory.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/block/Kconfig b/block/Kconfig
-index 0363cd7..5665ffe 100644
---- a/block/Kconfig
-+++ b/block/Kconfig
-@@ -111,7 +111,7 @@ config BLK_DEV_THROTTLING
- 	one needs to mount and use blkio cgroup controller for creating
- 	cgroups and specifying per device IO rate policies.
+diff --git a/mm/memory.c b/mm/memory.c
+index 4425b6059339..5b7f0ce44a27 100644
+--- a/mm/memory.c
++++ b/mm/memory.c
+@@ -3448,8 +3448,17 @@ static int wp_huge_pmd(struct fault_env *fe, pmd_t orig_pmd)
+ 		return fe->vma->vm_ops->pmd_fault(fe->vma, fe->address, fe->pmd,
+ 				fe->flags);
  
--	See Documentation/cgroups/blkio-controller.txt for more information.
-+	See Documentation/cgroup-v1/blkio-controller.txt for more information.
++	if (fe->vma->vm_flags & VM_SHARED) {
++		/* Clear PMD */
++		zap_page_range_single(fe->vma, fe->address,
++				HPAGE_PMD_SIZE, NULL);
++		VM_BUG_ON(!pmd_none(*fe->pmd));
++
++		/* Refault to establish writable PMD */
++		return 0;
++	}
++
+ 	/* COW handled on pte level: split pmd */
+-	VM_BUG_ON_VMA(fe->vma->vm_flags & VM_SHARED, fe->vma);
+ 	split_huge_pmd(fe->vma, fe->pmd, fe->address);
  
- config BLK_CMDLINE_PARSER
- 	bool "Block device command line partition parser"
+ 	return VM_FAULT_FALLBACK;
 -- 
-1.9.1
+2.8.1
+
