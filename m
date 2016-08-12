@@ -1,53 +1,115 @@
-Return-Path: <linux-ide-owner@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pf0-f196.google.com ([209.85.192.196]:34200 "EHLO
+	mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752147AbcHLO1S (ORCPT
+	<rfc822;linux-block@vger.kernel.org>);
+	Fri, 12 Aug 2016 10:27:18 -0400
 From: tom.ty89@gmail.com
-To: tj@kernel.org
+To: tj@kernel.org, martin.petersen@oracle.com
 Cc: linux-ide@vger.kernel.org, linux-scsi@vger.kernel.org,
 	linux-block@vger.kernel.org, Tom Yan <tom.ty89@gmail.com>
-Subject: [PATCH v2 2/2] libata-core: do not set dev->max_sectors for LBA48 devices
-Date: Tue,  9 Aug 2016 22:45:47 +0800
-Message-Id: <10c4d38005e24bb477b5182d4fc17879139f14d9.1470753817.git.tom.ty89@gmail.com>
-In-Reply-To: <5eceeb9ad825beb87db03b0989f746dfbe0cf3fe.1470753817.git.tom.ty89@gmail.com>
-References: <5eceeb9ad825beb87db03b0989f746dfbe0cf3fe.1470753817.git.tom.ty89@gmail.com>
-Sender: linux-ide-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Subject: [PATCH v2 1/2] libata-scsi: use dev->max_sectors from libata-core appropriately
+Date: Fri, 12 Aug 2016 22:27:03 +0800
+Message-Id: <60518e90d462d4cbb1c528914eac64e2fe124717.1471011949.git.tom.ty89@gmail.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
 From: Tom Yan <tom.ty89@gmail.com>
 
-Currently block layer limit max_hw_sectors is set to
-ATA_MAX_SECTORS_LBA48 (65535), for devices with LBA48 support.
+Currently we use dev->max_sectors to set max_hw_sectors, which
+is actually supposed to be a host controller limit (that get set
+by the host controller driver like ahci, and if not it would be
+the fallback SCSI_DEFAULT_MAX_SECTORS).
 
-However, block layer limit max_sectors (which is the effective
-one; also adjustable, upper-bounded by max_hw_sectors) is set to
-BLK_DEF_MAX_SECTORS (currently 2560) by the scsi disk driver,
-since libata's SATL does not report an Optimal Transfer Length.
+That means we have been doing the wrong thing. Therefore, use it
+to set the correct request queue limit that is used to report
+device limit: max_dev_sectors.
 
-This does not make much sense, especially when the current
-BLK_DEF_MAX_SECTORS appears to be unsafe for some ATA devices
-(see ATA_HORKAGE_MAX_SEC_1024). Truth is, the current value
-appears to be arbitrary anyway. See commit d2be537c3ba3
-("block: bump BLK_DEF_MAX_SECTORS to 2560").
+For disk devices, it is reported through the Maximum Transfer Length
+field on the Block Limits VPD to the SCSI disk driver, which will
+then set and make use of max_dev_sectors.
 
-Therefore, avoid setting dev->max_sectors when it is strictly
-necessary. Leave it as 0 otherwise, so that both block layer
-limits will remain as SCSI_DEFAULT_MAX_SECTORS (currently 1024).
+Note that when max_dev_sectors is larger than max_hw_sectors, it
+does not have any effect. Therefore, setting dev->max_sectors to
+ATA_MAX_SECTORS_LBA48 will only have some effect when the host
+driver has set max_hw_sectors to a value that is as large as that.
+
+This should not matter for typical devices, since according to our
+past experience, 1024 (the current SCSI_DEFAULT_MAX_SECTORS) is a
+decent and safe value for max_sectors. ATA_MAX_SECTORS_LBA48 has
+actually appeared to be too large for some devices.
+
+For cdrom devices, there is a different story. Since a few ATAPI
+devices needed ATA_HORKAGE_MAX_SEC_LBA48 to work. Therefore,
+max_hw_sectors must be set to match with that, so that the
+effective max_sectors can be set to ATA_MAX_SECTORS_LBA48.
+
+Signed-off-by: Tom Yan <tom.ty89@gmail.com>
 
 diff --git a/drivers/ata/libata-core.c b/drivers/ata/libata-core.c
-index 0749f71..07259d8 100644
+index 223a770..39374236 100644
 --- a/drivers/ata/libata-core.c
 +++ b/drivers/ata/libata-core.c
-@@ -2610,10 +2610,8 @@ int ata_dev_configure(struct ata_device *dev)
- 				     dma_dir_string);
- 	}
+@@ -2639,6 +2639,11 @@ int ata_dev_configure(struct ata_device *dev)
+ 		dev->max_sectors = min_t(unsigned int, ATA_MAX_SECTORS_1024,
+ 					 dev->max_sectors);
  
--	/* determine max_sectors */
--	dev->max_sectors = ATA_MAX_SECTORS;
--	if (dev->flags & ATA_DFLAG_LBA48)
--		dev->max_sectors = ATA_MAX_SECTORS_LBA48;
-+	if (!(dev->flags & ATA_DFLAG_LBA48))
-+		dev->max_sectors = ATA_MAX_SECTORS;
++	/* For disk devices, max sectors set here will only be used as
++	 * max_dev_sectors. We should never expect max sectors horkage
++	 * that sets the value larger than BLK_DEF_MAX_SECTORS to work
++	 * for non-ATAPI devices. */
++
+ 	if (dev->horkage & ATA_HORKAGE_MAX_SEC_LBA48)
+ 		dev->max_sectors = ATA_MAX_SECTORS_LBA48;
  
- 	/* Limit PATA drive on SATA cable bridge transfers to udma5,
- 	   200 sectors */
+diff --git a/drivers/ata/libata-scsi.c b/drivers/ata/libata-scsi.c
+index be9c76c..13f518b 100644
+--- a/drivers/ata/libata-scsi.c
++++ b/drivers/ata/libata-scsi.c
+@@ -1204,14 +1204,26 @@ static int ata_scsi_dev_config(struct scsi_device *sdev,
+ 	if (!ata_id_has_unload(dev->id))
+ 		dev->flags |= ATA_DFLAG_NO_UNLOAD;
+ 
+-	/* configure max sectors */
+-	blk_queue_max_hw_sectors(q, dev->max_sectors);
+-
+ 	if (dev->class == ATA_DEV_ATAPI) {
+ 		void *buf;
+ 
+ 		sdev->sector_size = ATA_SECT_SIZE;
+ 
++		/*
++		 * max_hw_sectors is supposed to be host controller limit, it is
++		 * changed here only to make sure ATA_HORKAGE_MAX_SEC_LBA48 that
++		 * is needed by a few ATAPI devices works.
++		 *
++		 * Unlike the SCSI disk driver, the SCSI cdrom (sr) driver will
++		 * not further change max_sectors. Therefore, the value that is
++		 * also set here is guaranteed to be the effective one.
++		 *
++		 * For disk devices, we should only report dev->max_sectors in
++		 * the Maximum Transfer Length field on the Block Limits VPD
++		 * (which CD/DVD devices are not supposed to have).
++		 */
++		blk_queue_max_hw_sectors(q, dev->max_sectors);
++
+ 		/* set DMA padding */
+ 		blk_queue_update_dma_pad(q, ATA_DMA_PAD_SZ - 1);
+ 
+@@ -2310,6 +2322,13 @@ static unsigned int ata_scsiop_inq_b0(struct ata_scsi_args *args, u8 *rbuf)
+ 	put_unaligned_be16(min_io_sectors, &rbuf[6]);
+ 
+ 	/*
++	 * Maximum transfer length.
++	 *
++	 * This will be used by the SCSI disk driver to set max_dev_sectors.
++	 */
++	put_unaligned_be32(args->dev->max_sectors, &rbuf[8]);
++
++	/*
+ 	 * Optimal unmap granularity.
+ 	 *
+ 	 * The ATA spec doesn't even know about a granularity or alignment
 -- 
 2.9.2
 
