@@ -1,104 +1,77 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.9]:37531 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932244AbcH2Kx7 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 29 Aug 2016 06:53:59 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@fb.com
-Cc: keith.busch@intel.com, linux-block@vger.kernel.org,
-        linux-nvme@lists.infradead.org
-Subject: [PATCH 7/7] blk-mq: get rid of the cpumask in struct blk_mq_tags
-Date: Mon, 29 Aug 2016 12:53:33 +0200
-Message-Id: <1472468013-29936-8-git-send-email-hch@lst.de>
-In-Reply-To: <1472468013-29936-1-git-send-email-hch@lst.de>
-References: <1472468013-29936-1-git-send-email-hch@lst.de>
+Received: from mga02.intel.com ([134.134.136.20]:64597 "EHLO mga02.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752723AbcHLSi5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+	Fri, 12 Aug 2016 14:38:57 -0400
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+	Andreas Dilger <adilger.kernel@dilger.ca>,
+	Jan Kara <jack@suse.com>,
+	Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+	Hugh Dickins <hughd@google.com>,
+	Andrea Arcangeli <aarcange@redhat.com>,
+	Dave Hansen <dave.hansen@intel.com>,
+	Vlastimil Babka <vbabka@suse.cz>,
+	Matthew Wilcox <willy@infradead.org>,
+	Ross Zwisler <ross.zwisler@linux.intel.com>,
+	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+	linux-block@vger.kernel.org,
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv2 31/41] ext4: handle huge pages in ext4_page_mkwrite()
+Date: Fri, 12 Aug 2016 21:38:14 +0300
+Message-Id: <1471027104-115213-32-git-send-email-kirill.shutemov@linux.intel.com>
+In-Reply-To: <1471027104-115213-1-git-send-email-kirill.shutemov@linux.intel.com>
+References: <1471027104-115213-1-git-send-email-kirill.shutemov@linux.intel.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Unused now that NVMe sets up irq affinity before calling into blk-mq.
+Trivial: remove assumption on page size.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- block/blk-mq-tag.c     | 6 ------
- block/blk-mq-tag.h     | 1 -
- block/blk-mq.c         | 7 -------
- include/linux/blk-mq.h | 1 -
- 4 files changed, 15 deletions(-)
+ fs/ext4/inode.c | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
 
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index 1602813..2eae3d5 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -665,11 +665,6 @@ struct blk_mq_tags *blk_mq_init_tags(unsigned int total_tags,
- 	if (!tags)
- 		return NULL;
+diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
+index f585f9160a96..cd435d4a10f0 100644
+--- a/fs/ext4/inode.c
++++ b/fs/ext4/inode.c
+@@ -5646,7 +5646,7 @@ static int ext4_bh_unmapped(handle_t *handle, struct buffer_head *bh)
  
--	if (!zalloc_cpumask_var(&tags->cpumask, GFP_KERNEL)) {
--		kfree(tags);
--		return NULL;
--	}
--
- 	tags->nr_tags = total_tags;
- 	tags->nr_reserved_tags = reserved_tags;
- 
-@@ -680,7 +675,6 @@ void blk_mq_free_tags(struct blk_mq_tags *tags)
+ int ext4_page_mkwrite(struct vm_area_struct *vma, struct vm_fault *vmf)
  {
- 	bt_free(&tags->bitmap_tags);
- 	bt_free(&tags->breserved_tags);
--	free_cpumask_var(tags->cpumask);
- 	kfree(tags);
- }
+-	struct page *page = vmf->page;
++	struct page *page = compound_head(vmf->page);
+ 	loff_t size;
+ 	unsigned long len;
+ 	int ret;
+@@ -5682,10 +5682,10 @@ int ext4_page_mkwrite(struct vm_area_struct *vma, struct vm_fault *vmf)
+ 		goto out;
+ 	}
  
-diff --git a/block/blk-mq-tag.h b/block/blk-mq-tag.h
-index d468a79..5569641 100644
---- a/block/blk-mq-tag.h
-+++ b/block/blk-mq-tag.h
-@@ -44,7 +44,6 @@ struct blk_mq_tags {
- 	struct list_head page_list;
- 
- 	int alloc_policy;
--	cpumask_var_t cpumask;
- };
- 
- 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index a679562..1fc42a0 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1852,7 +1852,6 @@ static void blk_mq_map_swqueue(struct request_queue *q,
- 		hctx->tags = set->tags[i];
- 		WARN_ON(!hctx->tags);
- 
--		cpumask_copy(hctx->tags->cpumask, hctx->cpumask);
- 		/*
- 		 * Set the map size to the number of mapped software queues.
- 		 * This is more accurate and more efficient than looping
-@@ -2279,12 +2278,6 @@ static int blk_mq_alloc_rq_maps(struct blk_mq_tag_set *set)
- 	return 0;
- }
- 
--struct cpumask *blk_mq_tags_cpumask(struct blk_mq_tags *tags)
--{
--	return tags->cpumask;
--}
--EXPORT_SYMBOL_GPL(blk_mq_tags_cpumask);
--
- static int blk_mq_create_mq_map(struct blk_mq_tag_set *set,
- 		const struct cpumask *affinity_mask)
- {
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 29e227b..79a421e 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -197,7 +197,6 @@ struct request *blk_mq_alloc_request(struct request_queue *q, int rw,
- struct request *blk_mq_alloc_request_hctx(struct request_queue *q, int op,
- 		unsigned int flags, unsigned int hctx_idx);
- struct request *blk_mq_tag_to_rq(struct blk_mq_tags *tags, unsigned int tag);
--struct cpumask *blk_mq_tags_cpumask(struct blk_mq_tags *tags);
- 
- enum {
- 	BLK_MQ_UNIQUE_TAG_BITS = 16,
+-	if (page->index == size >> PAGE_SHIFT)
+-		len = size & ~PAGE_MASK;
+-	else
+-		len = PAGE_SIZE;
++	len = hpage_size(page);
++	if (page->index + hpage_nr_pages(page) - 1 == size >> PAGE_SHIFT)
++		len = size & ~hpage_mask(page);
++
+ 	/*
+ 	 * Return if we have all the buffers mapped. This avoids the need to do
+ 	 * journal_start/journal_stop which can block and take a long time
+@@ -5716,7 +5716,8 @@ retry_alloc:
+ 	ret = block_page_mkwrite(vma, vmf, get_block);
+ 	if (!ret && ext4_should_journal_data(inode)) {
+ 		if (ext4_walk_page_buffers(handle, page_buffers(page), 0,
+-			  PAGE_SIZE, NULL, do_journal_get_write_access)) {
++			  hpage_size(page), NULL,
++			  do_journal_get_write_access)) {
+ 			unlock_page(page);
+ 			ret = VM_FAULT_SIGBUS;
+ 			ext4_journal_stop(handle);
 -- 
-2.1.4
+2.8.1
 
