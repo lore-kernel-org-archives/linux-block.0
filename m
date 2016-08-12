@@ -1,94 +1,100 @@
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>,
-	Tejun Heo <tj@kernel.org>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	linus.walleij@linaro.org,
-	broonie@kernel.org,
-	Paolo Valente <paolo.valente@linaro.org>,
-	Arianna Avanzini <avanzini.arianna@gmail.com>
-Subject: [PATCH V2 21/22] block, bfq: boost the throughput with random I/O on NCQ-capable HDDs
-Date: Mon,  8 Aug 2016 13:15:16 +0200
-Message-Id: <1470654917-4280-22-git-send-email-paolo.valente@linaro.org>
-In-Reply-To: <1470654917-4280-1-git-send-email-paolo.valente@linaro.org>
-References: <1470654917-4280-1-git-send-email-paolo.valente@linaro.org>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+	Andreas Dilger <adilger.kernel@dilger.ca>,
+	Jan Kara <jack@suse.com>,
+	Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+	Hugh Dickins <hughd@google.com>,
+	Andrea Arcangeli <aarcange@redhat.com>,
+	Dave Hansen <dave.hansen@intel.com>,
+	Vlastimil Babka <vbabka@suse.cz>,
+	Matthew Wilcox <willy@infradead.org>,
+	Ross Zwisler <ross.zwisler@linux.intel.com>,
+	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+	linux-block@vger.kernel.org,
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv2 11/41] thp: try to free page's buffers before attempt split
+Date: Fri, 12 Aug 2016 21:37:54 +0300
+Message-Id: <1471027104-115213-12-git-send-email-kirill.shutemov@linux.intel.com>
+In-Reply-To: <1471027104-115213-1-git-send-email-kirill.shutemov@linux.intel.com>
+References: <1471027104-115213-1-git-send-email-kirill.shutemov@linux.intel.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-This patch is basically the counterpart, for NCQ-capable rotational
-devices, of the previous patch. Exactly as the previous patch does on
-flash-based devices and for any workload, this patch disables device
-idling on rotational devices, but only for random I/O. In fact, only
-with these queues disabling idling boosts the throughput on
-NCQ-capable rotational devices. To not break service guarantees,
-idling is disabled for NCQ-enabled rotational devices only when the
-same symmetry conditions considered in the previous patches hold.
+We want page to be isolated from the rest of the system before spliting
+it. We rely on page count to be 2 for file pages to make sure nobody
+uses the page: one pin to caller, one to radix-tree.
 
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
-Signed-off-by: Arianna Avanzini <avanzini.arianna@gmail.com>
+Filesystems with backing storage can have page count increased if it has
+buffers.
+
+Let's try to free them, before attempt split. And remove one guarding
+VM_BUG_ON_PAGE().
+
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- block/cfq-iosched.c | 22 ++++++++++------------
- 1 file changed, 10 insertions(+), 12 deletions(-)
+ include/linux/buffer_head.h |  1 +
+ mm/huge_memory.c            | 19 ++++++++++++++++++-
+ 2 files changed, 19 insertions(+), 1 deletion(-)
 
-diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
-index c0469fd..50dab96 100644
---- a/block/cfq-iosched.c
-+++ b/block/cfq-iosched.c
-@@ -38,7 +38,9 @@
-  * Even better for latency, BFQ explicitly privileges the I/O of two
-  * classes of time-sensitive applications: interactive and soft
-  * real-time. This feature enables BFQ to provide applications in
-- * these classes with a very low latency.
-+ * these classes with a very low latency. Finally, BFQ also features
-+ * additional heuristics for preserving both a low latency and a high
-+ * throughput on NCQ-capable, rotational or flash-based devices.
-  *
-  * With respect to the version of BFQ presented in [1], and in the
-  * papers cited therein, this implementation adds a hierarchical
-@@ -5661,20 +5663,15 @@ static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
- 	 * The next variable takes into account the cases where idling
- 	 * boosts the throughput.
- 	 *
--	 * The value of the variable is computed considering that
--	 * idling is usually beneficial for the throughput if:
-+	 * The value of the variable is computed considering, first, that
-+	 * idling is virtually always beneficial for the throughput if:
- 	 * (a) the device is not NCQ-capable, or
- 	 * (b) regardless of the presence of NCQ, the device is rotational
--	 *     and the request pattern for bfqq is I/O-bound (possible
--	 *     throughput losses caused by granting idling to seeky queues
--	 *     are mitigated by the fact that, in all scenarios where
--	 *     boosting throughput is the best thing to do, i.e., in all
--	 *     symmetric scenarios, only a minimal idle time is allowed to
--	 *     seeky queues).
-+	 *     and the request pattern for bfqq is I/O-bound and sequential.
- 	 *
- 	 * Secondly, and in contrast to the above item (b), idling an
- 	 * NCQ-capable flash-based device would not boost the
--	 * throughput even with intense I/O; rather it would lower
-+	 * throughput even with sequential I/O; rather it would lower
- 	 * the throughput in proportion to how fast the device
- 	 * is. Accordingly, the next variable is true if any of the
- 	 * above conditions (a) and (b) is true, and, in particular,
-@@ -5682,7 +5679,8 @@ static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
- 	 * device.
- 	 */
- 	idling_boosts_thr = !bfqd->hw_tag ||
--		(!blk_queue_nonrot(bfqd->queue) && bfq_bfqq_IO_bound(bfqq));
-+		(!blk_queue_nonrot(bfqd->queue) && bfq_bfqq_IO_bound(bfqq) &&
-+		 bfq_bfqq_idle_window(bfqq));
+diff --git a/include/linux/buffer_head.h b/include/linux/buffer_head.h
+index ebbacd14d450..006a8a42acfb 100644
+--- a/include/linux/buffer_head.h
++++ b/include/linux/buffer_head.h
+@@ -395,6 +395,7 @@ extern int __set_page_dirty_buffers(struct page *page);
+ #else /* CONFIG_BLOCK */
  
- 	/*
- 	 * The value of the next variable,
-@@ -7519,7 +7517,7 @@ static int __init bfq_init(void)
- 	if (ret)
- 		goto err_pol_unreg;
+ static inline void buffer_init(void) {}
++static inline int page_has_buffers(struct page *page) { return 0; }
+ static inline int try_to_free_buffers(struct page *page) { return 1; }
+ static inline int inode_has_buffers(struct inode *inode) { return 0; }
+ static inline void invalidate_inode_buffers(struct inode *inode) {}
+diff --git a/mm/huge_memory.c b/mm/huge_memory.c
+index 73e80d49c32e..a8fcfa3010c8 100644
+--- a/mm/huge_memory.c
++++ b/mm/huge_memory.c
+@@ -30,6 +30,7 @@
+ #include <linux/userfaultfd_k.h>
+ #include <linux/page_idle.h>
+ #include <linux/shmem_fs.h>
++#include <linux/buffer_head.h>
  
--	pr_info("BFQ I/O-scheduler: v6");
-+	pr_info("BFQ I/O-scheduler: v7r3");
+ #include <asm/tlb.h>
+ #include <asm/pgalloc.h>
+@@ -2007,7 +2008,6 @@ int split_huge_page_to_list(struct page *page, struct list_head *list)
  
- 	return 0;
+ 	VM_BUG_ON_PAGE(is_huge_zero_page(page), page);
+ 	VM_BUG_ON_PAGE(!PageLocked(page), page);
+-	VM_BUG_ON_PAGE(!PageSwapBacked(page), page);
+ 	VM_BUG_ON_PAGE(!PageCompound(page), page);
  
+ 	if (PageAnon(head)) {
+@@ -2036,6 +2036,23 @@ int split_huge_page_to_list(struct page *page, struct list_head *list)
+ 			goto out;
+ 		}
+ 
++		/* Try to free buffers before attempt split */
++		if (!PageSwapBacked(head) && PagePrivate(page)) {
++			/*
++			 * We cannot trigger writeback from here due possible
++			 * recursion if triggered from vmscan, only wait.
++			 *
++			 * Caller can trigger writeback it on its own, if safe.
++			 */
++			wait_on_page_writeback(head);
++
++			if (page_has_buffers(head) &&
++					!try_to_free_buffers(head)) {
++				ret = -EBUSY;
++				goto out;
++			}
++		}
++
+ 		/* Addidional pin from radix tree */
+ 		extra_pins = 1;
+ 		anon_vma = NULL;
 -- 
-1.9.1
+2.8.1
+
