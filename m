@@ -1,68 +1,39 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-qk0-f193.google.com ([209.85.220.193]:34105 "EHLO
-	mail-qk0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751631AbcHNJXq (ORCPT
+Received: from userp1040.oracle.com ([156.151.31.81]:16584 "EHLO
+	userp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751372AbcHLWPt (ORCPT
 	<rfc822;linux-block@vger.kernel.org>);
-	Sun, 14 Aug 2016 05:23:46 -0400
-MIME-Version: 1.0
-In-Reply-To: <yq1lh01n1ul.fsf@sermon.lab.mkp.net>
-References: <833713246c1a70d85150289c1537797d6f7dd606.1470903899.git.tom.ty89@gmail.com>
- <yq1r39upy7p.fsf@sermon.lab.mkp.net> <CAGnHSE=E1Bj99EciXrDS31n4Q4VcRL0sDJ2t4ynx0bHgp5RNtw@mail.gmail.com>
- <yq1lh01n1ul.fsf@sermon.lab.mkp.net>
-From: Tom Yan <tom.ty89@gmail.com>
-Date: Sun, 14 Aug 2016 17:23:45 +0800
-Message-ID: <CAGnHSEnycyCRy=SHXs+fQx8mwaQwLtAKO1thH6yYscbBkL2+VQ@mail.gmail.com>
-Subject: Re: [RFC] libata-scsi: make sure Maximum Write Same Length is not too large
-To: "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: Tejun Heo <tj@kernel.org>,
-	Shaun Tancheff <shaun.tancheff@seagate.com>,
+	Fri, 12 Aug 2016 18:15:49 -0400
+To: Shaun Tancheff <shaun.tancheff@seagate.com>
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
+	Tom Yan <tom.ty89@gmail.com>, Tejun Heo <tj@kernel.org>,
 	Shaun Tancheff <shaun@tancheff.com>, linux-ide@vger.kernel.org,
 	linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [RFC] libata-scsi: make sure Maximum Write Same Length is not too large
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <833713246c1a70d85150289c1537797d6f7dd606.1470903899.git.tom.ty89@gmail.com>
+	<yq1r39upy7p.fsf@sermon.lab.mkp.net>
+	<CAGnHSE=E1Bj99EciXrDS31n4Q4VcRL0sDJ2t4ynx0bHgp5RNtw@mail.gmail.com>
+	<yq1lh01n1ul.fsf@sermon.lab.mkp.net>
+	<CAJVOszDDC39ge6d3h+uy1wtxMBv95_V1eWofumya_G5zg21OrQ@mail.gmail.com>
+Date: Fri, 12 Aug 2016 18:15:30 -0400
+In-Reply-To: <CAJVOszDDC39ge6d3h+uy1wtxMBv95_V1eWofumya_G5zg21OrQ@mail.gmail.com>
+	(Shaun Tancheff's message of "Fri, 12 Aug 2016 16:49:06 -0500")
+Message-ID: <yq1wpjlljlp.fsf@sermon.lab.mkp.net>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 13 August 2016 at 04:56, Martin K. Petersen
-<martin.petersen@oracle.com> wrote:
->>>>>> "Tom" == Tom Yan <tom.ty89@gmail.com> writes:
->
-> Tom,
->
->>> put_unaligned_be64(65535 * ATA_MAX_TRIM_RNUM / (sector_size / 512), &rbuf[36]);
->
-> How many 8-byte ranges fit in a 4096-byte sector?
+>>>>> "Shaun" == Shaun Tancheff <shaun.tancheff@seagate.com> writes:
 
-The thing is, as of ACS-4, blocks that carry DSM/TRIM LBA Range
-Entries are always 512-byte. Honestly, I have no idea how that would
-work on a 4Kn SSD, if it is / will ever be a thing.
+Shaun,
 
-Anyway I was NOT trying to bump the number entries allowed, but
-instead to decrease it accordingly for the increased sector size, only
-to make sure that the Maximum Write Same Length advertised here is
-gonna overflow the 32-bit limit when it is converted to a
-representation in bytes (i.e. discard_max_bytes and
-write_same_max_bytes), and probably also, the bio size.
+Shaun> Ah, I think I am understanding now. When the sector size is 4K
+Shaun> the minimum page sent with WRITE SAME will be 4K.
 
-It's also a suggestion from me for Shaun to determine how the Maximum
-Write Same Length to be advertised, so that the size in bytes covered
-by a single SCT Write Same will stay at ~2G in spite of the logical
-sector size.
+Correct. We'll always transfer one logical block of data as required by
+the spec.
 
->
-> Tom> So were you trying to pointing out something I am still missing, or
-> Tom> were you merely confirming I was right?
->
-> I suggest you drop ATA_MAX_TRIM_RNUM and do:
->
-> enum {
->      ATA_TRIM_BLOCKS_PER_RANGE = 65535, /* 0xffff blocks per range desc. */
->      ATA_TRIM_RANGE_SIZE_SHIFT = 3,     /* range descriptor is 8 bytes */
-> };
->
-> put_unaligned_be64(ATA_TRIM_BLOCKS_PER_RANGE *
->                    sector_size >> ATA_TRIM_RANGE_SIZE_SHIFT, &rbuf[36]);
->
-> Might be worthwhile to create an ata_max_lba_range_blocks() wrapper.
->
-> --
-> Martin K. Petersen      Oracle Linux Engineering
+-- 
+Martin K. Petersen	Oracle Linux Engineering
