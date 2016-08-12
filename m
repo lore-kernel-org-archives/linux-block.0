@@ -14,73 +14,66 @@ Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
 	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
 	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
 	linux-block@vger.kernel.org,
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv2 16/41] filemap: allocate huge page in pagecache_get_page(), if allowed
-Date: Fri, 12 Aug 2016 21:37:59 +0300
-Message-Id: <1471027104-115213-17-git-send-email-kirill.shutemov@linux.intel.com>
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv2 06/41] radix-tree: Handle multiorder entries being deleted by replace_clear_tags
+Date: Fri, 12 Aug 2016 21:37:49 +0300
+Message-Id: <1471027104-115213-7-git-send-email-kirill.shutemov@linux.intel.com>
 In-Reply-To: <1471027104-115213-1-git-send-email-kirill.shutemov@linux.intel.com>
 References: <1471027104-115213-1-git-send-email-kirill.shutemov@linux.intel.com>
 Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Write path allocate pages using pagecache_get_page(). We should be able
-to allocate huge pages there, if it's allowed. As usually, fallback to
-small pages, if failed.
+From: Matthew Wilcox <willy@infradead.org>
 
+radix_tree_replace_clear_tags() can be called with NULL as the replacement
+value; in this case we need to delete sibling entries which point to
+the slot.
+
+Signed-off-by: Matthew Wilcox <willy@infradead.org>
 Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- mm/filemap.c | 18 ++++++++++++++++--
- 1 file changed, 16 insertions(+), 2 deletions(-)
+ lib/radix-tree.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/mm/filemap.c b/mm/filemap.c
-index 9d7d70b265d4..93fa97f143ab 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -1310,13 +1310,16 @@ repeat:
+diff --git a/lib/radix-tree.c b/lib/radix-tree.c
+index e49f32f7c537..89092c4011b8 100644
+--- a/lib/radix-tree.c
++++ b/lib/radix-tree.c
+@@ -1799,17 +1799,23 @@ void *radix_tree_delete(struct radix_tree_root *root, unsigned long index)
+ }
+ EXPORT_SYMBOL(radix_tree_delete);
  
- no_page:
- 	if (!page && (fgp_flags & FGP_CREAT)) {
-+		pgoff_t hoffset;
- 		int err;
- 		if ((fgp_flags & FGP_WRITE) && mapping_cap_account_dirty(mapping))
- 			gfp_mask |= __GFP_WRITE;
- 		if (fgp_flags & FGP_NOFS)
- 			gfp_mask &= ~__GFP_FS;
++/*
++ * If the caller passes NULL for @entry, it must take care to adjust
++ * node->count.  See page_cache_tree_delete() for an example.
++ */
+ struct radix_tree_node *radix_tree_replace_clear_tags(
+ 			struct radix_tree_root *root,
+ 			unsigned long index, void *entry)
+ {
+ 	struct radix_tree_node *node;
+ 	void **slot;
++	unsigned int offset;
  
--		page = __page_cache_alloc(gfp_mask);
-+		page = page_cache_alloc_huge(mapping, offset, gfp_mask);
-+no_huge:	if (!page)
-+			page = __page_cache_alloc(gfp_mask);
- 		if (!page)
- 			return NULL;
+ 	__radix_tree_lookup(root, index, &node, &slot);
  
-@@ -1327,14 +1330,25 @@ no_page:
- 		if (fgp_flags & FGP_ACCESSED)
- 			__SetPageReferenced(page);
- 
--		err = add_to_page_cache_lru(page, mapping, offset,
-+		if (PageTransHuge(page))
-+			hoffset = round_down(offset, HPAGE_PMD_NR);
-+		else
-+			hoffset = offset;
-+
-+		err = add_to_page_cache_lru(page, mapping, hoffset,
- 				gfp_mask & GFP_RECLAIM_MASK);
- 		if (unlikely(err)) {
-+			if (PageTransHuge(page)) {
-+				put_page(page);
-+				page = NULL;
-+				goto no_huge;
-+			}
- 			put_page(page);
- 			page = NULL;
- 			if (err == -EEXIST)
- 				goto repeat;
- 		}
-+		page += offset - hoffset;
+ 	if (node) {
+-		unsigned int tag, offset = get_slot_offset(node, slot);
++		unsigned int tag;
++		offset = get_slot_offset(node, slot);
+ 		for (tag = 0; tag < RADIX_TREE_MAX_TAGS; tag++)
+ 			node_tag_clear(root, node, tag, offset);
+ 	} else {
+@@ -1818,6 +1824,9 @@ struct radix_tree_node *radix_tree_replace_clear_tags(
  	}
  
- 	return page;
+ 	radix_tree_replace_slot(slot, entry);
++	if (!entry && node)
++		delete_sibling_entries(node, node_to_entry(slot), offset);
++
+ 	return node;
+ }
+ 
 -- 
 2.8.1
 
