@@ -1,102 +1,164 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f193.google.com ([209.85.192.193]:33911 "EHLO
-	mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752175AbcHLL4P (ORCPT
-	<rfc822;linux-block@vger.kernel.org>);
-	Fri, 12 Aug 2016 07:56:15 -0400
-From: tom.ty89@gmail.com
-To: tj@kernel.org, martin.petersen@oracle.com
-Cc: linux-ide@vger.kernel.org, linux-scsi@vger.kernel.org,
-	linux-block@vger.kernel.org, Tom Yan <tom.ty89@gmail.com>
-Subject: [PATCH 1/2] libata-scsi: use dev->max_sectors from libata-core appropriately
-Date: Fri, 12 Aug 2016 19:56:06 +0800
-Message-Id: <911c68378b91bf275a4bbed5717b4639641d7029.1471002480.git.tom.ty89@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+	Andreas Dilger <adilger.kernel@dilger.ca>,
+	Jan Kara <jack@suse.com>,
+	Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+	Hugh Dickins <hughd@google.com>,
+	Andrea Arcangeli <aarcange@redhat.com>,
+	Dave Hansen <dave.hansen@intel.com>,
+	Vlastimil Babka <vbabka@suse.cz>,
+	Matthew Wilcox <willy@infradead.org>,
+	Ross Zwisler <ross.zwisler@linux.intel.com>,
+	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+	linux-block@vger.kernel.org,
+	Matthew Wilcox <willy@linux.intel.com>,
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv2 05/41] radix-tree: Add radix_tree_split_preload()
+Date: Fri, 12 Aug 2016 21:37:48 +0300
+Message-Id: <1471027104-115213-6-git-send-email-kirill.shutemov@linux.intel.com>
+In-Reply-To: <1471027104-115213-1-git-send-email-kirill.shutemov@linux.intel.com>
+References: <1471027104-115213-1-git-send-email-kirill.shutemov@linux.intel.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-From: Tom Yan <tom.ty89@gmail.com>
+From: Matthew Wilcox <willy@linux.intel.com>
 
-Currently we use dev->max_sectors to set max_hw_sectors, which
-is actually supposed to be a host controller limit (that get set
-by the host controller driver like ahci, and if not it would be
-the fallback SCSI_DEFAULT_MAX_SECTORS).
+Calculate how many nodes we need to allocate to split an old_order entry
+into multiple entries, each of size new_order.  The test suite checks that
+we allocated exactly the right number of nodes; neither too many (checked
+by rtp->nr == 0), nor too few (checked by comparing nr_allocated before
+and after the call to radix_tree_split()).
 
-That means we have been doing the wrong thing. Therefore, use it
-to set the correct request queue limit that is used to report
-device limit: max_dev_sectors.
+Signed-off-by: Matthew Wilcox <willy@linux.intel.com>
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+---
+ include/linux/radix-tree.h            |  1 +
+ lib/radix-tree.c                      | 22 ++++++++++++++++++++++
+ tools/testing/radix-tree/multiorder.c | 28 ++++++++++++++++++++++++++--
+ tools/testing/radix-tree/test.h       |  9 +++++++++
+ 4 files changed, 58 insertions(+), 2 deletions(-)
 
-For disk devices, it is reported through the Maximum Transfer Length
-field on the Block Limits VPD to the SCSI disk driver, which will
-then set and make use of max_dev_sectors.
-
-For cdrom devices, since they are not supposed to have any VPD, and
-neither will the SCSI cdrom (sr) driver touch any of the max sectors
-limits, we are hence setting the limit directly in libata-scsi.
-
-Note that when max_dev_sectors is larger than max_hw_sectors, it
-does not have any effect. Therefore, setting dev->max_sectors to
-ATA_MAX_SECTORS_LBA48 will only have some effect when the host
-driver has set max_hw_sectors to a value that is as large as that.
-
-This should not matter for typical devices, since according to our
-past experience, 1024 (the current SCSI_DEFAULT_MAX_SECTORS) is a
-decent and safe value for max_sectors. ATA_MAX_SECTORS_LBA48 has
-actually appeared to be too large for some devices.
-
-Also note that ATA_HORKAGE_MAX_SEC_LBA48 is not supposed to work
-automatically anyway, even when max_hw_sectors is as high as 65535,
-since the effective max_sectors will be set by the SCSI disk driver.
-
-Signed-off-by: Tom Yan <tom.ty89@gmail.com>
-
-diff --git a/drivers/ata/libata-scsi.c b/drivers/ata/libata-scsi.c
-index be9c76c..4e2d8e7 100644
---- a/drivers/ata/libata-scsi.c
-+++ b/drivers/ata/libata-scsi.c
-@@ -1204,14 +1204,26 @@ static int ata_scsi_dev_config(struct scsi_device *sdev,
- 	if (!ata_id_has_unload(dev->id))
- 		dev->flags |= ATA_DFLAG_NO_UNLOAD;
+diff --git a/include/linux/radix-tree.h b/include/linux/radix-tree.h
+index 459e8a152c8a..c4cea311d901 100644
+--- a/include/linux/radix-tree.h
++++ b/include/linux/radix-tree.h
+@@ -318,6 +318,7 @@ static inline void radix_tree_preload_end(void)
+ 	preempt_enable();
+ }
  
--	/* configure max sectors */
--	blk_queue_max_hw_sectors(q, dev->max_sectors);
--
- 	if (dev->class == ATA_DEV_ATAPI) {
- 		void *buf;
++int radix_tree_split_preload(unsigned old_order, unsigned new_order, gfp_t);
+ int radix_tree_split(struct radix_tree_root *, unsigned long index,
+ 			unsigned new_order);
+ int radix_tree_join(struct radix_tree_root *, unsigned long index,
+diff --git a/lib/radix-tree.c b/lib/radix-tree.c
+index e69f1053cd78..e49f32f7c537 100644
+--- a/lib/radix-tree.c
++++ b/lib/radix-tree.c
+@@ -404,6 +404,28 @@ int radix_tree_maybe_preload(gfp_t gfp_mask)
+ }
+ EXPORT_SYMBOL(radix_tree_maybe_preload);
  
- 		sdev->sector_size = ATA_SECT_SIZE;
- 
-+		/*
-+		 * We are setting the limit here merely because CD/DVD device does not
-+		 * have Block Limits VPD.
-+		 *
-+		 * Supposedly dev->max_sectors should be left shifted by
-+		 * (ilog2(sdev->sector_size) - 9). But since ATAPI class device has a
-+		 * static logical sector size of 512 (ATA_SECT_SIZE), the shift became
-+		 * unnecessary.
-+		 */
-+		q->limits.max_dev_sectors = dev->max_sectors;
-+		/* Make max_dev_sectors effective by adjusting max_sectors accordingly,
-+		   while leave max_hw_sectors, which is supposed to be host controller
-+		   limit, untouched. */
-+		blk_queue_max_hw_sectors(q, queue_max_hw_sectors(q));
++#ifdef CONFIG_RADIX_TREE_MULTIORDER
++/*
++ * Preload with enough objects to ensure that we can split a single entry
++ * of order @old_order into many entries of size @new_order
++ */
++int radix_tree_split_preload(unsigned int old_order, unsigned int new_order,
++							gfp_t gfp_mask)
++{
++	unsigned top = 1 << (old_order % RADIX_TREE_MAP_SHIFT);
++	unsigned layers = (old_order / RADIX_TREE_MAP_SHIFT) -
++				(new_order / RADIX_TREE_MAP_SHIFT);
++	unsigned nr = 0;
 +
- 		/* set DMA padding */
- 		blk_queue_update_dma_pad(q, ATA_DMA_PAD_SZ - 1);
- 
-@@ -2310,6 +2322,13 @@ static unsigned int ata_scsiop_inq_b0(struct ata_scsi_args *args, u8 *rbuf)
- 	put_unaligned_be16(min_io_sectors, &rbuf[6]);
- 
- 	/*
-+	 * Maximum transfer length.
-+	 *
-+	 * This will be used by the SCSI disk driver to set max_dev_sectors.
-+	 */
-+	put_unaligned_be32(args->dev->max_sectors, &rbuf[8]);
++	WARN_ON_ONCE(!gfpflags_allow_blocking(gfp_mask));
++	BUG_ON(new_order >= old_order);
 +
++	while (layers--)
++		nr = nr * RADIX_TREE_MAP_SIZE + 1;
++	return __radix_tree_preload(gfp_mask, top * nr);
++}
++#endif
++
+ /*
+  * The same as function above, but preload number of nodes required to insert
+  * (1 << order) continuous naturally-aligned elements.
+diff --git a/tools/testing/radix-tree/multiorder.c b/tools/testing/radix-tree/multiorder.c
+index 9d27a4dd7b2a..5eda47dfe818 100644
+--- a/tools/testing/radix-tree/multiorder.c
++++ b/tools/testing/radix-tree/multiorder.c
+@@ -348,18 +348,42 @@ static void multiorder_join(void)
+ 	}
+ }
+ 
++static void check_mem(unsigned old_order, unsigned new_order, unsigned alloc)
++{
++	struct radix_tree_preload *rtp = &radix_tree_preloads;
++	if (rtp->nr != 0)
++		printf("split(%u %u) remaining %u\n", old_order, new_order,
++							rtp->nr);
 +	/*
- 	 * Optimal unmap granularity.
- 	 *
- 	 * The ATA spec doesn't even know about a granularity or alignment
++	 * Can't check for equality here as some nodes may have been
++	 * RCU-freed while we ran.  But we should never finish with more
++	 * nodes allocated since they should have all been preloaded.
++	 */
++	if (nr_allocated > alloc)
++		printf("split(%u %u) allocated %u %u\n", old_order, new_order,
++							alloc, nr_allocated);
++}
++
+ static void __multiorder_split(int old_order, int new_order)
+ {
+-	RADIX_TREE(tree, GFP_KERNEL);
++	RADIX_TREE(tree, GFP_ATOMIC);
+ 	void **slot;
+ 	struct radix_tree_iter iter;
++	unsigned alloc;
+ 
+-	item_insert_order(&tree, 0, old_order);
++	radix_tree_preload(GFP_KERNEL);
++	assert(item_insert_order(&tree, 0, old_order) == 0);
++	radix_tree_callback(NULL, CPU_DEAD, NULL);
+ 	radix_tree_tag_set(&tree, 0, 2);
++
++	radix_tree_split_preload(old_order, new_order, GFP_KERNEL);
++	alloc = nr_allocated;
+ 	radix_tree_split(&tree, 0, new_order);
++	check_mem(old_order, new_order, alloc);
+ 	radix_tree_for_each_slot(slot, &tree, &iter, 0) {
+ 		radix_tree_replace_slot(slot, item_create(iter.index));
+ 	}
++	radix_tree_preload_end();
+ 
+ 	item_kill_tree(&tree);
+ }
+diff --git a/tools/testing/radix-tree/test.h b/tools/testing/radix-tree/test.h
+index e85131369723..55e6d095047b 100644
+--- a/tools/testing/radix-tree/test.h
++++ b/tools/testing/radix-tree/test.h
+@@ -2,6 +2,8 @@
+ #include <linux/types.h>
+ #include <linux/radix-tree.h>
+ #include <linux/rcupdate.h>
++#include <linux/notifier.h>
++#include <linux/cpu.h>
+ 
+ struct item {
+ 	unsigned long index;
+@@ -43,3 +45,10 @@ void radix_tree_dump(struct radix_tree_root *root);
+ int root_tag_get(struct radix_tree_root *root, unsigned int tag);
+ unsigned long node_maxindex(struct radix_tree_node *);
+ unsigned long shift_maxindex(unsigned int shift);
++int radix_tree_callback(struct notifier_block *nfb,
++			unsigned long action, void *hcpu);
++struct radix_tree_preload {
++	unsigned nr;
++	struct radix_tree_node *nodes;
++};
++extern struct radix_tree_preload radix_tree_preloads;
 -- 
-2.9.2
+2.8.1
 
