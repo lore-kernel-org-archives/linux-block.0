@@ -1,103 +1,81 @@
-Return-Path: <famz@redhat.com>
-From: Fam Zheng <famz@redhat.com>
-To: linux-kernel@vger.kernel.org
-Cc: linux-nvme@lists.infradead.org, Keith Busch <keith.busch@intel.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        linuxppc-dev@lists.ozlabs.org, "Michael S. Tsirkin" <mst@redhat.com>,
-        linux-block@vger.kernel.org,
-        Brian Norris <computersforpeace@gmail.com>,
-        Paul Mackerras <paulus@samba.org>, linux-mtd@lists.infradead.org,
-        "Ed L. Cashin" <ed.cashin@acm.org>, Jens Axboe <axboe@kernel.dk>,
-        Minchan Kim <minchan@kernel.org>,
-        virtualization@lists.linux-foundation.org,
-        Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
-        Nitin Gupta <ngupta@vflare.org>, David Woodhouse <dwmw2@infradead.org>
-Subject: [PATCH 05/15] genhd: Return error from disk_{add,alloc}_events
-Date: Wed, 17 Aug 2016 15:15:05 +0800
-Message-Id: <1471418115-3654-6-git-send-email-famz@redhat.com>
-In-Reply-To: <1471418115-3654-1-git-send-email-famz@redhat.com>
-References: <1471418115-3654-1-git-send-email-famz@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f50.google.com ([74.125.82.50]:38844 "EHLO
+	mail-wm0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752243AbcHMKLM (ORCPT
+	<rfc822;linux-block@vger.kernel.org>);
+	Sat, 13 Aug 2016 06:11:12 -0400
+Received: by mail-wm0-f50.google.com with SMTP id o80so17866503wme.1
+        for <linux-block@vger.kernel.org>; Sat, 13 Aug 2016 03:10:18 -0700 (PDT)
+Subject: Re: [PATCH 1/2] libata-scsi: use dev->max_sectors from libata-core
+ appropriately
+To: Tom Yan <tom.ty89@gmail.com>
+References: <911c68378b91bf275a4bbed5717b4639641d7029.1471002480.git.tom.ty89@gmail.com>
+ <f7fcf6b0-8d12-c2ae-2c51-a9071fd89f7c@cogentembedded.com>
+ <CAGnHSEn36OgegFJHzojOPYiMzfiLe6eDgSofYHGgmtmdoUQbww@mail.gmail.com>
+Cc: Tejun Heo <tj@kernel.org>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	linux-ide@vger.kernel.org, linux-scsi@vger.kernel.org,
+	linux-block@vger.kernel.org
+From: Sergei Shtylyov <sergei.shtylyov@cogentembedded.com>
+Message-ID: <e5daafbb-e0f4-94fa-6edf-8ba0c9cced88@cogentembedded.com>
+Date: Sat, 13 Aug 2016 13:10:15 +0300
+MIME-Version: 1.0
+In-Reply-To: <CAGnHSEn36OgegFJHzojOPYiMzfiLe6eDgSofYHGgmtmdoUQbww@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-disk_alloc_events and disk_add_events can fail, return the error code so
-the caller can handle it.
+Hello.
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
----
- block/genhd.c | 24 +++++++++++++++---------
- 1 file changed, 15 insertions(+), 9 deletions(-)
+On 8/12/2016 5:36 PM, Tom Yan wrote:
 
-diff --git a/block/genhd.c b/block/genhd.c
-index 8c7510d..4316d2d 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -40,8 +40,8 @@ static struct device_type disk_type;
- 
- static void disk_check_events(struct disk_events *ev,
- 			      unsigned int *clearing_ptr);
--static void disk_alloc_events(struct gendisk *disk);
--static void disk_add_events(struct gendisk *disk);
-+static int disk_alloc_events(struct gendisk *disk);
-+static int disk_add_events(struct gendisk *disk);
- static void disk_del_events(struct gendisk *disk);
- static void disk_release_events(struct gendisk *disk);
- 
-@@ -1823,17 +1823,17 @@ module_param_cb(events_dfl_poll_msecs, &disk_events_dfl_poll_msecs_param_ops,
- /*
-  * disk_{alloc|add|del|release}_events - initialize and destroy disk_events.
-  */
--static void disk_alloc_events(struct gendisk *disk)
-+static int disk_alloc_events(struct gendisk *disk)
- {
- 	struct disk_events *ev;
- 
- 	if (!disk->fops->check_events)
--		return;
-+		return 0;
- 
- 	ev = kzalloc(sizeof(*ev), GFP_KERNEL);
- 	if (!ev) {
- 		pr_warn("%s: failed to initialize events\n", disk->disk_name);
--		return;
-+		return -ENOMEM;
- 	}
- 
- 	INIT_LIST_HEAD(&ev->node);
-@@ -1845,17 +1845,22 @@ static void disk_alloc_events(struct gendisk *disk)
- 	INIT_DELAYED_WORK(&ev->dwork, disk_events_workfn);
- 
- 	disk->ev = ev;
-+	return 0;
- }
- 
--static void disk_add_events(struct gendisk *disk)
-+static int disk_add_events(struct gendisk *disk)
- {
-+	int rc;
-+
- 	if (!disk->ev)
--		return;
-+		return 0;
- 
--	/* FIXME: error handling */
--	if (sysfs_create_files(&disk_to_dev(disk)->kobj, disk_events_attrs) < 0)
-+	rc = sysfs_create_files(&disk_to_dev(disk)->kobj, disk_events_attrs);
-+	if (rc) {
- 		pr_warn("%s: failed to create sysfs files for events\n",
- 			disk->disk_name);
-+		return rc;
-+	}
- 
- 	mutex_lock(&disk_events_mutex);
- 	list_add_tail(&disk->ev->node, &disk_events);
-@@ -1866,6 +1871,7 @@ static void disk_add_events(struct gendisk *disk)
- 	 * unblock kicks it into action.
- 	 */
- 	__disk_unblock_events(disk, true);
-+	return 0;
- }
- 
- static void disk_del_events(struct gendisk *disk)
--- 
-2.7.4
+>>> diff --git a/drivers/ata/libata-scsi.c b/drivers/ata/libata-scsi.c
+>>> index be9c76c..4e2d8e7 100644
+>>> --- a/drivers/ata/libata-scsi.c
+>>> +++ b/drivers/ata/libata-scsi.c
+>>> @@ -1204,14 +1204,26 @@ static int ata_scsi_dev_config(struct scsi_device
+>>> *sdev,
+>>>         if (!ata_id_has_unload(dev->id))
+>>>                 dev->flags |= ATA_DFLAG_NO_UNLOAD;
+>>>
+>>> -       /* configure max sectors */
+>>> -       blk_queue_max_hw_sectors(q, dev->max_sectors);
+>>> -
+>>>         if (dev->class == ATA_DEV_ATAPI) {
+>>>                 void *buf;
+>>>
+>>>                 sdev->sector_size = ATA_SECT_SIZE;
+>>>
+>>> +               /*
+>>> +                * We are setting the limit here merely because CD/DVD
+>>> device does not
+>>> +                * have Block Limits VPD.
+>>> +                *
+>>> +                * Supposedly dev->max_sectors should be left shifted by
+>>> +                * (ilog2(sdev->sector_size) - 9). But since ATAPI class
+>>> device has a
+>>> +                * static logical sector size of 512 (ATA_SECT_SIZE), the
+>>> shift became
+>>> +                * unnecessary.
+>>> +                */
+>>> +               q->limits.max_dev_sectors = dev->max_sectors;
+>>> +               /* Make max_dev_sectors effective by adjusting max_sectors
+>>> accordingly,
+>>> +                  while leave max_hw_sectors, which is supposed to be
+>>> host controller
+>>> +                  limit, untouched. */
+>>
+>>
+>>    Why 2 different comment styles? The previous comment's style is actually
+>> preferred in the kernel.
+>>
+>
+> I just tried to follow the styles of the existing comments. Apparently
+> the first style is used for multi-paragraph comments, while the other
+> one is used for single-paragraph one.
+
+    Nevertheless, only the 1st comment is formatted in the preferred manner; 
+see Documentation/CodingStyle, chapter 8.
+
+MBR, Sergei
+
