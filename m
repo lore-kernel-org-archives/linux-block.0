@@ -1,46 +1,37 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from aserp1040.oracle.com ([141.146.126.69]:25833 "EHLO
-	aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751667AbcHPEKW (ORCPT
+Received: from mail-qk0-f194.google.com ([209.85.220.194]:34000 "EHLO
+	mail-qk0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751334AbcHNJzx (ORCPT
 	<rfc822;linux-block@vger.kernel.org>);
-	Tue, 16 Aug 2016 00:10:22 -0400
-To: Tom Yan <tom.ty89@gmail.com>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
-	Tejun Heo <tj@kernel.org>, linux-ide@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH v2 2/2] sd: check BLK_DEF_MAX_SECTORS against max_dev_sectors
-From: "Martin K. Petersen" <martin.petersen@oracle.com>
-References: <60518e90d462d4cbb1c528914eac64e2fe124717.1471011949.git.tom.ty89@gmail.com>
-	<974f3a0aa9e82caf067353fd7d7119c07d7e98c1.1471011949.git.tom.ty89@gmail.com>
-	<yq11t1tmzxb.fsf@sermon.lab.mkp.net>
-	<CAGnHSE=yBrBCbyKMNKBpZHRX7YKR-TV-s5YybvTKW18_gcrAbw@mail.gmail.com>
-Date: Tue, 16 Aug 2016 00:10:15 -0400
-In-Reply-To: <CAGnHSE=yBrBCbyKMNKBpZHRX7YKR-TV-s5YybvTKW18_gcrAbw@mail.gmail.com>
-	(Tom Yan's message of "Sun, 14 Aug 2016 17:00:52 +0800")
-Message-ID: <yq1d1l9l5g8.fsf@sermon.lab.mkp.net>
+	Sun, 14 Aug 2016 05:55:53 -0400
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <CAGnHSE=yBrBCbyKMNKBpZHRX7YKR-TV-s5YybvTKW18_gcrAbw@mail.gmail.com>
+References: <60518e90d462d4cbb1c528914eac64e2fe124717.1471011949.git.tom.ty89@gmail.com>
+ <974f3a0aa9e82caf067353fd7d7119c07d7e98c1.1471011949.git.tom.ty89@gmail.com>
+ <yq11t1tmzxb.fsf@sermon.lab.mkp.net> <CAGnHSE=yBrBCbyKMNKBpZHRX7YKR-TV-s5YybvTKW18_gcrAbw@mail.gmail.com>
+From: Tom Yan <tom.ty89@gmail.com>
+Date: Sun, 14 Aug 2016 17:40:41 +0800
+Message-ID: <CAGnHSEmnj5Bf5CJom=2e9VurxRyFwNBbwmgg1wpM8h2NvQkN-A@mail.gmail.com>
+Subject: Re: [PATCH v2 2/2] sd: check BLK_DEF_MAX_SECTORS against max_dev_sectors
+To: "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: Tejun Heo <tj@kernel.org>, linux-ide@vger.kernel.org,
+	linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
->>>>> "Tom" == Tom Yan <tom.ty89@gmail.com> writes:
+On 14 August 2016 at 17:00, Tom Yan <tom.ty89@gmail.com> wrote:
+>
+> That won't really work. min_t() would, though the line is gonna be a
+> bit long; not sure if I can/should simply cast the type (unsigned int)
+> to BLK_DEF_MAX_SECTORS. And which braces are you referring to?
+>
+Oh you mean the else-clause braces. Hmm I thought the coding style was
+that if you needed braces in one clause, you should use braces for
+others in the condition even if it consists of only one line of
+statement. At least that is what I was told when I send patches for
+libata.
 
-Tom,
-
->> It would be pretty unusual for a device that is smart enough to
->> report a transfer length limit to be constrained to 1 MB and change.
-
-Tom> Well, it is done pretty much for libata's SATL.
-
-But why?
-
->> rw_max = min(BLK_DEF_MAX_SECTORS, q->limits.max_dev_sectors);
-
-Tom> That won't really work. min_t() would, though the line is gonna be
-Tom> a bit long; not sure if I can/should simply cast the type (unsigned
-Tom> int) to BLK_DEF_MAX_SECTORS. And which braces are you referring to?
-
-I'd rather have a split line than double lines with braces.
-
--- 
-Martin K. Petersen	Oracle Linux Engineering
+So, should I use min_t() or just do a type casting in front to
+BLK_DEF_MAX_SECTORS? Also do I need to break the line at a certain
+point when it exceeds certain length?
