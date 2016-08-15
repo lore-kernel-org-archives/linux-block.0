@@ -1,8 +1,8 @@
 Return-Path: <linux-scsi-owner@vger.kernel.org>
 Subject: Re: Time to make dynamically allocated devt the default for scsi
  disks?
-To: James Bottomley <James.Bottomley@HansenPartnership.com>,
-        Dan Williams <dan.j.williams@intel.com>
+To: Dan Williams <dan.j.williams@intel.com>,
+	James Bottomley <James.Bottomley@hansenpartnership.com>
 References: <CAPcyv4jK8W52ss2FhJDa=95B_1q8Szv4AmH0f7p_jzyfEXv0Ag@mail.gmail.com>
  <1471047451.2407.95.camel@HansenPartnership.com>
  <CAPcyv4jqEaBY1atyrjG3G4PYOzaoLvAMfHgK1PD0Si=MRRwAuw@mail.gmail.com>
@@ -12,81 +12,49 @@ References: <CAPcyv4jK8W52ss2FhJDa=95B_1q8Szv4AmH0f7p_jzyfEXv0Ag@mail.gmail.com>
  <1471110212.2397.39.camel@HansenPartnership.com>
  <CAPcyv4gHq=RraHgcJGx_txk7YJHC8YQ3gCT4CHL0hvzsGpU1wg@mail.gmail.com>
  <1471195252.2355.18.camel@HansenPartnership.com>
+ <CAPcyv4i4vyXc-qigqVo9oBL-7n9g4cbhK9Yt0o2F_bCPqMSF1Q@mail.gmail.com>
+ <CAPcyv4j_R9CZKFXuv1EDqUOMTnAutyQwk_+h1pzC3NKyR6aGVQ@mail.gmail.com>
 CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        linux-scsi <linux-scsi@vger.kernel.org>,
-        Jens Axboe <axboe@fb.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Christoph Hellwig <hch@lst.de>, Tejun Heo <tj@kernel.org>,
-        Dave Hansen <dave.hansen@intel.com>
+	linux-scsi <linux-scsi@vger.kernel.org>,
+	Jens Axboe <axboe@fb.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Christoph Hellwig <hch@lst.de>, Tejun Heo <tj@kernel.org>,
+	Dave Hansen <dave.hansen@intel.com>
 From: Bart Van Assche <bart.vanassche@sandisk.com>
-Message-ID: <cf141c9f-2bda-060a-0a7d-86638c2f5818@sandisk.com>
-Date: Mon, 29 Aug 2016 11:16:47 -0700
+Message-ID: <27888438-c88d-d810-bcfc-1828dd61d593@sandisk.com>
+Date: Mon, 15 Aug 2016 13:11:59 -0700
 MIME-Version: 1.0
-In-Reply-To: <1471195252.2355.18.camel@HansenPartnership.com>
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <CAPcyv4j_R9CZKFXuv1EDqUOMTnAutyQwk_+h1pzC3NKyR6aGVQ@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Sender: linux-scsi-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-T24gMDgvMTQvMjAxNiAxMDoyMSBBTSwgSmFtZXMgQm90dG9tbGV5IHdyb3RlOg0KPiBkaWZm
-IC0tZ2l0IGEvZHJpdmVycy9zY3NpL3NkLmMgYi9kcml2ZXJzL3Njc2kvc2QuYw0KPiBpbmRl
-eCBkM2U4NTJhLi4yMjI3NzFkIDEwMDY0NA0KPiAtLS0gYS9kcml2ZXJzL3Njc2kvc2QuYw0K
-PiArKysgYi9kcml2ZXJzL3Njc2kvc2QuYw0KPiBAQCAtMzAwMCw3ICszMDAwLDEzIEBAIHN0
-YXRpYyB2b2lkIHNkX3Byb2JlX2FzeW5jKHZvaWQgKmRhdGEsIGFzeW5jX2Nvb2tpZV90IGNv
-b2tpZSkNCj4gIAl9DQo+ICANCj4gIAlibGtfcG1fcnVudGltZV9pbml0KHNkcC0+cmVxdWVz
-dF9xdWV1ZSwgZGV2KTsNCj4gLQlkZXZpY2VfYWRkX2Rpc2soZGV2LCBnZCk7DQo+ICsJLyoN
-Cj4gKwkgKiBwcmV2aW91c2x5IHRoZSBwYXJlbnQgb2YgdGhlIGdlbmRpc2sgd2FzIHRoZSBz
-Y3NpIGRldmljZS4gIEl0DQo+ICsJICogd2FzIG1vdmVkIHRvIGZpeCBsaWZldGltZSBydWxl
-cywgc28gbm93IHdlIGluc3RhbGwgYSBzeW1saW5rDQo+ICsJICogdG8gdGhlIG5ldyBsb2Nh
-dGlvbiBvZiB0aGUgYmxvY2sgY2xhc3MgZGlyZWN0b3J5DQo+ICsJICovDQo+ICsJZGV2aWNl
-X2FkZF9kaXNrKCZzZGtwLT5kZXYsIGdkKTsNCj4gKwlXQVJOX09OKHN5c2ZzX2FkZF9saW5r
-X3RvX2dyb3VwKCZkZXYtPmtvYmosICJibG9jayIsICZzZGtwLT5kZXYua29iaiwgImJsb2Nr
-IikpOw0KPiAgCWlmIChzZGtwLT5jYXBhY2l0eSkNCj4gIAkJc2RfZGlmX2NvbmZpZ19ob3N0
-KHNka3ApOw0KPiAgDQo+IEBAIC0zMTQyLDYgKzMxNDgsNyBAQCBzdGF0aWMgaW50IHNkX3Jl
-bW92ZShzdHJ1Y3QgZGV2aWNlICpkZXYpDQo+ICANCj4gIAlhc3luY19zeW5jaHJvbml6ZV9m
-dWxsX2RvbWFpbigmc2NzaV9zZF9wbV9kb21haW4pOw0KPiAgCWFzeW5jX3N5bmNocm9uaXpl
-X2Z1bGxfZG9tYWluKCZzY3NpX3NkX3Byb2JlX2RvbWFpbik7DQo+ICsJc3lzZnNfcmVtb3Zl
-X2xpbmsoJmRldi0+a29iaiwgImJsb2NrIik7DQo+ICAJZGV2aWNlX2RlbCgmc2RrcC0+ZGV2
-KTsNCj4gIAlkZWxfZ2VuZGlzayhzZGtwLT5kaXNrKTsNCj4gIAlzZF9zaHV0ZG93bihkZXYp
-Ow0KDQpIZWxsbyBKYW1lcywNCg0KU29ycnkgdGhhdCBpdCB0b29rIHNvIGxvbmcgYmVmb3Jl
-IEkgY291bGQgdGVzdCB0aGlzIHBhdGNoIGFuZA0KdGhlIHByZXZpb3VzIHBhdGNoIHRoYXQg
-d2FzIHBvc3RlZCBpbiB0aGlzIGUtbWFpbCB0aHJlYWQuIEJ1dCBJDQpkaWQgc28gZWFybGll
-ciB0aGlzIG1vcm5pbmcuIFdoYXQgSSBzZWUgaXMgdGhhdCB0aGUgZm9sbG93aW5nDQp3YXJu
-aW5nIG1lc3NhZ2UgaXMgcmVwb3J0ZWQgZnJlcXVlbnRseToNCg0KV0FSTklORzogQ1BVOiAx
-IFBJRDogMTM2IGF0IGRyaXZlcnMvc2NzaS9zZC5jOjMwMDkgc2RfcHJvYmVfYXN5bmMrMHgx
-Y2UvMHgxZTANCk1vZHVsZXMgbGlua2VkIGluOiBpYl9zcnAgbGliY3JjMzJjIHNjc2lfdHJh
-bnNwb3J0X3NycCB0YXJnZXRfY29yZV9wc2NzaSB0YXJnZXRfY29yZV9maWxlIGliX3NycHQg
-dGFyZ2V0X2NvcmVfaWJsb2NrIHRhcmdldF9jb3JlX21vZCBicmQgZG1fbXVsdGlwYXRoIHNj
-c2lfZGhfcmRhYyBzY3NpX2RoX2VtYyBzY3NpX2RoX2FsdWEgbmV0Y29uc29sZSB4dF9DSEVD
-S1NVTSBpcHRhYmxlX21hbmdsZSBpcHRfTUFTUVVFUkFERSBuZl9uYXRfbWFzcXVlcmFkZV9p
-cHY0IGlwdGFibGVfbmF0IG5mX25hdF9pcHY0IG5mX25hdCBuZl9jb25udHJhY2tfaXB2NCBu
-Zl9kZWZyYWdfaXB2NCB4dF9jb25udHJhY2sgbmZfY29ubnRyYWNrIGlwdF9SRUpFQ1QgeHRf
-dGNwdWRwIHR1biBlYnRhYmxlX2ZpbHRlciBlYnRhYmxlcyBpcDZ0YWJsZV9maWx0ZXIgaXA2
-X3RhYmxlcyBpcHRhYmxlX2ZpbHRlciBpcF90YWJsZXMgeF90YWJsZXMgYWZfcGFja2V0IGJy
-aWRnZSBzdHAgbGxjIGlzY3NpX2liZnQgaXNjc2lfYm9vdF9zeXNmcyBpYl9pcG9pYiByZG1h
-X3VjbSBpYl91Y20gaWJfdXZlcmJzIGliX3VtYWQgbXNyIHJkbWFfY20gY29uZmlnZnMgaWJf
-Y20gaXdfY20gbWx4NF9pYiBpYl9jb3JlIHNiX2VkYWMgZWRhY19jb3JlIHg4Nl9wa2dfdGVt
-cF90aGVybWFsIGludGVsX3Bvd2VyY2xhbXAgY29yZXRlbXAga3ZtX2ludGVsIGt2bSBkbV9t
-b2QgaXJxYnlwYXNzIGlwbWlfc3NpZiBjcmN0MTBkaWZfcGNsbXVsIGlwbWlfZGV2aW50ZiBj
-cmMzMl9wY2xtdWwgZ2hhc2hfY2xtdWxuaV9pbnRlbCBhZXNuaV9pbnRlbCBpVENPX3dkdCBh
-ZXNfeDg2XzY0IGxydyBpVENPX3ZlbmRvcl9zdXBwb3J0IGRjZGJhcyBnZjEyOG11bCB0ZzMg
-bWx4NF9jb3JlIGdsdWVfaGVscGVyIGFibGtfaGVscGVyIHB0cCBjcnlwdGQgZmplcyBpcG1p
-X3NpIHBjc3BrciBwcHNfY29yZSBsaWJwaHkgaXBtaV9tc2doYW5kbGVyIG1laV9tZSB0cG1f
-dGlzIHRwbV90aXNfY29yZSBtZWkgdHBtIGxwY19pY2ggc2hwY2hwIG1mZF9jb3JlIHdtaSBi
-dXR0b24gaGlkX2dlbmVyaWMgdXNiaGlkIG1nYWcyMDAgaTJjX2FsZ29fYml0IGRybV9rbXNf
-aGVscGVyIHN5c2NvcHlhcmVhIHN5c2ZpbGxyZWN0IHN5c2ltZ2JsdCBmYl9zeXNfZm9wcyB0
-dG0gZHJtIHNyX21vZCBjZHJvbSBjcmMzMmNfaW50ZWwgZWhjaV9wY2kgZWhjaV9oY2QgdXNi
-Y29yZSB1c2JfY29tbW9uIHNnIFtsYXN0IHVubG9hZGVkOiBzY3NpX3RyYW5zcG9ydF9zcnBd
-DQpDUFU6IDEgUElEOiAxMzYgQ29tbToga3dvcmtlci91NjQ6OCBUYWludGVkOiBHICAgICAg
-ICBXICAgICAgIDQuOC4wLXJjNC1kYmcrICMyDQpIYXJkd2FyZSBuYW1lOiBEZWxsIEluYy4g
-UG93ZXJFZGdlIFI0MzAvMDNYS0RWLCBCSU9TIDEuMC4yIDExLzE3LzIwMTQNCldvcmtxdWV1
-ZTogZXZlbnRzX3VuYm91bmQgYXN5bmNfcnVuX2VudHJ5X2ZuDQpDYWxsIFRyYWNlOg0KIFs8
-ZmZmZmZmZmY4MTMyNDdjNT5dIGR1bXBfc3RhY2srMHg2OC8weDkzDQogWzxmZmZmZmZmZjgx
-MDYyZjk2Pl0gX193YXJuKzB4YzYvMHhlMA0KIFs8ZmZmZmZmZmY4MTA2MzA2OD5dIHdhcm5f
-c2xvd3BhdGhfbnVsbCsweDE4LzB4MjANCiBbPGZmZmZmZmZmODE0ODE0NWU+XSBzZF9wcm9i
-ZV9hc3luYysweDFjZS8weDFlMA0KIFs8ZmZmZmZmZmY4MTA4OWQ2ND5dIGFzeW5jX3J1bl9l
-bnRyeV9mbisweDM0LzB4MTQwDQogWzxmZmZmZmZmZjgxMDgwMzU1Pl0gcHJvY2Vzc19vbmVf
-d29yaysweDFmNS8weDY5MA0KIFs8ZmZmZmZmZmY4MTA4MDgzOT5dIHdvcmtlcl90aHJlYWQr
-MHg0OS8weDQ5MA0KIFs8ZmZmZmZmZmY4MTA4NzAxYT5dIGt0aHJlYWQrMHhlYS8weDEwMA0K
-IFs8ZmZmZmZmZmY4MTYyZDNiZj5dIHJldF9mcm9tX2ZvcmsrMHgxZi8weDQwDQoNClRoZSB0
-ZXN0IEkgcmFuIGlzIGF2YWlsYWJsZSBhdCBodHRwczovL2dpdGh1Yi5jb20vYnZhbmFzc2No
-ZS9zcnAtdGVzdC4NCg0KQmFydC4NCg0K
+On 08/14/2016 11:23 AM, Dan Williams wrote:
+> [ adding Bart back to the cc ]
+>
+> On Sun, Aug 14, 2016 at 11:08 AM, Dan Williams <dan.j.williams@intel.com> wrote:
+>> On Sun, Aug 14, 2016 at 10:20 AM, James Bottomley
+>> <James.Bottomley@hansenpartnership.com> wrote:
+> [..]
+>> I like it.  I still think the bdi registration code should be in
+>> charge of taking the extra reference on the disk device's parent to
+>> isolate / make clear why the extra reference is being acquired, but I
+>> won't lose sleep if Jens takes your smaller change.
+>>
+>> Thanks James!
+>
+> Bart, do you have a test configuration already set up for this case.
+> Can you give the 2 patches from James a try?
+>
+> https://patchwork.kernel.org/patch/9278201/
+> https://patchwork.kernel.org/patch/9279513/
+
+Hello Dan,
+
+The "sysfs: cannot create duplicate filename" issue is something I ran 
+into sporadically before I started using my patch that fixes this issue. 
+I have not yet found a systematic way to trigger this behavior. Anyway, 
+I will drop my patch and will start testing James' two patches. It will 
+take a few days to test these patches thoroughly.
+
+Bart.
