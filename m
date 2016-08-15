@@ -1,47 +1,36 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-Subject: Re: [PATCH] block: Fix secure erase
-To: Christoph Hellwig <hch@lst.de>,
-	Shaun Tancheff <shaun.tancheff@seagate.com>
-References: <20160811140533.GA16543@lst.de>
- <1471270071-28921-1-git-send-email-adrian.hunter@intel.com>
- <CAJVOszDxKmaEEsg49yMT+Vr8oNbKLmgAGJ_P9KNa=zQcqcx+CQ@mail.gmail.com>
- <20160815181457.GA9781@lst.de>
-Cc: Jens Axboe <axboe@fb.com>, Ulf Hansson <ulf.hansson@linaro.org>,
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from verein.lst.de ([213.95.11.211]:58025 "EHLO newverein.lst.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752909AbcHOSSG (ORCPT <rfc822;linux-block@vger.kernel.org>);
+	Mon, 15 Aug 2016 14:18:06 -0400
+Date: Mon, 15 Aug 2016 20:17:54 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@fb.com>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	Ulf Hansson <ulf.hansson@linaro.org>,
 	linux-mmc@vger.kernel.org, linux-block@vger.kernel.org,
-	LKML <linux-kernel@vger.kernel.org>,
-	Josh Bingaman <josh.bingaman@seagate.com>,
-	Vinayak Holikatti <vinholikatti@gmail.com>,
-	Joao Pinto <Joao.Pinto@synopsys.com>,
-	linux-scsi@vger.kernel.org,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Pawel Wodkowski <pawelx.wodkowski@intel.com>
-From: Adrian Hunter <adrian.hunter@intel.com>
-Message-ID: <d350c5b0-3ac8-342b-608b-933652c26b65@intel.com>
-Date: Tue, 16 Aug 2016 10:20:25 +0300
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] block: Fix secure erase
+Message-ID: <20160815181754.GA9918@lst.de>
+References: <20160811140533.GA16543@lst.de> <1471270071-28921-1-git-send-email-adrian.hunter@intel.com> <20160815181328.GA9696@lst.de> <0da0904a-9d46-e043-edec-8d0d34cf0714@fb.com>
 MIME-Version: 1.0
-In-Reply-To: <20160815181457.GA9781@lst.de>
-Content-Type: text/plain; charset=windows-1252
-Sender: linux-scsi-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <0da0904a-9d46-e043-edec-8d0d34cf0714@fb.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On 15/08/16 21:14, Christoph Hellwig wrote:
-> On Mon, Aug 15, 2016 at 11:43:12AM -0500, Shaun Tancheff wrote:
->> Hmm ... Since REQ_SECURE implied REQ_DISCARD doesn't this
->> mean that we should include REQ_OP_SECURE_ERASE checking
->> wherever REQ_OP_DISCARD is being checked now in drivers/scsi/sd.c ?
+On Mon, Aug 15, 2016 at 12:16:30PM -0600, Jens Axboe wrote:
+>> This really should be a:
 >>
->> (It's only in 3 spots so it's a quickie patch)
-> 
-> SCSI doesn't support secure erase operations.  Only MMC really
-> supports it, plus the usual cargo culting in Xen blkfront that's
-> probably never been tested..
-> 
+>> 	if (req_op(rq) != req_op(pos))
+>>
+>> I'l lleave it up to Jens if he wants that in this patch or not, otherwise
+>> I'll send an incremental patch.
+>
+> Let's get a v2 with that fixed up, it makes a big readability
+> difference.
 
-I left SCSI out because support does not exist at the moment.
-However there is UFS which is seen as the replacement for eMMC.
-And there is a patch to add support for BLKSECDISCARD:
-
-	http://marc.info/?l=linux-scsi&m=146953519016056
-
-So SCSI will need updating if that is to go in.
-
+It's not just readbility, it's also a potential correctness issue.
+Not sure if we'd hit it for other request types at the moment, but
+we'd surely hit if people add more..
