@@ -1,71 +1,46 @@
-Return-Path: <famz@redhat.com>
-From: Fam Zheng <famz@redhat.com>
-To: linux-kernel@vger.kernel.org
-Cc: linux-nvme@lists.infradead.org, Keith Busch <keith.busch@intel.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        linuxppc-dev@lists.ozlabs.org, "Michael S. Tsirkin" <mst@redhat.com>,
-        linux-block@vger.kernel.org,
-        Brian Norris <computersforpeace@gmail.com>,
-        Paul Mackerras <paulus@samba.org>, linux-mtd@lists.infradead.org,
-        "Ed L. Cashin" <ed.cashin@acm.org>, Jens Axboe <axboe@kernel.dk>,
-        Minchan Kim <minchan@kernel.org>,
-        virtualization@lists.linux-foundation.org,
-        Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
-        Nitin Gupta <ngupta@vflare.org>, David Woodhouse <dwmw2@infradead.org>
-Subject: [PATCH 03/15] genhd: Return error from blk_register_region
-Date: Wed, 17 Aug 2016 15:15:03 +0800
-Message-Id: <1471418115-3654-4-git-send-email-famz@redhat.com>
-In-Reply-To: <1471418115-3654-1-git-send-email-famz@redhat.com>
-References: <1471418115-3654-1-git-send-email-famz@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from aserp1040.oracle.com ([141.146.126.69]:25833 "EHLO
+	aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751667AbcHPEKW (ORCPT
+	<rfc822;linux-block@vger.kernel.org>);
+	Tue, 16 Aug 2016 00:10:22 -0400
+To: Tom Yan <tom.ty89@gmail.com>
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
+	Tejun Heo <tj@kernel.org>, linux-ide@vger.kernel.org,
+	linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH v2 2/2] sd: check BLK_DEF_MAX_SECTORS against max_dev_sectors
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <60518e90d462d4cbb1c528914eac64e2fe124717.1471011949.git.tom.ty89@gmail.com>
+	<974f3a0aa9e82caf067353fd7d7119c07d7e98c1.1471011949.git.tom.ty89@gmail.com>
+	<yq11t1tmzxb.fsf@sermon.lab.mkp.net>
+	<CAGnHSE=yBrBCbyKMNKBpZHRX7YKR-TV-s5YybvTKW18_gcrAbw@mail.gmail.com>
+Date: Tue, 16 Aug 2016 00:10:15 -0400
+In-Reply-To: <CAGnHSE=yBrBCbyKMNKBpZHRX7YKR-TV-s5YybvTKW18_gcrAbw@mail.gmail.com>
+	(Tom Yan's message of "Sun, 14 Aug 2016 17:00:52 +0800")
+Message-ID: <yq1d1l9l5g8.fsf@sermon.lab.mkp.net>
+MIME-Version: 1.0
+Content-Type: text/plain
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-blk_register_region can fail (-ENOMEM), return the error to the caller.
+>>>>> "Tom" == Tom Yan <tom.ty89@gmail.com> writes:
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
----
- block/genhd.c         |  4 ++--
- include/linux/genhd.h | 10 +++++-----
- 2 files changed, 7 insertions(+), 7 deletions(-)
+Tom,
 
-diff --git a/block/genhd.c b/block/genhd.c
-index 3dcecaa..8c7510d 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -474,11 +474,11 @@ static char *bdevt_str(dev_t devt, char *buf)
-  * range must be nonzero
-  * The hash chain is sorted on range, so that subranges can override.
-  */
--void blk_register_region(dev_t devt, unsigned long range, struct module *module,
-+int blk_register_region(dev_t devt, unsigned long range, struct module *module,
- 			 struct kobject *(*probe)(dev_t, int *, void *),
- 			 int (*lock)(dev_t, void *), void *data)
- {
--	kobj_map(bdev_map, devt, range, module, probe, lock, data);
-+	return kobj_map(bdev_map, devt, range, module, probe, lock, data);
- }
- 
- EXPORT_SYMBOL(blk_register_region);
-diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index 889b1bb..b6fd666 100644
---- a/include/linux/genhd.h
-+++ b/include/linux/genhd.h
-@@ -617,11 +617,11 @@ extern struct gendisk *alloc_disk_node(int minors, int node_id);
- extern struct gendisk *alloc_disk(int minors);
- extern struct kobject *get_disk(struct gendisk *disk);
- extern void put_disk(struct gendisk *disk);
--extern void blk_register_region(dev_t devt, unsigned long range,
--			struct module *module,
--			struct kobject *(*probe)(dev_t, int *, void *),
--			int (*lock)(dev_t, void *),
--			void *data);
-+extern int blk_register_region(dev_t devt, unsigned long range,
-+			       struct module *module,
-+			       struct kobject *(*probe)(dev_t, int *, void *),
-+			       int (*lock)(dev_t, void *),
-+			       void *data);
- extern void blk_unregister_region(dev_t devt, unsigned long range);
- 
- extern ssize_t part_size_show(struct device *dev,
+>> It would be pretty unusual for a device that is smart enough to
+>> report a transfer length limit to be constrained to 1 MB and change.
+
+Tom> Well, it is done pretty much for libata's SATL.
+
+But why?
+
+>> rw_max = min(BLK_DEF_MAX_SECTORS, q->limits.max_dev_sectors);
+
+Tom> That won't really work. min_t() would, though the line is gonna be
+Tom> a bit long; not sure if I can/should simply cast the type (unsigned
+Tom> int) to BLK_DEF_MAX_SECTORS. And which braces are you referring to?
+
+I'd rather have a split line than double lines with braces.
+
 -- 
-2.7.4
+Martin K. Petersen	Oracle Linux Engineering
