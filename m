@@ -1,199 +1,122 @@
-Return-Path: <shaun.tancheff@seagate.com>
-MIME-Version: 1.0
-In-Reply-To: <D1D04A20-893C-4FB2-9822-0DC6309C58C8@hgst.com>
-References: <1469818955-20568-1-git-send-email-shaun@tancheff.com>
- <20160801094116.GB14677@lst.de> <CAJVOszCAb4o5LWpJL8Yd66n9jPvy+EMQX2Xfr6awZCxfGJf_CA@mail.gmail.com>
- <6a4a27ac-009d-9825-bf77-0529da77cc36@suse.de> <C7B51F39-AC67-4D96-B1DE-45C70F99134D@hgst.com>
- <CAJVOszDt5HfSKTk_8a3AkqjjAXV_9RaA2TxeqgY5Gp90w89-Lg@mail.gmail.com>
- <2370d779-3f9b-28a2-7596-42b7b6a89c21@suse.de> <CAJVOszAHL55uOuD4MbCG0gWs3ko7tZVwtAeRBXxDhD-GuD2kGA@mail.gmail.com>
- <D1D04A20-893C-4FB2-9822-0DC6309C58C8@hgst.com>
-From: Shaun Tancheff <shaun.tancheff@seagate.com>
-Date: Tue, 16 Aug 2016 00:49:33 -0500
-Message-ID: <CAJVOszAnq+bfkfQ4UWD8gERfOBP_eAyNdS_3cTM2ZtrDG+6Z1A@mail.gmail.com>
+Return-Path: <Damien.LeMoal@hgst.com>
+From: Damien Le Moal <Damien.LeMoal@hgst.com>
+To: Shaun Tancheff <shaun.tancheff@seagate.com>
+CC: Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>, "Shaun
+ Tancheff" <shaun@tancheff.com>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "linux-scsi@vger.kernel.org"
+	<linux-scsi@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Jens Axboe
+	<axboe@kernel.dk>, Jens Axboe <axboe@fb.com>, "James E . J . Bottomley"
+	<jejb@linux.vnet.ibm.com>, "Martin K . Petersen"
+	<martin.petersen@oracle.com>, Jeff Layton <jlayton@poochiereds.net>, "J .
+ Bruce Fields" <bfields@fieldses.org>, Josh Bingaman
+	<josh.bingaman@seagate.com>
 Subject: Re: [PATCH v6 0/2] Block layer support ZAC/ZBC commands
-To: Damien Le Moal <Damien.LeMoal@hgst.com>
-Cc: Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>,
-        Shaun Tancheff <shaun@tancheff.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        Jens Axboe <axboe@fb.com>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Jeff Layton <jlayton@poochiereds.net>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Josh Bingaman <josh.bingaman@seagate.com>
-Content-Type: text/plain; charset=UTF-8
+Date: Tue, 16 Aug 2016 04:00:37 +0000
+Message-ID: <D1D04A20-893C-4FB2-9822-0DC6309C58C8@hgst.com>
+References: <1469818955-20568-1-git-send-email-shaun@tancheff.com>
+ <20160801094116.GB14677@lst.de>
+ <CAJVOszCAb4o5LWpJL8Yd66n9jPvy+EMQX2Xfr6awZCxfGJf_CA@mail.gmail.com>
+ <6a4a27ac-009d-9825-bf77-0529da77cc36@suse.de>
+ <C7B51F39-AC67-4D96-B1DE-45C70F99134D@hgst.com>
+ <CAJVOszDt5HfSKTk_8a3AkqjjAXV_9RaA2TxeqgY5Gp90w89-Lg@mail.gmail.com>
+ <2370d779-3f9b-28a2-7596-42b7b6a89c21@suse.de>
+ <CAJVOszAHL55uOuD4MbCG0gWs3ko7tZVwtAeRBXxDhD-GuD2kGA@mail.gmail.com>
+In-Reply-To: <CAJVOszAHL55uOuD4MbCG0gWs3ko7tZVwtAeRBXxDhD-GuD2kGA@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Aug 15, 2016 at 11:00 PM, Damien Le Moal <Damien.LeMoal@hgst.com> w=
-rote:
->
-> Shaun,
->
->> On Aug 14, 2016, at 09:09, Shaun Tancheff <shaun.tancheff@seagate.com> w=
-rote:
-> [=E2=80=A6]
->>>>
->>> No, surely not.
->>> But one of the _big_ advantages for the RB tree is blkdev_discard().
->>> Without the RB tree any mkfs program will issue a 'discard' for every
->>> sector. We will be able to coalesce those into one discard per zone, bu=
-t
->>> we still need to issue one for _every_ zone.
->>
->> How can you make coalesce work transparently in the
->> sd layer _without_ keeping some sort of a discard cache along
->> with the zone cache?
->>
->> Currently the block layer's blkdev_issue_discard() is breaking
->> large discard's into nice granular and aligned chunks but it is
->> not preventing small discards nor coalescing them.
->>
->> In the sd layer would there be way to persist or purge an
->> overly large discard cache? What about honoring
->> discard_zeroes_data? Once the discard is completed with
->> discard_zeroes_data you have to return zeroes whenever
->> a discarded sector is read. Isn't that a log more than just
->> tracking a write pointer? Couldn't a zone have dozens of holes?
->
-> My understanding of the standards regarding discard is that it is not
-> mandatory and that it is a hint to the drive. The drive can completely
-> ignore it if it thinks that is a better choice. I may be wrong on this
-> though. Need to check again.
-
-But you are currently setting discard_zeroes_data=3D1 in your
-current patches. I believe that setting discard_zeroes_data=3D1
-effectively promotes discards to being mandatory.
-
-I have a follow on patch to my SCT Write Same series that
-handles the CMR zone case in the sd_zbc_setup_discard() handler.
-
-> For reset write pointer, the mapping to discard requires that the calls
-> to blkdev_issue_discard be zone aligned for anything to happen. Specify
-> less than a zone and nothing will be done. This I think preserve the
-> discard semantic.
-
-Oh. If that is the intent then there is just a bug in the handler.
-I have pointed out where I believe it to be in my response to
-the zone cache patch being posted.
-
-> As for the =E2=80=9Cdiscard_zeroes_data=E2=80=9D thing, I also think that=
- is a drive
-> feature not mandatory. Drives may have it or not, which is consistent
-> with the ZBC/ZAC standards regarding reading after write pointer (nothing
-> says that zeros have to be returned). In any case, discard of CMR zones
-> will be a nop, so for SMR drives, discard_zeroes_data=3D0 may be a better
-> choice.
-
-However I am still curious about discard's being coalesced.
-
->>> Which is (as indicated) really slow, and easily takes several minutes.
->>> With the RB tree we can short-circuit discards to empty zones, and spee=
-d
->>> up processing time dramatically.
->>> Sure we could be moving the logic into mkfs and friends, but that would
->>> require us to change the programs and agree on a library (libzbc?) whic=
-h
->>> should be handling that.
->>
->> F2FS's mkfs.f2fs is already reading the zone topology via SG_IO ...
->> so I'm not sure your argument is valid here.
->
-> This initial SMR support patch is just that: a first try. Jaegeuk
-> used SG_IO (in fact copy-paste of parts of libzbc) because the current
-> ZBC patch-set has no ioctl API for zone information manipulation. We
-> will fix this mkfs.f2fs once we agree on an ioctl interface.
-
-Which again is my point. If mkfs.f2fs wants to speed up it's
-discard pass in mkfs.f2fs by _not_ sending unneccessary
-Reset WP for zones that are already empty it has all the
-information it needs to do so.
-
-Here it seems to me that the zone cache is _at_best_
-doing double work. At works the zone cache could be
-doing the wrong thing _if_ the zone cache got out of sync.
-It is certainly possible (however unlikely) that someone was
-doing some raw sg activity that is not seed by the sd path.
-
-All I am trying to do is have a discussion about the reasons for
-and against have a zone cache. Where it works and where it breaks
-this should be entirely technical but I understand that we have all
-spent a lot of time _not_ discussing this for various non-technical
-reasons.
-
-So far the only reason I've been able to ascertain is that
-Host Manged drives really don't like being stuck with the
-URSWRZ and would like to have a software hack to return
-MUD rather than ship drives with some weird out-of-the box
-config where the last zone is marked as FINISH'd thereby
-returning MUD on reads as per spec.
-
-I understand that it would be strange state to see of first
-boot and likely people would just do a ResetWP and have
-weird boot errors, which would probably just make matters
-worse.
-
-I just would rather the work around be a bit cleaner and/or
-use less memory. I would also like a path available that
-does not require SD_ZBC or BLK_ZONED for Host Aware
-drives to work, hence this set of patches and me begging
-for a single bit in struct bio.
-
->>
->> [..]
->>
->>>>> 3) Try to condense the blkzone data structure to save memory:
->>>>> I think that we can at the very least remove the zone length, and als=
-o
->>>>> may be the per zone spinlock too (a single spinlock and proper state =
-flags can
->>>>> be used).
->>>>
->>>> I have a variant that is an array of descriptors that roughly mimics t=
-he
->>>> api from blk-zoned.c that I did a few months ago as an example.
->>>> I should be able to update that to the current kernel + patches.
->>>>
->>> Okay. If we restrict the in-kernel SMR drive handling to devices with
->>> identical zone sizes of course we can remove the zone length.
->>> And we can do away with the per-zone spinlock and use a global one inst=
-ead.
->>
->> I don't think dropping the zone length is a reasonable thing to do.
-
-REPEAT: I do _not_ think dropping the zone length is a good thing.
-
->> What I propose is an array of _descriptors_ it doesn't drop _any_
->> of the zone information that you are holding in an RB tree, it is
->> just a condensed format that _mostly_ plugs into your existing
->> API.
->
-> I do not agree. The Seagate drive already has one zone (the last one)
-> that is not the same length as the other zones. Sure, since it is the
-> last one, we can had =E2=80=9Cif (last zone)=E2=80=9D all over the place =
-and make it
-> work. But that is really ugly. Keeping the length field makes the code
-> generic and following the standard, which has no restriction on the
-> zone sizes. We could do some memory optimisation using different types
-> of blk_zone sturcts, the types mapping to the SAME value: drives with
-> constant zone size can use a blk_zone type without the length field,
-> others use a different type that include the field. Accessor functions
-> can hide the different types in the zone manipulation code.
-
-Ah. I just said that dropping the zone length is not a good idea.
-Why the antagonistic exposition?
-
-All I am saying is that I can give you the zone cache with 1/7th of
-the memory and the same performance with _no_ loss of information,
-or features, as compared to the existing zone cache.
-
-All the code is done now. I will post patches once my testing is
-done.
-
-I have also reworked all the zone integration so the BIO flags will
-pull from and update the zone cache as opposed to the first hack
-that only really integrated with some ioctls.
-
-Regards,
-Shaun
+DQpTaGF1biwNCg0KPiBPbiBBdWcgMTQsIDIwMTYsIGF0IDA5OjA5LCBTaGF1biBUYW5jaGVmZiA8
+c2hhdW4udGFuY2hlZmZAc2VhZ2F0ZS5jb20+IHdyb3RlOg0KW+KApl0NCj4+PiANCj4+IE5vLCBz
+dXJlbHkgbm90Lg0KPj4gQnV0IG9uZSBvZiB0aGUgX2JpZ18gYWR2YW50YWdlcyBmb3IgdGhlIFJC
+IHRyZWUgaXMgYmxrZGV2X2Rpc2NhcmQoKS4NCj4+IFdpdGhvdXQgdGhlIFJCIHRyZWUgYW55IG1r
+ZnMgcHJvZ3JhbSB3aWxsIGlzc3VlIGEgJ2Rpc2NhcmQnIGZvciBldmVyeQ0KPj4gc2VjdG9yLiBX
+ZSB3aWxsIGJlIGFibGUgdG8gY29hbGVzY2UgdGhvc2UgaW50byBvbmUgZGlzY2FyZCBwZXIgem9u
+ZSwgYnV0DQo+PiB3ZSBzdGlsbCBuZWVkIHRvIGlzc3VlIG9uZSBmb3IgX2V2ZXJ5XyB6b25lLg0K
+PiANCj4gSG93IGNhbiB5b3UgbWFrZSBjb2FsZXNjZSB3b3JrIHRyYW5zcGFyZW50bHkgaW4gdGhl
+DQo+IHNkIGxheWVyIF93aXRob3V0XyBrZWVwaW5nIHNvbWUgc29ydCBvZiBhIGRpc2NhcmQgY2Fj
+aGUgYWxvbmcNCj4gd2l0aCB0aGUgem9uZSBjYWNoZT8NCj4gDQo+IEN1cnJlbnRseSB0aGUgYmxv
+Y2sgbGF5ZXIncyBibGtkZXZfaXNzdWVfZGlzY2FyZCgpIGlzIGJyZWFraW5nDQo+IGxhcmdlIGRp
+c2NhcmQncyBpbnRvIG5pY2UgZ3JhbnVsYXIgYW5kIGFsaWduZWQgY2h1bmtzIGJ1dCBpdCBpcw0K
+PiBub3QgcHJldmVudGluZyBzbWFsbCBkaXNjYXJkcyBub3IgY29hbGVzY2luZyB0aGVtLg0KPiAN
+Cj4gSW4gdGhlIHNkIGxheWVyIHdvdWxkIHRoZXJlIGJlIHdheSB0byBwZXJzaXN0IG9yIHB1cmdl
+IGFuDQo+IG92ZXJseSBsYXJnZSBkaXNjYXJkIGNhY2hlPyBXaGF0IGFib3V0IGhvbm9yaW5nDQo+
+IGRpc2NhcmRfemVyb2VzX2RhdGE/IE9uY2UgdGhlIGRpc2NhcmQgaXMgY29tcGxldGVkIHdpdGgN
+Cj4gZGlzY2FyZF96ZXJvZXNfZGF0YSB5b3UgaGF2ZSB0byByZXR1cm4gemVyb2VzIHdoZW5ldmVy
+DQo+IGEgZGlzY2FyZGVkIHNlY3RvciBpcyByZWFkLiBJc24ndCB0aGF0IGEgbG9nIG1vcmUgdGhh
+biBqdXN0DQo+IHRyYWNraW5nIGEgd3JpdGUgcG9pbnRlcj8gQ291bGRuJ3QgYSB6b25lIGhhdmUg
+ZG96ZW5zIG9mIGhvbGVzPw0KDQpNeSB1bmRlcnN0YW5kaW5nIG9mIHRoZSBzdGFuZGFyZHMgcmVn
+YXJkaW5nIGRpc2NhcmQgaXMgdGhhdCBpdCBpcyBub3QNCm1hbmRhdG9yeSBhbmQgdGhhdCBpdCBp
+cyBhIGhpbnQgdG8gdGhlIGRyaXZlLiBUaGUgZHJpdmUgY2FuIGNvbXBsZXRlbHkNCmlnbm9yZSBp
+dCBpZiBpdCB0aGlua3MgdGhhdCBpcyBhIGJldHRlciBjaG9pY2UuIEkgbWF5IGJlIHdyb25nIG9u
+IHRoaXMNCnRob3VnaC4gTmVlZCB0byBjaGVjayBhZ2Fpbi4NCkZvciByZXNldCB3cml0ZSBwb2lu
+dGVyLCB0aGUgbWFwcGluZyB0byBkaXNjYXJkIHJlcXVpcmVzIHRoYXQgdGhlIGNhbGxzDQp0byBi
+bGtkZXZfaXNzdWVfZGlzY2FyZCBiZSB6b25lIGFsaWduZWQgZm9yIGFueXRoaW5nIHRvIGhhcHBl
+bi4gU3BlY2lmeQ0KbGVzcyB0aGFuIGEgem9uZSBhbmQgbm90aGluZyB3aWxsIGJlIGRvbmUuIFRo
+aXMgSSB0aGluayBwcmVzZXJ2ZSB0aGUNCmRpc2NhcmQgc2VtYW50aWMuDQoNCkFzIGZvciB0aGUg
+4oCcZGlzY2FyZF96ZXJvZXNfZGF0YeKAnSB0aGluZywgSSBhbHNvIHRoaW5rIHRoYXQgaXMgYSBk
+cml2ZQ0KZmVhdHVyZSBub3QgbWFuZGF0b3J5LiBEcml2ZXMgbWF5IGhhdmUgaXQgb3Igbm90LCB3
+aGljaCBpcyBjb25zaXN0ZW50DQp3aXRoIHRoZSBaQkMvWkFDIHN0YW5kYXJkcyByZWdhcmRpbmcg
+cmVhZGluZyBhZnRlciB3cml0ZSBwb2ludGVyIChub3RoaW5nDQpzYXlzIHRoYXQgemVyb3MgaGF2
+ZSB0byBiZSByZXR1cm5lZCkuIEluIGFueSBjYXNlLCBkaXNjYXJkIG9mIENNUiB6b25lcw0Kd2ls
+bCBiZSBhIG5vcCwgc28gZm9yIFNNUiBkcml2ZXMsIGRpc2NhcmRfemVyb2VzX2RhdGE9MCBtYXkg
+YmUgYSBiZXR0ZXINCmNob2ljZS4NCg0KPiANCj4+IFdoaWNoIGlzIChhcyBpbmRpY2F0ZWQpIHJl
+YWxseSBzbG93LCBhbmQgZWFzaWx5IHRha2VzIHNldmVyYWwgbWludXRlcy4NCj4+IFdpdGggdGhl
+IFJCIHRyZWUgd2UgY2FuIHNob3J0LWNpcmN1aXQgZGlzY2FyZHMgdG8gZW1wdHkgem9uZXMsIGFu
+ZCBzcGVlZA0KPj4gdXAgcHJvY2Vzc2luZyB0aW1lIGRyYW1hdGljYWxseS4NCj4+IFN1cmUgd2Ug
+Y291bGQgYmUgbW92aW5nIHRoZSBsb2dpYyBpbnRvIG1rZnMgYW5kIGZyaWVuZHMsIGJ1dCB0aGF0
+IHdvdWxkDQo+PiByZXF1aXJlIHVzIHRvIGNoYW5nZSB0aGUgcHJvZ3JhbXMgYW5kIGFncmVlIG9u
+IGEgbGlicmFyeSAobGliemJjPykgd2hpY2gNCj4+IHNob3VsZCBiZSBoYW5kbGluZyB0aGF0Lg0K
+PiANCj4gRjJGUydzIG1rZnMuZjJmcyBpcyBhbHJlYWR5IHJlYWRpbmcgdGhlIHpvbmUgdG9wb2xv
+Z3kgdmlhIFNHX0lPIC4uLg0KPiBzbyBJJ20gbm90IHN1cmUgeW91ciBhcmd1bWVudCBpcyB2YWxp
+ZCBoZXJlLg0KDQpUaGlzIGluaXRpYWwgU01SIHN1cHBvcnQgcGF0Y2ggaXMganVzdCB0aGF0OiBh
+IGZpcnN0IHRyeS4gSmFlZ2V1aw0KdXNlZCBTR19JTyAoaW4gZmFjdCBjb3B5LXBhc3RlIG9mIHBh
+cnRzIG9mIGxpYnpiYykgYmVjYXVzZSB0aGUgY3VycmVudA0KWkJDIHBhdGNoLXNldCBoYXMgbm8g
+aW9jdGwgQVBJIGZvciB6b25lIGluZm9ybWF0aW9uIG1hbmlwdWxhdGlvbi4gV2UNCndpbGwgZml4
+IHRoaXMgbWtmcy5mMmZzIG9uY2Ugd2UgYWdyZWUgb24gYW4gaW9jdGwgaW50ZXJmYWNlLg0KDQo+
+IA0KPiBbLi5dDQo+IA0KPj4+PiAzKSBUcnkgdG8gY29uZGVuc2UgdGhlIGJsa3pvbmUgZGF0YSBz
+dHJ1Y3R1cmUgdG8gc2F2ZSBtZW1vcnk6DQo+Pj4+IEkgdGhpbmsgdGhhdCB3ZSBjYW4gYXQgdGhl
+IHZlcnkgbGVhc3QgcmVtb3ZlIHRoZSB6b25lIGxlbmd0aCwgYW5kIGFsc28NCj4+Pj4gbWF5IGJl
+IHRoZSBwZXIgem9uZSBzcGlubG9jayB0b28gKGEgc2luZ2xlIHNwaW5sb2NrIGFuZCBwcm9wZXIg
+c3RhdGUgZmxhZ3MgY2FuDQo+Pj4+IGJlIHVzZWQpLg0KPj4+IA0KPj4+IEkgaGF2ZSBhIHZhcmlh
+bnQgdGhhdCBpcyBhbiBhcnJheSBvZiBkZXNjcmlwdG9ycyB0aGF0IHJvdWdobHkgbWltaWNzIHRo
+ZQ0KPj4+IGFwaSBmcm9tIGJsay16b25lZC5jIHRoYXQgSSBkaWQgYSBmZXcgbW9udGhzIGFnbyBh
+cyBhbiBleGFtcGxlLg0KPj4+IEkgc2hvdWxkIGJlIGFibGUgdG8gdXBkYXRlIHRoYXQgdG8gdGhl
+IGN1cnJlbnQga2VybmVsICsgcGF0Y2hlcy4NCj4+PiANCj4+IE9rYXkuIElmIHdlIHJlc3RyaWN0
+IHRoZSBpbi1rZXJuZWwgU01SIGRyaXZlIGhhbmRsaW5nIHRvIGRldmljZXMgd2l0aA0KPj4gaWRl
+bnRpY2FsIHpvbmUgc2l6ZXMgb2YgY291cnNlIHdlIGNhbiByZW1vdmUgdGhlIHpvbmUgbGVuZ3Ro
+Lg0KPj4gQW5kIHdlIGNhbiBkbyBhd2F5IHdpdGggdGhlIHBlci16b25lIHNwaW5sb2NrIGFuZCB1
+c2UgYSBnbG9iYWwgb25lIGluc3RlYWQuDQo+IA0KPiBJIGRvbid0IHRoaW5rIGRyb3BwaW5nIHRo
+ZSB6b25lIGxlbmd0aCBpcyBhIHJlYXNvbmFibGUgdGhpbmcgdG8gZG8uDQo+IA0KPiBXaGF0IEkg
+cHJvcG9zZSBpcyBhbiBhcnJheSBvZiBfZGVzY3JpcHRvcnNfIGl0IGRvZXNuJ3QgZHJvcCBfYW55
+Xw0KPiBvZiB0aGUgem9uZSBpbmZvcm1hdGlvbiB0aGF0IHlvdSBhcmUgaG9sZGluZyBpbiBhbiBS
+QiB0cmVlLCBpdCBpcw0KPiBqdXN0IGEgY29uZGVuc2VkIGZvcm1hdCB0aGF0IF9tb3N0bHlfIHBs
+dWdzIGludG8geW91ciBleGlzdGluZw0KPiBBUEkuDQoNCkkgZG8gbm90IGFncmVlLiBUaGUgU2Vh
+Z2F0ZSBkcml2ZSBhbHJlYWR5IGhhcyBvbmUgem9uZSAodGhlIGxhc3Qgb25lKQ0KdGhhdCBpcyBu
+b3QgdGhlIHNhbWUgbGVuZ3RoIGFzIHRoZSBvdGhlciB6b25lcy4gU3VyZSwgc2luY2UgaXQgaXMg
+dGhlDQpsYXN0IG9uZSwgd2UgY2FuIGhhZCDigJxpZiAobGFzdCB6b25lKeKAnSBhbGwgb3ZlciB0
+aGUgcGxhY2UgYW5kIG1ha2UgaXQNCndvcmsuIEJ1dCB0aGF0IGlzIHJlYWxseSB1Z2x5LiBLZWVw
+aW5nIHRoZSBsZW5ndGggZmllbGQgbWFrZXMgdGhlIGNvZGUNCmdlbmVyaWMgYW5kIGZvbGxvd2lu
+ZyB0aGUgc3RhbmRhcmQsIHdoaWNoIGhhcyBubyByZXN0cmljdGlvbiBvbiB0aGUNCnpvbmUgc2l6
+ZXMuIFdlIGNvdWxkIGRvIHNvbWUgbWVtb3J5IG9wdGltaXNhdGlvbiB1c2luZyBkaWZmZXJlbnQg
+dHlwZXMNCm9mIGJsa196b25lIHN0dXJjdHMsIHRoZSB0eXBlcyBtYXBwaW5nIHRvIHRoZSBTQU1F
+IHZhbHVlOiBkcml2ZXMgd2l0aA0KY29uc3RhbnQgem9uZSBzaXplIGNhbiB1c2UgYSBibGtfem9u
+ZSB0eXBlIHdpdGhvdXQgdGhlIGxlbmd0aCBmaWVsZCwNCm90aGVycyB1c2UgYSBkaWZmZXJlbnQg
+dHlwZSB0aGF0IGluY2x1ZGUgdGhlIGZpZWxkLiBBY2Nlc3NvciBmdW5jdGlvbnMNCmNhbiBoaWRl
+IHRoZSBkaWZmZXJlbnQgdHlwZXMgaW4gdGhlIHpvbmUgbWFuaXB1bGF0aW9uIGNvZGUuDQoNCkJl
+c3QgcmVnYXJkcy4NCg0KDQotLSANCkRhbWllbiBMZSBNb2FsLCBQaC5ELg0KU3IuIE1hbmFnZXIs
+IFN5c3RlbSBTb2Z0d2FyZSBHcm91cCwgSEdTVCBSZXNlYXJjaCwNCkhHU1QsIGEgV2VzdGVybiBE
+aWdpdGFsIGJyYW5kDQpEYW1pZW4uTGVNb2FsQGhnc3QuY29tDQooKzgxKSAwNDY2LTk4LTM1OTMg
+KGV4dC4gNTEzNTkzKQ0KMSBraXJpaGFyYS1jaG8sIEZ1amlzYXdhLCANCkthbmFnYXdhLCAyNTIt
+MDg4OCBKYXBhbg0Kd3d3Lmhnc3QuY29tDQoNCldlc3Rlcm4gRGlnaXRhbCBDb3Jwb3JhdGlvbiAo
+YW5kIGl0cyBzdWJzaWRpYXJpZXMpIEUtbWFpbCBDb25maWRlbnRpYWxpdHkgTm90aWNlICYgRGlz
+Y2xhaW1lcjoKClRoaXMgZS1tYWlsIGFuZCBhbnkgZmlsZXMgdHJhbnNtaXR0ZWQgd2l0aCBpdCBt
+YXkgY29udGFpbiBjb25maWRlbnRpYWwgb3IgbGVnYWxseSBwcml2aWxlZ2VkIGluZm9ybWF0aW9u
+IG9mIFdEQyBhbmQvb3IgaXRzIGFmZmlsaWF0ZXMsIGFuZCBhcmUgaW50ZW5kZWQgc29sZWx5IGZv
+ciB0aGUgdXNlIG9mIHRoZSBpbmRpdmlkdWFsIG9yIGVudGl0eSB0byB3aGljaCB0aGV5IGFyZSBh
+ZGRyZXNzZWQuIElmIHlvdSBhcmUgbm90IHRoZSBpbnRlbmRlZCByZWNpcGllbnQsIGFueSBkaXNj
+bG9zdXJlLCBjb3B5aW5nLCBkaXN0cmlidXRpb24gb3IgYW55IGFjdGlvbiB0YWtlbiBvciBvbWl0
+dGVkIHRvIGJlIHRha2VuIGluIHJlbGlhbmNlIG9uIGl0LCBpcyBwcm9oaWJpdGVkLiBJZiB5b3Ug
+aGF2ZSByZWNlaXZlZCB0aGlzIGUtbWFpbCBpbiBlcnJvciwgcGxlYXNlIG5vdGlmeSB0aGUgc2Vu
+ZGVyIGltbWVkaWF0ZWx5IGFuZCBkZWxldGUgdGhlIGUtbWFpbCBpbiBpdHMgZW50aXJldHkgZnJv
+bSB5b3VyIHN5c3RlbS4K
