@@ -1,66 +1,43 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-	Andreas Dilger <adilger.kernel@dilger.ca>,
-	Jan Kara <jack@suse.com>,
-	Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-	Hugh Dickins <hughd@google.com>,
-	Andrea Arcangeli <aarcange@redhat.com>,
-	Dave Hansen <dave.hansen@intel.com>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	Matthew Wilcox <willy@infradead.org>,
-	Ross Zwisler <ross.zwisler@linux.intel.com>,
-	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	linux-block@vger.kernel.org,
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv2 13/41] truncate: make sure invalidate_mapping_pages() can discard huge pages
-Date: Fri, 12 Aug 2016 21:37:56 +0300
-Message-Id: <1471027104-115213-14-git-send-email-kirill.shutemov@linux.intel.com>
-In-Reply-To: <1471027104-115213-1-git-send-email-kirill.shutemov@linux.intel.com>
-References: <1471027104-115213-1-git-send-email-kirill.shutemov@linux.intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <linux-ide-owner@vger.kernel.org>
+To: Tom Yan <tom.ty89@gmail.com>
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
+	Tejun Heo <tj@kernel.org>,
+	Shaun Tancheff <shaun.tancheff@seagate.com>,
+	Shaun Tancheff <shaun@tancheff.com>, linux-ide@vger.kernel.org,
+	linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [RFC] libata-scsi: make sure Maximum Write Same Length is not too large
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <833713246c1a70d85150289c1537797d6f7dd606.1470903899.git.tom.ty89@gmail.com>
+	<yq1r39upy7p.fsf@sermon.lab.mkp.net>
+	<CAGnHSE=E1Bj99EciXrDS31n4Q4VcRL0sDJ2t4ynx0bHgp5RNtw@mail.gmail.com>
+	<yq1lh01n1ul.fsf@sermon.lab.mkp.net>
+	<CAGnHSEnycyCRy=SHXs+fQx8mwaQwLtAKO1thH6yYscbBkL2+VQ@mail.gmail.com>
+Date: Tue, 16 Aug 2016 00:15:15 -0400
+In-Reply-To: <CAGnHSEnycyCRy=SHXs+fQx8mwaQwLtAKO1thH6yYscbBkL2+VQ@mail.gmail.com>
+	(Tom Yan's message of "Sun, 14 Aug 2016 17:23:45 +0800")
+Message-ID: <yq18tvxl57w.fsf@sermon.lab.mkp.net>
+MIME-Version: 1.0
+Content-Type: text/plain
+Sender: linux-ide-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-invalidate_inode_page() has expectation about page_count() of the page
--- if it's not 2 (one to caller, one to radix-tree), it will not be
-dropped. That condition almost never met for THPs -- tail pages are
-pinned to the pagevec.
+>>>>> "Tom" == Tom Yan <tom.ty89@gmail.com> writes:
 
-Let's drop them, before calling invalidate_inode_page().
+Tom,
 
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
----
- mm/truncate.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+Tom> The thing is, as of ACS-4, blocks that carry DSM/TRIM LBA Range
+Tom> Entries are always 512-byte.
 
-diff --git a/mm/truncate.c b/mm/truncate.c
-index a01cce450a26..ce904e4b1708 100644
---- a/mm/truncate.c
-+++ b/mm/truncate.c
-@@ -504,10 +504,21 @@ unsigned long invalidate_mapping_pages(struct address_space *mapping,
- 				/* 'end' is in the middle of THP */
- 				if (index ==  round_down(end, HPAGE_PMD_NR))
- 					continue;
-+				/*
-+				 * invalidate_inode_page() expects
-+				 * page_count(page) == 2 to drop page from page
-+				 * cache -- drop tail pages references.
-+				 */
-+				get_page(page);
-+				pagevec_release(&pvec);
- 			}
- 
- 			ret = invalidate_inode_page(page);
- 			unlock_page(page);
-+
-+			if (PageTransHuge(page))
-+				put_page(page);
-+
- 			/*
- 			 * Invalidation is a hint that the page is no longer
- 			 * of interest and try to speed up its reclaim.
+Lovely. And SAT conveniently ignores this entirely.
+
+Tom> Honestly, I have no idea how that would work on a 4Kn SSD, if it is
+Tom> / will ever be a thing.
+
+Highly unlikely.
+
+But I guess you would have to report 8 512-byte ranges in the 4Kn
+case. And then rely on the patch we talked about to clamp the number of
+sectors based on the block layer limit.
+
 -- 
-2.8.1
-
+Martin K. Petersen	Oracle Linux Engineering
