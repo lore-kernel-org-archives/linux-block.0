@@ -1,17 +1,17 @@
 Return-Path: <shaun.tancheff@seagate.com>
 MIME-Version: 1.0
-In-Reply-To: <37fdd603-403d-84bf-9f3d-51e9791006c4@hgst.com>
+In-Reply-To: <D1D04A20-893C-4FB2-9822-0DC6309C58C8@hgst.com>
 References: <1469818955-20568-1-git-send-email-shaun@tancheff.com>
  <20160801094116.GB14677@lst.de> <CAJVOszCAb4o5LWpJL8Yd66n9jPvy+EMQX2Xfr6awZCxfGJf_CA@mail.gmail.com>
  <6a4a27ac-009d-9825-bf77-0529da77cc36@suse.de> <C7B51F39-AC67-4D96-B1DE-45C70F99134D@hgst.com>
  <CAJVOszDt5HfSKTk_8a3AkqjjAXV_9RaA2TxeqgY5Gp90w89-Lg@mail.gmail.com>
- <2370d779-3f9b-28a2-7596-42b7b6a89c21@suse.de> <D3D5E748-ADB9-4376-8969-623A8A815E36@hgst.com>
- <CAJVOszDavBDA0hZTox-nNtPHCz-tWecOJCJ5R25u+AV6Wq3xwQ@mail.gmail.com> <37fdd603-403d-84bf-9f3d-51e9791006c4@hgst.com>
+ <2370d779-3f9b-28a2-7596-42b7b6a89c21@suse.de> <CAJVOszAHL55uOuD4MbCG0gWs3ko7tZVwtAeRBXxDhD-GuD2kGA@mail.gmail.com>
+ <D1D04A20-893C-4FB2-9822-0DC6309C58C8@hgst.com>
 From: Shaun Tancheff <shaun.tancheff@seagate.com>
-Date: Tue, 16 Aug 2016 01:07:30 -0500
-Message-ID: <CAJVOszDGxEsLkQ3jMcvhd7N9FtY5r4Q2ARqyebJqwtmTDmsk=w@mail.gmail.com>
+Date: Tue, 16 Aug 2016 00:49:33 -0500
+Message-ID: <CAJVOszAnq+bfkfQ4UWD8gERfOBP_eAyNdS_3cTM2ZtrDG+6Z1A@mail.gmail.com>
 Subject: Re: [PATCH v6 0/2] Block layer support ZAC/ZBC commands
-To: Damien Le Moal <damien.lemoal@hgst.com>
+To: Damien Le Moal <Damien.LeMoal@hgst.com>
 Cc: Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>,
         Shaun Tancheff <shaun@tancheff.com>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
@@ -26,156 +26,174 @@ Cc: Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>,
 Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Aug 9, 2016 at 11:38 PM, Damien Le Moal <damien.lemoal@hgst.com> wrote:
+On Mon, Aug 15, 2016 at 11:00 PM, Damien Le Moal <Damien.LeMoal@hgst.com> w=
+rote:
+>
 > Shaun,
 >
-> On 8/10/16 12:58, Shaun Tancheff wrote:
->>
->> On Tue, Aug 9, 2016 at 3:09 AM, Damien Le Moal <Damien.LeMoal@hgst.com>
->> wrote:
+>> On Aug 14, 2016, at 09:09, Shaun Tancheff <shaun.tancheff@seagate.com> w=
+rote:
+> [=E2=80=A6]
 >>>>
->>>> On Aug 9, 2016, at 15:47, Hannes Reinecke <hare@suse.de> wrote:
+>>> No, surely not.
+>>> But one of the _big_ advantages for the RB tree is blkdev_discard().
+>>> Without the RB tree any mkfs program will issue a 'discard' for every
+>>> sector. We will be able to coalesce those into one discard per zone, bu=
+t
+>>> we still need to issue one for _every_ zone.
 >>
+>> How can you make coalesce work transparently in the
+>> sd layer _without_ keeping some sort of a discard cache along
+>> with the zone cache?
 >>
->> [trim]
+>> Currently the block layer's blkdev_issue_discard() is breaking
+>> large discard's into nice granular and aligned chunks but it is
+>> not preventing small discards nor coalescing them.
 >>
->>>>> Since disk type == 0 for everything that isn't HM so I would prefer the
->>>>> sysfs 'zoned' file just report if the drive is HA or HM.
->>>>>
->>>> Okay. So let's put in the 'zoned' attribute the device type:
->>>> 'host-managed', 'host-aware', or 'device managed'.
->>>
->>>
->>> I hacked your patches and simply put a "0" or "1" in the sysfs zoned
->>> file.
->>> Any drive that has ZBC/ZAC command support gets a "1", "0" for everything
->>> else. This means that drive managed models are not exposed as zoned block
->>> devices. For HM vs HA differentiation, an application can look at the
->>> device type file since it is already present.
->>>
->>> We could indeed set the "zoned" file to the device type, but HM drives
->>> and
->>> regular drives will both have "0" in it, so no differentiation possible.
->>> The other choice could be the "zoned" bits defined by ZBC, but these
->>> do not define a value for host managed drives, and the drive managed
->>> value
->>> being not "0" could be confusing too. So I settled for a simple 0/1
->>> boolean.
->>
->>
->> This seems good to me.
+>> In the sd layer would there be way to persist or purge an
+>> overly large discard cache? What about honoring
+>> discard_zeroes_data? Once the discard is completed with
+>> discard_zeroes_data you have to return zeroes whenever
+>> a discarded sector is read. Isn't that a log more than just
+>> tracking a write pointer? Couldn't a zone have dozens of holes?
 >
->
-> Another option I forgot is for the "zoned" file to indicate the total number
-> of zones of the device, and 0 for a non zoned regular block device. That
-> would work as well.
+> My understanding of the standards regarding discard is that it is not
+> mandatory and that it is a hint to the drive. The drive can completely
+> ignore it if it thinks that is a better choice. I may be wrong on this
+> though. Need to check again.
 
-Clearly either is sufficient.
+But you are currently setting discard_zeroes_data=3D1 in your
+current patches. I believe that setting discard_zeroes_data=3D1
+effectively promotes discards to being mandatory.
 
-> [...]
->>>
->>> Done: I hacked Shaun ioctl code and added finish zone too. The
->>> difference with Shaun initial code is that the ioctl are propagated down
->>> to
->>> the driver (__blkdev_driver_ioctl -> sd_ioctl) so that there is no need
->>> for
->>> BIO request definition for the zone operations. So a lot less code added.
+I have a follow on patch to my SCT Write Same series that
+handles the CMR zone case in the sd_zbc_setup_discard() handler.
+
+> For reset write pointer, the mapping to discard requires that the calls
+> to blkdev_issue_discard be zone aligned for anything to happen. Specify
+> less than a zone and nothing will be done. This I think preserve the
+> discard semantic.
+
+Oh. If that is the intent then there is just a bug in the handler.
+I have pointed out where I believe it to be in my response to
+the zone cache patch being posted.
+
+> As for the =E2=80=9Cdiscard_zeroes_data=E2=80=9D thing, I also think that=
+ is a drive
+> feature not mandatory. Drives may have it or not, which is consistent
+> with the ZBC/ZAC standards regarding reading after write pointer (nothing
+> says that zeros have to be returned). In any case, discard of CMR zones
+> will be a nop, so for SMR drives, discard_zeroes_data=3D0 may be a better
+> choice.
+
+However I am still curious about discard's being coalesced.
+
+>>> Which is (as indicated) really slow, and easily takes several minutes.
+>>> With the RB tree we can short-circuit discards to empty zones, and spee=
+d
+>>> up processing time dramatically.
+>>> Sure we could be moving the logic into mkfs and friends, but that would
+>>> require us to change the programs and agree on a library (libzbc?) whic=
+h
+>>> should be handling that.
 >>
->>
->> The purpose of the BIO flags is not to enable the ioctls so much as
->> the other way round. Creating BIO op's is to enable issuing ZBC
->> commands from device mapper targets and file systems without some
->> heinous ioctl hacks.
->> Making the resulting block layer interfaces available via ioctls is just a
->> reasonable way to exercise the code ... or that was my intent.
+>> F2FS's mkfs.f2fs is already reading the zone topology via SG_IO ...
+>> so I'm not sure your argument is valid here.
 >
->
-> Yes, I understood your code. However, since (or if) we keep the zone
-> information in the RB-tree cache, there is no need for the report zone
-> operation BIO interface. Same for reset write pointer by keeping the mapping
-> to discard. blk_lookup_zone can be used in kernel as a report zone BIO
-> replacement and works as well for the report zone ioctl implementation. For
-> reset, there is blkdev_issue_discrad in kernel, and the reset zone ioctl
-> becomes equivalent to BLKDISCARD ioctl. These are simple. Open, close and
-> finish zone remains. For these, adding the BIO interface seemed an overkill.
-> Hence my choice of propagating the ioctl to the driver.
-> This is debatable of course, and adding an in-kernel interface is not hard:
-> we can implement blk_open_zone, blk_close_zone and blk_finish_zone using
-> __blkdev_driver_ioctl. That looks clean to me.
+> This initial SMR support patch is just that: a first try. Jaegeuk
+> used SG_IO (in fact copy-paste of parts of libzbc) because the current
+> ZBC patch-set has no ioctl API for zone information manipulation. We
+> will fix this mkfs.f2fs once we agree on an ioctl interface.
 
-Uh. I would call that "heinous" ioctl hacks myself. Kernel -> User API
--> Kernel
-is not really a good designed IMO.
+Which again is my point. If mkfs.f2fs wants to speed up it's
+discard pass in mkfs.f2fs by _not_ sending unneccessary
+Reset WP for zones that are already empty it has all the
+information it needs to do so.
 
-> Overall, my concern with the BIO based interface for the ZBC commands is
-> that it adds one flag for each command, which is not really the philosophy
-> of the interface and potentially opens the door for more such
-> implementations in the future with new standards and new commands coming up.
-> Clearly that is not a sustainable path. So I think that a more specific
-> interface for these zone operations is a better choice. That is consistent
-> with what happens with the tons of ATA and SCSI commands not actually doing
-> data I/Os (mode sense, log pages, SMART, etc). All these do not use BIOs and
-> are processed as request REQ_TYPE_BLOCK_PC.
+Here it seems to me that the zone cache is _at_best_
+doing double work. At works the zone cache could be
+doing the wrong thing _if_ the zone cache got out of sync.
+It is certainly possible (however unlikely) that someone was
+doing some raw sg activity that is not seed by the sd path.
 
-Part of the reason for following on Mike Christie's bio op/flags cleanup was to
-make these op's. The advantage of being added as ops is that there is only
-1 extra bit need (not 4 or 5 bits for flags). The other reason for being
-promoted into the block layer as commands is because it seems to me
-to make sense that these abstractions could be allowed to be passed through
-a DM layer and be handled by a files system.
+All I am trying to do is have a discussion about the reasons for
+and against have a zone cache. Where it works and where it breaks
+this should be entirely technical but I understand that we have all
+spent a lot of time _not_ discussing this for various non-technical
+reasons.
 
->>> The ioctls do not mimic exactly the ZBC standard. For instance, there is
->>> no
->>> reporting options for report zones, nor is the "all" bit supported for
->>> open,
->>> close or finish zone commands. But the information provided on zones is
->>> complete
->>> and maps to the standard definitions.
+So far the only reason I've been able to ascertain is that
+Host Manged drives really don't like being stuck with the
+URSWRZ and would like to have a software hack to return
+MUD rather than ship drives with some weird out-of-the box
+config where the last zone is marked as FINISH'd thereby
+returning MUD on reads as per spec.
+
+I understand that it would be strange state to see of first
+boot and likely people would just do a ResetWP and have
+weird boot errors, which would probably just make matters
+worse.
+
+I just would rather the work around be a bit cleaner and/or
+use less memory. I would also like a path available that
+does not require SD_ZBC or BLK_ZONED for Host Aware
+drives to work, hence this set of patches and me begging
+for a single bit in struct bio.
+
 >>
+>> [..]
 >>
->> For the reporting options I have planned to reuse the stream_id in
->> struct bio when that is formalized. There are certainly other places in
->> struct bio to stuff a few extra bits ...
-
-Sorry I was confused here. I was under the impression you were talking
-about one of my patches when you seem to have been talking about
-your hacking thereof.
-
-> We could add reporting options to blk_lookup_zones to filter the result and
-> use that in the ioctl implementation as well. This can be added without any
-> problem.
->
->> As far as the all bit ... this is being handled by all the zone action
->> commands. Just pass a sector of ~0ul and it's handled in sd.c by
->> sd_setup_zone_action_cmnd().
+>>>>> 3) Try to condense the blkzone data structure to save memory:
+>>>>> I think that we can at the very least remove the zone length, and als=
+o
+>>>>> may be the per zone spinlock too (a single spinlock and proper state =
+flags can
+>>>>> be used).
+>>>>
+>>>> I have a variant that is an array of descriptors that roughly mimics t=
+he
+>>>> api from blk-zoned.c that I did a few months ago as an example.
+>>>> I should be able to update that to the current kernel + patches.
+>>>>
+>>> Okay. If we restrict the in-kernel SMR drive handling to devices with
+>>> identical zone sizes of course we can remove the zone length.
+>>> And we can do away with the per-zone spinlock and use a global one inst=
+ead.
 >>
->> Apologies as apparently my documentation here is lacking :-(
->
->
-> Yes, I got it (libzbc does the same actually). I did not add it for
-> simplicity. But indeed may be it should be. The same trick can be used with
-> the ioctl to driver interface. No problems.
->
->>> I also added a reset_wp ioctl for completeness, but this one simply calls
->>> blkdev_issue_discard internally, so it is in fact equivalent to the
->>> BLKDISCARD
->>> ioctl call with a range exactly aligned on a zone.
->>
->>
->> I'm confused as my patch set includes a Reset WP (BLKRESETZONE) that
->> creates a REQ_OP_ZONE_RESET .. same as open and close. My
->> expectation being that BLKDISCARD doesn't really need yet another alias.
+>> I don't think dropping the zone length is a reasonable thing to do.
 
-Same as above.
+REPEAT: I do _not_ think dropping the zone length is a good thing.
 
-> Yes, we could remove the BLKRESETZONE ioctl and have applications use the
-> BLKDISCARD ioctl instead. In the kernel, both generate blkdev_issue_discard
-> calls and are thus identical. Only the ioctl interface differs (sector vs
-> range argument). Again, I added it to have the full set of 5 ZBC/ZAC
-> operations mapping to one BLKxxxZONE ioctl. But granted, reset is optional.
+>> What I propose is an array of _descriptors_ it doesn't drop _any_
+>> of the zone information that you are holding in an RB tree, it is
+>> just a condensed format that _mostly_ plugs into your existing
+>> API.
+>
+> I do not agree. The Seagate drive already has one zone (the last one)
+> that is not the same length as the other zones. Sure, since it is the
+> last one, we can had =E2=80=9Cif (last zone)=E2=80=9D all over the place =
+and make it
+> work. But that is really ugly. Keeping the length field makes the code
+> generic and following the standard, which has no restriction on the
+> zone sizes. We could do some memory optimisation using different types
+> of blk_zone sturcts, the types mapping to the SAME value: drives with
+> constant zone size can use a blk_zone type without the length field,
+> others use a different type that include the field. Accessor functions
+> can hide the different types in the zone manipulation code.
 
-Which is the opposite of what I had stated above which is that I do _not_
-think reset is optional. I think that if the user wants discard they should
-call discard and if they want reset wp they *can* call reset wp and have
-it behave as expected.
-Why would I and a new ioctl that just calls discard? That makes no sense to me.
+Ah. I just said that dropping the zone length is not a good idea.
+Why the antagonistic exposition?
+
+All I am saying is that I can give you the zone cache with 1/7th of
+the memory and the same performance with _no_ loss of information,
+or features, as compared to the existing zone cache.
+
+All the code is done now. I will post patches once my testing is
+done.
+
+I have also reworked all the zone integration so the BIO flags will
+pull from and update the zone cache as opposed to the first hack
+that only really integrated with some ioctls.
+
+Regards,
+Shaun
