@@ -1,96 +1,72 @@
-Return-Path: <mpatocka@redhat.com>
-Date: Thu, 25 Aug 2016 14:34:57 -0400 (EDT)
-From: Mikulas Patocka <mpatocka@redhat.com>
-To: Eric Wheeler <dm-devel@lists.ewheeler.net>
-cc: Christoph Hellwig <hch@lst.de>, dm-devel@redhat.com,
-        Mike Snitzer <snitzer@redhat.com>, johnstonj.public@codenest.com,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: Re: [dm-devel] dm-crypt: Fix error with too large bios
-In-Reply-To: <alpine.LRH.2.11.1608181742260.10662@mail.ewheeler.net>
-Message-ID: <alpine.LRH.2.02.1608251426590.26645@file01.intranet.prod.int.rdu2.redhat.com>
-References: <alpine.LRH.2.11.1608102050200.10662@mail.ewheeler.net> <alpine.LRH.2.02.1608131342250.3291@file01.intranet.prod.int.rdu2.redhat.com> <20160814000740.GA5317@redhat.com> <alpine.LRH.2.02.1608151245120.13026@file01.intranet.prod.int.rdu2.redhat.com>
- <alpine.LRH.2.11.1608181742260.10662@mail.ewheeler.net>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Return-Path: <famz@redhat.com>
+From: Fam Zheng <famz@redhat.com>
+To: linux-kernel@vger.kernel.org
+Cc: linux-nvme@lists.infradead.org, Keith Busch <keith.busch@intel.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        linuxppc-dev@lists.ozlabs.org, "Michael S. Tsirkin" <mst@redhat.com>,
+        linux-block@vger.kernel.org,
+        Brian Norris <computersforpeace@gmail.com>,
+        Paul Mackerras <paulus@samba.org>, linux-mtd@lists.infradead.org,
+        "Ed L. Cashin" <ed.cashin@acm.org>, Jens Axboe <axboe@kernel.dk>,
+        Minchan Kim <minchan@kernel.org>,
+        virtualization@lists.linux-foundation.org,
+        Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
+        Nitin Gupta <ngupta@vflare.org>, David Woodhouse <dwmw2@infradead.org>
+Subject: [PATCH 13/15] aoeblk: Pass attribute group to device_add_disk
+Date: Wed, 17 Aug 2016 15:15:13 +0800
+Message-Id: <1471418115-3654-14-git-send-email-famz@redhat.com>
+In-Reply-To: <1471418115-3654-1-git-send-email-famz@redhat.com>
+References: <1471418115-3654-1-git-send-email-famz@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
+Previously after device_add_disk returns, the KOBJ_ADD uevent is already
+emitted. Adding attributes after that is a poor usage of kobject, and
+in practice may result in race conditions with userspace, for
+example udev checks availability of certain attributes and initializes
+/dev entries conditionally.
 
+device_add_disk can handle adding attribute group better, so use it.
 
-On Thu, 18 Aug 2016, Eric Wheeler wrote:
+Signed-off-by: Fam Zheng <famz@redhat.com>
+---
+ drivers/block/aoe/aoeblk.c | 10 ++--------
+ 1 file changed, 2 insertions(+), 8 deletions(-)
 
-> > On Wed, Jun 01 2016 at  9:44am -0400, Christoph Hellwig <hch@infradead.org> wrote:
-> > 
-> > > > > be dm-crypt.c.  Maybe you've identified some indirect use of
-> > > > > BIO_MAX_SIZE?
-> > > >
-> > > > I mean the recently introduced BIO_MAX_SIZE in -next tree:
-> > > >
-> > > https://git.kernel.org/cgit/linux/kernel/git/next/linux-next.git/commit/drivers/md/dm-crypt.c?id=4ed89c97b0706477b822ea2182827640c0cec486
-> > >
-> > > The crazy bcache bios striking back once again.  I really think it's
-> > > harmful having a _MAX value and then having a minor driver
-> > > reinterpreting it and sending larger ones.  Until we can lift the
-> > > maximum limit in general nad have common code exercise it we really need
-> > > to stop bcache from sending these instead of littering the tree with
-> > > workarounds.
-> > 
-> > The bio_kmalloc function allocates bios with up to 1024 vector entries (as 
-> > opposed to bio_alloc and bio_alloc_bioset that has a limit of 256 vector 
-> > entries).
-> > 
-> > Device mapper is using bio_alloc_bioset with a bio set, so it is limited 
-> > to 256 vector entries, but other kernel users may use bio_kmalloc and 
-> > create larger bios.
-> > 
-> > So, if you don't want bios with more than 256 vector entries to exist, you 
-> > should impose this limit in bio_kmalloc (and fix all the callers that use 
-> > it).
-> 
-> FYI, Kent Overstreet notes this about bcache from the other thread here:
-> 	https://lkml.org/lkml/2016/8/15/620
-> 
-> [paste]
-> >> bcache originally had workaround code to split too-large bios when it 
-> >> first went upstream - that was dropped only after the patches to make 
-> >> generic_make_request() handle arbitrary size bios went in. So to do what 
-> >> you're suggesting would mean reverting that bcache patch and bringing that 
-> >> code back, which from my perspective would be a step in the wrong 
-> >> direction. I just want to get this over and done with.
-> >> 
-> >> re: interactions with other drivers - bio_clone() has already been changed 
-> >> to only clone biovecs that are live for current bi_iter, so there 
-> >> shouldn't be any safety issues. A driver would have to be intentionally 
-> >> doing its own open coded bio cloning that clones all of bi_io_vec, not 
-> >> just the active ones - but if they're doing that, they're already broken 
-> >> because a driver isn't allowed to look at bi_vcnt if it isn't a bio that 
-> >> it owns - bi_vcnt is 0 on bios that don't own their biovec (i.e. that were 
-> >> created by bio_clone_fast).
-> >> 
-> >> And the cloning and bi_vcnt usage stuff I audited very thoroughly back 
-> >> when I was working on immutable biovecs and such back in the day, and I 
-> >> had to do a fair amount of cleanup/refactoring before that stuff could go 
-> >> in. 
-> [/paste]
-> 
-> They are making progress in the patch-v3 thread, so perhaps this can be 
-> fixed for now in generic_make_request().
-> 
-> --
-> Eric Wheeler
-
-Device mapper can't split the bio in generic_make_request - it frees the 
-md->queue->bio_split bioset, to save one kernel thread per device. Device 
-mapper uses its own splitting mechanism.
-
-So what is the final decision? - should device mapper split the big bio or 
-should bcache not submit big bios?
-
-I think splitting big bios in the device mapper is better - simply because 
-it is much less code than reworking bcache to split bios internally.
-
-BTW. In the device mapper, we have a layer dm-io, that was created to work 
-around bio size limitations - it accepts unlimited I/O request and splits 
-it to several bios. When bio size limitations are gone, we could simplify 
-dm-io too.
-
-Mikulas
+diff --git a/drivers/block/aoe/aoeblk.c b/drivers/block/aoe/aoeblk.c
+index 4edfff2..d1b7541 100644
+--- a/drivers/block/aoe/aoeblk.c
++++ b/drivers/block/aoe/aoeblk.c
+@@ -177,7 +177,7 @@ static struct attribute *aoe_attrs[] = {
+ 	NULL,
+ };
+ 
+-static const struct attribute_group attr_group = {
++static struct attribute_group attr_group = {
+ 	.attrs = aoe_attrs,
+ };
+ 
+@@ -219,11 +219,6 @@ aoedisk_rm_debugfs(struct aoedev *d)
+ 	d->debugfs = NULL;
+ }
+ 
+-static int
+-aoedisk_add_sysfs(struct aoedev *d)
+-{
+-	return sysfs_create_group(&disk_to_dev(d->gd)->kobj, &attr_group);
+-}
+ void
+ aoedisk_rm_sysfs(struct aoedev *d)
+ {
+@@ -417,8 +412,7 @@ aoeblk_gdalloc(void *vp)
+ 
+ 	spin_unlock_irqrestore(&d->lock, flags);
+ 
+-	device_add_disk(NULL, gd, NULL);
+-	aoedisk_add_sysfs(d);
++	device_add_disk(NULL, gd, &attr_group);
+ 	aoedisk_add_debugfs(d);
+ 
+ 	spin_lock_irqsave(&d->lock, flags);
+-- 
+2.7.4
