@@ -1,53 +1,84 @@
-Return-Path: <shaun.tancheff@gmail.com>
-Return-Path: <shaun.tancheff@gmail.com>
-Sender: Shaun Tancheff <shaun.tancheff@gmail.com>
-From: Shaun Tancheff <shaun@tancheff.com>
-To: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Shaun Tancheff <shaun@tancheff.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Jens Axboe <axboe@fb.com>,
-	Christoph Hellwig <hch@lst.de>,
-	"James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	Damien Le Moal <damien.lemoal@hgst.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Sagi Grimberg <sagig@mellanox.com>,
-	Mike Christie <mchristi@redhat.com>,
-	Ming Lei <ming.lei@canonical.com>,
-	Josh Bingaman <josh.bingaman@seagate.com>
-Subject: [PATCH 0/2] Change zone cache format to use less memory
-Date: Sun, 21 Aug 2016 23:34:00 -0500
-Message-Id: <20160822043402.8855-1-shaun@tancheff.com>
+Return-Path: <daeho.jeong@samsung.com>
+From: Daeho Jeong <daeho.jeong@samsung.com>
+To: axboe@kernel.dk, tytso@mit.edu, adilger.kernel@dilger.ca, jack@suse.com,
+ linux-block@vger.kernel.org, linux-mm@kvack.org, linux-ext4@vger.kernel.org
+Cc: Daeho Jeong <daeho.jeong@samsung.com>
+Subject: [RFC 0/3] Add the feature of boosting urgent asynchronous writeback I/O
+Date: Wed, 17 Aug 2016 14:20:42 +0900
+Message-id: <1471411245-5186-1-git-send-email-daeho.jeong@samsung.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Currently the RB-Tree zone cache is fast and flexible. It does
-use a rather largish amount of ram. This model reduces the ram
-required from 120 bytes per zone to 16 bytes per zone with a
-moderate transformation of the blk_zone_lookup() api.
+This is the draft version of the feature to boost urgent async
+writeback I/O and this is developed based on kernel 4.7.
 
-This model is predicated on the belief that most variations
-on zoned media will follow a pattern of using collections of same
-sized zones on a single device. Similar to the pattern of erase
-blocks on flash devices being progressivly larger 16K, 64K, ...
+We can experience an unexpected dalay when we execute fsync() in the
+situation of that tons of async I/O are being flushed out in the system
+and, by this kind of fsync() delay, mobile users can see the
+application's hiccups frequently.
 
-The goal is to be able to build a descriptor which is both memory
-efficient, performant, and flexible.
+To finish the fsync() operation, fsync() normally flushes out the
+previous buffered data of the file as sync I/O, however, if there are
+too many dirty pages in the page cache, the buffered data can be
+flushed out as async I/O with other dirty pages by kworker before
+fsync() directly flushes out that, and fysnc() might wait until all the
+asynchronously issued I/Os are done.
 
-Shaun Tancheff (2):
-  Move ZBC core setup to sd_zbc
-  Migrate zone cache from RB-Tree to arrays of descriptors
+To minimize this kind of delay, we convert async I/Os whose completion
+are waited by other processes into sync I/Os for better responsiveness.
 
- block/blk-core.c       |    2 +-
- block/blk-sysfs.c      |   31 +-
- block/blk-zoned.c      |  103 +++--
- drivers/scsi/sd.c      |   66 +--
- drivers/scsi/sd.h      |   20 +-
- drivers/scsi/sd_zbc.c  | 1037 +++++++++++++++++++++++++++++-------------------
- include/linux/blkdev.h |   82 +++-
- 7 files changed, 759 insertions(+), 582 deletions(-)
+We made two micro benchmarks using fsync() and evaluated the effect of
+this feature on the mobile device having four 2.3GHz Exynos M1 ARM
+cores and four 1.6GHz Cortex-A53 ARM cores, 4GB RAM and 32GB UFS
+storage.
+
+The first benchmark is iterating that 4KB data write() and holding on
+for 100ms for giving more chances for kworker to flush the buffered
+data and executing fsync(), 100 times with the intensive background I/O.
+(Its total execution time is 1.06s without the background I/O.)
+
+                        <before opt.>   =>      <after opt.>
+fsync exec. time(sec.)  0.289489                0.031048
+                        0.282681                0.031255
+                        0.290374                0.034004
+                        0.235380                0.026512
+                        (...)                   (...)
+                        0.230488                0.044029
+                        0.337035                0.054402
+                        0.377575                0.025746
+Total exec. time(sec.)  21.78                   3.24 (85.1% decreased)
+
+The second one is iterating that 8MB data write() and fsync(), 50 times
+with the intensive background I/O.
+(Its total execution time is 5.23s without the background I/O.)
+
+                        <before opt.>   =>      <after opt.>
+fsync exec. time(sec.)  0.258374                0.125503
+                        0.311217                0.127392
+                        0.255543                0.117327
+                        0.237811                0.154037
+                        (...)                   (...)
+                        0.205052                0.131991
+                        0.206469                0.107791
+                        0.263619                0.155979
+Total exec. time(sec.)  14.61                   11.28 (22.8% decreased)
+
+Daeho Jeong (3):
+  block, mm: add support for boosting urgent asynchronous writeback io
+  cfq: add cfq_find_async_wb_req
+  ext4: tag asynchronous writeback io
+
+ block/Kconfig.iosched          |    9 +++
+ block/blk-core.c               |   28 ++++++++
+ block/cfq-iosched.c            |   29 +++++++++
+ block/elevator.c               |  141 ++++++++++++++++++++++++++++++++++++++++
+ fs/ext4/page-io.c              |   11 ++++
+ include/linux/blk_types.h      |    3 +
+ include/linux/elevator.h       |   13 ++++
+ include/linux/page-flags.h     |   12 ++++
+ include/linux/pagemap.h        |   12 ++++
+ include/trace/events/mmflags.h |   10 ++-
+ mm/filemap.c                   |   39 +++++++++++
+ 11 files changed, 306 insertions(+), 1 deletion(-)
 
 -- 
-2.9.3
+1.7.9.5
