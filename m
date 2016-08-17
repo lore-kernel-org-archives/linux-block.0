@@ -1,119 +1,71 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga03.intel.com ([134.134.136.65]:56461 "EHLO mga03.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752305AbcHLSin (ORCPT <rfc822;linux-block@vger.kernel.org>);
-	Fri, 12 Aug 2016 14:38:43 -0400
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-	Andreas Dilger <adilger.kernel@dilger.ca>,
-	Jan Kara <jack@suse.com>,
-	Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-	Hugh Dickins <hughd@google.com>,
-	Andrea Arcangeli <aarcange@redhat.com>,
-	Dave Hansen <dave.hansen@intel.com>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	Matthew Wilcox <willy@infradead.org>,
-	Ross Zwisler <ross.zwisler@linux.intel.com>,
-	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	linux-block@vger.kernel.org,
-	Matthew Wilcox <willy@linux.intel.com>,
-	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv2 02/41] radix tree test suite: Allow GFP_ATOMIC allocations to fail
-Date: Fri, 12 Aug 2016 21:37:45 +0300
-Message-Id: <1471027104-115213-3-git-send-email-kirill.shutemov@linux.intel.com>
-In-Reply-To: <1471027104-115213-1-git-send-email-kirill.shutemov@linux.intel.com>
-References: <1471027104-115213-1-git-send-email-kirill.shutemov@linux.intel.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <famz@redhat.com>
+From: Fam Zheng <famz@redhat.com>
+To: linux-kernel@vger.kernel.org
+Cc: linux-nvme@lists.infradead.org, Keith Busch <keith.busch@intel.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        linuxppc-dev@lists.ozlabs.org, "Michael S. Tsirkin" <mst@redhat.com>,
+        linux-block@vger.kernel.org,
+        Brian Norris <computersforpeace@gmail.com>,
+        Paul Mackerras <paulus@samba.org>, linux-mtd@lists.infradead.org,
+        "Ed L. Cashin" <ed.cashin@acm.org>, Jens Axboe <axboe@kernel.dk>,
+        Minchan Kim <minchan@kernel.org>,
+        virtualization@lists.linux-foundation.org,
+        Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
+        Nitin Gupta <ngupta@vflare.org>, David Woodhouse <dwmw2@infradead.org>
+Subject: [PATCH 03/15] genhd: Return error from blk_register_region
+Date: Wed, 17 Aug 2016 15:15:03 +0800
+Message-Id: <1471418115-3654-4-git-send-email-famz@redhat.com>
+In-Reply-To: <1471418115-3654-1-git-send-email-famz@redhat.com>
+References: <1471418115-3654-1-git-send-email-famz@redhat.com>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Matthew Wilcox <willy@linux.intel.com>
+blk_register_region can fail (-ENOMEM), return the error to the caller.
 
-In order to test the preload code, it is necessary to fail GFP_ATOMIC
-allocations, which requires defining GFP_KERNEL and GFP_ATOMIC properly.
-Remove the obsolete __GFP_WAIT and copy the definitions of the __GFP
-flags which are used from the kernel include files.  We also need the
-real definition of gfpflags_allow_blocking() to persuade the radix tree
-to actually use its preallocated nodes.
-
-Signed-off-by: Matthew Wilcox <willy@linux.intel.com>
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- tools/testing/radix-tree/linux.c      |  7 ++++++-
- tools/testing/radix-tree/linux/gfp.h  | 24 ++++++++++++++++++++----
- tools/testing/radix-tree/linux/slab.h |  5 -----
- 3 files changed, 26 insertions(+), 10 deletions(-)
+ block/genhd.c         |  4 ++--
+ include/linux/genhd.h | 10 +++++-----
+ 2 files changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/tools/testing/radix-tree/linux.c b/tools/testing/radix-tree/linux.c
-index 154823737b20..3cfb04e98e2f 100644
---- a/tools/testing/radix-tree/linux.c
-+++ b/tools/testing/radix-tree/linux.c
-@@ -33,7 +33,12 @@ mempool_t *mempool_create(int min_nr, mempool_alloc_t *alloc_fn,
- 
- void *kmem_cache_alloc(struct kmem_cache *cachep, int flags)
+diff --git a/block/genhd.c b/block/genhd.c
+index 3dcecaa..8c7510d 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -474,11 +474,11 @@ static char *bdevt_str(dev_t devt, char *buf)
+  * range must be nonzero
+  * The hash chain is sorted on range, so that subranges can override.
+  */
+-void blk_register_region(dev_t devt, unsigned long range, struct module *module,
++int blk_register_region(dev_t devt, unsigned long range, struct module *module,
+ 			 struct kobject *(*probe)(dev_t, int *, void *),
+ 			 int (*lock)(dev_t, void *), void *data)
  {
--	void *ret = malloc(cachep->size);
-+	void *ret;
-+
-+	if (flags & __GFP_NOWARN)
-+		return NULL;
-+
-+	ret = malloc(cachep->size);
- 	if (cachep->ctor)
- 		cachep->ctor(ret);
- 	uatomic_inc(&nr_allocated);
-diff --git a/tools/testing/radix-tree/linux/gfp.h b/tools/testing/radix-tree/linux/gfp.h
-index 0e37f7a760eb..5b09b2ce6c33 100644
---- a/tools/testing/radix-tree/linux/gfp.h
-+++ b/tools/testing/radix-tree/linux/gfp.h
-@@ -1,10 +1,26 @@
- #ifndef _GFP_H
- #define _GFP_H
+-	kobj_map(bdev_map, devt, range, module, probe, lock, data);
++	return kobj_map(bdev_map, devt, range, module, probe, lock, data);
+ }
  
--#define __GFP_BITS_SHIFT 22
-+#define __GFP_BITS_SHIFT 26
- #define __GFP_BITS_MASK ((gfp_t)((1 << __GFP_BITS_SHIFT) - 1))
--#define __GFP_WAIT 1
--#define __GFP_ACCOUNT 0
--#define __GFP_NOWARN 0
-+
-+#define __GFP_HIGH		0x20u
-+#define __GFP_IO		0x40u
-+#define __GFP_FS		0x80u
-+#define __GFP_NOWARN		0x200u
-+#define __GFP_ATOMIC		0x80000u
-+#define __GFP_ACCOUNT		0x100000u
-+#define __GFP_DIRECT_RECLAIM	0x400000u
-+#define __GFP_KSWAPD_RECLAIM	0x2000000u
-+
-+#define __GFP_RECLAIM		(__GFP_DIRECT_RECLAIM|__GFP_KSWAPD_RECLAIM)
-+
-+#define GFP_ATOMIC		(__GFP_HIGH|__GFP_ATOMIC|__GFP_KSWAPD_RECLAIM)
-+#define GFP_KERNEL		(__GFP_RECLAIM | __GFP_IO | __GFP_FS)
-+
-+static inline bool gfpflags_allow_blocking(const gfp_t gfp_flags)
-+{
-+	return !!(gfp_flags & __GFP_DIRECT_RECLAIM);
-+}
+ EXPORT_SYMBOL(blk_register_region);
+diff --git a/include/linux/genhd.h b/include/linux/genhd.h
+index 889b1bb..b6fd666 100644
+--- a/include/linux/genhd.h
++++ b/include/linux/genhd.h
+@@ -617,11 +617,11 @@ extern struct gendisk *alloc_disk_node(int minors, int node_id);
+ extern struct gendisk *alloc_disk(int minors);
+ extern struct kobject *get_disk(struct gendisk *disk);
+ extern void put_disk(struct gendisk *disk);
+-extern void blk_register_region(dev_t devt, unsigned long range,
+-			struct module *module,
+-			struct kobject *(*probe)(dev_t, int *, void *),
+-			int (*lock)(dev_t, void *),
+-			void *data);
++extern int blk_register_region(dev_t devt, unsigned long range,
++			       struct module *module,
++			       struct kobject *(*probe)(dev_t, int *, void *),
++			       int (*lock)(dev_t, void *),
++			       void *data);
+ extern void blk_unregister_region(dev_t devt, unsigned long range);
  
- #endif
-diff --git a/tools/testing/radix-tree/linux/slab.h b/tools/testing/radix-tree/linux/slab.h
-index 6d5a34770fd4..452e2bf502e3 100644
---- a/tools/testing/radix-tree/linux/slab.h
-+++ b/tools/testing/radix-tree/linux/slab.h
-@@ -7,11 +7,6 @@
- #define SLAB_PANIC 2
- #define SLAB_RECLAIM_ACCOUNT    0x00020000UL            /* Objects are reclaimable */
- 
--static inline int gfpflags_allow_blocking(gfp_t mask)
--{
--	return 1;
--}
--
- struct kmem_cache {
- 	int size;
- 	void (*ctor)(void *);
+ extern ssize_t part_size_show(struct device *dev,
 -- 
-2.8.1
-
+2.7.4
