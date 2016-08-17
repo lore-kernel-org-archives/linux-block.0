@@ -1,97 +1,115 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:17252 "EHLO mga11.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752557AbcHLSiu (ORCPT <rfc822;linux-block@vger.kernel.org>);
-	Fri, 12 Aug 2016 14:38:50 -0400
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-	Andreas Dilger <adilger.kernel@dilger.ca>,
-	Jan Kara <jack@suse.com>,
-	Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-	Hugh Dickins <hughd@google.com>,
-	Andrea Arcangeli <aarcange@redhat.com>,
-	Dave Hansen <dave.hansen@intel.com>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	Matthew Wilcox <willy@infradead.org>,
-	Ross Zwisler <ross.zwisler@linux.intel.com>,
-	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	linux-block@vger.kernel.org,
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv2 27/41] truncate: make invalidate_inode_pages2_range() aware about huge pages
-Date: Fri, 12 Aug 2016 21:38:10 +0300
-Message-Id: <1471027104-115213-28-git-send-email-kirill.shutemov@linux.intel.com>
-In-Reply-To: <1471027104-115213-1-git-send-email-kirill.shutemov@linux.intel.com>
-References: <1471027104-115213-1-git-send-email-kirill.shutemov@linux.intel.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <famz@redhat.com>
+From: Fam Zheng <famz@redhat.com>
+To: linux-kernel@vger.kernel.org
+Cc: linux-nvme@lists.infradead.org, Keith Busch <keith.busch@intel.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        linuxppc-dev@lists.ozlabs.org, "Michael S. Tsirkin" <mst@redhat.com>,
+        linux-block@vger.kernel.org,
+        Brian Norris <computersforpeace@gmail.com>,
+        Paul Mackerras <paulus@samba.org>, linux-mtd@lists.infradead.org,
+        "Ed L. Cashin" <ed.cashin@acm.org>, Jens Axboe <axboe@kernel.dk>,
+        Minchan Kim <minchan@kernel.org>,
+        virtualization@lists.linux-foundation.org,
+        Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
+        Nitin Gupta <ngupta@vflare.org>, David Woodhouse <dwmw2@infradead.org>
+Subject: [PATCH 09/15] virtio-blk: Pass attribute group to device_add_disk
+Date: Wed, 17 Aug 2016 15:15:09 +0800
+Message-Id: <1471418115-3654-10-git-send-email-famz@redhat.com>
+In-Reply-To: <1471418115-3654-1-git-send-email-famz@redhat.com>
+References: <1471418115-3654-1-git-send-email-famz@redhat.com>
+List-ID: <linux-block@vger.kernel.org>
 
-For huge pages we need to unmap whole range covered by the huge page.
+Previously after device_add_disk returns, the KOBJ_ADD uevent is already
+emitted. Adding attributes after that is a poor usage of kobject, and
+in practice may result in race conditions with userspace, for
+example udev checks availability of certain attributes and initializes
+/dev entries conditionally.
 
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+device_add_disk can handle adding attribute group better, so use it.
+
+Meanwhile, handle error of device_add_disk.
+
+Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- mm/truncate.c | 27 +++++++++++++++++++--------
- 1 file changed, 19 insertions(+), 8 deletions(-)
+ drivers/block/virtio_blk.c | 38 +++++++++++++++++++++++++++-----------
+ 1 file changed, 27 insertions(+), 11 deletions(-)
 
-diff --git a/mm/truncate.c b/mm/truncate.c
-index 9c339e6255f2..6a445278aaaf 100644
---- a/mm/truncate.c
-+++ b/mm/truncate.c
-@@ -708,27 +708,34 @@ int invalidate_inode_pages2_range(struct address_space *mapping,
- 				continue;
- 			}
- 			wait_on_page_writeback(page);
-+			page = compound_head(page);
+diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+index 4564df5..ff60d82 100644
+--- a/drivers/block/virtio_blk.c
++++ b/drivers/block/virtio_blk.c
+@@ -522,10 +522,10 @@ virtblk_cache_type_show(struct device *dev, struct device_attribute *attr,
+ 	return snprintf(buf, 40, "%s\n", virtblk_cache_types[writeback]);
+ }
+ 
+-static const struct device_attribute dev_attr_cache_type_ro =
++static struct device_attribute dev_attr_cache_type_ro =
+ 	__ATTR(cache_type, S_IRUGO,
+ 	       virtblk_cache_type_show, NULL);
+-static const struct device_attribute dev_attr_cache_type_rw =
++static struct device_attribute dev_attr_cache_type_rw =
+ 	__ATTR(cache_type, S_IRUGO|S_IWUSR,
+ 	       virtblk_cache_type_show, virtblk_cache_type_store);
+ 
+@@ -550,6 +550,26 @@ static struct blk_mq_ops virtio_mq_ops = {
+ static unsigned int virtblk_queue_depth;
+ module_param_named(queue_depth, virtblk_queue_depth, uint, 0444);
+ 
++static struct attribute *virtblk_attrs_ro[] = {
++	&dev_attr_serial.attr,
++	&dev_attr_cache_type_ro.attr,
++	NULL
++};
 +
- 			if (page_mapped(page)) {
-+				loff_t begin, len;
++static struct attribute *virtblk_attrs_rw[] = {
++	&dev_attr_serial.attr,
++	&dev_attr_cache_type_rw.attr,
++	NULL
++};
 +
-+				begin = page->index << PAGE_SHIFT;
++static struct attribute_group virtblk_attr_group_ro = {
++	.attrs		= virtblk_attrs_ro,
++};
 +
- 				if (!did_range_unmap) {
- 					/*
- 					 * Zap the rest of the file in one hit.
- 					 */
-+					len = (loff_t)(1 + end - page->index) <<
-+						PAGE_SHIFT;
-+					if (len < hpage_size(page))
-+						len = hpage_size(page);
- 					unmap_mapping_range(mapping,
--					   (loff_t)index << PAGE_SHIFT,
--					   (loff_t)(1 + end - index)
--							 << PAGE_SHIFT,
--							 0);
-+							begin, len, 0);
- 					did_range_unmap = 1;
- 				} else {
- 					/*
- 					 * Just zap this page
- 					 */
--					unmap_mapping_range(mapping,
--					   (loff_t)index << PAGE_SHIFT,
--					   PAGE_SIZE, 0);
-+					len = hpage_size(page);
-+					unmap_mapping_range(mapping, begin,
-+							len, 0 );
- 				}
- 			}
--			BUG_ON(page_mapped(page));
-+			VM_BUG_ON_PAGE(page_mapped(page), page);
- 			ret2 = do_launder_page(mapping, page);
- 			if (ret2 == 0) {
- 				if (!invalidate_complete_page2(mapping, page))
-@@ -737,6 +744,10 @@ int invalidate_inode_pages2_range(struct address_space *mapping,
- 			if (ret2 < 0)
- 				ret = ret2;
- 			unlock_page(page);
-+			if (PageTransHuge(page)) {
-+				index = page->index + HPAGE_PMD_NR - 1;
-+				break;
-+			}
- 		}
- 		pagevec_remove_exceptionals(&pvec);
- 		pagevec_release(&pvec);
++static struct attribute_group virtblk_attr_group_rw = {
++	.attrs		= virtblk_attrs_rw,
++};
++
+ static int virtblk_probe(struct virtio_device *vdev)
+ {
+ 	struct virtio_blk *vblk;
+@@ -560,6 +580,7 @@ static int virtblk_probe(struct virtio_device *vdev)
+ 	u32 v, blk_size, sg_elems, opt_io_size;
+ 	u16 min_io_size;
+ 	u8 physical_block_exp, alignment_offset;
++	struct attribute_group *attr_group;
+ 
+ 	if (!vdev->config->get) {
+ 		dev_err(&vdev->dev, "%s failure: config access disabled\n",
+@@ -719,19 +740,14 @@ static int virtblk_probe(struct virtio_device *vdev)
+ 
+ 	virtio_device_ready(vdev);
+ 
+-	device_add_disk(&vdev->dev, vblk->disk, NULL);
+-	err = device_create_file(disk_to_dev(vblk->disk), &dev_attr_serial);
+-	if (err)
+-		goto out_del_disk;
+-
+ 	if (virtio_has_feature(vdev, VIRTIO_BLK_F_CONFIG_WCE))
+-		err = device_create_file(disk_to_dev(vblk->disk),
+-					 &dev_attr_cache_type_rw);
++		attr_group = &virtblk_attr_group_rw;
+ 	else
+-		err = device_create_file(disk_to_dev(vblk->disk),
+-					 &dev_attr_cache_type_ro);
++		attr_group = &virtblk_attr_group_ro;
++	err = device_add_disk(&vdev->dev, vblk->disk, attr_group);
+ 	if (err)
+ 		goto out_del_disk;
++
+ 	return 0;
+ 
+ out_del_disk:
 -- 
-2.8.1
-
+2.7.4
