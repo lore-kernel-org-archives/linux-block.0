@@ -1,23 +1,23 @@
-Return-Path: <hch@lst.de>
-Date: Mon, 1 Aug 2016 11:41:16 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Shaun Tancheff <shaun@tancheff.com>
-Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-	Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@lst.de>,
-	"James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	Jeff Layton <jlayton@poochiereds.net>,
-	"J . Bruce Fields" <bfields@fieldses.org>,
-	Josh Bingaman <josh.bingaman@seagate.com>
-Subject: Re: [PATCH v6 0/2] Block layer support ZAC/ZBC commands
-Message-ID: <20160801094116.GB14677@lst.de>
-References: <1469818955-20568-1-git-send-email-shaun@tancheff.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] block: Fix race triggered by blk_set_queue_dying()
+To: Bart Van Assche <bart.vanassche@sandisk.com>
+References: <e50dbd54-30fb-bf59-0ce6-5ccf1d830017@sandisk.com>
+Cc: Christoph Hellwig <hch@lst.de>, Mike Snitzer <snitzer@redhat.com>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <e6644369-db59-215e-bd01-0f2b623fdbb6@kernel.dk>
+Date: Tue, 16 Aug 2016 19:37:16 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1469818955-20568-1-git-send-email-shaun@tancheff.com>
+In-Reply-To: <e50dbd54-30fb-bf59-0ce6-5ccf1d830017@sandisk.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
+On 08/16/2016 05:48 PM, Bart Van Assche wrote:
+> blk_set_queue_dying() can be called while another thread is
+> submitting I/O or changing queue flags, e.g. through dm_stop_queue().
+> Hence protect the QUEUE_FLAG_DYING flag change with locking.
 
-Can you please integrate this with Hannes series so that it uses
-his cache of the zone information?
+Added, thanks.
+
+-- 
+Jens Axboe
