@@ -1,244 +1,104 @@
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>,
-	Tejun Heo <tj@kernel.org>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	linus.walleij@linaro.org,
-	broonie@kernel.org,
-	Paolo Valente <paolo.valente@linaro.org>,
-	Arianna Avanzini <avanzini.arianna@gmail.com>
-Subject: [PATCH V2 20/22] block, bfq: boost the throughput on NCQ-capable flash-based devices
-Date: Mon,  8 Aug 2016 13:15:15 +0200
-Message-Id: <1470654917-4280-21-git-send-email-paolo.valente@linaro.org>
-In-Reply-To: <1470654917-4280-1-git-send-email-paolo.valente@linaro.org>
-References: <1470654917-4280-1-git-send-email-paolo.valente@linaro.org>
+Return-Path: <famz@redhat.com>
+From: Fam Zheng <famz@redhat.com>
+To: linux-kernel@vger.kernel.org
+Cc: linux-nvme@lists.infradead.org, Keith Busch <keith.busch@intel.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        linuxppc-dev@lists.ozlabs.org, "Michael S. Tsirkin" <mst@redhat.com>,
+        linux-block@vger.kernel.org,
+        Brian Norris <computersforpeace@gmail.com>,
+        Paul Mackerras <paulus@samba.org>, linux-mtd@lists.infradead.org,
+        "Ed L. Cashin" <ed.cashin@acm.org>, Jens Axboe <axboe@kernel.dk>,
+        Minchan Kim <minchan@kernel.org>,
+        virtualization@lists.linux-foundation.org,
+        Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
+        Nitin Gupta <ngupta@vflare.org>, David Woodhouse <dwmw2@infradead.org>
+Subject: [PATCH 12/15] mtip: Pass attribute group to device_add_disk
+Date: Wed, 17 Aug 2016 15:15:12 +0800
+Message-Id: <1471418115-3654-13-git-send-email-famz@redhat.com>
+In-Reply-To: <1471418115-3654-1-git-send-email-famz@redhat.com>
+References: <1471418115-3654-1-git-send-email-famz@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-This patch boosts the throughput on NCQ-capable flash-based devices,
-while still preserving latency guarantees for interactive and soft
-real-time applications. The throughput is boosted by just not idling
-the device when the in-service queue remains empty, even if the queue
-is sync and has a non-null idle window. This helps to keep the drive's
-internal queue full, which is necessary to achieve maximum
-performance. This solution to boost the throughput is a port of
-commits a68bbdd and f7d7b7a for CFQ.
+Previously after device_add_disk returns, the KOBJ_ADD uevent is already
+emitted. Adding attributes after that is a poor usage of kobject, and
+in practice may result in race conditions with userspace, for
+example udev checks availability of certain attributes and initializes
+/dev entries conditionally.
 
-As already highlighted in a previous patch, allowing the device to
-prefetch and internally reorder requests trivially causes loss of
-control on the request service order, and hence on service guarantees.
-Fortunately, as discussed in detail in the comments on the function
-bfq_bfqq_may_idle(), if every process has to receive the same
-fraction of the throughput, then the service order enforced by the
-internal scheduler of a flash-based device is relatively close to that
-enforced by BFQ. In particular, it is close enough to let service
-guarantees be substantially preserved.
+device_add_disk can handle adding attribute group better, so use it.
+Meanwhile, update the error check code and message.
 
-Things change in an asymmetric scenario, i.e., if not every process
-has to receive the same fraction of the throughput. In this case, to
-guarantee the desired throughput distribution, the device must be
-prevented from prefetching requests. This is exactly what this patch
-does in asymmetric scenarios.
-
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
-Signed-off-by: Arianna Avanzini <avanzini.arianna@gmail.com>
+Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- block/cfq-iosched.c | 154 ++++++++++++++++++++++++++++++++++++----------------
- 1 file changed, 106 insertions(+), 48 deletions(-)
+ drivers/block/mtip32xx/mtip32xx.c | 38 ++++++++------------------------------
+ 1 file changed, 8 insertions(+), 30 deletions(-)
 
-diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
-index ae524ae..c0469fd 100644
---- a/block/cfq-iosched.c
-+++ b/block/cfq-iosched.c
-@@ -5664,15 +5664,25 @@ static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
- 	 * The value of the variable is computed considering that
- 	 * idling is usually beneficial for the throughput if:
- 	 * (a) the device is not NCQ-capable, or
--	 * (b) regardless of the presence of NCQ, the request pattern
--	 *     for bfqq is I/O-bound (possible throughput losses
--	 *     caused by granting idling to seeky queues are mitigated
--	 *     by the fact that, in all scenarios where boosting
--	 *     throughput is the best thing to do, i.e., in all
--	 *     symmetric scenarios, only a minimal idle time is
--	 *     allowed to seeky queues).
-+	 * (b) regardless of the presence of NCQ, the device is rotational
-+	 *     and the request pattern for bfqq is I/O-bound (possible
-+	 *     throughput losses caused by granting idling to seeky queues
-+	 *     are mitigated by the fact that, in all scenarios where
-+	 *     boosting throughput is the best thing to do, i.e., in all
-+	 *     symmetric scenarios, only a minimal idle time is allowed to
-+	 *     seeky queues).
-+	 *
-+	 * Secondly, and in contrast to the above item (b), idling an
-+	 * NCQ-capable flash-based device would not boost the
-+	 * throughput even with intense I/O; rather it would lower
-+	 * the throughput in proportion to how fast the device
-+	 * is. Accordingly, the next variable is true if any of the
-+	 * above conditions (a) and (b) is true, and, in particular,
-+	 * happens to be false if bfqd is an NCQ-capable flash-based
-+	 * device.
- 	 */
--	idling_boosts_thr = !bfqd->hw_tag || bfq_bfqq_IO_bound(bfqq);
-+	idling_boosts_thr = !bfqd->hw_tag ||
-+		(!blk_queue_nonrot(bfqd->queue) && bfq_bfqq_IO_bound(bfqq));
+diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/mtip32xx.c
+index 4048a70..504c549 100644
+--- a/drivers/block/mtip32xx/mtip32xx.c
++++ b/drivers/block/mtip32xx/mtip32xx.c
+@@ -2702,26 +2702,14 @@ static const struct file_operations mtip_flags_fops = {
+ 	.llseek = no_llseek,
+ };
  
- 	/*
- 	 * The value of the next variable,
-@@ -5713,14 +5723,16 @@ static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
- 		bfqd->wr_busy_queues == 0;
+-/*
+- * Create the sysfs related attributes.
+- *
+- * @dd   Pointer to the driver data structure.
+- * @kobj Pointer to the kobj for the block device.
+- *
+- * return value
+- *	0	Operation completed successfully.
+- *	-EINVAL Invalid parameter.
+- */
+-static int mtip_hw_sysfs_init(struct driver_data *dd, struct kobject *kobj)
+-{
+-	if (!kobj || !dd)
+-		return -EINVAL;
++static struct attribute *mtip_dev_attrs[] = {
++	&dev_attr_status.attr,
++	NULL
++};
  
- 	/*
--	 * There is then a case where idling must be performed not for
--	 * throughput concerns, but to preserve service guarantees. To
--	 * introduce it, we can note that allowing the drive to
--	 * enqueue more than one request at a time, and hence
-+	 * There is then a case where idling must be performed not
-+	 * for throughput concerns, but to preserve service
-+	 * guarantees.
-+	 *
-+	 * To introduce this case, we can note that allowing the drive
-+	 * to enqueue more than one request at a time, and hence
- 	 * delegating de facto final scheduling decisions to the
--	 * drive's internal scheduler, causes loss of control on the
-+	 * drive's internal scheduler, entails loss of control on the
- 	 * actual request service order. In particular, the critical
--	 * situation is when requests from different processes happens
-+	 * situation is when requests from different processes happen
- 	 * to be present, at the same time, in the internal queue(s)
- 	 * of the drive. In such a situation, the drive, by deciding
- 	 * the service order of the internally-queued requests, does
-@@ -5731,51 +5743,97 @@ static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
- 	 * the service distribution enforced by the drive's internal
- 	 * scheduler is likely to coincide with the desired
- 	 * device-throughput distribution only in a completely
--	 * symmetric scenario where: (i) each of these processes must
--	 * get the same throughput as the others; (ii) all these
--	 * processes have the same I/O pattern (either sequential or
--	 * random).  In fact, in such a scenario, the drive will tend
--	 * to treat the requests of each of these processes in about
--	 * the same way as the requests of the others, and thus to
--	 * provide each of these processes with about the same
--	 * throughput (which is exactly the desired throughput
--	 * distribution). In contrast, in any asymmetric scenario,
--	 * device idling is certainly needed to guarantee that bfqq
--	 * receives its assigned fraction of the device throughput
--	 * (see [1] for details).
-+	 * symmetric scenario where:
-+	 * (i)  each of these processes must get the same throughput as
-+	 *      the others;
-+	 * (ii) all these processes have the same I/O pattern
-+		(either sequential or random).
-+	 * In fact, in such a scenario, the drive will tend to treat
-+	 * the requests of each of these processes in about the same
-+	 * way as the requests of the others, and thus to provide
-+	 * each of these processes with about the same throughput
-+	 * (which is exactly the desired throughput distribution). In
-+	 * contrast, in any asymmetric scenario, device idling is
-+	 * certainly needed to guarantee that bfqq receives its
-+	 * assigned fraction of the device throughput (see [1] for
-+	 * details).
-+	 *
-+	 * We address this issue by controlling, actually, only the
-+	 * symmetry sub-condition (i), i.e., provided that
-+	 * sub-condition (i) holds, idling is not performed,
-+	 * regardless of whether sub-condition (ii) holds. In other
-+	 * words, only if sub-condition (i) holds, then idling is
-+	 * allowed, and the device tends to be prevented from queueing
-+	 * many requests, possibly of several processes. The reason
-+	 * for not controlling also sub-condition (ii) is that we
-+	 * exploit preemption to preserve guarantees in case of
-+	 * symmetric scenarios, even if (ii) does not hold, as
-+	 * explained in the next two paragraphs.
-+	 *
-+	 * Even if a queue, say Q, is expired when it remains idle, Q
-+	 * can still preempt the new in-service queue if the next
-+	 * request of Q arrives soon (see the comments on
-+	 * bfq_bfqq_update_budg_for_activation). If all queues and
-+	 * groups have the same weight, this form of preemption,
-+	 * combined with the hole-recovery heuristic described in the
-+	 * comments on function bfq_bfqq_update_budg_for_activation,
-+	 * are enough to preserve a correct bandwidth distribution in
-+	 * the mid term, even without idling. In fact, even if not
-+	 * idling allows the internal queues of the device to contain
-+	 * many requests, and thus to reorder requests, we can rather
-+	 * safely assume that the internal scheduler still preserves a
-+	 * minimum of mid-term fairness. The motivation for using
-+	 * preemption instead of idling is that, by not idling,
-+	 * service guarantees are preserved without minimally
-+	 * sacrificing throughput. In other words, both a high
-+	 * throughput and its desired distribution are obtained.
-+	 *
-+	 * More precisely, this preemption-based, idleless approach
-+	 * provides fairness in terms of IOPS, and not sectors per
-+	 * second. This can be seen with a simple example. Suppose
-+	 * that there are two queues with the same weight, but that
-+	 * the first queue receives requests of 8 sectors, while the
-+	 * second queue receives requests of 1024 sectors. In
-+	 * addition, suppose that each of the two queues contains at
-+	 * most one request at a time, which implies that each queue
-+	 * always remains idle after it is served. Finally, after
-+	 * remaining idle, each queue receives very quickly a new
-+	 * request. It follows that the two queues are served
-+	 * alternatively, preempting each other if needed. This
-+	 * implies that, although both queues have the same weight,
-+	 * the queue with large requests receives a service that is
-+	 * 1024/8 times as high as the service received by the other
-+	 * queue.
- 	 *
--	 * As for sub-condition (i), actually we check only whether
--	 * bfqq is being weight-raised. In fact, if bfqq is not being
--	 * weight-raised, we have that:
--	 * - if the process associated with bfqq is not I/O-bound, then
--	 *   it is not either latency- or throughput-critical; therefore
--	 *   idling is not needed for bfqq;
--	 * - if the process asociated with bfqq is I/O-bound, then
--	 *   idling is already granted with bfqq (see the comments on
--	 *   idling_boosts_thr).
-+	 * On the other hand, device idling is performed, and thus
-+	 * pure sector-domain guarantees are provided, for the
-+	 * following queues, which are likely to need stronger
-+	 * throughput guarantees: weight-raised queues, and queues
-+	 * with a higher weight than other queues. When such queues
-+	 * are active, sub-condition (i) is false, which triggers
-+	 * device idling.
- 	 *
--	 * We do not check sub-condition (ii) at all, i.e., the next
--	 * variable is true if and only if bfqq is being
--	 * weight-raised. We do not need to control sub-condition (ii)
--	 * for the following reason:
--	 * - if bfqq is being weight-raised, then idling is already
--	 *   guaranteed to bfqq by sub-condition (i);
--	 * - if bfqq is not being weight-raised, then idling is
--	 *   already guaranteed to bfqq (only) if it matters, i.e., if
--	 *   bfqq is associated to a currently I/O-bound process (see
--	 *   the above comment on sub-condition (i)).
-+	 * According to the above considerations, the next variable is
-+	 * true (only) if sub-condition (i) holds. To compute the
-+	 * value of this variable, we not only use the return value of
-+	 * the function bfq_symmetric_scenario(), but also check
-+	 * whether bfqq is being weight-raised, because
-+	 * bfq_symmetric_scenario() does not take into account also
-+	 * weight-raised queues (see comments on
-+	 * bfq_weights_tree_add()).
- 	 *
- 	 * As a side note, it is worth considering that the above
- 	 * device-idling countermeasures may however fail in the
- 	 * following unlucky scenario: if idling is (correctly)
--	 * disabled in a time period during which the symmetry
--	 * sub-condition holds, and hence the device is allowed to
-+	 * disabled in a time period during which all symmetry
-+	 * sub-conditions hold, and hence the device is allowed to
- 	 * enqueue many requests, but at some later point in time some
- 	 * sub-condition stops to hold, then it may become impossible
- 	 * to let requests be served in the desired order until all
- 	 * the requests already queued in the device have been served.
- 	 */
--	asymmetric_scenario = bfqq->wr_coeff > 1;
-+	asymmetric_scenario = bfqq->wr_coeff > 1 ||
-+		!bfq_symmetric_scenario(bfqd);
+-	if (sysfs_create_file(kobj, &dev_attr_status.attr))
+-		dev_warn(&dd->pdev->dev,
+-			"Error creating 'status' sysfs entry\n");
+-	return 0;
+-}
++static struct attribute_group mtip_attr_group = {
++	.attrs = mtip_dev_attrs,
++};
  
- 	/*
- 	 * We have now all the components we need to compute the return
+ /*
+  * Remove the sysfs related attributes.
+@@ -3918,7 +3906,6 @@ static int mtip_block_initialize(struct driver_data *dd)
+ 	int rv = 0, wait_for_rebuild = 0;
+ 	sector_t capacity;
+ 	unsigned int index = 0;
+-	struct kobject *kobj;
+ 
+ 	if (dd->disk)
+ 		goto skip_create_disk; /* hw init done, before rebuild */
+@@ -4041,18 +4028,9 @@ skip_create_disk:
+ 	set_capacity(dd->disk, capacity);
+ 
+ 	/* Enable the block device and add it to /dev */
+-	device_add_disk(&dd->pdev->dev, dd->disk, NULL);
++	device_add_disk(&dd->pdev->dev, dd->disk, &mtip_attr_group);
+ 
+ 	dd->bdev = bdget_disk(dd->disk, 0);
+-	/*
+-	 * Now that the disk is active, initialize any sysfs attributes
+-	 * managed by the protocol layer.
+-	 */
+-	kobj = kobject_get(&disk_to_dev(dd->disk)->kobj);
+-	if (kobj) {
+-		mtip_hw_sysfs_init(dd, kobj);
+-		kobject_put(kobj);
+-	}
+ 
+ 	if (dd->mtip_svc_handler) {
+ 		set_bit(MTIP_DDF_INIT_DONE_BIT, &dd->dd_flag);
 -- 
-1.9.1
+2.7.4
