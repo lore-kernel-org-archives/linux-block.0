@@ -13,127 +13,91 @@ Cc: linux-nvme@lists.infradead.org, Keith Busch <keith.busch@intel.com>,
         virtualization@lists.linux-foundation.org,
         Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
         Nitin Gupta <ngupta@vflare.org>, David Woodhouse <dwmw2@infradead.org>
-Subject: [PATCH 06/15] genhd: Add return code to device_add_disk
-Date: Wed, 17 Aug 2016 15:15:06 +0800
-Message-Id: <1471418115-3654-7-git-send-email-famz@redhat.com>
+Subject: [PATCH 05/15] genhd: Return error from disk_{add,alloc}_events
+Date: Wed, 17 Aug 2016 15:15:05 +0800
+Message-Id: <1471418115-3654-6-git-send-email-famz@redhat.com>
 In-Reply-To: <1471418115-3654-1-git-send-email-famz@redhat.com>
 References: <1471418115-3654-1-git-send-email-famz@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-There are a number of places in device_add_disk that can fail, and even
-more to come as we extend it.
-
-Switch the return type of the function, and return the error code when
-error happens.
-
-The WARN_ON is kept because callers are not updated to check the error
-yet.
+disk_alloc_events and disk_add_events can fail, return the error code so
+the caller can handle it.
 
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- block/genhd.c         | 49 ++++++++++++++++++++++++++++++++++---------------
- include/linux/genhd.h |  2 +-
- 2 files changed, 35 insertions(+), 16 deletions(-)
+ block/genhd.c | 24 +++++++++++++++---------
+ 1 file changed, 15 insertions(+), 9 deletions(-)
 
 diff --git a/block/genhd.c b/block/genhd.c
-index 4316d2d..ffb3929 100644
+index 8c7510d..4316d2d 100644
 --- a/block/genhd.c
 +++ b/block/genhd.c
-@@ -595,9 +595,10 @@ exit:
-  * This function registers the partitioning information in @disk
-  * with the kernel.
-  *
-- * FIXME: error handling
-+ * RETURNS:
-+ * 0 on success, -errno on failure.
+@@ -40,8 +40,8 @@ static struct device_type disk_type;
+ 
+ static void disk_check_events(struct disk_events *ev,
+ 			      unsigned int *clearing_ptr);
+-static void disk_alloc_events(struct gendisk *disk);
+-static void disk_add_events(struct gendisk *disk);
++static int disk_alloc_events(struct gendisk *disk);
++static int disk_add_events(struct gendisk *disk);
+ static void disk_del_events(struct gendisk *disk);
+ static void disk_release_events(struct gendisk *disk);
+ 
+@@ -1823,17 +1823,17 @@ module_param_cb(events_dfl_poll_msecs, &disk_events_dfl_poll_msecs_param_ops,
+ /*
+  * disk_{alloc|add|del|release}_events - initialize and destroy disk_events.
   */
--void device_add_disk(struct device *parent, struct gendisk *disk)
-+int device_add_disk(struct device *parent, struct gendisk *disk)
+-static void disk_alloc_events(struct gendisk *disk)
++static int disk_alloc_events(struct gendisk *disk)
  {
- 	struct backing_dev_info *bdi;
- 	dev_t devt;
-@@ -613,10 +614,8 @@ void device_add_disk(struct device *parent, struct gendisk *disk)
- 	disk->flags |= GENHD_FL_UP;
+ 	struct disk_events *ev;
  
- 	retval = blk_alloc_devt(&disk->part0, &devt);
--	if (retval) {
--		WARN_ON(1);
+ 	if (!disk->fops->check_events)
 -		return;
--	}
-+	if (retval)
-+		goto fail;
- 	disk_to_dev(disk)->devt = devt;
++		return 0;
  
- 	/* ->major and ->first_minor aren't supposed to be
-@@ -625,16 +624,26 @@ void device_add_disk(struct device *parent, struct gendisk *disk)
- 	disk->major = MAJOR(devt);
- 	disk->first_minor = MINOR(devt);
+ 	ev = kzalloc(sizeof(*ev), GFP_KERNEL);
+ 	if (!ev) {
+ 		pr_warn("%s: failed to initialize events\n", disk->disk_name);
+-		return;
++		return -ENOMEM;
+ 	}
  
--	disk_alloc_events(disk);
-+	retval = disk_alloc_events(disk);
-+	if (retval)
-+		goto fail;
+ 	INIT_LIST_HEAD(&ev->node);
+@@ -1845,17 +1845,22 @@ static void disk_alloc_events(struct gendisk *disk)
+ 	INIT_DELAYED_WORK(&ev->dwork, disk_events_workfn);
  
- 	/* Register BDI before referencing it from bdev */
- 	bdi = &disk->queue->backing_dev_info;
--	bdi_register_owner(bdi, disk_to_dev(disk));
-+	retval = bdi_register_owner(bdi, disk_to_dev(disk));
-+	if (retval)
-+		goto fail;
- 
--	blk_register_region(disk_devt(disk), disk->minors, NULL,
--			    exact_match, exact_lock, disk);
--	register_disk(parent, disk);
--	blk_register_queue(disk);
-+	retval = blk_register_region(disk_devt(disk), disk->minors, NULL,
-+				     exact_match, exact_lock, disk);
-+	if (retval)
-+		goto fail;
-+	retval = register_disk(parent, disk);
-+	if (retval)
-+		goto fail;
-+	retval = blk_register_queue(disk);
-+	if (retval)
-+		goto fail;
- 
- 	/*
- 	 * Take an extra ref on queue which will be put on disk_release()
-@@ -644,10 +653,20 @@ void device_add_disk(struct device *parent, struct gendisk *disk)
- 
- 	retval = sysfs_create_link(&disk_to_dev(disk)->kobj, &bdi->dev->kobj,
- 				   "bdi");
-+	if (retval)
-+		goto fail;
-+
-+	retval = disk_add_events(disk);
-+	if (retval)
-+		goto fail;
-+
-+	retval = blk_integrity_add(disk);
-+	if (retval)
-+		goto fail;
+ 	disk->ev = ev;
 +	return 0;
-+fail:
- 	WARN_ON(retval);
--
--	disk_add_events(disk);
--	blk_integrity_add(disk);
-+	return retval;
  }
- EXPORT_SYMBOL(device_add_disk);
  
-diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index 85ce560..991b5ff 100644
---- a/include/linux/genhd.h
-+++ b/include/linux/genhd.h
-@@ -413,7 +413,7 @@ static inline void free_part_info(struct hd_struct *part)
- extern void part_round_stats(int cpu, struct hd_struct *part);
+-static void disk_add_events(struct gendisk *disk)
++static int disk_add_events(struct gendisk *disk)
+ {
++	int rc;
++
+ 	if (!disk->ev)
+-		return;
++		return 0;
  
- /* block/genhd.c */
--extern void device_add_disk(struct device *parent, struct gendisk *disk);
-+extern int device_add_disk(struct device *parent, struct gendisk *disk);
+-	/* FIXME: error handling */
+-	if (sysfs_create_files(&disk_to_dev(disk)->kobj, disk_events_attrs) < 0)
++	rc = sysfs_create_files(&disk_to_dev(disk)->kobj, disk_events_attrs);
++	if (rc) {
+ 		pr_warn("%s: failed to create sysfs files for events\n",
+ 			disk->disk_name);
++		return rc;
++	}
  
- extern void del_gendisk(struct gendisk *gp);
- extern struct gendisk *get_gendisk(dev_t dev, int *partno);
+ 	mutex_lock(&disk_events_mutex);
+ 	list_add_tail(&disk->ev->node, &disk_events);
+@@ -1866,6 +1871,7 @@ static void disk_add_events(struct gendisk *disk)
+ 	 * unblock kicks it into action.
+ 	 */
+ 	__disk_unblock_events(disk, true);
++	return 0;
+ }
+ 
+ static void disk_del_events(struct gendisk *disk)
 -- 
 2.7.4
