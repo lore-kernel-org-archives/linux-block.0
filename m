@@ -1,42 +1,41 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: Christoph Hellwig <hch@lst.de>, Mike Snitzer <snitzer@redhat.com>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-Subject: [PATCH] block: Fix race triggered by blk_set_queue_dying()
-Message-ID: <e50dbd54-30fb-bf59-0ce6-5ccf1d830017@sandisk.com>
-Date: Tue, 16 Aug 2016 16:48:36 -0700
+Return-Path: <sergey.senozhatsky.work@gmail.com>
+Return-Path: <sergey.senozhatsky.work@gmail.com>
+Date: Thu, 18 Aug 2016 11:36:33 +0900
+From: Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+	Keith Busch <keith.busch@intel.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+	linuxppc-dev@lists.ozlabs.org,
+	"Michael S. Tsirkin" <mst@redhat.com>, linux-block@vger.kernel.org,
+	Brian Norris <computersforpeace@gmail.com>,
+	Paul Mackerras <paulus@samba.org>, linux-mtd@lists.infradead.org,
+	"Ed L. Cashin" <ed.cashin@acm.org>, Jens Axboe <axboe@kernel.dk>,
+	Minchan Kim <minchan@kernel.org>,
+	virtualization@lists.linux-foundation.org,
+	Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
+	Nitin Gupta <ngupta@vflare.org>,
+	David Woodhouse <dwmw2@infradead.org>
+Subject: Re: [PATCH 15/15] block: Add FIXME comment to handle device_add_disk
+ error
+Message-ID: <20160818023633.GC500@swordfish>
+References: <1471418115-3654-1-git-send-email-famz@redhat.com>
+ <1471418115-3654-16-git-send-email-famz@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Return-Path: Bart.VanAssche@sandisk.com
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1471418115-3654-16-git-send-email-famz@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-blk_set_queue_dying() can be called while another thread is
-submitting I/O or changing queue flags, e.g. through dm_stop_queue().
-Hence protect the QUEUE_FLAG_DYING flag change with locking.
+On (08/17/16 15:15), Fam Zheng wrote:
+[..]
+>   (
+>     rc = device_add_disk(e1, e2, e3);
+>   |
+>   + /* FIXME: handle error. */
+>     device_add_disk(e1, e2, e3);
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Mike Snitzer <snitzer@redhat.com>
-Cc: stable <stable@vger.kernel.org>
----
- block/blk-core.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+or use __must_check for device_add_disk() function?
+/* which is _attribute__((warn_unused_result)) */
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index e0bc563..96d5835 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -515,7 +515,9 @@ EXPORT_SYMBOL_GPL(blk_queue_bypass_end);
- 
- void blk_set_queue_dying(struct request_queue *q)
- {
--	queue_flag_set_unlocked(QUEUE_FLAG_DYING, q);
-+	spin_lock_irq(q->queue_lock);
-+	queue_flag_set(QUEUE_FLAG_DYING, q);
-+	spin_unlock_irq(q->queue_lock);
- 
- 	if (q->mq_ops)
- 		blk_mq_wake_waiters(q);
--- 
-2.9.2
+	-ss
