@@ -9,76 +9,124 @@ References: <87a8gltgks.fsf@linux.vnet.ibm.com>
 	<871t1kq455.fsf@linux.vnet.ibm.com>
 	<bb6f8757-4c3d-8f49-8aff-aa0fdb8bae89@kernel.dk>
 	<8fc9ae38-9488-ef52-f620-08499edebffa@kernel.dk>
-	<87shu0hfye.fsf@linux.vnet.ibm.com>
-Date: Tue, 23 Aug 2016 17:54:03 -0300
-In-Reply-To: <87shu0hfye.fsf@linux.vnet.ibm.com> (Gabriel Krisman Bertazi's
-	message of "Fri, 19 Aug 2016 13:38:17 -0300")
+Date: Fri, 19 Aug 2016 13:38:17 -0300
+In-Reply-To: <8fc9ae38-9488-ef52-f620-08499edebffa@kernel.dk> (Jens Axboe's
+	message of "Fri, 19 Aug 2016 09:51:21 -0600")
 MIME-Version: 1.0
 Content-Type: text/plain
-Message-Id: <87a8g39pg4.fsf@linux.vnet.ibm.com>
+Message-Id: <87shu0hfye.fsf@linux.vnet.ibm.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Gabriel Krisman Bertazi <krisman@linux.vnet.ibm.com> writes:
+Jens Axboe <axboe@kernel.dk> writes:
 
->> Can you share what you ran to online/offline CPUs? I can't reproduce
->> this here.
->
-> I was using the ppc64_cpu tool, which shouldn't do nothing more than
-> write to sysfs.  but I just reproduced it with the script below.
->
-> Note that this is ppc64le.  I don't have a x86 in hand to attempt to
-> reproduce right now, but I'll look for one and see how it goes.
+>> Some good detective work so far! I agree, this looks like a blk-mq core
+>> bug. Do you have a trace of a BUG() triggering in nvme_queue_rq(), when
+>> req->tag != nvmeq->tags? I don't immediately see how this could happen,
+>> the freezing should protect us from this, unless it's broken somehow.
+>> I'll take a look at this.
 
-Hi,
+Nothing much on the BUG() stack trace, at least to me.  We are coming
+from an async execution of __blk_mq_run_hw_queue:
 
-Any luck on reproducing it?  We were initially reproducing with a
-proprietary stress test, but I gave a try to a generated fio jobfile
-associated with the SMT script I shared earlier and I could reproduce
-the crash consistently in less than 10 minutes of execution.  this was
-still ppc64le, though.  I couldn't get my hands on nvme on x86 yet.
+This is from 4.7. I'll give another run on 4.8-rc1.
 
-The job file I used, as well as the smt.sh script, in case you want to
-give it a try:
+[ 1953.910860] kernel BUG at ../drivers/nvme/host/pci.c:602!
+cpu 0x48: Vector: 700 (Program Check) at [c000007870d3b7a0]
+    pc: d000000035aa2e88: nvme_queue_rq+0x1a8/0x7a0 [nvme]
+    lr: d000000035aa2e78: nvme_queue_rq+0x198/0x7a0 [nvme]
+    sp: c000007870d3ba20
+   msr: 900000010282b033
+  current = 0xc000007870d9e400
+  paca    = 0xc000000002bd8800   softe: 0        irq_happened: 0x01
+    pid   = 9205, comm = kworker/72:1H
+kernel BUG at ../drivers/nvme/host/pci.c:602!
+Linux version 4.7.0.mainline+ (root@iod76) (gcc version 5.3.1 20160413 (Ubuntu/IBM 5.3.1-14ubuntu2.
+1) ) #150 SMP Wed Aug 17 14:53:47 CDT 2016
+enter ? for help
+[c000007870d3bb10] c0000000005697b4 __blk_mq_run_hw_queue+0x384/0x640
+[c000007870d3bc50] c0000000000e8cf0 process_one_work+0x1e0/0x590
+[c000007870d3bce0] c0000000000e9148 worker_thread+0xa8/0x660
+[c000007870d3bd80] c0000000000f2090 kthread+0x110/0x130
+[c000007870d3be30] c0000000000095f0 ret_from_kernel_thread+0x5c/0x6c
+48:mon>
 
-jobfile: http://krisman.be/k/nvmejob.fio
-smt.sh:  http://krisman.be/k/smt.sh
 
-Still, the trigger seems to be consistently a heavy load of IO
-associated with CPU addition/removal.
+Another interesting data point is that we always reach the WARN_ON in
+__blk_mq_run_hw_queue immediately before submitting the bad request.
 
-Let me share my progress from the last couple days in the hope that it
-rings a bell for you.
+Maybe we are touching some percpu variable from the wrong cpu?
 
-Firstly, I verified that when we hit the BUG_ON in nvme_queue_rq, the
-request_queue's freeze_depth is 0, which points away from a fault in the
-freeze/unfreeze mechanism.  If a request was escaping and going through
-the block layer during a freeze, we'd see freeze_depth >= 1.  Before
-that, I had also tried to keep the q_usage_counter in atomic mode, in
-case of a bug in the percpu refcount.  No luck, the BUG_ON was still
-hit.
+See the WARN_ON trace below.
 
-Also, I don't see anything special about the request that reaches the
-BUG_ON.  It's a REQ_TYPE_FS request and, at least in the last time I
-reproduced, it was a READ that came from the stress test task through
-submit_bio.  So nothing remarkable about it too, as far as I can see.
 
-I'm still thinking about a case in which the mapping get's screwed up,
-where a ctx would appear into two hctxs bitmaps after a remap, or if the
-ctx got remaped to another hctx.  I'm still learning my way through the
-cpumap code, so I'm not sure it's a real possibility, but I'm not
-convinced it isn't.  Some preliminary tests don't suggest it's the case
-at play, but I wanna spend a little more time on this theory (maybe
-for my lack of better ideas :)
+[  369.953825] ------------[ cut here ]------------
+[  369.954011] WARNING: CPU: 142 PID: 9475 at ../block/blk-mq.c:840 __blk_mq_run_hw_queue+0x338/0x6
+40
+[  369.954139] Modules linked in: rpcsec_gss_krb5 auth_rpcgss nfsv4 nfs lockd grace fscache binfmt_
+misc xfs ofpart cmdlinepart powernv_flash mtd ipmi_powernv ipmi_msghandler at24 opal_prd ibmpowernv
+ nvmem_core powernv_rng input_leds joydev uio_pdrv_genirq mac_hid uio ib_iser rdma_cm sunrpc iw_cm
+ib_cm ib_core configfs iscsi_tcp libiscsi_tcp libiscsi scsi_transport_iscsi autofs4 btrfs raid10 ra
+id456 async_raid6_recov async_memcpy async_pq async_xor async_tx xor raid6_pq libcrc32c raid1 raid0
+ multipath linear ast i2c_algo_bit ttm drm_kms_helper syscopyarea sysfillrect sysimgblt fb_sys_fops
+ drm hid_generic uas usb_storage usbhid hid nvme ahci libahci nvme_core drbg ansi_cprng
+[  369.955011] CPU: 142 PID: 9475 Comm: kworker/142:1H Not tainted 4.7.0.mainline+ #150
+[  369.955085] Workqueue: kblockd blk_mq_run_work_fn
+[  369.955153] task: c0000078cbb89a00 ti: c0000078cb024000 task.ti: c0000078cb024000
+[  369.955253] NIP: c000000000569768 LR: c000000000569668 CTR: 0000000000000000
+[  369.955314] REGS: c0000078cb027890 TRAP: 0700   Not tainted  (4.7.0.mainline+)
+[  369.955372] MSR: 900000010282b033 <SF,HV,VEC,VSX,EE,FP,ME,IR,DR,RI,LE,TM[E]>  CR: 28002224  XER:
+ 20000000
+[  369.955579] CFAR: c000000000569a18 SOFTE: 1
+GPR00: c0000000005695b0 c0000078cb027b10 c0000000013d0b00 0000000000000008
+GPR04: 0000000000000008 0000000000000040 0000000000000000 0000000000000001
+GPR08: c0000078c345d800 0000000000000001 0000000001700000 9000000102803003
+GPR12: 0000000000002200 c000000002bffe00 c0000078bb96b000 0000000000000000
+GPR16: 0000000000000008 c0000078bb930000 c000007954aafd00 c0000078bb961800
+GPR20: c000007954aafd08 c000000000da3728 c0000078bea80000 c0000078cb027b88
+GPR24: 0000000000000000 c0000078bea80000 c0000078bb961808 fffffffffffffffb
+GPR28: 0000000000000000 c0000078cb027b98 0000000000000000 c0000078bd299700
+[  369.956334] NIP [c000000000569768] __blk_mq_run_hw_queue+0x338/0x640
+[  369.956383] LR [c000000000569668] __blk_mq_run_hw_queue+0x238/0x640
+[  369.956433] Call Trace:
+[  369.956454] [c0000078cb027b10] [c0000000005695b0] __blk_mq_run_hw_queue+0x180/0x640 (unreliable)
+[  369.956535] [c0000078cb027c50] [c0000000000e8cf0] process_one_work+0x1e0/0x590
+[  369.956605] [c0000078cb027ce0] [c0000000000e9148] worker_thread+0xa8/0x660
+[  369.956664] [c0000078cb027d80] [c0000000000f2090] kthread+0x110/0x130
+[  369.956723] [c0000078cb027e30] [c0000000000095f0] ret_from_kernel_thread+0x5c/0x6c
+[  369.956791] Instruction dump:
+[  369.956821] 815f0108 e91302d8 81280000 7f895040 409d01e8 e9280060 794a1f24 7d29502a
+[  369.956920] 7d2afa78 312affff 7d295110 7d2907b4 <0b090000> e9210088 e95f0058 38810060
+[  369.957020] ---[ end trace 1398dd60e3057065 ]---
+[  369.957094] ------------[ cut here ]------------
 
-On a side note, probably unrelated to this crash, it also got me
-thinking about the current usefulness of blk_mq_hctx_notify.  Since CPU
-is dead, no more requests would be coming through its ctx.  I think we
-could force a queue run in blk_mq_queue_reinit_notify, before remapping,
-which would cause the hctx to fetch the remaining requests from that
-dead ctx (since it's not unmapped yet).  This way, we could maintain a
-single hotplug notification hook and simplify the hotplug path.  I
-haven't written code for it yet, but I'll see if I can come up with
-something and send to the list.
+
+> Can you share what you ran to online/offline CPUs? I can't reproduce
+> this here.
+
+I was using the ppc64_cpu tool, which shouldn't do nothing more than
+write to sysfs.  but I just reproduced it with the script below.
+
+Note that this is ppc64le.  I don't have a x86 in hand to attempt to
+reproduce right now, but I'll look for one and see how it goes.
+
+
+#!/bin/bash
+
+MAXCPUs=159
+STATE=1
+
+while true; do
+    for i in $(seq 1 ${MAXCPUS}); do
+        if (($i%8)); then
+            echo $STATE > /sys/devices/system/cpu/cpu$i/online
+        fi
+    done
+    if [[ $STATE -eq 1 ]]; then
+        STATE=0
+    else
+        STATE=1
+    fi
+done
 
 -- 
 Gabriel Krisman Bertazi
