@@ -1,68 +1,36 @@
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>,
-	Tejun Heo <tj@kernel.org>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	linus.walleij@linaro.org,
-	broonie@kernel.org,
-	Arianna Avanzini <avanzini.arianna@gmail.com>,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH V2 02/22] block, cfq: remove close-based preemption
-Date: Mon,  8 Aug 2016 13:14:57 +0200
-Message-Id: <1470654917-4280-3-git-send-email-paolo.valente@linaro.org>
-In-Reply-To: <1470654917-4280-1-git-send-email-paolo.valente@linaro.org>
-References: <1470654917-4280-1-git-send-email-paolo.valente@linaro.org>
+Subject: Re: [PATCH V2] block: Fix secure erase
+To: Ulf Hansson <ulf.hansson@linaro.org>,
+ Adrian Hunter <adrian.hunter@intel.com>
+References: <20160815181754.GA9918@lst.de>
+ <1471334375-2585-1-git-send-email-adrian.hunter@intel.com>
+ <CAPDyKFpTtxX6k13kFZNQ0MiCXeaWneepZu4q1y=42ZBPQmu1ig@mail.gmail.com>
+Cc: Christoph Hellwig <hch@lst.de>, linux-mmc <linux-mmc@vger.kernel.org>,
+ linux-block@vger.kernel.org,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+From: Jens Axboe <axboe@fb.com>
+Message-ID: <f5a069ae-f4d1-b6f6-4cd9-fe95824602fb@fb.com>
+Date: Fri, 19 Aug 2016 09:14:16 -0600
+MIME-Version: 1.0
+In-Reply-To: <CAPDyKFpTtxX6k13kFZNQ0MiCXeaWneepZu4q1y=42ZBPQmu1ig@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-From: Arianna Avanzini <avanzini.arianna@gmail.com>
+On 08/19/2016 05:52 AM, Ulf Hansson wrote:
+> On 16 August 2016 at 09:59, Adrian Hunter <adrian.hunter@intel.com> wrote:
+>> Commit 288dab8a35a0 ("block: add a separate operation type for secure
+>> erase") split REQ_OP_SECURE_ERASE from REQ_OP_DISCARD without considering
+>> all the places REQ_OP_DISCARD was being used to mean either. Fix those.
+>>
+>> Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
+>> Fixes: 288dab8a35a0 ("block: add a separate operation type for secure erase")
+>
+> For the mmc parts:
+>
+> Acked-by: Ulf Hansson <ulf.hansson@linaro.org>
+>
+> Jens, will you pick this up via your tree?
 
-CFQ may preempt the queue currently in service if a new request, for a
-different queue, happens to be close to the last-dispatched
-request. This boosts the throughput with processes that issue close
-requests, but whose I/O patterns are not regularly interleaved enough
-to trigger the activation of the queue-merging heuristic removed in
-the previous commit. BFQ does not need to perform any such preemption,
-because the queue-merging mechanism of BFQ (EQM) is reactive enough to
-merge queues also in the presence of irregularly interleaved I/O.
+Already did, was applied 3 days ago.
 
-Signed-off-by: Arianna Avanzini <avanzini.arianna@gmail.com>
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
----
- block/cfq-iosched.c | 13 -------------
- 1 file changed, 13 deletions(-)
-
-diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
-index 10761b5..1ab8898 100644
---- a/block/cfq-iosched.c
-+++ b/block/cfq-iosched.c
-@@ -2696,12 +2696,6 @@ static inline sector_t cfq_dist_from_last(struct cfq_data *cfqd,
- 		return cfqd->last_position - blk_rq_pos(rq);
- }
- 
--static inline int cfq_rq_close(struct cfq_data *cfqd, struct cfq_queue *cfqq,
--			       struct request *rq)
--{
--	return cfq_dist_from_last(cfqd, rq) <= CFQQ_CLOSE_THR;
--}
--
- /*
-  * Determine whether we should enforce idle window for this queue.
-  */
-@@ -3751,13 +3745,6 @@ cfq_should_preempt(struct cfq_data *cfqd, struct cfq_queue *new_cfqq,
- 	if (!cfqd->active_cic || !cfq_cfqq_wait_request(cfqq))
- 		return false;
- 
--	/*
--	 * if this request is as-good as one we would expect from the
--	 * current cfqq, let it preempt
--	 */
--	if (cfq_rq_close(cfqd, cfqq, rq))
--		return true;
--
- 	return false;
- }
- 
 -- 
-1.9.1
+Jens Axboe
