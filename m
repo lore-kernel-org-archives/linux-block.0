@@ -37,19 +37,13 @@ Cc: Shaun Tancheff <shaun@tancheff.com>,
 	Linus Walleij <linus.walleij@linaro.org>,
 	Jeff Layton <jlayton@poochiereds.net>,
 	"J . Bruce Fields" <bfields@fieldses.org>,
-	linux-f2fs-devel@lists.sourceforge.net,
-	linux-fsdevel@vger.kernel.org,
-	dm-devel@redhat.com,
-	Jaegeuk Kim <jaegeuk@kernel.org>,
 	Shaun Tancheff <shaun.tancheff@seagate.com>
-Subject: [PATCH v8 1/2 RESEND] Add bio/request flags to issue ZBC/ZAC commands
-Date: Wed, 24 Aug 2016 15:24:09 -0500
-Message-Id: <20160824202409.30345-1-shaun@tancheff.com>
-In-Reply-To: <20160822042010.32416-2-shaun@tancheff.com>
-References: <20160822042010.32416-2-shaun@tancheff.com>
+Subject: [PATCH v8 1/2] Add bio/request flags to issue ZBC/ZAC commands
+Date: Sun, 21 Aug 2016 23:20:09 -0500
+Message-Id: <20160822042010.32416-2-shaun@tancheff.com>
+In-Reply-To: <20160822042010.32416-1-shaun@tancheff.com>
+References: <20160822042010.32416-1-shaun@tancheff.com>
 List-ID: <linux-block@vger.kernel.org>
-
-(RESENDING to include f2fs, fs-devel and dm-devel)
 
 Add op flags to access to zone information as well as open, close
 and reset zones:
