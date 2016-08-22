@@ -1,179 +1,339 @@
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>,
-	Tejun Heo <tj@kernel.org>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	linus.walleij@linaro.org,
-	broonie@kernel.org,
-	Paolo Valente <paolo.valente@linaro.org>,
-	Arianna Avanzini <avanzini.arianna@gmail.com>
-Subject: [PATCH V2 17/22] block, bfq: reduce latency during request-pool saturation
-Date: Mon,  8 Aug 2016 13:15:12 +0200
-Message-Id: <1470654917-4280-18-git-send-email-paolo.valente@linaro.org>
-In-Reply-To: <1470654917-4280-1-git-send-email-paolo.valente@linaro.org>
-References: <1470654917-4280-1-git-send-email-paolo.valente@linaro.org>
+Return-Path: <shaun.tancheff@gmail.com>
+Return-Path: <shaun.tancheff@gmail.com>
+Sender: Shaun Tancheff <shaun.tancheff@gmail.com>
+From: Shaun Tancheff <shaun@tancheff.com>
+To: linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Shaun Tancheff <shaun@tancheff.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>,
+	"James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	Damien Le Moal <damien.lemoal@hgst.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Josh Bingaman <josh.bingaman@seagate.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Sagi Grimberg <sagig@mellanox.com>,
+	Mike Christie <mchristi@redhat.com>,
+	Toshi Kani <toshi.kani@hpe.com>,
+	Ming Lei <ming.lei@canonical.com>,
+	Shaun Tancheff <shaun.tancheff@seagate.com>
+Subject: [PATCH v2 3/4] Merge ZBC constants
+Date: Sun, 21 Aug 2016 23:31:15 -0500
+Message-Id: <20160822043116.21168-4-shaun@tancheff.com>
+In-Reply-To: <20160822043116.21168-1-shaun@tancheff.com>
+References: <20160822043116.21168-1-shaun@tancheff.com>
 List-ID: <linux-block@vger.kernel.org>
 
-This patch introduces an heuristic that reduces latency when the
-I/O-request pool is saturated. This goal is achieved by disabling
-device idling, for non-weight-raised queues, when there are weight-
-raised queues with pending or in-flight requests. In fact, as
-explained in more detail in the comment on the function
-bfq_bfqq_may_idle(), this reduces the rate at which processes
-associated with non-weight-raised queues grab requests from the pool,
-thereby increasing the probability that processes associated with
-weight-raised queues get a request immediately (or at least soon) when
-they need one. Along the same line, if there are weight-raised queues,
-then this patch halves the service rate of async (write) requests for
-non-weight-raised queues.
+Dedupe ZBC/ZAC constants used for reporting options, same code,
+zone condition and zone type.
 
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
-Signed-off-by: Arianna Avanzini <avanzini.arianna@gmail.com>
+These are all useful to programs consuming zone information from
+user space as well so include them in a uapi header.
+
+Signed-off-by: Shaun Tancheff <shaun.tancheff@seagate.com>
 ---
- block/cfq-iosched.c | 66 ++++++++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 63 insertions(+), 3 deletions(-)
+ block/blk-lib.c                   |   4 +-
+ drivers/scsi/sd.c                 |   2 +-
+ include/linux/blkdev.h            |  20 -----
+ include/scsi/scsi_proto.h         |  17 ----
+ include/uapi/linux/blkzoned_api.h | 167 +++++++++++++++++++++++---------------
+ 5 files changed, 103 insertions(+), 107 deletions(-)
 
-diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
-index d3cda1a..d137ed2 100644
---- a/block/cfq-iosched.c
-+++ b/block/cfq-iosched.c
-@@ -375,6 +375,8 @@ struct bfq_data {
- 	 * queue in service, even if it is idling).
- 	 */
- 	int busy_queues;
-+	/* number of weight-raised busy @bfq_queues */
-+	int wr_busy_queues;
- 	/* number of queued requests */
- 	int queued;
- 	/* number of requests dispatched and waiting for completion */
-@@ -1993,6 +1995,9 @@ static void bfq_del_bfqq_busy(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+diff --git a/block/blk-lib.c b/block/blk-lib.c
+index e92bd56..67b9258 100644
+--- a/block/blk-lib.c
++++ b/block/blk-lib.c
+@@ -316,8 +316,8 @@ int blkdev_issue_zone_report(struct block_device *bdev, unsigned int op_flags,
+ 		__be64 blksz = cpu_to_be64(bdev->bd_part->nr_sects);
  
- 	bfqd->busy_queues--;
+ 		conv->maximum_lba = blksz;
+-		conv->descriptors[0].type = ZTYP_CONVENTIONAL;
+-		conv->descriptors[0].flags = ZCOND_CONVENTIONAL << 4;
++		conv->descriptors[0].type = BLK_ZONE_TYPE_CONVENTIONAL;
++		conv->descriptors[0].flags = BLK_ZONE_NO_WP << 4;
+ 		conv->descriptors[0].length = blksz;
+ 		conv->descriptors[0].lba_start = 0;
+ 		conv->descriptors[0].lba_wptr = blksz;
+diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
+index d5ef6d8..b76ffbb 100644
+--- a/drivers/scsi/sd.c
++++ b/drivers/scsi/sd.c
+@@ -1201,7 +1201,7 @@ static int sd_setup_zone_report_cmnd(struct scsi_cmnd *cmd)
+ 		src = kmap_atomic(bio->bi_io_vec->bv_page);
+ 		conv = src + bio->bi_io_vec->bv_offset;
+ 		conv->descriptor_count = cpu_to_be32(1);
+-		conv->same_field = ZS_ALL_SAME;
++		conv->same_field = BLK_ZONE_SAME_ALL;
+ 		conv->maximum_lba = cpu_to_be64(disk->part0.nr_sects);
+ 		kunmap_atomic(src);
+ 		goto out;
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 68198eb..d5cdb5d 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -263,26 +263,6 @@ struct blk_queue_tag {
+ #define BLK_SCSI_CMD_PER_LONG	(BLK_SCSI_MAX_CMDS / (sizeof(long) * 8))
  
-+	if (bfqq->wr_coeff > 1)
-+		bfqd->wr_busy_queues--;
+ #ifdef CONFIG_BLK_DEV_ZONED
+-enum blk_zone_type {
+-	BLK_ZONE_TYPE_UNKNOWN,
+-	BLK_ZONE_TYPE_CONVENTIONAL,
+-	BLK_ZONE_TYPE_SEQWRITE_REQ,
+-	BLK_ZONE_TYPE_SEQWRITE_PREF,
+-	BLK_ZONE_TYPE_RESERVED,
+-};
+-
+-enum blk_zone_state {
+-	BLK_ZONE_NO_WP,
+-	BLK_ZONE_EMPTY,
+-	BLK_ZONE_OPEN,
+-	BLK_ZONE_OPEN_EXPLICIT,
+-	BLK_ZONE_CLOSED,
+-	BLK_ZONE_UNKNOWN = 5,
+-	BLK_ZONE_READONLY = 0xd,
+-	BLK_ZONE_FULL,
+-	BLK_ZONE_OFFLINE,
+-	BLK_ZONE_BUSY = 0x20,
+-};
+ 
+ struct blk_zone {
+ 	struct rb_node node;
+diff --git a/include/scsi/scsi_proto.h b/include/scsi/scsi_proto.h
+index 6ba66e0..d1defd1 100644
+--- a/include/scsi/scsi_proto.h
++++ b/include/scsi/scsi_proto.h
+@@ -299,21 +299,4 @@ struct scsi_lun {
+ #define SCSI_ACCESS_STATE_MASK        0x0f
+ #define SCSI_ACCESS_STATE_PREFERRED   0x80
+ 
+-/* Reporting options for REPORT ZONES */
+-enum zbc_zone_reporting_options {
+-	ZBC_ZONE_REPORTING_OPTION_ALL = 0,
+-	ZBC_ZONE_REPORTING_OPTION_EMPTY,
+-	ZBC_ZONE_REPORTING_OPTION_IMPLICIT_OPEN,
+-	ZBC_ZONE_REPORTING_OPTION_EXPLICIT_OPEN,
+-	ZBC_ZONE_REPORTING_OPTION_CLOSED,
+-	ZBC_ZONE_REPORTING_OPTION_FULL,
+-	ZBC_ZONE_REPORTING_OPTION_READONLY,
+-	ZBC_ZONE_REPORTING_OPTION_OFFLINE,
+-	ZBC_ZONE_REPORTING_OPTION_NEED_RESET_WP = 0x10,
+-	ZBC_ZONE_REPORTING_OPTION_NON_SEQWRITE,
+-	ZBC_ZONE_REPORTING_OPTION_NON_WP = 0x3f,
+-};
+-
+-#define ZBC_REPORT_ZONE_PARTIAL 0x80
+-
+ #endif /* _SCSI_PROTO_H_ */
+diff --git a/include/uapi/linux/blkzoned_api.h b/include/uapi/linux/blkzoned_api.h
+index cd81a9f..fa12976 100644
+--- a/include/uapi/linux/blkzoned_api.h
++++ b/include/uapi/linux/blkzoned_api.h
+@@ -16,97 +16,123 @@
+ 
+ #include <linux/types.h>
+ 
++#define ZBC_REPORT_OPTION_MASK  0x3f
++#define ZBC_REPORT_ZONE_PARTIAL 0x80
 +
- 	bfqg_stats_update_dequeue(bfqq_group(bfqq));
- 
- 	bfq_deactivate_bfqq(bfqd, bfqq, requeue);
-@@ -2009,6 +2014,9 @@ static void bfq_add_bfqq_busy(struct bfq_data *bfqd, struct bfq_queue *bfqq)
- 
- 	bfq_mark_bfqq_busy(bfqq);
- 	bfqd->busy_queues++;
-+
-+	if (bfqq->wr_coeff > 1)
-+		bfqd->wr_busy_queues++;
- }
- 
- #if defined(CONFIG_CFQ_GROUP_IOSCHED) && defined(CONFIG_DEBUG_BLK_CGROUP)
-@@ -3305,7 +3313,16 @@ static unsigned long bfq_serv_to_charge(struct request *rq,
- 	if (bfq_bfqq_sync(bfqq) || bfqq->wr_coeff > 1)
- 		return blk_rq_sectors(rq);
- 
--	return blk_rq_sectors(rq) * bfq_async_charge_factor;
-+	/*
-+	 * If there are no weight-raised queues, then amplify service
-+	 * by just the async charge factor; otherwise amplify service
-+	 * by twice the async charge factor, to further reduce latency
-+	 * for weight-raised queues.
-+	 */
-+	if (bfqq->bfqd->wr_busy_queues == 0)
-+		return blk_rq_sectors(rq) * bfq_async_charge_factor;
-+
-+	return blk_rq_sectors(rq) * 2 * bfq_async_charge_factor;
- }
+ /**
+  * enum zone_report_option - Report Zones types to be included.
+  *
+- * @ZOPT_NON_SEQ_AND_RESET: Default (all zones).
+- * @ZOPT_ZC1_EMPTY: Zones which are empty.
+- * @ZOPT_ZC2_OPEN_IMPLICIT: Zones open but not explicitly opened
+- * @ZOPT_ZC3_OPEN_EXPLICIT: Zones opened explicitly
+- * @ZOPT_ZC4_CLOSED: Zones closed for writing.
+- * @ZOPT_ZC5_FULL: Zones that are full.
+- * @ZOPT_ZC6_READ_ONLY: Zones that are read-only
+- * @ZOPT_ZC7_OFFLINE: Zones that are offline
+- * @ZOPT_RESET: Zones that are empty
+- * @ZOPT_NON_SEQ: Zones that have HA media-cache writes pending
+- * @ZOPT_NON_WP_ZONES: Zones that do not have Write Pointers (conventional)
+- * @ZOPT_PARTIAL_FLAG: Modifies the definition of the Zone List Length field.
++ * @ZBC_ZONE_REPORTING_OPTION_ALL: Default (all zones).
++ * @ZBC_ZONE_REPORTING_OPTION_EMPTY: Zones which are empty.
++ * @ZBC_ZONE_REPORTING_OPTION_IMPLICIT_OPEN:
++ *	Zones open but not explicitly opened
++ * @ZBC_ZONE_REPORTING_OPTION_EXPLICIT_OPEN: Zones opened explicitly
++ * @ZBC_ZONE_REPORTING_OPTION_CLOSED: Zones closed for writing.
++ * @ZBC_ZONE_REPORTING_OPTION_FULL: Zones that are full.
++ * @ZBC_ZONE_REPORTING_OPTION_READONLY: Zones that are read-only
++ * @ZBC_ZONE_REPORTING_OPTION_OFFLINE: Zones that are offline
++ * @ZBC_ZONE_REPORTING_OPTION_NEED_RESET_WP: Zones with Reset WP Recommended
++ * @ZBC_ZONE_REPORTING_OPTION_RESERVED: Zones that with Non-Sequential
++ *	Write Resources Active
++ * @ZBC_ZONE_REPORTING_OPTION_NON_WP: Zones that do not have Write Pointers
++ *	(conventional)
++ * @ZBC_ZONE_REPORTING_OPTION_RESERVED: Undefined
++ * @ZBC_ZONE_REPORTING_OPTION_PARTIAL: Modifies the definition of the Zone List
++ *	Length field.
+  *
+  * Used by Report Zones in bdev_zone_get_report: report_option
+  */
+-enum bdev_zone_report_option {
+-	ZOPT_NON_SEQ_AND_RESET   = 0x00,
+-	ZOPT_ZC1_EMPTY,
+-	ZOPT_ZC2_OPEN_IMPLICIT,
+-	ZOPT_ZC3_OPEN_EXPLICIT,
+-	ZOPT_ZC4_CLOSED,
+-	ZOPT_ZC5_FULL,
+-	ZOPT_ZC6_READ_ONLY,
+-	ZOPT_ZC7_OFFLINE,
+-	ZOPT_RESET               = 0x10,
+-	ZOPT_NON_SEQ             = 0x11,
+-	ZOPT_NON_WP_ZONES        = 0x3f,
+-	ZOPT_PARTIAL_FLAG        = 0x80,
++enum zbc_zone_reporting_options {
++	ZBC_ZONE_REPORTING_OPTION_ALL = 0,
++	ZBC_ZONE_REPORTING_OPTION_EMPTY,
++	ZBC_ZONE_REPORTING_OPTION_IMPLICIT_OPEN,
++	ZBC_ZONE_REPORTING_OPTION_EXPLICIT_OPEN,
++	ZBC_ZONE_REPORTING_OPTION_CLOSED,
++	ZBC_ZONE_REPORTING_OPTION_FULL,
++	ZBC_ZONE_REPORTING_OPTION_READONLY,
++	ZBC_ZONE_REPORTING_OPTION_OFFLINE,
++	ZBC_ZONE_REPORTING_OPTION_NEED_RESET_WP = 0x10,
++	ZBC_ZONE_REPORTING_OPTION_NON_SEQWRITE,
++	ZBC_ZONE_REPORTING_OPTION_NON_WP = 0x3f,
++	ZBC_ZONE_REPORTING_OPTION_RESERVED = 0x40,
++	ZBC_ZONE_REPORTING_OPTION_PARTIAL = ZBC_REPORT_ZONE_PARTIAL
+ };
  
  /**
-@@ -3773,6 +3790,7 @@ static void bfq_add_request(struct request *rq)
- 			bfqq->wr_coeff = bfqd->bfq_wr_coeff;
- 			bfqq->wr_cur_max_time = bfq_wr_duration(bfqd);
+- * enum bdev_zone_type - Type of zone in descriptor
++ * enum blk_zone_type - Types of zones allowed in a zoned device.
+  *
+- * @ZTYP_RESERVED: Reserved
+- * @ZTYP_CONVENTIONAL: Conventional random write zone (No Write Pointer)
+- * @ZTYP_SEQ_WRITE_REQUIRED: Non-sequential writes are rejected.
+- * @ZTYP_SEQ_WRITE_PREFERRED: Non-sequential writes allowed but discouraged.
++ * @BLK_ZONE_TYPE_RESERVED: Reserved.
++ * @BLK_ZONE_TYPE_CONVENTIONAL: Zone has no WP. Zone commands are not available.
++ * @BLK_ZONE_TYPE_SEQWRITE_REQ: Zone must be written sequentially
++ * @BLK_ZONE_TYPE_SEQWRITE_PREF: Zone may be written non-sequentially
+  *
+- * Returned from Report Zones. See bdev_zone_descriptor* type.
++ * TBD: Move to blkzoned_api - we don't need pointless duplication
++ * and user space needs to handle the same information in the
++ * same format -- so lets make it easy
+  */
+-enum bdev_zone_type {
+-	ZTYP_RESERVED            = 0,
+-	ZTYP_CONVENTIONAL        = 1,
+-	ZTYP_SEQ_WRITE_REQUIRED  = 2,
+-	ZTYP_SEQ_WRITE_PREFERRED = 3,
++enum blk_zone_type {
++	BLK_ZONE_TYPE_RESERVED,
++	BLK_ZONE_TYPE_CONVENTIONAL,
++	BLK_ZONE_TYPE_SEQWRITE_REQ,
++	BLK_ZONE_TYPE_SEQWRITE_PREF,
++	BLK_ZONE_TYPE_UNKNOWN,
+ };
  
-+			bfqd->wr_busy_queues++;
- 			bfqq->entity.prio_changed = 1;
- 		}
- 		if (prev != bfqq->next_rq)
-@@ -3974,6 +3992,8 @@ static void bfq_merged_requests(struct request_queue *q, struct request *rq,
- /* Must be called with bfqq != NULL */
- static void bfq_bfqq_end_wr(struct bfq_queue *bfqq)
- {
-+	if (bfq_bfqq_busy(bfqq))
-+		bfqq->bfqd->wr_busy_queues--;
- 	bfqq->wr_coeff = 1;
- 	bfqq->wr_cur_max_time = 0;
- 	/*
-@@ -4839,7 +4859,8 @@ static bool bfq_may_expire_for_budg_timeout(struct bfq_queue *bfqq)
- static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
- {
- 	struct bfq_data *bfqd = bfqq->bfqd;
--	bool idling_boosts_thr, asymmetric_scenario;
-+	bool idling_boosts_thr, idling_boosts_thr_without_issues,
-+		asymmetric_scenario;
+ /**
+- * enum bdev_zone_condition - Condition of zone in descriptor
+- *
+- * @ZCOND_CONVENTIONAL: N/A
+- * @ZCOND_ZC1_EMPTY: Empty
+- * @ZCOND_ZC2_OPEN_IMPLICIT: Opened via write to zone.
+- * @ZCOND_ZC3_OPEN_EXPLICIT: Opened via open zone command.
+- * @ZCOND_ZC4_CLOSED: Closed
+- * @ZCOND_ZC6_READ_ONLY:
+- * @ZCOND_ZC5_FULL: No remaining space in zone.
+- * @ZCOND_ZC7_OFFLINE: Offline
+- *
+- * Returned from Report Zones. See bdev_zone_descriptor* flags.
++ * enum blk_zone_state - State [condition] of a zone in a zoned device.
++ *
++ * @BLK_ZONE_NO_WP: Zone has not write pointer it is CMR/Conventional
++ * @BLK_ZONE_EMPTY: Zone is empty. Write pointer is at the start of the zone.
++ * @BLK_ZONE_OPEN: Zone is open, but not explicitly opened by a zone open cmd.
++ * @BLK_ZONE_OPEN_EXPLICIT: Zones was explicitly opened by a zone open cmd.
++ * @BLK_ZONE_CLOSED: Zone was [explicitly] closed for writing.
++ * @BLK_ZONE_UNKNOWN: Zone states 0x5 through 0xc are reserved by standard.
++ * @BLK_ZONE_FULL: Zone was [explicitly] marked full by a zone finish cmd.
++ * @BLK_ZONE_READONLY: Zone is read-only.
++ * @BLK_ZONE_OFFLINE: Zone is offline.
++ * @BLK_ZONE_BUSY: [INTERNAL] Kernel zone cache for this zone is being updated.
++ *
++ * The Zone Condition state machine also maps the above deinitions as:
++ *   - ZC1: Empty         | BLK_ZONE_EMPTY
++ *   - ZC2: Implicit Open | BLK_ZONE_OPEN
++ *   - ZC3: Explicit Open | BLK_ZONE_OPEN_EXPLICIT
++ *   - ZC4: Closed        | BLK_ZONE_CLOSED
++ *   - ZC5: Full          | BLK_ZONE_FULL
++ *   - ZC6: Read Only     | BLK_ZONE_READONLY
++ *   - ZC7: Offline       | BLK_ZONE_OFFLINE
++ *
++ * States 0x5 to 0xC are reserved by the current ZBC/ZAC spec.
+  */
+-enum bdev_zone_condition {
+-	ZCOND_CONVENTIONAL       = 0,
+-	ZCOND_ZC1_EMPTY          = 1,
+-	ZCOND_ZC2_OPEN_IMPLICIT  = 2,
+-	ZCOND_ZC3_OPEN_EXPLICIT  = 3,
+-	ZCOND_ZC4_CLOSED         = 4,
+-	/* 0x5 to 0xC are reserved */
+-	ZCOND_ZC6_READ_ONLY      = 0xd,
+-	ZCOND_ZC5_FULL           = 0xe,
+-	ZCOND_ZC7_OFFLINE        = 0xf,
++enum blk_zone_state {
++	BLK_ZONE_NO_WP,
++	BLK_ZONE_EMPTY,
++	BLK_ZONE_OPEN,
++	BLK_ZONE_OPEN_EXPLICIT,
++	BLK_ZONE_CLOSED,
++	BLK_ZONE_UNKNOWN = 0x5,
++	BLK_ZONE_READONLY = 0xd,
++	BLK_ZONE_FULL = 0xe,
++	BLK_ZONE_OFFLINE = 0xf,
++	BLK_ZONE_BUSY = 0x10,
+ };
  
- 	if (bfqd->strict_guarantees)
- 		return true;
-@@ -4862,6 +4883,44 @@ static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
- 	idling_boosts_thr = !bfqd->hw_tag || bfq_bfqq_IO_bound(bfqq);
+ /**
+  * enum bdev_zone_same - Report Zones same code.
+  *
+- * @ZS_ALL_DIFFERENT: All zones differ in type and size.
+- * @ZS_ALL_SAME: All zones are the same size and type.
+- * @ZS_LAST_DIFFERS: All zones are the same size and type except the last zone.
+- * @ZS_SAME_LEN_DIFF_TYPES: All zones are the same length but types differ.
++ * @BLK_ZONE_SAME_ALL_DIFFERENT: All zones differ in type and size.
++ * @BLK_ZONE_SAME_ALL: All zones are the same size and type.
++ * @BLK_ZONE_SAME_LAST_DIFFERS: All zones are the same size and type
++ *    except the last zone which differs by size.
++ * @BLK_ZONE_SAME_LEN_TYPES_DIFFER: All zones are the same length
++ *    but zone types differ.
+  *
+  * Returned from Report Zones. See bdev_zone_report* same_field.
+  */
+-enum bdev_zone_same {
+-	ZS_ALL_DIFFERENT        = 0,
+-	ZS_ALL_SAME             = 1,
+-	ZS_LAST_DIFFERS         = 2,
+-	ZS_SAME_LEN_DIFF_TYPES  = 3,
++enum blk_zone_same {
++	BLK_ZONE_SAME_ALL_DIFFERENT     = 0,
++	BLK_ZONE_SAME_ALL               = 1,
++	BLK_ZONE_SAME_LAST_DIFFERS      = 2,
++	BLK_ZONE_SAME_LEN_TYPES_DIFFER  = 3,
+ };
  
- 	/*
-+	 * The value of the next variable,
-+	 * idling_boosts_thr_without_issues, is equal to that of
-+	 * idling_boosts_thr, unless a special case holds. In this
-+	 * special case, described below, idling may cause problems to
-+	 * weight-raised queues.
-+	 *
-+	 * When the request pool is saturated (e.g., in the presence
-+	 * of write hogs), if the processes associated with
-+	 * non-weight-raised queues ask for requests at a lower rate,
-+	 * then processes associated with weight-raised queues have a
-+	 * higher probability to get a request from the pool
-+	 * immediately (or at least soon) when they need one. Thus
-+	 * they have a higher probability to actually get a fraction
-+	 * of the device throughput proportional to their high
-+	 * weight. This is especially true with NCQ-capable drives,
-+	 * which enqueue several requests in advance, and further
-+	 * reorder internally-queued requests.
-+	 *
-+	 * For this reason, we force to false the value of
-+	 * idling_boosts_thr_without_issues if there are weight-raised
-+	 * busy queues. In this case, and if bfqq is not weight-raised,
-+	 * this guarantees that the device is not idled for bfqq (if,
-+	 * instead, bfqq is weight-raised, then idling will be
-+	 * guaranteed by another variable, see below). Combined with
-+	 * the timestamping rules of BFQ (see [1] for details), this
-+	 * behavior causes bfqq, and hence any sync non-weight-raised
-+	 * queue, to get a lower number of requests served, and thus
-+	 * to ask for a lower number of requests from the request
-+	 * pool, before the busy weight-raised queues get served
-+	 * again. This often mitigates starvation problems in the
-+	 * presence of heavy write workloads and NCQ, thereby
-+	 * guaranteeing a higher application and system responsiveness
-+	 * in these hostile scenarios.
-+	 */
-+	idling_boosts_thr_without_issues = idling_boosts_thr &&
-+		bfqd->wr_busy_queues == 0;
+ /**
+@@ -198,6 +224,13 @@ struct bdev_zone_report_io {
+ 	} data;
+ } __packed;
+ 
 +
-+	/*
- 	 * There is then a case where idling must be performed not for
- 	 * throughput concerns, but to preserve service guarantees. To
- 	 * introduce it, we can note that allowing the drive to
-@@ -4935,7 +4994,7 @@ static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
- 	 *    is necessary to preserve service guarantees.
- 	 */
- 	return bfq_bfqq_sync(bfqq) &&
--		(idling_boosts_thr || asymmetric_scenario);
-+		(idling_boosts_thr_without_issues || asymmetric_scenario);
- }
- 
- /*
-@@ -6059,6 +6118,7 @@ static int bfq_init_queue(struct request_queue *q, struct elevator_type *e)
- 					      * high-definition compressed
- 					      * video.
- 					      */
-+	bfqd->wr_busy_queues = 0;
- 
- 	/*
- 	 * Begin by assuming, optimistically, that the device is a
++static inline u32 max_report_entries(size_t bytes)
++{
++	bytes -= sizeof(struct bdev_zone_report);
++	return bytes / sizeof(struct bdev_zone_descriptor);
++}
++
+ /* continuing from uapi/linux/fs.h: */
+ #define BLKREPORT	_IOWR(0x12, 130, struct bdev_zone_report_io)
+ #define BLKZONEACTION	_IOW(0x12, 131, struct bdev_zone_action)
 -- 
-1.9.1
+2.9.3
