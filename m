@@ -1,87 +1,69 @@
-Return-Path: <shaun.tancheff@gmail.com>
-Return-Path: <shaun.tancheff@gmail.com>
-Sender: Shaun Tancheff <shaun.tancheff@gmail.com>
-From: Shaun Tancheff <shaun@tancheff.com>
-To: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Shaun Tancheff <shaun@tancheff.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>,
-	"James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	Damien Le Moal <damien.lemoal@hgst.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Josh Bingaman <josh.bingaman@seagate.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Sagi Grimberg <sagig@mellanox.com>,
-	Mike Christie <mchristi@redhat.com>,
-	Toshi Kani <toshi.kani@hpe.com>,
-	Ming Lei <ming.lei@canonical.com>
-Subject: [PATCH v2 0/4] Integrate bio/request ZBC ops with zone cache
-Date: Sun, 21 Aug 2016 23:31:12 -0500
-Message-Id: <20160822043116.21168-1-shaun@tancheff.com>
+Return-Path: <shaun.tancheff@seagate.com>
+MIME-Version: 1.0
+In-Reply-To: <ad5c983d-ae7c-bd5b-edef-b56552c3038b@suse.de>
+References: <20160822043402.8855-1-shaun@tancheff.com> <20160822043402.8855-3-shaun@tancheff.com>
+ <ad5c983d-ae7c-bd5b-edef-b56552c3038b@suse.de>
+From: Shaun Tancheff <shaun.tancheff@seagate.com>
+Date: Mon, 22 Aug 2016 10:43:29 -0500
+Message-ID: <CAJVOszDeLZH2+ifPEBKc=-VRkqUKHauTiS5CVF6d-F4qfT8epA@mail.gmail.com>
+Subject: Re: [PATCH 2/2] Migrate zone cache from RB-Tree to arrays of descriptors
+To: Hannes Reinecke <hare@suse.de>
+Cc: Shaun Tancheff <shaun@tancheff.com>, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>, Jens Axboe <axboe@fb.com>,
+        Christoph Hellwig <hch@lst.de>,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Damien Le Moal <damien.lemoal@hgst.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Sagi Grimberg <sagig@mellanox.com>,
+        Mike Christie <mchristi@redhat.com>, Ming Lei <ming.lei@canonical.com>,
+        Josh Bingaman <josh.bingaman@seagate.com>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
-Hi,
+On Mon, Aug 22, 2016 at 2:11 AM, Hannes Reinecke <hare@suse.de> wrote:
+> On 08/22/2016 06:34 AM, Shaun Tancheff wrote:
+>> Currently the RB-Tree zone cache is fast and flexible. It does
+>> use a rather largish amount of ram. This model reduces the ram
+>> required from 120 bytes per zone to 16 bytes per zone with a
+>> moderate transformation of the blk_zone_lookup() api.
+>>
+>> This model is predicated on the belief that most variations
+>> on zoned media will follow a pattern of using collections of same
+>> sized zones on a single device. Similar to the pattern of erase
+>> blocks on flash devices being progressivly larger 16K, 64K, ...
+>>
+>> The goal is to be able to build a descriptor which is both memory
+>> efficient, performant, and flexible.
+>>
+>> Signed-off-by: Shaun Tancheff <shaun.tancheff@seagate.com>
+>> ---
+>>  block/blk-core.c       |    2 +-
+>>  block/blk-sysfs.c      |   31 +-
+>>  block/blk-zoned.c      |  103 +++--
+>>  drivers/scsi/sd.c      |    5 +-
+>>  drivers/scsi/sd.h      |    4 +-
+>>  drivers/scsi/sd_zbc.c  | 1025 +++++++++++++++++++++++++++---------------------
+>>  include/linux/blkdev.h |   82 +++-
+>>  7 files changed, 716 insertions(+), 536 deletions(-)
 
-As per Christoph's request this patch incorporates Hannes' cache of zone
-information.
+> Have you measure the performance impact here?
 
-This approach is to have REQ_OP_ZONE_REPORT return data in the same
-format regardless of the availability of the zone cache. So if the
-is kernel being built with or without BLK_DEV_ZONED [and SCSI_ZBC]
-users of blkdev_issue_zone_report() and/or REQ_OP_ZONE_REPORT bio's
-will have a consistent data format to digest.
+As far as actual hardware (HostAware) I am seeing the same
+I/O performance. I suspect its just that below 100k iops the
+zone cache just isn't a bottleneck.
 
-Additionally it seems reasonable to allow the REQ_OP_ZONE_* to
-be able to indicate if the command *must* be delivered to the
-device [and update the zone cache] accordingly. Here REQ_META is
-being used as REQ_FUA can be dropped causing sd_done to be skipped.
-Rather than special case the current code I chose to pick an otherwise
-non-applicable flag.
+> The main idea behind using an RB-tree is that each single element will
+> fit in the CPU cache; using an array will prevent that.
+> So we will increase the number of cache flushes, and most likely a
+> performance penalty, too.
+> Hence I'd rather like to see a performance measurement here before going
+> down that road.
 
-This series is based off of Linus's v4.8-rc2 and builds on top of the
-previous series of block layer support:
-    Add ioctl to issue ZBC/ZAC commands via block layer
-    Add bio/request flags to issue ZBC/ZAC commands
-as well as the series posted by Hannes
-    sd_zbc: Fix handling of ZBC read after write pointer
-    sd: Limit messages for ZBC disks capacity change
-    sd: Implement support for ZBC devices
-    sd: Implement new RESET_WP provisioning mode
-    sd: configure ZBC devices
-...
+I think it will have to be a simulated benchmark, if that's okay.
 
-Patches for util-linux can be found here:
-    git@github.com:stancheff/util-linux.git v2.28.1+biof
-
-    https://github.com/stancheff/util-linux/tree/v2.28.1%2Bbiof
-
-This patch is available here:
-    https://github.com/stancheff/linux/tree/v4.8-rc2%2Bbiof.v9
-
-    git@github.com:stancheff/linux.git v4.8-rc2+biof.v9
-
-v2:
- - Fully integrated bio <-> zone cache [<-> device]
- - Added discard -> write same for conventional zones.
- - Merged disparate constants into a canonical set.
-
-Shaun Tancheff (4):
-  Enable support for Seagate HostAware drives (testing).
-  On Discard either do Reset WP or Write Same
-  Merge ZBC constants
-  Integrate ZBC command requests with zone cache.
-
- block/blk-lib.c                   |  16 -
- drivers/scsi/sd.c                 | 111 +++--
- drivers/scsi/sd.h                 |  49 ++-
- drivers/scsi/sd_zbc.c             | 904 ++++++++++++++++++++++++++++++++++----
- include/linux/blkdev.h            |  22 +-
- include/scsi/scsi_proto.h         |  17 -
- include/uapi/linux/blkzoned_api.h | 167 ++++---
- 7 files changed, 1032 insertions(+), 254 deletions(-)
-
+Of course I'm open to suggestions if there is something you have in mind.
 -- 
-2.9.3
+Regards,
+Shaun Tancheff
