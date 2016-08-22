@@ -36,19 +36,11 @@ Cc: Shaun Tancheff <shaun@tancheff.com>,
 	Andrea Arcangeli <aarcange@redhat.com>,
 	Linus Walleij <linus.walleij@linaro.org>,
 	Jeff Layton <jlayton@poochiereds.net>,
-	"J . Bruce Fields" <bfields@fieldses.org>,
-	linux-f2fs-devel@lists.sourceforge.net,
-	linux-fsdevel@vger.kernel.org,
-	dm-devel@redhat.com,
-	Jaegeuk Kim <jaegeuk@kernel.org>
-Subject: [PATCH v8 0/2 RESEND] Block layer support ZAC/ZBC commands
-Date: Wed, 24 Aug 2016 15:22:50 -0500
-Message-Id: <20160824202250.30271-1-shaun@tancheff.com>
-In-Reply-To: <20160822042010.32416-1-shaun@tancheff.com>
-References: <20160822042010.32416-1-shaun@tancheff.com>
+	"J . Bruce Fields" <bfields@fieldses.org>
+Subject: [PATCH v8 0/2] Block layer support ZAC/ZBC commands
+Date: Sun, 21 Aug 2016 23:20:08 -0500
+Message-Id: <20160822042010.32416-1-shaun@tancheff.com>
 List-ID: <linux-block@vger.kernel.org>
-
-(RESENDING to include f2fs, fs-devel and dm-devel)
 
 Hi Jens,
 
