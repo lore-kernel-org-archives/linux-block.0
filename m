@@ -1,43 +1,55 @@
-Return-Path: <baolex.ni@intel.com>
-From: Baole Ni <baolex.ni@intel.com>
-To: axboe@kernel.dk,
-	mingo@redhat.com,
-	hpa@zytor.com,
-	x86@kernel.org
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	chuansheng.liu@intel.com,
-	baolex.ni@intel.com,
-	travis@sgi.com
-Subject: [PATCH 0039/1285] Replace numeric parameter like 0444 with macro
-Date: Tue,  2 Aug 2016 18:36:23 +0800
-Message-Id: <20160802103623.16373-1-baolex.ni@intel.com>
+Return-Path: <ming.lei@canonical.com>
+MIME-Version: 1.0
+In-Reply-To: <20160821175844.byt3lejy7mu5sohc@kmo-pixel>
+References: <1471273882-3938-1-git-send-email-ming.lei@canonical.com>
+ <20160815182328.GA13886@infradead.org> <20160815191253.cxbjui3mymrkpkz6@kmo-pixel>
+ <alpine.LRH.2.11.1608181733110.10662@mail.ewheeler.net> <CACVXFVMDod01eDYxvd8_LXmXaNusz2gsQRywdNgi=Z+nJzzjTA@mail.gmail.com>
+ <20160821175844.byt3lejy7mu5sohc@kmo-pixel>
+From: Ming Lei <ming.lei@canonical.com>
+Date: Mon, 22 Aug 2016 16:57:42 +0800
+Message-ID: <CACVXFVM+RbD47dKsLo-J+aHkkfGjHOmNc03bESnh5H4VOFHgWw@mail.gmail.com>
+Subject: Re: [PATCH v3] block: make sure big bio is splitted into at most 256 bvecs
+To: Kent Overstreet <kent.overstreet@gmail.com>
+Cc: Eric Wheeler <bcache@lists.ewheeler.net>, Christoph Hellwig <hch@infradead.org>,
+	Jens Axboe <axboe@fb.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	linux-block <linux-block@vger.kernel.org>,
+	Sebastian Roesner <sroesner-kernelorg@roesner-online.de>, "4.3+" <stable@vger.kernel.org>,
+	Shaohua Li <shli@fb.com>, Jens Axboe <axboe@kernel.dk>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
-I find that the developers often just specified the numeric value
-when calling a macro which is defined with a parameter for access permission.
-As we know, these numeric value for access permission have had the corresponding macro,
-and that using macro can improve the robustness and readability of the code,
-thus, I suggest replacing the numeric parameter with the macro.
+On Mon, Aug 22, 2016 at 1:58 AM, Kent Overstreet
+<kent.overstreet@gmail.com> wrote:
+> On Sun, Aug 21, 2016 at 05:31:33PM +0800, Ming Lei wrote:
+>> This patch is definitely correct, and I don't see dealing with 'no_merge'
+>> should be removed.
+>>
+>> In this case, the bio is still possible to merge with others because
+>> it doesn't violate any limit of the queue because it just can't be held in
+>> 256 bvecs, that means it is correct to clear no_merge for this situation.
+>>
+>> Also I don't think it is complicated or ugly to deal with the flag.
+>
+> It's extra unnecessary code. All other things being equal, less code is always
+> better than more code. It works just fine without it, what's the justification
+> for adding the flag?
 
-Signed-off-by: Chuansheng Liu <chuansheng.liu@intel.com>
-Signed-off-by: Baole Ni <baolex.ni@intel.com>
----
- block/genhd.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+>From rationality view, the 'no_merge' flag need to be cleared because
+it doesn't violate any queue's limit and should be allowed to merge, and
+actually it is possible to submit all these splitted bios into hardware via
+one request, that is different with other splitting cases.
 
-diff --git a/block/genhd.c b/block/genhd.c
-index 9f42526..1079e623 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -1807,7 +1807,7 @@ static const struct kernel_param_ops disk_events_dfl_poll_msecs_param_ops = {
- #define MODULE_PARAM_PREFIX	"block."
- 
- module_param_cb(events_dfl_poll_msecs, &disk_events_dfl_poll_msecs_param_ops,
--		&disk_events_dfl_poll_msecs, 0644);
-+		&disk_events_dfl_poll_msecs, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
- 
- /*
-  * disk_{alloc|add|del|release}_events - initialize and destroy disk_events.
--- 
-2.9.2
+Given you introduced support of arbitrarily sized bios in commit 54efd50bf
+(block:make generic_make_request handle arbitrarily sized bios), other
+drivers/fs might use this to simplify bio submission too in the future.
+
+>
+> Don't be so dismissive of other maintainer's concerns, we've got to deal with
+> this code too. Especially when I and Christoph are agreeing on something - how
+> often does that happen?
+
+OK, I will submit a V4 and comment on not merging just for simplicity resaon.
+
+
+Thanks,
+Ming
