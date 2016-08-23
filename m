@@ -1,101 +1,136 @@
-Return-Path: <shaun.tancheff@seagate.com>
-MIME-Version: 1.0
-In-Reply-To: <e091a52a-3f6d-ee69-b0a7-9b57f5df6563@hgst.com>
-References: <20160822043116.21168-1-shaun@tancheff.com> <20160822043116.21168-3-shaun@tancheff.com>
- <53c2949f-f8b9-463f-2adf-faf4603429bb@hgst.com> <CAJVOszBYMyx5ODyCAF6ZczC+aU_zpYS9SSfMcOzp+G38HN7BLg@mail.gmail.com>
- <e091a52a-3f6d-ee69-b0a7-9b57f5df6563@hgst.com>
-From: Shaun Tancheff <shaun.tancheff@seagate.com>
-Date: Wed, 24 Aug 2016 00:19:57 -0500
-Message-ID: <CAJVOszBFyYOa8u3ZSuQ5L28hCkWOgWFpfMq9P35-ggu3oZAaaQ@mail.gmail.com>
+Return-Path: <Damien.LeMoal@hgst.com>
 Subject: Re: [PATCH v2 2/4] On Discard either do Reset WP or Write Same
-To: Damien Le Moal <damien.lemoal@hgst.com>
-Cc: Shaun Tancheff <shaun@tancheff.com>, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Josh Bingaman <josh.bingaman@seagate.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Sagi Grimberg <sagig@mellanox.com>,
-        Mike Christie <mchristi@redhat.com>, Toshi Kani <toshi.kani@hpe.com>,
-        Ming Lei <ming.lei@canonical.com>
-Content-Type: text/plain; charset=UTF-8
+To: Shaun Tancheff <shaun.tancheff@seagate.com>
+References: <20160822043116.21168-1-shaun@tancheff.com>
+ <20160822043116.21168-3-shaun@tancheff.com>
+ <53c2949f-f8b9-463f-2adf-faf4603429bb@hgst.com>
+ <CAJVOszBYMyx5ODyCAF6ZczC+aU_zpYS9SSfMcOzp+G38HN7BLg@mail.gmail.com>
+CC: Shaun Tancheff <shaun@tancheff.com>, <linux-block@vger.kernel.org>,
+	<linux-scsi@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Jens Axboe
+	<axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, "James E . J . Bottomley"
+	<jejb@linux.vnet.ibm.com>, "Martin K . Petersen"
+	<martin.petersen@oracle.com>, Hannes Reinecke <hare@suse.de>, Josh Bingaman
+	<josh.bingaman@seagate.com>, Dan Williams <dan.j.williams@intel.com>, Sagi
+ Grimberg <sagig@mellanox.com>, Mike Christie <mchristi@redhat.com>, Toshi
+ Kani <toshi.kani@hpe.com>, Ming Lei <ming.lei@canonical.com>
+From: Damien Le Moal <damien.lemoal@hgst.com>
+Message-ID: <e091a52a-3f6d-ee69-b0a7-9b57f5df6563@hgst.com>
+Date: Tue, 23 Aug 2016 10:25:02 +0900
+MIME-Version: 1.0
+In-Reply-To: <CAJVOszBYMyx5ODyCAF6ZczC+aU_zpYS9SSfMcOzp+G38HN7BLg@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Return-Path: damien.lemoal@hgst.com
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Aug 22, 2016 at 8:25 PM, Damien Le Moal <damien.lemoal@hgst.com> wrote:
->
-> Shaun,
->
-> On 8/23/16 09:22, Shaun Tancheff wrote:
->> On Mon, Aug 22, 2016 at 6:57 PM, Damien Le Moal <damien.lemoal@hgst.com> wrote:
-
->> Also you may note that in my patch to get Host Aware working
->> with the zone cache I do not include the runt zone in the cache.
->
-> Why not ? The RB-tree will handle it just fine (the insert and lookup
-> code as Hannes had them was not relying on a constant zone size).
-
-A good point. I didn't pay too much attention while brining this
-forward. I think a few of my hacks may be pointless now. I'll
-try to rework it and get rid of the runt check.
-
->> So as it sits I need this fallback otherwise doing blkdiscard over
->> the whole device ends in a error, as well as mkfs.f2fs et. al.
->
-> Got it, but I do not see a problem with including it. I have not checked
-> the code, but the split of a big discard call into "chunks" should be
-> already handling the last chunk and make sure that the operation does
-> not exceed the device capacity (in any case, that's easy to fix in the
-> sd_zbc_setup_discard code).
-
-Yes I agree the split of big discards does handle the last chunk correctly.
-
->>> Some 10TB host managed disks out there have 1% conventional zone space,
->>> that is 100GB of capacity. When issuing a "reset all", doing a write
->>> same in these zones will take forever... If the user really wants zeroes
->>> in those zones, let it issue a zeroout.
->>>
->>> I think that it would a better choice to simply not report
->>> discard_zeroes_data as true and do nothing for conventional zones reset.
->>
->> I think that would be unfortunate for Host Managed but I think it's
->> the right choice for Host Aware at this time. So either we base
->> it on disk type or we have some other config flag added to sysfs.
->
-> I do not see any difference between host managed and host aware. Both
-> define the same behavior for reset, and both end up in a NOP for
-> conventional zone reset (no data "erasure" required by the standard).
-> For write pointer zones, reading unwritten LBAs returns the
-> initialization pattern, with the exception of host-managed disks with
-> the URSWRZ bit set to 0. But that case is covered in sd.c, so the
-> behavior is consistent across all models. So why forcing data zeroing
-> when the standards do not mandate it ?
-
-Well you do have point.
-It appears to be only mkfs and similar tools that are really utilizing
-discard zeros data at the moment.
-
-I did a quick test:
-
-mkfs -t ext4 -b 4096 -g 32768 -G 32  \
- -E lazy_itable_init=0,lazy_journal_init=0,offset=0,num_backup_sb=0,packed_meta_blocks=1,discard
-  \
- -O flex_bg,extent,sparse_super2
-
-   - discard zeroes data true - 3 minutess
-   - discard zeroes data false - 6 minutes
-So for the smaller conventional space on the current HA drive
-there is some advantage to enabling discard zeroes data.
-
-However for a larger conventional space you are correct the overall
-impact is worse performance.
-
-For some reason I had been assuming that some file systems
-used or relied on discard zeroes data during normal operation.
-Now that I am looking for that I don't seem to be finding any
-evidence of it, so aside from mkfs I don't have as good an
-argument discard zeroes data as I though I did.
-
-Regards,
-Shaun
+ClNoYXVuLAoKT24gOC8yMy8xNiAwOToyMiwgU2hhdW4gVGFuY2hlZmYgd3JvdGU6Cj4gT24gTW9u
+LCBBdWcgMjIsIDIwMTYgYXQgNjo1NyBQTSwgRGFtaWVuIExlIE1vYWwgPGRhbWllbi5sZW1vYWxA
+aGdzdC5jb20+IHdyb3RlOgo+Pgo+PiBTaGF1biwKPj4KPj4gT24gOC8yMi8xNiAxMzozMSwgU2hh
+dW4gVGFuY2hlZmYgd3JvdGU6Cj4+IFsuLi5dCj4+PiAtaW50IHNkX3piY19zZXR1cF9kaXNjYXJk
+KHN0cnVjdCBzY3NpX2Rpc2sgKnNka3AsIHN0cnVjdCByZXF1ZXN0ICpycSwKPj4+IC0gICAgICAg
+ICAgICAgICAgICAgICAgc2VjdG9yX3Qgc2VjdG9yLCB1bnNpZ25lZCBpbnQgbnVtX3NlY3RvcnMp
+Cj4+PiAraW50IHNkX3piY19zZXR1cF9kaXNjYXJkKHN0cnVjdCBzY3NpX2NtbmQgKmNtZCkKPj4+
+ICB7Cj4+PiAtICAgICBzdHJ1Y3QgYmxrX3pvbmUgKnpvbmU7Cj4+PiArICAgICBzdHJ1Y3QgcmVx
+dWVzdCAqcnEgPSBjbWQtPnJlcXVlc3Q7Cj4+PiArICAgICBzdHJ1Y3Qgc2NzaV9kZXZpY2UgKnNk
+cCA9IGNtZC0+ZGV2aWNlOwo+Pj4gKyAgICAgc3RydWN0IHNjc2lfZGlzayAqc2RrcCA9IHNjc2lf
+ZGlzayhycS0+cnFfZGlzayk7Cj4+PiArICAgICBzZWN0b3JfdCBzZWN0b3IgPSBibGtfcnFfcG9z
+KHJxKTsKPj4+ICsgICAgIHVuc2lnbmVkIGludCBucl9zZWN0b3JzID0gYmxrX3JxX3NlY3RvcnMo
+cnEpOwo+Pj4gICAgICAgaW50IHJldCA9IEJMS1BSRVBfT0s7Cj4+PiArICAgICBzdHJ1Y3QgYmxr
+X3pvbmUgKnpvbmU7Cj4+PiAgICAgICB1bnNpZ25lZCBsb25nIGZsYWdzOwo+Pj4gKyAgICAgdTMy
+IHdwX29mZnNldDsKPj4+ICsgICAgIGJvb2wgdXNlX3dyaXRlX3NhbWUgPSBmYWxzZTsKPj4+Cj4+
+PiAgICAgICB6b25lID0gYmxrX2xvb2t1cF96b25lKHJxLT5xLCBzZWN0b3IpOwo+Pj4gLSAgICAg
+aWYgKCF6b25lKQo+Pj4gKyAgICAgaWYgKCF6b25lKSB7Cj4+PiArICAgICAgICAgICAgIC8qIFRl
+c3QgZm9yIGEgcnVudCB6b25lIGJlZm9yZSBnaXZpbmcgdXAgKi8KPj4+ICsgICAgICAgICAgICAg
+aWYgKHNkcC0+dHlwZSAhPSBUWVBFX1pCQykgewo+Pj4gKyAgICAgICAgICAgICAgICAgICAgIHN0
+cnVjdCByZXF1ZXN0X3F1ZXVlICpxID0gcnEtPnE7Cj4+PiArICAgICAgICAgICAgICAgICAgICAg
+c3RydWN0IHJiX25vZGUgKm5vZGU7Cj4+PiArCj4+PiArICAgICAgICAgICAgICAgICAgICAgbm9k
+ZSA9IHJiX2xhc3QoJnEtPnpvbmVzKTsKPj4+ICsgICAgICAgICAgICAgICAgICAgICBpZiAobm9k
+ZSkKPj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHpvbmUgPSByYl9lbnRyeShub2Rl
+LCBzdHJ1Y3QgYmxrX3pvbmUsIG5vZGUpOwo+Pj4gKyAgICAgICAgICAgICAgICAgICAgIGlmICh6
+b25lKSB7Cj4+PiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzcGluX2xvY2tfaXJxc2F2
+ZSgmem9uZS0+bG9jaywgZmxhZ3MpOwo+Pj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+aWYgKCh6b25lLT5zdGFydCArIHpvbmUtPmxlbikgPD0gc2VjdG9yKQo+Pj4gKyAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICBnb3RvIG91dDsKPj4+ICsgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgIHNwaW5fdW5sb2NrX2lycXJlc3RvcmUoJnpvbmUtPmxvY2ssIGZsYWdzKTsK
+Pj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHpvbmUgPSBOVUxMOwo+Pj4gKyAgICAg
+ICAgICAgICAgICAgICAgIH0KPj4+ICsgICAgICAgICAgICAgfQo+Pj4gICAgICAgICAgICAgICBy
+ZXR1cm4gQkxLUFJFUF9LSUxMOwo+Pj4gKyAgICAgfQo+Pgo+PiBJIGRvIG5vdCB1bmRlcnN0YW5k
+IHRoZSBwb2ludCBvZiB0aGlzIGNvZGUgaGVyZSB0byB0ZXN0IGZvciB0aGUgcnVudAo+PiB6b25l
+LiBBcyBsb25nIGFzIHNlY3RvciBpcyB3aXRoaW4gdGhlIGRldmljZSBtYXhpbXVtIGNhcGFjaXR5
+IChpbiA1MTJCCj4+IHVuaXQpLCBibGtfbG9va3VwX3pvbmUgd2lsbCByZXR1cm4gdGhlIHBvaW50
+ZXIgdG8gdGhlIHpvbmUgc3RydWN0dXJlCj4+IGNvbnRhaW5pbmcgdGhhdCBzZWN0b3IgKHRoZSBS
+Qi10cmVlIGRvZXMgbm90IGhhdmUgYW55IGNvbnN0cmFpbnQKPj4gcmVnYXJkaW5nIHpvbmUgc2l6
+ZSkuIFRoZSBvbmx5IGNhc2Ugd2hlcmUgTlVMTCB3b3VsZCBiZSByZXR1cm5lZCBpcyBpZgo+PiBk
+aXNjYXJkIGlzIGlzc3VlZCBzdXBlciBlYXJseSByaWdodCBhZnRlciB0aGUgZGlzayBpcyBwcm9i
+ZWQgYW5kIGJlZm9yZQo+PiB0aGUgem9uZSByZWZyZXNoIHdvcmsgaGFzIGNvbXBsZXRlZC4gV2Ug
+Y2FuIGNlcnRhaW5seSBwcm90ZWN0IGFnYWluc3QKPj4gdGhhdCBieSBkZWxheWluZyB0aGUgZGlz
+Y2FyZC4KPiAKPiBBcyB5b3UgY2FuIHNlZSBJIGFtIG5vdCBpbmNsdWRpbmcgSG9zdCBNYW5hZ2Vk
+IGluIHRoZQo+IHJ1bnQgY2hlY2suCgpJbmRlZWQsIGJ1dCBoYXZpbmcgYSBydW50IHpvbmUgY291
+bGQgYWxzbyBoYXBwZW4gd2l0aCBhIGhvc3QtbWFuYWdlZCBkaXNrLgoKPiBBbHNvIHlvdSBtYXkg
+bm90ZSB0aGF0IGluIG15IHBhdGNoIHRvIGdldCBIb3N0IEF3YXJlIHdvcmtpbmcKPiB3aXRoIHRo
+ZSB6b25lIGNhY2hlIEkgZG8gbm90IGluY2x1ZGUgdGhlIHJ1bnQgem9uZSBpbiB0aGUgY2FjaGUu
+CgpXaHkgbm90ID8gVGhlIFJCLXRyZWUgd2lsbCBoYW5kbGUgaXQganVzdCBmaW5lICh0aGUgaW5z
+ZXJ0IGFuZCBsb29rdXAKY29kZSBhcyBIYW5uZXMgaGFkIHRoZW0gd2FzIG5vdCByZWx5aW5nIG9u
+IGEgY29uc3RhbnQgem9uZSBzaXplKS4KCj4gU28gYXMgaXQgc2l0cyBJIG5lZWQgdGhpcyBmYWxs
+YmFjayBvdGhlcndpc2UgZG9pbmcgYmxrZGlzY2FyZCBvdmVyCj4gdGhlIHdob2xlIGRldmljZSBl
+bmRzIGluIGEgZXJyb3IsIGFzIHdlbGwgYXMgbWtmcy5mMmZzIGV0LiBhbC4KCkdvdCBpdCwgYnV0
+IEkgZG8gbm90IHNlZSBhIHByb2JsZW0gd2l0aCBpbmNsdWRpbmcgaXQuIEkgaGF2ZSBub3QgY2hl
+Y2tlZAp0aGUgY29kZSwgYnV0IHRoZSBzcGxpdCBvZiBhIGJpZyBkaXNjYXJkIGNhbGwgaW50byAi
+Y2h1bmtzIiBzaG91bGQgYmUKYWxyZWFkeSBoYW5kbGluZyB0aGUgbGFzdCBjaHVuayBhbmQgbWFr
+ZSBzdXJlIHRoYXQgdGhlIG9wZXJhdGlvbiBkb2VzCm5vdCBleGNlZWQgdGhlIGRldmljZSBjYXBh
+Y2l0eSAoaW4gYW55IGNhc2UsIHRoYXQncyBlYXN5IHRvIGZpeCBpbiB0aGUKc2RfemJjX3NldHVw
+X2Rpc2NhcmQgY29kZSkuCgo+Pj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+IHpvbmUtPnN0YXJ0LCB6b25lLT5zdGF0ZSk7Cj4+PiAgICAgICAgICAgICAgIHJldCA9IEJMS1BS
+RVBfREVGRVI7Cj4+PiAgICAgICAgICAgICAgIGdvdG8gb3V0Owo+Pj4gQEAgLTQwNiw0NiArNDI4
+LDgwIEBAIGludCBzZF96YmNfc2V0dXBfZGlzY2FyZChzdHJ1Y3Qgc2NzaV9kaXNrICpzZGtwLCBz
+dHJ1Y3QgcmVxdWVzdCAqcnEsCj4+PiAgICAgICBpZiAoem9uZS0+c3RhdGUgPT0gQkxLX1pPTkVf
+T0ZGTElORSkgewo+Pj4gICAgICAgICAgICAgICAvKiBsZXQgdGhlIGRyaXZlIGZhaWwgdGhlIGNv
+bW1hbmQgKi8KPj4+ICAgICAgICAgICAgICAgc2RfemJjX2RlYnVnX3JhdGVsaW1pdChzZGtwLAo+
+Pj4gLSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICJEaXNjYXJkaW5nIG9mZmxp
+bmUgem9uZSAlenVcbiIsCj4+PiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+IkRpc2NhcmRpbmcgb2ZmbGluZSB6b25lICV6eFxuIiwKPj4+ICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICB6b25lLT5zdGFydCk7Cj4+PiAgICAgICAgICAgICAgIGdvdG8gb3V0
+Owo+Pj4gICAgICAgfQo+Pj4gLQo+Pj4gLSAgICAgaWYgKCFibGtfem9uZV9pc19zbXIoem9uZSkp
+IHsKPj4+ICsgICAgIGlmIChibGtfem9uZV9pc19jbXIoem9uZSkpIHsKPj4+ICsgICAgICAgICAg
+ICAgdXNlX3dyaXRlX3NhbWUgPSB0cnVlOwo+Pj4gICAgICAgICAgICAgICBzZF96YmNfZGVidWdf
+cmF0ZWxpbWl0KHNka3AsCj4+PiAtICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+IkRpc2NhcmRpbmcgJXMgem9uZSAlenVcbiIsCj4+PiAtICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgYmxrX3pvbmVfaXNfY21yKHpvbmUpID8gIkNNUiIgOiAidW5rbm93biIsCj4+
+PiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIkRpc2NhcmRpbmcgQ01SIHpv
+bmUgJXp4XG4iLAo+Pj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHpvbmUt
+PnN0YXJ0KTsKPj4+IC0gICAgICAgICAgICAgcmV0ID0gQkxLUFJFUF9ET05FOwo+Pj4gICAgICAg
+ICAgICAgICBnb3RvIG91dDsKPj4+ICAgICAgIH0KPj4KPj4gU29tZSAxMFRCIGhvc3QgbWFuYWdl
+ZCBkaXNrcyBvdXQgdGhlcmUgaGF2ZSAxJSBjb252ZW50aW9uYWwgem9uZSBzcGFjZSwKPj4gdGhh
+dCBpcyAxMDBHQiBvZiBjYXBhY2l0eS4gV2hlbiBpc3N1aW5nIGEgInJlc2V0IGFsbCIsIGRvaW5n
+IGEgd3JpdGUKPj4gc2FtZSBpbiB0aGVzZSB6b25lcyB3aWxsIHRha2UgZm9yZXZlci4uLiBJZiB0
+aGUgdXNlciByZWFsbHkgd2FudHMgemVyb2VzCj4+IGluIHRob3NlIHpvbmVzLCBsZXQgaXQgaXNz
+dWUgYSB6ZXJvb3V0Lgo+Pgo+PiBJIHRoaW5rIHRoYXQgaXQgd291bGQgYSBiZXR0ZXIgY2hvaWNl
+IHRvIHNpbXBseSBub3QgcmVwb3J0Cj4+IGRpc2NhcmRfemVyb2VzX2RhdGEgYXMgdHJ1ZSBhbmQg
+ZG8gbm90aGluZyBmb3IgY29udmVudGlvbmFsIHpvbmVzIHJlc2V0Lgo+IAo+IEkgdGhpbmsgdGhh
+dCB3b3VsZCBiZSB1bmZvcnR1bmF0ZSBmb3IgSG9zdCBNYW5hZ2VkIGJ1dCBJIHRoaW5rIGl0J3MK
+PiB0aGUgcmlnaHQgY2hvaWNlIGZvciBIb3N0IEF3YXJlIGF0IHRoaXMgdGltZS4gU28gZWl0aGVy
+IHdlIGJhc2UKPiBpdCBvbiBkaXNrIHR5cGUgb3Igd2UgaGF2ZSBzb21lIG90aGVyIGNvbmZpZyBm
+bGFnIGFkZGVkIHRvIHN5c2ZzLgoKSSBkbyBub3Qgc2VlIGFueSBkaWZmZXJlbmNlIGJldHdlZW4g
+aG9zdCBtYW5hZ2VkIGFuZCBob3N0IGF3YXJlLiBCb3RoCmRlZmluZSB0aGUgc2FtZSBiZWhhdmlv
+ciBmb3IgcmVzZXQsIGFuZCBib3RoIGVuZCB1cCBpbiBhIE5PUCBmb3IKY29udmVudGlvbmFsIHpv
+bmUgcmVzZXQgKG5vIGRhdGEgImVyYXN1cmUiIHJlcXVpcmVkIGJ5IHRoZSBzdGFuZGFyZCkuCkZv
+ciB3cml0ZSBwb2ludGVyIHpvbmVzLCByZWFkaW5nIHVud3JpdHRlbiBMQkFzIHJldHVybnMgdGhl
+CmluaXRpYWxpemF0aW9uIHBhdHRlcm4sIHdpdGggdGhlIGV4Y2VwdGlvbiBvZiBob3N0LW1hbmFn
+ZWQgZGlza3Mgd2l0aAp0aGUgVVJTV1JaIGJpdCBzZXQgdG8gMC4gQnV0IHRoYXQgY2FzZSBpcyBj
+b3ZlcmVkIGluIHNkLmMsIHNvIHRoZQpiZWhhdmlvciBpcyBjb25zaXN0ZW50IGFjcm9zcyBhbGwg
+bW9kZWxzLiBTbyB3aHkgZm9yY2luZyBkYXRhIHplcm9pbmcKd2hlbiB0aGUgc3RhbmRhcmRzIGRv
+IG5vdCBtYW5kYXRlIGl0ID8KCkJlc3QgcmVnYXJkcy4KCi0tIApEYW1pZW4gTGUgTW9hbCwgUGgu
+RC4KU3IuIE1hbmFnZXIsIFN5c3RlbSBTb2Z0d2FyZSBHcm91cCwgSEdTVCBSZXNlYXJjaCwKSEdT
+VCwgYSBXZXN0ZXJuIERpZ2l0YWwgYnJhbmQKRGFtaWVuLkxlTW9hbEBoZ3N0LmNvbQooKzgxKSAw
+NDY2LTk4LTM1OTMgKGV4dC4gNTEzNTkzKQoxIGtpcmloYXJhLWNobywgRnVqaXNhd2EsIApLYW5h
+Z2F3YSwgMjUyLTA4ODggSmFwYW4Kd3d3Lmhnc3QuY29tCldlc3Rlcm4gRGlnaXRhbCBDb3Jwb3Jh
+dGlvbiAoYW5kIGl0cyBzdWJzaWRpYXJpZXMpIEUtbWFpbCBDb25maWRlbnRpYWxpdHkgTm90aWNl
+ICYgRGlzY2xhaW1lcjoKClRoaXMgZS1tYWlsIGFuZCBhbnkgZmlsZXMgdHJhbnNtaXR0ZWQgd2l0
+aCBpdCBtYXkgY29udGFpbiBjb25maWRlbnRpYWwgb3IgbGVnYWxseSBwcml2aWxlZ2VkIGluZm9y
+bWF0aW9uIG9mIFdEQyBhbmQvb3IgaXRzIGFmZmlsaWF0ZXMsIGFuZCBhcmUgaW50ZW5kZWQgc29s
+ZWx5IGZvciB0aGUgdXNlIG9mIHRoZSBpbmRpdmlkdWFsIG9yIGVudGl0eSB0byB3aGljaCB0aGV5
+IGFyZSBhZGRyZXNzZWQuIElmIHlvdSBhcmUgbm90IHRoZSBpbnRlbmRlZCByZWNpcGllbnQsIGFu
+eSBkaXNjbG9zdXJlLCBjb3B5aW5nLCBkaXN0cmlidXRpb24gb3IgYW55IGFjdGlvbiB0YWtlbiBv
+ciBvbWl0dGVkIHRvIGJlIHRha2VuIGluIHJlbGlhbmNlIG9uIGl0LCBpcyBwcm9oaWJpdGVkLiBJ
+ZiB5b3UgaGF2ZSByZWNlaXZlZCB0aGlzIGUtbWFpbCBpbiBlcnJvciwgcGxlYXNlIG5vdGlmeSB0
+aGUgc2VuZGVyIGltbWVkaWF0ZWx5IGFuZCBkZWxldGUgdGhlIGUtbWFpbCBpbiBpdHMgZW50aXJl
+dHkgZnJvbSB5b3VyIHN5c3RlbS4K
