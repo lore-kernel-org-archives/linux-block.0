@@ -1,223 +1,154 @@
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>,
-	Tejun Heo <tj@kernel.org>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	linus.walleij@linaro.org,
-	broonie@kernel.org,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH V2 00/22] Replace the CFQ I/O Scheduler with BFQ
-Date: Mon,  8 Aug 2016 13:14:55 +0200
-Message-Id: <1470654917-4280-1-git-send-email-paolo.valente@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Return-Path: <shaun.tancheff@gmail.com>
+Return-Path: <shaun.tancheff@gmail.com>
+Sender: Shaun Tancheff <shaun.tancheff@gmail.com>
+From: Shaun Tancheff <shaun@tancheff.com>
+To: linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Shaun Tancheff <shaun@tancheff.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>,
+	"James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	Damien Le Moal <damien.lemoal@hgst.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Josh Bingaman <josh.bingaman@seagate.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Geert Uytterhoeven <geert@linux-m68k.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Mauro Carvalho Chehab <mchehab@kernel.org>,
+	Guenter Roeck <linux@roeck-us.net>,
+	Ming Lei <ming.lei@canonical.com>,
+	Mike Christie <michaelc@cs.wisc.edu>,
+	Keith Busch <keith.busch@intel.com>,
+	Mike Snitzer <snitzer@redhat.com>,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	Shaohua Li <shli@fb.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	stephen hemminger <stephen@networkplumber.org>,
+	Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
+	Alexandre Bounine <alexandre.bounine@idt.com>,
+	Asias He <asias@redhat.com>,
+	Sabrina Dubroca <sd@queasysnail.net>,
+	Mike Frysinger <vapier@gentoo.org>,
+	Andrea Arcangeli <aarcange@redhat.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Jeff Layton <jlayton@poochiereds.net>,
+	"J . Bruce Fields" <bfields@fieldses.org>,
+	linux-f2fs-devel@lists.sourceforge.net,
+	linux-fsdevel@vger.kernel.org,
+	dm-devel@redhat.com,
+	Jaegeuk Kim <jaegeuk@kernel.org>
+Subject: [PATCH v8 0/2 RESEND] Block layer support ZAC/ZBC commands
+Date: Wed, 24 Aug 2016 15:22:50 -0500
+Message-Id: <20160824202250.30271-1-shaun@tancheff.com>
+In-Reply-To: <20160822042010.32416-1-shaun@tancheff.com>
+References: <20160822042010.32416-1-shaun@tancheff.com>
 List-ID: <linux-block@vger.kernel.org>
 
-[This patchset, based against v4.8-rc1, replaces my last-submitted
-series, wrongly tagged as V8]
+(RESENDING to include f2fs, fs-devel and dm-devel)
 
-Hi,
-this new version of the patchset contains the improvements and bug
-fixes recommended by Tejun [7], plus new features of BFQ-v8r2. Details
-about old and new features in patch descriptions. For your
-convenience, here is the usual description of the overall patchset.
+Hi Jens,
 
-This patchset replaces CFQ with the last version of BFQ (which is a
-proportional-share I/O scheduler). To make a smooth transition, this
-patchset first brings CFQ back to its state at the time when BFQ was
-forked from CFQ. Basically, this reduces CFQ to its engine, by
-removing every heuristic and improvement that has nothing to do with
-any heuristic or improvement in BFQ, and every heuristic and
-improvement whose goal is achieved in a different way in BFQ. Then,
-the second part of the patchset starts by replacing CFQ's engine with
-BFQ's engine, and goes on by adding current BFQ improvements and extra
-heuristics. Here is the thread in which we agreed on both this first
-step, and the second and last step: [1]. Moreover, here is a direct
-link to the email describing both steps: [2].
+This series is based on linus' v4.8-rc2 branch.
 
-Some patch generates WARNINGS with checkpatch.pl, but these WARNINGS
-seem to be either unavoidable for the involved pieces of code (which
-the patch just extends), or false positives.
- 
-Turning back to BFQ, its first version was submitted a few years ago
-[3]. It is denoted as v0 in this patchset, to distinguish it from the
-version I am submitting now, v8r2. In particular, the first two
-patches concerned with BFQ introduce BFQ-v0, whereas the remaining
-patches turn progressively BFQ-v0 into BFQ-v8. Here are some nice
-features of BFQ-v8r2.
+As Host Aware drives are becoming available we would like to be able
+to make use of such drives. This series is also intended to be
+suitable for use by Host Managed drives.
 
-Low latency for interactive applications
+ZBC [and ZAC] drives add new commands for discovering and working
+with Zones.
 
-According to our results, and regardless of the actual background
-workload, for interactive tasks the storage device is virtually as
-responsive as if it was idle. For example, even if one or more of the
-following background workloads are being executed:
-- one or more large files are being read or written,
-- a tree of source files is being compiled,
-- one or more virtual machines are performing I/O,
-- a software update is in progress,
-- indexing daemons are scanning filesystems and updating their
-  databases,
-starting an application or loading a file from within an application
-takes about the same time as if the storage device was idle. As a
-comparison, with CFQ, NOOP or DEADLINE, and in the same conditions,
-applications experience high latencies, or even become unresponsive
-until the background workload terminates (also on SSDs).
+Part one of this series expands the bio/request reserved op size from
+3 to 4 bits and then adds op codes for each of the ZBC commands:
+   Report zones, close zone, finish zone, open zone and reset zone.
 
-Low latency for soft real-time applications
+Part two of this series deals with integrating these new bio/request
+op's with Hannes' zone cache.
 
-Also soft real-time applications, such as audio and video
-players/streamers, enjoy a low latency and a low drop rate, regardless
-of the background I/O workload. As a consequence, these applications
-do not suffer from almost any glitch due to the background workload.
+This extends the ZBC support up to the block layer allowing direct
+control by file systems or device mapper targets. Also by deferring
+the zone handling to the authoritative subsystem there is an overall
+lower memory usage for holding the active zone information as well
+as clarifying responsible party for maintaining the write pointer
+for each active zone.
 
-High throughput
+By way of example a DM target may have several writes in progress. To sector
+(or lba) for those writes will each depend on the previous write. While the
+drive's write pointer will be updated as writes are completed the DM target
+will be maintaining both where the next write should be scheduled from and
+where the write pointer is based on writes completed w/o errors.
 
-On hard disks, BFQ achieves up to 30% higher throughput than CFQ, and
-up to 150% higher throughput than DEADLINE and NOOP, with half of the
-parallel workloads considered in our tests. With the rest of the
-workloads, and with all the workloads on flash-based devices, BFQ
-achieves instead about the same throughput as the other schedulers.
+Knowing the drive zone topology enables DM targets and file systems to
+extend their block allocation schemes and issue write pointer resets (or
+discards) that are zone aligned.
 
-Strong fairness guarantees (already provided by BFQ-v0)
+A perhaps non-obvious approach is that a conventional drive will
+returns a zone report descriptor with a single large conventional zone.
+This is intended to allow a collection of zoned and non-zoned media to
+be stitched together to provide a file system with a zoned device with
+conventional space mapped to where it is useful.
 
-As for long-term guarantees, BFQ distributes the device throughput
-(and not just the device time) as desired among I/O-bound
-applications, with any workload and regardless of the device
-parameters.
+Patches for util-linux can be found here:
+    git@github.com:stancheff/util-linux.git v2.28.1+biof
 
+    https://github.com/stancheff/util-linux/tree/v2.28.1%2Bbiof
 
-BFQ achieves the above service properties thanks to the combination of
-its accurate scheduling engine (patches 9-10), and a set of simple
-heuristics and improvements (patches 11-22). Details on how BFQ and
-its components work are provided in the descriptions of the
-patches. In addition, an organic description of the main BFQ algorithm
-and of most of its features can be found in this paper [4].
+This patch is available here:
+    https://github.com/stancheff/linux/tree/v4.8-rc2%2Bbiof.v8
 
-What BFQ can do in practice is shown, e.g., in this 8-minute demo with
-an SSD: [5]. I made this demo with an older version of BFQ (v7r6) and
-under Linux 3.17.0, but, for the tests considered in the demo,
-performance has remained about the same with more recent BFQ and
-kernel versions. More details about this point can be found here [6],
-together with graphs showing the performance of BFQ, as compared with
-CFQ, DEADLINE and NOOP, and on: a fast and a slow hard disk, a RAID1,
-an SSD, a microSDHC Card and an eMMC. As an example, our results on
-the SSD are reported also in a table at the end of this email.
+    git@github.com:stancheff/linux.git v4.8-rc2+biof.v8
 
-Finally, as for testing in everyday use, BFQ is the default I/O
-scheduler in, e.g., Manjaro, Sabayon, OpenMandriva and Arch Linux ARM,
-plus several kernel forks for PCs and smartphones. In addition, BFQ is
-optionally available in, e.g., Arch, PCLinuxOS and Gentoo, and we
-record several downloads a day from people using other
-distributions. The feedback received so far basically confirms the
-expected latency drop and throughput boost.
+v8:
+ - Changed zone report to default to reading from zone cache.
+ - Changed ioctl for zone commands to support forcing a query or command
+   to be sent to media.
+ - Fixed report zones copy to user to work when HARDENED_USERCOPY is enabled
+v7:
+ - Initial support for Hannes' zone cache.
+v6:
+ - Fix page alloc to include DMA flag for ioctl.
+v5:
+ - In sd_setup_zone_action_cmnd, remove unused vars and fix switch indent
+ - In blk-lib fix documentation
+v4:
+ - Rebase on linux-next tag next-20160617.
+ - Change bio flags to bio op's
+ - Dropped ata16 hackery
+V3:
+ - Rebase on Mike Cristie's separate bio operations
+ - Update blkzoned_api.h to include report zones PARTIAL bit.
+ - Use zoned report reserved bit for ata-passthrough flag.
 
-Paolo
-
-Results on a Plextor PX-256M5S SSD
-
-The first two rows of the next table report the aggregate throughput
-achieved by BFQ, CFQ, DEADLINE and NOOP, while ten parallel processes
-read, either sequentially or randomly, a separate portion of the
-memory blocks each. These processes read directly from the device, and
-no process performs writes, to avoid writing large files repeatedly
-and wearing out the device during the many tests done. As can be seen,
-all schedulers achieve about the same throughput with sequential
-readers, whereas, with random readers, the throughput slightly grows
-as the complexity, and hence the execution time, of the schedulers
-decreases. In fact, with random readers, the number of IOPS is
-extremely higher, and all CPUs spend all the time either executing
-instructions or waiting for I/O (the total idle percentage is
-0). Therefore, the processing time of I/O requests influences the
-maximum throughput achievable.
-
-The remaining rows report the cold-cache start-up time experienced by
-various applications while one of the above two workloads is being
-executed in parallel. In particular, "Start-up time 10 seq/rand"
-stands for "Start-up time of the application at hand while 10
-sequential/random readers are running". A timeout fires, and the test
-is aborted, if the application does not start within 60 seconds; so,
-in the table, '>60' means that the application did not start before
-the timeout fired.
-
-With sequential readers, the performance gap between BFQ and the other
-schedulers is remarkable. Background workloads are intentionally very
-heavy, to show the performance of the schedulers in somewhat extreme
-conditions. Differences are however still significant also with
-lighter workloads, as shown, e.g., here [6] for slower devices.
-
------------------------------------------------------------------------------
-|                      SCHEDULER                    |        Test           |
------------------------------------------------------------------------------
-|    BFQ     |    CFQ     |  DEADLINE  |    NOOP    |                       |
------------------------------------------------------------------------------
-|            |            |            |            | Aggregate Throughput  |
-|            |            |            |            |       [MB/s]          |
-|    399     |    400     |    400     |    400     |  10 raw seq. readers  |
-|    191     |    193     |    202     |    203     | 10 raw random readers |
------------------------------------------------------------------------------
-|            |            |            |            | Start-up time 10 seq  |
-|            |            |            |            |       [sec]           |
-|    0.21    |    >60     |    1.91    |    1.88    |      xterm            |
-|    0.93    |    >60     |    10.2    |    10.8    |     oowriter          |
-|    0.89    |    >60     |    29.7    |    30.0    |      konsole          |
------------------------------------------------------------------------------
-|            |            |            |            | Start-up time 10 rand |
-|            |            |            |            |       [sec]           |
-|    0.20    |    0.30    |    0.21    |    0.21    |      xterm            |
-|    0.81    |    3.28    |    0.80    |    0.81    |     oowriter          |
-|    0.88    |    2.90    |    1.02    |    1.00    |      konsole          |
------------------------------------------------------------------------------
+V2:
+ - Changed bi_rw to op_flags clarify sepeartion of bio op from flags.
+ - Fixed memory leak in blkdev_issue_zone_report failing to put_bio().
+ - Documented opt in blkdev_issue_zone_report.
+ - Moved include/uapi/linux/fs.h changes to patch 3
+ - Fixed commit message for first patch in series.
 
 
-[1] https://lkml.org/lkml/2014/5/27/314
+Shaun Tancheff (2):
+  Add bio/request flags to issue ZBC/ZAC commands
+  Add ioctl to issue ZBC/ZAC commands via block layer
 
-[2] https://lists.linux-foundation.org/pipermail/containers/2014-June/034704.html
-
-[3] https://lkml.org/lkml/2008/4/1/234
-
-[4] P. Valente, A. Avanzini, "Evolution of the BFQ Storage I/O
-    Scheduler", Proceedings of the First Workshop on Mobile System
-    Technologies (MST-2015), May 2015.
-    http://algogroup.unimore.it/people/paolo/disk_sched/mst-2015.pdf
-
-[5] https://youtu.be/1cjZeaCXIyM
-
-[6] http://algogroup.unimore.it/people/paolo/disk_sched/results.php
-
-[7] https://lkml.org/lkml/2016/2/1/818
-
-Arianna Avanzini (11):
-  block, cfq: remove queue merging for close cooperators
-  block, cfq: remove close-based preemption
-  block, cfq: remove deep seek queues logic
-  block, cfq: remove SSD-related logic
-  block, cfq: get rid of hierarchical support
-  block, cfq: get rid of queue preemption
-  block, cfq: get rid of workload type
-  block, bfq: add full hierarchical scheduling and cgroups support
-  block, bfq: add Early Queue Merge (EQM)
-  block, bfq: reduce idling only in symmetric scenarios
-  block, bfq: handle bursts of queue activations
-
-Paolo Valente (11):
-  block, cfq: get rid of latency tunables
-  block, cfq: replace CFQ with the BFQ-v0 I/O scheduler
-  block, bfq: improve throughput boosting
-  block, bfq: modify the peak-rate estimator
-  block, bfq: add more fairness with writes and slow processes
-  block, bfq: improve responsiveness
-  block, bfq: reduce I/O latency for soft real-time applications
-  block, bfq: preserve a low latency also with NCQ-capable drives
-  block, bfq: reduce latency during request-pool saturation
-  block, bfq: boost the throughput on NCQ-capable flash-based devices
-  block, bfq: boost the throughput with random I/O on NCQ-capable HDDs
-
- block/Kconfig.iosched |   19 +-
- block/cfq-iosched.c   | 9859 ++++++++++++++++++++++++++++++++-----------------
- 2 files changed, 6440 insertions(+), 3438 deletions(-)
+ MAINTAINERS                       |   9 ++
+ block/blk-lib.c                   |  94 +++++++++++++++++
+ block/ioctl.c                     | 149 +++++++++++++++++++++++++++
+ drivers/scsi/sd.c                 | 121 ++++++++++++++++++++++
+ drivers/scsi/sd.h                 |   1 +
+ include/linux/bio.h               |   8 +-
+ include/linux/blk_types.h         |   7 +-
+ include/linux/blkdev.h            |   1 +
+ include/linux/blkzoned_api.h      |  25 +++++
+ include/uapi/linux/Kbuild         |   1 +
+ include/uapi/linux/blkzoned_api.h | 210 ++++++++++++++++++++++++++++++++++++++
+ include/uapi/linux/fs.h           |   1 +
+ 12 files changed, 625 insertions(+), 2 deletions(-)
+ create mode 100644 include/linux/blkzoned_api.h
+ create mode 100644 include/uapi/linux/blkzoned_api.h
 
 -- 
-1.9.1
+2.9.3
