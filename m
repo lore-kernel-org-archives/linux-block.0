@@ -1,91 +1,51 @@
-Return-Path: <shaun@helios.aeonazure.com>
-From: Shaun Tancheff <shaun@tancheff.com>
-To: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Shaun Tancheff <shaun@tancheff.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Jens Axboe <axboe@fb.com>,
-	Christoph Hellwig <hch@lst.de>,
-	"James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	Josh Bingaman <josh.bingaman@seagate.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Damien Le Moal <damien.lemoal@hgst.com>
-Subject: [PATCH 0/2] Bio flags use zone cache when available.
-Date: Wed,  3 Aug 2016 14:06:43 -0500
-Message-Id: <1470251205-4916-1-git-send-email-shaun@tancheff.com>
+Subject: Re: [PATCH v4] block: make sure big bio is splitted into at most 256
+ bvecs
+To: Ming Lei <ming.lei@canonical.com>, linux-kernel@vger.kernel.org
+References: <1471960185-14044-1-git-send-email-ming.lei@canonical.com>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+ Kent Overstreet <kent.overstreet@gmail.com>,
+ Eric Wheeler <bcache@lists.ewheeler.net>,
+ Sebastian Roesner <sroesner-kernelorg@roesner-online.de>,
+ "4.3+" <stable@vger.kernel.org>, Shaohua Li <shli@fb.com>,
+ Jens Axboe <axboe@kernel.dk>
+From: Jens Axboe <axboe@fb.com>
+Message-ID: <2fff8ded-6046-e810-1777-4be9cbb029d6@fb.com>
+Date: Wed, 24 Aug 2016 08:17:51 -0600
+MIME-Version: 1.0
+In-Reply-To: <1471960185-14044-1-git-send-email-ming.lei@canonical.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-Hi,
+On 08/23/2016 07:49 AM, Ming Lei wrote:
+> After arbitrary bio size is supported, the incoming bio may
+> be very big. We have to split the bio into small bios so that
+> each holds at most BIO_MAX_PAGES bvecs for safety reason, such
+> as bio_clone().
+>
+> This patch fixes the following kernel crash:
+>
+>> [  172.660142] BUG: unable to handle kernel NULL pointer dereference at 0000000000000028
+>> [  172.660229] IP: [<ffffffff811e53b4>] bio_trim+0xf/0x2a
+>> [  172.660289] PGD 7faf3e067 PUD 7f9279067 PMD 0
+>> [  172.660399] Oops: 0000 [#1] SMP
+>> [...]
+>> [  172.664780] Call Trace:
+>> [  172.664813]  [<ffffffffa007f3be>] ? raid1_make_request+0x2e8/0xad7 [raid1]
+>> [  172.664846]  [<ffffffff811f07da>] ? blk_queue_split+0x377/0x3d4
+>> [  172.664880]  [<ffffffffa005fb5f>] ? md_make_request+0xf6/0x1e9 [md_mod]
+>> [  172.664912]  [<ffffffff811eb860>] ? generic_make_request+0xb5/0x155
+>> [  172.664947]  [<ffffffffa0445c89>] ? prio_io+0x85/0x95 [bcache]
+>> [  172.664981]  [<ffffffffa0448252>] ? register_cache_set+0x355/0x8d0 [bcache]
+>> [  172.665016]  [<ffffffffa04497d3>] ? register_bcache+0x1006/0x1174 [bcache]
+>
+> The issue can be reproduced by the following steps:
+> 	- create one raid1 over two virtio-blk
+> 	- build bcache device over the above raid1 and another cache device
+> 	and bucket size is set as 2Mbytes
+> 	- set cache mode as writeback
+> 	- run random write over ext4 on the bcache device
 
-As per Christoph's request this patch incorporates Hannes' cache of zone
-information.
-
-The approach is to provide the same blkreport format as would be done 
-when BLK_DEV_ZONED is not enabled via an ioctl.
-Reset WP, Open, and Close zone will update the zone cache.
-
-Using blkdev_issue_zone_report() from within the kernel the report
-will still come directly from the media. I am considering an option
-for the ioctl to force pulling the zone report from the media when
-BLK_DEV_ZONED is enabled and using the resulting information to
-refresh the zone cache. It is not clear that this is useful so I
-have not included that in this patch.
-
-The follow-on patch just enables the zone cache to be populated
-using a Seagate's HostAware drive.
-
-This series is based off of Linus current tip post (f38d2e5313f0af..)
-and builds on top of the previous series of block layer support:
-    Add ioctl to issue ZBC/ZAC commands via block layer
-    Add bio/request flags to issue ZBC/ZAC commands
-
-as well as the series post by Hannes'
-    sd_zbc: Fix handling of ZBC read after write pointer
-    sd: Limit messages for ZBC disks capacity change
-    sd: Implement support for ZBC devices
-    sd: Implement new RESET_WP provisioning mode
-    sd: configure ZBC devices
-...    
-
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Damien Le Moal <damien.lemoal@hgst.com>
-
-Shaun Tancheff (2):
-  bio/zbc support for zone cache
-  Enable support for Seagate HostAware drives (testing).
-
- block/blk-lib.c        |   3 +-
- block/blk-zoned.c      | 190 +++++++++++++++++++++++++++++++++++++++++++++++++
- block/ioctl.c          |  39 +++++++---
- drivers/scsi/sd.c      |  22 +++---
- drivers/scsi/sd.h      |  20 ++++--
- drivers/scsi/sd_zbc.c  | 150 ++++++++++++++++++++++++++++++++------
- include/linux/blkdev.h |  14 +++-
- 7 files changed, 389 insertions(+), 49 deletions(-)
+Applied for 4.8, thanks.
 
 -- 
-2.8.1
-
-
-
-
-    sd_zbc: Fix handling of ZBC read after write pointer
-    sd: Limit messages for ZBC disks capacity change
-    sd: Implement support for ZBC devices
-    sd: Implement new RESET_WP provisioning mode
-    sd: configure ZBC devices
-    block: Add 'BLK_MQ_RQ_QUEUE_DONE' return value
-    block: Introduce BLKPREP_DONE
-    block: Add 'zoned' sysfs queue attribute
-    block: Implement support for zoned block devices
-    block: update chunk_sectors in blk_stack_limits()
-    blk-sysfs: Add 'chunk_sectors' to sysfs attributes
-    sd: configure ZBC devices
-    block: Add 'BLK_MQ_RQ_QUEUE_DONE' return value
-    block: Introduce BLKPREP_DONE
-    block: Add 'zoned' sysfs queue attribute
-    block: Implement support for zoned block devices
-    block: update chunk_sectors in blk_stack_limits()
-    blk-sysfs: Add 'chunk_sectors' to sysfs attributes
+Jens Axboe
