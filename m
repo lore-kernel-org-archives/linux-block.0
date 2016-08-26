@@ -1,91 +1,165 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-dm3nam03on0058.outbound.protection.outlook.com ([104.47.41.58]:12704
-        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1759519AbcHaWSc (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 31 Aug 2016 18:18:32 -0400
-To: Jens Axboe <axboe@fb.com>
-CC: Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-Subject: [PATCH] blk-mq: Use non-atomic operations to manipulate the sw-ctx
- busy bits
-Message-ID: <aa1d8314-3c5e-4554-61e1-95c61aa11624@sandisk.com>
-Date: Wed, 31 Aug 2016 15:03:24 -0700
+Return-Path: <darrick.wong@oracle.com>
+Subject: [PATCH 3/3] block: implement (some of) fallocate for block devices
+From: "Darrick J. Wong" <darrick.wong@oracle.com>
+To: axboe@kernel.dk, darrick.wong@oracle.com
+Cc: linux-block@vger.kernel.org, tytso@mit.edu, martin.petersen@oracle.com,
+        snitzer@redhat.com, linux-api@vger.kernel.org, bfoster@redhat.com,
+        xfs@oss.sgi.com, hch@infradead.org, dm-devel@redhat.com,
+        linux-fsdevel@vger.kernel.org, bart.vanassche@sandisk.com
+Date: Thu, 25 Aug 2016 17:02:22 -0700
+Message-ID: <147216974248.7860.6130980039718256377.stgit@birch.djwong.org>
+In-Reply-To: <147216972158.7860.13484490862091226290.stgit@birch.djwong.org>
+References: <147216972158.7860.13484490862091226290.stgit@birch.djwong.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Protect sw-ctx busy bit manipulations via the sw queue lock.
-This allows to convert the atomic bit operations into slightly
-faster non-atomic operations. Document that blk_mq_run_hw_queues()
-tests these bits without holding the sw queue lock.
+After much discussion, it seems that the fallocate feature flag
+FALLOC_FL_ZERO_RANGE maps nicely to SCSI WRITE SAME; and the feature
+FALLOC_FL_PUNCH_HOLE maps nicely to the devices that have been
+whitelisted for zeroing SCSI UNMAP.  Punch still requires that
+FALLOC_FL_KEEP_SIZE is set.  A length that goes past the end of the
+device will be clamped to the device size if KEEP_SIZE is set; or will
+return -EINVAL if not.  Both start and length must be aligned to the
+device's logical block size.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Sagi Grimberg <sagi@grimberg.me>
+Since the semantics of fallocate are fairly well established already,
+wire up the two pieces.  The other fallocate variants (collapse range,
+insert range, and allocate blocks) are not supported.
+
+v2: Incorporate feedback from Christoph & Linus.  Tentatively add
+a requirement that the fallocate arguments be aligned to logical block
+size, and put in a few XXX comments ahead of LSF discussion.
+
+v3: Forward port to 4.7.
+
+Signed-off-by: Darrick J. Wong <darrick.wong@oracle.com>
 ---
- block/blk-mq.c | 16 +++++++++++++---
- 1 file changed, 13 insertions(+), 3 deletions(-)
+ fs/block_dev.c |   84 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ fs/open.c      |    3 +-
+ 2 files changed, 86 insertions(+), 1 deletion(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 13f5a6c..0dcafa6 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -66,8 +66,9 @@ static void blk_mq_hctx_mark_pending(struct blk_mq_hw_ctx *hctx,
- {
- 	struct blk_align_bitmap *bm = get_bm(hctx, ctx);
- 
-+	lockdep_assert_held(&ctx->lock);
- 	if (!test_bit(CTX_TO_BIT(hctx, ctx), &bm->word))
--		set_bit(CTX_TO_BIT(hctx, ctx), &bm->word);
-+		__set_bit(CTX_TO_BIT(hctx, ctx), &bm->word);
- }
- 
- static void blk_mq_hctx_clear_pending(struct blk_mq_hw_ctx *hctx,
-@@ -75,7 +76,8 @@ static void blk_mq_hctx_clear_pending(struct blk_mq_hw_ctx *hctx,
- {
- 	struct blk_align_bitmap *bm = get_bm(hctx, ctx);
- 
--	clear_bit(CTX_TO_BIT(hctx, ctx), &bm->word);
-+	lockdep_assert_held(&ctx->lock);
-+	__clear_bit(CTX_TO_BIT(hctx, ctx), &bm->word);
- }
- 
- void blk_mq_freeze_queue_start(struct request_queue *q)
-@@ -768,8 +770,8 @@ static void flush_busy_ctxs(struct blk_mq_hw_ctx *hctx, struct list_head *list)
- 				break;
- 
- 			ctx = hctx->ctxs[bit + off];
--			clear_bit(bit, &bm->word);
- 			spin_lock(&ctx->lock);
-+			__clear_bit(bit, &bm->word);
- 			list_splice_tail_init(&ctx->rq_list, list);
- 			spin_unlock(&ctx->lock);
- 
-@@ -940,6 +942,13 @@ void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
- 			&hctx->run_work, 0);
- }
- 
-+/**
-+ * blk_mq_run_hw_queues - run all hardware queues
-+ *
-+ * Note: this function checks the SW and HW busy status without serialization
-+ * against the functions that modify that status information. The caller is
-+ * responsible for realizing that serialization.
-+ */
- void blk_mq_run_hw_queues(struct request_queue *q, bool async)
- {
- 	struct blk_mq_hw_ctx *hctx;
-@@ -1055,6 +1064,7 @@ static void __blk_mq_insert_request(struct blk_mq_hw_ctx *hctx,
- {
- 	struct blk_mq_ctx *ctx = rq->mq_ctx;
- 
-+	lockdep_assert_held(&ctx->lock);
- 	__blk_mq_insert_req_list(hctx, rq, at_head);
- 	blk_mq_hctx_mark_pending(hctx, ctx);
- }
--- 
-2.9.3
 
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index c3cdde8..4df3fc8 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -30,6 +30,7 @@
+ #include <linux/cleancache.h>
+ #include <linux/dax.h>
+ #include <linux/badblocks.h>
++#include <linux/falloc.h>
+ #include <asm/uaccess.h>
+ #include "internal.h"
+ 
+@@ -1786,6 +1787,88 @@ static const struct address_space_operations def_blk_aops = {
+ 	.is_dirty_writeback = buffer_check_dirty_writeback,
+ };
+ 
++#define	BLKDEV_FALLOC_FL_SUPPORTED					\
++		(FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE |		\
++		 FALLOC_FL_ZERO_RANGE | FALLOC_FL_NO_HIDE_STALE)
++
++static long blkdev_fallocate(struct file *file, int mode, loff_t start,
++			     loff_t len)
++{
++	struct block_device *bdev = I_BDEV(bdev_file_inode(file));
++	struct request_queue *q = bdev_get_queue(bdev);
++	struct address_space *mapping;
++	loff_t end = start + len - 1;
++	loff_t isize;
++	int error;
++
++	/* Fail if we don't recognize the flags. */
++	if (mode & ~BLKDEV_FALLOC_FL_SUPPORTED)
++		return -EOPNOTSUPP;
++
++	/* Don't go off the end of the device. */
++	isize = i_size_read(bdev->bd_inode);
++	if (start >= isize)
++		return -EINVAL;
++	if (end > isize) {
++		if (mode & FALLOC_FL_KEEP_SIZE) {
++			len = isize - start;
++			end = start + len - 1;
++		} else
++			return -EINVAL;
++	}
++
++	/*
++	 * Don't allow IO that isn't aligned to logical block size.
++	 */
++	if ((start | len) & (bdev_logical_block_size(bdev) - 1))
++		return -EINVAL;
++
++	/* Invalidate the page cache, including dirty pages. */
++	mapping = bdev->bd_inode->i_mapping;
++	truncate_inode_pages_range(mapping, start, end);
++
++	switch (mode) {
++	case FALLOC_FL_ZERO_RANGE:
++	case FALLOC_FL_ZERO_RANGE | FALLOC_FL_KEEP_SIZE:
++		error = blkdev_issue_zeroout(bdev, start >> 9, len >> 9,
++					    GFP_KERNEL, false);
++		if (error)
++			return error;
++		break;
++	case FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE:
++		/* Only punch if the device can do zeroing discard. */
++		if (!blk_queue_discard(q) || !q->limits.discard_zeroes_data)
++			return -EOPNOTSUPP;
++		error = blkdev_issue_discard(bdev, start >> 9, len >> 9,
++					     GFP_KERNEL, 0);
++		if (error)
++			return error;
++		break;
++	case FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE | FALLOC_FL_NO_HIDE_STALE:
++		/*
++		 * XXX: a well known search engine vendor interprets this
++		 * flag (in other circumstances) to mean "I don't care if
++		 * we can read stale contents later".  Is it appropriate
++		 * to wire this up to the non-zeroing discard?
++		 */
++		error = blkdev_issue_discard(bdev, start >> 9, len >> 9,
++					     GFP_KERNEL, 0);
++		if (error)
++			return error;
++		break;
++	default:
++		return -EOPNOTSUPP;
++	}
++
++	/*
++	 * Invalidate again; if someone wandered in and dirtied a page,
++	 * the caller will be given -EBUSY;
++	 */
++	return invalidate_inode_pages2_range(mapping,
++					     start >> PAGE_SHIFT,
++					     end >> PAGE_SHIFT);
++}
++
+ const struct file_operations def_blk_fops = {
+ 	.open		= blkdev_open,
+ 	.release	= blkdev_close,
+@@ -1800,6 +1883,7 @@ const struct file_operations def_blk_fops = {
+ #endif
+ 	.splice_read	= generic_file_splice_read,
+ 	.splice_write	= iter_file_splice_write,
++	.fallocate	= blkdev_fallocate,
+ };
+ 
+ int ioctl_by_bdev(struct block_device *bdev, unsigned cmd, unsigned long arg)
+diff --git a/fs/open.c b/fs/open.c
+index 4fd6e25..01b6092 100644
+--- a/fs/open.c
++++ b/fs/open.c
+@@ -289,7 +289,8 @@ int vfs_fallocate(struct file *file, int mode, loff_t offset, loff_t len)
+ 	 * Let individual file system decide if it supports preallocation
+ 	 * for directories or not.
+ 	 */
+-	if (!S_ISREG(inode->i_mode) && !S_ISDIR(inode->i_mode))
++	if (!S_ISREG(inode->i_mode) && !S_ISDIR(inode->i_mode) &&
++	    !S_ISBLK(inode->i_mode))
+ 		return -ENODEV;
+ 
+ 	/* Check for wrap through zero too */
