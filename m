@@ -1,53 +1,76 @@
-Return-Path: <daeho.jeong@samsung.com>
-From: Daeho Jeong <daeho.jeong@samsung.com>
-To: axboe@kernel.dk, tytso@mit.edu, adilger.kernel@dilger.ca, jack@suse.com,
- linux-block@vger.kernel.org, linux-mm@kvack.org, linux-ext4@vger.kernel.org
-Cc: Daeho Jeong <daeho.jeong@samsung.com>
-Subject: [RFC 3/3] ext4: tag asynchronous writeback io
-Date: Wed, 17 Aug 2016 14:20:45 +0900
-Message-id: <1471411245-5186-4-git-send-email-daeho.jeong@samsung.com>
-In-reply-to: <1471411245-5186-1-git-send-email-daeho.jeong@samsung.com>
-References: <1471411245-5186-1-git-send-email-daeho.jeong@samsung.com>
+Return-Path: <darrick.wong@oracle.com>
+Subject: [PATCH 1/3] block: invalidate the page cache when issuing
+ BLKZEROOUT.
+From: "Darrick J. Wong" <darrick.wong@oracle.com>
+To: axboe@kernel.dk, darrick.wong@oracle.com
+Cc: linux-block@vger.kernel.org, tytso@mit.edu, martin.petersen@oracle.com,
+        snitzer@redhat.com, linux-api@vger.kernel.org, bfoster@redhat.com,
+        xfs@oss.sgi.com, hch@infradead.org, dm-devel@redhat.com,
+        linux-fsdevel@vger.kernel.org, bart.vanassche@sandisk.com,
+        Christoph Hellwig <hch@lst.de>
+Date: Thu, 25 Aug 2016 17:02:08 -0700
+Message-ID: <147216972858.7860.4375500103860205870.stgit@birch.djwong.org>
+In-Reply-To: <147216972158.7860.13484490862091226290.stgit@birch.djwong.org>
+References: <147216972158.7860.13484490862091226290.stgit@birch.djwong.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 List-ID: <linux-block@vger.kernel.org>
 
-Set the page with PG_asyncwb and PG_plugged, and set the bio with
-BIO_ASYNC_WB when submitting asynchronous writeback I/O in order to
-mark which pages are flushed as asynchronous writeback I/O and which
-one stays in the plug list.
+Invalidate the page cache (as a regular O_DIRECT write would do) to avoid
+returning stale cache contents at a later time.
 
-Signed-off-by: Daeho Jeong <daeho.jeong@samsung.com>
+v5: Refactor the 4.4 refactoring of the ioctl code into separate functions.
+Split the page invalidation and the new ioctl into separate patches.
+v6: Remove the call to invalidate_inode_pages2_range since we don't need it.
+
+Signed-off-by: Darrick J. Wong <darrick.wong@oracle.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
 ---
- fs/ext4/page-io.c |   11 +++++++++++
- 1 file changed, 11 insertions(+)
+ block/ioctl.c |   18 ++++++++++++------
+ 1 file changed, 12 insertions(+), 6 deletions(-)
 
-diff --git a/fs/ext4/page-io.c b/fs/ext4/page-io.c
-index 2a01df9..5912e59 100644
---- a/fs/ext4/page-io.c
-+++ b/fs/ext4/page-io.c
-@@ -370,6 +370,10 @@ static int io_submit_init_bio(struct ext4_io_submit *io,
- 	bio->bi_private = ext4_get_io_end(io->io_end);
- 	io->io_bio = bio;
- 	io->io_next_block = bh->b_blocknr;
-+#ifdef CONFIG_BOOST_URGENT_ASYNC_WB
-+	if (io->io_wbc->sync_mode == WB_SYNC_NONE)
-+		bio->bi_flags |= (1 << BIO_ASYNC_WB);
-+#endif
- 	return 0;
+
+diff --git a/block/ioctl.c b/block/ioctl.c
+index ed2397f..755119c 100644
+--- a/block/ioctl.c
++++ b/block/ioctl.c
+@@ -225,7 +225,8 @@ static int blk_ioctl_zeroout(struct block_device *bdev, fmode_t mode,
+ 		unsigned long arg)
+ {
+ 	uint64_t range[2];
+-	uint64_t start, len;
++	struct address_space *mapping;
++	uint64_t start, end, len;
+ 
+ 	if (!(mode & FMODE_WRITE))
+ 		return -EBADF;
+@@ -235,18 +236,23 @@ static int blk_ioctl_zeroout(struct block_device *bdev, fmode_t mode,
+ 
+ 	start = range[0];
+ 	len = range[1];
++	end = start + len - 1;
+ 
+ 	if (start & 511)
+ 		return -EINVAL;
+ 	if (len & 511)
+ 		return -EINVAL;
+-	start >>= 9;
+-	len >>= 9;
+-
+-	if (start + len > (i_size_read(bdev->bd_inode) >> 9))
++	if (end >= (uint64_t)i_size_read(bdev->bd_inode))
++		return -EINVAL;
++	if (end < start)
+ 		return -EINVAL;
+ 
+-	return blkdev_issue_zeroout(bdev, start, len, GFP_KERNEL, false);
++	/* Invalidate the page cache, including dirty pages */
++	mapping = bdev->bd_inode->i_mapping;
++	truncate_inode_pages_range(mapping, start, end);
++
++	return blkdev_issue_zeroout(bdev, start >> 9, len >> 9, GFP_KERNEL,
++				    false);
  }
  
-@@ -416,6 +420,13 @@ int ext4_bio_write_page(struct ext4_io_submit *io,
- 	BUG_ON(!PageLocked(page));
- 	BUG_ON(PageWriteback(page));
- 
-+#ifdef CONFIG_BOOST_URGENT_ASYNC_WB
-+	if (wbc->sync_mode == WB_SYNC_NONE) {
-+		SetPagePlugged(page);
-+		SetPageAsyncWB(page);
-+	}
-+#endif
-+
- 	if (keep_towrite)
- 		set_page_writeback_keepwrite(page);
- 	else
--- 
-1.7.9.5
+ static int put_ushort(unsigned long arg, unsigned short val)
