@@ -1,161 +1,104 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:14034 "EHLO mga02.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752653AbcHLSiz (ORCPT <rfc822;linux-block@vger.kernel.org>);
-	Fri, 12 Aug 2016 14:38:55 -0400
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-	Andreas Dilger <adilger.kernel@dilger.ca>,
-	Jan Kara <jack@suse.com>,
-	Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-	Hugh Dickins <hughd@google.com>,
-	Andrea Arcangeli <aarcange@redhat.com>,
-	Dave Hansen <dave.hansen@intel.com>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	Matthew Wilcox <willy@infradead.org>,
-	Ross Zwisler <ross.zwisler@linux.intel.com>,
-	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	linux-block@vger.kernel.org,
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv2 23/41] fs: make block_read_full_page() be able to read huge page
-Date: Fri, 12 Aug 2016 21:38:06 +0300
-Message-Id: <1471027104-115213-24-git-send-email-kirill.shutemov@linux.intel.com>
-In-Reply-To: <1471027104-115213-1-git-send-email-kirill.shutemov@linux.intel.com>
-References: <1471027104-115213-1-git-send-email-kirill.shutemov@linux.intel.com>
+Received: from bombadil.infradead.org ([198.137.202.9]:37531 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932244AbcH2Kx7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 29 Aug 2016 06:53:59 -0400
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@fb.com
+Cc: keith.busch@intel.com, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org
+Subject: [PATCH 7/7] blk-mq: get rid of the cpumask in struct blk_mq_tags
+Date: Mon, 29 Aug 2016 12:53:33 +0200
+Message-Id: <1472468013-29936-8-git-send-email-hch@lst.de>
+In-Reply-To: <1472468013-29936-1-git-send-email-hch@lst.de>
+References: <1472468013-29936-1-git-send-email-hch@lst.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-The approach is straight-forward: for compound pages we read out whole
-huge page.
+Unused now that NVMe sets up irq affinity before calling into blk-mq.
 
-For huge page we cannot have array of buffer head pointers on stack --
-it's 4096 pointers on x86-64 -- 'arr' is allocated with kmalloc() for
-huge pages.
-
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- fs/buffer.c                 | 22 +++++++++++++++++-----
- include/linux/buffer_head.h |  9 +++++----
- include/linux/page-flags.h  |  2 +-
- 3 files changed, 23 insertions(+), 10 deletions(-)
+ block/blk-mq-tag.c     | 6 ------
+ block/blk-mq-tag.h     | 1 -
+ block/blk-mq.c         | 7 -------
+ include/linux/blk-mq.h | 1 -
+ 4 files changed, 15 deletions(-)
 
-diff --git a/fs/buffer.c b/fs/buffer.c
-index 9c8eb9b6db6a..2739f5dae690 100644
---- a/fs/buffer.c
-+++ b/fs/buffer.c
-@@ -870,7 +870,7 @@ struct buffer_head *alloc_page_buffers(struct page *page, unsigned long size,
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index 1602813..2eae3d5 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -665,11 +665,6 @@ struct blk_mq_tags *blk_mq_init_tags(unsigned int total_tags,
+ 	if (!tags)
+ 		return NULL;
  
- try_again:
- 	head = NULL;
--	offset = PAGE_SIZE;
-+	offset = hpage_size(page);
- 	while ((offset -= size) >= 0) {
- 		bh = alloc_buffer_head(GFP_NOFS);
- 		if (!bh)
-@@ -1466,7 +1466,7 @@ void set_bh_page(struct buffer_head *bh,
- 		struct page *page, unsigned long offset)
+-	if (!zalloc_cpumask_var(&tags->cpumask, GFP_KERNEL)) {
+-		kfree(tags);
+-		return NULL;
+-	}
+-
+ 	tags->nr_tags = total_tags;
+ 	tags->nr_reserved_tags = reserved_tags;
+ 
+@@ -680,7 +675,6 @@ void blk_mq_free_tags(struct blk_mq_tags *tags)
  {
- 	bh->b_page = page;
--	BUG_ON(offset >= PAGE_SIZE);
-+	BUG_ON(offset >= hpage_size(page));
- 	if (PageHighMem(page))
+ 	bt_free(&tags->bitmap_tags);
+ 	bt_free(&tags->breserved_tags);
+-	free_cpumask_var(tags->cpumask);
+ 	kfree(tags);
+ }
+ 
+diff --git a/block/blk-mq-tag.h b/block/blk-mq-tag.h
+index d468a79..5569641 100644
+--- a/block/blk-mq-tag.h
++++ b/block/blk-mq-tag.h
+@@ -44,7 +44,6 @@ struct blk_mq_tags {
+ 	struct list_head page_list;
+ 
+ 	int alloc_policy;
+-	cpumask_var_t cpumask;
+ };
+ 
+ 
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index a679562..1fc42a0 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1852,7 +1852,6 @@ static void blk_mq_map_swqueue(struct request_queue *q,
+ 		hctx->tags = set->tags[i];
+ 		WARN_ON(!hctx->tags);
+ 
+-		cpumask_copy(hctx->tags->cpumask, hctx->cpumask);
  		/*
- 		 * This catches illegal uses and preserves the offset:
-@@ -2239,11 +2239,13 @@ int block_read_full_page(struct page *page, get_block_t *get_block)
- {
- 	struct inode *inode = page->mapping->host;
- 	sector_t iblock, lblock;
--	struct buffer_head *bh, *head, *arr[MAX_BUF_PER_PAGE];
-+	struct buffer_head *arr_on_stack[MAX_BUF_PER_PAGE];
-+	struct buffer_head *bh, *head, **arr = arr_on_stack;
- 	unsigned int blocksize, bbits;
- 	int nr, i;
- 	int fully_mapped = 1;
- 
-+	VM_BUG_ON_PAGE(PageTail(page), page);
- 	head = create_page_buffers(page, inode, 0);
- 	blocksize = head->b_size;
- 	bbits = block_size_bits(blocksize);
-@@ -2254,6 +2256,11 @@ int block_read_full_page(struct page *page, get_block_t *get_block)
- 	nr = 0;
- 	i = 0;
- 
-+	if (PageTransHuge(page)) {
-+		arr = kmalloc(sizeof(struct buffer_head *) * HPAGE_PMD_NR *
-+				MAX_BUF_PER_PAGE, GFP_NOFS);
-+	}
-+
- 	do {
- 		if (buffer_uptodate(bh))
- 			continue;
-@@ -2269,7 +2276,9 @@ int block_read_full_page(struct page *page, get_block_t *get_block)
- 					SetPageError(page);
- 			}
- 			if (!buffer_mapped(bh)) {
--				zero_user(page, i * blocksize, blocksize);
-+				zero_user(page + (i * blocksize / PAGE_SIZE),
-+						i * blocksize % PAGE_SIZE,
-+						blocksize);
- 				if (!err)
- 					set_buffer_uptodate(bh);
- 				continue;
-@@ -2295,7 +2304,7 @@ int block_read_full_page(struct page *page, get_block_t *get_block)
- 		if (!PageError(page))
- 			SetPageUptodate(page);
- 		unlock_page(page);
--		return 0;
-+		goto out;
- 	}
- 
- 	/* Stage two: lock the buffers */
-@@ -2317,6 +2326,9 @@ int block_read_full_page(struct page *page, get_block_t *get_block)
- 		else
- 			submit_bh(REQ_OP_READ, 0, bh);
- 	}
-+out:
-+	if (arr != arr_on_stack)
-+		kfree(arr);
+ 		 * Set the map size to the number of mapped software queues.
+ 		 * This is more accurate and more efficient than looping
+@@ -2279,12 +2278,6 @@ static int blk_mq_alloc_rq_maps(struct blk_mq_tag_set *set)
  	return 0;
  }
- EXPORT_SYMBOL(block_read_full_page);
-diff --git a/include/linux/buffer_head.h b/include/linux/buffer_head.h
-index 006a8a42acfb..194a85822d5f 100644
---- a/include/linux/buffer_head.h
-+++ b/include/linux/buffer_head.h
-@@ -131,13 +131,14 @@ BUFFER_FNS(Meta, meta)
- BUFFER_FNS(Prio, prio)
- BUFFER_FNS(Defer_Completion, defer_completion)
  
--#define bh_offset(bh)		((unsigned long)(bh)->b_data & ~PAGE_MASK)
-+#define bh_offset(bh)	((unsigned long)(bh)->b_data & ~hpage_mask(bh->b_page))
- 
- /* If we *know* page->private refers to buffer_heads */
--#define page_buffers(page)					\
-+#define page_buffers(__page)					\
- 	({							\
--		BUG_ON(!PagePrivate(page));			\
--		((struct buffer_head *)page_private(page));	\
-+		struct page *p = compound_head(__page);		\
-+		BUG_ON(!PagePrivate(p));			\
-+		((struct buffer_head *)page_private(p));	\
- 	})
- #define page_has_buffers(page)	PagePrivate(page)
- 
-diff --git a/include/linux/page-flags.h b/include/linux/page-flags.h
-index a2bef9a41bcf..20b7684e9298 100644
---- a/include/linux/page-flags.h
-+++ b/include/linux/page-flags.h
-@@ -730,7 +730,7 @@ static inline void ClearPageSlabPfmemalloc(struct page *page)
-  */
- static inline int page_has_private(struct page *page)
+-struct cpumask *blk_mq_tags_cpumask(struct blk_mq_tags *tags)
+-{
+-	return tags->cpumask;
+-}
+-EXPORT_SYMBOL_GPL(blk_mq_tags_cpumask);
+-
+ static int blk_mq_create_mq_map(struct blk_mq_tag_set *set,
+ 		const struct cpumask *affinity_mask)
  {
--	return !!(page->flags & PAGE_FLAGS_PRIVATE);
-+	return !!(compound_head(page)->flags & PAGE_FLAGS_PRIVATE);
- }
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 29e227b..79a421e 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -197,7 +197,6 @@ struct request *blk_mq_alloc_request(struct request_queue *q, int rw,
+ struct request *blk_mq_alloc_request_hctx(struct request_queue *q, int op,
+ 		unsigned int flags, unsigned int hctx_idx);
+ struct request *blk_mq_tag_to_rq(struct blk_mq_tags *tags, unsigned int tag);
+-struct cpumask *blk_mq_tags_cpumask(struct blk_mq_tags *tags);
  
- #undef PF_ANY
+ enum {
+ 	BLK_MQ_UNIQUE_TAG_BITS = 16,
 -- 
-2.8.1
+2.1.4
 
