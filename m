@@ -1,156 +1,61 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-	Andreas Dilger <adilger.kernel@dilger.ca>,
-	Jan Kara <jack@suse.com>,
-	Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-	Hugh Dickins <hughd@google.com>,
-	Andrea Arcangeli <aarcange@redhat.com>,
-	Dave Hansen <dave.hansen@intel.com>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	Matthew Wilcox <willy@infradead.org>,
-	Ross Zwisler <ross.zwisler@linux.intel.com>,
-	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	linux-block@vger.kernel.org,
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv2 08/41] Revert "radix-tree: implement radix_tree_maybe_preload_order()"
-Date: Fri, 12 Aug 2016 21:37:51 +0300
-Message-Id: <1471027104-115213-9-git-send-email-kirill.shutemov@linux.intel.com>
-In-Reply-To: <1471027104-115213-1-git-send-email-kirill.shutemov@linux.intel.com>
-References: <1471027104-115213-1-git-send-email-kirill.shutemov@linux.intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: Oops when completing request on the wrong queue
+To: Gabriel Krisman Bertazi <krisman@linux.vnet.ibm.com>
+References: <87a8gltgks.fsf@linux.vnet.ibm.com>
+ <871t1kq455.fsf@linux.vnet.ibm.com>
+ <bb6f8757-4c3d-8f49-8aff-aa0fdb8bae89@kernel.dk>
+ <8fc9ae38-9488-ef52-f620-08499edebffa@kernel.dk>
+ <87shu0hfye.fsf@linux.vnet.ibm.com> <87a8g39pg4.fsf@linux.vnet.ibm.com>
+ <43693064-dd37-92ce-7753-2a8edb43eab5@kernel.dk>
+ <164a4c63-065b-b766-36f3-bcef4aa46a38@kernel.dk>
+ <49a954e6-2f96-8a63-ce15-2c82c1a1d36d@kernel.dk>
+ <dbe42007-8109-2e21-d0f3-0778007cd152@kernel.dk>
+ <87d1krzbz6.fsf@linux.vnet.ibm.com>
+Cc: Keith Busch <keith.busch@intel.com>, Christoph Hellwig <hch@lst.de>,
+ linux-nvme@lists.infradead.org, Brian King <brking@linux.vnet.ibm.com>,
+ linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <5902c166-7aec-b2ae-72d7-07e8efeb5aa9@kernel.dk>
+Date: Mon, 29 Aug 2016 12:40:32 -0600
+MIME-Version: 1.0
+In-Reply-To: <87d1krzbz6.fsf@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-This reverts commit 356e1c23292a4f63cfdf1daf0e0ddada51f32de8.
+On 08/29/2016 12:06 PM, Gabriel Krisman Bertazi wrote:
+> Jens Axboe <axboe@kernel.dk> writes:
+>>> Can you try this patch? It's not perfect, but I'll be interested if it
+>>> makes a difference for you.
+>>
+>
+> Hi Jens,
+>
+> Sorry for the delay.  I just got back to this and have been running your
+> patch on top of 4.8 without a crash for over 1 hour.  I wanna give it
+> more time to make sure it's running properly, though.
+>
+> Let me get back to you after a few more rounds of test.
 
-After conversion of huge tmpfs to multi-order entries, we don't need
-this anymore.
+Thanks, sounds good. The patches have landed in mainline too.
 
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
----
- include/linux/radix-tree.h |  1 -
- lib/radix-tree.c           | 74 ----------------------------------------------
- 2 files changed, 75 deletions(-)
+>> This one should handle the WARN_ON() for running the hw queue on the
+>> wrong CPU as well.
+>
+> On the workaround you added to prevent WARN_ON, we surely need to
+> prevent blk_mq_hctx_next_cpu from scheduling dead cpus in the first
+> place, right..  How do you feel about the following RFC?  I know it's
+> not a complete fix, but it feels like a good improvement to me.
+>
+> http://www.spinics.net/lists/linux-scsi/msg98608.html
 
-diff --git a/include/linux/radix-tree.h b/include/linux/radix-tree.h
-index c4cea311d901..7a271f662320 100644
---- a/include/linux/radix-tree.h
-+++ b/include/linux/radix-tree.h
-@@ -290,7 +290,6 @@ unsigned int radix_tree_gang_lookup_slot(struct radix_tree_root *root,
- 			unsigned long first_index, unsigned int max_items);
- int radix_tree_preload(gfp_t gfp_mask);
- int radix_tree_maybe_preload(gfp_t gfp_mask);
--int radix_tree_maybe_preload_order(gfp_t gfp_mask, int order);
- void radix_tree_init(void);
- void *radix_tree_tag_set(struct radix_tree_root *root,
- 			unsigned long index, unsigned int tag);
-diff --git a/lib/radix-tree.c b/lib/radix-tree.c
-index 89092c4011b8..aa23643814a5 100644
---- a/lib/radix-tree.c
-+++ b/lib/radix-tree.c
-@@ -38,9 +38,6 @@
- #include <linux/preempt.h>		/* in_interrupt() */
- 
- 
--/* Number of nodes in fully populated tree of given height */
--static unsigned long height_to_maxnodes[RADIX_TREE_MAX_PATH + 1] __read_mostly;
--
- /*
-  * Radix tree node cache.
-  */
-@@ -427,51 +424,6 @@ int radix_tree_split_preload(unsigned int old_order, unsigned int new_order,
- #endif
- 
- /*
-- * The same as function above, but preload number of nodes required to insert
-- * (1 << order) continuous naturally-aligned elements.
-- */
--int radix_tree_maybe_preload_order(gfp_t gfp_mask, int order)
--{
--	unsigned long nr_subtrees;
--	int nr_nodes, subtree_height;
--
--	/* Preloading doesn't help anything with this gfp mask, skip it */
--	if (!gfpflags_allow_blocking(gfp_mask)) {
--		preempt_disable();
--		return 0;
--	}
--
--	/*
--	 * Calculate number and height of fully populated subtrees it takes to
--	 * store (1 << order) elements.
--	 */
--	nr_subtrees = 1 << order;
--	for (subtree_height = 0; nr_subtrees > RADIX_TREE_MAP_SIZE;
--			subtree_height++)
--		nr_subtrees >>= RADIX_TREE_MAP_SHIFT;
--
--	/*
--	 * The worst case is zero height tree with a single item at index 0 and
--	 * then inserting items starting at ULONG_MAX - (1 << order).
--	 *
--	 * This requires RADIX_TREE_MAX_PATH nodes to build branch from root to
--	 * 0-index item.
--	 */
--	nr_nodes = RADIX_TREE_MAX_PATH;
--
--	/* Plus branch to fully populated subtrees. */
--	nr_nodes += RADIX_TREE_MAX_PATH - subtree_height;
--
--	/* Root node is shared. */
--	nr_nodes--;
--
--	/* Plus nodes required to build subtrees. */
--	nr_nodes += nr_subtrees * height_to_maxnodes[subtree_height];
--
--	return __radix_tree_preload(gfp_mask, nr_nodes);
--}
--
--/*
-  * The maximum index which can be stored in a radix tree
-  */
- static inline unsigned long shift_maxindex(unsigned int shift)
-@@ -1850,31 +1802,6 @@ radix_tree_node_ctor(void *arg)
- 	INIT_LIST_HEAD(&node->private_list);
- }
- 
--static __init unsigned long __maxindex(unsigned int height)
--{
--	unsigned int width = height * RADIX_TREE_MAP_SHIFT;
--	int shift = RADIX_TREE_INDEX_BITS - width;
--
--	if (shift < 0)
--		return ~0UL;
--	if (shift >= BITS_PER_LONG)
--		return 0UL;
--	return ~0UL >> shift;
--}
--
--static __init void radix_tree_init_maxnodes(void)
--{
--	unsigned long height_to_maxindex[RADIX_TREE_MAX_PATH + 1];
--	unsigned int i, j;
--
--	for (i = 0; i < ARRAY_SIZE(height_to_maxindex); i++)
--		height_to_maxindex[i] = __maxindex(i);
--	for (i = 0; i < ARRAY_SIZE(height_to_maxnodes); i++) {
--		for (j = i; j > 0; j--)
--			height_to_maxnodes[i] += height_to_maxindex[j - 1] + 1;
--	}
--}
--
- static int radix_tree_callback(struct notifier_block *nfb,
- 				unsigned long action, void *hcpu)
- {
-@@ -1901,6 +1828,5 @@ void __init radix_tree_init(void)
- 			sizeof(struct radix_tree_node), 0,
- 			SLAB_PANIC | SLAB_RECLAIM_ACCOUNT,
- 			radix_tree_node_ctor);
--	radix_tree_init_maxnodes();
- 	hotcpu_notifier(radix_tree_callback, 0);
- }
+But we can't completely prevent it, and I don't think we have to. I just
+don't want to trigger a warning for something that's a valid condition.
+I want the warning to trigger if this happens without the CPU going
+offline, since then it's indicative of a real bug in the mapping. Your
+patch isn't going to prevent it either - it'll shrink the window, at the
+expense of making blk_mq_hctx_next_cpu() more expensive. So I don't
+think it's worthwhile.
+
+
 -- 
-2.8.1
-
+Jens Axboe
