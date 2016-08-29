@@ -1,121 +1,92 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-oi0-f43.google.com ([209.85.218.43]:36228 "EHLO
-        mail-oi0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750846AbcH3UnC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 Aug 2016 16:43:02 -0400
-Received: by mail-oi0-f43.google.com with SMTP id f189so43188360oig.3
-        for <linux-block@vger.kernel.org>; Tue, 30 Aug 2016 13:43:01 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <cf141c9f-2bda-060a-0a7d-86638c2f5818@sandisk.com>
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+Subject: Re: Time to make dynamically allocated devt the default for scsi
+ disks?
+To: James Bottomley <James.Bottomley@HansenPartnership.com>,
+        Dan Williams <dan.j.williams@intel.com>
 References: <CAPcyv4jK8W52ss2FhJDa=95B_1q8Szv4AmH0f7p_jzyfEXv0Ag@mail.gmail.com>
- <1471047451.2407.95.camel@HansenPartnership.com> <CAPcyv4jqEaBY1atyrjG3G4PYOzaoLvAMfHgK1PD0Si=MRRwAuw@mail.gmail.com>
+ <1471047451.2407.95.camel@HansenPartnership.com>
+ <CAPcyv4jqEaBY1atyrjG3G4PYOzaoLvAMfHgK1PD0Si=MRRwAuw@mail.gmail.com>
  <CAPcyv4i=85fCAm1A5Zh2+nYSw7vwXOD=i-B0g4m2eJ+XkEW3tw@mail.gmail.com>
- <1471101800.2397.9.camel@HansenPartnership.com> <CAPcyv4gDw49gZBO=Y+K9krgth68OUHcs8urGDNXiZzLNa6kotg@mail.gmail.com>
- <1471110212.2397.39.camel@HansenPartnership.com> <CAPcyv4gHq=RraHgcJGx_txk7YJHC8YQ3gCT4CHL0hvzsGpU1wg@mail.gmail.com>
- <1471195252.2355.18.camel@HansenPartnership.com> <cf141c9f-2bda-060a-0a7d-86638c2f5818@sandisk.com>
-From: Dan Williams <dan.j.williams@intel.com>
-Date: Tue, 30 Aug 2016 13:43:00 -0700
-Message-ID: <CAPcyv4hzda80kqNtyTUHL7_mpoiDzLvQaj5OQL9OxePU3BKjEw@mail.gmail.com>
-Subject: Re: Time to make dynamically allocated devt the default for scsi disks?
-To: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: James Bottomley <James.Bottomley@hansenpartnership.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ <1471101800.2397.9.camel@HansenPartnership.com>
+ <CAPcyv4gDw49gZBO=Y+K9krgth68OUHcs8urGDNXiZzLNa6kotg@mail.gmail.com>
+ <1471110212.2397.39.camel@HansenPartnership.com>
+ <CAPcyv4gHq=RraHgcJGx_txk7YJHC8YQ3gCT4CHL0hvzsGpU1wg@mail.gmail.com>
+ <1471195252.2355.18.camel@HansenPartnership.com>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         linux-scsi <linux-scsi@vger.kernel.org>,
         Jens Axboe <axboe@fb.com>,
         "Martin K. Petersen" <martin.petersen@oracle.com>,
         Christoph Hellwig <hch@lst.de>, Tejun Heo <tj@kernel.org>,
         Dave Hansen <dave.hansen@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+From: Bart Van Assche <bart.vanassche@sandisk.com>
+Message-ID: <cf141c9f-2bda-060a-0a7d-86638c2f5818@sandisk.com>
+Date: Mon, 29 Aug 2016 11:16:47 -0700
+MIME-Version: 1.0
+In-Reply-To: <1471195252.2355.18.camel@HansenPartnership.com>
+Content-Type: text/plain; charset="utf-8"
+Sender: linux-scsi-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Aug 29, 2016 at 11:16 AM, Bart Van Assche
-<bart.vanassche@sandisk.com> wrote:
-> On 08/14/2016 10:21 AM, James Bottomley wrote:
->> diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
->> index d3e852a..222771d 100644
->> --- a/drivers/scsi/sd.c
->> +++ b/drivers/scsi/sd.c
->> @@ -3000,7 +3000,13 @@ static void sd_probe_async(void *data, async_cook=
-ie_t cookie)
->>       }
->>
->>       blk_pm_runtime_init(sdp->request_queue, dev);
->> -     device_add_disk(dev, gd);
->> +     /*
->> +      * previously the parent of the gendisk was the scsi device.  It
->> +      * was moved to fix lifetime rules, so now we install a symlink
->> +      * to the new location of the block class directory
->> +      */
->> +     device_add_disk(&sdkp->dev, gd);
->> +     WARN_ON(sysfs_add_link_to_group(&dev->kobj, "block", &sdkp->dev.ko=
-bj, "block"));
->>       if (sdkp->capacity)
->>               sd_dif_config_host(sdkp);
->>
->> @@ -3142,6 +3148,7 @@ static int sd_remove(struct device *dev)
->>
->>       async_synchronize_full_domain(&scsi_sd_pm_domain);
->>       async_synchronize_full_domain(&scsi_sd_probe_domain);
->> +     sysfs_remove_link(&dev->kobj, "block");
->>       device_del(&sdkp->dev);
->>       del_gendisk(sdkp->disk);
->>       sd_shutdown(dev);
->
-> Hello James,
->
-> Sorry that it took so long before I could test this patch and
-> the previous patch that was posted in this e-mail thread. But I
-> did so earlier this morning. What I see is that the following
-> warning message is reported frequently:
->
-> WARNING: CPU: 1 PID: 136 at drivers/scsi/sd.c:3009 sd_probe_async+0x1ce/0=
-x1e0
-> Modules linked in: ib_srp libcrc32c scsi_transport_srp target_core_pscsi =
-target_core_file ib_srpt target_core_iblock target_core_mod brd dm_multipat=
-h scsi_dh_rdac scsi_dh_emc scsi_dh_alua netconsole xt_CHECKSUM iptable_mang=
-le ipt_MASQUERADE nf_nat_masquerade_ipv4 iptable_nat nf_nat_ipv4 nf_nat nf_=
-conntrack_ipv4 nf_defrag_ipv4 xt_conntrack nf_conntrack ipt_REJECT xt_tcpud=
-p tun ebtable_filter ebtables ip6table_filter ip6_tables iptable_filter ip_=
-tables x_tables af_packet bridge stp llc iscsi_ibft iscsi_boot_sysfs ib_ipo=
-ib rdma_ucm ib_ucm ib_uverbs ib_umad msr rdma_cm configfs ib_cm iw_cm mlx4_=
-ib ib_core sb_edac edac_core x86_pkg_temp_thermal intel_powerclamp coretemp=
- kvm_intel kvm dm_mod irqbypass ipmi_ssif crct10dif_pclmul ipmi_devintf crc=
-32_pclmul ghash_clmulni_intel aesni_intel iTCO_wdt aes_x86_64 lrw iTCO_vend=
-or_support dcdbas gf128mul tg3 mlx4_core glue_helper ablk_helper ptp cryptd=
- fjes ipmi_si pcspkr pps_core libphy ipmi_msghandler mei_me tpm_tis tpm_tis=
-_core mei tpm lpc_ich shpchp mfd_core wmi button hid_generic usbhid mgag200=
- i2c_algo_bit drm_kms_helper syscopyarea sysfillrect sysimgblt fb_sys_fops =
-ttm drm sr_mod cdrom crc32c_intel ehci_pci ehci_hcd usbcore usb_common sg [=
-last unloaded: scsi_transport_srp]
-> CPU: 1 PID: 136 Comm: kworker/u64:8 Tainted: G        W       4.8.0-rc4-d=
-bg+ #2
-> Hardware name: Dell Inc. PowerEdge R430/03XKDV, BIOS 1.0.2 11/17/2014
-> Workqueue: events_unbound async_run_entry_fn
-> Call Trace:
->  [<ffffffff813247c5>] dump_stack+0x68/0x93
->  [<ffffffff81062f96>] __warn+0xc6/0xe0
->  [<ffffffff81063068>] warn_slowpath_null+0x18/0x20
->  [<ffffffff8148145e>] sd_probe_async+0x1ce/0x1e0
->  [<ffffffff81089d64>] async_run_entry_fn+0x34/0x140
->  [<ffffffff81080355>] process_one_work+0x1f5/0x690
->  [<ffffffff81080839>] worker_thread+0x49/0x490
->  [<ffffffff8108701a>] kthread+0xea/0x100
->  [<ffffffff8162d3bf>] ret_from_fork+0x1f/0x40
->
-> The test I ran is available at https://github.com/bvanassche/srp-test.
-
-I tried running this, but it seems I'm failing to configure my test
-environment correctly [1], but I'm worried that this "re-parenting the
-scsi-disk" approach, even if the above warning is addressed, may not
-be backwards compatible.  We now have an ordering difference where the
-link to the "block" attribute group is established after the disk's
-KOBJ_ADD event which seems in the same class of problems that Fam
-Zheng's patchset [2] is trying to solve.
-
-Bart, if you can help me get the test case running I can take a look
-at finishing off the disk_devt approach I proposed earlier.
-
-[1]: https://gist.github.com/djbw/1c72526c90d1ea8fe2a05dcfbfc73dda
-[2]: https://lkml.org/lkml/2016/8/17/63
+T24gMDgvMTQvMjAxNiAxMDoyMSBBTSwgSmFtZXMgQm90dG9tbGV5IHdyb3RlOg0KPiBkaWZm
+IC0tZ2l0IGEvZHJpdmVycy9zY3NpL3NkLmMgYi9kcml2ZXJzL3Njc2kvc2QuYw0KPiBpbmRl
+eCBkM2U4NTJhLi4yMjI3NzFkIDEwMDY0NA0KPiAtLS0gYS9kcml2ZXJzL3Njc2kvc2QuYw0K
+PiArKysgYi9kcml2ZXJzL3Njc2kvc2QuYw0KPiBAQCAtMzAwMCw3ICszMDAwLDEzIEBAIHN0
+YXRpYyB2b2lkIHNkX3Byb2JlX2FzeW5jKHZvaWQgKmRhdGEsIGFzeW5jX2Nvb2tpZV90IGNv
+b2tpZSkNCj4gIAl9DQo+ICANCj4gIAlibGtfcG1fcnVudGltZV9pbml0KHNkcC0+cmVxdWVz
+dF9xdWV1ZSwgZGV2KTsNCj4gLQlkZXZpY2VfYWRkX2Rpc2soZGV2LCBnZCk7DQo+ICsJLyoN
+Cj4gKwkgKiBwcmV2aW91c2x5IHRoZSBwYXJlbnQgb2YgdGhlIGdlbmRpc2sgd2FzIHRoZSBz
+Y3NpIGRldmljZS4gIEl0DQo+ICsJICogd2FzIG1vdmVkIHRvIGZpeCBsaWZldGltZSBydWxl
+cywgc28gbm93IHdlIGluc3RhbGwgYSBzeW1saW5rDQo+ICsJICogdG8gdGhlIG5ldyBsb2Nh
+dGlvbiBvZiB0aGUgYmxvY2sgY2xhc3MgZGlyZWN0b3J5DQo+ICsJICovDQo+ICsJZGV2aWNl
+X2FkZF9kaXNrKCZzZGtwLT5kZXYsIGdkKTsNCj4gKwlXQVJOX09OKHN5c2ZzX2FkZF9saW5r
+X3RvX2dyb3VwKCZkZXYtPmtvYmosICJibG9jayIsICZzZGtwLT5kZXYua29iaiwgImJsb2Nr
+IikpOw0KPiAgCWlmIChzZGtwLT5jYXBhY2l0eSkNCj4gIAkJc2RfZGlmX2NvbmZpZ19ob3N0
+KHNka3ApOw0KPiAgDQo+IEBAIC0zMTQyLDYgKzMxNDgsNyBAQCBzdGF0aWMgaW50IHNkX3Jl
+bW92ZShzdHJ1Y3QgZGV2aWNlICpkZXYpDQo+ICANCj4gIAlhc3luY19zeW5jaHJvbml6ZV9m
+dWxsX2RvbWFpbigmc2NzaV9zZF9wbV9kb21haW4pOw0KPiAgCWFzeW5jX3N5bmNocm9uaXpl
+X2Z1bGxfZG9tYWluKCZzY3NpX3NkX3Byb2JlX2RvbWFpbik7DQo+ICsJc3lzZnNfcmVtb3Zl
+X2xpbmsoJmRldi0+a29iaiwgImJsb2NrIik7DQo+ICAJZGV2aWNlX2RlbCgmc2RrcC0+ZGV2
+KTsNCj4gIAlkZWxfZ2VuZGlzayhzZGtwLT5kaXNrKTsNCj4gIAlzZF9zaHV0ZG93bihkZXYp
+Ow0KDQpIZWxsbyBKYW1lcywNCg0KU29ycnkgdGhhdCBpdCB0b29rIHNvIGxvbmcgYmVmb3Jl
+IEkgY291bGQgdGVzdCB0aGlzIHBhdGNoIGFuZA0KdGhlIHByZXZpb3VzIHBhdGNoIHRoYXQg
+d2FzIHBvc3RlZCBpbiB0aGlzIGUtbWFpbCB0aHJlYWQuIEJ1dCBJDQpkaWQgc28gZWFybGll
+ciB0aGlzIG1vcm5pbmcuIFdoYXQgSSBzZWUgaXMgdGhhdCB0aGUgZm9sbG93aW5nDQp3YXJu
+aW5nIG1lc3NhZ2UgaXMgcmVwb3J0ZWQgZnJlcXVlbnRseToNCg0KV0FSTklORzogQ1BVOiAx
+IFBJRDogMTM2IGF0IGRyaXZlcnMvc2NzaS9zZC5jOjMwMDkgc2RfcHJvYmVfYXN5bmMrMHgx
+Y2UvMHgxZTANCk1vZHVsZXMgbGlua2VkIGluOiBpYl9zcnAgbGliY3JjMzJjIHNjc2lfdHJh
+bnNwb3J0X3NycCB0YXJnZXRfY29yZV9wc2NzaSB0YXJnZXRfY29yZV9maWxlIGliX3NycHQg
+dGFyZ2V0X2NvcmVfaWJsb2NrIHRhcmdldF9jb3JlX21vZCBicmQgZG1fbXVsdGlwYXRoIHNj
+c2lfZGhfcmRhYyBzY3NpX2RoX2VtYyBzY3NpX2RoX2FsdWEgbmV0Y29uc29sZSB4dF9DSEVD
+S1NVTSBpcHRhYmxlX21hbmdsZSBpcHRfTUFTUVVFUkFERSBuZl9uYXRfbWFzcXVlcmFkZV9p
+cHY0IGlwdGFibGVfbmF0IG5mX25hdF9pcHY0IG5mX25hdCBuZl9jb25udHJhY2tfaXB2NCBu
+Zl9kZWZyYWdfaXB2NCB4dF9jb25udHJhY2sgbmZfY29ubnRyYWNrIGlwdF9SRUpFQ1QgeHRf
+dGNwdWRwIHR1biBlYnRhYmxlX2ZpbHRlciBlYnRhYmxlcyBpcDZ0YWJsZV9maWx0ZXIgaXA2
+X3RhYmxlcyBpcHRhYmxlX2ZpbHRlciBpcF90YWJsZXMgeF90YWJsZXMgYWZfcGFja2V0IGJy
+aWRnZSBzdHAgbGxjIGlzY3NpX2liZnQgaXNjc2lfYm9vdF9zeXNmcyBpYl9pcG9pYiByZG1h
+X3VjbSBpYl91Y20gaWJfdXZlcmJzIGliX3VtYWQgbXNyIHJkbWFfY20gY29uZmlnZnMgaWJf
+Y20gaXdfY20gbWx4NF9pYiBpYl9jb3JlIHNiX2VkYWMgZWRhY19jb3JlIHg4Nl9wa2dfdGVt
+cF90aGVybWFsIGludGVsX3Bvd2VyY2xhbXAgY29yZXRlbXAga3ZtX2ludGVsIGt2bSBkbV9t
+b2QgaXJxYnlwYXNzIGlwbWlfc3NpZiBjcmN0MTBkaWZfcGNsbXVsIGlwbWlfZGV2aW50ZiBj
+cmMzMl9wY2xtdWwgZ2hhc2hfY2xtdWxuaV9pbnRlbCBhZXNuaV9pbnRlbCBpVENPX3dkdCBh
+ZXNfeDg2XzY0IGxydyBpVENPX3ZlbmRvcl9zdXBwb3J0IGRjZGJhcyBnZjEyOG11bCB0ZzMg
+bWx4NF9jb3JlIGdsdWVfaGVscGVyIGFibGtfaGVscGVyIHB0cCBjcnlwdGQgZmplcyBpcG1p
+X3NpIHBjc3BrciBwcHNfY29yZSBsaWJwaHkgaXBtaV9tc2doYW5kbGVyIG1laV9tZSB0cG1f
+dGlzIHRwbV90aXNfY29yZSBtZWkgdHBtIGxwY19pY2ggc2hwY2hwIG1mZF9jb3JlIHdtaSBi
+dXR0b24gaGlkX2dlbmVyaWMgdXNiaGlkIG1nYWcyMDAgaTJjX2FsZ29fYml0IGRybV9rbXNf
+aGVscGVyIHN5c2NvcHlhcmVhIHN5c2ZpbGxyZWN0IHN5c2ltZ2JsdCBmYl9zeXNfZm9wcyB0
+dG0gZHJtIHNyX21vZCBjZHJvbSBjcmMzMmNfaW50ZWwgZWhjaV9wY2kgZWhjaV9oY2QgdXNi
+Y29yZSB1c2JfY29tbW9uIHNnIFtsYXN0IHVubG9hZGVkOiBzY3NpX3RyYW5zcG9ydF9zcnBd
+DQpDUFU6IDEgUElEOiAxMzYgQ29tbToga3dvcmtlci91NjQ6OCBUYWludGVkOiBHICAgICAg
+ICBXICAgICAgIDQuOC4wLXJjNC1kYmcrICMyDQpIYXJkd2FyZSBuYW1lOiBEZWxsIEluYy4g
+UG93ZXJFZGdlIFI0MzAvMDNYS0RWLCBCSU9TIDEuMC4yIDExLzE3LzIwMTQNCldvcmtxdWV1
+ZTogZXZlbnRzX3VuYm91bmQgYXN5bmNfcnVuX2VudHJ5X2ZuDQpDYWxsIFRyYWNlOg0KIFs8
+ZmZmZmZmZmY4MTMyNDdjNT5dIGR1bXBfc3RhY2srMHg2OC8weDkzDQogWzxmZmZmZmZmZjgx
+MDYyZjk2Pl0gX193YXJuKzB4YzYvMHhlMA0KIFs8ZmZmZmZmZmY4MTA2MzA2OD5dIHdhcm5f
+c2xvd3BhdGhfbnVsbCsweDE4LzB4MjANCiBbPGZmZmZmZmZmODE0ODE0NWU+XSBzZF9wcm9i
+ZV9hc3luYysweDFjZS8weDFlMA0KIFs8ZmZmZmZmZmY4MTA4OWQ2ND5dIGFzeW5jX3J1bl9l
+bnRyeV9mbisweDM0LzB4MTQwDQogWzxmZmZmZmZmZjgxMDgwMzU1Pl0gcHJvY2Vzc19vbmVf
+d29yaysweDFmNS8weDY5MA0KIFs8ZmZmZmZmZmY4MTA4MDgzOT5dIHdvcmtlcl90aHJlYWQr
+MHg0OS8weDQ5MA0KIFs8ZmZmZmZmZmY4MTA4NzAxYT5dIGt0aHJlYWQrMHhlYS8weDEwMA0K
+IFs8ZmZmZmZmZmY4MTYyZDNiZj5dIHJldF9mcm9tX2ZvcmsrMHgxZi8weDQwDQoNClRoZSB0
+ZXN0IEkgcmFuIGlzIGF2YWlsYWJsZSBhdCBodHRwczovL2dpdGh1Yi5jb20vYnZhbmFzc2No
+ZS9zcnAtdGVzdC4NCg0KQmFydC4NCg0K
