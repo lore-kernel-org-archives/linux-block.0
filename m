@@ -1,142 +1,82 @@
-Return-Path: <babu.moger@oracle.com>
-From: Babu Moger <babu.moger@oracle.com>
-Subject: Filesystem slow write performance
-To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Message-ID: <0fac0b7a-8723-cc5d-6118-bec29881a480@oracle.com>
-Date: Sat, 6 Aug 2016 13:49:48 -0500
+Return-Path: <aaronlee0817@163.com>
+Date: Mon, 29 Aug 2016 23:12:08 +0800 (CST)
+From: aaronlee0817 <aaronlee0817@163.com>
+To: tg <tg@kernel.org>, "jens axboe" <axboe@kernel.dk>,
+	"ming lin" <mlin@kernel.org>
+Cc: cgroup <cgroup@vger.kernel.org>, linux-block <linux-block@vger.kernel.org>,
+	"linux kernel mailing list" <linux-kernel@vger.kernel.org>,
+	"shaohua li" <shli@kernel.org>,
+	"yanzi.zhang" <yanzi.zhang@samsung.com>,
+	"zhen1.zhang" <zhen1.zhang@samsung.com>,
+	"jiale0817.li" <jiale0817.li@samsung.com>
+Subject: [AFC] cgroup: Fix block throttle bio more than once
+Content-Type: text/plain; charset=GBK
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+Message-ID: <335a26a9.11bb7.156d6db9097.Coremail.aaronlee0817@163.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Hi,
-
-Seeing some terrible write performance with ext3/4 writes.  Reads are fine.
-
-I have a created loop device and mounted as ext3(tried ext4 also).
-
-Here is iostat output. await time is pretty high most of the time.
-
-Device:         rrqm/s   wrqm/s     r/s     w/s   rsec/s   wsec/s 
-avgrq-sz avgqu-sz   await  svctm  %util
-loop0             0.00     0.00    0.00  133.00     0.00 1064.00     
-8.00   124.14  835.61   7.52 100.00
-dm-0              0.00     0.00    0.00  132.00     0.00 1056.00     
-8.00     1.00    7.52   7.52  99.20
-
-Device:         rrqm/s   wrqm/s     r/s     w/s   rsec/s   wsec/s 
-avgrq-sz avgqu-sz   await  svctm  %util
-loop0             0.00     0.00    0.00   94.00     0.00 752.00     
-8.00   124.18  901.02  10.64 100.00
-dm-0              0.00     0.00    0.00   92.00     0.00 736.00     
-8.00     1.02   11.09  10.87 100.00
-
-Device:         rrqm/s   wrqm/s     r/s     w/s   rsec/s   wsec/s 
-avgrq-sz avgqu-sz   await  svctm  %util
-loop0             0.00     0.00    0.00  132.00     0.00 1056.00     
-8.00   124.56 1329.30   7.58 100.00
-dm-0              0.00     0.00    0.00  141.00     0.00 1128.00     
-8.00     1.08    7.72   7.06  99.60
-
-Tags output
-[root@build-t7 0]# cat tags
-nr_tags=128, reserved_tags=0, bits_per_word=5
-nr_free=128, nr_reserved=0
-active_queues=0
-
-Here is the output of  "echo w > /proc/sysrq-trigger" when the problem 
-happens.
-
-Aug  3 12:18:55 build-t7 kernel: kworker/u512:0  D 00000000009defd4     
-0     6      2 0x06000000
-Aug  3 12:18:55 build-t7 kernel: Workqueue: writeback 
-bdi_writeback_workfn (flush-7:0)
-Aug  3 12:18:55 build-t7 kernel: Call Trace:
-Aug  3 12:18:55 build-t7 kernel: [00000000009dc9e4] schedule+0x24/0xa0
-Aug  3 12:18:55 build-t7 kernel: [00000000009defd4] 
-schedule_timeout+0x134/0x220
-Aug  3 12:18:55 build-t7 kernel: [00000000009dc044] 
-io_schedule_timeout+0x84/0x100
-Aug  3 12:18:55 build-t7 kernel: [00000000006be64c] bt_get+0x10c/0x1e0
-Aug  3 12:18:55 build-t7 kernel: [00000000006be7f4] blk_mq_get_tag+0x74/0xe0
-Aug  3 12:18:55 build-t7 kernel: [00000000006ba570] 
-__blk_mq_alloc_request+0x10/0x180
-Aug  3 12:18:55 build-t7 kernel: [00000000006bb9f4] 
-blk_mq_map_request+0x1d4/0x260
-Aug  3 12:18:55 build-t7 kernel: [00000000006bbd40] 
-blk_sq_make_request+0x60/0x300
-Aug  3 12:18:55 build-t7 kernel: [00000000006afa58] 
-generic_make_request+0x78/0xe0
-Aug  3 12:18:55 build-t7 kernel: [00000000006afb44] submit_bio+0x84/0x160
-Aug  3 12:18:55 build-t7 kernel: [00000000005f7cb4] _submit_bh+0x174/0x200
-Aug  3 12:18:55 build-t7 kernel: [00000000005f7d54] submit_bh+0x14/0x40
-Aug  3 12:18:55 build-t7 kernel: [00000000005fc248] 
-__block_write_full_page.clone.0+0x2c8/0x500
-Aug  3 12:18:55 build-t7 kernel: [00000000005fc620] 
-block_write_full_page+0xa0/0xe0
-Aug  3 12:18:55 build-t7 kernel: [00000000100e7d94] 
-ext3_writeback_writepage+0x134/0x200 [ext3]
-Aug  3 12:18:55 build-t7 kernel: [0000000000562798] __writepage+0x18/0x60
-
-Aug  3 12:18:55 build-t7 kernel: loop0           D 00000000009deff4     
-0 15632      2 0x01000400
-Aug  3 12:18:55 build-t7 kernel: Call Trace:
-Aug  3 12:18:55 build-t7 kernel: [00000000009dc9e4] schedule+0x24/0xa0
-Aug  3 12:18:55 build-t7 kernel: [00000000009deff4] 
-schedule_timeout+0x154/0x220
-Aug  3 12:18:55 build-t7 kernel: [00000000009dc044] 
-io_schedule_timeout+0x84/0x100
-Aug  3 12:18:55 build-t7 kernel: [00000000009dcdbc] bit_wait_io+0x3c/0x80
-Aug  3 12:18:55 build-t7 kernel: [00000000009dd1c4] __wait_on_bit+0x84/0x100
-Aug  3 12:18:55 build-t7 kernel: [000000000055719c] 
-wait_on_page_bit+0x7c/0xa0
-Aug  3 12:18:55 build-t7 kernel: [00000000005586a8] 
-filemap_fdatawait_range+0xc8/0x140
-Aug  3 12:18:55 build-t7 kernel: [00000000005587fc] 
-filemap_write_and_wait_range+0x3c/0x80
-Aug  3 12:18:55 build-t7 kernel: [0000000000558a58] 
-__generic_file_write_iter+0xb8/0x140
-Aug  3 12:18:55 build-t7 kernel: [0000000000558bac] 
-generic_file_write_iter+0xcc/0x1e0
-Aug  3 12:18:55 build-t7 kernel: [00000000007ca000] lo_rw_aio+0x180/0x240
-Aug  3 12:18:55 build-t7 kernel: [00000000007ca260] 
-do_req_filebacked+0x1a0/0x1c0
-Aug  3 12:18:55 build-t7 kernel: [00000000007ca2b4] 
-loop_queue_work+0x34/0x80
-Aug  3 12:18:55 build-t7 kernel: [0000000000491944] 
-kthread_worker_fn+0x44/0x180
-Aug  3 12:18:55 build-t7 kernel: [0000000000491c4c] kthread+0xac/0xe0
-Aug  3 12:18:55 build-t7 kernel: [0000000000406184] ret_from_fork+0x1c/0x2c
-
-Aug  3 12:18:55 build-t7 kernel: livecd-creator  D 00000000009deff4     
-0 15627   2676 0x308000103000400
-Aug  3 12:18:55 build-t7 kernel: Call Trace:
-Aug  3 12:18:55 build-t7 kernel: [00000000009dc9e4] schedule+0x24/0xa0
-Aug  3 12:18:55 build-t7 kernel: [00000000009deff4] 
-schedule_timeout+0x154/0x220
-Aug  3 12:18:55 build-t7 kernel: [00000000009dc044] 
-io_schedule_timeout+0x84/0x100
-Aug  3 12:18:55 build-t7 kernel: [00000000009dcdbc] bit_wait_io+0x3c/0x80
-Aug  3 12:18:55 build-t7 kernel: [00000000009dd1c4] __wait_on_bit+0x84/0x100
-Aug  3 12:18:55 build-t7 kernel: [000000000055719c] 
-wait_on_page_bit+0x7c/0xa0
-Aug  3 12:18:55 build-t7 kernel: [00000000005586a8] 
-filemap_fdatawait_range+0xc8/0x140
-Aug  3 12:18:55 build-t7 kernel: [00000000005587fc] 
-filemap_write_and_wait_range+0x3c/0x80
-Aug  3 12:18:55 build-t7 kernel: [00000000100e4258] 
-ext3_sync_file+0x58/0x2c0 [ext3]
-Aug  3 12:18:55 build-t7 kernel: [00000000005f54d8] 
-vfs_fsync_range+0x38/0xa0
-Aug  3 12:18:55 build-t7 kernel: [00000000005f555c] vfs_fsync+0x1c/0x40
-Aug  3 12:18:55 build-t7 kernel: [00000000005f55a8] do_fsync+0x28/0x60
-Aug  3 12:18:55 build-t7 kernel: [00000000005f55f0] SyS_fdatasync+0x10/0x40
-
-I am not an expert on this area. Note that I am bit behind on the kernel 
-version(but not a whole lot). Working on to recreate this
-with latest upstream kernel. Looked at the upstream patches and tried 
-most of the upstream patches which appear to be related
-and nothing helped. Problem is fairly easy to reproduce. Let me know if 
-you want me to try something.
-Thanks
-Babu Moger
+SGkgVGVqdW4sCgpGZXcgbW9udGhzIGFnbywgd2Ugc2VuZCBhbiBlbWFpbCB0byB0ZWxsIHRoZSBw
+cm9ibGVtIG9mIGJsa2lvIHRocm90dGxlIHRoZSBzcGxpdCBiaW8KbW9yZSB0aGFuIG9uY2UsIHdo
+aWNoIGxlYWRzIHRvIHRoZSBhY3R1YWwgYmFuZHdpZHRoIGlzIHNtYWxsZXIgdGhhbiB3ZSBoYXZl
+IHNldC4KQW5kIHdlIHRyeSB0byBmaXggdGhpcyBieSBhZGRpbmcgYSBmbGFnIGJpdCBCSU9fU1BM
+SVQgaW4gYmlvIGZsYWcgZmllbGQuIEFuZCB0aGVzZSBkYXlzCndlIGRpZCBzb21lIGVuaGFuY2Ug
+dGVzdCwgYW5kIGZvdW5kIHRoYXQgdGhlIGxhc3QgcGF0Y2ggd2Ugc2VudCB0byB5b3UgY2F1c2Vz
+IGFub3RoZXIKcHJvYmxlbSBvZiBpb3BzIHRocm90dGxlIHdoaWNoIHRocm90dGxlIHRoZSBpb3Bz
+IG11Y2ggdGhhbiB3aGF0IHdlIHNldC4gQmVjYXVzZSBzcGxpdApiaW8gc2hvdWxkIGJlIGNvdW50
+IG1vcmUgdGhhbiBvbmNlIG9mIGlvcHMsIG5vdCBvbmx5IG9uY2UuIAoKQWZ0ZXIgb3VyIHRlc3Rp
+bmcsIHdlIHByb3Bvc2UgdGhpcyBwYXRjaCB0byBmaXggYm90aCBicHMgYW5kIGlvcHMgdGhyb3R0
+bGUgcHJvYmxlbSBhbmQgCndhbnQgdG8gYXNrIGZvciB5b3VyIGNvbW1lbnQuIFRoYW5rcy4KCkZy
+b20gZWIxYjFjNzU0ZDRiMjY3NDA1YjVhMGQ2MmY4YjNmN2Y3Yjg1ZGY4ZCBNb24gU2VwIDE3IDAw
+OjAwOjAwIDIwMDEKRnJvbTogSmlhbGUgTGkgPGFhcm9ubGVlMDgxN0AxNjMuY29tPgpEYXRlOiBN
+b24sIDI5IEF1ZyAyMDE2IDEwOjI1OjQ3IC0wNDAwClN1YmplY3Q6IFtQQVRDSF0gRml4IGJsb2Nr
+IHRocm90dGxlIGJpbyBtb3JlIHRoYW4gb25jZQoKU2lnbmVkLW9mZi1ieTogSmlhbGUgTGkgPGFh
+cm9ubGVlMDgxN0AxNjMuY29tPgotLS0KIGJsb2NrL2Jsay1tZXJnZS5jICAgICAgICAgIHwgMSAr
+CiBibG9jay9ibGstdGhyb3R0bGUuYyAgICAgICB8IDkgKysrKysrKystCiBpbmNsdWRlL2xpbnV4
+L2Jsay1jZ3JvdXAuaCB8IDYgKysrKy0tCiBpbmNsdWRlL2xpbnV4L2Jsa190eXBlcy5oICB8IDEg
+KwogNCBmaWxlcyBjaGFuZ2VkLCAxNCBpbnNlcnRpb25zKCspLCAzIGRlbGV0aW9ucygtKQoKZGlm
+ZiAtLWdpdCBhL2Jsb2NrL2Jsay1tZXJnZS5jIGIvYmxvY2svYmxrLW1lcmdlLmMKaW5kZXggN2Ix
+N2E2NS4uMDc0ZjJiZCAxMDA2NDQKLS0tIGEvYmxvY2svYmxrLW1lcmdlLmMKKysrIGIvYmxvY2sv
+YmxrLW1lcmdlLmMKQEAgLTE5MCw3ICsxOTAsNyBAQCB2b2lkIGJsa19xdWV1ZV9zcGxpdChzdHJ1
+Y3QgcmVxdWVzdF9xdWV1ZSAqcSwgc3RydWN0IGJpbyAqKmJpbywKIAogCQliaW9fY2hhaW4oc3Bs
+aXQsICpiaW8pOwogCQl0cmFjZV9ibG9ja19zcGxpdChxLCBzcGxpdCwgKCpiaW8pLT5iaV9pdGVy
+LmJpX3NlY3Rvcik7CisJCWJpb19zZXRfZmxhZygqYmlvLCBCSU9fU1BMSVQpOwogCQlnZW5lcmlj
+X21ha2VfcmVxdWVzdCgqYmlvKTsKIAkJKmJpbyA9IHNwbGl0OwogCX0KZGlmZiAtLWdpdCBhL2Js
+b2NrL2Jsay10aHJvdHRsZS5jIGIvYmxvY2svYmxrLXRocm90dGxlLmMKaW5kZXggNGZmZGU5NS4u
+NTNhN2Q2NyAxMDA2NDQKLS0tIGEvYmxvY2svYmxrLXRocm90dGxlLmMKKysrIGIvYmxvY2svYmxr
+LXRocm90dGxlLmMKQEAgLTcyMSw2ICs3MjEsMTIgQEAgc3RhdGljIGJvb2wgdGdfd2l0aF9pbl9i
+cHNfbGltaXQoc3RydWN0IHRocm90bF9ncnAgKnRnLCBzdHJ1Y3QgYmlvICpiaW8sCiAJdTY0IGJ5
+dGVzX2FsbG93ZWQsIGV4dHJhX2J5dGVzLCB0bXA7CiAJdW5zaWduZWQgbG9uZyBqaWZmeV9lbGFw
+c2VkLCBqaWZmeV93YWl0LCBqaWZmeV9lbGFwc2VkX3JuZDsKIAorCWlmIChiaW9fZmxhZ2dlZChi
+aW8sIEJJT19TUExJVCkpIHsKKwkJaWYgKHdhaXQpCisJCQkqd2FpdCA9IDA7CisJCXJldHVybiB0
+cnVlOworCX0KKwogCWppZmZ5X2VsYXBzZWQgPSBqaWZmeV9lbGFwc2VkX3JuZCA9IGppZmZpZXMg
+LSB0Zy0+c2xpY2Vfc3RhcnRbcnddOwogCiAJLyogU2xpY2UgaGFzIGp1c3Qgc3RhcnRlZC4gQ29u
+c2lkZXIgb25lIHNsaWNlIGludGVydmFsICovCkBAIC04MTcsNyArODIzLDggQEAgc3RhdGljIHZv
+aWQgdGhyb3RsX2NoYXJnZV9iaW8oc3RydWN0IHRocm90bF9ncnAgKnRnLCBzdHJ1Y3QgYmlvICpi
+aW8pCiAJYm9vbCBydyA9IGJpb19kYXRhX2RpcihiaW8pOwogCiAJLyogQ2hhcmdlIHRoZSBiaW8g
+dG8gdGhlIGdyb3VwICovCi0JdGctPmJ5dGVzX2Rpc3BbcnddICs9IGJpby0+YmlfaXRlci5iaV9z
+aXplOworCWlmICghYmlvX2ZsYWdnZWQoYmlvLCBCSU9fU1BMSVQpKQorCQl0Zy0+Ynl0ZXNfZGlz
+cFtyd10gKz0gYmlvLT5iaV9pdGVyLmJpX3NpemU7CiAJdGctPmlvX2Rpc3BbcnddKys7CiAKIAkv
+KgpkaWZmIC0tZ2l0IGEvaW5jbHVkZS9saW51eC9ibGstY2dyb3VwLmggYi9pbmNsdWRlL2xpbnV4
+L2Jsay1jZ3JvdXAuaAppbmRleCBjMDJlNjY5Li4yNGRjMDliIDEwMDY0NAotLS0gYS9pbmNsdWRl
+L2xpbnV4L2Jsay1jZ3JvdXAuaAorKysgYi9pbmNsdWRlL2xpbnV4L2Jsay1jZ3JvdXAuaApAQCAt
+MTksNiArMTksNyBAQAogI2luY2x1ZGUgPGxpbnV4L3JhZGl4LXRyZWUuaD4KICNpbmNsdWRlIDxs
+aW51eC9ibGtkZXYuaD4KICNpbmNsdWRlIDxsaW51eC9hdG9taWMuaD4KKyNpbmNsdWRlIDxsaW51
+eC9ibGtfdHlwZXMuaD4KIAogLyogcGVyY3B1X2NvdW50ZXIgYmF0Y2ggZm9yIGJsa2dfW3J3XXN0
+YXRzLCBwZXItY3B1IGRyaWZ0IGRvZXNuJ3QgbWF0dGVyICovCiAjZGVmaW5lIEJMS0dfU1RBVF9D
+UFVfQkFUQ0gJKElOVF9NQVggLyAyKQpAQCAtNzEzLDggKzcxNCw5IEBAIHN0YXRpYyBpbmxpbmUg
+Ym9vbCBibGtjZ19iaW9faXNzdWVfY2hlY2soc3RydWN0IHJlcXVlc3RfcXVldWUgKnEsCiAKIAlp
+ZiAoIXRocm90bCkgewogCQlibGtnID0gYmxrZyA/OiBxLT5yb290X2Jsa2c7Ci0JCWJsa2dfcndz
+dGF0X2FkZCgmYmxrZy0+c3RhdF9ieXRlcywgYmlvLT5iaV9ydywKLQkJCQliaW8tPmJpX2l0ZXIu
+Ymlfc2l6ZSk7CisJCWlmICghYmlvX2ZsYWdnZWQoYmlvLCBCSU9fU1BMSVQpKQorCQkJYmxrZ19y
+d3N0YXRfYWRkKCZibGtnLT5zdGF0X2J5dGVzLCBiaW8tPmJpX3J3LAorCQkJCQliaW8tPmJpX2l0
+ZXIuYmlfc2l6ZSk7CiAJCWJsa2dfcndzdGF0X2FkZCgmYmxrZy0+c3RhdF9pb3MsIGJpby0+Ymlf
+cncsIDEpOwogCX0KIApkaWZmIC0tZ2l0IGEvaW5jbHVkZS9saW51eC9ibGtfdHlwZXMuaCBiL2lu
+Y2x1ZGUvbGludXgvYmxrX3R5cGVzLmgKaW5kZXggYjI5NDc4MC4uZTBlNDE4ZiAxMDA2NDQKLS0t
+IGEvaW5jbHVkZS9saW51eC9ibGtfdHlwZXMuaAorKysgYi9pbmNsdWRlL2xpbnV4L2Jsa190eXBl
+cy5oCkBAIC0xMjAsNyArMTIwLDcgQEAgc3RydWN0IGJpbyB7CiAjZGVmaW5lIEJJT19RVUlFVAk2
+CS8qIE1ha2UgQklPIFF1aWV0ICovCiAjZGVmaW5lIEJJT19DSEFJTgk3CS8qIGNoYWluZWQgYmlv
+LCAtPmJpX3JlbWFpbmluZyBpbiBlZmZlY3QgKi8KICNkZWZpbmUgQklPX1JFRkZFRAk4CS8qIGJp
+byBoYXMgZWxldmF0ZWQgLT5iaV9jbnQgKi8KKyNkZWZpbmUgQklPX1NQTElUICAgICAgIDkgICAg
+ICAgLyogYmlvIGhhcyBiZWVuIHNwbGl0ZWQgKi8KIAogLyoKICAqIEZsYWdzIHN0YXJ0aW5nIGhl
+cmUgZ2V0IHByZXNlcnZlZCBieSBiaW9fcmVzZXQoKSAtIHRoaXMgaW5jbHVkZXMKLS0gCjEuOS4x
+Cg==
