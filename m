@@ -1,146 +1,102 @@
-Return-Path: <shaun.tancheff@gmail.com>
-Return-Path: <shaun.tancheff@gmail.com>
-Sender: Shaun Tancheff <shaun.tancheff@gmail.com>
-From: Shaun Tancheff <shaun@tancheff.com>
-To: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Shaun Tancheff <shaun@tancheff.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>,
-	"James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	Damien Le Moal <damien.lemoal@hgst.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Josh Bingaman <josh.bingaman@seagate.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Geert Uytterhoeven <geert@linux-m68k.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Mauro Carvalho Chehab <mchehab@kernel.org>,
-	Guenter Roeck <linux@roeck-us.net>,
-	Ming Lei <ming.lei@canonical.com>,
-	Mike Christie <michaelc@cs.wisc.edu>,
-	Keith Busch <keith.busch@intel.com>,
-	Mike Snitzer <snitzer@redhat.com>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Shaohua Li <shli@fb.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	stephen hemminger <stephen@networkplumber.org>,
-	Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
-	Alexandre Bounine <alexandre.bounine@idt.com>,
-	Asias He <asias@redhat.com>,
-	Sabrina Dubroca <sd@queasysnail.net>,
-	Mike Frysinger <vapier@gentoo.org>,
-	Andrea Arcangeli <aarcange@redhat.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Jeff Layton <jlayton@poochiereds.net>,
-	"J . Bruce Fields" <bfields@fieldses.org>
-Subject: [PATCH v8 0/2] Block layer support ZAC/ZBC commands
-Date: Sun, 21 Aug 2016 23:20:08 -0500
-Message-Id: <20160822042010.32416-1-shaun@tancheff.com>
+Return-Path: <jinpuwang@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <CAJrWOzCUzPiFUOS5HbToB1AdsMKFGG=UQHAr5=ZL5KYGyf2GLg@mail.gmail.com>
+References: <20160808113908.5445-1-roman.penyaev@profitbricks.com>
+ <20160810035542.GE25053@mtj.duckdns.org> <CAJrWOzCWfMN7qKipgWn2P0dfycu4y5DQysD+7Q1UANgXBgw0+g@mail.gmail.com>
+ <CAJrWOzCUzPiFUOS5HbToB1AdsMKFGG=UQHAr5=ZL5KYGyf2GLg@mail.gmail.com>
+From: =?UTF-8?B?546L6YeR5rWm?= <jinpuwang@gmail.com>
+Date: Tue, 30 Aug 2016 11:37:10 +0200
+Message-ID: <CAD9gYJJfvKeNU=QeQPm-mCqc3O9sfMQoTgVFnAqKLpcac+P5xQ@mail.gmail.com>
+Subject: Re: [PATCH v2 1/1] blk-mq: fix hang caused by freeze/unfreeze sequence
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Tejun Heo <tj@kernel.org>, Akinobu Mita <akinobu.mita@gmail.com>,
+	Roman Penyaev <roman.penyaev@profitbricks.com>, Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
+	LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
+
+2016-08-10 13:36 GMT+02:00 Roman Penyaev <roman.penyaev@profitbricks.com>:
+> On Wed, Aug 10, 2016 at 10:42 AM, Roman Penyaev
+> <roman.penyaev@profitbricks.com> wrote:
+>> Hi,
+>>
+>> On Wed, Aug 10, 2016 at 5:55 AM, Tejun Heo <tj@kernel.org> wrote:
+>>> Hello,
+>>>
+>>> On Mon, Aug 08, 2016 at 01:39:08PM +0200, Roman Pen wrote:
+>>>> Long time ago there was a similar fix proposed by Akinobu Mita[1],
+>>>> but it seems that time everyone decided to fix this subtle race in
+>>>> percpu-refcount and Tejun Heo[2] did an attempt (as I can see that
+>>>> patchset was not applied).
+>>>
+>>> So, I probably forgot about it while waiting for confirmation of fix.
+>>> Can you please verify that the patchset fixes the issue?  I can apply
+>>> the patchset right away.
+>>
+>> I have not checked your patchset but according to my understanding
+>> it should not fix *this* issue.
+>
+> So, your patchset does not help (but for sure it helps for keeping
+> internal percpu-refcount members consistent, but that is not related
+> to this issue).  That's the backtrace which I observe:
+>
+> Call Trace:
+>  [<ffffffff810ba8df>] ? vprintk_default+0x1f/0x30
+>  [<ffffffff816a47f5>] schedule+0x35/0x80
+>  [<ffffffff81336154>] blk_mq_freeze_queue_wait+0x124/0x1a0
+>  [<ffffffff810a3f70>] ? wake_atomic_t_function+0x60/0x60
+>  [<ffffffff8133821a>] blk_mq_freeze_queue+0x1a/0x20
+>  [<ffffffff8133822e>] blk_freeze_queue+0xe/0x10
+>  [<ffffffff81329cc2>] blk_cleanup_queue+0xe2/0x280
+>
+> To ease reproduction I do the following:
+>
+> -------------------------------------------
+> static int thread_fn(void *data)
+> {
+>     struct blk_mq_tag_set *tags = data;
+>     struct request_queue *q;
+>
+>     while (!kthread_should_stop()) {
+>         q = blk_mq_init_queue(tags);
+>         BUG_ON(q == NULL);
+>         /*
+>          * That is done by blk_register_queue(), but here
+>          * we are reproducing blk-mq bug and do not require
+>          * gendisk and friends.  Just silently switch to percpu.
+>          */
+>         percpu_ref_switch_to_percpu(&q->q_usage_counter);
+>
+>         msleep(prandom_u32_max(10));
+>         blk_cleanup_queue(q);
+>     }
+>
+>     return 0;
+> }
+> -------------------------------------------
+>
+> o Start 2 threads (exactly 2, we need 2 queues for 1 shared tags)
+> o Pass same shared tags pointer for each thread
+> o Wait
+> o PROFIT
+>
+> To make immediate reproduction this hunk can be applied:
+>
+> @@ -129,6 +142,7 @@ void blk_mq_unfreeze_queue(struct request_queue *q)
+>         freeze_depth = atomic_dec_return(&q->mq_freeze_depth);
+>         WARN_ON_ONCE(freeze_depth < 0);
+>         if (!freeze_depth) {
+> +               msleep(1000);
+>                 percpu_ref_reinit(&q->q_usage_counter);
+>                 wake_up_all(&q->mq_freeze_wq);
+>         }
+>
+> --
+> Roman
 
 Hi Jens,
 
-This series is based on linus' v4.8-rc2 branch.
+I didn't see this patch in you tree, what's the blocker?
 
-As Host Aware drives are becoming available we would like to be able
-to make use of such drives. This series is also intended to be
-suitable for use by Host Managed drives.
-
-ZBC [and ZAC] drives add new commands for discovering and working
-with Zones.
-
-Part one of this series expands the bio/request reserved op size from
-3 to 4 bits and then adds op codes for each of the ZBC commands:
-   Report zones, close zone, finish zone, open zone and reset zone.
-
-Part two of this series deals with integrating these new bio/request
-op's with Hannes' zone cache.
-
-This extends the ZBC support up to the block layer allowing direct
-control by file systems or device mapper targets. Also by deferring
-the zone handling to the authoritative subsystem there is an overall
-lower memory usage for holding the active zone information as well
-as clarifying responsible party for maintaining the write pointer
-for each active zone.
-
-By way of example a DM target may have several writes in progress. To sector
-(or lba) for those writes will each depend on the previous write. While the
-drive's write pointer will be updated as writes are completed the DM target
-will be maintaining both where the next write should be scheduled from and
-where the write pointer is based on writes completed w/o errors.
-
-Knowing the drive zone topology enables DM targets and file systems to
-extend their block allocation schemes and issue write pointer resets (or
-discards) that are zone aligned.
-
-A perhaps non-obvious approach is that a conventional drive will
-returns a zone report descriptor with a single large conventional zone.
-This is intended to allow a collection of zoned and non-zoned media to
-be stitched together to provide a file system with a zoned device with
-conventional space mapped to where it is useful.
-
-Patches for util-linux can be found here:
-    git@github.com:stancheff/util-linux.git v2.28.1+biof
-
-    https://github.com/stancheff/util-linux/tree/v2.28.1%2Bbiof
-
-This patch is available here:
-    https://github.com/stancheff/linux/tree/v4.8-rc2%2Bbiof.v8
-
-    git@github.com:stancheff/linux.git v4.8-rc2+biof.v8
-
-v8:
- - Changed zone report to default to reading from zone cache.
- - Changed ioctl for zone commands to support forcing a query or command
-   to be sent to media.
- - Fixed report zones copy to user to work when HARDENED_USERCOPY is enabled
-v7:
- - Initial support for Hannes' zone cache.
-v6:
- - Fix page alloc to include DMA flag for ioctl.
-v5:
- - In sd_setup_zone_action_cmnd, remove unused vars and fix switch indent
- - In blk-lib fix documentation
-v4:
- - Rebase on linux-next tag next-20160617.
- - Change bio flags to bio op's
- - Dropped ata16 hackery
-V3:
- - Rebase on Mike Cristie's separate bio operations
- - Update blkzoned_api.h to include report zones PARTIAL bit.
- - Use zoned report reserved bit for ata-passthrough flag.
-
-V2:
- - Changed bi_rw to op_flags clarify sepeartion of bio op from flags.
- - Fixed memory leak in blkdev_issue_zone_report failing to put_bio().
- - Documented opt in blkdev_issue_zone_report.
- - Moved include/uapi/linux/fs.h changes to patch 3
- - Fixed commit message for first patch in series.
-
-
-Shaun Tancheff (2):
-  Add bio/request flags to issue ZBC/ZAC commands
-  Add ioctl to issue ZBC/ZAC commands via block layer
-
- MAINTAINERS                       |   9 ++
- block/blk-lib.c                   |  94 +++++++++++++++++
- block/ioctl.c                     | 149 +++++++++++++++++++++++++++
- drivers/scsi/sd.c                 | 121 ++++++++++++++++++++++
- drivers/scsi/sd.h                 |   1 +
- include/linux/bio.h               |   8 +-
- include/linux/blk_types.h         |   7 +-
- include/linux/blkdev.h            |   1 +
- include/linux/blkzoned_api.h      |  25 +++++
- include/uapi/linux/Kbuild         |   1 +
- include/uapi/linux/blkzoned_api.h | 210 ++++++++++++++++++++++++++++++++++++++
- include/uapi/linux/fs.h           |   1 +
- 12 files changed, 625 insertions(+), 2 deletions(-)
- create mode 100644 include/linux/blkzoned_api.h
- create mode 100644 include/uapi/linux/blkzoned_api.h
-
--- 
-2.9.3
+Thanks,
+Jinpu
