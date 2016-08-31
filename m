@@ -3,140 +3,575 @@ From: Jens Axboe <axboe@fb.com>
 To: <axboe@kernel.dk>, <linux-kernel@vger.kernel.org>,
         <linux-fsdevel@vger.kernel.org>, <linux-block@vger.kernel.org>
 CC: Jens Axboe <axboe@fb.com>
-Subject: [PATCH 2/8] writeback: add wbc_to_write_flags()
-Date: Wed, 31 Aug 2016 11:05:45 -0600
-Message-ID: <1472663151-18560-3-git-send-email-axboe@fb.com>
+Subject: [PATCH 8/8] writeback: throttle buffered writeback
+Date: Wed, 31 Aug 2016 11:05:51 -0600
+Message-ID: <1472663151-18560-9-git-send-email-axboe@fb.com>
 In-Reply-To: <1472663151-18560-1-git-send-email-axboe@fb.com>
 References: <1472663151-18560-1-git-send-email-axboe@fb.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-Add wbc_to_write_flags(), which returns the write modifier flags to use,
-based on a struct writeback_control. No functional changes in this
-patch, but it prepares us for factoring other wbc fields for write type.
+Test patch that throttles buffered writeback to make it a lot
+more smooth, and has way less impact on other system activity.
+Background writeback should be, by definition, background
+activity. The fact that we flush huge bundles of it at the time
+means that it potentially has heavy impacts on foreground workloads,
+which isn't ideal. We can't easily limit the sizes of writes that
+we do, since that would impact file system layout in the presence
+of delayed allocation. So just throttle back buffered writeback,
+unless someone is waiting for it.
+
+The algorithm for when to throttle takes its inspiration in the
+CoDel networking scheduling algorithm. Like CoDel, blk-wb monitors
+the minimum latencies of requests over a window of time. In that
+window of time, if the minimum latency of any request exceeds a
+given target, then a scale count is incremented and the queue depth
+is shrunk. The next monitoring window is shrunk accordingly. Unlike
+CoDel, if we hit a window that exhibits good behavior, then we
+simply increment the scale count and re-calculate the limits for that
+scale value. This prevents us from oscillating between a
+close-to-ideal value and max all the time, instead remaining in the
+windows where we get good behavior.
+
+The patch registers two sysfs entries. The first one, 'wb_window_usec',
+defines the window of monitoring. The second one, 'wb_lat_usec',
+sets the latency target for the window. It defaults to 2 msec for
+non-rotational storage, and 75 msec for rotational storage. Setting
+this value to '0' disables blk-wb. Generally, a user would not have
+to touch these settings.
+
+We don't enable WBT on devices that are managed with CFQ, and have
+a non-root block cgroup attached. If we have a proportional share setup
+on this particular disk, then the wbt throttling will interfere with
+that. We don't have a strong need for wbt for that case, since we will
+rely on CFQ doing that for us.
 
 Signed-off-by: Jens Axboe <axboe@fb.com>
-Reviewed-by: Jan Kara <jack@suse.cz>
 ---
- fs/buffer.c               | 2 +-
- fs/f2fs/data.c            | 2 +-
- fs/f2fs/node.c            | 2 +-
- fs/gfs2/meta_io.c         | 3 +--
- fs/mpage.c                | 2 +-
- fs/xfs/xfs_aops.c         | 7 +++----
- include/linux/writeback.h | 8 ++++++++
- 7 files changed, 16 insertions(+), 10 deletions(-)
+ Documentation/block/queue-sysfs.txt |  13 ++++
+ block/Kconfig                       |   1 +
+ block/blk-core.c                    |  20 +++++-
+ block/blk-mq.c                      |  30 ++++++++-
+ block/blk-settings.c                |   3 +
+ block/blk-stat.c                    |   5 +-
+ block/blk-sysfs.c                   | 119 ++++++++++++++++++++++++++++++++++++
+ block/cfq-iosched.c                 |  12 ++++
+ include/linux/blkdev.h              |   6 +-
+ 9 files changed, 200 insertions(+), 9 deletions(-)
 
-diff --git a/fs/buffer.c b/fs/buffer.c
-index 9c8eb9b6db6a..6a5f1a01102e 100644
---- a/fs/buffer.c
-+++ b/fs/buffer.c
-@@ -1698,7 +1698,7 @@ int __block_write_full_page(struct inode *inode, struct page *page,
- 	struct buffer_head *bh, *head;
- 	unsigned int blocksize, bbits;
- 	int nr_underway = 0;
--	int write_flags = (wbc->sync_mode == WB_SYNC_ALL ? WRITE_SYNC : 0);
-+	int write_flags = wbc_to_write_flags(wbc);
+diff --git a/Documentation/block/queue-sysfs.txt b/Documentation/block/queue-sysfs.txt
+index 2a3904030dea..2847219ebd8c 100644
+--- a/Documentation/block/queue-sysfs.txt
++++ b/Documentation/block/queue-sysfs.txt
+@@ -169,5 +169,18 @@ This is the number of bytes the device can write in a single write-same
+ command.  A value of '0' means write-same is not supported by this
+ device.
  
- 	head = create_page_buffers(page, inode,
- 					(1 << BH_Dirty)|(1 << BH_Uptodate));
-diff --git a/fs/f2fs/data.c b/fs/f2fs/data.c
-index ccb401eebc11..cb0528b31eb0 100644
---- a/fs/f2fs/data.c
-+++ b/fs/f2fs/data.c
-@@ -1240,7 +1240,7 @@ static int f2fs_write_data_page(struct page *page,
- 		.sbi = sbi,
- 		.type = DATA,
- 		.op = REQ_OP_WRITE,
--		.op_flags = (wbc->sync_mode == WB_SYNC_ALL) ? WRITE_SYNC : 0,
-+		.op_flags = wbc_to_write_flags(wbc),
- 		.page = page,
- 		.encrypted_page = NULL,
- 	};
-diff --git a/fs/f2fs/node.c b/fs/f2fs/node.c
-index f75d197d5beb..c1713da2542f 100644
---- a/fs/f2fs/node.c
-+++ b/fs/f2fs/node.c
-@@ -1561,7 +1561,7 @@ static int f2fs_write_node_page(struct page *page,
- 		.sbi = sbi,
- 		.type = NODE,
- 		.op = REQ_OP_WRITE,
--		.op_flags = (wbc->sync_mode == WB_SYNC_ALL) ? WRITE_SYNC : 0,
-+		.op_flags = wbc_to_write_flags(wbc),
- 		.page = page,
- 		.encrypted_page = NULL,
- 	};
-diff --git a/fs/gfs2/meta_io.c b/fs/gfs2/meta_io.c
-index 950b8be68e41..7991c62e9d6f 100644
---- a/fs/gfs2/meta_io.c
-+++ b/fs/gfs2/meta_io.c
-@@ -37,8 +37,7 @@ static int gfs2_aspace_writepage(struct page *page, struct writeback_control *wb
- {
- 	struct buffer_head *bh, *head;
- 	int nr_underway = 0;
--	int write_flags = REQ_META | REQ_PRIO |
--		(wbc->sync_mode == WB_SYNC_ALL ? WRITE_SYNC : 0);
-+	int write_flags = REQ_META | REQ_PRIO | wbc_to_write_flags(wbc);
++wb_lat_usec (RW)
++----------------
++If the device is registered for writeback throttling, then this file shows
++the target minimum read latency. If this latency is exceeded in a given
++window of time (see wb_window_usec), then the writeback throttling will start
++scaling back writes.
++
++wb_window_usec (RW)
++-------------------
++If the device is registered for writeback throttling, then this file shows
++the value of the monitoring window in which we'll look at the target
++latency. See wb_lat_usec.
++
  
- 	BUG_ON(!PageLocked(page));
- 	BUG_ON(!page_has_buffers(page));
-diff --git a/fs/mpage.c b/fs/mpage.c
-index d2413af0823a..d6f1afe3397a 100644
---- a/fs/mpage.c
-+++ b/fs/mpage.c
-@@ -489,7 +489,7 @@ static int __mpage_writepage(struct page *page, struct writeback_control *wbc,
- 	struct buffer_head map_bh;
- 	loff_t i_size = i_size_read(inode);
- 	int ret = 0;
--	int op_flags = (wbc->sync_mode == WB_SYNC_ALL ?  WRITE_SYNC : 0);
-+	int op_flags = wbc_to_write_flags(wbc);
+ Jens Axboe <jens.axboe@oracle.com>, February 2009
+diff --git a/block/Kconfig b/block/Kconfig
+index 161491d0a879..6da79e670709 100644
+--- a/block/Kconfig
++++ b/block/Kconfig
+@@ -4,6 +4,7 @@
+ menuconfig BLOCK
+        bool "Enable the block layer" if EXPERT
+        default y
++       select WBT
+        help
+ 	 Provide block layer support for the kernel.
  
- 	if (page_has_buffers(page)) {
- 		struct buffer_head *head = page_buffers(page);
-diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
-index 7575cfc3ad15..a68645abde56 100644
---- a/fs/xfs/xfs_aops.c
-+++ b/fs/xfs/xfs_aops.c
-@@ -447,8 +447,8 @@ xfs_submit_ioend(
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 4075cbeb720e..4f4ce050290c 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -33,6 +33,7 @@
+ #include <linux/ratelimit.h>
+ #include <linux/pm_runtime.h>
+ #include <linux/blk-cgroup.h>
++#include <linux/wbt.h>
  
- 	ioend->io_bio->bi_private = ioend;
- 	ioend->io_bio->bi_end_io = xfs_end_bio;
--	bio_set_op_attrs(ioend->io_bio, REQ_OP_WRITE,
--			 (wbc->sync_mode == WB_SYNC_ALL) ? WRITE_SYNC : 0);
-+	bio_set_op_attrs(ioend->io_bio, REQ_OP_WRITE, wbc_to_write_flags(wbc));
+ #define CREATE_TRACE_POINTS
+ #include <trace/events/block.h>
+@@ -882,6 +883,8 @@ blk_init_allocated_queue(struct request_queue *q, request_fn_proc *rfn,
+ 
+ fail:
+ 	blk_free_flush_queue(q->fq);
++	wbt_exit(q->rq_wb);
++	q->rq_wb = NULL;
+ 	return NULL;
+ }
+ EXPORT_SYMBOL(blk_init_allocated_queue);
+@@ -1346,6 +1349,7 @@ void blk_requeue_request(struct request_queue *q, struct request *rq)
+ 	blk_delete_timer(rq);
+ 	blk_clear_rq_complete(rq);
+ 	trace_block_rq_requeue(q, rq);
++	wbt_requeue(q->rq_wb, &rq->wb_stat);
+ 
+ 	if (rq->cmd_flags & REQ_QUEUED)
+ 		blk_queue_end_tag(q, rq);
+@@ -1436,6 +1440,8 @@ void __blk_put_request(struct request_queue *q, struct request *req)
+ 	/* this is a bio leak */
+ 	WARN_ON(req->bio != NULL);
+ 
++	wbt_done(q->rq_wb, &req->wb_stat);
 +
  	/*
- 	 * If we are failing the IO now, just mark the ioend with an
- 	 * error and finish it. This will run IO completion immediately
-@@ -519,8 +519,7 @@ xfs_chain_bio(
+ 	 * Request may not have originated from ll_rw_blk. if not,
+ 	 * it didn't come out of our reserved rq pools
+@@ -1667,6 +1673,7 @@ static blk_qc_t blk_queue_bio(struct request_queue *q, struct bio *bio)
+ 	int el_ret, rw_flags = 0, where = ELEVATOR_INSERT_SORT;
+ 	struct request *req;
+ 	unsigned int request_count = 0;
++	unsigned int wb_acct;
  
- 	bio_chain(ioend->io_bio, new);
- 	bio_get(ioend->io_bio);		/* for xfs_destroy_ioend */
--	bio_set_op_attrs(ioend->io_bio, REQ_OP_WRITE,
--			  (wbc->sync_mode == WB_SYNC_ALL) ? WRITE_SYNC : 0);
-+	bio_set_op_attrs(ioend->io_bio, REQ_OP_WRITE, wbc_to_write_flags(wbc));
- 	submit_bio(ioend->io_bio);
- 	ioend->io_bio = new;
- }
-diff --git a/include/linux/writeback.h b/include/linux/writeback.h
-index fc1e16c25a29..e1fc25172397 100644
---- a/include/linux/writeback.h
-+++ b/include/linux/writeback.h
-@@ -100,6 +100,14 @@ struct writeback_control {
- #endif
- };
+ 	/*
+ 	 * low level driver can indicate that it wants pages above a
+@@ -1719,6 +1726,8 @@ static blk_qc_t blk_queue_bio(struct request_queue *q, struct bio *bio)
+ 	}
  
-+static inline int wbc_to_write_flags(struct writeback_control *wbc)
-+{
-+	if (wbc->sync_mode == WB_SYNC_ALL)
-+		return WRITE_SYNC;
+ get_rq:
++	wb_acct = wbt_wait(q->rq_wb, bio->bi_opf, q->queue_lock);
 +
-+	return WRITE;
+ 	/*
+ 	 * This sync check and mask will be re-done in init_request_from_bio(),
+ 	 * but we need to set it earlier to expose the sync flag to the
+@@ -1738,11 +1747,15 @@ get_rq:
+ 	 */
+ 	req = get_request(q, bio_data_dir(bio), rw_flags, bio, GFP_NOIO);
+ 	if (IS_ERR(req)) {
++		if (wb_acct & WBT_TRACKED)
++			__wbt_done(q->rq_wb);
+ 		bio->bi_error = PTR_ERR(req);
+ 		bio_endio(bio);
+ 		goto out_unlock;
+ 	}
+ 
++	wbt_track(&req->wb_stat, wb_acct);
++
+ 	/*
+ 	 * After dropping the lock and possibly sleeping here, our request
+ 	 * may now be mergeable after it had proven unmergeable (above).
+@@ -2475,7 +2488,7 @@ void blk_start_request(struct request *req)
+ {
+ 	blk_dequeue_request(req);
+ 
+-	req->issue_time = ktime_to_ns(ktime_get());
++	wbt_issue(req->q->rq_wb, &req->wb_stat);
+ 
+ 	/*
+ 	 * We are now handing the request to the hardware, initialize
+@@ -2713,9 +2726,10 @@ void blk_finish_request(struct request *req, int error)
+ 
+ 	blk_account_io_done(req);
+ 
+-	if (req->end_io)
++	if (req->end_io) {
++		wbt_done(req->q->rq_wb, &req->wb_stat);
+ 		req->end_io(req, error);
+-	else {
++	} else {
+ 		if (blk_bidi_rq(req))
+ 			__blk_put_request(req->next_rq->q, req->next_rq);
+ 
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 712f141a6f1a..511289a4626a 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -22,6 +22,7 @@
+ #include <linux/sched/sysctl.h>
+ #include <linux/delay.h>
+ #include <linux/crash_dump.h>
++#include <linux/wbt.h>
+ 
+ #include <trace/events/block.h>
+ 
+@@ -319,6 +320,8 @@ static void __blk_mq_free_request(struct blk_mq_hw_ctx *hctx,
+ 
+ 	if (rq->cmd_flags & REQ_MQ_INFLIGHT)
+ 		atomic_dec(&hctx->nr_active);
++
++	wbt_done(q->rq_wb, &rq->wb_stat);
+ 	rq->cmd_flags = 0;
+ 
+ 	clear_bit(REQ_ATOM_STARTED, &rq->atomic_flags);
+@@ -351,6 +354,7 @@ inline void __blk_mq_end_request(struct request *rq, int error)
+ 	blk_account_io_done(rq);
+ 
+ 	if (rq->end_io) {
++		wbt_done(rq->q->rq_wb, &rq->wb_stat);
+ 		rq->end_io(rq, error);
+ 	} else {
+ 		if (unlikely(blk_bidi_rq(rq)))
+@@ -457,7 +461,7 @@ void blk_mq_start_request(struct request *rq)
+ 	if (unlikely(blk_bidi_rq(rq)))
+ 		rq->next_rq->resid_len = blk_rq_bytes(rq->next_rq);
+ 
+-	rq->issue_time = ktime_to_ns(ktime_get());
++	wbt_issue(q->rq_wb, &rq->wb_stat);
+ 
+ 	blk_add_timer(rq);
+ 
+@@ -494,6 +498,7 @@ static void __blk_mq_requeue_request(struct request *rq)
+ 	struct request_queue *q = rq->q;
+ 
+ 	trace_block_rq_requeue(q, rq);
++	wbt_requeue(q->rq_wb, &rq->wb_stat);
+ 
+ 	if (test_and_clear_bit(REQ_ATOM_STARTED, &rq->atomic_flags)) {
+ 		if (q->dma_drain_size && blk_rq_bytes(rq))
+@@ -1312,6 +1317,7 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
+ 	struct blk_plug *plug;
+ 	struct request *same_queue_rq = NULL;
+ 	blk_qc_t cookie;
++	unsigned int wb_acct;
+ 
+ 	blk_queue_bounce(q, &bio);
+ 
+@@ -1326,9 +1332,16 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
+ 	    blk_attempt_plug_merge(q, bio, &request_count, &same_queue_rq))
+ 		return BLK_QC_T_NONE;
+ 
++	wb_acct = wbt_wait(q->rq_wb, bio->bi_opf, NULL);
++
+ 	rq = blk_mq_map_request(q, bio, &data);
+-	if (unlikely(!rq))
++	if (unlikely(!rq)) {
++		if (wb_acct & WBT_TRACKED)
++			__wbt_done(q->rq_wb);
+ 		return BLK_QC_T_NONE;
++	}
++
++	wbt_track(&rq->wb_stat, wb_acct);
+ 
+ 	cookie = blk_tag_to_qc_t(rq->tag, data.hctx->queue_num);
+ 
+@@ -1405,6 +1418,7 @@ static blk_qc_t blk_sq_make_request(struct request_queue *q, struct bio *bio)
+ 	struct blk_map_ctx data;
+ 	struct request *rq;
+ 	blk_qc_t cookie;
++	unsigned int wb_acct;
+ 
+ 	blk_queue_bounce(q, &bio);
+ 
+@@ -1421,9 +1435,16 @@ static blk_qc_t blk_sq_make_request(struct request_queue *q, struct bio *bio)
+ 	} else
+ 		request_count = blk_plug_queued_count(q);
+ 
++	wb_acct = wbt_wait(q->rq_wb, bio->bi_opf, NULL);
++
+ 	rq = blk_mq_map_request(q, bio, &data);
+-	if (unlikely(!rq))
++	if (unlikely(!rq)) {
++		if (wb_acct & WBT_TRACKED)
++			__wbt_done(q->rq_wb);
+ 		return BLK_QC_T_NONE;
++	}
++
++	wbt_track(&rq->wb_stat, wb_acct);
+ 
+ 	cookie = blk_tag_to_qc_t(rq->tag, data.hctx->queue_num);
+ 
+@@ -2147,6 +2168,9 @@ void blk_mq_free_queue(struct request_queue *q)
+ 	list_del_init(&q->all_q_node);
+ 	mutex_unlock(&all_q_mutex);
+ 
++	wbt_exit(q->rq_wb);
++	q->rq_wb = NULL;
++
+ 	blk_mq_del_queue_tag_set(q);
+ 
+ 	blk_mq_exit_hw_queues(q, set, set->nr_hw_queues);
+diff --git a/block/blk-settings.c b/block/blk-settings.c
+index f7e122e717e8..746dc9fee1ac 100644
+--- a/block/blk-settings.c
++++ b/block/blk-settings.c
+@@ -840,6 +840,7 @@ EXPORT_SYMBOL_GPL(blk_queue_flush_queueable);
+ void blk_set_queue_depth(struct request_queue *q, unsigned int depth)
+ {
+ 	q->queue_depth = depth;
++	wbt_set_queue_depth(q->rq_wb, depth);
+ }
+ EXPORT_SYMBOL(blk_set_queue_depth);
+ 
+@@ -863,6 +864,8 @@ void blk_queue_write_cache(struct request_queue *q, bool wc, bool fua)
+ 	else
+ 		queue_flag_clear(QUEUE_FLAG_FUA, q);
+ 	spin_unlock_irq(q->queue_lock);
++
++	wbt_set_write_cache(q->rq_wb, test_bit(QUEUE_FLAG_WC, &q->queue_flags));
+ }
+ EXPORT_SYMBOL_GPL(blk_queue_write_cache);
+ 
+diff --git a/block/blk-stat.c b/block/blk-stat.c
+index 76cf2e2092c1..d8cb9b56fced 100644
+--- a/block/blk-stat.c
++++ b/block/blk-stat.c
+@@ -162,15 +162,16 @@ void blk_stat_init(struct blk_rq_stat *stat)
+ void blk_stat_add(struct blk_rq_stat *stat, struct request *rq)
+ {
+ 	s64 now, value;
++	u64 rq_time = wbt_issue_stat_get_time(&rq->wb_stat);
+ 
+ 	now = ktime_to_ns(ktime_get());
+-	if (now < rq->issue_time)
++	if (now < rq_time)
+ 		return;
+ 
+ 	if ((now & BLK_STAT_MASK) != (stat->time & BLK_STAT_MASK))
+ 		__blk_stat_init(stat, now);
+ 
+-	value = now - rq->issue_time;
++	value = now - rq_time;
+ 	if (value > stat->max)
+ 		stat->max = value;
+ 	if (value < stat->min)
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index 0b9e435fec97..7fcf02c9bfa7 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -10,6 +10,7 @@
+ #include <linux/blktrace_api.h>
+ #include <linux/blk-mq.h>
+ #include <linux/blk-cgroup.h>
++#include <linux/wbt.h>
+ 
+ #include "blk.h"
+ #include "blk-mq.h"
+@@ -41,6 +42,19 @@ queue_var_store(unsigned long *var, const char *page, size_t count)
+ 	return count;
+ }
+ 
++static ssize_t queue_var_store64(u64 *var, const char *page)
++{
++	int err;
++	u64 v;
++
++	err = kstrtou64(page, 10, &v);
++	if (err < 0)
++		return err;
++
++	*var = v;
++	return 0;
 +}
 +
- /*
-  * A wb_domain represents a domain that wb's (bdi_writeback's) belong to
-  * and are measured against each other in.  There always is one global
+ static ssize_t queue_requests_show(struct request_queue *q, char *page)
+ {
+ 	return queue_var_show(q->nr_requests, (page));
+@@ -347,6 +361,58 @@ static ssize_t queue_poll_store(struct request_queue *q, const char *page,
+ 	return ret;
+ }
+ 
++static ssize_t queue_wb_win_show(struct request_queue *q, char *page)
++{
++	if (!q->rq_wb)
++		return -EINVAL;
++
++	return sprintf(page, "%llu\n", div_u64(q->rq_wb->win_nsec, 1000));
++}
++
++static ssize_t queue_wb_win_store(struct request_queue *q, const char *page,
++				  size_t count)
++{
++	ssize_t ret;
++	u64 val;
++
++	if (!q->rq_wb)
++		return -EINVAL;
++
++	ret = queue_var_store64(&val, page);
++	if (ret < 0)
++		return ret;
++
++	q->rq_wb->win_nsec = val * 1000ULL;
++	wbt_update_limits(q->rq_wb);
++	return count;
++}
++
++static ssize_t queue_wb_lat_show(struct request_queue *q, char *page)
++{
++	if (!q->rq_wb)
++		return -EINVAL;
++
++	return sprintf(page, "%llu\n", div_u64(q->rq_wb->min_lat_nsec, 1000));
++}
++
++static ssize_t queue_wb_lat_store(struct request_queue *q, const char *page,
++				  size_t count)
++{
++	ssize_t ret;
++	u64 val;
++
++	if (!q->rq_wb)
++		return -EINVAL;
++
++	ret = queue_var_store64(&val, page);
++	if (ret < 0)
++		return ret;
++
++	q->rq_wb->min_lat_nsec = val * 1000ULL;
++	wbt_update_limits(q->rq_wb);
++	return count;
++}
++
+ static ssize_t queue_wc_show(struct request_queue *q, char *page)
+ {
+ 	if (test_bit(QUEUE_FLAG_WC, &q->queue_flags))
+@@ -551,6 +617,18 @@ static struct queue_sysfs_entry queue_stats_entry = {
+ 	.show = queue_stats_show,
+ };
+ 
++static struct queue_sysfs_entry queue_wb_lat_entry = {
++	.attr = {.name = "wbt_lat_usec", .mode = S_IRUGO | S_IWUSR },
++	.show = queue_wb_lat_show,
++	.store = queue_wb_lat_store,
++};
++
++static struct queue_sysfs_entry queue_wb_win_entry = {
++	.attr = {.name = "wbt_window_usec", .mode = S_IRUGO | S_IWUSR },
++	.show = queue_wb_win_show,
++	.store = queue_wb_win_store,
++};
++
+ static struct attribute *default_attrs[] = {
+ 	&queue_requests_entry.attr,
+ 	&queue_ra_entry.attr,
+@@ -579,6 +657,8 @@ static struct attribute *default_attrs[] = {
+ 	&queue_wc_entry.attr,
+ 	&queue_dax_entry.attr,
+ 	&queue_stats_entry.attr,
++	&queue_wb_lat_entry.attr,
++	&queue_wb_win_entry.attr,
+ 	NULL,
+ };
+ 
+@@ -693,6 +773,43 @@ struct kobj_type blk_queue_ktype = {
+ 	.release	= blk_release_queue,
+ };
+ 
++static void blk_wb_stat_get(void *data, struct blk_rq_stat *stat)
++{
++	blk_queue_stat_get(data, stat);
++}
++
++static void blk_wb_stat_clear(void *data)
++{
++	blk_stat_clear(data);
++}
++
++static struct wb_stat_ops wb_stat_ops = {
++	.get	= blk_wb_stat_get,
++	.clear	= blk_wb_stat_clear,
++};
++
++static void blk_wb_init(struct request_queue *q)
++{
++	struct rq_wb *rwb;
++
++	rwb = wbt_init(&q->backing_dev_info, &wb_stat_ops, q);
++
++	/*
++	 * If this fails, we don't get throttling
++	 */
++	if (IS_ERR(rwb))
++		return;
++
++	if (blk_queue_nonrot(q))
++		rwb->min_lat_nsec = 2000000ULL;
++	else
++		rwb->min_lat_nsec = 75000000ULL;
++
++	wbt_set_queue_depth(rwb, blk_queue_depth(q));
++	wbt_set_write_cache(rwb, test_bit(QUEUE_FLAG_WC, &q->queue_flags));
++	q->rq_wb = rwb;
++}
++
+ int blk_register_queue(struct gendisk *disk)
+ {
+ 	int ret;
+@@ -732,6 +849,8 @@ int blk_register_queue(struct gendisk *disk)
+ 	if (q->mq_ops)
+ 		blk_mq_register_disk(disk);
+ 
++	blk_wb_init(q);
++
+ 	if (!q->request_fn)
+ 		return 0;
+ 
+diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
+index cc2f6dbd4303..ef61bda76317 100644
+--- a/block/cfq-iosched.c
++++ b/block/cfq-iosched.c
+@@ -3777,6 +3777,18 @@ static void check_blkcg_changed(struct cfq_io_cq *cic, struct bio *bio)
+ 		return;
+ 
+ 	/*
++	 * If we have a non-root cgroup, we can depend on that to
++	 * do proper throttling of writes. Turn off wbt for that
++	 * case.
++	 */
++	if (bio_blkcg(bio) != &blkcg_root) {
++		struct request_queue *q = cfqd->queue;
++
++		if (q->rq_wb)
++			wbt_disable(q->rq_wb);
++	}
++
++	/*
+ 	 * Drop reference to queues.  New queues will be assigned in new
+ 	 * group upon arrival of fresh requests.
+ 	 */
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 259eba88f991..45256d75c4b7 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -24,6 +24,7 @@
+ #include <linux/rcupdate.h>
+ #include <linux/percpu-refcount.h>
+ #include <linux/scatterlist.h>
++#include <linux/wbt.h>
+ 
+ struct module;
+ struct scsi_ioctl_command;
+@@ -37,6 +38,7 @@ struct bsg_job;
+ struct blkcg_gq;
+ struct blk_flush_queue;
+ struct pr_ops;
++struct rq_wb;
+ 
+ #define BLKDEV_MIN_RQ	4
+ #define BLKDEV_MAX_RQ	128	/* Default maximum */
+@@ -151,7 +153,7 @@ struct request {
+ 	struct gendisk *rq_disk;
+ 	struct hd_struct *part;
+ 	unsigned long start_time;
+-	s64 issue_time;
++	struct wb_issue_stat wb_stat;
+ #ifdef CONFIG_BLK_CGROUP
+ 	struct request_list *rl;		/* rl this rq is alloced from */
+ 	unsigned long long start_time_ns;
+@@ -303,6 +305,8 @@ struct request_queue {
+ 	int			nr_rqs[2];	/* # allocated [a]sync rqs */
+ 	int			nr_rqs_elvpriv;	/* # allocated rqs w/ elvpriv */
+ 
++	struct rq_wb		*rq_wb;
++
+ 	/*
+ 	 * If blkcg is not used, @q->root_rl serves all requests.  If blkcg
+ 	 * is used, root blkg allocates from @q->root_rl and all other
 -- 
 2.7.4
