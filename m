@@ -1,71 +1,75 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-	Andreas Dilger <adilger.kernel@dilger.ca>,
-	Jan Kara <jack@suse.com>,
-	Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-	Hugh Dickins <hughd@google.com>,
-	Andrea Arcangeli <aarcange@redhat.com>,
-	Dave Hansen <dave.hansen@intel.com>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	Matthew Wilcox <willy@infradead.org>,
-	Ross Zwisler <ross.zwisler@linux.intel.com>,
-	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	linux-block@vger.kernel.org,
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv2 21/41] thp: introduce hpage_size() and hpage_mask()
-Date: Fri, 12 Aug 2016 21:38:04 +0300
-Message-Id: <1471027104-115213-22-git-send-email-kirill.shutemov@linux.intel.com>
-In-Reply-To: <1471027104-115213-1-git-send-email-kirill.shutemov@linux.intel.com>
-References: <1471027104-115213-1-git-send-email-kirill.shutemov@linux.intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <prvs=80513f069d=axboe@fb.com>
+From: Jens Axboe <axboe@fb.com>
+To: <axboe@kernel.dk>, <linux-kernel@vger.kernel.org>,
+        <linux-fsdevel@vger.kernel.org>, <linux-block@vger.kernel.org>
+CC: Jens Axboe <axboe@fb.com>
+Subject: [PATCH 1/8] block: add WRITE_BG
+Date: Wed, 31 Aug 2016 11:05:44 -0600
+Message-ID: <1472663151-18560-2-git-send-email-axboe@fb.com>
+In-Reply-To: <1472663151-18560-1-git-send-email-axboe@fb.com>
+References: <1472663151-18560-1-git-send-email-axboe@fb.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-Introduce new helpers which return size/mask of the page:
-HPAGE_PMD_SIZE/HPAGE_PMD_MASK if the page is PageTransHuge() and
-PAGE_SIZE/PAGE_MASK otherwise.
+This adds a new request flag, REQ_BG, that callers can use to tell
+the block layer that this is background (non-urgent) IO.
 
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+Signed-off-by: Jens Axboe <axboe@fb.com>
 ---
- include/linux/huge_mm.h | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ include/linux/blk_types.h | 4 +++-
+ include/linux/fs.h        | 3 +++
+ 2 files changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/include/linux/huge_mm.h b/include/linux/huge_mm.h
-index 6f14de45b5ce..de2789b4402c 100644
---- a/include/linux/huge_mm.h
-+++ b/include/linux/huge_mm.h
-@@ -138,6 +138,20 @@ static inline int hpage_nr_pages(struct page *page)
- 	return 1;
- }
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index 436f43f87da9..be4409b6ae4f 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -155,6 +155,7 @@ enum rq_flag_bits {
+ 	__REQ_INTEGRITY,	/* I/O includes block integrity payload */
+ 	__REQ_FUA,		/* forced unit access */
+ 	__REQ_PREFLUSH,		/* request for cache flush */
++	__REQ_BG,		/* background activity */
  
-+static inline int hpage_size(struct page *page)
-+{
-+	if (unlikely(PageTransHuge(page)))
-+		return HPAGE_PMD_SIZE;
-+	return PAGE_SIZE;
-+}
-+
-+static inline unsigned long hpage_mask(struct page *page)
-+{
-+	if (unlikely(PageTransHuge(page)))
-+		return HPAGE_PMD_MASK;
-+	return PAGE_MASK;
-+}
-+
- extern int do_huge_pmd_numa_page(struct fault_env *fe, pmd_t orig_pmd);
+ 	/* bio only flags */
+ 	__REQ_RAHEAD,		/* read ahead, can fail anytime */
+@@ -198,7 +199,7 @@ enum rq_flag_bits {
+ 	(REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT | REQ_FAILFAST_DRIVER)
+ #define REQ_COMMON_MASK \
+ 	(REQ_FAILFAST_MASK | REQ_SYNC | REQ_META | REQ_PRIO | REQ_NOIDLE | \
+-	 REQ_PREFLUSH | REQ_FUA | REQ_INTEGRITY | REQ_NOMERGE)
++	 REQ_PREFLUSH | REQ_FUA | REQ_INTEGRITY | REQ_NOMERGE | REQ_BG)
+ #define REQ_CLONE_MASK		REQ_COMMON_MASK
  
- extern struct page *huge_zero_page;
-@@ -163,6 +177,8 @@ void put_huge_zero_page(void);
- #define HPAGE_PMD_SIZE ({ BUILD_BUG(); 0; })
+ /* This mask is used for both bio and request merge checking */
+@@ -223,6 +224,7 @@ enum rq_flag_bits {
+ #define REQ_COPY_USER		(1ULL << __REQ_COPY_USER)
+ #define REQ_PREFLUSH		(1ULL << __REQ_PREFLUSH)
+ #define REQ_FLUSH_SEQ		(1ULL << __REQ_FLUSH_SEQ)
++#define REQ_BG			(1ULL << __REQ_BG)
+ #define REQ_IO_STAT		(1ULL << __REQ_IO_STAT)
+ #define REQ_MIXED_MERGE		(1ULL << __REQ_MIXED_MERGE)
+ #define REQ_PM			(1ULL << __REQ_PM)
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index 3523bf62f328..5a5f567c416a 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -189,6 +189,8 @@ typedef int (dio_iodone_t)(struct kiocb *iocb, loff_t offset,
+  * WRITE_FLUSH_FUA	Combination of WRITE_FLUSH and FUA. The IO is preceded
+  *			by a cache flush and data is guaranteed to be on
+  *			non-volatile media on completion.
++ * WRITE_BG		Background write. This is for background activity like
++ *			the periodic flush and background threshold writeback
+  *
+  */
+ #define RW_MASK			REQ_OP_WRITE
+@@ -202,6 +204,7 @@ typedef int (dio_iodone_t)(struct kiocb *iocb, loff_t offset,
+ #define WRITE_FLUSH		(REQ_SYNC | REQ_NOIDLE | REQ_PREFLUSH)
+ #define WRITE_FUA		(REQ_SYNC | REQ_NOIDLE | REQ_FUA)
+ #define WRITE_FLUSH_FUA		(REQ_SYNC | REQ_NOIDLE | REQ_PREFLUSH | REQ_FUA)
++#define WRITE_BG		(REQ_NOIDLE | REQ_BG)
  
- #define hpage_nr_pages(x) 1
-+#define hpage_size(x) PAGE_SIZE
-+#define hpage_mask(x) PAGE_MASK
- 
- #define transparent_hugepage_enabled(__vma) 0
- 
+ /*
+  * Attribute flags.  These should be or-ed together to figure out what
 -- 
-2.8.1
-
+2.7.4
