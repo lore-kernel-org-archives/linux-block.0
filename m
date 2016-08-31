@@ -1,235 +1,84 @@
-Return-Path: <prvs=80513f069d=axboe@fb.com>
-From: Jens Axboe <axboe@fb.com>
-To: <axboe@kernel.dk>, <linux-kernel@vger.kernel.org>,
-        <linux-fsdevel@vger.kernel.org>, <linux-block@vger.kernel.org>
-Subject: [PATCHSET v6] Throttled background buffered writeback
-Date: Wed, 31 Aug 2016 11:05:43 -0600
-Message-ID: <1472663151-18560-1-git-send-email-axboe@fb.com>
+Return-Path: <martin.petersen@oracle.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Andy Grover <agrover@redhat.com>, linux-block@vger.kernel.org,
+        linux-scsi <linux-scsi@vger.kernel.org>,
+        target-devel <target-devel@vger.kernel.org>
+Subject: Re: Should queue_max_hw_sectors() always be <= max_dev_sectors?
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <202d350b-0e59-1a10-4b65-3563f0afa084@redhat.com>
+	<yq1y43d7kgm.fsf@sermon.lab.mkp.net>
+	<74ef47ec-4aee-bdba-b000-cc0b46cf815a@kernel.dk>
+Date: Wed, 31 Aug 2016 00:11:36 -0400
+In-Reply-To: <74ef47ec-4aee-bdba-b000-cc0b46cf815a@kernel.dk> (Jens Axboe's
+	message of "Tue, 30 Aug 2016 20:36:02 -0600")
+Message-ID: <yq18tvd7f2f.fsf@sermon.lab.mkp.net>
 MIME-Version: 1.0
 Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-Hi,
+>>>>> "Jens" == Jens Axboe <axboe@kernel.dk> writes:
 
-Since the dawn of time, our background buffered writeback has sucked.
-When we do background buffered writeback, it should have little impact
-on foreground activity. That's the definition of background activity...
-But for as long as I can remember, heavy buffered writers have not
-behaved like that. For instance, if I do something like this:
+Jens,
 
-$ dd if=/dev/zero of=foo bs=1M count=10k
+>> It is a requirement for SG_IO, firmware updates, tape drives,
+>> etc. that the controller limits are reported correctly since they do
+>> I/Os that are much bigger than typical filesystem requests. When we
+>> tried to conflate the two things broke in interesting ways.
 
-on my laptop, and then try and start chrome, it basically won't start
-before the buffered writeback is done. Or, for server oriented
-workloads, where installation of a big RPM (or similar) adversely
-impacts database reads or sync writes. When that happens, I get people
-yelling at me.
+Jens> That's crazy. If max_hw_sectors_kb is expected to be the DMA
+Jens> constraint, then it makes no sense to name it 'sectors'.
 
-I have posted plenty of results previously, I'll keep it shorter
-this time. Here's a run on my laptop, using read-to-pipe-async for
-reading a 5g file, and rewriting it. You can find this test program
-in the fio git repo.
+I don't believe I named it :)
 
-4.6-rc3:
+It's the maximum DMA transfer size supported by the controller. Some
+controllers have limitations above and beyond their scatter-gather
+capabilities.
 
-$ t/read-to-pipe-async -f ~/5g > 5g-new
+You could argue that they should use max_dev_sectors since the limit is
+probably more of a firmware virtual disk thing than a DMA engine
+constraint. But max_dev_sectors and the matching SCSI transfer size cap
+are both very new to the game.
 
-Latency percentiles (usec) (READERS)
-	50.0000th: 2
-	75.0000th: 3
-	90.0000th: 5
-	95.0000th: 7
-	99.0000th: 43
-	99.5000th: 77
-	99.9000th: 9008
-	99.9900th: 91008
-	99.9990th: 286208
-	99.9999th: 347648
-	Over=1251, min=0, max=358081
-Latency percentiles (usec) (WRITERS)
-	50.0000th: 4
-	75.0000th: 8
-	90.0000th: 13
-	95.0000th: 15
-	99.0000th: 32
-	99.5000th: 43
-	99.9000th: 81
-	99.9900th: 2372
-	99.9990th: 104320
-	99.9999th: 349696
-	Over=63, min=1, max=358321
-Read rate (KB/sec) : 91859
-Write rate (KB/sec): 91859
+Jens> We currently have the one exported constraints, and making it
+Jens> anything but the 'this is the maximum IO size we can support'
+Jens> would be nonsensical.
 
-4.6-rc3 + wb-buf-throttle
+That implies that the value is the same for all types of I/O which is
+not the case. Hasn't been for a long time. See discard, write same,
+etc. blk_rq_get_max_sectors() is passed a struct request because the
+answer depends on what type of request and which operation it is.
 
-Latency percentiles (usec) (READERS)
-	50.0000th: 2
-	75.0000th: 3
-	90.0000th: 5
-	95.0000th: 8
-	99.0000th: 48
-	99.5000th: 79
-	99.9000th: 5304
-	99.9900th: 22496
-	99.9990th: 29408
-	99.9999th: 33728
-	Over=860, min=0, max=37599
-Latency percentiles (usec) (WRITERS)
-	50.0000th: 4
-	75.0000th: 9
-	90.0000th: 14
-	95.0000th: 16
-	99.0000th: 34
-	99.5000th: 45
-	99.9000th: 87
-	99.9900th: 1342
-	99.9990th: 13648
-	99.9999th: 21280
-	Over=29, min=1, max=30457
-Read rate (KB/sec) : 95832
-Write rate (KB/sec): 95832
+With max_hw_sectors_kb we're not so lucky. We could assume read/write
+but it would break existing apps that check it for SG_IO or to set tape
+block size. And they do exist.
 
-Better throughput and tighter latencies, for both reads and writes.
-That's hard not to like.
+Jens> Which, coincidentally, is what that file already is for most other
+Jens> devices.
 
-The above was the why. The how is basically throttling background
-writeback. We still want to issue big writes from the vm side of things,
-so we get nice and big extents on the file system end. But we don't need
-to flood the device with THOUSANDS of requests for background writeback.
-For most devices, we don't need a whole lot to get decent throughput.
+Because none of the other protocols happen to have device limits.
 
-This adds some simple blk-wb code that keeps limits how much buffered
-writeback we keep in flight on the device end. It's all about managing
-the queues on the hardware side. The big change in this version is that
-it should be pretty much auto-tuning - you no longer have to set a
-given percentage of writeback bandwidth. I've implemented something
-similar to CoDel to manage the writeback queue. See the last patch
-for a full description, but the tldr is that we monitor min latencies
-over a window of time, and scale up/down the queue based on that. This
-needs a minimum of tunables, and it stays out of the way, if your device
-is fast enough. There's a single tunable now, wb_last_usec, that simply
-sets this latency target. Most people won't have to touch this, it'll
-work pretty well just being in the ballpark.
+Jens> It'd make more sense to bring SCSI into this realm, instead of
+Jens> imposing this weird world view on others.
 
-I welcome testing. If you are sick of Linux bogging down when buffered
-writes are happening, then this is for you, laptop or server. The
-patchset is fully stable, I have not observed problems. It passes full
-xfstest runs, and a variety of benchmarks as well. It works equally well
-on blk-mq/scsi-mq, and "classic" setups.
+Hey, I didn't invent the SCSI device constraint. I think it sucks. But
+it is a hard limit and we absolutely have to enforce it. And we can't
+lower the hw limit willy-nilly because it breaks non-REQ_TYPE_FS
+requests.
 
-You can also find this in a branch in the block git repo:
+As a result, max_dev_sectors is only used by sd and it's only used to
+gate max_sectors_kb for filesystem requests. I would have happily kept
+it internal to SCSI but users need to be able to set max_sectors_kb
+through sysfs. And consequently I need to be able to clamp on it there.
 
-git://git.kernel.dk/linux-block.git wb-buf-throttle
+I'm happy to clean things up if you have a better idea how to enforce
+the device limit without breaking existing apps. It's possible that with
+the arbitrary bio size changes some of the original pain points have
+gone away. Will take a look.
 
-Note that I rebase this branch when I collapse patches. The
-wb-buf-throttle-v6 will remain the same as this version. I know there
-are a bunch of folks running this patchset with success. If there's
-any interest in a version that applies cleanly to Linux v4.7, let me
-know, and I can provide one.
-
-the patches here on top of my for-next. A full patch against Linus'
-current tree can also be downloaded here:
-
-http://brick.kernel.dk/snaps/wb-buf-throttle-v6.patch
-
-Changes since v5
-
-- Rebased on top of 4.8-rc4, drop parts of the series that is
-  now in mainline.
-- Fixes for QD=1 devices, should make them perform better.
-- Fix for hang with disabling WBT with IO in flight
-- Change in the sync issue/completion logic. Previously we
-  used whether this IO was tracked or not (eg was a buffered write),
-  this has now been changed to just look at reads. This is a better
-  metric, and should improve behavior.
-- Add some more comments to the code, explaining how it works.
-
-Changes since v4
-
-- Add some documentation for the two queue sysfs files
-- Kill off wb_stats sysfs file. Use the trace points to get this info
-  now.
-- Various work around making this block layer agnostic. The main code
-  now resides in lib/wbt.c and can be plugged into NFS as well, for
-  instance.
-- Fix an issue with double completions on the block layer side.
-- Fix an issue where a long sync issue was disregarded, if the stat
-  sample weren't valid.
-- Speed up the division in rwb_arm_timer().
-- Add logic to scale back up for 'unknown' latency events.
-- Don't track sync issue timestamp of wbt is disabled.
-- Drop the dirty/writeback page inc/dec patch. We don't need it, and
-  it was racy.
-- Move block/blk-wb.c to lib/wbt.c
-
-Changes since v3
-
-- Re-do the mm/ writheback parts. Add REQ_BG for background writes,
-  and don't overload the wbc 'reason' for writeback decisions.
-- Add tracking for when apps are sleeping waiting for a page to complete.
-- Change wbc_to_write() to wbc_to_write_cmd().
-- Use atomic_t for the balance_dirty_pages() sleep count.
-- Add a basic scalable block stats tracking framework.
-- Rewrite blk-wb core as described above, to dynamically adapt. This is
-  a big change, see the last patch for a full description of it.
-- Add tracing to blk-wb, instead of using debug printk's.
-- Rebased to 4.6-rc3 (ish)
-
-Changes since v2
-
-- Switch from wb_depth to wb_percent, as that's an easier tunable.
-- Add the patch to track device depth on the block layer side.
-- Cleanup the limiting code.
-- Don't use a fixed limit in the wb wait, since it can change
-  between wakeups.
-- Minor tweaks, fixups, cleanups.
-
-Changes since v1
-
-- Drop sync() WB_SYNC_NONE -> WB_SYNC_ALL change
-- wb_start_writeback() fills in background/reclaim/sync info in
-  the writeback work, based on writeback reason.
-- Use WRITE_SYNC for reclaim/sync IO
-- Split balance_dirty_pages() sleep change into separate patch
-- Drop get_request() u64 flag change, set the bit on the request
-  directly after-the-fact.
-- Fix wrong sysfs return value
-- Various small cleanups
-
-
- Documentation/block/queue-sysfs.txt |   13 
- block/Kconfig                       |    1 
- block/Makefile                      |    2 
- block/blk-core.c                    |   22 +
- block/blk-mq-sysfs.c                |   47 ++
- block/blk-mq.c                      |   42 ++
- block/blk-mq.h                      |    3 
- block/blk-settings.c                |   15 
- block/blk-stat.c                    |  205 ++++++++++++
- block/blk-stat.h                    |   17 +
- block/blk-sysfs.c                   |  145 ++++++++
- block/cfq-iosched.c                 |   12 
- drivers/scsi/scsi.c                 |    3 
- fs/buffer.c                         |    2 
- fs/f2fs/data.c                      |    2 
- fs/f2fs/node.c                      |    2 
- fs/gfs2/meta_io.c                   |    3 
- fs/mpage.c                          |    2 
- fs/xfs/xfs_aops.c                   |    7 
- include/linux/backing-dev-defs.h    |    2 
- include/linux/blk_types.h           |   16 
- include/linux/blkdev.h              |   19 +
- include/linux/fs.h                  |    3 
- include/linux/wbt.h                 |  118 +++++++
- include/linux/writeback.h           |   10 
- include/trace/events/wbt.h          |  122 +++++++
- lib/Kconfig                         |    4 
- lib/Makefile                        |    1 
- lib/wbt.c                           |  587 ++++++++++++++++++++++++++++++++++++
- mm/backing-dev.c                    |    1 
- mm/page-writeback.c                 |    2 
- 31 files changed, 1414 insertions(+), 16 deletions(-)
+But implementation aesthetics aside, Andy's problem still
+persists. Because at least in the context of SCSI the answer to his
+question is "it depends" :(
 
 -- 
-Jens Axboe
+Martin K. Petersen	Oracle Linux Engineering
