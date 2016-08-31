@@ -1,97 +1,105 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f193.google.com ([209.85.192.193]:35815 "EHLO
-	mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750909AbcHKI04 (ORCPT
-	<rfc822;linux-block@vger.kernel.org>);
-	Thu, 11 Aug 2016 04:26:56 -0400
-From: tom.ty89@gmail.com
-To: tj@kernel.org, shaun.tancheff@seagate.com, shaun@tancheff.com,
-	martin.petersen@oracle.com
-Cc: linux-ide@vger.kernel.org, linux-scsi@vger.kernel.org,
-	linux-block@vger.kernel.org, Tom Yan <tom.ty89@gmail.com>
-Subject: [RFC] libata-scsi: make sure Maximum Write Same Length is not too large
-Date: Thu, 11 Aug 2016 16:26:39 +0800
-Message-Id: <833713246c1a70d85150289c1537797d6f7dd606.1470903899.git.tom.ty89@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=80513f069d=axboe@fb.com>
+From: Jens Axboe <axboe@fb.com>
+To: <axboe@kernel.dk>, <linux-kernel@vger.kernel.org>,
+        <linux-fsdevel@vger.kernel.org>, <linux-block@vger.kernel.org>
+CC: Jens Axboe <axboe@fb.com>
+Subject: [PATCH 5/8] block: add code to track actual device queue depth
+Date: Wed, 31 Aug 2016 11:05:48 -0600
+Message-ID: <1472663151-18560-6-git-send-email-axboe@fb.com>
+In-Reply-To: <1472663151-18560-1-git-send-email-axboe@fb.com>
+References: <1472663151-18560-1-git-send-email-axboe@fb.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+List-ID: <linux-block@vger.kernel.org>
 
-From: Tom Yan <tom.ty89@gmail.com>
+For blk-mq, ->nr_requests does track queue depth, at least at init
+time. But for the older queue paths, it's simply a soft setting.
+On top of that, it's generally larger than the hardware setting
+on purpose, to allow backup of requests for merging.
 
-Currently we advertise Maximum Write Same Length based on the
-maximum number of sectors that one-block TRIM payload can cover.
-The field are used to derived discard_max_bytes and
-write_same_max_bytes limits in the block layer, which currently can
-at max be 0xffffffff (32-bit).
+Fill a hole in struct request with a 'queue_depth' member, that
+drivers can call to more closely inform the block layer of the
+real queue depth.
 
-However, with a AF 4Kn drive, the derived limits would be 65535 *
-64 * 4096 = 0x3fffc0000 (34-bit). Therefore, we now devide
-ATA_MAX_TRIM_RNUM with (logical sector size / 512), so that the
-derived limits will not overflow.
+Signed-off-by: Jens Axboe <axboe@fb.com>
+---
+ block/blk-settings.c   | 12 ++++++++++++
+ drivers/scsi/scsi.c    |  3 +++
+ include/linux/blkdev.h | 11 +++++++++++
+ 3 files changed, 26 insertions(+)
 
-The limits are now also consistent among drives with different
-logical sector sizes. (Although that may or may not be what we
-want ultimately when the SCSI / block layer allows larger
-representation in the future.)
-
-Although 4Kn ATA SSDs may not be a thing on the market yet, this
-patch is necessary for forthcoming SCT Write Same translation
-support, which could be available on traditional HDDs where 4Kn is
-already a thing. Also it should not change the current behavior on
-drives with 512-byte logical sectors.
-
-Note: this patch is not about AF 512e drives.
-Signed-off-by: Tom Yan <tom.ty89@gmail.com>
-
-diff --git a/drivers/ata/libata-scsi.c b/drivers/ata/libata-scsi.c
-index be9c76c..dcadcaf 100644
---- a/drivers/ata/libata-scsi.c
-+++ b/drivers/ata/libata-scsi.c
-@@ -2295,6 +2295,7 @@ static unsigned int ata_scsiop_inq_89(struct ata_scsi_args *args, u8 *rbuf)
- static unsigned int ata_scsiop_inq_b0(struct ata_scsi_args *args, u8 *rbuf)
- {
- 	u16 min_io_sectors;
-+	u32 sector_size;
+diff --git a/block/blk-settings.c b/block/blk-settings.c
+index f679ae122843..f7e122e717e8 100644
+--- a/block/blk-settings.c
++++ b/block/blk-settings.c
+@@ -832,6 +832,18 @@ void blk_queue_flush_queueable(struct request_queue *q, bool queueable)
+ EXPORT_SYMBOL_GPL(blk_queue_flush_queueable);
  
- 	rbuf[1] = 0xb0;
- 	rbuf[3] = 0x3c;		/* required VPD size with unmap support */
-@@ -2309,17 +2310,27 @@ static unsigned int ata_scsiop_inq_b0(struct ata_scsi_args *args, u8 *rbuf)
- 	min_io_sectors = 1 << ata_id_log2_per_physical_sector(args->id);
- 	put_unaligned_be16(min_io_sectors, &rbuf[6]);
- 
--	/*
--	 * Optimal unmap granularity.
--	 *
--	 * The ATA spec doesn't even know about a granularity or alignment
--	 * for the TRIM command.  We can leave away most of the unmap related
--	 * VPD page entries, but we have specifify a granularity to signal
--	 * that we support some form of unmap - in thise case via WRITE SAME
--	 * with the unmap bit set.
--	 */
-+	sector_size = ata_id_logical_sector_size(args->id);
- 	if (ata_id_has_trim(args->id)) {
--		put_unaligned_be64(65535 * ATA_MAX_TRIM_RNUM, &rbuf[36]);
-+		/*
-+		 * Maximum write same length.
-+		 *
-+		 * Avoid overflow in discard_max_bytes and write_same_max_bytes
-+		 * with AF 4Kn drives. Also make them consistent among drives
-+		 * with different logical sector sizes.
-+		 */
-+		put_unaligned_be64(65535 * ATA_MAX_TRIM_RNUM /
-+				   (sector_size / 512), &rbuf[36]);
+ /**
++ * blk_set_queue_depth - tell the block layer about the device queue depth
++ * @q:		the request queue for the device
++ * @depth:		queue depth
++ *
++ */
++void blk_set_queue_depth(struct request_queue *q, unsigned int depth)
++{
++	q->queue_depth = depth;
++}
++EXPORT_SYMBOL(blk_set_queue_depth);
 +
-+		/*
-+		 * Optimal unmap granularity.
-+		 *
-+		 * The ATA spec doesn't even know about a granularity or alignment
-+		 * for the TRIM command.  We can leave away most of the unmap related
-+		 * VPD page entries, but we have specifify a granularity to signal
-+		 * that we support some form of unmap - in thise case via WRITE SAME
-+		 * with the unmap bit set.
-+		 */
- 		put_unaligned_be32(1, &rbuf[28]);
++/**
+  * blk_queue_write_cache - configure queue's write cache
+  * @q:		the request queue for the device
+  * @wc:		write back cache on or off
+diff --git a/drivers/scsi/scsi.c b/drivers/scsi/scsi.c
+index 1f36aca44394..f3de98abe7a9 100644
+--- a/drivers/scsi/scsi.c
++++ b/drivers/scsi/scsi.c
+@@ -621,6 +621,9 @@ int scsi_change_queue_depth(struct scsi_device *sdev, int depth)
+ 		wmb();
  	}
  
++	if (sdev->request_queue)
++		blk_set_queue_depth(sdev->request_queue, depth);
++
+ 	return sdev->queue_depth;
+ }
+ EXPORT_SYMBOL(scsi_change_queue_depth);
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index e79055c8b577..1d12aa664112 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -327,6 +327,8 @@ struct request_queue {
+ 	struct blk_mq_ctx __percpu	*queue_ctx;
+ 	unsigned int		nr_queues;
+ 
++	unsigned int		queue_depth;
++
+ 	/* hw dispatch queues */
+ 	struct blk_mq_hw_ctx	**queue_hw_ctx;
+ 	unsigned int		nr_hw_queues;
+@@ -683,6 +685,14 @@ static inline bool blk_write_same_mergeable(struct bio *a, struct bio *b)
+ 	return false;
+ }
+ 
++static inline unsigned int blk_queue_depth(struct request_queue *q)
++{
++	if (q->queue_depth)
++		return q->queue_depth;
++
++	return q->nr_requests;
++}
++
+ /*
+  * q->prep_rq_fn return values
+  */
+@@ -999,6 +1009,7 @@ extern void blk_limits_io_min(struct queue_limits *limits, unsigned int min);
+ extern void blk_queue_io_min(struct request_queue *q, unsigned int min);
+ extern void blk_limits_io_opt(struct queue_limits *limits, unsigned int opt);
+ extern void blk_queue_io_opt(struct request_queue *q, unsigned int opt);
++extern void blk_set_queue_depth(struct request_queue *q, unsigned int depth);
+ extern void blk_set_default_limits(struct queue_limits *lim);
+ extern void blk_set_stacking_limits(struct queue_limits *lim);
+ extern int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
 -- 
-2.9.2
-
+2.7.4
