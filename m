@@ -1,66 +1,54 @@
-Return-Path: <prvs=80513f069d=axboe@fb.com>
-From: Jens Axboe <axboe@fb.com>
-To: <axboe@kernel.dk>, <linux-kernel@vger.kernel.org>,
-        <linux-fsdevel@vger.kernel.org>, <linux-block@vger.kernel.org>
-CC: Jens Axboe <axboe@fb.com>
-Subject: [PATCH 4/8] writeback: track if we're sleeping on progress in balance_dirty_pages()
-Date: Wed, 31 Aug 2016 11:05:47 -0600
-Message-ID: <1472663151-18560-5-git-send-email-axboe@fb.com>
-In-Reply-To: <1472663151-18560-1-git-send-email-axboe@fb.com>
-References: <1472663151-18560-1-git-send-email-axboe@fb.com>
+Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
+Date: Wed, 31 Aug 2016 12:38:53 -0400
+From: Keith Busch <keith.busch@intel.com>
+To: Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH 4/7] blk-mq: allow the driver to pass in an affinity mask
+Message-ID: <20160831163852.GB5598@localhost.localdomain>
+References: <1472468013-29936-1-git-send-email-hch@lst.de>
+ <1472468013-29936-5-git-send-email-hch@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <1472468013-29936-5-git-send-email-hch@lst.de>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
+List-Post: <mailto:linux-nvme@lists.infradead.org>
+List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
+Cc: axboe@fb.com, linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+Content-Type: text/plain; charset="us-ascii"
+Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
+Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
 List-ID: <linux-block@vger.kernel.org>
 
-Note in the bdi_writeback structure if a task is currently being
-limited in balance_dirty_pages(), waiting for writeback to
-proceed.
+On Mon, Aug 29, 2016 at 12:53:30PM +0200, Christoph Hellwig wrote:
+> +static int blk_mq_create_mq_map(struct blk_mq_tag_set *set,
+> +		const struct cpumask *affinity_mask)
+> +{
+> +	int queue = -1, cpu = 0;
+> +
+> +	set->mq_map = kzalloc_node(sizeof(*set->mq_map) * nr_cpu_ids,
+> +			GFP_KERNEL, set->numa_node);
+> +	if (!set->mq_map)
+> +		return -ENOMEM;
+> +
+> +	if (!affinity_mask)
+> +		return 0;	/* map all cpus to queue 0 */
+> +
+> +	/* If cpus are offline, map them to first hctx */
+> +	for_each_online_cpu(cpu) {
+> +		if (cpumask_test_cpu(cpu, affinity_mask))
+> +			queue++;
+> +		if (queue >= 0)
+> +			set->mq_map[cpu] = queue;
+> +	}
 
-Signed-off-by: Jens Axboe <axboe@fb.com>
----
- include/linux/backing-dev-defs.h | 2 ++
- mm/backing-dev.c                 | 1 +
- mm/page-writeback.c              | 2 ++
- 3 files changed, 5 insertions(+)
+This can't be right. We have a single affinity mask for the entire
+set, but what I think we want is an one affinity mask for each
+nr_io_queues. The irq_create_affinity_mask should then create an array
+of cpumasks based on nr_vecs..
 
-diff --git a/include/linux/backing-dev-defs.h b/include/linux/backing-dev-defs.h
-index c357f27d5483..5a56588573f6 100644
---- a/include/linux/backing-dev-defs.h
-+++ b/include/linux/backing-dev-defs.h
-@@ -116,6 +116,8 @@ struct bdi_writeback {
- 	struct list_head work_list;
- 	struct delayed_work dwork;	/* work item used for writeback */
- 
-+	atomic_t dirty_sleeping;	/* waiting on dirty limit exceeded */
-+
- 	struct list_head bdi_node;	/* anchored at bdi->wb_list */
- 
- #ifdef CONFIG_CGROUP_WRITEBACK
-diff --git a/mm/backing-dev.c b/mm/backing-dev.c
-index 8fde443f36d7..ffd607c9f00d 100644
---- a/mm/backing-dev.c
-+++ b/mm/backing-dev.c
-@@ -310,6 +310,7 @@ static int wb_init(struct bdi_writeback *wb, struct backing_dev_info *bdi,
- 	spin_lock_init(&wb->work_lock);
- 	INIT_LIST_HEAD(&wb->work_list);
- 	INIT_DELAYED_WORK(&wb->dwork, wb_workfn);
-+	atomic_set(&wb->dirty_sleeping, 0);
- 
- 	wb->congested = wb_congested_get_create(bdi, blkcg_id, gfp);
- 	if (!wb->congested)
-diff --git a/mm/page-writeback.c b/mm/page-writeback.c
-index f4cd7d8005c9..c8e9e7a487c6 100644
---- a/mm/page-writeback.c
-+++ b/mm/page-writeback.c
-@@ -1778,7 +1778,9 @@ pause:
- 					  pause,
- 					  start_time);
- 		__set_current_state(TASK_KILLABLE);
-+		atomic_inc(&wb->dirty_sleeping);
- 		io_schedule_timeout(pause);
-+		atomic_dec(&wb->dirty_sleeping);
- 
- 		current->dirty_paused_when = now + pause;
- 		current->nr_dirtied = 0;
--- 
-2.7.4
+_______________________________________________
+Linux-nvme mailing list
+Linux-nvme@lists.infradead.org
+http://lists.infradead.org/mailman/listinfo/linux-nvme
