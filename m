@@ -1,58 +1,86 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.9]:36989 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932179AbcH2Kxm (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 29 Aug 2016 06:53:42 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@fb.com
-Cc: keith.busch@intel.com, linux-block@vger.kernel.org,
-        linux-nvme@lists.infradead.org
-Subject: [PATCH 1/7] blk-mq: don't redistribute hardware queues on a CPU hotplug event
-Date: Mon, 29 Aug 2016 12:53:27 +0200
-Message-Id: <1472468013-29936-2-git-send-email-hch@lst.de>
-In-Reply-To: <1472468013-29936-1-git-send-email-hch@lst.de>
-References: <1472468013-29936-1-git-send-email-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <broonie@sirena.org.uk>
+Date: Wed, 31 Aug 2016 23:09:49 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Christoph Hellwig <hch@infradead.org>, Tejun Heo <tj@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Paolo Valente <paolo.valente@linaro.org>, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, ulf.hansson@linaro.org,
+	linus.walleij@linaro.org, Omar Sandoval <osandov@fb.com>
+Message-ID: <20160831220949.GD5967@sirena.org.uk>
+References: <1470654917-4280-1-git-send-email-paolo.valente@linaro.org>
+ <20160808131954.GA12647@infradead.org>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="SO98HVl1bnMOfKZd"
+In-Reply-To: <20160808131954.GA12647@infradead.org>
+Subject: Re: [PATCH V2 00/22] Replace the CFQ I/O Scheduler with BFQ
+List-ID: <linux-block@vger.kernel.org>
 
-Currently blk-mq will totally remap hardware context when a CPU hotplug
-even happened, which causes major havoc for drivers, as they are never
-told about this remapping.  E.g. any carefully sorted out CPU affinity
-will just be completely messed up.
 
-The rebuild also doesn't really help for the common case of cpu
-hotplug, which is soft onlining / offlining of cpus - in this case we
-should just leave the queue and irq mapping as is.  If it actually
-worked it would have helped in the case of physical cpu hotplug,
-although for that we'd need a way to actually notify the driver.
-Note that drivers may already be able to accommodate such a topology
-change on their own, e.g. using the reset_controller sysfs file in NVMe
-will cause the driver to get things right for this case.
+--SO98HVl1bnMOfKZd
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-With the rebuild removed we will simplify retain the queue mapping for
-a soft offlined CPU that will work when it comes back online, and will
-map any newly onlined CPU to queue 0 until the driver initiates
-a rebuild of the queue map.
+On Mon, Aug 08, 2016 at 06:19:54AM -0700, Christoph Hellwig wrote:
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-mq.c | 2 --
- 1 file changed, 2 deletions(-)
+> please don't spend more time on the legacy request interface.  If you
+> want your work included and make an impact add it to blk-mq.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 13f5a6c..b29e7b2 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2147,8 +2147,6 @@ static void blk_mq_queue_reinit(struct request_queue *q,
- 
- 	blk_mq_sysfs_unregister(q);
- 
--	blk_mq_update_queue_map(q->mq_map, q->nr_hw_queues, online_mask);
--
- 	/*
- 	 * redo blk_mq_init_cpu_queues and blk_mq_init_hw_queues. FIXME: maybe
- 	 * we should change hctx numa_node according to new topology (this
--- 
-2.1.4
+So, an update on this: off-list Tejun said that he'd spoken with Jens
+and agreed that nothing should be changed in the block layer and
+everything should be focused on blk-mq at this point.  This is obviously
+very disappointing especially given the previous reviews - Christoph had
+been very clear but it wasn't clear to us that everyone agreed with him.
 
+I do agree (as I think everyone looking at BFQ does) that we do want to
+work to replace the current block code with blk-mq but it really feels
+that we're still quite a way from being able to deploy it on systems
+with MMC or SD storage where we're particularly looking with this work.
+The big thing that needs doing is the queuing and scheduling which these
+devices don't make any effort to do in hardware.  Omar has been working
+on this but the work has mostly been off-list thus far AFAICT so not
+terribly visible.  Once that's there the individual subsystems will need
+to be converted, that's fairly mechanical code wise but is obviously
+going to need some studying of the performance in order to make sure we
+don't cause problems for users.  This all seems like at least a couple
+of releases worth of work rather than being at the point where the
+current code can be deprecated.
+
+So, how do we take this forward?  In terms of Linaro's work what we've
+been thinking is:
+
+ - Send a proposal for a face to face discussion at Kernel Summit (Paolo
+   will be going there), Paolo said he was drafting a mail.
+ - Continue maintaining and testing BFQ, most likely reverting to a
+   separate scheduler rather than replacing CFQ.
+ - Do some benchmarks on the current status of the various branches on
+   relevant hardware (including trying to convert some of these slower
+   devices to blk-mq and seeing what happens).  Linus has been working
+   on this already in the context of MMC.
+ - Try to pitch in to the blk-mq development, we'll need to work out how
+   to coordinate with everyone else here.
+
+I personally feel that given that it looks like this is all going to
+take a while it'd still be good to merge BFQ at least as an alternative
+scheduler so that people can take advantage of it while the work on
+modernising everything to use blk-mq - that way we can hopefully improve
+the state of the art for users in the short term or at least help get
+some wider feedback on how well this works in the real world
+independently of the work on blk-mq.
+
+--SO98HVl1bnMOfKZd
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQEcBAEBCAAGBQJXx1WrAAoJECTWi3JdVIfQuPsH/2LeWTL9qiL50Nw50IzAfuo4
+bPOBtYDwbAiZI1d/aJZMmf2cEw3PH8i/2log+6ZMwLDSImolUTeJfci9KUOgL9fV
+PoIkUEGwQZcLWD3OqBIR1x7nF5zmPtkryCsb1pQiFrvTRzk3SNIKdJFvPu5x5ubD
+4burh+AtDkYvKUuCOhKUPQURbwUZK1C3j2zkTC5pLPqeH5ZHJFHVvmNn08usFOi0
+dU49mwIhxOgpeC1Rd9daT432hS2cRb0zExanKw67CnQ7ODRp2sJHXJlKIGpR4zIy
+tclO296Xx9T3YzvjUHNfgBXzfNPks5ugYxoiCoOEzAmrx7fcRPYgpOhPMcMh00s=
+=48Y6
+-----END PGP SIGNATURE-----
+
+--SO98HVl1bnMOfKZd--
