@@ -1,322 +1,546 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.9]:37243 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932244AbcH2Kxv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 29 Aug 2016 06:53:51 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@fb.com
-Cc: keith.busch@intel.com, linux-block@vger.kernel.org,
-        linux-nvme@lists.infradead.org
-Subject: [PATCH 4/7] blk-mq: allow the driver to pass in an affinity mask
-Date: Mon, 29 Aug 2016 12:53:30 +0200
-Message-Id: <1472468013-29936-5-git-send-email-hch@lst.de>
-In-Reply-To: <1472468013-29936-1-git-send-email-hch@lst.de>
-References: <1472468013-29936-1-git-send-email-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=80513f069d=axboe@fb.com>
+From: Jens Axboe <axboe@fb.com>
+To: <axboe@kernel.dk>, <linux-kernel@vger.kernel.org>,
+        <linux-fsdevel@vger.kernel.org>, <linux-block@vger.kernel.org>
+CC: Jens Axboe <axboe@fb.com>
+Subject: [PATCH 6/8] block: add scalable completion tracking of requests
+Date: Wed, 31 Aug 2016 11:05:49 -0600
+Message-ID: <1472663151-18560-7-git-send-email-axboe@fb.com>
+In-Reply-To: <1472663151-18560-1-git-send-email-axboe@fb.com>
+References: <1472663151-18560-1-git-send-email-axboe@fb.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+List-ID: <linux-block@vger.kernel.org>
 
-Allow drivers to pass in the affinity mask from the generic interrupt
-layer, and spread queues based on that.  If the driver doesn't pass in
-a mask we will create it using the genirq helper.  As this helper was
-modelled after the blk-mq algorithm there should be no change in
-behavior.
+For legacy block, we simply track them in the request queue. For
+blk-mq, we track them on a per-sw queue basis, which we can then
+sum up through the hardware queues and finally to a per device
+state.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+The stats are tracked in, roughly, 0.1s interval windows.
+
+Add sysfs files to display the stats.
+
+Signed-off-by: Jens Axboe <axboe@fb.com>
 ---
- block/Makefile         |   2 +-
- block/blk-mq-cpumap.c  | 120 -------------------------------------------------
- block/blk-mq.c         |  68 +++++++++++++++++++++++++---
- block/blk-mq.h         |   7 +--
- include/linux/blk-mq.h |   1 +
- 5 files changed, 66 insertions(+), 132 deletions(-)
- delete mode 100644 block/blk-mq-cpumap.c
+ block/Makefile            |   2 +-
+ block/blk-core.c          |   4 +
+ block/blk-mq-sysfs.c      |  47 +++++++++++
+ block/blk-mq.c            |  14 ++++
+ block/blk-mq.h            |   3 +
+ block/blk-stat.c          | 204 ++++++++++++++++++++++++++++++++++++++++++++++
+ block/blk-stat.h          |  17 ++++
+ block/blk-sysfs.c         |  26 ++++++
+ include/linux/blk_types.h |  12 +++
+ include/linux/blkdev.h    |   4 +
+ 10 files changed, 332 insertions(+), 1 deletion(-)
+ create mode 100644 block/blk-stat.c
+ create mode 100644 block/blk-stat.h
 
 diff --git a/block/Makefile b/block/Makefile
-index 9eda232..aeb318d 100644
+index 9eda2322b2d4..3446e0472df0 100644
 --- a/block/Makefile
 +++ b/block/Makefile
-@@ -6,7 +6,7 @@ obj-$(CONFIG_BLOCK) := bio.o elevator.o blk-core.o blk-tag.o blk-sysfs.o \
+@@ -5,7 +5,7 @@
+ obj-$(CONFIG_BLOCK) := bio.o elevator.o blk-core.o blk-tag.o blk-sysfs.o \
  			blk-flush.o blk-settings.o blk-ioc.o blk-map.o \
  			blk-exec.o blk-merge.o blk-softirq.o blk-timeout.o \
- 			blk-lib.o blk-mq.o blk-mq-tag.o \
--			blk-mq-sysfs.o blk-mq-cpu.o blk-mq-cpumap.o ioctl.o \
-+			blk-mq-sysfs.o blk-mq-cpu.o ioctl.o \
+-			blk-lib.o blk-mq.o blk-mq-tag.o \
++			blk-lib.o blk-mq.o blk-mq-tag.o blk-stat.o \
+ 			blk-mq-sysfs.o blk-mq-cpu.o blk-mq-cpumap.o ioctl.o \
  			genhd.o scsi_ioctl.o partition-generic.o ioprio.o \
  			badblocks.o partitions/
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 36c7ac328d8c..4075cbeb720e 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -2475,6 +2475,8 @@ void blk_start_request(struct request *req)
+ {
+ 	blk_dequeue_request(req);
  
-diff --git a/block/blk-mq-cpumap.c b/block/blk-mq-cpumap.c
-deleted file mode 100644
-index d0634bc..0000000
---- a/block/blk-mq-cpumap.c
-+++ /dev/null
-@@ -1,120 +0,0 @@
--/*
-- * CPU <-> hardware queue mapping helpers
-- *
-- * Copyright (C) 2013-2014 Jens Axboe
-- */
--#include <linux/kernel.h>
--#include <linux/threads.h>
--#include <linux/module.h>
--#include <linux/mm.h>
--#include <linux/smp.h>
--#include <linux/cpu.h>
--
--#include <linux/blk-mq.h>
--#include "blk.h"
--#include "blk-mq.h"
--
--static int cpu_to_queue_index(unsigned int nr_cpus, unsigned int nr_queues,
--			      const int cpu)
--{
--	return cpu * nr_queues / nr_cpus;
--}
--
--static int get_first_sibling(unsigned int cpu)
--{
--	unsigned int ret;
--
--	ret = cpumask_first(topology_sibling_cpumask(cpu));
--	if (ret < nr_cpu_ids)
--		return ret;
--
--	return cpu;
--}
--
--int blk_mq_update_queue_map(unsigned int *map, unsigned int nr_queues,
--			    const struct cpumask *online_mask)
--{
--	unsigned int i, nr_cpus, nr_uniq_cpus, queue, first_sibling;
--	cpumask_var_t cpus;
--
--	if (!alloc_cpumask_var(&cpus, GFP_ATOMIC))
--		return 1;
--
--	cpumask_clear(cpus);
--	nr_cpus = nr_uniq_cpus = 0;
--	for_each_cpu(i, online_mask) {
--		nr_cpus++;
--		first_sibling = get_first_sibling(i);
--		if (!cpumask_test_cpu(first_sibling, cpus))
--			nr_uniq_cpus++;
--		cpumask_set_cpu(i, cpus);
--	}
--
--	queue = 0;
--	for_each_possible_cpu(i) {
--		if (!cpumask_test_cpu(i, online_mask)) {
--			map[i] = 0;
--			continue;
--		}
--
--		/*
--		 * Easy case - we have equal or more hardware queues. Or
--		 * there are no thread siblings to take into account. Do
--		 * 1:1 if enough, or sequential mapping if less.
--		 */
--		if (nr_queues >= nr_cpus || nr_cpus == nr_uniq_cpus) {
--			map[i] = cpu_to_queue_index(nr_cpus, nr_queues, queue);
--			queue++;
--			continue;
--		}
--
--		/*
--		 * Less then nr_cpus queues, and we have some number of
--		 * threads per cores. Map sibling threads to the same
--		 * queue.
--		 */
--		first_sibling = get_first_sibling(i);
--		if (first_sibling == i) {
--			map[i] = cpu_to_queue_index(nr_uniq_cpus, nr_queues,
--							queue);
--			queue++;
--		} else
--			map[i] = map[first_sibling];
--	}
--
--	free_cpumask_var(cpus);
--	return 0;
--}
--
--unsigned int *blk_mq_make_queue_map(struct blk_mq_tag_set *set)
--{
--	unsigned int *map;
--
--	/* If cpus are offline, map them to first hctx */
--	map = kzalloc_node(sizeof(*map) * nr_cpu_ids, GFP_KERNEL,
--				set->numa_node);
--	if (!map)
--		return NULL;
--
--	if (!blk_mq_update_queue_map(map, set->nr_hw_queues, cpu_online_mask))
--		return map;
--
--	kfree(map);
--	return NULL;
--}
--
--/*
-- * We have no quick way of doing reverse lookups. This is only used at
-- * queue init time, so runtime isn't important.
-- */
--int blk_mq_hw_queue_to_node(unsigned int *mq_map, unsigned int index)
--{
--	int i;
--
--	for_each_possible_cpu(i) {
--		if (index == mq_map[i])
--			return local_memory_node(cpu_to_node(i));
--	}
--
--	return NUMA_NO_NODE;
--}
++	req->issue_time = ktime_to_ns(ktime_get());
++
+ 	/*
+ 	 * We are now handing the request to the hardware, initialize
+ 	 * resid_len to full count and add the timeout handler.
+@@ -2542,6 +2544,8 @@ bool blk_update_request(struct request *req, int error, unsigned int nr_bytes)
+ 
+ 	trace_block_rq_complete(req->q, req, nr_bytes);
+ 
++	blk_stat_add(&req->q->rq_stats[rq_data_dir(req)], req);
++
+ 	if (!req->bio)
+ 		return false;
+ 
+diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
+index fe822aa5b8e4..b66bbf13cc12 100644
+--- a/block/blk-mq-sysfs.c
++++ b/block/blk-mq-sysfs.c
+@@ -247,6 +247,47 @@ static ssize_t blk_mq_hw_sysfs_cpus_show(struct blk_mq_hw_ctx *hctx, char *page)
+ 	return ret;
+ }
+ 
++static void blk_mq_stat_clear(struct blk_mq_hw_ctx *hctx)
++{
++	struct blk_mq_ctx *ctx;
++	unsigned int i;
++
++	hctx_for_each_ctx(hctx, ctx, i) {
++		blk_stat_init(&ctx->stat[0]);
++		blk_stat_init(&ctx->stat[1]);
++	}
++}
++
++static ssize_t blk_mq_hw_sysfs_stat_store(struct blk_mq_hw_ctx *hctx,
++					  const char *page, size_t count)
++{
++	blk_mq_stat_clear(hctx);
++	return count;
++}
++
++static ssize_t print_stat(char *page, struct blk_rq_stat *stat, const char *pre)
++{
++	return sprintf(page, "%s samples=%llu, mean=%lld, min=%lld, max=%lld\n",
++			pre, (long long) stat->nr_samples,
++			(long long) stat->mean, (long long) stat->min,
++			(long long) stat->max);
++}
++
++static ssize_t blk_mq_hw_sysfs_stat_show(struct blk_mq_hw_ctx *hctx, char *page)
++{
++	struct blk_rq_stat stat[2];
++	ssize_t ret;
++
++	blk_stat_init(&stat[0]);
++	blk_stat_init(&stat[1]);
++
++	blk_hctx_stat_get(hctx, stat);
++
++	ret = print_stat(page, &stat[0], "read :");
++	ret += print_stat(page + ret, &stat[1], "write:");
++	return ret;
++}
++
+ static struct blk_mq_ctx_sysfs_entry blk_mq_sysfs_dispatched = {
+ 	.attr = {.name = "dispatched", .mode = S_IRUGO },
+ 	.show = blk_mq_sysfs_dispatched_show,
+@@ -304,6 +345,11 @@ static struct blk_mq_hw_ctx_sysfs_entry blk_mq_hw_sysfs_poll = {
+ 	.attr = {.name = "io_poll", .mode = S_IRUGO },
+ 	.show = blk_mq_hw_sysfs_poll_show,
+ };
++static struct blk_mq_hw_ctx_sysfs_entry blk_mq_hw_sysfs_stat = {
++	.attr = {.name = "stats", .mode = S_IRUGO | S_IWUSR },
++	.show = blk_mq_hw_sysfs_stat_show,
++	.store = blk_mq_hw_sysfs_stat_store,
++};
+ 
+ static struct attribute *default_hw_ctx_attrs[] = {
+ 	&blk_mq_hw_sysfs_queued.attr,
+@@ -314,6 +360,7 @@ static struct attribute *default_hw_ctx_attrs[] = {
+ 	&blk_mq_hw_sysfs_cpus.attr,
+ 	&blk_mq_hw_sysfs_active.attr,
+ 	&blk_mq_hw_sysfs_poll.attr,
++	&blk_mq_hw_sysfs_stat.attr,
+ 	NULL,
+ };
+ 
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 434df39..a679562 100644
+index 13f5a6c1de76..712f141a6f1a 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -22,6 +22,7 @@
- #include <linux/sched/sysctl.h>
- #include <linux/delay.h>
- #include <linux/crash_dump.h>
-+#include <linux/interrupt.h>
+@@ -29,6 +29,7 @@
+ #include "blk.h"
+ #include "blk-mq.h"
+ #include "blk-mq-tag.h"
++#include "blk-stat.h"
  
- #include <trace/events/block.h>
- 
-@@ -1969,6 +1970,22 @@ struct request_queue *blk_mq_init_queue(struct blk_mq_tag_set *set)
+ static DEFINE_MUTEX(all_q_mutex);
+ static LIST_HEAD(all_q_list);
+@@ -400,10 +401,19 @@ static void blk_mq_ipi_complete_request(struct request *rq)
+ 	put_cpu();
  }
- EXPORT_SYMBOL(blk_mq_init_queue);
  
-+/*
-+ * We have no quick way of doing reverse lookups. This is only used at
-+ * queue init time, so runtime isn't important.
-+ */
-+static int blk_mq_hw_queue_to_node(unsigned int *mq_map, unsigned int index)
++static void blk_mq_stat_add(struct request *rq)
 +{
-+	int i;
++	struct blk_rq_stat *stat = &rq->mq_ctx->stat[rq_data_dir(rq)];
 +
-+	for_each_possible_cpu(i) {
-+		if (index == mq_map[i])
-+			return local_memory_node(cpu_to_node(i));
-+	}
-+
-+	return NUMA_NO_NODE;
++	blk_stat_add(stat, rq);
 +}
 +
- static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
- 						struct request_queue *q)
+ static void __blk_mq_complete_request(struct request *rq)
  {
-@@ -2268,6 +2285,30 @@ struct cpumask *blk_mq_tags_cpumask(struct blk_mq_tags *tags)
- }
- EXPORT_SYMBOL_GPL(blk_mq_tags_cpumask);
+ 	struct request_queue *q = rq->q;
  
-+static int blk_mq_create_mq_map(struct blk_mq_tag_set *set,
-+		const struct cpumask *affinity_mask)
-+{
-+	int queue = -1, cpu = 0;
++	blk_mq_stat_add(rq);
 +
-+	set->mq_map = kzalloc_node(sizeof(*set->mq_map) * nr_cpu_ids,
-+			GFP_KERNEL, set->numa_node);
-+	if (!set->mq_map)
-+		return -ENOMEM;
-+
-+	if (!affinity_mask)
-+		return 0;	/* map all cpus to queue 0 */
-+
-+	/* If cpus are offline, map them to first hctx */
-+	for_each_online_cpu(cpu) {
-+		if (cpumask_test_cpu(cpu, affinity_mask))
-+			queue++;
-+		if (queue >= 0)
-+			set->mq_map[cpu] = queue;
-+	}
-+
-+	return 0;
-+}
-+
- /*
-  * Alloc a tag set to be associated with one or more request queues.
-  * May fail with EINVAL for various error conditions. May adjust the
-@@ -2276,6 +2317,8 @@ EXPORT_SYMBOL_GPL(blk_mq_tags_cpumask);
-  */
- int blk_mq_alloc_tag_set(struct blk_mq_tag_set *set)
- {
-+	int ret;
-+
- 	BUILD_BUG_ON(BLK_MQ_MAX_DEPTH > 1 << BLK_MQ_UNIQUE_TAG_BITS);
+ 	if (!q->softirq_done_fn)
+ 		blk_mq_end_request(rq, rq->errors);
+ 	else
+@@ -447,6 +457,8 @@ void blk_mq_start_request(struct request *rq)
+ 	if (unlikely(blk_bidi_rq(rq)))
+ 		rq->next_rq->resid_len = blk_rq_bytes(rq->next_rq);
  
- 	if (!set->nr_hw_queues)
-@@ -2314,11 +2357,26 @@ int blk_mq_alloc_tag_set(struct blk_mq_tag_set *set)
- 	if (!set->tags)
- 		return -ENOMEM;
- 
--	set->mq_map = blk_mq_make_queue_map(set);
--	if (!set->mq_map)
--		goto out_free_tags;
-+	/*
-+	 * Use the passed in affinity mask if the driver provided one.
-+	 */
-+	if (set->affinity_mask) {
-+		ret = blk_mq_create_mq_map(set, set->affinity_mask);
-+		if (!set->mq_map)
-+			goto out_free_tags;
-+	} else {
-+		struct cpumask *affinity_mask;
++	rq->issue_time = ktime_to_ns(ktime_get());
 +
-+		affinity_mask = irq_create_affinity_mask(&set->nr_hw_queues);
-+		ret = blk_mq_create_mq_map(set, affinity_mask);
-+		kfree(affinity_mask);
-+
-+		if (!set->mq_map)
-+			goto out_free_tags;
-+	}
+ 	blk_add_timer(rq);
  
--	if (blk_mq_alloc_rq_maps(set))
-+	ret = blk_mq_alloc_rq_maps(set);
-+	if (ret)
- 		goto out_free_mq_map;
+ 	/*
+@@ -1795,6 +1807,8 @@ static void blk_mq_init_cpu_queues(struct request_queue *q,
+ 		spin_lock_init(&__ctx->lock);
+ 		INIT_LIST_HEAD(&__ctx->rq_list);
+ 		__ctx->queue = q;
++		blk_stat_init(&__ctx->stat[0]);
++		blk_stat_init(&__ctx->stat[1]);
  
- 	mutex_init(&set->tag_list_lock);
-@@ -2332,7 +2390,7 @@ out_free_mq_map:
- out_free_tags:
- 	kfree(set->tags);
- 	set->tags = NULL;
--	return -ENOMEM;
-+	return ret;
- }
- EXPORT_SYMBOL(blk_mq_alloc_tag_set);
- 
+ 		/* If the cpu isn't online, the cpu is mapped to first hctx */
+ 		if (!cpu_online(i))
 diff --git a/block/blk-mq.h b/block/blk-mq.h
-index ec774bf..7ef5302 100644
+index 9087b11037b7..e107f700ff17 100644
 --- a/block/blk-mq.h
 +++ b/block/blk-mq.h
-@@ -45,13 +45,8 @@ void blk_mq_enable_hotplug(void);
- void blk_mq_disable_hotplug(void);
+@@ -1,6 +1,8 @@
+ #ifndef INT_BLK_MQ_H
+ #define INT_BLK_MQ_H
  
- /*
-- * CPU -> queue mappings
-+ * CPU -> queue mapping
-  */
--extern unsigned int *blk_mq_make_queue_map(struct blk_mq_tag_set *set);
--extern int blk_mq_update_queue_map(unsigned int *map, unsigned int nr_queues,
--				   const struct cpumask *online_mask);
--extern int blk_mq_hw_queue_to_node(unsigned int *map, unsigned int);
--
- static inline struct blk_mq_hw_ctx *blk_mq_map_queue(struct request_queue *q,
- 		int cpu)
- {
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index d4d8bc8..29e227b 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -75,6 +75,7 @@ struct blk_mq_tag_set {
- 	unsigned int		timeout;
- 	unsigned int		flags;		/* BLK_MQ_F_* */
- 	void			*driver_data;
-+	struct cpumask		*affinity_mask;
++#include "blk-stat.h"
++
+ struct blk_mq_tag_set;
  
- 	struct blk_mq_tags	**tags;
+ struct blk_mq_ctx {
+@@ -20,6 +22,7 @@ struct blk_mq_ctx {
  
+ 	/* incremented at completion time */
+ 	unsigned long		____cacheline_aligned_in_smp rq_completed[2];
++	struct blk_rq_stat	stat[2];
+ 
+ 	struct request_queue	*queue;
+ 	struct kobject		kobj;
+diff --git a/block/blk-stat.c b/block/blk-stat.c
+new file mode 100644
+index 000000000000..76cf2e2092c1
+--- /dev/null
++++ b/block/blk-stat.c
+@@ -0,0 +1,204 @@
++/*
++ * Block stat tracking code
++ *
++ * Copyright (C) 2016 Jens Axboe
++ */
++#include <linux/kernel.h>
++#include <linux/blk-mq.h>
++
++#include "blk-stat.h"
++#include "blk-mq.h"
++
++static void blk_stat_flush_batch(struct blk_rq_stat *stat)
++{
++	if (!stat->nr_batch)
++		return;
++	if (!stat->nr_samples)
++		stat->mean = div64_s64(stat->batch, stat->nr_batch);
++	else {
++		stat->mean = div64_s64((stat->mean * stat->nr_samples) +
++					stat->batch,
++					stat->nr_samples + stat->nr_batch);
++	}
++
++	stat->nr_samples += stat->nr_batch;
++	stat->nr_batch = stat->batch = 0;
++}
++
++void blk_stat_sum(struct blk_rq_stat *dst, struct blk_rq_stat *src)
++{
++	if (!src->nr_samples)
++		return;
++
++	blk_stat_flush_batch(src);
++
++	dst->min = min(dst->min, src->min);
++	dst->max = max(dst->max, src->max);
++
++	if (!dst->nr_samples)
++		dst->mean = src->mean;
++	else {
++		dst->mean = div64_s64((src->mean * src->nr_samples) +
++					(dst->mean * dst->nr_samples),
++					dst->nr_samples + src->nr_samples);
++	}
++	dst->nr_samples += src->nr_samples;
++}
++
++static void blk_mq_stat_get(struct request_queue *q, struct blk_rq_stat *dst)
++{
++	struct blk_mq_hw_ctx *hctx;
++	struct blk_mq_ctx *ctx;
++	int i, j, nr;
++
++	blk_stat_init(&dst[0]);
++	blk_stat_init(&dst[1]);
++
++	nr = 0;
++	do {
++		uint64_t newest = 0;
++
++		queue_for_each_hw_ctx(q, hctx, i) {
++			hctx_for_each_ctx(hctx, ctx, j) {
++				if (!ctx->stat[0].nr_samples &&
++				    !ctx->stat[1].nr_samples)
++					continue;
++				if (ctx->stat[0].time > newest)
++					newest = ctx->stat[0].time;
++				if (ctx->stat[1].time > newest)
++					newest = ctx->stat[1].time;
++			}
++		}
++
++		/*
++		 * No samples
++		 */
++		if (!newest)
++			break;
++
++		queue_for_each_hw_ctx(q, hctx, i) {
++			hctx_for_each_ctx(hctx, ctx, j) {
++				if (ctx->stat[0].time == newest) {
++					blk_stat_sum(&dst[0], &ctx->stat[0]);
++					nr++;
++				}
++				if (ctx->stat[1].time == newest) {
++					blk_stat_sum(&dst[1], &ctx->stat[1]);
++					nr++;
++				}
++			}
++		}
++		/*
++		 * If we race on finding an entry, just loop back again.
++		 * Should be very rare.
++		 */
++	} while (!nr);
++}
++
++void blk_queue_stat_get(struct request_queue *q, struct blk_rq_stat *dst)
++{
++	if (q->mq_ops)
++		blk_mq_stat_get(q, dst);
++	else {
++		memcpy(&dst[0], &q->rq_stats[0], sizeof(struct blk_rq_stat));
++		memcpy(&dst[1], &q->rq_stats[1], sizeof(struct blk_rq_stat));
++	}
++}
++
++void blk_hctx_stat_get(struct blk_mq_hw_ctx *hctx, struct blk_rq_stat *dst)
++{
++	struct blk_mq_ctx *ctx;
++	unsigned int i, nr;
++
++	nr = 0;
++	do {
++		uint64_t newest = 0;
++
++		hctx_for_each_ctx(hctx, ctx, i) {
++			if (!ctx->stat[0].nr_samples &&
++			    !ctx->stat[1].nr_samples)
++				continue;
++
++			if (ctx->stat[0].time > newest)
++				newest = ctx->stat[0].time;
++			if (ctx->stat[1].time > newest)
++				newest = ctx->stat[1].time;
++		}
++
++		if (!newest)
++			break;
++
++		hctx_for_each_ctx(hctx, ctx, i) {
++			if (ctx->stat[0].time == newest) {
++				blk_stat_sum(&dst[0], &ctx->stat[0]);
++				nr++;
++			}
++			if (ctx->stat[1].time == newest) {
++				blk_stat_sum(&dst[1], &ctx->stat[1]);
++				nr++;
++			}
++		}
++		/*
++		 * If we race on finding an entry, just loop back again.
++		 * Should be very rare, as the window is only updated
++		 * occasionally
++		 */
++	} while (!nr);
++}
++
++static void __blk_stat_init(struct blk_rq_stat *stat, s64 time_now)
++{
++	stat->min = -1ULL;
++	stat->max = stat->nr_samples = stat->mean = 0;
++	stat->batch = stat->nr_batch = 0;
++	stat->time = time_now & BLK_STAT_MASK;
++}
++
++void blk_stat_init(struct blk_rq_stat *stat)
++{
++	__blk_stat_init(stat, ktime_to_ns(ktime_get()));
++}
++
++void blk_stat_add(struct blk_rq_stat *stat, struct request *rq)
++{
++	s64 now, value;
++
++	now = ktime_to_ns(ktime_get());
++	if (now < rq->issue_time)
++		return;
++
++	if ((now & BLK_STAT_MASK) != (stat->time & BLK_STAT_MASK))
++		__blk_stat_init(stat, now);
++
++	value = now - rq->issue_time;
++	if (value > stat->max)
++		stat->max = value;
++	if (value < stat->min)
++		stat->min = value;
++
++	if (stat->batch + value < stat->batch ||
++	    stat->nr_batch + 1 == BLK_RQ_STAT_BATCH)
++		blk_stat_flush_batch(stat);
++
++	stat->batch += value;
++	stat->nr_batch++;
++}
++
++void blk_stat_clear(struct request_queue *q)
++{
++	if (q->mq_ops) {
++		struct blk_mq_hw_ctx *hctx;
++		struct blk_mq_ctx *ctx;
++		int i, j;
++
++		queue_for_each_hw_ctx(q, hctx, i) {
++			hctx_for_each_ctx(hctx, ctx, j) {
++				blk_stat_init(&ctx->stat[0]);
++				blk_stat_init(&ctx->stat[1]);
++			}
++		}
++	} else {
++		blk_stat_init(&q->rq_stats[0]);
++		blk_stat_init(&q->rq_stats[1]);
++	}
++}
+diff --git a/block/blk-stat.h b/block/blk-stat.h
+new file mode 100644
+index 000000000000..d77548dbf196
+--- /dev/null
++++ b/block/blk-stat.h
+@@ -0,0 +1,17 @@
++#ifndef BLK_STAT_H
++#define BLK_STAT_H
++
++/*
++ * ~0.13s window as a power-of-2 (2^27 nsecs)
++ */
++#define BLK_STAT_NSEC	134217728ULL
++#define BLK_STAT_MASK	~(BLK_STAT_NSEC - 1)
++
++void blk_stat_add(struct blk_rq_stat *, struct request *);
++void blk_hctx_stat_get(struct blk_mq_hw_ctx *, struct blk_rq_stat *);
++void blk_queue_stat_get(struct request_queue *, struct blk_rq_stat *);
++void blk_stat_clear(struct request_queue *q);
++void blk_stat_init(struct blk_rq_stat *);
++void blk_stat_sum(struct blk_rq_stat *, struct blk_rq_stat *);
++
++#endif
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index f87a7e747d36..0b9e435fec97 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -384,6 +384,26 @@ static ssize_t queue_dax_show(struct request_queue *q, char *page)
+ 	return queue_var_show(blk_queue_dax(q), page);
+ }
+ 
++static ssize_t print_stat(char *page, struct blk_rq_stat *stat, const char *pre)
++{
++	return sprintf(page, "%s samples=%llu, mean=%lld, min=%lld, max=%lld\n",
++			pre, (long long) stat->nr_samples,
++			(long long) stat->mean, (long long) stat->min,
++			(long long) stat->max);
++}
++
++static ssize_t queue_stats_show(struct request_queue *q, char *page)
++{
++	struct blk_rq_stat stat[2];
++	ssize_t ret;
++
++	blk_queue_stat_get(q, stat);
++
++	ret = print_stat(page, &stat[0], "read :");
++	ret += print_stat(page + ret, &stat[1], "write:");
++	return ret;
++}
++
+ static struct queue_sysfs_entry queue_requests_entry = {
+ 	.attr = {.name = "nr_requests", .mode = S_IRUGO | S_IWUSR },
+ 	.show = queue_requests_show,
+@@ -526,6 +546,11 @@ static struct queue_sysfs_entry queue_dax_entry = {
+ 	.show = queue_dax_show,
+ };
+ 
++static struct queue_sysfs_entry queue_stats_entry = {
++	.attr = {.name = "stats", .mode = S_IRUGO },
++	.show = queue_stats_show,
++};
++
+ static struct attribute *default_attrs[] = {
+ 	&queue_requests_entry.attr,
+ 	&queue_ra_entry.attr,
+@@ -553,6 +578,7 @@ static struct attribute *default_attrs[] = {
+ 	&queue_poll_entry.attr,
+ 	&queue_wc_entry.attr,
+ 	&queue_dax_entry.attr,
++	&queue_stats_entry.attr,
+ 	NULL,
+ };
+ 
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index be4409b6ae4f..95fbfa1fe010 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -266,4 +266,16 @@ static inline unsigned int blk_qc_t_to_tag(blk_qc_t cookie)
+ 	return cookie & ((1u << BLK_QC_T_SHIFT) - 1);
+ }
+ 
++#define BLK_RQ_STAT_BATCH	64
++
++struct blk_rq_stat {
++	s64 mean;
++	u64 min;
++	u64 max;
++	s32 nr_samples;
++	s32 nr_batch;
++	u64 batch;
++	s64 time;
++};
++
+ #endif /* __LINUX_BLK_TYPES_H */
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 1d12aa664112..259eba88f991 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -151,6 +151,7 @@ struct request {
+ 	struct gendisk *rq_disk;
+ 	struct hd_struct *part;
+ 	unsigned long start_time;
++	s64 issue_time;
+ #ifdef CONFIG_BLK_CGROUP
+ 	struct request_list *rl;		/* rl this rq is alloced from */
+ 	unsigned long long start_time_ns;
+@@ -414,6 +415,9 @@ struct request_queue {
+ 
+ 	unsigned int		nr_sorted;
+ 	unsigned int		in_flight[2];
++
++	struct blk_rq_stat	rq_stats[2];
++
+ 	/*
+ 	 * Number of active block driver functions for which blk_drain_queue()
+ 	 * must wait. Must be incremented around functions that unlock the
 -- 
-2.1.4
-
+2.7.4
