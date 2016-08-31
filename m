@@ -1,86 +1,37 @@
-Return-Path: <famz@redhat.com>
-From: Fam Zheng <famz@redhat.com>
-To: linux-kernel@vger.kernel.org
-Cc: linux-nvme@lists.infradead.org, Keith Busch <keith.busch@intel.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        linuxppc-dev@lists.ozlabs.org, "Michael S. Tsirkin" <mst@redhat.com>,
-        linux-block@vger.kernel.org,
-        Brian Norris <computersforpeace@gmail.com>,
-        Paul Mackerras <paulus@samba.org>, linux-mtd@lists.infradead.org,
-        "Ed L. Cashin" <ed.cashin@acm.org>, Jens Axboe <axboe@kernel.dk>,
-        Minchan Kim <minchan@kernel.org>,
-        virtualization@lists.linux-foundation.org,
-        Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
-        Nitin Gupta <ngupta@vflare.org>, David Woodhouse <dwmw2@infradead.org>
-Subject: [PATCH 14/15] axonram: Pass attribute group to device_add_disk
-Date: Wed, 17 Aug 2016 15:15:14 +0800
-Message-Id: <1471418115-3654-15-git-send-email-famz@redhat.com>
-In-Reply-To: <1471418115-3654-1-git-send-email-famz@redhat.com>
-References: <1471418115-3654-1-git-send-email-famz@redhat.com>
+Return-Path: <prvs=80513f069d=axboe@fb.com>
+From: Jens Axboe <axboe@fb.com>
+To: <axboe@kernel.dk>, <linux-kernel@vger.kernel.org>,
+        <linux-fsdevel@vger.kernel.org>, <linux-block@vger.kernel.org>
+CC: Jens Axboe <axboe@fb.com>
+Subject: [PATCH 3/8] writeback: use WRITE_BG for kupdate and background writeback
+Date: Wed, 31 Aug 2016 11:05:46 -0600
+Message-ID: <1472663151-18560-4-git-send-email-axboe@fb.com>
+In-Reply-To: <1472663151-18560-1-git-send-email-axboe@fb.com>
+References: <1472663151-18560-1-git-send-email-axboe@fb.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-Previously after device_add_disk returns, the KOBJ_ADD uevent is already
-emitted. Adding attributes after that is a poor usage of kobject, and
-in practice may result in race conditions with userspace, for
-example udev checks availability of certain attributes and initializes
-/dev entries conditionally.
+If we're doing background type writes, then use the appropriate
+write command for that.
 
-device_add_disk can handle adding attribute group better, so use it.
-Meanwhile, handle the error of device_add_disk.
-
-Signed-off-by: Fam Zheng <famz@redhat.com>
+Signed-off-by: Jens Axboe <axboe@fb.com>
 ---
- arch/powerpc/sysdev/axonram.c | 23 +++++++++++++++--------
- 1 file changed, 15 insertions(+), 8 deletions(-)
+ include/linux/writeback.h | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/arch/powerpc/sysdev/axonram.c b/arch/powerpc/sysdev/axonram.c
-index 6aef6c2..23109e3 100644
---- a/arch/powerpc/sysdev/axonram.c
-+++ b/arch/powerpc/sysdev/axonram.c
-@@ -158,6 +158,15 @@ static const struct block_device_operations axon_ram_devops = {
- 	.direct_access	= axon_ram_direct_access
- };
+diff --git a/include/linux/writeback.h b/include/linux/writeback.h
+index e1fc25172397..7fb80c78f159 100644
+--- a/include/linux/writeback.h
++++ b/include/linux/writeback.h
+@@ -104,6 +104,8 @@ static inline int wbc_to_write_flags(struct writeback_control *wbc)
+ {
+ 	if (wbc->sync_mode == WB_SYNC_ALL)
+ 		return WRITE_SYNC;
++	else if (wbc->for_kupdate || wbc->for_background)
++		return WRITE_BG;
  
-+static struct attribute *axon_attrs[] = {
-+	&dev_attr_ecc.attr,
-+	NULL,
-+};
-+
-+static struct attribute_group axon_attr_group = {
-+	.attrs = axon_attrs,
-+};
-+
- /**
-  * axon_ram_probe - probe() method for platform driver
-  * @device: see platform_driver method
-@@ -237,7 +246,12 @@ static int axon_ram_probe(struct platform_device *device)
- 	set_capacity(bank->disk, bank->size >> AXON_RAM_SECTOR_SHIFT);
- 	blk_queue_make_request(bank->disk->queue, axon_ram_make_request);
- 	blk_queue_logical_block_size(bank->disk->queue, AXON_RAM_SECTOR_SIZE);
--	device_add_disk(&device->dev, bank->disk, NULL);
-+	rc = device_add_disk(&device->dev, bank->disk, &axon_attr_group);
-+	if (rc != 0) {
-+		dev_err(&device->dev, "Cannot create disk\n");
-+		rc = -EFAULT;
-+		goto failed;
-+	}
- 
- 	bank->irq_id = irq_of_parse_and_map(device->dev.of_node, 0);
- 	if (bank->irq_id == NO_IRQ) {
-@@ -255,13 +269,6 @@ static int axon_ram_probe(struct platform_device *device)
- 		goto failed;
- 	}
- 
--	rc = device_create_file(&device->dev, &dev_attr_ecc);
--	if (rc != 0) {
--		dev_err(&device->dev, "Cannot create sysfs file\n");
--		rc = -EFAULT;
--		goto failed;
--	}
--
- 	azfs_minor += bank->disk->minors;
- 
- 	return 0;
+ 	return WRITE;
+ }
 -- 
 2.7.4
