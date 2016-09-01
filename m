@@ -1,30 +1,26 @@
 Return-Path: <jthumshirn@suse.de>
-Date: Thu, 1 Sep 2016 09:59:31 +0200
+Date: Thu, 1 Sep 2016 09:55:18 +0200
 From: Johannes Thumshirn <jthumshirn@suse.de>
 To: Jens Axboe <axboe@fb.com>
 Cc: axboe@kernel.dk, linux-kernel@vger.kernel.org,
 	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
 Subject: Re: [PATCH 1/8] block: add WRITE_BG
-Message-ID: <20160901075930.fmvsvji6hyfruv57@c203.arch.suse.de>
+Message-ID: <20160901075518.7itcqemtm6dzmj7k@c203.arch.suse.de>
 References: <1472663151-18560-1-git-send-email-axboe@fb.com>
  <1472663151-18560-2-git-send-email-axboe@fb.com>
- <20160901075518.7itcqemtm6dzmj7k@c203.arch.suse.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <20160901075518.7itcqemtm6dzmj7k@c203.arch.suse.de>
+In-Reply-To: <1472663151-18560-2-git-send-email-axboe@fb.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Sep 01, 2016 at 09:55:18AM +0200, Johannes Thumshirn wrote:
-> On Wed, Aug 31, 2016 at 11:05:44AM -0600, Jens Axboe wrote:
-> > This adds a new request flag, REQ_BG, that callers can use to tell
-> > the block layer that this is background (non-urgent) IO.
-> > 
-> > Signed-off-by: Jens Axboe <axboe@fb.com>
-> > ---
+On Wed, Aug 31, 2016 at 11:05:44AM -0600, Jens Axboe wrote:
+> This adds a new request flag, REQ_BG, that callers can use to tell
+> the block layer that this is background (non-urgent) IO.
 > 
-> s/WRITE_BG/REQ_BG/ in Subject?
+> Signed-off-by: Jens Axboe <axboe@fb.com>
+> ---
 
-Gah rm $LAST_MAIL
+s/WRITE_BG/REQ_BG/ in Subject?
 
 -- 
 Johannes Thumshirn                                          Storage
