@@ -1,58 +1,49 @@
-Return-Path: <b.zolnierkie@samsung.com>
-From: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
-To: Linus Walleij <linus.walleij@linaro.org>
-Cc: Mark Brown <broonie@kernel.org>, Christoph Hellwig <hch@infradead.org>,
- Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>,
- Paolo Valente <paolo.valente@linaro.org>, linux-block@vger.kernel.org,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- Ulf Hansson <ulf.hansson@linaro.org>, Omar Sandoval <osandov@fb.com>
+Return-Path: <bcache@lists.ewheeler.net>
+Date: Thu, 1 Sep 2016 14:06:02 -0700 (PDT)
+From: Eric Wheeler <bcache@lists.ewheeler.net>
+To: Mark Brown <broonie@kernel.org>
+cc: Christoph Hellwig <hch@infradead.org>, Tejun Heo <tj@kernel.org>,
+    Jens Axboe <axboe@kernel.dk>, Paolo Valente <paolo.valente@linaro.org>,
+    linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+    ulf.hansson@linaro.org, linus.walleij@linaro.org,
+    linux-bcache@vger.kernel.org, Omar Sandoval <osandov@fb.com>
 Subject: Re: [PATCH V2 00/22] Replace the CFQ I/O Scheduler with BFQ
-Date: Mon, 05 Sep 2016 17:56:35 +0200
-Message-id: <17539224.xnQ9OR2lcz@amdc1976>
-In-reply-to: 
- <CACRpkdZjMcOyn6C-xV3yLsQM0hxZ1JUMGmmS8VqaDpx1xiL1ZA@mail.gmail.com>
-References: <1470654917-4280-1-git-send-email-paolo.valente@linaro.org>
- <20160831220949.GD5967@sirena.org.uk>
- <CACRpkdZjMcOyn6C-xV3yLsQM0hxZ1JUMGmmS8VqaDpx1xiL1ZA@mail.gmail.com>
-MIME-version: 1.0
-Content-type: text/plain; charset=us-ascii
+In-Reply-To: <20160831220949.GD5967@sirena.org.uk>
+Message-ID: <alpine.LRH.2.11.1609011349290.5413@mail.ewheeler.net>
+References: <1470654917-4280-1-git-send-email-paolo.valente@linaro.org> <20160808131954.GA12647@infradead.org> <20160831220949.GD5967@sirena.org.uk>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 List-ID: <linux-block@vger.kernel.org>
 
+On Wed, 31 Aug 2016, Mark Brown wrote:
+[...]
+> I personally feel that given that it looks like this is all going to
+> take a while it'd still be good to merge BFQ at least as an alternative
+> scheduler so that people can take advantage of it while the work on
+> modernising everything to use blk-mq - that way we can hopefully improve
+> the state of the art for users in the short term or at least help get
+> some wider feedback on how well this works in the real world
+> independently of the work on blk-mq.
 
-Hi,
+I would like to chime in agree fervently with Mark.  
 
-On Thursday, September 01, 2016 10:39:46 AM Linus Walleij wrote:
-> On Thu, Sep 1, 2016 at 12:09 AM, Mark Brown <broonie@kernel.org> wrote:
-> 
-> >  - Do some benchmarks on the current status of the various branches on
-> >    relevant hardware (including trying to convert some of these slower
-> >    devices to blk-mq and seeing what happens).  Linus has been working
-> >    on this already in the context of MMC.
-> 
-> I'm trying to do a patch switching MMC to use blk-mq, so I can
-> benchmark performance before/after this.
-> 
-> While we expect mq to perform worse on single-hardware-queue
-> devices like these, we don't know until we tried, so I'm trying.
+We have a pair of very busy hypervisors with a complicated block stack 
+integrating bcache, drbd, LVM, dm-thin, kvm, ggaoed (AoE target), zram 
+swap, continuous block-layer backups and snapshot verifies to tertiary 
+storage, cgroup block IO throttled limits, and lots of hourly dm-thin 
+snapshots replicated to tertiary storage.  All of this is performed under 
+heavy memory pressure (35-40% swapped out to zram).
 
-I did this (switched MMC to blk-mq) some time ago.  Patches are
-extremely ugly and hacky (basically the whole MMC block layer
-glue code needs to be re-done) so I'm rather reluctant to
-sharing them yet (to be honest I would like to rewrite them
-completely before posting).
+The systems work moderately well under cfq, but *amazingly well* using 
+BFQ.  I like BFQ so much that I've backported v8r2 to Linux v4.1 [1].
 
-I only did linear read tests (using dd) so far and results that
-I got were mixed (BTW the hardware I'm doing this work on is
-Odroid-XU3).  Pure block performance under maximum CPU frequency
-was slightly worse (5-12%) but the CPU consumption was reduced so
-when CPU was scaled down manually (or ondemand CPUfreq governor
-was used) blk-mq mode results were better then vanilla ones (up
-to 10% when CPU was scaled down to minimum frequency and even
-up to 50% when using ondemand governor - this finding is very
-interesting and needs to be investigated further).
++1 to upstream this as a new scheduler without replacing CFQ.
 
-Best regards,
+Including BFQ would be a boon for Linux and the community at large.
+
 --
-Bartlomiej Zolnierkiewicz
-Samsung R&D Institute Poland
-Samsung Electronics
+Eric Wheeler
+
+[1] Based on Linux v4.1-rc1, it cleanly merges forward into v4.7:
+	https://bitbucket.org/ewheelerinc/linux/branch/v4.1-rc1-bfq-v8
+	git pull https://bitbucket.org/ewheelerinc/linux.git v4.1-rc1-bfq-v8
