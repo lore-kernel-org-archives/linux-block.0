@@ -1,57 +1,36 @@
-Return-Path: <BATV+2ec0b7ee621439cf862d+4779+infradead.org+hch@bombadil.srs.infradead.org>
+Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
+Date: Thu, 1 Sep 2016 10:45:09 +0200
 From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH] blk-mq: skip unmapped queues in blk_mq_alloc_request_hctx
-Date: Fri, 23 Sep 2016 09:26:58 -0700
-Message-Id: <1474648018-3920-1-git-send-email-hch@lst.de>
+To: Keith Busch <keith.busch@intel.com>
+Subject: Re: blk-mq: allow passing in an external queue mapping V2
+Message-ID: <20160901084509.GB4115@lst.de>
+References: <1472468013-29936-1-git-send-email-hch@lst.de>
+ <20160830232824.GA2807@localhost.localdomain>
+MIME-Version: 1.0
+In-Reply-To: <20160830232824.GA2807@localhost.localdomain>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
+List-Post: <mailto:linux-nvme@lists.infradead.org>
+List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
+Cc: axboe@fb.com, linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+ linux-nvme@lists.infradead.org
+Content-Type: text/plain; charset="us-ascii"
+Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
+Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
 List-ID: <linux-block@vger.kernel.org>
 
-This provides the caller a feedback that a given hctx is not mapped and thus
-no command can be sent on it.
+On Tue, Aug 30, 2016 at 07:28:24PM -0400, Keith Busch wrote:
+> Before, each mq hardware queue would have 2 CPUs, now it's terribly
+> unbalanced.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Tested-by: Steve Wise <swise@opengridcomputing.com>
----
- block/blk-mq.c | 16 ++++++++++++++--
- 1 file changed, 14 insertions(+), 2 deletions(-)
+Hmm.  This wasn't supposed to change the cpu mapping, an indeed I saw
+results like that horrible one before as well.  Let me dig into this
+with my fake lower queue count device.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index e9b8007..7b430ab 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -266,17 +266,29 @@ struct request *blk_mq_alloc_request_hctx(struct request_queue *q, int rw,
- 	if (ret)
- 		return ERR_PTR(ret);
- 
-+	/*
-+	 * Check if the hardware context is actually mapped to anything.
-+	 * If not tell the caller that it should skip this queue.
-+	 */
- 	hctx = q->queue_hw_ctx[hctx_idx];
-+	if (!blk_mq_hw_queue_mapped(hctx)) {
-+		ret = -EXDEV;
-+		goto out_queue_exit;
-+	}
- 	ctx = __blk_mq_get_ctx(q, cpumask_first(hctx->cpumask));
- 
- 	blk_mq_set_alloc_data(&alloc_data, q, flags, ctx, hctx);
- 	rq = __blk_mq_alloc_request(&alloc_data, rw, 0);
- 	if (!rq) {
--		blk_queue_exit(q);
--		return ERR_PTR(-EWOULDBLOCK);
-+		ret = -EWOULDBLOCK;
-+		goto out_queue_exit;
- 	}
- 
- 	return rq;
-+
-+out_queue_exit:
-+	blk_queue_exit(q);
-+	return ERR_PTR(ret);
- }
- EXPORT_SYMBOL_GPL(blk_mq_alloc_request_hctx);
- 
--- 
-2.1.4
+_______________________________________________
+Linux-nvme mailing list
+Linux-nvme@lists.infradead.org
+http://lists.infradead.org/mailman/listinfo/linux-nvme
