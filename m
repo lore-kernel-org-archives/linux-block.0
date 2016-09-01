@@ -1,100 +1,47 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-co1nam03on0043.outbound.protection.outlook.com ([104.47.40.43]:37408
-        "EHLO NAM03-CO1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751621AbcINIpt (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 14 Sep 2016 04:45:49 -0400
-Subject: [PATCH 2/3] block, dm-crypt, btrfs: Introduce bio_flags()
-To: Jens Axboe <axboe@fb.com>
-References: <35e3cdd6-8983-6c84-cb4c-9a7be15aea55@sandisk.com>
-CC: Mike Christie <mchristi@redhat.com>, Chris Mason <clm@fb.com>,
-        Josef Bacik <jbacik@fb.com>, Mike Snitzer <snitzer@redhat.com>,
-        Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
-        Damien Le Moal <Damien.LeMoal@hgst.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
-        device-mapper development <dm-devel@redhat.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-Message-ID: <144083a3-2d0a-00ff-add2-a2f6f3690528@sandisk.com>
-Date: Wed, 14 Sep 2016 10:45:36 +0200
+Subject: Re: [PATCH 7/8] wbt: add general throttling mechanism
+To: Omar Sandoval <osandov@osandov.com>
+References: <1472663151-18560-1-git-send-email-axboe@fb.com>
+ <1472663151-18560-8-git-send-email-axboe@fb.com>
+ <20160901180523.GA3280@vader.DHCP.thefacebook.com>
+Cc: axboe@kernel.dk, linux-kernel@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
+From: Jens Axboe <axboe@fb.com>
+Message-ID: <b983e71b-c959-ca43-ce7b-b234db6035fa@fb.com>
+Date: Thu, 1 Sep 2016 12:51:49 -0600
 MIME-Version: 1.0
-In-Reply-To: <35e3cdd6-8983-6c84-cb4c-9a7be15aea55@sandisk.com>
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <20160901180523.GA3280@vader.DHCP.thefacebook.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+List-ID: <linux-block@vger.kernel.org>
 
-Introduce the bio_flags() macro. Ensure that the second argument of
-bio_set_op_attrs() only contains flags and no operation. This patch
-does not change any functionality.
+On 09/01/2016 12:05 PM, Omar Sandoval wrote:
+>> diff --git a/lib/Kconfig b/lib/Kconfig
+>> index d79909dc01ec..5a65a1f91889 100644
+>> --- a/lib/Kconfig
+>> +++ b/lib/Kconfig
+>> @@ -550,4 +550,8 @@ config STACKDEPOT
+>>  	bool
+>>  	select STACKTRACE
+>>
+>> +config WBT
+>> +	bool
+>> +	select SCALE_BITMAP
+>
+> Looks like this snuck in from your experiments to get this to work on
+> top of scale_bitmap?
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Mike Christie <mchristi@redhat.com>
-Cc: Chris Mason <clm@fb.com> (maintainer:BTRFS FILE SYSTEM)
-Cc: Josef Bacik <jbacik@fb.com> (maintainer:BTRFS FILE SYSTEM)
-Cc: Mike Snitzer <snitzer@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Damien Le Moal <damien.lemoal@hgst.com>
----
- drivers/md/dm-crypt.c     | 2 +-
- fs/btrfs/inode.c          | 5 +++--
- include/linux/blk_types.h | 3 ++-
- 3 files changed, 6 insertions(+), 4 deletions(-)
+Oops yes, it is indeed. Killed, thanks.
 
-diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
-index 8742957..0448e7e 100644
---- a/drivers/md/dm-crypt.c
-+++ b/drivers/md/dm-crypt.c
-@@ -1136,7 +1136,7 @@ static void clone_init(struct dm_crypt_io *io, struct bio *clone)
- 	clone->bi_private = io;
- 	clone->bi_end_io  = crypt_endio;
- 	clone->bi_bdev    = cc->dev->bdev;
--	bio_set_op_attrs(clone, bio_op(io->base_bio), io->base_bio->bi_opf);
-+	bio_set_op_attrs(clone, bio_op(io->base_bio), bio_flags(io->base_bio));
- }
- 
- static int kcryptd_io_read(struct dm_crypt_io *io, gfp_t gfp)
-diff --git a/fs/btrfs/inode.c b/fs/btrfs/inode.c
-index e6811c4..ca01106 100644
---- a/fs/btrfs/inode.c
-+++ b/fs/btrfs/inode.c
-@@ -8412,7 +8412,7 @@ static int btrfs_submit_direct_hook(struct btrfs_dio_private *dip,
- 	if (!bio)
- 		return -ENOMEM;
- 
--	bio_set_op_attrs(bio, bio_op(orig_bio), orig_bio->bi_opf);
-+	bio_set_op_attrs(bio, bio_op(orig_bio), bio_flags(orig_bio));
- 	bio->bi_private = dip;
- 	bio->bi_end_io = btrfs_end_dio_bio;
- 	btrfs_io_bio(bio)->logical = file_offset;
-@@ -8450,7 +8450,8 @@ next_block:
- 						  start_sector, GFP_NOFS);
- 			if (!bio)
- 				goto out_err;
--			bio_set_op_attrs(bio, bio_op(orig_bio), orig_bio->bi_opf);
-+			bio_set_op_attrs(bio, bio_op(orig_bio),
-+					 bio_flags(orig_bio));
- 			bio->bi_private = dip;
- 			bio->bi_end_io = btrfs_end_dio_bio;
- 			btrfs_io_bio(bio)->logical = file_offset;
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 1e1ef21..311fa2f 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -90,11 +90,12 @@ struct bio {
- };
- 
- #define BIO_OP_SHIFT	(8 * FIELD_SIZEOF(struct bio, bi_opf) - REQ_OP_BITS)
-+#define bio_flags(bio)	((bio)->bi_opf & ((1 << BIO_OP_SHIFT) - 1))
- #define bio_op(bio)	((bio)->bi_opf >> BIO_OP_SHIFT)
- 
- #define bio_set_op_attrs(bio, op, op_flags) do {		\
- 	WARN_ON(op >= (1 << REQ_OP_BITS));			\
--	(bio)->bi_opf &= ((1 << BIO_OP_SHIFT) - 1);		\
-+	(bio)->bi_opf = bio_flags(bio);				\
- 	(bio)->bi_opf |= ((unsigned int) (op) << BIO_OP_SHIFT);	\
- 	(bio)->bi_opf |= op_flags;				\
- } while (0)
+>> +	if (waitqueue_active(&rwb->wait)) {
+>> +		int diff = limit - inflight;
+>> +
+>> +		if (!inflight || diff >= rwb->wb_background / 2)
+>> +			wake_up_nr(&rwb->wait, 1);
+>
+> wake_up(&rwb->wait)?
+
+Yeah, that'd be cleaner. I think this is a leftover from when I 
+experimented with batched wakeups, with nr != 1. I'll change it to just 
+wake_up().
+
 -- 
-2.10.0
-
+Jens Axboe
