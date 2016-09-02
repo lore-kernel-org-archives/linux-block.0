@@ -1,96 +1,67 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:47268 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S933651AbcI3NXu (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Sep 2016 09:23:50 -0400
-From: Alexander Gordeev <agordeev@redhat.com>
-To: linux-kernel@vger.kernel.org
-Cc: Alexander Gordeev <agordeev@redhat.com>,
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <6705ed02-0f22-83d0-159a-c9c4a111a933@sandisk.com>
+References: <CAGA4w7nO+mrRwY-Rg0i_O8zBcrNeSS0KurLXN34duR2JJqvEmA@mail.gmail.com>
+ <CAGA4w7=eM9+sHMNaCXx5tXCEEyeJp0wb7ZqpAiuW35u+PEiSBw@mail.gmail.com> <6705ed02-0f22-83d0-159a-c9c4a111a933@sandisk.com>
+From: Alex Austin <aaustin@oceantechonline.com>
+Date: Fri, 2 Sep 2016 09:24:38 -0500
+Message-ID: <CAGA4w7kD6KK-bW=HjQTOCgyG1thtz7WKm=nTv__2xZSYzZKvvA@mail.gmail.com>
+Subject: Re: Block-level access
+To: Bart Van Assche <bart.vanassche@sandisk.com>
+Cc: linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
         linux-block@vger.kernel.org
-Subject: [PATCH v2 6/8] blk-mq: Rework blk_mq_realloc_hw_ctxs()
-Date: Fri, 30 Sep 2016 15:23:28 +0200
-Message-Id: <7459c980dd965b5f7b91e3bf1c3114d658535229.1475241231.git.agordeev@redhat.com>
-In-Reply-To: <cover.1475241231.git.agordeev@redhat.com>
-References: <cover.1475241231.git.agordeev@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-scsi-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Rework blk_mq_realloc_hw_ctxs() so deallocation is done in order
-reverse to allocation and indentation is bit more easy to read.
+My access is almost purely sequential and primarily writing, so read-ahead
+doesn't help me. What's problematic with pread/pwrite is the lack of error
+channel from media errors.
 
-CC: linux-block@vger.kernel.org
-Signed-off-by: Alexander Gordeev <agordeev@redhat.com>
----
- block/blk-mq.c | 40 ++++++++++++++++++++++------------------
- 1 file changed, 22 insertions(+), 18 deletions(-)
+BSG looks very interesting. I'll look further into that today.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 15c03c2..4b07901 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1895,6 +1895,7 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
- 						struct request_queue *q)
- {
- 	int i, j;
-+	struct blk_mq_hw_ctx *hctx;
- 	struct blk_mq_hw_ctx **hctxs = q->queue_hw_ctx;
- 
- 	blk_mq_sysfs_unregister(q);
-@@ -1908,33 +1909,36 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
- 		if (node == NUMA_NO_NODE)
- 			node = set->numa_node;
- 
--		hctxs[i] = kzalloc_node(sizeof(struct blk_mq_hw_ctx),
--					GFP_KERNEL, node);
--		if (!hctxs[i])
-+		hctx = kzalloc_node(sizeof(*hctx), GFP_KERNEL, node);
-+		if (!hctx)
- 			break;
- 
--		if (blk_mq_init_hctx(q, set, hctxs[i], i, node)) {
--			kfree(hctxs[i]);
--			hctxs[i] = NULL;
-+		if (blk_mq_init_hctx(q, set, hctx, i, node)) {
-+			kfree(hctx);
- 			break;
- 		}
--		blk_mq_hctx_kobj_init(hctxs[i]);
-+
-+		blk_mq_hctx_kobj_init(hctx);
-+		hctxs[i] = hctx;
- 	}
- 	for (j = i; j < q->nr_hw_queues; j++) {
--		struct blk_mq_hw_ctx *hctx = hctxs[j];
-+		hctx = hctxs[i];
- 
--		if (hctx) {
--			if (hctx->tags) {
--				blk_mq_free_rq_map(set, hctx->tags, j);
--				set->tags[j] = NULL;
--			}
--			blk_mq_exit_hctx(q, set, hctx, j);
--			kobject_put(&hctx->kobj);
--			kfree(hctx->ctxs);
--			kfree(hctx);
--			hctxs[j] = NULL;
-+		if (!hctx)
-+			continue;
- 
-+		hctxs[i] = NULL;
-+		kobject_put(&hctx->kobj);
-+
-+		if (hctx->tags) {
-+			blk_mq_free_rq_map(set, hctx->tags, j);
-+			set->tags[j] = NULL;
- 		}
-+
-+		blk_mq_exit_hctx(q, set, hctx, j);
-+
-+		kfree(hctx->ctxs);
-+		kfree(hctx);
- 	}
- 	q->nr_hw_queues = i;
- 	blk_mq_sysfs_register(q);
+On Thu, Sep 1, 2016 at 5:16 PM, Bart Van Assche
+<bart.vanassche@sandisk.com> wrote:
+> On 09/01/2016 02:48 PM, Alex Austin wrote:
+>>
+>> CC'ing linux-scsi and linux-block.
+>>
+>> Also, please CC me in replies.
+>>
+>> On Thu, Sep 1, 2016 at 4:43 PM, Alex Austin <aaustin@oceantechonline.com>
+>> wrote:
+>>>
+>>> Hello,
+>>> What is the most performant way to directly interface with an attached
+>>> hard
+>>> drive? I've so far used read()/write() on /dev/sd_ but I find error
+>>> handling
+>>> exceedingly difficult, as I don't always even get errors reported, even
+>>> if the
+>>> open() call includes O_DIRECT. I've also used ioctl(SG_IO), but find that
+>>> it's
+>>> extremely slow due to the lack of queuing support in the API. Is there a
+>>> mid-level API that will get me decent error handling while allowing
+>>> command
+>>> queuing, or do I just need to make multiple threads all doing separate
+>>> SG_IO
+>>> ioctls?
+>
+>
+> What the most efficient way is to interface is with a hard drive depends on
+> the I/O pattern. Are you aware that buffered I/O performs read-ahead? Have
+> you already tried to tune the read-ahead setting (blockdev --getra /
+> blockdev --setra)?
+>
+> BTW, if you need an example of how to queue SG_IO, you are welcome to have a
+> look at the fio source code. You will probably be interested in the bsg API.
+> See e.g. https://lwn.net/Articles/174469/.
+>
+> Bart.
+
+
+
 -- 
-1.8.3.1
-
+Intelligence is knowing that a tomoato is a fruit; wisdom is knowing
+that it doesn't go in a fruit salad; charisma is selling a
+tomato-based fruit salad.
