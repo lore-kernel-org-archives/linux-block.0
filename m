@@ -1,52 +1,85 @@
-Return-Path: <sbates@raithlin.com>
-From: Stephen Bates <sbates@raithlin.com>
-To: linux-block@vger.kernel.org
-Cc: axboe@kernel.dk,
-	hch@lst.de
-Subject: [PATCH 2/2] Enable zeroing of io_poll statistics
-Date: Tue, 13 Sep 2016 12:23:16 -0600
-Message-Id: <1473790996-27038-3-git-send-email-sbates@raithlin.com>
-In-Reply-To: <1473790996-27038-1-git-send-email-sbates@raithlin.com>
-References: <1473790996-27038-1-git-send-email-sbates@raithlin.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx.ewheeler.net ([66.155.3.69]:43250 "EHLO mail.ewheeler.net"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751057AbcICG0w (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 3 Sep 2016 02:26:52 -0400
+Date: Fri, 2 Sep 2016 23:26:50 -0700 (PDT)
+From: Eric Wheeler <dm-devel@lists.ewheeler.net>
+To: dm-devel@redhat.com
+cc: linux-block@vger.kernel.org, linux-crypto@vger.kernel.org
+Subject: Re: [dm-devel] dm-crypt: flush crypt_queue on suspend? on
+ REQ_FLUSH?
+In-Reply-To: <alpine.LRH.2.11.1609021430390.5413@mail.ewheeler.net>
+Message-ID: <alpine.LRH.2.11.1609022303170.5413@mail.ewheeler.net>
+References: <alpine.LRH.2.11.1609021430390.5413@mail.ewheeler.net>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Allow the io_poll statistics to be zeroed to make for easier logging
-of polling event.
+On Fri, 2 Sep 2016, Eric Wheeler wrote:
+> We have a KVM => dm-crypt => dm-thin stack and a snapshot may have 
+> partially completed queued IO out-of-order.  EXT4 is giving errors like 
+> this after mounting a snapshot, but only on files recently modified near 
+> the snapshot time.  This might imply out-of-order writes since, 
+> presumably, the ext4 journal would handle deletions in journal order and 
+> snapshots should be safe at any time:
+> 
+> 	kernel: EXT4-fs error (device dm-2): ext4_lookup:1441: inode #1196093: comm rsync: deleted inode referenced: 1188710 
+> 
+> Notably, the ext4 error did not present prior to the snapshot.  We have 
+> rsync logs from hours before that didn't report this message, but all 
+> later rsyncs do.
+> 
+> Perhaps related, or perhaps not, crypt_map() notes the following:
+> 	1914          * If bio is REQ_FLUSH or REQ_DISCARD, just bypass crypt queues.
+> 	1915          * - for REQ_FLUSH device-mapper core ensures that no IO is in-flight
+> 	1916          * - for REQ_DISCARD caller must use flush if IO ordering matters
+> 
+> However, crypt_map returns DM_MAPIO_SUBMITTED after calling 
+> kcryptd_queue_crypt(io) which processes asynchronously on 
+> cc->crypto_queue.  In crypt_ctr(), alloc_workqueue sets max_active to 
+> num_online_cpus() unless 'same_cpu_crypt' is set in the dm table (mine is 
+> not), so if I understand correctly, completion could happen out of order 
+> with CPUs >1.
+> 
+> Does the dm stack know that the bio (dm_crypt_io) hasn't been completed 
+> [since] it was put on a work queue [and then a write_thread]?  If so, I 
+> would like to understand that dm bio-tracking mechanism, so please point 
+> me at documentation or code.
+> 
+> If not, then does crypt_map() need a workqueue_flush(cc->crypto_queue) on 
+> REQ_FLUSH?  
+>
+> I'm new to the dm-crypt code, so please educate me if I'm missing 
+> something here.
 
-Signed-off-by: Stephen Bates <sbates@raithlin.com>
----
- block/blk-mq-sysfs.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+On second look, simply adding workqueue_flush isn't enough since I've not 
+set 'submit_from_crypt_cpus'; it's the cc->write_thread's job to get the 
+bio's submitted via kcryptd_io_write() after pulling them from a red-black 
+tree that kcryptd_crypt_write_io_submit() inserted into.  Is the red-black 
+tree guaranteed to pop off in order, or at least to flush in order when a 
+REQ_FLUSH comes through?
 
-diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
-index ea8c3f5..ac5160e 100644
---- a/block/blk-mq-sysfs.c
-+++ b/block/blk-mq-sysfs.c
-@@ -181,6 +181,14 @@ static ssize_t blk_mq_hw_sysfs_poll_show(struct blk_mq_hw_ctx *hctx, char *page)
- 		       hctx->poll_success);
- }
+If not, then I think this means I need to set both 'same_cpu_crypt' 
+(DM_CRYPT_SAME_CPU) and 'submit_from_crypt_cpus' (DM_CRYPT_NO_OFFLOAD) to 
+guarantee ordering by restricting the workqueue to serial work 
+(DM_CRYPT_SAME_CPU) and force immediate generic_make_request inside 
+kcryptd_crypt_write_io_submit (DM_CRYPT_NO_OFFLOAD) instead of queuing to 
+the cc->write_thread.
+
+Your thoughts?
+
+-Eric
+
  
-+static ssize_t blk_mq_hw_sysfs_poll_store(struct blk_mq_hw_ctx *hctx,
-+					  const char *page, size_t size)
-+{
-+	hctx->poll_considered = hctx->poll_invoked = hctx->poll_success = 0;
-+
-+	return size;
-+}
-+
- static ssize_t blk_mq_hw_sysfs_queued_show(struct blk_mq_hw_ctx *hctx,
- 					   char *page)
- {
-@@ -303,8 +311,9 @@ static struct blk_mq_hw_ctx_sysfs_entry blk_mq_hw_sysfs_cpus = {
- 	.show = blk_mq_hw_sysfs_cpus_show,
- };
- static struct blk_mq_hw_ctx_sysfs_entry blk_mq_hw_sysfs_poll = {
--	.attr = {.name = "io_poll", .mode = S_IRUGO },
-+	.attr = {.name = "io_poll", .mode = S_IWUSR | S_IRUGO },
- 	.show = blk_mq_hw_sysfs_poll_show,
-+	.store = blk_mq_hw_sysfs_poll_store,
- };
- 
- static struct attribute *default_hw_ctx_attrs[] = {
--- 
-2.1.4
+> Thank you for your help!
+> 
+> --
+> Eric Wheeler
+> 
+> --
+> dm-devel mailing list
+> dm-devel@redhat.com
+> https://www.redhat.com/mailman/listinfo/dm-devel
+> 
