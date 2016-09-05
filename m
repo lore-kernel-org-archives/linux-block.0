@@ -1,30 +1,27 @@
-Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail.linuxfoundation.org ([140.211.169.12]:52476 "EHLO
+        mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S935642AbcIEQtq (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Sep 2016 12:49:46 -0400
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: linux-kernel@vger.kernel.org
-Subject: [PATCH 4.4 027/113] genirq/msi: Remove unused MSI_FLAG_IDENTITY_MAP
-Date: Mon,  5 Sep 2016 18:43:50 +0200
-Message-Id: <20160905164350.396981651@linuxfoundation.org>
-In-Reply-To: <20160905164349.217621339@linuxfoundation.org>
-References: <20160905164349.217621339@linuxfoundation.org>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        stable@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Bart Van Assche <bart.vanassche@sandisk.com>,
+        Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
+        linux-pci@vger.kernel.org, linux-nvme@lists.infradead.org,
+        axboe@fb.com, agordeev@redhat.com
+Subject: [PATCH 4.7 022/143] genirq/msi: Remove unused MSI_FLAG_IDENTITY_MAP
+Date: Mon,  5 Sep 2016 18:43:18 +0200
+Message-Id: <20160905164431.560979069@linuxfoundation.org>
+In-Reply-To: <20160905164430.593075551@linuxfoundation.org>
+References: <20160905164430.593075551@linuxfoundation.org>
 MIME-Version: 1.0
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
-List-Post: <mailto:linux-nvme@lists.infradead.org>
-List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
-Cc: axboe@fb.com, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- stable@vger.kernel.org, linux-block@vger.kernel.org, agordeev@redhat.com,
- linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
- Bart Van Assche <bart.vanassche@sandisk.com>,
- Thomas Gleixner <tglx@linutronix.de>, Christoph Hellwig <hch@lst.de>
-Content-Type: text/plain; charset="us-ascii"
-Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
-Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-4.4-stable review patch.  If anyone has any objections, please let me know.
+4.7-stable review patch.  If anyone has any objections, please let me know.
 
 ------------------
 
@@ -53,7 +50,7 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
 --- a/include/linux/msi.h
 +++ b/include/linux/msi.h
-@@ -254,12 +254,10 @@ enum {
+@@ -264,12 +264,10 @@ enum {
  	 * callbacks.
  	 */
  	MSI_FLAG_USE_DEF_CHIP_OPS	= (1 << 1),
@@ -70,16 +67,16 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
  int msi_domain_set_affinity(struct irq_data *data, const struct cpumask *mask,
 --- a/kernel/irq/msi.c
 +++ b/kernel/irq/msi.c
-@@ -268,7 +268,7 @@ int msi_domain_alloc_irqs(struct irq_dom
+@@ -324,7 +324,7 @@ int msi_domain_alloc_irqs(struct irq_dom
  	struct msi_domain_ops *ops = info->ops;
  	msi_alloc_info_t arg;
  	struct msi_desc *desc;
 -	int i, ret, virq = -1;
 +	int i, ret, virq;
  
- 	ret = ops->msi_check(domain, info, dev);
- 	if (ret == 0)
-@@ -278,12 +278,8 @@ int msi_domain_alloc_irqs(struct irq_dom
+ 	ret = msi_domain_prepare_irqs(domain, dev, nvec, &arg);
+ 	if (ret)
+@@ -332,12 +332,8 @@ int msi_domain_alloc_irqs(struct irq_dom
  
  	for_each_msi_entry(desc, dev) {
  		ops->set_desc(&arg, desc);
@@ -95,8 +92,3 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
  			ret = -ENOSPC;
 
 
-
-_______________________________________________
-Linux-nvme mailing list
-Linux-nvme@lists.infradead.org
-http://lists.infradead.org/mailman/listinfo/linux-nvme
