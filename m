@@ -1,52 +1,54 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-co1nam03on0075.outbound.protection.outlook.com ([104.47.40.75]:60416
-        "EHLO NAM03-CO1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1754542AbcI2PsQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 29 Sep 2016 11:48:16 -0400
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-Subject: [PATCH v2] blkcg: Unlock blkcg_pol_mutex once if cpd == NULL
-To: Jens Axboe <axboe@fb.com>
-CC: Tejun Heo <tj@kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Message-ID: <e9746d79-c14d-bf76-5218-3e7cdfbf4b34@sandisk.com>
-Date: Thu, 29 Sep 2016 08:33:30 -0700
-MIME-Version: 1.0
-Content-Type: text/plain; charset="windows-1252"
+Received: from mga09.intel.com ([134.134.136.24]:19834 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S932370AbcIFJAH (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 6 Sep 2016 05:00:07 -0400
+From: Tomasz Majchrzak <tomasz.majchrzak@intel.com>
+To: linux-block@vger.kernel.org
+Cc: neilb@suse.com
+Subject: [PATCH] badblocks: fix overlapping check for clearing
+Date: Tue,  6 Sep 2016 10:58:58 +0200
+Message-Id: <1473152338-30539-1-git-send-email-tomasz.majchrzak@intel.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Unlocking a mutex twice is wrong. Hence modify blkcg_policy_register()
-such that blkcg_pol_mutex is unlocked once if cpd == NULL. This patch
-avoids that smatch reports the following error:
+Current bad block clear implementation assumes the range to clear
+overlaps with at least one bad block already stored. If given range to
+clear precedes first bad block in a list, the first entry is incorrectly
+updated.
 
-block/blk-cgroup.c:1378: blkcg_policy_register() error: double unlock 'mutex:&blkcg_pol_mutex'
+Check not only if stored block end is past clear block end but also if
+stored block start is before clear block end.
 
-Fixes: 06b285bd1125 ("blkcg: fix blkcg_policy_data allocation bug")
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Tejun Heo <tj@kernel.org>
-Cc: <stable@vger.kernel.org>
+Signed-off-by: Tomasz Majchrzak <tomasz.majchrzak@intel.com>
 ---
- block/blk-cgroup.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ block/badblocks.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index dd38e5c..b08ccbb 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -1340,10 +1340,8 @@ int blkcg_policy_register(struct blkcg_policy *pol)
- 			struct blkcg_policy_data *cpd;
- 
- 			cpd = pol->cpd_alloc_fn(GFP_KERNEL);
--			if (!cpd) {
--				mutex_unlock(&blkcg_pol_mutex);
-+			if (!cpd)
- 				goto err_free_cpds;
--			}
- 
- 			blkcg->cpd[pol->plid] = cpd;
- 			cpd->blkcg = blkcg;
+diff --git a/block/badblocks.c b/block/badblocks.c
+index 7be53cb..b2ffcc7 100644
+--- a/block/badblocks.c
++++ b/block/badblocks.c
+@@ -354,7 +354,8 @@ int badblocks_clear(struct badblocks *bb, sector_t s, int sectors)
+ 		 * current range.  Earlier ranges could also overlap,
+ 		 * but only this one can overlap the end of the range.
+ 		 */
+-		if (BB_OFFSET(p[lo]) + BB_LEN(p[lo]) > target) {
++		if ((BB_OFFSET(p[lo]) + BB_LEN(p[lo]) > target) &&
++		    (BB_OFFSET(p[lo]) <= target)) {
+ 			/* Partial overlap, leave the tail of this range */
+ 			int ack = BB_ACK(p[lo]);
+ 			sector_t a = BB_OFFSET(p[lo]);
+@@ -377,7 +378,8 @@ int badblocks_clear(struct badblocks *bb, sector_t s, int sectors)
+ 			lo--;
+ 		}
+ 		while (lo >= 0 &&
+-		       BB_OFFSET(p[lo]) + BB_LEN(p[lo]) > s) {
++		       (BB_OFFSET(p[lo]) + BB_LEN(p[lo]) > s) &&
++		       (BB_OFFSET(p[lo]) <= target)) {
+ 			/* This range does overlap */
+ 			if (BB_OFFSET(p[lo]) < s) {
+ 				/* Keep the early parts of this range. */
 -- 
-2.10.0
-
+1.8.3.1
 
