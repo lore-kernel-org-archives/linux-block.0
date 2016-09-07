@@ -1,33 +1,64 @@
-Return-Path: <msnitzer@redhat.com>
-From: Mike Snitzer <snitzer@redhat.com>
-To: axboe@kernel.dk, dm-devel@redhat.com
-Cc: linux-block@vger.kernel.org
-Subject: [PATCH for-4.9 0/3] allow delayed requeue of blk-mq requests
-Date: Tue, 13 Sep 2016 12:01:32 -0400
-Message-Id: <1473782495-44128-1-git-send-email-snitzer@redhat.com>
+Return-Path: <prvs=80586c83e0=axboe@fb.com>
+From: Jens Axboe <axboe@fb.com>
+To: <axboe@kernel.dk>, <linux-kernel@vger.kernel.org>,
+        <linux-fsdevel@vger.kernel.org>, <linux-block@vger.kernel.org>
+CC: Jens Axboe <axboe@fb.com>
+Subject: [PATCH 4/8] writeback: track if we're sleeping on progress in balance_dirty_pages()
+Date: Wed, 7 Sep 2016 08:46:46 -0600
+Message-ID: <1473259610-3295-5-git-send-email-axboe@fb.com>
+In-Reply-To: <1473259610-3295-1-git-send-email-axboe@fb.com>
+References: <1473259610-3295-1-git-send-email-axboe@fb.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-I'd like to see these changes included during the 4.9 merge.  The
-blk-mq change is a straight-forward switch from work_struct to
-delayed_work and the addition of the blk_mq_delay_kick_requeue_list()
-interface.  Jens, can you pick up this blk-mq changes (patch 1)?
+Note in the bdi_writeback structure whenever a task ends up sleeping
+waiting for progress. We can use that information in the lower layers
+to increase the priority of writes.
 
-These changes offer reduced CPU utilization during DM multipath's all
-path down case (when 'queue_if_no_path' is enabled).  Please see each
-patch's header for more details.
+Signed-off-by: Jens Axboe <axboe@fb.com>
+---
+ include/linux/backing-dev-defs.h | 2 ++
+ mm/backing-dev.c                 | 1 +
+ mm/page-writeback.c              | 1 +
+ 3 files changed, 4 insertions(+)
 
-Mike Snitzer (3):
-  blk-mq: introduce blk_mq_delay_kick_requeue_list()
-  dm rq: add DM_MAPIO_DELAY_REQUEUE to delay requeue of blk-mq requests
-  dm mpath: delay the requeue of blk-mq requests while all paths down
-
- block/blk-mq.c                | 15 +++++++++++----
- drivers/md/dm-mpath.c         | 15 +++++++++------
- drivers/md/dm-rq.c            | 35 ++++++++++++++++++++---------------
- include/linux/blk-mq.h        |  1 +
- include/linux/blkdev.h        |  2 +-
- include/linux/device-mapper.h |  1 +
- 6 files changed, 43 insertions(+), 26 deletions(-)
-
+diff --git a/include/linux/backing-dev-defs.h b/include/linux/backing-dev-defs.h
+index c357f27d5483..dc5f76d7f648 100644
+--- a/include/linux/backing-dev-defs.h
++++ b/include/linux/backing-dev-defs.h
+@@ -116,6 +116,8 @@ struct bdi_writeback {
+ 	struct list_head work_list;
+ 	struct delayed_work dwork;	/* work item used for writeback */
+ 
++	unsigned long dirty_sleep;	/* last wait */
++
+ 	struct list_head bdi_node;	/* anchored at bdi->wb_list */
+ 
+ #ifdef CONFIG_CGROUP_WRITEBACK
+diff --git a/mm/backing-dev.c b/mm/backing-dev.c
+index 8fde443f36d7..3bfed5ab2475 100644
+--- a/mm/backing-dev.c
++++ b/mm/backing-dev.c
+@@ -310,6 +310,7 @@ static int wb_init(struct bdi_writeback *wb, struct backing_dev_info *bdi,
+ 	spin_lock_init(&wb->work_lock);
+ 	INIT_LIST_HEAD(&wb->work_list);
+ 	INIT_DELAYED_WORK(&wb->dwork, wb_workfn);
++	wb->dirty_sleep = jiffies;
+ 
+ 	wb->congested = wb_congested_get_create(bdi, blkcg_id, gfp);
+ 	if (!wb->congested)
+diff --git a/mm/page-writeback.c b/mm/page-writeback.c
+index f4cd7d8005c9..98bc3fc301a1 100644
+--- a/mm/page-writeback.c
++++ b/mm/page-writeback.c
+@@ -1778,6 +1778,7 @@ pause:
+ 					  pause,
+ 					  start_time);
+ 		__set_current_state(TASK_KILLABLE);
++		wb->dirty_sleep = now;
+ 		io_schedule_timeout(pause);
+ 
+ 		current->dirty_paused_when = now + pause;
 -- 
-2.7.4 (Apple Git-66)
+2.7.4
