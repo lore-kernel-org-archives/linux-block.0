@@ -1,158 +1,142 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:33482 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1754881AbcIOQXW (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Sep 2016 12:23:22 -0400
-Received: from pps.filterd (m0044010.ppops.net [127.0.0.1])
-        by mx0a-00082601.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id u8FGFE6Y022591
-        for <linux-block@vger.kernel.org>; Thu, 15 Sep 2016 09:23:22 -0700
-Received: from mail.thefacebook.com ([199.201.64.23])
-        by mx0a-00082601.pphosted.com with ESMTP id 25fww30vgw-4
-        (version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT)
-        for <linux-block@vger.kernel.org>; Thu, 15 Sep 2016 09:23:22 -0700
-Received: from facebook.com (2401:db00:11:d0a2:face:0:39:0)     by
- mx-out.facebook.com (10.223.100.97) with ESMTP id
- b7654bb07b6011e6a8e524be0593f280-f85fba50 for <linux-block@vger.kernel.org>;
-        Thu, 15 Sep 2016 09:23:20 -0700
-From: Shaohua Li <shli@fb.com>
-To: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <axboe@fb.com>, <Kernel-team@fb.com>, <tj@kernel.org>,
-        <jmoyer@redhat.com>, <vgoyal@redhat.com>
-Subject: [PATCH V2 09/11] block-throttle: make bandwidth change smooth
-Date: Thu, 15 Sep 2016 09:23:16 -0700
-Message-ID: <451324f5936db27b69eca2ddf9b273794e743617.1473953743.git.shli@fb.com>
-In-Reply-To: <cover.1473953743.git.shli@fb.com>
-References: <cover.1473953743.git.shli@fb.com>
+Return-Path: <prvs=80586c83e0=axboe@fb.com>
+From: Jens Axboe <axboe@fb.com>
+To: <axboe@kernel.dk>, <linux-kernel@vger.kernel.org>,
+        <linux-fsdevel@vger.kernel.org>, <linux-block@vger.kernel.org>
+CC: Jens Axboe <axboe@fb.com>
+Subject: [PATCH 2/8] writeback: add wbc_to_write_flags()
+Date: Wed, 7 Sep 2016 08:46:44 -0600
+Message-ID: <1473259610-3295-3-git-send-email-axboe@fb.com>
+In-Reply-To: <1473259610-3295-1-git-send-email-axboe@fb.com>
+References: <1473259610-3295-1-git-send-email-axboe@fb.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-When cgroups all reach high limit, cgroups can dispatch more IO. This
-could make some cgroups dispatch more IO but others not, and even some
-cgroups could dispatch less IO than their high limit. For example, cg1
-high limit 10MB/s, cg2 limit 80MB/s, assume disk maximum bandwidth is
-120M/s for the workload. Their bps could something like this:
+Add wbc_to_write_flags(), which returns the write modifier flags to use,
+based on a struct writeback_control. No functional changes in this
+patch, but it prepares us for factoring other wbc fields for write type.
 
-cg1/cg2 bps: T1: 10/80 -> T2: 60/60 -> T3: 10/80
-
-At T1, all cgroups reach high limit, so they can dispatch more IO later.
-Then cg1 dispatch more IO and cg2 has no room to dispatch enough IO. At
-T2, cg2 only dispatches 60M/s. Since We detect cg2 dispatches less IO
-than its high limit 80M/s, we downgrade the queue from LIMIT_MAX to
-LIMIT_HIGH, then all cgroups are throttled to their high limit (T3). cg2
-will have bandwidth below its high limit at most time.
-
-The big problem here is we don't know the maximum bandwidth of the
-workload, so we can't make smart decision to avoid the situation. This
-patch makes cgroup bandwidth change smooth. After disk upgrades from
-LIMIT_HIGH to LIMIT_MAX, we don't allow cgroups use all bandwidth upto
-their max limit immediately. Their bandwidth limit will be increased
-gradually to avoid above situation. So above example will became
-something like:
-
-cg1/cg2 bps: 10/80 -> 15/105 -> 20/100 -> 25/95 -> 30/90 -> 35/85 -> 40/80
--> 45/75 -> 10/80
-
-In this way cgroups bandwidth will be above their limit in majority
-time, this still doesn't fully utilize disk bandwidth, but that's
-something we pay for sharing.
-
-Note this doesn't completely avoid cgroup running under its high limit.
-The best way to guarantee cgroup doesn't run under its limit is to set
-max limit. For example, if we set cg1 max limit to 40, cg2 will never
-run under its high limit.
-
-Signed-off-by: Shaohua Li <shli@fb.com>
+Signed-off-by: Jens Axboe <axboe@fb.com>
+Reviewed-by: Jan Kara <jack@suse.cz>
 ---
- block/blk-throttle.c | 44 ++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 40 insertions(+), 4 deletions(-)
+ fs/buffer.c               | 2 +-
+ fs/f2fs/data.c            | 2 +-
+ fs/f2fs/node.c            | 2 +-
+ fs/gfs2/meta_io.c         | 3 +--
+ fs/mpage.c                | 2 +-
+ fs/xfs/xfs_aops.c         | 7 +++----
+ include/linux/writeback.h | 8 ++++++++
+ 7 files changed, 16 insertions(+), 10 deletions(-)
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index e4713b1..d956831 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -170,6 +170,8 @@ struct throtl_data
+diff --git a/fs/buffer.c b/fs/buffer.c
+index 9c8eb9b6db6a..6a5f1a01102e 100644
+--- a/fs/buffer.c
++++ b/fs/buffer.c
+@@ -1698,7 +1698,7 @@ int __block_write_full_page(struct inode *inode, struct page *page,
+ 	struct buffer_head *bh, *head;
+ 	unsigned int blocksize, bbits;
+ 	int nr_underway = 0;
+-	int write_flags = (wbc->sync_mode == WB_SYNC_ALL ? WRITE_SYNC : 0);
++	int write_flags = wbc_to_write_flags(wbc);
  
- 	unsigned long high_upgrade_time;
- 	unsigned long high_downgrade_time;
+ 	head = create_page_buffers(page, inode,
+ 					(1 << BH_Dirty)|(1 << BH_Uptodate));
+diff --git a/fs/f2fs/data.c b/fs/f2fs/data.c
+index ccb401eebc11..cb0528b31eb0 100644
+--- a/fs/f2fs/data.c
++++ b/fs/f2fs/data.c
+@@ -1240,7 +1240,7 @@ static int f2fs_write_data_page(struct page *page,
+ 		.sbi = sbi,
+ 		.type = DATA,
+ 		.op = REQ_OP_WRITE,
+-		.op_flags = (wbc->sync_mode == WB_SYNC_ALL) ? WRITE_SYNC : 0,
++		.op_flags = wbc_to_write_flags(wbc),
+ 		.page = page,
+ 		.encrypted_page = NULL,
+ 	};
+diff --git a/fs/f2fs/node.c b/fs/f2fs/node.c
+index f75d197d5beb..c1713da2542f 100644
+--- a/fs/f2fs/node.c
++++ b/fs/f2fs/node.c
+@@ -1561,7 +1561,7 @@ static int f2fs_write_node_page(struct page *page,
+ 		.sbi = sbi,
+ 		.type = NODE,
+ 		.op = REQ_OP_WRITE,
+-		.op_flags = (wbc->sync_mode == WB_SYNC_ALL) ? WRITE_SYNC : 0,
++		.op_flags = wbc_to_write_flags(wbc),
+ 		.page = page,
+ 		.encrypted_page = NULL,
+ 	};
+diff --git a/fs/gfs2/meta_io.c b/fs/gfs2/meta_io.c
+index 950b8be68e41..7991c62e9d6f 100644
+--- a/fs/gfs2/meta_io.c
++++ b/fs/gfs2/meta_io.c
+@@ -37,8 +37,7 @@ static int gfs2_aspace_writepage(struct page *page, struct writeback_control *wb
+ {
+ 	struct buffer_head *bh, *head;
+ 	int nr_underway = 0;
+-	int write_flags = REQ_META | REQ_PRIO |
+-		(wbc->sync_mode == WB_SYNC_ALL ? WRITE_SYNC : 0);
++	int write_flags = REQ_META | REQ_PRIO | wbc_to_write_flags(wbc);
+ 
+ 	BUG_ON(!PageLocked(page));
+ 	BUG_ON(!page_has_buffers(page));
+diff --git a/fs/mpage.c b/fs/mpage.c
+index d2413af0823a..d6f1afe3397a 100644
+--- a/fs/mpage.c
++++ b/fs/mpage.c
+@@ -489,7 +489,7 @@ static int __mpage_writepage(struct page *page, struct writeback_control *wbc,
+ 	struct buffer_head map_bh;
+ 	loff_t i_size = i_size_read(inode);
+ 	int ret = 0;
+-	int op_flags = (wbc->sync_mode == WB_SYNC_ALL ?  WRITE_SYNC : 0);
++	int op_flags = wbc_to_write_flags(wbc);
+ 
+ 	if (page_has_buffers(page)) {
+ 		struct buffer_head *head = page_buffers(page);
+diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
+index 7575cfc3ad15..a68645abde56 100644
+--- a/fs/xfs/xfs_aops.c
++++ b/fs/xfs/xfs_aops.c
+@@ -447,8 +447,8 @@ xfs_submit_ioend(
+ 
+ 	ioend->io_bio->bi_private = ioend;
+ 	ioend->io_bio->bi_end_io = xfs_end_bio;
+-	bio_set_op_attrs(ioend->io_bio, REQ_OP_WRITE,
+-			 (wbc->sync_mode == WB_SYNC_ALL) ? WRITE_SYNC : 0);
++	bio_set_op_attrs(ioend->io_bio, REQ_OP_WRITE, wbc_to_write_flags(wbc));
 +
-+	unsigned int scale;
+ 	/*
+ 	 * If we are failing the IO now, just mark the ioend with an
+ 	 * error and finish it. This will run IO completion immediately
+@@ -519,8 +519,7 @@ xfs_chain_bio(
+ 
+ 	bio_chain(ioend->io_bio, new);
+ 	bio_get(ioend->io_bio);		/* for xfs_destroy_ioend */
+-	bio_set_op_attrs(ioend->io_bio, REQ_OP_WRITE,
+-			  (wbc->sync_mode == WB_SYNC_ALL) ? WRITE_SYNC : 0);
++	bio_set_op_attrs(ioend->io_bio, REQ_OP_WRITE, wbc_to_write_flags(wbc));
+ 	submit_bio(ioend->io_bio);
+ 	ioend->io_bio = new;
+ }
+diff --git a/include/linux/writeback.h b/include/linux/writeback.h
+index fc1e16c25a29..608afd39b1c2 100644
+--- a/include/linux/writeback.h
++++ b/include/linux/writeback.h
+@@ -100,6 +100,14 @@ struct writeback_control {
+ #endif
  };
  
- static void throtl_pending_timer_fn(unsigned long arg);
-@@ -224,12 +226,28 @@ static struct throtl_data *sq_to_td(struct throtl_service_queue *sq)
- static uint64_t tg_bps_limit(struct throtl_grp *tg, int rw)
- {
- 	struct blkcg_gq *blkg = tg_to_blkg(tg);
-+	struct throtl_data *td;
- 	uint64_t ret;
- 
- 	if (cgroup_subsys_on_dfl(io_cgrp_subsys) && !blkg->parent)
- 		return -1;
--	ret = tg->bps[rw][tg->td->limit_index];
--	if (ret == -1 && tg->td->limit_index == LIMIT_HIGH)
-+	td = tg->td;
-+	ret = tg->bps[rw][td->limit_index];
-+	if (td->limit_index == LIMIT_MAX && tg->bps[rw][LIMIT_HIGH] != -1) {
-+		uint64_t increase;
++static inline int wbc_to_write_flags(struct writeback_control *wbc)
++{
++	if (wbc->sync_mode == WB_SYNC_ALL)
++		return WRITE_SYNC;
 +
-+		if (td->scale < 4096 && time_after_eq(jiffies,
-+		    td->high_upgrade_time + td->scale * td->throtl_slice)) {
-+			uint64_t time = jiffies - td->high_upgrade_time;
++	return 0;
++}
 +
-+			do_div(time, td->throtl_slice);
-+			td->scale = time;
-+		}
-+		increase = (tg->bps[rw][LIMIT_HIGH] >> 1) * td->scale;
-+		ret = min(tg->bps[rw][LIMIT_MAX],
-+			tg->bps[rw][LIMIT_HIGH] + increase);
-+	}
-+	if (ret == -1 && td->limit_index == LIMIT_HIGH)
- 		return tg->bps[rw][LIMIT_MAX];
- 
- 	return ret;
-@@ -238,12 +256,29 @@ static uint64_t tg_bps_limit(struct throtl_grp *tg, int rw)
- static unsigned int tg_iops_limit(struct throtl_grp *tg, int rw)
- {
- 	struct blkcg_gq *blkg = tg_to_blkg(tg);
-+	struct throtl_data *td;
- 	unsigned int ret;
- 
- 	if (cgroup_subsys_on_dfl(io_cgrp_subsys) && !blkg->parent)
- 		return -1;
--	ret = tg->iops[rw][tg->td->limit_index];
--	if (ret == -1 && tg->td->limit_index == LIMIT_HIGH)
-+	td = tg->td;
-+	ret = tg->iops[rw][td->limit_index];
-+	if (td->limit_index == LIMIT_MAX && tg->iops[rw][LIMIT_HIGH] != -1) {
-+		uint64_t increase;
-+
-+		if (td->scale < 4096 && time_after_eq(jiffies,
-+		    td->high_upgrade_time + td->scale * td->throtl_slice)) {
-+			uint64_t time = jiffies - td->high_upgrade_time;
-+
-+			do_div(time, td->throtl_slice);
-+			td->scale = time;
-+		}
-+
-+		increase = (tg->iops[rw][LIMIT_HIGH] >> 1) * td->scale;
-+		ret = min(tg->iops[rw][LIMIT_MAX],
-+			tg->iops[rw][LIMIT_HIGH] + (unsigned int)increase);
-+	}
-+	if (ret == -1 && td->limit_index == LIMIT_HIGH)
- 		return tg->iops[rw][LIMIT_MAX];
- 	return ret;
- }
-@@ -1669,6 +1704,7 @@ static void throtl_upgrade_state(struct throtl_data *td)
- 
- 	td->limit_index = LIMIT_MAX;
- 	td->high_upgrade_time = jiffies;
-+	td->scale = 0;
- 	rcu_read_lock();
- 	blkg_for_each_descendant_post(blkg, pos_css, td->queue->root_blkg) {
- 		struct throtl_grp *tg = blkg_to_tg(blkg);
+ /*
+  * A wb_domain represents a domain that wb's (bdi_writeback's) belong to
+  * and are measured against each other in.  There always is one global
 -- 
-2.8.0.rc2
-
+2.7.4
