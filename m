@@ -1,159 +1,89 @@
-Return-Path: <darrick.wong@oracle.com>
-Subject: [PATCH 3/3] block: implement (some of) fallocate for block devices
-From: "Darrick J. Wong" <darrick.wong@oracle.com>
-To: axboe@kernel.dk, akpm@linux-foundation.org, darrick.wong@oracle.com
-Cc: linux-block@vger.kernel.org, tytso@mit.edu, martin.petersen@oracle.com,
-        snitzer@redhat.com, linux-api@vger.kernel.org, bfoster@redhat.com,
-        xfs@oss.sgi.com, hch@infradead.org, dm-devel@redhat.com,
-        linux-fsdevel@vger.kernel.org, bart.vanassche@sandisk.com
-Date: Wed, 28 Sep 2016 17:39:51 -0700
-Message-ID: <147510959149.8940.2897845352082568677.stgit@birch.djwong.org>
-In-Reply-To: <147510957066.8940.13803086684642725401.stgit@birch.djwong.org>
-References: <147510957066.8940.13803086684642725401.stgit@birch.djwong.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:42356 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1757258AbcIHVMy (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 8 Sep 2016 17:12:54 -0400
+From: Josef Bacik <jbacik@fb.com>
+To: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <kernel-team@fb.com>, <mpa@pengutronix.de>,
+        <nbd-general@lists.sourceforge.net>
+Subject: [PATCH 2/5] nbd: don't shutdown sock with irq's disabled
+Date: Thu, 8 Sep 2016 17:12:07 -0400
+Message-ID: <1473369130-22986-3-git-send-email-jbacik@fb.com>
+In-Reply-To: <1473369130-22986-1-git-send-email-jbacik@fb.com>
+References: <1473369130-22986-1-git-send-email-jbacik@fb.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-After much discussion, it seems that the fallocate feature flag
-FALLOC_FL_ZERO_RANGE maps nicely to SCSI WRITE SAME; and the feature
-FALLOC_FL_PUNCH_HOLE maps nicely to the devices that have been
-whitelisted for zeroing SCSI UNMAP.  Punch still requires that
-FALLOC_FL_KEEP_SIZE is set.  A length that goes past the end of the
-device will be clamped to the device size if KEEP_SIZE is set; or will
-return -EINVAL if not.  Both start and length must be aligned to the
-device's logical block size.
+We hit a warning when shutting down the nbd connection because we have irq's
+disabled.  We don't really need to do the shutdown under the lock, just clear
+the nbd->sock.  So do the shutdown outside of the irq.  This gets rid of the
+warning.
 
-Since the semantics of fallocate are fairly well established already,
-wire up the two pieces.  The other fallocate variants (collapse range,
-insert range, and allocate blocks) are not supported.
-
-Signed-off-by: Darrick J. Wong <darrick.wong@oracle.com>
+Signed-off-by: Josef Bacik <jbacik@fb.com>
 ---
-v2: Incorporate feedback from Christoph & Linus.  Tentatively add
-a requirement that the fallocate arguments be aligned to logical block
-size, and put in a few XXX comments ahead of LSF discussion.
-v3: Forward port to 4.7.
-v4: Forward port to 4.8.
----
- fs/block_dev.c |   78 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- fs/open.c      |    3 +-
- 2 files changed, 80 insertions(+), 1 deletion(-)
+ drivers/block/nbd.c | 19 +++++++++++++++----
+ 1 file changed, 15 insertions(+), 4 deletions(-)
 
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index 15e7c67..4b7d0f3 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -161,6 +161,8 @@ static void nbd_end_request(struct nbd_cmd *cmd)
+  */
+ static void sock_shutdown(struct nbd_device *nbd)
+ {
++	struct socket *sock;
++
+ 	spin_lock_irq(&nbd->sock_lock);
+ 
+ 	if (!nbd->sock) {
+@@ -168,18 +170,21 @@ static void sock_shutdown(struct nbd_device *nbd)
+ 		return;
+ 	}
+ 
++	sock = nbd->sock;
+ 	dev_warn(disk_to_dev(nbd->disk), "shutting down socket\n");
+-	kernel_sock_shutdown(nbd->sock, SHUT_RDWR);
+-	sockfd_put(nbd->sock);
+ 	nbd->sock = NULL;
+ 	spin_unlock_irq(&nbd->sock_lock);
+ 
++	kernel_sock_shutdown(sock, SHUT_RDWR);
++	sockfd_put(sock);
++
+ 	del_timer(&nbd->timeout_timer);
+ }
+ 
+ static void nbd_xmit_timeout(unsigned long arg)
+ {
+ 	struct nbd_device *nbd = (struct nbd_device *)arg;
++	struct socket *sock = NULL;
+ 	unsigned long flags;
+ 
+ 	if (!atomic_read(&nbd->outstanding_cmds))
+@@ -189,10 +194,16 @@ static void nbd_xmit_timeout(unsigned long arg)
+ 
+ 	nbd->timedout = true;
+ 
+-	if (nbd->sock)
+-		kernel_sock_shutdown(nbd->sock, SHUT_RDWR);
++	if (nbd->sock) {
++		sock = nbd->sock;
++		get_file(sock->file);
++	}
+ 
+ 	spin_unlock_irqrestore(&nbd->sock_lock, flags);
++	if (sock) {
++		kernel_sock_shutdown(sock, SHUT_RDWR);
++		sockfd_put(sock);
++	}
+ 
+ 	dev_err(nbd_to_dev(nbd), "Connection timed out, shutting down connection\n");
+ }
+-- 
+2.8.0.rc2
 
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 08ae993..0c808fc 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -30,6 +30,7 @@
- #include <linux/cleancache.h>
- #include <linux/dax.h>
- #include <linux/badblocks.h>
-+#include <linux/falloc.h>
- #include <asm/uaccess.h>
- #include "internal.h"
- 
-@@ -1787,6 +1788,82 @@ static const struct address_space_operations def_blk_aops = {
- 	.is_dirty_writeback = buffer_check_dirty_writeback,
- };
- 
-+#define	BLKDEV_FALLOC_FL_SUPPORTED					\
-+		(FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE |		\
-+		 FALLOC_FL_ZERO_RANGE | FALLOC_FL_NO_HIDE_STALE)
-+
-+static long blkdev_fallocate(struct file *file, int mode, loff_t start,
-+			     loff_t len)
-+{
-+	struct block_device *bdev = I_BDEV(bdev_file_inode(file));
-+	struct request_queue *q = bdev_get_queue(bdev);
-+	struct address_space *mapping;
-+	loff_t end = start + len - 1;
-+	loff_t isize;
-+	int error;
-+
-+	/* Fail if we don't recognize the flags. */
-+	if (mode & ~BLKDEV_FALLOC_FL_SUPPORTED)
-+		return -EOPNOTSUPP;
-+
-+	/* Don't go off the end of the device. */
-+	isize = i_size_read(bdev->bd_inode);
-+	if (start >= isize)
-+		return -EINVAL;
-+	if (end > isize) {
-+		if (mode & FALLOC_FL_KEEP_SIZE) {
-+			len = isize - start;
-+			end = start + len - 1;
-+		} else
-+			return -EINVAL;
-+	}
-+
-+	/*
-+	 * Don't allow IO that isn't aligned to logical block size.
-+	 */
-+	if ((start | len) & (bdev_logical_block_size(bdev) - 1))
-+		return -EINVAL;
-+
-+	/* Invalidate the page cache, including dirty pages. */
-+	mapping = bdev->bd_inode->i_mapping;
-+	truncate_inode_pages_range(mapping, start, end);
-+
-+	switch (mode) {
-+	case FALLOC_FL_ZERO_RANGE:
-+	case FALLOC_FL_ZERO_RANGE | FALLOC_FL_KEEP_SIZE:
-+		error = blkdev_issue_zeroout(bdev, start >> 9, len >> 9,
-+					    GFP_KERNEL, false);
-+		if (error)
-+			return error;
-+		break;
-+	case FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE:
-+		/* Only punch if the device can do zeroing discard. */
-+		if (!blk_queue_discard(q) || !q->limits.discard_zeroes_data)
-+			return -EOPNOTSUPP;
-+		error = blkdev_issue_discard(bdev, start >> 9, len >> 9,
-+					     GFP_KERNEL, 0);
-+		if (error)
-+			return error;
-+		break;
-+	case FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE | FALLOC_FL_NO_HIDE_STALE:
-+		error = blkdev_issue_discard(bdev, start >> 9, len >> 9,
-+					     GFP_KERNEL, 0);
-+		if (error)
-+			return error;
-+		break;
-+	default:
-+		return -EOPNOTSUPP;
-+	}
-+
-+	/*
-+	 * Invalidate again; if someone wandered in and dirtied a page,
-+	 * the caller will be given -EBUSY;
-+	 */
-+	return invalidate_inode_pages2_range(mapping,
-+					     start >> PAGE_SHIFT,
-+					     end >> PAGE_SHIFT);
-+}
-+
- const struct file_operations def_blk_fops = {
- 	.open		= blkdev_open,
- 	.release	= blkdev_close,
-@@ -1801,6 +1878,7 @@ const struct file_operations def_blk_fops = {
- #endif
- 	.splice_read	= generic_file_splice_read,
- 	.splice_write	= iter_file_splice_write,
-+	.fallocate	= blkdev_fallocate,
- };
- 
- int ioctl_by_bdev(struct block_device *bdev, unsigned cmd, unsigned long arg)
-diff --git a/fs/open.c b/fs/open.c
-index 4fd6e25..01b6092 100644
---- a/fs/open.c
-+++ b/fs/open.c
-@@ -289,7 +289,8 @@ int vfs_fallocate(struct file *file, int mode, loff_t offset, loff_t len)
- 	 * Let individual file system decide if it supports preallocation
- 	 * for directories or not.
- 	 */
--	if (!S_ISREG(inode->i_mode) && !S_ISDIR(inode->i_mode))
-+	if (!S_ISREG(inode->i_mode) && !S_ISDIR(inode->i_mode) &&
-+	    !S_ISBLK(inode->i_mode))
- 		return -ENODEV;
- 
- 	/* Check for wrap through zero too */
