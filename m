@@ -1,37 +1,48 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.9]:49928 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755780AbcIKODK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 11 Sep 2016 10:03:10 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org
-Subject: [PATCH 1/3] block: remove bio_destructor_t
-Date: Sun, 11 Sep 2016 16:03:02 +0200
-Message-Id: <1473602584-11744-2-git-send-email-hch@lst.de>
-In-Reply-To: <1473602584-11744-1-git-send-email-hch@lst.de>
-References: <1473602584-11744-1-git-send-email-hch@lst.de>
+Received: from mail-pf0-f174.google.com ([209.85.192.174]:34020 "EHLO
+        mail-pf0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754260AbcIISma (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Sep 2016 14:42:30 -0400
+Received: by mail-pf0-f174.google.com with SMTP id p64so32004207pfb.1
+        for <linux-block@vger.kernel.org>; Fri, 09 Sep 2016 11:42:29 -0700 (PDT)
+From: Omar Sandoval <osandov@osandov.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, kernel-team@fb.com,
+        Alexei Starovoitov <ast@fb.com>
+Subject: [PATCH v3 2/5] sbitmap: allocate wait queues on a specific node
+Date: Fri,  9 Sep 2016 11:42:08 -0700
+Message-Id: <ab0ffdba530d6dffb86c47745c2976a9be53dd5d.1473446095.git.osandov@fb.com>
+In-Reply-To: <cover.1473446095.git.osandov@fb.com>
+References: <cover.1473446095.git.osandov@fb.com>
+In-Reply-To: <cover.1473446095.git.osandov@fb.com>
+References: <cover.1473446095.git.osandov@fb.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- include/linux/blk_types.h | 1 -
- 1 file changed, 1 deletion(-)
+From: Omar Sandoval <osandov@fb.com>
 
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 436f43f..a2f4add 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -16,7 +16,6 @@ struct block_device;
- struct io_context;
- struct cgroup_subsys_state;
- typedef void (bio_end_io_t) (struct bio *);
--typedef void (bio_destructor_t) (struct bio *);
+The original bt_alloc() we converted from was using kzalloc(), not
+kzalloc_node(), to allocate the wait queues. This was probably an
+oversight, so fix it for sbitmap_queue_init_node().
+
+Signed-off-by: Omar Sandoval <osandov@fb.com>
+---
+ lib/sbitmap.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/sbitmap.c b/lib/sbitmap.c
+index 303d83e..213d831 100644
+--- a/lib/sbitmap.c
++++ b/lib/sbitmap.c
+@@ -208,7 +208,7 @@ int sbitmap_queue_init_node(struct sbitmap_queue *sbq, unsigned int depth,
  
- #ifdef CONFIG_BLOCK
- /*
+ 	atomic_set(&sbq->wake_index, 0);
+ 
+-	sbq->ws = kzalloc(SBQ_WAIT_QUEUES * sizeof(*sbq->ws), flags);
++	sbq->ws = kzalloc_node(SBQ_WAIT_QUEUES * sizeof(*sbq->ws), flags, node);
+ 	if (!sbq->ws) {
+ 		sbitmap_free(&sbq->sb);
+ 		return -ENOMEM;
 -- 
-2.1.4
+2.9.3
 
