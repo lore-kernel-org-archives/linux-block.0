@@ -1,342 +1,102 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv3 14/41] filemap: allocate huge page in page_cache_read(), if allowed
-Date: Thu, 15 Sep 2016 14:54:56 +0300
-Message-Id: <20160915115523.29737-15-kirill.shutemov@linux.intel.com>
-In-Reply-To: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
-References: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pa0-f41.google.com ([209.85.220.41]:35989 "EHLO
+        mail-pa0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754414AbcIISmd (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Sep 2016 14:42:33 -0400
+Received: by mail-pa0-f41.google.com with SMTP id id6so30774734pad.3
+        for <linux-block@vger.kernel.org>; Fri, 09 Sep 2016 11:42:33 -0700 (PDT)
+From: Omar Sandoval <osandov@osandov.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, kernel-team@fb.com,
+        Alexei Starovoitov <ast@fb.com>
+Subject: [PATCH v3 5/5] sbitmap: randomize initial last_cache values
+Date: Fri,  9 Sep 2016 11:42:11 -0700
+Message-Id: <38c544e501d976df00a7e13b3041fcfca2a117ed.1473446095.git.osandov@fb.com>
+In-Reply-To: <cover.1473446095.git.osandov@fb.com>
+References: <cover.1473446095.git.osandov@fb.com>
+In-Reply-To: <cover.1473446095.git.osandov@fb.com>
+References: <cover.1473446095.git.osandov@fb.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This patch adds basic functionality to put huge page into page cache.
+From: Omar Sandoval <osandov@fb.com>
 
-At the moment we only put huge pages into radix-tree if the range covered
-by the huge page is empty.
+In order to get good cache behavior from a sbitmap, we want each CPU to
+stick to its own cacheline(s) as much as possible. This might happen
+naturally as the bitmap gets filled up and the last_cache values spread
+out, but we really want this behavior from the start. blk-mq apparently
+intended to do this, but the code to do this was never wired up. Get rid
+of the dead code and make it part of the sbitmap library.
 
-We ignore shadow entires for now, just remove them from the tree before
-inserting huge page.
-
-Later we can add logic to accumulate information from shadow entires to
-return to caller (average eviction time?).
-
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+Signed-off-by: Omar Sandoval <osandov@fb.com>
 ---
- include/linux/fs.h      |   5 ++
- include/linux/pagemap.h |  21 ++++++-
- mm/filemap.c            | 148 +++++++++++++++++++++++++++++++++++++++++++-----
- 3 files changed, 157 insertions(+), 17 deletions(-)
+ block/blk-mq-tag.c | 8 --------
+ block/blk-mq-tag.h | 1 -
+ lib/sbitmap.c      | 6 ++++++
+ 3 files changed, 6 insertions(+), 9 deletions(-)
 
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 901e25d495cc..122024ccc739 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -1829,6 +1829,11 @@ struct super_operations {
- #else
- #define S_DAX		0	/* Make all the DAX code disappear */
- #endif
-+#define S_HUGE_MODE		0xc000
-+#define S_HUGE_NEVER		0x0000
-+#define S_HUGE_ALWAYS		0x4000
-+#define S_HUGE_WITHIN_SIZE	0x8000
-+#define S_HUGE_ADVISE		0xc000
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index e1c2bed..cef618f 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -7,7 +7,6 @@
+  */
+ #include <linux/kernel.h>
+ #include <linux/module.h>
+-#include <linux/random.h>
  
- /*
-  * Note that nosuid etc flags are inode-specific: setting some file-system
-diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
-index 66a1260b33de..a84f11a672f0 100644
---- a/include/linux/pagemap.h
-+++ b/include/linux/pagemap.h
-@@ -191,14 +191,20 @@ static inline int page_cache_add_speculative(struct page *page, int count)
+ #include <linux/blk-mq.h>
+ #include "blk.h"
+@@ -419,13 +418,6 @@ void blk_mq_free_tags(struct blk_mq_tags *tags)
+ 	kfree(tags);
  }
  
- #ifdef CONFIG_NUMA
--extern struct page *__page_cache_alloc(gfp_t gfp);
-+extern struct page *__page_cache_alloc_order(gfp_t gfp, unsigned int order);
- #else
--static inline struct page *__page_cache_alloc(gfp_t gfp)
-+static inline struct page *__page_cache_alloc_order(gfp_t gfp,
-+		unsigned int order)
+-void blk_mq_tag_init_last_tag(struct blk_mq_tags *tags, unsigned int *tag)
+-{
+-	unsigned int depth = tags->nr_tags - tags->nr_reserved_tags;
+-
+-	*tag = prandom_u32() % depth;
+-}
+-
+ int blk_mq_tag_update_depth(struct blk_mq_tags *tags, unsigned int tdepth)
  {
--	return alloc_pages(gfp, 0);
-+	return alloc_pages(gfp, order);
- }
- #endif
+ 	tdepth -= tags->nr_reserved_tags;
+diff --git a/block/blk-mq-tag.h b/block/blk-mq-tag.h
+index f90b850..09f4cc0 100644
+--- a/block/blk-mq-tag.h
++++ b/block/blk-mq-tag.h
+@@ -30,7 +30,6 @@ extern void blk_mq_put_tag(struct blk_mq_hw_ctx *hctx, struct blk_mq_ctx *ctx,
+ 			   unsigned int tag);
+ extern bool blk_mq_has_free_tags(struct blk_mq_tags *tags);
+ extern ssize_t blk_mq_tag_sysfs_show(struct blk_mq_tags *tags, char *page);
+-extern void blk_mq_tag_init_last_tag(struct blk_mq_tags *tags, unsigned int *last_tag);
+ extern int blk_mq_tag_update_depth(struct blk_mq_tags *tags, unsigned int depth);
+ extern void blk_mq_tag_wakeup_all(struct blk_mq_tags *tags, bool);
+ void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_iter_fn *fn,
+diff --git a/lib/sbitmap.c b/lib/sbitmap.c
+index 3a91269..d873bb0a 100644
+--- a/lib/sbitmap.c
++++ b/lib/sbitmap.c
+@@ -15,6 +15,7 @@
+  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  */
  
-+static inline struct page *__page_cache_alloc(gfp_t gfp)
-+{
-+	return __page_cache_alloc_order(gfp, 0);
-+}
-+
- static inline struct page *page_cache_alloc(struct address_space *x)
- {
- 	return __page_cache_alloc(mapping_gfp_mask(x));
-@@ -215,6 +221,15 @@ static inline gfp_t readahead_gfp_mask(struct address_space *x)
- 				  __GFP_COLD | __GFP_NORETRY | __GFP_NOWARN;
- }
++#include <linux/random.h>
+ #include <linux/sbitmap.h>
  
-+extern bool __page_cache_allow_huge(struct address_space *x, pgoff_t offset);
-+static inline bool page_cache_allow_huge(struct address_space *x,
-+		pgoff_t offset)
-+{
-+	if (!IS_ENABLED(CONFIG_TRANSPARENT_HUGEPAGE))
-+		return false;
-+	return __page_cache_allow_huge(x, offset);
-+}
-+
- typedef int filler_t(void *, struct page *);
- 
- pgoff_t page_cache_next_hole(struct address_space *mapping,
-diff --git a/mm/filemap.c b/mm/filemap.c
-index 6f7f45f47d68..50afe17230e7 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -637,14 +637,14 @@ static int __add_to_page_cache_locked(struct page *page,
- 				      pgoff_t offset, gfp_t gfp_mask,
- 				      void **shadowp)
- {
--	int huge = PageHuge(page);
-+	int hugetlb = PageHuge(page);
- 	struct mem_cgroup *memcg;
- 	int error;
- 
- 	VM_BUG_ON_PAGE(!PageLocked(page), page);
- 	VM_BUG_ON_PAGE(PageSwapBacked(page), page);
- 
--	if (!huge) {
-+	if (!hugetlb) {
- 		error = mem_cgroup_try_charge(page, current->mm,
- 					      gfp_mask, &memcg, false);
- 		if (error)
-@@ -653,7 +653,7 @@ static int __add_to_page_cache_locked(struct page *page,
- 
- 	error = radix_tree_maybe_preload(gfp_mask & ~__GFP_HIGHMEM);
- 	if (error) {
--		if (!huge)
-+		if (!hugetlb)
- 			mem_cgroup_cancel_charge(page, memcg, false);
- 		return error;
+ int sbitmap_init_node(struct sbitmap *sb, unsigned int depth, int shift,
+@@ -208,6 +209,11 @@ int sbitmap_queue_init_node(struct sbitmap_queue *sbq, unsigned int depth,
+ 		return -ENOMEM;
  	}
-@@ -663,16 +663,55 @@ static int __add_to_page_cache_locked(struct page *page,
- 	page->index = offset;
  
- 	spin_lock_irq(&mapping->tree_lock);
--	error = page_cache_tree_insert(mapping, page, shadowp);
-+	if (PageTransHuge(page)) {
-+		struct radix_tree_iter iter;
-+		void **slot;
-+		void *p;
-+
-+		error = 0;
-+
-+		/* Wipe shadow entires */
-+		radix_tree_for_each_slot(slot, &mapping->page_tree, &iter, offset) {
-+			if (iter.index >= offset + HPAGE_PMD_NR)
-+				break;
-+
-+			p = radix_tree_deref_slot_protected(slot,
-+					&mapping->tree_lock);
-+			if (!p)
-+				continue;
-+
-+			if (!radix_tree_exception(p)) {
-+				error = -EEXIST;
-+				break;
-+			}
-+
-+			mapping->nrexceptional--;
-+			rcu_assign_pointer(*slot, NULL);
-+		}
-+
-+		if (!error)
-+			error = __radix_tree_insert(&mapping->page_tree, offset,
-+					compound_order(page), page);
-+
-+		if (!error) {
-+			count_vm_event(THP_FILE_ALLOC);
-+			mapping->nrpages += HPAGE_PMD_NR;
-+			*shadowp = NULL;
-+			__inc_node_page_state(page, NR_FILE_THPS);
-+		}
-+	} else {
-+		error = page_cache_tree_insert(mapping, page, shadowp);
-+	}
- 	radix_tree_preload_end();
- 	if (unlikely(error))
- 		goto err_insert;
- 
- 	/* hugetlb pages do not participate in page cache accounting. */
--	if (!huge)
--		__inc_node_page_state(page, NR_FILE_PAGES);
-+	if (!hugetlb)
-+		__mod_node_page_state(page_pgdat(page), NR_FILE_PAGES,
-+				hpage_nr_pages(page));
- 	spin_unlock_irq(&mapping->tree_lock);
--	if (!huge)
-+	if (!hugetlb)
- 		mem_cgroup_commit_charge(page, memcg, false, false);
- 	trace_mm_filemap_add_to_page_cache(page);
- 	return 0;
-@@ -680,7 +719,7 @@ err_insert:
- 	page->mapping = NULL;
- 	/* Leave page->index set: truncation relies upon it */
- 	spin_unlock_irq(&mapping->tree_lock);
--	if (!huge)
-+	if (!hugetlb)
- 		mem_cgroup_cancel_charge(page, memcg, false);
- 	put_page(page);
- 	return error;
-@@ -737,7 +776,7 @@ int add_to_page_cache_lru(struct page *page, struct address_space *mapping,
- EXPORT_SYMBOL_GPL(add_to_page_cache_lru);
- 
- #ifdef CONFIG_NUMA
--struct page *__page_cache_alloc(gfp_t gfp)
-+struct page *__page_cache_alloc_order(gfp_t gfp, unsigned int order)
- {
- 	int n;
- 	struct page *page;
-@@ -747,14 +786,14 @@ struct page *__page_cache_alloc(gfp_t gfp)
- 		do {
- 			cpuset_mems_cookie = read_mems_allowed_begin();
- 			n = cpuset_mem_spread_node();
--			page = __alloc_pages_node(n, gfp, 0);
-+			page = __alloc_pages_node(n, gfp, order);
- 		} while (!page && read_mems_allowed_retry(cpuset_mems_cookie));
- 
- 		return page;
- 	}
--	return alloc_pages(gfp, 0);
-+	return alloc_pages(gfp, order);
- }
--EXPORT_SYMBOL(__page_cache_alloc);
-+EXPORT_SYMBOL(__page_cache_alloc_order);
- #endif
- 
- /*
-@@ -1149,6 +1188,69 @@ repeat:
- }
- EXPORT_SYMBOL(find_lock_entry);
- 
-+bool __page_cache_allow_huge(struct address_space *mapping, pgoff_t offset)
-+{
-+	struct inode *inode = mapping->host;
-+	struct radix_tree_iter iter;
-+	void **slot;
-+	struct page *page;
-+
-+	if (!IS_ENABLED(CONFIG_TRANSPARENT_HUGE_PAGECACHE))
-+		return false;
-+
-+	offset = round_down(offset, HPAGE_PMD_NR);
-+
-+	switch (inode->i_flags & S_HUGE_MODE) {
-+	case S_HUGE_NEVER:
-+		return false;
-+	case S_HUGE_ALWAYS:
-+		break;
-+	case S_HUGE_WITHIN_SIZE:
-+		if (DIV_ROUND_UP(i_size_read(inode), PAGE_SIZE) <
-+				offset + HPAGE_PMD_NR)
-+			return false;
-+		break;
-+	case S_HUGE_ADVISE:
-+		/* TODO */
-+		return false;
-+	default:
-+		WARN_ON_ONCE(1);
-+		return false;
++	if (depth && !round_robin) {
++		for_each_possible_cpu(i)
++			*per_cpu_ptr(sbq->alloc_hint, i) = prandom_u32() % depth;
 +	}
 +
-+	rcu_read_lock();
-+	radix_tree_for_each_slot(slot, &mapping->page_tree, &iter, offset) {
-+		if (iter.index >= offset + HPAGE_PMD_NR)
-+			break;
-+
-+		/* Shadow entires are fine */
-+		page = radix_tree_deref_slot(slot);
-+		if (page && !radix_tree_exception(page)) {
-+			rcu_read_unlock();
-+			return false;
-+		}
-+	}
-+	rcu_read_unlock();
-+
-+	return true;
-+
-+}
-+
-+static struct page *page_cache_alloc_huge(struct address_space *mapping,
-+		pgoff_t offset, gfp_t gfp_mask)
-+{
-+	struct page *page;
-+
-+	if (!page_cache_allow_huge(mapping, offset))
-+		return NULL;
-+
-+	gfp_mask |= __GFP_COMP | __GFP_NORETRY | __GFP_NOWARN;
-+	page = __page_cache_alloc_order(gfp_mask, HPAGE_PMD_ORDER);
-+	if (page)
-+		prep_transhuge_page(page);
-+	return page;
-+}
-+
- /**
-  * pagecache_get_page - find and get a page reference
-  * @mapping: the address_space to search
-@@ -2022,19 +2124,37 @@ static int page_cache_read(struct file *file, pgoff_t offset, gfp_t gfp_mask)
- {
- 	struct address_space *mapping = file->f_mapping;
- 	struct page *page;
-+	pgoff_t hoffset;
- 	int ret;
- 
- 	do {
--		page = __page_cache_alloc(gfp_mask|__GFP_COLD);
-+		page = page_cache_alloc_huge(mapping, offset, gfp_mask);
-+no_huge:
-+		if (!page)
-+			page = __page_cache_alloc(gfp_mask|__GFP_COLD);
- 		if (!page)
- 			return -ENOMEM;
- 
--		ret = add_to_page_cache_lru(page, mapping, offset, gfp_mask & GFP_KERNEL);
-+		if (PageTransHuge(page))
-+			hoffset = round_down(offset, HPAGE_PMD_NR);
-+		else
-+			hoffset = offset;
-+
-+		ret = add_to_page_cache_lru(page, mapping, hoffset,
-+				gfp_mask & GFP_KERNEL);
- 		if (ret == 0)
- 			ret = mapping->a_ops->readpage(file, page);
- 		else if (ret == -EEXIST)
- 			ret = 0; /* losing race to add is OK */
- 
-+		if (ret && PageTransHuge(page)) {
-+			delete_from_page_cache(page);
-+			unlock_page(page);
-+			put_page(page);
-+			page = NULL;
-+			goto no_huge;
-+		}
-+
- 		put_page(page);
- 
- 	} while (ret == AOP_TRUNCATED_PAGE);
+ 	sbq->wake_batch = SBQ_WAKE_BATCH;
+ 	if (sbq->wake_batch > depth / SBQ_WAIT_QUEUES)
+ 		sbq->wake_batch = max(1U, depth / SBQ_WAIT_QUEUES);
 -- 
 2.9.3
 
