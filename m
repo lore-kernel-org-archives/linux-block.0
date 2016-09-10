@@ -1,101 +1,116 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.9]:40165 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1763237AbcINOT0 (ORCPT
+Received: from szxga03-in.huawei.com ([119.145.14.66]:55854 "EHLO
+        szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751695AbcIJLPk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 14 Sep 2016 10:19:26 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@fb.com, tglx@linutronix.de
-Cc: agordeev@redhat.com, keith.busch@intel.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 05/13] pci/msi: Retrieve affinity for a vector
-Date: Wed, 14 Sep 2016 16:18:51 +0200
-Message-Id: <1473862739-15032-6-git-send-email-hch@lst.de>
-In-Reply-To: <1473862739-15032-1-git-send-email-hch@lst.de>
-References: <1473862739-15032-1-git-send-email-hch@lst.de>
+        Sat, 10 Sep 2016 07:15:40 -0400
+From: Hou Tao <houtao1@huawei.com>
+To: <linux-block@vger.kernel.org>
+CC: <linux-kernel@vger.kernel.org>
+Subject: [PATCH] block-throttle: fix throtl_log for throttled-bios dispatch
+Date: Sat, 10 Sep 2016 19:11:49 +0800
+Message-ID: <1473505909-17603-1-git-send-email-houtao1@huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Thomas Gleixner <tglx@linutronix.de>
+on throtl_pending_timer_fn(), the number of queued rw bios of sq
+and dispatched bios are logged, but the numbers are meaningless,
+because the dispatched bios are NOT queued on sq->queued[] instead
+theses bios are queued on the sq of tg queued on sq->pending_tree,
+so move these two throtl_log() to throtl_select_dispatch.
 
-Add a helper to get the affinity mask for a given PCI irq vector.  For MSI or
-MSI-X vectors these are stored by the IRQ core, while for legacy interrupts
-we will always return cpu_possible_map.
+before patch:
+1. throttle on /
+throtl / [R] bio. bdisp=18432 sz=262144 bps=512000 ... queued=1/0
+throtl dispatch nr_queued=0 read=0 write=0
+......
+throtl bios disp=1
 
-Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
-[hch: updated to follow the style of pci_irq_vector()]
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+2. throttle on / and /1
+throtl /1 [R] bio. bdisp=40960 sz=262144 bps=1024000 ... queued=1/0
+throtl dispatch nr_queued=0 read=0 write=0
+......
+throtl bios disp=1
+
+after patch:
+1. throttle on /
+throtl / [R] bio. bdisp=26624 sz=262144 bps=512000 ... queued=1/0
+throtl / dispatch queued=2/0
+......
+throtl / dispatch disp=1
+
+2. throttle on / and /1
+throtl /1 [R] bio. bdisp=81920 sz=262144 bps=1024000 ... queued=1/0
+throtl /1 dispatch queued=2/0
+......
+throtl /1 dispatch disp=1
+
+Signed-off-by: Hou Tao <houtao1@huawei.com>
 ---
- drivers/pci/msi.c   | 31 +++++++++++++++++++++++++++++++
- include/linux/pci.h |  6 ++++++
- 2 files changed, 37 insertions(+)
+ block/blk-throttle.c | 21 ++++++++++++---------
+ 1 file changed, 12 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/pci/msi.c b/drivers/pci/msi.c
-index 06100dd..9da5ecb 100644
---- a/drivers/pci/msi.c
-+++ b/drivers/pci/msi.c
-@@ -1270,6 +1270,37 @@ int pci_irq_vector(struct pci_dev *dev, unsigned int nr)
- }
- EXPORT_SYMBOL(pci_irq_vector);
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index 47a3e54..c724c97 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -974,11 +974,12 @@ static int throtl_dispatch_tg(struct throtl_grp *tg)
  
-+/**
-+ * pci_irq_get_affinity - return the affinity of a particular msi vector
-+ * @dev:	PCI device to operate on
-+ * @nr:		device-relative interrupt vector index (0-based).
-+ */
-+const struct cpumask *pci_irq_get_affinity(struct pci_dev *dev, int nr)
-+{
-+	if (dev->msix_enabled) {
-+		struct msi_desc *entry;
-+		int i = 0;
-+
-+		for_each_pci_msi_entry(entry, dev) {
-+			if (i == nr)
-+				return entry->affinity;
-+			i++;
-+		}
-+		WARN_ON_ONCE(1);
-+		return NULL;
-+	} else if (dev->msi_enabled) {
-+		struct msi_desc *entry = first_pci_msi_entry(dev);
-+
-+		if (WARN_ON_ONCE(!entry || nr >= entry->nvec_used))
-+			return NULL;
-+
-+		return &entry->affinity[nr];
-+	} else {
-+		return cpu_possible_mask;
-+	}
-+}
-+EXPORT_SYMBOL(pci_irq_get_affinity);
-+
- struct pci_dev *msi_desc_to_pci_dev(struct msi_desc *desc)
+ static int throtl_select_dispatch(struct throtl_service_queue *parent_sq)
  {
- 	return to_pci_dev(desc->dev);
-diff --git a/include/linux/pci.h b/include/linux/pci.h
-index 0ab8359..3b0a800 100644
---- a/include/linux/pci.h
-+++ b/include/linux/pci.h
-@@ -1300,6 +1300,7 @@ int pci_alloc_irq_vectors(struct pci_dev *dev, unsigned int min_vecs,
- 		unsigned int max_vecs, unsigned int flags);
- void pci_free_irq_vectors(struct pci_dev *dev);
- int pci_irq_vector(struct pci_dev *dev, unsigned int nr);
-+const struct cpumask *pci_irq_get_affinity(struct pci_dev *pdev, int vec);
+-	unsigned int nr_disp = 0;
++	unsigned int sum_disp = 0;
  
- #else
- static inline int pci_msi_vec_count(struct pci_dev *dev) { return -ENOSYS; }
-@@ -1342,6 +1343,11 @@ static inline int pci_irq_vector(struct pci_dev *dev, unsigned int nr)
- 		return -EINVAL;
- 	return dev->irq;
+ 	while (1) {
+ 		struct throtl_grp *tg = throtl_rb_first(parent_sq);
+ 		struct throtl_service_queue *sq = &tg->service_queue;
++		unsigned int nr_disp;
+ 
+ 		if (!tg)
+ 			break;
+@@ -988,16 +989,23 @@ static int throtl_select_dispatch(struct throtl_service_queue *parent_sq)
+ 
+ 		throtl_dequeue_tg(tg);
+ 
+-		nr_disp += throtl_dispatch_tg(tg);
++		throtl_log(sq, "dispatch queued=%u/%u",
++				   sq->nr_queued[READ], sq->nr_queued[WRITE]);
++
++		nr_disp = throtl_dispatch_tg(tg);
++
++		throtl_log(sq, "dispatch disp=%u", nr_disp);
++
++		sum_disp += nr_disp;
+ 
+ 		if (sq->nr_queued[0] || sq->nr_queued[1])
+ 			tg_update_disptime(tg);
+ 
+-		if (nr_disp >= throtl_quantum)
++		if (sum_disp >= throtl_quantum)
+ 			break;
+ 	}
+ 
+-	return nr_disp;
++	return sum_disp;
  }
-+static inline const struct cpumask *pci_irq_get_affinity(struct pci_dev *pdev,
-+		int vec)
-+{
-+	return cpu_possible_mask;
-+}
- #endif
  
- #ifdef CONFIG_PCIEPORTBUS
+ /**
+@@ -1031,13 +1039,8 @@ again:
+ 	dispatched = false;
+ 
+ 	while (true) {
+-		throtl_log(sq, "dispatch nr_queued=%u read=%u write=%u",
+-			   sq->nr_queued[READ] + sq->nr_queued[WRITE],
+-			   sq->nr_queued[READ], sq->nr_queued[WRITE]);
+-
+ 		ret = throtl_select_dispatch(sq);
+ 		if (ret) {
+-			throtl_log(sq, "bios disp=%u", ret);
+ 			dispatched = true;
+ 		}
+ 
 -- 
-2.1.4
+2.5.5
 
