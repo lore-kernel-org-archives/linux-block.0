@@ -1,19 +1,17 @@
-Subject: Re: a few trivial cleanups
-To: Christoph Hellwig <hch@lst.de>
-References: <1473602584-11744-1-git-send-email-hch@lst.de>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([198.137.202.9]:49923 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755542AbcIKODI (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sun, 11 Sep 2016 10:03:08 -0400
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@fb.com
 Cc: linux-block@vger.kernel.org
-From: Jens Axboe <axboe@fb.com>
-Message-ID: <f7b18315-dc52-151b-3ec7-678e5d4b32c3@fb.com>
-Date: Wed, 14 Sep 2016 09:18:23 -0600
-MIME-Version: 1.0
-In-Reply-To: <1473602584-11744-1-git-send-email-hch@lst.de>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-List-ID: <linux-block@vger.kernel.org>
+Subject: a few trivial cleanups
+Date: Sun, 11 Sep 2016 16:03:01 +0200
+Message-Id: <1473602584-11744-1-git-send-email-hch@lst.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On 09/11/2016 08:03 AM, Christoph Hellwig wrote:
-> Just dusting off some old branches that had these as side work..
+Just dusting off some old branches that had these as side work..
 
-Applied for 4.9, thanks.
-
--- 
-Jens Axboe
