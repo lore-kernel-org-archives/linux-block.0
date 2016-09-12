@@ -1,83 +1,36 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv3 37/41] ext4: make EXT4_IOC_MOVE_EXT work with huge pages
-Date: Thu, 15 Sep 2016 14:55:19 +0300
-Message-Id: <20160915115523.29737-38-kirill.shutemov@linux.intel.com>
-In-Reply-To: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
-References: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:48039 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1757251AbcILNOQ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 12 Sep 2016 09:14:16 -0400
+Subject: Re: [PATCH 5/5] nbd: add multi-connection support
+To: Christoph Hellwig <hch@infradead.org>
+References: <1473369130-22986-1-git-send-email-jbacik@fb.com>
+ <1473369130-22986-6-git-send-email-jbacik@fb.com>
+ <20160910074340.GA24069@infradead.org>
+CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <kernel-team@fb.com>, <mpa@pengutronix.de>,
+        <nbd-general@lists.sourceforge.net>
+From: Josef Bacik <jbacik@fb.com>
+Message-ID: <40321d4b-a8f6-5dfe-1aca-230b055c0f3a@fb.com>
+Date: Mon, 12 Sep 2016 09:11:34 -0400
+MIME-Version: 1.0
+In-Reply-To: <20160910074340.GA24069@infradead.org>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Adjust how we find relevant block within page and how we clear the
-required part of the page.
+On 09/10/2016 03:43 AM, Christoph Hellwig wrote:
+> Hi Josef,
+>
+> I haven't read the full path as I'm a bit in a hurry, but is there
+> a good reason to not simply have a socket per-hw_ctx and store it in
+> the hw_ctx private data instead of using the index in the nbd_cmd
+> structure?
+>
 
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
----
- fs/ext4/move_extent.c | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+No good reason, just didn't know I could do that.  I'll fix things up to do that 
+instead, thanks,
 
-diff --git a/fs/ext4/move_extent.c b/fs/ext4/move_extent.c
-index a920c5d29fac..f3efdd0e0eaf 100644
---- a/fs/ext4/move_extent.c
-+++ b/fs/ext4/move_extent.c
-@@ -210,7 +210,9 @@ mext_page_mkuptodate(struct page *page, unsigned from, unsigned to)
- 				return err;
- 			}
- 			if (!buffer_mapped(bh)) {
--				zero_user(page, block_start, blocksize);
-+				zero_user(page + block_start / PAGE_SIZE,
-+						block_start % PAGE_SIZE,
-+						blocksize);
- 				set_buffer_uptodate(bh);
- 				continue;
- 			}
-@@ -267,10 +269,11 @@ move_extent_per_page(struct file *o_filp, struct inode *donor_inode,
- 	unsigned int tmp_data_size, data_size, replaced_size;
- 	int i, err2, jblocks, retries = 0;
- 	int replaced_count = 0;
--	int from = data_offset_in_page << orig_inode->i_blkbits;
-+	int from;
- 	int blocks_per_page = PAGE_SIZE >> orig_inode->i_blkbits;
- 	struct super_block *sb = orig_inode->i_sb;
- 	struct buffer_head *bh = NULL;
-+	int diff;
- 
- 	/*
- 	 * It needs twice the amount of ordinary journal buffers because
-@@ -355,6 +358,9 @@ again:
- 		goto unlock_pages;
- 	}
- data_copy:
-+	diff = (pagep[0] - compound_head(pagep[0])) * blocks_per_page;
-+	from = (data_offset_in_page + diff) << orig_inode->i_blkbits;
-+	pagep[0] = compound_head(pagep[0]);
- 	*err = mext_page_mkuptodate(pagep[0], from, from + replaced_size);
- 	if (*err)
- 		goto unlock_pages;
-@@ -384,7 +390,7 @@ data_copy:
- 	if (!page_has_buffers(pagep[0]))
- 		create_empty_buffers(pagep[0], 1 << orig_inode->i_blkbits, 0);
- 	bh = page_buffers(pagep[0]);
--	for (i = 0; i < data_offset_in_page; i++)
-+	for (i = 0; i < data_offset_in_page + diff; i++)
- 		bh = bh->b_this_page;
- 	for (i = 0; i < block_len_in_page; i++) {
- 		*err = ext4_get_block(orig_inode, orig_blk_offset + i, bh, 0);
--- 
-2.9.3
-
+Josef
