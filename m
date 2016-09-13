@@ -1,111 +1,78 @@
-Return-Path: <jshank@google.com>
+Return-Path: <msnitzer@redhat.com>
+Date: Tue, 13 Sep 2016 10:36:47 -0400
+From: Mike Snitzer <snitzer@redhat.com>
+To: Bart Van Assche <bart.vanassche@gmail.com>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>, axboe@kernel.dk,
+        linux-block@vger.kernel.org,
+        device-mapper development <dm-devel@redhat.com>, hch@lst.de
+Subject: Re: should blk-mq halt requeue processing while queue is frozen?
+Message-ID: <20160913143647.GA23094@redhat.com>
+References: <f276cf3d-cad3-3e61-2903-754970f90445@sandisk.com>
+ <20160901222654.GA13292@redhat.com>
+ <938609b9-3a55-0ed3-ffeb-de27e1c1e864@sandisk.com>
+ <20160901234754.GA13653@redhat.com>
+ <6af010f8-0a8f-cf0e-d819-3b8e1c20b56e@sandisk.com>
+ <20160902151213.GA17508@redhat.com>
+ <20160902161059.GB17508@redhat.com>
+ <aa663595-4890-adb1-a2b4-422b0b65b097@sandisk.com>
+ <20160907164114.GA17578@redhat.com>
+ <7c034c5b-db1b-e0c7-2824-81672c6683f9@acm.org>
 MIME-Version: 1.0
-From: Jim Shankland <jshank@google.com>
-Date: Thu, 15 Sep 2016 12:39:13 -0700
-Message-ID: <CAK1UeSYKgM=AnbUdJ+4fhFVrG59OYydyWPSki8e4GaYAPiXkEg@mail.gmail.com>
-Subject: Counting I/O errors in /sys/block/<dev>/stat
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org
-Content-Type: multipart/mixed; boundary=001a114b2f6a4d374f053c9100d5
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <7c034c5b-db1b-e0c7-2824-81672c6683f9@acm.org>
 List-ID: <linux-block@vger.kernel.org>
 
---001a114b2f6a4d374f053c9100d5
-Content-Type: multipart/alternative; boundary=001a114b2f6a4d374a053c9100d3
+On Tue, Sep 13 2016 at  4:01am -0400,
+Bart Van Assche <bart.vanassche@gmail.com> wrote:
 
---001a114b2f6a4d374a053c9100d3
-Content-Type: text/plain; charset=UTF-8
+> On 09/07/2016 06:41 PM, Mike Snitzer wrote:
+> >On Fri, Sep 02 2016 at  6:42pm -0400,
+> >Bart Van Assche <bart.vanassche@sandisk.com> wrote:
+> >>+/**
+> >>+ * blk_mq_quiesce_queue - wait until all pending queue_rq calls have finished
+> >>+ *
+> >>+ * Prevent that new I/O requests are queued and wait until all pending
+> >>+ * queue_rq() calls have finished.
+> >>+ */
+> >>+void blk_mq_quiesce_queue(struct request_queue *q)
+> >>+{
+> >>+	spin_lock_irq(q->queue_lock);
+> >>+	WARN_ON_ONCE(blk_queue_quiescing(q));
+> >>+	queue_flag_set(QUEUE_FLAG_QUIESCING, q);
+> >>+	spin_unlock_irq(q->queue_lock);
+> >>+
+> >>+	atomic_inc_return(&q->mq_freeze_depth);
+> >>+	blk_mq_run_hw_queues(q, false);
+> >>+	synchronize_rcu();
+> >
+> >Why the synchronize_rcu()?
+> 
+> Hello Mike,
+> 
+> Adding read_lock() + read_unlock() in __blk_mq_run_hw_queue() and
+> synchronize_rcu() in blk_mq_quiesce_queue() is the lowest overhead
+> mechanism I know of to make the latter function wait until the
+> former has finished.
 
-Dear colleagues,
+OK.
 
-The attached patch keeps a count of block device I/O errors -- any error
-event that generates a klog message in blk_update_request -- and reports
-the count as a 12th field in /sys/block/<dev>/stat. That allows, e.g.,
-monitoring systems to detect and count block device errors without having
-to scrape syslog.
+> >Also, you're effectively open-coding blk_mq_freeze_queue_start() minus
+> >the q->q_usage_counter mgmt.  Why not add a flag to conditionally manage
+> >q->q_usage_counter to blk_mq_freeze_queue_start()?
+> 
+> I will consider this.
+> 
+> >But I'm concerned about blk_mq_{quiesce,resume}_queue vs
+> >blk_mq_{freeze,unfreeze}_queue -- e.g. if "freeze" is nested after
+> >"queue" (but before "resume") it would still need the q->q_usage_counter
+> >management.  Your patch as-is would break the blk-mq freeze interface.
+> 
+> Agreed. blk_mq_{quiesce,resume}_queue() has to manipulate
+> q_usage_counter in the same way as blk_mq_{freeze,unfreeze}_queue().
+> Once I am back in the office I will rework this patch and send it to
+> Jens.
 
-If the patch is acceptable as is, please consider it submitted for eventual
-merging into the mainline kernel. If not, I'd welcome comments, feedback,
-etc.
+Please base any further work in this area ontop of
+http://git.kernel.org/cgit/linux/kernel/git/snitzer/linux.git/log/?h=devel
 
-Thanks,
-
-Jim Shankland
-
---001a114b2f6a4d374a053c9100d3
-Content-Type: text/html; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div>Dear colleagues,</div><div><br></div>The attached pat=
-ch keeps a count of block device I/O errors -- any error event that generat=
-es a klog message in blk_update_request -- and reports the count as a 12th =
-field in /sys/block/&lt;dev&gt;/stat. That allows, e.g., monitoring systems=
- to detect and count block device errors without having to scrape syslog.<d=
-iv><br></div><div>If the patch is acceptable as is, please consider it subm=
-itted for eventual merging into the mainline kernel. If not, I&#39;d welcom=
-e comments, feedback, etc.</div><div><br></div><div>Thanks,</div><div><br><=
-/div><div>Jim Shankland</div><div><br></div></div>
-
---001a114b2f6a4d374a053c9100d3--
-
---001a114b2f6a4d374f053c9100d5
-Content-Type: application/octet-stream; name="blockdev-error-counts.patch"
-Content-Disposition: attachment; filename="blockdev-error-counts.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_it4qp3s20
-
-ZGlmZiAtLWdpdCBhL2Jsb2NrL2Jsay1jb3JlLmMgYi9ibG9jay9ibGstY29yZS5jCmluZGV4IDM2
-YzdhYzMuLmU2NzEwZTQgMTAwNjQ0Ci0tLSBhL2Jsb2NrL2Jsay1jb3JlLmMKKysrIGIvYmxvY2sv
-YmxrLWNvcmUuYwpAQCAtMjIzMiw3ICsyMjMyLDggQEAgdW5zaWduZWQgaW50IGJsa19ycV9lcnJf
-Ynl0ZXMoY29uc3Qgc3RydWN0IHJlcXVlc3QgKnJxKQogfQogRVhQT1JUX1NZTUJPTF9HUEwoYmxr
-X3JxX2Vycl9ieXRlcyk7CiAKLXZvaWQgYmxrX2FjY291bnRfaW9fY29tcGxldGlvbihzdHJ1Y3Qg
-cmVxdWVzdCAqcmVxLCB1bnNpZ25lZCBpbnQgYnl0ZXMpCit2b2lkIGJsa19hY2NvdW50X2lvX2Nv
-bXBsZXRpb24oc3RydWN0IHJlcXVlc3QgKnJlcSwgaW50IGlvX2VyciwKKwkJCSAgICAgICB1bnNp
-Z25lZCBpbnQgYnl0ZXMpCiB7CiAJaWYgKGJsa19kb19pb19zdGF0KHJlcSkpIHsKIAkJY29uc3Qg
-aW50IHJ3ID0gcnFfZGF0YV9kaXIocmVxKTsKQEAgLTIyNDIsNiArMjI0Myw4IEBAIHZvaWQgYmxr
-X2FjY291bnRfaW9fY29tcGxldGlvbihzdHJ1Y3QgcmVxdWVzdCAqcmVxLCB1bnNpZ25lZCBpbnQg
-Ynl0ZXMpCiAJCWNwdSA9IHBhcnRfc3RhdF9sb2NrKCk7CiAJCXBhcnQgPSByZXEtPnBhcnQ7CiAJ
-CXBhcnRfc3RhdF9hZGQoY3B1LCBwYXJ0LCBzZWN0b3JzW3J3XSwgYnl0ZXMgPj4gOSk7CisJCWlm
-IChpb19lcnIpCisJCQlwYXJ0X3N0YXRfaW5jKGNwdSwgcGFydCwgaW9fZXJyb3JzKTsKIAkJcGFy
-dF9zdGF0X3VubG9jaygpOwogCX0KIH0KQEAgLTI1MzksNiArMjU0Miw3IEBAIEVYUE9SVF9TWU1C
-T0woYmxrX2ZldGNoX3JlcXVlc3QpOwogYm9vbCBibGtfdXBkYXRlX3JlcXVlc3Qoc3RydWN0IHJl
-cXVlc3QgKnJlcSwgaW50IGVycm9yLCB1bnNpZ25lZCBpbnQgbnJfYnl0ZXMpCiB7CiAJaW50IHRv
-dGFsX2J5dGVzOworCWludCBpb19lcnJvciA9IDA7CiAKIAl0cmFjZV9ibG9ja19ycV9jb21wbGV0
-ZShyZXEtPnEsIHJlcSwgbnJfYnl0ZXMpOwogCkBAIC0yNTg4LDEwICsyNTkyLDExIEBAIGJvb2wg
-YmxrX3VwZGF0ZV9yZXF1ZXN0KHN0cnVjdCByZXF1ZXN0ICpyZXEsIGludCBlcnJvciwgdW5zaWdu
-ZWQgaW50IG5yX2J5dGVzKQogCQkJCSAgIF9fZnVuY19fLCBlcnJvcl90eXBlLCByZXEtPnJxX2Rp
-c2sgPwogCQkJCSAgIHJlcS0+cnFfZGlzay0+ZGlza19uYW1lIDogIj8iLAogCQkJCSAgICh1bnNp
-Z25lZCBsb25nIGxvbmcpYmxrX3JxX3BvcyhyZXEpKTsKKwkJaW9fZXJyb3IgPSAxOwogCiAJfQog
-Ci0JYmxrX2FjY291bnRfaW9fY29tcGxldGlvbihyZXEsIG5yX2J5dGVzKTsKKwlibGtfYWNjb3Vu
-dF9pb19jb21wbGV0aW9uKHJlcSwgaW9fZXJyb3IsIG5yX2J5dGVzKTsKIAogCXRvdGFsX2J5dGVz
-ID0gMDsKIAl3aGlsZSAocmVxLT5iaW8pIHsKZGlmZiAtLWdpdCBhL2Jsb2NrL2Jsay5oIGIvYmxv
-Y2svYmxrLmgKaW5kZXggYzM3NDkyZi4uYjNmZDM5NCAxMDA2NDQKLS0tIGEvYmxvY2svYmxrLmgK
-KysrIGIvYmxvY2svYmxrLmgKQEAgLTEwNyw3ICsxMDcsOCBAQCBib29sIGJsa19hdHRlbXB0X3Bs
-dWdfbWVyZ2Uoc3RydWN0IHJlcXVlc3RfcXVldWUgKnEsIHN0cnVjdCBiaW8gKmJpbywKIHVuc2ln
-bmVkIGludCBibGtfcGx1Z19xdWV1ZWRfY291bnQoc3RydWN0IHJlcXVlc3RfcXVldWUgKnEpOwog
-CiB2b2lkIGJsa19hY2NvdW50X2lvX3N0YXJ0KHN0cnVjdCByZXF1ZXN0ICpyZXEsIGJvb2wgbmV3
-X2lvKTsKLXZvaWQgYmxrX2FjY291bnRfaW9fY29tcGxldGlvbihzdHJ1Y3QgcmVxdWVzdCAqcmVx
-LCB1bnNpZ25lZCBpbnQgYnl0ZXMpOwordm9pZCBibGtfYWNjb3VudF9pb19jb21wbGV0aW9uKHN0
-cnVjdCByZXF1ZXN0ICpyZXEsIGludCBpb19lcnIsCisJCQkgICAgICAgdW5zaWduZWQgaW50IGJ5
-dGVzKTsKIHZvaWQgYmxrX2FjY291bnRfaW9fZG9uZShzdHJ1Y3QgcmVxdWVzdCAqcmVxKTsKIAog
-LyoKZGlmZiAtLWdpdCBhL2Jsb2NrL3BhcnRpdGlvbi1nZW5lcmljLmMgYi9ibG9jay9wYXJ0aXRp
-b24tZ2VuZXJpYy5jCmluZGV4IDcxZDllZDkuLjA4MTRjY2IgMTAwNjQ0Ci0tLSBhL2Jsb2NrL3Bh
-cnRpdGlvbi1nZW5lcmljLmMKKysrIGIvYmxvY2svcGFydGl0aW9uLWdlbmVyaWMuYwpAQCAtMTIx
-LDcgKzEyMSw3IEBAIHNzaXplX3QgcGFydF9zdGF0X3Nob3coc3RydWN0IGRldmljZSAqZGV2LAog
-CXJldHVybiBzcHJpbnRmKGJ1ZiwKIAkJIiU4bHUgJThsdSAlOGxsdSAlOHUgIgogCQkiJThsdSAl
-OGx1ICU4bGx1ICU4dSAiCi0JCSIlOHUgJTh1ICU4dSIKKwkJIiU4dSAlOHUgJTh1ICU4bHUiCiAJ
-CSJcbiIsCiAJCXBhcnRfc3RhdF9yZWFkKHAsIGlvc1tSRUFEXSksCiAJCXBhcnRfc3RhdF9yZWFk
-KHAsIG1lcmdlc1tSRUFEXSksCkBAIC0xMzMsNyArMTMzLDggQEAgc3NpemVfdCBwYXJ0X3N0YXRf
-c2hvdyhzdHJ1Y3QgZGV2aWNlICpkZXYsCiAJCWppZmZpZXNfdG9fbXNlY3MocGFydF9zdGF0X3Jl
-YWQocCwgdGlja3NbV1JJVEVdKSksCiAJCXBhcnRfaW5fZmxpZ2h0KHApLAogCQlqaWZmaWVzX3Rv
-X21zZWNzKHBhcnRfc3RhdF9yZWFkKHAsIGlvX3RpY2tzKSksCi0JCWppZmZpZXNfdG9fbXNlY3Mo
-cGFydF9zdGF0X3JlYWQocCwgdGltZV9pbl9xdWV1ZSkpKTsKKwkJamlmZmllc190b19tc2Vjcyhw
-YXJ0X3N0YXRfcmVhZChwLCB0aW1lX2luX3F1ZXVlKSksCisJCXBhcnRfc3RhdF9yZWFkKHAsIGlv
-X2Vycm9ycykpOwogfQogCiBzc2l6ZV90IHBhcnRfaW5mbGlnaHRfc2hvdyhzdHJ1Y3QgZGV2aWNl
-ICpkZXYsCmRpZmYgLS1naXQgYS9pbmNsdWRlL2xpbnV4L2dlbmhkLmggYi9pbmNsdWRlL2xpbnV4
-L2dlbmhkLmgKaW5kZXggMWRiZjUyZi4uMWRlN2EzMCAxMDA2NDQKLS0tIGEvaW5jbHVkZS9saW51
-eC9nZW5oZC5oCisrKyBiL2luY2x1ZGUvbGludXgvZ2VuaGQuaApAQCAtODcsNiArODcsNyBAQCBz
-dHJ1Y3QgZGlza19zdGF0cyB7CiAJdW5zaWduZWQgbG9uZyB0aWNrc1syXTsKIAl1bnNpZ25lZCBs
-b25nIGlvX3RpY2tzOwogCXVuc2lnbmVkIGxvbmcgdGltZV9pbl9xdWV1ZTsKKwl1bnNpZ25lZCBs
-b25nIGlvX2Vycm9yczsKIH07CiAKICNkZWZpbmUgUEFSVElUSU9OX01FVEFfSU5GT19WT0xOQU1F
-TFRICTY0Cg==
---001a114b2f6a4d374f053c9100d5--
+And please verify all the mptest tests pass with your changes in place.
