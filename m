@@ -1,101 +1,52 @@
-Return-Path: <msnitzer@redhat.com>
-From: Mike Snitzer <snitzer@redhat.com>
-To: axboe@kernel.dk, dm-devel@redhat.com
-Cc: linux-block@vger.kernel.org
-Subject: [PATCH 1/3] blk-mq: introduce blk_mq_delay_kick_requeue_list()
-Date: Tue, 13 Sep 2016 12:01:33 -0400
-Message-Id: <1473782495-44128-2-git-send-email-snitzer@redhat.com>
-In-Reply-To: <1473782495-44128-1-git-send-email-snitzer@redhat.com>
-References: <1473782495-44128-1-git-send-email-snitzer@redhat.com>
+Return-Path: <sbates@raithlin.com>
+From: Stephen Bates <sbates@raithlin.com>
+To: linux-block@vger.kernel.org
+Cc: axboe@kernel.dk,
+	hch@lst.de
+Subject: [PATCH 2/2] Enable zeroing of io_poll statistics
+Date: Tue, 13 Sep 2016 12:23:16 -0600
+Message-Id: <1473790996-27038-3-git-send-email-sbates@raithlin.com>
+In-Reply-To: <1473790996-27038-1-git-send-email-sbates@raithlin.com>
+References: <1473790996-27038-1-git-send-email-sbates@raithlin.com>
 List-ID: <linux-block@vger.kernel.org>
 
-blk_mq_delay_kick_requeue_list() provides the ability to kick the
-q->requeue_list after a specified time.  To do this the request_queue's
-'requeue_work' member was changed to a delayed_work.
+Allow the io_poll statistics to be zeroed to make for easier logging
+of polling event.
 
-blk_mq_delay_kick_requeue_list() allows DM to defer processing requeued
-requests while it doesn't make sense to immediately requeue them
-(e.g. when all paths in a DM multipath have failed).
-
-Signed-off-by: Mike Snitzer <snitzer@redhat.com>
+Signed-off-by: Stephen Bates <sbates@raithlin.com>
 ---
- block/blk-mq.c         | 15 +++++++++++----
- include/linux/blk-mq.h |  1 +
- include/linux/blkdev.h |  2 +-
- 3 files changed, 13 insertions(+), 5 deletions(-)
+ block/blk-mq-sysfs.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 13f5a6c..096e7a0 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -501,7 +501,7 @@ EXPORT_SYMBOL(blk_mq_requeue_request);
- static void blk_mq_requeue_work(struct work_struct *work)
- {
- 	struct request_queue *q =
--		container_of(work, struct request_queue, requeue_work);
-+		container_of(work, struct request_queue, requeue_work.work);
- 	LIST_HEAD(rq_list);
- 	struct request *rq, *next;
- 	unsigned long flags;
-@@ -556,16 +556,23 @@ EXPORT_SYMBOL(blk_mq_add_to_requeue_list);
- 
- void blk_mq_cancel_requeue_work(struct request_queue *q)
- {
--	cancel_work_sync(&q->requeue_work);
-+	cancel_delayed_work_sync(&q->requeue_work);
+diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
+index ea8c3f5..ac5160e 100644
+--- a/block/blk-mq-sysfs.c
++++ b/block/blk-mq-sysfs.c
+@@ -181,6 +181,14 @@ static ssize_t blk_mq_hw_sysfs_poll_show(struct blk_mq_hw_ctx *hctx, char *page)
+ 		       hctx->poll_success);
  }
- EXPORT_SYMBOL_GPL(blk_mq_cancel_requeue_work);
  
- void blk_mq_kick_requeue_list(struct request_queue *q)
- {
--	kblockd_schedule_work(&q->requeue_work);
-+	kblockd_schedule_delayed_work(&q->requeue_work, 0);
- }
- EXPORT_SYMBOL(blk_mq_kick_requeue_list);
- 
-+void blk_mq_delay_kick_requeue_list(struct request_queue *q,
-+				    unsigned long msecs)
++static ssize_t blk_mq_hw_sysfs_poll_store(struct blk_mq_hw_ctx *hctx,
++					  const char *page, size_t size)
 +{
-+	kblockd_schedule_delayed_work(&q->requeue_work, msecs);
-+}
-+EXPORT_SYMBOL(blk_mq_delay_kick_requeue_list);
++	hctx->poll_considered = hctx->poll_invoked = hctx->poll_success = 0;
 +
- void blk_mq_abort_requeue_list(struct request_queue *q)
++	return size;
++}
++
+ static ssize_t blk_mq_hw_sysfs_queued_show(struct blk_mq_hw_ctx *hctx,
+ 					   char *page)
  {
- 	unsigned long flags;
-@@ -2082,7 +2089,7 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+@@ -303,8 +311,9 @@ static struct blk_mq_hw_ctx_sysfs_entry blk_mq_hw_sysfs_cpus = {
+ 	.show = blk_mq_hw_sysfs_cpus_show,
+ };
+ static struct blk_mq_hw_ctx_sysfs_entry blk_mq_hw_sysfs_poll = {
+-	.attr = {.name = "io_poll", .mode = S_IRUGO },
++	.attr = {.name = "io_poll", .mode = S_IWUSR | S_IRUGO },
+ 	.show = blk_mq_hw_sysfs_poll_show,
++	.store = blk_mq_hw_sysfs_poll_store,
+ };
  
- 	q->sg_reserved_size = INT_MAX;
- 
--	INIT_WORK(&q->requeue_work, blk_mq_requeue_work);
-+	INIT_DELAYED_WORK(&q->requeue_work, blk_mq_requeue_work);
- 	INIT_LIST_HEAD(&q->requeue_list);
- 	spin_lock_init(&q->requeue_lock);
- 
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index e43bbff..ecec4b8 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -232,6 +232,7 @@ void blk_mq_requeue_request(struct request *rq);
- void blk_mq_add_to_requeue_list(struct request *rq, bool at_head);
- void blk_mq_cancel_requeue_work(struct request_queue *q);
- void blk_mq_kick_requeue_list(struct request_queue *q);
-+void blk_mq_delay_kick_requeue_list(struct request_queue *q, unsigned long msecs);
- void blk_mq_abort_requeue_list(struct request_queue *q);
- void blk_mq_complete_request(struct request *rq, int error);
- 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index e79055c..b0a6189 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -449,7 +449,7 @@ struct request_queue {
- 
- 	struct list_head	requeue_list;
- 	spinlock_t		requeue_lock;
--	struct work_struct	requeue_work;
-+	struct delayed_work	requeue_work;
- 
- 	struct mutex		sysfs_lock;
- 
+ static struct attribute *default_hw_ctx_attrs[] = {
 -- 
-2.7.4 (Apple Git-66)
+2.1.4
