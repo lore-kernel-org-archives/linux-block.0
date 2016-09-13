@@ -1,43 +1,65 @@
-Return-Path: <hare@suse.de>
-Subject: Re: [PATCH 3/3] dm mpath: delay the requeue of blk-mq requests while
- all paths down
-To: Mike Snitzer <snitzer@redhat.com>, axboe@kernel.dk, dm-devel@redhat.com
-References: <1473782495-44128-1-git-send-email-snitzer@redhat.com>
- <1473782495-44128-4-git-send-email-snitzer@redhat.com>
+Return-Path: <msnitzer@redhat.com>
+From: Mike Snitzer <snitzer@redhat.com>
+To: axboe@kernel.dk, dm-devel@redhat.com
 Cc: linux-block@vger.kernel.org
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <a20ea38d-4dce-3302-3e9a-bc46e250f556@suse.de>
-Date: Wed, 14 Sep 2016 08:25:51 +0200
-MIME-Version: 1.0
-In-Reply-To: <1473782495-44128-4-git-send-email-snitzer@redhat.com>
-Content-Type: text/plain; charset=windows-1252
+Subject: [PATCH 3/3] dm mpath: delay the requeue of blk-mq requests while all paths down
+Date: Tue, 13 Sep 2016 12:01:35 -0400
+Message-Id: <1473782495-44128-4-git-send-email-snitzer@redhat.com>
+In-Reply-To: <1473782495-44128-1-git-send-email-snitzer@redhat.com>
+References: <1473782495-44128-1-git-send-email-snitzer@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On 09/13/2016 06:01 PM, Mike Snitzer wrote:
-> Return DM_MAPIO_DELAY_REQUEUE from .clone_and_map_rq.  Also, return
-> false from .busy, if all paths are down, so that blk-mq requests get
-> mapped via .clone_and_map_rq -- which results in DM_MAPIO_DELAY_REQUEUE
-> being returned to dm-rq.
-> 
-> This change allows for a noticeable reduction in cpu utilization
-> (reduced kworker load) while all paths are down, e.g.:
-> 
-> system CPU idleness (as measured by fio's --idle-prof=system):
-> before: system: 87.53%
-> after:  system: 97.07%
-> 
-> Signed-off-by: Mike Snitzer <snitzer@redhat.com>
-> ---
->  drivers/md/dm-mpath.c | 15 +++++++++------
->  1 file changed, 9 insertions(+), 6 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+Return DM_MAPIO_DELAY_REQUEUE from .clone_and_map_rq.  Also, return
+false from .busy, if all paths are down, so that blk-mq requests get
+mapped via .clone_and_map_rq -- which results in DM_MAPIO_DELAY_REQUEUE
+being returned to dm-rq.
 
-Cheers,
+This change allows for a noticeable reduction in cpu utilization
+(reduced kworker load) while all paths are down, e.g.:
 
-Hannes
+system CPU idleness (as measured by fio's --idle-prof=system):
+before: system: 87.53%
+after:  system: 97.07%
+
+Signed-off-by: Mike Snitzer <snitzer@redhat.com>
+---
+ drivers/md/dm-mpath.c | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/md/dm-mpath.c b/drivers/md/dm-mpath.c
+index c777d38..7613d64 100644
+--- a/drivers/md/dm-mpath.c
++++ b/drivers/md/dm-mpath.c
+@@ -550,9 +550,9 @@ static int __multipath_map(struct dm_target *ti, struct request *clone,
+ 		pgpath = choose_pgpath(m, nr_bytes);
+ 
+ 	if (!pgpath) {
+-		if (!must_push_back_rq(m))
+-			r = -EIO;	/* Failed */
+-		return r;
++		if (must_push_back_rq(m))
++			return DM_MAPIO_DELAY_REQUEUE;
++		return -EIO;	/* Failed */
+ 	} else if (test_bit(MPATHF_QUEUE_IO, &m->flags) ||
+ 		   test_bit(MPATHF_PG_INIT_REQUIRED, &m->flags)) {
+ 		pg_init_all_paths(m);
+@@ -1990,11 +1990,14 @@ static int multipath_busy(struct dm_target *ti)
+ 	struct priority_group *pg, *next_pg;
+ 	struct pgpath *pgpath;
+ 
+-	/* pg_init in progress or no paths available */
+-	if (atomic_read(&m->pg_init_in_progress) ||
+-	    (!atomic_read(&m->nr_valid_paths) && test_bit(MPATHF_QUEUE_IF_NO_PATH, &m->flags)))
++	/* pg_init in progress */
++	if (atomic_read(&m->pg_init_in_progress))
+ 		return true;
+ 
++	/* no paths available, for blk-mq: rely on IO mapping to delay requeue */
++	if (!atomic_read(&m->nr_valid_paths) && test_bit(MPATHF_QUEUE_IF_NO_PATH, &m->flags))
++		return (m->queue_mode != DM_TYPE_MQ_REQUEST_BASED);
++
+ 	/* Guess which priority_group will be used at next mapping time */
+ 	pg = lockless_dereference(m->current_pg);
+ 	next_pg = lockless_dereference(m->next_pg);
 -- 
-Dr. Hannes Reinecke		      zSeries & Storage
-hare@suse.de			      +49 911 74053 688
-SUSE LINUX Products GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: J. Hawn, J. Guild, F. Imend�rffer, HRB 16746 (AG N�rnberg)
+2.7.4 (Apple Git-66)
