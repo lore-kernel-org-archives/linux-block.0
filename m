@@ -1,36 +1,33 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.9]:49939 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755780AbcIKODN (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 11 Sep 2016 10:03:13 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@fb.com
+Return-Path: <msnitzer@redhat.com>
+From: Mike Snitzer <snitzer@redhat.com>
+To: axboe@kernel.dk, dm-devel@redhat.com
 Cc: linux-block@vger.kernel.org
-Subject: [PATCH 2/3] bio.h: remove a very outdated comment
-Date: Sun, 11 Sep 2016 16:03:03 +0200
-Message-Id: <1473602584-11744-3-git-send-email-hch@lst.de>
-In-Reply-To: <1473602584-11744-1-git-send-email-hch@lst.de>
-References: <1473602584-11744-1-git-send-email-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Subject: [PATCH for-4.9 0/3] allow delayed requeue of blk-mq requests
+Date: Tue, 13 Sep 2016 12:01:32 -0400
+Message-Id: <1473782495-44128-1-git-send-email-snitzer@redhat.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- include/linux/bio.h | 2 --
- 1 file changed, 2 deletions(-)
+I'd like to see these changes included during the 4.9 merge.  The
+blk-mq change is a straight-forward switch from work_struct to
+delayed_work and the addition of the blk_mq_delay_kick_requeue_list()
+interface.  Jens, can you pick up this blk-mq changes (patch 1)?
 
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 23ddf4b..e00721a 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -1,6 +1,4 @@
- /*
-- * 2.5 block I/O model
-- *
-  * Copyright (C) 2001 Jens Axboe <axboe@suse.de>
-  *
-  * This program is free software; you can redistribute it and/or modify
+These changes offer reduced CPU utilization during DM multipath's all
+path down case (when 'queue_if_no_path' is enabled).  Please see each
+patch's header for more details.
+
+Mike Snitzer (3):
+  blk-mq: introduce blk_mq_delay_kick_requeue_list()
+  dm rq: add DM_MAPIO_DELAY_REQUEUE to delay requeue of blk-mq requests
+  dm mpath: delay the requeue of blk-mq requests while all paths down
+
+ block/blk-mq.c                | 15 +++++++++++----
+ drivers/md/dm-mpath.c         | 15 +++++++++------
+ drivers/md/dm-rq.c            | 35 ++++++++++++++++++++---------------
+ include/linux/blk-mq.h        |  1 +
+ include/linux/blkdev.h        |  2 +-
+ include/linux/device-mapper.h |  1 +
+ 6 files changed, 43 insertions(+), 26 deletions(-)
+
 -- 
-2.1.4
-
+2.7.4 (Apple Git-66)
