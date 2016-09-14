@@ -1,44 +1,25 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:52124 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S932839AbcI3NXn (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Sep 2016 09:23:43 -0400
-From: Alexander Gordeev <agordeev@redhat.com>
-To: linux-kernel@vger.kernel.org
-Cc: Alexander Gordeev <agordeev@redhat.com>,
-        linux-block@vger.kernel.org
-Subject: [PATCH v2 0/8] blk-mq: Minor cleanups
-Date: Fri, 30 Sep 2016 15:23:22 +0200
-Message-Id: <cover.1475241231.git.agordeev@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] block: remove remnant refs to hardsect
+To: Linus Walleij <linus.walleij@linaro.org>, linux-block@vger.kernel.org
+References: <1473856372-22204-1-git-send-email-linus.walleij@linaro.org>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <d4911dca-b840-997f-c4e4-2d4dab9d6d92@kernel.dk>
+Date: Wed, 14 Sep 2016 08:45:26 -0600
+MIME-Version: 1.0
+In-Reply-To: <1473856372-22204-1-git-send-email-linus.walleij@linaro.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+List-ID: <linux-block@vger.kernel.org>
 
-Hello,
+On 09/14/2016 06:32 AM, Linus Walleij wrote:
+> commit e1defc4ff0cf57aca6c5e3ff99fa503f5943c1f1
+> "block: Do away with the notion of hardsect_size"
+> removed the notion of "hardware sector size" from
+> the kernel in favor of logical block size, but
+> references remain in comments and documentation.
+>
+> Update the remaining sites mentioning hardsect.
 
-The series is against:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
-
-Thanks!
-
-CC: linux-block@vger.kernel.org
-
-Alexander Gordeev (8):
-  block: Get rid of unused request_queue::nr_queues member
-  blk-mq: Remove a redundant assignment
-  blk-mq: Fix hardware context data node selection
-  blk-mq: Cleanup a loop exit condition
-  blk-mq: Cleanup blk_mq_hw_ctx::cpumask (de-)allocation
-  blk-mq: Rework blk_mq_realloc_hw_ctxs()
-  blk-mq: Pair blk_mq_hctx_kobj_init() with blk_mq_hctx_kobj_put()
-  blk-mq: Cleanup (de-)allocation of blk_mq_hw_ctx::ctxs
-
- block/blk-mq-sysfs.c   |   5 ++
- block/blk-mq.c         | 129 ++++++++++++++++++++++++-------------------------
- block/blk-mq.h         |   1 +
- include/linux/blkdev.h |   1 -
- 4 files changed, 68 insertions(+), 68 deletions(-)
+Added for 4.9, thanks.
 
 -- 
-1.8.3.1
-
+Jens Axboe
