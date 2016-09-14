@@ -1,269 +1,43 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pa0-f53.google.com ([209.85.220.53]:32990 "EHLO
-        mail-pa0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752200AbcIGXqW (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Sep 2016 19:46:22 -0400
-Received: by mail-pa0-f53.google.com with SMTP id cm16so10882152pac.0
-        for <linux-block@vger.kernel.org>; Wed, 07 Sep 2016 16:46:22 -0700 (PDT)
-From: Omar Sandoval <osandov@osandov.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, kernel-team@fb.com
-Subject: [PATCH v2 4/5] scale_bitmap: push alloc policy into scale_bitmap_queue
-Date: Wed,  7 Sep 2016 16:46:05 -0700
-Message-Id: <75a4269defe9c61cdfa37fa8ebd7da7f2faa3ce5.1473291702.git.osandov@fb.com>
-In-Reply-To: <cover.1473291702.git.osandov@fb.com>
-References: <cover.1473291702.git.osandov@fb.com>
-In-Reply-To: <cover.1473291702.git.osandov@fb.com>
-References: <cover.1473291702.git.osandov@fb.com>
+Received: from mail-wm0-f66.google.com ([74.125.82.66]:36827 "EHLO
+        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751567AbcINCP3 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 13 Sep 2016 22:15:29 -0400
+Received: by mail-wm0-f66.google.com with SMTP id b184so322008wma.3
+        for <linux-block@vger.kernel.org>; Tue, 13 Sep 2016 19:15:28 -0700 (PDT)
+From: Bart Van Assche <bart.vanassche@gmail.com>
+Subject: Re: [PATCH 1/3] block: remove bio_destructor_t
+To: Christoph Hellwig <hch@lst.de>, axboe@fb.com
+References: <1473602584-11744-1-git-send-email-hch@lst.de>
+ <1473602584-11744-2-git-send-email-hch@lst.de>
+Cc: linux-block@vger.kernel.org,
+        Bart Van Assche <Bart.VanAssche@sandisk.com>
+Message-ID: <2b3670e0-9394-8681-8ac5-5967f11fd9ae@acm.org>
+Date: Wed, 14 Sep 2016 04:15:25 +0200
+MIME-Version: 1.0
+In-Reply-To: <1473602584-11744-2-git-send-email-hch@lst.de>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Omar Sandoval <osandov@fb.com>
+On 09/11/2016 04:03 PM, Christoph Hellwig wrote:
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  include/linux/blk_types.h | 1 -
+>  1 file changed, 1 deletion(-)
+>
+> diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+> index 436f43f..a2f4add 100644
+> --- a/include/linux/blk_types.h
+> +++ b/include/linux/blk_types.h
+> @@ -16,7 +16,6 @@ struct block_device;
+>  struct io_context;
+>  struct cgroup_subsys_state;
+>  typedef void (bio_end_io_t) (struct bio *);
+> -typedef void (bio_destructor_t) (struct bio *);
+>
+>  #ifdef CONFIG_BLOCK
+>  /*
 
-Again, there's no point in passing this in every time. Make it part of
-`struct scale_bitmap_queue` and clean up the API.
-
-Signed-off-by: Omar Sandoval <osandov@fb.com>
----
- block/blk-mq-tag.c           | 33 +++++++++++++++------------------
- block/blk-mq-tag.h           |  1 -
- include/linux/scale_bitmap.h | 24 +++++++++++++-----------
- lib/scale_bitmap.c           | 10 ++++++----
- 4 files changed, 34 insertions(+), 34 deletions(-)
-
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index cc1941b..4dff92c 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -91,14 +91,11 @@ static inline bool hctx_may_queue(struct blk_mq_hw_ctx *hctx,
- 	return atomic_read(&hctx->nr_active) < depth;
- }
- 
--#define BT_ALLOC_RR(tags) (tags->alloc_policy == BLK_TAG_ALLOC_RR)
--
--static int __bt_get(struct blk_mq_hw_ctx *hctx, struct scale_bitmap_queue *bt,
--		    struct blk_mq_tags *tags)
-+static int __bt_get(struct blk_mq_hw_ctx *hctx, struct scale_bitmap_queue *bt)
- {
- 	if (!hctx_may_queue(hctx, bt))
- 		return -1;
--	return __scale_bitmap_queue_get(bt, BT_ALLOC_RR(tags));
-+	return __scale_bitmap_queue_get(bt);
- }
- 
- static int bt_get(struct blk_mq_alloc_data *data, struct scale_bitmap_queue *bt,
-@@ -108,7 +105,7 @@ static int bt_get(struct blk_mq_alloc_data *data, struct scale_bitmap_queue *bt,
- 	DEFINE_WAIT(wait);
- 	int tag;
- 
--	tag = __bt_get(hctx, bt, tags);
-+	tag = __bt_get(hctx, bt);
- 	if (tag != -1)
- 		return tag;
- 
-@@ -119,7 +116,7 @@ static int bt_get(struct blk_mq_alloc_data *data, struct scale_bitmap_queue *bt,
- 	do {
- 		prepare_to_wait(&ws->wait, &wait, TASK_UNINTERRUPTIBLE);
- 
--		tag = __bt_get(hctx, bt, tags);
-+		tag = __bt_get(hctx, bt);
- 		if (tag != -1)
- 			break;
- 
-@@ -136,7 +133,7 @@ static int bt_get(struct blk_mq_alloc_data *data, struct scale_bitmap_queue *bt,
- 		 * Retry tag allocation after running the hardware queue,
- 		 * as running the queue may also have found completions.
- 		 */
--		tag = __bt_get(hctx, bt, tags);
-+		tag = __bt_get(hctx, bt);
- 		if (tag != -1)
- 			break;
- 
-@@ -206,12 +203,10 @@ void blk_mq_put_tag(struct blk_mq_hw_ctx *hctx, struct blk_mq_ctx *ctx,
- 		const int real_tag = tag - tags->nr_reserved_tags;
- 
- 		BUG_ON(real_tag >= tags->nr_tags);
--		scale_bitmap_queue_clear(&tags->bitmap_tags, real_tag,
--					 BT_ALLOC_RR(tags), ctx->cpu);
-+		scale_bitmap_queue_clear(&tags->bitmap_tags, real_tag, ctx->cpu);
- 	} else {
- 		BUG_ON(tag >= tags->nr_reserved_tags);
--		scale_bitmap_queue_clear(&tags->breserved_tags, tag,
--					 BT_ALLOC_RR(tags), ctx->cpu);
-+		scale_bitmap_queue_clear(&tags->breserved_tags, tag, ctx->cpu);
- 	}
- }
- 
-@@ -366,21 +361,23 @@ static unsigned int bt_unused_tags(const struct scale_bitmap_queue *bt)
- 	return bt->map.depth - scale_bitmap_weight(&bt->map);
- }
- 
--static int bt_alloc(struct scale_bitmap_queue *bt, unsigned int depth, int node)
-+static int bt_alloc(struct scale_bitmap_queue *bt, unsigned int depth,
-+		    bool round_robin, int node)
- {
--	return scale_bitmap_queue_init_node(bt, depth, -1, GFP_KERNEL, node);
-+	return scale_bitmap_queue_init_node(bt, depth, -1, round_robin,
-+					    GFP_KERNEL, node);
- }
- 
- static struct blk_mq_tags *blk_mq_init_bitmap_tags(struct blk_mq_tags *tags,
- 						   int node, int alloc_policy)
- {
- 	unsigned int depth = tags->nr_tags - tags->nr_reserved_tags;
-+	bool round_robin = alloc_policy == BLK_TAG_ALLOC_RR;
- 
--	tags->alloc_policy = alloc_policy;
--
--	if (bt_alloc(&tags->bitmap_tags, depth, node))
-+	if (bt_alloc(&tags->bitmap_tags, depth, round_robin, node))
- 		goto free_tags;
--	if (bt_alloc(&tags->breserved_tags, tags->nr_reserved_tags, node))
-+	if (bt_alloc(&tags->breserved_tags, tags->nr_reserved_tags, round_robin,
-+		     node))
- 		goto free_bitmap_tags;
- 
- 	return tags;
-diff --git a/block/blk-mq-tag.h b/block/blk-mq-tag.h
-index d52c286..e6fc179c 100644
---- a/block/blk-mq-tag.h
-+++ b/block/blk-mq-tag.h
-@@ -18,7 +18,6 @@ struct blk_mq_tags {
- 	struct request **rqs;
- 	struct list_head page_list;
- 
--	int alloc_policy;
- 	cpumask_var_t cpumask;
- };
- 
-diff --git a/include/linux/scale_bitmap.h b/include/linux/scale_bitmap.h
-index 49824c1..b83db63 100644
---- a/include/linux/scale_bitmap.h
-+++ b/include/linux/scale_bitmap.h
-@@ -122,6 +122,11 @@ struct scale_bitmap_queue {
- 	 * @ws: Wait queues.
- 	 */
- 	struct sbq_wait_state *ws;
-+
-+	/**
-+	 * @round_robin: Allocate bits in strict round-robin order.
-+	 */
-+	bool round_robin;
- };
- 
- /**
-@@ -270,14 +275,15 @@ unsigned int scale_bitmap_weight(const struct scale_bitmap *bitmap);
-  * @sbq: Bitmap queue to initialize.
-  * @depth: See scale_bitmap_init_node().
-  * @shift: See scale_bitmap_init_node().
-+ * @round_robin: See scale_bitmap_get().
-  * @flags: Allocation flags.
-  * @node: Memory node to allocate on.
-  *
-  * Return: Zero on success or negative errno on failure.
-  */
- int scale_bitmap_queue_init_node(struct scale_bitmap_queue *sbq,
--				 unsigned int depth, int shift, gfp_t flags,
--				 int node);
-+				 unsigned int depth, int shift,
-+				 bool round_robin, gfp_t flags, int node);
- 
- /**
-  * scale_bitmap_queue_free() - Free memory used by a &struct scale_bitmap_queue.
-@@ -307,34 +313,31 @@ void scale_bitmap_queue_resize(struct scale_bitmap_queue *sbq,
-  * __scale_bitmap_queue_get() - Try to allocate a free bit from a &struct
-  * scale_bitmap_queue with preemption already disabled.
-  * @sbq: Bitmap queue to allocate from.
-- * @round_robin: See scale_bitmap_get().
-  *
-  * Return: Non-negative allocated bit number if successful, -1 otherwise.
-  */
--static inline int __scale_bitmap_queue_get(struct scale_bitmap_queue *sbq,
--					   bool round_robin)
-+static inline int __scale_bitmap_queue_get(struct scale_bitmap_queue *sbq)
- {
- 	return scale_bitmap_get(&sbq->map, this_cpu_ptr(sbq->alloc_hint),
--				round_robin);
-+				sbq->round_robin);
- }
- 
- /**
-  * scale_bitmap_queue_get() - Try to allocate a free bit from a &struct
-  * scale_bitmap_queue.
-  * @sbq: Bitmap queue to allocate from.
-- * @round_robin: See scale_bitmap_get().
-  * @cpu: Output parameter; will contain the CPU we ran on (e.g., to be passed to
-  *       scale_bitmap_queue_clear()).
-  *
-  * Return: Non-negative allocated bit number if successful, -1 otherwise.
-  */
- static inline int scale_bitmap_queue_get(struct scale_bitmap_queue *sbq,
--					 bool round_robin, unsigned int *cpu)
-+					 unsigned int *cpu)
- {
- 	int ret;
- 
- 	*cpu = get_cpu();
--	ret = __scale_bitmap_queue_get(sbq, round_robin);
-+	ret = __scale_bitmap_queue_get(sbq);
- 	put_cpu();
- 	return ret;
- }
-@@ -344,11 +347,10 @@ static inline int scale_bitmap_queue_get(struct scale_bitmap_queue *sbq,
-  * &struct scale_bitmap_queue.
-  * @sbq: Bitmap to free from.
-  * @nr: Bit number to free.
-- * @round_robin: See scale_bitmap_get().
-  * @cpu: CPU the bit was allocated on.
-  */
- void scale_bitmap_queue_clear(struct scale_bitmap_queue *sbq, unsigned int nr,
--			      bool round_robin, unsigned int cpu);
-+			      unsigned int cpu);
- 
- static inline int sbq_index_inc(int index)
- {
-diff --git a/lib/scale_bitmap.c b/lib/scale_bitmap.c
-index 12fee62..8abe2cd 100644
---- a/lib/scale_bitmap.c
-+++ b/lib/scale_bitmap.c
-@@ -196,8 +196,8 @@ unsigned int scale_bitmap_weight(const struct scale_bitmap *bitmap)
- EXPORT_SYMBOL_GPL(scale_bitmap_weight);
- 
- int scale_bitmap_queue_init_node(struct scale_bitmap_queue *sbq,
--				 unsigned int depth, int shift, gfp_t flags,
--				 int node)
-+				 unsigned int depth, int shift,
-+				 bool round_robin, gfp_t flags, int node)
- {
- 	int ret;
- 	int i;
-@@ -229,6 +229,8 @@ int scale_bitmap_queue_init_node(struct scale_bitmap_queue *sbq,
- 		init_waitqueue_head(&sbq->ws[i].wait);
- 		atomic_set(&sbq->ws[i].wait_cnt, sbq->wake_batch);
- 	}
-+
-+	sbq->round_robin = round_robin;
- 	return 0;
- }
- EXPORT_SYMBOL_GPL(scale_bitmap_queue_init_node);
-@@ -267,7 +269,7 @@ static struct sbq_wait_state *sbq_wake_ptr(struct scale_bitmap_queue *sbq)
- }
- 
- void scale_bitmap_queue_clear(struct scale_bitmap_queue *sbq, unsigned int nr,
--			      bool round_robin, unsigned int cpu)
-+			      unsigned int cpu)
- {
- 	struct sbq_wait_state *ws;
- 	int wait_cnt;
-@@ -291,7 +293,7 @@ void scale_bitmap_queue_clear(struct scale_bitmap_queue *sbq, unsigned int nr,
- 	}
- 
- update_cache:
--	if (likely(!round_robin))
-+	if (likely(!sbq->round_robin))
- 		*per_cpu_ptr(sbq->alloc_hint, cpu) = nr;
- }
- EXPORT_SYMBOL_GPL(scale_bitmap_queue_clear);
--- 
-2.9.3
-
+Reviewed-by: Bart Van Assche <bart.vanassche@sandisk.com>
