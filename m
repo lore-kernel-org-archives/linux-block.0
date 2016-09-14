@@ -1,57 +1,29 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-bn3nam01on0069.outbound.protection.outlook.com ([104.47.33.69]:1472
-        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752922AbcI1X5X (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Sep 2016 19:57:23 -0400
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-Subject: [PATCH v2 0/7] Introduce blk_quiesce_queue() and blk_resume_queue()
-To: Jens Axboe <axboe@fb.com>
-CC: Christoph Hellwig <hch@lst.de>,
-        James Bottomley <jejb@linux.vnet.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
+Received: from verein.lst.de ([213.95.11.211]:48794 "EHLO newverein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1760285AbcINJ4j (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 14 Sep 2016 05:56:39 -0400
+Date: Wed, 14 Sep 2016 11:56:37 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Bart Van Assche <bart.vanassche@sandisk.com>
+Cc: Jens Axboe <axboe@fb.com>, Mike Christie <mchristi@redhat.com>,
+        Chris Mason <clm@fb.com>, Josef Bacik <jbacik@fb.com>,
         Mike Snitzer <snitzer@redhat.com>,
-        Doug Ledford <dledford@redhat.com>,
-        Keith Busch <keith.busch@intel.com>,
+        Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
+        Damien Le Moal <Damien.LeMoal@hgst.com>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-Message-ID: <f153ee47-e599-c333-92b0-d5da475012f3@sandisk.com>
-Date: Wed, 28 Sep 2016 16:57:07 -0700
+        "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
+        device-mapper development <dm-devel@redhat.com>
+Subject: Re: [PATCH 1/3] block: Document that bio_op() uses the data type
+        of bio.bi_opf
+Message-ID: <20160914095637.GA21938@lst.de>
+References: <35e3cdd6-8983-6c84-cb4c-9a7be15aea55@sandisk.com> <5e51ae40-994c-1f83-0575-6505662fb138@sandisk.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <5e51ae40-994c-1f83-0575-6505662fb138@sandisk.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hello Jens,
+Looks good,
 
-Multiple block drivers need the functionality to stop a request queue 
-and to wait until all ongoing request_fn() / queue_rq() calls have 
-finished without waiting until all outstanding requests have finished. 
-Hence this patch series that introduces the blk_mq_quiesce_queue() and 
-blk_mq_resume_queue() functions. The dm-mq, SRP and nvme patches in this 
-patch series are three examples of where these functions are useful. 
-These patches apply on top of the September 21 version of your 
-for-4.9/block branch.
-
-The changes compared to the previous version of this patch series are:
-- Dropped the non-blk-mq changes from this patch series.
-- Added support for harware queues with BLK_MQ_F_BLOCKING set.
-- Added a call stack to the description of the dm race fix patch.
-- Dropped the non-scsi-mq changes from the SRP patch.
-- Added a patch that introduces blk_mq_queue_stopped() in the dm driver.
-
-The individual patches in this series are:
-
-0001-blk-mq-Introduce-blk_mq_queue_stopped.patch
-0002-dm-Use-BLK_MQ_S_STOPPED-instead-of-QUEUE_FLAG_STOPPE.patch
-0003-RFC-nvme-Use-BLK_MQ_S_STOPPED-instead-of-QUEUE_FLAG_.patch
-0004-blk-mq-Introduce-blk_quiesce_queue-and-blk_resume_qu.patch
-0005-dm-Fix-a-race-condition-related-to-stopping-and-star.patch
-0006-SRP-transport-Port-srp_wait_for_queuecommand-to-scsi.patch
-0007-RFC-nvme-Fix-a-race-condition.patch
-
-Thanks,
-
-Bart.
+Reviewed-by: Christoph Hellwig <hch@lst.de>
