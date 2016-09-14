@@ -1,63 +1,43 @@
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@fb.com>
-Subject: [GIT PULL] Block fixes for 4.8-rc
-Message-ID: <f8f3d0fd-23e7-0ac5-fb67-2abc48708a32@fb.com>
-Date: Fri, 2 Sep 2016 20:12:09 -0600
+Return-Path: <hare@suse.de>
+Subject: Re: [PATCH 3/3] dm mpath: delay the requeue of blk-mq requests while
+ all paths down
+To: Mike Snitzer <snitzer@redhat.com>, axboe@kernel.dk, dm-devel@redhat.com
+References: <1473782495-44128-1-git-send-email-snitzer@redhat.com>
+ <1473782495-44128-4-git-send-email-snitzer@redhat.com>
+Cc: linux-block@vger.kernel.org
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <a20ea38d-4dce-3302-3e9a-bc46e250f556@suse.de>
+Date: Wed, 14 Sep 2016 08:25:51 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <1473782495-44128-4-git-send-email-snitzer@redhat.com>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Linus,
+On 09/13/2016 06:01 PM, Mike Snitzer wrote:
+> Return DM_MAPIO_DELAY_REQUEUE from .clone_and_map_rq.  Also, return
+> false from .busy, if all paths are down, so that blk-mq requests get
+> mapped via .clone_and_map_rq -- which results in DM_MAPIO_DELAY_REQUEUE
+> being returned to dm-rq.
+> 
+> This change allows for a noticeable reduction in cpu utilization
+> (reduced kworker load) while all paths are down, e.g.:
+> 
+> system CPU idleness (as measured by fio's --idle-prof=system):
+> before: system: 87.53%
+> after:  system: 97.07%
+> 
+> Signed-off-by: Mike Snitzer <snitzer@redhat.com>
+> ---
+>  drivers/md/dm-mpath.c | 15 +++++++++------
+>  1 file changed, 9 insertions(+), 6 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Collection of fixes for the nvme over fabrics code. The shortlog is
-below, probably no need to further detail it.
+Cheers,
 
-Please pull, thanks!
-
-
-   git://git.kernel.dk/linux-block.git for-linus
-
-
-----------------------------------------------------------------
-Christoph Hellwig (2):
-       nvme-fabrics: get a reference when reusing a nvme_host structure
-       nvme: fabrics drivers don't need the nvme-pci driver
-
-Colin Ian King (1):
-       nvme-rdma: initialize ret to zero to avoid returning garbage
-
-Daniel Verkamp (1):
-       nvme-fabrics: change NQN UUID to big-endian format
-
-Jay Freyensee (4):
-       nvmet-rdma: +1 to *queue_size from hsqsize/hrqsize
-       fabrics: define admin sqsize min default, per spec
-       nvme-rdma: fix sqsize/hsqsize per spec
-       nvme-loop: set sqsize to 0-based value, per spec
-
-Jens Axboe (1):
-       Merge branch 'nvmf-4.8-rc' of 
-git://git.infradead.org/nvme-fabrics into for-linus
-
-Sagi Grimberg (2):
-       nvme-rdma: Get rid of duplicate variable
-       nvme-rdma: Get rid of redundant defines
-
-Vincent Stehlé (1):
-       nvmet-rdma: Fix use after free
-
-  drivers/nvme/host/Kconfig   |  2 +-
-  drivers/nvme/host/fabrics.c | 23 ++++++++++++++++-------
-  drivers/nvme/host/fabrics.h |  2 +-
-  drivers/nvme/host/rdma.c    | 46 
-+++++++++++++++++++++++++++------------------
-  drivers/nvme/target/Kconfig |  2 +-
-  drivers/nvme/target/loop.c  |  4 ++--
-  drivers/nvme/target/rdma.c  |  7 ++++---
-  include/linux/nvme.h        |  2 +-
-  8 files changed, 54 insertions(+), 34 deletions(-)
-
+Hannes
 -- 
-Jens Axboe
+Dr. Hannes Reinecke		      zSeries & Storage
+hare@suse.de			      +49 911 74053 688
+SUSE LINUX Products GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: J. Hawn, J. Guild, F. Imend�rffer, HRB 16746 (AG N�rnberg)
