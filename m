@@ -1,24 +1,26 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH] block_dev: remove DAX leftovers
-To: Christoph Hellwig <hch@lst.de>, ross.zwisler@linux.intel.com
-References: <1473846973-18798-1-git-send-email-hch@lst.de>
-Cc: linux-nvdimm@ml01.01.org, linux-block@vger.kernel.org
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <ecd353f8-ae9b-b219-8db4-e6e37b19c81a@kernel.dk>
-Date: Wed, 14 Sep 2016 08:42:41 -0600
+Return-Path: <dan.j.williams@intel.com>
 MIME-Version: 1.0
 In-Reply-To: <1473846973-18798-1-git-send-email-hch@lst.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
+References: <1473846973-18798-1-git-send-email-hch@lst.de>
+From: Dan Williams <dan.j.williams@intel.com>
+Date: Wed, 14 Sep 2016 07:12:39 -0700
+Message-ID: <CAPcyv4gKLtkiJe-J7amrRTL8FhL==3nk3h3kto6tMHqTC2dZXw@mail.gmail.com>
+Subject: Re: [PATCH] block_dev: remove DAX leftovers
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Ross Zwisler <ross.zwisler@linux.intel.com>,
+	linux-block@vger.kernel.org, linux-nvdimm <linux-nvdimm@ml01.01.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 09/14/2016 03:56 AM, Christoph Hellwig wrote:
+On Wed, Sep 14, 2016 at 2:56 AM, Christoph Hellwig <hch@lst.de> wrote:
 > DAX support for block devices was removed in commits 03cdad
 > ("block: disable block device DAX by default") and 99a01cd
 > ("block: remove BLK_DEV_DAX config option"), but we still kept a call to
 > dax_do_io and some uneeded i_flags manipulations introduced in commit
 > bbab37 ("block: Add support for DAX reads/writes to block devices").
+>
+> Remove those leftovers.
+>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-Applied for 4.9, thanks.
-
--- 
-Jens Axboe
+Acked-by: Dan Williams <dan.j.williams@intel.com>
