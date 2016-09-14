@@ -1,37 +1,30 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.9]:49945 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755780AbcIKODP (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 11 Sep 2016 10:03:15 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org
-Subject: [PATCH 3/3] block: remove IOPRIO_BITS
-Date: Sun, 11 Sep 2016 16:03:04 +0200
-Message-Id: <1473602584-11744-4-git-send-email-hch@lst.de>
-In-Reply-To: <1473602584-11744-1-git-send-email-hch@lst.de>
-References: <1473602584-11744-1-git-send-email-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 0/2] block : Patches related to io_polling
+To: Stephen Bates <sbates@raithlin.com>, linux-block@vger.kernel.org
+References: <1473790996-27038-1-git-send-email-sbates@raithlin.com>
+Cc: hch@lst.de
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <3863895a-e165-4708-d636-9cb3c82c2709@kernel.dk>
+Date: Wed, 14 Sep 2016 08:42:38 -0600
+MIME-Version: 1.0
+In-Reply-To: <1473790996-27038-1-git-send-email-sbates@raithlin.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- include/linux/ioprio.h | 1 -
- 1 file changed, 1 deletion(-)
+On 09/13/2016 12:23 PM, Stephen Bates wrote:
+> While profiling the performance of the io_poll feature of the blk-mq
+> section of the block layer I found it useful to add another entry to
+> the io_poll stats counters. I also found it really useful to be able
+> to zero the stats counters by echoing into the relevant sysfs entry.
+>
+> These two patches are based off commit 0eadf37afc in Jen's
+> for-4.9/block. I am not sure if that is the right repo and can rebase
+> if necessary.
+>
+> In full disclosure the zeroing patch is based heavily on a code
+> snippet Jens send me a few months ago.
 
-diff --git a/include/linux/ioprio.h b/include/linux/ioprio.h
-index beb9ce1..8c12390 100644
---- a/include/linux/ioprio.h
-+++ b/include/linux/ioprio.h
-@@ -7,7 +7,6 @@
- /*
-  * Gives us 8 prio classes with 13-bits of data for each class
-  */
--#define IOPRIO_BITS		(16)
- #define IOPRIO_CLASS_SHIFT	(13)
- #define IOPRIO_PRIO_MASK	((1UL << IOPRIO_CLASS_SHIFT) - 1)
- 
+Thanks Stephen, added for 4.9.
+
 -- 
-2.1.4
-
+Jens Axboe
