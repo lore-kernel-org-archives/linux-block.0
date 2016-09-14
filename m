@@ -1,35 +1,70 @@
-Return-Path: <jthumshirn@suse.de>
-Date: Wed, 14 Sep 2016 12:57:43 +0200
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Christoph Hellwig <hch@lst.de>
-Cc: axboe@kernel.dk, ross.zwisler@linux.intel.com,
-	linux-block@vger.kernel.org, linux-nvdimm@ml01.01.org
-Subject: Re: [PATCH] block_dev: remove DAX leftovers
-Message-ID: <20160914105743.tzwckeaqtl3zr3th@linux-x5ow.site>
-References: <1473846973-18798-1-git-send-email-hch@lst.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1473846973-18798-1-git-send-email-hch@lst.de>
+Return-Path: <BATV+6a0d0451059a4bcd7d0f+4770+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk,
+	ross.zwisler@linux.intel.com
+Cc: linux-nvdimm@ml01.01.org,
+	linux-block@vger.kernel.org
+Subject: [PATCH] block_dev: remove DAX leftovers
+Date: Wed, 14 Sep 2016 11:56:13 +0200
+Message-Id: <1473846973-18798-1-git-send-email-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed, Sep 14, 2016 at 11:56:13AM +0200, Christoph Hellwig wrote:
-> DAX support for block devices was removed in commits 03cdad
-> ("block: disable block device DAX by default") and 99a01cd
-> ("block: remove BLK_DEV_DAX config option"), but we still kept a call to
-> dax_do_io and some uneeded i_flags manipulations introduced in commit
-> bbab37 ("block: Add support for DAX reads/writes to block devices").
-> 
-> Remove those leftovers.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
+DAX support for block devices was removed in commits 03cdad
+("block: disable block device DAX by default") and 99a01cd
+("block: remove BLK_DEV_DAX config option"), but we still kept a call to
+dax_do_io and some uneeded i_flags manipulations introduced in commit
+bbab37 ("block: Add support for DAX reads/writes to block devices").
 
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Remove those leftovers.
 
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ fs/block_dev.c | 11 +----------
+ 1 file changed, 1 insertion(+), 10 deletions(-)
+
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index c3cdde8..45f5491 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -180,9 +180,6 @@ blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter)
+ 	struct file *file = iocb->ki_filp;
+ 	struct inode *inode = bdev_file_inode(file);
+ 
+-	if (IS_DAX(inode))
+-		return dax_do_io(iocb, inode, iter, blkdev_get_block,
+-				NULL, DIO_SKIP_DIO_COUNT);
+ 	return __blockdev_direct_IO(iocb, inode, I_BDEV(inode), iter,
+ 				    blkdev_get_block, NULL, NULL,
+ 				    DIO_SKIP_DIO_COUNT);
+@@ -1274,7 +1271,6 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
+ 		bdev->bd_disk = disk;
+ 		bdev->bd_queue = disk->queue;
+ 		bdev->bd_contains = bdev;
+-		bdev->bd_inode->i_flags = 0;
+ 
+ 		if (!partno) {
+ 			ret = -ENXIO;
+@@ -1302,11 +1298,8 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
+ 				}
+ 			}
+ 
+-			if (!ret) {
++			if (!ret)
+ 				bd_set_size(bdev,(loff_t)get_capacity(disk)<<9);
+-				if (!bdev_dax_capable(bdev))
+-					bdev->bd_inode->i_flags &= ~S_DAX;
+-			}
+ 
+ 			/*
+ 			 * If the device is invalidated, rescan partition
+@@ -1341,8 +1334,6 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
+ 				goto out_clear;
+ 			}
+ 			bd_set_size(bdev, (loff_t)bdev->bd_part->nr_sects << 9);
+-			if (!bdev_dax_capable(bdev))
+-				bdev->bd_inode->i_flags &= ~S_DAX;
+ 		}
+ 	} else {
+ 		if (bdev->bd_contains == bdev) {
 -- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: Felix Imend�rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N�rnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+2.1.4
