@@ -1,45 +1,46 @@
-Return-Path: <Damien.LeMoal@hgst.com>
-From: Damien Le Moal <damien.lemoal@hgst.com>
-To: <linux-scsi@vger.kernel.org>, <linux-block@vger.kernel.org>
-CC: <martin.petersen@oracle.com>, <axboe@kernel.dk>, <hare@suse.de>,
-	<shaun.tancheff@seagate.com>, Hannes Reinecke <hare@suse.com>, Damien Le Moal
-	<damien.lemoal@hgst.com>
-Subject: [PATCH 3/9] block: update chunk_sectors in blk_stack_limits()
-Date: Tue, 20 Sep 2016 06:27:28 +0900
-Message-ID: <1474320454-5264-4-git-send-email-damien.lemoal@hgst.com>
-In-Reply-To: <1474320454-5264-1-git-send-email-damien.lemoal@hgst.com>
-References: <1474320454-5264-1-git-send-email-damien.lemoal@hgst.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: damien.lemoal@hgst.com
+Return-Path: <msnitzer@redhat.com>
+From: Mike Snitzer <snitzer@redhat.com>
+To: axboe@kernel.dk, dm-devel@redhat.com
+Cc: linux-block@vger.kernel.org
+Subject: [PATCH for-4.9 v2 0/6] [PATCH for-4.9 v2 0/3] allow delayed requeue of blk-mq requests
+Date: Wed, 14 Sep 2016 12:29:30 -0400
+Message-Id: <1473870576-54331-1-git-send-email-snitzer@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Hannes Reinecke <hare@suse.de>
+I'd like to see these changes included during the 4.9 merge.  The
+blk-mq change is a straight-forward switch from work_struct to
+delayed_work and the addition of the blk_mq_delay_kick_requeue_list()
+interface.
 
-Signed-off-by: Hannes Reinecke <hare@suse.com>
-Signed-off-by: Damien Le Moal <damien.lemoal@hgst.com>
----
- block/blk-settings.c | 4 ++++
- 1 file changed, 4 insertions(+)
+Jens, please pick up the first patch and I'll rebase linux-dm.git
+ontop of your 4.9 branch.  Hannes, please re-review/ack as you like.
 
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index b1d5b7f..55369a6 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -631,6 +631,10 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
- 			t->discard_granularity;
- 	}
- 
-+	if (b->chunk_sectors)
-+		t->chunk_sectors = min_not_zero(t->chunk_sectors,
-+						b->chunk_sectors);
-+
- 	return ret;
- }
- EXPORT_SYMBOL(blk_stack_limits);
+
+These changes offer reduced CPU utilization during DM multipath's all
+path down case (when 'queue_if_no_path' is enabled).  Please see each
+patch's header for more details.
+
+v2: fixed 'msecs' variable name to be 'delay' in blk-mq, use
+    msecs_to_jiffies() in dm-rq call to blk-mq, also made
+    DM-mpath kick the queue if/when a path is reinstated
+
+Mike Snitzer (6):
+  blk-mq: introduce blk_mq_delay_kick_requeue_list()
+  dm rq: add DM_MAPIO_DELAY_REQUEUE to delay requeue of blk-mq requests
+  dm rq: reduce arguments passed to map_request() and
+    dm_requeue_original_request()
+  dm rq: introduce dm_mq_kick_requeue_list()
+  dm mpath: use dm_mq_kick_requeue_list()
+  dm mpath: delay the requeue of blk-mq requests while all paths down
+
+ block/blk-mq.c                | 15 ++++++++---
+ drivers/md/dm-mpath.c         | 29 ++++++++++++---------
+ drivers/md/dm-rq.c            | 59 ++++++++++++++++++++++++++-----------------
+ drivers/md/dm-rq.h            |  2 ++
+ include/linux/blk-mq.h        |  1 +
+ include/linux/blkdev.h        |  2 +-
+ include/linux/device-mapper.h |  1 +
+ 7 files changed, 69 insertions(+), 40 deletions(-)
+
 -- 
-2.7.4
-
-Western Digital Corporation (and its subsidiaries) E-mail Confidentiality Notice & Disclaimer:
-
-This e-mail and any files transmitted with it may contain confidential or legally privileged information of WDC and/or its affiliates, and are intended solely for the use of the individual or entity to which they are addressed. If you are not the intended recipient, any disclosure, copying, distribution or any action taken or omitted to be taken in reliance on it, is prohibited. If you have received this e-mail in error, please notify the sender immediately and delete the e-mail in its entirety from your system.
+2.7.4 (Apple Git-66)
