@@ -1,192 +1,112 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.9]:40013 "EHLO
+Received: from bombadil.infradead.org ([198.137.202.9]:40246 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1762296AbcINOTM (ORCPT
+        with ESMTP id S1763635AbcINOTc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 14 Sep 2016 10:19:12 -0400
+        Wed, 14 Sep 2016 10:19:32 -0400
 From: Christoph Hellwig <hch@lst.de>
 To: axboe@fb.com, tglx@linutronix.de
 Cc: agordeev@redhat.com, keith.busch@intel.com,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 01/13] genirq/msi: Add cpumask allocation to alloc_msi_entry
-Date: Wed, 14 Sep 2016 16:18:47 +0200
-Message-Id: <1473862739-15032-2-git-send-email-hch@lst.de>
+Subject: [PATCH 07/13] blk-mq: only allocate a single mq_map per tag_set
+Date: Wed, 14 Sep 2016 16:18:53 +0200
+Message-Id: <1473862739-15032-8-git-send-email-hch@lst.de>
 In-Reply-To: <1473862739-15032-1-git-send-email-hch@lst.de>
 References: <1473862739-15032-1-git-send-email-hch@lst.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Thomas Gleixner <tglx@linutronix.de>
+The mapping is identical for all queues in a tag_set, so stop wasting
+memory for building multiple.  Note that for now I've kept the mq_map
+pointer in the request_queue, but we'll need to investigate if we can
+remove it without suffering too much from the additional pointer chasing.
+The same would apply to the mq_ops pointer as well.
 
-For irq spreading want to store affinity masks in the msi_entry. Add the
-infrastructure for it.
-
-We allocate an array of cpumasks with an array size of the number of used
-vectors in the entry, so we can hand in the information per linux interrupt
-later.
-
-As we hand in the number of used vectors, we assign them right
-away. Convert all the call sites.
-
-Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/base/platform-msi.c         |  3 +--
- drivers/pci/msi.c                   |  6 ++----
- drivers/staging/fsl-mc/bus/mc-msi.c |  3 +--
- include/linux/msi.h                 |  5 +++--
- kernel/irq/msi.c                    | 26 ++++++++++++++++++++++++--
- 5 files changed, 31 insertions(+), 12 deletions(-)
+ block/blk-mq.c         | 22 ++++++++++++++--------
+ include/linux/blk-mq.h |  1 +
+ 2 files changed, 15 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/base/platform-msi.c b/drivers/base/platform-msi.c
-index 279e539..be6a599 100644
---- a/drivers/base/platform-msi.c
-+++ b/drivers/base/platform-msi.c
-@@ -142,13 +142,12 @@ static int platform_msi_alloc_descs_with_irq(struct device *dev, int virq,
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index b29e7b2..15c36c1 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1963,7 +1963,6 @@ void blk_mq_release(struct request_queue *q)
+ 		kfree(hctx);
  	}
  
- 	for (i = 0; i < nvec; i++) {
--		desc = alloc_msi_entry(dev);
-+		desc = alloc_msi_entry(dev, 1, NULL);
- 		if (!desc)
- 			break;
+-	kfree(q->mq_map);
+ 	q->mq_map = NULL;
  
- 		desc->platform.msi_priv_data = data;
- 		desc->platform.msi_index = base + i;
--		desc->nvec_used = 1;
- 		desc->irq = virq ? virq + i : 0;
+ 	kfree(q->queue_hw_ctx);
+@@ -2062,9 +2061,7 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+ 	if (!q->queue_hw_ctx)
+ 		goto err_percpu;
  
- 		list_add_tail(&desc->list, dev_to_msi_list(dev));
-diff --git a/drivers/pci/msi.c b/drivers/pci/msi.c
-index 98f1222..0db72ba 100644
---- a/drivers/pci/msi.c
-+++ b/drivers/pci/msi.c
-@@ -555,7 +555,7 @@ static struct msi_desc *msi_setup_entry(struct pci_dev *dev, int nvec)
- 	struct msi_desc *entry;
+-	q->mq_map = blk_mq_make_queue_map(set);
+-	if (!q->mq_map)
+-		goto err_map;
++	q->mq_map = set->mq_map;
  
- 	/* MSI Entry Initialization */
--	entry = alloc_msi_entry(&dev->dev);
-+	entry = alloc_msi_entry(&dev->dev, nvec, NULL);
- 	if (!entry)
- 		return NULL;
+ 	blk_mq_realloc_hw_ctxs(set, q);
+ 	if (!q->nr_hw_queues)
+@@ -2114,8 +2111,6 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+ 	return q;
  
-@@ -568,7 +568,6 @@ static struct msi_desc *msi_setup_entry(struct pci_dev *dev, int nvec)
- 	entry->msi_attrib.default_irq	= dev->irq;	/* Save IOAPIC IRQ */
- 	entry->msi_attrib.multi_cap	= (control & PCI_MSI_FLAGS_QMASK) >> 1;
- 	entry->msi_attrib.multiple	= ilog2(__roundup_pow_of_two(nvec));
--	entry->nvec_used		= nvec;
- 	entry->affinity			= dev->irq_affinity;
+ err_hctxs:
+-	kfree(q->mq_map);
+-err_map:
+ 	kfree(q->queue_hw_ctx);
+ err_percpu:
+ 	free_percpu(q->queue_ctx);
+@@ -2337,14 +2332,22 @@ int blk_mq_alloc_tag_set(struct blk_mq_tag_set *set)
+ 	if (!set->tags)
+ 		return -ENOMEM;
  
- 	if (control & PCI_MSI_FLAGS_64BIT)
-@@ -693,7 +692,7 @@ static int msix_setup_entries(struct pci_dev *dev, void __iomem *base,
- 			mask = cpumask_of(cpu);
- 		}
- 
--		entry = alloc_msi_entry(&dev->dev);
-+		entry = alloc_msi_entry(&dev->dev, 1, NULL);
- 		if (!entry) {
- 			if (!i)
- 				iounmap(base);
-@@ -711,7 +710,6 @@ static int msix_setup_entries(struct pci_dev *dev, void __iomem *base,
- 			entry->msi_attrib.entry_nr = i;
- 		entry->msi_attrib.default_irq	= dev->irq;
- 		entry->mask_base		= base;
--		entry->nvec_used		= 1;
- 		entry->affinity			= mask;
- 
- 		list_add_tail(&entry->list, dev_to_msi_list(&dev->dev));
-diff --git a/drivers/staging/fsl-mc/bus/mc-msi.c b/drivers/staging/fsl-mc/bus/mc-msi.c
-index c7be156..4fd8e41 100644
---- a/drivers/staging/fsl-mc/bus/mc-msi.c
-+++ b/drivers/staging/fsl-mc/bus/mc-msi.c
-@@ -213,7 +213,7 @@ static int fsl_mc_msi_alloc_descs(struct device *dev, unsigned int irq_count)
- 	struct msi_desc *msi_desc;
- 
- 	for (i = 0; i < irq_count; i++) {
--		msi_desc = alloc_msi_entry(dev);
-+		msi_desc = alloc_msi_entry(dev, 1, NULL);
- 		if (!msi_desc) {
- 			dev_err(dev, "Failed to allocate msi entry\n");
- 			error = -ENOMEM;
-@@ -221,7 +221,6 @@ static int fsl_mc_msi_alloc_descs(struct device *dev, unsigned int irq_count)
- 		}
- 
- 		msi_desc->fsl_mc.msi_index = i;
--		msi_desc->nvec_used = 1;
- 		INIT_LIST_HEAD(&msi_desc->list);
- 		list_add_tail(&msi_desc->list, dev_to_msi_list(dev));
- 	}
-diff --git a/include/linux/msi.h b/include/linux/msi.h
-index e8c81fb..0db320b 100644
---- a/include/linux/msi.h
-+++ b/include/linux/msi.h
-@@ -68,7 +68,7 @@ struct msi_desc {
- 	unsigned int			nvec_used;
- 	struct device			*dev;
- 	struct msi_msg			msg;
--	const struct cpumask		*affinity;
-+	struct cpumask			*affinity;
- 
- 	union {
- 		/* PCI MSI/X specific data */
-@@ -123,7 +123,8 @@ static inline void *msi_desc_to_pci_sysdata(struct msi_desc *desc)
- }
- #endif /* CONFIG_PCI_MSI */
- 
--struct msi_desc *alloc_msi_entry(struct device *dev);
-+struct msi_desc *alloc_msi_entry(struct device *dev, int nvec,
-+				 const struct cpumask *affinity);
- void free_msi_entry(struct msi_desc *entry);
- void __pci_read_msi_msg(struct msi_desc *entry, struct msi_msg *msg);
- void __pci_write_msi_msg(struct msi_desc *entry, struct msi_msg *msg);
-diff --git a/kernel/irq/msi.c b/kernel/irq/msi.c
-index 19e9dfb..8a3e8727 100644
---- a/kernel/irq/msi.c
-+++ b/kernel/irq/msi.c
-@@ -18,20 +18,42 @@
- /* Temparory solution for building, will be removed later */
- #include <linux/pci.h>
- 
--struct msi_desc *alloc_msi_entry(struct device *dev)
-+/**
-+ * alloc_msi_entry - Allocate an initialize msi_entry
-+ * @dev:	Pointer to the device for which this is allocated
-+ * @nvec:	The number of vectors used in this entry
-+ * @affinity:	Optional pointer to an affinity mask array size of @nvec
-+ *
-+ * If @affinity is not NULL then a an affinity array[@nvec] is allocated
-+ * and the affinity masks from @affinity are copied.
-+ */
-+struct msi_desc *
-+alloc_msi_entry(struct device *dev, int nvec, const struct cpumask *affinity)
- {
--	struct msi_desc *desc = kzalloc(sizeof(*desc), GFP_KERNEL);
-+	struct msi_desc *desc;
++	set->mq_map = blk_mq_make_queue_map(set);
++	if (!set->mq_map)
++		goto out_free_tags;
 +
-+	desc = kzalloc(sizeof(*desc), GFP_KERNEL);
- 	if (!desc)
- 		return NULL;
+ 	if (blk_mq_alloc_rq_maps(set))
+-		goto enomem;
++		goto out_free_mq_map;
  
- 	INIT_LIST_HEAD(&desc->list);
- 	desc->dev = dev;
-+	desc->nvec_used = nvec;
-+	if (affinity) {
-+		desc->affinity = kmemdup(affinity,
-+			nvec * sizeof(*desc->affinity), GFP_KERNEL);
-+		if (!desc->affinity) {
-+			kfree(desc);
-+			return NULL;
-+		}
-+	}
+ 	mutex_init(&set->tag_list_lock);
+ 	INIT_LIST_HEAD(&set->tag_list);
  
- 	return desc;
+ 	return 0;
+-enomem:
++
++out_free_mq_map:
++	kfree(set->mq_map);
++	set->mq_map = NULL;
++out_free_tags:
+ 	kfree(set->tags);
+ 	set->tags = NULL;
+ 	return -ENOMEM;
+@@ -2360,6 +2363,9 @@ void blk_mq_free_tag_set(struct blk_mq_tag_set *set)
+ 			blk_mq_free_rq_map(set, set->tags[i], i);
+ 	}
+ 
++	kfree(set->mq_map);
++	set->mq_map = NULL;
++
+ 	kfree(set->tags);
+ 	set->tags = NULL;
  }
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index e43bbff..a572227 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -65,6 +65,7 @@ struct blk_mq_hw_ctx {
+ };
  
- void free_msi_entry(struct msi_desc *entry)
- {
-+	kfree(entry->affinity);
- 	kfree(entry);
- }
- 
+ struct blk_mq_tag_set {
++	unsigned int		*mq_map;
+ 	struct blk_mq_ops	*ops;
+ 	unsigned int		nr_hw_queues;
+ 	unsigned int		queue_depth;	/* max hw supported */
 -- 
 2.1.4
 
