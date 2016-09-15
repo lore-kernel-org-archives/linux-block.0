@@ -1,79 +1,186 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.126.133]:50864 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754313AbcIOPxg (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Sep 2016 11:53:36 -0400
-From: Arnd Bergmann <arnd@arndb.de>
-To: Matias Bjorling <mb@lightnvm.io>
-Cc: Arnd Bergmann <arnd@arndb.de>,
-        "Simon A. F. Lund" <slund@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] lightnvm: propagate device_add() error code
-Date: Thu, 15 Sep 2016 17:53:12 +0200
-Message-Id: <20160915155325.3009409-1-arnd@arndb.de>
+Received: from mga03.intel.com ([134.134.136.65]:7206 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S934350AbcIOLzv (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 15 Sep 2016 07:55:51 -0400
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv3 36/41] ext4: handle writeback with huge pages
+Date: Thu, 15 Sep 2016 14:55:18 +0300
+Message-Id: <20160915115523.29737-37-kirill.shutemov@linux.intel.com>
+In-Reply-To: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
+References: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-device_add() may fail, and all callers are supposed to check the
-return value, but one new user in lightnvm doesn't:
+Modify mpage_map_and_submit_buffers() and mpage_release_unused_pages()
+to deal with huge pages.
 
-drivers/lightnvm/sysfs.c: In function 'nvm_sysfs_register_dev':
-drivers/lightnvm/sysfs.c:184:2: error: ignoring return value of 'device_add', declared with attribute warn_unused_result [-Werror=unused-result]
+Mostly result of try-and-error. Critical view would be appriciated.
 
-This changes the caller to propagate any error codes, which avoids
-the warning.
-
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-Fixes: 38c9e260b9f9 ("lightnvm: expose device geometry through sysfs")
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- drivers/lightnvm/lightnvm.h | 2 +-
- drivers/lightnvm/sysfs.c    | 9 ++++++---
- 2 files changed, 7 insertions(+), 4 deletions(-)
+ fs/ext4/inode.c | 61 ++++++++++++++++++++++++++++++++++++++++-----------------
+ 1 file changed, 43 insertions(+), 18 deletions(-)
 
-diff --git a/drivers/lightnvm/lightnvm.h b/drivers/lightnvm/lightnvm.h
-index 93f1aacc9f02..305c181509a6 100644
---- a/drivers/lightnvm/lightnvm.h
-+++ b/drivers/lightnvm/lightnvm.h
-@@ -24,7 +24,7 @@
- #include <linux/lightnvm.h>
- 
- /* core -> sysfs.c */
--int nvm_sysfs_register_dev(struct nvm_dev *);
-+int __must_check nvm_sysfs_register_dev(struct nvm_dev *);
- void nvm_sysfs_unregister_dev(struct nvm_dev *);
- int nvm_sysfs_register(void);
- void nvm_sysfs_unregister(void);
-diff --git a/drivers/lightnvm/sysfs.c b/drivers/lightnvm/sysfs.c
-index 72ad089c0269..0338c27ab95a 100644
---- a/drivers/lightnvm/sysfs.c
-+++ b/drivers/lightnvm/sysfs.c
-@@ -174,6 +174,8 @@ static struct device_type nvm_type = {
- 
- int nvm_sysfs_register_dev(struct nvm_dev *dev)
- {
-+	int ret;
+diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
+index 6a8da1a8409c..f2e34e340e65 100644
+--- a/fs/ext4/inode.c
++++ b/fs/ext4/inode.c
+@@ -1652,18 +1652,30 @@ static void mpage_release_unused_pages(struct mpage_da_data *mpd,
+ 		if (nr_pages == 0)
+ 			break;
+ 		for (i = 0; i < nr_pages; i++) {
+-			struct page *page = pvec.pages[i];
++			struct page *page = compound_head(pvec.pages[i]);
 +
- 	if (!dev->parent_dev)
- 		return 0;
- 
-@@ -181,11 +183,12 @@ int nvm_sysfs_register_dev(struct nvm_dev *dev)
- 	dev_set_name(&dev->dev, "%s", dev->name);
- 	dev->dev.type = &nvm_type;
- 	device_initialize(&dev->dev);
--	device_add(&dev->dev);
-+	ret = device_add(&dev->dev);
- 
--	blk_mq_register_dev(&dev->dev, dev->q);
-+	if (!ret)
-+		blk_mq_register_dev(&dev->dev, dev->q);
- 
--	return 0;
-+	return ret;
+ 			if (page->index > end)
+ 				break;
+ 			BUG_ON(!PageLocked(page));
+ 			BUG_ON(PageWriteback(page));
+ 			if (invalidate) {
+-				block_invalidatepage(page, 0, PAGE_SIZE);
++				unsigned long offset, len;
++
++				offset = (index % hpage_nr_pages(page));
++				len = min_t(unsigned long, end - page->index,
++						hpage_nr_pages(page));
++
++				block_invalidatepage(page, offset << PAGE_SHIFT,
++						len << PAGE_SHIFT);
+ 				ClearPageUptodate(page);
+ 			}
+ 			unlock_page(page);
++			if (PageTransHuge(page))
++				break;
+ 		}
+-		index = pvec.pages[nr_pages - 1]->index + 1;
++		index = page_to_pgoff(pvec.pages[nr_pages - 1]) + 1;
++		if (PageTransCompound(pvec.pages[nr_pages - 1]))
++			index = round_up(index, HPAGE_PMD_NR);
+ 		pagevec_release(&pvec);
+ 	}
  }
+@@ -2097,16 +2109,16 @@ static int mpage_submit_page(struct mpage_da_data *mpd, struct page *page)
+ 	loff_t size = i_size_read(mpd->inode);
+ 	int err;
  
- void nvm_sysfs_unregister_dev(struct nvm_dev *dev)
+-	BUG_ON(page->index != mpd->first_page);
+-	if (page->index == size >> PAGE_SHIFT)
+-		len = size & ~PAGE_MASK;
+-	else
+-		len = PAGE_SIZE;
++	page = compound_head(page);
++	len = hpage_size(page);
++	if (page->index + hpage_nr_pages(page) - 1 == size >> PAGE_SHIFT)
++		len = size & ~hpage_mask(page);
++
+ 	clear_page_dirty_for_io(page);
+ 	err = ext4_bio_write_page(&mpd->io_submit, page, len, mpd->wbc, false);
+ 	if (!err)
+-		mpd->wbc->nr_to_write--;
+-	mpd->first_page++;
++		mpd->wbc->nr_to_write -= hpage_nr_pages(page);
++	mpd->first_page = round_up(mpd->first_page + 1, hpage_nr_pages(page));
+ 
+ 	return err;
+ }
+@@ -2254,12 +2266,16 @@ static int mpage_map_and_submit_buffers(struct mpage_da_data *mpd)
+ 			break;
+ 		for (i = 0; i < nr_pages; i++) {
+ 			struct page *page = pvec.pages[i];
++			unsigned long diff;
+ 
+-			if (page->index > end)
++			if (page_to_pgoff(page) > end)
+ 				break;
+ 			/* Up to 'end' pages must be contiguous */
+-			BUG_ON(page->index != start);
++			BUG_ON(page_to_pgoff(page) != start);
++			diff = (page - compound_head(page)) << bpp_bits;
+ 			bh = head = page_buffers(page);
++			while (diff--)
++				bh = bh->b_this_page;
+ 			do {
+ 				if (lblk < mpd->map.m_lblk)
+ 					continue;
+@@ -2296,7 +2312,10 @@ static int mpage_map_and_submit_buffers(struct mpage_da_data *mpd)
+ 			 * supports blocksize < pagesize as we will try to
+ 			 * convert potentially unmapped parts of inode.
+ 			 */
+-			mpd->io_submit.io_end->size += PAGE_SIZE;
++			if (PageTransCompound(page))
++				mpd->io_submit.io_end->size += HPAGE_PMD_SIZE;
++			else
++				mpd->io_submit.io_end->size += PAGE_SIZE;
+ 			/* Page fully mapped - let IO run! */
+ 			err = mpage_submit_page(mpd, page);
+ 			if (err < 0) {
+@@ -2304,6 +2323,10 @@ static int mpage_map_and_submit_buffers(struct mpage_da_data *mpd)
+ 				return err;
+ 			}
+ 			start++;
++			if (PageTransCompound(page)) {
++				start = round_up(start, HPAGE_PMD_NR);
++				break;
++			}
+ 		}
+ 		pagevec_release(&pvec);
+ 	}
+@@ -2543,7 +2566,7 @@ static int mpage_prepare_extent_to_map(struct mpage_da_data *mpd)
+ 			 * mapping. However, page->index will not change
+ 			 * because we have a reference on the page.
+ 			 */
+-			if (page->index > end)
++			if (page_to_pgoff(page) > end)
+ 				goto out;
+ 
+ 			/*
+@@ -2558,7 +2581,7 @@ static int mpage_prepare_extent_to_map(struct mpage_da_data *mpd)
+ 				goto out;
+ 
+ 			/* If we can't merge this page, we are done. */
+-			if (mpd->map.m_len > 0 && mpd->next_page != page->index)
++			if (mpd->map.m_len > 0 && mpd->next_page != page_to_pgoff(page))
+ 				goto out;
+ 
+ 			lock_page(page);
+@@ -2572,7 +2595,7 @@ static int mpage_prepare_extent_to_map(struct mpage_da_data *mpd)
+ 			if (!PageDirty(page) ||
+ 			    (PageWriteback(page) &&
+ 			     (mpd->wbc->sync_mode == WB_SYNC_NONE)) ||
+-			    unlikely(page->mapping != mapping)) {
++			    unlikely(page_mapping(page) != mapping)) {
+ 				unlock_page(page);
+ 				continue;
+ 			}
+@@ -2581,8 +2604,10 @@ static int mpage_prepare_extent_to_map(struct mpage_da_data *mpd)
+ 			BUG_ON(PageWriteback(page));
+ 
+ 			if (mpd->map.m_len == 0)
+-				mpd->first_page = page->index;
+-			mpd->next_page = page->index + 1;
++				mpd->first_page = page_to_pgoff(page);
++			page = compound_head(page);
++			mpd->next_page = round_up(page->index + 1,
++					hpage_nr_pages(page));
+ 			/* Add all dirty buffers to mpd */
+ 			lblk = ((ext4_lblk_t)page->index) <<
+ 				(PAGE_SHIFT - blkbits);
 -- 
-2.9.0
+2.9.3
 
