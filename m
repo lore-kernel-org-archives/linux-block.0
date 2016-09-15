@@ -1,97 +1,158 @@
-Return-Path: <Damien.LeMoal@hgst.com>
-From: Damien Le Moal <damien.lemoal@hgst.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>, Christoph
- Hellwig <hch@lst.de>, "Martin K . Petersen" <martin.petersen@oracle.com>,
-	Damien Le Moal <damien.lemoal@hgst.com>
-Subject: [PATCH v2 0/7] ZBC / Zoned block device support
-Date: Mon, 26 Sep 2016 20:14:36 +0900
-Message-ID: <1474888483-29762-1-git-send-email-damien.lemoal@hgst.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:33482 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1754881AbcIOQXW (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 15 Sep 2016 12:23:22 -0400
+Received: from pps.filterd (m0044010.ppops.net [127.0.0.1])
+        by mx0a-00082601.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id u8FGFE6Y022591
+        for <linux-block@vger.kernel.org>; Thu, 15 Sep 2016 09:23:22 -0700
+Received: from mail.thefacebook.com ([199.201.64.23])
+        by mx0a-00082601.pphosted.com with ESMTP id 25fww30vgw-4
+        (version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT)
+        for <linux-block@vger.kernel.org>; Thu, 15 Sep 2016 09:23:22 -0700
+Received: from facebook.com (2401:db00:11:d0a2:face:0:39:0)     by
+ mx-out.facebook.com (10.223.100.97) with ESMTP id
+ b7654bb07b6011e6a8e524be0593f280-f85fba50 for <linux-block@vger.kernel.org>;
+        Thu, 15 Sep 2016 09:23:20 -0700
+From: Shaohua Li <shli@fb.com>
+To: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <axboe@fb.com>, <Kernel-team@fb.com>, <tj@kernel.org>,
+        <jmoyer@redhat.com>, <vgoyal@redhat.com>
+Subject: [PATCH V2 09/11] block-throttle: make bandwidth change smooth
+Date: Thu, 15 Sep 2016 09:23:16 -0700
+Message-ID: <451324f5936db27b69eca2ddf9b273794e743617.1473953743.git.shli@fb.com>
+In-Reply-To: <cover.1473953743.git.shli@fb.com>
+References: <cover.1473953743.git.shli@fb.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Return-Path: damien.lemoal@hgst.com
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Re-sending due to error in mailing list addresses. My apologies if
-you receive multiple copies of the emails.
+When cgroups all reach high limit, cgroups can dispatch more IO. This
+could make some cgroups dispatch more IO but others not, and even some
+cgroups could dispatch less IO than their high limit. For example, cg1
+high limit 10MB/s, cg2 limit 80MB/s, assume disk maximum bandwidth is
+120M/s for the workload. Their bps could something like this:
 
-This series introduces support for zoned block devices. It integrates
-earlier submissions by Hannes Reinecke and Shaun Tancheff. Compared to the
-previous series version, the code was significantly simplified by limiting
-support to zoned devices satisfying the following conditions:
-1) All zones of the device are the same size, with the exception of an
-   eventual last smaller runt zone.
-2) For host-managed disks, reads must be unrestricted (read commands do not
-   fail due to zone or write pointer alignement constraints).
-Zoned disks that do not satisfy these 2 conditions are ignored.
+cg1/cg2 bps: T1: 10/80 -> T2: 60/60 -> T3: 10/80
 
-These 2 conditions allowed dropping the zone information cache implemented
-in the previous version. This simplifies the code and also reduces the memory
-consumption at run time. Support for zoned devices now only require one bit
-per zone (less than 8KB in total). This bit field is used to write-lock
-zones and prevent the concurrent execution of multiple write commands in
-the same zone. This avoids write ordering problems at dispatch time, for
-both the simple queue and scsi-mq settings.
+At T1, all cgroups reach high limit, so they can dispatch more IO later.
+Then cg1 dispatch more IO and cg2 has no room to dispatch enough IO. At
+T2, cg2 only dispatches 60M/s. Since We detect cg2 dispatches less IO
+than its high limit 80M/s, we downgrade the queue from LIMIT_MAX to
+LIMIT_HIGH, then all cgroups are throttled to their high limit (T3). cg2
+will have bandwidth below its high limit at most time.
 
-The new operations introduced to suport zone manipulation was reduced to
-only the two main ZBC/ZAC defined commands: REPORT ZONES (REQ_OP_ZONE_REPORT)
-and RESET WRITE POINTER (REQ_OP_ZONE_RESET). This brings the total number of
-operations defined to 8, which fits in the 3 bits (REQ_OP_BITS) reserved for
-operation code in bio->bi_opf and req->cmd_flags.
+The big problem here is we don't know the maximum bandwidth of the
+workload, so we can't make smart decision to avoid the situation. This
+patch makes cgroup bandwidth change smooth. After disk upgrades from
+LIMIT_HIGH to LIMIT_MAX, we don't allow cgroups use all bandwidth upto
+their max limit immediately. Their bandwidth limit will be increased
+gradually to avoid above situation. So above example will became
+something like:
 
-Most of the ZBC specific code is kept out of sd.c and implemented in the
-new file sd_zbc.c. Similarly, at the block layer, most of the zoned block
-device code is implemented in the new blk-zoned.c.
+cg1/cg2 bps: 10/80 -> 15/105 -> 20/100 -> 25/95 -> 30/90 -> 35/85 -> 40/80
+-> 45/75 -> 10/80
 
-For host-managed zoned block devices, the sequential write constraint of
-write pointer zones is exposed to the user. Users of the disk (applications,
-file systems or device mappers) must sequentially write to zones. This means
-that for raw block device accesses from applications, buffered writes are
-unreliable and direct I/Os must be used (or buffered writes with O_SYNC).
+In this way cgroups bandwidth will be above their limit in majority
+time, this still doesn't fully utilize disk bandwidth, but that's
+something we pay for sharing.
 
-Access to zone manipulation operations is also provided to applications
-through a set of new ioctls. This allows applications operating on raw
-block devices (e.g. mkfs.xxx) to discover a device zone layout and
-manipulate zone state.
+Note this doesn't completely avoid cgroup running under its high limit.
+The best way to guarantee cgroup doesn't run under its limit is to set
+max limit. For example, if we set cg1 max limit to 40, cg2 will never
+run under its high limit.
 
-Damien Le Moal (1):
-  block: Add 'zoned' queue limit
+Signed-off-by: Shaohua Li <shli@fb.com>
+---
+ block/blk-throttle.c | 44 ++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 40 insertions(+), 4 deletions(-)
 
-Hannes Reinecke (4):
-  blk-sysfs: Add 'chunk_sectors' to sysfs attributes
-  block: update chunk_sectors in blk_stack_limits()
-  block: Implement support for zoned block devices
-  sd: Implement support for ZBC devices
-
-Shaun Tancheff (2):
-  block: Define zoned block device operations
-  blk-zoned: implement ioctls
-
- block/Kconfig                 |   8 +
- block/Makefile                |   1 +
- block/blk-core.c              |   4 +
- block/blk-settings.c          |   5 +
- block/blk-sysfs.c             |  29 +++
- block/blk-zoned.c             | 335 ++++++++++++++++++++++++
- block/ioctl.c                 |   4 +
- drivers/scsi/Makefile         |   1 +
- drivers/scsi/sd.c             |  97 ++++++-
- drivers/scsi/sd.h             |  67 +++++
- drivers/scsi/sd_zbc.c         | 586 ++++++++++++++++++++++++++++++++++++++++++
- include/linux/blk_types.h     |   2 +
- include/linux/blkdev.h        |  99 +++++++
- include/scsi/scsi_proto.h     |  17 ++
- include/uapi/linux/Kbuild     |   1 +
- include/uapi/linux/blkzoned.h | 143 +++++++++++
- include/uapi/linux/fs.h       |   4 +
- 17 files changed, 1389 insertions(+), 14 deletions(-)
- create mode 100644 block/blk-zoned.c
- create mode 100644 drivers/scsi/sd_zbc.c
- create mode 100644 include/uapi/linux/blkzoned.h
-
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index e4713b1..d956831 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -170,6 +170,8 @@ struct throtl_data
+ 
+ 	unsigned long high_upgrade_time;
+ 	unsigned long high_downgrade_time;
++
++	unsigned int scale;
+ };
+ 
+ static void throtl_pending_timer_fn(unsigned long arg);
+@@ -224,12 +226,28 @@ static struct throtl_data *sq_to_td(struct throtl_service_queue *sq)
+ static uint64_t tg_bps_limit(struct throtl_grp *tg, int rw)
+ {
+ 	struct blkcg_gq *blkg = tg_to_blkg(tg);
++	struct throtl_data *td;
+ 	uint64_t ret;
+ 
+ 	if (cgroup_subsys_on_dfl(io_cgrp_subsys) && !blkg->parent)
+ 		return -1;
+-	ret = tg->bps[rw][tg->td->limit_index];
+-	if (ret == -1 && tg->td->limit_index == LIMIT_HIGH)
++	td = tg->td;
++	ret = tg->bps[rw][td->limit_index];
++	if (td->limit_index == LIMIT_MAX && tg->bps[rw][LIMIT_HIGH] != -1) {
++		uint64_t increase;
++
++		if (td->scale < 4096 && time_after_eq(jiffies,
++		    td->high_upgrade_time + td->scale * td->throtl_slice)) {
++			uint64_t time = jiffies - td->high_upgrade_time;
++
++			do_div(time, td->throtl_slice);
++			td->scale = time;
++		}
++		increase = (tg->bps[rw][LIMIT_HIGH] >> 1) * td->scale;
++		ret = min(tg->bps[rw][LIMIT_MAX],
++			tg->bps[rw][LIMIT_HIGH] + increase);
++	}
++	if (ret == -1 && td->limit_index == LIMIT_HIGH)
+ 		return tg->bps[rw][LIMIT_MAX];
+ 
+ 	return ret;
+@@ -238,12 +256,29 @@ static uint64_t tg_bps_limit(struct throtl_grp *tg, int rw)
+ static unsigned int tg_iops_limit(struct throtl_grp *tg, int rw)
+ {
+ 	struct blkcg_gq *blkg = tg_to_blkg(tg);
++	struct throtl_data *td;
+ 	unsigned int ret;
+ 
+ 	if (cgroup_subsys_on_dfl(io_cgrp_subsys) && !blkg->parent)
+ 		return -1;
+-	ret = tg->iops[rw][tg->td->limit_index];
+-	if (ret == -1 && tg->td->limit_index == LIMIT_HIGH)
++	td = tg->td;
++	ret = tg->iops[rw][td->limit_index];
++	if (td->limit_index == LIMIT_MAX && tg->iops[rw][LIMIT_HIGH] != -1) {
++		uint64_t increase;
++
++		if (td->scale < 4096 && time_after_eq(jiffies,
++		    td->high_upgrade_time + td->scale * td->throtl_slice)) {
++			uint64_t time = jiffies - td->high_upgrade_time;
++
++			do_div(time, td->throtl_slice);
++			td->scale = time;
++		}
++
++		increase = (tg->iops[rw][LIMIT_HIGH] >> 1) * td->scale;
++		ret = min(tg->iops[rw][LIMIT_MAX],
++			tg->iops[rw][LIMIT_HIGH] + (unsigned int)increase);
++	}
++	if (ret == -1 && td->limit_index == LIMIT_HIGH)
+ 		return tg->iops[rw][LIMIT_MAX];
+ 	return ret;
+ }
+@@ -1669,6 +1704,7 @@ static void throtl_upgrade_state(struct throtl_data *td)
+ 
+ 	td->limit_index = LIMIT_MAX;
+ 	td->high_upgrade_time = jiffies;
++	td->scale = 0;
+ 	rcu_read_lock();
+ 	blkg_for_each_descendant_post(blkg, pos_css, td->queue->root_blkg) {
+ 		struct throtl_grp *tg = blkg_to_tg(blkg);
 -- 
-2.7.4
+2.8.0.rc2
 
-Western Digital Corporation (and its subsidiaries) E-mail Confidentiality Notice & Disclaimer:
-
-This e-mail and any files transmitted with it may contain confidential or legally privileged information of WDC and/or its affiliates, and are intended solely for the use of the individual or entity to which they are addressed. If you are not the intended recipient, any disclosure, copying, distribution or any action taken or omitted to be taken in reliance on it, is prohibited. If you have received this e-mail in error, please notify the sender immediately and delete the e-mail in its entirety from your system.
