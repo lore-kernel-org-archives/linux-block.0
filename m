@@ -1,211 +1,164 @@
-Return-Path: <shaun.tancheff@gmail.com>
-Return-Path: <shaun.tancheff@gmail.com>
-Sender: Shaun Tancheff <shaun.tancheff@gmail.com>
-From: Shaun Tancheff <shaun@tancheff.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Damien Le Moal <damien.lemoal@hgst.com>,
-	linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	"James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Michael T Lombardi <michael.t.lombardi@seagate.com>
-Subject: [PATCH v6 1/7] block: Add 'zoned' queue limit
-Date: Fri, 30 Sep 2016 14:12:30 -0500
-Message-Id: <20160930191237.13695-2-shaun@tancheff.com>
-In-Reply-To: <20160930191237.13695-1-shaun@tancheff.com>
-References: <20160930191237.13695-1-shaun@tancheff.com>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org,
+        Matthew Wilcox <willy@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv3 05/41] radix-tree: Add radix_tree_split_preload()
+Date: Thu, 15 Sep 2016 14:54:47 +0300
+Message-Id: <20160915115523.29737-6-kirill.shutemov@linux.intel.com>
+In-Reply-To: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
+References: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-From: Damien Le Moal <damien.lemoal@hgst.com>
+From: Matthew Wilcox <willy@linux.intel.com>
 
-Add the zoned queue limit to indicate the zoning model of a block device.
-Defined values are 0 (BLK_ZONED_NONE) for regular block devices,
-1 (BLK_ZONED_HA) for host-aware zone block devices and 2 (BLK_ZONED_HM)
-for host-managed zone block devices. The standards defined drive managed
-model is not defined here since these block devices do not provide any
-command for accessing zone information. Drive managed model devices will
-be reported as BLK_ZONED_NONE.
+Calculate how many nodes we need to allocate to split an old_order entry
+into multiple entries, each of size new_order.  The test suite checks that
+we allocated exactly the right number of nodes; neither too many (checked
+by rtp->nr == 0), nor too few (checked by comparing nr_allocated before
+and after the call to radix_tree_split()).
 
-The helper functions blk_queue_zoned_model and bdev_zoned_model return
-the zoned limit and the functions blk_queue_is_zoned and bdev_is_zoned
-return a boolean for callers to test if a block device is zoned.
-
-The zoned attribute is also exported as a string to applications via
-sysfs. BLK_ZONED_NONE shows as "none", BLK_ZONED_HA as "host-aware" and
-BLK_ZONED_HM as "host-managed".
-
-Signed-off-by: Damien Le Moal <damien.lemoal@hgst.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-Reviewed-by: Shaun Tancheff <shaun.tancheff@seagate.com>
-Tested-by: Shaun Tancheff <shaun.tancheff@seagate.com>
+Signed-off-by: Matthew Wilcox <willy@linux.intel.com>
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- Documentation/ABI/testing/sysfs-block | 16 ++++++++++++
- block/blk-settings.c                  |  1 +
- block/blk-sysfs.c                     | 18 ++++++++++++++
- include/linux/blkdev.h                | 47 +++++++++++++++++++++++++++++++++++
- 4 files changed, 82 insertions(+)
+ include/linux/radix-tree.h            |  1 +
+ lib/radix-tree.c                      | 22 ++++++++++++++++++++++
+ tools/testing/radix-tree/multiorder.c | 28 ++++++++++++++++++++++++++--
+ tools/testing/radix-tree/test.h       |  9 +++++++++
+ 4 files changed, 58 insertions(+), 2 deletions(-)
 
-diff --git a/Documentation/ABI/testing/sysfs-block b/Documentation/ABI/testing/sysfs-block
-index 71d184d..75a5055 100644
---- a/Documentation/ABI/testing/sysfs-block
-+++ b/Documentation/ABI/testing/sysfs-block
-@@ -235,3 +235,19 @@ Description:
- 		write_same_max_bytes is 0, write same is not supported
- 		by the device.
- 
-+What:		/sys/block/<disk>/queue/zoned
-+Date:		September 2016
-+Contact:	Damien Le Moal <damien.lemoal@hgst.com>
-+Description:
-+		zoned indicates if the device is a zoned block device
-+		and the zone model of the device if it is indeed zoned.
-+		The possible values indicated by zoned are "none" for
-+		regular block devices and "host-aware" or "host-managed"
-+		for zoned block devices. The characteristics of
-+		host-aware and host-managed zoned block devices are
-+		described in the ZBC (Zoned Block Commands) and ZAC
-+		(Zoned Device ATA Command Set) standards. These standards
-+		also define the "drive-managed" zone model. However,
-+		since drive-managed zoned block devices do not support
-+		zone commands, they will be treated as regular block
-+		devices and zoned will report "none".
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index f679ae1..b1d5b7f 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -107,6 +107,7 @@ void blk_set_default_limits(struct queue_limits *lim)
- 	lim->io_opt = 0;
- 	lim->misaligned = 0;
- 	lim->cluster = 1;
-+	lim->zoned = BLK_ZONED_NONE;
+diff --git a/include/linux/radix-tree.h b/include/linux/radix-tree.h
+index 459e8a152c8a..c4cea311d901 100644
+--- a/include/linux/radix-tree.h
++++ b/include/linux/radix-tree.h
+@@ -318,6 +318,7 @@ static inline void radix_tree_preload_end(void)
+ 	preempt_enable();
  }
- EXPORT_SYMBOL(blk_set_default_limits);
  
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 9cc8d7c..ff9cd9c 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -257,6 +257,18 @@ QUEUE_SYSFS_BIT_FNS(random, ADD_RANDOM, 0);
- QUEUE_SYSFS_BIT_FNS(iostats, IO_STAT, 0);
- #undef QUEUE_SYSFS_BIT_FNS
++int radix_tree_split_preload(unsigned old_order, unsigned new_order, gfp_t);
+ int radix_tree_split(struct radix_tree_root *, unsigned long index,
+ 			unsigned new_order);
+ int radix_tree_join(struct radix_tree_root *, unsigned long index,
+diff --git a/lib/radix-tree.c b/lib/radix-tree.c
+index ad3116cbe61b..e58855435c01 100644
+--- a/lib/radix-tree.c
++++ b/lib/radix-tree.c
+@@ -410,6 +410,28 @@ int radix_tree_maybe_preload(gfp_t gfp_mask)
+ }
+ EXPORT_SYMBOL(radix_tree_maybe_preload);
  
-+static ssize_t queue_zoned_show(struct request_queue *q, char *page)
-+{
-+	switch (blk_queue_zoned_model(q)) {
-+	case BLK_ZONED_HA:
-+		return sprintf(page, "host-aware\n");
-+	case BLK_ZONED_HM:
-+		return sprintf(page, "host-managed\n");
-+	default:
-+		return sprintf(page, "none\n");
-+	}
-+}
-+
- static ssize_t queue_nomerges_show(struct request_queue *q, char *page)
- {
- 	return queue_var_show((blk_queue_nomerges(q) << 1) |
-@@ -485,6 +497,11 @@ static struct queue_sysfs_entry queue_nonrot_entry = {
- 	.store = queue_store_nonrot,
- };
- 
-+static struct queue_sysfs_entry queue_zoned_entry = {
-+	.attr = {.name = "zoned", .mode = S_IRUGO },
-+	.show = queue_zoned_show,
-+};
-+
- static struct queue_sysfs_entry queue_nomerges_entry = {
- 	.attr = {.name = "nomerges", .mode = S_IRUGO | S_IWUSR },
- 	.show = queue_nomerges_show,
-@@ -546,6 +563,7 @@ static struct attribute *default_attrs[] = {
- 	&queue_discard_zeroes_data_entry.attr,
- 	&queue_write_same_max_entry.attr,
- 	&queue_nonrot_entry.attr,
-+	&queue_zoned_entry.attr,
- 	&queue_nomerges_entry.attr,
- 	&queue_rq_affinity_entry.attr,
- 	&queue_iostats_entry.attr,
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index c47c358..f19e16b 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -261,6 +261,15 @@ struct blk_queue_tag {
- #define BLK_SCSI_MAX_CMDS	(256)
- #define BLK_SCSI_CMD_PER_LONG	(BLK_SCSI_MAX_CMDS / (sizeof(long) * 8))
- 
++#ifdef CONFIG_RADIX_TREE_MULTIORDER
 +/*
-+ * Zoned block device models (zoned limit).
++ * Preload with enough objects to ensure that we can split a single entry
++ * of order @old_order into many entries of size @new_order
 + */
-+enum blk_zoned_model {
-+	BLK_ZONED_NONE,	/* Regular block device */
-+	BLK_ZONED_HA,	/* Host-aware zoned block device */
-+	BLK_ZONED_HM,	/* Host-managed zoned block device */
-+};
-+
- struct queue_limits {
- 	unsigned long		bounce_pfn;
- 	unsigned long		seg_boundary_mask;
-@@ -290,6 +299,7 @@ struct queue_limits {
- 	unsigned char		cluster;
- 	unsigned char		discard_zeroes_data;
- 	unsigned char		raid_partial_stripes_expensive;
-+	enum blk_zoned_model	zoned;
- };
- 
- struct request_queue {
-@@ -627,6 +637,23 @@ static inline unsigned int blk_queue_cluster(struct request_queue *q)
- 	return q->limits.cluster;
- }
- 
-+static inline enum blk_zoned_model
-+blk_queue_zoned_model(struct request_queue *q)
++int radix_tree_split_preload(unsigned int old_order, unsigned int new_order,
++							gfp_t gfp_mask)
 +{
-+	return q->limits.zoned;
-+}
++	unsigned top = 1 << (old_order % RADIX_TREE_MAP_SHIFT);
++	unsigned layers = (old_order / RADIX_TREE_MAP_SHIFT) -
++				(new_order / RADIX_TREE_MAP_SHIFT);
++	unsigned nr = 0;
 +
-+static inline bool blk_queue_is_zoned(struct request_queue *q)
-+{
-+	switch (blk_queue_zoned_model(q)) {
-+	case BLK_ZONED_HA:
-+	case BLK_ZONED_HM:
-+		return true;
-+	default:
-+		return false;
-+	}
++	WARN_ON_ONCE(!gfpflags_allow_blocking(gfp_mask));
++	BUG_ON(new_order >= old_order);
++
++	while (layers--)
++		nr = nr * RADIX_TREE_MAP_SIZE + 1;
++	return __radix_tree_preload(gfp_mask, top * nr);
 +}
++#endif
 +
  /*
-  * We regard a request as sync, if either a read or a sync write
-  */
-@@ -1354,6 +1381,26 @@ static inline unsigned int bdev_write_same(struct block_device *bdev)
- 	return 0;
+  * The same as function above, but preload number of nodes required to insert
+  * (1 << order) continuous naturally-aligned elements.
+diff --git a/tools/testing/radix-tree/multiorder.c b/tools/testing/radix-tree/multiorder.c
+index 9d27a4dd7b2a..5eda47dfe818 100644
+--- a/tools/testing/radix-tree/multiorder.c
++++ b/tools/testing/radix-tree/multiorder.c
+@@ -348,18 +348,42 @@ static void multiorder_join(void)
+ 	}
  }
  
-+static inline enum blk_zoned_model bdev_zoned_model(struct block_device *bdev)
++static void check_mem(unsigned old_order, unsigned new_order, unsigned alloc)
 +{
-+	struct request_queue *q = bdev_get_queue(bdev);
-+
-+	if (q)
-+		return blk_queue_zoned_model(q);
-+
-+	return BLK_ZONED_NONE;
++	struct radix_tree_preload *rtp = &radix_tree_preloads;
++	if (rtp->nr != 0)
++		printf("split(%u %u) remaining %u\n", old_order, new_order,
++							rtp->nr);
++	/*
++	 * Can't check for equality here as some nodes may have been
++	 * RCU-freed while we ran.  But we should never finish with more
++	 * nodes allocated since they should have all been preloaded.
++	 */
++	if (nr_allocated > alloc)
++		printf("split(%u %u) allocated %u %u\n", old_order, new_order,
++							alloc, nr_allocated);
 +}
 +
-+static inline bool bdev_is_zoned(struct block_device *bdev)
-+{
-+	struct request_queue *q = bdev_get_queue(bdev);
-+
-+	if (q)
-+		return blk_queue_is_zoned(q);
-+
-+	return false;
-+}
-+
- static inline int queue_dma_alignment(struct request_queue *q)
+ static void __multiorder_split(int old_order, int new_order)
  {
- 	return q ? q->dma_alignment : 511;
+-	RADIX_TREE(tree, GFP_KERNEL);
++	RADIX_TREE(tree, GFP_ATOMIC);
+ 	void **slot;
+ 	struct radix_tree_iter iter;
++	unsigned alloc;
+ 
+-	item_insert_order(&tree, 0, old_order);
++	radix_tree_preload(GFP_KERNEL);
++	assert(item_insert_order(&tree, 0, old_order) == 0);
++	radix_tree_callback(NULL, CPU_DEAD, NULL);
+ 	radix_tree_tag_set(&tree, 0, 2);
++
++	radix_tree_split_preload(old_order, new_order, GFP_KERNEL);
++	alloc = nr_allocated;
+ 	radix_tree_split(&tree, 0, new_order);
++	check_mem(old_order, new_order, alloc);
+ 	radix_tree_for_each_slot(slot, &tree, &iter, 0) {
+ 		radix_tree_replace_slot(slot, item_create(iter.index));
+ 	}
++	radix_tree_preload_end();
+ 
+ 	item_kill_tree(&tree);
+ }
+diff --git a/tools/testing/radix-tree/test.h b/tools/testing/radix-tree/test.h
+index e85131369723..55e6d095047b 100644
+--- a/tools/testing/radix-tree/test.h
++++ b/tools/testing/radix-tree/test.h
+@@ -2,6 +2,8 @@
+ #include <linux/types.h>
+ #include <linux/radix-tree.h>
+ #include <linux/rcupdate.h>
++#include <linux/notifier.h>
++#include <linux/cpu.h>
+ 
+ struct item {
+ 	unsigned long index;
+@@ -43,3 +45,10 @@ void radix_tree_dump(struct radix_tree_root *root);
+ int root_tag_get(struct radix_tree_root *root, unsigned int tag);
+ unsigned long node_maxindex(struct radix_tree_node *);
+ unsigned long shift_maxindex(unsigned int shift);
++int radix_tree_callback(struct notifier_block *nfb,
++			unsigned long action, void *hcpu);
++struct radix_tree_preload {
++	unsigned nr;
++	struct radix_tree_node *nodes;
++};
++extern struct radix_tree_preload radix_tree_preloads;
 -- 
 2.9.3
+
