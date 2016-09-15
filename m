@@ -1,84 +1,94 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:48906 "EHLO mx1.redhat.com"
+Received: from mga03.intel.com ([134.134.136.65]:7206 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1759121AbcINQ3p (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 14 Sep 2016 12:29:45 -0400
-From: Mike Snitzer <snitzer@redhat.com>
-To: axboe@kernel.dk, dm-devel@redhat.com
-Cc: linux-block@vger.kernel.org
-Subject: [PATCH v2 5/6] dm mpath: use dm_mq_kick_requeue_list()
-Date: Wed, 14 Sep 2016 12:29:35 -0400
-Message-Id: <1473870576-54331-6-git-send-email-snitzer@redhat.com>
-In-Reply-To: <1473870576-54331-1-git-send-email-snitzer@redhat.com>
-References: <1473870576-54331-1-git-send-email-snitzer@redhat.com>
+        id S934380AbcIOLzw (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 15 Sep 2016 07:55:52 -0400
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv3 39/41] ext4: make fallocate() operations work with huge pages
+Date: Thu, 15 Sep 2016 14:55:21 +0300
+Message-Id: <20160915115523.29737-40-kirill.shutemov@linux.intel.com>
+In-Reply-To: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
+References: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-When reinstating a path the blk-mq request_queue's requeue_list should
-get kicked.  It makes sense to kick the requeue_list as part of the
-existing hook (previously only used by bio-based support).
+__ext4_block_zero_page_range() adjusted to calculate starting iblock
+correctry for huge pages.
 
-Rename process_queued_bios_list to process_queued_io_list.
+ext4_{collapse,insert}_range() requires page cache invalidation. We need
+the invalidation to be aligning to huge page border if huge pages are
+possible in page cache.
 
-Signed-off-by: Mike Snitzer <snitzer@redhat.com>
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- drivers/md/dm-mpath.c | 14 ++++++++------
- 1 file changed, 8 insertions(+), 6 deletions(-)
+ fs/ext4/extents.c | 10 ++++++++--
+ fs/ext4/inode.c   |  3 +--
+ 2 files changed, 9 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/md/dm-mpath.c b/drivers/md/dm-mpath.c
-index c777d38..f69715b 100644
---- a/drivers/md/dm-mpath.c
-+++ b/drivers/md/dm-mpath.c
-@@ -680,9 +680,11 @@ static int multipath_map_bio(struct dm_target *ti, struct bio *bio)
- 	return __multipath_map_bio(m, bio, mpio);
- }
- 
--static void process_queued_bios_list(struct multipath *m)
-+static void process_queued_io_list(struct multipath *m)
+diff --git a/fs/ext4/extents.c b/fs/ext4/extents.c
+index d7ccb7f51dfc..d46aeda70fb0 100644
+--- a/fs/ext4/extents.c
++++ b/fs/ext4/extents.c
+@@ -5525,7 +5525,10 @@ int ext4_collapse_range(struct inode *inode, loff_t offset, loff_t len)
+ 	 * Need to round down offset to be aligned with page size boundary
+ 	 * for page size > block size.
+ 	 */
+-	ioffset = round_down(offset, PAGE_SIZE);
++	if (IS_ENABLED(CONFIG_TRANSPARENT_HUGE_PAGECACHE))
++		ioffset = round_down(offset, HPAGE_PMD_SIZE);
++	else
++		ioffset = round_down(offset, PAGE_SIZE);
+ 	/*
+ 	 * Write tail of the last page before removed range since it will get
+ 	 * removed from the page cache below.
+@@ -5674,7 +5677,10 @@ int ext4_insert_range(struct inode *inode, loff_t offset, loff_t len)
+ 	 * Need to round down to align start offset to page size boundary
+ 	 * for page size > block size.
+ 	 */
+-	ioffset = round_down(offset, PAGE_SIZE);
++	if (IS_ENABLED(CONFIG_TRANSPARENT_HUGE_PAGECACHE))
++		ioffset = round_down(offset, HPAGE_PMD_SIZE);
++	else
++		ioffset = round_down(offset, PAGE_SIZE);
+ 	/* Write out all dirty pages */
+ 	ret = filemap_write_and_wait_range(inode->i_mapping, ioffset,
+ 			LLONG_MAX);
+diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
+index f2e34e340e65..645a984a15ef 100644
+--- a/fs/ext4/inode.c
++++ b/fs/ext4/inode.c
+@@ -3711,7 +3711,6 @@ void ext4_set_aops(struct inode *inode)
+ static int __ext4_block_zero_page_range(handle_t *handle,
+ 		struct address_space *mapping, loff_t from, loff_t length)
  {
--	if (m->queue_mode == DM_TYPE_BIO_BASED)
-+	if (m->queue_mode == DM_TYPE_MQ_REQUEST_BASED)
-+		dm_mq_kick_requeue_list(dm_table_get_md(m->ti->table));
-+	else if (m->queue_mode == DM_TYPE_BIO_BASED)
- 		queue_work(kmultipathd, &m->process_queued_bios);
- }
+-	ext4_fsblk_t index = from >> PAGE_SHIFT;
+ 	unsigned offset;
+ 	unsigned blocksize, pos;
+ 	ext4_lblk_t iblock;
+@@ -3730,7 +3729,7 @@ static int __ext4_block_zero_page_range(handle_t *handle,
  
-@@ -752,7 +754,7 @@ static int queue_if_no_path(struct multipath *m, bool queue_if_no_path,
+ 	blocksize = inode->i_sb->s_blocksize;
  
- 	if (!queue_if_no_path) {
- 		dm_table_run_md_queue_async(m->ti->table);
--		process_queued_bios_list(m);
-+		process_queued_io_list(m);
- 	}
+-	iblock = index << (PAGE_SHIFT - inode->i_sb->s_blocksize_bits);
++	iblock = page->index << (PAGE_SHIFT - inode->i_sb->s_blocksize_bits);
  
- 	return 0;
-@@ -1304,7 +1306,7 @@ out:
- 	spin_unlock_irqrestore(&m->lock, flags);
- 	if (run_queue) {
- 		dm_table_run_md_queue_async(m->ti->table);
--		process_queued_bios_list(m);
-+		process_queued_io_list(m);
- 	}
- 
- 	return r;
-@@ -1502,7 +1504,7 @@ static void pg_init_done(void *data, int errors)
- 	}
- 	clear_bit(MPATHF_QUEUE_IO, &m->flags);
- 
--	process_queued_bios_list(m);
-+	process_queued_io_list(m);
- 
- 	/*
- 	 * Wake up any thread waiting to suspend.
-@@ -1937,7 +1939,7 @@ static int multipath_prepare_ioctl(struct dm_target *ti,
- 		if (test_bit(MPATHF_PG_INIT_REQUIRED, &m->flags))
- 			pg_init_all_paths(m);
- 		dm_table_run_md_queue_async(m->ti->table);
--		process_queued_bios_list(m);
-+		process_queued_io_list(m);
- 	}
- 
- 	/*
+ 	if (!page_has_buffers(page))
+ 		create_empty_buffers(page, blocksize, 0);
 -- 
-2.7.4 (Apple Git-66)
+2.9.3
 
