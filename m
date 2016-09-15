@@ -1,89 +1,124 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail.avalus.com ([89.16.176.221]:36760 "EHLO mail.avalus.com"
+Received: from mail.avalus.com ([89.16.176.221]:49483 "EHLO mail.avalus.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S933595AbcIOML1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Sep 2016 08:11:27 -0400
-Content-Type: text/plain; charset=us-ascii
+        id S933540AbcIOMEa (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 15 Sep 2016 08:04:30 -0400
+Content-Type: text/plain; charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
 Subject: Re: [Nbd] [RESEND][PATCH 0/5] nbd improvements
 From: Alex Bligh <alex@alex.org.uk>
-In-Reply-To: <20160915120125.GA31044@infradead.org>
-Date: Thu, 15 Sep 2016 13:11:24 +0100
+In-Reply-To: <20160915115217.GB6411@infradead.org>
+Date: Thu, 15 Sep 2016 13:04:27 +0100
 Cc: Alex Bligh <alex@alex.org.uk>, Wouter Verhelst <w@uter.be>,
-        "nbd-general@lists.sourceforge.net"
-        <nbd-general@lists.sourceforge.net>, linux-block@vger.kernel.org,
         Josef Bacik <jbacik@fb.com>,
+        "nbd-general@lists.sourceforge.net"
+        <nbd-general@lists.sourceforge.net>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        mpa@pengutronix.de, kernel-team@fb.com
-Message-Id: <30DE0D1A-FAB1-43EE-A88E-ED6565719166@alex.org.uk>
-References: <1473369130-22986-1-git-send-email-jbacik@fb.com> <20160909200203.phhvodsfs7ymukfp@grep.be> <20160915104935.ohuwgq2chsedz6fl@grep.be> <20160915113807.GA23259@infradead.org> <20160915115514.7hba23nqvvwfhb5z@grep.be> <20160915120125.GA31044@infradead.org>
+        linux-block@vger.kernel.org, Markus Pargmann <mpa@pengutronix.de>,
+        kernel-team@fb.com
+Message-Id: <E19F1FFC-3112-40EE-8935-306CC5B039C2@alex.org.uk>
+References: <1473369130-22986-1-git-send-email-jbacik@fb.com> <20160909200203.phhvodsfs7ymukfp@grep.be> <20160915104935.ohuwgq2chsedz6fl@grep.be> <27B346AF-F144-4770-BE38-446A66E71326@alex.org.uk> <20160915112936.vb7zxe7k6rvczosg@grep.be> <20160915114005.GC23259@infradead.org> <C38C69BC-CA2F-4F73-A762-CDAEA5C94702@alex.org.uk> <20160915115217.GB6411@infradead.org>
 To: Christoph Hellwig <hch@infradead.org>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Christoph,
 
-> It's not a write barrier - a write barrier was command that ensured =
-that
+> On 15 Sep 2016, at 12:52, Christoph Hellwig <hch@infradead.org> wrote:
 >=20
-> a) all previous writes were completed to the host/client
-> b) all previous writes were on non-volatile storage
+> On Thu, Sep 15, 2016 at 12:46:07PM +0100, Alex Bligh wrote:
+>> Essentially NBD does supports FLUSH/FUA like this:
+>>=20
+>> =
+https://www.kernel.org/doc/Documentation/block/writeback_cache_control.txt=
+
+>>=20
+>> IE supports the same FLUSH/FUA primitives as other block drivers =
+(AIUI).
+>>=20
+>> Link to protocol (per last email) here:
+>>=20
+>> =
+https://github.com/yoe/nbd/blob/master/doc/proto.md#ordering-of-messages-a=
+nd-writes
 >=20
-> and
+> Flush as defined by the Linux block layer (and supported that way in
+> SCSI, ATA, NVMe) only requires to flush all already completed writes
+> to non-volatile media.  It does not impose any ordering unlike the
+> nbd spec.
+
+As maintainer of the NBD spec, I'm confused as to why you think it
+imposes any ordering - if you think this, clearly I need to clean up
+the wording.
+
+Here's what it says:
+
+> The server MAY process commands out of order, and MAY reply out of =
+order,
+> except that:
 >=20
-> c) the actual write with the barrier bit was on non-volatile storage
+> 	=E2=80=A2 All write commands (that includes NBD_CMD_WRITE, and =
+NBD_CMD_TRIM)
+> that the server completes (i.e. replies to) prior to processing to a
+> NBD_CMD_FLUSH MUST be written to non-volatile storage prior to =
+replying to that
+> NBD_CMD_FLUSH. This paragraph only applies if NBD_FLAG_SEND_FLUSH is =
+set within
+> the transmission flags, as otherwise NBD_CMD_FLUSH will never be sent =
+by the
+> client to the server.
 
-Ah! the bit you are complaining about is not the bit I pointed to you, =
-but:
+(and another bit re FUA that isn't relevant here).
 
-> NBD_CMD_FLUSH (3)
->=20
-> A flush request; a write barrier.=20
+Here's the Linux Kernel documentation:
 
-I can see that's potentially confusing as isn't meant to mean 'an =
-old-style
-linux kernel block device write barrier'. I think in general terms it
-probably is some form of barrier, but I see no problem in deleting the
-words "a write barrier" from the spec text if only to make it
-clearer. However, I think the description of the command itself:
-
-> The server MUST NOT send a successful reply header for this request =
-before all write requests for which a reply has already been sent to the =
-client have reached permanent storage (using fsync() or similar).
-
-and the ordering section I pointed you to before, were both correct, =
-yes?
+> The REQ_PREFLUSH flag can be OR ed into the r/w flags of a bio =
+submitted from
+> the filesystem and will make sure the volatile cache of the storage =
+device
+> has been flushed before the actual I/O operation is started.  This =
+explicitly
+> guarantees that previously completed write requests are on =
+non-volatile
+> storage before the flagged bio starts. In addition the REQ_PREFLUSH =
+flag can be
+> set on an otherwise empty bio structure, which causes only an explicit =
+cache
+> flush without any dependent I/O.  It is recommend to use
+> the blkdev_issue_flush() helper for a pure cache flush.
 
 
->> The point still remains that "X was sent before Y" is difficult to
->> determine on the client side if X was sent over a different TCP =
-channel
->> than Y, because a packet might be dropped (requiring a retransmit) =
-for
->> X, and similar things. If blk-mq can deal with that, we're good and
->> nothing further needs to be done. If not, this should be evaluated by
->> someone more familiar with the internals of the kernel block =
-subsystem
->> than me.
->=20
-> The important bit in all the existing protocols, and which Linux =
-relies
-> on is that any write the Linux block layer got a completion for =
-earlier
-> needs to be flushed out to non-volatile storage when a FLUSH command =
-is
-> set.  Anything that still is in flight does not matter.  Which for
-> NBD means anything that you already replies to need to be flushed.
+I believe that NBD treats NBD_CMD_FLUSH the same as a REQ_PREFLUSH and =
+empty
+bio.
 
-... that's what it says (I hope).
+If you don't read those two as compatible, I'd like to understand why =
+not
+(i.e. what additional constraints one is applying that the other is not)
+as they are meant to be the same (save that NBD only has FLUSH as a =
+command,
+i.e. the 'empty bio' version). I am happy to improve the docs to make it
+clearer.
 
-> Or to say it more practicly - in the nbd server you simply need to
-> call fdatasync on the backing device or file whenever you get a FLUSH
-> requires, and it will do the right thing.
+(sidenote: I am interested in the change from REQ_FLUSH to REQ_PREFLUSH,
+but in an empty bio it's not really relevant I think).
 
-actually fdatasync() technically does more than is necessary, as it
-will also flush commands that have been processed, but for which no
-reply has yet been sent - that's no bad thing.
+> FUA as defined by the Linux block layer (and supported that way in =
+SCSI,
+> ATA, NVMe) only requires the write operation the FUA bit is set on to =
+be
+> on non-volatile media before completing the write operation.  It does
+> not impose any ordering, which seems to match the nbd spec.  Unlike =
+the
+> NBD spec Linux does not allow FUA to be set on anything by WRITE
+> commands.  Some other storage protocols allow a FUA bit on READ
+> commands or other commands that write data to the device, though.
+
+I think you mean "anything *but* WRITE commands". In NBD setting
+FUA on a command that does not write will do nothing, but FUA can
+be set on NBD_CMD_TRIM and has the expected effect.
+
+Interestingly the kernel docs are silent on which commands REQ_FUA
+can be set on.
 
 --=20
 Alex Bligh
