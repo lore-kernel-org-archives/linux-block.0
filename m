@@ -1,55 +1,49 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:58754 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753224AbcIRHhi (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 18 Sep 2016 03:37:38 -0400
-From: Alexander Gordeev <agordeev@redhat.com>
-To: linux-kernel@vger.kernel.org
-Cc: Alexander Gordeev <agordeev@redhat.com>,
-        linux-block@vger.kernel.org
-Subject: [PATCH 06/14] blk-mq: Fix hardware context data node selection
-Date: Sun, 18 Sep 2016 09:37:16 +0200
-Message-Id: <2ca00b95f42aefc5423ab09db0c50fcd3e5ee578.1474183901.git.agordeev@redhat.com>
-In-Reply-To: <cover.1474183901.git.agordeev@redhat.com>
-References: <cover.1474183901.git.agordeev@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Subject: Re: blk-mq: allow passing in an external queue mapping V3
+To: Christoph Hellwig <hch@lst.de>
+References: <1473862739-15032-1-git-send-email-hch@lst.de>
+ <20160915144050.GD16556@localhost.localdomain>
+ <20160915143202.GA26221@lst.de> <de5c219e-fe1f-7524-6054-995ae2f734ae@fb.com>
+ <20160915144212.GA26430@lst.de>
+Cc: Keith Busch <keith.busch@intel.com>, tglx@linutronix.de,
+ agordeev@redhat.com, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+From: Jens Axboe <axboe@fb.com>
+Message-ID: <1c3794ac-4890-adf4-e953-3d57ab545cd2@fb.com>
+Date: Thu, 15 Sep 2016 08:44:44 -0600
+MIME-Version: 1.0
+In-Reply-To: <20160915144212.GA26430@lst.de>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+List-ID: <linux-block@vger.kernel.org>
 
-CC: linux-block@vger.kernel.org
-Signed-off-by: Alexander Gordeev <agordeev@redhat.com>
----
- block/blk-mq.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+On 09/15/2016 08:42 AM, Christoph Hellwig wrote:
+> On Thu, Sep 15, 2016 at 08:34:42AM -0600, Jens Axboe wrote:
+>> I was going to ask about splitting it, but that looks fine, I can pull
+>> that in.
+>>
+>> The series looks fine to me. My only real concern is giving drivers the
+>> flexibility to define mappings, I don't want that to evolve into drivers
+>> (again) doing stupid things wrt mappings. As long as we keep it strictly
+>> as a tunnel for passing mappings defined by the (previous blk-mq) core
+>> code, then that's fine.
+>
+> So my earlier versions just passed in the affinity mask and left
+> all the mapping in the core.  This doesn't really work anymore with
+> the sibling aware code so I had to add a method.  That being said there
+> are some drivers that might want slightly different mappings.
+>
+> For example skd (if converted to blk-mq) has MSI-X vectors for it's up
+> to four queues, but it also has MSI-X vectors for misc book keeping
+> before those, so we'd need a version of our PCI mapping that adds an
+> offset to add to queue number when assining the MSI-X vectors.
+>
+> That being said I structured the map_queues interface so it can't do
+> anything crazy - it can just build up the cpu to queue mapping array
+> so there isn't exactly a whole lot of crazy things a driver could do.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index a38fd2e..9fbfe31 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1712,13 +1712,9 @@ static int blk_mq_init_hctx(struct request_queue *q,
- 		struct blk_mq_tag_set *set,
- 		struct blk_mq_hw_ctx *hctx, unsigned hctx_idx)
- {
--	int node;
-+	int node = hctx->numa_node;
- 	unsigned flush_start_tag = set->queue_depth;
- 
--	node = hctx->numa_node;
--	if (node == NUMA_NO_NODE)
--		node = hctx->numa_node = set->numa_node;
--
- 	INIT_WORK(&hctx->run_work, blk_mq_run_work_fn);
- 	INIT_DELAYED_WORK(&hctx->delay_work, blk_mq_delay_work_fn);
- 	spin_lock_init(&hctx->lock);
-@@ -1999,6 +1995,9 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
- 			break;
- 
- 		node = blk_mq_hw_queue_to_node(q->mq_map, i);
-+		if (node == NUMA_NO_NODE)
-+			node = set->numa_node;
-+
- 		hctxs[i] = kzalloc_node(sizeof(struct blk_mq_hw_ctx),
- 					GFP_KERNEL, node);
- 		if (!hctxs[i])
+By crazy, I mean even things like thinking it knows better and defining
+mappings differently just because it can. But I'm not too worried about
+it, it's just something to watch for that we didn't have to care about
+before, as the mappings were completely mandated by the core code.
+
 -- 
-1.8.3.1
-
+Jens Axboe
