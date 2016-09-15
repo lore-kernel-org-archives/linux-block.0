@@ -1,113 +1,65 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail.avalus.com ([89.16.176.221]:48974 "EHLO mail.avalus.com"
+Received: from mail.avalus.com ([89.16.176.221]:45192 "EHLO mail.avalus.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751085AbcIOPXv (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Sep 2016 11:23:51 -0400
-Subject: Re: [Nbd] [RESEND][PATCH 0/5] nbd improvements
+        id S1753211AbcIOPSC (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 15 Sep 2016 11:18:02 -0400
+Content-Type: text/plain; charset=windows-1252
 Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-Content-Type: multipart/signed; boundary="Apple-Mail=_0CE677D8-17DB-4038-93B5-6F82A6D615F1"; protocol="application/pgp-signature"; micalg=pgp-sha512
+Subject: Re: [Nbd] [RESEND][PATCH 0/5] nbd improvements
 From: Alex Bligh <alex@alex.org.uk>
-In-Reply-To: <f4756e27-9814-477c-2d03-e7373154c3b7@redhat.com>
-Date: Thu, 15 Sep 2016 16:23:48 +0100
-Cc: Alex Bligh <alex@alex.org.uk>, Eric Blake <eblake@redhat.com>,
-        Wouter Verhelst <w@uter.be>, Josef Bacik <jbacik@fb.com>,
-        linux-block@vger.kernel.org, Markus Pargmann <mpa@pengutronix.de>,
-        kernel-team@fb.com,
+In-Reply-To: <93b5c669-fbcf-e972-fc4d-3b08f1c76299@fb.com>
+Date: Thu, 15 Sep 2016 16:17:58 +0100
+Cc: Alex Bligh <alex@alex.org.uk>, Wouter Verhelst <w@uter.be>,
+        Christoph Hellwig <hch@infradead.org>,
         "nbd-general@lists.sourceforge.net"
         <nbd-general@lists.sourceforge.net>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Message-Id: <95DD0F04-13D7-4FEB-8710-5489AA72B259@alex.org.uk>
-References: <1473369130-22986-1-git-send-email-jbacik@fb.com> <20160909200203.phhvodsfs7ymukfp@grep.be> <20160915104935.ohuwgq2chsedz6fl@grep.be> <27B346AF-F144-4770-BE38-446A66E71326@alex.org.uk> <8dd28f8b-0a3c-4112-ca6d-a9ad080d5920@redhat.com> <f4756e27-9814-477c-2d03-e7373154c3b7@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        linux-block@vger.kernel.org, Markus Pargmann <mpa@pengutronix.de>,
+        kernel-team@fb.com
+Message-Id: <61FA9037-0D6C-4902-968C-11BCDEED3DC8@alex.org.uk>
+References: <20160915113807.GA23259@infradead.org> <20160915115514.7hba23nqvvwfhb5z@grep.be> <20160915120125.GA31044@infradead.org> <20160915122120.4h3ykbewaavjk5nx@grep.be> <20160915122304.GA15501@infradead.org> <2ABB8966-5C20-45A7-BB4C-6882F042905D@alex.org.uk> <20160915123646.GA10394@infradead.org> <C48DD624-6EDF-4EED-B474-8BEA021F00F0@alex.org.uk> <20160915124103.GA20657@infradead.org> <DA0880DA-700F-4989-9326-68F5F7A55F25@alex.org.uk> <20160915131741.cth6kilmcgnobbuu@grep.be> <93b5c669-fbcf-e972-fc4d-3b08f1c76299@fb.com>
+To: Josef Bacik <jbacik@fb.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
+Josef,
 
---Apple-Mail=_0CE677D8-17DB-4038-93B5-6F82A6D615F1
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain;
-	charset=us-ascii
-
-Paolo,
-
-> On 15 Sep 2016, at 15:07, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> On 15 Sep 2016, at 14:57, Josef Bacik <jbacik@fb.com> wrote:
 >=20
-> I don't think QEMU forbids multiple clients to the single server, and
-> guarantees consistency as long as there is no overlap between writes =
-and
-> reads.  These are the same guarantees you have for multiple commands =
-on
-> a single connection.
+> This isn't an NBD problem, this is an application problem.  The =
+application must wait for all writes it cares about _before_ issuing a =
+flush.  This is the same as for normal storage as it is for NBD.  It is =
+not NBD's responsibility to maintain coherency between multiple requests =
+across connections, just simply to act on and respond to requests.
 >=20
-> In other words, from the POV of QEMU there's no difference whether
-> multiple commands come from one or more connections.
+> I think changing the specification to indicate that this is the case =
+for multiple connections is a good thing, to keep NBD servers from doing =
+weird things like sending different connections to the same export to =
+different backing stores without some sort of synchronization.  It =
+should definitely be explicitly stated somewhere that NBD does not =
+provide any ordering guarantees and that is up to the application.  =
+Thanks,
 
-This isn't really about ordering, it's about cache coherency
-and persisting things to disk.
+I don't think that's correct.
 
-What you say is correct as far as it goes in terms of ordering. However
-consider the scenario with read and writes on two channels as follows
-of the same block:
+The block stack issues a flush to mean (precisely) "do not reply to this =
+until all preceding writes THAT HAVE BEEN REPLIED TO have been persisted =
+to non-volatile storage".
 
-     Channel1     Channel2
+The danger is with multiple connections (where apparently only one flush =
+is sent - let's say down connection 1) that not al the writes that have =
+been replied to on connection 2 have been persisted to non-volatile =
+storage. Only the ones on connection 1 have been persisted (this is =
+assuming the nbd server doesn't 'link' in some way the connections).
 
-     R                      Block read, and cached in user space in
-                            channel 1's cache
-                            Reply sent
+There's nothing the 'application' (here meaning the kernel or higher =
+level) can do to mitigate this. Sure it can wait for all the replies, =
+but this doesn't guarantee the writes have been persisted to =
+non-volatile storage, precisely because writes may return prior to this.
 
-                  W         New value written, channel 2's cache updated
-                            channel 1's cache not
-
-     R                      Value returned from channel 1's cache.
-
-
-In the above scenario, there is a problem if the server(s) handling the
-two channels each use a read cache which is not coherent between the
-two channels. An example would be a read-through cache on a server that
-did fork() and shared no state between connections.
-
-Similarly, if there is a write on channel 1 that has completed, and
-the flush goes to channel 2, it may not (if state is not shared) =
-guarantee
-that the write on channel 1 (which has completed) is persisted to =
-non-volatile
-media. Obviously if the 'state' is OS block cache/buffers/whatever, it
-will, but if it's (e.g.) a user-space per process write-through cache,
-it won't.
-
-I don't know whether qemu-nbd is likely to suffer from either of these.
-
---
+--=20
 Alex Bligh
 
 
 
 
-
---Apple-Mail=_0CE677D8-17DB-4038-93B5-6F82A6D615F1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename=signature.asc
-Content-Type: application/pgp-signature;
-	name=signature.asc
-Content-Description: Message signed with OpenPGP using GPGMail
-
------BEGIN PGP SIGNATURE-----
-Comment: GPGTools - https://gpgtools.org
-
-iQIcBAEBCgAGBQJX2r0FAAoJEBPm5K7i9iORO1kP/1RTZBBY7FfY6QzQ962DXEV5
-GVRjx1U51Jc98jRtq1S+3fhkcSOp4pDicg1x6UIXRM8My/zPBQMIOI6nsqO1kyq0
-2UX09Blokz+HSZfM9LYpyrsBxn+d6oE50fQncgkRVXUP1zvzczPHDxr8k4+b/Faa
-ZID2qRsBZecjDeAakuOFdm9tWbRin9FG9H+QjbZn/n57Ste3OmEwRaNlOnBuXDqB
-NUAgKi3p2M2FjWlqcO0u8zqzbUT/5bZrFOk63RVyIf4HAGkF6ERIJB3MSTG1KrIk
-uhhv+GvS8p8AZ1OiaiElHYyB7rg348d4PrKakq8zyM4Sw303KtB2gKct+axVzK+a
-Mhhe/1qouXlRAjB9IUeVOqRmcXbCa1rVjwPIPQVmgTWzhxFddNpQdbnEHoy7Lcki
-MQbyfT4IEOeyiWoN2CL3FAFpa7F6vfzL7O6cjXcLlXXrtzi+07uk4xgnbaIHcfrp
-CWccLxYF97o+SDgFA/sR8QYIK7BWpdHOyQfvmIirN6gnsA7DQRk+Y+m9j8s+vs7E
-KzzG/fQs5hI+M3f7Qpdlirlowe2cAAAgv/PYbDPnuUwCAFY2qeosgHyRk3LvCjRb
-Bg5R9K3+jl6a6TPI8FpDv1fGnqFZ/Zd+7jS7sz7U23IGb/vBDZ52uYFPCWRE7Zw8
-8/mwTAy9xDR/tOdRbMwo
-=pz9X
------END PGP SIGNATURE-----
-
---Apple-Mail=_0CE677D8-17DB-4038-93B5-6F82A6D615F1--
