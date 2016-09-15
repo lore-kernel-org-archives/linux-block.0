@@ -1,42 +1,60 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.9]:40077 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1756916AbcIOLqO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Sep 2016 07:46:14 -0400
-Date: Thu, 15 Sep 2016 04:46:10 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Alex Bligh <alex@alex.org.uk>
-Cc: Christoph Hellwig <hch@infradead.org>, Wouter Verhelst <w@uter.be>,
+Received: from mail.avalus.com ([89.16.176.221]:60853 "EHLO mail.avalus.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751758AbcIOLqJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 15 Sep 2016 07:46:09 -0400
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Subject: Re: [Nbd] [RESEND][PATCH 0/5] nbd improvements
+From: Alex Bligh <alex@alex.org.uk>
+In-Reply-To: <20160915114005.GC23259@infradead.org>
+Date: Thu, 15 Sep 2016 12:46:07 +0100
+Cc: Alex Bligh <alex@alex.org.uk>, Wouter Verhelst <w@uter.be>,
+        Josef Bacik <jbacik@fb.com>,
         "nbd-general@lists.sourceforge.net"
-        <nbd-general@lists.sourceforge.net>, Josef Bacik <jbacik@fb.com>,
+        <nbd-general@lists.sourceforge.net>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         linux-block@vger.kernel.org, Markus Pargmann <mpa@pengutronix.de>,
         kernel-team@fb.com
-Subject: Re: [Nbd] [RESEND][PATCH 0/5] nbd improvements
-Message-ID: <20160915114610.GA6411@infradead.org>
-References: <1473369130-22986-1-git-send-email-jbacik@fb.com>
- <20160909200203.phhvodsfs7ymukfp@grep.be>
- <20160915104935.ohuwgq2chsedz6fl@grep.be>
- <20160915113807.GA23259@infradead.org>
- <751994A2-653B-4201-8210-A31495804788@alex.org.uk>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <751994A2-653B-4201-8210-A31495804788@alex.org.uk>
+Message-Id: <C38C69BC-CA2F-4F73-A762-CDAEA5C94702@alex.org.uk>
+References: <1473369130-22986-1-git-send-email-jbacik@fb.com> <20160909200203.phhvodsfs7ymukfp@grep.be> <20160915104935.ohuwgq2chsedz6fl@grep.be> <27B346AF-F144-4770-BE38-446A66E71326@alex.org.uk> <20160915112936.vb7zxe7k6rvczosg@grep.be> <20160915114005.GC23259@infradead.org>
+To: Christoph Hellwig <hch@infradead.org>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Thu, Sep 15, 2016 at 12:43:35PM +0100, Alex Bligh wrote:
-> Sure, it's at:
-> 
-> https://github.com/yoe/nbd/blob/master/doc/proto.md#ordering-of-messages-and-writes
-> 
-> and that link takes you to the specific section.
-> 
-> The treatment of FLUSH and FUA is meant to mirror exactly the
-> linux block layer (or rather how the linux block layer was a few
-> years ago). I even asked on LKML to verify a few points.
 
-Linux never expected ordering on the wire.  Before 2010 we had barriers
-in the kernel that provided ordering to the caller, but we never
-required it from the protocol / hardware.
+> On 15 Sep 2016, at 12:40, Christoph Hellwig <hch@infradead.org> wrote:
+>=20
+> On Thu, Sep 15, 2016 at 01:29:36PM +0200, Wouter Verhelst wrote:
+>> Yes, and that is why I was asking about this. If the write barriers
+>> are expected to be shared across connections, we have a problem. If,
+>> however, they are not, then it doesn't matter that the commands may =
+be
+>> processed out of order.
+>=20
+> There is no such thing as a write barrier in the Linux kernel.  We'd
+> much prefer protocols not to introduce any pointless synchronization
+> if we can avoid it.
+
+I suspect the issue is terminological.
+
+Essentially NBD does supports FLUSH/FUA like this:
+
+=
+https://www.kernel.org/doc/Documentation/block/writeback_cache_control.txt=
+
+
+IE supports the same FLUSH/FUA primitives as other block drivers (AIUI).
+
+Link to protocol (per last email) here:
+
+=
+https://github.com/yoe/nbd/blob/master/doc/proto.md#ordering-of-messages-a=
+nd-writes
+
+--=20
+Alex Bligh
+
+
+
+
