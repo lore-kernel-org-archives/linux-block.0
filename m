@@ -1,40 +1,66 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-co1nam03on0089.outbound.protection.outlook.com ([104.47.40.89]:19668
-        "EHLO NAM03-CO1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S933093AbcIZCyt (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 25 Sep 2016 22:54:49 -0400
-To: Jens Axboe <axboe@fb.com>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-Subject: [PATCH] bsg: Add sparse annotations to bsg_request_fn()
-Message-ID: <6dfb1793-ca6a-c3b6-b3fc-272e68ca6880@sandisk.com>
-Date: Sun, 25 Sep 2016 19:54:38 -0700
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv3 13/41] truncate: make sure invalidate_mapping_pages() can discard huge pages
+Date: Thu, 15 Sep 2016 14:54:55 +0300
+Message-Id: <20160915115523.29737-14-kirill.shutemov@linux.intel.com>
+In-Reply-To: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
+References: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Avoid that sparse complains about unbalanced lock actions.
+invalidate_inode_page() has expectation about page_count() of the page
+-- if it's not 2 (one to caller, one to radix-tree), it will not be
+dropped. That condition almost never met for THPs -- tail pages are
+pinned to the pagevec.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+Let's drop them, before calling invalidate_inode_page().
+
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- block/bsg-lib.c | 2 ++
- 1 file changed, 2 insertions(+)
+ mm/truncate.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/block/bsg-lib.c b/block/bsg-lib.c
-index 650f427..b2a61e3 100644
---- a/block/bsg-lib.c
-+++ b/block/bsg-lib.c
-@@ -161,6 +161,8 @@ failjob_rls_job:
-  * Drivers/subsys should pass this to the queue init function.
-  */
- void bsg_request_fn(struct request_queue *q)
-+	__releases(q->queue_lock)
-+	__acquires(q->queue_lock)
- {
- 	struct device *dev = q->queuedata;
- 	struct request *req;
+diff --git a/mm/truncate.c b/mm/truncate.c
+index a01cce450a26..ce904e4b1708 100644
+--- a/mm/truncate.c
++++ b/mm/truncate.c
+@@ -504,10 +504,21 @@ unsigned long invalidate_mapping_pages(struct address_space *mapping,
+ 				/* 'end' is in the middle of THP */
+ 				if (index ==  round_down(end, HPAGE_PMD_NR))
+ 					continue;
++				/*
++				 * invalidate_inode_page() expects
++				 * page_count(page) == 2 to drop page from page
++				 * cache -- drop tail pages references.
++				 */
++				get_page(page);
++				pagevec_release(&pvec);
+ 			}
+ 
+ 			ret = invalidate_inode_page(page);
+ 			unlock_page(page);
++
++			if (PageTransHuge(page))
++				put_page(page);
++
+ 			/*
+ 			 * Invalidation is a hint that the page is no longer
+ 			 * of interest and try to speed up its reclaim.
 -- 
-2.10.0
+2.9.3
 
