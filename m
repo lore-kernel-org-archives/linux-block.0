@@ -1,103 +1,207 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f175.google.com ([209.85.192.175]:36401 "EHLO
-        mail-pf0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1757538AbcIQI2n (ORCPT
+Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:33474 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1754834AbcIOQXW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 17 Sep 2016 04:28:43 -0400
-Received: by mail-pf0-f175.google.com with SMTP id q2so14511871pfj.3
-        for <linux-block@vger.kernel.org>; Sat, 17 Sep 2016 01:28:42 -0700 (PDT)
-From: Omar Sandoval <osandov@osandov.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, kernel-team@fb.com,
-        Alexei Starovoitov <ast@fb.com>
-Subject: [PATCH v4 5/6] sbitmap: randomize initial alloc_hint values
-Date: Sat, 17 Sep 2016 01:28:25 -0700
-Message-Id: <1dd4b50b976acc1c250d495822c32f7617b29d07.1474100040.git.osandov@fb.com>
-In-Reply-To: <cover.1474100040.git.osandov@fb.com>
-References: <cover.1474100040.git.osandov@fb.com>
-In-Reply-To: <cover.1474100040.git.osandov@fb.com>
-References: <cover.1474100040.git.osandov@fb.com>
+        Thu, 15 Sep 2016 12:23:22 -0400
+Received: from pps.filterd (m0044010.ppops.net [127.0.0.1])
+        by mx0a-00082601.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id u8FGFFc8022599
+        for <linux-block@vger.kernel.org>; Thu, 15 Sep 2016 09:23:21 -0700
+Received: from mail.thefacebook.com ([199.201.64.23])
+        by mx0a-00082601.pphosted.com with ESMTP id 25fww30vgy-2
+        (version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT)
+        for <linux-block@vger.kernel.org>; Thu, 15 Sep 2016 09:23:21 -0700
+Received: from facebook.com (2401:db00:11:d0a2:face:0:39:0)     by
+ mx-out.facebook.com (10.223.101.97) with ESMTP id
+ b68c699e7b6011e6ab6e24be0595f910-1bdfaa50 for <linux-block@vger.kernel.org>;
+        Thu, 15 Sep 2016 09:23:19 -0700
+From: Shaohua Li <shli@fb.com>
+To: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <axboe@fb.com>, <Kernel-team@fb.com>, <tj@kernel.org>,
+        <jmoyer@redhat.com>, <vgoyal@redhat.com>
+Subject: [PATCH V2 04/11] block-throttle: add upgrade logic for LIMIT_HIGH state
+Date: Thu, 15 Sep 2016 09:23:11 -0700
+Message-ID: <6218af07fac14a75bd922ccaab81698c511f1b25.1473953743.git.shli@fb.com>
+In-Reply-To: <cover.1473953743.git.shli@fb.com>
+References: <cover.1473953743.git.shli@fb.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Omar Sandoval <osandov@fb.com>
+When queue is in LIMIT_HIGH state and all cgroups with high limit cross
+the bps/iops limitation, we will upgrade queue's state to
+LIMIT_MAX
 
-In order to get good cache behavior from a sbitmap, we want each CPU to
-stick to its own cacheline(s) as much as possible. This might happen
-naturally as the bitmap gets filled up and the alloc_hint values spread
-out, but we really want this behavior from the start. blk-mq apparently
-intended to do this, but the code to do this was never wired up. Get rid
-of the dead code and make it part of the sbitmap library.
+For a cgroup hierarchy, there are two cases. Children has lower high
+limit than parent. Parent's high limit is meaningless. If children's
+bps/iops cross high limit, we can upgrade queue state. The other case is
+children has higher high limit than parent. Children's high limit is
+meaningless. As long as parent's bps/iops cross high limit, we can
+upgrade queue state.
 
-Signed-off-by: Omar Sandoval <osandov@fb.com>
+Signed-off-by: Shaohua Li <shli@fb.com>
 ---
- block/blk-mq-tag.c | 8 --------
- block/blk-mq-tag.h | 1 -
- lib/sbitmap.c      | 6 ++++++
- 3 files changed, 6 insertions(+), 9 deletions(-)
+ block/blk-throttle.c | 104 +++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 100 insertions(+), 4 deletions(-)
 
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index e1c2bed..cef618f 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -7,7 +7,6 @@
-  */
- #include <linux/kernel.h>
- #include <linux/module.h>
--#include <linux/random.h>
- 
- #include <linux/blk-mq.h>
- #include "blk.h"
-@@ -419,13 +418,6 @@ void blk_mq_free_tags(struct blk_mq_tags *tags)
- 	kfree(tags);
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index 6bae1b4..80b50cc 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -456,6 +456,7 @@ static void blk_throtl_update_valid_limit(struct throtl_data *td)
+ 		td->limit_valid[LIMIT_HIGH] = false;
  }
  
--void blk_mq_tag_init_last_tag(struct blk_mq_tags *tags, unsigned int *tag)
--{
--	unsigned int depth = tags->nr_tags - tags->nr_reserved_tags;
--
--	*tag = prandom_u32() % depth;
--}
--
- int blk_mq_tag_update_depth(struct blk_mq_tags *tags, unsigned int tdepth)
++static void throtl_upgrade_state(struct throtl_data *td);
+ static void throtl_pd_offline(struct blkg_policy_data *pd)
  {
- 	tdepth -= tags->nr_reserved_tags;
-diff --git a/block/blk-mq-tag.h b/block/blk-mq-tag.h
-index f90b850..09f4cc0 100644
---- a/block/blk-mq-tag.h
-+++ b/block/blk-mq-tag.h
-@@ -30,7 +30,6 @@ extern void blk_mq_put_tag(struct blk_mq_hw_ctx *hctx, struct blk_mq_ctx *ctx,
- 			   unsigned int tag);
- extern bool blk_mq_has_free_tags(struct blk_mq_tags *tags);
- extern ssize_t blk_mq_tag_sysfs_show(struct blk_mq_tags *tags, char *page);
--extern void blk_mq_tag_init_last_tag(struct blk_mq_tags *tags, unsigned int *last_tag);
- extern int blk_mq_tag_update_depth(struct blk_mq_tags *tags, unsigned int depth);
- extern void blk_mq_tag_wakeup_all(struct blk_mq_tags *tags, bool);
- void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_iter_fn *fn,
-diff --git a/lib/sbitmap.c b/lib/sbitmap.c
-index be55f74..928b82a 100644
---- a/lib/sbitmap.c
-+++ b/lib/sbitmap.c
-@@ -15,6 +15,7 @@
-  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-  */
+ 	struct throtl_grp *tg = pd_to_tg(pd);
+@@ -467,9 +468,8 @@ static void throtl_pd_offline(struct blkg_policy_data *pd)
  
-+#include <linux/random.h>
- #include <linux/sbitmap.h>
+ 	blk_throtl_update_valid_limit(tg->td);
  
- int sbitmap_init_node(struct sbitmap *sb, unsigned int depth, int shift,
-@@ -211,6 +212,11 @@ int sbitmap_queue_init_node(struct sbitmap_queue *sbq, unsigned int depth,
- 		return -ENOMEM;
- 	}
+-	if (tg->td->limit_index == LIMIT_HIGH &&
+-	    !tg->td->limit_valid[LIMIT_HIGH])
+-		tg->td->limit_index = LIMIT_MAX;
++	if (!tg->td->limit_valid[tg->td->limit_index])
++		throtl_upgrade_state(tg->td);
+ }
  
-+	if (depth && !round_robin) {
-+		for_each_possible_cpu(i)
-+			*per_cpu_ptr(sbq->alloc_hint, i) = prandom_u32() % depth;
-+	}
+ static void throtl_pd_free(struct blkg_policy_data *pd)
+@@ -1075,6 +1075,8 @@ static int throtl_select_dispatch(struct throtl_service_queue *parent_sq)
+ 	return nr_disp;
+ }
+ 
++static bool throtl_can_upgrade(struct throtl_data *td,
++	struct throtl_grp *this_tg);
+ /**
+  * throtl_pending_timer_fn - timer function for service_queue->pending_timer
+  * @arg: the throtl_service_queue being serviced
+@@ -1101,6 +1103,9 @@ static void throtl_pending_timer_fn(unsigned long arg)
+ 	int ret;
+ 
+ 	spin_lock_irq(q->queue_lock);
++	if (throtl_can_upgrade(td, NULL))
++		throtl_upgrade_state(td);
 +
- 	sbq->wake_batch = sbq_calc_wake_batch(depth);
- 	atomic_set(&sbq->wake_index, 0);
+ again:
+ 	parent_sq = sq->parent_sq;
+ 	dispatched = false;
+@@ -1503,6 +1508,91 @@ static struct blkcg_policy blkcg_policy_throtl = {
+ 	.pd_free_fn		= throtl_pd_free,
+ };
  
++static bool throtl_upgrade_check_one(struct throtl_grp *tg)
++{
++	struct throtl_service_queue *sq = &tg->service_queue;
++	bool read_limit, write_limit;
++
++	/* if cgroup reaches high/max limit, it's ok to next limit */
++	read_limit = tg->bps[READ][LIMIT_HIGH] != -1 ||
++		     tg->iops[READ][LIMIT_HIGH] != -1 ||
++		     tg->bps[READ][LIMIT_MAX] != -1 ||
++		     tg->iops[READ][LIMIT_MAX] != -1;
++	write_limit = tg->bps[WRITE][LIMIT_HIGH] != -1 ||
++		      tg->iops[WRITE][LIMIT_HIGH] != -1 ||
++		      tg->bps[WRITE][LIMIT_MAX] != -1 ||
++		      tg->iops[WRITE][LIMIT_MAX] != -1;
++	if (read_limit && sq->nr_queued[READ] &&
++	    (!write_limit || sq->nr_queued[WRITE]))
++		return true;
++	if (write_limit && sq->nr_queued[WRITE] &&
++	    (!read_limit || sq->nr_queued[READ]))
++		return true;
++	return false;
++}
++
++static bool throtl_upgrade_check_hierarchy(struct throtl_grp *tg)
++{
++	if (throtl_upgrade_check_one(tg))
++		return true;
++	while (true) {
++		if (!tg || (cgroup_subsys_on_dfl(io_cgrp_subsys) &&
++				!tg_to_blkg(tg)->parent))
++			return false;
++		if (throtl_upgrade_check_one(tg))
++			return true;
++		tg = sq_to_tg(tg->service_queue.parent_sq);
++	}
++	return false;
++}
++
++static bool throtl_can_upgrade(struct throtl_data *td,
++	struct throtl_grp *this_tg)
++{
++	struct cgroup_subsys_state *pos_css;
++	struct blkcg_gq *blkg;
++
++	if (td->limit_index != LIMIT_HIGH)
++		return false;
++
++	rcu_read_lock();
++	blkg_for_each_descendant_post(blkg, pos_css, td->queue->root_blkg) {
++		struct throtl_grp *tg = blkg_to_tg(blkg);
++
++		if (tg == this_tg)
++			continue;
++		if (!list_empty(&tg_to_blkg(tg)->blkcg->css.children))
++			continue;
++		if (!throtl_upgrade_check_hierarchy(tg)) {
++			rcu_read_unlock();
++			return false;
++		}
++	}
++	rcu_read_unlock();
++	return true;
++}
++
++static void throtl_upgrade_state(struct throtl_data *td)
++{
++	struct cgroup_subsys_state *pos_css;
++	struct blkcg_gq *blkg;
++
++	td->limit_index = LIMIT_MAX;
++	rcu_read_lock();
++	blkg_for_each_descendant_post(blkg, pos_css, td->queue->root_blkg) {
++		struct throtl_grp *tg = blkg_to_tg(blkg);
++		struct throtl_service_queue *sq = &tg->service_queue;
++
++		tg->disptime = jiffies - 1;
++		throtl_select_dispatch(sq);
++		throtl_schedule_next_dispatch(sq, false);
++	}
++	rcu_read_unlock();
++	throtl_select_dispatch(&td->service_queue);
++	throtl_schedule_next_dispatch(&td->service_queue, false);
++	queue_work(kthrotld_workqueue, &td->dispatch_work);
++}
++
+ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
+ 		    struct bio *bio)
+ {
+@@ -1525,14 +1615,20 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
+ 
+ 	sq = &tg->service_queue;
+ 
++again:
+ 	while (true) {
+ 		/* throtl is FIFO - if bios are already queued, should queue */
+ 		if (sq->nr_queued[rw])
+ 			break;
+ 
+ 		/* if above limits, break to queue */
+-		if (!tg_may_dispatch(tg, bio, NULL))
++		if (!tg_may_dispatch(tg, bio, NULL)) {
++			if (throtl_can_upgrade(tg->td, tg)) {
++				throtl_upgrade_state(tg->td);
++				goto again;
++			}
+ 			break;
++		}
+ 
+ 		/* within limits, let's charge and dispatch directly */
+ 		throtl_charge_bio(tg, bio);
 -- 
-2.9.3
+2.8.0.rc2
 
