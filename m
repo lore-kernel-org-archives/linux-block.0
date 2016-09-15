@@ -1,74 +1,66 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-From: Christoph Hellwig <hch@lst.de>
-To: hans.verkuil@cisco.com, brking@us.ibm.com,
-        haver@linux.vnet.ibm.com, ching2048@areca.com.tw, axboe@fb.com,
-        alex.williamson@redhat.com
-Cc: kvm@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-media@vger.kernel.org,
-        linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 6/6] media/cobalt: use pci_irq_allocate_vectors
-Date: Sun, 11 Sep 2016 15:31:28 +0200
-Message-Id: <1473600688-24043-7-git-send-email-hch@lst.de>
-In-Reply-To: <1473600688-24043-1-git-send-email-hch@lst.de>
-References: <1473600688-24043-1-git-send-email-hch@lst.de>
-Sender: linux-scsi-owner@vger.kernel.org
+Return-Path: <msnitzer@redhat.com>
+Date: Thu, 15 Sep 2016 08:54:42 -0400
+From: Mike Snitzer <snitzer@redhat.com>
+To: Hannes Reinecke <hare@suse.de>
+Cc: axboe@kernel.dk, dm-devel@redhat.com, linux-block@vger.kernel.org
+Subject: Re: [PATCH v2 2/6] dm rq: add DM_MAPIO_DELAY_REQUEUE to delay
+ requeue of blk-mq requests
+Message-ID: <20160915125442.GA6373@redhat.com>
+References: <1473870576-54331-1-git-send-email-snitzer@redhat.com>
+ <1473870576-54331-3-git-send-email-snitzer@redhat.com>
+ <f8ec9117-2191-590c-582d-e41d69072fd6@suse.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <f8ec9117-2191-590c-582d-e41d69072fd6@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Simply the interrupt setup by using the new PCI layer helpers.
+On Thu, Sep 15 2016 at  2:14am -0400,
+Hannes Reinecke <hare@suse.de> wrote:
 
-Despite using pci_enable_msi_range, this driver was only requesting a
-single MSI vector anyway.
+> On 09/14/2016 06:29 PM, Mike Snitzer wrote:
+> > Otherwise blk-mq will immediately dispatch requests that are requeued
+> > via a BLK_MQ_RQ_QUEUE_BUSY return from blk_mq_ops .queue_rq.
+> > 
+> > Delayed requeue is implemented using blk_mq_delay_kick_requeue_list()
+> > with a delay of 5 secs.  In the context of DM multipath (all paths down)
+> > it doesn't make any sense to requeue more quickly.
+> > 
+> > Signed-off-by: Mike Snitzer <snitzer@redhat.com>
+> > ---
+> >  drivers/md/dm-rq.c            | 32 ++++++++++++++++++--------------
+> >  include/linux/device-mapper.h |  1 +
+> >  2 files changed, 19 insertions(+), 14 deletions(-)
+> > 
+> > diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
+> > index 0d301d5..9eebc8d 100644
+> > --- a/drivers/md/dm-rq.c
+> > +++ b/drivers/md/dm-rq.c
+> [..]
+> > @@ -671,7 +673,10 @@ static int map_request(struct dm_rq_target_io *tio, struct request *rq,
+> >  		break;
+> >  	case DM_MAPIO_REQUEUE:
+> >  		/* The target wants to requeue the I/O */
+> > -		dm_requeue_original_request(md, tio->orig);
+> > +		break;
+> > +	case DM_MAPIO_DELAY_REQUEUE:
+> > +		/* The target wants to requeue the I/O after a delay */
+> > +		dm_requeue_original_request(md, tio->orig, true);
+> >  		break;
+> >  	default:
+> >  		if (r > 0) {
+> Hmm? What happened here?
+> Don't we need to requeue the request for DM_MAPIO_REQUEUE?
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/media/pci/cobalt/cobalt-driver.c | 8 ++------
- drivers/media/pci/cobalt/cobalt-driver.h | 2 --
- 2 files changed, 2 insertions(+), 8 deletions(-)
+Yes, as always, the caller will perform the immediate requeue -- this is
+a requirement for blk-mq but I made .request_fn do the same just for
+consistency in the request-based DM code.
 
-diff --git a/drivers/media/pci/cobalt/cobalt-driver.c b/drivers/media/pci/cobalt/cobalt-driver.c
-index 476f7f0..5a0a9e4 100644
---- a/drivers/media/pci/cobalt/cobalt-driver.c
-+++ b/drivers/media/pci/cobalt/cobalt-driver.c
-@@ -307,9 +307,7 @@ static void cobalt_pci_iounmap(struct cobalt *cobalt, struct pci_dev *pci_dev)
- static void cobalt_free_msi(struct cobalt *cobalt, struct pci_dev *pci_dev)
- {
- 	free_irq(pci_dev->irq, (void *)cobalt);
--
--	if (cobalt->msi_enabled)
--		pci_disable_msi(pci_dev);
-+	pci_free_irq_vectors(pci_dev);
- }
- 
- static int cobalt_setup_pci(struct cobalt *cobalt, struct pci_dev *pci_dev,
-@@ -386,14 +384,12 @@ static int cobalt_setup_pci(struct cobalt *cobalt, struct pci_dev *pci_dev,
- 	   from being generated. */
- 	cobalt_set_interrupt(cobalt, false);
- 
--	if (pci_enable_msi_range(pci_dev, 1, 1) < 1) {
-+	if (pci_alloc_irq_vectors(pci_dev, 1, 1, PCI_IRQ_MSI) < 1) {
- 		cobalt_err("Could not enable MSI\n");
--		cobalt->msi_enabled = false;
- 		ret = -EIO;
- 		goto err_release;
- 	}
- 	msi_config_show(cobalt, pci_dev);
--	cobalt->msi_enabled = true;
- 
- 	/* Register IRQ */
- 	if (request_irq(pci_dev->irq, cobalt_irq_handler, IRQF_SHARED,
-diff --git a/drivers/media/pci/cobalt/cobalt-driver.h b/drivers/media/pci/cobalt/cobalt-driver.h
-index ed00dc9..00f773e 100644
---- a/drivers/media/pci/cobalt/cobalt-driver.h
-+++ b/drivers/media/pci/cobalt/cobalt-driver.h
-@@ -287,8 +287,6 @@ struct cobalt {
- 	u32 irq_none;
- 	u32 irq_full_fifo;
- 
--	bool msi_enabled;
--
- 	/* omnitek dma */
- 	int dma_channels;
- 	int first_fifo_channel;
--- 
-2.1.4
+In the case of blk-mq it is done in terms of a BLK_MQ_RQ_QUEUE_BUSY
+return from .queue_rq (which is the most immediate requeue there is
+since blk-mq just puts the request back on its dispatch list for the
+very next queue run).
 
+(it is so quick that it causes excessive load when all paths are down,
+hence this patchset to only use immediate requeue when it makes sense)
+
+Mike
