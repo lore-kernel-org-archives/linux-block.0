@@ -1,73 +1,69 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from latin.grep.be ([46.4.76.168]:59457 "EHLO latin.grep.be"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S933791AbcIOMCl (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Sep 2016 08:02:41 -0400
-Date: Thu, 15 Sep 2016 14:01:59 +0200
-From: Wouter Verhelst <w@uter.be>
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Alex Bligh <alex@alex.org.uk>,
-        "nbd-general@lists.sourceforge.net"
-        <nbd-general@lists.sourceforge.net>, linux-block@vger.kernel.org,
-        Josef Bacik <jbacik@fb.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Markus Pargmann <mpa@pengutronix.de>, kernel-team@fb.com
+Received: from bombadil.infradead.org ([198.137.202.9]:42863 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S934709AbcIOMBc (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 15 Sep 2016 08:01:32 -0400
+Date: Thu, 15 Sep 2016 05:01:25 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Wouter Verhelst <w@uter.be>
+Cc: Christoph Hellwig <hch@infradead.org>,
+        nbd-general@lists.sourceforge.net, Josef Bacik <jbacik@fb.com>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        mpa@pengutronix.de, kernel-team@fb.com
 Subject: Re: [Nbd] [RESEND][PATCH 0/5] nbd improvements
-Message-ID: <20160915120159.2o5lb7rvkjndzayh@grep.be>
+Message-ID: <20160915120125.GA31044@infradead.org>
 References: <1473369130-22986-1-git-send-email-jbacik@fb.com>
  <20160909200203.phhvodsfs7ymukfp@grep.be>
  <20160915104935.ohuwgq2chsedz6fl@grep.be>
- <27B346AF-F144-4770-BE38-446A66E71326@alex.org.uk>
- <20160915112936.vb7zxe7k6rvczosg@grep.be>
- <20160915114005.GC23259@infradead.org>
- <C38C69BC-CA2F-4F73-A762-CDAEA5C94702@alex.org.uk>
- <20160915115217.GB6411@infradead.org>
+ <20160915113807.GA23259@infradead.org>
+ <20160915115514.7hba23nqvvwfhb5z@grep.be>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20160915115217.GB6411@infradead.org>
+In-Reply-To: <20160915115514.7hba23nqvvwfhb5z@grep.be>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Thu, Sep 15, 2016 at 04:52:17AM -0700, Christoph Hellwig wrote:
-> On Thu, Sep 15, 2016 at 12:46:07PM +0100, Alex Bligh wrote:
-> > Essentially NBD does supports FLUSH/FUA like this:
-> > 
-> > https://www.kernel.org/doc/Documentation/block/writeback_cache_control.txt
-> > 
-> > IE supports the same FLUSH/FUA primitives as other block drivers (AIUI).
-> > 
-> > Link to protocol (per last email) here:
-> > 
-> > https://github.com/yoe/nbd/blob/master/doc/proto.md#ordering-of-messages-and-writes
+On Thu, Sep 15, 2016 at 01:55:14PM +0200, Wouter Verhelst wrote:
+> Maybe I'm not using the correct terminology here. The point is that
+> after a FLUSH, the server asserts that all write commands *for which a
+> reply has already been sent to the client* will also have reached
+> permanent storage. Nothing is asserted about commands for which the
+> reply has not yet been sent, regardless of whether they were sent to the
+> server before or after the FLUSH; they may reach permanent storage as a
+> result of the FLUSH, or they may not, we don't say.
 > 
-> Flush as defined by the Linux block layer (and supported that way in
-> SCSI, ATA, NVMe) only requires to flush all already completed writes
-> to non-volatile media.
+> With FUA, we only assert that the FUA-flagged command reaches permanent
+> storage before its reply is sent, nothing else.
 
-That is precisely what FLUSH in nbd does, too.
+Yes, that's the correct semantics.
 
-> It does not impose any ordering unlike the nbd spec.
+> If that's not a write barrier, then I was using the wrong terminology
+> (and offer my apologies for the confusion).
 
-If you read the spec differently, then that's a bug in the spec. Can you
-clarify which part of it caused that confusion? We should fix it, then.
+It's not a write barrier - a write barrier was command that ensured that
 
-> FUA as defined by the Linux block layer (and supported that way in SCSI,
-> ATA, NVMe) only requires the write operation the FUA bit is set on to be
-> on non-volatile media before completing the write operation.  It does
-> not impose any ordering, which seems to match the nbd spec.  Unlike the
-> NBD spec Linux does not allow FUA to be set on anything by WRITE
-> commands.  Some other storage protocols allow a FUA bit on READ
-> commands or other commands that write data to the device, though.
+ a) all previous writes were completed to the host/client
+ b) all previous writes were on non-volatile storage
 
-Yes. There was some discussion on that part, and we decided that setting
-the flag doesn't hurt, but the spec also clarifies that using it on READ
-does nothing, semantically.
+and
 
-The problem is that there are clients in the wild which do set it on
-READ, so it's just a matter of "be liberal in what you accept".
+ c) the actual write with the barrier bit was on non-volatile storage
 
--- 
-< ron> I mean, the main *practical* problem with C++, is there's like a dozen
-       people in the world who think they really understand all of its rules,
-       and pretty much all of them are just lying to themselves too.
- -- #debian-devel, OFTC, 2016-02-12
+> The point still remains that "X was sent before Y" is difficult to
+> determine on the client side if X was sent over a different TCP channel
+> than Y, because a packet might be dropped (requiring a retransmit) for
+> X, and similar things. If blk-mq can deal with that, we're good and
+> nothing further needs to be done. If not, this should be evaluated by
+> someone more familiar with the internals of the kernel block subsystem
+> than me.
+
+The important bit in all the existing protocols, and which Linux relies
+on is that any write the Linux block layer got a completion for earlier
+needs to be flushed out to non-volatile storage when a FLUSH command is
+set.  Anything that still is in flight does not matter.  Which for
+NBD means anything that you already replies to need to be flushed.
+
+Or to say it more practicly - in the nbd server you simply need to
+call fdatasync on the backing device or file whenever you get a FLUSH
+requires, and it will do the right thing.
