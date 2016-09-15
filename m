@@ -1,93 +1,69 @@
-Return-Path: <houtao1@huawei.com>
-From: Hou Tao <houtao1@huawei.com>
-To: <linux-block@vger.kernel.org>
-CC: <linux-kernel@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        Vivek Goyal
-	<vgoyal@redhat.com>
-Subject: [PATCH] blk-throttle: fix infinite throttling caused by non-cascading timer wheel
-Date: Mon, 12 Sep 2016 14:45:30 +0800
-Message-ID: <1473662730-184701-1-git-send-email-houtao1@huawei.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv3 15/41] filemap: handle huge pages in do_generic_file_read()
+Date: Thu, 15 Sep 2016 14:54:57 +0300
+Message-Id: <20160915115523.29737-16-kirill.shutemov@linux.intel.com>
+In-Reply-To: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
+References: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Due to commit 500462a9de65 ("timers: Switch to a non-cascading wheel"),
-the slack of timer increases when the timeout increases:
+Most of work happans on head page. Only when we need to do copy data to
+userspace we find relevant subpage.
 
- So for HZ=250 we end up with the following granularity levels:
-  Level Offset   Granularity                  Range
-      0      0          4 ms                 0 ms -        252 ms
-      1     64         32 ms               256 ms -       2044 ms (256ms - ~2s)
-      2    128        256 ms              2048 ms -      16380 ms (~2s   - ~16s)
+We are still limited by PAGE_SIZE per iteration. Lifting this limitation
+would require some more work.
 
-When the slack is bigger than throtl_slice (100ms), there will be
-a problem: throtl_slice_used() will always return true, a new slice
-will always be genereated, and the bio will be throttled forever.
-
-The following is a example:
-
- echo 253:0 512 > /sys/fs/cgroup/blkio/blkio.throttle.read_bps_device
- fio --readonly --direct=1 --filename=/dev/vda --size=4K --rate=4K \
-		 --rw=read --ioengine=libaio --iodepth=16 --name 1
-
- the slack of 8s-timer is about 302ms.
-
- throtl / [R] bio. bdisp=0 sz=4096 bps=512 iodisp=0 iops=4294967295 queued=0/0
- throtl schedule timer. delay=8000 jiffies=4295784850
- throtl / dispatch nr_queued=1 read=1 write=0, bdisp=0/0, iodisp=0/0
- throtl / [R] new slice start=4295793152 end=4295793252 jiffies=4295793152
- throtl / [R] extend slice start=4295793152 end=4295801200 jiffies=4295793152
- throtl schedule timer. delay=8000 jiffies=4295793152
- throtl / dispatch nr_queued=1 read=1 write=0, bdisp=0/0, iodisp=0/0
- throtl / [R] new slice start=4295801344 end=4295801444 jiffies=4295801344
- throtl / [R] extend slice start=4295801344 end=4295809400 jiffies=4295801344
- throtl schedule timer. delay=8000 jiffies=4295801344
-
-Fix it by checking the delayed dispatch in tg_may_dispatch():
-1. If there is any dispatched bio, the time slice must have been used,
-   so it's OK to renew the time slice.
-2. If there is no queued bio, the time slice must have been expired,
-   so it's Ok to renew the time slice.
-
-Signed-off-by: Hou Tao <houtao1@huawei.com>
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- block/blk-throttle.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+ mm/filemap.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index f1aba26..91f8140 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -591,13 +591,20 @@ static inline void throtl_extend_slice(struct throtl_grp *tg, bool rw,
- 		   tg->slice_end[rw], jiffies);
- }
+diff --git a/mm/filemap.c b/mm/filemap.c
+index 50afe17230e7..b77bcf6843ee 100644
+--- a/mm/filemap.c
++++ b/mm/filemap.c
+@@ -1860,6 +1860,7 @@ find_page:
+ 			if (unlikely(page == NULL))
+ 				goto no_cached_page;
+ 		}
++		page = compound_head(page);
+ 		if (PageReadahead(page)) {
+ 			page_cache_async_readahead(mapping,
+ 					ra, filp, page,
+@@ -1936,7 +1937,8 @@ page_ok:
+ 		 * now we can copy it to user space...
+ 		 */
  
-+static bool throtl_is_delayed_disp(struct throtl_grp *tg, bool rw)
-+{
-+	return (time_after(jiffies, tg->slice_end[rw]) &&
-+			!tg->bytes_disp[rw] && !tg->io_disp[rw] &&
-+			tg->service_queue.nr_queued[rw]) ? true : false;
-+}
-+
- /* Determine if previously allocated or extended slice is complete or not */
- static bool throtl_slice_used(struct throtl_grp *tg, bool rw)
- {
- 	if (time_in_range(jiffies, tg->slice_start[rw], tg->slice_end[rw]))
- 		return false;
- 
--	return 1;
-+	return true;
- }
- 
- /* Trim the used slices and adjust slice start accordingly */
-@@ -782,7 +789,7 @@ static bool tg_may_dispatch(struct throtl_grp *tg, struct bio *bio,
- 	 * existing slice to make sure it is at least throtl_slice interval
- 	 * long since now.
+-		ret = copy_page_to_iter(page, offset, nr, iter);
++		ret = copy_page_to_iter(page + index - page->index, offset,
++				nr, iter);
+ 		offset += ret;
+ 		index += offset >> PAGE_SHIFT;
+ 		offset &= ~PAGE_MASK;
+@@ -2356,6 +2358,7 @@ page_not_uptodate:
+ 	 * because there really aren't any performance issues here
+ 	 * and we need to check for errors.
  	 */
--	if (throtl_slice_used(tg, rw))
-+	if (throtl_slice_used(tg, rw) && !throtl_is_delayed_disp(tg, rw))
- 		throtl_start_new_slice(tg, rw);
- 	else {
- 		if (time_before(tg->slice_end[rw], jiffies + throtl_slice))
++	page = compound_head(page);
+ 	ClearPageError(page);
+ 	error = mapping->a_ops->readpage(file, page);
+ 	if (!error) {
 -- 
-2.5.5
+2.9.3
+
