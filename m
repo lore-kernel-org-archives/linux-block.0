@@ -1,150 +1,108 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:60304 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:32836 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752143AbcIOVLC (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Sep 2016 17:11:02 -0400
+        id S1754493AbcIOTCV (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 15 Sep 2016 15:02:21 -0400
 Subject: Re: [Nbd] [RESEND][PATCH 0/5] nbd improvements
-To: Alex Bligh <alex@alex.org.uk>
-References: <1473369130-22986-1-git-send-email-jbacik@fb.com>
- <20160909200203.phhvodsfs7ymukfp@grep.be>
- <20160915104935.ohuwgq2chsedz6fl@grep.be>
- <27B346AF-F144-4770-BE38-446A66E71326@alex.org.uk>
- <8dd28f8b-0a3c-4112-ca6d-a9ad080d5920@redhat.com>
- <f4756e27-9814-477c-2d03-e7373154c3b7@redhat.com>
- <95DD0F04-13D7-4FEB-8710-5489AA72B259@alex.org.uk>
-Cc: Eric Blake <eblake@redhat.com>, Wouter Verhelst <w@uter.be>,
-        Josef Bacik <jbacik@fb.com>, linux-block@vger.kernel.org,
-        Markus Pargmann <mpa@pengutronix.de>, kernel-team@fb.com,
-        "nbd-general@lists.sourceforge.net"
+To: Wouter Verhelst <w@uter.be>, Alex Bligh <alex@alex.org.uk>
+References: <20160915120125.GA31044@infradead.org>
+ <20160915122120.4h3ykbewaavjk5nx@grep.be>
+ <20160915122304.GA15501@infradead.org>
+ <2ABB8966-5C20-45A7-BB4C-6882F042905D@alex.org.uk>
+ <20160915123646.GA10394@infradead.org>
+ <C48DD624-6EDF-4EED-B474-8BEA021F00F0@alex.org.uk>
+ <20160915124103.GA20657@infradead.org>
+ <DA0880DA-700F-4989-9326-68F5F7A55F25@alex.org.uk>
+ <20160915131741.cth6kilmcgnobbuu@grep.be>
+ <ECDC1983-E21B-48D5-892D-63CA3572B2B4@alex.org.uk>
+ <20160915162714.om3rwucexi5ogjtm@grep.be>
+Cc: "nbd-general@lists.sourceforge.net"
         <nbd-general@lists.sourceforge.net>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f24823d3-0fcb-20d1-90db-4072e7ddec9e@redhat.com>
-Date: Thu, 15 Sep 2016 23:10:52 +0200
+        Christoph Hellwig <hch@infradead.org>,
+        Josef Bacik <jbacik@fb.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        linux-block@vger.kernel.org, mpa@pengutronix.de, kernel-team@fb.com
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <1a51ea56-6597-9e8f-e929-86f8e951fe09@redhat.com>
+Date: Thu, 15 Sep 2016 14:02:19 -0500
 MIME-Version: 1.0
-In-Reply-To: <95DD0F04-13D7-4FEB-8710-5489AA72B259@alex.org.uk>
+In-Reply-To: <20160915162714.om3rwucexi5ogjtm@grep.be>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="29s3rUDG2i8t4jV1Np500Pb3jJKRJxltK"
+ boundary="NjGlCo2X9Oo5VJoHJMWIlNKlQNPNmUuto"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---29s3rUDG2i8t4jV1Np500Pb3jJKRJxltK
-Content-Type: multipart/mixed; boundary="D62wHar1deQUpGeVIlMgA5pinjn0At4pw";
- protected-headers="v1"
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: Alex Bligh <alex@alex.org.uk>
-Cc: Eric Blake <eblake@redhat.com>, Wouter Verhelst <w@uter.be>,
- Josef Bacik <jbacik@fb.com>, linux-block@vger.kernel.org,
- Markus Pargmann <mpa@pengutronix.de>, kernel-team@fb.com,
- "nbd-general@lists.sourceforge.net" <nbd-general@lists.sourceforge.net>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Message-ID: <f24823d3-0fcb-20d1-90db-4072e7ddec9e@redhat.com>
+--NjGlCo2X9Oo5VJoHJMWIlNKlQNPNmUuto
+Content-Type: multipart/mixed; boundary="iF3MvqNiILar1a4TqMjM7GVVl7JI9AASM"
+From: Eric Blake <eblake@redhat.com>
+To: Wouter Verhelst <w@uter.be>, Alex Bligh <alex@alex.org.uk>
+Cc: "nbd-general@lists.sourceforge.net" <nbd-general@lists.sourceforge.net>,
+ Christoph Hellwig <hch@infradead.org>, Josef Bacik <jbacik@fb.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ linux-block@vger.kernel.org, mpa@pengutronix.de, kernel-team@fb.com
+Message-ID: <1a51ea56-6597-9e8f-e929-86f8e951fe09@redhat.com>
 Subject: Re: [Nbd] [RESEND][PATCH 0/5] nbd improvements
-References: <1473369130-22986-1-git-send-email-jbacik@fb.com>
- <20160909200203.phhvodsfs7ymukfp@grep.be>
- <20160915104935.ohuwgq2chsedz6fl@grep.be>
- <27B346AF-F144-4770-BE38-446A66E71326@alex.org.uk>
- <8dd28f8b-0a3c-4112-ca6d-a9ad080d5920@redhat.com>
- <f4756e27-9814-477c-2d03-e7373154c3b7@redhat.com>
- <95DD0F04-13D7-4FEB-8710-5489AA72B259@alex.org.uk>
-In-Reply-To: <95DD0F04-13D7-4FEB-8710-5489AA72B259@alex.org.uk>
+References: <20160915120125.GA31044@infradead.org>
+ <20160915122120.4h3ykbewaavjk5nx@grep.be>
+ <20160915122304.GA15501@infradead.org>
+ <2ABB8966-5C20-45A7-BB4C-6882F042905D@alex.org.uk>
+ <20160915123646.GA10394@infradead.org>
+ <C48DD624-6EDF-4EED-B474-8BEA021F00F0@alex.org.uk>
+ <20160915124103.GA20657@infradead.org>
+ <DA0880DA-700F-4989-9326-68F5F7A55F25@alex.org.uk>
+ <20160915131741.cth6kilmcgnobbuu@grep.be>
+ <ECDC1983-E21B-48D5-892D-63CA3572B2B4@alex.org.uk>
+ <20160915162714.om3rwucexi5ogjtm@grep.be>
+In-Reply-To: <20160915162714.om3rwucexi5ogjtm@grep.be>
 
---D62wHar1deQUpGeVIlMgA5pinjn0At4pw
-Content-Type: text/plain; charset=windows-1252
+--iF3MvqNiILar1a4TqMjM7GVVl7JI9AASM
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-
-
-On 15/09/2016 17:23, Alex Bligh wrote:
-> Paolo,
->=20
->> On 15 Sep 2016, at 15:07, Paolo Bonzini <pbonzini@redhat.com> wrote:
+On 09/15/2016 11:27 AM, Wouter Verhelst wrote:
+> On Thu, Sep 15, 2016 at 05:08:21PM +0100, Alex Bligh wrote:
+>> Wouter,
 >>
->> I don't think QEMU forbids multiple clients to the single server, and
->> guarantees consistency as long as there is no overlap between writes a=
-nd
->> reads.  These are the same guarantees you have for multiple commands o=
-n
->> a single connection.
+>>> The server can always refuse to allow multiple connections.
 >>
->> In other words, from the POV of QEMU there's no difference whether
->> multiple commands come from one or more connections.
+>> Sure, but it would be neater to warn the client of that at negotiation=
+
+>> stage (it would only be one flag, e.g.  'multiple connections
+>> unsafe').
 >=20
-> This isn't really about ordering, it's about cache coherency
-> and persisting things to disk.
->=20
-> What you say is correct as far as it goes in terms of ordering. However=
+> I suppose that's not a bad idea.
 
-> consider the scenario with read and writes on two channels as follows
-> of the same block:
->=20
->      Channel1     Channel2
->=20
->      R                      Block read, and cached in user space in
->                             channel 1's cache
->                             Reply sent
->=20
->                   W         New value written, channel 2's cache update=
-d
->                             channel 1's cache not
->=20
->      R                      Value returned from channel 1's cache.
->=20
->=20
-> In the above scenario, there is a problem if the server(s) handling the=
-
-> two channels each use a read cache which is not coherent between the
-> two channels. An example would be a read-through cache on a server that=
-
-> did fork() and shared no state between connections.
-
-qemu-nbd does not fork(), so there is no coherency issue if W has replied=
-=2E
-
-However, if W hasn't replied, channel1 can get garbage.  Typically the
-VM will be the one during writes, everyone else must be ready to handle
-whatever mess the VM throws at them.
-
-Paolo
-
-> Similarly, if there is a write on channel 1 that has completed, and
-> the flush goes to channel 2, it may not (if state is not shared) guaran=
-tee
-> that the write on channel 1 (which has completed) is persisted to non-v=
-olatile
-> media. Obviously if the 'state' is OS block cache/buffers/whatever, it
-> will, but if it's (e.g.) a user-space per process write-through cache,
-> it won't.
->=20
-> I don't know whether qemu-nbd is likely to suffer from either of these.=
+Seems like it may need to be a per-export flag, rather than a global
+flag (as a given server may be able to serve multiple types of files,
+where the safety depends on the type of file being served).
 
 
-It can't happen.  On the other hand, channel1 must be ready to handle
-garbage, it's illegal.
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
 
+--iF3MvqNiILar1a4TqMjM7GVVl7JI9AASM--
 
-
-
---D62wHar1deQUpGeVIlMgA5pinjn0At4pw--
-
---29s3rUDG2i8t4jV1Np500Pb3jJKRJxltK
+--NjGlCo2X9Oo5VJoHJMWIlNKlQNPNmUuto
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJX2w5cAAoJEL/70l94x66DQdgH/3kzF84UHwT4R2CYqJpuxVvL
-kz90PbduLg1EgS3uARGRXRD0L/c/Rr6uWKN184WpaSZldPG+HsfAEkjLg9hqo9gA
-rQAg2v3+j6RtU8bQLH780jDXsleF9krhgK0n+NkTXW+pn8P5O8YVzoXXWYz28MkC
-9cGPM/GeDmtFwh8DFYK4MCs93Vn4P95XR/TIgywU1H9ldR0Qkg6ebO3BahiaHrGW
-ed/uZT9mUNBlo5TQYZkjoEj3X5CE0kawMA+WG9oUD0wj1Dt37ye+gyF3wVQM1/wt
-T43uy6yYvBjoGYMM15udP9RwhL5/QXvK7GxdOJHHfo59hlrGozr9nPOO9MCvyMA=
-=Q6oz
+iQEcBAEBCAAGBQJX2vA7AAoJEKeha0olJ0NqK14H/1tosW6gf8v/KJC+YYtgnIvy
+tzwHV2p8r7nLqwUhu7dJjDr1F8las0Mq90YeU3NoM8LsRy9+uy6uHKUSNNfgaCNX
+E/RwaRBmg0Qq7iwMB7iywLZJ+A22k1jm5SZB919q0BMMW1CvwxJkQonNrT0NbbRw
+sy1UczZFMsWdulJPFPpSCXQKIJtoe9QtY9IDa/+B12z8+Ko3CyVdcQGEggivyYw8
+I1LFoQu/oB/HWSdrZ/hjl2lw89cnFfdHFKOggGJpN32Mv8vh77DZWO4hFTXjaQiv
+FRuiYhz+AzEva+4XaQcClHuLLCNLgEkZ9Cm8QS6QI4y/Ako/pNrlx8moXiA+tR8=
+=HT2Y
 -----END PGP SIGNATURE-----
 
---29s3rUDG2i8t4jV1Np500Pb3jJKRJxltK--
+--NjGlCo2X9Oo5VJoHJMWIlNKlQNPNmUuto--
