@@ -1,75 +1,94 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga07.intel.com ([134.134.136.100]:42018 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S934047AbcIOLzm (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Sep 2016 07:55:42 -0400
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv3 21/41] thp: introduce hpage_size() and hpage_mask()
-Date: Thu, 15 Sep 2016 14:55:03 +0300
-Message-Id: <20160915115523.29737-22-kirill.shutemov@linux.intel.com>
-In-Reply-To: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
-References: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jshank@google.com>
+MIME-Version: 1.0
+From: Jim Shankland <jshank@google.com>
+Date: Thu, 15 Sep 2016 12:45:47 -0700
+Message-ID: <CAK1UeSYJOBH-ZdHvwLVYyyWOFsU29Wu+G2VV9gRyxy-Y_8_X_w@mail.gmail.com>
+Subject: Counting I/O errors in /sys/block/<dev>/stat
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org
+Content-Type: multipart/mixed; boundary=001a11477e36adf408053c9117aa
+List-ID: <linux-block@vger.kernel.org>
 
-Introduce new helpers which return size/mask of the page:
-HPAGE_PMD_SIZE/HPAGE_PMD_MASK if the page is PageTransHuge() and
-PAGE_SIZE/PAGE_MASK otherwise.
+--001a11477e36adf408053c9117aa
+Content-Type: text/plain; charset=UTF-8
 
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
----
- include/linux/huge_mm.h | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+[Resent without html]
 
-diff --git a/include/linux/huge_mm.h b/include/linux/huge_mm.h
-index 6f14de45b5ce..de2789b4402c 100644
---- a/include/linux/huge_mm.h
-+++ b/include/linux/huge_mm.h
-@@ -138,6 +138,20 @@ static inline int hpage_nr_pages(struct page *page)
- 	return 1;
- }
- 
-+static inline int hpage_size(struct page *page)
-+{
-+	if (unlikely(PageTransHuge(page)))
-+		return HPAGE_PMD_SIZE;
-+	return PAGE_SIZE;
-+}
-+
-+static inline unsigned long hpage_mask(struct page *page)
-+{
-+	if (unlikely(PageTransHuge(page)))
-+		return HPAGE_PMD_MASK;
-+	return PAGE_MASK;
-+}
-+
- extern int do_huge_pmd_numa_page(struct fault_env *fe, pmd_t orig_pmd);
- 
- extern struct page *huge_zero_page;
-@@ -163,6 +177,8 @@ void put_huge_zero_page(void);
- #define HPAGE_PMD_SIZE ({ BUILD_BUG(); 0; })
- 
- #define hpage_nr_pages(x) 1
-+#define hpage_size(x) PAGE_SIZE
-+#define hpage_mask(x) PAGE_MASK
- 
- #define transparent_hugepage_enabled(__vma) 0
- 
--- 
-2.9.3
+Dear colleagues,
 
+The attached patch keeps a count of block device I/O errors -- any
+error event that generates a klog message in blk_update_request -- and
+reports the count as a 12th field in /sys/block/<dev>/stat. That
+allows, e.g., monitoring systems to detect and count block device
+errors without having to scrape syslog.
+
+If the patch is acceptable as is, please consider it submitted for
+eventual merging into the mainline kernel. If not, I'd welcome
+comments, feedback, etc.
+
+Thanks,
+
+Jim Shankland
+
+--001a11477e36adf408053c9117aa
+Content-Type: application/octet-stream; name="blockdev-error-counts.patch"
+Content-Disposition: attachment; filename="blockdev-error-counts.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_it4qx8eo0
+
+ZGlmZiAtLWdpdCBhL2Jsb2NrL2Jsay1jb3JlLmMgYi9ibG9jay9ibGstY29yZS5jCmluZGV4IDM2
+YzdhYzMuLmU2NzEwZTQgMTAwNjQ0Ci0tLSBhL2Jsb2NrL2Jsay1jb3JlLmMKKysrIGIvYmxvY2sv
+YmxrLWNvcmUuYwpAQCAtMjIzMiw3ICsyMjMyLDggQEAgdW5zaWduZWQgaW50IGJsa19ycV9lcnJf
+Ynl0ZXMoY29uc3Qgc3RydWN0IHJlcXVlc3QgKnJxKQogfQogRVhQT1JUX1NZTUJPTF9HUEwoYmxr
+X3JxX2Vycl9ieXRlcyk7CiAKLXZvaWQgYmxrX2FjY291bnRfaW9fY29tcGxldGlvbihzdHJ1Y3Qg
+cmVxdWVzdCAqcmVxLCB1bnNpZ25lZCBpbnQgYnl0ZXMpCit2b2lkIGJsa19hY2NvdW50X2lvX2Nv
+bXBsZXRpb24oc3RydWN0IHJlcXVlc3QgKnJlcSwgaW50IGlvX2VyciwKKwkJCSAgICAgICB1bnNp
+Z25lZCBpbnQgYnl0ZXMpCiB7CiAJaWYgKGJsa19kb19pb19zdGF0KHJlcSkpIHsKIAkJY29uc3Qg
+aW50IHJ3ID0gcnFfZGF0YV9kaXIocmVxKTsKQEAgLTIyNDIsNiArMjI0Myw4IEBAIHZvaWQgYmxr
+X2FjY291bnRfaW9fY29tcGxldGlvbihzdHJ1Y3QgcmVxdWVzdCAqcmVxLCB1bnNpZ25lZCBpbnQg
+Ynl0ZXMpCiAJCWNwdSA9IHBhcnRfc3RhdF9sb2NrKCk7CiAJCXBhcnQgPSByZXEtPnBhcnQ7CiAJ
+CXBhcnRfc3RhdF9hZGQoY3B1LCBwYXJ0LCBzZWN0b3JzW3J3XSwgYnl0ZXMgPj4gOSk7CisJCWlm
+IChpb19lcnIpCisJCQlwYXJ0X3N0YXRfaW5jKGNwdSwgcGFydCwgaW9fZXJyb3JzKTsKIAkJcGFy
+dF9zdGF0X3VubG9jaygpOwogCX0KIH0KQEAgLTI1MzksNiArMjU0Miw3IEBAIEVYUE9SVF9TWU1C
+T0woYmxrX2ZldGNoX3JlcXVlc3QpOwogYm9vbCBibGtfdXBkYXRlX3JlcXVlc3Qoc3RydWN0IHJl
+cXVlc3QgKnJlcSwgaW50IGVycm9yLCB1bnNpZ25lZCBpbnQgbnJfYnl0ZXMpCiB7CiAJaW50IHRv
+dGFsX2J5dGVzOworCWludCBpb19lcnJvciA9IDA7CiAKIAl0cmFjZV9ibG9ja19ycV9jb21wbGV0
+ZShyZXEtPnEsIHJlcSwgbnJfYnl0ZXMpOwogCkBAIC0yNTg4LDEwICsyNTkyLDExIEBAIGJvb2wg
+YmxrX3VwZGF0ZV9yZXF1ZXN0KHN0cnVjdCByZXF1ZXN0ICpyZXEsIGludCBlcnJvciwgdW5zaWdu
+ZWQgaW50IG5yX2J5dGVzKQogCQkJCSAgIF9fZnVuY19fLCBlcnJvcl90eXBlLCByZXEtPnJxX2Rp
+c2sgPwogCQkJCSAgIHJlcS0+cnFfZGlzay0+ZGlza19uYW1lIDogIj8iLAogCQkJCSAgICh1bnNp
+Z25lZCBsb25nIGxvbmcpYmxrX3JxX3BvcyhyZXEpKTsKKwkJaW9fZXJyb3IgPSAxOwogCiAJfQog
+Ci0JYmxrX2FjY291bnRfaW9fY29tcGxldGlvbihyZXEsIG5yX2J5dGVzKTsKKwlibGtfYWNjb3Vu
+dF9pb19jb21wbGV0aW9uKHJlcSwgaW9fZXJyb3IsIG5yX2J5dGVzKTsKIAogCXRvdGFsX2J5dGVz
+ID0gMDsKIAl3aGlsZSAocmVxLT5iaW8pIHsKZGlmZiAtLWdpdCBhL2Jsb2NrL2Jsay5oIGIvYmxv
+Y2svYmxrLmgKaW5kZXggYzM3NDkyZi4uYjNmZDM5NCAxMDA2NDQKLS0tIGEvYmxvY2svYmxrLmgK
+KysrIGIvYmxvY2svYmxrLmgKQEAgLTEwNyw3ICsxMDcsOCBAQCBib29sIGJsa19hdHRlbXB0X3Bs
+dWdfbWVyZ2Uoc3RydWN0IHJlcXVlc3RfcXVldWUgKnEsIHN0cnVjdCBiaW8gKmJpbywKIHVuc2ln
+bmVkIGludCBibGtfcGx1Z19xdWV1ZWRfY291bnQoc3RydWN0IHJlcXVlc3RfcXVldWUgKnEpOwog
+CiB2b2lkIGJsa19hY2NvdW50X2lvX3N0YXJ0KHN0cnVjdCByZXF1ZXN0ICpyZXEsIGJvb2wgbmV3
+X2lvKTsKLXZvaWQgYmxrX2FjY291bnRfaW9fY29tcGxldGlvbihzdHJ1Y3QgcmVxdWVzdCAqcmVx
+LCB1bnNpZ25lZCBpbnQgYnl0ZXMpOwordm9pZCBibGtfYWNjb3VudF9pb19jb21wbGV0aW9uKHN0
+cnVjdCByZXF1ZXN0ICpyZXEsIGludCBpb19lcnIsCisJCQkgICAgICAgdW5zaWduZWQgaW50IGJ5
+dGVzKTsKIHZvaWQgYmxrX2FjY291bnRfaW9fZG9uZShzdHJ1Y3QgcmVxdWVzdCAqcmVxKTsKIAog
+LyoKZGlmZiAtLWdpdCBhL2Jsb2NrL3BhcnRpdGlvbi1nZW5lcmljLmMgYi9ibG9jay9wYXJ0aXRp
+b24tZ2VuZXJpYy5jCmluZGV4IDcxZDllZDkuLjA4MTRjY2IgMTAwNjQ0Ci0tLSBhL2Jsb2NrL3Bh
+cnRpdGlvbi1nZW5lcmljLmMKKysrIGIvYmxvY2svcGFydGl0aW9uLWdlbmVyaWMuYwpAQCAtMTIx
+LDcgKzEyMSw3IEBAIHNzaXplX3QgcGFydF9zdGF0X3Nob3coc3RydWN0IGRldmljZSAqZGV2LAog
+CXJldHVybiBzcHJpbnRmKGJ1ZiwKIAkJIiU4bHUgJThsdSAlOGxsdSAlOHUgIgogCQkiJThsdSAl
+OGx1ICU4bGx1ICU4dSAiCi0JCSIlOHUgJTh1ICU4dSIKKwkJIiU4dSAlOHUgJTh1ICU4bHUiCiAJ
+CSJcbiIsCiAJCXBhcnRfc3RhdF9yZWFkKHAsIGlvc1tSRUFEXSksCiAJCXBhcnRfc3RhdF9yZWFk
+KHAsIG1lcmdlc1tSRUFEXSksCkBAIC0xMzMsNyArMTMzLDggQEAgc3NpemVfdCBwYXJ0X3N0YXRf
+c2hvdyhzdHJ1Y3QgZGV2aWNlICpkZXYsCiAJCWppZmZpZXNfdG9fbXNlY3MocGFydF9zdGF0X3Jl
+YWQocCwgdGlja3NbV1JJVEVdKSksCiAJCXBhcnRfaW5fZmxpZ2h0KHApLAogCQlqaWZmaWVzX3Rv
+X21zZWNzKHBhcnRfc3RhdF9yZWFkKHAsIGlvX3RpY2tzKSksCi0JCWppZmZpZXNfdG9fbXNlY3Mo
+cGFydF9zdGF0X3JlYWQocCwgdGltZV9pbl9xdWV1ZSkpKTsKKwkJamlmZmllc190b19tc2Vjcyhw
+YXJ0X3N0YXRfcmVhZChwLCB0aW1lX2luX3F1ZXVlKSksCisJCXBhcnRfc3RhdF9yZWFkKHAsIGlv
+X2Vycm9ycykpOwogfQogCiBzc2l6ZV90IHBhcnRfaW5mbGlnaHRfc2hvdyhzdHJ1Y3QgZGV2aWNl
+ICpkZXYsCmRpZmYgLS1naXQgYS9pbmNsdWRlL2xpbnV4L2dlbmhkLmggYi9pbmNsdWRlL2xpbnV4
+L2dlbmhkLmgKaW5kZXggMWRiZjUyZi4uMWRlN2EzMCAxMDA2NDQKLS0tIGEvaW5jbHVkZS9saW51
+eC9nZW5oZC5oCisrKyBiL2luY2x1ZGUvbGludXgvZ2VuaGQuaApAQCAtODcsNiArODcsNyBAQCBz
+dHJ1Y3QgZGlza19zdGF0cyB7CiAJdW5zaWduZWQgbG9uZyB0aWNrc1syXTsKIAl1bnNpZ25lZCBs
+b25nIGlvX3RpY2tzOwogCXVuc2lnbmVkIGxvbmcgdGltZV9pbl9xdWV1ZTsKKwl1bnNpZ25lZCBs
+b25nIGlvX2Vycm9yczsKIH07CiAKICNkZWZpbmUgUEFSVElUSU9OX01FVEFfSU5GT19WT0xOQU1F
+TFRICTY0Cg==
+--001a11477e36adf408053c9117aa--
