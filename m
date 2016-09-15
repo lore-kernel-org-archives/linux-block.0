@@ -1,40 +1,57 @@
 Return-Path: <jshank@google.com>
 MIME-Version: 1.0
 From: Jim Shankland <jshank@google.com>
-Date: Thu, 15 Sep 2016 12:45:47 -0700
-Message-ID: <CAK1UeSYJOBH-ZdHvwLVYyyWOFsU29Wu+G2VV9gRyxy-Y_8_X_w@mail.gmail.com>
+Date: Thu, 15 Sep 2016 12:39:13 -0700
+Message-ID: <CAK1UeSYKgM=AnbUdJ+4fhFVrG59OYydyWPSki8e4GaYAPiXkEg@mail.gmail.com>
 Subject: Counting I/O errors in /sys/block/<dev>/stat
 To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org
-Content-Type: multipart/mixed; boundary=001a11477e36adf408053c9117aa
+Content-Type: multipart/mixed; boundary=001a114b2f6a4d374f053c9100d5
 List-ID: <linux-block@vger.kernel.org>
 
---001a11477e36adf408053c9117aa
-Content-Type: text/plain; charset=UTF-8
+--001a114b2f6a4d374f053c9100d5
+Content-Type: multipart/alternative; boundary=001a114b2f6a4d374a053c9100d3
 
-[Resent without html]
+--001a114b2f6a4d374a053c9100d3
+Content-Type: text/plain; charset=UTF-8
 
 Dear colleagues,
 
-The attached patch keeps a count of block device I/O errors -- any
-error event that generates a klog message in blk_update_request -- and
-reports the count as a 12th field in /sys/block/<dev>/stat. That
-allows, e.g., monitoring systems to detect and count block device
-errors without having to scrape syslog.
+The attached patch keeps a count of block device I/O errors -- any error
+event that generates a klog message in blk_update_request -- and reports
+the count as a 12th field in /sys/block/<dev>/stat. That allows, e.g.,
+monitoring systems to detect and count block device errors without having
+to scrape syslog.
 
-If the patch is acceptable as is, please consider it submitted for
-eventual merging into the mainline kernel. If not, I'd welcome
-comments, feedback, etc.
+If the patch is acceptable as is, please consider it submitted for eventual
+merging into the mainline kernel. If not, I'd welcome comments, feedback,
+etc.
 
 Thanks,
 
 Jim Shankland
 
---001a11477e36adf408053c9117aa
+--001a114b2f6a4d374a053c9100d3
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div>Dear colleagues,</div><div><br></div>The attached pat=
+ch keeps a count of block device I/O errors -- any error event that generat=
+es a klog message in blk_update_request -- and reports the count as a 12th =
+field in /sys/block/&lt;dev&gt;/stat. That allows, e.g., monitoring systems=
+ to detect and count block device errors without having to scrape syslog.<d=
+iv><br></div><div>If the patch is acceptable as is, please consider it subm=
+itted for eventual merging into the mainline kernel. If not, I&#39;d welcom=
+e comments, feedback, etc.</div><div><br></div><div>Thanks,</div><div><br><=
+/div><div>Jim Shankland</div><div><br></div></div>
+
+--001a114b2f6a4d374a053c9100d3--
+
+--001a114b2f6a4d374f053c9100d5
 Content-Type: application/octet-stream; name="blockdev-error-counts.patch"
 Content-Disposition: attachment; filename="blockdev-error-counts.patch"
 Content-Transfer-Encoding: base64
-X-Attachment-Id: f_it4qx8eo0
+X-Attachment-Id: f_it4qp3s20
 
 ZGlmZiAtLWdpdCBhL2Jsb2NrL2Jsay1jb3JlLmMgYi9ibG9jay9ibGstY29yZS5jCmluZGV4IDM2
 YzdhYzMuLmU2NzEwZTQgMTAwNjQ0Ci0tLSBhL2Jsb2NrL2Jsay1jb3JlLmMKKysrIGIvYmxvY2sv
@@ -91,4 +108,4 @@ dHJ1Y3QgZGlza19zdGF0cyB7CiAJdW5zaWduZWQgbG9uZyB0aWNrc1syXTsKIAl1bnNpZ25lZCBs
 b25nIGlvX3RpY2tzOwogCXVuc2lnbmVkIGxvbmcgdGltZV9pbl9xdWV1ZTsKKwl1bnNpZ25lZCBs
 b25nIGlvX2Vycm9yczsKIH07CiAKICNkZWZpbmUgUEFSVElUSU9OX01FVEFfSU5GT19WT0xOQU1F
 TFRICTY0Cg==
---001a11477e36adf408053c9117aa--
+--001a114b2f6a4d374f053c9100d5--
