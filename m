@@ -1,72 +1,73 @@
-Return-Path: <darrick.wong@oracle.com>
-Subject: [PATCH 1/3] block: invalidate the page cache when issuing
- BLKZEROOUT.
-From: "Darrick J. Wong" <darrick.wong@oracle.com>
-To: axboe@kernel.dk, akpm@linux-foundation.org, darrick.wong@oracle.com
-Cc: linux-block@vger.kernel.org, tytso@mit.edu, martin.petersen@oracle.com,
-        snitzer@redhat.com, linux-api@vger.kernel.org, bfoster@redhat.com,
-        xfs@oss.sgi.com, hch@infradead.org, dm-devel@redhat.com,
-        linux-fsdevel@vger.kernel.org, bart.vanassche@sandisk.com,
-        Christoph Hellwig <hch@lst.de>
-Date: Wed, 28 Sep 2016 17:39:37 -0700
-Message-ID: <147510957761.8940.14476876584539116975.stgit@birch.djwong.org>
-In-Reply-To: <147510957066.8940.13803086684642725401.stgit@birch.djwong.org>
-References: <147510957066.8940.13803086684642725401.stgit@birch.djwong.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv3 31/41] ext4: handle huge pages in ext4_page_mkwrite()
+Date: Thu, 15 Sep 2016 14:55:13 +0300
+Message-Id: <20160915115523.29737-32-kirill.shutemov@linux.intel.com>
+In-Reply-To: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
+References: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Invalidate the page cache (as a regular O_DIRECT write would do) to avoid
-returning stale cache contents at a later time.
+Trivial: remove assumption on page size.
 
-Signed-off-by: Darrick J. Wong <darrick.wong@oracle.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- block/ioctl.c |   18 ++++++++++++------
- 1 file changed, 12 insertions(+), 6 deletions(-)
+ fs/ext4/inode.c | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
 
-
-diff --git a/block/ioctl.c b/block/ioctl.c
-index ed2397f..755119c 100644
---- a/block/ioctl.c
-+++ b/block/ioctl.c
-@@ -225,7 +225,8 @@ static int blk_ioctl_zeroout(struct block_device *bdev, fmode_t mode,
- 		unsigned long arg)
+diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
+index c9c05840f6cc..9ed715ed00e7 100644
+--- a/fs/ext4/inode.c
++++ b/fs/ext4/inode.c
+@@ -5644,7 +5644,7 @@ static int ext4_bh_unmapped(handle_t *handle, struct buffer_head *bh)
+ 
+ int ext4_page_mkwrite(struct vm_area_struct *vma, struct vm_fault *vmf)
  {
- 	uint64_t range[2];
--	uint64_t start, len;
-+	struct address_space *mapping;
-+	uint64_t start, end, len;
+-	struct page *page = vmf->page;
++	struct page *page = compound_head(vmf->page);
+ 	loff_t size;
+ 	unsigned long len;
+ 	int ret;
+@@ -5680,10 +5680,10 @@ int ext4_page_mkwrite(struct vm_area_struct *vma, struct vm_fault *vmf)
+ 		goto out;
+ 	}
  
- 	if (!(mode & FMODE_WRITE))
- 		return -EBADF;
-@@ -235,18 +236,23 @@ static int blk_ioctl_zeroout(struct block_device *bdev, fmode_t mode,
- 
- 	start = range[0];
- 	len = range[1];
-+	end = start + len - 1;
- 
- 	if (start & 511)
- 		return -EINVAL;
- 	if (len & 511)
- 		return -EINVAL;
--	start >>= 9;
--	len >>= 9;
--
--	if (start + len > (i_size_read(bdev->bd_inode) >> 9))
-+	if (end >= (uint64_t)i_size_read(bdev->bd_inode))
-+		return -EINVAL;
-+	if (end < start)
- 		return -EINVAL;
- 
--	return blkdev_issue_zeroout(bdev, start, len, GFP_KERNEL, false);
-+	/* Invalidate the page cache, including dirty pages */
-+	mapping = bdev->bd_inode->i_mapping;
-+	truncate_inode_pages_range(mapping, start, end);
+-	if (page->index == size >> PAGE_SHIFT)
+-		len = size & ~PAGE_MASK;
+-	else
+-		len = PAGE_SIZE;
++	len = hpage_size(page);
++	if (page->index + hpage_nr_pages(page) - 1 == size >> PAGE_SHIFT)
++		len = size & ~hpage_mask(page);
 +
-+	return blkdev_issue_zeroout(bdev, start >> 9, len >> 9, GFP_KERNEL,
-+				    false);
- }
- 
- static int put_ushort(unsigned long arg, unsigned short val)
+ 	/*
+ 	 * Return if we have all the buffers mapped. This avoids the need to do
+ 	 * journal_start/journal_stop which can block and take a long time
+@@ -5714,7 +5714,8 @@ retry_alloc:
+ 	ret = block_page_mkwrite(vma, vmf, get_block);
+ 	if (!ret && ext4_should_journal_data(inode)) {
+ 		if (ext4_walk_page_buffers(handle, page_buffers(page), 0,
+-			  PAGE_SIZE, NULL, do_journal_get_write_access)) {
++			  hpage_size(page), NULL,
++			  do_journal_get_write_access)) {
+ 			unlock_page(page);
+ 			ret = VM_FAULT_SIGBUS;
+ 			ext4_journal_stop(handle);
+-- 
+2.9.3
+
