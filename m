@@ -1,8 +1,8 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga03.intel.com ([134.134.136.65]:7206 "EHLO mga03.intel.com"
+Received: from mga03.intel.com ([134.134.136.65]:33605 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S934380AbcIOLzw (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Sep 2016 07:55:52 -0400
+        id S934234AbcIOLzr (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 15 Sep 2016 07:55:47 -0400
 From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
 To: "Theodore Ts'o" <tytso@mit.edu>,
         Andreas Dilger <adilger.kernel@dilger.ca>,
@@ -19,76 +19,82 @@ Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         linux-block@vger.kernel.org,
         "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv3 39/41] ext4: make fallocate() operations work with huge pages
-Date: Thu, 15 Sep 2016 14:55:21 +0300
-Message-Id: <20160915115523.29737-40-kirill.shutemov@linux.intel.com>
+Subject: [PATCHv3 30/41] ext4: make ext4_writepage() work on huge pages
+Date: Thu, 15 Sep 2016 14:55:12 +0300
+Message-Id: <20160915115523.29737-31-kirill.shutemov@linux.intel.com>
 In-Reply-To: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
 References: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-__ext4_block_zero_page_range() adjusted to calculate starting iblock
-correctry for huge pages.
+Change ext4_writepage() and underlying ext4_bio_write_page().
 
-ext4_{collapse,insert}_range() requires page cache invalidation. We need
-the invalidation to be aligning to huge page border if huge pages are
-possible in page cache.
+It basically removes assumption on page size, infer it from struct page
+instead.
 
 Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- fs/ext4/extents.c | 10 ++++++++--
- fs/ext4/inode.c   |  3 +--
- 2 files changed, 9 insertions(+), 4 deletions(-)
+ fs/ext4/inode.c   | 10 +++++-----
+ fs/ext4/page-io.c | 11 +++++++++--
+ 2 files changed, 14 insertions(+), 7 deletions(-)
 
-diff --git a/fs/ext4/extents.c b/fs/ext4/extents.c
-index d7ccb7f51dfc..d46aeda70fb0 100644
---- a/fs/ext4/extents.c
-+++ b/fs/ext4/extents.c
-@@ -5525,7 +5525,10 @@ int ext4_collapse_range(struct inode *inode, loff_t offset, loff_t len)
- 	 * Need to round down offset to be aligned with page size boundary
- 	 * for page size > block size.
- 	 */
--	ioffset = round_down(offset, PAGE_SIZE);
-+	if (IS_ENABLED(CONFIG_TRANSPARENT_HUGE_PAGECACHE))
-+		ioffset = round_down(offset, HPAGE_PMD_SIZE);
-+	else
-+		ioffset = round_down(offset, PAGE_SIZE);
- 	/*
- 	 * Write tail of the last page before removed range since it will get
- 	 * removed from the page cache below.
-@@ -5674,7 +5677,10 @@ int ext4_insert_range(struct inode *inode, loff_t offset, loff_t len)
- 	 * Need to round down to align start offset to page size boundary
- 	 * for page size > block size.
- 	 */
--	ioffset = round_down(offset, PAGE_SIZE);
-+	if (IS_ENABLED(CONFIG_TRANSPARENT_HUGE_PAGECACHE))
-+		ioffset = round_down(offset, HPAGE_PMD_SIZE);
-+	else
-+		ioffset = round_down(offset, PAGE_SIZE);
- 	/* Write out all dirty pages */
- 	ret = filemap_write_and_wait_range(inode->i_mapping, ioffset,
- 			LLONG_MAX);
 diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
-index f2e34e340e65..645a984a15ef 100644
+index c6ea25a190f8..c9c05840f6cc 100644
 --- a/fs/ext4/inode.c
 +++ b/fs/ext4/inode.c
-@@ -3711,7 +3711,6 @@ void ext4_set_aops(struct inode *inode)
- static int __ext4_block_zero_page_range(handle_t *handle,
- 		struct address_space *mapping, loff_t from, loff_t length)
- {
--	ext4_fsblk_t index = from >> PAGE_SHIFT;
- 	unsigned offset;
- 	unsigned blocksize, pos;
- 	ext4_lblk_t iblock;
-@@ -3730,7 +3729,7 @@ static int __ext4_block_zero_page_range(handle_t *handle,
+@@ -2020,10 +2020,10 @@ static int ext4_writepage(struct page *page,
  
- 	blocksize = inode->i_sb->s_blocksize;
+ 	trace_ext4_writepage(page);
+ 	size = i_size_read(inode);
+-	if (page->index == size >> PAGE_SHIFT)
+-		len = size & ~PAGE_MASK;
+-	else
+-		len = PAGE_SIZE;
++
++	len = hpage_size(page);
++	if (page->index + hpage_nr_pages(page) - 1 == size >> PAGE_SHIFT)
++			len = size & ~hpage_mask(page);
  
--	iblock = index << (PAGE_SHIFT - inode->i_sb->s_blocksize_bits);
-+	iblock = page->index << (PAGE_SHIFT - inode->i_sb->s_blocksize_bits);
+ 	page_bufs = page_buffers(page);
+ 	/*
+@@ -2047,7 +2047,7 @@ static int ext4_writepage(struct page *page,
+ 				   ext4_bh_delay_or_unwritten)) {
+ 		redirty_page_for_writepage(wbc, page);
+ 		if ((current->flags & PF_MEMALLOC) ||
+-		    (inode->i_sb->s_blocksize == PAGE_SIZE)) {
++		    (inode->i_sb->s_blocksize == hpage_size(page))) {
+ 			/*
+ 			 * For memory cleaning there's no point in writing only
+ 			 * some buffers. So just bail out. Warn if we came here
+diff --git a/fs/ext4/page-io.c b/fs/ext4/page-io.c
+index a6132a730967..952957ee48b7 100644
+--- a/fs/ext4/page-io.c
++++ b/fs/ext4/page-io.c
+@@ -415,6 +415,7 @@ int ext4_bio_write_page(struct ext4_io_submit *io,
  
- 	if (!page_has_buffers(page))
- 		create_empty_buffers(page, blocksize, 0);
+ 	BUG_ON(!PageLocked(page));
+ 	BUG_ON(PageWriteback(page));
++	BUG_ON(PageTail(page));
+ 
+ 	if (keep_towrite)
+ 		set_page_writeback_keepwrite(page);
+@@ -431,8 +432,14 @@ int ext4_bio_write_page(struct ext4_io_submit *io,
+ 	 * the page size, the remaining memory is zeroed when mapped, and
+ 	 * writes to that region are not written out to the file."
+ 	 */
+-	if (len < PAGE_SIZE)
+-		zero_user_segment(page, len, PAGE_SIZE);
++	if (len < hpage_size(page)) {
++		page += len / PAGE_SIZE;
++		if (len % PAGE_SIZE)
++			zero_user_segment(page, len % PAGE_SIZE, PAGE_SIZE);
++		while (page + 1 == compound_head(page))
++			clear_highpage(++page);
++		page = compound_head(page);
++	}
+ 	/*
+ 	 * In the first loop we prepare and mark buffers to submit. We have to
+ 	 * mark all buffers in the page before submitting so that
 -- 
 2.9.3
 
