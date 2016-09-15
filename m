@@ -1,83 +1,89 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:44919 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1752429AbcIOOyP (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Sep 2016 10:54:15 -0400
-To: Linus Torvalds <torvalds@linux-foundation.org>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-From: Jens Axboe <axboe@fb.com>
-Subject: [GIT PULL] Block fixes for 4.8-rc
-Message-ID: <e3b80293-d2e2-dc21-073b-b892664dff36@fb.com>
-Date: Thu, 15 Sep 2016 08:54:03 -0600
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
+Received: from mga09.intel.com ([134.134.136.24]:40135 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S934293AbcIOLzt (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 15 Sep 2016 07:55:49 -0400
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv3 33/41] ext4: make ext4_block_write_begin() aware about huge pages
+Date: Thu, 15 Sep 2016 14:55:15 +0300
+Message-Id: <20160915115523.29737-34-kirill.shutemov@linux.intel.com>
+In-Reply-To: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
+References: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hi Linus,
+It simply matches changes to __block_write_begin_int().
 
-A set of fixes for the current series in the realm of block. Like the
-previous pull request, the meat of it are fixes for the nvme fabrics/target
-code. Outside of that, just one fix from Gabriel for not doing a queue
-suspend if we didn't get the admin queue setup in the first place.
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+---
+ fs/ext4/inode.c | 24 ++++++++++++++++--------
+ 1 file changed, 16 insertions(+), 8 deletions(-)
 
-Note that this branch contains a patch that will cause a merge conflict
-with your commit:
-
-commit bd0b841fee49de421f615cc173ccff063303672f
-Author: Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Sun Sep 11 14:41:49 2016 -0700
-
-     nvme: make NVME_RDMA depend on BLOCK
-
-since you ended up fixing that one up yourself. Apart from that, it will
-merge cleanly.
-
-Please pull!
-
-
-   git://git.kernel.dk/linux-block.git for-linus
-
-
-----------------------------------------------------------------
-Arnd Bergmann (1):
-       nvme-rdma: add back dependency on CONFIG_BLOCK
-
-Colin Ian King (1):
-       nvme-rdma: fix null pointer dereference on req->mr
-
-Gabriel Krisman Bertazi (1):
-       nvme: Don't suspend admin queue that wasn't created
-
-Jens Axboe (1):
-       Merge branch 'nvmf-4.8-rc' of 
-git://git.infradead.org/nvme-fabrics into for-linus
-
-Sagi Grimberg (1):
-       nvme-rdma: add DELETING queue flag
-
-Steve Wise (5):
-       iw_cxgb4: call dev_put() on l2t allocation failure
-       iw_cxgb4: block module unload until all ep resources are released
-       nvme_rdma: keep a ref on the ctrl during delete/flush
-       nvme-rdma: destroy nvme queue rdma resources on connect failure
-       nvme-rdma: use ib_client API to detect device removal
-
-Wenbo Wang (1):
-       nvme/quirk: Add a delay before checking device ready for memblaze 
-device
-
-  drivers/infiniband/hw/cxgb4/cm.c       |   6 +-
-  drivers/infiniband/hw/cxgb4/device.c   |   5 ++
-  drivers/infiniband/hw/cxgb4/iw_cxgb4.h |   1 +
-  drivers/nvme/host/Kconfig              |   1 +
-  drivers/nvme/host/pci.c                |   9 ++-
-  drivers/nvme/host/rdma.c               | 144 
-++++++++++++++++-----------------
-  6 files changed, 91 insertions(+), 75 deletions(-)
-
+diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
+index a07c055d8e78..31560b52eff2 100644
+--- a/fs/ext4/inode.c
++++ b/fs/ext4/inode.c
+@@ -1079,9 +1079,8 @@ int do_journal_get_write_access(handle_t *handle,
+ static int ext4_block_write_begin(struct page *page, loff_t pos, unsigned len,
+ 				  get_block_t *get_block)
+ {
+-	unsigned from = pos & (PAGE_SIZE - 1);
+-	unsigned to = from + len;
+-	struct inode *inode = page->mapping->host;
++	unsigned from, to;
++	struct inode *inode = page_mapping(page)->host;
+ 	unsigned block_start, block_end;
+ 	sector_t block;
+ 	int err = 0;
+@@ -1090,9 +1089,12 @@ static int ext4_block_write_begin(struct page *page, loff_t pos, unsigned len,
+ 	struct buffer_head *bh, *head, *wait[2], **wait_bh = wait;
+ 	bool decrypt = false;
+ 
++	page = compound_head(page);
++	from = pos & ~hpage_mask(page);
++	to = from + len;
+ 	BUG_ON(!PageLocked(page));
+-	BUG_ON(from > PAGE_SIZE);
+-	BUG_ON(to > PAGE_SIZE);
++	BUG_ON(from > hpage_size(page));
++	BUG_ON(to > hpage_size(page));
+ 	BUG_ON(from > to);
+ 
+ 	if (!page_has_buffers(page))
+@@ -1127,9 +1129,15 @@ static int ext4_block_write_begin(struct page *page, loff_t pos, unsigned len,
+ 					mark_buffer_dirty(bh);
+ 					continue;
+ 				}
+-				if (block_end > to || block_start < from)
+-					zero_user_segments(page, to, block_end,
+-							   block_start, from);
++				if (block_end > to || block_start < from) {
++					BUG_ON(to - from  > PAGE_SIZE);
++					zero_user_segments(page +
++							block_start / PAGE_SIZE,
++							to % PAGE_SIZE,
++							(block_start % PAGE_SIZE) + blocksize,
++							block_start % PAGE_SIZE,
++							from % PAGE_SIZE);
++				}
+ 				continue;
+ 			}
+ 		}
 -- 
-Jens Axboe
+2.9.3
 
