@@ -1,106 +1,65 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.9]:40398 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1763722AbcINOTm (ORCPT
+Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:47619 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1754903AbcIOQXX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 14 Sep 2016 10:19:42 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@fb.com, tglx@linutronix.de
-Cc: agordeev@redhat.com, keith.busch@intel.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 10/13] blk-mq: provide a default queue mapping for PCI device
-Date: Wed, 14 Sep 2016 16:18:56 +0200
-Message-Id: <1473862739-15032-11-git-send-email-hch@lst.de>
-In-Reply-To: <1473862739-15032-1-git-send-email-hch@lst.de>
-References: <1473862739-15032-1-git-send-email-hch@lst.de>
+        Thu, 15 Sep 2016 12:23:23 -0400
+Received: from pps.filterd (m0001303.ppops.net [127.0.0.1])
+        by m0001303.ppops.net (8.16.0.17/8.16.0.17) with SMTP id u8FGGos6009858
+        for <linux-block@vger.kernel.org>; Thu, 15 Sep 2016 09:23:22 -0700
+Received: from mail.thefacebook.com ([199.201.64.23])
+        by m0001303.ppops.net with ESMTP id 25fxrd07ws-2
+        (version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT)
+        for <linux-block@vger.kernel.org>; Thu, 15 Sep 2016 09:23:22 -0700
+Received: from facebook.com (2401:db00:11:d0a2:face:0:39:0)     by
+ mx-out.facebook.com (10.223.101.97) with ESMTP id
+ b6f164527b6011e681d924be0595f910-198f1a50 for <linux-block@vger.kernel.org>;
+        Thu, 15 Sep 2016 09:23:19 -0700
+From: Shaohua Li <shli@fb.com>
+To: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <axboe@fb.com>, <Kernel-team@fb.com>, <tj@kernel.org>,
+        <jmoyer@redhat.com>, <vgoyal@redhat.com>
+Subject: [PATCH V2 06/11] blk-throttle: make sure expire time isn't too big
+Date: Thu, 15 Sep 2016 09:23:13 -0700
+Message-ID: <c94426633627913afc86b652fe17e265e2076618.1473953743.git.shli@fb.com>
+In-Reply-To: <cover.1473953743.git.shli@fb.com>
+References: <cover.1473953743.git.shli@fb.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/Makefile             |  2 +-
- block/blk-mq-pci.c         | 45 +++++++++++++++++++++++++++++++++++++++++++++
- include/linux/blk-mq-pci.h |  9 +++++++++
- 3 files changed, 55 insertions(+), 1 deletion(-)
- create mode 100644 block/blk-mq-pci.c
- create mode 100644 include/linux/blk-mq-pci.h
+cgroup could be throttled to a limit but when all cgroups cross high
+limit, queue enters a higher state and so the group should be throttled
+to a higher limit. It's possible the cgroup is sleeping because of
+throttle and other cgroups don't dispatch IO any more. In this case,
+nobody can trigger current downgrade/upgrade logic. To fix this issue,
+we could either set up a timer to wakeup the cgroup if other cgroups are
+idle or make sure this cgroup doesn't sleep too long. Setting up a timer
+means we must change the timer very frequently. This patch chooses the
+latter. Making cgroup sleep time not too big wouldn't change cgroup
+bps/iops, but could make it wakeup more frequently, which isn't a big
+issue because throtl_slice * 8 is already quite big.
 
-diff --git a/block/Makefile b/block/Makefile
-index 9eda232..2447a0b 100644
---- a/block/Makefile
-+++ b/block/Makefile
-@@ -22,4 +22,4 @@ obj-$(CONFIG_IOSCHED_CFQ)	+= cfq-iosched.o
- obj-$(CONFIG_BLOCK_COMPAT)	+= compat_ioctl.o
- obj-$(CONFIG_BLK_CMDLINE_PARSER)	+= cmdline-parser.o
- obj-$(CONFIG_BLK_DEV_INTEGRITY) += bio-integrity.o blk-integrity.o t10-pi.o
--
-+obj-$(CONFIG_PCI)		+= blk-mq-pci.o
-diff --git a/block/blk-mq-pci.c b/block/blk-mq-pci.c
-new file mode 100644
-index 0000000..33c7bd7
---- /dev/null
-+++ b/block/blk-mq-pci.c
-@@ -0,0 +1,45 @@
-+/*
-+ * Copyright (c) 2016 Christoph Hellwig.
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-+ * more details.
-+ */
-+#include <linux/blk-mq.h>
-+#include <linux/blk-mq-pci.h>
-+#include <linux/pci.h>
-+#include <linux/module.h>
-+
-+/**
-+ * blk_mq_pci_map_queues - provide a default queue mapping for PCI device
-+ * @set:	tagset to provide the mapping for
-+ * @pdev:	PCI device associated with @set.
-+ *
-+ * This function assumes the PCI device @pdev has at least as many available
-+ * interrupt vetors as @set has queues.  It will then queuery the vector
-+ * corresponding to each queue for it's affinity mask and built queue mapping
-+ * that maps a queue to the CPUs that have irq affinity for the corresponding
-+ * vector.
-+ */
-+int blk_mq_pci_map_queues(struct blk_mq_tag_set *set, struct pci_dev *pdev)
-+{
-+	const struct cpumask *mask;
-+	unsigned int queue, cpu;
-+
-+	for (queue = 0; queue < set->nr_hw_queues; queue++) {
-+		mask = pci_irq_get_affinity(pdev, queue);
-+		if (!mask)
-+			return -EINVAL;
-+
-+		for_each_cpu(cpu, mask)
-+			set->mq_map[cpu] = queue;
-+	}
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(blk_mq_pci_map_queues);
-diff --git a/include/linux/blk-mq-pci.h b/include/linux/blk-mq-pci.h
-new file mode 100644
-index 0000000..6ab5952
---- /dev/null
-+++ b/include/linux/blk-mq-pci.h
-@@ -0,0 +1,9 @@
-+#ifndef _LINUX_BLK_MQ_PCI_H
-+#define _LINUX_BLK_MQ_PCI_H
-+
-+struct blk_mq_tag_set;
-+struct pci_dev;
-+
-+int blk_mq_pci_map_queues(struct blk_mq_tag_set *set, struct pci_dev *pdev);
-+
-+#endif /* _LINUX_BLK_MQ_PCI_H */
+Signed-off-by: Shaohua Li <shli@fb.com>
+---
+ block/blk-throttle.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index 76988f0..2bd8333 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -589,6 +589,9 @@ static void throtl_dequeue_tg(struct throtl_grp *tg)
+ static void throtl_schedule_pending_timer(struct throtl_service_queue *sq,
+ 					  unsigned long expires)
+ {
++	unsigned long max_expire = jiffies + 8 * throtl_slice;
++	if (time_after(expires, max_expire))
++		expires = max_expire;
+ 	mod_timer(&sq->pending_timer, expires);
+ 	throtl_log(sq, "schedule timer. delay=%lu jiffies=%lu",
+ 		   expires - jiffies, jiffies);
 -- 
-2.1.4
+2.8.0.rc2
 
