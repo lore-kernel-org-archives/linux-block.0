@@ -1,349 +1,157 @@
-Return-Path: <Damien.LeMoal@hgst.com>
-From: Damien Le Moal <damien.lemoal@hgst.com>
-To: <linux-scsi@vger.kernel.org>, <linux-block@vger.kernel.org>
-CC: <martin.petersen@oracle.com>, <axboe@kernel.dk>, <hare@suse.de>,
-	<shaun.tancheff@seagate.com>, Damien Le Moal <damien.lemoal@hgst.com>
-Subject: [PATCH 9/9] blk-zoned: Add ioctl interface for zone operations
-Date: Tue, 20 Sep 2016 06:27:34 +0900
-Message-ID: <1474320454-5264-10-git-send-email-damien.lemoal@hgst.com>
-In-Reply-To: <1474320454-5264-1-git-send-email-damien.lemoal@hgst.com>
-References: <1474320454-5264-1-git-send-email-damien.lemoal@hgst.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: damien.lemoal@hgst.com
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv3 23/41] fs: make block_read_full_page() be able to read huge page
+Date: Thu, 15 Sep 2016 14:55:05 +0300
+Message-Id: <20160915115523.29737-24-kirill.shutemov@linux.intel.com>
+In-Reply-To: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
+References: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-From: Shaun Tancheff <shaun.tancheff@seagate.com>
+The approach is straight-forward: for compound pages we read out whole
+huge page.
 
-Adds the new BLKUPDATEZONES, BLKREPORTZONE, BLKRESETZONE,
-BLKOPENZONE, BLKCLOSEZONE and BLKFINISHZONE ioctls.
+For huge page we cannot have array of buffer head pointers on stack --
+it's 4096 pointers on x86-64 -- 'arr' is allocated with kmalloc() for
+huge pages.
 
-BLKREPORTZONE implementation uses the device queue zone RB-tree by
-default and no actual command is issued to the device. If the
-application needs access to the untracked zone attributes (non-seq
-flag or reset recommended flag, offline or read-only zone condition,
-etc), BLKUPDATEZONES must be issued first to force an update of the
-cached zone information.
-
-Changelog (Damien):
-* Simplified blkzone descriptor (removed bit-fields and use CPU
-  endianness)
-* Changed report ioctl to operate on single zone instead of an
-  array of blkzone structures.
-
-Signed-off-by: Shaun Tancheff <shaun.tancheff@seagate.com>
-Signed-off-by: Damien Le Moal <damien.lemoal@hgst.com>
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- block/blk-zoned.c             | 115 ++++++++++++++++++++++++++++++++++++++++++
- block/ioctl.c                 |   8 +++
- include/linux/blkdev.h        |   7 +++
- include/uapi/linux/Kbuild     |   1 +
- include/uapi/linux/blkzoned.h |  91 +++++++++++++++++++++++++++++++++
- include/uapi/linux/fs.h       |   1 +
- 6 files changed, 223 insertions(+)
- create mode 100644 include/uapi/linux/blkzoned.h
+ fs/buffer.c                 | 22 +++++++++++++++++-----
+ include/linux/buffer_head.h |  9 +++++----
+ include/linux/page-flags.h  |  2 +-
+ 3 files changed, 23 insertions(+), 10 deletions(-)
 
-diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index a107940..71205c8 100644
---- a/block/blk-zoned.c
-+++ b/block/blk-zoned.c
-@@ -12,6 +12,7 @@
- #include <linux/module.h>
- #include <linux/rbtree.h>
- #include <linux/blkdev.h>
-+#include <linux/blkzoned.h>
+diff --git a/fs/buffer.c b/fs/buffer.c
+index 9c8eb9b6db6a..2739f5dae690 100644
+--- a/fs/buffer.c
++++ b/fs/buffer.c
+@@ -870,7 +870,7 @@ struct buffer_head *alloc_page_buffers(struct page *page, unsigned long size,
  
- void blk_init_zones(struct request_queue *q)
+ try_again:
+ 	head = NULL;
+-	offset = PAGE_SIZE;
++	offset = hpage_size(page);
+ 	while ((offset -= size) >= 0) {
+ 		bh = alloc_buffer_head(GFP_NOFS);
+ 		if (!bh)
+@@ -1466,7 +1466,7 @@ void set_bh_page(struct buffer_head *bh,
+ 		struct page *page, unsigned long offset)
  {
-@@ -336,3 +337,117 @@ int blkdev_finish_zone(struct block_device *bdev,
- 	return blkdev_issue_zone_action(bdev, sector, REQ_OP_ZONE_FINISH,
- 					gfp_mask);
+ 	bh->b_page = page;
+-	BUG_ON(offset >= PAGE_SIZE);
++	BUG_ON(offset >= hpage_size(page));
+ 	if (PageHighMem(page))
+ 		/*
+ 		 * This catches illegal uses and preserves the offset:
+@@ -2239,11 +2239,13 @@ int block_read_full_page(struct page *page, get_block_t *get_block)
+ {
+ 	struct inode *inode = page->mapping->host;
+ 	sector_t iblock, lblock;
+-	struct buffer_head *bh, *head, *arr[MAX_BUF_PER_PAGE];
++	struct buffer_head *arr_on_stack[MAX_BUF_PER_PAGE];
++	struct buffer_head *bh, *head, **arr = arr_on_stack;
+ 	unsigned int blocksize, bbits;
+ 	int nr, i;
+ 	int fully_mapped = 1;
+ 
++	VM_BUG_ON_PAGE(PageTail(page), page);
+ 	head = create_page_buffers(page, inode, 0);
+ 	blocksize = head->b_size;
+ 	bbits = block_size_bits(blocksize);
+@@ -2254,6 +2256,11 @@ int block_read_full_page(struct page *page, get_block_t *get_block)
+ 	nr = 0;
+ 	i = 0;
+ 
++	if (PageTransHuge(page)) {
++		arr = kmalloc(sizeof(struct buffer_head *) * HPAGE_PMD_NR *
++				MAX_BUF_PER_PAGE, GFP_NOFS);
++	}
++
+ 	do {
+ 		if (buffer_uptodate(bh))
+ 			continue;
+@@ -2269,7 +2276,9 @@ int block_read_full_page(struct page *page, get_block_t *get_block)
+ 					SetPageError(page);
+ 			}
+ 			if (!buffer_mapped(bh)) {
+-				zero_user(page, i * blocksize, blocksize);
++				zero_user(page + (i * blocksize / PAGE_SIZE),
++						i * blocksize % PAGE_SIZE,
++						blocksize);
+ 				if (!err)
+ 					set_buffer_uptodate(bh);
+ 				continue;
+@@ -2295,7 +2304,7 @@ int block_read_full_page(struct page *page, get_block_t *get_block)
+ 		if (!PageError(page))
+ 			SetPageUptodate(page);
+ 		unlock_page(page);
+-		return 0;
++		goto out;
+ 	}
+ 
+ 	/* Stage two: lock the buffers */
+@@ -2317,6 +2326,9 @@ int block_read_full_page(struct page *page, get_block_t *get_block)
+ 		else
+ 			submit_bh(REQ_OP_READ, 0, bh);
+ 	}
++out:
++	if (arr != arr_on_stack)
++		kfree(arr);
+ 	return 0;
  }
-+
-+static int blkdev_report_zone_ioctl(struct block_device *bdev,
-+				    void __user *argp)
-+{
-+	struct blk_zone *zone;
-+	struct blkzone z;
-+
-+	if (copy_from_user(&z, argp, sizeof(struct blkzone)))
-+		return -EFAULT;
-+
-+	zone = blk_lookup_zone(bdev_get_queue(bdev), z.start);
-+	if (!zone)
-+		return -EINVAL;
-+
-+	memset(&z, 0, sizeof(struct blkzone));
-+
-+	blk_lock_zone(zone);
-+
-+	blk_wait_for_zone_update(zone);
-+
-+	z.len = zone->len;
-+	z.start = zone->start;
-+	z.wp = zone->wp;
-+	z.type = zone->type;
-+	z.cond = zone->cond;
-+	z.non_seq = zone->non_seq;
-+	z.reset = zone->reset;
-+
-+	blk_unlock_zone(zone);
-+
-+	if (copy_to_user(argp, &z, sizeof(struct blkzone)))
-+		return -EFAULT;
-+
-+	return 0;
-+}
-+
-+static int blkdev_zone_action_ioctl(struct block_device *bdev,
-+				    unsigned cmd, void __user *argp)
-+{
-+	unsigned int op;
-+	u64 sector;
-+
-+	if (get_user(sector, (u64 __user *)argp))
-+		return -EFAULT;
-+
-+	switch (cmd) {
-+	case BLKRESETZONE:
-+		op = REQ_OP_ZONE_RESET;
-+		break;
-+	case BLKOPENZONE:
-+		op = REQ_OP_ZONE_OPEN;
-+		break;
-+	case BLKCLOSEZONE:
-+		op = REQ_OP_ZONE_CLOSE;
-+		break;
-+	case BLKFINISHZONE:
-+		op = REQ_OP_ZONE_FINISH;
-+		break;
-+	}
-+
-+	return blkdev_issue_zone_action(bdev, sector, op, GFP_KERNEL);
-+}
-+
-+/**
-+ * Called from blkdev_ioctl.
-+ */
-+int blkdev_zone_ioctl(struct block_device *bdev, fmode_t mode,
-+		      unsigned cmd, unsigned long arg)
-+{
-+	void __user *argp = (void __user *)arg;
-+	struct request_queue *q;
-+	int ret;
-+
-+	if (!argp)
-+		return -EINVAL;
-+
-+	q = bdev_get_queue(bdev);
-+	if (!q)
-+		return -ENXIO;
-+
-+	if (!blk_queue_zoned(q))
-+		return -ENOTTY;
-+
-+	if (!capable(CAP_SYS_ADMIN))
-+		return -EACCES;
-+
-+	switch (cmd) {
-+	case BLKREPORTZONE:
-+		ret = blkdev_report_zone_ioctl(bdev, argp);
-+		break;
-+	case BLKUPDATEZONES:
-+		if (!(mode & FMODE_WRITE)) {
-+			ret = -EBADF;
-+			break;
-+		}
-+		ret = blkdev_update_zones(bdev, GFP_KERNEL);
-+		break;
-+	case BLKRESETZONE:
-+	case BLKOPENZONE:
-+	case BLKCLOSEZONE:
-+	case BLKFINISHZONE:
-+		if (!(mode & FMODE_WRITE)) {
-+			ret = -EBADF;
-+			break;
-+		}
-+		ret = blkdev_zone_action_ioctl(bdev, cmd, argp);
-+		break;
-+	default:
-+		ret = -ENOTTY;
-+		break;
-+	}
-+
-+	return ret;
-+}
-diff --git a/block/ioctl.c b/block/ioctl.c
-index ed2397f..f09679a 100644
---- a/block/ioctl.c
-+++ b/block/ioctl.c
-@@ -3,6 +3,7 @@
- #include <linux/export.h>
- #include <linux/gfp.h>
- #include <linux/blkpg.h>
-+#include <linux/blkzoned.h>
- #include <linux/hdreg.h>
- #include <linux/backing-dev.h>
- #include <linux/fs.h>
-@@ -513,6 +514,13 @@ int blkdev_ioctl(struct block_device *bdev, fmode_t mode, unsigned cmd,
- 				BLKDEV_DISCARD_SECURE);
- 	case BLKZEROOUT:
- 		return blk_ioctl_zeroout(bdev, mode, arg);
-+	case BLKUPDATEZONES:
-+	case BLKREPORTZONE:
-+	case BLKRESETZONE:
-+	case BLKOPENZONE:
-+	case BLKCLOSEZONE:
-+	case BLKFINISHZONE:
-+		return blkdev_zone_ioctl(bdev, mode, cmd, arg);
- 	case HDIO_GETGEO:
- 		return blkdev_getgeo(bdev, argp);
- 	case BLKRAGET:
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index a85f95b..0299d41 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -405,9 +405,16 @@ extern int blkdev_reset_zone(struct block_device *, sector_t, gfp_t);
- extern int blkdev_open_zone(struct block_device *, sector_t, gfp_t);
- extern int blkdev_close_zone(struct block_device *, sector_t, gfp_t);
- extern int blkdev_finish_zone(struct block_device *, sector_t, gfp_t);
-+extern int blkdev_zone_ioctl(struct block_device *, fmode_t, unsigned int,
-+			     unsigned long);
- #else /* CONFIG_BLK_DEV_ZONED */
- static inline void blk_init_zones(struct request_queue *q) { };
- static inline void blk_drop_zones(struct request_queue *q) { };
-+static inline int blkdev_zone_ioctl(struct block_device *bdev, fmode_t mode,
-+				    unsigned cmd, unsigned long arg)
-+{
-+	return -ENOTTY;
-+}
- #endif /* CONFIG_BLK_DEV_ZONED */
+ EXPORT_SYMBOL(block_read_full_page);
+diff --git a/include/linux/buffer_head.h b/include/linux/buffer_head.h
+index 006a8a42acfb..194a85822d5f 100644
+--- a/include/linux/buffer_head.h
++++ b/include/linux/buffer_head.h
+@@ -131,13 +131,14 @@ BUFFER_FNS(Meta, meta)
+ BUFFER_FNS(Prio, prio)
+ BUFFER_FNS(Defer_Completion, defer_completion)
  
- struct request_queue {
-diff --git a/include/uapi/linux/Kbuild b/include/uapi/linux/Kbuild
-index 185f8ea..a2a7522 100644
---- a/include/uapi/linux/Kbuild
-+++ b/include/uapi/linux/Kbuild
-@@ -70,6 +70,7 @@ header-y += bfs_fs.h
- header-y += binfmts.h
- header-y += blkpg.h
- header-y += blktrace_api.h
-+header-y += blkzoned.h
- header-y += bpf_common.h
- header-y += bpf.h
- header-y += bpqether.h
-diff --git a/include/uapi/linux/blkzoned.h b/include/uapi/linux/blkzoned.h
-new file mode 100644
-index 0000000..23a2702
---- /dev/null
-+++ b/include/uapi/linux/blkzoned.h
-@@ -0,0 +1,91 @@
-+/*
-+ * Zoned block devices handling.
-+ *
-+ * Copyright (C) 2015 Seagate Technology PLC
-+ *
-+ * Written by: Shaun Tancheff <shaun.tancheff@seagate.com>
-+ *
-+ * Modified by: Damien Le Moal <damien.lemoal@hgst.com>
-+ * Copyright (C) 2016 Western Digital
-+ *
-+ * This file is licensed under  the terms of the GNU General Public
-+ * License version 2. This program is licensed "as is" without any
-+ * warranty of any kind, whether express or implied.
-+ */
-+#ifndef _UAPI_BLKZONED_H
-+#define _UAPI_BLKZONED_H
-+
-+#include <linux/types.h>
-+#include <linux/ioctl.h>
-+
-+/*
-+ * Zone type.
-+ */
-+enum blkzone_type {
-+	BLKZONE_TYPE_UNKNOWN,
-+	BLKZONE_TYPE_CONVENTIONAL,
-+	BLKZONE_TYPE_SEQWRITE_REQ,
-+	BLKZONE_TYPE_SEQWRITE_PREF,
-+};
-+
-+/*
-+ * Zone condition.
-+ */
-+enum blkzone_cond {
-+	BLKZONE_COND_NO_WP,
-+	BLKZONE_COND_EMPTY,
-+	BLKZONE_COND_IMP_OPEN,
-+	BLKZONE_COND_EXP_OPEN,
-+	BLKZONE_COND_CLOSED,
-+	BLKZONE_COND_READONLY = 0xd,
-+	BLKZONE_COND_FULL,
-+	BLKZONE_COND_OFFLINE,
-+};
-+
-+/*
-+ * Zone descriptor for BLKREPORTZONE.
-+ * start, len and wp use the regulare 512 B sector unit,
-+ * regardless of the device logical block size. The overall
-+ * structure size is 64 B to match the ZBC/ZAC defined zone descriptor
-+ * and allow support for future additional zone information.
-+ */
-+struct blkzone {
-+       __u64 	start;	 	/* Zone start sector */
-+       __u64 	len;	 	/* Zone length in number of sectors */
-+       __u64 	wp;	 	/* Zone write pointer position */
-+       __u8	type;		/* Zone type */
-+       __u8	cond;		/* Zone condition */
-+       __u8	non_seq;	/* Non-sequential write resources active */
-+       __u8	reset;		/* Reset write pointer recommended */
-+       __u8 	reserved[36];
-+};
-+
-+/*
-+ * Zone ioctl's:
-+ *
-+ * BLKUPDATEZONES	: Force update of all zones information
-+ * BLKREPORTZONE	: Get a zone descriptor. Takes a zone descriptor as
-+ *                        argument. The zone to report is the one
-+ *                        containing the sector initially specified in the
-+ *                        descriptor start field.
-+ * BLKRESETZONE		: Reset the write pointer of the zone containing the
-+ *                        specified sector, or of all written zones if the
-+ *                        sector is ~0ull.
-+ * BLKOPENZONE		: Explicitely open the zone containing the
-+ *                        specified sector, or all possible zones if the
-+ *                        sector is ~0ull (the drive determines which zone
-+ *                        to open in this case).
-+ * BLKCLOSEZONE		: Close the zone containing the specified sector, or
-+ *                        all open zones if the sector is ~0ull.
-+ * BLKFINISHZONE	: Finish the zone (make it full) containing the
-+ *                        specified sector, or all open and closed zones if
-+ *                        the sector is ~0ull.
-+ */
-+#define BLKUPDATEZONES	_IO(0x12,130)
-+#define BLKREPORTZONE 	_IOWR(0x12,131,struct blkzone)
-+#define BLKRESETZONE 	_IOW(0x12,132,unsigned long long)
-+#define BLKOPENZONE 	_IOW(0x12,133,unsigned long long)
-+#define BLKCLOSEZONE 	_IOW(0x12,134,unsigned long long)
-+#define BLKFINISHZONE 	_IOW(0x12,135,unsigned long long)
-+
-+#endif /* _UAPI_BLKZONED_H */
-diff --git a/include/uapi/linux/fs.h b/include/uapi/linux/fs.h
-index 3b00f7c..1db6d66 100644
---- a/include/uapi/linux/fs.h
-+++ b/include/uapi/linux/fs.h
-@@ -222,6 +222,7 @@ struct fsxattr {
- #define BLKSECDISCARD _IO(0x12,125)
- #define BLKROTATIONAL _IO(0x12,126)
- #define BLKZEROOUT _IO(0x12,127)
-+/* A jump here: 130-135 are used for zoned block devices (see uapi/linux/blkzoned.h) */
+-#define bh_offset(bh)		((unsigned long)(bh)->b_data & ~PAGE_MASK)
++#define bh_offset(bh)	((unsigned long)(bh)->b_data & ~hpage_mask(bh->b_page))
  
- #define BMAP_IOCTL 1		/* obsolete - kept for compatibility */
- #define FIBMAP	   _IO(0x00,1)	/* bmap access */
+ /* If we *know* page->private refers to buffer_heads */
+-#define page_buffers(page)					\
++#define page_buffers(__page)					\
+ 	({							\
+-		BUG_ON(!PagePrivate(page));			\
+-		((struct buffer_head *)page_private(page));	\
++		struct page *p = compound_head(__page);		\
++		BUG_ON(!PagePrivate(p));			\
++		((struct buffer_head *)page_private(p));	\
+ 	})
+ #define page_has_buffers(page)	PagePrivate(page)
+ 
+diff --git a/include/linux/page-flags.h b/include/linux/page-flags.h
+index a2bef9a41bcf..20b7684e9298 100644
+--- a/include/linux/page-flags.h
++++ b/include/linux/page-flags.h
+@@ -730,7 +730,7 @@ static inline void ClearPageSlabPfmemalloc(struct page *page)
+  */
+ static inline int page_has_private(struct page *page)
+ {
+-	return !!(page->flags & PAGE_FLAGS_PRIVATE);
++	return !!(compound_head(page)->flags & PAGE_FLAGS_PRIVATE);
+ }
+ 
+ #undef PF_ANY
 -- 
-2.7.4
+2.9.3
 
-Western Digital Corporation (and its subsidiaries) E-mail Confidentiality Notice & Disclaimer:
-
-This e-mail and any files transmitted with it may contain confidential or legally privileged information of WDC and/or its affiliates, and are intended solely for the use of the individual or entity to which they are addressed. If you are not the intended recipient, any disclosure, copying, distribution or any action taken or omitted to be taken in reliance on it, is prohibited. If you have received this e-mail in error, please notify the sender immediately and delete the e-mail in its entirety from your system.
