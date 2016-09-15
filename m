@@ -1,39 +1,61 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from szxga01-in.huawei.com ([58.251.152.64]:1444 "EHLO
-        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750784AbcIWExl (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Sep 2016 00:53:41 -0400
-From: Yunlong Song <yunlong.song@huawei.com>
-To: <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
-        <sylinux@163.com>, <yunlong.song@huawei.com>
-CC: <bintian.wang@huawei.com>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH] block: Change BIO_RESET_BITS to current proper value
-Date: Fri, 23 Sep 2016 13:03:44 +0800
-Message-ID: <1474607024-21240-1-git-send-email-yunlong.song@huawei.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv3 35/41] ext4: make ext4_da_page_release_reservation() aware about huge pages
+Date: Thu, 15 Sep 2016 14:55:17 +0300
+Message-Id: <20160915115523.29737-36-kirill.shutemov@linux.intel.com>
+In-Reply-To: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
+References: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Yunlong Song <yunlong.song@huawei.com>
+For huge pages 'stop' must be within HPAGE_PMD_SIZE.
+Let's use hpage_size() in the BUG_ON().
+
+We also need to change how we calculate lblk for cluster deallocation.
+
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- include/linux/blk_types.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ fs/ext4/inode.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 436f43f..b7221b3 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -117,7 +117,7 @@ struct bio {
-  * Flags starting here get preserved by bio_reset() - this includes
-  * BVEC_POOL_IDX()
-  */
--#define BIO_RESET_BITS	10
-+#define BIO_RESET_BITS	9
+diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
+index deacd3499ec7..6a8da1a8409c 100644
+--- a/fs/ext4/inode.c
++++ b/fs/ext4/inode.c
+@@ -1558,7 +1558,7 @@ static void ext4_da_page_release_reservation(struct page *page,
+ 	int num_clusters;
+ 	ext4_fsblk_t lblk;
  
- /*
-  * We support 6 different bvec pools, the last one is magic in that it
+-	BUG_ON(stop > PAGE_SIZE || stop < length);
++	BUG_ON(stop > hpage_size(page) || stop < length);
+ 
+ 	head = page_buffers(page);
+ 	bh = head;
+@@ -1593,7 +1593,8 @@ static void ext4_da_page_release_reservation(struct page *page,
+ 	 * need to release the reserved space for that cluster. */
+ 	num_clusters = EXT4_NUM_B2C(sbi, to_release);
+ 	while (num_clusters > 0) {
+-		lblk = (page->index << (PAGE_SHIFT - inode->i_blkbits)) +
++		lblk = ((page->index + offset / PAGE_SIZE) <<
++				(PAGE_SHIFT - inode->i_blkbits)) +
+ 			((num_clusters - 1) << sbi->s_cluster_bits);
+ 		if (sbi->s_cluster_ratio == 1 ||
+ 		    !ext4_find_delalloc_cluster(inode, lblk))
 -- 
-1.8.5.2
+2.9.3
 
