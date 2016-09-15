@@ -1,133 +1,123 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:55828 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S934171AbcIOOIJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Sep 2016 10:08:09 -0400
+Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:36534 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S934132AbcION6m (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 15 Sep 2016 09:58:42 -0400
 Subject: Re: [Nbd] [RESEND][PATCH 0/5] nbd improvements
-To: Eric Blake <eblake@redhat.com>, Alex Bligh <alex@alex.org.uk>,
-        Wouter Verhelst <w@uter.be>, Josef Bacik <jbacik@fb.com>
-References: <1473369130-22986-1-git-send-email-jbacik@fb.com>
- <20160909200203.phhvodsfs7ymukfp@grep.be>
- <20160915104935.ohuwgq2chsedz6fl@grep.be>
- <27B346AF-F144-4770-BE38-446A66E71326@alex.org.uk>
- <8dd28f8b-0a3c-4112-ca6d-a9ad080d5920@redhat.com>
-Cc: linux-block@vger.kernel.org, Markus Pargmann <mpa@pengutronix.de>,
-        kernel-team@fb.com,
+To: Wouter Verhelst <w@uter.be>, Alex Bligh <alex@alex.org.uk>
+References: <20160915113807.GA23259@infradead.org>
+ <20160915115514.7hba23nqvvwfhb5z@grep.be>
+ <20160915120125.GA31044@infradead.org>
+ <20160915122120.4h3ykbewaavjk5nx@grep.be>
+ <20160915122304.GA15501@infradead.org>
+ <2ABB8966-5C20-45A7-BB4C-6882F042905D@alex.org.uk>
+ <20160915123646.GA10394@infradead.org>
+ <C48DD624-6EDF-4EED-B474-8BEA021F00F0@alex.org.uk>
+ <20160915124103.GA20657@infradead.org>
+ <DA0880DA-700F-4989-9326-68F5F7A55F25@alex.org.uk>
+ <20160915131741.cth6kilmcgnobbuu@grep.be>
+CC: Christoph Hellwig <hch@infradead.org>,
         "nbd-general@lists.sourceforge.net"
         <nbd-general@lists.sourceforge.net>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f4756e27-9814-477c-2d03-e7373154c3b7@redhat.com>
-Date: Thu, 15 Sep 2016 16:07:54 +0200
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, <mpa@pengutronix.de>,
+        <kernel-team@fb.com>
+From: Josef Bacik <jbacik@fb.com>
+Message-ID: <93b5c669-fbcf-e972-fc4d-3b08f1c76299@fb.com>
+Date: Thu, 15 Sep 2016 09:57:25 -0400
 MIME-Version: 1.0
-In-Reply-To: <8dd28f8b-0a3c-4112-ca6d-a9ad080d5920@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="4FHCt7GDgNSjApphcH50D1MAse9DfrJ9V"
+In-Reply-To: <20160915131741.cth6kilmcgnobbuu@grep.be>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---4FHCt7GDgNSjApphcH50D1MAse9DfrJ9V
-Content-Type: multipart/mixed; boundary="RTloq5xUGAeDHeQsHCk68u2trL1mfauWL";
- protected-headers="v1"
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: Eric Blake <eblake@redhat.com>, Alex Bligh <alex@alex.org.uk>,
- Wouter Verhelst <w@uter.be>, Josef Bacik <jbacik@fb.com>
-Cc: linux-block@vger.kernel.org, Markus Pargmann <mpa@pengutronix.de>,
- kernel-team@fb.com,
- "nbd-general@lists.sourceforge.net" <nbd-general@lists.sourceforge.net>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Message-ID: <f4756e27-9814-477c-2d03-e7373154c3b7@redhat.com>
-Subject: Re: [Nbd] [RESEND][PATCH 0/5] nbd improvements
-References: <1473369130-22986-1-git-send-email-jbacik@fb.com>
- <20160909200203.phhvodsfs7ymukfp@grep.be>
- <20160915104935.ohuwgq2chsedz6fl@grep.be>
- <27B346AF-F144-4770-BE38-446A66E71326@alex.org.uk>
- <8dd28f8b-0a3c-4112-ca6d-a9ad080d5920@redhat.com>
-In-Reply-To: <8dd28f8b-0a3c-4112-ca6d-a9ad080d5920@redhat.com>
-
---RTloq5xUGAeDHeQsHCk68u2trL1mfauWL
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-
-
-On 15/09/2016 15:34, Eric Blake wrote:
-> On 09/15/2016 06:09 AM, Alex Bligh wrote:
+On 09/15/2016 09:17 AM, Wouter Verhelst wrote:
+> On Thu, Sep 15, 2016 at 01:44:29PM +0100, Alex Bligh wrote:
 >>
->> I also wonder whether any servers that can do caching per
->> connection will always share a consistent cache between=20
->> connections. The one I'm worried about in particular here
->> is qemu-nbd - Eric Blake CC'd.
+>>> On 15 Sep 2016, at 13:41, Christoph Hellwig <hch@infradead.org> wrote:
+>>>
+>>> On Thu, Sep 15, 2016 at 01:39:11PM +0100, Alex Bligh wrote:
+>>>> That's probably right in the case of file-based back ends that
+>>>> are running on a Linux OS. But gonbdserver for instance supports
+>>>> (e.g.) Ceph based backends, where each connection might be talking
+>>>> to a completely separate ceph node, and there may be no cache
+>>>> consistency between connections.
+>>>
+>>> Yes, if you don't have a cache coherent backend you are generally
+>>> screwed with a multiqueue protocol.
 >>
->=20
-> I doubt that qemu-nbd would ever want to support the situation with mor=
-e
-> than one client connection writing to the same image at the same time;
-> the implications of sorting out data consistency between multiple
-> writers is rather complex and not worth coding into qemu.  So I think
-> qemu would probably prefer to just prohibit the multiple writer
-> situation.  And while multiple readers with no writer should be fine,
-> I'm not even sure if multiple readers plus one writer can always be mad=
-e
-> to appear sane (if there is no coordination between the different
-> connections, on an image where the writer changes AA to BA then flushes=
+>> I wonder if the ability to support multiqueue should be visible
+>> in the negotiation stage. That would allow the client to refuse
+>> to select multiqueue where it isn't safe.
+>
+> The server can always refuse to allow multiple connections.
+>
+> I was thinking of changing the spec as follows:
+>
+> diff --git a/doc/proto.md b/doc/proto.md
+> index 217f57e..cb099e2 100644
+> --- a/doc/proto.md
+> +++ b/doc/proto.md
+> @@ -308,6 +308,23 @@ specification, the
+>  [kernel documentation](https://www.kernel.org/doc/Documentation/block/writeback_cache_control.txt)
+>  may be useful.
+>
+> +For performance reasons, clients MAY open multiple connections to the
+> +same server. To support such clients, servers SHOULD ensure that at
+> +least one of the following conditions hold:
+> +
+> +* Flush commands are processed for ALL connections. That is, when an
+> +  `NBD_CMD_WRITE` is processed on one connection, and then an
+> +  `NBD_CMD_FLUSH` is processed on another connection, the data of the
+> +  `NBD_CMD_WRITE` on the first connection MUST reach permanent storage
+> +  before the reply of the `NBD_CMD_FLUSH` is sent.
+> +* The server allows `NBD_CMD_WRITE` and `NBD_CMD_FLUSH` on at most one
+> +  connection
+> +* Multiple connections are not allowed
+> +
+> +In addition, clients using multiple connections SHOULD NOT send
+> +`NBD_CMD_FLUSH` if an `NBD_CMD_WRITE` for which they care in relation to
+> +the flush has not been replied to yet.
+> +
+>  #### Request message
+>
+>  The request message, sent by the client, looks as follows:
+>
+> The latter bit (on the client side) is because even if your backend has
+> no cache coherency issues, TCP does not guarantee ordering between
+> multiple connections. I don't know if the above is in line with what
+> blk-mq does, but consider the following scenario:
+>
+> - A client sends two writes to the server, followed (immediately) by a
+>   flush, where at least the second write and the flush are not sent over
+>   the same connection.
+> - The first write is a small one, and it is handled almost immediately.
+> - The second write takes a little longer, so the flush is handled
+>   earlier than the second write
+> - The network packet containing the flush reply gets lost for whatever
+>   reason, so the client doesn't get it, and we fall into TCP
+>   retransmits.
+> - The second write finishes, and its reply header does not get lost
+> - After the second write reply reaches the client, the TCP retransmits
+>   for the flush reply are handled.
+>
+> In the above scenario, the flush reply arrives on the client side after
+> a write reply which it did not cover; so the client will (incorrectly)
+> assume that the write has reached permanent storage when in fact it may
+> not have done so yet.
 
-> then changes to BB, it is still feasible that a reader could see AB
-> (pre-flush state of the first sector, post-flush changes to the second
-> sector, even though the writer never flushed that particular content to=
+This isn't an NBD problem, this is an application problem.  The application must 
+wait for all writes it cares about _before_ issuing a flush.  This is the same 
+as for normal storage as it is for NBD.  It is not NBD's responsibility to 
+maintain coherency between multiple requests across connections, just simply to 
+act on and respond to requests.
 
-> disk).
->=20
-> But Paolo Bonzini (cc'd) may have more insight on qemu's NBD server and=
+I think changing the specification to indicate that this is the case for 
+multiple connections is a good thing, to keep NBD servers from doing weird 
+things like sending different connections to the same export to different 
+backing stores without some sort of synchronization.  It should definitely be 
+explicitly stated somewhere that NBD does not provide any ordering guarantees 
+and that is up to the application.  Thanks,
 
-> what it supports (or forbids) in the way of multiple clients to a singl=
-e
-> server.
-
-I don't think QEMU forbids multiple clients to the single server, and
-guarantees consistency as long as there is no overlap between writes and
-reads.  These are the same guarantees you have for multiple commands on
-a single connection.
-
-In other words, from the POV of QEMU there's no difference whether
-multiple commands come from one or more connections.
-
-Paolo
-
->> A more general point is that with multiple queues requests
->> may be processed in a different order even by those servers that
->> currently process the requests in strict order, or in something
->> similar to strict order. The server is permitted by the spec
->> (save as mandated by NBD_CMD_FLUSH and NBD_CMD_FLAG_FUA) to
->> process commands out of order anyway, but I suspect this has
->> to date been little tested.
->=20
-> qemu-nbd is definitely capable of serving reads and writes out-of-order=
-
-> to a single connection client; but that's different than the case with
-> multiple connections.
->=20
-
-
---RTloq5xUGAeDHeQsHCk68u2trL1mfauWL--
-
---4FHCt7GDgNSjApphcH50D1MAse9DfrJ9V
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQEcBAEBCAAGBQJX2qs/AAoJEL/70l94x66DZqYIAIht6TgcoSaZfQXWM2fYv2kc
-0lxbS4+detutAwkcgMh3hWUUY5WDLCQDuCHRbF6WubXU9SwdzWNEZeUnjKY60Y2V
-VclfxrMiUwyvhYVLTV+oJDcXzNSyXh80o3rpcb9e+zBVofIs7IlQJtkzLo6/7Bqp
-tHMQjKtS4lSDz4pI213/VD4DUS3kpJ7zsCwQULSu+QDs+vWLbeWPXJaB3IQ1OOSl
-kPpcG8Xs+HIqJfUHFxnTWO6M7yIbP93zvW6Z5e1aiPjhHdSqRSUHRVApGY3iLYSm
-PJuq1rK9D+qLWY6qdQ6SbZV+U/WdZxxrXtWSkvXK9QvDRSZIuqw2FzwKG9VkLA0=
-=vRxL
------END PGP SIGNATURE-----
-
---4FHCt7GDgNSjApphcH50D1MAse9DfrJ9V--
+Josef
