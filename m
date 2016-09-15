@@ -1,69 +1,69 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:47272 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S933652AbcI3NXv (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Sep 2016 09:23:51 -0400
-From: Alexander Gordeev <agordeev@redhat.com>
-To: linux-kernel@vger.kernel.org
-Cc: Alexander Gordeev <agordeev@redhat.com>,
-        linux-block@vger.kernel.org
-Subject: [PATCH v2 7/8] blk-mq: Pair blk_mq_hctx_kobj_init() with blk_mq_hctx_kobj_put()
-Date: Fri, 30 Sep 2016 15:23:29 +0200
-Message-Id: <ae5b727341240a974b6b2cbd91b98eb85f9aef53.1475241231.git.agordeev@redhat.com>
-In-Reply-To: <cover.1475241231.git.agordeev@redhat.com>
-References: <cover.1475241231.git.agordeev@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv3 22/41] thp: do not threat slab pages as huge in hpage_{nr_pages,size,mask}
+Date: Thu, 15 Sep 2016 14:55:04 +0300
+Message-Id: <20160915115523.29737-23-kirill.shutemov@linux.intel.com>
+In-Reply-To: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
+References: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-CC: linux-block@vger.kernel.org
-Signed-off-by: Alexander Gordeev <agordeev@redhat.com>
+Slab pages can be compound, but we shouldn't threat them as THP for
+pupose of hpage_* helpers, otherwise it would lead to confusing results.
+
+For instance, ext4 uses slab pages for journal pages and we shouldn't
+confuse them with THPs. The easiest way is to exclude them in hpage_*
+helpers.
+
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- block/blk-mq-sysfs.c | 5 +++++
- block/blk-mq.c       | 2 +-
- block/blk-mq.h       | 1 +
- 3 files changed, 7 insertions(+), 1 deletion(-)
+ include/linux/huge_mm.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
-index 01fb455..11846d0 100644
---- a/block/blk-mq-sysfs.c
-+++ b/block/blk-mq-sysfs.c
-@@ -429,6 +429,11 @@ void blk_mq_hctx_kobj_init(struct blk_mq_hw_ctx *hctx)
- 	kobject_init(&hctx->kobj, &blk_mq_hw_ktype);
+diff --git a/include/linux/huge_mm.h b/include/linux/huge_mm.h
+index de2789b4402c..5c5466ba37df 100644
+--- a/include/linux/huge_mm.h
++++ b/include/linux/huge_mm.h
+@@ -133,21 +133,21 @@ static inline spinlock_t *pmd_trans_huge_lock(pmd_t *pmd,
+ }
+ static inline int hpage_nr_pages(struct page *page)
+ {
+-	if (unlikely(PageTransHuge(page)))
++	if (unlikely(!PageSlab(page) && PageTransHuge(page)))
+ 		return HPAGE_PMD_NR;
+ 	return 1;
  }
  
-+void blk_mq_hctx_kobj_put(struct blk_mq_hw_ctx *hctx)
-+{
-+	kobject_put(&hctx->kobj);
-+}
-+
- static void blk_mq_sysfs_init(struct request_queue *q)
+ static inline int hpage_size(struct page *page)
  {
- 	struct blk_mq_ctx *ctx;
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 4b07901..78ee5af 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1928,7 +1928,7 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
- 			continue;
+-	if (unlikely(PageTransHuge(page)))
++	if (unlikely(!PageSlab(page) && PageTransHuge(page)))
+ 		return HPAGE_PMD_SIZE;
+ 	return PAGE_SIZE;
+ }
  
- 		hctxs[i] = NULL;
--		kobject_put(&hctx->kobj);
-+		blk_mq_hctx_kobj_put(hctx);
- 
- 		if (hctx->tags) {
- 			blk_mq_free_rq_map(set, hctx->tags, j);
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index e5d2524..3d53818 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -53,6 +53,7 @@ static inline struct blk_mq_hw_ctx *blk_mq_map_queue(struct request_queue *q,
- extern int blk_mq_sysfs_register(struct request_queue *q);
- extern void blk_mq_sysfs_unregister(struct request_queue *q);
- extern void blk_mq_hctx_kobj_init(struct blk_mq_hw_ctx *hctx);
-+extern void blk_mq_hctx_kobj_put(struct blk_mq_hw_ctx *hctx);
- 
- extern void blk_mq_rq_timed_out(struct request *req, bool reserved);
- 
+ static inline unsigned long hpage_mask(struct page *page)
+ {
+-	if (unlikely(PageTransHuge(page)))
++	if (unlikely(!PageSlab(page) && PageTransHuge(page)))
+ 		return HPAGE_PMD_MASK;
+ 	return PAGE_MASK;
+ }
 -- 
-1.8.3.1
+2.9.3
 
