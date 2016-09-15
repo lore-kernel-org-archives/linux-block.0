@@ -1,125 +1,126 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:58417 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1754954AbcIOQX2 (ORCPT
+Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:33485 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1754891AbcIOQXW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Sep 2016 12:23:28 -0400
-Received: from pps.filterd (m0001255.ppops.net [127.0.0.1])
-        by mx0b-00082601.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id u8FGHNOw008552
-        for <linux-block@vger.kernel.org>; Thu, 15 Sep 2016 09:23:27 -0700
+        Thu, 15 Sep 2016 12:23:22 -0400
+Received: from pps.filterd (m0044010.ppops.net [127.0.0.1])
+        by mx0a-00082601.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id u8FGFE6a022591
+        for <linux-block@vger.kernel.org>; Thu, 15 Sep 2016 09:23:22 -0700
 Received: from mail.thefacebook.com ([199.201.64.23])
-        by mx0b-00082601.pphosted.com with ESMTP id 25fy1880vq-7
+        by mx0a-00082601.pphosted.com with ESMTP id 25fww30vgw-6
         (version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT)
-        for <linux-block@vger.kernel.org>; Thu, 15 Sep 2016 09:23:27 -0700
+        for <linux-block@vger.kernel.org>; Thu, 15 Sep 2016 09:23:22 -0700
 Received: from facebook.com (2401:db00:11:d0a2:face:0:39:0)     by
- mx-out.facebook.com (10.223.100.97) with ESMTP id
- b661b85c7b6011e686a424be0593f280-5d51d6d0 for <linux-block@vger.kernel.org>;
-        Thu, 15 Sep 2016 09:23:19 -0700
+ mx-out.facebook.com (10.223.100.99) with ESMTP id
+ b76616447b6011e680c424be05956610-7b8e2a50 for <linux-block@vger.kernel.org>;
+        Thu, 15 Sep 2016 09:23:20 -0700
 From: Shaohua Li <shli@fb.com>
 To: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
 CC: <axboe@fb.com>, <Kernel-team@fb.com>, <tj@kernel.org>,
         <jmoyer@redhat.com>, <vgoyal@redhat.com>
-Subject: [PATCH V2 00/11] block-throttle: add .high limit
-Date: Thu, 15 Sep 2016 09:23:07 -0700
-Message-ID: <cover.1473953743.git.shli@fb.com>
+Subject: [PATCH V2 11/11] blk-throttle: ignore idle cgroup limit
+Date: Thu, 15 Sep 2016 09:23:18 -0700
+Message-ID: <8c687c3d686fda706084b748e757e8b9e1cffd47.1473953743.git.shli@fb.com>
+In-Reply-To: <cover.1473953743.git.shli@fb.com>
+References: <cover.1473953743.git.shli@fb.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hi,
+Last patch introduces a way to detect idle cgroup. We use it to make
+upgrade/downgrade decision.
 
-The background is we don't have an ioscheduler for blk-mq yet, so we can't
-prioritize processes/cgroups. This patch set tries to add basic arbitration
-between cgroups with blk-throttle. It adds a new limit io.high for
-blk-throttle. It's only for cgroup2.
+Signed-off-by: Shaohua Li <shli@fb.com>
+---
+ block/blk-throttle.c | 30 ++++++++++++++++++------------
+ 1 file changed, 18 insertions(+), 12 deletions(-)
 
-io.max is a hard limit throttling. cgroups with a max limit never dispatch more
-IO than their max limit. While io.high is a best effort throttling. cgroups
-with high limit can run above their high limit at appropriate time.
-Specifically, if all cgroups reach their high limit, all cgroups can run above
-their high limit. If any cgroup runs under its high limit, all other cgroups
-will run according to their high limit.
-
-An example usage is we have a high prio cgroup with high high limit and a low
-prio cgroup with low high limit. If the high prio cgroup isn't running, the low
-prio can run above its high limit, so we don't waste the bandwidth. When the
-high prio cgroup runs and is below its high limit, low prio cgroup will run
-under its high limit. This will protect high prio cgroup to get more resources.
-If both cgroups reach their high limit, both can run above their high limit
-(eg, fully utilize disk bandwidth). All these can't be done with io.max limit.
-
-The implementation is simple. The disk queue has 2 states LIMIT_HIGH and
-LIMIT_MAX. In each disk state, we throttle cgroups according to the limit of
-the state. That is io.high limit for LIMIT_HIGH state, io.max limit for
-LIMIT_MAX. The disk state can be upgraded/downgraded between
-LIMIT_HIGH/LIMIT_MAX according to the rule above. Initially disk state is
-LIMIT_MAX. And if no cgroup sets io.high, the disk state will remain in
-LIMIT_MAX state. Users with only io.max set will find nothing changed with the
-patches.
-
-The first 8 patches implement the basic framework. Add interface, handle
-upgrade and downgrade logic. The patch 8 detects a special case a cgroup is
-completely idle. In this case, we ignore the cgroup's limit. The patch 9-11
-adds more heuristics.
-
-The basic framework has 2 major issues.
-1. fluctuation. When the state is upgraded from LIMIT_HIGH to LIMIT_MAX, the
-cgroup's bandwidth can change dramatically, sometimes in a way not expected.
-For example, one cgroup's bandwidth will drop below its io.high limit very soon
-after a upgrade. patch 9 has more details about the issue.
-2. idle cgroup. cgroup with a io.high limit doesn't always dispatch enough IO.
-In above upgrade rule, the disk will remain in LIMIT_HIGH state and all other
-cgroups can't dispatch more IO above their high limit. Hence this is a waste of
-disk bandwidth. patch 10 has more details about the issue.
-
-For issue 1, we make cgroup bandwidth increase smoothly after a upgrade. This
-will reduce the chance a cgroup's bandwidth drop under its high limit rapidly.
-The smoothness means we could waste some bandwidth in the transition though.
-But we must pay something for sharing.
-
-The issue 2 is very hard to solve. To be honest, I don't have a good solution
-yet. The patch 10 uses the 'think time check' idea borrowed from CFQ to detect
-idle cgroup. It's not perfect, eg, not works well for high IO depth workloads.
-But it's the best I tried so far and in practice works well. This definitively
-needs more tuning.
-
-Please review, test and consider merge.
-
-Thanks,
-Shaohua
-
-V1->V2:
-- Drop io.low interface for simplicity and the interface isn't a must-have to
-  prioritize cgroups.
-- Remove the 'trial' logic, which creates too much fluctuation
-- Add a new idle cgroup detection
-- Other bug fixes and improvements
-
-V1:
-http://marc.info/?l=linux-block&m=146292596425689&w=2
-
-------------------------------------------------------
-Shaohua Li (11):
-  block-throttle: prepare support multiple limits
-  block-throttle: add .high interface
-  block-throttle: configure bps/iops limit for cgroup in high limit
-  block-throttle: add upgrade logic for LIMIT_HIGH state
-  block-throttle: add downgrade logic
-  blk-throttle: make sure expire time isn't too big
-  blk-throttle: make throtl_slice tunable
-  blk-throttle: detect completed idle cgroup
-  block-throttle: make bandwidth change smooth
-  block-throttle: add a simple idle detection
-  blk-throttle: ignore idle cgroup limit
-
- block/bio.c               |   2 +
- block/blk-sysfs.c         |  18 ++
- block/blk-throttle.c      | 704 +++++++++++++++++++++++++++++++++++++++++-----
- block/blk.h               |   9 +
- include/linux/blk_types.h |   1 +
- 5 files changed, 669 insertions(+), 65 deletions(-)
-
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index 0810e1b..276e71e 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -145,8 +145,6 @@ struct throtl_grp {
+ 
+ 	unsigned long last_check_time;
+ 
+-	unsigned long last_dispatch_time[2];
+-
+ 	/* When did we start a new slice */
+ 	unsigned long slice_start[2];
+ 	unsigned long slice_end[2];
+@@ -488,8 +486,6 @@ static void throtl_pd_online(struct blkg_policy_data *pd)
+ 	 * Update has_rules[] after a new group is brought online.
+ 	 */
+ 	tg_update_has_rules(tg);
+-	tg->last_dispatch_time[READ] = jiffies;
+-	tg->last_dispatch_time[WRITE] = jiffies;
+ }
+ 
+ static void blk_throtl_update_valid_limit(struct throtl_data *td)
+@@ -1661,9 +1657,8 @@ static bool throtl_upgrade_check_one(struct throtl_grp *tg)
+ 		return true;
+ 
+ 	if (time_after_eq(jiffies,
+-	     tg->last_dispatch_time[READ] + tg->td->throtl_slice) &&
+-	    time_after_eq(jiffies,
+-	     tg->last_dispatch_time[WRITE] + tg->td->throtl_slice))
++		tg_last_high_overflow_time(tg) + tg->td->throtl_slice) &&
++	    throtl_tg_is_idle(tg))
+ 		return true;
+ 	return false;
+ }
+@@ -1712,6 +1707,19 @@ static bool throtl_can_upgrade(struct throtl_data *td,
+ 	return true;
+ }
+ 
++static void throtl_upgrade_check(struct throtl_grp *tg)
++{
++	if (tg->td->limit_index != LIMIT_HIGH)
++		return;
++
++	if (!time_after_eq(jiffies,
++	     __tg_last_high_overflow_time(tg) + tg->td->throtl_slice))
++		return;
++
++	if (throtl_can_upgrade(tg->td, NULL))
++		throtl_upgrade_state(tg->td);
++}
++
+ static void throtl_upgrade_state(struct throtl_data *td)
+ {
+ 	struct cgroup_subsys_state *pos_css;
+@@ -1746,15 +1754,13 @@ static bool throtl_downgrade_check_one(struct throtl_grp *tg)
+ 	struct throtl_data *td = tg->td;
+ 	unsigned long now = jiffies;
+ 
+-	if (time_after_eq(now, tg->last_dispatch_time[READ] + td->throtl_slice) &&
+-	    time_after_eq(now, tg->last_dispatch_time[WRITE] + td->throtl_slice))
+-		return false;
+ 	/*
+ 	 * If cgroup is below high limit, consider downgrade and throttle other
+ 	 * cgroups
+ 	 */
+ 	if (time_after_eq(now, td->high_upgrade_time + td->throtl_slice) &&
+-	    time_after_eq(now, tg_last_high_overflow_time(tg) + td->throtl_slice))
++	    time_after_eq(now, tg_last_high_overflow_time(tg) + td->throtl_slice) &&
++	    !throtl_tg_is_idle(tg))
+ 		return true;
+ 	return false;
+ }
+@@ -1885,10 +1891,10 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
+ 
+ again:
+ 	while (true) {
+-		tg->last_dispatch_time[rw] = jiffies;
+ 		if (tg->last_high_overflow_time[rw] == 0)
+ 			tg->last_high_overflow_time[rw] = jiffies;
+ 		throtl_downgrade_check(tg);
++		throtl_upgrade_check(tg);
+ 		/* throtl is FIFO - if bios are already queued, should queue */
+ 		if (sq->nr_queued[rw])
+ 			break;
 -- 
 2.8.0.rc2
 
