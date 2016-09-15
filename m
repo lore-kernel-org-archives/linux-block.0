@@ -1,95 +1,214 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:35643 "EHLO mga11.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S934676AbcIPMKl (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Sep 2016 08:10:41 -0400
-Date: Fri, 16 Sep 2016 15:10:34 +0300
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: Theodore Ts'o <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+Received: from mail-it0-f68.google.com ([209.85.214.68]:34502 "EHLO
+        mail-it0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933464AbcIOM1U (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 15 Sep 2016 08:27:20 -0400
+Received: by mail-it0-f68.google.com with SMTP id 186so4343406itf.1
+        for <linux-block@vger.kernel.org>; Thu, 15 Sep 2016 05:27:20 -0700 (PDT)
+Subject: Re: [PATCHv3 29/41] ext4: make ext4_mpage_readpages() hugepage-aware
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Content-Type: multipart/signed; boundary="Apple-Mail=_BEA46A94-7100-4052-A6D6-900EC626E8C5"; protocol="application/pgp-signature"; micalg=pgp-sha256
+From: Andreas Dilger <adilger@dilger.ca>
+In-Reply-To: <20160915115523.29737-30-kirill.shutemov@linux.intel.com>
+Date: Thu, 15 Sep 2016 06:27:10 -0600
+Cc: Theodore Ts'o <tytso@mit.edu>, Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
         Hugh Dickins <hughd@google.com>,
         Andrea Arcangeli <aarcange@redhat.com>,
         Dave Hansen <dave.hansen@intel.com>,
         Vlastimil Babka <vbabka@suse.cz>,
         Matthew Wilcox <willy@infradead.org>,
         Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCHv3 29/41] ext4: make ext4_mpage_readpages() hugepage-aware
-Message-ID: <20160916121034.GC72667@black.fi.intel.com>
-References: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
- <20160915115523.29737-30-kirill.shutemov@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20160915115523.29737-30-kirill.shutemov@linux.intel.com>
+        linux-ext4 <linux-ext4@vger.kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Linux MM <linux-mm@kvack.org>, linux-block@vger.kernel.org
+Message-Id: <56332284-449B-4998-AA99-245361CEE6D9@dilger.ca>
+References: <20160915115523.29737-1-kirill.shutemov@linux.intel.com> <20160915115523.29737-30-kirill.shutemov@linux.intel.com>
+To: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Thu, Sep 15, 2016 at 02:55:11PM +0300, Kirill A. Shutemov wrote:
+
+--Apple-Mail=_BEA46A94-7100-4052-A6D6-900EC626E8C5
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset=us-ascii
+
+On Sep 15, 2016, at 5:55 AM, Kirill A. Shutemov =
+<kirill.shutemov@linux.intel.com> wrote:
+>=20
 > This patch modifies ext4_mpage_readpages() to deal with huge pages.
-> 
+>=20
 > We read out 2M at once, so we have to alloc (HPAGE_PMD_NR *
-> blocks_per_page) sector_t for that. I'm not entirely happy with kmalloc
+> blocks_per_page) sector_t for that. I'm not entirely happy with =
+kmalloc
 > in this codepath, but don't see any other option.
-> 
+
+If you're reading 2MB from disk (possibly from disjoint blocks with =
+seeks
+in between) I don't think that the kmalloc() is going to be the limiting
+performance factor.  If you are concerned about the size of the =
+kmalloc()
+causing failures when pages are fragmented (it can be 16KB for 1KB =
+blocks
+with 4KB pages), then using ext4_kvmalloc() to fall back to vmalloc() in
+case kmalloc() fails.  It shouldn't fail often for 16KB allocations,
+but it could in theory.
+
+I also notice that ext4_kvmalloc() should probably use unlikely() for
+the failure case, so that the uncommon vmalloc() fallback is out-of-line
+in this more important codepath.  The only other callers are during =
+mount,
+so a branch misprediction is not critical.
+
+Cheers, Andreas
+
+>=20
 > Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+> ---
+> fs/ext4/readpage.c | 38 ++++++++++++++++++++++++++++++++------
+> 1 file changed, 32 insertions(+), 6 deletions(-)
+>=20
+> diff --git a/fs/ext4/readpage.c b/fs/ext4/readpage.c
+> index a81b829d56de..6d7cbddceeb2 100644
+> --- a/fs/ext4/readpage.c
+> +++ b/fs/ext4/readpage.c
+> @@ -104,12 +104,12 @@ int ext4_mpage_readpages(struct address_space =
+*mapping,
+>=20
+> 	struct inode *inode =3D mapping->host;
+> 	const unsigned blkbits =3D inode->i_blkbits;
+> -	const unsigned blocks_per_page =3D PAGE_SIZE >> blkbits;
+> 	const unsigned blocksize =3D 1 << blkbits;
+> 	sector_t block_in_file;
+> 	sector_t last_block;
+> 	sector_t last_block_in_file;
+> -	sector_t blocks[MAX_BUF_PER_PAGE];
+> +	sector_t blocks_on_stack[MAX_BUF_PER_PAGE];
+> +	sector_t *blocks =3D blocks_on_stack;
+> 	unsigned page_block;
+> 	struct block_device *bdev =3D inode->i_sb->s_bdev;
+> 	int length;
+> @@ -122,8 +122,9 @@ int ext4_mpage_readpages(struct address_space =
+*mapping,
+> 	map.m_flags =3D 0;
+>=20
+> 	for (; nr_pages; nr_pages--) {
+> -		int fully_mapped =3D 1;
+> -		unsigned first_hole =3D blocks_per_page;
+> +		int fully_mapped =3D 1, nr =3D nr_pages;
+> +		unsigned blocks_per_page =3D PAGE_SIZE >> blkbits;
+> +		unsigned first_hole;
+>=20
+> 		prefetchw(&page->flags);
+> 		if (pages) {
+> @@ -138,10 +139,31 @@ int ext4_mpage_readpages(struct address_space =
+*mapping,
+> 			goto confused;
+>=20
+> 		block_in_file =3D (sector_t)page->index << (PAGE_SHIFT - =
+blkbits);
+> -		last_block =3D block_in_file + nr_pages * =
+blocks_per_page;
+> +
+> +		if (PageTransHuge(page)) {
+> +			BUILD_BUG_ON(BIO_MAX_PAGES < HPAGE_PMD_NR);
+> +			nr =3D HPAGE_PMD_NR * blocks_per_page;
+> +			/* XXX: need a better solution ? */
+> +			blocks =3D kmalloc(sizeof(sector_t) * nr, =
+GFP_NOFS);
+> +			if (!blocks) {
+> +				if (pages) {
+> +					delete_from_page_cache(page);
+> +					goto next_page;
+> +				}
+> +				return -ENOMEM;
+> +			}
+> +
+> +			blocks_per_page *=3D HPAGE_PMD_NR;
+> +			last_block =3D block_in_file + blocks_per_page;
+> +		} else {
+> +			blocks =3D blocks_on_stack;
+> +			last_block =3D block_in_file + nr * =
+blocks_per_page;
+> +		}
+> +
+> 		last_block_in_file =3D (i_size_read(inode) + blocksize - =
+1) >> blkbits;
+> 		if (last_block > last_block_in_file)
+> 			last_block =3D last_block_in_file;
+> +		first_hole =3D blocks_per_page;
+> 		page_block =3D 0;
+>=20
+> 		/*
+> @@ -213,6 +235,8 @@ int ext4_mpage_readpages(struct address_space =
+*mapping,
+> 			}
+> 		}
+> 		if (first_hole !=3D blocks_per_page) {
+> +			if (PageTransHuge(page))
+> +				goto confused;
+> 			zero_user_segment(page, first_hole << blkbits,
+> 					  PAGE_SIZE);
+> 			if (first_hole =3D=3D 0) {
+> @@ -248,7 +272,7 @@ int ext4_mpage_readpages(struct address_space =
+*mapping,
+> 					goto set_error_page;
+> 			}
+> 			bio =3D bio_alloc(GFP_KERNEL,
+> -				min_t(int, nr_pages, BIO_MAX_PAGES));
+> +				min_t(int, nr, BIO_MAX_PAGES));
+> 			if (!bio) {
+> 				if (ctx)
+> 					fscrypt_release_ctx(ctx);
+> @@ -289,5 +313,7 @@ int ext4_mpage_readpages(struct address_space =
+*mapping,
+> 	BUG_ON(pages && !list_empty(pages));
+> 	if (bio)
+> 		submit_bio(bio);
+> +	if (blocks !=3D blocks_on_stack)
+> +		kfree(blocks);
+> 	return 0;
+> }
+> --
+> 2.9.3
+>=20
 
-0-DAY reported this:
 
-compiler: powerpc64-linux-gnu-gcc (Debian 5.4.0-6) 5.4.0 20160609
-reproduce:
-        wget https://git.kernel.org/cgit/linux/kernel/git/wfg/lkp-tests.git/plain/sbin/make.cross -O ~/bin/make.cro
-+ss
-        chmod +x ~/bin/make.cross
-        git checkout d8bfe8f327288810a9a099b15f3c89a834d419a4
-        # save the attached .config to linux build tree
-        make.cross ARCH=powerpc
+Cheers, Andreas
 
-All errors (new ones prefixed by >>):
 
-   In file included from include/linux/linkage.h:4:0,
-                    from include/linux/kernel.h:6,
-                    from fs/ext4/readpage.c:30:
-   fs/ext4/readpage.c: In function 'ext4_mpage_readpages':
->> include/linux/compiler.h:491:38: error: call to '__compiletime_assert_144' declared with attribute error:
-+BUILD_BUG_ON failed: BIO_MAX_PAGES < HPAGE_PMD_NR
-     _compiletime_assert(condition, msg, __compiletime_assert_, __LINE__)
-                                         ^
-   include/linux/compiler.h:474:4: note: in definition of macro '__compiletime_assert'
-       prefix ## suffix();    \                                                       
-       ^                       
-   include/linux/compiler.h:491:2: note: in expansion of macro '_compiletime_assert'
-     _compiletime_assert(condition, msg, __compiletime_assert_, __LINE__)           
-     ^                                                                   
-   include/linux/bug.h:51:37: note: in expansion of macro 'compiletime_assert'
-    #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond), msg)      
-                                        ^
-   include/linux/bug.h:75:2: note: in expansion of macro 'BUILD_BUG_ON_MSG'
-     BUILD_BUG_ON_MSG(condition, "BUILD_BUG_ON failed: " #condition)       
-     ^                                                              
-   fs/ext4/readpage.c:144:4: note: in expansion of macro 'BUILD_BUG_ON'
-       BUILD_BUG_ON(BIO_MAX_PAGES < HPAGE_PMD_NR);                     
-       ^                                          
 
-The fixup:
 
-diff --git a/fs/ext4/readpage.c b/fs/ext4/readpage.c
-index 6d7cbddceeb2..75b2a7700c9a 100644
---- a/fs/ext4/readpage.c
-+++ b/fs/ext4/readpage.c
-@@ -140,7 +140,8 @@ int ext4_mpage_readpages(struct address_space *mapping,
- 
- 		block_in_file = (sector_t)page->index << (PAGE_SHIFT - blkbits);
- 
--		if (PageTransHuge(page)) {
-+		if (PageTransHuge(page) &&
-+				IS_ENABLED(TRANSPARENT_HUGE_PAGECACHE)) {
- 			BUILD_BUG_ON(BIO_MAX_PAGES < HPAGE_PMD_NR);
- 			nr = HPAGE_PMD_NR * blocks_per_page;
- 			/* XXX: need a better solution ? */
--- 
- Kirill A. Shutemov
+
+
+--Apple-Mail=_BEA46A94-7100-4052-A6D6-900EC626E8C5
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename=signature.asc
+Content-Type: application/pgp-signature;
+	name=signature.asc
+Content-Description: Message signed with OpenPGP using GPGMail
+
+-----BEGIN PGP SIGNATURE-----
+Comment: GPGTools - http://gpgtools.org
+
+iQIVAwUBV9qTn3Kl2rkXzB/gAQgamxAAnld/ukq16T/RaQZCpyWukXjcNC2oQCAO
+j1Zit7ygnSd1FtMS/XIn4iOss9K4JSsny/RCOMhM7uLAtBilDBpmDT/neMgu5WpM
+mY1jikG6VWRTynEh5vZwQzzYCHKPgPnwTrI3GlXajuQ0m4Ii/1mjSpEwtR5L7Qd/
+UBDbqJUq1rJ4iOmPsNdoPFQJTE1cbFiyWEKz8cUpM89K6/R+d7E58KTXlm5bnZD2
+nRICj8Urbsm1U/oLtY+E1IOhh+XQ1FLjF4INNuXdRHKfdBPvy7b6NAVhZ2SfTtkc
+RWxc+JkQBmCf3I2nuRoj7FrfJUXi0/ypRB4wAr4x4P+In0xyuGsAbta5rPGOSB0A
+js7KUdRcde74xbyM11PtyTXyP1BuNI0UQDJz6/bkarRPG/JTCogg31/tZWN8QmR7
+bko4OKq6R3QogdYI0oBszB0cKD9GZUakEqg82y9vJfujXj0NpDlQvVoBEUmhdz2x
+b1esXlmG2aCDyDPZc+pFe1yoLeIzKw3SG3sciMf1pYkTTdz+8ytJIcTzZ4F4lJFY
+swXne4ljBBe0ij8+ahKy8If88+05SCEkQEeCRCrHu/dfWd6s6DNYQJMv7q2mdj+G
+DRKQSVjUuLO0mbUsqnrUfpvMAzCtwMg/gqZ+s/GpDMwZPczkHQWFQbBVuW7yAst0
+NPZpQ2uLMwk=
+=bTJs
+-----END PGP SIGNATURE-----
+
+--Apple-Mail=_BEA46A94-7100-4052-A6D6-900EC626E8C5--
