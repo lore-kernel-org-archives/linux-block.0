@@ -1,333 +1,107 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org,
-        Matthew Wilcox <willy@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv3 03/41] radix-tree: Add radix_tree_join
-Date: Thu, 15 Sep 2016 14:54:45 +0300
-Message-Id: <20160915115523.29737-4-kirill.shutemov@linux.intel.com>
-In-Reply-To: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
-References: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:33483 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1754868AbcIOQXW (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 15 Sep 2016 12:23:22 -0400
+Received: from pps.filterd (m0044010.ppops.net [127.0.0.1])
+        by mx0a-00082601.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id u8FGFCYk022570
+        for <linux-block@vger.kernel.org>; Thu, 15 Sep 2016 09:23:22 -0700
+Received: from mail.thefacebook.com ([199.201.64.23])
+        by mx0a-00082601.pphosted.com with ESMTP id 25fww30vgx-4
+        (version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT)
+        for <linux-block@vger.kernel.org>; Thu, 15 Sep 2016 09:23:22 -0700
+Received: from facebook.com (2401:db00:11:d0a2:face:0:39:0)     by
+ mx-out.facebook.com (10.223.100.97) with ESMTP id
+ b6fb9e4a7b6011e6a8e524be0593f280-f85fba50 for <linux-block@vger.kernel.org>;
+        Thu, 15 Sep 2016 09:23:20 -0700
+From: Shaohua Li <shli@fb.com>
+To: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <axboe@fb.com>, <Kernel-team@fb.com>, <tj@kernel.org>,
+        <jmoyer@redhat.com>, <vgoyal@redhat.com>
+Subject: [PATCH V2 08/11] blk-throttle: detect completed idle cgroup
+Date: Thu, 15 Sep 2016 09:23:15 -0700
+Message-ID: <9519a7a7ff79d702b9a4d6591734e17b4e39f92f.1473953743.git.shli@fb.com>
+In-Reply-To: <cover.1473953743.git.shli@fb.com>
+References: <cover.1473953743.git.shli@fb.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Matthew Wilcox <willy@linux.intel.com>
+cgroup could be assigned a limit, but doesn't dispatch enough IO, eg the
+cgroup is idle. When this happens, the cgroup doesn't hit its limit, so
+we can't move the state machine to higher level and all cgroups will be
+throttled to thier lower limit, so we waste bandwidth. Detecting idle
+cgroup is hard. This patch handles a simple case, a cgroup doesn't
+dispatch any IO. We ignore such cgroup's limit, so other cgroups can use
+the bandwidth.
 
-This new function allows for the replacement of many smaller entries in
-the radix tree with one larger multiorder entry.  From the point of view
-of an RCU walker, they may see a mixture of the smaller entries and the
-large entry during the same walk, but they will never see NULL for an
-index which was populated before the join.
-
-Signed-off-by: Matthew Wilcox <willy@linux.intel.com>
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+Signed-off-by: Shaohua Li <shli@fb.com>
 ---
- include/linux/radix-tree.h            |   2 +
- lib/radix-tree.c                      | 159 +++++++++++++++++++++++++++-------
- tools/testing/radix-tree/multiorder.c |  32 +++++++
- 3 files changed, 163 insertions(+), 30 deletions(-)
+ block/blk-throttle.c | 17 ++++++++++++++++-
+ 1 file changed, 16 insertions(+), 1 deletion(-)
 
-diff --git a/include/linux/radix-tree.h b/include/linux/radix-tree.h
-index 4c45105dece3..75ae4648d13d 100644
---- a/include/linux/radix-tree.h
-+++ b/include/linux/radix-tree.h
-@@ -319,6 +319,8 @@ static inline void radix_tree_preload_end(void)
- 	preempt_enable();
- }
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index bc94086..e4713b1 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -144,6 +144,8 @@ struct throtl_grp {
  
-+int radix_tree_join(struct radix_tree_root *, unsigned long index,
-+			unsigned new_order, void *);
- /**
-  * struct radix_tree_iter - radix tree iterator state
-  *
-diff --git a/lib/radix-tree.c b/lib/radix-tree.c
-index 1b7bf7314141..3157f223c268 100644
---- a/lib/radix-tree.c
-+++ b/lib/radix-tree.c
-@@ -314,18 +314,14 @@ static void radix_tree_node_rcu_free(struct rcu_head *head)
+ 	unsigned long last_check_time;
+ 
++	unsigned long last_dispatch_time[2];
++
+ 	/* When did we start a new slice */
+ 	unsigned long slice_start[2];
+ 	unsigned long slice_end[2];
+@@ -438,11 +440,14 @@ static void tg_update_has_rules(struct throtl_grp *tg)
+ 
+ static void throtl_pd_online(struct blkg_policy_data *pd)
  {
- 	struct radix_tree_node *node =
- 			container_of(head, struct radix_tree_node, rcu_head);
--	int i;
- 
++	struct throtl_grp *tg = pd_to_tg(pd);
  	/*
--	 * must only free zeroed nodes into the slab. radix_tree_shrink
--	 * can leave us with a non-NULL entry in the first slot, so clear
--	 * that here to make sure.
-+	 * Must only free zeroed nodes into the slab.  We can be left with
-+	 * non-NULL entries by radix_tree_free_nodes, so clear the entries
-+	 * and tags here.
+ 	 * We don't want new groups to escape the limits of its ancestors.
+ 	 * Update has_rules[] after a new group is brought online.
  	 */
--	for (i = 0; i < RADIX_TREE_MAX_TAGS; i++)
--		tag_clear(node, i, 0);
--
--	node->slots[0] = NULL;
--	node->count = 0;
-+	memset(node->slots, 0, sizeof(node->slots));
-+	memset(node->tags, 0, sizeof(node->tags));
- 
- 	kmem_cache_free(radix_tree_node_cachep, node);
- }
-@@ -563,14 +559,14 @@ int __radix_tree_create(struct radix_tree_root *root, unsigned long index,
- 	shift = radix_tree_load_root(root, &child, &maxindex);
- 
- 	/* Make sure the tree is high enough.  */
-+	if (order > 0 && max == ((1UL << order) - 1))
-+		max++;
- 	if (max > maxindex) {
- 		int error = radix_tree_extend(root, max, shift);
- 		if (error < 0)
- 			return error;
- 		shift = error;
- 		child = root->rnode;
--		if (order == shift)
--			shift += RADIX_TREE_MAP_SHIFT;
- 	}
- 
- 	while (shift > order) {
-@@ -582,6 +578,7 @@ int __radix_tree_create(struct radix_tree_root *root, unsigned long index,
- 				return -ENOMEM;
- 			child->shift = shift;
- 			child->offset = offset;
-+			child->count = 0;
- 			child->parent = node;
- 			rcu_assign_pointer(*slot, node_to_entry(child));
- 			if (node)
-@@ -595,31 +592,113 @@ int __radix_tree_create(struct radix_tree_root *root, unsigned long index,
- 		slot = &node->slots[offset];
- 	}
- 
-+	if (nodep)
-+		*nodep = node;
-+	if (slotp)
-+		*slotp = slot;
-+	return 0;
-+}
-+
- #ifdef CONFIG_RADIX_TREE_MULTIORDER
--	/* Insert pointers to the canonical entry */
--	if (order > shift) {
--		unsigned i, n = 1 << (order - shift);
-+/*
-+ * Free any nodes below this node.  The tree is presumed to not need
-+ * shrinking, and any user data in the tree is presumed to not need a
-+ * destructor called on it.  If we need to add a destructor, we can
-+ * add that functionality later.  Note that we may not clear tags or
-+ * slots from the tree as an RCU walker may still have a pointer into
-+ * this subtree.  We could replace the entries with RADIX_TREE_RETRY,
-+ * but we'll still have to clear those in rcu_free.
-+ */
-+static void radix_tree_free_nodes(struct radix_tree_node *node)
-+{
-+	unsigned offset = 0;
-+	struct radix_tree_node *child = entry_to_node(node);
-+
-+	for (;;) {
-+		void *entry = child->slots[offset];
-+		if (radix_tree_is_internal_node(entry) &&
-+					!is_sibling_entry(child, entry)) {
-+			child = entry_to_node(entry);
-+			offset = 0;
-+			continue;
-+		}
-+		offset++;
-+		while (offset == RADIX_TREE_MAP_SIZE) {
-+			struct radix_tree_node *old = child;
-+			offset = child->offset + 1;
-+			child = child->parent;
-+			radix_tree_node_free(old);
-+			if (old == entry_to_node(node))
-+				return;
-+		}
-+	}
-+}
-+
-+static inline int insert_entries(struct radix_tree_node *node, void **slot,
-+				void *ptr, unsigned order, bool replace)
-+{
-+	struct radix_tree_node *child;
-+	unsigned i, n, tag, offset, tags = 0;
-+
-+	if (node) {
-+		n = 1 << (order - node->shift);
-+		offset = get_slot_offset(node, slot);
-+	} else {
-+		n = 1;
-+		offset = 0;
-+	}
-+
-+	if (n > 1) {
- 		offset = offset & ~(n - 1);
- 		slot = &node->slots[offset];
--		child = node_to_entry(slot);
--		for (i = 0; i < n; i++) {
--			if (slot[i])
-+	}
-+	child = node_to_entry(slot);
-+
-+	for (i = 0; i < n; i++) {
-+		if (slot[i]) {
-+			if (replace) {
-+				node->count--;
-+				for (tag = 0; tag < RADIX_TREE_MAX_TAGS; tag++)
-+					if (tag_get(node, tag, offset + i))
-+						tags |= 1 << tag;
-+			} else
- 				return -EEXIST;
- 		}
-+	}
- 
--		for (i = 1; i < n; i++) {
-+	for (i = 0; i < n; i++) {
-+		struct radix_tree_node *old = slot[i];
-+		if (i) {
- 			rcu_assign_pointer(slot[i], child);
--			node->count++;
-+			for (tag = 0; tag < RADIX_TREE_MAX_TAGS; tag++)
-+				if (tags & (1 << tag))
-+					tag_clear(node, tag, offset + i);
-+		} else {
-+			rcu_assign_pointer(slot[i], ptr);
-+			for (tag = 0; tag < RADIX_TREE_MAX_TAGS; tag++)
-+				if (tags & (1 << tag))
-+					tag_set(node, tag, offset);
- 		}
-+		if (radix_tree_is_internal_node(old) &&
-+					!is_sibling_entry(node, old))
-+			radix_tree_free_nodes(old);
- 	}
--#endif
--
--	if (nodep)
--		*nodep = node;
--	if (slotp)
--		*slotp = slot;
--	return 0;
-+	if (node)
-+		node->count += n;
-+	return n;
-+}
-+#else
-+static inline int insert_entries(struct radix_tree_node *node, void **slot,
-+				void *ptr, unsigned order, bool replace)
-+{
-+	if (*slot)
-+		return -EEXIST;
-+	rcu_assign_pointer(*slot, ptr);
-+	if (node)
-+		node->count++;
-+	return 1;
- }
-+#endif
- 
- /**
-  *	__radix_tree_insert    -    insert into a radix tree
-@@ -642,13 +721,13 @@ int __radix_tree_insert(struct radix_tree_root *root, unsigned long index,
- 	error = __radix_tree_create(root, index, order, &node, &slot);
- 	if (error)
- 		return error;
--	if (*slot != NULL)
--		return -EEXIST;
--	rcu_assign_pointer(*slot, item);
-+
-+	error = insert_entries(node, slot, item, order, false);
-+	if (error < 0)
-+		return error;
- 
- 	if (node) {
- 		unsigned offset = get_slot_offset(node, slot);
--		node->count++;
- 		BUG_ON(tag_get(node, 0, offset));
- 		BUG_ON(tag_get(node, 1, offset));
- 		BUG_ON(tag_get(node, 2, offset));
-@@ -746,6 +825,26 @@ void *radix_tree_lookup(struct radix_tree_root *root, unsigned long index)
- }
- EXPORT_SYMBOL(radix_tree_lookup);
- 
-+#ifdef CONFIG_RADIX_TREE_MULTIORDER
-+int radix_tree_join(struct radix_tree_root *root, unsigned long index,
-+			unsigned order, void *item)
-+{
-+	struct radix_tree_node *node;
-+	void **slot;
-+	int error;
-+
-+	BUG_ON(radix_tree_is_internal_node(item));
-+
-+	error = __radix_tree_create(root, index, order, &node, &slot);
-+	if (!error)
-+		error = insert_entries(node, slot, item, order, true);
-+	if (error > 0)
-+		error = 0;
-+
-+	return error;
-+}
-+#endif
-+
- /**
-  *	radix_tree_tag_set - set a tag on a radix tree node
-  *	@root:		radix tree root
-diff --git a/tools/testing/radix-tree/multiorder.c b/tools/testing/radix-tree/multiorder.c
-index 39d9b9568fe2..f917da164b00 100644
---- a/tools/testing/radix-tree/multiorder.c
-+++ b/tools/testing/radix-tree/multiorder.c
-@@ -317,6 +317,37 @@ void multiorder_tagged_iteration(void)
- 	item_kill_tree(&tree);
+-	tg_update_has_rules(pd_to_tg(pd));
++	tg_update_has_rules(tg);
++	tg->last_dispatch_time[READ] = jiffies;
++	tg->last_dispatch_time[WRITE] = jiffies;
  }
  
-+static void __multiorder_join(unsigned long index,
-+				unsigned order1, unsigned order2)
-+{
-+	unsigned long loc;
-+	void *item, *item2 = item_create(index + 1);
-+	RADIX_TREE(tree, GFP_KERNEL);
+ static void blk_throtl_update_valid_limit(struct throtl_data *td)
+@@ -1604,6 +1609,12 @@ static bool throtl_upgrade_check_one(struct throtl_grp *tg)
+ 	if (write_limit && sq->nr_queued[WRITE] &&
+ 	    (!read_limit || sq->nr_queued[READ]))
+ 		return true;
 +
-+	item_insert_order(&tree, index, order2);
-+	item = radix_tree_lookup(&tree, index);
-+	radix_tree_join(&tree, index + 1, order1, item2);
-+	loc = radix_tree_locate_item(&tree, item);
-+	if (loc == -1)
-+		free(item);
-+	item = radix_tree_lookup(&tree, index + 1);
-+	assert(item == item2);
-+	item_kill_tree(&tree);
-+}
-+
-+static void multiorder_join(void)
-+{
-+	int i, j, idx;
-+
-+	for (idx = 0; idx < 1024; idx = idx * 2 + 3) {
-+		for (i = 1; i < 15; i++) {
-+			for (j = 0; j < i; j++) {
-+				__multiorder_join(idx, i, j);
-+			}
-+		}
-+	}
-+}
-+
- void multiorder_checks(void)
- {
- 	int i;
-@@ -334,4 +365,5 @@ void multiorder_checks(void)
- 	multiorder_tag_tests();
- 	multiorder_iteration();
- 	multiorder_tagged_iteration();
-+	multiorder_join();
++	if (time_after_eq(jiffies,
++	     tg->last_dispatch_time[READ] + tg->td->throtl_slice) &&
++	    time_after_eq(jiffies,
++	     tg->last_dispatch_time[WRITE] + tg->td->throtl_slice))
++		return true;
+ 	return false;
  }
+ 
+@@ -1684,6 +1695,9 @@ static bool throtl_downgrade_check_one(struct throtl_grp *tg)
+ 	struct throtl_data *td = tg->td;
+ 	unsigned long now = jiffies;
+ 
++	if (time_after_eq(now, tg->last_dispatch_time[READ] + td->throtl_slice) &&
++	    time_after_eq(now, tg->last_dispatch_time[WRITE] + td->throtl_slice))
++		return false;
+ 	/*
+ 	 * If cgroup is below high limit, consider downgrade and throttle other
+ 	 * cgroups
+@@ -1802,6 +1816,7 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
+ 
+ again:
+ 	while (true) {
++		tg->last_dispatch_time[rw] = jiffies;
+ 		if (tg->last_high_overflow_time[rw] == 0)
+ 			tg->last_high_overflow_time[rw] = jiffies;
+ 		throtl_downgrade_check(tg);
 -- 
-2.9.3
+2.8.0.rc2
 
