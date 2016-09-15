@@ -1,250 +1,296 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pa0-f65.google.com ([209.85.220.65]:34529 "EHLO
-        mail-pa0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S934824AbcIPMZc (ORCPT
+Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:47620 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1751990AbcIOQXX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Sep 2016 08:25:32 -0400
-Received: by mail-pa0-f65.google.com with SMTP id vz6so3449991pab.1
-        for <linux-block@vger.kernel.org>; Fri, 16 Sep 2016 05:25:32 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        axboe@fb.com
-Cc: keith.busch@intel.com,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [PATCH 2/7] nvme: refactor namespaces to support non-gendisk devices
-Date: Fri, 16 Sep 2016 14:25:04 +0200
-Message-Id: <1474028709-30260-3-git-send-email-m@bjorling.me>
-In-Reply-To: <1474028709-30260-1-git-send-email-m@bjorling.me>
-References: <1474028709-30260-1-git-send-email-m@bjorling.me>
+        Thu, 15 Sep 2016 12:23:23 -0400
+Received: from pps.filterd (m0001303.ppops.net [127.0.0.1])
+        by m0001303.ppops.net (8.16.0.17/8.16.0.17) with SMTP id u8FGGos7009858
+        for <linux-block@vger.kernel.org>; Thu, 15 Sep 2016 09:23:22 -0700
+Received: from mail.thefacebook.com ([199.201.64.23])
+        by m0001303.ppops.net with ESMTP id 25fxrd07ws-3
+        (version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT)
+        for <linux-block@vger.kernel.org>; Thu, 15 Sep 2016 09:23:22 -0700
+Received: from facebook.com (2401:db00:11:d0a2:face:0:39:0)     by
+ mx-out.facebook.com (10.223.101.97) with ESMTP id
+ b705e29c7b6011e6ab6e24be0595f910-1bdfaa50 for <linux-block@vger.kernel.org>;
+        Thu, 15 Sep 2016 09:23:20 -0700
+From: Shaohua Li <shli@fb.com>
+To: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <axboe@fb.com>, <Kernel-team@fb.com>, <tj@kernel.org>,
+        <jmoyer@redhat.com>, <vgoyal@redhat.com>
+Subject: [PATCH V2 07/11] blk-throttle: make throtl_slice tunable
+Date: Thu, 15 Sep 2016 09:23:14 -0700
+Message-ID: <d3520e8aeda42b1cdfa515f3b90ae075c5d5934e.1473953743.git.shli@fb.com>
+In-Reply-To: <cover.1473953743.git.shli@fb.com>
+References: <cover.1473953743.git.shli@fb.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-With LightNVM enabled namespaces, the gendisk structure is not exposed
-to the user. This prevents LightNVM users from accessing the NVMe device
-driver specific sysfs entries, and LightNVM namespace geometry.
+throtl_slice is important for blk-throttling. A lot of stuffes depend on
+it, for example, throughput measurement. It has 100ms default value,
+which is not appropriate for all disks. For example, for SSD we might
+use a smaller value to make the throughput smoother. This patch makes it
+tunable.
 
-Refactor the revalidation process, so that a namespace, instead of a
-gendisk, is revalidated. This later allows patches to wire up the
-sysfs entries up to a non-gendisk namespace.
-
-Signed-off-by: Matias Bjørling <m@bjorling.me>
+Signed-off-by: Shaohua Li <shli@fb.com>
 ---
- drivers/lightnvm/core.c      |   2 +
- drivers/nvme/host/core.c     | 116 +++++++++++++++++++++++++++----------------
- drivers/nvme/host/lightnvm.c |   5 +-
- 3 files changed, 79 insertions(+), 44 deletions(-)
+ block/blk-sysfs.c    | 11 ++++++++
+ block/blk-throttle.c | 72 ++++++++++++++++++++++++++++++++++++----------------
+ block/blk.h          |  3 +++
+ 3 files changed, 64 insertions(+), 22 deletions(-)
 
-diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-index 9ebd2cf..25c5df9 100644
---- a/drivers/lightnvm/core.c
-+++ b/drivers/lightnvm/core.c
-@@ -581,6 +581,8 @@ static int nvm_core_init(struct nvm_dev *dev)
- 	mutex_init(&dev->mlock);
- 	spin_lock_init(&dev->lock);
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index f87a7e7..610f08d 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -526,6 +526,14 @@ static struct queue_sysfs_entry queue_dax_entry = {
+ 	.show = queue_dax_show,
+ };
  
-+	blk_queue_logical_block_size(dev->q, dev->sec_size);
++#ifdef CONFIG_BLK_DEV_THROTTLING
++static struct queue_sysfs_entry throtl_slice_entry = {
++	.attr = {.name = "throttling_slice", .mode = S_IRUGO | S_IWUSR },
++	.show = blk_throtl_slice_show,
++	.store = blk_throtl_slice_store,
++};
++#endif
 +
- 	return 0;
- err_fmtype:
- 	kfree(dev->lun_map);
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 2feacc7..2c3da33 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -888,42 +888,33 @@ static void nvme_config_discard(struct nvme_ns *ns)
- 	queue_flag_set_unlocked(QUEUE_FLAG_DISCARD, ns->queue);
+ static struct attribute *default_attrs[] = {
+ 	&queue_requests_entry.attr,
+ 	&queue_ra_entry.attr,
+@@ -553,6 +561,9 @@ static struct attribute *default_attrs[] = {
+ 	&queue_poll_entry.attr,
+ 	&queue_wc_entry.attr,
+ 	&queue_dax_entry.attr,
++#ifdef CONFIG_BLK_DEV_THROTTLING
++	&throtl_slice_entry.attr,
++#endif
+ 	NULL,
+ };
+ 
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index 2bd8333..bc94086 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -19,7 +19,8 @@ static int throtl_grp_quantum = 8;
+ static int throtl_quantum = 32;
+ 
+ /* Throttling is performed over 100ms slice and after that slice is renewed */
+-static unsigned long throtl_slice = HZ/10;	/* 100 ms */
++#define DFL_THROTL_SLICE (HZ / 10)
++#define MAX_THROTL_SLICE (HZ / 5)
+ 
+ static struct blkcg_policy blkcg_policy_throtl;
+ 
+@@ -158,6 +159,8 @@ struct throtl_data
+ 	/* Total Number of queued bios on READ and WRITE lists */
+ 	unsigned int nr_queued[2];
+ 
++	unsigned int throtl_slice;
++
+ 	/* Work for dispatching throttled bios */
+ 	struct work_struct dispatch_work;
+ 	unsigned int limit_index;
+@@ -589,7 +592,7 @@ static void throtl_dequeue_tg(struct throtl_grp *tg)
+ static void throtl_schedule_pending_timer(struct throtl_service_queue *sq,
+ 					  unsigned long expires)
+ {
+-	unsigned long max_expire = jiffies + 8 * throtl_slice;
++	unsigned long max_expire = jiffies + 8 * sq_to_tg(sq)->td->throtl_slice;
+ 	if (time_after(expires, max_expire))
+ 		expires = max_expire;
+ 	mod_timer(&sq->pending_timer, expires);
+@@ -649,7 +652,7 @@ static inline void throtl_start_new_slice_with_credit(struct throtl_grp *tg,
+ 	if (time_after_eq(start, tg->slice_start[rw]))
+ 		tg->slice_start[rw] = start;
+ 
+-	tg->slice_end[rw] = jiffies + throtl_slice;
++	tg->slice_end[rw] = jiffies + tg->td->throtl_slice;
+ 	throtl_log(&tg->service_queue,
+ 		   "[%c] new slice with credit start=%lu end=%lu jiffies=%lu",
+ 		   rw == READ ? 'R' : 'W', tg->slice_start[rw],
+@@ -661,7 +664,7 @@ static inline void throtl_start_new_slice(struct throtl_grp *tg, bool rw)
+ 	tg->bytes_disp[rw] = 0;
+ 	tg->io_disp[rw] = 0;
+ 	tg->slice_start[rw] = jiffies;
+-	tg->slice_end[rw] = jiffies + throtl_slice;
++	tg->slice_end[rw] = jiffies + tg->td->throtl_slice;
+ 	throtl_log(&tg->service_queue,
+ 		   "[%c] new slice start=%lu end=%lu jiffies=%lu",
+ 		   rw == READ ? 'R' : 'W', tg->slice_start[rw],
+@@ -671,13 +674,13 @@ static inline void throtl_start_new_slice(struct throtl_grp *tg, bool rw)
+ static inline void throtl_set_slice_end(struct throtl_grp *tg, bool rw,
+ 					unsigned long jiffy_end)
+ {
+-	tg->slice_end[rw] = roundup(jiffy_end, throtl_slice);
++	tg->slice_end[rw] = roundup(jiffy_end, tg->td->throtl_slice);
  }
  
--static int nvme_revalidate_disk(struct gendisk *disk)
-+static int nvme_revalidate_ns(struct nvme_ns *ns, struct nvme_id_ns **id)
+ static inline void throtl_extend_slice(struct throtl_grp *tg, bool rw,
+ 				       unsigned long jiffy_end)
  {
--	struct nvme_ns *ns = disk->private_data;
--	struct nvme_id_ns *id;
--	u8 lbaf, pi_type;
--	u16 old_ms;
--	unsigned short bs;
--
--	if (test_bit(NVME_NS_DEAD, &ns->flags)) {
--		set_capacity(disk, 0);
--		return -ENODEV;
--	}
--	if (nvme_identify_ns(ns->ctrl, ns->ns_id, &id)) {
-+	if (nvme_identify_ns(ns->ctrl, ns->ns_id, id)) {
- 		dev_warn(disk_to_dev(ns->disk), "%s: Identify failure\n",
- 				__func__);
- 		return -ENODEV;
+-	tg->slice_end[rw] = roundup(jiffy_end, throtl_slice);
++	tg->slice_end[rw] = roundup(jiffy_end, tg->td->throtl_slice);
+ 	throtl_log(&tg->service_queue,
+ 		   "[%c] extend slice start=%lu end=%lu jiffies=%lu",
+ 		   rw == READ ? 'R' : 'W', tg->slice_start[rw],
+@@ -717,19 +720,19 @@ static inline void throtl_trim_slice(struct throtl_grp *tg, bool rw)
+ 	 * is bad because it does not allow new slice to start.
+ 	 */
+ 
+-	throtl_set_slice_end(tg, rw, jiffies + throtl_slice);
++	throtl_set_slice_end(tg, rw, jiffies + tg->td->throtl_slice);
+ 
+ 	time_elapsed = jiffies - tg->slice_start[rw];
+ 
+-	nr_slices = time_elapsed / throtl_slice;
++	nr_slices = time_elapsed / tg->td->throtl_slice;
+ 
+ 	if (!nr_slices)
+ 		return;
+-	tmp = tg_bps_limit(tg, rw) * throtl_slice * nr_slices;
++	tmp = tg_bps_limit(tg, rw) * tg->td->throtl_slice * nr_slices;
+ 	do_div(tmp, HZ);
+ 	bytes_trim = tmp;
+ 
+-	io_trim = (tg_iops_limit(tg, rw) * throtl_slice * nr_slices)/HZ;
++	io_trim = (tg_iops_limit(tg, rw) * tg->td->throtl_slice * nr_slices)/HZ;
+ 
+ 	if (!bytes_trim && !io_trim)
+ 		return;
+@@ -744,7 +747,7 @@ static inline void throtl_trim_slice(struct throtl_grp *tg, bool rw)
+ 	else
+ 		tg->io_disp[rw] = 0;
+ 
+-	tg->slice_start[rw] += nr_slices * throtl_slice;
++	tg->slice_start[rw] += nr_slices * tg->td->throtl_slice;
+ 
+ 	throtl_log(&tg->service_queue,
+ 		   "[%c] trim slice nr=%lu bytes=%llu io=%lu start=%lu end=%lu jiffies=%lu",
+@@ -764,9 +767,9 @@ static bool tg_with_in_iops_limit(struct throtl_grp *tg, struct bio *bio,
+ 
+ 	/* Slice has just started. Consider one slice interval */
+ 	if (!jiffy_elapsed)
+-		jiffy_elapsed_rnd = throtl_slice;
++		jiffy_elapsed_rnd = tg->td->throtl_slice;
+ 
+-	jiffy_elapsed_rnd = roundup(jiffy_elapsed_rnd, throtl_slice);
++	jiffy_elapsed_rnd = roundup(jiffy_elapsed_rnd, tg->td->throtl_slice);
+ 
+ 	/*
+ 	 * jiffy_elapsed_rnd should not be a big value as minimum iops can be
+@@ -813,9 +816,9 @@ static bool tg_with_in_bps_limit(struct throtl_grp *tg, struct bio *bio,
+ 
+ 	/* Slice has just started. Consider one slice interval */
+ 	if (!jiffy_elapsed)
+-		jiffy_elapsed_rnd = throtl_slice;
++		jiffy_elapsed_rnd = tg->td->throtl_slice;
+ 
+-	jiffy_elapsed_rnd = roundup(jiffy_elapsed_rnd, throtl_slice);
++	jiffy_elapsed_rnd = roundup(jiffy_elapsed_rnd, tg->td->throtl_slice);
+ 
+ 	tmp = tg_bps_limit(tg, rw) * jiffy_elapsed_rnd;
+ 	do_div(tmp, HZ);
+@@ -878,8 +881,8 @@ static bool tg_may_dispatch(struct throtl_grp *tg, struct bio *bio,
+ 	if (throtl_slice_used(tg, rw))
+ 		throtl_start_new_slice(tg, rw);
+ 	else {
+-		if (time_before(tg->slice_end[rw], jiffies + throtl_slice))
+-			throtl_extend_slice(tg, rw, jiffies + throtl_slice);
++		if (time_before(tg->slice_end[rw], jiffies + tg->td->throtl_slice))
++			throtl_extend_slice(tg, rw, jiffies + tg->td->throtl_slice);
  	}
--	if (id->ncap == 0) {
--		kfree(id);
--		return -ENODEV;
--	}
  
--	if (nvme_nvm_ns_supported(ns, id) && ns->type != NVME_NS_LIGHTNVM) {
--		if (nvme_nvm_register(ns->queue, disk->disk_name)) {
--			dev_warn(disk_to_dev(ns->disk),
--				"%s: LightNVM init failure\n", __func__);
--			kfree(id);
--			return -ENODEV;
--		}
--		ns->type = NVME_NS_LIGHTNVM;
-+	if ((*id)->ncap == 0) {
-+		kfree(*id);
-+		return -ENODEV;
- 	}
+ 	if (tg_with_in_bps_limit(tg, bio, &bps_wait) &&
+@@ -1628,7 +1631,7 @@ static bool throtl_can_upgrade(struct throtl_data *td,
+ 	if (td->limit_index != LIMIT_HIGH)
+ 		return false;
  
- 	if (ns->ctrl->vs >= NVME_VS(1, 1))
--		memcpy(ns->eui, id->eui64, sizeof(ns->eui));
-+		memcpy(ns->eui, (*id)->eui64, sizeof(ns->eui));
- 	if (ns->ctrl->vs >= NVME_VS(1, 2))
--		memcpy(ns->uuid, id->nguid, sizeof(ns->uuid));
-+		memcpy(ns->uuid, (*id)->nguid, sizeof(ns->uuid));
-+
-+	return 0;
-+}
-+
-+static void __nvme_revalidate_disk(struct gendisk *disk, struct nvme_id_ns *id)
-+{
-+	struct nvme_ns *ns = disk->private_data;
-+	u8 lbaf, pi_type;
-+	u16 old_ms;
-+	unsigned short bs;
+-	if (time_before(jiffies, td->high_downgrade_time + throtl_slice))
++	if (time_before(jiffies, td->high_downgrade_time + td->throtl_slice))
+ 		return false;
  
- 	old_ms = ns->ms;
- 	lbaf = id->flbas & NVME_NS_FLBAS_LBA_MASK;
-@@ -962,8 +953,26 @@ static int nvme_revalidate_disk(struct gendisk *disk)
- 	if (ns->ctrl->oncs & NVME_CTRL_ONCS_DSM)
- 		nvme_config_discard(ns);
- 	blk_mq_unfreeze_queue(disk->queue);
-+}
- 
-+static int nvme_revalidate_disk(struct gendisk *disk)
-+{
-+	struct nvme_ns *ns = disk->private_data;
-+	struct nvme_id_ns *id = NULL;
-+	int ret;
-+
-+	if (test_bit(NVME_NS_DEAD, &ns->flags)) {
-+		set_capacity(disk, 0);
-+		return -ENODEV;
-+	}
-+
-+	ret = nvme_revalidate_ns(ns, &id);
-+	if (ret)
-+		return ret;
-+
-+	__nvme_revalidate_disk(disk, id);
- 	kfree(id);
-+
- 	return 0;
+ 	rcu_read_lock();
+@@ -1685,8 +1688,8 @@ static bool throtl_downgrade_check_one(struct throtl_grp *tg)
+ 	 * If cgroup is below high limit, consider downgrade and throttle other
+ 	 * cgroups
+ 	 */
+-	if (time_after_eq(now, td->high_upgrade_time + throtl_slice) &&
+-	    time_after_eq(now, tg_last_high_overflow_time(tg) + throtl_slice))
++	if (time_after_eq(now, td->high_upgrade_time + td->throtl_slice) &&
++	    time_after_eq(now, tg_last_high_overflow_time(tg) + td->throtl_slice))
+ 		return true;
+ 	return false;
  }
- 
-@@ -1642,6 +1651,8 @@ static void nvme_alloc_ns(struct nvme_ctrl *ctrl, unsigned nsid)
- {
- 	struct nvme_ns *ns;
- 	struct gendisk *disk;
-+	struct nvme_id_ns *id;
-+	char disk_name[DISK_NAME_LEN];
- 	int node = dev_to_node(ctrl->dev);
- 
- 	ns = kzalloc_node(sizeof(*ns), GFP_KERNEL, node);
-@@ -1659,33 +1670,54 @@ static void nvme_alloc_ns(struct nvme_ctrl *ctrl, unsigned nsid)
- 	ns->queue->queuedata = ns;
- 	ns->ctrl = ctrl;
- 
--	disk = alloc_disk_node(0, node);
--	if (!disk)
--		goto out_free_queue;
--
- 	kref_init(&ns->kref);
- 	ns->ns_id = nsid;
--	ns->disk = disk;
- 	ns->lba_shift = 9; /* set to a default value for 512 until disk is validated */
- 
--
- 	blk_queue_logical_block_size(ns->queue, 1 << ns->lba_shift);
- 	nvme_set_queue_limits(ctrl, ns->queue);
- 
--	disk->fops = &nvme_fops;
--	disk->private_data = ns;
--	disk->queue = ns->queue;
--	disk->flags = GENHD_FL_EXT_DEVT;
--	sprintf(disk->disk_name, "nvme%dn%d", ctrl->instance, ns->instance);
--
--	if (nvme_revalidate_disk(ns->disk))
--		goto out_free_disk;
-+	sprintf(disk_name, "nvme%dn%d", ctrl->instance, ns->instance);
-+
-+	if (nvme_revalidate_ns(ns, &id))
-+		goto out_free_queue;
-+
-+	if (nvme_nvm_ns_supported(ns, id)) {
-+		if (nvme_nvm_register(ns->queue, disk_name)) {
-+			dev_warn(ctrl->dev,
-+				"%s: LightNVM init failure\n", __func__);
-+			goto out_free_id;
-+		}
-+
-+		disk = alloc_disk_node(0, node);
-+		if (!disk)
-+			goto out_free_id;
-+		memcpy(disk->disk_name, disk_name, DISK_NAME_LEN);
-+		ns->disk = disk;
-+		ns->type = NVME_NS_LIGHTNVM;
-+	} else {
-+		disk = alloc_disk_node(0, node);
-+		if (!disk)
-+			goto out_free_id;
-+
-+		disk->fops = &nvme_fops;
-+		disk->private_data = ns;
-+		disk->queue = ns->queue;
-+		disk->flags = GENHD_FL_EXT_DEVT;
-+		memcpy(disk->disk_name, disk_name, DISK_NAME_LEN);
-+		ns->disk = disk;
-+
-+		__nvme_revalidate_disk(disk, id);
-+	}
- 
- 	mutex_lock(&ctrl->namespaces_mutex);
- 	list_add_tail(&ns->list, &ctrl->namespaces);
- 	mutex_unlock(&ctrl->namespaces_mutex);
- 
- 	kref_get(&ctrl->kref);
-+
-+	kfree(id);
-+
- 	if (ns->type == NVME_NS_LIGHTNVM)
+@@ -1719,10 +1722,10 @@ static void throtl_downgrade_check(struct throtl_grp *tg)
+ 		return;
+ 	if (!list_empty(&tg_to_blkg(tg)->blkcg->css.children))
+ 		return;
+-	if (time_after(tg->last_check_time + throtl_slice, now))
++	if (time_after(tg->last_check_time + tg->td->throtl_slice, now))
  		return;
  
-@@ -1695,8 +1727,8 @@ static void nvme_alloc_ns(struct nvme_ctrl *ctrl, unsigned nsid)
- 		pr_warn("%s: failed to create sysfs group for identification\n",
- 			ns->disk->disk_name);
- 	return;
-- out_free_disk:
--	kfree(disk);
-+ out_free_id:
-+	kfree(id);
-  out_free_queue:
- 	blk_cleanup_queue(ns->queue);
-  out_release_instance:
-diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
-index 63f483d..7268a7a 100644
---- a/drivers/nvme/host/lightnvm.c
-+++ b/drivers/nvme/host/lightnvm.c
-@@ -474,8 +474,9 @@ static inline void nvme_nvm_rqtocmd(struct request *rq, struct nvm_rq *rqd,
- 	c->ph_rw.length = cpu_to_le16(rqd->nr_ppas - 1);
+-	if (time_before(now, tg_last_high_overflow_time(tg) + throtl_slice))
++	if (time_before(now, tg_last_high_overflow_time(tg) + tg->td->throtl_slice))
+ 		return;
  
- 	if (rqd->opcode == NVM_OP_HBWRITE || rqd->opcode == NVM_OP_HBREAD)
--		c->hb_rw.slba = cpu_to_le64(nvme_block_nr(ns,
--						rqd->bio->bi_iter.bi_sector));
-+		/* momentarily hardcode the shift configuration. lba_shift from
-+		 * nvm_dev will be available in a follow-up patch */
-+		c->hb_rw.slba = cpu_to_le64(rqd->bio->bi_iter.bi_sector >> 3);
+ 	elapsed_time = now - tg->last_check_time;
+@@ -1960,6 +1963,7 @@ int blk_throtl_init(struct request_queue *q)
+ 
+ 	q->td = td;
+ 	td->queue = q;
++	td->throtl_slice = DFL_THROTL_SLICE;
+ 
+ 	td->limit_valid[LIMIT_HIGH] = false;
+ 	td->limit_valid[LIMIT_MAX] = true;
+@@ -1981,6 +1985,30 @@ void blk_throtl_exit(struct request_queue *q)
+ 	kfree(q->td);
  }
  
- static void nvme_nvm_end_io(struct request *rq, int error)
++ssize_t blk_throtl_slice_show(struct request_queue *q, char *page)
++{
++	if (!q->td)
++		return -EINVAL;
++	return sprintf(page, "%ums\n", jiffies_to_msecs(q->td->throtl_slice));
++}
++
++ssize_t blk_throtl_slice_store(struct request_queue *q,
++	const char *page, size_t count)
++{
++	unsigned long v;
++	unsigned long t;
++
++	if (!q->td)
++		return -EINVAL;
++	if (kstrtoul(page, 10, &v))
++		return -EINVAL;
++	t = msecs_to_jiffies(v);
++	if (t == 0 || t > MAX_THROTL_SLICE)
++		return -EINVAL;
++	q->td->throtl_slice = t;
++	return count;
++}
++
+ static int __init throtl_init(void)
+ {
+ 	kthrotld_workqueue = alloc_workqueue("kthrotld", WQ_MEM_RECLAIM, 0);
+diff --git a/block/blk.h b/block/blk.h
+index c37492f..8ad6068 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -294,6 +294,9 @@ static inline struct io_context *create_io_context(gfp_t gfp_mask, int node)
+ extern void blk_throtl_drain(struct request_queue *q);
+ extern int blk_throtl_init(struct request_queue *q);
+ extern void blk_throtl_exit(struct request_queue *q);
++extern ssize_t blk_throtl_slice_show(struct request_queue *q, char *page);
++extern ssize_t blk_throtl_slice_store(struct request_queue *q,
++	const char *page, size_t count);
+ #else /* CONFIG_BLK_DEV_THROTTLING */
+ static inline void blk_throtl_drain(struct request_queue *q) { }
+ static inline int blk_throtl_init(struct request_queue *q) { return 0; }
 -- 
-2.1.4
+2.8.0.rc2
 
