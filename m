@@ -1,8 +1,4 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:3361 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S934569AbcIOL4U (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Sep 2016 07:56:20 -0400
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
 From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
 To: "Theodore Ts'o" <tytso@mit.edu>,
         Andreas Dilger <adilger.kernel@dilger.ca>,
@@ -19,55 +15,72 @@ Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         linux-block@vger.kernel.org,
         "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv3 34/41] ext4: handle huge pages in ext4_da_write_end()
-Date: Thu, 15 Sep 2016 14:55:16 +0300
-Message-Id: <20160915115523.29737-35-kirill.shutemov@linux.intel.com>
+Subject: [PATCHv3 16/41] filemap: allocate huge page in pagecache_get_page(), if allowed
+Date: Thu, 15 Sep 2016 14:54:58 +0300
+Message-Id: <20160915115523.29737-17-kirill.shutemov@linux.intel.com>
 In-Reply-To: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
 References: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Call ext4_da_should_update_i_disksize() for head page with offset
-relative to head page.
+Write path allocate pages using pagecache_get_page(). We should be able
+to allocate huge pages there, if it's allowed. As usually, fallback to
+small pages, if failed.
 
 Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- fs/ext4/inode.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+ mm/filemap.c | 18 ++++++++++++++++--
+ 1 file changed, 16 insertions(+), 2 deletions(-)
 
-diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
-index 31560b52eff2..deacd3499ec7 100644
---- a/fs/ext4/inode.c
-+++ b/fs/ext4/inode.c
-@@ -3006,7 +3006,6 @@ static int ext4_da_write_end(struct file *file,
- 	int ret = 0, ret2;
- 	handle_t *handle = ext4_journal_current_handle();
- 	loff_t new_i_size;
--	unsigned long start, end;
- 	int write_mode = (int)(unsigned long)fsdata;
+diff --git a/mm/filemap.c b/mm/filemap.c
+index b77bcf6843ee..05b42d3e5ed8 100644
+--- a/mm/filemap.c
++++ b/mm/filemap.c
+@@ -1310,13 +1310,16 @@ repeat:
  
- 	if (write_mode == FALL_BACK_TO_NONDELALLOC)
-@@ -3014,8 +3013,6 @@ static int ext4_da_write_end(struct file *file,
- 				      len, copied, page, fsdata);
+ no_page:
+ 	if (!page && (fgp_flags & FGP_CREAT)) {
++		pgoff_t hoffset;
+ 		int err;
+ 		if ((fgp_flags & FGP_WRITE) && mapping_cap_account_dirty(mapping))
+ 			gfp_mask |= __GFP_WRITE;
+ 		if (fgp_flags & FGP_NOFS)
+ 			gfp_mask &= ~__GFP_FS;
  
- 	trace_ext4_da_write_end(inode, pos, len, copied);
--	start = pos & (PAGE_SIZE - 1);
--	end = start + copied - 1;
+-		page = __page_cache_alloc(gfp_mask);
++		page = page_cache_alloc_huge(mapping, offset, gfp_mask);
++no_huge:	if (!page)
++			page = __page_cache_alloc(gfp_mask);
+ 		if (!page)
+ 			return NULL;
  
- 	/*
- 	 * generic_write_end() will run mark_inode_dirty() if i_size
-@@ -3024,8 +3021,10 @@ static int ext4_da_write_end(struct file *file,
- 	 */
- 	new_i_size = pos + copied;
- 	if (copied && new_i_size > EXT4_I(inode)->i_disksize) {
-+		struct page *head = compound_head(page);
-+		unsigned long end = (pos & ~hpage_mask(head)) + copied - 1;
- 		if (ext4_has_inline_data(inode) ||
--		    ext4_da_should_update_i_disksize(page, end)) {
-+		    ext4_da_should_update_i_disksize(head, end)) {
- 			ext4_update_i_disksize(inode, new_i_size);
- 			/* We need to mark inode dirty even if
- 			 * new_i_size is less that inode->i_size
+@@ -1327,14 +1330,25 @@ no_page:
+ 		if (fgp_flags & FGP_ACCESSED)
+ 			__SetPageReferenced(page);
+ 
+-		err = add_to_page_cache_lru(page, mapping, offset,
++		if (PageTransHuge(page))
++			hoffset = round_down(offset, HPAGE_PMD_NR);
++		else
++			hoffset = offset;
++
++		err = add_to_page_cache_lru(page, mapping, hoffset,
+ 				gfp_mask & GFP_RECLAIM_MASK);
+ 		if (unlikely(err)) {
++			if (PageTransHuge(page)) {
++				put_page(page);
++				page = NULL;
++				goto no_huge;
++			}
+ 			put_page(page);
+ 			page = NULL;
+ 			if (err == -EEXIST)
+ 				goto repeat;
+ 		}
++		page += offset - hoffset;
+ 	}
+ 
+ 	return page;
 -- 
 2.9.3
 
