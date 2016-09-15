@@ -1,65 +1,133 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail.avalus.com ([89.16.176.221]:45192 "EHLO mail.avalus.com"
+Received: from mx1.redhat.com ([209.132.183.28]:55828 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753211AbcIOPSC (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Sep 2016 11:18:02 -0400
-Content-Type: text/plain; charset=windows-1252
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+        id S934171AbcIOOIJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 15 Sep 2016 10:08:09 -0400
 Subject: Re: [Nbd] [RESEND][PATCH 0/5] nbd improvements
-From: Alex Bligh <alex@alex.org.uk>
-In-Reply-To: <93b5c669-fbcf-e972-fc4d-3b08f1c76299@fb.com>
-Date: Thu, 15 Sep 2016 16:17:58 +0100
-Cc: Alex Bligh <alex@alex.org.uk>, Wouter Verhelst <w@uter.be>,
-        Christoph Hellwig <hch@infradead.org>,
+To: Eric Blake <eblake@redhat.com>, Alex Bligh <alex@alex.org.uk>,
+        Wouter Verhelst <w@uter.be>, Josef Bacik <jbacik@fb.com>
+References: <1473369130-22986-1-git-send-email-jbacik@fb.com>
+ <20160909200203.phhvodsfs7ymukfp@grep.be>
+ <20160915104935.ohuwgq2chsedz6fl@grep.be>
+ <27B346AF-F144-4770-BE38-446A66E71326@alex.org.uk>
+ <8dd28f8b-0a3c-4112-ca6d-a9ad080d5920@redhat.com>
+Cc: linux-block@vger.kernel.org, Markus Pargmann <mpa@pengutronix.de>,
+        kernel-team@fb.com,
         "nbd-general@lists.sourceforge.net"
         <nbd-general@lists.sourceforge.net>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        linux-block@vger.kernel.org, Markus Pargmann <mpa@pengutronix.de>,
-        kernel-team@fb.com
-Message-Id: <61FA9037-0D6C-4902-968C-11BCDEED3DC8@alex.org.uk>
-References: <20160915113807.GA23259@infradead.org> <20160915115514.7hba23nqvvwfhb5z@grep.be> <20160915120125.GA31044@infradead.org> <20160915122120.4h3ykbewaavjk5nx@grep.be> <20160915122304.GA15501@infradead.org> <2ABB8966-5C20-45A7-BB4C-6882F042905D@alex.org.uk> <20160915123646.GA10394@infradead.org> <C48DD624-6EDF-4EED-B474-8BEA021F00F0@alex.org.uk> <20160915124103.GA20657@infradead.org> <DA0880DA-700F-4989-9326-68F5F7A55F25@alex.org.uk> <20160915131741.cth6kilmcgnobbuu@grep.be> <93b5c669-fbcf-e972-fc4d-3b08f1c76299@fb.com>
-To: Josef Bacik <jbacik@fb.com>
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <f4756e27-9814-477c-2d03-e7373154c3b7@redhat.com>
+Date: Thu, 15 Sep 2016 16:07:54 +0200
+MIME-Version: 1.0
+In-Reply-To: <8dd28f8b-0a3c-4112-ca6d-a9ad080d5920@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="4FHCt7GDgNSjApphcH50D1MAse9DfrJ9V"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Josef,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--4FHCt7GDgNSjApphcH50D1MAse9DfrJ9V
+Content-Type: multipart/mixed; boundary="RTloq5xUGAeDHeQsHCk68u2trL1mfauWL";
+ protected-headers="v1"
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: Eric Blake <eblake@redhat.com>, Alex Bligh <alex@alex.org.uk>,
+ Wouter Verhelst <w@uter.be>, Josef Bacik <jbacik@fb.com>
+Cc: linux-block@vger.kernel.org, Markus Pargmann <mpa@pengutronix.de>,
+ kernel-team@fb.com,
+ "nbd-general@lists.sourceforge.net" <nbd-general@lists.sourceforge.net>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Message-ID: <f4756e27-9814-477c-2d03-e7373154c3b7@redhat.com>
+Subject: Re: [Nbd] [RESEND][PATCH 0/5] nbd improvements
+References: <1473369130-22986-1-git-send-email-jbacik@fb.com>
+ <20160909200203.phhvodsfs7ymukfp@grep.be>
+ <20160915104935.ohuwgq2chsedz6fl@grep.be>
+ <27B346AF-F144-4770-BE38-446A66E71326@alex.org.uk>
+ <8dd28f8b-0a3c-4112-ca6d-a9ad080d5920@redhat.com>
+In-Reply-To: <8dd28f8b-0a3c-4112-ca6d-a9ad080d5920@redhat.com>
 
-> On 15 Sep 2016, at 14:57, Josef Bacik <jbacik@fb.com> wrote:
+--RTloq5xUGAeDHeQsHCk68u2trL1mfauWL
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+
+
+On 15/09/2016 15:34, Eric Blake wrote:
+> On 09/15/2016 06:09 AM, Alex Bligh wrote:
+>>
+>> I also wonder whether any servers that can do caching per
+>> connection will always share a consistent cache between=20
+>> connections. The one I'm worried about in particular here
+>> is qemu-nbd - Eric Blake CC'd.
+>>
 >=20
-> This isn't an NBD problem, this is an application problem.  The =
-application must wait for all writes it cares about _before_ issuing a =
-flush.  This is the same as for normal storage as it is for NBD.  It is =
-not NBD's responsibility to maintain coherency between multiple requests =
-across connections, just simply to act on and respond to requests.
+> I doubt that qemu-nbd would ever want to support the situation with mor=
+e
+> than one client connection writing to the same image at the same time;
+> the implications of sorting out data consistency between multiple
+> writers is rather complex and not worth coding into qemu.  So I think
+> qemu would probably prefer to just prohibit the multiple writer
+> situation.  And while multiple readers with no writer should be fine,
+> I'm not even sure if multiple readers plus one writer can always be mad=
+e
+> to appear sane (if there is no coordination between the different
+> connections, on an image where the writer changes AA to BA then flushes=
+
+> then changes to BB, it is still feasible that a reader could see AB
+> (pre-flush state of the first sector, post-flush changes to the second
+> sector, even though the writer never flushed that particular content to=
+
+> disk).
 >=20
-> I think changing the specification to indicate that this is the case =
-for multiple connections is a good thing, to keep NBD servers from doing =
-weird things like sending different connections to the same export to =
-different backing stores without some sort of synchronization.  It =
-should definitely be explicitly stated somewhere that NBD does not =
-provide any ordering guarantees and that is up to the application.  =
-Thanks,
+> But Paolo Bonzini (cc'd) may have more insight on qemu's NBD server and=
 
-I don't think that's correct.
+> what it supports (or forbids) in the way of multiple clients to a singl=
+e
+> server.
 
-The block stack issues a flush to mean (precisely) "do not reply to this =
-until all preceding writes THAT HAVE BEEN REPLIED TO have been persisted =
-to non-volatile storage".
+I don't think QEMU forbids multiple clients to the single server, and
+guarantees consistency as long as there is no overlap between writes and
+reads.  These are the same guarantees you have for multiple commands on
+a single connection.
 
-The danger is with multiple connections (where apparently only one flush =
-is sent - let's say down connection 1) that not al the writes that have =
-been replied to on connection 2 have been persisted to non-volatile =
-storage. Only the ones on connection 1 have been persisted (this is =
-assuming the nbd server doesn't 'link' in some way the connections).
+In other words, from the POV of QEMU there's no difference whether
+multiple commands come from one or more connections.
 
-There's nothing the 'application' (here meaning the kernel or higher =
-level) can do to mitigate this. Sure it can wait for all the replies, =
-but this doesn't guarantee the writes have been persisted to =
-non-volatile storage, precisely because writes may return prior to this.
+Paolo
 
---=20
-Alex Bligh
+>> A more general point is that with multiple queues requests
+>> may be processed in a different order even by those servers that
+>> currently process the requests in strict order, or in something
+>> similar to strict order. The server is permitted by the spec
+>> (save as mandated by NBD_CMD_FLUSH and NBD_CMD_FLAG_FUA) to
+>> process commands out of order anyway, but I suspect this has
+>> to date been little tested.
+>=20
+> qemu-nbd is definitely capable of serving reads and writes out-of-order=
+
+> to a single connection client; but that's different than the case with
+> multiple connections.
+>=20
 
 
+--RTloq5xUGAeDHeQsHCk68u2trL1mfauWL--
 
+--4FHCt7GDgNSjApphcH50D1MAse9DfrJ9V
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQEcBAEBCAAGBQJX2qs/AAoJEL/70l94x66DZqYIAIht6TgcoSaZfQXWM2fYv2kc
+0lxbS4+detutAwkcgMh3hWUUY5WDLCQDuCHRbF6WubXU9SwdzWNEZeUnjKY60Y2V
+VclfxrMiUwyvhYVLTV+oJDcXzNSyXh80o3rpcb9e+zBVofIs7IlQJtkzLo6/7Bqp
+tHMQjKtS4lSDz4pI213/VD4DUS3kpJ7zsCwQULSu+QDs+vWLbeWPXJaB3IQ1OOSl
+kPpcG8Xs+HIqJfUHFxnTWO6M7yIbP93zvW6Z5e1aiPjhHdSqRSUHRVApGY3iLYSm
+PJuq1rK9D+qLWY6qdQ6SbZV+U/WdZxxrXtWSkvXK9QvDRSZIuqw2FzwKG9VkLA0=
+=vRxL
+-----END PGP SIGNATURE-----
+
+--4FHCt7GDgNSjApphcH50D1MAse9DfrJ9V--
