@@ -1,23 +1,75 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-From: Christoph Hellwig <hch@lst.de>
-To: hans.verkuil@cisco.com, brking@us.ibm.com,
-        haver@linux.vnet.ibm.com, ching2048@areca.com.tw, axboe@fb.com,
-        alex.williamson@redhat.com
-Cc: kvm@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-media@vger.kernel.org,
-        linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: replace pci_enable_msi_{exact_range} with pci_alloc_irq_vectors
-Date: Sun, 11 Sep 2016 15:31:22 +0200
-Message-Id: <1473600688-24043-1-git-send-email-hch@lst.de>
-Sender: linux-scsi-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga07.intel.com ([134.134.136.100]:42018 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S934047AbcIOLzm (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 15 Sep 2016 07:55:42 -0400
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv3 21/41] thp: introduce hpage_size() and hpage_mask()
+Date: Thu, 15 Sep 2016 14:55:03 +0300
+Message-Id: <20160915115523.29737-22-kirill.shutemov@linux.intel.com>
+In-Reply-To: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
+References: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Hi all,
+Introduce new helpers which return size/mask of the page:
+HPAGE_PMD_SIZE/HPAGE_PMD_MASK if the page is PageTransHuge() and
+PAGE_SIZE/PAGE_MASK otherwise.
 
-this series switch the remaining users of pci_enable_msi_{exact_range}
-(accounting for ahci and nvme being done through other channels) to
-use the pci_alloc_irq_vectors helper instead and thus simplify the
-interrupt code in those drivers a lot.  I decided to post it as a
-series to everyone involved and linux-pci so that we can get a bit of
-cross-review given that I have none of the involved hardware myself.
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+---
+ include/linux/huge_mm.h | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+diff --git a/include/linux/huge_mm.h b/include/linux/huge_mm.h
+index 6f14de45b5ce..de2789b4402c 100644
+--- a/include/linux/huge_mm.h
++++ b/include/linux/huge_mm.h
+@@ -138,6 +138,20 @@ static inline int hpage_nr_pages(struct page *page)
+ 	return 1;
+ }
+ 
++static inline int hpage_size(struct page *page)
++{
++	if (unlikely(PageTransHuge(page)))
++		return HPAGE_PMD_SIZE;
++	return PAGE_SIZE;
++}
++
++static inline unsigned long hpage_mask(struct page *page)
++{
++	if (unlikely(PageTransHuge(page)))
++		return HPAGE_PMD_MASK;
++	return PAGE_MASK;
++}
++
+ extern int do_huge_pmd_numa_page(struct fault_env *fe, pmd_t orig_pmd);
+ 
+ extern struct page *huge_zero_page;
+@@ -163,6 +177,8 @@ void put_huge_zero_page(void);
+ #define HPAGE_PMD_SIZE ({ BUILD_BUG(); 0; })
+ 
+ #define hpage_nr_pages(x) 1
++#define hpage_size(x) PAGE_SIZE
++#define hpage_mask(x) PAGE_MASK
+ 
+ #define transparent_hugepage_enabled(__vma) 0
+ 
+-- 
+2.9.3
 
