@@ -1,65 +1,72 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f194.google.com ([209.85.192.194]:33434 "EHLO
-        mail-pf0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S934217AbcIPMZa (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Sep 2016 08:25:30 -0400
-Received: by mail-pf0-f194.google.com with SMTP id q2so935777pfj.0
-        for <linux-block@vger.kernel.org>; Fri, 16 Sep 2016 05:25:30 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        axboe@fb.com
-Cc: keith.busch@intel.com, Geert Uytterhoeven <geert@linux-m68k.org>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [PATCH 1/7] lightnvm: NVM should depend on HAS_DMA
-Date: Fri, 16 Sep 2016 14:25:03 +0200
-Message-Id: <1474028709-30260-2-git-send-email-m@bjorling.me>
-In-Reply-To: <1474028709-30260-1-git-send-email-m@bjorling.me>
-References: <1474028709-30260-1-git-send-email-m@bjorling.me>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Received: from mga07.intel.com ([134.134.136.100]:41643 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S934245AbcIOLzs (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 15 Sep 2016 07:55:48 -0400
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv3 32/41] ext4: handle huge pages in __ext4_block_zero_page_range()
+Date: Thu, 15 Sep 2016 14:55:14 +0300
+Message-Id: <20160915115523.29737-33-kirill.shutemov@linux.intel.com>
+In-Reply-To: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
+References: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Geert Uytterhoeven <geert@linux-m68k.org>
+As the function handles zeroing range only within one block, the
+required changes are trivial, just remove assuption on page size.
 
-If NO_DMA=y:
-
-    drivers/built-in.o: In function `nvme_nvm_dev_dma_free':
-    lightnvm.c:(.text+0x23df1a): undefined reference to `dma_pool_free'
-    drivers/built-in.o: In function `nvme_nvm_dev_dma_alloc':
-    lightnvm.c:(.text+0x23df38): undefined reference to `dma_pool_alloc'
-    drivers/built-in.o: In function `nvme_nvm_destroy_dma_pool':
-    lightnvm.c:(.text+0x23df4c): undefined reference to `dma_pool_destroy'
-    drivers/built-in.o: In function `nvme_nvm_create_dma_pool':
-    lightnvm.c:(.text+0x23df7e): undefined reference to `dma_pool_create'
-
-and
-
-    ERROR: "dma_pool_destroy" [drivers/nvme/host/nvme-core.ko] undefined!
-    ERROR: "dma_pool_free" [drivers/nvme/host/nvme-core.ko] undefined!
-    ERROR: "dma_pool_alloc" [drivers/nvme/host/nvme-core.ko] undefined!
-    ERROR: "dma_pool_create" [drivers/nvme/host/nvme-core.ko] undefined!
-
-Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
-Signed-off-by: Matias Bjørling <m@bjorling.me>
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- drivers/lightnvm/Kconfig | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ fs/ext4/inode.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/lightnvm/Kconfig b/drivers/lightnvm/Kconfig
-index 61c68a1..2f5d5f4 100644
---- a/drivers/lightnvm/Kconfig
-+++ b/drivers/lightnvm/Kconfig
-@@ -4,7 +4,7 @@
+diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
+index 9ed715ed00e7..a07c055d8e78 100644
+--- a/fs/ext4/inode.c
++++ b/fs/ext4/inode.c
+@@ -3679,7 +3679,7 @@ static int __ext4_block_zero_page_range(handle_t *handle,
+ 		struct address_space *mapping, loff_t from, loff_t length)
+ {
+ 	ext4_fsblk_t index = from >> PAGE_SHIFT;
+-	unsigned offset = from & (PAGE_SIZE-1);
++	unsigned offset;
+ 	unsigned blocksize, pos;
+ 	ext4_lblk_t iblock;
+ 	struct inode *inode = mapping->host;
+@@ -3692,6 +3692,9 @@ static int __ext4_block_zero_page_range(handle_t *handle,
+ 	if (!page)
+ 		return -ENOMEM;
  
- menuconfig NVM
- 	bool "Open-Channel SSD target support"
--	depends on BLOCK
-+	depends on BLOCK && HAS_DMA
- 	help
- 	  Say Y here to get to enable Open-channel SSDs.
++	page = compound_head(page);
++	offset = from & ~hpage_mask(page);
++
+ 	blocksize = inode->i_sb->s_blocksize;
  
+ 	iblock = index << (PAGE_SHIFT - inode->i_sb->s_blocksize_bits);
+@@ -3746,7 +3749,7 @@ static int __ext4_block_zero_page_range(handle_t *handle,
+ 		if (err)
+ 			goto unlock;
+ 	}
+-	zero_user(page, offset, length);
++	zero_user(page + offset / PAGE_SIZE, offset % PAGE_SIZE, length);
+ 	BUFFER_TRACE(bh, "zeroed end of block");
+ 
+ 	if (ext4_should_journal_data(inode)) {
 -- 
-2.1.4
+2.9.3
 
