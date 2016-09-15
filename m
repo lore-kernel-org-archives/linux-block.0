@@ -1,72 +1,81 @@
-Return-Path: <agordeev@redhat.com>
-Date: Mon, 19 Sep 2016 12:38:05 +0200
-From: Alexander Gordeev <agordeev@redhat.com>
-To: Keith Busch <keith.busch@intel.com>
-Cc: linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH RFC 00/21] blk-mq: Introduce combined hardware queues
-Message-ID: <20160919103805.GA22169@agordeev.lab.eng.brq.redhat.com>
-References: <cover.1474014910.git.agordeev@redhat.com>
- <20160916210448.GA1178@localhost.localdomain>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:33475 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1754872AbcIOQXW (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 15 Sep 2016 12:23:22 -0400
+Received: from pps.filterd (m0044010.ppops.net [127.0.0.1])
+        by mx0a-00082601.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id u8FGFE6W022591
+        for <linux-block@vger.kernel.org>; Thu, 15 Sep 2016 09:23:21 -0700
+Received: from mail.thefacebook.com ([199.201.64.23])
+        by mx0a-00082601.pphosted.com with ESMTP id 25fww30vgw-2
+        (version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT)
+        for <linux-block@vger.kernel.org>; Thu, 15 Sep 2016 09:23:21 -0700
+Received: from facebook.com (2401:db00:11:d0a2:face:0:39:0)     by
+ mx-out.facebook.com (10.223.100.97) with ESMTP id
+ b68feb007b6011e6a8e524be0593f280-f85fba50 for <linux-block@vger.kernel.org>;
+        Thu, 15 Sep 2016 09:23:19 -0700
+From: Shaohua Li <shli@fb.com>
+To: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <axboe@fb.com>, <Kernel-team@fb.com>, <tj@kernel.org>,
+        <jmoyer@redhat.com>, <vgoyal@redhat.com>
+Subject: [PATCH V2 03/11] block-throttle: configure bps/iops limit for cgroup in high limit
+Date: Thu, 15 Sep 2016 09:23:10 -0700
+Message-ID: <3d5ec2c037901f7e30478b1d5a3f8d7cacf657cf.1473953743.git.shli@fb.com>
+In-Reply-To: <cover.1473953743.git.shli@fb.com>
+References: <cover.1473953743.git.shli@fb.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20160916210448.GA1178@localhost.localdomain>
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Fri, Sep 16, 2016 at 05:04:48PM -0400, Keith Busch wrote:
+each queue will have a state machine. Initially queue is in LIMIT_HIGH
+state, which means all cgroups will be throttled according to their high
+limit. After all cgroups with high limit cross the limit, the queue state
+gets upgraded to LIMIT_MAX state.
+cgroups without high limit will use max limit for their high limit.
 
-CC-ing linux-block@vger.kernel.org
+Signed-off-by: Shaohua Li <shli@fb.com>
+---
+ block/blk-throttle.c | 21 +++++++++++++++++++--
+ 1 file changed, 19 insertions(+), 2 deletions(-)
 
-> I'm not sure I see how this helps. That probably means I'm not considering
-> the right scenario. Could you elaborate on when having multiple hardware
-> queues to choose from a given CPU will provide a benefit?
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index 02323fb..6bae1b4 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -208,12 +208,29 @@ static struct throtl_data *sq_to_td(struct throtl_service_queue *sq)
+ 
+ static uint64_t tg_bps_limit(struct throtl_grp *tg, int rw)
+ {
+-	return tg->bps[rw][tg->td->limit_index];
++	struct blkcg_gq *blkg = tg_to_blkg(tg);
++	uint64_t ret;
++
++	if (cgroup_subsys_on_dfl(io_cgrp_subsys) && !blkg->parent)
++		return -1;
++	ret = tg->bps[rw][tg->td->limit_index];
++	if (ret == -1 && tg->td->limit_index == LIMIT_HIGH)
++		return tg->bps[rw][LIMIT_MAX];
++
++	return ret;
+ }
+ 
+ static unsigned int tg_iops_limit(struct throtl_grp *tg, int rw)
+ {
+-	return tg->iops[rw][tg->td->limit_index];
++	struct blkcg_gq *blkg = tg_to_blkg(tg);
++	unsigned int ret;
++
++	if (cgroup_subsys_on_dfl(io_cgrp_subsys) && !blkg->parent)
++		return -1;
++	ret = tg->iops[rw][tg->td->limit_index];
++	if (ret == -1 && tg->td->limit_index == LIMIT_HIGH)
++		return tg->iops[rw][LIMIT_MAX];
++	return ret;
+ }
+ 
+ /**
+-- 
+2.8.0.rc2
 
-No, I do not keep in mind any particular scenario besides common
-sense. Just an assumption deeper queues are better (in this RFC
-a virtual combined queue consisting of multipe h/w queues).
-
-Apparently, there could be positive effects only in systems where
-# of queues / # of CPUs > 1 or # of queues / # of cores > 1. But
-I do not happen to have ones. If I had numbers this would not be
-the RFC and I probably would not have posted in the first place ;)
-
-Would it be possible to give it a try on your hardware?
-
-> If we're out of avaliable h/w tags, having more queues shouldn't
-> improve performance. The tag depth on each nvme hw context is already
-> deep enough that it should mean even one full queue has saturated the
-> device capabilities.
-
-Am I getting you right - a single full nvme hardware queue makes
-other queues stalled?
-
-> Having a 1:1 already seemed like the ideal solution since you can't
-> simultaneously utilize more than that from the host, so there's no more
-> h/w parallelisms from we can exploit. On the controller side, fetching
-> commands is serialized memory reads, so I don't think spreading IO
-> among more h/w queues helps the target over posting more commands to a
-> single queue.
-
-I take a notion of un-ordered commands completion you described below.
-But I fail to realize why a CPU would not simultaneously utilize more
-than one queue by posting to multiple. Is it due to nvme specifics or
-you assume the host would not issue that many commands?
-
-Besides, blk-mq-tag re-uses the latest freed tag and IO should not
-actually get spred. Instead, if only currently used hardware queue is
-full, the next available queue is chosen. But this is a speculation
-without real benchmarks, of course.
-
-> If a CPU has more than one to choose from, a command sent to a less
-> used queue would be serviced ahead of previously issued commands on a
-> more heavily used one from the same CPU thread due to how NVMe command
-> arbitraration works, so it sounds like this would create odd latency
-> outliers.
-
-Yep, that sounds scary indeed. Still, any hints on benchmarking
-are welcomed.
-
-Many thanks!
-
-> Thanks,
-> Keith
