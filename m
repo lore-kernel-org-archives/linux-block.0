@@ -15,55 +15,40 @@ Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         linux-block@vger.kernel.org,
         "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv3 15/41] filemap: handle huge pages in do_generic_file_read()
-Date: Thu, 15 Sep 2016 14:54:57 +0300
-Message-Id: <20160915115523.29737-16-kirill.shutemov@linux.intel.com>
+Subject: [PATCHv3 17/41] filemap: handle huge pages in filemap_fdatawait_range()
+Date: Thu, 15 Sep 2016 14:54:59 +0300
+Message-Id: <20160915115523.29737-18-kirill.shutemov@linux.intel.com>
 In-Reply-To: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
 References: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
 Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Most of work happans on head page. Only when we need to do copy data to
-userspace we find relevant subpage.
-
-We are still limited by PAGE_SIZE per iteration. Lifting this limitation
-would require some more work.
+We writeback whole huge page a time.
 
 Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- mm/filemap.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ mm/filemap.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
 diff --git a/mm/filemap.c b/mm/filemap.c
-index 50afe17230e7..b77bcf6843ee 100644
+index 05b42d3e5ed8..53da93156e60 100644
 --- a/mm/filemap.c
 +++ b/mm/filemap.c
-@@ -1860,6 +1860,7 @@ find_page:
- 			if (unlikely(page == NULL))
- 				goto no_cached_page;
- 		}
-+		page = compound_head(page);
- 		if (PageReadahead(page)) {
- 			page_cache_async_readahead(mapping,
- 					ra, filp, page,
-@@ -1936,7 +1937,8 @@ page_ok:
- 		 * now we can copy it to user space...
- 		 */
+@@ -372,9 +372,14 @@ static int __filemap_fdatawait_range(struct address_space *mapping,
+ 			if (page->index > end)
+ 				continue;
  
--		ret = copy_page_to_iter(page, offset, nr, iter);
-+		ret = copy_page_to_iter(page + index - page->index, offset,
-+				nr, iter);
- 		offset += ret;
- 		index += offset >> PAGE_SHIFT;
- 		offset &= ~PAGE_MASK;
-@@ -2356,6 +2358,7 @@ page_not_uptodate:
- 	 * because there really aren't any performance issues here
- 	 * and we need to check for errors.
- 	 */
-+	page = compound_head(page);
- 	ClearPageError(page);
- 	error = mapping->a_ops->readpage(file, page);
- 	if (!error) {
++			page = compound_head(page);
+ 			wait_on_page_writeback(page);
+ 			if (TestClearPageError(page))
+ 				ret = -EIO;
++			if (PageTransHuge(page)) {
++				index = page->index + HPAGE_PMD_NR;
++				i += index - pvec.pages[i]->index - 1;
++			}
+ 		}
+ 		pagevec_release(&pvec);
+ 		cond_resched();
 -- 
 2.9.3
 
