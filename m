@@ -1,75 +1,83 @@
-Return-Path: <prvs=80586c83e0=axboe@fb.com>
-From: Jens Axboe <axboe@fb.com>
-To: <axboe@kernel.dk>, <linux-kernel@vger.kernel.org>,
-        <linux-fsdevel@vger.kernel.org>, <linux-block@vger.kernel.org>
-CC: Jens Axboe <axboe@fb.com>
-Subject: [PATCH 1/8] block: add WRITE_BG
-Date: Wed, 7 Sep 2016 08:46:43 -0600
-Message-ID: <1473259610-3295-2-git-send-email-axboe@fb.com>
-In-Reply-To: <1473259610-3295-1-git-send-email-axboe@fb.com>
-References: <1473259610-3295-1-git-send-email-axboe@fb.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga01.intel.com ([192.55.52.88]:25920 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S934569AbcIOL4N (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 15 Sep 2016 07:56:13 -0400
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv3 06/41] radix-tree: Handle multiorder entries being deleted by replace_clear_tags
+Date: Thu, 15 Sep 2016 14:54:48 +0300
+Message-Id: <20160915115523.29737-7-kirill.shutemov@linux.intel.com>
+In-Reply-To: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
+References: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This adds a new request flag, REQ_BG, that callers can use to tell
-the block layer that this is background (non-urgent) IO.
+From: Matthew Wilcox <willy@infradead.org>
 
-Signed-off-by: Jens Axboe <axboe@fb.com>
+radix_tree_replace_clear_tags() can be called with NULL as the replacement
+value; in this case we need to delete sibling entries which point to
+the slot.
+
+Signed-off-by: Matthew Wilcox <willy@infradead.org>
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- include/linux/blk_types.h | 4 +++-
- include/linux/fs.h        | 3 +++
- 2 files changed, 6 insertions(+), 1 deletion(-)
+ lib/radix-tree.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 436f43f87da9..be4409b6ae4f 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -155,6 +155,7 @@ enum rq_flag_bits {
- 	__REQ_INTEGRITY,	/* I/O includes block integrity payload */
- 	__REQ_FUA,		/* forced unit access */
- 	__REQ_PREFLUSH,		/* request for cache flush */
-+	__REQ_BG,		/* background activity */
+diff --git a/lib/radix-tree.c b/lib/radix-tree.c
+index e58855435c01..57c15c4d0796 100644
+--- a/lib/radix-tree.c
++++ b/lib/radix-tree.c
+@@ -1805,17 +1805,23 @@ void *radix_tree_delete(struct radix_tree_root *root, unsigned long index)
+ }
+ EXPORT_SYMBOL(radix_tree_delete);
  
- 	/* bio only flags */
- 	__REQ_RAHEAD,		/* read ahead, can fail anytime */
-@@ -198,7 +199,7 @@ enum rq_flag_bits {
- 	(REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT | REQ_FAILFAST_DRIVER)
- #define REQ_COMMON_MASK \
- 	(REQ_FAILFAST_MASK | REQ_SYNC | REQ_META | REQ_PRIO | REQ_NOIDLE | \
--	 REQ_PREFLUSH | REQ_FUA | REQ_INTEGRITY | REQ_NOMERGE)
-+	 REQ_PREFLUSH | REQ_FUA | REQ_INTEGRITY | REQ_NOMERGE | REQ_BG)
- #define REQ_CLONE_MASK		REQ_COMMON_MASK
++/*
++ * If the caller passes NULL for @entry, it must take care to adjust
++ * node->count.  See page_cache_tree_delete() for an example.
++ */
+ struct radix_tree_node *radix_tree_replace_clear_tags(
+ 			struct radix_tree_root *root,
+ 			unsigned long index, void *entry)
+ {
+ 	struct radix_tree_node *node;
+ 	void **slot;
++	unsigned int offset;
  
- /* This mask is used for both bio and request merge checking */
-@@ -223,6 +224,7 @@ enum rq_flag_bits {
- #define REQ_COPY_USER		(1ULL << __REQ_COPY_USER)
- #define REQ_PREFLUSH		(1ULL << __REQ_PREFLUSH)
- #define REQ_FLUSH_SEQ		(1ULL << __REQ_FLUSH_SEQ)
-+#define REQ_BG			(1ULL << __REQ_BG)
- #define REQ_IO_STAT		(1ULL << __REQ_IO_STAT)
- #define REQ_MIXED_MERGE		(1ULL << __REQ_MIXED_MERGE)
- #define REQ_PM			(1ULL << __REQ_PM)
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 901e25d495cc..7c7951f1166a 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -189,6 +189,8 @@ typedef int (dio_iodone_t)(struct kiocb *iocb, loff_t offset,
-  * WRITE_FLUSH_FUA	Combination of WRITE_FLUSH and FUA. The IO is preceded
-  *			by a cache flush and data is guaranteed to be on
-  *			non-volatile media on completion.
-+ * WRITE_BG		Background write. This is for background activity like
-+ *			the periodic flush and background threshold writeback
-  *
-  */
- #define RW_MASK			REQ_OP_WRITE
-@@ -202,6 +204,7 @@ typedef int (dio_iodone_t)(struct kiocb *iocb, loff_t offset,
- #define WRITE_FLUSH		(REQ_SYNC | REQ_NOIDLE | REQ_PREFLUSH)
- #define WRITE_FUA		(REQ_SYNC | REQ_NOIDLE | REQ_FUA)
- #define WRITE_FLUSH_FUA		(REQ_SYNC | REQ_NOIDLE | REQ_PREFLUSH | REQ_FUA)
-+#define WRITE_BG		(REQ_NOIDLE | REQ_BG)
+ 	__radix_tree_lookup(root, index, &node, &slot);
  
- /*
-  * Attribute flags.  These should be or-ed together to figure out what
+ 	if (node) {
+-		unsigned int tag, offset = get_slot_offset(node, slot);
++		unsigned int tag;
++		offset = get_slot_offset(node, slot);
+ 		for (tag = 0; tag < RADIX_TREE_MAX_TAGS; tag++)
+ 			node_tag_clear(root, node, tag, offset);
+ 	} else {
+@@ -1824,6 +1830,9 @@ struct radix_tree_node *radix_tree_replace_clear_tags(
+ 	}
+ 
+ 	radix_tree_replace_slot(slot, entry);
++	if (!entry && node)
++		delete_sibling_entries(node, node_to_entry(slot), offset);
++
+ 	return node;
+ }
+ 
 -- 
-2.7.4
+2.9.3
+
