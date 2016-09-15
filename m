@@ -1,72 +1,36 @@
-Return-Path: <dan.carpenter@oracle.com>
-Date: Thu, 15 Sep 2016 12:11:10 +0300
-From: Dan Carpenter <dan.carpenter@oracle.com>
-To: Matthew Wilcox <matthew@wil.cx>
-Cc: kernel-janitors@vger.kernel.org, linux-block@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>, Hugh Dickins <hughd@google.com>
-Subject: Re: [bug report] fs/block_dev.c: add bdev_read_page() and
- bdev_write_page()
-Message-ID: <20160915091110.GD26713@mwanda>
-References: <20160804140206.GA11852@mwanda>
+Return-Path: <hare@suse.de>
+Subject: Re: [PATCH v2 5/6] dm mpath: use dm_mq_kick_requeue_list()
+To: Mike Snitzer <snitzer@redhat.com>, axboe@kernel.dk, dm-devel@redhat.com
+References: <1473870576-54331-1-git-send-email-snitzer@redhat.com>
+ <1473870576-54331-6-git-send-email-snitzer@redhat.com>
+Cc: linux-block@vger.kernel.org
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <9961e795-39f5-0d1a-80ea-785586abb0ca@suse.de>
+Date: Thu, 15 Sep 2016 08:16:54 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20160804140206.GA11852@mwanda>
+In-Reply-To: <1473870576-54331-6-git-send-email-snitzer@redhat.com>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-block@vger.kernel.org>
 
-Let's try reporting this again to new email addresses...
+On 09/14/2016 06:29 PM, Mike Snitzer wrote:
+> When reinstating a path the blk-mq request_queue's requeue_list should
+> get kicked.  It makes sense to kick the requeue_list as part of the
+> existing hook (previously only used by bio-based support).
+> 
+> Rename process_queued_bios_list to process_queued_io_list.
+> 
+> Signed-off-by: Mike Snitzer <snitzer@redhat.com>
+> ---
+>  drivers/md/dm-mpath.c | 14 ++++++++------
+>  1 file changed, 8 insertions(+), 6 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Btw, belated thanks for creating a linux-block mailing list Jens.  :)
+Cheers,
 
-regards,
-dan carpenter
-
-On Thu, Aug 04, 2016 at 05:02:06PM +0300, Dan Carpenter wrote:
-> Hello Matthew Wilcox,
-> 
-> The patch 47a191fd38eb: "fs/block_dev.c: add bdev_read_page() and
-> bdev_write_page()" from Jun 4, 2014, leads to the following static
-> checker warning:
-> 
-> 	include/linux/genhd.h:382 part_inc_in_flight()
-> 	warn: buffer overflow 'part->in_flight' 2 <= 72
-> 
-> include/linux/genhd.h
->    380  static inline void part_inc_in_flight(struct hd_struct *part, int rw)
->    381  {
->    382          atomic_inc(&part->in_flight[rw]);
->                                             ^^
-> This should either be READ or WRITE.
-> 
->    383          if (part->partno)
->    384                  atomic_inc(&part_to_disk(part)->part0.in_flight[rw]);
->    385  }
-> 
-> 
->    444  int bdev_write_page(struct block_device *bdev, sector_t sector,
->    445                          struct page *page, struct writeback_control *wbc)
->    446  {
->    447          int result;
->    448          int rw = (wbc->sync_mode == WB_SYNC_ALL) ? WRITE_SYNC : WRITE;
->                                                            ^^^^^^^^^^
-> But here we're setting it to WRITE_SYNC.
-> 
->    449          const struct block_device_operations *ops = bdev->bd_disk->fops;
->    450  
->    451          if (!ops->rw_page || bdev_get_integrity(bdev))
->    452                  return -EOPNOTSUPP;
->    453          result = blk_queue_enter(bdev->bd_queue, false);
->    454          if (result)
->    455                  return result;
->    456  
->    457          set_page_writeback(page);
->    458          result = ops->rw_page(bdev, sector + get_start_sect(bdev), page, rw);
->    459          if (result)
->    460                  end_page_writeback(page);
->    461          else
->    462                  unlock_page(page);
->    463          blk_queue_exit(bdev->bd_queue);
->    464          return result;
->    465  }
-> 
-> regards,
-> dan carpenter
+Hannes
+-- 
+Dr. Hannes Reinecke		      zSeries & Storage
+hare@suse.de			      +49 911 74053 688
+SUSE LINUX Products GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: J. Hawn, J. Guild, F. Imend�rffer, HRB 16746 (AG N�rnberg)
