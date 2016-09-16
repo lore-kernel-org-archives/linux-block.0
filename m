@@ -1,144 +1,65 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga03.intel.com ([134.134.136.65]:33605 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S934221AbcIOLzq (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Sep 2016 07:55:46 -0400
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv3 24/41] fs: make block_write_{begin,end}() be able to handle huge pages
-Date: Thu, 15 Sep 2016 14:55:06 +0300
-Message-Id: <20160915115523.29737-25-kirill.shutemov@linux.intel.com>
-In-Reply-To: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
-References: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
+Received: from mail-pf0-f194.google.com ([209.85.192.194]:33434 "EHLO
+        mail-pf0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S934217AbcIPMZa (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 16 Sep 2016 08:25:30 -0400
+Received: by mail-pf0-f194.google.com with SMTP id q2so935777pfj.0
+        for <linux-block@vger.kernel.org>; Fri, 16 Sep 2016 05:25:30 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        axboe@fb.com
+Cc: keith.busch@intel.com, Geert Uytterhoeven <geert@linux-m68k.org>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+Subject: [PATCH 1/7] lightnvm: NVM should depend on HAS_DMA
+Date: Fri, 16 Sep 2016 14:25:03 +0200
+Message-Id: <1474028709-30260-2-git-send-email-m@bjorling.me>
+In-Reply-To: <1474028709-30260-1-git-send-email-m@bjorling.me>
+References: <1474028709-30260-1-git-send-email-m@bjorling.me>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-It's more or less straight-forward.
+From: Geert Uytterhoeven <geert@linux-m68k.org>
 
-Most changes are around getting offset/len withing page right and zero
-out desired part of the page.
+If NO_DMA=y:
 
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+    drivers/built-in.o: In function `nvme_nvm_dev_dma_free':
+    lightnvm.c:(.text+0x23df1a): undefined reference to `dma_pool_free'
+    drivers/built-in.o: In function `nvme_nvm_dev_dma_alloc':
+    lightnvm.c:(.text+0x23df38): undefined reference to `dma_pool_alloc'
+    drivers/built-in.o: In function `nvme_nvm_destroy_dma_pool':
+    lightnvm.c:(.text+0x23df4c): undefined reference to `dma_pool_destroy'
+    drivers/built-in.o: In function `nvme_nvm_create_dma_pool':
+    lightnvm.c:(.text+0x23df7e): undefined reference to `dma_pool_create'
+
+and
+
+    ERROR: "dma_pool_destroy" [drivers/nvme/host/nvme-core.ko] undefined!
+    ERROR: "dma_pool_free" [drivers/nvme/host/nvme-core.ko] undefined!
+    ERROR: "dma_pool_alloc" [drivers/nvme/host/nvme-core.ko] undefined!
+    ERROR: "dma_pool_create" [drivers/nvme/host/nvme-core.ko] undefined!
+
+Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
+Signed-off-by: Matias Bjørling <m@bjorling.me>
 ---
- fs/buffer.c | 53 +++++++++++++++++++++++++++++++----------------------
- 1 file changed, 31 insertions(+), 22 deletions(-)
+ drivers/lightnvm/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/fs/buffer.c b/fs/buffer.c
-index 2739f5dae690..7f50e5a63670 100644
---- a/fs/buffer.c
-+++ b/fs/buffer.c
-@@ -1870,21 +1870,21 @@ void page_zero_new_buffers(struct page *page, unsigned from, unsigned to)
- 	do {
- 		block_end = block_start + bh->b_size;
+diff --git a/drivers/lightnvm/Kconfig b/drivers/lightnvm/Kconfig
+index 61c68a1..2f5d5f4 100644
+--- a/drivers/lightnvm/Kconfig
++++ b/drivers/lightnvm/Kconfig
+@@ -4,7 +4,7 @@
  
--		if (buffer_new(bh)) {
--			if (block_end > from && block_start < to) {
--				if (!PageUptodate(page)) {
--					unsigned start, size;
-+		if (buffer_new(bh) && block_end > from && block_start < to) {
-+			if (!PageUptodate(page)) {
-+				unsigned start, size;
+ menuconfig NVM
+ 	bool "Open-Channel SSD target support"
+-	depends on BLOCK
++	depends on BLOCK && HAS_DMA
+ 	help
+ 	  Say Y here to get to enable Open-channel SSDs.
  
--					start = max(from, block_start);
--					size = min(to, block_end) - start;
-+				start = max(from, block_start);
-+				size = min(to, block_end) - start;
- 
--					zero_user(page, start, size);
--					set_buffer_uptodate(bh);
--				}
--
--				clear_buffer_new(bh);
--				mark_buffer_dirty(bh);
-+				zero_user(page + block_start / PAGE_SIZE,
-+						start % PAGE_SIZE,
-+						size);
-+				set_buffer_uptodate(bh);
- 			}
-+
-+			clear_buffer_new(bh);
-+			mark_buffer_dirty(bh);
- 		}
- 
- 		block_start = block_end;
-@@ -1950,18 +1950,20 @@ iomap_to_bh(struct inode *inode, sector_t block, struct buffer_head *bh,
- int __block_write_begin_int(struct page *page, loff_t pos, unsigned len,
- 		get_block_t *get_block, struct iomap *iomap)
- {
--	unsigned from = pos & (PAGE_SIZE - 1);
--	unsigned to = from + len;
--	struct inode *inode = page->mapping->host;
-+	unsigned from, to;
-+	struct inode *inode = page_mapping(page)->host;
- 	unsigned block_start, block_end;
- 	sector_t block;
- 	int err = 0;
- 	unsigned blocksize, bbits;
- 	struct buffer_head *bh, *head, *wait[2], **wait_bh=wait;
- 
-+	page = compound_head(page);
-+	from = pos & ~hpage_mask(page);
-+	to = from + len;
- 	BUG_ON(!PageLocked(page));
--	BUG_ON(from > PAGE_SIZE);
--	BUG_ON(to > PAGE_SIZE);
-+	BUG_ON(from > hpage_size(page));
-+	BUG_ON(to > hpage_size(page));
- 	BUG_ON(from > to);
- 
- 	head = create_page_buffers(page, inode, 0);
-@@ -2001,10 +2003,15 @@ int __block_write_begin_int(struct page *page, loff_t pos, unsigned len,
- 					mark_buffer_dirty(bh);
- 					continue;
- 				}
--				if (block_end > to || block_start < from)
--					zero_user_segments(page,
--						to, block_end,
--						block_start, from);
-+				if (block_end > to || block_start < from) {
-+					BUG_ON(to - from  > PAGE_SIZE);
-+					zero_user_segments(page +
-+							block_start / PAGE_SIZE,
-+						to % PAGE_SIZE,
-+						(block_start % PAGE_SIZE) + blocksize,
-+						block_start % PAGE_SIZE,
-+						from % PAGE_SIZE);
-+				}
- 				continue;
- 			}
- 		}
-@@ -2048,6 +2055,7 @@ static int __block_commit_write(struct inode *inode, struct page *page,
- 	unsigned blocksize;
- 	struct buffer_head *bh, *head;
- 
-+	VM_BUG_ON_PAGE(PageTail(page), page);
- 	bh = head = page_buffers(page);
- 	blocksize = bh->b_size;
- 
-@@ -2114,7 +2122,8 @@ int block_write_end(struct file *file, struct address_space *mapping,
- 	struct inode *inode = mapping->host;
- 	unsigned start;
- 
--	start = pos & (PAGE_SIZE - 1);
-+	page = compound_head(page);
-+	start = pos & ~hpage_mask(page);
- 
- 	if (unlikely(copied < len)) {
- 		/*
 -- 
-2.9.3
+2.1.4
 
