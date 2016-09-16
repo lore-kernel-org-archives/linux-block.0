@@ -1,64 +1,95 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lf0-f65.google.com ([209.85.215.65]:35896 "EHLO
-        mail-lf0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752144AbcIPMRo (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Sep 2016 08:17:44 -0400
-Received: by mail-lf0-f65.google.com with SMTP id s29so4907684lfg.3
-        for <linux-block@vger.kernel.org>; Fri, 16 Sep 2016 05:17:44 -0700 (PDT)
-Date: Fri, 16 Sep 2016 15:17:40 +0300
-From: "Kirill A. Shutemov" <kirill@shutemov.name>
-To: Andreas Dilger <adilger@dilger.ca>
-Cc: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        Theodore Ts'o <tytso@mit.edu>, Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
+Received: from mga11.intel.com ([192.55.52.93]:35643 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S934676AbcIPMKl (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 16 Sep 2016 08:10:41 -0400
+Date: Fri, 16 Sep 2016 15:10:34 +0300
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: Theodore Ts'o <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
         Hugh Dickins <hughd@google.com>,
         Andrea Arcangeli <aarcange@redhat.com>,
         Dave Hansen <dave.hansen@intel.com>,
         Vlastimil Babka <vbabka@suse.cz>,
         Matthew Wilcox <willy@infradead.org>,
         Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4 <linux-ext4@vger.kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Linux MM <linux-mm@kvack.org>, linux-block@vger.kernel.org
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org
 Subject: Re: [PATCHv3 29/41] ext4: make ext4_mpage_readpages() hugepage-aware
-Message-ID: <20160916121740.GA18021@node.shutemov.name>
+Message-ID: <20160916121034.GC72667@black.fi.intel.com>
 References: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
  <20160915115523.29737-30-kirill.shutemov@linux.intel.com>
- <56332284-449B-4998-AA99-245361CEE6D9@dilger.ca>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <56332284-449B-4998-AA99-245361CEE6D9@dilger.ca>
+In-Reply-To: <20160915115523.29737-30-kirill.shutemov@linux.intel.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Thu, Sep 15, 2016 at 06:27:10AM -0600, Andreas Dilger wrote:
-> On Sep 15, 2016, at 5:55 AM, Kirill A. Shutemov <kirill.shutemov@linux.intel.com> wrote:
-> > 
-> > This patch modifies ext4_mpage_readpages() to deal with huge pages.
-> > 
-> > We read out 2M at once, so we have to alloc (HPAGE_PMD_NR *
-> > blocks_per_page) sector_t for that. I'm not entirely happy with kmalloc
-> > in this codepath, but don't see any other option.
+On Thu, Sep 15, 2016 at 02:55:11PM +0300, Kirill A. Shutemov wrote:
+> This patch modifies ext4_mpage_readpages() to deal with huge pages.
 > 
-> If you're reading 2MB from disk (possibly from disjoint blocks with seeks
-> in between) I don't think that the kmalloc() is going to be the limiting
-> performance factor.  If you are concerned about the size of the kmalloc()
-> causing failures when pages are fragmented (it can be 16KB for 1KB blocks
-> with 4KB pages), then using ext4_kvmalloc() to fall back to vmalloc() in
-> case kmalloc() fails.  It shouldn't fail often for 16KB allocations,
-> but it could in theory.
+> We read out 2M at once, so we have to alloc (HPAGE_PMD_NR *
+> blocks_per_page) sector_t for that. I'm not entirely happy with kmalloc
+> in this codepath, but don't see any other option.
+> 
+> Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 
-Good point. Will use ext4_kvmalloc().
+0-DAY reported this:
 
-> I also notice that ext4_kvmalloc() should probably use unlikely() for
-> the failure case, so that the uncommon vmalloc() fallback is out-of-line
-> in this more important codepath.  The only other callers are during mount,
-> so a branch misprediction is not critical.
+compiler: powerpc64-linux-gnu-gcc (Debian 5.4.0-6) 5.4.0 20160609
+reproduce:
+        wget https://git.kernel.org/cgit/linux/kernel/git/wfg/lkp-tests.git/plain/sbin/make.cross -O ~/bin/make.cro
++ss
+        chmod +x ~/bin/make.cross
+        git checkout d8bfe8f327288810a9a099b15f3c89a834d419a4
+        # save the attached .config to linux build tree
+        make.cross ARCH=powerpc
 
-I agree. But it's out-of-scope for the patchset.
+All errors (new ones prefixed by >>):
 
+   In file included from include/linux/linkage.h:4:0,
+                    from include/linux/kernel.h:6,
+                    from fs/ext4/readpage.c:30:
+   fs/ext4/readpage.c: In function 'ext4_mpage_readpages':
+>> include/linux/compiler.h:491:38: error: call to '__compiletime_assert_144' declared with attribute error:
++BUILD_BUG_ON failed: BIO_MAX_PAGES < HPAGE_PMD_NR
+     _compiletime_assert(condition, msg, __compiletime_assert_, __LINE__)
+                                         ^
+   include/linux/compiler.h:474:4: note: in definition of macro '__compiletime_assert'
+       prefix ## suffix();    \                                                       
+       ^                       
+   include/linux/compiler.h:491:2: note: in expansion of macro '_compiletime_assert'
+     _compiletime_assert(condition, msg, __compiletime_assert_, __LINE__)           
+     ^                                                                   
+   include/linux/bug.h:51:37: note: in expansion of macro 'compiletime_assert'
+    #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond), msg)      
+                                        ^
+   include/linux/bug.h:75:2: note: in expansion of macro 'BUILD_BUG_ON_MSG'
+     BUILD_BUG_ON_MSG(condition, "BUILD_BUG_ON failed: " #condition)       
+     ^                                                              
+   fs/ext4/readpage.c:144:4: note: in expansion of macro 'BUILD_BUG_ON'
+       BUILD_BUG_ON(BIO_MAX_PAGES < HPAGE_PMD_NR);                     
+       ^                                          
+
+The fixup:
+
+diff --git a/fs/ext4/readpage.c b/fs/ext4/readpage.c
+index 6d7cbddceeb2..75b2a7700c9a 100644
+--- a/fs/ext4/readpage.c
++++ b/fs/ext4/readpage.c
+@@ -140,7 +140,8 @@ int ext4_mpage_readpages(struct address_space *mapping,
+ 
+ 		block_in_file = (sector_t)page->index << (PAGE_SHIFT - blkbits);
+ 
+-		if (PageTransHuge(page)) {
++		if (PageTransHuge(page) &&
++				IS_ENABLED(TRANSPARENT_HUGE_PAGECACHE)) {
+ 			BUILD_BUG_ON(BIO_MAX_PAGES < HPAGE_PMD_NR);
+ 			nr = HPAGE_PMD_NR * blocks_per_page;
+ 			/* XXX: need a better solution ? */
 -- 
  Kirill A. Shutemov
