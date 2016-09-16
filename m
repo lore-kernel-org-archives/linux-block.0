@@ -1,213 +1,84 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-Subject: Re: [dm-devel] should blk-mq halt requeue processing while queue is
- frozen?
-To: Mike Snitzer <snitzer@redhat.com>
-References: <20160901204806.GA12742@redhat.com>
- <66e36ae7-19ff-058f-049a-3e91a62b19b3@sandisk.com>
- <20160901211718.GA12894@redhat.com> <20160901221823.GA13209@redhat.com>
- <f276cf3d-cad3-3e61-2903-754970f90445@sandisk.com>
- <20160901222654.GA13292@redhat.com>
- <938609b9-3a55-0ed3-ffeb-de27e1c1e864@sandisk.com>
- <20160901234754.GA13653@redhat.com>
- <6af010f8-0a8f-cf0e-d819-3b8e1c20b56e@sandisk.com>
- <20160902151213.GA17508@redhat.com> <20160902161059.GB17508@redhat.com>
-CC: <axboe@kernel.dk>, <linux-block@vger.kernel.org>, "device-mapper
- development" <dm-devel@redhat.com>, <hch@lst.de>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-Message-ID: <aa663595-4890-adb1-a2b4-422b0b65b097@sandisk.com>
-Date: Fri, 2 Sep 2016 15:42:33 -0700
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga04.intel.com ([192.55.52.120]:21721 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1757003AbcIPMJJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 16 Sep 2016 08:09:09 -0400
+Date: Fri, 16 Sep 2016 15:09:03 +0300
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: Theodore Ts'o <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCHv3 19/41] block: define BIO_MAX_PAGES to HPAGE_PMD_NR if
+ huge page cache enabled
+Message-ID: <20160916120903.GB72667@black.fi.intel.com>
+References: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
+ <20160915115523.29737-20-kirill.shutemov@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20160902161059.GB17508@redhat.com>
-Content-Type: multipart/mixed;
-	boundary="------------3483500B203E42BB43E83497"
-Return-Path: Bart.VanAssche@sandisk.com
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20160915115523.29737-20-kirill.shutemov@linux.intel.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
---------------3483500B203E42BB43E83497
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
+On Thu, Sep 15, 2016 at 02:55:01PM +0300, Kirill A. Shutemov wrote:
+> We are going to do IO a huge page a time. So we need BIO_MAX_PAGES to be
+> at least HPAGE_PMD_NR. For x86-64, it's 512 pages.
 
-On 09/02/2016 09:10 AM, Mike Snitzer wrote:
-> On Fri, Sep 02 2016 at 11:12am -0400,
-> Mike Snitzer <snitzer@redhat.com> wrote:
->
->> So in the case of blk-mq request-based DM: we cannot expect
->> blk_mq_freeze_queue(), during suspend, to complete if requests are
->> getting requeued to the blk-mq queue via BLK_MQ_RQ_QUEUE_BUSY.
->
-> Looking closer at blk-mq.  Currently __blk_mq_run_hw_queue() will move
-> any requeued requests to the hctx->dispatch list and then performs async
-> blk_mq_run_hw_queue().
->
-> To do what you hoped (have blk_mq_freeze_queue() discontinue all use of
-> blk-mq hw queues during DM suspend) I think we'd need blk-mq to:
-> 1) avoid processing requeued IO if blk_mq_freeze_queue() was used to
->    freeze the queue.  Meaning it'd have to hold requeued work longer
->    than it currently does.
-> 2) Then once blk_mq_unfreeze_queue() is called it'd allow requeues to
->    proceed.
->
-> This would be catering to a very specific requirement of DM (given it
-> re-queues IO back to the request_queue during suspend).
->
-> BUT all said, relative to request-based DM multipath, what we have is
-> perfectly fine on a correctness level: the requests are re-queued
-> because the blk-mq DM device is suspended.
->
-> Unfortunately on an efficiency level DM suspend creates a lot of busy
-> looping in blk-mq, with 100% cpu usage in a threads with names
-> "kworker/3:1H", ideally we'd avoid that!
+0-DAY reported this:
 
-Hello Mike,
+[    2.555776] PCI: Using configuration type 1 for base access
+[    2.870504] HugeTLB registered 2 MB page size, pre-allocated 0 pages
+[    2.885252] ------------[ cut here ]------------
+[    2.887501] WARNING: CPU: 0 PID: 1 at mm/slab_common.c:98 kmem_cache_create+0xbc/0x18b
+[    2.891987] Modules linked in:
+[    2.893538] CPU: 0 PID: 1 Comm: swapper/0 Not tainted 4.8.0-rc6-00021-gd96a38d #421
+[    2.897164]  00000000 00200246 cef0decc c141aa9e 00000000 c11279b6 cef0dee4 c104990a
+[    2.908396]  00000062 c1a820f0 c1b752f4 c1999b09 cef0def8 c104999c 00000009 00000000
+[    2.912555]  00000000 cef0df1c c11279b6 00000000 c1999afe 00001800 6bc01ac0 c1b3d0bc
+[    2.916733] Call Trace:
+[    2.930981]  [<c141aa9e>] dump_stack+0x74/0xa7
+[    2.933128]  [<c11279b6>] ? kmem_cache_create+0xbc/0x18b
+[    2.935630]  [<c104990a>] __warn+0xbc/0xd3
+[    2.937586]  [<c1b752f4>] ? x509_key_init+0xf/0xf
+[    2.939837]  [<c104999c>] warn_slowpath_null+0x16/0x1b
+[    2.942279]  [<c11279b6>] kmem_cache_create+0xbc/0x18b
+[    2.957745]  [<c1b752f4>] ? x509_key_init+0xf/0xf
+[    2.960010]  [<c1b7534c>] init_bio+0x58/0x94
+[    2.962048]  [<c10004a8>] do_one_initcall+0x83/0x103
+[    2.964428]  [<c1061d24>] ? parse_args+0x1c9/0x29c
+[    2.966725]  [<c1b41cc0>] ? kernel_init_freeable+0x16f/0x20c
+[    2.969400]  [<c1b41ce0>] kernel_init_freeable+0x18f/0x20c
+[    2.994076]  [<c1731e6a>] kernel_init+0xd/0xd5
+[    2.996185]  [<c17385ae>] ret_from_kernel_thread+0xe/0x30
+[    2.998748]  [<c1731e5d>] ? rest_init+0xa6/0xa6
+[    3.000968] ---[ end trace 197bc755366f9a86 ]---
+[    3.021244] ACPI: Added _OSI(Module Device)
 
-What blk_mq_freeze_queue() does is to wait until queue_rq() has finished 
-*and* all pending requests have completed. However, I think in 
-dm_stop_queue() all we need is to wait until queue_rq() has finished. 
-How about adding new functions in the block layer core to realize this, 
-e.g. something like in the attached (untested) patch? Busy looping 
-should be avoided - see also the tests of the new "quiescing" flag.
+Fix up:
 
-Thanks,
-
-Bart.
-
---------------3483500B203E42BB43E83497
-Content-Type: text/x-patch;
-	name="0001-blk-mq-Introduce-blk_mq_quiesce_queue.patch"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename="0001-blk-mq-Introduce-blk_mq_quiesce_queue.patch"
-
->From e55a161ee4df7804767ed8faf9ddb698e8852b06 Mon Sep 17 00:00:00 2001
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-Date: Fri, 2 Sep 2016 09:32:17 -0700
-Subject: [PATCH] blk-mq: Introduce blk_mq_quiesce_queue()
-
----
- block/blk-mq.c         | 50 +++++++++++++++++++++++++++++++++++++++++++++++++-
- include/linux/blk-mq.h |  2 ++
- include/linux/blkdev.h |  3 +++
- 3 files changed, 54 insertions(+), 1 deletion(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 123d1ad..0320cd9 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -135,6 +135,46 @@ void blk_mq_unfreeze_queue(struct request_queue *q)
- }
- EXPORT_SYMBOL_GPL(blk_mq_unfreeze_queue);
+diff --git a/block/bio.c b/block/bio.c
+index aa7354088008..a06bf174cddf 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -44,7 +44,8 @@
+  */
+ #define BV(x) { .nr_vecs = x, .name = "biovec-"__stringify(x) }
+ static struct biovec_slab bvec_slabs[BVEC_POOL_NR] __read_mostly = {
+-	BV(1), BV(4), BV(16), BV(64), BV(128), BV(BIO_MAX_PAGES),
++	BV(1), BV(4), BV(16), BV(64), BV(128),
++	{ .nr_vecs = BIO_MAX_PAGES, .name ="biovec-max_pages" },
+ };
+ #undef BV
  
-+/**
-+ * blk_mq_quiesce_queue - wait until all pending queue_rq calls have finished
-+ *
-+ * Prevent that new I/O requests are queued and wait until all pending
-+ * queue_rq() calls have finished.
-+ */
-+void blk_mq_quiesce_queue(struct request_queue *q)
-+{
-+	spin_lock_irq(q->queue_lock);
-+	WARN_ON_ONCE(blk_queue_quiescing(q));
-+	queue_flag_set(QUEUE_FLAG_QUIESCING, q);
-+	spin_unlock_irq(q->queue_lock);
-+
-+	atomic_inc_return(&q->mq_freeze_depth);
-+	blk_mq_run_hw_queues(q, false);
-+	synchronize_rcu();
-+
-+	spin_lock_irq(q->queue_lock);
-+	WARN_ON_ONCE(!blk_queue_quiescing(q));
-+	queue_flag_clear(QUEUE_FLAG_QUIESCING, q);
-+	spin_unlock_irq(q->queue_lock);
-+}
-+EXPORT_SYMBOL_GPL(blk_mq_quiesce_queue);
-+
-+/**
-+ * blk_mq_resume_queue - resume request processing
-+ */
-+void blk_mq_resume_queue(struct request_queue *q)
-+{
-+	int freeze_depth;
-+
-+	freeze_depth = atomic_dec_return(&q->mq_freeze_depth);
-+	WARN_ON_ONCE(freeze_depth < 0);
-+	if (freeze_depth == 0)
-+		wake_up_all(&q->mq_freeze_wq);
-+
-+	blk_mq_run_hw_queues(q, false);
-+}
-+EXPORT_SYMBOL_GPL(blk_mq_resume_queue);
-+
- void blk_mq_wake_waiters(struct request_queue *q)
- {
- 	struct blk_mq_hw_ctx *hctx;
-@@ -506,6 +546,9 @@ static void blk_mq_requeue_work(struct work_struct *work)
- 	struct request *rq, *next;
- 	unsigned long flags;
- 
-+	if (blk_queue_quiescing(q))
-+		return;
-+
- 	spin_lock_irqsave(&q->requeue_lock, flags);
- 	list_splice_init(&q->requeue_list, &rq_list);
- 	spin_unlock_irqrestore(&q->requeue_lock, flags);
-@@ -806,6 +849,8 @@ static void __blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx)
- 	 */
- 	flush_busy_ctxs(hctx, &rq_list);
- 
-+	rcu_read_lock();
-+
- 	/*
- 	 * If we have previous entries on our dispatch list, grab them
- 	 * and stuff them at the front for more fair dispatch.
-@@ -888,8 +933,11 @@ static void __blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx)
- 		 *
- 		 * blk_mq_run_hw_queue() already checks the STOPPED bit
- 		 **/
--		blk_mq_run_hw_queue(hctx, true);
-+		if (!blk_queue_quiescing(q))
-+			blk_mq_run_hw_queue(hctx, true);
- 	}
-+
-+	rcu_read_unlock();
- }
- 
- /*
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index bd677bc..8fc07bb 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -248,6 +248,8 @@ void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
- void blk_mq_freeze_queue(struct request_queue *q);
- void blk_mq_unfreeze_queue(struct request_queue *q);
- void blk_mq_freeze_queue_start(struct request_queue *q);
-+void blk_mq_quiesce_queue(struct request_queue *q);
-+void blk_mq_resume_queue(struct request_queue *q);
- int blk_mq_reinit_tagset(struct blk_mq_tag_set *set);
- 
- void blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set, int nr_hw_queues);
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index e79055c..9b360fc 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -505,6 +505,7 @@ struct request_queue {
- #define QUEUE_FLAG_FUA	       24	/* device supports FUA writes */
- #define QUEUE_FLAG_FLUSH_NQ    25	/* flush not queueuable */
- #define QUEUE_FLAG_DAX         26	/* device supports DAX */
-+#define QUEUE_FLAG_QUIESCING   27
- 
- #define QUEUE_FLAG_DEFAULT	((1 << QUEUE_FLAG_IO_STAT) |		\
- 				 (1 << QUEUE_FLAG_STACKABLE)	|	\
-@@ -595,6 +596,8 @@ static inline void queue_flag_clear(unsigned int flag, struct request_queue *q)
- #define blk_queue_secure_erase(q) \
- 	(test_bit(QUEUE_FLAG_SECERASE, &(q)->queue_flags))
- #define blk_queue_dax(q)	test_bit(QUEUE_FLAG_DAX, &(q)->queue_flags)
-+#define blk_queue_quiescing(q)	test_bit(QUEUE_FLAG_QUIESCING,	\
-+					 &(q)->queue_flags)
- 
- #define blk_noretry_request(rq) \
- 	((rq)->cmd_flags & (REQ_FAILFAST_DEV|REQ_FAILFAST_TRANSPORT| \
 -- 
-2.9.3
-
-
---------------3483500B203E42BB43E83497--
+ Kirill A. Shutemov
