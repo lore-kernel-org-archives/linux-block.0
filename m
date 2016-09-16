@@ -1,126 +1,79 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:33485 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1754891AbcIOQXW (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Sep 2016 12:23:22 -0400
-Received: from pps.filterd (m0044010.ppops.net [127.0.0.1])
-        by mx0a-00082601.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id u8FGFE6a022591
-        for <linux-block@vger.kernel.org>; Thu, 15 Sep 2016 09:23:22 -0700
-Received: from mail.thefacebook.com ([199.201.64.23])
-        by mx0a-00082601.pphosted.com with ESMTP id 25fww30vgw-6
-        (version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT)
-        for <linux-block@vger.kernel.org>; Thu, 15 Sep 2016 09:23:22 -0700
-Received: from facebook.com (2401:db00:11:d0a2:face:0:39:0)     by
- mx-out.facebook.com (10.223.100.99) with ESMTP id
- b76616447b6011e680c424be05956610-7b8e2a50 for <linux-block@vger.kernel.org>;
-        Thu, 15 Sep 2016 09:23:20 -0700
-From: Shaohua Li <shli@fb.com>
-To: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <axboe@fb.com>, <Kernel-team@fb.com>, <tj@kernel.org>,
-        <jmoyer@redhat.com>, <vgoyal@redhat.com>
-Subject: [PATCH V2 11/11] blk-throttle: ignore idle cgroup limit
-Date: Thu, 15 Sep 2016 09:23:18 -0700
-Message-ID: <8c687c3d686fda706084b748e757e8b9e1cffd47.1473953743.git.shli@fb.com>
-In-Reply-To: <cover.1473953743.git.shli@fb.com>
-References: <cover.1473953743.git.shli@fb.com>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Date: Fri, 16 Sep 2016 15:07:32 +0300
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: Theodore Ts'o <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCHv3 07/41] mm, shmem: swich huge tmpfs to multi-order
+ radix-tree entries
+Message-ID: <20160916120732.GA72667@black.fi.intel.com>
+References: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
+ <20160915115523.29737-8-kirill.shutemov@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20160915115523.29737-8-kirill.shutemov@linux.intel.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Last patch introduces a way to detect idle cgroup. We use it to make
-upgrade/downgrade decision.
+On Thu, Sep 15, 2016 at 02:54:49PM +0300, Kirill A. Shutemov wrote:
+> We would need to use multi-order radix-tree entires for ext4 and other
+> filesystems to have coherent view on tags (dirty/towrite) in the tree.
+> 
+> This patch converts huge tmpfs implementation to multi-order entries, so
+> we will be able to use the same code patch for all filesystems.
+> 
+> Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 
-Signed-off-by: Shaohua Li <shli@fb.com>
----
- block/blk-throttle.c | 30 ++++++++++++++++++------------
- 1 file changed, 18 insertions(+), 12 deletions(-)
+0-DAY reported this:
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 0810e1b..276e71e 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -145,8 +145,6 @@ struct throtl_grp {
- 
- 	unsigned long last_check_time;
- 
--	unsigned long last_dispatch_time[2];
--
- 	/* When did we start a new slice */
- 	unsigned long slice_start[2];
- 	unsigned long slice_end[2];
-@@ -488,8 +486,6 @@ static void throtl_pd_online(struct blkg_policy_data *pd)
- 	 * Update has_rules[] after a new group is brought online.
- 	 */
- 	tg_update_has_rules(tg);
--	tg->last_dispatch_time[READ] = jiffies;
--	tg->last_dispatch_time[WRITE] = jiffies;
- }
- 
- static void blk_throtl_update_valid_limit(struct throtl_data *td)
-@@ -1661,9 +1657,8 @@ static bool throtl_upgrade_check_one(struct throtl_grp *tg)
- 		return true;
- 
- 	if (time_after_eq(jiffies,
--	     tg->last_dispatch_time[READ] + tg->td->throtl_slice) &&
--	    time_after_eq(jiffies,
--	     tg->last_dispatch_time[WRITE] + tg->td->throtl_slice))
-+		tg_last_high_overflow_time(tg) + tg->td->throtl_slice) &&
-+	    throtl_tg_is_idle(tg))
- 		return true;
- 	return false;
- }
-@@ -1712,6 +1707,19 @@ static bool throtl_can_upgrade(struct throtl_data *td,
- 	return true;
- }
- 
-+static void throtl_upgrade_check(struct throtl_grp *tg)
-+{
-+	if (tg->td->limit_index != LIMIT_HIGH)
-+		return;
-+
-+	if (!time_after_eq(jiffies,
-+	     __tg_last_high_overflow_time(tg) + tg->td->throtl_slice))
-+		return;
-+
-+	if (throtl_can_upgrade(tg->td, NULL))
-+		throtl_upgrade_state(tg->td);
-+}
-+
- static void throtl_upgrade_state(struct throtl_data *td)
- {
- 	struct cgroup_subsys_state *pos_css;
-@@ -1746,15 +1754,13 @@ static bool throtl_downgrade_check_one(struct throtl_grp *tg)
- 	struct throtl_data *td = tg->td;
- 	unsigned long now = jiffies;
- 
--	if (time_after_eq(now, tg->last_dispatch_time[READ] + td->throtl_slice) &&
--	    time_after_eq(now, tg->last_dispatch_time[WRITE] + td->throtl_slice))
--		return false;
- 	/*
- 	 * If cgroup is below high limit, consider downgrade and throttle other
- 	 * cgroups
- 	 */
- 	if (time_after_eq(now, td->high_upgrade_time + td->throtl_slice) &&
--	    time_after_eq(now, tg_last_high_overflow_time(tg) + td->throtl_slice))
-+	    time_after_eq(now, tg_last_high_overflow_time(tg) + td->throtl_slice) &&
-+	    !throtl_tg_is_idle(tg))
- 		return true;
- 	return false;
- }
-@@ -1885,10 +1891,10 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
- 
- again:
- 	while (true) {
--		tg->last_dispatch_time[rw] = jiffies;
- 		if (tg->last_high_overflow_time[rw] == 0)
- 			tg->last_high_overflow_time[rw] = jiffies;
- 		throtl_downgrade_check(tg);
-+		throtl_upgrade_check(tg);
- 		/* throtl is FIFO - if bios are already queued, should queue */
- 		if (sq->nr_queued[rw])
- 			break;
+reproduce: make htmldocs
+
+All warnings (new ones prefixed by >>):
+
+   lib/crc32.c:148: warning: No description found for parameter 'tab)[256]'
+   lib/crc32.c:148: warning: Excess function parameter 'tab' description in 'crc32_le_generic'
+   lib/crc32.c:293: warning: No description found for parameter 'tab)[256]'
+   lib/crc32.c:293: warning: Excess function parameter 'tab' description in 'crc32_be_generic'
+   lib/crc32.c:1: warning: no structured comments found
+>> mm/filemap.c:1434: warning: No description found for parameter 'start'
+>> mm/filemap.c:1434: warning: Excess function parameter 'index' description in 'find_get_pages_contig'
+>> mm/filemap.c:1525: warning: No description found for parameter 'indexp'
+>> mm/filemap.c:1525: warning: Excess function parameter 'index' description in 'find_get_pages_tag'
+
+The fixup:
+
+diff --git a/mm/filemap.c b/mm/filemap.c
+index c69b1204744a..1ef20dd45b6b 100644
+--- a/mm/filemap.c
++++ b/mm/filemap.c
+@@ -1548,7 +1548,7 @@ repeat:
+ /**
+  * find_get_pages_contig - gang contiguous pagecache lookup
+  * @mapping:	The address_space to search
+- * @index:	The starting page index
++ * @start:	The starting page index
+  * @nr_pages:	The maximum number of pages
+  * @pages:	Where the resulting pages are placed
+  *
+@@ -1641,7 +1641,7 @@ EXPORT_SYMBOL(find_get_pages_contig);
+ /**
+  * find_get_pages_tag - find and return pages that match @tag
+  * @mapping:	the address_space to search
+- * @index:	the starting page index
++ * @indexp:	the starting page index
+  * @tag:	the tag index
+  * @nr_pages:	the maximum number of pages
+  * @pages:	where the resulting pages are placed
 -- 
-2.8.0.rc2
-
+ Kirill A. Shutemov
