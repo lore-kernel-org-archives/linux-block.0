@@ -1,39 +1,73 @@
-Return-Path: <linus.walleij@linaro.org>
-Return-Path: <linus.walleij@linaro.org>
-From: Linus Walleij <linus.walleij@linaro.org>
-To: linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Linus Walleij <linus.walleij@linaro.org>,
-	Christoph Hellwig <hch@lst.de>
-Subject: [PATCH] block: remove blk_mq_alloc_single_hw_queue() prototype
-Date: Wed, 14 Sep 2016 14:33:15 +0200
-Message-Id: <1473856395-22262-1-git-send-email-linus.walleij@linaro.org>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pf0-f182.google.com ([209.85.192.182]:36402 "EHLO
+        mail-pf0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1758480AbcIQI2n (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sat, 17 Sep 2016 04:28:43 -0400
+Received: by mail-pf0-f182.google.com with SMTP id q2so14511957pfj.3
+        for <linux-block@vger.kernel.org>; Sat, 17 Sep 2016 01:28:43 -0700 (PDT)
+From: Omar Sandoval <osandov@osandov.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, kernel-team@fb.com,
+        Alexei Starovoitov <ast@fb.com>
+Subject: [PATCH v4 6/6] sbitmap: re-initialize allocation hints after resize
+Date: Sat, 17 Sep 2016 01:28:26 -0700
+Message-Id: <bdfa41b6f22207f650ab743e87fec2cd7fd8b327.1474100040.git.osandov@fb.com>
+In-Reply-To: <cover.1474100040.git.osandov@fb.com>
+References: <cover.1474100040.git.osandov@fb.com>
+In-Reply-To: <cover.1474100040.git.osandov@fb.com>
+References: <cover.1474100040.git.osandov@fb.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-The blk_mq_alloc_single_hw_queue() is a prototype artifact that
-should have been removed with
-commit cdef54dd85ad66e77262ea57796a3e81683dd5d6
-"blk-mq: remove alloc_hctx and free_hctx methods" where the last
-users of it were deleted.
+From: Omar Sandoval <osandov@fb.com>
 
-Fixes: cdef54dd85ad ("blk-mq: remove alloc_hctx and free_hctx methods")
-Cc: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+After a struct sbitmap_queue is resized smaller, the allocation hints
+may still be set to bits beyond the new depth of the bitmap. This means
+that, for example, if the number of blk-mq tags is reduced through
+sysfs, more requests than the nominal queue depth may be in flight.
+
+It's tempting to fix this at resize time by doing a one-time
+reinitialization of the hints, but this can race with
+__sbitmap_queue_get() updating the hint. Instead, check the hint before
+we use it. This caused no measurable performance difference in my
+synthetic benchmarks.
+
+Signed-off-by: Omar Sandoval <osandov@fb.com>
 ---
- include/linux/blk-mq.h | 1 -
- 1 file changed, 1 deletion(-)
+ lib/sbitmap.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index e43bbffb5b7a..d3fb9c3c6969 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -221,7 +221,6 @@ static inline u16 blk_mq_unique_tag_to_tag(u32 unique_tag)
- }
+diff --git a/lib/sbitmap.c b/lib/sbitmap.c
+index 928b82a..f736c52 100644
+--- a/lib/sbitmap.c
++++ b/lib/sbitmap.c
+@@ -246,10 +246,15 @@ EXPORT_SYMBOL_GPL(sbitmap_queue_resize);
  
- struct blk_mq_hw_ctx *blk_mq_map_queue(struct request_queue *, const int ctx_index);
--struct blk_mq_hw_ctx *blk_mq_alloc_single_hw_queue(struct blk_mq_tag_set *, unsigned int, int);
+ int __sbitmap_queue_get(struct sbitmap_queue *sbq)
+ {
+-	unsigned int hint;
++	unsigned int hint, depth;
+ 	int nr;
  
- int blk_mq_request_started(struct request *rq);
- void blk_mq_start_request(struct request *rq);
+ 	hint = this_cpu_read(*sbq->alloc_hint);
++	depth = READ_ONCE(sbq->sb.depth);
++	if (unlikely(hint >= depth)) {
++		hint = depth ? prandom_u32() % depth : 0;
++		this_cpu_write(*sbq->alloc_hint, hint);
++	}
+ 	nr = sbitmap_get(&sbq->sb, hint, sbq->round_robin);
+ 
+ 	if (nr == -1) {
+@@ -258,7 +263,7 @@ int __sbitmap_queue_get(struct sbitmap_queue *sbq)
+ 	} else if (nr == hint || unlikely(sbq->round_robin)) {
+ 		/* Only update the hint if we used it. */
+ 		hint = nr + 1;
+-		if (hint >= sbq->sb.depth - 1)
++		if (hint >= depth - 1)
+ 			hint = 0;
+ 		this_cpu_write(*sbq->alloc_hint, hint);
+ 	}
 -- 
-2.7.4
+2.9.3
+
