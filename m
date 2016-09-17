@@ -1,105 +1,49 @@
-Return-Path: <osandov@osandov.com>
-Return-Path: <osandov@osandov.com>
-Date: Thu, 1 Sep 2016 11:05:23 -0700
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pa0-f52.google.com ([209.85.220.52]:36050 "EHLO
+        mail-pa0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755250AbcIQI2j (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sat, 17 Sep 2016 04:28:39 -0400
+Received: by mail-pa0-f52.google.com with SMTP id id6so32978053pad.3
+        for <linux-block@vger.kernel.org>; Sat, 17 Sep 2016 01:28:39 -0700 (PDT)
 From: Omar Sandoval <osandov@osandov.com>
-To: Jens Axboe <axboe@fb.com>
-Cc: axboe@kernel.dk, linux-kernel@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH 7/8] wbt: add general throttling mechanism
-Message-ID: <20160901180523.GA3280@vader.DHCP.thefacebook.com>
-References: <1472663151-18560-1-git-send-email-axboe@fb.com>
- <1472663151-18560-8-git-send-email-axboe@fb.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1472663151-18560-8-git-send-email-axboe@fb.com>
-List-ID: <linux-block@vger.kernel.org>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, kernel-team@fb.com,
+        Alexei Starovoitov <ast@fb.com>
+Subject: [PATCH v4 2/6] sbitmap: allocate wait queues on a specific node
+Date: Sat, 17 Sep 2016 01:28:22 -0700
+Message-Id: <b0139db1c481aeb4b5484dba4a23328e7800b8d7.1474100040.git.osandov@fb.com>
+In-Reply-To: <cover.1474100040.git.osandov@fb.com>
+References: <cover.1474100040.git.osandov@fb.com>
+In-Reply-To: <cover.1474100040.git.osandov@fb.com>
+References: <cover.1474100040.git.osandov@fb.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Wed, Aug 31, 2016 at 11:05:50AM -0600, Jens Axboe wrote:
-> We can hook this up to the block layer, to help throttle buffered
-> writes. Or NFS can tap into it, to accomplish the same.
-> 
-> wbt registers a few trace points that can be used to track what is
-> happening in the system:
-> 
-> wbt_lat: 259:0: latency 2446318
-> wbt_stat: 259:0: rmean=2446318, rmin=2446318, rmax=2446318, rsamples=1,
->                wmean=518866, wmin=15522, wmax=5330353, wsamples=57
-> wbt_step: 259:0: step down: step=1, window=72727272, background=8, normal=16, max=32
-> 
-> This shows a sync issue event (wbt_lat) that exceeded it's time. wbt_stat
-> dumps the current read/write stats for that window, and wbt_step shows a
-> step down event where we now scale back writes. Each trace includes the
-> device, 259:0 in this case.
-> 
-> Signed-off-by: Jens Axboe <axboe@fb.com>
-> ---
->  include/linux/wbt.h        | 118 +++++++++
->  include/trace/events/wbt.h | 122 ++++++++++
->  lib/Kconfig                |   4 +
->  lib/Makefile               |   1 +
->  lib/wbt.c                  | 587 +++++++++++++++++++++++++++++++++++++++++++++
->  5 files changed, 832 insertions(+)
->  create mode 100644 include/linux/wbt.h
->  create mode 100644 include/trace/events/wbt.h
->  create mode 100644 lib/wbt.c
-> 
+From: Omar Sandoval <osandov@fb.com>
 
-[snip]
+The original bt_alloc() we converted from was using kzalloc(), not
+kzalloc_node(), to allocate the wait queues. This was probably an
+oversight, so fix it for sbitmap_queue_init_node().
 
-> diff --git a/lib/Kconfig b/lib/Kconfig
-> index d79909dc01ec..5a65a1f91889 100644
-> --- a/lib/Kconfig
-> +++ b/lib/Kconfig
-> @@ -550,4 +550,8 @@ config STACKDEPOT
->  	bool
->  	select STACKTRACE
->  
-> +config WBT
-> +	bool
-> +	select SCALE_BITMAP
+Signed-off-by: Omar Sandoval <osandov@fb.com>
+---
+ lib/sbitmap.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Looks like this snuck in from your experiments to get this to work on
-top of scale_bitmap?
-
-[snip]
-
-> +void __wbt_done(struct rq_wb *rwb)
-> +{
-> +	int inflight, limit;
-> +
-> +	inflight = atomic_dec_return(&rwb->inflight);
-> +
-> +	/*
-> +	 * wbt got disabled with IO in flight. Wake up any potential
-> +	 * waiters, we don't have to do more than that.
-> +	 */
-> +	if (unlikely(!rwb_enabled(rwb))) {
-> +		wake_up_all(&rwb->wait);
-> +		return;
-> +	}
-> +
-> +	/*
-> +	 * If the device does write back caching, drop further down
-> +	 * before we wake people up.
-> +	 */
-> +	if (rwb->wc && !atomic_read(&rwb->bdi->wb.dirty_sleeping))
-> +		limit = 0;
-> +	else
-> +		limit = rwb->wb_normal;
-> +
-> +	/*
-> +	 * Don't wake anyone up if we are above the normal limit.
-> +	 */
-> +	if (inflight && inflight >= limit)
-> +		return;
-> +
-> +	if (waitqueue_active(&rwb->wait)) {
-> +		int diff = limit - inflight;
-> +
-> +		if (!inflight || diff >= rwb->wb_background / 2)
-> +			wake_up_nr(&rwb->wait, 1);
-
-wake_up(&rwb->wait)?
-
+diff --git a/lib/sbitmap.c b/lib/sbitmap.c
+index dfc084a..4d8e97e 100644
+--- a/lib/sbitmap.c
++++ b/lib/sbitmap.c
+@@ -208,7 +208,7 @@ int sbitmap_queue_init_node(struct sbitmap_queue *sbq, unsigned int depth,
+ 	sbq->wake_batch = sbq_calc_wake_batch(depth);
+ 	atomic_set(&sbq->wake_index, 0);
+ 
+-	sbq->ws = kzalloc(SBQ_WAIT_QUEUES * sizeof(*sbq->ws), flags);
++	sbq->ws = kzalloc_node(SBQ_WAIT_QUEUES * sizeof(*sbq->ws), flags, node);
+ 	if (!sbq->ws) {
+ 		sbitmap_free(&sbq->sb);
+ 		return -ENOMEM;
 -- 
-Omar
+2.9.3
+
