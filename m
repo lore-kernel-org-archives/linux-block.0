@@ -1,100 +1,69 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga03.intel.com ([134.134.136.65]:33605 "EHLO mga03.intel.com"
+Received: from mx1.redhat.com ([209.132.183.28]:51938 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S934234AbcIOLzr (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Sep 2016 07:55:47 -0400
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv3 30/41] ext4: make ext4_writepage() work on huge pages
-Date: Thu, 15 Sep 2016 14:55:12 +0300
-Message-Id: <20160915115523.29737-31-kirill.shutemov@linux.intel.com>
-In-Reply-To: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
-References: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
+        id S932396AbcIRHhr (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 18 Sep 2016 03:37:47 -0400
+From: Alexander Gordeev <agordeev@redhat.com>
+To: linux-kernel@vger.kernel.org
+Cc: Alexander Gordeev <agordeev@redhat.com>,
+        linux-block@vger.kernel.org
+Subject: [PATCH 13/14] blk-mq: Pair blk_mq_hctx_kobj_init() with blk_mq_hctx_kobj_put()
+Date: Sun, 18 Sep 2016 09:37:23 +0200
+Message-Id: <ec057c0fa0c8c21394f5ae64b0268e42b8a5db37.1474183901.git.agordeev@redhat.com>
+In-Reply-To: <cover.1474183901.git.agordeev@redhat.com>
+References: <cover.1474183901.git.agordeev@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Change ext4_writepage() and underlying ext4_bio_write_page().
-
-It basically removes assumption on page size, infer it from struct page
-instead.
-
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+CC: linux-block@vger.kernel.org
+Signed-off-by: Alexander Gordeev <agordeev@redhat.com>
 ---
- fs/ext4/inode.c   | 10 +++++-----
- fs/ext4/page-io.c | 11 +++++++++--
- 2 files changed, 14 insertions(+), 7 deletions(-)
+ block/blk-mq-sysfs.c | 5 +++++
+ block/blk-mq.c       | 2 +-
+ block/blk-mq.h       | 1 +
+ 3 files changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
-index c6ea25a190f8..c9c05840f6cc 100644
---- a/fs/ext4/inode.c
-+++ b/fs/ext4/inode.c
-@@ -2020,10 +2020,10 @@ static int ext4_writepage(struct page *page,
+diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
+index ac5160e..81288a2 100644
+--- a/block/blk-mq-sysfs.c
++++ b/block/blk-mq-sysfs.c
+@@ -428,6 +428,11 @@ void blk_mq_hctx_kobj_init(struct blk_mq_hw_ctx *hctx)
+ 	kobject_init(&hctx->kobj, &blk_mq_hw_ktype);
+ }
  
- 	trace_ext4_writepage(page);
- 	size = i_size_read(inode);
--	if (page->index == size >> PAGE_SHIFT)
--		len = size & ~PAGE_MASK;
--	else
--		len = PAGE_SIZE;
++void blk_mq_hctx_kobj_put(struct blk_mq_hw_ctx *hctx)
++{
++	kobject_put(&hctx->kobj);
++}
 +
-+	len = hpage_size(page);
-+	if (page->index + hpage_nr_pages(page) - 1 == size >> PAGE_SHIFT)
-+			len = size & ~hpage_mask(page);
+ static void blk_mq_sysfs_init(struct request_queue *q)
+ {
+ 	struct blk_mq_ctx *ctx;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 5ecbb5f..c617002 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2009,7 +2009,7 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
+ 		if (!hctx)
+ 			continue;
  
- 	page_bufs = page_buffers(page);
- 	/*
-@@ -2047,7 +2047,7 @@ static int ext4_writepage(struct page *page,
- 				   ext4_bh_delay_or_unwritten)) {
- 		redirty_page_for_writepage(wbc, page);
- 		if ((current->flags & PF_MEMALLOC) ||
--		    (inode->i_sb->s_blocksize == PAGE_SIZE)) {
-+		    (inode->i_sb->s_blocksize == hpage_size(page))) {
- 			/*
- 			 * For memory cleaning there's no point in writing only
- 			 * some buffers. So just bail out. Warn if we came here
-diff --git a/fs/ext4/page-io.c b/fs/ext4/page-io.c
-index a6132a730967..952957ee48b7 100644
---- a/fs/ext4/page-io.c
-+++ b/fs/ext4/page-io.c
-@@ -415,6 +415,7 @@ int ext4_bio_write_page(struct ext4_io_submit *io,
+-		kobject_put(&hctx->kobj);
++		blk_mq_hctx_kobj_put(hctx);
  
- 	BUG_ON(!PageLocked(page));
- 	BUG_ON(PageWriteback(page));
-+	BUG_ON(PageTail(page));
+ 		if (hctx->tags) {
+ 			blk_mq_free_rq_map(set, hctx->tags, j);
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index c92bb7d..1caedc3 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -62,6 +62,7 @@ static inline struct blk_mq_hw_ctx *blk_mq_map_queue(struct request_queue *q,
+ extern int blk_mq_sysfs_register(struct request_queue *q);
+ extern void blk_mq_sysfs_unregister(struct request_queue *q);
+ extern void blk_mq_hctx_kobj_init(struct blk_mq_hw_ctx *hctx);
++extern void blk_mq_hctx_kobj_put(struct blk_mq_hw_ctx *hctx);
  
- 	if (keep_towrite)
- 		set_page_writeback_keepwrite(page);
-@@ -431,8 +432,14 @@ int ext4_bio_write_page(struct ext4_io_submit *io,
- 	 * the page size, the remaining memory is zeroed when mapped, and
- 	 * writes to that region are not written out to the file."
- 	 */
--	if (len < PAGE_SIZE)
--		zero_user_segment(page, len, PAGE_SIZE);
-+	if (len < hpage_size(page)) {
-+		page += len / PAGE_SIZE;
-+		if (len % PAGE_SIZE)
-+			zero_user_segment(page, len % PAGE_SIZE, PAGE_SIZE);
-+		while (page + 1 == compound_head(page))
-+			clear_highpage(++page);
-+		page = compound_head(page);
-+	}
- 	/*
- 	 * In the first loop we prepare and mark buffers to submit. We have to
- 	 * mark all buffers in the page before submitting so that
+ extern void blk_mq_rq_timed_out(struct request *req, bool reserved);
+ 
 -- 
-2.9.3
+1.8.3.1
 
