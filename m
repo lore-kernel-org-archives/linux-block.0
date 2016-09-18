@@ -1,180 +1,166 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:47177 "EHLO
-        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933067AbcI0SPa (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Sep 2016 14:15:30 -0400
-From: Adam Manzanares <adam.manzanares@hgst.com>
-To: <axboe@kernel.dk>, <tj@kernel.org>
-CC: <linux-block@vger.kernel.org>, <linux-ide@vger.kernel.org>,
-        "Adam Manzanares" <adam.manzanares@hgst.com>
-Subject: [PATCH 3/3] ata: ATA Command Priority Disabled By Default
-Date: Tue, 27 Sep 2016 11:14:56 -0700
-Message-ID: <1475000096-6148-4-git-send-email-adam.manzanares@hgst.com>
-In-Reply-To: <1475000096-6148-1-git-send-email-adam.manzanares@hgst.com>
-References: <1475000096-6148-1-git-send-email-adam.manzanares@hgst.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Received: from mx1.redhat.com ([209.132.183.28]:51936 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S932323AbcIRHhp (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 18 Sep 2016 03:37:45 -0400
+From: Alexander Gordeev <agordeev@redhat.com>
+To: linux-kernel@vger.kernel.org
+Cc: Alexander Gordeev <agordeev@redhat.com>,
+        linux-block@vger.kernel.org
+Subject: [PATCH 11/14] blk-mq: Move hardware context init code into single location
+Date: Sun, 18 Sep 2016 09:37:21 +0200
+Message-Id: <7aff70063ae3fd118e54d9da3d790a3079853c16.1474183901.git.agordeev@redhat.com>
+In-Reply-To: <cover.1474183901.git.agordeev@redhat.com>
+References: <cover.1474183901.git.agordeev@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Add a sysfs entry to turn on priority information being passed
-to a ATA device. By default this feature is turned off.
+Move scattered hardware context initialization code into
+a single function destined to do that, blk_mq_init_hctx()
 
-This patch depends on ata: Enabling ATA Command Priorities
-
-Signed-off-by: Adam Manzanares <adam.manzanares@hgst.com>
+CC: linux-block@vger.kernel.org
+Signed-off-by: Alexander Gordeev <agordeev@redhat.com>
 ---
- drivers/ata/libahci.c     |  1 +
- drivers/ata/libata-core.c |  2 +-
- drivers/ata/libata-scsi.c | 68 +++++++++++++++++++++++++++++++++++++++++++++++
- include/linux/libata.h    |  8 ++++++
- 4 files changed, 78 insertions(+), 1 deletion(-)
+ block/blk-mq.c | 81 +++++++++++++++++++++++++++++-----------------------------
+ 1 file changed, 40 insertions(+), 41 deletions(-)
 
-diff --git a/drivers/ata/libahci.c b/drivers/ata/libahci.c
-index dcf2c72..383adf7 100644
---- a/drivers/ata/libahci.c
-+++ b/drivers/ata/libahci.c
-@@ -140,6 +140,7 @@ EXPORT_SYMBOL_GPL(ahci_shost_attrs);
- struct device_attribute *ahci_sdev_attrs[] = {
- 	&dev_attr_sw_activity,
- 	&dev_attr_unload_heads,
-+	&dev_attr_enable_prio,
- 	NULL
- };
- EXPORT_SYMBOL_GPL(ahci_sdev_attrs);
-diff --git a/drivers/ata/libata-core.c b/drivers/ata/libata-core.c
-index 181b530..d0cf987 100644
---- a/drivers/ata/libata-core.c
-+++ b/drivers/ata/libata-core.c
-@@ -787,7 +787,7 @@ int ata_build_rw_tf(struct ata_taskfile *tf, struct ata_device *dev,
- 		if (tf->flags & ATA_TFLAG_FUA)
- 			tf->device |= 1 << 7;
- 
--		if (ata_ncq_prio_enabled(dev)) {
-+		if (ata_ncq_prio_enabled(dev) && ata_prio_enabled(dev)) {
- 			if (class == IOPRIO_CLASS_RT)
- 				tf->hob_nsect |= ATA_PRIO_HIGH <<
- 						 ATA_SHIFT_PRIO;
-diff --git a/drivers/ata/libata-scsi.c b/drivers/ata/libata-scsi.c
-index 18629e8..10ba118 100644
---- a/drivers/ata/libata-scsi.c
-+++ b/drivers/ata/libata-scsi.c
-@@ -271,6 +271,73 @@ DEVICE_ATTR(unload_heads, S_IRUGO | S_IWUSR,
- 	    ata_scsi_park_show, ata_scsi_park_store);
- EXPORT_SYMBOL_GPL(dev_attr_unload_heads);
- 
-+static ssize_t ata_enable_prio_show(struct device *device,
-+				    struct device_attribute *attr, char *buf)
-+{
-+	struct scsi_device *sdev = to_scsi_device(device);
-+	struct ata_port *ap;
-+	struct ata_device *dev;
-+	int rc = 0;
-+	int enable_prio;
-+
-+	ap = ata_shost_to_port(sdev->host);
-+
-+	spin_lock_irq(ap->lock);
-+	dev = ata_scsi_find_dev(ap, sdev);
-+	if (!dev) {
-+		rc = -ENODEV;
-+		goto unlock;
-+	}
-+
-+	enable_prio = ata_prio_enabled(dev);
-+
-+unlock:
-+	spin_unlock_irq(ap->lock);
-+
-+	return rc ? rc : snprintf(buf, 20, "%u\n", enable_prio);
-+}
-+
-+static ssize_t ata_enable_prio_store(struct device *device,
-+				     struct device_attribute *attr,
-+				     const char *buf, size_t len)
-+{
-+	struct scsi_device *sdev = to_scsi_device(device);
-+	struct ata_port *ap;
-+	struct ata_device *dev;
-+	long int input;
-+	unsigned long flags;
-+	int rc;
-+
-+	rc = kstrtol(buf, 10, &input);
-+	if (rc)
-+		return rc;
-+	if ((input < 0) || (input > 1))
-+		return -EINVAL;
-+
-+	ap = ata_shost_to_port(sdev->host);
-+
-+	spin_lock_irqsave(ap->lock, flags);
-+	dev = ata_scsi_find_dev(ap, sdev);
-+	if (unlikely(!dev)) {
-+		rc = -ENODEV;
-+		goto unlock;
-+	}
-+
-+	if (input)
-+		dev->flags |= ATA_DFLAG_ENABLE_PRIO;
-+	else
-+		dev->flags &= ~ATA_DFLAG_ENABLE_PRIO;
-+
-+unlock:
-+	spin_unlock_irqrestore(ap->lock, flags);
-+
-+	return rc ? rc : len;
-+}
-+
-+DEVICE_ATTR(enable_prio, S_IRUGO | S_IWUSR,
-+	    ata_enable_prio_show, ata_enable_prio_store);
-+EXPORT_SYMBOL_GPL(dev_attr_enable_prio);
-+
- void ata_scsi_set_sense(struct ata_device *dev, struct scsi_cmnd *cmd,
- 			u8 sk, u8 asc, u8 ascq)
- {
-@@ -402,6 +469,7 @@ EXPORT_SYMBOL_GPL(dev_attr_sw_activity);
- 
- struct device_attribute *ata_common_sdev_attrs[] = {
- 	&dev_attr_unload_heads,
-+	&dev_attr_enable_prio,
- 	NULL
- };
- EXPORT_SYMBOL_GPL(ata_common_sdev_attrs);
-diff --git a/include/linux/libata.h b/include/linux/libata.h
-index a3c66852..804c4c6 100644
---- a/include/linux/libata.h
-+++ b/include/linux/libata.h
-@@ -166,6 +166,7 @@ enum {
- 	ATA_DFLAG_UNLOCK_HPA	= (1 << 18), /* unlock HPA */
- 	ATA_DFLAG_NCQ_SEND_RECV = (1 << 19), /* device supports NCQ SEND and RECV */
- 	ATA_DFLAG_NCQ_PRIO	= (1 << 20), /* device supports NCQ priority */
-+	ATA_DFLAG_ENABLE_PRIO	= (1 << 21), /* User enable device priority */
- 	ATA_DFLAG_INIT_MASK	= (1 << 24) - 1,
- 
- 	ATA_DFLAG_DETACH	= (1 << 24),
-@@ -544,6 +545,7 @@ typedef void (*ata_postreset_fn_t)(struct ata_link *link, unsigned int *classes)
- 
- extern struct device_attribute dev_attr_link_power_management_policy;
- extern struct device_attribute dev_attr_unload_heads;
-+extern struct device_attribute dev_attr_enable_prio;
- extern struct device_attribute dev_attr_em_message_type;
- extern struct device_attribute dev_attr_em_message;
- extern struct device_attribute dev_attr_sw_activity;
-@@ -1628,6 +1630,12 @@ static inline int ata_ncq_prio_enabled(struct ata_device *dev)
- 			      ATA_DFLAG_NCQ_PRIO)) == ATA_DFLAG_NCQ_PRIO;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index c589096..af6d049 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1696,17 +1696,30 @@ static void blk_mq_exit_hw_queues(struct request_queue *q,
+ 	q->nr_hw_queues = 0;
  }
  
-+static inline int ata_prio_enabled(struct ata_device *dev)
-+{
-+	return ((dev->flags & ATA_DFLAG_ENABLE_PRIO) ==
-+		 ATA_DFLAG_ENABLE_PRIO);
-+}
-+
- static inline bool ata_fpdma_dsm_supported(struct ata_device *dev)
+-static int blk_mq_init_hctx(struct request_queue *q,
+-		struct blk_mq_tag_set *set,
+-		struct blk_mq_hw_ctx *hctx, unsigned hctx_idx)
++static struct blk_mq_hw_ctx *blk_mq_init_hctx(struct request_queue *q,
++		struct blk_mq_tag_set *set, unsigned hctx_idx)
  {
- 	return (dev->flags & ATA_DFLAG_NCQ_SEND_RECV) &&
+-	int node = hctx->numa_node;
+ 	unsigned flush_start_tag = set->queue_depth;
++	struct blk_mq_hw_ctx *hctx;
++	int node;
++
++	node = blk_mq_hw_queue_to_node(q->mq_map, hctx_idx);
++	if (node == NUMA_NO_NODE)
++		node = set->numa_node;
++
++	hctx = kzalloc_node(sizeof(*hctx), GFP_KERNEL, node);
++	if (!hctx)
++		return NULL;
++
++	if (!zalloc_cpumask_var_node(&hctx->cpumask, GFP_KERNEL, node))
++		goto free_hctx;
+ 
+ 	INIT_WORK(&hctx->run_work, blk_mq_run_work_fn);
+ 	INIT_DELAYED_WORK(&hctx->delay_work, blk_mq_delay_work_fn);
+ 	spin_lock_init(&hctx->lock);
+ 	INIT_LIST_HEAD(&hctx->dispatch);
++	atomic_set(&hctx->nr_active, 0);
++	hctx->numa_node = node;
+ 	hctx->queue = q;
+ 	hctx->queue_num = hctx_idx;
+ 	hctx->flags = set->flags & ~BLK_MQ_F_TAG_SHARED;
+@@ -1745,7 +1758,7 @@ static int blk_mq_init_hctx(struct request_queue *q,
+ 				   flush_start_tag + hctx_idx, node))
+ 		goto free_fq;
+ 
+-	return 0;
++	return hctx;
+ 
+  free_fq:
+ 	kfree(hctx->fq);
+@@ -1758,8 +1771,11 @@ static int blk_mq_init_hctx(struct request_queue *q,
+ 	kfree(hctx->ctxs);
+  unregister_cpu_notifier:
+ 	blk_mq_unregister_cpu_notifier(&hctx->cpu_notifier);
+-
+-	return -1;
++	free_cpumask_var(hctx->cpumask);
++ free_hctx:
++	kfree(hctx);
++	
++	return NULL;
+ }
+ 
+ static void blk_mq_init_cpu_queues(struct request_queue *q,
+@@ -1971,57 +1987,40 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
+ 						struct request_queue *q)
+ {
+ 	int i, j;
++	struct blk_mq_hw_ctx *hctx;
+ 	struct blk_mq_hw_ctx **hctxs = q->queue_hw_ctx;
+ 
+ 	blk_mq_sysfs_unregister(q);
+ 	for (i = 0; i < set->nr_hw_queues; i++) {
+-		int node;
+-
+ 		if (hctxs[i])
+ 			continue;
+ 		if (!set->tags[i])
+ 			break;
+ 
+-		node = blk_mq_hw_queue_to_node(q->mq_map, i);
+-		if (node == NUMA_NO_NODE)
+-			node = set->numa_node;
+-
+-		hctxs[i] = kzalloc_node(sizeof(struct blk_mq_hw_ctx),
+-					GFP_KERNEL, node);
+-		if (!hctxs[i])
+-			break;
+-
+-		if (!zalloc_cpumask_var_node(&hctxs[i]->cpumask, GFP_KERNEL,
+-						node)) {
+-			kfree(hctxs[i]);
+-			hctxs[i] = NULL;
++		hctx = blk_mq_init_hctx(q, set, i);
++		if (!hctx)
+ 			break;
+-		}
+ 
+-		atomic_set(&hctxs[i]->nr_active, 0);
+-		hctxs[i]->numa_node = node;
++		blk_mq_hctx_kobj_init(hctx);
+ 
+-		if (blk_mq_init_hctx(q, set, hctxs[i], i)) {
+-			free_cpumask_var(hctxs[i]->cpumask);
+-			kfree(hctxs[i]);
+-			hctxs[i] = NULL;
+-			break;
+-		}
+-		blk_mq_hctx_kobj_init(hctxs[i]);
++		hctxs[i] = hctx;
+ 	}
+ 	for (j = i; j < q->nr_hw_queues; j++) {
+-		struct blk_mq_hw_ctx *hctx = hctxs[j];
++		hctx = hctxs[j];
+ 
+-		if (hctx) {
+-			kobject_put(&hctx->kobj);
++		if (!hctx)
++			continue;
+ 
+-			if (hctx->tags) {
+-				blk_mq_free_rq_map(set, hctx->tags, j);
+-				set->tags[j] = NULL;
+-			}
+-			blk_mq_exit_hctx(q, set, hctx, j);
+-			hctxs[j] = NULL;
++		kobject_put(&hctx->kobj);
++
++		if (hctx->tags) {
++			blk_mq_free_rq_map(set, hctx->tags, j);
++			set->tags[j] = NULL;
+ 		}
++
++		blk_mq_exit_hctx(q, set, hctx, j);
++
++		hctxs[j] = NULL;
+ 	}
+ 	q->nr_hw_queues = i;
+ 	blk_mq_sysfs_register(q);
 -- 
-2.1.4
+1.8.3.1
 
