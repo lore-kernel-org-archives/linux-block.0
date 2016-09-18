@@ -1,186 +1,67 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga03.intel.com ([134.134.136.65]:7206 "EHLO mga03.intel.com"
+Received: from mx1.redhat.com ([209.132.183.28]:36460 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S934350AbcIOLzv (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Sep 2016 07:55:51 -0400
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv3 36/41] ext4: handle writeback with huge pages
-Date: Thu, 15 Sep 2016 14:55:18 +0300
-Message-Id: <20160915115523.29737-37-kirill.shutemov@linux.intel.com>
-In-Reply-To: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
-References: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
+        id S932499AbcIRHhx (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 18 Sep 2016 03:37:53 -0400
+From: Alexander Gordeev <agordeev@redhat.com>
+To: linux-kernel@vger.kernel.org
+Cc: Alexander Gordeev <agordeev@redhat.com>,
+        linux-block@vger.kernel.org
+Subject: [PATCH 14/14] blk-mq: Set flush_start_tag to BLK_MQ_MAX_DEPTH
+Date: Sun, 18 Sep 2016 09:37:24 +0200
+Message-Id: <1aa82162eff437f7f23f42d951e1249baf4faabf.1474183901.git.agordeev@redhat.com>
+In-Reply-To: <cover.1474183901.git.agordeev@redhat.com>
+References: <cover.1474183901.git.agordeev@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Modify mpage_map_and_submit_buffers() and mpage_release_unused_pages()
-to deal with huge pages.
+We need flush tags unique across hardware contexts and do
+not overlap with normal tags. BLK_MQ_MAX_DEPTH as a base
+number seems better choice than a queue's depth.
 
-Mostly result of try-and-error. Critical view would be appriciated.
-
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+CC: linux-block@vger.kernel.org
+Signed-off-by: Alexander Gordeev <agordeev@redhat.com>
 ---
- fs/ext4/inode.c | 61 ++++++++++++++++++++++++++++++++++++++++-----------------
- 1 file changed, 43 insertions(+), 18 deletions(-)
+ block/blk-mq.c | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
-diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
-index 6a8da1a8409c..f2e34e340e65 100644
---- a/fs/ext4/inode.c
-+++ b/fs/ext4/inode.c
-@@ -1652,18 +1652,30 @@ static void mpage_release_unused_pages(struct mpage_da_data *mpd,
- 		if (nr_pages == 0)
- 			break;
- 		for (i = 0; i < nr_pages; i++) {
--			struct page *page = pvec.pages[i];
-+			struct page *page = compound_head(pvec.pages[i]);
-+
- 			if (page->index > end)
- 				break;
- 			BUG_ON(!PageLocked(page));
- 			BUG_ON(PageWriteback(page));
- 			if (invalidate) {
--				block_invalidatepage(page, 0, PAGE_SIZE);
-+				unsigned long offset, len;
-+
-+				offset = (index % hpage_nr_pages(page));
-+				len = min_t(unsigned long, end - page->index,
-+						hpage_nr_pages(page));
-+
-+				block_invalidatepage(page, offset << PAGE_SHIFT,
-+						len << PAGE_SHIFT);
- 				ClearPageUptodate(page);
- 			}
- 			unlock_page(page);
-+			if (PageTransHuge(page))
-+				break;
- 		}
--		index = pvec.pages[nr_pages - 1]->index + 1;
-+		index = page_to_pgoff(pvec.pages[nr_pages - 1]) + 1;
-+		if (PageTransCompound(pvec.pages[nr_pages - 1]))
-+			index = round_up(index, HPAGE_PMD_NR);
- 		pagevec_release(&pvec);
- 	}
- }
-@@ -2097,16 +2109,16 @@ static int mpage_submit_page(struct mpage_da_data *mpd, struct page *page)
- 	loff_t size = i_size_read(mpd->inode);
- 	int err;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index c617002..d1f5c2e 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1663,14 +1663,12 @@ static void blk_mq_exit_hctx(struct request_queue *q,
+ 		struct blk_mq_tag_set *set,
+ 		struct blk_mq_hw_ctx *hctx, unsigned int hctx_idx)
+ {
+-	unsigned flush_start_tag = set->queue_depth;
+-
+ 	blk_mq_tag_idle(hctx);
  
--	BUG_ON(page->index != mpd->first_page);
--	if (page->index == size >> PAGE_SHIFT)
--		len = size & ~PAGE_MASK;
--	else
--		len = PAGE_SIZE;
-+	page = compound_head(page);
-+	len = hpage_size(page);
-+	if (page->index + hpage_nr_pages(page) - 1 == size >> PAGE_SHIFT)
-+		len = size & ~hpage_mask(page);
-+
- 	clear_page_dirty_for_io(page);
- 	err = ext4_bio_write_page(&mpd->io_submit, page, len, mpd->wbc, false);
- 	if (!err)
--		mpd->wbc->nr_to_write--;
--	mpd->first_page++;
-+		mpd->wbc->nr_to_write -= hpage_nr_pages(page);
-+	mpd->first_page = round_up(mpd->first_page + 1, hpage_nr_pages(page));
+ 	if (set->ops->exit_request)
+ 		set->ops->exit_request(set->driver_data,
+ 				       hctx->fq->flush_rq, hctx_idx,
+-				       flush_start_tag + hctx_idx);
++				       BLK_MQ_MAX_DEPTH + hctx_idx);
  
- 	return err;
- }
-@@ -2254,12 +2266,16 @@ static int mpage_map_and_submit_buffers(struct mpage_da_data *mpd)
- 			break;
- 		for (i = 0; i < nr_pages; i++) {
- 			struct page *page = pvec.pages[i];
-+			unsigned long diff;
+ 	if (set->ops->exit_hctx)
+ 		set->ops->exit_hctx(hctx, hctx_idx);
+@@ -1699,7 +1697,6 @@ static void blk_mq_exit_hw_queues(struct request_queue *q,
+ static struct blk_mq_hw_ctx *blk_mq_init_hctx(struct request_queue *q,
+ 		struct blk_mq_tag_set *set, unsigned hctx_idx)
+ {
+-	unsigned flush_start_tag = set->queue_depth;
+ 	struct blk_mq_hw_ctx *hctx;
+ 	int node;
  
--			if (page->index > end)
-+			if (page_to_pgoff(page) > end)
- 				break;
- 			/* Up to 'end' pages must be contiguous */
--			BUG_ON(page->index != start);
-+			BUG_ON(page_to_pgoff(page) != start);
-+			diff = (page - compound_head(page)) << bpp_bits;
- 			bh = head = page_buffers(page);
-+			while (diff--)
-+				bh = bh->b_this_page;
- 			do {
- 				if (lblk < mpd->map.m_lblk)
- 					continue;
-@@ -2296,7 +2312,10 @@ static int mpage_map_and_submit_buffers(struct mpage_da_data *mpd)
- 			 * supports blocksize < pagesize as we will try to
- 			 * convert potentially unmapped parts of inode.
- 			 */
--			mpd->io_submit.io_end->size += PAGE_SIZE;
-+			if (PageTransCompound(page))
-+				mpd->io_submit.io_end->size += HPAGE_PMD_SIZE;
-+			else
-+				mpd->io_submit.io_end->size += PAGE_SIZE;
- 			/* Page fully mapped - let IO run! */
- 			err = mpage_submit_page(mpd, page);
- 			if (err < 0) {
-@@ -2304,6 +2323,10 @@ static int mpage_map_and_submit_buffers(struct mpage_da_data *mpd)
- 				return err;
- 			}
- 			start++;
-+			if (PageTransCompound(page)) {
-+				start = round_up(start, HPAGE_PMD_NR);
-+				break;
-+			}
- 		}
- 		pagevec_release(&pvec);
- 	}
-@@ -2543,7 +2566,7 @@ static int mpage_prepare_extent_to_map(struct mpage_da_data *mpd)
- 			 * mapping. However, page->index will not change
- 			 * because we have a reference on the page.
- 			 */
--			if (page->index > end)
-+			if (page_to_pgoff(page) > end)
- 				goto out;
+@@ -1753,7 +1750,7 @@ static struct blk_mq_hw_ctx *blk_mq_init_hctx(struct request_queue *q,
+ 	if (set->ops->init_request &&
+ 	    set->ops->init_request(set->driver_data,
+ 				   hctx->fq->flush_rq, hctx_idx,
+-				   flush_start_tag + hctx_idx, node))
++				   BLK_MQ_MAX_DEPTH + hctx_idx, node))
+ 		goto exit_hctx;
  
- 			/*
-@@ -2558,7 +2581,7 @@ static int mpage_prepare_extent_to_map(struct mpage_da_data *mpd)
- 				goto out;
- 
- 			/* If we can't merge this page, we are done. */
--			if (mpd->map.m_len > 0 && mpd->next_page != page->index)
-+			if (mpd->map.m_len > 0 && mpd->next_page != page_to_pgoff(page))
- 				goto out;
- 
- 			lock_page(page);
-@@ -2572,7 +2595,7 @@ static int mpage_prepare_extent_to_map(struct mpage_da_data *mpd)
- 			if (!PageDirty(page) ||
- 			    (PageWriteback(page) &&
- 			     (mpd->wbc->sync_mode == WB_SYNC_NONE)) ||
--			    unlikely(page->mapping != mapping)) {
-+			    unlikely(page_mapping(page) != mapping)) {
- 				unlock_page(page);
- 				continue;
- 			}
-@@ -2581,8 +2604,10 @@ static int mpage_prepare_extent_to_map(struct mpage_da_data *mpd)
- 			BUG_ON(PageWriteback(page));
- 
- 			if (mpd->map.m_len == 0)
--				mpd->first_page = page->index;
--			mpd->next_page = page->index + 1;
-+				mpd->first_page = page_to_pgoff(page);
-+			page = compound_head(page);
-+			mpd->next_page = round_up(page->index + 1,
-+					hpage_nr_pages(page));
- 			/* Add all dirty buffers to mpd */
- 			lblk = ((ext4_lblk_t)page->index) <<
- 				(PAGE_SHIFT - blkbits);
+ 	return hctx;
 -- 
-2.9.3
+1.8.3.1
 
