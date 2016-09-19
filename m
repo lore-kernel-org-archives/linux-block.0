@@ -1,55 +1,28 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.9]:40454 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1763840AbcINOTr (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 14 Sep 2016 10:19:47 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@fb.com, tglx@linutronix.de
-Cc: agordeev@redhat.com, keith.busch@intel.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 12/13] nvme: remove the post_scan callout
-Date: Wed, 14 Sep 2016 16:18:58 +0200
-Message-Id: <1473862739-15032-13-git-send-email-hch@lst.de>
-In-Reply-To: <1473862739-15032-1-git-send-email-hch@lst.de>
-References: <1473862739-15032-1-git-send-email-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <tglx@linutronix.de>
+Message-Id: <20160919212207.161583394@linutronix.de>
+Date: Mon, 19 Sep 2016 21:28:16 -0000
+From: Thomas Gleixner <tglx@linutronix.de>
+To: LKML <linux-kernel@vger.kernel.org>
+Cc: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+ Christoph Hellwing <hch@lst.de>, Sebastian Siewior <bigeasy@linutronix.de>
+Subject: [patch 0/3] block/mq: Convert to the new hotplug state machine
+List-ID: <linux-block@vger.kernel.org>
 
-No need now that we don't have to reverse engineer the irq affinity.
+The following series converts block/mq to the new hotplug state
+machine. Patch 1/3 reserves the states for the block layer and is already applied to
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+   git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git smp/for-block
+
+to avoid merge conflicts. This branch can be pulled into the block layer
+instead of applying patch 1/3 manually,
+
+Thanks,
+
+	tglx
 ---
- drivers/nvme/host/core.c | 3 ---
- drivers/nvme/host/nvme.h | 1 -
- 2 files changed, 4 deletions(-)
-
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 2feacc7..b245616 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -1826,9 +1826,6 @@ static void nvme_scan_work(struct work_struct *work)
- 	list_sort(NULL, &ctrl->namespaces, ns_cmp);
- 	mutex_unlock(&ctrl->namespaces_mutex);
- 	kfree(id);
--
--	if (ctrl->ops->post_scan)
--		ctrl->ops->post_scan(ctrl);
- }
- 
- void nvme_queue_scan(struct nvme_ctrl *ctrl)
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index ab18b78..99e4c16 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -184,7 +184,6 @@ struct nvme_ctrl_ops {
- 	int (*reg_read64)(struct nvme_ctrl *ctrl, u32 off, u64 *val);
- 	int (*reset_ctrl)(struct nvme_ctrl *ctrl);
- 	void (*free_ctrl)(struct nvme_ctrl *ctrl);
--	void (*post_scan)(struct nvme_ctrl *ctrl);
- 	void (*submit_async_event)(struct nvme_ctrl *ctrl, int aer_idx);
- 	int (*delete_ctrl)(struct nvme_ctrl *ctrl);
- 	const char *(*get_subsysnqn)(struct nvme_ctrl *ctrl);
--- 
-2.1.4
-
+ include/linux/blk-mq.h     |    2 
+ block/blk-mq-cpu.c         |   15 ++----
+ block/blk-mq.c             |  108 ++++++++++++++++++++-------------------------
+ block/blk-mq.h             |    2 
+ include/linux/cpuhotplug.h |    2 
+ 5 files changed, 59 insertions(+), 70 deletions(-)
