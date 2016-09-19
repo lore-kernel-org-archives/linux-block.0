@@ -1,149 +1,68 @@
-Return-Path: <tglx@linutronix.de>
-Message-Id: <20160919212601.180033814@linutronix.de>
-Date: Mon, 19 Sep 2016 21:28:22 -0000
-From: Thomas Gleixner <tglx@linutronix.de>
-To: LKML <linux-kernel@vger.kernel.org>
-Cc: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
- Christoph Hellwing <hch@lst.de>, Sebastian Siewior <bigeasy@linutronix.de>,
- Peter Zijlstra <peterz@infradead.org>, rt@linutronix.de
-Subject: [patch 3/3] blk/mq: Convert to hotplug state machine
-References: <20160919212207.161583394@linutronix.de>
+Return-Path: <Damien.LeMoal@hgst.com>
+From: Damien Le Moal <damien.lemoal@hgst.com>
+To: <linux-scsi@vger.kernel.org>, <linux-block@vger.kernel.org>
+CC: <martin.petersen@oracle.com>, <axboe@kernel.dk>, <hare@suse.de>,
+	<shaun.tancheff@seagate.com>, Damien Le Moal <damien.lemoal@hgst.com>
+Subject: [PATCH 2/9] blk-sysfs: Add 'chunk_sectors' to sysfs attributes
+Date: Tue, 20 Sep 2016 06:27:27 +0900
+Message-ID: <1474320454-5264-3-git-send-email-damien.lemoal@hgst.com>
+In-Reply-To: <1474320454-5264-1-git-send-email-damien.lemoal@hgst.com>
+References: <1474320454-5264-1-git-send-email-damien.lemoal@hgst.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-15
+Content-Type: text/plain
+Return-Path: damien.lemoal@hgst.com
 List-ID: <linux-block@vger.kernel.org>
 
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+From: Hannes Reinecke <hare@suse.de>
 
-Install the callbacks via the state machine so we can phase out the cpu
-hotplug notifiers mess.
+The queue limits already have a 'chunk_sectors' setting, so
+we should be presenting it via sysfs.
 
-Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: Peter Zijlstra <peterz@infradead.org>
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: rt@linutronix.de
-Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
-
+Signed-off-by: Hannes Reinecke <hare@suse.de>
+Signed-off-by: Damien Le Moal <damien.lemoal@hgst.com>
 ---
+ block/blk-sysfs.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
- block/blk-mq.c |   87 ++++++++++++++++++++++++++++-----------------------------
- 1 file changed, 43 insertions(+), 44 deletions(-)
-
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2090,50 +2090,18 @@ static void blk_mq_queue_reinit(struct r
- 	blk_mq_sysfs_register(q);
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index 31ecff9..15e5baf 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -130,6 +130,11 @@ static ssize_t queue_physical_block_size_show(struct request_queue *q, char *pag
+ 	return queue_var_show(queue_physical_block_size(q), page);
  }
  
--static int blk_mq_queue_reinit_notify(struct notifier_block *nb,
--				      unsigned long action, void *hcpu)
-+/*
-+ * New online cpumask which is going to be set in this hotplug event.
-+ * Declare this cpumasks as global as cpu-hotplug operation is invoked
-+ * one-by-one and dynamically allocating this could result in a failure.
-+ */
-+static struct cpumask cpuhp_online_new;
-+
-+static void blk_mq_queue_reinit_work(void)
- {
- 	struct request_queue *q;
--	int cpu = (unsigned long)hcpu;
--	/*
--	 * New online cpumask which is going to be set in this hotplug event.
--	 * Declare this cpumasks as global as cpu-hotplug operation is invoked
--	 * one-by-one and dynamically allocating this could result in a failure.
--	 */
--	static struct cpumask online_new;
--
--	/*
--	 * Before hotadded cpu starts handling requests, new mappings must
--	 * be established.  Otherwise, these requests in hw queue might
--	 * never be dispatched.
--	 *
--	 * For example, there is a single hw queue (hctx) and two CPU queues
--	 * (ctx0 for CPU0, and ctx1 for CPU1).
--	 *
--	 * Now CPU1 is just onlined and a request is inserted into
--	 * ctx1->rq_list and set bit0 in pending bitmap as ctx1->index_hw is
--	 * still zero.
--	 *
--	 * And then while running hw queue, flush_busy_ctxs() finds bit0 is
--	 * set in pending bitmap and tries to retrieve requests in
--	 * hctx->ctxs[0]->rq_list.  But htx->ctxs[0] is a pointer to ctx0,
--	 * so the request in ctx1->rq_list is ignored.
--	 */
--	switch (action & ~CPU_TASKS_FROZEN) {
--	case CPU_DEAD:
--	case CPU_UP_CANCELED:
--		cpumask_copy(&online_new, cpu_online_mask);
--		break;
--	case CPU_UP_PREPARE:
--		cpumask_copy(&online_new, cpu_online_mask);
--		cpumask_set_cpu(cpu, &online_new);
--		break;
--	default:
--		return NOTIFY_OK;
--	}
- 
- 	mutex_lock(&all_q_mutex);
--
- 	/*
- 	 * We need to freeze and reinit all existing queues.  Freezing
- 	 * involves synchronous wait for an RCU grace period and doing it
-@@ -2154,13 +2122,43 @@ static int blk_mq_queue_reinit_notify(st
- 	}
- 
- 	list_for_each_entry(q, &all_q_list, all_q_node)
--		blk_mq_queue_reinit(q, &online_new);
-+		blk_mq_queue_reinit(q, &cpuhp_online_new);
- 
- 	list_for_each_entry(q, &all_q_list, all_q_node)
- 		blk_mq_unfreeze_queue(q);
- 
- 	mutex_unlock(&all_q_mutex);
--	return NOTIFY_OK;
++static ssize_t queue_chunk_sectors_show(struct request_queue *q, char *page)
++{
++	return queue_var_show(q->limits.chunk_sectors, page);
 +}
 +
-+static int blk_mq_queue_reinit_dead(unsigned int cpu)
-+{
-+	cpumask_clear_cpu(cpu, &cpuhp_online_new);
-+	blk_mq_queue_reinit_work();
-+	return 0;
-+}
-+
-+/*
-+ * Before hotadded cpu starts handling requests, new mappings must be
-+ * established.  Otherwise, these requests in hw queue might never be
-+ * dispatched.
-+ *
-+ * For example, there is a single hw queue (hctx) and two CPU queues (ctx0
-+ * for CPU0, and ctx1 for CPU1).
-+ *
-+ * Now CPU1 is just onlined and a request is inserted into ctx1->rq_list
-+ * and set bit0 in pending bitmap as ctx1->index_hw is still zero.
-+ *
-+ * And then while running hw queue, flush_busy_ctxs() finds bit0 is set in
-+ * pending bitmap and tries to retrieve requests in hctx->ctxs[0]->rq_list.
-+ * But htx->ctxs[0] is a pointer to ctx0, so the request in ctx1->rq_list
-+ * is ignored.
-+ */
-+static int blk_mq_queue_reinit_prepare(unsigned int cpu)
-+{
-+	cpumask_copy(&cpuhp_online_new, cpu_online_mask);
-+	cpumask_set_cpu(cpu, &cpuhp_online_new);
-+	blk_mq_queue_reinit_work();
-+	return 0;
- }
- 
- static int __blk_mq_alloc_rq_maps(struct blk_mq_tag_set *set)
-@@ -2381,8 +2379,9 @@ static int __init blk_mq_init(void)
+ static ssize_t queue_io_min_show(struct request_queue *q, char *page)
  {
- 	blk_mq_cpu_init();
+ 	return queue_var_show(queue_io_min(q), page);
+@@ -455,6 +460,11 @@ static struct queue_sysfs_entry queue_physical_block_size_entry = {
+ 	.show = queue_physical_block_size_show,
+ };
  
--	hotcpu_notifier(blk_mq_queue_reinit_notify, 0);
--
-+	cpuhp_setup_state_nocalls(CPUHP_BLK_MQ_PREPARE, "block/mq:prepare",
-+				  blk_mq_queue_reinit_prepare,
-+				  blk_mq_queue_reinit_dead);
- 	return 0;
- }
- subsys_initcall(blk_mq_init);
++static struct queue_sysfs_entry queue_chunk_sectors_entry = {
++	.attr = {.name = "chunk_sectors", .mode = S_IRUGO },
++	.show = queue_chunk_sectors_show,
++};
++
+ static struct queue_sysfs_entry queue_io_min_entry = {
+ 	.attr = {.name = "minimum_io_size", .mode = S_IRUGO },
+ 	.show = queue_io_min_show,
+@@ -555,6 +565,7 @@ static struct attribute *default_attrs[] = {
+ 	&queue_hw_sector_size_entry.attr,
+ 	&queue_logical_block_size_entry.attr,
+ 	&queue_physical_block_size_entry.attr,
++	&queue_chunk_sectors_entry.attr,
+ 	&queue_io_min_entry.attr,
+ 	&queue_io_opt_entry.attr,
+ 	&queue_discard_granularity_entry.attr,
+-- 
+2.7.4
+
+Western Digital Corporation (and its subsidiaries) E-mail Confidentiality Notice & Disclaimer:
+
+This e-mail and any files transmitted with it may contain confidential or legally privileged information of WDC and/or its affiliates, and are intended solely for the use of the individual or entity to which they are addressed. If you are not the intended recipient, any disclosure, copying, distribution or any action taken or omitted to be taken in reliance on it, is prohibited. If you have received this e-mail in error, please notify the sender immediately and delete the e-mail in its entirety from your system.
