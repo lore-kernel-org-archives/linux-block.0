@@ -1,46 +1,25 @@
-Return-Path: <Damien.LeMoal@hgst.com>
-From: Damien Le Moal <damien.lemoal@hgst.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>, Christoph
- Hellwig <hch@lst.de>, "Martin K . Petersen" <martin.petersen@oracle.com>,
-	Hannes Reinecke <hare@suse.de>, Hannes Reinecke <hare@suse.com>, Damien Le
- Moal <damien.lemoal@hgst.com>
-Subject: [PATCH v2 3/7] block: update chunk_sectors in blk_stack_limits()
-Date: Mon, 26 Sep 2016 20:14:39 +0900
-Message-ID: <1474888483-29762-4-git-send-email-damien.lemoal@hgst.com>
-In-Reply-To: <1474888483-29762-1-git-send-email-damien.lemoal@hgst.com>
-References: <1474888483-29762-1-git-send-email-damien.lemoal@hgst.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([198.137.202.9]:52365 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1757003AbcISNvG (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 19 Sep 2016 09:51:06 -0400
+Date: Mon, 19 Sep 2016 06:51:04 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Alexander Gordeev <agordeev@redhat.com>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH 01/14] blk-mq: Fix memory leaks on queue cleanup
+Message-ID: <20160919135104.GA9763@infradead.org>
+References: <cover.1474183901.git.agordeev@redhat.com>
+ <6bbad3e6321685525574d6c0f01b875375351b81.1474183901.git.agordeev@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: damien.lemoal@hgst.com
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <6bbad3e6321685525574d6c0f01b875375351b81.1474183901.git.agordeev@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Hannes Reinecke <hare@suse.de>
+On Sun, Sep 18, 2016 at 09:37:11AM +0200, Alexander Gordeev wrote:
+> Some data are leaked when blk_cleanup_queue() interface
+> is called.
 
-Signed-off-by: Hannes Reinecke <hare@suse.com>
-Signed-off-by: Damien Le Moal <damien.lemoal@hgst.com>
----
- block/blk-settings.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index b1d5b7f..55369a6 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -631,6 +631,10 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
- 			t->discard_granularity;
- 	}
- 
-+	if (b->chunk_sectors)
-+		t->chunk_sectors = min_not_zero(t->chunk_sectors,
-+						b->chunk_sectors);
-+
- 	return ret;
- }
- EXPORT_SYMBOL(blk_stack_limits);
--- 
-2.7.4
-
-Western Digital Corporation (and its subsidiaries) E-mail Confidentiality Notice & Disclaimer:
-
-This e-mail and any files transmitted with it may contain confidential or legally privileged information of WDC and/or its affiliates, and are intended solely for the use of the individual or entity to which they are addressed. If you are not the intended recipient, any disclosure, copying, distribution or any action taken or omitted to be taken in reliance on it, is prohibited. If you have received this e-mail in error, please notify the sender immediately and delete the e-mail in its entirety from your system.
+I don't think this is correct - we free them in blk_mq_release.
