@@ -1,81 +1,149 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:33475 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1754872AbcIOQXW (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Sep 2016 12:23:22 -0400
-Received: from pps.filterd (m0044010.ppops.net [127.0.0.1])
-        by mx0a-00082601.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id u8FGFE6W022591
-        for <linux-block@vger.kernel.org>; Thu, 15 Sep 2016 09:23:21 -0700
-Received: from mail.thefacebook.com ([199.201.64.23])
-        by mx0a-00082601.pphosted.com with ESMTP id 25fww30vgw-2
-        (version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT)
-        for <linux-block@vger.kernel.org>; Thu, 15 Sep 2016 09:23:21 -0700
-Received: from facebook.com (2401:db00:11:d0a2:face:0:39:0)     by
- mx-out.facebook.com (10.223.100.97) with ESMTP id
- b68feb007b6011e6a8e524be0593f280-f85fba50 for <linux-block@vger.kernel.org>;
-        Thu, 15 Sep 2016 09:23:19 -0700
-From: Shaohua Li <shli@fb.com>
-To: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <axboe@fb.com>, <Kernel-team@fb.com>, <tj@kernel.org>,
-        <jmoyer@redhat.com>, <vgoyal@redhat.com>
-Subject: [PATCH V2 03/11] block-throttle: configure bps/iops limit for cgroup in high limit
-Date: Thu, 15 Sep 2016 09:23:10 -0700
-Message-ID: <3d5ec2c037901f7e30478b1d5a3f8d7cacf657cf.1473953743.git.shli@fb.com>
-In-Reply-To: <cover.1473953743.git.shli@fb.com>
-References: <cover.1473953743.git.shli@fb.com>
+Return-Path: <tglx@linutronix.de>
+Message-Id: <20160919212601.180033814@linutronix.de>
+Date: Mon, 19 Sep 2016 21:28:22 -0000
+From: Thomas Gleixner <tglx@linutronix.de>
+To: LKML <linux-kernel@vger.kernel.org>
+Cc: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+ Christoph Hellwing <hch@lst.de>, Sebastian Siewior <bigeasy@linutronix.de>,
+ Peter Zijlstra <peterz@infradead.org>, rt@linutronix.de
+Subject: [patch 3/3] blk/mq: Convert to hotplug state machine
+References: <20160919212207.161583394@linutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-15
+List-ID: <linux-block@vger.kernel.org>
 
-each queue will have a state machine. Initially queue is in LIMIT_HIGH
-state, which means all cgroups will be throttled according to their high
-limit. After all cgroups with high limit cross the limit, the queue state
-gets upgraded to LIMIT_MAX state.
-cgroups without high limit will use max limit for their high limit.
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 
-Signed-off-by: Shaohua Li <shli@fb.com>
+Install the callbacks via the state machine so we can phase out the cpu
+hotplug notifiers mess.
+
+Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: Peter Zijlstra <peterz@infradead.org>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: rt@linutronix.de
+Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+
 ---
- block/blk-throttle.c | 21 +++++++++++++++++++--
- 1 file changed, 19 insertions(+), 2 deletions(-)
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 02323fb..6bae1b4 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -208,12 +208,29 @@ static struct throtl_data *sq_to_td(struct throtl_service_queue *sq)
- 
- static uint64_t tg_bps_limit(struct throtl_grp *tg, int rw)
- {
--	return tg->bps[rw][tg->td->limit_index];
-+	struct blkcg_gq *blkg = tg_to_blkg(tg);
-+	uint64_t ret;
-+
-+	if (cgroup_subsys_on_dfl(io_cgrp_subsys) && !blkg->parent)
-+		return -1;
-+	ret = tg->bps[rw][tg->td->limit_index];
-+	if (ret == -1 && tg->td->limit_index == LIMIT_HIGH)
-+		return tg->bps[rw][LIMIT_MAX];
-+
-+	return ret;
+ block/blk-mq.c |   87 ++++++++++++++++++++++++++++-----------------------------
+ 1 file changed, 43 insertions(+), 44 deletions(-)
+
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2090,50 +2090,18 @@ static void blk_mq_queue_reinit(struct r
+ 	blk_mq_sysfs_register(q);
  }
  
- static unsigned int tg_iops_limit(struct throtl_grp *tg, int rw)
- {
--	return tg->iops[rw][tg->td->limit_index];
-+	struct blkcg_gq *blkg = tg_to_blkg(tg);
-+	unsigned int ret;
+-static int blk_mq_queue_reinit_notify(struct notifier_block *nb,
+-				      unsigned long action, void *hcpu)
++/*
++ * New online cpumask which is going to be set in this hotplug event.
++ * Declare this cpumasks as global as cpu-hotplug operation is invoked
++ * one-by-one and dynamically allocating this could result in a failure.
++ */
++static struct cpumask cpuhp_online_new;
 +
-+	if (cgroup_subsys_on_dfl(io_cgrp_subsys) && !blkg->parent)
-+		return -1;
-+	ret = tg->iops[rw][tg->td->limit_index];
-+	if (ret == -1 && tg->td->limit_index == LIMIT_HIGH)
-+		return tg->iops[rw][LIMIT_MAX];
-+	return ret;
++static void blk_mq_queue_reinit_work(void)
+ {
+ 	struct request_queue *q;
+-	int cpu = (unsigned long)hcpu;
+-	/*
+-	 * New online cpumask which is going to be set in this hotplug event.
+-	 * Declare this cpumasks as global as cpu-hotplug operation is invoked
+-	 * one-by-one and dynamically allocating this could result in a failure.
+-	 */
+-	static struct cpumask online_new;
+-
+-	/*
+-	 * Before hotadded cpu starts handling requests, new mappings must
+-	 * be established.  Otherwise, these requests in hw queue might
+-	 * never be dispatched.
+-	 *
+-	 * For example, there is a single hw queue (hctx) and two CPU queues
+-	 * (ctx0 for CPU0, and ctx1 for CPU1).
+-	 *
+-	 * Now CPU1 is just onlined and a request is inserted into
+-	 * ctx1->rq_list and set bit0 in pending bitmap as ctx1->index_hw is
+-	 * still zero.
+-	 *
+-	 * And then while running hw queue, flush_busy_ctxs() finds bit0 is
+-	 * set in pending bitmap and tries to retrieve requests in
+-	 * hctx->ctxs[0]->rq_list.  But htx->ctxs[0] is a pointer to ctx0,
+-	 * so the request in ctx1->rq_list is ignored.
+-	 */
+-	switch (action & ~CPU_TASKS_FROZEN) {
+-	case CPU_DEAD:
+-	case CPU_UP_CANCELED:
+-		cpumask_copy(&online_new, cpu_online_mask);
+-		break;
+-	case CPU_UP_PREPARE:
+-		cpumask_copy(&online_new, cpu_online_mask);
+-		cpumask_set_cpu(cpu, &online_new);
+-		break;
+-	default:
+-		return NOTIFY_OK;
+-	}
+ 
+ 	mutex_lock(&all_q_mutex);
+-
+ 	/*
+ 	 * We need to freeze and reinit all existing queues.  Freezing
+ 	 * involves synchronous wait for an RCU grace period and doing it
+@@ -2154,13 +2122,43 @@ static int blk_mq_queue_reinit_notify(st
+ 	}
+ 
+ 	list_for_each_entry(q, &all_q_list, all_q_node)
+-		blk_mq_queue_reinit(q, &online_new);
++		blk_mq_queue_reinit(q, &cpuhp_online_new);
+ 
+ 	list_for_each_entry(q, &all_q_list, all_q_node)
+ 		blk_mq_unfreeze_queue(q);
+ 
+ 	mutex_unlock(&all_q_mutex);
+-	return NOTIFY_OK;
++}
++
++static int blk_mq_queue_reinit_dead(unsigned int cpu)
++{
++	cpumask_clear_cpu(cpu, &cpuhp_online_new);
++	blk_mq_queue_reinit_work();
++	return 0;
++}
++
++/*
++ * Before hotadded cpu starts handling requests, new mappings must be
++ * established.  Otherwise, these requests in hw queue might never be
++ * dispatched.
++ *
++ * For example, there is a single hw queue (hctx) and two CPU queues (ctx0
++ * for CPU0, and ctx1 for CPU1).
++ *
++ * Now CPU1 is just onlined and a request is inserted into ctx1->rq_list
++ * and set bit0 in pending bitmap as ctx1->index_hw is still zero.
++ *
++ * And then while running hw queue, flush_busy_ctxs() finds bit0 is set in
++ * pending bitmap and tries to retrieve requests in hctx->ctxs[0]->rq_list.
++ * But htx->ctxs[0] is a pointer to ctx0, so the request in ctx1->rq_list
++ * is ignored.
++ */
++static int blk_mq_queue_reinit_prepare(unsigned int cpu)
++{
++	cpumask_copy(&cpuhp_online_new, cpu_online_mask);
++	cpumask_set_cpu(cpu, &cpuhp_online_new);
++	blk_mq_queue_reinit_work();
++	return 0;
  }
  
- /**
--- 
-2.8.0.rc2
-
+ static int __blk_mq_alloc_rq_maps(struct blk_mq_tag_set *set)
+@@ -2381,8 +2379,9 @@ static int __init blk_mq_init(void)
+ {
+ 	blk_mq_cpu_init();
+ 
+-	hotcpu_notifier(blk_mq_queue_reinit_notify, 0);
+-
++	cpuhp_setup_state_nocalls(CPUHP_BLK_MQ_PREPARE, "block/mq:prepare",
++				  blk_mq_queue_reinit_prepare,
++				  blk_mq_queue_reinit_dead);
+ 	return 0;
+ }
+ subsys_initcall(blk_mq_init);
