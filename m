@@ -1,114 +1,85 @@
-Return-Path: <Damien.LeMoal@hgst.com>
-From: Damien Le Moal <damien.lemoal@hgst.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>, Christoph
- Hellwig <hch@lst.de>, "Martin K . Petersen" <martin.petersen@oracle.com>,
-	Hannes Reinecke <hare@suse.de>, Shaun Tancheff <shaun@tancheff.com>, Damien
- Le Moal <damien.lemoal@hgst.com>
-Subject: [PATCH v5 0/7] ZBC / Zoned block device support
-Date: Fri, 30 Sep 2016 13:11:32 +0900
-Message-ID: <1475208699-27310-1-git-send-email-damien.lemoal@hgst.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pa0-f54.google.com ([209.85.220.54]:36707 "EHLO
+        mail-pa0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752040AbcISSCZ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 19 Sep 2016 14:02:25 -0400
+Received: by mail-pa0-f54.google.com with SMTP id id6so50879842pad.3
+        for <linux-block@vger.kernel.org>; Mon, 19 Sep 2016 11:02:25 -0700 (PDT)
+Date: Mon, 19 Sep 2016 10:57:19 -0700
+From: Omar Sandoval <osandov@osandov.com>
+To: Alexander Gordeev <agordeev@redhat.com>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH 09/14] blk-mq: Move duplicating code to blk_mq_exit_hctx()
+Message-ID: <20160919175719.GB21803@vader>
+References: <cover.1474183901.git.agordeev@redhat.com>
+ <08fde52dea32101ca7fffe1ff6e1a4786a7eab2c.1474183901.git.agordeev@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: damien.lemoal@hgst.com
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <08fde52dea32101ca7fffe1ff6e1a4786a7eab2c.1474183901.git.agordeev@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This series introduces support for zoned block devices. It integrates
-earlier submissions by Hannes Reinecke and Shaun Tancheff. Compared to the
-previous series version, the code was significantly simplified by limiting
-support to zoned devices satisfying the following conditions:
-1) All zones of the device are the same size, with the exception of an
-   eventual last smaller runt zone.
-2) For host-managed disks, reads must be unrestricted (read commands do not
-   fail due to zone or write pointer alignement constraints).
-Zoned disks that do not satisfy these 2 conditions are ignored.
+On Sun, Sep 18, 2016 at 09:37:19AM +0200, Alexander Gordeev wrote:
+> CC: linux-block@vger.kernel.org
+> Signed-off-by: Alexander Gordeev <agordeev@redhat.com>
+> ---
+>  block/blk-mq.c | 14 +++++---------
+>  1 file changed, 5 insertions(+), 9 deletions(-)
+> 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 3efb700..cd32a08 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -1678,6 +1678,10 @@ static void blk_mq_exit_hctx(struct request_queue *q,
+>  	blk_mq_unregister_cpu_notifier(&hctx->cpu_notifier);
+>  	blk_free_flush_queue(hctx->fq);
+>  	blk_mq_free_bitmap(&hctx->ctx_map);
+> +
+> +	free_cpumask_var(hctx->cpumask);
+> +	kfree(hctx->ctxs);
+> +	kfree(hctx);
+>  }
+>  
+>  static void blk_mq_exit_hw_queues(struct request_queue *q,
+> @@ -1686,12 +1690,8 @@ static void blk_mq_exit_hw_queues(struct request_queue *q,
+>  	struct blk_mq_hw_ctx *hctx;
+>  	unsigned int i;
+>  
+> -	queue_for_each_hw_ctx(q, hctx, i) {
+> +	queue_for_each_hw_ctx(q, hctx, i)
+>  		blk_mq_exit_hctx(q, set, hctx, i);
+> -		free_cpumask_var(hctx->cpumask);
+> -		kfree(hctx->ctxs);
+> -		kfree(hctx);
+> -	}
+>  
+>  	q->nr_hw_queues = 0;
+>  }
+> @@ -2018,12 +2018,8 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
+>  				set->tags[j] = NULL;
+>  			}
+>  			blk_mq_exit_hctx(q, set, hctx, j);
+> -			free_cpumask_var(hctx->cpumask);
+>  			kobject_put(&hctx->kobj);
 
-These 2 conditions allowed dropping the zone information cache implemented
-in the previous version. This simplifies the code and also reduces the memory
-consumption at run time. Support for zoned devices now only require one bit
-per zone (less than 8KB in total). This bit field is used to write-lock
-zones and prevent the concurrent execution of multiple write commands in
-the same zone. This avoids write ordering problems at dispatch time, for
-both the simple queue and scsi-mq settings.
+Now this hctx->kobj will be a use-after-free since we just kfreed hctx
+in blk_mq_exit_hctx().
 
-The new operations introduced to suport zone manipulation was reduced to
-only the two main ZBC/ZAC defined commands: REPORT ZONES (REQ_OP_ZONE_REPORT)
-and RESET WRITE POINTER (REQ_OP_ZONE_RESET). This brings the total number of
-operations defined to 8, which fits in the 3 bits (REQ_OP_BITS) reserved for
-operation code in bio->bi_opf and req->cmd_flags.
-
-Most of the ZBC specific code is kept out of sd.c and implemented in the
-new file sd_zbc.c. Similarly, at the block layer, most of the zoned block
-device code is implemented in the new blk-zoned.c.
-
-For host-managed zoned block devices, the sequential write constraint of
-write pointer zones is exposed to the user. Users of the disk (applications,
-file systems or device mappers) must sequentially write to zones. This means
-that for raw block device accesses from applications, buffered writes are
-unreliable and direct I/Os must be used (or buffered writes with O_SYNC).
-
-Access to zone manipulation operations is also provided to applications
-through a set of new ioctls. This allows applications operating on raw
-block devices (e.g. mkfs.xxx) to discover a device zone layout and
-manipulate zone state.
-
-Changes from v4:
-* Changed interface of sd_zbc_setup_read_write
-
-Changes from v3:
-* Fixed several typos and tabs/spaces
-* Added description of zoned and chunk_sectors queue attributes in
-  Documentation/ABI/testing/sysfs-block
-* Fixed sd_read_capacity call in sd.c and to avoid missing information on
-  the first pass of a disk scan
-* Fixed scsi_disk zone related field to use logical block size unit instead
-  of 512B sector unit.
-
-Changes from v2:
-* Use kcalloc to allocate zone information array for ioctl
-* Use kcalloc to allocate zone information array for ioctl
-* Export GPL the functions blkdev_report_zones and blkdev_reset_zones
-* Shuffled uapi definitions from patch 7 into patch 5
-
-Damien Le Moal (1):
-  block: Add 'zoned' queue limit
-
-Hannes Reinecke (4):
-  blk-sysfs: Add 'chunk_sectors' to sysfs attributes
-  block: update chunk_sectors in blk_stack_limits()
-  block: Implement support for zoned block devices
-  sd: Implement support for ZBC devices
-
-Shaun Tancheff (2):
-  block: Define zoned block device operations
-  blk-zoned: implement ioctls
-
- Documentation/ABI/testing/sysfs-block |  29 ++
- block/Kconfig                         |   8 +
- block/Makefile                        |   1 +
- block/blk-core.c                      |   4 +
- block/blk-settings.c                  |   5 +
- block/blk-sysfs.c                     |  29 ++
- block/blk-zoned.c                     | 350 +++++++++++++++++++
- block/ioctl.c                         |   4 +
- drivers/scsi/Makefile                 |   1 +
- drivers/scsi/sd.c                     | 141 ++++++--
- drivers/scsi/sd.h                     |  67 ++++
- drivers/scsi/sd_zbc.c                 | 627 ++++++++++++++++++++++++++++++++++
- include/linux/blk_types.h             |   2 +
- include/linux/blkdev.h                |  99 ++++++
- include/scsi/scsi_proto.h             |  17 +
- include/uapi/linux/Kbuild             |   1 +
- include/uapi/linux/blkzoned.h         | 143 ++++++++
- include/uapi/linux/fs.h               |   4 +
- 18 files changed, 1499 insertions(+), 33 deletions(-)
- create mode 100644 block/blk-zoned.c
- create mode 100644 drivers/scsi/sd_zbc.c
- create mode 100644 include/uapi/linux/blkzoned.h
+> -			kfree(hctx->ctxs);
+> -			kfree(hctx);
+>  			hctxs[j] = NULL;
+> -
+>  		}
+>  	}
+>  	q->nr_hw_queues = i;
+> -- 
+> 1.8.3.1
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-block" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
 -- 
-2.7.4
-
-Western Digital Corporation (and its subsidiaries) E-mail Confidentiality Notice & Disclaimer:
-
-This e-mail and any files transmitted with it may contain confidential or legally privileged information of WDC and/or its affiliates, and are intended solely for the use of the individual or entity to which they are addressed. If you are not the intended recipient, any disclosure, copying, distribution or any action taken or omitted to be taken in reliance on it, is prohibited. If you have received this e-mail in error, please notify the sender immediately and delete the e-mail in its entirety from your system.
+Omar
