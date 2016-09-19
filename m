@@ -1,66 +1,55 @@
-Return-Path: <Damien.LeMoal@hgst.com>
-From: Damien Le Moal <damien.lemoal@hgst.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>, "Christoph
- Hellwig" <hch@lst.de>, "Martin K . Petersen" <martin.petersen@oracle.com>,
-	Hannes Reinecke <hare@suse.de>, Shaun Tancheff <shaun@tancheff.com>, "Damien
- Le Moal" <damien.lemoal@hgst.com>, Shaun Tancheff
-	<shaun.tancheff@seagate.com>
-Subject: [PATCH v3 4/7] block: Define zoned block device operations
-Date: Wed, 28 Sep 2016 10:22:34 +0900
-Message-ID: <1475025757-6340-5-git-send-email-damien.lemoal@hgst.com>
-In-Reply-To: <1475025757-6340-1-git-send-email-damien.lemoal@hgst.com>
-References: <1475025757-6340-1-git-send-email-damien.lemoal@hgst.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pa0-f44.google.com ([209.85.220.44]:34070 "EHLO
+        mail-pa0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750997AbcISR7t (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 19 Sep 2016 13:59:49 -0400
+Received: by mail-pa0-f44.google.com with SMTP id wk8so50855899pab.1
+        for <linux-block@vger.kernel.org>; Mon, 19 Sep 2016 10:59:48 -0700 (PDT)
+Date: Mon, 19 Sep 2016 10:59:46 -0700
+From: Omar Sandoval <osandov@osandov.com>
+To: Alexander Gordeev <agordeev@redhat.com>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH 10/14] blk-mq: Uninit hardware context in order reverse
+ to init
+Message-ID: <20160919175946.GC21803@vader>
+References: <cover.1474183901.git.agordeev@redhat.com>
+ <cdf0bb66b4fa3bdcedb3bcd2df57ff38ed9fb02c.1474183901.git.agordeev@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: damien.lemoal@hgst.com
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <cdf0bb66b4fa3bdcedb3bcd2df57ff38ed9fb02c.1474183901.git.agordeev@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Shaun Tancheff <shaun.tancheff@seagate.com>
+On Sun, Sep 18, 2016 at 09:37:20AM +0200, Alexander Gordeev wrote:
+> CC: linux-block@vger.kernel.org
+> Signed-off-by: Alexander Gordeev <agordeev@redhat.com>
+> ---
+>  block/blk-mq.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index cd32a08..c589096 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -2013,12 +2013,13 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
+>  		struct blk_mq_hw_ctx *hctx = hctxs[j];
+>  
+>  		if (hctx) {
+> +			kobject_put(&hctx->kobj);
+> +
+>  			if (hctx->tags) {
+>  				blk_mq_free_rq_map(set, hctx->tags, j);
+>  				set->tags[j] = NULL;
+>  			}
+>  			blk_mq_exit_hctx(q, set, hctx, j);
+> -			kobject_put(&hctx->kobj);
+>  			hctxs[j] = NULL;
+>  		}
+>  	}
 
-Define REQ_OP_ZONE_REPORT and REQ_OP_ZONE_RESET for handling zones of
-host-managed and host-aware zoned block devices. With with these two
-new operations, the total number of operations defined reaches 8 and
-still fits with the 3 bits definition of REQ_OP_BITS.
+Oh, this fixes my comment from the last one, but it should be folded in
+to be bisect-safe.
 
-Signed-off-by: Shaun Tancheff <shaun.tancheff@seagate.com>
-Signed-off-by: Damien Le Moal <damien.lemoal@hgst.com>
----
- block/blk-core.c          | 4 ++++
- include/linux/blk_types.h | 2 ++
- 2 files changed, 6 insertions(+)
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 14d7c07..e4eda5d 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1941,6 +1941,10 @@ generic_make_request_checks(struct bio *bio)
- 	case REQ_OP_WRITE_SAME:
- 		if (!bdev_write_same(bio->bi_bdev))
- 			goto not_supported;
-+	case REQ_OP_ZONE_REPORT:
-+	case REQ_OP_ZONE_RESET:
-+		if (!bdev_is_zoned(bio->bi_bdev))
-+			goto not_supported;
- 		break;
- 	default:
- 		break;
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index cd395ec..dd50dce 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -243,6 +243,8 @@ enum req_op {
- 	REQ_OP_SECURE_ERASE,	/* request to securely erase sectors */
- 	REQ_OP_WRITE_SAME,	/* write same block many times */
- 	REQ_OP_FLUSH,		/* request for cache flush */
-+	REQ_OP_ZONE_REPORT,	/* Get zone information */
-+	REQ_OP_ZONE_RESET,	/* Reset a zone write pointer */
- };
- 
- #define REQ_OP_BITS 3
 -- 
-2.7.4
-
-Western Digital Corporation (and its subsidiaries) E-mail Confidentiality Notice & Disclaimer:
-
-This e-mail and any files transmitted with it may contain confidential or legally privileged information of WDC and/or its affiliates, and are intended solely for the use of the individual or entity to which they are addressed. If you are not the intended recipient, any disclosure, copying, distribution or any action taken or omitted to be taken in reliance on it, is prohibited. If you have received this e-mail in error, please notify the sender immediately and delete the e-mail in its entirety from your system.
+Omar
