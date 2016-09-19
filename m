@@ -1,31 +1,40 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH] sbitmap: initialize weight to zero
-To: Colin King <colin.king@canonical.com>, linux-block@vger.kernel.org
-References: <20160919133408.25559-1-colin.king@canonical.com>
+Return-Path: <colin.king@canonical.com>
+From: Colin King <colin.king@canonical.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <cab7d4ae-3079-7add-d72b-1bdecf57e13d@kernel.dk>
-Date: Mon, 19 Sep 2016 08:20:45 -0600
+Subject: [PATCH] sbitmap: initialize weight to zero
+Date: Mon, 19 Sep 2016 14:34:08 +0100
+Message-Id: <20160919133408.25559-1-colin.king@canonical.com>
 MIME-Version: 1.0
-In-Reply-To: <20160919133408.25559-1-colin.king@canonical.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 List-ID: <linux-block@vger.kernel.org>
 
-On 09/19/2016 07:34 AM, Colin King wrote:
-> From: Colin Ian King <colin.king@canonical.com>
->
-> Variable weight is not being initialized to zero before it is
-> used to compute the weight sum. Ensure it is initialized to zero.
->
-> Found with static analysis with cppcheck:
-> [lib/sbitmap.c:177]: (error) Uninitialized variable: weight
+From: Colin Ian King <colin.king@canonical.com>
 
-Thanks, applied. Strange, this is an old issue, it was just moved to 
-this file. It should have triggered on mainline too. My compiler doesn't 
-complain here:
+Variable weight is not being initialized to zero before it is
+used to compute the weight sum. Ensure it is initialized to zero.
 
-$ gcc --version
-gcc (Ubuntu 6.2.0-3ubuntu11~16.04) 6.2.0 20160901
+Found with static analysis with cppcheck:
+[lib/sbitmap.c:177]: (error) Uninitialized variable: weight
 
+Signed-off-by: Colin Ian King <colin.king@canonical.com>
+---
+ lib/sbitmap.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/sbitmap.c b/lib/sbitmap.c
+index e408089..2cecf05 100644
+--- a/lib/sbitmap.c
++++ b/lib/sbitmap.c
+@@ -169,7 +169,7 @@ EXPORT_SYMBOL_GPL(sbitmap_any_bit_clear);
+ 
+ unsigned int sbitmap_weight(const struct sbitmap *sb)
+ {
+-	unsigned int i, weight;
++	unsigned int i, weight = 0;
+ 
+ 	for (i = 0; i < sb->map_nr; i++) {
+ 		const struct sbitmap_word *word = &sb->map[i];
 -- 
-Jens Axboe
+2.9.3
