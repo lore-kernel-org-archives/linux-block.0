@@ -1,116 +1,69 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from szxga03-in.huawei.com ([119.145.14.66]:55854 "EHLO
-        szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751695AbcIJLPk (ORCPT
+Received: from mail-pa0-f52.google.com ([209.85.220.52]:33164 "EHLO
+        mail-pa0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751638AbcISSyW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 10 Sep 2016 07:15:40 -0400
-From: Hou Tao <houtao1@huawei.com>
-To: <linux-block@vger.kernel.org>
-CC: <linux-kernel@vger.kernel.org>
-Subject: [PATCH] block-throttle: fix throtl_log for throttled-bios dispatch
-Date: Sat, 10 Sep 2016 19:11:49 +0800
-Message-ID: <1473505909-17603-1-git-send-email-houtao1@huawei.com>
+        Mon, 19 Sep 2016 14:54:22 -0400
+Received: by mail-pa0-f52.google.com with SMTP id hm5so19075126pac.0
+        for <linux-block@vger.kernel.org>; Mon, 19 Sep 2016 11:54:22 -0700 (PDT)
+Date: Mon, 19 Sep 2016 11:54:20 -0700
+From: Omar Sandoval <osandov@osandov.com>
+To: Alexander Gordeev <agordeev@redhat.com>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH 06/14] blk-mq: Fix hardware context data node selection
+Message-ID: <20160919185420.GG21803@vader>
+References: <cover.1474183901.git.agordeev@redhat.com>
+ <2ca00b95f42aefc5423ab09db0c50fcd3e5ee578.1474183901.git.agordeev@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <2ca00b95f42aefc5423ab09db0c50fcd3e5ee578.1474183901.git.agordeev@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-on throtl_pending_timer_fn(), the number of queued rw bios of sq
-and dispatched bios are logged, but the numbers are meaningless,
-because the dispatched bios are NOT queued on sq->queued[] instead
-theses bios are queued on the sq of tg queued on sq->pending_tree,
-so move these two throtl_log() to throtl_select_dispatch.
+On Sun, Sep 18, 2016 at 09:37:16AM +0200, Alexander Gordeev wrote:
+> CC: linux-block@vger.kernel.org
+> Signed-off-by: Alexander Gordeev <agordeev@redhat.com>
 
-before patch:
-1. throttle on /
-throtl / [R] bio. bdisp=18432 sz=262144 bps=512000 ... queued=1/0
-throtl dispatch nr_queued=0 read=0 write=0
-......
-throtl bios disp=1
+Makes sense.
 
-2. throttle on / and /1
-throtl /1 [R] bio. bdisp=40960 sz=262144 bps=1024000 ... queued=1/0
-throtl dispatch nr_queued=0 read=0 write=0
-......
-throtl bios disp=1
+Reviewed-by: Omar Sandoval <osandov@fb.com>
 
-after patch:
-1. throttle on /
-throtl / [R] bio. bdisp=26624 sz=262144 bps=512000 ... queued=1/0
-throtl / dispatch queued=2/0
-......
-throtl / dispatch disp=1
+> ---
+>  block/blk-mq.c | 9 ++++-----
+>  1 file changed, 4 insertions(+), 5 deletions(-)
+> 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index a38fd2e..9fbfe31 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -1712,13 +1712,9 @@ static int blk_mq_init_hctx(struct request_queue *q,
+>  		struct blk_mq_tag_set *set,
+>  		struct blk_mq_hw_ctx *hctx, unsigned hctx_idx)
+>  {
+> -	int node;
+> +	int node = hctx->numa_node;
+>  	unsigned flush_start_tag = set->queue_depth;
+>  
+> -	node = hctx->numa_node;
+> -	if (node == NUMA_NO_NODE)
+> -		node = hctx->numa_node = set->numa_node;
+> -
+>  	INIT_WORK(&hctx->run_work, blk_mq_run_work_fn);
+>  	INIT_DELAYED_WORK(&hctx->delay_work, blk_mq_delay_work_fn);
+>  	spin_lock_init(&hctx->lock);
+> @@ -1999,6 +1995,9 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
+>  			break;
+>  
+>  		node = blk_mq_hw_queue_to_node(q->mq_map, i);
+> +		if (node == NUMA_NO_NODE)
+> +			node = set->numa_node;
+> +
+>  		hctxs[i] = kzalloc_node(sizeof(struct blk_mq_hw_ctx),
+>  					GFP_KERNEL, node);
+>  		if (!hctxs[i])
+> -- 
+> 1.8.3.1
+> 
 
-2. throttle on / and /1
-throtl /1 [R] bio. bdisp=81920 sz=262144 bps=1024000 ... queued=1/0
-throtl /1 dispatch queued=2/0
-......
-throtl /1 dispatch disp=1
-
-Signed-off-by: Hou Tao <houtao1@huawei.com>
----
- block/blk-throttle.c | 21 ++++++++++++---------
- 1 file changed, 12 insertions(+), 9 deletions(-)
-
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 47a3e54..c724c97 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -974,11 +974,12 @@ static int throtl_dispatch_tg(struct throtl_grp *tg)
- 
- static int throtl_select_dispatch(struct throtl_service_queue *parent_sq)
- {
--	unsigned int nr_disp = 0;
-+	unsigned int sum_disp = 0;
- 
- 	while (1) {
- 		struct throtl_grp *tg = throtl_rb_first(parent_sq);
- 		struct throtl_service_queue *sq = &tg->service_queue;
-+		unsigned int nr_disp;
- 
- 		if (!tg)
- 			break;
-@@ -988,16 +989,23 @@ static int throtl_select_dispatch(struct throtl_service_queue *parent_sq)
- 
- 		throtl_dequeue_tg(tg);
- 
--		nr_disp += throtl_dispatch_tg(tg);
-+		throtl_log(sq, "dispatch queued=%u/%u",
-+				   sq->nr_queued[READ], sq->nr_queued[WRITE]);
-+
-+		nr_disp = throtl_dispatch_tg(tg);
-+
-+		throtl_log(sq, "dispatch disp=%u", nr_disp);
-+
-+		sum_disp += nr_disp;
- 
- 		if (sq->nr_queued[0] || sq->nr_queued[1])
- 			tg_update_disptime(tg);
- 
--		if (nr_disp >= throtl_quantum)
-+		if (sum_disp >= throtl_quantum)
- 			break;
- 	}
- 
--	return nr_disp;
-+	return sum_disp;
- }
- 
- /**
-@@ -1031,13 +1039,8 @@ again:
- 	dispatched = false;
- 
- 	while (true) {
--		throtl_log(sq, "dispatch nr_queued=%u read=%u write=%u",
--			   sq->nr_queued[READ] + sq->nr_queued[WRITE],
--			   sq->nr_queued[READ], sq->nr_queued[WRITE]);
--
- 		ret = throtl_select_dispatch(sq);
- 		if (ret) {
--			throtl_log(sq, "bios disp=%u", ret);
- 			dispatched = true;
- 		}
- 
 -- 
-2.5.5
-
+Omar
