@@ -1,16 +1,16 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:51372 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:44178 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751468AbcIVIp0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Sep 2016 04:45:26 -0400
-Date: Thu, 22 Sep 2016 10:51:17 +0200
+        id S933871AbcIUMRn (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 21 Sep 2016 08:17:43 -0400
+Date: Wed, 21 Sep 2016 14:23:36 +0200
 From: Alexander Gordeev <agordeev@redhat.com>
 To: Christoph Hellwig <hch@lst.de>
 Cc: axboe@fb.com, tglx@linutronix.de, keith.busch@intel.com,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
 Subject: Re: [PATCH 03/13] genirq/msi: Switch to new irq spreading
  infrastructure
-Message-ID: <20160922085117.GF26808@agordeev.lab.eng.brq.redhat.com>
+Message-ID: <20160921122335.GD26808@agordeev.lab.eng.brq.redhat.com>
 References: <1473862739-15032-1-git-send-email-hch@lst.de>
  <1473862739-15032-4-git-send-email-hch@lst.de>
 MIME-Version: 1.0
@@ -20,74 +20,60 @@ Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
 On Wed, Sep 14, 2016 at 04:18:49PM +0200, Christoph Hellwig wrote:
->  static int msix_setup_entries(struct pci_dev *dev, void __iomem *base,
-> -			      struct msix_entry *entries, int nvec)
-> +			      struct msix_entry *entries, int nvec,
-> +			      bool affinity)
+> @@ -1039,6 +1058,7 @@ EXPORT_SYMBOL(pci_msi_enabled);
+>  static int __pci_enable_msi_range(struct pci_dev *dev, int minvec, int maxvec,
+>  		unsigned int flags)
 >  {
-> -	const struct cpumask *mask = NULL;
-> +	struct cpumask *curmsk, *masks = NULL;
->  	struct msi_desc *entry;
-> -	int cpu = -1, i;
-> -
-> -	for (i = 0; i < nvec; i++) {
-> -		if (dev->irq_affinity) {
-> -			cpu = cpumask_next(cpu, dev->irq_affinity);
-> -			if (cpu >= nr_cpu_ids)
-> -				cpu = cpumask_first(dev->irq_affinity);
-> -			mask = cpumask_of(cpu);
-> -		}
-> +	int ret, i;
+> +	bool affinity = flags & PCI_IRQ_AFFINITY;
+>  	int nvec;
+>  	int rc;
+
+The below notes apply to __pci_enable_msi_range() obviously.
+
+> @@ -1111,26 +1129,24 @@ static int __pci_enable_msix_range(struct pci_dev *dev,
+>  		struct msix_entry *entries, int minvec, int maxvec,
+>  		unsigned int flags)
+>  {
+> -	int nvec = maxvec;
+> -	int rc;
+> +	bool affinity = flags & PCI_IRQ_AFFINITY;
+> +	int rc, nvec = maxvec;
 >  
-> -		entry = alloc_msi_entry(&dev->dev, 1, NULL);
-> +	if (affinity) {
-> +		masks = irq_create_affinity_masks(dev->irq_affinity, nvec);
-> +		if (!masks)
-> +			pr_err("Unable to allocate affinity masks, ignoring\n");
+>  	if (maxvec < minvec)
+>  		return -ERANGE;
 
-Okay, so if we can tolerate affinity mask failure here, then we should be
-able to tolerate it everywhere. Therefore, this piece of code (I pointed
-in my other mail) in __pci_enable_msi_range() should not bail out:
+A sanity check is missing in case dev->irq_affinity/cpu_online_mask
+weight is less than minvec. We want to throw -EINVAL in this case,
+not -ENOSPC.
 
-		if (affinity) {
-			nvec = irq_calc_affinity_vectors(dev->irq_affinity,
-					nvec);
-			if (nvec < minvec)
-				return -ENOSPC;
-		}
-
-> +	}
-> +
-> +	for (i = 0, curmsk = masks; i < nvec; i++) {
-> +		entry = alloc_msi_entry(&dev->dev, 1, curmsk);
->  		if (!entry) {
->  			if (!i)
->  				iounmap(base);
->  			else
->  				free_msi_irqs(dev);
->  			/* No enough memory. Don't try again */
-> -			return -ENOMEM;
-> +			ret = -ENOMEM;
-> +			goto out;
+>  	for (;;) {
+> -		if (flags & PCI_IRQ_AFFINITY) {
+> -			dev->irq_affinity = irq_create_affinity_mask(&nvec);
+> +		if (affinity) {
+> +			nvec = irq_calc_affinity_vectors(dev->irq_affinity,
+> +					nvec);
+>  			if (nvec < minvec)
+>  				return -ENOSPC;
 >  		}
+
+The affinity mask weight might change and fall below minvec before
+__pci_enable_msix() is called. I guess, get/put_online_cpus() calls
+need to protect the loop iterations, not just irq_calc_affinity_vectors()
+function alone.
+
+But throwing -ENOSPC due to lack of dedicated CPUs for interrupt
+handling looks like an overkill in general case, since we still can
+distribute interrupts to a lower cpumask. Sorry if I forgot or missed
+a discussion on this case.
+
+> -		rc = pci_enable_msix(dev, entries, nvec);
+> +		rc = __pci_enable_msix(dev, entries, nvec, affinity);
+>  		if (rc == 0)
+>  			return nvec;
 >  
->  		entry->msi_attrib.is_msix	= 1;
-> @@ -710,11 +720,14 @@ static int msix_setup_entries(struct pci_dev *dev, void __iomem *base,
->  			entry->msi_attrib.entry_nr = i;
->  		entry->msi_attrib.default_irq	= dev->irq;
->  		entry->mask_base		= base;
-> -		entry->affinity			= mask;
->  
->  		list_add_tail(&entry->list, dev_to_msi_list(&dev->dev));
-> +		if (masks)
-> +			curmsk++;
->  	}
+> -		kfree(dev->irq_affinity);
+> -		dev->irq_affinity = NULL;
 > -
-> +	ret = 0;
-> +out:
-> +	kfree(masks);
->  	return 0;
-
-	return ret;
-
->  }
+>  		if (rc < 0)
+>  			return rc;
+>  		if (rc < minvec)
