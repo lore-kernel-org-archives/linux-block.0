@@ -1,20 +1,24 @@
-Return-Path: <ming.lei@canonical.com>
+Return-Path: <prvs=80731d7bfe=axboe@fb.com>
+Subject: Re: [PATCH 2/2] blk-mq: add flag for drivers wanting blocking
+ ->queue_rq()
+To: Christoph Hellwig <hch@infradead.org>
+References: <1474555980-2787-1-git-send-email-axboe@fb.com>
+ <1474555980-2787-3-git-send-email-axboe@fb.com>
+ <20160922145922.GB1800@infradead.org>
+ <a4162d4e-dc64-0e76-6f0c-3ff12eb0231c@fb.com>
+ <20160922151222.GA515@infradead.org>
+CC: <axboe@kernel.dk>, <linux-block@vger.kernel.org>, <jbacik@fb.com>,
+        "Ming
+ Lei" <ming.lei@canonical.com>
+From: Jens Axboe <axboe@fb.com>
+Message-ID: <ef600cc3-f8cc-bacf-5538-9eb8d7e2c95a@fb.com>
+Date: Thu, 22 Sep 2016 09:17:52 -0600
 MIME-Version: 1.0
 In-Reply-To: <20160922151222.GA515@infradead.org>
-References: <1474555980-2787-1-git-send-email-axboe@fb.com>
- <1474555980-2787-3-git-send-email-axboe@fb.com> <20160922145922.GB1800@infradead.org>
- <a4162d4e-dc64-0e76-6f0c-3ff12eb0231c@fb.com> <20160922151222.GA515@infradead.org>
-From: Ming Lei <ming.lei@canonical.com>
-Date: Fri, 23 Sep 2016 09:35:41 +0800
-Message-ID: <CACVXFVNHfYAzf+Kdge3S+QjnEE38qQjBuGtC6VGafBpwSxgBKQ@mail.gmail.com>
-Subject: Re: [PATCH 2/2] blk-mq: add flag for drivers wanting blocking ->queue_rq()
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Jens Axboe <axboe@fb.com>, Jens Axboe <axboe@kernel.dk>,
-	linux-block <linux-block@vger.kernel.org>, jbacik@fb.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="windows-1252"; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Sep 22, 2016 at 11:12 PM, Christoph Hellwig <hch@infradead.org> wrote:
+On 09/22/2016 09:12 AM, Christoph Hellwig wrote:
 > On Thu, Sep 22, 2016 at 09:03:56AM -0600, Jens Axboe wrote:
 >> Having to grab a mutex, for instance. We invoke ->queue_rq() with
 >> preemption disabled, so I'd hope that would not be the case... What
@@ -24,7 +28,9 @@ On Thu, Sep 22, 2016 at 11:12 PM, Christoph Hellwig <hch@infradead.org> wrote:
 > allocations, but I can't find any evidence of that.  Maybe it was just
 > my imagination, or an unsubmitted patch series.  Sorry for the
 > confusion.
->
+
+OK, that makes more sense. Pretty sure we would have had complaints!
+
 >> Loop was another case that was on my radar to get rid of the queue_work
 >> it currently has to do. Josef is currently testing the nbd driver using
 >> this approach, so we should get some numbers there too. If we have to,
@@ -40,6 +46,11 @@ On Thu, Sep 22, 2016 at 11:12 PM, Christoph Hellwig <hch@infradead.org> wrote:
 > We can't just increase the concurrency as a single work_struct item
 > can't be queued multiple times even on a high concurreny workqueue.
 
-Yes, that is it, and that is why last time we can't convert to this way.
+But we could have more work items, if we had to. Even if loop isn't a
+drop-in replacement for this simpler approach, I think it'll work well
+enough for nbd. The 5% number from Josef is comparing to not having any
+offload at all, I suspect the number from just converting to queue_work
+in the driver would be similar.
 
-Thanks,
+-- 
+Jens Axboe
