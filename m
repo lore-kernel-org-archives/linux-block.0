@@ -1,71 +1,37 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:3616 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751540AbcIZWtd (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Sep 2016 18:49:33 -0400
-Date: Mon, 26 Sep 2016 19:00:30 -0400
-From: Keith Busch <keith.busch@intel.com>
-To: linux-block@vger.kernel.org, Jens Axboe <axboe@fb.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Subject: [PATCH] blk-mq: Return invalid cookie if bio was split
-Message-ID: <20160926230030.GB24200@localhost.localdomain>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [patch V2 0/2] block/mq: Convert to new hotplug state machine
+To: Christoph Hellwing <hch@lst.de>
+References: <20160920152020.777561324@linutronix.de>
+ <0d239a65-b34c-b062-0f44-4155c001143a@kernel.dk>
+ <20160922135753.GB14645@lst.de>
+Cc: Thomas Gleixner <tglx@linutronix.de>, LKML
+ <linux-kernel@vger.kernel.org>, linux-block@vger.kernel.org,
+ Sebastian Siewior <bigeasy@linutronix.de>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <bb61e8ee-c58f-e05d-a979-4649cb60f383@kernel.dk>
+Date: Thu, 22 Sep 2016 08:05:45 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <20160922135753.GB14645@lst.de>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+List-ID: <linux-block@vger.kernel.org>
 
-The only user of polling requires its original request be completed in
-its entirety before continuing execution. If the bio needs to be split
-and chained for any reason, the direct IO path would have waited for just
-that split portion to complete, leading to potential data corruption if
-the remaining transfer has not yet completed.
+On 09/22/2016 07:57 AM, Christoph Hellwing wrote:
+> On Tue, Sep 20, 2016 at 09:48:39PM -0600, Jens Axboe wrote:
+>> On 09/20/2016 09:21 AM, Thomas Gleixner wrote:
+>>> The following series converts block/mq to the new hotplug state
+>>> machine. The series is against block.git/for-next and depends on
+>>>
+>>>    git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git smp/for-block
+>>>
+>>> This branch contains the necessary infrastructure for multi-instance
+>>> callbacks which allows us to remove blk-mq-cpu.c completely. It can be
+>>> pulled into the block tree.
+>>
+>> Thanks, I'll pull this in for 4.9.
+>
+> I still can't find it in your tree despite other commits today.
 
-This patch has blk-mq return an invalid cookie if a bio requires splitting
-so that polling does not occur.
+Didn't get to it yesterday, done now.
 
-Signed-off-by: Keith Busch <keith.busch@intel.com>
----
- block/blk-mq.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index c207fa9..6385985 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1311,6 +1311,7 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
- 	unsigned int request_count = 0;
- 	struct blk_plug *plug;
- 	struct request *same_queue_rq = NULL;
-+	struct bio *orig = bio;
- 	blk_qc_t cookie;
- 
- 	blk_queue_bounce(q, &bio);
-@@ -1389,7 +1390,7 @@ run_queue:
- 	}
- 	blk_mq_put_ctx(data.ctx);
- done:
--	return cookie;
-+	return bio == orig ? cookie : BLK_QC_T_NONE;
- }
- 
- /*
-@@ -1404,6 +1405,7 @@ static blk_qc_t blk_sq_make_request(struct request_queue *q, struct bio *bio)
- 	unsigned int request_count = 0;
- 	struct blk_map_ctx data;
- 	struct request *rq;
-+	struct bio *orig = bio;
- 	blk_qc_t cookie;
- 
- 	blk_queue_bounce(q, &bio);
-@@ -1467,7 +1469,7 @@ run_queue:
- 	}
- 
- 	blk_mq_put_ctx(data.ctx);
--	return cookie;
-+	return bio == orig ? cookie : BLK_QC_T_NONE;
- }
- 
- /*
 -- 
-2.7.2
-
+Jens Axboe
