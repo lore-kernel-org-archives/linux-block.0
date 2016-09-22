@@ -1,35 +1,29 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
+Return-Path: <prvs=8073c3c87f=jbacik@fb.com>
 Subject: Re: [PATCH 0/2]: Add option for async ->queue_rq
 To: Jens Axboe <axboe@fb.com>, <axboe@kernel.dk>,
-	<linux-block@vger.kernel.org>
+        <linux-block@vger.kernel.org>
 References: <1474555980-2787-1-git-send-email-axboe@fb.com>
-CC: <jbacik@fb.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-Message-ID: <acf43ae6-76d5-8dca-548a-30f16d0e0928@sandisk.com>
-Date: Tue, 27 Sep 2016 17:25:36 -0700
+From: Josef Bacik <jbacik@fb.com>
+Message-ID: <6f65d509-622e-6e65-dccd-ced0a37422ee@fb.com>
+Date: Thu, 22 Sep 2016 14:01:48 -0400
 MIME-Version: 1.0
 In-Reply-To: <1474555980-2787-1-git-send-email-axboe@fb.com>
 Content-Type: text/plain; charset="windows-1252"; format=flowed
-Return-Path: Bart.VanAssche@sandisk.com
 List-ID: <linux-block@vger.kernel.org>
 
-On 09/22/16 07:52, Jens Axboe wrote:
+On 09/22/2016 10:52 AM, Jens Axboe wrote:
 > Two patches that add the ability for a driver to flag itself
 > as wanting the ->queue_rq() invoked in a manner that allows
 > it to block. We'll need that for the nbd conversion, to avoid
 > having to add workqueue offload. We can use this in the current
 > loop mq path as well.
+>
+>
 
-Hello Jens,
+You can add my
 
-How can this work since there is code that calls blk_mq_run_hw_queue() 
-with a spin lock held? From mq_flush_data_end_io():
+Tested-by: Josef Bacik <jbacik@fb.com>
 
-	spin_lock_irqsave(&fq->mq_flush_lock, flags);
-	if (blk_flush_complete_seq(rq, fq, REQ_FSEQ_DATA, error))
-		blk_mq_run_hw_queue(hctx, true);
-	spin_unlock_irqrestore(&fq->mq_flush_lock, flags);
+to these.  Thanks,
 
-Sorry that I hadn't noticed this before.
-
-Bart.
+Josef
