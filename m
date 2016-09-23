@@ -1,72 +1,57 @@
-Return-Path: <msnitzer@redhat.com>
-From: Mike Snitzer <snitzer@redhat.com>
-To: axboe@kernel.dk, dm-devel@redhat.com
-Cc: linux-block@vger.kernel.org
-Subject: [PATCH v2 4/6] dm rq: introduce dm_mq_kick_requeue_list()
-Date: Wed, 14 Sep 2016 12:29:34 -0400
-Message-Id: <1473870576-54331-5-git-send-email-snitzer@redhat.com>
-In-Reply-To: <1473870576-54331-1-git-send-email-snitzer@redhat.com>
-References: <1473870576-54331-1-git-send-email-snitzer@redhat.com>
+Return-Path: <BATV+2ec0b7ee621439cf862d+4779+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk
+Cc: linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org
+Subject: [PATCH] blk-mq: skip unmapped queues in blk_mq_alloc_request_hctx
+Date: Fri, 23 Sep 2016 09:26:58 -0700
+Message-Id: <1474648018-3920-1-git-send-email-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Make it possible for a request-based target to kick the DM device's
-blk-mq request_queue's requeue_list.
+This provides the caller a feedback that a given hctx is not mapped and thus
+no command can be sent on it.
 
-Signed-off-by: Mike Snitzer <snitzer@redhat.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Tested-by: Steve Wise <swise@opengridcomputing.com>
 ---
- drivers/md/dm-rq.c | 17 +++++++++++++----
- drivers/md/dm-rq.h |  2 ++
- 2 files changed, 15 insertions(+), 4 deletions(-)
+ block/blk-mq.c | 16 ++++++++++++++--
+ 1 file changed, 14 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
-index bdbfe05..726cb3b 100644
---- a/drivers/md/dm-rq.c
-+++ b/drivers/md/dm-rq.c
-@@ -336,19 +336,28 @@ static void dm_old_requeue_request(struct request *rq)
- 	spin_unlock_irqrestore(q->queue_lock, flags);
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index e9b8007..7b430ab 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -266,17 +266,29 @@ struct request *blk_mq_alloc_request_hctx(struct request_queue *q, int rw,
+ 	if (ret)
+ 		return ERR_PTR(ret);
+ 
++	/*
++	 * Check if the hardware context is actually mapped to anything.
++	 * If not tell the caller that it should skip this queue.
++	 */
+ 	hctx = q->queue_hw_ctx[hctx_idx];
++	if (!blk_mq_hw_queue_mapped(hctx)) {
++		ret = -EXDEV;
++		goto out_queue_exit;
++	}
+ 	ctx = __blk_mq_get_ctx(q, cpumask_first(hctx->cpumask));
+ 
+ 	blk_mq_set_alloc_data(&alloc_data, q, flags, ctx, hctx);
+ 	rq = __blk_mq_alloc_request(&alloc_data, rw, 0);
+ 	if (!rq) {
+-		blk_queue_exit(q);
+-		return ERR_PTR(-EWOULDBLOCK);
++		ret = -EWOULDBLOCK;
++		goto out_queue_exit;
+ 	}
+ 
+ 	return rq;
++
++out_queue_exit:
++	blk_queue_exit(q);
++	return ERR_PTR(ret);
  }
+ EXPORT_SYMBOL_GPL(blk_mq_alloc_request_hctx);
  
--static void dm_mq_delay_requeue_request(struct request *rq, unsigned long msecs)
-+static void __dm_mq_kick_requeue_list(struct request_queue *q, unsigned long msecs)
- {
--	struct request_queue *q = rq->q;
- 	unsigned long flags;
- 
--	blk_mq_requeue_request(rq);
--
- 	spin_lock_irqsave(q->queue_lock, flags);
- 	if (!blk_queue_stopped(q))
- 		blk_mq_delay_kick_requeue_list(q, msecs_to_jiffies(msecs));
- 	spin_unlock_irqrestore(q->queue_lock, flags);
- }
- 
-+void dm_mq_kick_requeue_list(struct mapped_device *md)
-+{
-+	__dm_mq_kick_requeue_list(dm_get_md_queue(md), 0);
-+}
-+EXPORT_SYMBOL(dm_mq_kick_requeue_list);
-+
-+static void dm_mq_delay_requeue_request(struct request *rq, unsigned long msecs)
-+{
-+	blk_mq_requeue_request(rq);
-+	__dm_mq_kick_requeue_list(rq->q, msecs);
-+}
-+
- static void dm_requeue_original_request(struct dm_rq_target_io *tio, bool delay_requeue)
- {
- 	struct mapped_device *md = tio->md;
-diff --git a/drivers/md/dm-rq.h b/drivers/md/dm-rq.h
-index 9e6f0a3..4da06ca 100644
---- a/drivers/md/dm-rq.h
-+++ b/drivers/md/dm-rq.h
-@@ -55,6 +55,8 @@ void dm_mq_cleanup_mapped_device(struct mapped_device *md);
- void dm_start_queue(struct request_queue *q);
- void dm_stop_queue(struct request_queue *q);
- 
-+void dm_mq_kick_requeue_list(struct mapped_device *md);
-+
- unsigned dm_get_reserved_rq_based_ios(void);
- 
- ssize_t dm_attr_rq_based_seq_io_merge_deadline_show(struct mapped_device *md, char *buf);
 -- 
-2.7.4 (Apple Git-66)
+2.1.4
