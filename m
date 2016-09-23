@@ -1,42 +1,42 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:49756 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S933613AbcI3NXp (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Sep 2016 09:23:45 -0400
-From: Alexander Gordeev <agordeev@redhat.com>
-To: linux-kernel@vger.kernel.org
-Cc: Alexander Gordeev <agordeev@redhat.com>,
-        linux-block@vger.kernel.org
-Subject: [PATCH v2 2/8] blk-mq: Remove a redundant assignment
-Date: Fri, 30 Sep 2016 15:23:24 +0200
-Message-Id: <acd70e1736928907d479e29203844505a82d1413.1475241231.git.agordeev@redhat.com>
-In-Reply-To: <cover.1475241231.git.agordeev@redhat.com>
-References: <cover.1475241231.git.agordeev@redhat.com>
+Received: from mail-pf0-f176.google.com ([209.85.192.176]:36484 "EHLO
+        mail-pf0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S934834AbcIWV7M (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 23 Sep 2016 17:59:12 -0400
+Received: by mail-pf0-f176.google.com with SMTP id q2so45776526pfj.3
+        for <linux-block@vger.kernel.org>; Fri, 23 Sep 2016 14:59:12 -0700 (PDT)
+Subject: Re: [PATCH 1/2] blk-mq: get rid of manual run of queue with
+ __blk_mq_run_hw_queue()
+To: Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@fb.com>
+References: <1474555980-2787-1-git-send-email-axboe@fb.com>
+ <1474555980-2787-2-git-send-email-axboe@fb.com>
+ <20160922185603.GA32468@infradead.org>
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org, jbacik@fb.com
+From: Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <82480512-8c91-eca1-b6ca-c61fb098ce1d@grimberg.me>
+Date: Fri, 23 Sep 2016 14:59:12 -0700
+MIME-Version: 1.0
+In-Reply-To: <20160922185603.GA32468@infradead.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-blk_mq_hw_ctx::queue_num is initialized in blk_mq_init_hctx()
-function.
 
-CC: linux-block@vger.kernel.org
-Reviewed-by: Omar Sandoval <osandov@fb.com>
-Signed-off-by: Alexander Gordeev <agordeev@redhat.com>
----
- block/blk-mq.c | 1 -
- 1 file changed, 1 deletion(-)
+> ---
+> From c69bf02929d9c37d193b004a4c3c85c1142fa996 Mon Sep 17 00:00:00 2001
+> From: Christoph Hellwig <hch@lst.de>
+> Date: Thu, 22 Sep 2016 11:38:23 -0700
+> Subject: blk-mq: remove non-blocking pass in blk_mq_map_request
+>
+> bt_get already does a non-blocking pass as well as running the queue
+> when scheduling internally, no need to duplicate it.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index c96a168..92c2519 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1928,7 +1928,6 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
- 
- 		atomic_set(&hctxs[i]->nr_active, 0);
- 		hctxs[i]->numa_node = node;
--		hctxs[i]->queue_num = i;
- 
- 		if (blk_mq_init_hctx(q, set, hctxs[i], i)) {
- 			free_cpumask_var(hctxs[i]->cpumask);
--- 
-1.8.3.1
+Looks good too,
 
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+
+Question (while we're on the subject):
+Do consumers have a way to restrict blk-mq to block on
+lack of tags? I'm thinking in the context of nvme-target
+that can do more useful things than waiting for a tag...
