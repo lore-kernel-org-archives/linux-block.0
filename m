@@ -1,58 +1,39 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:51904 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1758186AbcIRHhj (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 18 Sep 2016 03:37:39 -0400
-From: Alexander Gordeev <agordeev@redhat.com>
-To: linux-kernel@vger.kernel.org
-Cc: Alexander Gordeev <agordeev@redhat.com>,
-        linux-block@vger.kernel.org
-Subject: [PATCH 07/14] blk-mq: Cleanup a loop exit condition
-Date: Sun, 18 Sep 2016 09:37:17 +0200
-Message-Id: <28367fd20927339e103d7e5afef31e2988e7ee78.1474183901.git.agordeev@redhat.com>
-In-Reply-To: <cover.1474183901.git.agordeev@redhat.com>
-References: <cover.1474183901.git.agordeev@redhat.com>
+Received: from szxga01-in.huawei.com ([58.251.152.64]:1444 "EHLO
+        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750784AbcIWExl (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 23 Sep 2016 00:53:41 -0400
+From: Yunlong Song <yunlong.song@huawei.com>
+To: <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
+        <sylinux@163.com>, <yunlong.song@huawei.com>
+CC: <bintian.wang@huawei.com>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH] block: Change BIO_RESET_BITS to current proper value
+Date: Fri, 23 Sep 2016 13:03:44 +0800
+Message-ID: <1474607024-21240-1-git-send-email-yunlong.song@huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-CC: linux-block@vger.kernel.org
-Signed-off-by: Alexander Gordeev <agordeev@redhat.com>
+Signed-off-by: Yunlong Song <yunlong.song@huawei.com>
 ---
- block/blk-mq.c | 9 +++------
- 1 file changed, 3 insertions(+), 6 deletions(-)
+ include/linux/blk_types.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 9fbfe31..b2ef8f5 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1681,16 +1681,13 @@ static void blk_mq_exit_hctx(struct request_queue *q,
- }
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index 436f43f..b7221b3 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -117,7 +117,7 @@ struct bio {
+  * Flags starting here get preserved by bio_reset() - this includes
+  * BVEC_POOL_IDX()
+  */
+-#define BIO_RESET_BITS	10
++#define BIO_RESET_BITS	9
  
- static void blk_mq_exit_hw_queues(struct request_queue *q,
--		struct blk_mq_tag_set *set, int nr_queue)
-+		struct blk_mq_tag_set *set)
- {
- 	struct blk_mq_hw_ctx *hctx;
- 	unsigned int i;
- 
--	queue_for_each_hw_ctx(q, hctx, i) {
--		if (i == nr_queue)
--			break;
-+	queue_for_each_hw_ctx(q, hctx, i)
- 		blk_mq_exit_hctx(q, set, hctx, i);
--	}
- }
- 
- static void blk_mq_free_hw_queues(struct request_queue *q,
-@@ -2124,7 +2121,7 @@ void blk_mq_free_queue(struct request_queue *q)
- 
- 	blk_mq_del_queue_tag_set(q);
- 
--	blk_mq_exit_hw_queues(q, set, set->nr_hw_queues);
-+	blk_mq_exit_hw_queues(q, set);
- 	blk_mq_free_hw_queues(q, set);
- }
- 
+ /*
+  * We support 6 different bvec pools, the last one is magic in that it
 -- 
-1.8.3.1
+1.8.5.2
 
