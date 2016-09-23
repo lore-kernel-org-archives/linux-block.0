@@ -1,160 +1,83 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:22890 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S934509AbcIOL4H (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Sep 2016 07:56:07 -0400
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv3 08/41] Revert "radix-tree: implement radix_tree_maybe_preload_order()"
-Date: Thu, 15 Sep 2016 14:54:50 +0300
-Message-Id: <20160915115523.29737-9-kirill.shutemov@linux.intel.com>
-In-Reply-To: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
-References: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=8074f4b59d=jbacik@fb.com>
+From: Josef Bacik <jbacik@fb.com>
+To: Ming Lei <ming.lei@canonical.com>
+CC: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        "Jens
+ Axboe" <axboe@kernel.dk>,
+        linux-block <linux-block@vger.kernel.org>
+Subject: Re: [PATCH 2/2] blk-mq: add flag for drivers wanting blocking
+ ->queue_rq()
+Date: Fri, 23 Sep 2016 02:44:03 +0000
+Message-ID: <2FC6BB17-F15F-4EE8-8280-3BE20B527827@fb.com>
+References: <1474555980-2787-1-git-send-email-axboe@fb.com>
+ <1474555980-2787-3-git-send-email-axboe@fb.com>
+ <20160922145922.GB1800@infradead.org>
+ <a4162d4e-dc64-0e76-6f0c-3ff12eb0231c@fb.com>
+ <20160922151222.GA515@infradead.org>
+ <ef600cc3-f8cc-bacf-5538-9eb8d7e2c95a@fb.com>,<CACVXFVOE9XU0ubtBPaSZdZnfFHi6ce+A=UhpJ+acbx=x5EJEug@mail.gmail.com>
+In-Reply-To: <CACVXFVOE9XU0ubtBPaSZdZnfFHi6ce+A=UhpJ+acbx=x5EJEug@mail.gmail.com>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+List-ID: <linux-block@vger.kernel.org>
 
-This reverts commit 356e1c23292a4f63cfdf1daf0e0ddada51f32de8.
 
-After conversion of huge tmpfs to multi-order entries, we don't need
-this anymore.
+> On Sep 22, 2016, at 9:44 PM, Ming Lei <ming.lei@canonical.com> wrote:
+>=20
+>> On Thu, Sep 22, 2016 at 11:17 PM, Jens Axboe <axboe@fb.com> wrote:
+>>> On 09/22/2016 09:12 AM, Christoph Hellwig wrote:
+>>>=20
+>>>> On Thu, Sep 22, 2016 at 09:03:56AM -0600, Jens Axboe wrote:
+>>>>=20
+>>>> Having to grab a mutex, for instance. We invoke ->queue_rq() with
+>>>> preemption disabled, so I'd hope that would not be the case... What
+>>>> drivers block in ->queue_rq?
+>>>=20
+>>>=20
+>>> I though I had converted a lot of them to GFP_NOIO instead of GFP_ATOMI=
+C
+>>> allocations, but I can't find any evidence of that.  Maybe it was just
+>>> my imagination, or an unsubmitted patch series.  Sorry for the
+>>> confusion.
+>>=20
+>>=20
+>> OK, that makes more sense. Pretty sure we would have had complaints!
+>>=20
+>>>> Loop was another case that was on my radar to get rid of the queue_wor=
+k
+>>>> it currently has to do. Josef is currently testing the nbd driver usin=
+g
+>>>> this approach, so we should get some numbers there too. If we have to,
+>>>> we can always bump up the concurrency to mimic more of the behavior of
+>>>> having multiple workers running on the hardware queue. I'd prefer to
+>>>> still do that in blk-mq, instead of having drivers reinventing their o=
+wn
+>>>> work offload functionality.
+>>>=20
+>>>=20
+>>> There should be a lot of numbers in the list archives from the time
+>>> that Ming did the loop conversion, as I've been trying to steer him
+>>> that way, and he actually implemented and benchmarked it.
+>>>=20
+>>> We can't just increase the concurrency as a single work_struct item
+>>> can't be queued multiple times even on a high concurreny workqueue.
+>>=20
+>>=20
+>> But we could have more work items, if we had to. Even if loop isn't a
+>> drop-in replacement for this simpler approach, I think it'll work well
+>> enough for nbd. The 5% number from Josef is comparing to not having any
+>> offload at all, I suspect the number from just converting to queue_work
+>> in the driver would be similar.
+>=20
+> 5% might be a noise.
+>=20
+> From nbd's .queue_rq(), kthread_work should match its case because
+> one per-nbd mutex is required and all cmds sent to the nbd are serialized=
+,
+> so using common work items may hurt performance caused by
+> unnecessary context switch.
 
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
----
- include/linux/radix-tree.h |  1 -
- lib/radix-tree.c           | 74 ----------------------------------------------
- 2 files changed, 75 deletions(-)
+This is with my multi connection patch with 4 connections per device (so 4 =
+hw queues).  The 5% is real but I don't think it'll get better by punting t=
+o a worker per command, so this approach is fine for NBD.  Thanks,
 
-diff --git a/include/linux/radix-tree.h b/include/linux/radix-tree.h
-index c4cea311d901..7a271f662320 100644
---- a/include/linux/radix-tree.h
-+++ b/include/linux/radix-tree.h
-@@ -290,7 +290,6 @@ unsigned int radix_tree_gang_lookup_slot(struct radix_tree_root *root,
- 			unsigned long first_index, unsigned int max_items);
- int radix_tree_preload(gfp_t gfp_mask);
- int radix_tree_maybe_preload(gfp_t gfp_mask);
--int radix_tree_maybe_preload_order(gfp_t gfp_mask, int order);
- void radix_tree_init(void);
- void *radix_tree_tag_set(struct radix_tree_root *root,
- 			unsigned long index, unsigned int tag);
-diff --git a/lib/radix-tree.c b/lib/radix-tree.c
-index 57c15c4d0796..307e517b2479 100644
---- a/lib/radix-tree.c
-+++ b/lib/radix-tree.c
-@@ -38,9 +38,6 @@
- #include <linux/preempt.h>		/* in_interrupt() */
- 
- 
--/* Number of nodes in fully populated tree of given height */
--static unsigned long height_to_maxnodes[RADIX_TREE_MAX_PATH + 1] __read_mostly;
--
- /*
-  * Radix tree node cache.
-  */
-@@ -433,51 +430,6 @@ int radix_tree_split_preload(unsigned int old_order, unsigned int new_order,
- #endif
- 
- /*
-- * The same as function above, but preload number of nodes required to insert
-- * (1 << order) continuous naturally-aligned elements.
-- */
--int radix_tree_maybe_preload_order(gfp_t gfp_mask, int order)
--{
--	unsigned long nr_subtrees;
--	int nr_nodes, subtree_height;
--
--	/* Preloading doesn't help anything with this gfp mask, skip it */
--	if (!gfpflags_allow_blocking(gfp_mask)) {
--		preempt_disable();
--		return 0;
--	}
--
--	/*
--	 * Calculate number and height of fully populated subtrees it takes to
--	 * store (1 << order) elements.
--	 */
--	nr_subtrees = 1 << order;
--	for (subtree_height = 0; nr_subtrees > RADIX_TREE_MAP_SIZE;
--			subtree_height++)
--		nr_subtrees >>= RADIX_TREE_MAP_SHIFT;
--
--	/*
--	 * The worst case is zero height tree with a single item at index 0 and
--	 * then inserting items starting at ULONG_MAX - (1 << order).
--	 *
--	 * This requires RADIX_TREE_MAX_PATH nodes to build branch from root to
--	 * 0-index item.
--	 */
--	nr_nodes = RADIX_TREE_MAX_PATH;
--
--	/* Plus branch to fully populated subtrees. */
--	nr_nodes += RADIX_TREE_MAX_PATH - subtree_height;
--
--	/* Root node is shared. */
--	nr_nodes--;
--
--	/* Plus nodes required to build subtrees. */
--	nr_nodes += nr_subtrees * height_to_maxnodes[subtree_height];
--
--	return __radix_tree_preload(gfp_mask, nr_nodes);
--}
--
--/*
-  * The maximum index which can be stored in a radix tree
-  */
- static inline unsigned long shift_maxindex(unsigned int shift)
-@@ -1856,31 +1808,6 @@ radix_tree_node_ctor(void *arg)
- 	INIT_LIST_HEAD(&node->private_list);
- }
- 
--static __init unsigned long __maxindex(unsigned int height)
--{
--	unsigned int width = height * RADIX_TREE_MAP_SHIFT;
--	int shift = RADIX_TREE_INDEX_BITS - width;
--
--	if (shift < 0)
--		return ~0UL;
--	if (shift >= BITS_PER_LONG)
--		return 0UL;
--	return ~0UL >> shift;
--}
--
--static __init void radix_tree_init_maxnodes(void)
--{
--	unsigned long height_to_maxindex[RADIX_TREE_MAX_PATH + 1];
--	unsigned int i, j;
--
--	for (i = 0; i < ARRAY_SIZE(height_to_maxindex); i++)
--		height_to_maxindex[i] = __maxindex(i);
--	for (i = 0; i < ARRAY_SIZE(height_to_maxnodes); i++) {
--		for (j = i; j > 0; j--)
--			height_to_maxnodes[i] += height_to_maxindex[j - 1] + 1;
--	}
--}
--
- static int radix_tree_callback(struct notifier_block *nfb,
- 				unsigned long action, void *hcpu)
- {
-@@ -1907,6 +1834,5 @@ void __init radix_tree_init(void)
- 			sizeof(struct radix_tree_node), 0,
- 			SLAB_PANIC | SLAB_RECLAIM_ACCOUNT,
- 			radix_tree_node_ctor);
--	radix_tree_init_maxnodes();
- 	hotcpu_notifier(radix_tree_callback, 0);
- }
--- 
-2.9.3
-
+Josef=
