@@ -1,15 +1,14 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:52009 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751962AbcI0G0W (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Sep 2016 02:26:22 -0400
-Subject: Re: [PATCH 4/9] block: Move blk_freeze_queue() and
- blk_unfreeze_queue() code
-To: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Jens Axboe <axboe@fb.com>
+Received: from mail-bn3nam01on0085.outbound.protection.outlook.com ([104.47.33.85]:55808
+        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1163010AbcIZS1k (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 26 Sep 2016 14:27:40 -0400
+Subject: [PATCH 4/9] block: Move blk_freeze_queue() and blk_unfreeze_queue()
+ code
+To: Jens Axboe <axboe@fb.com>
 References: <7948dbb8-6333-dc62-2673-4da35b4dfdbc@sandisk.com>
- <f990694e-76ea-f6b1-10a4-c23b9a738b39@sandisk.com>
-Cc: Christoph Hellwig <hch@lst.de>,
+CC: Christoph Hellwig <hch@lst.de>,
         James Bottomley <jejb@linux.vnet.ibm.com>,
         "Martin K. Petersen" <martin.petersen@oracle.com>,
         Mike Snitzer <snitzer@redhat.com>,
@@ -19,63 +18,165 @@ Cc: Christoph Hellwig <hch@lst.de>,
         "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
         "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
         "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <ffad7b3c-e7f5-56d7-0a75-574e65ac5b31@suse.de>
-Date: Tue, 27 Sep 2016 08:26:19 +0200
+From: Bart Van Assche <bart.vanassche@sandisk.com>
+Message-ID: <f990694e-76ea-f6b1-10a4-c23b9a738b39@sandisk.com>
+Date: Mon, 26 Sep 2016 11:27:28 -0700
 MIME-Version: 1.0
-In-Reply-To: <f990694e-76ea-f6b1-10a4-c23b9a738b39@sandisk.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <7948dbb8-6333-dc62-2673-4da35b4dfdbc@sandisk.com>
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 09/26/2016 08:27 PM, Bart Van Assche wrote:
-> Move the blk_freeze_queue() and blk_unfreeze_queue() implementations
-> from block/blk-mq.c to block/blk-core.c. Drop "_mq" from the name of
-> the functions that have been moved.
-> 
-> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-> ---
->  block/blk-core.c | 45 +++++++++++++++++++++++++++++++++++++++++++++
->  block/blk-mq.c   | 41 +++--------------------------------------
->  block/blk.h      |  3 +++
->  3 files changed, 51 insertions(+), 38 deletions(-)
-> 
-> diff --git a/block/blk-core.c b/block/blk-core.c
-> index b75d688..8cc8006 100644
-> --- a/block/blk-core.c
-> +++ b/block/blk-core.c
-> @@ -682,6 +682,51 @@ static void blk_queue_usage_counter_release(struct percpu_ref *ref)
->  	wake_up_all(&q->mq_freeze_wq);
->  }
->  
-> +void blk_freeze_queue_start(struct request_queue *q)
-> +{
-> +	int freeze_depth;
-> +
-> +	freeze_depth = atomic_inc_return(&q->mq_freeze_depth);
-> +	if (freeze_depth == 1) {
-> +		percpu_ref_kill(&q->q_usage_counter);
-> +		blk_mq_run_hw_queues(q, false);
-> +	}
-> +}
-> +
-As you dropped the 'mq_' prefix, maybe you should rename the counter to
-'freeze_depth', to?
-And are you sure this works in the !mq case, too?
+Move the blk_freeze_queue() and blk_unfreeze_queue() implementations
+from block/blk-mq.c to block/blk-core.c. Drop "_mq" from the name of
+the functions that have been moved.
 
-> +void blk_freeze_queue_wait(struct request_queue *q)
-> +{
-> +	wait_event(q->mq_freeze_wq, percpu_ref_is_zero(&q->q_usage_counter));
-> +}
-> +
-Same here, rename ->mq_freeze_wq to ->freeze_wq.
+Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+---
+ block/blk-core.c | 45 +++++++++++++++++++++++++++++++++++++++++++++
+ block/blk-mq.c   | 41 +++--------------------------------------
+ block/blk.h      |  3 +++
+ 3 files changed, 51 insertions(+), 38 deletions(-)
 
-Cheers,
-
-Hannes
+diff --git a/block/blk-core.c b/block/blk-core.c
+index b75d688..8cc8006 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -682,6 +682,51 @@ static void blk_queue_usage_counter_release(struct percpu_ref *ref)
+ 	wake_up_all(&q->mq_freeze_wq);
+ }
+ 
++void blk_freeze_queue_start(struct request_queue *q)
++{
++	int freeze_depth;
++
++	freeze_depth = atomic_inc_return(&q->mq_freeze_depth);
++	if (freeze_depth == 1) {
++		percpu_ref_kill(&q->q_usage_counter);
++		blk_mq_run_hw_queues(q, false);
++	}
++}
++
++void blk_freeze_queue_wait(struct request_queue *q)
++{
++	wait_event(q->mq_freeze_wq, percpu_ref_is_zero(&q->q_usage_counter));
++}
++
++/*
++ * Guarantee no request is in use, so we can change any data structure of
++ * the queue afterward.
++ */
++void blk_freeze_queue(struct request_queue *q)
++{
++	/*
++	 * In the !blk_mq case we are only calling this to kill the
++	 * q_usage_counter, otherwise this increases the freeze depth
++	 * and waits for it to return to zero.  For this reason there is
++	 * no blk_unfreeze_queue(), and blk_freeze_queue() is not
++	 * exported to drivers as the only user for unfreeze is blk_mq.
++	 */
++	blk_freeze_queue_start(q);
++	blk_freeze_queue_wait(q);
++}
++
++void blk_unfreeze_queue(struct request_queue *q)
++{
++	int freeze_depth;
++
++	freeze_depth = atomic_dec_return(&q->mq_freeze_depth);
++	WARN_ON_ONCE(freeze_depth < 0);
++	if (!freeze_depth) {
++		percpu_ref_reinit(&q->q_usage_counter);
++		wake_up_all(&q->mq_freeze_wq);
++	}
++}
++
+ static void blk_rq_timed_out_timer(unsigned long data)
+ {
+ 	struct request_queue *q = (struct request_queue *)data;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 98d4812..50b26df 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -60,38 +60,10 @@ static void blk_mq_hctx_clear_pending(struct blk_mq_hw_ctx *hctx,
+ 
+ void blk_mq_freeze_queue_start(struct request_queue *q)
+ {
+-	int freeze_depth;
+-
+-	freeze_depth = atomic_inc_return(&q->mq_freeze_depth);
+-	if (freeze_depth == 1) {
+-		percpu_ref_kill(&q->q_usage_counter);
+-		blk_mq_run_hw_queues(q, false);
+-	}
++	blk_freeze_queue_start(q);
+ }
+ EXPORT_SYMBOL_GPL(blk_mq_freeze_queue_start);
+ 
+-static void blk_mq_freeze_queue_wait(struct request_queue *q)
+-{
+-	wait_event(q->mq_freeze_wq, percpu_ref_is_zero(&q->q_usage_counter));
+-}
+-
+-/*
+- * Guarantee no request is in use, so we can change any data structure of
+- * the queue afterward.
+- */
+-void blk_freeze_queue(struct request_queue *q)
+-{
+-	/*
+-	 * In the !blk_mq case we are only calling this to kill the
+-	 * q_usage_counter, otherwise this increases the freeze depth
+-	 * and waits for it to return to zero.  For this reason there is
+-	 * no blk_unfreeze_queue(), and blk_freeze_queue() is not
+-	 * exported to drivers as the only user for unfreeze is blk_mq.
+-	 */
+-	blk_mq_freeze_queue_start(q);
+-	blk_mq_freeze_queue_wait(q);
+-}
+-
+ void blk_mq_freeze_queue(struct request_queue *q)
+ {
+ 	/*
+@@ -104,14 +76,7 @@ EXPORT_SYMBOL_GPL(blk_mq_freeze_queue);
+ 
+ void blk_mq_unfreeze_queue(struct request_queue *q)
+ {
+-	int freeze_depth;
+-
+-	freeze_depth = atomic_dec_return(&q->mq_freeze_depth);
+-	WARN_ON_ONCE(freeze_depth < 0);
+-	if (!freeze_depth) {
+-		percpu_ref_reinit(&q->q_usage_counter);
+-		wake_up_all(&q->mq_freeze_wq);
+-	}
++	blk_unfreeze_queue(q);
+ }
+ EXPORT_SYMBOL_GPL(blk_mq_unfreeze_queue);
+ 
+@@ -2177,7 +2142,7 @@ static int blk_mq_queue_reinit_notify(struct notifier_block *nb,
+ 	list_for_each_entry(q, &all_q_list, all_q_node)
+ 		blk_mq_freeze_queue_start(q);
+ 	list_for_each_entry(q, &all_q_list, all_q_node) {
+-		blk_mq_freeze_queue_wait(q);
++		blk_freeze_queue_wait(q);
+ 
+ 		/*
+ 		 * timeout handler can't touch hw queue during the
+diff --git a/block/blk.h b/block/blk.h
+index c37492f..12f7366 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -71,6 +71,9 @@ void __blk_queue_free_tags(struct request_queue *q);
+ bool __blk_end_bidi_request(struct request *rq, int error,
+ 			    unsigned int nr_bytes, unsigned int bidi_bytes);
+ void blk_freeze_queue(struct request_queue *q);
++void blk_freeze_queue_start(struct request_queue *q);
++void blk_freeze_queue_wait(struct request_queue *q);
++void blk_unfreeze_queue(struct request_queue *q);
+ 
+ static inline void blk_queue_enter_live(struct request_queue *q)
+ {
 -- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG Nürnberg)
+2.10.0
+
