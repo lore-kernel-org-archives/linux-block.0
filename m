@@ -1,60 +1,97 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-co1nam03on0056.outbound.protection.outlook.com ([104.47.40.56]:65212
-        "EHLO NAM03-CO1-obe.outbound.protection.outlook.com"
+Received: from mail-cys01nam02on0046.outbound.protection.outlook.com ([104.47.37.46]:50928
+        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1753240AbcIZWgf (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Sep 2016 18:36:35 -0400
+        id S1162880AbcIZS2y (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 26 Sep 2016 14:28:54 -0400
+Subject: [PATCH 8/9] SRP transport: Port srp_wait_for_queuecommand() to
+ scsi-mq
 To: Jens Axboe <axboe@fb.com>
-CC: Tejun Heo <tj@kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <7948dbb8-6333-dc62-2673-4da35b4dfdbc@sandisk.com>
+CC: Christoph Hellwig <hch@lst.de>,
+        James Bottomley <jejb@linux.vnet.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Doug Ledford <dledford@redhat.com>,
+        Keith Busch <keith.busch@intel.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
 From: Bart Van Assche <bart.vanassche@sandisk.com>
-Subject: [PATCH] blkcg: Unlock blkcg_pol_mutex once if cpd == NULL
-Message-ID: <db0c6205-9ca2-d80e-26fc-6cff0d84d73c@sandisk.com>
-Date: Mon, 26 Sep 2016 15:36:25 -0700
+Message-ID: <456fc29e-a20f-51ec-631b-39ae311aa83a@sandisk.com>
+Date: Mon, 26 Sep 2016 11:28:42 -0700
 MIME-Version: 1.0
+In-Reply-To: <7948dbb8-6333-dc62-2673-4da35b4dfdbc@sandisk.com>
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Unlocking a mutex twice is wrong. Hence modify blkcg_policy_register()
-such that blkcg_pol_mutex is unlocked once if cpd == NULL. This patch
-avoids that smatch reports the following error:
-
-block/blk-cgroup.c:1378: blkcg_policy_register() error: double unlock 'mutex:&blkcg_pol_mutex'
+Ensure that if scsi-mq is enabled that srp_wait_for_queuecommand()
+waits until ongoing shost->hostt->queuecommand() calls have finished.
+For the !scsi-mq path, use blk_quiesce_queue() and blk_resume_queue()
+instead of busy-waiting.
 
 Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Tejun Heo <tj@kernel.org>
-Cc: <stable@vger.kernel.org>
+Cc: James Bottomley <jejb@linux.vnet.ibm.com>
+Cc: Martin K. Petersen <martin.petersen@oracle.com>
+Cc: Doug Ledford <dledford@redhat.com>
 ---
- block/blk-cgroup.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ drivers/scsi/scsi_transport_srp.c | 26 +++++---------------------
+ 1 file changed, 5 insertions(+), 21 deletions(-)
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index dd38e5c..cdbca1c 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -1327,8 +1327,10 @@ int blkcg_policy_register(struct blkcg_policy *pol)
- 	for (i = 0; i < BLKCG_MAX_POLS; i++)
- 		if (!blkcg_policy[i])
- 			break;
--	if (i >= BLKCG_MAX_POLS)
-+	if (i >= BLKCG_MAX_POLS) {
-+		mutex_unlock(&blkcg_pol_mutex);
- 		goto err_unlock;
-+	}
+diff --git a/drivers/scsi/scsi_transport_srp.c b/drivers/scsi/scsi_transport_srp.c
+index e3cd3ec..841a3eb 100644
+--- a/drivers/scsi/scsi_transport_srp.c
++++ b/drivers/scsi/scsi_transport_srp.c
+@@ -24,7 +24,7 @@
+ #include <linux/err.h>
+ #include <linux/slab.h>
+ #include <linux/string.h>
+-#include <linux/delay.h>
++#include <linux/blk-mq.h>
  
- 	/* register @pol */
- 	pol->plid = i;
-@@ -1374,8 +1376,8 @@ err_free_cpds:
- 		}
+ #include <scsi/scsi.h>
+ #include <scsi/scsi_cmnd.h>
+@@ -402,34 +402,18 @@ static void srp_reconnect_work(struct work_struct *work)
  	}
- 	blkcg_policy[pol->plid] = NULL;
-+
- err_unlock:
--	mutex_unlock(&blkcg_pol_mutex);
- 	mutex_unlock(&blkcg_pol_register_mutex);
- 	return ret;
  }
+ 
+-/**
+- * scsi_request_fn_active() - number of kernel threads inside scsi_request_fn()
+- * @shost: SCSI host for which to count the number of scsi_request_fn() callers.
+- *
+- * To do: add support for scsi-mq in this function.
+- */
+-static int scsi_request_fn_active(struct Scsi_Host *shost)
++/* Wait until ongoing shost->hostt->queuecommand() calls have finished. */
++static void srp_wait_for_queuecommand(struct Scsi_Host *shost)
+ {
+ 	struct scsi_device *sdev;
+ 	struct request_queue *q;
+-	int request_fn_active = 0;
+ 
+ 	shost_for_each_device(sdev, shost) {
+ 		q = sdev->request_queue;
+ 
+-		spin_lock_irq(q->queue_lock);
+-		request_fn_active += q->request_fn_active;
+-		spin_unlock_irq(q->queue_lock);
++		blk_quiesce_queue(q);
++		blk_resume_queue(q);
+ 	}
+-
+-	return request_fn_active;
+-}
+-
+-/* Wait until ongoing shost->hostt->queuecommand() calls have finished. */
+-static void srp_wait_for_queuecommand(struct Scsi_Host *shost)
+-{
+-	while (scsi_request_fn_active(shost))
+-		msleep(20);
+ }
+ 
+ static void __rport_fail_io_fast(struct srp_rport *rport)
 -- 
 2.10.0
 
