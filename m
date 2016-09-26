@@ -1,50 +1,80 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from smtp.opengridcomputing.com ([72.48.136.20]:35792 "EHLO
-        smtp.opengridcomputing.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1752565AbcI0QbC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Sep 2016 12:31:02 -0400
-From: "Steve Wise" <swise@opengridcomputing.com>
-To: "'Bart Van Assche'" <bart.vanassche@sandisk.com>,
-        "'Jens Axboe'" <axboe@fb.com>
-Cc: <linux-block@vger.kernel.org>,
-        "'James Bottomley'" <jejb@linux.vnet.ibm.com>,
-        "'Martin K. Petersen'" <martin.petersen@oracle.com>,
-        "'Mike Snitzer'" <snitzer@redhat.com>,
-        <linux-rdma@vger.kernel.org>, <linux-nvme@lists.infradead.org>,
-        "'Keith Busch'" <keith.busch@intel.com>,
-        "'Doug Ledford'" <dledford@redhat.com>,
-        <linux-scsi@vger.kernel.org>, "'Christoph Hellwig'" <hch@lst.de>
-References: <7948dbb8-6333-dc62-2673-4da35b4dfdbc@sandisk.com> <9c372b04-a194-58c4-a64f-b155b52a5244@sandisk.com>
-In-Reply-To: <9c372b04-a194-58c4-a64f-b155b52a5244@sandisk.com>
-Subject: RE: [PATCH 9/9] [RFC] nvme: Fix a race condition
-Date: Tue, 27 Sep 2016 11:31:03 -0500
-Message-ID: <013c01d218dc$8a5406c0$9efc1440$@opengridcomputing.com>
+Received: from mail-bn3nam01on0081.outbound.protection.outlook.com ([104.47.33.81]:53242
+        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1162880AbcIZS3I (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 26 Sep 2016 14:29:08 -0400
+Subject: [PATCH 9/9] [RFC] nvme: Fix a race condition
+To: Jens Axboe <axboe@fb.com>
+References: <7948dbb8-6333-dc62-2673-4da35b4dfdbc@sandisk.com>
+CC: Christoph Hellwig <hch@lst.de>,
+        James Bottomley <jejb@linux.vnet.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Doug Ledford <dledford@redhat.com>,
+        Keith Busch <keith.busch@intel.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+From: Bart Van Assche <bart.vanassche@sandisk.com>
+Message-ID: <9c372b04-a194-58c4-a64f-b155b52a5244@sandisk.com>
+Date: Mon, 26 Sep 2016 11:28:59 -0700
 MIME-Version: 1.0
-Content-Type: text/plain;
-        charset="us-ascii"
+In-Reply-To: <7948dbb8-6333-dc62-2673-4da35b4dfdbc@sandisk.com>
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-> @@ -2079,11 +2075,15 @@ EXPORT_SYMBOL_GPL(nvme_kill_queues);
->  void nvme_stop_queues(struct nvme_ctrl *ctrl)
->  {
->  	struct nvme_ns *ns;
-> +	struct request_queue *q;
-> 
->  	mutex_lock(&ctrl->namespaces_mutex);
->  	list_for_each_entry(ns, &ctrl->namespaces, list) {
-> -		blk_mq_cancel_requeue_work(ns->queue);
-> -		blk_mq_stop_hw_queues(ns->queue);
-> +		q = ns->queue;
-> +		blk_quiesce_queue(q);
-> +		blk_mq_cancel_requeue_work(q);
-> +		blk_mq_stop_hw_queues(q);
-> +		blk_resume_queue(q);
->  	}
->  	mutex_unlock(&ctrl->namespaces_mutex);
+Avoid that nvme_queue_rq() is still running when nvme_stop_queues()
+returns. Untested.
 
-Hey Bart, should nvme_stop_queues() really be resuming the blk queue?
+Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+Cc: Keith Busch <keith.busch@intel.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Sagi Grimberg <sagi@grimberg.me>
+---
+ drivers/nvme/host/core.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 057f1fa..6e2bf6a 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -201,13 +201,9 @@ fail:
+ 
+ void nvme_requeue_req(struct request *req)
+ {
+-	unsigned long flags;
+-
+ 	blk_mq_requeue_request(req);
+-	spin_lock_irqsave(req->q->queue_lock, flags);
+-	if (!blk_mq_queue_stopped(req->q))
+-		blk_mq_kick_requeue_list(req->q);
+-	spin_unlock_irqrestore(req->q->queue_lock, flags);
++	WARN_ON_ONCE(blk_mq_queue_stopped(req->q));
++	blk_mq_kick_requeue_list(req->q);
+ }
+ EXPORT_SYMBOL_GPL(nvme_requeue_req);
+ 
+@@ -2079,11 +2075,15 @@ EXPORT_SYMBOL_GPL(nvme_kill_queues);
+ void nvme_stop_queues(struct nvme_ctrl *ctrl)
+ {
+ 	struct nvme_ns *ns;
++	struct request_queue *q;
+ 
+ 	mutex_lock(&ctrl->namespaces_mutex);
+ 	list_for_each_entry(ns, &ctrl->namespaces, list) {
+-		blk_mq_cancel_requeue_work(ns->queue);
+-		blk_mq_stop_hw_queues(ns->queue);
++		q = ns->queue;
++		blk_quiesce_queue(q);
++		blk_mq_cancel_requeue_work(q);
++		blk_mq_stop_hw_queues(q);
++		blk_resume_queue(q);
+ 	}
+ 	mutex_unlock(&ctrl->namespaces_mutex);
+ }
+-- 
+2.10.0
 
