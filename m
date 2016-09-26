@@ -1,76 +1,97 @@
-Return-Path: <linus.walleij@linaro.org>
-Return-Path: <linus.walleij@linaro.org>
-From: Linus Walleij <linus.walleij@linaro.org>
-To: linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Linus Walleij <linus.walleij@linaro.org>
-Subject: [PATCH] block: remove remnant refs to hardsect
-Date: Wed, 14 Sep 2016 14:32:52 +0200
-Message-Id: <1473856372-22204-1-git-send-email-linus.walleij@linaro.org>
+Return-Path: <Damien.LeMoal@hgst.com>
+From: Damien Le Moal <damien.lemoal@hgst.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>, Christoph
+ Hellwig <hch@lst.de>, "Martin K . Petersen" <martin.petersen@oracle.com>,
+	Damien Le Moal <damien.lemoal@hgst.com>
+Subject: [PATCH v2 0/7] ZBC / Zoned block device support
+Date: Mon, 26 Sep 2016 20:14:36 +0900
+Message-ID: <1474888483-29762-1-git-send-email-damien.lemoal@hgst.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Return-Path: damien.lemoal@hgst.com
 List-ID: <linux-block@vger.kernel.org>
 
-commit e1defc4ff0cf57aca6c5e3ff99fa503f5943c1f1
-"block: Do away with the notion of hardsect_size"
-removed the notion of "hardware sector size" from
-the kernel in favor of logical block size, but
-references remain in comments and documentation.
+Re-sending due to error in mailing list addresses. My apologies if
+you receive multiple copies of the emails.
 
-Update the remaining sites mentioning hardsect.
+This series introduces support for zoned block devices. It integrates
+earlier submissions by Hannes Reinecke and Shaun Tancheff. Compared to the
+previous series version, the code was significantly simplified by limiting
+support to zoned devices satisfying the following conditions:
+1) All zones of the device are the same size, with the exception of an
+   eventual last smaller runt zone.
+2) For host-managed disks, reads must be unrestricted (read commands do not
+   fail due to zone or write pointer alignement constraints).
+Zoned disks that do not satisfy these 2 conditions are ignored.
 
-Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
----
- Documentation/block/biodoc.txt | 4 ++--
- block/bio.c                    | 2 +-
- fs/befs/linuxvfs.c             | 2 +-
- 3 files changed, 4 insertions(+), 4 deletions(-)
+These 2 conditions allowed dropping the zone information cache implemented
+in the previous version. This simplifies the code and also reduces the memory
+consumption at run time. Support for zoned devices now only require one bit
+per zone (less than 8KB in total). This bit field is used to write-lock
+zones and prevent the concurrent execution of multiple write commands in
+the same zone. This avoids write ordering problems at dispatch time, for
+both the simple queue and scsi-mq settings.
 
-diff --git a/Documentation/block/biodoc.txt b/Documentation/block/biodoc.txt
-index bcdb2b4c1f12..918e1e0d0e78 100644
---- a/Documentation/block/biodoc.txt
-+++ b/Documentation/block/biodoc.txt
-@@ -115,7 +115,7 @@ i. Per-queue limits/values exported to the generic layer by the driver
- 
- Various parameters that the generic i/o scheduler logic uses are set at
- a per-queue level (e.g maximum request size, maximum number of segments in
--a scatter-gather list, hardsect size)
-+a scatter-gather list, logical block size)
- 
- Some parameters that were earlier available as global arrays indexed by
- major/minor are now directly associated with the queue. Some of these may
-@@ -156,7 +156,7 @@ Some new queue property settings:
- 	blk_queue_max_segment_size(q, max_seg_size)
- 		Maximum size of a clustered segment, 64kB default.
- 
--	blk_queue_hardsect_size(q, hardsect_size)
-+	blk_queue_logical_block_size(q, logical_block_size)
- 		Lowest possible sector size that the hardware can operate
- 		on, 512 bytes default.
- 
-diff --git a/block/bio.c b/block/bio.c
-index aa7354088008..a6d279e1ea9e 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1274,7 +1274,7 @@ struct bio *bio_map_user_iov(struct request_queue *q,
- 
- 		nr_pages += end - start;
- 		/*
--		 * buffer must be aligned to at least hardsector size for now
-+		 * buffer must be aligned to at least logical block size for now
- 		 */
- 		if (uaddr & queue_dma_alignment(q))
- 			return ERR_PTR(-EINVAL);
-diff --git a/fs/befs/linuxvfs.c b/fs/befs/linuxvfs.c
-index 7da05b159ade..bfe9f9994935 100644
---- a/fs/befs/linuxvfs.c
-+++ b/fs/befs/linuxvfs.c
-@@ -789,7 +789,7 @@ befs_fill_super(struct super_block *sb, void *data, int silent)
- 	 * Will be set to real fs blocksize later.
- 	 *
- 	 * Linux 2.4.10 and later refuse to read blocks smaller than
--	 * the hardsect size for the device. But we also need to read at 
-+	 * the logical block size for the device. But we also need to read at
- 	 * least 1k to get the second 512 bytes of the volume.
- 	 * -WD 10-26-01
- 	 */ 
+The new operations introduced to suport zone manipulation was reduced to
+only the two main ZBC/ZAC defined commands: REPORT ZONES (REQ_OP_ZONE_REPORT)
+and RESET WRITE POINTER (REQ_OP_ZONE_RESET). This brings the total number of
+operations defined to 8, which fits in the 3 bits (REQ_OP_BITS) reserved for
+operation code in bio->bi_opf and req->cmd_flags.
+
+Most of the ZBC specific code is kept out of sd.c and implemented in the
+new file sd_zbc.c. Similarly, at the block layer, most of the zoned block
+device code is implemented in the new blk-zoned.c.
+
+For host-managed zoned block devices, the sequential write constraint of
+write pointer zones is exposed to the user. Users of the disk (applications,
+file systems or device mappers) must sequentially write to zones. This means
+that for raw block device accesses from applications, buffered writes are
+unreliable and direct I/Os must be used (or buffered writes with O_SYNC).
+
+Access to zone manipulation operations is also provided to applications
+through a set of new ioctls. This allows applications operating on raw
+block devices (e.g. mkfs.xxx) to discover a device zone layout and
+manipulate zone state.
+
+Damien Le Moal (1):
+  block: Add 'zoned' queue limit
+
+Hannes Reinecke (4):
+  blk-sysfs: Add 'chunk_sectors' to sysfs attributes
+  block: update chunk_sectors in blk_stack_limits()
+  block: Implement support for zoned block devices
+  sd: Implement support for ZBC devices
+
+Shaun Tancheff (2):
+  block: Define zoned block device operations
+  blk-zoned: implement ioctls
+
+ block/Kconfig                 |   8 +
+ block/Makefile                |   1 +
+ block/blk-core.c              |   4 +
+ block/blk-settings.c          |   5 +
+ block/blk-sysfs.c             |  29 +++
+ block/blk-zoned.c             | 335 ++++++++++++++++++++++++
+ block/ioctl.c                 |   4 +
+ drivers/scsi/Makefile         |   1 +
+ drivers/scsi/sd.c             |  97 ++++++-
+ drivers/scsi/sd.h             |  67 +++++
+ drivers/scsi/sd_zbc.c         | 586 ++++++++++++++++++++++++++++++++++++++++++
+ include/linux/blk_types.h     |   2 +
+ include/linux/blkdev.h        |  99 +++++++
+ include/scsi/scsi_proto.h     |  17 ++
+ include/uapi/linux/Kbuild     |   1 +
+ include/uapi/linux/blkzoned.h | 143 +++++++++++
+ include/uapi/linux/fs.h       |   4 +
+ 17 files changed, 1389 insertions(+), 14 deletions(-)
+ create mode 100644 block/blk-zoned.c
+ create mode 100644 drivers/scsi/sd_zbc.c
+ create mode 100644 include/uapi/linux/blkzoned.h
+
 -- 
 2.7.4
+
+Western Digital Corporation (and its subsidiaries) E-mail Confidentiality Notice & Disclaimer:
+
+This e-mail and any files transmitted with it may contain confidential or legally privileged information of WDC and/or its affiliates, and are intended solely for the use of the individual or entity to which they are addressed. If you are not the intended recipient, any disclosure, copying, distribution or any action taken or omitted to be taken in reliance on it, is prohibited. If you have received this e-mail in error, please notify the sender immediately and delete the e-mail in its entirety from your system.
