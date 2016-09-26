@@ -1,21 +1,17 @@
-Return-Path: <shaun.tancheff@gmail.com>
-Return-Path: <shaun.tancheff@gmail.com>
-Sender: Shaun Tancheff <shaun.tancheff@gmail.com>
-From: Shaun Tancheff <shaun@tancheff.com>
+Return-Path: <Damien.LeMoal@hgst.com>
+From: Damien Le Moal <damien.lemoal@hgst.com>
 To: Jens Axboe <axboe@kernel.dk>
-Cc: Hannes Reinecke <hare@suse.de>,
-	linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	Damien Le Moal <damien.lemoal@hgst.com>,
-	shaun.tancheff@seagate.com,
-	shaun@tancheff.com
-Subject: [PATCH v3 5/7] block: Implement support for zoned block devices
-Date: Tue, 27 Sep 2016 13:51:10 -0500
-Message-Id: <20160927185110.18508-1-shaun@tancheff.com>
-In-Reply-To: <1474888483-29762-6-git-send-email-damien.lemoal@hgst.com>
-References: <1474888483-29762-6-git-send-email-damien.lemoal@hgst.com>
+CC: <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>, Christoph
+ Hellwig <hch@lst.de>, "Martin K . Petersen" <martin.petersen@oracle.com>,
+	Hannes Reinecke <hare@suse.de>, Damien Le Moal <damien.lemoal@hgst.com>
+Subject: [PATCH v2 5/7] block: Implement support for zoned block devices
+Date: Mon, 26 Sep 2016 20:14:41 +0900
+Message-ID: <1474888483-29762-6-git-send-email-damien.lemoal@hgst.com>
+In-Reply-To: <1474888483-29762-1-git-send-email-damien.lemoal@hgst.com>
+References: <1474888483-29762-1-git-send-email-damien.lemoal@hgst.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Return-Path: damien.lemoal@hgst.com
 List-ID: <linux-block@vger.kernel.org>
 
 From: Hannes Reinecke <hare@suse.de>
@@ -37,21 +33,12 @@ Signed-off-by: Hannes Reinecke <hare@suse.de>
            by Shaun Tancheff <shaun.tancheff@seagate.com>]
 Signed-off-by: Damien Le Moal <damien.lemoal@hgst.com>
 ---
-
-Changes from v2:
- - Added EXPORT_SYMBOL_GPL() per Damien
- - Added uapi blkzoned.h earlier and put shared enums/struct directly
-   into blkzoned.h
-
- block/Kconfig                 |   8 ++
- block/Makefile                |   1 +
- block/blk-zoned.c             | 242 ++++++++++++++++++++++++++++++++++++++++++
- include/linux/blkdev.h        |  30 ++++++
- include/uapi/linux/Kbuild     |   1 +
- include/uapi/linux/blkzoned.h | 103 ++++++++++++++++++
- 6 files changed, 385 insertions(+)
+ block/Kconfig          |   8 ++
+ block/Makefile         |   1 +
+ block/blk-zoned.c      | 240 +++++++++++++++++++++++++++++++++++++++++++++++++
+ include/linux/blkdev.h |  71 +++++++++++++++
+ 4 files changed, 320 insertions(+)
  create mode 100644 block/blk-zoned.c
- create mode 100644 include/uapi/linux/blkzoned.h
 
 diff --git a/block/Kconfig b/block/Kconfig
 index 1d4d624..6b0ad08 100644
@@ -84,10 +71,10 @@ index 36acdd7..9371bc7 100644
  obj-$(CONFIG_BLK_MQ_PCI)	+= blk-mq-pci.o
 diff --git a/block/blk-zoned.c b/block/blk-zoned.c
 new file mode 100644
-index 0000000..bc4159d
+index 0000000..473cb0a
 --- /dev/null
 +++ b/block/blk-zoned.c
-@@ -0,0 +1,242 @@
+@@ -0,0 +1,240 @@
 +/*
 + * Zoned block device handling
 + *
@@ -264,7 +251,6 @@ index 0000000..bc4159d
 +
 +	return ret;
 +}
-+EXPORT_SYMBOL_GPL(blkdev_report_zones);
 +
 +/**
 + * blkdev_reset_zones - Reset zones write pointer
@@ -329,24 +315,57 @@ index 0000000..bc4159d
 +
 +	return 0;
 +}
-+EXPORT_SYMBOL_GPL(blkdev_reset_zones);
 diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index f19e16b..6316972 100644
+index f19e16b..6034f38 100644
 --- a/include/linux/blkdev.h
 +++ b/include/linux/blkdev.h
-@@ -24,6 +24,7 @@
- #include <linux/rcupdate.h>
- #include <linux/percpu-refcount.h>
- #include <linux/scatterlist.h>
-+#include <linux/blkzoned.h>
- 
- struct module;
- struct scsi_ioctl_command;
-@@ -302,6 +303,20 @@ struct queue_limits {
+@@ -302,6 +302,62 @@ struct queue_limits {
  	enum blk_zoned_model	zoned;
  };
  
 +#ifdef CONFIG_BLK_DEV_ZONED
++
++/*
++ * Zone type.
++ */
++enum blk_zone_type {
++	BLK_ZONE_TYPE_UNKNOWN,
++	BLK_ZONE_TYPE_CONVENTIONAL,
++	BLK_ZONE_TYPE_SEQWRITE_REQ,
++	BLK_ZONE_TYPE_SEQWRITE_PREF,
++};
++
++/*
++ * Zone condition.
++ */
++enum blk_zone_cond {
++	BLK_ZONE_COND_NO_WP,
++	BLK_ZONE_COND_EMPTY,
++	BLK_ZONE_COND_IMP_OPEN,
++	BLK_ZONE_COND_EXP_OPEN,
++	BLK_ZONE_COND_CLOSED,
++	BLK_ZONE_COND_READONLY = 0xd,
++	BLK_ZONE_COND_FULL,
++	BLK_ZONE_COND_OFFLINE,
++};
++
++/*
++ * Zone descriptor for BLKREPORTZONE.
++ * start, len and wp use the regulare 512 B sector unit,
++ * regardless of the device logical block size. The overall
++ * structure size is 64 B to match the ZBC/ZAC defined zone descriptor
++ * and allow support for future additional zone information.
++ */
++struct blk_zone {
++	u64	start;		/* Zone start sector */
++	u64	len;		/* Zone length in number of sectors */
++	u64	wp;		/* Zone write pointer position */
++	u8	type;		/* Zone type */
++	u8	cond;		/* Zone condition */
++	u8	non_seq;	/* Non-sequential write resources active */
++	u8	reset;		/* Reset write pointer recommended */
++	u8	reserved[36];
++};
 +
 +struct blk_zone_report_hdr {
 +	unsigned int	nr_zones;
@@ -363,7 +382,7 @@ index f19e16b..6316972 100644
  struct request_queue {
  	/*
  	 * Together with queue_head for cacheline sharing
-@@ -654,6 +669,11 @@ static inline bool blk_queue_is_zoned(struct request_queue *q)
+@@ -654,6 +710,11 @@ static inline bool blk_queue_is_zoned(struct request_queue *q)
  	}
  }
  
@@ -375,7 +394,7 @@ index f19e16b..6316972 100644
  /*
   * We regard a request as sync, if either a read or a sync write
   */
-@@ -1401,6 +1421,16 @@ static inline bool bdev_is_zoned(struct block_device *bdev)
+@@ -1401,6 +1462,16 @@ static inline bool bdev_is_zoned(struct block_device *bdev)
  	return false;
  }
  
@@ -392,126 +411,9 @@ index f19e16b..6316972 100644
  static inline int queue_dma_alignment(struct request_queue *q)
  {
  	return q ? q->dma_alignment : 511;
-diff --git a/include/uapi/linux/Kbuild b/include/uapi/linux/Kbuild
-index dd60439..92466a6 100644
---- a/include/uapi/linux/Kbuild
-+++ b/include/uapi/linux/Kbuild
-@@ -70,6 +70,7 @@ header-y += bfs_fs.h
- header-y += binfmts.h
- header-y += blkpg.h
- header-y += blktrace_api.h
-+header-y += blkzoned.h
- header-y += bpf_common.h
- header-y += bpf_perf_event.h
- header-y += bpf.h
-diff --git a/include/uapi/linux/blkzoned.h b/include/uapi/linux/blkzoned.h
-new file mode 100644
-index 0000000..a381721
---- /dev/null
-+++ b/include/uapi/linux/blkzoned.h
-@@ -0,0 +1,103 @@
-+/*
-+ * Zoned block devices handling.
-+ *
-+ * Copyright (C) 2015 Seagate Technology PLC
-+ *
-+ * Written by: Shaun Tancheff <shaun.tancheff@seagate.com>
-+ *
-+ * Modified by: Damien Le Moal <damien.lemoal@hgst.com>
-+ * Copyright (C) 2016 Western Digital
-+ *
-+ * This file is licensed under  the terms of the GNU General Public
-+ * License version 2. This program is licensed "as is" without any
-+ * warranty of any kind, whether express or implied.
-+ */
-+#ifndef _UAPI_BLKZONED_H
-+#define _UAPI_BLKZONED_H
-+
-+#include <linux/types.h>
-+
-+/**
-+ * enum blk_zone_type - Types of zones allowed in a zoned device.
-+ *
-+ * @BLK_ZONE_TYPE_CONVENTIONAL: The zone has no write pointer and can be writen
-+ *                              randomly. Zone reset has no effect on the zone.
-+ * @BLK_ZONE_TYPE_SEQWRITE_REQ: The zone must be written sequentially
-+ * @BLK_ZONE_TYPE_SEQWRITE_PREF: The zone can be written non-sequentially
-+ *
-+ * Any other value not defined is reserved and must be considered as invalid.
-+ */
-+enum blk_zone_type {
-+	BLK_ZONE_TYPE_CONVENTIONAL	= 0x1,
-+	BLK_ZONE_TYPE_SEQWRITE_REQ	= 0x2,
-+	BLK_ZONE_TYPE_SEQWRITE_PREF	= 0x3,
-+};
-+
-+/**
-+ * enum blk_zone_cond - Condition [state] of a zone in a zoned device.
-+ *
-+ * @BLK_ZONE_COND_NOT_WP: The zone has no write pointer, it is conventional.
-+ * @BLK_ZONE_COND_EMPTY: The zone is empty.
-+ * @BLK_ZONE_COND_IMP_OPEN: The zone is open, but not explicitly opened.
-+ * @BLK_ZONE_COND_EXP_OPEN: The zones was explicitly opened by an
-+ *                          OPEN ZONE command.
-+ * @BLK_ZONE_COND_CLOSED: The zone was [explicitly] closed after writing.
-+ * @BLK_ZONE_COND_FULL: The zone is marked as full, possibly by a zone
-+ *                      FINISH ZONE command.
-+ * @BLK_ZONE_COND_READONLY: The zone is read-only.
-+ * @BLK_ZONE_COND_OFFLINE: The zone is offline (sectors cannot be read/written).
-+ *
-+ * The Zone Condition state machine in the ZBC/ZAC standards maps the above
-+ * deinitions as:
-+ *   - ZC1: Empty         | BLK_ZONE_EMPTY
-+ *   - ZC2: Implicit Open | BLK_ZONE_COND_IMP_OPEN
-+ *   - ZC3: Explicit Open | BLK_ZONE_COND_EXP_OPEN
-+ *   - ZC4: Closed        | BLK_ZONE_CLOSED
-+ *   - ZC5: Full          | BLK_ZONE_FULL
-+ *   - ZC6: Read Only     | BLK_ZONE_READONLY
-+ *   - ZC7: Offline       | BLK_ZONE_OFFLINE
-+ *
-+ * Conditions 0x5 to 0xC are reserved by the current ZBC/ZAC spec and should
-+ * be considered invalid.
-+ */
-+enum blk_zone_cond {
-+	BLK_ZONE_COND_NOT_WP	= 0x0,
-+	BLK_ZONE_COND_EMPTY	= 0x1,
-+	BLK_ZONE_COND_IMP_OPEN	= 0x2,
-+	BLK_ZONE_COND_EXP_OPEN	= 0x3,
-+	BLK_ZONE_COND_CLOSED	= 0x4,
-+	BLK_ZONE_COND_READONLY	= 0xD,
-+	BLK_ZONE_COND_FULL	= 0xE,
-+	BLK_ZONE_COND_OFFLINE	= 0xF,
-+};
-+
-+/**
-+ * struct blk_zone - Zone descriptor for BLKREPORTZONE ioctl.
-+ *
-+ * @start: Zone start in 512 B sector units
-+ * @len: Zone length in 512 B sector units
-+ * @wp: Zone write pointer location in 512 B sector units
-+ * @type: see enum blk_zone_type for possible values
-+ * @cond: see enum blk_zone_cond for possible values
-+ * @non_seq: Flag indicating that the zone is using non-sequential resources
-+ *           (for host-aware zoned block devices only).
-+ * @reset: Flag indicating that a zone reset is recommended.
-+ * @reserved: Padding to 64 B to match the ZBC/ZAC defined zone descriptor size.
-+ *
-+ * start, len and wp use the regular 512 B sector unit, regardless of the
-+ * device logical block size. The overall structure size is 64 B to match the
-+ * ZBC/ZAC defined zone descriptor and allow support for future additional
-+ * zone information.
-+ */
-+struct blk_zone {
-+	__u64	start;		/* Zone start sector */
-+	__u64	len;		/* Zone length in number of sectors */
-+	__u64	wp;		/* Zone write pointer position */
-+	__u8	type;		/* Zone type */
-+	__u8	cond;		/* Zone condition */
-+	__u8	non_seq;	/* Non-sequential write resources active */
-+	__u8	reset;		/* Reset write pointer recommended */
-+	__u8	reserved[36];
-+};
-+
-+#endif /* _UAPI_BLKZONED_H */
 -- 
-2.9.3
+2.7.4
+
+Western Digital Corporation (and its subsidiaries) E-mail Confidentiality Notice & Disclaimer:
+
+This e-mail and any files transmitted with it may contain confidential or legally privileged information of WDC and/or its affiliates, and are intended solely for the use of the individual or entity to which they are addressed. If you are not the intended recipient, any disclosure, copying, distribution or any action taken or omitted to be taken in reliance on it, is prohibited. If you have received this e-mail in error, please notify the sender immediately and delete the e-mail in its entirety from your system.
