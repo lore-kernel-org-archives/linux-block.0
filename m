@@ -1,193 +1,517 @@
-Return-Path: <glommer@cloudius-systems.com>
-Return-Path: <glommer@cloudius-systems.com>
-From: Glauber Costa <glauber@scylladb.com>
-To: linux-block@vger.kernel.org
-Cc: Glauber Costa <glauber@scylladb.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] cfq: fix starvation of asynchronous writes
-Date: Thu, 22 Sep 2016 20:59:59 -0400
-Message-Id: <1474592399-2790-1-git-send-email-glauber@scylladb.com>
+Return-Path: <shaun.tancheff@gmail.com>
+Return-Path: <shaun.tancheff@gmail.com>
+Sender: Shaun Tancheff <shaun.tancheff@gmail.com>
+From: Shaun Tancheff <shaun@tancheff.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Hannes Reinecke <hare@suse.de>,
+	linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	Damien Le Moal <damien.lemoal@hgst.com>,
+	shaun.tancheff@seagate.com,
+	shaun@tancheff.com
+Subject: [PATCH v3 5/7] block: Implement support for zoned block devices
+Date: Tue, 27 Sep 2016 13:51:10 -0500
+Message-Id: <20160927185110.18508-1-shaun@tancheff.com>
+In-Reply-To: <1474888483-29762-6-git-send-email-damien.lemoal@hgst.com>
+References: <1474888483-29762-6-git-send-email-damien.lemoal@hgst.com>
 List-ID: <linux-block@vger.kernel.org>
 
-While debugging timeouts happening in my application workload (ScyllaDB), I have
-observed calls to open() taking a long time, ranging everywhere from 2 seconds -
-the first ones that are enough to time out my application - to more than 30
-seconds.
+From: Hannes Reinecke <hare@suse.de>
 
-The problem seems to happen because XFS may block on pending metadata updates
-under certain circumnstances, and that's confirmed with the following backtrace
-taken by the offcputime tool (iovisor/bcc):
+Implement zoned block device zone information reporting and reset.
+Zone information are reported as struct blk_zone. This implementation
+does not differentiate between host-aware and host-managed device
+models and is valid for both. Two functions are provided:
+blkdev_report_zones for discovering the zone configuration of a
+zoned block device, and blkdev_reset_zones for resetting the write
+pointer of sequential zones. The helper function blk_queue_zone_size
+and bdev_zone_size are also provided for, as the name suggest,
+obtaining the zone size (in 512B sectors) of the zones of the device.
 
-    ffffffffb90c57b1 finish_task_switch
-    ffffffffb97dffb5 schedule
-    ffffffffb97e310c schedule_timeout
-    ffffffffb97e1f12 __down
-    ffffffffb90ea821 down
-    ffffffffc046a9dc xfs_buf_lock
-    ffffffffc046abfb _xfs_buf_find
-    ffffffffc046ae4a xfs_buf_get_map
-    ffffffffc046babd xfs_buf_read_map
-    ffffffffc0499931 xfs_trans_read_buf_map
-    ffffffffc044a561 xfs_da_read_buf
-    ffffffffc0451390 xfs_dir3_leaf_read.constprop.16
-    ffffffffc0452b90 xfs_dir2_leaf_lookup_int
-    ffffffffc0452e0f xfs_dir2_leaf_lookup
-    ffffffffc044d9d3 xfs_dir_lookup
-    ffffffffc047d1d9 xfs_lookup
-    ffffffffc0479e53 xfs_vn_lookup
-    ffffffffb925347a path_openat
-    ffffffffb9254a71 do_filp_open
-    ffffffffb9242a94 do_sys_open
-    ffffffffb9242b9e sys_open
-    ffffffffb97e42b2 entry_SYSCALL_64_fastpath
-    00007fb0698162ed [unknown]
+Signed-off-by: Hannes Reinecke <hare@suse.de>
 
-Inspecting my run with blktrace, I can see that the xfsaild kthread exhibit very
-high "Dispatch wait" times, on the dozens of seconds range and consistent with
-the open() times I have saw in that run.
-
-Still from the blktrace output, we can after searching a bit, identify the
-request that wasn't dispatched:
-
-  8,0   11      152    81.092472813   804  A  WM 141698288 + 8 <- (8,1) 141696240
-  8,0   11      153    81.092472889   804  Q  WM 141698288 + 8 [xfsaild/sda1]
-  8,0   11      154    81.092473207   804  G  WM 141698288 + 8 [xfsaild/sda1]
-  8,0   11      206    81.092496118   804  I  WM 141698288 + 8 (   22911) [xfsaild/sda1]
-  <==== 'I' means Inserted (into the IO scheduler) ===================================>
-  8,0    0   289372    96.718761435     0  D  WM 141698288 + 8 (15626265317) [swapper/0]
-  <==== Only 15s later the CFQ scheduler dispatches the request ======================>
-
-As we can see above, in this particular example CFQ took 15 seconds to dispatch
-this request. Going back to the full trace, we can see that the xfsaild queue
-had plenty of opportunity to run, and it was selected as the active queue many
-times. It would just always be preempted by something else (example):
-
-  8,0    1        0    81.117912979     0  m   N cfq1618SN / insert_request
-  8,0    1        0    81.117913419     0  m   N cfq1618SN / add_to_rr
-  8,0    1        0    81.117914044     0  m   N cfq1618SN / preempt
-  8,0    1        0    81.117914398     0  m   N cfq767A  / slice expired t=1
-  8,0    1        0    81.117914755     0  m   N cfq767A  / resid=40
-  8,0    1        0    81.117915340     0  m   N / served: vt=1948520448 min_vt=1948520448
-  8,0    1        0    81.117915858     0  m   N cfq767A  / sl_used=1 disp=0 charge=0 iops=1 sect=0
-
-where cfq767 is the xfsaild queue and cfq1618 corresponds to one of the ScyllaDB
-IO dispatchers.
-
-The requests preempting the xfsaild queue are synchronous requests. That's a
-characteristic of ScyllaDB workloads, as we only ever issue O_DIRECT requests.
-While it can be argued that preempting ASYNC requests in favor of SYNC is part
-of the CFQ logic, I don't believe that doing so for 15+ seconds is anyone's
-goal.
-
-Moreover, unless I am misunderstanding something, that breaks the expectation
-set by the "fifo_expire_async" tunable, which in my system is set to the
-default.
-
-Looking at the code, it seems to me that the issue is that after we make
-an async queue active, there is no guarantee that it will execute any request.
-
-When the queue itself tests if it cfq_may_dispatch() it can bail if it sees SYNC
-requests in flight. An incoming request from another queue can also preempt it
-in such situation before we have the chance to execute anything (as seen in the
-trace above).
-
-This patch sets the must_dispatch flag if we notice that we have requests
-that are already fifo_expired. This flag is always cleared after
-cfq_dispatch_request() returns from cfq_dispatch_requests(), so it won't pin
-the queue for subsequent requests (unless they are themselves expired)
-
-Care is taken during preempt to still allow rt requests to preempt us
-regardless.
-
-Testing my workload with this patch applied produces much better results.
->From the application side I see no timeouts, and the open() latency histogram
-generated by systemtap looks much better, with the worst outlier at 131ms:
-
-Latency histogram of xfs_buf_lock acquisition (microseconds):
- value |-------------------------------------------------- count
-     0 |                                                     11
-     1 |@@@@                                                161
-     2 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@  1966
-     4 |@                                                    54
-     8 |                                                     36
-    16 |                                                      7
-    32 |                                                      0
-    64 |                                                      0
-       ~
-  1024 |                                                      0
-  2048 |                                                      0
-  4096 |                                                      1
-  8192 |                                                      1
- 16384 |                                                      2
- 32768 |                                                      0
- 65536 |                                                      0
-131072 |                                                      1
-262144 |                                                      0
-524288 |                                                      0
-
-Signed-off-by: Glauber Costa <glauber@scylladb.com>
-CC: Jens Axboe <axboe@kernel.dk>
-CC: linux-block@vger.kernel.org
-CC: linux-kernel@vger.kernel.org
-
-Signed-off-by: Glauber Costa <glauber@scylladb.com>
+[Damien: * Removed the zone cache
+         * Implement report zones operation based on earlier proposal
+           by Shaun Tancheff <shaun.tancheff@seagate.com>]
+Signed-off-by: Damien Le Moal <damien.lemoal@hgst.com>
 ---
- block/cfq-iosched.c | 13 ++++++++++---
- 1 file changed, 10 insertions(+), 3 deletions(-)
 
-diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
-index cc2f6db..5e24d88 100644
---- a/block/cfq-iosched.c
-+++ b/block/cfq-iosched.c
-@@ -3042,7 +3042,6 @@ static struct request *cfq_check_fifo(struct cfq_queue *cfqq)
- 	if (ktime_get_ns() < rq->fifo_time)
- 		rq = NULL;
+Changes from v2:
+ - Added EXPORT_SYMBOL_GPL() per Damien
+ - Added uapi blkzoned.h earlier and put shared enums/struct directly
+   into blkzoned.h
+
+ block/Kconfig                 |   8 ++
+ block/Makefile                |   1 +
+ block/blk-zoned.c             | 242 ++++++++++++++++++++++++++++++++++++++++++
+ include/linux/blkdev.h        |  30 ++++++
+ include/uapi/linux/Kbuild     |   1 +
+ include/uapi/linux/blkzoned.h | 103 ++++++++++++++++++
+ 6 files changed, 385 insertions(+)
+ create mode 100644 block/blk-zoned.c
+ create mode 100644 include/uapi/linux/blkzoned.h
+
+diff --git a/block/Kconfig b/block/Kconfig
+index 1d4d624..6b0ad08 100644
+--- a/block/Kconfig
++++ b/block/Kconfig
+@@ -89,6 +89,14 @@ config BLK_DEV_INTEGRITY
+ 	T10/SCSI Data Integrity Field or the T13/ATA External Path
+ 	Protection.  If in doubt, say N.
  
--	cfq_log_cfqq(cfqq->cfqd, cfqq, "fifo=%p", rq);
- 	return rq;
++config BLK_DEV_ZONED
++	bool "Zoned block device support"
++	---help---
++	Block layer zoned block device support. This option enables
++	support for ZAC/ZBC host-managed and host-aware zoned block devices.
++
++	Say yes here if you have a ZAC or ZBC storage device.
++
+ config BLK_DEV_THROTTLING
+ 	bool "Block layer bio throttling support"
+ 	depends on BLK_CGROUP=y
+diff --git a/block/Makefile b/block/Makefile
+index 36acdd7..9371bc7 100644
+--- a/block/Makefile
++++ b/block/Makefile
+@@ -22,4 +22,5 @@ obj-$(CONFIG_IOSCHED_CFQ)	+= cfq-iosched.o
+ obj-$(CONFIG_BLOCK_COMPAT)	+= compat_ioctl.o
+ obj-$(CONFIG_BLK_CMDLINE_PARSER)	+= cmdline-parser.o
+ obj-$(CONFIG_BLK_DEV_INTEGRITY) += bio-integrity.o blk-integrity.o t10-pi.o
++obj-$(CONFIG_BLK_DEV_ZONED)	+= blk-zoned.o
+ obj-$(CONFIG_BLK_MQ_PCI)	+= blk-mq-pci.o
+diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+new file mode 100644
+index 0000000..bc4159d
+--- /dev/null
++++ b/block/blk-zoned.c
+@@ -0,0 +1,242 @@
++/*
++ * Zoned block device handling
++ *
++ * Copyright (c) 2015, Hannes Reinecke
++ * Copyright (c) 2015, SUSE Linux GmbH
++ *
++ * Copyright (c) 2016, Damien Le Moal
++ * Copyright (c) 2016, Western Digital
++ */
++
++#include <linux/kernel.h>
++#include <linux/module.h>
++#include <linux/rbtree.h>
++#include <linux/blkdev.h>
++
++static inline sector_t blk_zone_start(struct request_queue *q,
++				      sector_t sector)
++{
++	sector_t zone_mask = blk_queue_zone_size(q) - 1;
++
++	return sector & ~zone_mask;
++}
++
++static inline void blkdev_report_to_zone(struct block_device *bdev,
++					 void *rep,
++					 struct blk_zone *zone)
++{
++	sector_t offset = get_start_sect(bdev);
++
++	memcpy(zone, rep, sizeof(struct blk_zone));
++	zone->start -= offset;
++	if (zone->type == BLK_ZONE_TYPE_CONVENTIONAL)
++		zone->wp = zone->start + zone->len;
++	else
++		zone->wp -= offset;
++}
++
++/**
++ * blkdev_report_zones - Get zones information
++ * @bdev:	Target block device
++ * @sector:	Sector from which to report zones
++ * @zones:      Array of zone structures where to return the zones information
++ * @nr_zones:   Number of zone structures in the zone array
++ * @gfp_mask:	Memory allocation flags (for bio_alloc)
++ *
++ * Description:
++ *    Get zone information starting from the zone containing @sector.
++ *    The number of zone information reported may be less than the number
++ *    requested by @nr_zones. The number of zones actually reported is
++ *    returned in @nr_zones.
++ */
++int blkdev_report_zones(struct block_device *bdev,
++			sector_t sector,
++			struct blk_zone *zones,
++			unsigned int *nr_zones,
++			gfp_t gfp_mask)
++{
++	struct request_queue *q = bdev_get_queue(bdev);
++	struct blk_zone_report_hdr *hdr;
++	unsigned int nrz = *nr_zones;
++	struct page *page;
++	unsigned int nr_rep;
++	size_t rep_bytes;
++	unsigned int nr_pages;
++	struct bio *bio;
++	struct bio_vec *bv;
++	unsigned int i, nz;
++	unsigned int ofst;
++	void *addr;
++	int ret = 0;
++
++	if (!q)
++		return -ENXIO;
++
++	if (!blk_queue_is_zoned(q))
++		return -EOPNOTSUPP;
++
++	if (!nrz)
++		return 0;
++
++	if (sector > bdev->bd_part->nr_sects) {
++		*nr_zones = 0;
++		return 0;
++	}
++
++	/*
++	 * The zone report has a header. So make room for it in the
++	 * payload. Also make sure that the report fits in a single BIO
++	 * that will not be split down the stack.
++	 */
++	rep_bytes = sizeof(struct blk_zone_report_hdr) +
++		sizeof(struct blk_zone) * nrz;
++	rep_bytes = (rep_bytes + PAGE_SIZE - 1) & PAGE_MASK;
++	if (rep_bytes > (queue_max_sectors(q) << 9))
++		rep_bytes = queue_max_sectors(q) << 9;
++
++	nr_pages = min_t(unsigned int, BIO_MAX_PAGES,
++			 rep_bytes >> PAGE_SHIFT);
++	nr_pages = min_t(unsigned int, nr_pages,
++			 queue_max_segments(q));
++
++	bio = bio_alloc(gfp_mask, nr_pages);
++	if (!bio)
++		return -ENOMEM;
++
++	bio->bi_bdev = bdev;
++	bio->bi_iter.bi_sector = blk_zone_start(q, sector);
++	bio_set_op_attrs(bio, REQ_OP_ZONE_REPORT, 0);
++
++	for (i = 0; i < nr_pages; i++) {
++		page = alloc_page(gfp_mask);
++		if (!page) {
++			ret = -ENOMEM;
++			goto out;
++		}
++		if (!bio_add_page(bio, page, PAGE_SIZE, 0)) {
++			__free_page(page);
++			break;
++		}
++	}
++
++	if (i == 0)
++		ret = -ENOMEM;
++	else
++		ret = submit_bio_wait(bio);
++	if (ret)
++		goto out;
++
++	/*
++	 * Process the report resukt: skip the header and go through the
++	 * reported zones to fixup and fixup the zone information for
++	 * partitions. At the same time, return the zone information into
++	 * the zone array.
++	 */
++	nz = 0;
++	nr_rep = 0;
++	bio_for_each_segment_all(bv, bio, i) {
++
++		if (!bv->bv_page)
++			break;
++
++		addr = kmap_atomic(bv->bv_page);
++
++		/* Get header in the first page */
++		ofst = 0;
++		if (!nr_rep) {
++			hdr = (struct blk_zone_report_hdr *) addr;
++			nr_rep = hdr->nr_zones;
++			ofst = sizeof(struct blk_zone_report_hdr);
++		}
++
++		/* Fixup and report zones */
++		while (ofst < bv->bv_len &&
++		       nz < min_t(unsigned int, nr_rep, nrz)) {
++			blkdev_report_to_zone(bdev, addr + ofst, &zones[nz]);
++			ofst += sizeof(struct blk_zone);
++			nz++;
++		}
++
++		kunmap_atomic(addr);
++
++		if (!nr_rep)
++			break;
++
++	}
++
++out:
++	bio_for_each_segment_all(bv, bio, i)
++		__free_page(bv->bv_page);
++	bio_put(bio);
++
++	if (ret == 0)
++		*nr_zones = nz;
++
++	return ret;
++}
++EXPORT_SYMBOL_GPL(blkdev_report_zones);
++
++/**
++ * blkdev_reset_zones - Reset zones write pointer
++ * @bdev:       Target block device
++ * @sector:     Start sector of the first zone to reset
++ * @nr_sectors: Number of sectors, at least the length of one zone
++ * @gfp_mask:   Memory allocation flags (for bio_alloc)
++ *
++ * Description:
++ *    Reset the write pointer of the zones contained in the range
++ *    @sector..@sector+@nr_sectors. Specifying the entire disk sector range
++ *    is valid, but the specified range should not contain conventional zones.
++ */
++int blkdev_reset_zones(struct block_device *bdev,
++		       sector_t sector, sector_t nr_sectors,
++		       gfp_t gfp_mask)
++{
++	struct request_queue *q = bdev_get_queue(bdev);
++	sector_t zone_sectors;
++	sector_t end_sector = sector + nr_sectors;
++	struct bio *bio;
++	int ret;
++
++	if (!q)
++		return -ENXIO;
++
++	if (!blk_queue_is_zoned(q))
++		return -EOPNOTSUPP;
++
++	if (end_sector > bdev->bd_part->nr_sects)
++		/* Out of range */
++		return -EINVAL;
++
++	/* Check alignement (handle eventual smaller last zone) */
++	zone_sectors = blk_queue_zone_size(q);
++	if (sector & (zone_sectors - 1))
++		return -EINVAL;
++
++	if ((nr_sectors & (zone_sectors - 1)) &&
++	    end_sector != bdev->bd_part->nr_sects)
++		return -EINVAL;
++
++	while (sector < end_sector) {
++
++		bio = bio_alloc(gfp_mask, 0);
++		bio->bi_iter.bi_sector = sector;
++		bio->bi_bdev = bdev;
++		bio_set_op_attrs(bio, REQ_OP_ZONE_RESET, 0);
++
++		ret = submit_bio_wait(bio);
++		bio_put(bio);
++
++		if (ret)
++			return ret;
++
++		sector += zone_sectors;
++
++		/* This may take a while, so be nice to others */
++		cond_resched();
++
++	}
++
++	return 0;
++}
++EXPORT_SYMBOL_GPL(blkdev_reset_zones);
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index f19e16b..6316972 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -24,6 +24,7 @@
+ #include <linux/rcupdate.h>
+ #include <linux/percpu-refcount.h>
+ #include <linux/scatterlist.h>
++#include <linux/blkzoned.h>
+ 
+ struct module;
+ struct scsi_ioctl_command;
+@@ -302,6 +303,20 @@ struct queue_limits {
+ 	enum blk_zoned_model	zoned;
+ };
+ 
++#ifdef CONFIG_BLK_DEV_ZONED
++
++struct blk_zone_report_hdr {
++	unsigned int	nr_zones;
++	u8		padding[60];
++};
++
++extern int blkdev_report_zones(struct block_device *,
++				sector_t, struct blk_zone *,
++				unsigned int *, gfp_t);
++extern int blkdev_reset_zones(struct block_device *, sector_t,
++				sector_t, gfp_t);
++#endif /* CONFIG_BLK_DEV_ZONED */
++
+ struct request_queue {
+ 	/*
+ 	 * Together with queue_head for cacheline sharing
+@@ -654,6 +669,11 @@ static inline bool blk_queue_is_zoned(struct request_queue *q)
+ 	}
  }
  
-@@ -3420,6 +3419,9 @@ static bool cfq_may_dispatch(struct cfq_data *cfqd, struct cfq_queue *cfqq)
++static inline unsigned int blk_queue_zone_size(struct request_queue *q)
++{
++	return blk_queue_is_zoned(q) ? q->limits.chunk_sectors : 0;
++}
++
+ /*
+  * We regard a request as sync, if either a read or a sync write
+  */
+@@ -1401,6 +1421,16 @@ static inline bool bdev_is_zoned(struct block_device *bdev)
+ 	return false;
+ }
+ 
++static inline unsigned int bdev_zone_size(struct block_device *bdev)
++{
++	struct request_queue *q = bdev_get_queue(bdev);
++
++	if (q)
++		return blk_queue_zone_size(q);
++
++	return 0;
++}
++
+ static inline int queue_dma_alignment(struct request_queue *q)
  {
- 	unsigned int max_dispatch;
- 
-+	if (cfq_cfqq_must_dispatch(cfqq))
-+		return true;
+ 	return q ? q->dma_alignment : 511;
+diff --git a/include/uapi/linux/Kbuild b/include/uapi/linux/Kbuild
+index dd60439..92466a6 100644
+--- a/include/uapi/linux/Kbuild
++++ b/include/uapi/linux/Kbuild
+@@ -70,6 +70,7 @@ header-y += bfs_fs.h
+ header-y += binfmts.h
+ header-y += blkpg.h
+ header-y += blktrace_api.h
++header-y += blkzoned.h
+ header-y += bpf_common.h
+ header-y += bpf_perf_event.h
+ header-y += bpf.h
+diff --git a/include/uapi/linux/blkzoned.h b/include/uapi/linux/blkzoned.h
+new file mode 100644
+index 0000000..a381721
+--- /dev/null
++++ b/include/uapi/linux/blkzoned.h
+@@ -0,0 +1,103 @@
++/*
++ * Zoned block devices handling.
++ *
++ * Copyright (C) 2015 Seagate Technology PLC
++ *
++ * Written by: Shaun Tancheff <shaun.tancheff@seagate.com>
++ *
++ * Modified by: Damien Le Moal <damien.lemoal@hgst.com>
++ * Copyright (C) 2016 Western Digital
++ *
++ * This file is licensed under  the terms of the GNU General Public
++ * License version 2. This program is licensed "as is" without any
++ * warranty of any kind, whether express or implied.
++ */
++#ifndef _UAPI_BLKZONED_H
++#define _UAPI_BLKZONED_H
 +
- 	/*
- 	 * Drain async requests before we start sync IO
- 	 */
-@@ -3511,15 +3513,20 @@ static bool cfq_dispatch_request(struct cfq_data *cfqd, struct cfq_queue *cfqq)
- 
- 	BUG_ON(RB_EMPTY_ROOT(&cfqq->sort_list));
- 
-+	rq = cfq_check_fifo(cfqq);
-+	if (rq)
-+		cfq_mark_cfqq_must_dispatch(cfqq);
++#include <linux/types.h>
 +
- 	if (!cfq_may_dispatch(cfqd, cfqq))
- 		return false;
- 
- 	/*
- 	 * follow expired path, else get first next available
- 	 */
--	rq = cfq_check_fifo(cfqq);
- 	if (!rq)
- 		rq = cfqq->next_rq;
-+	else
-+		cfq_log_cfqq(cfqq->cfqd, cfqq, "fifo=%p", rq);
- 
- 	/*
- 	 * insert request into driver dispatch list
-@@ -3989,7 +3996,7 @@ cfq_should_preempt(struct cfq_data *cfqd, struct cfq_queue *new_cfqq,
- 	 * if the new request is sync, but the currently running queue is
- 	 * not, let the sync request have priority.
- 	 */
--	if (rq_is_sync(rq) && !cfq_cfqq_sync(cfqq))
-+	if (rq_is_sync(rq) && !cfq_cfqq_sync(cfqq) && !cfq_cfqq_must_dispatch(cfqq))
- 		return true;
- 
- 	/*
++/**
++ * enum blk_zone_type - Types of zones allowed in a zoned device.
++ *
++ * @BLK_ZONE_TYPE_CONVENTIONAL: The zone has no write pointer and can be writen
++ *                              randomly. Zone reset has no effect on the zone.
++ * @BLK_ZONE_TYPE_SEQWRITE_REQ: The zone must be written sequentially
++ * @BLK_ZONE_TYPE_SEQWRITE_PREF: The zone can be written non-sequentially
++ *
++ * Any other value not defined is reserved and must be considered as invalid.
++ */
++enum blk_zone_type {
++	BLK_ZONE_TYPE_CONVENTIONAL	= 0x1,
++	BLK_ZONE_TYPE_SEQWRITE_REQ	= 0x2,
++	BLK_ZONE_TYPE_SEQWRITE_PREF	= 0x3,
++};
++
++/**
++ * enum blk_zone_cond - Condition [state] of a zone in a zoned device.
++ *
++ * @BLK_ZONE_COND_NOT_WP: The zone has no write pointer, it is conventional.
++ * @BLK_ZONE_COND_EMPTY: The zone is empty.
++ * @BLK_ZONE_COND_IMP_OPEN: The zone is open, but not explicitly opened.
++ * @BLK_ZONE_COND_EXP_OPEN: The zones was explicitly opened by an
++ *                          OPEN ZONE command.
++ * @BLK_ZONE_COND_CLOSED: The zone was [explicitly] closed after writing.
++ * @BLK_ZONE_COND_FULL: The zone is marked as full, possibly by a zone
++ *                      FINISH ZONE command.
++ * @BLK_ZONE_COND_READONLY: The zone is read-only.
++ * @BLK_ZONE_COND_OFFLINE: The zone is offline (sectors cannot be read/written).
++ *
++ * The Zone Condition state machine in the ZBC/ZAC standards maps the above
++ * deinitions as:
++ *   - ZC1: Empty         | BLK_ZONE_EMPTY
++ *   - ZC2: Implicit Open | BLK_ZONE_COND_IMP_OPEN
++ *   - ZC3: Explicit Open | BLK_ZONE_COND_EXP_OPEN
++ *   - ZC4: Closed        | BLK_ZONE_CLOSED
++ *   - ZC5: Full          | BLK_ZONE_FULL
++ *   - ZC6: Read Only     | BLK_ZONE_READONLY
++ *   - ZC7: Offline       | BLK_ZONE_OFFLINE
++ *
++ * Conditions 0x5 to 0xC are reserved by the current ZBC/ZAC spec and should
++ * be considered invalid.
++ */
++enum blk_zone_cond {
++	BLK_ZONE_COND_NOT_WP	= 0x0,
++	BLK_ZONE_COND_EMPTY	= 0x1,
++	BLK_ZONE_COND_IMP_OPEN	= 0x2,
++	BLK_ZONE_COND_EXP_OPEN	= 0x3,
++	BLK_ZONE_COND_CLOSED	= 0x4,
++	BLK_ZONE_COND_READONLY	= 0xD,
++	BLK_ZONE_COND_FULL	= 0xE,
++	BLK_ZONE_COND_OFFLINE	= 0xF,
++};
++
++/**
++ * struct blk_zone - Zone descriptor for BLKREPORTZONE ioctl.
++ *
++ * @start: Zone start in 512 B sector units
++ * @len: Zone length in 512 B sector units
++ * @wp: Zone write pointer location in 512 B sector units
++ * @type: see enum blk_zone_type for possible values
++ * @cond: see enum blk_zone_cond for possible values
++ * @non_seq: Flag indicating that the zone is using non-sequential resources
++ *           (for host-aware zoned block devices only).
++ * @reset: Flag indicating that a zone reset is recommended.
++ * @reserved: Padding to 64 B to match the ZBC/ZAC defined zone descriptor size.
++ *
++ * start, len and wp use the regular 512 B sector unit, regardless of the
++ * device logical block size. The overall structure size is 64 B to match the
++ * ZBC/ZAC defined zone descriptor and allow support for future additional
++ * zone information.
++ */
++struct blk_zone {
++	__u64	start;		/* Zone start sector */
++	__u64	len;		/* Zone length in number of sectors */
++	__u64	wp;		/* Zone write pointer position */
++	__u8	type;		/* Zone type */
++	__u8	cond;		/* Zone condition */
++	__u8	non_seq;	/* Non-sequential write resources active */
++	__u8	reset;		/* Reset write pointer recommended */
++	__u8	reserved[36];
++};
++
++#endif /* _UAPI_BLKZONED_H */
 -- 
-2.5.5
+2.9.3
