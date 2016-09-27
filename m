@@ -1,112 +1,56 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org,
-        Matthew Wilcox <willy@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv3 02/41] radix tree test suite: Allow GFP_ATOMIC allocations to fail
-Date: Thu, 15 Sep 2016 14:54:44 +0300
-Message-Id: <20160915115523.29737-3-kirill.shutemov@linux.intel.com>
-In-Reply-To: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
-References: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <shaun.tancheff@seagate.com>
+MIME-Version: 1.0
+In-Reply-To: <1474888483-29762-4-git-send-email-damien.lemoal@hgst.com>
+References: <1474888483-29762-1-git-send-email-damien.lemoal@hgst.com> <1474888483-29762-4-git-send-email-damien.lemoal@hgst.com>
+From: Shaun Tancheff <shaun.tancheff@seagate.com>
+Date: Tue, 27 Sep 2016 16:12:42 -0500
+Message-ID: <CAJVOszAx9cfuWeSsh_LE--SXKT6ur9ZTdAYk7dzpc7njP=K06w@mail.gmail.com>
+Subject: Re: [PATCH v2 3/7] block: update chunk_sectors in blk_stack_limits()
+To: Damien Le Moal <damien.lemoal@hgst.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Hannes Reinecke <hare@suse.de>, Hannes Reinecke <hare@suse.com>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
-From: Matthew Wilcox <willy@linux.intel.com>
+On Mon, Sep 26, 2016 at 6:14 AM, Damien Le Moal <damien.lemoal@hgst.com> wrote:
+> From: Hannes Reinecke <hare@suse.de>
+>
+> Signed-off-by: Hannes Reinecke <hare@suse.com>
+> Signed-off-by: Damien Le Moal <damien.lemoal@hgst.com>
+> ---
+>  block/blk-settings.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+>
+> diff --git a/block/blk-settings.c b/block/blk-settings.c
+> index b1d5b7f..55369a6 100644
+> --- a/block/blk-settings.c
+> +++ b/block/blk-settings.c
+> @@ -631,6 +631,10 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
+>                         t->discard_granularity;
+>         }
+>
+> +       if (b->chunk_sectors)
+> +               t->chunk_sectors = min_not_zero(t->chunk_sectors,
+> +                                               b->chunk_sectors);
+> +
+>         return ret;
+>  }
+>  EXPORT_SYMBOL(blk_stack_limits);
+> --
+> 2.7.4
 
-In order to test the preload code, it is necessary to fail GFP_ATOMIC
-allocations, which requires defining GFP_KERNEL and GFP_ATOMIC properly.
-Remove the obsolete __GFP_WAIT and copy the definitions of the __GFP
-flags which are used from the kernel include files.  We also need the
-real definition of gfpflags_allow_blocking() to persuade the radix tree
-to actually use its preallocated nodes.
+Reviewed-by: Shaun Tancheff <shaun.tancheff@seagate.com>
+Tested-by: Shaun Tancheff <shaun.tancheff@seagate.com>
 
-Signed-off-by: Matthew Wilcox <willy@linux.intel.com>
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
----
- tools/testing/radix-tree/linux.c      |  7 ++++++-
- tools/testing/radix-tree/linux/gfp.h  | 22 +++++++++++++++++++---
- tools/testing/radix-tree/linux/slab.h |  5 -----
- 3 files changed, 25 insertions(+), 9 deletions(-)
 
-diff --git a/tools/testing/radix-tree/linux.c b/tools/testing/radix-tree/linux.c
-index 154823737b20..3cfb04e98e2f 100644
---- a/tools/testing/radix-tree/linux.c
-+++ b/tools/testing/radix-tree/linux.c
-@@ -33,7 +33,12 @@ mempool_t *mempool_create(int min_nr, mempool_alloc_t *alloc_fn,
- 
- void *kmem_cache_alloc(struct kmem_cache *cachep, int flags)
- {
--	void *ret = malloc(cachep->size);
-+	void *ret;
-+
-+	if (flags & __GFP_NOWARN)
-+		return NULL;
-+
-+	ret = malloc(cachep->size);
- 	if (cachep->ctor)
- 		cachep->ctor(ret);
- 	uatomic_inc(&nr_allocated);
-diff --git a/tools/testing/radix-tree/linux/gfp.h b/tools/testing/radix-tree/linux/gfp.h
-index 5201b915f631..5b09b2ce6c33 100644
---- a/tools/testing/radix-tree/linux/gfp.h
-+++ b/tools/testing/radix-tree/linux/gfp.h
-@@ -3,8 +3,24 @@
- 
- #define __GFP_BITS_SHIFT 26
- #define __GFP_BITS_MASK ((gfp_t)((1 << __GFP_BITS_SHIFT) - 1))
--#define __GFP_WAIT 1
--#define __GFP_ACCOUNT 0
--#define __GFP_NOWARN 0
-+
-+#define __GFP_HIGH		0x20u
-+#define __GFP_IO		0x40u
-+#define __GFP_FS		0x80u
-+#define __GFP_NOWARN		0x200u
-+#define __GFP_ATOMIC		0x80000u
-+#define __GFP_ACCOUNT		0x100000u
-+#define __GFP_DIRECT_RECLAIM	0x400000u
-+#define __GFP_KSWAPD_RECLAIM	0x2000000u
-+
-+#define __GFP_RECLAIM		(__GFP_DIRECT_RECLAIM|__GFP_KSWAPD_RECLAIM)
-+
-+#define GFP_ATOMIC		(__GFP_HIGH|__GFP_ATOMIC|__GFP_KSWAPD_RECLAIM)
-+#define GFP_KERNEL		(__GFP_RECLAIM | __GFP_IO | __GFP_FS)
-+
-+static inline bool gfpflags_allow_blocking(const gfp_t gfp_flags)
-+{
-+	return !!(gfp_flags & __GFP_DIRECT_RECLAIM);
-+}
- 
- #endif
-diff --git a/tools/testing/radix-tree/linux/slab.h b/tools/testing/radix-tree/linux/slab.h
-index 6d5a34770fd4..452e2bf502e3 100644
---- a/tools/testing/radix-tree/linux/slab.h
-+++ b/tools/testing/radix-tree/linux/slab.h
-@@ -7,11 +7,6 @@
- #define SLAB_PANIC 2
- #define SLAB_RECLAIM_ACCOUNT    0x00020000UL            /* Objects are reclaimable */
- 
--static inline int gfpflags_allow_blocking(gfp_t mask)
--{
--	return 1;
--}
--
- struct kmem_cache {
- 	int size;
- 	void (*ctor)(void *);
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-block" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
 -- 
-2.9.3
-
+Shaun Tancheff
