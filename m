@@ -1,12 +1,14 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:59861 "EHLO mx2.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:51241 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751572AbcI0HiO (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Sep 2016 03:38:14 -0400
-Date: Tue, 27 Sep 2016 09:38:08 +0200
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@lst.de>,
+        id S1751962AbcI0GVA (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 27 Sep 2016 02:21:00 -0400
+Subject: Re: [PATCH 1/9] blk-mq: Introduce blk_mq_queue_stopped()
+To: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Jens Axboe <axboe@fb.com>
+References: <7948dbb8-6333-dc62-2673-4da35b4dfdbc@sandisk.com>
+ <b2210943-62b2-959a-569a-a404da03bcae@sandisk.com>
+Cc: Christoph Hellwig <hch@lst.de>,
         James Bottomley <jejb@linux.vnet.ibm.com>,
         "Martin K. Petersen" <martin.petersen@oracle.com>,
         Mike Snitzer <snitzer@redhat.com>,
@@ -16,17 +18,16 @@ Cc: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@lst.de>,
         "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
         "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
         "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-Subject: Re: [PATCH 1/9] blk-mq: Introduce blk_mq_queue_stopped()
-Message-ID: <20160927073808.dfza42u2co7t7yi4@linux-x5ow.site>
-References: <7948dbb8-6333-dc62-2673-4da35b4dfdbc@sandisk.com>
- <b2210943-62b2-959a-569a-a404da03bcae@sandisk.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <5a954988-1b81-5bc2-c2e9-5e0eae927a46@suse.de>
+Date: Tue, 27 Sep 2016 08:20:57 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
 In-Reply-To: <b2210943-62b2-959a-569a-a404da03bcae@sandisk.com>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Mon, Sep 26, 2016 at 11:26:26AM -0700, Bart Van Assche wrote:
+On 09/26/2016 08:26 PM, Bart Van Assche wrote:
 > The function blk_queue_stopped() allows to test whether or not a
 > traditional request queue has been stopped. Introduce a helper
 > function that allows block drivers to query easily whether or not
@@ -36,14 +37,18 @@ On Mon, Sep 26, 2016 at 11:26:26AM -0700, Bart Van Assche wrote:
 > Cc: Jens Axboe <axboe@fb.com>
 > Cc: Christoph Hellwig <hch@lst.de>
 > ---
+>  block/blk-mq.c         | 20 ++++++++++++++++++++
+>  include/linux/blk-mq.h |  1 +
+>  2 files changed, 21 insertions(+)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Looks good,
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Cheers,
 
+Hannes
 -- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: Felix Imend�rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N�rnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
