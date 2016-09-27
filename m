@@ -1,102 +1,42 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pa0-f41.google.com ([209.85.220.41]:35989 "EHLO
-        mail-pa0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754414AbcIISmd (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Sep 2016 14:42:33 -0400
-Received: by mail-pa0-f41.google.com with SMTP id id6so30774734pad.3
-        for <linux-block@vger.kernel.org>; Fri, 09 Sep 2016 11:42:33 -0700 (PDT)
-From: Omar Sandoval <osandov@osandov.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, kernel-team@fb.com,
-        Alexei Starovoitov <ast@fb.com>
-Subject: [PATCH v3 5/5] sbitmap: randomize initial last_cache values
-Date: Fri,  9 Sep 2016 11:42:11 -0700
-Message-Id: <38c544e501d976df00a7e13b3041fcfca2a117ed.1473446095.git.osandov@fb.com>
-In-Reply-To: <cover.1473446095.git.osandov@fb.com>
-References: <cover.1473446095.git.osandov@fb.com>
-In-Reply-To: <cover.1473446095.git.osandov@fb.com>
-References: <cover.1473446095.git.osandov@fb.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+Date: Tue, 27 Sep 2016 09:51:48 +0200
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Bart Van Assche <bart.vanassche@sandisk.com>
+Cc: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@lst.de>,
+        James Bottomley <jejb@linux.vnet.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Doug Ledford <dledford@redhat.com>,
+        Keith Busch <keith.busch@intel.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+Subject: Re: [PATCH 6/9] block: Rename mq_freeze_wq and mq_freeze_depth
+Message-ID: <20160927075148.6vrdr44eb34g2ccf@linux-x5ow.site>
+References: <7948dbb8-6333-dc62-2673-4da35b4dfdbc@sandisk.com>
+ <129b2a52-1ff7-7048-dfa3-89416ea42dd2@sandisk.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <129b2a52-1ff7-7048-dfa3-89416ea42dd2@sandisk.com>
+Sender: linux-scsi-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-From: Omar Sandoval <osandov@fb.com>
+On Mon, Sep 26, 2016 at 11:28:08AM -0700, Bart Van Assche wrote:
+> Since these two structure members are now used in blk-mq and !blk-mq
+> paths, remove the mq_prefix. This patch does not change any
+> functionality.
+> 
+> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+> ---
 
-In order to get good cache behavior from a sbitmap, we want each CPU to
-stick to its own cacheline(s) as much as possible. This might happen
-naturally as the bitmap gets filled up and the last_cache values spread
-out, but we really want this behavior from the start. blk-mq apparently
-intended to do this, but the code to do this was never wired up. Get rid
-of the dead code and make it part of the sbitmap library.
+Looks good,
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
 
-Signed-off-by: Omar Sandoval <osandov@fb.com>
----
- block/blk-mq-tag.c | 8 --------
- block/blk-mq-tag.h | 1 -
- lib/sbitmap.c      | 6 ++++++
- 3 files changed, 6 insertions(+), 9 deletions(-)
-
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index e1c2bed..cef618f 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -7,7 +7,6 @@
-  */
- #include <linux/kernel.h>
- #include <linux/module.h>
--#include <linux/random.h>
- 
- #include <linux/blk-mq.h>
- #include "blk.h"
-@@ -419,13 +418,6 @@ void blk_mq_free_tags(struct blk_mq_tags *tags)
- 	kfree(tags);
- }
- 
--void blk_mq_tag_init_last_tag(struct blk_mq_tags *tags, unsigned int *tag)
--{
--	unsigned int depth = tags->nr_tags - tags->nr_reserved_tags;
--
--	*tag = prandom_u32() % depth;
--}
--
- int blk_mq_tag_update_depth(struct blk_mq_tags *tags, unsigned int tdepth)
- {
- 	tdepth -= tags->nr_reserved_tags;
-diff --git a/block/blk-mq-tag.h b/block/blk-mq-tag.h
-index f90b850..09f4cc0 100644
---- a/block/blk-mq-tag.h
-+++ b/block/blk-mq-tag.h
-@@ -30,7 +30,6 @@ extern void blk_mq_put_tag(struct blk_mq_hw_ctx *hctx, struct blk_mq_ctx *ctx,
- 			   unsigned int tag);
- extern bool blk_mq_has_free_tags(struct blk_mq_tags *tags);
- extern ssize_t blk_mq_tag_sysfs_show(struct blk_mq_tags *tags, char *page);
--extern void blk_mq_tag_init_last_tag(struct blk_mq_tags *tags, unsigned int *last_tag);
- extern int blk_mq_tag_update_depth(struct blk_mq_tags *tags, unsigned int depth);
- extern void blk_mq_tag_wakeup_all(struct blk_mq_tags *tags, bool);
- void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_iter_fn *fn,
-diff --git a/lib/sbitmap.c b/lib/sbitmap.c
-index 3a91269..d873bb0a 100644
---- a/lib/sbitmap.c
-+++ b/lib/sbitmap.c
-@@ -15,6 +15,7 @@
-  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-  */
- 
-+#include <linux/random.h>
- #include <linux/sbitmap.h>
- 
- int sbitmap_init_node(struct sbitmap *sb, unsigned int depth, int shift,
-@@ -208,6 +209,11 @@ int sbitmap_queue_init_node(struct sbitmap_queue *sbq, unsigned int depth,
- 		return -ENOMEM;
- 	}
- 
-+	if (depth && !round_robin) {
-+		for_each_possible_cpu(i)
-+			*per_cpu_ptr(sbq->alloc_hint, i) = prandom_u32() % depth;
-+	}
-+
- 	sbq->wake_batch = SBQ_WAKE_BATCH;
- 	if (sbq->wake_batch > depth / SBQ_WAIT_QUEUES)
- 		sbq->wake_batch = max(1U, depth / SBQ_WAIT_QUEUES);
 -- 
-2.9.3
-
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
