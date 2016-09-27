@@ -1,69 +1,55 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-	Andreas Dilger <adilger.kernel@dilger.ca>,
-	Jan Kara <jack@suse.com>,
-	Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-	Hugh Dickins <hughd@google.com>,
-	Andrea Arcangeli <aarcange@redhat.com>,
-	Dave Hansen <dave.hansen@intel.com>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	Matthew Wilcox <willy@infradead.org>,
-	Ross Zwisler <ross.zwisler@linux.intel.com>,
-	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	linux-block@vger.kernel.org,
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv2 09/41] page-flags: relax page flag policy for few flags
-Date: Fri, 12 Aug 2016 21:37:52 +0300
-Message-Id: <1471027104-115213-10-git-send-email-kirill.shutemov@linux.intel.com>
-In-Reply-To: <1471027104-115213-1-git-send-email-kirill.shutemov@linux.intel.com>
-References: <1471027104-115213-1-git-send-email-kirill.shutemov@linux.intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <vgoyal@redhat.com>
+Date: Tue, 27 Sep 2016 10:10:33 -0400
+From: Vivek Goyal <vgoyal@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Tejun Heo <tj@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
+        Hou Tao <houtao1@huawei.com>
+Subject: Re: [PATCH] blk-throttle: fix infinite throttling caused by
+ non-cascading timer wheel
+Message-ID: <20160927141033.GB30881@redhat.com>
+References: <1473662730-184701-1-git-send-email-houtao1@huawei.com>
+ <20160913134646.GA19320@redhat.com>
+ <20160919210645.GE12537@redhat.com>
+ <61ec807a-96ed-5363-7e0c-0ee46c3b70f4@kernel.dk>
+ <20160927125722.GA30881@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20160927125722.GA30881@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-These flags are in use for filesystems with backing storage: PG_error,
-PG_writeback and PG_readahead.
+On Tue, Sep 27, 2016 at 08:57:22AM -0400, Vivek Goyal wrote:
+> On Mon, Sep 19, 2016 at 03:11:10PM -0600, Jens Axboe wrote:
+> > On 09/19/2016 03:06 PM, Vivek Goyal wrote:
+> > > On Tue, Sep 13, 2016 at 09:46:46AM -0400, Vivek Goyal wrote:
+> > > > 
+> > > > Hi Hou Tao,
+> > > > 
+> > > > [ CC Tejun and Thomas ]
+> > > > 
+> > > > Thanks for the patch. I can reproduce it. I am wondering that why are you
+> > > > doing so many checks. Can't we just check if throttle group is empty or
+> > > > not. If it is empty and slice has expired, then start a new slice. If
+> > > > throttle group is not empty, then we know slice has to be an active slice
+> > > > and should be extended (despite the fact that it might have expired
+> > > > because timer function got called later than we expected it to be).
+> > > > 
+> > > > Can you please try following patch. It seems to resolve the issue for me.
+> > > > 
+> > > > Vivek
+> > > 
+> > > Hi Jens,
+> > > 
+> > > Can you please pick this patch. It seems to fix the reported issued.
+> > > Please let me know if you prefer a separate posting.
+> > 
+> > I'll apply it, thanks Vivek.
+> 
+> Hi Jens,
+> 
+> Did you get a chance to apply this one. Can't find it in for-next branch.
+> 
 
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
----
- include/linux/page-flags.h | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+Oh, just noticed that you sent it for 4.8. Sorry for the noise.
 
-diff --git a/include/linux/page-flags.h b/include/linux/page-flags.h
-index 74e4dda91238..a2bef9a41bcf 100644
---- a/include/linux/page-flags.h
-+++ b/include/linux/page-flags.h
-@@ -253,7 +253,7 @@ static inline int TestClearPage##uname(struct page *page) { return 0; }
- 	TESTSETFLAG_FALSE(uname) TESTCLEARFLAG_FALSE(uname)
- 
- __PAGEFLAG(Locked, locked, PF_NO_TAIL)
--PAGEFLAG(Error, error, PF_NO_COMPOUND) TESTCLEARFLAG(Error, error, PF_NO_COMPOUND)
-+PAGEFLAG(Error, error, PF_NO_TAIL) TESTCLEARFLAG(Error, error, PF_NO_TAIL)
- PAGEFLAG(Referenced, referenced, PF_HEAD)
- 	TESTCLEARFLAG(Referenced, referenced, PF_HEAD)
- 	__SETPAGEFLAG(Referenced, referenced, PF_HEAD)
-@@ -293,15 +293,15 @@ PAGEFLAG(OwnerPriv1, owner_priv_1, PF_ANY)
-  * Only test-and-set exist for PG_writeback.  The unconditional operators are
-  * risky: they bypass page accounting.
-  */
--TESTPAGEFLAG(Writeback, writeback, PF_NO_COMPOUND)
--	TESTSCFLAG(Writeback, writeback, PF_NO_COMPOUND)
-+TESTPAGEFLAG(Writeback, writeback, PF_NO_TAIL)
-+	TESTSCFLAG(Writeback, writeback, PF_NO_TAIL)
- PAGEFLAG(MappedToDisk, mappedtodisk, PF_NO_TAIL)
- 
- /* PG_readahead is only used for reads; PG_reclaim is only for writes */
- PAGEFLAG(Reclaim, reclaim, PF_NO_TAIL)
- 	TESTCLEARFLAG(Reclaim, reclaim, PF_NO_TAIL)
--PAGEFLAG(Readahead, reclaim, PF_NO_COMPOUND)
--	TESTCLEARFLAG(Readahead, reclaim, PF_NO_COMPOUND)
-+PAGEFLAG(Readahead, reclaim, PF_NO_TAIL)
-+	TESTCLEARFLAG(Readahead, reclaim, PF_NO_TAIL)
- 
- #ifdef CONFIG_HIGHMEM
- /*
--- 
-2.8.1
-
+Vivek
