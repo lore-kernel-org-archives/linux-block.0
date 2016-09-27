@@ -1,68 +1,47 @@
-Return-Path: <shaun.tancheff@gmail.com>
-Return-Path: <shaun.tancheff@gmail.com>
-Sender: Shaun Tancheff <shaun.tancheff@gmail.com>
-From: Shaun Tancheff <shaun@tancheff.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Shaun Tancheff <shaun.tancheff@seagate.com>,
-	linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	"James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-	Damien Le Moal <damien.lemoal@hgst.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Michael T Lombardi <michael.t.lombardi@seagate.com>
-Subject: [PATCH v6 4/7] block: Define zoned block device operations
-Date: Fri, 30 Sep 2016 14:12:33 -0500
-Message-Id: <20160930191237.13695-5-shaun@tancheff.com>
-In-Reply-To: <20160930191237.13695-1-shaun@tancheff.com>
-References: <20160930191237.13695-1-shaun@tancheff.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-dm3nam03on0069.outbound.protection.outlook.com ([104.47.41.69]:61344
+        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S932181AbcI0Pz4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 27 Sep 2016 11:55:56 -0400
+Subject: Re: [PATCH 5/9] block: Extend blk_freeze_queue_start() to the
+ non-blk-mq path
+To: Ming Lei <tom.leiming@gmail.com>
+References: <7948dbb8-6333-dc62-2673-4da35b4dfdbc@sandisk.com>
+ <7c8af8d2-2ac9-2767-5e5f-8de72eba3814@sandisk.com>
+ <CACVXFVO=GFp=ArC_FT+xPSmL84m01fX6bzReBQ8DeLQ4fUD5cQ@mail.gmail.com>
+ <a8e8796e-7266-4c8a-a4eb-31cedf73ec8a@sandisk.com>
+CC: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@lst.de>,
+        James Bottomley <jejb@linux.vnet.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Doug Ledford <dledford@redhat.com>,
+        Keith Busch <keith.busch@intel.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+From: Bart Van Assche <bart.vanassche@sandisk.com>
+Message-ID: <d15c920e-8333-b970-4e8c-4a3fbf148bb4@sandisk.com>
+Date: Tue, 27 Sep 2016 08:55:42 -0700
+MIME-Version: 1.0
+In-Reply-To: <a8e8796e-7266-4c8a-a4eb-31cedf73ec8a@sandisk.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Shaun Tancheff <shaun.tancheff@seagate.com>
+On 09/27/2016 07:42 AM, Bart Van Assche wrote:
+> Jens, regarding non-blk-mq mode and q_usage_counter: do you prefer that
+> I rework patch 8/9 such that blk_quiesce_queue() and blk_resume_queue()
+> are only used in blk-mq mode or are you OK with adding a
+> blk_queue_enter() call in get_request() and a blk_queue_exit() call to
+> __blk_put_request()?
 
-Define REQ_OP_ZONE_REPORT and REQ_OP_ZONE_RESET for handling zones of
-host-managed and host-aware zoned block devices. With with these two
-new operations, the total number of operations defined reaches 8 and
-still fits with the 3 bits definition of REQ_OP_BITS.
+(replying to my own e-mail)
 
-Signed-off-by: Shaun Tancheff <shaun.tancheff@seagate.com>
-Signed-off-by: Damien Le Moal <damien.lemoal@hgst.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
----
- block/blk-core.c          | 4 ++++
- include/linux/blk_types.h | 2 ++
- 2 files changed, 6 insertions(+)
+Although it is easy to make q_usage_counter count non-blk-mq requests, 
+extending the blk_quiesce_queue() waiting mechanism to the non-blk-mq 
+path is non-trivial. To limit the number of changes in this patch series 
+I will drop the non-blk-mq changes from this patch series.
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 14d7c07..e4eda5d 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1941,6 +1941,10 @@ generic_make_request_checks(struct bio *bio)
- 	case REQ_OP_WRITE_SAME:
- 		if (!bdev_write_same(bio->bi_bdev))
- 			goto not_supported;
-+	case REQ_OP_ZONE_REPORT:
-+	case REQ_OP_ZONE_RESET:
-+		if (!bdev_is_zoned(bio->bi_bdev))
-+			goto not_supported;
- 		break;
- 	default:
- 		break;
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index cd395ec..dd50dce 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -243,6 +243,8 @@ enum req_op {
- 	REQ_OP_SECURE_ERASE,	/* request to securely erase sectors */
- 	REQ_OP_WRITE_SAME,	/* write same block many times */
- 	REQ_OP_FLUSH,		/* request for cache flush */
-+	REQ_OP_ZONE_REPORT,	/* Get zone information */
-+	REQ_OP_ZONE_RESET,	/* Reset a zone write pointer */
- };
- 
- #define REQ_OP_BITS 3
--- 
-2.9.3
+Bart.
