@@ -1,21 +1,101 @@
-Return-Path: <hch@lst.de>
-Date: Wed, 28 Sep 2016 04:04:33 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Damien Le Moal <damien.lemoal@hgst.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	Hannes Reinecke <hare@suse.de>, Shaun Tancheff <shaun@tancheff.com>
-Subject: Re: [PATCH v3 0/7] ZBC / Zoned block device support
-Message-ID: <20160928020433.GA4443@lst.de>
-References: <1475025757-6340-1-git-send-email-damien.lemoal@hgst.com>
+Return-Path: <Damien.LeMoal@hgst.com>
+From: Damien Le Moal <damien.lemoal@hgst.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>, Christoph
+ Hellwig <hch@lst.de>, "Martin K . Petersen" <martin.petersen@oracle.com>,
+	Hannes Reinecke <hare@suse.de>, Shaun Tancheff <shaun@tancheff.com>, Damien
+ Le Moal <damien.lemoal@hgst.com>
+Subject: [PATCH v3 0/7] ZBC / Zoned block device support
+Date: Wed, 28 Sep 2016 10:22:30 +0900
+Message-ID: <1475025757-6340-1-git-send-email-damien.lemoal@hgst.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1475025757-6340-1-git-send-email-damien.lemoal@hgst.com>
+Content-Type: text/plain
+Return-Path: damien.lemoal@hgst.com
 List-ID: <linux-block@vger.kernel.org>
 
-The updated series looks fine to me:
+This series introduces support for zoned block devices. It integrates
+earlier submissions by Hannes Reinecke and Shaun Tancheff. Compared to the
+previous series version, the code was significantly simplified by limiting
+support to zoned devices satisfying the following conditions:
+1) All zones of the device are the same size, with the exception of an
+   eventual last smaller runt zone.
+2) For host-managed disks, reads must be unrestricted (read commands do not
+   fail due to zone or write pointer alignement constraints).
+Zoned disks that do not satisfy these 2 conditions are ignored.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+These 2 conditions allowed dropping the zone information cache implemented
+in the previous version. This simplifies the code and also reduces the memory
+consumption at run time. Support for zoned devices now only require one bit
+per zone (less than 8KB in total). This bit field is used to write-lock
+zones and prevent the concurrent execution of multiple write commands in
+the same zone. This avoids write ordering problems at dispatch time, for
+both the simple queue and scsi-mq settings.
 
-Thanks a lot shaun and Demian for your hard work in the last weeks!
+The new operations introduced to suport zone manipulation was reduced to
+only the two main ZBC/ZAC defined commands: REPORT ZONES (REQ_OP_ZONE_REPORT)
+and RESET WRITE POINTER (REQ_OP_ZONE_RESET). This brings the total number of
+operations defined to 8, which fits in the 3 bits (REQ_OP_BITS) reserved for
+operation code in bio->bi_opf and req->cmd_flags.
+
+Most of the ZBC specific code is kept out of sd.c and implemented in the
+new file sd_zbc.c. Similarly, at the block layer, most of the zoned block
+device code is implemented in the new blk-zoned.c.
+
+For host-managed zoned block devices, the sequential write constraint of
+write pointer zones is exposed to the user. Users of the disk (applications,
+file systems or device mappers) must sequentially write to zones. This means
+that for raw block device accesses from applications, buffered writes are
+unreliable and direct I/Os must be used (or buffered writes with O_SYNC).
+
+Access to zone manipulation operations is also provided to applications
+through a set of new ioctls. This allows applications operating on raw
+block devices (e.g. mkfs.xxx) to discover a device zone layout and
+manipulate zone state.
+
+Changes from v2:
+* Use kcalloc to allocate zone information array for ioctl
+* Use kcalloc to allocate zone information array for ioctl
+* Export GPL the functions blkdev_report_zones and blkdev_reset_zones
+* Shuffled uapi definitions from patch 7 into patch 5
+
+Damien Le Moal (1):
+  block: Add 'zoned' queue limit
+
+Hannes Reinecke (4):
+  blk-sysfs: Add 'chunk_sectors' to sysfs attributes
+  block: update chunk_sectors in blk_stack_limits()
+  block: Implement support for zoned block devices
+  sd: Implement support for ZBC devices
+
+Shaun Tancheff (2):
+  block: Define zoned block device operations
+  blk-zoned: implement ioctls
+
+ block/Kconfig                 |   8 +
+ block/Makefile                |   1 +
+ block/blk-core.c              |   4 +
+ block/blk-settings.c          |   5 +
+ block/blk-sysfs.c             |  29 +++
+ block/blk-zoned.c             | 350 +++++++++++++++++++++++++
+ block/ioctl.c                 |   4 +
+ drivers/scsi/Makefile         |   1 +
+ drivers/scsi/sd.c             |  97 ++++++-
+ drivers/scsi/sd.h             |  67 +++++
+ drivers/scsi/sd_zbc.c         | 586 ++++++++++++++++++++++++++++++++++++++++++
+ include/linux/blk_types.h     |   2 +
+ include/linux/blkdev.h        |  99 +++++++
+ include/scsi/scsi_proto.h     |  17 ++
+ include/uapi/linux/Kbuild     |   1 +
+ include/uapi/linux/blkzoned.h | 143 +++++++++++
+ include/uapi/linux/fs.h       |   4 +
+ 17 files changed, 1404 insertions(+), 14 deletions(-)
+ create mode 100644 block/blk-zoned.c
+ create mode 100644 drivers/scsi/sd_zbc.c
+ create mode 100644 include/uapi/linux/blkzoned.h
+
+-- 
+2.7.4
+
+Western Digital Corporation (and its subsidiaries) E-mail Confidentiality Notice & Disclaimer:
+
+This e-mail and any files transmitted with it may contain confidential or legally privileged information of WDC and/or its affiliates, and are intended solely for the use of the individual or entity to which they are addressed. If you are not the intended recipient, any disclosure, copying, distribution or any action taken or omitted to be taken in reliance on it, is prohibited. If you have received this e-mail in error, please notify the sender immediately and delete the e-mail in its entirety from your system.
