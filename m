@@ -1,68 +1,53 @@
-Return-Path: <Damien.LeMoal@hgst.com>
-From: Damien Le Moal <damien.lemoal@hgst.com>
-To: <linux-scsi@vger.kernel.org>, <linux-block@vger.kernel.org>
-CC: <martin.petersen@oracle.com>, <axboe@kernel.dk>, <hare@suse.de>,
-	<shaun.tancheff@seagate.com>, Damien Le Moal <damien.lemoal@hgst.com>
-Subject: [PATCH 2/9] blk-sysfs: Add 'chunk_sectors' to sysfs attributes
-Date: Tue, 20 Sep 2016 06:27:27 +0900
-Message-ID: <1474320454-5264-3-git-send-email-damien.lemoal@hgst.com>
-In-Reply-To: <1474320454-5264-1-git-send-email-damien.lemoal@hgst.com>
-References: <1474320454-5264-1-git-send-email-damien.lemoal@hgst.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: damien.lemoal@hgst.com
+Return-Path: <krisman@linux.vnet.ibm.com>
+From: Gabriel Krisman Bertazi <krisman@linux.vnet.ibm.com>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+        Gabriel Krisman Bertazi <krisman@linux.vnet.ibm.com>
+Subject: [PATCH] blk-mq: Always schedule hctx->next_cpu
+Date: Wed, 28 Sep 2016 00:24:24 -0300
+Message-Id: <1475033064-31848-1-git-send-email-krisman@linux.vnet.ibm.com>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Hannes Reinecke <hare@suse.de>
+Commit 0e87e58bf60e ("blk-mq: improve warning for running a queue on the
+wrong CPU") attempts to avoid triggering the WARN_ON in
+__blk_mq_run_hw_queue when the expected CPU is dead.  Problem is, in the
+last batch execution before round robin, blk_mq_hctx_next_cpu can
+schedule a dead CPU and also update next_cpu to the next alive CPU in
+the mask, which will trigger the WARN_ON despite the previous
+workaround.
 
-The queue limits already have a 'chunk_sectors' setting, so
-we should be presenting it via sysfs.
+The following patch fixes this scenario by always scheduling the value
+in hctx->next_cpu.  This changes the moment when we round-robin the CPU
+running the hctx, but it really doesn't matter, since it still executes
+BLK_MQ_CPU_WORK_BATCH times in a row before switching to another CPU.
 
-Signed-off-by: Hannes Reinecke <hare@suse.de>
-Signed-off-by: Damien Le Moal <damien.lemoal@hgst.com>
+Fixes: 0e87e58bf60e ("blk-mq: improve warning for running a queue on the wrong CPU")
+Signed-off-by: Gabriel Krisman Bertazi <krisman@linux.vnet.ibm.com>
 ---
- block/blk-sysfs.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ block/blk-mq.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 31ecff9..15e5baf 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -130,6 +130,11 @@ static ssize_t queue_physical_block_size_show(struct request_queue *q, char *pag
- 	return queue_var_show(queue_physical_block_size(q), page);
- }
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 0be5577b0d56..367d21215345 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -883,7 +883,7 @@ static int blk_mq_hctx_next_cpu(struct blk_mq_hw_ctx *hctx)
+ 		return WORK_CPU_UNBOUND;
  
-+static ssize_t queue_chunk_sectors_show(struct request_queue *q, char *page)
-+{
-+	return queue_var_show(q->limits.chunk_sectors, page);
-+}
-+
- static ssize_t queue_io_min_show(struct request_queue *q, char *page)
- {
- 	return queue_var_show(queue_io_min(q), page);
-@@ -455,6 +460,11 @@ static struct queue_sysfs_entry queue_physical_block_size_entry = {
- 	.show = queue_physical_block_size_show,
- };
+ 	if (--hctx->next_cpu_batch <= 0) {
+-		int cpu = hctx->next_cpu, next_cpu;
++		int next_cpu;
  
-+static struct queue_sysfs_entry queue_chunk_sectors_entry = {
-+	.attr = {.name = "chunk_sectors", .mode = S_IRUGO },
-+	.show = queue_chunk_sectors_show,
-+};
-+
- static struct queue_sysfs_entry queue_io_min_entry = {
- 	.attr = {.name = "minimum_io_size", .mode = S_IRUGO },
- 	.show = queue_io_min_show,
-@@ -555,6 +565,7 @@ static struct attribute *default_attrs[] = {
- 	&queue_hw_sector_size_entry.attr,
- 	&queue_logical_block_size_entry.attr,
- 	&queue_physical_block_size_entry.attr,
-+	&queue_chunk_sectors_entry.attr,
- 	&queue_io_min_entry.attr,
- 	&queue_io_opt_entry.attr,
- 	&queue_discard_granularity_entry.attr,
+ 		next_cpu = cpumask_next(hctx->next_cpu, hctx->cpumask);
+ 		if (next_cpu >= nr_cpu_ids)
+@@ -891,8 +891,6 @@ static int blk_mq_hctx_next_cpu(struct blk_mq_hw_ctx *hctx)
+ 
+ 		hctx->next_cpu = next_cpu;
+ 		hctx->next_cpu_batch = BLK_MQ_CPU_WORK_BATCH;
+-
+-		return cpu;
+ 	}
+ 
+ 	return hctx->next_cpu;
 -- 
 2.7.4
-
-Western Digital Corporation (and its subsidiaries) E-mail Confidentiality Notice & Disclaimer:
-
-This e-mail and any files transmitted with it may contain confidential or legally privileged information of WDC and/or its affiliates, and are intended solely for the use of the individual or entity to which they are addressed. If you are not the intended recipient, any disclosure, copying, distribution or any action taken or omitted to be taken in reliance on it, is prohibited. If you have received this e-mail in error, please notify the sender immediately and delete the e-mail in its entirety from your system.
