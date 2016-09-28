@@ -1,32 +1,33 @@
-Return-Path: <linus.walleij@linaro.org>
+Return-Path: <martin.petersen@oracle.com>
+To: Damien Le Moal <damien.lemoal@hgst.com>
+Cc: Jens Axboe <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
+        <linux-scsi@vger.kernel.org>, "Christoph Hellwig" <hch@lst.de>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Hannes Reinecke <hare@suse.de>, Shaun Tancheff <shaun@tancheff.com>,
+        Shaun Tancheff <shaun.tancheff@seagate.com>
+Subject: Re: [PATCH v3 4/7] block: Define zoned block device operations
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <1475025757-6340-1-git-send-email-damien.lemoal@hgst.com>
+	<1475025757-6340-5-git-send-email-damien.lemoal@hgst.com>
+Date: Tue, 27 Sep 2016 23:45:10 -0400
+In-Reply-To: <1475025757-6340-5-git-send-email-damien.lemoal@hgst.com> (Damien
+	Le Moal's message of "Wed, 28 Sep 2016 10:22:34 +0900")
+Message-ID: <yq1h990znzt.fsf@sermon.lab.mkp.net>
 MIME-Version: 1.0
-In-Reply-To: <20160831220949.GD5967@sirena.org.uk>
-References: <1470654917-4280-1-git-send-email-paolo.valente@linaro.org>
- <20160808131954.GA12647@infradead.org> <20160831220949.GD5967@sirena.org.uk>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Thu, 1 Sep 2016 10:39:46 +0200
-Message-ID: <CACRpkdZjMcOyn6C-xV3yLsQM0hxZ1JUMGmmS8VqaDpx1xiL1ZA@mail.gmail.com>
-Subject: Re: [PATCH V2 00/22] Replace the CFQ I/O Scheduler with BFQ
-To: Mark Brown <broonie@kernel.org>
-Cc: Christoph Hellwig <hch@infradead.org>, Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-	Paolo Valente <paolo.valente@linaro.org>, linux-block@vger.kernel.org,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Ulf Hansson <ulf.hansson@linaro.org>,
-	Omar Sandoval <osandov@fb.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Sep 1, 2016 at 12:09 AM, Mark Brown <broonie@kernel.org> wrote:
+>>>>> "Damien" == Damien Le Moal <damien.lemoal@hgst.com> writes:
 
->  - Do some benchmarks on the current status of the various branches on
->    relevant hardware (including trying to convert some of these slower
->    devices to blk-mq and seeing what happens).  Linus has been working
->    on this already in the context of MMC.
+Damien> Define REQ_OP_ZONE_REPORT and REQ_OP_ZONE_RESET for handling
+Damien> zones of host-managed and host-aware zoned block devices. With
+Damien> with these two new operations, the total number of operations
+Damien> defined reaches 8 and still fits with the 3 bits definition of
+Damien> REQ_OP_BITS.
 
-I'm trying to do a patch switching MMC to use blk-mq, so I can
-benchmark performance before/after this.
+Nicer!
 
-While we expect mq to perform worse on single-hardware-queue
-devices like these, we don't know until we tried, so I'm trying.
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
 
-Yours,
-Linus Walleij
+-- 
+Martin K. Petersen	Oracle Linux Engineering
