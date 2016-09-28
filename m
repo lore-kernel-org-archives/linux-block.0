@@ -1,38 +1,42 @@
-Return-Path: <htejun@gmail.com>
-Return-Path: <htejun@gmail.com>
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Thu, 29 Sep 2016 10:48:34 +0200
-From: "tj@kernel.org" <tj@kernel.org>
-To: Adam Manzanares <Adam.Manzanares@hgst.com>
-Cc: Christoph Hellwig <hch@infradead.org>,
-	"axboe@kernel.dk" <axboe@kernel.dk>,
+Return-Path: <Adam.Manzanares@hgst.com>
+From: Adam Manzanares <Adam.Manzanares@hgst.com>
+To: Christoph Hellwig <hch@infradead.org>
+CC: "axboe@kernel.dk" <axboe@kernel.dk>, "tj@kernel.org" <tj@kernel.org>,
 	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
 	"linux-ide@vger.kernel.org" <linux-ide@vger.kernel.org>
 Subject: Re: [PATCH 0/3] Enabling ATA Command Priorities
-Message-ID: <20160929084834.GD11087@mtj.duckdns.org>
+Date: Wed, 28 Sep 2016 03:43:32 +0000
+Message-ID: <5C8FF242-7C7B-442E-A6FF-89878366F154@hgst.com>
 References: <1475000096-6148-1-git-send-email-adam.manzanares@hgst.com>
  <20160928020610.GA28998@infradead.org>
- <5C8FF242-7C7B-442E-A6FF-89878366F154@hgst.com>
+In-Reply-To: <20160928020610.GA28998@infradead.org>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <5C8FF242-7C7B-442E-A6FF-89878366F154@hgst.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Hello,
-
-On Wed, Sep 28, 2016 at 03:43:32AM +0000, Adam Manzanares wrote:
-> I prefer having the feature conditional so you can use the CFQ
-> scheduler with I/O priorities as is. If you decide to enable the
-> feature then the priorities will be passed down to the drive in
-> addition to the work that the CFQ scheduler does. Since this feature
-> may change the user perceived performance of the device I want to
-> make sure they know what they are getting into.
-
-Yeah, I prefer to have it behind an explicit flag given the history of
-optional ATA features.  The feature is unlikely to matter to a lot of
-people and is almost bound to break existing RT prio usages.
-
-Thanks.
-
--- 
-tejun
+SSBwcmVmZXIgaGF2aW5nIHRoZSBmZWF0dXJlIGNvbmRpdGlvbmFsIHNvIHlvdSBjYW4gdXNlIHRo
+ZSBDRlEgc2NoZWR1bGVyIHdpdGggSS9PIHByaW9yaXRpZXMgYXMgaXMuIElmIHlvdSBkZWNpZGUg
+dG8gZW5hYmxlIHRoZSBmZWF0dXJlIHRoZW4gdGhlIHByaW9yaXRpZXMgd2lsbCBiZSBwYXNzZWQg
+ZG93biB0byB0aGUgZHJpdmUgaW4gYWRkaXRpb24gdG8gdGhlIHdvcmsgdGhhdCB0aGUgQ0ZRIHNj
+aGVkdWxlciBkb2VzLiBTaW5jZSB0aGlzIGZlYXR1cmUgbWF5IGNoYW5nZSB0aGUgdXNlciBwZXJj
+ZWl2ZWQgcGVyZm9ybWFuY2Ugb2YgdGhlIGRldmljZSBJIHdhbnQgdG8gbWFrZSBzdXJlIHRoZXkg
+a25vdyB3aGF0IHRoZXkgYXJlIGdldHRpbmcgaW50by4NCg0KDQoNCg0KDQpPbiA5LzI3LzE2LCA3
+OjA2IFBNLCAiQ2hyaXN0b3BoIEhlbGx3aWciIDxoY2hAaW5mcmFkZWFkLm9yZz4gd3JvdGU6DQoN
+Cj5UaGUgc2VyaWVzIGxvb2tzIGZpbmUgdG8gbWU6DQo+DQo+UmV2aWV3ZWQtYnk6IENocmlzdG9w
+aCBIZWxsd2lnIDxoY2hAbHN0LmRlPg0KPg0KPlRoZSBvbmx5IHF1ZXN0aW9uIGlzIGlmIHdlIG5l
+ZWQgdG8gYm90aGVyIHdpdGggdGhlIGxhc3QgcGF0Y2ggdG8NCj5tYWtlIHRoZSBmZWF0dXJlIGNv
+bmRpdGlvbmFsIGF0IGFsbCwgZ2l2ZW4gdGhhdCB3ZSBib3RoIG5lZWQgaGFyZHdhcmUNCj5zdXBw
+b3J0IGFuZCBhcHBsaWNhdGlvbnMgb3B0aW5nIGludG8gdXNpbmcgSS9PIHByaW9yaXRpZXMgdG8g
+ZXZlbiB1c2UNCj5pdC4gIEJ1dCBpZiB5b3UgZmVlbCBpdCdzIHNhZmVyIHRoYXQgd2F5IHRoZSB1
+bmFibGUgY2VydGFpbmx5IGRvZXNuJ3QNCj5odXJ0Lg0KV2VzdGVybiBEaWdpdGFsIENvcnBvcmF0
+aW9uIChhbmQgaXRzIHN1YnNpZGlhcmllcykgRS1tYWlsIENvbmZpZGVudGlhbGl0eSBOb3RpY2Ug
+JiBEaXNjbGFpbWVyOgoKVGhpcyBlLW1haWwgYW5kIGFueSBmaWxlcyB0cmFuc21pdHRlZCB3aXRo
+IGl0IG1heSBjb250YWluIGNvbmZpZGVudGlhbCBvciBsZWdhbGx5IHByaXZpbGVnZWQgaW5mb3Jt
+YXRpb24gb2YgV0RDIGFuZC9vciBpdHMgYWZmaWxpYXRlcywgYW5kIGFyZSBpbnRlbmRlZCBzb2xl
+bHkgZm9yIHRoZSB1c2Ugb2YgdGhlIGluZGl2aWR1YWwgb3IgZW50aXR5IHRvIHdoaWNoIHRoZXkg
+YXJlIGFkZHJlc3NlZC4gSWYgeW91IGFyZSBub3QgdGhlIGludGVuZGVkIHJlY2lwaWVudCwgYW55
+IGRpc2Nsb3N1cmUsIGNvcHlpbmcsIGRpc3RyaWJ1dGlvbiBvciBhbnkgYWN0aW9uIHRha2VuIG9y
+IG9taXR0ZWQgdG8gYmUgdGFrZW4gaW4gcmVsaWFuY2Ugb24gaXQsIGlzIHByb2hpYml0ZWQuIElm
+IHlvdSBoYXZlIHJlY2VpdmVkIHRoaXMgZS1tYWlsIGluIGVycm9yLCBwbGVhc2Ugbm90aWZ5IHRo
+ZSBzZW5kZXIgaW1tZWRpYXRlbHkgYW5kIGRlbGV0ZSB0aGUgZS1tYWlsIGluIGl0cyBlbnRpcmV0
+eSBmcm9tIHlvdXIgc3lzdGVtLgo=
