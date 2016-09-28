@@ -1,82 +1,50 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-dm3nam03on0068.outbound.protection.outlook.com ([104.47.41.68]:3380
-        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1753938AbcI2ACb (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Sep 2016 20:02:31 -0400
-Subject: [PATCH v2 2/7] dm: Use BLK_MQ_S_STOPPED instead of QUEUE_FLAG_STOPPED
- in blk-mq code
-To: Jens Axboe <axboe@fb.com>
-References: <f153ee47-e599-c333-92b0-d5da475012f3@sandisk.com>
-CC: Christoph Hellwig <hch@lst.de>,
-        James Bottomley <jejb@linux.vnet.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Doug Ledford <dledford@redhat.com>,
-        Keith Busch <keith.busch@intel.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-Message-ID: <43265806-b77f-b357-cbf1-1d05cf253f97@sandisk.com>
-Date: Wed, 28 Sep 2016 17:02:23 -0700
+Received: from smtp.opengridcomputing.com ([72.48.136.20]:36944 "EHLO
+        smtp.opengridcomputing.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S932362AbcI1OXA (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 28 Sep 2016 10:23:00 -0400
+From: "Steve Wise" <swise@opengridcomputing.com>
+To: "'Bart Van Assche'" <bart.vanassche@sandisk.com>,
+        "'James Bottomley'" <jejb@linux.vnet.ibm.com>,
+        "'Jens Axboe'" <axboe@fb.com>
+Cc: <linux-block@vger.kernel.org>,
+        "'Martin K. Petersen'" <martin.petersen@oracle.com>,
+        "'Mike Snitzer'" <snitzer@redhat.com>,
+        <linux-rdma@vger.kernel.org>, <linux-nvme@lists.infradead.org>,
+        "'Keith Busch'" <keith.busch@intel.com>,
+        "'Doug Ledford'" <dledford@redhat.com>,
+        <linux-scsi@vger.kernel.org>, "'Christoph Hellwig'" <hch@lst.de>
+References: <7948dbb8-6333-dc62-2673-4da35b4dfdbc@sandisk.com> <9c372b04-a194-58c4-a64f-b155b52a5244@sandisk.com> <013c01d218dc$8a5406c0$9efc1440$@opengridcomputing.com> <9d8e0f32-6703-cf23-d424-bcecb65c2a26@sandisk.com> <1474995360.2716.19.camel@linux.vnet.ibm.com> <3fb86a78-de3a-b764-a493-cb5bc5b6d8b6@sandisk.com>
+In-Reply-To: <3fb86a78-de3a-b764-a493-cb5bc5b6d8b6@sandisk.com>
+Subject: RE: [PATCH 9/9] [RFC] nvme: Fix a race condition
+Date: Wed, 28 Sep 2016 09:23:03 -0500
+Message-ID: <009601d21993$d2d33670$7879a350$@opengridcomputing.com>
 MIME-Version: 1.0
-In-Reply-To: <f153ee47-e599-c333-92b0-d5da475012f3@sandisk.com>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain;
+        charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Mike Snitzer <snitzer@redhat.com>
----
- drivers/md/dm-rq.c | 18 ++----------------
- 1 file changed, 2 insertions(+), 16 deletions(-)
+> 
+> Hello James and Steve,
+> 
+> I will add a comment.
+> 
+> Please note that the above patch does not change the behavior of
+> nvme_stop_queues() except that it causes nvme_stop_queues() to wait
+> until any ongoing nvme_queue_rq() calls have finished.
+> blk_resume_queue() does not affect the value of the BLK_MQ_S_STOPPED bit
+> that has been set by blk_mq_stop_hw_queues(). All it does is to resume
+> pending blk_queue_enter() calls and to ensure that future
+> blk_queue_enter() calls do not block. Even after blk_resume_queue() has
+> been called if a new request is queued queue_rq() won't be invoked
+> because the BLK_MQ_S_STOPPED bit is still set. Patch "dm: Fix a race
+> condition related to stopping and starting queues" realizes a similar
+> change in the dm driver and that change has been tested extensively.
+> 
 
-diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
-index 182b679..f2c271a 100644
---- a/drivers/md/dm-rq.c
-+++ b/drivers/md/dm-rq.c
-@@ -75,12 +75,6 @@ static void dm_old_start_queue(struct request_queue *q)
- 
- static void dm_mq_start_queue(struct request_queue *q)
- {
--	unsigned long flags;
--
--	spin_lock_irqsave(q->queue_lock, flags);
--	queue_flag_clear(QUEUE_FLAG_STOPPED, q);
--	spin_unlock_irqrestore(q->queue_lock, flags);
--
- 	blk_mq_start_stopped_hw_queues(q, true);
- 	blk_mq_kick_requeue_list(q);
- }
-@@ -105,16 +99,8 @@ static void dm_old_stop_queue(struct request_queue *q)
- 
- static void dm_mq_stop_queue(struct request_queue *q)
- {
--	unsigned long flags;
--
--	spin_lock_irqsave(q->queue_lock, flags);
--	if (blk_queue_stopped(q)) {
--		spin_unlock_irqrestore(q->queue_lock, flags);
-+	if (blk_mq_queue_stopped(q))
- 		return;
--	}
--
--	queue_flag_set(QUEUE_FLAG_STOPPED, q);
--	spin_unlock_irqrestore(q->queue_lock, flags);
- 
- 	/* Avoid that requeuing could restart the queue. */
- 	blk_mq_cancel_requeue_work(q);
-@@ -341,7 +327,7 @@ static void __dm_mq_kick_requeue_list(struct request_queue *q, unsigned long mse
- 	unsigned long flags;
- 
- 	spin_lock_irqsave(q->queue_lock, flags);
--	if (!blk_queue_stopped(q))
-+	if (!blk_mq_queue_stopped(q))
- 		blk_mq_delay_kick_requeue_list(q, msecs);
- 	spin_unlock_irqrestore(q->queue_lock, flags);
- }
--- 
-2.10.0
+Thanks for the detailed explanation!  I think your code, then, is correct as-is.   And this series doesn't fix the issue I'm hitting, so I'll keep digging. :)
+
+Steve.  
 
