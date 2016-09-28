@@ -1,65 +1,45 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:9896 "EHLO
-        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750765AbcI1EVr (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Sep 2016 00:21:47 -0400
-Subject: Re: [PATCH v3 5/7] block: Implement support for zoned block devices
-To: "Martin K. Petersen" <martin.petersen@oracle.com>
-References: <1475025757-6340-1-git-send-email-damien.lemoal@hgst.com>
- <1475025757-6340-6-git-send-email-damien.lemoal@hgst.com>
- <yq1d1joznjh.fsf@sermon.lab.mkp.net>
-CC: Jens Axboe <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
+Return-Path: <martin.petersen@oracle.com>
+To: Damien Le Moal <damien.lemoal@hgst.com>
+Cc: Jens Axboe <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
         <linux-scsi@vger.kernel.org>, Christoph Hellwig <hch@lst.de>,
-        Hannes Reinecke <hare@suse.de>,
-        Shaun Tancheff <shaun@tancheff.com>
-From: Damien Le Moal <damien.lemoal@hgst.com>
-Message-ID: <6d9a2682-33f8-be5a-1f7d-d118663b0986@hgst.com>
-Date: Wed, 28 Sep 2016 13:21:36 +0900
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Hannes Reinecke <hare@suse.de>, Shaun Tancheff <shaun@tancheff.com>
+Subject: Re: [PATCH v3 5/7] block: Implement support for zoned block devices
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <1475025757-6340-1-git-send-email-damien.lemoal@hgst.com>
+	<1475025757-6340-6-git-send-email-damien.lemoal@hgst.com>
+Date: Tue, 27 Sep 2016 23:54:58 -0400
+In-Reply-To: <1475025757-6340-6-git-send-email-damien.lemoal@hgst.com> (Damien
+	Le Moal's message of "Wed, 28 Sep 2016 10:22:35 +0900")
+Message-ID: <yq1d1joznjh.fsf@sermon.lab.mkp.net>
 MIME-Version: 1.0
-In-Reply-To: <yq1d1joznjh.fsf@sermon.lab.mkp.net>
-Content-Type: text/plain; charset="windows-1252"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain
+List-ID: <linux-block@vger.kernel.org>
 
+>>>>> "Damien" == Damien Le Moal <damien.lemoal@hgst.com> writes:
 
-Martin,
+Purely cosmetic: Looks like whitespace is a bit funky (spaces instead of
+tabs several places). Also a few typos.
 
-On 9/28/16 12:54, Martin K. Petersen wrote:
->>>>>> "Damien" == Damien Le Moal <damien.lemoal@hgst.com> writes:
-> 
-> Purely cosmetic: Looks like whitespace is a bit funky (spaces instead of
-> tabs several places). Also a few typos.
-> 
-> + * blkdev_report_zones - Get zones information
-> + * @bdev:	Target block device
-> + * @sector:	Sector from which to report zones
-> + * @zones:      Array of zone structures where to return the zones information
-> + * @nr_zones:   Number of zone structures in the zone array
-> + * @gfp_mask:	Memory allocation flags (for bio_alloc)
-> 
-> Tabs and spaces: Together at last! ^^^^^
-> 
-> +	/*
-> +	 * Process the report resukt: skip the header and go through the
-> 
-> result
-> 
-> +	/* Check alignement (handle eventual smaller last zone) */
-> 
-> alignment
++ * blkdev_report_zones - Get zones information
++ * @bdev:	Target block device
++ * @sector:	Sector from which to report zones
++ * @zones:      Array of zone structures where to return the zones information
++ * @nr_zones:   Number of zone structures in the zone array
++ * @gfp_mask:	Memory allocation flags (for bio_alloc)
 
-Thanks for all the comments. Should I send a fixed-up series or just
-send correction patches later ?
+Tabs and spaces: Together at last! ^^^^^
 
-Best regards.
++	/*
++	 * Process the report resukt: skip the header and go through the
+
+result
+
++	/* Check alignement (handle eventual smaller last zone) */
+
+alignment
+
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
 
 -- 
-Damien Le Moal, Ph.D.
-Sr. Manager, System Software Group, HGST Research,
-HGST, a Western Digital brand
-Damien.LeMoal@hgst.com
-(+81) 0466-98-3593 (ext. 513593)
-1 kirihara-cho, Fujisawa, 
-Kanagawa, 252-0888 Japan
-www.hgst.com
+Martin K. Petersen	Oracle Linux Engineering
