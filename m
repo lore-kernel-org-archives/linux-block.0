@@ -1,154 +1,264 @@
-Return-Path: <tglx@linutronix.de>
-Message-Id: <20160920152108.092081086@linutronix.de>
-Date: Tue, 20 Sep 2016 15:21:55 -0000
-From: Thomas Gleixner <tglx@linutronix.de>
-To: LKML <linux-kernel@vger.kernel.org>
-Cc: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
- Christoph Hellwing <hch@lst.de>, Sebastian Siewior <bigeasy@linutronix.de>,
- Peter Zijlstra <peterz@infradead.org>, rt@linutronix.de
-Subject: [patch V2 2/2] blk/mq: Convert to hotplug state machine
-References: <20160920152020.777561324@linutronix.de>
+Return-Path: <Damien.LeMoal@hgst.com>
+From: Damien Le Moal <damien.lemoal@hgst.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>, Christoph
+ Hellwig <hch@lst.de>, "Martin K . Petersen" <martin.petersen@oracle.com>,
+	Hannes Reinecke <hare@suse.de>, Shaun Tancheff <shaun@tancheff.com>, Damien
+ Le Moal <damien.lemoal@hgst.com>, Shaun Tancheff <shaun.tancheff@seagate.com>
+Subject: [PATCH v4 7/7] blk-zoned: implement ioctls
+Date: Wed, 28 Sep 2016 17:45:39 +0900
+Message-ID: <1475052339-10202-8-git-send-email-damien.lemoal@hgst.com>
+In-Reply-To: <1475052339-10202-1-git-send-email-damien.lemoal@hgst.com>
+References: <1475052339-10202-1-git-send-email-damien.lemoal@hgst.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-15
+Content-Type: text/plain
+Return-Path: damien.lemoal@hgst.com
 List-ID: <linux-block@vger.kernel.org>
 
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+From: Shaun Tancheff <shaun@tancheff.com>
 
-Install the callbacks via the state machine so we can phase out the cpu
-hotplug notifiers mess.
+Adds the new BLKREPORTZONE and BLKRESETZONE ioctls for respectively
+obtaining the zone configuration of a zoned block device and resetting
+the write pointer of sequential zones of a zoned block device.
 
+The BLKREPORTZONE ioctl maps directly to a single call of the function
+blkdev_report_zones. The zone information result is passed as an array
+of struct blk_zone identical to the structure used internally for
+processing the REQ_OP_ZONE_REPORT operation.  The BLKRESETZONE ioctl
+maps to a single call of the blkdev_reset_zones function.
 
-Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: Peter Zijlstra <peterz@infradead.org>
-Cc: linux-block@vger.kernel.org
-Cc: rt@linutronix.de
-Cc: Christoph Hellwing <hch@lst.de>
-Link: http://lkml.kernel.org/r/20160919212601.180033814@linutronix.de
-Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
-
+Signed-off-by: Shaun Tancheff <shaun.tancheff@seagate.com>
+Signed-off-by: Damien Le Moal <damien.lemoal@hgst.com>
 ---
+ block/blk-zoned.c             | 93 +++++++++++++++++++++++++++++++++++++++++++
+ block/ioctl.c                 |  4 ++
+ include/linux/blkdev.h        | 21 ++++++++++
+ include/uapi/linux/blkzoned.h | 40 +++++++++++++++++++
+ include/uapi/linux/fs.h       |  4 ++
+ 5 files changed, 162 insertions(+)
 
- block/blk-mq.c |   87 ++++++++++++++++++++++++++++-----------------------------
- 1 file changed, 43 insertions(+), 44 deletions(-)
-
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2090,50 +2090,18 @@ static void blk_mq_queue_reinit(struct r
- 	blk_mq_sysfs_register(q);
- }
- 
--static int blk_mq_queue_reinit_notify(struct notifier_block *nb,
--				      unsigned long action, void *hcpu)
-+/*
-+ * New online cpumask which is going to be set in this hotplug event.
-+ * Declare this cpumasks as global as cpu-hotplug operation is invoked
-+ * one-by-one and dynamically allocating this could result in a failure.
-+ */
-+static struct cpumask cpuhp_online_new;
-+
-+static void blk_mq_queue_reinit_work(void)
- {
- 	struct request_queue *q;
--	int cpu = (unsigned long)hcpu;
--	/*
--	 * New online cpumask which is going to be set in this hotplug event.
--	 * Declare this cpumasks as global as cpu-hotplug operation is invoked
--	 * one-by-one and dynamically allocating this could result in a failure.
--	 */
--	static struct cpumask online_new;
--
--	/*
--	 * Before hotadded cpu starts handling requests, new mappings must
--	 * be established.  Otherwise, these requests in hw queue might
--	 * never be dispatched.
--	 *
--	 * For example, there is a single hw queue (hctx) and two CPU queues
--	 * (ctx0 for CPU0, and ctx1 for CPU1).
--	 *
--	 * Now CPU1 is just onlined and a request is inserted into
--	 * ctx1->rq_list and set bit0 in pending bitmap as ctx1->index_hw is
--	 * still zero.
--	 *
--	 * And then while running hw queue, flush_busy_ctxs() finds bit0 is
--	 * set in pending bitmap and tries to retrieve requests in
--	 * hctx->ctxs[0]->rq_list.  But htx->ctxs[0] is a pointer to ctx0,
--	 * so the request in ctx1->rq_list is ignored.
--	 */
--	switch (action & ~CPU_TASKS_FROZEN) {
--	case CPU_DEAD:
--	case CPU_UP_CANCELED:
--		cpumask_copy(&online_new, cpu_online_mask);
--		break;
--	case CPU_UP_PREPARE:
--		cpumask_copy(&online_new, cpu_online_mask);
--		cpumask_set_cpu(cpu, &online_new);
--		break;
--	default:
--		return NOTIFY_OK;
--	}
- 
- 	mutex_lock(&all_q_mutex);
--
- 	/*
- 	 * We need to freeze and reinit all existing queues.  Freezing
- 	 * involves synchronous wait for an RCU grace period and doing it
-@@ -2154,13 +2122,43 @@ static int blk_mq_queue_reinit_notify(st
- 	}
- 
- 	list_for_each_entry(q, &all_q_list, all_q_node)
--		blk_mq_queue_reinit(q, &online_new);
-+		blk_mq_queue_reinit(q, &cpuhp_online_new);
- 
- 	list_for_each_entry(q, &all_q_list, all_q_node)
- 		blk_mq_unfreeze_queue(q);
- 
- 	mutex_unlock(&all_q_mutex);
--	return NOTIFY_OK;
-+}
-+
-+static int blk_mq_queue_reinit_dead(unsigned int cpu)
-+{
-+	cpumask_clear_cpu(cpu, &cpuhp_online_new);
-+	blk_mq_queue_reinit_work();
-+	return 0;
-+}
-+
-+/*
-+ * Before hotadded cpu starts handling requests, new mappings must be
-+ * established.  Otherwise, these requests in hw queue might never be
-+ * dispatched.
-+ *
-+ * For example, there is a single hw queue (hctx) and two CPU queues (ctx0
-+ * for CPU0, and ctx1 for CPU1).
-+ *
-+ * Now CPU1 is just onlined and a request is inserted into ctx1->rq_list
-+ * and set bit0 in pending bitmap as ctx1->index_hw is still zero.
-+ *
-+ * And then while running hw queue, flush_busy_ctxs() finds bit0 is set in
-+ * pending bitmap and tries to retrieve requests in hctx->ctxs[0]->rq_list.
-+ * But htx->ctxs[0] is a pointer to ctx0, so the request in ctx1->rq_list
-+ * is ignored.
-+ */
-+static int blk_mq_queue_reinit_prepare(unsigned int cpu)
-+{
-+	cpumask_copy(&cpuhp_online_new, cpu_online_mask);
-+	cpumask_set_cpu(cpu, &cpuhp_online_new);
-+	blk_mq_queue_reinit_work();
-+	return 0;
- }
- 
- static int __blk_mq_alloc_rq_maps(struct blk_mq_tag_set *set)
-@@ -2382,8 +2380,9 @@ static int __init blk_mq_init(void)
- 	cpuhp_setup_state_multi(CPUHP_BLK_MQ_DEAD, "block/mq:dead", NULL,
- 				blk_mq_hctx_notify_dead);
- 
--	hotcpu_notifier(blk_mq_queue_reinit_notify, 0);
--
-+	cpuhp_setup_state_nocalls(CPUHP_BLK_MQ_PREPARE, "block/mq:prepare",
-+				  blk_mq_queue_reinit_prepare,
-+				  blk_mq_queue_reinit_dead);
+diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+index 1603573..667f95d 100644
+--- a/block/blk-zoned.c
++++ b/block/blk-zoned.c
+@@ -255,3 +255,96 @@ int blkdev_reset_zones(struct block_device *bdev,
  	return 0;
  }
- subsys_initcall(blk_mq_init);
+ EXPORT_SYMBOL_GPL(blkdev_reset_zones);
++
++/**
++ * BLKREPORTZONE ioctl processing.
++ * Called from blkdev_ioctl.
++ */
++int blkdev_report_zones_ioctl(struct block_device *bdev, fmode_t mode,
++			      unsigned int cmd, unsigned long arg)
++{
++	void __user *argp = (void __user *)arg;
++	struct request_queue *q;
++	struct blk_zone_report rep;
++	struct blk_zone *zones;
++	int ret;
++
++	if (!argp)
++		return -EINVAL;
++
++	q = bdev_get_queue(bdev);
++	if (!q)
++		return -ENXIO;
++
++	if (!blk_queue_is_zoned(q))
++		return -ENOTTY;
++
++	if (!capable(CAP_SYS_ADMIN))
++		return -EACCES;
++
++	if (copy_from_user(&rep, argp, sizeof(struct blk_zone_report)))
++		return -EFAULT;
++
++	if (!rep.nr_zones)
++		return -EINVAL;
++
++	zones = kcalloc(rep.nr_zones, sizeof(struct blk_zone), GFP_KERNEL);
++	if (!zones)
++		return -ENOMEM;
++
++	ret = blkdev_report_zones(bdev, rep.sector,
++				  zones, &rep.nr_zones,
++				  GFP_KERNEL);
++	if (ret)
++		goto out;
++
++	if (copy_to_user(argp, &rep, sizeof(struct blk_zone_report))) {
++		ret = -EFAULT;
++		goto out;
++	}
++
++	if (rep.nr_zones) {
++		if (copy_to_user(argp + sizeof(struct blk_zone_report), zones,
++				 sizeof(struct blk_zone) * rep.nr_zones))
++			ret = -EFAULT;
++	}
++
++ out:
++	kfree(zones);
++
++	return ret;
++}
++
++/**
++ * BLKRESETZONE ioctl processing.
++ * Called from blkdev_ioctl.
++ */
++int blkdev_reset_zones_ioctl(struct block_device *bdev, fmode_t mode,
++			     unsigned int cmd, unsigned long arg)
++{
++	void __user *argp = (void __user *)arg;
++	struct request_queue *q;
++	struct blk_zone_range zrange;
++
++	if (!argp)
++		return -EINVAL;
++
++	q = bdev_get_queue(bdev);
++	if (!q)
++		return -ENXIO;
++
++	if (!blk_queue_is_zoned(q))
++		return -ENOTTY;
++
++	if (!capable(CAP_SYS_ADMIN))
++		return -EACCES;
++
++	if (!(mode & FMODE_WRITE))
++		return -EBADF;
++
++	if (copy_from_user(&zrange, argp, sizeof(struct blk_zone_range)))
++		return -EFAULT;
++
++	return blkdev_reset_zones(bdev, zrange.sector, zrange.nr_sectors,
++				  GFP_KERNEL);
++}
+diff --git a/block/ioctl.c b/block/ioctl.c
+index ed2397f..448f78a 100644
+--- a/block/ioctl.c
++++ b/block/ioctl.c
+@@ -513,6 +513,10 @@ int blkdev_ioctl(struct block_device *bdev, fmode_t mode, unsigned cmd,
+ 				BLKDEV_DISCARD_SECURE);
+ 	case BLKZEROOUT:
+ 		return blk_ioctl_zeroout(bdev, mode, arg);
++	case BLKREPORTZONE:
++		return blkdev_report_zones_ioctl(bdev, mode, cmd, arg);
++	case BLKRESETZONE:
++		return blkdev_reset_zones_ioctl(bdev, mode, cmd, arg);
+ 	case HDIO_GETGEO:
+ 		return blkdev_getgeo(bdev, argp);
+ 	case BLKRAGET:
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 252043f..90097dd 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -316,6 +316,27 @@ extern int blkdev_report_zones(struct block_device *bdev,
+ extern int blkdev_reset_zones(struct block_device *bdev, sector_t sectors,
+ 			      sector_t nr_sectors, gfp_t gfp_mask);
+ 
++extern int blkdev_report_zones_ioctl(struct block_device *bdev, fmode_t mode,
++				     unsigned int cmd, unsigned long arg);
++extern int blkdev_reset_zones_ioctl(struct block_device *bdev, fmode_t mode,
++				    unsigned int cmd, unsigned long arg);
++
++#else /* CONFIG_BLK_DEV_ZONED */
++
++static inline int blkdev_report_zones_ioctl(struct block_device *bdev,
++					    fmode_t mode, unsigned int cmd,
++					    unsigned long arg)
++{
++	return -ENOTTY;
++}
++
++static inline int blkdev_reset_zones_ioctl(struct block_device *bdev,
++					   fmode_t mode, unsigned int cmd,
++					   unsigned long arg)
++{
++	return -ENOTTY;
++}
++
+ #endif /* CONFIG_BLK_DEV_ZONED */
+ 
+ struct request_queue {
+diff --git a/include/uapi/linux/blkzoned.h b/include/uapi/linux/blkzoned.h
+index a381721..40d1d7b 100644
+--- a/include/uapi/linux/blkzoned.h
++++ b/include/uapi/linux/blkzoned.h
+@@ -16,6 +16,7 @@
+ #define _UAPI_BLKZONED_H
+ 
+ #include <linux/types.h>
++#include <linux/ioctl.h>
+ 
+ /**
+  * enum blk_zone_type - Types of zones allowed in a zoned device.
+@@ -100,4 +101,43 @@ struct blk_zone {
+ 	__u8	reserved[36];
+ };
+ 
++/**
++ * struct blk_zone_report - BLKREPORTZONE ioctl request/reply
++ *
++ * @sector: starting sector of report
++ * @nr_zones: IN maximum / OUT actual
++ * @reserved: padding to 16 byte alignment
++ * @zones: Space to hold @nr_zones @zones entries on reply.
++ *
++ * The array of at most @nr_zones must follow this structure in memory.
++ */
++struct blk_zone_report {
++	__u64		sector;
++	__u32		nr_zones;
++	__u8		reserved[4];
++	struct blk_zone zones[0];
++} __packed;
++
++/**
++ * struct blk_zone_range - BLKRESETZONE ioctl request
++ * @sector: starting sector of the first zone to issue reset write pointer
++ * @nr_sectors: Total number of sectors of 1 or more zones to reset
++ */
++struct blk_zone_range {
++	__u64		sector;
++	__u64		nr_sectors;
++};
++
++/**
++ * Zoned block device ioctl's:
++ *
++ * @BLKREPORTZONE: Get zone information. Takes a zone report as argument.
++ *                 The zone report will start from the zone containing the
++ *                 sector specified in the report request structure.
++ * @BLKRESETZONE: Reset the write pointer of the zones in the specified
++ *                sector range. The sector range must be zone aligned.
++ */
++#define BLKREPORTZONE	_IOWR(0x12, 130, struct blk_zone_report)
++#define BLKRESETZONE	_IOW(0x12, 131, struct blk_zone_range)
++
+ #endif /* _UAPI_BLKZONED_H */
+diff --git a/include/uapi/linux/fs.h b/include/uapi/linux/fs.h
+index 3b00f7c..e0fc7f0 100644
+--- a/include/uapi/linux/fs.h
++++ b/include/uapi/linux/fs.h
+@@ -222,6 +222,10 @@ struct fsxattr {
+ #define BLKSECDISCARD _IO(0x12,125)
+ #define BLKROTATIONAL _IO(0x12,126)
+ #define BLKZEROOUT _IO(0x12,127)
++/*
++ * A jump here: 130-131 are reserved for zoned block devices
++ * (see uapi/linux/blkzoned.h)
++ */
+ 
+ #define BMAP_IOCTL 1		/* obsolete - kept for compatibility */
+ #define FIBMAP	   _IO(0x00,1)	/* bmap access */
+-- 
+2.7.4
+
+Western Digital Corporation (and its subsidiaries) E-mail Confidentiality Notice & Disclaimer:
+
+This e-mail and any files transmitted with it may contain confidential or legally privileged information of WDC and/or its affiliates, and are intended solely for the use of the individual or entity to which they are addressed. If you are not the intended recipient, any disclosure, copying, distribution or any action taken or omitted to be taken in reliance on it, is prohibited. If you have received this e-mail in error, please notify the sender immediately and delete the e-mail in its entirety from your system.
