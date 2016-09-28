@@ -1,42 +1,23 @@
-Return-Path: <Adam.Manzanares@hgst.com>
-From: Adam Manzanares <Adam.Manzanares@hgst.com>
-To: Christoph Hellwig <hch@infradead.org>
-CC: "axboe@kernel.dk" <axboe@kernel.dk>, "tj@kernel.org" <tj@kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-ide@vger.kernel.org" <linux-ide@vger.kernel.org>
+Return-Path: <BATV+c8a620365d075c7a7acf+4784+infradead.org+hch@bombadil.srs.infradead.org>
+Date: Tue, 27 Sep 2016 19:06:10 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Adam Manzanares <adam.manzanares@hgst.com>
+Cc: axboe@kernel.dk, tj@kernel.org, linux-block@vger.kernel.org,
+	linux-ide@vger.kernel.org
 Subject: Re: [PATCH 0/3] Enabling ATA Command Priorities
-Date: Wed, 28 Sep 2016 03:43:32 +0000
-Message-ID: <5C8FF242-7C7B-442E-A6FF-89878366F154@hgst.com>
+Message-ID: <20160928020610.GA28998@infradead.org>
 References: <1475000096-6148-1-git-send-email-adam.manzanares@hgst.com>
- <20160928020610.GA28998@infradead.org>
-In-Reply-To: <20160928020610.GA28998@infradead.org>
-Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1475000096-6148-1-git-send-email-adam.manzanares@hgst.com>
 List-ID: <linux-block@vger.kernel.org>
 
-SSBwcmVmZXIgaGF2aW5nIHRoZSBmZWF0dXJlIGNvbmRpdGlvbmFsIHNvIHlvdSBjYW4gdXNlIHRo
-ZSBDRlEgc2NoZWR1bGVyIHdpdGggSS9PIHByaW9yaXRpZXMgYXMgaXMuIElmIHlvdSBkZWNpZGUg
-dG8gZW5hYmxlIHRoZSBmZWF0dXJlIHRoZW4gdGhlIHByaW9yaXRpZXMgd2lsbCBiZSBwYXNzZWQg
-ZG93biB0byB0aGUgZHJpdmUgaW4gYWRkaXRpb24gdG8gdGhlIHdvcmsgdGhhdCB0aGUgQ0ZRIHNj
-aGVkdWxlciBkb2VzLiBTaW5jZSB0aGlzIGZlYXR1cmUgbWF5IGNoYW5nZSB0aGUgdXNlciBwZXJj
-ZWl2ZWQgcGVyZm9ybWFuY2Ugb2YgdGhlIGRldmljZSBJIHdhbnQgdG8gbWFrZSBzdXJlIHRoZXkg
-a25vdyB3aGF0IHRoZXkgYXJlIGdldHRpbmcgaW50by4NCg0KDQoNCg0KDQpPbiA5LzI3LzE2LCA3
-OjA2IFBNLCAiQ2hyaXN0b3BoIEhlbGx3aWciIDxoY2hAaW5mcmFkZWFkLm9yZz4gd3JvdGU6DQoN
-Cj5UaGUgc2VyaWVzIGxvb2tzIGZpbmUgdG8gbWU6DQo+DQo+UmV2aWV3ZWQtYnk6IENocmlzdG9w
-aCBIZWxsd2lnIDxoY2hAbHN0LmRlPg0KPg0KPlRoZSBvbmx5IHF1ZXN0aW9uIGlzIGlmIHdlIG5l
-ZWQgdG8gYm90aGVyIHdpdGggdGhlIGxhc3QgcGF0Y2ggdG8NCj5tYWtlIHRoZSBmZWF0dXJlIGNv
-bmRpdGlvbmFsIGF0IGFsbCwgZ2l2ZW4gdGhhdCB3ZSBib3RoIG5lZWQgaGFyZHdhcmUNCj5zdXBw
-b3J0IGFuZCBhcHBsaWNhdGlvbnMgb3B0aW5nIGludG8gdXNpbmcgSS9PIHByaW9yaXRpZXMgdG8g
-ZXZlbiB1c2UNCj5pdC4gIEJ1dCBpZiB5b3UgZmVlbCBpdCdzIHNhZmVyIHRoYXQgd2F5IHRoZSB1
-bmFibGUgY2VydGFpbmx5IGRvZXNuJ3QNCj5odXJ0Lg0KV2VzdGVybiBEaWdpdGFsIENvcnBvcmF0
-aW9uIChhbmQgaXRzIHN1YnNpZGlhcmllcykgRS1tYWlsIENvbmZpZGVudGlhbGl0eSBOb3RpY2Ug
-JiBEaXNjbGFpbWVyOgoKVGhpcyBlLW1haWwgYW5kIGFueSBmaWxlcyB0cmFuc21pdHRlZCB3aXRo
-IGl0IG1heSBjb250YWluIGNvbmZpZGVudGlhbCBvciBsZWdhbGx5IHByaXZpbGVnZWQgaW5mb3Jt
-YXRpb24gb2YgV0RDIGFuZC9vciBpdHMgYWZmaWxpYXRlcywgYW5kIGFyZSBpbnRlbmRlZCBzb2xl
-bHkgZm9yIHRoZSB1c2Ugb2YgdGhlIGluZGl2aWR1YWwgb3IgZW50aXR5IHRvIHdoaWNoIHRoZXkg
-YXJlIGFkZHJlc3NlZC4gSWYgeW91IGFyZSBub3QgdGhlIGludGVuZGVkIHJlY2lwaWVudCwgYW55
-IGRpc2Nsb3N1cmUsIGNvcHlpbmcsIGRpc3RyaWJ1dGlvbiBvciBhbnkgYWN0aW9uIHRha2VuIG9y
-IG9taXR0ZWQgdG8gYmUgdGFrZW4gaW4gcmVsaWFuY2Ugb24gaXQsIGlzIHByb2hpYml0ZWQuIElm
-IHlvdSBoYXZlIHJlY2VpdmVkIHRoaXMgZS1tYWlsIGluIGVycm9yLCBwbGVhc2Ugbm90aWZ5IHRo
-ZSBzZW5kZXIgaW1tZWRpYXRlbHkgYW5kIGRlbGV0ZSB0aGUgZS1tYWlsIGluIGl0cyBlbnRpcmV0
-eSBmcm9tIHlvdXIgc3lzdGVtLgo=
+The series looks fine to me:
+
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+
+The only question is if we need to bother with the last patch to
+make the feature conditional at all, given that we both need hardware
+support and applications opting into using I/O priorities to even use
+it.  But if you feel it's safer that way the unable certainly doesn't
+hurt.
