@@ -1,10 +1,10 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-cys01nam02on0088.outbound.protection.outlook.com ([104.47.37.88]:38544
-        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
+Received: from mail-bn3nam01on0070.outbound.protection.outlook.com ([104.47.33.70]:5632
+        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752922AbcI1X6D (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Sep 2016 19:58:03 -0400
-Subject: [PATCH v2 1/7] blk-mq: Introduce blk_mq_queue_stopped()
+        id S1753938AbcI2ACA (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 28 Sep 2016 20:02:00 -0400
+Subject: [PATCH v2 7/7] [RFC] nvme: Fix a race condition
 To: Jens Axboe <axboe@fb.com>
 References: <f153ee47-e599-c333-92b0-d5da475012f3@sandisk.com>
 CC: Christoph Hellwig <hch@lst.de>,
@@ -18,71 +18,67 @@ CC: Christoph Hellwig <hch@lst.de>,
         "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
         "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
 From: Bart Van Assche <bart.vanassche@sandisk.com>
-Message-ID: <26c7db22-bac8-6d8c-ba6e-3cbf0cec3368@sandisk.com>
-Date: Wed, 28 Sep 2016 16:57:55 -0700
+Message-ID: <ff412bfb-548c-c4fc-5180-78ede8a19ef2@sandisk.com>
+Date: Wed, 28 Sep 2016 17:01:45 -0700
 MIME-Version: 1.0
 In-Reply-To: <f153ee47-e599-c333-92b0-d5da475012f3@sandisk.com>
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-The function blk_queue_stopped() allows to test whether or not a
-traditional request queue has been stopped. Introduce a helper
-function that allows block drivers to query easily whether or not
-one or more hardware contexts of a blk-mq queue have been stopped.
+Avoid that nvme_queue_rq() is still running when nvme_stop_queues()
+returns. Untested.
 
 Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Cc: Keith Busch <keith.busch@intel.com>
 Cc: Christoph Hellwig <hch@lst.de>
+Cc: Sagi Grimberg <sagi@grimberg.me>
 ---
- block/blk-mq.c         | 20 ++++++++++++++++++++
- include/linux/blk-mq.h |  1 +
- 2 files changed, 21 insertions(+)
+ drivers/nvme/host/core.c | 20 ++++++++++++--------
+ 1 file changed, 12 insertions(+), 8 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index dc5f47f..d8c45de 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -950,6 +950,26 @@ void blk_mq_run_hw_queues(struct request_queue *q, bool async)
- }
- EXPORT_SYMBOL(blk_mq_run_hw_queues);
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index d791fba..98f1f29 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -201,13 +201,9 @@ fail:
  
-+/**
-+ * blk_mq_queue_stopped() - check whether one or more hctxs have been stopped
-+ * @q: request queue.
-+ *
-+ * The caller is responsible for serializing this function against
-+ * blk_mq_{start,stop}_hw_queue().
-+ */
-+bool blk_mq_queue_stopped(struct request_queue *q)
-+{
-+	struct blk_mq_hw_ctx *hctx;
-+	int i;
-+
-+	queue_for_each_hw_ctx(q, hctx, i)
-+		if (test_bit(BLK_MQ_S_STOPPED, &hctx->state))
-+			return true;
-+
-+	return false;
-+}
-+EXPORT_SYMBOL(blk_mq_queue_stopped);
-+
- void blk_mq_stop_hw_queue(struct blk_mq_hw_ctx *hctx)
+ void nvme_requeue_req(struct request *req)
  {
- 	cancel_work(&hctx->run_work);
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 5daa0ef..368c460d 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -233,6 +233,7 @@ void blk_mq_delay_kick_requeue_list(struct request_queue *q, unsigned long msecs
- void blk_mq_abort_requeue_list(struct request_queue *q);
- void blk_mq_complete_request(struct request *rq, int error);
+-	unsigned long flags;
+-
+ 	blk_mq_requeue_request(req);
+-	spin_lock_irqsave(req->q->queue_lock, flags);
+-	if (!blk_mq_queue_stopped(req->q))
+-		blk_mq_kick_requeue_list(req->q);
+-	spin_unlock_irqrestore(req->q->queue_lock, flags);
++	WARN_ON_ONCE(blk_mq_queue_stopped(req->q));
++	blk_mq_kick_requeue_list(req->q);
+ }
+ EXPORT_SYMBOL_GPL(nvme_requeue_req);
  
-+bool blk_mq_queue_stopped(struct request_queue *q);
- void blk_mq_stop_hw_queue(struct blk_mq_hw_ctx *hctx);
- void blk_mq_start_hw_queue(struct blk_mq_hw_ctx *hctx);
- void blk_mq_stop_hw_queues(struct request_queue *q);
+@@ -2077,11 +2073,19 @@ EXPORT_SYMBOL_GPL(nvme_kill_queues);
+ void nvme_stop_queues(struct nvme_ctrl *ctrl)
+ {
+ 	struct nvme_ns *ns;
++	struct request_queue *q;
+ 
+ 	mutex_lock(&ctrl->namespaces_mutex);
+ 	list_for_each_entry(ns, &ctrl->namespaces, list) {
+-		blk_mq_cancel_requeue_work(ns->queue);
+-		blk_mq_stop_hw_queues(ns->queue);
++		q = ns->queue;
++		blk_mq_quiesce_queue(q);
++		blk_mq_cancel_requeue_work(q);
++		blk_mq_stop_hw_queues(q);
++		/*
++		 * Note: blk_mq_resume_queue() does not affect the value
++		 * of the BLK_MQ_S_STOPPED bit.
++		 */
++		blk_mq_resume_queue(q);
+ 	}
+ 	mutex_unlock(&ctrl->namespaces_mutex);
+ }
 -- 
 2.10.0
 
