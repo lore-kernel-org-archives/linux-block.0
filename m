@@ -1,41 +1,26 @@
-Return-Path: <hare@suse.de>
+Return-Path: <Bart.VanAssche@sandisk.com>
 Subject: Re: [PATCH 1/3] block: invalidate the page cache when issuing
  BLKZEROOUT.
-To: "Darrick J. Wong" <darrick.wong@oracle.com>, axboe@kernel.dk,
- akpm@linux-foundation.org
+To: "Darrick J. Wong" <darrick.wong@oracle.com>, <axboe@kernel.dk>,
+	<akpm@linux-foundation.org>
 References: <147510957066.8940.13803086684642725401.stgit@birch.djwong.org>
  <147510957761.8940.14476876584539116975.stgit@birch.djwong.org>
-Cc: linux-block@vger.kernel.org, tytso@mit.edu, martin.petersen@oracle.com,
- snitzer@redhat.com, linux-api@vger.kernel.org, bfoster@redhat.com,
- xfs@oss.sgi.com, hch@infradead.org, dm-devel@redhat.com,
- linux-fsdevel@vger.kernel.org, bart.vanassche@sandisk.com,
- Christoph Hellwig <hch@lst.de>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <95e7b8a5-49dd-ea06-5fba-8831ef08ca5a@suse.de>
-Date: Thu, 29 Sep 2016 07:56:03 +0200
+CC: <linux-block@vger.kernel.org>, <tytso@mit.edu>,
+	<martin.petersen@oracle.com>, <snitzer@redhat.com>,
+	<linux-api@vger.kernel.org>, <bfoster@redhat.com>, <xfs@oss.sgi.com>,
+	<hch@infradead.org>, <dm-devel@redhat.com>, <linux-fsdevel@vger.kernel.org>,
+	Christoph Hellwig <hch@lst.de>
+From: Bart Van Assche <bart.vanassche@sandisk.com>
+Message-ID: <58a6bc29-42d5-92f2-30bf-89168faa8eb0@sandisk.com>
+Date: Wed, 28 Sep 2016 18:16:13 -0700
 MIME-Version: 1.0
 In-Reply-To: <147510957761.8940.14476876584539116975.stgit@birch.djwong.org>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Return-Path: Bart.VanAssche@sandisk.com
 List-ID: <linux-block@vger.kernel.org>
 
-On 09/29/2016 02:39 AM, Darrick J. Wong wrote:
+On 09/28/16 17:39, Darrick J. Wong wrote:
 > Invalidate the page cache (as a regular O_DIRECT write would do) to avoid
 > returning stale cache contents at a later time.
-> 
-> Signed-off-by: Darrick J. Wong <darrick.wong@oracle.com>
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-> ---
->  block/ioctl.c |   18 ++++++++++++------
->  1 file changed, 12 insertions(+), 6 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Cheers,
-
-Hannes
--- 
-Dr. Hannes Reinecke		      zSeries & Storage
-hare@suse.de			      +49 911 74053 688
-SUSE LINUX Products GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: J. Hawn, J. Guild, F. Imendörffer, HRB 16746 (AG Nürnberg)
+Reviewed-by: Bart Van Assche <bart.vanassche@sandisk.com>
