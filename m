@@ -1,12 +1,13 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-bn3nam01on0081.outbound.protection.outlook.com ([104.47.33.81]:53242
+Received: from mail-bn3nam01on0066.outbound.protection.outlook.com ([104.47.33.66]:13280
         "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1162880AbcIZS3I (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Sep 2016 14:29:08 -0400
-Subject: [PATCH 9/9] [RFC] nvme: Fix a race condition
+        id S1753938AbcI2ABE (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 28 Sep 2016 20:01:04 -0400
+Subject: [PATCH v2 5/7] dm: Fix a race condition related to stopping and
+ starting queues
 To: Jens Axboe <axboe@fb.com>
-References: <7948dbb8-6333-dc62-2673-4da35b4dfdbc@sandisk.com>
+References: <f153ee47-e599-c333-92b0-d5da475012f3@sandisk.com>
 CC: Christoph Hellwig <hch@lst.de>,
         James Bottomley <jejb@linux.vnet.ibm.com>,
         "Martin K. Petersen" <martin.petersen@oracle.com>,
@@ -18,63 +19,92 @@ CC: Christoph Hellwig <hch@lst.de>,
         "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
         "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
 From: Bart Van Assche <bart.vanassche@sandisk.com>
-Message-ID: <9c372b04-a194-58c4-a64f-b155b52a5244@sandisk.com>
-Date: Mon, 26 Sep 2016 11:28:59 -0700
+Message-ID: <8fcd8dd3-567f-a6d6-0ea8-f8cd510aea6e@sandisk.com>
+Date: Wed, 28 Sep 2016 17:00:54 -0700
 MIME-Version: 1.0
-In-Reply-To: <7948dbb8-6333-dc62-2673-4da35b4dfdbc@sandisk.com>
+In-Reply-To: <f153ee47-e599-c333-92b0-d5da475012f3@sandisk.com>
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Avoid that nvme_queue_rq() is still running when nvme_stop_queues()
-returns. Untested.
+Ensure that all ongoing dm_mq_queue_rq() and dm_mq_requeue_request()
+calls have stopped before setting the "queue stopped" flag. This
+allows to remove the "queue stopped" test from dm_mq_queue_rq() and
+dm_mq_requeue_request(). This patch fixes a race condition because
+dm_mq_queue_rq() is called without holding the queue lock and hence
+BLK_MQ_S_STOPPED can be set at any time while dm_mq_queue_rq() is
+in progress. This patch prevents that the following hang occurs
+sporadically when using dm-mq:
+
+INFO: task systemd-udevd:10111 blocked for more than 480 seconds.
+      Not tainted 4.7.0-dbg+ #1
+Call Trace:
+ [<ffffffff8161f397>] schedule+0x37/0x90
+ [<ffffffff816239ef>] schedule_timeout+0x27f/0x470
+ [<ffffffff8161e76f>] io_schedule_timeout+0x9f/0x110
+ [<ffffffff8161fb36>] bit_wait_io+0x16/0x60
+ [<ffffffff8161f929>] __wait_on_bit_lock+0x49/0xa0
+ [<ffffffff8114fe69>] __lock_page+0xb9/0xc0
+ [<ffffffff81165d90>] truncate_inode_pages_range+0x3e0/0x760
+ [<ffffffff81166120>] truncate_inode_pages+0x10/0x20
+ [<ffffffff81212a20>] kill_bdev+0x30/0x40
+ [<ffffffff81213d41>] __blkdev_put+0x71/0x360
+ [<ffffffff81214079>] blkdev_put+0x49/0x170
+ [<ffffffff812141c0>] blkdev_close+0x20/0x30
+ [<ffffffff811d48e8>] __fput+0xe8/0x1f0
+ [<ffffffff811d4a29>] ____fput+0x9/0x10
+ [<ffffffff810842d3>] task_work_run+0x83/0xb0
+ [<ffffffff8106606e>] do_exit+0x3ee/0xc40
+ [<ffffffff8106694b>] do_group_exit+0x4b/0xc0
+ [<ffffffff81073d9a>] get_signal+0x2ca/0x940
+ [<ffffffff8101bf43>] do_signal+0x23/0x660
+ [<ffffffff810022b3>] exit_to_usermode_loop+0x73/0xb0
+ [<ffffffff81002cb0>] syscall_return_slowpath+0xb0/0xc0
+ [<ffffffff81624e33>] entry_SYSCALL_64_fastpath+0xa6/0xa8
 
 Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Keith Busch <keith.busch@intel.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Sagi Grimberg <sagi@grimberg.me>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Cc: Mike Snitzer <snitzer@redhat.com>
 ---
- drivers/nvme/host/core.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+ drivers/md/dm-rq.c | 14 +++-----------
+ 1 file changed, 3 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 057f1fa..6e2bf6a 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -201,13 +201,9 @@ fail:
+diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
+index f2c271a..f7a8ba3 100644
+--- a/drivers/md/dm-rq.c
++++ b/drivers/md/dm-rq.c
+@@ -102,9 +102,12 @@ static void dm_mq_stop_queue(struct request_queue *q)
+ 	if (blk_mq_queue_stopped(q))
+ 		return;
  
- void nvme_requeue_req(struct request *req)
- {
--	unsigned long flags;
--
- 	blk_mq_requeue_request(req);
--	spin_lock_irqsave(req->q->queue_lock, flags);
--	if (!blk_mq_queue_stopped(req->q))
--		blk_mq_kick_requeue_list(req->q);
--	spin_unlock_irqrestore(req->q->queue_lock, flags);
-+	WARN_ON_ONCE(blk_mq_queue_stopped(req->q));
-+	blk_mq_kick_requeue_list(req->q);
++	/* Wait until dm_mq_queue_rq() has finished. */
++	blk_mq_quiesce_queue(q);
+ 	/* Avoid that requeuing could restart the queue. */
+ 	blk_mq_cancel_requeue_work(q);
+ 	blk_mq_stop_hw_queues(q);
++	blk_mq_resume_queue(q);
  }
- EXPORT_SYMBOL_GPL(nvme_requeue_req);
  
-@@ -2079,11 +2075,15 @@ EXPORT_SYMBOL_GPL(nvme_kill_queues);
- void nvme_stop_queues(struct nvme_ctrl *ctrl)
- {
- 	struct nvme_ns *ns;
-+	struct request_queue *q;
- 
- 	mutex_lock(&ctrl->namespaces_mutex);
- 	list_for_each_entry(ns, &ctrl->namespaces, list) {
--		blk_mq_cancel_requeue_work(ns->queue);
--		blk_mq_stop_hw_queues(ns->queue);
-+		q = ns->queue;
-+		blk_quiesce_queue(q);
-+		blk_mq_cancel_requeue_work(q);
-+		blk_mq_stop_hw_queues(q);
-+		blk_resume_queue(q);
+ void dm_stop_queue(struct request_queue *q)
+@@ -887,17 +890,6 @@ static int dm_mq_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 		dm_put_live_table(md, srcu_idx);
  	}
- 	mutex_unlock(&ctrl->namespaces_mutex);
- }
+ 
+-	/*
+-	 * On suspend dm_stop_queue() handles stopping the blk-mq
+-	 * request_queue BUT: even though the hw_queues are marked
+-	 * BLK_MQ_S_STOPPED at that point there is still a race that
+-	 * is allowing block/blk-mq.c to call ->queue_rq against a
+-	 * hctx that it really shouldn't.  The following check guards
+-	 * against this rarity (albeit _not_ race-free).
+-	 */
+-	if (unlikely(test_bit(BLK_MQ_S_STOPPED, &hctx->state)))
+-		return BLK_MQ_RQ_QUEUE_BUSY;
+-
+ 	if (ti->type->busy && ti->type->busy(ti))
+ 		return BLK_MQ_RQ_QUEUE_BUSY;
+ 
 -- 
 2.10.0
 
