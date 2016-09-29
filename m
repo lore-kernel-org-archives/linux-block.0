@@ -1,45 +1,84 @@
-Return-Path: <hare@suse.de>
-Subject: Re: [PATCH 2/3] block: require write_same and discard requests align
- to logical block size
-To: "Darrick J. Wong" <darrick.wong@oracle.com>, axboe@kernel.dk,
- akpm@linux-foundation.org
-References: <147510957066.8940.13803086684642725401.stgit@birch.djwong.org>
- <147510958448.8940.14280630935441533825.stgit@birch.djwong.org>
+Return-Path: <darrick.wong@oracle.com>
+Subject: [PATCH 2/3] block: require write_same and discard requests align to
+ logical block size
+From: "Darrick J. Wong" <darrick.wong@oracle.com>
+To: axboe@kernel.dk, akpm@linux-foundation.org, darrick.wong@oracle.com
 Cc: linux-block@vger.kernel.org, tytso@mit.edu, martin.petersen@oracle.com,
- snitzer@redhat.com, linux-api@vger.kernel.org, bfoster@redhat.com,
- xfs@oss.sgi.com, hch@infradead.org, dm-devel@redhat.com,
- linux-fsdevel@vger.kernel.org, bart.vanassche@sandisk.com,
- Christoph Hellwig <hch@lst.de>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <01403e58-6638-7c60-c195-5ab413f4ceb4@suse.de>
-Date: Thu, 29 Sep 2016 07:56:31 +0200
+        snitzer@redhat.com, linux-api@vger.kernel.org, bfoster@redhat.com,
+        xfs@oss.sgi.com, hch@infradead.org, dm-devel@redhat.com,
+        linux-fsdevel@vger.kernel.org, bart.vanassche@sandisk.com,
+        Christoph Hellwig <hch@lst.de>
+Date: Wed, 28 Sep 2016 17:39:44 -0700
+Message-ID: <147510958448.8940.14280630935441533825.stgit@birch.djwong.org>
+In-Reply-To: <147510957066.8940.13803086684642725401.stgit@birch.djwong.org>
+References: <147510957066.8940.13803086684642725401.stgit@birch.djwong.org>
 MIME-Version: 1.0
-In-Reply-To: <147510958448.8940.14280630935441533825.stgit@birch.djwong.org>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
 List-ID: <linux-block@vger.kernel.org>
 
-On 09/29/2016 02:39 AM, Darrick J. Wong wrote:
-> Make sure that the offset and length arguments that we're using to
-> construct WRITE SAME and DISCARD requests are actually aligned to the
-> logical block size.  Failure to do this causes other errors in other
-> parts of the block layer or the SCSI layer because disks don't support
-> partial logical block writes.
-> 
-> Signed-off-by: Darrick J. Wong <darrick.wong@oracle.com>
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> Reviewed-by: Bart Van Assche <bart.vanassche@sandisk.com>
-> Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-> ---
->  block/blk-lib.c |   15 +++++++++++++++
->  1 file changed, 15 insertions(+)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+Make sure that the offset and length arguments that we're using to
+construct WRITE SAME and DISCARD requests are actually aligned to the
+logical block size.  Failure to do this causes other errors in other
+parts of the block layer or the SCSI layer because disks don't support
+partial logical block writes.
 
-Cheers,
+Signed-off-by: Darrick J. Wong <darrick.wong@oracle.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Bart Van Assche <bart.vanassche@sandisk.com>
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+---
+ block/blk-lib.c |   15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-Hannes
--- 
-Dr. Hannes Reinecke		      zSeries & Storage
-hare@suse.de			      +49 911 74053 688
-SUSE LINUX Products GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: J. Hawn, J. Guild, F. Imendörffer, HRB 16746 (AG Nürnberg)
+
+diff --git a/block/blk-lib.c b/block/blk-lib.c
+index 083e56f..46fe924 100644
+--- a/block/blk-lib.c
++++ b/block/blk-lib.c
+@@ -31,6 +31,7 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
+ 	unsigned int granularity;
+ 	enum req_op op;
+ 	int alignment;
++	sector_t bs_mask;
+ 
+ 	if (!q)
+ 		return -ENXIO;
+@@ -50,6 +51,10 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
+ 		op = REQ_OP_DISCARD;
+ 	}
+ 
++	bs_mask = (bdev_logical_block_size(bdev) >> 9) - 1;
++	if ((sector | nr_sects) & bs_mask)
++		return -EINVAL;
++
+ 	/* Zero-sector (unknown) and one-sector granularities are the same.  */
+ 	granularity = max(q->limits.discard_granularity >> 9, 1U);
+ 	alignment = (bdev_discard_alignment(bdev) >> 9) % granularity;
+@@ -150,10 +155,15 @@ int blkdev_issue_write_same(struct block_device *bdev, sector_t sector,
+ 	unsigned int max_write_same_sectors;
+ 	struct bio *bio = NULL;
+ 	int ret = 0;
++	sector_t bs_mask;
+ 
+ 	if (!q)
+ 		return -ENXIO;
+ 
++	bs_mask = (bdev_logical_block_size(bdev) >> 9) - 1;
++	if ((sector | nr_sects) & bs_mask)
++		return -EINVAL;
++
+ 	/* Ensure that max_write_same_sectors doesn't overflow bi_size */
+ 	max_write_same_sectors = UINT_MAX >> 9;
+ 
+@@ -202,6 +212,11 @@ static int __blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
+ 	int ret;
+ 	struct bio *bio = NULL;
+ 	unsigned int sz;
++	sector_t bs_mask;
++
++	bs_mask = (bdev_logical_block_size(bdev) >> 9) - 1;
++	if ((sector | nr_sects) & bs_mask)
++		return -EINVAL;
+ 
+ 	while (nr_sects != 0) {
+ 		bio = next_bio(bio, min(nr_sects, (sector_t)BIO_MAX_PAGES),
