@@ -1,100 +1,45 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv3 11/41] thp: try to free page's buffers before attempt split
-Date: Thu, 15 Sep 2016 14:54:53 +0300
-Message-Id: <20160915115523.29737-12-kirill.shutemov@linux.intel.com>
-In-Reply-To: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
-References: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:47565 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S932469AbcI2RAM (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 29 Sep 2016 13:00:12 -0400
+Subject: Re: [Nbd] [PATCH][V3] nbd: add multi-connection support
+To: Wouter Verhelst <w@uter.be>
+References: <1475092892-8230-1-git-send-email-jbacik@fb.com>
+ <20160929095204.mexr6wpypo3bl6mx@grep.be>
+ <87908d95-0b7c-bc3f-f69d-94d006829daf@fb.com>
+ <20160929164100.akytbkbtvziwaqqj@grep.be>
+CC: <axboe@fb.com>, <linux-block@vger.kernel.org>,
+        <kernel-team@fb.com>, <nbd-general@lists.sourceforge.net>,
+        <linux-kernel@vger.kernel.org>
+From: Josef Bacik <jbacik@fb.com>
+Message-ID: <a2d8d560-41d0-e17d-90df-b1953ce00a51@fb.com>
+Date: Thu, 29 Sep 2016 12:59:18 -0400
+MIME-Version: 1.0
+In-Reply-To: <20160929164100.akytbkbtvziwaqqj@grep.be>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-We want page to be isolated from the rest of the system before spliting
-it. We rely on page count to be 2 for file pages to make sure nobody
-uses the page: one pin to caller, one to radix-tree.
+On 09/29/2016 12:41 PM, Wouter Verhelst wrote:
+> On Thu, Sep 29, 2016 at 10:03:50AM -0400, Josef Bacik wrote:
+>> So think of it like normal disks with multiple channels.  We don't send flushes
+>> down all the hwq's to make sure they are clear, we leave that decision up to the
+>> application (usually a FS of course).
+>
+> Well, when I asked earlier, Christoph said[1] that blk-mq assumes that
+> when a FLUSH is sent over one channel, and the reply comes in, that all
+> commands which have been received, regardless of which channel they were
+> received over, have reched disk.
+>
+> [1] Message-ID: <20160915122304.GA15501@infradead.org>
+>
+> It is impossible for nbd to make such a guarantee, due to head-of-line
+> blocking on TCP.
+>
 
-Filesystems with backing storage can have page count increased if it has
-buffers.
+Huh I missed that.  Yeah that's not possible for us for sure, I think my option 
+idea is the less awful way forward if we want to address that limitation.  Thanks,
 
-Let's try to free them, before attempt split. And remove one guarding
-VM_BUG_ON_PAGE().
-
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
----
- include/linux/buffer_head.h |  1 +
- mm/huge_memory.c            | 19 ++++++++++++++++++-
- 2 files changed, 19 insertions(+), 1 deletion(-)
-
-diff --git a/include/linux/buffer_head.h b/include/linux/buffer_head.h
-index ebbacd14d450..006a8a42acfb 100644
---- a/include/linux/buffer_head.h
-+++ b/include/linux/buffer_head.h
-@@ -395,6 +395,7 @@ extern int __set_page_dirty_buffers(struct page *page);
- #else /* CONFIG_BLOCK */
- 
- static inline void buffer_init(void) {}
-+static inline int page_has_buffers(struct page *page) { return 0; }
- static inline int try_to_free_buffers(struct page *page) { return 1; }
- static inline int inode_has_buffers(struct inode *inode) { return 0; }
- static inline void invalidate_inode_buffers(struct inode *inode) {}
-diff --git a/mm/huge_memory.c b/mm/huge_memory.c
-index 020a23d6e7f8..44bf0ba3d10f 100644
---- a/mm/huge_memory.c
-+++ b/mm/huge_memory.c
-@@ -30,6 +30,7 @@
- #include <linux/userfaultfd_k.h>
- #include <linux/page_idle.h>
- #include <linux/shmem_fs.h>
-+#include <linux/buffer_head.h>
- 
- #include <asm/tlb.h>
- #include <asm/pgalloc.h>
-@@ -2012,7 +2013,6 @@ int split_huge_page_to_list(struct page *page, struct list_head *list)
- 
- 	VM_BUG_ON_PAGE(is_huge_zero_page(page), page);
- 	VM_BUG_ON_PAGE(!PageLocked(page), page);
--	VM_BUG_ON_PAGE(!PageSwapBacked(page), page);
- 	VM_BUG_ON_PAGE(!PageCompound(page), page);
- 
- 	if (PageAnon(head)) {
-@@ -2041,6 +2041,23 @@ int split_huge_page_to_list(struct page *page, struct list_head *list)
- 			goto out;
- 		}
- 
-+		/* Try to free buffers before attempt split */
-+		if (!PageSwapBacked(head) && PagePrivate(page)) {
-+			/*
-+			 * We cannot trigger writeback from here due possible
-+			 * recursion if triggered from vmscan, only wait.
-+			 *
-+			 * Caller can trigger writeback it on its own, if safe.
-+			 */
-+			wait_on_page_writeback(head);
-+
-+			if (page_has_buffers(head) &&
-+					!try_to_free_buffers(head)) {
-+				ret = -EBUSY;
-+				goto out;
-+			}
-+		}
-+
- 		/* Addidional pin from radix tree */
- 		extra_pins = 1;
- 		anon_vma = NULL;
--- 
-2.9.3
-
+Josef
