@@ -1,79 +1,45 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-by2nam03on0082.outbound.protection.outlook.com ([104.47.42.82]:35264
-        "EHLO NAM03-BY2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1753938AbcI2AC4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Sep 2016 20:02:56 -0400
-Subject: [PATCH v2 3/7] [RFC] nvme: Use BLK_MQ_S_STOPPED instead of
- QUEUE_FLAG_STOPPED in blk-mq code
-To: Jens Axboe <axboe@fb.com>
-References: <f153ee47-e599-c333-92b0-d5da475012f3@sandisk.com>
-CC: Christoph Hellwig <hch@lst.de>,
-        James Bottomley <jejb@linux.vnet.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Doug Ledford <dledford@redhat.com>,
-        Keith Busch <keith.busch@intel.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-Message-ID: <9faa7607-eb3e-ce41-b09e-1e10492a5f45@sandisk.com>
-Date: Wed, 28 Sep 2016 17:02:50 -0700
+Return-Path: <hare@suse.de>
+Subject: Re: [PATCH 2/3] block: require write_same and discard requests align
+ to logical block size
+To: "Darrick J. Wong" <darrick.wong@oracle.com>, axboe@kernel.dk,
+ akpm@linux-foundation.org
+References: <147510957066.8940.13803086684642725401.stgit@birch.djwong.org>
+ <147510958448.8940.14280630935441533825.stgit@birch.djwong.org>
+Cc: linux-block@vger.kernel.org, tytso@mit.edu, martin.petersen@oracle.com,
+ snitzer@redhat.com, linux-api@vger.kernel.org, bfoster@redhat.com,
+ xfs@oss.sgi.com, hch@infradead.org, dm-devel@redhat.com,
+ linux-fsdevel@vger.kernel.org, bart.vanassche@sandisk.com,
+ Christoph Hellwig <hch@lst.de>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <01403e58-6638-7c60-c195-5ab413f4ceb4@suse.de>
+Date: Thu, 29 Sep 2016 07:56:31 +0200
 MIME-Version: 1.0
-In-Reply-To: <f153ee47-e599-c333-92b0-d5da475012f3@sandisk.com>
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <147510958448.8940.14280630935441533825.stgit@birch.djwong.org>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-Make nvme_requeue_req() check BLK_MQ_S_STOPPED instead of
-QUEUE_FLAG_STOPPED. Remove the QUEUE_FLAG_STOPPED manipulations
-that became superfluous because of this change. This patch fixes
-a race condition: using queue_flag_clear_unlocked() is not safe
-if any other function that manipulates the queue flags can be
-called concurrently, e.g. blk_cleanup_queue(). Untested.
+On 09/29/2016 02:39 AM, Darrick J. Wong wrote:
+> Make sure that the offset and length arguments that we're using to
+> construct WRITE SAME and DISCARD requests are actually aligned to the
+> logical block size.  Failure to do this causes other errors in other
+> parts of the block layer or the SCSI layer because disks don't support
+> partial logical block writes.
+> 
+> Signed-off-by: Darrick J. Wong <darrick.wong@oracle.com>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Reviewed-by: Bart Van Assche <bart.vanassche@sandisk.com>
+> Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+> ---
+>  block/blk-lib.c |   15 +++++++++++++++
+>  1 file changed, 15 insertions(+)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Keith Busch <keith.busch@intel.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Sagi Grimberg <sagi@grimberg.me>
----
- drivers/nvme/host/core.c | 7 +------
- 1 file changed, 1 insertion(+), 6 deletions(-)
+Cheers,
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 4669c05..d791fba 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -205,7 +205,7 @@ void nvme_requeue_req(struct request *req)
- 
- 	blk_mq_requeue_request(req);
- 	spin_lock_irqsave(req->q->queue_lock, flags);
--	if (!blk_queue_stopped(req->q))
-+	if (!blk_mq_queue_stopped(req->q))
- 		blk_mq_kick_requeue_list(req->q);
- 	spin_unlock_irqrestore(req->q->queue_lock, flags);
- }
-@@ -2080,10 +2080,6 @@ void nvme_stop_queues(struct nvme_ctrl *ctrl)
- 
- 	mutex_lock(&ctrl->namespaces_mutex);
- 	list_for_each_entry(ns, &ctrl->namespaces, list) {
--		spin_lock_irq(ns->queue->queue_lock);
--		queue_flag_set(QUEUE_FLAG_STOPPED, ns->queue);
--		spin_unlock_irq(ns->queue->queue_lock);
--
- 		blk_mq_cancel_requeue_work(ns->queue);
- 		blk_mq_stop_hw_queues(ns->queue);
- 	}
-@@ -2097,7 +2093,6 @@ void nvme_start_queues(struct nvme_ctrl *ctrl)
- 
- 	mutex_lock(&ctrl->namespaces_mutex);
- 	list_for_each_entry(ns, &ctrl->namespaces, list) {
--		queue_flag_clear_unlocked(QUEUE_FLAG_STOPPED, ns->queue);
- 		blk_mq_start_stopped_hw_queues(ns->queue, true);
- 		blk_mq_kick_requeue_list(ns->queue);
- 	}
+Hannes
 -- 
-2.10.0
-
+Dr. Hannes Reinecke		      zSeries & Storage
+hare@suse.de			      +49 911 74053 688
+SUSE LINUX Products GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: J. Hawn, J. Guild, F. Imendörffer, HRB 16746 (AG Nürnberg)
