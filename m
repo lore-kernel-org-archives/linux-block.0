@@ -1,15 +1,14 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:55483 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752887AbcI2Fyc (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 29 Sep 2016 01:54:32 -0400
-Subject: Re: [PATCH v2 6/7] SRP transport: Port srp_wait_for_queuecommand() to
+Received: from mail-by2nam03on0070.outbound.protection.outlook.com ([104.47.42.70]:2240
+        "EHLO NAM03-BY2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1753938AbcI2ABc (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 28 Sep 2016 20:01:32 -0400
+Subject: [PATCH v2 6/7] SRP transport: Port srp_wait_for_queuecommand() to
  scsi-mq
-To: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Jens Axboe <axboe@fb.com>
+To: Jens Axboe <axboe@fb.com>
 References: <f153ee47-e599-c333-92b0-d5da475012f3@sandisk.com>
- <bedf4b45-00b0-6844-047d-f1e05bb1092f@sandisk.com>
-Cc: Christoph Hellwig <hch@lst.de>,
+CC: Christoph Hellwig <hch@lst.de>,
         James Bottomley <jejb@linux.vnet.ibm.com>,
         "Martin K. Petersen" <martin.petersen@oracle.com>,
         Mike Snitzer <snitzer@redhat.com>,
@@ -19,34 +18,78 @@ Cc: Christoph Hellwig <hch@lst.de>,
         "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
         "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
         "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <c0cae8d1-c82e-5089-3f93-cd03511b45cc@suse.de>
-Date: Thu, 29 Sep 2016 07:54:29 +0200
+From: Bart Van Assche <bart.vanassche@sandisk.com>
+Message-ID: <bedf4b45-00b0-6844-047d-f1e05bb1092f@sandisk.com>
+Date: Wed, 28 Sep 2016 17:01:22 -0700
 MIME-Version: 1.0
-In-Reply-To: <bedf4b45-00b0-6844-047d-f1e05bb1092f@sandisk.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <f153ee47-e599-c333-92b0-d5da475012f3@sandisk.com>
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 09/29/2016 02:01 AM, Bart Van Assche wrote:
-> Ensure that if scsi-mq is enabled that srp_wait_for_queuecommand()
-> waits until ongoing shost->hostt->queuecommand() calls have finished.
-> 
-> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-> Cc: James Bottomley <jejb@linux.vnet.ibm.com>
-> Cc: Martin K. Petersen <martin.petersen@oracle.com>
-> Cc: Doug Ledford <dledford@redhat.com>
-> ---
->  drivers/scsi/scsi_transport_srp.c | 24 ++++++++++++++++++++----
->  1 file changed, 20 insertions(+), 4 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+Ensure that if scsi-mq is enabled that srp_wait_for_queuecommand()
+waits until ongoing shost->hostt->queuecommand() calls have finished.
 
-Cheers,
+Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+Cc: James Bottomley <jejb@linux.vnet.ibm.com>
+Cc: Martin K. Petersen <martin.petersen@oracle.com>
+Cc: Doug Ledford <dledford@redhat.com>
+---
+ drivers/scsi/scsi_transport_srp.c | 24 ++++++++++++++++++++----
+ 1 file changed, 20 insertions(+), 4 deletions(-)
 
-Hannes
+diff --git a/drivers/scsi/scsi_transport_srp.c b/drivers/scsi/scsi_transport_srp.c
+index e3cd3ec..f1d580e 100644
+--- a/drivers/scsi/scsi_transport_srp.c
++++ b/drivers/scsi/scsi_transport_srp.c
+@@ -25,6 +25,7 @@
+ #include <linux/slab.h>
+ #include <linux/string.h>
+ #include <linux/delay.h>
++#include <linux/blk-mq.h>
+ 
+ #include <scsi/scsi.h>
+ #include <scsi/scsi_cmnd.h>
+@@ -405,8 +406,6 @@ static void srp_reconnect_work(struct work_struct *work)
+ /**
+  * scsi_request_fn_active() - number of kernel threads inside scsi_request_fn()
+  * @shost: SCSI host for which to count the number of scsi_request_fn() callers.
+- *
+- * To do: add support for scsi-mq in this function.
+  */
+ static int scsi_request_fn_active(struct Scsi_Host *shost)
+ {
+@@ -425,11 +424,28 @@ static int scsi_request_fn_active(struct Scsi_Host *shost)
+ 	return request_fn_active;
+ }
+ 
++static void srp_mq_wait_for_queuecommand(struct Scsi_Host *shost)
++{
++	struct scsi_device *sdev;
++	struct request_queue *q;
++
++	shost_for_each_device(sdev, shost) {
++		q = sdev->request_queue;
++
++		blk_mq_quiesce_queue(q);
++		blk_mq_resume_queue(q);
++	}
++}
++
+ /* Wait until ongoing shost->hostt->queuecommand() calls have finished. */
+ static void srp_wait_for_queuecommand(struct Scsi_Host *shost)
+ {
+-	while (scsi_request_fn_active(shost))
+-		msleep(20);
++	if (shost->use_blk_mq) {
++		srp_mq_wait_for_queuecommand(shost);
++	} else {
++		while (scsi_request_fn_active(shost))
++			msleep(20);
++	}
+ }
+ 
+ static void __rport_fail_io_fast(struct srp_rport *rport)
 -- 
-Dr. Hannes Reinecke		      zSeries & Storage
-hare@suse.de			      +49 911 74053 688
-SUSE LINUX Products GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: J. Hawn, J. Guild, F. Imendörffer, HRB 16746 (AG Nürnberg)
+2.10.0
+
