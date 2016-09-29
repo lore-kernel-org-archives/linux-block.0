@@ -1,89 +1,75 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:40135 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S934293AbcIOLzt (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Sep 2016 07:55:49 -0400
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv3 33/41] ext4: make ext4_block_write_begin() aware about huge pages
-Date: Thu, 15 Sep 2016 14:55:15 +0300
-Message-Id: <20160915115523.29737-34-kirill.shutemov@linux.intel.com>
-In-Reply-To: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
-References: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <darrick.wong@oracle.com>
+Subject: [PATCH 1/3] block: invalidate the page cache when issuing
+ BLKZEROOUT.
+From: "Darrick J. Wong" <darrick.wong@oracle.com>
+To: axboe@kernel.dk, akpm@linux-foundation.org, darrick.wong@oracle.com
+Cc: linux-block@vger.kernel.org, Hannes Reinecke <hare@suse.com>,
+        tytso@mit.edu, snitzer@redhat.com, martin.petersen@oracle.com,
+        linux-api@vger.kernel.org, bfoster@redhat.com, xfs@oss.sgi.com,
+        hch@infradead.org, dm-devel@redhat.com, hare@suse.de,
+        linux-fsdevel@vger.kernel.org, bart.vanassche@sandisk.com,
+        Christoph Hellwig <hch@lst.de>
+Date: Thu, 29 Sep 2016 14:16:23 -0700
+Message-ID: <147518378313.22791.16649519283678515021.stgit@birch.djwong.org>
+In-Reply-To: <147518377601.22791.14436504108602322570.stgit@birch.djwong.org>
+References: <147518377601.22791.14436504108602322570.stgit@birch.djwong.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+List-ID: <linux-block@vger.kernel.org>
 
-It simply matches changes to __block_write_begin_int().
+Invalidate the page cache (as a regular O_DIRECT write would do) to avoid
+returning stale cache contents at a later time.
 
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+Signed-off-by: Darrick J. Wong <darrick.wong@oracle.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+Reviewed-by: Bart Van Assche <bart.vanassche@sandisk.com>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 ---
- fs/ext4/inode.c | 24 ++++++++++++++++--------
- 1 file changed, 16 insertions(+), 8 deletions(-)
+ block/ioctl.c |   18 ++++++++++++------
+ 1 file changed, 12 insertions(+), 6 deletions(-)
 
-diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
-index a07c055d8e78..31560b52eff2 100644
---- a/fs/ext4/inode.c
-+++ b/fs/ext4/inode.c
-@@ -1079,9 +1079,8 @@ int do_journal_get_write_access(handle_t *handle,
- static int ext4_block_write_begin(struct page *page, loff_t pos, unsigned len,
- 				  get_block_t *get_block)
+
+diff --git a/block/ioctl.c b/block/ioctl.c
+index ed2397f..755119c 100644
+--- a/block/ioctl.c
++++ b/block/ioctl.c
+@@ -225,7 +225,8 @@ static int blk_ioctl_zeroout(struct block_device *bdev, fmode_t mode,
+ 		unsigned long arg)
  {
--	unsigned from = pos & (PAGE_SIZE - 1);
--	unsigned to = from + len;
--	struct inode *inode = page->mapping->host;
-+	unsigned from, to;
-+	struct inode *inode = page_mapping(page)->host;
- 	unsigned block_start, block_end;
- 	sector_t block;
- 	int err = 0;
-@@ -1090,9 +1089,12 @@ static int ext4_block_write_begin(struct page *page, loff_t pos, unsigned len,
- 	struct buffer_head *bh, *head, *wait[2], **wait_bh = wait;
- 	bool decrypt = false;
+ 	uint64_t range[2];
+-	uint64_t start, len;
++	struct address_space *mapping;
++	uint64_t start, end, len;
  
-+	page = compound_head(page);
-+	from = pos & ~hpage_mask(page);
-+	to = from + len;
- 	BUG_ON(!PageLocked(page));
--	BUG_ON(from > PAGE_SIZE);
--	BUG_ON(to > PAGE_SIZE);
-+	BUG_ON(from > hpage_size(page));
-+	BUG_ON(to > hpage_size(page));
- 	BUG_ON(from > to);
+ 	if (!(mode & FMODE_WRITE))
+ 		return -EBADF;
+@@ -235,18 +236,23 @@ static int blk_ioctl_zeroout(struct block_device *bdev, fmode_t mode,
  
- 	if (!page_has_buffers(page))
-@@ -1127,9 +1129,15 @@ static int ext4_block_write_begin(struct page *page, loff_t pos, unsigned len,
- 					mark_buffer_dirty(bh);
- 					continue;
- 				}
--				if (block_end > to || block_start < from)
--					zero_user_segments(page, to, block_end,
--							   block_start, from);
-+				if (block_end > to || block_start < from) {
-+					BUG_ON(to - from  > PAGE_SIZE);
-+					zero_user_segments(page +
-+							block_start / PAGE_SIZE,
-+							to % PAGE_SIZE,
-+							(block_start % PAGE_SIZE) + blocksize,
-+							block_start % PAGE_SIZE,
-+							from % PAGE_SIZE);
-+				}
- 				continue;
- 			}
- 		}
--- 
-2.9.3
-
+ 	start = range[0];
+ 	len = range[1];
++	end = start + len - 1;
+ 
+ 	if (start & 511)
+ 		return -EINVAL;
+ 	if (len & 511)
+ 		return -EINVAL;
+-	start >>= 9;
+-	len >>= 9;
+-
+-	if (start + len > (i_size_read(bdev->bd_inode) >> 9))
++	if (end >= (uint64_t)i_size_read(bdev->bd_inode))
++		return -EINVAL;
++	if (end < start)
+ 		return -EINVAL;
+ 
+-	return blkdev_issue_zeroout(bdev, start, len, GFP_KERNEL, false);
++	/* Invalidate the page cache, including dirty pages */
++	mapping = bdev->bd_inode->i_mapping;
++	truncate_inode_pages_range(mapping, start, end);
++
++	return blkdev_issue_zeroout(bdev, start >> 9, len >> 9, GFP_KERNEL,
++				    false);
+ }
+ 
+ static int put_ushort(unsigned long arg, unsigned short val)
