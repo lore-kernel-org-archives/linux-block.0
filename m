@@ -1,70 +1,82 @@
-Return-Path: <Damien.LeMoal@hgst.com>
-From: Damien Le Moal <damien.lemoal@hgst.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>, Christoph
- Hellwig <hch@lst.de>, "Martin K . Petersen" <martin.petersen@oracle.com>,
-	Hannes Reinecke <hare@suse.de>, Shaun Tancheff <shaun@tancheff.com>, Damien
- Le Moal <damien.lemoal@hgst.com>
-Subject: [PATCH v3 2/7] blk-sysfs: Add 'chunk_sectors' to sysfs attributes
-Date: Wed, 28 Sep 2016 10:22:32 +0900
-Message-ID: <1475025757-6340-3-git-send-email-damien.lemoal@hgst.com>
-In-Reply-To: <1475025757-6340-1-git-send-email-damien.lemoal@hgst.com>
-References: <1475025757-6340-1-git-send-email-damien.lemoal@hgst.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-dm3nam03on0068.outbound.protection.outlook.com ([104.47.41.68]:3380
+        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1753938AbcI2ACb (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 28 Sep 2016 20:02:31 -0400
+Subject: [PATCH v2 2/7] dm: Use BLK_MQ_S_STOPPED instead of QUEUE_FLAG_STOPPED
+ in blk-mq code
+To: Jens Axboe <axboe@fb.com>
+References: <f153ee47-e599-c333-92b0-d5da475012f3@sandisk.com>
+CC: Christoph Hellwig <hch@lst.de>,
+        James Bottomley <jejb@linux.vnet.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Doug Ledford <dledford@redhat.com>,
+        Keith Busch <keith.busch@intel.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+From: Bart Van Assche <bart.vanassche@sandisk.com>
+Message-ID: <43265806-b77f-b357-cbf1-1d05cf253f97@sandisk.com>
+Date: Wed, 28 Sep 2016 17:02:23 -0700
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: damien.lemoal@hgst.com
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <f153ee47-e599-c333-92b0-d5da475012f3@sandisk.com>
+Content-Type: text/plain; charset="utf-8"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Hannes Reinecke <hare@suse.de>
-
-The queue limits already have a 'chunk_sectors' setting, so
-we should be presenting it via sysfs.
-
-Signed-off-by: Hannes Reinecke <hare@suse.de>
-Signed-off-by: Damien Le Moal <damien.lemoal@hgst.com>
+Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+Cc: Mike Snitzer <snitzer@redhat.com>
 ---
- block/blk-sysfs.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ drivers/md/dm-rq.c | 18 ++----------------
+ 1 file changed, 2 insertions(+), 16 deletions(-)
 
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index ff9cd9c..488c2e2 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -130,6 +130,11 @@ static ssize_t queue_physical_block_size_show(struct request_queue *q, char *pag
- 	return queue_var_show(queue_physical_block_size(q), page);
- }
+diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
+index 182b679..f2c271a 100644
+--- a/drivers/md/dm-rq.c
++++ b/drivers/md/dm-rq.c
+@@ -75,12 +75,6 @@ static void dm_old_start_queue(struct request_queue *q)
  
-+static ssize_t queue_chunk_sectors_show(struct request_queue *q, char *page)
-+{
-+	return queue_var_show(q->limits.chunk_sectors, page);
-+}
-+
- static ssize_t queue_io_min_show(struct request_queue *q, char *page)
+ static void dm_mq_start_queue(struct request_queue *q)
  {
- 	return queue_var_show(queue_io_min(q), page);
-@@ -455,6 +460,11 @@ static struct queue_sysfs_entry queue_physical_block_size_entry = {
- 	.show = queue_physical_block_size_show,
- };
+-	unsigned long flags;
+-
+-	spin_lock_irqsave(q->queue_lock, flags);
+-	queue_flag_clear(QUEUE_FLAG_STOPPED, q);
+-	spin_unlock_irqrestore(q->queue_lock, flags);
+-
+ 	blk_mq_start_stopped_hw_queues(q, true);
+ 	blk_mq_kick_requeue_list(q);
+ }
+@@ -105,16 +99,8 @@ static void dm_old_stop_queue(struct request_queue *q)
  
-+static struct queue_sysfs_entry queue_chunk_sectors_entry = {
-+	.attr = {.name = "chunk_sectors", .mode = S_IRUGO },
-+	.show = queue_chunk_sectors_show,
-+};
-+
- static struct queue_sysfs_entry queue_io_min_entry = {
- 	.attr = {.name = "minimum_io_size", .mode = S_IRUGO },
- 	.show = queue_io_min_show,
-@@ -555,6 +565,7 @@ static struct attribute *default_attrs[] = {
- 	&queue_hw_sector_size_entry.attr,
- 	&queue_logical_block_size_entry.attr,
- 	&queue_physical_block_size_entry.attr,
-+	&queue_chunk_sectors_entry.attr,
- 	&queue_io_min_entry.attr,
- 	&queue_io_opt_entry.attr,
- 	&queue_discard_granularity_entry.attr,
+ static void dm_mq_stop_queue(struct request_queue *q)
+ {
+-	unsigned long flags;
+-
+-	spin_lock_irqsave(q->queue_lock, flags);
+-	if (blk_queue_stopped(q)) {
+-		spin_unlock_irqrestore(q->queue_lock, flags);
++	if (blk_mq_queue_stopped(q))
+ 		return;
+-	}
+-
+-	queue_flag_set(QUEUE_FLAG_STOPPED, q);
+-	spin_unlock_irqrestore(q->queue_lock, flags);
+ 
+ 	/* Avoid that requeuing could restart the queue. */
+ 	blk_mq_cancel_requeue_work(q);
+@@ -341,7 +327,7 @@ static void __dm_mq_kick_requeue_list(struct request_queue *q, unsigned long mse
+ 	unsigned long flags;
+ 
+ 	spin_lock_irqsave(q->queue_lock, flags);
+-	if (!blk_queue_stopped(q))
++	if (!blk_mq_queue_stopped(q))
+ 		blk_mq_delay_kick_requeue_list(q, msecs);
+ 	spin_unlock_irqrestore(q->queue_lock, flags);
+ }
 -- 
-2.7.4
+2.10.0
 
-Western Digital Corporation (and its subsidiaries) E-mail Confidentiality Notice & Disclaimer:
-
-This e-mail and any files transmitted with it may contain confidential or legally privileged information of WDC and/or its affiliates, and are intended solely for the use of the individual or entity to which they are addressed. If you are not the intended recipient, any disclosure, copying, distribution or any action taken or omitted to be taken in reliance on it, is prohibited. If you have received this e-mail in error, please notify the sender immediately and delete the e-mail in its entirety from your system.
