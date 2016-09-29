@@ -1,11 +1,15 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-dm3nam03on0087.outbound.protection.outlook.com ([104.47.41.87]:14336
-        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1162640AbcIZS0G (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Sep 2016 14:26:06 -0400
-To: Jens Axboe <axboe@fb.com>
-CC: Christoph Hellwig <hch@lst.de>,
+Received: from mx2.suse.de ([195.135.220.15]:55483 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752887AbcI2Fyc (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 29 Sep 2016 01:54:32 -0400
+Subject: Re: [PATCH v2 6/7] SRP transport: Port srp_wait_for_queuecommand() to
+ scsi-mq
+To: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Jens Axboe <axboe@fb.com>
+References: <f153ee47-e599-c333-92b0-d5da475012f3@sandisk.com>
+ <bedf4b45-00b0-6844-047d-f1e05bb1092f@sandisk.com>
+Cc: Christoph Hellwig <hch@lst.de>,
         James Bottomley <jejb@linux.vnet.ibm.com>,
         "Martin K. Petersen" <martin.petersen@oracle.com>,
         Mike Snitzer <snitzer@redhat.com>,
@@ -15,36 +19,34 @@ CC: Christoph Hellwig <hch@lst.de>,
         "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
         "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
         "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-Subject: [PATCH 0/9] Introduce blk_quiesce_queue() and blk_resume_queue()
-Message-ID: <7948dbb8-6333-dc62-2673-4da35b4dfdbc@sandisk.com>
-Date: Mon, 26 Sep 2016 11:25:54 -0700
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <c0cae8d1-c82e-5089-3f93-cd03511b45cc@suse.de>
+Date: Thu, 29 Sep 2016 07:54:29 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
+In-Reply-To: <bedf4b45-00b0-6844-047d-f1e05bb1092f@sandisk.com>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hello Jens,
+On 09/29/2016 02:01 AM, Bart Van Assche wrote:
+> Ensure that if scsi-mq is enabled that srp_wait_for_queuecommand()
+> waits until ongoing shost->hostt->queuecommand() calls have finished.
+> 
+> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+> Cc: James Bottomley <jejb@linux.vnet.ibm.com>
+> Cc: Martin K. Petersen <martin.petersen@oracle.com>
+> Cc: Doug Ledford <dledford@redhat.com>
+> ---
+>  drivers/scsi/scsi_transport_srp.c | 24 ++++++++++++++++++++----
+>  1 file changed, 20 insertions(+), 4 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Multiple block drivers need the functionality to stop a request queue 
-and to wait until all ongoing request_fn() / queue_rq() calls have 
-finished without waiting until all outstanding requests have finished. 
-Hence this patch series that introduces the blk_quiesce_queue() and 
-blk_resume_queue() functions. The dm-mq, SRP and nvme patches in this 
-patch series are three examples of where these functions are useful. 
-These patches apply on top of the September 21 version of your 
-for-4.9/block branch. The individual patches in this series are:
+Cheers,
 
-0001-blk-mq-Introduce-blk_mq_queue_stopped.patch
-0002-dm-Fix-a-race-condition-related-to-stopping-and-star.patch
-0003-RFC-nvme-Use-BLK_MQ_S_STOPPED-instead-of-QUEUE_FLAG_.patch
-0004-block-Move-blk_freeze_queue-and-blk_unfreeze_queue-c.patch
-0005-block-Extend-blk_freeze_queue_start-to-the-non-blk-m.patch
-0006-block-Rename-mq_freeze_wq-and-mq_freeze_depth.patch
-0007-blk-mq-Introduce-blk_quiesce_queue-and-blk_resume_qu.patch
-0008-SRP-transport-Port-srp_wait_for_queuecommand-to-scsi.patch
-0009-RFC-nvme-Fix-a-race-condition.patch
-
-Thanks,
-
-Bart.
+Hannes
+-- 
+Dr. Hannes Reinecke		      zSeries & Storage
+hare@suse.de			      +49 911 74053 688
+SUSE LINUX Products GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: J. Hawn, J. Guild, F. Imendörffer, HRB 16746 (AG Nürnberg)
