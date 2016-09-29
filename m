@@ -1,95 +1,31 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-by2nam03on0070.outbound.protection.outlook.com ([104.47.42.70]:2240
-        "EHLO NAM03-BY2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1753938AbcI2ABc (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Sep 2016 20:01:32 -0400
-Subject: [PATCH v2 6/7] SRP transport: Port srp_wait_for_queuecommand() to
- scsi-mq
-To: Jens Axboe <axboe@fb.com>
-References: <f153ee47-e599-c333-92b0-d5da475012f3@sandisk.com>
-CC: Christoph Hellwig <hch@lst.de>,
-        James Bottomley <jejb@linux.vnet.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Doug Ledford <dledford@redhat.com>,
-        Keith Busch <keith.busch@intel.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-Message-ID: <bedf4b45-00b0-6844-047d-f1e05bb1092f@sandisk.com>
-Date: Wed, 28 Sep 2016 17:01:22 -0700
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+Date: Thu, 29 Sep 2016 17:32:37 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Brian King <brking@linux.vnet.ibm.com>
+Cc: Christoph Hellwig <hch@lst.de>, hans.verkuil@cisco.com,
+        brking@us.ibm.com, haver@linux.vnet.ibm.com,
+        ching2048@areca.com.tw, axboe@fb.com, alex.williamson@redhat.com,
+        kvm@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/6] ipr: use pci_irq_allocate_vectors
+Message-ID: <20160929153237.GA32512@lst.de>
+References: <1473600688-24043-1-git-send-email-hch@lst.de> <1473600688-24043-3-git-send-email-hch@lst.de> <200e5b3f-8555-9cd3-7940-0ec0f2867b95@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <f153ee47-e599-c333-92b0-d5da475012f3@sandisk.com>
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <200e5b3f-8555-9cd3-7940-0ec0f2867b95@linux.vnet.ibm.com>
+Sender: linux-scsi-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Ensure that if scsi-mq is enabled that srp_wait_for_queuecommand()
-waits until ongoing shost->hostt->queuecommand() calls have finished.
+On Thu, Sep 29, 2016 at 09:01:44AM -0500, Brian King wrote:
+> Thanks Christoph. Very nice. As I was reviewing the patch, I noticed
+> the additional PCI_IRQ_AFFINITY flag, which is currently not being set
+> in this patch. Is the intention to set that globally by default, or
+> should I follow up with a one liner to add that to the ipr driver
+> in the next patch set I send out?
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: James Bottomley <jejb@linux.vnet.ibm.com>
-Cc: Martin K. Petersen <martin.petersen@oracle.com>
-Cc: Doug Ledford <dledford@redhat.com>
----
- drivers/scsi/scsi_transport_srp.c | 24 ++++++++++++++++++++----
- 1 file changed, 20 insertions(+), 4 deletions(-)
+Hi Brian,
 
-diff --git a/drivers/scsi/scsi_transport_srp.c b/drivers/scsi/scsi_transport_srp.c
-index e3cd3ec..f1d580e 100644
---- a/drivers/scsi/scsi_transport_srp.c
-+++ b/drivers/scsi/scsi_transport_srp.c
-@@ -25,6 +25,7 @@
- #include <linux/slab.h>
- #include <linux/string.h>
- #include <linux/delay.h>
-+#include <linux/blk-mq.h>
- 
- #include <scsi/scsi.h>
- #include <scsi/scsi_cmnd.h>
-@@ -405,8 +406,6 @@ static void srp_reconnect_work(struct work_struct *work)
- /**
-  * scsi_request_fn_active() - number of kernel threads inside scsi_request_fn()
-  * @shost: SCSI host for which to count the number of scsi_request_fn() callers.
-- *
-- * To do: add support for scsi-mq in this function.
-  */
- static int scsi_request_fn_active(struct Scsi_Host *shost)
- {
-@@ -425,11 +424,28 @@ static int scsi_request_fn_active(struct Scsi_Host *shost)
- 	return request_fn_active;
- }
- 
-+static void srp_mq_wait_for_queuecommand(struct Scsi_Host *shost)
-+{
-+	struct scsi_device *sdev;
-+	struct request_queue *q;
-+
-+	shost_for_each_device(sdev, shost) {
-+		q = sdev->request_queue;
-+
-+		blk_mq_quiesce_queue(q);
-+		blk_mq_resume_queue(q);
-+	}
-+}
-+
- /* Wait until ongoing shost->hostt->queuecommand() calls have finished. */
- static void srp_wait_for_queuecommand(struct Scsi_Host *shost)
- {
--	while (scsi_request_fn_active(shost))
--		msleep(20);
-+	if (shost->use_blk_mq) {
-+		srp_mq_wait_for_queuecommand(shost);
-+	} else {
-+		while (scsi_request_fn_active(shost))
-+			msleep(20);
-+	}
- }
- 
- static void __rport_fail_io_fast(struct srp_rport *rport)
--- 
-2.10.0
-
+PCI_IRQ_AFFINITY seems useful for ipr, especially if you also increase
+the number of vectors above the current default 2.  And yes, please
+make it a separate patch.
