@@ -1,182 +1,58 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-bn3nam01on0085.outbound.protection.outlook.com ([104.47.33.85]:55808
-        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
+Received: from mail-co1nam03on0068.outbound.protection.outlook.com ([104.47.40.68]:2661
+        "EHLO NAM03-CO1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1163010AbcIZS1k (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Sep 2016 14:27:40 -0400
-Subject: [PATCH 4/9] block: Move blk_freeze_queue() and blk_unfreeze_queue()
- code
-To: Jens Axboe <axboe@fb.com>
-References: <7948dbb8-6333-dc62-2673-4da35b4dfdbc@sandisk.com>
-CC: Christoph Hellwig <hch@lst.de>,
-        James Bottomley <jejb@linux.vnet.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Doug Ledford <dledford@redhat.com>,
-        Keith Busch <keith.busch@intel.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+        id S1754821AbcI2PsR (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 29 Sep 2016 11:48:17 -0400
+Subject: Re: [PATCH] blkcg: Unlock blkcg_pol_mutex once if cpd == NULL
+To: Tejun Heo <tj@kernel.org>
+References: <db0c6205-9ca2-d80e-26fc-6cff0d84d73c@sandisk.com>
+ <20160929100352.GC24034@mtj.duckdns.org>
+CC: Jens Axboe <axboe@fb.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 From: Bart Van Assche <bart.vanassche@sandisk.com>
-Message-ID: <f990694e-76ea-f6b1-10a4-c23b9a738b39@sandisk.com>
-Date: Mon, 26 Sep 2016 11:27:28 -0700
+Message-ID: <f068d439-4769-5fb5-f64a-0eed54bfe576@sandisk.com>
+Date: Thu, 29 Sep 2016 08:32:26 -0700
 MIME-Version: 1.0
-In-Reply-To: <7948dbb8-6333-dc62-2673-4da35b4dfdbc@sandisk.com>
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20160929100352.GC24034@mtj.duckdns.org>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Move the blk_freeze_queue() and blk_unfreeze_queue() implementations
-from block/blk-mq.c to block/blk-core.c. Drop "_mq" from the name of
-the functions that have been moved.
+On 09/29/2016 03:03 AM, Tejun Heo wrote:
+> Hello,
+>
+> On Mon, Sep 26, 2016 at 03:36:25PM -0700, Bart Van Assche wrote:
+>> Unlocking a mutex twice is wrong. Hence modify blkcg_policy_register()
+>> such that blkcg_pol_mutex is unlocked once if cpd == NULL. This patch
+>> avoids that smatch reports the following error:
+>>
+>> block/blk-cgroup.c:1378: blkcg_policy_register() error: double unlock 'mutex:&blkcg_pol_mutex'
+>>
+>> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+>> Cc: Tejun Heo <tj@kernel.org>
+>> Cc: <stable@vger.kernel.org>
+>> ---
+>>  block/blk-cgroup.c | 6 ++++--
+>>  1 file changed, 4 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+>> index dd38e5c..cdbca1c 100644
+>> --- a/block/blk-cgroup.c
+>> +++ b/block/blk-cgroup.c
+>> @@ -1327,8 +1327,10 @@ int blkcg_policy_register(struct blkcg_policy *pol)
+>>  	for (i = 0; i < BLKCG_MAX_POLS; i++)
+>>  		if (!blkcg_policy[i])
+>>  			break;
+>> -	if (i >= BLKCG_MAX_POLS)
+>> +	if (i >= BLKCG_MAX_POLS) {
+>> +		mutex_unlock(&blkcg_pol_mutex);
+>>  		goto err_unlock;
+>> +	}
+>
+> Wouldn't it be better to drop explicit mutx_unlock(&blkcg_pol_mutex)
+> on "if (!cpd)"?
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
----
- block/blk-core.c | 45 +++++++++++++++++++++++++++++++++++++++++++++
- block/blk-mq.c   | 41 +++--------------------------------------
- block/blk.h      |  3 +++
- 3 files changed, 51 insertions(+), 38 deletions(-)
+Agreed. I will rework this patch accordingly. Thanks for the feedback.
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index b75d688..8cc8006 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -682,6 +682,51 @@ static void blk_queue_usage_counter_release(struct percpu_ref *ref)
- 	wake_up_all(&q->mq_freeze_wq);
- }
- 
-+void blk_freeze_queue_start(struct request_queue *q)
-+{
-+	int freeze_depth;
-+
-+	freeze_depth = atomic_inc_return(&q->mq_freeze_depth);
-+	if (freeze_depth == 1) {
-+		percpu_ref_kill(&q->q_usage_counter);
-+		blk_mq_run_hw_queues(q, false);
-+	}
-+}
-+
-+void blk_freeze_queue_wait(struct request_queue *q)
-+{
-+	wait_event(q->mq_freeze_wq, percpu_ref_is_zero(&q->q_usage_counter));
-+}
-+
-+/*
-+ * Guarantee no request is in use, so we can change any data structure of
-+ * the queue afterward.
-+ */
-+void blk_freeze_queue(struct request_queue *q)
-+{
-+	/*
-+	 * In the !blk_mq case we are only calling this to kill the
-+	 * q_usage_counter, otherwise this increases the freeze depth
-+	 * and waits for it to return to zero.  For this reason there is
-+	 * no blk_unfreeze_queue(), and blk_freeze_queue() is not
-+	 * exported to drivers as the only user for unfreeze is blk_mq.
-+	 */
-+	blk_freeze_queue_start(q);
-+	blk_freeze_queue_wait(q);
-+}
-+
-+void blk_unfreeze_queue(struct request_queue *q)
-+{
-+	int freeze_depth;
-+
-+	freeze_depth = atomic_dec_return(&q->mq_freeze_depth);
-+	WARN_ON_ONCE(freeze_depth < 0);
-+	if (!freeze_depth) {
-+		percpu_ref_reinit(&q->q_usage_counter);
-+		wake_up_all(&q->mq_freeze_wq);
-+	}
-+}
-+
- static void blk_rq_timed_out_timer(unsigned long data)
- {
- 	struct request_queue *q = (struct request_queue *)data;
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 98d4812..50b26df 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -60,38 +60,10 @@ static void blk_mq_hctx_clear_pending(struct blk_mq_hw_ctx *hctx,
- 
- void blk_mq_freeze_queue_start(struct request_queue *q)
- {
--	int freeze_depth;
--
--	freeze_depth = atomic_inc_return(&q->mq_freeze_depth);
--	if (freeze_depth == 1) {
--		percpu_ref_kill(&q->q_usage_counter);
--		blk_mq_run_hw_queues(q, false);
--	}
-+	blk_freeze_queue_start(q);
- }
- EXPORT_SYMBOL_GPL(blk_mq_freeze_queue_start);
- 
--static void blk_mq_freeze_queue_wait(struct request_queue *q)
--{
--	wait_event(q->mq_freeze_wq, percpu_ref_is_zero(&q->q_usage_counter));
--}
--
--/*
-- * Guarantee no request is in use, so we can change any data structure of
-- * the queue afterward.
-- */
--void blk_freeze_queue(struct request_queue *q)
--{
--	/*
--	 * In the !blk_mq case we are only calling this to kill the
--	 * q_usage_counter, otherwise this increases the freeze depth
--	 * and waits for it to return to zero.  For this reason there is
--	 * no blk_unfreeze_queue(), and blk_freeze_queue() is not
--	 * exported to drivers as the only user for unfreeze is blk_mq.
--	 */
--	blk_mq_freeze_queue_start(q);
--	blk_mq_freeze_queue_wait(q);
--}
--
- void blk_mq_freeze_queue(struct request_queue *q)
- {
- 	/*
-@@ -104,14 +76,7 @@ EXPORT_SYMBOL_GPL(blk_mq_freeze_queue);
- 
- void blk_mq_unfreeze_queue(struct request_queue *q)
- {
--	int freeze_depth;
--
--	freeze_depth = atomic_dec_return(&q->mq_freeze_depth);
--	WARN_ON_ONCE(freeze_depth < 0);
--	if (!freeze_depth) {
--		percpu_ref_reinit(&q->q_usage_counter);
--		wake_up_all(&q->mq_freeze_wq);
--	}
-+	blk_unfreeze_queue(q);
- }
- EXPORT_SYMBOL_GPL(blk_mq_unfreeze_queue);
- 
-@@ -2177,7 +2142,7 @@ static int blk_mq_queue_reinit_notify(struct notifier_block *nb,
- 	list_for_each_entry(q, &all_q_list, all_q_node)
- 		blk_mq_freeze_queue_start(q);
- 	list_for_each_entry(q, &all_q_list, all_q_node) {
--		blk_mq_freeze_queue_wait(q);
-+		blk_freeze_queue_wait(q);
- 
- 		/*
- 		 * timeout handler can't touch hw queue during the
-diff --git a/block/blk.h b/block/blk.h
-index c37492f..12f7366 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -71,6 +71,9 @@ void __blk_queue_free_tags(struct request_queue *q);
- bool __blk_end_bidi_request(struct request *rq, int error,
- 			    unsigned int nr_bytes, unsigned int bidi_bytes);
- void blk_freeze_queue(struct request_queue *q);
-+void blk_freeze_queue_start(struct request_queue *q);
-+void blk_freeze_queue_wait(struct request_queue *q);
-+void blk_unfreeze_queue(struct request_queue *q);
- 
- static inline void blk_queue_enter_live(struct request_queue *q)
- {
--- 
-2.10.0
-
+Bart.
