@@ -1,83 +1,155 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:25920 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S934569AbcIOL4N (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Sep 2016 07:56:13 -0400
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv3 06/41] radix-tree: Handle multiorder entries being deleted by replace_clear_tags
-Date: Thu, 15 Sep 2016 14:54:48 +0300
-Message-Id: <20160915115523.29737-7-kirill.shutemov@linux.intel.com>
-In-Reply-To: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
-References: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <darrick.wong@oracle.com>
+Subject: [PATCH 3/3] block: implement (some of) fallocate for block devices
+From: "Darrick J. Wong" <darrick.wong@oracle.com>
+To: axboe@kernel.dk, akpm@linux-foundation.org, darrick.wong@oracle.com
+Cc: linux-block@vger.kernel.org, Hannes Reinecke <hare@suse.com>,
+        tytso@mit.edu, martin.petersen@oracle.com, snitzer@redhat.com,
+        linux-api@vger.kernel.org, bfoster@redhat.com, xfs@oss.sgi.com,
+        hch@infradead.org, dm-devel@redhat.com, hare@suse.de,
+        linux-fsdevel@vger.kernel.org, bart.vanassche@sandisk.com
+Date: Thu, 29 Sep 2016 14:16:40 -0700
+Message-ID: <147518379992.22791.8849838163218235007.stgit@birch.djwong.org>
+In-Reply-To: <147518377601.22791.14436504108602322570.stgit@birch.djwong.org>
+References: <147518377601.22791.14436504108602322570.stgit@birch.djwong.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+List-ID: <linux-block@vger.kernel.org>
 
-From: Matthew Wilcox <willy@infradead.org>
+After much discussion, it seems that the fallocate feature flag
+FALLOC_FL_ZERO_RANGE maps nicely to SCSI WRITE SAME; and the feature
+FALLOC_FL_PUNCH_HOLE maps nicely to the devices that have been
+whitelisted for zeroing SCSI UNMAP.  Punch still requires that
+FALLOC_FL_KEEP_SIZE is set.  A length that goes past the end of the
+device will be clamped to the device size if KEEP_SIZE is set; or will
+return -EINVAL if not.  Both start and length must be aligned to the
+device's logical block size.
 
-radix_tree_replace_clear_tags() can be called with NULL as the replacement
-value; in this case we need to delete sibling entries which point to
-the slot.
+Since the semantics of fallocate are fairly well established already,
+wire up the two pieces.  The other fallocate variants (collapse range,
+insert range, and allocate blocks) are not supported.
 
-Signed-off-by: Matthew Wilcox <willy@infradead.org>
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+Signed-off-by: Darrick J. Wong <darrick.wong@oracle.com>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Reviewed-by: Bart Van Assche <bart.vanassche@sandisk.com>
 ---
- lib/radix-tree.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+ fs/block_dev.c |   77 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ fs/open.c      |    3 +-
+ 2 files changed, 79 insertions(+), 1 deletion(-)
 
-diff --git a/lib/radix-tree.c b/lib/radix-tree.c
-index e58855435c01..57c15c4d0796 100644
---- a/lib/radix-tree.c
-+++ b/lib/radix-tree.c
-@@ -1805,17 +1805,23 @@ void *radix_tree_delete(struct radix_tree_root *root, unsigned long index)
- }
- EXPORT_SYMBOL(radix_tree_delete);
+
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index 08ae993..777fd9b 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -30,6 +30,7 @@
+ #include <linux/cleancache.h>
+ #include <linux/dax.h>
+ #include <linux/badblocks.h>
++#include <linux/falloc.h>
+ #include <asm/uaccess.h>
+ #include "internal.h"
  
-+/*
-+ * If the caller passes NULL for @entry, it must take care to adjust
-+ * node->count.  See page_cache_tree_delete() for an example.
-+ */
- struct radix_tree_node *radix_tree_replace_clear_tags(
- 			struct radix_tree_root *root,
- 			unsigned long index, void *entry)
- {
- 	struct radix_tree_node *node;
- 	void **slot;
-+	unsigned int offset;
+@@ -1787,6 +1788,81 @@ static const struct address_space_operations def_blk_aops = {
+ 	.is_dirty_writeback = buffer_check_dirty_writeback,
+ };
  
- 	__radix_tree_lookup(root, index, &node, &slot);
- 
- 	if (node) {
--		unsigned int tag, offset = get_slot_offset(node, slot);
-+		unsigned int tag;
-+		offset = get_slot_offset(node, slot);
- 		for (tag = 0; tag < RADIX_TREE_MAX_TAGS; tag++)
- 			node_tag_clear(root, node, tag, offset);
- 	} else {
-@@ -1824,6 +1830,9 @@ struct radix_tree_node *radix_tree_replace_clear_tags(
- 	}
- 
- 	radix_tree_replace_slot(slot, entry);
-+	if (!entry && node)
-+		delete_sibling_entries(node, node_to_entry(slot), offset);
++#define	BLKDEV_FALLOC_FL_SUPPORTED					\
++		(FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE |		\
++		 FALLOC_FL_ZERO_RANGE | FALLOC_FL_NO_HIDE_STALE)
 +
- 	return node;
- }
++static long blkdev_fallocate(struct file *file, int mode, loff_t start,
++			     loff_t len)
++{
++	struct block_device *bdev = I_BDEV(bdev_file_inode(file));
++	struct request_queue *q = bdev_get_queue(bdev);
++	struct address_space *mapping;
++	loff_t end = start + len - 1;
++	loff_t isize;
++	int error;
++
++	/* Fail if we don't recognize the flags. */
++	if (mode & ~BLKDEV_FALLOC_FL_SUPPORTED)
++		return -EOPNOTSUPP;
++
++	/* Don't go off the end of the device. */
++	isize = i_size_read(bdev->bd_inode);
++	if (start >= isize)
++		return -EINVAL;
++	if (end >= isize) {
++		if (mode & FALLOC_FL_KEEP_SIZE) {
++			len = isize - start;
++			end = start + len - 1;
++		} else
++			return -EINVAL;
++	}
++
++	/*
++	 * Don't allow IO that isn't aligned to logical block size.
++	 */
++	if ((start | len) & (bdev_logical_block_size(bdev) - 1))
++		return -EINVAL;
++
++	/* Invalidate the page cache, including dirty pages. */
++	mapping = bdev->bd_inode->i_mapping;
++	truncate_inode_pages_range(mapping, start, end);
++
++	switch (mode) {
++	case FALLOC_FL_ZERO_RANGE:
++	case FALLOC_FL_ZERO_RANGE | FALLOC_FL_KEEP_SIZE:
++		error = blkdev_issue_zeroout(bdev, start >> 9, len >> 9,
++					    GFP_KERNEL, false);
++		break;
++	case FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE:
++		/* Only punch if the device can do zeroing discard. */
++		if (!blk_queue_discard(q) || !q->limits.discard_zeroes_data)
++			return -EOPNOTSUPP;
++		error = blkdev_issue_discard(bdev, start >> 9, len >> 9,
++					     GFP_KERNEL, 0);
++		break;
++	case FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE | FALLOC_FL_NO_HIDE_STALE:
++		if (!blk_queue_discard(q))
++			return -EOPNOTSUPP;
++		error = blkdev_issue_discard(bdev, start >> 9, len >> 9,
++					     GFP_KERNEL, 0);
++		break;
++	default:
++		return -EOPNOTSUPP;
++	}
++	if (error)
++		return error;
++
++	/*
++	 * Invalidate again; if someone wandered in and dirtied a page,
++	 * the caller will be given -EBUSY.  The third argument is
++	 * inclusive, so the rounding here is safe.
++	 */
++	return invalidate_inode_pages2_range(mapping,
++					     start >> PAGE_SHIFT,
++					     end >> PAGE_SHIFT);
++}
++
+ const struct file_operations def_blk_fops = {
+ 	.open		= blkdev_open,
+ 	.release	= blkdev_close,
+@@ -1801,6 +1877,7 @@ const struct file_operations def_blk_fops = {
+ #endif
+ 	.splice_read	= generic_file_splice_read,
+ 	.splice_write	= iter_file_splice_write,
++	.fallocate	= blkdev_fallocate,
+ };
  
--- 
-2.9.3
-
+ int ioctl_by_bdev(struct block_device *bdev, unsigned cmd, unsigned long arg)
+diff --git a/fs/open.c b/fs/open.c
+index 4fd6e25..01b6092 100644
+--- a/fs/open.c
++++ b/fs/open.c
+@@ -289,7 +289,8 @@ int vfs_fallocate(struct file *file, int mode, loff_t offset, loff_t len)
+ 	 * Let individual file system decide if it supports preallocation
+ 	 * for directories or not.
+ 	 */
+-	if (!S_ISREG(inode->i_mode) && !S_ISDIR(inode->i_mode))
++	if (!S_ISREG(inode->i_mode) && !S_ISDIR(inode->i_mode) &&
++	    !S_ISBLK(inode->i_mode))
+ 		return -ENODEV;
+ 
+ 	/* Check for wrap through zero too */
