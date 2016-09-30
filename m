@@ -1,62 +1,51 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv3 12/41] thp: handle write-protection faults for file THP
-Date: Thu, 15 Sep 2016 14:54:54 +0300
-Message-Id: <20160915115523.29737-13-kirill.shutemov@linux.intel.com>
-In-Reply-To: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
-References: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <Damien.LeMoal@hgst.com>
+From: Damien Le Moal <damien.lemoal@hgst.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>, Christoph
+ Hellwig <hch@lst.de>, "Martin K . Petersen" <martin.petersen@oracle.com>,
+	Hannes Reinecke <hare@suse.de>, Shaun Tancheff <shaun@tancheff.com>, Damien
+ Le Moal <damien.lemoal@hgst.com>, Hannes Reinecke <hare@suse.com>
+Subject: [PATCH v5 3/7] block: update chunk_sectors in blk_stack_limits()
+Date: Fri, 30 Sep 2016 13:11:35 +0900
+Message-ID: <1475208699-27310-4-git-send-email-damien.lemoal@hgst.com>
+In-Reply-To: <1475208699-27310-1-git-send-email-damien.lemoal@hgst.com>
+References: <1475208699-27310-1-git-send-email-damien.lemoal@hgst.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Return-Path: damien.lemoal@hgst.com
 List-ID: <linux-block@vger.kernel.org>
 
-For filesystems that wants to be write-notified (has mkwrite), we will
-encount write-protection faults for huge PMDs in shared mappings.
+From: Hannes Reinecke <hare@suse.de>
 
-The easiest way to handle them is to clear the PMD and let it refault as
-wriable.
+Signed-off-by: Hannes Reinecke <hare@suse.com>
+Signed-off-by: Damien Le Moal <damien.lemoal@hgst.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+Reviewed-by: Shaun Tancheff <shaun.tancheff@seagate.com>
+Tested-by: Shaun Tancheff <shaun.tancheff@seagate.com>
 
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- mm/memory.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+ block/blk-settings.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/mm/memory.c b/mm/memory.c
-index 83be99d9d8a1..aad8d5c6311f 100644
---- a/mm/memory.c
-+++ b/mm/memory.c
-@@ -3451,8 +3451,17 @@ static int wp_huge_pmd(struct fault_env *fe, pmd_t orig_pmd)
- 		return fe->vma->vm_ops->pmd_fault(fe->vma, fe->address, fe->pmd,
- 				fe->flags);
+diff --git a/block/blk-settings.c b/block/blk-settings.c
+index b1d5b7f..55369a6 100644
+--- a/block/blk-settings.c
++++ b/block/blk-settings.c
+@@ -631,6 +631,10 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
+ 			t->discard_granularity;
+ 	}
  
-+	if (fe->vma->vm_flags & VM_SHARED) {
-+		/* Clear PMD */
-+		zap_page_range_single(fe->vma, fe->address,
-+				HPAGE_PMD_SIZE, NULL);
-+		VM_BUG_ON(!pmd_none(*fe->pmd));
++	if (b->chunk_sectors)
++		t->chunk_sectors = min_not_zero(t->chunk_sectors,
++						b->chunk_sectors);
 +
-+		/* Refault to establish writable PMD */
-+		return 0;
-+	}
-+
- 	/* COW handled on pte level: split pmd */
--	VM_BUG_ON_VMA(fe->vma->vm_flags & VM_SHARED, fe->vma);
- 	split_huge_pmd(fe->vma, fe->pmd, fe->address);
- 
- 	return VM_FAULT_FALLBACK;
+ 	return ret;
+ }
+ EXPORT_SYMBOL(blk_stack_limits);
 -- 
-2.9.3
+2.7.4
 
+Western Digital Corporation (and its subsidiaries) E-mail Confidentiality Notice & Disclaimer:
+
+This e-mail and any files transmitted with it may contain confidential or legally privileged information of WDC and/or its affiliates, and are intended solely for the use of the individual or entity to which they are addressed. If you are not the intended recipient, any disclosure, copying, distribution or any action taken or omitted to be taken in reliance on it, is prohibited. If you have received this e-mail in error, please notify the sender immediately and delete the e-mail in its entirety from your system.
