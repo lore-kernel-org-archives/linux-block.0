@@ -1,97 +1,95 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-cys01nam02on0046.outbound.protection.outlook.com ([104.47.37.46]:50928
-        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1162880AbcIZS2y (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Sep 2016 14:28:54 -0400
-Subject: [PATCH 8/9] SRP transport: Port srp_wait_for_queuecommand() to
- scsi-mq
-To: Jens Axboe <axboe@fb.com>
-References: <7948dbb8-6333-dc62-2673-4da35b4dfdbc@sandisk.com>
-CC: Christoph Hellwig <hch@lst.de>,
-        James Bottomley <jejb@linux.vnet.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Doug Ledford <dledford@redhat.com>,
-        Keith Busch <keith.busch@intel.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-Message-ID: <456fc29e-a20f-51ec-631b-39ae311aa83a@sandisk.com>
-Date: Mon, 26 Sep 2016 11:28:42 -0700
+Return-Path: <Adam.Manzanares@hgst.com>
+Date: Fri, 30 Sep 2016 09:02:17 -0700
+From: Adam Manzanares <adam.manzanares@hgst.com>
+To: Tejun Heo <tj@kernel.org>
+CC: <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
+	<linux-ide@vger.kernel.org>
+Subject: Re: [PATCH 1/3] block: Add iocontext priority to request
+Message-ID: <20160930160216.GA13637@hgst.com>
+References: <1475000096-6148-1-git-send-email-adam.manzanares@hgst.com>
+ <1475000096-6148-2-git-send-email-adam.manzanares@hgst.com>
+ <20160929084059.GB11087@mtj.duckdns.org>
 MIME-Version: 1.0
-In-Reply-To: <7948dbb8-6333-dc62-2673-4da35b4dfdbc@sandisk.com>
 Content-Type: text/plain; charset="utf-8"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <20160929084059.GB11087@mtj.duckdns.org>
+Return-Path: adam.manzanares@hgst.com
+List-ID: <linux-block@vger.kernel.org>
 
-Ensure that if scsi-mq is enabled that srp_wait_for_queuecommand()
-waits until ongoing shost->hostt->queuecommand() calls have finished.
-For the !scsi-mq path, use blk_quiesce_queue() and blk_resume_queue()
-instead of busy-waiting.
-
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: James Bottomley <jejb@linux.vnet.ibm.com>
-Cc: Martin K. Petersen <martin.petersen@oracle.com>
-Cc: Doug Ledford <dledford@redhat.com>
----
- drivers/scsi/scsi_transport_srp.c | 26 +++++---------------------
- 1 file changed, 5 insertions(+), 21 deletions(-)
-
-diff --git a/drivers/scsi/scsi_transport_srp.c b/drivers/scsi/scsi_transport_srp.c
-index e3cd3ec..841a3eb 100644
---- a/drivers/scsi/scsi_transport_srp.c
-+++ b/drivers/scsi/scsi_transport_srp.c
-@@ -24,7 +24,7 @@
- #include <linux/err.h>
- #include <linux/slab.h>
- #include <linux/string.h>
--#include <linux/delay.h>
-+#include <linux/blk-mq.h>
- 
- #include <scsi/scsi.h>
- #include <scsi/scsi_cmnd.h>
-@@ -402,34 +402,18 @@ static void srp_reconnect_work(struct work_struct *work)
- 	}
- }
- 
--/**
-- * scsi_request_fn_active() - number of kernel threads inside scsi_request_fn()
-- * @shost: SCSI host for which to count the number of scsi_request_fn() callers.
-- *
-- * To do: add support for scsi-mq in this function.
-- */
--static int scsi_request_fn_active(struct Scsi_Host *shost)
-+/* Wait until ongoing shost->hostt->queuecommand() calls have finished. */
-+static void srp_wait_for_queuecommand(struct Scsi_Host *shost)
- {
- 	struct scsi_device *sdev;
- 	struct request_queue *q;
--	int request_fn_active = 0;
- 
- 	shost_for_each_device(sdev, shost) {
- 		q = sdev->request_queue;
- 
--		spin_lock_irq(q->queue_lock);
--		request_fn_active += q->request_fn_active;
--		spin_unlock_irq(q->queue_lock);
-+		blk_quiesce_queue(q);
-+		blk_resume_queue(q);
- 	}
--
--	return request_fn_active;
--}
--
--/* Wait until ongoing shost->hostt->queuecommand() calls have finished. */
--static void srp_wait_for_queuecommand(struct Scsi_Host *shost)
--{
--	while (scsi_request_fn_active(shost))
--		msleep(20);
- }
- 
- static void __rport_fail_io_fast(struct srp_rport *rport)
--- 
-2.10.0
-
+SGVsbG8gVGVqdW4sCgpUaGUgMDkvMjkvMjAxNiAxMDo0MCwgVGVqdW4gSGVvIHdyb3RlOgo+IEhl
+bGxvLAo+IAo+IE9uIFR1ZSwgU2VwIDI3LCAyMDE2IGF0IDExOjE0OjU0QU0gLTA3MDAsIEFkYW0g
+TWFuemFuYXJlcyB3cm90ZToKPiA+IFBhdGNoIGFkZHMgYXNzb2NpYXRpb24gYmV0d2VlbiBpb2Nv
+bnRleHQgYW5kIGEgcmVxdWVzdC4KPiA+IAo+ID4gU2lnbmVkLW9mZi1ieTogQWRhbSBNYW56YW5h
+cmVzIDxhZGFtLm1hbnphbmFyZXNAaGdzdC5jb20+Cj4gCj4gQ2FuIHlvdSBwbGVhc2UgZGVzY3Jp
+YmUgaG93IHRoaXMgbWF5IGltcGFjdCBleGlzdGluZyB1c2FnZXM/Cj4KSSdsbCBzdGFydCB3aXRo
+IHRoZSBjaGFuZ2VzIEkgbWFkZSBhbmQgd29yayBteSB3YXkgdGhyb3VnaCBhIGdyZXAgb2YgICAg
+ICAgICAgICAKaW9wcmlvLiBQbGVhc2UgYWRkIG9yIGNvcnJlY3QgYW55IG9mIHRoZSBhc3N1bXB0
+aW9ucyBJIGhhdmUgbWFkZS4gICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAK
+SW4gYmxrLWNvcmUsIHRoZSBiZWhhdmlvciBiZWZvcmUgdGhlIHBhdGNoIGlzIHRvIGdldCB0aGUg
+aW9wcmlvIGZvciB0aGUgcmVxdWVzdCAKZnJvbSB0aGUgYmlvLiBUaGUgb25seSByZWZlcmVuY2Vz
+IEkgZm91bmQgdG8gYmlvX3NldF9wcmlvIGFyZSBpbiBiY2FjaGUuIEJvdGggICAKb2YgdGhlc2Ug
+cmVmZXJlbmNlcyBhcmUgaW4gbG93IHByaW9yaXR5IG9wZXJhdGlvbnMgKGdjLCBiZyB3cml0ZWJh
+Y2spIHNvIHRoZSAgICAKaW9wcmlvcml0eSBvZiB0aGUgYmlvIGlzIHNldCB0byBJT19QUklPQ0xB
+U1NfSURMRSBpbiB0aGVzZSBjYXNlcy4gICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAKQSBrZXJuZWwgdGhyZWFkIGlzIHVzZWQgdG8gc3VibWl0IHRoZXNlIGJpb3Mgc28gdGhl
+IGlvcHJpbyBpcyBnb2luZyB0byBjb21lICAgICAKZnJvbSB0aGUgY3VycmVudCBydW5uaW5nIHRh
+c2sgaWYgdGhlIGlvY29udGV4dCBleGlzdHMuIFRoaXMgY291bGQgYmUgYSBwcm9ibGVtICAKaWYg
+d2UgaGF2ZSBzZXQgYSB0YXNrIHdpdGggaGlnaCBwcmlvcml0eSBhbmQgc29tZSBiYWNrZ3JvdW5k
+IHdvcmsgZW5kcyB1cCAgICAgICAKZ2V0dGluZyBnZW5lcmF0ZWQgaW4gdGhlIGJjYWNoZSBsYXll
+ci4gSSBwcm9wb3NlIHRoYXQgd2UgY2hlY2sgaWYgdGhlICAgICAgICAgICAKaW9wcmlvcml0eSBv
+ZiB0aGUgYmlvIGlzIHZhbGlkIGFuZCBpZiBzbywgdGhlbiB3ZSBrZWVwIHRoZSBwcmlvcmlydHkg
+ZnJvbSB0aGUgICAKYmlvLiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAKVGhlIHNlY29uZCBhcmVhIHRoYXQgSSBzZWUgYSBwb3RlbnRpYWwgcHJvYmxlbSBpcyBpbiB0
+aGUgbWVyZ2luZyBjb2RlIGNvZGUgaW4gICAKYmxrLWNvcmUgd2hlbiBhIGJpbyBpcyBxdWV1ZWQu
+IElmIHRoZXJlIGlzIGEgcmVxdWVzdCB0aGF0IGlzIG1lcmdlYWJsZSB0aGVuICAgICAKdGhlIG1l
+cmdlIGNvZGUgdGFrZXMgdGhlIGhpZ2hlc3QgcHJpb3JpdHkgb2YgdGhlIGJpbyBhbmQgdGhlIHJl
+cXVlc3QuIFRoaXMgICAgICAKY291bGQgd2lwZSBvdXQgdGhlIHZhbHVlcyBzZXQgYnkgYmlvX3Nl
+dF9wcmlvLiBJIHRoaW5rIGl0IHdvdWxkIGJlICAgICAgICAgICAgICAKYmVzdCB0byBzZXQgdGhl
+IHJlcXVlc3QgYXMgbm9uIG1lcmdlYWJsZSB3aGVuIHdlIHNlZSB0aGF0IGl0IGlzIGEgaGlnaCAg
+ICAgICAgICAKcHJpb3JpdHkgSU8gcmVxdWVzdC4gICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAK
+VGhlIHRoaXJkIGFyZWEgdGhhdCBpcyBvZiBpbnRlcmVzdCBpcyBpbiB0aGUgQ0ZRIHNjaGVkdWxl
+ciBhbmQgdGhlIGlvcHJpbyBpcyAgICAKb25seSB1c2VkIGluIHRoZSBjYXNlIG9mIGFzeW5jIElP
+IGFuZCBJIGZvdW5kIHRoYXQgdGhlIHByaW9yaXR5IGlzIG9ubHkgICAgICAgICAKb2J0YWluZWQg
+ZnJvbSB0aGUgdGFzayBhbmQgbm90IGZyb20gdGhlIHJlcXVlc3QuIFRoaXMgbGVhZHMgbWUgdG8g
+YmVsaWV2ZSB0aGF0ICAKdGhlIGNoYW5nZXMgbWFkZSBpbiB0aGUgYmxrLWNvcmUgdG8gYWRkIHRo
+ZSBwcmlvcml0eSB0byB0aGUgcmVxdWVzdCB3aWxsIG5vdCAgICAKaW1wYWN0IHRoZSBDRlEgc2No
+ZWR1bGVyLiAKClRoZSBmb3VydGggYXJlYSB0aGF0IG1pZ2h0IGJlIGNvbmNlcm5pbmcgaXMgdGhl
+IGRyaXZlcnMuIHZpcnRpb19ibG9jayBjb3BpZXMgICAgCnRoZSByZXF1ZXN0IHByaW9yaXR5IGlu
+dG8gYSB2aXJ0dWFsIGJsb2NrIHJlcXVlc3QuIEkgYW0gYXNzdW1pbmcgdGhhdCB0aGlzICAgICAg
+CmV2ZW50dWFsbHkgbWFrZXMgaXQgdG8gYW5vdGhlciBkZXZpY2UgZHJpdmVyIHNvIHdlIGRvbid0
+IG5lZWQgdG8gd29ycnkgYWJvdXQgICAgCnRoaXMuIG51bGwgYmxvY2sgZGV2aWNlIGRyaXZlciBh
+bHNvIHVzZXMgdGhlIGlvcHJpbywgYnV0IHRoaXMgaXMgYWxzbyBub3QgYSAgICAgCmNvbmNlcm4u
+IGxpZ2h0bnZtIGFsc28gc2V0cyB0aGUgaW9wcmlvIHRvIGJ1aWxkIGEgcmVxdWVzdCB0aGF0IGlz
+IHBhc3NlZCBvbnRvICAgCmFub3RoZXIgZHJpdmVyLiBUaGUgbGFzdCBkcml2ZXIgdGhhdCB1c2Vz
+IHRoZSByZXF1ZXN0IGlvcHJpbyBpcyB0aGUgZnVzaW9uICAgICAgCm1wdHNhcyBkcml2ZXIgYW5k
+IEkgZG9uJ3QgdW5kZXJzdGFuZCBob3cgaXQgaXMgdXNpbmcgdGhlIGlvcHJpby4gRnJvbSB3aGF0
+IEkgICAgCmNhbiB0ZWxsIGl0IGlzIHRha2luZyBhIHJlcXVlc3Qgb2YgSU9QUklPX0NMQVNTX05P
+TkUgd2l0aCBkYXRhIG9mIDB4NyBhbmQgICAgICAgCmNhbGxpbmcgdGhpcyBoaWdoIHByaW9yaXR5
+IElPLiBUaGlzIGNvdWxkIGJlIGltcGFjdGVkIGJ5IHRoZSBjb2RlIEkgaGF2ZSAgICAgICAgCnBy
+b3Bvc2VkLCBidXQgSSBiZWxpZXZlIHRoZSBhdXRob3JzIGludGVuZGVkIHRvIHRyZWF0IHRoaXMg
+cGFydGljdWxhciBpb3ByaW8gICAgCnZhbHVlIGFzIGhpZ2ggcHJpb3JpdHkuIFRoZSBkcml2ZXIg
+d2lsbCBwYXNzIHRoZSByZXF1ZXN0IHRvIHRoZSBkZXZpY2UgICAgICAgICAgCndpdGggaGlnaCBw
+cmlvcml0eSBpZiB0aGUgYXBwcm9wcmlhdGUgaW9wcmlvIHZhbHVlcyBpcyBzZWVuIG9uIHRoZSBy
+ZXF1ZXN0LiAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgClRoZSBmaWZ0aCBhcmVhIHRoYXQg
+SSBub3RpY2VkIG1heSBiZSBpbXBhY3RlZCBpcyBmaWxlIHN5c3RlbXMuIGJ0cmZzIHVzZXMgbG93
+ICAgCnByaW9yaXR5IElPIGZvciByZWFkIGFoZWFkLiBFeHQ0IHVzZXMgaW9wcmlvIGZvciBqb3Vy
+bmFsaW5nLiBCb3RoIG9mIHRoZXNlICAgICAgCmlzc3VlcyBhcmUgbm90IGEgcHJvYmxlbSBiZWNh
+dXNlIHRoZSBpb3ByaW8gaXMgc2V0IG9uIHRoZSB0YXNrIGFuZCBub3Qgb24gYSAgICAgCmJpby4K
+Cj4gVGhhbmtzLgo+IAo+IC0tIAo+IHRlanVuCgpUYWtlIGNhcmUsCkFkYW0KV2VzdGVybiBEaWdp
+dGFsIENvcnBvcmF0aW9uIChhbmQgaXRzIHN1YnNpZGlhcmllcykgRS1tYWlsIENvbmZpZGVudGlh
+bGl0eSBOb3RpY2UgJiBEaXNjbGFpbWVyOgoKVGhpcyBlLW1haWwgYW5kIGFueSBmaWxlcyB0cmFu
+c21pdHRlZCB3aXRoIGl0IG1heSBjb250YWluIGNvbmZpZGVudGlhbCBvciBsZWdhbGx5IHByaXZp
+bGVnZWQgaW5mb3JtYXRpb24gb2YgV0RDIGFuZC9vciBpdHMgYWZmaWxpYXRlcywgYW5kIGFyZSBp
+bnRlbmRlZCBzb2xlbHkgZm9yIHRoZSB1c2Ugb2YgdGhlIGluZGl2aWR1YWwgb3IgZW50aXR5IHRv
+IHdoaWNoIHRoZXkgYXJlIGFkZHJlc3NlZC4gSWYgeW91IGFyZSBub3QgdGhlIGludGVuZGVkIHJl
+Y2lwaWVudCwgYW55IGRpc2Nsb3N1cmUsIGNvcHlpbmcsIGRpc3RyaWJ1dGlvbiBvciBhbnkgYWN0
+aW9uIHRha2VuIG9yIG9taXR0ZWQgdG8gYmUgdGFrZW4gaW4gcmVsaWFuY2Ugb24gaXQsIGlzIHBy
+b2hpYml0ZWQuIElmIHlvdSBoYXZlIHJlY2VpdmVkIHRoaXMgZS1tYWlsIGluIGVycm9yLCBwbGVh
+c2Ugbm90aWZ5IHRoZSBzZW5kZXIgaW1tZWRpYXRlbHkgYW5kIGRlbGV0ZSB0aGUgZS1tYWlsIGlu
+IGl0cyBlbnRpcmV0eSBmcm9tIHlvdXIgc3lzdGVtLgo=
