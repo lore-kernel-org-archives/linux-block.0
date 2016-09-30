@@ -1,98 +1,120 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:42198 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1755937AbcIHVMo (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 8 Sep 2016 17:12:44 -0400
-From: Josef Bacik <jbacik@fb.com>
-To: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <kernel-team@fb.com>, <mpa@pengutronix.de>,
-        <nbd-general@lists.sourceforge.net>
-Subject: [PATCH 3/5] nbd: use flags instead of bool
-Date: Thu, 8 Sep 2016 17:12:08 -0400
-Message-ID: <1473369130-22986-4-git-send-email-jbacik@fb.com>
-In-Reply-To: <1473369130-22986-1-git-send-email-jbacik@fb.com>
-References: <1473369130-22986-1-git-send-email-jbacik@fb.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <shaun.tancheff@gmail.com>
+Return-Path: <shaun.tancheff@gmail.com>
+Sender: Shaun Tancheff <shaun.tancheff@gmail.com>
+From: Shaun Tancheff <shaun@tancheff.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Shaun Tancheff <shaun@tancheff.com>,
+	linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	"James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
+	Damien Le Moal <damien.lemoal@hgst.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Michael T Lombardi <michael.t.lombardi@seagate.com>
+Subject: [PATCH v6 0/7] ZBC / Zoned block device support
+Date: Fri, 30 Sep 2016 14:12:29 -0500
+Message-Id: <20160930191237.13695-1-shaun@tancheff.com>
+List-ID: <linux-block@vger.kernel.org>
 
-In preparation for some future changes, change a few of the state bools over to
-normal bits to set/clear properly.
+This series introduces support for zoned block devices. It integrates
+earlier submissions by Hannes Reinecke, Damien Le Moal and Shaun Tancheff.
+Compared to the previous series version, the code was significantly
+simplified by limiting support to zoned devices satisfying the following
+conditions:
+1) All zones of the device are the same size, with the exception of an
+   eventual last smaller runt zone.
+2) For host-managed disks, reads must be unrestricted (read commands do not
+   fail due to zone or write pointer alignement constraints).
+Zoned disks that do not satisfy these 2 conditions are ignored.
 
-Signed-off-by: Josef Bacik <jbacik@fb.com>
----
- drivers/block/nbd.c | 18 ++++++++++--------
- 1 file changed, 10 insertions(+), 8 deletions(-)
+These 2 conditions allowed dropping the zone information cache implemented
+in the previous version. This simplifies the code and also reduces the memory
+consumption at run time. Support for zoned devices now only require one bit
+per zone (less than 8KB in total). This bit field is used to write-lock
+zones and prevent the concurrent execution of multiple write commands in
+the same zone. This avoids write ordering problems at dispatch time, for
+both the simple queue and scsi-mq settings.
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 4b7d0f3..cf855a1 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -41,8 +41,12 @@
- 
- #include <linux/nbd.h>
- 
-+#define NBD_TIMEDOUT			0
-+#define NBD_DISCONNECT_REQUESTED	1
-+
- struct nbd_device {
- 	u32 flags;
-+	unsigned long runtime_flags;
- 	struct socket * sock;	/* If == NULL, device is not ready, yet	*/
- 	int magic;
- 
-@@ -54,8 +58,6 @@ struct nbd_device {
- 	int blksize;
- 	loff_t bytesize;
- 	int xmit_timeout;
--	bool timedout;
--	bool disconnect; /* a disconnect has been requested by user */
- 
- 	struct timer_list timeout_timer;
- 	/* protects initialization and shutdown of the socket */
-@@ -192,7 +194,7 @@ static void nbd_xmit_timeout(unsigned long arg)
- 
- 	spin_lock_irqsave(&nbd->sock_lock, flags);
- 
--	nbd->timedout = true;
-+	set_bit(NBD_TIMEDOUT, &nbd->runtime_flags);
- 
- 	if (nbd->sock) {
- 		sock = nbd->sock;
-@@ -562,8 +564,7 @@ out:
- /* Reset all properties of an NBD device */
- static void nbd_reset(struct nbd_device *nbd)
- {
--	nbd->disconnect = false;
--	nbd->timedout = false;
-+	nbd->runtime_flags = 0;
- 	nbd->blksize = 1024;
- 	nbd->bytesize = 0;
- 	set_capacity(nbd->disk, 0);
-@@ -626,7 +627,7 @@ static int __nbd_ioctl(struct block_device *bdev, struct nbd_device *nbd,
- 			return -EINVAL;
- 		}
- 
--		nbd->disconnect = true;
-+		set_bit(NBD_DISCONNECT_REQUESTED, &nbd->runtime_flags);
- 
- 		nbd_send_cmd(nbd, blk_mq_rq_to_pdu(sreq));
- 		blk_mq_free_request(sreq);
-@@ -706,9 +707,10 @@ static int __nbd_ioctl(struct block_device *bdev, struct nbd_device *nbd,
- 		kill_bdev(bdev);
- 		nbd_bdev_reset(bdev);
- 
--		if (nbd->disconnect) /* user requested, ignore socket errors */
-+		/* user requested, ignore socket errors */
-+		if (test_bit(NBD_DISCONNECT_REQUESTED, &nbd->runtime_flags))
- 			error = 0;
--		if (nbd->timedout)
-+		if (test_bit(NBD_TIMEDOUT, &nbd->runtime_flags))
- 			error = -ETIMEDOUT;
- 
- 		nbd_reset(nbd);
+The new operations introduced to suport zone manipulation was reduced to
+only the two main ZBC/ZAC defined commands: REPORT ZONES (REQ_OP_ZONE_REPORT)
+and RESET WRITE POINTER (REQ_OP_ZONE_RESET). This brings the total number of
+operations defined to 8, which fits in the 3 bits (REQ_OP_BITS) reserved for
+operation code in bio->bi_opf and req->cmd_flags.
+
+Most of the ZBC specific code is kept out of sd.c and implemented in the
+new file sd_zbc.c. Similarly, at the block layer, most of the zoned block
+device code is implemented in the new blk-zoned.c.
+
+For host-managed zoned block devices, the sequential write constraint of
+write pointer zones is exposed to the user. Users of the disk (applications,
+file systems or device mappers) must sequentially write to zones. This means
+that for raw block device accesses from applications, buffered writes are
+unreliable and direct I/Os must be used (or buffered writes with O_SYNC).
+
+Access to zone manipulation operations is also provided to applications
+through a set of new ioctls. This allows applications operating on raw
+block devices (e.g. mkfs.xxx) to discover a device zone layout and
+manipulate zone state.
+
+Changes from v5:
+* Rebased on Jens' for-4.9/block branch (v5 is based on next-20160928).
+
+Changes from v4:
+* Changed interface of sd_zbc_setup_read_write
+
+Changes from v3:
+* Fixed several typos and tabs/spaces
+* Added description of zoned and chunk_sectors queue attributes in
+  Documentation/ABI/testing/sysfs-block
+* Fixed sd_read_capacity call in sd.c and to avoid missing information on
+  the first pass of a disk scan
+* Fixed scsi_disk zone related field to use logical block size unit instead
+  of 512B sector unit.
+
+Changes from v2:
+* Use kcalloc to allocate zone information array for ioctl
+* Use kcalloc to allocate zone information array for ioctl
+* Export GPL the functions blkdev_report_zones and blkdev_reset_zones
+* Shuffled uapi definitions from patch 7 into patch 5
+
+
+Damien Le Moal (1):
+  block: Add 'zoned' queue limit
+
+Hannes Reinecke (4):
+  blk-sysfs: Add 'chunk_sectors' to sysfs attributes
+  block: update chunk_sectors in blk_stack_limits()
+  block: Implement support for zoned block devices
+  sd: Implement support for ZBC devices
+
+Shaun Tancheff (2):
+  block: Define zoned block device operations
+  blk-zoned: implement ioctls
+
+ Documentation/ABI/testing/sysfs-block |  29 ++
+ block/Kconfig                         |   8 +
+ block/Makefile                        |   2 +-
+ block/blk-core.c                      |   4 +
+ block/blk-settings.c                  |   5 +
+ block/blk-sysfs.c                     |  29 ++
+ block/blk-zoned.c                     | 350 +++++++++++++++++++
+ block/ioctl.c                         |   4 +
+ drivers/scsi/Makefile                 |   1 +
+ drivers/scsi/sd.c                     | 141 ++++++--
+ drivers/scsi/sd.h                     |  67 ++++
+ drivers/scsi/sd_zbc.c                 | 627 ++++++++++++++++++++++++++++++++++
+ include/linux/blk_types.h             |   2 +
+ include/linux/blkdev.h                |  99 ++++++
+ include/scsi/scsi_proto.h             |  17 +
+ include/uapi/linux/Kbuild             |   1 +
+ include/uapi/linux/blkzoned.h         | 143 ++++++++
+ include/uapi/linux/fs.h               |   4 +
+ 18 files changed, 1499 insertions(+), 34 deletions(-)
+ create mode 100644 block/blk-zoned.c
+ create mode 100644 drivers/scsi/sd_zbc.c
+ create mode 100644 include/uapi/linux/blkzoned.h
+
 -- 
-2.8.0.rc2
-
+2.9.3
