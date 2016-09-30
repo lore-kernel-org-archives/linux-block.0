@@ -1,54 +1,47 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:19834 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S932370AbcIFJAH (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 6 Sep 2016 05:00:07 -0400
-From: Tomasz Majchrzak <tomasz.majchrzak@intel.com>
-To: linux-block@vger.kernel.org
-Cc: neilb@suse.com
-Subject: [PATCH] badblocks: fix overlapping check for clearing
-Date: Tue,  6 Sep 2016 10:58:58 +0200
-Message-Id: <1473152338-30539-1-git-send-email-tomasz.majchrzak@intel.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <hare@suse.de>
+Subject: Re: [PATCH v5 7/7] blk-zoned: implement ioctls
+To: Damien Le Moal <damien.lemoal@hgst.com>, Jens Axboe <axboe@kernel.dk>
+References: <1475208699-27310-1-git-send-email-damien.lemoal@hgst.com>
+ <1475208699-27310-8-git-send-email-damien.lemoal@hgst.com>
+Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+ Christoph Hellwig <hch@lst.de>,
+ "Martin K . Petersen" <martin.petersen@oracle.com>,
+ Shaun Tancheff <shaun@tancheff.com>,
+ Shaun Tancheff <shaun.tancheff@seagate.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <c2d83405-faba-fe10-56a6-5298357ed492@suse.de>
+Date: Fri, 30 Sep 2016 09:21:03 +0200
+MIME-Version: 1.0
+In-Reply-To: <1475208699-27310-8-git-send-email-damien.lemoal@hgst.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+List-ID: <linux-block@vger.kernel.org>
 
-Current bad block clear implementation assumes the range to clear
-overlaps with at least one bad block already stored. If given range to
-clear precedes first bad block in a list, the first entry is incorrectly
-updated.
+On 09/30/2016 06:11 AM, Damien Le Moal wrote:
+> From: Shaun Tancheff <shaun@tancheff.com>
+>
+> Adds the new BLKREPORTZONE and BLKRESETZONE ioctls for respectively
+> obtaining the zone configuration of a zoned block device and resetting
+> the write pointer of sequential zones of a zoned block device.
+>
+> The BLKREPORTZONE ioctl maps directly to a single call of the function
+> blkdev_report_zones. The zone information result is passed as an array
+> of struct blk_zone identical to the structure used internally for
+> processing the REQ_OP_ZONE_REPORT operation.  The BLKRESETZONE ioctl
+> maps to a single call of the blkdev_reset_zones function.
+>
+> Signed-off-by: Shaun Tancheff <shaun.tancheff@seagate.com>
+> Signed-off-by: Damien Le Moal <damien.lemoal@hgst.com>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Check not only if stored block end is past clear block end but also if
-stored block start is before clear block end.
+Cheers,
 
-Signed-off-by: Tomasz Majchrzak <tomasz.majchrzak@intel.com>
----
- block/badblocks.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/block/badblocks.c b/block/badblocks.c
-index 7be53cb..b2ffcc7 100644
---- a/block/badblocks.c
-+++ b/block/badblocks.c
-@@ -354,7 +354,8 @@ int badblocks_clear(struct badblocks *bb, sector_t s, int sectors)
- 		 * current range.  Earlier ranges could also overlap,
- 		 * but only this one can overlap the end of the range.
- 		 */
--		if (BB_OFFSET(p[lo]) + BB_LEN(p[lo]) > target) {
-+		if ((BB_OFFSET(p[lo]) + BB_LEN(p[lo]) > target) &&
-+		    (BB_OFFSET(p[lo]) <= target)) {
- 			/* Partial overlap, leave the tail of this range */
- 			int ack = BB_ACK(p[lo]);
- 			sector_t a = BB_OFFSET(p[lo]);
-@@ -377,7 +378,8 @@ int badblocks_clear(struct badblocks *bb, sector_t s, int sectors)
- 			lo--;
- 		}
- 		while (lo >= 0 &&
--		       BB_OFFSET(p[lo]) + BB_LEN(p[lo]) > s) {
-+		       (BB_OFFSET(p[lo]) + BB_LEN(p[lo]) > s) &&
-+		       (BB_OFFSET(p[lo]) <= target)) {
- 			/* This range does overlap */
- 			if (BB_OFFSET(p[lo]) < s) {
- 				/* Keep the early parts of this range. */
+Hannes
 -- 
-1.8.3.1
-
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: F. Imend�rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG N�rnberg)
