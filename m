@@ -1,68 +1,35 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-Subject: [PATCH 5/9] block: Extend blk_freeze_queue_start() to the non-blk-mq
- path
-To: Jens Axboe <axboe@fb.com>
-References: <7948dbb8-6333-dc62-2673-4da35b4dfdbc@sandisk.com>
-CC: Christoph Hellwig <hch@lst.de>,
-        James Bottomley <jejb@linux.vnet.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Doug Ledford <dledford@redhat.com>,
-        Keith Busch <keith.busch@intel.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-Message-ID: <7c8af8d2-2ac9-2767-5e5f-8de72eba3814@sandisk.com>
-Date: Mon, 26 Sep 2016 11:27:49 -0700
+Return-Path: <martin.petersen@oracle.com>
+To: Damien Le Moal <damien.lemoal@hgst.com>
+Cc: Jens Axboe <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
+        <linux-scsi@vger.kernel.org>, Christoph Hellwig <hch@lst.de>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Hannes Reinecke <hare@suse.de>, Shaun Tancheff <shaun@tancheff.com>
+Subject: Re: [PATCH v4 5/7] block: Implement support for zoned block devices
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <1475052339-10202-1-git-send-email-damien.lemoal@hgst.com>
+	<1475052339-10202-6-git-send-email-damien.lemoal@hgst.com>
+Date: Thu, 29 Sep 2016 22:05:37 -0400
+In-Reply-To: <1475052339-10202-6-git-send-email-damien.lemoal@hgst.com>
+	(Damien Le Moal's message of "Wed, 28 Sep 2016 17:45:37 +0900")
+Message-ID: <yq160peuopa.fsf@sermon.lab.mkp.net>
 MIME-Version: 1.0
-In-Reply-To: <7948dbb8-6333-dc62-2673-4da35b4dfdbc@sandisk.com>
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-scsi-owner@vger.kernel.org
+Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
----
- block/blk-core.c | 15 ++++++---------
- 1 file changed, 6 insertions(+), 9 deletions(-)
+>>>>> "Damien" == Damien Le Moal <damien.lemoal@hgst.com> writes:
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 8cc8006..5ecc7ab 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -689,7 +689,10 @@ void blk_freeze_queue_start(struct request_queue *q)
- 	freeze_depth = atomic_inc_return(&q->mq_freeze_depth);
- 	if (freeze_depth == 1) {
- 		percpu_ref_kill(&q->q_usage_counter);
--		blk_mq_run_hw_queues(q, false);
-+		if (q->mq_ops)
-+			blk_mq_run_hw_queues(q, false);
-+		else if (q->request_fn)
-+			blk_run_queue(q);
- 	}
- }
- 
-@@ -700,17 +703,11 @@ void blk_freeze_queue_wait(struct request_queue *q)
- 
- /*
-  * Guarantee no request is in use, so we can change any data structure of
-- * the queue afterward.
-+ * the queue afterward. Increases q->mq_freeze_depth and waits until
-+ * q->q_usage_counter drops to zero.
-  */
- void blk_freeze_queue(struct request_queue *q)
- {
--	/*
--	 * In the !blk_mq case we are only calling this to kill the
--	 * q_usage_counter, otherwise this increases the freeze depth
--	 * and waits for it to return to zero.  For this reason there is
--	 * no blk_unfreeze_queue(), and blk_freeze_queue() is not
--	 * exported to drivers as the only user for unfreeze is blk_mq.
--	 */
- 	blk_freeze_queue_start(q);
- 	blk_freeze_queue_wait(q);
- }
+Damien> Implement zoned block device zone information reporting and
+Damien> reset.  Zone information are reported as struct blk_zone. This
+Damien> implementation does not differentiate between host-aware and
+Damien> host-managed device models and is valid for both. Two functions
+Damien> are provided: blkdev_report_zones for discovering the zone
+Damien> configuration of a zoned block device, and blkdev_reset_zones
+Damien> for resetting the write pointer of sequential zones. The helper
+Damien> function blk_queue_zone_size and bdev_zone_size are also
+Damien> provided for, as the name suggest, obtaining the zone size (in
+Damien> 512B sectors) of the zones of the device.
+
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+
 -- 
-2.10.0
-
+Martin K. Petersen	Oracle Linux Engineering
