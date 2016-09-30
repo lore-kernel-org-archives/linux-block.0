@@ -1,56 +1,99 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:60496 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S933619AbcI3NXr (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Sep 2016 09:23:47 -0400
-From: Alexander Gordeev <agordeev@redhat.com>
-To: linux-kernel@vger.kernel.org
-Cc: Alexander Gordeev <agordeev@redhat.com>,
-        linux-block@vger.kernel.org
-Subject: [PATCH v2 3/8] blk-mq: Fix hardware context data node selection
-Date: Fri, 30 Sep 2016 15:23:25 +0200
-Message-Id: <326a467ee21f2324c9161f7f814a3ed9780dc767.1475241231.git.agordeev@redhat.com>
-In-Reply-To: <cover.1475241231.git.agordeev@redhat.com>
-References: <cover.1475241231.git.agordeev@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <shaun.tancheff@gmail.com>
+Return-Path: <shaun.tancheff@gmail.com>
+Sender: Shaun Tancheff <shaun.tancheff@gmail.com>
+From: Shaun Tancheff <shaun@tancheff.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Hannes Reinecke <hare@suse.de>,
+	linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	"James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
+	Damien Le Moal <damien.lemoal@hgst.com>,
+	Michael T Lombardi <michael.t.lombardi@seagate.com>
+Subject: [PATCH v6 2/7] blk-sysfs: Add 'chunk_sectors' to sysfs attributes
+Date: Fri, 30 Sep 2016 14:12:31 -0500
+Message-Id: <20160930191237.13695-3-shaun@tancheff.com>
+In-Reply-To: <20160930191237.13695-1-shaun@tancheff.com>
+References: <20160930191237.13695-1-shaun@tancheff.com>
+List-ID: <linux-block@vger.kernel.org>
 
-CC: linux-block@vger.kernel.org
-Reviewed-by: Omar Sandoval <osandov@fb.com>
-Signed-off-by: Alexander Gordeev <agordeev@redhat.com>
+From: Hannes Reinecke <hare@suse.de>
+
+The queue limits already have a 'chunk_sectors' setting, so
+we should be presenting it via sysfs.
+
+Signed-off-by: Hannes Reinecke <hare@suse.de>
+
+[Damien: Updated Documentation/ABI/testing/sysfs-block]
+
+Signed-off-by: Damien Le Moal <damien.lemoal@hgst.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+Reviewed-by: Shaun Tancheff <shaun.tancheff@seagate.com>
+Tested-by: Shaun Tancheff <shaun.tancheff@seagate.com>
 ---
- block/blk-mq.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+ Documentation/ABI/testing/sysfs-block | 13 +++++++++++++
+ block/blk-sysfs.c                     | 11 +++++++++++
+ 2 files changed, 24 insertions(+)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 92c2519..e3e9b23 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1633,13 +1633,9 @@ static int blk_mq_init_hctx(struct request_queue *q,
- 		struct blk_mq_tag_set *set,
- 		struct blk_mq_hw_ctx *hctx, unsigned hctx_idx)
- {
--	int node;
-+	int node = hctx->numa_node;
- 	unsigned flush_start_tag = set->queue_depth;
- 
--	node = hctx->numa_node;
--	if (node == NUMA_NO_NODE)
--		node = hctx->numa_node = set->numa_node;
--
- 	INIT_WORK(&hctx->run_work, blk_mq_run_work_fn);
- 	INIT_DELAYED_WORK(&hctx->delay_work, blk_mq_delay_work_fn);
- 	spin_lock_init(&hctx->lock);
-@@ -1914,6 +1910,9 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
- 			continue;
- 
- 		node = blk_mq_hw_queue_to_node(q->mq_map, i);
-+		if (node == NUMA_NO_NODE)
-+			node = set->numa_node;
+diff --git a/Documentation/ABI/testing/sysfs-block b/Documentation/ABI/testing/sysfs-block
+index 75a5055..ee2d5cd 100644
+--- a/Documentation/ABI/testing/sysfs-block
++++ b/Documentation/ABI/testing/sysfs-block
+@@ -251,3 +251,16 @@ Description:
+ 		since drive-managed zoned block devices do not support
+ 		zone commands, they will be treated as regular block
+ 		devices and zoned will report "none".
 +
- 		hctxs[i] = kzalloc_node(sizeof(struct blk_mq_hw_ctx),
- 					GFP_KERNEL, node);
- 		if (!hctxs[i])
++What:		/sys/block/<disk>/queue/chunk_sectors
++Date:		September 2016
++Contact:	Hannes Reinecke <hare@suse.com>
++Description:
++		chunk_sectors has different meaning depending on the type
++		of the disk. For a RAID device (dm-raid), chunk_sectors
++		indicates the size in 512B sectors of the RAID volume
++		stripe segment. For a zoned block device, either
++		host-aware or host-managed, chunk_sectors indicates the
++		size of 512B sectors of the zones of the device, with
++		the eventual exception of the last zone of the device
++		which may be smaller.
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index ff9cd9c..488c2e2 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -130,6 +130,11 @@ static ssize_t queue_physical_block_size_show(struct request_queue *q, char *pag
+ 	return queue_var_show(queue_physical_block_size(q), page);
+ }
+ 
++static ssize_t queue_chunk_sectors_show(struct request_queue *q, char *page)
++{
++	return queue_var_show(q->limits.chunk_sectors, page);
++}
++
+ static ssize_t queue_io_min_show(struct request_queue *q, char *page)
+ {
+ 	return queue_var_show(queue_io_min(q), page);
+@@ -455,6 +460,11 @@ static struct queue_sysfs_entry queue_physical_block_size_entry = {
+ 	.show = queue_physical_block_size_show,
+ };
+ 
++static struct queue_sysfs_entry queue_chunk_sectors_entry = {
++	.attr = {.name = "chunk_sectors", .mode = S_IRUGO },
++	.show = queue_chunk_sectors_show,
++};
++
+ static struct queue_sysfs_entry queue_io_min_entry = {
+ 	.attr = {.name = "minimum_io_size", .mode = S_IRUGO },
+ 	.show = queue_io_min_show,
+@@ -555,6 +565,7 @@ static struct attribute *default_attrs[] = {
+ 	&queue_hw_sector_size_entry.attr,
+ 	&queue_logical_block_size_entry.attr,
+ 	&queue_physical_block_size_entry.attr,
++	&queue_chunk_sectors_entry.attr,
+ 	&queue_io_min_entry.attr,
+ 	&queue_io_opt_entry.attr,
+ 	&queue_discard_granularity_entry.attr,
 -- 
-1.8.3.1
-
+2.9.3
