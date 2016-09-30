@@ -1,54 +1,69 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from michel.telenet-ops.be ([195.130.137.88]:60156 "EHLO
-        michel.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751221AbcIELQC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Sep 2016 07:16:02 -0400
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-To: Matias Bjorling <mb@lightnvm.io>, Jens Axboe <axboe@fb.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Geert Uytterhoeven <geert@linux-m68k.org>
-Subject: [PATCH] lightnvm: NVM should depend on HAS_DMA
-Date: Mon,  5 Sep 2016 13:15:58 +0200
-Message-Id: <1473074158-15985-1-git-send-email-geert@linux-m68k.org>
+Received: from mx1.redhat.com ([209.132.183.28]:47272 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S933652AbcI3NXv (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 30 Sep 2016 09:23:51 -0400
+From: Alexander Gordeev <agordeev@redhat.com>
+To: linux-kernel@vger.kernel.org
+Cc: Alexander Gordeev <agordeev@redhat.com>,
+        linux-block@vger.kernel.org
+Subject: [PATCH v2 7/8] blk-mq: Pair blk_mq_hctx_kobj_init() with blk_mq_hctx_kobj_put()
+Date: Fri, 30 Sep 2016 15:23:29 +0200
+Message-Id: <ae5b727341240a974b6b2cbd91b98eb85f9aef53.1475241231.git.agordeev@redhat.com>
+In-Reply-To: <cover.1475241231.git.agordeev@redhat.com>
+References: <cover.1475241231.git.agordeev@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-If NO_DMA=y:
-
-    drivers/built-in.o: In function `nvme_nvm_dev_dma_free':
-    lightnvm.c:(.text+0x23df1a): undefined reference to `dma_pool_free'
-    drivers/built-in.o: In function `nvme_nvm_dev_dma_alloc':
-    lightnvm.c:(.text+0x23df38): undefined reference to `dma_pool_alloc'
-    drivers/built-in.o: In function `nvme_nvm_destroy_dma_pool':
-    lightnvm.c:(.text+0x23df4c): undefined reference to `dma_pool_destroy'
-    drivers/built-in.o: In function `nvme_nvm_create_dma_pool':
-    lightnvm.c:(.text+0x23df7e): undefined reference to `dma_pool_create'
-
-and
-
-    ERROR: "dma_pool_destroy" [drivers/nvme/host/nvme-core.ko] undefined!
-    ERROR: "dma_pool_free" [drivers/nvme/host/nvme-core.ko] undefined!
-    ERROR: "dma_pool_alloc" [drivers/nvme/host/nvme-core.ko] undefined!
-    ERROR: "dma_pool_create" [drivers/nvme/host/nvme-core.ko] undefined!
-
-Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
+CC: linux-block@vger.kernel.org
+Signed-off-by: Alexander Gordeev <agordeev@redhat.com>
 ---
- drivers/lightnvm/Kconfig | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block/blk-mq-sysfs.c | 5 +++++
+ block/blk-mq.c       | 2 +-
+ block/blk-mq.h       | 1 +
+ 3 files changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/lightnvm/Kconfig b/drivers/lightnvm/Kconfig
-index 61c68a1f054ae58e..2f5d5f4a4c75b37d 100644
---- a/drivers/lightnvm/Kconfig
-+++ b/drivers/lightnvm/Kconfig
-@@ -4,7 +4,7 @@
+diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
+index 01fb455..11846d0 100644
+--- a/block/blk-mq-sysfs.c
++++ b/block/blk-mq-sysfs.c
+@@ -429,6 +429,11 @@ void blk_mq_hctx_kobj_init(struct blk_mq_hw_ctx *hctx)
+ 	kobject_init(&hctx->kobj, &blk_mq_hw_ktype);
+ }
  
- menuconfig NVM
- 	bool "Open-Channel SSD target support"
--	depends on BLOCK
-+	depends on BLOCK && HAS_DMA
- 	help
- 	  Say Y here to get to enable Open-channel SSDs.
++void blk_mq_hctx_kobj_put(struct blk_mq_hw_ctx *hctx)
++{
++	kobject_put(&hctx->kobj);
++}
++
+ static void blk_mq_sysfs_init(struct request_queue *q)
+ {
+ 	struct blk_mq_ctx *ctx;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 4b07901..78ee5af 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1928,7 +1928,7 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
+ 			continue;
+ 
+ 		hctxs[i] = NULL;
+-		kobject_put(&hctx->kobj);
++		blk_mq_hctx_kobj_put(hctx);
+ 
+ 		if (hctx->tags) {
+ 			blk_mq_free_rq_map(set, hctx->tags, j);
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index e5d2524..3d53818 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -53,6 +53,7 @@ static inline struct blk_mq_hw_ctx *blk_mq_map_queue(struct request_queue *q,
+ extern int blk_mq_sysfs_register(struct request_queue *q);
+ extern void blk_mq_sysfs_unregister(struct request_queue *q);
+ extern void blk_mq_hctx_kobj_init(struct blk_mq_hw_ctx *hctx);
++extern void blk_mq_hctx_kobj_put(struct blk_mq_hw_ctx *hctx);
+ 
+ extern void blk_mq_rq_timed_out(struct request *req, bool reserved);
  
 -- 
-1.9.1
+1.8.3.1
 
