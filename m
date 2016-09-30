@@ -1,87 +1,68 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-cys01nam02on0054.outbound.protection.outlook.com ([104.47.37.54]:44480
-        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S934150AbcIZS0q (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Sep 2016 14:26:46 -0400
-Subject: [PATCH 1/9] blk-mq: Introduce blk_mq_queue_stopped()
-To: Jens Axboe <axboe@fb.com>
-References: <7948dbb8-6333-dc62-2673-4da35b4dfdbc@sandisk.com>
-CC: Christoph Hellwig <hch@lst.de>,
-        James Bottomley <jejb@linux.vnet.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Doug Ledford <dledford@redhat.com>,
-        Keith Busch <keith.busch@intel.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-Message-ID: <b2210943-62b2-959a-569a-a404da03bcae@sandisk.com>
-Date: Mon, 26 Sep 2016 11:26:26 -0700
-MIME-Version: 1.0
-In-Reply-To: <7948dbb8-6333-dc62-2673-4da35b4dfdbc@sandisk.com>
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <shaun.tancheff@gmail.com>
+Return-Path: <shaun.tancheff@gmail.com>
+Sender: Shaun Tancheff <shaun.tancheff@gmail.com>
+From: Shaun Tancheff <shaun@tancheff.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Shaun Tancheff <shaun.tancheff@seagate.com>,
+	linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	"James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
+	Damien Le Moal <damien.lemoal@hgst.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Michael T Lombardi <michael.t.lombardi@seagate.com>
+Subject: [PATCH v6 4/7] block: Define zoned block device operations
+Date: Fri, 30 Sep 2016 14:12:33 -0500
+Message-Id: <20160930191237.13695-5-shaun@tancheff.com>
+In-Reply-To: <20160930191237.13695-1-shaun@tancheff.com>
+References: <20160930191237.13695-1-shaun@tancheff.com>
+List-ID: <linux-block@vger.kernel.org>
 
-The function blk_queue_stopped() allows to test whether or not a
-traditional request queue has been stopped. Introduce a helper
-function that allows block drivers to query easily whether or not
-one or more hardware contexts of a blk-mq queue have been stopped.
+From: Shaun Tancheff <shaun.tancheff@seagate.com>
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Jens Axboe <axboe@fb.com>
-Cc: Christoph Hellwig <hch@lst.de>
+Define REQ_OP_ZONE_REPORT and REQ_OP_ZONE_RESET for handling zones of
+host-managed and host-aware zoned block devices. With with these two
+new operations, the total number of operations defined reaches 8 and
+still fits with the 3 bits definition of REQ_OP_BITS.
+
+Signed-off-by: Shaun Tancheff <shaun.tancheff@seagate.com>
+Signed-off-by: Damien Le Moal <damien.lemoal@hgst.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
 ---
- block/blk-mq.c         | 20 ++++++++++++++++++++
- include/linux/blk-mq.h |  1 +
- 2 files changed, 21 insertions(+)
+ block/blk-core.c          | 4 ++++
+ include/linux/blk_types.h | 2 ++
+ 2 files changed, 6 insertions(+)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index e9ebe98..98d4812 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -938,6 +938,26 @@ void blk_mq_run_hw_queues(struct request_queue *q, bool async)
- }
- EXPORT_SYMBOL(blk_mq_run_hw_queues);
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 14d7c07..e4eda5d 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -1941,6 +1941,10 @@ generic_make_request_checks(struct bio *bio)
+ 	case REQ_OP_WRITE_SAME:
+ 		if (!bdev_write_same(bio->bi_bdev))
+ 			goto not_supported;
++	case REQ_OP_ZONE_REPORT:
++	case REQ_OP_ZONE_RESET:
++		if (!bdev_is_zoned(bio->bi_bdev))
++			goto not_supported;
+ 		break;
+ 	default:
+ 		break;
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index cd395ec..dd50dce 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -243,6 +243,8 @@ enum req_op {
+ 	REQ_OP_SECURE_ERASE,	/* request to securely erase sectors */
+ 	REQ_OP_WRITE_SAME,	/* write same block many times */
+ 	REQ_OP_FLUSH,		/* request for cache flush */
++	REQ_OP_ZONE_REPORT,	/* Get zone information */
++	REQ_OP_ZONE_RESET,	/* Reset a zone write pointer */
+ };
  
-+/**
-+ * blk_mq_queue_stopped() - check whether one or more hctxs have been stopped
-+ * @q: request queue.
-+ *
-+ * The caller is responsible for serializing this function against
-+ * blk_mq_{start,stop}_hw_queue().
-+ */
-+bool blk_mq_queue_stopped(struct request_queue *q)
-+{
-+	struct blk_mq_hw_ctx *hctx;
-+	int i;
-+
-+	queue_for_each_hw_ctx(q, hctx, i)
-+		if (test_bit(BLK_MQ_S_STOPPED, &hctx->state))
-+			return true;
-+
-+	return false;
-+}
-+EXPORT_SYMBOL(blk_mq_queue_stopped);
-+
- void blk_mq_stop_hw_queue(struct blk_mq_hw_ctx *hctx)
- {
- 	cancel_work(&hctx->run_work);
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 5daa0ef..368c460d 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -233,6 +233,7 @@ void blk_mq_delay_kick_requeue_list(struct request_queue *q, unsigned long msecs
- void blk_mq_abort_requeue_list(struct request_queue *q);
- void blk_mq_complete_request(struct request *rq, int error);
- 
-+bool blk_mq_queue_stopped(struct request_queue *q);
- void blk_mq_stop_hw_queue(struct blk_mq_hw_ctx *hctx);
- void blk_mq_start_hw_queue(struct blk_mq_hw_ctx *hctx);
- void blk_mq_stop_hw_queues(struct request_queue *q);
+ #define REQ_OP_BITS 3
 -- 
-2.10.0
-
+2.9.3
