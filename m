@@ -1,213 +1,530 @@
 Return-Path: <Damien.LeMoal@hgst.com>
 From: Damien Le Moal <damien.lemoal@hgst.com>
-To: <linux-scsi@vger.kernel.org>, <linux-block@vger.kernel.org>
-CC: <martin.petersen@oracle.com>, <axboe@kernel.dk>, <hare@suse.de>,
-	<shaun.tancheff@seagate.com>, Damien Le Moal <damien.lemoal@hgst.com>
-Subject: [PATCH 4/9] block: Define zoned block device operations
-Date: Tue, 20 Sep 2016 06:27:29 +0900
-Message-ID: <1474320454-5264-5-git-send-email-damien.lemoal@hgst.com>
-In-Reply-To: <1474320454-5264-1-git-send-email-damien.lemoal@hgst.com>
-References: <1474320454-5264-1-git-send-email-damien.lemoal@hgst.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>, Christoph
+ Hellwig <hch@lst.de>, "Martin K . Petersen" <martin.petersen@oracle.com>,
+	Hannes Reinecke <hare@suse.de>, Shaun Tancheff <shaun@tancheff.com>, Damien
+ Le Moal <damien.lemoal@hgst.com>
+Subject: [PATCH v5 5/7] block: Implement support for zoned block devices
+Date: Fri, 30 Sep 2016 13:11:37 +0900
+Message-ID: <1475208699-27310-6-git-send-email-damien.lemoal@hgst.com>
+In-Reply-To: <1475208699-27310-1-git-send-email-damien.lemoal@hgst.com>
+References: <1475208699-27310-1-git-send-email-damien.lemoal@hgst.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Return-Path: damien.lemoal@hgst.com
 List-ID: <linux-block@vger.kernel.org>
 
-From: Shaun Tancheff <shaun.tancheff@seagate.com>
+From: Hannes Reinecke <hare@suse.de>
 
-Define REQ_OP_ZONE_REPORT, REQ_OP_ZONE_RESET, REQ_OP_ZONE_OPEN,
-REQ_OP_ZONE_CLOSE and REQ_OP_ZONE_FINISH for handling zones of
-zoned block devices (host-managed and host-aware). With with these
-new commands, the total number of operations defined reaches 11 and
-requires increasing REQ_OP_BITS from 3 to 4.
+Implement zoned block device zone information reporting and reset.
+Zone information are reported as struct blk_zone. This implementation
+does not differentiate between host-aware and host-managed device
+models and is valid for both. Two functions are provided:
+blkdev_report_zones for discovering the zone configuration of a
+zoned block device, and blkdev_reset_zones for resetting the write
+pointer of sequential zones. The helper function blk_queue_zone_size
+and bdev_zone_size are also provided for, as the name suggest,
+obtaining the zone size (in 512B sectors) of the zones of the device.
 
-Signed-off-by: Shaun Tancheff <shaun.tancheff@seagate.com>
+Signed-off-by: Hannes Reinecke <hare@suse.de>
 
-Changelog (Damien):
-All requests have no payload and may operate on all zones of the
-device (when the BIO sector and size are 0) or on a single zone
-(when the BIO sector and size are aigned on a zone).
-
-REQ_OP_ZONE_REPORT is not sent directly to the device
-and is processed in sd_zbc.c using the device zone work
-in order to parse the report reply and manage changes to
-the zone information cache of the device.
-
+[Damien: * Removed the zone cache
+         * Implement report zones operation based on earlier proposal
+           by Shaun Tancheff <shaun.tancheff@seagate.com>]
 Signed-off-by: Damien Le Moal <damien.lemoal@hgst.com>
----
- block/blk-core.c          |  7 +++++++
- block/blk-merge.c         | 31 +++++++++++++++++++++++++++----
- include/linux/bio.h       | 36 +++++++++++++++++++++++++++---------
- include/linux/blk_types.h | 27 ++++++++++++++++++++++++++-
- 4 files changed, 87 insertions(+), 14 deletions(-)
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+Reviewed-by: Shaun Tancheff <shaun.tancheff@seagate.com>
+Tested-by: Shaun Tancheff <shaun.tancheff@seagate.com>
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 36c7ac3..4a7f7ba 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1941,6 +1941,13 @@ generic_make_request_checks(struct bio *bio)
- 	case REQ_OP_WRITE_SAME:
- 		if (!bdev_write_same(bio->bi_bdev))
- 			goto not_supported;
-+	case REQ_OP_ZONE_REPORT:
-+	case REQ_OP_ZONE_RESET:
-+	case REQ_OP_ZONE_OPEN:
-+	case REQ_OP_ZONE_CLOSE:
-+	case REQ_OP_ZONE_FINISH:
-+		if (!bdev_zoned(bio->bi_bdev))
-+			goto not_supported;
- 		break;
- 	default:
- 		break;
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 2642e5f..f9299df 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -202,6 +202,21 @@ void blk_queue_split(struct request_queue *q, struct bio **bio,
- 	case REQ_OP_WRITE_SAME:
- 		split = blk_bio_write_same_split(q, *bio, bs, &nsegs);
- 		break;
-+	case REQ_OP_ZONE_REPORT:
-+	case REQ_OP_ZONE_RESET:
-+	case REQ_OP_ZONE_OPEN:
-+	case REQ_OP_ZONE_CLOSE:
-+	case REQ_OP_ZONE_FINISH:
-+		/*
-+		 * For these commands, bi_size is either 0 to specify
-+		 * operation on the entire block device sector range,
-+		 * or a zone size for operation on a single zone.
-+		 * Since a zone size may be much bigger than the maximum
-+		 * allowed BIO size, we cannot use blk_bio_segment_split.
-+		 */
-+		split = NULL;
-+		nsegs = 0;
-+		break;
- 	default:
- 		split = blk_bio_segment_split(q, *bio, q->bio_split, &nsegs);
- 		break;
-@@ -241,11 +256,19 @@ static unsigned int __blk_recalc_rq_segments(struct request_queue *q,
- 	 * This should probably be returning 0, but blk_add_request_payload()
- 	 * (Christoph!!!!)
- 	 */
--	if (bio_op(bio) == REQ_OP_DISCARD || bio_op(bio) == REQ_OP_SECURE_ERASE)
--		return 1;
--
--	if (bio_op(bio) == REQ_OP_WRITE_SAME)
-+	switch(bio_op(bio)) {
-+	case REQ_OP_DISCARD:
-+	case REQ_OP_SECURE_ERASE:
-+	case REQ_OP_WRITE_SAME:
-+	case REQ_OP_ZONE_REPORT:
-+	case REQ_OP_ZONE_RESET:
-+	case REQ_OP_ZONE_OPEN:
-+	case REQ_OP_ZONE_CLOSE:
-+	case REQ_OP_ZONE_FINISH:
- 		return 1;
-+	default:
-+		break;
-+	}
+---
+ block/Kconfig                 |   8 ++
+ block/Makefile                |   1 +
+ block/blk-zoned.c             | 257 ++++++++++++++++++++++++++++++++++++++++++
+ include/linux/blkdev.h        |  31 +++++
+ include/uapi/linux/Kbuild     |   1 +
+ include/uapi/linux/blkzoned.h | 103 +++++++++++++++++
+ 6 files changed, 401 insertions(+)
+ create mode 100644 block/blk-zoned.c
+ create mode 100644 include/uapi/linux/blkzoned.h
+
+diff --git a/block/Kconfig b/block/Kconfig
+index 1d4d624..6b0ad08 100644
+--- a/block/Kconfig
++++ b/block/Kconfig
+@@ -89,6 +89,14 @@ config BLK_DEV_INTEGRITY
+ 	T10/SCSI Data Integrity Field or the T13/ATA External Path
+ 	Protection.  If in doubt, say N.
  
- 	fbio = bio;
- 	cluster = blk_queue_cluster(q);
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 23ddf4b..d9c2e21 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -69,20 +69,38 @@
-  */
- static inline bool bio_has_data(struct bio *bio)
- {
--	if (bio &&
--	    bio->bi_iter.bi_size &&
--	    bio_op(bio) != REQ_OP_DISCARD &&
--	    bio_op(bio) != REQ_OP_SECURE_ERASE)
--		return true;
-+	if (!bio || !bio->bi_iter.bi_size)
-+		return false;
- 
--	return false;
-+	switch (bio_op(bio)) {
-+	case REQ_OP_DISCARD:
-+	case REQ_OP_SECURE_ERASE:
-+	case REQ_OP_ZONE_REPORT:
-+	case REQ_OP_ZONE_RESET:
-+	case REQ_OP_ZONE_OPEN:
-+	case REQ_OP_ZONE_CLOSE:
-+	case REQ_OP_ZONE_FINISH:
-+		return false;
-+	default:
-+		return true;
-+	}
- }
- 
- static inline bool bio_no_advance_iter(struct bio *bio)
- {
--	return bio_op(bio) == REQ_OP_DISCARD ||
--	       bio_op(bio) == REQ_OP_SECURE_ERASE ||
--	       bio_op(bio) == REQ_OP_WRITE_SAME;
-+	switch (bio_op(bio)) {
-+	case REQ_OP_DISCARD:
-+	case REQ_OP_SECURE_ERASE:
-+	case REQ_OP_WRITE_SAME:
-+	case REQ_OP_ZONE_REPORT:
-+	case REQ_OP_ZONE_RESET:
-+	case REQ_OP_ZONE_OPEN:
-+	case REQ_OP_ZONE_CLOSE:
-+	case REQ_OP_ZONE_FINISH:
-+		return true;
-+	default:
-+		return false;
-+	}
- }
- 
- static inline bool bio_is_rw(struct bio *bio)
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 436f43f..70df996 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -229,6 +229,26 @@ enum rq_flag_bits {
- #define REQ_HASHED		(1ULL << __REQ_HASHED)
- #define REQ_MQ_INFLIGHT		(1ULL << __REQ_MQ_INFLIGHT)
- 
++config BLK_DEV_ZONED
++	bool "Zoned block device support"
++	---help---
++	Block layer zoned block device support. This option enables
++	support for ZAC/ZBC host-managed and host-aware zoned block devices.
++
++	Say yes here if you have a ZAC or ZBC storage device.
++
+ config BLK_DEV_THROTTLING
+ 	bool "Block layer bio throttling support"
+ 	depends on BLK_CGROUP=y
+diff --git a/block/Makefile b/block/Makefile
+index 36acdd7..9371bc7 100644
+--- a/block/Makefile
++++ b/block/Makefile
+@@ -22,4 +22,5 @@ obj-$(CONFIG_IOSCHED_CFQ)	+= cfq-iosched.o
+ obj-$(CONFIG_BLOCK_COMPAT)	+= compat_ioctl.o
+ obj-$(CONFIG_BLK_CMDLINE_PARSER)	+= cmdline-parser.o
+ obj-$(CONFIG_BLK_DEV_INTEGRITY) += bio-integrity.o blk-integrity.o t10-pi.o
++obj-$(CONFIG_BLK_DEV_ZONED)	+= blk-zoned.o
+ obj-$(CONFIG_BLK_MQ_PCI)	+= blk-mq-pci.o
+diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+new file mode 100644
+index 0000000..1603573
+--- /dev/null
++++ b/block/blk-zoned.c
+@@ -0,0 +1,257 @@
 +/*
-+ * Note on zone operations:
-+ * All REQ_OP_ZONE_* commands do not have a payload and share a common
-+ * interface for specifying operation range:
-+ * (1) bio->bi_iter.bi_sector and bio->bi_iter.bi_size set to 0:
-+ *     the command is to operate on ALL zones of the device.
-+ * (2) bio->bi_iter.bi_sector is set to a zone start sector and
-+ *     bio->bi_iter.bi_size is set to the zone size in bytes:
-+ *     the command is to operate on only the specified zone.
-+ * Operation:
-+ * REQ_OP_ZONE_REPORT: Request information for all zones or for a single zone.
-+ * REQ_OP_ZONE_RESET: Reset the write pointer of all zones or of a single zone.
-+ * REQ_OP_ZONE_OPEN: Explicitely open the maximum allowed number of zones or
-+ *                   a single zone. For the former case, the zones that will
-+ *                   actually be open are chosen by the disk.
-+ * REQ_OP_ZONE_CLOSE: Close all implicitely or explicitely open zones or
-+ *                    a single zone.
-+ * REQ_OP_ZONE_FINISH: Transition one or all open and closed zones to the full
-+ *                     condition.
++ * Zoned block device handling
++ *
++ * Copyright (c) 2015, Hannes Reinecke
++ * Copyright (c) 2015, SUSE Linux GmbH
++ *
++ * Copyright (c) 2016, Damien Le Moal
++ * Copyright (c) 2016, Western Digital
 + */
- enum req_op {
- 	REQ_OP_READ,
- 	REQ_OP_WRITE,
-@@ -236,9 +256,14 @@ enum req_op {
- 	REQ_OP_SECURE_ERASE,	/* request to securely erase sectors */
- 	REQ_OP_WRITE_SAME,	/* write same block many times */
- 	REQ_OP_FLUSH,		/* request for cache flush */
-+	REQ_OP_ZONE_REPORT,	/* Get zone information */
-+	REQ_OP_ZONE_RESET,	/* Reset a zone write pointer */
-+	REQ_OP_ZONE_OPEN,	/* Explicitely open a zone */
-+	REQ_OP_ZONE_CLOSE,	/* Close an open zone */
-+	REQ_OP_ZONE_FINISH,	/* Finish a zone */
++
++#include <linux/kernel.h>
++#include <linux/module.h>
++#include <linux/rbtree.h>
++#include <linux/blkdev.h>
++
++static inline sector_t blk_zone_start(struct request_queue *q,
++				      sector_t sector)
++{
++	sector_t zone_mask = blk_queue_zone_size(q) - 1;
++
++	return sector & ~zone_mask;
++}
++
++/*
++ * Check that a zone report belongs to the partition.
++ * If yes, fix its start sector and write pointer, copy it in the
++ * zone information array and return true. Return false otherwise.
++ */
++static bool blkdev_report_zone(struct block_device *bdev,
++			       struct blk_zone *rep,
++			       struct blk_zone *zone)
++{
++	sector_t offset = get_start_sect(bdev);
++
++	if (rep->start < offset)
++		return false;
++
++	rep->start -= offset;
++	if (rep->start + rep->len > bdev->bd_part->nr_sects)
++		return false;
++
++	if (rep->type == BLK_ZONE_TYPE_CONVENTIONAL)
++		rep->wp = rep->start + rep->len;
++	else
++		rep->wp -= offset;
++	memcpy(zone, rep, sizeof(struct blk_zone));
++
++	return true;
++}
++
++/**
++ * blkdev_report_zones - Get zones information
++ * @bdev:	Target block device
++ * @sector:	Sector from which to report zones
++ * @zones:	Array of zone structures where to return the zones information
++ * @nr_zones:	Number of zone structures in the zone array
++ * @gfp_mask:	Memory allocation flags (for bio_alloc)
++ *
++ * Description:
++ *    Get zone information starting from the zone containing @sector.
++ *    The number of zone information reported may be less than the number
++ *    requested by @nr_zones. The number of zones actually reported is
++ *    returned in @nr_zones.
++ */
++int blkdev_report_zones(struct block_device *bdev,
++			sector_t sector,
++			struct blk_zone *zones,
++			unsigned int *nr_zones,
++			gfp_t gfp_mask)
++{
++	struct request_queue *q = bdev_get_queue(bdev);
++	struct blk_zone_report_hdr *hdr;
++	unsigned int nrz = *nr_zones;
++	struct page *page;
++	unsigned int nr_rep;
++	size_t rep_bytes;
++	unsigned int nr_pages;
++	struct bio *bio;
++	struct bio_vec *bv;
++	unsigned int i, n, nz;
++	unsigned int ofst;
++	void *addr;
++	int ret = 0;
++
++	if (!q)
++		return -ENXIO;
++
++	if (!blk_queue_is_zoned(q))
++		return -EOPNOTSUPP;
++
++	if (!nrz)
++		return 0;
++
++	if (sector > bdev->bd_part->nr_sects) {
++		*nr_zones = 0;
++		return 0;
++	}
++
++	/*
++	 * The zone report has a header. So make room for it in the
++	 * payload. Also make sure that the report fits in a single BIO
++	 * that will not be split down the stack.
++	 */
++	rep_bytes = sizeof(struct blk_zone_report_hdr) +
++		sizeof(struct blk_zone) * nrz;
++	rep_bytes = (rep_bytes + PAGE_SIZE - 1) & PAGE_MASK;
++	if (rep_bytes > (queue_max_sectors(q) << 9))
++		rep_bytes = queue_max_sectors(q) << 9;
++
++	nr_pages = min_t(unsigned int, BIO_MAX_PAGES,
++			 rep_bytes >> PAGE_SHIFT);
++	nr_pages = min_t(unsigned int, nr_pages,
++			 queue_max_segments(q));
++
++	bio = bio_alloc(gfp_mask, nr_pages);
++	if (!bio)
++		return -ENOMEM;
++
++	bio->bi_bdev = bdev;
++	bio->bi_iter.bi_sector = blk_zone_start(q, sector);
++	bio_set_op_attrs(bio, REQ_OP_ZONE_REPORT, 0);
++
++	for (i = 0; i < nr_pages; i++) {
++		page = alloc_page(gfp_mask);
++		if (!page) {
++			ret = -ENOMEM;
++			goto out;
++		}
++		if (!bio_add_page(bio, page, PAGE_SIZE, 0)) {
++			__free_page(page);
++			break;
++		}
++	}
++
++	if (i == 0)
++		ret = -ENOMEM;
++	else
++		ret = submit_bio_wait(bio);
++	if (ret)
++		goto out;
++
++	/*
++	 * Process the report result: skip the header and go through the
++	 * reported zones to fixup and fixup the zone information for
++	 * partitions. At the same time, return the zone information into
++	 * the zone array.
++	 */
++	n = 0;
++	nz = 0;
++	nr_rep = 0;
++	bio_for_each_segment_all(bv, bio, i) {
++
++		if (!bv->bv_page)
++			break;
++
++		addr = kmap_atomic(bv->bv_page);
++
++		/* Get header in the first page */
++		ofst = 0;
++		if (!nr_rep) {
++			hdr = (struct blk_zone_report_hdr *) addr;
++			nr_rep = hdr->nr_zones;
++			ofst = sizeof(struct blk_zone_report_hdr);
++		}
++
++		/* Fixup and report zones */
++		while (ofst < bv->bv_len &&
++		       n < nr_rep && nz < nrz) {
++			if (blkdev_report_zone(bdev, addr + ofst, &zones[nz]))
++				nz++;
++			ofst += sizeof(struct blk_zone);
++			n++;
++		}
++
++		kunmap_atomic(addr);
++
++		if (n >= nr_rep || nz >= nrz)
++			break;
++
++	}
++
++out:
++	bio_for_each_segment_all(bv, bio, i)
++		__free_page(bv->bv_page);
++	bio_put(bio);
++
++	if (ret == 0)
++		*nr_zones = nz;
++
++	return ret;
++}
++EXPORT_SYMBOL_GPL(blkdev_report_zones);
++
++/**
++ * blkdev_reset_zones - Reset zones write pointer
++ * @bdev:	Target block device
++ * @sector:	Start sector of the first zone to reset
++ * @nr_sectors:	Number of sectors, at least the length of one zone
++ * @gfp_mask:	Memory allocation flags (for bio_alloc)
++ *
++ * Description:
++ *    Reset the write pointer of the zones contained in the range
++ *    @sector..@sector+@nr_sectors. Specifying the entire disk sector range
++ *    is valid, but the specified range should not contain conventional zones.
++ */
++int blkdev_reset_zones(struct block_device *bdev,
++		       sector_t sector, sector_t nr_sectors,
++		       gfp_t gfp_mask)
++{
++	struct request_queue *q = bdev_get_queue(bdev);
++	sector_t zone_sectors;
++	sector_t end_sector = sector + nr_sectors;
++	struct bio *bio;
++	int ret;
++
++	if (!q)
++		return -ENXIO;
++
++	if (!blk_queue_is_zoned(q))
++		return -EOPNOTSUPP;
++
++	if (end_sector > bdev->bd_part->nr_sects)
++		/* Out of range */
++		return -EINVAL;
++
++	/* Check alignment (handle eventual smaller last zone) */
++	zone_sectors = blk_queue_zone_size(q);
++	if (sector & (zone_sectors - 1))
++		return -EINVAL;
++
++	if ((nr_sectors & (zone_sectors - 1)) &&
++	    end_sector != bdev->bd_part->nr_sects)
++		return -EINVAL;
++
++	while (sector < end_sector) {
++
++		bio = bio_alloc(gfp_mask, 0);
++		bio->bi_iter.bi_sector = sector;
++		bio->bi_bdev = bdev;
++		bio_set_op_attrs(bio, REQ_OP_ZONE_RESET, 0);
++
++		ret = submit_bio_wait(bio);
++		bio_put(bio);
++
++		if (ret)
++			return ret;
++
++		sector += zone_sectors;
++
++		/* This may take a while, so be nice to others */
++		cond_resched();
++
++	}
++
++	return 0;
++}
++EXPORT_SYMBOL_GPL(blkdev_reset_zones);
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index f19e16b..252043f 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -24,6 +24,7 @@
+ #include <linux/rcupdate.h>
+ #include <linux/percpu-refcount.h>
+ #include <linux/scatterlist.h>
++#include <linux/blkzoned.h>
+ 
+ struct module;
+ struct scsi_ioctl_command;
+@@ -302,6 +303,21 @@ struct queue_limits {
+ 	enum blk_zoned_model	zoned;
  };
  
--#define REQ_OP_BITS 3
-+#define REQ_OP_BITS 4
++#ifdef CONFIG_BLK_DEV_ZONED
++
++struct blk_zone_report_hdr {
++	unsigned int	nr_zones;
++	u8		padding[60];
++};
++
++extern int blkdev_report_zones(struct block_device *bdev,
++			       sector_t sector, struct blk_zone *zones,
++			       unsigned int *nr_zones, gfp_t gfp_mask);
++extern int blkdev_reset_zones(struct block_device *bdev, sector_t sectors,
++			      sector_t nr_sectors, gfp_t gfp_mask);
++
++#endif /* CONFIG_BLK_DEV_ZONED */
++
+ struct request_queue {
+ 	/*
+ 	 * Together with queue_head for cacheline sharing
+@@ -654,6 +670,11 @@ static inline bool blk_queue_is_zoned(struct request_queue *q)
+ 	}
+ }
  
- typedef unsigned int blk_qc_t;
- #define BLK_QC_T_NONE	-1U
++static inline unsigned int blk_queue_zone_size(struct request_queue *q)
++{
++	return blk_queue_is_zoned(q) ? q->limits.chunk_sectors : 0;
++}
++
+ /*
+  * We regard a request as sync, if either a read or a sync write
+  */
+@@ -1401,6 +1422,16 @@ static inline bool bdev_is_zoned(struct block_device *bdev)
+ 	return false;
+ }
+ 
++static inline unsigned int bdev_zone_size(struct block_device *bdev)
++{
++	struct request_queue *q = bdev_get_queue(bdev);
++
++	if (q)
++		return blk_queue_zone_size(q);
++
++	return 0;
++}
++
+ static inline int queue_dma_alignment(struct request_queue *q)
+ {
+ 	return q ? q->dma_alignment : 511;
+diff --git a/include/uapi/linux/Kbuild b/include/uapi/linux/Kbuild
+index dd60439..92466a6 100644
+--- a/include/uapi/linux/Kbuild
++++ b/include/uapi/linux/Kbuild
+@@ -70,6 +70,7 @@ header-y += bfs_fs.h
+ header-y += binfmts.h
+ header-y += blkpg.h
+ header-y += blktrace_api.h
++header-y += blkzoned.h
+ header-y += bpf_common.h
+ header-y += bpf_perf_event.h
+ header-y += bpf.h
+diff --git a/include/uapi/linux/blkzoned.h b/include/uapi/linux/blkzoned.h
+new file mode 100644
+index 0000000..a381721
+--- /dev/null
++++ b/include/uapi/linux/blkzoned.h
+@@ -0,0 +1,103 @@
++/*
++ * Zoned block devices handling.
++ *
++ * Copyright (C) 2015 Seagate Technology PLC
++ *
++ * Written by: Shaun Tancheff <shaun.tancheff@seagate.com>
++ *
++ * Modified by: Damien Le Moal <damien.lemoal@hgst.com>
++ * Copyright (C) 2016 Western Digital
++ *
++ * This file is licensed under  the terms of the GNU General Public
++ * License version 2. This program is licensed "as is" without any
++ * warranty of any kind, whether express or implied.
++ */
++#ifndef _UAPI_BLKZONED_H
++#define _UAPI_BLKZONED_H
++
++#include <linux/types.h>
++
++/**
++ * enum blk_zone_type - Types of zones allowed in a zoned device.
++ *
++ * @BLK_ZONE_TYPE_CONVENTIONAL: The zone has no write pointer and can be writen
++ *                              randomly. Zone reset has no effect on the zone.
++ * @BLK_ZONE_TYPE_SEQWRITE_REQ: The zone must be written sequentially
++ * @BLK_ZONE_TYPE_SEQWRITE_PREF: The zone can be written non-sequentially
++ *
++ * Any other value not defined is reserved and must be considered as invalid.
++ */
++enum blk_zone_type {
++	BLK_ZONE_TYPE_CONVENTIONAL	= 0x1,
++	BLK_ZONE_TYPE_SEQWRITE_REQ	= 0x2,
++	BLK_ZONE_TYPE_SEQWRITE_PREF	= 0x3,
++};
++
++/**
++ * enum blk_zone_cond - Condition [state] of a zone in a zoned device.
++ *
++ * @BLK_ZONE_COND_NOT_WP: The zone has no write pointer, it is conventional.
++ * @BLK_ZONE_COND_EMPTY: The zone is empty.
++ * @BLK_ZONE_COND_IMP_OPEN: The zone is open, but not explicitly opened.
++ * @BLK_ZONE_COND_EXP_OPEN: The zones was explicitly opened by an
++ *                          OPEN ZONE command.
++ * @BLK_ZONE_COND_CLOSED: The zone was [explicitly] closed after writing.
++ * @BLK_ZONE_COND_FULL: The zone is marked as full, possibly by a zone
++ *                      FINISH ZONE command.
++ * @BLK_ZONE_COND_READONLY: The zone is read-only.
++ * @BLK_ZONE_COND_OFFLINE: The zone is offline (sectors cannot be read/written).
++ *
++ * The Zone Condition state machine in the ZBC/ZAC standards maps the above
++ * deinitions as:
++ *   - ZC1: Empty         | BLK_ZONE_EMPTY
++ *   - ZC2: Implicit Open | BLK_ZONE_COND_IMP_OPEN
++ *   - ZC3: Explicit Open | BLK_ZONE_COND_EXP_OPEN
++ *   - ZC4: Closed        | BLK_ZONE_CLOSED
++ *   - ZC5: Full          | BLK_ZONE_FULL
++ *   - ZC6: Read Only     | BLK_ZONE_READONLY
++ *   - ZC7: Offline       | BLK_ZONE_OFFLINE
++ *
++ * Conditions 0x5 to 0xC are reserved by the current ZBC/ZAC spec and should
++ * be considered invalid.
++ */
++enum blk_zone_cond {
++	BLK_ZONE_COND_NOT_WP	= 0x0,
++	BLK_ZONE_COND_EMPTY	= 0x1,
++	BLK_ZONE_COND_IMP_OPEN	= 0x2,
++	BLK_ZONE_COND_EXP_OPEN	= 0x3,
++	BLK_ZONE_COND_CLOSED	= 0x4,
++	BLK_ZONE_COND_READONLY	= 0xD,
++	BLK_ZONE_COND_FULL	= 0xE,
++	BLK_ZONE_COND_OFFLINE	= 0xF,
++};
++
++/**
++ * struct blk_zone - Zone descriptor for BLKREPORTZONE ioctl.
++ *
++ * @start: Zone start in 512 B sector units
++ * @len: Zone length in 512 B sector units
++ * @wp: Zone write pointer location in 512 B sector units
++ * @type: see enum blk_zone_type for possible values
++ * @cond: see enum blk_zone_cond for possible values
++ * @non_seq: Flag indicating that the zone is using non-sequential resources
++ *           (for host-aware zoned block devices only).
++ * @reset: Flag indicating that a zone reset is recommended.
++ * @reserved: Padding to 64 B to match the ZBC/ZAC defined zone descriptor size.
++ *
++ * start, len and wp use the regular 512 B sector unit, regardless of the
++ * device logical block size. The overall structure size is 64 B to match the
++ * ZBC/ZAC defined zone descriptor and allow support for future additional
++ * zone information.
++ */
++struct blk_zone {
++	__u64	start;		/* Zone start sector */
++	__u64	len;		/* Zone length in number of sectors */
++	__u64	wp;		/* Zone write pointer position */
++	__u8	type;		/* Zone type */
++	__u8	cond;		/* Zone condition */
++	__u8	non_seq;	/* Non-sequential write resources active */
++	__u8	reset;		/* Reset write pointer recommended */
++	__u8	reserved[36];
++};
++
++#endif /* _UAPI_BLKZONED_H */
 -- 
 2.7.4
 
