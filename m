@@ -1,68 +1,42 @@
-Return-Path: <Damien.LeMoal@hgst.com>
-From: Damien Le Moal <damien.lemoal@hgst.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>, Christoph
- Hellwig <hch@lst.de>, "Martin K . Petersen" <martin.petersen@oracle.com>,
-	Hannes Reinecke <hare@suse.de>, Shaun Tancheff <shaun@tancheff.com>, Damien
- Le Moal <damien.lemoal@hgst.com>, Shaun Tancheff <shaun.tancheff@seagate.com>
-Subject: [PATCH v5 4/7] block: Define zoned block device operations
-Date: Fri, 30 Sep 2016 13:11:36 +0900
-Message-ID: <1475208699-27310-5-git-send-email-damien.lemoal@hgst.com>
-In-Reply-To: <1475208699-27310-1-git-send-email-damien.lemoal@hgst.com>
-References: <1475208699-27310-1-git-send-email-damien.lemoal@hgst.com>
+Return-Path: <martin.petersen@oracle.com>
+To: Damien Le Moal <damien.lemoal@hgst.com>
+Cc: Jens Axboe <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
+        <linux-scsi@vger.kernel.org>, Christoph Hellwig <hch@lst.de>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Hannes Reinecke <hare@suse.de>, Shaun Tancheff <shaun@tancheff.com>
+Subject: Re: [PATCH v4 1/7] block: Add 'zoned' queue limit
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <1475052339-10202-1-git-send-email-damien.lemoal@hgst.com>
+	<1475052339-10202-2-git-send-email-damien.lemoal@hgst.com>
+Date: Thu, 29 Sep 2016 21:59:57 -0400
+In-Reply-To: <1475052339-10202-2-git-send-email-damien.lemoal@hgst.com>
+	(Damien Le Moal's message of "Wed, 28 Sep 2016 17:45:33 +0900")
+Message-ID: <yq1mviquoyq.fsf@sermon.lab.mkp.net>
 MIME-Version: 1.0
 Content-Type: text/plain
-Return-Path: damien.lemoal@hgst.com
 List-ID: <linux-block@vger.kernel.org>
 
-From: Shaun Tancheff <shaun.tancheff@seagate.com>
+>>>>> "Damien" == Damien Le Moal <damien.lemoal@hgst.com> writes:
 
-Define REQ_OP_ZONE_REPORT and REQ_OP_ZONE_RESET for handling zones of
-host-managed and host-aware zoned block devices. With with these two
-new operations, the total number of operations defined reaches 8 and
-still fits with the 3 bits definition of REQ_OP_BITS.
+Damien> Add the zoned queue limit to indicate the zoning model of a
+Damien> block device.  Defined values are 0 (BLK_ZONED_NONE) for regular
+Damien> block devices, 1 (BLK_ZONED_HA) for host-aware zone block
+Damien> devices and 2 (BLK_ZONED_HM) for host-managed zone block
+Damien> devices. The standards defined drive managed model is not
+Damien> defined here since these block devices do not provide any
+Damien> command for accessing zone information. Drive managed model
+Damien> devices will be reported as BLK_ZONED_NONE.
 
-Signed-off-by: Shaun Tancheff <shaun.tancheff@seagate.com>
-Signed-off-by: Damien Le Moal <damien.lemoal@hgst.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Damien> The helper functions blk_queue_zoned_model and bdev_zoned_model
+Damien> return the zoned limit and the functions blk_queue_is_zoned and
+Damien> bdev_is_zoned return a boolean for callers to test if a block
+Damien> device is zoned.
+
+Damien> The zoned attribute is also exported as a string to applications
+Damien> via sysfs. BLK_ZONED_NONE shows as "none", BLK_ZONED_HA as
+Damien> "host-aware" and BLK_ZONED_HM as "host-managed".
+
 Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
 
----
- block/blk-core.c          | 4 ++++
- include/linux/blk_types.h | 2 ++
- 2 files changed, 6 insertions(+)
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 14d7c07..e4eda5d 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1941,6 +1941,10 @@ generic_make_request_checks(struct bio *bio)
- 	case REQ_OP_WRITE_SAME:
- 		if (!bdev_write_same(bio->bi_bdev))
- 			goto not_supported;
-+	case REQ_OP_ZONE_REPORT:
-+	case REQ_OP_ZONE_RESET:
-+		if (!bdev_is_zoned(bio->bi_bdev))
-+			goto not_supported;
- 		break;
- 	default:
- 		break;
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index cd395ec..dd50dce 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -243,6 +243,8 @@ enum req_op {
- 	REQ_OP_SECURE_ERASE,	/* request to securely erase sectors */
- 	REQ_OP_WRITE_SAME,	/* write same block many times */
- 	REQ_OP_FLUSH,		/* request for cache flush */
-+	REQ_OP_ZONE_REPORT,	/* Get zone information */
-+	REQ_OP_ZONE_RESET,	/* Reset a zone write pointer */
- };
- 
- #define REQ_OP_BITS 3
 -- 
-2.7.4
-
-Western Digital Corporation (and its subsidiaries) E-mail Confidentiality Notice & Disclaimer:
-
-This e-mail and any files transmitted with it may contain confidential or legally privileged information of WDC and/or its affiliates, and are intended solely for the use of the individual or entity to which they are addressed. If you are not the intended recipient, any disclosure, copying, distribution or any action taken or omitted to be taken in reliance on it, is prohibited. If you have received this e-mail in error, please notify the sender immediately and delete the e-mail in its entirety from your system.
+Martin K. Petersen	Oracle Linux Engineering
