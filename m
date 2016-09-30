@@ -1,69 +1,42 @@
-Return-Path: <Damien.LeMoal@hgst.com>
-From: Damien Le Moal <damien.lemoal@hgst.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>, Christoph
- Hellwig <hch@lst.de>, "Martin K . Petersen" <martin.petersen@oracle.com>,
-	Hannes Reinecke <hare@suse.de>, Damien Le Moal <damien.lemoal@hgst.com>
-Subject: [PATCH v2 2/7] blk-sysfs: Add 'chunk_sectors' to sysfs attributes
-Date: Mon, 26 Sep 2016 20:14:38 +0900
-Message-ID: <1474888483-29762-3-git-send-email-damien.lemoal@hgst.com>
-In-Reply-To: <1474888483-29762-1-git-send-email-damien.lemoal@hgst.com>
-References: <1474888483-29762-1-git-send-email-damien.lemoal@hgst.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: damien.lemoal@hgst.com
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:49756 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S933613AbcI3NXp (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 30 Sep 2016 09:23:45 -0400
+From: Alexander Gordeev <agordeev@redhat.com>
+To: linux-kernel@vger.kernel.org
+Cc: Alexander Gordeev <agordeev@redhat.com>,
+        linux-block@vger.kernel.org
+Subject: [PATCH v2 2/8] blk-mq: Remove a redundant assignment
+Date: Fri, 30 Sep 2016 15:23:24 +0200
+Message-Id: <acd70e1736928907d479e29203844505a82d1413.1475241231.git.agordeev@redhat.com>
+In-Reply-To: <cover.1475241231.git.agordeev@redhat.com>
+References: <cover.1475241231.git.agordeev@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Hannes Reinecke <hare@suse.de>
+blk_mq_hw_ctx::queue_num is initialized in blk_mq_init_hctx()
+function.
 
-The queue limits already have a 'chunk_sectors' setting, so
-we should be presenting it via sysfs.
-
-Signed-off-by: Hannes Reinecke <hare@suse.de>
-Signed-off-by: Damien Le Moal <damien.lemoal@hgst.com>
+CC: linux-block@vger.kernel.org
+Reviewed-by: Omar Sandoval <osandov@fb.com>
+Signed-off-by: Alexander Gordeev <agordeev@redhat.com>
 ---
- block/blk-sysfs.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ block/blk-mq.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index ff9cd9c..488c2e2 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -130,6 +130,11 @@ static ssize_t queue_physical_block_size_show(struct request_queue *q, char *pag
- 	return queue_var_show(queue_physical_block_size(q), page);
- }
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index c96a168..92c2519 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1928,7 +1928,6 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
  
-+static ssize_t queue_chunk_sectors_show(struct request_queue *q, char *page)
-+{
-+	return queue_var_show(q->limits.chunk_sectors, page);
-+}
-+
- static ssize_t queue_io_min_show(struct request_queue *q, char *page)
- {
- 	return queue_var_show(queue_io_min(q), page);
-@@ -455,6 +460,11 @@ static struct queue_sysfs_entry queue_physical_block_size_entry = {
- 	.show = queue_physical_block_size_show,
- };
+ 		atomic_set(&hctxs[i]->nr_active, 0);
+ 		hctxs[i]->numa_node = node;
+-		hctxs[i]->queue_num = i;
  
-+static struct queue_sysfs_entry queue_chunk_sectors_entry = {
-+	.attr = {.name = "chunk_sectors", .mode = S_IRUGO },
-+	.show = queue_chunk_sectors_show,
-+};
-+
- static struct queue_sysfs_entry queue_io_min_entry = {
- 	.attr = {.name = "minimum_io_size", .mode = S_IRUGO },
- 	.show = queue_io_min_show,
-@@ -555,6 +565,7 @@ static struct attribute *default_attrs[] = {
- 	&queue_hw_sector_size_entry.attr,
- 	&queue_logical_block_size_entry.attr,
- 	&queue_physical_block_size_entry.attr,
-+	&queue_chunk_sectors_entry.attr,
- 	&queue_io_min_entry.attr,
- 	&queue_io_opt_entry.attr,
- 	&queue_discard_granularity_entry.attr,
+ 		if (blk_mq_init_hctx(q, set, hctxs[i], i)) {
+ 			free_cpumask_var(hctxs[i]->cpumask);
 -- 
-2.7.4
+1.8.3.1
 
-Western Digital Corporation (and its subsidiaries) E-mail Confidentiality Notice & Disclaimer:
-
-This e-mail and any files transmitted with it may contain confidential or legally privileged information of WDC and/or its affiliates, and are intended solely for the use of the individual or entity to which they are addressed. If you are not the intended recipient, any disclosure, copying, distribution or any action taken or omitted to be taken in reliance on it, is prohibited. If you have received this e-mail in error, please notify the sender immediately and delete the e-mail in its entirety from your system.
