@@ -1,117 +1,87 @@
-Return-Path: <Adam.Manzanares@hgst.com>
-Date: Tue, 4 Oct 2016 08:49:18 -0700
-From: Adam Manzanares <adam.manzanares@hgst.com>
-To: Tejun Heo <tj@kernel.org>
-CC: <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
-	<linux-ide@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f68.google.com ([74.125.82.68]:33782 "EHLO
+        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751006AbcJBIxZ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 2 Oct 2016 04:53:25 -0400
+Date: Sun, 2 Oct 2016 10:53:21 +0200
+From: Tejun Heo <tj@kernel.org>
+To: Adam Manzanares <adam.manzanares@hgst.com>
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-ide@vger.kernel.org
 Subject: Re: [PATCH 1/3] block: Add iocontext priority to request
-Message-ID: <20161004154917.GA4764@hgst.com>
+Message-ID: <20161002085321.GA13648@mtj.duckdns.org>
 References: <1475000096-6148-1-git-send-email-adam.manzanares@hgst.com>
  <1475000096-6148-2-git-send-email-adam.manzanares@hgst.com>
  <20160929084059.GB11087@mtj.duckdns.org>
  <20160930160216.GA13637@hgst.com>
- <20161002085321.GA13648@mtj.duckdns.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-In-Reply-To: <20161002085321.GA13648@mtj.duckdns.org>
-Return-Path: adam.manzanares@hgst.com
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20160930160216.GA13637@hgst.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-SGVsbG8gVGVqdW4sCgoxMC8wMi8yMDE2IDEwOjUzLCBUZWp1biBIZW8gd3JvdGU6Cj4gSGVsbG8s
-IEFkYW0uCj4gCj4gT24gRnJpLCBTZXAgMzAsIDIwMTYgYXQgMDk6MDI6MTdBTSAtMDcwMCwgQWRh
-bSBNYW56YW5hcmVzIHdyb3RlOgo+ID4gSSdsbCBzdGFydCB3aXRoIHRoZSBjaGFuZ2VzIEkgbWFk
-ZSBhbmQgd29yayBteSB3YXkgdGhyb3VnaCBhIGdyZXAgb2YgICAgICAgICAgICAKPiA+IGlvcHJp
-by4gUGxlYXNlIGFkZCBvciBjb3JyZWN0IGFueSBvZiB0aGUgYXNzdW1wdGlvbnMgSSBoYXZlIG1h
-ZGUuICAgICAgICAgICAgICAgCj4gCj4gV2VsbCwgaXQgbG9va3MgbGlrZSB5b3UncmUgdGhlIG9u
-ZSB3aG8ncyBtb3N0IGZhbWlsaWFyIHdpdGggaW9wcmlvCj4gaGFuZGxpbmcgYXQgdGhpcyBwb2lu
-dC4gOikKPiAKPiA+IEluIGJsay1jb3JlLCB0aGUgYmVoYXZpb3IgYmVmb3JlIHRoZSBwYXRjaCBp
-cyB0byBnZXQgdGhlIGlvcHJpbyBmb3IgdGhlIHJlcXVlc3QgCj4gPiBmcm9tIHRoZSBiaW8uIFRo
-ZSBvbmx5IHJlZmVyZW5jZXMgSSBmb3VuZCB0byBiaW9fc2V0X3ByaW8gYXJlIGluIGJjYWNoZS4g
-Qm90aCAgIAo+ID4gb2YgdGhlc2UgcmVmZXJlbmNlcyBhcmUgaW4gbG93IHByaW9yaXR5IG9wZXJh
-dGlvbnMgKGdjLCBiZyB3cml0ZWJhY2spIHNvIHRoZSAgICAKPiA+IGlvcHJpb3JpdHkgb2YgdGhl
-IGJpbyBpcyBzZXQgdG8gSU9fUFJJT0NMQVNTX0lETEUgaW4gdGhlc2UgY2FzZXMuICAgICAgICAg
-ICAgICAgCj4gPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAo+ID4gQSBrZXJuZWwgdGhyZWFkIGlz
-IHVzZWQgdG8gc3VibWl0IHRoZXNlIGJpb3Mgc28gdGhlIGlvcHJpbyBpcyBnb2luZyB0byBjb21l
-ICAgICAKPiA+IGZyb20gdGhlIGN1cnJlbnQgcnVubmluZyB0YXNrIGlmIHRoZSBpb2NvbnRleHQg
-ZXhpc3RzLiBUaGlzIGNvdWxkIGJlIGEgcHJvYmxlbSAgCj4gPiBpZiB3ZSBoYXZlIHNldCBhIHRh
-c2sgd2l0aCBoaWdoIHByaW9yaXR5IGFuZCBzb21lIGJhY2tncm91bmQgd29yayBlbmRzIHVwICAg
-ICAgIAo+ID4gZ2V0dGluZyBnZW5lcmF0ZWQgaW4gdGhlIGJjYWNoZSBsYXllci4gSSBwcm9wb3Nl
-IHRoYXQgd2UgY2hlY2sgaWYgdGhlICAgICAgICAgICAKPiA+IGlvcHJpb3JpdHkgb2YgdGhlIGJp
-byBpcyB2YWxpZCBhbmQgaWYgc28sIHRoZW4gd2Uga2VlcCB0aGUgcHJpb3JpcnR5IGZyb20gdGhl
-ICAgCj4gPiBiaW8uICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAo+IAo+IEkgd29uZGVyIHdoZXRoZXIgdGhl
-IHJpZ2h0IHRoaW5nIHRvIGRvIGlzIGFkZGluZyBiaW8tPmJpX2lvcHJpbyB3aGljaAo+IGlzIGlu
-aXRpYWxpemVkIG9uIGJpbyBzdWJtaXNzaW9uIGFuZCBjYXJyaWVkIHRocm91Z2ggcmVxLT5pb3By
-aW8uCj4gCgpJIGxvb2tlZCBhcm91bmQgYW5kIHRob3VnaHQgYWJvdXQgdGhpcyBhbmQgSSdtIG5v
-dCBzdXJlIGlmIHRoaXMgd2lsbCBoZWxwLiAKSSBkdWcgaW50byB0aGUgYmlvIHN1Ym1pc3Npb24g
-Y29kZSBhbmQgSSB0aG91Z2h0IGdlbmVyaWNfbWFrZV9yZXF1ZXN0IHdhcyAKdGhlIGJlc3QgcGxh
-Y2UgdG8gc2F2ZSB0aGUgaW9wcmlvIGluZm9ybWF0aW9uLiBUaGlzIGlzIHF1aXRlIGNsb3NlIGlu
-IAp0aGUgY2FsbCBzdGFjayB0byBpbml0X3JlcXVlc3RfZnJvbSBiaW8uIEJjYWNoZSBzZXRzIHRo
-ZSBiaW8gcHJpb3JpdHkgYmVmb3JlIAp0aGUgc3VibWlzc2lvbiwgc28gd2Ugd291bGQgaGF2ZSB0
-byBjaGVjayB0byBzZWUgaWYgdGhlIGJpbyBwcmlvcml0eSB3YXMgCnZhbGlkIG9uIGJpbyBzdWJt
-aXNzaW9uIGxlYXZpbmcgdXMgd2l0aCB0aGUgc2FtZSBwcm9ibGVtLiBMZWF2aW5nIHRoZSAKcHJp
-b3JpdHkgaW4gdGhlIHVwcGVyIGJpdHMgb2YgYmlvLT5iaV9ydyBpcyBmaW5lIHdpdGggbWUuIEl0
-IG1heSBoZWxwIHRvIApoYXZlIHRoZSBiaW8tPmJpX2lvcHJpbyBmb3IgY2xhcml0eSwgYnV0IEkg
-dGhpbmsgd2Ugd2lsbCBzdGlsbCBmYWNlIHRoZSAKaXNzdWUgb2YgaGF2aW5nIHRvIGNoZWNrIGlm
-IHRoaXMgdmFsdWUgaXMgc2V0IHdoZW4gd2Ugc3VibWl0IHRoZSBiaW8gb3IgCmluaXQgdGhlIHJl
-cXVlc3Qgc28gSSdtIGxlYW5pbmcgdG93YXJkcyBsZWF2aW5nIGl0IGFzIGlzLgoKCj4gPiBUaGUg
-c2Vjb25kIGFyZWEgdGhhdCBJIHNlZSBhIHBvdGVudGlhbCBwcm9ibGVtIGlzIGluIHRoZSBtZXJn
-aW5nIGNvZGUgY29kZSBpbiAgIAo+ID4gYmxrLWNvcmUgd2hlbiBhIGJpbyBpcyBxdWV1ZWQuIElm
-IHRoZXJlIGlzIGEgcmVxdWVzdCB0aGF0IGlzIG1lcmdlYWJsZSB0aGVuICAgICAKPiA+IHRoZSBt
-ZXJnZSBjb2RlIHRha2VzIHRoZSBoaWdoZXN0IHByaW9yaXR5IG9mIHRoZSBiaW8gYW5kIHRoZSBy
-ZXF1ZXN0LiBUaGlzICAgICAgCj4gPiBjb3VsZCB3aXBlIG91dCB0aGUgdmFsdWVzIHNldCBieSBi
-aW9fc2V0X3ByaW8uIEkgdGhpbmsgaXQgd291bGQgYmUgICAgICAgICAgICAgIAo+ID4gYmVzdCB0
-byBzZXQgdGhlIHJlcXVlc3QgYXMgbm9uIG1lcmdlYWJsZSB3aGVuIHdlIHNlZSB0aGF0IGl0IGlz
-IGEgaGlnaCAgICAgICAgICAKPiA+IHByaW9yaXR5IElPIHJlcXVlc3QuICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCj4gCj4gVGhlIGN1
-cnJlbnQgYmVoYXZpb3Igc2hvdWxkIGJlIGZpbmUgZm9yIG1vc3Qgbm9uLXBhdGhvbG9naWNhbCBj
-YXNlcwo+IGJ1dCBJIGhhdmUgbm8gb2JqZWN0aW9uIHRvIG5vdCBtZXJnaW5nIGlvcyB3aXRoIGRp
-ZmZlcmluZyBwcmlvcml0aWVzLgo+IAo+ID4gVGhlIHRoaXJkIGFyZWEgdGhhdCBpcyBvZiBpbnRl
-cmVzdCBpcyBpbiB0aGUgQ0ZRIHNjaGVkdWxlciBhbmQgdGhlIGlvcHJpbyBpcyAgICAKPiA+IG9u
-bHkgdXNlZCBpbiB0aGUgY2FzZSBvZiBhc3luYyBJTyBhbmQgSSBmb3VuZCB0aGF0IHRoZSBwcmlv
-cml0eSBpcyBvbmx5ICAgICAgICAgCj4gPiBvYnRhaW5lZCBmcm9tIHRoZSB0YXNrIGFuZCBub3Qg
-ZnJvbSB0aGUgcmVxdWVzdC4gVGhpcyBsZWFkcyBtZSB0byBiZWxpZXZlIHRoYXQgIAo+ID4gdGhl
-IGNoYW5nZXMgbWFkZSBpbiB0aGUgYmxrLWNvcmUgdG8gYWRkIHRoZSBwcmlvcml0eSB0byB0aGUg
-cmVxdWVzdCB3aWxsIG5vdCAgICAKPiA+IGltcGFjdCB0aGUgQ0ZRIHNjaGVkdWxlci4gCj4gPgo+
-ID4gVGhlIGZvdXJ0aCBhcmVhIHRoYXQgbWlnaHQgYmUgY29uY2VybmluZyBpcyB0aGUgZHJpdmVy
-cy4gdmlydGlvX2Jsb2NrIGNvcGllcyAgICAKPiA+IHRoZSByZXF1ZXN0IHByaW9yaXR5IGludG8g
-YSB2aXJ0dWFsIGJsb2NrIHJlcXVlc3QuIEkgYW0gYXNzdW1pbmcgdGhhdCB0aGlzICAgICAgCj4g
-PiBldmVudHVhbGx5IG1ha2VzIGl0IHRvIGFub3RoZXIgZGV2aWNlIGRyaXZlciBzbyB3ZSBkb24n
-dCBuZWVkIHRvIHdvcnJ5IGFib3V0ICAgIAo+ID4gdGhpcy4gbnVsbCBibG9jayBkZXZpY2UgZHJp
-dmVyIGFsc28gdXNlcyB0aGUgaW9wcmlvLCBidXQgdGhpcyBpcyBhbHNvIG5vdCBhICAgICAKPiA+
-IGNvbmNlcm4uIGxpZ2h0bnZtIGFsc28gc2V0cyB0aGUgaW9wcmlvIHRvIGJ1aWxkIGEgcmVxdWVz
-dCB0aGF0IGlzIHBhc3NlZCBvbnRvICAgCj4gPiBhbm90aGVyIGRyaXZlci4gVGhlIGxhc3QgZHJp
-dmVyIHRoYXQgdXNlcyB0aGUgcmVxdWVzdCBpb3ByaW8gaXMgdGhlIGZ1c2lvbiAgICAgIAo+ID4g
-bXB0c2FzIGRyaXZlciBhbmQgSSBkb24ndCB1bmRlcnN0YW5kIGhvdyBpdCBpcyB1c2luZyB0aGUg
-aW9wcmlvLiBGcm9tIHdoYXQgSSAgICAKPiA+IGNhbiB0ZWxsIGl0IGlzIHRha2luZyBhIHJlcXVl
-c3Qgb2YgSU9QUklPX0NMQVNTX05PTkUgd2l0aCBkYXRhIG9mIDB4NyBhbmQgICAgICAgCj4gPiBj
-YWxsaW5nIHRoaXMgaGlnaCBwcmlvcml0eSBJTy4gVGhpcyBjb3VsZCBiZSBpbXBhY3RlZCBieSB0
-aGUgY29kZSBJIGhhdmUgICAgICAgIAo+ID4gcHJvcG9zZWQsIGJ1dCBJIGJlbGlldmUgdGhlIGF1
-dGhvcnMgaW50ZW5kZWQgdG8gdHJlYXQgdGhpcyBwYXJ0aWN1bGFyIGlvcHJpbyAgICAKPiA+IHZh
-bHVlIGFzIGhpZ2ggcHJpb3JpdHkuIFRoZSBkcml2ZXIgd2lsbCBwYXNzIHRoZSByZXF1ZXN0IHRv
-IHRoZSBkZXZpY2UgICAgICAgICAgCj4gPiB3aXRoIGhpZ2ggcHJpb3JpdHkgaWYgdGhlIGFwcHJv
-cHJpYXRlIGlvcHJpbyB2YWx1ZXMgaXMgc2VlbiBvbiB0aGUgcmVxdWVzdC4gICAgIAo+ID4gICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAKPiA+IFRoZSBmaWZ0aCBhcmVhIHRoYXQgSSBub3RpY2VkIG1h
-eSBiZSBpbXBhY3RlZCBpcyBmaWxlIHN5c3RlbXMuIGJ0cmZzIHVzZXMgbG93ICAgCj4gPiBwcmlv
-cml0eSBJTyBmb3IgcmVhZCBhaGVhZC4gRXh0NCB1c2VzIGlvcHJpbyBmb3Igam91cm5hbGluZy4g
-Qm90aCBvZiB0aGVzZSAgICAgIAo+ID4gaXNzdWVzIGFyZSBub3QgYSBwcm9ibGVtIGJlY2F1c2Ug
-dGhlIGlvcHJpbyBpcyBzZXQgb24gdGhlIHRhc2sgYW5kIG5vdCBvbiBhICAgICAKPiA+IGJpby4K
-PiAKPiBZZWFoLCBsb29rcyBnb29kIHRvIG1lLiAgQ2FyZSB0byBpbmNsdWRlIGEgYnJpZWYgc3Vt
-bWFyeSBvZiBleHBlY3RlZAo+IChub24paW1wYWN0cyBpbiB0aGUgcGF0Y2ggZGVzY3JpcHRpb24/
-Cj4gCkknbSBnb2luZyB0byBzZW5kIG91dCBhbiB1cGRhdGVkIHNlcmllcyBvZiBwYXRjaGVzIHN1
-bW1hcml6aW5nIHNvbWUgb2YgdGhpcyAKZGlzY3Vzc2lvbiBhbmQgSSdsbCBhbHNvIGluY2x1ZGUg
-c29tZSBwZXJmb3JtYW5jZSByZXN1bHRzIHRoYXQgd2UgaGF2ZSAKbWVhc3VyZWQuCgo+IFRoYW5r
-cy4KPiAKPiAtLSAKPiB0ZWp1bgoKVGFrZSBjYXJlLApBZGFtCldlc3Rlcm4gRGlnaXRhbCBDb3Jw
-b3JhdGlvbiAoYW5kIGl0cyBzdWJzaWRpYXJpZXMpIEUtbWFpbCBDb25maWRlbnRpYWxpdHkgTm90
-aWNlICYgRGlzY2xhaW1lcjoKClRoaXMgZS1tYWlsIGFuZCBhbnkgZmlsZXMgdHJhbnNtaXR0ZWQg
-d2l0aCBpdCBtYXkgY29udGFpbiBjb25maWRlbnRpYWwgb3IgbGVnYWxseSBwcml2aWxlZ2VkIGlu
-Zm9ybWF0aW9uIG9mIFdEQyBhbmQvb3IgaXRzIGFmZmlsaWF0ZXMsIGFuZCBhcmUgaW50ZW5kZWQg
-c29sZWx5IGZvciB0aGUgdXNlIG9mIHRoZSBpbmRpdmlkdWFsIG9yIGVudGl0eSB0byB3aGljaCB0
-aGV5IGFyZSBhZGRyZXNzZWQuIElmIHlvdSBhcmUgbm90IHRoZSBpbnRlbmRlZCByZWNpcGllbnQs
-IGFueSBkaXNjbG9zdXJlLCBjb3B5aW5nLCBkaXN0cmlidXRpb24gb3IgYW55IGFjdGlvbiB0YWtl
-biBvciBvbWl0dGVkIHRvIGJlIHRha2VuIGluIHJlbGlhbmNlIG9uIGl0LCBpcyBwcm9oaWJpdGVk
-LiBJZiB5b3UgaGF2ZSByZWNlaXZlZCB0aGlzIGUtbWFpbCBpbiBlcnJvciwgcGxlYXNlIG5vdGlm
-eSB0aGUgc2VuZGVyIGltbWVkaWF0ZWx5IGFuZCBkZWxldGUgdGhlIGUtbWFpbCBpbiBpdHMgZW50
-aXJldHkgZnJvbSB5b3VyIHN5c3RlbS4K
+Hello, Adam.
+
+On Fri, Sep 30, 2016 at 09:02:17AM -0700, Adam Manzanares wrote:
+> I'll start with the changes I made and work my way through a grep of            
+> ioprio. Please add or correct any of the assumptions I have made.               
+
+Well, it looks like you're the one who's most familiar with ioprio
+handling at this point. :)
+
+> In blk-core, the behavior before the patch is to get the ioprio for the request 
+> from the bio. The only references I found to bio_set_prio are in bcache. Both   
+> of these references are in low priority operations (gc, bg writeback) so the    
+> iopriority of the bio is set to IO_PRIOCLASS_IDLE in these cases.               
+>                                                                                 
+> A kernel thread is used to submit these bios so the ioprio is going to come     
+> from the current running task if the iocontext exists. This could be a problem  
+> if we have set a task with high priority and some background work ends up       
+> getting generated in the bcache layer. I propose that we check if the           
+> iopriority of the bio is valid and if so, then we keep the priorirty from the   
+> bio.                                                                            
+
+I wonder whether the right thing to do is adding bio->bi_ioprio which
+is initialized on bio submission and carried through req->ioprio.
+
+> The second area that I see a potential problem is in the merging code code in   
+> blk-core when a bio is queued. If there is a request that is mergeable then     
+> the merge code takes the highest priority of the bio and the request. This      
+> could wipe out the values set by bio_set_prio. I think it would be              
+> best to set the request as non mergeable when we see that it is a high          
+> priority IO request.                                                            
+
+The current behavior should be fine for most non-pathological cases
+but I have no objection to not merging ios with differing priorities.
+
+> The third area that is of interest is in the CFQ scheduler and the ioprio is    
+> only used in the case of async IO and I found that the priority is only         
+> obtained from the task and not from the request. This leads me to believe that  
+> the changes made in the blk-core to add the priority to the request will not    
+> impact the CFQ scheduler. 
+>
+> The fourth area that might be concerning is the drivers. virtio_block copies    
+> the request priority into a virtual block request. I am assuming that this      
+> eventually makes it to another device driver so we don't need to worry about    
+> this. null block device driver also uses the ioprio, but this is also not a     
+> concern. lightnvm also sets the ioprio to build a request that is passed onto   
+> another driver. The last driver that uses the request ioprio is the fusion      
+> mptsas driver and I don't understand how it is using the ioprio. From what I    
+> can tell it is taking a request of IOPRIO_CLASS_NONE with data of 0x7 and       
+> calling this high priority IO. This could be impacted by the code I have        
+> proposed, but I believe the authors intended to treat this particular ioprio    
+> value as high priority. The driver will pass the request to the device          
+> with high priority if the appropriate ioprio values is seen on the request.     
+>                                                                                 
+> The fifth area that I noticed may be impacted is file systems. btrfs uses low   
+> priority IO for read ahead. Ext4 uses ioprio for journaling. Both of these      
+> issues are not a problem because the ioprio is set on the task and not on a     
+> bio.
+
+Yeah, looks good to me.  Care to include a brief summary of expected
+(non)impacts in the patch description?
+
+Thanks.
+
+-- 
+tejun
