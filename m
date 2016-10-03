@@ -1,179 +1,182 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:43082 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1751388AbcJCOdR (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 3 Oct 2016 10:33:17 -0400
+Received: from mail.avalus.com ([89.16.176.221]:36807 "EHLO mail.avalus.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752200AbcJCLeb (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 3 Oct 2016 07:34:31 -0400
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
 Subject: Re: [Nbd] [PATCH][V3] nbd: add multi-connection support
-To: Alex Bligh <alex@alex.org.uk>,
-        Christoph Hellwig <hch@infradead.org>
-References: <1475092892-8230-1-git-send-email-jbacik@fb.com>
- <20160929095204.mexr6wpypo3bl6mx@grep.be>
- <87908d95-0b7c-bc3f-f69d-94d006829daf@fb.com>
- <20160929164100.akytbkbtvziwaqqj@grep.be>
- <a2d8d560-41d0-e17d-90df-b1953ce00a51@fb.com>
- <F4CD5523-E3BC-4151-B9B8-ADFE9040F6E3@alex.org.uk>
- <2B49072B-6F83-4CD2-863B-5AB21E1F7816@fb.com>
- <20161003072049.GA16847@infradead.org>
- <20161003075149.u3ppcnk2j55fci6h@grep.be>
- <20161003075701.GA29457@infradead.org>
- <97C12880-A095-4F7B-B828-1837E65F7721@alex.org.uk>
-CC: Wouter Verhelst <w@uter.be>, Jens Axboe <axboe@fb.com>,
+From: Alex Bligh <alex@alex.org.uk>
+In-Reply-To: <20161003075701.GA29457@infradead.org>
+Date: Mon, 3 Oct 2016 12:34:33 +0100
+Cc: Alex Bligh <alex@alex.org.uk>, Wouter Verhelst <w@uter.be>,
+        Josef Bacik <jbacik@fb.com>, Jens Axboe <axboe@fb.com>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         Kernel Team <Kernel-team@fb.com>,
         "nbd-general@lists.sourceforge.net"
         <nbd-general@lists.sourceforge.net>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-From: Josef Bacik <jbacik@fb.com>
-Message-ID: <5cf31839-3642-166a-55ab-8d4313025b0c@fb.com>
-Date: Mon, 3 Oct 2016 10:32:13 -0400
-MIME-Version: 1.0
-In-Reply-To: <97C12880-A095-4F7B-B828-1837E65F7721@alex.org.uk>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
+Message-Id: <97C12880-A095-4F7B-B828-1837E65F7721@alex.org.uk>
+References: <1475092892-8230-1-git-send-email-jbacik@fb.com> <20160929095204.mexr6wpypo3bl6mx@grep.be> <87908d95-0b7c-bc3f-f69d-94d006829daf@fb.com> <20160929164100.akytbkbtvziwaqqj@grep.be> <a2d8d560-41d0-e17d-90df-b1953ce00a51@fb.com> <F4CD5523-E3BC-4151-B9B8-ADFE9040F6E3@alex.org.uk> <2B49072B-6F83-4CD2-863B-5AB21E1F7816@fb.com> <20161003072049.GA16847@infradead.org> <20161003075149.u3ppcnk2j55fci6h@grep.be> <20161003075701.GA29457@infradead.org>
+To: Christoph Hellwig <hch@infradead.org>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-T24gMTAvMDMvMjAxNiAwNzozNCBBTSwgQWxleCBCbGlnaCB3cm90ZToNCj4NCj4+IE9uIDMg
-T2N0IDIwMTYsIGF0IDA4OjU3LCBDaHJpc3RvcGggSGVsbHdpZyA8aGNoQGluZnJhZGVhZC5v
-cmc+IHdyb3RlOg0KPj4NCj4+PiBDYW4geW91IGNsYXJpZnkgd2hhdCB5b3UgbWVhbiBieSB0
-aGF0PyBXaHkgaXMgaXQgYW4gIm9kZCBmbHVzaA0KPj4+IGRlZmluaXRpb24iLCBhbmQgaG93
-IHdvdWxkIHlvdSAicHJvcGVybHkiIGRlZmluZSBpdD8NCj4+DQo+PiBFLmcuIHRha2UgdGhl
-IGRlZmludGlvbiBmcm9tIE5WTWUgd2hpY2ggYWxzbyBzdXBwb3J0cyBtdWx0aXBsZSBxdWV1
-ZXM6DQo+Pg0KPj4gIlRoZSBGbHVzaCBjb21tYW5kIHNoYWxsIGNvbW1pdCBkYXRhIGFuZCBt
-ZXRhZGF0YSBhc3NvY2lhdGVkIHdpdGggdGhlDQo+PiBzcGVjaWZpZWQgbmFtZXNwYWNlKHMp
-IHRvIG5vbi12b2xhdGlsZSBtZWRpYS4gVGhlIGZsdXNoIGFwcGxpZXMgdG8gYWxsDQo+PiBj
-b21tYW5kcyBjb21wbGV0ZWQgcHJpb3IgdG8gdGhlIHN1Ym1pc3Npb24gb2YgdGhlIEZsdXNo
-IGNvbW1hbmQuDQo+PiBUaGUgY29udHJvbGxlciBtYXkgYWxzbyBmbHVzaCBhZGRpdGlvbmFs
-IGRhdGEgYW5kL29yIG1ldGFkYXRhIGZyb20gYW55DQo+PiBuYW1lc3BhY2UuIg0KPj4NCj4+
-IFRoZSBmb2N1cyBpcyBjb21wbGV0ZWQgLSB3ZSBuZWVkIHRvIGdldCBhIHJlcGx5IHRvIHRo
-ZSBob3N0IGZpcnN0DQo+PiBiZWZvcmUgd2UgY2FuIHNlbmQgdGhlIGZsdXNoIGNvbW1hbmQs
-IHNvIGFueXRoaW5nIHRoYXQgd2UgcmVxdWlyZQ0KPj4gdG8gYmUgZmx1c2hlZCBuZWVkcyB0
-byBleHBsaWNpdGx5IGJlIGNvbXBsZXRlZCBmaXJzdC4NCj4NCj4gSSB0aGluayB0aGVyZSBh
-cmUgdHdvIHNlcGFyYXRlIGlzc3VlcyBoZXJlOg0KPg0KPiBhKSBXaGF0J3MgZGVzY3JpYmVk
-IGFzIHRoZSAiSE9MIGJsb2NraW5nIGlzc3VlIi4NCj4NCj4gVGhpcyBjb21lcyBkb3duIHRv
-IHdoYXQgV291dGVyIHNhaWQgaGVyZToNCj4NCj4+IFdlbGwsIHdoZW4gSSBhc2tlZCBlYXJs
-aWVyLCBDaHJpc3RvcGggc2FpZFsxXSB0aGF0IGJsay1tcSBhc3N1bWVzIHRoYXQNCj4+IHdo
-ZW4gYSBGTFVTSCBpcyBzZW50IG92ZXIgb25lIGNoYW5uZWwsIGFuZCB0aGUgcmVwbHkgY29t
-ZXMgaW4sIHRoYXQgYWxsDQo+PiBjb21tYW5kcyB3aGljaCBoYXZlIGJlZW4gcmVjZWl2ZWQs
-IHJlZ2FyZGxlc3Mgb2Ygd2hpY2ggY2hhbm5lbCB0aGV5IHdlcmUNCj4+IHJlY2VpdmVkIG92
-ZXIsIGhhdmUgcmVjaGVkIGRpc2suDQo+Pg0KPj4gWzFdIE1lc3NhZ2UtSUQ6IDwyMDE2MDkx
-NTEyMjMwNC5HQTE1NTAxQGluZnJhZGVhZC5vcmc+DQo+Pg0KPj4gSXQgaXMgaW1wb3NzaWJs
-ZSBmb3IgbmJkIHRvIG1ha2Ugc3VjaCBhIGd1YXJhbnRlZSwgZHVlIHRvIGhlYWQtb2YtbGlu
-ZQ0KPj4gYmxvY2tpbmcgb24gVENQLg0KPg0KPiB0aGlzIGlzIHBlcmZlY3RseSBhY2N1cmF0
-ZSBhcyBmYXIgYXMgaXQgZ29lcywgYnV0IHRoaXMgaXNuJ3QgdGhlIGN1cnJlbnQNCj4gTkJE
-IGRlZmluaXRpb24gb2YgJ2ZsdXNoJy4NCj4NCj4gVGhhdCBpcyAoZnJvbSB0aGUgZG9jcyk6
-DQo+DQo+PiBBbGwgd3JpdGUgY29tbWFuZHMgKHRoYXQgaW5jbHVkZXMgTkJEX0NNRF9XUklU
-RSwgYW5kIE5CRF9DTURfVFJJTSkgdGhhdCB0aGUgc2VydmVyIGNvbXBsZXRlcyAoaS5lLiBy
-ZXBsaWVzIHRvKSBwcmlvciB0byBwcm9jZXNzaW5nIHRvIGEgTkJEX0NNRF9GTFVTSCBNVVNU
-IGJlIHdyaXR0ZW4gdG8gbm9uLXZvbGF0aWxlIHN0b3JhZ2UgcHJpb3IgdG8gcmVwbHlpbmcg
-dG8gdGhhdE5CRF9DTURfRkxVU0guIFRoaXMgcGFyYWdyYXBoIG9ubHkgYXBwbGllcyBpZiBO
-QkRfRkxBR19TRU5EX0ZMVVNIIGlzIHNldCB3aXRoaW4gdGhlIHRyYW5zbWlzc2lvbiBmbGFn
-cywgYXMgb3RoZXJ3aXNlIE5CRF9DTURfRkxVU0ggd2lsbCBuZXZlciBiZSBzZW50IGJ5IHRo
-ZSBjbGllbnQgdG8gdGhlIHNlcnZlci4NCj4NCj4gSSBkb24ndCB0aGluayBIT0wgYmxvY2tp
-bmcgaXMgYW4gaXNzdWUgaGVyZSBieSB0aGF0IGRlZmluaXRpb24sIGJlY2F1c2UgYWxsIEZM
-VVNIIHJlcXVpcmVzIGlzIHRoYXQgY29tbWFuZHMgdGhhdCBhcmUgYWN0dWFsbHkgY29tcGxl
-dGVkIGFyZSBmbHVzaGVkIHRvIGRpc2suIElmIHRoZXJlIGlzIGhlYWQgb2YgbGluZSBibG9j
-a2luZyB3aGljaCBkZWxheXMgdGhlIGFycml2YWwgb2YgYSB3cml0ZSBpc3N1ZWQgYmVmb3Jl
-IGEgZmx1c2gsIHRoZW4gdGhlIHNlbmRlciBjYW5ub3QgYmUgcmVseWluZyBvbiB3aGV0aGVy
-IHRoYXQgd3JpdGUgaXMgYWN0dWFsbHkgY29tcGxldGVkIG9yIG5vdCAob3IgaXQgd291bGQg
-aGF2ZSB3YWl0ZWQgZm9yIHRoZSByZXN1bHQpLiBUaGUgZmx1c2ggcmVxdWlyZXMgb25seSB0
-aGF0IHRob3NlIGNvbW1hbmRzIENPTVBMRVRFRCBhcmUgZmx1c2hlZCB0byBkaXNrLCBub3Qg
-dGhhdCB0aG9zZSBjb21tYW5kcyBSRUNFSVZFRCBoYXZlIGJlZW4gZmx1c2hlZCB0byBkaXNr
-IChhbmQgYSBmb3J0aW9yaSBub3QgdGhhdCB0aG9zZSBjb21tYW5kcyBTRU5UIEZJUlNUKSBo
-YXZlIGJlZW4gZmx1c2hlZCB0byBkaXNrLiBGcm9tIHRoZSBwb2ludCBvZiB2aWV3IG9mIHRo
-ZSBjbGllbnQsIHRoZSBmbHVzaCBjYW4gdGhlcmVmb3JlIG9ubHkgZ3VhcmFudGVlIHRoYXQg
-dGhlIGRhdGEgYXNzb2NpYXRlZCB3aXRoIHRob3NlIGNvbW1hbmRzIGZvciB3aGljaCBpdCdz
-IGFjdHVhbGx5IHJlY2VpdmVkIGEgcmVwbHkgcHJpb3IgdG8gaXNzdWluZyB0aGUgZmx1c2gg
-d2lsbCBiZSBmbHVzaGVkLCBiZWNhdXNlIHRoZSByZXBsaWVzIGNhbiBiZSBkaXNvcmRlcmVk
-IHRvby4NCj4NCj4gSSBkb24ndCB0aGluayB0aGVyZSBpcyBhY3R1YWxseSBhIHByb2JsZW0g
-aGVyZSAtIFdvdXRlciBpZiBJJ20gd3JvbmcgYWJvdXQgdGhpcywgSSdkIGxpa2UgdG8gdW5k
-ZXJzdGFuZCB5b3VyIGFyZ3VtZW50IGJldHRlci4NCj4NCj4NCj4NCj4gYikgV2hhdCBJJ20g
-ZGVzY3JpYmluZyAtIHdoaWNoIGlzIHRoZSBsYWNrIG9mIHN5bmNocm9uaXNhdGlvbiBiZXR3
-ZWVuIGNoYW5uZWxzLg0KPg0KPiBTdXBwb3NlIHlvdSBoYXZlIGEgc2ltcGxlIGZvcmtpbmcg
-TkJEIHNlcnZlciB3aGljaCB1c2VzIChlLmcuKSBhIENlcGggYmFja2VuZC4gRWFjaCBwcm9j
-ZXNzIChpLmUuIGVhY2ggTkJEIGNoYW5uZWwpIHdpbGwgaGF2ZSBhIHNlcGFyYXRlIGNvbm5l
-Y3Rpb24gdG8gc29tZXRoaW5nIHdpdGggaXRzIG93biBjYWNoZSBhbmQgYnVmZmVyaW5nLiBJ
-c3N1aW5nIGEgZmx1c2ggaW4gQ2VwaCByZXF1aXJlcyB3YWl0aW5nIHVudGlsIGEgcXVvcnVt
-IG9mIGJhY2tlbmRzIChPU0RzKSBoYXMgYmVlbiB3cml0dGVuIHRvLCBhbmQgd2l0aCBhIG51
-bWJlciBvZiBiYWNrZW5kcyBzdWJzdGFudGlhbGx5IGdyZWF0ZXIgdGhhbiB0aGUgcXVvcnVt
-LCBpdCBpcyBub3QgdW5saWtlbHkgdGhhdCBhIGZsdXNoIG9uIG9uZSBjaGFubmVsIHdpbGwg
-bm90IHdhaXQgZm9yIHdyaXRlcyBvbiB3aGF0IENlcGggY29uc2lkZXJzIGEgY29tcGxldGVs
-eSBpbmRlcGVuZGVudCBjaGFubmVsIHRvIGhhdmUgZnVsbHkgd3JpdHRlbiAoYXNzdW1pbmcg
-dGhlIHdyaXRlIGNvbXBsZXRlcyBiZWZvcmUgdGhlIGZsdXNoIGlzIGRvbmUpLg0KPg0KPiBU
-aGUgc2FtZSB3b3VsZCBoYXBwZW4gcHJldHR5IHRyaXZpYWxseSB3aXRoIGEgZm9ya2luZyBz
-ZXJ2ZXIgdGhhdCB1c2VzIGEgcHJvY2Vzcy1zcGFjZSB3cml0ZS1iYWNrIGNhY2hlLg0KPg0K
-PiBUaGlzIGlzIGJlY2F1c2UgdGhlIHNwZWMgd2hlbiB0aGUgc3BlYyBzYXlzOiAiQWxsIHdy
-aXRlIGNvbW1hbmRzICh0aGF0IGluY2x1ZGVzIE5CRF9DTURfV1JJVEUsIGFuZCBOQkRfQ01E
-X1RSSU0pIHRoYXQgdGhlIHNlcnZlciBjb21wbGV0ZXMgKGkuZS4gcmVwbGllcyB0bykgcHJp
-b3IgdG8gcHJvY2Vzc2luZyB0byBhIE5CRF9DTURfRkxVU0ggTVVTVCBiZSB3cml0dGVuIHRv
-IG5vbi12b2xhdGlsZSBzdG9yYWdlIHByaW9yIHRvIHJlcGx5aW5nIHRvIHRoYXQgTkJEX0NN
-RF9GTFVTSC4iIHdoYXQgaXQgY3VycmVudGx5IG1lYW5zIGlzIGFjdHVhbGx5ICJBbGwgd3Jp
-dGUgY29tbWFuZHMgKHRoYXQgaW5jbHVkZXMgTkJEX0NNRF9XUklURSwgYW5kIE5CRF9DTURf
-VFJJTSkgKioqQVNTT0NJQVRFRCBXSVRIIFRIQVQgQ0xJRU5UKioqIHRoYXQgdGhlIHNlcnZl
-ciBjb21wbGV0ZXMgKGkuZS4gcmVwbGllcyB0bykgcHJpb3IgdG8gcHJvY2Vzc2luZyB0byBh
-IE5CRF9DTURfRkxVU0ggTVVTVCBiZSB3cml0dGVuIHRvIG5vbi12b2xhdGlsZSBzdG9yYWdl
-IHByaW9yIHRvIHJlcGx5aW5nIHRvIHRoYXQgTkJEX0NNRF9GTFVTSCIuDQo+DQo+IFNvIHdo
-YXQgd2Ugd291bGQgbmVlZCB0aGUgc3BlYyB0byBtZWFuIGlzICJBbGwgd3JpdGUgY29tbWFu
-ZHMgKHRoYXQgaW5jbHVkZXMgTkJEX0NNRF9XUklURSwgYW5kIE5CRF9DTURfVFJJTSkgKioq
-QVNTT0NJQVRFRCBXSVRIIEFOWSBDSEFOTkVMIE9GIFRIQVQgQ0xJRU5UKioqIHRoYXQgdGhl
-IHNlcnZlciBjb21wbGV0ZXMgKGkuZS4gcmVwbGllcyB0bykgcHJpb3IgdG8gcHJvY2Vzc2lu
-ZyB0byBhIE5CRF9DTURfRkxVU0ggTVVTVCBiZSB3cml0dGVuIHRvIG5vbi12b2xhdGlsZSBz
-dG9yYWdlIHByaW9yIHRvIHJlcGx5aW5nIHRvIHRoYXQgTkJEX0NNRF9GTFVTSCIuIEFuZCBh
-cyB3ZSBoYXZlIG5vIHdheSB0byBhc3NvY2lhdGUgZGlmZmVyZW50IGNoYW5uZWxzIG9mIHRo
-ZSBzYW1lIGNsaWVudCwgZm9yIHNlcnZlcnMgdGhhdCBjYW4ndCByZWx5IG9uIHRoZSBPUyB0
-byBzeW5jaHJvbmlzZSBmbHVzaGluZyBhY3Jvc3MgZGlmZmVyZW50IGNsaWVudHMgcmVsYXRp
-bmcgdG8gdGhlIHNhbWUgZmlsZSwgaW4gcHJhY3RpY2UgdGhhdCBtZWFucyAiQWxsIHdyaXRl
-IGNvbW1hbmRzICh0aGF0IGluY2x1ZGVzIE5CRF9DTURfV1JJVEUsIGFuZCBOQkRfQ01EX1RS
-SU0pICoqKkFTU09DSUFURUQgV0lUSCBBTlkgQ0xJRU5UIEFUIEFMTCoqKiB0aGF0IHRoZSBz
-ZXJ2ZXIgY29tcGxldGVzIChpLmUuIHJlcGxpZXMgdG8pIHByaW9yIHRvIHByb2Nlc3Npbmcg
-dG8gYSBOQkRfQ01EX0ZMVVNIIE1VU1QgYmUgd3JpdHRlbiB0byBub24tdm9sYXRpbGUgc3Rv
-cmFnZSBwcmlvciB0byByZXBseWluZyB0byB0aGF0IE5CRF9DTURfRkxVU0giIC0gaS5lLiBh
-IGZsdXNoIG9uIGFueSBjaGFubmVsIG9mIGFueSBjbGllbnQgbXVzdCBmbHVzaCBldmVyeSBj
-aGFubmVsIG9mIGV2ZXJ5IGNsaWVudCwgYmVjYXVzZSB3ZSBoYXZlIG5vIGVhc3kgd2F5IHRv
-IHRlbGwgd2hpY2ggY2xpZW50cyBhcmUgaW4gZmFjdCB0d28gY2hhbm5lbHMuIEkgaGF2ZSBj
-b25jZXJucyBvdmVyIHRoZSBzY2FsYWJpbGl0eSBvZiB0aGlzLg0KPg0KPiBOb3csIGluIHRo
-ZSByZWZlcmVuY2Ugc2VydmVyLCBOQkRfQ01EX0ZMVVNIIGlzIGltcGxlbWVudGVkIHRocm91
-Z2ggYW4gZmRhdGFzeW5jKCkuIEVhY2ggY2xpZW50IChhbmQgdGhlcmVmb3JlIGVhY2ggY2hh
-bm5lbCkgcnVucyBpbiBhIGRpZmZlcmVudCBwcm9jZXNzLg0KPg0KPiBFYXJsaWVyIGluIHRo
-aXMgdGhyZWFkLCBzb21lb25lIHN1Z2dlc3RlZCB0aGF0IGlmIHRoaXMgaGFwcGVuczoNCj4N
-Cj4gICAgICAgUHJvY2VzcyBBICAgICAgICAgICAgICAgIFByb2Nlc3MgQg0KPiAgICAgICA9
-PT09PT09PT0gICAgICAgICAgICAgICAgPT09PT09PT09DQo+DQo+ICAgICAgIGZkMT1vcGVu
-KCJmaWxlMTIzIikNCj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGZkMj1vcGVu
-KCJmaWxlMTIzIikNCj4NCj4gICAgICAgd3JpdGUoZmQxLCAuLi4pDQo+ICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICBmZGF0YXN5bmMoImZkMiIpDQo+DQo+IHRoZW4gdGhlIGZk
-YXRhc3luYygpIGlzIGd1YXJhbnRlZWQgdG8gc3luYyB0aGUgd3JpdGUgdGhhdCBQcm9jZXNz
-IEEgaGFzIHdyaXR0ZW4uIFRoaXMgbWF5IG9yIG1heSBub3QgYmUgdGhlIGNhc2UgdW5kZXIg
-TGludXggKHdpc2VyIG1pbmRzIHRoYW4gbWUgd2lsbCBrbm93KS4gSXMgaXQgZ3VhcmFudGVl
-ZCB0byBiZSB0aGUgY2FzZSB3aXRoIChlLmcuKSB0aGUgZmlsZSBvbiBORlM/IE9uIGFsbCBQ
-T1NJWCBwbGF0Zm9ybXM/DQo+DQo+IExvb2tpbmcgYXQgaHR0cHM6Ly91cmxkZWZlbnNlLnBy
-b29mcG9pbnQuY29tL3YyL3VybD91PWh0dHAtM0FfX3B1YnMub3Blbmdyb3VwLm9yZ19vbmxp
-bmVwdWJzXzAwOTY5NTM5OV9mdW5jdGlvbnNfZmRhdGFzeW5jLmh0bWwmZD1EUUlGQWcmYz01
-VkQwUlR0TmxUaDN5Y2Q0MWIzTVV3JnI9c0R6ZzZNdkh5bUtPVWdJOFNGSW00USZtPUNyS1Rz
-d1o1Zno1dGR0WnZBOXJlclpIWGI4TzhPNTdMU09qTkpOMWVqbXMmcz1ia09wajY0bUhONjBK
-WGFwSjYyR0plMFF0enAtWld3Vm45MWtYbUoyNDdNJmU9ICBJJ2Qgc2F5IGl0IHdhcyBhIGxp
-dHRsZSBhbWJpZ3VvdXMgYXMgdG8gd2hldGhlciBpdCB3aWxsIEFMV0FZUyBmbHVzaCBhbGwg
-ZGF0YSBhc3NvY2lhdGVkIHdpdGggdGhlIGZpbGUgZXZlbiBpZiBpdCBpcyBiZWluZyB3cml0
-dGVuIGJ5IGEgZGlmZmVyZW50IHByb2Nlc3MgKGFuZCBhIGRpZmZlcmVudCBGRCkuDQo+DQo+
-IElmIGZkYXRhc3luYygpIGlzIGFsd2F5cyBndWFyYW50ZWVkIHRvIGZsdXNoIGRhdGEgYXNz
-b2NpYXRlZCB3aXRoIHdyaXRlcyBieSBhIGRpZmZlcmVudCBwcm9jZXNzIChhbmQgc2VwYXJh
-dGVseSBvcGVuZWQgZmQpLCB0aGVuIGFzIGl0IGhhcHBlbnMgdGhlcmUgd29uJ3QgYmUgYSBw
-cm9ibGVtIG9uIHRoZSByZWZlcmVuY2Ugc2VydmVyLCBqdXN0IG9uIHNlcnZlcnMgdGhhdCBk
-b24ndCBoYXBwZW4gdG8gdXNlIGZkYXRhc3luYygpIG9yIHNpbWlsYXIgdG8gaW1wbGVtZW50
-IGZsdXNoZXMsIGFuZCB3aGljaCBkb24ndCBtYWludGFpbiB0aGVpciBvd24gY2FjaGVzLiBJ
-ZiBmZGF0YXN5bmMoKSBpcyBub3Qgc28gZ3VhcmFudGVlZCwgd2UgaGF2ZSBhIHByb2JsZW0g
-d2l0aCB0aGUgcmVmZXJlbmNlIHNlcnZlciB0b28sIGF0IGxlYXN0IG9uIHNvbWUgcGxhdGZv
-cm1zIGFuZCBmbGluZyBzeXN0ZW1zLg0KPg0KPiBXaGF0IEknbSB0aGVyZWZvcmUgYXNraW5n
-IGZvciBpcyBlaXRoZXI6DQo+IGEpIHRoYXQgdGhlIHNlcnZlciBjYW4gc2F5ICdpZiB5b3Ug
-YXJlIG11bHRpY2hhbm5lbCwgeW91IHdpbGwgbmVlZCB0byBzZW5kIGZsdXNoIG9uIGVhY2gg
-Y2hhbm5lbCcgKGJlc3QpOyBPUg0KPiBiKSB0aGF0IHRoZSBzZXJ2ZXIgY2FuIHNheSAnZG9u
-J3QgZ28gbXVsdGljaGFubmVsJw0KPg0KPiBhcyBwYXJ0IG9mIHRoZSBuZWdvdGlhdGlvbiBz
-dGFnZS4gT2YgY291cnNlIGFzIHRoaXMgaXMgZGVwZW5kZW50IG9uIHRoZSBiYWNrZW5kLCB0
-aGlzIGlzIGdvaW5nIHRvIGJlIHNvbWV0aGluZyB0aGF0IGlzIHBlci10YXJnZXQgKGkuZS4g
-bmVlZHMgdG8gY29tZSBhcyBhIHRyYW5zbWlzc2lvbiBmbGFnIG9yIHNpbWlsYXIpLg0KPg0K
-DQpPayBJIHVuZGVyc3RhbmQgeW91ciBvYmplY3Rpb25zIG5vdy4gIFlvdSBhcmVuJ3QgYXJn
-dWluZyB0aGF0IHdlIGFyZSB1bnNhZmUgYnkgDQpkZWZhdWx0LCBvbmx5IHRoYXQgd2UgYXJl
-IHVuc2FmZSB3aXRoIHNlcnZlcnMgdGhhdCBkbyBzb21ldGhpbmcgc3BlY2lhbCBiZXlvbmQg
-DQpzaW1wbHkgd3JpdGluZyB0byBhIHNpbmdsZSBkaXNrIG9yIGZpbGUuICBJIGFncmVlIHRo
-aXMgaXMgcHJvYmxlbWF0aWMsIGJ1dCB5b3UgDQpzaW1wbHkgZG9uJ3QgdXNlIHRoaXMgZmVh
-dHVyZSBpZiB5b3VyIHNlcnZlciBjYW4ndCBkZWFsIHdpdGggaXQgd2VsbC4gIFRoYW5rcywN
-Cg0KSm9zZWYNCg==
+
+> On 3 Oct 2016, at 08:57, Christoph Hellwig <hch@infradead.org> wrote:
+>=20
+>> Can you clarify what you mean by that? Why is it an "odd flush
+>> definition", and how would you "properly" define it?
+>=20
+> E.g. take the defintion from NVMe which also supports multiple queues:
+>=20
+> "The Flush command shall commit data and metadata associated with the
+> specified namespace(s) to non-volatile media. The flush applies to all
+> commands completed prior to the submission of the Flush command.
+> The controller may also flush additional data and/or metadata from any
+> namespace."
+>=20
+> The focus is completed - we need to get a reply to the host first
+> before we can send the flush command, so anything that we require
+> to be flushed needs to explicitly be completed first.
+
+I think there are two separate issues here:
+
+a) What's described as the "HOL blocking issue".=20
+
+This comes down to what Wouter said here:
+
+> Well, when I asked earlier, Christoph said[1] that blk-mq assumes that
+> when a FLUSH is sent over one channel, and the reply comes in, that =
+all
+> commands which have been received, regardless of which channel they =
+were
+> received over, have reched disk.
+>=20
+> [1] Message-ID: <20160915122304.GA15501@infradead.org>
+>=20
+> It is impossible for nbd to make such a guarantee, due to head-of-line
+> blocking on TCP.
+
+this is perfectly accurate as far as it goes, but this isn't the current
+NBD definition of 'flush'.
+
+That is (from the docs):
+
+> All write commands (that includes NBD_CMD_WRITE, and NBD_CMD_TRIM) =
+that the server completes (i.e. replies to) prior to processing to a =
+NBD_CMD_FLUSH MUST be written to non-volatile storage prior to replying =
+to thatNBD_CMD_FLUSH. This paragraph only applies if NBD_FLAG_SEND_FLUSH =
+is set within the transmission flags, as otherwise NBD_CMD_FLUSH will =
+never be sent by the client to the server.
+
+I don't think HOL blocking is an issue here by that definition, because =
+all FLUSH requires is that commands that are actually completed are =
+flushed to disk. If there is head of line blocking which delays the =
+arrival of a write issued before a flush, then the sender cannot be =
+relying on whether that write is actually completed or not (or it would =
+have waited for the result). The flush requires only that those commands =
+COMPLETED are flushed to disk, not that those commands RECEIVED have =
+been flushed to disk (and a fortiori not that those commands SENT FIRST) =
+have been flushed to disk. =46rom the point of view of the client, the =
+flush can therefore only guarantee that the data associated with those =
+commands for which it's actually received a reply prior to issuing the =
+flush will be flushed, because the replies can be disordered too.
+
+I don't think there is actually a problem here - Wouter if I'm wrong =
+about this, I'd like to understand your argument better.
+
+
+
+b) What I'm describing - which is the lack of synchronisation between =
+channels.
+
+Suppose you have a simple forking NBD server which uses (e.g.) a Ceph =
+backend. Each process (i.e. each NBD channel) will have a separate =
+connection to something with its own cache and buffering. Issuing a =
+flush in Ceph requires waiting until a quorum of backends (OSDs) has =
+been written to, and with a number of backends substantially greater =
+than the quorum, it is not unlikely that a flush on one channel will not =
+wait for writes on what Ceph considers a completely independent channel =
+to have fully written (assuming the write completes before the flush is =
+done).
+
+The same would happen pretty trivially with a forking server that uses a =
+process-space write-back cache.
+
+This is because the spec when the spec says: "All write commands (that =
+includes NBD_CMD_WRITE, and NBD_CMD_TRIM) that the server completes =
+(i.e. replies to) prior to processing to a NBD_CMD_FLUSH MUST be written =
+to non-volatile storage prior to replying to that NBD_CMD_FLUSH." what =
+it currently means is actually "All write commands (that includes =
+NBD_CMD_WRITE, and NBD_CMD_TRIM) ***ASSOCIATED WITH THAT CLIENT*** that =
+the server completes (i.e. replies to) prior to processing to a =
+NBD_CMD_FLUSH MUST be written to non-volatile storage prior to replying =
+to that NBD_CMD_FLUSH".=20
+
+So what we would need the spec to mean is "All write commands (that =
+includes NBD_CMD_WRITE, and NBD_CMD_TRIM) ***ASSOCIATED WITH ANY CHANNEL =
+OF THAT CLIENT*** that the server completes (i.e. replies to) prior to =
+processing to a NBD_CMD_FLUSH MUST be written to non-volatile storage =
+prior to replying to that NBD_CMD_FLUSH". And as we have no way to =
+associate different channels of the same client, for servers that can't =
+rely on the OS to synchronise flushing across different clients relating =
+to the same file, in practice that means "All write commands (that =
+includes NBD_CMD_WRITE, and NBD_CMD_TRIM) ***ASSOCIATED WITH ANY CLIENT =
+AT ALL*** that the server completes (i.e. replies to) prior to =
+processing to a NBD_CMD_FLUSH MUST be written to non-volatile storage =
+prior to replying to that NBD_CMD_FLUSH" - i.e. a flush on any channel =
+of any client must flush every channel of every client, because we have =
+no easy way to tell which clients are in fact two channels. I have =
+concerns over the scalability of this.
+
+Now, in the reference server, NBD_CMD_FLUSH is implemented through an =
+fdatasync(). Each client (and therefore each channel) runs in a =
+different process.
+
+Earlier in this thread, someone suggested that if this happens:
+
+      Process A                Process B
+      =3D=3D=3D=3D=3D=3D=3D=3D=3D                =3D=3D=3D=3D=3D=3D=3D=3D=3D=
+
+
+      fd1=3Dopen("file123")
+                               fd2=3Dopen("file123")
+
+      write(fd1, ...)
+                               fdatasync("fd2")
+
+then the fdatasync() is guaranteed to sync the write that Process A has =
+written. This may or may not be the case under Linux (wiser minds than =
+me will know). Is it guaranteed to be the case with (e.g.) the file on =
+NFS? On all POSIX platforms?
+
+Looking at =
+http://pubs.opengroup.org/onlinepubs/009695399/functions/fdatasync.html =
+I'd say it was a little ambiguous as to whether it will ALWAYS flush all =
+data associated with the file even if it is being written by a different =
+process (and a different FD).
+
+If fdatasync() is always guaranteed to flush data associated with writes =
+by a different process (and separately opened fd), then as it happens =
+there won't be a problem on the reference server, just on servers that =
+don't happen to use fdatasync() or similar to implement flushes, and =
+which don't maintain their own caches. If fdatasync() is not so =
+guaranteed, we have a problem with the reference server too, at least on =
+some platforms and fling systems.
+
+What I'm therefore asking for is either:
+a) that the server can say 'if you are multichannel, you will need to =
+send flush on each channel' (best); OR
+b) that the server can say 'don't go multichannel'
+
+as part of the negotiation stage. Of course as this is dependent on the =
+backend, this is going to be something that is per-target (i.e. needs to =
+come as a transmission flag or similar).
+
+--=20
+Alex Bligh
+
+
+
+
