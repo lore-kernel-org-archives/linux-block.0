@@ -1,75 +1,131 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:56068 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1754013AbcJDN2H (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 4 Oct 2016 09:28:07 -0400
-Date: Tue, 4 Oct 2016 09:28:05 -0400
-From: Vivek Goyal <vgoyal@redhat.com>
-To: Shaohua Li <shli@fb.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        axboe@fb.com, Kernel-team@fb.com, tj@kernel.org, jmoyer@redhat.com
-Subject: Re: [PATCH V3 00/11] block-throttle: add .high limit
-Message-ID: <20161004132805.GB28808@redhat.com>
-References: <cover.1475529372.git.shli@fb.com>
+Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:54246 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1753512AbcJCVVK (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 3 Oct 2016 17:21:10 -0400
+Received: from pps.filterd (m0001255.ppops.net [127.0.0.1])
+        by mx0b-00082601.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id u93LEJKL023812
+        for <linux-block@vger.kernel.org>; Mon, 3 Oct 2016 14:21:09 -0700
+Received: from mail.thefacebook.com ([199.201.64.23])
+        by mx0b-00082601.pphosted.com with ESMTP id 25t8y8msff-16
+        (version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT)
+        for <linux-block@vger.kernel.org>; Mon, 03 Oct 2016 14:21:09 -0700
+Received: from facebook.com (2401:db00:21:603d:face:0:19:0)     by
+ mx-out.facebook.com (10.223.100.99) with ESMTP id
+ 36ffa10c89af11e69c1824be05956610-84ffca50 for <linux-block@vger.kernel.org>;
+        Mon, 03 Oct 2016 14:20:31 -0700
+From: Shaohua Li <shli@fb.com>
+To: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <axboe@fb.com>, <Kernel-team@fb.com>, <tj@kernel.org>,
+        <jmoyer@redhat.com>, <vgoyal@redhat.com>
+Subject: [PATCH V3 00/11] block-throttle: add .high limit
+Date: Mon, 3 Oct 2016 14:20:19 -0700
+Message-ID: <cover.1475529372.git.shli@fb.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <cover.1475529372.git.shli@fb.com>
+Content-Type: text/plain
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Mon, Oct 03, 2016 at 02:20:19PM -0700, Shaohua Li wrote:
-> Hi,
-> 
-> The background is we don't have an ioscheduler for blk-mq yet, so we can't
-> prioritize processes/cgroups.
+Hi,
 
-So this is an interim solution till we have ioscheduler for blk-mq?
+The background is we don't have an ioscheduler for blk-mq yet, so we can't
+prioritize processes/cgroups. This patch set tries to add basic arbitration
+between cgroups with blk-throttle. It adds a new limit io.high for
+blk-throttle. It's only for cgroup2.
 
-> This patch set tries to add basic arbitration
-> between cgroups with blk-throttle. It adds a new limit io.high for
-> blk-throttle. It's only for cgroup2.
-> 
-> io.max is a hard limit throttling. cgroups with a max limit never dispatch more
-> IO than their max limit. While io.high is a best effort throttling. cgroups
-> with high limit can run above their high limit at appropriate time.
-> Specifically, if all cgroups reach their high limit, all cgroups can run above
-> their high limit. If any cgroup runs under its high limit, all other cgroups
-> will run according to their high limit.
+io.max is a hard limit throttling. cgroups with a max limit never dispatch more
+IO than their max limit. While io.high is a best effort throttling. cgroups
+with high limit can run above their high limit at appropriate time.
+Specifically, if all cgroups reach their high limit, all cgroups can run above
+their high limit. If any cgroup runs under its high limit, all other cgroups
+will run according to their high limit.
 
-Hi Shaohua,
+An example usage is we have a high prio cgroup with high high limit and a low
+prio cgroup with low high limit. If the high prio cgroup isn't running, the low
+prio can run above its high limit, so we don't waste the bandwidth. When the
+high prio cgroup runs and is below its high limit, low prio cgroup will run
+under its high limit. This will protect high prio cgroup to get more resources.
+If both cgroups reach their high limit, both can run above their high limit
+(eg, fully utilize disk bandwidth). All these can't be done with io.max limit.
 
-I still don't understand why we should not implement a weight based
-proportional IO mechanism and how this mechanism is better than proportional IO .
+The implementation is simple. The disk queue has 2 states LIMIT_HIGH and
+LIMIT_MAX. In each disk state, we throttle cgroups according to the limit of
+the state. That is io.high limit for LIMIT_HIGH state, io.max limit for
+LIMIT_MAX. The disk state can be upgraded/downgraded between
+LIMIT_HIGH/LIMIT_MAX according to the rule above. Initially disk state is
+LIMIT_MAX. And if no cgroup sets io.high, the disk state will remain in
+LIMIT_MAX state. Users with only io.max set will find nothing changed with the
+patches.
 
-Agreed that we have issues with proportional IO and we don't have good
-solutions for these problems. But I can't see that how this mechanism
-will overcome these problems either.
+The first 8 patches implement the basic framework. Add interface, handle
+upgrade and downgrade logic. The patch 8 detects a special case a cgroup is
+completely idle. In this case, we ignore the cgroup's limit. The patch 9-11
+adds more heuristics.
 
-IIRC, biggest issue with proportional IO was that a low prio group might
-fill up the device queue with plenty of IO requests and later when high
-prio cgroup comes, it will still experience latencies anyway. And solution
-to the problem probably would be to get some awareness in device about 
-priority of request and map weights to those priority. That way higher
-prio requests get prioritized.
+The basic framework has 2 major issues.
+1. fluctuation. When the state is upgraded from LIMIT_HIGH to LIMIT_MAX, the
+cgroup's bandwidth can change dramatically, sometimes in a way not expected.
+For example, one cgroup's bandwidth will drop below its io.high limit very soon
+after a upgrade. patch 9 has more details about the issue.
+2. idle cgroup. cgroup with a io.high limit doesn't always dispatch enough IO.
+In above upgrade rule, the disk will remain in LIMIT_HIGH state and all other
+cgroups can't dispatch more IO above their high limit. Hence this is a waste of
+disk bandwidth. patch 10 has more details about the issue.
 
-Or run device at lower queue depth. That will improve latencies but migth
-reduce overall throughput.
+For issue 1, we make cgroup bandwidth increase smoothly after a upgrade. This
+will reduce the chance a cgroup's bandwidth drop under its high limit rapidly.
+The smoothness means we could waste some bandwidth in the transition though.
+But we must pay something for sharing.
 
-Or thorottle number of buffered writes (as Jens's writeback throttling)
-patches were doing. Buffered writes seem to be biggest culprit for 
-increased latencies and being able to control these should help.
+The issue 2 is very hard to solve. To be honest, I don't have a good solution
+yet. The patch 10 uses the 'think time check' idea borrowed from CFQ to detect
+idle cgroup. It's not perfect, eg, not works well for high IO depth workloads.
+But it's the best I tried so far and in practice works well. This definitively
+needs more tuning.
 
-ioprio/weight based proportional IO mechanism is much more generic and
-much easier to configure for any kind of storage. io.high is absolute
-limit and makes it much harder to configure. One needs to know a lot
-about underlying volume/device's bandwidth (which varies a lot anyway
-based on workload).
+Please review, test and consider merge.
 
-IMHO, we seem to be trying to cater to one specific use case using
-this mechanism. Something ioprio/weight based will be much more
-generic and we should explore implementing that along with building
-notion of ioprio in devices. When these two work together, we might
-be able to see good results. Just software mechanism alone might not
-be enough.
+Thanks,
+Shaohua
 
-Vivek
+V2->V3:
+- Rebase
+- Fix several bugs
+- Make harddisk think time threshold bigger
+
+V1->V2:
+- Drop io.low interface for simplicity and the interface isn't a must-have to
+  prioritize cgroups.
+- Remove the 'trial' logic, which creates too much fluctuation
+- Add a new idle cgroup detection
+- Other bug fixes and improvements
+http://marc.info/?l=linux-block&m=147395674732335&w=2
+
+V1:
+http://marc.info/?l=linux-block&m=146292596425689&w=2
+
+
+Shaohua Li (11):
+  block-throttle: prepare support multiple limits
+  block-throttle: add .high interface
+  block-throttle: configure bps/iops limit for cgroup in high limit
+  block-throttle: add upgrade logic for LIMIT_HIGH state
+  block-throttle: add downgrade logic
+  blk-throttle: make sure expire time isn't too big
+  blk-throttle: make throtl_slice tunable
+  blk-throttle: detect completed idle cgroup
+  block-throttle: make bandwidth change smooth
+  block-throttle: add a simple idle detection
+  blk-throttle: ignore idle cgroup limit
+
+ block/bio.c               |   2 +
+ block/blk-sysfs.c         |  18 ++
+ block/blk-throttle.c      | 715 +++++++++++++++++++++++++++++++++++++++++-----
+ block/blk.h               |   9 +
+ include/linux/blk_types.h |   1 +
+ 5 files changed, 680 insertions(+), 65 deletions(-)
+
+-- 
+2.9.3
+
