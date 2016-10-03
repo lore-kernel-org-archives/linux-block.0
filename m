@@ -1,83 +1,179 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail.avalus.com ([89.16.176.221]:51576 "EHLO mail.avalus.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751400AbcJCOq6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 3 Oct 2016 10:46:58 -0400
-Content-Type: text/plain; charset=windows-1252
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:43082 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1751388AbcJCOdR (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 3 Oct 2016 10:33:17 -0400
 Subject: Re: [Nbd] [PATCH][V3] nbd: add multi-connection support
-From: Alex Bligh <alex@alex.org.uk>
-In-Reply-To: <5cf31839-3642-166a-55ab-8d4313025b0c@fb.com>
-Date: Mon, 3 Oct 2016 15:46:53 +0100
-Cc: Alex Bligh <alex@alex.org.uk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Wouter Verhelst <w@uter.be>, Jens Axboe <axboe@fb.com>,
+To: Alex Bligh <alex@alex.org.uk>,
+        Christoph Hellwig <hch@infradead.org>
+References: <1475092892-8230-1-git-send-email-jbacik@fb.com>
+ <20160929095204.mexr6wpypo3bl6mx@grep.be>
+ <87908d95-0b7c-bc3f-f69d-94d006829daf@fb.com>
+ <20160929164100.akytbkbtvziwaqqj@grep.be>
+ <a2d8d560-41d0-e17d-90df-b1953ce00a51@fb.com>
+ <F4CD5523-E3BC-4151-B9B8-ADFE9040F6E3@alex.org.uk>
+ <2B49072B-6F83-4CD2-863B-5AB21E1F7816@fb.com>
+ <20161003072049.GA16847@infradead.org>
+ <20161003075149.u3ppcnk2j55fci6h@grep.be>
+ <20161003075701.GA29457@infradead.org>
+ <97C12880-A095-4F7B-B828-1837E65F7721@alex.org.uk>
+CC: Wouter Verhelst <w@uter.be>, Jens Axboe <axboe@fb.com>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         Kernel Team <Kernel-team@fb.com>,
         "nbd-general@lists.sourceforge.net"
         <nbd-general@lists.sourceforge.net>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Message-Id: <A8EF4CD3-61BC-4E29-8796-1013FDBC96F1@alex.org.uk>
-References: <1475092892-8230-1-git-send-email-jbacik@fb.com> <20160929095204.mexr6wpypo3bl6mx@grep.be> <87908d95-0b7c-bc3f-f69d-94d006829daf@fb.com> <20160929164100.akytbkbtvziwaqqj@grep.be> <a2d8d560-41d0-e17d-90df-b1953ce00a51@fb.com> <F4CD5523-E3BC-4151-B9B8-ADFE9040F6E3@alex.org.uk> <2B49072B-6F83-4CD2-863B-5AB21E1F7816@fb.com> <20161003072049.GA16847@infradead.org> <20161003075149.u3ppcnk2j55fci6h@grep.be> <20161003075701.GA29457@infradead.org> <97C12880-A095-4F7B-B828-1837E65F7721@alex.org.uk> <5cf31839-3642-166a-55ab-8d4313025b0c@fb.com>
-To: Josef Bacik <jbacik@fb.com>
+From: Josef Bacik <jbacik@fb.com>
+Message-ID: <5cf31839-3642-166a-55ab-8d4313025b0c@fb.com>
+Date: Mon, 3 Oct 2016 10:32:13 -0400
+MIME-Version: 1.0
+In-Reply-To: <97C12880-A095-4F7B-B828-1837E65F7721@alex.org.uk>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Josef,
-
-> On 3 Oct 2016, at 15:32, Josef Bacik <jbacik@fb.com> wrote:
->=20
-> Ok I understand your objections now.  You aren't arguing that we are =
-unsafe by default, only that we are unsafe with servers that do =
-something special beyond simply writing to a single disk or file.  I =
-agree this is problematic, but you simply don't use this feature if your =
-server can't deal with it well.
-
-Not quite. I am arguing that:
-
-1. Parallel channels as currently implemented are inherently unsafe on =
-some servers - I have given an example of such servers
-
-2. Parallel channels as currently implemented may be unsafe on the =
-reference server on some or all platforms (depending on the behaviour of =
-fdatasync() which might varies between platforms)
-
-3. Either the parallel channels stuff should issue flush requests on all =
-channels, or the protocol should protect the unwitting user by =
-negotiating an option to do so (or refusing multi-channel connects). It =
-is not reasonable for an nbd client to have to know the intimate details =
-of the server and its implementation of synchronisation primitives - =
-saying 'the user should disable multiple channels' is not good enough, =
-as this is what we have a protocol for.
-
-"unsafe" here means 'do not conform to the kernel's requirements for =
-flush semantics, whereas they did without multiple channels'
-
-So from my point of view either we need to have an additional connection =
-flag ("don't use multiple channels unless you are going to issue a flush =
-on all channels") OR flush on all channels should be the default.
-
-Whatever SOME more work needs to be done on your patch because there it =
-current doesn't issue flush on all channels, and it currently does not =
-have any way to prevent use of multiple channels.
-
-
-I'd really like someone with linux / POSIX knowledge to confirm the =
-linux and POSIX position on fdatasync of an fd opened by one process on =
-writes made to the same file by another process. If on all POSIX =
-platforms and all filing systems this is guaranteed to flush the second =
-platform's writes, then I think we could argue "OK there may be some =
-weird servers which might not support multiple channels and they just =
-need a way of signalling that". If on the other hand there is no such =
-cross platform guarantee, I think this means in essence even with the =
-reference server, this patch is unsafe, and it needs adapting to send =
-flushes on all channels - yes it might theoretically be possible to =
-introduce IPC to the current server, but you'd still need some way of =
-tying together channels from a single client.
-
---=20
-Alex Bligh
-
-
-
-
+T24gMTAvMDMvMjAxNiAwNzozNCBBTSwgQWxleCBCbGlnaCB3cm90ZToNCj4NCj4+IE9uIDMg
+T2N0IDIwMTYsIGF0IDA4OjU3LCBDaHJpc3RvcGggSGVsbHdpZyA8aGNoQGluZnJhZGVhZC5v
+cmc+IHdyb3RlOg0KPj4NCj4+PiBDYW4geW91IGNsYXJpZnkgd2hhdCB5b3UgbWVhbiBieSB0
+aGF0PyBXaHkgaXMgaXQgYW4gIm9kZCBmbHVzaA0KPj4+IGRlZmluaXRpb24iLCBhbmQgaG93
+IHdvdWxkIHlvdSAicHJvcGVybHkiIGRlZmluZSBpdD8NCj4+DQo+PiBFLmcuIHRha2UgdGhl
+IGRlZmludGlvbiBmcm9tIE5WTWUgd2hpY2ggYWxzbyBzdXBwb3J0cyBtdWx0aXBsZSBxdWV1
+ZXM6DQo+Pg0KPj4gIlRoZSBGbHVzaCBjb21tYW5kIHNoYWxsIGNvbW1pdCBkYXRhIGFuZCBt
+ZXRhZGF0YSBhc3NvY2lhdGVkIHdpdGggdGhlDQo+PiBzcGVjaWZpZWQgbmFtZXNwYWNlKHMp
+IHRvIG5vbi12b2xhdGlsZSBtZWRpYS4gVGhlIGZsdXNoIGFwcGxpZXMgdG8gYWxsDQo+PiBj
+b21tYW5kcyBjb21wbGV0ZWQgcHJpb3IgdG8gdGhlIHN1Ym1pc3Npb24gb2YgdGhlIEZsdXNo
+IGNvbW1hbmQuDQo+PiBUaGUgY29udHJvbGxlciBtYXkgYWxzbyBmbHVzaCBhZGRpdGlvbmFs
+IGRhdGEgYW5kL29yIG1ldGFkYXRhIGZyb20gYW55DQo+PiBuYW1lc3BhY2UuIg0KPj4NCj4+
+IFRoZSBmb2N1cyBpcyBjb21wbGV0ZWQgLSB3ZSBuZWVkIHRvIGdldCBhIHJlcGx5IHRvIHRo
+ZSBob3N0IGZpcnN0DQo+PiBiZWZvcmUgd2UgY2FuIHNlbmQgdGhlIGZsdXNoIGNvbW1hbmQs
+IHNvIGFueXRoaW5nIHRoYXQgd2UgcmVxdWlyZQ0KPj4gdG8gYmUgZmx1c2hlZCBuZWVkcyB0
+byBleHBsaWNpdGx5IGJlIGNvbXBsZXRlZCBmaXJzdC4NCj4NCj4gSSB0aGluayB0aGVyZSBh
+cmUgdHdvIHNlcGFyYXRlIGlzc3VlcyBoZXJlOg0KPg0KPiBhKSBXaGF0J3MgZGVzY3JpYmVk
+IGFzIHRoZSAiSE9MIGJsb2NraW5nIGlzc3VlIi4NCj4NCj4gVGhpcyBjb21lcyBkb3duIHRv
+IHdoYXQgV291dGVyIHNhaWQgaGVyZToNCj4NCj4+IFdlbGwsIHdoZW4gSSBhc2tlZCBlYXJs
+aWVyLCBDaHJpc3RvcGggc2FpZFsxXSB0aGF0IGJsay1tcSBhc3N1bWVzIHRoYXQNCj4+IHdo
+ZW4gYSBGTFVTSCBpcyBzZW50IG92ZXIgb25lIGNoYW5uZWwsIGFuZCB0aGUgcmVwbHkgY29t
+ZXMgaW4sIHRoYXQgYWxsDQo+PiBjb21tYW5kcyB3aGljaCBoYXZlIGJlZW4gcmVjZWl2ZWQs
+IHJlZ2FyZGxlc3Mgb2Ygd2hpY2ggY2hhbm5lbCB0aGV5IHdlcmUNCj4+IHJlY2VpdmVkIG92
+ZXIsIGhhdmUgcmVjaGVkIGRpc2suDQo+Pg0KPj4gWzFdIE1lc3NhZ2UtSUQ6IDwyMDE2MDkx
+NTEyMjMwNC5HQTE1NTAxQGluZnJhZGVhZC5vcmc+DQo+Pg0KPj4gSXQgaXMgaW1wb3NzaWJs
+ZSBmb3IgbmJkIHRvIG1ha2Ugc3VjaCBhIGd1YXJhbnRlZSwgZHVlIHRvIGhlYWQtb2YtbGlu
+ZQ0KPj4gYmxvY2tpbmcgb24gVENQLg0KPg0KPiB0aGlzIGlzIHBlcmZlY3RseSBhY2N1cmF0
+ZSBhcyBmYXIgYXMgaXQgZ29lcywgYnV0IHRoaXMgaXNuJ3QgdGhlIGN1cnJlbnQNCj4gTkJE
+IGRlZmluaXRpb24gb2YgJ2ZsdXNoJy4NCj4NCj4gVGhhdCBpcyAoZnJvbSB0aGUgZG9jcyk6
+DQo+DQo+PiBBbGwgd3JpdGUgY29tbWFuZHMgKHRoYXQgaW5jbHVkZXMgTkJEX0NNRF9XUklU
+RSwgYW5kIE5CRF9DTURfVFJJTSkgdGhhdCB0aGUgc2VydmVyIGNvbXBsZXRlcyAoaS5lLiBy
+ZXBsaWVzIHRvKSBwcmlvciB0byBwcm9jZXNzaW5nIHRvIGEgTkJEX0NNRF9GTFVTSCBNVVNU
+IGJlIHdyaXR0ZW4gdG8gbm9uLXZvbGF0aWxlIHN0b3JhZ2UgcHJpb3IgdG8gcmVwbHlpbmcg
+dG8gdGhhdE5CRF9DTURfRkxVU0guIFRoaXMgcGFyYWdyYXBoIG9ubHkgYXBwbGllcyBpZiBO
+QkRfRkxBR19TRU5EX0ZMVVNIIGlzIHNldCB3aXRoaW4gdGhlIHRyYW5zbWlzc2lvbiBmbGFn
+cywgYXMgb3RoZXJ3aXNlIE5CRF9DTURfRkxVU0ggd2lsbCBuZXZlciBiZSBzZW50IGJ5IHRo
+ZSBjbGllbnQgdG8gdGhlIHNlcnZlci4NCj4NCj4gSSBkb24ndCB0aGluayBIT0wgYmxvY2tp
+bmcgaXMgYW4gaXNzdWUgaGVyZSBieSB0aGF0IGRlZmluaXRpb24sIGJlY2F1c2UgYWxsIEZM
+VVNIIHJlcXVpcmVzIGlzIHRoYXQgY29tbWFuZHMgdGhhdCBhcmUgYWN0dWFsbHkgY29tcGxl
+dGVkIGFyZSBmbHVzaGVkIHRvIGRpc2suIElmIHRoZXJlIGlzIGhlYWQgb2YgbGluZSBibG9j
+a2luZyB3aGljaCBkZWxheXMgdGhlIGFycml2YWwgb2YgYSB3cml0ZSBpc3N1ZWQgYmVmb3Jl
+IGEgZmx1c2gsIHRoZW4gdGhlIHNlbmRlciBjYW5ub3QgYmUgcmVseWluZyBvbiB3aGV0aGVy
+IHRoYXQgd3JpdGUgaXMgYWN0dWFsbHkgY29tcGxldGVkIG9yIG5vdCAob3IgaXQgd291bGQg
+aGF2ZSB3YWl0ZWQgZm9yIHRoZSByZXN1bHQpLiBUaGUgZmx1c2ggcmVxdWlyZXMgb25seSB0
+aGF0IHRob3NlIGNvbW1hbmRzIENPTVBMRVRFRCBhcmUgZmx1c2hlZCB0byBkaXNrLCBub3Qg
+dGhhdCB0aG9zZSBjb21tYW5kcyBSRUNFSVZFRCBoYXZlIGJlZW4gZmx1c2hlZCB0byBkaXNr
+IChhbmQgYSBmb3J0aW9yaSBub3QgdGhhdCB0aG9zZSBjb21tYW5kcyBTRU5UIEZJUlNUKSBo
+YXZlIGJlZW4gZmx1c2hlZCB0byBkaXNrLiBGcm9tIHRoZSBwb2ludCBvZiB2aWV3IG9mIHRo
+ZSBjbGllbnQsIHRoZSBmbHVzaCBjYW4gdGhlcmVmb3JlIG9ubHkgZ3VhcmFudGVlIHRoYXQg
+dGhlIGRhdGEgYXNzb2NpYXRlZCB3aXRoIHRob3NlIGNvbW1hbmRzIGZvciB3aGljaCBpdCdz
+IGFjdHVhbGx5IHJlY2VpdmVkIGEgcmVwbHkgcHJpb3IgdG8gaXNzdWluZyB0aGUgZmx1c2gg
+d2lsbCBiZSBmbHVzaGVkLCBiZWNhdXNlIHRoZSByZXBsaWVzIGNhbiBiZSBkaXNvcmRlcmVk
+IHRvby4NCj4NCj4gSSBkb24ndCB0aGluayB0aGVyZSBpcyBhY3R1YWxseSBhIHByb2JsZW0g
+aGVyZSAtIFdvdXRlciBpZiBJJ20gd3JvbmcgYWJvdXQgdGhpcywgSSdkIGxpa2UgdG8gdW5k
+ZXJzdGFuZCB5b3VyIGFyZ3VtZW50IGJldHRlci4NCj4NCj4NCj4NCj4gYikgV2hhdCBJJ20g
+ZGVzY3JpYmluZyAtIHdoaWNoIGlzIHRoZSBsYWNrIG9mIHN5bmNocm9uaXNhdGlvbiBiZXR3
+ZWVuIGNoYW5uZWxzLg0KPg0KPiBTdXBwb3NlIHlvdSBoYXZlIGEgc2ltcGxlIGZvcmtpbmcg
+TkJEIHNlcnZlciB3aGljaCB1c2VzIChlLmcuKSBhIENlcGggYmFja2VuZC4gRWFjaCBwcm9j
+ZXNzIChpLmUuIGVhY2ggTkJEIGNoYW5uZWwpIHdpbGwgaGF2ZSBhIHNlcGFyYXRlIGNvbm5l
+Y3Rpb24gdG8gc29tZXRoaW5nIHdpdGggaXRzIG93biBjYWNoZSBhbmQgYnVmZmVyaW5nLiBJ
+c3N1aW5nIGEgZmx1c2ggaW4gQ2VwaCByZXF1aXJlcyB3YWl0aW5nIHVudGlsIGEgcXVvcnVt
+IG9mIGJhY2tlbmRzIChPU0RzKSBoYXMgYmVlbiB3cml0dGVuIHRvLCBhbmQgd2l0aCBhIG51
+bWJlciBvZiBiYWNrZW5kcyBzdWJzdGFudGlhbGx5IGdyZWF0ZXIgdGhhbiB0aGUgcXVvcnVt
+LCBpdCBpcyBub3QgdW5saWtlbHkgdGhhdCBhIGZsdXNoIG9uIG9uZSBjaGFubmVsIHdpbGwg
+bm90IHdhaXQgZm9yIHdyaXRlcyBvbiB3aGF0IENlcGggY29uc2lkZXJzIGEgY29tcGxldGVs
+eSBpbmRlcGVuZGVudCBjaGFubmVsIHRvIGhhdmUgZnVsbHkgd3JpdHRlbiAoYXNzdW1pbmcg
+dGhlIHdyaXRlIGNvbXBsZXRlcyBiZWZvcmUgdGhlIGZsdXNoIGlzIGRvbmUpLg0KPg0KPiBU
+aGUgc2FtZSB3b3VsZCBoYXBwZW4gcHJldHR5IHRyaXZpYWxseSB3aXRoIGEgZm9ya2luZyBz
+ZXJ2ZXIgdGhhdCB1c2VzIGEgcHJvY2Vzcy1zcGFjZSB3cml0ZS1iYWNrIGNhY2hlLg0KPg0K
+PiBUaGlzIGlzIGJlY2F1c2UgdGhlIHNwZWMgd2hlbiB0aGUgc3BlYyBzYXlzOiAiQWxsIHdy
+aXRlIGNvbW1hbmRzICh0aGF0IGluY2x1ZGVzIE5CRF9DTURfV1JJVEUsIGFuZCBOQkRfQ01E
+X1RSSU0pIHRoYXQgdGhlIHNlcnZlciBjb21wbGV0ZXMgKGkuZS4gcmVwbGllcyB0bykgcHJp
+b3IgdG8gcHJvY2Vzc2luZyB0byBhIE5CRF9DTURfRkxVU0ggTVVTVCBiZSB3cml0dGVuIHRv
+IG5vbi12b2xhdGlsZSBzdG9yYWdlIHByaW9yIHRvIHJlcGx5aW5nIHRvIHRoYXQgTkJEX0NN
+RF9GTFVTSC4iIHdoYXQgaXQgY3VycmVudGx5IG1lYW5zIGlzIGFjdHVhbGx5ICJBbGwgd3Jp
+dGUgY29tbWFuZHMgKHRoYXQgaW5jbHVkZXMgTkJEX0NNRF9XUklURSwgYW5kIE5CRF9DTURf
+VFJJTSkgKioqQVNTT0NJQVRFRCBXSVRIIFRIQVQgQ0xJRU5UKioqIHRoYXQgdGhlIHNlcnZl
+ciBjb21wbGV0ZXMgKGkuZS4gcmVwbGllcyB0bykgcHJpb3IgdG8gcHJvY2Vzc2luZyB0byBh
+IE5CRF9DTURfRkxVU0ggTVVTVCBiZSB3cml0dGVuIHRvIG5vbi12b2xhdGlsZSBzdG9yYWdl
+IHByaW9yIHRvIHJlcGx5aW5nIHRvIHRoYXQgTkJEX0NNRF9GTFVTSCIuDQo+DQo+IFNvIHdo
+YXQgd2Ugd291bGQgbmVlZCB0aGUgc3BlYyB0byBtZWFuIGlzICJBbGwgd3JpdGUgY29tbWFu
+ZHMgKHRoYXQgaW5jbHVkZXMgTkJEX0NNRF9XUklURSwgYW5kIE5CRF9DTURfVFJJTSkgKioq
+QVNTT0NJQVRFRCBXSVRIIEFOWSBDSEFOTkVMIE9GIFRIQVQgQ0xJRU5UKioqIHRoYXQgdGhl
+IHNlcnZlciBjb21wbGV0ZXMgKGkuZS4gcmVwbGllcyB0bykgcHJpb3IgdG8gcHJvY2Vzc2lu
+ZyB0byBhIE5CRF9DTURfRkxVU0ggTVVTVCBiZSB3cml0dGVuIHRvIG5vbi12b2xhdGlsZSBz
+dG9yYWdlIHByaW9yIHRvIHJlcGx5aW5nIHRvIHRoYXQgTkJEX0NNRF9GTFVTSCIuIEFuZCBh
+cyB3ZSBoYXZlIG5vIHdheSB0byBhc3NvY2lhdGUgZGlmZmVyZW50IGNoYW5uZWxzIG9mIHRo
+ZSBzYW1lIGNsaWVudCwgZm9yIHNlcnZlcnMgdGhhdCBjYW4ndCByZWx5IG9uIHRoZSBPUyB0
+byBzeW5jaHJvbmlzZSBmbHVzaGluZyBhY3Jvc3MgZGlmZmVyZW50IGNsaWVudHMgcmVsYXRp
+bmcgdG8gdGhlIHNhbWUgZmlsZSwgaW4gcHJhY3RpY2UgdGhhdCBtZWFucyAiQWxsIHdyaXRl
+IGNvbW1hbmRzICh0aGF0IGluY2x1ZGVzIE5CRF9DTURfV1JJVEUsIGFuZCBOQkRfQ01EX1RS
+SU0pICoqKkFTU09DSUFURUQgV0lUSCBBTlkgQ0xJRU5UIEFUIEFMTCoqKiB0aGF0IHRoZSBz
+ZXJ2ZXIgY29tcGxldGVzIChpLmUuIHJlcGxpZXMgdG8pIHByaW9yIHRvIHByb2Nlc3Npbmcg
+dG8gYSBOQkRfQ01EX0ZMVVNIIE1VU1QgYmUgd3JpdHRlbiB0byBub24tdm9sYXRpbGUgc3Rv
+cmFnZSBwcmlvciB0byByZXBseWluZyB0byB0aGF0IE5CRF9DTURfRkxVU0giIC0gaS5lLiBh
+IGZsdXNoIG9uIGFueSBjaGFubmVsIG9mIGFueSBjbGllbnQgbXVzdCBmbHVzaCBldmVyeSBj
+aGFubmVsIG9mIGV2ZXJ5IGNsaWVudCwgYmVjYXVzZSB3ZSBoYXZlIG5vIGVhc3kgd2F5IHRv
+IHRlbGwgd2hpY2ggY2xpZW50cyBhcmUgaW4gZmFjdCB0d28gY2hhbm5lbHMuIEkgaGF2ZSBj
+b25jZXJucyBvdmVyIHRoZSBzY2FsYWJpbGl0eSBvZiB0aGlzLg0KPg0KPiBOb3csIGluIHRo
+ZSByZWZlcmVuY2Ugc2VydmVyLCBOQkRfQ01EX0ZMVVNIIGlzIGltcGxlbWVudGVkIHRocm91
+Z2ggYW4gZmRhdGFzeW5jKCkuIEVhY2ggY2xpZW50IChhbmQgdGhlcmVmb3JlIGVhY2ggY2hh
+bm5lbCkgcnVucyBpbiBhIGRpZmZlcmVudCBwcm9jZXNzLg0KPg0KPiBFYXJsaWVyIGluIHRo
+aXMgdGhyZWFkLCBzb21lb25lIHN1Z2dlc3RlZCB0aGF0IGlmIHRoaXMgaGFwcGVuczoNCj4N
+Cj4gICAgICAgUHJvY2VzcyBBICAgICAgICAgICAgICAgIFByb2Nlc3MgQg0KPiAgICAgICA9
+PT09PT09PT0gICAgICAgICAgICAgICAgPT09PT09PT09DQo+DQo+ICAgICAgIGZkMT1vcGVu
+KCJmaWxlMTIzIikNCj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGZkMj1vcGVu
+KCJmaWxlMTIzIikNCj4NCj4gICAgICAgd3JpdGUoZmQxLCAuLi4pDQo+ICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICBmZGF0YXN5bmMoImZkMiIpDQo+DQo+IHRoZW4gdGhlIGZk
+YXRhc3luYygpIGlzIGd1YXJhbnRlZWQgdG8gc3luYyB0aGUgd3JpdGUgdGhhdCBQcm9jZXNz
+IEEgaGFzIHdyaXR0ZW4uIFRoaXMgbWF5IG9yIG1heSBub3QgYmUgdGhlIGNhc2UgdW5kZXIg
+TGludXggKHdpc2VyIG1pbmRzIHRoYW4gbWUgd2lsbCBrbm93KS4gSXMgaXQgZ3VhcmFudGVl
+ZCB0byBiZSB0aGUgY2FzZSB3aXRoIChlLmcuKSB0aGUgZmlsZSBvbiBORlM/IE9uIGFsbCBQ
+T1NJWCBwbGF0Zm9ybXM/DQo+DQo+IExvb2tpbmcgYXQgaHR0cHM6Ly91cmxkZWZlbnNlLnBy
+b29mcG9pbnQuY29tL3YyL3VybD91PWh0dHAtM0FfX3B1YnMub3Blbmdyb3VwLm9yZ19vbmxp
+bmVwdWJzXzAwOTY5NTM5OV9mdW5jdGlvbnNfZmRhdGFzeW5jLmh0bWwmZD1EUUlGQWcmYz01
+VkQwUlR0TmxUaDN5Y2Q0MWIzTVV3JnI9c0R6ZzZNdkh5bUtPVWdJOFNGSW00USZtPUNyS1Rz
+d1o1Zno1dGR0WnZBOXJlclpIWGI4TzhPNTdMU09qTkpOMWVqbXMmcz1ia09wajY0bUhONjBK
+WGFwSjYyR0plMFF0enAtWld3Vm45MWtYbUoyNDdNJmU9ICBJJ2Qgc2F5IGl0IHdhcyBhIGxp
+dHRsZSBhbWJpZ3VvdXMgYXMgdG8gd2hldGhlciBpdCB3aWxsIEFMV0FZUyBmbHVzaCBhbGwg
+ZGF0YSBhc3NvY2lhdGVkIHdpdGggdGhlIGZpbGUgZXZlbiBpZiBpdCBpcyBiZWluZyB3cml0
+dGVuIGJ5IGEgZGlmZmVyZW50IHByb2Nlc3MgKGFuZCBhIGRpZmZlcmVudCBGRCkuDQo+DQo+
+IElmIGZkYXRhc3luYygpIGlzIGFsd2F5cyBndWFyYW50ZWVkIHRvIGZsdXNoIGRhdGEgYXNz
+b2NpYXRlZCB3aXRoIHdyaXRlcyBieSBhIGRpZmZlcmVudCBwcm9jZXNzIChhbmQgc2VwYXJh
+dGVseSBvcGVuZWQgZmQpLCB0aGVuIGFzIGl0IGhhcHBlbnMgdGhlcmUgd29uJ3QgYmUgYSBw
+cm9ibGVtIG9uIHRoZSByZWZlcmVuY2Ugc2VydmVyLCBqdXN0IG9uIHNlcnZlcnMgdGhhdCBk
+b24ndCBoYXBwZW4gdG8gdXNlIGZkYXRhc3luYygpIG9yIHNpbWlsYXIgdG8gaW1wbGVtZW50
+IGZsdXNoZXMsIGFuZCB3aGljaCBkb24ndCBtYWludGFpbiB0aGVpciBvd24gY2FjaGVzLiBJ
+ZiBmZGF0YXN5bmMoKSBpcyBub3Qgc28gZ3VhcmFudGVlZCwgd2UgaGF2ZSBhIHByb2JsZW0g
+d2l0aCB0aGUgcmVmZXJlbmNlIHNlcnZlciB0b28sIGF0IGxlYXN0IG9uIHNvbWUgcGxhdGZv
+cm1zIGFuZCBmbGluZyBzeXN0ZW1zLg0KPg0KPiBXaGF0IEknbSB0aGVyZWZvcmUgYXNraW5n
+IGZvciBpcyBlaXRoZXI6DQo+IGEpIHRoYXQgdGhlIHNlcnZlciBjYW4gc2F5ICdpZiB5b3Ug
+YXJlIG11bHRpY2hhbm5lbCwgeW91IHdpbGwgbmVlZCB0byBzZW5kIGZsdXNoIG9uIGVhY2gg
+Y2hhbm5lbCcgKGJlc3QpOyBPUg0KPiBiKSB0aGF0IHRoZSBzZXJ2ZXIgY2FuIHNheSAnZG9u
+J3QgZ28gbXVsdGljaGFubmVsJw0KPg0KPiBhcyBwYXJ0IG9mIHRoZSBuZWdvdGlhdGlvbiBz
+dGFnZS4gT2YgY291cnNlIGFzIHRoaXMgaXMgZGVwZW5kZW50IG9uIHRoZSBiYWNrZW5kLCB0
+aGlzIGlzIGdvaW5nIHRvIGJlIHNvbWV0aGluZyB0aGF0IGlzIHBlci10YXJnZXQgKGkuZS4g
+bmVlZHMgdG8gY29tZSBhcyBhIHRyYW5zbWlzc2lvbiBmbGFnIG9yIHNpbWlsYXIpLg0KPg0K
+DQpPayBJIHVuZGVyc3RhbmQgeW91ciBvYmplY3Rpb25zIG5vdy4gIFlvdSBhcmVuJ3QgYXJn
+dWluZyB0aGF0IHdlIGFyZSB1bnNhZmUgYnkgDQpkZWZhdWx0LCBvbmx5IHRoYXQgd2UgYXJl
+IHVuc2FmZSB3aXRoIHNlcnZlcnMgdGhhdCBkbyBzb21ldGhpbmcgc3BlY2lhbCBiZXlvbmQg
+DQpzaW1wbHkgd3JpdGluZyB0byBhIHNpbmdsZSBkaXNrIG9yIGZpbGUuICBJIGFncmVlIHRo
+aXMgaXMgcHJvYmxlbWF0aWMsIGJ1dCB5b3UgDQpzaW1wbHkgZG9uJ3QgdXNlIHRoaXMgZmVh
+dHVyZSBpZiB5b3VyIHNlcnZlciBjYW4ndCBkZWFsIHdpdGggaXQgd2VsbC4gIFRoYW5rcywN
+Cg0KSm9zZWYNCg==
