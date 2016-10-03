@@ -1,99 +1,158 @@
-Return-Path: <Damien.LeMoal@hgst.com>
-From: Damien Le Moal <damien.lemoal@hgst.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>, Christoph
- Hellwig <hch@lst.de>, "Martin K . Petersen" <martin.petersen@oracle.com>,
-	Hannes Reinecke <hare@suse.de>, Shaun Tancheff <shaun@tancheff.com>, Damien
- Le Moal <damien.lemoal@hgst.com>
-Subject: [PATCH v7 2/7] blk-sysfs: Add 'chunk_sectors' to sysfs attributes
-Date: Thu, 6 Oct 2016 10:04:47 +0900
-Message-ID: <1475715892-18856-3-git-send-email-damien.lemoal@hgst.com>
-In-Reply-To: <1475715892-18856-1-git-send-email-damien.lemoal@hgst.com>
-References: <1475715892-18856-1-git-send-email-damien.lemoal@hgst.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:33665 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1753232AbcJCVVD (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 3 Oct 2016 17:21:03 -0400
+Received: from pps.filterd (m0044010.ppops.net [127.0.0.1])
+        by mx0a-00082601.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id u93LJOJ7031421
+        for <linux-block@vger.kernel.org>; Mon, 3 Oct 2016 14:21:02 -0700
+Received: from mail.thefacebook.com ([199.201.64.23])
+        by mx0a-00082601.pphosted.com with ESMTP id 25uwpd8s6u-12
+        (version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT)
+        for <linux-block@vger.kernel.org>; Mon, 03 Oct 2016 14:21:02 -0700
+Received: from facebook.com (2401:db00:21:603d:face:0:19:0)     by
+ mx-out.facebook.com (10.223.100.97) with ESMTP id
+ 380e715e89af11e6a23724be0593f280-71df7a50 for <linux-block@vger.kernel.org>;
+        Mon, 03 Oct 2016 14:20:33 -0700
+From: Shaohua Li <shli@fb.com>
+To: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <axboe@fb.com>, <Kernel-team@fb.com>, <tj@kernel.org>,
+        <jmoyer@redhat.com>, <vgoyal@redhat.com>
+Subject: [PATCH v3 09/11] block-throttle: make bandwidth change smooth
+Date: Mon, 3 Oct 2016 14:20:28 -0700
+Message-ID: <aae223635c325cfdc22ddd3cfc6dfa52f92cd130.1475529372.git.shli@fb.com>
+In-Reply-To: <cover.1475529372.git.shli@fb.com>
+References: <cover.1475529372.git.shli@fb.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Return-Path: damien.lemoal@hgst.com
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Hannes Reinecke <hare@suse.de>
+When cgroups all reach high limit, cgroups can dispatch more IO. This
+could make some cgroups dispatch more IO but others not, and even some
+cgroups could dispatch less IO than their high limit. For example, cg1
+high limit 10MB/s, cg2 limit 80MB/s, assume disk maximum bandwidth is
+120M/s for the workload. Their bps could something like this:
 
-The queue limits already have a 'chunk_sectors' setting, so
-we should be presenting it via sysfs.
+cg1/cg2 bps: T1: 10/80 -> T2: 60/60 -> T3: 10/80
 
-Signed-off-by: Hannes Reinecke <hare@suse.de>
+At T1, all cgroups reach high limit, so they can dispatch more IO later.
+Then cg1 dispatch more IO and cg2 has no room to dispatch enough IO. At
+T2, cg2 only dispatches 60M/s. Since We detect cg2 dispatches less IO
+than its high limit 80M/s, we downgrade the queue from LIMIT_MAX to
+LIMIT_HIGH, then all cgroups are throttled to their high limit (T3). cg2
+will have bandwidth below its high limit at most time.
 
-[Damien: Updated Documentation/ABI/testing/sysfs-block]
+The big problem here is we don't know the maximum bandwidth of the
+workload, so we can't make smart decision to avoid the situation. This
+patch makes cgroup bandwidth change smooth. After disk upgrades from
+LIMIT_HIGH to LIMIT_MAX, we don't allow cgroups use all bandwidth upto
+their max limit immediately. Their bandwidth limit will be increased
+gradually to avoid above situation. So above example will became
+something like:
 
-Signed-off-by: Damien Le Moal <damien.lemoal@hgst.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-Reviewed-by: Shaun Tancheff <shaun.tancheff@seagate.com>
-Tested-by: Shaun Tancheff <shaun.tancheff@seagate.com>
+cg1/cg2 bps: 10/80 -> 15/105 -> 20/100 -> 25/95 -> 30/90 -> 35/85 -> 40/80
+-> 45/75 -> 10/80
+
+In this way cgroups bandwidth will be above their limit in majority
+time, this still doesn't fully utilize disk bandwidth, but that's
+something we pay for sharing.
+
+Note this doesn't completely avoid cgroup running under its high limit.
+The best way to guarantee cgroup doesn't run under its limit is to set
+max limit. For example, if we set cg1 max limit to 40, cg2 will never
+run under its high limit.
+
+Signed-off-by: Shaohua Li <shli@fb.com>
 ---
- Documentation/ABI/testing/sysfs-block | 13 +++++++++++++
- block/blk-sysfs.c                     | 11 +++++++++++
- 2 files changed, 24 insertions(+)
+ block/blk-throttle.c | 44 ++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 40 insertions(+), 4 deletions(-)
 
-diff --git a/Documentation/ABI/testing/sysfs-block b/Documentation/ABI/testing/sysfs-block
-index 75a5055..ee2d5cd 100644
---- a/Documentation/ABI/testing/sysfs-block
-+++ b/Documentation/ABI/testing/sysfs-block
-@@ -251,3 +251,16 @@ Description:
- 		since drive-managed zoned block devices do not support
- 		zone commands, they will be treated as regular block
- 		devices and zoned will report "none".
-+
-+What:		/sys/block/<disk>/queue/chunk_sectors
-+Date:		September 2016
-+Contact:	Hannes Reinecke <hare@suse.com>
-+Description:
-+		chunk_sectors has different meaning depending on the type
-+		of the disk. For a RAID device (dm-raid), chunk_sectors
-+		indicates the size in 512B sectors of the RAID volume
-+		stripe segment. For a zoned block device, either
-+		host-aware or host-managed, chunk_sectors indicates the
-+		size of 512B sectors of the zones of the device, with
-+		the eventual exception of the last zone of the device
-+		which may be smaller.
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index ff9cd9c..488c2e2 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -130,6 +130,11 @@ static ssize_t queue_physical_block_size_show(struct request_queue *q, char *pag
- 	return queue_var_show(queue_physical_block_size(q), page);
- }
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index 759bce1..1658b13 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -170,6 +170,8 @@ struct throtl_data
  
-+static ssize_t queue_chunk_sectors_show(struct request_queue *q, char *page)
-+{
-+	return queue_var_show(q->limits.chunk_sectors, page);
-+}
+ 	unsigned long high_upgrade_time;
+ 	unsigned long high_downgrade_time;
 +
- static ssize_t queue_io_min_show(struct request_queue *q, char *page)
- {
- 	return queue_var_show(queue_io_min(q), page);
-@@ -455,6 +460,11 @@ static struct queue_sysfs_entry queue_physical_block_size_entry = {
- 	.show = queue_physical_block_size_show,
++	unsigned int scale;
  };
  
-+static struct queue_sysfs_entry queue_chunk_sectors_entry = {
-+	.attr = {.name = "chunk_sectors", .mode = S_IRUGO },
-+	.show = queue_chunk_sectors_show,
-+};
+ static void throtl_pending_timer_fn(unsigned long arg);
+@@ -224,12 +226,28 @@ static struct throtl_data *sq_to_td(struct throtl_service_queue *sq)
+ static uint64_t tg_bps_limit(struct throtl_grp *tg, int rw)
+ {
+ 	struct blkcg_gq *blkg = tg_to_blkg(tg);
++	struct throtl_data *td;
+ 	uint64_t ret;
+ 
+ 	if (cgroup_subsys_on_dfl(io_cgrp_subsys) && !blkg->parent)
+ 		return -1;
+-	ret = tg->bps[rw][tg->td->limit_index];
+-	if (ret == -1 && tg->td->limit_index == LIMIT_HIGH)
++	td = tg->td;
++	ret = tg->bps[rw][td->limit_index];
++	if (td->limit_index == LIMIT_MAX && tg->bps[rw][LIMIT_HIGH] != -1) {
++		uint64_t increase;
 +
- static struct queue_sysfs_entry queue_io_min_entry = {
- 	.attr = {.name = "minimum_io_size", .mode = S_IRUGO },
- 	.show = queue_io_min_show,
-@@ -555,6 +565,7 @@ static struct attribute *default_attrs[] = {
- 	&queue_hw_sector_size_entry.attr,
- 	&queue_logical_block_size_entry.attr,
- 	&queue_physical_block_size_entry.attr,
-+	&queue_chunk_sectors_entry.attr,
- 	&queue_io_min_entry.attr,
- 	&queue_io_opt_entry.attr,
- 	&queue_discard_granularity_entry.attr,
++		if (td->scale < 4096 && time_after_eq(jiffies,
++		    td->high_upgrade_time + td->scale * td->throtl_slice)) {
++			uint64_t time = jiffies - td->high_upgrade_time;
++
++			do_div(time, td->throtl_slice);
++			td->scale = time;
++		}
++		increase = (tg->bps[rw][LIMIT_HIGH] >> 1) * td->scale;
++		ret = min(tg->bps[rw][LIMIT_MAX],
++			tg->bps[rw][LIMIT_HIGH] + increase);
++	}
++	if (ret == -1 && td->limit_index == LIMIT_HIGH)
+ 		return tg->bps[rw][LIMIT_MAX];
+ 
+ 	return ret;
+@@ -238,12 +256,29 @@ static uint64_t tg_bps_limit(struct throtl_grp *tg, int rw)
+ static unsigned int tg_iops_limit(struct throtl_grp *tg, int rw)
+ {
+ 	struct blkcg_gq *blkg = tg_to_blkg(tg);
++	struct throtl_data *td;
+ 	unsigned int ret;
+ 
+ 	if (cgroup_subsys_on_dfl(io_cgrp_subsys) && !blkg->parent)
+ 		return -1;
+-	ret = tg->iops[rw][tg->td->limit_index];
+-	if (ret == -1 && tg->td->limit_index == LIMIT_HIGH)
++	td = tg->td;
++	ret = tg->iops[rw][td->limit_index];
++	if (td->limit_index == LIMIT_MAX && tg->iops[rw][LIMIT_HIGH] != -1) {
++		uint64_t increase;
++
++		if (td->scale < 4096 && time_after_eq(jiffies,
++		    td->high_upgrade_time + td->scale * td->throtl_slice)) {
++			uint64_t time = jiffies - td->high_upgrade_time;
++
++			do_div(time, td->throtl_slice);
++			td->scale = time;
++		}
++
++		increase = (tg->iops[rw][LIMIT_HIGH] >> 1) * td->scale;
++		ret = min(tg->iops[rw][LIMIT_MAX],
++			tg->iops[rw][LIMIT_HIGH] + (unsigned int)increase);
++	}
++	if (ret == -1 && td->limit_index == LIMIT_HIGH)
+ 		return tg->iops[rw][LIMIT_MAX];
+ 	return ret;
+ }
+@@ -1671,6 +1706,7 @@ static void throtl_upgrade_state(struct throtl_data *td)
+ 
+ 	td->limit_index = LIMIT_MAX;
+ 	td->high_upgrade_time = jiffies;
++	td->scale = 0;
+ 	rcu_read_lock();
+ 	blkg_for_each_descendant_post(blkg, pos_css, td->queue->root_blkg) {
+ 		struct throtl_grp *tg = blkg_to_tg(blkg);
 -- 
-2.7.4
+2.9.3
 
-Western Digital Corporation (and its subsidiaries) E-mail Confidentiality Notice & Disclaimer:
-
-This e-mail and any files transmitted with it may contain confidential or legally privileged information of WDC and/or its affiliates, and are intended solely for the use of the individual or entity to which they are addressed. If you are not the intended recipient, any disclosure, copying, distribution or any action taken or omitted to be taken in reliance on it, is prohibited. If you have received this e-mail in error, please notify the sender immediately and delete the e-mail in its entirety from your system.
