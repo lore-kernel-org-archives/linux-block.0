@@ -1,95 +1,81 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-by2nam03on0077.outbound.protection.outlook.com ([104.47.42.77]:4352
-        "EHLO NAM03-BY2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1756051AbcJRVw5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Oct 2016 17:52:57 -0400
-Subject: [PATCH v3 09/11] SRP transport, scsi-mq: Wait for .queue_rq() if
- necessary
-To: Jens Axboe <axboe@fb.com>
-References: <b39eb0e7-1007-eb63-8e7f-9a7f08508379@sandisk.com>
-CC: Christoph Hellwig <hch@lst.de>,
-        James Bottomley <jejb@linux.vnet.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Doug Ledford <dledford@redhat.com>,
-        Keith Busch <keith.busch@intel.com>,
-        Ming Lin <ming.l@ssi.samsung.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-Message-ID: <23d3615f-6905-0b60-a531-4a4d2cd9cf3f@sandisk.com>
-Date: Tue, 18 Oct 2016 14:52:53 -0700
+Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:43226 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1752074AbcJCVVT (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 3 Oct 2016 17:21:19 -0400
+Received: from pps.filterd (m0001303.ppops.net [127.0.0.1])
+        by m0001303.ppops.net (8.16.0.17/8.16.0.17) with SMTP id u93LJ4Nt027461
+        for <linux-block@vger.kernel.org>; Mon, 3 Oct 2016 14:21:18 -0700
+Received: from mail.thefacebook.com ([199.201.64.23])
+        by m0001303.ppops.net with ESMTP id 25t8tbef7s-12
+        (version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT)
+        for <linux-block@vger.kernel.org>; Mon, 03 Oct 2016 14:21:18 -0700
+Received: from facebook.com (2401:db00:21:603d:face:0:19:0)     by
+ mx-out.facebook.com (10.223.100.97) with ESMTP id
+ 3792d2b089af11e69e6224be0593f280-6eae7a50 for <linux-block@vger.kernel.org>;
+        Mon, 03 Oct 2016 14:20:32 -0700
+From: Shaohua Li <shli@fb.com>
+To: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <axboe@fb.com>, <Kernel-team@fb.com>, <tj@kernel.org>,
+        <jmoyer@redhat.com>, <vgoyal@redhat.com>
+Subject: [PATCH v3 03/11] block-throttle: configure bps/iops limit for cgroup in high limit
+Date: Mon, 3 Oct 2016 14:20:22 -0700
+Message-ID: <c3230437bee26afcf2938421a35471d1bca56daf.1475529372.git.shli@fb.com>
+In-Reply-To: <cover.1475529372.git.shli@fb.com>
+References: <cover.1475529372.git.shli@fb.com>
 MIME-Version: 1.0
-In-Reply-To: <b39eb0e7-1007-eb63-8e7f-9a7f08508379@sandisk.com>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Rename srp_wait_for_queuecommand() into scsi_wait_for_queuecommand().
-Ensure that if scsi-mq is enabled that scsi_wait_for_queuecommand()
-waits until ongoing shost->hostt->queuecommand() calls have finished.
+each queue will have a state machine. Initially queue is in LIMIT_HIGH
+state, which means all cgroups will be throttled according to their high
+limit. After all cgroups with high limit cross the limit, the queue state
+gets upgraded to LIMIT_MAX state.
+cgroups without high limit will use max limit for their high limit.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: James Bottomley <jejb@linux.vnet.ibm.com>
-Cc: Martin K. Petersen <martin.petersen@oracle.com>
-Cc: Doug Ledford <dledford@redhat.com>
+Signed-off-by: Shaohua Li <shli@fb.com>
 ---
- drivers/scsi/scsi_lib.c | 20 +++++++++++++++-----
- 1 file changed, 15 insertions(+), 5 deletions(-)
+ block/blk-throttle.c | 21 +++++++++++++++++++--
+ 1 file changed, 19 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index a5a1b5d..b7e9662 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -2724,8 +2724,6 @@ EXPORT_SYMBOL_GPL(sdev_evt_send_simple);
- /**
-  * scsi_request_fn_active() - number of kernel threads inside scsi_request_fn()
-  * @shost: SCSI host for which to count the number of scsi_request_fn() callers.
-- *
-- * To do: add support for scsi-mq in this function.
-  */
- static int scsi_request_fn_active(struct Scsi_Host *shost)
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index 59d4b4c..e2b3704 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -208,12 +208,29 @@ static struct throtl_data *sq_to_td(struct throtl_service_queue *sq)
+ 
+ static uint64_t tg_bps_limit(struct throtl_grp *tg, int rw)
  {
-@@ -2744,11 +2742,19 @@ static int scsi_request_fn_active(struct Scsi_Host *shost)
- 	return request_fn_active;
+-	return tg->bps[rw][tg->td->limit_index];
++	struct blkcg_gq *blkg = tg_to_blkg(tg);
++	uint64_t ret;
++
++	if (cgroup_subsys_on_dfl(io_cgrp_subsys) && !blkg->parent)
++		return -1;
++	ret = tg->bps[rw][tg->td->limit_index];
++	if (ret == -1 && tg->td->limit_index == LIMIT_HIGH)
++		return tg->bps[rw][LIMIT_MAX];
++
++	return ret;
  }
  
-+static void scsi_mq_wait_for_queuecommand(struct Scsi_Host *shost)
-+{
-+	struct scsi_device *sdev;
-+
-+	shost_for_each_device(sdev, shost)
-+		blk_mq_quiesce_queue(sdev->request_queue);
-+}
-+
- /**
-  * scsi_wait_for_queuecommand() - wait for ongoing queuecommand() calls
-  *
-  * Wait until the ongoing shost->hostt->queuecommand() calls that are
-- * invoked from scsi_request_fn() have finished.
-+ * invoked from either scsi_request_fn() or scsi_queue_rq() have finished.
-  *
-  * To do: avoid that scsi_send_eh_cmnd() calls queuecommand() after
-  * scsi_internal_device_block() has blocked a SCSI device and remove and also
-@@ -2756,8 +2762,12 @@ static int scsi_request_fn_active(struct Scsi_Host *shost)
-  */
- void scsi_wait_for_queuecommand(struct Scsi_Host *shost)
+ static unsigned int tg_iops_limit(struct throtl_grp *tg, int rw)
  {
--	while (scsi_request_fn_active(shost))
--		msleep(20);
-+	if (shost->use_blk_mq) {
-+		scsi_mq_wait_for_queuecommand(shost);
-+	} else {
-+		while (scsi_request_fn_active(shost))
-+			msleep(20);
-+	}
+-	return tg->iops[rw][tg->td->limit_index];
++	struct blkcg_gq *blkg = tg_to_blkg(tg);
++	unsigned int ret;
++
++	if (cgroup_subsys_on_dfl(io_cgrp_subsys) && !blkg->parent)
++		return -1;
++	ret = tg->iops[rw][tg->td->limit_index];
++	if (ret == -1 && tg->td->limit_index == LIMIT_HIGH)
++		return tg->iops[rw][LIMIT_MAX];
++	return ret;
  }
- EXPORT_SYMBOL(scsi_wait_for_queuecommand);
  
+ /**
 -- 
-2.10.1
+2.9.3
 
