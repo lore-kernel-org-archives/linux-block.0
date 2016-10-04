@@ -1,81 +1,46 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:43226 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1752074AbcJCVVT (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 3 Oct 2016 17:21:19 -0400
-Received: from pps.filterd (m0001303.ppops.net [127.0.0.1])
-        by m0001303.ppops.net (8.16.0.17/8.16.0.17) with SMTP id u93LJ4Nt027461
-        for <linux-block@vger.kernel.org>; Mon, 3 Oct 2016 14:21:18 -0700
-Received: from mail.thefacebook.com ([199.201.64.23])
-        by m0001303.ppops.net with ESMTP id 25t8tbef7s-12
-        (version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT)
-        for <linux-block@vger.kernel.org>; Mon, 03 Oct 2016 14:21:18 -0700
-Received: from facebook.com (2401:db00:21:603d:face:0:19:0)     by
- mx-out.facebook.com (10.223.100.97) with ESMTP id
- 3792d2b089af11e69e6224be0593f280-6eae7a50 for <linux-block@vger.kernel.org>;
-        Mon, 03 Oct 2016 14:20:32 -0700
-From: Shaohua Li <shli@fb.com>
-To: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <axboe@fb.com>, <Kernel-team@fb.com>, <tj@kernel.org>,
-        <jmoyer@redhat.com>, <vgoyal@redhat.com>
-Subject: [PATCH v3 03/11] block-throttle: configure bps/iops limit for cgroup in high limit
-Date: Mon, 3 Oct 2016 14:20:22 -0700
-Message-ID: <c3230437bee26afcf2938421a35471d1bca56daf.1475529372.git.shli@fb.com>
-In-Reply-To: <cover.1475529372.git.shli@fb.com>
-References: <cover.1475529372.git.shli@fb.com>
+Received: from mail-yw0-f196.google.com ([209.85.161.196]:35024 "EHLO
+        mail-yw0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754021AbcJDUwa (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Oct 2016 16:52:30 -0400
+Date: Tue, 4 Oct 2016 16:52:27 -0400
+From: Tejun Heo <tj@kernel.org>
+To: Adam Manzanares <adam.manzanares@hgst.com>
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-ide@vger.kernel.org
+Subject: Re: [PATCH 1/3] block: Add iocontext priority to request
+Message-ID: <20161004205227.GL4205@htj.duckdns.org>
+References: <1475000096-6148-1-git-send-email-adam.manzanares@hgst.com>
+ <1475000096-6148-2-git-send-email-adam.manzanares@hgst.com>
+ <20160929084059.GB11087@mtj.duckdns.org>
+ <20160930160216.GA13637@hgst.com>
+ <20161002085321.GA13648@mtj.duckdns.org>
+ <20161004154917.GA4764@hgst.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20161004154917.GA4764@hgst.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-each queue will have a state machine. Initially queue is in LIMIT_HIGH
-state, which means all cgroups will be throttled according to their high
-limit. After all cgroups with high limit cross the limit, the queue state
-gets upgraded to LIMIT_MAX state.
-cgroups without high limit will use max limit for their high limit.
+Hello, Adam.
 
-Signed-off-by: Shaohua Li <shli@fb.com>
----
- block/blk-throttle.c | 21 +++++++++++++++++++--
- 1 file changed, 19 insertions(+), 2 deletions(-)
+On Tue, Oct 04, 2016 at 08:49:18AM -0700, Adam Manzanares wrote:
+> > I wonder whether the right thing to do is adding bio->bi_ioprio which
+> > is initialized on bio submission and carried through req->ioprio.
+> 
+> I looked around and thought about this and I'm not sure if this will help. 
+> I dug into the bio submission code and I thought generic_make_request was 
+> the best place to save the ioprio information. This is quite close in 
+> the call stack to init_request_from bio. Bcache sets the bio priority before 
+> the submission, so we would have to check to see if the bio priority was 
+> valid on bio submission leaving us with the same problem. Leaving the 
+> priority in the upper bits of bio->bi_rw is fine with me. It may help to 
+> have the bio->bi_ioprio for clarity, but I think we will still face the 
+> issue of having to check if this value is set when we submit the bio or 
+> init the request so I'm leaning towards leaving it as is.
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 59d4b4c..e2b3704 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -208,12 +208,29 @@ static struct throtl_data *sq_to_td(struct throtl_service_queue *sq)
- 
- static uint64_t tg_bps_limit(struct throtl_grp *tg, int rw)
- {
--	return tg->bps[rw][tg->td->limit_index];
-+	struct blkcg_gq *blkg = tg_to_blkg(tg);
-+	uint64_t ret;
-+
-+	if (cgroup_subsys_on_dfl(io_cgrp_subsys) && !blkg->parent)
-+		return -1;
-+	ret = tg->bps[rw][tg->td->limit_index];
-+	if (ret == -1 && tg->td->limit_index == LIMIT_HIGH)
-+		return tg->bps[rw][LIMIT_MAX];
-+
-+	return ret;
- }
- 
- static unsigned int tg_iops_limit(struct throtl_grp *tg, int rw)
- {
--	return tg->iops[rw][tg->td->limit_index];
-+	struct blkcg_gq *blkg = tg_to_blkg(tg);
-+	unsigned int ret;
-+
-+	if (cgroup_subsys_on_dfl(io_cgrp_subsys) && !blkg->parent)
-+		return -1;
-+	ret = tg->iops[rw][tg->td->limit_index];
-+	if (ret == -1 && tg->td->limit_index == LIMIT_HIGH)
-+		return tg->iops[rw][LIMIT_MAX];
-+	return ret;
- }
- 
- /**
+I see.  Thanks for looking into it.  It's icky that we don't have a
+clear path of propagating ioprio but let's save that for another day.
+
 -- 
-2.9.3
-
+tejun
