@@ -1,88 +1,156 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-yw0-f174.google.com ([209.85.161.174]:33712 "EHLO
-        mail-yw0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752778AbcJDSuW (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Oct 2016 14:50:22 -0400
-Date: Tue, 4 Oct 2016 14:50:18 -0400
-From: Tejun Heo <tj@kernel.org>
-To: Vivek Goyal <vgoyal@redhat.com>
-Cc: Shaohua Li <shli@fb.com>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, axboe@fb.com, Kernel-team@fb.com,
-        jmoyer@redhat.com
+Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:37960 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1752596AbcJDS2o (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 4 Oct 2016 14:28:44 -0400
+Date: Tue, 4 Oct 2016 11:28:12 -0700
+From: Shaohua Li <shli@fb.com>
+To: Paolo Valente <paolo.valente@unimore.it>
+CC: Tejun Heo <tj@kernel.org>, Vivek Goyal <vgoyal@redhat.com>,
+        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        Jens Axboe <axboe@fb.com>, <Kernel-team@fb.com>,
+        <jmoyer@redhat.com>, Mark Brown <broonie@kernel.org>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Ulf Hansson <ulf.hansson@linaro.org>
 Subject: Re: [PATCH V3 00/11] block-throttle: add .high limit
-Message-ID: <20161004185018.GE4205@htj.duckdns.org>
+Message-ID: <20161004182811.GA76949@anikkar-mbp.local.dhcp.thefacebook.com>
 References: <cover.1475529372.git.shli@fb.com>
  <20161004132805.GB28808@redhat.com>
  <20161004155616.GB4205@htj.duckdns.org>
- <20161004181245.GC25323@redhat.com>
+ <A5525664-DF90-4604-B64A-E793BBC0CB6A@unimore.it>
+ <20161004162759.GD4205@htj.duckdns.org>
+ <278BCC7B-ED58-4FDF-9243-FAFC3F862E4D@unimore.it>
+ <20161004172852.GB73678@anikkar-mbp.local.dhcp.thefacebook.com>
+ <EE90477C-FD56-48C1-8A45-97AF39A8BB0C@unimore.it>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20161004181245.GC25323@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <EE90477C-FD56-48C1-8A45-97AF39A8BB0C@unimore.it>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hello, Vivek.
-
-On Tue, Oct 04, 2016 at 02:12:45PM -0400, Vivek Goyal wrote:
-> Agreed that we don't have a good basic unit to measure IO cost. I was
-> thinking of measuring cost in terms of sectors as that's simple and
-> gets more accurate on faster devices with almost no seek penalty. And
-
-If this were true, we could simply base everything on bandwidth;
-unfortunately, even highspeed ssds perform wildly differently
-depending on the specifics of workloads.
-
-> in fact this proposal is also providing fairness in terms of bandwitdh.
-> One extra feature seems to be this notion of minimum bandwidth for each
-> cgroup and until and unless all competing groups have met their minimum,
-> other cgroups can't cross their limits.
-
-Haven't read the patches yet but it should allow regulating in terms
-of both bandwidth and iops.
-
-> (BTW, should we call io.high, io.minimum instead. To say, this is the
->  minimum bandwidth group should get before others get to cross their
->  minimum limit till max limit).
-
-The naming convetion is min, low, high, max but I'm not sure "min",
-which means hard minimum amount (whether guaranteed or best-effort),
-quite makes sense here.
-
-> > It mostly defers the burden to the one who's configuring the limits
-> > and expects it to know the characteristics of the device and workloads
-> > and configure accordingly.  It's quite a bit more tedious to use but
-> > should be able to cover good portion of use cases without being overly
-> > complicated.  I agree that it'd be nice to have a simple proportional
-> > control but as you said can't see a good solution for it at the
-> > moment.
+On Tue, Oct 04, 2016 at 07:43:48PM +0200, Paolo Valente wrote:
 > 
-> Ok, so idea is that if we can't provide something accurate in kernel,
-> then expose a very low level knob, which is harder to configure but
-> should work in some cases where users know their devices and workload
-> very well. 
-
-Yeah, that's the basic idea for this approach.  It'd be great if we
-eventually end up with proper proportional control but having
-something low level is useful anyway, so...
-
-> > I don't think it's catering to specific use cases.  It is a generic
-> > mechanism which demands knowledge and experimentation to configure.
-> > It's more a way for the kernel to cop out and defer figuring out
-> > device characteristics to userland.  If you have a better idea, I'm
-> > all ears.
+> > Il giorno 04 ott 2016, alle ore 19:28, Shaohua Li <shli@fb.com> ha scritto:
+> > 
+> > On Tue, Oct 04, 2016 at 07:01:39PM +0200, Paolo Valente wrote:
+> >> 
+> >>> Il giorno 04 ott 2016, alle ore 18:27, Tejun Heo <tj@kernel.org> ha scritto:
+> >>> 
+> >>> Hello,
+> >>> 
+> >>> On Tue, Oct 04, 2016 at 06:22:28PM +0200, Paolo Valente wrote:
+> >>>> Could you please elaborate more on this point?  BFQ uses sectors
+> >>>> served to measure service, and, on the all the fast devices on which
+> >>>> we have tested it, it accurately distributes
+> >>>> bandwidth as desired, redistributes excess bandwidth with any issue,
+> >>>> and guarantees high responsiveness and low latency at application and
+> >>>> system level (e.g., ~0 drop rate in video playback, with any background
+> >>>> workload tested).
+> >>> 
+> >>> The same argument as before.  Bandwidth is a very bad measure of IO
+> >>> resources spent.  For specific use cases (like desktop or whatever),
+> >>> this can work but not generally.
+> >>> 
+> >> 
+> >> Actually, we have already discussed this point, and IMHO the arguments
+> >> that (apparently) convinced you that bandwidth is the most relevant
+> >> service guarantee for I/O in desktops and the like, prove that
+> >> bandwidth is the most important service guarantee in servers too.
+> >> 
+> >> Again, all the examples I can think of seem to confirm it:
+> >> . file hosting: a good service must guarantee reasonable read/write,
+> >> i.e., download/upload, speeds to users
+> >> . file streaming: a good service must guarantee low drop rates, and
+> >> this can be guaranteed only by guaranteeing bandwidth and latency
+> >> . web hosting: high bandwidth and low latency needed here too
+> >> . clouds: high bw and low latency needed to let, e.g., users of VMs
+> >> enjoy high responsiveness and, for example, reasonable file-copy
+> >> time
+> >> ...
+> >> 
+> >> To put in yet another way, with packet I/O in, e.g., clouds, there are
+> >> basically the same issues, and the main goal is again guaranteeing
+> >> bandwidth and low latency among nodes.
+> >> 
+> >> Could you please provide a concrete server example (assuming we still
+> >> agree about desktops), where I/O bandwidth does not matter while time
+> >> does?
+> > 
+> > I don't think IO bandwidth does not matter. The problem is bandwidth can't
+> > measure IO cost. For example, you can't say 8k IO costs 2x IO resource than 4k
+> > IO.
+> > 
 > 
-> I don't think I have a better idea as such. Once we had talked and you
-> mentioned that for faster devices we should probably do some token based
-> mechanism (which I believe would probably mean sector based IO
-> accounting). 
+> For what goal do you need to be able to say this, once you succeeded
+> in guaranteeing bandwidth and low latency to each
+> process/client/group/node/user?
 
-That's more about the implementation strategy and doesn't affect
-whether we support bw, iops or combined configurations.  In terms of
-implementation, I still think it'd be great to have something token
-based with per-cpu batch to lower the cpu overhead on highspeed
-devices but that shouldn't really affect the semantics.
+I think we are discussing if bandwidth should be used to measure IO for
+propotional IO scheduling. Since bandwidth can't measure the cost and you are
+using it to do arbitration, you will either have low latency but unfair
+bandwidth, or fair bandwidth but some workloads have unexpected high latency.
+But it might be ok depending on the latency target (for example, you can set
+the latency target high, so low latency is guaranteed*) and workload
+characteristics. I think the bandwidth based proporional scheduling will only
+work for workloads disk isn't fully utilized.
+ 
+> >>>> Could you please suggest me some test to show how sector-based
+> >>>> guarantees fails?
+> >>> 
+> >>> Well, mix 4k random and sequential workloads and try to distribute the
+> >>> acteual IO resources.
+> >>> 
+> >> 
+> >> 
+> >> If I'm not mistaken, we have already gone through this example too,
+> >> and I thought we agreed on what service scheme worked best, again
+> >> focusing only on desktops.  To make a long story short(er), here is a
+> >> snippet from one of our last exchanges.
+> >> 
+> >> ----------
+> >> 
+> >> On Sat, Apr 16, 2016 at 12:08:44AM +0200, Paolo Valente wrote:
+> >>> Maybe the source of confusion is the fact that a simple sector-based,
+> >>> proportional share scheduler always distributes total bandwidth
+> >>> according to weights. The catch is the additional BFQ rule: random
+> >>> workloads get only time isolation, and are charged for full budgets,
+> >>> so as to not affect the schedule of quasi-sequential workloads. So,
+> >>> the correct claim for BFQ is that it distributes total bandwidth
+> >>> according to weights (only) when all competing workloads are
+> >>> quasi-sequential. If some workloads are random, then these workloads
+> >>> are just time scheduled. This does break proportional-share bandwidth
+> >>> distribution with mixed workloads, but, much more importantly, saves
+> >>> both total throughput and individual bandwidths of quasi-sequential
+> >>> workloads.
+> >>> 
+> >>> We could then check whether I did succeed in tuning timeouts and
+> >>> budgets so as to achieve the best tradeoffs. But this is probably a
+> >>> second-order problem as of now.
+> > 
+> > I don't see why random/sequential matters for SSD. what really matters is
+> > request size and IO depth. Time scheduling is skeptical too, as workloads can
+> > dispatch all IO within almost 0 time in high queue depth disks.
+> > 
+> 
+> That's an orthogonal issue.  If what matter is, e.g., size, then it is
+> enough to replace "sequential I/O" with "large-request I/O".  In case
+> I have been too vague, here is an example: I mean that, e.g, in an I/O
+> scheduler you replace the function that computes whether a queue is
+> seeky based on request distance, with a function based on
+> request size.  And this is exactly what has been already done, for
+> example, in CFQ:
+> 
+> 	if (blk_queue_nonrot(cfqd->queue))
+> 		cfqq->seek_history |= (n_sec < CFQQ_SECT_THR_NONROT);
+> 	else
+> 		cfqq->seek_history |= (sdist > CFQQ_SEEK_THR);
 
-Thanks.
+CFQ is known not fair for SSD especially high queue depth SSD, so this doesn't
+mean correctness. And based on request size for idle detection (so let cfqq
+backlog the disk) isn't very good. iodepth 1 4k workload could be idle, but
+iodepth 128 4k workload likely isn't idle (and the workload can dispatch 128
+requests in almost 0 time in high queue depth disk).
 
--- 
-tejun
+Thanks,
+Shaohua
