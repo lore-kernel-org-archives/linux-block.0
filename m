@@ -1,8 +1,14 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-Date: Tue, 11 Oct 2016 18:40:17 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@lst.de>,
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f50.google.com ([74.125.82.50]:36199 "EHLO
+        mail-wm0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750935AbcJERul (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Oct 2016 13:50:41 -0400
+Subject: Re: [PATCH v2 1/7] blk-mq: Introduce blk_mq_queue_stopped()
+To: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Jens Axboe <axboe@fb.com>
+References: <f153ee47-e599-c333-92b0-d5da475012f3@sandisk.com>
+ <26c7db22-bac8-6d8c-ba6e-3cbf0cec3368@sandisk.com>
+Cc: Christoph Hellwig <hch@lst.de>,
         James Bottomley <jejb@linux.vnet.ibm.com>,
         "Martin K. Petersen" <martin.petersen@oracle.com>,
         Mike Snitzer <snitzer@redhat.com>,
@@ -12,15 +18,15 @@ Cc: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@lst.de>,
         "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
         "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
         "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-Subject: Re: [PATCH v2 1/7] blk-mq: Introduce blk_mq_queue_stopped()
-Message-ID: <20161011164017.GA18822@lst.de>
-References: <f153ee47-e599-c333-92b0-d5da475012f3@sandisk.com> <26c7db22-bac8-6d8c-ba6e-3cbf0cec3368@sandisk.com>
+From: Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <c5a9fd34-a8fa-d50f-20c2-a48f1f807e04@grimberg.me>
+Date: Wed, 5 Oct 2016 20:50:26 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <26c7db22-bac8-6d8c-ba6e-3cbf0cec3368@sandisk.com>
-Sender: linux-scsi-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Looks fine,
+Looks good,
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
