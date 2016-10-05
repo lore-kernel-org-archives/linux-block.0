@@ -1,91 +1,54 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-dm3nam03on0076.outbound.protection.outlook.com ([104.47.41.76]:13838
-        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S932584AbcJZWw2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Oct 2016 18:52:28 -0400
-Subject: [PATCH 03/12] blk-mq: Introduce blk_mq_queue_stopped()
-To: Jens Axboe <axboe@fb.com>
-References: <b22edafc-725f-0419-d074-34d35d57d126@sandisk.com>
-CC: Christoph Hellwig <hch@lst.de>,
-        James Bottomley <jejb@linux.vnet.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Doug Ledford <dledford@redhat.com>,
-        Keith Busch <keith.busch@intel.com>,
-        Ming Lei <tom.leiming@gmail.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-Message-ID: <f68b2997-8b0d-7aea-2859-5fbda4f6bf71@sandisk.com>
-Date: Wed, 26 Oct 2016 15:52:05 -0700
+Return-Path: <Adam.Manzanares@hgst.com>
+From: Adam Manzanares <adam.manzanares@hgst.com>
+To: <axboe@kernel.dk>, <tj@kernel.org>
+CC: <linux-block@vger.kernel.org>, <linux-ide@vger.kernel.org>, Adam
+ Manzanares <adam.manzanares@hgst.com>
+Subject: [PATCH v2 0/2] Enabling ATA Command Priorities
+Date: Wed, 5 Oct 2016 12:00:05 -0700
+Message-ID: <1475694007-11999-1-git-send-email-adam.manzanares@hgst.com>
 MIME-Version: 1.0
-In-Reply-To: <b22edafc-725f-0419-d074-34d35d57d126@sandisk.com>
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain
+Return-Path: adam.manzanares@hgst.com
+List-ID: <linux-block@vger.kernel.org>
 
-The function blk_queue_stopped() allows to test whether or not a
-traditional request queue has been stopped. Introduce a helper
-function that allows block drivers to query easily whether or not
-one or more hardware contexts of a blk-mq queue have been stopped.
+This patch builds ATA commands with high priority if the iocontext
+of a process is set to real time. The goal of the patch is to
+improve tail latencies of workloads that use higher queue depths.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
-Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-mq.c         | 20 ++++++++++++++++++++
- include/linux/blk-mq.h |  1 +
- 2 files changed, 21 insertions(+)
+This patch has been tested with an Ultrastar HE8 HDD and cuts the 
+the p99.99 tail latency of foreground IO from 2s down to 72ms when
+using the deadline scheduler. This patch works independently of the
+scheduler so it can be used with all of the currently available 
+request based schedulers. 
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index b52b3a6..4643fa8 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -946,6 +946,26 @@ void blk_mq_run_hw_queues(struct request_queue *q, bool async)
- }
- EXPORT_SYMBOL(blk_mq_run_hw_queues);
- 
-+/**
-+ * blk_mq_queue_stopped() - check whether one or more hctxs have been stopped
-+ * @q: request queue.
-+ *
-+ * The caller is responsible for serializing this function against
-+ * blk_mq_{start,stop}_hw_queue().
-+ */
-+bool blk_mq_queue_stopped(struct request_queue *q)
-+{
-+	struct blk_mq_hw_ctx *hctx;
-+	int i;
-+
-+	queue_for_each_hw_ctx(q, hctx, i)
-+		if (blk_mq_hctx_stopped(hctx))
-+			return true;
-+
-+	return false;
-+}
-+EXPORT_SYMBOL(blk_mq_queue_stopped);
-+
- void blk_mq_stop_hw_queue(struct blk_mq_hw_ctx *hctx)
- {
- 	cancel_work(&hctx->run_work);
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 535ab2e..aa93000 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -223,6 +223,7 @@ void blk_mq_delay_kick_requeue_list(struct request_queue *q, unsigned long msecs
- void blk_mq_abort_requeue_list(struct request_queue *q);
- void blk_mq_complete_request(struct request *rq, int error);
- 
-+bool blk_mq_queue_stopped(struct request_queue *q);
- void blk_mq_stop_hw_queue(struct blk_mq_hw_ctx *hctx);
- void blk_mq_start_hw_queue(struct blk_mq_hw_ctx *hctx);
- void blk_mq_stop_hw_queues(struct request_queue *q);
+Foreground IO, for the previously described results, is an async fio job 
+submitting 4K read requests at a QD of 1 to the HDD. The foreground IO is set 
+with the iopriority class of real time. The background workload is another fio
+job submitting read requests at a QD of 32 to the same HDD with default 
+iopriority.
+
+This feature is enabled by setting a queue flag that is exposed as a sysfs
+entry named req_prio. If this feature is enabled the request ioprio comes
+from the highest priority between the iocontext and the bio. 
+
+v2:
+ - Add queue flag to set iopriority going to the request
+ - If queue flag set, send iopriority class to ata_build_rw_tf
+ - Remove redundant code in ata_ncq_prio_enabled function.
+
+
+Adam Manzanares (2):
+  ata: Enabling ATA Command Priorities
+  block: Add iocontext priority to request
+
+ block/blk-core.c       |  8 +++++++-
+ block/blk-sysfs.c      | 32 ++++++++++++++++++++++++++++++++
+ include/linux/blkdev.h |  2 ++
+ 3 files changed, 41 insertions(+), 1 deletion(-)
+
 -- 
-2.10.1
+2.1.4
 
+Western Digital Corporation (and its subsidiaries) E-mail Confidentiality Notice & Disclaimer:
+
+This e-mail and any files transmitted with it may contain confidential or legally privileged information of WDC and/or its affiliates, and are intended solely for the use of the individual or entity to which they are addressed. If you are not the intended recipient, any disclosure, copying, distribution or any action taken or omitted to be taken in reliance on it, is prohibited. If you have received this e-mail in error, please notify the sender immediately and delete the e-mail in its entirety from your system.
