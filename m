@@ -1,147 +1,326 @@
-Return-Path: <francesco@dolcini.it>
-Date: Thu, 6 Oct 2016 09:54:09 +0200
-From: Francesco Dolcini <francesco@dolcini.it>
-To: NeilBrown <neilb@suse.com>
-Cc: Francesco Dolcini <francesco@dolcini.it>, axboe@kernel.dk,
-	tj@kernel.org, hch@lst.de, axboe@fb.com, akpm@linux-foundation.org,
-	linux-block@vger.kernel.org
+Return-Path: <neilb@suse.de>
+From: NeilBrown <neilb@suse.com>
+To: Francesco Dolcini <francesco@dolcini.it>, axboe@kernel.dk
+Date: Thu, 06 Oct 2016 16:42:52 +1100
+Cc: tj@kernel.org, hch@lst.de, axboe@fb.com, akpm@linux-foundation.org, linux-block@vger.kernel.org
 Subject: Re: blockdev kernel regression (bugzilla 173031)
-Message-ID: <20161006075409.GA4059@dev1>
-References: <20161004150350.GA27176@dev1>
- <8760p75zc6.fsf@notabene.neil.brown.name>
- <20161005111826.GA2430@dev1>
- <87k2dm3ueb.fsf@notabene.neil.brown.name>
+In-Reply-To: <20161005111826.GA2430@dev1>
+References: <20161004150350.GA27176@dev1> <8760p75zc6.fsf@notabene.neil.brown.name> <20161005111826.GA2430@dev1>
+Message-ID: <87k2dm3ueb.fsf@notabene.neil.brown.name>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <87k2dm3ueb.fsf@notabene.neil.brown.name>
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha256; protocol="application/pgp-signature"
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Oct 06, 2016 at 04:42:52PM +1100, NeilBrown wrote:
-cc
-> Maybe there is a race, but that seems unlikely.
+--=-=-=
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
-Consider that just hot removal while writing is not enough to 
-reproduce systematically the bug.
+On Wed, Oct 05 2016, Francesco Dolcini wrote:
 
-while true; do [ ! -f /media/usb/.not_mounted ] \
-	&& dd if=/dev/zero of=/media/usb/aaa bs=1k \
-	count=1 2>/dev/null && echo -n '*' ; done
+> Hi all,
+> Adding linux-block in CC for this bug report.
+>
+>
+> On Wed, Oct 05, 2016 at 01:00:57PM +1100, NeilBrown wrote:
+>> On Wed, Oct 05 2016, Francesco Dolcini wrote:
+>> > Hi all,
+>> > moving from kernel 3.14 to kernel 4.1 I had a kernel regression on blo=
+ck device.
+>> >
+>> > Problem first arise while removing a usb flash drive while writing was=
+ in
+>> > progress (details here: https://bugzilla.kernel.org/show_bug.cgi?id=3D=
+173031).
+>> >
+>> > I was able to bisect the issue to commit 6cd18e711dd8075da9d78cfc1239f=
+912ff28968a.
+>> >
+>> > Any suggestion?=20
+>> >
+>> > Maybe b02176f30cd30acccd3b633ab7d9aed8b5da52ff is the correct fix also=
+ for v4.1 stable?
+>> >
+>> > Andrew Morton in copy since I originally assigned the bug, by mistake,=
+ to mm.
+>> >
+>> > Thanks,
+>> > Francesco
+>>=20
+>> You probably just need
+>>=20
+>> Commit: bdfe0cbd746a ("Revert "ext4: remove block_device_ejected"")
+>>=20
+>> NeilBrown
+>
+> Hi NeilBrown,
+> bdfe0cbd746a is already present on 4.1-stable, moreover Oops is reproduce=
+d also using vfat.
 
-with lazy umount by mdev on USB flash drive removal
+So it is... odd.
 
-reproduce the problem pretty always
+The change should cause ext4 to avoid the problematic code when bdi->dev
+is NULL, yet the stack trace strongly suggests that bdi->bdi_stat[x] is
+NULL.
+bdi_stat[] aren't destroyed until after bdi->dev is set to NULL.
 
-> The vfat issue is different, and is only a warning.
-Why you say is only a warning? Here the Oops with vfat on ARM/i.MX6:
+Maybe there is a race, but that seems unlikely.
 
-[  103.493761] Unable to handle kernel paging request at virtual address 50886000
-[  103.500996] pgd = cecec000
-[  103.503709] [50886000] *pgd=00000000
-[  103.507310] Internal error: Oops: 5 [#1] PREEMPT SMP ARM
-[  103.512626] Modules linked in:
-[  103.515707] CPU: 3 PID: 2071 Comm: umount Tainted: G        W       4.1.33-01808-gab8d223 #4
-[  103.524150] Hardware name: Freescale i.MX6 Quad/DualLite (Device Tree)
-[  103.530684] task: ce67cc00 ti: cecd8000 task.ti: cecd8000
-[  103.536096] PC is at __percpu_counter_add+0x2c/0x104
-[  103.541068] LR is at __percpu_counter_add+0x24/0x104
-[  103.546044] pc : [<801dcca0>]    lr : [<801dcc98>]    psr: 200c0093
-[  103.546044] sp : cecd9e08  ip : 00000000  fp : 00000000
-[  103.557525] r10: d1970ba0  r9 : 00000001  r8 : 00000000
-[  103.562755] r7 : ffffffff  r6 : ffffffff  r5 : 00000018  r4 : ce411150
-[  103.569288] r3 : 00000000  r2 : 50886000  r1 : 805eb7d0  r0 : 00000003
-[  103.575821] Flags: nzCv  IRQs off  FIQs on  Mode SVC_32  ISA ARM  Segment user
-[  103.583049] Control: 10c53c7d  Table: 5ecec04a  DAC: 00000015
-[  103.588800] Process umount (pid: 2071, stack limit = 0xcecd8210)
-[  103.594812] Stack: (0xcecd9e08 to 0xcecda000)
-[  103.599180] 9e00:                   200c0013 cc024b5c ffffffff cc024b5c 00000000 00000001
-[  103.607365] 9e20: d1970ba0 8009599c 00000018 d1970ba0 00040831 cecd9f00 00000000 80095bc4
-[  103.615550] 9e40: 0000000e ce06b900 d0f22640 00000004 00000001 00000000 00000002 cecd9e78
-[  103.623736] 9e60: 800954d0 cc024b5c ffffe000 000003c6 00000002 00000000 d1970ba0 d1960620
-[  103.631922] 9e80: cecd8000 800b5b90 ffffe000 cc36bee0 a00c0013 00000001 ffffe000 00000001
-[  103.640107] 9ea0: cecd9eb4 80043108 cecd9f00 cecd9efc 000ac998 cc024b5c cecd9f00 00000000
-[  103.648293] 9ec0: 00000000 8000ebc4 cecd8000 00000000 000ac998 80095cf8 cecd9ed8 cecd9ed8
-[  103.656478] 9ee0: cecd9ee0 cecd9ee0 cecd9ee8 cecd9ee8 cc024b5c cc024b5c 00000000 8008e7cc
-[  103.664662] 9f00: 7fffffff 00000000 00000000 00000000 ffffffff 7fffffff 00000000 00000000
-[  103.672847] 9f20: ce73b800 804aaf00 00000034 8008e868 ffffffff 7fffffff 00000000 cc024a90
-[  103.681033] 9f40: ce73b800 800e0090 ce73b800 ce73b864 804aaf00 800bcec8 cc024a00 00000083
-[  103.689218] 9f60: 806c95a0 800bd184 ce73b800 806aac0c 806c95a0 800bd448 cebf39c0 00000000
-[  103.697404] 9f80: 806c95a0 800d44c4 ce67cc00 8003c6c8 8000ebc4 cecd8000 cecd9fb0 800116bc
-[  103.705589] 9fa0: 011fd408 011fd428 011fd408 8000ea8c 00000000 00000002 00000000 00000000
-[  103.713774] 9fc0: 011fd408 011fd428 011fd408 00000034 00000002 011fd438 011fd408 000ac998
-[  103.721959] 9fe0: 76e0a441 7ef6abac 00050fe0 76e0a446 800c0030 011fd428 00000000 00000000
-[  103.730163] [<801dcca0>] (__percpu_counter_add) from [<8009599c>] (clear_page_dirty_for_io+0xac/0xd8)
-[  103.739401] [<8009599c>] (clear_page_dirty_for_io) from [<80095bc4>] (write_cache_pages+0x1fc/0x2f4)
-[  103.748550] [<80095bc4>] (write_cache_pages) from [<80095cf8>] (generic_writepages+0x3c/0x60)
-[  103.757090] [<80095cf8>] (generic_writepages) from [<8008e7cc>] (__filemap_fdatawrite_range+0x64/0x6c)
-[  103.766412] [<8008e7cc>] (__filemap_fdatawrite_range) from [<8008e868>] (filemap_flush+0x24/0x2c)
-[  103.775306] [<8008e868>] (filemap_flush) from [<800e0090>] (sync_filesystem+0x60/0xa8)
-[  103.783240] [<800e0090>] (sync_filesystem) from [<800bcec8>] (generic_shutdown_super+0x28/0xd4)
-[  103.791953] [<800bcec8>] (generic_shutdown_super) from [<800bd184>] (kill_block_super+0x18/0x64)
-[  103.800750] [<800bd184>] (kill_block_super) from [<800bd448>] (deactivate_locked_super+0x4c/0x7c)
-[  103.809638] [<800bd448>] (deactivate_locked_super) from [<800d44c4>] (cleanup_mnt+0x4c/0x6c)
-[  103.818097] [<800d44c4>] (cleanup_mnt) from [<8003c6c8>] (task_work_run+0xb4/0xc8)
-[  103.825688] [<8003c6c8>] (task_work_run) from [<800116bc>] (do_work_pending+0x90/0xa4)
-[  103.833623] [<800116bc>] (do_work_pending) from [<8000ea8c>] (work_pending+0xc/0x20)
-[  103.841378] Code: e59f00d8 ebfff186 e5943018 ee1d2f90 (e7933002) 
-[  103.847477] ---[ end trace 5b641bdc50ddcfe7 ]---
-[  103.852101] Kernel panic - not syncing: Fatal exception
-[  103.857337] CPU1: stopping
-[  103.860059] CPU: 1 PID: 277 Comm: sh Tainted: G      D W       4.1.33-01808-gab8d223 #4
-[  103.868068] Hardware name: Freescale i.MX6 Quad/DualLite (Device Tree)
-[  103.874623] [<80014bc4>] (unwind_backtrace) from [<80011a60>] (show_stack+0x10/0x14)
-[  103.882384] [<80011a60>] (show_stack) from [<80495e24>] (dump_stack+0x70/0x8c)
-[  103.889623] [<80495e24>] (dump_stack) from [<80013b44>] (handle_IPI+0xd0/0x174)
-[  103.896945] [<80013b44>] (handle_IPI) from [<800093c0>] (gic_handle_irq+0x58/0x60)
-[  103.904527] [<800093c0>] (gic_handle_irq) from [<80012784>] (__irq_usr+0x44/0x60)
-[  103.912015] Exception stack(0xce753fb0 to 0xce753ff8)
-[  103.917074] 3fa0:                                     0000012c 76f07a90 76f07a98 76f07a90
-[  103.925260] 3fc0: 76f077d8 76f077a8 76f077d8 0000270f 00000808 76f07228 76eea6d4 000001ff
-[  103.933445] 3fe0: 000aa34c 7eb60028 76f077a8 76e6fefc 600d0030 ffffffff
-[  103.940066] CPU2: stopping
-[  103.942788] CPU: 2 PID: 0 Comm: swapper/2 Tainted: G      D W       4.1.33-01808-gab8d223 #4
-[  103.951231] Hardware name: Freescale i.MX6 Quad/DualLite (Device Tree)
-[  103.957781] [<80014bc4>] (unwind_backtrace) from [<80011a60>] (show_stack+0x10/0x14)
-[  103.965539] [<80011a60>] (show_stack) from [<80495e24>] (dump_stack+0x70/0x8c)
-[  103.972775] [<80495e24>] (dump_stack) from [<80013b44>] (handle_IPI+0xd0/0x174)
-[  103.980096] [<80013b44>] (handle_IPI) from [<800093c0>] (gic_handle_irq+0x58/0x60)
-[  103.987676] [<800093c0>] (gic_handle_irq) from [<800124c0>] (__irq_svc+0x40/0x74)
-[  103.995163] Exception stack(0xce097f70 to 0xce097fb8)
-[  104.000222] 7f60:                                     ce097fb8 00000018 2e2a9789 00000018
-[  104.008408] 7f80: 00000000 d0f15ce8 2e2a9789 00000018 2df279a6 00000018 00000000 806a05f4
-[  104.016594] 7fa0: 00000009 ce097fb8 8006a850 802ef9cc 600c0013 ffffffff
-[  104.023226] [<800124c0>] (__irq_svc) from [<802ef9cc>] (cpuidle_enter_state+0xc4/0x1a0)
-[  104.031250] [<802ef9cc>] (cpuidle_enter_state) from [<80052aa8>] (cpu_startup_entry+0x1a4/0x264)
-[  104.040049] [<80052aa8>] (cpu_startup_entry) from [<1000946c>] (0x1000946c)
-[  104.047019] CPU0: stopping
-[  104.049740] CPU: 0 PID: 0 Comm: swapper/0 Tainted: G      D W       4.1.33-01808-gab8d223 #4
-[  104.058184] Hardware name: Freescale i.MX6 Quad/DualLite (Device Tree)
-[  104.064733] [<80014bc4>] (unwind_backtrace) from [<80011a60>] (show_stack+0x10/0x14)
-[  104.072491] [<80011a60>] (show_stack) from [<80495e24>] (dump_stack+0x70/0x8c)
-[  104.079724] [<80495e24>] (dump_stack) from [<80013b44>] (handle_IPI+0xd0/0x174)
-[  104.087045] [<80013b44>] (handle_IPI) from [<800093c0>] (gic_handle_irq+0x58/0x60)
-[  104.094625] [<800093c0>] (gic_handle_irq) from [<800124c0>] (__irq_svc+0x40/0x74)
-[  104.102112] Exception stack(0x8069ff38 to 0x8069ff80)
-[  104.107170] ff20:                                                       8069ff80 00000018
-[  104.115356] ff40: 2e2a963c 00000018 00000000 d0efdce8 2e2a963c 00000018 2df282c4 00000018
-[  104.123543] ff60: 00000000 806a05f4 00000009 8069ff80 8006a850 802ef9cc 600c0013 ffffffff
-[  104.131735] [<800124c0>] (__irq_svc) from [<802ef9cc>] (cpuidle_enter_state+0xc4/0x1a0)
-[  104.139754] [<802ef9cc>] (cpuidle_enter_state) from [<80052aa8>] (cpu_startup_entry+0x1a4/0x264)
-[  104.148555] [<80052aa8>] (cpu_startup_entry) from [<80667b90>] (start_kernel+0x2d8/0x330)
-[  104.156741] Rebooting in 60 seconds..
+Anyway, clearly that patch cannot fix the problem.
+The vfat issue is different, and is only a warning.
+
+>
+>
+> Short recap of the situation, if someone does not need the long story on =
+bugzilla.
+>
+> Regression in kernel 4.1, Kernel Oops on USB flash drive removal while wr=
+iting.
+> Problem was reproduced with ext4 and fat, on x86 and ARM arch.
+>
+> [   90.740733] BUG: unable to handle kernel paging request at 1dcb5000
+> [   90.744026] IP: [<c121ca3c>] __percpu_counter_add+0x2c/0xf0
+> [   90.744026] *pde =3D 00000000=20
+> [   90.744026] Oops: 0000 [#1] PREEMPT SMP=20
+> [   90.744026] Modules linked in: arc4 ath9k ath9k_common ath9k_hw ath ma=
+c80211 cfg80211 rfkill
+> [   90.744026] CPU: 0 PID: 1534 Comm: dd Tainted: G        W       4.1.33=
+_11 #2
+> [   90.744026] task: dee12880 ti: defca000 task.ti: defca000
+> [   90.744026] EIP: 0060:[<c121ca3c>] EFLAGS: 00010002 CPU: 0
+> [   90.744026] EIP is at __percpu_counter_add+0x2c/0xf0
+> [   90.744026] EAX: 00000000 EBX: ded84bfc ECX: 00000002 EDX: 00000001
+> [   90.744026] ESI: ffffffff EDI: de80eb68 EBP: defcbc84 ESP: defcbc68
+> [   90.744026]  DS: 007b ES: 007b FS: 00d8 GS: 0033 SS: 0068
+> [   90.744026] CR0: 8005003b CR2: 1dcb5000 CR3: 1efa5000 CR4: 000006d0
+> [   90.744026] Stack:
+> [   90.744026]  c15ed780 00000019 00000001 00000000 ded84bdc ffffffff de8=
+0eb68 defcbc98
+> [   90.744026]  c10c58ca 00000008 df6bf800 de80eb58 defcbcb4 c1121447 000=
+00000 00000282
+> [   90.744026]  df6bf800 de040400 de040400 defcbcc0 c11215a4 dd553000 def=
+cbcf4 c1189c5a
+> [   90.744026] Call Trace:
+> [   90.744026]  [<c10c58ca>] account_page_dirtied+0x6a/0xc0
+> [   90.744026]  [<c1121447>] __set_page_dirty+0x37/0xb0
+> [   90.744026]  [<c11215a4>] mark_buffer_dirty+0x44/0x80
+> [   90.744026]  [<c1189c5a>] ext4_commit_super+0x17a/0x230
+> [   90.744026]  [<c118a38b>] __ext4_abort+0x2b/0x110
+> [   90.744026]  [<c1124f1d>] ? sync_dirty_buffer+0xd/0x10
+> [   90.744026]  [<c1189c7a>] ? ext4_commit_super+0x19a/0x230
+> [   90.744026]  [<c119c3c8>] ext4_journal_check_start+0x88/0x90
+> [   90.744026]  [<c119c495>] __ext4_journal_start_sb+0x15/0x60
+> [   90.744026]  [<c117f7c4>] ext4_dirty_inode+0x34/0x70
+> [   90.744026]  [<c111b577>] __mark_inode_dirty+0x27/0x290
+> [   90.744026]  [<c111039c>] ? setattr_copy+0x6c/0xd0
+> [   90.744026]  [<c117f36e>] ext4_setattr+0x23e/0x660
+> [   90.744026]  [<c1173fb7>] ? ext4_file_open+0x37/0x140
+> [   90.744026]  [<c11107c5>] notify_change+0x1d5/0x350
+> [   90.744026]  [<c121cac4>] ? __percpu_counter_add+0xb4/0xf0
+> [   90.744026]  [<c105c17b>] ? get_parent_ip+0xb/0x40
+> [   90.744026]  [<c10f4b33>] do_truncate+0x53/0x90
+> [   90.744026]  [<c10c71bd>] ? file_ra_state_init+0xd/0x30
+> [   90.744026]  [<c11030a8>] do_last.isra.48+0x778/0xe90
+> [   90.744026]  [<c121c36f>] ? __this_cpu_preempt_check+0xf/0x20
+> [   90.744026]  [<c1104788>] path_openat+0x68/0x4d0
+> [   90.744026]  [<c1105c3d>] do_filp_open+0x2d/0x80
+> [   90.744026]  [<c10f5e31>] do_sys_open+0x111/0x200
+> [   90.744026]  [<c10f4376>] ? filp_close+0x46/0x60
+> [   90.744026]  [<c10f5f3f>] SyS_open+0x1f/0x30
+> [   90.744026]  [<c1418ba2>] syscall_call+0x7/0x7
+> [   90.744026] Code: 89 e5 57 56 53 89 c3 b8 01 00 00 00 8d 64 24 f0 89 5=
+5 ec 89 4d f0 e8 84 f7 e3 ff b8 1b b1 53 c1 e8 2a f9 ff ff 8b 55 ec 8b 43 0=
+c <64> 8b 30 89 f7 8b 4d f0 c1 ff 1f 01 d6 89 75 ec 8b 75 08 11 cf
+> [   90.744026] EIP: [<c121ca3c>] __percpu_counter_add+0x2c/0xf0 SS:ESP 00=
+68:defcbc68
+> [   90.744026] CR2: 000000001dcb5000
+> [   90.744026] ---[ end trace faf081e4d1712537 ]---
+> [   90.744026] Kernel panic - not syncing: Fatal exception
+> [   90.744026] Kernel Offset: disabled
+>
+>
+> Regression is on commit 6cd18e7 ("block: destroy bdi before blockdev is u=
+nregistered.")
+>
+> Commit: bdfe0cbd746a ("Revert "ext4: remove block_device_ejected") is alr=
+eady present on 4.1 stable I am currently working on (2a6f417 on 4.1 branch)
+>
+> I wonder if commit b02176f ("block: don't release bdi while request_queue=
+ has live references") is the correct fix for this also in kernel 4.1.
+
+Maybe.  It is worth a try.
+
+Below is a a backport to 4.1.33.  It compiles, but I haven't tested.
+If it works for you, I can recommend it for -stable.
+
+NeilBrown
+
+From: Tejun Heo <tj@kernel.org>
+Date: Tue, 8 Sep 2015 12:20:22 -0400
+Subject: [PATCH] block: don't release bdi while request_queue has live
+ references
+
+bdi's are initialized in two steps, bdi_init() and bdi_register(), but
+destroyed in a single step by bdi_destroy() which, for a bdi embedded
+in a request_queue, is called during blk_cleanup_queue() which makes
+the queue invisible and starts the draining of remaining usages.
+
+A request_queue's user can access the congestion state of the embedded
+bdi as long as it holds a reference to the queue.  As such, it may
+access the congested state of a queue which finished
+blk_cleanup_queue() but hasn't reached blk_release_queue() yet.
+Because the congested state was embedded in backing_dev_info which in
+turn is embedded in request_queue, accessing the congested state after
+bdi_destroy() was called was fine.  The bdi was destroyed but the
+memory region for the congested state remained accessible till the
+queue got released.
+
+a13f35e87140 ("writeback: don't embed root bdi_writeback_congested in
+bdi_writeback") changed the situation.  Now, the root congested state
+which is expected to be pinned while request_queue remains accessible
+is separately reference counted and the base ref is put during
+bdi_destroy().  This means that the root congested state may go away
+prematurely while the queue is between bdi_dstroy() and
+blk_cleanup_queue(), which was detected by Andrey's KASAN tests.
+
+The root cause of this problem is that bdi doesn't distinguish the two
+steps of destruction, unregistration and release, and now the root
+congested state actually requires a separate release step.  To fix the
+issue, this patch separates out bdi_unregister() and bdi_exit() from
+bdi_destroy().  bdi_unregister() is called from blk_cleanup_queue()
+and bdi_exit() from blk_release_queue().  bdi_destroy() is now just a
+simple wrapper calling the two steps back-to-back.
+
+While at it, the prototype of bdi_destroy() is moved right below
+bdi_setup_and_register() so that the counterpart operations are
+located together.
+
+Signed-off-by: Tejun Heo <tj@kernel.org>
+Fixes: a13f35e87140 ("writeback: don't embed root bdi_writeback_congested i=
+n bdi_writeback")
+Cc: stable@vger.kernel.org # v4.2+
+Reported-and-tested-by: Andrey Konovalov <andreyknvl@google.com>
+Link: http://lkml.kernel.org/g/CAAeHK+zUJ74Zn17=3DrOyxacHU18SgCfC6bsYW=3D6k=
+CY5GXJBwGfQ@mail.gmail.com
+Reviewed-by: Jan Kara <jack@suse.com>
+Reviewed-by: Jeff Moyer <jmoyer@redhat.com>
+Signed-off-by: Jens Axboe <axboe@fb.com>
+Signed-off-by: NeilBrown <neilb@suse.com>
+=2D--
+ block/blk-core.c            |  2 +-
+ block/blk-sysfs.c           |  1 +
+ include/linux/backing-dev.h |  5 ++++-
+ mm/backing-dev.c            | 17 ++++++++++++++---
+ 4 files changed, 20 insertions(+), 5 deletions(-)
+
+diff --git a/block/blk-core.c b/block/blk-core.c
+index bbbf36e6066b..edf8d72daa83 100644
+=2D-- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -554,7 +554,7 @@ void blk_cleanup_queue(struct request_queue *q)
+ 		q->queue_lock =3D &q->__queue_lock;
+ 	spin_unlock_irq(lock);
+=20
+=2D	bdi_destroy(&q->backing_dev_info);
++	bdi_unregister(&q->backing_dev_info);
+=20
+ 	/* @q is and will stay empty, shutdown and put */
+ 	blk_put_queue(q);
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index 2b8fd302f677..c0bb3291859c 100644
+=2D-- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -501,6 +501,7 @@ static void blk_release_queue(struct kobject *kobj)
+ 	struct request_queue *q =3D
+ 		container_of(kobj, struct request_queue, kobj);
+=20
++	bdi_exit(&q->backing_dev_info);
+ 	blkcg_exit_queue(q);
+=20
+ 	if (q->elevator) {
+diff --git a/include/linux/backing-dev.h b/include/linux/backing-dev.h
+index d87d8eced064..17d1799f8552 100644
+=2D-- a/include/linux/backing-dev.h
++++ b/include/linux/backing-dev.h
+@@ -110,12 +110,15 @@ struct backing_dev_info {
+ struct backing_dev_info *inode_to_bdi(struct inode *inode);
+=20
+ int __must_check bdi_init(struct backing_dev_info *bdi);
+=2Dvoid bdi_destroy(struct backing_dev_info *bdi);
++void bdi_exit(struct backing_dev_info *bdi);
+=20
+ __printf(3, 4)
+ int bdi_register(struct backing_dev_info *bdi, struct device *parent,
+ 		const char *fmt, ...);
+ int bdi_register_dev(struct backing_dev_info *bdi, dev_t dev);
++void bdi_unregister(struct backing_dev_info *bdi);
++void bdi_destroy(struct backing_dev_info *bdi);
++
+ int __must_check bdi_setup_and_register(struct backing_dev_info *, char *);
+ void bdi_start_writeback(struct backing_dev_info *bdi, long nr_pages,
+ 			enum wb_reason reason);
+diff --git a/mm/backing-dev.c b/mm/backing-dev.c
+index 000e7b3b9896..1cf18ff42c54 100644
+=2D-- a/mm/backing-dev.c
++++ b/mm/backing-dev.c
+@@ -421,10 +421,8 @@ err:
+ }
+ EXPORT_SYMBOL(bdi_init);
+=20
+=2Dvoid bdi_destroy(struct backing_dev_info *bdi)
++void bdi_unregister(struct backing_dev_info *bdi)
+ {
+=2D	int i;
+=2D
+ 	bdi_wb_shutdown(bdi);
+ 	bdi_set_min_ratio(bdi, 0);
+=20
+@@ -436,11 +434,24 @@ void bdi_destroy(struct backing_dev_info *bdi)
+ 		device_unregister(bdi->dev);
+ 		bdi->dev =3D NULL;
+ 	}
++}
++
++void bdi_exit(struct backing_dev_info *bdi)
++{
++	int i;
++
++	WARN_ON_ONCE(bdi->dev);
+=20
+ 	for (i =3D 0; i < NR_BDI_STAT_ITEMS; i++)
+ 		percpu_counter_destroy(&bdi->bdi_stat[i]);
+ 	fprop_local_destroy_percpu(&bdi->completions);
+ }
++
++void bdi_destroy(struct backing_dev_info *bdi)
++{
++	bdi_unregister(bdi);
++	bdi_exit(bdi);
++}
+ EXPORT_SYMBOL(bdi_destroy);
+=20
+ /*
+=2D-=20
+2.10.0
 
 
-> > Regression is on commit 6cd18e7 ("block: destroy bdi before blockdev is unregistered.")
-> >
-> > Commit: bdfe0cbd746a ("Revert "ext4: remove block_device_ejected") is already present on 4.1 stable I am currently working on (2a6f417 on 4.1 branch)
-> >
-> > I wonder if commit b02176f ("block: don't release bdi while request_queue has live references") is the correct fix for this also in kernel 4.1.
-> 
-> Maybe.  It is worth a try.
-> 
-> Below is a a backport to 4.1.33.  It compiles, but I haven't tested.
-> If it works for you, I can recommend it for -stable.
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
 
-I confirm that it works!
+-----BEGIN PGP SIGNATURE-----
 
-Thanks,
-Francesco
+iQIcBAEBCAAGBQJX9eRcAAoJEDnsnt1WYoG5SdsP/REuoIKghviAmyLDkXmevVks
+ojomY2J4I3P/+kHtlzno6/J/ZZnHvknM2OMbOlxTk8S2G9fOgdmA2rjmBIe+5aAO
+ZuEFlaytb106Pp5nHhcmAeJhqUQeBgnlRDeRFJrkYDdnDuFm0IL8rzbbFqyVlJoK
++MX+cQk41lQ0ZQKXIUWrJpNZGfuhDndPEoeoeswP6pm8grhPOIFIPqZoB8V4pEDn
+/VGzKbmxQQYmI2EkhXxXsXryJypa0QQHIogpAGMLwyqg/p/PnXkGJE+vus3mziKL
+H9Atkab3HpV++vP5J82KV+oWo2FfphDRAEIswjW3f+g/3qYaGnuGceiNiApArIvv
+rxakF2CAM7uHYWnEaXK50Ud86VT+l9CGczPYNNDGvBkqyMKghKh0SykgLNiMLHj7
+3Zcvwh0fv5UvXFxkQM91+MoKIBmA443THuhUrmLebikd9xBZMP1m2fC84XNauLO6
+Es/a1q355wpaah3msrIKp3oOx0fL98JSEmeURPN5GypcGWPDMsNkIjuUYICw9hl4
+QTyc/zbkHnXNy0oGtQl0gj7gyX7imxezYQWw7uZ46SjjFjLw088XjqQTvHnWQWm4
+QD6C1Mh7hhioI+Zjk0qlL5K9BkSiruGG2dWowOrCpKrILdRf+xvzTT45GHcPVp9J
+P9Fn5NIL2bvcihOrdMDp
+=WRd4
+-----END PGP SIGNATURE-----
+--=-=-=--
