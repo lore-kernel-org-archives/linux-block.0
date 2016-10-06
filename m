@@ -1,68 +1,42 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:38180 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S933370AbcJFTqD (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 6 Oct 2016 15:46:03 -0400
-From: Jeff Moyer <jmoyer@redhat.com>
-To: Adam Manzanares <adam.manzanares@hgst.com>
-Cc: <axboe@kernel.dk>, <tj@kernel.org>, <linux-block@vger.kernel.org>,
-        <linux-ide@vger.kernel.org>
+Return-Path: <hare@suse.de>
 Subject: Re: [PATCH v2 2/2] block: Add iocontext priority to request
+To: Adam Manzanares <adam.manzanares@hgst.com>, axboe@kernel.dk, tj@kernel.org
 References: <1475694007-11999-1-git-send-email-adam.manzanares@hgst.com>
-        <1475694007-11999-3-git-send-email-adam.manzanares@hgst.com>
-Date: Thu, 06 Oct 2016 15:46:00 -0400
-In-Reply-To: <1475694007-11999-3-git-send-email-adam.manzanares@hgst.com>
-        (Adam Manzanares's message of "Wed, 5 Oct 2016 12:00:07 -0700")
-Message-ID: <x49d1jdi7lz.fsf@segfault.boston.devel.redhat.com>
+ <1475694007-11999-3-git-send-email-adam.manzanares@hgst.com>
+Cc: linux-block@vger.kernel.org, linux-ide@vger.kernel.org
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <5e96d531-8636-8e63-0ea8-e134676109c2@suse.de>
+Date: Thu, 6 Oct 2016 08:24:54 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <1475694007-11999-3-git-send-email-adam.manzanares@hgst.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+List-ID: <linux-block@vger.kernel.org>
 
-Hi, Adam,
-
-Adam Manzanares <adam.manzanares@hgst.com> writes:
-
+On 10/05/2016 09:00 PM, Adam Manzanares wrote:
 > Patch adds an association between iocontext ioprio and the ioprio of
 > a request. This feature is only enabled if a queue flag is set to
 > indicate that requests should have ioprio associated with them. The
 > queue flag is exposed as the req_prio queue sysfs entry.
 >
 > Signed-off-by: Adam Mananzanares <adam.manzanares@hgst.com>
+> ---
+>  block/blk-core.c       |  8 +++++++-
+>  block/blk-sysfs.c      | 32 ++++++++++++++++++++++++++++++++
+>  include/linux/blkdev.h |  2 ++
+>  3 files changed, 41 insertions(+), 1 deletion(-)
+>
+As the previous patch depends on this one it should actually be the 
+first in the series.
 
-I like the idea of the patch, but I have a few comments.
+But other than that:
 
-First, don't add a tunable, there's no need for it.  (And in the future,
-if you do add tunables, document them.)  That should make your patch
-much smaller.
+Reviewed-by: Hannes Reinecke <hare@xuse.com>
 
-> @@ -1648,6 +1649,7 @@ out:
->  
->  void init_request_from_bio(struct request *req, struct bio *bio)
->  {
-> +	struct io_context *ioc = rq_ioc(bio);
+Cheers,
 
-That can return NULL, and you blindly dereference it later.
-
-> @@ -1656,7 +1658,11 @@ void init_request_from_bio(struct request *req, struct bio *bio)
->  
->  	req->errors = 0;
->  	req->__sector = bio->bi_iter.bi_sector;
-> -	req->ioprio = bio_prio(bio);
-> +	if (blk_queue_req_prio(req->q))
-> +		req->ioprio = ioprio_best(bio_prio(bio), ioc->ioprio);
-> +	else
-> +		req->ioprio = bio_prio(bio);
-> +
-
-If the bio actually has an ioprio (only happens for bcache at this
-point), you should use it.  Something like this:
-
-        req->ioprio = bio_prio(bio);
-        if (!req->ioprio && ioc)
-		req->ioprio = ioc->ioprio;
-
-Finally, please re-order your series as Hannes suggested.
-
-Thanks!
-Jeff
+Hannes
+-- 
+Dr. Hannes Reinecke		      zSeries & Storage
+hare@suse.de			      +49 911 74053 688
+SUSE LINUX Products GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: J. Hawn, J. Guild, F. Imend�rffer, HRB 16746 (AG N�rnberg)
