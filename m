@@ -1,107 +1,69 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:55965 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1752134AbcJCVUg (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 3 Oct 2016 17:20:36 -0400
-Received: from pps.filterd (m0044008.ppops.net [127.0.0.1])
-        by mx0a-00082601.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id u93LIOkG001970
-        for <linux-block@vger.kernel.org>; Mon, 3 Oct 2016 14:20:35 -0700
-Received: from mail.thefacebook.com ([199.201.64.23])
-        by mx0a-00082601.pphosted.com with ESMTP id 25uvb51hw3-7
-        (version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT)
-        for <linux-block@vger.kernel.org>; Mon, 03 Oct 2016 14:20:35 -0700
-Received: from facebook.com (2401:db00:21:603d:face:0:19:0)     by
- mx-out.facebook.com (10.223.100.97) with ESMTP id
- 37fc744a89af11e69e6224be0593f280-6eae7a50 for <linux-block@vger.kernel.org>;
-        Mon, 03 Oct 2016 14:20:33 -0700
-From: Shaohua Li <shli@fb.com>
-To: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <axboe@fb.com>, <Kernel-team@fb.com>, <tj@kernel.org>,
-        <jmoyer@redhat.com>, <vgoyal@redhat.com>
-Subject: [PATCH v3 08/11] blk-throttle: detect completed idle cgroup
-Date: Mon, 3 Oct 2016 14:20:27 -0700
-Message-ID: <12dcc0dec825f25b5c8198d03b3c5d4e646724c8.1475529372.git.shli@fb.com>
-In-Reply-To: <cover.1475529372.git.shli@fb.com>
-References: <cover.1475529372.git.shli@fb.com>
+Return-Path: <Damien.LeMoal@hgst.com>
+From: Damien Le Moal <damien.lemoal@hgst.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>, Christoph
+ Hellwig <hch@lst.de>, "Martin K . Petersen" <martin.petersen@oracle.com>,
+	Hannes Reinecke <hare@suse.de>, Shaun Tancheff <shaun@tancheff.com>, Damien
+ Le Moal <damien.lemoal@hgst.com>, Shaun Tancheff <shaun.tancheff@seagate.com>
+Subject: [PATCH v7 4/7] block: Define zoned block device operations
+Date: Thu, 6 Oct 2016 10:04:49 +0900
+Message-ID: <1475715892-18856-5-git-send-email-damien.lemoal@hgst.com>
+In-Reply-To: <1475715892-18856-1-git-send-email-damien.lemoal@hgst.com>
+References: <1475715892-18856-1-git-send-email-damien.lemoal@hgst.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: damien.lemoal@hgst.com
+List-ID: <linux-block@vger.kernel.org>
 
-cgroup could be assigned a limit, but doesn't dispatch enough IO, eg the
-cgroup is idle. When this happens, the cgroup doesn't hit its limit, so
-we can't move the state machine to higher level and all cgroups will be
-throttled to thier lower limit, so we waste bandwidth. Detecting idle
-cgroup is hard. This patch handles a simple case, a cgroup doesn't
-dispatch any IO. We ignore such cgroup's limit, so other cgroups can use
-the bandwidth.
+From: Shaun Tancheff <shaun.tancheff@seagate.com>
 
-Signed-off-by: Shaohua Li <shli@fb.com>
+Define REQ_OP_ZONE_REPORT and REQ_OP_ZONE_RESET for handling zones of
+host-managed and host-aware zoned block devices. With with these two
+new operations, the total number of operations defined reaches 8 and
+still fits with the 3 bits definition of REQ_OP_BITS.
+
+Signed-off-by: Shaun Tancheff <shaun.tancheff@seagate.com>
+Signed-off-by: Damien Le Moal <damien.lemoal@hgst.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+
 ---
- block/blk-throttle.c | 17 ++++++++++++++++-
- 1 file changed, 16 insertions(+), 1 deletion(-)
+ block/blk-core.c          | 4 ++++
+ include/linux/blk_types.h | 2 ++
+ 2 files changed, 6 insertions(+)
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 4263f0c..759bce1 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -144,6 +144,8 @@ struct throtl_grp {
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 14d7c07..e4eda5d 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -1941,6 +1941,10 @@ generic_make_request_checks(struct bio *bio)
+ 	case REQ_OP_WRITE_SAME:
+ 		if (!bdev_write_same(bio->bi_bdev))
+ 			goto not_supported;
++	case REQ_OP_ZONE_REPORT:
++	case REQ_OP_ZONE_RESET:
++		if (!bdev_is_zoned(bio->bi_bdev))
++			goto not_supported;
+ 		break;
+ 	default:
+ 		break;
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index cd395ec..dd50dce 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -243,6 +243,8 @@ enum req_op {
+ 	REQ_OP_SECURE_ERASE,	/* request to securely erase sectors */
+ 	REQ_OP_WRITE_SAME,	/* write same block many times */
+ 	REQ_OP_FLUSH,		/* request for cache flush */
++	REQ_OP_ZONE_REPORT,	/* Get zone information */
++	REQ_OP_ZONE_RESET,	/* Reset a zone write pointer */
+ };
  
- 	unsigned long last_check_time;
- 
-+	unsigned long last_dispatch_time[2];
-+
- 	/* When did we start a new slice */
- 	unsigned long slice_start[2];
- 	unsigned long slice_end[2];
-@@ -438,11 +440,14 @@ static void tg_update_has_rules(struct throtl_grp *tg)
- 
- static void throtl_pd_online(struct blkg_policy_data *pd)
- {
-+	struct throtl_grp *tg = pd_to_tg(pd);
- 	/*
- 	 * We don't want new groups to escape the limits of its ancestors.
- 	 * Update has_rules[] after a new group is brought online.
- 	 */
--	tg_update_has_rules(pd_to_tg(pd));
-+	tg_update_has_rules(tg);
-+	tg->last_dispatch_time[READ] = jiffies;
-+	tg->last_dispatch_time[WRITE] = jiffies;
- }
- 
- static void blk_throtl_update_valid_limit(struct throtl_data *td)
-@@ -1606,6 +1611,12 @@ static bool throtl_upgrade_check_one(struct throtl_grp *tg)
- 	if (write_limit && sq->nr_queued[WRITE] &&
- 	    (!read_limit || sq->nr_queued[READ]))
- 		return true;
-+
-+	if (time_after_eq(jiffies,
-+	     tg->last_dispatch_time[READ] + tg->td->throtl_slice) &&
-+	    time_after_eq(jiffies,
-+	     tg->last_dispatch_time[WRITE] + tg->td->throtl_slice))
-+		return true;
- 	return false;
- }
- 
-@@ -1686,6 +1697,9 @@ static bool throtl_downgrade_check_one(struct throtl_grp *tg)
- 	struct throtl_data *td = tg->td;
- 	unsigned long now = jiffies;
- 
-+	if (time_after_eq(now, tg->last_dispatch_time[READ] + td->throtl_slice) &&
-+	    time_after_eq(now, tg->last_dispatch_time[WRITE] + td->throtl_slice))
-+		return false;
- 	/*
- 	 * If cgroup is below high limit, consider downgrade and throttle other
- 	 * cgroups
-@@ -1804,6 +1818,7 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
- 
- again:
- 	while (true) {
-+		tg->last_dispatch_time[rw] = jiffies;
- 		if (tg->last_high_overflow_time[rw] == 0)
- 			tg->last_high_overflow_time[rw] = jiffies;
- 		throtl_downgrade_check(tg);
+ #define REQ_OP_BITS 3
 -- 
-2.9.3
+2.7.4
 
+Western Digital Corporation (and its subsidiaries) E-mail Confidentiality Notice & Disclaimer:
+
+This e-mail and any files transmitted with it may contain confidential or legally privileged information of WDC and/or its affiliates, and are intended solely for the use of the individual or entity to which they are addressed. If you are not the intended recipient, any disclosure, copying, distribution or any action taken or omitted to be taken in reliance on it, is prohibited. If you have received this e-mail in error, please notify the sender immediately and delete the e-mail in its entirety from your system.
