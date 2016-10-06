@@ -1,108 +1,268 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Ming Lei <tom.leiming@gmail.com>
-To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Ming Lei <tom.leiming@gmail.com>,
-        Kent Overstreet <kent.overstreet@gmail.com>,
-        Shaohua Li <shli@kernel.org>,
-        Mike Christie <mchristi@redhat.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Guoqing Jiang <gqjiang@suse.com>,
-        Jiri Kosina <jkosina@suse.cz>,
-        Zheng Liu <gnehzuil.liu@gmail.com>,
-        Eric Wheeler <git@linux.ewheeler.net>,
-        Yijing Wang <wangyijing@huawei.com>, Coly Li <colyli@suse.de>,
-        Al Viro <viro@ZenIV.linux.org.uk>,
-        linux-bcache@vger.kernel.org (open list:BCACHE (BLOCK LAYER CACHE)),
-        linux-raid@vger.kernel.org (open list:SOFTWARE RAID (Multiple Disks)
-        SUPPORT)
-Subject: [PATCH 21/60] bcache: comment on direct access to bvec table
-Date: Sat, 29 Oct 2016 16:08:20 +0800
-Message-Id: <1477728600-12938-22-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
-References: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <Damien.LeMoal@hgst.com>
+From: Damien Le Moal <damien.lemoal@hgst.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>, Christoph
+ Hellwig <hch@lst.de>, "Martin K . Petersen" <martin.petersen@oracle.com>,
+	Hannes Reinecke <hare@suse.de>, Shaun Tancheff <shaun@tancheff.com>, Damien
+ Le Moal <damien.lemoal@hgst.com>, Shaun Tancheff <shaun.tancheff@seagate.com>
+Subject: [PATCH v7 7/7] blk-zoned: implement ioctls
+Date: Thu, 6 Oct 2016 10:04:52 +0900
+Message-ID: <1475715892-18856-8-git-send-email-damien.lemoal@hgst.com>
+In-Reply-To: <1475715892-18856-1-git-send-email-damien.lemoal@hgst.com>
+References: <1475715892-18856-1-git-send-email-damien.lemoal@hgst.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Return-Path: damien.lemoal@hgst.com
 List-ID: <linux-block@vger.kernel.org>
 
-Looks all are safe after multipage bvec is supported.
+From: Shaun Tancheff <shaun@tancheff.com>
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+Adds the new BLKREPORTZONE and BLKRESETZONE ioctls for respectively
+obtaining the zone configuration of a zoned block device and resetting
+the write pointer of sequential zones of a zoned block device.
+
+The BLKREPORTZONE ioctl maps directly to a single call of the function
+blkdev_report_zones. The zone information result is passed as an array
+of struct blk_zone identical to the structure used internally for
+processing the REQ_OP_ZONE_REPORT operation.  The BLKRESETZONE ioctl
+maps to a single call of the blkdev_reset_zones function.
+
+Signed-off-by: Shaun Tancheff <shaun.tancheff@seagate.com>
+Signed-off-by: Damien Le Moal <damien.lemoal@hgst.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+
 ---
- drivers/md/bcache/btree.c | 1 +
- drivers/md/bcache/super.c | 6 ++++++
- drivers/md/bcache/util.c  | 7 +++++++
- 3 files changed, 14 insertions(+)
+ block/blk-zoned.c             | 93 +++++++++++++++++++++++++++++++++++++++++++
+ block/ioctl.c                 |  4 ++
+ include/linux/blkdev.h        | 21 ++++++++++
+ include/uapi/linux/blkzoned.h | 40 +++++++++++++++++++
+ include/uapi/linux/fs.h       |  4 ++
+ 5 files changed, 162 insertions(+)
 
-diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
-index 81d3db40cd7b..b419bc91ba32 100644
---- a/drivers/md/bcache/btree.c
-+++ b/drivers/md/bcache/btree.c
-@@ -428,6 +428,7 @@ static void do_btree_node_write(struct btree *b)
- 
- 		continue_at(cl, btree_node_write_done, NULL);
- 	} else {
-+		/* No harm for multipage bvec since the new is just allocated */
- 		b->bio->bi_vcnt = 0;
- 		bch_bio_map(b->bio, i);
- 
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index d8a6d807b498..52876fcf2b36 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -207,6 +207,7 @@ static void write_bdev_super_endio(struct bio *bio)
- 
- static void __write_super(struct cache_sb *sb, struct bio *bio)
- {
-+	/* single page bio, safe for multipage bvec */
- 	struct cache_sb *out = page_address(bio->bi_io_vec[0].bv_page);
- 	unsigned i;
- 
-@@ -1153,6 +1154,8 @@ static void register_bdev(struct cache_sb *sb, struct page *sb_page,
- 	dc->bdev->bd_holder = dc;
- 
- 	bio_init_with_vec_table(&dc->sb_bio, dc->sb_bio.bi_inline_vecs, 1);
-+
-+	/* single page bio, safe for multipage bvec */
- 	dc->sb_bio.bi_io_vec[0].bv_page = sb_page;
- 	get_page(sb_page);
- 
-@@ -1794,6 +1797,7 @@ void bch_cache_release(struct kobject *kobj)
- 	for (i = 0; i < RESERVE_NR; i++)
- 		free_fifo(&ca->free[i]);
- 
-+	/* single page bio, safe for multipage bvec */
- 	if (ca->sb_bio.bi_inline_vecs[0].bv_page)
- 		put_page(ca->sb_bio.bi_io_vec[0].bv_page);
- 
-@@ -1850,6 +1854,8 @@ static int register_cache(struct cache_sb *sb, struct page *sb_page,
- 	ca->bdev->bd_holder = ca;
- 
- 	bio_init_with_vec_table(&ca->sb_bio, ca->sb_bio.bi_inline_vecs, 1);
-+
-+	/* single page bio, safe for multipage bvec */
- 	ca->sb_bio.bi_io_vec[0].bv_page = sb_page;
- 	get_page(sb_page);
- 
-diff --git a/drivers/md/bcache/util.c b/drivers/md/bcache/util.c
-index dde6172f3f10..5cc0b49a65fb 100644
---- a/drivers/md/bcache/util.c
-+++ b/drivers/md/bcache/util.c
-@@ -222,6 +222,13 @@ uint64_t bch_next_delay(struct bch_ratelimit *d, uint64_t done)
- 		: 0;
+diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+index 1603573..667f95d 100644
+--- a/block/blk-zoned.c
++++ b/block/blk-zoned.c
+@@ -255,3 +255,96 @@ int blkdev_reset_zones(struct block_device *bdev,
+ 	return 0;
  }
- 
-+/*
-+ * Generally it isn't good to access .bi_io_vec and .bi_vcnt
-+ * directly, the preferred way is bio_add_page, but in
-+ * this case, bch_bio_map() supposes that the bvec table
-+ * is empty, so it is safe to access .bi_vcnt & .bi_io_vec
-+ * in this way even after multipage bvec is supported.
+ EXPORT_SYMBOL_GPL(blkdev_reset_zones);
++
++/**
++ * BLKREPORTZONE ioctl processing.
++ * Called from blkdev_ioctl.
 + */
- void bch_bio_map(struct bio *bio, void *base)
- {
- 	size_t size = bio->bi_iter.bi_size;
++int blkdev_report_zones_ioctl(struct block_device *bdev, fmode_t mode,
++			      unsigned int cmd, unsigned long arg)
++{
++	void __user *argp = (void __user *)arg;
++	struct request_queue *q;
++	struct blk_zone_report rep;
++	struct blk_zone *zones;
++	int ret;
++
++	if (!argp)
++		return -EINVAL;
++
++	q = bdev_get_queue(bdev);
++	if (!q)
++		return -ENXIO;
++
++	if (!blk_queue_is_zoned(q))
++		return -ENOTTY;
++
++	if (!capable(CAP_SYS_ADMIN))
++		return -EACCES;
++
++	if (copy_from_user(&rep, argp, sizeof(struct blk_zone_report)))
++		return -EFAULT;
++
++	if (!rep.nr_zones)
++		return -EINVAL;
++
++	zones = kcalloc(rep.nr_zones, sizeof(struct blk_zone), GFP_KERNEL);
++	if (!zones)
++		return -ENOMEM;
++
++	ret = blkdev_report_zones(bdev, rep.sector,
++				  zones, &rep.nr_zones,
++				  GFP_KERNEL);
++	if (ret)
++		goto out;
++
++	if (copy_to_user(argp, &rep, sizeof(struct blk_zone_report))) {
++		ret = -EFAULT;
++		goto out;
++	}
++
++	if (rep.nr_zones) {
++		if (copy_to_user(argp + sizeof(struct blk_zone_report), zones,
++				 sizeof(struct blk_zone) * rep.nr_zones))
++			ret = -EFAULT;
++	}
++
++ out:
++	kfree(zones);
++
++	return ret;
++}
++
++/**
++ * BLKRESETZONE ioctl processing.
++ * Called from blkdev_ioctl.
++ */
++int blkdev_reset_zones_ioctl(struct block_device *bdev, fmode_t mode,
++			     unsigned int cmd, unsigned long arg)
++{
++	void __user *argp = (void __user *)arg;
++	struct request_queue *q;
++	struct blk_zone_range zrange;
++
++	if (!argp)
++		return -EINVAL;
++
++	q = bdev_get_queue(bdev);
++	if (!q)
++		return -ENXIO;
++
++	if (!blk_queue_is_zoned(q))
++		return -ENOTTY;
++
++	if (!capable(CAP_SYS_ADMIN))
++		return -EACCES;
++
++	if (!(mode & FMODE_WRITE))
++		return -EBADF;
++
++	if (copy_from_user(&zrange, argp, sizeof(struct blk_zone_range)))
++		return -EFAULT;
++
++	return blkdev_reset_zones(bdev, zrange.sector, zrange.nr_sectors,
++				  GFP_KERNEL);
++}
+diff --git a/block/ioctl.c b/block/ioctl.c
+index ed2397f..448f78a 100644
+--- a/block/ioctl.c
++++ b/block/ioctl.c
+@@ -513,6 +513,10 @@ int blkdev_ioctl(struct block_device *bdev, fmode_t mode, unsigned cmd,
+ 				BLKDEV_DISCARD_SECURE);
+ 	case BLKZEROOUT:
+ 		return blk_ioctl_zeroout(bdev, mode, arg);
++	case BLKREPORTZONE:
++		return blkdev_report_zones_ioctl(bdev, mode, cmd, arg);
++	case BLKRESETZONE:
++		return blkdev_reset_zones_ioctl(bdev, mode, cmd, arg);
+ 	case HDIO_GETGEO:
+ 		return blkdev_getgeo(bdev, argp);
+ 	case BLKRAGET:
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 252043f..90097dd 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -316,6 +316,27 @@ extern int blkdev_report_zones(struct block_device *bdev,
+ extern int blkdev_reset_zones(struct block_device *bdev, sector_t sectors,
+ 			      sector_t nr_sectors, gfp_t gfp_mask);
+ 
++extern int blkdev_report_zones_ioctl(struct block_device *bdev, fmode_t mode,
++				     unsigned int cmd, unsigned long arg);
++extern int blkdev_reset_zones_ioctl(struct block_device *bdev, fmode_t mode,
++				    unsigned int cmd, unsigned long arg);
++
++#else /* CONFIG_BLK_DEV_ZONED */
++
++static inline int blkdev_report_zones_ioctl(struct block_device *bdev,
++					    fmode_t mode, unsigned int cmd,
++					    unsigned long arg)
++{
++	return -ENOTTY;
++}
++
++static inline int blkdev_reset_zones_ioctl(struct block_device *bdev,
++					   fmode_t mode, unsigned int cmd,
++					   unsigned long arg)
++{
++	return -ENOTTY;
++}
++
+ #endif /* CONFIG_BLK_DEV_ZONED */
+ 
+ struct request_queue {
+diff --git a/include/uapi/linux/blkzoned.h b/include/uapi/linux/blkzoned.h
+index a381721..40d1d7b 100644
+--- a/include/uapi/linux/blkzoned.h
++++ b/include/uapi/linux/blkzoned.h
+@@ -16,6 +16,7 @@
+ #define _UAPI_BLKZONED_H
+ 
+ #include <linux/types.h>
++#include <linux/ioctl.h>
+ 
+ /**
+  * enum blk_zone_type - Types of zones allowed in a zoned device.
+@@ -100,4 +101,43 @@ struct blk_zone {
+ 	__u8	reserved[36];
+ };
+ 
++/**
++ * struct blk_zone_report - BLKREPORTZONE ioctl request/reply
++ *
++ * @sector: starting sector of report
++ * @nr_zones: IN maximum / OUT actual
++ * @reserved: padding to 16 byte alignment
++ * @zones: Space to hold @nr_zones @zones entries on reply.
++ *
++ * The array of at most @nr_zones must follow this structure in memory.
++ */
++struct blk_zone_report {
++	__u64		sector;
++	__u32		nr_zones;
++	__u8		reserved[4];
++	struct blk_zone zones[0];
++} __packed;
++
++/**
++ * struct blk_zone_range - BLKRESETZONE ioctl request
++ * @sector: starting sector of the first zone to issue reset write pointer
++ * @nr_sectors: Total number of sectors of 1 or more zones to reset
++ */
++struct blk_zone_range {
++	__u64		sector;
++	__u64		nr_sectors;
++};
++
++/**
++ * Zoned block device ioctl's:
++ *
++ * @BLKREPORTZONE: Get zone information. Takes a zone report as argument.
++ *                 The zone report will start from the zone containing the
++ *                 sector specified in the report request structure.
++ * @BLKRESETZONE: Reset the write pointer of the zones in the specified
++ *                sector range. The sector range must be zone aligned.
++ */
++#define BLKREPORTZONE	_IOWR(0x12, 130, struct blk_zone_report)
++#define BLKRESETZONE	_IOW(0x12, 131, struct blk_zone_range)
++
+ #endif /* _UAPI_BLKZONED_H */
+diff --git a/include/uapi/linux/fs.h b/include/uapi/linux/fs.h
+index 3b00f7c..e0fc7f0 100644
+--- a/include/uapi/linux/fs.h
++++ b/include/uapi/linux/fs.h
+@@ -222,6 +222,10 @@ struct fsxattr {
+ #define BLKSECDISCARD _IO(0x12,125)
+ #define BLKROTATIONAL _IO(0x12,126)
+ #define BLKZEROOUT _IO(0x12,127)
++/*
++ * A jump here: 130-131 are reserved for zoned block devices
++ * (see uapi/linux/blkzoned.h)
++ */
+ 
+ #define BMAP_IOCTL 1		/* obsolete - kept for compatibility */
+ #define FIBMAP	   _IO(0x00,1)	/* bmap access */
 -- 
 2.7.4
 
+Western Digital Corporation (and its subsidiaries) E-mail Confidentiality Notice & Disclaimer:
+
+This e-mail and any files transmitted with it may contain confidential or legally privileged information of WDC and/or its affiliates, and are intended solely for the use of the individual or entity to which they are addressed. If you are not the intended recipient, any disclosure, copying, distribution or any action taken or omitted to be taken in reliance on it, is prohibited. If you have received this e-mail in error, please notify the sender immediately and delete the e-mail in its entirety from your system.
