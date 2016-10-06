@@ -1,178 +1,65 @@
-Return-Path: <tomasz.majchrzak@intel.com>
-From: Tomasz Majchrzak <tomasz.majchrzak@intel.com>
-To: linux-raid@vger.kernel.org
-Cc: shli@kernel.org,
-	aleksey.obitotskiy@intel.com,
-	pawel.baldysiak@intel.com,
-	artur.paszkiewicz@intel.com,
-	maksymilian.kunt@intel.com,
-	mariusz.dabrowski@intel.com,
-	axboe@kernel.dk,
-	dan.j.williams@intel.com,
+Return-Path: <sitsofe@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <20161005213945.GA84123@kernel.org>
+References: <CALjAwxgg-m2bgFf10hLB3j=2ntVxqt0vDSKuQyOavqvKXC2G5Q@mail.gmail.com>
+ <CALjAwxhYh0JDKh7E_t9sm-vBBPX-3dzL5hDMi4rA6uE2RqaJoQ@mail.gmail.com> <20161005213945.GA84123@kernel.org>
+From: Sitsofe Wheeler <sitsofe@gmail.com>
+Date: Thu, 6 Oct 2016 07:57:59 +0100
+Message-ID: <CALjAwxjRVs0ozLwe-avrure85+y4Ajg-KNf2a7a__jfsL2BspQ@mail.gmail.com>
+Subject: Re: kernel BUG at block/bio.c:1785 while trying to issue a discard to
+ LVM on RAID1 md
+To: Shaohua Li <shli@kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-raid@vger.kernel.org,
 	linux-block@vger.kernel.org,
-	Tomasz Majchrzak <tomasz.majchrzak@intel.com>
-Subject: [PATCH 2/3 v2] md: add bad block support for external metadata
-Date: Tue, 18 Oct 2016 16:09:45 +0200
-Message-Id: <1476799785-6339-1-git-send-email-tomasz.majchrzak@intel.com>
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
-Add new rdev flag which external metadata handler can use to switch
-on/off bad block support. If new bad block is encountered, notify it via
-rdev 'unacknowledged_bad_blocks' sysfs file. If bad block has been
-cleared, notify update to rdev 'bad_blocks' sysfs file.
+On 5 October 2016 at 22:39, Shaohua Li <shli@kernel.org> wrote:
+> On Wed, Oct 05, 2016 at 10:31:11PM +0100, Sitsofe Wheeler wrote:
+>> On 3 October 2016 at 17:47, Sitsofe Wheeler <sitsofe@gmail.com> wrote:
+>> >
+>> > While trying to do a discard (via blkdiscard --length 1048576
+>> > /dev/<pathtodevice>) to an LVM device atop a two disk md RAID1 the
+>> > following oops was generated:
+>> >
+>> > [  103.306243] md: resync of RAID array md127
+>> > [  103.306246] md: minimum _guaranteed_  speed: 1000 KB/sec/disk.
+>> > [  103.306248] md: using maximum available idle IO bandwidth (but not
+>> > more than 200000 KB/sec) for resync.
+>> > [  103.306251] md: using 128k window, over a total of 244194432k.
+>> > [  103.308158] ------------[ cut here ]------------
+>> > [  103.308205] kernel BUG at block/bio.c:1785!
+>>
+>> This still seems to be here but slightly modified with a 4.8.0 kernel:
+>
+> Does this fix the issue? Looks there is IO error
+>
+>
+> diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
+> index 21dc00e..349eb11 100644
+> --- a/drivers/md/raid1.c
+> +++ b/drivers/md/raid1.c
+> @@ -2196,7 +2196,6 @@ static int narrow_write_error(struct r1bio *r1_bio, int i)
+>                         wbio = bio_clone_mddev(r1_bio->master_bio, GFP_NOIO, mddev);
+>                 }
+>
+> -               bio_set_op_attrs(wbio, REQ_OP_WRITE, 0);
+>                 wbio->bi_iter.bi_sector = r1_bio->sector;
+>                 wbio->bi_iter.bi_size = r1_bio->sectors << 9;
+>
 
-When bad blocks support is being removed, just clear rdev flag. It is
-not necessary to reset badblocks->shift field. If there are bad blocks
-cleared or added at the same time, it is ok for those changes to be
-applied to the structure. The array is in blocked state and the drive
-which cannot handle bad blocks any more will be removed from the array
-before it is unlocked.
+Yes the patch above fixes the issue and make blkdiscard just report
+that the BLKDISCARD ioctl failed. Since having this patch applied
+means the issue seen in
+http://www.gossamer-threads.com/lists/linux/kernel/2538757?do=post_view_threaded#2538757
+(BUG at arch/x86/kernel/pci-nommu.c:66 / BUG at
+./include/linux/scatterlist.h:90) can't be reached does that mean
+whatever was seen there is also spurious?
 
-Simplify state_show function by adding a separator at the end of each
-string and overwrite last separator with new line.
+Additionally as this issue seems to have been a problem going back to
+at least the 3.18 kernels, would a fix similar to this be eligible for
+stable kernels?
 
-Signed-off-by: Tomasz Majchrzak <tomasz.majchrzak@intel.com>
-Reviewed-by: Artur Paszkiewicz <artur.paszkiewicz@intel.com>
----
- drivers/md/md.c | 78 ++++++++++++++++++++++++++++-----------------------------
- drivers/md/md.h |  3 +++
- 2 files changed, 42 insertions(+), 39 deletions(-)
-
-diff --git a/drivers/md/md.c b/drivers/md/md.c
-index eac84d8..cc05236 100644
---- a/drivers/md/md.c
-+++ b/drivers/md/md.c
-@@ -2523,51 +2523,38 @@ struct rdev_sysfs_entry {
- static ssize_t
- state_show(struct md_rdev *rdev, char *page)
- {
--	char *sep = "";
-+	char *sep = ",";
- 	size_t len = 0;
- 	unsigned long flags = ACCESS_ONCE(rdev->flags);
- 
- 	if (test_bit(Faulty, &flags) ||
--	    rdev->badblocks.unacked_exist) {
--		len+= sprintf(page+len, "%sfaulty",sep);
--		sep = ",";
--	}
--	if (test_bit(In_sync, &flags)) {
--		len += sprintf(page+len, "%sin_sync",sep);
--		sep = ",";
--	}
--	if (test_bit(Journal, &flags)) {
--		len += sprintf(page+len, "%sjournal",sep);
--		sep = ",";
--	}
--	if (test_bit(WriteMostly, &flags)) {
--		len += sprintf(page+len, "%swrite_mostly",sep);
--		sep = ",";
--	}
-+	    rdev->badblocks.unacked_exist)
-+		len += sprintf(page+len, "faulty%s", sep);
-+	if (test_bit(In_sync, &flags))
-+		len += sprintf(page+len, "in_sync%s", sep);
-+	if (test_bit(Journal, &flags))
-+		len += sprintf(page+len, "journal%s", sep);
-+	if (test_bit(WriteMostly, &flags))
-+		len += sprintf(page+len, "write_mostly%s", sep);
- 	if (test_bit(Blocked, &flags) ||
- 	    (rdev->badblocks.unacked_exist
--	     && !test_bit(Faulty, &flags))) {
--		len += sprintf(page+len, "%sblocked", sep);
--		sep = ",";
--	}
-+	     && !test_bit(Faulty, &flags)))
-+		len += sprintf(page+len, "blocked%s", sep);
- 	if (!test_bit(Faulty, &flags) &&
- 	    !test_bit(Journal, &flags) &&
--	    !test_bit(In_sync, &flags)) {
--		len += sprintf(page+len, "%sspare", sep);
--		sep = ",";
--	}
--	if (test_bit(WriteErrorSeen, &flags)) {
--		len += sprintf(page+len, "%swrite_error", sep);
--		sep = ",";
--	}
--	if (test_bit(WantReplacement, &flags)) {
--		len += sprintf(page+len, "%swant_replacement", sep);
--		sep = ",";
--	}
--	if (test_bit(Replacement, &flags)) {
--		len += sprintf(page+len, "%sreplacement", sep);
--		sep = ",";
--	}
-+	    !test_bit(In_sync, &flags))
-+		len += sprintf(page+len, "spare%s", sep);
-+	if (test_bit(WriteErrorSeen, &flags))
-+		len += sprintf(page+len, "write_error%s", sep);
-+	if (test_bit(WantReplacement, &flags))
-+		len += sprintf(page+len, "want_replacement%s", sep);
-+	if (test_bit(Replacement, &flags))
-+		len += sprintf(page+len, "replacement%s", sep);
-+	if (test_bit(ExternalBbl, &flags))
-+		len += sprintf(page+len, "external_bbl%s", sep);
-+
-+	if (len)
-+		len -= strlen(sep);
- 
- 	return len+sprintf(page+len, "\n");
- }
-@@ -2708,6 +2695,13 @@ state_store(struct md_rdev *rdev, const char *buf, size_t len)
- 			}
- 		} else
- 			err = -EBUSY;
-+	} else if (cmd_match(buf, "external_bbl") && (rdev->mddev->external)) {
-+		set_bit(ExternalBbl, &rdev->flags);
-+		rdev->badblocks.shift = 0;
-+		err = 0;
-+	} else if (cmd_match(buf, "-external_bbl") && (rdev->mddev->external)) {
-+		clear_bit(ExternalBbl, &rdev->flags);
-+		err = 0;
- 	}
- 	if (!err)
- 		sysfs_notify_dirent_safe(rdev->sysfs_state);
-@@ -8614,6 +8608,9 @@ int rdev_set_badblocks(struct md_rdev *rdev, sector_t s, int sectors,
- 	rv = badblocks_set(&rdev->badblocks, s, sectors, 0);
- 	if (rv == 0) {
- 		/* Make sure they get written out promptly */
-+		if (test_bit(ExternalBbl, &rdev->flags))
-+			sysfs_notify(&rdev->kobj, NULL,
-+				     "unacknowledged_bad_blocks");
- 		sysfs_notify_dirent_safe(rdev->sysfs_state);
- 		set_mask_bits(&mddev->flags, 0,
- 			      BIT(MD_CHANGE_CLEAN) | BIT(MD_CHANGE_PENDING));
-@@ -8627,12 +8624,15 @@ EXPORT_SYMBOL_GPL(rdev_set_badblocks);
- int rdev_clear_badblocks(struct md_rdev *rdev, sector_t s, int sectors,
- 			 int is_new)
- {
-+	int rv;
- 	if (is_new)
- 		s += rdev->new_data_offset;
- 	else
- 		s += rdev->data_offset;
--	return badblocks_clear(&rdev->badblocks,
--				  s, sectors);
-+	rv = badblocks_clear(&rdev->badblocks, s, sectors);
-+	if ((rv == 0) && test_bit(ExternalBbl, &rdev->flags))
-+		sysfs_notify(&rdev->kobj, NULL, "bad_blocks");
-+	return rv;
- }
- EXPORT_SYMBOL_GPL(rdev_clear_badblocks);
- 
-diff --git a/drivers/md/md.h b/drivers/md/md.h
-index 2b20417..21bd94f 100644
---- a/drivers/md/md.h
-+++ b/drivers/md/md.h
-@@ -168,6 +168,9 @@ enum flag_bits {
- 				 * so it is safe to remove without
- 				 * another synchronize_rcu() call.
- 				 */
-+	ExternalBbl,            /* External metadata provides bad
-+				 * block management for a disk
-+				 */
- };
- 
- static inline int is_badblock(struct md_rdev *rdev, sector_t s, int sectors,
 -- 
-1.8.3.1
+Sitsofe | http://sucs.org/~sits/
