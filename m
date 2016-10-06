@@ -1,127 +1,209 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:45084 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750801AbcJGEvj (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 7 Oct 2016 00:51:39 -0400
-From: NeilBrown <neilb@suse.com>
-To: Tomasz Majchrzak <tomasz.majchrzak@intel.com>,
-        linux-block@vger.kernel.org
-Date: Fri, 07 Oct 2016 15:50:34 +1100
-Subject: Re: [PATCH] badblocks: fix overlapping check for clearing
-In-Reply-To: <1473152338-30539-1-git-send-email-tomasz.majchrzak@intel.com>
-References: <1473152338-30539-1-git-send-email-tomasz.majchrzak@intel.com>
-cc: Dan Williams <dan.j.williams@intel.com>
-Message-ID: <87wphk3gpx.fsf@notabene.neil.brown.name>
+Return-Path: <Damien.LeMoal@hgst.com>
+From: Damien Le Moal <damien.lemoal@hgst.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>, Christoph
+ Hellwig <hch@lst.de>, "Martin K . Petersen" <martin.petersen@oracle.com>,
+	Hannes Reinecke <hare@suse.de>, Shaun Tancheff <shaun@tancheff.com>, Damien
+ Le Moal <damien.lemoal@hgst.com>
+Subject: [PATCH v7 1/7] block: Add 'zoned' queue limit
+Date: Thu, 6 Oct 2016 10:04:46 +0900
+Message-ID: <1475715892-18856-2-git-send-email-damien.lemoal@hgst.com>
+In-Reply-To: <1475715892-18856-1-git-send-email-damien.lemoal@hgst.com>
+References: <1475715892-18856-1-git-send-email-damien.lemoal@hgst.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-        micalg=pgp-sha256; protocol="application/pgp-signature"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
-
---=-=-=
 Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+Return-Path: damien.lemoal@hgst.com
+List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Sep 06 2016, Tomasz Majchrzak wrote:
+Add the zoned queue limit to indicate the zoning model of a block device.
+Defined values are 0 (BLK_ZONED_NONE) for regular block devices,
+1 (BLK_ZONED_HA) for host-aware zone block devices and 2 (BLK_ZONED_HM)
+for host-managed zone block devices. The standards defined drive managed
+model is not defined here since these block devices do not provide any
+command for accessing zone information. Drive managed model devices will
+be reported as BLK_ZONED_NONE.
 
-> Current bad block clear implementation assumes the range to clear
-> overlaps with at least one bad block already stored. If given range to
-> clear precedes first bad block in a list, the first entry is incorrectly
-> updated.
+The helper functions blk_queue_zoned_model and bdev_zoned_model return
+the zoned limit and the functions blk_queue_is_zoned and bdev_is_zoned
+return a boolean for callers to test if a block device is zoned.
 
-In the original md context, it would only ever be called on a block that
-was already in the list.
-But you are right that it is best not to assume this, and to code more
-safely.
+The zoned attribute is also exported as a string to applications via
+sysfs. BLK_ZONED_NONE shows as "none", BLK_ZONED_HA as "host-aware" and
+BLK_ZONED_HM as "host-managed".
 
+Signed-off-by: Damien Le Moal <damien.lemoal@hgst.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+Reviewed-by: Shaun Tancheff <shaun.tancheff@seagate.com>
+Tested-by: Shaun Tancheff <shaun.tancheff@seagate.com>
+---
+ Documentation/ABI/testing/sysfs-block | 16 ++++++++++++
+ block/blk-settings.c                  |  1 +
+ block/blk-sysfs.c                     | 18 ++++++++++++++
+ include/linux/blkdev.h                | 47 +++++++++++++++++++++++++++++++++++
+ 4 files changed, 82 insertions(+)
 
+diff --git a/Documentation/ABI/testing/sysfs-block b/Documentation/ABI/testing/sysfs-block
+index 71d184d..75a5055 100644
+--- a/Documentation/ABI/testing/sysfs-block
++++ b/Documentation/ABI/testing/sysfs-block
+@@ -235,3 +235,19 @@ Description:
+ 		write_same_max_bytes is 0, write same is not supported
+ 		by the device.
+ 
++What:		/sys/block/<disk>/queue/zoned
++Date:		September 2016
++Contact:	Damien Le Moal <damien.lemoal@hgst.com>
++Description:
++		zoned indicates if the device is a zoned block device
++		and the zone model of the device if it is indeed zoned.
++		The possible values indicated by zoned are "none" for
++		regular block devices and "host-aware" or "host-managed"
++		for zoned block devices. The characteristics of
++		host-aware and host-managed zoned block devices are
++		described in the ZBC (Zoned Block Commands) and ZAC
++		(Zoned Device ATA Command Set) standards. These standards
++		also define the "drive-managed" zone model. However,
++		since drive-managed zoned block devices do not support
++		zone commands, they will be treated as regular block
++		devices and zoned will report "none".
+diff --git a/block/blk-settings.c b/block/blk-settings.c
+index f679ae1..b1d5b7f 100644
+--- a/block/blk-settings.c
++++ b/block/blk-settings.c
+@@ -107,6 +107,7 @@ void blk_set_default_limits(struct queue_limits *lim)
+ 	lim->io_opt = 0;
+ 	lim->misaligned = 0;
+ 	lim->cluster = 1;
++	lim->zoned = BLK_ZONED_NONE;
+ }
+ EXPORT_SYMBOL(blk_set_default_limits);
+ 
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index 9cc8d7c..ff9cd9c 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -257,6 +257,18 @@ QUEUE_SYSFS_BIT_FNS(random, ADD_RANDOM, 0);
+ QUEUE_SYSFS_BIT_FNS(iostats, IO_STAT, 0);
+ #undef QUEUE_SYSFS_BIT_FNS
+ 
++static ssize_t queue_zoned_show(struct request_queue *q, char *page)
++{
++	switch (blk_queue_zoned_model(q)) {
++	case BLK_ZONED_HA:
++		return sprintf(page, "host-aware\n");
++	case BLK_ZONED_HM:
++		return sprintf(page, "host-managed\n");
++	default:
++		return sprintf(page, "none\n");
++	}
++}
++
+ static ssize_t queue_nomerges_show(struct request_queue *q, char *page)
+ {
+ 	return queue_var_show((blk_queue_nomerges(q) << 1) |
+@@ -485,6 +497,11 @@ static struct queue_sysfs_entry queue_nonrot_entry = {
+ 	.store = queue_store_nonrot,
+ };
+ 
++static struct queue_sysfs_entry queue_zoned_entry = {
++	.attr = {.name = "zoned", .mode = S_IRUGO },
++	.show = queue_zoned_show,
++};
++
+ static struct queue_sysfs_entry queue_nomerges_entry = {
+ 	.attr = {.name = "nomerges", .mode = S_IRUGO | S_IWUSR },
+ 	.show = queue_nomerges_show,
+@@ -546,6 +563,7 @@ static struct attribute *default_attrs[] = {
+ 	&queue_discard_zeroes_data_entry.attr,
+ 	&queue_write_same_max_entry.attr,
+ 	&queue_nonrot_entry.attr,
++	&queue_zoned_entry.attr,
+ 	&queue_nomerges_entry.attr,
+ 	&queue_rq_affinity_entry.attr,
+ 	&queue_iostats_entry.attr,
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index c47c358..f19e16b 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -261,6 +261,15 @@ struct blk_queue_tag {
+ #define BLK_SCSI_MAX_CMDS	(256)
+ #define BLK_SCSI_CMD_PER_LONG	(BLK_SCSI_MAX_CMDS / (sizeof(long) * 8))
+ 
++/*
++ * Zoned block device models (zoned limit).
++ */
++enum blk_zoned_model {
++	BLK_ZONED_NONE,	/* Regular block device */
++	BLK_ZONED_HA,	/* Host-aware zoned block device */
++	BLK_ZONED_HM,	/* Host-managed zoned block device */
++};
++
+ struct queue_limits {
+ 	unsigned long		bounce_pfn;
+ 	unsigned long		seg_boundary_mask;
+@@ -290,6 +299,7 @@ struct queue_limits {
+ 	unsigned char		cluster;
+ 	unsigned char		discard_zeroes_data;
+ 	unsigned char		raid_partial_stripes_expensive;
++	enum blk_zoned_model	zoned;
+ };
+ 
+ struct request_queue {
+@@ -627,6 +637,23 @@ static inline unsigned int blk_queue_cluster(struct request_queue *q)
+ 	return q->limits.cluster;
+ }
+ 
++static inline enum blk_zoned_model
++blk_queue_zoned_model(struct request_queue *q)
++{
++	return q->limits.zoned;
++}
++
++static inline bool blk_queue_is_zoned(struct request_queue *q)
++{
++	switch (blk_queue_zoned_model(q)) {
++	case BLK_ZONED_HA:
++	case BLK_ZONED_HM:
++		return true;
++	default:
++		return false;
++	}
++}
++
+ /*
+  * We regard a request as sync, if either a read or a sync write
+  */
+@@ -1354,6 +1381,26 @@ static inline unsigned int bdev_write_same(struct block_device *bdev)
+ 	return 0;
+ }
+ 
++static inline enum blk_zoned_model bdev_zoned_model(struct block_device *bdev)
++{
++	struct request_queue *q = bdev_get_queue(bdev);
++
++	if (q)
++		return blk_queue_zoned_model(q);
++
++	return BLK_ZONED_NONE;
++}
++
++static inline bool bdev_is_zoned(struct block_device *bdev)
++{
++	struct request_queue *q = bdev_get_queue(bdev);
++
++	if (q)
++		return blk_queue_is_zoned(q);
++
++	return false;
++}
++
+ static inline int queue_dma_alignment(struct request_queue *q)
+ {
+ 	return q ? q->dma_alignment : 511;
+-- 
+2.7.4
 
->
-> Check not only if stored block end is past clear block end but also if
-> stored block start is before clear block end.
->
-> Signed-off-by: Tomasz Majchrzak <tomasz.majchrzak@intel.com>
+Western Digital Corporation (and its subsidiaries) E-mail Confidentiality Notice & Disclaimer:
 
-Dan Williams seems to have taken responsibility for this code through
-his nvdimm tree, so I've added him to 'cc' in the hope that he looks at
-this (I wonder if he is even on linux-block ....)
-
-
-> ---
->  block/badblocks.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
->
-> diff --git a/block/badblocks.c b/block/badblocks.c
-> index 7be53cb..b2ffcc7 100644
-> --- a/block/badblocks.c
-> +++ b/block/badblocks.c
-> @@ -354,7 +354,8 @@ int badblocks_clear(struct badblocks *bb, sector_t s,=
- int sectors)
->  		 * current range.  Earlier ranges could also overlap,
->  		 * but only this one can overlap the end of the range.
->  		 */
-> -		if (BB_OFFSET(p[lo]) + BB_LEN(p[lo]) > target) {
-> +		if ((BB_OFFSET(p[lo]) + BB_LEN(p[lo]) > target) &&
-> +		    (BB_OFFSET(p[lo]) <=3D target)) {
-
-hmmm..
-'target' is the sector just beyond the set of sectors to remove from the
-list.
-BB_OFFSET(p[lo]) is the first sector in a range that was found in the
-list.
-If these are equal, then are aren't clearing anything in this range.
-So I would have '<', not '<=3D'.
-
-I don't think this makes the code wrong as we end up assigning to p[lo]
-the value that is already there.  But it might be confusing.
-
-
->  			/* Partial overlap, leave the tail of this range */
->  			int ack =3D BB_ACK(p[lo]);
->  			sector_t a =3D BB_OFFSET(p[lo]);
-> @@ -377,7 +378,8 @@ int badblocks_clear(struct badblocks *bb, sector_t s,=
- int sectors)
->  			lo--;
->  		}
->  		while (lo >=3D 0 &&
-> -		       BB_OFFSET(p[lo]) + BB_LEN(p[lo]) > s) {
-> +		       (BB_OFFSET(p[lo]) + BB_LEN(p[lo]) > s) &&
-> +		       (BB_OFFSET(p[lo]) <=3D target)) {
-
-Ditto.
-
-But the code is, I think, correct. Just not how I would have written it.
-So
-
- Acked-by: NeilBrown <neilb@suse.com>
-
-Thanks,
-NeilBrown
-
-
->  			/* This range does overlap */
->  			if (BB_OFFSET(p[lo]) < s) {
->  				/* Keep the early parts of this range. */
-> --=20
-> 1.8.3.1
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBCAAGBQJX9ymaAAoJEDnsnt1WYoG5cz0QAJVJOVRV56vKO79/2pO0PEkN
-+vLDk6fsSmZanV+p0oF4cr6XgjuULyYg4aySld3f72RgIw4rVu5gr89bHkxUzU9H
-XzdiEkvya3viv6cny1xbuZJVJS+VWksU+5bhhgPBFMDWegblKxfFZcGMhpejCW9X
-jBZBUxLXDK0uIw1Ea7Vi7vrG/CP+9FR1XoWMMI/nby4KAcTdmwApO0lMIsNYQmD7
-4g1KFKlHpa9EHXbW+m5J6E/k2z6Hg1BXQpoWi8O+FFhNVzx5XDRb1grFuQdLduE8
-h11a1vveSlk03x/m05t2g4dFjyABzmo/WyunPoIKGIxAfdqHKQcOf6GeIPwj84q9
-frBQQGaj8rGUBG099VUQ8WrTbep6YX3M/N/AL5ma3fGtLrZbEkPGQBDUsfJHwr2b
-lskBYyoPzSLqbSN1lR8+S1xJ1T5b/9es+s7n+OQ9s0HqxZVm5Vi8J3xgsuhQl89s
-rQuvG27JlBTHlW81VN+jDAOhDsELC4Cy8TMgrHhJTKSy1HA7xah4MNZoE3A9h4EI
-o9m5l2LvDaTpNCq95RqReOJvyxwxyBTMel5rhmUBBm0GnP2bIMYLOGKhwbbBOZu0
-3DObL0UIXVumM6UsANzbJsrSht0QTFA1qgHNv1zqNIeh8hIKjYI5WeuB41NWdH42
-RfRXNAeQYlgJCm49bVYV
-=QX7c
------END PGP SIGNATURE-----
---=-=-=--
+This e-mail and any files transmitted with it may contain confidential or legally privileged information of WDC and/or its affiliates, and are intended solely for the use of the individual or entity to which they are addressed. If you are not the intended recipient, any disclosure, copying, distribution or any action taken or omitted to be taken in reliance on it, is prohibited. If you have received this e-mail in error, please notify the sender immediately and delete the e-mail in its entirety from your system.
