@@ -1,39 +1,73 @@
-Return-Path: <BATV+31c1bd2ad9e9d76aef3a+4812+infradead.org+hch@bombadil.srs.infradead.org>
-Date: Wed, 26 Oct 2016 14:50:52 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Mikulas Patocka <mpatocka@redhat.com>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-	Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	dm-devel@redhat.com, "Alasdair G. Kergon" <agk@redhat.com>,
-	Mike Snitzer <snitzer@redhat.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>
-Subject: REQ_OP for zeroing, was Re: [dm-devel] [PATCH 1/4] brd: handle
- misaligned discard
-Message-ID: <20161026215052.GA11679@infradead.org>
-References: <20161021200022.GA12580@redhat.com>
- <alpine.LRH.2.02.1610211616450.31606@file01.intranet.prod.int.rdu2.redhat.com>
- <20161024155756.GA48306@redhat.com>
- <20161025130712.GA12717@infradead.org>
- <20161025143719.GA51266@redhat.com>
- <710b07a3-9091-6935-37c4-ea1dcedcab4f@kernel.dk>
- <alpine.LRH.2.02.1610261624100.12287@file01.intranet.prod.int.rdu2.redhat.com>
- <alpine.LRH.2.02.1610261625580.12287@file01.intranet.prod.int.rdu2.redhat.com>
- <338b76f0-40d1-904f-66e0-f6455c5287e7@sandisk.com>
- <alpine.LRH.2.02.1610261733190.25893@file01.intranet.prod.int.rdu2.redhat.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:51644 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751294AbcJIVb3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 9 Oct 2016 17:31:29 -0400
+Date: Sun, 9 Oct 2016 23:31:25 +0200
+From: Alexander Gordeev <agordeev@redhat.com>
+To: Sagi Grimberg <sagi@grimberg.me>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: [PATCH v3 7/8] blk-mq: Pair blk_mq_hctx_kobj_init() with
+ blk_mq_hctx_kobj_put()
+Message-ID: <20161009213125.GB21398@dhcp-27-118.brq.redhat.com>
+References: <cover.1475241231.git.agordeev@redhat.com>
+ <ae5b727341240a974b6b2cbd91b98eb85f9aef53.1475241231.git.agordeev@redhat.com>
+ <854ffaab-7021-036f-7684-bf33edc59799@grimberg.me>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <alpine.LRH.2.02.1610261733190.25893@file01.intranet.prod.int.rdu2.redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <854ffaab-7021-036f-7684-bf33edc59799@grimberg.me>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Wed, Oct 26, 2016 at 05:46:11PM -0400, Mikulas Patocka wrote:
-> I think the proper thing would be to move "discard_zeroes_data" flag into 
-> the bio itself - there would be REQ_OP_DISCARD and REQ_OP_DISCARD_ZERO - 
-> and if the device doesn't support REQ_OP_DISCARD_ZERO, it rejects the bio 
-> and the caller is supposed to do zeroing manually.
+CC: linux-block@vger.kernel.org
+Signed-off-by: Alexander Gordeev <agordeev@redhat.com>
+---
+ block/blk-mq-sysfs.c | 5 +++++
+ block/blk-mq.c       | 2 +-
+ block/blk-mq.h       | 1 +
+ 3 files changed, 7 insertions(+), 1 deletion(-)
 
-Yes, Martin and I have come to a similar conclusion recently.  An
-additional aspect is that NVMe has a Write Zeroes command which is more
-limited than what REQ_OP_WRITE_SAME does.
+diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
+index 01fb455..11846d0 100644
+--- a/block/blk-mq-sysfs.c
++++ b/block/blk-mq-sysfs.c
+@@ -429,6 +429,11 @@ void blk_mq_hctx_kobj_init(struct blk_mq_hw_ctx *hctx)
+ 	kobject_init(&hctx->kobj, &blk_mq_hw_ktype);
+ }
+ 
++void blk_mq_hctx_kobj_put(struct blk_mq_hw_ctx *hctx)
++{
++	kobject_put(&hctx->kobj);
++}
++
+ static void blk_mq_sysfs_init(struct request_queue *q)
+ {
+ 	struct blk_mq_ctx *ctx;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index d2c11fc..53f8663 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1928,7 +1928,7 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
+ 			continue;
+ 
+ 		hctxs[j] = NULL;
+-		kobject_put(&hctx->kobj);
++		blk_mq_hctx_kobj_put(hctx);
+ 
+ 		if (hctx->tags) {
+ 			blk_mq_free_rq_map(set, hctx->tags, j);
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index e5d2524..3d53818 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -53,6 +53,7 @@ static inline struct blk_mq_hw_ctx *blk_mq_map_queue(struct request_queue *q,
+ extern int blk_mq_sysfs_register(struct request_queue *q);
+ extern void blk_mq_sysfs_unregister(struct request_queue *q);
+ extern void blk_mq_hctx_kobj_init(struct blk_mq_hw_ctx *hctx);
++extern void blk_mq_hctx_kobj_put(struct blk_mq_hw_ctx *hctx);
+ 
+ extern void blk_mq_rq_timed_out(struct request *req, bool reserved);
+ 
+-- 
+1.8.3.1
 
-So I think the right way is to add a REQ_OP_WRITE_ZEROES (or
-REQ_OP_ZERO) and have modifies if it may discard or not.
