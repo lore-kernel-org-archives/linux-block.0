@@ -1,62 +1,228 @@
-Return-Path: <jthumshirn@suse.de>
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: "Martin K . Petersen" <martin.petersen@oracle.com>
-Cc: Christoph Hellwig <hch@infradead.org>,
-	Hannes Reinecke <hare@suse.de>,
-	Linux Kernel Mailinglist <linux-kernel@vger.kernel.org>,
-	Linux SCSI Mailinglist <linux-scsi@vger.kernel.org>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org (open list:BLOCK LAYER)
-Subject: [PATCH v2 16/16] block: unexport bsg_softirq_done() again
-Date: Wed, 12 Oct 2016 15:06:42 +0200
-Message-Id: <992fceabad26e146a728e8c80694ccb856182dc5.1476276823.git.jthumshirn@suse.de>
-In-Reply-To: <cover.1476276823.git.jthumshirn@suse.de>
-References: <cover.1476276823.git.jthumshirn@suse.de>
-In-Reply-To: <cover.1476276823.git.jthumshirn@suse.de>
-References: <cover.1476276823.git.jthumshirn@suse.de>
+Return-Path: <Adam.Manzanares@hgst.com>
+From: Adam Manzanares <adam.manzanares@hgst.com>
+To: <axboe@kernel.dk>, <tj@kernel.org>
+CC: <linux-block@vger.kernel.org>, <linux-ide@vger.kernel.org>, "Adam
+ Manzanares" <adam.manzanares@hgst.com>
+Subject: [PATCH v3 2/2] ata: Enabling ATA Command Priorities
+Date: Tue, 11 Oct 2016 13:40:27 -0700
+Message-ID: <1476218427-4021-3-git-send-email-adam.manzanares@hgst.com>
+In-Reply-To: <1476218427-4021-1-git-send-email-adam.manzanares@hgst.com>
+References: <1476218427-4021-1-git-send-email-adam.manzanares@hgst.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Return-Path: adam.manzanares@hgst.com
 List-ID: <linux-block@vger.kernel.org>
 
-Unexport bsg_softirq_done() again, we don't need it outside of bsg-lib.c
-anymore now that scsi_transport_fc is a pure bsg-lib client.
+This patch checks to see if an ATA device supports NCQ command priorities.
+If so and the user has specified an iocontext that indicates IO_PRIO_CLASS_RT
+and also enables request priorities in the block queue then we build a tf
+with a high priority command.
 
-Signed-off-by: Johannes Thumshirn <jthumshirn@suse.de>
+This patch depends on patch block-Add-iocontext-priority-to-request
+
+Signed-off-by: Adam Manzanares <adam.manzanares@hgst.com>
 ---
- block/bsg-lib.c         | 3 +--
- include/linux/bsg-lib.h | 1 -
- 2 files changed, 1 insertion(+), 3 deletions(-)
+ drivers/ata/libata-core.c | 35 ++++++++++++++++++++++++++++++++++-
+ drivers/ata/libata-scsi.c | 10 +++++++++-
+ drivers/ata/libata.h      |  2 +-
+ include/linux/ata.h       |  6 ++++++
+ include/linux/libata.h    | 18 ++++++++++++++++++
+ 5 files changed, 68 insertions(+), 3 deletions(-)
 
-diff --git a/block/bsg-lib.c b/block/bsg-lib.c
-index 46a4fee..4ac0ade 100644
---- a/block/bsg-lib.c
-+++ b/block/bsg-lib.c
-@@ -93,14 +93,13 @@ EXPORT_SYMBOL_GPL(bsg_job_done);
-  * bsg_softirq_done - softirq done routine for destroying the bsg requests
-  * @rq: BSG request that holds the job to be destroyed
+diff --git a/drivers/ata/libata-core.c b/drivers/ata/libata-core.c
+index 223a770..181b530 100644
+--- a/drivers/ata/libata-core.c
++++ b/drivers/ata/libata-core.c
+@@ -739,6 +739,7 @@ u64 ata_tf_read_block(const struct ata_taskfile *tf, struct ata_device *dev)
+  *	@n_block: Number of blocks
+  *	@tf_flags: RW/FUA etc...
+  *	@tag: tag
++ *	@class: IO priority class
+  *
+  *	LOCKING:
+  *	None.
+@@ -753,7 +754,7 @@ u64 ata_tf_read_block(const struct ata_taskfile *tf, struct ata_device *dev)
   */
--void bsg_softirq_done(struct request *rq)
-+static void bsg_softirq_done(struct request *rq)
+ int ata_build_rw_tf(struct ata_taskfile *tf, struct ata_device *dev,
+ 		    u64 block, u32 n_block, unsigned int tf_flags,
+-		    unsigned int tag)
++		    unsigned int tag, int class)
  {
- 	struct bsg_job *job = rq->special;
+ 	tf->flags |= ATA_TFLAG_ISADDR | ATA_TFLAG_DEVICE;
+ 	tf->flags |= tf_flags;
+@@ -785,6 +786,12 @@ int ata_build_rw_tf(struct ata_taskfile *tf, struct ata_device *dev,
+ 		tf->device = ATA_LBA;
+ 		if (tf->flags & ATA_TFLAG_FUA)
+ 			tf->device |= 1 << 7;
++
++		if (ata_ncq_prio_enabled(dev)) {
++			if (class == IOPRIO_CLASS_RT)
++				tf->hob_nsect |= ATA_PRIO_HIGH <<
++						 ATA_SHIFT_PRIO;
++		}
+ 	} else if (dev->flags & ATA_DFLAG_LBA) {
+ 		tf->flags |= ATA_TFLAG_LBA;
  
- 	blk_end_request_all(rq, rq->errors);
- 	bsg_job_put(job);
+@@ -2156,6 +2163,30 @@ static void ata_dev_config_ncq_non_data(struct ata_device *dev)
+ 	}
  }
--EXPORT_SYMBOL_GPL(bsg_softirq_done);
  
- static int bsg_map_buffer(struct bsg_buffer *buf, struct request *req)
++static void ata_dev_config_ncq_prio(struct ata_device *dev)
++{
++	struct ata_port *ap = dev->link->ap;
++	unsigned int err_mask;
++
++	err_mask = ata_read_log_page(dev,
++				     ATA_LOG_SATA_ID_DEV_DATA,
++				     ATA_LOG_SATA_SETTINGS,
++				     ap->sector_buf,
++				     1);
++	if (err_mask) {
++		ata_dev_dbg(dev,
++			    "failed to get Identify Device data, Emask 0x%x\n",
++			    err_mask);
++		return;
++	}
++
++	if (ap->sector_buf[ATA_LOG_NCQ_PRIO_OFFSET] & BIT(3))
++		dev->flags |= ATA_DFLAG_NCQ_PRIO;
++	else
++		ata_dev_dbg(dev, "SATA page does not support priority\n");
++
++}
++
+ static int ata_dev_config_ncq(struct ata_device *dev,
+ 			       char *desc, size_t desc_sz)
  {
-diff --git a/include/linux/bsg-lib.h b/include/linux/bsg-lib.h
-index b708db9..657a718 100644
---- a/include/linux/bsg-lib.h
-+++ b/include/linux/bsg-lib.h
-@@ -69,7 +69,6 @@ void bsg_job_done(struct bsg_job *job, int result,
- int bsg_setup_queue(struct device *dev, struct request_queue *q, char *name,
- 		    bsg_job_fn *job_fn, int dd_job_size);
- void bsg_request_fn(struct request_queue *q);
--void bsg_softirq_done(struct request *rq);
- void bsg_job_put(struct bsg_job *job);
- int __must_check bsg_job_get(struct bsg_job *job);
+@@ -2205,6 +2236,8 @@ static int ata_dev_config_ncq(struct ata_device *dev,
+ 			ata_dev_config_ncq_send_recv(dev);
+ 		if (ata_id_has_ncq_non_data(dev->id))
+ 			ata_dev_config_ncq_non_data(dev);
++		if (ata_id_has_ncq_prio(dev->id))
++			ata_dev_config_ncq_prio(dev);
+ 	}
  
+ 	return 0;
+diff --git a/drivers/ata/libata-scsi.c b/drivers/ata/libata-scsi.c
+index e207b33..4304694 100644
+--- a/drivers/ata/libata-scsi.c
++++ b/drivers/ata/libata-scsi.c
+@@ -50,6 +50,7 @@
+ #include <linux/uaccess.h>
+ #include <linux/suspend.h>
+ #include <asm/unaligned.h>
++#include <linux/ioprio.h>
+ 
+ #include "libata.h"
+ #include "libata-transport.h"
+@@ -1757,6 +1758,8 @@ static unsigned int ata_scsi_rw_xlat(struct ata_queued_cmd *qc)
+ {
+ 	struct scsi_cmnd *scmd = qc->scsicmd;
+ 	const u8 *cdb = scmd->cmnd;
++	struct request *rq = scmd->request;
++	int class = 0;
+ 	unsigned int tf_flags = 0;
+ 	u64 block;
+ 	u32 n_block;
+@@ -1822,8 +1825,13 @@ static unsigned int ata_scsi_rw_xlat(struct ata_queued_cmd *qc)
+ 	qc->flags |= ATA_QCFLAG_IO;
+ 	qc->nbytes = n_block * scmd->device->sector_size;
+ 
++	/* If queue supports req prio pass it onto the task file */
++	if (blk_queue_rq_ioc_prio(rq->q))
++		class = IOPRIO_PRIO_CLASS(req_get_ioprio(rq));
++
+ 	rc = ata_build_rw_tf(&qc->tf, qc->dev, block, n_block, tf_flags,
+-			     qc->tag);
++			     qc->tag, class);
++
+ 	if (likely(rc == 0))
+ 		return 0;
+ 
+diff --git a/drivers/ata/libata.h b/drivers/ata/libata.h
+index 3b301a4..8f3a559 100644
+--- a/drivers/ata/libata.h
++++ b/drivers/ata/libata.h
+@@ -66,7 +66,7 @@ extern u64 ata_tf_to_lba48(const struct ata_taskfile *tf);
+ extern struct ata_queued_cmd *ata_qc_new_init(struct ata_device *dev, int tag);
+ extern int ata_build_rw_tf(struct ata_taskfile *tf, struct ata_device *dev,
+ 			   u64 block, u32 n_block, unsigned int tf_flags,
+-			   unsigned int tag);
++			   unsigned int tag, int class);
+ extern u64 ata_tf_read_block(const struct ata_taskfile *tf,
+ 			     struct ata_device *dev);
+ extern unsigned ata_exec_internal(struct ata_device *dev,
+diff --git a/include/linux/ata.h b/include/linux/ata.h
+index adbc812..ebe4c3b 100644
+--- a/include/linux/ata.h
++++ b/include/linux/ata.h
+@@ -347,6 +347,7 @@ enum {
+ 	ATA_LOG_DEVSLP_DETO	  = 0x01,
+ 	ATA_LOG_DEVSLP_VALID	  = 0x07,
+ 	ATA_LOG_DEVSLP_VALID_MASK = 0x80,
++	ATA_LOG_NCQ_PRIO_OFFSET   = 0x09,
+ 
+ 	/* NCQ send and receive log */
+ 	ATA_LOG_NCQ_SEND_RECV_SUBCMDS_OFFSET	= 0x00,
+@@ -897,6 +898,11 @@ static inline bool ata_id_has_ncq_non_data(const u16 *id)
+ 	return id[ATA_ID_SATA_CAPABILITY_2] & BIT(5);
+ }
+ 
++static inline bool ata_id_has_ncq_prio(const u16 *id)
++{
++	return id[ATA_ID_SATA_CAPABILITY] & BIT(12);
++}
++
+ static inline bool ata_id_has_trim(const u16 *id)
+ {
+ 	if (ata_id_major_version(id) >= 7 &&
+diff --git a/include/linux/libata.h b/include/linux/libata.h
+index e37d4f9..244f261 100644
+--- a/include/linux/libata.h
++++ b/include/linux/libata.h
+@@ -165,6 +165,7 @@ enum {
+ 	ATA_DFLAG_NO_UNLOAD	= (1 << 17), /* device doesn't support unload */
+ 	ATA_DFLAG_UNLOCK_HPA	= (1 << 18), /* unlock HPA */
+ 	ATA_DFLAG_NCQ_SEND_RECV = (1 << 19), /* device supports NCQ SEND and RECV */
++	ATA_DFLAG_NCQ_PRIO	= (1 << 20), /* device supports NCQ priority */
+ 	ATA_DFLAG_INIT_MASK	= (1 << 24) - 1,
+ 
+ 	ATA_DFLAG_DETACH	= (1 << 24),
+@@ -341,7 +342,9 @@ enum {
+ 	ATA_SHIFT_PIO		= 0,
+ 	ATA_SHIFT_MWDMA		= ATA_SHIFT_PIO + ATA_NR_PIO_MODES,
+ 	ATA_SHIFT_UDMA		= ATA_SHIFT_MWDMA + ATA_NR_MWDMA_MODES,
++	ATA_SHIFT_PRIO		= 6,
+ 
++	ATA_PRIO_HIGH		= 2,
+ 	/* size of buffer to pad xfers ending on unaligned boundaries */
+ 	ATA_DMA_PAD_SZ		= 4,
+ 
+@@ -1609,6 +1612,21 @@ static inline int ata_ncq_enabled(struct ata_device *dev)
+ 			      ATA_DFLAG_NCQ)) == ATA_DFLAG_NCQ;
+ }
+ 
++/**
++ *	ata_ncq_prio_enabled - Test whether NCQ prio is enabled
++ *	@dev: ATA device to test for
++ *
++ *	LOCKING:
++ *	spin_lock_irqsave(host lock)
++ *
++ *	RETURNS:
++ *	1 if NCQ prio is enabled for @dev, 0 otherwise.
++ */
++static inline int ata_ncq_prio_enabled(struct ata_device *dev)
++{
++	return (dev->flags & ATA_DFLAG_NCQ_PRIO) == ATA_DFLAG_NCQ_PRIO;
++}
++
+ static inline bool ata_fpdma_dsm_supported(struct ata_device *dev)
+ {
+ 	return (dev->flags & ATA_DFLAG_NCQ_SEND_RECV) &&
 -- 
-1.8.5.6
+2.1.4
+
+Western Digital Corporation (and its subsidiaries) E-mail Confidentiality Notice & Disclaimer:
+
+This e-mail and any files transmitted with it may contain confidential or legally privileged information of WDC and/or its affiliates, and are intended solely for the use of the individual or entity to which they are addressed. If you are not the intended recipient, any disclosure, copying, distribution or any action taken or omitted to be taken in reliance on it, is prohibited. If you have received this e-mail in error, please notify the sender immediately and delete the e-mail in its entirety from your system.
