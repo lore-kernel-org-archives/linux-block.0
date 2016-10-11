@@ -1,89 +1,66 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f194.google.com ([209.85.192.194]:35364 "EHLO
-        mail-pf0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S934345AbcJ2IP3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sat, 29 Oct 2016 04:15:29 -0400
-From: Ming Lei <tom.leiming@gmail.com>
-To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Ming Lei <tom.leiming@gmail.com>,
-        Mike Christie <mchristi@redhat.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Keith Busch <keith.busch@intel.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        Bart Van Assche <bart.vanassche@sandisk.com>
-Subject: [PATCH 45/60] block: bio: introduce bio_for_each_segment_all_rd() and its write pair
-Date: Sat, 29 Oct 2016 16:08:44 +0800
-Message-Id: <1477728600-12938-46-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
-References: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <Adam.Manzanares@hgst.com>
+From: Adam Manzanares <adam.manzanares@hgst.com>
+To: <axboe@kernel.dk>, <tj@kernel.org>
+CC: <linux-block@vger.kernel.org>, <linux-ide@vger.kernel.org>, Adam
+ Manzanares <adam.manzanares@hgst.com>
+Subject: [PATCH v3 0/2] Enabling ATA Command Priorities
+Date: Tue, 11 Oct 2016 13:40:25 -0700
+Message-ID: <1476218427-4021-1-git-send-email-adam.manzanares@hgst.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Return-Path: adam.manzanares@hgst.com
+List-ID: <linux-block@vger.kernel.org>
 
-This patches introduce bio_for_each_segment_all_rd() and
-bio_for_each_segment_all_wt().
+This patch builds ATA commands with high priority if the iocontext
+of a process is set to real time. The goal of the patch is to
+improve tail latencies of workloads that use higher queue depths.
 
-bio_for_each_segment_all_rd() is for replacing
-bio_for_each_segment_all() in case the bvec from bio->bi_io_vec
-is accessed as readonly.
+This patch has been tested with an Ultrastar HE8 HDD and cuts the 
+the p99.99 tail latency of foreground IO from 2s down to 72ms when
+using the deadline scheduler. This patch works independently of the
+scheduler so it can be used with all of the currently available 
+request based schedulers. 
 
-bio_for_each_segment_all_wt() is for replacing
-bio_for_each_segment_all() in case the bvec from bio->bi_io_vec
-need to be updated.
+Foreground IO, for the previously described results, is an async fio job 
+submitting 4K read requests at a QD of 1 to the HDD. The foreground IO is set 
+with the iopriority class of real time. The background workload is another fio
+job submitting read requests at a QD of 32 to the same HDD with default 
+iopriority.
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
----
- include/linux/bio.h       | 15 +++++++++++++++
- include/linux/blk_types.h |  6 ++++++
- 2 files changed, 21 insertions(+)
+This feature is enabled by setting a queue flag that is exposed as a sysfs
+entry named rq_ioc_prio. If this feature is enabled, and the submission 
+iocontext exists, and the bio_prio is not valid then the request ioprio is
+set to the iocontext prio.
 
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index ec1c0f2aaa19..f8a025ffaa9c 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -215,6 +215,21 @@ static inline void bio_advance_iter_mp(struct bio *bio, struct bvec_iter *iter,
- #define bio_for_each_segment_mp(bvl, bio, iter)				\
- 	__bio_for_each_segment_mp(bvl, bio, iter, (bio)->bi_iter)
- 
-+/* the bio has to be singlepage bvecs based */
-+#define bio_for_each_segment_all_wt(bvl, bio, i)                       \
-+	bio_for_each_segment_all((bvl), (bio), (i))
-+
-+/*
-+ * This helper returns singlepage bvec to caller for readonly
-+ * purpose, and the caller can _not_ change the bvec stored in
-+ * bio->bi_io_vec[] via this helper.
-+ */
-+#define bio_for_each_segment_all_rd(bvl, bio, i, bi)			\
-+	for ((bi).iter = BVEC_ITER_ALL_INIT, i = 0, bvl = &(bi).bv;	\
-+	     (bi).iter.bi_idx < (bio)->bi_vcnt &&			\
-+		(((bi).bv = bio_iter_iovec((bio), (bi).iter)), 1);	\
-+	     bio_advance_iter((bio), &(bi).iter, (bi).bv.bv_len), i++)
-+
- #define bio_iter_last(bvec, iter) ((iter).bi_size == (bvec).bv_len)
- 
- static inline unsigned __bio_segments(struct bio *bio, bool mp)
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index cd395ecec99d..b4a202e98016 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -108,6 +108,12 @@ struct bio {
- 
- #define BIO_RESET_BYTES		offsetof(struct bio, bi_max_vecs)
- 
-+/* this iter is only for implementing bio_for_each_segment_rd() */
-+struct bvec_iter_all {
-+	struct bvec_iter	iter;
-+	struct bio_vec		bv;      /* in-flight singlepage bvec */
-+};
-+
- /*
-  * bio flags
-  */
+v3:
+ - Removed null dereference issue in blk-core
+ - Renamed queue sysfs entries for clarity
+ - Added documentation for sysfs queue entry
+
+v2:
+ - Add queue flag to set iopriority going to the request
+ - If queue flag set, send iopriority class to ata_build_rw_tf
+ - Remove redundant code in ata_ncq_prio_enabled function.
+
+
+Adam Manzanares (2):
+  block: Add iocontext priority to request
+  ata: Enabling ATA Command Priorities
+
+ Documentation/block/queue-sysfs.txt | 12 ++++++++++++
+ block/blk-core.c                    |  5 +++++
+ block/blk-sysfs.c                   | 32 ++++++++++++++++++++++++++++++++
+ drivers/ata/libata-core.c           | 35 ++++++++++++++++++++++++++++++++++-
+ drivers/ata/libata-scsi.c           | 10 +++++++++-
+ drivers/ata/libata.h                |  2 +-
+ include/linux/ata.h                 |  6 ++++++
+ include/linux/blkdev.h              |  3 +++
+ include/linux/libata.h              | 18 ++++++++++++++++++
+ 9 files changed, 120 insertions(+), 3 deletions(-)
+
 -- 
-2.7.4
+2.1.4
 
+Western Digital Corporation (and its subsidiaries) E-mail Confidentiality Notice & Disclaimer:
+
+This e-mail and any files transmitted with it may contain confidential or legally privileged information of WDC and/or its affiliates, and are intended solely for the use of the individual or entity to which they are addressed. If you are not the intended recipient, any disclosure, copying, distribution or any action taken or omitted to be taken in reliance on it, is prohibited. If you have received this e-mail in error, please notify the sender immediately and delete the e-mail in its entirety from your system.
