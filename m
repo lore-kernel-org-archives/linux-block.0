@@ -1,23 +1,81 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f41.google.com ([74.125.82.41]:35004 "EHLO
-        mail-wm0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752145AbcJEViu (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Oct 2016 17:38:50 -0400
-Subject: Re: [PATCH v2 3/8] blk-mq: Fix hardware context data node selection
-To: Alexander Gordeev <agordeev@redhat.com>,
-        linux-kernel@vger.kernel.org
-References: <cover.1475241231.git.agordeev@redhat.com>
- <326a467ee21f2324c9161f7f814a3ed9780dc767.1475241231.git.agordeev@redhat.com>
-Cc: linux-block@vger.kernel.org
-From: Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <c1082a1c-dc70-4d97-24ce-d1398557a403@grimberg.me>
-Date: Thu, 6 Oct 2016 00:38:46 +0300
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Date: Wed, 12 Oct 2016 00:47:26 +0300
+From: "Kirill A. Shutemov" <kirill@shutemov.name>
+To: Jan Kara <jack@suse.cz>
+Cc: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCHv3 12/41] thp: handle write-protection faults for file THP
+Message-ID: <20161011214726.GB27110@node.shutemov.name>
+References: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
+ <20160915115523.29737-13-kirill.shutemov@linux.intel.com>
+ <20161011154750.GL6952@quack2.suse.cz>
 MIME-Version: 1.0
-In-Reply-To: <326a467ee21f2324c9161f7f814a3ed9780dc767.1475241231.git.agordeev@redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20161011154750.GL6952@quack2.suse.cz>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Looks fine,
+On Tue, Oct 11, 2016 at 05:47:50PM +0200, Jan Kara wrote:
+> On Thu 15-09-16 14:54:54, Kirill A. Shutemov wrote:
+> > For filesystems that wants to be write-notified (has mkwrite), we will
+> > encount write-protection faults for huge PMDs in shared mappings.
+> > 
+> > The easiest way to handle them is to clear the PMD and let it refault as
+> > wriable.
+> > 
+> > Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+> > ---
+> >  mm/memory.c | 11 ++++++++++-
+> >  1 file changed, 10 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/mm/memory.c b/mm/memory.c
+> > index 83be99d9d8a1..aad8d5c6311f 100644
+> > --- a/mm/memory.c
+> > +++ b/mm/memory.c
+> > @@ -3451,8 +3451,17 @@ static int wp_huge_pmd(struct fault_env *fe, pmd_t orig_pmd)
+> >  		return fe->vma->vm_ops->pmd_fault(fe->vma, fe->address, fe->pmd,
+> >  				fe->flags);
+> >  
+> > +	if (fe->vma->vm_flags & VM_SHARED) {
+> > +		/* Clear PMD */
+> > +		zap_page_range_single(fe->vma, fe->address,
+> > +				HPAGE_PMD_SIZE, NULL);
+> > +		VM_BUG_ON(!pmd_none(*fe->pmd));
+> > +
+> > +		/* Refault to establish writable PMD */
+> > +		return 0;
+> > +	}
+> > +
+> 
+> Since we want to write-protect the page table entry on each page writeback
+> and write-enable then on the next write, this is relatively expensive.
+> Would it be that complicated to handle this fully in ->pmd_fault handler
+> like we do for DAX?
+> 
+> Maybe it doesn't have to be done now but longer term I guess it might make
+> sense.
 
-Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+Right. This approach is just simplier to implement. We can rework it if it
+will show up on traces.
+
+> Otherwise the patch looks good so feel free to add:
+> 
+> Reviewed-by: Jan Kara <jack@suse.cz>
+
+Thanks!
+
+-- 
+ Kirill A. Shutemov
