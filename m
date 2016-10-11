@@ -1,9 +1,8 @@
 Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-Date: Wed, 12 Oct 2016 00:43:53 +0300
-From: "Kirill A. Shutemov" <kirill@shutemov.name>
-To: Jan Kara <jack@suse.cz>
-Cc: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        Theodore Ts'o <tytso@mit.edu>,
+Date: Tue, 11 Oct 2016 17:40:31 +0200
+From: Jan Kara <jack@suse.cz>
+To: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Cc: Theodore Ts'o <tytso@mit.edu>,
         Andreas Dilger <adilger.kernel@dilger.ca>,
         Jan Kara <jack@suse.com>,
         Andrew Morton <akpm@linux-foundation.org>,
@@ -19,56 +18,54 @@ Cc: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
         linux-block@vger.kernel.org
 Subject: Re: [PATCHv3 11/41] thp: try to free page's buffers before attempt
  split
-Message-ID: <20161011214353.GA27110@node.shutemov.name>
+Message-ID: <20161011154031.GK6952@quack2.suse.cz>
 References: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
  <20160915115523.29737-12-kirill.shutemov@linux.intel.com>
- <20161011154031.GK6952@quack2.suse.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20161011154031.GK6952@quack2.suse.cz>
+In-Reply-To: <20160915115523.29737-12-kirill.shutemov@linux.intel.com>
 Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Oct 11, 2016 at 05:40:31PM +0200, Jan Kara wrote:
-> On Thu 15-09-16 14:54:53, Kirill A. Shutemov wrote:
-> > We want page to be isolated from the rest of the system before spliting
-> > it. We rely on page count to be 2 for file pages to make sure nobody
-> > uses the page: one pin to caller, one to radix-tree.
-> > 
-> > Filesystems with backing storage can have page count increased if it has
-> > buffers.
-> > 
-> > Let's try to free them, before attempt split. And remove one guarding
-> > VM_BUG_ON_PAGE().
-> > 
-> > Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
-> ...
-> > @@ -2041,6 +2041,23 @@ int split_huge_page_to_list(struct page *page, struct list_head *list)
-> >  			goto out;
-> >  		}
-> >  
-> > +		/* Try to free buffers before attempt split */
-> > +		if (!PageSwapBacked(head) && PagePrivate(page)) {
-> > +			/*
-> > +			 * We cannot trigger writeback from here due possible
-> > +			 * recursion if triggered from vmscan, only wait.
-> > +			 *
-> > +			 * Caller can trigger writeback it on its own, if safe.
-> > +			 */
-> > +			wait_on_page_writeback(head);
-> > +
-> > +			if (page_has_buffers(head) &&
-> > +					!try_to_free_buffers(head)) {
-> > +				ret = -EBUSY;
-> > +				goto out;
-> > +			}
+On Thu 15-09-16 14:54:53, Kirill A. Shutemov wrote:
+> We want page to be isolated from the rest of the system before spliting
+> it. We rely on page count to be 2 for file pages to make sure nobody
+> uses the page: one pin to caller, one to radix-tree.
 > 
-> Shouldn't you rather use try_to_release_page() here? Because filesystems
-> have their ->releasepage() callbacks for freeing data associated with a
-> page. It is not guaranteed page private data are buffers although it is
-> true for ext4...
+> Filesystems with backing storage can have page count increased if it has
+> buffers.
+> 
+> Let's try to free them, before attempt split. And remove one guarding
+> VM_BUG_ON_PAGE().
+> 
+> Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+...
+> @@ -2041,6 +2041,23 @@ int split_huge_page_to_list(struct page *page, struct list_head *list)
+>  			goto out;
+>  		}
+>  
+> +		/* Try to free buffers before attempt split */
+> +		if (!PageSwapBacked(head) && PagePrivate(page)) {
+> +			/*
+> +			 * We cannot trigger writeback from here due possible
+> +			 * recursion if triggered from vmscan, only wait.
+> +			 *
+> +			 * Caller can trigger writeback it on its own, if safe.
+> +			 */
+> +			wait_on_page_writeback(head);
+> +
+> +			if (page_has_buffers(head) &&
+> +					!try_to_free_buffers(head)) {
+> +				ret = -EBUSY;
+> +				goto out;
+> +			}
 
-Fair enough. Will fix this.
+Shouldn't you rather use try_to_release_page() here? Because filesystems
+have their ->releasepage() callbacks for freeing data associated with a
+page. It is not guaranteed page private data are buffers although it is
+true for ext4...
 
+								Honza
 -- 
- Kirill A. Shutemov
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
