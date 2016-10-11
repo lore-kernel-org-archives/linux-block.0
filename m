@@ -1,39 +1,60 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-Subject: Re: [PATCH v2 7/7] [RFC] nvme: Fix a race condition
-To: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Jens Axboe <axboe@fb.com>
-References: <f153ee47-e599-c333-92b0-d5da475012f3@sandisk.com>
- <ff412bfb-548c-c4fc-5180-78ede8a19ef2@sandisk.com>
-Cc: Christoph Hellwig <hch@lst.de>,
-        James Bottomley <jejb@linux.vnet.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Doug Ledford <dledford@redhat.com>,
-        Keith Busch <keith.busch@intel.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-From: Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <08fab9f6-f928-4cec-b616-317a52361557@grimberg.me>
-Date: Wed, 5 Oct 2016 20:40:24 +0300
-MIME-Version: 1.0
-In-Reply-To: <ff412bfb-548c-c4fc-5180-78ede8a19ef2@sandisk.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Sender: linux-scsi-owner@vger.kernel.org
+Return-Path: <jthumshirn@suse.de>
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: "Martin K . Petersen" <martin.petersen@oracle.com>
+Cc: Christoph Hellwig <hch@infradead.org>,
+	Hannes Reinecke <hare@suse.de>,
+	Linux Kernel Mailinglist <linux-kernel@vger.kernel.org>,
+	Linux SCSI Mailinglist <linux-scsi@vger.kernel.org>,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org (open list:BLOCK LAYER)
+Subject: [PATCH 39/44] block: export bsg_softirq_done
+Date: Tue, 11 Oct 2016 13:29:10 +0200
+Message-Id: <848f22701f408fd0625dd941b4993df06b227a72.1476180827.git.jthumshirn@suse.de>
+In-Reply-To: <cover.1476180827.git.jthumshirn@suse.de>
+References: <cover.1476180827.git.jthumshirn@suse.de>
+In-Reply-To: <cover.1476180827.git.jthumshirn@suse.de>
+References: <cover.1476180827.git.jthumshirn@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
+Export bsg_softirq_done so it can be used by clients of bsg-lib.
 
-> Avoid that nvme_queue_rq() is still running when nvme_stop_queues()
-> returns. Untested.
->
-> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-> Cc: Keith Busch <keith.busch@intel.com>
-> Cc: Christoph Hellwig <hch@lst.de>
-> Cc: Sagi Grimberg <sagi@grimberg.me>
+Signed-off-by: Johannes Thumshirn <jthumshirn@suse.de>
+---
+ block/bsg-lib.c         | 3 ++-
+ include/linux/bsg-lib.h | 1 +
+ 2 files changed, 3 insertions(+), 1 deletion(-)
 
-Bart this looks really good! and possibly fixes an issue
-I've been chasing with fabrics a while ago. I'll take it
-for testing but you can add my:
-
-Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+diff --git a/block/bsg-lib.c b/block/bsg-lib.c
+index 6b99c7f..5d24d25 100644
+--- a/block/bsg-lib.c
++++ b/block/bsg-lib.c
+@@ -82,13 +82,14 @@ EXPORT_SYMBOL_GPL(bsg_job_done);
+  * bsg_softirq_done - softirq done routine for destroying the bsg requests
+  * @rq: BSG request that holds the job to be destroyed
+  */
+-static void bsg_softirq_done(struct request *rq)
++void bsg_softirq_done(struct request *rq)
+ {
+ 	struct bsg_job *job = rq->special;
+ 
+ 	blk_end_request_all(rq, rq->errors);
+ 	kref_put(&job->kref, bsg_destroy_job);
+ }
++EXPORT_SYMBOL_GPL(bsg_softirq_done);
+ 
+ static int bsg_map_buffer(struct bsg_buffer *buf, struct request *req)
+ {
+diff --git a/include/linux/bsg-lib.h b/include/linux/bsg-lib.h
+index 67f7de6..09f3044 100644
+--- a/include/linux/bsg-lib.h
++++ b/include/linux/bsg-lib.h
+@@ -70,5 +70,6 @@ int bsg_setup_queue(struct device *dev, struct request_queue *q, char *name,
+ 		    bsg_job_fn *job_fn, int dd_job_size);
+ void bsg_request_fn(struct request_queue *q);
+ void bsg_destroy_job(struct kref *kref);
++void bsg_softirq_done(struct request *rq);
+ 
+ #endif
+-- 
+1.8.5.6
