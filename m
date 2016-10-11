@@ -1,66 +1,52 @@
-Return-Path: <Adam.Manzanares@hgst.com>
-From: Adam Manzanares <adam.manzanares@hgst.com>
-To: <axboe@kernel.dk>, <tj@kernel.org>
-CC: <linux-block@vger.kernel.org>, <linux-ide@vger.kernel.org>, Adam
- Manzanares <adam.manzanares@hgst.com>
-Subject: [PATCH v3 0/2] Enabling ATA Command Priorities
-Date: Tue, 11 Oct 2016 13:40:25 -0700
-Message-ID: <1476218427-4021-1-git-send-email-adam.manzanares@hgst.com>
+Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
+Date: Tue, 11 Oct 2016 18:44:17 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Bart Van Assche <bart.vanassche@sandisk.com>
+Subject: Re: [PATCH v2 6/7] SRP transport: Port srp_wait_for_queuecommand()
+ to scsi-mq
+Message-ID: <20161011164417.GB18822@lst.de>
+References: <f153ee47-e599-c333-92b0-d5da475012f3@sandisk.com>
+ <bedf4b45-00b0-6844-047d-f1e05bb1092f@sandisk.com>
+ <8ce2910d-fde0-724f-a61f-8fbd7fbf499d@grimberg.me>
+ <619e3ffc-2123-4cb0-361a-4025ba47b991@sandisk.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: adam.manzanares@hgst.com
+In-Reply-To: <619e3ffc-2123-4cb0-361a-4025ba47b991@sandisk.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
+List-Post: <mailto:linux-nvme@lists.infradead.org>
+List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
+Cc: Keith Busch <keith.busch@intel.com>,
+ James Bottomley <jejb@linux.vnet.ibm.com>, Sagi Grimberg <sagi@grimberg.me>,
+ Mike Snitzer <snitzer@redhat.com>,
+ "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+ "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+ Jens Axboe <axboe@fb.com>, Doug Ledford <dledford@redhat.com>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+ Christoph Hellwig <hch@lst.de>
+Content-Type: text/plain; charset="us-ascii"
+Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
+Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
 List-ID: <linux-block@vger.kernel.org>
 
-This patch builds ATA commands with high priority if the iocontext
-of a process is set to real time. The goal of the patch is to
-improve tail latencies of workloads that use higher queue depths.
+On Wed, Oct 05, 2016 at 02:51:50PM -0700, Bart Van Assche wrote:
+> There are multiple direct blk_*() calls in other SCSI transport drivers. So 
+> my proposal is to wait with moving this code into scsi_lib.c until there is 
+> a second user of this code.
 
-This patch has been tested with an Ultrastar HE8 HDD and cuts the 
-the p99.99 tail latency of foreground IO from 2s down to 72ms when
-using the deadline scheduler. This patch works independently of the
-scheduler so it can be used with all of the currently available 
-request based schedulers. 
+I still don't think these low-level difference for blk-mq vs legacy
+request belong into a scsi LLDD.  So I concur with Sagi that this
+should go into the core SCSI code.
 
-Foreground IO, for the previously described results, is an async fio job 
-submitting 4K read requests at a QD of 1 to the HDD. The foreground IO is set 
-with the iopriority class of real time. The background workload is another fio
-job submitting read requests at a QD of 32 to the same HDD with default 
-iopriority.
+In fact I suspect we should just call it directly from
+scsi_internal_device_block, and maybe even scsi_internal_device_unblock
+for case of setting the device offline.
 
-This feature is enabled by setting a queue flag that is exposed as a sysfs
-entry named rq_ioc_prio. If this feature is enabled, and the submission 
-iocontext exists, and the bio_prio is not valid then the request ioprio is
-set to the iocontext prio.
-
-v3:
- - Removed null dereference issue in blk-core
- - Renamed queue sysfs entries for clarity
- - Added documentation for sysfs queue entry
-
-v2:
- - Add queue flag to set iopriority going to the request
- - If queue flag set, send iopriority class to ata_build_rw_tf
- - Remove redundant code in ata_ncq_prio_enabled function.
-
-
-Adam Manzanares (2):
-  block: Add iocontext priority to request
-  ata: Enabling ATA Command Priorities
-
- Documentation/block/queue-sysfs.txt | 12 ++++++++++++
- block/blk-core.c                    |  5 +++++
- block/blk-sysfs.c                   | 32 ++++++++++++++++++++++++++++++++
- drivers/ata/libata-core.c           | 35 ++++++++++++++++++++++++++++++++++-
- drivers/ata/libata-scsi.c           | 10 +++++++++-
- drivers/ata/libata.h                |  2 +-
- include/linux/ata.h                 |  6 ++++++
- include/linux/blkdev.h              |  3 +++
- include/linux/libata.h              | 18 ++++++++++++++++++
- 9 files changed, 120 insertions(+), 3 deletions(-)
-
--- 
-2.1.4
-
-Western Digital Corporation (and its subsidiaries) E-mail Confidentiality Notice & Disclaimer:
-
-This e-mail and any files transmitted with it may contain confidential or legally privileged information of WDC and/or its affiliates, and are intended solely for the use of the individual or entity to which they are addressed. If you are not the intended recipient, any disclosure, copying, distribution or any action taken or omitted to be taken in reliance on it, is prohibited. If you have received this e-mail in error, please notify the sender immediately and delete the e-mail in its entirety from your system.
+_______________________________________________
+Linux-nvme mailing list
+Linux-nvme@lists.infradead.org
+http://lists.infradead.org/mailman/listinfo/linux-nvme
