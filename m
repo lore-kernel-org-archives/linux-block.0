@@ -1,100 +1,98 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv4 10/43] thp: try to free page's buffers before attempt split
-Date: Tue, 25 Oct 2016 03:13:09 +0300
-Message-Id: <20161025001342.76126-11-kirill.shutemov@linux.intel.com>
-In-Reply-To: <20161025001342.76126-1-kirill.shutemov@linux.intel.com>
-References: <20161025001342.76126-1-kirill.shutemov@linux.intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-lf0-f66.google.com ([209.85.215.66]:34316 "EHLO
+        mail-lf0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752538AbcJKAc4 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 10 Oct 2016 20:32:56 -0400
+From: Alexey Klimov <klimov.linux@gmail.com>
+To: axboe@kernel.dk, linux-block@vger.kernel.org, axboe@fb.com
+Cc: jmoyer@redhat.com, linux-kernel@vger.kernel.org,
+        yury.norov@gmail.com, Alexey Klimov <klimov.linux@gmail.com>
+Subject: [PATCH RESEND] elevator: remove second argument in elevator_init()
+Date: Tue, 11 Oct 2016 01:32:49 +0100
+Message-Id: <20161011003249.5010-1-klimov.linux@gmail.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-We want page to be isolated from the rest of the system before spliting
-it. We rely on page count to be 2 for file pages to make sure nobody
-uses the page: one pin to caller, one to radix-tree.
+Last user of elevator_init() with non-NULL name as second argument
+that supposed to be s390 dasd driver has gone few releases ago.
+Drivers rely on elevator_change(), elevator_switch() and friends
+for example. Right now elevator_init() is always called as
+elevator_init(q, NULL).
 
-Filesystems with backing storage can have page count increased if it has
-buffers.
+Patch removes passing of second name argument and its usage.
 
-Let's try to free them, before attempt split. And remove one guarding
-VM_BUG_ON_PAGE().
+While we're at it fix following if-check after removed lines. We know
+that elevator_type e is initialized by NULL and need to check only
+chosen_elevator.
 
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+Signed-off-by: Alexey Klimov <klimov.linux@gmail.com>
+Reviewed-by: Jeff Moyer <jmoyer@redhat.com>
 ---
- include/linux/buffer_head.h |  1 +
- mm/huge_memory.c            | 19 ++++++++++++++++++-
- 2 files changed, 19 insertions(+), 1 deletion(-)
+ block/blk-core.c         |  2 +-
+ block/elevator.c         | 10 ++--------
+ include/linux/elevator.h |  2 +-
+ 3 files changed, 4 insertions(+), 10 deletions(-)
 
-diff --git a/include/linux/buffer_head.h b/include/linux/buffer_head.h
-index ebbacd14d450..006a8a42acfb 100644
---- a/include/linux/buffer_head.h
-+++ b/include/linux/buffer_head.h
-@@ -395,6 +395,7 @@ extern int __set_page_dirty_buffers(struct page *page);
- #else /* CONFIG_BLOCK */
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 36c7ac3..6e36d0b 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -871,7 +871,7 @@ blk_init_allocated_queue(struct request_queue *q, request_fn_proc *rfn,
+ 	mutex_lock(&q->sysfs_lock);
  
- static inline void buffer_init(void) {}
-+static inline int page_has_buffers(struct page *page) { return 0; }
- static inline int try_to_free_buffers(struct page *page) { return 1; }
- static inline int inode_has_buffers(struct inode *inode) { return 0; }
- static inline void invalidate_inode_buffers(struct inode *inode) {}
-diff --git a/mm/huge_memory.c b/mm/huge_memory.c
-index e7cda8e86f2c..40fe91ac383c 100644
---- a/mm/huge_memory.c
-+++ b/mm/huge_memory.c
-@@ -30,6 +30,7 @@
- #include <linux/userfaultfd_k.h>
- #include <linux/page_idle.h>
- #include <linux/shmem_fs.h>
-+#include <linux/buffer_head.h>
+ 	/* init elevator */
+-	if (elevator_init(q, NULL)) {
++	if (elevator_init(q)) {
+ 		mutex_unlock(&q->sysfs_lock);
+ 		goto fail;
+ 	}
+diff --git a/block/elevator.c b/block/elevator.c
+index f7d973a..e810938 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -177,7 +177,7 @@ static void elevator_release(struct kobject *kobj)
+ 	kfree(e);
+ }
  
- #include <asm/tlb.h>
- #include <asm/pgalloc.h>
-@@ -2066,7 +2067,6 @@ int split_huge_page_to_list(struct page *page, struct list_head *list)
+-int elevator_init(struct request_queue *q, char *name)
++int elevator_init(struct request_queue *q)
+ {
+ 	struct elevator_type *e = NULL;
+ 	int err;
+@@ -196,18 +196,12 @@ int elevator_init(struct request_queue *q, char *name)
+ 	q->end_sector = 0;
+ 	q->boundary_rq = NULL;
  
- 	VM_BUG_ON_PAGE(is_huge_zero_page(page), page);
- 	VM_BUG_ON_PAGE(!PageLocked(page), page);
--	VM_BUG_ON_PAGE(!PageSwapBacked(page), page);
- 	VM_BUG_ON_PAGE(!PageCompound(page), page);
+-	if (name) {
+-		e = elevator_get(name, true);
+-		if (!e)
+-			return -EINVAL;
+-	}
+-
+ 	/*
+ 	 * Use the default elevator specified by config boot param or
+ 	 * config option.  Don't try to load modules as we could be running
+ 	 * off async and request_module() isn't allowed from async.
+ 	 */
+-	if (!e && *chosen_elevator) {
++	if (*chosen_elevator) {
+ 		e = elevator_get(chosen_elevator, false);
+ 		if (!e)
+ 			printk(KERN_ERR "I/O scheduler %s not found\n",
+diff --git a/include/linux/elevator.h b/include/linux/elevator.h
+index e7f358d..ab6963e 100644
+--- a/include/linux/elevator.h
++++ b/include/linux/elevator.h
+@@ -159,7 +159,7 @@ extern void elv_unregister(struct elevator_type *);
+ extern ssize_t elv_iosched_show(struct request_queue *, char *);
+ extern ssize_t elv_iosched_store(struct request_queue *, const char *, size_t);
  
- 	if (PageAnon(head)) {
-@@ -2095,6 +2095,23 @@ int split_huge_page_to_list(struct page *page, struct list_head *list)
- 			goto out;
- 		}
- 
-+		/* Try to free buffers before attempt split */
-+		if (!PageSwapBacked(head) && PagePrivate(page)) {
-+			/*
-+			 * We cannot trigger writeback from here due possible
-+			 * recursion if triggered from vmscan, only wait.
-+			 *
-+			 * Caller can trigger writeback it on its own, if safe.
-+			 */
-+			wait_on_page_writeback(head);
-+
-+			if (page_has_buffers(head) && !try_to_release_page(head,
-+						GFP_KERNEL)) {
-+				ret = -EBUSY;
-+				goto out;
-+			}
-+		}
-+
- 		/* Addidional pin from radix tree */
- 		extra_pins = 1;
- 		anon_vma = NULL;
+-extern int elevator_init(struct request_queue *, char *);
++extern int elevator_init(struct request_queue *);
+ extern void elevator_exit(struct elevator_queue *);
+ extern int elevator_change(struct request_queue *, const char *);
+ extern bool elv_bio_merge_ok(struct request *, struct bio *);
 -- 
 2.9.3
 
