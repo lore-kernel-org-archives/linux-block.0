@@ -1,78 +1,36 @@
-Return-Path: <jthumshirn@suse.de>
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: "Martin K . Petersen" <martin.petersen@oracle.com>
-Cc: Christoph Hellwig <hch@infradead.org>,
-	Hannes Reinecke <hare@suse.de>,
-	Linux Kernel Mailinglist <linux-kernel@vger.kernel.org>,
-	Linux SCSI Mailinglist <linux-scsi@vger.kernel.org>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Jens Axboe <axboe@kernel.dk>,
-	Hannes Reinecke <hare@suse.com>,
-	linux-block@vger.kernel.org (open list:BLOCK LAYER)
-Subject: [PATCH v3 09/16] block: add reference counting for struct bsg_job
-Date: Thu, 13 Oct 2016 17:00:25 +0200
-Message-Id: <6c7700e282af9661e7c4588a040eb3d1a066d118.1476369687.git.jthumshirn@suse.de>
-In-Reply-To: <cover.1476369687.git.jthumshirn@suse.de>
-References: <cover.1476369687.git.jthumshirn@suse.de>
-In-Reply-To: <cover.1476369687.git.jthumshirn@suse.de>
-References: <cover.1476369687.git.jthumshirn@suse.de>
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: hans.verkuil@cisco.com, brking@us.ibm.com,
+        haver@linux.vnet.ibm.com, ching2048@areca.com.tw, axboe@fb.com,
+        alex.williamson@redhat.com, kvm@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/6] arcmsr: use pci_alloc_irq_vectors
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <1473600688-24043-1-git-send-email-hch@lst.de>
+        <1473600688-24043-2-git-send-email-hch@lst.de>
+Date: Tue, 11 Oct 2016 16:16:46 -0400
+In-Reply-To: <1473600688-24043-2-git-send-email-hch@lst.de> (Christoph
+        Hellwig's message of "Sun, 11 Sep 2016 15:31:23 +0200")
+Message-ID: <yq1y41uod3l.fsf@sermon.lab.mkp.net>
+MIME-Version: 1.0
+Content-Type: text/plain
+Sender: linux-scsi-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Add reference counting to 'struct bsg_job' so we can implement a reuqest
-timeout handler for bsg_jobs, which is needed for Fibre Channel.
+>>>>> "Christoph" == Christoph Hellwig <hch@lst.de> writes:
 
-Signed-off-by: Johannes Thumshirn <jthumshirn@suse.de>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
----
- block/bsg-lib.c         | 7 +++++--
- include/linux/bsg-lib.h | 2 ++
- 2 files changed, 7 insertions(+), 2 deletions(-)
+Christoph> Switch the arcmsr driver to use pci_alloc_irq_vectors.  We
+Christoph> need to two calls to pci_alloc_irq_vectors as arcmsr only
+Christoph> supports multiple MSI-X vectors, but not multiple MSI
+Christoph> vectors.
 
-diff --git a/block/bsg-lib.c b/block/bsg-lib.c
-index 650f427..632fb40 100644
---- a/block/bsg-lib.c
-+++ b/block/bsg-lib.c
-@@ -32,8 +32,10 @@
-  * bsg_destroy_job - routine to teardown/delete a bsg job
-  * @job: bsg_job that is to be torn down
-  */
--static void bsg_destroy_job(struct bsg_job *job)
-+static void bsg_destroy_job(struct kref *kref)
- {
-+	struct bsg_job *job = container_of(kref, struct bsg_job, kref);
-+
- 	put_device(job->dev);	/* release reference for the request */
- 
- 	kfree(job->request_payload.sg_list);
-@@ -84,7 +86,7 @@ static void bsg_softirq_done(struct request *rq)
- 	struct bsg_job *job = rq->special;
- 
- 	blk_end_request_all(rq, rq->errors);
--	bsg_destroy_job(job);
-+	kref_put(&job->kref, bsg_destroy_job);
- }
- 
- static int bsg_map_buffer(struct bsg_buffer *buf, struct request *req)
-@@ -142,6 +144,7 @@ static int bsg_create_job(struct device *dev, struct request *req)
- 	job->dev = dev;
- 	/* take a reference for the request */
- 	get_device(job->dev);
-+	kref_init(&job->kref);
- 	return 0;
- 
- failjob_rls_rqst_payload:
-diff --git a/include/linux/bsg-lib.h b/include/linux/bsg-lib.h
-index a226652..58e0717 100644
---- a/include/linux/bsg-lib.h
-+++ b/include/linux/bsg-lib.h
-@@ -40,6 +40,8 @@ struct bsg_job {
- 	struct device *dev;
- 	struct request *req;
- 
-+	struct kref kref;
-+
- 	/* Transport/driver specific request/reply structs */
- 	void *request;
- 	void *reply;
+Christoph> Otherwise this cleans up a lot of cruft and allows to use a
+Christoph> common request_irq loop for irq types, which happens to only
+Christoph> iterate over a single line in the non MSI-X case.
+
+Applied to 4.10/scsi-queue.
+
 -- 
-1.8.5.6
+Martin K. Petersen	Oracle Linux Engineering
