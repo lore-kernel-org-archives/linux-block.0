@@ -1,71 +1,106 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga03.intel.com ([134.134.136.65]:63637 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1758183AbcJYAOU (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 Oct 2016 20:14:20 -0400
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv4 18/43] block: define BIO_MAX_PAGES to HPAGE_PMD_NR if huge page cache enabled
-Date: Tue, 25 Oct 2016 03:13:17 +0300
-Message-Id: <20161025001342.76126-19-kirill.shutemov@linux.intel.com>
-In-Reply-To: <20161025001342.76126-1-kirill.shutemov@linux.intel.com>
-References: <20161025001342.76126-1-kirill.shutemov@linux.intel.com>
+Received: from mail-lf0-f67.google.com ([209.85.215.67]:34927 "EHLO
+        mail-lf0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752377AbcJKJAX (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 11 Oct 2016 05:00:23 -0400
+Subject: Re: [PATCH][V3] nbd: add multi-connection support
+To: Josef Bacik <jbacik@fb.com>, axboe@fb.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kernel-team@fb.com, nbd-general@lists.sourceforge.net, w@uter.be
+References: <1475092892-8230-1-git-send-email-jbacik@fb.com>
+From: Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <4b5da874-dd62-b683-563d-717d710156e4@grimberg.me>
+Date: Tue, 11 Oct 2016 12:00:18 +0300
+MIME-Version: 1.0
+In-Reply-To: <1475092892-8230-1-git-send-email-jbacik@fb.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-We are going to do IO a huge page a time. So we need BIO_MAX_PAGES to be
-at least HPAGE_PMD_NR. For x86-64, it's 512 pages.
 
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
----
- block/bio.c         | 3 ++-
- include/linux/bio.h | 4 ++++
- 2 files changed, 6 insertions(+), 1 deletion(-)
+> NBD can become contended on its single connection.  We have to serialize all
+> writes and we can only process one read response at a time.  Fix this by
+> allowing userspace to provide multiple connections to a single nbd device.  This
+> coupled with block-mq drastically increases performance in multi-process cases.
+> Thanks,
 
-diff --git a/block/bio.c b/block/bio.c
-index db85c5753a76..a69062bda3e0 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -44,7 +44,8 @@
-  */
- #define BV(x) { .nr_vecs = x, .name = "biovec-"__stringify(x) }
- static struct biovec_slab bvec_slabs[BVEC_POOL_NR] __read_mostly = {
--	BV(1), BV(4), BV(16), BV(64), BV(128), BV(BIO_MAX_PAGES),
-+	BV(1), BV(4), BV(16), BV(64), BV(128),
-+	{ .nr_vecs = BIO_MAX_PAGES, .name ="biovec-max_pages" },
- };
- #undef BV
- 
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 97cb48f03dc7..19d0fae9cdd0 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -38,7 +38,11 @@
- #define BIO_BUG_ON
- #endif
- 
-+#ifdef CONFIG_TRANSPARENT_HUGE_PAGECACHE
-+#define BIO_MAX_PAGES		(HPAGE_PMD_NR > 256 ? HPAGE_PMD_NR : 256)
-+#else
- #define BIO_MAX_PAGES		256
-+#endif
- 
- #define bio_prio(bio)			(bio)->bi_ioprio
- #define bio_set_prio(bio, prio)		((bio)->bi_ioprio = prio)
--- 
-2.9.3
+Hey Josef,
 
+I gave this patch a tryout and I'm getting a kernel paging request when
+running multi-threaded write workload [1].
+
+I have 2 VMs on my laptop: each is assigned with 2 cpus. I connected
+the client to the server via 2 connections and ran:
+fio --group_reporting --rw=randwrite --bs=4k --numjobs=2 --iodepth=128 
+--runtime=60 --time_based --loops=1 --ioengine=libaio --direct=1 
+--invalidate=1 --randrepeat=1 --norandommap --exitall --name task_nbd0 
+--filename=/dev/nbd0
+
+The server backend is null_blk btw:
+./nbd-server 1022 /dev/nullb0
+
+nbd-client:
+./nbd-client -C 2 192.168.100.3 1022 /dev/nbd0
+
+[1]:
+[  171.813649] BUG: unable to handle kernel paging request at 
+0000000235363130
+[  171.816015] IP: [<ffffffffc0645e39>] nbd_queue_rq+0x319/0x580 [nbd]
+[  171.816015] PGD 7a080067 PUD 0
+[  171.816015] Oops: 0000 [#1] SMP
+[  171.816015] Modules linked in: nbd(O) rpcsec_gss_krb5 nfsv4 ib_iser 
+iscsi_tcp libiscsi_tcp libiscsi scsi_transport_iscsi 
+snd_hda_codec_generic ppdev kvm_intel cirrus snd_hda_intel ttm kvm 
+irqbypass drm_kms_helper snd_hda_codec drm snd_hda_core snd_hwdep joydev 
+input_leds fb_sys_fops snd_pcm serio_raw syscopyarea snd_timer 
+sysfillrect snd sysimgblt soundcore i2c_piix4 nfsd ib_umad parport_pc 
+auth_rpcgss nfs_acl rdma_ucm nfs rdma_cm iw_cm lockd grace ib_cm 
+configfs sunrpc ib_uverbs mac_hid fscache ib_core lp parport psmouse 
+floppy e1000 pata_acpi [last unloaded: nbd]
+[  171.816015] CPU: 0 PID: 196 Comm: kworker/0:1H Tainted: G           O 
+    4.8.0-rc4+ #61
+[  171.816015] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), 
+BIOS Bochs 01/01/2011
+[  171.816015] Workqueue: kblockd blk_mq_run_work_fn
+[  171.816015] task: ffff8f0b37b23280 task.stack: ffff8f0b37bf0000
+[  171.816015] RIP: 0010:[<ffffffffc0645e39>]  [<ffffffffc0645e39>] 
+nbd_queue_rq+0x319/0x580 [nbd]
+[  171.816015] RSP: 0018:ffff8f0b37bf3c20  EFLAGS: 00010206
+[  171.816015] RAX: 0000000235363130 RBX: 0000000000000000 RCX: 
+0000000000000200
+[  171.816015] RDX: 0000000000000200 RSI: ffff8f0b37b23b48 RDI: 
+ffff8f0b37b23280
+[  171.816015] RBP: ffff8f0b37bf3cc8 R08: 0000000000000001 R09: 
+0000000000000000
+[  171.816015] R10: 0000000000000000 R11: ffff8f0b37f21000 R12: 
+0000000023536303
+[  171.816015] R13: 0000000000000000 R14: 0000000023536313 R15: 
+ffff8f0b37f21000
+[  171.816015] FS:  0000000000000000(0000) GS:ffff8f0b3d200000(0000) 
+knlGS:0000000000000000
+[  171.816015] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  171.816015] CR2: 0000000235363130 CR3: 00000000789b7000 CR4: 
+00000000000006f0
+[  171.816015] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 
+0000000000000000
+[  171.816015] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 
+0000000000000400
+[  171.816015] Stack:
+[  171.816015]  ffff8f0b00000000 ffff8f0b37a79480 ffff8f0b378513c8 
+0000000000000282
+[  171.816015]  ffff8f0b37b28428 ffff8f0b37a795f0 ffff8f0b37f21500 
+00000a0023536313
+[  171.816015]  ffffea0001c69080 0000000000000000 ffff8f0b37b28280 
+1395602537b23280
+[  171.816015] Call Trace:
+[  171.816015]  [<ffffffffb8426840>] __blk_mq_run_hw_queue+0x260/0x390
+[  171.816015]  [<ffffffffb84269b2>] blk_mq_run_work_fn+0x12/0x20
+[  171.816015]  [<ffffffffb80aae21>] process_one_work+0x1f1/0x6b0
+[  171.816015]  [<ffffffffb80aada2>] ? process_one_work+0x172/0x6b0
+[  171.816015]  [<ffffffffb80ab32e>] worker_thread+0x4e/0x490
+[  171.816015]  [<ffffffffb80ab2e0>] ? process_one_work+0x6b0/0x6b0
+[  171.816015]  [<ffffffffb80ab2e0>] ? process_one_work+0x6b0/0x6b0
+[  171.816015]  [<ffffffffb80b1f41>] kthread+0x101/0x120
+[  171.816015]  [<ffffffffb88d4ecf>] ret_from_fork+0x1f/0x40
+[  171.816015]  [<ffffffffb80b1e40>] ? kthread_create_on_node+0x250/0x250
