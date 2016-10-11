@@ -1,51 +1,120 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Ming Lei <tom.leiming@gmail.com>
-To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Ming Lei <tom.leiming@gmail.com>,
-        "Nicholas A. Bellinger" <nab@linux-iscsi.org>,
-        linux-scsi@vger.kernel.org (open list:TARGET SUBSYSTEM),
-        target-devel@vger.kernel.org (open list:TARGET SUBSYSTEM)
-Subject: [PATCH 05/60] target: avoid to access .bi_vcnt directly
-Date: Sat, 29 Oct 2016 16:08:04 +0800
-Message-Id: <1477728600-12938-6-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
-References: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-lf0-f67.google.com ([209.85.215.67]:33171 "EHLO
+        mail-lf0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753718AbcJKV5I (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 11 Oct 2016 17:57:08 -0400
+Received: by mail-lf0-f67.google.com with SMTP id l131so2718519lfl.0
+        for <linux-block@vger.kernel.org>; Tue, 11 Oct 2016 14:57:07 -0700 (PDT)
+Date: Wed, 12 Oct 2016 00:57:04 +0300
+From: "Kirill A. Shutemov" <kirill@shutemov.name>
+To: Jan Kara <jack@suse.cz>
+Cc: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCHv3 14/41] filemap: allocate huge page in
+ page_cache_read(), if allowed
+Message-ID: <20161011215704.GD27110@node.shutemov.name>
+References: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
+ <20160915115523.29737-15-kirill.shutemov@linux.intel.com>
+ <20161011161545.GN6952@quack2.suse.cz>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20161011161545.GN6952@quack2.suse.cz>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-When the bio is full, bio_add_pc_page() will return zero,
-so use this way to handle full bio.
+On Tue, Oct 11, 2016 at 06:15:45PM +0200, Jan Kara wrote:
+> On Thu 15-09-16 14:54:56, Kirill A. Shutemov wrote:
+> > This patch adds basic functionality to put huge page into page cache.
+> > 
+> > At the moment we only put huge pages into radix-tree if the range covered
+> > by the huge page is empty.
+> > 
+> > We ignore shadow entires for now, just remove them from the tree before
+> > inserting huge page.
+> > 
+> > Later we can add logic to accumulate information from shadow entires to
+> > return to caller (average eviction time?).
+> > 
+> > Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+> > ---
+> >  include/linux/fs.h      |   5 ++
+> >  include/linux/pagemap.h |  21 ++++++-
+> >  mm/filemap.c            | 148 +++++++++++++++++++++++++++++++++++++++++++-----
+> >  3 files changed, 157 insertions(+), 17 deletions(-)
+> > 
+> ...
+> > @@ -663,16 +663,55 @@ static int __add_to_page_cache_locked(struct page *page,
+> >  	page->index = offset;
+> >  
+> >  	spin_lock_irq(&mapping->tree_lock);
+> > -	error = page_cache_tree_insert(mapping, page, shadowp);
+> > +	if (PageTransHuge(page)) {
+> > +		struct radix_tree_iter iter;
+> > +		void **slot;
+> > +		void *p;
+> > +
+> > +		error = 0;
+> > +
+> > +		/* Wipe shadow entires */
+> > +		radix_tree_for_each_slot(slot, &mapping->page_tree, &iter, offset) {
+> > +			if (iter.index >= offset + HPAGE_PMD_NR)
+> > +				break;
+> > +
+> > +			p = radix_tree_deref_slot_protected(slot,
+> > +					&mapping->tree_lock);
+> > +			if (!p)
+> > +				continue;
+> > +
+> > +			if (!radix_tree_exception(p)) {
+> > +				error = -EEXIST;
+> > +				break;
+> > +			}
+> > +
+> > +			mapping->nrexceptional--;
+> > +			rcu_assign_pointer(*slot, NULL);
+> 
+> I think you also need something like workingset_node_shadows_dec(node)
+> here. It would be even better if you used something like
+> clear_exceptional_entry() to have the logic in one place (you obviously
+> need to factor out only part of clear_exceptional_entry() first).
 
-Also replace access to .bi_vcnt for pr_debug() with bio_segments().
+Good point. Will do.
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
----
- drivers/target/target_core_pscsi.c | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
+> > +		}
+> > +
+> > +		if (!error)
+> > +			error = __radix_tree_insert(&mapping->page_tree, offset,
+> > +					compound_order(page), page);
+> > +
+> > +		if (!error) {
+> > +			count_vm_event(THP_FILE_ALLOC);
+> > +			mapping->nrpages += HPAGE_PMD_NR;
+> > +			*shadowp = NULL;
+> > +			__inc_node_page_state(page, NR_FILE_THPS);
+> > +		}
+> > +	} else {
+> > +		error = page_cache_tree_insert(mapping, page, shadowp);
+> > +	}
+> 
+> And I'd prefer to have this logic moved to page_cache_tree_insert() because
+> logically it IMHO belongs there - it is a simply another case of handling
+> of radix tree used for page cache.
 
-diff --git a/drivers/target/target_core_pscsi.c b/drivers/target/target_core_pscsi.c
-index 9125d9358dea..04d7aa7390d0 100644
---- a/drivers/target/target_core_pscsi.c
-+++ b/drivers/target/target_core_pscsi.c
-@@ -935,13 +935,9 @@ pscsi_map_sg(struct se_cmd *cmd, struct scatterlist *sgl, u32 sgl_nents,
- 
- 			rc = bio_add_pc_page(pdv->pdv_sd->request_queue,
- 					bio, page, bytes, off);
--			if (rc != bytes)
--				goto fail;
--
- 			pr_debug("PSCSI: bio->bi_vcnt: %d nr_vecs: %d\n",
--				bio->bi_vcnt, nr_vecs);
--
--			if (bio->bi_vcnt > nr_vecs) {
-+				bio_segments(bio), nr_vecs);
-+			if (rc != bytes) {
- 				pr_debug("PSCSI: Reached bio->bi_vcnt max:"
- 					" %d i: %d bio: %p, allocating another"
- 					" bio\n", bio->bi_vcnt, i, bio);
+Okay.
+
 -- 
-2.7.4
-
+ Kirill A. Shutemov
