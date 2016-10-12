@@ -1,257 +1,80 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv4 30/43] mm: account huge pages to dirty, writaback, reclaimable, etc.
-Date: Tue, 25 Oct 2016 03:13:29 +0300
-Message-Id: <20161025001342.76126-31-kirill.shutemov@linux.intel.com>
-In-Reply-To: <20161025001342.76126-1-kirill.shutemov@linux.intel.com>
-References: <20161025001342.76126-1-kirill.shutemov@linux.intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH v3 1/2] block: Add iocontext priority to request
+To: Adam Manzanares <adam.manzanares@wdc.com>
+References: <1476218427-4021-1-git-send-email-adam.manzanares@hgst.com>
+ <1476218427-4021-2-git-send-email-adam.manzanares@hgst.com>
+ <4b60fe5d-113f-9361-bbae-7473002500ba@kernel.dk>
+ <20161012175830.GA4072@hgst.com>
+Cc: Adam Manzanares <adam.manzanares@hgst.com>, tj@kernel.org,
+ linux-block@vger.kernel.org, linux-ide@vger.kernel.org
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <3a9a6df0-b355-bd0b-817c-fcccaa6f1398@kernel.dk>
+Date: Wed, 12 Oct 2016 15:05:47 -0600
+MIME-Version: 1.0
+In-Reply-To: <20161012175830.GA4072@hgst.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-We need to account huge pages according to its size to get background
-writaback work properly.
+On 10/12/2016 11:58 AM, Adam Manzanares wrote:
+> The 10/12/2016 08:49, Jens Axboe wrote:
+>> On 10/11/2016 02:40 PM, Adam Manzanares wrote:
+>>> Patch adds an association between iocontext ioprio and the ioprio of
+>>> a request. This feature is only enabled if a queue flag is set to
+>>> indicate that requests should have ioprio associated with them. The
+>>> queue flag is exposed as the req_prio queue sysfs entry.
+>>
+>> Honestly, I don't get this patchset. For the normal file system path, we
+>> inherit the iocontext priority into the bio. That in turns gets
+>> inherited by the request. Why is this any different?
+>>
+> I was hoping this was true before I started looking into this, but the
+> iocontext priority is not set on the bio. I did look into setting the
+> iocontext priority on the bio, and this would have do be done close
+> in the call stack to init_request_from_bio so I chose to set it here.
+>
+> If I missed where this occurs I would appreciate it if you pointed me
+> to the code where the bio gets the iopriority from the iocontext.
 
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
----
- fs/fs-writeback.c           | 10 ++++---
- include/linux/backing-dev.h | 10 +++++++
- include/linux/memcontrol.h  |  5 ++--
- mm/migrate.c                |  1 +
- mm/page-writeback.c         | 67 +++++++++++++++++++++++++++++----------------
- 5 files changed, 64 insertions(+), 29 deletions(-)
+It currently happens in CFQ, since that is what deals with priorities.
+But we should just make that the case, generically. The rule is that if
+priority is set in a bio, that is what we'll use. But if not, we'll
+use what the application has set in general, and that is available in
+the io context.
 
-diff --git a/fs/fs-writeback.c b/fs/fs-writeback.c
-index 05713a5da083..2feb8677e69e 100644
---- a/fs/fs-writeback.c
-+++ b/fs/fs-writeback.c
-@@ -366,8 +366,9 @@ static void inode_switch_wbs_work_fn(struct work_struct *work)
- 		struct page *page = radix_tree_deref_slot_protected(slot,
- 							&mapping->tree_lock);
- 		if (likely(page) && PageDirty(page)) {
--			__dec_wb_stat(old_wb, WB_RECLAIMABLE);
--			__inc_wb_stat(new_wb, WB_RECLAIMABLE);
-+			int nr = hpage_nr_pages(page);
-+			__add_wb_stat(old_wb, WB_RECLAIMABLE, -nr);
-+			__add_wb_stat(new_wb, WB_RECLAIMABLE, nr);
- 		}
- 	}
- 
-@@ -376,9 +377,10 @@ static void inode_switch_wbs_work_fn(struct work_struct *work)
- 		struct page *page = radix_tree_deref_slot_protected(slot,
- 							&mapping->tree_lock);
- 		if (likely(page)) {
-+			int nr = hpage_nr_pages(page);
- 			WARN_ON_ONCE(!PageWriteback(page));
--			__dec_wb_stat(old_wb, WB_WRITEBACK);
--			__inc_wb_stat(new_wb, WB_WRITEBACK);
-+			__add_wb_stat(old_wb, WB_WRITEBACK, -nr);
-+			__add_wb_stat(new_wb, WB_WRITEBACK, nr);
- 		}
- 	}
- 
-diff --git a/include/linux/backing-dev.h b/include/linux/backing-dev.h
-index 43b93a947e61..e63487f78824 100644
---- a/include/linux/backing-dev.h
-+++ b/include/linux/backing-dev.h
-@@ -61,6 +61,16 @@ static inline void __add_wb_stat(struct bdi_writeback *wb,
- 	__percpu_counter_add(&wb->stat[item], amount, WB_STAT_BATCH);
- }
- 
-+static inline void add_wb_stat(struct bdi_writeback *wb,
-+				 enum wb_stat_item item, s64 amount)
-+{
-+	unsigned long flags;
-+
-+	local_irq_save(flags);
-+	__add_wb_stat(wb, item, amount);
-+	local_irq_restore(flags);
-+}
-+
- static inline void __inc_wb_stat(struct bdi_writeback *wb,
- 				 enum wb_stat_item item)
- {
-diff --git a/include/linux/memcontrol.h b/include/linux/memcontrol.h
-index 61d20c17f3b7..d24092581442 100644
---- a/include/linux/memcontrol.h
-+++ b/include/linux/memcontrol.h
-@@ -29,6 +29,7 @@
- #include <linux/mmzone.h>
- #include <linux/writeback.h>
- #include <linux/page-flags.h>
-+#include <linux/mm.h>
- 
- struct mem_cgroup;
- struct page;
-@@ -506,13 +507,13 @@ static inline void mem_cgroup_update_page_stat(struct page *page,
- static inline void mem_cgroup_inc_page_stat(struct page *page,
- 					    enum mem_cgroup_stat_index idx)
- {
--	mem_cgroup_update_page_stat(page, idx, 1);
-+	mem_cgroup_update_page_stat(page, idx, hpage_nr_pages(page));
- }
- 
- static inline void mem_cgroup_dec_page_stat(struct page *page,
- 					    enum mem_cgroup_stat_index idx)
- {
--	mem_cgroup_update_page_stat(page, idx, -1);
-+	mem_cgroup_update_page_stat(page, idx, -hpage_nr_pages(page));
- }
- 
- unsigned long mem_cgroup_soft_limit_reclaim(pg_data_t *pgdat, int order,
-diff --git a/mm/migrate.c b/mm/migrate.c
-index 99250aee1ac1..bfc722959d3e 100644
---- a/mm/migrate.c
-+++ b/mm/migrate.c
-@@ -505,6 +505,7 @@ int migrate_page_move_mapping(struct address_space *mapping,
- 	 * are mapped to swap space.
- 	 */
- 	if (newzone != oldzone) {
-+		BUG_ON(PageTransHuge(page));
- 		__dec_node_state(oldzone->zone_pgdat, NR_FILE_PAGES);
- 		__inc_node_state(newzone->zone_pgdat, NR_FILE_PAGES);
- 		if (PageSwapBacked(page) && !PageSwapCache(page)) {
-diff --git a/mm/page-writeback.c b/mm/page-writeback.c
-index c76fc90b7039..f903c09940c4 100644
---- a/mm/page-writeback.c
-+++ b/mm/page-writeback.c
-@@ -2421,19 +2421,22 @@ void account_page_dirtied(struct page *page, struct address_space *mapping)
- 
- 	if (mapping_cap_account_dirty(mapping)) {
- 		struct bdi_writeback *wb;
-+		struct zone *zone = page_zone(page);
-+		pg_data_t *pgdat = page_pgdat(page);
-+		int nr = hpage_nr_pages(page);
- 
- 		inode_attach_wb(inode, page);
- 		wb = inode_to_wb(inode);
- 
- 		mem_cgroup_inc_page_stat(page, MEM_CGROUP_STAT_DIRTY);
--		__inc_node_page_state(page, NR_FILE_DIRTY);
--		__inc_zone_page_state(page, NR_ZONE_WRITE_PENDING);
--		__inc_node_page_state(page, NR_DIRTIED);
--		__inc_wb_stat(wb, WB_RECLAIMABLE);
--		__inc_wb_stat(wb, WB_DIRTIED);
--		task_io_account_write(PAGE_SIZE);
--		current->nr_dirtied++;
--		this_cpu_inc(bdp_ratelimits);
-+		__mod_node_page_state(pgdat, NR_FILE_DIRTY, nr);
-+		__mod_zone_page_state(zone, NR_ZONE_WRITE_PENDING, nr);
-+		__mod_node_page_state(pgdat, NR_DIRTIED, nr);
-+		__add_wb_stat(wb, WB_RECLAIMABLE, nr);
-+		__add_wb_stat(wb, WB_DIRTIED, nr);
-+		task_io_account_write(nr * PAGE_SIZE);
-+		current->nr_dirtied += nr;
-+		this_cpu_add(bdp_ratelimits, nr);
- 	}
- }
- EXPORT_SYMBOL(account_page_dirtied);
-@@ -2447,11 +2450,15 @@ void account_page_cleaned(struct page *page, struct address_space *mapping,
- 			  struct bdi_writeback *wb)
- {
- 	if (mapping_cap_account_dirty(mapping)) {
-+		struct zone *zone = page_zone(page);
-+		pg_data_t *pgdat = page_pgdat(page);
-+		int nr = hpage_nr_pages(page);
-+
- 		mem_cgroup_dec_page_stat(page, MEM_CGROUP_STAT_DIRTY);
--		dec_node_page_state(page, NR_FILE_DIRTY);
--		dec_zone_page_state(page, NR_ZONE_WRITE_PENDING);
--		dec_wb_stat(wb, WB_RECLAIMABLE);
--		task_io_account_cancelled_write(PAGE_SIZE);
-+		mod_node_page_state(pgdat, NR_FILE_DIRTY, -nr);
-+		mod_zone_page_state(zone, NR_ZONE_WRITE_PENDING, -nr);
-+		add_wb_stat(wb, WB_RECLAIMABLE, -nr);
-+		task_io_account_cancelled_write(PAGE_SIZE * nr);
- 	}
- }
- 
-@@ -2511,14 +2518,16 @@ void account_page_redirty(struct page *page)
- 	struct address_space *mapping = page->mapping;
- 
- 	if (mapping && mapping_cap_account_dirty(mapping)) {
-+		pg_data_t *pgdat = page_pgdat(page);
-+		int nr = hpage_nr_pages(page);
- 		struct inode *inode = mapping->host;
- 		struct bdi_writeback *wb;
- 		bool locked;
- 
- 		wb = unlocked_inode_to_wb_begin(inode, &locked);
--		current->nr_dirtied--;
--		dec_node_page_state(page, NR_DIRTIED);
--		dec_wb_stat(wb, WB_DIRTIED);
-+		current->nr_dirtied -= nr;
-+		mod_node_page_state(pgdat, NR_DIRTIED, -nr);
-+		add_wb_stat(wb, WB_DIRTIED, -nr);
- 		unlocked_inode_to_wb_end(inode, locked);
- 	}
- }
-@@ -2704,10 +2713,14 @@ int clear_page_dirty_for_io(struct page *page)
- 		 */
- 		wb = unlocked_inode_to_wb_begin(inode, &locked);
- 		if (TestClearPageDirty(page)) {
-+			struct zone *zone = page_zone(page);
-+			pg_data_t *pgdat = page_pgdat(page);
-+			int nr = hpage_nr_pages(page);
-+
- 			mem_cgroup_dec_page_stat(page, MEM_CGROUP_STAT_DIRTY);
--			dec_node_page_state(page, NR_FILE_DIRTY);
--			dec_zone_page_state(page, NR_ZONE_WRITE_PENDING);
--			dec_wb_stat(wb, WB_RECLAIMABLE);
-+			mod_node_page_state(pgdat, NR_FILE_DIRTY, -nr);
-+			mod_zone_page_state(zone, NR_ZONE_WRITE_PENDING, -nr);
-+			add_wb_stat(wb, WB_RECLAIMABLE, -nr);
- 			ret = 1;
- 		}
- 		unlocked_inode_to_wb_end(inode, locked);
-@@ -2751,10 +2764,14 @@ int test_clear_page_writeback(struct page *page)
- 		ret = TestClearPageWriteback(page);
- 	}
- 	if (ret) {
-+		struct zone *zone = page_zone(page);
-+		pg_data_t *pgdat = page_pgdat(page);
-+		int nr = hpage_nr_pages(page);
-+
- 		mem_cgroup_dec_page_stat(page, MEM_CGROUP_STAT_WRITEBACK);
--		dec_node_page_state(page, NR_WRITEBACK);
--		dec_zone_page_state(page, NR_ZONE_WRITE_PENDING);
--		inc_node_page_state(page, NR_WRITTEN);
-+		mod_node_page_state(pgdat, NR_WRITEBACK, -nr);
-+		mod_zone_page_state(zone, NR_ZONE_WRITE_PENDING, -nr);
-+		mod_node_page_state(pgdat, NR_WRITTEN, nr);
- 	}
- 	unlock_page_memcg(page);
- 	return ret;
-@@ -2806,9 +2823,13 @@ int __test_set_page_writeback(struct page *page, bool keep_write)
- 		ret = TestSetPageWriteback(page);
- 	}
- 	if (!ret) {
-+		struct zone *zone = page_zone(page);
-+		pg_data_t *pgdat = page_pgdat(page);
-+		int nr = hpage_nr_pages(page);
-+
- 		mem_cgroup_inc_page_stat(page, MEM_CGROUP_STAT_WRITEBACK);
--		inc_node_page_state(page, NR_WRITEBACK);
--		inc_zone_page_state(page, NR_ZONE_WRITE_PENDING);
-+		mod_node_page_state(pgdat, NR_WRITEBACK, nr);
-+		mod_zone_page_state(zone, NR_ZONE_WRITE_PENDING, nr);
- 	}
- 	unlock_page_memcg(page);
- 	return ret;
+>> It'd be much cleaner to just have 'rq' inherit the IO priority from the
+>> io context when the 'rq' is allocated, and ensuring that we inherit and
+>> override this if the bio has one set instead. It should already work
+>> like that.
+>
+> I looked into the request allocation code and the only place I see where
+> the iocontext is associated with the request is through a icq. Looking at
+> the documentation of the icq it states that the icq_size of the elevator
+> has to be set in order for block core to manage this. The only scheduler
+> using this currently is the cfq scheduler and I think prioritized requests
+> should be independent of the scheduler used.
+
+Agree, see above, it should just happen generically.
+
+>> And in no way should we add some sysfs file to control this, that is
+>> nuts.
+>
+> My concern is that we will now be exposing priority information to lower
+> layers and if there happens to be code that uses the priority now it will
+> actually make an impact. My example being the fusion mptsas driver.
+>
+> The second issue I foresee is that lower level drivers will need a sysfs
+> file to control whether or not we send prioritized commands to the device.
+> We are wary of sending prioritized commands by default when we are unsure
+> of how the device will respond to these prioritized commands.
+>
+> The reason I propose a sysfs file in the queue is that it solves these two
+> issues at the same time.
+>
+> I would appreciate it if you could suggest an alternative fix for
+> these issues or an explanation of why these concerns are not valid.
+
+At that point it should be a driver knob, it's not something that should
+be part of the generic block layer.
+
 -- 
-2.9.3
-
+Jens Axboe
