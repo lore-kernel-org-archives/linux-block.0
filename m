@@ -1,80 +1,76 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <Adam.Manzanares@wdc.com>
+Date: Wed, 12 Oct 2016 10:58:30 -0700
+From: Adam Manzanares <adam.manzanares@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: Adam Manzanares <adam.manzanares@hgst.com>, <tj@kernel.org>,
+	<linux-block@vger.kernel.org>, <linux-ide@vger.kernel.org>
 Subject: Re: [PATCH v3 1/2] block: Add iocontext priority to request
-To: Adam Manzanares <adam.manzanares@wdc.com>
+Message-ID: <20161012175830.GA4072@hgst.com>
 References: <1476218427-4021-1-git-send-email-adam.manzanares@hgst.com>
  <1476218427-4021-2-git-send-email-adam.manzanares@hgst.com>
  <4b60fe5d-113f-9361-bbae-7473002500ba@kernel.dk>
- <20161012175830.GA4072@hgst.com>
-Cc: Adam Manzanares <adam.manzanares@hgst.com>, tj@kernel.org,
- linux-block@vger.kernel.org, linux-ide@vger.kernel.org
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <3a9a6df0-b355-bd0b-817c-fcccaa6f1398@kernel.dk>
-Date: Wed, 12 Oct 2016 15:05:47 -0600
 MIME-Version: 1.0
-In-Reply-To: <20161012175830.GA4072@hgst.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <4b60fe5d-113f-9361-bbae-7473002500ba@kernel.dk>
+Return-Path: adam.manzanares@wdc.com
 List-ID: <linux-block@vger.kernel.org>
 
-On 10/12/2016 11:58 AM, Adam Manzanares wrote:
-> The 10/12/2016 08:49, Jens Axboe wrote:
->> On 10/11/2016 02:40 PM, Adam Manzanares wrote:
->>> Patch adds an association between iocontext ioprio and the ioprio of
->>> a request. This feature is only enabled if a queue flag is set to
->>> indicate that requests should have ioprio associated with them. The
->>> queue flag is exposed as the req_prio queue sysfs entry.
->>
->> Honestly, I don't get this patchset. For the normal file system path, we
->> inherit the iocontext priority into the bio. That in turns gets
->> inherited by the request. Why is this any different?
->>
-> I was hoping this was true before I started looking into this, but the
-> iocontext priority is not set on the bio. I did look into setting the
-> iocontext priority on the bio, and this would have do be done close
-> in the call stack to init_request_from_bio so I chose to set it here.
->
-> If I missed where this occurs I would appreciate it if you pointed me
-> to the code where the bio gets the iopriority from the iocontext.
-
-It currently happens in CFQ, since that is what deals with priorities.
-But we should just make that the case, generically. The rule is that if
-priority is set in a bio, that is what we'll use. But if not, we'll
-use what the application has set in general, and that is available in
-the io context.
-
->> It'd be much cleaner to just have 'rq' inherit the IO priority from the
->> io context when the 'rq' is allocated, and ensuring that we inherit and
->> override this if the bio has one set instead. It should already work
->> like that.
->
-> I looked into the request allocation code and the only place I see where
-> the iocontext is associated with the request is through a icq. Looking at
-> the documentation of the icq it states that the icq_size of the elevator
-> has to be set in order for block core to manage this. The only scheduler
-> using this currently is the cfq scheduler and I think prioritized requests
-> should be independent of the scheduler used.
-
-Agree, see above, it should just happen generically.
-
->> And in no way should we add some sysfs file to control this, that is
->> nuts.
->
-> My concern is that we will now be exposing priority information to lower
-> layers and if there happens to be code that uses the priority now it will
-> actually make an impact. My example being the fusion mptsas driver.
->
-> The second issue I foresee is that lower level drivers will need a sysfs
-> file to control whether or not we send prioritized commands to the device.
-> We are wary of sending prioritized commands by default when we are unsure
-> of how the device will respond to these prioritized commands.
->
-> The reason I propose a sysfs file in the queue is that it solves these two
-> issues at the same time.
->
-> I would appreciate it if you could suggest an alternative fix for
-> these issues or an explanation of why these concerns are not valid.
-
-At that point it should be a driver knob, it's not something that should
-be part of the generic block layer.
-
--- 
-Jens Axboe
+VGhlIDEwLzEyLzIwMTYgMDg6NDksIEplbnMgQXhib2Ugd3JvdGU6Cj4gT24gMTAvMTEvMjAxNiAw
+Mjo0MCBQTSwgQWRhbSBNYW56YW5hcmVzIHdyb3RlOgo+ID5QYXRjaCBhZGRzIGFuIGFzc29jaWF0
+aW9uIGJldHdlZW4gaW9jb250ZXh0IGlvcHJpbyBhbmQgdGhlIGlvcHJpbyBvZgo+ID5hIHJlcXVl
+c3QuIFRoaXMgZmVhdHVyZSBpcyBvbmx5IGVuYWJsZWQgaWYgYSBxdWV1ZSBmbGFnIGlzIHNldCB0
+bwo+ID5pbmRpY2F0ZSB0aGF0IHJlcXVlc3RzIHNob3VsZCBoYXZlIGlvcHJpbyBhc3NvY2lhdGVk
+IHdpdGggdGhlbS4gVGhlCj4gPnF1ZXVlIGZsYWcgaXMgZXhwb3NlZCBhcyB0aGUgcmVxX3ByaW8g
+cXVldWUgc3lzZnMgZW50cnkuCj4gCj4gSG9uZXN0bHksIEkgZG9uJ3QgZ2V0IHRoaXMgcGF0Y2hz
+ZXQuIEZvciB0aGUgbm9ybWFsIGZpbGUgc3lzdGVtIHBhdGgsIHdlCj4gaW5oZXJpdCB0aGUgaW9j
+b250ZXh0IHByaW9yaXR5IGludG8gdGhlIGJpby4gVGhhdCBpbiB0dXJucyBnZXRzCj4gaW5oZXJp
+dGVkIGJ5IHRoZSByZXF1ZXN0LiBXaHkgaXMgdGhpcyBhbnkgZGlmZmVyZW50Pwo+Ckkgd2FzIGhv
+cGluZyB0aGlzIHdhcyB0cnVlIGJlZm9yZSBJIHN0YXJ0ZWQgbG9va2luZyBpbnRvIHRoaXMsIGJ1
+dCB0aGUgCmlvY29udGV4dCBwcmlvcml0eSBpcyBub3Qgc2V0IG9uIHRoZSBiaW8uIEkgZGlkIGxv
+b2sgaW50byBzZXR0aW5nIHRoZQppb2NvbnRleHQgcHJpb3JpdHkgb24gdGhlIGJpbywgYW5kIHRo
+aXMgd291bGQgaGF2ZSBkbyBiZSBkb25lIGNsb3NlIAppbiB0aGUgY2FsbCBzdGFjayB0byBpbml0
+X3JlcXVlc3RfZnJvbV9iaW8gc28gSSBjaG9zZSB0byBzZXQgaXQgaGVyZS4KCklmIEkgbWlzc2Vk
+IHdoZXJlIHRoaXMgb2NjdXJzIEkgd291bGQgYXBwcmVjaWF0ZSBpdCBpZiB5b3UgcG9pbnRlZCBt
+ZSB0byB0aGUgCmNvZGUgd2hlcmUgdGhlIGJpbyBnZXRzIHRoZSBpb3ByaW9yaXR5IGZyb20gdGhl
+IGlvY29udGV4dC4gCgo+IEl0J2QgYmUgbXVjaCBjbGVhbmVyIHRvIGp1c3QgaGF2ZSAncnEnIGlu
+aGVyaXQgdGhlIElPIHByaW9yaXR5IGZyb20gdGhlCj4gaW8gY29udGV4dCB3aGVuIHRoZSAncnEn
+IGlzIGFsbG9jYXRlZCwgYW5kIGVuc3VyaW5nIHRoYXQgd2UgaW5oZXJpdCBhbmQKPiBvdmVycmlk
+ZSB0aGlzIGlmIHRoZSBiaW8gaGFzIG9uZSBzZXQgaW5zdGVhZC4gSXQgc2hvdWxkIGFscmVhZHkg
+d29yawo+IGxpa2UgdGhhdC4KCkkgbG9va2VkIGludG8gdGhlIHJlcXVlc3QgYWxsb2NhdGlvbiBj
+b2RlIGFuZCB0aGUgb25seSBwbGFjZSBJIHNlZSB3aGVyZSAKdGhlIGlvY29udGV4dCBpcyBhc3Nv
+Y2lhdGVkIHdpdGggdGhlIHJlcXVlc3QgaXMgdGhyb3VnaCBhIGljcS4gTG9va2luZyBhdCAKdGhl
+IGRvY3VtZW50YXRpb24gb2YgdGhlIGljcSBpdCBzdGF0ZXMgdGhhdCB0aGUgaWNxX3NpemUgb2Yg
+dGhlIGVsZXZhdG9yIApoYXMgdG8gYmUgc2V0IGluIG9yZGVyIGZvciBibG9jayBjb3JlIHRvIG1h
+bmFnZSB0aGlzLiBUaGUgb25seSBzY2hlZHVsZXIgCnVzaW5nIHRoaXMgY3VycmVudGx5IGlzIHRo
+ZSBjZnEgc2NoZWR1bGVyIGFuZCBJIHRoaW5rIHByaW9yaXRpemVkIHJlcXVlc3RzIApzaG91bGQg
+YmUgaW5kZXBlbmRlbnQgb2YgdGhlIHNjaGVkdWxlciB1c2VkLiAKCkkgYWdyZWUgdGhhdCB0aGlz
+IHNob3VsZCBtYWtlIGl0IGludG8gdGhlIGNvZGUgd2hlcmUgdGhlIHJxIGlzIGFsbG9jYXRlZC4K
+CkFnYWluIGlmIEkgaGF2ZSBtaXNzZWQgc29tZXRoaW5nIHBsZWFzZSBwb2ludCBtZSB0byB0aGUg
+cmVsZXZhbnQgY29kZSBhbmQgCkkgd2lsbCBtb2RpZnkgdGhlIHBhdGNoIGFzIG5lY2Vzc2FyeS4K
+Cj4gCj4gQW5kIGluIG5vIHdheSBzaG91bGQgd2UgYWRkIHNvbWUgc3lzZnMgZmlsZSB0byBjb250
+cm9sIHRoaXMsIHRoYXQgaXMKPiBudXRzLgoKTXkgY29uY2VybiBpcyB0aGF0IHdlIHdpbGwgbm93
+IGJlIGV4cG9zaW5nIHByaW9yaXR5IGluZm9ybWF0aW9uIHRvIGxvd2VyIApsYXllcnMgYW5kIGlm
+IHRoZXJlIGhhcHBlbnMgdG8gYmUgY29kZSB0aGF0IHVzZXMgdGhlIHByaW9yaXR5IG5vdyBpdCB3
+aWxsIAphY3R1YWxseSBtYWtlIGFuIGltcGFjdC4gTXkgZXhhbXBsZSBiZWluZyB0aGUgZnVzaW9u
+IG1wdHNhcyBkcml2ZXIuIAoKVGhlIHNlY29uZCBpc3N1ZSBJIGZvcmVzZWUgaXMgdGhhdCBsb3dl
+ciBsZXZlbCBkcml2ZXJzIHdpbGwgbmVlZCBhIHN5c2ZzIApmaWxlIHRvIGNvbnRyb2wgd2hldGhl
+ciBvciBub3Qgd2Ugc2VuZCBwcmlvcml0aXplZCBjb21tYW5kcyB0byB0aGUgZGV2aWNlLgpXZSBh
+cmUgd2FyeSBvZiBzZW5kaW5nIHByaW9yaXRpemVkIGNvbW1hbmRzIGJ5IGRlZmF1bHQgd2hlbiB3
+ZSBhcmUgdW5zdXJlCm9mIGhvdyB0aGUgZGV2aWNlIHdpbGwgcmVzcG9uZCB0byB0aGVzZSBwcmlv
+cml0aXplZCBjb21tYW5kcy4KClRoZSByZWFzb24gSSBwcm9wb3NlIGEgc3lzZnMgZmlsZSBpbiB0
+aGUgcXVldWUgaXMgdGhhdCBpdCBzb2x2ZXMgdGhlc2UgdHdvIAppc3N1ZXMgYXQgdGhlIHNhbWUg
+dGltZS4gCgpJIHdvdWxkIGFwcHJlY2lhdGUgaXQgaWYgeW91IGNvdWxkIHN1Z2dlc3QgYW4gYWx0
+ZXJuYXRpdmUgZml4IGZvciB0aGVzZSBpc3N1ZXMKb3IgYW4gZXhwbGFuYXRpb24gb2Ygd2h5IHRo
+ZXNlIGNvbmNlcm5zIGFyZSBub3QgdmFsaWQuCgo+IAo+IC0tIAo+IEplbnMgQXhib2UKPiAKClRh
+a2UgY2FyZSwKQWRhbQpXZXN0ZXJuIERpZ2l0YWwgQ29ycG9yYXRpb24gKGFuZCBpdHMgc3Vic2lk
+aWFyaWVzKSBFLW1haWwgQ29uZmlkZW50aWFsaXR5IE5vdGljZSAmIERpc2NsYWltZXI6CgpUaGlz
+IGUtbWFpbCBhbmQgYW55IGZpbGVzIHRyYW5zbWl0dGVkIHdpdGggaXQgbWF5IGNvbnRhaW4gY29u
+ZmlkZW50aWFsIG9yIGxlZ2FsbHkgcHJpdmlsZWdlZCBpbmZvcm1hdGlvbiBvZiBXREMgYW5kL29y
+IGl0cyBhZmZpbGlhdGVzLCBhbmQgYXJlIGludGVuZGVkIHNvbGVseSBmb3IgdGhlIHVzZSBvZiB0
+aGUgaW5kaXZpZHVhbCBvciBlbnRpdHkgdG8gd2hpY2ggdGhleSBhcmUgYWRkcmVzc2VkLiBJZiB5
+b3UgYXJlIG5vdCB0aGUgaW50ZW5kZWQgcmVjaXBpZW50LCBhbnkgZGlzY2xvc3VyZSwgY29weWlu
+ZywgZGlzdHJpYnV0aW9uIG9yIGFueSBhY3Rpb24gdGFrZW4gb3Igb21pdHRlZCB0byBiZSB0YWtl
+biBpbiByZWxpYW5jZSBvbiBpdCwgaXMgcHJvaGliaXRlZC4gSWYgeW91IGhhdmUgcmVjZWl2ZWQg
+dGhpcyBlLW1haWwgaW4gZXJyb3IsIHBsZWFzZSBub3RpZnkgdGhlIHNlbmRlciBpbW1lZGlhdGVs
+eSBhbmQgZGVsZXRlIHRoZSBlLW1haWwgaW4gaXRzIGVudGlyZXR5IGZyb20geW91ciBzeXN0ZW0u
+Cg==
