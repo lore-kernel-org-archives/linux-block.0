@@ -1,188 +1,28 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv4 25/43] fs: make block_write_{begin,end}() be able to handle huge pages
-Date: Tue, 25 Oct 2016 03:13:24 +0300
-Message-Id: <20161025001342.76126-26-kirill.shutemov@linux.intel.com>
-In-Reply-To: <20161025001342.76126-1-kirill.shutemov@linux.intel.com>
-References: <20161025001342.76126-1-kirill.shutemov@linux.intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH v2] badblocks: fix overlapping check for clearing
+To: Tomasz Majchrzak <tomasz.majchrzak@intel.com>, linux-block@vger.kernel.org
+References: <1476267788-31480-1-git-send-email-tomasz.majchrzak@intel.com>
+Cc: dan.j.williams@intel.com, neilb@suse.com, aleksey.obitotskiy@intel.com,
+ pawel.baldysiak@intel.com, artur.paszkiewicz@intel.com,
+ maksymilian.kunt@intel.com
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <beaa1a1c-be60-a3c8-b8e3-9e9ece4b8b26@kernel.dk>
+Date: Wed, 12 Oct 2016 08:07:41 -0600
+MIME-Version: 1.0
+In-Reply-To: <1476267788-31480-1-git-send-email-tomasz.majchrzak@intel.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-It's more or less straight-forward.
+On 10/12/2016 04:23 AM, Tomasz Majchrzak wrote:
+> Current bad block clear implementation assumes the range to clear
+> overlaps with at least one bad block already stored. If given range to
+> clear precedes first bad block in a list, the first entry is incorrectly
+> updated.
+>
+> Check not only if stored block end is past clear block end but also if
+> stored block start is before clear block end.
 
-Most changes are around getting offset/len withing page right and zero
-out desired part of the page.
+Queued up, thanks.
 
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
----
- fs/buffer.c | 70 +++++++++++++++++++++++++++++++++++--------------------------
- 1 file changed, 40 insertions(+), 30 deletions(-)
-
-diff --git a/fs/buffer.c b/fs/buffer.c
-index 35b76b1c0308..c078f5d74a2a 100644
---- a/fs/buffer.c
-+++ b/fs/buffer.c
-@@ -1859,6 +1859,7 @@ void page_zero_new_buffers(struct page *page, unsigned from, unsigned to)
- {
- 	unsigned int block_start, block_end;
- 	struct buffer_head *head, *bh;
-+	bool uptodate = PageUptodate(page);
- 
- 	BUG_ON(!PageLocked(page));
- 	if (!page_has_buffers(page))
-@@ -1869,21 +1870,21 @@ void page_zero_new_buffers(struct page *page, unsigned from, unsigned to)
- 	do {
- 		block_end = block_start + bh->b_size;
- 
--		if (buffer_new(bh)) {
--			if (block_end > from && block_start < to) {
--				if (!PageUptodate(page)) {
--					unsigned start, size;
-+		if (buffer_new(bh) && block_end > from && block_start < to) {
-+			if (!uptodate) {
-+				unsigned start, size;
- 
--					start = max(from, block_start);
--					size = min(to, block_end) - start;
-+				start = max(from, block_start);
-+				size = min(to, block_end) - start;
- 
--					zero_user(page, start, size);
--					set_buffer_uptodate(bh);
--				}
--
--				clear_buffer_new(bh);
--				mark_buffer_dirty(bh);
-+				zero_user(page + block_start / PAGE_SIZE,
-+						start % PAGE_SIZE,
-+						size);
-+				set_buffer_uptodate(bh);
- 			}
-+
-+			clear_buffer_new(bh);
-+			mark_buffer_dirty(bh);
- 		}
- 
- 		block_start = block_end;
-@@ -1949,18 +1950,21 @@ iomap_to_bh(struct inode *inode, sector_t block, struct buffer_head *bh,
- int __block_write_begin_int(struct page *page, loff_t pos, unsigned len,
- 		get_block_t *get_block, struct iomap *iomap)
- {
--	unsigned from = pos & (PAGE_SIZE - 1);
--	unsigned to = from + len;
--	struct inode *inode = page->mapping->host;
-+	unsigned from, to;
-+	struct inode *inode = page_mapping(page)->host;
- 	unsigned block_start, block_end;
- 	sector_t block;
- 	int err = 0;
- 	unsigned blocksize, bbits;
- 	struct buffer_head *bh, *head, *wait[2], **wait_bh=wait;
-+	bool uptodate = PageUptodate(page);
- 
-+	page = compound_head(page);
-+	from = pos & ~hpage_mask(page);
-+	to = from + len;
- 	BUG_ON(!PageLocked(page));
--	BUG_ON(from > PAGE_SIZE);
--	BUG_ON(to > PAGE_SIZE);
-+	BUG_ON(from > hpage_size(page));
-+	BUG_ON(to > hpage_size(page));
- 	BUG_ON(from > to);
- 
- 	head = create_page_buffers(page, inode, 0);
-@@ -1973,10 +1977,8 @@ int __block_write_begin_int(struct page *page, loff_t pos, unsigned len,
- 	    block++, block_start=block_end, bh = bh->b_this_page) {
- 		block_end = block_start + blocksize;
- 		if (block_end <= from || block_start >= to) {
--			if (PageUptodate(page)) {
--				if (!buffer_uptodate(bh))
--					set_buffer_uptodate(bh);
--			}
-+			if (uptodate && !buffer_uptodate(bh))
-+				set_buffer_uptodate(bh);
- 			continue;
- 		}
- 		if (buffer_new(bh))
-@@ -1994,23 +1996,28 @@ int __block_write_begin_int(struct page *page, loff_t pos, unsigned len,
- 			if (buffer_new(bh)) {
- 				unmap_underlying_metadata(bh->b_bdev,
- 							bh->b_blocknr);
--				if (PageUptodate(page)) {
-+				if (uptodate) {
- 					clear_buffer_new(bh);
- 					set_buffer_uptodate(bh);
- 					mark_buffer_dirty(bh);
- 					continue;
- 				}
--				if (block_end > to || block_start < from)
--					zero_user_segments(page,
--						to, block_end,
--						block_start, from);
-+				if (block_end > to || block_start < from) {
-+					BUG_ON(to - from  > PAGE_SIZE);
-+					zero_user_segments(page +
-+							block_start / PAGE_SIZE,
-+						to % PAGE_SIZE,
-+						(block_start % PAGE_SIZE) + blocksize,
-+						block_start % PAGE_SIZE,
-+						from % PAGE_SIZE);
-+				}
- 				continue;
- 			}
- 		}
--		if (PageUptodate(page)) {
-+		if (uptodate) {
- 			if (!buffer_uptodate(bh))
- 				set_buffer_uptodate(bh);
--			continue; 
-+			continue;
- 		}
- 		if (!buffer_uptodate(bh) && !buffer_delay(bh) &&
- 		    !buffer_unwritten(bh) &&
-@@ -2047,6 +2054,7 @@ static int __block_commit_write(struct inode *inode, struct page *page,
- 	unsigned blocksize;
- 	struct buffer_head *bh, *head;
- 
-+	VM_BUG_ON_PAGE(PageTail(page), page);
- 	bh = head = page_buffers(page);
- 	blocksize = bh->b_size;
- 
-@@ -2060,7 +2068,8 @@ static int __block_commit_write(struct inode *inode, struct page *page,
- 			set_buffer_uptodate(bh);
- 			mark_buffer_dirty(bh);
- 		}
--		clear_buffer_new(bh);
-+		if (buffer_new(bh))
-+			clear_buffer_new(bh);
- 
- 		block_start = block_end;
- 		bh = bh->b_this_page;
-@@ -2113,7 +2122,8 @@ int block_write_end(struct file *file, struct address_space *mapping,
- 	struct inode *inode = mapping->host;
- 	unsigned start;
- 
--	start = pos & (PAGE_SIZE - 1);
-+	page = compound_head(page);
-+	start = pos & ~hpage_mask(page);
- 
- 	if (unlikely(copied < len)) {
- 		/*
 -- 
-2.9.3
-
+Jens Axboe
