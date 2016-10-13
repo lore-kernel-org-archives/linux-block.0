@@ -1,93 +1,76 @@
-Return-Path: <hare@suse.de>
+Return-Path: <Adam.Manzanares@wdc.com>
+Date: Thu, 13 Oct 2016 15:02:43 -0700
+From: Adam Manzananares <adam.manzanares@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: Dan Williams <dan.j.williams@intel.com>, Adam Manzanares
+	<adam.manzanares@hgst.com>, Tejun Heo <tj@kernel.org>, Hannes Reinecke
+	<hare@suse.de>, "Martin K. Petersen" <martin.petersen@oracle.com>,
+	<mchristi@redhat.com>, Toshi Kani <toshi.kani@hpe.com>, Ming Lei
+	<ming.lei@canonical.com>, <sathya.prakash@broadcom.com>,
+	<chaitra.basappa@broadcom.com>, <suganath-prabu.subramani@broadcom.com>,
+	<linux-block@vger.kernel.org>, IDE/ATA development list
+	<linux-ide@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, <MPT-FusionLinux.pdl@broadcom.com>,
+	linux-scsi <linux-scsi@vger.kernel.org>
 Subject: Re: [PATCH v4 1/4] block: Add iocontext priority to request
-To: Adam Manzanares <adam.manzanares@hgst.com>, axboe@kernel.dk,
- tj@kernel.org, dan.j.williams@intel.com, martin.petersen@oracle.com,
- mchristi@redhat.com, toshi.kani@hpe.com, ming.lei@canonical.com,
- sathya.prakash@broadcom.com, chaitra.basappa@broadcom.com,
- suganath-prabu.subramani@broadcom.com
+Message-ID: <20161013220243.GA2745@hgst.com>
 References: <1476388433-2539-1-git-send-email-adam.manzanares@hgst.com>
  <1476388433-2539-2-git-send-email-adam.manzanares@hgst.com>
-Cc: linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
- linux-kernel@vger.kernel.org, MPT-FusionLinux.pdl@broadcom.com,
- linux-scsi@vger.kernel.org, Adam Manzananares <adam.manzanares@wdc.com>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <733629ac-fb98-9acf-3b2b-e1554e839346@suse.de>
-Date: Fri, 14 Oct 2016 07:54:45 +0200
+ <CAPcyv4giMwLRkP9YDcOo4st2RqxPXsYYyTOJ2_U8ywQPteM5gQ@mail.gmail.com>
+ <068e03c4-3558-a6b1-2008-d13bde4958a1@kernel.dk>
 MIME-Version: 1.0
-In-Reply-To: <1476388433-2539-2-git-send-email-adam.manzanares@hgst.com>
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <068e03c4-3558-a6b1-2008-d13bde4958a1@kernel.dk>
+Return-Path: adam.manzanares@wdc.com
 List-ID: <linux-block@vger.kernel.org>
 
-On 10/13/2016 09:53 PM, Adam Manzanares wrote:
-> Patch adds an association between iocontext ioprio and the ioprio of a
-> request. This value is set in blk_rq_set_prio which takes the request and
-> the ioc as arguments. If the ioc is valid in blk_rq_set_prio then the
-> iopriority of the request is set as the iopriority of the ioc. In
-> init_request_from_bio a check is made to see if the ioprio of the bio is
-> valid and if so then the request prio comes from the bio.
-> 
-> Signed-off-by: Adam Manzananares <adam.manzanares@wdc.com>
-> ---
->  block/blk-core.c       |  4 +++-
->  include/linux/blkdev.h | 14 ++++++++++++++
->  2 files changed, 17 insertions(+), 1 deletion(-)
-> 
-> diff --git a/block/blk-core.c b/block/blk-core.c
-> index 14d7c07..361b1b9 100644
-> --- a/block/blk-core.c
-> +++ b/block/blk-core.c
-> @@ -1153,6 +1153,7 @@ static struct request *__get_request(struct request_list *rl, int op,
->  
->  	blk_rq_init(q, rq);
->  	blk_rq_set_rl(rq, rl);
-> +	blk_rq_set_prio(rq, ioc);
->  	req_set_op_attrs(rq, op, op_flags | REQ_ALLOCED);
->  
->  	/* init elvpriv */
-> @@ -1656,7 +1657,8 @@ void init_request_from_bio(struct request *req, struct bio *bio)
->  
->  	req->errors = 0;
->  	req->__sector = bio->bi_iter.bi_sector;
-> -	req->ioprio = bio_prio(bio);
-> +	if (ioprio_valid(bio_prio(bio)))
-> +		req->ioprio = bio_prio(bio);
->  	blk_rq_bio_prep(req->q, req, bio);
->  }
->  
-> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-> index c47c358..9a0ceaa 100644
-> --- a/include/linux/blkdev.h
-> +++ b/include/linux/blkdev.h
-> @@ -934,6 +934,20 @@ static inline unsigned int blk_rq_count_bios(struct request *rq)
->  }
->  
->  /*
-> + * blk_rq_set_prio - associate a request with prio from ioc
-> + * @rq: request of interest
-> + * @ioc: target iocontext
-> + *
-> + * Assocate request prio with ioc prio so request based drivers
-> + * can leverage priority information.
-> + */
-> +static inline void blk_rq_set_prio(struct request *rq, struct io_context *ioc)
-> +{
-> +	if (ioc)
-> +		rq->ioprio = ioc->ioprio;
-> +}
-> +
-> +/*
->   * Request issue related functions.
->   */
->  extern struct request *blk_peek_request(struct request_queue *q);
-> 
-Don't you need to check for 'ioprio_valid()' here, too?
-
-Cheers,
-
-Hannes
--- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: F. Imend�rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG N�rnberg)
+VGhlIDEwLzEzLzIwMTYgMTQ6MDksIEplbnMgQXhib2Ugd3JvdGU6Cj4gT24gMTAvMTMvMjAxNiAw
+MjowNiBQTSwgRGFuIFdpbGxpYW1zIHdyb3RlOgo+ID5PbiBUaHUsIE9jdCAxMywgMjAxNiBhdCAx
+Mjo1MyBQTSwgQWRhbSBNYW56YW5hcmVzCj4gPjxhZGFtLm1hbnphbmFyZXNAaGdzdC5jb20+IHdy
+b3RlOgo+ID4+UGF0Y2ggYWRkcyBhbiBhc3NvY2lhdGlvbiBiZXR3ZWVuIGlvY29udGV4dCBpb3By
+aW8gYW5kIHRoZSBpb3ByaW8gb2YgYQo+ID4+cmVxdWVzdC4gVGhpcyB2YWx1ZSBpcyBzZXQgaW4g
+YmxrX3JxX3NldF9wcmlvIHdoaWNoIHRha2VzIHRoZSByZXF1ZXN0IGFuZAo+ID4+dGhlIGlvYyBh
+cyBhcmd1bWVudHMuIElmIHRoZSBpb2MgaXMgdmFsaWQgaW4gYmxrX3JxX3NldF9wcmlvIHRoZW4g
+dGhlCj4gPj5pb3ByaW9yaXR5IG9mIHRoZSByZXF1ZXN0IGlzIHNldCBhcyB0aGUgaW9wcmlvcml0
+eSBvZiB0aGUgaW9jLiBJbgo+ID4+aW5pdF9yZXF1ZXN0X2Zyb21fYmlvIGEgY2hlY2sgaXMgbWFk
+ZSB0byBzZWUgaWYgdGhlIGlvcHJpbyBvZiB0aGUgYmlvIGlzCj4gPj52YWxpZCBhbmQgaWYgc28g
+dGhlbiB0aGUgcmVxdWVzdCBwcmlvIGNvbWVzIGZyb20gdGhlIGJpby4KPiA+Pgo+ID4+U2lnbmVk
+LW9mZi1ieTogQWRhbSBNYW56YW5hbmFyZXMgPGFkYW0ubWFuemFuYXJlc0B3ZGMuY29tPgo+ID4+
+LS0tCj4gPj4gYmxvY2svYmxrLWNvcmUuYyAgICAgICB8ICA0ICsrKy0KPiA+PiBpbmNsdWRlL2xp
+bnV4L2Jsa2Rldi5oIHwgMTQgKysrKysrKysrKysrKysKPiA+PiAyIGZpbGVzIGNoYW5nZWQsIDE3
+IGluc2VydGlvbnMoKyksIDEgZGVsZXRpb24oLSkKPiA+Pgo+ID4+ZGlmZiAtLWdpdCBhL2Jsb2Nr
+L2Jsay1jb3JlLmMgYi9ibG9jay9ibGstY29yZS5jCj4gPj5pbmRleCAxNGQ3YzA3Li4zNjFiMWI5
+IDEwMDY0NAo+ID4+LS0tIGEvYmxvY2svYmxrLWNvcmUuYwo+ID4+KysrIGIvYmxvY2svYmxrLWNv
+cmUuYwo+ID4+QEAgLTExNTMsNiArMTE1Myw3IEBAIHN0YXRpYyBzdHJ1Y3QgcmVxdWVzdCAqX19n
+ZXRfcmVxdWVzdChzdHJ1Y3QgcmVxdWVzdF9saXN0ICpybCwgaW50IG9wLAo+ID4+Cj4gPj4gICAg
+ICAgIGJsa19ycV9pbml0KHEsIHJxKTsKPiA+PiAgICAgICAgYmxrX3JxX3NldF9ybChycSwgcmwp
+Owo+ID4+KyAgICAgICBibGtfcnFfc2V0X3ByaW8ocnEsIGlvYyk7Cj4gPj4gICAgICAgIHJlcV9z
+ZXRfb3BfYXR0cnMocnEsIG9wLCBvcF9mbGFncyB8IFJFUV9BTExPQ0VEKTsKPiA+Pgo+ID4+ICAg
+ICAgICAvKiBpbml0IGVsdnByaXYgKi8KPiA+PkBAIC0xNjU2LDcgKzE2NTcsOCBAQCB2b2lkIGlu
+aXRfcmVxdWVzdF9mcm9tX2JpbyhzdHJ1Y3QgcmVxdWVzdCAqcmVxLCBzdHJ1Y3QgYmlvICpiaW8p
+Cj4gPj4KPiA+PiAgICAgICAgcmVxLT5lcnJvcnMgPSAwOwo+ID4+ICAgICAgICByZXEtPl9fc2Vj
+dG9yID0gYmlvLT5iaV9pdGVyLmJpX3NlY3RvcjsKPiA+Pi0gICAgICAgcmVxLT5pb3ByaW8gPSBi
+aW9fcHJpbyhiaW8pOwo+ID4+KyAgICAgICBpZiAoaW9wcmlvX3ZhbGlkKGJpb19wcmlvKGJpbykp
+KQo+ID4+KyAgICAgICAgICAgICAgIHJlcS0+aW9wcmlvID0gYmlvX3ByaW8oYmlvKTsKPiA+Cj4g
+PlNob3VsZCB3ZSB1c2UgaW9wcmlvX2Jlc3QoKSBoZXJlPyAgSWYgcmVxLT5pb3ByaW8gYW5kIGJp
+b19wcmlvKCkKPiA+ZGlzYWdyZWUgb25lIHNpZGUgaGFzIGV4cGxpY2l0bHkgYXNrZWQgZm9yIGEg
+aGlnaGVyIHByaW9yaXR5Lgo+IAo+IEl0J3MgYSBnb29kIHF1ZXN0aW9uIC0gYnV0IGlmIHByaW9y
+aXR5IGhhcyBiZWVuIHNldCBpbiB0aGUgYmlvLCBpdCBtYWtlcwo+IHNlbnNlIHRoYXQgdGhhdCB3
+b3VsZCB0YWtlIHByaW9yaXR5IG92ZXIgdGhlIGdlbmVyYWwgc2V0dGluZyBmb3IgdGhlCj4gdGFz
+ay9pbyBjb250ZXh0LiBTbyBJIHRoaW5rIHRoZSBwYXRjaCBpcyBjb3JyZWN0IGFzLWlzLgo+IAo+
+IEFkYW0sIHlvdSdsbCB3YW50IHRvIHJld3JpdGUgdGhlIGNvbW1pdCBtZXNzYWdlIHRob3VnaC4g
+QSBnb29kIGNvbW1pdAo+IG1lc3NhZ2Ugc2hvdWxkIGV4cGxhaW4gV0hZIHRoZSBjaGFuZ2UgaXMg
+bWFkZSwgbm90IGRldGFpbCB0aGUgY29kZQo+IGltcGxlbWVudGF0aW9uIG9mIGl0LgoKR290IGl0
+IEknbGwgc2VuZCBzb21ldGhpbmcgb3V0IHNvb24uCgo+IAo+IC0tIAo+IEplbnMgQXhib2UKPiAK
+ClRha2UgY2FyZSwKQWRhbQpXZXN0ZXJuIERpZ2l0YWwgQ29ycG9yYXRpb24gKGFuZCBpdHMgc3Vi
+c2lkaWFyaWVzKSBFLW1haWwgQ29uZmlkZW50aWFsaXR5IE5vdGljZSAmIERpc2NsYWltZXI6CgpU
+aGlzIGUtbWFpbCBhbmQgYW55IGZpbGVzIHRyYW5zbWl0dGVkIHdpdGggaXQgbWF5IGNvbnRhaW4g
+Y29uZmlkZW50aWFsIG9yIGxlZ2FsbHkgcHJpdmlsZWdlZCBpbmZvcm1hdGlvbiBvZiBXREMgYW5k
+L29yIGl0cyBhZmZpbGlhdGVzLCBhbmQgYXJlIGludGVuZGVkIHNvbGVseSBmb3IgdGhlIHVzZSBv
+ZiB0aGUgaW5kaXZpZHVhbCBvciBlbnRpdHkgdG8gd2hpY2ggdGhleSBhcmUgYWRkcmVzc2VkLiBJ
+ZiB5b3UgYXJlIG5vdCB0aGUgaW50ZW5kZWQgcmVjaXBpZW50LCBhbnkgZGlzY2xvc3VyZSwgY29w
+eWluZywgZGlzdHJpYnV0aW9uIG9yIGFueSBhY3Rpb24gdGFrZW4gb3Igb21pdHRlZCB0byBiZSB0
+YWtlbiBpbiByZWxpYW5jZSBvbiBpdCwgaXMgcHJvaGliaXRlZC4gSWYgeW91IGhhdmUgcmVjZWl2
+ZWQgdGhpcyBlLW1haWwgaW4gZXJyb3IsIHBsZWFzZSBub3RpZnkgdGhlIHNlbmRlciBpbW1lZGlh
+dGVseSBhbmQgZGVsZXRlIHRoZSBlLW1haWwgaW4gaXRzIGVudGlyZXR5IGZyb20geW91ciBzeXN0
+ZW0uCg==
