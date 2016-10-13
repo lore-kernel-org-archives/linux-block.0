@@ -9,22 +9,19 @@ CC: <linux-block@vger.kernel.org>, <linux-ide@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>, <MPT-FusionLinux.pdl@broadcom.com>,
 	<linux-scsi@vger.kernel.org>, Adam Manzanares <adam.manzanares@hgst.com>,
 	Adam Manzanares <adam.manzanares@wdc.com>
-Subject: [PATCH v5 3/4] ata: Enabling ATA Command Priorities
-Date: Thu, 13 Oct 2016 16:00:30 -0700
-Message-ID: <1476399631-5799-4-git-send-email-adam.manzanares@hgst.com>
-In-Reply-To: <1476399631-5799-1-git-send-email-adam.manzanares@hgst.com>
-References: <1476399631-5799-1-git-send-email-adam.manzanares@hgst.com>
+Subject: [PATCH v4 3/4] ata: Enabling ATA Command Priorities
+Date: Thu, 13 Oct 2016 12:53:52 -0700
+Message-ID: <1476388433-2539-4-git-send-email-adam.manzanares@hgst.com>
+In-Reply-To: <1476388433-2539-1-git-send-email-adam.manzanares@hgst.com>
+References: <1476388433-2539-1-git-send-email-adam.manzanares@hgst.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Return-Path: adam.manzanares@hgst.com
 List-ID: <linux-block@vger.kernel.org>
 
 This patch checks to see if an ATA device supports NCQ command priorities.
-If so and the user has specified an iocontext that indicates
-IO_PRIO_CLASS_RT then we build a tf with a high priority command.
-
-This is done to improve the tail latency of commands that are high
-priority by passing priority to the device.
+If so and the user has specified an iocontext that indicates IO_PRIO_CLASS_RT
+then we build a tf with a high priority command.
 
 Signed-off-by: Adam Manzanares <adam.manzanares@wdc.com>
 ---
