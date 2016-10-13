@@ -1,68 +1,78 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f195.google.com ([209.85.192.195]:36074 "EHLO
-        mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S966412AbcJ2IQH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sat, 29 Oct 2016 04:16:07 -0400
-From: Ming Lei <tom.leiming@gmail.com>
-To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Ming Lei <tom.leiming@gmail.com>,
-        Boaz Harrosh <ooo@electrozaur.com>,
-        Benny Halevy <bhalevy@primarydata.com>,
-        osd-dev@open-osd.org (open list:OSD LIBRARY and FILESYSTEM)
-Subject: [PATCH 55/60] exofs: convert to bio_for_each_segment_all_rd()
-Date: Sat, 29 Oct 2016 16:08:54 +0800
-Message-Id: <1477728600-12938-56-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
-References: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jthumshirn@suse.de>
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: "Martin K . Petersen" <martin.petersen@oracle.com>
+Cc: Christoph Hellwig <hch@infradead.org>,
+	Hannes Reinecke <hare@suse.de>,
+	Linux Kernel Mailinglist <linux-kernel@vger.kernel.org>,
+	Linux SCSI Mailinglist <linux-scsi@vger.kernel.org>,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	Jens Axboe <axboe@kernel.dk>,
+	Hannes Reinecke <hare@suse.com>,
+	linux-block@vger.kernel.org (open list:BLOCK LAYER)
+Subject: [PATCH v3 09/16] block: add reference counting for struct bsg_job
+Date: Thu, 13 Oct 2016 17:00:25 +0200
+Message-Id: <6c7700e282af9661e7c4588a040eb3d1a066d118.1476369687.git.jthumshirn@suse.de>
+In-Reply-To: <cover.1476369687.git.jthumshirn@suse.de>
+References: <cover.1476369687.git.jthumshirn@suse.de>
+In-Reply-To: <cover.1476369687.git.jthumshirn@suse.de>
+References: <cover.1476369687.git.jthumshirn@suse.de>
+List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+Add reference counting to 'struct bsg_job' so we can implement a reuqest
+timeout handler for bsg_jobs, which is needed for Fibre Channel.
+
+Signed-off-by: Johannes Thumshirn <jthumshirn@suse.de>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 ---
- fs/exofs/ore.c      | 3 ++-
- fs/exofs/ore_raid.c | 3 ++-
- 2 files changed, 4 insertions(+), 2 deletions(-)
+ block/bsg-lib.c         | 7 +++++--
+ include/linux/bsg-lib.h | 2 ++
+ 2 files changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/fs/exofs/ore.c b/fs/exofs/ore.c
-index 8bb72807e70d..826696f3bdf2 100644
---- a/fs/exofs/ore.c
-+++ b/fs/exofs/ore.c
-@@ -406,8 +406,9 @@ static void _clear_bio(struct bio *bio)
+diff --git a/block/bsg-lib.c b/block/bsg-lib.c
+index 650f427..632fb40 100644
+--- a/block/bsg-lib.c
++++ b/block/bsg-lib.c
+@@ -32,8 +32,10 @@
+  * bsg_destroy_job - routine to teardown/delete a bsg job
+  * @job: bsg_job that is to be torn down
+  */
+-static void bsg_destroy_job(struct bsg_job *job)
++static void bsg_destroy_job(struct kref *kref)
  {
- 	struct bio_vec *bv;
- 	unsigned i;
-+	struct bvec_iter_all bia;
++	struct bsg_job *job = container_of(kref, struct bsg_job, kref);
++
+ 	put_device(job->dev);	/* release reference for the request */
  
--	bio_for_each_segment_all(bv, bio, i) {
-+	bio_for_each_segment_all_rd(bv, bio, i, bia) {
- 		unsigned this_count = bv->bv_len;
+ 	kfree(job->request_payload.sg_list);
+@@ -84,7 +86,7 @@ static void bsg_softirq_done(struct request *rq)
+ 	struct bsg_job *job = rq->special;
  
- 		if (likely(PAGE_SIZE == this_count))
-diff --git a/fs/exofs/ore_raid.c b/fs/exofs/ore_raid.c
-index 27cbdb697649..a083d2f3f10d 100644
---- a/fs/exofs/ore_raid.c
-+++ b/fs/exofs/ore_raid.c
-@@ -429,6 +429,7 @@ static void _mark_read4write_pages_uptodate(struct ore_io_state *ios, int ret)
- {
- 	struct bio_vec *bv;
- 	unsigned i, d;
-+	struct bvec_iter_all bia;
+ 	blk_end_request_all(rq, rq->errors);
+-	bsg_destroy_job(job);
++	kref_put(&job->kref, bsg_destroy_job);
+ }
  
- 	/* loop on all devices all pages */
- 	for (d = 0; d < ios->numdevs; d++) {
-@@ -437,7 +438,7 @@ static void _mark_read4write_pages_uptodate(struct ore_io_state *ios, int ret)
- 		if (!bio)
- 			continue;
+ static int bsg_map_buffer(struct bsg_buffer *buf, struct request *req)
+@@ -142,6 +144,7 @@ static int bsg_create_job(struct device *dev, struct request *req)
+ 	job->dev = dev;
+ 	/* take a reference for the request */
+ 	get_device(job->dev);
++	kref_init(&job->kref);
+ 	return 0;
  
--		bio_for_each_segment_all(bv, bio, i) {
-+		bio_for_each_segment_all_rd(bv, bio, i, bia) {
- 			struct page *page = bv->bv_page;
+ failjob_rls_rqst_payload:
+diff --git a/include/linux/bsg-lib.h b/include/linux/bsg-lib.h
+index a226652..58e0717 100644
+--- a/include/linux/bsg-lib.h
++++ b/include/linux/bsg-lib.h
+@@ -40,6 +40,8 @@ struct bsg_job {
+ 	struct device *dev;
+ 	struct request *req;
  
- 			SetPageUptodate(page);
++	struct kref kref;
++
+ 	/* Transport/driver specific request/reply structs */
+ 	void *request;
+ 	void *reply;
 -- 
-2.7.4
-
+1.8.5.6
