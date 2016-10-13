@@ -1,144 +1,82 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
+Return-Path: <Adam.Manzanares@wdc.com>
+From: Adam Manzanares <adam.manzanares@hgst.com>
+To: <axboe@kernel.dk>, <tj@kernel.org>, <dan.j.williams@intel.com>,
+	<hare@suse.de>, <martin.petersen@oracle.com>, <mchristi@redhat.com>,
+	<toshi.kani@hpe.com>, <ming.lei@canonical.com>,
+	<sathya.prakash@broadcom.com>, <chaitra.basappa@broadcom.com>,
+	<suganath-prabu.subramani@broadcom.com>
+CC: <linux-block@vger.kernel.org>, <linux-ide@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <MPT-FusionLinux.pdl@broadcom.com>,
+	<linux-scsi@vger.kernel.org>, Adam Manzanares <adam.manzanares@hgst.com>
+Subject: [PATCH v5 0/4] Enabling ATA Command Priorities
+Date: Thu, 13 Oct 2016 16:00:27 -0700
+Message-ID: <1476399631-5799-1-git-send-email-adam.manzanares@hgst.com>
 MIME-Version: 1.0
-In-Reply-To: <9fb67745-954c-a70f-a89a-d184c99ae9aa@sandisk.com>
-References: <f153ee47-e599-c333-92b0-d5da475012f3@sandisk.com>
- <a9eb4e95-6d77-e527-c42a-fd2e6f104bed@sandisk.com> <CACVXFVOO4P3RsnWci8XHdFoYBhNPq0KqjWJddsie-92+31bpEg@mail.gmail.com>
- <9fb67745-954c-a70f-a89a-d184c99ae9aa@sandisk.com>
-From: Ming Lei <tom.leiming@gmail.com>
-Date: Sun, 2 Oct 2016 06:56:19 +0800
-Message-ID: <CACVXFVMY19vuDjsECg2uX0_y_K7DUaaGqXPX9PYiBy5sfXmAEw@mail.gmail.com>
-Subject: Re: [PATCH v2 4/7] blk-mq: Introduce blk_quiesce_queue() and blk_resume_queue()
-To: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@lst.de>,
-        James Bottomley <jejb@linux.vnet.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Doug Ledford <dledford@redhat.com>,
-        Keith Busch <keith.busch@intel.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-scsi-owner@vger.kernel.org
+Content-Type: text/plain
+Return-Path: adam.manzanares@hgst.com
 List-ID: <linux-block@vger.kernel.org>
 
-On Fri, Sep 30, 2016 at 11:55 PM, Bart Van Assche
-<bart.vanassche@sandisk.com> wrote:
-> On 09/29/16 14:51, Ming Lei wrote:
->>
->> On Thu, Sep 29, 2016 at 7:59 AM, Bart Van Assche
->> <bart.vanassche@sandisk.com> wrote:
->>>
->>> blk_quiesce_queue() prevents that new queue_rq() invocations
->>
->>
->> blk_mq_quiesce_queue()
->
->
-> Thanks, I will update the patch title and patch description.
->
->>> +void blk_mq_quiesce_queue(struct request_queue *q)
->>> +{
->>> +       struct blk_mq_hw_ctx *hctx;
->>> +       unsigned int i;
->>> +       bool res, rcu = false;
->>> +
->>> +       spin_lock_irq(q->queue_lock);
->>> +       WARN_ON_ONCE(blk_queue_quiescing(q));
->>> +       queue_flag_set(QUEUE_FLAG_QUIESCING, q);
->>> +       spin_unlock_irq(q->queue_lock);
->>> +
->>> +       res = __blk_mq_freeze_queue_start(q, false);
->>
->>
->> Looks the implementation is a bit tricky and complicated, if the percpu
->> usage counter isn't killed, it isn't necessary to touch .mq_freeze_depth
->> since you use QUEUE_FLAG_QUIESCING to set/get this status of
->> the queue.
->
->>
->> Then using synchronize_rcu() and rcu_read_lock()/rcu_read_unlock()
->> with the flag of QUIESCING may be enough to wait for completing
->> of ongoing invocations of .queue_rq() and avoid to run new .queue_rq,
->> right?
->
-> That's an interesting thought. Can you have a look at the attached patch in
-> which blk_mq_quiesce_queue() no longer manipulates the mq_freeze_depth
-> counter?
+This patch builds ATA commands with high priority if the iocontext of a process
+is set to real time. The goal of the patch is to improve tail latencies of 
+workloads that use higher queue depths. This requires setting the iocontext 
+ioprio on the request when it is initialized.
 
-About this part of manipulating 'mq_freeze_depth', your new patch looks
-better and cleaner.
+This patch has been tested with an Ultrastar HE8 HDD and cuts the 
+the p99.99 tail latency of foreground IO from 2s down to 72ms when
+using the deadline scheduler. This patch works independently of the
+scheduler so it can be used with all of the currently available 
+request based schedulers. 
 
->
->>> +       WARN_ON_ONCE(!res);
->>> +       queue_for_each_hw_ctx(q, hctx, i) {
->>> +               if (hctx->flags & BLK_MQ_F_BLOCKING) {
->>> +                       mutex_lock(&hctx->queue_rq_mutex);
->>> +                       mutex_unlock(&hctx->queue_rq_mutex);
->>
->>
->> Could you explain a bit why all BLOCKING is treated so special? And
->> that flag just means the hw queue always need to schedule asynchronously,
->> and of course even though the flag isn't set, it still may be run
->> asynchronously too. So looks it should be enough to just use RCU.
->
->
-> The mutex manipulations introduce atomic stores in the hot path. Hence the
-> use of synchronize_rcu() and rcu_read_lock()/rcu_read_unlock() when
-> possible. Since BLK_MQ_F_BLOCKING indicates that .queue_rq() may sleep and
-> since sleeping is not allowed while holding the RCU read lock,
-> queue_rq_mutex has been introduced for the BLK_MQ_F_BLOCKING case.
+Foreground IO, for the previously described results, is an async fio job 
+submitting 4K read requests at a QD of 1 to the HDD. The foreground IO is set 
+with the iopriority class of real time. The background workload is another fio
+job submitting read requests at a QD of 32 to the same HDD with default 
+iopriority.
 
-OK, got it.
+This feature is enabled for ATA devices by setting the ata enable_prio device 
+attribute to 1. An ATA device is also checked to see if the device supports per
+command priority.
 
-But this part looks still not good enough:
+v5:
+ - Updated block patch commit message to explain the why 
 
-> +static void __blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx)
-> +{
-> +       if (unlikely(test_bit(BLK_MQ_S_STOPPED, &hctx->state)))
-> +               return;
-> +
-> +       if (hctx->flags & BLK_MQ_F_BLOCKING) {
-> +               mutex_lock(&hctx->queue_rq_mutex);
-> +               blk_mq_process_rq_list(hctx);
-> +               mutex_unlock(&hctx->queue_rq_mutex);
+v4:
+ - Added blk_rq_set_prio function to associate request prio with ioc prio
+ - In init_request_from_bio use bio_prio if it is valid
+ - Removed queue flag used to enable prio
+ - Added ata enable_prio dev attribute to sysfs to enable prioritized commands
 
-With the new mutex, .queue_rq can't be run concurrently any more, even
-though the hw queue can be mapped to more than one CPUs. So maybe
-srcu for BLK_MQ_F_BLOCKING?
+v3:
+ - Removed null dereference issue in blk-core
+ - Renamed queue sysfs entries for clarity
+ - Added documentation for sysfs queue entry
 
-> +       } else {
-> +               rcu_read_lock();
-> +               blk_mq_process_rq_list(hctx);
-> +               rcu_read_unlock();
->         }
+v2:
+ - Add queue flag to set iopriority going to the request
+ - If queue flag set, send iopriority class to ata_build_rw_tf
+ - Remove redundant code in ata_ncq_prio_enabled function.
 
-...
 
-> -               if (!blk_mq_direct_issue_request(old_rq, &cookie))
-> -                       goto done;
-> -               blk_mq_insert_request(old_rq, false, true, true);
-> +
-> +               if (data.hctx->flags & BLK_MQ_F_BLOCKING) {
-> +                       mutex_lock(&data.hctx->queue_rq_mutex);
-> +                       if (blk_queue_quiescing(q) ||
-> +                           blk_mq_direct_issue_request(old_rq, &cookie) != 0)
-> +                               blk_mq_insert_request(old_rq, false, true,
-> +                                                     true);
-> +                       mutex_unlock(&data.hctx->queue_rq_mutex);
-> +               } else {
-> +                       rcu_read_lock();
-> +                       if (blk_queue_quiescing(q) ||
-> +                           blk_mq_direct_issue_request(old_rq, &cookie) != 0)
-> +                               blk_mq_insert_request(old_rq, false, true,
-> +                                                     true);
-> +                       rcu_read_unlock();
-> +               }
-> +
+Adam Manzanares (4):
+  block: Add iocontext priority to request
+  fusion: remove iopriority handling
+  ata: Enabling ATA Command Priorities
+  ata: ATA Command Priority Disabled By Default
 
-If we just call the rcu/srcu read lock(or the mutex) around .queue_rq(), the
-above code needn't to be duplicated any more.
+ block/blk-core.c                  |  4 ++-
+ drivers/ata/libahci.c             |  1 +
+ drivers/ata/libata-core.c         | 35 +++++++++++++++++-
+ drivers/ata/libata-scsi.c         | 74 ++++++++++++++++++++++++++++++++++++++-
+ drivers/ata/libata.h              |  2 +-
+ drivers/message/fusion/mptscsih.c |  5 ---
+ include/linux/ata.h               |  6 ++++
+ include/linux/blkdev.h            | 14 ++++++++
+ include/linux/libata.h            | 26 ++++++++++++++
+ 9 files changed, 158 insertions(+), 9 deletions(-)
 
-Thanks,
-Ming Lei
+-- 
+2.1.4
+
+Western Digital Corporation (and its subsidiaries) E-mail Confidentiality Notice & Disclaimer:
+
+This e-mail and any files transmitted with it may contain confidential or legally privileged information of WDC and/or its affiliates, and are intended solely for the use of the individual or entity to which they are addressed. If you are not the intended recipient, any disclosure, copying, distribution or any action taken or omitted to be taken in reliance on it, is prohibited. If you have received this e-mail in error, please notify the sender immediately and delete the e-mail in its entirety from your system.
