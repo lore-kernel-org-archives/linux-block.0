@@ -1,87 +1,42 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga03.intel.com ([134.134.136.65]:63386 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S933586AbcJYAO2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 Oct 2016 20:14:28 -0400
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv4 39/43] ext4: make EXT4_IOC_MOVE_EXT work with huge pages
-Date: Tue, 25 Oct 2016 03:13:38 +0300
-Message-Id: <20161025001342.76126-40-kirill.shutemov@linux.intel.com>
-In-Reply-To: <20161025001342.76126-1-kirill.shutemov@linux.intel.com>
-References: <20161025001342.76126-1-kirill.shutemov@linux.intel.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <hare@suse.de>
+Subject: Re: [PATCH v2 14/16] block: add bsg_job_put() and bsg_job_get()
+To: Johannes Thumshirn <jthumshirn@suse.de>,
+ "Martin K . Petersen" <martin.petersen@oracle.com>
+References: <cover.1476276823.git.jthumshirn@suse.de>
+ <18a915378ba11b84faa85341beb57df3f5976b64.1476276823.git.jthumshirn@suse.de>
+Cc: Christoph Hellwig <hch@infradead.org>,
+ Linux Kernel Mailinglist <linux-kernel@vger.kernel.org>,
+ Linux SCSI Mailinglist <linux-scsi@vger.kernel.org>,
+ Jens Axboe <axboe@kernel.dk>, "James E.J. Bottomley"
+ <jejb@linux.vnet.ibm.com>,
+ "open list:BLOCK LAYER" <linux-block@vger.kernel.org>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <ded0fa07-42b8-e05a-fd8f-d05af8b8d704@suse.de>
+Date: Thu, 13 Oct 2016 13:47:07 +0200
+MIME-Version: 1.0
+In-Reply-To: <18a915378ba11b84faa85341beb57df3f5976b64.1476276823.git.jthumshirn@suse.de>
+Content-Type: text/plain; charset=windows-1252
+List-ID: <linux-block@vger.kernel.org>
 
-Adjust how we find relevant block within page and how we clear the
-required part of the page.
+On 10/12/2016 03:06 PM, Johannes Thumshirn wrote:
+> Add bsg_job_put() and bsg_job_get() so don't need to export
+> bsg_destroy_job() any more.
+> 
+> Signed-off-by: Johannes Thumshirn <jthumshirn@suse.de>
+> ---
+>  block/bsg-lib.c                  | 17 ++++++++++++++---
+>  drivers/scsi/scsi_transport_fc.c |  4 ++--
+>  include/linux/bsg-lib.h          |  3 ++-
+>  3 files changed, 18 insertions(+), 6 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
----
- fs/ext4/move_extent.c | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+Cheers,
 
-diff --git a/fs/ext4/move_extent.c b/fs/ext4/move_extent.c
-index 6fc14def0c70..2efa9deb47a9 100644
---- a/fs/ext4/move_extent.c
-+++ b/fs/ext4/move_extent.c
-@@ -210,7 +210,9 @@ mext_page_mkuptodate(struct page *page, unsigned from, unsigned to)
- 				return err;
- 			}
- 			if (!buffer_mapped(bh)) {
--				zero_user(page, block_start, blocksize);
-+				zero_user(page + block_start / PAGE_SIZE,
-+						block_start % PAGE_SIZE,
-+						blocksize);
- 				set_buffer_uptodate(bh);
- 				continue;
- 			}
-@@ -267,10 +269,11 @@ move_extent_per_page(struct file *o_filp, struct inode *donor_inode,
- 	unsigned int tmp_data_size, data_size, replaced_size;
- 	int i, err2, jblocks, retries = 0;
- 	int replaced_count = 0;
--	int from = data_offset_in_page << orig_inode->i_blkbits;
-+	int from;
- 	int blocks_per_page = PAGE_SIZE >> orig_inode->i_blkbits;
- 	struct super_block *sb = orig_inode->i_sb;
- 	struct buffer_head *bh = NULL;
-+	int diff;
- 
- 	/*
- 	 * It needs twice the amount of ordinary journal buffers because
-@@ -355,6 +358,9 @@ move_extent_per_page(struct file *o_filp, struct inode *donor_inode,
- 		goto unlock_pages;
- 	}
- data_copy:
-+	diff = (pagep[0] - compound_head(pagep[0])) * blocks_per_page;
-+	from = (data_offset_in_page + diff) << orig_inode->i_blkbits;
-+	pagep[0] = compound_head(pagep[0]);
- 	*err = mext_page_mkuptodate(pagep[0], from, from + replaced_size);
- 	if (*err)
- 		goto unlock_pages;
-@@ -384,7 +390,7 @@ move_extent_per_page(struct file *o_filp, struct inode *donor_inode,
- 	if (!page_has_buffers(pagep[0]))
- 		create_empty_buffers(pagep[0], 1 << orig_inode->i_blkbits, 0);
- 	bh = page_buffers(pagep[0]);
--	for (i = 0; i < data_offset_in_page; i++)
-+	for (i = 0; i < data_offset_in_page + diff; i++)
- 		bh = bh->b_this_page;
- 	for (i = 0; i < block_len_in_page; i++) {
- 		*err = ext4_get_block(orig_inode, orig_blk_offset + i, bh, 0);
+Hannes
 -- 
-2.9.3
-
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: F. Imend�rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG N�rnberg)
