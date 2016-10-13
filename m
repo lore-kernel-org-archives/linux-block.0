@@ -1,93 +1,77 @@
-Return-Path: <Adam.Manzanares@wdc.com>
-Date: Thu, 13 Oct 2016 15:12:25 -0700
-From: Adam Manzanares <adam.manzanares@wdc.com>
-To: Sathya Prakash Veerichetty <sathya.prakash@broadcom.com>
-CC: Adam Manzanares <adam.manzanares@hgst.com>, <axboe@kernel.dk>,
-	<tj@kernel.org>, <dan.j.williams@intel.com>, <hare@suse.de>,
-	<martin.petersen@oracle.com>, <mchristi@redhat.com>, <toshi.kani@hpe.com>,
-	<ming.lei@canonical.com>, Chaitra Basappa <chaitra.basappa@broadcom.com>,
-	Suganath Prabu Subramani <suganath-prabu.subramani@broadcom.com>,
-	<linux-block@vger.kernel.org>, <linux-ide@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, PDL-MPT-FUSIONLINUX
-	<mpt-fusionlinux.pdl@broadcom.com>, <linux-scsi@vger.kernel.org>
-Subject: Re: [PATCH v4 2/4] fusion: remove iopriority handling
-Message-ID: <20161013221225.GB2745@hgst.com>
-References: <1476388433-2539-1-git-send-email-adam.manzanares@hgst.com>
- <1476388433-2539-3-git-send-email-adam.manzanares@hgst.com>
- <8338586db99fd444337d27f9abc3a777@mail.gmail.com>
+Return-Path: <sathya.prakash@broadcom.com>
+From: Sathya Prakash Veerichetty <sathya.prakash@broadcom.com>
+References: <1476388433-2539-1-git-send-email-adam.manzanares@hgst.com> <1476388433-2539-3-git-send-email-adam.manzanares@hgst.com>
+In-Reply-To: <1476388433-2539-3-git-send-email-adam.manzanares@hgst.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-In-Reply-To: <8338586db99fd444337d27f9abc3a777@mail.gmail.com>
-Return-Path: adam.manzanares@wdc.com
+Date: Thu, 13 Oct 2016 15:05:49 -0600
+Message-ID: <8338586db99fd444337d27f9abc3a777@mail.gmail.com>
+Subject: RE: [PATCH v4 2/4] fusion: remove iopriority handling
+To: Adam Manzanares <adam.manzanares@hgst.com>, axboe@kernel.dk, tj@kernel.org,
+	dan.j.williams@intel.com, hare@suse.de, martin.petersen@oracle.com,
+	mchristi@redhat.com, toshi.kani@hpe.com, ming.lei@canonical.com,
+	Chaitra Basappa <chaitra.basappa@broadcom.com>,
+	Suganath Prabu Subramani <suganath-prabu.subramani@broadcom.com>
+Cc: linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	PDL-MPT-FUSIONLINUX <mpt-fusionlinux.pdl@broadcom.com>, linux-scsi@vger.kernel.org,
+	Adam Manzanares <adam.manzanares@wdc.com>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
-VGhlIDEwLzEzLzIwMTYgMTU6MDUsIFNhdGh5YSBQcmFrYXNoIFZlZXJpY2hldHR5IHdyb3RlOgo+
-IEJ5IHJlbW92aW5nIHRoZSBjb2RlIGJlbG93LCB3ZSBwdXQgYWxsIHRoZSBjb21tYW5kcyBmb3Ig
-YWxsIHRoZSB0eXBlcyBvZgo+IGRldmljZXMgKFNBUy9TQVRBKSBhcyBzaW1wbGUtUSAocmVxdWV1
-ZSBhcyB0aGUgZGV2aWNlIHJlcXVpcmUpIGFuZCBJIGFtCj4gbm90IHN1cmUgd2hldGhlciBpdCBp
-cyB0aGUgaW50ZW50aW9uIG9mIHRoaXMgY2hhbmdlLgo+IAoKVGhpcyBpcyB0aGUgaW50ZW50aW9u
-IG9mIHRoZSBjaGFuZ2UuIEkgZG9uJ3QgdGhpbmsgdGhlIGlvcHJpb3JpdHkgb2YgdGhlCnJlcXVl
-c3QgaXMgYmVpbmcgdXNlZCBjb3JyZWN0bHkuIFdoYXQgZG9lcyBpdCBtZWFuIHRvIHVzZSAweDcg
-YXMgYW4gCmluZGljYXRvciB0aGF0IGEgY29tbWFuZCBzaG91bGQgYmUgcHV0IGF0IHRoZSBoZWFk
-IG9mIHRoZSBxdWV1ZT8gVGhpcyAKd291bGQgYmUgY2xlYXJlciBpZiBpdCB3YXMgdXNpbmcgc29t
-ZSBvZiB0aGUgbWFjcm9zIGZyb20gaW9wcmlvLiBJZiAKMHg3IG1lYW5zIHNvbWV0aGluZyBzcGVj
-aWFsIEkgdGhpbmsgdGhpcyBzaG91bGQgYmUgc29tZSAjZGVmaW5lIGluIHRoZSAKaW5jbHVkZXMg
-b2YgdGhlIGZ1c2lvbiBkcml2ZXIgd2l0aCBzb21lIGRvY3VtZW50YXRpb24uCgo+IC0tLS0tT3Jp
-Z2luYWwgTWVzc2FnZS0tLS0tCj4gRnJvbTogQWRhbSBNYW56YW5hcmVzIFttYWlsdG86YWRhbS5t
-YW56YW5hcmVzQGhnc3QuY29tXQo+IFNlbnQ6IFRodXJzZGF5LCBPY3RvYmVyIDEzLCAyMDE2IDE6
-NTQgUE0KPiBUbzogYXhib2VAa2VybmVsLmRrOyB0akBrZXJuZWwub3JnOyBkYW4uai53aWxsaWFt
-c0BpbnRlbC5jb207Cj4gaGFyZUBzdXNlLmRlOyBtYXJ0aW4ucGV0ZXJzZW5Ab3JhY2xlLmNvbTsg
-bWNocmlzdGlAcmVkaGF0LmNvbTsKPiB0b3NoaS5rYW5pQGhwZS5jb207IG1pbmcubGVpQGNhbm9u
-aWNhbC5jb207IHNhdGh5YS5wcmFrYXNoQGJyb2FkY29tLmNvbTsKPiBjaGFpdHJhLmJhc2FwcGFA
-YnJvYWRjb20uY29tOyBzdWdhbmF0aC1wcmFidS5zdWJyYW1hbmlAYnJvYWRjb20uY29tCj4gQ2M6
-IGxpbnV4LWJsb2NrQHZnZXIua2VybmVsLm9yZzsgbGludXgtaWRlQHZnZXIua2VybmVsLm9yZzsK
-PiBsaW51eC1rZXJuZWxAdmdlci5rZXJuZWwub3JnOyBNUFQtRnVzaW9uTGludXgucGRsQGJyb2Fk
-Y29tLmNvbTsKPiBsaW51eC1zY3NpQHZnZXIua2VybmVsLm9yZzsgQWRhbSBNYW56YW5hcmVzOyBB
-ZGFtIE1hbnphbmFyZXMKPiBTdWJqZWN0OiBbUEFUQ0ggdjQgMi80XSBmdXNpb246IHJlbW92ZSBp
-b3ByaW9yaXR5IGhhbmRsaW5nCj4gCj4gVGhlIHJlcXVlc3QgcHJpb3JpdHkgaXMgbm93IGJ5IGRl
-ZmF1bHQgY29taW5nIGZyb20gdGhlIGlvYy4gSXQgd2FzIG5vdAo+IGNsZWFyIHdoYXQgdGhpcyBj
-b2RlIHdhcyB0cnlpbmcgdG8gZG8gYmFzZWQgdXBvbiB0aGUgaW9wcmlvcml0eSBjbGFzcyBvcgo+
-IGRhdGEuIFRoZSBkcml2ZXIgc2hvdWxkIGNoZWNrIHRoYXQgYSBkZXZpY2Ugc3VwcG9ydHMgcHJp
-b3JpdGllcyBhbmQgdXNlCj4gdGhlbSBhY2NvcmRpbmcgdG8gdGhlIHNwZWNpZmljaWF0aW9ucyBv
-ZiBpb3ByaW8uCj4gCj4gU2lnbmVkLW9mZi1ieTogQWRhbSBNYW56YW5hcmVzIDxhZGFtLm1hbnph
-bmFyZXNAd2RjLmNvbT4KPiAtLS0KPiAgZHJpdmVycy9tZXNzYWdlL2Z1c2lvbi9tcHRzY3NpaC5j
-IHwgNSAtLS0tLQo+ICAxIGZpbGUgY2hhbmdlZCwgNSBkZWxldGlvbnMoLSkKPiAKPiBkaWZmIC0t
-Z2l0IGEvZHJpdmVycy9tZXNzYWdlL2Z1c2lvbi9tcHRzY3NpaC5jCj4gYi9kcml2ZXJzL21lc3Nh
-Z2UvZnVzaW9uL21wdHNjc2loLmMKPiBpbmRleCA2YzlmYzExLi40NzQwYmI2IDEwMDY0NAo+IC0t
-LSBhL2RyaXZlcnMvbWVzc2FnZS9mdXNpb24vbXB0c2NzaWguYwo+ICsrKyBiL2RyaXZlcnMvbWVz
-c2FnZS9mdXNpb24vbXB0c2NzaWguYwo+IEBAIC0xMzY5LDExICsxMzY5LDYgQEAgbXB0c2NzaWhf
-cWNtZChzdHJ1Y3Qgc2NzaV9jbW5kICpTQ3BudCkKPiAgCWlmICgodmRldmljZS0+dnRhcmdldC0+
-dGZsYWdzICYgTVBUX1RBUkdFVF9GTEFHU19RX1lFUykKPiAgCSAgICAmJiAoU0NwbnQtPmRldmlj
-ZS0+dGFnZ2VkX3N1cHBvcnRlZCkpIHsKPiAgCQlzY3NpY3RsID0gc2NzaWRpciB8IE1QSV9TQ1NJ
-SU9fQ09OVFJPTF9TSU1QTEVROwo+IC0JCWlmIChTQ3BudC0+cmVxdWVzdCAmJiBTQ3BudC0+cmVx
-dWVzdC0+aW9wcmlvKSB7Cj4gLQkJCWlmICgoKFNDcG50LT5yZXF1ZXN0LT5pb3ByaW8gJiAweDcp
-ID09IDEpIHx8Cj4gLQkJCQkhKFNDcG50LT5yZXF1ZXN0LT5pb3ByaW8gJiAweDcpKQo+IC0JCQkJ
-c2NzaWN0bCB8PSBNUElfU0NTSUlPX0NPTlRST0xfSEVBRE9GUTsKPiAtCQl9Cj4gIAl9IGVsc2UK
-PiAgCQlzY3NpY3RsID0gc2NzaWRpciB8IE1QSV9TQ1NJSU9fQ09OVFJPTF9VTlRBR0dFRDsKPiAK
-PiAtLQo+IDIuMS40Cj4gCj4gV2VzdGVybiBEaWdpdGFsIENvcnBvcmF0aW9uIChhbmQgaXRzIHN1
-YnNpZGlhcmllcykgRS1tYWlsIENvbmZpZGVudGlhbGl0eQo+IE5vdGljZSAmIERpc2NsYWltZXI6
-Cj4gCj4gVGhpcyBlLW1haWwgYW5kIGFueSBmaWxlcyB0cmFuc21pdHRlZCB3aXRoIGl0IG1heSBj
-b250YWluIGNvbmZpZGVudGlhbCBvcgo+IGxlZ2FsbHkgcHJpdmlsZWdlZCBpbmZvcm1hdGlvbiBv
-ZiBXREMgYW5kL29yIGl0cyBhZmZpbGlhdGVzLCBhbmQgYXJlCj4gaW50ZW5kZWQgc29sZWx5IGZv
-ciB0aGUgdXNlIG9mIHRoZSBpbmRpdmlkdWFsIG9yIGVudGl0eSB0byB3aGljaCB0aGV5IGFyZQo+
-IGFkZHJlc3NlZC4gSWYgeW91IGFyZSBub3QgdGhlIGludGVuZGVkIHJlY2lwaWVudCwgYW55IGRp
-c2Nsb3N1cmUsIGNvcHlpbmcsCj4gZGlzdHJpYnV0aW9uIG9yIGFueSBhY3Rpb24gdGFrZW4gb3Ig
-b21pdHRlZCB0byBiZSB0YWtlbiBpbiByZWxpYW5jZSBvbiBpdCwKPiBpcyBwcm9oaWJpdGVkLiBJ
-ZiB5b3UgaGF2ZSByZWNlaXZlZCB0aGlzIGUtbWFpbCBpbiBlcnJvciwgcGxlYXNlIG5vdGlmeQo+
-IHRoZSBzZW5kZXIgaW1tZWRpYXRlbHkgYW5kIGRlbGV0ZSB0aGUgZS1tYWlsIGluIGl0cyBlbnRp
-cmV0eSBmcm9tIHlvdXIKPiBzeXN0ZW0uCj4gLS0KPiBUbyB1bnN1YnNjcmliZSBmcm9tIHRoaXMg
-bGlzdDogc2VuZCB0aGUgbGluZSAidW5zdWJzY3JpYmUgbGludXgtaWRlIiBpbgo+IHRoZSBib2R5
-IG9mIGEgbWVzc2FnZSB0byBtYWpvcmRvbW9Admdlci5rZXJuZWwub3JnCj4gTW9yZSBtYWpvcmRv
-bW8gaW5mbyBhdCAgaHR0cDovL3ZnZXIua2VybmVsLm9yZy9tYWpvcmRvbW8taW5mby5odG1sCgpU
-YWtlIGNhcmUsCkFkYW0KV2VzdGVybiBEaWdpdGFsIENvcnBvcmF0aW9uIChhbmQgaXRzIHN1YnNp
-ZGlhcmllcykgRS1tYWlsIENvbmZpZGVudGlhbGl0eSBOb3RpY2UgJiBEaXNjbGFpbWVyOgoKVGhp
-cyBlLW1haWwgYW5kIGFueSBmaWxlcyB0cmFuc21pdHRlZCB3aXRoIGl0IG1heSBjb250YWluIGNv
-bmZpZGVudGlhbCBvciBsZWdhbGx5IHByaXZpbGVnZWQgaW5mb3JtYXRpb24gb2YgV0RDIGFuZC9v
-ciBpdHMgYWZmaWxpYXRlcywgYW5kIGFyZSBpbnRlbmRlZCBzb2xlbHkgZm9yIHRoZSB1c2Ugb2Yg
-dGhlIGluZGl2aWR1YWwgb3IgZW50aXR5IHRvIHdoaWNoIHRoZXkgYXJlIGFkZHJlc3NlZC4gSWYg
-eW91IGFyZSBub3QgdGhlIGludGVuZGVkIHJlY2lwaWVudCwgYW55IGRpc2Nsb3N1cmUsIGNvcHlp
-bmcsIGRpc3RyaWJ1dGlvbiBvciBhbnkgYWN0aW9uIHRha2VuIG9yIG9taXR0ZWQgdG8gYmUgdGFr
-ZW4gaW4gcmVsaWFuY2Ugb24gaXQsIGlzIHByb2hpYml0ZWQuIElmIHlvdSBoYXZlIHJlY2VpdmVk
-IHRoaXMgZS1tYWlsIGluIGVycm9yLCBwbGVhc2Ugbm90aWZ5IHRoZSBzZW5kZXIgaW1tZWRpYXRl
-bHkgYW5kIGRlbGV0ZSB0aGUgZS1tYWlsIGluIGl0cyBlbnRpcmV0eSBmcm9tIHlvdXIgc3lzdGVt
-Lgo=
+By removing the code below, we put all the commands for all the types of
+devices (SAS/SATA) as simple-Q (requeue as the device require) and I am
+not sure whether it is the intention of this change.
+
+-----Original Message-----
+From: Adam Manzanares [mailto:adam.manzanares@hgst.com]
+Sent: Thursday, October 13, 2016 1:54 PM
+To: axboe@kernel.dk; tj@kernel.org; dan.j.williams@intel.com;
+hare@suse.de; martin.petersen@oracle.com; mchristi@redhat.com;
+toshi.kani@hpe.com; ming.lei@canonical.com; sathya.prakash@broadcom.com;
+chaitra.basappa@broadcom.com; suganath-prabu.subramani@broadcom.com
+Cc: linux-block@vger.kernel.org; linux-ide@vger.kernel.org;
+linux-kernel@vger.kernel.org; MPT-FusionLinux.pdl@broadcom.com;
+linux-scsi@vger.kernel.org; Adam Manzanares; Adam Manzanares
+Subject: [PATCH v4 2/4] fusion: remove iopriority handling
+
+The request priority is now by default coming from the ioc. It was not
+clear what this code was trying to do based upon the iopriority class or
+data. The driver should check that a device supports priorities and use
+them according to the specificiations of ioprio.
+
+Signed-off-by: Adam Manzanares <adam.manzanares@wdc.com>
+---
+ drivers/message/fusion/mptscsih.c | 5 -----
+ 1 file changed, 5 deletions(-)
+
+diff --git a/drivers/message/fusion/mptscsih.c
+b/drivers/message/fusion/mptscsih.c
+index 6c9fc11..4740bb6 100644
+--- a/drivers/message/fusion/mptscsih.c
++++ b/drivers/message/fusion/mptscsih.c
+@@ -1369,11 +1369,6 @@ mptscsih_qcmd(struct scsi_cmnd *SCpnt)
+ 	if ((vdevice->vtarget->tflags & MPT_TARGET_FLAGS_Q_YES)
+ 	    && (SCpnt->device->tagged_supported)) {
+ 		scsictl = scsidir | MPI_SCSIIO_CONTROL_SIMPLEQ;
+-		if (SCpnt->request && SCpnt->request->ioprio) {
+-			if (((SCpnt->request->ioprio & 0x7) == 1) ||
+-				!(SCpnt->request->ioprio & 0x7))
+-				scsictl |= MPI_SCSIIO_CONTROL_HEADOFQ;
+-		}
+ 	} else
+ 		scsictl = scsidir | MPI_SCSIIO_CONTROL_UNTAGGED;
+
+--
+2.1.4
+
+Western Digital Corporation (and its subsidiaries) E-mail Confidentiality
+Notice & Disclaimer:
+
+This e-mail and any files transmitted with it may contain confidential or
+legally privileged information of WDC and/or its affiliates, and are
+intended solely for the use of the individual or entity to which they are
+addressed. If you are not the intended recipient, any disclosure, copying,
+distribution or any action taken or omitted to be taken in reliance on it,
+is prohibited. If you have received this e-mail in error, please notify
+the sender immediately and delete the e-mail in its entirety from your
+system.
