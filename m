@@ -9,11 +9,11 @@ CC: <linux-block@vger.kernel.org>, <linux-ide@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>, <MPT-FusionLinux.pdl@broadcom.com>,
 	<linux-scsi@vger.kernel.org>, Adam Manzanares <adam.manzanares@hgst.com>,
 	Adam Manzanares <adam.manzanares@wdc.com>
-Subject: [PATCH v5 4/4] ata: ATA Command Priority Disabled By Default
-Date: Thu, 13 Oct 2016 16:00:31 -0700
-Message-ID: <1476399631-5799-5-git-send-email-adam.manzanares@hgst.com>
-In-Reply-To: <1476399631-5799-1-git-send-email-adam.manzanares@hgst.com>
-References: <1476399631-5799-1-git-send-email-adam.manzanares@hgst.com>
+Subject: [PATCH v4 4/4] ata: ATA Command Priority Disabled By Default
+Date: Thu, 13 Oct 2016 12:53:53 -0700
+Message-ID: <1476388433-2539-5-git-send-email-adam.manzanares@hgst.com>
+In-Reply-To: <1476388433-2539-1-git-send-email-adam.manzanares@hgst.com>
+References: <1476388433-2539-1-git-send-email-adam.manzanares@hgst.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Return-Path: adam.manzanares@hgst.com
