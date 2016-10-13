@@ -8,18 +8,19 @@ To: <axboe@kernel.dk>, <tj@kernel.org>, <dan.j.williams@intel.com>,
 CC: <linux-block@vger.kernel.org>, <linux-ide@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>, <MPT-FusionLinux.pdl@broadcom.com>,
 	<linux-scsi@vger.kernel.org>, Adam Manzanares <adam.manzanares@hgst.com>
-Subject: [PATCH v5 0/4] Enabling ATA Command Priorities
-Date: Thu, 13 Oct 2016 16:00:27 -0700
-Message-ID: <1476399631-5799-1-git-send-email-adam.manzanares@hgst.com>
+Subject: [PATCH v4 0/4] Enabling ATA Command Priorities
+Date: Thu, 13 Oct 2016 12:53:49 -0700
+Message-ID: <1476388433-2539-1-git-send-email-adam.manzanares@hgst.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Return-Path: adam.manzanares@hgst.com
 List-ID: <linux-block@vger.kernel.org>
 
-This patch builds ATA commands with high priority if the iocontext of a process
-is set to real time. The goal of the patch is to improve tail latencies of 
-workloads that use higher queue depths. This requires setting the iocontext 
-ioprio on the request when it is initialized.
+This patch builds ATA commands with high priority if the iocontext
+of a process is set to real time. The goal of the patch is to
+improve tail latencies of workloads that use higher queue depths.
+This required setting the iocontext ioprio on the request when 
+the request is initialized.
 
 This patch has been tested with an Ultrastar HE8 HDD and cuts the 
 the p99.99 tail latency of foreground IO from 2s down to 72ms when
@@ -37,13 +38,9 @@ This feature is enabled for ATA devices by setting the ata enable_prio device
 attribute to 1. An ATA device is also checked to see if the device supports per
 command priority.
 
-v5:
- - Updated block patch commit message to explain the why 
-
 v4:
  - Added blk_rq_set_prio function to associate request prio with ioc prio
  - In init_request_from_bio use bio_prio if it is valid
- - Removed queue flag used to enable prio
  - Added ata enable_prio dev attribute to sysfs to enable prioritized commands
 
 v3:
