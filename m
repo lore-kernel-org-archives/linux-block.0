@@ -1,58 +1,42 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:56102 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S932546AbcJLKZ2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Oct 2016 06:25:28 -0400
-From: Tomasz Majchrzak <tomasz.majchrzak@intel.com>
-To: linux-block@vger.kernel.org
-Cc: dan.j.williams@intel.com, neilb@suse.com,
-        aleksey.obitotskiy@intel.com, pawel.baldysiak@intel.com,
-        artur.paszkiewicz@intel.com, maksymilian.kunt@intel.com,
-        Tomasz Majchrzak <tomasz.majchrzak@intel.com>
-Subject: [PATCH v2] badblocks: fix overlapping check for clearing
-Date: Wed, 12 Oct 2016 12:23:08 +0200
-Message-Id: <1476267788-31480-1-git-send-email-tomasz.majchrzak@intel.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <hare@suse.de>
+Subject: Re: [PATCH v2 12/16] scsi: fc: use bsg_softirq_done
+To: Johannes Thumshirn <jthumshirn@suse.de>,
+ "Martin K . Petersen" <martin.petersen@oracle.com>
+References: <cover.1476276823.git.jthumshirn@suse.de>
+ <4bf6d3e57ce4637effcc763e5f5ed6166b32f518.1476276823.git.jthumshirn@suse.de>
+Cc: Christoph Hellwig <hch@infradead.org>,
+ Linux Kernel Mailinglist <linux-kernel@vger.kernel.org>,
+ Linux SCSI Mailinglist <linux-scsi@vger.kernel.org>,
+ Jens Axboe <axboe@kernel.dk>, "James E.J. Bottomley"
+ <jejb@linux.vnet.ibm.com>,
+ "open list:BLOCK LAYER" <linux-block@vger.kernel.org>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <cec7c174-288b-2740-e7d0-90b1dac881a2@suse.de>
+Date: Thu, 13 Oct 2016 13:45:38 +0200
+MIME-Version: 1.0
+In-Reply-To: <4bf6d3e57ce4637effcc763e5f5ed6166b32f518.1476276823.git.jthumshirn@suse.de>
+Content-Type: text/plain; charset=windows-1252
+List-ID: <linux-block@vger.kernel.org>
 
-Current bad block clear implementation assumes the range to clear
-overlaps with at least one bad block already stored. If given range to
-clear precedes first bad block in a list, the first entry is incorrectly
-updated.
+On 10/12/2016 03:06 PM, Johannes Thumshirn wrote:
+> bsg_softirq_done() and fc_bsg_softirq_done() are copies of each other, so
+> ditch the fc specific one.
+> 
+> Signed-off-by: Johannes Thumshirn <jthumshirn@suse.de>
+> ---
+>  block/bsg-lib.c                  |  3 ++-
+>  drivers/scsi/scsi_transport_fc.c | 16 ++--------------
+>  include/linux/bsg-lib.h          |  1 +
+>  3 files changed, 5 insertions(+), 15 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Check not only if stored block end is past clear block end but also if
-stored block start is before clear block end.
+Cheers,
 
-Signed-off-by: Tomasz Majchrzak <tomasz.majchrzak@intel.com>
-Acked-by: NeilBrown <neilb@suse.com>
----
- block/badblocks.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/block/badblocks.c b/block/badblocks.c
-index 7be53cb..b2ffcc7 100644
---- a/block/badblocks.c
-+++ b/block/badblocks.c
-@@ -354,7 +354,8 @@ int badblocks_clear(struct badblocks *bb, sector_t s, int sectors)
- 		 * current range.  Earlier ranges could also overlap,
- 		 * but only this one can overlap the end of the range.
- 		 */
--		if (BB_OFFSET(p[lo]) + BB_LEN(p[lo]) > target) {
-+		if ((BB_OFFSET(p[lo]) + BB_LEN(p[lo]) > target) &&
-+		    (BB_OFFSET(p[lo]) < target)) {
- 			/* Partial overlap, leave the tail of this range */
- 			int ack = BB_ACK(p[lo]);
- 			sector_t a = BB_OFFSET(p[lo]);
-@@ -377,7 +378,8 @@ int badblocks_clear(struct badblocks *bb, sector_t s, int sectors)
- 			lo--;
- 		}
- 		while (lo >= 0 &&
--		       BB_OFFSET(p[lo]) + BB_LEN(p[lo]) > s) {
-+		       (BB_OFFSET(p[lo]) + BB_LEN(p[lo]) > s) &&
-+		       (BB_OFFSET(p[lo]) < target)) {
- 			/* This range does overlap */
- 			if (BB_OFFSET(p[lo]) < s) {
- 				/* Keep the early parts of this range. */
+Hannes
 -- 
-1.8.3.1
-
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: F. Imend�rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG N�rnberg)
