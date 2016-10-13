@@ -1,53 +1,63 @@
-Return-Path: <Adam.Manzanares@wdc.com>
-From: Adam Manzanares <adam.manzanares@hgst.com>
-To: <axboe@kernel.dk>, <tj@kernel.org>, <dan.j.williams@intel.com>,
-	<hare@suse.de>, <martin.petersen@oracle.com>, <mchristi@redhat.com>,
-	<toshi.kani@hpe.com>, <ming.lei@canonical.com>,
-	<sathya.prakash@broadcom.com>, <chaitra.basappa@broadcom.com>,
-	<suganath-prabu.subramani@broadcom.com>
-CC: <linux-block@vger.kernel.org>, <linux-ide@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <MPT-FusionLinux.pdl@broadcom.com>,
-	<linux-scsi@vger.kernel.org>, Adam Manzanares <adam.manzanares@hgst.com>,
-	Adam Manzanares <adam.manzanares@wdc.com>
-Subject: [PATCH v5 2/4] fusion: remove iopriority handling
-Date: Thu, 13 Oct 2016 16:00:29 -0700
-Message-ID: <1476399631-5799-3-git-send-email-adam.manzanares@hgst.com>
-In-Reply-To: <1476399631-5799-1-git-send-email-adam.manzanares@hgst.com>
-References: <1476399631-5799-1-git-send-email-adam.manzanares@hgst.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: adam.manzanares@hgst.com
+Return-Path: <jthumshirn@suse.de>
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: "Martin K . Petersen" <martin.petersen@oracle.com>
+Cc: Christoph Hellwig <hch@infradead.org>,
+	Hannes Reinecke <hare@suse.de>,
+	Linux Kernel Mailinglist <linux-kernel@vger.kernel.org>,
+	Linux SCSI Mailinglist <linux-scsi@vger.kernel.org>,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	Jens Axboe <axboe@kernel.dk>,
+	Hannes Reinecke <hare@suse.com>,
+	linux-block@vger.kernel.org (open list:BLOCK LAYER)
+Subject: [PATCH v3 16/16] block: unexport bsg_softirq_done() again
+Date: Thu, 13 Oct 2016 17:00:32 +0200
+Message-Id: <dde8c4d8fcd0ad224f32a8036ce7793143633b53.1476369687.git.jthumshirn@suse.de>
+In-Reply-To: <cover.1476369687.git.jthumshirn@suse.de>
+References: <cover.1476369687.git.jthumshirn@suse.de>
+In-Reply-To: <cover.1476369687.git.jthumshirn@suse.de>
+References: <cover.1476369687.git.jthumshirn@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
-The request priority is now by default coming from the ioc. It was not
-clear what this code was trying to do based upon the iopriority class or
-data. The driver should check that a device supports priorities and use
-them according to the specificiations of ioprio.
+Unexport bsg_softirq_done() again, we don't need it outside of bsg-lib.c
+anymore now that scsi_transport_fc is a pure bsg-lib client.
 
-Signed-off-by: Adam Manzanares <adam.manzanares@wdc.com>
+Signed-off-by: Johannes Thumshirn <jthumshirn@suse.de>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 ---
- drivers/message/fusion/mptscsih.c | 5 -----
- 1 file changed, 5 deletions(-)
+ block/bsg-lib.c         | 3 +--
+ include/linux/bsg-lib.h | 1 -
+ 2 files changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/drivers/message/fusion/mptscsih.c b/drivers/message/fusion/mptscsih.c
-index 6c9fc11..4740bb6 100644
---- a/drivers/message/fusion/mptscsih.c
-+++ b/drivers/message/fusion/mptscsih.c
-@@ -1369,11 +1369,6 @@ mptscsih_qcmd(struct scsi_cmnd *SCpnt)
- 	if ((vdevice->vtarget->tflags & MPT_TARGET_FLAGS_Q_YES)
- 	    && (SCpnt->device->tagged_supported)) {
- 		scsictl = scsidir | MPI_SCSIIO_CONTROL_SIMPLEQ;
--		if (SCpnt->request && SCpnt->request->ioprio) {
--			if (((SCpnt->request->ioprio & 0x7) == 1) ||
--				!(SCpnt->request->ioprio & 0x7))
--				scsictl |= MPI_SCSIIO_CONTROL_HEADOFQ;
--		}
- 	} else
- 		scsictl = scsidir | MPI_SCSIIO_CONTROL_UNTAGGED;
+diff --git a/block/bsg-lib.c b/block/bsg-lib.c
+index 803ec40..2d1df5c 100644
+--- a/block/bsg-lib.c
++++ b/block/bsg-lib.c
+@@ -96,13 +96,12 @@ void bsg_job_done(struct bsg_job *job, int result,
+  * bsg_softirq_done - softirq done routine for destroying the bsg requests
+  * @rq: BSG request that holds the job to be destroyed
+  */
+-void bsg_softirq_done(struct request *rq)
++static void bsg_softirq_done(struct request *rq)
+ {
+ 	struct bsg_job *job = rq->special;
+ 
+ 	bsg_job_put(job);
+ }
+-EXPORT_SYMBOL_GPL(bsg_softirq_done);
+ 
+ static int bsg_map_buffer(struct bsg_buffer *buf, struct request *req)
+ {
+diff --git a/include/linux/bsg-lib.h b/include/linux/bsg-lib.h
+index b708db9..657a718 100644
+--- a/include/linux/bsg-lib.h
++++ b/include/linux/bsg-lib.h
+@@ -69,7 +69,6 @@ void bsg_job_done(struct bsg_job *job, int result,
+ int bsg_setup_queue(struct device *dev, struct request_queue *q, char *name,
+ 		    bsg_job_fn *job_fn, int dd_job_size);
+ void bsg_request_fn(struct request_queue *q);
+-void bsg_softirq_done(struct request *rq);
+ void bsg_job_put(struct bsg_job *job);
+ int __must_check bsg_job_get(struct bsg_job *job);
  
 -- 
-2.1.4
-
-Western Digital Corporation (and its subsidiaries) E-mail Confidentiality Notice & Disclaimer:
-
-This e-mail and any files transmitted with it may contain confidential or legally privileged information of WDC and/or its affiliates, and are intended solely for the use of the individual or entity to which they are addressed. If you are not the intended recipient, any disclosure, copying, distribution or any action taken or omitted to be taken in reliance on it, is prohibited. If you have received this e-mail in error, please notify the sender immediately and delete the e-mail in its entirety from your system.
+1.8.5.6
