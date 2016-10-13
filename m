@@ -8,96 +8,102 @@ Cc: Christoph Hellwig <hch@infradead.org>,
 	Johannes Thumshirn <jthumshirn@suse.de>,
 	Jens Axboe <axboe@kernel.dk>,
 	"James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
+	Hannes Reinecke <hare@suse.com>,
 	linux-block@vger.kernel.org (open list:BLOCK LAYER)
-Subject: [PATCH v2 12/16] scsi: fc: use bsg_softirq_done
-Date: Wed, 12 Oct 2016 15:06:38 +0200
-Message-Id: <4bf6d3e57ce4637effcc763e5f5ed6166b32f518.1476276823.git.jthumshirn@suse.de>
-In-Reply-To: <cover.1476276823.git.jthumshirn@suse.de>
-References: <cover.1476276823.git.jthumshirn@suse.de>
-In-Reply-To: <cover.1476276823.git.jthumshirn@suse.de>
-References: <cover.1476276823.git.jthumshirn@suse.de>
+Subject: [PATCH v3 14/16] block: add bsg_job_put() and bsg_job_get()
+Date: Thu, 13 Oct 2016 17:00:30 +0200
+Message-Id: <12f3d5bd877a88147349065d291b19fe36e24c60.1476369687.git.jthumshirn@suse.de>
+In-Reply-To: <cover.1476369687.git.jthumshirn@suse.de>
+References: <cover.1476369687.git.jthumshirn@suse.de>
+In-Reply-To: <cover.1476369687.git.jthumshirn@suse.de>
+References: <cover.1476369687.git.jthumshirn@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
-bsg_softirq_done() and fc_bsg_softirq_done() are copies of each other, so
-ditch the fc specific one.
+Add bsg_job_put() and bsg_job_get() so don't need to export
+bsg_destroy_job() any more.
 
 Signed-off-by: Johannes Thumshirn <jthumshirn@suse.de>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 ---
- block/bsg-lib.c                  |  3 ++-
- drivers/scsi/scsi_transport_fc.c | 16 ++--------------
- include/linux/bsg-lib.h          |  1 +
- 3 files changed, 5 insertions(+), 15 deletions(-)
+ block/bsg-lib.c                  | 17 ++++++++++++++---
+ drivers/scsi/scsi_transport_fc.c |  4 ++--
+ include/linux/bsg-lib.h          |  3 ++-
+ 3 files changed, 18 insertions(+), 6 deletions(-)
 
 diff --git a/block/bsg-lib.c b/block/bsg-lib.c
-index 6b99c7f..5d24d25 100644
+index 6661f82..803ec40 100644
 --- a/block/bsg-lib.c
 +++ b/block/bsg-lib.c
-@@ -82,13 +82,14 @@ EXPORT_SYMBOL_GPL(bsg_job_done);
-  * bsg_softirq_done - softirq done routine for destroying the bsg requests
-  * @rq: BSG request that holds the job to be destroyed
+@@ -32,7 +32,7 @@
+  * bsg_destroy_job - routine to teardown/delete a bsg job
+  * @job: bsg_job that is to be torn down
   */
--static void bsg_softirq_done(struct request *rq)
-+void bsg_softirq_done(struct request *rq)
+-void bsg_destroy_job(struct kref *kref)
++static void bsg_destroy_job(struct kref *kref)
+ {
+ 	struct bsg_job *job = container_of(kref, struct bsg_job, kref);
+ 	struct request *rq = job->req;
+@@ -45,7 +45,18 @@ void bsg_destroy_job(struct kref *kref)
+ 	kfree(job->reply_payload.sg_list);
+ 	kfree(job);
+ }
+-EXPORT_SYMBOL_GPL(bsg_destroy_job);
++
++void bsg_job_put(struct bsg_job *job)
++{
++	kref_put(&job->kref, bsg_destroy_job);
++}
++EXPORT_SYMBOL_GPL(bsg_job_put);
++
++int bsg_job_get(struct bsg_job *job)
++{
++	return kref_get_unless_zero(&job->kref);
++}
++EXPORT_SYMBOL_GPL(bsg_job_get);
+ 
+ /**
+  * bsg_job_done - completion routine for bsg requests
+@@ -89,7 +100,7 @@ void bsg_softirq_done(struct request *rq)
  {
  	struct bsg_job *job = rq->special;
  
- 	blk_end_request_all(rq, rq->errors);
- 	kref_put(&job->kref, bsg_destroy_job);
+-	kref_put(&job->kref, bsg_destroy_job);
++	bsg_job_put(job);
  }
-+EXPORT_SYMBOL_GPL(bsg_softirq_done);
+ EXPORT_SYMBOL_GPL(bsg_softirq_done);
  
- static int bsg_map_buffer(struct bsg_buffer *buf, struct request *req)
- {
 diff --git a/drivers/scsi/scsi_transport_fc.c b/drivers/scsi/scsi_transport_fc.c
-index 4b9324f..1ae6d86 100644
+index 720ddc9..7fae045 100644
 --- a/drivers/scsi/scsi_transport_fc.c
 +++ b/drivers/scsi/scsi_transport_fc.c
-@@ -3591,18 +3591,6 @@ void fc_bsg_jobdone(struct bsg_job *job, int result,
- EXPORT_SYMBOL_GPL(fc_bsg_jobdone);
+@@ -3571,13 +3571,13 @@ struct fc_vport *
+ 	if (rport && rport->port_state == FC_PORTSTATE_BLOCKED)
+ 		return BLK_EH_RESET_TIMER;
  
- /**
-- * fc_bsg_softirq_done - softirq done routine for destroying the bsg requests
-- * @rq:        BSG request that holds the job to be destroyed
-- */
--static void fc_bsg_softirq_done(struct request *rq)
--{
--	struct bsg_job *job = rq->special;
--
--	blk_end_request_all(rq, rq->errors);
--	kref_put(&job->kref, fc_destroy_bsgjob);
--}
--
--/**
-  * fc_bsg_job_timeout - handler for when a bsg request timesout
-  * @req:	request that timed out
-  */
-@@ -4036,7 +4024,7 @@ fc_bsg_hostadd(struct Scsi_Host *shost, struct fc_host_attrs *fc_host)
+-	inflight = kref_get_unless_zero(&job->kref);
++	inflight = bsg_job_get(job);
  
- 	q->queuedata = shost;
- 	queue_flag_set_unlocked(QUEUE_FLAG_BIDI, q);
--	blk_queue_softirq_done(q, fc_bsg_softirq_done);
-+	blk_queue_softirq_done(q, bsg_softirq_done);
- 	blk_queue_rq_timed_out(q, fc_bsg_job_timeout);
- 	blk_queue_rq_timeout(q, FC_DEFAULT_BSG_TIMEOUT);
- 
-@@ -4082,7 +4070,7 @@ fc_bsg_rportadd(struct Scsi_Host *shost, struct fc_rport *rport)
- 
- 	q->queuedata = rport;
- 	queue_flag_set_unlocked(QUEUE_FLAG_BIDI, q);
--	blk_queue_softirq_done(q, fc_bsg_softirq_done);
-+	blk_queue_softirq_done(q, bsg_softirq_done);
- 	blk_queue_rq_timed_out(q, fc_bsg_job_timeout);
- 	blk_queue_rq_timeout(q, BLK_DEFAULT_SG_TIMEOUT);
- 
+ 	if (inflight && i->f->bsg_timeout) {
+ 		/* call LLDD to abort the i/o as it has timed out */
+ 		err = i->f->bsg_timeout(job);
+ 		if (err == -EAGAIN) {
+-			kref_put(&job->kref, bsg_destroy_job);
++			bsg_job_put(job);
+ 			return BLK_EH_RESET_TIMER;
+ 		} else if (err)
+ 			printk(KERN_ERR "ERROR: FC BSG request timeout - LLD "
 diff --git a/include/linux/bsg-lib.h b/include/linux/bsg-lib.h
-index 67f7de6..09f3044 100644
+index 09f3044..b708db9 100644
 --- a/include/linux/bsg-lib.h
 +++ b/include/linux/bsg-lib.h
-@@ -70,5 +70,6 @@ int bsg_setup_queue(struct device *dev, struct request_queue *q, char *name,
+@@ -69,7 +69,8 @@ void bsg_job_done(struct bsg_job *job, int result,
+ int bsg_setup_queue(struct device *dev, struct request_queue *q, char *name,
  		    bsg_job_fn *job_fn, int dd_job_size);
  void bsg_request_fn(struct request_queue *q);
- void bsg_destroy_job(struct kref *kref);
-+void bsg_softirq_done(struct request *rq);
+-void bsg_destroy_job(struct kref *kref);
+ void bsg_softirq_done(struct request *rq);
++void bsg_job_put(struct bsg_job *job);
++int __must_check bsg_job_get(struct bsg_job *job);
  
  #endif
 -- 
