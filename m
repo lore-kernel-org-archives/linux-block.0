@@ -1,70 +1,53 @@
-Return-Path: <shaun.tancheff@seagate.com>
+Return-Path: <Adam.Manzanares@wdc.com>
+From: Adam Manzanares <adam.manzanares@hgst.com>
+To: <axboe@kernel.dk>, <tj@kernel.org>, <dan.j.williams@intel.com>,
+	<hare@suse.de>, <martin.petersen@oracle.com>, <mchristi@redhat.com>,
+	<toshi.kani@hpe.com>, <ming.lei@canonical.com>,
+	<sathya.prakash@broadcom.com>, <chaitra.basappa@broadcom.com>,
+	<suganath-prabu.subramani@broadcom.com>
+CC: <linux-block@vger.kernel.org>, <linux-ide@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <MPT-FusionLinux.pdl@broadcom.com>,
+	<linux-scsi@vger.kernel.org>, Adam Manzanares <adam.manzanares@hgst.com>,
+	Adam Manzanares <adam.manzanares@wdc.com>
+Subject: [PATCH v5 2/4] fusion: remove iopriority handling
+Date: Thu, 13 Oct 2016 16:00:29 -0700
+Message-ID: <1476399631-5799-3-git-send-email-adam.manzanares@hgst.com>
+In-Reply-To: <1476399631-5799-1-git-send-email-adam.manzanares@hgst.com>
+References: <1476399631-5799-1-git-send-email-adam.manzanares@hgst.com>
 MIME-Version: 1.0
-In-Reply-To: <1476399631-5799-3-git-send-email-adam.manzanares@hgst.com>
-References: <1476399631-5799-1-git-send-email-adam.manzanares@hgst.com> <1476399631-5799-3-git-send-email-adam.manzanares@hgst.com>
-From: Shaun Tancheff <shaun.tancheff@seagate.com>
-Date: Thu, 13 Oct 2016 18:36:32 -0500
-Message-ID: <CAJVOszDaOiDN1nMW7X6pgEkjSkE9+hNE0doUc-hweJc-qtAu3w@mail.gmail.com>
-Subject: Re: [PATCH v5 2/4] fusion: remove iopriority handling
-To: Adam Manzanares <adam.manzanares@hgst.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Hannes Reinecke <hare@suse.de>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Mike Christie <mchristi@redhat.com>, Toshi Kani <toshi.kani@hpe.com>,
-        Ming Lei <ming.lei@canonical.com>,
-        Sathya Prakash <sathya.prakash@broadcom.com>,
-        chaitra.basappa@broadcom.com, suganath-prabu.subramani@broadcom.com,
-        linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
-        LKML <linux-kernel@vger.kernel.org>, MPT-FusionLinux.pdl@broadcom.com,
-        linux-scsi@vger.kernel.org, Adam Manzanares <adam.manzanares@wdc.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain
+Return-Path: adam.manzanares@hgst.com
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Oct 13, 2016 at 6:00 PM, Adam Manzanares
-<adam.manzanares@hgst.com> wrote:
-> The request priority is now by default coming from the ioc. It was not
-> clear what this code was trying to do based upon the iopriority class or
-> data. The driver should check that a device supports priorities and use
-> them according to the specificiations of ioprio.
->
-> Signed-off-by: Adam Manzanares <adam.manzanares@wdc.com>
-> ---
->  drivers/message/fusion/mptscsih.c | 5 -----
->  1 file changed, 5 deletions(-)
->
-> diff --git a/drivers/message/fusion/mptscsih.c b/drivers/message/fusion/m=
-ptscsih.c
-> index 6c9fc11..4740bb6 100644
-> --- a/drivers/message/fusion/mptscsih.c
-> +++ b/drivers/message/fusion/mptscsih.c
-> @@ -1369,11 +1369,6 @@ mptscsih_qcmd(struct scsi_cmnd *SCpnt)
->         if ((vdevice->vtarget->tflags & MPT_TARGET_FLAGS_Q_YES)
->             && (SCpnt->device->tagged_supported)) {
->                 scsictl =3D scsidir | MPI_SCSIIO_CONTROL_SIMPLEQ;
-> -               if (SCpnt->request && SCpnt->request->ioprio) {
-> -                       if (((SCpnt->request->ioprio & 0x7) =3D=3D 1) ||
-> -                               !(SCpnt->request->ioprio & 0x7))
-> -                               scsictl |=3D MPI_SCSIIO_CONTROL_HEADOFQ;
-> -               }
->         } else
->                 scsictl =3D scsidir | MPI_SCSIIO_CONTROL_UNTAGGED;
+The request priority is now by default coming from the ioc. It was not
+clear what this code was trying to do based upon the iopriority class or
+data. The driver should check that a device supports priorities and use
+them according to the specificiations of ioprio.
 
-Style wise you can further remove the extra parens around
-  SCpnt->device->tagged_supported
-As well as the now redundant braces.
+Signed-off-by: Adam Manzanares <adam.manzanares@wdc.com>
+---
+ drivers/message/fusion/mptscsih.c | 5 -----
+ 1 file changed, 5 deletions(-)
 
-Regards,
-Shaun
+diff --git a/drivers/message/fusion/mptscsih.c b/drivers/message/fusion/mptscsih.c
+index 6c9fc11..4740bb6 100644
+--- a/drivers/message/fusion/mptscsih.c
++++ b/drivers/message/fusion/mptscsih.c
+@@ -1369,11 +1369,6 @@ mptscsih_qcmd(struct scsi_cmnd *SCpnt)
+ 	if ((vdevice->vtarget->tflags & MPT_TARGET_FLAGS_Q_YES)
+ 	    && (SCpnt->device->tagged_supported)) {
+ 		scsictl = scsidir | MPI_SCSIIO_CONTROL_SIMPLEQ;
+-		if (SCpnt->request && SCpnt->request->ioprio) {
+-			if (((SCpnt->request->ioprio & 0x7) == 1) ||
+-				!(SCpnt->request->ioprio & 0x7))
+-				scsictl |= MPI_SCSIIO_CONTROL_HEADOFQ;
+-		}
+ 	} else
+ 		scsictl = scsidir | MPI_SCSIIO_CONTROL_UNTAGGED;
+ 
+-- 
+2.1.4
 
-> --
-> 2.1.4
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-block" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  https://urldefense.proofpoint.com/v2/url?u=3Dhttp=
--3A__vger.kernel.org_majordomo-2Dinfo.html&d=3DDQIBAg&c=3DIGDlg0lD0b-nebmJJ=
-0Kp8A&r=3DWg5NqlNlVTT7Ugl8V50qIHLe856QW0qfG3WVYGOrWzA&m=3DZE7JzxXeXPEWqk9WY=
-m42hZHj8gESRg1QoS5XklfbprM&s=3DC0iMyTgYbYl06F1SQ2DqfdESKBtl3Whp5rSnHSBXOc4&=
-e=3D
+Western Digital Corporation (and its subsidiaries) E-mail Confidentiality Notice & Disclaimer:
+
+This e-mail and any files transmitted with it may contain confidential or legally privileged information of WDC and/or its affiliates, and are intended solely for the use of the individual or entity to which they are addressed. If you are not the intended recipient, any disclosure, copying, distribution or any action taken or omitted to be taken in reliance on it, is prohibited. If you have received this e-mail in error, please notify the sender immediately and delete the e-mail in its entirety from your system.
