@@ -1,29 +1,29 @@
-Return-Path: <jthumshirn@suse.de>
-Date: Mon, 17 Oct 2016 09:27:03 +0200
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Christoph Hellwig <hch@lst.de>
-Cc: martin.petersen@oracle.com, don.brace@microsemi.com, axboe@kernel.dk,
-	linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
+Return-Path: <hare@suse.de>
 Subject: Re: [PATCH 2/3] scsi: allow LLDDs to expose the queue mapping to
  blk-mq
-Message-ID: <20161017072703.jql7gbmbnsfed4n3@linux-x5ow.site>
+To: Christoph Hellwig <hch@lst.de>, martin.petersen@oracle.com,
+ don.brace@microsemi.com
 References: <1476521241-32765-1-git-send-email-hch@lst.de>
  <1476521241-32765-3-git-send-email-hch@lst.de>
+Cc: axboe@kernel.dk, linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <cc8bc425-e931-c3a8-4b53-32b59d5e7be5@suse.de>
+Date: Sat, 15 Oct 2016 13:46:12 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
 In-Reply-To: <1476521241-32765-3-git-send-email-hch@lst.de>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-On Sat, Oct 15, 2016 at 10:47:20AM +0200, Christoph Hellwig wrote:
+On 10/15/2016 10:47 AM, Christoph Hellwig wrote:
 > Just hand through the blk-mq map_queues method in the host template.
-> 
+>
 > Signed-off-by: Christoph Hellwig <hch@lst.de>
 > ---
 >  block/blk-mq-cpumap.c    |  1 +
 >  drivers/scsi/scsi_lib.c  | 10 ++++++++++
 >  include/scsi/scsi_host.h |  8 ++++++++
 >  3 files changed, 19 insertions(+)
-> 
+>
 > diff --git a/block/blk-mq-cpumap.c b/block/blk-mq-cpumap.c
 > index 19b1d9c..8e61e86 100644
 > --- a/block/blk-mq-cpumap.c
@@ -33,19 +33,64 @@ On Sat, Oct 15, 2016 at 10:47:20AM +0200, Christoph Hellwig wrote:
 >  	return 0;
 >  }
 > +EXPORT_SYMBOL_GPL(blk_mq_map_queues);
->  
+>
 >  /*
 >   * We have no quick way of doing reverse lookups. This is only used at
+> diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+> index 2cca9cf..f23ec24 100644
+> --- a/drivers/scsi/scsi_lib.c
+> +++ b/drivers/scsi/scsi_lib.c
+> @@ -1990,6 +1990,15 @@ static void scsi_exit_request(void *data, struct request *rq,
+>  	kfree(cmd->sense_buffer);
+>  }
+>
+> +static int scsi_map_queues(struct blk_mq_tag_set *set)
+> +{
+> +	struct Scsi_Host *shost = container_of(set, struct Scsi_Host, tag_set);
+> +
+> +	if (shost->hostt->map_queues)
+> +		return shost->hostt->map_queues(shost);
+> +	return blk_mq_map_queues(set);
+> +}
+> +
+>  static u64 scsi_calculate_bounce_limit(struct Scsi_Host *shost)
+>  {
+>  	struct device *host_dev;
+> @@ -2082,6 +2091,7 @@ static struct blk_mq_ops scsi_mq_ops = {
+>  	.timeout	= scsi_timeout,
+>  	.init_request	= scsi_init_request,
+>  	.exit_request	= scsi_exit_request,
+> +	.map_queues	= scsi_map_queues,
+>  };
+>
+>  struct request_queue *scsi_mq_alloc_queue(struct scsi_device *sdev)
+> diff --git a/include/scsi/scsi_host.h b/include/scsi/scsi_host.h
+> index 7e4cd53..36680f1 100644
+> --- a/include/scsi/scsi_host.h
+> +++ b/include/scsi/scsi_host.h
+> @@ -278,6 +278,14 @@ struct scsi_host_template {
+>  	int (* change_queue_depth)(struct scsi_device *, int);
+>
+>  	/*
+> +	 * This functions lets the driver expose the queue mapping
+> +	 * to the block layer.
+> +	 *
+> +	 * Status: OPTIONAL
+> +	 */
+> +	int (* map_queues)(struct Scsi_Host *shost);
+> +
+> +	/*
+>  	 * This function determines the BIOS parameters for a given
+>  	 * harddisk.  These tend to be numbers that are made up by
+>  	 * the host adapter.  Parameters:
+>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Shouldn't this hunk go into the previous patch?
+Cheers,
 
-Otherwise,
-
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Hannes
 -- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: Felix Imend�rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N�rnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+Dr. Hannes Reinecke		      zSeries & Storage
+hare@suse.de			      +49 911 74053 688
+SUSE LINUX Products GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: J. Hawn, J. Guild, F. Imend�rffer, HRB 16746 (AG N�rnberg)
