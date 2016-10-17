@@ -1,104 +1,48 @@
-Return-Path: <jthumshirn@suse.de>
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: "Martin K . Petersen" <martin.petersen@oracle.com>
-Cc: Christoph Hellwig <hch@infradead.org>,
-	Hannes Reinecke <hare@suse.de>,
-	Linux Kernel Mailinglist <linux-kernel@vger.kernel.org>,
-	Linux SCSI Mailinglist <linux-scsi@vger.kernel.org>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Jens Axboe <axboe@kernel.dk>,
-	"James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
-	Hannes Reinecke <hare@suse.com>,
-	linux-block@vger.kernel.org (open list:BLOCK LAYER)
-Subject: [PATCH v3 12/16] scsi: fc: use bsg_softirq_done
-Date: Thu, 13 Oct 2016 17:00:28 +0200
-Message-Id: <a4a1fd8981ade25296f11faeb626d5480fcb8907.1476369687.git.jthumshirn@suse.de>
-In-Reply-To: <cover.1476369687.git.jthumshirn@suse.de>
-References: <cover.1476369687.git.jthumshirn@suse.de>
-In-Reply-To: <cover.1476369687.git.jthumshirn@suse.de>
-References: <cover.1476369687.git.jthumshirn@suse.de>
+Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
+From: Stephen Bates <sbates@raithlin.com>
+To: linux-nvme@lists.infradead.org, keith.busch@intel.com, axboe@fb.com,
+ linux-block@vger.kernel.org
+Subject: [TRIVIAL PATCH] nvme : trivial whitespace fix in pci.c
+Date: Mon, 17 Oct 2016 17:24:19 -0600
+Message-Id: <1476746659-24663-1-git-send-email-sbates@raithlin.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
+List-Post: <mailto:linux-nvme@lists.infradead.org>
+List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
+Cc: Stephen Bates <sbates@raithlin.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
+Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
 List-ID: <linux-block@vger.kernel.org>
 
-bsg_softirq_done() and fc_bsg_softirq_done() are copies of each other, so
-ditch the fc specific one.
+Remove annoying white space damage in pci.c.
 
-Signed-off-by: Johannes Thumshirn <jthumshirn@suse.de>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+Signed-off-by: Stephen Bates <sbates@raithlin.com>
 ---
- block/bsg-lib.c                  |  3 ++-
- drivers/scsi/scsi_transport_fc.c | 15 ++-------------
- include/linux/bsg-lib.h          |  1 +
- 3 files changed, 5 insertions(+), 14 deletions(-)
+ drivers/nvme/host/pci.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/bsg-lib.c b/block/bsg-lib.c
-index 9f1e8fd..6661f82 100644
---- a/block/bsg-lib.c
-+++ b/block/bsg-lib.c
-@@ -85,12 +85,13 @@ void bsg_job_done(struct bsg_job *job, int result,
-  * bsg_softirq_done - softirq done routine for destroying the bsg requests
-  * @rq: BSG request that holds the job to be destroyed
-  */
--static void bsg_softirq_done(struct request *rq)
-+void bsg_softirq_done(struct request *rq)
- {
- 	struct bsg_job *job = rq->special;
- 
- 	kref_put(&job->kref, bsg_destroy_job);
- }
-+EXPORT_SYMBOL_GPL(bsg_softirq_done);
- 
- static int bsg_map_buffer(struct bsg_buffer *buf, struct request *req)
- {
-diff --git a/drivers/scsi/scsi_transport_fc.c b/drivers/scsi/scsi_transport_fc.c
-index d2d0a27..1ae6d86 100644
---- a/drivers/scsi/scsi_transport_fc.c
-+++ b/drivers/scsi/scsi_transport_fc.c
-@@ -3591,17 +3591,6 @@ void fc_bsg_jobdone(struct bsg_job *job, int result,
- EXPORT_SYMBOL_GPL(fc_bsg_jobdone);
- 
- /**
-- * fc_bsg_softirq_done - softirq done routine for destroying the bsg requests
-- * @rq:        BSG request that holds the job to be destroyed
-- */
--static void fc_bsg_softirq_done(struct request *rq)
--{
--	struct bsg_job *job = rq->special;
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index a7c6e9d..e2b3243 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -50,7 +50,7 @@
+ #define NVME_AQ_DEPTH		256
+ #define SQ_SIZE(depth)		(depth * sizeof(struct nvme_command))
+ #define CQ_SIZE(depth)		(depth * sizeof(struct nvme_completion))
 -
--	kref_put(&job->kref, fc_destroy_bsgjob);
--}
--
--/**
-  * fc_bsg_job_timeout - handler for when a bsg request timesout
-  * @req:	request that timed out
-  */
-@@ -4035,7 +4024,7 @@ enum fc_dispatch_result {
- 
- 	q->queuedata = shost;
- 	queue_flag_set_unlocked(QUEUE_FLAG_BIDI, q);
--	blk_queue_softirq_done(q, fc_bsg_softirq_done);
-+	blk_queue_softirq_done(q, bsg_softirq_done);
- 	blk_queue_rq_timed_out(q, fc_bsg_job_timeout);
- 	blk_queue_rq_timeout(q, FC_DEFAULT_BSG_TIMEOUT);
- 
-@@ -4081,7 +4070,7 @@ enum fc_dispatch_result {
- 
- 	q->queuedata = rport;
- 	queue_flag_set_unlocked(QUEUE_FLAG_BIDI, q);
--	blk_queue_softirq_done(q, fc_bsg_softirq_done);
-+	blk_queue_softirq_done(q, bsg_softirq_done);
- 	blk_queue_rq_timed_out(q, fc_bsg_job_timeout);
- 	blk_queue_rq_timeout(q, BLK_DEFAULT_SG_TIMEOUT);
- 
-diff --git a/include/linux/bsg-lib.h b/include/linux/bsg-lib.h
-index 67f7de6..09f3044 100644
---- a/include/linux/bsg-lib.h
-+++ b/include/linux/bsg-lib.h
-@@ -70,5 +70,6 @@ int bsg_setup_queue(struct device *dev, struct request_queue *q, char *name,
- 		    bsg_job_fn *job_fn, int dd_job_size);
- void bsg_request_fn(struct request_queue *q);
- void bsg_destroy_job(struct kref *kref);
-+void bsg_softirq_done(struct request *rq);
- 
- #endif
--- 
-1.8.5.6
++
+ /*
+  * We handle AEN commands ourselves and don't even let the
+  * block layer know about them.
+--
+2.1.4
+
+_______________________________________________
+Linux-nvme mailing list
+Linux-nvme@lists.infradead.org
+http://lists.infradead.org/mailman/listinfo/linux-nvme
