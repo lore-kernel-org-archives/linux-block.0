@@ -1,38 +1,22 @@
-Return-Path: <htejun@gmail.com>
-Return-Path: <htejun@gmail.com>
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Wed, 19 Oct 2016 14:37:14 -0400
-From: Tejun Heo <tj@kernel.org>
-To: Adam Manzanares <adam.manzanares@hgst.com>
-Cc: axboe@kernel.dk, dan.j.williams@intel.com, hare@suse.de,
-	martin.petersen@oracle.com, mchristi@redhat.com, toshi.kani@hpe.com,
-	ming.lei@canonical.com, sathya.prakash@broadcom.com,
-	chaitra.basappa@broadcom.com, suganath-prabu.subramani@broadcom.com,
-	linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
-	linux-kernel@vger.kernel.org, MPT-FusionLinux.pdl@broadcom.com,
-	linux-scsi@vger.kernel.org
-Subject: Re: [PATCH v6 2/3] ata: Enabling ATA Command Priorities
-Message-ID: <20161019183714.GJ18532@htj.duckdns.org>
-References: <1476728850-2309-1-git-send-email-adam.manzanares@hgst.com>
- <1476728850-2309-3-git-send-email-adam.manzanares@hgst.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1476728850-2309-3-git-send-email-adam.manzanares@hgst.com>
-List-ID: <linux-block@vger.kernel.org>
-
-Hello,
-
-I removed ata_ncq_prio_enabled() as it was colliding with the sysfs
-file rename and these trivial test functions tend to obscure more than
-help anything.
-
-Thanks.
-
------- 8< ------
->From 8e061784b51ec4a4efed0deaafb5bd9725bf5b06 Mon Sep 17 00:00:00 2001
+Return-Path: <Adam.Manzanares@wdc.com>
 From: Adam Manzanares <adam.manzanares@hgst.com>
+To: <axboe@kernel.dk>, <tj@kernel.org>, <dan.j.williams@intel.com>,
+	<hare@suse.de>, <martin.petersen@oracle.com>, <mchristi@redhat.com>,
+	<toshi.kani@hpe.com>, <ming.lei@canonical.com>,
+	<sathya.prakash@broadcom.com>, <chaitra.basappa@broadcom.com>,
+	<suganath-prabu.subramani@broadcom.com>
+CC: <linux-block@vger.kernel.org>, <linux-ide@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <MPT-FusionLinux.pdl@broadcom.com>,
+	<linux-scsi@vger.kernel.org>, Adam Manzanares <adam.manzanares@hgst.com>
+Subject: [PATCH v6 2/3] ata: Enabling ATA Command Priorities
 Date: Mon, 17 Oct 2016 11:27:29 -0700
-Subject: [PATCH 1/2] ata: Enabling ATA Command Priorities
+Message-ID: <1476728850-2309-3-git-send-email-adam.manzanares@hgst.com>
+In-Reply-To: <1476728850-2309-1-git-send-email-adam.manzanares@hgst.com>
+References: <1476728850-2309-1-git-send-email-adam.manzanares@hgst.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Return-Path: adam.manzanares@hgst.com
+List-ID: <linux-block@vger.kernel.org>
 
 This patch checks to see if an ATA device supports NCQ command priorities.
 If so and the user has specified an iocontext that indicates
@@ -41,20 +25,17 @@ IO_PRIO_CLASS_RT then we build a tf with a high priority command.
 This is done to improve the tail latency of commands that are high
 priority by passing priority to the device.
 
-tj: Removed trivial ata_ncq_prio_enabled() and open-coded the test.
-
 Signed-off-by: Adam Manzanares <adam.manzanares@hgst.com>
-Signed-off-by: Tejun Heo <tj@kernel.org>
 ---
  drivers/ata/libata-core.c | 35 ++++++++++++++++++++++++++++++++++-
  drivers/ata/libata-scsi.c |  6 +++++-
  drivers/ata/libata.h      |  2 +-
  include/linux/ata.h       |  6 ++++++
- include/linux/libata.h    |  3 +++
- 5 files changed, 49 insertions(+), 3 deletions(-)
+ include/linux/libata.h    | 18 ++++++++++++++++++
+ 5 files changed, 64 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/ata/libata-core.c b/drivers/ata/libata-core.c
-index 223a770..8346faf 100644
+index 223a770..181b530 100644
 --- a/drivers/ata/libata-core.c
 +++ b/drivers/ata/libata-core.c
 @@ -739,6 +739,7 @@ u64 ata_tf_read_block(const struct ata_taskfile *tf, struct ata_device *dev)
@@ -79,7 +60,7 @@ index 223a770..8346faf 100644
  		if (tf->flags & ATA_TFLAG_FUA)
  			tf->device |= 1 << 7;
 +
-+		if (dev->flags & ATA_DFLAG_NCQ_PRIO) {
++		if (ata_ncq_prio_enabled(dev)) {
 +			if (class == IOPRIO_CLASS_RT)
 +				tf->hob_nsect |= ATA_PRIO_HIGH <<
 +						 ATA_SHIFT_PRIO;
@@ -196,7 +177,7 @@ index fdb1803..af6859b 100644
  {
  	if (ata_id_major_version(id) >= 7 &&
 diff --git a/include/linux/libata.h b/include/linux/libata.h
-index 616eef4..90b69a6 100644
+index 616eef4..1a524cf 100644
 --- a/include/linux/libata.h
 +++ b/include/linux/libata.h
 @@ -166,6 +166,7 @@ enum {
@@ -217,5 +198,31 @@ index 616eef4..90b69a6 100644
  	/* size of buffer to pad xfers ending on unaligned boundaries */
  	ATA_DMA_PAD_SZ		= 4,
  
+@@ -1610,6 +1613,21 @@ static inline int ata_ncq_enabled(struct ata_device *dev)
+ 			      ATA_DFLAG_NCQ)) == ATA_DFLAG_NCQ;
+ }
+ 
++/**
++ *	ata_ncq_prio_enabled - Test whether NCQ prio is enabled
++ *	@dev: ATA device to test for
++ *
++ *	LOCKING:
++ *	spin_lock_irqsave(host lock)
++ *
++ *	RETURNS:
++ *	1 if NCQ prio is enabled for @dev, 0 otherwise.
++ */
++static inline int ata_ncq_prio_enabled(struct ata_device *dev)
++{
++	return (dev->flags & ATA_DFLAG_NCQ_PRIO) == ATA_DFLAG_NCQ_PRIO;
++}
++
+ static inline bool ata_fpdma_dsm_supported(struct ata_device *dev)
+ {
+ 	return (dev->flags & ATA_DFLAG_NCQ_SEND_RECV) &&
 -- 
-2.7.4
+2.1.4
+
+Western Digital Corporation (and its subsidiaries) E-mail Confidentiality Notice & Disclaimer:
+
+This e-mail and any files transmitted with it may contain confidential or legally privileged information of WDC and/or its affiliates, and are intended solely for the use of the individual or entity to which they are addressed. If you are not the intended recipient, any disclosure, copying, distribution or any action taken or omitted to be taken in reliance on it, is prohibited. If you have received this e-mail in error, please notify the sender immediately and delete the e-mail in its entirety from your system.
