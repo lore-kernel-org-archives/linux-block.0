@@ -1,49 +1,82 @@
-Return-Path: <htejun@gmail.com>
-Return-Path: <htejun@gmail.com>
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Wed, 19 Oct 2016 14:38:45 -0400
-From: Tejun Heo <tj@kernel.org>
-To: Adam Manzanares <adam.manzanares@hgst.com>
-Cc: axboe@kernel.dk, dan.j.williams@intel.com, hare@suse.de,
-	martin.petersen@oracle.com, mchristi@redhat.com, toshi.kani@hpe.com,
-	ming.lei@canonical.com, sathya.prakash@broadcom.com,
-	chaitra.basappa@broadcom.com, suganath-prabu.subramani@broadcom.com,
-	linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
-	linux-kernel@vger.kernel.org, MPT-FusionLinux.pdl@broadcom.com,
-	linux-scsi@vger.kernel.org
-Subject: Re: [PATCH v6 0/3] Enabling ATA Command Priorities
-Message-ID: <20161019183845.GL18532@htj.duckdns.org>
-References: <1476728850-2309-1-git-send-email-adam.manzanares@hgst.com>
+Return-Path: <Adam.Manzanares@wdc.com>
+From: Adam Manzanares <adam.manzanares@hgst.com>
+To: <axboe@kernel.dk>, <tj@kernel.org>, <dan.j.williams@intel.com>,
+	<hare@suse.de>, <martin.petersen@oracle.com>, <mchristi@redhat.com>,
+	<toshi.kani@hpe.com>, <ming.lei@canonical.com>,
+	<sathya.prakash@broadcom.com>, <chaitra.basappa@broadcom.com>,
+	<suganath-prabu.subramani@broadcom.com>
+CC: <linux-block@vger.kernel.org>, <linux-ide@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <MPT-FusionLinux.pdl@broadcom.com>,
+	<linux-scsi@vger.kernel.org>, Adam Manzanares <adam.manzanares@hgst.com>
+Subject: [PATCH v6 0/3] Enabling ATA Command Priorities
+Date: Mon, 17 Oct 2016 11:27:27 -0700
+Message-ID: <1476728850-2309-1-git-send-email-adam.manzanares@hgst.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1476728850-2309-1-git-send-email-adam.manzanares@hgst.com>
+Content-Type: text/plain
+Return-Path: adam.manzanares@hgst.com
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Oct 17, 2016 at 11:27:27AM -0700, Adam Manzanares wrote:
-> This patch builds ATA commands with high priority if the iocontext of a process
-> is set to real time. The goal of the patch is to improve tail latencies of 
-> workloads that use higher queue depths. This requires setting the iocontext 
-> ioprio on the request when it is initialized
-> 
-> This patch has been tested with an Ultrastar HE8 HDD and cuts the 
-> the p99.99 tail latency of foreground IO from 2s down to 72ms when
-> using the deadline scheduler. This patch works independently of the
-> scheduler so it can be used with all of the currently available 
-> request based schedulers. 
-> 
-> Foreground IO, for the previously described results, is an async fio job 
-> submitting 4K read requests at a QD of 1 to the HDD. The foreground IO is set 
-> with the iopriority class of real time. The background workload is another fio
-> job submitting read requests at a QD of 32 to the same HDD with default 
-> iopriority.
-> 
-> This feature is enabled for ATA devices by setting the ata ncq_prio_on device 
-> attribute to 1. An ATA device is also checked to see if the device supports per
-> command priority.
+This patch builds ATA commands with high priority if the iocontext of a process
+is set to real time. The goal of the patch is to improve tail latencies of 
+workloads that use higher queue depths. This requires setting the iocontext 
+ioprio on the request when it is initialized
 
-Applied 1-3 to libata/for-4.10 w/ some modifications.
+This patch has been tested with an Ultrastar HE8 HDD and cuts the 
+the p99.99 tail latency of foreground IO from 2s down to 72ms when
+using the deadline scheduler. This patch works independently of the
+scheduler so it can be used with all of the currently available 
+request based schedulers. 
 
-Thanks.
+Foreground IO, for the previously described results, is an async fio job 
+submitting 4K read requests at a QD of 1 to the HDD. The foreground IO is set 
+with the iopriority class of real time. The background workload is another fio
+job submitting read requests at a QD of 32 to the same HDD with default 
+iopriority.
+
+This feature is enabled for ATA devices by setting the ata ncq_prio_on device 
+attribute to 1. An ATA device is also checked to see if the device supports per
+command priority.
+
+v6:
+ - Removed fusion mpt sas prio related code deletion
+ - Renamed ata device attribute that enables priority cmds to the device
+
+v5:
+ - Updated block patch commit message to indicate the why and not the how
+v4:
+ - Added blk_rq_set_prio function to associate request prio with ioc prio
+ - In init_request_from_bio use bio_prio if it is valid
+ - Added ata enable_prio dev attribute to sysfs to enable prioritized commands
+
+v3:
+ - Removed null dereference issue in blk-core
+ - Renamed queue sysfs entries for clarity
+ - Added documentation for sysfs queue entry
+
+v2:
+ - Add queue flag to set iopriority going to the request
+ - If queue flag set, send iopriority class to ata_build_rw_tf
+ - Remove redundant code in ata_ncq_prio_enabled function.
+
+
+Adam Manzanares (3):
+  block: Add iocontext priority to request
+  ata: Enabling ATA Command Priorities
+  ata: ATA Command Priority Disabled By Default
+
+ block/blk-core.c          |  4 ++-
+ drivers/ata/libahci.c     |  1 +
+ drivers/ata/libata-core.c | 35 +++++++++++++++++++++-
+ drivers/ata/libata-scsi.c | 74 ++++++++++++++++++++++++++++++++++++++++++++++-
+ drivers/ata/libata.h      |  2 +-
+ include/linux/ata.h       |  6 ++++
+ include/linux/blkdev.h    | 14 +++++++++
+ include/linux/libata.h    | 25 ++++++++++++++++
+ 8 files changed, 157 insertions(+), 4 deletions(-)
 
 -- 
-tejun
+2.1.4
+
+Western Digital Corporation (and its subsidiaries) E-mail Confidentiality Notice & Disclaimer:
+
+This e-mail and any files transmitted with it may contain confidential or legally privileged information of WDC and/or its affiliates, and are intended solely for the use of the individual or entity to which they are addressed. If you are not the intended recipient, any disclosure, copying, distribution or any action taken or omitted to be taken in reliance on it, is prohibited. If you have received this e-mail in error, please notify the sender immediately and delete the e-mail in its entirety from your system.
