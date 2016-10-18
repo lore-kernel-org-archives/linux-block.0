@@ -1,79 +1,178 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:42815 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753427AbcJKSnj (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Oct 2016 14:43:39 -0400
-Date: Tue, 11 Oct 2016 17:47:50 +0200
-From: Jan Kara <jack@suse.cz>
-To: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Cc: Theodore Ts'o <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCHv3 12/41] thp: handle write-protection faults for file THP
-Message-ID: <20161011154750.GL6952@quack2.suse.cz>
-References: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
- <20160915115523.29737-13-kirill.shutemov@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20160915115523.29737-13-kirill.shutemov@linux.intel.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <tomasz.majchrzak@intel.com>
+From: Tomasz Majchrzak <tomasz.majchrzak@intel.com>
+To: linux-raid@vger.kernel.org
+Cc: shli@kernel.org,
+	aleksey.obitotskiy@intel.com,
+	pawel.baldysiak@intel.com,
+	artur.paszkiewicz@intel.com,
+	maksymilian.kunt@intel.com,
+	mariusz.dabrowski@intel.com,
+	axboe@kernel.dk,
+	dan.j.williams@intel.com,
+	linux-block@vger.kernel.org,
+	Tomasz Majchrzak <tomasz.majchrzak@intel.com>
+Subject: [PATCH 2/3 v2] md: add bad block support for external metadata
+Date: Tue, 18 Oct 2016 16:09:45 +0200
+Message-Id: <1476799785-6339-1-git-send-email-tomasz.majchrzak@intel.com>
+List-ID: <linux-block@vger.kernel.org>
 
-On Thu 15-09-16 14:54:54, Kirill A. Shutemov wrote:
-> For filesystems that wants to be write-notified (has mkwrite), we will
-> encount write-protection faults for huge PMDs in shared mappings.
-> 
-> The easiest way to handle them is to clear the PMD and let it refault as
-> wriable.
-> 
-> Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
-> ---
->  mm/memory.c | 11 ++++++++++-
->  1 file changed, 10 insertions(+), 1 deletion(-)
-> 
-> diff --git a/mm/memory.c b/mm/memory.c
-> index 83be99d9d8a1..aad8d5c6311f 100644
-> --- a/mm/memory.c
-> +++ b/mm/memory.c
-> @@ -3451,8 +3451,17 @@ static int wp_huge_pmd(struct fault_env *fe, pmd_t orig_pmd)
->  		return fe->vma->vm_ops->pmd_fault(fe->vma, fe->address, fe->pmd,
->  				fe->flags);
->  
-> +	if (fe->vma->vm_flags & VM_SHARED) {
-> +		/* Clear PMD */
-> +		zap_page_range_single(fe->vma, fe->address,
-> +				HPAGE_PMD_SIZE, NULL);
-> +		VM_BUG_ON(!pmd_none(*fe->pmd));
-> +
-> +		/* Refault to establish writable PMD */
-> +		return 0;
-> +	}
-> +
+Add new rdev flag which external metadata handler can use to switch
+on/off bad block support. If new bad block is encountered, notify it via
+rdev 'unacknowledged_bad_blocks' sysfs file. If bad block has been
+cleared, notify update to rdev 'bad_blocks' sysfs file.
 
-Since we want to write-protect the page table entry on each page writeback
-and write-enable then on the next write, this is relatively expensive.
-Would it be that complicated to handle this fully in ->pmd_fault handler
-like we do for DAX?
+When bad blocks support is being removed, just clear rdev flag. It is
+not necessary to reset badblocks->shift field. If there are bad blocks
+cleared or added at the same time, it is ok for those changes to be
+applied to the structure. The array is in blocked state and the drive
+which cannot handle bad blocks any more will be removed from the array
+before it is unlocked.
 
-Maybe it doesn't have to be done now but longer term I guess it might make
-sense.
+Simplify state_show function by adding a separator at the end of each
+string and overwrite last separator with new line.
 
-Otherwise the patch looks good so feel free to add:
+Signed-off-by: Tomasz Majchrzak <tomasz.majchrzak@intel.com>
+Reviewed-by: Artur Paszkiewicz <artur.paszkiewicz@intel.com>
+---
+ drivers/md/md.c | 78 ++++++++++++++++++++++++++++-----------------------------
+ drivers/md/md.h |  3 +++
+ 2 files changed, 42 insertions(+), 39 deletions(-)
 
-Reviewed-by: Jan Kara <jack@suse.cz>
-
-								Honza
+diff --git a/drivers/md/md.c b/drivers/md/md.c
+index eac84d8..cc05236 100644
+--- a/drivers/md/md.c
++++ b/drivers/md/md.c
+@@ -2523,51 +2523,38 @@ struct rdev_sysfs_entry {
+ static ssize_t
+ state_show(struct md_rdev *rdev, char *page)
+ {
+-	char *sep = "";
++	char *sep = ",";
+ 	size_t len = 0;
+ 	unsigned long flags = ACCESS_ONCE(rdev->flags);
+ 
+ 	if (test_bit(Faulty, &flags) ||
+-	    rdev->badblocks.unacked_exist) {
+-		len+= sprintf(page+len, "%sfaulty",sep);
+-		sep = ",";
+-	}
+-	if (test_bit(In_sync, &flags)) {
+-		len += sprintf(page+len, "%sin_sync",sep);
+-		sep = ",";
+-	}
+-	if (test_bit(Journal, &flags)) {
+-		len += sprintf(page+len, "%sjournal",sep);
+-		sep = ",";
+-	}
+-	if (test_bit(WriteMostly, &flags)) {
+-		len += sprintf(page+len, "%swrite_mostly",sep);
+-		sep = ",";
+-	}
++	    rdev->badblocks.unacked_exist)
++		len += sprintf(page+len, "faulty%s", sep);
++	if (test_bit(In_sync, &flags))
++		len += sprintf(page+len, "in_sync%s", sep);
++	if (test_bit(Journal, &flags))
++		len += sprintf(page+len, "journal%s", sep);
++	if (test_bit(WriteMostly, &flags))
++		len += sprintf(page+len, "write_mostly%s", sep);
+ 	if (test_bit(Blocked, &flags) ||
+ 	    (rdev->badblocks.unacked_exist
+-	     && !test_bit(Faulty, &flags))) {
+-		len += sprintf(page+len, "%sblocked", sep);
+-		sep = ",";
+-	}
++	     && !test_bit(Faulty, &flags)))
++		len += sprintf(page+len, "blocked%s", sep);
+ 	if (!test_bit(Faulty, &flags) &&
+ 	    !test_bit(Journal, &flags) &&
+-	    !test_bit(In_sync, &flags)) {
+-		len += sprintf(page+len, "%sspare", sep);
+-		sep = ",";
+-	}
+-	if (test_bit(WriteErrorSeen, &flags)) {
+-		len += sprintf(page+len, "%swrite_error", sep);
+-		sep = ",";
+-	}
+-	if (test_bit(WantReplacement, &flags)) {
+-		len += sprintf(page+len, "%swant_replacement", sep);
+-		sep = ",";
+-	}
+-	if (test_bit(Replacement, &flags)) {
+-		len += sprintf(page+len, "%sreplacement", sep);
+-		sep = ",";
+-	}
++	    !test_bit(In_sync, &flags))
++		len += sprintf(page+len, "spare%s", sep);
++	if (test_bit(WriteErrorSeen, &flags))
++		len += sprintf(page+len, "write_error%s", sep);
++	if (test_bit(WantReplacement, &flags))
++		len += sprintf(page+len, "want_replacement%s", sep);
++	if (test_bit(Replacement, &flags))
++		len += sprintf(page+len, "replacement%s", sep);
++	if (test_bit(ExternalBbl, &flags))
++		len += sprintf(page+len, "external_bbl%s", sep);
++
++	if (len)
++		len -= strlen(sep);
+ 
+ 	return len+sprintf(page+len, "\n");
+ }
+@@ -2708,6 +2695,13 @@ state_store(struct md_rdev *rdev, const char *buf, size_t len)
+ 			}
+ 		} else
+ 			err = -EBUSY;
++	} else if (cmd_match(buf, "external_bbl") && (rdev->mddev->external)) {
++		set_bit(ExternalBbl, &rdev->flags);
++		rdev->badblocks.shift = 0;
++		err = 0;
++	} else if (cmd_match(buf, "-external_bbl") && (rdev->mddev->external)) {
++		clear_bit(ExternalBbl, &rdev->flags);
++		err = 0;
+ 	}
+ 	if (!err)
+ 		sysfs_notify_dirent_safe(rdev->sysfs_state);
+@@ -8614,6 +8608,9 @@ int rdev_set_badblocks(struct md_rdev *rdev, sector_t s, int sectors,
+ 	rv = badblocks_set(&rdev->badblocks, s, sectors, 0);
+ 	if (rv == 0) {
+ 		/* Make sure they get written out promptly */
++		if (test_bit(ExternalBbl, &rdev->flags))
++			sysfs_notify(&rdev->kobj, NULL,
++				     "unacknowledged_bad_blocks");
+ 		sysfs_notify_dirent_safe(rdev->sysfs_state);
+ 		set_mask_bits(&mddev->flags, 0,
+ 			      BIT(MD_CHANGE_CLEAN) | BIT(MD_CHANGE_PENDING));
+@@ -8627,12 +8624,15 @@ EXPORT_SYMBOL_GPL(rdev_set_badblocks);
+ int rdev_clear_badblocks(struct md_rdev *rdev, sector_t s, int sectors,
+ 			 int is_new)
+ {
++	int rv;
+ 	if (is_new)
+ 		s += rdev->new_data_offset;
+ 	else
+ 		s += rdev->data_offset;
+-	return badblocks_clear(&rdev->badblocks,
+-				  s, sectors);
++	rv = badblocks_clear(&rdev->badblocks, s, sectors);
++	if ((rv == 0) && test_bit(ExternalBbl, &rdev->flags))
++		sysfs_notify(&rdev->kobj, NULL, "bad_blocks");
++	return rv;
+ }
+ EXPORT_SYMBOL_GPL(rdev_clear_badblocks);
+ 
+diff --git a/drivers/md/md.h b/drivers/md/md.h
+index 2b20417..21bd94f 100644
+--- a/drivers/md/md.h
++++ b/drivers/md/md.h
+@@ -168,6 +168,9 @@ enum flag_bits {
+ 				 * so it is safe to remove without
+ 				 * another synchronize_rcu() call.
+ 				 */
++	ExternalBbl,            /* External metadata provides bad
++				 * block management for a disk
++				 */
+ };
+ 
+ static inline int is_badblock(struct md_rdev *rdev, sector_t s, int sectors,
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+1.8.3.1
