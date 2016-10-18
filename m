@@ -1,228 +1,131 @@
-Return-Path: <Adam.Manzanares@hgst.com>
-From: Adam Manzanares <adam.manzanares@hgst.com>
-To: <axboe@kernel.dk>, <tj@kernel.org>
-CC: <linux-block@vger.kernel.org>, <linux-ide@vger.kernel.org>, "Adam
- Manzanares" <adam.manzanares@hgst.com>
-Subject: [PATCH v3 2/2] ata: Enabling ATA Command Priorities
-Date: Tue, 11 Oct 2016 13:40:27 -0700
-Message-ID: <1476218427-4021-3-git-send-email-adam.manzanares@hgst.com>
-In-Reply-To: <1476218427-4021-1-git-send-email-adam.manzanares@hgst.com>
-References: <1476218427-4021-1-git-send-email-adam.manzanares@hgst.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-io0-f193.google.com ([209.85.223.193]:36478 "EHLO
+        mail-io0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754883AbcJRFPc (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 18 Oct 2016 01:15:32 -0400
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: adam.manzanares@hgst.com
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <7980A2DC-3701-4A3D-9253-2E047A0144AE@unimore.it>
+References: <EE90477C-FD56-48C1-8A45-97AF39A8BB0C@unimore.it>
+ <20161004185413.GF4205@htj.duckdns.org> <F9A2F063-F5A2-49A6-8DFE-91ACDE380645@unimore.it>
+ <20161004191427.GG4205@htj.duckdns.org> <B8B66027-D652-46E2-A0C6-81F227817571@unimore.it>
+ <20161004202754.GJ4205@htj.duckdns.org> <CACsaVZ+AqSXHTRdpdrQQp6PuynEPeB-5YOyweWsenjvuKsD12w@mail.gmail.com>
+ <CACsaVZ+azEP+fH5Dg-8soH8QjWBRnL-2B4Uuj4YF2hUnoyvzgA@mail.gmail.com>
+ <20161014164036.GA6320@mtj.duckdns.org> <6B4FE5ED-75BD-4AD8-B0FA-B452FB631BE8@unimore.it>
+ <20161014183517.GB6320@mtj.duckdns.org> <7980A2DC-3701-4A3D-9253-2E047A0144AE@unimore.it>
+From: Kyle Sanderson <kyle.leet@gmail.com>
+Date: Mon, 17 Oct 2016 22:15:10 -0700
+Message-ID: <CACsaVZL2Pv4v55amW8fjXyg0cP6h3i0NS36nRB_6a5mZJvgAZw@mail.gmail.com>
+Subject: Re: [PATCH V3 00/11] block-throttle: add .high limit
+To: Paolo Valente <paolo.valente@unimore.it>
+Cc: Tejun Heo <tj@kernel.org>, jmoyer@redhat.com,
+        Linux-Kernal <linux-kernel@vger.kernel.org>,
+        Mark Brown <broonie@kernel.org>, linux-block@vger.kernel.org,
+        Shaohua Li <shli@fb.com>, Jens Axboe <axboe@fb.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Vivek Goyal <vgoyal@redhat.com>, Kernel-team@fb.com,
+        Ulf Hansson <ulf.hansson@linaro.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This patch checks to see if an ATA device supports NCQ command priorities.
-If so and the user has specified an iocontext that indicates IO_PRIO_CLASS_RT
-and also enables request priorities in the block queue then we build a tf
-with a high priority command.
+Not to compound upon this again. However if BFQ isn't suitable to
+replace CFQ for high I/O workloads (I've yet to see 20k IOPS on any
+reasonably sized SAN (SC4020 / v5000, etc)), can't we at-least default
+BFQ to become the default I/O scheduler for people otherwise
+requesting CFQ? Paolo has had a team of students working on this for
+years, even if the otherwise "secret weapon" is mainlined I highly
+doubt his work will stop. We're pretty close to fixing hard I/O stalls
+in Linux, mainlining being the last major burden.
 
-This patch depends on patch block-Add-iocontext-priority-to-request
+While I've contributed nothing to BFQ code wise, absolutely let any of
+us know if there's anything outstanding to solve hard lockups and I
+believe any of us will try our best.
 
-Signed-off-by: Adam Manzanares <adam.manzanares@hgst.com>
----
- drivers/ata/libata-core.c | 35 ++++++++++++++++++++++++++++++++++-
- drivers/ata/libata-scsi.c | 10 +++++++++-
- drivers/ata/libata.h      |  2 +-
- include/linux/ata.h       |  6 ++++++
- include/linux/libata.h    | 18 ++++++++++++++++++
- 5 files changed, 68 insertions(+), 3 deletions(-)
+Kyle.
 
-diff --git a/drivers/ata/libata-core.c b/drivers/ata/libata-core.c
-index 223a770..181b530 100644
---- a/drivers/ata/libata-core.c
-+++ b/drivers/ata/libata-core.c
-@@ -739,6 +739,7 @@ u64 ata_tf_read_block(const struct ata_taskfile *tf, struct ata_device *dev)
-  *	@n_block: Number of blocks
-  *	@tf_flags: RW/FUA etc...
-  *	@tag: tag
-+ *	@class: IO priority class
-  *
-  *	LOCKING:
-  *	None.
-@@ -753,7 +754,7 @@ u64 ata_tf_read_block(const struct ata_taskfile *tf, struct ata_device *dev)
-  */
- int ata_build_rw_tf(struct ata_taskfile *tf, struct ata_device *dev,
- 		    u64 block, u32 n_block, unsigned int tf_flags,
--		    unsigned int tag)
-+		    unsigned int tag, int class)
- {
- 	tf->flags |= ATA_TFLAG_ISADDR | ATA_TFLAG_DEVICE;
- 	tf->flags |= tf_flags;
-@@ -785,6 +786,12 @@ int ata_build_rw_tf(struct ata_taskfile *tf, struct ata_device *dev,
- 		tf->device = ATA_LBA;
- 		if (tf->flags & ATA_TFLAG_FUA)
- 			tf->device |= 1 << 7;
-+
-+		if (ata_ncq_prio_enabled(dev)) {
-+			if (class == IOPRIO_CLASS_RT)
-+				tf->hob_nsect |= ATA_PRIO_HIGH <<
-+						 ATA_SHIFT_PRIO;
-+		}
- 	} else if (dev->flags & ATA_DFLAG_LBA) {
- 		tf->flags |= ATA_TFLAG_LBA;
- 
-@@ -2156,6 +2163,30 @@ static void ata_dev_config_ncq_non_data(struct ata_device *dev)
- 	}
- }
- 
-+static void ata_dev_config_ncq_prio(struct ata_device *dev)
-+{
-+	struct ata_port *ap = dev->link->ap;
-+	unsigned int err_mask;
-+
-+	err_mask = ata_read_log_page(dev,
-+				     ATA_LOG_SATA_ID_DEV_DATA,
-+				     ATA_LOG_SATA_SETTINGS,
-+				     ap->sector_buf,
-+				     1);
-+	if (err_mask) {
-+		ata_dev_dbg(dev,
-+			    "failed to get Identify Device data, Emask 0x%x\n",
-+			    err_mask);
-+		return;
-+	}
-+
-+	if (ap->sector_buf[ATA_LOG_NCQ_PRIO_OFFSET] & BIT(3))
-+		dev->flags |= ATA_DFLAG_NCQ_PRIO;
-+	else
-+		ata_dev_dbg(dev, "SATA page does not support priority\n");
-+
-+}
-+
- static int ata_dev_config_ncq(struct ata_device *dev,
- 			       char *desc, size_t desc_sz)
- {
-@@ -2205,6 +2236,8 @@ static int ata_dev_config_ncq(struct ata_device *dev,
- 			ata_dev_config_ncq_send_recv(dev);
- 		if (ata_id_has_ncq_non_data(dev->id))
- 			ata_dev_config_ncq_non_data(dev);
-+		if (ata_id_has_ncq_prio(dev->id))
-+			ata_dev_config_ncq_prio(dev);
- 	}
- 
- 	return 0;
-diff --git a/drivers/ata/libata-scsi.c b/drivers/ata/libata-scsi.c
-index e207b33..4304694 100644
---- a/drivers/ata/libata-scsi.c
-+++ b/drivers/ata/libata-scsi.c
-@@ -50,6 +50,7 @@
- #include <linux/uaccess.h>
- #include <linux/suspend.h>
- #include <asm/unaligned.h>
-+#include <linux/ioprio.h>
- 
- #include "libata.h"
- #include "libata-transport.h"
-@@ -1757,6 +1758,8 @@ static unsigned int ata_scsi_rw_xlat(struct ata_queued_cmd *qc)
- {
- 	struct scsi_cmnd *scmd = qc->scsicmd;
- 	const u8 *cdb = scmd->cmnd;
-+	struct request *rq = scmd->request;
-+	int class = 0;
- 	unsigned int tf_flags = 0;
- 	u64 block;
- 	u32 n_block;
-@@ -1822,8 +1825,13 @@ static unsigned int ata_scsi_rw_xlat(struct ata_queued_cmd *qc)
- 	qc->flags |= ATA_QCFLAG_IO;
- 	qc->nbytes = n_block * scmd->device->sector_size;
- 
-+	/* If queue supports req prio pass it onto the task file */
-+	if (blk_queue_rq_ioc_prio(rq->q))
-+		class = IOPRIO_PRIO_CLASS(req_get_ioprio(rq));
-+
- 	rc = ata_build_rw_tf(&qc->tf, qc->dev, block, n_block, tf_flags,
--			     qc->tag);
-+			     qc->tag, class);
-+
- 	if (likely(rc == 0))
- 		return 0;
- 
-diff --git a/drivers/ata/libata.h b/drivers/ata/libata.h
-index 3b301a4..8f3a559 100644
---- a/drivers/ata/libata.h
-+++ b/drivers/ata/libata.h
-@@ -66,7 +66,7 @@ extern u64 ata_tf_to_lba48(const struct ata_taskfile *tf);
- extern struct ata_queued_cmd *ata_qc_new_init(struct ata_device *dev, int tag);
- extern int ata_build_rw_tf(struct ata_taskfile *tf, struct ata_device *dev,
- 			   u64 block, u32 n_block, unsigned int tf_flags,
--			   unsigned int tag);
-+			   unsigned int tag, int class);
- extern u64 ata_tf_read_block(const struct ata_taskfile *tf,
- 			     struct ata_device *dev);
- extern unsigned ata_exec_internal(struct ata_device *dev,
-diff --git a/include/linux/ata.h b/include/linux/ata.h
-index adbc812..ebe4c3b 100644
---- a/include/linux/ata.h
-+++ b/include/linux/ata.h
-@@ -347,6 +347,7 @@ enum {
- 	ATA_LOG_DEVSLP_DETO	  = 0x01,
- 	ATA_LOG_DEVSLP_VALID	  = 0x07,
- 	ATA_LOG_DEVSLP_VALID_MASK = 0x80,
-+	ATA_LOG_NCQ_PRIO_OFFSET   = 0x09,
- 
- 	/* NCQ send and receive log */
- 	ATA_LOG_NCQ_SEND_RECV_SUBCMDS_OFFSET	= 0x00,
-@@ -897,6 +898,11 @@ static inline bool ata_id_has_ncq_non_data(const u16 *id)
- 	return id[ATA_ID_SATA_CAPABILITY_2] & BIT(5);
- }
- 
-+static inline bool ata_id_has_ncq_prio(const u16 *id)
-+{
-+	return id[ATA_ID_SATA_CAPABILITY] & BIT(12);
-+}
-+
- static inline bool ata_id_has_trim(const u16 *id)
- {
- 	if (ata_id_major_version(id) >= 7 &&
-diff --git a/include/linux/libata.h b/include/linux/libata.h
-index e37d4f9..244f261 100644
---- a/include/linux/libata.h
-+++ b/include/linux/libata.h
-@@ -165,6 +165,7 @@ enum {
- 	ATA_DFLAG_NO_UNLOAD	= (1 << 17), /* device doesn't support unload */
- 	ATA_DFLAG_UNLOCK_HPA	= (1 << 18), /* unlock HPA */
- 	ATA_DFLAG_NCQ_SEND_RECV = (1 << 19), /* device supports NCQ SEND and RECV */
-+	ATA_DFLAG_NCQ_PRIO	= (1 << 20), /* device supports NCQ priority */
- 	ATA_DFLAG_INIT_MASK	= (1 << 24) - 1,
- 
- 	ATA_DFLAG_DETACH	= (1 << 24),
-@@ -341,7 +342,9 @@ enum {
- 	ATA_SHIFT_PIO		= 0,
- 	ATA_SHIFT_MWDMA		= ATA_SHIFT_PIO + ATA_NR_PIO_MODES,
- 	ATA_SHIFT_UDMA		= ATA_SHIFT_MWDMA + ATA_NR_MWDMA_MODES,
-+	ATA_SHIFT_PRIO		= 6,
- 
-+	ATA_PRIO_HIGH		= 2,
- 	/* size of buffer to pad xfers ending on unaligned boundaries */
- 	ATA_DMA_PAD_SZ		= 4,
- 
-@@ -1609,6 +1612,21 @@ static inline int ata_ncq_enabled(struct ata_device *dev)
- 			      ATA_DFLAG_NCQ)) == ATA_DFLAG_NCQ;
- }
- 
-+/**
-+ *	ata_ncq_prio_enabled - Test whether NCQ prio is enabled
-+ *	@dev: ATA device to test for
-+ *
-+ *	LOCKING:
-+ *	spin_lock_irqsave(host lock)
-+ *
-+ *	RETURNS:
-+ *	1 if NCQ prio is enabled for @dev, 0 otherwise.
-+ */
-+static inline int ata_ncq_prio_enabled(struct ata_device *dev)
-+{
-+	return (dev->flags & ATA_DFLAG_NCQ_PRIO) == ATA_DFLAG_NCQ_PRIO;
-+}
-+
- static inline bool ata_fpdma_dsm_supported(struct ata_device *dev)
- {
- 	return (dev->flags & ATA_DFLAG_NCQ_SEND_RECV) &&
--- 
-2.1.4
-
-Western Digital Corporation (and its subsidiaries) E-mail Confidentiality Notice & Disclaimer:
-
-This e-mail and any files transmitted with it may contain confidential or legally privileged information of WDC and/or its affiliates, and are intended solely for the use of the individual or entity to which they are addressed. If you are not the intended recipient, any disclosure, copying, distribution or any action taken or omitted to be taken in reliance on it, is prohibited. If you have received this e-mail in error, please notify the sender immediately and delete the e-mail in its entirety from your system.
+On Sun, Oct 16, 2016 at 12:02 PM, Paolo Valente
+<paolo.valente@unimore.it> wrote:
+>
+>> Il giorno 14 ott 2016, alle ore 20:35, Tejun Heo <tj@kernel.org> ha scritto:
+>>
+>> Hello, Paolo.
+>>
+>> On Fri, Oct 14, 2016 at 07:13:41PM +0200, Paolo Valente wrote:
+>>> That said, your 'thus' seems a little too strong: "bfq does not yet
+>>> handle fast SSDs, thus we need something else".  What about the
+>>> millions of devices (and people) still within 10-20 K IOPS, and
+>>> experiencing awful latencies and lack of bandwidth guarantees?
+>>
+>> I'm not objecting to any of that.
+>
+> Ok, sorry for misunderstanding.  I'm just more and more confused about
+> why a readily available, and not proven wrong solution has not yet
+> been accepted, if everybody apparently acknowledges the problem.
+>
+>>  My point just is that bfq, at least
+>> as currently implemented, is unfit for certain classes of use cases.
+>>
+>
+> Absolutely correct.
+>
+>>>> FWIW, it looks like the only way we can implement proportional control
+>>>> on highspeed ssds with acceptable overhead
+>>>
+>>> Maybe not: as I wrote to Viveck in a previous reply, containing
+>>> pointers to documentation, we have already achieved twenty millions
+>>> of decisions per second with a prototype driving existing
+>>> proportional-share packet schedulers (essentially without
+>>> modifications).
+>>
+>> And that doesn't require idling and thus doesn't severely impact
+>> utilization?
+>>
+>
+> Nope.  Packets are commonly assumed to be sent asynchronously.
+> I guess that discussing the validity of this assumption is out of the
+> scope of this thread.
+>
+> Thanks,
+> Paolo
+>
+>>>> is somehow finding a way to
+>>>> calculate the cost of each IO and throttle IOs according to that while
+>>>> controlling for latency as necessary.  Slice scheduling with idling
+>>>> seems too expensive with highspeed devices with high io depth.
+>>>
+>>> Yes, that's absolutely true.  I'm already thinking about an idleless
+>>> solution.  As I already wrote, I'm willing to help with scheduling in
+>>> blk-mq.  I hope there will be the opportunity to find some way to go
+>>> at KS.
+>>
+>> It'd be great to have a proportional control mechanism whose overhead
+>> is acceptable.  Unfortunately, we don't have one now and nothing seems
+>> right around the corner.  (Mostly) work-conserving throttling would be
+>> fiddlier to use but is something which is useful regardless of such
+>> proportional control mechanism and can be obtained relatively easily.
+>>
+>> I don't see why the two approaches would be mutually exclusive.
+>>
+>> Thanks.
+>>
+>> --
+>> tejun
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-block" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+>
+> --
+> Paolo Valente
+> Algogroup
+> Dipartimento di Scienze Fisiche, Informatiche e Matematiche
+> Via Campi 213/B
+> 41125 Modena - Italy
+> http://algogroup.unimore.it/people/paolo/
+>
+>
+>
+>
+>
