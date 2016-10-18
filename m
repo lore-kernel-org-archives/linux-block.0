@@ -1,54 +1,69 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv4 16/43] filemap: handle huge pages in filemap_fdatawait_range()
-Date: Tue, 25 Oct 2016 03:13:15 +0300
-Message-Id: <20161025001342.76126-17-kirill.shutemov@linux.intel.com>
-In-Reply-To: <20161025001342.76126-1-kirill.shutemov@linux.intel.com>
-References: <20161025001342.76126-1-kirill.shutemov@linux.intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <Damien.LeMoal@wdc.com>
+From: Damien Le Moal <damien.lemoal@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>, Christoph
+ Hellwig <hch@lst.de>, "Martin K . Petersen" <martin.petersen@oracle.com>,
+	Hannes Reinecke <hare@suse.de>, Shaun Tancheff <shaun@tancheff.com>, Shaun
+ Tancheff <shaun.tancheff@seagate.com>, Damien Le Moal
+	<damien.lemoal@hgst.com>
+Subject: [PATCH v8 4/7] block: Define zoned block device operations
+Date: Tue, 18 Oct 2016 15:40:32 +0900
+Message-ID: <1476772835-18541-5-git-send-email-damien.lemoal@wdc.com>
+In-Reply-To: <1476772835-18541-1-git-send-email-damien.lemoal@wdc.com>
+References: <1476772835-18541-1-git-send-email-damien.lemoal@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Return-Path: damien.lemoal@wdc.com
 List-ID: <linux-block@vger.kernel.org>
 
-We writeback whole huge page a time.
+From: Shaun Tancheff <shaun.tancheff@seagate.com>
 
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+Define REQ_OP_ZONE_REPORT and REQ_OP_ZONE_RESET for handling zones of
+host-managed and host-aware zoned block devices. With with these two
+new operations, the total number of operations defined reaches 8 and
+still fits with the 3 bits definition of REQ_OP_BITS.
+
+Signed-off-by: Shaun Tancheff <shaun.tancheff@seagate.com>
+Signed-off-by: Damien Le Moal <damien.lemoal@hgst.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 ---
- mm/filemap.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ block/blk-core.c          | 4 ++++
+ include/linux/blk_types.h | 2 ++
+ 2 files changed, 6 insertions(+)
 
-diff --git a/mm/filemap.c b/mm/filemap.c
-index 954720092cf8..ecf5c2dba3fb 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -509,9 +509,14 @@ static int __filemap_fdatawait_range(struct address_space *mapping,
- 			if (page->index > end)
- 				continue;
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 14d7c07..e4eda5d 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -1941,6 +1941,10 @@ generic_make_request_checks(struct bio *bio)
+ 	case REQ_OP_WRITE_SAME:
+ 		if (!bdev_write_same(bio->bi_bdev))
+ 			goto not_supported;
++	case REQ_OP_ZONE_REPORT:
++	case REQ_OP_ZONE_RESET:
++		if (!bdev_is_zoned(bio->bi_bdev))
++			goto not_supported;
+ 		break;
+ 	default:
+ 		break;
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index cd395ec..dd50dce 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -243,6 +243,8 @@ enum req_op {
+ 	REQ_OP_SECURE_ERASE,	/* request to securely erase sectors */
+ 	REQ_OP_WRITE_SAME,	/* write same block many times */
+ 	REQ_OP_FLUSH,		/* request for cache flush */
++	REQ_OP_ZONE_REPORT,	/* Get zone information */
++	REQ_OP_ZONE_RESET,	/* Reset a zone write pointer */
+ };
  
-+			page = compound_head(page);
- 			wait_on_page_writeback(page);
- 			if (TestClearPageError(page))
- 				ret = -EIO;
-+			if (PageTransHuge(page)) {
-+				index = page->index + HPAGE_PMD_NR;
-+				i += index - pvec.pages[i]->index - 1;
-+			}
- 		}
- 		pagevec_release(&pvec);
- 		cond_resched();
+ #define REQ_OP_BITS 3
 -- 
-2.9.3
+2.7.4
 
+Western Digital Corporation (and its subsidiaries) E-mail Confidentiality Notice & Disclaimer:
+
+This e-mail and any files transmitted with it may contain confidential or legally privileged information of WDC and/or its affiliates, and are intended solely for the use of the individual or entity to which they are addressed. If you are not the intended recipient, any disclosure, copying, distribution or any action taken or omitted to be taken in reliance on it, is prohibited. If you have received this e-mail in error, please notify the sender immediately and delete the e-mail in its entirety from your system.
