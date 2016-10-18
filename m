@@ -1,115 +1,268 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:33270 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S932320AbcJZU0g (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Oct 2016 16:26:36 -0400
-Date: Wed, 26 Oct 2016 16:26:35 -0400 (EDT)
-From: Mikulas Patocka <mpatocka@redhat.com>
+Return-Path: <Damien.LeMoal@wdc.com>
+From: Damien Le Moal <damien.lemoal@wdc.com>
 To: Jens Axboe <axboe@kernel.dk>
-cc: Mike Snitzer <snitzer@redhat.com>,
-        Christoph Hellwig <hch@infradead.org>, dm-devel@redhat.com,
-        "Alasdair G. Kergon" <agk@redhat.com>, linux-block@vger.kernel.org
-Subject: [PATCH 2/4] brd: extend rcu read sections
-In-Reply-To: <alpine.LRH.2.02.1610261624100.12287@file01.intranet.prod.int.rdu2.redhat.com>
-Message-ID: <alpine.LRH.2.02.1610261626190.12287@file01.intranet.prod.int.rdu2.redhat.com>
-References: <alpine.LRH.2.02.1610211406290.9197@file01.intranet.prod.int.rdu2.redhat.com> <20161021200022.GA12580@redhat.com> <alpine.LRH.2.02.1610211616450.31606@file01.intranet.prod.int.rdu2.redhat.com> <20161024155756.GA48306@redhat.com>
- <20161025130712.GA12717@infradead.org> <20161025143719.GA51266@redhat.com> <710b07a3-9091-6935-37c4-ea1dcedcab4f@kernel.dk> <alpine.LRH.2.02.1610261624100.12287@file01.intranet.prod.int.rdu2.redhat.com>
+CC: <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>, Christoph
+ Hellwig <hch@lst.de>, "Martin K . Petersen" <martin.petersen@oracle.com>,
+	Hannes Reinecke <hare@suse.de>, Shaun Tancheff <shaun@tancheff.com>, Shaun
+ Tancheff <shaun.tancheff@seagate.com>, Damien Le Moal
+	<damien.lemoal@hgst.com>
+Subject: [PATCH v8 7/7] blk-zoned: implement ioctls
+Date: Tue, 18 Oct 2016 15:40:35 +0900
+Message-ID: <1476772835-18541-8-git-send-email-damien.lemoal@wdc.com>
+In-Reply-To: <1476772835-18541-1-git-send-email-damien.lemoal@wdc.com>
+References: <1476772835-18541-1-git-send-email-damien.lemoal@wdc.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain
+Return-Path: damien.lemoal@wdc.com
+List-ID: <linux-block@vger.kernel.org>
 
-This patch extends rcu read sections, so that all manipulations of the
-page and its data are within read sections.
+From: Shaun Tancheff <shaun@tancheff.com>
 
-This patch is a prerequisite for discarding pages using rcu.
+Adds the new BLKREPORTZONE and BLKRESETZONE ioctls for respectively
+obtaining the zone configuration of a zoned block device and resetting
+the write pointer of sequential zones of a zoned block device.
 
-Note that the page pointer escapes the rcu section in the function
-brd_direct_access, however, direct access is not supposed to race with
-discard.
+The BLKREPORTZONE ioctl maps directly to a single call of the function
+blkdev_report_zones. The zone information result is passed as an array
+of struct blk_zone identical to the structure used internally for
+processing the REQ_OP_ZONE_REPORT operation.  The BLKRESETZONE ioctl
+maps to a single call of the blkdev_reset_zones function.
 
-Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
-
+Signed-off-by: Shaun Tancheff <shaun.tancheff@seagate.com>
+Signed-off-by: Damien Le Moal <damien.lemoal@hgst.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 ---
- drivers/block/brd.c |   19 +++++++++++++++++--
- 1 file changed, 17 insertions(+), 2 deletions(-)
+ block/blk-zoned.c             | 93 +++++++++++++++++++++++++++++++++++++++++++
+ block/ioctl.c                 |  4 ++
+ include/linux/blkdev.h        | 21 ++++++++++
+ include/uapi/linux/blkzoned.h | 40 +++++++++++++++++++
+ include/uapi/linux/fs.h       |  4 ++
+ 5 files changed, 162 insertions(+)
 
-Index: linux-2.6/drivers/block/brd.c
-===================================================================
---- linux-2.6.orig/drivers/block/brd.c
-+++ linux-2.6/drivers/block/brd.c
-@@ -71,10 +71,8 @@ static struct page *brd_lookup_page(stru
- 	 * safe here (we don't have total exclusion from radix tree updates
- 	 * here, only deletes).
- 	 */
--	rcu_read_lock();
- 	idx = sector >> PAGE_SECTORS_SHIFT; /* sector to page index */
- 	page = radix_tree_lookup(&brd->brd_pages, idx);
--	rcu_read_unlock();
- 
- 	BUG_ON(page && page->index != idx);
- 
-@@ -92,7 +90,12 @@ static struct page *brd_insert_page(stru
- 	struct page *page;
- 	gfp_t gfp_flags;
- 
-+	rcu_read_lock();
-+
- 	page = brd_lookup_page(brd, sector);
-+
-+	rcu_read_unlock();
-+
- 	if (page)
- 		return page;
- 
-@@ -151,9 +154,13 @@ static void brd_zero_page(struct brd_dev
- {
- 	struct page *page;
- 
-+	rcu_read_lock();
-+
- 	page = brd_lookup_page(brd, sector);
- 	if (page)
- 		clear_highpage(page);
-+
-+	rcu_read_unlock();
+diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+index 1603573..667f95d 100644
+--- a/block/blk-zoned.c
++++ b/block/blk-zoned.c
+@@ -255,3 +255,96 @@ int blkdev_reset_zones(struct block_device *bdev,
+ 	return 0;
  }
- 
- /*
-@@ -246,6 +253,8 @@ static void copy_to_brd(struct brd_devic
- 	unsigned int offset = (sector & (PAGE_SECTORS-1)) << SECTOR_SHIFT;
- 	size_t copy;
- 
-+	rcu_read_lock();
+ EXPORT_SYMBOL_GPL(blkdev_reset_zones);
 +
- 	copy = min_t(size_t, n, PAGE_SIZE - offset);
- 	page = brd_lookup_page(brd, sector);
- 	BUG_ON(!page);
-@@ -265,6 +274,8 @@ static void copy_to_brd(struct brd_devic
- 		memcpy(dst, src, copy);
- 		kunmap_atomic(dst);
- 	}
++/**
++ * BLKREPORTZONE ioctl processing.
++ * Called from blkdev_ioctl.
++ */
++int blkdev_report_zones_ioctl(struct block_device *bdev, fmode_t mode,
++			      unsigned int cmd, unsigned long arg)
++{
++	void __user *argp = (void __user *)arg;
++	struct request_queue *q;
++	struct blk_zone_report rep;
++	struct blk_zone *zones;
++	int ret;
 +
-+	rcu_read_unlock();
- }
- 
- /*
-@@ -278,6 +289,8 @@ static void copy_from_brd(void *dst, str
- 	unsigned int offset = (sector & (PAGE_SECTORS-1)) << SECTOR_SHIFT;
- 	size_t copy;
- 
-+	rcu_read_lock();
++	if (!argp)
++		return -EINVAL;
 +
- 	copy = min_t(size_t, n, PAGE_SIZE - offset);
- 	page = brd_lookup_page(brd, sector);
- 	if (page) {
-@@ -299,6 +312,8 @@ static void copy_from_brd(void *dst, str
- 		} else
- 			memset(dst, 0, copy);
- 	}
++	q = bdev_get_queue(bdev);
++	if (!q)
++		return -ENXIO;
 +
-+	rcu_read_unlock();
- }
++	if (!blk_queue_is_zoned(q))
++		return -ENOTTY;
++
++	if (!capable(CAP_SYS_ADMIN))
++		return -EACCES;
++
++	if (copy_from_user(&rep, argp, sizeof(struct blk_zone_report)))
++		return -EFAULT;
++
++	if (!rep.nr_zones)
++		return -EINVAL;
++
++	zones = kcalloc(rep.nr_zones, sizeof(struct blk_zone), GFP_KERNEL);
++	if (!zones)
++		return -ENOMEM;
++
++	ret = blkdev_report_zones(bdev, rep.sector,
++				  zones, &rep.nr_zones,
++				  GFP_KERNEL);
++	if (ret)
++		goto out;
++
++	if (copy_to_user(argp, &rep, sizeof(struct blk_zone_report))) {
++		ret = -EFAULT;
++		goto out;
++	}
++
++	if (rep.nr_zones) {
++		if (copy_to_user(argp + sizeof(struct blk_zone_report), zones,
++				 sizeof(struct blk_zone) * rep.nr_zones))
++			ret = -EFAULT;
++	}
++
++ out:
++	kfree(zones);
++
++	return ret;
++}
++
++/**
++ * BLKRESETZONE ioctl processing.
++ * Called from blkdev_ioctl.
++ */
++int blkdev_reset_zones_ioctl(struct block_device *bdev, fmode_t mode,
++			     unsigned int cmd, unsigned long arg)
++{
++	void __user *argp = (void __user *)arg;
++	struct request_queue *q;
++	struct blk_zone_range zrange;
++
++	if (!argp)
++		return -EINVAL;
++
++	q = bdev_get_queue(bdev);
++	if (!q)
++		return -ENXIO;
++
++	if (!blk_queue_is_zoned(q))
++		return -ENOTTY;
++
++	if (!capable(CAP_SYS_ADMIN))
++		return -EACCES;
++
++	if (!(mode & FMODE_WRITE))
++		return -EBADF;
++
++	if (copy_from_user(&zrange, argp, sizeof(struct blk_zone_range)))
++		return -EFAULT;
++
++	return blkdev_reset_zones(bdev, zrange.sector, zrange.nr_sectors,
++				  GFP_KERNEL);
++}
+diff --git a/block/ioctl.c b/block/ioctl.c
+index ed2397f..448f78a 100644
+--- a/block/ioctl.c
++++ b/block/ioctl.c
+@@ -513,6 +513,10 @@ int blkdev_ioctl(struct block_device *bdev, fmode_t mode, unsigned cmd,
+ 				BLKDEV_DISCARD_SECURE);
+ 	case BLKZEROOUT:
+ 		return blk_ioctl_zeroout(bdev, mode, arg);
++	case BLKREPORTZONE:
++		return blkdev_report_zones_ioctl(bdev, mode, cmd, arg);
++	case BLKRESETZONE:
++		return blkdev_reset_zones_ioctl(bdev, mode, cmd, arg);
+ 	case HDIO_GETGEO:
+ 		return blkdev_getgeo(bdev, argp);
+ 	case BLKRAGET:
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 252043f..90097dd 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -316,6 +316,27 @@ extern int blkdev_report_zones(struct block_device *bdev,
+ extern int blkdev_reset_zones(struct block_device *bdev, sector_t sectors,
+ 			      sector_t nr_sectors, gfp_t gfp_mask);
  
- /*
++extern int blkdev_report_zones_ioctl(struct block_device *bdev, fmode_t mode,
++				     unsigned int cmd, unsigned long arg);
++extern int blkdev_reset_zones_ioctl(struct block_device *bdev, fmode_t mode,
++				    unsigned int cmd, unsigned long arg);
++
++#else /* CONFIG_BLK_DEV_ZONED */
++
++static inline int blkdev_report_zones_ioctl(struct block_device *bdev,
++					    fmode_t mode, unsigned int cmd,
++					    unsigned long arg)
++{
++	return -ENOTTY;
++}
++
++static inline int blkdev_reset_zones_ioctl(struct block_device *bdev,
++					   fmode_t mode, unsigned int cmd,
++					   unsigned long arg)
++{
++	return -ENOTTY;
++}
++
+ #endif /* CONFIG_BLK_DEV_ZONED */
+ 
+ struct request_queue {
+diff --git a/include/uapi/linux/blkzoned.h b/include/uapi/linux/blkzoned.h
+index a381721..40d1d7b 100644
+--- a/include/uapi/linux/blkzoned.h
++++ b/include/uapi/linux/blkzoned.h
+@@ -16,6 +16,7 @@
+ #define _UAPI_BLKZONED_H
+ 
+ #include <linux/types.h>
++#include <linux/ioctl.h>
+ 
+ /**
+  * enum blk_zone_type - Types of zones allowed in a zoned device.
+@@ -100,4 +101,43 @@ struct blk_zone {
+ 	__u8	reserved[36];
+ };
+ 
++/**
++ * struct blk_zone_report - BLKREPORTZONE ioctl request/reply
++ *
++ * @sector: starting sector of report
++ * @nr_zones: IN maximum / OUT actual
++ * @reserved: padding to 16 byte alignment
++ * @zones: Space to hold @nr_zones @zones entries on reply.
++ *
++ * The array of at most @nr_zones must follow this structure in memory.
++ */
++struct blk_zone_report {
++	__u64		sector;
++	__u32		nr_zones;
++	__u8		reserved[4];
++	struct blk_zone zones[0];
++} __packed;
++
++/**
++ * struct blk_zone_range - BLKRESETZONE ioctl request
++ * @sector: starting sector of the first zone to issue reset write pointer
++ * @nr_sectors: Total number of sectors of 1 or more zones to reset
++ */
++struct blk_zone_range {
++	__u64		sector;
++	__u64		nr_sectors;
++};
++
++/**
++ * Zoned block device ioctl's:
++ *
++ * @BLKREPORTZONE: Get zone information. Takes a zone report as argument.
++ *                 The zone report will start from the zone containing the
++ *                 sector specified in the report request structure.
++ * @BLKRESETZONE: Reset the write pointer of the zones in the specified
++ *                sector range. The sector range must be zone aligned.
++ */
++#define BLKREPORTZONE	_IOWR(0x12, 130, struct blk_zone_report)
++#define BLKRESETZONE	_IOW(0x12, 131, struct blk_zone_range)
++
+ #endif /* _UAPI_BLKZONED_H */
+diff --git a/include/uapi/linux/fs.h b/include/uapi/linux/fs.h
+index 3b00f7c..e0fc7f0 100644
+--- a/include/uapi/linux/fs.h
++++ b/include/uapi/linux/fs.h
+@@ -222,6 +222,10 @@ struct fsxattr {
+ #define BLKSECDISCARD _IO(0x12,125)
+ #define BLKROTATIONAL _IO(0x12,126)
+ #define BLKZEROOUT _IO(0x12,127)
++/*
++ * A jump here: 130-131 are reserved for zoned block devices
++ * (see uapi/linux/blkzoned.h)
++ */
+ 
+ #define BMAP_IOCTL 1		/* obsolete - kept for compatibility */
+ #define FIBMAP	   _IO(0x00,1)	/* bmap access */
+-- 
+2.7.4
 
+Western Digital Corporation (and its subsidiaries) E-mail Confidentiality Notice & Disclaimer:
+
+This e-mail and any files transmitted with it may contain confidential or legally privileged information of WDC and/or its affiliates, and are intended solely for the use of the individual or entity to which they are addressed. If you are not the intended recipient, any disclosure, copying, distribution or any action taken or omitted to be taken in reliance on it, is prohibited. If you have received this e-mail in error, please notify the sender immediately and delete the e-mail in its entirety from your system.
