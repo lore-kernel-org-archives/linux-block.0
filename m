@@ -1,333 +1,71 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org,
-        Matthew Wilcox <willy@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv4 03/43] radix-tree: Add radix_tree_join
-Date: Tue, 25 Oct 2016 03:13:02 +0300
-Message-Id: <20161025001342.76126-4-kirill.shutemov@linux.intel.com>
-In-Reply-To: <20161025001342.76126-1-kirill.shutemov@linux.intel.com>
-References: <20161025001342.76126-1-kirill.shutemov@linux.intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <Damien.LeMoal@wdc.com>
+Subject: Re: [PATCH v8 2/7] blk-sysfs: Add 'chunk_sectors' to sysfs attributes
+To: Jeff Moyer <jmoyer@redhat.com>
+References: <1476772835-18541-1-git-send-email-damien.lemoal@wdc.com>
+ <1476772835-18541-3-git-send-email-damien.lemoal@wdc.com>
+ <x49funtvca2.fsf@segfault.boston.devel.redhat.com>
+CC: Jens Axboe <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
+	<linux-scsi@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Martin K .
+ Petersen" <martin.petersen@oracle.com>, Hannes Reinecke <hare@suse.de>, Shaun
+ Tancheff <shaun@tancheff.com>, Damien Le Moal <damien.lemoal@hgst.com>
+From: Damien Le Moal <damien.lemoal@wdc.com>
+Message-ID: <d391589a-6e87-3679-7b38-cddbf0125801@wdc.com>
+Date: Wed, 19 Oct 2016 08:17:21 +0900
+MIME-Version: 1.0
+In-Reply-To: <x49funtvca2.fsf@segfault.boston.devel.redhat.com>
+Content-Type: text/plain; charset="windows-1252"
+Return-Path: damien.lemoal@wdc.com
 List-ID: <linux-block@vger.kernel.org>
 
-From: Matthew Wilcox <willy@linux.intel.com>
 
-This new function allows for the replacement of many smaller entries in
-the radix tree with one larger multiorder entry.  From the point of view
-of an RCU walker, they may see a mixture of the smaller entries and the
-large entry during the same walk, but they will never see NULL for an
-index which was populated before the join.
+Jeff,
 
-Signed-off-by: Matthew Wilcox <willy@linux.intel.com>
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
----
- include/linux/radix-tree.h            |   2 +
- lib/radix-tree.c                      | 159 +++++++++++++++++++++++++++-------
- tools/testing/radix-tree/multiorder.c |  32 +++++++
- 3 files changed, 163 insertions(+), 30 deletions(-)
+On 10/19/16 01:43, Jeff Moyer wrote:
+> Damien Le Moal <damien.lemoal@wdc.com> writes:
+> =
 
-diff --git a/include/linux/radix-tree.h b/include/linux/radix-tree.h
-index af3581b8a451..1efd81f21241 100644
---- a/include/linux/radix-tree.h
-+++ b/include/linux/radix-tree.h
-@@ -319,6 +319,8 @@ static inline void radix_tree_preload_end(void)
- 	preempt_enable();
- }
- 
-+int radix_tree_join(struct radix_tree_root *, unsigned long index,
-+			unsigned new_order, void *);
- /**
-  * struct radix_tree_iter - radix tree iterator state
-  *
-diff --git a/lib/radix-tree.c b/lib/radix-tree.c
-index 8e6d552c40dd..6a76252c93a6 100644
---- a/lib/radix-tree.c
-+++ b/lib/radix-tree.c
-@@ -314,18 +314,14 @@ static void radix_tree_node_rcu_free(struct rcu_head *head)
- {
- 	struct radix_tree_node *node =
- 			container_of(head, struct radix_tree_node, rcu_head);
--	int i;
- 
- 	/*
--	 * must only free zeroed nodes into the slab. radix_tree_shrink
--	 * can leave us with a non-NULL entry in the first slot, so clear
--	 * that here to make sure.
-+	 * Must only free zeroed nodes into the slab.  We can be left with
-+	 * non-NULL entries by radix_tree_free_nodes, so clear the entries
-+	 * and tags here.
- 	 */
--	for (i = 0; i < RADIX_TREE_MAX_TAGS; i++)
--		tag_clear(node, i, 0);
--
--	node->slots[0] = NULL;
--	node->count = 0;
-+	memset(node->slots, 0, sizeof(node->slots));
-+	memset(node->tags, 0, sizeof(node->tags));
- 
- 	kmem_cache_free(radix_tree_node_cachep, node);
- }
-@@ -563,14 +559,14 @@ int __radix_tree_create(struct radix_tree_root *root, unsigned long index,
- 	shift = radix_tree_load_root(root, &child, &maxindex);
- 
- 	/* Make sure the tree is high enough.  */
-+	if (order > 0 && max == ((1UL << order) - 1))
-+		max++;
- 	if (max > maxindex) {
- 		int error = radix_tree_extend(root, max, shift);
- 		if (error < 0)
- 			return error;
- 		shift = error;
- 		child = root->rnode;
--		if (order == shift)
--			shift += RADIX_TREE_MAP_SHIFT;
- 	}
- 
- 	while (shift > order) {
-@@ -582,6 +578,7 @@ int __radix_tree_create(struct radix_tree_root *root, unsigned long index,
- 				return -ENOMEM;
- 			child->shift = shift;
- 			child->offset = offset;
-+			child->count = 0;
- 			child->parent = node;
- 			rcu_assign_pointer(*slot, node_to_entry(child));
- 			if (node)
-@@ -595,31 +592,113 @@ int __radix_tree_create(struct radix_tree_root *root, unsigned long index,
- 		slot = &node->slots[offset];
- 	}
- 
-+	if (nodep)
-+		*nodep = node;
-+	if (slotp)
-+		*slotp = slot;
-+	return 0;
-+}
-+
- #ifdef CONFIG_RADIX_TREE_MULTIORDER
--	/* Insert pointers to the canonical entry */
--	if (order > shift) {
--		unsigned i, n = 1 << (order - shift);
-+/*
-+ * Free any nodes below this node.  The tree is presumed to not need
-+ * shrinking, and any user data in the tree is presumed to not need a
-+ * destructor called on it.  If we need to add a destructor, we can
-+ * add that functionality later.  Note that we may not clear tags or
-+ * slots from the tree as an RCU walker may still have a pointer into
-+ * this subtree.  We could replace the entries with RADIX_TREE_RETRY,
-+ * but we'll still have to clear those in rcu_free.
-+ */
-+static void radix_tree_free_nodes(struct radix_tree_node *node)
-+{
-+	unsigned offset = 0;
-+	struct radix_tree_node *child = entry_to_node(node);
-+
-+	for (;;) {
-+		void *entry = child->slots[offset];
-+		if (radix_tree_is_internal_node(entry) &&
-+					!is_sibling_entry(child, entry)) {
-+			child = entry_to_node(entry);
-+			offset = 0;
-+			continue;
-+		}
-+		offset++;
-+		while (offset == RADIX_TREE_MAP_SIZE) {
-+			struct radix_tree_node *old = child;
-+			offset = child->offset + 1;
-+			child = child->parent;
-+			radix_tree_node_free(old);
-+			if (old == entry_to_node(node))
-+				return;
-+		}
-+	}
-+}
-+
-+static inline int insert_entries(struct radix_tree_node *node, void **slot,
-+				void *ptr, unsigned order, bool replace)
-+{
-+	struct radix_tree_node *child;
-+	unsigned i, n, tag, offset, tags = 0;
-+
-+	if (node) {
-+		n = 1 << (order - node->shift);
-+		offset = get_slot_offset(node, slot);
-+	} else {
-+		n = 1;
-+		offset = 0;
-+	}
-+
-+	if (n > 1) {
- 		offset = offset & ~(n - 1);
- 		slot = &node->slots[offset];
--		child = node_to_entry(slot);
--		for (i = 0; i < n; i++) {
--			if (slot[i])
-+	}
-+	child = node_to_entry(slot);
-+
-+	for (i = 0; i < n; i++) {
-+		if (slot[i]) {
-+			if (replace) {
-+				node->count--;
-+				for (tag = 0; tag < RADIX_TREE_MAX_TAGS; tag++)
-+					if (tag_get(node, tag, offset + i))
-+						tags |= 1 << tag;
-+			} else
- 				return -EEXIST;
- 		}
-+	}
- 
--		for (i = 1; i < n; i++) {
-+	for (i = 0; i < n; i++) {
-+		struct radix_tree_node *old = slot[i];
-+		if (i) {
- 			rcu_assign_pointer(slot[i], child);
--			node->count++;
-+			for (tag = 0; tag < RADIX_TREE_MAX_TAGS; tag++)
-+				if (tags & (1 << tag))
-+					tag_clear(node, tag, offset + i);
-+		} else {
-+			rcu_assign_pointer(slot[i], ptr);
-+			for (tag = 0; tag < RADIX_TREE_MAX_TAGS; tag++)
-+				if (tags & (1 << tag))
-+					tag_set(node, tag, offset);
- 		}
-+		if (radix_tree_is_internal_node(old) &&
-+					!is_sibling_entry(node, old))
-+			radix_tree_free_nodes(old);
- 	}
--#endif
--
--	if (nodep)
--		*nodep = node;
--	if (slotp)
--		*slotp = slot;
--	return 0;
-+	if (node)
-+		node->count += n;
-+	return n;
-+}
-+#else
-+static inline int insert_entries(struct radix_tree_node *node, void **slot,
-+				void *ptr, unsigned order, bool replace)
-+{
-+	if (*slot)
-+		return -EEXIST;
-+	rcu_assign_pointer(*slot, ptr);
-+	if (node)
-+		node->count++;
-+	return 1;
- }
-+#endif
- 
- /**
-  *	__radix_tree_insert    -    insert into a radix tree
-@@ -642,13 +721,13 @@ int __radix_tree_insert(struct radix_tree_root *root, unsigned long index,
- 	error = __radix_tree_create(root, index, order, &node, &slot);
- 	if (error)
- 		return error;
--	if (*slot != NULL)
--		return -EEXIST;
--	rcu_assign_pointer(*slot, item);
-+
-+	error = insert_entries(node, slot, item, order, false);
-+	if (error < 0)
-+		return error;
- 
- 	if (node) {
- 		unsigned offset = get_slot_offset(node, slot);
--		node->count++;
- 		BUG_ON(tag_get(node, 0, offset));
- 		BUG_ON(tag_get(node, 1, offset));
- 		BUG_ON(tag_get(node, 2, offset));
-@@ -746,6 +825,26 @@ void *radix_tree_lookup(struct radix_tree_root *root, unsigned long index)
- }
- EXPORT_SYMBOL(radix_tree_lookup);
- 
-+#ifdef CONFIG_RADIX_TREE_MULTIORDER
-+int radix_tree_join(struct radix_tree_root *root, unsigned long index,
-+			unsigned order, void *item)
-+{
-+	struct radix_tree_node *node;
-+	void **slot;
-+	int error;
-+
-+	BUG_ON(radix_tree_is_internal_node(item));
-+
-+	error = __radix_tree_create(root, index, order, &node, &slot);
-+	if (!error)
-+		error = insert_entries(node, slot, item, order, true);
-+	if (error > 0)
-+		error = 0;
-+
-+	return error;
-+}
-+#endif
-+
- /**
-  *	radix_tree_tag_set - set a tag on a radix tree node
-  *	@root:		radix tree root
-diff --git a/tools/testing/radix-tree/multiorder.c b/tools/testing/radix-tree/multiorder.c
-index 05d7bc488971..4c66acc6d0ea 100644
---- a/tools/testing/radix-tree/multiorder.c
-+++ b/tools/testing/radix-tree/multiorder.c
-@@ -325,6 +325,37 @@ void multiorder_tagged_iteration(void)
- 	item_kill_tree(&tree);
- }
- 
-+static void __multiorder_join(unsigned long index,
-+				unsigned order1, unsigned order2)
-+{
-+	unsigned long loc;
-+	void *item, *item2 = item_create(index + 1);
-+	RADIX_TREE(tree, GFP_KERNEL);
-+
-+	item_insert_order(&tree, index, order2);
-+	item = radix_tree_lookup(&tree, index);
-+	radix_tree_join(&tree, index + 1, order1, item2);
-+	loc = radix_tree_locate_item(&tree, item);
-+	if (loc == -1)
-+		free(item);
-+	item = radix_tree_lookup(&tree, index + 1);
-+	assert(item == item2);
-+	item_kill_tree(&tree);
-+}
-+
-+static void multiorder_join(void)
-+{
-+	int i, j, idx;
-+
-+	for (idx = 0; idx < 1024; idx = idx * 2 + 3) {
-+		for (i = 1; i < 15; i++) {
-+			for (j = 0; j < i; j++) {
-+				__multiorder_join(idx, i, j);
-+			}
-+		}
-+	}
-+}
-+
- void multiorder_checks(void)
- {
- 	int i;
-@@ -342,4 +373,5 @@ void multiorder_checks(void)
- 	multiorder_tag_tests();
- 	multiorder_iteration();
- 	multiorder_tagged_iteration();
-+	multiorder_join();
- }
--- 
-2.9.3
+>> diff --git a/Documentation/ABI/testing/sysfs-block b/Documentation/ABI/t=
+esting/sysfs-block
+>> index 75a5055..ee2d5cd 100644
+>> --- a/Documentation/ABI/testing/sysfs-block
+>> +++ b/Documentation/ABI/testing/sysfs-block
+>> @@ -251,3 +251,16 @@ Description:
+>>  		since drive-managed zoned block devices do not support
+>>  		zone commands, they will be treated as regular block
+>>  		devices and zoned will report "none".
+>> +
+>> +What:		/sys/block/<disk>/queue/chunk_sectors
+>> +Date:		September 2016
+>> +Contact:	Hannes Reinecke <hare@suse.com>
+>> +Description:
+>> +		chunk_sectors has different meaning depending on the type
+>> +		of the disk. For a RAID device (dm-raid), chunk_sectors
+>> +		indicates the size in 512B sectors of the RAID volume
+>> +		stripe segment. For a zoned block device, either
+>> +		host-aware or host-managed, chunk_sectors indicates the
+>> +		size of 512B sectors of the zones of the device, with
+>                      ^^
+>                      in
 
+Good catch. Thank you. Will fix this.
+
+-- =
+
+Damien Le Moal, Ph.D.
+Sr. Manager, System Software Research Group,
+Western Digital Corporation
+Damien.LeMoal@wdc.com
+(+81) 0466-98-3593 (ext. 513593)
+1 kirihara-cho, Fujisawa,
+Kanagawa, 252-0888 Japan
+www.wdc.com, www.hgst.com
+Western Digital Corporation (and its subsidiaries) E-mail Confidentiality N=
+otice & Disclaimer:
+
+This e-mail and any files transmitted with it may contain confidential or l=
+egally privileged information of WDC and/or its affiliates, and are intende=
+d solely for the use of the individual or entity to which they are addresse=
+d. If you are not the intended recipient, any disclosure, copying, distribu=
+tion or any action taken or omitted to be taken in reliance on it, is prohi=
+bited. If you have received this e-mail in error, please notify the sender =
+immediately and delete the e-mail in its entirety from your system.
