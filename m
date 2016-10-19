@@ -1,117 +1,40 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv4 20/43] mm: make write_cache_pages() work on huge pages
-Date: Tue, 25 Oct 2016 03:13:19 +0300
-Message-Id: <20161025001342.76126-21-kirill.shutemov@linux.intel.com>
-In-Reply-To: <20161025001342.76126-1-kirill.shutemov@linux.intel.com>
-References: <20161025001342.76126-1-kirill.shutemov@linux.intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
+Date: Wed, 19 Oct 2016 15:19:25 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Bart Van Assche <bart.vanassche@sandisk.com>
+Subject: Re: [PATCH v3 03/11] blk-mq: Introduce blk_mq_queue_stopped()
+Message-ID: <20161019131925.GC6323@lst.de>
+References: <b39eb0e7-1007-eb63-8e7f-9a7f08508379@sandisk.com>
+ <b4e8cd03-0654-3e62-a559-ecc996676807@sandisk.com>
+MIME-Version: 1.0
+In-Reply-To: <b4e8cd03-0654-3e62-a559-ecc996676807@sandisk.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
+List-Post: <mailto:linux-nvme@lists.infradead.org>
+List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
+Cc: Keith Busch <keith.busch@intel.com>, Ming Lin <ming.l@ssi.samsung.com>,
+ James Bottomley <jejb@linux.vnet.ibm.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ Mike Snitzer <snitzer@redhat.com>,
+ "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+ "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+ Jens Axboe <axboe@fb.com>, Doug Ledford <dledford@redhat.com>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+ Laurence Oberman <loberman@redhat.com>, Christoph Hellwig <hch@lst.de>
+Content-Type: text/plain; charset="us-ascii"
+Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
+Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
 List-ID: <linux-block@vger.kernel.org>
 
-We writeback whole huge page a time. Let's adjust iteration this way.
+Looks good,
 
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
----
- include/linux/mm.h      |  1 +
- include/linux/pagemap.h |  1 +
- mm/page-writeback.c     | 17 ++++++++++++-----
- 3 files changed, 14 insertions(+), 5 deletions(-)
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 
-diff --git a/include/linux/mm.h b/include/linux/mm.h
-index 3a191853faaa..315df8051d06 100644
---- a/include/linux/mm.h
-+++ b/include/linux/mm.h
-@@ -1056,6 +1056,7 @@ extern pgoff_t __page_file_index(struct page *page);
-  */
- static inline pgoff_t page_index(struct page *page)
- {
-+	page = compound_head(page);
- 	if (unlikely(PageSwapCache(page)))
- 		return __page_file_index(page);
- 	return page->index;
-diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
-index 712343108d31..f9aa8bede15e 100644
---- a/include/linux/pagemap.h
-+++ b/include/linux/pagemap.h
-@@ -528,6 +528,7 @@ static inline void wait_on_page_locked(struct page *page)
-  */
- static inline void wait_on_page_writeback(struct page *page)
- {
-+	page = compound_head(page);
- 	if (PageWriteback(page))
- 		wait_on_page_bit(page, PG_writeback);
- }
-diff --git a/mm/page-writeback.c b/mm/page-writeback.c
-index 439cc63ad903..c76fc90b7039 100644
---- a/mm/page-writeback.c
-+++ b/mm/page-writeback.c
-@@ -2200,7 +2200,7 @@ int write_cache_pages(struct address_space *mapping,
- 			 * mapping. However, page->index will not change
- 			 * because we have a reference on the page.
- 			 */
--			if (page->index > end) {
-+			if (page_to_pgoff(page) > end) {
- 				/*
- 				 * can't be range_cyclic (1st pass) because
- 				 * end == -1 in that case.
-@@ -2209,7 +2209,12 @@ int write_cache_pages(struct address_space *mapping,
- 				break;
- 			}
- 
--			done_index = page->index;
-+			done_index = page_to_pgoff(page);
-+			if (PageTransCompound(page)) {
-+				index = round_up(index + 1, HPAGE_PMD_NR);
-+				i += HPAGE_PMD_NR -
-+					done_index % HPAGE_PMD_NR - 1;
-+			}
- 
- 			lock_page(page);
- 
-@@ -2221,7 +2226,7 @@ int write_cache_pages(struct address_space *mapping,
- 			 * even if there is now a new, dirty page at the same
- 			 * pagecache address.
- 			 */
--			if (unlikely(page->mapping != mapping)) {
-+			if (unlikely(page_mapping(page) != mapping)) {
- continue_unlock:
- 				unlock_page(page);
- 				continue;
-@@ -2259,7 +2264,8 @@ int write_cache_pages(struct address_space *mapping,
- 					 * not be suitable for data integrity
- 					 * writeout).
- 					 */
--					done_index = page->index + 1;
-+					done_index = compound_head(page)->index
-+						+ hpage_nr_pages(page);
- 					done = 1;
- 					break;
- 				}
-@@ -2271,7 +2277,8 @@ int write_cache_pages(struct address_space *mapping,
- 			 * keep going until we have written all the pages
- 			 * we tagged for writeback prior to entering this loop.
- 			 */
--			if (--wbc->nr_to_write <= 0 &&
-+			wbc->nr_to_write -= hpage_nr_pages(page);
-+			if (wbc->nr_to_write <= 0 &&
- 			    wbc->sync_mode == WB_SYNC_NONE) {
- 				done = 1;
- 				break;
--- 
-2.9.3
-
+_______________________________________________
+Linux-nvme mailing list
+Linux-nvme@lists.infradead.org
+http://lists.infradead.org/mailman/listinfo/linux-nvme
