@@ -1,47 +1,83 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-sn1nam02on0084.outbound.protection.outlook.com ([104.47.36.84]:64800
-        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
+Received: from mail-dm3nam03on0088.outbound.protection.outlook.com ([104.47.41.88]:25248
+        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1756310AbcJSVE0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Oct 2016 17:04:26 -0400
+        id S941272AbcJSQNn (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 19 Oct 2016 12:13:43 -0400
 Subject: Re: [PATCH v3 04/11] blk-mq: Introduce blk_mq_quiesce_queue()
-To: Jens Axboe <axboe@fb.com>
+To: Christoph Hellwig <hch@lst.de>
 References: <b39eb0e7-1007-eb63-8e7f-9a7f08508379@sandisk.com>
  <e42a952c-f245-eb39-d0a1-0336035573f9@sandisk.com>
-CC: Christoph Hellwig <hch@lst.de>,
+ <20161019132321.GD6323@lst.de>
+CC: Jens Axboe <axboe@fb.com>,
         James Bottomley <jejb@linux.vnet.ibm.com>,
         "Martin K. Petersen" <martin.petersen@oracle.com>,
         Mike Snitzer <snitzer@redhat.com>,
         Doug Ledford <dledford@redhat.com>,
         Keith Busch <keith.busch@intel.com>,
-        Ming Lei <tom.leiming@gmail.com>,
+        Ming Lin <ming.l@ssi.samsung.com>,
         Laurence Oberman <loberman@redhat.com>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
         "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
         "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
 From: Bart Van Assche <bart.vanassche@sandisk.com>
-Message-ID: <0718ec72-d525-2e75-a123-3bf9ea129319@sandisk.com>
-Date: Wed, 19 Oct 2016 14:04:17 -0700
+Message-ID: <921009c0-5c2e-75f1-a903-986ce21ee9e8@sandisk.com>
+Date: Wed, 19 Oct 2016 09:13:39 -0700
 MIME-Version: 1.0
-In-Reply-To: <e42a952c-f245-eb39-d0a1-0336035573f9@sandisk.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+In-Reply-To: <20161019132321.GD6323@lst.de>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 10/18/2016 02:50 PM, Bart Van Assche wrote:
-> blk_mq_quiesce_queue() waits until ongoing .queue_rq() invocations
-> have finished. This function does *not* wait until all outstanding
-> requests have finished (this means invocation of request.end_io()).
+On 10/19/2016 06:23 AM, Christoph Hellwig wrote:
+>> +/**
+>> + * blk_mq_quiesce_queue() - wait until all ongoing queue_rq calls have finished
+>> + *
+>> + * Note: this function does not prevent that the struct request end_io()
+>> + * callback function is invoked. Additionally, it is not prevented that
+>> + * new queue_rq() calls occur unless the queue has been stopped first.
+>> + */
+>> +void blk_mq_quiesce_queue(struct request_queue *q)
+>
+> If this is intended to be a kerneldoc comment you need to document the 'q'
+> parameter.  If not you should drop the magic "/**" marker.
 
-(replying to my own e-mail)
+Good catch. I will document the 'q' parameter.
 
-The zero-day kernel test infrastructure reported to me that this patch 
-causes a build failure with CONFIG_SRCU=n. Should I add "select SRCU" to 
-block/Kconfig (excludes TINY_RCU) or should I rather modify this patch 
-such that a mutex or rwsem is used instead of SRCU?
+>> +static void __blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx)
+>> +{
+>> +	int srcu_idx;
+>> +
+>> +	WARN_ON(!cpumask_test_cpu(raw_smp_processor_id(), hctx->cpumask) &&
+>> +		cpu_online(hctx->next_cpu));
+>> +
+>> +	if (!(hctx->flags & BLK_MQ_F_BLOCKING)) {
+>> +		rcu_read_lock();
+>> +		blk_mq_process_rq_list(hctx);
+>> +		rcu_read_unlock();
+>> +	} else {
+>> +		srcu_idx = srcu_read_lock(&hctx->queue_rq_srcu);
+>> +		blk_mq_process_rq_list(hctx);
+>> +		srcu_read_unlock(&hctx->queue_rq_srcu, srcu_idx);
+>> +	}
+>> +}
+>
+> Can you document these synchronization changes in detail in the changelog?
 
-Thanks,
+Sure, I will do that.
+
+>> +static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+>> +				      struct request *rq, blk_qc_t *cookie)
+>> +{
+>> +	if (blk_mq_hctx_stopped(hctx) ||
+>> +	    blk_mq_direct_issue_request(rq, cookie) != 0)
+>> +		blk_mq_insert_request(rq, false, true, true);
+>> +}
+>
+> Any reason not to merge this function with blk_mq_direct_issue_request?
+
+That sounds like a good idea to me. I will make the proposed change.
 
 Bart.
 
