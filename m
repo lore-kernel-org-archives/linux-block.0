@@ -1,53 +1,53 @@
-Return-Path: <Adam.Manzanares@wdc.com>
-Date: Wed, 19 Oct 2016 11:09:53 -0700
-From: Adam Manzanares <adam.manzanares@wdc.com>
-To: Tejun Heo <tj@kernel.org>
-CC: Adam Manzanares <adam.manzanares@hgst.com>, <axboe@kernel.dk>,
-	<dan.j.williams@intel.com>, <hare@suse.de>, <martin.petersen@oracle.com>,
-	<mchristi@redhat.com>, <toshi.kani@hpe.com>, <ming.lei@canonical.com>,
-	<sathya.prakash@broadcom.com>, <chaitra.basappa@broadcom.com>,
-	<suganath-prabu.subramani@broadcom.com>, <linux-block@vger.kernel.org>,
-	<linux-ide@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<MPT-FusionLinux.pdl@broadcom.com>, <linux-scsi@vger.kernel.org>
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Wed, 19 Oct 2016 14:05:53 -0400
+From: Tejun Heo <tj@kernel.org>
+To: Adam Manzanares <adam.manzanares@hgst.com>
+Cc: axboe@kernel.dk, dan.j.williams@intel.com, hare@suse.de,
+	martin.petersen@oracle.com, mchristi@redhat.com, toshi.kani@hpe.com,
+	ming.lei@canonical.com, sathya.prakash@broadcom.com,
+	chaitra.basappa@broadcom.com, suganath-prabu.subramani@broadcom.com,
+	linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
+	linux-kernel@vger.kernel.org, MPT-FusionLinux.pdl@broadcom.com,
+	linux-scsi@vger.kernel.org
 Subject: Re: [PATCH v6 3/3] ata: ATA Command Priority Disabled By Default
-Message-ID: <20161019180952.GA17968@hgst.com>
+Message-ID: <20161019180553.GI18532@htj.duckdns.org>
 References: <1476728850-2309-1-git-send-email-adam.manzanares@hgst.com>
  <1476728850-2309-4-git-send-email-adam.manzanares@hgst.com>
- <20161019180553.GI18532@htj.duckdns.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-In-Reply-To: <20161019180553.GI18532@htj.duckdns.org>
-Return-Path: adam.manzanares@wdc.com
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1476728850-2309-4-git-send-email-adam.manzanares@hgst.com>
 List-ID: <linux-block@vger.kernel.org>
 
-VGhlIDEwLzE5LzIwMTYgMTQ6MDUsIFRlanVuIEhlbyB3cm90ZToKPiBPbiBNb24sIE9jdCAxNywg
-MjAxNiBhdCAxMToyNzozMEFNIC0wNzAwLCBBZGFtIE1hbnphbmFyZXMgd3JvdGU6Cj4gPiBBZGQg
-YSBzeXNmcyBlbnRyeSB0byB0dXJuIG9uIHByaW9yaXR5IGluZm9ybWF0aW9uIGJlaW5nIHBhc3Nl
-ZAo+ID4gdG8gYSBBVEEgZGV2aWNlLiBCeSBkZWZhdWx0IHRoaXMgZmVhdHVyZSBpcyB0dXJuZWQg
-b2ZmLgo+ID4gCj4gPiBUaGlzIHBhdGNoIGRlcGVuZHMgb24gYXRhOiBFbmFibGluZyBBVEEgQ29t
-bWFuZCBQcmlvcml0aWVzCj4gPiAKPiA+IFNpZ25lZC1vZmYtYnk6IEFkYW0gTWFuemFuYXJlcyA8
-YWRhbS5tYW56YW5hcmVzQGhnc3QuY29tPgo+ID4gLS0tCj4gPiAgZHJpdmVycy9hdGEvbGliYWhj
-aS5jICAgICB8ICAxICsKPiA+ICBkcml2ZXJzL2F0YS9saWJhdGEtY29yZS5jIHwgIDIgKy0KPiA+
-ICBkcml2ZXJzL2F0YS9saWJhdGEtc2NzaS5jIHwgNjggKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKysrKysKPiA+ICBpbmNsdWRlL2xpbnV4L2xpYmF0YS5oICAgIHwg
-IDcgKysrKysKPiA+ICA0IGZpbGVzIGNoYW5nZWQsIDc3IGluc2VydGlvbnMoKyksIDEgZGVsZXRp
-b24oLSkKPiA+IAo+ID4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvYXRhL2xpYmFoY2kuYyBiL2RyaXZl
-cnMvYXRhL2xpYmFoY2kuYwo+ID4gaW5kZXggMGQwMjhlYS4uMGUxNzI4NSAxMDA2NDQKPiA+IC0t
-LSBhL2RyaXZlcnMvYXRhL2xpYmFoY2kuYwo+ID4gKysrIGIvZHJpdmVycy9hdGEvbGliYWhjaS5j
-Cj4gPiBAQCAtMTQwLDYgKzE0MCw3IEBAIEVYUE9SVF9TWU1CT0xfR1BMKGFoY2lfc2hvc3RfYXR0
-cnMpOwo+ID4gIHN0cnVjdCBkZXZpY2VfYXR0cmlidXRlICphaGNpX3NkZXZfYXR0cnNbXSA9IHsK
-PiA+ICAJJmRldl9hdHRyX3N3X2FjdGl2aXR5LAo+ID4gIAkmZGV2X2F0dHJfdW5sb2FkX2hlYWRz
-LAo+ID4gKwkmZGV2X2F0dHJfbmNxX3ByaW9fb24sCj4gCj4gSSdsbCByZW5hbWUgaXQgdG8gbmNx
-X3ByaW9fZW5hYmxlIHdoaWxlIGFwcGx5aW5nIGJ1dCBvdGhlcndpc2UgbG9va3MKPiBnb29kIHRv
-IG1lLgoKU291bmRzIGdvb2QuCgpUYWtlIGNhcmUsCkFkYW0KCj4gCj4gVGhhbmtzLgo+IAo+IC0t
-IAo+IHRlanVuCldlc3Rlcm4gRGlnaXRhbCBDb3Jwb3JhdGlvbiAoYW5kIGl0cyBzdWJzaWRpYXJp
-ZXMpIEUtbWFpbCBDb25maWRlbnRpYWxpdHkgTm90aWNlICYgRGlzY2xhaW1lcjoKClRoaXMgZS1t
-YWlsIGFuZCBhbnkgZmlsZXMgdHJhbnNtaXR0ZWQgd2l0aCBpdCBtYXkgY29udGFpbiBjb25maWRl
-bnRpYWwgb3IgbGVnYWxseSBwcml2aWxlZ2VkIGluZm9ybWF0aW9uIG9mIFdEQyBhbmQvb3IgaXRz
-IGFmZmlsaWF0ZXMsIGFuZCBhcmUgaW50ZW5kZWQgc29sZWx5IGZvciB0aGUgdXNlIG9mIHRoZSBp
-bmRpdmlkdWFsIG9yIGVudGl0eSB0byB3aGljaCB0aGV5IGFyZSBhZGRyZXNzZWQuIElmIHlvdSBh
-cmUgbm90IHRoZSBpbnRlbmRlZCByZWNpcGllbnQsIGFueSBkaXNjbG9zdXJlLCBjb3B5aW5nLCBk
-aXN0cmlidXRpb24gb3IgYW55IGFjdGlvbiB0YWtlbiBvciBvbWl0dGVkIHRvIGJlIHRha2VuIGlu
-IHJlbGlhbmNlIG9uIGl0LCBpcyBwcm9oaWJpdGVkLiBJZiB5b3UgaGF2ZSByZWNlaXZlZCB0aGlz
-IGUtbWFpbCBpbiBlcnJvciwgcGxlYXNlIG5vdGlmeSB0aGUgc2VuZGVyIGltbWVkaWF0ZWx5IGFu
-ZCBkZWxldGUgdGhlIGUtbWFpbCBpbiBpdHMgZW50aXJldHkgZnJvbSB5b3VyIHN5c3RlbS4K
+On Mon, Oct 17, 2016 at 11:27:30AM -0700, Adam Manzanares wrote:
+> Add a sysfs entry to turn on priority information being passed
+> to a ATA device. By default this feature is turned off.
+> 
+> This patch depends on ata: Enabling ATA Command Priorities
+> 
+> Signed-off-by: Adam Manzanares <adam.manzanares@hgst.com>
+> ---
+>  drivers/ata/libahci.c     |  1 +
+>  drivers/ata/libata-core.c |  2 +-
+>  drivers/ata/libata-scsi.c | 68 +++++++++++++++++++++++++++++++++++++++++++++++
+>  include/linux/libata.h    |  7 +++++
+>  4 files changed, 77 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/ata/libahci.c b/drivers/ata/libahci.c
+> index 0d028ea..0e17285 100644
+> --- a/drivers/ata/libahci.c
+> +++ b/drivers/ata/libahci.c
+> @@ -140,6 +140,7 @@ EXPORT_SYMBOL_GPL(ahci_shost_attrs);
+>  struct device_attribute *ahci_sdev_attrs[] = {
+>  	&dev_attr_sw_activity,
+>  	&dev_attr_unload_heads,
+> +	&dev_attr_ncq_prio_on,
+
+I'll rename it to ncq_prio_enable while applying but otherwise looks
+good to me.
+
+Thanks.
+
+-- 
+tejun
