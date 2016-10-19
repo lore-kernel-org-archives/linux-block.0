@@ -1,62 +1,42 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f196.google.com ([209.85.192.196]:33613 "EHLO
-        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752291AbcJ2ILy (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sat, 29 Oct 2016 04:11:54 -0400
-From: Ming Lei <tom.leiming@gmail.com>
-To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Ming Lei <tom.leiming@gmail.com>,
-        Mike Christie <mchristi@redhat.com>,
-        Hannes Reinecke <hare@suse.com>,
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+Subject: Re: [PATCH v3 02/11] blk-mq: Introduce blk_mq_hctx_stopped()
+To: Christoph Hellwig <hch@lst.de>
+References: <b39eb0e7-1007-eb63-8e7f-9a7f08508379@sandisk.com>
+ <b5b0ffcc-767d-1b90-9c5a-52c57690dea8@sandisk.com>
+ <20161019131900.GB6323@lst.de>
+CC: Jens Axboe <axboe@fb.com>,
+        James Bottomley <jejb@linux.vnet.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Doug Ledford <dledford@redhat.com>,
         Keith Busch <keith.busch@intel.com>,
-        Mike Snitzer <snitzer@redhat.com>
-Subject: [PATCH 01/60] block: bio: introduce bio_init_with_vec_table()
-Date: Sat, 29 Oct 2016 16:08:00 +0800
-Message-Id: <1477728600-12938-2-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
-References: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+        Ming Lin <ming.l@ssi.samsung.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+From: Bart Van Assche <bart.vanassche@sandisk.com>
+Message-ID: <4c09e48d-4b23-915a-bf60-c58d0aae6007@sandisk.com>
+Date: Wed, 19 Oct 2016 08:58:55 -0700
+MIME-Version: 1.0
+In-Reply-To: <20161019131900.GB6323@lst.de>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Sender: linux-scsi-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Some drivers often uses external bvec table, so introduce
-this helper for this case. It is always safe to access the
-bio->bi_io_vec in this way for this case.
+On 10/19/2016 06:19 AM, Christoph Hellwig wrote:
+> On Tue, Oct 18, 2016 at 02:49:09PM -0700, Bart Van Assche wrote:
+>> Multiple functions test the BLK_MQ_S_STOPPED bit so introduce
+>> a helper function that performs this test.
+>
+> Looks sensible.  Any reason to have it in the public blk-mq.h instead
+> of the private one, though?  I see that dm is using it with this patch,
+> but that usage should go away once your full series is merged, right?
 
-After converting to this helper, it will becomes a bit easier
-to evaluate the remaining direct access to bio->bi_io_vec,
-so it can help to prepare for the following multipage bvec
-support.
+Hello Christoph,
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
----
- include/linux/bio.h | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+Moving the blk_mq_hctx_stopped() declaration from the public to the 
+private blk-mq.h header file should be possible. I will look into this.
 
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 97cb48f03dc7..8634bd24984c 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -664,6 +664,16 @@ static inline void bio_inc_remaining(struct bio *bio)
- 	atomic_inc(&bio->__bi_remaining);
- }
- 
-+static inline void bio_init_with_vec_table(struct bio *bio,
-+					   struct bio_vec *table,
-+					   unsigned max_vecs)
-+{
-+	bio_init(bio);
-+	bio->bi_io_vec = table;
-+	bio->bi_max_vecs = max_vecs;
-+}
-+
-+
- /*
-  * bio_set is used to allow other portions of the IO system to
-  * allocate their own private memory pools for bio and iovec structures.
--- 
-2.7.4
-
+Bart.
