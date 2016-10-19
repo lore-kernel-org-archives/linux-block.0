@@ -1,35 +1,32 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH v8 0/7] ZBC / Zoned block device support
-To: "Martin K. Petersen" <martin.petersen@oracle.com>
-References: <1476772835-18541-1-git-send-email-damien.lemoal@wdc.com>
- <2a80d950-c831-9ac6-1969-dc6386e58236@kernel.dk>
- <yq1twc9f9o3.fsf@sermon.lab.mkp.net>
+Return-Path: <martin.petersen@oracle.com>
+To: Jens Axboe <axboe@kernel.dk>
 Cc: Damien Le Moal <damien.lemoal@wdc.com>, linux-block@vger.kernel.org,
- linux-scsi@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
- Hannes Reinecke <hare@suse.de>, Shaun Tancheff <shaun@tancheff.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <48383eb2-e982-abf8-ce18-2b0117dd27b9@kernel.dk>
-Date: Tue, 18 Oct 2016 19:49:49 -0600
+        linux-scsi@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Hannes Reinecke <hare@suse.de>, Shaun Tancheff <shaun@tancheff.com>
+Subject: Re: [PATCH v8 0/7] ZBC / Zoned block device support
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <1476772835-18541-1-git-send-email-damien.lemoal@wdc.com>
+	<2a80d950-c831-9ac6-1969-dc6386e58236@kernel.dk>
+Date: Tue, 18 Oct 2016 20:46:04 -0400
+In-Reply-To: <2a80d950-c831-9ac6-1969-dc6386e58236@kernel.dk> (Jens Axboe's
+	message of "Tue, 18 Oct 2016 09:58:00 -0600")
+Message-ID: <yq1twc9f9o3.fsf@sermon.lab.mkp.net>
 MIME-Version: 1.0
-In-Reply-To: <yq1twc9f9o3.fsf@sermon.lab.mkp.net>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-On 10/18/2016 06:46 PM, Martin K. Petersen wrote:
->>>>>> "Jens" == Jens Axboe <axboe@kernel.dk> writes:
->
-> Jens> This is starting to look mergeable to me.
->
-> Yup.
->
-> Jens> Any objections in getting this applied for 4.10? Looks like 6/7
-> Jens> should go through the SCSI tree, but I can queue up the rest.
->
-> I'm OK with it at this point. Probably easier if either you or I take
-> the whole lot.
+>>>>> "Jens" == Jens Axboe <axboe@kernel.dk> writes:
 
-I already queued up the other bits, if it's fine with you I'll add 6/7
-as well.
+Jens> This is starting to look mergeable to me.
+
+Yup.
+
+Jens> Any objections in getting this applied for 4.10? Looks like 6/7
+Jens> should go through the SCSI tree, but I can queue up the rest.
+
+I'm OK with it at this point. Probably easier if either you or I take
+the whole lot.
 
 -- 
-Jens Axboe
+Martin K. Petersen	Oracle Linux Engineering
