@@ -1,45 +1,53 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f195.google.com ([209.85.192.195]:35773 "EHLO
-        mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S941619AbcJ2INX (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sat, 29 Oct 2016 04:13:23 -0400
-From: Ming Lei <tom.leiming@gmail.com>
-To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Ming Lei <tom.leiming@gmail.com>,
-        Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <yuchao0@huawei.com>,
-        linux-f2fs-devel@lists.sourceforge.net (open list:F2FS FILE SYSTEM)
-Subject: [PATCH 20/60] f2fs: f2fs_read_end_io: comment on direct access to bvec table
-Date: Sat, 29 Oct 2016 16:08:19 +0800
-Message-Id: <1477728600-12938-21-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
-References: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH v6 1/3] block: Add iocontext priority to request
+To: Tejun Heo <tj@kernel.org>, Adam Manzanares <adam.manzanares@hgst.com>
+References: <1476728850-2309-1-git-send-email-adam.manzanares@hgst.com>
+ <1476728850-2309-2-git-send-email-adam.manzanares@hgst.com>
+ <20161019180524.GH18532@htj.duckdns.org>
+Cc: dan.j.williams@intel.com, hare@suse.de, martin.petersen@oracle.com,
+ mchristi@redhat.com, toshi.kani@hpe.com, ming.lei@canonical.com,
+ sathya.prakash@broadcom.com, chaitra.basappa@broadcom.com,
+ suganath-prabu.subramani@broadcom.com, linux-block@vger.kernel.org,
+ linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org,
+ MPT-FusionLinux.pdl@broadcom.com, linux-scsi@vger.kernel.org,
+ Adam Manzananares <adam.manzanares@wdc.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <adbf7ea0-f230-cea9-1098-ff069770cb9e@kernel.dk>
+Date: Wed, 19 Oct 2016 12:08:13 -0600
+MIME-Version: 1.0
+In-Reply-To: <20161019180524.GH18532@htj.duckdns.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
----
- fs/f2fs/data.c | 4 ++++
- 1 file changed, 4 insertions(+)
+On 10/19/2016 12:05 PM, Tejun Heo wrote:
+> Hello,
+>
+> On Mon, Oct 17, 2016 at 11:27:28AM -0700, Adam Manzanares wrote:
+>> Patch adds an association between iocontext ioprio and the ioprio of a
+>> request. This is done to enable request based drivers the ability to
+>> act on priority information stored in the request. An example being
+>> ATA devices that support command priorities. If the ATA driver discovers
+>> that the device supports command priorities and the request has valid
+>> priority information indicating the request is high priority, then a high
+>> priority command can be sent to the device. This should improve tail
+>> latencies for high priority IO on any device that queues requests
+>> internally and can make use of the priority information stored in the
+>> request.
+>>
+>> The ioprio of the request is set in blk_rq_set_prio which takes the
+>> request and the ioc as arguments. If the ioc is valid in blk_rq_set_prio
+>> then the iopriority of the request is set as the iopriority of the ioc.
+>> In init_request_from_bio a check is made to see if the ioprio of the bio
+>> is valid and if so then the request prio comes from the bio.
+>>
+>> Signed-off-by: Adam Manzananares <adam.manzanares@wdc.com>
+>
+> Jens, if you're okay with it, I can route this through
+> libata/for-4.10, or this can be applied to block and libata tree can
+> pull from it.
 
-diff --git a/fs/f2fs/data.c b/fs/f2fs/data.c
-index 9ae194fd2fdb..24f6f6977d37 100644
---- a/fs/f2fs/data.c
-+++ b/fs/f2fs/data.c
-@@ -35,6 +35,10 @@ static void f2fs_read_end_io(struct bio *bio)
- 	int i;
- 
- #ifdef CONFIG_F2FS_FAULT_INJECTION
-+	/*
-+	 * It is still safe to retrieve the 1st page of the bio
-+	 * in this way after supporting multipage bvec.
-+	 */
- 	if (time_to_inject(F2FS_P_SB(bio->bi_io_vec->bv_page), FAULT_IO))
- 		bio->bi_error = -EIO;
- #endif
+I'm fine with that, add my Reviewed-by and funnel it through the libata
+tree.
+
 -- 
-2.7.4
-
+Jens Axboe
