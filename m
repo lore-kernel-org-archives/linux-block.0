@@ -1,37 +1,56 @@
-Return-Path: <prvs=9107f69a83=axboe@fb.com>
-From: Jens Axboe <axboe@fb.com>
-To: <axboe@kernel.dk>, <linux-kernel@vger.kernel.org>,
-        <linux-fsdevel@vger.kernel.org>, <linux-block@vger.kernel.org>
-CC: <jack@suse.cz>, <kernel@kolivas.org>, Jens Axboe <axboe@fb.com>
-Subject: [PATCH 3/8] writeback: use WRITE_BG for kupdate and background writeback
-Date: Wed, 26 Oct 2016 14:52:10 -0600
-Message-ID: <1477515135-16469-4-git-send-email-axboe@fb.com>
-In-Reply-To: <1477515135-16469-1-git-send-email-axboe@fb.com>
-References: <1477515135-16469-1-git-send-email-axboe@fb.com>
+Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
+Date: Wed, 19 Oct 2016 15:28:04 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Bart Van Assche <bart.vanassche@sandisk.com>
+Subject: Re: [PATCH v3 06/11] dm: Use BLK_MQ_S_STOPPED instead of
+ QUEUE_FLAG_STOPPED in blk-mq code
+Message-ID: <20161019132804.GF6323@lst.de>
+References: <b39eb0e7-1007-eb63-8e7f-9a7f08508379@sandisk.com>
+ <e5facfd0-82d5-10cb-712b-13d7950b78b8@sandisk.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <e5facfd0-82d5-10cb-712b-13d7950b78b8@sandisk.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
+List-Post: <mailto:linux-nvme@lists.infradead.org>
+List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
+Cc: Keith Busch <keith.busch@intel.com>, Ming Lin <ming.l@ssi.samsung.com>,
+ James Bottomley <jejb@linux.vnet.ibm.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ Mike Snitzer <snitzer@redhat.com>,
+ "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+ "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+ Jens Axboe <axboe@fb.com>, Doug Ledford <dledford@redhat.com>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+ Laurence Oberman <loberman@redhat.com>, Christoph Hellwig <hch@lst.de>
+Content-Type: text/plain; charset="us-ascii"
+Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
+Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
 List-ID: <linux-block@vger.kernel.org>
 
-If we're doing background type writes, then use the appropriate
-write command for that.
+This looks good:
 
-Signed-off-by: Jens Axboe <axboe@fb.com>
----
- include/linux/writeback.h | 2 ++
- 1 file changed, 2 insertions(+)
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 
-diff --git a/include/linux/writeback.h b/include/linux/writeback.h
-index 78b87c517b5f..f12f0b34daca 100644
---- a/include/linux/writeback.h
-+++ b/include/linux/writeback.h
-@@ -104,6 +104,8 @@ static inline int wbc_to_write_flags(struct writeback_control *wbc)
- {
- 	if (wbc->sync_mode == WB_SYNC_ALL)
- 		return WRITE_SYNC;
-+	else if (wbc->for_kupdate || wbc->for_background)
-+		return WRITE_BG;
- 
- 	return 0;
- }
--- 
-2.7.4
+On Tue, Oct 18, 2016 at 02:51:33PM -0700, Bart Van Assche wrote:
+>  static void dm_mq_start_queue(struct request_queue *q)
+>  {
+> -	unsigned long flags;
+> -
+> -	spin_lock_irqsave(q->queue_lock, flags);
+> -	queue_flag_clear(QUEUE_FLAG_STOPPED, q);
+> -	spin_unlock_irqrestore(q->queue_lock, flags);
+> -
+>  	blk_mq_start_stopped_hw_queues(q, true);
+>  	blk_mq_kick_requeue_list(q);
+
+FYI, I'm tempted to say we should always call blk_mq_kick_requeue_list
+from blk_mq_start_stopped_hw_queues, but that's a separate issue.
+
+_______________________________________________
+Linux-nvme mailing list
+Linux-nvme@lists.infradead.org
+http://lists.infradead.org/mailman/listinfo/linux-nvme
