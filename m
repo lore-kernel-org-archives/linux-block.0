@@ -1,23 +1,46 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f48.google.com ([74.125.82.48]:37018 "EHLO
-        mail-wm0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752973AbcJEVht (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Oct 2016 17:37:49 -0400
-Subject: Re: [PATCH v2 2/8] blk-mq: Remove a redundant assignment
-To: Alexander Gordeev <agordeev@redhat.com>,
-        linux-kernel@vger.kernel.org
-References: <cover.1475241231.git.agordeev@redhat.com>
- <acd70e1736928907d479e29203844505a82d1413.1475241231.git.agordeev@redhat.com>
-Cc: linux-block@vger.kernel.org
-From: Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <89b0d898-a5dc-e6f4-3c86-695c1f07df80@grimberg.me>
-Date: Thu, 6 Oct 2016 00:37:31 +0300
+Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
+Date: Wed, 19 Oct 2016 15:30:50 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Bart Van Assche <bart.vanassche@sandisk.com>
+Subject: Re: [PATCH v3 07/11] dm: Fix a race condition related to stopping
+ and starting queues
+Message-ID: <20161019133050.GG6323@lst.de>
+References: <b39eb0e7-1007-eb63-8e7f-9a7f08508379@sandisk.com>
+ <1e89a7d7-5cae-40b1-ce31-09d630e6f33d@sandisk.com>
 MIME-Version: 1.0
-In-Reply-To: <acd70e1736928907d479e29203844505a82d1413.1475241231.git.agordeev@redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <1e89a7d7-5cae-40b1-ce31-09d630e6f33d@sandisk.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
+List-Post: <mailto:linux-nvme@lists.infradead.org>
+List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
+Cc: Keith Busch <keith.busch@intel.com>, Ming Lin <ming.l@ssi.samsung.com>,
+ James Bottomley <jejb@linux.vnet.ibm.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ Mike Snitzer <snitzer@redhat.com>,
+ "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+ "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+ Jens Axboe <axboe@fb.com>, Doug Ledford <dledford@redhat.com>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+ Laurence Oberman <loberman@redhat.com>, Christoph Hellwig <hch@lst.de>
+Content-Type: text/plain; charset="us-ascii"
+Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
+Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
+List-ID: <linux-block@vger.kernel.org>
 
-Looks good,
+Looks good:
 
-Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+
+FYI, I wonder how many of the blk_mq_stop_hw_queues do not need
+the quiesce call.  In the long run it might be better to have
+blk_mq_stop_hw_queues to stop an quiesce, and have a
+__blk_mq_stop_hw_queues variant to just stop.
+
+_______________________________________________
+Linux-nvme mailing list
+Linux-nvme@lists.infradead.org
+http://lists.infradead.org/mailman/listinfo/linux-nvme
