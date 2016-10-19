@@ -1,35 +1,41 @@
-Return-Path: <bigeasy@linutronix.de>
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Subject: [PATCH] blk-mq: use GFP_KERNEL for allocations in blk_mq_map_queues()
-Date: Fri, 21 Oct 2016 16:51:25 +0200
-Message-Id: <20161021145125.31284-1-bigeasy@linutronix.de>
+Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
+Date: Wed, 19 Oct 2016 15:38:46 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Bart Van Assche <bart.vanassche@sandisk.com>
+Subject: Re: [PATCH v3 08/11] SRP transport: Move queuecommand() wait code
+ to SCSI core
+Message-ID: <20161019133846.GA6809@lst.de>
+References: <b39eb0e7-1007-eb63-8e7f-9a7f08508379@sandisk.com>
+ <09a8efcb-d0e0-d5bd-288c-686b553e6326@sandisk.com>
 MIME-Version: 1.0
+In-Reply-To: <09a8efcb-d0e0-d5bd-288c-686b553e6326@sandisk.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
+List-Post: <mailto:linux-nvme@lists.infradead.org>
+List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
+Cc: Keith Busch <keith.busch@intel.com>, Ming Lin <ming.l@ssi.samsung.com>,
+ James Bottomley <jejb@linux.vnet.ibm.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ Mike Snitzer <snitzer@redhat.com>,
+ "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+ "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+ Jens Axboe <axboe@fb.com>, Doug Ledford <dledford@redhat.com>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+ Laurence Oberman <loberman@redhat.com>, Christoph Hellwig <hch@lst.de>
+Content-Type: text/plain; charset="us-ascii"
+Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
+Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
 List-ID: <linux-block@vger.kernel.org>
 
-There is one caller of blk_mq_map_queues() which already doing a GFP_KERNEL
-allocation for ->mq_map so I don't see the need for GFP_ATOMIC later in
-blk_mq_map_queues().
+Looks fine,
 
-Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
----
- block/blk-mq-cpumap.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 
-diff --git a/block/blk-mq-cpumap.c b/block/blk-mq-cpumap.c
-index 19b1d9c5f07e..7fc37f28b433 100644
---- a/block/blk-mq-cpumap.c
-+++ b/block/blk-mq-cpumap.c
-@@ -39,7 +39,7 @@ int blk_mq_map_queues(struct blk_mq_tag_set *set)
- 	unsigned int i, nr_cpus, nr_uniq_cpus, queue, first_sibling;
- 	cpumask_var_t cpus;
-=20
--	if (!alloc_cpumask_var(&cpus, GFP_ATOMIC))
-+	if (!alloc_cpumask_var(&cpus, GFP_KERNEL))
- 		return -ENOMEM;
-=20
- 	cpumask_clear(cpus);
---=20
-2.9.3
+_______________________________________________
+Linux-nvme mailing list
+Linux-nvme@lists.infradead.org
+http://lists.infradead.org/mailman/listinfo/linux-nvme
