@@ -1,303 +1,65 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from gateway22.websitewelcome.com ([192.185.46.234]:34637 "EHLO
-        gateway22.websitewelcome.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1752735AbcJRWGu (ORCPT
+Received: from mail-vk0-f67.google.com ([209.85.213.67]:33325 "EHLO
+        mail-vk0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753827AbcJSXrs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Oct 2016 18:06:50 -0400
-Received: from cm2.websitewelcome.com (cm2.websitewelcome.com [192.185.178.13])
-        by gateway22.websitewelcome.com (Postfix) with ESMTP id 82CF1D21BD16C
-        for <linux-block@vger.kernel.org>; Tue, 18 Oct 2016 16:42:27 -0500 (CDT)
-From: Stephen Bates <sbates@raithlin.com>
-To: linux-kernel@vger.kernel.org, linux-nvdimm@lists.01.org,
-        linux-rdma@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mm@kvack.org
-Cc: dan.j.williams@intel.com, ross.zwisler@linux.intel.com,
-        willy@linux.intel.com, jgunthorpe@obsidianresearch.com,
-        haggaie@mellanox.com, hch@infradead.org, axboe@fb.com,
-        corbet@lwn.net, jim.macdonald@everspin.com, sbates@raithin.com,
-        logang@deltatee.com, Stephen Bates <sbates@raithlin.com>
-Subject: [PATCH 1/3] memremap.c : Add support for ZONE_DEVICE IO memory with struct pages.
-Date: Tue, 18 Oct 2016 15:42:15 -0600
-Message-Id: <1476826937-20665-2-git-send-email-sbates@raithlin.com>
-In-Reply-To: <1476826937-20665-1-git-send-email-sbates@raithlin.com>
-References: <1476826937-20665-1-git-send-email-sbates@raithlin.com>
+        Wed, 19 Oct 2016 19:47:48 -0400
+MIME-Version: 1.0
+In-Reply-To: <0718ec72-d525-2e75-a123-3bf9ea129319@sandisk.com>
+References: <b39eb0e7-1007-eb63-8e7f-9a7f08508379@sandisk.com>
+ <e42a952c-f245-eb39-d0a1-0336035573f9@sandisk.com> <0718ec72-d525-2e75-a123-3bf9ea129319@sandisk.com>
+From: Ming Lei <tom.leiming@gmail.com>
+Date: Thu, 20 Oct 2016 07:47:46 +0800
+Message-ID: <CACVXFVM1tRXPDkJZbrtxkgZ=Uy9iCAh3OvmHf5BC23RbJkbMKg@mail.gmail.com>
+Subject: Re: [PATCH v3 04/11] blk-mq: Introduce blk_mq_quiesce_queue()
+To: Bart Van Assche <bart.vanassche@sandisk.com>
+Cc: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@lst.de>,
+        James Bottomley <jejb@linux.vnet.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Doug Ledford <dledford@redhat.com>,
+        Keith Busch <keith.busch@intel.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Logan Gunthorpe <logang@deltatee.com>
+On Thu, Oct 20, 2016 at 5:04 AM, Bart Van Assche
+<bart.vanassche@sandisk.com> wrote:
+> On 10/18/2016 02:50 PM, Bart Van Assche wrote:
+>>
+>> blk_mq_quiesce_queue() waits until ongoing .queue_rq() invocations
+>> have finished. This function does *not* wait until all outstanding
+>> requests have finished (this means invocation of request.end_io()).
+>
+>
+> (replying to my own e-mail)
+>
+> The zero-day kernel test infrastructure reported to me that this patch
+> causes a build failure with CONFIG_SRCU=n. Should I add "select SRCU" to
+> block/Kconfig (excludes TINY_RCU) or should I rather modify this patch such
 
-We build on recent work that adds memory regions owned by a device
-driver (ZONE_DEVICE) [1] and to add struct page support for these new
-regions of memory [2].
+Select SRCU is fine, and you can see it is done in lots of
+places(btrfs, net, quota, kvm, power,...)
 
-1. Add an extra flags argument into dev_memremap_pages to take in a
-MEMREMAP_XX argument. We update the existing calls to this function to
-reflect the change.
+> that a mutex or rwsem is used instead of SRCU?
 
-2. For completeness, we add MEMREMAP_WT support to the memremap;
-however we have no actual need for this functionality.
+Both should be much worse than SRCU, even not as good as atomic_t.
 
-3. We add the static functions, add_zone_device_pages and
-remove_zone_device pages. These are similar to arch_add_memory except
-they don't create the memory mapping. We don't believe these need to be
-made arch specific, but are open to other opinions.
+Thanks,
+Ming
 
-4. dev_memremap_pages and devm_memremap_pages_release are updated to
-treat IO memory slightly differently. For IO memory we use a combination
-of the appropriate io_remap function and the zone_device pages functions
-created above. A flags variable and kaddr pointer are added to struct
-page_mem to facilitate this for the release function. We also set up
-the page attribute tables for the mapped region correctly based on the
-desired mapping.
+>
+> Thanks,
+>
+> Bart.
+>
 
-[1] https://lists.01.org/pipermail/linux-nvdimm/2015-August/001810.html
-[2] https://lists.01.org/pipermail/linux-nvdimm/2015-October/002387.html
 
-Signed-off-by: Stephen Bates <sbates@raithlin.com>
-Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
----
- drivers/dax/pmem.c                |  4 +-
- drivers/nvdimm/pmem.c             |  4 +-
- include/linux/memremap.h          |  5 ++-
- kernel/memremap.c                 | 80 +++++++++++++++++++++++++++++++++++++--
- tools/testing/nvdimm/test/iomap.c |  3 +-
- 5 files changed, 86 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/dax/pmem.c b/drivers/dax/pmem.c
-index 9630d88..58ac456 100644
---- a/drivers/dax/pmem.c
-+++ b/drivers/dax/pmem.c
-@@ -14,6 +14,7 @@
- #include <linux/memremap.h>
- #include <linux/module.h>
- #include <linux/pfn_t.h>
-+#include <linux/pmem.h>
- #include "../nvdimm/pfn.h"
- #include "../nvdimm/nd.h"
- #include "dax.h"
-@@ -108,7 +109,8 @@ static int dax_pmem_probe(struct device *dev)
- 	if (rc)
- 		return rc;
-
--	addr = devm_memremap_pages(dev, &res, &dax_pmem->ref, altmap);
-+	addr = devm_memremap_pages(dev, &res, &dax_pmem->ref, altmap,
-+							ARCH_MEMREMAP_PMEM);
- 	if (IS_ERR(addr))
- 		return PTR_ERR(addr);
-
-diff --git a/drivers/nvdimm/pmem.c b/drivers/nvdimm/pmem.c
-index 42b3a82..97032a1 100644
---- a/drivers/nvdimm/pmem.c
-+++ b/drivers/nvdimm/pmem.c
-@@ -278,7 +278,7 @@ static int pmem_attach_disk(struct device *dev,
- 	pmem->pfn_flags = PFN_DEV;
- 	if (is_nd_pfn(dev)) {
- 		addr = devm_memremap_pages(dev, &pfn_res, &q->q_usage_counter,
--				altmap);
-+				altmap, ARCH_MEMREMAP_PMEM);
- 		pfn_sb = nd_pfn->pfn_sb;
- 		pmem->data_offset = le64_to_cpu(pfn_sb->dataoff);
- 		pmem->pfn_pad = resource_size(res) - resource_size(&pfn_res);
-@@ -287,7 +287,7 @@ static int pmem_attach_disk(struct device *dev,
- 		res->start += pmem->data_offset;
- 	} else if (pmem_should_map_pages(dev)) {
- 		addr = devm_memremap_pages(dev, &nsio->res,
--				&q->q_usage_counter, NULL);
-+				&q->q_usage_counter, NULL, ARCH_MEMREMAP_PMEM);
- 		pmem->pfn_flags |= PFN_MAP;
- 	} else
- 		addr = devm_memremap(dev, pmem->phys_addr,
-diff --git a/include/linux/memremap.h b/include/linux/memremap.h
-index 9341619..fc99283 100644
---- a/include/linux/memremap.h
-+++ b/include/linux/memremap.h
-@@ -51,12 +51,13 @@ struct dev_pagemap {
-
- #ifdef CONFIG_ZONE_DEVICE
- void *devm_memremap_pages(struct device *dev, struct resource *res,
--		struct percpu_ref *ref, struct vmem_altmap *altmap);
-+		struct percpu_ref *ref, struct vmem_altmap *altmap,
-+		unsigned long flags);
- struct dev_pagemap *find_dev_pagemap(resource_size_t phys);
- #else
- static inline void *devm_memremap_pages(struct device *dev,
- 		struct resource *res, struct percpu_ref *ref,
--		struct vmem_altmap *altmap)
-+		struct vmem_altmap *altmap, unsigned long flags)
- {
- 	/*
- 	 * Fail attempts to call devm_memremap_pages() without
-diff --git a/kernel/memremap.c b/kernel/memremap.c
-index b501e39..d5f462c 100644
---- a/kernel/memremap.c
-+++ b/kernel/memremap.c
-@@ -175,13 +175,41 @@ static RADIX_TREE(pgmap_radix, GFP_KERNEL);
- #define SECTION_MASK ~((1UL << PA_SECTION_SHIFT) - 1)
- #define SECTION_SIZE (1UL << PA_SECTION_SHIFT)
-
-+enum {
-+	PAGEMAP_IO_MEM = 1 << 0,
-+};
-+
- struct page_map {
- 	struct resource res;
- 	struct percpu_ref *ref;
- 	struct dev_pagemap pgmap;
- 	struct vmem_altmap altmap;
-+	void *kaddr;
-+	int flags;
- };
-
-+static int add_zone_device_pages(int nid, u64 start, u64 size)
-+{
-+	struct pglist_data *pgdat = NODE_DATA(nid);
-+	struct zone *zone = pgdat->node_zones + ZONE_DEVICE;
-+	unsigned long start_pfn = start >> PAGE_SHIFT;
-+	unsigned long nr_pages = size >> PAGE_SHIFT;
-+
-+	return __add_pages(nid, zone, start_pfn, nr_pages);
-+}
-+
-+static void remove_zone_device_pages(u64 start, u64 size)
-+{
-+	unsigned long start_pfn = start >> PAGE_SHIFT;
-+	unsigned long nr_pages = size >> PAGE_SHIFT;
-+	struct zone *zone;
-+	int ret;
-+
-+	zone = page_zone(pfn_to_page(start_pfn));
-+	ret = __remove_pages(zone, start_pfn, nr_pages);
-+	WARN_ON_ONCE(ret);
-+}
-+
- void get_zone_device_page(struct page *page)
- {
- 	percpu_ref_get(page->pgmap->ref);
-@@ -246,9 +274,17 @@ static void devm_memremap_pages_release(struct device *dev, void *data)
- 	/* pages are dead and unused, undo the arch mapping */
- 	align_start = res->start & ~(SECTION_SIZE - 1);
- 	align_size = ALIGN(resource_size(res), SECTION_SIZE);
--	arch_remove_memory(align_start, align_size);
-+
-+	if (page_map->flags & PAGEMAP_IO_MEM) {
-+		remove_zone_device_pages(align_start, align_size);
-+		iounmap(page_map->kaddr);
-+	} else {
-+		arch_remove_memory(align_start, align_size);
-+	}
-+
- 	untrack_pfn(NULL, PHYS_PFN(align_start), align_size);
- 	pgmap_radix_release(res);
-+
- 	dev_WARN_ONCE(dev, pgmap->altmap && pgmap->altmap->alloc,
- 			"%s: failed to free all reserved pages\n", __func__);
- }
-@@ -270,6 +306,8 @@ struct dev_pagemap *find_dev_pagemap(resource_size_t phys)
-  * @res: "host memory" address range
-  * @ref: a live per-cpu reference count
-  * @altmap: optional descriptor for allocating the memmap from @res
-+ * @flags: either MEMREMAP_WB, MEMREMAP_WT and MEMREMAP_WC
-+ *         see memremap() for a description of the flags
-  *
-  * Notes:
-  * 1/ @ref must be 'live' on entry and 'dead' before devm_memunmap_pages() time
-@@ -280,7 +318,8 @@ struct dev_pagemap *find_dev_pagemap(resource_size_t phys)
-  *    this is not enforced.
-  */
- void *devm_memremap_pages(struct device *dev, struct resource *res,
--		struct percpu_ref *ref, struct vmem_altmap *altmap)
-+		struct percpu_ref *ref, struct vmem_altmap *altmap,
-+		unsigned long flags)
- {
- 	resource_size_t key, align_start, align_size, align_end;
- 	pgprot_t pgprot = PAGE_KERNEL;
-@@ -288,6 +327,8 @@ void *devm_memremap_pages(struct device *dev, struct resource *res,
- 	struct page_map *page_map;
- 	int error, nid, is_ram;
- 	unsigned long pfn;
-+	void *addr = NULL;
-+	enum page_cache_mode pcm;
-
- 	align_start = res->start & ~(SECTION_SIZE - 1);
- 	align_size = ALIGN(res->start + resource_size(res), SECTION_SIZE)
-@@ -353,15 +394,44 @@ void *devm_memremap_pages(struct device *dev, struct resource *res,
- 	if (nid < 0)
- 		nid = numa_mem_id();
-
-+	if (flags & MEMREMAP_WB)
-+		pcm = _PAGE_CACHE_MODE_WB;
-+	else if (flags & MEMREMAP_WT)
-+		pcm = _PAGE_CACHE_MODE_WT;
-+	else if (flags & MEMREMAP_WC)
-+		pcm = _PAGE_CACHE_MODE_WC;
-+	else
-+		pcm = _PAGE_CACHE_MODE_WB;
-+
-+	pgprot = __pgprot(pgprot_val(pgprot) | cachemode2protval(pcm));
-+
- 	error = track_pfn_remap(NULL, &pgprot, PHYS_PFN(align_start), 0,
- 			align_size);
- 	if (error)
- 		goto err_pfn_remap;
-
--	error = arch_add_memory(nid, align_start, align_size, true);
-+	if (flags & MEMREMAP_WB || !flags) {
-+		error = arch_add_memory(nid, align_start, align_size, true);
-+		addr = __va(res->start);
-+	} else {
-+		page_map->flags |= PAGEMAP_IO_MEM;
-+		error = add_zone_device_pages(nid, align_start, align_size);
-+	}
-+
- 	if (error)
- 		goto err_add_memory;
-
-+	if (!addr && (flags & MEMREMAP_WT))
-+		addr = ioremap_wt(res->start, resource_size(res));
-+
-+	if (!addr && (flags & MEMREMAP_WC))
-+		addr = ioremap_wc(res->start, resource_size(res));
-+
-+	if (!addr && page_map->flags & PAGEMAP_IO_MEM) {
-+		remove_zone_device_pages(res->start, resource_size(res));
-+		goto err_add_memory;
-+	}
-+
- 	for_each_device_pfn(pfn, page_map) {
- 		struct page *page = pfn_to_page(pfn);
-
-@@ -374,8 +444,10 @@ void *devm_memremap_pages(struct device *dev, struct resource *res,
- 		list_del(&page->lru);
- 		page->pgmap = pgmap;
- 	}
-+
-+	page_map->kaddr = addr;
- 	devres_add(dev, page_map);
--	return __va(res->start);
-+	return addr;
-
-  err_add_memory:
- 	untrack_pfn(NULL, PHYS_PFN(align_start), align_size);
-diff --git a/tools/testing/nvdimm/test/iomap.c b/tools/testing/nvdimm/test/iomap.c
-index 3ccef73..b82fecb 100644
---- a/tools/testing/nvdimm/test/iomap.c
-+++ b/tools/testing/nvdimm/test/iomap.c
-@@ -17,6 +17,7 @@
- #include <linux/module.h>
- #include <linux/types.h>
- #include <linux/pfn_t.h>
-+#include <linux/pmem.h>
- #include <linux/acpi.h>
- #include <linux/io.h>
- #include <linux/mm.h>
-@@ -109,7 +110,7 @@ void *__wrap_devm_memremap_pages(struct device *dev, struct resource *res,
-
- 	if (nfit_res)
- 		return nfit_res->buf + offset - nfit_res->res.start;
--	return devm_memremap_pages(dev, res, ref, altmap);
-+	return devm_memremap_pages(dev, res, ref, altmap, ARCH_MEMREMAP_PMEM);
- }
- EXPORT_SYMBOL(__wrap_devm_memremap_pages);
-
---
-2.1.4
+-- 
+Ming Lei
