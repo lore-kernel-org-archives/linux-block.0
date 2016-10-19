@@ -1,55 +1,52 @@
 Return-Path: <jmoyer@redhat.com>
 From: Jeff Moyer <jmoyer@redhat.com>
-To: Shaun Tancheff <shaun.tancheff@seagate.com>
+To: "Martin K. Petersen" <martin.petersen@oracle.com>
 Cc: Damien Le Moal <damien.lemoal@wdc.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Hannes Reinecke <hare@suse.de>, Shaun Tancheff <shaun@tancheff.com>,
+        <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
+        Shaun Tancheff <shaun@tancheff.com>,
         Damien Le Moal <damien.lemoal@hgst.com>
 Subject: Re: [PATCH v8 6/7] sd: Implement support for ZBC devices
 References: <1476772835-18541-1-git-send-email-damien.lemoal@wdc.com>
 	<1476772835-18541-7-git-send-email-damien.lemoal@wdc.com>
 	<x498ttlvbks.fsf@segfault.boston.devel.redhat.com>
-	<CAJVOszBUe2BoCWoKLXXi9DUgk7Mg08uX6a-+LcEdho63nQzOWQ@mail.gmail.com>
-Date: Wed, 19 Oct 2016 09:23:04 -0400
-In-Reply-To: <CAJVOszBUe2BoCWoKLXXi9DUgk7Mg08uX6a-+LcEdho63nQzOWQ@mail.gmail.com>
-	(Shaun Tancheff's message of "Tue, 18 Oct 2016 13:22:11 -0500")
-Message-ID: <x4937jsscav.fsf@segfault.boston.devel.redhat.com>
+	<yq1y41lf9qk.fsf@sermon.lab.mkp.net>
+Date: Wed, 19 Oct 2016 09:21:59 -0400
+In-Reply-To: <yq1y41lf9qk.fsf@sermon.lab.mkp.net> (Martin K. Petersen's
+	message of "Tue, 18 Oct 2016 20:44:35 -0400")
+Message-ID: <x497f94scco.fsf@segfault.boston.devel.redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-Shaun Tancheff <shaun.tancheff@seagate.com> writes:
+"Martin K. Petersen" <martin.petersen@oracle.com> writes:
 
-> On Tue, Oct 18, 2016 at 11:58 AM, Jeff Moyer <jmoyer@redhat.com> wrote:
->> Damien Le Moal <damien.lemoal@wdc.com> writes:
->>
->>> +     if (!is_power_of_2(zone_blocks)) {
->>> +             if (sdkp->first_scan)
->>> +                     sd_printk(KERN_NOTICE, sdkp,
->>> +                               "Devices with non power of 2 zone "
->>> +                               "size are not supported\n");
->>> +             return -ENODEV;
->>> +     }
->>
->> Are power of 2 zone sizes required by the standard?  I see why you've
->> done this, but I wonder if we're artificially limiting the
->> implementation, and whether there will be valid devices on the market
->> that simply won't work with Linux because of this.
+>>>>>> "Jeff" == Jeff Moyer <jmoyer@redhat.com> writes:
 >
-> The standard does not require power of 2 zones.
-> That said, I am not aware of any current (or planned) devices other
-> than a power of 2.
-> Common zone sizes I am aware of: 256MiB, 128MiB and 1GiB.
+> Jeff,
 >
-> Also note that we are excluding the runt zone from the power of 2 expectation.
+> Jeff> Are power of 2 zone sizes required by the standard?  I see why
+> Jeff> you've done this, but I wonder if we're artificially limiting the
+> Jeff> implementation, and whether there will be valid devices on the
+> Jeff> market that simply won't work with Linux because of this.
 >
-> So conforming devices should (excluding a runt zone):
->   - Have zones of the same size.
->   - Choose a zone size that is a power of 2.
+> Standards are deliberately written to be permissive. But Linux doesn't
+> support arbitrary sector sizes either even though the spec allows it. We
+> always pick a reasonably sane subset of features to implement and this
+> case is no different.
+>
+> After some discussion we decided to rip out all the complexity that was
+> required to facilitate crazy drive layouts. As a result, the code is now
+> in a state where we can actually merge it. The hope is that by picking a
+> specific configuration subset and widely advertising it we can influence
+> the market.
+>
+> Also, I am not aware of anybody actually asking the drive vendors to
+> support crazy zone configurations.
 
-OK, thanks for following up.  As long as the drive vendors are on board,
-I guess we're okay.  :)
+That's fine with me.  I didn't see any mention of this design decision
+in the patch logs, though, and given that I'm not intimately involved, I
+asked the question.
 
--Jeff
+Thanks,
+Jeff
