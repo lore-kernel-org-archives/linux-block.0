@@ -1,494 +1,221 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f43.google.com ([74.125.82.43]:37034 "EHLO
-        mail-wm0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S942876AbcJ0OuP (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Oct 2016 10:50:15 -0400
-Received: by mail-wm0-f43.google.com with SMTP id 140so28758175wmv.0
-        for <linux-block@vger.kernel.org>; Thu, 27 Oct 2016 07:50:14 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH 3/7] lightnvm: manage block list on LUN owner
-Date: Thu, 27 Oct 2016 16:49:39 +0200
-Message-Id: <1477579783-5289-3-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1477579783-5289-1-git-send-email-javier@cnexlabs.com>
-References: <1477579783-5289-1-git-send-email-javier@cnexlabs.com>
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Wed, 19 Oct 2016 14:37:14 -0400
+From: Tejun Heo <tj@kernel.org>
+To: Adam Manzanares <adam.manzanares@hgst.com>
+Cc: axboe@kernel.dk, dan.j.williams@intel.com, hare@suse.de,
+	martin.petersen@oracle.com, mchristi@redhat.com, toshi.kani@hpe.com,
+	ming.lei@canonical.com, sathya.prakash@broadcom.com,
+	chaitra.basappa@broadcom.com, suganath-prabu.subramani@broadcom.com,
+	linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
+	linux-kernel@vger.kernel.org, MPT-FusionLinux.pdl@broadcom.com,
+	linux-scsi@vger.kernel.org
+Subject: Re: [PATCH v6 2/3] ata: Enabling ATA Command Priorities
+Message-ID: <20161019183714.GJ18532@htj.duckdns.org>
+References: <1476728850-2309-1-git-send-email-adam.manzanares@hgst.com>
+ <1476728850-2309-3-git-send-email-adam.manzanares@hgst.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1476728850-2309-3-git-send-email-adam.manzanares@hgst.com>
+List-ID: <linux-block@vger.kernel.org>
 
-LUNs can be exclusively owned by a target through the media manager's
-reserve_lun function. In this case, the target should implement its own
-provisioning and manage internally the free/used/bad block list.
+Hello,
 
-This patch introduces a LUN management structure that can be passed on
-to LUN exclusive owners. The media manager is the default owner. On boot
-up, it populates the lists with based on the device's bad block table
-and sysblk metadata. Then, if the LUN is owned by a target, the
-management structured is passed on to it. From this moment, the target
-is responsible for list management. Thus, since LUNs are managed
-strictly by the target, there is no need for the media manager to
-reserve GC blocks.
+I removed ata_ncq_prio_enabled() as it was colliding with the sysfs
+file rename and these trivial test functions tend to obscure more than
+help anything.
 
-As a FTL, rrpc owns exclusively its LUNs. Therefore, adapt rrpc to use
-the new management interface.
+Thanks.
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
+------ 8< ------
+>From 8e061784b51ec4a4efed0deaafb5bd9725bf5b06 Mon Sep 17 00:00:00 2001
+From: Adam Manzanares <adam.manzanares@hgst.com>
+Date: Mon, 17 Oct 2016 11:27:29 -0700
+Subject: [PATCH 1/2] ata: Enabling ATA Command Priorities
+
+This patch checks to see if an ATA device supports NCQ command priorities.
+If so and the user has specified an iocontext that indicates
+IO_PRIO_CLASS_RT then we build a tf with a high priority command.
+
+This is done to improve the tail latency of commands that are high
+priority by passing priority to the device.
+
+tj: Removed trivial ata_ncq_prio_enabled() and open-coded the test.
+
+Signed-off-by: Adam Manzanares <adam.manzanares@hgst.com>
+Signed-off-by: Tejun Heo <tj@kernel.org>
 ---
- drivers/lightnvm/core.c   |  5 ++--
- drivers/lightnvm/gennvm.c | 76 +++++++++++++++++++++++++++++++----------------
- drivers/lightnvm/gennvm.h | 19 ++++++------
- drivers/lightnvm/rrpc.c   | 74 ++++++++++++++++++++++++++++++++++++++-------
- drivers/lightnvm/rrpc.h   |  4 +++
- include/linux/lightnvm.h  | 21 +++++++++----
- 6 files changed, 145 insertions(+), 54 deletions(-)
+ drivers/ata/libata-core.c | 35 ++++++++++++++++++++++++++++++++++-
+ drivers/ata/libata-scsi.c |  6 +++++-
+ drivers/ata/libata.h      |  2 +-
+ include/linux/ata.h       |  6 ++++++
+ include/linux/libata.h    |  3 +++
+ 5 files changed, 49 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-index f752087..4be3879 100644
---- a/drivers/lightnvm/core.c
-+++ b/drivers/lightnvm/core.c
-@@ -178,10 +178,9 @@ static struct nvm_dev *nvm_find_nvm_dev(const char *name)
- 	return NULL;
- }
- 
--struct nvm_block *nvm_get_blk(struct nvm_dev *dev, struct nvm_lun *lun,
--							unsigned long flags)
-+struct nvm_block *nvm_get_blk(struct nvm_dev *dev, struct nvm_lun *lun)
+diff --git a/drivers/ata/libata-core.c b/drivers/ata/libata-core.c
+index 223a770..8346faf 100644
+--- a/drivers/ata/libata-core.c
++++ b/drivers/ata/libata-core.c
+@@ -739,6 +739,7 @@ u64 ata_tf_read_block(const struct ata_taskfile *tf, struct ata_device *dev)
+  *	@n_block: Number of blocks
+  *	@tf_flags: RW/FUA etc...
+  *	@tag: tag
++ *	@class: IO priority class
+  *
+  *	LOCKING:
+  *	None.
+@@ -753,7 +754,7 @@ u64 ata_tf_read_block(const struct ata_taskfile *tf, struct ata_device *dev)
+  */
+ int ata_build_rw_tf(struct ata_taskfile *tf, struct ata_device *dev,
+ 		    u64 block, u32 n_block, unsigned int tf_flags,
+-		    unsigned int tag)
++		    unsigned int tag, int class)
  {
--	return dev->mt->get_blk(dev, lun, flags);
-+	return dev->mt->get_blk(dev, lun);
- }
- EXPORT_SYMBOL(nvm_get_blk);
- 
-diff --git a/drivers/lightnvm/gennvm.c b/drivers/lightnvm/gennvm.c
-index a7e17fa..8bff725 100644
---- a/drivers/lightnvm/gennvm.c
-+++ b/drivers/lightnvm/gennvm.c
-@@ -243,6 +243,7 @@ static void gen_luns_free(struct nvm_dev *dev)
- static int gen_luns_init(struct nvm_dev *dev, struct gen_dev *gn)
- {
- 	struct gen_lun *lun;
-+	struct nvm_lun_mgmt *mgmt;
- 	int i;
- 
- 	gn->luns = kcalloc(dev->nr_luns, sizeof(struct gen_lun), GFP_KERNEL);
-@@ -250,18 +251,31 @@ static int gen_luns_init(struct nvm_dev *dev, struct gen_dev *gn)
- 		return -ENOMEM;
- 
- 	gen_for_each_lun(gn, lun, i) {
-+		mgmt = kmalloc(sizeof(struct nvm_lun_mgmt), GFP_KERNEL);
-+		if (!mgmt)
-+			goto free;
+ 	tf->flags |= ATA_TFLAG_ISADDR | ATA_TFLAG_DEVICE;
+ 	tf->flags |= tf_flags;
+@@ -785,6 +786,12 @@ int ata_build_rw_tf(struct ata_taskfile *tf, struct ata_device *dev,
+ 		tf->device = ATA_LBA;
+ 		if (tf->flags & ATA_TFLAG_FUA)
+ 			tf->device |= 1 << 7;
 +
-+		lun->mgmt = mgmt;
-+		lun->tgt = NULL;
-+
- 		spin_lock_init(&lun->vlun.lock);
--		INIT_LIST_HEAD(&lun->free_list);
--		INIT_LIST_HEAD(&lun->used_list);
--		INIT_LIST_HEAD(&lun->bb_list);
-+		INIT_LIST_HEAD(&lun->mgmt->free_list);
-+		INIT_LIST_HEAD(&lun->mgmt->used_list);
-+		INIT_LIST_HEAD(&lun->mgmt->bb_list);
-+		lun->mgmt->nr_free_blocks = dev->blks_per_lun;
++		if (dev->flags & ATA_DFLAG_NCQ_PRIO) {
++			if (class == IOPRIO_CLASS_RT)
++				tf->hob_nsect |= ATA_PRIO_HIGH <<
++						 ATA_SHIFT_PRIO;
++		}
+ 	} else if (dev->flags & ATA_DFLAG_LBA) {
+ 		tf->flags |= ATA_TFLAG_LBA;
  
--		lun->reserved_blocks = 2; /* for GC only */
- 		lun->vlun.id = i;
- 		lun->vlun.lun_id = i % dev->luns_per_chnl;
- 		lun->vlun.chnl_id = i / dev->luns_per_chnl;
--		lun->vlun.nr_free_blocks = dev->blks_per_lun;
-+		lun->vlun.priv = NULL;
+@@ -2156,6 +2163,30 @@ static void ata_dev_config_ncq_non_data(struct ata_device *dev)
  	}
- 	return 0;
-+
-+free:
-+	gen_for_each_lun(gn, lun, i)
-+		kfree(lun->mgmt);
-+
-+	return -ENOMEM;
  }
  
- static int gen_block_bb(struct gen_dev *gn, struct ppa_addr ppa,
-@@ -279,12 +293,13 @@ static int gen_block_bb(struct gen_dev *gn, struct ppa_addr ppa,
- 	lun = &gn->luns[(dev->luns_per_chnl * ppa.g.ch) + ppa.g.lun];
- 
- 	for (i = 0; i < nr_blks; i++) {
--		if (blks[i] == 0)
-+		if (blks[i] == NVM_BLK_T_FREE && i > 0)
- 			continue;
- 
- 		blk = &lun->vlun.blocks[i];
--		list_move_tail(&blk->list, &lun->bb_list);
--		lun->vlun.nr_free_blocks--;
-+		list_move_tail(&blk->list, &lun->mgmt->bb_list);
-+		blk->state = NVM_BLK_ST_BAD;
-+		lun->mgmt->nr_free_blocks--;
- 	}
- 
- 	return 0;
-@@ -333,9 +348,9 @@ static int gen_block_map(u64 slba, u32 nlb, __le64 *entries, void *private)
- 			 * block. It's up to the FTL on top to re-etablish the
- 			 * block state. The block is assumed to be open.
- 			 */
--			list_move_tail(&blk->list, &lun->used_list);
-+			list_move_tail(&blk->list, &lun->mgmt->used_list);
- 			blk->state = NVM_BLK_ST_TGT;
--			lun->vlun.nr_free_blocks--;
-+			lun->mgmt->nr_free_blocks--;
- 		}
- 	}
- 
-@@ -371,7 +386,7 @@ static int gen_blocks_init(struct nvm_dev *dev, struct gen_dev *gn)
- 			block->lun = &lun->vlun;
- 			block->id = cur_block_id++;
- 
--			list_add_tail(&block->list, &lun->free_list);
-+			list_add_tail(&block->list, &lun->mgmt->free_list);
- 		}
- 
- 		if (dev->ops->get_bb_tbl) {
-@@ -467,30 +482,30 @@ static void gen_unregister(struct nvm_dev *dev)
- 	module_put(THIS_MODULE);
- }
- 
--static struct nvm_block *gen_get_blk(struct nvm_dev *dev,
--				struct nvm_lun *vlun, unsigned long flags)
-+static struct nvm_block *gen_get_blk(struct nvm_dev *dev, struct nvm_lun *vlun)
- {
- 	struct gen_lun *lun = container_of(vlun, struct gen_lun, vlun);
- 	struct nvm_block *blk = NULL;
--	int is_gc = flags & NVM_IOTYPE_GC;
- 
- 	spin_lock(&vlun->lock);
--	if (list_empty(&lun->free_list)) {
--		pr_err_ratelimited("gen: lun %u have no free pages available",
--								lun->vlun.id);
-+	if (test_bit(vlun->id, dev->lun_map)) {
-+		pr_err("gen: bad get block - lun:%d not managed by mm\n",
-+				vlun->id);
- 		goto out;
- 	}
- 
--	if (!is_gc && lun->vlun.nr_free_blocks < lun->reserved_blocks)
-+	if (list_empty(&lun->mgmt->free_list))
- 		goto out;
- 
--	blk = list_first_entry(&lun->free_list, struct nvm_block, list);
-+	blk = list_first_entry(&lun->mgmt->free_list, struct nvm_block, list);
- 
--	list_move_tail(&blk->list, &lun->used_list);
-+	list_move_tail(&blk->list, &lun->mgmt->used_list);
- 	blk->state = NVM_BLK_ST_TGT;
--	lun->vlun.nr_free_blocks--;
-+	lun->mgmt->nr_free_blocks--;
++static void ata_dev_config_ncq_prio(struct ata_device *dev)
++{
++	struct ata_port *ap = dev->link->ap;
++	unsigned int err_mask;
 +
- out:
- 	spin_unlock(&vlun->lock);
-+
- 	return blk;
- }
- 
-@@ -500,19 +515,28 @@ static void gen_put_blk(struct nvm_dev *dev, struct nvm_block *blk)
- 	struct gen_lun *lun = container_of(vlun, struct gen_lun, vlun);
- 
- 	spin_lock(&vlun->lock);
-+
-+	if (test_bit(vlun->id, dev->lun_map)) {
-+		pr_err("gen: bad put block - lun:%d not managed by mm\n",
-+				vlun->id);
-+		goto out;
++	err_mask = ata_read_log_page(dev,
++				     ATA_LOG_SATA_ID_DEV_DATA,
++				     ATA_LOG_SATA_SETTINGS,
++				     ap->sector_buf,
++				     1);
++	if (err_mask) {
++		ata_dev_dbg(dev,
++			    "failed to get Identify Device data, Emask 0x%x\n",
++			    err_mask);
++		return;
 +	}
 +
- 	if (blk->state & NVM_BLK_ST_TGT) {
--		list_move_tail(&blk->list, &lun->free_list);
--		lun->vlun.nr_free_blocks++;
-+		list_move_tail(&blk->list, &lun->mgmt->free_list);
-+		lun->mgmt->nr_free_blocks++;
- 		blk->state = NVM_BLK_ST_FREE;
- 	} else if (blk->state & NVM_BLK_ST_BAD) {
--		list_move_tail(&blk->list, &lun->bb_list);
-+		list_move_tail(&blk->list, &lun->mgmt->bb_list);
- 		blk->state = NVM_BLK_ST_BAD;
- 	} else {
- 		WARN_ON_ONCE(1);
- 		pr_err("gen: erroneous block type (%lu -> %u)\n",
- 							blk->id, blk->state);
--		list_move_tail(&blk->list, &lun->bb_list);
-+		list_move_tail(&blk->list, &lun->mgmt->bb_list);
- 	}
++	if (ap->sector_buf[ATA_LOG_NCQ_PRIO_OFFSET] & BIT(3))
++		dev->flags |= ATA_DFLAG_NCQ_PRIO;
++	else
++		ata_dev_dbg(dev, "SATA page does not support priority\n");
 +
-+out:
- 	spin_unlock(&vlun->lock);
- }
- 
-@@ -625,7 +649,7 @@ static void gen_lun_info_print(struct nvm_dev *dev)
- 		spin_lock(&lun->vlun.lock);
- 
- 		pr_info("%s: lun%8u\t%u\n", dev->name, i,
--						lun->vlun.nr_free_blocks);
-+						lun->mgmt->nr_free_blocks);
- 
- 		spin_unlock(&lun->vlun.lock);
- 	}
-diff --git a/drivers/lightnvm/gennvm.h b/drivers/lightnvm/gennvm.h
-index 8ecfa81..f19d25a 100644
---- a/drivers/lightnvm/gennvm.h
-+++ b/drivers/lightnvm/gennvm.h
-@@ -23,15 +23,16 @@
- struct gen_lun {
- 	struct nvm_lun vlun;
- 
--	int reserved_blocks;
--	/* lun block lists */
--	struct list_head used_list;	/* In-use blocks */
--	struct list_head free_list;	/* Not used blocks i.e. released
--					 * and ready for use
--					 */
--	struct list_head bb_list;	/* Bad blocks. Mutually exclusive with
--					 * free_list and used_list
--					 */
-+	/* A LUN can either be managed by the media manager if it is shared
-+	 * among several used through the generic get/put block interface or
-+	 * exclusively owned by a target. In this case, the target manages
-+	 * the LUN. gen_lun always maintains a reference to the LUN management.
-+	 *
-+	 * Exclusive access is managed by the dev->lun_map bitmask. 0:
-+	 * non-exclusive, 1: exclusive.
-+	 */
-+	struct nvm_lun_mgmt *mgmt;
-+	struct nvm_target *tgt;
- };
- 
- struct gen_dev {
-diff --git a/drivers/lightnvm/rrpc.c b/drivers/lightnvm/rrpc.c
-index 067e890..f293d00 100644
---- a/drivers/lightnvm/rrpc.c
-+++ b/drivers/lightnvm/rrpc.c
-@@ -188,17 +188,45 @@ static void rrpc_set_lun_cur(struct rrpc_lun *rlun, struct rrpc_block *new_rblk,
- 	*cur_rblk = new_rblk;
- }
- 
-+static struct nvm_block *__rrpc_get_blk(struct rrpc *rrpc,
-+							struct rrpc_lun *rlun)
-+{
-+	struct nvm_block *blk = NULL;
-+
-+	if (list_empty(&rlun->mgmt->free_list))
-+		goto out;
-+
-+	blk = list_first_entry(&rlun->mgmt->free_list, struct nvm_block, list);
-+
-+	list_move_tail(&blk->list, &rlun->mgmt->used_list);
-+	blk->state = NVM_BLK_ST_TGT;
-+	rlun->mgmt->nr_free_blocks--;
-+
-+out:
-+	return blk;
 +}
 +
- static struct rrpc_block *rrpc_get_blk(struct rrpc *rrpc, struct rrpc_lun *rlun,
- 							unsigned long flags)
+ static int ata_dev_config_ncq(struct ata_device *dev,
+ 			       char *desc, size_t desc_sz)
  {
- 	struct nvm_block *blk;
- 	struct rrpc_block *rblk;
-+	int is_gc = flags & NVM_IOTYPE_GC;
- 
--	blk = nvm_get_blk(rrpc->dev, rlun->parent, flags);
-+	spin_lock(&rlun->lock);
-+	if (!is_gc && rlun->mgmt->nr_free_blocks < rlun->reserved_blocks) {
-+		pr_err("nvm: rrpc: cannot give block to non GC request\n");
-+		spin_unlock(&rlun->lock);
-+		return NULL;
-+	}
-+
-+	blk = __rrpc_get_blk(rrpc, rlun);
- 	if (!blk) {
--		pr_err("nvm: rrpc: cannot get new block from media manager\n");
-+		pr_err("nvm: rrpc: cannot get new block\n");
-+		spin_unlock(&rlun->lock);
- 		return NULL;
+@@ -2205,6 +2236,8 @@ static int ata_dev_config_ncq(struct ata_device *dev,
+ 			ata_dev_config_ncq_send_recv(dev);
+ 		if (ata_id_has_ncq_non_data(dev->id))
+ 			ata_dev_config_ncq_non_data(dev);
++		if (ata_id_has_ncq_prio(dev->id))
++			ata_dev_config_ncq_prio(dev);
  	}
-+	spin_unlock(&rlun->lock);
  
- 	rblk = rrpc_get_rblk(rlun, blk->id);
- 	blk->priv = rblk;
-@@ -212,7 +240,24 @@ static struct rrpc_block *rrpc_get_blk(struct rrpc *rrpc, struct rrpc_lun *rlun,
+ 	return 0;
+diff --git a/drivers/ata/libata-scsi.c b/drivers/ata/libata-scsi.c
+index 9cceb4a..2bccc3c 100644
+--- a/drivers/ata/libata-scsi.c
++++ b/drivers/ata/libata-scsi.c
+@@ -50,6 +50,7 @@
+ #include <linux/uaccess.h>
+ #include <linux/suspend.h>
+ #include <asm/unaligned.h>
++#include <linux/ioprio.h>
  
- static void rrpc_put_blk(struct rrpc *rrpc, struct rrpc_block *rblk)
+ #include "libata.h"
+ #include "libata-transport.h"
+@@ -1755,6 +1756,8 @@ static unsigned int ata_scsi_rw_xlat(struct ata_queued_cmd *qc)
  {
--	nvm_put_blk(rrpc->dev, rblk->parent);
-+	struct nvm_block *blk = rblk->parent;
-+	struct rrpc_lun *rlun = rblk->rlun;
+ 	struct scsi_cmnd *scmd = qc->scsicmd;
+ 	const u8 *cdb = scmd->cmnd;
++	struct request *rq = scmd->request;
++	int class = IOPRIO_PRIO_CLASS(req_get_ioprio(rq));
+ 	unsigned int tf_flags = 0;
+ 	u64 block;
+ 	u32 n_block;
+@@ -1821,7 +1824,8 @@ static unsigned int ata_scsi_rw_xlat(struct ata_queued_cmd *qc)
+ 	qc->nbytes = n_block * scmd->device->sector_size;
+ 
+ 	rc = ata_build_rw_tf(&qc->tf, qc->dev, block, n_block, tf_flags,
+-			     qc->tag);
++			     qc->tag, class);
 +
-+	spin_lock(&rlun->lock);
-+	if (blk->state & NVM_BLK_ST_TGT) {
-+		list_move_tail(&blk->list, &rlun->mgmt->free_list);
-+		rlun->mgmt->nr_free_blocks++;
-+		blk->state = NVM_BLK_ST_FREE;
-+	} else if (blk->state & NVM_BLK_ST_BAD) {
-+		list_move_tail(&blk->list, &rlun->mgmt->bb_list);
-+		blk->state = NVM_BLK_ST_BAD;
-+	} else {
-+		WARN_ON_ONCE(1);
-+		pr_err("rrpc: erroneous block type (%lu -> %u)\n",
-+							blk->id, blk->state);
-+		list_move_tail(&blk->list, &rlun->mgmt->bb_list);
-+	}
-+	spin_unlock(&rlun->lock);
+ 	if (likely(rc == 0))
+ 		return 0;
+ 
+diff --git a/drivers/ata/libata.h b/drivers/ata/libata.h
+index 3b301a4..8f3a559 100644
+--- a/drivers/ata/libata.h
++++ b/drivers/ata/libata.h
+@@ -66,7 +66,7 @@ extern u64 ata_tf_to_lba48(const struct ata_taskfile *tf);
+ extern struct ata_queued_cmd *ata_qc_new_init(struct ata_device *dev, int tag);
+ extern int ata_build_rw_tf(struct ata_taskfile *tf, struct ata_device *dev,
+ 			   u64 block, u32 n_block, unsigned int tf_flags,
+-			   unsigned int tag);
++			   unsigned int tag, int class);
+ extern u64 ata_tf_read_block(const struct ata_taskfile *tf,
+ 			     struct ata_device *dev);
+ extern unsigned ata_exec_internal(struct ata_device *dev,
+diff --git a/include/linux/ata.h b/include/linux/ata.h
+index fdb1803..af6859b 100644
+--- a/include/linux/ata.h
++++ b/include/linux/ata.h
+@@ -348,6 +348,7 @@ enum {
+ 	ATA_LOG_DEVSLP_DETO	  = 0x01,
+ 	ATA_LOG_DEVSLP_VALID	  = 0x07,
+ 	ATA_LOG_DEVSLP_VALID_MASK = 0x80,
++	ATA_LOG_NCQ_PRIO_OFFSET   = 0x09,
+ 
+ 	/* NCQ send and receive log */
+ 	ATA_LOG_NCQ_SEND_RECV_SUBCMDS_OFFSET	= 0x00,
+@@ -940,6 +941,11 @@ static inline bool ata_id_has_ncq_non_data(const u16 *id)
+ 	return id[ATA_ID_SATA_CAPABILITY_2] & BIT(5);
  }
  
- static void rrpc_put_blks(struct rrpc *rrpc)
-@@ -450,7 +495,6 @@ static void rrpc_lun_gc(struct work_struct *work)
++static inline bool ata_id_has_ncq_prio(const u16 *id)
++{
++	return id[ATA_ID_SATA_CAPABILITY] & BIT(12);
++}
++
+ static inline bool ata_id_has_trim(const u16 *id)
  {
- 	struct rrpc_lun *rlun = container_of(work, struct rrpc_lun, ws_gc);
- 	struct rrpc *rrpc = rlun->rrpc;
--	struct nvm_lun *lun = rlun->parent;
- 	struct rrpc_block_gc *gcb;
- 	unsigned int nr_blocks_need;
+ 	if (ata_id_major_version(id) >= 7 &&
+diff --git a/include/linux/libata.h b/include/linux/libata.h
+index 616eef4..90b69a6 100644
+--- a/include/linux/libata.h
++++ b/include/linux/libata.h
+@@ -166,6 +166,7 @@ enum {
+ 	ATA_DFLAG_NO_UNLOAD	= (1 << 17), /* device doesn't support unload */
+ 	ATA_DFLAG_UNLOCK_HPA	= (1 << 18), /* unlock HPA */
+ 	ATA_DFLAG_NCQ_SEND_RECV = (1 << 19), /* device supports NCQ SEND and RECV */
++	ATA_DFLAG_NCQ_PRIO	= (1 << 20), /* device supports NCQ priority */
+ 	ATA_DFLAG_INIT_MASK	= (1 << 24) - 1,
  
-@@ -460,7 +504,7 @@ static void rrpc_lun_gc(struct work_struct *work)
- 		nr_blocks_need = rrpc->nr_luns;
+ 	ATA_DFLAG_DETACH	= (1 << 24),
+@@ -342,7 +343,9 @@ enum {
+ 	ATA_SHIFT_PIO		= 0,
+ 	ATA_SHIFT_MWDMA		= ATA_SHIFT_PIO + ATA_NR_PIO_MODES,
+ 	ATA_SHIFT_UDMA		= ATA_SHIFT_MWDMA + ATA_NR_MWDMA_MODES,
++	ATA_SHIFT_PRIO		= 6,
  
- 	spin_lock(&rlun->lock);
--	while (nr_blocks_need > lun->nr_free_blocks &&
-+	while (nr_blocks_need > rlun->mgmt->nr_free_blocks &&
- 					!list_empty(&rlun->prio_list)) {
- 		struct rrpc_block *rblock = block_prio_find_max(rlun);
- 		struct nvm_block *block = rblock->parent;
-@@ -529,8 +573,7 @@ static struct rrpc_lun *rrpc_get_lun_rr(struct rrpc *rrpc, int is_gc)
- 	 * estimate.
- 	 */
- 	rrpc_for_each_lun(rrpc, rlun, i) {
--		if (rlun->parent->nr_free_blocks >
--					max_free->parent->nr_free_blocks)
-+		if (rlun->mgmt->nr_free_blocks > max_free->mgmt->nr_free_blocks)
- 			max_free = rlun;
- 	}
++	ATA_PRIO_HIGH		= 2,
+ 	/* size of buffer to pad xfers ending on unaligned boundaries */
+ 	ATA_DMA_PAD_SZ		= 4,
  
-@@ -587,14 +630,12 @@ static struct rrpc_addr *rrpc_map_page(struct rrpc *rrpc, sector_t laddr,
- {
- 	struct rrpc_lun *rlun;
- 	struct rrpc_block *rblk, **cur_rblk;
--	struct nvm_lun *lun;
- 	u64 paddr;
- 	int gc_force = 0;
- 
- 	rlun = rrpc_get_lun_rr(rrpc, is_gc);
--	lun = rlun->parent;
- 
--	if (!is_gc && lun->nr_free_blocks < rrpc->nr_luns * 4)
-+	if (!is_gc && rlun->mgmt->nr_free_blocks < rrpc->nr_luns * 4)
- 		return NULL;
- 
- 	/*
-@@ -1175,11 +1216,20 @@ static int rrpc_luns_init(struct rrpc *rrpc, int lun_begin, int lun_end)
- 		}
- 
- 		lun = dev->mt->get_lun(dev, lunid);
--		if (!lun)
-+		if (!lun) {
-+			pr_err("rrpc: cannot get lun %d\n", lun->id);
- 			goto err;
-+		}
-+
-+		if (!lun->priv) {
-+			pr_err("rrpc: lun %d not allocated exclusively\n",
-+								lun->id);
-+			goto err;
-+		}
- 
- 		rlun = &rrpc->luns[i];
- 		rlun->parent = lun;
-+		rlun->mgmt = lun->priv;
- 		rlun->blocks = vzalloc(sizeof(struct rrpc_block) *
- 						rrpc->dev->blks_per_lun);
- 		if (!rlun->blocks) {
-@@ -1197,6 +1247,8 @@ static int rrpc_luns_init(struct rrpc *rrpc, int lun_begin, int lun_end)
- 			spin_lock_init(&rblk->lock);
- 		}
- 
-+		rlun->reserved_blocks = 2; /* for GC only */
-+
- 		rlun->rrpc = rrpc;
- 		INIT_LIST_HEAD(&rlun->prio_list);
- 		INIT_LIST_HEAD(&rlun->wblk_list);
-diff --git a/drivers/lightnvm/rrpc.h b/drivers/lightnvm/rrpc.h
-index 5e87d52..b8b3ad0 100644
---- a/drivers/lightnvm/rrpc.h
-+++ b/drivers/lightnvm/rrpc.h
-@@ -75,11 +75,15 @@ struct rrpc_lun {
- 	struct rrpc_block *cur, *gc_cur;
- 	struct rrpc_block *blocks;	/* Reference to block allocation */
- 
-+	struct nvm_lun_mgmt *mgmt;
-+
- 	struct list_head prio_list;	/* Blocks that may be GC'ed */
- 	struct list_head wblk_list;	/* Queued blocks to be written to */
- 
- 	struct work_struct ws_gc;
- 
-+	int reserved_blocks;
-+
- 	spinlock_t lock;
- };
- 
-diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
-index d7da953..14c6fa5 100644
---- a/include/linux/lightnvm.h
-+++ b/include/linux/lightnvm.h
-@@ -273,8 +273,8 @@ struct nvm_lun {
- 
- 	spinlock_t lock;
- 
--	unsigned int nr_free_blocks;	/* Number of unused blocks */
- 	struct nvm_block *blocks;
-+	void *priv;
- };
- 
- enum {
-@@ -452,6 +452,19 @@ struct nvm_tgt_type {
- 	struct list_head list;
- };
- 
-+struct nvm_lun_mgmt {
-+	/* lun block lists */
-+	struct list_head used_list;	/* In-use blocks */
-+	struct list_head free_list;	/* Not used blocks i.e. released
-+					 * and ready for use
-+					 */
-+	struct list_head bb_list;	/* Bad blocks. Mutually exclusive with
-+					 * free_list and used_list
-+					 */
-+
-+	unsigned int nr_free_blocks;	/* Number of unused blocks */
-+};
-+
- extern struct nvm_tgt_type *nvm_find_target_type(const char *, int);
- 
- extern int nvm_register_tgt_type(struct nvm_tgt_type *);
-@@ -465,8 +478,7 @@ typedef void (nvmm_unregister_fn)(struct nvm_dev *);
- 
- typedef int (nvmm_create_tgt_fn)(struct nvm_dev *, struct nvm_ioctl_create *);
- typedef int (nvmm_remove_tgt_fn)(struct nvm_dev *, struct nvm_ioctl_remove *);
--typedef struct nvm_block *(nvmm_get_blk_fn)(struct nvm_dev *,
--					      struct nvm_lun *, unsigned long);
-+typedef struct nvm_block *(nvmm_get_blk_fn)(struct nvm_dev *, struct nvm_lun *);
- typedef void (nvmm_put_blk_fn)(struct nvm_dev *, struct nvm_block *);
- typedef int (nvmm_open_blk_fn)(struct nvm_dev *, struct nvm_block *);
- typedef int (nvmm_close_blk_fn)(struct nvm_dev *, struct nvm_block *);
-@@ -522,8 +534,7 @@ struct nvmm_type {
- extern int nvm_register_mgr(struct nvmm_type *);
- extern void nvm_unregister_mgr(struct nvmm_type *);
- 
--extern struct nvm_block *nvm_get_blk(struct nvm_dev *, struct nvm_lun *,
--								unsigned long);
-+extern struct nvm_block *nvm_get_blk(struct nvm_dev *, struct nvm_lun *);
- extern void nvm_put_blk(struct nvm_dev *, struct nvm_block *);
- 
- extern struct nvm_dev *nvm_alloc_dev(int);
 -- 
 2.7.4
-
