@@ -1,183 +1,133 @@
-Return-Path: <tim.dawson@nyriad.com>
-Return-Path: <tim.dawson@nyriad.com>
-Date: Fri, 21 Oct 2016 20:24:55 +1300
-From: Tim Dawson <tim.dawson@nyriad.com>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org
-Subject: [PATCH] nbd: allow socket reconnect without block IO errors
-Message-ID: <20161021072455.GA7101@tim-dev>
+Return-Path: <Adam.Manzanares@wdc.com>
+Date: Wed, 19 Oct 2016 13:02:45 -0700
+From: Adam Manzanares <adam.manzanares@wdc.com>
+To: Tejun Heo <tj@kernel.org>
+CC: Adam Manzanares <adam.manzanares@hgst.com>, <axboe@kernel.dk>,
+	<dan.j.williams@intel.com>, <hare@suse.de>, <martin.petersen@oracle.com>,
+	<mchristi@redhat.com>, <toshi.kani@hpe.com>, <ming.lei@canonical.com>,
+	<sathya.prakash@broadcom.com>, <chaitra.basappa@broadcom.com>,
+	<suganath-prabu.subramani@broadcom.com>, <linux-block@vger.kernel.org>,
+	<linux-ide@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<MPT-FusionLinux.pdl@broadcom.com>, <linux-scsi@vger.kernel.org>
+Subject: Re: [PATCH v6 3/3] ata: ATA Command Priority Disabled By Default
+Message-ID: <20161019200244.GB2506@hgst.com>
+References: <1476728850-2309-1-git-send-email-adam.manzanares@hgst.com>
+ <1476728850-2309-4-git-send-email-adam.manzanares@hgst.com>
+ <20161019183829.GK18532@htj.duckdns.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20161019183829.GK18532@htj.duckdns.org>
+Return-Path: adam.manzanares@wdc.com
 List-ID: <linux-block@vger.kernel.org>
 
-this patch introduces a new ioctl that prevents requests being aborted on a socket error
-and instead the request is retried on the next connection
-or is cleaned up on timeout, disconnect or clear_sock.
-
-Signed-off-by: Tim Dawson <tim.dawson@nyriad.com>
----
- drivers/block/nbd.c      | 80 +++++++++++++++++++++++++++++++++++++++---------
- include/uapi/linux/nbd.h |  1 +
- 2 files changed, 66 insertions(+), 15 deletions(-)
-
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index ba405b5..727f5b5 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -43,6 +43,7 @@
- 
- #define NBD_TIMEDOUT			0
- #define NBD_DISCONNECT_REQUESTED	1
-+#define NBD_RESEND_DO_IT			2
- 
- struct nbd_device {
- 	u32 flags;
-@@ -433,8 +434,6 @@ static int nbd_thread_recv(struct nbd_device *nbd, struct block_device *bdev)
- 		return ret;
- 	}
- 
--	nbd_size_update(nbd, bdev);
--
- 	while (1) {
- 		cmd = nbd_read_stat(nbd);
- 		if (IS_ERR(cmd)) {
-@@ -442,10 +441,19 @@ static int nbd_thread_recv(struct nbd_device *nbd, struct block_device *bdev)
- 			break;
- 		}
- 
-+		struct request *req = blk_mq_rq_from_pdu(cmd);
-+
-+		if (test_bit(NBD_RESEND_DO_IT, &nbd->runtime_flags) && req->errors) {
-+			/* reset errors - we will reconnect and fix these */
-+			req->errors = 0;
-+			ret = -EIO;
-+			dev_warn(disk_to_dev(nbd->disk), "Handling failed recv %p\n", req);
-+			break;
-+		}
-+
- 		nbd_end_request(cmd);
--	}
- 
--	nbd_size_clear(nbd, bdev);
-+	}
- 
- 	device_remove_file(disk_to_dev(nbd->disk), &pid_attr);
- 	return ret;
-@@ -503,7 +511,10 @@ static void nbd_handle_cmd(struct nbd_cmd *cmd)
- 		goto error_out;
- 	}
- 
--	if (nbd_send_cmd(nbd, cmd) != 0) {
-+	/* if not NBD_RESEND_DO_IT and there is an error,
-+	 * we dont want to nbd_end_request if we can retry later
-+	 */
-+	if (nbd_send_cmd(nbd, cmd) != 0 && !test_bit(NBD_RESEND_DO_IT, &nbd->runtime_flags)) {
- 		dev_err(disk_to_dev(nbd->disk), "Request send failed\n");
- 		req->errors++;
- 		nbd_end_request(cmd);
-@@ -515,8 +526,32 @@ static void nbd_handle_cmd(struct nbd_cmd *cmd)
- 	return;
- 
- error_out:
--	req->errors++;
--	nbd_end_request(cmd);
-+	if (test_bit(NBD_RESEND_DO_IT, &nbd->runtime_flags)) {
-+		nbd->task_send = NULL;
-+		mutex_unlock(&nbd->tx_lock);
-+		return;
-+	}
-+
-+    req->errors++;
-+    nbd_end_request(cmd);
-+}
-+
-+
-+static void nbd_resend_req(struct request *req, void *data, bool reserved)
-+{
-+	struct nbd_device *nbd = data;
-+	struct nbd_cmd *cmd = blk_mq_rq_to_pdu(req);
-+
-+	dev_err(nbd_to_dev(nbd), "resend request %p\n", cmd);
-+	nbd_handle_cmd(cmd);
-+}
-+
-+static void nbd_resend_pending(struct nbd_device *nbd)
-+{
-+	BUG_ON(nbd->magic != NBD_MAGIC);
-+
-+	blk_mq_tagset_busy_iter(&nbd->tag_set, nbd_resend_req, nbd);
-+	dev_dbg(disk_to_dev(nbd->disk), "queue cleared\n");
- }
- 
- static int nbd_queue_rq(struct blk_mq_hw_ctx *hctx,
-@@ -661,6 +696,10 @@ static int __nbd_ioctl(struct block_device *bdev, struct nbd_device *nbd,
- 		nbd->flags = arg;
- 		return 0;
- 
-+	case NBD_SET_RESEND:
-+		set_bit(NBD_RESEND_DO_IT, &nbd->runtime_flags);
-+		return 0;
-+
- 	case NBD_DO_IT: {
- 		int error;
- 
-@@ -675,26 +714,37 @@ static int __nbd_ioctl(struct block_device *bdev, struct nbd_device *nbd,
- 
- 		nbd_parse_flags(nbd, bdev);
- 
-+		/* Resend remaining commands from last connection */
-+		if (test_bit(NBD_RESEND_DO_IT, &nbd->runtime_flags))
-+			nbd_resend_pending(nbd);
-+
-+		nbd_size_update(nbd, bdev);
-+
- 		nbd_dev_dbg_init(nbd);
--		error = nbd_thread_recv(nbd, bdev);
-+		error = nbd_thread_recv(nbd, bdev); //blocking
- 		nbd_dev_dbg_close(nbd);
- 
- 		mutex_lock(&nbd->tx_lock);
- 		nbd->task_recv = NULL;
- 
- 		sock_shutdown(nbd);
--		nbd_clear_que(nbd);
--		kill_bdev(bdev);
--		nbd_bdev_reset(bdev);
-+		if (!test_bit(NBD_RESEND_DO_IT, &nbd->runtime_flags) ||
-+			test_bit(NBD_DISCONNECT_REQUESTED, &nbd->runtime_flags)) {
- 
--		/* user requested, ignore socket errors */
--		if (test_bit(NBD_DISCONNECT_REQUESTED, &nbd->runtime_flags))
-+			dev_info(disk_to_dev(nbd->disk), "NBD_DO_IT cleanup\n");
-+			nbd_size_clear(nbd, bdev);
-+			nbd_clear_que(nbd);
-+			kill_bdev(bdev);
-+			nbd_bdev_reset(bdev);
-+			nbd_reset(nbd);
-+
-+			/* user requested, ignore socket errors */
- 			error = 0;
-+		}
-+
- 		if (test_bit(NBD_TIMEDOUT, &nbd->runtime_flags))
- 			error = -ETIMEDOUT;
- 
--		nbd_reset(nbd);
--
- 		return error;
- 	}
- 
-diff --git a/include/uapi/linux/nbd.h b/include/uapi/linux/nbd.h
-index e08e413..9031c87 100644
---- a/include/uapi/linux/nbd.h
-+++ b/include/uapi/linux/nbd.h
-@@ -28,6 +28,7 @@
- #define NBD_DISCONNECT  _IO( 0xab, 8 )
- #define NBD_SET_TIMEOUT _IO( 0xab, 9 )
- #define NBD_SET_FLAGS   _IO( 0xab, 10)
-+#define NBD_SET_RESEND   _IO( 0xab, 11)
- 
- enum {
- 	NBD_CMD_READ = 0,
--- 
-1.9.1
+VGhlIDEwLzE5LzIwMTYgMTQ6MzgsIFRlanVuIEhlbyB3cm90ZToKPiBIZWxsbywKPiAKPiBSZW1v
+dmVkIGF0YV9uY3FfcHJpb19vbigpIGFuZCByZW5hbWVkIF9vbiB0byBfZW5hYmxlLiAgSWYgSSBt
+ZXNzZWQgdXAKPiBhbnl0aGluZywgcGxlYXNlIGxldCBtZSBrbm93Lgo+IAoKV29ya3MgYXMgZXhw
+ZWN0ZWQuIFRoYW5rcyBmb3IgY2xlYW5pbmcgdGhpcyB1cC4KCj4gQWxzbywgY2FuIHlvdSBwbGVh
+c2Ugc2VuZCBhIGZvbGxvdy11cCBwYXRjaCB0byBtYWtlIHRoZSBzdG9yZSBmdW5jdGlvbgo+IHJl
+amVjdCBwcmlvIGVuYWJsaW5nIGlmIHRoZSBkZXZpY2UgZG9lc24ndCBzdXBwb3J0IGl0Pwo+IAoK
+SSdsbCBzZW5kIHNvbWV0aGluZyBvdXQgc2hvcnRseS4KClRha2UgY2FyZSwKQWRhbQoKPiBUaGFu
+a3MuCj4gCj4gLS0tLS0tIDg8IC0tLS0tLQo+IEZyb20gODRmOTUyNDNiNTQzOWEyMGMzMzgzNzA3
+NWI4ODkyNmJmYTAwYzRlYyBNb24gU2VwIDE3IDAwOjAwOjAwIDIwMDEKPiBGcm9tOiBBZGFtIE1h
+bnphbmFyZXMgPGFkYW0ubWFuemFuYXJlc0BoZ3N0LmNvbT4KPiBEYXRlOiBNb24sIDE3IE9jdCAy
+MDE2IDExOjI3OjMwIC0wNzAwCj4gU3ViamVjdDogW1BBVENIIDIvMl0gYXRhOiBBVEEgQ29tbWFu
+ZCBQcmlvcml0eSBEaXNhYmxlZCBCeSBEZWZhdWx0Cj4gCj4gQWRkIGEgc3lzZnMgZW50cnkgdG8g
+dHVybiBvbiBwcmlvcml0eSBpbmZvcm1hdGlvbiBiZWluZyBwYXNzZWQKPiB0byBhIEFUQSBkZXZp
+Y2UuIEJ5IGRlZmF1bHQgdGhpcyBmZWF0dXJlIGlzIHR1cm5lZCBvZmYuCj4gCj4gVGhpcyBwYXRj
+aCBkZXBlbmRzIG9uIGF0YTogRW5hYmxpbmcgQVRBIENvbW1hbmQgUHJpb3JpdGllcwo+IAo+IHRq
+OiBSZW5hbWVkIG5jcV9wcmlvX29uIHRvIG5jcV9wcmlvX2VuYWJsZSBhbmQgcmVtb3ZlZCB0cml2
+aWFsCj4gICAgIGF0YV9uY3FfcHJpb19vbigpIGFuZCBvcGVuLWNvZGVkIHRoZSB0ZXN0Lgo+IAo+
+IFNpZ25lZC1vZmYtYnk6IEFkYW0gTWFuemFuYXJlcyA8YWRhbS5tYW56YW5hcmVzQGhnc3QuY29t
+Pgo+IFNpZ25lZC1vZmYtYnk6IFRlanVuIEhlbyA8dGpAa2VybmVsLm9yZz4KPiAtLS0KPiAgZHJp
+dmVycy9hdGEvbGliYWhjaS5jICAgICB8ICAxICsKPiAgZHJpdmVycy9hdGEvbGliYXRhLWNvcmUu
+YyB8ICAzICsrLQo+ICBkcml2ZXJzL2F0YS9saWJhdGEtc2NzaS5jIHwgNjggKysrKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysKPiAgaW5jbHVkZS9saW51eC9saWJh
+dGEuaCAgICB8ICAyICsrCj4gIDQgZmlsZXMgY2hhbmdlZCwgNzMgaW5zZXJ0aW9ucygrKSwgMSBk
+ZWxldGlvbigtKQo+IAo+IGRpZmYgLS1naXQgYS9kcml2ZXJzL2F0YS9saWJhaGNpLmMgYi9kcml2
+ZXJzL2F0YS9saWJhaGNpLmMKPiBpbmRleCAwZDAyOGVhLi5lZTdkYjMxIDEwMDY0NAo+IC0tLSBh
+L2RyaXZlcnMvYXRhL2xpYmFoY2kuYwo+ICsrKyBiL2RyaXZlcnMvYXRhL2xpYmFoY2kuYwo+IEBA
+IC0xNDAsNiArMTQwLDcgQEAgRVhQT1JUX1NZTUJPTF9HUEwoYWhjaV9zaG9zdF9hdHRycyk7Cj4g
+IHN0cnVjdCBkZXZpY2VfYXR0cmlidXRlICphaGNpX3NkZXZfYXR0cnNbXSA9IHsKPiAgCSZkZXZf
+YXR0cl9zd19hY3Rpdml0eSwKPiAgCSZkZXZfYXR0cl91bmxvYWRfaGVhZHMsCj4gKwkmZGV2X2F0
+dHJfbmNxX3ByaW9fZW5hYmxlLAo+ICAJTlVMTAo+ICB9Owo+ICBFWFBPUlRfU1lNQk9MX0dQTChh
+aGNpX3NkZXZfYXR0cnMpOwo+IGRpZmYgLS1naXQgYS9kcml2ZXJzL2F0YS9saWJhdGEtY29yZS5j
+IGIvZHJpdmVycy9hdGEvbGliYXRhLWNvcmUuYwo+IGluZGV4IDgzNDZmYWYuLmIyOTQzMzkgMTAw
+NjQ0Cj4gLS0tIGEvZHJpdmVycy9hdGEvbGliYXRhLWNvcmUuYwo+ICsrKyBiL2RyaXZlcnMvYXRh
+L2xpYmF0YS1jb3JlLmMKPiBAQCAtNzg3LDcgKzc4Nyw4IEBAIGludCBhdGFfYnVpbGRfcndfdGYo
+c3RydWN0IGF0YV90YXNrZmlsZSAqdGYsIHN0cnVjdCBhdGFfZGV2aWNlICpkZXYsCj4gIAkJaWYg
+KHRmLT5mbGFncyAmIEFUQV9URkxBR19GVUEpCj4gIAkJCXRmLT5kZXZpY2UgfD0gMSA8PCA3Owo+
+ICAKPiAtCQlpZiAoZGV2LT5mbGFncyAmIEFUQV9ERkxBR19OQ1FfUFJJTykgewo+ICsJCWlmICgo
+ZGV2LT5mbGFncyAmIEFUQV9ERkxBR19OQ1FfUFJJTykgJiYKPiArCQkgICAgKGRldi0+ZmxhZ3Mg
+JiBBVEFfREZMQUdfTkNRX1BSSU9fRU5BQkxFKSkgewo+ICAJCQlpZiAoY2xhc3MgPT0gSU9QUklP
+X0NMQVNTX1JUKQo+ICAJCQkJdGYtPmhvYl9uc2VjdCB8PSBBVEFfUFJJT19ISUdIIDw8Cj4gIAkJ
+CQkJCSBBVEFfU0hJRlRfUFJJTzsKPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9hdGEvbGliYXRhLXNj
+c2kuYyBiL2RyaXZlcnMvYXRhL2xpYmF0YS1zY3NpLmMKPiBpbmRleCAyYmNjYzNjLi44NzU5N2Ez
+IDEwMDY0NAo+IC0tLSBhL2RyaXZlcnMvYXRhL2xpYmF0YS1zY3NpLmMKPiArKysgYi9kcml2ZXJz
+L2F0YS9saWJhdGEtc2NzaS5jCj4gQEAgLTI3MSw2ICsyNzEsNzMgQEAgREVWSUNFX0FUVFIodW5s
+b2FkX2hlYWRzLCBTX0lSVUdPIHwgU19JV1VTUiwKPiAgCSAgICBhdGFfc2NzaV9wYXJrX3Nob3cs
+IGF0YV9zY3NpX3Bhcmtfc3RvcmUpOwo+ICBFWFBPUlRfU1lNQk9MX0dQTChkZXZfYXR0cl91bmxv
+YWRfaGVhZHMpOwo+ICAKPiArc3RhdGljIHNzaXplX3QgYXRhX25jcV9wcmlvX2VuYWJsZV9zaG93
+KHN0cnVjdCBkZXZpY2UgKmRldmljZSwKPiArCQkJCQlzdHJ1Y3QgZGV2aWNlX2F0dHJpYnV0ZSAq
+YXR0ciwgY2hhciAqYnVmKQo+ICt7Cj4gKwlzdHJ1Y3Qgc2NzaV9kZXZpY2UgKnNkZXYgPSB0b19z
+Y3NpX2RldmljZShkZXZpY2UpOwo+ICsJc3RydWN0IGF0YV9wb3J0ICphcDsKPiArCXN0cnVjdCBh
+dGFfZGV2aWNlICpkZXY7Cj4gKwlib29sIG5jcV9wcmlvX2VuYWJsZTsKPiArCWludCByYyA9IDA7
+Cj4gKwo+ICsJYXAgPSBhdGFfc2hvc3RfdG9fcG9ydChzZGV2LT5ob3N0KTsKPiArCj4gKwlzcGlu
+X2xvY2tfaXJxKGFwLT5sb2NrKTsKPiArCWRldiA9IGF0YV9zY3NpX2ZpbmRfZGV2KGFwLCBzZGV2
+KTsKPiArCWlmICghZGV2KSB7Cj4gKwkJcmMgPSAtRU5PREVWOwo+ICsJCWdvdG8gdW5sb2NrOwo+
+ICsJfQo+ICsKPiArCW5jcV9wcmlvX2VuYWJsZSA9IGRldi0+ZmxhZ3MgJiBBVEFfREZMQUdfTkNR
+X1BSSU9fRU5BQkxFOwo+ICsKPiArdW5sb2NrOgo+ICsJc3Bpbl91bmxvY2tfaXJxKGFwLT5sb2Nr
+KTsKPiArCj4gKwlyZXR1cm4gcmMgPyByYyA6IHNucHJpbnRmKGJ1ZiwgMjAsICIldVxuIiwgbmNx
+X3ByaW9fZW5hYmxlKTsKPiArfQo+ICsKPiArc3RhdGljIHNzaXplX3QgYXRhX25jcV9wcmlvX2Vu
+YWJsZV9zdG9yZShzdHJ1Y3QgZGV2aWNlICpkZXZpY2UsCj4gKwkJCQkJIHN0cnVjdCBkZXZpY2Vf
+YXR0cmlidXRlICphdHRyLAo+ICsJCQkJCSBjb25zdCBjaGFyICpidWYsIHNpemVfdCBsZW4pCj4g
+K3sKPiArCXN0cnVjdCBzY3NpX2RldmljZSAqc2RldiA9IHRvX3Njc2lfZGV2aWNlKGRldmljZSk7
+Cj4gKwlzdHJ1Y3QgYXRhX3BvcnQgKmFwOwo+ICsJc3RydWN0IGF0YV9kZXZpY2UgKmRldjsKPiAr
+CWxvbmcgaW50IGlucHV0Owo+ICsJdW5zaWduZWQgbG9uZyBmbGFnczsKPiArCWludCByYzsKPiAr
+Cj4gKwlyYyA9IGtzdHJ0b2woYnVmLCAxMCwgJmlucHV0KTsKPiArCWlmIChyYykKPiArCQlyZXR1
+cm4gcmM7Cj4gKwlpZiAoKGlucHV0IDwgMCkgfHwgKGlucHV0ID4gMSkpCj4gKwkJcmV0dXJuIC1F
+SU5WQUw7Cj4gKwo+ICsJYXAgPSBhdGFfc2hvc3RfdG9fcG9ydChzZGV2LT5ob3N0KTsKPiArCj4g
+KwlzcGluX2xvY2tfaXJxc2F2ZShhcC0+bG9jaywgZmxhZ3MpOwo+ICsJZGV2ID0gYXRhX3Njc2lf
+ZmluZF9kZXYoYXAsIHNkZXYpOwo+ICsJaWYgKHVubGlrZWx5KCFkZXYpKSB7Cj4gKwkJcmMgPSAt
+RU5PREVWOwo+ICsJCWdvdG8gdW5sb2NrOwo+ICsJfQo+ICsKPiArCWlmIChpbnB1dCkKPiArCQlk
+ZXYtPmZsYWdzIHw9IEFUQV9ERkxBR19OQ1FfUFJJT19FTkFCTEU7Cj4gKwllbHNlCj4gKwkJZGV2
+LT5mbGFncyAmPSB+QVRBX0RGTEFHX05DUV9QUklPX0VOQUJMRTsKPiArCj4gK3VubG9jazoKPiAr
+CXNwaW5fdW5sb2NrX2lycXJlc3RvcmUoYXAtPmxvY2ssIGZsYWdzKTsKPiArCj4gKwlyZXR1cm4g
+cmMgPyByYyA6IGxlbjsKPiArfQo+ICsKPiArREVWSUNFX0FUVFIobmNxX3ByaW9fZW5hYmxlLCBT
+X0lSVUdPIHwgU19JV1VTUiwKPiArCSAgICBhdGFfbmNxX3ByaW9fZW5hYmxlX3Nob3csIGF0YV9u
+Y3FfcHJpb19lbmFibGVfc3RvcmUpOwo+ICtFWFBPUlRfU1lNQk9MX0dQTChkZXZfYXR0cl9uY3Ff
+cHJpb19lbmFibGUpOwo+ICsKPiAgdm9pZCBhdGFfc2NzaV9zZXRfc2Vuc2Uoc3RydWN0IGF0YV9k
+ZXZpY2UgKmRldiwgc3RydWN0IHNjc2lfY21uZCAqY21kLAo+ICAJCQl1OCBzaywgdTggYXNjLCB1
+OCBhc2NxKQo+ICB7Cj4gQEAgLTQwMiw2ICs0NjksNyBAQCBFWFBPUlRfU1lNQk9MX0dQTChkZXZf
+YXR0cl9zd19hY3Rpdml0eSk7Cj4gIAo+ICBzdHJ1Y3QgZGV2aWNlX2F0dHJpYnV0ZSAqYXRhX2Nv
+bW1vbl9zZGV2X2F0dHJzW10gPSB7Cj4gIAkmZGV2X2F0dHJfdW5sb2FkX2hlYWRzLAo+ICsJJmRl
+dl9hdHRyX25jcV9wcmlvX2VuYWJsZSwKPiAgCU5VTEwKPiAgfTsKPiAgRVhQT1JUX1NZTUJPTF9H
+UEwoYXRhX2NvbW1vbl9zZGV2X2F0dHJzKTsKPiBkaWZmIC0tZ2l0IGEvaW5jbHVkZS9saW51eC9s
+aWJhdGEuaCBiL2luY2x1ZGUvbGludXgvbGliYXRhLmgKPiBpbmRleCA5MGI2OWE2Li5jMTcwYmU1
+IDEwMDY0NAo+IC0tLSBhL2luY2x1ZGUvbGludXgvbGliYXRhLmgKPiArKysgYi9pbmNsdWRlL2xp
+bnV4L2xpYmF0YS5oCj4gQEAgLTE2Nyw2ICsxNjcsNyBAQCBlbnVtIHsKPiAgCUFUQV9ERkxBR19V
+TkxPQ0tfSFBBCT0gKDEgPDwgMTgpLCAvKiB1bmxvY2sgSFBBICovCj4gIAlBVEFfREZMQUdfTkNR
+X1NFTkRfUkVDViA9ICgxIDw8IDE5KSwgLyogZGV2aWNlIHN1cHBvcnRzIE5DUSBTRU5EIGFuZCBS
+RUNWICovCj4gIAlBVEFfREZMQUdfTkNRX1BSSU8JPSAoMSA8PCAyMCksIC8qIGRldmljZSBzdXBw
+b3J0cyBOQ1EgcHJpb3JpdHkgKi8KPiArCUFUQV9ERkxBR19OQ1FfUFJJT19FTkFCTEUgPSAoMSA8
+PCAyMSksIC8qIFByaW9yaXR5IGNtZHMgc2VudCB0byBkZXYgKi8KPiAgCUFUQV9ERkxBR19JTklU
+X01BU0sJPSAoMSA8PCAyNCkgLSAxLAo+ICAKPiAgCUFUQV9ERkxBR19ERVRBQ0gJPSAoMSA8PCAy
+NCksCj4gQEAgLTU0NSw2ICs1NDYsNyBAQCB0eXBlZGVmIHZvaWQgKCphdGFfcG9zdHJlc2V0X2Zu
+X3QpKHN0cnVjdCBhdGFfbGluayAqbGluaywgdW5zaWduZWQgaW50ICpjbGFzc2VzKQo+ICAKPiAg
+ZXh0ZXJuIHN0cnVjdCBkZXZpY2VfYXR0cmlidXRlIGRldl9hdHRyX2xpbmtfcG93ZXJfbWFuYWdl
+bWVudF9wb2xpY3k7Cj4gIGV4dGVybiBzdHJ1Y3QgZGV2aWNlX2F0dHJpYnV0ZSBkZXZfYXR0cl91
+bmxvYWRfaGVhZHM7Cj4gK2V4dGVybiBzdHJ1Y3QgZGV2aWNlX2F0dHJpYnV0ZSBkZXZfYXR0cl9u
+Y3FfcHJpb19lbmFibGU7Cj4gIGV4dGVybiBzdHJ1Y3QgZGV2aWNlX2F0dHJpYnV0ZSBkZXZfYXR0
+cl9lbV9tZXNzYWdlX3R5cGU7Cj4gIGV4dGVybiBzdHJ1Y3QgZGV2aWNlX2F0dHJpYnV0ZSBkZXZf
+YXR0cl9lbV9tZXNzYWdlOwo+ICBleHRlcm4gc3RydWN0IGRldmljZV9hdHRyaWJ1dGUgZGV2X2F0
+dHJfc3dfYWN0aXZpdHk7Cj4gLS0gCj4gMi43LjQKPiAKV2VzdGVybiBEaWdpdGFsIENvcnBvcmF0
+aW9uIChhbmQgaXRzIHN1YnNpZGlhcmllcykgRS1tYWlsIENvbmZpZGVudGlhbGl0eSBOb3RpY2Ug
+JiBEaXNjbGFpbWVyOgoKVGhpcyBlLW1haWwgYW5kIGFueSBmaWxlcyB0cmFuc21pdHRlZCB3aXRo
+IGl0IG1heSBjb250YWluIGNvbmZpZGVudGlhbCBvciBsZWdhbGx5IHByaXZpbGVnZWQgaW5mb3Jt
+YXRpb24gb2YgV0RDIGFuZC9vciBpdHMgYWZmaWxpYXRlcywgYW5kIGFyZSBpbnRlbmRlZCBzb2xl
+bHkgZm9yIHRoZSB1c2Ugb2YgdGhlIGluZGl2aWR1YWwgb3IgZW50aXR5IHRvIHdoaWNoIHRoZXkg
+YXJlIGFkZHJlc3NlZC4gSWYgeW91IGFyZSBub3QgdGhlIGludGVuZGVkIHJlY2lwaWVudCwgYW55
+IGRpc2Nsb3N1cmUsIGNvcHlpbmcsIGRpc3RyaWJ1dGlvbiBvciBhbnkgYWN0aW9uIHRha2VuIG9y
+IG9taXR0ZWQgdG8gYmUgdGFrZW4gaW4gcmVsaWFuY2Ugb24gaXQsIGlzIHByb2hpYml0ZWQuIElm
+IHlvdSBoYXZlIHJlY2VpdmVkIHRoaXMgZS1tYWlsIGluIGVycm9yLCBwbGVhc2Ugbm90aWZ5IHRo
+ZSBzZW5kZXIgaW1tZWRpYXRlbHkgYW5kIGRlbGV0ZSB0aGUgZS1tYWlsIGluIGl0cyBlbnRpcmV0
+eSBmcm9tIHlvdXIgc3lzdGVtLgo=
