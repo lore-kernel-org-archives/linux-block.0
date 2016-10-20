@@ -1,40 +1,53 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Ming Lei <tom.leiming@gmail.com>
-To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Ming Lei <tom.leiming@gmail.com>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>,
-        Jaegeuk Kim <jaegeuk@kernel.org>
-Subject: [PATCH 56/60] fs: crypto: convert to bio_for_each_segment_all_rd()
-Date: Sat, 29 Oct 2016 16:08:55 +0800
-Message-Id: <1477728600-12938-57-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
-References: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([198.137.202.9]:49592 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S934018AbcJTNM1 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 20 Oct 2016 09:12:27 -0400
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org
+Subject: [PATCH 3/7] block: move REQ_RAHEAD to common flags
+Date: Thu, 20 Oct 2016 15:12:11 +0200
+Message-Id: <1476969135-32732-4-git-send-email-hch@lst.de>
+In-Reply-To: <1476969135-32732-1-git-send-email-hch@lst.de>
+References: <1476969135-32732-1-git-send-email-hch@lst.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+The information that am I/O is a read-ahead can be useful for drivers.
+In fact the NVMe driver already checks it, even if it won't ever be set
+at the moment.
+
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- fs/crypto/crypto.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ include/linux/blk_types.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/fs/crypto/crypto.c b/fs/crypto/crypto.c
-index 98f87fe8f186..ed007ebbd1ab 100644
---- a/fs/crypto/crypto.c
-+++ b/fs/crypto/crypto.c
-@@ -411,8 +411,9 @@ static void completion_pages(struct work_struct *work)
- 	struct bio *bio = ctx->r.bio;
- 	struct bio_vec *bv;
- 	int i;
-+	struct bvec_iter_all bia;
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index b541425..44f9bca 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -163,9 +163,9 @@ enum rq_flag_bits {
+ 	__REQ_INTEGRITY,	/* I/O includes block integrity payload */
+ 	__REQ_FUA,		/* forced unit access */
+ 	__REQ_PREFLUSH,		/* request for cache flush */
++	__REQ_RAHEAD,		/* read ahead, can fail anytime */
  
--	bio_for_each_segment_all(bv, bio, i) {
-+	bio_for_each_segment_all_rd(bv, bio, i, bia) {
- 		struct page *page = bv->bv_page;
- 		int ret = fscrypt_decrypt_page(page);
+ 	/* bio only flags */
+-	__REQ_RAHEAD,		/* read ahead, can fail anytime */
+ 	__REQ_THROTTLED,	/* This bio has already been subjected to
+ 				 * throttling rules. Don't do it again. */
  
+@@ -205,7 +205,7 @@ enum rq_flag_bits {
+ 	(REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT | REQ_FAILFAST_DRIVER)
+ #define REQ_COMMON_MASK \
+ 	(REQ_FAILFAST_MASK | REQ_SYNC | REQ_META | REQ_PRIO | REQ_NOIDLE | \
+-	 REQ_PREFLUSH | REQ_FUA | REQ_INTEGRITY | REQ_NOMERGE)
++	 REQ_PREFLUSH | REQ_FUA | REQ_INTEGRITY | REQ_NOMERGE | REQ_RAHEAD)
+ #define REQ_CLONE_MASK		REQ_COMMON_MASK
+ 
+ /* This mask is used for both bio and request merge checking */
 -- 
-2.7.4
+2.1.4
 
