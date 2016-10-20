@@ -1,69 +1,101 @@
-Return-Path: <Damien.LeMoal@hgst.com>
-From: Damien Le Moal <damien.lemoal@hgst.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>, Christoph
- Hellwig <hch@lst.de>, "Martin K . Petersen" <martin.petersen@oracle.com>,
-	Hannes Reinecke <hare@suse.de>, Shaun Tancheff <shaun@tancheff.com>, Damien
- Le Moal <damien.lemoal@hgst.com>, Shaun Tancheff <shaun.tancheff@seagate.com>
-Subject: [PATCH v7 4/7] block: Define zoned block device operations
-Date: Thu, 6 Oct 2016 10:04:49 +0900
-Message-ID: <1475715892-18856-5-git-send-email-damien.lemoal@hgst.com>
-In-Reply-To: <1475715892-18856-1-git-send-email-damien.lemoal@hgst.com>
-References: <1475715892-18856-1-git-send-email-damien.lemoal@hgst.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: damien.lemoal@hgst.com
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([198.137.202.9]:49624 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S934018AbcJTNMa (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 20 Oct 2016 09:12:30 -0400
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org
+Subject: [PATCH 4/7] block: replace REQ_THROTTLED with a bio flag
+Date: Thu, 20 Oct 2016 15:12:12 +0200
+Message-Id: <1476969135-32732-5-git-send-email-hch@lst.de>
+In-Reply-To: <1476969135-32732-1-git-send-email-hch@lst.de>
+References: <1476969135-32732-1-git-send-email-hch@lst.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Shaun Tancheff <shaun.tancheff@seagate.com>
+It's the last bio-only REQ_* flag, and we have space for it in the bio
+bi_flags field.
 
-Define REQ_OP_ZONE_REPORT and REQ_OP_ZONE_RESET for handling zones of
-host-managed and host-aware zoned block devices. With with these two
-new operations, the total number of operations defined reaches 8 and
-still fits with the 3 bits definition of REQ_OP_BITS.
-
-Signed-off-by: Shaun Tancheff <shaun.tancheff@seagate.com>
-Signed-off-by: Damien Le Moal <damien.lemoal@hgst.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-core.c          | 4 ++++
- include/linux/blk_types.h | 2 ++
- 2 files changed, 6 insertions(+)
+ block/blk-throttle.c      | 10 +++++-----
+ include/linux/blk_types.h |  8 ++------
+ 2 files changed, 7 insertions(+), 11 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 14d7c07..e4eda5d 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1941,6 +1941,10 @@ generic_make_request_checks(struct bio *bio)
- 	case REQ_OP_WRITE_SAME:
- 		if (!bdev_write_same(bio->bi_bdev))
- 			goto not_supported;
-+	case REQ_OP_ZONE_REPORT:
-+	case REQ_OP_ZONE_RESET:
-+		if (!bdev_is_zoned(bio->bi_bdev))
-+			goto not_supported;
- 		break;
- 	default:
- 		break;
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index a3ea826..a6bb4fe 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -818,13 +818,13 @@ static void throtl_charge_bio(struct throtl_grp *tg, struct bio *bio)
+ 	tg->io_disp[rw]++;
+ 
+ 	/*
+-	 * REQ_THROTTLED is used to prevent the same bio to be throttled
++	 * BIO_THROTTLED is used to prevent the same bio to be throttled
+ 	 * more than once as a throttled bio will go through blk-throtl the
+ 	 * second time when it eventually gets issued.  Set it when a bio
+ 	 * is being charged to a tg.
+ 	 */
+-	if (!(bio->bi_opf & REQ_THROTTLED))
+-		bio->bi_opf |= REQ_THROTTLED;
++	if (!bio_flagged(bio, BIO_THROTTLED))
++		bio_set_flag(bio, BIO_THROTTLED);
+ }
+ 
+ /**
+@@ -1401,7 +1401,7 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
+ 	WARN_ON_ONCE(!rcu_read_lock_held());
+ 
+ 	/* see throtl_charge_bio() */
+-	if ((bio->bi_opf & REQ_THROTTLED) || !tg->has_rules[rw])
++	if (bio_flagged(bio, BIO_THROTTLED) || !tg->has_rules[rw])
+ 		goto out;
+ 
+ 	spin_lock_irq(q->queue_lock);
+@@ -1480,7 +1480,7 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
+ 	 * being issued.
+ 	 */
+ 	if (!throttled)
+-		bio->bi_opf &= ~REQ_THROTTLED;
++		bio_clear_flag(bio, BIO_THROTTLED);
+ 	return throttled;
+ }
+ 
 diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index cd395ec..dd50dce 100644
+index 44f9bca..6df722d 100644
 --- a/include/linux/blk_types.h
 +++ b/include/linux/blk_types.h
-@@ -243,6 +243,8 @@ enum req_op {
- 	REQ_OP_SECURE_ERASE,	/* request to securely erase sectors */
- 	REQ_OP_WRITE_SAME,	/* write same block many times */
- 	REQ_OP_FLUSH,		/* request for cache flush */
-+	REQ_OP_ZONE_REPORT,	/* Get zone information */
-+	REQ_OP_ZONE_RESET,	/* Reset a zone write pointer */
- };
+@@ -119,6 +119,8 @@ struct bio {
+ #define BIO_QUIET	6	/* Make BIO Quiet */
+ #define BIO_CHAIN	7	/* chained bio, ->bi_remaining in effect */
+ #define BIO_REFFED	8	/* bio has elevated ->bi_cnt */
++#define BIO_THROTTLED	9	/* This bio has already been subjected to
++				 * throttling rules. Don't do it again. */
  
- #define REQ_OP_BITS 3
+ /*
+  * Flags starting here get preserved by bio_reset() - this includes
+@@ -165,10 +167,6 @@ enum rq_flag_bits {
+ 	__REQ_PREFLUSH,		/* request for cache flush */
+ 	__REQ_RAHEAD,		/* read ahead, can fail anytime */
+ 
+-	/* bio only flags */
+-	__REQ_THROTTLED,	/* This bio has already been subjected to
+-				 * throttling rules. Don't do it again. */
+-
+ 	/* request only flags */
+ 	__REQ_SORTED,		/* elevator knows about this request */
+ 	__REQ_SOFTBARRIER,	/* may not be passed by ioscheduler */
+@@ -213,8 +211,6 @@ enum rq_flag_bits {
+ 	(REQ_NOMERGE | REQ_STARTED | REQ_SOFTBARRIER | REQ_PREFLUSH | REQ_FUA | REQ_FLUSH_SEQ)
+ 
+ #define REQ_RAHEAD		(1ULL << __REQ_RAHEAD)
+-#define REQ_THROTTLED		(1ULL << __REQ_THROTTLED)
+-
+ #define REQ_SORTED		(1ULL << __REQ_SORTED)
+ #define REQ_SOFTBARRIER		(1ULL << __REQ_SOFTBARRIER)
+ #define REQ_FUA			(1ULL << __REQ_FUA)
 -- 
-2.7.4
+2.1.4
 
-Western Digital Corporation (and its subsidiaries) E-mail Confidentiality Notice & Disclaimer:
-
-This e-mail and any files transmitted with it may contain confidential or legally privileged information of WDC and/or its affiliates, and are intended solely for the use of the individual or entity to which they are addressed. If you are not the intended recipient, any disclosure, copying, distribution or any action taken or omitted to be taken in reliance on it, is prohibited. If you have received this e-mail in error, please notify the sender immediately and delete the e-mail in its entirety from your system.
