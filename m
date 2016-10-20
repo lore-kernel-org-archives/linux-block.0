@@ -1,38 +1,65 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.9]:48871 "EHLO
+Received: from bombadil.infradead.org ([198.137.202.9]:49555 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S941853AbcJYPIW (ORCPT
+        with ESMTP id S1752104AbcJTNMW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 Oct 2016 11:08:22 -0400
+        Thu, 20 Oct 2016 09:12:22 -0400
 From: Christoph Hellwig <hch@lst.de>
-To: linux-xfs@vger.kernel.org
-Cc: axboe@fb.com, kent.overstreet@gmail.com,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
-Subject: 
-Date: Tue, 25 Oct 2016 17:08:12 +0200
-Message-Id: <1477408098-10153-1-git-send-email-hch@lst.de>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org
+Subject: [PATCH 1/7] block: remove bio_is_rw
+Date: Thu, 20 Oct 2016 15:12:09 +0200
+Message-Id: <1476969135-32732-2-git-send-email-hch@lst.de>
+In-Reply-To: <1476969135-32732-1-git-send-email-hch@lst.de>
+References: <1476969135-32732-1-git-send-email-hch@lst.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Subject: an iomap-based direct I/O implementation
+With the addition of the zoned operations the tests in this function
+became incorrect.  But I think it's much better to just open code the
+allow operations in the only caller anyway.
 
-Hi all,
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ block/bio-integrity.c |  2 +-
+ include/linux/bio.h   | 11 -----------
+ 2 files changed, 1 insertion(+), 12 deletions(-)
 
-this series adds a new direct I/O implementation based on the iomap
-interface, and switches XFS to use it.
+diff --git a/block/bio-integrity.c b/block/bio-integrity.c
+index 63f72f0..5384713 100644
+--- a/block/bio-integrity.c
++++ b/block/bio-integrity.c
+@@ -172,7 +172,7 @@ bool bio_integrity_enabled(struct bio *bio)
+ {
+ 	struct blk_integrity *bi = bdev_get_integrity(bio->bi_bdev);
+ 
+-	if (!bio_is_rw(bio))
++	if (bio_op(bio) != REQ_OP_READ && bio_op(bio) != REQ_OP_WRITE)
+ 		return false;
+ 
+ 	/* Already protected? */
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index 97cb48f..87ce64d 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -83,17 +83,6 @@ static inline bool bio_no_advance_iter(struct bio *bio)
+ 	       bio_op(bio) == REQ_OP_WRITE_SAME;
+ }
+ 
+-static inline bool bio_is_rw(struct bio *bio)
+-{
+-	if (!bio_has_data(bio))
+-		return false;
+-
+-	if (bio_no_advance_iter(bio))
+-		return false;
+-
+-	return true;
+-}
+-
+ static inline bool bio_mergeable(struct bio *bio)
+ {
+ 	if (bio->bi_opf & REQ_NOMERGE_FLAGS)
+-- 
+2.1.4
 
-The first two patches are a resend of my earlier series to remove the
-XFS iolock.  They are needed for the lockdep assert in the new iomap
-code.
-
-The third patch adds a new helper to the block layer that builds bio
-from locked down user pages without needing an additional page array.
-This helper was originally written by Kent and then heavily rewritten
-by me to use the iov_iter helper that also allow non-user page backed
-iov_iters.  (Kent - I kept your credits for it, if you feel this doesn't
-look like your code anymore I'll happily claim it for me).  This patch
-should probably go into a shared branch in the block layer tree as I
-have some other users for it as well.
-
-The rest implements a new iomap_dio_rw direct I/O implementation and
-switches XFS to use it.
