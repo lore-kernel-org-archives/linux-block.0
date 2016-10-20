@@ -1,15 +1,15 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from iad1-shared-relay2.dreamhost.com ([208.113.157.41]:44937 "EHLO
+Received: from iad1-shared-relay2.dreamhost.com ([208.113.157.41]:44081 "EHLO
         iad1-shared-relay2.dreamhost.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1751991AbdF3KVO (ORCPT
+        by vger.kernel.org with ESMTP id S1752500AbdF3KQZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Jun 2017 06:21:14 -0400
+        Fri, 30 Jun 2017 06:16:25 -0400
 Received: from iad1-shared-relay1.dreamhost.com (iad1-shared-relay1.dreamhost.com [208.113.157.50])
-        by iad1-shared-relay2.dreamhost.com (Postfix) with ESMTP id 83C583E56A2
-        for <linux-block@vger.kernel.org>; Thu, 29 Jun 2017 15:21:09 -0700 (PDT)
+        by iad1-shared-relay2.dreamhost.com (Postfix) with ESMTP id C61433E521C
+        for <linux-block@vger.kernel.org>; Thu, 29 Jun 2017 15:12:17 -0700 (PDT)
 Received: from ware.dreamhost.com (ware.dreamhost.com [64.111.127.160])
-        by iad1-shared-relay1.dreamhost.com (Postfix) with ESMTP id 242EAB400BE
-        for <linux-block@vger.kernel.org>; Thu, 29 Jun 2017 15:21:08 -0700 (PDT)
+        by iad1-shared-relay1.dreamhost.com (Postfix) with ESMTP id 0594BB400BA
+        for <linux-block@vger.kernel.org>; Thu, 29 Jun 2017 15:12:06 -0700 (PDT)
 In-Reply-To: <20170629134510.GA32385@infradead.org>
 References: <20170629134510.GA32385@infradead.org>
 From: Eric Wheeler <git@linux.ewheeler.net>
@@ -17,7 +17,7 @@ Date: Wed, 19 Oct 2016 17:36:37 -0700
 Subject: [PATCH 09/19] bcache: update bio->bi_opf bypass/writeback REQ_ flag
  hints
 To: linux-block@vger.kernel.org
-Message-Id: <20170629222108.0641D100132@ware.dreamhost.com>
+Message-Id: <20170629221206.C180710012A@ware.dreamhost.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
