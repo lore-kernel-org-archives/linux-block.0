@@ -1,35 +1,66 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: hans.verkuil@cisco.com, brking@us.ibm.com,
-        haver@linux.vnet.ibm.com, ching2048@areca.com.tw, axboe@fb.com,
-        alex.williamson@redhat.com, kvm@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/6] ipr: use pci_irq_allocate_vectors
-From: "Martin K. Petersen" <martin.petersen@oracle.com>
-References: <1473600688-24043-1-git-send-email-hch@lst.de>
-        <1473600688-24043-3-git-send-email-hch@lst.de>
-Date: Tue, 11 Oct 2016 16:18:05 -0400
-In-Reply-To: <1473600688-24043-3-git-send-email-hch@lst.de> (Christoph
-        Hellwig's message of "Sun, 11 Sep 2016 15:31:24 +0200")
-Message-ID: <yq1twciod1e.fsf@sermon.lab.mkp.net>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:43624 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S935043AbcJUQJ2 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 21 Oct 2016 12:09:28 -0400
+To: Linus Torvalds <torvalds@linux-foundation.org>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+From: Jens Axboe <axboe@fb.com>
+Subject: [GIT PULL] Block fixes for 4.9-rc
+Message-ID: <1b7e59a4-9558-801b-fe8f-0f7375d1c930@fb.com>
+Date: Fri, 21 Oct 2016 10:09:18 -0600
 MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-scsi-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
->>>>> "Christoph" == Christoph Hellwig <hch@lst.de> writes:
+Hi Linus,
 
-Christoph> Switch the ipr driver to use pci_alloc_irq_vectors.  We need
-Christoph> to two calls to pci_alloc_irq_vectors as ipr only supports
-Christoph> multiple MSI-X vectors, but not multiple MSI vectors.
+A set of fixes that missed the merge window, mostly due to me being away
+around that time. Nothing major here, a mix of nvme cleanups and fixes,
+and one fix for the badblocks handling.
 
-Christoph> Otherwise this cleans up a lot of cruft and allows to use a
-Christoph> common request_irq loop for irq types, which happens to only
-Christoph> iterate over a single line in the non MSI-X case.
+Please pull!
 
-Applied to 4.10/scsi-queue.
+
+   git://git.kernel.dk/linux-block.git for-linus
+
+
+----------------------------------------------------------------
+Christoph Hellwig (5):
+       nvme.h: resync with nvme-cli
+       nvme.h: don't use uuid_be
+       nvme.h: add an enum for cns values
+       nvme: use symbolic constants for CNS values
+       nvmet: use symbolic constants for CNS values
+
+Gabriel Krisman Bertazi (1):
+       nvme: Add tertiary number to NVME_VS
+
+Keith Busch (3):
+       nvme: Stop probing a removed device
+       nvme: Delete created IO queues on reset
+       nvme: don't schedule multiple resets
+
+Stephen Bates (1):
+       nvme : Add sysfs entry for NVMe CMBs when appropriate
+
+Tomasz Majchrzak (1):
+       badblocks: fix overlapping check for clearing
+
+  block/badblocks.c               |  6 ++--
+  drivers/nvme/host/core.c        | 14 ++++----
+  drivers/nvme/host/pci.c         | 77 
++++++++++++++++++++++++++++++------------
+  drivers/nvme/host/scsi.c        |  4 +--
+  drivers/nvme/target/admin-cmd.c |  8 ++---
+  drivers/nvme/target/core.c      |  2 +-
+  drivers/nvme/target/discovery.c |  4 +--
+  include/linux/nvme.h            | 49 +++++++++++++++++++++-----
+  8 files changed, 115 insertions(+), 49 deletions(-)
 
 -- 
-Martin K. Petersen	Oracle Linux Engineering
+Jens Axboe
+
