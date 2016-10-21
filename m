@@ -1,98 +1,23 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Ming Lei <tom.leiming@gmail.com>
-To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Ming Lei <tom.leiming@gmail.com>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        dm-devel@redhat.com (maintainer:DEVICE-MAPPER (LVM)),
-        Shaohua Li <shli@kernel.org>,
-        linux-raid@vger.kernel.org (open list:SOFTWARE RAID (Multiple Disks)
-        SUPPORT)
-Subject: [PATCH 08/60] dm: use bvec iterator helpers to implement .get_page and .next_page
-Date: Sat, 29 Oct 2016 16:08:07 +0800
-Message-Id: <1477728600-12938-9-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
-References: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] badblocks: badblocks_set/clear update unacked_exist
+To: Shaohua Li <shli@fb.com>, linux-raid@vger.kernel.org,
+ linux-block@vger.kernel.org
+References: <39f303dcb7bdf2958b6f82a0646467dfbc8d1abd.1476999400.git.shli@fb.com>
+Cc: tomasz.majchrzak@intel.com
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <ef73bc09-433d-8c3b-d70f-3400d4624ed5@kernel.dk>
+Date: Fri, 21 Oct 2016 10:15:28 -0600
+MIME-Version: 1.0
+In-Reply-To: <39f303dcb7bdf2958b6f82a0646467dfbc8d1abd.1476999400.git.shli@fb.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-Firstly we have mature bvec/bio iterator helper for iterate each
-page in one bio, not necessary to reinvent a wheel to do that.
+On 10/20/2016 03:40 PM, Shaohua Li wrote:
+> When bandblocks_set acknowledges a range or badblocks_clear a range,
+> it's possible all badblocks are acknowledged. We should update
+> unacked_exist if this occurs.
 
-Secondly the coming multipage bvecs requires this patch.
+Applied, thanks.
 
-Also add comments about the direct access to bvec table.
-
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
----
- drivers/md/dm-io.c | 34 ++++++++++++++++++++++++----------
- 1 file changed, 24 insertions(+), 10 deletions(-)
-
-diff --git a/drivers/md/dm-io.c b/drivers/md/dm-io.c
-index 0bf1a12e35fe..2ef573c220fc 100644
---- a/drivers/md/dm-io.c
-+++ b/drivers/md/dm-io.c
-@@ -162,7 +162,10 @@ struct dpages {
- 			 struct page **p, unsigned long *len, unsigned *offset);
- 	void (*next_page)(struct dpages *dp);
- 
--	unsigned context_u;
-+	union {
-+		unsigned context_u;
-+		struct bvec_iter context_bi;
-+	};
- 	void *context_ptr;
- 
- 	void *vma_invalidate_address;
-@@ -204,25 +207,36 @@ static void list_dp_init(struct dpages *dp, struct page_list *pl, unsigned offse
- static void bio_get_page(struct dpages *dp, struct page **p,
- 			 unsigned long *len, unsigned *offset)
- {
--	struct bio_vec *bvec = dp->context_ptr;
--	*p = bvec->bv_page;
--	*len = bvec->bv_len - dp->context_u;
--	*offset = bvec->bv_offset + dp->context_u;
-+	struct bio_vec bv = bvec_iter_bvec((struct bio_vec *)dp->context_ptr,
-+			dp->context_bi);
-+
-+	*p = bv.bv_page;
-+	*len = bv.bv_len;
-+	*offset = bv.bv_offset;
-+
-+	/* avoid to figure out it in bio_next_page() again */
-+	dp->context_bi.bi_sector = (sector_t)bv.bv_len;
- }
- 
- static void bio_next_page(struct dpages *dp)
- {
--	struct bio_vec *bvec = dp->context_ptr;
--	dp->context_ptr = bvec + 1;
--	dp->context_u = 0;
-+	unsigned int len = (unsigned int)dp->context_bi.bi_sector;
-+
-+	bvec_iter_advance((struct bio_vec *)dp->context_ptr,
-+			&dp->context_bi, len);
- }
- 
- static void bio_dp_init(struct dpages *dp, struct bio *bio)
- {
- 	dp->get_page = bio_get_page;
- 	dp->next_page = bio_next_page;
--	dp->context_ptr = __bvec_iter_bvec(bio->bi_io_vec, bio->bi_iter);
--	dp->context_u = bio->bi_iter.bi_bvec_done;
-+
-+	/*
-+	 * We just use bvec iterator to retrieve pages, so it is ok to
-+	 * access the bvec table directly here
-+	 */
-+	dp->context_ptr = bio->bi_io_vec;
-+	dp->context_bi = bio->bi_iter;
- }
- 
- /*
 -- 
-2.7.4
-
+Jens Axboe
