@@ -1,227 +1,117 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-Subject: [PATCH v3 04/11] blk-mq: Introduce blk_mq_quiesce_queue()
-To: Jens Axboe <axboe@fb.com>
-References: <b39eb0e7-1007-eb63-8e7f-9a7f08508379@sandisk.com>
-CC: Christoph Hellwig <hch@lst.de>,
-        James Bottomley <jejb@linux.vnet.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Doug Ledford <dledford@redhat.com>,
-        Keith Busch <keith.busch@intel.com>,
-        Ming Lin <ming.l@ssi.samsung.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-Message-ID: <e42a952c-f245-eb39-d0a1-0336035573f9@sandisk.com>
-Date: Tue, 18 Oct 2016 14:50:25 -0700
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Date: Mon, 24 Oct 2016 13:41:02 +0300
+From: "Kirill A. Shutemov" <kirill@shutemov.name>
+To: Jan Kara <jack@suse.cz>
+Cc: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCHv3 13/41] truncate: make sure invalidate_mapping_pages()
+ can discard huge pages
+Message-ID: <20161024104102.GA2849@node.shutemov.name>
+References: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
+ <20160915115523.29737-14-kirill.shutemov@linux.intel.com>
+ <20161011155815.GM6952@quack2.suse.cz>
+ <20161011215349.GC27110@node.shutemov.name>
+ <20161012064320.GA13896@quack2.suse.cz>
 MIME-Version: 1.0
-In-Reply-To: <b39eb0e7-1007-eb63-8e7f-9a7f08508379@sandisk.com>
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-scsi-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20161012064320.GA13896@quack2.suse.cz>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-blk_mq_quiesce_queue() waits until ongoing .queue_rq() invocations
-have finished. This function does *not* wait until all outstanding
-requests have finished (this means invocation of request.end_io()).
+On Wed, Oct 12, 2016 at 08:43:20AM +0200, Jan Kara wrote:
+> On Wed 12-10-16 00:53:49, Kirill A. Shutemov wrote:
+> > On Tue, Oct 11, 2016 at 05:58:15PM +0200, Jan Kara wrote:
+> > > On Thu 15-09-16 14:54:55, Kirill A. Shutemov wrote:
+> > > > invalidate_inode_page() has expectation about page_count() of the page
+> > > > -- if it's not 2 (one to caller, one to radix-tree), it will not be
+> > > > dropped. That condition almost never met for THPs -- tail pages are
+> > > > pinned to the pagevec.
+> > > > 
+> > > > Let's drop them, before calling invalidate_inode_page().
+> > > > 
+> > > > Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+> > > > ---
+> > > >  mm/truncate.c | 11 +++++++++++
+> > > >  1 file changed, 11 insertions(+)
+> > > > 
+> > > > diff --git a/mm/truncate.c b/mm/truncate.c
+> > > > index a01cce450a26..ce904e4b1708 100644
+> > > > --- a/mm/truncate.c
+> > > > +++ b/mm/truncate.c
+> > > > @@ -504,10 +504,21 @@ unsigned long invalidate_mapping_pages(struct address_space *mapping,
+> > > >  				/* 'end' is in the middle of THP */
+> > > >  				if (index ==  round_down(end, HPAGE_PMD_NR))
+> > > >  					continue;
+> > > > +				/*
+> > > > +				 * invalidate_inode_page() expects
+> > > > +				 * page_count(page) == 2 to drop page from page
+> > > > +				 * cache -- drop tail pages references.
+> > > > +				 */
+> > > > +				get_page(page);
+> > > > +				pagevec_release(&pvec);
+> > > 
+> > > I'm not quite sure why this is needed. When you have multiorder entry in
+> > > the radix tree for your huge page, then you should not get more entries in
+> > > the pagevec for your huge page. What do I miss?
+> > 
+> > For compatibility reason find_get_entries() (which is called by
+> > pagevec_lookup_entries()) collects all subpages of huge page in the range
+> > (head/tails). See patch [07/41]
+> > 
+> > So huge page, which is fully in the range it will be pinned up to
+> > PAGEVEC_SIZE times.
+> 
+> Yeah, I see. But then won't it be cleaner to provide iteration method that
+> would add to pagevec each radix tree entry (regardless of its order) only
+> once and then use it in places where we care? Instead of strange dances
+> like you do here?
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Ming Lei <tom.leiming@gmail.com>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
----
- block/blk-mq.c         | 78 ++++++++++++++++++++++++++++++++++++++++++++------
- include/linux/blk-mq.h |  3 ++
- include/linux/blkdev.h |  1 +
- 3 files changed, 73 insertions(+), 9 deletions(-)
+Maybe. It would require doubling number of find_get_* helpers or
+additional flag in each. We have too many already.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 4643fa8..d41ed92 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -115,6 +115,30 @@ void blk_mq_unfreeze_queue(struct request_queue *q)
- }
- EXPORT_SYMBOL_GPL(blk_mq_unfreeze_queue);
- 
-+/**
-+ * blk_mq_quiesce_queue() - wait until all ongoing queue_rq calls have finished
-+ *
-+ * Note: this function does not prevent that the struct request end_io()
-+ * callback function is invoked. Additionally, it is not prevented that
-+ * new queue_rq() calls occur unless the queue has been stopped first.
-+ */
-+void blk_mq_quiesce_queue(struct request_queue *q)
-+{
-+	struct blk_mq_hw_ctx *hctx;
-+	unsigned int i;
-+	bool rcu = false;
-+
-+	queue_for_each_hw_ctx(q, hctx, i) {
-+		if (hctx->flags & BLK_MQ_F_BLOCKING)
-+			synchronize_srcu(&hctx->queue_rq_srcu);
-+		else
-+			rcu = true;
-+	}
-+	if (rcu)
-+		synchronize_rcu();
-+}
-+EXPORT_SYMBOL_GPL(blk_mq_quiesce_queue);
-+
- void blk_mq_wake_waiters(struct request_queue *q)
- {
- 	struct blk_mq_hw_ctx *hctx;
-@@ -778,7 +802,7 @@ static inline unsigned int queued_to_index(unsigned int queued)
-  * of IO. In particular, we'd like FIFO behaviour on handling existing
-  * items on the hctx->dispatch list. Ignore that for now.
-  */
--static void __blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx)
-+static void blk_mq_process_rq_list(struct blk_mq_hw_ctx *hctx)
- {
- 	struct request_queue *q = hctx->queue;
- 	struct request *rq;
-@@ -790,9 +814,6 @@ static void __blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx)
- 	if (unlikely(blk_mq_hctx_stopped(hctx)))
- 		return;
- 
--	WARN_ON(!cpumask_test_cpu(raw_smp_processor_id(), hctx->cpumask) &&
--		cpu_online(hctx->next_cpu));
--
- 	hctx->run++;
- 
- 	/*
-@@ -883,6 +904,24 @@ static void __blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx)
- 	}
- }
- 
-+static void __blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx)
-+{
-+	int srcu_idx;
-+
-+	WARN_ON(!cpumask_test_cpu(raw_smp_processor_id(), hctx->cpumask) &&
-+		cpu_online(hctx->next_cpu));
-+
-+	if (!(hctx->flags & BLK_MQ_F_BLOCKING)) {
-+		rcu_read_lock();
-+		blk_mq_process_rq_list(hctx);
-+		rcu_read_unlock();
-+	} else {
-+		srcu_idx = srcu_read_lock(&hctx->queue_rq_srcu);
-+		blk_mq_process_rq_list(hctx);
-+		srcu_read_unlock(&hctx->queue_rq_srcu, srcu_idx);
-+	}
-+}
-+
- /*
-  * It'd be great if the workqueue API had a way to pass
-  * in a mask and had some smarts for more clever placement.
-@@ -1278,6 +1317,14 @@ static int blk_mq_direct_issue_request(struct request *rq, blk_qc_t *cookie)
- 	return -1;
- }
- 
-+static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
-+				      struct request *rq, blk_qc_t *cookie)
-+{
-+	if (blk_mq_hctx_stopped(hctx) ||
-+	    blk_mq_direct_issue_request(rq, cookie) != 0)
-+		blk_mq_insert_request(rq, false, true, true);
-+}
-+
- /*
-  * Multiple hardware queue variant. This will not use per-process plugs,
-  * but will attempt to bypass the hctx queueing if we can go straight to
-@@ -1289,7 +1336,7 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
- 	const int is_flush_fua = bio->bi_opf & (REQ_PREFLUSH | REQ_FUA);
- 	struct blk_map_ctx data;
- 	struct request *rq;
--	unsigned int request_count = 0;
-+	unsigned int request_count = 0, srcu_idx;
- 	struct blk_plug *plug;
- 	struct request *same_queue_rq = NULL;
- 	blk_qc_t cookie;
-@@ -1332,7 +1379,7 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
- 		blk_mq_bio_to_request(rq, bio);
- 
- 		/*
--		 * We do limited pluging. If the bio can be merged, do that.
-+		 * We do limited plugging. If the bio can be merged, do that.
- 		 * Otherwise the existing request in the plug list will be
- 		 * issued. So the plug list will have one request at most
- 		 */
-@@ -1352,9 +1399,16 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
- 		blk_mq_put_ctx(data.ctx);
- 		if (!old_rq)
- 			goto done;
--		if (blk_mq_hctx_stopped(data.hctx) ||
--		    blk_mq_direct_issue_request(old_rq, &cookie) != 0)
--			blk_mq_insert_request(old_rq, false, true, true);
-+
-+		if (!(data.hctx->flags & BLK_MQ_F_BLOCKING)) {
-+			rcu_read_lock();
-+			blk_mq_try_issue_directly(data.hctx, old_rq, &cookie);
-+			rcu_read_unlock();
-+		} else {
-+			srcu_idx = srcu_read_lock(&data.hctx->queue_rq_srcu);
-+			blk_mq_try_issue_directly(data.hctx, old_rq, &cookie);
-+			srcu_read_unlock(&data.hctx->queue_rq_srcu, srcu_idx);
-+		}
- 		goto done;
- 	}
- 
-@@ -1633,6 +1687,9 @@ static void blk_mq_exit_hctx(struct request_queue *q,
- 	if (set->ops->exit_hctx)
- 		set->ops->exit_hctx(hctx, hctx_idx);
- 
-+	if (hctx->flags & BLK_MQ_F_BLOCKING)
-+		cleanup_srcu_struct(&hctx->queue_rq_srcu);
-+
- 	blk_mq_remove_cpuhp(hctx);
- 	blk_free_flush_queue(hctx->fq);
- 	sbitmap_free(&hctx->ctx_map);
-@@ -1713,6 +1770,9 @@ static int blk_mq_init_hctx(struct request_queue *q,
- 				   flush_start_tag + hctx_idx, node))
- 		goto free_fq;
- 
-+	if (hctx->flags & BLK_MQ_F_BLOCKING)
-+		init_srcu_struct(&hctx->queue_rq_srcu);
-+
- 	return 0;
- 
-  free_fq:
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 523376a..02c3918 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -3,6 +3,7 @@
- 
- #include <linux/blkdev.h>
- #include <linux/sbitmap.h>
-+#include <linux/srcu.h>
- 
- struct blk_mq_tags;
- struct blk_flush_queue;
-@@ -35,6 +36,8 @@ struct blk_mq_hw_ctx {
- 
- 	struct blk_mq_tags	*tags;
- 
-+	struct srcu_struct	queue_rq_srcu;
-+
- 	unsigned long		queued;
- 	unsigned long		run;
- #define BLK_MQ_MAX_DISPATCH_ORDER	7
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index c47c358..8259d87 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -824,6 +824,7 @@ extern void __blk_run_queue(struct request_queue *q);
- extern void __blk_run_queue_uncond(struct request_queue *q);
- extern void blk_run_queue(struct request_queue *);
- extern void blk_run_queue_async(struct request_queue *q);
-+extern void blk_mq_quiesce_queue(struct request_queue *q);
- extern int blk_rq_map_user(struct request_queue *, struct request *,
- 			   struct rq_map_data *, void __user *, unsigned long,
- 			   gfp_t);
+And multi-order entries interface for radix-tree has not yet settled in.
+I would rather defer such rework until it will be shaped fully.
+
+Let's come back to this later.
+
+> Ultimately we could convert all the places to use these new iteration
+> methods but I don't see that as immediately necessary and maybe there are
+> places where getting all the subpages in the pagevec actually makes life
+> simpler for us (please point me if you know about such place).
+
+I did the way I did to now evaluate each use of find_get_*() one-by-one.
+I guessed most of the callers of find_get_page() would be confused by
+getting head page instead relevant subpage. Maybe I was wrong and it was
+easier to make caller work with that. I don't know...
+
+> On a somewhat unrelated note: I've noticed that you don't invalidate
+> a huge page when only part of it should be invalidated. That actually
+> breaks some assumptions filesystems make. In particular direct IO code
+> assumes that if you do
+> 
+> 	filemap_write_and_wait_range(inode, start, end);
+> 	invalidate_inode_pages2_range(inode, start, end);
+> 
+> all the page cache covering start-end *will* be invalidated. Your skipping
+> of partial pages breaks this assumption and thus can bring consistency
+> issues (e.g. write done using direct IO won't be seen by following buffered
+> read).
+
+Acctually, invalidate_inode_pages2_range does invalidate whole page if
+part of it is in the range. I've catched this problem during testing.
+
 -- 
-2.10.1
-
+ Kirill A. Shutemov
