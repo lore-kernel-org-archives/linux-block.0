@@ -1,48 +1,87 @@
-Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
-From: Stephen Bates <sbates@raithlin.com>
-To: linux-nvme@lists.infradead.org, keith.busch@intel.com, axboe@fb.com,
- linux-block@vger.kernel.org
-Subject: [TRIVIAL PATCH] nvme : trivial whitespace fix in pci.c
-Date: Mon, 17 Oct 2016 17:24:19 -0600
-Message-Id: <1476746659-24663-1-git-send-email-sbates@raithlin.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
-List-Post: <mailto:linux-nvme@lists.infradead.org>
-List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
-Cc: Stephen Bates <sbates@raithlin.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
-Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga03.intel.com ([134.134.136.65]:63386 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S933586AbcJYAO2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 24 Oct 2016 20:14:28 -0400
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv4 39/43] ext4: make EXT4_IOC_MOVE_EXT work with huge pages
+Date: Tue, 25 Oct 2016 03:13:38 +0300
+Message-Id: <20161025001342.76126-40-kirill.shutemov@linux.intel.com>
+In-Reply-To: <20161025001342.76126-1-kirill.shutemov@linux.intel.com>
+References: <20161025001342.76126-1-kirill.shutemov@linux.intel.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Remove annoying white space damage in pci.c.
+Adjust how we find relevant block within page and how we clear the
+required part of the page.
 
-Signed-off-by: Stephen Bates <sbates@raithlin.com>
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- drivers/nvme/host/pci.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ fs/ext4/move_extent.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index a7c6e9d..e2b3243 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -50,7 +50,7 @@
- #define NVME_AQ_DEPTH		256
- #define SQ_SIZE(depth)		(depth * sizeof(struct nvme_command))
- #define CQ_SIZE(depth)		(depth * sizeof(struct nvme_completion))
--
-+
- /*
-  * We handle AEN commands ourselves and don't even let the
-  * block layer know about them.
---
-2.1.4
+diff --git a/fs/ext4/move_extent.c b/fs/ext4/move_extent.c
+index 6fc14def0c70..2efa9deb47a9 100644
+--- a/fs/ext4/move_extent.c
++++ b/fs/ext4/move_extent.c
+@@ -210,7 +210,9 @@ mext_page_mkuptodate(struct page *page, unsigned from, unsigned to)
+ 				return err;
+ 			}
+ 			if (!buffer_mapped(bh)) {
+-				zero_user(page, block_start, blocksize);
++				zero_user(page + block_start / PAGE_SIZE,
++						block_start % PAGE_SIZE,
++						blocksize);
+ 				set_buffer_uptodate(bh);
+ 				continue;
+ 			}
+@@ -267,10 +269,11 @@ move_extent_per_page(struct file *o_filp, struct inode *donor_inode,
+ 	unsigned int tmp_data_size, data_size, replaced_size;
+ 	int i, err2, jblocks, retries = 0;
+ 	int replaced_count = 0;
+-	int from = data_offset_in_page << orig_inode->i_blkbits;
++	int from;
+ 	int blocks_per_page = PAGE_SIZE >> orig_inode->i_blkbits;
+ 	struct super_block *sb = orig_inode->i_sb;
+ 	struct buffer_head *bh = NULL;
++	int diff;
+ 
+ 	/*
+ 	 * It needs twice the amount of ordinary journal buffers because
+@@ -355,6 +358,9 @@ move_extent_per_page(struct file *o_filp, struct inode *donor_inode,
+ 		goto unlock_pages;
+ 	}
+ data_copy:
++	diff = (pagep[0] - compound_head(pagep[0])) * blocks_per_page;
++	from = (data_offset_in_page + diff) << orig_inode->i_blkbits;
++	pagep[0] = compound_head(pagep[0]);
+ 	*err = mext_page_mkuptodate(pagep[0], from, from + replaced_size);
+ 	if (*err)
+ 		goto unlock_pages;
+@@ -384,7 +390,7 @@ move_extent_per_page(struct file *o_filp, struct inode *donor_inode,
+ 	if (!page_has_buffers(pagep[0]))
+ 		create_empty_buffers(pagep[0], 1 << orig_inode->i_blkbits, 0);
+ 	bh = page_buffers(pagep[0]);
+-	for (i = 0; i < data_offset_in_page; i++)
++	for (i = 0; i < data_offset_in_page + diff; i++)
+ 		bh = bh->b_this_page;
+ 	for (i = 0; i < block_len_in_page; i++) {
+ 		*err = ext4_get_block(orig_inode, orig_blk_offset + i, bh, 0);
+-- 
+2.9.3
 
-_______________________________________________
-Linux-nvme mailing list
-Linux-nvme@lists.infradead.org
-http://lists.infradead.org/mailman/listinfo/linux-nvme
