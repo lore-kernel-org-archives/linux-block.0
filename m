@@ -1,58 +1,200 @@
 Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Ming Lei <tom.leiming@gmail.com>
-To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Ming Lei <tom.leiming@gmail.com>, Shaohua Li <shli@kernel.org>,
-        linux-raid@vger.kernel.org (open list:SOFTWARE RAID (Multiple Disks)
-        SUPPORT)
-Subject: [PATCH 24/60] md: set NO_MP for request queue of md
-Date: Sat, 29 Oct 2016 16:08:23 +0800
-Message-Id: <1477728600-12938-25-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
-References: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv4 27/43] truncate: make truncate_inode_pages_range() aware about huge pages
+Date: Tue, 25 Oct 2016 03:13:26 +0300
+Message-Id: <20161025001342.76126-28-kirill.shutemov@linux.intel.com>
+In-Reply-To: <20161025001342.76126-1-kirill.shutemov@linux.intel.com>
+References: <20161025001342.76126-1-kirill.shutemov@linux.intel.com>
 Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-MD isn't ready for multipage bvecs, so mark it as
-NO_MP.
+As with shmem_undo_range(), truncate_inode_pages_range() removes huge
+pages, if it fully within range.
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+Partial truncate of huge pages zero out this part of THP.
+
+Unlike with shmem, it doesn't prevent us having holes in the middle of
+huge page we still can skip writeback not touched buffers.
+
+With memory-mapped IO we would loose holes in some cases when we have
+THP in page cache, since we cannot track access on 4k level in this
+case.
+
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- drivers/md/md.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ fs/buffer.c   |  2 +-
+ mm/truncate.c | 95 ++++++++++++++++++++++++++++++++++++++++++++++++++++++-----
+ 2 files changed, 88 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/md/md.c b/drivers/md/md.c
-index eac84d8ff724..f8d98098dff8 100644
---- a/drivers/md/md.c
-+++ b/drivers/md/md.c
-@@ -5128,6 +5128,16 @@ static void md_safemode_timeout(unsigned long data)
+diff --git a/fs/buffer.c b/fs/buffer.c
+index 8dff5817e313..670290820325 100644
+--- a/fs/buffer.c
++++ b/fs/buffer.c
+@@ -1533,7 +1533,7 @@ void block_invalidatepage(struct page *page, unsigned int offset,
+ 	/*
+ 	 * Check for overflow
+ 	 */
+-	BUG_ON(stop > PAGE_SIZE || stop < length);
++	BUG_ON(stop > hpage_size(page) || stop < length);
  
- static int start_dirty_degraded;
- 
-+/*
-+ * MD isn't ready for multipage bvecs yet, and set the flag
-+ * so that MD still can see singlepage bvecs bio
-+ */
-+static inline void md_set_no_mp(struct mddev *mddev)
-+{
-+	if (mddev->queue)
-+		set_bit(QUEUE_FLAG_NO_MP, &mddev->queue->queue_flags);
-+}
-+
- int md_run(struct mddev *mddev)
+ 	head = page_buffers(page);
+ 	bh = head;
+diff --git a/mm/truncate.c b/mm/truncate.c
+index f88e2f1eb6f0..7bb9d197a9e8 100644
+--- a/mm/truncate.c
++++ b/mm/truncate.c
+@@ -74,7 +74,7 @@ void do_invalidatepage(struct page *page, unsigned int offset,
  {
- 	int err;
-@@ -5353,6 +5363,8 @@ int md_run(struct mddev *mddev)
- 	if (mddev->flags & MD_UPDATE_SB_FLAGS)
- 		md_update_sb(mddev, 0);
+ 	void (*invalidatepage)(struct page *, unsigned int, unsigned int);
  
-+	md_set_no_mp(mddev);
+-	invalidatepage = page->mapping->a_ops->invalidatepage;
++	invalidatepage = page_mapping(page)->a_ops->invalidatepage;
+ #ifdef CONFIG_BLOCK
+ 	if (!invalidatepage)
+ 		invalidatepage = block_invalidatepage;
+@@ -100,7 +100,7 @@ truncate_complete_page(struct address_space *mapping, struct page *page)
+ 		return -EIO;
+ 
+ 	if (page_has_private(page))
+-		do_invalidatepage(page, 0, PAGE_SIZE);
++		do_invalidatepage(page, 0, hpage_size(page));
+ 
+ 	/*
+ 	 * Some filesystems seem to re-dirty the page even after
+@@ -272,6 +272,36 @@ void truncate_inode_pages_range(struct address_space *mapping,
+ 				unlock_page(page);
+ 				continue;
+ 			}
 +
- 	md_new_event(mddev);
- 	sysfs_notify_dirent_safe(mddev->sysfs_state);
- 	sysfs_notify_dirent_safe(mddev->sysfs_action);
++			if (PageTransTail(page)) {
++				/* Middle of THP: zero out the page */
++				clear_highpage(page);
++				if (page_has_private(page)) {
++					int off = page - compound_head(page);
++					do_invalidatepage(compound_head(page),
++							off * PAGE_SIZE,
++							PAGE_SIZE);
++				}
++				unlock_page(page);
++				continue;
++			} else if (PageTransHuge(page)) {
++				if (index == round_down(end, HPAGE_PMD_NR)) {
++					/*
++					 * Range ends in the middle of THP:
++					 * zero out the page
++					 */
++					clear_highpage(page);
++					if (page_has_private(page)) {
++						do_invalidatepage(page, 0,
++								PAGE_SIZE);
++					}
++					unlock_page(page);
++					continue;
++				}
++				index += HPAGE_PMD_NR - 1;
++				i += HPAGE_PMD_NR - 1;
++			}
++
+ 			truncate_inode_page(mapping, page);
+ 			unlock_page(page);
+ 		}
+@@ -293,9 +323,12 @@ void truncate_inode_pages_range(struct address_space *mapping,
+ 			wait_on_page_writeback(page);
+ 			zero_user_segment(page, partial_start, top);
+ 			cleancache_invalidate_page(mapping, page);
+-			if (page_has_private(page))
+-				do_invalidatepage(page, partial_start,
+-						  top - partial_start);
++			if (page_has_private(page)) {
++				int off = page - compound_head(page);
++				do_invalidatepage(compound_head(page),
++						off * PAGE_SIZE + partial_start,
++						top - partial_start);
++			}
+ 			unlock_page(page);
+ 			put_page(page);
+ 		}
+@@ -306,9 +339,12 @@ void truncate_inode_pages_range(struct address_space *mapping,
+ 			wait_on_page_writeback(page);
+ 			zero_user_segment(page, 0, partial_end);
+ 			cleancache_invalidate_page(mapping, page);
+-			if (page_has_private(page))
+-				do_invalidatepage(page, 0,
+-						  partial_end);
++			if (page_has_private(page)) {
++				int off = page - compound_head(page);
++				do_invalidatepage(compound_head(page),
++						off * PAGE_SIZE,
++						partial_end);
++			}
+ 			unlock_page(page);
+ 			put_page(page);
+ 		}
+@@ -357,6 +393,49 @@ void truncate_inode_pages_range(struct address_space *mapping,
+ 			lock_page(page);
+ 			WARN_ON(page_to_pgoff(page) != index);
+ 			wait_on_page_writeback(page);
++
++			if (PageTransTail(page)) {
++				/* Middle of THP: zero out the page */
++				clear_highpage(page);
++				if (page_has_private(page)) {
++					int off = page - compound_head(page);
++					do_invalidatepage(compound_head(page),
++							off * PAGE_SIZE,
++							PAGE_SIZE);
++				}
++				unlock_page(page);
++				/*
++				 * Partial thp truncate due 'start' in middle
++				 * of THP: don't need to look on these pages
++				 * again on !pvec.nr restart.
++				 */
++				if (index != round_down(end, HPAGE_PMD_NR))
++					start++;
++				continue;
++			} else if (PageTransHuge(page)) {
++				if (index == round_down(end, HPAGE_PMD_NR)) {
++					/*
++					 * Range ends in the middle of THP:
++					 * zero out the page
++					 */
++					clear_highpage(page);
++					if (page_has_private(page)) {
++						do_invalidatepage(page, 0,
++								PAGE_SIZE);
++					}
++					unlock_page(page);
++					/*
++					 * Partial thp truncate due 'end' in
++					 * middle of THP: don't need to look on
++					 * these pages again restart.
++					 */
++					start++;
++					continue;
++				}
++				index += HPAGE_PMD_NR - 1;
++				i += HPAGE_PMD_NR - 1;
++			}
++
+ 			truncate_inode_page(mapping, page);
+ 			unlock_page(page);
+ 		}
 -- 
-2.7.4
+2.9.3
 
