@@ -1,50 +1,167 @@
-Return-Path: <Damien.LeMoal@hgst.com>
-From: Damien Le Moal <damien.lemoal@hgst.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>, "Christoph
- Hellwig" <hch@lst.de>, "Martin K . Petersen" <martin.petersen@oracle.com>,
-	Hannes Reinecke <hare@suse.de>, Shaun Tancheff <shaun@tancheff.com>, "Damien
- Le Moal" <damien.lemoal@hgst.com>, Hannes Reinecke <hare@suse.com>
-Subject: [PATCH v7 3/7] block: update chunk_sectors in blk_stack_limits()
-Date: Thu, 6 Oct 2016 10:04:48 +0900
-Message-ID: <1475715892-18856-4-git-send-email-damien.lemoal@hgst.com>
-In-Reply-To: <1475715892-18856-1-git-send-email-damien.lemoal@hgst.com>
-References: <1475715892-18856-1-git-send-email-damien.lemoal@hgst.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: damien.lemoal@hgst.com
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Christoph Hellwig <hch@lst.de>
+To: linux-xfs@vger.kernel.org
+Cc: axboe@fb.com, kent.overstreet@gmail.com,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        Peter Zijlstra <peterz@infradead.org>
+Subject: [PATCH 1/6] locking/lockdep: Provide a type check for lock_is_held
+Date: Tue, 25 Oct 2016 17:08:13 +0200
+Message-Id: <1477408098-10153-2-git-send-email-hch@lst.de>
+In-Reply-To: <1477408098-10153-1-git-send-email-hch@lst.de>
+References: <1477408098-10153-1-git-send-email-hch@lst.de>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-From: Hannes Reinecke <hare@suse.de>
+From: Peter Zijlstra <peterz@infradead.org>
 
-Signed-off-by: Hannes Reinecke <hare@suse.com>
-Signed-off-by: Damien Le Moal <damien.lemoal@hgst.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-Reviewed-by: Shaun Tancheff <shaun.tancheff@seagate.com>
-Tested-by: Shaun Tancheff <shaun.tancheff@seagate.com>
+Christoph requested lockdep_assert_held() variants that distinguish
+between held-for-read or held-for-write.
+
+Provide:
+
+  int lock_is_held_type(struct lockdep_map *lock, int read)
+
+which takes the same argument as lock_acquire(.read) and matches it to
+the held_lock instance.
+
+Use of this function should be gated by the debug_locks variable. When
+that is 0 the return value of the lock_is_held_type() function is
+undefined. This is done to allow both negative and positive tests for
+holding locks.
+
+By default we provide (positive) lockdep_assert_held{,_exclusive,_read}()
+macros.
+
+Requested-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
 ---
- block/blk-settings.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ include/linux/lockdep.h  | 25 +++++++++++++++++++++++--
+ kernel/locking/lockdep.c | 20 ++++++++++++--------
+ 2 files changed, 35 insertions(+), 10 deletions(-)
 
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index b1d5b7f..55369a6 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -631,6 +631,10 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
- 			t->discard_granularity;
+diff --git a/include/linux/lockdep.h b/include/linux/lockdep.h
+index c1458fe..a87f3c9 100644
+--- a/include/linux/lockdep.h
++++ b/include/linux/lockdep.h
+@@ -338,9 +338,18 @@ extern void lock_acquire(struct lockdep_map *lock, unsigned int subclass,
+ extern void lock_release(struct lockdep_map *lock, int nested,
+ 			 unsigned long ip);
+ 
+-#define lockdep_is_held(lock)	lock_is_held(&(lock)->dep_map)
++/*
++ * Same "read" as for lock_acquire(), except -1 means any.
++ */
++extern int lock_is_held_type(struct lockdep_map *lock, int read);
++
++static inline int lock_is_held(struct lockdep_map *lock)
++{
++	return lock_is_held_type(lock, -1);
++}
+ 
+-extern int lock_is_held(struct lockdep_map *lock);
++#define lockdep_is_held(lock)		lock_is_held(&(lock)->dep_map)
++#define lockdep_is_held_type(lock, r)	lock_is_held_type(&(lock)->dep_map, (r))
+ 
+ extern void lock_set_class(struct lockdep_map *lock, const char *name,
+ 			   struct lock_class_key *key, unsigned int subclass,
+@@ -372,6 +381,14 @@ extern void lock_unpin_lock(struct lockdep_map *lock, struct pin_cookie);
+ 		WARN_ON(debug_locks && !lockdep_is_held(l));	\
+ 	} while (0)
+ 
++#define lockdep_assert_held_exclusive(l)	do {			\
++		WARN_ON(debug_locks && !lockdep_is_held_type(l, 0));	\
++	} while (0)
++
++#define lockdep_assert_held_read(l)	do {				\
++		WARN_ON(debug_locks && !lockdep_is_held_type(l, 1));	\
++	} while (0)
++
+ #define lockdep_assert_held_once(l)	do {				\
+ 		WARN_ON_ONCE(debug_locks && !lockdep_is_held(l));	\
+ 	} while (0)
+@@ -428,7 +445,11 @@ struct lock_class_key { };
+ 
+ #define lockdep_depth(tsk)	(0)
+ 
++#define lockdep_is_held_type(l, r)		do { (void)(l); } while (0)
++
+ #define lockdep_assert_held(l)			do { (void)(l); } while (0)
++#define lockdep_assert_held_exclusive(l)	do { (void)(l); } while (0)
++#define lockdep_assert_held_read(l)		do { (void)(l); } while (0)
+ #define lockdep_assert_held_once(l)		do { (void)(l); } while (0)
+ 
+ #define lockdep_recursing(tsk)			(0)
+diff --git a/kernel/locking/lockdep.c b/kernel/locking/lockdep.c
+index 589d763..cff580a 100644
+--- a/kernel/locking/lockdep.c
++++ b/kernel/locking/lockdep.c
+@@ -3188,7 +3188,7 @@ print_lock_nested_lock_not_held(struct task_struct *curr,
+ 	return 0;
+ }
+ 
+-static int __lock_is_held(struct lockdep_map *lock);
++static int __lock_is_held(struct lockdep_map *lock, int read);
+ 
+ /*
+  * This gets called for every mutex_lock*()/spin_lock*() operation.
+@@ -3329,7 +3329,7 @@ static int __lock_acquire(struct lockdep_map *lock, unsigned int subclass,
+ 	}
+ 	chain_key = iterate_chain_key(chain_key, class_idx);
+ 
+-	if (nest_lock && !__lock_is_held(nest_lock))
++	if (nest_lock && !__lock_is_held(nest_lock, -1))
+ 		return print_lock_nested_lock_not_held(curr, hlock, ip);
+ 
+ 	if (!validate_chain(curr, lock, hlock, chain_head, chain_key))
+@@ -3576,7 +3576,7 @@ __lock_release(struct lockdep_map *lock, int nested, unsigned long ip)
+ 	return 1;
+ }
+ 
+-static int __lock_is_held(struct lockdep_map *lock)
++static int __lock_is_held(struct lockdep_map *lock, int read)
+ {
+ 	struct task_struct *curr = current;
+ 	int i;
+@@ -3584,8 +3584,12 @@ static int __lock_is_held(struct lockdep_map *lock)
+ 	for (i = 0; i < curr->lockdep_depth; i++) {
+ 		struct held_lock *hlock = curr->held_locks + i;
+ 
+-		if (match_held_lock(hlock, lock))
+-			return 1;
++		if (match_held_lock(hlock, lock)) {
++			if (read == -1 || hlock->read == read)
++				return 1;
++
++			return 0;
++		}
  	}
  
-+	if (b->chunk_sectors)
-+		t->chunk_sectors = min_not_zero(t->chunk_sectors,
-+						b->chunk_sectors);
-+
+ 	return 0;
+@@ -3769,7 +3773,7 @@ void lock_release(struct lockdep_map *lock, int nested,
+ }
+ EXPORT_SYMBOL_GPL(lock_release);
+ 
+-int lock_is_held(struct lockdep_map *lock)
++int lock_is_held_type(struct lockdep_map *lock, int read)
+ {
+ 	unsigned long flags;
+ 	int ret = 0;
+@@ -3781,13 +3785,13 @@ int lock_is_held(struct lockdep_map *lock)
+ 	check_flags(flags);
+ 
+ 	current->lockdep_recursion = 1;
+-	ret = __lock_is_held(lock);
++	ret = __lock_is_held(lock, read);
+ 	current->lockdep_recursion = 0;
+ 	raw_local_irq_restore(flags);
+ 
  	return ret;
  }
- EXPORT_SYMBOL(blk_stack_limits);
+-EXPORT_SYMBOL_GPL(lock_is_held);
++EXPORT_SYMBOL_GPL(lock_is_held_type);
+ 
+ struct pin_cookie lock_pin_lock(struct lockdep_map *lock)
+ {
 -- 
-2.7.4
+2.1.4
 
-Western Digital Corporation (and its subsidiaries) E-mail Confidentiality Notice & Disclaimer:
-
-This e-mail and any files transmitted with it may contain confidential or legally privileged information of WDC and/or its affiliates, and are intended solely for the use of the individual or entity to which they are addressed. If you are not the intended recipient, any disclosure, copying, distribution or any action taken or omitted to be taken in reliance on it, is prohibited. If you have received this e-mail in error, please notify the sender immediately and delete the e-mail in its entirety from your system.
