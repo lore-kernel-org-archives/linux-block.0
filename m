@@ -1,167 +1,61 @@
 Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Christoph Hellwig <hch@lst.de>
-To: linux-xfs@vger.kernel.org
-Cc: axboe@fb.com, kent.overstreet@gmail.com,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        Peter Zijlstra <peterz@infradead.org>
-Subject: [PATCH 1/6] locking/lockdep: Provide a type check for lock_is_held
-Date: Tue, 25 Oct 2016 17:08:13 +0200
-Message-Id: <1477408098-10153-2-git-send-email-hch@lst.de>
-In-Reply-To: <1477408098-10153-1-git-send-email-hch@lst.de>
-References: <1477408098-10153-1-git-send-email-hch@lst.de>
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv4 37/43] ext4: make ext4_da_page_release_reservation() aware about huge pages
+Date: Tue, 25 Oct 2016 03:13:36 +0300
+Message-Id: <20161025001342.76126-38-kirill.shutemov@linux.intel.com>
+In-Reply-To: <20161025001342.76126-1-kirill.shutemov@linux.intel.com>
+References: <20161025001342.76126-1-kirill.shutemov@linux.intel.com>
 Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-From: Peter Zijlstra <peterz@infradead.org>
+For huge pages 'stop' must be within HPAGE_PMD_SIZE.
+Let's use hpage_size() in the BUG_ON().
 
-Christoph requested lockdep_assert_held() variants that distinguish
-between held-for-read or held-for-write.
+We also need to change how we calculate lblk for cluster deallocation.
 
-Provide:
-
-  int lock_is_held_type(struct lockdep_map *lock, int read)
-
-which takes the same argument as lock_acquire(.read) and matches it to
-the held_lock instance.
-
-Use of this function should be gated by the debug_locks variable. When
-that is 0 the return value of the lock_is_held_type() function is
-undefined. This is done to allow both negative and positive tests for
-holding locks.
-
-By default we provide (positive) lockdep_assert_held{,_exclusive,_read}()
-macros.
-
-Requested-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- include/linux/lockdep.h  | 25 +++++++++++++++++++++++--
- kernel/locking/lockdep.c | 20 ++++++++++++--------
- 2 files changed, 35 insertions(+), 10 deletions(-)
+ fs/ext4/inode.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/include/linux/lockdep.h b/include/linux/lockdep.h
-index c1458fe..a87f3c9 100644
---- a/include/linux/lockdep.h
-+++ b/include/linux/lockdep.h
-@@ -338,9 +338,18 @@ extern void lock_acquire(struct lockdep_map *lock, unsigned int subclass,
- extern void lock_release(struct lockdep_map *lock, int nested,
- 			 unsigned long ip);
+diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
+index 59cd2b113eb2..869df0504174 100644
+--- a/fs/ext4/inode.c
++++ b/fs/ext4/inode.c
+@@ -1565,7 +1565,7 @@ static void ext4_da_page_release_reservation(struct page *page,
+ 	int num_clusters;
+ 	ext4_fsblk_t lblk;
  
--#define lockdep_is_held(lock)	lock_is_held(&(lock)->dep_map)
-+/*
-+ * Same "read" as for lock_acquire(), except -1 means any.
-+ */
-+extern int lock_is_held_type(struct lockdep_map *lock, int read);
-+
-+static inline int lock_is_held(struct lockdep_map *lock)
-+{
-+	return lock_is_held_type(lock, -1);
-+}
+-	BUG_ON(stop > PAGE_SIZE || stop < length);
++	BUG_ON(stop > hpage_size(page) || stop < length);
  
--extern int lock_is_held(struct lockdep_map *lock);
-+#define lockdep_is_held(lock)		lock_is_held(&(lock)->dep_map)
-+#define lockdep_is_held_type(lock, r)	lock_is_held_type(&(lock)->dep_map, (r))
- 
- extern void lock_set_class(struct lockdep_map *lock, const char *name,
- 			   struct lock_class_key *key, unsigned int subclass,
-@@ -372,6 +381,14 @@ extern void lock_unpin_lock(struct lockdep_map *lock, struct pin_cookie);
- 		WARN_ON(debug_locks && !lockdep_is_held(l));	\
- 	} while (0)
- 
-+#define lockdep_assert_held_exclusive(l)	do {			\
-+		WARN_ON(debug_locks && !lockdep_is_held_type(l, 0));	\
-+	} while (0)
-+
-+#define lockdep_assert_held_read(l)	do {				\
-+		WARN_ON(debug_locks && !lockdep_is_held_type(l, 1));	\
-+	} while (0)
-+
- #define lockdep_assert_held_once(l)	do {				\
- 		WARN_ON_ONCE(debug_locks && !lockdep_is_held(l));	\
- 	} while (0)
-@@ -428,7 +445,11 @@ struct lock_class_key { };
- 
- #define lockdep_depth(tsk)	(0)
- 
-+#define lockdep_is_held_type(l, r)		do { (void)(l); } while (0)
-+
- #define lockdep_assert_held(l)			do { (void)(l); } while (0)
-+#define lockdep_assert_held_exclusive(l)	do { (void)(l); } while (0)
-+#define lockdep_assert_held_read(l)		do { (void)(l); } while (0)
- #define lockdep_assert_held_once(l)		do { (void)(l); } while (0)
- 
- #define lockdep_recursing(tsk)			(0)
-diff --git a/kernel/locking/lockdep.c b/kernel/locking/lockdep.c
-index 589d763..cff580a 100644
---- a/kernel/locking/lockdep.c
-+++ b/kernel/locking/lockdep.c
-@@ -3188,7 +3188,7 @@ print_lock_nested_lock_not_held(struct task_struct *curr,
- 	return 0;
- }
- 
--static int __lock_is_held(struct lockdep_map *lock);
-+static int __lock_is_held(struct lockdep_map *lock, int read);
- 
- /*
-  * This gets called for every mutex_lock*()/spin_lock*() operation.
-@@ -3329,7 +3329,7 @@ static int __lock_acquire(struct lockdep_map *lock, unsigned int subclass,
- 	}
- 	chain_key = iterate_chain_key(chain_key, class_idx);
- 
--	if (nest_lock && !__lock_is_held(nest_lock))
-+	if (nest_lock && !__lock_is_held(nest_lock, -1))
- 		return print_lock_nested_lock_not_held(curr, hlock, ip);
- 
- 	if (!validate_chain(curr, lock, hlock, chain_head, chain_key))
-@@ -3576,7 +3576,7 @@ __lock_release(struct lockdep_map *lock, int nested, unsigned long ip)
- 	return 1;
- }
- 
--static int __lock_is_held(struct lockdep_map *lock)
-+static int __lock_is_held(struct lockdep_map *lock, int read)
- {
- 	struct task_struct *curr = current;
- 	int i;
-@@ -3584,8 +3584,12 @@ static int __lock_is_held(struct lockdep_map *lock)
- 	for (i = 0; i < curr->lockdep_depth; i++) {
- 		struct held_lock *hlock = curr->held_locks + i;
- 
--		if (match_held_lock(hlock, lock))
--			return 1;
-+		if (match_held_lock(hlock, lock)) {
-+			if (read == -1 || hlock->read == read)
-+				return 1;
-+
-+			return 0;
-+		}
- 	}
- 
- 	return 0;
-@@ -3769,7 +3773,7 @@ void lock_release(struct lockdep_map *lock, int nested,
- }
- EXPORT_SYMBOL_GPL(lock_release);
- 
--int lock_is_held(struct lockdep_map *lock)
-+int lock_is_held_type(struct lockdep_map *lock, int read)
- {
- 	unsigned long flags;
- 	int ret = 0;
-@@ -3781,13 +3785,13 @@ int lock_is_held(struct lockdep_map *lock)
- 	check_flags(flags);
- 
- 	current->lockdep_recursion = 1;
--	ret = __lock_is_held(lock);
-+	ret = __lock_is_held(lock, read);
- 	current->lockdep_recursion = 0;
- 	raw_local_irq_restore(flags);
- 
- 	return ret;
- }
--EXPORT_SYMBOL_GPL(lock_is_held);
-+EXPORT_SYMBOL_GPL(lock_is_held_type);
- 
- struct pin_cookie lock_pin_lock(struct lockdep_map *lock)
- {
+ 	head = page_buffers(page);
+ 	bh = head;
+@@ -1600,7 +1600,8 @@ static void ext4_da_page_release_reservation(struct page *page,
+ 	 * need to release the reserved space for that cluster. */
+ 	num_clusters = EXT4_NUM_B2C(sbi, to_release);
+ 	while (num_clusters > 0) {
+-		lblk = (page->index << (PAGE_SHIFT - inode->i_blkbits)) +
++		lblk = ((page->index + offset / PAGE_SIZE) <<
++				(PAGE_SHIFT - inode->i_blkbits)) +
+ 			((num_clusters - 1) << sbi->s_cluster_bits);
+ 		if (sbi->s_cluster_ratio == 1 ||
+ 		    !ext4_find_delalloc_cluster(inode, lblk))
 -- 
-2.1.4
+2.9.3
 
