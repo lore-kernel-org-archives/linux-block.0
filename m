@@ -1,77 +1,69 @@
-Return-Path: <tomasz.majchrzak@intel.com>
-From: Tomasz Majchrzak <tomasz.majchrzak@intel.com>
-To: linux-raid@vger.kernel.org
-Cc: shli@kernel.org,
-	aleksey.obitotskiy@intel.com,
-	pawel.baldysiak@intel.com,
-	artur.paszkiewicz@intel.com,
-	maksymilian.kunt@intel.com,
-	mariusz.dabrowski@intel.com,
-	axboe@kernel.dk,
-	dan.j.williams@intel.com,
-	linux-block@vger.kernel.org,
-	Tomasz Majchrzak <tomasz.majchrzak@intel.com>
-Subject: [PATCH 3/3 v2] md: unblock array if bad blocks have been acknowledged
-Date: Tue, 18 Oct 2016 16:10:24 +0200
-Message-Id: <1476799824-6498-1-git-send-email-tomasz.majchrzak@intel.com>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv4 22/43] thp: do not threat slab pages as huge in hpage_{nr_pages,size,mask}
+Date: Tue, 25 Oct 2016 03:13:21 +0300
+Message-Id: <20161025001342.76126-23-kirill.shutemov@linux.intel.com>
+In-Reply-To: <20161025001342.76126-1-kirill.shutemov@linux.intel.com>
+References: <20161025001342.76126-1-kirill.shutemov@linux.intel.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Once external metadata handler acknowledges all bad blocks (by writing
-to rdev 'bad_blocks' sysfs file), it requests to unblock the array.
-Check if all bad blocks are actually acknowledged as there might be a
-race if new bad blocks are notified at the same time. If all bad blocks
-are acknowledged, just unblock the array and continue. If not, ignore
-the request to unblock (do not fail an array). External metadata handler
-is expected to either process remaining bad blocks and try to unblock
-again or remove bad block support for a disk (which will cause disk to
-fail as in no-support case).
+Slab pages can be compound, but we shouldn't threat them as THP for
+pupose of hpage_* helpers, otherwise it would lead to confusing results.
 
-Signed-off-by: Tomasz Majchrzak <tomasz.majchrzak@intel.com>
-Reviewed-by: Artur Paszkiewicz <artur.paszkiewicz@intel.com>
+For instance, ext4 uses slab pages for journal pages and we shouldn't
+confuse them with THPs. The easiest way is to exclude them in hpage_*
+helpers.
+
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- drivers/md/md.c | 24 +++++++++++++++++-------
- 1 file changed, 17 insertions(+), 7 deletions(-)
+ include/linux/huge_mm.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/md/md.c b/drivers/md/md.c
-index cc05236..ce585b7 100644
---- a/drivers/md/md.c
-+++ b/drivers/md/md.c
-@@ -2612,19 +2612,29 @@ state_store(struct md_rdev *rdev, const char *buf, size_t len)
- 		set_bit(Blocked, &rdev->flags);
- 		err = 0;
- 	} else if (cmd_match(buf, "-blocked")) {
--		if (!test_bit(Faulty, &rdev->flags) &&
-+		int unblock = 1;
-+		int acked = !rdev->badblocks.unacked_exist;
-+
-+		if ((test_bit(ExternalBbl, &rdev->flags) &&
-+		     rdev->badblocks.changed))
-+			acked = check_if_badblocks_acked(&rdev->badblocks);
-+
-+		if (test_bit(ExternalBbl, &rdev->flags) && !acked) {
-+			unblock = 0;
-+		} else if (!test_bit(Faulty, &rdev->flags) &&
- 		    rdev->badblocks.unacked_exist) {
- 			/* metadata handler doesn't understand badblocks,
- 			 * so we need to fail the device
- 			 */
- 			md_error(rdev->mddev, rdev);
- 		}
--		clear_bit(Blocked, &rdev->flags);
--		clear_bit(BlockedBadBlocks, &rdev->flags);
--		wake_up(&rdev->blocked_wait);
--		set_bit(MD_RECOVERY_NEEDED, &rdev->mddev->recovery);
--		md_wakeup_thread(rdev->mddev->thread);
--
-+		if (unblock) {
-+			clear_bit(Blocked, &rdev->flags);
-+			clear_bit(BlockedBadBlocks, &rdev->flags);
-+			wake_up(&rdev->blocked_wait);
-+			set_bit(MD_RECOVERY_NEEDED, &rdev->mddev->recovery);
-+			md_wakeup_thread(rdev->mddev->thread);
-+		}
- 		err = 0;
- 	} else if (cmd_match(buf, "insync") && rdev->raid_disk == -1) {
- 		set_bit(In_sync, &rdev->flags);
+diff --git a/include/linux/huge_mm.h b/include/linux/huge_mm.h
+index 42934769f256..1300f8bb7523 100644
+--- a/include/linux/huge_mm.h
++++ b/include/linux/huge_mm.h
+@@ -137,21 +137,21 @@ static inline spinlock_t *pmd_trans_huge_lock(pmd_t *pmd,
+ }
+ static inline int hpage_nr_pages(struct page *page)
+ {
+-	if (unlikely(PageTransHuge(page)))
++	if (unlikely(!PageSlab(page) && PageTransHuge(page)))
+ 		return HPAGE_PMD_NR;
+ 	return 1;
+ }
+ 
+ static inline int hpage_size(struct page *page)
+ {
+-	if (unlikely(PageTransHuge(page)))
++	if (unlikely(!PageSlab(page) && PageTransHuge(page)))
+ 		return HPAGE_PMD_SIZE;
+ 	return PAGE_SIZE;
+ }
+ 
+ static inline unsigned long hpage_mask(struct page *page)
+ {
+-	if (unlikely(PageTransHuge(page)))
++	if (unlikely(!PageSlab(page) && PageTransHuge(page)))
+ 		return HPAGE_PMD_MASK;
+ 	return PAGE_MASK;
+ }
 -- 
-1.8.3.1
+2.9.3
+
