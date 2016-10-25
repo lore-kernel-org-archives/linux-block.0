@@ -1,44 +1,160 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lf0-f46.google.com ([209.85.215.46]:35849 "EHLO
-        mail-lf0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S934646AbcJ0SBv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Oct 2016 14:01:51 -0400
-Received: by mail-lf0-f46.google.com with SMTP id b75so38484839lfg.3
-        for <linux-block@vger.kernel.org>; Thu, 27 Oct 2016 11:01:50 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH 0/7] LightNVM patchset V2
-Date: Thu, 27 Oct 2016 20:01:32 +0200
-Message-Id: <1477591299-26504-1-git-send-email-javier@cnexlabs.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Received: from mga02.intel.com ([134.134.136.20]:16876 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S965615AbcJYAPP (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 24 Oct 2016 20:15:15 -0400
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv4 07/43] Revert "radix-tree: implement radix_tree_maybe_preload_order()"
+Date: Tue, 25 Oct 2016 03:13:06 +0300
+Message-Id: <20161025001342.76126-8-kirill.shutemov@linux.intel.com>
+In-Reply-To: <20161025001342.76126-1-kirill.shutemov@linux.intel.com>
+References: <20161025001342.76126-1-kirill.shutemov@linux.intel.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-V2: Rebase patches on Matias' for-next
+This reverts commit 356e1c23292a4f63cfdf1daf0e0ddada51f32de8.
 
-Javier González (7):
-  lightnvm: enable to send hint to erase command
-  lightnvm: do not decide on device blocks
-  lightnvm: manage block list on LUN owner
-  lightnvm: drop reserve and release LUN callbacks
-  lightnvm: export set bad block table
-  lightnvm: add ECC error codes
-  lightnvm: rrpc: split bios of size > 256kb
+After conversion of huge tmpfs to multi-order entries, we don't need
+this anymore.
 
- drivers/lightnvm/core.c      |  41 ++++++++--
- drivers/lightnvm/gennvm.c    | 180 +++++++++++++++++++++++++------------------
- drivers/lightnvm/gennvm.h    |  19 ++---
- drivers/lightnvm/rrpc.c      | 128 ++++++++++++++++++++++++------
- drivers/lightnvm/rrpc.h      |   4 +
- drivers/lightnvm/sysblk.c    |  33 ++------
- drivers/nvme/host/lightnvm.c |   1 +
- include/linux/lightnvm.h     |  52 +++++++++----
- 8 files changed, 305 insertions(+), 153 deletions(-)
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+---
+ include/linux/radix-tree.h |  1 -
+ lib/radix-tree.c           | 74 ----------------------------------------------
+ 2 files changed, 75 deletions(-)
 
+diff --git a/include/linux/radix-tree.h b/include/linux/radix-tree.h
+index 76fec3f52203..f84780aefd06 100644
+--- a/include/linux/radix-tree.h
++++ b/include/linux/radix-tree.h
+@@ -292,7 +292,6 @@ unsigned int radix_tree_gang_lookup_slot(struct radix_tree_root *root,
+ 			unsigned long first_index, unsigned int max_items);
+ int radix_tree_preload(gfp_t gfp_mask);
+ int radix_tree_maybe_preload(gfp_t gfp_mask);
+-int radix_tree_maybe_preload_order(gfp_t gfp_mask, int order);
+ void radix_tree_init(void);
+ void *radix_tree_tag_set(struct radix_tree_root *root,
+ 			unsigned long index, unsigned int tag);
+diff --git a/lib/radix-tree.c b/lib/radix-tree.c
+index 6c4ac58ab687..cb1de07ae5a1 100644
+--- a/lib/radix-tree.c
++++ b/lib/radix-tree.c
+@@ -38,9 +38,6 @@
+ #include <linux/preempt.h>		/* in_interrupt() */
+ 
+ 
+-/* Number of nodes in fully populated tree of given height */
+-static unsigned long height_to_maxnodes[RADIX_TREE_MAX_PATH + 1] __read_mostly;
+-
+ /*
+  * Radix tree node cache.
+  */
+@@ -433,51 +430,6 @@ int radix_tree_split_preload(unsigned int old_order, unsigned int new_order,
+ #endif
+ 
+ /*
+- * The same as function above, but preload number of nodes required to insert
+- * (1 << order) continuous naturally-aligned elements.
+- */
+-int radix_tree_maybe_preload_order(gfp_t gfp_mask, int order)
+-{
+-	unsigned long nr_subtrees;
+-	int nr_nodes, subtree_height;
+-
+-	/* Preloading doesn't help anything with this gfp mask, skip it */
+-	if (!gfpflags_allow_blocking(gfp_mask)) {
+-		preempt_disable();
+-		return 0;
+-	}
+-
+-	/*
+-	 * Calculate number and height of fully populated subtrees it takes to
+-	 * store (1 << order) elements.
+-	 */
+-	nr_subtrees = 1 << order;
+-	for (subtree_height = 0; nr_subtrees > RADIX_TREE_MAP_SIZE;
+-			subtree_height++)
+-		nr_subtrees >>= RADIX_TREE_MAP_SHIFT;
+-
+-	/*
+-	 * The worst case is zero height tree with a single item at index 0 and
+-	 * then inserting items starting at ULONG_MAX - (1 << order).
+-	 *
+-	 * This requires RADIX_TREE_MAX_PATH nodes to build branch from root to
+-	 * 0-index item.
+-	 */
+-	nr_nodes = RADIX_TREE_MAX_PATH;
+-
+-	/* Plus branch to fully populated subtrees. */
+-	nr_nodes += RADIX_TREE_MAX_PATH - subtree_height;
+-
+-	/* Root node is shared. */
+-	nr_nodes--;
+-
+-	/* Plus nodes required to build subtrees. */
+-	nr_nodes += nr_subtrees * height_to_maxnodes[subtree_height];
+-
+-	return __radix_tree_preload(gfp_mask, nr_nodes);
+-}
+-
+-/*
+  * The maximum index which can be stored in a radix tree
+  */
+ static inline unsigned long shift_maxindex(unsigned int shift)
+@@ -1845,31 +1797,6 @@ radix_tree_node_ctor(void *arg)
+ 	INIT_LIST_HEAD(&node->private_list);
+ }
+ 
+-static __init unsigned long __maxindex(unsigned int height)
+-{
+-	unsigned int width = height * RADIX_TREE_MAP_SHIFT;
+-	int shift = RADIX_TREE_INDEX_BITS - width;
+-
+-	if (shift < 0)
+-		return ~0UL;
+-	if (shift >= BITS_PER_LONG)
+-		return 0UL;
+-	return ~0UL >> shift;
+-}
+-
+-static __init void radix_tree_init_maxnodes(void)
+-{
+-	unsigned long height_to_maxindex[RADIX_TREE_MAX_PATH + 1];
+-	unsigned int i, j;
+-
+-	for (i = 0; i < ARRAY_SIZE(height_to_maxindex); i++)
+-		height_to_maxindex[i] = __maxindex(i);
+-	for (i = 0; i < ARRAY_SIZE(height_to_maxnodes); i++) {
+-		for (j = i; j > 0; j--)
+-			height_to_maxnodes[i] += height_to_maxindex[j - 1] + 1;
+-	}
+-}
+-
+ static int radix_tree_callback(struct notifier_block *nfb,
+ 				unsigned long action, void *hcpu)
+ {
+@@ -1896,6 +1823,5 @@ void __init radix_tree_init(void)
+ 			sizeof(struct radix_tree_node), 0,
+ 			SLAB_PANIC | SLAB_RECLAIM_ACCOUNT,
+ 			radix_tree_node_ctor);
+-	radix_tree_init_maxnodes();
+ 	hotcpu_notifier(radix_tree_callback, 0);
+ }
 -- 
-2.7.4
+2.9.3
 
