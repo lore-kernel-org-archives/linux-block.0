@@ -1,228 +1,117 @@
-Return-Path: <Adam.Manzanares@wdc.com>
-From: Adam Manzanares <adam.manzanares@hgst.com>
-To: <axboe@kernel.dk>, <tj@kernel.org>, <dan.j.williams@intel.com>,
-	<hare@suse.de>, <martin.petersen@oracle.com>, <mchristi@redhat.com>,
-	<toshi.kani@hpe.com>, <ming.lei@canonical.com>,
-	<sathya.prakash@broadcom.com>, <chaitra.basappa@broadcom.com>,
-	<suganath-prabu.subramani@broadcom.com>
-CC: <linux-block@vger.kernel.org>, <linux-ide@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <MPT-FusionLinux.pdl@broadcom.com>,
-	<linux-scsi@vger.kernel.org>, Adam Manzanares <adam.manzanares@hgst.com>
-Subject: [PATCH v6 2/3] ata: Enabling ATA Command Priorities
-Date: Mon, 17 Oct 2016 11:27:29 -0700
-Message-ID: <1476728850-2309-3-git-send-email-adam.manzanares@hgst.com>
-In-Reply-To: <1476728850-2309-1-git-send-email-adam.manzanares@hgst.com>
-References: <1476728850-2309-1-git-send-email-adam.manzanares@hgst.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: adam.manzanares@hgst.com
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv4 20/43] mm: make write_cache_pages() work on huge pages
+Date: Tue, 25 Oct 2016 03:13:19 +0300
+Message-Id: <20161025001342.76126-21-kirill.shutemov@linux.intel.com>
+In-Reply-To: <20161025001342.76126-1-kirill.shutemov@linux.intel.com>
+References: <20161025001342.76126-1-kirill.shutemov@linux.intel.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-This patch checks to see if an ATA device supports NCQ command priorities.
-If so and the user has specified an iocontext that indicates
-IO_PRIO_CLASS_RT then we build a tf with a high priority command.
+We writeback whole huge page a time. Let's adjust iteration this way.
 
-This is done to improve the tail latency of commands that are high
-priority by passing priority to the device.
-
-Signed-off-by: Adam Manzanares <adam.manzanares@hgst.com>
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- drivers/ata/libata-core.c | 35 ++++++++++++++++++++++++++++++++++-
- drivers/ata/libata-scsi.c |  6 +++++-
- drivers/ata/libata.h      |  2 +-
- include/linux/ata.h       |  6 ++++++
- include/linux/libata.h    | 18 ++++++++++++++++++
- 5 files changed, 64 insertions(+), 3 deletions(-)
+ include/linux/mm.h      |  1 +
+ include/linux/pagemap.h |  1 +
+ mm/page-writeback.c     | 17 ++++++++++++-----
+ 3 files changed, 14 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/ata/libata-core.c b/drivers/ata/libata-core.c
-index 223a770..181b530 100644
---- a/drivers/ata/libata-core.c
-+++ b/drivers/ata/libata-core.c
-@@ -739,6 +739,7 @@ u64 ata_tf_read_block(const struct ata_taskfile *tf, struct ata_device *dev)
-  *	@n_block: Number of blocks
-  *	@tf_flags: RW/FUA etc...
-  *	@tag: tag
-+ *	@class: IO priority class
-  *
-  *	LOCKING:
-  *	None.
-@@ -753,7 +754,7 @@ u64 ata_tf_read_block(const struct ata_taskfile *tf, struct ata_device *dev)
+diff --git a/include/linux/mm.h b/include/linux/mm.h
+index 3a191853faaa..315df8051d06 100644
+--- a/include/linux/mm.h
++++ b/include/linux/mm.h
+@@ -1056,6 +1056,7 @@ extern pgoff_t __page_file_index(struct page *page);
   */
- int ata_build_rw_tf(struct ata_taskfile *tf, struct ata_device *dev,
- 		    u64 block, u32 n_block, unsigned int tf_flags,
--		    unsigned int tag)
-+		    unsigned int tag, int class)
+ static inline pgoff_t page_index(struct page *page)
  {
- 	tf->flags |= ATA_TFLAG_ISADDR | ATA_TFLAG_DEVICE;
- 	tf->flags |= tf_flags;
-@@ -785,6 +786,12 @@ int ata_build_rw_tf(struct ata_taskfile *tf, struct ata_device *dev,
- 		tf->device = ATA_LBA;
- 		if (tf->flags & ATA_TFLAG_FUA)
- 			tf->device |= 1 << 7;
-+
-+		if (ata_ncq_prio_enabled(dev)) {
-+			if (class == IOPRIO_CLASS_RT)
-+				tf->hob_nsect |= ATA_PRIO_HIGH <<
-+						 ATA_SHIFT_PRIO;
-+		}
- 	} else if (dev->flags & ATA_DFLAG_LBA) {
- 		tf->flags |= ATA_TFLAG_LBA;
- 
-@@ -2156,6 +2163,30 @@ static void ata_dev_config_ncq_non_data(struct ata_device *dev)
- 	}
++	page = compound_head(page);
+ 	if (unlikely(PageSwapCache(page)))
+ 		return __page_file_index(page);
+ 	return page->index;
+diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
+index 712343108d31..f9aa8bede15e 100644
+--- a/include/linux/pagemap.h
++++ b/include/linux/pagemap.h
+@@ -528,6 +528,7 @@ static inline void wait_on_page_locked(struct page *page)
+  */
+ static inline void wait_on_page_writeback(struct page *page)
+ {
++	page = compound_head(page);
+ 	if (PageWriteback(page))
+ 		wait_on_page_bit(page, PG_writeback);
  }
+diff --git a/mm/page-writeback.c b/mm/page-writeback.c
+index 439cc63ad903..c76fc90b7039 100644
+--- a/mm/page-writeback.c
++++ b/mm/page-writeback.c
+@@ -2200,7 +2200,7 @@ int write_cache_pages(struct address_space *mapping,
+ 			 * mapping. However, page->index will not change
+ 			 * because we have a reference on the page.
+ 			 */
+-			if (page->index > end) {
++			if (page_to_pgoff(page) > end) {
+ 				/*
+ 				 * can't be range_cyclic (1st pass) because
+ 				 * end == -1 in that case.
+@@ -2209,7 +2209,12 @@ int write_cache_pages(struct address_space *mapping,
+ 				break;
+ 			}
  
-+static void ata_dev_config_ncq_prio(struct ata_device *dev)
-+{
-+	struct ata_port *ap = dev->link->ap;
-+	unsigned int err_mask;
-+
-+	err_mask = ata_read_log_page(dev,
-+				     ATA_LOG_SATA_ID_DEV_DATA,
-+				     ATA_LOG_SATA_SETTINGS,
-+				     ap->sector_buf,
-+				     1);
-+	if (err_mask) {
-+		ata_dev_dbg(dev,
-+			    "failed to get Identify Device data, Emask 0x%x\n",
-+			    err_mask);
-+		return;
-+	}
-+
-+	if (ap->sector_buf[ATA_LOG_NCQ_PRIO_OFFSET] & BIT(3))
-+		dev->flags |= ATA_DFLAG_NCQ_PRIO;
-+	else
-+		ata_dev_dbg(dev, "SATA page does not support priority\n");
-+
-+}
-+
- static int ata_dev_config_ncq(struct ata_device *dev,
- 			       char *desc, size_t desc_sz)
- {
-@@ -2205,6 +2236,8 @@ static int ata_dev_config_ncq(struct ata_device *dev,
- 			ata_dev_config_ncq_send_recv(dev);
- 		if (ata_id_has_ncq_non_data(dev->id))
- 			ata_dev_config_ncq_non_data(dev);
-+		if (ata_id_has_ncq_prio(dev->id))
-+			ata_dev_config_ncq_prio(dev);
- 	}
+-			done_index = page->index;
++			done_index = page_to_pgoff(page);
++			if (PageTransCompound(page)) {
++				index = round_up(index + 1, HPAGE_PMD_NR);
++				i += HPAGE_PMD_NR -
++					done_index % HPAGE_PMD_NR - 1;
++			}
  
- 	return 0;
-diff --git a/drivers/ata/libata-scsi.c b/drivers/ata/libata-scsi.c
-index 9cceb4a..2bccc3c 100644
---- a/drivers/ata/libata-scsi.c
-+++ b/drivers/ata/libata-scsi.c
-@@ -50,6 +50,7 @@
- #include <linux/uaccess.h>
- #include <linux/suspend.h>
- #include <asm/unaligned.h>
-+#include <linux/ioprio.h>
+ 			lock_page(page);
  
- #include "libata.h"
- #include "libata-transport.h"
-@@ -1755,6 +1756,8 @@ static unsigned int ata_scsi_rw_xlat(struct ata_queued_cmd *qc)
- {
- 	struct scsi_cmnd *scmd = qc->scsicmd;
- 	const u8 *cdb = scmd->cmnd;
-+	struct request *rq = scmd->request;
-+	int class = IOPRIO_PRIO_CLASS(req_get_ioprio(rq));
- 	unsigned int tf_flags = 0;
- 	u64 block;
- 	u32 n_block;
-@@ -1821,7 +1824,8 @@ static unsigned int ata_scsi_rw_xlat(struct ata_queued_cmd *qc)
- 	qc->nbytes = n_block * scmd->device->sector_size;
- 
- 	rc = ata_build_rw_tf(&qc->tf, qc->dev, block, n_block, tf_flags,
--			     qc->tag);
-+			     qc->tag, class);
-+
- 	if (likely(rc == 0))
- 		return 0;
- 
-diff --git a/drivers/ata/libata.h b/drivers/ata/libata.h
-index 3b301a4..8f3a559 100644
---- a/drivers/ata/libata.h
-+++ b/drivers/ata/libata.h
-@@ -66,7 +66,7 @@ extern u64 ata_tf_to_lba48(const struct ata_taskfile *tf);
- extern struct ata_queued_cmd *ata_qc_new_init(struct ata_device *dev, int tag);
- extern int ata_build_rw_tf(struct ata_taskfile *tf, struct ata_device *dev,
- 			   u64 block, u32 n_block, unsigned int tf_flags,
--			   unsigned int tag);
-+			   unsigned int tag, int class);
- extern u64 ata_tf_read_block(const struct ata_taskfile *tf,
- 			     struct ata_device *dev);
- extern unsigned ata_exec_internal(struct ata_device *dev,
-diff --git a/include/linux/ata.h b/include/linux/ata.h
-index fdb1803..af6859b 100644
---- a/include/linux/ata.h
-+++ b/include/linux/ata.h
-@@ -348,6 +348,7 @@ enum {
- 	ATA_LOG_DEVSLP_DETO	  = 0x01,
- 	ATA_LOG_DEVSLP_VALID	  = 0x07,
- 	ATA_LOG_DEVSLP_VALID_MASK = 0x80,
-+	ATA_LOG_NCQ_PRIO_OFFSET   = 0x09,
- 
- 	/* NCQ send and receive log */
- 	ATA_LOG_NCQ_SEND_RECV_SUBCMDS_OFFSET	= 0x00,
-@@ -940,6 +941,11 @@ static inline bool ata_id_has_ncq_non_data(const u16 *id)
- 	return id[ATA_ID_SATA_CAPABILITY_2] & BIT(5);
- }
- 
-+static inline bool ata_id_has_ncq_prio(const u16 *id)
-+{
-+	return id[ATA_ID_SATA_CAPABILITY] & BIT(12);
-+}
-+
- static inline bool ata_id_has_trim(const u16 *id)
- {
- 	if (ata_id_major_version(id) >= 7 &&
-diff --git a/include/linux/libata.h b/include/linux/libata.h
-index 616eef4..1a524cf 100644
---- a/include/linux/libata.h
-+++ b/include/linux/libata.h
-@@ -166,6 +166,7 @@ enum {
- 	ATA_DFLAG_NO_UNLOAD	= (1 << 17), /* device doesn't support unload */
- 	ATA_DFLAG_UNLOCK_HPA	= (1 << 18), /* unlock HPA */
- 	ATA_DFLAG_NCQ_SEND_RECV = (1 << 19), /* device supports NCQ SEND and RECV */
-+	ATA_DFLAG_NCQ_PRIO	= (1 << 20), /* device supports NCQ priority */
- 	ATA_DFLAG_INIT_MASK	= (1 << 24) - 1,
- 
- 	ATA_DFLAG_DETACH	= (1 << 24),
-@@ -342,7 +343,9 @@ enum {
- 	ATA_SHIFT_PIO		= 0,
- 	ATA_SHIFT_MWDMA		= ATA_SHIFT_PIO + ATA_NR_PIO_MODES,
- 	ATA_SHIFT_UDMA		= ATA_SHIFT_MWDMA + ATA_NR_MWDMA_MODES,
-+	ATA_SHIFT_PRIO		= 6,
- 
-+	ATA_PRIO_HIGH		= 2,
- 	/* size of buffer to pad xfers ending on unaligned boundaries */
- 	ATA_DMA_PAD_SZ		= 4,
- 
-@@ -1610,6 +1613,21 @@ static inline int ata_ncq_enabled(struct ata_device *dev)
- 			      ATA_DFLAG_NCQ)) == ATA_DFLAG_NCQ;
- }
- 
-+/**
-+ *	ata_ncq_prio_enabled - Test whether NCQ prio is enabled
-+ *	@dev: ATA device to test for
-+ *
-+ *	LOCKING:
-+ *	spin_lock_irqsave(host lock)
-+ *
-+ *	RETURNS:
-+ *	1 if NCQ prio is enabled for @dev, 0 otherwise.
-+ */
-+static inline int ata_ncq_prio_enabled(struct ata_device *dev)
-+{
-+	return (dev->flags & ATA_DFLAG_NCQ_PRIO) == ATA_DFLAG_NCQ_PRIO;
-+}
-+
- static inline bool ata_fpdma_dsm_supported(struct ata_device *dev)
- {
- 	return (dev->flags & ATA_DFLAG_NCQ_SEND_RECV) &&
+@@ -2221,7 +2226,7 @@ int write_cache_pages(struct address_space *mapping,
+ 			 * even if there is now a new, dirty page at the same
+ 			 * pagecache address.
+ 			 */
+-			if (unlikely(page->mapping != mapping)) {
++			if (unlikely(page_mapping(page) != mapping)) {
+ continue_unlock:
+ 				unlock_page(page);
+ 				continue;
+@@ -2259,7 +2264,8 @@ int write_cache_pages(struct address_space *mapping,
+ 					 * not be suitable for data integrity
+ 					 * writeout).
+ 					 */
+-					done_index = page->index + 1;
++					done_index = compound_head(page)->index
++						+ hpage_nr_pages(page);
+ 					done = 1;
+ 					break;
+ 				}
+@@ -2271,7 +2277,8 @@ int write_cache_pages(struct address_space *mapping,
+ 			 * keep going until we have written all the pages
+ 			 * we tagged for writeback prior to entering this loop.
+ 			 */
+-			if (--wbc->nr_to_write <= 0 &&
++			wbc->nr_to_write -= hpage_nr_pages(page);
++			if (wbc->nr_to_write <= 0 &&
+ 			    wbc->sync_mode == WB_SYNC_NONE) {
+ 				done = 1;
+ 				break;
 -- 
-2.1.4
+2.9.3
 
-Western Digital Corporation (and its subsidiaries) E-mail Confidentiality Notice & Disclaimer:
-
-This e-mail and any files transmitted with it may contain confidential or legally privileged information of WDC and/or its affiliates, and are intended solely for the use of the individual or entity to which they are addressed. If you are not the intended recipient, any disclosure, copying, distribution or any action taken or omitted to be taken in reliance on it, is prohibited. If you have received this e-mail in error, please notify the sender immediately and delete the e-mail in its entirety from your system.
