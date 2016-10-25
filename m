@@ -1,80 +1,77 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-Date: Tue, 25 Oct 2016 11:51:53 -0800
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pf0-f193.google.com ([209.85.192.193]:36083 "EHLO
+        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932547AbcJYRNd (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 25 Oct 2016 13:13:33 -0400
+Date: Tue, 25 Oct 2016 09:13:29 -0800
 From: Kent Overstreet <kent.overstreet@gmail.com>
 To: Christoph Hellwig <hch@lst.de>
 Cc: linux-xfs@vger.kernel.org, axboe@fb.com,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
 Subject: Re: [PATCH 5/6] iomap: implement direct I/O
-Message-ID: <20161025195153.ehrxmjqaqqkdc23f@kmo-pixel>
+Message-ID: <20161025171329.2txmbsgdnvn5vinn@kmo-pixel>
 References: <1477408098-10153-1-git-send-email-hch@lst.de>
  <1477408098-10153-6-git-send-email-hch@lst.de>
+ <20161025153156.cjhcvvoxd3c6pqf7@kmo-pixel>
+ <20161025163443.GA8730@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1477408098-10153-6-git-send-email-hch@lst.de>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <20161025163443.GA8730@lst.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Tue, Oct 25, 2016 at 05:08:17PM +0200, Christoph Hellwig wrote:
-> This adds a full fledget direct I/O implementation using the iomap
-> interface. Full fledged in this case means all features are supported:
-> AIO, vectored I/O, any iov_iter type including kernel pointers, bvecs
-> and pipes, support for hole filling and async apending writes.  It does
-> not mean supporting all the warts of the old generic code.  We expect
-> i_rwsem to be held over the duration of the call, and we expect to
-> maintain i_dio_count ourselves, and we pass on any kinds of mapping
-> to the file system for now.
+On Tue, Oct 25, 2016 at 06:34:43PM +0200, Christoph Hellwig wrote:
+> On Tue, Oct 25, 2016 at 07:31:56AM -0800, Kent Overstreet wrote:
+> Yes, this is the basic idea behind the whole iomap code - we have
+> a generic apply function that calls into the fs allocator, and then
+> takes a callback that it applies to one extent at a time.  It really
+> helps a lot to separate responsibilities and factor the code into
+> independent functions.
 > 
-> The algorithm used is very simple: We use iomap_apply to iterate over
-> the range of the I/O, and then we use the new bio_iov_iter_get_pages
-> helper to lock down the user range for the size of the extent.
-> bio_iov_iter_get_pages can currently lock down twice as many pages as
-> the old direct I/O code did, which means that we will have a better
-> batch factor for everything but overwrites of badly fragmented files.
+> I looked at carrying over bios between different invocations of the
+> callback, but it quickly turned into a mess.
 
-So - you're hitting inode locks on each call to iomap_begin()/iomap_end()?  :/
+Really? Ages ago that was the approach I was taking with my dio rewrite and it
+worked out fine - it was using get_block but I'd think the code would look
+almost exactly the same with iomap.
 
-But - (I'm not too familiar with the XFS code) - it looks like you're also doing
-a full extents btree traversal on each iomap_begin() call too, behind
-xfs_bmapi_read()?
+Anyways I'm not at all advocating you redo your code - if it works, please ship
+this so direct-IO.c can die in a fire! - but I would encourage you to take a
+look at my code, I think there's some good ideas in there.  I think my (ancient,
+and I never got it 100% debugged) dio rewrite is easiest to follow - maybe
+you've already seen it if you found my bio_get_user_pages() code, but if you
+haven't:
+https://evilpiepirate.org/git/linux-bcache.git/tree/fs/direct-io.c?h=dio
 
-I guess that's probably how it worked before though, so ah well - if it was a
-performance issue worth caring about you'd know, and like you said it only
-matters for fragmented files - or, wouldn't alternating written/unwritten
-extents trigger this? That does happen.
+getting on a bit of a tangent now: the actor approach you're taking with
+iomap_apply() really reminds me of going through internal vs. external iterators
+in bcache. We started out with internal iterators - which is what's still in the
+upstream code, bch_btree_map_keys() is roughly equivalent to iomap_apply() where
+you pass it a callback and it does the iteration.
 
-Anyways... more relevant comments...
+But later we ended up switching to external iterators - we've now got a struct
+btree_iter, with functions for init/peek/advance/set_pos, and inserting at an
+iterator's current position. It was actually another guy who convinced me to
+consider switching to external iterators (Slava Pestov), and it was quite a pain
+in the ass (walking a btree directly is a whole lot easier than implementing a
+state machine to do it, partly) - but it was _hugely_ worth it in the long run
+because it they're a whole lot more flexible to use and they made a lot of
+things possible that honestly I wouldn't have thought of before I had them.
 
-Are you returning the right thing on partial reads/writes? the existing dio code
-squashes -EFAULT (but not on other errors, even when some IO was successfully
-done, e.g. -ENOMEM from gup(), which doesn't seem right to me...)
+Don't know that it's actually relevant here - I haven't dug into your iomap code
+yet, just lately I've been noticing more places in the kernel where people have
+implemented stuff with internal iterators (e.g. the crypto code) or no real
+iterator at all for things where I'm pretty sure an external iterator could make
+things a whole lot simpler.
 
-One thing you're not doing that the existing dio code does is limit the number
-of outstanding pinned pages. I don't think it needs to be, but it does mean
-you'll return an error from gup() if someone issues a huge IO, too big to pin
-all the pages at once (i'm not sure why they would do that... copying a mmap'd
-file? actually, running under severe memory pressure probably makes this a real
-issue) where it would've worked with the existing dio code - and userspace could
-just continue after the short read/write except a) we all know how much
-userspace code won't, and b) that means you've dropped and retaken locks, and
-it's no longer atomic, so it is a change in semantics.
+> git://git.infradead.org/users/hch/vfs.git iomap-dio
 
-So I think it would be a good idea to handle any memory allocation failures by
-waiting for outstanding IOs to complete and then continuing, and only bailing
-out if there aren't any IOs outstanding (and that still gets rid of the stupid
-hard limit on the number of pinned pages in the existing dio code).
+Cool, reading.
 
-Your dio refcounting - you have the submitting thread unconditionally holding
-its own ref, and dropping it in iomap_dio_rw() after submitting all the IOs:
-this is definitely the right way to do it for the sake of sanity, but it's going
-to be a performance hit - this is something I've been bit by recently. The issue
-is that you've already gone down the rest of the IO stack in either submit_bio()
-or blk_finish_plug(), so the ref is no longer cache hot and that one atomic is
-_significantly_ more expensive than the rest.
-
-The way you've got the code setup it looks like it wouldn't be that painful to
-get rid of that final atomic_dec_and_test() when it's not needed (async kiocbs),
-but I also wouldn't see anything wrong with keeping things simple until after
-the code is in and leaving that optimization for later.
-
-On the whole though it looks pretty clean to me, I can't find anything that
-looks wrong.
+Also - what are you doing about the race between shooting down the range in the
+pagecache and dirty pages being readded? The existing direct IO code falls back
+to buffered IO for that, but your code doesn't appear to - I seem to recall that
+XFS has its own locking for this, are you just relying on that for now?  It'd be
+really nice to get some generic locking for this, anything that relies on
+pagecache invalidation is sketchy as hell in other filesystems.
