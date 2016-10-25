@@ -1,204 +1,333 @@
-Return-Path: <neilb@suse.de>
-From: NeilBrown <neilb@suse.com>
-To: stable@vger.kernel.org
-Date: Fri, 07 Oct 2016 15:13:26 +1100
-Cc: Francesco Dolcini <francesco@dolcini.it>, LKML <linux-kernel@vger.kernel.org>, linux-block@vger.kernel.org
-Cc: axboe@kernel.dk, tj@kernel.org
-Subject: [PATCH - stable 4.1 backport] block: don't release bdi while request_queue has live references
-Message-ID: <87zimg3ift.fsf@notabene.neil.brown.name>
-MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha256; protocol="application/pgp-signature"
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org,
+        Matthew Wilcox <willy@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv4 03/43] radix-tree: Add radix_tree_join
+Date: Tue, 25 Oct 2016 03:13:02 +0300
+Message-Id: <20161025001342.76126-4-kirill.shutemov@linux.intel.com>
+In-Reply-To: <20161025001342.76126-1-kirill.shutemov@linux.intel.com>
+References: <20161025001342.76126-1-kirill.shutemov@linux.intel.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
---=-=-=
-Content-Type: text/plain
+From: Matthew Wilcox <willy@linux.intel.com>
 
+This new function allows for the replacement of many smaller entries in
+the radix tree with one larger multiorder entry.  From the point of view
+of an RCU walker, they may see a mixture of the smaller entries and the
+large entry during the same walk, but they will never see NULL for an
+index which was populated before the join.
 
-Hi,
- This patch was marked for stable v4.2+, but is needed for v4.1 as well.
- It fixes a regression introduced by:
-  Fixes: 6cd18e711dd8 ("block: destroy bdi before blockdev is unregistered.")
-
- This is a backport to 4.1.33 which has been tested and confirmed to
- work.
- Bug report at
-  https://bugzilla.kernel.org/show_bug.cgi?id=173031
-
- Please queue for 4.1.y
-
-Thanks,
-NeilBrown
-
-
-
-From: Tejun Heo <tj@kernel.org>
-Date: Tue, 8 Sep 2015 12:20:22 -0400
-Subject: [PATCH] block: don't release bdi while request_queue has live
- references
-
-[ Upstream commit: b02176f30cd30acccd3b633ab7d9aed8b5da52ff ]
-
-bdi's are initialized in two steps, bdi_init() and bdi_register(), but
-destroyed in a single step by bdi_destroy() which, for a bdi embedded
-in a request_queue, is called during blk_cleanup_queue() which makes
-the queue invisible and starts the draining of remaining usages.
-
-A request_queue's user can access the congestion state of the embedded
-bdi as long as it holds a reference to the queue.  As such, it may
-access the congested state of a queue which finished
-blk_cleanup_queue() but hasn't reached blk_release_queue() yet.
-Because the congested state was embedded in backing_dev_info which in
-turn is embedded in request_queue, accessing the congested state after
-bdi_destroy() was called was fine.  The bdi was destroyed but the
-memory region for the congested state remained accessible till the
-queue got released.
-
-a13f35e87140 ("writeback: don't embed root bdi_writeback_congested in
-bdi_writeback") changed the situation.  Now, the root congested state
-which is expected to be pinned while request_queue remains accessible
-is separately reference counted and the base ref is put during
-bdi_destroy().  This means that the root congested state may go away
-prematurely while the queue is between bdi_dstroy() and
-blk_cleanup_queue(), which was detected by Andrey's KASAN tests.
-
-The root cause of this problem is that bdi doesn't distinguish the two
-steps of destruction, unregistration and release, and now the root
-congested state actually requires a separate release step.  To fix the
-issue, this patch separates out bdi_unregister() and bdi_exit() from
-bdi_destroy().  bdi_unregister() is called from blk_cleanup_queue()
-and bdi_exit() from blk_release_queue().  bdi_destroy() is now just a
-simple wrapper calling the two steps back-to-back.
-
-While at it, the prototype of bdi_destroy() is moved right below
-bdi_setup_and_register() so that the counterpart operations are
-located together.
-
-Signed-off-by: Tejun Heo <tj@kernel.org>
-Fixes: a13f35e87140 ("writeback: don't embed root bdi_writeback_congested in bdi_writeback")
-Fixes: 6cd18e711dd8 ("block: destroy bdi before blockdev is unregistered.")
-Cc: stable@vger.kernel.org # v4.2+
-Reported-and-tested-by: Andrey Konovalov <andreyknvl@google.com>
-Reported-and-tested-by: Francesco Dolcini <francesco@dolcini.it> (for 4.1 backport)
-Link: http://lkml.kernel.org/g/CAAeHK+zUJ74Zn17=rOyxacHU18SgCfC6bsYW=6kCY5GXJBwGfQ@mail.gmail.com
-Reviewed-by: Jan Kara <jack@suse.com>
-Reviewed-by: Jeff Moyer <jmoyer@redhat.com>
-Signed-off-by: Jens Axboe <axboe@fb.com>
-Signed-off-by: NeilBrown <neilb@suse.com>
-
+Signed-off-by: Matthew Wilcox <willy@linux.intel.com>
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- block/blk-core.c            |  2 +-
- block/blk-sysfs.c           |  1 +
- include/linux/backing-dev.h |  5 ++++-
- mm/backing-dev.c            | 17 ++++++++++++++---
- 4 files changed, 20 insertions(+), 5 deletions(-)
+ include/linux/radix-tree.h            |   2 +
+ lib/radix-tree.c                      | 159 +++++++++++++++++++++++++++-------
+ tools/testing/radix-tree/multiorder.c |  32 +++++++
+ 3 files changed, 163 insertions(+), 30 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index bbbf36e6066b..edf8d72daa83 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -554,7 +554,7 @@ void blk_cleanup_queue(struct request_queue *q)
- 		q->queue_lock = &q->__queue_lock;
- 	spin_unlock_irq(lock);
-
--	bdi_destroy(&q->backing_dev_info);
-+	bdi_unregister(&q->backing_dev_info);
-
- 	/* @q is and will stay empty, shutdown and put */
- 	blk_put_queue(q);
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 2b8fd302f677..c0bb3291859c 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -501,6 +501,7 @@ static void blk_release_queue(struct kobject *kobj)
- 	struct request_queue *q =
- 		container_of(kobj, struct request_queue, kobj);
-
-+	bdi_exit(&q->backing_dev_info);
- 	blkcg_exit_queue(q);
-
- 	if (q->elevator) {
-diff --git a/include/linux/backing-dev.h b/include/linux/backing-dev.h
-index d87d8eced064..17d1799f8552 100644
---- a/include/linux/backing-dev.h
-+++ b/include/linux/backing-dev.h
-@@ -110,12 +110,15 @@ struct backing_dev_info {
- struct backing_dev_info *inode_to_bdi(struct inode *inode);
-
- int __must_check bdi_init(struct backing_dev_info *bdi);
--void bdi_destroy(struct backing_dev_info *bdi);
-+void bdi_exit(struct backing_dev_info *bdi);
-
- __printf(3, 4)
- int bdi_register(struct backing_dev_info *bdi, struct device *parent,
- 		const char *fmt, ...);
- int bdi_register_dev(struct backing_dev_info *bdi, dev_t dev);
-+void bdi_unregister(struct backing_dev_info *bdi);
-+void bdi_destroy(struct backing_dev_info *bdi);
-+
- int __must_check bdi_setup_and_register(struct backing_dev_info *, char *);
- void bdi_start_writeback(struct backing_dev_info *bdi, long nr_pages,
- 			enum wb_reason reason);
-diff --git a/mm/backing-dev.c b/mm/backing-dev.c
-index 000e7b3b9896..1cf18ff42c54 100644
---- a/mm/backing-dev.c
-+++ b/mm/backing-dev.c
-@@ -421,10 +421,8 @@ err:
+diff --git a/include/linux/radix-tree.h b/include/linux/radix-tree.h
+index af3581b8a451..1efd81f21241 100644
+--- a/include/linux/radix-tree.h
++++ b/include/linux/radix-tree.h
+@@ -319,6 +319,8 @@ static inline void radix_tree_preload_end(void)
+ 	preempt_enable();
  }
- EXPORT_SYMBOL(bdi_init);
-
--void bdi_destroy(struct backing_dev_info *bdi)
-+void bdi_unregister(struct backing_dev_info *bdi)
+ 
++int radix_tree_join(struct radix_tree_root *, unsigned long index,
++			unsigned new_order, void *);
+ /**
+  * struct radix_tree_iter - radix tree iterator state
+  *
+diff --git a/lib/radix-tree.c b/lib/radix-tree.c
+index 8e6d552c40dd..6a76252c93a6 100644
+--- a/lib/radix-tree.c
++++ b/lib/radix-tree.c
+@@ -314,18 +314,14 @@ static void radix_tree_node_rcu_free(struct rcu_head *head)
  {
+ 	struct radix_tree_node *node =
+ 			container_of(head, struct radix_tree_node, rcu_head);
 -	int i;
+ 
+ 	/*
+-	 * must only free zeroed nodes into the slab. radix_tree_shrink
+-	 * can leave us with a non-NULL entry in the first slot, so clear
+-	 * that here to make sure.
++	 * Must only free zeroed nodes into the slab.  We can be left with
++	 * non-NULL entries by radix_tree_free_nodes, so clear the entries
++	 * and tags here.
+ 	 */
+-	for (i = 0; i < RADIX_TREE_MAX_TAGS; i++)
+-		tag_clear(node, i, 0);
 -
- 	bdi_wb_shutdown(bdi);
- 	bdi_set_min_ratio(bdi, 0);
-
-@@ -436,11 +434,24 @@ void bdi_destroy(struct backing_dev_info *bdi)
- 		device_unregister(bdi->dev);
- 		bdi->dev = NULL;
- 	}
-+}
-+
-+void bdi_exit(struct backing_dev_info *bdi)
-+{
-+	int i;
-+
-+	WARN_ON_ONCE(bdi->dev);
-
- 	for (i = 0; i < NR_BDI_STAT_ITEMS; i++)
- 		percpu_counter_destroy(&bdi->bdi_stat[i]);
- 	fprop_local_destroy_percpu(&bdi->completions);
+-	node->slots[0] = NULL;
+-	node->count = 0;
++	memset(node->slots, 0, sizeof(node->slots));
++	memset(node->tags, 0, sizeof(node->tags));
+ 
+ 	kmem_cache_free(radix_tree_node_cachep, node);
  }
-+
-+void bdi_destroy(struct backing_dev_info *bdi)
-+{
-+	bdi_unregister(bdi);
-+	bdi_exit(bdi);
+@@ -563,14 +559,14 @@ int __radix_tree_create(struct radix_tree_root *root, unsigned long index,
+ 	shift = radix_tree_load_root(root, &child, &maxindex);
+ 
+ 	/* Make sure the tree is high enough.  */
++	if (order > 0 && max == ((1UL << order) - 1))
++		max++;
+ 	if (max > maxindex) {
+ 		int error = radix_tree_extend(root, max, shift);
+ 		if (error < 0)
+ 			return error;
+ 		shift = error;
+ 		child = root->rnode;
+-		if (order == shift)
+-			shift += RADIX_TREE_MAP_SHIFT;
+ 	}
+ 
+ 	while (shift > order) {
+@@ -582,6 +578,7 @@ int __radix_tree_create(struct radix_tree_root *root, unsigned long index,
+ 				return -ENOMEM;
+ 			child->shift = shift;
+ 			child->offset = offset;
++			child->count = 0;
+ 			child->parent = node;
+ 			rcu_assign_pointer(*slot, node_to_entry(child));
+ 			if (node)
+@@ -595,31 +592,113 @@ int __radix_tree_create(struct radix_tree_root *root, unsigned long index,
+ 		slot = &node->slots[offset];
+ 	}
+ 
++	if (nodep)
++		*nodep = node;
++	if (slotp)
++		*slotp = slot;
++	return 0;
 +}
- EXPORT_SYMBOL(bdi_destroy);
++
+ #ifdef CONFIG_RADIX_TREE_MULTIORDER
+-	/* Insert pointers to the canonical entry */
+-	if (order > shift) {
+-		unsigned i, n = 1 << (order - shift);
++/*
++ * Free any nodes below this node.  The tree is presumed to not need
++ * shrinking, and any user data in the tree is presumed to not need a
++ * destructor called on it.  If we need to add a destructor, we can
++ * add that functionality later.  Note that we may not clear tags or
++ * slots from the tree as an RCU walker may still have a pointer into
++ * this subtree.  We could replace the entries with RADIX_TREE_RETRY,
++ * but we'll still have to clear those in rcu_free.
++ */
++static void radix_tree_free_nodes(struct radix_tree_node *node)
++{
++	unsigned offset = 0;
++	struct radix_tree_node *child = entry_to_node(node);
++
++	for (;;) {
++		void *entry = child->slots[offset];
++		if (radix_tree_is_internal_node(entry) &&
++					!is_sibling_entry(child, entry)) {
++			child = entry_to_node(entry);
++			offset = 0;
++			continue;
++		}
++		offset++;
++		while (offset == RADIX_TREE_MAP_SIZE) {
++			struct radix_tree_node *old = child;
++			offset = child->offset + 1;
++			child = child->parent;
++			radix_tree_node_free(old);
++			if (old == entry_to_node(node))
++				return;
++		}
++	}
++}
++
++static inline int insert_entries(struct radix_tree_node *node, void **slot,
++				void *ptr, unsigned order, bool replace)
++{
++	struct radix_tree_node *child;
++	unsigned i, n, tag, offset, tags = 0;
++
++	if (node) {
++		n = 1 << (order - node->shift);
++		offset = get_slot_offset(node, slot);
++	} else {
++		n = 1;
++		offset = 0;
++	}
++
++	if (n > 1) {
+ 		offset = offset & ~(n - 1);
+ 		slot = &node->slots[offset];
+-		child = node_to_entry(slot);
+-		for (i = 0; i < n; i++) {
+-			if (slot[i])
++	}
++	child = node_to_entry(slot);
++
++	for (i = 0; i < n; i++) {
++		if (slot[i]) {
++			if (replace) {
++				node->count--;
++				for (tag = 0; tag < RADIX_TREE_MAX_TAGS; tag++)
++					if (tag_get(node, tag, offset + i))
++						tags |= 1 << tag;
++			} else
+ 				return -EEXIST;
+ 		}
++	}
+ 
+-		for (i = 1; i < n; i++) {
++	for (i = 0; i < n; i++) {
++		struct radix_tree_node *old = slot[i];
++		if (i) {
+ 			rcu_assign_pointer(slot[i], child);
+-			node->count++;
++			for (tag = 0; tag < RADIX_TREE_MAX_TAGS; tag++)
++				if (tags & (1 << tag))
++					tag_clear(node, tag, offset + i);
++		} else {
++			rcu_assign_pointer(slot[i], ptr);
++			for (tag = 0; tag < RADIX_TREE_MAX_TAGS; tag++)
++				if (tags & (1 << tag))
++					tag_set(node, tag, offset);
+ 		}
++		if (radix_tree_is_internal_node(old) &&
++					!is_sibling_entry(node, old))
++			radix_tree_free_nodes(old);
+ 	}
+-#endif
+-
+-	if (nodep)
+-		*nodep = node;
+-	if (slotp)
+-		*slotp = slot;
+-	return 0;
++	if (node)
++		node->count += n;
++	return n;
++}
++#else
++static inline int insert_entries(struct radix_tree_node *node, void **slot,
++				void *ptr, unsigned order, bool replace)
++{
++	if (*slot)
++		return -EEXIST;
++	rcu_assign_pointer(*slot, ptr);
++	if (node)
++		node->count++;
++	return 1;
+ }
++#endif
+ 
+ /**
+  *	__radix_tree_insert    -    insert into a radix tree
+@@ -642,13 +721,13 @@ int __radix_tree_insert(struct radix_tree_root *root, unsigned long index,
+ 	error = __radix_tree_create(root, index, order, &node, &slot);
+ 	if (error)
+ 		return error;
+-	if (*slot != NULL)
+-		return -EEXIST;
+-	rcu_assign_pointer(*slot, item);
++
++	error = insert_entries(node, slot, item, order, false);
++	if (error < 0)
++		return error;
+ 
+ 	if (node) {
+ 		unsigned offset = get_slot_offset(node, slot);
+-		node->count++;
+ 		BUG_ON(tag_get(node, 0, offset));
+ 		BUG_ON(tag_get(node, 1, offset));
+ 		BUG_ON(tag_get(node, 2, offset));
+@@ -746,6 +825,26 @@ void *radix_tree_lookup(struct radix_tree_root *root, unsigned long index)
+ }
+ EXPORT_SYMBOL(radix_tree_lookup);
+ 
++#ifdef CONFIG_RADIX_TREE_MULTIORDER
++int radix_tree_join(struct radix_tree_root *root, unsigned long index,
++			unsigned order, void *item)
++{
++	struct radix_tree_node *node;
++	void **slot;
++	int error;
++
++	BUG_ON(radix_tree_is_internal_node(item));
++
++	error = __radix_tree_create(root, index, order, &node, &slot);
++	if (!error)
++		error = insert_entries(node, slot, item, order, true);
++	if (error > 0)
++		error = 0;
++
++	return error;
++}
++#endif
++
+ /**
+  *	radix_tree_tag_set - set a tag on a radix tree node
+  *	@root:		radix tree root
+diff --git a/tools/testing/radix-tree/multiorder.c b/tools/testing/radix-tree/multiorder.c
+index 05d7bc488971..4c66acc6d0ea 100644
+--- a/tools/testing/radix-tree/multiorder.c
++++ b/tools/testing/radix-tree/multiorder.c
+@@ -325,6 +325,37 @@ void multiorder_tagged_iteration(void)
+ 	item_kill_tree(&tree);
+ }
+ 
++static void __multiorder_join(unsigned long index,
++				unsigned order1, unsigned order2)
++{
++	unsigned long loc;
++	void *item, *item2 = item_create(index + 1);
++	RADIX_TREE(tree, GFP_KERNEL);
++
++	item_insert_order(&tree, index, order2);
++	item = radix_tree_lookup(&tree, index);
++	radix_tree_join(&tree, index + 1, order1, item2);
++	loc = radix_tree_locate_item(&tree, item);
++	if (loc == -1)
++		free(item);
++	item = radix_tree_lookup(&tree, index + 1);
++	assert(item == item2);
++	item_kill_tree(&tree);
++}
++
++static void multiorder_join(void)
++{
++	int i, j, idx;
++
++	for (idx = 0; idx < 1024; idx = idx * 2 + 3) {
++		for (i = 1; i < 15; i++) {
++			for (j = 0; j < i; j++) {
++				__multiorder_join(idx, i, j);
++			}
++		}
++	}
++}
++
+ void multiorder_checks(void)
+ {
+ 	int i;
+@@ -342,4 +373,5 @@ void multiorder_checks(void)
+ 	multiorder_tag_tests();
+ 	multiorder_iteration();
+ 	multiorder_tagged_iteration();
++	multiorder_join();
+ }
+-- 
+2.9.3
 
- /*
-
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBCAAGBQJX9yDmAAoJEDnsnt1WYoG50wUP/RLxJgZ9rOm8trOTAmiIaBiH
-LnW25pUjhlyOlmGx78loOlb+6TmBGe+cSTgxqkIkJ9i2FOwA6qymMQHrATDWstQX
-0UC9IYc3lGYthNtOjp5n856ILJtHIj6NQBx6nh3i4WKdc3GYAA1v0N6UP7gP6Kku
-L75+KTXRRiOjb0ThhiLloyxiXN9qOSlBISyG1A1jH95Y4F66DM66nGn54JtV7mLy
-jhnKcdqehUZSDRuZ6At+Uq/9t77rRWPsOSRR7s+Fhto9l/tSfMS9WrW5Wbz5MNC/
-QdFl4MZyYonn5U6SzC+8GYQEXG7NtygiZfHquBC662z8m0UO+b0R/mkqERNVe8cc
-7RZnPApKbx3IKGMi6KnWooX6QaZy0RnkmmvoBWTNY23QyOeyMGRSU+eOWFM2XZVi
-Dlfm2MzBF2kwbRwbdEu7ETHcl/MbitAP1my6VxC4ChBgYL658uvH1OmdqADkQU8k
-N60i6wS4LQB/GkIRP3l7Wy/4elcHvxg+33p7eV1uGrZFmU34qKSvoGOfPS7WMEfQ
-WmcE3vl/7aPxa/l0YrYI06XZ7tydG2hJwmJuLG8pd3ECIw7xTRDETW+bczGZsRYG
-a3WFLiRr1w2EC+kkRVWRyx7AcVEHud9h8RKmAA2p/Q5YDzxW7/nC/rP8gGC6A/uQ
-3394FplSYXMlVopLLchV
-=bDTi
------END PGP SIGNATURE-----
---=-=-=--
