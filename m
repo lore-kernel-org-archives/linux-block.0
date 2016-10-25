@@ -15,165 +15,116 @@ Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         linux-block@vger.kernel.org,
         "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv4 43/43] ext4, vfs: add huge= mount option
-Date: Tue, 25 Oct 2016 03:13:42 +0300
-Message-Id: <20161025001342.76126-44-kirill.shutemov@linux.intel.com>
+Subject: [PATCHv4 31/43] ext4: make ext4_mpage_readpages() hugepage-aware
+Date: Tue, 25 Oct 2016 03:13:30 +0300
+Message-Id: <20161025001342.76126-32-kirill.shutemov@linux.intel.com>
 In-Reply-To: <20161025001342.76126-1-kirill.shutemov@linux.intel.com>
 References: <20161025001342.76126-1-kirill.shutemov@linux.intel.com>
 Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-The same four values as in tmpfs case.
+This patch modifies ext4_mpage_readpages() to deal with huge pages.
 
-Encyption code is not yet ready to handle huge page, so we disable huge
-pages support if the inode has EXT4_INODE_ENCRYPT.
+We read out 2M at once, so we have to alloc (HPAGE_PMD_NR *
+blocks_per_page) sector_t for that. I'm not entirely happy with kmalloc
+in this codepath, but don't see any other option.
 
 Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- fs/ext4/ext4.h  |  5 +++++
- fs/ext4/inode.c | 26 +++++++++++++++++++++-----
- fs/ext4/super.c | 26 ++++++++++++++++++++++++++
- 3 files changed, 52 insertions(+), 5 deletions(-)
+ fs/ext4/readpage.c | 39 +++++++++++++++++++++++++++++++++------
+ 1 file changed, 33 insertions(+), 6 deletions(-)
 
-diff --git a/fs/ext4/ext4.h b/fs/ext4/ext4.h
-index 282a51b07c57..610c31c56bad 100644
---- a/fs/ext4/ext4.h
-+++ b/fs/ext4/ext4.h
-@@ -1132,6 +1132,11 @@ struct ext4_inode_info {
- #define EXT4_MOUNT_DIOREAD_NOLOCK	0x400000 /* Enable support for dio read nolocking */
- #define EXT4_MOUNT_JOURNAL_CHECKSUM	0x800000 /* Journal checksums */
- #define EXT4_MOUNT_JOURNAL_ASYNC_COMMIT	0x1000000 /* Journal Async Commit */
-+#define EXT4_MOUNT_HUGE_MODE		0x6000000 /* Huge support mode: */
-+#define EXT4_MOUNT_HUGE_NEVER		0x0000000
-+#define EXT4_MOUNT_HUGE_ALWAYS		0x2000000
-+#define EXT4_MOUNT_HUGE_WITHIN_SIZE	0x4000000
-+#define EXT4_MOUNT_HUGE_ADVISE		0x6000000
- #define EXT4_MOUNT_DELALLOC		0x8000000 /* Delalloc support */
- #define EXT4_MOUNT_DATA_ERR_ABORT	0x10000000 /* Abort on file data write */
- #define EXT4_MOUNT_BLOCK_VALIDITY	0x20000000 /* Block validity checking */
-diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
-index 76e98e5b3c5e..a6d86883b2b4 100644
---- a/fs/ext4/inode.c
-+++ b/fs/ext4/inode.c
-@@ -4374,7 +4374,7 @@ int ext4_get_inode_loc(struct inode *inode, struct ext4_iloc *iloc)
- void ext4_set_inode_flags(struct inode *inode)
- {
- 	unsigned int flags = EXT4_I(inode)->i_flags;
--	unsigned int new_fl = 0;
-+	unsigned int mask, new_fl = 0;
+diff --git a/fs/ext4/readpage.c b/fs/ext4/readpage.c
+index a81b829d56de..af8436a4702c 100644
+--- a/fs/ext4/readpage.c
++++ b/fs/ext4/readpage.c
+@@ -104,12 +104,12 @@ int ext4_mpage_readpages(struct address_space *mapping,
  
- 	if (flags & EXT4_SYNC_FL)
- 		new_fl |= S_SYNC;
-@@ -4386,10 +4386,26 @@ void ext4_set_inode_flags(struct inode *inode)
- 		new_fl |= S_NOATIME;
- 	if (flags & EXT4_DIRSYNC_FL)
- 		new_fl |= S_DIRSYNC;
--	if (test_opt(inode->i_sb, DAX) && S_ISREG(inode->i_mode))
--		new_fl |= S_DAX;
--	inode_set_flags(inode, new_fl,
--			S_SYNC|S_APPEND|S_IMMUTABLE|S_NOATIME|S_DIRSYNC|S_DAX);
-+	if (S_ISREG(inode->i_mode) && !ext4_encrypted_inode(inode)) {
-+		if (test_opt(inode->i_sb, DAX))
-+			new_fl |= S_DAX;
-+		switch (test_opt(inode->i_sb, HUGE_MODE)) {
-+		case EXT4_MOUNT_HUGE_NEVER:
-+			break;
-+		case EXT4_MOUNT_HUGE_ALWAYS:
-+			new_fl |= S_HUGE_ALWAYS;
-+			break;
-+		case EXT4_MOUNT_HUGE_WITHIN_SIZE:
-+			new_fl |= S_HUGE_WITHIN_SIZE;
-+			break;
-+		case EXT4_MOUNT_HUGE_ADVISE:
-+			new_fl |= S_HUGE_ADVISE;
-+			break;
+ 	struct inode *inode = mapping->host;
+ 	const unsigned blkbits = inode->i_blkbits;
+-	const unsigned blocks_per_page = PAGE_SIZE >> blkbits;
+ 	const unsigned blocksize = 1 << blkbits;
+ 	sector_t block_in_file;
+ 	sector_t last_block;
+ 	sector_t last_block_in_file;
+-	sector_t blocks[MAX_BUF_PER_PAGE];
++	sector_t blocks_on_stack[MAX_BUF_PER_PAGE];
++	sector_t *blocks = blocks_on_stack;
+ 	unsigned page_block;
+ 	struct block_device *bdev = inode->i_sb->s_bdev;
+ 	int length;
+@@ -122,8 +122,9 @@ int ext4_mpage_readpages(struct address_space *mapping,
+ 	map.m_flags = 0;
+ 
+ 	for (; nr_pages; nr_pages--) {
+-		int fully_mapped = 1;
+-		unsigned first_hole = blocks_per_page;
++		int fully_mapped = 1, nr = nr_pages;
++		unsigned blocks_per_page = PAGE_SIZE >> blkbits;
++		unsigned first_hole;
+ 
+ 		prefetchw(&page->flags);
+ 		if (pages) {
+@@ -138,10 +139,32 @@ int ext4_mpage_readpages(struct address_space *mapping,
+ 			goto confused;
+ 
+ 		block_in_file = (sector_t)page->index << (PAGE_SHIFT - blkbits);
+-		last_block = block_in_file + nr_pages * blocks_per_page;
++
++		if (PageTransHuge(page) &&
++				IS_ENABLED(CONFIG_TRANSPARENT_HUGE_PAGECACHE)) {
++			BUILD_BUG_ON(BIO_MAX_PAGES < HPAGE_PMD_NR);
++			nr = HPAGE_PMD_NR * blocks_per_page;
++			/* XXX: need a better solution ? */
++			blocks = ext4_kvmalloc(sizeof(sector_t) * nr, GFP_NOFS);
++			if (!blocks) {
++				if (pages) {
++					delete_from_page_cache(page);
++					goto next_page;
++				}
++				return -ENOMEM;
++			}
++
++			blocks_per_page *= HPAGE_PMD_NR;
++			last_block = block_in_file + blocks_per_page;
++		} else {
++			blocks = blocks_on_stack;
++			last_block = block_in_file + nr * blocks_per_page;
 +		}
-+	}
-+	mask = S_SYNC | S_APPEND | S_IMMUTABLE | S_NOATIME |
-+		S_DIRSYNC | S_DAX | S_HUGE_MODE;
-+	inode_set_flags(inode, new_fl, mask);
- }
++
+ 		last_block_in_file = (i_size_read(inode) + blocksize - 1) >> blkbits;
+ 		if (last_block > last_block_in_file)
+ 			last_block = last_block_in_file;
++		first_hole = blocks_per_page;
+ 		page_block = 0;
  
- /* Propagate flags from i_flags to EXT4_I(inode)->i_flags */
-diff --git a/fs/ext4/super.c b/fs/ext4/super.c
-index 20da99da0a34..81c434f0ee4e 100644
---- a/fs/ext4/super.c
-+++ b/fs/ext4/super.c
-@@ -1126,6 +1126,7 @@ static int ext4_set_context(struct inode *inode, const void *ctx, size_t len,
- 			ext4_set_inode_flag(inode, EXT4_INODE_ENCRYPT);
- 			ext4_clear_inode_state(inode,
- 					EXT4_STATE_MAY_INLINE_DATA);
-+			ext4_set_inode_flags(inode);
+ 		/*
+@@ -213,6 +236,8 @@ int ext4_mpage_readpages(struct address_space *mapping,
+ 			}
  		}
- 		return res;
- 	}
-@@ -1140,6 +1141,7 @@ static int ext4_set_context(struct inode *inode, const void *ctx, size_t len,
- 			len, 0);
- 	if (!res) {
- 		ext4_set_inode_flag(inode, EXT4_INODE_ENCRYPT);
-+		ext4_set_inode_flags(inode);
- 		res = ext4_mark_inode_dirty(handle, inode);
- 		if (res)
- 			EXT4_ERROR_INODE(inode, "Failed to mark inode dirty");
-@@ -1278,6 +1280,7 @@ enum {
- 	Opt_dioread_nolock, Opt_dioread_lock,
- 	Opt_discard, Opt_nodiscard, Opt_init_itable, Opt_noinit_itable,
- 	Opt_max_dir_size_kb, Opt_nojournal_checksum,
-+	Opt_huge_never, Opt_huge_always, Opt_huge_within_size, Opt_huge_advise,
- };
- 
- static const match_table_t tokens = {
-@@ -1358,6 +1361,10 @@ static const match_table_t tokens = {
- 	{Opt_init_itable, "init_itable"},
- 	{Opt_noinit_itable, "noinit_itable"},
- 	{Opt_max_dir_size_kb, "max_dir_size_kb=%u"},
-+	{Opt_huge_never, "huge=never"},
-+	{Opt_huge_always, "huge=always"},
-+	{Opt_huge_within_size, "huge=within_size"},
-+	{Opt_huge_advise, "huge=advise"},
- 	{Opt_test_dummy_encryption, "test_dummy_encryption"},
- 	{Opt_removed, "check=none"},	/* mount option from ext2/3 */
- 	{Opt_removed, "nocheck"},	/* mount option from ext2/3 */
-@@ -1476,6 +1483,11 @@ static int clear_qf_name(struct super_block *sb, int qtype)
- #define MOPT_NO_EXT3	0x0200
- #define MOPT_EXT4_ONLY	(MOPT_NO_EXT2 | MOPT_NO_EXT3)
- #define MOPT_STRING	0x0400
-+#ifdef CONFIG_TRANSPARENT_HUGE_PAGECACHE
-+#define MOPT_HUGE	0x1000
-+#else
-+#define MOPT_HUGE	MOPT_NOSUPPORT
-+#endif
- 
- static const struct mount_opts {
- 	int	token;
-@@ -1563,6 +1575,10 @@ static const struct mount_opts {
- 	{Opt_jqfmt_vfsv0, QFMT_VFS_V0, MOPT_QFMT},
- 	{Opt_jqfmt_vfsv1, QFMT_VFS_V1, MOPT_QFMT},
- 	{Opt_max_dir_size_kb, 0, MOPT_GTE0},
-+	{Opt_huge_never, EXT4_MOUNT_HUGE_NEVER, MOPT_HUGE},
-+	{Opt_huge_always, EXT4_MOUNT_HUGE_ALWAYS, MOPT_HUGE},
-+	{Opt_huge_within_size, EXT4_MOUNT_HUGE_WITHIN_SIZE, MOPT_HUGE},
-+	{Opt_huge_advise, EXT4_MOUNT_HUGE_ADVISE, MOPT_HUGE},
- 	{Opt_test_dummy_encryption, 0, MOPT_GTE0},
- 	{Opt_err, 0, 0}
- };
-@@ -1644,6 +1660,16 @@ static int handle_mount_opt(struct super_block *sb, char *opt, int token,
- 		} else
- 			return -1;
- 	}
-+	if (MOPT_HUGE != MOPT_NOSUPPORT && m->flags & MOPT_HUGE) {
-+		sbi->s_mount_opt &= ~EXT4_MOUNT_HUGE_MODE;
-+		sbi->s_mount_opt |= m->mount_opt;
-+		if (m->mount_opt) {
-+			ext4_msg(sb, KERN_WARNING, "Warning: "
-+					"Support of huge pages is EXPERIMENTAL,"
-+					" use at your own risk");
-+		}
-+		return 1;
-+	}
- 	if (m->flags & MOPT_CLEAR_ERR)
- 		clear_opt(sb, ERRORS_MASK);
- 	if (token == Opt_noquota && sb_any_quota_loaded(sb)) {
+ 		if (first_hole != blocks_per_page) {
++			if (PageTransHuge(page))
++				goto confused;
+ 			zero_user_segment(page, first_hole << blkbits,
+ 					  PAGE_SIZE);
+ 			if (first_hole == 0) {
+@@ -248,7 +273,7 @@ int ext4_mpage_readpages(struct address_space *mapping,
+ 					goto set_error_page;
+ 			}
+ 			bio = bio_alloc(GFP_KERNEL,
+-				min_t(int, nr_pages, BIO_MAX_PAGES));
++				min_t(int, nr, BIO_MAX_PAGES));
+ 			if (!bio) {
+ 				if (ctx)
+ 					fscrypt_release_ctx(ctx);
+@@ -289,5 +314,7 @@ int ext4_mpage_readpages(struct address_space *mapping,
+ 	BUG_ON(pages && !list_empty(pages));
+ 	if (bio)
+ 		submit_bio(bio);
++	if (blocks != blocks_on_stack)
++		kfree(blocks);
+ 	return 0;
+ }
 -- 
 2.9.3
 
