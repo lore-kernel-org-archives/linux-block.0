@@ -1,99 +1,96 @@
-Return-Path: <Damien.LeMoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>, Christoph
- Hellwig <hch@lst.de>, "Martin K . Petersen" <martin.petersen@oracle.com>,
-	Hannes Reinecke <hare@suse.de>, Shaun Tancheff <shaun@tancheff.com>, Damien
- Le Moal <damien.lemoal@hgst.com>
-Subject: [PATCH v8 2/7] blk-sysfs: Add 'chunk_sectors' to sysfs attributes
-Date: Tue, 18 Oct 2016 15:40:30 +0900
-Message-ID: <1476772835-18541-3-git-send-email-damien.lemoal@wdc.com>
-In-Reply-To: <1476772835-18541-1-git-send-email-damien.lemoal@wdc.com>
-References: <1476772835-18541-1-git-send-email-damien.lemoal@wdc.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: damien.lemoal@wdc.com
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv4 32/43] ext4: make ext4_writepage() work on huge pages
+Date: Tue, 25 Oct 2016 03:13:31 +0300
+Message-Id: <20161025001342.76126-33-kirill.shutemov@linux.intel.com>
+In-Reply-To: <20161025001342.76126-1-kirill.shutemov@linux.intel.com>
+References: <20161025001342.76126-1-kirill.shutemov@linux.intel.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-From: Hannes Reinecke <hare@suse.de>
+Change ext4_writepage() and underlying ext4_bio_write_page().
 
-The queue limits already have a 'chunk_sectors' setting, so
-we should be presenting it via sysfs.
+It basically removes assumption on page size, infer it from struct page
+instead.
 
-Signed-off-by: Hannes Reinecke <hare@suse.de>
-
-[Damien: Updated Documentation/ABI/testing/sysfs-block]
-
-Signed-off-by: Damien Le Moal <damien.lemoal@hgst.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-Reviewed-by: Shaun Tancheff <shaun.tancheff@seagate.com>
-Tested-by: Shaun Tancheff <shaun.tancheff@seagate.com>
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- Documentation/ABI/testing/sysfs-block | 13 +++++++++++++
- block/blk-sysfs.c                     | 11 +++++++++++
- 2 files changed, 24 insertions(+)
+ fs/ext4/inode.c   | 10 +++++-----
+ fs/ext4/page-io.c | 11 +++++++++--
+ 2 files changed, 14 insertions(+), 7 deletions(-)
 
-diff --git a/Documentation/ABI/testing/sysfs-block b/Documentation/ABI/testing/sysfs-block
-index 75a5055..ee2d5cd 100644
---- a/Documentation/ABI/testing/sysfs-block
-+++ b/Documentation/ABI/testing/sysfs-block
-@@ -251,3 +251,16 @@ Description:
- 		since drive-managed zoned block devices do not support
- 		zone commands, they will be treated as regular block
- 		devices and zoned will report "none".
-+
-+What:		/sys/block/<disk>/queue/chunk_sectors
-+Date:		September 2016
-+Contact:	Hannes Reinecke <hare@suse.com>
-+Description:
-+		chunk_sectors has different meaning depending on the type
-+		of the disk. For a RAID device (dm-raid), chunk_sectors
-+		indicates the size in 512B sectors of the RAID volume
-+		stripe segment. For a zoned block device, either
-+		host-aware or host-managed, chunk_sectors indicates the
-+		size of 512B sectors of the zones of the device, with
-+		the eventual exception of the last zone of the device
-+		which may be smaller.
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index ff9cd9c..488c2e2 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -130,6 +130,11 @@ static ssize_t queue_physical_block_size_show(struct request_queue *q, char *pag
- 	return queue_var_show(queue_physical_block_size(q), page);
- }
+diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
+index 9c064727ed62..c36296fbaa23 100644
+--- a/fs/ext4/inode.c
++++ b/fs/ext4/inode.c
+@@ -2030,10 +2030,10 @@ static int ext4_writepage(struct page *page,
  
-+static ssize_t queue_chunk_sectors_show(struct request_queue *q, char *page)
-+{
-+	return queue_var_show(q->limits.chunk_sectors, page);
-+}
+ 	trace_ext4_writepage(page);
+ 	size = i_size_read(inode);
+-	if (page->index == size >> PAGE_SHIFT)
+-		len = size & ~PAGE_MASK;
+-	else
+-		len = PAGE_SIZE;
 +
- static ssize_t queue_io_min_show(struct request_queue *q, char *page)
- {
- 	return queue_var_show(queue_io_min(q), page);
-@@ -455,6 +460,11 @@ static struct queue_sysfs_entry queue_physical_block_size_entry = {
- 	.show = queue_physical_block_size_show,
- };
++	len = hpage_size(page);
++	if (page->index + hpage_nr_pages(page) - 1 == size >> PAGE_SHIFT)
++			len = size & ~hpage_mask(page);
  
-+static struct queue_sysfs_entry queue_chunk_sectors_entry = {
-+	.attr = {.name = "chunk_sectors", .mode = S_IRUGO },
-+	.show = queue_chunk_sectors_show,
-+};
-+
- static struct queue_sysfs_entry queue_io_min_entry = {
- 	.attr = {.name = "minimum_io_size", .mode = S_IRUGO },
- 	.show = queue_io_min_show,
-@@ -555,6 +565,7 @@ static struct attribute *default_attrs[] = {
- 	&queue_hw_sector_size_entry.attr,
- 	&queue_logical_block_size_entry.attr,
- 	&queue_physical_block_size_entry.attr,
-+	&queue_chunk_sectors_entry.attr,
- 	&queue_io_min_entry.attr,
- 	&queue_io_opt_entry.attr,
- 	&queue_discard_granularity_entry.attr,
+ 	page_bufs = page_buffers(page);
+ 	/*
+@@ -2057,7 +2057,7 @@ static int ext4_writepage(struct page *page,
+ 				   ext4_bh_delay_or_unwritten)) {
+ 		redirty_page_for_writepage(wbc, page);
+ 		if ((current->flags & PF_MEMALLOC) ||
+-		    (inode->i_sb->s_blocksize == PAGE_SIZE)) {
++		    (inode->i_sb->s_blocksize == hpage_size(page))) {
+ 			/*
+ 			 * For memory cleaning there's no point in writing only
+ 			 * some buffers. So just bail out. Warn if we came here
+diff --git a/fs/ext4/page-io.c b/fs/ext4/page-io.c
+index 0094923e5ebf..20c9635a782e 100644
+--- a/fs/ext4/page-io.c
++++ b/fs/ext4/page-io.c
+@@ -413,6 +413,7 @@ int ext4_bio_write_page(struct ext4_io_submit *io,
+ 
+ 	BUG_ON(!PageLocked(page));
+ 	BUG_ON(PageWriteback(page));
++	BUG_ON(PageTail(page));
+ 
+ 	if (keep_towrite)
+ 		set_page_writeback_keepwrite(page);
+@@ -429,8 +430,14 @@ int ext4_bio_write_page(struct ext4_io_submit *io,
+ 	 * the page size, the remaining memory is zeroed when mapped, and
+ 	 * writes to that region are not written out to the file."
+ 	 */
+-	if (len < PAGE_SIZE)
+-		zero_user_segment(page, len, PAGE_SIZE);
++	if (len < hpage_size(page)) {
++		page += len / PAGE_SIZE;
++		if (len % PAGE_SIZE)
++			zero_user_segment(page, len % PAGE_SIZE, PAGE_SIZE);
++		while (page + 1 == compound_head(page))
++			clear_highpage(++page);
++		page = compound_head(page);
++	}
+ 	/*
+ 	 * In the first loop we prepare and mark buffers to submit. We have to
+ 	 * mark all buffers in the page before submitting so that
 -- 
-2.7.4
+2.9.3
 
-Western Digital Corporation (and its subsidiaries) E-mail Confidentiality Notice & Disclaimer:
-
-This e-mail and any files transmitted with it may contain confidential or legally privileged information of WDC and/or its affiliates, and are intended solely for the use of the individual or entity to which they are addressed. If you are not the intended recipient, any disclosure, copying, distribution or any action taken or omitted to be taken in reliance on it, is prohibited. If you have received this e-mail in error, please notify the sender immediately and delete the e-mail in its entirety from your system.
