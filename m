@@ -1,25 +1,54 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f178.google.com ([209.85.192.178]:32923 "EHLO
-        mail-pf0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754986AbcJUHdJ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Oct 2016 03:33:09 -0400
-Received: by mail-pf0-f178.google.com with SMTP id 128so52511041pfz.0
-        for <linux-block@vger.kernel.org>; Fri, 21 Oct 2016 00:33:08 -0700 (PDT)
-Received: from [192.168.0.178] (mail.shannon-data.com. [180.166.154.106])
-        by smtp.gmail.com with ESMTPSA id j4sm2410650pal.25.2016.10.21.00.33.06
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 21 Oct 2016 00:33:06 -0700 (PDT)
-To: linux-block@vger.kernel.org
-From: huix <huix.white@gmail.com>
-Subject: kernel develop mail list
-Message-ID: <5809C4A8.5080804@gmail.com>
-Date: Fri, 21 Oct 2016 15:32:56 +0800
-MIME-Version: 1.0
-Content-Type: text/plain; charset=gbk; format=flowed
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv4 23/43] thp: make thp_get_unmapped_area() respect S_HUGE_MODE
+Date: Tue, 25 Oct 2016 03:13:22 +0300
+Message-Id: <20161025001342.76126-24-kirill.shutemov@linux.intel.com>
+In-Reply-To: <20161025001342.76126-1-kirill.shutemov@linux.intel.com>
+References: <20161025001342.76126-1-kirill.shutemov@linux.intel.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-  subscribe linux-kernel
+We want mmap(NULL) to return PMD-aligned address if the inode can have
+huge pages in page cache.
+
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+---
+ mm/huge_memory.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/mm/huge_memory.c b/mm/huge_memory.c
+index 40fe91ac383c..2c1524a8d5d4 100644
+--- a/mm/huge_memory.c
++++ b/mm/huge_memory.c
+@@ -518,10 +518,12 @@ unsigned long thp_get_unmapped_area(struct file *filp, unsigned long addr,
+ 		unsigned long len, unsigned long pgoff, unsigned long flags)
+ {
+ 	loff_t off = (loff_t)pgoff << PAGE_SHIFT;
++	struct inode *inode = filp->f_mapping->host;
+ 
+ 	if (addr)
+ 		goto out;
+-	if (!IS_DAX(filp->f_mapping->host) || !IS_ENABLED(CONFIG_FS_DAX_PMD))
++	if ((inode->i_flags & S_HUGE_MODE) == S_HUGE_NEVER &&
++			(!IS_DAX(inode) || !IS_ENABLED(CONFIG_FS_DAX_PMD)))
+ 		goto out;
+ 
+ 	addr = __thp_get_unmapped_area(filp, len, off, flags, PMD_SIZE);
+-- 
+2.9.3
 
