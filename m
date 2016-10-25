@@ -1,93 +1,259 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:47826 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1753055AbcJYLok (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 Oct 2016 07:44:40 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id u9PBi4Jd037705
-        for <linux-block@vger.kernel.org>; Tue, 25 Oct 2016 07:44:40 -0400
-Received: from e06smtp09.uk.ibm.com (e06smtp09.uk.ibm.com [195.75.94.105])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 269yh1wsr7-1
-        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-        for <linux-block@vger.kernel.org>; Tue, 25 Oct 2016 07:44:40 -0400
-Received: from localhost
-        by e06smtp09.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-block@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Tue, 25 Oct 2016 12:44:37 +0100
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Christian Borntraeger <borntraeger@de.ibm.com>
-Subject: [PATCH] blk-cgroup: use __GFP_NOWARN for NOWAIT allocations
-Date: Tue, 25 Oct 2016 13:44:32 +0200
-Message-Id: <1477395872-33696-1-git-send-email-borntraeger@de.ibm.com>
+Received: from mga03.intel.com ([134.134.136.65]:63637 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S941040AbcJYAOc (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 24 Oct 2016 20:14:32 -0400
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv4 42/43] mm, fs, ext4: expand use of page_mapping() and page_to_pgoff()
+Date: Tue, 25 Oct 2016 03:13:41 +0300
+Message-Id: <20161025001342.76126-43-kirill.shutemov@linux.intel.com>
+In-Reply-To: <20161025001342.76126-1-kirill.shutemov@linux.intel.com>
+References: <20161025001342.76126-1-kirill.shutemov@linux.intel.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-I just got
+With huge pages in page cache we see tail pages in more code paths.
+This patch replaces direct access to struct page fields with macros
+which can handle tail pages properly.
 
-qemu-system-s39: page allocation failure: order:0, mode:0x2200000(GFP_NOWAIT|__GFP_NOTRACK)
-CPU: 0 PID: 6664 Comm: qemu-system-s39 Tainted: G 4.9.0-rc2+ #44
-[...]
-([<000000000011230a>] show_trace+0x62/0x78)
-([<00000000001123da>] show_stack+0x72/0xf0)
-([<00000000004a7906>] dump_stack+0x7e/0xb0)
-([<000000000025df14>] warn_alloc+0x11c/0x148)
-([<000000000025e48c>] __alloc_pages_nodemask+0x4c4/0xe50)
-([<00000000002be590>] new_slab+0x560/0x778
-([<00000000002c0adc>] ___slab_alloc.constprop.29+0x2b4/0x368)
-([<00000000002c0bc4>] __slab_alloc.constprop.28+0x34/0x50)
-([<00000000002c10aa>] kmem_cache_alloc_trace+0x20a/0x270)
-([<0000000000257934>] mempool_create_node+0x5c/0x188)
-([<00000000004745d6>] blk_init_rl+0xa6/0xe0)
-([<0000000000493f58>] blkg_alloc+0x150/0x2a8)
-([<0000000000494404>] blkg_create+0x354/0x3b0)
-([<00000000004962c0>] blkg_lookup_create+0x100/0x180)
-([<0000000000472cd4>] generic_make_request_checks+0x504/0x590)
-([<0000000000474a66>] generic_make_request+0x2e/0x1b0)
-([<0000000000474c8c>] submit_bio+0xa4/0x178)
-([<000003ff80c64670>] btrfs_map_bio+0x1c0/0x3c8 [btrfs])
-([<000003ff80c3075c>] btrfs_submit_bio_hook+0x104/0x210
-[...]
-
-Seems that blk-cgroup can handle allocation failures quite will - it
-does check the result and the system continues to run, so let's make
-allocation failures silent in here.
-
-There are other GFP_NOWAIT places in that file, but not all seem to
-check the return value. In addition this warning seems to be the only
-one that I can reliably reproduce so I decided to only touch
-blkg_create.
-
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- block/blk-cgroup.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ fs/buffer.c         |  2 +-
+ fs/ext4/inode.c     |  4 ++--
+ mm/filemap.c        | 26 ++++++++++++++------------
+ mm/memory.c         |  4 ++--
+ mm/page-writeback.c |  2 +-
+ mm/truncate.c       |  5 +++--
+ 6 files changed, 23 insertions(+), 20 deletions(-)
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index b08ccbb..d22bd95 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -185,7 +185,8 @@ static struct blkcg_gq *blkg_create(struct blkcg *blkcg,
+diff --git a/fs/buffer.c b/fs/buffer.c
+index 670290820325..eea5e9dc0c16 100644
+--- a/fs/buffer.c
++++ b/fs/buffer.c
+@@ -630,7 +630,7 @@ static void __set_page_dirty(struct page *page, struct address_space *mapping,
+ 	unsigned long flags;
+ 
+ 	spin_lock_irqsave(&mapping->tree_lock, flags);
+-	if (page->mapping) {	/* Race with truncate? */
++	if (page_mapping(page)) {	/* Race with truncate? */
+ 		WARN_ON_ONCE(warn && !PageUptodate(page));
+ 		account_page_dirtied(page, mapping);
+ 		radix_tree_tag_set(&mapping->page_tree,
+diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
+index 95b64a7cee67..76e98e5b3c5e 100644
+--- a/fs/ext4/inode.c
++++ b/fs/ext4/inode.c
+@@ -1230,7 +1230,7 @@ static int ext4_write_begin(struct file *file, struct address_space *mapping,
  	}
  
- 	wb_congested = wb_congested_get_create(&q->backing_dev_info,
--					       blkcg->css.id, GFP_NOWAIT);
-+					       blkcg->css.id,
-+					       GFP_NOWAIT | __GFP_NOWARN);
- 	if (!wb_congested) {
- 		ret = -ENOMEM;
- 		goto err_put_css;
-@@ -193,7 +194,7 @@ static struct blkcg_gq *blkg_create(struct blkcg *blkcg,
+ 	lock_page(page);
+-	if (page->mapping != mapping) {
++	if (page_mapping(page) != mapping) {
+ 		/* The page got truncated from under us */
+ 		unlock_page(page);
+ 		put_page(page);
+@@ -2970,7 +2970,7 @@ static int ext4_da_write_begin(struct file *file, struct address_space *mapping,
+ 	}
  
- 	/* allocate */
- 	if (!new_blkg) {
--		new_blkg = blkg_alloc(blkcg, q, GFP_NOWAIT);
-+		new_blkg = blkg_alloc(blkcg, q, GFP_NOWAIT | __GFP_NOWARN);
- 		if (unlikely(!new_blkg)) {
- 			ret = -ENOMEM;
- 			goto err_put_congested;
+ 	lock_page(page);
+-	if (page->mapping != mapping) {
++	if (page_mapping(page) != mapping) {
+ 		/* The page got truncated from under us */
+ 		unlock_page(page);
+ 		put_page(page);
+diff --git a/mm/filemap.c b/mm/filemap.c
+index 85274c4ca2c9..8815e63a5fe5 100644
+--- a/mm/filemap.c
++++ b/mm/filemap.c
+@@ -510,7 +510,7 @@ static int __filemap_fdatawait_range(struct address_space *mapping,
+ 			struct page *page = pvec.pages[i];
+ 
+ 			/* until radix tree lookup accepts end_index */
+-			if (page->index > end)
++			if (page_to_pgoff(page) > end)
+ 				continue;
+ 
+ 			page = compound_head(page);
+@@ -1348,12 +1348,12 @@ struct page *pagecache_get_page(struct address_space *mapping, pgoff_t offset,
+ 		}
+ 
+ 		/* Has the page been truncated? */
+-		if (unlikely(page->mapping != mapping)) {
++		if (unlikely(page_mapping(page) != mapping)) {
+ 			unlock_page(page);
+ 			put_page(page);
+ 			goto repeat;
+ 		}
+-		VM_BUG_ON_PAGE(page->index != offset, page);
++		VM_BUG_ON_PAGE(page_to_pgoff(page) != offset, page);
+ 	}
+ 
+ 	if (page && (fgp_flags & FGP_ACCESSED))
+@@ -1647,7 +1647,8 @@ unsigned find_get_pages_contig(struct address_space *mapping, pgoff_t start,
+ 		 * otherwise we can get both false positives and false
+ 		 * negatives, which is just confusing to the caller.
+ 		 */
+-		if (page->mapping == NULL || page_to_pgoff(page) != index) {
++		if (page_mapping(page) == NULL ||
++				page_to_pgoff(page) != index) {
+ 			put_page(page);
+ 			break;
+ 		}
+@@ -1954,7 +1955,7 @@ static ssize_t do_generic_file_read(struct file *filp, loff_t *ppos,
+ 			if (!trylock_page(page))
+ 				goto page_not_up_to_date;
+ 			/* Did it get truncated before we got the lock? */
+-			if (!page->mapping)
++			if (!page_mapping(page))
+ 				goto page_not_up_to_date_locked;
+ 			if (!mapping->a_ops->is_partially_uptodate(page,
+ 							offset, iter->count))
+@@ -2034,7 +2035,7 @@ static ssize_t do_generic_file_read(struct file *filp, loff_t *ppos,
+ 
+ page_not_up_to_date_locked:
+ 		/* Did it get truncated before we got the lock? */
+-		if (!page->mapping) {
++		if (!page_mapping(page)) {
+ 			unlock_page(page);
+ 			put_page(page);
+ 			continue;
+@@ -2070,7 +2071,7 @@ static ssize_t do_generic_file_read(struct file *filp, loff_t *ppos,
+ 			if (unlikely(error))
+ 				goto readpage_error;
+ 			if (!PageUptodate(page)) {
+-				if (page->mapping == NULL) {
++				if (page_mapping(page) == NULL) {
+ 					/*
+ 					 * invalidate_mapping_pages got it
+ 					 */
+@@ -2369,12 +2370,12 @@ int filemap_fault(struct vm_area_struct *vma, struct vm_fault *vmf)
+ 	}
+ 
+ 	/* Did it get truncated? */
+-	if (unlikely(page->mapping != mapping)) {
++	if (unlikely(page_mapping(page) != mapping)) {
+ 		unlock_page(page);
+ 		put_page(page);
+ 		goto retry_find;
+ 	}
+-	VM_BUG_ON_PAGE(page->index != offset, page);
++	VM_BUG_ON_PAGE(page_to_pgoff(page) != offset, page);
+ 
+ 	/*
+ 	 * We have a locked page in the page cache, now we need to check
+@@ -2550,7 +2551,7 @@ int filemap_page_mkwrite(struct vm_area_struct *vma, struct vm_fault *vmf)
+ 	sb_start_pagefault(inode->i_sb);
+ 	file_update_time(vma->vm_file);
+ 	lock_page(page);
+-	if (page->mapping != inode->i_mapping) {
++	if (page_mapping(page) != inode->i_mapping) {
+ 		unlock_page(page);
+ 		ret = VM_FAULT_NOPAGE;
+ 		goto out;
+@@ -2699,7 +2700,7 @@ static struct page *do_read_cache_page(struct address_space *mapping,
+ 	lock_page(page);
+ 
+ 	/* Case c or d, restart the operation */
+-	if (!page->mapping) {
++	if (!page_mapping(page)) {
+ 		unlock_page(page);
+ 		put_page(page);
+ 		goto repeat;
+@@ -3155,12 +3156,13 @@ EXPORT_SYMBOL(generic_file_write_iter);
+  */
+ int try_to_release_page(struct page *page, gfp_t gfp_mask)
+ {
+-	struct address_space * const mapping = page->mapping;
++	struct address_space * const mapping = page_mapping(page);
+ 
+ 	BUG_ON(!PageLocked(page));
+ 	if (PageWriteback(page))
+ 		return 0;
+ 
++	page = compound_head(page);
+ 	if (mapping && mapping->a_ops->releasepage)
+ 		return mapping->a_ops->releasepage(page, gfp_mask);
+ 	return try_to_free_buffers(page);
+diff --git a/mm/memory.c b/mm/memory.c
+index e8c04d1d87b8..5b8d8aba69a7 100644
+--- a/mm/memory.c
++++ b/mm/memory.c
+@@ -2056,7 +2056,7 @@ static int do_page_mkwrite(struct vm_area_struct *vma, struct page *page,
+ 		return ret;
+ 	if (unlikely(!(ret & VM_FAULT_LOCKED))) {
+ 		lock_page(page);
+-		if (!page->mapping) {
++		if (!page_mapping(page)) {
+ 			unlock_page(page);
+ 			return 0; /* retry */
+ 		}
+@@ -2104,7 +2104,7 @@ static inline int wp_page_reuse(struct fault_env *fe, pte_t orig_pte,
+ 
+ 		dirtied = set_page_dirty(page);
+ 		VM_BUG_ON_PAGE(PageAnon(page), page);
+-		mapping = page->mapping;
++		mapping = page_mapping(page);
+ 		unlock_page(page);
+ 		put_page(page);
+ 
+diff --git a/mm/page-writeback.c b/mm/page-writeback.c
+index f903c09940c4..2cfc5010d13e 100644
+--- a/mm/page-writeback.c
++++ b/mm/page-writeback.c
+@@ -2857,7 +2857,7 @@ EXPORT_SYMBOL(mapping_tagged);
+  */
+ void wait_for_stable_page(struct page *page)
+ {
+-	if (bdi_cap_stable_pages_required(inode_to_bdi(page->mapping->host)))
++	if (bdi_cap_stable_pages_required(inode_to_bdi(page_mapping(page)->host)))
+ 		wait_on_page_writeback(page);
+ }
+ EXPORT_SYMBOL_GPL(wait_for_stable_page);
+diff --git a/mm/truncate.c b/mm/truncate.c
+index 59bc1b4260d1..afeedf2d8871 100644
+--- a/mm/truncate.c
++++ b/mm/truncate.c
+@@ -612,6 +612,7 @@ invalidate_complete_page2(struct address_space *mapping, struct page *page)
+ {
+ 	unsigned long flags;
+ 
++	page = compound_head(page);
+ 	if (page->mapping != mapping)
+ 		return 0;
+ 
+@@ -640,7 +641,7 @@ static int do_launder_page(struct address_space *mapping, struct page *page)
+ {
+ 	if (!PageDirty(page))
+ 		return 0;
+-	if (page->mapping != mapping || mapping->a_ops->launder_page == NULL)
++	if (page_mapping(page) != mapping || mapping->a_ops->launder_page == NULL)
+ 		return 0;
+ 	return mapping->a_ops->launder_page(page);
+ }
+@@ -688,7 +689,7 @@ int invalidate_inode_pages2_range(struct address_space *mapping,
+ 
+ 			lock_page(page);
+ 			WARN_ON(page_to_pgoff(page) != index);
+-			if (page->mapping != mapping) {
++			if (page_mapping(page) != mapping) {
+ 				unlock_page(page);
+ 				continue;
+ 			}
 -- 
-2.5.5
+2.9.3
 
