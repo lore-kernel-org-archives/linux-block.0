@@ -1,63 +1,38 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Ming Lei <tom.leiming@gmail.com>
-To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Ming Lei <tom.leiming@gmail.com>,
-        "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        linux-ext4@vger.kernel.org (open list:EXT4 FILE SYSTEM)
-Subject: [PATCH 50/60] ext4: convert to bio_for_each_segment_all_rd()
-Date: Sat, 29 Oct 2016 16:08:49 +0800
-Message-Id: <1477728600-12938-51-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
-References: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([198.137.202.9]:48871 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S941853AbcJYPIW (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 25 Oct 2016 11:08:22 -0400
+From: Christoph Hellwig <hch@lst.de>
+To: linux-xfs@vger.kernel.org
+Cc: axboe@fb.com, kent.overstreet@gmail.com,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: 
+Date: Tue, 25 Oct 2016 17:08:12 +0200
+Message-Id: <1477408098-10153-1-git-send-email-hch@lst.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
----
- fs/ext4/page-io.c  | 3 ++-
- fs/ext4/readpage.c | 3 ++-
- 2 files changed, 4 insertions(+), 2 deletions(-)
+Subject: an iomap-based direct I/O implementation
 
-diff --git a/fs/ext4/page-io.c b/fs/ext4/page-io.c
-index 0094923e5ebf..abde26af55e7 100644
---- a/fs/ext4/page-io.c
-+++ b/fs/ext4/page-io.c
-@@ -63,8 +63,9 @@ static void ext4_finish_bio(struct bio *bio)
- {
- 	int i;
- 	struct bio_vec *bvec;
-+	struct bvec_iter_all bia;
- 
--	bio_for_each_segment_all(bvec, bio, i) {
-+	bio_for_each_segment_all_rd(bvec, bio, i, bia) {
- 		struct page *page = bvec->bv_page;
- #ifdef CONFIG_EXT4_FS_ENCRYPTION
- 		struct page *data_page = NULL;
-diff --git a/fs/ext4/readpage.c b/fs/ext4/readpage.c
-index a81b829d56de..b30444fd9333 100644
---- a/fs/ext4/readpage.c
-+++ b/fs/ext4/readpage.c
-@@ -71,6 +71,7 @@ static void mpage_end_io(struct bio *bio)
- {
- 	struct bio_vec *bv;
- 	int i;
-+	struct bvec_iter_all bia;
- 
- 	if (ext4_bio_encrypted(bio)) {
- 		if (bio->bi_error) {
-@@ -80,7 +81,7 @@ static void mpage_end_io(struct bio *bio)
- 			return;
- 		}
- 	}
--	bio_for_each_segment_all(bv, bio, i) {
-+	bio_for_each_segment_all_rd(bv, bio, i, bia) {
- 		struct page *page = bv->bv_page;
- 
- 		if (!bio->bi_error) {
--- 
-2.7.4
+Hi all,
 
+this series adds a new direct I/O implementation based on the iomap
+interface, and switches XFS to use it.
+
+The first two patches are a resend of my earlier series to remove the
+XFS iolock.  They are needed for the lockdep assert in the new iomap
+code.
+
+The third patch adds a new helper to the block layer that builds bio
+from locked down user pages without needing an additional page array.
+This helper was originally written by Kent and then heavily rewritten
+by me to use the iov_iter helper that also allow non-user page backed
+iov_iters.  (Kent - I kept your credits for it, if you feel this doesn't
+look like your code anymore I'll happily claim it for me).  This patch
+should probably go into a shared branch in the block layer tree as I
+have some other users for it as well.
+
+The rest implements a new iomap_dio_rw direct I/O implementation and
+switches XFS to use it.
