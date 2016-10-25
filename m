@@ -1,12 +1,15 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from ipmail07.adl2.internode.on.net ([150.101.137.131]:54720 "EHLO
-        ipmail07.adl2.internode.on.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1754654AbcJYVTI (ORCPT
+Received: from gateway22.websitewelcome.com ([192.185.46.233]:39515 "EHLO
+        gateway22.websitewelcome.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1752711AbcJYLuu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 Oct 2016 17:19:08 -0400
-Date: Wed, 26 Oct 2016 08:19:03 +1100
-From: Dave Chinner <david@fromorbit.com>
-To: Stephen Bates <sbates@raithlin.com>
+        Tue, 25 Oct 2016 07:50:50 -0400
+Received: from cm7.websitewelcome.com (cm7.websitewelcome.com [108.167.139.20])
+        by gateway22.websitewelcome.com (Postfix) with ESMTP id 39D15DF10E4D7
+        for <linux-block@vger.kernel.org>; Tue, 25 Oct 2016 06:50:48 -0500 (CDT)
+Date: Tue, 25 Oct 2016 05:50:43 -0600
+From: Stephen Bates <sbates@raithlin.com>
+To: Dave Chinner <david@fromorbit.com>
 Cc: Christoph Hellwig <hch@infradead.org>,
         Dan Williams <dan.j.williams@intel.com>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
@@ -22,79 +25,69 @@ Cc: Christoph Hellwig <hch@infradead.org>,
         David Woodhouse <dwmw2@infradead.org>,
         "Raj, Ashok" <ashok.raj@intel.com>
 Subject: Re: [PATCH 0/3] iopmem : A block device for PCIe memory
-Message-ID: <20161025211903.GD14023@dastard>
+Message-ID: <20161025115043.GA14986@cgy1-donard.priv.deltatee.com>
 References: <1476826937-20665-1-git-send-email-sbates@raithlin.com>
  <CAPcyv4gJ_c-6s2BUjsu6okR1EF53R+KNuXnOc5jv0fuwJaa3cQ@mail.gmail.com>
  <20161019184814.GC16550@cgy1-donard.priv.deltatee.com>
  <20161020232239.GQ23194@dastard>
  <20161021095714.GA12209@infradead.org>
  <20161021111253.GQ14023@dastard>
- <20161025115043.GA14986@cgy1-donard.priv.deltatee.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20161025115043.GA14986@cgy1-donard.priv.deltatee.com>
+In-Reply-To: <20161021111253.GQ14023@dastard>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Tue, Oct 25, 2016 at 05:50:43AM -0600, Stephen Bates wrote:
-> Hi Dave and Christoph
-> 
-> On Fri, Oct 21, 2016 at 10:12:53PM +1100, Dave Chinner wrote:
-> > On Fri, Oct 21, 2016 at 02:57:14AM -0700, Christoph Hellwig wrote:
-> > > On Fri, Oct 21, 2016 at 10:22:39AM +1100, Dave Chinner wrote:
-> > > > You do realise that local filesystems can silently change the
-> > > > location of file data at any point in time, so there is no such
-> > > > thing as a "stable mapping" of file data to block device addresses
-> > > > in userspace?
-> > > >
-> > > > If you want remote access to the blocks owned and controlled by a
-> > > > filesystem, then you need to use a filesystem with a remote locking
-> > > > mechanism to allow co-ordinated, coherent access to the data in
-> > > > those blocks. Anything else is just asking for ongoing, unfixable
-> > > > filesystem corruption or data leakage problems (i.e.  security
-> > > > issues).
+Hi Dave and Christoph
+
+On Fri, Oct 21, 2016 at 10:12:53PM +1100, Dave Chinner wrote:
+> On Fri, Oct 21, 2016 at 02:57:14AM -0700, Christoph Hellwig wrote:
+> > On Fri, Oct 21, 2016 at 10:22:39AM +1100, Dave Chinner wrote:
+> > > You do realise that local filesystems can silently change the
+> > > location of file data at any point in time, so there is no such
+> > > thing as a "stable mapping" of file data to block device addresses
+> > > in userspace?
 > > >
-> 
-> Dave are you saying that even for local mappings of files on a DAX
-> capable system it is possible for the mappings to move on you unless
-> the FS supports locking?
+> > > If you want remote access to the blocks owned and controlled by a
+> > > filesystem, then you need to use a filesystem with a remote locking
+> > > mechanism to allow co-ordinated, coherent access to the data in
+> > > those blocks. Anything else is just asking for ongoing, unfixable
+> > > filesystem corruption or data leakage problems (i.e.  security
+> > > issues).
+> >
 
-Yes.
+Dave are you saying that even for local mappings of files on a DAX
+capable system it is possible for the mappings to move on you unless
+the FS supports locking? Does that not mean DAX on such FS is
+inherently broken?
 
-> Does that not mean DAX on such FS is
-> inherently broken?
+> > And at least for XFS we have such a mechanism :)  E.g. I have a
+> > prototype of a pNFS layout that uses XFS+DAX to allow clients to do
+> > RDMA directly to XFS files, with the same locking mechanism we use
+> > for the current block and scsi layout in xfs_pnfs.c.
+>
 
-No. DAX is accessed through a virtual mapping layer that abstracts
-the physical location from userspace applications.
+Thanks for fixing this issue on XFS Christoph! I assume this problem
+continues to exist on the other DAX capable FS?
 
-Example: think copy-on-write overwrites. It occurs atomically from
-the perspective of userspace and starts by invalidating any current
-mappings userspace has of that physical location. The location is
-changes, the data copied in, and then when the locks are released
-userspace can fault in a new page table mapping on the next
-access....
+One more reason to consider a move to /dev/dax I guess ;-)...
 
-> > > And at least for XFS we have such a mechanism :)  E.g. I have a
-> > > prototype of a pNFS layout that uses XFS+DAX to allow clients to do
-> > > RDMA directly to XFS files, with the same locking mechanism we use
-> > > for the current block and scsi layout in xfs_pnfs.c.
-> 
-> Thanks for fixing this issue on XFS Christoph! I assume this problem
-> continues to exist on the other DAX capable FS?
+Stephen
 
-Yes, but it they implement the exportfs API that supplies this
-capability, they'll be able to use pNFS, too.
 
-> One more reason to consider a move to /dev/dax I guess ;-)...
-
-That doesn't get rid of the need for sane access control arbitration
-across all machines that are directly accessing the storage. That's
-the problem pNFS solves, regardless of whether your direct access
-target is a filesystem, a block device or object storage...
-
-Cheers,
-
-Dave.
--- 
-Dave Chinner
-david@fromorbit.com
+> Oh, that's good to know - pNFS over XFS was exactly what I was
+> thinking of when I wrote my earlier reply. A few months ago someone
+> else was trying to use file mappings in userspace for direct remote
+> client access on fabric connected devices. I told them "pNFS on XFS
+> and write an efficient transport for you hardware"....
+>
+> Now that I know we've got RDMA support for pNFS on XFS in the
+> pipeline, I can just tell them "just write an rdma driver for your
+> hardware" instead. :P
+>
+> Cheers,
+>
+> Dave.
+> --
+> Dave Chinner
+> david@fromorbit.com
