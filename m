@@ -1,60 +1,57 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from verein.lst.de ([213.95.11.211]:44575 "EHLO newverein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S932543AbcJYQeq (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 Oct 2016 12:34:46 -0400
-Date: Tue, 25 Oct 2016 18:34:43 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Kent Overstreet <kent.overstreet@gmail.com>
-Cc: Christoph Hellwig <hch@lst.de>, linux-xfs@vger.kernel.org,
-        axboe@fb.com, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org
+Received: from mail-pf0-f193.google.com ([209.85.192.193]:35470 "EHLO
+        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S934912AbcJYPcB (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 25 Oct 2016 11:32:01 -0400
+Date: Tue, 25 Oct 2016 07:31:56 -0800
+From: Kent Overstreet <kent.overstreet@gmail.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-xfs@vger.kernel.org, axboe@fb.com,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
 Subject: Re: [PATCH 5/6] iomap: implement direct I/O
-Message-ID: <20161025163443.GA8730@lst.de>
-References: <1477408098-10153-1-git-send-email-hch@lst.de> <1477408098-10153-6-git-send-email-hch@lst.de> <20161025153156.cjhcvvoxd3c6pqf7@kmo-pixel>
+Message-ID: <20161025153156.cjhcvvoxd3c6pqf7@kmo-pixel>
+References: <1477408098-10153-1-git-send-email-hch@lst.de>
+ <1477408098-10153-6-git-send-email-hch@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20161025153156.cjhcvvoxd3c6pqf7@kmo-pixel>
+In-Reply-To: <1477408098-10153-6-git-send-email-hch@lst.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Tue, Oct 25, 2016 at 07:31:56AM -0800, Kent Overstreet wrote:
-> So you're still walking the mappings, then for each mapping allocating a bio and
-> pinning pages - opposite of my approach, I started out by allocating a bio and
-> pinning pages and then walk the mapping, splitting the bio as needed.
+On Tue, Oct 25, 2016 at 05:08:17PM +0200, Christoph Hellwig wrote:
+> This adds a full fledget direct I/O implementation using the iomap
+> interface. Full fledged in this case means all features are supported:
+> AIO, vectored I/O, any iov_iter type including kernel pointers, bvecs
+> and pipes, support for hole filling and async apending writes.  It does
+> not mean supporting all the warts of the old generic code.  We expect
+> i_rwsem to be held over the duration of the call, and we expect to
+> maintain i_dio_count ourselves, and we pass on any kinds of mapping
+> to the file system for now.
 > 
-> I still like my approach better, I think it ought to perform better when doing
-> fragmented IOs and it feels cleaner to me - you're not going back and forth
-> between calling into the gup() code, and your filesystem's btree code, both of
-> which are going to require taking their own set of locks and such. That said, I
-> doubt it's much of a difference and your code is so much simpler than
-> direct-IO.c that who cares :)
+> The algorithm used is very simple: We use iomap_apply to iterate over
+> the range of the I/O, and then we use the new bio_iov_iter_get_pages
+> helper to lock down the user range for the size of the extent.
+> bio_iov_iter_get_pages can currently lock down twice as many pages as
+> the old direct I/O code did, which means that we will have a better
+> batch factor for everything but overwrites of badly fragmented files.
 
-Yes, this is the basic idea behind the whole iomap code - we have
-a generic apply function that calls into the fs allocator, and then
-takes a callback that it applies to one extent at a time.  It really
-helps a lot to separate responsibilities and factor the code into
-independent functions.
+It's definitely simpler :)
 
-I looked at carrying over bios between different invocations of the
-callback, but it quickly turned into a mess.  In the end the only thing
-we'd optimize with it is the gup call - bios would have to be split
-anyway, etc, etc.  So with this code there indeed is a worsr case
-for badly fragmented files, but I'd rather work on the fs allocator
-to further reduce the amount of fragmentation we have rather than
-working around it.  E.g. for XFS Darrick and I have sketched a rough
-plan for an auto-COW mode where we'd simply not reuse fragmented blocks
-for an overwrite and will instead give the caller a nice contiguous
-single extent.
+So you're still walking the mappings, then for each mapping allocating a bio and
+pinning pages - opposite of my approach, I started out by allocating a bio and
+pinning pages and then walk the mapping, splitting the bio as needed.
 
-> Do you have your code up in a git repo somewhere? I'm going to compare it to
-> bcachefs's dio code and see if I can remember all edge cases I hit when I was
-> working on that.
+I still like my approach better, I think it ought to perform better when doing
+fragmented IOs and it feels cleaner to me - you're not going back and forth
+between calling into the gup() code, and your filesystem's btree code, both of
+which are going to require taking their own set of locks and such. That said, I
+doubt it's much of a difference and your code is so much simpler than
+direct-IO.c that who cares :)
 
-Git:
+Do you have your code up in a git repo somewhere? I'm going to compare it to
+bcachefs's dio code and see if I can remember all edge cases I hit when I was
+working on that.
 
-git://git.infradead.org/users/hch/vfs.git iomap-dio
-
-Gitweb:
-
-http://git.infradead.org/users/hch/vfs.git/shortlog/refs/heads/iomap-dio
+bcachefs's dio code, for reference:
+https://evilpiepirate.org/git/linux-bcache.git/tree/drivers/md/bcache/fs-io.c?h=bcache-dev#n1268
