@@ -1,65 +1,93 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-by2nam03on0082.outbound.protection.outlook.com ([104.47.42.82]:38216
-        "EHLO NAM03-BY2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1755546AbcJRVsw (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Oct 2016 17:48:52 -0400
-Subject: [PATCH v3 01/11] blk-mq: Do not invoke .queue_rq() for a stopped
- queue
-To: Jens Axboe <axboe@fb.com>
-References: <b39eb0e7-1007-eb63-8e7f-9a7f08508379@sandisk.com>
-CC: Christoph Hellwig <hch@lst.de>,
-        James Bottomley <jejb@linux.vnet.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Doug Ledford <dledford@redhat.com>,
-        Keith Busch <keith.busch@intel.com>,
-        Ming Lin <ming.l@ssi.samsung.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-Message-ID: <595d4b59-3892-ef24-ef91-b7cab6611af7@sandisk.com>
-Date: Tue, 18 Oct 2016 14:48:43 -0700
-MIME-Version: 1.0
-In-Reply-To: <b39eb0e7-1007-eb63-8e7f-9a7f08508379@sandisk.com>
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv4 28/43] truncate: make invalidate_inode_pages2_range() aware about huge pages
+Date: Tue, 25 Oct 2016 03:13:27 +0300
+Message-Id: <20161025001342.76126-29-kirill.shutemov@linux.intel.com>
+In-Reply-To: <20161025001342.76126-1-kirill.shutemov@linux.intel.com>
+References: <20161025001342.76126-1-kirill.shutemov@linux.intel.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-The meaning of the BLK_MQ_S_STOPPED flag is "do not call
-.queue_rq()". Hence modify blk_mq_make_request() such that requests
-are queued instead of issued if a queue has been stopped.
+For huge pages we need to unmap whole range covered by the huge page.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Sagi Grimberg <sagi@grimberg.me>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: <stable@vger.kernel.org>
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- block/blk-mq.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ mm/truncate.c | 27 +++++++++++++++++++--------
+ 1 file changed, 19 insertions(+), 8 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index ddc2eed..b5dcafb 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1332,9 +1332,9 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
- 		blk_mq_put_ctx(data.ctx);
- 		if (!old_rq)
- 			goto done;
--		if (!blk_mq_direct_issue_request(old_rq, &cookie))
--			goto done;
--		blk_mq_insert_request(old_rq, false, true, true);
-+		if (test_bit(BLK_MQ_S_STOPPED, &data.hctx->state) ||
-+		    blk_mq_direct_issue_request(old_rq, &cookie) != 0)
-+			blk_mq_insert_request(old_rq, false, true, true);
- 		goto done;
- 	}
- 
+diff --git a/mm/truncate.c b/mm/truncate.c
+index 7bb9d197a9e8..59bc1b4260d1 100644
+--- a/mm/truncate.c
++++ b/mm/truncate.c
+@@ -693,27 +693,34 @@ int invalidate_inode_pages2_range(struct address_space *mapping,
+ 				continue;
+ 			}
+ 			wait_on_page_writeback(page);
++			page = compound_head(page);
++
+ 			if (page_mapped(page)) {
++				loff_t begin, len;
++
++				begin = page->index << PAGE_SHIFT;
++
+ 				if (!did_range_unmap) {
+ 					/*
+ 					 * Zap the rest of the file in one hit.
+ 					 */
++					len = (loff_t)(1 + end - page->index) <<
++						PAGE_SHIFT;
++					if (len < hpage_size(page))
++						len = hpage_size(page);
+ 					unmap_mapping_range(mapping,
+-					   (loff_t)index << PAGE_SHIFT,
+-					   (loff_t)(1 + end - index)
+-							 << PAGE_SHIFT,
+-							 0);
++							begin, len, 0);
+ 					did_range_unmap = 1;
+ 				} else {
+ 					/*
+ 					 * Just zap this page
+ 					 */
+-					unmap_mapping_range(mapping,
+-					   (loff_t)index << PAGE_SHIFT,
+-					   PAGE_SIZE, 0);
++					len = hpage_size(page);
++					unmap_mapping_range(mapping, begin,
++							len, 0 );
+ 				}
+ 			}
+-			BUG_ON(page_mapped(page));
++			VM_BUG_ON_PAGE(page_mapped(page), page);
+ 			ret2 = do_launder_page(mapping, page);
+ 			if (ret2 == 0) {
+ 				if (!invalidate_complete_page2(mapping, page))
+@@ -722,6 +729,10 @@ int invalidate_inode_pages2_range(struct address_space *mapping,
+ 			if (ret2 < 0)
+ 				ret = ret2;
+ 			unlock_page(page);
++			if (PageTransHuge(page)) {
++				index = page->index + HPAGE_PMD_NR - 1;
++				break;
++			}
+ 		}
+ 		pagevec_remove_exceptionals(&pvec);
+ 		pagevec_release(&pvec);
 -- 
-2.10.1
+2.9.3
 
