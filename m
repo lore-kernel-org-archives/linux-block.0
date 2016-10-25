@@ -1,127 +1,179 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:43057 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1752378AbcJCVUg (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 3 Oct 2016 17:20:36 -0400
-Received: from pps.filterd (m0001303.ppops.net [127.0.0.1])
-        by m0001303.ppops.net (8.16.0.17/8.16.0.17) with SMTP id u93LGc8p024552
-        for <linux-block@vger.kernel.org>; Mon, 3 Oct 2016 14:20:35 -0700
-Received: from mail.thefacebook.com ([199.201.64.23])
-        by m0001303.ppops.net with ESMTP id 25t8tbef39-2
-        (version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT)
-        for <linux-block@vger.kernel.org>; Mon, 03 Oct 2016 14:20:35 -0700
-Received: from facebook.com (2401:db00:21:603d:face:0:19:0)     by
- mx-out.facebook.com (10.223.101.97) with ESMTP id
- 3821076089af11e68fdf24be0595f910-daff9a50 for <linux-block@vger.kernel.org>;
-        Mon, 03 Oct 2016 14:20:33 -0700
-From: Shaohua Li <shli@fb.com>
-To: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <axboe@fb.com>, <Kernel-team@fb.com>, <tj@kernel.org>,
-        <jmoyer@redhat.com>, <vgoyal@redhat.com>
-Subject: [PATCH v3 11/11] blk-throttle: ignore idle cgroup limit
-Date: Mon, 3 Oct 2016 14:20:30 -0700
-Message-ID: <5939a89cb0573615410f82baae3abbe0c3c1fd56.1475529372.git.shli@fb.com>
-In-Reply-To: <cover.1475529372.git.shli@fb.com>
-References: <cover.1475529372.git.shli@fb.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv4 43/43] ext4, vfs: add huge= mount option
+Date: Tue, 25 Oct 2016 03:13:42 +0300
+Message-Id: <20161025001342.76126-44-kirill.shutemov@linux.intel.com>
+In-Reply-To: <20161025001342.76126-1-kirill.shutemov@linux.intel.com>
+References: <20161025001342.76126-1-kirill.shutemov@linux.intel.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Last patch introduces a way to detect idle cgroup. We use it to make
-upgrade/downgrade decision.
+The same four values as in tmpfs case.
 
-Signed-off-by: Shaohua Li <shli@fb.com>
+Encyption code is not yet ready to handle huge page, so we disable huge
+pages support if the inode has EXT4_INODE_ENCRYPT.
+
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- block/blk-throttle.c | 31 +++++++++++++++++++------------
- 1 file changed, 19 insertions(+), 12 deletions(-)
+ fs/ext4/ext4.h  |  5 +++++
+ fs/ext4/inode.c | 26 +++++++++++++++++++++-----
+ fs/ext4/super.c | 26 ++++++++++++++++++++++++++
+ 3 files changed, 52 insertions(+), 5 deletions(-)
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index e8a2f31..c46d6e4 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -146,8 +146,6 @@ struct throtl_grp {
- 
- 	unsigned long last_check_time;
- 
--	unsigned long last_dispatch_time[2];
--
- 	/* When did we start a new slice */
- 	unsigned long slice_start[2];
- 	unsigned long slice_end[2];
-@@ -489,8 +487,6 @@ static void throtl_pd_online(struct blkg_policy_data *pd)
- 	 * Update has_rules[] after a new group is brought online.
- 	 */
- 	tg_update_has_rules(tg);
--	tg->last_dispatch_time[READ] = jiffies;
--	tg->last_dispatch_time[WRITE] = jiffies;
- }
- 
- static void blk_throtl_update_valid_limit(struct throtl_data *td)
-@@ -1664,9 +1660,8 @@ static bool throtl_upgrade_check_one(struct throtl_grp *tg)
- 		return true;
- 
- 	if (time_after_eq(jiffies,
--	     tg->last_dispatch_time[READ] + tg->td->throtl_slice) &&
--	    time_after_eq(jiffies,
--	     tg->last_dispatch_time[WRITE] + tg->td->throtl_slice))
-+		tg_last_high_overflow_time(tg) + tg->td->throtl_slice) &&
-+	    throtl_tg_is_idle(tg))
- 		return true;
- 	return false;
- }
-@@ -1715,6 +1710,19 @@ static bool throtl_can_upgrade(struct throtl_data *td,
- 	return true;
- }
- 
-+static void throtl_upgrade_check(struct throtl_grp *tg)
-+{
-+	if (tg->td->limit_index != LIMIT_HIGH)
-+		return;
-+
-+	if (!time_after_eq(jiffies,
-+	     __tg_last_high_overflow_time(tg) + tg->td->throtl_slice))
-+		return;
-+
-+	if (throtl_can_upgrade(tg->td, NULL))
-+		throtl_upgrade_state(tg->td);
-+}
-+
- static void throtl_upgrade_state(struct throtl_data *td)
+diff --git a/fs/ext4/ext4.h b/fs/ext4/ext4.h
+index 282a51b07c57..610c31c56bad 100644
+--- a/fs/ext4/ext4.h
++++ b/fs/ext4/ext4.h
+@@ -1132,6 +1132,11 @@ struct ext4_inode_info {
+ #define EXT4_MOUNT_DIOREAD_NOLOCK	0x400000 /* Enable support for dio read nolocking */
+ #define EXT4_MOUNT_JOURNAL_CHECKSUM	0x800000 /* Journal checksums */
+ #define EXT4_MOUNT_JOURNAL_ASYNC_COMMIT	0x1000000 /* Journal Async Commit */
++#define EXT4_MOUNT_HUGE_MODE		0x6000000 /* Huge support mode: */
++#define EXT4_MOUNT_HUGE_NEVER		0x0000000
++#define EXT4_MOUNT_HUGE_ALWAYS		0x2000000
++#define EXT4_MOUNT_HUGE_WITHIN_SIZE	0x4000000
++#define EXT4_MOUNT_HUGE_ADVISE		0x6000000
+ #define EXT4_MOUNT_DELALLOC		0x8000000 /* Delalloc support */
+ #define EXT4_MOUNT_DATA_ERR_ABORT	0x10000000 /* Abort on file data write */
+ #define EXT4_MOUNT_BLOCK_VALIDITY	0x20000000 /* Block validity checking */
+diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
+index 76e98e5b3c5e..a6d86883b2b4 100644
+--- a/fs/ext4/inode.c
++++ b/fs/ext4/inode.c
+@@ -4374,7 +4374,7 @@ int ext4_get_inode_loc(struct inode *inode, struct ext4_iloc *iloc)
+ void ext4_set_inode_flags(struct inode *inode)
  {
- 	struct cgroup_subsys_state *pos_css;
-@@ -1749,15 +1757,14 @@ static bool throtl_downgrade_check_one(struct throtl_grp *tg)
- 	struct throtl_data *td = tg->td;
- 	unsigned long now = jiffies;
+ 	unsigned int flags = EXT4_I(inode)->i_flags;
+-	unsigned int new_fl = 0;
++	unsigned int mask, new_fl = 0;
  
--	if (time_after_eq(now, tg->last_dispatch_time[READ] + td->throtl_slice) &&
--	    time_after_eq(now, tg->last_dispatch_time[WRITE] + td->throtl_slice))
--		return false;
- 	/*
- 	 * If cgroup is below high limit, consider downgrade and throttle other
- 	 * cgroups
- 	 */
- 	if (time_after_eq(now, td->high_upgrade_time + td->throtl_slice) &&
--	    time_after_eq(now, tg_last_high_overflow_time(tg) + td->throtl_slice))
-+	    time_after_eq(now, tg_last_high_overflow_time(tg) + td->throtl_slice) &&
-+	    (!throtl_tg_is_idle(tg) ||
-+	     !list_empty(&tg_to_blkg(tg)->blkcg->css.children)))
- 		return true;
- 	return false;
+ 	if (flags & EXT4_SYNC_FL)
+ 		new_fl |= S_SYNC;
+@@ -4386,10 +4386,26 @@ void ext4_set_inode_flags(struct inode *inode)
+ 		new_fl |= S_NOATIME;
+ 	if (flags & EXT4_DIRSYNC_FL)
+ 		new_fl |= S_DIRSYNC;
+-	if (test_opt(inode->i_sb, DAX) && S_ISREG(inode->i_mode))
+-		new_fl |= S_DAX;
+-	inode_set_flags(inode, new_fl,
+-			S_SYNC|S_APPEND|S_IMMUTABLE|S_NOATIME|S_DIRSYNC|S_DAX);
++	if (S_ISREG(inode->i_mode) && !ext4_encrypted_inode(inode)) {
++		if (test_opt(inode->i_sb, DAX))
++			new_fl |= S_DAX;
++		switch (test_opt(inode->i_sb, HUGE_MODE)) {
++		case EXT4_MOUNT_HUGE_NEVER:
++			break;
++		case EXT4_MOUNT_HUGE_ALWAYS:
++			new_fl |= S_HUGE_ALWAYS;
++			break;
++		case EXT4_MOUNT_HUGE_WITHIN_SIZE:
++			new_fl |= S_HUGE_WITHIN_SIZE;
++			break;
++		case EXT4_MOUNT_HUGE_ADVISE:
++			new_fl |= S_HUGE_ADVISE;
++			break;
++		}
++	}
++	mask = S_SYNC | S_APPEND | S_IMMUTABLE | S_NOATIME |
++		S_DIRSYNC | S_DAX | S_HUGE_MODE;
++	inode_set_flags(inode, new_fl, mask);
  }
-@@ -1895,10 +1902,10 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
  
- again:
- 	while (true) {
--		tg->last_dispatch_time[rw] = jiffies;
- 		if (tg->last_high_overflow_time[rw] == 0)
- 			tg->last_high_overflow_time[rw] = jiffies;
- 		throtl_downgrade_check(tg);
-+		throtl_upgrade_check(tg);
- 		/* throtl is FIFO - if bios are already queued, should queue */
- 		if (sq->nr_queued[rw])
- 			break;
+ /* Propagate flags from i_flags to EXT4_I(inode)->i_flags */
+diff --git a/fs/ext4/super.c b/fs/ext4/super.c
+index 20da99da0a34..81c434f0ee4e 100644
+--- a/fs/ext4/super.c
++++ b/fs/ext4/super.c
+@@ -1126,6 +1126,7 @@ static int ext4_set_context(struct inode *inode, const void *ctx, size_t len,
+ 			ext4_set_inode_flag(inode, EXT4_INODE_ENCRYPT);
+ 			ext4_clear_inode_state(inode,
+ 					EXT4_STATE_MAY_INLINE_DATA);
++			ext4_set_inode_flags(inode);
+ 		}
+ 		return res;
+ 	}
+@@ -1140,6 +1141,7 @@ static int ext4_set_context(struct inode *inode, const void *ctx, size_t len,
+ 			len, 0);
+ 	if (!res) {
+ 		ext4_set_inode_flag(inode, EXT4_INODE_ENCRYPT);
++		ext4_set_inode_flags(inode);
+ 		res = ext4_mark_inode_dirty(handle, inode);
+ 		if (res)
+ 			EXT4_ERROR_INODE(inode, "Failed to mark inode dirty");
+@@ -1278,6 +1280,7 @@ enum {
+ 	Opt_dioread_nolock, Opt_dioread_lock,
+ 	Opt_discard, Opt_nodiscard, Opt_init_itable, Opt_noinit_itable,
+ 	Opt_max_dir_size_kb, Opt_nojournal_checksum,
++	Opt_huge_never, Opt_huge_always, Opt_huge_within_size, Opt_huge_advise,
+ };
+ 
+ static const match_table_t tokens = {
+@@ -1358,6 +1361,10 @@ static const match_table_t tokens = {
+ 	{Opt_init_itable, "init_itable"},
+ 	{Opt_noinit_itable, "noinit_itable"},
+ 	{Opt_max_dir_size_kb, "max_dir_size_kb=%u"},
++	{Opt_huge_never, "huge=never"},
++	{Opt_huge_always, "huge=always"},
++	{Opt_huge_within_size, "huge=within_size"},
++	{Opt_huge_advise, "huge=advise"},
+ 	{Opt_test_dummy_encryption, "test_dummy_encryption"},
+ 	{Opt_removed, "check=none"},	/* mount option from ext2/3 */
+ 	{Opt_removed, "nocheck"},	/* mount option from ext2/3 */
+@@ -1476,6 +1483,11 @@ static int clear_qf_name(struct super_block *sb, int qtype)
+ #define MOPT_NO_EXT3	0x0200
+ #define MOPT_EXT4_ONLY	(MOPT_NO_EXT2 | MOPT_NO_EXT3)
+ #define MOPT_STRING	0x0400
++#ifdef CONFIG_TRANSPARENT_HUGE_PAGECACHE
++#define MOPT_HUGE	0x1000
++#else
++#define MOPT_HUGE	MOPT_NOSUPPORT
++#endif
+ 
+ static const struct mount_opts {
+ 	int	token;
+@@ -1563,6 +1575,10 @@ static const struct mount_opts {
+ 	{Opt_jqfmt_vfsv0, QFMT_VFS_V0, MOPT_QFMT},
+ 	{Opt_jqfmt_vfsv1, QFMT_VFS_V1, MOPT_QFMT},
+ 	{Opt_max_dir_size_kb, 0, MOPT_GTE0},
++	{Opt_huge_never, EXT4_MOUNT_HUGE_NEVER, MOPT_HUGE},
++	{Opt_huge_always, EXT4_MOUNT_HUGE_ALWAYS, MOPT_HUGE},
++	{Opt_huge_within_size, EXT4_MOUNT_HUGE_WITHIN_SIZE, MOPT_HUGE},
++	{Opt_huge_advise, EXT4_MOUNT_HUGE_ADVISE, MOPT_HUGE},
+ 	{Opt_test_dummy_encryption, 0, MOPT_GTE0},
+ 	{Opt_err, 0, 0}
+ };
+@@ -1644,6 +1660,16 @@ static int handle_mount_opt(struct super_block *sb, char *opt, int token,
+ 		} else
+ 			return -1;
+ 	}
++	if (MOPT_HUGE != MOPT_NOSUPPORT && m->flags & MOPT_HUGE) {
++		sbi->s_mount_opt &= ~EXT4_MOUNT_HUGE_MODE;
++		sbi->s_mount_opt |= m->mount_opt;
++		if (m->mount_opt) {
++			ext4_msg(sb, KERN_WARNING, "Warning: "
++					"Support of huge pages is EXPERIMENTAL,"
++					" use at your own risk");
++		}
++		return 1;
++	}
+ 	if (m->flags & MOPT_CLEAR_ERR)
+ 		clear_opt(sb, ERRORS_MASK);
+ 	if (token == Opt_noquota && sb_any_quota_loaded(sb)) {
 -- 
 2.9.3
 
