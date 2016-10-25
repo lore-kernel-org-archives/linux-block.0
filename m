@@ -1,186 +1,63 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>,
-	Tejun Heo <tj@kernel.org>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	linus.walleij@linaro.org,
-	broonie@kernel.org,
-	hare@suse.de,
-	arnd@arndb.de,
-	bart.vanassche@sandisk.com,
-	grant.likely@secretlab.ca,
-	jack@suse.cz,
-	James.Bottomley@HansenPartnership.com,
-	Paolo Valente <paolo.valente@linaro.org>,
-	Arianna Avanzini <avanzini.arianna@gmail.com>
-Subject: [PATCH 09/14] block, bfq: reduce latency during request-pool saturation
-Date: Wed, 26 Oct 2016 11:28:02 +0200
-Message-Id: <1477474082-2846-10-git-send-email-paolo.valente@linaro.org>
-In-Reply-To: <1477474082-2846-1-git-send-email-paolo.valente@linaro.org>
-References: <1477474082-2846-1-git-send-email-paolo.valente@linaro.org>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv4 11/43] thp: handle write-protection faults for file THP
+Date: Tue, 25 Oct 2016 03:13:10 +0300
+Message-Id: <20161025001342.76126-12-kirill.shutemov@linux.intel.com>
+In-Reply-To: <20161025001342.76126-1-kirill.shutemov@linux.intel.com>
+References: <20161025001342.76126-1-kirill.shutemov@linux.intel.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-This patch introduces an heuristic that reduces latency when the
-I/O-request pool is saturated. This goal is achieved by disabling
-device idling, for non-weight-raised queues, when there are weight-
-raised queues with pending or in-flight requests. In fact, as
-explained in more detail in the comment on the function
-bfq_bfqq_may_idle(), this reduces the rate at which processes
-associated with non-weight-raised queues grab requests from the pool,
-thereby increasing the probability that processes associated with
-weight-raised queues get a request immediately (or at least soon) when
-they need one. Along the same line, if there are weight-raised queues,
-then this patch halves the service rate of async (write) requests for
-non-weight-raised queues.
+For filesystems that wants to be write-notified (has mkwrite), we will
+encount write-protection faults for huge PMDs in shared mappings.
 
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
-Signed-off-by: Arianna Avanzini <avanzini.arianna@gmail.com>
+The easiest way to handle them is to clear the PMD and let it refault as
+wriable.
+
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+Reviewed-by: Jan Kara <jack@suse.cz>
 ---
- block/bfq-iosched.c | 66 ++++++++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 63 insertions(+), 3 deletions(-)
+ mm/memory.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 3b11772..46d6df3 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -378,6 +378,8 @@ struct bfq_data {
- 	 * queue in service, even if it is idling).
- 	 */
- 	int busy_queues;
-+	/* number of weight-raised busy @bfq_queues */
-+	int wr_busy_queues;
- 	/* number of queued requests */
- 	int queued;
- 	/* number of requests dispatched and waiting for completion */
-@@ -2019,6 +2021,9 @@ static void bfq_del_bfqq_busy(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+diff --git a/mm/memory.c b/mm/memory.c
+index e18c57bdc75c..e8c04d1d87b8 100644
+--- a/mm/memory.c
++++ b/mm/memory.c
+@@ -3452,8 +3452,17 @@ static int wp_huge_pmd(struct fault_env *fe, pmd_t orig_pmd)
+ 		return fe->vma->vm_ops->pmd_fault(fe->vma, fe->address, fe->pmd,
+ 				fe->flags);
  
- 	bfqd->busy_queues--;
- 
-+	if (bfqq->wr_coeff > 1)
-+		bfqd->wr_busy_queues--;
++	if (fe->vma->vm_flags & VM_SHARED) {
++		/* Clear PMD */
++		zap_page_range_single(fe->vma, fe->address & HPAGE_PMD_MASK,
++				HPAGE_PMD_SIZE, NULL);
++		VM_BUG_ON(!pmd_none(*fe->pmd));
 +
- 	bfqg_stats_update_dequeue(bfqq_group(bfqq));
- 
- 	bfq_deactivate_bfqq(bfqd, bfqq, requeue);
-@@ -2035,6 +2040,9 @@ static void bfq_add_bfqq_busy(struct bfq_data *bfqd, struct bfq_queue *bfqq)
- 
- 	bfq_mark_bfqq_busy(bfqq);
- 	bfqd->busy_queues++;
++		/* Refault to establish writable PMD */
++		return 0;
++	}
 +
-+	if (bfqq->wr_coeff > 1)
-+		bfqd->wr_busy_queues++;
- }
+ 	/* COW handled on pte level: split pmd */
+-	VM_BUG_ON_VMA(fe->vma->vm_flags & VM_SHARED, fe->vma);
+ 	split_huge_pmd(fe->vma, fe->pmd, fe->address);
  
- #if defined(CONFIG_BFQ_GROUP_IOSCHED) && defined(CONFIG_DEBUG_BLK_CGROUP)
-@@ -3335,7 +3343,16 @@ static unsigned long bfq_serv_to_charge(struct request *rq,
- 	if (bfq_bfqq_sync(bfqq) || bfqq->wr_coeff > 1)
- 		return blk_rq_sectors(rq);
- 
--	return blk_rq_sectors(rq) * bfq_async_charge_factor;
-+	/*
-+	 * If there are no weight-raised queues, then amplify service
-+	 * by just the async charge factor; otherwise amplify service
-+	 * by twice the async charge factor, to further reduce latency
-+	 * for weight-raised queues.
-+	 */
-+	if (bfqq->bfqd->wr_busy_queues == 0)
-+		return blk_rq_sectors(rq) * bfq_async_charge_factor;
-+
-+	return blk_rq_sectors(rq) * 2 * bfq_async_charge_factor;
- }
- 
- /**
-@@ -3791,6 +3808,7 @@ static void bfq_add_request(struct request *rq)
- 			bfqq->wr_coeff = bfqd->bfq_wr_coeff;
- 			bfqq->wr_cur_max_time = bfq_wr_duration(bfqd);
- 
-+			bfqd->wr_busy_queues++;
- 			bfqq->entity.prio_changed = 1;
- 		}
- 		if (prev != bfqq->next_rq)
-@@ -4003,6 +4021,8 @@ static void bfq_merged_requests(struct request_queue *q, struct request *rq,
- /* Must be called with bfqq != NULL */
- static void bfq_bfqq_end_wr(struct bfq_queue *bfqq)
- {
-+	if (bfq_bfqq_busy(bfqq))
-+		bfqq->bfqd->wr_busy_queues--;
- 	bfqq->wr_coeff = 1;
- 	bfqq->wr_cur_max_time = 0;
- 	bfqq->last_wr_start_finish = jiffies;
-@@ -5049,7 +5069,8 @@ static bool bfq_may_expire_for_budg_timeout(struct bfq_queue *bfqq)
- static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
- {
- 	struct bfq_data *bfqd = bfqq->bfqd;
--	bool idling_boosts_thr, asymmetric_scenario;
-+	bool idling_boosts_thr, idling_boosts_thr_without_issues,
-+		asymmetric_scenario;
- 
- 	if (bfqd->strict_guarantees)
- 		return true;
-@@ -5072,6 +5093,44 @@ static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
- 	idling_boosts_thr = !bfqd->hw_tag || bfq_bfqq_IO_bound(bfqq);
- 
- 	/*
-+	 * The value of the next variable,
-+	 * idling_boosts_thr_without_issues, is equal to that of
-+	 * idling_boosts_thr, unless a special case holds. In this
-+	 * special case, described below, idling may cause problems to
-+	 * weight-raised queues.
-+	 *
-+	 * When the request pool is saturated (e.g., in the presence
-+	 * of write hogs), if the processes associated with
-+	 * non-weight-raised queues ask for requests at a lower rate,
-+	 * then processes associated with weight-raised queues have a
-+	 * higher probability to get a request from the pool
-+	 * immediately (or at least soon) when they need one. Thus
-+	 * they have a higher probability to actually get a fraction
-+	 * of the device throughput proportional to their high
-+	 * weight. This is especially true with NCQ-capable drives,
-+	 * which enqueue several requests in advance, and further
-+	 * reorder internally-queued requests.
-+	 *
-+	 * For this reason, we force to false the value of
-+	 * idling_boosts_thr_without_issues if there are weight-raised
-+	 * busy queues. In this case, and if bfqq is not weight-raised,
-+	 * this guarantees that the device is not idled for bfqq (if,
-+	 * instead, bfqq is weight-raised, then idling will be
-+	 * guaranteed by another variable, see below). Combined with
-+	 * the timestamping rules of BFQ (see [1] for details), this
-+	 * behavior causes bfqq, and hence any sync non-weight-raised
-+	 * queue, to get a lower number of requests served, and thus
-+	 * to ask for a lower number of requests from the request
-+	 * pool, before the busy weight-raised queues get served
-+	 * again. This often mitigates starvation problems in the
-+	 * presence of heavy write workloads and NCQ, thereby
-+	 * guaranteeing a higher application and system responsiveness
-+	 * in these hostile scenarios.
-+	 */
-+	idling_boosts_thr_without_issues = idling_boosts_thr &&
-+		bfqd->wr_busy_queues == 0;
-+
-+	/*
- 	 * There is then a case where idling must be performed not for
- 	 * throughput concerns, but to preserve service guarantees. To
- 	 * introduce it, we can note that allowing the drive to
-@@ -5145,7 +5204,7 @@ static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
- 	 *    is necessary to preserve service guarantees.
- 	 */
- 	return bfq_bfqq_sync(bfqq) &&
--		(idling_boosts_thr || asymmetric_scenario);
-+		(idling_boosts_thr_without_issues || asymmetric_scenario);
- }
- 
- /*
-@@ -6315,6 +6374,7 @@ static int bfq_init_queue(struct request_queue *q, struct elevator_type *e)
- 					      * high-definition compressed
- 					      * video.
- 					      */
-+	bfqd->wr_busy_queues = 0;
- 
- 	/*
- 	 * Begin by assuming, optimistically, that the device is a
+ 	return VM_FAULT_FALLBACK;
 -- 
-2.10.0
+2.9.3
+
