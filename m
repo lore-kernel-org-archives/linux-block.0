@@ -15,55 +15,58 @@ Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         linux-block@vger.kernel.org,
         "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv4 14/43] filemap: handle huge pages in do_generic_file_read()
-Date: Tue, 25 Oct 2016 03:13:13 +0300
-Message-Id: <20161025001342.76126-15-kirill.shutemov@linux.intel.com>
+Subject: [PATCHv4 26/43] fs: make block_page_mkwrite() aware about huge pages
+Date: Tue, 25 Oct 2016 03:13:25 +0300
+Message-Id: <20161025001342.76126-27-kirill.shutemov@linux.intel.com>
 In-Reply-To: <20161025001342.76126-1-kirill.shutemov@linux.intel.com>
 References: <20161025001342.76126-1-kirill.shutemov@linux.intel.com>
 Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Most of work happans on head page. Only when we need to do copy data to
-userspace we find relevant subpage.
-
-We are still limited by PAGE_SIZE per iteration. Lifting this limitation
-would require some more work.
+Adjust check on whether part of the page beyond file size and apply
+compound_head() and page_mapping() where appropriate.
 
 Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- mm/filemap.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ fs/buffer.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/mm/filemap.c b/mm/filemap.c
-index f8387488636f..ca4536f2035e 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -1906,6 +1906,7 @@ static ssize_t do_generic_file_read(struct file *filp, loff_t *ppos,
- 			if (unlikely(page == NULL))
- 				goto no_cached_page;
- 		}
-+		page = compound_head(page);
- 		if (PageReadahead(page)) {
- 			page_cache_async_readahead(mapping,
- 					ra, filp, page,
-@@ -1984,7 +1985,8 @@ static ssize_t do_generic_file_read(struct file *filp, loff_t *ppos,
- 		 * now we can copy it to user space...
- 		 */
+diff --git a/fs/buffer.c b/fs/buffer.c
+index c078f5d74a2a..8dff5817e313 100644
+--- a/fs/buffer.c
++++ b/fs/buffer.c
+@@ -2502,7 +2502,7 @@ EXPORT_SYMBOL(block_commit_write);
+ int block_page_mkwrite(struct vm_area_struct *vma, struct vm_fault *vmf,
+ 			 get_block_t get_block)
+ {
+-	struct page *page = vmf->page;
++	struct page *page = compound_head(vmf->page);
+ 	struct inode *inode = file_inode(vma->vm_file);
+ 	unsigned long end;
+ 	loff_t size;
+@@ -2510,7 +2510,7 @@ int block_page_mkwrite(struct vm_area_struct *vma, struct vm_fault *vmf,
  
--		ret = copy_page_to_iter(page, offset, nr, iter);
-+		ret = copy_page_to_iter(page + index - page->index, offset,
-+				nr, iter);
- 		offset += ret;
- 		index += offset >> PAGE_SHIFT;
- 		offset &= ~PAGE_MASK;
-@@ -2402,6 +2404,7 @@ int filemap_fault(struct vm_area_struct *vma, struct vm_fault *vmf)
- 	 * because there really aren't any performance issues here
- 	 * and we need to check for errors.
- 	 */
-+	page = compound_head(page);
- 	ClearPageError(page);
- 	error = mapping->a_ops->readpage(file, page);
- 	if (!error) {
+ 	lock_page(page);
+ 	size = i_size_read(inode);
+-	if ((page->mapping != inode->i_mapping) ||
++	if ((page_mapping(page) != inode->i_mapping) ||
+ 	    (page_offset(page) > size)) {
+ 		/* We overload EFAULT to mean page got truncated */
+ 		ret = -EFAULT;
+@@ -2518,10 +2518,10 @@ int block_page_mkwrite(struct vm_area_struct *vma, struct vm_fault *vmf,
+ 	}
+ 
+ 	/* page is wholly or partially inside EOF */
+-	if (((page->index + 1) << PAGE_SHIFT) > size)
+-		end = size & ~PAGE_MASK;
++	if (((page->index + hpage_nr_pages(page)) << PAGE_SHIFT) > size)
++		end = size & ~hpage_mask(page);
+ 	else
+-		end = PAGE_SIZE;
++		end = hpage_size(page);
+ 
+ 	ret = __block_write_begin(page, 0, end, get_block);
+ 	if (!ret)
 -- 
 2.9.3
 
