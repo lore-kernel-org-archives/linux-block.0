@@ -1,12 +1,14 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-Date: Tue, 25 Oct 2016 00:21:22 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Cc: Theodore Ts'o <tytso@mit.edu>,
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga03.intel.com ([134.134.136.65]:63637 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1758183AbcJYAOU (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 24 Oct 2016 20:14:20 -0400
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
         Andreas Dilger <adilger.kernel@dilger.ca>,
         Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
         Hugh Dickins <hughd@google.com>,
         Andrea Arcangeli <aarcange@redhat.com>,
         Dave Hansen <dave.hansen@intel.com>,
@@ -15,25 +17,55 @@ Cc: Theodore Ts'o <tytso@mit.edu>,
         Ross Zwisler <ross.zwisler@linux.intel.com>,
         linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCHv4 18/43] block: define BIO_MAX_PAGES to HPAGE_PMD_NR if
- huge page cache enabled
-Message-ID: <20161025072122.GA21708@infradead.org>
+        linux-block@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv4 18/43] block: define BIO_MAX_PAGES to HPAGE_PMD_NR if huge page cache enabled
+Date: Tue, 25 Oct 2016 03:13:17 +0300
+Message-Id: <20161025001342.76126-19-kirill.shutemov@linux.intel.com>
+In-Reply-To: <20161025001342.76126-1-kirill.shutemov@linux.intel.com>
 References: <20161025001342.76126-1-kirill.shutemov@linux.intel.com>
- <20161025001342.76126-19-kirill.shutemov@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20161025001342.76126-19-kirill.shutemov@linux.intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Tue, Oct 25, 2016 at 03:13:17AM +0300, Kirill A. Shutemov wrote:
-> We are going to do IO a huge page a time. So we need BIO_MAX_PAGES to be
-> at least HPAGE_PMD_NR. For x86-64, it's 512 pages.
+We are going to do IO a huge page a time. So we need BIO_MAX_PAGES to be
+at least HPAGE_PMD_NR. For x86-64, it's 512 pages.
 
-NAK.  The maximum bio size should not depend on an obscure vm config,
-please send a standalone patch increasing the size to the block list,
-with a much long explanation.  Also you can't simply increase the size
-of the largers pool, we'll probably need more pools instead, or maybe
-even implement a similar chaining scheme as we do for struct
-scatterlist.
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+---
+ block/bio.c         | 3 ++-
+ include/linux/bio.h | 4 ++++
+ 2 files changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/block/bio.c b/block/bio.c
+index db85c5753a76..a69062bda3e0 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -44,7 +44,8 @@
+  */
+ #define BV(x) { .nr_vecs = x, .name = "biovec-"__stringify(x) }
+ static struct biovec_slab bvec_slabs[BVEC_POOL_NR] __read_mostly = {
+-	BV(1), BV(4), BV(16), BV(64), BV(128), BV(BIO_MAX_PAGES),
++	BV(1), BV(4), BV(16), BV(64), BV(128),
++	{ .nr_vecs = BIO_MAX_PAGES, .name ="biovec-max_pages" },
+ };
+ #undef BV
+ 
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index 97cb48f03dc7..19d0fae9cdd0 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -38,7 +38,11 @@
+ #define BIO_BUG_ON
+ #endif
+ 
++#ifdef CONFIG_TRANSPARENT_HUGE_PAGECACHE
++#define BIO_MAX_PAGES		(HPAGE_PMD_NR > 256 ? HPAGE_PMD_NR : 256)
++#else
+ #define BIO_MAX_PAGES		256
++#endif
+ 
+ #define bio_prio(bio)			(bio)->bi_ioprio
+ #define bio_set_prio(bio, prio)		((bio)->bi_ioprio = prio)
+-- 
+2.9.3
+
