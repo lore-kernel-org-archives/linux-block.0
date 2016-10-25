@@ -1,109 +1,36 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Ming Lei <tom.leiming@gmail.com>
-To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Ming Lei <tom.leiming@gmail.com>,
-        Joern Engel <joern@logfs.org>,
-        Prasad Joshi <prasadjoshi.linux@gmail.com>,
-        logfs@logfs.org (open list:LogFS)
-Subject: [PATCH 11/60] fs: logfs: use bio_add_page() in __bdev_writeseg()
-Date: Sat, 29 Oct 2016 16:08:10 +0800
-Message-Id: <1477728600-12938-12-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
-References: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] brd: remove support for BLKFLSBUF
+To: Mike Snitzer <snitzer@redhat.com>, Christoph Hellwig <hch@infradead.org>
+References: <alpine.LRH.2.02.1610211406290.9197@file01.intranet.prod.int.rdu2.redhat.com>
+ <20161021200022.GA12580@redhat.com>
+ <alpine.LRH.2.02.1610211616450.31606@file01.intranet.prod.int.rdu2.redhat.com>
+ <20161024155756.GA48306@redhat.com> <20161025130712.GA12717@infradead.org>
+ <20161025143719.GA51266@redhat.com>
+Cc: Mikulas Patocka <mpatocka@redhat.com>, dm-devel@redhat.com,
+ "Alasdair G. Kergon" <agk@redhat.com>, linux-block@vger.kernel.org
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <710b07a3-9091-6935-37c4-ea1dcedcab4f@kernel.dk>
+Date: Tue, 25 Oct 2016 08:46:52 -0600
+MIME-Version: 1.0
+In-Reply-To: <20161025143719.GA51266@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-Also this patch simplify the code a bit.
+On 10/25/2016 08:37 AM, Mike Snitzer wrote:
+> On Tue, Oct 25 2016 at  9:07P -0400,
+> Christoph Hellwig <hch@infradead.org> wrote:
+>
+>> I think the right fix is to kill off the BLKFLSBUF special case in
+>> brd.  Yes, it break compatibility - but in this case the compatibility
+>> breaks more than it helps.
+>
+> Jens, please pick up this patch:
+>
+> From: Mike Snitzer <snitzer@redhat.com>
+> Date: Tue, 25 Oct 2016 10:25:07 -0400
+> Subject: [PATCH] brd: remove support for BLKFLSBUF
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
----
- fs/logfs/dev_bdev.c | 51 ++++++++++++++++++++-------------------------------
- 1 file changed, 20 insertions(+), 31 deletions(-)
+Added, thanks.
 
-diff --git a/fs/logfs/dev_bdev.c b/fs/logfs/dev_bdev.c
-index 696dcdd65fdd..79be4cb0dfd8 100644
---- a/fs/logfs/dev_bdev.c
-+++ b/fs/logfs/dev_bdev.c
-@@ -72,56 +72,45 @@ static int __bdev_writeseg(struct super_block *sb, u64 ofs, pgoff_t index,
- {
- 	struct logfs_super *super = logfs_super(sb);
- 	struct address_space *mapping = super->s_mapping_inode->i_mapping;
--	struct bio *bio;
-+	struct bio *bio = NULL;
- 	struct page *page;
- 	unsigned int max_pages;
--	int i;
-+	int i, ret;
- 
- 	max_pages = min_t(size_t, nr_pages, BIO_MAX_PAGES);
- 
--	bio = bio_alloc(GFP_NOFS, max_pages);
--	BUG_ON(!bio);
--
- 	for (i = 0; i < nr_pages; i++) {
--		if (i >= max_pages) {
--			/* Block layer cannot split bios :( */
--			bio->bi_vcnt = i;
--			bio->bi_iter.bi_size = i * PAGE_SIZE;
-+		if (!bio) {
-+			bio = bio_alloc(GFP_NOFS, max_pages);
-+			BUG_ON(!bio);
-+
- 			bio->bi_bdev = super->s_bdev;
- 			bio->bi_iter.bi_sector = ofs >> 9;
- 			bio->bi_private = sb;
- 			bio->bi_end_io = writeseg_end_io;
- 			bio_set_op_attrs(bio, REQ_OP_WRITE, 0);
--			atomic_inc(&super->s_pending_writes);
--			submit_bio(bio);
--
--			ofs += i * PAGE_SIZE;
--			index += i;
--			nr_pages -= i;
--			i = 0;
--
--			bio = bio_alloc(GFP_NOFS, max_pages);
--			BUG_ON(!bio);
- 		}
- 		page = find_lock_page(mapping, index + i);
- 		BUG_ON(!page);
--		bio->bi_io_vec[i].bv_page = page;
--		bio->bi_io_vec[i].bv_len = PAGE_SIZE;
--		bio->bi_io_vec[i].bv_offset = 0;
-+		ret = bio_add_page(bio, page, PAGE_SIZE, 0);
- 
- 		BUG_ON(PageWriteback(page));
- 		set_page_writeback(page);
- 		unlock_page(page);
-+
-+		if (!ret) {
-+			/* Block layer cannot split bios :( */
-+			ofs += bio->bi_iter.bi_size;
-+			atomic_inc(&super->s_pending_writes);
-+			submit_bio(bio);
-+			bio = NULL;
-+		}
-+	}
-+
-+	if (bio) {
-+		atomic_inc(&super->s_pending_writes);
-+		submit_bio(bio);
- 	}
--	bio->bi_vcnt = nr_pages;
--	bio->bi_iter.bi_size = nr_pages * PAGE_SIZE;
--	bio->bi_bdev = super->s_bdev;
--	bio->bi_iter.bi_sector = ofs >> 9;
--	bio->bi_private = sb;
--	bio->bi_end_io = writeseg_end_io;
--	bio_set_op_attrs(bio, REQ_OP_WRITE, 0);
--	atomic_inc(&super->s_pending_writes);
--	submit_bio(bio);
- 	return 0;
- }
- 
 -- 
-2.7.4
-
+Jens Axboe
