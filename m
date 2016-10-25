@@ -15,59 +15,76 @@ Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         linux-block@vger.kernel.org,
         "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv4 33/43] ext4: handle huge pages in ext4_page_mkwrite()
-Date: Tue, 25 Oct 2016 03:13:32 +0300
-Message-Id: <20161025001342.76126-34-kirill.shutemov@linux.intel.com>
+Subject: [PATCHv4 41/43] ext4: make fallocate() operations work with huge pages
+Date: Tue, 25 Oct 2016 03:13:40 +0300
+Message-Id: <20161025001342.76126-42-kirill.shutemov@linux.intel.com>
 In-Reply-To: <20161025001342.76126-1-kirill.shutemov@linux.intel.com>
 References: <20161025001342.76126-1-kirill.shutemov@linux.intel.com>
 Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Trivial: remove assumption on page size.
+__ext4_block_zero_page_range() adjusted to calculate starting iblock
+correctry for huge pages.
+
+ext4_{collapse,insert}_range() requires page cache invalidation. We need
+the invalidation to be aligning to huge page border if huge pages are
+possible in page cache.
 
 Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- fs/ext4/inode.c | 13 +++++++------
- 1 file changed, 7 insertions(+), 6 deletions(-)
+ fs/ext4/extents.c | 10 ++++++++--
+ fs/ext4/inode.c   |  3 +--
+ 2 files changed, 9 insertions(+), 4 deletions(-)
 
+diff --git a/fs/ext4/extents.c b/fs/ext4/extents.c
+index c930a0110fb4..16a6bdeac36f 100644
+--- a/fs/ext4/extents.c
++++ b/fs/ext4/extents.c
+@@ -5511,7 +5511,10 @@ int ext4_collapse_range(struct inode *inode, loff_t offset, loff_t len)
+ 	 * Need to round down offset to be aligned with page size boundary
+ 	 * for page size > block size.
+ 	 */
+-	ioffset = round_down(offset, PAGE_SIZE);
++	if (IS_ENABLED(CONFIG_TRANSPARENT_HUGE_PAGECACHE))
++		ioffset = round_down(offset, HPAGE_PMD_SIZE);
++	else
++		ioffset = round_down(offset, PAGE_SIZE);
+ 	/*
+ 	 * Write tail of the last page before removed range since it will get
+ 	 * removed from the page cache below.
+@@ -5660,7 +5663,10 @@ int ext4_insert_range(struct inode *inode, loff_t offset, loff_t len)
+ 	 * Need to round down to align start offset to page size boundary
+ 	 * for page size > block size.
+ 	 */
+-	ioffset = round_down(offset, PAGE_SIZE);
++	if (IS_ENABLED(CONFIG_TRANSPARENT_HUGE_PAGECACHE))
++		ioffset = round_down(offset, HPAGE_PMD_SIZE);
++	else
++		ioffset = round_down(offset, PAGE_SIZE);
+ 	/* Write out all dirty pages */
+ 	ret = filemap_write_and_wait_range(inode->i_mapping, ioffset,
+ 			LLONG_MAX);
 diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
-index c36296fbaa23..5ceb72c7bac1 100644
+index d179467f82e7..95b64a7cee67 100644
 --- a/fs/ext4/inode.c
 +++ b/fs/ext4/inode.c
-@@ -5649,7 +5649,7 @@ static int ext4_bh_unmapped(handle_t *handle, struct buffer_head *bh)
- 
- int ext4_page_mkwrite(struct vm_area_struct *vma, struct vm_fault *vmf)
+@@ -3716,7 +3716,6 @@ void ext4_set_aops(struct inode *inode)
+ static int __ext4_block_zero_page_range(handle_t *handle,
+ 		struct address_space *mapping, loff_t from, loff_t length)
  {
--	struct page *page = vmf->page;
-+	struct page *page = compound_head(vmf->page);
- 	loff_t size;
- 	unsigned long len;
- 	int ret;
-@@ -5685,10 +5685,10 @@ int ext4_page_mkwrite(struct vm_area_struct *vma, struct vm_fault *vmf)
- 		goto out;
- 	}
+-	ext4_fsblk_t index = from >> PAGE_SHIFT;
+ 	unsigned offset;
+ 	unsigned blocksize, pos;
+ 	ext4_lblk_t iblock;
+@@ -3735,7 +3734,7 @@ static int __ext4_block_zero_page_range(handle_t *handle,
  
--	if (page->index == size >> PAGE_SHIFT)
--		len = size & ~PAGE_MASK;
--	else
--		len = PAGE_SIZE;
-+	len = hpage_size(page);
-+	if (page->index + hpage_nr_pages(page) - 1 == size >> PAGE_SHIFT)
-+		len = size & ~hpage_mask(page);
-+
- 	/*
- 	 * Return if we have all the buffers mapped. This avoids the need to do
- 	 * journal_start/journal_stop which can block and take a long time
-@@ -5719,7 +5719,8 @@ int ext4_page_mkwrite(struct vm_area_struct *vma, struct vm_fault *vmf)
- 	ret = block_page_mkwrite(vma, vmf, get_block);
- 	if (!ret && ext4_should_journal_data(inode)) {
- 		if (ext4_walk_page_buffers(handle, page_buffers(page), 0,
--			  PAGE_SIZE, NULL, do_journal_get_write_access)) {
-+			  hpage_size(page), NULL,
-+			  do_journal_get_write_access)) {
- 			unlock_page(page);
- 			ret = VM_FAULT_SIGBUS;
- 			ext4_journal_stop(handle);
+ 	blocksize = inode->i_sb->s_blocksize;
+ 
+-	iblock = index << (PAGE_SHIFT - inode->i_sb->s_blocksize_bits);
++	iblock = page->index << (PAGE_SHIFT - inode->i_sb->s_blocksize_bits);
+ 
+ 	if (!page_has_buffers(page))
+ 		create_empty_buffers(page, blocksize, 0);
 -- 
 2.9.3
 
