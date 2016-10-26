@@ -1,88 +1,186 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-bl2nam02on0065.outbound.protection.outlook.com ([104.47.38.65]:49440
-        "EHLO NAM02-BL2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1754159AbcJRVvk (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Oct 2016 17:51:40 -0400
-Subject: [PATCH v3 06/11] dm: Use BLK_MQ_S_STOPPED instead of
- QUEUE_FLAG_STOPPED in blk-mq code
-To: Jens Axboe <axboe@fb.com>
-References: <b39eb0e7-1007-eb63-8e7f-9a7f08508379@sandisk.com>
-CC: Christoph Hellwig <hch@lst.de>,
-        James Bottomley <jejb@linux.vnet.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Doug Ledford <dledford@redhat.com>,
-        Keith Busch <keith.busch@intel.com>,
-        Ming Lin <ming.l@ssi.samsung.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-Message-ID: <e5facfd0-82d5-10cb-712b-13d7950b78b8@sandisk.com>
-Date: Tue, 18 Oct 2016 14:51:33 -0700
-MIME-Version: 1.0
-In-Reply-To: <b39eb0e7-1007-eb63-8e7f-9a7f08508379@sandisk.com>
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+From: Paolo Valente <paolo.valente@linaro.org>
+To: Jens Axboe <axboe@kernel.dk>,
+	Tejun Heo <tj@kernel.org>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ulf.hansson@linaro.org,
+	linus.walleij@linaro.org,
+	broonie@kernel.org,
+	hare@suse.de,
+	arnd@arndb.de,
+	bart.vanassche@sandisk.com,
+	grant.likely@secretlab.ca,
+	jack@suse.cz,
+	James.Bottomley@HansenPartnership.com,
+	Paolo Valente <paolo.valente@linaro.org>,
+	Arianna Avanzini <avanzini.arianna@gmail.com>
+Subject: [PATCH 09/14] block, bfq: reduce latency during request-pool saturation
+Date: Wed, 26 Oct 2016 11:28:02 +0200
+Message-Id: <1477474082-2846-10-git-send-email-paolo.valente@linaro.org>
+In-Reply-To: <1477474082-2846-1-git-send-email-paolo.valente@linaro.org>
+References: <1477474082-2846-1-git-send-email-paolo.valente@linaro.org>
+List-ID: <linux-block@vger.kernel.org>
 
-Instead of manipulating both QUEUE_FLAG_STOPPED and BLK_MQ_S_STOPPED
-in the dm start and stop queue functions, only manipulate the latter
-flag.
+This patch introduces an heuristic that reduces latency when the
+I/O-request pool is saturated. This goal is achieved by disabling
+device idling, for non-weight-raised queues, when there are weight-
+raised queues with pending or in-flight requests. In fact, as
+explained in more detail in the comment on the function
+bfq_bfqq_may_idle(), this reduces the rate at which processes
+associated with non-weight-raised queues grab requests from the pool,
+thereby increasing the probability that processes associated with
+weight-raised queues get a request immediately (or at least soon) when
+they need one. Along the same line, if there are weight-raised queues,
+then this patch halves the service rate of async (write) requests for
+non-weight-raised queues.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Mike Snitzer <snitzer@redhat.com>
+Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+Signed-off-by: Arianna Avanzini <avanzini.arianna@gmail.com>
 ---
- drivers/md/dm-rq.c | 18 ++----------------
- 1 file changed, 2 insertions(+), 16 deletions(-)
+ block/bfq-iosched.c | 66 ++++++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 63 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
-index d5cec26..9c34606 100644
---- a/drivers/md/dm-rq.c
-+++ b/drivers/md/dm-rq.c
-@@ -75,12 +75,6 @@ static void dm_old_start_queue(struct request_queue *q)
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index 3b11772..46d6df3 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -378,6 +378,8 @@ struct bfq_data {
+ 	 * queue in service, even if it is idling).
+ 	 */
+ 	int busy_queues;
++	/* number of weight-raised busy @bfq_queues */
++	int wr_busy_queues;
+ 	/* number of queued requests */
+ 	int queued;
+ 	/* number of requests dispatched and waiting for completion */
+@@ -2019,6 +2021,9 @@ static void bfq_del_bfqq_busy(struct bfq_data *bfqd, struct bfq_queue *bfqq,
  
- static void dm_mq_start_queue(struct request_queue *q)
- {
--	unsigned long flags;
--
--	spin_lock_irqsave(q->queue_lock, flags);
--	queue_flag_clear(QUEUE_FLAG_STOPPED, q);
--	spin_unlock_irqrestore(q->queue_lock, flags);
--
- 	blk_mq_start_stopped_hw_queues(q, true);
- 	blk_mq_kick_requeue_list(q);
+ 	bfqd->busy_queues--;
+ 
++	if (bfqq->wr_coeff > 1)
++		bfqd->wr_busy_queues--;
++
+ 	bfqg_stats_update_dequeue(bfqq_group(bfqq));
+ 
+ 	bfq_deactivate_bfqq(bfqd, bfqq, requeue);
+@@ -2035,6 +2040,9 @@ static void bfq_add_bfqq_busy(struct bfq_data *bfqd, struct bfq_queue *bfqq)
+ 
+ 	bfq_mark_bfqq_busy(bfqq);
+ 	bfqd->busy_queues++;
++
++	if (bfqq->wr_coeff > 1)
++		bfqd->wr_busy_queues++;
  }
-@@ -105,16 +99,8 @@ static void dm_old_stop_queue(struct request_queue *q)
  
- static void dm_mq_stop_queue(struct request_queue *q)
- {
--	unsigned long flags;
--
--	spin_lock_irqsave(q->queue_lock, flags);
--	if (blk_queue_stopped(q)) {
--		spin_unlock_irqrestore(q->queue_lock, flags);
-+	if (blk_mq_queue_stopped(q))
- 		return;
--	}
--
--	queue_flag_set(QUEUE_FLAG_STOPPED, q);
--	spin_unlock_irqrestore(q->queue_lock, flags);
+ #if defined(CONFIG_BFQ_GROUP_IOSCHED) && defined(CONFIG_DEBUG_BLK_CGROUP)
+@@ -3335,7 +3343,16 @@ static unsigned long bfq_serv_to_charge(struct request *rq,
+ 	if (bfq_bfqq_sync(bfqq) || bfqq->wr_coeff > 1)
+ 		return blk_rq_sectors(rq);
  
- 	/* Avoid that requeuing could restart the queue. */
- 	blk_mq_cancel_requeue_work(q);
-@@ -341,7 +327,7 @@ static void __dm_mq_kick_requeue_list(struct request_queue *q, unsigned long mse
- 	unsigned long flags;
- 
- 	spin_lock_irqsave(q->queue_lock, flags);
--	if (!blk_queue_stopped(q))
-+	if (!blk_mq_queue_stopped(q))
- 		blk_mq_delay_kick_requeue_list(q, msecs);
- 	spin_unlock_irqrestore(q->queue_lock, flags);
+-	return blk_rq_sectors(rq) * bfq_async_charge_factor;
++	/*
++	 * If there are no weight-raised queues, then amplify service
++	 * by just the async charge factor; otherwise amplify service
++	 * by twice the async charge factor, to further reduce latency
++	 * for weight-raised queues.
++	 */
++	if (bfqq->bfqd->wr_busy_queues == 0)
++		return blk_rq_sectors(rq) * bfq_async_charge_factor;
++
++	return blk_rq_sectors(rq) * 2 * bfq_async_charge_factor;
  }
+ 
+ /**
+@@ -3791,6 +3808,7 @@ static void bfq_add_request(struct request *rq)
+ 			bfqq->wr_coeff = bfqd->bfq_wr_coeff;
+ 			bfqq->wr_cur_max_time = bfq_wr_duration(bfqd);
+ 
++			bfqd->wr_busy_queues++;
+ 			bfqq->entity.prio_changed = 1;
+ 		}
+ 		if (prev != bfqq->next_rq)
+@@ -4003,6 +4021,8 @@ static void bfq_merged_requests(struct request_queue *q, struct request *rq,
+ /* Must be called with bfqq != NULL */
+ static void bfq_bfqq_end_wr(struct bfq_queue *bfqq)
+ {
++	if (bfq_bfqq_busy(bfqq))
++		bfqq->bfqd->wr_busy_queues--;
+ 	bfqq->wr_coeff = 1;
+ 	bfqq->wr_cur_max_time = 0;
+ 	bfqq->last_wr_start_finish = jiffies;
+@@ -5049,7 +5069,8 @@ static bool bfq_may_expire_for_budg_timeout(struct bfq_queue *bfqq)
+ static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
+ {
+ 	struct bfq_data *bfqd = bfqq->bfqd;
+-	bool idling_boosts_thr, asymmetric_scenario;
++	bool idling_boosts_thr, idling_boosts_thr_without_issues,
++		asymmetric_scenario;
+ 
+ 	if (bfqd->strict_guarantees)
+ 		return true;
+@@ -5072,6 +5093,44 @@ static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
+ 	idling_boosts_thr = !bfqd->hw_tag || bfq_bfqq_IO_bound(bfqq);
+ 
+ 	/*
++	 * The value of the next variable,
++	 * idling_boosts_thr_without_issues, is equal to that of
++	 * idling_boosts_thr, unless a special case holds. In this
++	 * special case, described below, idling may cause problems to
++	 * weight-raised queues.
++	 *
++	 * When the request pool is saturated (e.g., in the presence
++	 * of write hogs), if the processes associated with
++	 * non-weight-raised queues ask for requests at a lower rate,
++	 * then processes associated with weight-raised queues have a
++	 * higher probability to get a request from the pool
++	 * immediately (or at least soon) when they need one. Thus
++	 * they have a higher probability to actually get a fraction
++	 * of the device throughput proportional to their high
++	 * weight. This is especially true with NCQ-capable drives,
++	 * which enqueue several requests in advance, and further
++	 * reorder internally-queued requests.
++	 *
++	 * For this reason, we force to false the value of
++	 * idling_boosts_thr_without_issues if there are weight-raised
++	 * busy queues. In this case, and if bfqq is not weight-raised,
++	 * this guarantees that the device is not idled for bfqq (if,
++	 * instead, bfqq is weight-raised, then idling will be
++	 * guaranteed by another variable, see below). Combined with
++	 * the timestamping rules of BFQ (see [1] for details), this
++	 * behavior causes bfqq, and hence any sync non-weight-raised
++	 * queue, to get a lower number of requests served, and thus
++	 * to ask for a lower number of requests from the request
++	 * pool, before the busy weight-raised queues get served
++	 * again. This often mitigates starvation problems in the
++	 * presence of heavy write workloads and NCQ, thereby
++	 * guaranteeing a higher application and system responsiveness
++	 * in these hostile scenarios.
++	 */
++	idling_boosts_thr_without_issues = idling_boosts_thr &&
++		bfqd->wr_busy_queues == 0;
++
++	/*
+ 	 * There is then a case where idling must be performed not for
+ 	 * throughput concerns, but to preserve service guarantees. To
+ 	 * introduce it, we can note that allowing the drive to
+@@ -5145,7 +5204,7 @@ static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
+ 	 *    is necessary to preserve service guarantees.
+ 	 */
+ 	return bfq_bfqq_sync(bfqq) &&
+-		(idling_boosts_thr || asymmetric_scenario);
++		(idling_boosts_thr_without_issues || asymmetric_scenario);
+ }
+ 
+ /*
+@@ -6315,6 +6374,7 @@ static int bfq_init_queue(struct request_queue *q, struct elevator_type *e)
+ 					      * high-definition compressed
+ 					      * video.
+ 					      */
++	bfqd->wr_busy_queues = 0;
+ 
+ 	/*
+ 	 * Begin by assuming, optimistically, that the device is a
 -- 
-2.10.1
-
+2.10.0
