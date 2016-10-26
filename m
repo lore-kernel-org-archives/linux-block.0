@@ -1,33 +1,70 @@
-Return-Path: <jack@suse.cz>
-From: Jan Kara <jack@suse.cz>
+Return-Path: <mpatocka@redhat.com>
+Date: Wed, 26 Oct 2016 16:27:57 -0400 (EDT)
+From: Mikulas Patocka <mpatocka@redhat.com>
 To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Bart Van Assche <bart.vanassche@sandisk.com>,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH 1/2] brd: Make rd_size argument static
-Date: Tue, 25 Oct 2016 13:53:26 +0200
-Message-Id: <1477396407-28847-1-git-send-email-jack@suse.cz>
+cc: Mike Snitzer <snitzer@redhat.com>, Christoph Hellwig <hch@infradead.org>,
+        dm-devel@redhat.com, "Alasdair G. Kergon" <agk@redhat.com>,
+        linux-block@vger.kernel.org
+Subject: [PATCH 4/4] brd: remove unused brd_zero_page
+In-Reply-To: <alpine.LRH.2.02.1610261624100.12287@file01.intranet.prod.int.rdu2.redhat.com>
+Message-ID: <alpine.LRH.2.02.1610261627070.12287@file01.intranet.prod.int.rdu2.redhat.com>
+References: <alpine.LRH.2.02.1610211406290.9197@file01.intranet.prod.int.rdu2.redhat.com> <20161021200022.GA12580@redhat.com> <alpine.LRH.2.02.1610211616450.31606@file01.intranet.prod.int.rdu2.redhat.com> <20161024155756.GA48306@redhat.com>
+ <20161025130712.GA12717@infradead.org> <20161025143719.GA51266@redhat.com> <710b07a3-9091-6935-37c4-ea1dcedcab4f@kernel.dk> <alpine.LRH.2.02.1610261624100.12287@file01.intranet.prod.int.rdu2.redhat.com>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 List-ID: <linux-block@vger.kernel.org>
 
-rd_size does not appear to be used outside of brd. Make it static.
+Remove the function brd_zero_page. This function was used to zero a page
+when the discard request came in.
 
-Signed-off-by: Jan Kara <jack@suse.cz>
+The discard request is used for performance or space optimization, it
+makes no sense to zero pages on discard request, as it neither improves
+performance nor saves memory.
+
+Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
+
 ---
- drivers/block/brd.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/block/brd.c |   23 +----------------------
+ 1 file changed, 1 insertion(+), 22 deletions(-)
 
-diff --git a/drivers/block/brd.c b/drivers/block/brd.c
-index 0c76d4016eeb..8b22e4a04918 100644
---- a/drivers/block/brd.c
-+++ b/drivers/block/brd.c
-@@ -443,7 +443,7 @@ static int rd_nr = CONFIG_BLK_DEV_RAM_COUNT;
- module_param(rd_nr, int, S_IRUGO);
- MODULE_PARM_DESC(rd_nr, "Maximum number of brd devices");
+Index: linux-2.6/drivers/block/brd.c
+===================================================================
+--- linux-2.6.orig/drivers/block/brd.c
++++ linux-2.6/drivers/block/brd.c
+@@ -156,19 +156,6 @@ static void brd_free_page(struct brd_dev
+ 		call_rcu(&page->rcu_head, brd_free_page_rcu);
+ }
  
--int rd_size = CONFIG_BLK_DEV_RAM_SIZE;
-+static int rd_size = CONFIG_BLK_DEV_RAM_SIZE;
- module_param(rd_size, int, S_IRUGO);
- MODULE_PARM_DESC(rd_size, "Size of each RAM disk in kbytes.");
- 
--- 
-2.6.6
+-static void brd_zero_page(struct brd_device *brd, sector_t sector)
+-{
+-	struct page *page;
+-
+-	rcu_read_lock();
+-
+-	page = brd_lookup_page(brd, sector);
+-	if (page)
+-		clear_highpage(page);
+-
+-	rcu_read_unlock();
+-}
+-
+ /*
+  * Free all backing store pages and radix tree. This must only be called when
+  * there are no other users of the device.
+@@ -234,15 +221,7 @@ static void discard_from_brd(struct brd_
+ 	sector += boundary;
+ 	n_sectors -= boundary;
+ 	while (n_sectors >= PAGE_SIZE >> SECTOR_SHIFT) {
+-		/*
+-		 * Don't want to actually discard pages here because
+-		 * re-allocating the pages can result in writeback
+-		 * deadlocks under heavy load.
+-		 */
+-		if (1)
+-			brd_free_page(brd, sector);
+-		else
+-			brd_zero_page(brd, sector);
++		brd_free_page(brd, sector);
+ 		sector += PAGE_SIZE >> SECTOR_SHIFT;
+ 		n_sectors -= PAGE_SIZE >> SECTOR_SHIFT;
+ 	}
