@@ -1,55 +1,49 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f46.google.com ([74.125.82.46]:38646 "EHLO
-        mail-wm0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S942862AbcJ0OjA (ORCPT
+Received: from mail-oi0-f44.google.com ([209.85.218.44]:34052 "EHLO
+        mail-oi0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754321AbcJZNjo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Oct 2016 10:39:00 -0400
-Subject: Re: [PATCH 0/3] iopmem : A block device for PCIe memory
-To: Christoph Hellwig <hch@infradead.org>,
-        Dave Chinner <david@fromorbit.com>
-References: <1476826937-20665-1-git-send-email-sbates@raithlin.com>
- <CAPcyv4gJ_c-6s2BUjsu6okR1EF53R+KNuXnOc5jv0fuwJaa3cQ@mail.gmail.com>
- <20161019184814.GC16550@cgy1-donard.priv.deltatee.com>
- <20161020232239.GQ23194@dastard> <20161021095714.GA12209@infradead.org>
-Cc: jgunthorpe@obsidianresearch.com, sbates@raithin.com,
-        "Raj, Ashok" <ashok.raj@intel.com>, haggaie@mellanox.com,
-        linux-rdma@vger.kernel.org,
-        "linux-nvdimm@lists.01.org" <linux-nvdimm@ml01.01.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        jim.macdonald@everspin.com, Stephen Bates <sbates@raithlin.com>,
-        linux-block@vger.kernel.org, Linux MM <linux-mm@kvack.org>,
-        Jens Axboe <axboe@fb.com>,
-        David Woodhouse <dwmw2@infradead.org>
-From: Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <76e957c9-8002-5a46-8111-269bb0401718@grimberg.me>
-Date: Thu, 27 Oct 2016 13:22:49 +0300
+        Wed, 26 Oct 2016 09:39:44 -0400
+Received: by mail-oi0-f44.google.com with SMTP id a195so1612536oib.1
+        for <linux-block@vger.kernel.org>; Wed, 26 Oct 2016 06:39:07 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20161021095714.GA12209@infradead.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+In-Reply-To: <a5418089-2615-8c04-aca8-50ceb43978f1@mellanox.com>
+References: <1476826937-20665-1-git-send-email-sbates@raithlin.com>
+ <CAPcyv4gJ_c-6s2BUjsu6okR1EF53R+KNuXnOc5jv0fuwJaa3cQ@mail.gmail.com> <a5418089-2615-8c04-aca8-50ceb43978f1@mellanox.com>
+From: Dan Williams <dan.j.williams@intel.com>
+Date: Wed, 26 Oct 2016 06:39:05 -0700
+Message-ID: <CAPcyv4h9Ubgiv1B8FPqes-zUXMckzfEi6uqtfc4GrLc_8BeSLg@mail.gmail.com>
+Subject: Re: [PATCH 0/3] iopmem : A block device for PCIe memory
+To: Haggai Eran <haggaie@mellanox.com>
+Cc: Stephen Bates <sbates@raithlin.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-nvdimm@lists.01.org" <linux-nvdimm@lists.01.org>,
+        linux-rdma@vger.kernel.org, linux-block@vger.kernel.org,
+        Linux MM <linux-mm@kvack.org>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        Matthew Wilcox <willy@linux.intel.com>,
+        Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Jens Axboe <axboe@fb.com>, Jonathan Corbet <corbet@lwn.net>,
+        jim.macdonald@everspin.com, sbates@raithin.com,
+        Logan Gunthorpe <logang@deltatee.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        "Raj, Ashok" <ashok.raj@intel.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-
->> You do realise that local filesystems can silently change the
->> location of file data at any point in time, so there is no such
->> thing as a "stable mapping" of file data to block device addresses
->> in userspace?
->>
->> If you want remote access to the blocks owned and controlled by a
->> filesystem, then you need to use a filesystem with a remote locking
->> mechanism to allow co-ordinated, coherent access to the data in
->> those blocks. Anything else is just asking for ongoing, unfixable
->> filesystem corruption or data leakage problems (i.e.  security
->> issues).
+On Wed, Oct 26, 2016 at 1:24 AM, Haggai Eran <haggaie@mellanox.com> wrote:
+[..]
+>> I wonder if we could (ab)use a
+>> software-defined 'pasid' as the requester id for a peer-to-peer
+>> mapping that needs address translation.
+> Why would you need that? Isn't it enough to map the peer-to-peer
+> addresses correctly in the iommu driver?
 >
-> And at least for XFS we have such a mechanism :)  E.g. I have a
-> prototype of a pNFS layout that uses XFS+DAX to allow clients to do
-> RDMA directly to XFS files, with the same locking mechanism we use
-> for the current block and scsi layout in xfs_pnfs.c.
 
-Christoph, did you manage to leap to the future and solve the
-RDMA persistency hole? :)
+You're right, we might already have enough...
 
-e.g. what happens with O_DSYNC in this model? Or you did
-a message exchange for commits?
+We would just need to audit iommu drivers to undo any assumptions that
+the page being mapped is always in host memory and apply any bus
+address translations between source device and target device.
