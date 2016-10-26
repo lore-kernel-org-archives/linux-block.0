@@ -1,130 +1,95 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-Date: Wed, 26 Oct 2016 09:53:43 -0400 (EDT)
-From: Bob Peterson <rpeterso@redhat.com>
-To: Christoph Hellwig <hch@lst.de>
-Cc: linux-xfs@vger.kernel.org, axboe@fb.com,
-        kent overstreet <kent.overstreet@gmail.com>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
-Message-ID: <1700618561.12920142.1477490023642.JavaMail.zimbra@redhat.com>
-In-Reply-To: <1477408098-10153-6-git-send-email-hch@lst.de>
-References: <1477408098-10153-1-git-send-email-hch@lst.de> <1477408098-10153-6-git-send-email-hch@lst.de>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from verein.lst.de ([213.95.11.211]:47826 "EHLO newverein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753689AbcJZH5E (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 26 Oct 2016 03:57:04 -0400
+Date: Wed, 26 Oct 2016 09:57:02 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Kent Overstreet <kent.overstreet@gmail.com>
+Cc: Christoph Hellwig <hch@lst.de>, linux-xfs@vger.kernel.org,
+        axboe@fb.com, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org
 Subject: Re: [PATCH 5/6] iomap: implement direct I/O
+Message-ID: <20161026075702.GB28408@lst.de>
+References: <1477408098-10153-1-git-send-email-hch@lst.de> <1477408098-10153-6-git-send-email-hch@lst.de> <20161025195153.ehrxmjqaqqkdc23f@kmo-pixel>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20161025195153.ehrxmjqaqqkdc23f@kmo-pixel>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
------ Original Message -----
-| This adds a full fledget direct I/O implementation using the iomap
-| interface. Full fledged in this case means all features are supported:
-| AIO, vectored I/O, any iov_iter type including kernel pointers, bvecs
-| and pipes, support for hole filling and async apending writes.  It does
-| not mean supporting all the warts of the old generic code.  We expect
-| i_rwsem to be held over the duration of the call, and we expect to
-| maintain i_dio_count ourselves, and we pass on any kinds of mapping
-| to the file system for now.
-| 
-| The algorithm used is very simple: We use iomap_apply to iterate over
-| the range of the I/O, and then we use the new bio_iov_iter_get_pages
-| helper to lock down the user range for the size of the extent.
-| bio_iov_iter_get_pages can currently lock down twice as many pages as
-| the old direct I/O code did, which means that we will have a better
-| batch factor for everything but overwrites of badly fragmented files.
-| 
-| Signed-off-by: Christoph Hellwig <hch@lst.de>
-| ---
-(snip)
-| +static blk_qc_t
-| +iomap_dio_zero(struct iomap_dio *dio, struct iomap *iomap, loff_t pos,
-| +		unsigned len)
-| +{
-| +	struct page *page = ZERO_PAGE(0);
-| +	struct bio *bio;
-| +
-| +	bio = bio_alloc(GFP_KERNEL, 1);
+On Tue, Oct 25, 2016 at 11:51:53AM -0800, Kent Overstreet wrote:
+> So - you're hitting inode locks on each call to iomap_begin()/iomap_end()?  :/
 
-It's unlikely, but bio_alloc can return NULL; shouldn't the code be checking for that?
+Depends on your defintion of inode locks.  In XFS we have three inode
+locks:
 
-| +	bio->bi_bdev = iomap->bdev;
-| +	bio->bi_iter.bi_sector =
-| +		iomap->blkno + ((pos - iomap->offset) >> 9);
-| +	bio->bi_private = dio;
-| +	bio->bi_end_io = iomap_dio_bio_end_io;
-| +
-| +	get_page(page);
-| +	if (bio_add_page(bio, page, len, 0) != len)
-| +		BUG();
-| +	bio_set_op_attrs(bio, REQ_OP_WRITE, WRITE_ODIRECT);
-| +
-| +	atomic_inc(&dio->ref);
-| +	return submit_bio(bio);
-| +}
-| +
-| +static loff_t
-| +iomap_dio_actor(struct inode *inode, loff_t pos, loff_t length,
-| +		void *data, struct iomap *iomap)
-| +{
-| +	struct iomap_dio *dio = data;
-| +	unsigned blkbits = blksize_bits(bdev_logical_block_size(iomap->bdev));
-| +	unsigned fs_block_size = (1 << inode->i_blkbits), pad;
-| +	struct iov_iter iter = *dio->submit.iter;
-| +	struct bio *bio;
-| +	bool may_zero = false;
-| +	int nr_pages, ret;
-| +
-| +	if ((pos | length | iov_iter_alignment(&iter)) & ((1 << blkbits) - 1))
-| +		return -EINVAL;
-| +
-| +	switch (iomap->type) {
-| +	case IOMAP_HOLE:
-| +		/*
-| +		 * We return -ENOTBLK to fall back to buffered I/O for file
-| +		 * systems that can't fill holes from direct writes.
-| +		 */
-| +		if (dio->flags & IOMAP_DIO_WRITE)
-| +			return -ENOTBLK;
-| +		/*FALLTHRU*/
-| +	case IOMAP_UNWRITTEN:
-| +		if (!(dio->flags & IOMAP_DIO_WRITE)) {
-| +			iov_iter_zero(length, dio->submit.iter);
-| +			dio->size += length;
-| +			return length;
-| +		}
-| +		dio->flags |= IOMAP_DIO_UNWRITTEN;
-| +		may_zero = true;
-| +		break;
-| +	case IOMAP_MAPPED:
-| +		if (iomap->flags & IOMAP_F_SHARED)
-| +			dio->flags |= IOMAP_DIO_COW;
-| +		if (iomap->flags & IOMAP_F_NEW)
-| +			may_zero = true;
-| +		break;
-| +	default:
-| +		WARN_ON_ONCE(1);
-| +		return -EIO;
-| +	}
-| +
-| +	iov_iter_truncate(&iter, length);
-| +	nr_pages = iov_iter_npages(&iter, BIO_MAX_PAGES);
-| +	if (nr_pages <= 0)
-| +		return nr_pages;
-| +
-| +	if (may_zero) {
-| +		pad = pos & (fs_block_size - 1);
-| +		if (pad)
-| +			iomap_dio_zero(dio, iomap, pos - pad, pad);
-| +	}
-| +
-| +	do {
-| +		if (dio->error)
-| +			return 0;
-| +
-| +		bio = bio_alloc(GFP_KERNEL, nr_pages);
+ (1) the IOLOCK, which this patch series actually replaces entirely by the
+     VFS i_rwsem.  This one just serializes I/O to a file.  It is taken
+     exactly once for each read or write or truncate or similar operation.
+ (2) the MMAPLOCK, which is taken in page faults to synchronize against
+     truncate.  Note taken at all for read/write
+ (3) the ILOCK, which serializes access to the extent list for a file as
+     well as a few minor bits not relevant here.  This one is taken in
+     each iomap_begin call at the moment, although I have a crude prototype
+     that allows lockless lookup in the in-memory extent list.
 
-Same here. Also: the code that follows is nearly identical; do you want to make
-it a macro or inline function or something?
+> But - (I'm not too familiar with the XFS code) - it looks like you're also doing
+> a full extents btree traversal on each iomap_begin() call too, behind
+> xfs_bmapi_read()?
 
-Regards,
+xfs_bmapi_read does a "full" extent lookup in the in-memory extent list,
+yes.  It's not actually a btree but a linear list with indirection
+arrays at the moment.  A somewhat messy structure that hopefully won't
+be around for too long.
 
-Bob Peterson
-Red Hat File Systems
+> Are you returning the right thing on partial reads/writes? the existing dio code
+> squashes -EFAULT (but not on other errors, even when some IO was successfully
+> done, e.g. -ENOMEM from gup(), which doesn't seem right to me...)
+
+Both the old and the new code only support partial reads when hitting
+EOF - everything else is getting turned into a negative error.
+
+> One thing you're not doing that the existing dio code does is limit the number
+> of outstanding pinned pages. I don't think it needs to be, but it does mean
+> you'll return an error from gup() if someone issues a huge IO, too big to pin
+> all the pages at once
+
+Where would that error come from?  It's not like get_user_pages accounts
+for the number of pinned pages in any way.  I also don't see the old
+code to care for the pinned pages anywhere, it just has it's little
+64 page array that it wants to reuse to not have unbounded kernel
+allocation for large I/O.  For the new code the bio mempool takes care
+of that throtteling.
+
+> So I think it would be a good idea to handle any memory allocation failures by
+> waiting for outstanding IOs to complete and then continuing, and only bailing
+> out if there aren't any IOs outstanding (and that still gets rid of the stupid
+> hard limit on the number of pinned pages in the existing dio code).
+
+We have exactly two memory allocation in the iomap part of the code (the
+fs might have more):  The initial dio structure, and then the bios.  For
+a dio allocation failure we just return -ENOMEM, and bio allocation don't
+fail, they just wait for other bios to complete, so I get this behavior
+for free.
+
+> Your dio refcounting - you have the submitting thread unconditionally holding
+> its own ref, and dropping it in iomap_dio_rw() after submitting all the IOs:
+> this is definitely the right way to do it for the sake of sanity, but it's going
+> to be a performance hit - this is something I've been bit by recently. The issue
+> is that you've already gone down the rest of the IO stack in either submit_bio()
+> or blk_finish_plug(), so the ref is no longer cache hot and that one atomic is
+> _significantly_ more expensive than the rest.
+> 
+> The way you've got the code setup it looks like it wouldn't be that painful to
+> get rid of that final atomic_dec_and_test() when it's not needed (async kiocbs),
+> but I also wouldn't see anything wrong with keeping things simple until after
+> the code is in and leaving that optimization for later.
+
+Yes, I don't want to over-optimize things - there still is a lot
+easier fish to fry for the fs direct I/O case.  But I also have a cut
+down variant of this code just for block devices that has optimized
+every little bit we can - with that we get 4 microsecond latency from
+a userspace program to an (DRAM based) NVMe device.  The code is here:
+
+http://git.infradead.org/users/hch/block.git/commitdiff/2491eb79a983f7f6841189ad179c714a93316603
