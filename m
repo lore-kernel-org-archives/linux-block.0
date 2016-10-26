@@ -1,63 +1,140 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: Device or HBA level QD throttling creates randomness in sequetial
- workload
-To: Kashyap Desai <kashyap.desai@broadcom.com>,
- Omar Sandoval <osandov@osandov.com>
-References: <2d656e9c9fbde7206e40a635c61a6084@mail.gmail.com>
+Return-Path: <osandov@osandov.com>
+Return-Path: <osandov@osandov.com>
+Date: Wed, 26 Oct 2016 13:56:00 -0700
+From: Omar Sandoval <osandov@osandov.com>
+To: Kashyap Desai <kashyap.desai@broadcom.com>
 Cc: linux-scsi@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
- paolo.valente@linaro.org
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <298b6ff6-9feb-4b70-ec4c-d1295a0e1f41@kernel.dk>
-Date: Mon, 31 Oct 2016 11:24:02 -0600
+	linux-block@vger.kernel.org, axboe@kernel.dk,
+	Christoph Hellwig <hch@infradead.org>, paolo.valente@linaro.org
+Subject: Re: Device or HBA level QD throttling creates randomness in
+ sequetial workload
+Message-ID: <20161026205600.GA16627@vader>
+References: <2d656e9c9fbde7206e40a635c61a6084@mail.gmail.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <2d656e9c9fbde7206e40a635c61a6084@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-Hi,
+On Tue, Oct 25, 2016 at 12:24:24AM +0530, Kashyap Desai wrote:
+> > -----Original Message-----
+> > From: Omar Sandoval [mailto:osandov@osandov.com]
+> > Sent: Monday, October 24, 2016 9:11 PM
+> > To: Kashyap Desai
+> > Cc: linux-scsi@vger.kernel.org; linux-kernel@vger.kernel.org; linux-
+> > block@vger.kernel.org; axboe@kernel.dk; Christoph Hellwig;
+> > paolo.valente@linaro.org
+> > Subject: Re: Device or HBA level QD throttling creates randomness in
+> sequetial
+> > workload
+> >
+> > On Mon, Oct 24, 2016 at 06:35:01PM +0530, Kashyap Desai wrote:
+> > > >
+> > > > On Fri, Oct 21, 2016 at 05:43:35PM +0530, Kashyap Desai wrote:
+> > > > > Hi -
+> > > > >
+> > > > > I found below conversation and it is on the same line as I wanted
+> > > > > some input from mailing list.
+> > > > >
+> > > > > http://marc.info/?l=linux-kernel&m=147569860526197&w=2
+> > > > >
+> > > > > I can do testing on any WIP item as Omar mentioned in above
+> > > discussion.
+> > > > > https://github.com/osandov/linux/tree/blk-mq-iosched
+> > >
+> > > I tried build kernel using this repo, but looks like it is not allowed
+> > > to reboot due to some changes in <block> layer.
+> >
+> > Did you build the most up-to-date version of that branch? I've been
+> force
+> > pushing to it, so the commit id that you built would be useful.
+> > What boot failure are you seeing?
+> 
+> Below  is latest commit on repo.
+> commit b077a9a5149f17ccdaa86bc6346fa256e3c1feda
+> Author: Omar Sandoval <osandov@fb.com>
+> Date:   Tue Sep 20 11:20:03 2016 -0700
+> 
+>     [WIP] blk-mq: limit bio queue depth
+> 
+> I have latest repo from 4.9/scsi-next maintained by Martin which boots
+> fine.  Only Delta is  " CONFIG_SBITMAP" is enabled in WIP blk-mq-iosched
+> branch. I could not see any meaningful data on boot hang, so going to try
+> one more time tomorrow.
 
-One guess would be that this isn't around a requeue condition, but
-rather the fact that we don't really guarantee any sort of hard FIFO
-behavior between the software queues. Can you try this test patch to see
-if it changes the behavior for you? Warning: untested...
+The blk-mq-bio-queueing branch has the latest work there separated out.
+Not sure that it'll help in this case.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index f3d27a6dee09..5404ca9c71b2 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -772,6 +772,14 @@ static inline unsigned int queued_to_index(unsigned 
-int queued)
-  	return min(BLK_MQ_MAX_DISPATCH_ORDER - 1, ilog2(queued) + 1);
-  }
+> >
+> > > >
+> > > > Are you using blk-mq for this disk? If not, then the work there
+> > > > won't
+> > > affect you.
+> > >
+> > > YES. I am using blk-mq for my test. I also confirm if use_blk_mq is
+> > > disable, Sequential work load issue is not seen and <cfq> scheduling
+> > > works well.
+> >
+> > Ah, okay, perfect. Can you send the fio job file you're using? Hard to
+> tell exactly
+> > what's going on without the details. A sequential workload with just one
+> > submitter is about as easy as it gets, so this _should_ be behaving
+> nicely.
+> 
+> <FIO script>
+> 
+> ; setup numa policy for each thread
+> ; 'numactl --show' to determine the maximum numa nodes
+> [global]
+> ioengine=libaio
+> buffered=0
+> rw=write
+> bssplit=4K/100
+> iodepth=256
+> numjobs=1
+> direct=1
+> runtime=60s
+> allow_mounted_write=0
+> 
+> [job1]
+> filename=/dev/sdd
+> ..
+> [job24]
+> filename=/dev/sdaa
 
-+static int rq_pos_cmp(void *priv, struct list_head *a, struct list_head *b)
-+{
-+	struct request *rqa = container_of(a, struct request, queuelist);
-+	struct request *rqb = container_of(b, struct request, queuelist);
-+
-+	return blk_rq_pos(rqa) < blk_rq_pos(rqb);
-+}
-+
-  /*
-   * Run this hardware queue, pulling any software queues mapped to it in.
-   * Note that this function currently has various problems around ordering
-@@ -812,6 +820,14 @@ static void __blk_mq_run_hw_queue(struct 
-blk_mq_hw_ctx *hctx)
-  	}
+Okay, so you have one high-iodepth job per disk, got it.
 
-  	/*
-+	 * If the device is rotational, sort the list sanely to avoid
-+	 * unecessary seeks. The software queues are roughly FIFO, but
-+	 * only roughly, there are no hard guarantees.
-+	 */
-+	if (!blk_queue_nonrot(q))
-+		list_sort(NULL, &rq_list, rq_pos_cmp);
-+
-+	/*
-  	 * Start off with dptr being NULL, so we start the first request
-  	 * immediately, even if we have more pending.
-  	 */
+> When I tune /sys/module/scsi_mod/parameters/use_blk_mq = 1, below is a
+> ioscheduler detail. (It is in blk-mq mode. )
+> /sys/devices/pci0000:00/0000:00:02.0/0000:02:00.0/host10/target10:2:13/10:
+> 2:13:0/block/sdq/queue/scheduler:none
+> 
+> When I have set /sys/module/scsi_mod/parameters/use_blk_mq = 0,
+> ioscheduler picked by SML is <cfq>.
+> /sys/devices/pci0000:00/0000:00:02.0/0000:02:00.0/host10/target10:2:13/10:
+> 2:13:0/block/sdq/queue/scheduler:noop deadline [cfq]
+> 
+> I see in blk-mq performance is very low for Sequential Write work load and
+> I confirm that blk-mq convert Sequential work load into random stream due
+> to  io-scheduler change in blk-mq vs legacy block layer.
+
+Since this happens when the fio iodepth exceeds the per-device QD, my
+best guess is that this is that requests are getting requeued and
+scrambled when that happens. Do you have the blktrace lying around?
+
+> > > > > Is there any workaround/alternative in latest upstream kernel, if
+> > > > > user wants to see limited penalty  for Sequential Work load on HDD
+> ?
+> > > > >
+> > > > > ` Kashyap
+> > > > >
+> >
+> > P.S., your emails are being marked as spam by Gmail. Actually, Gmail
+> seems to
+> > mark just about everything I get from Broadcom as spam due to failed
+> DMARC.
+> >
+> > --
+> > Omar
 
 -- 
-Jens Axboe
+Omar
