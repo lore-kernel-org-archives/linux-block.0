@@ -1,59 +1,115 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Ming Lei <tom.leiming@gmail.com>
-To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Ming Lei <tom.leiming@gmail.com>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        dm-devel@redhat.com (maintainer:DEVICE-MAPPER (LVM)),
-        Shaohua Li <shli@kernel.org>,
-        linux-raid@vger.kernel.org (open list:SOFTWARE RAID (Multiple Disks)
-        SUPPORT)
-Subject: [PATCH 07/60] dm: crypt: use bio_add_page()
-Date: Sat, 29 Oct 2016 16:08:06 +0800
-Message-Id: <1477728600-12938-8-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
-References: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:33270 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S932320AbcJZU0g (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 26 Oct 2016 16:26:36 -0400
+Date: Wed, 26 Oct 2016 16:26:35 -0400 (EDT)
+From: Mikulas Patocka <mpatocka@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+cc: Mike Snitzer <snitzer@redhat.com>,
+        Christoph Hellwig <hch@infradead.org>, dm-devel@redhat.com,
+        "Alasdair G. Kergon" <agk@redhat.com>, linux-block@vger.kernel.org
+Subject: [PATCH 2/4] brd: extend rcu read sections
+In-Reply-To: <alpine.LRH.2.02.1610261624100.12287@file01.intranet.prod.int.rdu2.redhat.com>
+Message-ID: <alpine.LRH.2.02.1610261626190.12287@file01.intranet.prod.int.rdu2.redhat.com>
+References: <alpine.LRH.2.02.1610211406290.9197@file01.intranet.prod.int.rdu2.redhat.com> <20161021200022.GA12580@redhat.com> <alpine.LRH.2.02.1610211616450.31606@file01.intranet.prod.int.rdu2.redhat.com> <20161024155756.GA48306@redhat.com>
+ <20161025130712.GA12717@infradead.org> <20161025143719.GA51266@redhat.com> <710b07a3-9091-6935-37c4-ea1dcedcab4f@kernel.dk> <alpine.LRH.2.02.1610261624100.12287@file01.intranet.prod.int.rdu2.redhat.com>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-We have the standard interface to add page to bio, so don't
-do that in hacking way.
+This patch extends rcu read sections, so that all manipulations of the
+page and its data are within read sections.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+This patch is a prerequisite for discarding pages using rcu.
+
+Note that the page pointer escapes the rcu section in the function
+brd_direct_access, however, direct access is not supposed to race with
+discard.
+
+Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
+
 ---
- drivers/md/dm-crypt.c | 8 +-------
- 1 file changed, 1 insertion(+), 7 deletions(-)
+ drivers/block/brd.c |   19 +++++++++++++++++--
+ 1 file changed, 17 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
-index a2768835d394..4999c7497f95 100644
---- a/drivers/md/dm-crypt.c
-+++ b/drivers/md/dm-crypt.c
-@@ -994,7 +994,6 @@ static struct bio *crypt_alloc_buffer(struct dm_crypt_io *io, unsigned size)
- 	gfp_t gfp_mask = GFP_NOWAIT | __GFP_HIGHMEM;
- 	unsigned i, len, remaining_size;
+Index: linux-2.6/drivers/block/brd.c
+===================================================================
+--- linux-2.6.orig/drivers/block/brd.c
++++ linux-2.6/drivers/block/brd.c
+@@ -71,10 +71,8 @@ static struct page *brd_lookup_page(stru
+ 	 * safe here (we don't have total exclusion from radix tree updates
+ 	 * here, only deletes).
+ 	 */
+-	rcu_read_lock();
+ 	idx = sector >> PAGE_SECTORS_SHIFT; /* sector to page index */
+ 	page = radix_tree_lookup(&brd->brd_pages, idx);
+-	rcu_read_unlock();
+ 
+ 	BUG_ON(page && page->index != idx);
+ 
+@@ -92,7 +90,12 @@ static struct page *brd_insert_page(stru
  	struct page *page;
--	struct bio_vec *bvec;
+ 	gfp_t gfp_flags;
  
- retry:
- 	if (unlikely(gfp_mask & __GFP_DIRECT_RECLAIM))
-@@ -1019,12 +1018,7 @@ static struct bio *crypt_alloc_buffer(struct dm_crypt_io *io, unsigned size)
++	rcu_read_lock();
++
+ 	page = brd_lookup_page(brd, sector);
++
++	rcu_read_unlock();
++
+ 	if (page)
+ 		return page;
  
- 		len = (remaining_size > PAGE_SIZE) ? PAGE_SIZE : remaining_size;
+@@ -151,9 +154,13 @@ static void brd_zero_page(struct brd_dev
+ {
+ 	struct page *page;
  
--		bvec = &clone->bi_io_vec[clone->bi_vcnt++];
--		bvec->bv_page = page;
--		bvec->bv_len = len;
--		bvec->bv_offset = 0;
--
--		clone->bi_iter.bi_size += len;
-+		bio_add_page(clone, page, len, 0);
++	rcu_read_lock();
++
+ 	page = brd_lookup_page(brd, sector);
+ 	if (page)
+ 		clear_highpage(page);
++
++	rcu_read_unlock();
+ }
  
- 		remaining_size -= len;
+ /*
+@@ -246,6 +253,8 @@ static void copy_to_brd(struct brd_devic
+ 	unsigned int offset = (sector & (PAGE_SECTORS-1)) << SECTOR_SHIFT;
+ 	size_t copy;
+ 
++	rcu_read_lock();
++
+ 	copy = min_t(size_t, n, PAGE_SIZE - offset);
+ 	page = brd_lookup_page(brd, sector);
+ 	BUG_ON(!page);
+@@ -265,6 +274,8 @@ static void copy_to_brd(struct brd_devic
+ 		memcpy(dst, src, copy);
+ 		kunmap_atomic(dst);
  	}
--- 
-2.7.4
++
++	rcu_read_unlock();
+ }
+ 
+ /*
+@@ -278,6 +289,8 @@ static void copy_from_brd(void *dst, str
+ 	unsigned int offset = (sector & (PAGE_SECTORS-1)) << SECTOR_SHIFT;
+ 	size_t copy;
+ 
++	rcu_read_lock();
++
+ 	copy = min_t(size_t, n, PAGE_SIZE - offset);
+ 	page = brd_lookup_page(brd, sector);
+ 	if (page) {
+@@ -299,6 +312,8 @@ static void copy_from_brd(void *dst, str
+ 		} else
+ 			memset(dst, 0, copy);
+ 	}
++
++	rcu_read_unlock();
+ }
+ 
+ /*
 
