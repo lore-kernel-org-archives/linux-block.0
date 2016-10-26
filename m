@@ -1,41 +1,61 @@
-Return-Path: <jack@suse.cz>
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Bart Van Assche <bart.vanassche@sandisk.com>,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH 2/2] brd: Switch rd_size to unsigned long
-Date: Tue, 25 Oct 2016 13:53:27 +0200
-Message-Id: <1477396407-28847-2-git-send-email-jack@suse.cz>
-In-Reply-To: <1477396407-28847-1-git-send-email-jack@suse.cz>
-References: <1477396407-28847-1-git-send-email-jack@suse.cz>
+Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
+Subject: Re: [PATCH v4 0/12] Fix race conditions related to stopping block
+ layer queues
+To: Bart Van Assche <bart.vanassche@sandisk.com>
+References: <b22edafc-725f-0419-d074-34d35d57d126@sandisk.com>
+From: Jens Axboe <axboe@fb.com>
+Message-ID: <529affae-3470-b1ae-8873-35de53628e8c@fb.com>
+Date: Wed, 26 Oct 2016 17:28:55 -0600
+MIME-Version: 1.0
+In-Reply-To: <b22edafc-725f-0419-d074-34d35d57d126@sandisk.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
+List-Post: <mailto:linux-nvme@lists.infradead.org>
+List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ Ming Lin <ming.l@ssi.samsung.com>, James Bottomley <jejb@linux.vnet.ibm.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ Mike Snitzer <snitzer@redhat.com>,
+ "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+ "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+ Keith Busch <keith.busch@intel.com>, Doug Ledford <dledford@redhat.com>,
+ "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+ Laurence Oberman <loberman@redhat.com>, Christoph Hellwig <hch@lst.de>
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
+Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
 List-ID: <linux-block@vger.kernel.org>
 
-Currently rd_size was int which lead to overflow and bogus device size
-once the requested ramdisk size was 1 TB or more. Although these days
-ramdisks with 1 TB size are mostly a mistake, the days when they are
-useful are not far.
+On 10/26/2016 04:49 PM, Bart Van Assche wrote:
+> Hello Jens,
+>
+> Multiple block drivers need the functionality to stop a request queue
+> and to wait until all ongoing request_fn() / queue_rq() calls have
+> finished without waiting until all outstanding requests have finished.
+> Hence this patch series that introduces the blk_mq_quiesce_queue()
+> function. The dm-mq, SRP and NVMe patches in this patch series are three
+> examples of where these functions are useful. These patches have been
+> tested on top of kernel v4.9-rc1. The following tests have been run to
+> verify this patch series:
+> - Mike's mptest suite that stress-tests dm-multipath.
+> - My own srp-test suite that stress-tests SRP on top of dm-multipath.
+> - fio on top of the NVMeOF host driver that was connected to the NVMeOF
+>   target driver on the same host.
+> - Laurence verified the previous version (v3) of this patch series by
+>   running it through the Red Hat SRP and NVMe test suites.
 
-Reported-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- drivers/block/brd.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+This looks pretty good, I'll run some testing on it tomorrow and do a
+full review, hopefully we can get it applied sooner rather than later
+for the next series.
 
-diff --git a/drivers/block/brd.c b/drivers/block/brd.c
-index 8b22e4a04918..6af087068ab3 100644
---- a/drivers/block/brd.c
-+++ b/drivers/block/brd.c
-@@ -443,8 +443,8 @@ static int rd_nr = CONFIG_BLK_DEV_RAM_COUNT;
- module_param(rd_nr, int, S_IRUGO);
- MODULE_PARM_DESC(rd_nr, "Maximum number of brd devices");
- 
--static int rd_size = CONFIG_BLK_DEV_RAM_SIZE;
--module_param(rd_size, int, S_IRUGO);
-+static unsigned long rd_size = CONFIG_BLK_DEV_RAM_SIZE;
-+module_param(rd_size, ulong, S_IRUGO);
- MODULE_PARM_DESC(rd_size, "Size of each RAM disk in kbytes.");
- 
- static int max_part = 1;
 -- 
-2.6.6
+Jens Axboe
+
+
+_______________________________________________
+Linux-nvme mailing list
+Linux-nvme@lists.infradead.org
+http://lists.infradead.org/mailman/listinfo/linux-nvme
