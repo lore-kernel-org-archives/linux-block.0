@@ -1,66 +1,64 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-Date: Tue, 11 Oct 2016 17:58:15 +0200
-From: Jan Kara <jack@suse.cz>
-To: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Cc: Theodore Ts'o <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCHv3 13/41] truncate: make sure invalidate_mapping_pages()
- can discard huge pages
-Message-ID: <20161011155815.GM6952@quack2.suse.cz>
-References: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
- <20160915115523.29737-14-kirill.shutemov@linux.intel.com>
+Return-Path: <prvs=9107f69a83=axboe@fb.com>
+From: Jens Axboe <axboe@fb.com>
+To: <axboe@kernel.dk>, <linux-kernel@vger.kernel.org>,
+        <linux-fsdevel@vger.kernel.org>, <linux-block@vger.kernel.org>
+CC: <jack@suse.cz>, <kernel@kolivas.org>, Jens Axboe <axboe@fb.com>
+Subject: [PATCH 4/8] writeback: track if we're sleeping on progress in balance_dirty_pages()
+Date: Wed, 26 Oct 2016 14:52:11 -0600
+Message-ID: <1477515135-16469-5-git-send-email-axboe@fb.com>
+In-Reply-To: <1477515135-16469-1-git-send-email-axboe@fb.com>
+References: <1477515135-16469-1-git-send-email-axboe@fb.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20160915115523.29737-14-kirill.shutemov@linux.intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu 15-09-16 14:54:55, Kirill A. Shutemov wrote:
-> invalidate_inode_page() has expectation about page_count() of the page
-> -- if it's not 2 (one to caller, one to radix-tree), it will not be
-> dropped. That condition almost never met for THPs -- tail pages are
-> pinned to the pagevec.
-> 
-> Let's drop them, before calling invalidate_inode_page().
-> 
-> Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
-> ---
->  mm/truncate.c | 11 +++++++++++
->  1 file changed, 11 insertions(+)
-> 
-> diff --git a/mm/truncate.c b/mm/truncate.c
-> index a01cce450a26..ce904e4b1708 100644
-> --- a/mm/truncate.c
-> +++ b/mm/truncate.c
-> @@ -504,10 +504,21 @@ unsigned long invalidate_mapping_pages(struct address_space *mapping,
->  				/* 'end' is in the middle of THP */
->  				if (index ==  round_down(end, HPAGE_PMD_NR))
->  					continue;
-> +				/*
-> +				 * invalidate_inode_page() expects
-> +				 * page_count(page) == 2 to drop page from page
-> +				 * cache -- drop tail pages references.
-> +				 */
-> +				get_page(page);
-> +				pagevec_release(&pvec);
+Note in the bdi_writeback structure whenever a task ends up sleeping
+waiting for progress. We can use that information in the lower layers
+to increase the priority of writes.
 
-I'm not quite sure why this is needed. When you have multiorder entry in
-the radix tree for your huge page, then you should not get more entries in
-the pagevec for your huge page. What do I miss?
+Signed-off-by: Jens Axboe <axboe@fb.com>
+---
+ include/linux/backing-dev-defs.h | 2 ++
+ mm/backing-dev.c                 | 1 +
+ mm/page-writeback.c              | 1 +
+ 3 files changed, 4 insertions(+)
 
-								Honza
+diff --git a/include/linux/backing-dev-defs.h b/include/linux/backing-dev-defs.h
+index c357f27d5483..dc5f76d7f648 100644
+--- a/include/linux/backing-dev-defs.h
++++ b/include/linux/backing-dev-defs.h
+@@ -116,6 +116,8 @@ struct bdi_writeback {
+ 	struct list_head work_list;
+ 	struct delayed_work dwork;	/* work item used for writeback */
+ 
++	unsigned long dirty_sleep;	/* last wait */
++
+ 	struct list_head bdi_node;	/* anchored at bdi->wb_list */
+ 
+ #ifdef CONFIG_CGROUP_WRITEBACK
+diff --git a/mm/backing-dev.c b/mm/backing-dev.c
+index 8fde443f36d7..3bfed5ab2475 100644
+--- a/mm/backing-dev.c
++++ b/mm/backing-dev.c
+@@ -310,6 +310,7 @@ static int wb_init(struct bdi_writeback *wb, struct backing_dev_info *bdi,
+ 	spin_lock_init(&wb->work_lock);
+ 	INIT_LIST_HEAD(&wb->work_list);
+ 	INIT_DELAYED_WORK(&wb->dwork, wb_workfn);
++	wb->dirty_sleep = jiffies;
+ 
+ 	wb->congested = wb_congested_get_create(bdi, blkcg_id, gfp);
+ 	if (!wb->congested)
+diff --git a/mm/page-writeback.c b/mm/page-writeback.c
+index 439cc63ad903..52e2f8e3b472 100644
+--- a/mm/page-writeback.c
++++ b/mm/page-writeback.c
+@@ -1778,6 +1778,7 @@ static void balance_dirty_pages(struct address_space *mapping,
+ 					  pause,
+ 					  start_time);
+ 		__set_current_state(TASK_KILLABLE);
++		wb->dirty_sleep = now;
+ 		io_schedule_timeout(pause);
+ 
+ 		current->dirty_paused_when = now + pause;
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+2.7.4
