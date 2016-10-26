@@ -1,14 +1,8 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.9]:56137 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754716AbcJZHg2 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Oct 2016 03:36:28 -0400
-Date: Wed, 26 Oct 2016 00:36:19 -0700
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Date: Wed, 26 Oct 2016 00:35:43 -0700
 From: Christoph Hellwig <hch@infradead.org>
-To: Andreas Dilger <adilger@dilger.ca>
-Cc: "Kirill A. Shutemov" <kirill@shutemov.name>,
-        Christoph Hellwig <hch@infradead.org>,
+To: "Kirill A. Shutemov" <kirill@shutemov.name>
+Cc: Christoph Hellwig <hch@infradead.org>,
         "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
         Theodore Ts'o <tytso@mit.edu>,
         Andreas Dilger <adilger.kernel@dilger.ca>,
@@ -26,22 +20,19 @@ Cc: "Kirill A. Shutemov" <kirill@shutemov.name>,
         linux-block@vger.kernel.org
 Subject: Re: [PATCHv4 18/43] block: define BIO_MAX_PAGES to HPAGE_PMD_NR if
  huge page cache enabled
-Message-ID: <20161026073619.GB1128@infradead.org>
+Message-ID: <20161026073543.GA1128@infradead.org>
 References: <20161025001342.76126-1-kirill.shutemov@linux.intel.com>
  <20161025001342.76126-19-kirill.shutemov@linux.intel.com>
  <20161025072122.GA21708@infradead.org>
  <20161025125431.GA22787@node.shutemov.name>
- <BD27B76A-AF34-48B9-8D4F-F69AD2C17C66@dilger.ca>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <BD27B76A-AF34-48B9-8D4F-F69AD2C17C66@dilger.ca>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <20161025125431.GA22787@node.shutemov.name>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Oct 25, 2016 at 10:13:13PM -0600, Andreas Dilger wrote:
-> Why wouldn't you have all the pool sizes in between?  Definitely 1MB has
-> been too small already for high-bandwidth IO.  I wouldn't mind BIOs up to
-> 4MB or larger since most high-end RAID hardware does best with 4MB IOs.
+On Tue, Oct 25, 2016 at 03:54:31PM +0300, Kirill A. Shutemov wrote:
+> The size of required pool depends on architecture: different architectures
+> has different (huge page size)/(base page size).
 
-I/O sizes are not limited by the bio size, we can already support larger
-than 1MB I/O for a long time.
+Please explain first why they are required and not just nice to have.
