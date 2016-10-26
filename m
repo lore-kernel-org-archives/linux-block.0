@@ -1,78 +1,77 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:40583 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1756769AbcJ1Wwk (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Oct 2016 18:52:40 -0400
-Received: from pps.filterd (m0044010.ppops.net [127.0.0.1])
-        by mx0a-00082601.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id u9SMnVE4006337
-        for <linux-block@vger.kernel.org>; Fri, 28 Oct 2016 15:52:39 -0700
-Received: from mail.thefacebook.com ([199.201.64.23])
-        by mx0a-00082601.pphosted.com with ESMTP id 26c9u5bn08-1
-        (version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT)
-        for <linux-block@vger.kernel.org>; Fri, 28 Oct 2016 15:52:39 -0700
-Received: from facebook.com (2401:db00:21:603d:face:0:19:0)     by
- mx-out.facebook.com (10.222.219.45) with ESMTP id
- 38f1ab7a9d6111e6a3a124be05904660-519eda50 for <linux-block@vger.kernel.org>;
-        Fri, 28 Oct 2016 15:52:37 -0700
-From: Shaohua Li <shli@fb.com>
-To: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <Kernel-team@fb.com>, <axboe@fb.com>
-Subject: [PATCH 1/2] block: immediately dispatch big size request
-Date: Fri, 28 Oct 2016 15:52:35 -0700
-Message-ID: <a42409a1a37e819e0497c091ab49461370b34989.1477694963.git.shli@fb.com>
+Received: from mail-sn1nam02on0081.outbound.protection.outlook.com ([104.47.36.81]:11720
+        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S933860AbcJZW4m (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 26 Oct 2016 18:56:42 -0400
+Subject: [PATCH 12/12] nvme: Fix a race condition related to stopping queues
+To: Jens Axboe <axboe@fb.com>
+References: <b22edafc-725f-0419-d074-34d35d57d126@sandisk.com>
+CC: Christoph Hellwig <hch@lst.de>,
+        James Bottomley <jejb@linux.vnet.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Doug Ledford <dledford@redhat.com>,
+        Keith Busch <keith.busch@intel.com>,
+        Ming Lei <tom.leiming@gmail.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+From: Bart Van Assche <bart.vanassche@sandisk.com>
+Message-ID: <c84a33ce-e601-400b-f4c5-9c2ae4904f4f@sandisk.com>
+Date: Wed, 26 Oct 2016 15:56:28 -0700
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <b22edafc-725f-0419-d074-34d35d57d126@sandisk.com>
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Currently block plug holds up to 16 non-mergeable requests. This makes
-sense if the request size is small, eg, reduce lock contention. But if
-request size is big enough, we don't need to worry about lock
-contention. Holding such request makes no sense and it lows the disk
-utilization.
+Avoid that nvme_queue_rq() is still running when nvme_stop_queues()
+returns.
 
-In practice, this improves 10% throughput for my raid5 sequential write
-workload.
-
-The size (128k) is arbitrary right now, but it makes sure lock
-contention is small. This probably could be more intelligent, eg, check
-average request size holded. Since this is mainly for sequential IO,
-probably not worthy.
-
-Signed-off-by: Shaohua Li <shli@fb.com>
+Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Cc: Keith Busch <keith.busch@intel.com>
 ---
- block/blk-core.c       | 4 +++-
- include/linux/blkdev.h | 1 +
- 2 files changed, 4 insertions(+), 1 deletion(-)
+ drivers/nvme/host/core.c | 15 ++++++---------
+ 1 file changed, 6 insertions(+), 9 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 14d7c07..0a396e9 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1763,7 +1763,9 @@ static blk_qc_t blk_queue_bio(struct request_queue *q, struct bio *bio)
- 		if (!request_count)
- 			trace_block_plug(q);
- 		else {
--			if (request_count >= BLK_MAX_REQUEST_COUNT) {
-+			struct request *first = list_entry_rq(plug->list.next);
-+			if (request_count >= BLK_MAX_REQUEST_COUNT ||
-+			    blk_rq_bytes(first) >= BLK_PLUG_FLUSH_SIZE) {
- 				blk_flush_plug_list(plug, false);
- 				trace_block_plug(q);
- 			}
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index c47c358..72fa505 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1078,6 +1078,7 @@ struct blk_plug {
- 	struct list_head cb_list; /* md requires an unplug callback */
- };
- #define BLK_MAX_REQUEST_COUNT 16
-+#define BLK_PLUG_FLUSH_SIZE (128 * 1024)
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index b662416..d6ab9a0 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -201,13 +201,7 @@ static struct nvme_ns *nvme_get_ns_from_disk(struct gendisk *disk)
  
- struct blk_plug_cb;
- typedef void (*blk_plug_cb_fn)(struct blk_plug_cb *, bool);
+ void nvme_requeue_req(struct request *req)
+ {
+-	unsigned long flags;
+-
+-	blk_mq_requeue_request(req, false);
+-	spin_lock_irqsave(req->q->queue_lock, flags);
+-	if (!blk_mq_queue_stopped(req->q))
+-		blk_mq_kick_requeue_list(req->q);
+-	spin_unlock_irqrestore(req->q->queue_lock, flags);
++	blk_mq_requeue_request(req, !blk_mq_queue_stopped(req->q));
+ }
+ EXPORT_SYMBOL_GPL(nvme_requeue_req);
+ 
+@@ -2079,8 +2073,11 @@ void nvme_stop_queues(struct nvme_ctrl *ctrl)
+ 
+ 	mutex_lock(&ctrl->namespaces_mutex);
+ 	list_for_each_entry(ns, &ctrl->namespaces, list) {
+-		blk_mq_cancel_requeue_work(ns->queue);
+-		blk_mq_stop_hw_queues(ns->queue);
++		struct request_queue *q = ns->queue;
++
++		blk_mq_cancel_requeue_work(q);
++		blk_mq_stop_hw_queues(q);
++		blk_mq_quiesce_queue(q);
+ 	}
+ 	mutex_unlock(&ctrl->namespaces_mutex);
+ }
 -- 
-2.9.3
+2.10.1
 
