@@ -1,118 +1,255 @@
-Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
-Subject: Re: [PATCH 05/12] blk-mq: Introduce blk_mq_quiesce_queue()
-To: Ming Lei <tom.leiming@gmail.com>
-References: <b22edafc-725f-0419-d074-34d35d57d126@sandisk.com>
- <5143c240-39af-9fe2-d3e6-ed69f9c20531@sandisk.com>
- <CACVXFVPWL=izFmUPtpi-+RLrhNX0LFfw2m6eurgMC5GvfDWsxQ@mail.gmail.com>
-From: Bart Van Assche <bvanassche@acm.org>
-Message-ID: <7690b469-f5b7-ab04-4b6f-fa0d679e0f18@acm.org>
-Date: Wed, 26 Oct 2016 19:04:57 -0700
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-vk0-f65.google.com ([209.85.213.65]:34966 "EHLO
+        mail-vk0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932222AbcJ0BaV (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 26 Oct 2016 21:30:21 -0400
 MIME-Version: 1.0
-In-Reply-To: <CACVXFVPWL=izFmUPtpi-+RLrhNX0LFfw2m6eurgMC5GvfDWsxQ@mail.gmail.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
-List-Post: <mailto:linux-nvme@lists.infradead.org>
-List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
-Cc: Keith Busch <keith.busch@intel.com>,
- James Bottomley <jejb@linux.vnet.ibm.com>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- Mike Snitzer <snitzer@redhat.com>,
- "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
- "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
- Jens Axboe <axboe@fb.com>, Doug Ledford <dledford@redhat.com>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
- Laurence Oberman <loberman@redhat.com>, Christoph Hellwig <hch@lst.de>
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
-Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
-Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <5143c240-39af-9fe2-d3e6-ed69f9c20531@sandisk.com>
+References: <b22edafc-725f-0419-d074-34d35d57d126@sandisk.com> <5143c240-39af-9fe2-d3e6-ed69f9c20531@sandisk.com>
+From: Ming Lei <tom.leiming@gmail.com>
+Date: Thu, 27 Oct 2016 09:30:19 +0800
+Message-ID: <CACVXFVPWL=izFmUPtpi-+RLrhNX0LFfw2m6eurgMC5GvfDWsxQ@mail.gmail.com>
+Subject: Re: [PATCH 05/12] blk-mq: Introduce blk_mq_quiesce_queue()
+To: Bart Van Assche <bart.vanassche@sandisk.com>
+Cc: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@lst.de>,
+        James Bottomley <jejb@linux.vnet.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Doug Ledford <dledford@redhat.com>,
+        Keith Busch <keith.busch@intel.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On 10/26/16 18:30, Ming Lei wrote:
-> On Thu, Oct 27, 2016 at 6:53 AM, Bart Van Assche
-> <bart.vanassche@sandisk.com> wrote:
->> blk_mq_quiesce_queue() waits until ongoing .queue_rq() invocations
->> have finished. This function does *not* wait until all outstanding
->> requests have finished (this means invocation of request.end_io()).
->> The algorithm used by blk_mq_quiesce_queue() is as follows:
->> * Hold either an RCU read lock or an SRCU read lock around
->>   .queue_rq() calls. The former is used if .queue_rq() does not
->>   block and the latter if .queue_rq() may block.
->> * blk_mq_quiesce_queue() calls synchronize_srcu() or
->>   synchronize_rcu() to wait for .queue_rq() invocations that
->>   started before blk_mq_quiesce_queue() was called.
->> * The blk_mq_hctx_stopped() calls that control whether or not
->>   .queue_rq() will be called are called with the (S)RCU read lock
->>   held. This is necessary to avoid race conditions against
->>   the "blk_mq_stop_hw_queues(q); blk_mq_quiesce_queue(q);"
->>   sequence from another thread.
->>
->> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
->> Cc: Christoph Hellwig <hch@lst.de>
->> Cc: Ming Lei <tom.leiming@gmail.com>
->> Cc: Hannes Reinecke <hare@suse.com>
->> Cc: Johannes Thumshirn <jthumshirn@suse.de>
->> ---
->>  block/Kconfig          |  1 +
->>  block/blk-mq.c         | 69 +++++++++++++++++++++++++++++++++++++++++++++-----
->>  include/linux/blk-mq.h |  3 +++
->>  include/linux/blkdev.h |  1 +
->>  4 files changed, 67 insertions(+), 7 deletions(-)
->>
->> diff --git a/block/Kconfig b/block/Kconfig
->> index 1d4d624..0562ef9 100644
->> --- a/block/Kconfig
->> +++ b/block/Kconfig
->> @@ -5,6 +5,7 @@ menuconfig BLOCK
->>         bool "Enable the block layer" if EXPERT
->>         default y
->>         select SBITMAP
->> +       select SRCU
->>         help
->>          Provide block layer support for the kernel.
->>
->> diff --git a/block/blk-mq.c b/block/blk-mq.c
->> index 0cf21c2..4945437 100644
->> --- a/block/blk-mq.c
->> +++ b/block/blk-mq.c
->> @@ -115,6 +115,31 @@ void blk_mq_unfreeze_queue(struct request_queue *q)
->>  }
->>  EXPORT_SYMBOL_GPL(blk_mq_unfreeze_queue);
->>
->> +/**
->> + * blk_mq_quiesce_queue() - wait until all ongoing queue_rq calls have finished
->> + * @q: request queue.
->> + *
->> + * Note: this function does not prevent that the struct request end_io()
->> + * callback function is invoked. Additionally, it is not prevented that
->> + * new queue_rq() calls occur unless the queue has been stopped first.
->> + */
->> +void blk_mq_quiesce_queue(struct request_queue *q)
->> +{
->> +       struct blk_mq_hw_ctx *hctx;
->> +       unsigned int i;
->> +       bool rcu = false;
+On Thu, Oct 27, 2016 at 6:53 AM, Bart Van Assche
+<bart.vanassche@sandisk.com> wrote:
+> blk_mq_quiesce_queue() waits until ongoing .queue_rq() invocations
+> have finished. This function does *not* wait until all outstanding
+> requests have finished (this means invocation of request.end_io()).
+> The algorithm used by blk_mq_quiesce_queue() is as follows:
+> * Hold either an RCU read lock or an SRCU read lock around
+>   .queue_rq() calls. The former is used if .queue_rq() does not
+>   block and the latter if .queue_rq() may block.
+> * blk_mq_quiesce_queue() calls synchronize_srcu() or
+>   synchronize_rcu() to wait for .queue_rq() invocations that
+>   started before blk_mq_quiesce_queue() was called.
+> * The blk_mq_hctx_stopped() calls that control whether or not
+>   .queue_rq() will be called are called with the (S)RCU read lock
+>   held. This is necessary to avoid race conditions against
+>   the "blk_mq_stop_hw_queues(q); blk_mq_quiesce_queue(q);"
+>   sequence from another thread.
 >
-> Before synchronizing SRCU/RCU, we have to set a per-hctx flag
-> or per-queue flag to block comming .queue_rq(), seems I mentioned
-> that before:
+> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Ming Lei <tom.leiming@gmail.com>
+> Cc: Hannes Reinecke <hare@suse.com>
+> Cc: Johannes Thumshirn <jthumshirn@suse.de>
+> ---
+>  block/Kconfig          |  1 +
+>  block/blk-mq.c         | 69 +++++++++++++++++++++++++++++++++++++++++++++-----
+>  include/linux/blk-mq.h |  3 +++
+>  include/linux/blkdev.h |  1 +
+>  4 files changed, 67 insertions(+), 7 deletions(-)
 >
->    https://www.spinics.net/lists/linux-rdma/msg41389.html
+> diff --git a/block/Kconfig b/block/Kconfig
+> index 1d4d624..0562ef9 100644
+> --- a/block/Kconfig
+> +++ b/block/Kconfig
+> @@ -5,6 +5,7 @@ menuconfig BLOCK
+>         bool "Enable the block layer" if EXPERT
+>         default y
+>         select SBITMAP
+> +       select SRCU
+>         help
+>          Provide block layer support for the kernel.
+>
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 0cf21c2..4945437 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -115,6 +115,31 @@ void blk_mq_unfreeze_queue(struct request_queue *q)
+>  }
+>  EXPORT_SYMBOL_GPL(blk_mq_unfreeze_queue);
+>
+> +/**
+> + * blk_mq_quiesce_queue() - wait until all ongoing queue_rq calls have finished
+> + * @q: request queue.
+> + *
+> + * Note: this function does not prevent that the struct request end_io()
+> + * callback function is invoked. Additionally, it is not prevented that
+> + * new queue_rq() calls occur unless the queue has been stopped first.
+> + */
+> +void blk_mq_quiesce_queue(struct request_queue *q)
+> +{
+> +       struct blk_mq_hw_ctx *hctx;
+> +       unsigned int i;
+> +       bool rcu = false;
 
-Hello Ming,
+Before synchronizing SRCU/RCU, we have to set a per-hctx flag
+or per-queue flag to block comming .queue_rq(), seems I mentioned
+that before:
 
-Thanks for having included an URL to an archived version of that 
-discussion. What I remember about that discussion is that I proposed to 
-use the existing flag BLK_MQ_S_STOPPED instead of introducing a
-new QUEUE_FLAG_QUIESCING flag and that you agreed with that proposal. 
-See also https://www.spinics.net/lists/linux-rdma/msg41430.html.
+   https://www.spinics.net/lists/linux-rdma/msg41389.html
 
-Bart.
+> +
+> +       queue_for_each_hw_ctx(q, hctx, i) {
+> +               if (hctx->flags & BLK_MQ_F_BLOCKING)
+> +                       synchronize_srcu(&hctx->queue_rq_srcu);
+> +               else
+> +                       rcu = true;
+> +       }
+> +       if (rcu)
+> +               synchronize_rcu();
+> +}
+> +EXPORT_SYMBOL_GPL(blk_mq_quiesce_queue);
+> +
+>  void blk_mq_wake_waiters(struct request_queue *q)
+>  {
+>         struct blk_mq_hw_ctx *hctx;
+> @@ -778,7 +803,7 @@ static inline unsigned int queued_to_index(unsigned int queued)
+>   * of IO. In particular, we'd like FIFO behaviour on handling existing
+>   * items on the hctx->dispatch list. Ignore that for now.
+>   */
+> -static void __blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx)
+> +static void blk_mq_process_rq_list(struct blk_mq_hw_ctx *hctx)
+>  {
+>         struct request_queue *q = hctx->queue;
+>         struct request *rq;
+> @@ -790,9 +815,6 @@ static void __blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx)
+>         if (unlikely(blk_mq_hctx_stopped(hctx)))
+>                 return;
+>
+> -       WARN_ON(!cpumask_test_cpu(raw_smp_processor_id(), hctx->cpumask) &&
+> -               cpu_online(hctx->next_cpu));
+> -
+>         hctx->run++;
+>
+>         /*
+> @@ -883,6 +905,24 @@ static void __blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx)
+>         }
+>  }
+>
+> +static void __blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx)
+> +{
+> +       int srcu_idx;
+> +
+> +       WARN_ON(!cpumask_test_cpu(raw_smp_processor_id(), hctx->cpumask) &&
+> +               cpu_online(hctx->next_cpu));
+> +
+> +       if (!(hctx->flags & BLK_MQ_F_BLOCKING)) {
+> +               rcu_read_lock();
+> +               blk_mq_process_rq_list(hctx);
+> +               rcu_read_unlock();
+> +       } else {
+> +               srcu_idx = srcu_read_lock(&hctx->queue_rq_srcu);
+> +               blk_mq_process_rq_list(hctx);
+> +               srcu_read_unlock(&hctx->queue_rq_srcu, srcu_idx);
+> +       }
+> +}
+> +
+>  /*
+>   * It'd be great if the workqueue API had a way to pass
+>   * in a mask and had some smarts for more clever placement.
+> @@ -1293,7 +1333,7 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
+>         const int is_flush_fua = bio->bi_opf & (REQ_PREFLUSH | REQ_FUA);
+>         struct blk_map_ctx data;
+>         struct request *rq;
+> -       unsigned int request_count = 0;
+> +       unsigned int request_count = 0, srcu_idx;
+>         struct blk_plug *plug;
+>         struct request *same_queue_rq = NULL;
+>         blk_qc_t cookie;
+> @@ -1336,7 +1376,7 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
+>                 blk_mq_bio_to_request(rq, bio);
+>
+>                 /*
+> -                * We do limited pluging. If the bio can be merged, do that.
+> +                * We do limited plugging. If the bio can be merged, do that.
+>                  * Otherwise the existing request in the plug list will be
+>                  * issued. So the plug list will have one request at most
+>                  */
+> @@ -1356,7 +1396,16 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
+>                 blk_mq_put_ctx(data.ctx);
+>                 if (!old_rq)
+>                         goto done;
+> -               blk_mq_try_issue_directly(data.hctx, old_rq, &cookie);
+> +
+> +               if (!(data.hctx->flags & BLK_MQ_F_BLOCKING)) {
+> +                       rcu_read_lock();
+> +                       blk_mq_try_issue_directly(data.hctx, old_rq, &cookie);
+> +                       rcu_read_unlock();
+> +               } else {
+> +                       srcu_idx = srcu_read_lock(&data.hctx->queue_rq_srcu);
+> +                       blk_mq_try_issue_directly(data.hctx, old_rq, &cookie);
+> +                       srcu_read_unlock(&data.hctx->queue_rq_srcu, srcu_idx);
+> +               }
+>                 goto done;
+>         }
+>
+> @@ -1635,6 +1684,9 @@ static void blk_mq_exit_hctx(struct request_queue *q,
+>         if (set->ops->exit_hctx)
+>                 set->ops->exit_hctx(hctx, hctx_idx);
+>
+> +       if (hctx->flags & BLK_MQ_F_BLOCKING)
+> +               cleanup_srcu_struct(&hctx->queue_rq_srcu);
+> +
+>         blk_mq_remove_cpuhp(hctx);
+>         blk_free_flush_queue(hctx->fq);
+>         sbitmap_free(&hctx->ctx_map);
+> @@ -1715,6 +1767,9 @@ static int blk_mq_init_hctx(struct request_queue *q,
+>                                    flush_start_tag + hctx_idx, node))
+>                 goto free_fq;
+>
+> +       if (hctx->flags & BLK_MQ_F_BLOCKING)
+> +               init_srcu_struct(&hctx->queue_rq_srcu);
+> +
+>         return 0;
+>
+>   free_fq:
+> diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+> index aa93000..61be48b 100644
+> --- a/include/linux/blk-mq.h
+> +++ b/include/linux/blk-mq.h
+> @@ -3,6 +3,7 @@
+>
+>  #include <linux/blkdev.h>
+>  #include <linux/sbitmap.h>
+> +#include <linux/srcu.h>
+>
+>  struct blk_mq_tags;
+>  struct blk_flush_queue;
+> @@ -35,6 +36,8 @@ struct blk_mq_hw_ctx {
+>
+>         struct blk_mq_tags      *tags;
+>
+> +       struct srcu_struct      queue_rq_srcu;
+> +
+>         unsigned long           queued;
+>         unsigned long           run;
+>  #define BLK_MQ_MAX_DISPATCH_ORDER      7
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index c47c358..8259d87 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -824,6 +824,7 @@ extern void __blk_run_queue(struct request_queue *q);
+>  extern void __blk_run_queue_uncond(struct request_queue *q);
+>  extern void blk_run_queue(struct request_queue *);
+>  extern void blk_run_queue_async(struct request_queue *q);
+> +extern void blk_mq_quiesce_queue(struct request_queue *q);
+>  extern int blk_rq_map_user(struct request_queue *, struct request *,
+>                            struct rq_map_data *, void __user *, unsigned long,
+>                            gfp_t);
+> --
+> 2.10.1
+>
 
-_______________________________________________
-Linux-nvme mailing list
-Linux-nvme@lists.infradead.org
-http://lists.infradead.org/mailman/listinfo/linux-nvme
+
+
+-- 
+Ming Lei
