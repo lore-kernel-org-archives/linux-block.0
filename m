@@ -1,50 +1,60 @@
-Return-Path: <Damien.LeMoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>, Christoph
- Hellwig <hch@lst.de>, "Martin K . Petersen" <martin.petersen@oracle.com>,
-	Hannes Reinecke <hare@suse.de>, Shaun Tancheff <shaun@tancheff.com>, Hannes
- Reinecke <hare@suse.com>, Damien Le Moal <damien.lemoal@hgst.com>
-Subject: [PATCH v8 3/7] block: update chunk_sectors in blk_stack_limits()
-Date: Tue, 18 Oct 2016 15:40:31 +0900
-Message-ID: <1476772835-18541-4-git-send-email-damien.lemoal@wdc.com>
-In-Reply-To: <1476772835-18541-1-git-send-email-damien.lemoal@wdc.com>
-References: <1476772835-18541-1-git-send-email-damien.lemoal@wdc.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:35258 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1750742AbcJ0QkF (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 27 Oct 2016 12:40:05 -0400
+To: Linus Torvalds <torvalds@linux-foundation.org>
+CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@fb.com>
+Subject: [GIT PULL] Block fixes for 4.9-rc
+Message-ID: <b8d9532f-4582-d665-4b7f-7e0c3ff3083c@fb.com>
+Date: Thu, 27 Oct 2016 10:39:47 -0600
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: damien.lemoal@wdc.com
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Hannes Reinecke <hare@suse.de>
+Hi Linus,
 
-Signed-off-by: Hannes Reinecke <hare@suse.com>
-Signed-off-by: Damien Le Moal <damien.lemoal@hgst.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-Reviewed-by: Shaun Tancheff <shaun.tancheff@seagate.com>
-Tested-by: Shaun Tancheff <shaun.tancheff@seagate.com>
----
- block/blk-settings.c | 4 ++++
- 1 file changed, 4 insertions(+)
+A set of fixes for this series, most notably the fix for the blk-mq
+software queue regression in from this merge window.
 
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index b1d5b7f..55369a6 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -631,6 +631,10 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
- 			t->discard_granularity;
- 	}
- 
-+	if (b->chunk_sectors)
-+		t->chunk_sectors = min_not_zero(t->chunk_sectors,
-+						b->chunk_sectors);
-+
- 	return ret;
- }
- EXPORT_SYMBOL(blk_stack_limits);
+Apart from that, a fix for an unlikely hang if a queue is flooded with
+FUA requests from Ming, and a few small fixes for nbd and badblocks.
+Lastly, a rename update for the proc softirq output, since the block
+polling code was made generic.
+
+Please pull!
+
+
+   git://git.kernel.dk/linux-block.git for-linus
+
+
+----------------------------------------------------------------
+Jens Axboe (1):
+       blk-mq: update hardware and software queues for sleeping alloc
+
+John W. Linville (1):
+       nbd: fix incorrect unlock of nbd->sock_lock in sock_shutdown
+
+Ming Lei (1):
+       block: flush: fix IO hang in case of flood fua req
+
+Sagi Grimberg (1):
+       softirq: Display IRQ_POLL for irq-poll statistics
+
+Shaohua Li (1):
+       badblocks: badblocks_set/clear update unacked_exist
+
+  block/badblocks.c   | 23 +++++++++++++++++++++++
+  block/blk-flush.c   | 28 ++++++++++++++++++++++++++++
+  block/blk-mq.c      |  6 +++---
+  drivers/block/nbd.c |  2 +-
+  kernel/softirq.c    |  2 +-
+  5 files changed, 56 insertions(+), 5 deletions(-)
+
 -- 
-2.7.4
+Jens Axboe
 
-Western Digital Corporation (and its subsidiaries) E-mail Confidentiality Notice & Disclaimer:
-
-This e-mail and any files transmitted with it may contain confidential or legally privileged information of WDC and/or its affiliates, and are intended solely for the use of the individual or entity to which they are addressed. If you are not the intended recipient, any disclosure, copying, distribution or any action taken or omitted to be taken in reliance on it, is prohibited. If you have received this e-mail in error, please notify the sender immediately and delete the e-mail in its entirety from your system.
