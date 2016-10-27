@@ -1,45 +1,70 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f195.google.com ([209.85.192.195]:34016 "EHLO
-        mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S935299AbcJ2IPp (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sat, 29 Oct 2016 04:15:45 -0400
-From: Ming Lei <tom.leiming@gmail.com>
-To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+Date: Thu, 27 Oct 2016 10:01:56 -0400
+From: Mike Snitzer <snitzer@redhat.com>
+To: Bart Van Assche <bart.vanassche@sandisk.com>
+Cc: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@lst.de>,
+        James Bottomley <jejb@linux.vnet.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Doug Ledford <dledford@redhat.com>,
+        Keith Busch <keith.busch@intel.com>,
         Ming Lei <tom.leiming@gmail.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>
-Subject: [PATCH 48/60] fs/mpage: convert to bio_for_each_segment_all_rd()
-Date: Sat, 29 Oct 2016 16:08:47 +0800
-Message-Id: <1477728600-12938-49-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
-References: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+        Laurence Oberman <loberman@redhat.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+Subject: Re: [PATCH 08/12] dm: Fix a race condition related to stopping and
+ starting queues
+Message-ID: <20161027140155.GB16816@redhat.com>
+References: <b22edafc-725f-0419-d074-34d35d57d126@sandisk.com>
+ <28b3e91c-018a-0dbd-8ca9-0a7994a97a5d@sandisk.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <28b3e91c-018a-0dbd-8ca9-0a7994a97a5d@sandisk.com>
+Sender: linux-scsi-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
----
- fs/mpage.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+On Wed, Oct 26 2016 at  6:54pm -0400,
+Bart Van Assche <bart.vanassche@sandisk.com> wrote:
 
-diff --git a/fs/mpage.c b/fs/mpage.c
-index d2413af0823a..2c906e82dd49 100644
---- a/fs/mpage.c
-+++ b/fs/mpage.c
-@@ -46,9 +46,10 @@
- static void mpage_end_io(struct bio *bio)
- {
- 	struct bio_vec *bv;
-+	struct bvec_iter_all bia;
- 	int i;
- 
--	bio_for_each_segment_all(bv, bio, i) {
-+	bio_for_each_segment_all_rd(bv, bio, i, bia) {
- 		struct page *page = bv->bv_page;
- 		page_endio(page, op_is_write(bio_op(bio)), bio->bi_error);
- 	}
--- 
-2.7.4
+> Ensure that all ongoing dm_mq_queue_rq() and dm_mq_requeue_request()
+> calls have stopped before setting the "queue stopped" flag. This
+> allows to remove the "queue stopped" test from dm_mq_queue_rq() and
+> dm_mq_requeue_request(). This patch fixes a race condition because
+> dm_mq_queue_rq() is called without holding the queue lock and hence
+> BLK_MQ_S_STOPPED can be set at any time while dm_mq_queue_rq() is
+> in progress. This patch prevents that the following hang occurs
+> sporadically when using dm-mq:
+> 
+> INFO: task systemd-udevd:10111 blocked for more than 480 seconds.
+> Call Trace:
+>  [<ffffffff8161f397>] schedule+0x37/0x90
+>  [<ffffffff816239ef>] schedule_timeout+0x27f/0x470
+>  [<ffffffff8161e76f>] io_schedule_timeout+0x9f/0x110
+>  [<ffffffff8161fb36>] bit_wait_io+0x16/0x60
+>  [<ffffffff8161f929>] __wait_on_bit_lock+0x49/0xa0
+>  [<ffffffff8114fe69>] __lock_page+0xb9/0xc0
+>  [<ffffffff81165d90>] truncate_inode_pages_range+0x3e0/0x760
+>  [<ffffffff81166120>] truncate_inode_pages+0x10/0x20
+>  [<ffffffff81212a20>] kill_bdev+0x30/0x40
+>  [<ffffffff81213d41>] __blkdev_put+0x71/0x360
+>  [<ffffffff81214079>] blkdev_put+0x49/0x170
+>  [<ffffffff812141c0>] blkdev_close+0x20/0x30
+>  [<ffffffff811d48e8>] __fput+0xe8/0x1f0
+>  [<ffffffff811d4a29>] ____fput+0x9/0x10
+>  [<ffffffff810842d3>] task_work_run+0x83/0xb0
+>  [<ffffffff8106606e>] do_exit+0x3ee/0xc40
+>  [<ffffffff8106694b>] do_group_exit+0x4b/0xc0
+>  [<ffffffff81073d9a>] get_signal+0x2ca/0x940
+>  [<ffffffff8101bf43>] do_signal+0x23/0x660
+>  [<ffffffff810022b3>] exit_to_usermode_loop+0x73/0xb0
+>  [<ffffffff81002cb0>] syscall_return_slowpath+0xb0/0xc0
+>  [<ffffffff81624e33>] entry_SYSCALL_64_fastpath+0xa6/0xa8
+> 
+> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+> Reviewed-by: Hannes Reinecke <hare@suse.com>
+> Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Cc: Mike Snitzer <snitzer@redhat.com>
 
+Acked-by: Mike Snitzer <snitzer@redhat.com>
