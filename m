@@ -1,20 +1,20 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lf0-f49.google.com ([209.85.215.49]:35862 "EHLO
-        mail-lf0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S935747AbcJ0SBw (ORCPT
+Received: from mail-wm0-f52.google.com ([74.125.82.52]:33989 "EHLO
+        mail-wm0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1756402AbcJ0OuE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Oct 2016 14:01:52 -0400
-Received: by mail-lf0-f49.google.com with SMTP id b75so38485502lfg.3
-        for <linux-block@vger.kernel.org>; Thu, 27 Oct 2016 11:01:51 -0700 (PDT)
+        Thu, 27 Oct 2016 10:50:04 -0400
+Received: by mail-wm0-f52.google.com with SMTP id 140so5599041wmv.1
+        for <linux-block@vger.kernel.org>; Thu, 27 Oct 2016 07:50:03 -0700 (PDT)
 From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
 To: mb@lightnvm.io
 Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
 Subject: [PATCH 2/7] lightnvm: do not decide on device blocks
-Date: Thu, 27 Oct 2016 20:01:34 +0200
-Message-Id: <1477591299-26504-3-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1477591299-26504-1-git-send-email-javier@cnexlabs.com>
-References: <1477591299-26504-1-git-send-email-javier@cnexlabs.com>
+Date: Thu, 27 Oct 2016 16:49:38 +0200
+Message-Id: <1477579783-5289-2-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1477579783-5289-1-git-send-email-javier@cnexlabs.com>
+References: <1477579783-5289-1-git-send-email-javier@cnexlabs.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
