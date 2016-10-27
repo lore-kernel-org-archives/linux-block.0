@@ -1,15 +1,17 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.9]:52312 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S936094AbcJ0Nur (ORCPT
+Received: from mail-wm0-f46.google.com ([74.125.82.46]:38646 "EHLO
+        mail-wm0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S942862AbcJ0OjA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Oct 2016 09:50:47 -0400
-Date: Thu, 27 Oct 2016 05:32:19 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Sagi Grimberg <sagi@grimberg.me>
-Cc: Christoph Hellwig <hch@infradead.org>,
-        Dave Chinner <david@fromorbit.com>,
-        jgunthorpe@obsidianresearch.com, sbates@raithin.com,
+        Thu, 27 Oct 2016 10:39:00 -0400
+Subject: Re: [PATCH 0/3] iopmem : A block device for PCIe memory
+To: Christoph Hellwig <hch@infradead.org>,
+        Dave Chinner <david@fromorbit.com>
+References: <1476826937-20665-1-git-send-email-sbates@raithlin.com>
+ <CAPcyv4gJ_c-6s2BUjsu6okR1EF53R+KNuXnOc5jv0fuwJaa3cQ@mail.gmail.com>
+ <20161019184814.GC16550@cgy1-donard.priv.deltatee.com>
+ <20161020232239.GQ23194@dastard> <20161021095714.GA12209@infradead.org>
+Cc: jgunthorpe@obsidianresearch.com, sbates@raithin.com,
         "Raj, Ashok" <ashok.raj@intel.com>, haggaie@mellanox.com,
         linux-rdma@vger.kernel.org,
         "linux-nvdimm@lists.01.org" <linux-nvdimm@ml01.01.org>,
@@ -19,28 +21,35 @@ Cc: Christoph Hellwig <hch@infradead.org>,
         linux-block@vger.kernel.org, Linux MM <linux-mm@kvack.org>,
         Jens Axboe <axboe@fb.com>,
         David Woodhouse <dwmw2@infradead.org>
-Subject: Re: [PATCH 0/3] iopmem : A block device for PCIe memory
-Message-ID: <20161027123219.GA757@infradead.org>
-References: <1476826937-20665-1-git-send-email-sbates@raithlin.com>
- <CAPcyv4gJ_c-6s2BUjsu6okR1EF53R+KNuXnOc5jv0fuwJaa3cQ@mail.gmail.com>
- <20161019184814.GC16550@cgy1-donard.priv.deltatee.com>
- <20161020232239.GQ23194@dastard>
- <20161021095714.GA12209@infradead.org>
- <76e957c9-8002-5a46-8111-269bb0401718@grimberg.me>
+From: Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <76e957c9-8002-5a46-8111-269bb0401718@grimberg.me>
+Date: Thu, 27 Oct 2016 13:22:49 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <76e957c9-8002-5a46-8111-269bb0401718@grimberg.me>
+In-Reply-To: <20161021095714.GA12209@infradead.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Thu, Oct 27, 2016 at 01:22:49PM +0300, Sagi Grimberg wrote:
-> Christoph, did you manage to leap to the future and solve the
-> RDMA persistency hole? :)
-> 
-> e.g. what happens with O_DSYNC in this model? Or you did
-> a message exchange for commits?
 
-Yes, pNFS calls this the layoutcommit.  That being said once we get a RDMA
-commit or flush operation we could easily make the layoutcommit optional
-for some operations.  There already is a precedence for the in the
-flexfiles layout specification.
+>> You do realise that local filesystems can silently change the
+>> location of file data at any point in time, so there is no such
+>> thing as a "stable mapping" of file data to block device addresses
+>> in userspace?
+>>
+>> If you want remote access to the blocks owned and controlled by a
+>> filesystem, then you need to use a filesystem with a remote locking
+>> mechanism to allow co-ordinated, coherent access to the data in
+>> those blocks. Anything else is just asking for ongoing, unfixable
+>> filesystem corruption or data leakage problems (i.e.  security
+>> issues).
+>
+> And at least for XFS we have such a mechanism :)  E.g. I have a
+> prototype of a pNFS layout that uses XFS+DAX to allow clients to do
+> RDMA directly to XFS files, with the same locking mechanism we use
+> for the current block and scsi layout in xfs_pnfs.c.
+
+Christoph, did you manage to leap to the future and solve the
+RDMA persistency hole? :)
+
+e.g. what happens with O_DSYNC in this model? Or you did
+a message exchange for commits?
