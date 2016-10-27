@@ -1,58 +1,100 @@
-Return-Path: <linus.walleij@linaro.org>
-MIME-Version: 1.0
-In-Reply-To: <e792e932-cf16-4272-2388-ae813a0372b6@kernel.dk>
-References: <1477474082-2846-1-git-send-email-paolo.valente@linaro.org>
- <20161026113443.GA13587@quack2.suse.cz> <4ed3e291-b3e5-5ee3-6838-58644bd3d99b@sandisk.com>
- <12386463.fJy0cVexVD@wuerfel> <20161026152955.GA21262@infradead.org>
- <3ebadbb8-9ac2-851a-66f9-c9db25713695@kernel.dk> <38156FA7-9A66-44DC-8D0C-28F149D1E49B@linaro.org>
- <09fc1e06-3fd6-b13d-0dd9-0edfb55b01d1@kernel.dk> <CAPDyKFrCNS_ZWzVU9Y=J9q0ewp-7=VFs4LwV69SzgSGHBxTn-g@mail.gmail.com>
- <15ee2d0e-2d3a-81e2-9f83-f875e41bf388@kernel.dk> <CAPDyKFoi64Q0H9x2F35oY85PMDNq4hRsmqGYiP+En+qtQ4+Bag@mail.gmail.com>
- <1ac9b794-7e7f-0748-e4c8-a13034aecbc3@kernel.dk> <CAPDyKFpLhp0eoS8LWy-jU0_U_cWq4immq2+bPdi-j7=oa24OjA@mail.gmail.com>
- <e792e932-cf16-4272-2388-ae813a0372b6@kernel.dk>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Fri, 28 Oct 2016 00:27:28 +0200
-Message-ID: <CACRpkdbngAKuwDaUwZ=QaW9POb4U2tFJA60aLKD6QZKf60bq6g@mail.gmail.com>
-Subject: Re: [PATCH 00/14] introduce the BFQ-v0 I/O scheduler as an extra scheduler
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Ulf Hansson <ulf.hansson@linaro.org>, Paolo Valente <paolo.valente@linaro.org>,
-	Christoph Hellwig <hch@infradead.org>, Arnd Bergmann <arnd@arndb.de>,
-	Bart Van Assche <bart.vanassche@sandisk.com>, Jan Kara <jack@suse.cz>, Tejun Heo <tj@kernel.org>,
-	linux-block@vger.kernel.org, Linux-Kernal <linux-kernel@vger.kernel.org>,
-	Mark Brown <broonie@kernel.org>, Hannes Reinecke <hare@suse.de>,
+Return-Path: <broonie@sirena.org.uk>
+Date: Thu, 27 Oct 2016 23:01:05 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Jens Axboe <axboe@kernel.dk>, Ulf Hansson <ulf.hansson@linaro.org>,
+	Paolo Valente <paolo.valente@linaro.org>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Bart Van Assche <bart.vanassche@sandisk.com>,
+	Jan Kara <jack@suse.cz>, Tejun Heo <tj@kernel.org>,
+	linux-block@vger.kernel.org,
+	Linux-Kernal <linux-kernel@vger.kernel.org>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Hannes Reinecke <hare@suse.de>,
 	Grant Likely <grant.likely@secretlab.ca>,
 	James Bottomley <James.Bottomley@hansenpartnership.com>
-Content-Type: text/plain; charset=UTF-8
+Message-ID: <20161027220105.GV25322@sirena.org.uk>
+References: <20161026152955.GA21262@infradead.org>
+ <3ebadbb8-9ac2-851a-66f9-c9db25713695@kernel.dk>
+ <38156FA7-9A66-44DC-8D0C-28F149D1E49B@linaro.org>
+ <09fc1e06-3fd6-b13d-0dd9-0edfb55b01d1@kernel.dk>
+ <CAPDyKFrCNS_ZWzVU9Y=J9q0ewp-7=VFs4LwV69SzgSGHBxTn-g@mail.gmail.com>
+ <15ee2d0e-2d3a-81e2-9f83-f875e41bf388@kernel.dk>
+ <CAPDyKFoi64Q0H9x2F35oY85PMDNq4hRsmqGYiP+En+qtQ4+Bag@mail.gmail.com>
+ <1ac9b794-7e7f-0748-e4c8-a13034aecbc3@kernel.dk>
+ <20161027194127.GT25322@sirena.org.uk>
+ <20161027194548.GA30332@infradead.org>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="FQ9/qgh0YgB02Feu"
+In-Reply-To: <20161027194548.GA30332@infradead.org>
+Subject: Re: [PATCH 00/14] introduce the BFQ-v0 I/O scheduler as an extra
+ scheduler
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Oct 27, 2016 at 11:08 PM, Jens Axboe <axboe@kernel.dk> wrote:
 
-> blk-mq has evolved to support a variety of devices, there's nothing
-> special about mmc that can't work well within that framework.
+--FQ9/qgh0YgB02Feu
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-There is. Read mmc_queue_thread() in drivers/mmc/card/queue.c
+On Thu, Oct 27, 2016 at 12:45:48PM -0700, Christoph Hellwig wrote:
+> On Thu, Oct 27, 2016 at 08:41:27PM +0100, Mark Brown wrote:
 
-This repeatedly calls req = blk_fetch_request(q);, starting one request
-and then getting the next one off the queue, including reading
-a few NULL requests off the end of the queue (to satisfy the
-semantics of its state machine.
+> > Plus the benchmarking to verify that it works well of course, especially
+> > initially where it'll also be a new queue infrastructure as well as the
+> > blk-mq conversion itself.  It does feel like something that's going to
+> > take at least a couple of kernel releases to get through.
 
-It then preprocess each request by esstially calling .pre() and .post()
-hooks all the way down to the driver, flushing its mapped
-sglist from CPU to DMA device memory (not a problem on x86 and
-other DMA-coherent archs, but a big win on the incoherent ones).
+> Or to put it the other way around:  it could have been long done
+> if people had started it the first it was suggestead.  Instead you guys
+> keep arguing and nothing gets done.  Get started now, waiting won't
+> make anything go faster.
 
-In the attempt that was posted recently this is achieved by lying
-and saying the HW queue is two items deep and eating requests
-off that queue calling pre/post on them.
+There are things going on already like the effort to convert MMC to
+blk-mq and there have been some initial emails with Omar about how best
+to collaborate on his existing work (which was pointed out as the way
+forwards) so that things are useful and we avoid duplication of effort.
+In any case the situation is what it is, we can't change the past.
 
-But as there actually exist MMC cards with command queueing, this
-would become hopeless to handle, the hw queue depth has to reflect
-the real depth. What we need is for the block core to call pre/post
-hooks on each request.
+> > I think there's also value in having improvements there for people who
+> > benefit from them while queue infrastructure for blk-mq is being worked
+> > on. =20
 
-The "only" thing that doesn't work well after that is that CFQ is no
-longer in action, which will have interesting effects on MMC throughput
-in any fio-like stress test as it is mostly single-hw-queue.
+> Well, apply it to you vendor tree then and maintain it yourself if you
+> disagree with our direction.
 
-Yours,
-Linus Walleij
+I don't think there's any substantial disagreement about where we want
+to end up, it's a much more tactical discussion about what we do while
+we're on the way there.  Just saying put the changes in your vendor tree
+isn't ideal, it's not like there's some singular vendor tree out there
+that everyone uses and doing things in vendor trees is what we mostly
+encourage people to avoid doing.
+
+If it were something that was actively disruptive for other users or it
+made the blk-mq code harder to work with then it'd be clear that having
+it upstream would cause problems but that doesn't seem to be the case
+here.  Similarly if blk-mq were already at the point where it could
+replace blk then it'd be clear that drivers should just be being
+converted.  Instead we're in the middle somewhere, it wouldn't be
+entirely free to put something in but on the other hand helps solve
+people's problems and where it's causing costs those costs are also
+providing a hook that helps pull people into working with the community
+more.
+
+--FQ9/qgh0YgB02Feu
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQEcBAEBCAAGBQJYEnkgAAoJECTWi3JdVIfQtOkH/0RcXCrlU8IegNXKWMlHz5i/
+M/ihxAE/Uk2sicgYMsBprrvX8E+A9tTtvHTUiMPwoAoAwDOAQxYDBxUrqEp0uJtg
+SXS2Jp5KBgGqNIczL3M7x62SuqAlt16D3/MqOtWe+kqnfxxB4qZXuQh4DoWVr9pA
+05cZSO9/NYExhsLNjUjpz0FqZtitN1OO59W7Dl1T0uzBZx8P6KkHE+WOTq+WG/Fa
+4pRJlx3nyC+Xw8PPQ3ijmcEVKdsLvQQeYTDjepMBcYaj48NKa0aIss2C1wDJGjZH
+DjXg3XprHXvrI4RYX5hailTot1J1R6IbA/xf5NlbCvwSszq/192rTN6sqe21NQI=
+=QRFW
+-----END PGP SIGNATURE-----
+
+--FQ9/qgh0YgB02Feu--
