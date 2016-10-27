@@ -1,27 +1,24 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lf0-f42.google.com ([209.85.215.42]:35660 "EHLO
-        mail-lf0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S936547AbcJ0SBy (ORCPT
+Received: from mail-wm0-f43.google.com ([74.125.82.43]:37034 "EHLO
+        mail-wm0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S942876AbcJ0OuP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Oct 2016 14:01:54 -0400
-Received: by mail-lf0-f42.google.com with SMTP id f134so33663699lfg.2
-        for <linux-block@vger.kernel.org>; Thu, 27 Oct 2016 11:01:53 -0700 (PDT)
+        Thu, 27 Oct 2016 10:50:15 -0400
+Received: by mail-wm0-f43.google.com with SMTP id 140so28758175wmv.0
+        for <linux-block@vger.kernel.org>; Thu, 27 Oct 2016 07:50:14 -0700 (PDT)
 From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
 To: mb@lightnvm.io
 Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@javigon.com>,
         =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
 Subject: [PATCH 3/7] lightnvm: manage block list on LUN owner
-Date: Thu, 27 Oct 2016 20:01:35 +0200
-Message-Id: <1477591299-26504-4-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1477591299-26504-1-git-send-email-javier@cnexlabs.com>
-References: <1477591299-26504-1-git-send-email-javier@cnexlabs.com>
+Date: Thu, 27 Oct 2016 16:49:39 +0200
+Message-Id: <1477579783-5289-3-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1477579783-5289-1-git-send-email-javier@cnexlabs.com>
+References: <1477579783-5289-1-git-send-email-javier@cnexlabs.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
-
-From: Javier González <javier@javigon.com>
 
 LUNs can be exclusively owned by a target through the media manager's
 reserve_lun function. In this case, the target should implement its own
@@ -50,7 +47,7 @@ Signed-off-by: Javier González <javier@cnexlabs.com>
  6 files changed, 145 insertions(+), 54 deletions(-)
 
 diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-index 1a6a7e6..4c6577e 100644
+index f752087..4be3879 100644
 --- a/drivers/lightnvm/core.c
 +++ b/drivers/lightnvm/core.c
 @@ -178,10 +178,9 @@ static struct nvm_dev *nvm_find_nvm_dev(const char *name)
