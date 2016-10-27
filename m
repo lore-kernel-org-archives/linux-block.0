@@ -1,74 +1,54 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:46269 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751303AbcJ0Fwo (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Oct 2016 01:52:44 -0400
+Received: from ant-001.se.1eurohost.be ([5.134.1.73]:59197 "EHLO
+        ant-001.se.1eurohost.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752855AbcJ0DR3 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 26 Oct 2016 23:17:29 -0400
 Subject: Re: [PATCH 05/12] blk-mq: Introduce blk_mq_quiesce_queue()
-To: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Jens Axboe <axboe@fb.com>
+To: Ming Lei <tom.leiming@gmail.com>
 References: <b22edafc-725f-0419-d074-34d35d57d126@sandisk.com>
- <5143c240-39af-9fe2-d3e6-ed69f9c20531@sandisk.com>
-Cc: Christoph Hellwig <hch@lst.de>,
+        <5143c240-39af-9fe2-d3e6-ed69f9c20531@sandisk.com>
+        <CACVXFVPWL=izFmUPtpi-+RLrhNX0LFfw2m6eurgMC5GvfDWsxQ@mail.gmail.com>
+        <7690b469-f5b7-ab04-4b6f-fa0d679e0f18@acm.org>
+        <CACVXFVNvdNXm4JXsXo2p1_pZLqDpCos0MTTR+svR98p_vw5PCA@mail.gmail.com>
+        <16074653-5e31-27b0-90db-33d36a9df0bc@acm.org>
+        <CACVXFVNyRnJFnsSO9TNksE5GNy7TJKL=iZnqrv38=u0XCrW7jA@mail.gmail.com>
+Cc: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@lst.de>,
         James Bottomley <jejb@linux.vnet.ibm.com>,
         "Martin K. Petersen" <martin.petersen@oracle.com>,
         Mike Snitzer <snitzer@redhat.com>,
         Doug Ledford <dledford@redhat.com>,
         Keith Busch <keith.busch@intel.com>,
-        Ming Lei <tom.leiming@gmail.com>,
         Laurence Oberman <loberman@redhat.com>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
         "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
         "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <f1661bd2-12ca-20d1-ece2-5c7fe5987035@suse.de>
-Date: Thu, 27 Oct 2016 07:52:41 +0200
+From: Bart Van Assche <bvanassche@acm.org>
+Message-ID: <8404f2d1-5bc3-6c84-7ca0-24e7672ff67d@acm.org>
+Date: Wed, 26 Oct 2016 20:05:14 -0700
 MIME-Version: 1.0
-In-Reply-To: <5143c240-39af-9fe2-d3e6-ed69f9c20531@sandisk.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <CACVXFVNyRnJFnsSO9TNksE5GNy7TJKL=iZnqrv38=u0XCrW7jA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 10/27/2016 12:53 AM, Bart Van Assche wrote:
-> blk_mq_quiesce_queue() waits until ongoing .queue_rq() invocations
-> have finished. This function does *not* wait until all outstanding
-> requests have finished (this means invocation of request.end_io()).
-> The algorithm used by blk_mq_quiesce_queue() is as follows:
-> * Hold either an RCU read lock or an SRCU read lock around
->   .queue_rq() calls. The former is used if .queue_rq() does not
->   block and the latter if .queue_rq() may block.
-> * blk_mq_quiesce_queue() calls synchronize_srcu() or
->   synchronize_rcu() to wait for .queue_rq() invocations that
->   started before blk_mq_quiesce_queue() was called.
-> * The blk_mq_hctx_stopped() calls that control whether or not
->   .queue_rq() will be called are called with the (S)RCU read lock
->   held. This is necessary to avoid race conditions against
->   the "blk_mq_stop_hw_queues(q); blk_mq_quiesce_queue(q);"
->   sequence from another thread.
-> 
-> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-> Cc: Christoph Hellwig <hch@lst.de>
-> Cc: Ming Lei <tom.leiming@gmail.com>
-> Cc: Hannes Reinecke <hare@suse.com>
-> Cc: Johannes Thumshirn <jthumshirn@suse.de>
-> ---
->  block/Kconfig          |  1 +
->  block/blk-mq.c         | 69 +++++++++++++++++++++++++++++++++++++++++++++-----
->  include/linux/blk-mq.h |  3 +++
->  include/linux/blkdev.h |  1 +
->  4 files changed, 67 insertions(+), 7 deletions(-)
-> 
-Hmm. Can't say I like having to have two RCU structure for the same
-purpose, but I guess that can't be helped.
+On 10/26/16 19:48, Ming Lei wrote:
+> On Thu, Oct 27, 2016 at 10:40 AM, Bart Van Assche <bvanassche@acm.org> wrote:
+>> If you have a look at the later patches in this series then you will see
+>> that the dm core and the NVMe driver have been modified such that
+>> blk_mq_stop_hw_queues(q) is called immediately before
+>> blk_mq_quiesce_queue(q) is called.
+>
+> Cause any current and future users of blk_mq_quiesce_queue(q)
+> have to set the flag via blk_mq_stop_hw_queues(q), why not set
+> the flag explicitly in blk_mq_quiesce_queue(q)?
 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+Hello Ming,
 
-Cheers,
+I'll leave it to Jens to decide whether I should repost the patch series 
+with this change integrated or whether to realize this change with a 
+follow-up patch.
 
-Hannes
--- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG Nürnberg)
+Bart.
+
