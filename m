@@ -1,20 +1,11 @@
-Return-Path: <broonie@sirena.org.uk>
-Date: Thu, 27 Oct 2016 23:01:05 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Jens Axboe <axboe@kernel.dk>, Ulf Hansson <ulf.hansson@linaro.org>,
-	Paolo Valente <paolo.valente@linaro.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Bart Van Assche <bart.vanassche@sandisk.com>,
-	Jan Kara <jack@suse.cz>, Tejun Heo <tj@kernel.org>,
-	linux-block@vger.kernel.org,
-	Linux-Kernal <linux-kernel@vger.kernel.org>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Hannes Reinecke <hare@suse.de>,
-	Grant Likely <grant.likely@secretlab.ca>,
-	James Bottomley <James.Bottomley@hansenpartnership.com>
-Message-ID: <20161027220105.GV25322@sirena.org.uk>
-References: <20161026152955.GA21262@infradead.org>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 00/14] introduce the BFQ-v0 I/O scheduler as an extra
+ scheduler
+To: Ulf Hansson <ulf.hansson@linaro.org>
+References: <1477474082-2846-1-git-send-email-paolo.valente@linaro.org>
+ <20161026113443.GA13587@quack2.suse.cz>
+ <4ed3e291-b3e5-5ee3-6838-58644bd3d99b@sandisk.com>
+ <12386463.fJy0cVexVD@wuerfel> <20161026152955.GA21262@infradead.org>
  <3ebadbb8-9ac2-851a-66f9-c9db25713695@kernel.dk>
  <38156FA7-9A66-44DC-8D0C-28F149D1E49B@linaro.org>
  <09fc1e06-3fd6-b13d-0dd9-0edfb55b01d1@kernel.dk>
@@ -22,79 +13,107 @@ References: <20161026152955.GA21262@infradead.org>
  <15ee2d0e-2d3a-81e2-9f83-f875e41bf388@kernel.dk>
  <CAPDyKFoi64Q0H9x2F35oY85PMDNq4hRsmqGYiP+En+qtQ4+Bag@mail.gmail.com>
  <1ac9b794-7e7f-0748-e4c8-a13034aecbc3@kernel.dk>
- <20161027194127.GT25322@sirena.org.uk>
- <20161027194548.GA30332@infradead.org>
+ <CAPDyKFpLhp0eoS8LWy-jU0_U_cWq4immq2+bPdi-j7=oa24OjA@mail.gmail.com>
+Cc: Paolo Valente <paolo.valente@linaro.org>,
+ Christoph Hellwig <hch@infradead.org>, Arnd Bergmann <arnd@arndb.de>,
+ Bart Van Assche <bart.vanassche@sandisk.com>, Jan Kara <jack@suse.cz>,
+ Tejun Heo <tj@kernel.org>, linux-block@vger.kernel.org,
+ Linux-Kernal <linux-kernel@vger.kernel.org>,
+ Linus Walleij <linus.walleij@linaro.org>, Mark Brown <broonie@kernel.org>,
+ Hannes Reinecke <hare@suse.de>, Grant Likely <grant.likely@secretlab.ca>,
+ James Bottomley <James.Bottomley@hansenpartnership.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <e792e932-cf16-4272-2388-ae813a0372b6@kernel.dk>
+Date: Thu, 27 Oct 2016 15:08:51 -0600
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="FQ9/qgh0YgB02Feu"
-In-Reply-To: <20161027194548.GA30332@infradead.org>
-Subject: Re: [PATCH 00/14] introduce the BFQ-v0 I/O scheduler as an extra
- scheduler
+In-Reply-To: <CAPDyKFpLhp0eoS8LWy-jU0_U_cWq4immq2+bPdi-j7=oa24OjA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
+On 10/27/2016 01:34 PM, Ulf Hansson wrote:
+> [...]
+>
+>>> Instead, what I can tell, as we have been looking into converting mmc
+>>> (which I maintains) and that is indeed a significant amount of work.
+>>> We will need to rip out all of the mmc request management, and most
+>>> likely we also need to extend the blkmq interface - as to be able to
+>>> do re-implement all the current request optimizations. We are looking
+>>> into this, but it just takes time.
+>>
+>>
+>> It's usually as much work as you make it into, for most cases it's
+>> pretty straight forward and usually removes more code than it adds.
+>> Hence the end result is better for it as well - less code in a driver is
+>> better.
+>
+> From a scalability and maintenance point of view, converting to blkmq
+> makes perfect sense.
+>
+> Although, me personally don't want to sacrifice on performance (at
+> least very little), just for the sake of gaining in
+> scalability/maintainability.
 
---FQ9/qgh0YgB02Feu
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Nobody has said anything about sacrificing performance. And whether you
+like it or not, maintainability is always the most important aspect.
+Even performance takes a backseat to maintainability.
 
-On Thu, Oct 27, 2016 at 12:45:48PM -0700, Christoph Hellwig wrote:
-> On Thu, Oct 27, 2016 at 08:41:27PM +0100, Mark Brown wrote:
+> I would rather strive to adopt the blkmq framework to also suit my
+> needs. Then it simply do takes more time.
+>
+> For example, in the mmc case we have implemented an asynchronous
+> request path, which greatly improves performance on some systems.
 
-> > Plus the benchmarking to verify that it works well of course, especially
-> > initially where it'll also be a new queue infrastructure as well as the
-> > blk-mq conversion itself.  It does feel like something that's going to
-> > take at least a couple of kernel releases to get through.
+blk-mq has evolved to support a variety of devices, there's nothing
+special about mmc that can't work well within that framework.
 
-> Or to put it the other way around:  it could have been long done
-> if people had started it the first it was suggestead.  Instead you guys
-> keep arguing and nothing gets done.  Get started now, waiting won't
-> make anything go faster.
+>>>>> 3)
+>>>>> While we work on scheduling in blkmq (at least for single queue
+>>>>> devices), it's of course important that we set high goals. Having BFQ
+>>>>> (and the other schedulers) in the legacy blk, provides a good
+>>>>> reference for what we could aim for.
+>>>>
+>>>>
+>>>>
+>>>> Sure, but you don't need BFQ to be included in the kernel for that.
+>>>
+>>>
+>>> Perhaps not.
+>>>
+>>> But does that mean, you expect Paolo to maintain an up to date BFQ
+>>> tree for you?
+>>
+>>
+>> I don't expect anything. If Paolo or others want to compare with BFQ on
+>> the legacy IO path, then they can do that however way they want. If you
+>> (and others) want to have that reference point, it's up to you how to
+>> accomplish that.
+>
+> Do I get this right? You personally don't care about using BFQ as
+> reference when evolving blkmq for single queue devices?
+>
+> Paolo and lots of other Linux users certainly do care about this.
 
-There are things going on already like the effort to convert MMC to
-blk-mq and there have been some initial emails with Omar about how best
-to collaborate on his existing work (which was pointed out as the way
-forwards) so that things are useful and we avoid duplication of effort.
-In any case the situation is what it is, we can't change the past.
+I'm getting a little tired of this putting words in my mouth... That is
+not what I'm saying at all. What I'm saying is that the people working
+on BFQ can do what they need to do to have a reference implementation to
+compare against. You don't need BFQ in the kernel for that. I said it's
+up to YOU, with the you here meaning the people that want to work on it,
+how that goes down.
 
-> > I think there's also value in having improvements there for people who
-> > benefit from them while queue infrastructure for blk-mq is being worked
-> > on. =20
+> Moreover, I am still trying to understand what's the big deal to why
+> you say no to BFQ as a legacy scheduler. Ideally it shouldn't cause
+> you any maintenance burden and it doesn't make the removal of the
+> legacy blk layer any more difficult, right?
 
-> Well, apply it to you vendor tree then and maintain it yourself if you
-> disagree with our direction.
+Not sure I can state it much clearer. It's a new scheduler, and a
+complicated one at that. It WILL carry a maintenance burden. And I'm
+really not that interested in adding such a burden for something that
+will be defunct as soon as the single queue blk-mq version is done.
+Additionally, if we put BFQ in right now, the motivation to do the real
+work will be gone.
 
-I don't think there's any substantial disagreement about where we want
-to end up, it's a much more tactical discussion about what we do while
-we're on the way there.  Just saying put the changes in your vendor tree
-isn't ideal, it's not like there's some singular vendor tree out there
-that everyone uses and doing things in vendor trees is what we mostly
-encourage people to avoid doing.
+The path forward is clear. It'd be a lot better to put some work behind
+that, rather than continue this email thread.
 
-If it were something that was actively disruptive for other users or it
-made the blk-mq code harder to work with then it'd be clear that having
-it upstream would cause problems but that doesn't seem to be the case
-here.  Similarly if blk-mq were already at the point where it could
-replace blk then it'd be clear that drivers should just be being
-converted.  Instead we're in the middle somewhere, it wouldn't be
-entirely free to put something in but on the other hand helps solve
-people's problems and where it's causing costs those costs are also
-providing a hook that helps pull people into working with the community
-more.
-
---FQ9/qgh0YgB02Feu
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQEcBAEBCAAGBQJYEnkgAAoJECTWi3JdVIfQtOkH/0RcXCrlU8IegNXKWMlHz5i/
-M/ihxAE/Uk2sicgYMsBprrvX8E+A9tTtvHTUiMPwoAoAwDOAQxYDBxUrqEp0uJtg
-SXS2Jp5KBgGqNIczL3M7x62SuqAlt16D3/MqOtWe+kqnfxxB4qZXuQh4DoWVr9pA
-05cZSO9/NYExhsLNjUjpz0FqZtitN1OO59W7Dl1T0uzBZx8P6KkHE+WOTq+WG/Fa
-4pRJlx3nyC+Xw8PPQ3ijmcEVKdsLvQQeYTDjepMBcYaj48NKa0aIss2C1wDJGjZH
-DjXg3XprHXvrI4RYX5hailTot1J1R6IbA/xf5NlbCvwSszq/192rTN6sqe21NQI=
-=QRFW
------END PGP SIGNATURE-----
-
---FQ9/qgh0YgB02Feu--
+-- 
+Jens Axboe
