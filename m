@@ -1,60 +1,51 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:35258 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1750742AbcJ0QkF (ORCPT
+Received: from mail-lf0-f46.google.com ([209.85.215.46]:35902 "EHLO
+        mail-lf0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S942052AbcJ0SB6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Oct 2016 12:40:05 -0400
-To: Linus Torvalds <torvalds@linux-foundation.org>
-CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@fb.com>
-Subject: [GIT PULL] Block fixes for 4.9-rc
-Message-ID: <b8d9532f-4582-d665-4b7f-7e0c3ff3083c@fb.com>
-Date: Thu, 27 Oct 2016 10:39:47 -0600
+        Thu, 27 Oct 2016 14:01:58 -0400
+Received: by mail-lf0-f46.google.com with SMTP id b75so38487430lfg.3
+        for <linux-block@vger.kernel.org>; Thu, 27 Oct 2016 11:01:57 -0700 (PDT)
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
+To: mb@lightnvm.io
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
+Subject: [PATCH 7/7] lightnvm: rrpc: split bios of size > 256kb
+Date: Thu, 27 Oct 2016 20:01:39 +0200
+Message-Id: <1477591299-26504-8-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1477591299-26504-1-git-send-email-javier@cnexlabs.com>
+References: <1477591299-26504-1-git-send-email-javier@cnexlabs.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hi Linus,
+rrpc cannot handle bios of size > 256kb due to NVMe using a 64 bit
+bitmap to signal I/O completion. If a larger bio comes, split it
+explicitly.
 
-A set of fixes for this series, most notably the fix for the blk-mq
-software queue regression in from this merge window.
+Signed-off-by: Javier González <javier@cnexlabs.com>
+---
+ drivers/lightnvm/rrpc.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-Apart from that, a fix for an unlikely hang if a queue is flooded with
-FUA requests from Ming, and a few small fixes for nbd and badblocks.
-Lastly, a rename update for the proc softirq output, since the block
-polling code was made generic.
-
-Please pull!
-
-
-   git://git.kernel.dk/linux-block.git for-linus
-
-
-----------------------------------------------------------------
-Jens Axboe (1):
-       blk-mq: update hardware and software queues for sleeping alloc
-
-John W. Linville (1):
-       nbd: fix incorrect unlock of nbd->sock_lock in sock_shutdown
-
-Ming Lei (1):
-       block: flush: fix IO hang in case of flood fua req
-
-Sagi Grimberg (1):
-       softirq: Display IRQ_POLL for irq-poll statistics
-
-Shaohua Li (1):
-       badblocks: badblocks_set/clear update unacked_exist
-
-  block/badblocks.c   | 23 +++++++++++++++++++++++
-  block/blk-flush.c   | 28 ++++++++++++++++++++++++++++
-  block/blk-mq.c      |  6 +++---
-  drivers/block/nbd.c |  2 +-
-  kernel/softirq.c    |  2 +-
-  5 files changed, 56 insertions(+), 5 deletions(-)
-
+diff --git a/drivers/lightnvm/rrpc.c b/drivers/lightnvm/rrpc.c
+index 8deef2e..0b8251f 100644
+--- a/drivers/lightnvm/rrpc.c
++++ b/drivers/lightnvm/rrpc.c
+@@ -984,6 +984,12 @@ static blk_qc_t rrpc_make_rq(struct request_queue *q, struct bio *bio)
+ 	struct nvm_rq *rqd;
+ 	int err;
+ 
++	/*
++	 * Multipage is supported up until 256kb due to NVME's 64 bit completion
++	 * bitmap.
++	 */
++	blk_queue_split(q, &bio, q->bio_split);
++
+ 	if (bio_op(bio) == REQ_OP_DISCARD) {
+ 		rrpc_discard(rrpc, bio);
+ 		return BLK_QC_T_NONE;
 -- 
-Jens Axboe
+2.7.4
 
