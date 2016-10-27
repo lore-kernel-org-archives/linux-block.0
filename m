@@ -1,12 +1,12 @@
 Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
+Date: Thu, 27 Oct 2016 10:27:20 +0200
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Bart Van Assche <bart.vanassche@sandisk.com>
 Subject: Re: [PATCH 10/12] SRP transport, scsi-mq: Wait for .queue_rq() if
  necessary
-To: Bart Van Assche <bart.vanassche@sandisk.com>, Jens Axboe <axboe@fb.com>
+Message-ID: <20161027082720.4tjw3wnapqnfahxu@linux-x5ow.site>
 References: <b22edafc-725f-0419-d074-34d35d57d126@sandisk.com>
  <0cd77719-1f11-d5c3-3186-1c7c3cfd6886@sandisk.com>
-From: Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <ee78f333-3200-0f59-40a9-1ae1c4e04b62@grimberg.me>
-Date: Thu, 27 Oct 2016 15:19:15 +0300
 MIME-Version: 1.0
 In-Reply-To: <0cd77719-1f11-d5c3-3186-1c7c3cfd6886@sandisk.com>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
@@ -23,18 +23,34 @@ Cc: Keith Busch <keith.busch@intel.com>,
  "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
  Ming Lei <tom.leiming@gmail.com>,
  "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+ Jens Axboe <axboe@fb.com>, Doug Ledford <dledford@redhat.com>,
  "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- Doug Ledford <dledford@redhat.com>,
  "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
  Laurence Oberman <loberman@redhat.com>, Christoph Hellwig <hch@lst.de>
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
 Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
 List-ID: <linux-block@vger.kernel.org>
 
-Thanks for moving it,
+On Wed, Oct 26, 2016 at 03:55:34PM -0700, Bart Van Assche wrote:
+> Ensure that if scsi-mq is enabled that scsi_wait_for_queuecommand()
+> waits until ongoing shost->hostt->queuecommand() calls have finished.
+> =
 
-Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+
+Looks good,
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+
+-- =
+
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N=FCrnberg
+GF: Felix Imend=F6rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N=FCrnberg)
+Key fingerprint =3D EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
 
 _______________________________________________
 Linux-nvme mailing list
