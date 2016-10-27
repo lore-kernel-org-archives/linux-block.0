@@ -1,20 +1,20 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lf0-f49.google.com ([209.85.215.49]:34085 "EHLO
-        mail-lf0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S941772AbcJ0SB5 (ORCPT
+Received: from mail-wm0-f52.google.com ([74.125.82.52]:33998 "EHLO
+        mail-wm0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1756859AbcJ0OuH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Oct 2016 14:01:57 -0400
-Received: by mail-lf0-f49.google.com with SMTP id b81so38503589lfe.1
-        for <linux-block@vger.kernel.org>; Thu, 27 Oct 2016 11:01:56 -0700 (PDT)
+        Thu, 27 Oct 2016 10:50:07 -0400
+Received: by mail-wm0-f52.google.com with SMTP id 140so5599523wmv.1
+        for <linux-block@vger.kernel.org>; Thu, 27 Oct 2016 07:50:06 -0700 (PDT)
 From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
 To: mb@lightnvm.io
 Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
 Subject: [PATCH 6/7] lightnvm: add ECC error codes
-Date: Thu, 27 Oct 2016 20:01:38 +0200
-Message-Id: <1477591299-26504-7-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1477591299-26504-1-git-send-email-javier@cnexlabs.com>
-References: <1477591299-26504-1-git-send-email-javier@cnexlabs.com>
+Date: Thu, 27 Oct 2016 16:49:42 +0200
+Message-Id: <1477579783-5289-6-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1477579783-5289-1-git-send-email-javier@cnexlabs.com>
+References: <1477579783-5289-1-git-send-email-javier@cnexlabs.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
