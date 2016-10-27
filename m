@@ -1,20 +1,18 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lf0-f49.google.com ([209.85.215.49]:35643 "EHLO
-        mail-lf0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S935179AbcJ0SBw (ORCPT
+Received: from mail-wm0-f43.google.com ([74.125.82.43]:35679 "EHLO
+        mail-wm0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1756380AbcJ0OuD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Oct 2016 14:01:52 -0400
-Received: by mail-lf0-f49.google.com with SMTP id f134so33662929lfg.2
-        for <linux-block@vger.kernel.org>; Thu, 27 Oct 2016 11:01:51 -0700 (PDT)
+        Thu, 27 Oct 2016 10:50:03 -0400
+Received: by mail-wm0-f43.google.com with SMTP id e69so39725053wmg.0
+        for <linux-block@vger.kernel.org>; Thu, 27 Oct 2016 07:50:02 -0700 (PDT)
 From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
 To: mb@lightnvm.io
 Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
 Subject: [PATCH 1/7] lightnvm: enable to send hint to erase command
-Date: Thu, 27 Oct 2016 20:01:33 +0200
-Message-Id: <1477591299-26504-2-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1477591299-26504-1-git-send-email-javier@cnexlabs.com>
-References: <1477591299-26504-1-git-send-email-javier@cnexlabs.com>
+Date: Thu, 27 Oct 2016 16:49:37 +0200
+Message-Id: <1477579783-5289-1-git-send-email-javier@cnexlabs.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
@@ -35,7 +33,7 @@ Signed-off-by: Javier González <javier@cnexlabs.com>
  6 files changed, 15 insertions(+), 13 deletions(-)
 
 diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-index 1cac0f8..1a6a7e6 100644
+index a2393e1..f752087 100644
 --- a/drivers/lightnvm/core.c
 +++ b/drivers/lightnvm/core.c
 @@ -204,9 +204,9 @@ int nvm_submit_io(struct nvm_dev *dev, struct nvm_rq *rqd)
