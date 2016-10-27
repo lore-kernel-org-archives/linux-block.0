@@ -1,59 +1,58 @@
-Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
-Date: Thu, 27 Oct 2016 10:16:07 +0200
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Bart Van Assche <bart.vanassche@sandisk.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:46157 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751303AbcJ0FtY (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 27 Oct 2016 01:49:24 -0400
 Subject: Re: [PATCH 03/12] blk-mq: Introduce blk_mq_queue_stopped()
-Message-ID: <20161027081607.4qwdtaxs4k5s5m4p@linux-x5ow.site>
+To: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Jens Axboe <axboe@fb.com>
 References: <b22edafc-725f-0419-d074-34d35d57d126@sandisk.com>
  <f68b2997-8b0d-7aea-2859-5fbda4f6bf71@sandisk.com>
+Cc: Christoph Hellwig <hch@lst.de>,
+        James Bottomley <jejb@linux.vnet.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Doug Ledford <dledford@redhat.com>,
+        Keith Busch <keith.busch@intel.com>,
+        Ming Lei <tom.leiming@gmail.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <d1afa90c-b1ee-8185-0fac-40a812ed195c@suse.de>
+Date: Thu, 27 Oct 2016 07:49:13 +0200
 MIME-Version: 1.0
 In-Reply-To: <f68b2997-8b0d-7aea-2859-5fbda4f6bf71@sandisk.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
-List-Post: <mailto:linux-nvme@lists.infradead.org>
-List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
-Cc: Keith Busch <keith.busch@intel.com>,
- James Bottomley <jejb@linux.vnet.ibm.com>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- Mike Snitzer <snitzer@redhat.com>,
- "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
- Ming Lei <tom.leiming@gmail.com>,
- "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
- Jens Axboe <axboe@fb.com>, Doug Ledford <dledford@redhat.com>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
- Laurence Oberman <loberman@redhat.com>, Christoph Hellwig <hch@lst.de>
-Content-Type: text/plain; charset="iso-8859-1"
-Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
-Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Wed, Oct 26, 2016 at 03:52:05PM -0700, Bart Van Assche wrote:
+On 10/27/2016 12:52 AM, Bart Van Assche wrote:
 > The function blk_queue_stopped() allows to test whether or not a
 > traditional request queue has been stopped. Introduce a helper
 > function that allows block drivers to query easily whether or not
 > one or more hardware contexts of a blk-mq queue have been stopped.
-> =
-
+> 
 > Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
 > Reviewed-by: Hannes Reinecke <hare@suse.com>
+> Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+> Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  block/blk-mq.c         | 20 ++++++++++++++++++++
+>  include/linux/blk-mq.h |  1 +
+>  2 files changed, 21 insertions(+)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Looks good,
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Cheers,
 
--- =
-
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N=FCrnberg
-GF: Felix Imend=F6rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N=FCrnberg)
-Key fingerprint =3D EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
-
-_______________________________________________
-Linux-nvme mailing list
-Linux-nvme@lists.infradead.org
-http://lists.infradead.org/mailman/listinfo/linux-nvme
+Hannes
+-- 
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
