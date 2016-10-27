@@ -1,102 +1,41 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f195.google.com ([209.85.192.195]:34274 "EHLO
-        mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933122AbcJ2IMu (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sat, 29 Oct 2016 04:12:50 -0400
-From: Ming Lei <tom.leiming@gmail.com>
-To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Ming Lei <tom.leiming@gmail.com>,
-        Joern Engel <joern@logfs.org>,
-        Prasad Joshi <prasadjoshi.linux@gmail.com>,
-        logfs@logfs.org (open list:LogFS)
-Subject: [PATCH 12/60] fs: logfs: use bio_add_page() in do_erase()
-Date: Sat, 29 Oct 2016 16:08:11 +0800
-Message-Id: <1477728600-12938-13-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
-References: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
+Date: Thu, 27 Oct 2016 14:40:26 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Bart Van Assche <bart.vanassche@sandisk.com>
+Subject: Re: [PATCH 02/12] blk-mq: Introduce blk_mq_hctx_stopped()
+Message-ID: <20161027124026.GA13200@lst.de>
+References: <b22edafc-725f-0419-d074-34d35d57d126@sandisk.com>
+ <0de50789-e3b7-0a07-73c1-4fb87b1f957e@sandisk.com>
+MIME-Version: 1.0
+In-Reply-To: <0de50789-e3b7-0a07-73c1-4fb87b1f957e@sandisk.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
+List-Post: <mailto:linux-nvme@lists.infradead.org>
+List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
+Cc: Keith Busch <keith.busch@intel.com>,
+ James Bottomley <jejb@linux.vnet.ibm.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ Mike Snitzer <snitzer@redhat.com>,
+ "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+ Ming Lei <tom.leiming@gmail.com>,
+ "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+ Jens Axboe <axboe@fb.com>, Doug Ledford <dledford@redhat.com>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+ Laurence Oberman <loberman@redhat.com>, Christoph Hellwig <hch@lst.de>
+Content-Type: text/plain; charset="us-ascii"
+Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
+Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
+List-ID: <linux-block@vger.kernel.org>
 
-Also code gets simplified a bit.
+Looks fine,
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
----
- fs/logfs/dev_bdev.c | 44 +++++++++++++++-----------------------------
- 1 file changed, 15 insertions(+), 29 deletions(-)
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 
-diff --git a/fs/logfs/dev_bdev.c b/fs/logfs/dev_bdev.c
-index 79be4cb0dfd8..ff5e3e31bca3 100644
---- a/fs/logfs/dev_bdev.c
-+++ b/fs/logfs/dev_bdev.c
-@@ -154,49 +154,35 @@ static int do_erase(struct super_block *sb, u64 ofs, pgoff_t index,
- 		size_t nr_pages)
- {
- 	struct logfs_super *super = logfs_super(sb);
--	struct bio *bio;
-+	struct bio *bio = NULL;
- 	unsigned int max_pages;
--	int i;
-+	int i, ret;
- 
- 	max_pages = min_t(size_t, nr_pages, BIO_MAX_PAGES);
- 
--	bio = bio_alloc(GFP_NOFS, max_pages);
--	BUG_ON(!bio);
--
- 	for (i = 0; i < nr_pages; i++) {
--		if (i >= max_pages) {
--			/* Block layer cannot split bios :( */
--			bio->bi_vcnt = i;
--			bio->bi_iter.bi_size = i * PAGE_SIZE;
-+		if (!bio) {
-+			bio = bio_alloc(GFP_NOFS, max_pages);
-+			BUG_ON(!bio);
-+
- 			bio->bi_bdev = super->s_bdev;
- 			bio->bi_iter.bi_sector = ofs >> 9;
- 			bio->bi_private = sb;
- 			bio->bi_end_io = erase_end_io;
- 			bio_set_op_attrs(bio, REQ_OP_WRITE, 0);
-+		}
-+		ret = bio_add_page(bio, super->s_erase_page, PAGE_SIZE, 0);
-+		if (!ret) {
-+			/* Block layer cannot split bios :( */
-+			ofs += bio->bi_iter.bi_size;
- 			atomic_inc(&super->s_pending_writes);
- 			submit_bio(bio);
--
--			ofs += i * PAGE_SIZE;
--			index += i;
--			nr_pages -= i;
--			i = 0;
--
--			bio = bio_alloc(GFP_NOFS, max_pages);
--			BUG_ON(!bio);
- 		}
--		bio->bi_io_vec[i].bv_page = super->s_erase_page;
--		bio->bi_io_vec[i].bv_len = PAGE_SIZE;
--		bio->bi_io_vec[i].bv_offset = 0;
- 	}
--	bio->bi_vcnt = nr_pages;
--	bio->bi_iter.bi_size = nr_pages * PAGE_SIZE;
--	bio->bi_bdev = super->s_bdev;
--	bio->bi_iter.bi_sector = ofs >> 9;
--	bio->bi_private = sb;
--	bio->bi_end_io = erase_end_io;
--	bio_set_op_attrs(bio, REQ_OP_WRITE, 0);
--	atomic_inc(&super->s_pending_writes);
--	submit_bio(bio);
-+	if (bio) {
-+		atomic_inc(&super->s_pending_writes);
-+		submit_bio(bio);
-+	}
- 	return 0;
- }
- 
--- 
-2.7.4
-
+_______________________________________________
+Linux-nvme mailing list
+Linux-nvme@lists.infradead.org
+http://lists.infradead.org/mailman/listinfo/linux-nvme
