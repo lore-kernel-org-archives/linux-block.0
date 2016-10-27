@@ -1,65 +1,44 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.9]:49555 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752104AbcJTNMW (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Oct 2016 09:12:22 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org
-Subject: [PATCH 1/7] block: remove bio_is_rw
-Date: Thu, 20 Oct 2016 15:12:09 +0200
-Message-Id: <1476969135-32732-2-git-send-email-hch@lst.de>
-In-Reply-To: <1476969135-32732-1-git-send-email-hch@lst.de>
-References: <1476969135-32732-1-git-send-email-hch@lst.de>
+Received: from mail-by2nam03on0062.outbound.protection.outlook.com ([104.47.42.62]:20835
+        "EHLO NAM03-BY2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S933914AbcJ0P5B (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 27 Oct 2016 11:57:01 -0400
+Subject: Re: [PATCH 05/12] blk-mq: Introduce blk_mq_quiesce_queue()
+To: Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@fb.com>
+References: <b22edafc-725f-0419-d074-34d35d57d126@sandisk.com>
+ <5143c240-39af-9fe2-d3e6-ed69f9c20531@sandisk.com>
+ <f1661bd2-12ca-20d1-ece2-5c7fe5987035@suse.de>
+CC: Christoph Hellwig <hch@lst.de>,
+        James Bottomley <jejb@linux.vnet.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Doug Ledford <dledford@redhat.com>,
+        Keith Busch <keith.busch@intel.com>,
+        Ming Lei <tom.leiming@gmail.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+From: Bart Van Assche <bart.vanassche@sandisk.com>
+Message-ID: <5227b122-8c10-5f63-4448-499fc645cfbd@sandisk.com>
+Date: Thu, 27 Oct 2016 08:56:50 -0700
+MIME-Version: 1.0
+In-Reply-To: <f1661bd2-12ca-20d1-ece2-5c7fe5987035@suse.de>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-With the addition of the zoned operations the tests in this function
-became incorrect.  But I think it's much better to just open code the
-allow operations in the only caller anyway.
+On 10/26/2016 10:52 PM, Hannes Reinecke wrote:
+> Hmm. Can't say I like having to have two RCU structure for the same
+> purpose, but I guess that can't be helped.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/bio-integrity.c |  2 +-
- include/linux/bio.h   | 11 -----------
- 2 files changed, 1 insertion(+), 12 deletions(-)
+Hello Hannes,
 
-diff --git a/block/bio-integrity.c b/block/bio-integrity.c
-index 63f72f0..5384713 100644
---- a/block/bio-integrity.c
-+++ b/block/bio-integrity.c
-@@ -172,7 +172,7 @@ bool bio_integrity_enabled(struct bio *bio)
- {
- 	struct blk_integrity *bi = bdev_get_integrity(bio->bi_bdev);
- 
--	if (!bio_is_rw(bio))
-+	if (bio_op(bio) != REQ_OP_READ && bio_op(bio) != REQ_OP_WRITE)
- 		return false;
- 
- 	/* Already protected? */
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 97cb48f..87ce64d 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -83,17 +83,6 @@ static inline bool bio_no_advance_iter(struct bio *bio)
- 	       bio_op(bio) == REQ_OP_WRITE_SAME;
- }
- 
--static inline bool bio_is_rw(struct bio *bio)
--{
--	if (!bio_has_data(bio))
--		return false;
--
--	if (bio_no_advance_iter(bio))
--		return false;
--
--	return true;
--}
--
- static inline bool bio_mergeable(struct bio *bio)
- {
- 	if (bio->bi_opf & REQ_NOMERGE_FLAGS)
--- 
-2.1.4
+There are two RCU structures because of BLK_MQ_F_BLOCKING. Today only 
+the nbd driver sets that flag. If the nbd driver would be modified such 
+that it doesn't set that flag then the BLK_MQ_F_BLOCKING flag and also 
+queue_rq_srcu could be eliminated from the blk-mq core.
 
+Bart.
