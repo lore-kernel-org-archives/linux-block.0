@@ -1,20 +1,20 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lf0-f53.google.com ([209.85.215.53]:34078 "EHLO
-        mail-lf0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S941738AbcJ0SB4 (ORCPT
+Received: from mail-wm0-f45.google.com ([74.125.82.45]:37052 "EHLO
+        mail-wm0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S942929AbcJ0OuR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Oct 2016 14:01:56 -0400
-Received: by mail-lf0-f53.google.com with SMTP id b81so38503262lfe.1
-        for <linux-block@vger.kernel.org>; Thu, 27 Oct 2016 11:01:55 -0700 (PDT)
+        Thu, 27 Oct 2016 10:50:17 -0400
+Received: by mail-wm0-f45.google.com with SMTP id 140so28759096wmv.0
+        for <linux-block@vger.kernel.org>; Thu, 27 Oct 2016 07:50:16 -0700 (PDT)
 From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
 To: mb@lightnvm.io
 Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
 Subject: [PATCH 5/7] lightnvm: export set bad block table
-Date: Thu, 27 Oct 2016 20:01:37 +0200
-Message-Id: <1477591299-26504-6-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1477591299-26504-1-git-send-email-javier@cnexlabs.com>
-References: <1477591299-26504-1-git-send-email-javier@cnexlabs.com>
+Date: Thu, 27 Oct 2016 16:49:41 +0200
+Message-Id: <1477579783-5289-5-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1477579783-5289-1-git-send-email-javier@cnexlabs.com>
+References: <1477579783-5289-1-git-send-email-javier@cnexlabs.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
@@ -39,7 +39,7 @@ Signed-off-by: Javier González <javier@cnexlabs.com>
  5 files changed, 82 insertions(+), 50 deletions(-)
 
 diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-index 4c6577e..bbfff14 100644
+index 4be3879..a81ed1c 100644
 --- a/drivers/lightnvm/core.c
 +++ b/drivers/lightnvm/core.c
 @@ -197,6 +197,33 @@ void nvm_mark_blk(struct nvm_dev *dev, struct ppa_addr ppa, int type)
@@ -77,10 +77,10 @@ index 4c6577e..bbfff14 100644
  {
  	return dev->mt->submit_io(dev, rqd);
 diff --git a/drivers/lightnvm/gennvm.c b/drivers/lightnvm/gennvm.c
-index a340685..94fdffd 100644
+index 575afc4..ae19a61 100644
 --- a/drivers/lightnvm/gennvm.c
 +++ b/drivers/lightnvm/gennvm.c
-@@ -617,34 +617,11 @@ static void gen_mark_blk(struct nvm_dev *dev, struct ppa_addr ppa, int type)
+@@ -611,34 +611,11 @@ static void gen_mark_blk(struct nvm_dev *dev, struct ppa_addr ppa, int type)
  	blk->state = type;
  }
  
