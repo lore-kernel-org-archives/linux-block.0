@@ -1,108 +1,126 @@
-Return-Path: <kashyap.desai@broadcom.com>
-From: Kashyap Desai <kashyap.desai@broadcom.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([198.137.202.9]:46103 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933375AbcJ0HEt (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 27 Oct 2016 03:04:49 -0400
+From: Christoph Hellwig <hch@lst.de>
+To: petero2@telia.com, axboe@fb.com
+Cc: linux-block@vger.kernel.org
+Subject: [RFC, PATCH] pktcdvd: don't scribble over the bvec array
+Date: Thu, 27 Oct 2016 09:04:44 +0200
+Message-Id: <1477551884-25062-1-git-send-email-hch@lst.de>
 MIME-Version: 1.0
-Date: Fri, 21 Oct 2016 17:43:35 +0530
-Message-ID: <97184c74229af78b0d97e6b8016af972@mail.gmail.com>
-Subject: RE: Device or HBA level QD throttling creates randomness in sequetial workload
-To: linux-scsi@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: axboe@kernel.dk, Christoph Hellwig <hch@infradead.org>, paolo.valente@linaro.org,
-	osandov@osandov.com
 Content-Type: text/plain; charset=UTF-8
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Hi -
+Hi Peter, hi Jens,
 
-I found below conversation and it is on the same line as I wanted some
-input from mailing list.
+I've been looking over the multi page bio vec work again recently, and
+one of the stumbling blocks is raw biovec access in the pktcdvd.
 
-http://marc.info/?l=linux-kernel&m=147569860526197&w=2
+The first issue is that it directly sets up the page and offset pointers
+in the biovec just before calling bio_add_page.  As bio_add_page already
+does the setup it's trivial to just switch it to stack variables for the
+arguments.
 
-I can do testing on any WIP item as Omar mentioned in above discussion.
-https://github.com/osandov/linux/tree/blk-mq-iosched
+The second issue is the copy code in pkt_make_local_copy, which
+effectively is an opencoded version of bio_copy_data except that it
+skips pages that already are the same in the ѕource and destination.
+But we look at the only calleer we just set up the bio using bio_add_page
+to point exactly to the page array that pkt_make_local_copy compares,
+so the pages will always be the same and we can just remove this function.
 
-Is there any workaround/alternative in latest upstream kernel, if user
-wants to see limited penalty  for Sequential Work load on HDD ?
+Note that all this is done based on code inspection, I don't have any
+packet writing hardware myself.
 
-` Kashyap
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/block/pktcdvd.c | 47 ++++++-----------------------------------------
+ 1 file changed, 6 insertions(+), 41 deletions(-)
 
-> -----Original Message-----
-> From: Kashyap Desai [mailto:kashyap.desai@broadcom.com]
-> Sent: Thursday, October 20, 2016 3:39 PM
-> To: linux-scsi@vger.kernel.org
-> Subject: Device or HBA level QD throttling creates randomness in
-sequetial
-> workload
->
-> [ Apologize, if you find more than one instance of my email.
-> Web based email client has some issue, so now trying git send mail.]
->
-> Hi,
->
-> I am doing some performance tuning in MR driver to understand how sdev
-> queue depth and hba queue depth play role in IO submission from above
-layer.
-> I have 24 JBOD connected to MR 12GB controller and I can see performance
-for
-> 4K Sequential work load as below.
->
-> HBA QD for MR controller is 4065 and Per device QD is set to 32
->
-> queue depth from <fio> 256 reports 300K IOPS queue depth from <fio> 128
-> reports 330K IOPS queue depth from <fio> 64 reports 360K IOPS queue
-depth
-> from <fio> 32 reports 510K IOPS
->
-> In MR driver I added debug print and confirm that more IO come to driver
-as
-> random IO whenever I have <fio> queue depth more than 32.
->
-> I have debug using scsi logging level and blktrace as well. Below is
-snippet of
-> logs using scsi logging level.  In summary, if SML do flow control of IO
-due to
-> Device QD or HBA QD, IO coming to LLD is more random pattern.
->
-> I see IO coming to driver is not sequential.
->
-> [79546.912041] sd 18:2:21:0: [sdy] tag#854 CDB: Write(10) 2a 00 00 03 c0
-3b 00
-> 00 01 00 [79546.912049] sd 18:2:21:0: [sdy] tag#855 CDB: Write(10) 2a 00
-00 03
-> c0 3c 00 00 01 00 [79546.912053] sd 18:2:21:0: [sdy] tag#886 CDB:
-Write(10) 2a
-> 00 00 03 c0 5b 00 00 01 00
->
-> <KD> After LBA "00 03 c0 3c" next command is with LBA "00 03 c0 5b".
-> Two Sequence are overlapped due to sdev QD throttling.
->
-> [79546.912056] sd 18:2:21:0: [sdy] tag#887 CDB: Write(10) 2a 00 00 03 c0
-5c 00
-> 00 01 00 [79546.912250] sd 18:2:21:0: [sdy] tag#856 CDB: Write(10) 2a 00
-00 03
-> c0 3d 00 00 01 00 [79546.912257] sd 18:2:21:0: [sdy] tag#888 CDB:
-Write(10) 2a
-> 00 00 03 c0 5d 00 00 01 00 [79546.912259] sd 18:2:21:0: [sdy] tag#857
-CDB:
-> Write(10) 2a 00 00 03 c0 3e 00 00 01 00 [79546.912268] sd 18:2:21:0:
-[sdy]
-> tag#858 CDB: Write(10) 2a 00 00 03 c0 3f 00 00 01 00
->
->  If scsi_request_fn() breaks due to unavailability of device queue (due
-to below
-> check), will there be any side defect as I observe ?
->                 if (!scsi_dev_queue_ready(q, sdev))
->                              break;
->
-> If I reduce HBA QD and make sure IO from above layer is throttled due to
-HBA
-> QD, there is a same impact.
-> MR driver use host wide shared tag map.
->
-> Can someone help me if this can be tunable in LLD providing additional
-settings
-> or it is expected behavior ? Problem I am facing is, I am not able to
-figure out
-> optimal device queue depth for different configuration and work load.
->
-> Thanks, Kashyap
+diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
+index 7cf795e..95c98de 100644
+--- a/drivers/block/pktcdvd.c
++++ b/drivers/block/pktcdvd.c
+@@ -944,39 +944,6 @@ static int pkt_set_segment_merging(struct pktcdvd_device *pd, struct request_que
+ 	}
+ }
+ 
+-/*
+- * Copy all data for this packet to pkt->pages[], so that
+- * a) The number of required segments for the write bio is minimized, which
+- *    is necessary for some scsi controllers.
+- * b) The data can be used as cache to avoid read requests if we receive a
+- *    new write request for the same zone.
+- */
+-static void pkt_make_local_copy(struct packet_data *pkt, struct bio_vec *bvec)
+-{
+-	int f, p, offs;
+-
+-	/* Copy all data to pkt->pages[] */
+-	p = 0;
+-	offs = 0;
+-	for (f = 0; f < pkt->frames; f++) {
+-		if (bvec[f].bv_page != pkt->pages[p]) {
+-			void *vfrom = kmap_atomic(bvec[f].bv_page) + bvec[f].bv_offset;
+-			void *vto = page_address(pkt->pages[p]) + offs;
+-			memcpy(vto, vfrom, CD_FRAMESIZE);
+-			kunmap_atomic(vfrom);
+-			bvec[f].bv_page = pkt->pages[p];
+-			bvec[f].bv_offset = offs;
+-		} else {
+-			BUG_ON(bvec[f].bv_offset != offs);
+-		}
+-		offs += CD_FRAMESIZE;
+-		if (offs >= PAGE_SIZE) {
+-			offs = 0;
+-			p++;
+-		}
+-	}
+-}
+-
+ static void pkt_end_io_read(struct bio *bio)
+ {
+ 	struct packet_data *pkt = bio->bi_private;
+@@ -1298,7 +1265,6 @@ static int pkt_handle_queue(struct pktcdvd_device *pd)
+ static void pkt_start_write(struct pktcdvd_device *pd, struct packet_data *pkt)
+ {
+ 	int f;
+-	struct bio_vec *bvec = pkt->w_bio->bi_io_vec;
+ 
+ 	bio_reset(pkt->w_bio);
+ 	pkt->w_bio->bi_iter.bi_sector = pkt->sector;
+@@ -1308,9 +1274,10 @@ static void pkt_start_write(struct pktcdvd_device *pd, struct packet_data *pkt)
+ 
+ 	/* XXX: locking? */
+ 	for (f = 0; f < pkt->frames; f++) {
+-		bvec[f].bv_page = pkt->pages[(f * CD_FRAMESIZE) / PAGE_SIZE];
+-		bvec[f].bv_offset = (f * CD_FRAMESIZE) % PAGE_SIZE;
+-		if (!bio_add_page(pkt->w_bio, bvec[f].bv_page, CD_FRAMESIZE, bvec[f].bv_offset))
++		struct page *page = pkt->pages[(f * CD_FRAMESIZE) / PAGE_SIZE];
++		unsigned offset = (f * CD_FRAMESIZE) % PAGE_SIZE;
++
++		if (!bio_add_page(pkt->w_bio, page, CD_FRAMESIZE, offset))
+ 			BUG();
+ 	}
+ 	pkt_dbg(2, pd, "vcnt=%d\n", pkt->w_bio->bi_vcnt);
+@@ -1327,12 +1294,10 @@ static void pkt_start_write(struct pktcdvd_device *pd, struct packet_data *pkt)
+ 	pkt_dbg(2, pd, "Writing %d frames for zone %llx\n",
+ 		pkt->write_size, (unsigned long long)pkt->sector);
+ 
+-	if (test_bit(PACKET_MERGE_SEGS, &pd->flags) || (pkt->write_size < pkt->frames)) {
+-		pkt_make_local_copy(pkt, bvec);
++	if (test_bit(PACKET_MERGE_SEGS, &pd->flags) || (pkt->write_size < pkt->frames))
+ 		pkt->cache_valid = 1;
+-	} else {
++	else
+ 		pkt->cache_valid = 0;
+-	}
+ 
+ 	/* Start the write request */
+ 	atomic_set(&pkt->io_wait, 1);
+-- 
+2.1.4
+
