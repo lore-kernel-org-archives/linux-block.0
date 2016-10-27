@@ -1,27 +1,24 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lf0-f54.google.com ([209.85.215.54]:33288 "EHLO
-        mail-lf0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S934200AbcJ0SBz (ORCPT
+Received: from mail-wm0-f49.google.com ([74.125.82.49]:37044 "EHLO
+        mail-wm0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S942928AbcJ0OuQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Oct 2016 14:01:55 -0400
-Received: by mail-lf0-f54.google.com with SMTP id x79so38626911lff.0
-        for <linux-block@vger.kernel.org>; Thu, 27 Oct 2016 11:01:54 -0700 (PDT)
+        Thu, 27 Oct 2016 10:50:16 -0400
+Received: by mail-wm0-f49.google.com with SMTP id 140so28758653wmv.0
+        for <linux-block@vger.kernel.org>; Thu, 27 Oct 2016 07:50:15 -0700 (PDT)
 From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
 To: mb@lightnvm.io
 Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@javigon.com>,
         =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
 Subject: [PATCH 4/7] lightnvm: drop reserve and release LUN callbacks
-Date: Thu, 27 Oct 2016 20:01:36 +0200
-Message-Id: <1477591299-26504-5-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1477591299-26504-1-git-send-email-javier@cnexlabs.com>
-References: <1477591299-26504-1-git-send-email-javier@cnexlabs.com>
+Date: Thu, 27 Oct 2016 16:49:40 +0200
+Message-Id: <1477579783-5289-4-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1477579783-5289-1-git-send-email-javier@cnexlabs.com>
+References: <1477579783-5289-1-git-send-email-javier@cnexlabs.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
-
-From: Javier González <javier@javigon.com>
 
 On target initialization, targets use callbacks to the media manager to
 configure the LUNs they use. In order to simplify the flow, drop this
@@ -37,16 +34,16 @@ Adapt rrpc to not use the reserve_lun/release_lun callback functions.
 
 Signed-off-by: Javier González <javier@cnexlabs.com>
 ---
- drivers/lightnvm/gennvm.c | 68 ++++++++++++++++++++++++++++++++++++-----------
+ drivers/lightnvm/gennvm.c | 62 +++++++++++++++++++++++++++++++++++------------
  drivers/lightnvm/rrpc.c   | 12 +--------
  include/linux/lightnvm.h  |  5 +---
- 3 files changed, 55 insertions(+), 30 deletions(-)
+ 3 files changed, 49 insertions(+), 30 deletions(-)
 
 diff --git a/drivers/lightnvm/gennvm.c b/drivers/lightnvm/gennvm.c
-index 8bff725..a340685 100644
+index 8bff725..575afc4 100644
 --- a/drivers/lightnvm/gennvm.c
 +++ b/drivers/lightnvm/gennvm.c
-@@ -35,6 +35,50 @@ static const struct block_device_operations gen_fops = {
+@@ -35,6 +35,30 @@ static const struct block_device_operations gen_fops = {
  	.owner		= THIS_MODULE,
  };
  
@@ -64,8 +61,6 @@ index 8bff725..a340685 100644
 +		}
 +
 +		lun = &gn->luns[i];
-+		lun->tgt = t;
-+		lun->vlun.priv = lun->mgmt;
 +	}
 +
 +	return 0;
@@ -76,6 +71,24 @@ index 8bff725..a340685 100644
 +	return 1;
 +}
 +
+ static int gen_create_tgt(struct nvm_dev *dev, struct nvm_ioctl_create *create)
+ {
+ 	struct gen_dev *gn = dev->mp;
+@@ -80,6 +104,9 @@ static int gen_create_tgt(struct nvm_dev *dev, struct nvm_ioctl_create *create)
+ 	tdisk->fops = &gen_fops;
+ 	tdisk->queue = tqueue;
+ 
++	if (tt->exclusive && gen_reserve_luns(dev, s->lun_begin, s->lun_end, t))
++		goto err_init;
++
+ 	targetdata = tt->init(dev, tdisk, s->lun_begin, s->lun_end);
+ 	if (IS_ERR(targetdata))
+ 		goto err_init;
+@@ -110,7 +137,23 @@ err_t:
+ 	return -ENOMEM;
+ }
+ 
+-static void __gen_remove_target(struct nvm_target *t)
 +static void gen_release_luns(struct nvm_dev *dev, struct nvm_target *t)
 +{
 +	struct gen_dev *gn = dev->mp;
@@ -89,43 +102,14 @@ index 8bff725..a340685 100644
 +
 +		lunid = lun->vlun.id;
 +		WARN_ON(!test_and_clear_bit(lunid, dev->lun_map));
-+		lun->vlun.priv = NULL;
-+		lun->tgt = NULL;
 +	}
 +}
 +
- static int gen_create_tgt(struct nvm_dev *dev, struct nvm_ioctl_create *create)
- {
- 	struct gen_dev *gn = dev->mp;
-@@ -80,6 +124,9 @@ static int gen_create_tgt(struct nvm_dev *dev, struct nvm_ioctl_create *create)
- 	tdisk->fops = &gen_fops;
- 	tdisk->queue = tqueue;
- 
-+	if (tt->exclusive && gen_reserve_luns(dev, s->lun_begin, s->lun_end, t))
-+		goto err_reserve;
-+
- 	targetdata = tt->init(dev, tdisk, s->lun_begin, s->lun_end);
- 	if (IS_ERR(targetdata))
- 		goto err_init;
-@@ -102,6 +149,8 @@ static int gen_create_tgt(struct nvm_dev *dev, struct nvm_ioctl_create *create)
- 
- 	return 0;
- err_init:
-+	gen_release_luns(dev, t);
-+err_reserve:
- 	put_disk(tdisk);
- err_queue:
- 	blk_cleanup_queue(tqueue);
-@@ -110,7 +159,7 @@ static int gen_create_tgt(struct nvm_dev *dev, struct nvm_ioctl_create *create)
- 	return -ENOMEM;
- }
- 
--static void __gen_remove_target(struct nvm_target *t)
 +static void __gen_remove_target(struct nvm_dev *dev, struct nvm_target *t)
  {
  	struct nvm_tgt_type *tt = t->type;
  	struct gendisk *tdisk = t->disk;
-@@ -122,6 +171,7 @@ static void __gen_remove_target(struct nvm_target *t)
+@@ -122,6 +165,7 @@ static void __gen_remove_target(struct nvm_target *t)
  	if (tt->exit)
  		tt->exit(tdisk->private_data);
  
@@ -133,7 +117,7 @@ index 8bff725..a340685 100644
  	put_disk(tdisk);
  
  	list_del(&t->list);
-@@ -152,7 +202,7 @@ static int gen_remove_tgt(struct nvm_dev *dev, struct nvm_ioctl_remove *remove)
+@@ -152,7 +196,7 @@ static int gen_remove_tgt(struct nvm_dev *dev, struct nvm_ioctl_remove *remove)
  		mutex_unlock(&gn->lock);
  		return 1;
  	}
@@ -142,7 +126,7 @@ index 8bff725..a340685 100644
  	mutex_unlock(&gn->lock);
  
  	return 0;
-@@ -474,7 +524,7 @@ static void gen_unregister(struct nvm_dev *dev)
+@@ -474,7 +518,7 @@ static void gen_unregister(struct nvm_dev *dev)
  	list_for_each_entry_safe(t, tmp, &gn->targets, list) {
  		if (t->dev != dev)
  			continue;
@@ -151,7 +135,7 @@ index 8bff725..a340685 100644
  	}
  	mutex_unlock(&gn->lock);
  
-@@ -618,16 +668,6 @@ static int gen_erase_blk(struct nvm_dev *dev, struct nvm_block *blk, int flags)
+@@ -618,16 +662,6 @@ static int gen_erase_blk(struct nvm_dev *dev, struct nvm_block *blk, int flags)
  	return nvm_erase_ppa(dev, &addr, 1, flags);
  }
  
@@ -168,7 +152,7 @@ index 8bff725..a340685 100644
  static struct nvm_lun *gen_get_lun(struct nvm_dev *dev, int lunid)
  {
  	struct gen_dev *gn = dev->mp;
-@@ -674,8 +714,6 @@ static struct nvmm_type gen = {
+@@ -674,8 +708,6 @@ static struct nvmm_type gen = {
  	.mark_blk		= gen_mark_blk,
  
  	.get_lun		= gen_get_lun,
@@ -213,7 +197,7 @@ index f293d00..cb30ccf 100644
  		lun = dev->mt->get_lun(dev, lunid);
  		if (!lun) {
  			pr_err("rrpc: cannot get lun %d\n", lun->id);
-@@ -1508,6 +1497,7 @@ static void *rrpc_init(struct nvm_dev *dev, struct gendisk *tdisk,
+@@ -1508,6 +1497,7 @@ err:
  static struct nvm_tgt_type tt_rrpc = {
  	.name		= "rrpc",
  	.version	= {1, 0, 0},
