@@ -1,10 +1,10 @@
 Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
-Date: Thu, 27 Oct 2016 14:44:09 +0200
-From: Christoph Hellwig <hch@lst.de>
+Date: Thu, 27 Oct 2016 10:28:36 +0200
+From: Johannes Thumshirn <jthumshirn@suse.de>
 To: Bart Van Assche <bart.vanassche@sandisk.com>
 Subject: Re: [PATCH 06/12] blk-mq: Add a kick_requeue_list argument to
  blk_mq_requeue_request()
-Message-ID: <20161027124409.GE13200@lst.de>
+Message-ID: <20161027082836.pafo4gosudwc4mix@linux-x5ow.site>
 References: <b22edafc-725f-0419-d074-34d35d57d126@sandisk.com>
  <3944826d-bfde-f1e6-40ec-2c9a3c259e3a@sandisk.com>
 MIME-Version: 1.0
@@ -27,7 +27,7 @@ Cc: Keith Busch <keith.busch@intel.com>,
  "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
  "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
  Laurence Oberman <loberman@redhat.com>, Christoph Hellwig <hch@lst.de>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
 Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
 List-ID: <linux-block@vger.kernel.org>
@@ -37,10 +37,22 @@ On Wed, Oct 26, 2016 at 03:53:39PM -0700, Bart Van Assche wrote:
 > are followed by kicking the requeue list. Hence add an argument to
 > these two functions that allows to kick the requeue list. This was
 > proposed by Christoph Hellwig.
+> =
+
+> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+> Cc: Christoph Hellwig <hch@lst.de>
 
 Looks good,
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+-- =
+
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N=FCrnberg
+GF: Felix Imend=F6rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N=FCrnberg)
+Key fingerprint =3D EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
 
 _______________________________________________
 Linux-nvme mailing list
