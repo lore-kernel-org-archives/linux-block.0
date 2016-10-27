@@ -1,28 +1,27 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lf0-f46.google.com ([209.85.215.46]:35902 "EHLO
-        mail-lf0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S942052AbcJ0SB6 (ORCPT
+Received: from mail-wm0-f47.google.com ([74.125.82.47]:36753 "EHLO
+        mail-wm0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933129AbcJ0OuI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Oct 2016 14:01:58 -0400
-Received: by mail-lf0-f46.google.com with SMTP id b75so38487430lfg.3
-        for <linux-block@vger.kernel.org>; Thu, 27 Oct 2016 11:01:57 -0700 (PDT)
+        Thu, 27 Oct 2016 10:50:08 -0400
+Received: by mail-wm0-f47.google.com with SMTP id b80so38814291wme.1
+        for <linux-block@vger.kernel.org>; Thu, 27 Oct 2016 07:50:08 -0700 (PDT)
 From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
 To: mb@lightnvm.io
 Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
 Subject: [PATCH 7/7] lightnvm: rrpc: split bios of size > 256kb
-Date: Thu, 27 Oct 2016 20:01:39 +0200
-Message-Id: <1477591299-26504-8-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1477591299-26504-1-git-send-email-javier@cnexlabs.com>
-References: <1477591299-26504-1-git-send-email-javier@cnexlabs.com>
+Date: Thu, 27 Oct 2016 16:49:43 +0200
+Message-Id: <1477579783-5289-7-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1477579783-5289-1-git-send-email-javier@cnexlabs.com>
+References: <1477579783-5289-1-git-send-email-javier@cnexlabs.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-rrpc cannot handle bios of size > 256kb due to NVMe using a 64 bit
-bitmap to signal I/O completion. If a larger bio comes, split it
-explicitly.
+rrpc cannot handle bios of size > 256kb due to NVME's 64 bit completion
+bitmap. If a larger bio comes, split it explicitly.
 
 Signed-off-by: Javier González <javier@cnexlabs.com>
 ---
