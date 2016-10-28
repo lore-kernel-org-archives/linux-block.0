@@ -1,44 +1,27 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Ming Lei <tom.leiming@gmail.com>
-To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Ming Lei <tom.leiming@gmail.com>,
-        Johannes Berg <johannes.berg@intel.com>
-Subject: [PATCH 35/60] bvec_iter: introduce BVEC_ITER_ALL_INIT
-Date: Sat, 29 Oct 2016 16:08:34 +0800
-Message-Id: <1477728600-12938-36-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
-References: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([198.137.202.9]:50286 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751126AbcJ1Gql (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 28 Oct 2016 02:46:41 -0400
+Date: Thu, 27 Oct 2016 23:46:39 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Stephen Bates <stephen.bates@microsemi.com>
+Cc: linux-kernel@vger.kernel.org, linux-nvdimm@ml01.01.org,
+        linux-rdma@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-mm@kvack.org, dan.j.williams@intel.com,
+        ross.zwisler@linux.intel.com, willy@linux.intel.com,
+        jgunthorpe@obsidianresearch.com, haggaie@mellanox.com,
+        hch@infradead.org, axboe@fb.com, corbet@lwn.net,
+        jim.macdonald@everspin.com, sbates@raithin.com, logang@deltatee.com
+Subject: Re: [PATCH 3/3] iopmem : Add documentation for iopmem driver
+Message-ID: <20161028064639.GB3231@infradead.org>
+References: <1476826937-20665-1-git-send-email-sbates@raithlin.com>
+ <1476826937-20665-4-git-send-email-sbates@raithlin.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1476826937-20665-4-git-send-email-sbates@raithlin.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Introduce BVEC_ITER_ALL_INIT for iterating one bio
-from start to end.
-
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
----
- include/linux/bvec.h | 8 ++++++++
- 1 file changed, 8 insertions(+)
-
-diff --git a/include/linux/bvec.h b/include/linux/bvec.h
-index 9df9e582bd3f..e12ce6bd63d7 100644
---- a/include/linux/bvec.h
-+++ b/include/linux/bvec.h
-@@ -183,4 +183,12 @@ static inline void bvec_iter_advance_mp(const struct bio_vec *bv,
- 		((bvl = bvec_iter_bvec((bio_vec), (iter))), 1);	\
- 	     bvec_iter_advance((bio_vec), &(iter), (bvl).bv_len))
- 
-+#define BVEC_ITER_ALL_INIT (struct bvec_iter)			\
-+{									\
-+	.bi_sector	= 0,						\
-+	.bi_size	= UINT_MAX,					\
-+	.bi_idx		= 0,						\
-+	.bi_bvec_done	= 0,						\
-+}
-+
- #endif /* __LINUX_BVEC_ITER_H */
--- 
-2.7.4
-
+I'd say please fold this into the previous patch.
