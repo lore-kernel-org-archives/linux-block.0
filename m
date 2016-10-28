@@ -1,126 +1,105 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-Content-Type: text/plain; charset=windows-1252
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Return-Path: <linus.walleij@linaro.org>
+MIME-Version: 1.0
+In-Reply-To: <20161028152908.GA21341@infradead.org>
+References: <38156FA7-9A66-44DC-8D0C-28F149D1E49B@linaro.org>
+ <09fc1e06-3fd6-b13d-0dd9-0edfb55b01d1@kernel.dk> <CAPDyKFrCNS_ZWzVU9Y=J9q0ewp-7=VFs4LwV69SzgSGHBxTn-g@mail.gmail.com>
+ <15ee2d0e-2d3a-81e2-9f83-f875e41bf388@kernel.dk> <CAPDyKFoi64Q0H9x2F35oY85PMDNq4hRsmqGYiP+En+qtQ4+Bag@mail.gmail.com>
+ <1ac9b794-7e7f-0748-e4c8-a13034aecbc3@kernel.dk> <CAPDyKFpLhp0eoS8LWy-jU0_U_cWq4immq2+bPdi-j7=oa24OjA@mail.gmail.com>
+ <e792e932-cf16-4272-2388-ae813a0372b6@kernel.dk> <CACRpkdbngAKuwDaUwZ=QaW9POb4U2tFJA60aLKD6QZKf60bq6g@mail.gmail.com>
+ <CACRpkda0fmPdM2WZ_gtW=T7xvMfP_4ErtNZseExN2AggzZbcDQ@mail.gmail.com> <20161028152908.GA21341@infradead.org>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Fri, 28 Oct 2016 23:09:01 +0200
+Message-ID: <CACRpkdbveiRUU+N8fPuSoQkKTAq0EdQOWnQBLhyUX7R6OT0FbA@mail.gmail.com>
 Subject: Re: [PATCH 00/14] introduce the BFQ-v0 I/O scheduler as an extra scheduler
-From: Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <09fc1e06-3fd6-b13d-0dd9-0edfb55b01d1@kernel.dk>
-Date: Sat, 29 Oct 2016 07:38:09 +0200
-Cc: Christoph Hellwig <hch@infradead.org>,
- Arnd Bergmann <arnd@arndb.de>,
- Bart Van Assche <bart.vanassche@sandisk.com>,
- Jan Kara <jack@suse.cz>,
- Tejun Heo <tj@kernel.org>,
- linux-block@vger.kernel.org,
- Linux-Kernal <linux-kernel@vger.kernel.org>,
- Ulf Hansson <ulf.hansson@linaro.org>,
- Linus Walleij <linus.walleij@linaro.org>,
- Mark Brown <broonie@kernel.org>,
- Hannes Reinecke <hare@suse.de>,
- grant.likely@secretlab.ca,
- James.Bottomley@hansenpartnership.com
-Message-Id: <C1E15CDB-81A7-4103-A01E-E50BA6329CCA@linaro.org>
-References: <1477474082-2846-1-git-send-email-paolo.valente@linaro.org> <20161026113443.GA13587@quack2.suse.cz> <4ed3e291-b3e5-5ee3-6838-58644bd3d99b@sandisk.com> <12386463.fJy0cVexVD@wuerfel> <20161026152955.GA21262@infradead.org> <3ebadbb8-9ac2-851a-66f9-c9db25713695@kernel.dk> <38156FA7-9A66-44DC-8D0C-28F149D1E49B@linaro.org> <09fc1e06-3fd6-b13d-0dd9-0edfb55b01d1@kernel.dk>
-To: Jens Axboe <axboe@kernel.dk>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Jens Axboe <axboe@kernel.dk>, Ulf Hansson <ulf.hansson@linaro.org>,
+	Paolo Valente <paolo.valente@linaro.org>, Arnd Bergmann <arnd@arndb.de>,
+	Bart Van Assche <bart.vanassche@sandisk.com>, Jan Kara <jack@suse.cz>, Tejun Heo <tj@kernel.org>,
+	linux-block@vger.kernel.org, Linux-Kernal <linux-kernel@vger.kernel.org>,
+	Mark Brown <broonie@kernel.org>, Hannes Reinecke <hare@suse.de>,
+	Grant Likely <grant.likely@secretlab.ca>,
+	James Bottomley <James.Bottomley@hansenpartnership.com>,
+	Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
+On Fri, Oct 28, 2016 at 5:29 PM, Christoph Hellwig <hch@infradead.org> wrot=
+e:
+> On Fri, Oct 28, 2016 at 11:32:21AM +0200, Linus Walleij wrote:
+>> So I'm not just complaining by the way, I'm trying to fix this. Also
+>> Bartlomiej from Samsung has done some stabs at switching MMC/SD
+>> to blk-mq. I just rebased my latest stab at a na=C4=ABve switch to blk-m=
+q
+>> to v4.9-rc2 with these results.
+>>
+>> The patch to enable MQ looks like this:
+>> https://git.kernel.org/cgit/linux/kernel/git/linusw/linux-stericsson.git=
+/commit/?h=3Dmmc-mq&id=3D8f79b527e2e854071d8da019451da68d4753f71d
+>>
+>> I run these tests directly after boot with cold caches. The results
+>> are consistent: I ran the same commands 10 times in a row.
+>
+> A couple comments from a quick look over the patch:
+>
+> In the changelog you complain:
+>
+> ". Lack of front- and back-end merging in the MQ block layer creating
+> several small requests instead of a few large ones."
+>
+> In blk-mq merging is controller by the BLK_MQ_F_SHOULD_MERGE and
+> BLK_MQ_F_SG_MERGE flags.  You set the former, but not the latter.
+> BLK_MQ_F_SG_MERGE controls wether multiple physical contiguous pages get
+> merged into a single segment.  For a dd after a fresh boot that is
+> probably very common.  Except for the polarity of the merge flags the
+> basic merge functionality between the legacy and blk-mq path should be
+> the same, and if they aren't you've found a bug we need to address.
 
-> Il giorno 26 ott 2016, alle ore 18:12, Jens Axboe <axboe@kernel.dk> ha =
-scritto:
->=20
-> On 10/26/2016 10:04 AM, Paolo Valente wrote:
->>=20
->>> Il giorno 26 ott 2016, alle ore 17:32, Jens Axboe <axboe@kernel.dk> =
-ha scritto:
->>>=20
->>> On 10/26/2016 09:29 AM, Christoph Hellwig wrote:
->>>> On Wed, Oct 26, 2016 at 05:13:07PM +0200, Arnd Bergmann wrote:
->>>>> The question to ask first is whether to actually have pluggable
->>>>> schedulers on blk-mq at all, or just have one that is meant to
->>>>> do the right thing in every case (and possibly can be bypassed
->>>>> completely).
->>>>=20
->>>> That would be my preference.  Have a BFQ-variant for blk-mq as an
->>>> option (default to off unless opted in by the driver or user), and
->>>> not other scheduler for blk-mq.  Don't bother with bfq for non
->>>> blk-mq.  It's not like there is any advantage in the legacy-request
->>>> device even for slow devices, except for the option of having I/O
->>>> scheduling.
->>>=20
->>> It's the only right way forward. blk-mq might not offer any =
-substantial
->>> advantages to rotating storage, but with scheduling, it won't offer =
-a
->>> downside either. And it'll take us towards the real goal, which is =
-to
->>> have just one IO path.
->>=20
->> ok
->>=20
->>> Adding a new scheduler for the legacy IO path
->>> makes no sense.
->>=20
->> I would fully agree if effective and stable I/O scheduling would be
->> available in blk-mq in one or two months.  But I guess that it will
->> take at least one year optimistically, given the current status of =
-the
->> needed infrastructure, and given the great difficulties of doing
->> effective scheduling at the high parallelism and extreme target =
-speeds
->> of blk-mq.  Of course, this holds true unless little clever =
-scheduling
->> is performed.
->>=20
->> So, what's the point in forcing a lot of users wait another year or
->> more, for a solution that has yet to be even defined, while they =
-could
->> enjoy a much better system, and then switch an even better system =
-when
->> scheduling is ready in blk-mq too?
->=20
-> That same argument could have been made 2 years ago. Saying no to a =
-new
-> scheduler for the legacy framework goes back roughly that long. We =
-could
-> have had BFQ for mq NOW, if we didn't keep coming back to this very
-> point.
->=20
-> I'm hesistant to add a new scheduler because it's very easy to add, =
-very
-> difficult to get rid of. If we do add BFQ as a legacy scheduler now,
-> it'll take us years and years to get rid of it again. We should be
-> moving towards LESS moving parts in the legacy path, not more.
->=20
-> We can keep having this discussion every few years, but I think we'd
-> both prefer to make some actual progress here.
+Aha OK I will make sure to set both flags next time. (I will also stop
+guessing about that as a cause since that part probably works.)
 
-ok Jens, I give up
+> You also say that you disable the pipelining.  How much of a performance
+> gain did this feature give when added? How much does just removing that
+> on it's own cost you?
 
-> It's perfectly fine to
-> add an interface for a single queue interface for an IO scheduler for
-> blk-mq, since we don't care too much about scalability there. And that
-> won't take years, that should be a few weeks. Retrofitting BFQ on top =
-of
-> that should not be hard either. That can co-exist with a real =
-multiqueue
-> scheduler as well, something that's geared towards some fairness for
-> faster devices.
->=20
+Interestingly, the original commit doesn't say.
+http://marc.info/?l=3Dlinaro-dev&m=3D137645684811479&w=3D2
 
-AFAICT this solution is good, for many practical reasons.  I don't
-have the expertise to make such an infrastructure well on my own.  At
-least not in an acceptable amount of time, because working on this
-nice stuff is unfortunately not my job (although Linaro is now
-supporting me for BFQ).
+It however dependends the cache architecture of the machine how
+much is won. The heavier the cache flushes, the more it gains.
 
-Then, assuming that this solution may be of general interest, and that
-BFQ benefits convinced you a little bit too, may I get significant
-collaboration/help on implementing this infrastructure?  If so, Jens
-and all possibly interested parties, could we have a sort of short
-kick-off technical meeting during KS/LPC?
+I guess I need to make a patch removing that mechanism to bench
+it. It's pretty hard to get rid of because it goes really deep into the
+MMC subsystem. It's massaged in like a schampoo.
 
-Thanks,
-Paolo
+> While I think that features is rather messy and
+> should be avoided if possible I don't see how it's impossible to
+> implement in blk-mq.
 
-> --=20
-> Jens Axboe
+It's probably possible. What I discussed with Arnd was to let
+the blk-mq core call out to these pre-request and post-request
+hooks on new requests in parallel with processing a request or
+a queue of requests. I.e. add .prep_request() and .unprep_request()
+callbacks to struct blk_mq_ops.
+
+I tried to understand if the existing .init_request and .exit_request
+callbacks could be used. But as I understand it they are only used
+to allocate and prepare the extra per-request-associated memory
+and state, and does not have access to the request per se,
+so it doesn't know anything about the actual request when
+.init_request() is called.
+
+So we're looking for something called whenever the contents of
+a request are done, right before queueing it, and right after
+dequeueing it after being served.
+
+>  If you just increase your queue depth and use
+> the old scheme you should get it - if you currently can't handle the
+> second command for some reason (i.e. the special request magic) you
+> can just return BLK_MQ_RQ_QUEUE_BUSY from the queue_rq function.
+
+Bartlomiejs patch set did that, but I haven't been able to reproduce it.
+
+I will try to make a clean patch in the spirit of his.
+
+Yours,
+Linus Walleij
