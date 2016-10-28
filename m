@@ -1,139 +1,128 @@
-Return-Path: <linus.walleij@linaro.org>
-MIME-Version: 1.0
-In-Reply-To: <CACRpkdbngAKuwDaUwZ=QaW9POb4U2tFJA60aLKD6QZKf60bq6g@mail.gmail.com>
-References: <1477474082-2846-1-git-send-email-paolo.valente@linaro.org>
- <20161026113443.GA13587@quack2.suse.cz> <4ed3e291-b3e5-5ee3-6838-58644bd3d99b@sandisk.com>
- <12386463.fJy0cVexVD@wuerfel> <20161026152955.GA21262@infradead.org>
- <3ebadbb8-9ac2-851a-66f9-c9db25713695@kernel.dk> <38156FA7-9A66-44DC-8D0C-28F149D1E49B@linaro.org>
- <09fc1e06-3fd6-b13d-0dd9-0edfb55b01d1@kernel.dk> <CAPDyKFrCNS_ZWzVU9Y=J9q0ewp-7=VFs4LwV69SzgSGHBxTn-g@mail.gmail.com>
- <15ee2d0e-2d3a-81e2-9f83-f875e41bf388@kernel.dk> <CAPDyKFoi64Q0H9x2F35oY85PMDNq4hRsmqGYiP+En+qtQ4+Bag@mail.gmail.com>
- <1ac9b794-7e7f-0748-e4c8-a13034aecbc3@kernel.dk> <CAPDyKFpLhp0eoS8LWy-jU0_U_cWq4immq2+bPdi-j7=oa24OjA@mail.gmail.com>
- <e792e932-cf16-4272-2388-ae813a0372b6@kernel.dk> <CACRpkdbngAKuwDaUwZ=QaW9POb4U2tFJA60aLKD6QZKf60bq6g@mail.gmail.com>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Fri, 28 Oct 2016 11:32:21 +0200
-Message-ID: <CACRpkda0fmPdM2WZ_gtW=T7xvMfP_4ErtNZseExN2AggzZbcDQ@mail.gmail.com>
-Subject: Re: [PATCH 00/14] introduce the BFQ-v0 I/O scheduler as an extra scheduler
+Return-Path: <jack@suse.cz>
+Date: Fri, 28 Oct 2016 09:59:01 +0200
+From: Jan Kara <jack@suse.cz>
 To: Jens Axboe <axboe@kernel.dk>
-Cc: Ulf Hansson <ulf.hansson@linaro.org>, Paolo Valente <paolo.valente@linaro.org>,
-	Christoph Hellwig <hch@infradead.org>, Arnd Bergmann <arnd@arndb.de>,
-	Bart Van Assche <bart.vanassche@sandisk.com>, Jan Kara <jack@suse.cz>, Tejun Heo <tj@kernel.org>,
-	linux-block@vger.kernel.org, Linux-Kernal <linux-kernel@vger.kernel.org>,
+Cc: Jan Kara <jack@suse.cz>, Paolo Valente <paolo.valente@linaro.org>,
+	Christoph Hellwig <hch@infradead.org>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Bart Van Assche <bart.vanassche@sandisk.com>,
+	Tejun Heo <tj@kernel.org>, linux-block@vger.kernel.org,
+	Linux-Kernal <linux-kernel@vger.kernel.org>,
+	Ulf Hansson <ulf.hansson@linaro.org>,
+	Linus Walleij <linus.walleij@linaro.org>,
 	Mark Brown <broonie@kernel.org>, Hannes Reinecke <hare@suse.de>,
-	Grant Likely <grant.likely@secretlab.ca>,
-	James Bottomley <James.Bottomley@hansenpartnership.com>,
-	Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
-Content-Type: text/plain; charset=UTF-8
+	grant.likely@secretlab.ca, James.Bottomley@hansenpartnership.com
+Subject: Re: [PATCH 00/14] introduce the BFQ-v0 I/O scheduler as an extra
+ scheduler
+Message-ID: <20161028075901.GA30952@quack2.suse.cz>
+References: <1477474082-2846-1-git-send-email-paolo.valente@linaro.org>
+ <20161026113443.GA13587@quack2.suse.cz>
+ <4ed3e291-b3e5-5ee3-6838-58644bd3d99b@sandisk.com>
+ <12386463.fJy0cVexVD@wuerfel>
+ <20161026152955.GA21262@infradead.org>
+ <3ebadbb8-9ac2-851a-66f9-c9db25713695@kernel.dk>
+ <38156FA7-9A66-44DC-8D0C-28F149D1E49B@linaro.org>
+ <09fc1e06-3fd6-b13d-0dd9-0edfb55b01d1@kernel.dk>
+ <20161027092656.GD19743@quack2.suse.cz>
+ <690e7ddc-411f-20db-61a8-7996bf20dc37@kernel.dk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <690e7ddc-411f-20db-61a8-7996bf20dc37@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-On Fri, Oct 28, 2016 at 12:27 AM, Linus Walleij
-<linus.walleij@linaro.org> wrote:
-> On Thu, Oct 27, 2016 at 11:08 PM, Jens Axboe <axboe@kernel.dk> wrote:
+On Thu 27-10-16 10:26:18, Jens Axboe wrote:
+> On 10/27/2016 03:26 AM, Jan Kara wrote:
+> >On Wed 26-10-16 10:12:38, Jens Axboe wrote:
+> >>On 10/26/2016 10:04 AM, Paolo Valente wrote:
+> >>>
+> >>>>Il giorno 26 ott 2016, alle ore 17:32, Jens Axboe <axboe@kernel.dk> ha scritto:
+> >>>>
+> >>>>On 10/26/2016 09:29 AM, Christoph Hellwig wrote:
+> >>>>>On Wed, Oct 26, 2016 at 05:13:07PM +0200, Arnd Bergmann wrote:
+> >>>>>>The question to ask first is whether to actually have pluggable
+> >>>>>>schedulers on blk-mq at all, or just have one that is meant to
+> >>>>>>do the right thing in every case (and possibly can be bypassed
+> >>>>>>completely).
+> >>>>>
+> >>>>>That would be my preference.  Have a BFQ-variant for blk-mq as an
+> >>>>>option (default to off unless opted in by the driver or user), and
+> >>>>>not other scheduler for blk-mq.  Don't bother with bfq for non
+> >>>>>blk-mq.  It's not like there is any advantage in the legacy-request
+> >>>>>device even for slow devices, except for the option of having I/O
+> >>>>>scheduling.
+> >>>>
+> >>>>It's the only right way forward. blk-mq might not offer any substantial
+> >>>>advantages to rotating storage, but with scheduling, it won't offer a
+> >>>>downside either. And it'll take us towards the real goal, which is to
+> >>>>have just one IO path.
+> >>>
+> >>>ok
+> >>>
+> >>>>Adding a new scheduler for the legacy IO path
+> >>>>makes no sense.
+> >>>
+> >>>I would fully agree if effective and stable I/O scheduling would be
+> >>>available in blk-mq in one or two months.  But I guess that it will
+> >>>take at least one year optimistically, given the current status of the
+> >>>needed infrastructure, and given the great difficulties of doing
+> >>>effective scheduling at the high parallelism and extreme target speeds
+> >>>of blk-mq.  Of course, this holds true unless little clever scheduling
+> >>>is performed.
+> >>>
+> >>>So, what's the point in forcing a lot of users wait another year or
+> >>>more, for a solution that has yet to be even defined, while they could
+> >>>enjoy a much better system, and then switch an even better system when
+> >>>scheduling is ready in blk-mq too?
+> >>
+> >>That same argument could have been made 2 years ago. Saying no to a new
+> >>scheduler for the legacy framework goes back roughly that long. We could
+> >>have had BFQ for mq NOW, if we didn't keep coming back to this very
+> >>point.
+> >>
+> >>I'm hesistant to add a new scheduler because it's very easy to add, very
+> >>difficult to get rid of. If we do add BFQ as a legacy scheduler now,
+> >>it'll take us years and years to get rid of it again. We should be
+> >>moving towards LESS moving parts in the legacy path, not more.
+> >>
+> >>We can keep having this discussion every few years, but I think we'd
+> >>both prefer to make some actual progress here. It's perfectly fine to
+> >>add an interface for a single queue interface for an IO scheduler for
+> >>blk-mq, since we don't care too much about scalability there. And that
+> >>won't take years, that should be a few weeks. Retrofitting BFQ on top of
+> >>that should not be hard either. That can co-exist with a real multiqueue
+> >>scheduler as well, something that's geared towards some fairness for
+> >>faster devices.
+> >
+> >OK, so some solution like having a variant of blk_sq_make_request() that
+> >will consume requests, do IO scheduling decisions on them, and feed them
+> >into the HW queue is it sees fit would be acceptable? That will provide the
+> >IO scheduler a global view that it needs for complex scheduling decisions
+> >so it should indeed be relatively easy to port BFQ to work like that.
+> 
+> I'd probably start off Omar's base [1] that switches the software queues
+> to store bios instead of requests, since that lifts the of the 1:1
+> mapping between what we can queue up and what we can dispatch. Without
+> that, the IO scheduler won't have too much to work with. And with that
+> in place, it'll be a "bio in, request out" type of setup, which is
+> similar to what we have in the legacy path.
 >
->> blk-mq has evolved to support a variety of devices, there's nothing
->> special about mmc that can't work well within that framework.
->
-> There is. Read mmc_queue_thread() in drivers/mmc/card/queue.c
+> I'd keep the software queues, but as a starting point, mandate 1
+> hardware queue to keep that as the per-device view of the state. The IO
+> scheduler would be responsible for moving one or more bios from the
+> software queues to the hardware queue, when they are ready to dispatch.
+> 
+> [1] https://github.com/osandov/linux/commit/8ef3508628b6cf7c4712cd3d8084ee11ef5d2530
 
-So I'm not just complaining by the way, I'm trying to fix this. Also
-Bartlomiej from Samsung has done some stabs at switching MMC/SD
-to blk-mq. I just rebased my latest stab at a na=C3=AFve switch to blk-mq
-to v4.9-rc2 with these results.
+Yeah, but what would be software queues actually good for for a single
+queue device with device-global IO scheduling? The IO scheduler doing
+complex decisions will keep all the bios / requests in a single structure
+anyway so there's no scalability to gain from per-cpu software queues...
+So you can directly consume bios in your ->make_request handler, place it
+in IO scheduler structures and then push requests out to the HW queue in
+response to HW tags getting freed (i.e. IO completion). No need
+for intermediate software queues. But maybe I miss something.
 
-The patch to enable MQ looks like this:
-https://git.kernel.org/cgit/linux/kernel/git/linusw/linux-stericsson.git/co=
-mmit/?h=3Dmmc-mq&id=3D8f79b527e2e854071d8da019451da68d4753f71d
-
-I run these tests directly after boot with cold caches. The results
-are consistent: I ran the same commands 10 times in a row.
-
-
-BEFORE switching to BLK-MQ (clean v4.9-rc2):
-
-time dd if=3D/dev/mmcblk0 of=3D/dev/null bs=3D1M count=3D1024
-1024+0 records in
-1024+0 records out
-1073741824 bytes (1.0GB) copied, 47.781464 seconds, 21.4MB/s
-real    0m 47.79s
-user    0m 0.02s
-sys     0m 9.35s
-
-mount /dev/mmcblk0p1 /mnt/
-cd /mnt/
-time find . > /dev/null
-real    0m 3.60s
-user    0m 0.25s
-sys     0m 1.58s
-
-mount /dev/mmcblk0p1 /mnt/
-iozone -az -i0 -i1 -i2 -s 20m -I -f /mnt/foo.test
-(kBytes/second)
-                                                    random    random
-    kB  reclen    write  rewrite    read    reread    read     write
- 20480       4     2112     2157     6052     6060     6025       40
- 20480       8     4820     5074     9163     9121     9125       81
- 20480      16     5755     5242    12317    12320    12280      165
- 20480      32     6176     6261    14981    14987    14962      336
- 20480      64     6547     5875    16826    16828    16810      692
- 20480     128     6762     6828    17899    17896    17896     1408
- 20480     256     6802     6871    16960    17513    18373     3048
- 20480     512     7220     7252    18675    18746    18741     7228
- 20480    1024     7222     7304    18436    17858    18246     7322
- 20480    2048     7316     7398    18744    18751    18526     7419
- 20480    4096     7520     7636    20774    20995    20703     7609
- 20480    8192     7519     7704    21850    21489    21467     7663
- 20480   16384     7395     7782    22399    22210    22215     7781
-
-
-AFTER switching to BLK-MQ:
-
-time dd if=3D/dev/mmcblk0 of=3D/dev/null bs=3D1M count=3D1024
-1024+0 records in
-1024+0 records out
-1073741824 bytes (1.0GB) copied, 60.551117 seconds, 16.9MB/s
-real    1m 0.56s
-user    0m 0.02s
-sys     0m 9.81s
-
-mount /dev/mmcblk0p1 /mnt/
-cd /mnt/
-time find . > /dev/null
-real    0m 4.42s
-user    0m 0.24s
-sys     0m 1.81s
-
-mount /dev/mmcblk0p1 /mnt/
-iozone -az -i0 -i1 -i2 -s 20m -I -f /mnt/foo.test
-(kBytes/second)
-                                                    random    random
-    kB  reclen    write  rewrite    read    reread    read     write
- 20480       4     2086     2201     6024     6036     6006       40
- 20480       8     4812     5036     8014     9121     9090       82
- 20480      16     5432     5633    12267     9776    12212      168
- 20480      32     6180     6233    14870    14891    14852      340
- 20480      64     6382     5454    16744    16771    16746      702
- 20480     128     6761     6776    17816    17846    17836     1394
- 20480     256     6828     6842    17789    17895    17094     3084
- 20480     512     7158     7222    17957    17681    17698     7232
- 20480    1024     7215     7274    18642    17679    18031     7300
- 20480    2048     7229     7269    17943    18642    17732     7358
- 20480    4096     7212     7360    18272    18157    18889     7371
- 20480    8192     7008     7271    18632    18707    18225     7282
- 20480   16384     6889     7211    18243    18429    18018     7246
-
-
-A simple dd readtest of 1 GB is always consistently 10+
-seconds slower with MQ. find in the rootfs is a second slower.
-iozone results are consistently lower throughput or the same.
-
-This is without using Bartlomiej's clever hack to pretend we have
-2 elements in the HW queue though. His early tests indicate that
-it doesn't help much: the performance regression we see is due to
-lack of block scheduling.
-
-I try to find a way forward with this, and also massage the MMC/SD
-code to be more MQ friendly to begin with (like only pick requests
-when we get a request notification and stop pulling NULL requests
-off the queue) but it's really a messy piece of code.
-
-Yours,
-Linus Walleij
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
