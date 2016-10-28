@@ -1,74 +1,65 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Ming Lei <tom.leiming@gmail.com>
-To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Ming Lei <tom.leiming@gmail.com>,
-        Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <yuchao0@huawei.com>,
-        linux-f2fs-devel@lists.sourceforge.net (open list:F2FS FILE SYSTEM)
-Subject: [PATCH 54/60] f2fs: convert to bio_for_each_segment_all_rd()
-Date: Sat, 29 Oct 2016 16:08:53 +0800
-Message-Id: <1477728600-12938-55-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
-References: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:46831 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1756744AbcJ1Wwj (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 28 Oct 2016 18:52:39 -0400
+Received: from pps.filterd (m0044012.ppops.net [127.0.0.1])
+        by mx0a-00082601.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id u9SMnhd3005336
+        for <linux-block@vger.kernel.org>; Fri, 28 Oct 2016 15:52:38 -0700
+Received: from mail.thefacebook.com ([199.201.64.23])
+        by mx0a-00082601.pphosted.com with ESMTP id 26cbr42ba1-1
+        (version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT)
+        for <linux-block@vger.kernel.org>; Fri, 28 Oct 2016 15:52:38 -0700
+Received: from facebook.com (2401:db00:21:603d:face:0:19:0)     by
+ mx-out.facebook.com (10.212.236.87) with ESMTP id
+ 38fbbc789d6111e6b97e0002c9521c9e-f0ff6a50 for <linux-block@vger.kernel.org>;
+        Fri, 28 Oct 2016 15:52:37 -0700
+From: Shaohua Li <shli@fb.com>
+To: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <Kernel-team@fb.com>, <axboe@fb.com>
+Subject: [PATCH 2/2] blk-mq: immediately dispatch big size request
+Date: Fri, 28 Oct 2016 15:52:36 -0700
+Message-ID: <8896812b5cb9bd32e35e91d7f9aad4ccc368b2fc.1477694963.git.shli@fb.com>
+In-Reply-To: <a42409a1a37e819e0497c091ab49461370b34989.1477694963.git.shli@fb.com>
+References: <a42409a1a37e819e0497c091ab49461370b34989.1477694963.git.shli@fb.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+This is corresponding part for blk-mq. Disk with multiple hardware
+queues doesn't need this as we only hold 1 request at most.
+
+Signed-off-by: Shaohua Li <shli@fb.com>
 ---
- fs/f2fs/data.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ block/blk-mq.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/fs/f2fs/data.c b/fs/f2fs/data.c
-index 24f6f6977d37..04b1a5caf2d6 100644
---- a/fs/f2fs/data.c
-+++ b/fs/f2fs/data.c
-@@ -33,6 +33,7 @@ static void f2fs_read_end_io(struct bio *bio)
- {
- 	struct bio_vec *bvec;
- 	int i;
-+	struct bvec_iter_all bia;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index f3d27a6..9612306 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1401,13 +1401,18 @@ static blk_qc_t blk_sq_make_request(struct request_queue *q, struct bio *bio)
+ 	 */
+ 	plug = current->plug;
+ 	if (plug) {
++		struct request *first = NULL;
++
+ 		blk_mq_bio_to_request(rq, bio);
+ 		if (!request_count)
+ 			trace_block_plug(q);
++		else
++			first = list_entry_rq(plug->mq_list.next);
  
- #ifdef CONFIG_F2FS_FAULT_INJECTION
- 	/*
-@@ -52,7 +53,7 @@ static void f2fs_read_end_io(struct bio *bio)
+ 		blk_mq_put_ctx(data.ctx);
+ 
+-		if (request_count >= BLK_MAX_REQUEST_COUNT) {
++		if (request_count >= BLK_MAX_REQUEST_COUNT || (first &&
++		    blk_rq_bytes(first) >= BLK_PLUG_FLUSH_SIZE)) {
+ 			blk_flush_plug_list(plug, false);
+ 			trace_block_plug(q);
  		}
- 	}
- 
--	bio_for_each_segment_all(bvec, bio, i) {
-+	bio_for_each_segment_all_rd(bvec, bio, i, bia) {
- 		struct page *page = bvec->bv_page;
- 
- 		if (!bio->bi_error) {
-@@ -72,8 +73,9 @@ static void f2fs_write_end_io(struct bio *bio)
- 	struct f2fs_sb_info *sbi = bio->bi_private;
- 	struct bio_vec *bvec;
- 	int i;
-+	struct bvec_iter_all bia;
- 
--	bio_for_each_segment_all(bvec, bio, i) {
-+	bio_for_each_segment_all_rd(bvec, bio, i, bia) {
- 		struct page *page = bvec->bv_page;
- 
- 		fscrypt_pullback_bio_page(&page, true);
-@@ -145,6 +147,7 @@ static bool __has_merged_page(struct f2fs_bio_info *io, struct inode *inode,
- 	struct bio_vec *bvec;
- 	struct page *target;
- 	int i;
-+	struct bvec_iter_all bia;
- 
- 	if (!io->bio)
- 		return false;
-@@ -152,7 +155,7 @@ static bool __has_merged_page(struct f2fs_bio_info *io, struct inode *inode,
- 	if (!inode && !page && !ino)
- 		return true;
- 
--	bio_for_each_segment_all(bvec, io->bio, i) {
-+	bio_for_each_segment_all_rd(bvec, io->bio, i, bia) {
- 
- 		if (bvec->bv_page->mapping)
- 			target = bvec->bv_page;
 -- 
-2.7.4
+2.9.3
 
