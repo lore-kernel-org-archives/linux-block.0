@@ -1,70 +1,73 @@
 Return-Path: <broonie@sirena.org.uk>
-Date: Fri, 28 Oct 2016 18:17:44 +0100
+Date: Fri, 28 Oct 2016 18:12:01 +0100
 From: Mark Brown <broonie@kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Jens Axboe <axboe@kernel.dk>, Linus Walleij <linus.walleij@linaro.org>,
-	Ulf Hansson <ulf.hansson@linaro.org>,
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Ulf Hansson <ulf.hansson@linaro.org>,
 	Paolo Valente <paolo.valente@linaro.org>,
 	Christoph Hellwig <hch@infradead.org>,
+	Arnd Bergmann <arnd@arndb.de>,
 	Bart Van Assche <bart.vanassche@sandisk.com>,
 	Jan Kara <jack@suse.cz>, Tejun Heo <tj@kernel.org>,
 	linux-block@vger.kernel.org,
 	Linux-Kernal <linux-kernel@vger.kernel.org>,
+	Linus Walleij <linus.walleij@linaro.org>,
 	Hannes Reinecke <hare@suse.de>,
 	Grant Likely <grant.likely@secretlab.ca>,
-	James Bottomley <James.Bottomley@hansenpartnership.com>,
-	Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
-Message-ID: <20161028171744.n3l7brpcphi4duah@sirena.org.uk>
-References: <1477474082-2846-1-git-send-email-paolo.valente@linaro.org>
- <CACRpkda0fmPdM2WZ_gtW=T7xvMfP_4ErtNZseExN2AggzZbcDQ@mail.gmail.com>
- <3d0b38bb-537d-94ff-574f-587bad949fdd@kernel.dk>
- <2423164.8ioLhGisxr@wuerfel>
+	James Bottomley <James.Bottomley@hansenpartnership.com>
+Message-ID: <20161028171201.4tzhuedvybwrmwzb@sirena.org.uk>
+References: <38156FA7-9A66-44DC-8D0C-28F149D1E49B@linaro.org>
+ <09fc1e06-3fd6-b13d-0dd9-0edfb55b01d1@kernel.dk>
+ <CAPDyKFrCNS_ZWzVU9Y=J9q0ewp-7=VFs4LwV69SzgSGHBxTn-g@mail.gmail.com>
+ <15ee2d0e-2d3a-81e2-9f83-f875e41bf388@kernel.dk>
+ <CAPDyKFoi64Q0H9x2F35oY85PMDNq4hRsmqGYiP+En+qtQ4+Bag@mail.gmail.com>
+ <1ac9b794-7e7f-0748-e4c8-a13034aecbc3@kernel.dk>
+ <CAPDyKFpLhp0eoS8LWy-jU0_U_cWq4immq2+bPdi-j7=oa24OjA@mail.gmail.com>
+ <e792e932-cf16-4272-2388-ae813a0372b6@kernel.dk>
+ <CAPDyKFqDqhMgpCN83P_dFf6wgfT3KCVT1Uw4kDMz620=3Hkj+A@mail.gmail.com>
+ <4948c47a-6e24-0a81-0564-5a61b6be35e9@kernel.dk>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="cpog7nqtpk6cugy2"
-In-Reply-To: <2423164.8ioLhGisxr@wuerfel>
+	protocol="application/pgp-signature"; boundary="7r537rz6c3oikgku"
+In-Reply-To: <4948c47a-6e24-0a81-0564-5a61b6be35e9@kernel.dk>
 Subject: Re: [PATCH 00/14] introduce the BFQ-v0 I/O scheduler as an extra
  scheduler
 List-ID: <linux-block@vger.kernel.org>
 
 
---cpog7nqtpk6cugy2
+--7r537rz6c3oikgku
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
-On Fri, Oct 28, 2016 at 06:05:35PM +0200, Arnd Bergmann wrote:
-> On Friday, October 28, 2016 9:30:07 AM CEST Jens Axboe wrote:
+On Fri, Oct 28, 2016 at 08:17:01AM -0600, Jens Axboe wrote:
+> On 10/28/2016 12:36 AM, Ulf Hansson wrote:
 
-> > Also, 4.8 and newer have support for BLK_MQ_F_BLOCKING, if you need to
-> > block in ->queue_rq(). That could eliminate the need to offload to a
-> > kthread manually.
+> > You have been pushing Paolo in different directions throughout the
+> > years with his work in BFQ, wasting lots of his time/effort.
 
-> I think the main reason for the kthread is that on ARM and other
-> architectures, the dma mapping operations are fairly slow (for
-> cache flushes or bounce buffering) and we want to minimize the
-> time between subsequent requests being handled by the hardware.
+> I have not. Various entities have advised Paolo approach it in various ways.
+> We've had blk-mq for 3 years now, my position should have been pretty clear
+> on that.
 
-> This is not unique to MMC in any way, MMC just happens to be
-> common on ARM and it is limited by its lack of hardware
-> command queuing.
+Having come to this somewhat late I have to say that that hasn't been
+100% clear as a set opinion from everyone - in the time I've been
+following things there's been engagement about the meat of the code
+which gave the impression the patches were being seriously considered.
 
-Plus the fact that MMC (and SD) have some *relatively* high performance
-implementations which amplify the effects of desaturating the hardware -
-the faster the hardware is the more noticable the overhead of stalling
-it becomes.
+But like I said in a previous mail this is all in the past anyway, we
+need to focus on the present situation.
 
---cpog7nqtpk6cugy2
+--7r537rz6c3oikgku
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAABCAAGBQJYE4g4AAoJECTWi3JdVIfQ3WAH+gLuYxkY5tlON/3vAdv/Fl0t
-L6Q7pgMANhF6B8HRStco7AQAqVvb5cFcD8QLV8Opi36eq9nadmI26R3JvktzLagH
-fdtq+Aqqs1ldjBSULOmn15PioF6n46lpz9v6TM0MY0WWj1kFARfzGrZ64jUMTCR1
-BuGCFhutnmFRLK+SOjxh7YgdW7t30YV+wYtYb7XYy/una7GvdolOzCN3puWjWWDr
-IssJLzyfhMO8f7oO9n1W+mBHgOEPx0+ht62eZdGfSMNpQJwg2tAd5LNgaj4OwC0n
-REdjDS0nX1JSauhWOMzv7CLUmodVQ+Prsp9k8xZ8t3dR3TODgn/FxxdZzpRtp60=
-=lkfo
+iQEcBAABCAAGBQJYE4bhAAoJECTWi3JdVIfQRbUH/jY2o1Fh0UtDI+3EzfglRtuL
+0a3ihAYJSD4FbOimtMbyLgLG/3iKMmjWq3IFfxmlGIFvbxd3w6JKV/TBQLEwH7S+
+vcNPBdHqCZMg+ClnnZlPKhYcVfCaaLDHkiV/Z3zi8NL09PAlMxNkfCeata9tKiji
+w/PInBb2Dw3TG5V1Pe/C4ZTwrjS20tjqMUmZtFF6dFSGZWXBBH3MwjnjjcPeZ6Hq
+u0r4JcxJ8jhwVj8jvb0krIS86BOAz5WuKrcRAGkLb+3aFUq/lMQBeW3fyP/VHC1P
+HCCewPhWZNxbJ4k2S6fnhUk8mVfjfVnxc+ao7lVVFr6ydfXpLMfhy06k9rQzwrk=
+=IVh6
 -----END PGP SIGNATURE-----
 
---cpog7nqtpk6cugy2--
+--7r537rz6c3oikgku--
