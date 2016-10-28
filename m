@@ -1,7 +1,7 @@
 Return-Path: <axboe@kernel.dk>
 Subject: Re: [PATCH 00/14] introduce the BFQ-v0 I/O scheduler as an extra
  scheduler
-To: Jan Kara <jack@suse.cz>
+To: Linus Walleij <linus.walleij@linaro.org>
 References: <1477474082-2846-1-git-send-email-paolo.valente@linaro.org>
  <20161026113443.GA13587@quack2.suse.cz>
  <4ed3e291-b3e5-5ee3-6838-58644bd3d99b@sandisk.com>
@@ -9,125 +9,67 @@ References: <1477474082-2846-1-git-send-email-paolo.valente@linaro.org>
  <3ebadbb8-9ac2-851a-66f9-c9db25713695@kernel.dk>
  <38156FA7-9A66-44DC-8D0C-28F149D1E49B@linaro.org>
  <09fc1e06-3fd6-b13d-0dd9-0edfb55b01d1@kernel.dk>
- <20161027092656.GD19743@quack2.suse.cz>
- <690e7ddc-411f-20db-61a8-7996bf20dc37@kernel.dk>
- <20161028075901.GA30952@quack2.suse.cz>
-Cc: Paolo Valente <paolo.valente@linaro.org>,
+ <CAPDyKFrCNS_ZWzVU9Y=J9q0ewp-7=VFs4LwV69SzgSGHBxTn-g@mail.gmail.com>
+ <15ee2d0e-2d3a-81e2-9f83-f875e41bf388@kernel.dk>
+ <CAPDyKFoi64Q0H9x2F35oY85PMDNq4hRsmqGYiP+En+qtQ4+Bag@mail.gmail.com>
+ <1ac9b794-7e7f-0748-e4c8-a13034aecbc3@kernel.dk>
+ <CAPDyKFpLhp0eoS8LWy-jU0_U_cWq4immq2+bPdi-j7=oa24OjA@mail.gmail.com>
+ <e792e932-cf16-4272-2388-ae813a0372b6@kernel.dk>
+ <CACRpkdbngAKuwDaUwZ=QaW9POb4U2tFJA60aLKD6QZKf60bq6g@mail.gmail.com>
+Cc: Ulf Hansson <ulf.hansson@linaro.org>,
+ Paolo Valente <paolo.valente@linaro.org>,
  Christoph Hellwig <hch@infradead.org>, Arnd Bergmann <arnd@arndb.de>,
- Bart Van Assche <bart.vanassche@sandisk.com>, Tejun Heo <tj@kernel.org>,
- linux-block@vger.kernel.org, Linux-Kernal <linux-kernel@vger.kernel.org>,
- Ulf Hansson <ulf.hansson@linaro.org>,
- Linus Walleij <linus.walleij@linaro.org>, Mark Brown <broonie@kernel.org>,
- Hannes Reinecke <hare@suse.de>, grant.likely@secretlab.ca,
- James.Bottomley@hansenpartnership.com
+ Bart Van Assche <bart.vanassche@sandisk.com>, Jan Kara <jack@suse.cz>,
+ Tejun Heo <tj@kernel.org>, linux-block@vger.kernel.org,
+ Linux-Kernal <linux-kernel@vger.kernel.org>, Mark Brown
+ <broonie@kernel.org>, Hannes Reinecke <hare@suse.de>,
+ Grant Likely <grant.likely@secretlab.ca>,
+ James Bottomley <James.Bottomley@hansenpartnership.com>
 From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <adbe6097-9ece-af0a-a5c6-a4299c9bb72a@kernel.dk>
-Date: Fri, 28 Oct 2016 08:10:06 -0600
+Message-ID: <f71cb330-8e60-694e-0494-43ad8bc4b91b@kernel.dk>
+Date: Fri, 28 Oct 2016 08:07:35 -0600
 MIME-Version: 1.0
-In-Reply-To: <20161028075901.GA30952@quack2.suse.cz>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+In-Reply-To: <CACRpkdbngAKuwDaUwZ=QaW9POb4U2tFJA60aLKD6QZKf60bq6g@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-On 10/28/2016 01:59 AM, Jan Kara wrote:
-> On Thu 27-10-16 10:26:18, Jens Axboe wrote:
->> On 10/27/2016 03:26 AM, Jan Kara wrote:
->>> On Wed 26-10-16 10:12:38, Jens Axboe wrote:
->>>> On 10/26/2016 10:04 AM, Paolo Valente wrote:
->>>>>
->>>>>> Il giorno 26 ott 2016, alle ore 17:32, Jens Axboe <axboe@kernel.dk> ha scritto:
->>>>>>
->>>>>> On 10/26/2016 09:29 AM, Christoph Hellwig wrote:
->>>>>>> On Wed, Oct 26, 2016 at 05:13:07PM +0200, Arnd Bergmann wrote:
->>>>>>>> The question to ask first is whether to actually have pluggable
->>>>>>>> schedulers on blk-mq at all, or just have one that is meant to
->>>>>>>> do the right thing in every case (and possibly can be bypassed
->>>>>>>> completely).
->>>>>>>
->>>>>>> That would be my preference.  Have a BFQ-variant for blk-mq as an
->>>>>>> option (default to off unless opted in by the driver or user), and
->>>>>>> not other scheduler for blk-mq.  Don't bother with bfq for non
->>>>>>> blk-mq.  It's not like there is any advantage in the legacy-request
->>>>>>> device even for slow devices, except for the option of having I/O
->>>>>>> scheduling.
->>>>>>
->>>>>> It's the only right way forward. blk-mq might not offer any substantial
->>>>>> advantages to rotating storage, but with scheduling, it won't offer a
->>>>>> downside either. And it'll take us towards the real goal, which is to
->>>>>> have just one IO path.
->>>>>
->>>>> ok
->>>>>
->>>>>> Adding a new scheduler for the legacy IO path
->>>>>> makes no sense.
->>>>>
->>>>> I would fully agree if effective and stable I/O scheduling would be
->>>>> available in blk-mq in one or two months.  But I guess that it will
->>>>> take at least one year optimistically, given the current status of the
->>>>> needed infrastructure, and given the great difficulties of doing
->>>>> effective scheduling at the high parallelism and extreme target speeds
->>>>> of blk-mq.  Of course, this holds true unless little clever scheduling
->>>>> is performed.
->>>>>
->>>>> So, what's the point in forcing a lot of users wait another year or
->>>>> more, for a solution that has yet to be even defined, while they could
->>>>> enjoy a much better system, and then switch an even better system when
->>>>> scheduling is ready in blk-mq too?
->>>>
->>>> That same argument could have been made 2 years ago. Saying no to a new
->>>> scheduler for the legacy framework goes back roughly that long. We could
->>>> have had BFQ for mq NOW, if we didn't keep coming back to this very
->>>> point.
->>>>
->>>> I'm hesistant to add a new scheduler because it's very easy to add, very
->>>> difficult to get rid of. If we do add BFQ as a legacy scheduler now,
->>>> it'll take us years and years to get rid of it again. We should be
->>>> moving towards LESS moving parts in the legacy path, not more.
->>>>
->>>> We can keep having this discussion every few years, but I think we'd
->>>> both prefer to make some actual progress here. It's perfectly fine to
->>>> add an interface for a single queue interface for an IO scheduler for
->>>> blk-mq, since we don't care too much about scalability there. And that
->>>> won't take years, that should be a few weeks. Retrofitting BFQ on top of
->>>> that should not be hard either. That can co-exist with a real multiqueue
->>>> scheduler as well, something that's geared towards some fairness for
->>>> faster devices.
->>>
->>> OK, so some solution like having a variant of blk_sq_make_request() that
->>> will consume requests, do IO scheduling decisions on them, and feed them
->>> into the HW queue is it sees fit would be acceptable? That will provide the
->>> IO scheduler a global view that it needs for complex scheduling decisions
->>> so it should indeed be relatively easy to port BFQ to work like that.
->>
->> I'd probably start off Omar's base [1] that switches the software queues
->> to store bios instead of requests, since that lifts the of the 1:1
->> mapping between what we can queue up and what we can dispatch. Without
->> that, the IO scheduler won't have too much to work with. And with that
->> in place, it'll be a "bio in, request out" type of setup, which is
->> similar to what we have in the legacy path.
->>
->> I'd keep the software queues, but as a starting point, mandate 1
->> hardware queue to keep that as the per-device view of the state. The IO
->> scheduler would be responsible for moving one or more bios from the
->> software queues to the hardware queue, when they are ready to dispatch.
->>
->> [1] https://github.com/osandov/linux/commit/8ef3508628b6cf7c4712cd3d8084ee11ef5d2530
+On 10/27/2016 04:27 PM, Linus Walleij wrote:
+> On Thu, Oct 27, 2016 at 11:08 PM, Jens Axboe <axboe@kernel.dk> wrote:
 >
-> Yeah, but what would be software queues actually good for for a single
-> queue device with device-global IO scheduling? The IO scheduler doing
-> complex decisions will keep all the bios / requests in a single structure
-> anyway so there's no scalability to gain from per-cpu software queues...
-> So you can directly consume bios in your ->make_request handler, place it
-> in IO scheduler structures and then push requests out to the HW queue in
-> response to HW tags getting freed (i.e. IO completion). No need
-> for intermediate software queues. But maybe I miss something.
+>> blk-mq has evolved to support a variety of devices, there's nothing
+>> special about mmc that can't work well within that framework.
+>
+> There is. Read mmc_queue_thread() in drivers/mmc/card/queue.c
+>
+> This repeatedly calls req = blk_fetch_request(q);, starting one request
+> and then getting the next one off the queue, including reading
+> a few NULL requests off the end of the queue (to satisfy the
+> semantics of its state machine.
+>
+> It then preprocess each request by esstially calling .pre() and .post()
+> hooks all the way down to the driver, flushing its mapped
+> sglist from CPU to DMA device memory (not a problem on x86 and
+> other DMA-coherent archs, but a big win on the incoherent ones).
+>
+> In the attempt that was posted recently this is achieved by lying
+> and saying the HW queue is two items deep and eating requests
+> off that queue calling pre/post on them.
+>
+> But as there actually exist MMC cards with command queueing, this
+> would become hopeless to handle, the hw queue depth has to reflect
+> the real depth. What we need is for the block core to call pre/post
+> hooks on each request.
+>
+> The "only" thing that doesn't work well after that is that CFQ is no
+> longer in action, which will have interesting effects on MMC throughput
+> in any fio-like stress test as it is mostly single-hw-queue.
 
-The software queues tend to take the pressure of lock contention on the
-submission side. It's one of the reasons why the single queue blk-mq
-still scales a lot better than the old request_fn model.
-
-If you bypass and grab them at make_request time, I'd be worried that we
-are now losing the various support functionality we have for block
-devices, or having to implement that differently.
+That will cause you pain with any IO scheduler that has more complex
+state, like CFQ and BFQ... I looked at the code but I don't quite get
+why it is handling requests like that. Care to expand? Is it a
+performance optimization? It looks fairly convoluted for some reason. I
+would imagine that latency would be one of the more important aspects
+for mmc, yet the driver has a context switch for each sync IO.
 
 -- 
 Jens Axboe
