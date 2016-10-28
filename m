@@ -1,73 +1,60 @@
-Return-Path: <broonie@sirena.org.uk>
-Date: Fri, 28 Oct 2016 18:12:01 +0100
-From: Mark Brown <broonie@kernel.org>
+Return-Path: <arnd@arndb.de>
+From: Arnd Bergmann <arnd@arndb.de>
 To: Jens Axboe <axboe@kernel.dk>
-Cc: Ulf Hansson <ulf.hansson@linaro.org>,
-	Paolo Valente <paolo.valente@linaro.org>,
-	Christoph Hellwig <hch@infradead.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Bart Van Assche <bart.vanassche@sandisk.com>,
-	Jan Kara <jack@suse.cz>, Tejun Heo <tj@kernel.org>,
-	linux-block@vger.kernel.org,
-	Linux-Kernal <linux-kernel@vger.kernel.org>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Hannes Reinecke <hare@suse.de>,
-	Grant Likely <grant.likely@secretlab.ca>,
-	James Bottomley <James.Bottomley@hansenpartnership.com>
-Message-ID: <20161028171201.4tzhuedvybwrmwzb@sirena.org.uk>
-References: <38156FA7-9A66-44DC-8D0C-28F149D1E49B@linaro.org>
- <09fc1e06-3fd6-b13d-0dd9-0edfb55b01d1@kernel.dk>
- <CAPDyKFrCNS_ZWzVU9Y=J9q0ewp-7=VFs4LwV69SzgSGHBxTn-g@mail.gmail.com>
- <15ee2d0e-2d3a-81e2-9f83-f875e41bf388@kernel.dk>
- <CAPDyKFoi64Q0H9x2F35oY85PMDNq4hRsmqGYiP+En+qtQ4+Bag@mail.gmail.com>
- <1ac9b794-7e7f-0748-e4c8-a13034aecbc3@kernel.dk>
- <CAPDyKFpLhp0eoS8LWy-jU0_U_cWq4immq2+bPdi-j7=oa24OjA@mail.gmail.com>
- <e792e932-cf16-4272-2388-ae813a0372b6@kernel.dk>
- <CAPDyKFqDqhMgpCN83P_dFf6wgfT3KCVT1Uw4kDMz620=3Hkj+A@mail.gmail.com>
- <4948c47a-6e24-0a81-0564-5a61b6be35e9@kernel.dk>
+Cc: Linus Walleij <linus.walleij@linaro.org>, Ulf Hansson <ulf.hansson@linaro.org>, Paolo Valente <paolo.valente@linaro.org>, Christoph Hellwig <hch@infradead.org>, Bart Van Assche <bart.vanassche@sandisk.com>, Jan Kara <jack@suse.cz>, Tejun Heo <tj@kernel.org>, linux-block@vger.kernel.org, Linux-Kernal <linux-kernel@vger.kernel.org>, Mark Brown <broonie@kernel.org>, Hannes Reinecke <hare@suse.de>, Grant Likely <grant.likely@secretlab.ca>, James Bottomley <James.Bottomley@hansenpartnership.com>, Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
+Subject: Re: [PATCH 00/14] introduce the BFQ-v0 I/O scheduler as an extra scheduler
+Date: Fri, 28 Oct 2016 18:05:35 +0200
+Message-ID: <2423164.8ioLhGisxr@wuerfel>
+In-Reply-To: <3d0b38bb-537d-94ff-574f-587bad949fdd@kernel.dk>
+References: <1477474082-2846-1-git-send-email-paolo.valente@linaro.org> <CACRpkda0fmPdM2WZ_gtW=T7xvMfP_4ErtNZseExN2AggzZbcDQ@mail.gmail.com> <3d0b38bb-537d-94ff-574f-587bad949fdd@kernel.dk>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="7r537rz6c3oikgku"
-In-Reply-To: <4948c47a-6e24-0a81-0564-5a61b6be35e9@kernel.dk>
-Subject: Re: [PATCH 00/14] introduce the BFQ-v0 I/O scheduler as an extra
- scheduler
+Content-Type: text/plain; charset="us-ascii"
 List-ID: <linux-block@vger.kernel.org>
 
+On Friday, October 28, 2016 9:30:07 AM CEST Jens Axboe wrote:
+> On 10/28/2016 03:32 AM, Linus Walleij wrote:
+> > The patch to enable MQ looks like this:
+> > https://git.kernel.org/cgit/linux/kernel/git/linusw/linux-stericsson.git/commit/?h=mmc-mq&id=8f79b527e2e854071d8da019451da68d4753f71d
+> 
+> BTW, another viable "hack" for the depth issue would be to expose more
+> than one hardware queue. It's meant to map to a distinct submission
+> region in the hardware, but there's nothing stopping the driver from
+> using it differently. Might not be cleaner than just increasing the
+> queue depth on a single queue, though.
+> 
+> That still won't solve the issue of lying about it and causing IO
+> scheduler confusion, of course.
+> 
+> Also, 4.8 and newer have support for BLK_MQ_F_BLOCKING, if you need to
+> block in ->queue_rq(). That could eliminate the need to offload to a
+> kthread manually.
 
---7r537rz6c3oikgku
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+I think the main reason for the kthread is that on ARM and other
+architectures, the dma mapping operations are fairly slow (for
+cache flushes or bounce buffering) and we want to minimize the
+time between subsequent requests being handled by the hardware.
 
-On Fri, Oct 28, 2016 at 08:17:01AM -0600, Jens Axboe wrote:
-> On 10/28/2016 12:36 AM, Ulf Hansson wrote:
+This is not unique to MMC in any way, MMC just happens to be
+common on ARM and it is limited by its lack of hardware
+command queuing.
+It would be nice to do a similar trick for SCSI disks,
+especially USB mass storage, maybe also SATA, which are the
+next most common storage devices on non-coherent ARM systems
+(SATA nowadays often comes with NCQ, so it's less of an
+issue)
 
-> > You have been pushing Paolo in different directions throughout the
-> > years with his work in BFQ, wasting lots of his time/effort.
+It may be reasonable to tie this in with the I/O scheduler:
+if you don't have a scheduler, the access to the device is
+probably rather direct and you want to avoid any complexity
+in the kernel, but if preparing a request is expensive
+and the hardware has no queuing, you probably also want to
+use a scheduler.
 
-> I have not. Various entities have advised Paolo approach it in various ways.
-> We've had blk-mq for 3 years now, my position should have been pretty clear
-> on that.
+We should probably also try to understand how this could
+work out with USB mass storage, if there is a solution at
+all, and then do it for MMC in a way that would work on
+both. I don't think the USB core can currently split the
+dma_map_sg() operation from the USB command submission,
+so this may require some deeper surgery there.
 
-Having come to this somewhat late I have to say that that hasn't been
-100% clear as a set opinion from everyone - in the time I've been
-following things there's been engagement about the meat of the code
-which gave the impression the patches were being seriously considered.
-
-But like I said in a previous mail this is all in the past anyway, we
-need to focus on the present situation.
-
---7r537rz6c3oikgku
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAABCAAGBQJYE4bhAAoJECTWi3JdVIfQRbUH/jY2o1Fh0UtDI+3EzfglRtuL
-0a3ihAYJSD4FbOimtMbyLgLG/3iKMmjWq3IFfxmlGIFvbxd3w6JKV/TBQLEwH7S+
-vcNPBdHqCZMg+ClnnZlPKhYcVfCaaLDHkiV/Z3zi8NL09PAlMxNkfCeata9tKiji
-w/PInBb2Dw3TG5V1Pe/C4ZTwrjS20tjqMUmZtFF6dFSGZWXBBH3MwjnjjcPeZ6Hq
-u0r4JcxJ8jhwVj8jvb0krIS86BOAz5WuKrcRAGkLb+3aFUq/lMQBeW3fyP/VHC1P
-HCCewPhWZNxbJ4k2S6fnhUk8mVfjfVnxc+ao7lVVFr6ydfXpLMfhy06k9rQzwrk=
-=IVh6
------END PGP SIGNATURE-----
-
---7r537rz6c3oikgku--
+	Arnd
