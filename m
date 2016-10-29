@@ -1,122 +1,59 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-Subject: [PATCH v3 02/11] blk-mq: Introduce blk_mq_hctx_stopped()
-To: Jens Axboe <axboe@fb.com>
-References: <b39eb0e7-1007-eb63-8e7f-9a7f08508379@sandisk.com>
-CC: Christoph Hellwig <hch@lst.de>,
-        James Bottomley <jejb@linux.vnet.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Ming Lei <tom.leiming@gmail.com>
+To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
+Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        Ming Lei <tom.leiming@gmail.com>,
+        Alasdair Kergon <agk@redhat.com>,
         Mike Snitzer <snitzer@redhat.com>,
-        Doug Ledford <dledford@redhat.com>,
-        Keith Busch <keith.busch@intel.com>,
-        Ming Lin <ming.l@ssi.samsung.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-Message-ID: <b5b0ffcc-767d-1b90-9c5a-52c57690dea8@sandisk.com>
-Date: Tue, 18 Oct 2016 14:49:09 -0700
-MIME-Version: 1.0
-In-Reply-To: <b39eb0e7-1007-eb63-8e7f-9a7f08508379@sandisk.com>
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-scsi-owner@vger.kernel.org
+        dm-devel@redhat.com (maintainer:DEVICE-MAPPER (LVM)),
+        Shaohua Li <shli@kernel.org>,
+        linux-raid@vger.kernel.org (open list:SOFTWARE RAID (Multiple Disks)
+        SUPPORT)
+Subject: [PATCH 07/60] dm: crypt: use bio_add_page()
+Date: Sat, 29 Oct 2016 16:08:06 +0800
+Message-Id: <1477728600-12938-8-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
+References: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Multiple functions test the BLK_MQ_S_STOPPED bit so introduce
-a helper function that performs this test.
+We have the standard interface to add page to bio, so don't
+do that in hacking way.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Sagi Grimberg <sagi@grimberg.me>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- block/blk-mq.c         | 12 ++++++------
- drivers/md/dm-rq.c     |  2 +-
- include/linux/blk-mq.h |  5 +++++
- 3 files changed, 12 insertions(+), 7 deletions(-)
+ drivers/md/dm-crypt.c | 8 +-------
+ 1 file changed, 1 insertion(+), 7 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index b5dcafb..b52b3a6 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -787,7 +787,7 @@ static void __blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx)
- 	struct list_head *dptr;
- 	int queued;
+diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
+index a2768835d394..4999c7497f95 100644
+--- a/drivers/md/dm-crypt.c
++++ b/drivers/md/dm-crypt.c
+@@ -994,7 +994,6 @@ static struct bio *crypt_alloc_buffer(struct dm_crypt_io *io, unsigned size)
+ 	gfp_t gfp_mask = GFP_NOWAIT | __GFP_HIGHMEM;
+ 	unsigned i, len, remaining_size;
+ 	struct page *page;
+-	struct bio_vec *bvec;
  
--	if (unlikely(test_bit(BLK_MQ_S_STOPPED, &hctx->state)))
-+	if (unlikely(blk_mq_hctx_stopped(hctx)))
- 		return;
+ retry:
+ 	if (unlikely(gfp_mask & __GFP_DIRECT_RECLAIM))
+@@ -1019,12 +1018,7 @@ static struct bio *crypt_alloc_buffer(struct dm_crypt_io *io, unsigned size)
  
- 	WARN_ON(!cpumask_test_cpu(raw_smp_processor_id(), hctx->cpumask) &&
-@@ -912,8 +912,8 @@ static int blk_mq_hctx_next_cpu(struct blk_mq_hw_ctx *hctx)
+ 		len = (remaining_size > PAGE_SIZE) ? PAGE_SIZE : remaining_size;
  
- void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
- {
--	if (unlikely(test_bit(BLK_MQ_S_STOPPED, &hctx->state) ||
--	    !blk_mq_hw_queue_mapped(hctx)))
-+	if (unlikely(blk_mq_hctx_stopped(hctx) ||
-+		     !blk_mq_hw_queue_mapped(hctx)))
- 		return;
+-		bvec = &clone->bi_io_vec[clone->bi_vcnt++];
+-		bvec->bv_page = page;
+-		bvec->bv_len = len;
+-		bvec->bv_offset = 0;
+-
+-		clone->bi_iter.bi_size += len;
++		bio_add_page(clone, page, len, 0);
  
- 	if (!async && !(hctx->flags & BLK_MQ_F_BLOCKING)) {
-@@ -938,7 +938,7 @@ void blk_mq_run_hw_queues(struct request_queue *q, bool async)
- 	queue_for_each_hw_ctx(q, hctx, i) {
- 		if ((!blk_mq_hctx_has_pending(hctx) &&
- 		    list_empty_careful(&hctx->dispatch)) ||
--		    test_bit(BLK_MQ_S_STOPPED, &hctx->state))
-+		    blk_mq_hctx_stopped(hctx))
- 			continue;
- 
- 		blk_mq_run_hw_queue(hctx, async);
-@@ -988,7 +988,7 @@ void blk_mq_start_stopped_hw_queues(struct request_queue *q, bool async)
- 	int i;
- 
- 	queue_for_each_hw_ctx(q, hctx, i) {
--		if (!test_bit(BLK_MQ_S_STOPPED, &hctx->state))
-+		if (!blk_mq_hctx_stopped(hctx))
- 			continue;
- 
- 		clear_bit(BLK_MQ_S_STOPPED, &hctx->state);
-@@ -1332,7 +1332,7 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
- 		blk_mq_put_ctx(data.ctx);
- 		if (!old_rq)
- 			goto done;
--		if (test_bit(BLK_MQ_S_STOPPED, &data.hctx->state) ||
-+		if (blk_mq_hctx_stopped(data.hctx) ||
- 		    blk_mq_direct_issue_request(old_rq, &cookie) != 0)
- 			blk_mq_insert_request(old_rq, false, true, true);
- 		goto done;
-diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
-index dc75bea..76d1666 100644
---- a/drivers/md/dm-rq.c
-+++ b/drivers/md/dm-rq.c
-@@ -909,7 +909,7 @@ static int dm_mq_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	 * hctx that it really shouldn't.  The following check guards
- 	 * against this rarity (albeit _not_ race-free).
- 	 */
--	if (unlikely(test_bit(BLK_MQ_S_STOPPED, &hctx->state)))
-+	if (unlikely(blk_mq_hctx_stopped(hctx)))
- 		return BLK_MQ_RQ_QUEUE_BUSY;
- 
- 	if (ti->type->busy && ti->type->busy(ti))
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 535ab2e..bb000c3 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -239,6 +239,11 @@ int blk_mq_reinit_tagset(struct blk_mq_tag_set *set);
- 
- void blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set, int nr_hw_queues);
- 
-+static inline bool blk_mq_hctx_stopped(struct blk_mq_hw_ctx *hctx)
-+{
-+	return test_bit(BLK_MQ_S_STOPPED, &hctx->state);
-+}
-+
- /*
-  * Driver command data is immediately after the request. So subtract request
-  * size to get back to the original request, add request size to get the PDU.
+ 		remaining_size -= len;
+ 	}
 -- 
-2.10.1
+2.7.4
 
