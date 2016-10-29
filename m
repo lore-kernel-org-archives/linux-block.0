@@ -1,47 +1,134 @@
-Return-Path: <msnitzer@redhat.com>
-From: Mike Snitzer <snitzer@redhat.com>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org, dm-devel@redhat.com
-Subject: [PATCH] block: disallow changing max_sectors_kb on a request stacking device
-Date: Fri, 28 Oct 2016 15:45:49 -0400
-Message-Id: <20161028194549.14556-1-snitzer@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-cys01nam02on0076.outbound.protection.outlook.com ([104.47.37.76]:33977
+        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1752423AbcJ2AUj (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 28 Oct 2016 20:20:39 -0400
+Subject: [PATCH v5 05/14] blk-mq: Avoid that requeueing starts stopped queues
+To: Jens Axboe <axboe@fb.com>
+References: <7460e8b2-2cfd-c0d5-7ae7-7f662d89dad3@sandisk.com>
+CC: Christoph Hellwig <hch@lst.de>,
+        James Bottomley <jejb@linux.vnet.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Doug Ledford <dledford@redhat.com>,
+        Keith Busch <keith.busch@intel.com>,
+        Ming Lei <tom.leiming@gmail.com>,
+        "Konrad Rzeszutek Wilk" <konrad.wilk@oracle.com>,
+        =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+From: Bart Van Assche <bart.vanassche@sandisk.com>
+Message-ID: <8d5b97cb-429a-e451-ad2e-ad63a3f94dfd@sandisk.com>
+Date: Fri, 28 Oct 2016 17:20:32 -0700
+MIME-Version: 1.0
+In-Reply-To: <7460e8b2-2cfd-c0d5-7ae7-7f662d89dad3@sandisk.com>
+Content-Type: text/plain; charset="utf-8"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Otherwise users can easily shoot themselves in the foot by creating the
-situation where the top-level stacked device (e.g. DM multipath) has a
-larger max_sectors_kb than the underlying device(s).  Which will
-certainly lead to IO errors due to the "over max size limit" check in
-blk_cloned_rq_check_limits().
+Since blk_mq_requeue_work() starts stopped queues and since
+execution of this function can be scheduled after a queue has
+been stopped it is not possible to stop queues without using
+an additional state variable to track whether or not the queue
+has been stopped. Hence modify blk_mq_requeue_work() such that it
+does not start stopped queues. My conclusion after a review of
+the blk_mq_stop_hw_queues() and blk_mq_{delay_,}kick_requeue_list()
+callers is as follows:
+* In the dm driver starting and stopping queues should only happen
+  if __dm_suspend() or __dm_resume() is called and not if the
+  requeue list is processed.
+* In the SCSI core queue stopping and starting should only be
+  performed by the scsi_internal_device_block() and
+  scsi_internal_device_unblock() functions but not by any other
+  function. Although the blk_mq_stop_hw_queue() call in
+  scsi_queue_rq() may help to reduce CPU load if a LLD queue is
+  full, figuring out whether or not a queue should be restarted
+  when requeueing a command would require to introduce additional
+  locking in scsi_mq_requeue_cmd() to avoid a race with
+  scsi_internal_device_block(). Avoid this complexity by removing
+  the blk_mq_stop_hw_queue() call from scsi_queue_rq().
+* In the NVMe core only the functions that call
+  blk_mq_start_stopped_hw_queues() explicitly should start stopped
+  queues.
+* A blk_mq_start_stopped_hwqueues() call must be added in the
+  xen-blkfront driver in its blkif_recover() function.
 
-Use of WARN_ON_ONCE() gives users visibility into which application
-attempted to perform this unsupported max_sectors_kb change.
-
-This is a crude, yet effective, solution that forces the use of system
-software (e.g. udev rules or multipathd) to tweak max_sectors_kb of the
-underlying devices _before_ a layer like DM multipath is layered ontop.
-
-Signed-off-by: Mike Snitzer <snitzer@redhat.com>
+Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+Cc: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+Cc: Roger Pau Monné <roger.pau@citrix.com>
+Cc: Mike Snitzer <snitzer@redhat.com>
+Cc: James Bottomley <jejb@linux.vnet.ibm.com>
+Cc: Martin K. Petersen <martin.petersen@oracle.com>
 ---
- block/blk-sysfs.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ block/blk-mq.c               | 6 +-----
+ drivers/block/xen-blkfront.c | 1 +
+ drivers/md/dm-rq.c           | 7 +------
+ drivers/scsi/scsi_lib.c      | 1 -
+ 4 files changed, 3 insertions(+), 12 deletions(-)
 
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 9cc8d7c..cce43d7 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -199,8 +199,12 @@ queue_max_sectors_store(struct request_queue *q, const char *page, size_t count)
- 	unsigned long max_sectors_kb,
- 		max_hw_sectors_kb = queue_max_hw_sectors(q) >> 1,
- 			page_kb = 1 << (PAGE_SHIFT - 10);
--	ssize_t ret = queue_var_store(&max_sectors_kb, page, count);
-+	ssize_t ret;
-+
-+	if (WARN_ON_ONCE(blk_queue_stackable(q)))
-+		return -EINVAL;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index c8ae970..fe367b5 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -503,11 +503,7 @@ static void blk_mq_requeue_work(struct work_struct *work)
+ 		blk_mq_insert_request(rq, false, false, false);
+ 	}
  
-+	ret = queue_var_store(&max_sectors_kb, page, count);
- 	if (ret < 0)
- 		return ret;
+-	/*
+-	 * Use the start variant of queue running here, so that running
+-	 * the requeue work will kick stopped queues.
+-	 */
+-	blk_mq_start_hw_queues(q);
++	blk_mq_run_hw_queues(q, false);
+ }
  
+ void blk_mq_add_to_requeue_list(struct request *rq, bool at_head)
+diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
+index 9908597..60fff99 100644
+--- a/drivers/block/xen-blkfront.c
++++ b/drivers/block/xen-blkfront.c
+@@ -2045,6 +2045,7 @@ static int blkif_recover(struct blkfront_info *info)
+ 		BUG_ON(req->nr_phys_segments > segs);
+ 		blk_mq_requeue_request(req);
+ 	}
++	blk_mq_start_stopped_hwqueues(info->rq);
+ 	blk_mq_kick_requeue_list(info->rq);
+ 
+ 	while ((bio = bio_list_pop(&info->bio_list)) != NULL) {
+diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
+index 1d0d2ad..1794de5 100644
+--- a/drivers/md/dm-rq.c
++++ b/drivers/md/dm-rq.c
+@@ -338,12 +338,7 @@ static void dm_old_requeue_request(struct request *rq)
+ 
+ static void __dm_mq_kick_requeue_list(struct request_queue *q, unsigned long msecs)
+ {
+-	unsigned long flags;
+-
+-	spin_lock_irqsave(q->queue_lock, flags);
+-	if (!blk_queue_stopped(q))
+-		blk_mq_delay_kick_requeue_list(q, msecs);
+-	spin_unlock_irqrestore(q->queue_lock, flags);
++	blk_mq_delay_kick_requeue_list(q, msecs);
+ }
+ 
+ void dm_mq_kick_requeue_list(struct mapped_device *md)
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index 2cca9cf..126a784 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -1941,7 +1941,6 @@ static int scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
+ out:
+ 	switch (ret) {
+ 	case BLK_MQ_RQ_QUEUE_BUSY:
+-		blk_mq_stop_hw_queue(hctx);
+ 		if (atomic_read(&sdev->device_busy) == 0 &&
+ 		    !scsi_device_blocked(sdev))
+ 			blk_mq_delay_queue(hctx, SCSI_QUEUE_DELAY);
 -- 
-2.8.4 (Apple Git-73)
+2.10.1
+
