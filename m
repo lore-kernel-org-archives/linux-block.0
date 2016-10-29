@@ -1,102 +1,69 @@
-Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
-Subject: [PATCH 10/12] SRP transport, scsi-mq: Wait for .queue_rq() if
- necessary
-To: Jens Axboe <axboe@fb.com>
-References: <b22edafc-725f-0419-d074-34d35d57d126@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-Message-ID: <0cd77719-1f11-d5c3-3186-1c7c3cfd6886@sandisk.com>
-Date: Wed, 26 Oct 2016 15:55:34 -0700
-MIME-Version: 1.0
-In-Reply-To: <b22edafc-725f-0419-d074-34d35d57d126@sandisk.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
-List-Post: <mailto:linux-nvme@lists.infradead.org>
-List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- James Bottomley <jejb@linux.vnet.ibm.com>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- Mike Snitzer <snitzer@redhat.com>,
- "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
- Ming Lei <tom.leiming@gmail.com>,
- "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
- Keith Busch <keith.busch@intel.com>, Doug Ledford <dledford@redhat.com>,
- "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
- Laurence Oberman <loberman@redhat.com>, Christoph Hellwig <hch@lst.de>
-Content-Type: text/plain; charset="us-ascii"
-Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
-Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
+Return-Path: <tom.leiming@gmail.com>
+Return-Path: <tom.leiming@gmail.com>
+From: Ming Lei <tom.leiming@gmail.com>
+To: Jens Axboe <axboe@fb.com>,
+	linux-kernel@vger.kernel.org
+Cc: linux-block@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>,
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+	Ming Lei <tom.leiming@gmail.com>,
+	Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 37/60] block: bounce: don't access bio->bi_io_vec in copy_to_high_bio_irq
+Date: Sat, 29 Oct 2016 16:08:36 +0800
+Message-Id: <1477728600-12938-38-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
+References: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Ensure that if scsi-mq is enabled that scsi_wait_for_queuecommand()
-waits until ongoing shost->hostt->queuecommand() calls have finished.
+As we need to support multipage bvecs, so don't access bio->bi_io_vec
+in copy_to_high_bio_irq(), and just use the standard iterator
+to do that.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Cc: James Bottomley <jejb@linux.vnet.ibm.com>
-Cc: Martin K. Petersen <martin.petersen@oracle.com>
-Cc: Doug Ledford <dledford@redhat.com>
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- drivers/scsi/scsi_lib.c | 20 +++++++++++++++-----
- 1 file changed, 15 insertions(+), 5 deletions(-)
+ block/bounce.c | 16 +++++++++++-----
+ 1 file changed, 11 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index c1561e7..9b8b19e 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -2724,8 +2724,6 @@ EXPORT_SYMBOL_GPL(sdev_evt_send_simple);
- /**
-  * scsi_request_fn_active() - number of kernel threads inside scsi_request_fn()
-  * @shost: SCSI host for which to count the number of scsi_request_fn() callers.
-- *
-- * To do: add support for scsi-mq in this function.
-  */
- static int scsi_request_fn_active(struct Scsi_Host *shost)
+diff --git a/block/bounce.c b/block/bounce.c
+index babd3f224ca0..a42f7b98b7e6 100644
+--- a/block/bounce.c
++++ b/block/bounce.c
+@@ -102,24 +102,30 @@ int init_emergency_isa_pool(void)
+ static void copy_to_high_bio_irq(struct bio *to, struct bio *from)
  {
-@@ -2744,12 +2742,20 @@ static int scsi_request_fn_active(struct Scsi_Host *shost)
- 	return request_fn_active;
- }
+ 	unsigned char *vfrom;
+-	struct bio_vec tovec, *fromvec = from->bi_io_vec;
++	struct bio_vec tovec, fromvec;
+ 	struct bvec_iter iter;
++	/*
++	 * @from bio is created by bounce, so we can iterate from
++	 * start and can't trust @from->bi_iter because it might be
++	 * changed by splitting.
++	 */
++	struct bvec_iter from_iter = BVEC_ITER_ALL_INIT;
  
-+static void scsi_mq_wait_for_queuecommand(struct Scsi_Host *shost)
-+{
-+	struct scsi_device *sdev;
-+
-+	shost_for_each_device(sdev, shost)
-+		blk_mq_quiesce_queue(sdev->request_queue);
-+}
-+
- /**
-  * scsi_wait_for_queuecommand() - wait for ongoing queuecommand() calls
-  * @shost: SCSI host pointer.
-  *
-  * Wait until the ongoing shost->hostt->queuecommand() calls that are
-- * invoked from scsi_request_fn() have finished.
-+ * invoked from either scsi_request_fn() or scsi_queue_rq() have finished.
-  *
-  * To do: avoid that scsi_send_eh_cmnd() calls queuecommand() after
-  * scsi_internal_device_block() has blocked a SCSI device and remove and also
-@@ -2757,8 +2763,12 @@ static int scsi_request_fn_active(struct Scsi_Host *shost)
-  */
- void scsi_wait_for_queuecommand(struct Scsi_Host *shost)
- {
--	while (scsi_request_fn_active(shost))
--		msleep(20);
-+	if (shost->use_blk_mq) {
-+		scsi_mq_wait_for_queuecommand(shost);
-+	} else {
-+		while (scsi_request_fn_active(shost))
-+			msleep(20);
-+	}
+ 	bio_for_each_segment(tovec, to, iter) {
+-		if (tovec.bv_page != fromvec->bv_page) {
++		fromvec = bio_iter_iovec(from, from_iter);
++		if (tovec.bv_page != fromvec.bv_page) {
+ 			/*
+ 			 * fromvec->bv_offset and fromvec->bv_len might have
+ 			 * been modified by the block layer, so use the original
+ 			 * copy, bounce_copy_vec already uses tovec->bv_len
+ 			 */
+-			vfrom = page_address(fromvec->bv_page) +
++			vfrom = page_address(fromvec.bv_page) +
+ 				tovec.bv_offset;
+ 
+ 			bounce_copy_vec(&tovec, vfrom);
+ 			flush_dcache_page(tovec.bv_page);
+ 		}
+-
+-		fromvec++;
++		bio_advance_iter(from, &from_iter, tovec.bv_len);
+ 	}
  }
- EXPORT_SYMBOL(scsi_wait_for_queuecommand);
  
 -- 
-2.10.1
-
-
-_______________________________________________
-Linux-nvme mailing list
-Linux-nvme@lists.infradead.org
-http://lists.infradead.org/mailman/listinfo/linux-nvme
+2.7.4
