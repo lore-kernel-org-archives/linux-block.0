@@ -1,293 +1,107 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga14.intel.com ([192.55.52.115]:62596 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S947385AbcJaWDw (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 31 Oct 2016 18:03:52 -0400
-From: Scott Bauer <scott.bauer@intel.com>
-To: linux-nvme@lists.infradead.org
-Cc: Rafael.Antognolli@intel.com, axboe@fb.com, keith.busch@intel.com,
-        jonathan.derrick@intel.com, j.naumann@fu-berlin.de,
-        hch@infradead.org, linux-block@vger.kernel.org,
-        Scott Bauer <scott.bauer@intel.com>
-Subject: [RFC PATCH 6/6] block: ioctl: Wire up Sed to block ioctls
-Date: Mon, 31 Oct 2016 15:58:19 -0600
-Message-Id: <1477951099-3127-7-git-send-email-scott.bauer@intel.com>
-In-Reply-To: <1477951099-3127-1-git-send-email-scott.bauer@intel.com>
-References: <1477951099-3127-1-git-send-email-scott.bauer@intel.com>
+Received: from mail-co1nam03on0083.outbound.protection.outlook.com ([104.47.40.83]:64128
+        "EHLO NAM03-CO1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1752423AbcJ2AUy (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 28 Oct 2016 20:20:54 -0400
+Subject: [PATCH v5 06/14] blk-mq: Remove blk_mq_cancel_requeue_work()
+To: Jens Axboe <axboe@fb.com>
+References: <7460e8b2-2cfd-c0d5-7ae7-7f662d89dad3@sandisk.com>
+CC: Christoph Hellwig <hch@lst.de>,
+        James Bottomley <jejb@linux.vnet.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Doug Ledford <dledford@redhat.com>,
+        Keith Busch <keith.busch@intel.com>,
+        Ming Lei <tom.leiming@gmail.com>,
+        "Konrad Rzeszutek Wilk" <konrad.wilk@oracle.com>,
+        =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+From: Bart Van Assche <bart.vanassche@sandisk.com>
+Message-ID: <7207b8ad-aec9-b7d8-e36b-8c360bf32f06@sandisk.com>
+Date: Fri, 28 Oct 2016 17:20:49 -0700
+MIME-Version: 1.0
+In-Reply-To: <7460e8b2-2cfd-c0d5-7ae7-7f662d89dad3@sandisk.com>
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Signed-off-by: Scott Bauer <scott.bauer@intel.com>
-Signed-off-by: Rafael Antognolli <Rafael.Antognolli@intel.com>
----
- block/compat_ioctl.c |  14 ++++
- block/ioctl.c        | 200 ++++++++++++++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 213 insertions(+), 1 deletion(-)
+Since blk_mq_requeue_work() no longer restarts stopped queues
+canceling requeue work is no longer needed to prevent that a
+stopped queue would be restarted. Hence remove this function.
 
-diff --git a/block/compat_ioctl.c b/block/compat_ioctl.c
-index 556826a..2b83019 100644
---- a/block/compat_ioctl.c
-+++ b/block/compat_ioctl.c
-@@ -10,6 +10,7 @@
- #include <linux/syscalls.h>
- #include <linux/types.h>
- #include <linux/uaccess.h>
-+#include <linux/sed.h>
+Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+Cc: Mike Snitzer <snitzer@redhat.com>
+Cc: Keith Busch <keith.busch@intel.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Sagi Grimberg <sagi@grimberg.me>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
+---
+ block/blk-mq.c           | 6 ------
+ drivers/md/dm-rq.c       | 2 --
+ drivers/nvme/host/core.c | 1 -
+ include/linux/blk-mq.h   | 1 -
+ 4 files changed, 10 deletions(-)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index fe367b5..534128a 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -528,12 +528,6 @@ void blk_mq_add_to_requeue_list(struct request *rq, bool at_head)
+ }
+ EXPORT_SYMBOL(blk_mq_add_to_requeue_list);
  
- static int compat_put_ushort(unsigned long arg, unsigned short val)
+-void blk_mq_cancel_requeue_work(struct request_queue *q)
+-{
+-	cancel_delayed_work_sync(&q->requeue_work);
+-}
+-EXPORT_SYMBOL_GPL(blk_mq_cancel_requeue_work);
+-
+ void blk_mq_kick_requeue_list(struct request_queue *q)
  {
-@@ -746,6 +747,19 @@ long compat_blkdev_ioctl(struct file *file, unsigned cmd, unsigned long arg)
- 	case BLKTRACETEARDOWN: /* compatible */
- 		ret = blk_trace_ioctl(bdev, cmd, compat_ptr(arg));
- 		return ret;
-+	case IOC_SED_SAVE:
-+	case IOC_SED_LOCK_UNLOCK:
-+	case IOC_SED_TAKE_OWNERSHIP:
-+	case IOC_SED_ACTIVATE_LSP:
-+	case IOC_SED_SET_PW:
-+	case IOC_SED_ACTIVATE_USR:
-+	case IOC_SED_REVERT_TPR:
-+	case IOC_SED_LR_SETUP:
-+	case IOC_SED_ADD_USR_TO_LR:
-+	case IOC_SED_ENABLE_DISABLE_MBR:
-+	case IOC_SED_ERASE_LR:
-+		return blkdev_ioctl(bdev, mode, cmd,
-+				(unsigned long)compat_ptr(arg));
- 	default:
- 		if (disk->fops->compat_ioctl)
- 			ret = disk->fops->compat_ioctl(bdev, mode, cmd, arg);
-diff --git a/block/ioctl.c b/block/ioctl.c
-index 755119c..f5c971b 100644
---- a/block/ioctl.c
-+++ b/block/ioctl.c
-@@ -8,6 +8,7 @@
- #include <linux/fs.h>
- #include <linux/blktrace_api.h>
- #include <linux/pr.h>
-+#include <linux/sed.h>
- #include <asm/uaccess.h>
+ 	kblockd_schedule_delayed_work(&q->requeue_work, 0);
+diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
+index 1794de5..2b82496 100644
+--- a/drivers/md/dm-rq.c
++++ b/drivers/md/dm-rq.c
+@@ -116,8 +116,6 @@ static void dm_mq_stop_queue(struct request_queue *q)
+ 	queue_flag_set(QUEUE_FLAG_STOPPED, q);
+ 	spin_unlock_irqrestore(q->queue_lock, flags);
  
- static int blkpg_ioctl(struct block_device *bdev, struct blkpg_ioctl_arg __user *arg)
-@@ -392,6 +393,181 @@ static int blkdev_pr_clear(struct block_device *bdev,
- 	return ops->pr_clear(bdev, c.key);
+-	/* Avoid that requeuing could restart the queue. */
+-	blk_mq_cancel_requeue_work(q);
+ 	blk_mq_stop_hw_queues(q);
  }
  
-+static int blkdev_sed_save(struct block_device *bdev,
-+		struct sed_key __user *arg)
-+{
-+	const struct sec_ops *ops = bdev->bd_disk->fops->sec_ops;
-+	struct sed_key k;
-+
-+	if (!capable(CAP_SYS_ADMIN))
-+		return -EPERM;
-+	if (!ops || !ops->send || !ops->recv)
-+		return -EOPNOTSUPP;
-+	if (copy_from_user(&k, arg, sizeof(k)))
-+		return -EFAULT;
-+
-+	return sed_save(bdev, &k);
-+}
-+
-+static int blkdev_sed_lock_unlock(struct block_device *bdev,
-+		struct sed_key __user *arg)
-+{
-+	const struct sec_ops *ops = bdev->bd_disk->fops->sec_ops;
-+	struct sed_key k;
-+
-+	if (!capable(CAP_SYS_ADMIN))
-+		return -EPERM;
-+	if (!ops || !ops->send || !ops->recv)
-+		return -EOPNOTSUPP;
-+	if (copy_from_user(&k, arg, sizeof(k)))
-+		return -EFAULT;
-+
-+	return sed_lock_unlock(bdev, &k);
-+}
-+
-+static int blkdev_sed_take_ownership(struct block_device *bdev,
-+		struct sed_key __user *arg)
-+{
-+	const struct sec_ops *ops = bdev->bd_disk->fops->sec_ops;
-+	struct sed_key k;
-+
-+	if (!capable(CAP_SYS_ADMIN))
-+		return -EPERM;
-+	if (!ops || !ops->send || !ops->recv)
-+		return -EOPNOTSUPP;
-+	if (copy_from_user(&k, arg, sizeof(k)))
-+		return -EFAULT;
-+
-+	return sed_take_ownership(bdev, &k);
-+}
-+
-+static int blkdev_sed_activate_lsp(struct block_device *bdev,
-+		struct sed_key __user *arg)
-+{
-+	const struct sec_ops *ops = bdev->bd_disk->fops->sec_ops;
-+	struct sed_key k;
-+
-+	if (!capable(CAP_SYS_ADMIN))
-+		return -EPERM;
-+	if (!ops || !ops->send || !ops->recv)
-+		return -EOPNOTSUPP;
-+	if (copy_from_user(&k, arg, sizeof(k)))
-+		return -EFAULT;
-+
-+	return sed_activate_lsp(bdev, &k);
-+}
-+
-+static int blkdev_sed_set_pw(struct block_device *bdev,
-+			     struct sed_key __user *arg)
-+{
-+	const struct sec_ops *ops = bdev->bd_disk->fops->sec_ops;
-+	struct sed_key k;
-+
-+	if (!capable(CAP_SYS_ADMIN))
-+		return -EPERM;
-+	if (!ops || !ops->send || !ops->recv)
-+		return -EOPNOTSUPP;
-+	if (copy_from_user(&k, arg, sizeof(k)))
-+		return -EFAULT;
-+
-+	return sed_set_pw(bdev, &k);
-+}
-+
-+static int blkdev_sed_activate_user(struct block_device *bdev,
-+				    struct sed_key __user *arg)
-+{
-+	const struct sec_ops *ops = bdev->bd_disk->fops->sec_ops;
-+	struct sed_key k;
-+
-+	if (!capable(CAP_SYS_ADMIN))
-+		return -EPERM;
-+	if (!ops || !ops->send || !ops->recv)
-+		return -EOPNOTSUPP;
-+	if (copy_from_user(&k, arg, sizeof(k)))
-+		return -EFAULT;
-+	return sed_activate_user(bdev, &k);
-+}
-+
-+static int blkdev_sed_reverttper(struct block_device *bdev,
-+				 struct sed_key __user *arg)
-+{
-+	const struct sec_ops *ops = bdev->bd_disk->fops->sec_ops;
-+	struct sed_key k;
-+
-+	if (!capable(CAP_SYS_ADMIN))
-+		return -EPERM;
-+	if (!ops || !ops->send || !ops->recv)
-+		return -EOPNOTSUPP;
-+	if (copy_from_user(&k, arg, sizeof(k)))
-+		return -EFAULT;
-+
-+	return sed_reverttper(bdev, &k);
-+}
-+
-+static int blkdev_sed_setuplr(struct block_device *bdev,
-+			      struct sed_key __user *arg)
-+{
-+	const struct sec_ops *ops = bdev->bd_disk->fops->sec_ops;
-+	struct sed_key k;
-+
-+	if (!capable(CAP_SYS_ADMIN))
-+		return -EPERM;
-+	if (!ops || !ops->send || !ops->recv)
-+		return -EOPNOTSUPP;
-+	if (copy_from_user(&k, arg, sizeof(k)))
-+		return -EFAULT;
-+
-+	return sed_setup_locking_range(bdev, &k);
-+}
-+
-+static int blkdev_sed_add_usr_to_lr(struct block_device *bdev,
-+				    struct sed_key __user *arg)
-+{
-+	const struct sec_ops *ops = bdev->bd_disk->fops->sec_ops;
-+	struct sed_key k;
-+
-+	if (!capable(CAP_SYS_ADMIN))
-+		return -EPERM;
-+	if (!ops || !ops->send || !ops->recv)
-+		return -EOPNOTSUPP;
-+	if (copy_from_user(&k, arg, sizeof(k)))
-+		return -EFAULT;
-+
-+	return sed_adduser_to_lr(bdev, &k);
-+}
-+
-+static int blkdev_sed_do_mbr(struct block_device *bdev,
-+			     struct sed_key __user *arg)
-+{
-+	const struct sec_ops *ops = bdev->bd_disk->fops->sec_ops;
-+	struct sed_key k;
-+
-+	if (!capable(CAP_SYS_ADMIN))
-+		return -EPERM;
-+	if (!ops || !ops->send || !ops->recv)
-+		return -EOPNOTSUPP;
-+	if (copy_from_user(&k, arg, sizeof(k)))
-+		return -EFAULT;
-+
-+	return sed_do_mbr(bdev, &k);
-+}
-+
-+static int blkdev_sed_erase_lr(struct block_device *bdev,
-+			     struct sed_key __user *arg)
-+{
-+	const struct sec_ops *ops = bdev->bd_disk->fops->sec_ops;
-+	struct sed_key k;
-+
-+	if (!capable(CAP_SYS_ADMIN))
-+		return -EPERM;
-+	if (!ops || !ops->send || !ops->recv)
-+		return -EOPNOTSUPP;
-+	if (copy_from_user(&k, arg, sizeof(k)))
-+		return -EFAULT;
-+
-+	return sed_erase_lr(bdev, &k);
-+}
-+
- /*
-  * Is it an unrecognized ioctl? The correct returns are either
-  * ENOTTY (final) or ENOIOCTLCMD ("I don't know this one, try a
-@@ -551,7 +727,7 @@ int blkdev_ioctl(struct block_device *bdev, fmode_t mode, unsigned cmd,
- 		return put_ushort(arg, !blk_queue_nonrot(bdev_get_queue(bdev)));
- 	case BLKRASET:
- 	case BLKFRASET:
--		if(!capable(CAP_SYS_ADMIN))
-+		if (!capable(CAP_SYS_ADMIN))
- 			return -EACCES;
- 		bdi = blk_get_backing_dev_info(bdev);
- 		bdi->ra_pages = (arg * 512) / PAGE_SIZE;
-@@ -586,6 +762,28 @@ int blkdev_ioctl(struct block_device *bdev, fmode_t mode, unsigned cmd,
- 		return blkdev_pr_preempt(bdev, argp, true);
- 	case IOC_PR_CLEAR:
- 		return blkdev_pr_clear(bdev, argp);
-+	case IOC_SED_SAVE:
-+		return blkdev_sed_save(bdev, argp);
-+	case IOC_SED_LOCK_UNLOCK:
-+		return blkdev_sed_lock_unlock(bdev, argp);
-+	case IOC_SED_TAKE_OWNERSHIP:
-+		return blkdev_sed_take_ownership(bdev, argp);
-+	case IOC_SED_ACTIVATE_LSP:
-+		return blkdev_sed_activate_lsp(bdev, argp);
-+	case IOC_SED_SET_PW:
-+		return blkdev_sed_set_pw(bdev, argp);
-+	case IOC_SED_ACTIVATE_USR:
-+		return blkdev_sed_activate_user(bdev, argp);
-+	case IOC_SED_REVERT_TPR:
-+		return blkdev_sed_reverttper(bdev, argp);
-+	case IOC_SED_LR_SETUP:
-+		return blkdev_sed_setuplr(bdev, argp);
-+	case IOC_SED_ADD_USR_TO_LR:
-+		return blkdev_sed_add_usr_to_lr(bdev, argp);
-+	case IOC_SED_ENABLE_DISABLE_MBR:
-+		return blkdev_sed_do_mbr(bdev, argp);
-+	case IOC_SED_ERASE_LR:
-+		return blkdev_sed_erase_lr(bdev, argp);
- 	default:
- 		return __blkdev_driver_ioctl(bdev, mode, cmd, arg);
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 79e679d..ab5f59e 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -2083,7 +2083,6 @@ void nvme_stop_queues(struct nvme_ctrl *ctrl)
+ 		queue_flag_set(QUEUE_FLAG_STOPPED, ns->queue);
+ 		spin_unlock_irq(ns->queue->queue_lock);
+ 
+-		blk_mq_cancel_requeue_work(ns->queue);
+ 		blk_mq_stop_hw_queues(ns->queue);
  	}
+ 	mutex_unlock(&ctrl->namespaces_mutex);
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index aa93000..a85a20f 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -217,7 +217,6 @@ void __blk_mq_end_request(struct request *rq, int error);
+ 
+ void blk_mq_requeue_request(struct request *rq);
+ void blk_mq_add_to_requeue_list(struct request *rq, bool at_head);
+-void blk_mq_cancel_requeue_work(struct request_queue *q);
+ void blk_mq_kick_requeue_list(struct request_queue *q);
+ void blk_mq_delay_kick_requeue_list(struct request_queue *q, unsigned long msecs);
+ void blk_mq_abort_requeue_list(struct request_queue *q);
 -- 
-2.7.4
+2.10.1
 
