@@ -1,45 +1,44 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f194.google.com ([209.85.192.194]:36280 "EHLO
-        mail-pf0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S941020AbcJ2INK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sat, 29 Oct 2016 04:13:10 -0400
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
 From: Ming Lei <tom.leiming@gmail.com>
 To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
 Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         Christoph Hellwig <hch@infradead.org>,
         "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
         Ming Lei <tom.leiming@gmail.com>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        Pavel Machek <pavel@ucw.cz>, Len Brown <len.brown@intel.com>,
-        linux-pm@vger.kernel.org (open list:HIBERNATION (aka Software Suspend,
-        aka swsusp))
-Subject: [PATCH 17/60] kernel/power/swap.c: comment on direct access to bvec table
-Date: Sat, 29 Oct 2016 16:08:16 +0800
-Message-Id: <1477728600-12938-18-git-send-email-tom.leiming@gmail.com>
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        dm-devel@redhat.com (maintainer:DEVICE-MAPPER (LVM)),
+        Shaohua Li <shli@kernel.org>,
+        linux-raid@vger.kernel.org (open list:SOFTWARE RAID (Multiple Disks)
+        SUPPORT)
+Subject: [PATCH 58/60] dm-crypt: convert to bio_for_each_segment_all_rd()
+Date: Sat, 29 Oct 2016 16:08:57 +0800
+Message-Id: <1477728600-12938-59-git-send-email-tom.leiming@gmail.com>
 In-Reply-To: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
 References: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
 Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- kernel/power/swap.c | 2 ++
- 1 file changed, 2 insertions(+)
+ drivers/md/dm-crypt.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/kernel/power/swap.c b/kernel/power/swap.c
-index a3b1e617bcdc..8bc13a4461bc 100644
---- a/kernel/power/swap.c
-+++ b/kernel/power/swap.c
-@@ -238,6 +238,8 @@ static void hib_init_batch(struct hib_bio_batch *hb)
- static void hib_end_io(struct bio *bio)
+diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
+index 4999c7497f95..ed0f54e51638 100644
+--- a/drivers/md/dm-crypt.c
++++ b/drivers/md/dm-crypt.c
+@@ -1034,8 +1034,9 @@ static void crypt_free_buffer_pages(struct crypt_config *cc, struct bio *clone)
  {
- 	struct hib_bio_batch *hb = bio->bi_private;
-+
-+	/* single page bio, safe for multipage bvec */
- 	struct page *page = bio->bi_io_vec[0].bv_page;
+ 	unsigned int i;
+ 	struct bio_vec *bv;
++	struct bvec_iter_all bia;
  
- 	if (bio->bi_error) {
+-	bio_for_each_segment_all(bv, clone, i) {
++	bio_for_each_segment_all_rd(bv, clone, i, bia) {
+ 		BUG_ON(!bv->bv_page);
+ 		mempool_free(bv->bv_page, cc->page_pool);
+ 		bv->bv_page = NULL;
 -- 
 2.7.4
 
