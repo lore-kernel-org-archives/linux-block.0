@@ -1,126 +1,114 @@
-Return-Path: <tom.leiming@gmail.com>
-Return-Path: <tom.leiming@gmail.com>
-From: Ming Lei <tom.leiming@gmail.com>
-To: Jens Axboe <axboe@fb.com>,
-	linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
-	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-	Ming Lei <tom.leiming@gmail.com>,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 43/60] block: use bio_for_each_segment_mp() to map sg
-Date: Sat, 29 Oct 2016 16:08:42 +0800
-Message-Id: <1477728600-12938-44-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
-References: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-dm3nam03on0074.outbound.protection.outlook.com ([104.47.41.74]:12666
+        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1753086AbcJ2AUO (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 28 Oct 2016 20:20:14 -0400
+Subject: [PATCH v5 04/14] blk-mq: Move more code into
+ blk_mq_direct_issue_request()
+To: Jens Axboe <axboe@fb.com>
+References: <7460e8b2-2cfd-c0d5-7ae7-7f662d89dad3@sandisk.com>
+CC: Christoph Hellwig <hch@lst.de>,
+        James Bottomley <jejb@linux.vnet.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Doug Ledford <dledford@redhat.com>,
+        Keith Busch <keith.busch@intel.com>,
+        Ming Lei <tom.leiming@gmail.com>,
+        "Konrad Rzeszutek Wilk" <konrad.wilk@oracle.com>,
+        =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+From: Bart Van Assche <bart.vanassche@sandisk.com>
+Message-ID: <2b30ad84-5b66-f475-7663-28d38b47e67a@sandisk.com>
+Date: Fri, 28 Oct 2016 17:20:02 -0700
+MIME-Version: 1.0
+In-Reply-To: <7460e8b2-2cfd-c0d5-7ae7-7f662d89dad3@sandisk.com>
+Content-Type: text/plain; charset="utf-8"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-It is more efficient to use bio_for_each_segment_mp()
-for mapping sg, meantime we have to consider splitting
-multipage bvec as done in blk_bio_segment_split().
+Move the "hctx stopped" test and the insert request calls into
+blk_mq_direct_issue_request(). Rename that function into
+blk_mq_try_issue_directly() to reflect its new semantics. Pass
+the hctx pointer to that function instead of looking it up a
+second time. These changes avoid that code has to be duplicated
+in the next patch.
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-merge.c | 72 +++++++++++++++++++++++++++++++++++++++----------------
- 1 file changed, 52 insertions(+), 20 deletions(-)
+ block/blk-mq.c | 18 ++++++++++--------
+ 1 file changed, 10 insertions(+), 8 deletions(-)
 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 9142f1fc914b..e3b8cbc8b675 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -442,6 +442,56 @@ static int blk_phys_contig_segment(struct request_queue *q, struct bio *bio,
- 	return 0;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 283e0eb..c8ae970 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1243,11 +1243,11 @@ static struct request *blk_mq_map_request(struct request_queue *q,
+ 	return rq;
  }
  
-+static inline struct scatterlist *blk_next_sg(struct scatterlist **sg,
-+		struct scatterlist *sglist)
-+{
-+	if (!*sg)
-+		return sglist;
-+	else {
-+		/*
-+		 * If the driver previously mapped a shorter
-+		 * list, we could see a termination bit
-+		 * prematurely unless it fully inits the sg
-+		 * table on each mapping. We KNOW that there
-+		 * must be more entries here or the driver
-+		 * would be buggy, so force clear the
-+		 * termination bit to avoid doing a full
-+		 * sg_init_table() in drivers for each command.
-+		 */
-+		sg_unmark_end(*sg);
-+		return sg_next(*sg);
-+	}
-+}
-+
-+static inline unsigned
-+blk_bvec_map_sg(struct request_queue *q, struct bio_vec *bvec,
-+		struct scatterlist *sglist, struct scatterlist **sg)
-+{
-+	unsigned nbytes = bvec->bv_len;
-+	unsigned nsegs = 0, total = 0;
-+
-+	while (nbytes > 0) {
-+		unsigned seg_size;
-+		struct page *pg;
-+		unsigned offset, idx;
-+
-+		*sg = blk_next_sg(sg, sglist);
-+
-+		seg_size = min(nbytes, queue_max_segment_size(q));
-+		offset = (total + bvec->bv_offset) % PAGE_SIZE;
-+		idx = (total + bvec->bv_offset) / PAGE_SIZE;
-+		pg = nth_page(bvec->bv_page, idx);
-+
-+		sg_set_page(*sg, pg, seg_size, offset);
-+
-+		total += seg_size;
-+		nbytes -= seg_size;
-+		nsegs++;
-+	}
-+
-+	return nsegs;
-+}
-+
- static inline void
- __blk_segment_map_sg(struct request_queue *q, struct bio_vec *bvec,
- 		     struct scatterlist *sglist, struct bio_vec *bvprv,
-@@ -475,25 +525,7 @@ __blk_segment_map_sg(struct request_queue *q, struct bio_vec *bvec,
- 		(*sg)->length += nbytes;
- 	} else {
- new_segment:
--		if (!*sg)
--			*sg = sglist;
--		else {
--			/*
--			 * If the driver previously mapped a shorter
--			 * list, we could see a termination bit
--			 * prematurely unless it fully inits the sg
--			 * table on each mapping. We KNOW that there
--			 * must be more entries here or the driver
--			 * would be buggy, so force clear the
--			 * termination bit to avoid doing a full
--			 * sg_init_table() in drivers for each command.
--			 */
--			sg_unmark_end(*sg);
--			*sg = sg_next(*sg);
--		}
--
--		sg_set_page(*sg, bvec->bv_page, nbytes, bvec->bv_offset);
--		(*nsegs)++;
-+		(*nsegs) += blk_bvec_map_sg(q, bvec, sglist, sg);
+-static int blk_mq_direct_issue_request(struct request *rq, blk_qc_t *cookie)
++static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
++				      struct request *rq, blk_qc_t *cookie)
+ {
+ 	int ret;
+ 	struct request_queue *q = rq->q;
+-	struct blk_mq_hw_ctx *hctx = blk_mq_map_queue(q, rq->mq_ctx->cpu);
+ 	struct blk_mq_queue_data bd = {
+ 		.rq = rq,
+ 		.list = NULL,
+@@ -1255,6 +1255,9 @@ static int blk_mq_direct_issue_request(struct request *rq, blk_qc_t *cookie)
+ 	};
+ 	blk_qc_t new_cookie = blk_tag_to_qc_t(rq->tag, hctx->queue_num);
  
- 		/* for making iterator happy */
- 		bvec->bv_offset -= advance;
-@@ -536,7 +568,7 @@ static int __blk_bios_map_sg(struct request_queue *q, struct bio *bio,
++	if (blk_mq_hctx_stopped(hctx))
++		goto insert;
++
+ 	/*
+ 	 * For OK queue, we are done. For error, kill it. Any other
+ 	 * error (busy), just add it to our list as we previously
+@@ -1263,7 +1266,7 @@ static int blk_mq_direct_issue_request(struct request *rq, blk_qc_t *cookie)
+ 	ret = q->mq_ops->queue_rq(hctx, &bd);
+ 	if (ret == BLK_MQ_RQ_QUEUE_OK) {
+ 		*cookie = new_cookie;
+-		return 0;
++		return;
  	}
  
- 	for_each_bio(bio)
--		bio_for_each_segment(bvec, bio, iter)
-+		bio_for_each_segment_mp(bvec, bio, iter)
- 			__blk_segment_map_sg(q, &bvec, sglist, &bvprv, sg,
- 					     &nsegs, &cluster);
+ 	__blk_mq_requeue_request(rq);
+@@ -1272,10 +1275,11 @@ static int blk_mq_direct_issue_request(struct request *rq, blk_qc_t *cookie)
+ 		*cookie = BLK_QC_T_NONE;
+ 		rq->errors = -EIO;
+ 		blk_mq_end_request(rq, rq->errors);
+-		return 0;
++		return;
+ 	}
+ 
+-	return -1;
++insert:
++	blk_mq_insert_request(rq, false, true, true);
+ }
+ 
+ /*
+@@ -1352,9 +1356,7 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
+ 		blk_mq_put_ctx(data.ctx);
+ 		if (!old_rq)
+ 			goto done;
+-		if (blk_mq_hctx_stopped(data.hctx) ||
+-		    blk_mq_direct_issue_request(old_rq, &cookie) != 0)
+-			blk_mq_insert_request(old_rq, false, true, true);
++		blk_mq_try_issue_directly(data.hctx, old_rq, &cookie);
+ 		goto done;
+ 	}
  
 -- 
-2.7.4
+2.10.1
+
