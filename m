@@ -1,60 +1,48 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f195.google.com ([209.85.192.195]:34689 "EHLO
-        mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S942779AbcJ2IOI (ORCPT
+Received: from mail-pf0-f196.google.com ([209.85.192.196]:36025 "EHLO
+        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S966359AbcJ2IP4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 29 Oct 2016 04:14:08 -0400
+        Sat, 29 Oct 2016 04:15:56 -0400
 From: Ming Lei <tom.leiming@gmail.com>
 To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
 Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         Christoph Hellwig <hch@infradead.org>,
         "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
         Ming Lei <tom.leiming@gmail.com>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        dm-devel@redhat.com (maintainer:DEVICE-MAPPER (LVM)),
-        Shaohua Li <shli@kernel.org>,
-        linux-raid@vger.kernel.org (open list:SOFTWARE RAID (Multiple Disks)
-        SUPPORT)
-Subject: [PATCH 29/60] dm: limit the max bio size as BIO_SP_MAX_SECTORS << SECTOR_SHIFT
-Date: Sat, 29 Oct 2016 16:08:28 +0800
-Message-Id: <1477728600-12938-30-git-send-email-tom.leiming@gmail.com>
+        Joern Engel <joern@logfs.org>,
+        Prasad Joshi <prasadjoshi.linux@gmail.com>,
+        logfs@logfs.org (open list:LogFS)
+Subject: [PATCH 52/60] logfs: convert to bio_for_each_segment_all_rd()
+Date: Sat, 29 Oct 2016 16:08:51 +0800
+Message-Id: <1477728600-12938-53-git-send-email-tom.leiming@gmail.com>
 In-Reply-To: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
 References: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-For BIO based DM, some targets aren't ready for dealing with
-bigger incoming bio than 1Mbyte, such as crypt and log write
-targets.
-
 Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- drivers/md/dm.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+ fs/logfs/dev_bdev.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index ef7bf1dd6900..ce454c6c1a4e 100644
---- a/drivers/md/dm.c
-+++ b/drivers/md/dm.c
-@@ -899,7 +899,16 @@ int dm_set_target_max_io_len(struct dm_target *ti, sector_t len)
- 		return -EINVAL;
+diff --git a/fs/logfs/dev_bdev.c b/fs/logfs/dev_bdev.c
+index f05a02ff43e6..b81bd2154253 100644
+--- a/fs/logfs/dev_bdev.c
++++ b/fs/logfs/dev_bdev.c
+@@ -55,10 +55,11 @@ static void writeseg_end_io(struct bio *bio)
+ 	int i;
+ 	struct super_block *sb = bio->bi_private;
+ 	struct logfs_super *super = logfs_super(sb);
++	struct bvec_iter_all bia;
+ 
+ 	BUG_ON(bio->bi_error); /* FIXME: Retry io or write elsewhere */
+ 
+-	bio_for_each_segment_all(bvec, bio, i) {
++	bio_for_each_segment_all_rd(bvec, bio, i, bia) {
+ 		end_page_writeback(bvec->bv_page);
+ 		put_page(bvec->bv_page);
  	}
- 
--	ti->max_io_len = (uint32_t) len;
-+	/*
-+	 * BIO based queue uses its own splitting. When multipage bvecs
-+	 * is switched on, size of the incoming bio may be too big to
-+	 * be handled in some targets, such as crypt and log write.
-+	 *
-+	 * When these targets are ready for the big bio, we can remove
-+	 * the limit.
-+	 */
-+	ti->max_io_len = min_t(uint32_t, len,
-+			       BIO_SP_MAX_SECTORS << SECTOR_SHIFT);
- 
- 	return 0;
- }
 -- 
 2.7.4
 
