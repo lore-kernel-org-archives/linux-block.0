@@ -1,52 +1,47 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f52.google.com ([74.125.82.52]:33989 "EHLO
-        mail-wm0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1756402AbcJ0OuE (ORCPT
+Received: from mail-pf0-f196.google.com ([209.85.192.196]:34587 "EHLO
+        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753038AbcJ2INt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Oct 2016 10:50:04 -0400
-Received: by mail-wm0-f52.google.com with SMTP id 140so5599041wmv.1
-        for <linux-block@vger.kernel.org>; Thu, 27 Oct 2016 07:50:03 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH 2/7] lightnvm: do not decide on device blocks
-Date: Thu, 27 Oct 2016 16:49:38 +0200
-Message-Id: <1477579783-5289-2-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1477579783-5289-1-git-send-email-javier@cnexlabs.com>
-References: <1477579783-5289-1-git-send-email-javier@cnexlabs.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+        Sat, 29 Oct 2016 04:13:49 -0400
+From: Ming Lei <tom.leiming@gmail.com>
+To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
+Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        Ming Lei <tom.leiming@gmail.com>,
+        Jiri Kosina <jikos@kernel.org>
+Subject: [PATCH 25/60] block: pktcdvd: set NO_MP for pktcdvd request queue
+Date: Sat, 29 Oct 2016 16:08:24 +0800
+Message-Id: <1477728600-12938-26-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
+References: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Device blocks should be marked by the device and considered as bad
-blocks by the media manager. Thus, do not make assumptions on which
-blocks are going to be used by the device. In doing so we might lose
-valid blocks from the free list.
+At least pkt_start_write() operates on the bvec table directly,
+it isn't ready to enable multipage bvec yet, so mark the
+flag now.
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- drivers/lightnvm/gennvm.c | 6 ------
- 1 file changed, 6 deletions(-)
+ drivers/block/pktcdvd.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/lightnvm/gennvm.c b/drivers/lightnvm/gennvm.c
-index 730d736..a7e17fa 100644
---- a/drivers/lightnvm/gennvm.c
-+++ b/drivers/lightnvm/gennvm.c
-@@ -371,12 +371,6 @@ static int gen_blocks_init(struct nvm_dev *dev, struct gen_dev *gn)
- 			block->lun = &lun->vlun;
- 			block->id = cur_block_id++;
+diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
+index 817d2cc17d01..403c93b46ea3 100644
+--- a/drivers/block/pktcdvd.c
++++ b/drivers/block/pktcdvd.c
+@@ -2518,6 +2518,9 @@ static void pkt_init_queue(struct pktcdvd_device *pd)
+ 	blk_queue_logical_block_size(q, CD_FRAMESIZE);
+ 	blk_queue_max_hw_sectors(q, PACKET_MAX_SECTORS);
+ 	q->queuedata = pd;
++
++	/* not ready for multipage bvec yet */
++	set_bit(QUEUE_FLAG_NO_MP, &q->queue_flags);
+ }
  
--			/* First block is reserved for device */
--			if (unlikely(lun_iter == 0 && blk_iter == 0)) {
--				lun->vlun.nr_free_blocks--;
--				continue;
--			}
--
- 			list_add_tail(&block->list, &lun->free_list);
- 		}
- 
+ static int pkt_seq_show(struct seq_file *m, void *p)
 -- 
 2.7.4
 
