@@ -1,51 +1,115 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f193.google.com ([209.85.192.193]:36063 "EHLO
-        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1756894AbcJ2IMj (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sat, 29 Oct 2016 04:12:39 -0400
-From: Ming Lei <tom.leiming@gmail.com>
-To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Ming Lei <tom.leiming@gmail.com>,
-        Alasdair Kergon <agk@redhat.com>,
+Received: from mail-bn3nam01on0071.outbound.protection.outlook.com ([104.47.33.71]:17488
+        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1753086AbcJ2AUH (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 28 Oct 2016 20:20:07 -0400
+From: Bart Van Assche <bart.vanassche@sandisk.com>
+Subject: [PATCH v5 0/14] Fix race conditions related to stopping block layer
+ queues
+To: Jens Axboe <axboe@fb.com>
+CC: Christoph Hellwig <hch@lst.de>,
+        James Bottomley <jejb@linux.vnet.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
         Mike Snitzer <snitzer@redhat.com>,
-        dm-devel@redhat.com (maintainer:DEVICE-MAPPER (LVM)),
-        Shaohua Li <shli@kernel.org>,
-        linux-raid@vger.kernel.org (open list:SOFTWARE RAID (Multiple Disks)
-        SUPPORT)
-Subject: [PATCH 09/60] dm: dm.c: replace 'bio->bi_vcnt == 1' with !bio_multiple_segments
-Date: Sat, 29 Oct 2016 16:08:08 +0800
-Message-Id: <1477728600-12938-10-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
-References: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
+        Doug Ledford <dledford@redhat.com>,
+        Keith Busch <keith.busch@intel.com>,
+        Ming Lei <tom.leiming@gmail.com>,
+        "Konrad Rzeszutek Wilk" <konrad.wilk@oracle.com>,
+        =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+Message-ID: <7460e8b2-2cfd-c0d5-7ae7-7f662d89dad3@sandisk.com>
+Date: Fri, 28 Oct 2016 17:18:17 -0700
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Avoid to access .bi_vcnt directly, because it may be not what
-the driver expected any more after supporting multipage bvec.
+Hello Jens,
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
----
- drivers/md/dm-rq.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Multiple block drivers need the functionality to stop a request queue 
+and to wait until all ongoing request_fn() / queue_rq() calls have 
+finished without waiting until all outstanding requests have finished. 
+Hence this patch series that introduces the blk_mq_quiesce_queue() 
+function. The dm-mq, SRP and NVMe patches in this patch series are three 
+examples of where these functions are useful. These patches have been 
+tested on top of kernel v4.9-rc2. The following tests have been run to 
+verify this patch series:
+- Mike's mptest suite that stress-tests dm-multipath.
+- My own srp-test suite that stress-tests SRP on top of dm-multipath.
+- fio on top of the NVMeOF host driver that was connected to the NVMeOF
+   target driver on the same host.
+- Laurence verified the previous version (v3) of this patch series by
+   running it through the Red Hat SRP and NVMe test suites.
 
-diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
-index 1d0d2adc050a..8534cbf8ce35 100644
---- a/drivers/md/dm-rq.c
-+++ b/drivers/md/dm-rq.c
-@@ -819,7 +819,8 @@ static void dm_old_request_fn(struct request_queue *q)
- 			pos = blk_rq_pos(rq);
- 
- 		if ((dm_old_request_peeked_before_merge_deadline(md) &&
--		     md_in_flight(md) && rq->bio && rq->bio->bi_vcnt == 1 &&
-+		     md_in_flight(md) && rq->bio &&
-+		     !bio_multiple_segments(rq->bio) &&
- 		     md->last_rq_pos == pos && md->last_rq_rw == rq_data_dir(rq)) ||
- 		    (ti->type->busy && ti->type->busy(ti))) {
- 			blk_delay_queue(q, 10);
--- 
-2.7.4
+The changes compared to the third version of this patch series are:
+- Added a blk_mq_stop_hw_queues() call in blk_mq_quiesce_queue() as
+   requested by Ming Lei.
+- Modified scsi_unblock_target() such that it waits until
+   .queuecommand() finished. Unexported scsi_wait_for_queuecommand().
+- Reordered the two NVMe patches.
+- Added a patch that avoids that blk_mq_requeue_work() restarts stopped
+   queues.
+- Added a patch that removes blk_mq_cancel_requeue_work().
 
+Changes between v4 and v3:
+- Left out the dm changes from the patch that introduces
+   blk_mq_hctx_stopped() because a later patch deletes the changed code
+   from the dm core.
+- Moved the blk_mq_hctx_stopped() declaration from a public to a
+   private block layer header file.
+- Added a new patch that moves more code into
+   blk_mq_direct_issue_request(). This patch avoids that a new function
+   has to be introduced to avoid code duplication.
+- Explained the implemented algorithm in the patch that introduces
+   blk_mq_quiesce_queue() in the description of the patch that
+   introduces this function.
+- Added "select SRCU" to the patch that introduces
+   blk_mq_quiesce_queue() to avoid build failures.
+- Documented the shost argument in the scsi_wait_for_queuecommand()
+   kerneldoc header.
+- Fixed an unintended behavior change in the last patch of this series.
+
+Changes between v3 and v2:
+- Changed the order of the patches in this patch series.
+- Added several new patches: a patch that avoids that .queue_rq() gets
+   invoked from the direct submission path if a queue has been stopped
+   and also a patch that introduces the helper function
+   blk_mq_hctx_stopped().
+- blk_mq_quiesce_queue() has been reworked (thanks to Ming Lin and Sagi
+   for their feedback).
+- A bool 'kick' argument has been added to blk_mq_requeue_request().
+- As proposed by Christoph, the code that waits for queuecommand() has
+   been moved from the SRP transport driver to the SCSI core.
+
+Changes between v2 and v1:
+- Dropped the non-blk-mq changes from this patch series.
+- Added support for harware queues with BLK_MQ_F_BLOCKING set.
+- Added a call stack to the description of the dm race fix patch.
+- Dropped the non-scsi-mq changes from the SRP patch.
+- Added a patch that introduces blk_mq_queue_stopped() in the dm driver.
+
+The individual patches in this series are:
+
+0001-blk-mq-Do-not-invoke-.queue_rq-for-a-stopped-queue.patch
+0002-blk-mq-Introduce-blk_mq_hctx_stopped.patch
+0003-blk-mq-Introduce-blk_mq_queue_stopped.patch
+0004-blk-mq-Move-more-code-into-blk_mq_direct_issue_reque.patch
+0005-blk-mq-Avoid-that-requeueing-starts-stopped-queues.patch
+0006-blk-mq-Remove-blk_mq_cancel_requeue_work.patch
+0007-blk-mq-Introduce-blk_mq_quiesce_queue.patch
+0008-blk-mq-Add-a-kick_requeue_list-argument-to-blk_mq_re.patch
+0009-dm-Use-BLK_MQ_S_STOPPED-instead-of-QUEUE_FLAG_STOPPE.patch
+0010-dm-Fix-a-race-condition-related-to-stopping-and-star.patch
+0011-SRP-transport-Move-queuecommand-wait-code-to-SCSI-co.patch
+0012-SRP-transport-scsi-mq-Wait-for-.queue_rq-if-necessar.patch
+0013-nvme-Fix-a-race-condition-related-to-stopping-queues.patch
+0014-nvme-Use-BLK_MQ_S_STOPPED-instead-of-QUEUE_FLAG_STOP.patch
+
+Thanks,
+
+Bart.
