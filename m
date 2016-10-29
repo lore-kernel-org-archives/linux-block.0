@@ -1,65 +1,57 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:43059 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1752444AbcJCVUg (ORCPT
+Received: from mail-pf0-f195.google.com ([209.85.192.195]:35533 "EHLO
+        mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933122AbcJ2IMm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 3 Oct 2016 17:20:36 -0400
-Received: from pps.filterd (m0001303.ppops.net [127.0.0.1])
-        by m0001303.ppops.net (8.16.0.17/8.16.0.17) with SMTP id u93LGccw024557
-        for <linux-block@vger.kernel.org>; Mon, 3 Oct 2016 14:20:35 -0700
-Received: from mail.thefacebook.com ([199.201.64.23])
-        by m0001303.ppops.net with ESMTP id 25t8tbef3a-1
-        (version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT)
-        for <linux-block@vger.kernel.org>; Mon, 03 Oct 2016 14:20:35 -0700
-Received: from facebook.com (2401:db00:21:603d:face:0:19:0)     by
- mx-out.facebook.com (10.223.100.99) with ESMTP id
- 37a5b54c89af11e693a824be05956610-83ffaa50 for <linux-block@vger.kernel.org>;
-        Mon, 03 Oct 2016 14:20:32 -0700
-From: Shaohua Li <shli@fb.com>
-To: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <axboe@fb.com>, <Kernel-team@fb.com>, <tj@kernel.org>,
-        <jmoyer@redhat.com>, <vgoyal@redhat.com>
-Subject: [PATCH v3 06/11] blk-throttle: make sure expire time isn't too big
-Date: Mon, 3 Oct 2016 14:20:25 -0700
-Message-ID: <bdd738c6104cee359264cdc3ed4bf10d668c476a.1475529372.git.shli@fb.com>
-In-Reply-To: <cover.1475529372.git.shli@fb.com>
-References: <cover.1475529372.git.shli@fb.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+        Sat, 29 Oct 2016 04:12:42 -0400
+From: Ming Lei <tom.leiming@gmail.com>
+To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
+Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        Ming Lei <tom.leiming@gmail.com>,
+        Joern Engel <joern@logfs.org>,
+        Prasad Joshi <prasadjoshi.linux@gmail.com>,
+        logfs@logfs.org (open list:LogFS)
+Subject: [PATCH 10/60] fs: logfs: convert to bio_add_page() in sync_request()
+Date: Sat, 29 Oct 2016 16:08:09 +0800
+Message-Id: <1477728600-12938-11-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
+References: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-cgroup could be throttled to a limit but when all cgroups cross high
-limit, queue enters a higher state and so the group should be throttled
-to a higher limit. It's possible the cgroup is sleeping because of
-throttle and other cgroups don't dispatch IO any more. In this case,
-nobody can trigger current downgrade/upgrade logic. To fix this issue,
-we could either set up a timer to wakeup the cgroup if other cgroups are
-idle or make sure this cgroup doesn't sleep too long. Setting up a timer
-means we must change the timer very frequently. This patch chooses the
-latter. Making cgroup sleep time not too big wouldn't change cgroup
-bps/iops, but could make it wakeup more frequently, which isn't a big
-issue because throtl_slice * 8 is already quite big.
+Always bio_add_page() is the standard and preferred way to
+do the task.
 
-Signed-off-by: Shaohua Li <shli@fb.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- block/blk-throttle.c | 3 +++
- 1 file changed, 3 insertions(+)
+ fs/logfs/dev_bdev.c | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 41b75a3..778de0b 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -589,6 +589,9 @@ static void throtl_dequeue_tg(struct throtl_grp *tg)
- static void throtl_schedule_pending_timer(struct throtl_service_queue *sq,
- 					  unsigned long expires)
- {
-+	unsigned long max_expire = jiffies + 8 * throtl_slice;
-+	if (time_after(expires, max_expire))
-+		expires = max_expire;
- 	mod_timer(&sq->pending_timer, expires);
- 	throtl_log(sq, "schedule timer. delay=%lu jiffies=%lu",
- 		   expires - jiffies, jiffies);
+diff --git a/fs/logfs/dev_bdev.c b/fs/logfs/dev_bdev.c
+index 2bf53b0ffe83..696dcdd65fdd 100644
+--- a/fs/logfs/dev_bdev.c
++++ b/fs/logfs/dev_bdev.c
+@@ -20,15 +20,12 @@ static int sync_request(struct page *page, struct block_device *bdev, int op)
+ 	struct bio_vec bio_vec;
+ 
+ 	bio_init_with_vec_table(&bio, &bio_vec, 1);
+-	bio_vec.bv_page = page;
+-	bio_vec.bv_len = PAGE_SIZE;
+-	bio_vec.bv_offset = 0;
+-	bio.bi_vcnt = 1;
+ 	bio.bi_bdev = bdev;
+ 	bio.bi_iter.bi_sector = page->index * (PAGE_SIZE >> 9);
+-	bio.bi_iter.bi_size = PAGE_SIZE;
+ 	bio_set_op_attrs(&bio, op, 0);
+ 
++	bio_add_page(&bio, page, PAGE_SIZE, 0);
++
+ 	return submit_bio_wait(&bio);
+ }
+ 
 -- 
-2.9.3
+2.7.4
 
