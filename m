@@ -1,47 +1,60 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f196.google.com ([209.85.192.196]:34587 "EHLO
-        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753038AbcJ2INt (ORCPT
+Received: from mail-pf0-f195.google.com ([209.85.192.195]:34689 "EHLO
+        mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S942779AbcJ2IOI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 29 Oct 2016 04:13:49 -0400
+        Sat, 29 Oct 2016 04:14:08 -0400
 From: Ming Lei <tom.leiming@gmail.com>
 To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
 Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         Christoph Hellwig <hch@infradead.org>,
         "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
         Ming Lei <tom.leiming@gmail.com>,
-        Jiri Kosina <jikos@kernel.org>
-Subject: [PATCH 25/60] block: pktcdvd: set NO_MP for pktcdvd request queue
-Date: Sat, 29 Oct 2016 16:08:24 +0800
-Message-Id: <1477728600-12938-26-git-send-email-tom.leiming@gmail.com>
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        dm-devel@redhat.com (maintainer:DEVICE-MAPPER (LVM)),
+        Shaohua Li <shli@kernel.org>,
+        linux-raid@vger.kernel.org (open list:SOFTWARE RAID (Multiple Disks)
+        SUPPORT)
+Subject: [PATCH 29/60] dm: limit the max bio size as BIO_SP_MAX_SECTORS << SECTOR_SHIFT
+Date: Sat, 29 Oct 2016 16:08:28 +0800
+Message-Id: <1477728600-12938-30-git-send-email-tom.leiming@gmail.com>
 In-Reply-To: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
 References: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-At least pkt_start_write() operates on the bvec table directly,
-it isn't ready to enable multipage bvec yet, so mark the
-flag now.
+For BIO based DM, some targets aren't ready for dealing with
+bigger incoming bio than 1Mbyte, such as crypt and log write
+targets.
 
 Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- drivers/block/pktcdvd.c | 3 +++
- 1 file changed, 3 insertions(+)
+ drivers/md/dm.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
-index 817d2cc17d01..403c93b46ea3 100644
---- a/drivers/block/pktcdvd.c
-+++ b/drivers/block/pktcdvd.c
-@@ -2518,6 +2518,9 @@ static void pkt_init_queue(struct pktcdvd_device *pd)
- 	blk_queue_logical_block_size(q, CD_FRAMESIZE);
- 	blk_queue_max_hw_sectors(q, PACKET_MAX_SECTORS);
- 	q->queuedata = pd;
-+
-+	/* not ready for multipage bvec yet */
-+	set_bit(QUEUE_FLAG_NO_MP, &q->queue_flags);
- }
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index ef7bf1dd6900..ce454c6c1a4e 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -899,7 +899,16 @@ int dm_set_target_max_io_len(struct dm_target *ti, sector_t len)
+ 		return -EINVAL;
+ 	}
  
- static int pkt_seq_show(struct seq_file *m, void *p)
+-	ti->max_io_len = (uint32_t) len;
++	/*
++	 * BIO based queue uses its own splitting. When multipage bvecs
++	 * is switched on, size of the incoming bio may be too big to
++	 * be handled in some targets, such as crypt and log write.
++	 *
++	 * When these targets are ready for the big bio, we can remove
++	 * the limit.
++	 */
++	ti->max_io_len = min_t(uint32_t, len,
++			       BIO_SP_MAX_SECTORS << SECTOR_SHIFT);
+ 
+ 	return 0;
+ }
 -- 
 2.7.4
 
