@@ -1,39 +1,59 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.9]:53335 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S943729AbcJaPZw (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 31 Oct 2016 11:25:52 -0400
-Date: Mon, 31 Oct 2016 08:25:49 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Ming Lei <tom.leiming@gmail.com>
-Cc: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Ming Lei <tom.leiming@gmail.com>
+To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
+Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         Christoph Hellwig <hch@infradead.org>,
         "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        Ming Lei <tom.leiming@gmail.com>,
         Philipp Reisner <philipp.reisner@linbit.com>,
         Lars Ellenberg <lars.ellenberg@linbit.com>,
-        "open list:DRBD DRIVER" <drbd-dev@lists.linbit.com>
-Subject: Re: [PATCH 03/60] block: drbd: remove impossible failure handling
-Message-ID: <20161031152549.GA30919@infradead.org>
+        drbd-dev@lists.linbit.com (open list:DRBD DRIVER)
+Subject: [PATCH 03/60] block: drbd: remove impossible failure handling
+Date: Sat, 29 Oct 2016 16:08:02 +0800
+Message-Id: <1477728600-12938-4-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
 References: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
- <1477728600-12938-4-git-send-email-tom.leiming@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1477728600-12938-4-git-send-email-tom.leiming@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-On Sat, Oct 29, 2016 at 04:08:02PM +0800, Ming Lei wrote:
-> For a non-cloned bio, bio_add_page() only returns failure when
-> the io vec table is full, but in that case, bio->bi_vcnt can't
-> be zero at all.
-> 
-> So remove the impossible failure handling.
-> 
-> Acked-by: Lars Ellenberg <lars.ellenberg@linbit.com>
-> Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+For a non-cloned bio, bio_add_page() only returns failure when
+the io vec table is full, but in that case, bio->bi_vcnt can't
+be zero at all.
 
-Looks good,
+So remove the impossible failure handling.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Acked-by: Lars Ellenberg <lars.ellenberg@linbit.com>
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+---
+ drivers/block/drbd/drbd_receiver.c | 14 +-------------
+ 1 file changed, 1 insertion(+), 13 deletions(-)
+
+diff --git a/drivers/block/drbd/drbd_receiver.c b/drivers/block/drbd/drbd_receiver.c
+index 942384f34e22..c537e3bd09eb 100644
+--- a/drivers/block/drbd/drbd_receiver.c
++++ b/drivers/block/drbd/drbd_receiver.c
+@@ -1648,20 +1648,8 @@ int drbd_submit_peer_request(struct drbd_device *device,
+ 
+ 	page_chain_for_each(page) {
+ 		unsigned len = min_t(unsigned, data_size, PAGE_SIZE);
+-		if (!bio_add_page(bio, page, len, 0)) {
+-			/* A single page must always be possible!
+-			 * But in case it fails anyways,
+-			 * we deal with it, and complain (below). */
+-			if (bio->bi_vcnt == 0) {
+-				drbd_err(device,
+-					"bio_add_page failed for len=%u, "
+-					"bi_vcnt=0 (bi_sector=%llu)\n",
+-					len, (uint64_t)bio->bi_iter.bi_sector);
+-				err = -ENOSPC;
+-				goto fail;
+-			}
++		if (!bio_add_page(bio, page, len, 0))
+ 			goto next_bio;
+-		}
+ 		data_size -= len;
+ 		sector += len >> 9;
+ 		--nr_pages;
+-- 
+2.7.4
+
