@@ -1,58 +1,98 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:43637 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1752314AbcJHCL4 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 7 Oct 2016 22:11:56 -0400
-To: Linus Torvalds <torvalds@linux-foundation.org>
-CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@fb.com>
-Subject: [GIT PULL] blk-mq CPU hotplug
-Message-ID: <e5272a53-81d4-61d9-d0c2-bc8279d08fc5@fb.com>
-Date: Fri, 7 Oct 2016 20:11:47 -0600
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Ming Lei <tom.leiming@gmail.com>
+To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
+Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        Ming Lei <tom.leiming@gmail.com>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        dm-devel@redhat.com (maintainer:DEVICE-MAPPER (LVM)),
+        Shaohua Li <shli@kernel.org>,
+        linux-raid@vger.kernel.org (open list:SOFTWARE RAID (Multiple Disks)
+        SUPPORT)
+Subject: [PATCH 08/60] dm: use bvec iterator helpers to implement .get_page and .next_page
+Date: Sat, 29 Oct 2016 16:08:07 +0800
+Message-Id: <1477728600-12938-9-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
+References: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Hi Linus,
+Firstly we have mature bvec/bio iterator helper for iterate each
+page in one bio, not necessary to reinvent a wheel to do that.
 
-Last topical branch, this is the conversion of blk-mq to the new hotplug
-state machine. This should merge cleanly.
+Secondly the coming multipage bvecs requires this patch.
 
-Please pull!
+Also add comments about the direct access to bvec table.
 
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+---
+ drivers/md/dm-io.c | 34 ++++++++++++++++++++++++----------
+ 1 file changed, 24 insertions(+), 10 deletions(-)
 
-   git://git.kernel.dk/linux-block.git for-4.9/block-smp
-
-
-----------------------------------------------------------------
-Jens Axboe (1):
-       Merge branch 'smp/for-block' of git://git.kernel.org/.../tip/tip 
-into for-4.9/block-smp
-
-Sebastian Andrzej Siewior (2):
-       blk-mq: Convert to new hotplug state machine
-       blk-mq: fixup "Convert to new hotplug state machine"
-
-Thomas Gleixner (1):
-       blk-mq/cpu-notif: Convert to new hotplug state machine
-
-  arch/x86/kernel/smpboot.c    |  11 --
-  block/Makefile               |   2 +-
-  block/blk-mq-cpu.c           |  67 ---------
-  block/blk-mq.c               | 123 +++++++---------
-  block/blk-mq.h               |   7 -
-  include/linux/blk-mq.h       |   8 +-
-  include/linux/cpuhotplug.h   | 112 +++++++++++++-
-  include/trace/events/cpuhp.h |  28 ++++
-  kernel/cpu.c                 | 344 
-+++++++++++++++++++++++++++++++------------
-  9 files changed, 444 insertions(+), 258 deletions(-)
-  delete mode 100644 block/blk-mq-cpu.c
-
-
+diff --git a/drivers/md/dm-io.c b/drivers/md/dm-io.c
+index 0bf1a12e35fe..2ef573c220fc 100644
+--- a/drivers/md/dm-io.c
++++ b/drivers/md/dm-io.c
+@@ -162,7 +162,10 @@ struct dpages {
+ 			 struct page **p, unsigned long *len, unsigned *offset);
+ 	void (*next_page)(struct dpages *dp);
+ 
+-	unsigned context_u;
++	union {
++		unsigned context_u;
++		struct bvec_iter context_bi;
++	};
+ 	void *context_ptr;
+ 
+ 	void *vma_invalidate_address;
+@@ -204,25 +207,36 @@ static void list_dp_init(struct dpages *dp, struct page_list *pl, unsigned offse
+ static void bio_get_page(struct dpages *dp, struct page **p,
+ 			 unsigned long *len, unsigned *offset)
+ {
+-	struct bio_vec *bvec = dp->context_ptr;
+-	*p = bvec->bv_page;
+-	*len = bvec->bv_len - dp->context_u;
+-	*offset = bvec->bv_offset + dp->context_u;
++	struct bio_vec bv = bvec_iter_bvec((struct bio_vec *)dp->context_ptr,
++			dp->context_bi);
++
++	*p = bv.bv_page;
++	*len = bv.bv_len;
++	*offset = bv.bv_offset;
++
++	/* avoid to figure out it in bio_next_page() again */
++	dp->context_bi.bi_sector = (sector_t)bv.bv_len;
+ }
+ 
+ static void bio_next_page(struct dpages *dp)
+ {
+-	struct bio_vec *bvec = dp->context_ptr;
+-	dp->context_ptr = bvec + 1;
+-	dp->context_u = 0;
++	unsigned int len = (unsigned int)dp->context_bi.bi_sector;
++
++	bvec_iter_advance((struct bio_vec *)dp->context_ptr,
++			&dp->context_bi, len);
+ }
+ 
+ static void bio_dp_init(struct dpages *dp, struct bio *bio)
+ {
+ 	dp->get_page = bio_get_page;
+ 	dp->next_page = bio_next_page;
+-	dp->context_ptr = __bvec_iter_bvec(bio->bi_io_vec, bio->bi_iter);
+-	dp->context_u = bio->bi_iter.bi_bvec_done;
++
++	/*
++	 * We just use bvec iterator to retrieve pages, so it is ok to
++	 * access the bvec table directly here
++	 */
++	dp->context_ptr = bio->bi_io_vec;
++	dp->context_bi = bio->bi_iter;
+ }
+ 
+ /*
 -- 
-Jens Axboe
+2.7.4
 
