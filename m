@@ -1,119 +1,186 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from gateway23.websitewelcome.com ([192.185.48.71]:49983 "EHLO
-        gateway23.websitewelcome.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S932771AbcJRWbm (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Oct 2016 18:31:42 -0400
-Received: from cm1.websitewelcome.com (cm.websitewelcome.com [192.185.0.102])
-        by gateway23.websitewelcome.com (Postfix) with ESMTP id A2A53D4536935
-        for <linux-block@vger.kernel.org>; Tue, 18 Oct 2016 16:42:31 -0500 (CDT)
-From: Stephen Bates <sbates@raithlin.com>
-To: linux-kernel@vger.kernel.org, linux-nvdimm@lists.01.org,
-        linux-rdma@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mm@kvack.org
-Cc: dan.j.williams@intel.com, ross.zwisler@linux.intel.com,
-        willy@linux.intel.com, jgunthorpe@obsidianresearch.com,
-        haggaie@mellanox.com, hch@infradead.org, axboe@fb.com,
-        corbet@lwn.net, jim.macdonald@everspin.com, sbates@raithin.com,
-        logang@deltatee.com, Stephen Bates <sbates@raithlin.com>
-Subject: [PATCH 3/3] iopmem : Add documentation for iopmem driver
-Date: Tue, 18 Oct 2016 15:42:17 -0600
-Message-Id: <1476826937-20665-4-git-send-email-sbates@raithlin.com>
-In-Reply-To: <1476826937-20665-1-git-send-email-sbates@raithlin.com>
-References: <1476826937-20665-1-git-send-email-sbates@raithlin.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <tom.leiming@gmail.com>
+Return-Path: <tom.leiming@gmail.com>
+From: Ming Lei <tom.leiming@gmail.com>
+To: Jens Axboe <axboe@fb.com>,
+	linux-kernel@vger.kernel.org
+Cc: linux-block@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>,
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+	Ming Lei <tom.leiming@gmail.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Mike Christie <mchristi@redhat.com>,
+	Hannes Reinecke <hare@suse.com>,
+	Keith Busch <keith.busch@intel.com>,
+	Mike Snitzer <snitzer@redhat.com>
+Subject: [PATCH 34/60] block: introduce bio_clone_sp()
+Date: Sat, 29 Oct 2016 16:08:33 +0800
+Message-Id: <1477728600-12938-35-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
+References: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Add documentation for the iopmem PCIe device driver.
+Firstly bio_clone() and bio_clone_bioset() are changed
+to clone mp bvecs because our iterator helpers are capable
+of splitting mp bvecs into sp bvecs.
 
-Signed-off-by: Stephen Bates <sbates@raithlin.com>
-Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+But sometimes we still need cloned bio with singlepage bvecs,
+for example, in bio bounce/bcache(bch_data_verify), bvecs of
+cloned bio need to be updated.
+
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- Documentation/blockdev/00-INDEX   |  2 ++
- Documentation/blockdev/iopmem.txt | 62 +++++++++++++++++++++++++++++++++++++++
- 2 files changed, 64 insertions(+)
- create mode 100644 Documentation/blockdev/iopmem.txt
+ block/bio.c         | 27 +++++++++++++++++++++------
+ include/linux/bio.h | 42 ++++++++++++++++++++++++++++++++++++++----
+ 2 files changed, 59 insertions(+), 10 deletions(-)
 
-diff --git a/Documentation/blockdev/00-INDEX b/Documentation/blockdev/00-INDEX
-index c08df56..913e500 100644
---- a/Documentation/blockdev/00-INDEX
-+++ b/Documentation/blockdev/00-INDEX
-@@ -8,6 +8,8 @@ cpqarray.txt
- 	- info on using Compaq's SMART2 Intelligent Disk Array Controllers.
- floppy.txt
- 	- notes and driver options for the floppy disk driver.
-+iopmem.txt
-+	- info on the iopmem block driver.
- mflash.txt
- 	- info on mGine m(g)flash driver for linux.
- nbd.txt
-diff --git a/Documentation/blockdev/iopmem.txt b/Documentation/blockdev/iopmem.txt
-new file mode 100644
-index 0000000..ba805b8
---- /dev/null
-+++ b/Documentation/blockdev/iopmem.txt
-@@ -0,0 +1,62 @@
-+IOPMEM Block Driver
-+===================
+diff --git a/block/bio.c b/block/bio.c
+index a49d1d89a85c..a9bf01784f37 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -626,16 +626,22 @@ EXPORT_SYMBOL(bio_clone_fast);
+  * 	@bio_src: bio to clone
+  *	@gfp_mask: allocation priority
+  *	@bs: bio_set to allocate from
++ *	@sp_bvecs: if clone to singlepage bvecs.
+  *
+  *	Clone bio. Caller will own the returned bio, but not the actual data it
+  *	points to. Reference count of returned bio will be one.
++ *
++ *	If @sp_bvecs is true, the caller must make sure number of singlepage
++ *	bvecs is less than maximum bvec count.
++ *
+  */
+-struct bio *bio_clone_bioset(struct bio *bio_src, gfp_t gfp_mask,
+-			     struct bio_set *bs)
++struct bio *__bio_clone_bioset(struct bio *bio_src, gfp_t gfp_mask,
++			       struct bio_set *bs, bool sp_bvecs)
+ {
+ 	struct bvec_iter iter;
+ 	struct bio_vec bv;
+ 	struct bio *bio;
++	unsigned segs;
+ 
+ 	/*
+ 	 * Pre immutable biovecs, __bio_clone() used to just do a memcpy from
+@@ -659,7 +665,12 @@ struct bio *bio_clone_bioset(struct bio *bio_src, gfp_t gfp_mask,
+ 	 *    __bio_clone_fast() anyways.
+ 	 */
+ 
+-	bio = bio_alloc_bioset(gfp_mask, bio_segments(bio_src), bs);
++	if (sp_bvecs)
++		segs = bio_segments(bio_src);
++	else
++		segs = bio_segments_mp(bio_src);
 +
-+Logan Gunthorpe and Stephen Bates - October 2016
++	bio = bio_alloc_bioset(gfp_mask, segs, bs);
+ 	if (!bio)
+ 		return NULL;
+ 	bio->bi_bdev		= bio_src->bi_bdev;
+@@ -675,8 +686,12 @@ struct bio *bio_clone_bioset(struct bio *bio_src, gfp_t gfp_mask,
+ 		bio->bi_io_vec[bio->bi_vcnt++] = bio_src->bi_io_vec[0];
+ 		break;
+ 	default:
+-		bio_for_each_segment(bv, bio_src, iter)
+-			bio->bi_io_vec[bio->bi_vcnt++] = bv;
++		if (sp_bvecs)
++			bio_for_each_segment(bv, bio_src, iter)
++				bio->bi_io_vec[bio->bi_vcnt++] = bv;
++		else
++			bio_for_each_segment_mp(bv, bio_src, iter)
++				bio->bi_io_vec[bio->bi_vcnt++] = bv;
+ 		break;
+ 	}
+ 
+@@ -694,7 +709,7 @@ struct bio *bio_clone_bioset(struct bio *bio_src, gfp_t gfp_mask,
+ 
+ 	return bio;
+ }
+-EXPORT_SYMBOL(bio_clone_bioset);
++EXPORT_SYMBOL(__bio_clone_bioset);
+ 
+ /**
+  *	bio_add_pc_page	-	attempt to add page to bio
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index 17852ba0e40f..ec1c0f2aaa19 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -217,7 +217,7 @@ static inline void bio_advance_iter_mp(struct bio *bio, struct bvec_iter *iter,
+ 
+ #define bio_iter_last(bvec, iter) ((iter).bi_size == (bvec).bv_len)
+ 
+-static inline unsigned bio_segments(struct bio *bio)
++static inline unsigned __bio_segments(struct bio *bio, bool mp)
+ {
+ 	unsigned segs = 0;
+ 	struct bio_vec bv;
+@@ -237,12 +237,26 @@ static inline unsigned bio_segments(struct bio *bio)
+ 	if (bio_op(bio) == REQ_OP_WRITE_SAME)
+ 		return 1;
+ 
+-	bio_for_each_segment(bv, bio, iter)
+-		segs++;
++	if (!mp)
++		bio_for_each_segment(bv, bio, iter)
++			segs++;
++	else
++		bio_for_each_segment_mp(bv, bio, iter)
++			segs++;
+ 
+ 	return segs;
+ }
+ 
++static inline unsigned bio_segments(struct bio *bio)
++{
++	return __bio_segments(bio, false);
++}
 +
-+Introduction
-+------------
++static inline unsigned bio_segments_mp(struct bio *bio)
++{
++	return __bio_segments(bio, true);
++}
 +
-+The iopmem module creates a DAX capable block device from a BAR on a PCIe
-+device. iopmem leverages heavily from the pmem driver although it utilizes IO
-+memory rather than system memory as its backing store.
+ /*
+  * get a reference to a bio, so it won't disappear. the intended use is
+  * something like:
+@@ -415,10 +429,24 @@ extern void bio_put(struct bio *);
+ 
+ extern void __bio_clone_fast(struct bio *, struct bio *);
+ extern struct bio *bio_clone_fast(struct bio *, gfp_t, struct bio_set *);
+-extern struct bio *bio_clone_bioset(struct bio *, gfp_t, struct bio_set *bs);
++extern struct bio *__bio_clone_bioset(struct bio *, gfp_t,
++				      struct bio_set *bs, bool);
+ 
+ extern struct bio_set *fs_bio_set;
+ 
++/* at default we clone bio with multipage bvecs */
++static inline struct bio *bio_clone_bioset(struct bio *bio, gfp_t gfp,
++					   struct bio_set *bs)
++{
++	return __bio_clone_bioset(bio, gfp, bs, false);
++}
 +
-+Usage
-+-----
++static inline struct bio *bio_clone_bioset_sp(struct bio *bio, gfp_t gfp,
++					      struct bio_set *bs)
++{
++	return __bio_clone_bioset(bio, gfp, bs, true);
++}
 +
-+To include the iopmem module in your kernel please set CONFIG_BLK_DEV_IOPMEM
-+to either y or m. A block device will be created for each PCIe attached device
-+that matches the vendor and device ID as specified in the module. Currently an
-+unallocated PMC PCIe ID is used as the default. Alternatively this driver can
-+be bound to any aribtary PCIe function using the sysfs bind entry.
+ static inline struct bio *bio_alloc(gfp_t gfp_mask, unsigned int nr_iovecs)
+ {
+ 	return bio_alloc_bioset(gfp_mask, nr_iovecs, fs_bio_set);
+@@ -429,6 +457,12 @@ static inline struct bio *bio_clone(struct bio *bio, gfp_t gfp_mask)
+ 	return bio_clone_bioset(bio, gfp_mask, fs_bio_set);
+ }
+ 
++/* Sometimes we have to clone one bio with singlepage bvec */
++static inline struct bio *bio_clone_sp(struct bio *bio, gfp_t gfp_mask)
++{
++	return __bio_clone_bioset(bio, gfp_mask, fs_bio_set, true);
++}
 +
-+The main purpose for an iopmem block device is expected to be for peer-2-peer
-+PCIe transfers. We DO NOT RECCOMEND accessing a iopmem device using the local
-+CPU unless you are doing one of the three following things:
-+
-+1. Creating a DAX capable filesystem on the iopmem device.
-+2. Creating some files on the DAX capable filesystem.
-+3. Interogating the files on said filesystem to obtain pointers that can be
-+   passed to other PCIe devices for p2p DMA operations.
-+
-+Issues
-+------
-+
-+1. Address Translation. Suggestions have been made that in certain
-+architectures and topologies the dma_addr_t passed to the DMA master
-+in a peer-2-peer transfer will not correctly route to the IO memory
-+intended. However in our testing to date we have not seen this to be
-+an issue, even in systems with IOMMUs and PCIe switches. It is our
-+understanding that an IOMMU only maps system memory and would not
-+interfere with device memory regions. (It certainly has no opportunity
-+to do so if the transfer gets routed through a switch).
-+
-+2. Memory Segment Spacing. This patch has the same limitations that
-+ZONE_DEVICE does in that memory regions must be spaces at least
-+SECTION_SIZE bytes part. On x86 this is 128MB and there are cases where
-+BARs can be placed closer together than this. Thus ZONE_DEVICE would not
-+be usable on neighboring BARs. For our purposes, this is not an issue as
-+we'd only be looking at enabling a single BAR in a given PCIe device.
-+More exotic use cases may have problems with this.
-+
-+3. Coherency Issues. When IOMEM is written from both the CPU and a PCIe
-+peer there is potential for coherency issues and for writes to occur out
-+of order. This is something that users of this feature need to be
-+cognizant of and may necessitate the use of CONFIG_EXPERT. Though really,
-+this isn't much different than the existing situation with RDMA: if
-+userspace sets up an MR for remote use, they need to be careful about
-+using that memory region themselves.
-+
-+4. Architecture. Currently this patch is applicable only to x86
-+architectures. The same is true for much of the code pertaining to
-+PMEM and ZONE_DEVICE. It is hoped that the work will be extended to other
-+ARCH over time.
---
-2.1.4
+ static inline struct bio *bio_kmalloc(gfp_t gfp_mask, unsigned int nr_iovecs)
+ {
+ 	return bio_alloc_bioset(gfp_mask, nr_iovecs, NULL);
+-- 
+2.7.4
