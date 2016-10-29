@@ -1,47 +1,53 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f196.google.com ([209.85.192.196]:35725 "EHLO
-        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S941455AbcJ2INP (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sat, 29 Oct 2016 04:13:15 -0400
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
 From: Ming Lei <tom.leiming@gmail.com>
 To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
 Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         Christoph Hellwig <hch@infradead.org>,
         "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
         Ming Lei <tom.leiming@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Michal Hocko <mhocko@suse.com>,
-        Minchan Kim <minchan@kernel.org>,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        Shaohua Li <shli@kernel.org>,
+        Eric Wheeler <git@linux.ewheeler.net>,
+        Coly Li <colyli@suse.de>, Yijing Wang <wangyijing@huawei.com>,
+        Zheng Liu <wenqing.lz@taobao.com>,
         Mike Christie <mchristi@redhat.com>,
-        Santosh Shilimkar <santosh.shilimkar@oracle.com>,
-        Joe Perches <joe@perches.com>,
-        linux-mm@kvack.org (open list:MEMORY MANAGEMENT)
-Subject: [PATCH 18/60] mm: page_io.c: comment on direct access to bvec table
-Date: Sat, 29 Oct 2016 16:08:17 +0800
-Message-Id: <1477728600-12938-19-git-send-email-tom.leiming@gmail.com>
+        linux-bcache@vger.kernel.org (open list:BCACHE (BLOCK LAYER CACHE)),
+        linux-raid@vger.kernel.org (open list:SOFTWARE RAID (Multiple Disks)
+        SUPPORT)
+Subject: [PATCH 30/60] bcache: set flag of QUEUE_FLAG_SPLIT_MP
+Date: Sat, 29 Oct 2016 16:08:29 +0800
+Message-Id: <1477728600-12938-31-git-send-email-tom.leiming@gmail.com>
 In-Reply-To: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
 References: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
+
+It isn't safe(such as bch_data_verify()) to let bcache deal with
+more than 1M bio from multipage bvec, so set this flag and size of
+incoming bio won't be bigger than BIO_SP_MAX_SECTORS.
 
 Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- mm/page_io.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/md/bcache/super.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/mm/page_io.c b/mm/page_io.c
-index a2651f58c86a..b0c0069ec1f4 100644
---- a/mm/page_io.c
-+++ b/mm/page_io.c
-@@ -43,6 +43,7 @@ static struct bio *get_swap_bio(gfp_t gfp_flags,
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index 52876fcf2b36..fca023a1a026 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -821,6 +821,12 @@ static int bcache_device_init(struct bcache_device *d, unsigned block_size,
  
- void end_swap_bio_write(struct bio *bio)
- {
-+	/* single page bio, safe for multipage bvec */
- 	struct page *page = bio->bi_io_vec[0].bv_page;
+ 	blk_queue_write_cache(q, true, true);
  
- 	if (bio->bi_error) {
++	/*
++	 * Once bcache is audited that it is ready to deal with big
++	 * incoming bio with multipage bvecs, we can remove the flag.
++	 */
++	set_bit(QUEUE_FLAG_SPLIT_MP,	&d->disk->queue->queue_flags);
++
+ 	return 0;
+ }
+ 
 -- 
 2.7.4
 
