@@ -1,103 +1,63 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:60590 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750813AbcJYOhV (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 Oct 2016 10:37:21 -0400
-Date: Tue, 25 Oct 2016 10:37:19 -0400
-From: Mike Snitzer <snitzer@redhat.com>
-To: Christoph Hellwig <hch@infradead.org>, axboe@kernel.dk
-Cc: Mikulas Patocka <mpatocka@redhat.com>, dm-devel@redhat.com,
-        "Alasdair G. Kergon" <agk@redhat.com>, linux-block@vger.kernel.org
-Subject: [PATCH] brd: remove support for BLKFLSBUF
-Message-ID: <20161025143719.GA51266@redhat.com>
-References: <alpine.LRH.2.02.1610211406290.9197@file01.intranet.prod.int.rdu2.redhat.com>
- <20161021200022.GA12580@redhat.com>
- <alpine.LRH.2.02.1610211616450.31606@file01.intranet.prod.int.rdu2.redhat.com>
- <20161024155756.GA48306@redhat.com>
- <20161025130712.GA12717@infradead.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20161025130712.GA12717@infradead.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Ming Lei <tom.leiming@gmail.com>
+To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
+Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        Ming Lei <tom.leiming@gmail.com>,
+        "Theodore Ts'o" <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        linux-ext4@vger.kernel.org (open list:EXT4 FILE SYSTEM)
+Subject: [PATCH 50/60] ext4: convert to bio_for_each_segment_all_rd()
+Date: Sat, 29 Oct 2016 16:08:49 +0800
+Message-Id: <1477728600-12938-51-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
+References: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Oct 25 2016 at  9:07P -0400,
-Christoph Hellwig <hch@infradead.org> wrote:
-
-> I think the right fix is to kill off the BLKFLSBUF special case in
-> brd.  Yes, it break compatibility - but in this case the compatibility
-> breaks more than it helps.
-
-Jens, please pick up this patch:
-
-From: Mike Snitzer <snitzer@redhat.com>
-Date: Tue, 25 Oct 2016 10:25:07 -0400
-Subject: [PATCH] brd: remove support for BLKFLSBUF
-
-Discontinue having the brd driver destructively free all pages in the
-ramdisk in response to the BLKFLSBUF ioctl.  Doing so allows a BLKFLSBUF
-ioctl issued to a logical partition to destroy pages of the parent brd
-device (and all other partitions of that brd device).
-
-This change breaks compatibility - but in this case the compatibility
-breaks more than it helps.
-
-Reported-by: Mikulas Patocka <mpatocka@redhat.com>
-Suggested-by: Christoph Hellwig <hch@infradead.org>
-Signed-off-by: Mike Snitzer <snitzer@redhat.com>
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- drivers/block/brd.c | 35 -----------------------------------
- 1 file changed, 35 deletions(-)
+ fs/ext4/page-io.c  | 3 ++-
+ fs/ext4/readpage.c | 3 ++-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/block/brd.c b/drivers/block/brd.c
-index 0c76d40..45c998a 100644
---- a/drivers/block/brd.c
-+++ b/drivers/block/brd.c
-@@ -395,44 +395,9 @@ static long brd_direct_access(struct block_device *bdev, sector_t sector,
- #define brd_direct_access NULL
- #endif
+diff --git a/fs/ext4/page-io.c b/fs/ext4/page-io.c
+index 0094923e5ebf..abde26af55e7 100644
+--- a/fs/ext4/page-io.c
++++ b/fs/ext4/page-io.c
+@@ -63,8 +63,9 @@ static void ext4_finish_bio(struct bio *bio)
+ {
+ 	int i;
+ 	struct bio_vec *bvec;
++	struct bvec_iter_all bia;
  
--static int brd_ioctl(struct block_device *bdev, fmode_t mode,
--			unsigned int cmd, unsigned long arg)
--{
--	int error;
--	struct brd_device *brd = bdev->bd_disk->private_data;
--
--	if (cmd != BLKFLSBUF)
--		return -ENOTTY;
--
--	/*
--	 * ram device BLKFLSBUF has special semantics, we want to actually
--	 * release and destroy the ramdisk data.
--	 */
--	mutex_lock(&brd_mutex);
--	mutex_lock(&bdev->bd_mutex);
--	error = -EBUSY;
--	if (bdev->bd_openers <= 1) {
--		/*
--		 * Kill the cache first, so it isn't written back to the
--		 * device.
--		 *
--		 * Another thread might instantiate more buffercache here,
--		 * but there is not much we can do to close that race.
--		 */
--		kill_bdev(bdev);
--		brd_free_pages(brd);
--		error = 0;
--	}
--	mutex_unlock(&bdev->bd_mutex);
--	mutex_unlock(&brd_mutex);
--
--	return error;
--}
--
- static const struct block_device_operations brd_fops = {
- 	.owner =		THIS_MODULE,
- 	.rw_page =		brd_rw_page,
--	.ioctl =		brd_ioctl,
- 	.direct_access =	brd_direct_access,
- };
+-	bio_for_each_segment_all(bvec, bio, i) {
++	bio_for_each_segment_all_rd(bvec, bio, i, bia) {
+ 		struct page *page = bvec->bv_page;
+ #ifdef CONFIG_EXT4_FS_ENCRYPTION
+ 		struct page *data_page = NULL;
+diff --git a/fs/ext4/readpage.c b/fs/ext4/readpage.c
+index a81b829d56de..b30444fd9333 100644
+--- a/fs/ext4/readpage.c
++++ b/fs/ext4/readpage.c
+@@ -71,6 +71,7 @@ static void mpage_end_io(struct bio *bio)
+ {
+ 	struct bio_vec *bv;
+ 	int i;
++	struct bvec_iter_all bia;
  
+ 	if (ext4_bio_encrypted(bio)) {
+ 		if (bio->bi_error) {
+@@ -80,7 +81,7 @@ static void mpage_end_io(struct bio *bio)
+ 			return;
+ 		}
+ 	}
+-	bio_for_each_segment_all(bv, bio, i) {
++	bio_for_each_segment_all_rd(bv, bio, i, bia) {
+ 		struct page *page = bv->bv_page;
+ 
+ 		if (!bio->bi_error) {
 -- 
-2.8.4 (Apple Git-73)
+2.7.4
 
