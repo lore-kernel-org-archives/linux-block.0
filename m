@@ -1,75 +1,250 @@
-Return-Path: <prvs=9107f69a83=axboe@fb.com>
-From: Jens Axboe <axboe@fb.com>
-To: <axboe@kernel.dk>, <linux-kernel@vger.kernel.org>,
-        <linux-fsdevel@vger.kernel.org>, <linux-block@vger.kernel.org>
-CC: <jack@suse.cz>, <kernel@kolivas.org>, Jens Axboe <axboe@fb.com>
-Subject: [PATCH 1/8] block: add WRITE_BG
-Date: Wed, 26 Oct 2016 14:52:08 -0600
-Message-ID: <1477515135-16469-2-git-send-email-axboe@fb.com>
-In-Reply-To: <1477515135-16469-1-git-send-email-axboe@fb.com>
-References: <1477515135-16469-1-git-send-email-axboe@fb.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Ming Lei <tom.leiming@gmail.com>
+To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
+Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        Ming Lei <tom.leiming@gmail.com>,
+        Jiri Kosina <jikos@kernel.org>,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        Shaohua Li <shli@kernel.org>, Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        dm-devel@redhat.com (maintainer:DEVICE-MAPPER (LVM)),
+        Christoph Hellwig <hch@lst.de>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Joern Engel <joern@logfs.org>,
+        Prasad Joshi <prasadjoshi.linux@gmail.com>,
+        Mike Christie <mchristi@redhat.com>,
+        Hannes Reinecke <hare@suse.com>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Guoqing Jiang <gqjiang@suse.com>,
+        Eric Wheeler <git@linux.ewheeler.net>,
+        Coly Li <colyli@suse.de>, Yijing Wang <wangyijing@huawei.com>,
+        Zheng Liu <wenqing.lz@taobao.com>,
+        linux-bcache@vger.kernel.org (open list:BCACHE (BLOCK LAYER CACHE)),
+        linux-raid@vger.kernel.org (open list:SOFTWARE RAID (Multiple Disks)
+        SUPPORT),
+        linux-nvme@lists.infradead.org (open list:NVM EXPRESS TARGET DRIVER),
+        logfs@logfs.org (open list:LogFS)
+Subject: [PATCH 02/60] block drivers: convert to bio_init_with_vec_table()
+Date: Sat, 29 Oct 2016 16:08:01 +0800
+Message-Id: <1477728600-12938-3-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
+References: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-This adds a new request flag, REQ_BG, that callers can use to tell
-the block layer that this is background (non-urgent) IO.
-
-Signed-off-by: Jens Axboe <axboe@fb.com>
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- include/linux/blk_types.h | 4 +++-
- include/linux/fs.h        | 3 +++
- 2 files changed, 6 insertions(+), 1 deletion(-)
+ drivers/block/floppy.c        |  3 +--
+ drivers/md/bcache/io.c        |  4 +---
+ drivers/md/bcache/journal.c   |  4 +---
+ drivers/md/bcache/movinggc.c  |  7 +++----
+ drivers/md/bcache/super.c     | 13 ++++---------
+ drivers/md/bcache/writeback.c |  6 +++---
+ drivers/md/dm-bufio.c         |  4 +---
+ drivers/md/raid5.c            |  9 ++-------
+ drivers/nvme/target/io-cmd.c  |  4 +---
+ fs/logfs/dev_bdev.c           |  4 +---
+ 10 files changed, 18 insertions(+), 40 deletions(-)
 
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index cd395ecec99d..765994c5b2c5 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -162,6 +162,7 @@ enum rq_flag_bits {
- 	__REQ_INTEGRITY,	/* I/O includes block integrity payload */
- 	__REQ_FUA,		/* forced unit access */
- 	__REQ_PREFLUSH,		/* request for cache flush */
-+	__REQ_BG,		/* background activity */
+diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
+index e3d8e4ced4a2..cdc916a95137 100644
+--- a/drivers/block/floppy.c
++++ b/drivers/block/floppy.c
+@@ -3806,8 +3806,7 @@ static int __floppy_read_block_0(struct block_device *bdev, int drive)
  
- 	/* bio only flags */
- 	__REQ_RAHEAD,		/* read ahead, can fail anytime */
-@@ -205,7 +206,7 @@ enum rq_flag_bits {
- 	(REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT | REQ_FAILFAST_DRIVER)
- #define REQ_COMMON_MASK \
- 	(REQ_FAILFAST_MASK | REQ_SYNC | REQ_META | REQ_PRIO | REQ_NOIDLE | \
--	 REQ_PREFLUSH | REQ_FUA | REQ_INTEGRITY | REQ_NOMERGE)
-+	 REQ_PREFLUSH | REQ_FUA | REQ_INTEGRITY | REQ_NOMERGE | REQ_BG)
- #define REQ_CLONE_MASK		REQ_COMMON_MASK
+ 	cbdata.drive = drive;
  
- /* This mask is used for both bio and request merge checking */
-@@ -230,6 +231,7 @@ enum rq_flag_bits {
- #define REQ_COPY_USER		(1ULL << __REQ_COPY_USER)
- #define REQ_PREFLUSH		(1ULL << __REQ_PREFLUSH)
- #define REQ_FLUSH_SEQ		(1ULL << __REQ_FLUSH_SEQ)
-+#define REQ_BG			(1ULL << __REQ_BG)
- #define REQ_IO_STAT		(1ULL << __REQ_IO_STAT)
- #define REQ_MIXED_MERGE		(1ULL << __REQ_MIXED_MERGE)
- #define REQ_PM			(1ULL << __REQ_PM)
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 16d2b6e874d6..baaedb05e5b2 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -189,6 +189,8 @@ typedef int (dio_iodone_t)(struct kiocb *iocb, loff_t offset,
-  * WRITE_FLUSH_FUA	Combination of WRITE_FLUSH and FUA. The IO is preceded
-  *			by a cache flush and data is guaranteed to be on
-  *			non-volatile media on completion.
-+ * WRITE_BG		Background write. This is for background activity like
-+ *			the periodic flush and background threshold writeback
-  *
-  */
- #define RW_MASK			REQ_OP_WRITE
-@@ -202,6 +204,7 @@ typedef int (dio_iodone_t)(struct kiocb *iocb, loff_t offset,
- #define WRITE_FLUSH		(REQ_SYNC | REQ_NOIDLE | REQ_PREFLUSH)
- #define WRITE_FUA		(REQ_SYNC | REQ_NOIDLE | REQ_FUA)
- #define WRITE_FLUSH_FUA		(REQ_SYNC | REQ_NOIDLE | REQ_PREFLUSH | REQ_FUA)
-+#define WRITE_BG		(REQ_NOIDLE | REQ_BG)
+-	bio_init(&bio);
+-	bio.bi_io_vec = &bio_vec;
++	bio_init_with_vec_table(&bio, &bio_vec, 1);
+ 	bio_vec.bv_page = page;
+ 	bio_vec.bv_len = size;
+ 	bio_vec.bv_offset = 0;
+diff --git a/drivers/md/bcache/io.c b/drivers/md/bcache/io.c
+index e97b0acf7b8d..af9489087cd3 100644
+--- a/drivers/md/bcache/io.c
++++ b/drivers/md/bcache/io.c
+@@ -24,9 +24,7 @@ struct bio *bch_bbio_alloc(struct cache_set *c)
+ 	struct bbio *b = mempool_alloc(c->bio_meta, GFP_NOIO);
+ 	struct bio *bio = &b->bio;
  
- /*
-  * Attribute flags.  These should be or-ed together to figure out what
+-	bio_init(bio);
+-	bio->bi_max_vecs	 = bucket_pages(c);
+-	bio->bi_io_vec		 = bio->bi_inline_vecs;
++	bio_init_with_vec_table(bio, bio->bi_inline_vecs, bucket_pages(c));
+ 
+ 	return bio;
+ }
+diff --git a/drivers/md/bcache/journal.c b/drivers/md/bcache/journal.c
+index 6925023e12d4..b966f28d1b98 100644
+--- a/drivers/md/bcache/journal.c
++++ b/drivers/md/bcache/journal.c
+@@ -448,13 +448,11 @@ static void do_journal_discard(struct cache *ca)
+ 
+ 		atomic_set(&ja->discard_in_flight, DISCARD_IN_FLIGHT);
+ 
+-		bio_init(bio);
++		bio_init_with_vec_table(bio, bio->bi_inline_vecs, 1);
+ 		bio_set_op_attrs(bio, REQ_OP_DISCARD, 0);
+ 		bio->bi_iter.bi_sector	= bucket_to_sector(ca->set,
+ 						ca->sb.d[ja->discard_idx]);
+ 		bio->bi_bdev		= ca->bdev;
+-		bio->bi_max_vecs	= 1;
+-		bio->bi_io_vec		= bio->bi_inline_vecs;
+ 		bio->bi_iter.bi_size	= bucket_bytes(ca);
+ 		bio->bi_end_io		= journal_discard_endio;
+ 
+diff --git a/drivers/md/bcache/movinggc.c b/drivers/md/bcache/movinggc.c
+index 5c4bddecfaf0..9d7991f69030 100644
+--- a/drivers/md/bcache/movinggc.c
++++ b/drivers/md/bcache/movinggc.c
+@@ -77,15 +77,14 @@ static void moving_init(struct moving_io *io)
+ {
+ 	struct bio *bio = &io->bio.bio;
+ 
+-	bio_init(bio);
++	bio_init_with_vec_table(bio, bio->bi_inline_vecs,
++				DIV_ROUND_UP(KEY_SIZE(&io->w->key),
++					     PAGE_SECTORS));
+ 	bio_get(bio);
+ 	bio_set_prio(bio, IOPRIO_PRIO_VALUE(IOPRIO_CLASS_IDLE, 0));
+ 
+ 	bio->bi_iter.bi_size	= KEY_SIZE(&io->w->key) << 9;
+-	bio->bi_max_vecs	= DIV_ROUND_UP(KEY_SIZE(&io->w->key),
+-					       PAGE_SECTORS);
+ 	bio->bi_private		= &io->cl;
+-	bio->bi_io_vec		= bio->bi_inline_vecs;
+ 	bch_bio_map(bio, NULL);
+ }
+ 
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index 849ad441cd76..d8a6d807b498 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -1152,9 +1152,7 @@ static void register_bdev(struct cache_sb *sb, struct page *sb_page,
+ 	dc->bdev = bdev;
+ 	dc->bdev->bd_holder = dc;
+ 
+-	bio_init(&dc->sb_bio);
+-	dc->sb_bio.bi_max_vecs	= 1;
+-	dc->sb_bio.bi_io_vec	= dc->sb_bio.bi_inline_vecs;
++	bio_init_with_vec_table(&dc->sb_bio, dc->sb_bio.bi_inline_vecs, 1);
+ 	dc->sb_bio.bi_io_vec[0].bv_page = sb_page;
+ 	get_page(sb_page);
+ 
+@@ -1814,9 +1812,8 @@ static int cache_alloc(struct cache *ca)
+ 	__module_get(THIS_MODULE);
+ 	kobject_init(&ca->kobj, &bch_cache_ktype);
+ 
+-	bio_init(&ca->journal.bio);
+-	ca->journal.bio.bi_max_vecs = 8;
+-	ca->journal.bio.bi_io_vec = ca->journal.bio.bi_inline_vecs;
++	bio_init_with_vec_table(&ca->journal.bio,
++				ca->journal.bio.bi_inline_vecs, 8);
+ 
+ 	free = roundup_pow_of_two(ca->sb.nbuckets) >> 10;
+ 
+@@ -1852,9 +1849,7 @@ static int register_cache(struct cache_sb *sb, struct page *sb_page,
+ 	ca->bdev = bdev;
+ 	ca->bdev->bd_holder = ca;
+ 
+-	bio_init(&ca->sb_bio);
+-	ca->sb_bio.bi_max_vecs	= 1;
+-	ca->sb_bio.bi_io_vec	= ca->sb_bio.bi_inline_vecs;
++	bio_init_with_vec_table(&ca->sb_bio, ca->sb_bio.bi_inline_vecs, 1);
+ 	ca->sb_bio.bi_io_vec[0].bv_page = sb_page;
+ 	get_page(sb_page);
+ 
+diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
+index e51644e503a5..b2568cef8c86 100644
+--- a/drivers/md/bcache/writeback.c
++++ b/drivers/md/bcache/writeback.c
+@@ -106,14 +106,14 @@ static void dirty_init(struct keybuf_key *w)
+ 	struct dirty_io *io = w->private;
+ 	struct bio *bio = &io->bio;
+ 
+-	bio_init(bio);
++	bio_init_with_vec_table(bio, bio->bi_inline_vecs,
++				DIV_ROUND_UP(KEY_SIZE(&w->key),
++					     PAGE_SECTORS));
+ 	if (!io->dc->writeback_percent)
+ 		bio_set_prio(bio, IOPRIO_PRIO_VALUE(IOPRIO_CLASS_IDLE, 0));
+ 
+ 	bio->bi_iter.bi_size	= KEY_SIZE(&w->key) << 9;
+-	bio->bi_max_vecs	= DIV_ROUND_UP(KEY_SIZE(&w->key), PAGE_SECTORS);
+ 	bio->bi_private		= w;
+-	bio->bi_io_vec		= bio->bi_inline_vecs;
+ 	bch_bio_map(bio, NULL);
+ }
+ 
+diff --git a/drivers/md/dm-bufio.c b/drivers/md/dm-bufio.c
+index 125aedc3875f..5b13e7e7c8aa 100644
+--- a/drivers/md/dm-bufio.c
++++ b/drivers/md/dm-bufio.c
+@@ -611,9 +611,7 @@ static void use_inline_bio(struct dm_buffer *b, int rw, sector_t block,
+ 	char *ptr;
+ 	int len;
+ 
+-	bio_init(&b->bio);
+-	b->bio.bi_io_vec = b->bio_vec;
+-	b->bio.bi_max_vecs = DM_BUFIO_INLINE_VECS;
++	bio_init_with_vec_table(&b->bio, b->bio_vec, DM_BUFIO_INLINE_VECS);
+ 	b->bio.bi_iter.bi_sector = block << b->c->sectors_per_block_bits;
+ 	b->bio.bi_bdev = b->c->bdev;
+ 	b->bio.bi_end_io = inline_endio;
+diff --git a/drivers/md/raid5.c b/drivers/md/raid5.c
+index 92ac251e91e6..eae7b4cf34d4 100644
+--- a/drivers/md/raid5.c
++++ b/drivers/md/raid5.c
+@@ -2004,13 +2004,8 @@ static struct stripe_head *alloc_stripe(struct kmem_cache *sc, gfp_t gfp,
+ 		for (i = 0; i < disks; i++) {
+ 			struct r5dev *dev = &sh->dev[i];
+ 
+-			bio_init(&dev->req);
+-			dev->req.bi_io_vec = &dev->vec;
+-			dev->req.bi_max_vecs = 1;
+-
+-			bio_init(&dev->rreq);
+-			dev->rreq.bi_io_vec = &dev->rvec;
+-			dev->rreq.bi_max_vecs = 1;
++			bio_init_with_vec_table(&dev->req, &dev->vec, 1);
++			bio_init_with_vec_table(&dev->rreq, &dev->rvec, 1);
+ 		}
+ 	}
+ 	return sh;
+diff --git a/drivers/nvme/target/io-cmd.c b/drivers/nvme/target/io-cmd.c
+index 4a96c2049b7b..6a32b0b68b1e 100644
+--- a/drivers/nvme/target/io-cmd.c
++++ b/drivers/nvme/target/io-cmd.c
+@@ -37,9 +37,7 @@ static void nvmet_inline_bio_init(struct nvmet_req *req)
+ {
+ 	struct bio *bio = &req->inline_bio;
+ 
+-	bio_init(bio);
+-	bio->bi_max_vecs = NVMET_MAX_INLINE_BIOVEC;
+-	bio->bi_io_vec = req->inline_bvec;
++	bio_init_with_vec_table(bio, req->inline_bvec, NVMET_MAX_INLINE_BIOVEC);
+ }
+ 
+ static void nvmet_execute_rw(struct nvmet_req *req)
+diff --git a/fs/logfs/dev_bdev.c b/fs/logfs/dev_bdev.c
+index a8329cc47dec..2bf53b0ffe83 100644
+--- a/fs/logfs/dev_bdev.c
++++ b/fs/logfs/dev_bdev.c
+@@ -19,9 +19,7 @@ static int sync_request(struct page *page, struct block_device *bdev, int op)
+ 	struct bio bio;
+ 	struct bio_vec bio_vec;
+ 
+-	bio_init(&bio);
+-	bio.bi_max_vecs = 1;
+-	bio.bi_io_vec = &bio_vec;
++	bio_init_with_vec_table(&bio, &bio_vec, 1);
+ 	bio_vec.bv_page = page;
+ 	bio_vec.bv_len = PAGE_SIZE;
+ 	bio_vec.bv_offset = 0;
 -- 
 2.7.4
+
