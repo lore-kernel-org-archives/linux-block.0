@@ -1,61 +1,63 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv4 37/43] ext4: make ext4_da_page_release_reservation() aware about huge pages
-Date: Tue, 25 Oct 2016 03:13:36 +0300
-Message-Id: <20161025001342.76126-38-kirill.shutemov@linux.intel.com>
-In-Reply-To: <20161025001342.76126-1-kirill.shutemov@linux.intel.com>
-References: <20161025001342.76126-1-kirill.shutemov@linux.intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-vk0-f66.google.com ([209.85.213.66]:35594 "EHLO
+        mail-vk0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753958AbcJ2WUL (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sat, 29 Oct 2016 18:20:11 -0400
+MIME-Version: 1.0
+In-Reply-To: <20161029152933.GA17241@infradead.org>
+References: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
+ <1477728600-12938-24-git-send-email-tom.leiming@gmail.com> <20161029152933.GA17241@infradead.org>
+From: Ming Lei <tom.leiming@gmail.com>
+Date: Sun, 30 Oct 2016 06:20:09 +0800
+Message-ID: <CACVXFVPVW0YJ1+X_EhHAbt1zxF6BWqgmjOM_VRdzyLTJNxJWTw@mail.gmail.com>
+Subject: Re: [PATCH 23/60] block: introduce flag QUEUE_FLAG_NO_MP
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Jens Axboe <axboe@fb.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        Mike Christie <mchristi@redhat.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Toshi Kani <toshi.kani@hpe.com>, Shaohua Li <shli@kernel.org>,
+        "open list:SOFTWARE RAID (Multiple Disks) SUPPORT"
+        <linux-raid@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-For huge pages 'stop' must be within HPAGE_PMD_SIZE.
-Let's use hpage_size() in the BUG_ON().
+On Sat, Oct 29, 2016 at 11:29 PM, Christoph Hellwig <hch@infradead.org> wrote:
+> On Sat, Oct 29, 2016 at 04:08:22PM +0800, Ming Lei wrote:
+>> MD(especially raid1 and raid10) is a bit difficult to support
+>> multipage bvec, so introduce this flag for not enabling multipage
+>> bvec, then MD can still accept singlepage bvec only, and once
+>> direct access to bvec table in MD and other fs/drivers are cleanuped,
+>> the flag can be removed. BTRFS has the similar issue too.
+>
+> There is really no good reason for that.  The RAID1 and 10 code really
+> just needs some love to use the bio cloning infrastructure, bio
+> iterators and generally recent bio apis.  btrfs just needs a tiny little
+> bit of help and I'll send patches soon.
 
-We also need to change how we calculate lblk for cluster deallocation.
+That is very nice of you to do this cleanup, cool!
 
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
----
- fs/ext4/inode.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+I guess it still need a bit time, and hope that won't be the block
+for the whole patchset, :-)
 
-diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
-index 59cd2b113eb2..869df0504174 100644
---- a/fs/ext4/inode.c
-+++ b/fs/ext4/inode.c
-@@ -1565,7 +1565,7 @@ static void ext4_da_page_release_reservation(struct page *page,
- 	int num_clusters;
- 	ext4_fsblk_t lblk;
- 
--	BUG_ON(stop > PAGE_SIZE || stop < length);
-+	BUG_ON(stop > hpage_size(page) || stop < length);
- 
- 	head = page_buffers(page);
- 	bh = head;
-@@ -1600,7 +1600,8 @@ static void ext4_da_page_release_reservation(struct page *page,
- 	 * need to release the reserved space for that cluster. */
- 	num_clusters = EXT4_NUM_B2C(sbi, to_release);
- 	while (num_clusters > 0) {
--		lblk = (page->index << (PAGE_SHIFT - inode->i_blkbits)) +
-+		lblk = ((page->index + offset / PAGE_SIZE) <<
-+				(PAGE_SHIFT - inode->i_blkbits)) +
- 			((num_clusters - 1) << sbi->s_cluster_bits);
- 		if (sbi->s_cluster_ratio == 1 ||
- 		    !ext4_find_delalloc_cluster(inode, lblk))
--- 
-2.9.3
+[linux-2.6-next]$git grep -n -E "bi_io_vec|bi_vcnt" ./fs/btrfs/ | wc -l
+45
 
+[linux-2.6-next]$git grep -n -E "bi_io_vec|bi_vcnt" ./drivers/md/ |
+grep raid | wc -l
+54
+
+>
+> Having two different code path is just asking for trouble in the long
+> run.
+
+Definitely, that flag is introduced just as a short-term solution.
+
+Thanks,
+Ming Lei
