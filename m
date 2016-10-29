@@ -1,64 +1,46 @@
-Return-Path: <prvs=9107f69a83=axboe@fb.com>
-From: Jens Axboe <axboe@fb.com>
-To: <axboe@kernel.dk>, <linux-kernel@vger.kernel.org>,
-        <linux-fsdevel@vger.kernel.org>, <linux-block@vger.kernel.org>
-CC: <jack@suse.cz>, <kernel@kolivas.org>, Jens Axboe <axboe@fb.com>
-Subject: [PATCH 4/8] writeback: track if we're sleeping on progress in balance_dirty_pages()
-Date: Wed, 26 Oct 2016 14:52:11 -0600
-Message-ID: <1477515135-16469-5-git-send-email-axboe@fb.com>
-In-Reply-To: <1477515135-16469-1-git-send-email-axboe@fb.com>
-References: <1477515135-16469-1-git-send-email-axboe@fb.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Ming Lei <tom.leiming@gmail.com>
+To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
+Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        Ming Lei <tom.leiming@gmail.com>,
+        Dave Chinner <david@fromorbit.com>,
+        linux-xfs@vger.kernel.org (supporter:XFS FILESYSTEM)
+Subject: [PATCH 51/60] xfs: convert to bio_for_each_segment_all_rd()
+Date: Sat, 29 Oct 2016 16:08:50 +0800
+Message-Id: <1477728600-12938-52-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
+References: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Note in the bdi_writeback structure whenever a task ends up sleeping
-waiting for progress. We can use that information in the lower layers
-to increase the priority of writes.
-
-Signed-off-by: Jens Axboe <axboe@fb.com>
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- include/linux/backing-dev-defs.h | 2 ++
- mm/backing-dev.c                 | 1 +
- mm/page-writeback.c              | 1 +
- 3 files changed, 4 insertions(+)
+ fs/xfs/xfs_aops.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/include/linux/backing-dev-defs.h b/include/linux/backing-dev-defs.h
-index c357f27d5483..dc5f76d7f648 100644
---- a/include/linux/backing-dev-defs.h
-+++ b/include/linux/backing-dev-defs.h
-@@ -116,6 +116,8 @@ struct bdi_writeback {
- 	struct list_head work_list;
- 	struct delayed_work dwork;	/* work item used for writeback */
+diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
+index 3e57a56cf829..974b0a516f1d 100644
+--- a/fs/xfs/xfs_aops.c
++++ b/fs/xfs/xfs_aops.c
+@@ -144,6 +144,7 @@ xfs_destroy_ioend(
+ 	for (bio = &ioend->io_inline_bio; bio; bio = next) {
+ 		struct bio_vec	*bvec;
+ 		int		i;
++		struct bvec_iter_all bia;
  
-+	unsigned long dirty_sleep;	/* last wait */
-+
- 	struct list_head bdi_node;	/* anchored at bdi->wb_list */
+ 		/*
+ 		 * For the last bio, bi_private points to the ioend, so we
+@@ -155,7 +156,7 @@ xfs_destroy_ioend(
+ 			next = bio->bi_private;
  
- #ifdef CONFIG_CGROUP_WRITEBACK
-diff --git a/mm/backing-dev.c b/mm/backing-dev.c
-index 8fde443f36d7..3bfed5ab2475 100644
---- a/mm/backing-dev.c
-+++ b/mm/backing-dev.c
-@@ -310,6 +310,7 @@ static int wb_init(struct bdi_writeback *wb, struct backing_dev_info *bdi,
- 	spin_lock_init(&wb->work_lock);
- 	INIT_LIST_HEAD(&wb->work_list);
- 	INIT_DELAYED_WORK(&wb->dwork, wb_workfn);
-+	wb->dirty_sleep = jiffies;
+ 		/* walk each page on bio, ending page IO on them */
+-		bio_for_each_segment_all(bvec, bio, i)
++		bio_for_each_segment_all_rd(bvec, bio, i, bia)
+ 			xfs_finish_page_writeback(inode, bvec, error);
  
- 	wb->congested = wb_congested_get_create(bdi, blkcg_id, gfp);
- 	if (!wb->congested)
-diff --git a/mm/page-writeback.c b/mm/page-writeback.c
-index 439cc63ad903..52e2f8e3b472 100644
---- a/mm/page-writeback.c
-+++ b/mm/page-writeback.c
-@@ -1778,6 +1778,7 @@ static void balance_dirty_pages(struct address_space *mapping,
- 					  pause,
- 					  start_time);
- 		__set_current_state(TASK_KILLABLE);
-+		wb->dirty_sleep = now;
- 		io_schedule_timeout(pause);
- 
- 		current->dirty_paused_when = now + pause;
+ 		bio_put(bio);
 -- 
 2.7.4
+
