@@ -1,34 +1,72 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.9]:49526 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752104AbcJTNMT (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Oct 2016 09:12:19 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org
-Subject: clean up block ops defintions
-Date: Thu, 20 Oct 2016 15:12:08 +0200
-Message-Id: <1476969135-32732-1-git-send-email-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <tom.leiming@gmail.com>
+Return-Path: <tom.leiming@gmail.com>
+From: Ming Lei <tom.leiming@gmail.com>
+To: Jens Axboe <axboe@fb.com>,
+	linux-kernel@vger.kernel.org
+Cc: linux-block@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>,
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+	Ming Lei <tom.leiming@gmail.com>,
+	Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 40/60] blk-merge: compute bio->bi_seg_front_size efficiently
+Date: Sat, 29 Oct 2016 16:08:39 +0800
+Message-Id: <1477728600-12938-41-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
+References: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Hi Jens,
+It is enough to check and compute bio->bi_seg_front_size just
+after the 1st segment is found, but current code checks that
+for each bvec, which is inefficient.
 
-this series takes advantage of the the new REQ_OP* scheme to further
-clean up the way how we classify bios and requests.
+This patch follows the way in  __blk_recalc_rq_segments()
+for computing bio->bi_seg_front_size, and it is more efficient
+and code becomes more readable too.
 
-After the series both the bio and request have a field where the
-REQ_OP operation is stored in directly without any shiting around,
-and the coomon REQ_* flags can be ORed into directly as well.  All
-the bio flags are now in the existing bi_flags field, and the many
-request-only flags are moved into a new field in struct request,
-which is split off cmd_flags.
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+---
+ block/blk-merge.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-Last but not least this series ensures that we can encode the
-operational direction of a command in it's code.  Currently the
-op_is_write, bio_data_dir and rq_data_dir helpers all assume that
-everything but a READ is a data out command.  This surprisingly
-actually was true until this week, but the new shingled driver
-support conflicts with it - it's just that the relevant path
-didn't use any of these helpers so that issue wasn't noticed.
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index 266c94d1d82f..465d9c65cb41 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -157,22 +157,21 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
+ 			bvprvp = &bvprv;
+ 			sectors += bv.bv_len >> 9;
+ 
+-			if (nsegs == 1 && seg_size > front_seg_size)
+-				front_seg_size = seg_size;
+ 			continue;
+ 		}
+ new_segment:
+ 		if (nsegs == queue_max_segments(q))
+ 			goto split;
+ 
++		if (nsegs == 1 && seg_size > front_seg_size)
++			front_seg_size = seg_size;
++
+ 		nsegs++;
+ 		bvprv = bv;
+ 		bvprvp = &bvprv;
+ 		seg_size = bv.bv_len;
+ 		sectors += bv.bv_len >> 9;
+ 
+-		if (nsegs == 1 && seg_size > front_seg_size)
+-			front_seg_size = seg_size;
+ 	}
+ 
+ 	do_split = false;
+@@ -185,6 +184,8 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
+ 			bio = new;
+ 	}
+ 
++	if (nsegs == 1 && seg_size > front_seg_size)
++		front_seg_size = seg_size;
+ 	bio->bi_seg_front_size = front_seg_size;
+ 	if (seg_size > bio->bi_seg_back_size)
+ 		bio->bi_seg_back_size = seg_size;
+-- 
+2.7.4
