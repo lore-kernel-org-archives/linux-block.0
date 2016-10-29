@@ -1,45 +1,47 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f52.google.com ([74.125.82.52]:33998 "EHLO
-        mail-wm0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1756859AbcJ0OuH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Oct 2016 10:50:07 -0400
-Received: by mail-wm0-f52.google.com with SMTP id 140so5599523wmv.1
-        for <linux-block@vger.kernel.org>; Thu, 27 Oct 2016 07:50:06 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH 6/7] lightnvm: add ECC error codes
-Date: Thu, 27 Oct 2016 16:49:42 +0200
-Message-Id: <1477579783-5289-6-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1477579783-5289-1-git-send-email-javier@cnexlabs.com>
-References: <1477579783-5289-1-git-send-email-javier@cnexlabs.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Ming Lei <tom.leiming@gmail.com>
+To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
+Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        Ming Lei <tom.leiming@gmail.com>,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        Shaohua Li <shli@kernel.org>, Hannes Reinecke <hare@suse.com>,
+        Jiri Kosina <jkosina@suse.cz>,
+        Mike Christie <mchristi@redhat.com>,
+        Guoqing Jiang <gqjiang@suse.com>,
+        Zheng Liu <gnehzuil.liu@gmail.com>,
+        linux-bcache@vger.kernel.org (open list:BCACHE (BLOCK LAYER CACHE)),
+        linux-raid@vger.kernel.org (open list:SOFTWARE RAID (Multiple Disks)
+        SUPPORT)
+Subject: [PATCH 57/60] bcache: convert to bio_for_each_segment_all_rd()
+Date: Sat, 29 Oct 2016 16:08:56 +0800
+Message-Id: <1477728600-12938-58-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
+References: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Add ECC error codes to enable the appropriate handling in the target.
-
-Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- include/linux/lightnvm.h | 2 ++
- 1 file changed, 2 insertions(+)
+ drivers/md/bcache/btree.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
-index e3ccaff..33643ae 100644
---- a/include/linux/lightnvm.h
-+++ b/include/linux/lightnvm.h
-@@ -107,6 +107,8 @@ enum {
- 	NVM_RSP_NOT_CHANGEABLE	= 0x1,
- 	NVM_RSP_ERR_FAILWRITE	= 0x40ff,
- 	NVM_RSP_ERR_EMPTYPAGE	= 0x42ff,
-+	NVM_RSP_ERR_FAILECC	= 0x4281,
-+	NVM_RSP_WARN_HIGHECC	= 0x4700,
+diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
+index b419bc91ba32..89abada6a091 100644
+--- a/drivers/md/bcache/btree.c
++++ b/drivers/md/bcache/btree.c
+@@ -419,8 +419,9 @@ static void do_btree_node_write(struct btree *b)
+ 		int j;
+ 		struct bio_vec *bv;
+ 		void *base = (void *) ((unsigned long) i & ~(PAGE_SIZE - 1));
++		struct bvec_iter_all bia;
  
- 	/* Device opcodes */
- 	NVM_OP_HBREAD		= 0x02,
+-		bio_for_each_segment_all(bv, b->bio, j)
++		bio_for_each_segment_all_rd(bv, b->bio, j, bia)
+ 			memcpy(page_address(bv->bv_page),
+ 			       base + j * PAGE_SIZE, PAGE_SIZE);
+ 
 -- 
 2.7.4
 
