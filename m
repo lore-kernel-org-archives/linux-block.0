@@ -1,71 +1,45 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv4 21/43] thp: introduce hpage_size() and hpage_mask()
-Date: Tue, 25 Oct 2016 03:13:20 +0300
-Message-Id: <20161025001342.76126-22-kirill.shutemov@linux.intel.com>
-In-Reply-To: <20161025001342.76126-1-kirill.shutemov@linux.intel.com>
-References: <20161025001342.76126-1-kirill.shutemov@linux.intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pf0-f195.google.com ([209.85.192.195]:35773 "EHLO
+        mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S941619AbcJ2INX (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sat, 29 Oct 2016 04:13:23 -0400
+From: Ming Lei <tom.leiming@gmail.com>
+To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
+Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        Ming Lei <tom.leiming@gmail.com>,
+        Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <yuchao0@huawei.com>,
+        linux-f2fs-devel@lists.sourceforge.net (open list:F2FS FILE SYSTEM)
+Subject: [PATCH 20/60] f2fs: f2fs_read_end_io: comment on direct access to bvec table
+Date: Sat, 29 Oct 2016 16:08:19 +0800
+Message-Id: <1477728600-12938-21-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
+References: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Introduce new helpers which return size/mask of the page:
-HPAGE_PMD_SIZE/HPAGE_PMD_MASK if the page is PageTransHuge() and
-PAGE_SIZE/PAGE_MASK otherwise.
-
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- include/linux/huge_mm.h | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ fs/f2fs/data.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/include/linux/huge_mm.h b/include/linux/huge_mm.h
-index 9b9f65d99873..42934769f256 100644
---- a/include/linux/huge_mm.h
-+++ b/include/linux/huge_mm.h
-@@ -142,6 +142,20 @@ static inline int hpage_nr_pages(struct page *page)
- 	return 1;
- }
+diff --git a/fs/f2fs/data.c b/fs/f2fs/data.c
+index 9ae194fd2fdb..24f6f6977d37 100644
+--- a/fs/f2fs/data.c
++++ b/fs/f2fs/data.c
+@@ -35,6 +35,10 @@ static void f2fs_read_end_io(struct bio *bio)
+ 	int i;
  
-+static inline int hpage_size(struct page *page)
-+{
-+	if (unlikely(PageTransHuge(page)))
-+		return HPAGE_PMD_SIZE;
-+	return PAGE_SIZE;
-+}
-+
-+static inline unsigned long hpage_mask(struct page *page)
-+{
-+	if (unlikely(PageTransHuge(page)))
-+		return HPAGE_PMD_MASK;
-+	return PAGE_MASK;
-+}
-+
- extern int do_huge_pmd_numa_page(struct fault_env *fe, pmd_t orig_pmd);
- 
- extern struct page *huge_zero_page;
-@@ -167,6 +181,8 @@ void mm_put_huge_zero_page(struct mm_struct *mm);
- #define HPAGE_PMD_SIZE ({ BUILD_BUG(); 0; })
- 
- #define hpage_nr_pages(x) 1
-+#define hpage_size(x) PAGE_SIZE
-+#define hpage_mask(x) PAGE_MASK
- 
- #define transparent_hugepage_enabled(__vma) 0
- 
+ #ifdef CONFIG_F2FS_FAULT_INJECTION
++	/*
++	 * It is still safe to retrieve the 1st page of the bio
++	 * in this way after supporting multipage bvec.
++	 */
+ 	if (time_to_inject(F2FS_P_SB(bio->bi_io_vec->bv_page), FAULT_IO))
+ 		bio->bi_error = -EIO;
+ #endif
 -- 
-2.9.3
+2.7.4
 
