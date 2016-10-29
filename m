@@ -1,96 +1,108 @@
 Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv4 32/43] ext4: make ext4_writepage() work on huge pages
-Date: Tue, 25 Oct 2016 03:13:31 +0300
-Message-Id: <20161025001342.76126-33-kirill.shutemov@linux.intel.com>
-In-Reply-To: <20161025001342.76126-1-kirill.shutemov@linux.intel.com>
-References: <20161025001342.76126-1-kirill.shutemov@linux.intel.com>
+From: Ming Lei <tom.leiming@gmail.com>
+To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
+Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        Ming Lei <tom.leiming@gmail.com>,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        Shaohua Li <shli@kernel.org>,
+        Mike Christie <mchristi@redhat.com>,
+        Hannes Reinecke <hare@suse.com>,
+        Guoqing Jiang <gqjiang@suse.com>,
+        Jiri Kosina <jkosina@suse.cz>,
+        Zheng Liu <gnehzuil.liu@gmail.com>,
+        Eric Wheeler <git@linux.ewheeler.net>,
+        Yijing Wang <wangyijing@huawei.com>, Coly Li <colyli@suse.de>,
+        Al Viro <viro@ZenIV.linux.org.uk>,
+        linux-bcache@vger.kernel.org (open list:BCACHE (BLOCK LAYER CACHE)),
+        linux-raid@vger.kernel.org (open list:SOFTWARE RAID (Multiple Disks)
+        SUPPORT)
+Subject: [PATCH 21/60] bcache: comment on direct access to bvec table
+Date: Sat, 29 Oct 2016 16:08:20 +0800
+Message-Id: <1477728600-12938-22-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
+References: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
 Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Change ext4_writepage() and underlying ext4_bio_write_page().
+Looks all are safe after multipage bvec is supported.
 
-It basically removes assumption on page size, infer it from struct page
-instead.
-
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- fs/ext4/inode.c   | 10 +++++-----
- fs/ext4/page-io.c | 11 +++++++++--
- 2 files changed, 14 insertions(+), 7 deletions(-)
+ drivers/md/bcache/btree.c | 1 +
+ drivers/md/bcache/super.c | 6 ++++++
+ drivers/md/bcache/util.c  | 7 +++++++
+ 3 files changed, 14 insertions(+)
 
-diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
-index 9c064727ed62..c36296fbaa23 100644
---- a/fs/ext4/inode.c
-+++ b/fs/ext4/inode.c
-@@ -2030,10 +2030,10 @@ static int ext4_writepage(struct page *page,
+diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
+index 81d3db40cd7b..b419bc91ba32 100644
+--- a/drivers/md/bcache/btree.c
++++ b/drivers/md/bcache/btree.c
+@@ -428,6 +428,7 @@ static void do_btree_node_write(struct btree *b)
  
- 	trace_ext4_writepage(page);
- 	size = i_size_read(inode);
--	if (page->index == size >> PAGE_SHIFT)
--		len = size & ~PAGE_MASK;
--	else
--		len = PAGE_SIZE;
+ 		continue_at(cl, btree_node_write_done, NULL);
+ 	} else {
++		/* No harm for multipage bvec since the new is just allocated */
+ 		b->bio->bi_vcnt = 0;
+ 		bch_bio_map(b->bio, i);
+ 
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index d8a6d807b498..52876fcf2b36 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -207,6 +207,7 @@ static void write_bdev_super_endio(struct bio *bio)
+ 
+ static void __write_super(struct cache_sb *sb, struct bio *bio)
+ {
++	/* single page bio, safe for multipage bvec */
+ 	struct cache_sb *out = page_address(bio->bi_io_vec[0].bv_page);
+ 	unsigned i;
+ 
+@@ -1153,6 +1154,8 @@ static void register_bdev(struct cache_sb *sb, struct page *sb_page,
+ 	dc->bdev->bd_holder = dc;
+ 
+ 	bio_init_with_vec_table(&dc->sb_bio, dc->sb_bio.bi_inline_vecs, 1);
 +
-+	len = hpage_size(page);
-+	if (page->index + hpage_nr_pages(page) - 1 == size >> PAGE_SHIFT)
-+			len = size & ~hpage_mask(page);
++	/* single page bio, safe for multipage bvec */
+ 	dc->sb_bio.bi_io_vec[0].bv_page = sb_page;
+ 	get_page(sb_page);
  
- 	page_bufs = page_buffers(page);
- 	/*
-@@ -2057,7 +2057,7 @@ static int ext4_writepage(struct page *page,
- 				   ext4_bh_delay_or_unwritten)) {
- 		redirty_page_for_writepage(wbc, page);
- 		if ((current->flags & PF_MEMALLOC) ||
--		    (inode->i_sb->s_blocksize == PAGE_SIZE)) {
-+		    (inode->i_sb->s_blocksize == hpage_size(page))) {
- 			/*
- 			 * For memory cleaning there's no point in writing only
- 			 * some buffers. So just bail out. Warn if we came here
-diff --git a/fs/ext4/page-io.c b/fs/ext4/page-io.c
-index 0094923e5ebf..20c9635a782e 100644
---- a/fs/ext4/page-io.c
-+++ b/fs/ext4/page-io.c
-@@ -413,6 +413,7 @@ int ext4_bio_write_page(struct ext4_io_submit *io,
+@@ -1794,6 +1797,7 @@ void bch_cache_release(struct kobject *kobj)
+ 	for (i = 0; i < RESERVE_NR; i++)
+ 		free_fifo(&ca->free[i]);
  
- 	BUG_ON(!PageLocked(page));
- 	BUG_ON(PageWriteback(page));
-+	BUG_ON(PageTail(page));
++	/* single page bio, safe for multipage bvec */
+ 	if (ca->sb_bio.bi_inline_vecs[0].bv_page)
+ 		put_page(ca->sb_bio.bi_io_vec[0].bv_page);
  
- 	if (keep_towrite)
- 		set_page_writeback_keepwrite(page);
-@@ -429,8 +430,14 @@ int ext4_bio_write_page(struct ext4_io_submit *io,
- 	 * the page size, the remaining memory is zeroed when mapped, and
- 	 * writes to that region are not written out to the file."
- 	 */
--	if (len < PAGE_SIZE)
--		zero_user_segment(page, len, PAGE_SIZE);
-+	if (len < hpage_size(page)) {
-+		page += len / PAGE_SIZE;
-+		if (len % PAGE_SIZE)
-+			zero_user_segment(page, len % PAGE_SIZE, PAGE_SIZE);
-+		while (page + 1 == compound_head(page))
-+			clear_highpage(++page);
-+		page = compound_head(page);
-+	}
- 	/*
- 	 * In the first loop we prepare and mark buffers to submit. We have to
- 	 * mark all buffers in the page before submitting so that
+@@ -1850,6 +1854,8 @@ static int register_cache(struct cache_sb *sb, struct page *sb_page,
+ 	ca->bdev->bd_holder = ca;
+ 
+ 	bio_init_with_vec_table(&ca->sb_bio, ca->sb_bio.bi_inline_vecs, 1);
++
++	/* single page bio, safe for multipage bvec */
+ 	ca->sb_bio.bi_io_vec[0].bv_page = sb_page;
+ 	get_page(sb_page);
+ 
+diff --git a/drivers/md/bcache/util.c b/drivers/md/bcache/util.c
+index dde6172f3f10..5cc0b49a65fb 100644
+--- a/drivers/md/bcache/util.c
++++ b/drivers/md/bcache/util.c
+@@ -222,6 +222,13 @@ uint64_t bch_next_delay(struct bch_ratelimit *d, uint64_t done)
+ 		: 0;
+ }
+ 
++/*
++ * Generally it isn't good to access .bi_io_vec and .bi_vcnt
++ * directly, the preferred way is bio_add_page, but in
++ * this case, bch_bio_map() supposes that the bvec table
++ * is empty, so it is safe to access .bi_vcnt & .bi_io_vec
++ * in this way even after multipage bvec is supported.
++ */
+ void bch_bio_map(struct bio *bio, void *base)
+ {
+ 	size_t size = bio->bi_iter.bi_size;
 -- 
-2.9.3
+2.7.4
 
