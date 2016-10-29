@@ -1,706 +1,84 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>,
-	Tejun Heo <tj@kernel.org>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	linus.walleij@linaro.org,
-	broonie@kernel.org,
-	hare@suse.de,
-	arnd@arndb.de,
-	bart.vanassche@sandisk.com,
-	grant.likely@secretlab.ca,
-	jack@suse.cz,
-	James.Bottomley@HansenPartnership.com,
-	Paolo Valente <paolo.valente@linaro.org>,
-	Arianna Avanzini <avanzini.arianna@gmail.com>
-Subject: [PATCH 04/14] block, bfq: modify the peak-rate estimator
-Date: Wed, 26 Oct 2016 11:27:57 +0200
-Message-Id: <1477474082-2846-5-git-send-email-paolo.valente@linaro.org>
-In-Reply-To: <1477474082-2846-1-git-send-email-paolo.valente@linaro.org>
-References: <1477474082-2846-1-git-send-email-paolo.valente@linaro.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-by2nam01on0055.outbound.protection.outlook.com ([104.47.34.55]:28736
+        "EHLO NAM01-BY2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S964933AbcJ2AWE (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 28 Oct 2016 20:22:04 -0400
+Subject: [PATCH v5 09/14] dm: Use BLK_MQ_S_STOPPED instead of
+ QUEUE_FLAG_STOPPED in blk-mq code
+To: Jens Axboe <axboe@fb.com>
+References: <7460e8b2-2cfd-c0d5-7ae7-7f662d89dad3@sandisk.com>
+CC: Christoph Hellwig <hch@lst.de>,
+        James Bottomley <jejb@linux.vnet.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Doug Ledford <dledford@redhat.com>,
+        Keith Busch <keith.busch@intel.com>,
+        Ming Lei <tom.leiming@gmail.com>,
+        "Konrad Rzeszutek Wilk" <konrad.wilk@oracle.com>,
+        =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+From: Bart Van Assche <bart.vanassche@sandisk.com>
+Message-ID: <00f9e739-6331-9a16-95d2-03b0d73f8ab1@sandisk.com>
+Date: Fri, 28 Oct 2016 17:22:00 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <7460e8b2-2cfd-c0d5-7ae7-7f662d89dad3@sandisk.com>
+Content-Type: text/plain; charset="utf-8"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Unless the maximum budget B_max that BFQ can assign to a queue is set
-explicitly by the user, BFQ automatically updates B_max. In
-particular, BFQ dynamically sets B_max to the number of sectors that
-can be read, at the current estimated peak rate, during the maximum
-time, T_max, allowed before a budget timeout occurs. In formulas, if
-we denote as R_est the estimated peak rate, then B_max = T_max ∗
-R_est. Hence, the higher R_est is with respect to the actual device
-peak rate, the higher the probability that processes incur budget
-timeouts unjustly is. Besides, a too high value of B_max unnecessarily
-increases the deviation from an ideal, smooth service.
+Instead of manipulating both QUEUE_FLAG_STOPPED and BLK_MQ_S_STOPPED
+in the dm start and stop queue functions, only manipulate the latter
+flag. Change blk_queue_stopped() tests into blk_mq_queue_stopped().
 
-Unfortunately, it is not trivial to estimate the peak rate correctly:
-because of the presence of sw and hw queues between the scheduler and
-the device components that finally serve I/O requests, it is hard to
-say exactly when a given dispatched request is served inside the
-device, and for how long. As a consequence, it is hard to know
-precisely at what rate a given set of requests is actually served by
-the device.
-
-On the opposite end, the dispatch time of any request is trivially
-available, and, from this piece of information, the "dispatch rate"
-of requests can be immediately computed. So, the idea in the next
-function is to use what is known, namely request dispatch times
-(plus, when useful, request completion times), to estimate what is
-unknown, namely in-device request service rate.
-
-The main issue is that, because of the above facts, the rate at
-which a certain set of requests is dispatched over a certain time
-interval can vary greatly with respect to the rate at which the
-same requests are then served. But, since the size of any
-intermediate queue is limited, and the service scheme is lossless
-(no request is silently dropped), the following obvious convergence
-property holds: the number of requests dispatched MUST become
-closer and closer to the number of requests completed as the
-observation interval grows. This is the key property used in
-this new version of the peak-rate estimator.
-
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
-Signed-off-by: Arianna Avanzini <avanzini.arianna@gmail.com>
+Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+Acked-by: Mike Snitzer <snitzer@redhat.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
 ---
- block/bfq-iosched.c | 496 +++++++++++++++++++++++++++++++++++++++-------------
- 1 file changed, 376 insertions(+), 120 deletions(-)
+ drivers/md/dm-rq.c | 16 +---------------
+ 1 file changed, 1 insertion(+), 15 deletions(-)
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index fa1e531..101c591 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -367,14 +367,32 @@ struct bfq_data {
- 	/* on-disk position of the last served request */
- 	sector_t last_position;
+diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
+index 4b62e74..0103031 100644
+--- a/drivers/md/dm-rq.c
++++ b/drivers/md/dm-rq.c
+@@ -75,12 +75,6 @@ static void dm_old_start_queue(struct request_queue *q)
  
-+	/* time of last request completion (ns) */
-+	u64 last_completion;
-+
-+	/* time of first rq dispatch in current observation interval (ns) */
-+	u64 first_dispatch;
-+	/* time of last rq dispatch in current observation interval (ns) */
-+	u64 last_dispatch;
-+
- 	/* beginning of the last budget */
- 	ktime_t last_budget_start;
- 	/* beginning of the last idle slice */
- 	ktime_t last_idling_start;
--	/* number of samples used to calculate @peak_rate */
-+
-+	/* number of samples in current observation interval */
- 	int peak_rate_samples;
--	/* peak transfer rate observed for a budget */
--	u64 peak_rate;
-+	/* num of samples of seq dispatches in current observation interval */
-+	u32 sequential_samples;
-+	/* total num of sectors transferred in current observation interval */
-+	u64 tot_sectors_dispatched;
-+	/* max rq size seen during current observation interval (sectors) */
-+	u32 last_rq_max_size;
-+	/* time elapsed from first dispatch in current observ. interval (us) */
-+	u64 delta_from_first;
-+	/* current estimate of device peak rate */
-+	u32 peak_rate;
-+
- 	/* maximum budget allotted to a bfq_queue before rescheduling */
- 	int bfq_max_budget;
- 
-@@ -682,7 +700,7 @@ static const int bfq_timeout = HZ / 8;
- 
- struct kmem_cache *bfq_pool;
- 
--/* Below this threshold (in ms), we consider thinktime immediate. */
-+/* Below this threshold (in ns), we consider thinktime immediate. */
- #define BFQ_MIN_TT		(2 * NSEC_PER_MSEC)
- 
- /* hw_tag detection: parallel requests threshold and min samples needed. */
-@@ -692,8 +710,12 @@ struct kmem_cache *bfq_pool;
- #define BFQQ_SEEK_THR		(sector_t)(8 * 100)
- #define BFQQ_SEEKY(bfqq)	(hweight32(bfqq->seek_history) > 32/8)
- 
--/* Min samples used for peak rate estimation (for autotuning). */
--#define BFQ_PEAK_RATE_SAMPLES	32
-+/* Min number of samples required to perform peak-rate update */
-+#define BFQ_RATE_MIN_SAMPLES	32
-+/* Min observation time interval required to perform a peak-rate update (ns) */
-+#define BFQ_RATE_MIN_INTERVAL	(300*NSEC_PER_MSEC)
-+/* Target observation time interval for a peak-rate update (ns) */
-+#define BFQ_RATE_REF_INTERVAL	NSEC_PER_SEC
- 
- /* Shift used for peak rate fixed precision calculations. */
- #define BFQ_RATE_SHIFT		16
-@@ -3400,14 +3422,25 @@ static struct request *bfq_find_rq_fmerge(struct bfq_data *bfqd,
- 	return NULL;
- }
- 
-+static sector_t get_sdist(sector_t last_pos, struct request *rq)
-+{
-+	sector_t sdist = 0;
-+
-+	if (last_pos) {
-+		if (last_pos < blk_rq_pos(rq))
-+			sdist = blk_rq_pos(rq) - last_pos;
-+		else
-+			sdist = last_pos - blk_rq_pos(rq);
-+	}
-+
-+	return sdist;
-+}
-+
- static void bfq_activate_request(struct request_queue *q, struct request *rq)
+ static void dm_mq_start_queue(struct request_queue *q)
  {
- 	struct bfq_data *bfqd = q->elevator->elevator_data;
- 
- 	bfqd->rq_in_driver++;
--	bfqd->last_position = blk_rq_pos(rq) + blk_rq_sectors(rq);
--	bfq_log(bfqd, "activate_request: new bfqd->last_position %llu",
--		(unsigned long long)bfqd->last_position);
- }
- 
- static void bfq_deactivate_request(struct request_queue *q, struct request *rq)
-@@ -3659,6 +3692,226 @@ static void bfq_set_budget_timeout(struct bfq_data *bfqd)
- }
- 
- /*
-+ * In autotuning mode, max_budget is dynamically recomputed as the
-+ * amount of sectors transferred in timeout at the estimated peak
-+ * rate. This enables BFQ to utilize a full timeslice with a full
-+ * budget, even if the in-service queue is served at peak rate. And
-+ * this maximises throughput with sequential workloads.
-+ */
-+static unsigned long bfq_calc_max_budget(struct bfq_data *bfqd)
-+{
-+	return (u64)bfqd->peak_rate * USEC_PER_MSEC *
-+		jiffies_to_msecs(bfqd->bfq_timeout)>>BFQ_RATE_SHIFT;
-+}
-+
-+void bfq_reset_rate_computation(struct bfq_data *bfqd, struct request *rq)
-+{
-+	if (rq != NULL) { /* new rq dispatch now, reset accordingly */
-+		bfqd->last_dispatch = bfqd->first_dispatch = ktime_get_ns();
-+		bfqd->peak_rate_samples = 1;
-+		bfqd->sequential_samples = 0;
-+		bfqd->tot_sectors_dispatched = bfqd->last_rq_max_size =
-+			blk_rq_sectors(rq);
-+	} else /* no new rq dispatched, just reset the number of samples */
-+		bfqd->peak_rate_samples = 0; /* full re-init on next disp. */
-+
-+	bfq_log(bfqd,
-+		"reset_rate_computation at end, sample %u/%u tot_sects %llu",
-+		bfqd->peak_rate_samples, bfqd->sequential_samples,
-+		bfqd->tot_sectors_dispatched);
-+}
-+
-+void bfq_update_rate_reset(struct bfq_data *bfqd, struct request *rq)
-+{
-+	u32 rate, weight, divisor;
-+
-+	/*
-+	 * For the convergence property to hold (see comments on
-+	 * bfq_update_peak_rate()) and for the assessment to be
-+	 * reliable, a minimum number of samples must be present, and
-+	 * a minimum amount of time must have elapsed. If not so, do
-+	 * not compute new rate. Just reset parameters, to get ready
-+	 * for a new evaluation attempt.
-+	 */
-+	if (bfqd->peak_rate_samples < BFQ_RATE_MIN_SAMPLES ||
-+	    bfqd->delta_from_first < BFQ_RATE_MIN_INTERVAL)
-+		goto reset_computation;
-+
-+	/*
-+	 * If a new request completion has occurred after last
-+	 * dispatch, then, to approximate the rate at which requests
-+	 * have been served by the device, it is more precise to
-+	 * extend the observation interval to the last completion.
-+	 */
-+	bfqd->delta_from_first =
-+		max_t(u64, bfqd->delta_from_first,
-+		      bfqd->last_completion - bfqd->first_dispatch);
-+
-+	/*
-+	 * Rate computed in sects/usec, and not sects/nsec, for
-+	 * precision issues.
-+	 */
-+	rate = div64_ul(bfqd->tot_sectors_dispatched<<BFQ_RATE_SHIFT,
-+			div_u64(bfqd->delta_from_first, NSEC_PER_USEC));
-+
-+	/*
-+	 * Peak rate not updated if:
-+	 * - the percentage of sequential dispatches is below 3/4 of the
-+	 *   total, and rate is below the current estimated peak rate
-+	 * - rate is unreasonably high (> 20M sectors/sec)
-+	 */
-+	if ((bfqd->peak_rate_samples > (3 * bfqd->sequential_samples)>>2 &&
-+	     rate <= bfqd->peak_rate) ||
-+		rate > 20<<BFQ_RATE_SHIFT)
-+		goto reset_computation;
-+
-+	/*
-+	 * We have to update the peak rate, at last! To this purpose,
-+	 * we use a low-pass filter. We compute the smoothing constant
-+	 * of the filter as a function of the 'weight' of the new
-+	 * measured rate.
-+	 *
-+	 * As can be seen in next formulas, we define this weight as a
-+	 * quantity proportional to how sequential the workload is,
-+	 * and to how long the observation time interval is.
-+	 *
-+	 * The weight runs from 0 to 8. The maximum value of the
-+	 * weight, 8, yields the minimum value for the smoothing
-+	 * constant. At this minimum value for the smoothing constant,
-+	 * the measured rate contributes for half of the next value of
-+	 * the estimated peak rate.
-+	 *
-+	 * So, the first step is to compute the weight as a function
-+	 * of how sequential the workload is. Note that the weight
-+	 * cannot reach 9, because bfqd->sequential_samples cannot
-+	 * become equal to bfqd->peak_rate_samples, which, in its
-+	 * turn, holds true because bfqd->sequential_samples is not
-+	 * incremented for the first sample.
-+	 */
-+	weight = (9 * bfqd->sequential_samples) / bfqd->peak_rate_samples;
-+
-+	/*
-+	 * Second step: further refine the weight as a function of the
-+	 * duration of the observation interval.
-+	 */
-+	weight = min_t(u32, 8,
-+		       div_u64(weight * bfqd->delta_from_first,
-+			       BFQ_RATE_REF_INTERVAL));
-+
-+	/*
-+	 * Divisor ranging from 10, for minimum weight, to 2, for
-+	 * maximum weight.
-+	 */
-+	divisor = 10 - weight;
-+
-+	/*
-+	 * Finally, update peak rate:
-+	 *
-+	 * peak_rate = peak_rate * (divisor-1) / divisor  +  rate / divisor
-+	 */
-+	bfqd->peak_rate *= divisor-1;
-+	bfqd->peak_rate /= divisor;
-+	rate /= divisor; /* smoothing constant alpha = 1/divisor */
-+
-+	bfqd->peak_rate += rate;
-+	if (bfqd->bfq_user_max_budget == 0)
-+		bfqd->bfq_max_budget =
-+			bfq_calc_max_budget(bfqd);
-+
-+reset_computation:
-+	bfq_reset_rate_computation(bfqd, rq);
-+}
-+
-+/*
-+ * Update the read/write peak rate (the main quantity used for
-+ * auto-tuning, see update_thr_responsiveness_params()).
-+ *
-+ * It is not trivial to estimate the peak rate (correctly): because of
-+ * the presence of sw and hw queues between the scheduler and the
-+ * device components that finally serve I/O requests, it is hard to
-+ * say exactly when a given dispatched request is served inside the
-+ * device, and for how long. As a consequence, it is hard to know
-+ * precisely at what rate a given set of requests is actually served
-+ * by the device.
-+ *
-+ * On the opposite end, the dispatch time of any request is trivially
-+ * available, and, from this piece of information, the "dispatch rate"
-+ * of requests can be immediately computed. So, the idea in the next
-+ * function is to use what is known, namely request dispatch times
-+ * (plus, when useful, request completion times), to estimate what is
-+ * unknown, namely in-device request service rate.
-+ *
-+ * The main issue is that, because of the above facts, the rate at
-+ * which a certain set of requests is dispatched over a certain time
-+ * interval can vary greatly with respect to the rate at which the
-+ * same requests are then served. But, since the size of any
-+ * intermediate queue is limited, and the service scheme is lossless
-+ * (no request is silently dropped), the following obvious convergence
-+ * property holds: the number of requests dispatched MUST become
-+ * closer and closer to the number of requests completed as the
-+ * observation interval grows. This is the key property used in
-+ * the next function to estimate the peak service rate as a function
-+ * of the observed dispatch rate. The function assumes to be invoked
-+ * on every request dispatch.
-+ */
-+void bfq_update_peak_rate(struct bfq_data *bfqd, struct request *rq)
-+{
-+	u64 now_ns = ktime_get_ns();
-+
-+	if (bfqd->peak_rate_samples == 0) { /* first dispatch */
-+		bfq_log(bfqd, "update_peak_rate: goto reset, samples %d",
-+			bfqd->peak_rate_samples);
-+		bfq_reset_rate_computation(bfqd, rq);
-+		goto update_last_values; /* will add one sample */
-+	}
-+
-+	/*
-+	 * Device idle for very long: the observation interval lasting
-+	 * up to this dispatch cannot be a valid observation interval
-+	 * for computing a new peak rate (similarly to the late-
-+	 * completion event in bfq_completed_request()). Go to
-+	 * update_rate_and_reset to have the following three steps
-+	 * taken:
-+	 * - close the observation interval at the last (previous)
-+	 *   request dispatch or completion
-+	 * - compute rate, if possible, for that observation interval
-+	 * - start a new observation interval with this dispatch
-+	 */
-+	if (now_ns - bfqd->last_dispatch > 100*NSEC_PER_MSEC &&
-+	    bfqd->rq_in_driver == 0)
-+		goto update_rate_and_reset;
-+
-+	/* Update sampling information */
-+	bfqd->peak_rate_samples++;
-+
-+	if ((bfqd->rq_in_driver > 0 ||
-+		now_ns - bfqd->last_completion < BFQ_MIN_TT)
-+	     && get_sdist(bfqd->last_position, rq) < BFQQ_SEEK_THR)
-+		bfqd->sequential_samples++;
-+
-+	bfqd->tot_sectors_dispatched += blk_rq_sectors(rq);
-+
-+	/* Reset max observed rq size every 32 dispatches */
-+	if (likely(bfqd->peak_rate_samples % 32))
-+		bfqd->last_rq_max_size =
-+			max_t(u32, blk_rq_sectors(rq), bfqd->last_rq_max_size);
-+	else
-+		bfqd->last_rq_max_size = blk_rq_sectors(rq);
-+
-+	bfqd->delta_from_first = now_ns - bfqd->first_dispatch;
-+
-+	/* Target observation interval not yet reached, go on sampling */
-+	if (bfqd->delta_from_first < BFQ_RATE_REF_INTERVAL)
-+		goto update_last_values;
-+
-+update_rate_and_reset:
-+	bfq_update_rate_reset(bfqd, rq);
-+update_last_values:
-+	bfqd->last_position = blk_rq_pos(rq) + blk_rq_sectors(rq);
-+	bfqd->last_dispatch = now_ns;
-+}
-+
-+/*
-  * Move request from internal lists to the dispatch list of the request queue.
-  */
- static void bfq_dispatch_insert(struct request_queue *q, struct request *rq)
-@@ -3676,6 +3929,7 @@ static void bfq_dispatch_insert(struct request_queue *q, struct request *rq)
- 	 * incrementing bfqq->dispatched.
- 	 */
- 	bfqq->dispatched++;
-+	bfq_update_peak_rate(q->elevator->elevator_data, rq);
- 
- 	bfq_remove_request(rq);
- 	elv_dispatch_sort(q, rq);
-@@ -3874,105 +4128,92 @@ static void __bfq_bfqq_recalc_budget(struct bfq_data *bfqd,
- 			bfqq->entity.budget);
- }
- 
--static unsigned long bfq_calc_max_budget(u64 peak_rate, u64 timeout)
--{
--	unsigned long max_budget;
+-	unsigned long flags;
 -
--	/*
--	 * The max_budget calculated when autotuning is equal to the
--	 * amount of sectors transferred in timeout at the
--	 * estimated peak rate.
--	 */
--	max_budget = (unsigned long)(peak_rate * 1000 *
--				     timeout >> BFQ_RATE_SHIFT);
+-	spin_lock_irqsave(q->queue_lock, flags);
+-	queue_flag_clear(QUEUE_FLAG_STOPPED, q);
+-	spin_unlock_irqrestore(q->queue_lock, flags);
 -
--	return max_budget;
--}
--
- /*
-- * In addition to updating the peak rate, checks whether the process
-- * is "slow", and returns 1 if so. This slow flag is used, in addition
-- * to the budget timeout, to reduce the amount of service provided to
-- * seeky processes, and hence reduce their chances to lower the
-- * throughput. See the code for more details.
-+ * Return true if the process associated with bfqq is "slow". The slow
-+ * flag is used, in addition to the budget timeout, to reduce the
-+ * amount of service provided to seeky processes, and thus reduce
-+ * their chances to lower the throughput. More details in the comments
-+ * on the function bfq_bfqq_expire().
-+ *
-+ * An important observation is in order: as discussed in the comments
-+ * on the function bfq_update_peak_rate(), with devices with internal
-+ * queues, it is hard if ever possible to know when and for how long
-+ * an I/O request is processed by the device (apart from the trivial
-+ * I/O pattern where a new request is dispatched only after the
-+ * previous one has been completed). This makes it hard to evaluate
-+ * the real rate at which the I/O requests of each bfq_queue are
-+ * served.  In fact, for an I/O scheduler like BFQ, serving a
-+ * bfq_queue means just dispatching its requests during its service
-+ * slot (i.e., until the budget of the queue is exhausted, or the
-+ * queue remains idle, or, finally, a timeout fires). But, during the
-+ * service slot of a bfq_queue, around 100 ms at most, the device may
-+ * be even still processing requests of bfq_queues served in previous
-+ * service slots. On the opposite end, the requests of the in-service
-+ * bfq_queue may be completed after the service slot of the queue
-+ * finishes.
-+ *
-+ * Anyway, unless more sophisticated solutions are used
-+ * (where possible), the sum of the sizes of the requests dispatched
-+ * during the service slot of a bfq_queue is probably the only
-+ * approximation available for the service received by the bfq_queue
-+ * during its service slot. And this sum is the quantity used in this
-+ * function to evaluate the I/O speed of a process.
-  */
--static bool bfq_update_peak_rate(struct bfq_data *bfqd, struct bfq_queue *bfqq,
--				 bool compensate)
-+static bool bfq_bfqq_is_slow(struct bfq_data *bfqd, struct bfq_queue *bfqq,
-+				 bool compensate, enum bfqq_expiration reason,
-+				 unsigned long *delta_ms)
+ 	blk_mq_start_stopped_hw_queues(q, true);
+ 	blk_mq_kick_requeue_list(q);
+ }
+@@ -105,16 +99,8 @@ static void dm_old_stop_queue(struct request_queue *q)
+ 
+ static void dm_mq_stop_queue(struct request_queue *q)
  {
--	u64 bw, usecs, expected, timeout;
--	ktime_t delta;
--	int update = 0;
-+	ktime_t delta_ktime;
-+	u32 delta_usecs;
-+	bool slow = BFQQ_SEEKY(bfqq); /* if delta too short, use seekyness */
- 
--	if (!bfq_bfqq_sync(bfqq) || bfq_bfqq_budget_new(bfqq))
-+	if (!bfq_bfqq_sync(bfqq))
- 		return false;
- 
- 	if (compensate)
--		delta = bfqd->last_idling_start;
-+		delta_ktime = bfqd->last_idling_start;
- 	else
--		delta = ktime_get();
--	delta = ktime_sub(delta, bfqd->last_budget_start);
--	usecs = ktime_to_us(delta);
+-	unsigned long flags;
 -
--	/* Don't trust short/unrealistic values. */
--	if (usecs < 100 || usecs >= LONG_MAX)
--		return false;
--
--	/*
--	 * Calculate the bandwidth for the last slice.  We use a 64 bit
--	 * value to store the peak rate, in sectors per usec in fixed
--	 * point math.  We do so to have enough precision in the estimate
--	 * and to avoid overflows.
--	 */
--	bw = (u64)bfqq->entity.service << BFQ_RATE_SHIFT;
--	do_div(bw, (unsigned long)usecs);
-+		delta_ktime = ktime_get();
-+	delta_ktime = ktime_sub(delta_ktime, bfqd->last_budget_start);
-+	delta_usecs = ktime_to_us(delta_ktime);
-+
-+	/* don't trust short/unrealistic values. */
-+	if (delta_usecs < 1000 || delta_usecs >= LONG_MAX) {
-+		if (blk_queue_nonrot(bfqd->queue))
-+			 /*
-+			  * give same worst-case guarantees as idling
-+			  * for seeky
-+			  */
-+			*delta_ms = BFQ_MIN_TT / NSEC_PER_MSEC;
-+		else /* charge at least one seek */
-+			*delta_ms = bfq_slice_idle / NSEC_PER_MSEC;
-+
-+		return slow;
-+	}
- 
--	timeout = jiffies_to_msecs(bfqd->bfq_timeout);
-+	*delta_ms = delta_usecs / USEC_PER_MSEC;
- 
- 	/*
--	 * Use only long (> 20ms) intervals to filter out spikes for
--	 * the peak rate estimation.
-+	 * Use only long (> 20ms) intervals to filter out excessive
-+	 * spikes in service rate estimation.
- 	 */
--	if (usecs > 20000) {
--		if (bw > bfqd->peak_rate) {
--			bfqd->peak_rate = bw;
--			update = 1;
--			bfq_log(bfqd, "new peak_rate=%llu", bw);
--		}
--
--		update |= bfqd->peak_rate_samples == BFQ_PEAK_RATE_SAMPLES - 1;
--
--		if (bfqd->peak_rate_samples < BFQ_PEAK_RATE_SAMPLES)
--			bfqd->peak_rate_samples++;
--
--		if (bfqd->peak_rate_samples == BFQ_PEAK_RATE_SAMPLES &&
--		    update && bfqd->bfq_user_max_budget == 0) {
--			bfqd->bfq_max_budget =
--				bfq_calc_max_budget(bfqd->peak_rate,
--						    timeout);
--			bfq_log(bfqd, "new max_budget=%d",
--				bfqd->bfq_max_budget);
--		}
-+	if (delta_usecs > 20000) {
-+		/*
-+		 * Caveat for rotational devices: processes doing I/O
-+		 * in the slower disk zones tend to be slow(er) even
-+		 * if not seeky. In this respect, the estimated peak
-+		 * rate is likely to be an average over the disk
-+		 * surface. Accordingly, to not be too harsh with
-+		 * unlucky processes, a process is deemed slow only if
-+		 * its rate has been lower than half of the estimated
-+		 * peak rate.
-+		 */
-+		slow = bfqq->entity.service < bfqd->bfq_max_budget / 2;
- 	}
- 
--	/*
--	 * A process is considered ``slow'' (i.e., seeky, so that we
--	 * cannot treat it fairly in the service domain, as it would
--	 * slow down too much the other processes) if, when a slice
--	 * ends for whatever reason, it has received service at a
--	 * rate that would not be high enough to complete the budget
--	 * before the budget timeout expiration.
--	 */
--	expected = bw * 1000 * timeout >> BFQ_RATE_SHIFT;
-+	bfq_log_bfqq(bfqd, bfqq, "bfq_bfqq_is_slow: slow %d", slow);
- 
--	/*
--	 * Caveat: processes doing IO in the slower disk zones will
--	 * tend to be slow(er) even if not seeky. And the estimated
--	 * peak rate will actually be an average over the disk
--	 * surface. Hence, to not be too harsh with unlucky processes,
--	 * we keep a budget/3 margin of safety before declaring a
--	 * process slow.
--	 */
--	return expected > (4 * bfqq->entity.budget) / 3;
-+	return slow;
- }
- 
- /*
-@@ -4020,12 +4261,13 @@ static void bfq_bfqq_expire(struct bfq_data *bfqd,
- 			    enum bfqq_expiration reason)
- {
- 	bool slow;
-+	unsigned long delta = 0;
-+	struct bfq_entity *entity = &bfqq->entity;
- 
- 	/*
--	 * Update device peak rate for autotuning and check whether the
--	 * process is slow (see bfq_update_peak_rate).
-+	 * Check whether the process is slow (see bfq_bfqq_is_slow).
- 	 */
--	slow = bfq_update_peak_rate(bfqd, bfqq, compensate);
-+	slow = bfq_bfqq_is_slow(bfqd, bfqq, compensate, reason, &delta);
- 
- 	/*
- 	 * As above explained, 'punish' slow (i.e., seeky), timed-out
-@@ -4035,7 +4277,7 @@ static void bfq_bfqq_expire(struct bfq_data *bfqd,
- 		bfq_bfqq_charge_full_budget(bfqq);
- 
- 	if (reason == BFQ_BFQQ_TOO_IDLE &&
--	    bfqq->entity.service <= 2 * bfqq->entity.budget / 10)
-+	    entity->service <= 2 * entity->budget / 10)
- 		bfq_clear_bfqq_IO_bound(bfqq);
- 
- 	bfq_log_bfqq(bfqd, bfqq,
-@@ -4636,17 +4878,9 @@ static void
- bfq_update_io_seektime(struct bfq_data *bfqd, struct bfq_queue *bfqq,
- 		       struct request *rq)
- {
--	sector_t sdist = 0;
--
--	if (bfqq->last_request_pos) {
--		if (bfqq->last_request_pos < blk_rq_pos(rq))
--			sdist = blk_rq_pos(rq) - bfqq->last_request_pos;
--		else
--			sdist = bfqq->last_request_pos - blk_rq_pos(rq);
+-	spin_lock_irqsave(q->queue_lock, flags);
+-	if (blk_queue_stopped(q)) {
+-		spin_unlock_irqrestore(q->queue_lock, flags);
++	if (blk_mq_queue_stopped(q))
+ 		return;
 -	}
 -
- 	bfqq->seek_history <<= 1;
--	bfqq->seek_history |= (sdist > BFQQ_SEEK_THR);
-+	bfqq->seek_history |=
-+		get_sdist(bfqq->last_request_pos, rq) > BFQQ_SEEK_THR;
- }
+-	queue_flag_set(QUEUE_FLAG_STOPPED, q);
+-	spin_unlock_irqrestore(q->queue_lock, flags);
  
- /*
-@@ -4804,6 +5038,8 @@ static void bfq_completed_request(struct request_queue *q, struct request *rq)
- {
- 	struct bfq_queue *bfqq = RQ_BFQQ(rq);
- 	struct bfq_data *bfqd = bfqq->bfqd;
-+	u64 now_ns;
-+	u32 delta_us;
- 
- 	bfq_update_hw_tag(bfqd);
- 
-@@ -4814,7 +5050,37 @@ static void bfq_completed_request(struct request_queue *q, struct request *rq)
- 				     rq_io_start_time_ns(rq), req_op(rq),
- 				     rq->cmd_flags);
- 
--	RQ_BIC(rq)->ttime.last_end_request = ktime_get_ns();
-+	now_ns = ktime_get_ns();
-+
-+	RQ_BIC(rq)->ttime.last_end_request = now_ns;
-+
-+	/*
-+	 * Using us instead of ns, to get a reasonable precision in
-+	 * computing rate in next check.
-+	 */
-+	delta_us = div_u64(now_ns - bfqd->last_completion, NSEC_PER_USEC);
-+
-+	/*
-+	 * If the request took rather long to complete, and, according
-+	 * to the maximum request size recorded, this completion latency
-+	 * implies that the request was certainly served at a very low
-+	 * rate (less than 1M sectors/sec), then the whole observation
-+	 * interval that lasts up to this time instant cannot be a
-+	 * valid time interval for computing a new peak rate.  Invoke
-+	 * bfq_update_rate_reset to have the following three steps
-+	 * taken:
-+	 * - close the observation interval at the last (previous)
-+	 *   request dispatch or completion
-+	 * - compute rate, if possible, for that observation interval
-+	 * - reset to zero samples, which will trigger a proper
-+	 *   re-initialization of the observation interval on next
-+	 *   dispatch
-+	 */
-+	if (delta_us > BFQ_MIN_TT/NSEC_PER_USEC &&
-+	   (bfqd->last_rq_max_size<<BFQ_RATE_SHIFT)/delta_us <
-+			1UL<<(BFQ_RATE_SHIFT - 10))
-+		bfq_update_rate_reset(bfqd, NULL);
-+	bfqd->last_completion = now_ns;
- 
- 	/*
- 	 * If this is the in-service queue, check if it needs to be expired,
-@@ -5322,16 +5588,6 @@ static ssize_t bfq_weights_store(struct elevator_queue *e,
- 	return count;
- }
- 
--static unsigned long bfq_estimated_max_budget(struct bfq_data *bfqd)
--{
--	u64 timeout = jiffies_to_msecs(bfqd->bfq_timeout);
--
--	if (bfqd->peak_rate_samples >= BFQ_PEAK_RATE_SAMPLES)
--		return bfq_calc_max_budget(bfqd->peak_rate, timeout);
--	else
--		return bfq_default_max_budget;
--}
--
- static ssize_t bfq_max_budget_store(struct elevator_queue *e,
- 				    const char *page, size_t count)
- {
-@@ -5340,7 +5596,7 @@ static ssize_t bfq_max_budget_store(struct elevator_queue *e,
- 	int ret = bfq_var_store(&__data, (page), count);
- 
- 	if (__data == 0)
--		bfqd->bfq_max_budget = bfq_estimated_max_budget(bfqd);
-+		bfqd->bfq_max_budget = bfq_calc_max_budget(bfqd);
- 	else {
- 		if (__data > INT_MAX)
- 			__data = INT_MAX;
-@@ -5370,7 +5626,7 @@ static ssize_t bfq_timeout_sync_store(struct elevator_queue *e,
- 
- 	bfqd->bfq_timeout = msecs_to_jiffies(__data);
- 	if (bfqd->bfq_user_max_budget == 0)
--		bfqd->bfq_max_budget = bfq_estimated_max_budget(bfqd);
-+		bfqd->bfq_max_budget = bfq_calc_max_budget(bfqd);
- 
- 	return ret;
+ 	blk_mq_stop_hw_queues(q);
  }
 -- 
-2.10.0
+2.10.1
+
