@@ -1,124 +1,61 @@
-Return-Path: <Damien.LeMoal@hgst.com>
-From: Damien Le Moal <damien.lemoal@hgst.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>, Christoph
- Hellwig <hch@lst.de>, "Martin K . Petersen" <martin.petersen@oracle.com>,
-	Hannes Reinecke <hare@suse.de>, Shaun Tancheff <shaun@tancheff.com>, Damien
- Le Moal <damien.lemoal@hgst.com>
-Subject: [PATCH v7 0/7] ZBC / Zoned block device support
-Date: Thu, 6 Oct 2016 10:04:45 +0900
-Message-ID: <1475715892-18856-1-git-send-email-damien.lemoal@hgst.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: damien.lemoal@hgst.com
+Return-Path: <tom.leiming@gmail.com>
+Return-Path: <tom.leiming@gmail.com>
+From: Ming Lei <tom.leiming@gmail.com>
+To: Jens Axboe <axboe@fb.com>,
+	linux-kernel@vger.kernel.org
+Cc: linux-block@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>,
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+	Ming Lei <tom.leiming@gmail.com>,
+	Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 60/60] block: enable multipage bvecs
+Date: Sat, 29 Oct 2016 16:08:59 +0800
+Message-Id: <1477728600-12938-61-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
+References: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
-This series introduces support for zoned block devices. It integrates
-earlier submissions by Hannes Reinecke and Shaun Tancheff. Compared to the
-previous series version, the code was significantly simplified by limiting
-support to zoned devices satisfying the following conditions:
-1) All zones of the device are the same size, with the exception of an
-   eventual last smaller runt zone.
-2) For host-managed disks, reads must be unrestricted (read commands do not
-   fail due to zone or write pointer alignement constraints).
-Zoned disks that do not satisfy these 2 conditions are ignored.
+This patch pulls the trigger for multipage bvecs.
 
-These 2 conditions allowed dropping the zone information cache implemented
-in the previous version. This simplifies the code and also reduces the memory
-consumption at run time. Support for zoned devices now only require one bit
-per zone (less than 8KB in total). This bit field is used to write-lock
-zones and prevent the concurrent execution of multiple write commands in
-the same zone. This avoids write ordering problems at dispatch time, for
-both the simple queue and scsi-mq settings.
+Any request queue which doesn't set QUEUE_FLAG_NO_MP
+should support to handle multipage bvecs.
 
-The new operations introduced to suport zone manipulation was reduced to
-only the two main ZBC/ZAC defined commands: REPORT ZONES (REQ_OP_ZONE_REPORT)
-and RESET WRITE POINTER (REQ_OP_ZONE_RESET). This brings the total number of
-operations defined to 8, which fits in the 3 bits (REQ_OP_BITS) reserved for
-operation code in bio->bi_opf and req->cmd_flags.
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+---
+ block/bio.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-Most of the ZBC specific code is kept out of sd.c and implemented in the
-new file sd_zbc.c. Similarly, at the block layer, most of the zoned block
-device code is implemented in the new blk-zoned.c.
-
-For host-managed zoned block devices, the sequential write constraint of
-write pointer zones is exposed to the user. Users of the disk (applications,
-file systems or device mappers) must sequentially write to zones. This means
-that for raw block device accesses from applications, buffered writes are
-unreliable and direct I/Os must be used (or buffered writes with O_SYNC).
-
-Access to zone manipulation operations is also provided to applications
-through a set of new ioctls. This allows applications operating on raw
-block devices (e.g. mkfs.xxx) to discover a device zone layout and
-manipulate zone state.
-
-Changes from v6:
-* Fixed problems with zone write locking:
-  - Wrong sdkp->zone_wlock bitmap allocation size
-  - Incorrect (reversed condition) test of lock state with test_and_set_bit
-  - Potential error in sd_setup_read_write_cmnd could leave a zone locked
-    without the locking write command being executed
-
-Changes from v5:
-* Rebased on Jens' for-4.9/block branch (v5 is based on next-20160928)
-
-Changes from v4:
-* Changed interface of sd_zbc_setup_read_write
-
-Changes from v3:
-* Fixed several typos and tabs/spaces
-* Added description of zoned and chunk_sectors queue attributes in
-  Documentation/ABI/testing/sysfs-block
-* Fixed sd_read_capacity call in sd.c and to avoid missing information on
-  the first pass of a disk scan
-* Fixed scsi_disk zone related field to use logical block size unit instead
-  of 512B sector unit.
-
-Changes from v2:
-* Use kcalloc to allocate zone information array for ioctl
-* Use kcalloc to allocate zone information array for ioctl
-* Export GPL the functions blkdev_report_zones and blkdev_reset_zones
-* Shuffled uapi definitions from patch 7 into patch 5
-
-Damien Le Moal (1):
-  block: Add 'zoned' queue limit
-
-Hannes Reinecke (4):
-  blk-sysfs: Add 'chunk_sectors' to sysfs attributes
-  block: update chunk_sectors in blk_stack_limits()
-  block: Implement support for zoned block devices
-  sd: Implement support for ZBC devices
-
-Shaun Tancheff (2):
-  block: Define zoned block device operations
-  blk-zoned: implement ioctls
-
- Documentation/ABI/testing/sysfs-block |  29 ++
- block/Kconfig                         |   8 +
- block/Makefile                        |   2 +-
- block/blk-core.c                      |   4 +
- block/blk-settings.c                  |   5 +
- block/blk-sysfs.c                     |  29 ++
- block/blk-zoned.c                     | 350 +++++++++++++++++++
- block/ioctl.c                         |   4 +
- drivers/scsi/Makefile                 |   1 +
- drivers/scsi/sd.c                     | 148 ++++++--
- drivers/scsi/sd.h                     |  70 ++++
- drivers/scsi/sd_zbc.c                 | 638 ++++++++++++++++++++++++++++++++++
- include/linux/blk_types.h             |   2 +
- include/linux/blkdev.h                |  99 ++++++
- include/scsi/scsi_proto.h             |  17 +
- include/uapi/linux/Kbuild             |   1 +
- include/uapi/linux/blkzoned.h         | 143 ++++++++
- include/uapi/linux/fs.h               |   4 +
- 18 files changed, 1518 insertions(+), 36 deletions(-)
- create mode 100644 block/blk-zoned.c
- create mode 100644 drivers/scsi/sd_zbc.c
- create mode 100644 include/uapi/linux/blkzoned.h
-
+diff --git a/block/bio.c b/block/bio.c
+index c9cf0a81cca3..b73777dc59c3 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -838,6 +838,11 @@ int bio_add_page(struct bio *bio, struct page *page,
+ 	 * a consecutive offset.  Optimize this special case.
+ 	 */
+ 	if (bio->bi_vcnt > 0) {
++		struct request_queue *q = NULL;
++
++		if (bio->bi_bdev)
++			q = bdev_get_queue(bio->bi_bdev);
++
+ 		bv = &bio->bi_io_vec[bio->bi_vcnt - 1];
+ 
+ 		if (page == bv->bv_page &&
+@@ -845,6 +850,14 @@ int bio_add_page(struct bio *bio, struct page *page,
+ 			bv->bv_len += len;
+ 			goto done;
+ 		}
++
++		/* disable multipage bvec too if cluster isn't enabled */
++		if (q && !blk_queue_no_mp(q) && blk_queue_cluster(q) &&
++		    (bvec_to_phys(bv) + bv->bv_len ==
++		     page_to_phys(page) + offset)) {
++			bv->bv_len += len;
++			goto done;
++		}
+ 	}
+ 
+ 	if (bio->bi_vcnt >= bio->bi_max_vecs)
 -- 
 2.7.4
-
-Western Digital Corporation (and its subsidiaries) E-mail Confidentiality Notice & Disclaimer:
-
-This e-mail and any files transmitted with it may contain confidential or legally privileged information of WDC and/or its affiliates, and are intended solely for the use of the individual or entity to which they are addressed. If you are not the intended recipient, any disclosure, copying, distribution or any action taken or omitted to be taken in reliance on it, is prohibited. If you have received this e-mail in error, please notify the sender immediately and delete the e-mail in its entirety from your system.
