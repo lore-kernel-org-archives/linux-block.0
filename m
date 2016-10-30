@@ -1,164 +1,173 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f196.google.com ([209.85.192.196]:33116 "EHLO
-        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S943070AbcJ2IOd (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sat, 29 Oct 2016 04:14:33 -0400
-From: Ming Lei <tom.leiming@gmail.com>
-To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Ming Lei <tom.leiming@gmail.com>,
-        Mike Christie <mchristi@redhat.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Keith Busch <keith.busch@intel.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Johannes Berg <johannes.berg@intel.com>
-Subject: [PATCH 33/60] block: introduce bio_for_each_segment_mp()
-Date: Sat, 29 Oct 2016 16:08:32 +0800
-Message-Id: <1477728600-12938-34-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
-References: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+Content-Type: text/plain; charset=windows-1252
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Subject: Re: [PATCH 00/14] introduce the BFQ-v0 I/O scheduler as an extra scheduler
+From: Paolo Valente <paolo.valente@linaro.org>
+In-Reply-To: <d9bee0b8-c761-3970-d2bc-80ca34722350@kernel.dk>
+Date: Sun, 30 Oct 2016 04:06:21 +0100
+Cc: Christoph Hellwig <hch@infradead.org>,
+ Arnd Bergmann <arnd@arndb.de>,
+ Bart Van Assche <bart.vanassche@sandisk.com>,
+ Jan Kara <jack@suse.cz>,
+ Tejun Heo <tj@kernel.org>,
+ linux-block@vger.kernel.org,
+ Linux-Kernal <linux-kernel@vger.kernel.org>,
+ Ulf Hansson <ulf.hansson@linaro.org>,
+ Linus Walleij <linus.walleij@linaro.org>,
+ Mark Brown <broonie@kernel.org>,
+ Hannes Reinecke <hare@suse.de>,
+ grant.likely@secretlab.ca,
+ James.Bottomley@hansenpartnership.com
+Message-Id: <6E3151D8-A8BE-46B5-9A24-162ADB8A15B4@linaro.org>
+References: <1477474082-2846-1-git-send-email-paolo.valente@linaro.org> <20161026113443.GA13587@quack2.suse.cz> <4ed3e291-b3e5-5ee3-6838-58644bd3d99b@sandisk.com> <12386463.fJy0cVexVD@wuerfel> <20161026152955.GA21262@infradead.org> <3ebadbb8-9ac2-851a-66f9-c9db25713695@kernel.dk> <38156FA7-9A66-44DC-8D0C-28F149D1E49B@linaro.org> <09fc1e06-3fd6-b13d-0dd9-0edfb55b01d1@kernel.dk> <C1E15CDB-81A7-4103-A01E-E50BA6329CCA@linaro.org> <d9bee0b8-c761-3970-d2bc-80ca34722350@kernel.dk>
+To: Jens Axboe <axboe@kernel.dk>
+List-ID: <linux-block@vger.kernel.org>
 
-This helper is used to iterate multipage bvec and it is
-required in bio_clone().
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
----
- include/linux/bio.h  | 38 +++++++++++++++++++++++++++++++++-----
- include/linux/bvec.h | 37 ++++++++++++++++++++++++++++++++-----
- 2 files changed, 65 insertions(+), 10 deletions(-)
+> Il giorno 29 ott 2016, alle ore 16:12, Jens Axboe <axboe@kernel.dk> ha =
+scritto:
+>=20
+> On 10/28/2016 11:38 PM, Paolo Valente wrote:
+>>=20
+>>> Il giorno 26 ott 2016, alle ore 18:12, Jens Axboe <axboe@kernel.dk> =
+ha scritto:
+>>>=20
+>>> On 10/26/2016 10:04 AM, Paolo Valente wrote:
+>>>>=20
+>>>>> Il giorno 26 ott 2016, alle ore 17:32, Jens Axboe =
+<axboe@kernel.dk> ha scritto:
+>>>>>=20
+>>>>> On 10/26/2016 09:29 AM, Christoph Hellwig wrote:
+>>>>>> On Wed, Oct 26, 2016 at 05:13:07PM +0200, Arnd Bergmann wrote:
+>>>>>>> The question to ask first is whether to actually have pluggable
+>>>>>>> schedulers on blk-mq at all, or just have one that is meant to
+>>>>>>> do the right thing in every case (and possibly can be bypassed
+>>>>>>> completely).
+>>>>>>=20
+>>>>>> That would be my preference.  Have a BFQ-variant for blk-mq as an
+>>>>>> option (default to off unless opted in by the driver or user), =
+and
+>>>>>> not other scheduler for blk-mq.  Don't bother with bfq for non
+>>>>>> blk-mq.  It's not like there is any advantage in the =
+legacy-request
+>>>>>> device even for slow devices, except for the option of having I/O
+>>>>>> scheduling.
+>>>>>=20
+>>>>> It's the only right way forward. blk-mq might not offer any =
+substantial
+>>>>> advantages to rotating storage, but with scheduling, it won't =
+offer a
+>>>>> downside either. And it'll take us towards the real goal, which is =
+to
+>>>>> have just one IO path.
+>>>>=20
+>>>> ok
+>>>>=20
+>>>>> Adding a new scheduler for the legacy IO path
+>>>>> makes no sense.
+>>>>=20
+>>>> I would fully agree if effective and stable I/O scheduling would be
+>>>> available in blk-mq in one or two months.  But I guess that it will
+>>>> take at least one year optimistically, given the current status of =
+the
+>>>> needed infrastructure, and given the great difficulties of doing
+>>>> effective scheduling at the high parallelism and extreme target =
+speeds
+>>>> of blk-mq.  Of course, this holds true unless little clever =
+scheduling
+>>>> is performed.
+>>>>=20
+>>>> So, what's the point in forcing a lot of users wait another year or
+>>>> more, for a solution that has yet to be even defined, while they =
+could
+>>>> enjoy a much better system, and then switch an even better system =
+when
+>>>> scheduling is ready in blk-mq too?
+>>>=20
+>>> That same argument could have been made 2 years ago. Saying no to a =
+new
+>>> scheduler for the legacy framework goes back roughly that long. We =
+could
+>>> have had BFQ for mq NOW, if we didn't keep coming back to this very
+>>> point.
+>>>=20
+>>> I'm hesistant to add a new scheduler because it's very easy to add, =
+very
+>>> difficult to get rid of. If we do add BFQ as a legacy scheduler now,
+>>> it'll take us years and years to get rid of it again. We should be
+>>> moving towards LESS moving parts in the legacy path, not more.
+>>>=20
+>>> We can keep having this discussion every few years, but I think we'd
+>>> both prefer to make some actual progress here.
+>>=20
+>> ok Jens, I give up
+>>=20
+>>> It's perfectly fine to
+>>> add an interface for a single queue interface for an IO scheduler =
+for
+>>> blk-mq, since we don't care too much about scalability there. And =
+that
+>>> won't take years, that should be a few weeks. Retrofitting BFQ on =
+top of
+>>> that should not be hard either. That can co-exist with a real =
+multiqueue
+>>> scheduler as well, something that's geared towards some fairness for
+>>> faster devices.
+>>>=20
+>>=20
+>> AFAICT this solution is good, for many practical reasons.  I don't
+>> have the expertise to make such an infrastructure well on my own.  At
+>> least not in an acceptable amount of time, because working on this
+>> nice stuff is unfortunately not my job (although Linaro is now
+>> supporting me for BFQ).
+>>=20
+>> Then, assuming that this solution may be of general interest, and =
+that
+>> BFQ benefits convinced you a little bit too, may I get significant
+>> collaboration/help on implementing this infrastructure?
+>=20
+> Of course, I already offered to help with this.
+>=20
 
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index fa71f6a57f81..17852ba0e40f 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -65,6 +65,9 @@
- #define bio_sectors(bio)	((bio)->bi_iter.bi_size >> 9)
- #define bio_end_sector(bio)	((bio)->bi_iter.bi_sector + bio_sectors((bio)))
- 
-+#define bio_iter_iovec_mp(bio, iter)				\
-+	bvec_iter_bvec_mp((bio)->bi_io_vec, (iter))
-+
- /*
-  * Check whether this bio carries any data or not. A NULL bio is allowed.
-  */
-@@ -167,15 +170,31 @@ static inline void *bio_data(struct bio *bio)
- #define bio_for_each_segment_all(bvl, bio, i)				\
- 	for (i = 0, bvl = (bio)->bi_io_vec; i < (bio)->bi_vcnt; i++, bvl++)
- 
--static inline void bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
--				    unsigned bytes)
-+static inline void __bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
-+				      unsigned bytes, bool mp)
- {
- 	iter->bi_sector += bytes >> 9;
- 
--	if (bio_no_advance_iter(bio))
-+	if (bio_no_advance_iter(bio)) {
- 		iter->bi_size -= bytes;
--	else
--		bvec_iter_advance(bio->bi_io_vec, iter, bytes);
-+	} else {
-+		if (!mp)
-+			bvec_iter_advance(bio->bi_io_vec, iter, bytes);
-+		else
-+			bvec_iter_advance_mp(bio->bi_io_vec, iter, bytes);
-+	}
-+}
-+
-+static inline void bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
-+				    unsigned bytes)
-+{
-+	__bio_advance_iter(bio, iter, bytes, false);
-+}
-+
-+static inline void bio_advance_iter_mp(struct bio *bio, struct bvec_iter *iter,
-+				       unsigned bytes)
-+{
-+	__bio_advance_iter(bio, iter, bytes, true);
- }
- 
- #define __bio_for_each_segment(bvl, bio, iter, start)			\
-@@ -187,6 +206,15 @@ static inline void bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
- #define bio_for_each_segment(bvl, bio, iter)				\
- 	__bio_for_each_segment(bvl, bio, iter, (bio)->bi_iter)
- 
-+#define __bio_for_each_segment_mp(bvl, bio, iter, start)		\
-+	for (iter = (start);						\
-+	     (iter).bi_size &&						\
-+		((bvl = bio_iter_iovec_mp((bio), (iter))), 1);		\
-+	     bio_advance_iter_mp((bio), &(iter), (bvl).bv_len))
-+
-+#define bio_for_each_segment_mp(bvl, bio, iter)				\
-+	__bio_for_each_segment_mp(bvl, bio, iter, (bio)->bi_iter)
-+
- #define bio_iter_last(bvec, iter) ((iter).bi_size == (bvec).bv_len)
- 
- static inline unsigned bio_segments(struct bio *bio)
-diff --git a/include/linux/bvec.h b/include/linux/bvec.h
-index 12c53a0eee52..9df9e582bd3f 100644
---- a/include/linux/bvec.h
-+++ b/include/linux/bvec.h
-@@ -128,16 +128,29 @@ struct bvec_iter {
- 	.bv_offset	= bvec_iter_offset((bvec), (iter)),	\
- })
- 
--static inline void bvec_iter_advance(const struct bio_vec *bv,
--				     struct bvec_iter *iter,
--				     unsigned bytes)
-+#define bvec_iter_bvec_mp(bvec, iter)				\
-+((struct bio_vec) {						\
-+	.bv_page	= bvec_iter_page_mp((bvec), (iter)),	\
-+	.bv_len		= bvec_iter_len_mp((bvec), (iter)),	\
-+	.bv_offset	= bvec_iter_offset_mp((bvec), (iter)),	\
-+})
-+
-+static inline void __bvec_iter_advance(const struct bio_vec *bv,
-+				       struct bvec_iter *iter,
-+				       unsigned bytes, bool mp)
- {
- 	WARN_ONCE(bytes > iter->bi_size,
- 		  "Attempted to advance past end of bvec iter\n");
- 
- 	while (bytes) {
--		unsigned iter_len = bvec_iter_len(bv, *iter);
--		unsigned len = min(bytes, iter_len);
-+		unsigned len;
-+
-+		if (mp)
-+			len = bvec_iter_len_mp(bv, *iter);
-+		else
-+			len = bvec_iter_len_sp(bv, *iter);
-+
-+		len = min(bytes, len);
- 
- 		bytes -= len;
- 		iter->bi_size -= len;
-@@ -150,6 +163,20 @@ static inline void bvec_iter_advance(const struct bio_vec *bv,
- 	}
- }
- 
-+static inline void bvec_iter_advance(const struct bio_vec *bv,
-+				     struct bvec_iter *iter,
-+				     unsigned bytes)
-+{
-+	__bvec_iter_advance(bv, iter, bytes, false);
-+}
-+
-+static inline void bvec_iter_advance_mp(const struct bio_vec *bv,
-+					struct bvec_iter *iter,
-+					unsigned bytes)
-+{
-+	__bvec_iter_advance(bv, iter, bytes, true);
-+}
-+
- #define for_each_bvec(bvl, bio_vec, iter, start)			\
- 	for (iter = (start);						\
- 	     (iter).bi_size &&						\
--- 
-2.7.4
+Yep, I just did not want to take this important point for granted.
 
+>> If so, Jens
+>> and all possibly interested parties, could we have a sort of short
+>> kick-off technical meeting during KS/LPC?
+>=20
+> I'm not a huge fan of setting up a BoF to discuss something technical,
+> when there's no code to discuss yet. We need some actual meat on the
+> bone in the shape of code, and that's much better dealt with in email.
+> Timing is pretty advanced at this point, otherwise I'd offer to cook
+> something up that we COULD discuss, but I will not have time to do =
+that
+> for KS.
+>=20
+
+Sorry, I was not thinking of any BoF or the like.  I just meant, with
+a stuffy phrase, "let's get it started concretely".=20
+
+> If you are at LPC, why don't the two of us sit down and talk about it
+> Wednesday or Thursday?
+
+I'm also at KS.  I'm available from Sunday evening to Wednesday
+evening.  I'm leaving on Thursday morning.  If Wednesday is in any
+case your preferred day, then let's do it on Wednesday.  At what time?
+
+If I understand correctly, Bart will join us too.
+
+> I'd like to try and understand what parts of
+> blk-mq you aren't up to speed on, and how we can best get a simple
+> framework going that will allow us to entertain single queue =
+scheduling
+> within blk-mq.
+>=20
+
+That's exactly what I hoped we would have talked about.
+
+Thanks,
+Paolo
+
+> --=20
+> Jens Axboe
