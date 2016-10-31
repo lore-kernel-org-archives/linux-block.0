@@ -1,44 +1,29 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Ming Lei <tom.leiming@gmail.com>
-To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([198.137.202.9]:54035 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S944018AbcJaP3p (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 31 Oct 2016 11:29:45 -0400
+Date: Mon, 31 Oct 2016 08:29:44 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Ming Lei <tom.leiming@gmail.com>
+Cc: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         Christoph Hellwig <hch@infradead.org>,
         "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Ming Lei <tom.leiming@gmail.com>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        dm-devel@redhat.com (maintainer:DEVICE-MAPPER (LVM)),
-        Shaohua Li <shli@kernel.org>,
-        linux-raid@vger.kernel.org (open list:SOFTWARE RAID (Multiple Disks)
-        SUPPORT)
-Subject: [PATCH 58/60] dm-crypt: convert to bio_for_each_segment_all_rd()
-Date: Sat, 29 Oct 2016 16:08:57 +0800
-Message-Id: <1477728600-12938-59-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
+        Joern Engel <joern@logfs.org>,
+        Prasad Joshi <prasadjoshi.linux@gmail.com>,
+        "open list:LogFS" <logfs@logfs.org>
+Subject: Re: [PATCH 12/60] fs: logfs: use bio_add_page() in do_erase()
+Message-ID: <20161031152944.GF30919@infradead.org>
 References: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+ <1477728600-12938-13-git-send-email-tom.leiming@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1477728600-12938-13-git-send-email-tom.leiming@gmail.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
----
- drivers/md/dm-crypt.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Looks fine,
 
-diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
-index 4999c7497f95..ed0f54e51638 100644
---- a/drivers/md/dm-crypt.c
-+++ b/drivers/md/dm-crypt.c
-@@ -1034,8 +1034,9 @@ static void crypt_free_buffer_pages(struct crypt_config *cc, struct bio *clone)
- {
- 	unsigned int i;
- 	struct bio_vec *bv;
-+	struct bvec_iter_all bia;
- 
--	bio_for_each_segment_all(bv, clone, i) {
-+	bio_for_each_segment_all_rd(bv, clone, i, bia) {
- 		BUG_ON(!bv->bv_page);
- 		mempool_free(bv->bv_page, cc->page_pool);
- 		bv->bv_page = NULL;
--- 
-2.7.4
-
+Reviewed-by: Christoph Hellwig <hch@lst.de>
