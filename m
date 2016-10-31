@@ -1,54 +1,43 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-co1nam03on0074.outbound.protection.outlook.com ([104.47.40.74]:4992
-        "EHLO NAM03-CO1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S943680AbcJaPKj (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 31 Oct 2016 11:10:39 -0400
-From: Bart Van Assche <Bart.VanAssche@sandisk.com>
-To: "loberman@redhat.com" <loberman@redhat.com>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "tom.leiming@gmail.com" <tom.leiming@gmail.com>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-        "snitzer@redhat.com" <snitzer@redhat.com>,
-        "hch@lst.de" <hch@lst.de>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-        "konrad.wilk@oracle.com" <konrad.wilk@oracle.com>,
-        "roger.pau@citrix.com" <roger.pau@citrix.com>,
-        "axboe@fb.com" <axboe@fb.com>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>,
-        "keith.busch@intel.com" <keith.busch@intel.com>,
-        "dledford@redhat.com" <dledford@redhat.com>
+Return-Path: <linux-scsi-owner@vger.kernel.org>
 Subject: Re: [PATCH v5 14/14] nvme: Use BLK_MQ_S_STOPPED instead of
  QUEUE_FLAG_STOPPED in blk-mq code
-Date: Mon, 31 Oct 2016 15:10:36 +0000
-Message-ID: <1477926635.2511.1.camel@sandisk.com>
+To: Laurence Oberman <loberman@redhat.com>
 References: <7460e8b2-2cfd-c0d5-7ae7-7f662d89dad3@sandisk.com>
-         <fe057bf0-6ede-fc9e-9a53-9d790c9782c2@sandisk.com>
-         <540193784.5466628.1477921998345.JavaMail.zimbra@redhat.com>
-In-Reply-To: <540193784.5466628.1477921998345.JavaMail.zimbra@redhat.com>
-Content-Type: text/plain; charset="utf-8"
+ <fe057bf0-6ede-fc9e-9a53-9d790c9782c2@sandisk.com>
+ <540193784.5466628.1477921998345.JavaMail.zimbra@redhat.com>
+CC: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@lst.de>,
+        James Bottomley <jejb@linux.vnet.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Doug Ledford <dledford@redhat.com>,
+        Keith Busch <keith.busch@intel.com>,
+        Ming Lei <tom.leiming@gmail.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>,
+        <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
+        <linux-rdma@vger.kernel.org>, <linux-nvme@lists.infradead.org>
+From: Bart Van Assche <bart.vanassche@sandisk.com>
+Message-ID: <c8c503bf-4fcb-5e1d-487a-53277bc1c300@sandisk.com>
+Date: Mon, 31 Oct 2016 06:59:35 -0700
 MIME-Version: 1.0
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <540193784.5466628.1477921998345.JavaMail.zimbra@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Sender: linux-scsi-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-T24gTW9uLCAyMDE2LTEwLTMxIGF0IDA5OjUzIC0wNDAwLCBMYXVyZW5jZSBPYmVybWFuIHdyb3Rl
-Og0KPiBBcHBsaWVkIGFsbCAxNCBwYXRjaGVzLCBhbHNvIGNvcnJlY3RlZCB0aGUgcGFydCBvZiB0
-aGUgeGVuLWJsa2Zyb250LmMgDQo+IGJsa2lmX3JlY292ZXIgcGF0Y2ggaW4gcGF0Y2h2NS01LzE0
-Lg0KPiANCj4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvYmxvY2sveGVuLWJsa2Zyb250LmMgYi9kcml2
-ZXJzL2Jsb2NrL3hlbi0NCj4gYmxrZnJvbnQuYw0KPiBpbmRleCA5OTA4NTk3Li42MGZmZjk5IDEw
-MDY0NA0KPiAtLS0gYS9kcml2ZXJzL2Jsb2NrL3hlbi1ibGtmcm9udC5jDQo+ICsrKyBiL2RyaXZl
-cnMvYmxvY2sveGVuLWJsa2Zyb250LmMNCj4gQEAgLTIwNDUsNiArMjA0NSw3IEBAIHN0YXRpYyBp
-bnQgYmxraWZfcmVjb3ZlcihzdHJ1Y3QgYmxrZnJvbnRfaW5mbw0KPiAqaW5mbykNCj4gwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoEJVR19PTihyZXEtPm5yX3BoeXNfc2VnbWVudHMg
-PiBzZWdzKTsNCj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGJsa19tcV9yZXF1
-ZXVlX3JlcXVlc3QocmVxKTsNCj4gwqDCoMKgwqDCoMKgwqDCoMKgfQ0KPiArwqDCoMKgwqDCoMKg
-wqDCoGJsa19tcV9zdGFydF9zdG9wcGVkX2h3X3F1ZXVlcyhpbmZycSwNCj4gdHJ1ZSk7wqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCoqKiBDb3JyZWN0ZWQNCj4gwqDCoMKg
-wqDCoMKgwqDCoMKgYmxrX21xX2tpY2tfcmVxdWV1ZV9saXN0KGluZnJxKTsNCj4gwqANCj4gwqDC
-oMKgwqDCoMKgwqDCoMKgd2hpbGUgKChiaW8gPSBiaW9fbGlzdF9wb3AoJmluZmJpb19saXN0KSkg
-IT0gTlVMTCkgew0KDQpIZWxsbyBMYXVyZW5jZSwNCg0KU29ycnkgZm9yIHRoZSBidWlsZCBmYWls
-dXJlLiBUaGUgd2F5IHlvdSBjaGFuZ2VkIHhlbi1ibGtmcm9udCBpcyBpbmRlZWQNCndoYXQgSSBp
-bnRlbmRlZC4gQXBwYXJlbnRseSBJIGZvcmdvdCB0byBlbmFibGUgWGVuIGluIG15IGtlcm5lbCBj
-b25maWcNCi4uLg0KDQpCYXJ0Lg==
+On 10/31/2016 06:53 AM, Laurence Oberman wrote:
+> Ran multiple read/write buffered and directio tests via RDMA/SRP and mlx5 (100Gbit) with max_sectors_kb set to 1024, 2048, 4096 and 8196
+> Ran multiple read/write buffered and directio tests via RDMA/SRP and mlx4 (56Gbit)  with max_sectors_kb set to 1024, 2048, 4096 and 8196
+> Reset the SRP hosts multiple times with multipath set to no_path_retry queue
+> Ran basic NVME read/write testing with no hot plug disconnects on multiple block sizes
+>
+> All tests passed.
+>
+> For the series:
+> Tested-by: Laurence Oberman <loberman@redhat.com>
+
+Hello Laurence,
+
+Thanks for having tested this version of this patch series again so quickly!
+
+Bart.
