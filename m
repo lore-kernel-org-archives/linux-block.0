@@ -1,48 +1,36 @@
-Return-Path: <yasu.isimatu@gmail.com>
-Return-Path: <yasu.isimatu@gmail.com>
-Subject: [PATCH] null_blk: Add notes to use LightNVM
-To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-From: Yasuaki Ishimatsu <yasu.isimatu@gmail.com>
-Cc: axboe@kernel.dk
-Message-ID: <37a5a6a3-cd8b-db98-b4f3-7bd66a5bf4d8@gmail.com>
-Date: Thu, 27 Oct 2016 11:56:17 -0400
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-ua0-f180.google.com ([209.85.217.180]:33633 "EHLO
+        mail-ua0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S946090AbcJaWyi (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 31 Oct 2016 18:54:38 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <20161031152616.GB30919@infradead.org>
+References: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
+ <1477728600-12938-5-git-send-email-tom.leiming@gmail.com> <20161031152616.GB30919@infradead.org>
+From: Ming Lei <tom.leiming@gmail.com>
+Date: Tue, 1 Nov 2016 06:54:36 +0800
+Message-ID: <CACVXFVNKVp7rWkYnry+dDvvPWvht09gVCi+qHdaHipYF4yPS+Q@mail.gmail.com>
+Subject: Re: [PATCH 04/60] block: floppy: use bio_add_page()
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Jens Axboe <axboe@fb.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        Jiri Kosina <jikos@kernel.org>,
+        Mike Christie <mchristi@redhat.com>,
+        Hannes Reinecke <hare@suse.com>,
+        Dan Williams <dan.j.williams@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-If CONFIG_NVM is disabled, loading null_block module with use_lightnvm=1
-fails. But there are no messages and documents related to the failure.
+On Mon, Oct 31, 2016 at 11:26 PM, Christoph Hellwig <hch@infradead.org> wrote:
+> Why not keep the bio_add_page in the same spot as direct assignments
+> were before?
 
-So the patch adds the notes to use LightNVM.
+I just want to put adding page after setting bi_bdev.
 
-Signed-off-by: Yasuaki Ishimatsu <isimatu.yasuaki@jp.fujitsu.com>
-Cc: Jens Axboe <axboe@kernel.dk>
----
-  Documentation/block/null_blk.txt | 2 +-
-  drivers/block/null_blk.c         | 1 +
-  2 files changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/Documentation/block/null_blk.txt b/Documentation/block/null_blk.txt
-index d8880ca..0365a26 100644
---- a/Documentation/block/null_blk.txt
-+++ b/Documentation/block/null_blk.txt
-@@ -72,4 +72,4 @@ use_per_node_hctx=[0/1]: Default: 0
-       queue for each CPU node in the system.
-
-  use_lightnvm=[0/1]: Default: 0
--  Register device with LightNVM. Requires blk-mq to be used.
-+  Register device with LightNVM. Requires blk-mq and CONFIG_NVM=y to be used.
-diff --git a/drivers/block/null_blk.c b/drivers/block/null_blk.c
-index ba6f4a2e..4943ee2 100644
---- a/drivers/block/null_blk.c
-+++ b/drivers/block/null_blk.c
-@@ -577,6 +577,7 @@ static void null_nvm_unregister(struct nullb *nullb)
-  #else
-  static int null_nvm_register(struct nullb *nullb)
-  {
-+	pr_err("null_blk: CONFIG_NVM needs to be enabled for LightNVM\n");
-  	return -EINVAL;
-  }
-  static void null_nvm_unregister(struct nullb *nullb) {}
--- 
-1.8.3.1
+Thanks,
+Ming Lei
