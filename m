@@ -1,119 +1,40 @@
-Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
-Subject: [PATCH 02/12] blk-mq: Introduce blk_mq_hctx_stopped()
-To: Jens Axboe <axboe@fb.com>
-References: <b22edafc-725f-0419-d074-34d35d57d126@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-Message-ID: <0de50789-e3b7-0a07-73c1-4fb87b1f957e@sandisk.com>
-Date: Wed, 26 Oct 2016 15:51:33 -0700
-MIME-Version: 1.0
-In-Reply-To: <b22edafc-725f-0419-d074-34d35d57d126@sandisk.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
-List-Post: <mailto:linux-nvme@lists.infradead.org>
-List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- James Bottomley <jejb@linux.vnet.ibm.com>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- Mike Snitzer <snitzer@redhat.com>,
- "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
- Ming Lei <tom.leiming@gmail.com>,
- "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
- Keith Busch <keith.busch@intel.com>, Doug Ledford <dledford@redhat.com>,
- "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
- Laurence Oberman <loberman@redhat.com>, Christoph Hellwig <hch@lst.de>
-Content-Type: text/plain; charset="us-ascii"
-Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
-Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga14.intel.com ([192.55.52.115]:30594 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S947383AbcJaWDu (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 31 Oct 2016 18:03:50 -0400
+From: Scott Bauer <scott.bauer@intel.com>
+To: linux-nvme@lists.infradead.org
+Cc: Rafael.Antognolli@intel.com, axboe@fb.com, keith.busch@intel.com,
+        jonathan.derrick@intel.com, j.naumann@fu-berlin.de,
+        hch@infradead.org, linux-block@vger.kernel.org,
+        Scott Bauer <scott.bauer@intel.com>
+Subject: [RFC PATCH 4/6] include: Add sec_ops to block device operations
+Date: Mon, 31 Oct 2016 15:58:17 -0600
+Message-Id: <1477951099-3127-5-git-send-email-scott.bauer@intel.com>
+In-Reply-To: <1477951099-3127-1-git-send-email-scott.bauer@intel.com>
+References: <1477951099-3127-1-git-send-email-scott.bauer@intel.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Multiple functions test the BLK_MQ_S_STOPPED bit so introduce
-a helper function that performs this test.
-
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Sagi Grimberg <sagi@grimberg.me>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
+Signed-off-by: Scott Bauer <scott.bauer@intel.com>
+Signed-off-by: Rafael Antognolli <Rafael.Antognolli@intel.com>
 ---
- block/blk-mq.c | 12 ++++++------
- block/blk-mq.h |  5 +++++
- 2 files changed, 11 insertions(+), 6 deletions(-)
+ include/linux/blkdev.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index b5dcafb..b52b3a6 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -787,7 +787,7 @@ static void __blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx)
- 	struct list_head *dptr;
- 	int queued;
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index c47c358..6fceff1 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1690,6 +1690,7 @@ struct block_device_operations {
+ 	void (*swap_slot_free_notify) (struct block_device *, unsigned long);
+ 	struct module *owner;
+ 	const struct pr_ops *pr_ops;
++	struct sec_ops *sec_ops;
+ };
  
--	if (unlikely(test_bit(BLK_MQ_S_STOPPED, &hctx->state)))
-+	if (unlikely(blk_mq_hctx_stopped(hctx)))
- 		return;
- 
- 	WARN_ON(!cpumask_test_cpu(raw_smp_processor_id(), hctx->cpumask) &&
-@@ -912,8 +912,8 @@ static int blk_mq_hctx_next_cpu(struct blk_mq_hw_ctx *hctx)
- 
- void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
- {
--	if (unlikely(test_bit(BLK_MQ_S_STOPPED, &hctx->state) ||
--	    !blk_mq_hw_queue_mapped(hctx)))
-+	if (unlikely(blk_mq_hctx_stopped(hctx) ||
-+		     !blk_mq_hw_queue_mapped(hctx)))
- 		return;
- 
- 	if (!async && !(hctx->flags & BLK_MQ_F_BLOCKING)) {
-@@ -938,7 +938,7 @@ void blk_mq_run_hw_queues(struct request_queue *q, bool async)
- 	queue_for_each_hw_ctx(q, hctx, i) {
- 		if ((!blk_mq_hctx_has_pending(hctx) &&
- 		    list_empty_careful(&hctx->dispatch)) ||
--		    test_bit(BLK_MQ_S_STOPPED, &hctx->state))
-+		    blk_mq_hctx_stopped(hctx))
- 			continue;
- 
- 		blk_mq_run_hw_queue(hctx, async);
-@@ -988,7 +988,7 @@ void blk_mq_start_stopped_hw_queues(struct request_queue *q, bool async)
- 	int i;
- 
- 	queue_for_each_hw_ctx(q, hctx, i) {
--		if (!test_bit(BLK_MQ_S_STOPPED, &hctx->state))
-+		if (!blk_mq_hctx_stopped(hctx))
- 			continue;
- 
- 		clear_bit(BLK_MQ_S_STOPPED, &hctx->state);
-@@ -1332,7 +1332,7 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
- 		blk_mq_put_ctx(data.ctx);
- 		if (!old_rq)
- 			goto done;
--		if (test_bit(BLK_MQ_S_STOPPED, &data.hctx->state) ||
-+		if (blk_mq_hctx_stopped(data.hctx) ||
- 		    blk_mq_direct_issue_request(old_rq, &cookie) != 0)
- 			blk_mq_insert_request(old_rq, false, true, true);
- 		goto done;
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index e5d2524..ac772da 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -100,6 +100,11 @@ static inline void blk_mq_set_alloc_data(struct blk_mq_alloc_data *data,
- 	data->hctx = hctx;
- }
- 
-+static inline bool blk_mq_hctx_stopped(struct blk_mq_hw_ctx *hctx)
-+{
-+	return test_bit(BLK_MQ_S_STOPPED, &hctx->state);
-+}
-+
- static inline bool blk_mq_hw_queue_mapped(struct blk_mq_hw_ctx *hctx)
- {
- 	return hctx->nr_ctx && hctx->tags;
+ extern int __blkdev_driver_ioctl(struct block_device *, fmode_t, unsigned int,
 -- 
-2.10.1
+2.7.4
 
-
-_______________________________________________
-Linux-nvme mailing list
-Linux-nvme@lists.infradead.org
-http://lists.infradead.org/mailman/listinfo/linux-nvme
