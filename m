@@ -1,73 +1,52 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga14.intel.com ([192.55.52.115]:52610 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1758068AbcJYAOA (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 Oct 2016 20:14:00 -0400
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv4 08/43] page-flags: relax page flag policy for few flags
-Date: Tue, 25 Oct 2016 03:13:07 +0300
-Message-Id: <20161025001342.76126-9-kirill.shutemov@linux.intel.com>
-In-Reply-To: <20161025001342.76126-1-kirill.shutemov@linux.intel.com>
-References: <20161025001342.76126-1-kirill.shutemov@linux.intel.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <mpatocka@redhat.com>
+Date: Mon, 31 Oct 2016 12:36:16 -0400 (EDT)
+From: Mikulas Patocka <mpatocka@redhat.com>
+To: Christoph Hellwig <hch@infradead.org>
+cc: Bart Van Assche <bart.vanassche@sandisk.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, dm-devel@redhat.com,
+        "Alasdair G. Kergon" <agk@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
+Subject: Re: REQ_OP for zeroing, was Re: [dm-devel] [PATCH 1/4] brd: handle
+ misaligned discard
+In-Reply-To: <20161028131457.GA15656@infradead.org>
+Message-ID: <alpine.LRH.2.02.1610311233550.27707@file01.intranet.prod.int.rdu2.redhat.com>
+References: <20161024155756.GA48306@redhat.com> <20161025130712.GA12717@infradead.org> <20161025143719.GA51266@redhat.com> <710b07a3-9091-6935-37c4-ea1dcedcab4f@kernel.dk> <alpine.LRH.2.02.1610261624100.12287@file01.intranet.prod.int.rdu2.redhat.com>
+ <alpine.LRH.2.02.1610261625580.12287@file01.intranet.prod.int.rdu2.redhat.com> <338b76f0-40d1-904f-66e0-f6455c5287e7@sandisk.com> <alpine.LRH.2.02.1610261733190.25893@file01.intranet.prod.int.rdu2.redhat.com> <20161026215052.GA11679@infradead.org>
+ <alpine.LRH.2.02.1610280741350.22676@file01.intranet.prod.int.rdu2.redhat.com> <20161028131457.GA15656@infradead.org>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+List-ID: <linux-block@vger.kernel.org>
 
-These flags are in use for filesystems with backing storage: PG_error,
-PG_writeback and PG_readahead.
 
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
----
- include/linux/page-flags.h | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/include/linux/page-flags.h b/include/linux/page-flags.h
-index 74e4dda91238..a2bef9a41bcf 100644
---- a/include/linux/page-flags.h
-+++ b/include/linux/page-flags.h
-@@ -253,7 +253,7 @@ static inline int TestClearPage##uname(struct page *page) { return 0; }
- 	TESTSETFLAG_FALSE(uname) TESTCLEARFLAG_FALSE(uname)
- 
- __PAGEFLAG(Locked, locked, PF_NO_TAIL)
--PAGEFLAG(Error, error, PF_NO_COMPOUND) TESTCLEARFLAG(Error, error, PF_NO_COMPOUND)
-+PAGEFLAG(Error, error, PF_NO_TAIL) TESTCLEARFLAG(Error, error, PF_NO_TAIL)
- PAGEFLAG(Referenced, referenced, PF_HEAD)
- 	TESTCLEARFLAG(Referenced, referenced, PF_HEAD)
- 	__SETPAGEFLAG(Referenced, referenced, PF_HEAD)
-@@ -293,15 +293,15 @@ PAGEFLAG(OwnerPriv1, owner_priv_1, PF_ANY)
-  * Only test-and-set exist for PG_writeback.  The unconditional operators are
-  * risky: they bypass page accounting.
-  */
--TESTPAGEFLAG(Writeback, writeback, PF_NO_COMPOUND)
--	TESTSCFLAG(Writeback, writeback, PF_NO_COMPOUND)
-+TESTPAGEFLAG(Writeback, writeback, PF_NO_TAIL)
-+	TESTSCFLAG(Writeback, writeback, PF_NO_TAIL)
- PAGEFLAG(MappedToDisk, mappedtodisk, PF_NO_TAIL)
- 
- /* PG_readahead is only used for reads; PG_reclaim is only for writes */
- PAGEFLAG(Reclaim, reclaim, PF_NO_TAIL)
- 	TESTCLEARFLAG(Reclaim, reclaim, PF_NO_TAIL)
--PAGEFLAG(Readahead, reclaim, PF_NO_COMPOUND)
--	TESTCLEARFLAG(Readahead, reclaim, PF_NO_COMPOUND)
-+PAGEFLAG(Readahead, reclaim, PF_NO_TAIL)
-+	TESTCLEARFLAG(Readahead, reclaim, PF_NO_TAIL)
- 
- #ifdef CONFIG_HIGHMEM
- /*
--- 
-2.9.3
+On Fri, 28 Oct 2016, Christoph Hellwig wrote:
 
+> [adding Chaitanya to Cc]
+> 
+> On Fri, Oct 28, 2016 at 07:43:41AM -0400, Mikulas Patocka wrote:
+> > We could detect if the REQ_OP_WRITE_SAME command contains all zeroes and 
+> > if it does, turn it into "Write Zeroes" or TRIM command (if the device 
+> > guarantees zeroing on trim). If it doesn't contain all zeroes and the 
+> > device doesn't support non-zero WRITE SAME, then reject it.
+> 
+> I don't like this because it's very inefficient - we have to allocate
+> a payload first and then compare the whole payload for very operation.
+> 
+> > Or maybe we could add a new command REQ_OP_WRITE_ZEROES - I'm not sure 
+> > which of these two possibilities is better.
+> 
+> Chaitanya actually did an initial prototype implementation of this for
+> NVMe that he shared with me.  I liked it a lot and I think he'll be
+> ready to post it in a few days.  Now that we have the REQ_OP* values
+> instead of mapping different command types to flags it's actually
+> surprisingly easy to add new block layer operations.
+
+OK - when it is in the kernel, let me know, so that I can write device 
+mapper support for that.
+
+We should remove the flag "discard_zeroes_data" afterwards, because it is 
+unreliable and impossible to support correctly in the device mapper.
+
+Mikulas
