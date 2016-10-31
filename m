@@ -1,53 +1,63 @@
-Return-Path: <krisman@linux.vnet.ibm.com>
-From: Gabriel Krisman Bertazi <krisman@linux.vnet.ibm.com>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-        Gabriel Krisman Bertazi <krisman@linux.vnet.ibm.com>
-Subject: [PATCH] blk-mq: Always schedule hctx->next_cpu
-Date: Wed, 28 Sep 2016 00:24:24 -0300
-Message-Id: <1475033064-31848-1-git-send-email-krisman@linux.vnet.ibm.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: Device or HBA level QD throttling creates randomness in sequetial
+ workload
+To: Kashyap Desai <kashyap.desai@broadcom.com>,
+ Omar Sandoval <osandov@osandov.com>
+References: <2d656e9c9fbde7206e40a635c61a6084@mail.gmail.com>
+Cc: linux-scsi@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+ paolo.valente@linaro.org
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <298b6ff6-9feb-4b70-ec4c-d1295a0e1f41@kernel.dk>
+Date: Mon, 31 Oct 2016 11:24:02 -0600
+MIME-Version: 1.0
+In-Reply-To: <2d656e9c9fbde7206e40a635c61a6084@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-Commit 0e87e58bf60e ("blk-mq: improve warning for running a queue on the
-wrong CPU") attempts to avoid triggering the WARN_ON in
-__blk_mq_run_hw_queue when the expected CPU is dead.  Problem is, in the
-last batch execution before round robin, blk_mq_hctx_next_cpu can
-schedule a dead CPU and also update next_cpu to the next alive CPU in
-the mask, which will trigger the WARN_ON despite the previous
-workaround.
+Hi,
 
-The following patch fixes this scenario by always scheduling the value
-in hctx->next_cpu.  This changes the moment when we round-robin the CPU
-running the hctx, but it really doesn't matter, since it still executes
-BLK_MQ_CPU_WORK_BATCH times in a row before switching to another CPU.
-
-Fixes: 0e87e58bf60e ("blk-mq: improve warning for running a queue on the wrong CPU")
-Signed-off-by: Gabriel Krisman Bertazi <krisman@linux.vnet.ibm.com>
----
- block/blk-mq.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+One guess would be that this isn't around a requeue condition, but
+rather the fact that we don't really guarantee any sort of hard FIFO
+behavior between the software queues. Can you try this test patch to see
+if it changes the behavior for you? Warning: untested...
 
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 0be5577b0d56..367d21215345 100644
+index f3d27a6dee09..5404ca9c71b2 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -883,7 +883,7 @@ static int blk_mq_hctx_next_cpu(struct blk_mq_hw_ctx *hctx)
- 		return WORK_CPU_UNBOUND;
- 
- 	if (--hctx->next_cpu_batch <= 0) {
--		int cpu = hctx->next_cpu, next_cpu;
-+		int next_cpu;
- 
- 		next_cpu = cpumask_next(hctx->next_cpu, hctx->cpumask);
- 		if (next_cpu >= nr_cpu_ids)
-@@ -891,8 +891,6 @@ static int blk_mq_hctx_next_cpu(struct blk_mq_hw_ctx *hctx)
- 
- 		hctx->next_cpu = next_cpu;
- 		hctx->next_cpu_batch = BLK_MQ_CPU_WORK_BATCH;
--
--		return cpu;
- 	}
- 
- 	return hctx->next_cpu;
+@@ -772,6 +772,14 @@ static inline unsigned int queued_to_index(unsigned 
+int queued)
+  	return min(BLK_MQ_MAX_DISPATCH_ORDER - 1, ilog2(queued) + 1);
+  }
+
++static int rq_pos_cmp(void *priv, struct list_head *a, struct list_head *b)
++{
++	struct request *rqa = container_of(a, struct request, queuelist);
++	struct request *rqb = container_of(b, struct request, queuelist);
++
++	return blk_rq_pos(rqa) < blk_rq_pos(rqb);
++}
++
+  /*
+   * Run this hardware queue, pulling any software queues mapped to it in.
+   * Note that this function currently has various problems around ordering
+@@ -812,6 +820,14 @@ static void __blk_mq_run_hw_queue(struct 
+blk_mq_hw_ctx *hctx)
+  	}
+
+  	/*
++	 * If the device is rotational, sort the list sanely to avoid
++	 * unecessary seeks. The software queues are roughly FIFO, but
++	 * only roughly, there are no hard guarantees.
++	 */
++	if (!blk_queue_nonrot(q))
++		list_sort(NULL, &rq_list, rq_pos_cmp);
++
++	/*
+  	 * Start off with dptr being NULL, so we start the first request
+  	 * immediately, even if we have more pending.
+  	 */
+
 -- 
-2.7.4
+Jens Axboe
