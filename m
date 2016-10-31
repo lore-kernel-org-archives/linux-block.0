@@ -1,136 +1,75 @@
-Return-Path: <Damien.LeMoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>, Christoph
- Hellwig <hch@lst.de>, "Martin K . Petersen" <martin.petersen@oracle.com>,
-	Hannes Reinecke <hare@suse.de>, Shaun Tancheff <shaun@tancheff.com>, Damien
- Le Moal <damien.lemoal@wdc.com>
-Subject: [PATCH v8 0/7] ZBC / Zoned block device support
-Date: Tue, 18 Oct 2016 15:40:28 +0900
-Message-ID: <1476772835-18541-1-git-send-email-damien.lemoal@wdc.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-ua0-f195.google.com ([209.85.217.195]:34485 "EHLO
+        mail-ua0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S946934AbcJaXvb (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 31 Oct 2016 19:51:31 -0400
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: damien.lemoal@wdc.com
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <CACVXFVPmEAUo6KVmKcmQB55jj7q=XRABEZZJS210jeD_W06Uog@mail.gmail.com>
+References: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
+ <1477728600-12938-46-git-send-email-tom.leiming@gmail.com>
+ <20161031135943.36crigad55hwmmrl@thunk.org> <CACVXFVPmEAUo6KVmKcmQB55jj7q=XRABEZZJS210jeD_W06Uog@mail.gmail.com>
+From: Ming Lei <tom.leiming@gmail.com>
+Date: Tue, 1 Nov 2016 07:51:27 +0800
+Message-ID: <CACVXFVPhS3FdzoRfqV8KFza_h0T48_bP-ix7y0_5exKw4iiXfg@mail.gmail.com>
+Subject: Re: [PATCH 45/60] block: bio: introduce bio_for_each_segment_all_rd()
+ and its write pair
+To: "Theodore Ts'o" <tytso@mit.edu>, Ming Lei <tom.leiming@gmail.com>,
+        Jens Axboe <axboe@fb.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        Mike Christie <mchristi@redhat.com>,
+        Hannes Reinecke <hare@suse.com>,
+        Keith Busch <keith.busch@intel.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Bart Van Assche <bart.vanassche@sandisk.com>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This series introduces support for zoned block devices. It integrates
-earlier submissions by Hannes Reinecke and Shaun Tancheff. Compared to the
-previous series version, the code was significantly simplified by limiting
-support to zoned devices satisfying the following conditions:
-1) All zones of the device are the same size, with the exception of an
-   eventual last smaller runt zone.
-2) For host-managed disks, reads must be unrestricted (read commands do not
-   fail due to zone or write pointer alignement constraints).
-Zoned disks that do not satisfy these 2 conditions are ignored.
+On Tue, Nov 1, 2016 at 6:46 AM, Ming Lei <tom.leiming@gmail.com> wrote:
+> On Mon, Oct 31, 2016 at 9:59 PM, Theodore Ts'o <tytso@mit.edu> wrote:
+>> On Sat, Oct 29, 2016 at 04:08:44PM +0800, Ming Lei wrote:
+>>> This patches introduce bio_for_each_segment_all_rd() and
+>>> bio_for_each_segment_all_wt().
+>>>
+>>> bio_for_each_segment_all_rd() is for replacing
+>>> bio_for_each_segment_all() in case the bvec from bio->bi_io_vec
+>>> is accessed as readonly.
+>>>
+>>> bio_for_each_segment_all_wt() is for replacing
+>>> bio_for_each_segment_all() in case the bvec from bio->bi_io_vec
+>>> need to be updated.
+>>
+>> What is _rd and _wt supposed to stand for?  And speaking more
+>
+> As Christoph replied, _rd means read, which said the bvec pointed by
+> the iterator variable(bvec pointer) is read-only, and the bvec table
+> can't be written into via this usage any more. Maybe
+> bio_for_each_segment_all_ro is better?
 
-These 2 conditions allowed dropping the zone information cache implemented
-in the previous version. This simplifies the code and also reduces the memory
-consumption at run time. Support for zoned devices now only require one bit
-per zone (less than 8KB in total). This bit field is used to write-lock
-zones and prevent the concurrent execution of multiple write commands in
-the same zone. This avoids write ordering problems at dispatch time, for
-both the simple queue and scsi-mq settings.
+Sorry for forgetting to mention one important point:
 
-The new operations introduced to suport zone manipulation was reduced to
-only the two main ZBC/ZAC defined commands: REPORT ZONES (REQ_OP_ZONE_REPORT)
-and RESET WRITE POINTER (REQ_OP_ZONE_RESET). This brings the total number of
-operations defined to 8, which fits in the 3 bits (REQ_OP_BITS) reserved for
-operation code in bio->bi_opf and req->cmd_flags.
+- after multipage bvec is introduced, the iterated bvec pointer
+still points to singlge page bvec, which is generated in-flight
+and is readonly actually. That is the motivation about the introduction
+of bio_for_each_segment_all_rd().
 
-Most of the ZBC specific code is kept out of sd.c and implemented in the
-new file sd_zbc.c. Similarly, at the block layer, most of the zoned block
-device code is implemented in the new blk-zoned.c.
+So maybe bio_for_each_page_all_ro() is better?
 
-For host-managed zoned block devices, the sequential write constraint of
-write pointer zones is exposed to the user. Users of the disk (applications,
-file systems or device mappers) must sequentially write to zones. This means
-that for raw block device accesses from applications, buffered writes are
-unreliable and direct I/Os must be used (or buffered writes with O_SYNC).
+>
+> On the other hand, _wr meands write, which said the bvec pointed by
+> the iterator variable(bvec pointer) can be written to. Maybe we can use
+> original bio_for_each_segment_all() for it?
 
-Access to zone manipulation operations is also provided to applications
-through a set of new ioctls. This allows applications operating on raw
-block devices (e.g. mkfs.xxx) to discover a device zone layout and
-manipulate zone state.
+For _wt(), we still can keep it as bio_for_each_segment(), which also
+reflects that now the iterated bvec points to one whole segment if
+we name _rd as bio_for_each_page_all_ro().
 
-v8:
-* Fixed compile time warnings (unused variable and sd_printk format)
-* For unsupported host-aware drives, the zone write lock bitmap is not
-  allocated, so check it before trying to use it
 
-v7:
-* Fixed problems with zone write locking:
-  - Wrong sdkp->zone_wlock bitmap allocation size
-  - Incorrect (reversed condition) test of lock state with test_and_set_bit
-  - Potential error in sd_setup_read_write_cmnd could leave a zone locked
-    without the locking write command being executed
-
-v6:
-* Rebased on Jens' for-4.9/block branch (v5 is based on next-20160928)
-
-v5:
-* Changed interface of sd_zbc_setup_read_write
-
-v4:
-* Fixed several typos and tabs/spaces
-* Added description of zoned and chunk_sectors queue attributes in
-  Documentation/ABI/testing/sysfs-block
-* Fixed sd_read_capacity call in sd.c and to avoid missing information on
-  the first pass of a disk scan
-* Fixed scsi_disk zone related field to use logical block size unit instead
-  of 512B sector unit.
-
-v3:
-* Use kcalloc to allocate zone information array for ioctl
-* Use kcalloc to allocate zone information array for ioctl
-* Export GPL the functions blkdev_report_zones and blkdev_reset_zones
-* Shuffled uapi definitions from patch 7 into patch 5
-
-v2
-* Removed zone information cache
-* Limit support to drives that have unrestricted reads and a constant zone
-  size that is a power of two number of LBAs
-* Introduce per zone write locking to avoid write reordering for both
-  blk-mq and simple queue cases
-
-Damien Le Moal (1):
-  block: Add 'zoned' queue limit
-
-Hannes Reinecke (4):
-  blk-sysfs: Add 'chunk_sectors' to sysfs attributes
-  block: update chunk_sectors in blk_stack_limits()
-  block: Implement support for zoned block devices
-  sd: Implement support for ZBC devices
-
-Shaun Tancheff (2):
-  block: Define zoned block device operations
-  blk-zoned: implement ioctls
-
- Documentation/ABI/testing/sysfs-block |  29 ++
- block/Kconfig                         |   8 +
- block/Makefile                        |   1 +
- block/blk-core.c                      |   4 +
- block/blk-settings.c                  |   5 +
- block/blk-sysfs.c                     |  29 ++
- block/blk-zoned.c                     | 350 ++++++++++++++++++
- block/ioctl.c                         |   4 +
- drivers/scsi/Makefile                 |   1 +
- drivers/scsi/sd.c                     | 148 ++++++--
- drivers/scsi/sd.h                     |  70 ++++
- drivers/scsi/sd_zbc.c                 | 642 ++++++++++++++++++++++++++++++++++
- include/linux/blk_types.h             |   2 +
- include/linux/blkdev.h                |  99 ++++++
- include/scsi/scsi_proto.h             |  17 +
- include/uapi/linux/Kbuild             |   1 +
- include/uapi/linux/blkzoned.h         | 143 ++++++++
- include/uapi/linux/fs.h               |   4 +
- 18 files changed, 1522 insertions(+), 35 deletions(-)
- create mode 100644 block/blk-zoned.c
- create mode 100644 drivers/scsi/sd_zbc.c
- create mode 100644 include/uapi/linux/blkzoned.h
-
--- 
-2.7.4
-
-Western Digital Corporation (and its subsidiaries) E-mail Confidentiality Notice & Disclaimer:
-
-This e-mail and any files transmitted with it may contain confidential or legally privileged information of WDC and/or its affiliates, and are intended solely for the use of the individual or entity to which they are addressed. If you are not the intended recipient, any disclosure, copying, distribution or any action taken or omitted to be taken in reliance on it, is prohibited. If you have received this e-mail in error, please notify the sender immediately and delete the e-mail in its entirety from your system.
+Thanks,
+Ming Lei
