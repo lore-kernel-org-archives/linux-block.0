@@ -1,116 +1,54 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-cys01nam02on0076.outbound.protection.outlook.com ([104.47.37.76]:41829
-        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
+Received: from mail-co1nam03on0074.outbound.protection.outlook.com ([104.47.40.74]:4992
+        "EHLO NAM03-CO1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1753005AbcJ2ATW (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Oct 2016 20:19:22 -0400
-Subject: [PATCH v5 02/14] blk-mq: Introduce blk_mq_hctx_stopped()
-To: Jens Axboe <axboe@fb.com>
-References: <7460e8b2-2cfd-c0d5-7ae7-7f662d89dad3@sandisk.com>
-CC: Christoph Hellwig <hch@lst.de>,
-        James Bottomley <jejb@linux.vnet.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Doug Ledford <dledford@redhat.com>,
-        Keith Busch <keith.busch@intel.com>,
-        Ming Lei <tom.leiming@gmail.com>,
-        "Konrad Rzeszutek Wilk" <konrad.wilk@oracle.com>,
-        =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        id S943680AbcJaPKj (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 31 Oct 2016 11:10:39 -0400
+From: Bart Van Assche <Bart.VanAssche@sandisk.com>
+To: "loberman@redhat.com" <loberman@redhat.com>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "tom.leiming@gmail.com" <tom.leiming@gmail.com>,
         "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-Message-ID: <075bab96-4f5f-d68c-843b-f2358319a0a6@sandisk.com>
-Date: Fri, 28 Oct 2016 17:19:15 -0700
-MIME-Version: 1.0
-In-Reply-To: <7460e8b2-2cfd-c0d5-7ae7-7f662d89dad3@sandisk.com>
+        "snitzer@redhat.com" <snitzer@redhat.com>,
+        "hch@lst.de" <hch@lst.de>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        "konrad.wilk@oracle.com" <konrad.wilk@oracle.com>,
+        "roger.pau@citrix.com" <roger.pau@citrix.com>,
+        "axboe@fb.com" <axboe@fb.com>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>,
+        "keith.busch@intel.com" <keith.busch@intel.com>,
+        "dledford@redhat.com" <dledford@redhat.com>
+Subject: Re: [PATCH v5 14/14] nvme: Use BLK_MQ_S_STOPPED instead of
+ QUEUE_FLAG_STOPPED in blk-mq code
+Date: Mon, 31 Oct 2016 15:10:36 +0000
+Message-ID: <1477926635.2511.1.camel@sandisk.com>
+References: <7460e8b2-2cfd-c0d5-7ae7-7f662d89dad3@sandisk.com>
+         <fe057bf0-6ede-fc9e-9a53-9d790c9782c2@sandisk.com>
+         <540193784.5466628.1477921998345.JavaMail.zimbra@redhat.com>
+In-Reply-To: <540193784.5466628.1477921998345.JavaMail.zimbra@redhat.com>
 Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Multiple functions test the BLK_MQ_S_STOPPED bit so introduce
-a helper function that performs this test.
-
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Reviewed-by: Ming Lei <tom.leiming@gmail.com>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
-Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-mq.c | 12 ++++++------
- block/blk-mq.h |  5 +++++
- 2 files changed, 11 insertions(+), 6 deletions(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index ad459e4..bc1f462 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -787,7 +787,7 @@ static void __blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx)
- 	struct list_head *dptr;
- 	int queued;
- 
--	if (unlikely(test_bit(BLK_MQ_S_STOPPED, &hctx->state)))
-+	if (unlikely(blk_mq_hctx_stopped(hctx)))
- 		return;
- 
- 	WARN_ON(!cpumask_test_cpu(raw_smp_processor_id(), hctx->cpumask) &&
-@@ -912,8 +912,8 @@ static int blk_mq_hctx_next_cpu(struct blk_mq_hw_ctx *hctx)
- 
- void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
- {
--	if (unlikely(test_bit(BLK_MQ_S_STOPPED, &hctx->state) ||
--	    !blk_mq_hw_queue_mapped(hctx)))
-+	if (unlikely(blk_mq_hctx_stopped(hctx) ||
-+		     !blk_mq_hw_queue_mapped(hctx)))
- 		return;
- 
- 	if (!async && !(hctx->flags & BLK_MQ_F_BLOCKING)) {
-@@ -938,7 +938,7 @@ void blk_mq_run_hw_queues(struct request_queue *q, bool async)
- 	queue_for_each_hw_ctx(q, hctx, i) {
- 		if ((!blk_mq_hctx_has_pending(hctx) &&
- 		    list_empty_careful(&hctx->dispatch)) ||
--		    test_bit(BLK_MQ_S_STOPPED, &hctx->state))
-+		    blk_mq_hctx_stopped(hctx))
- 			continue;
- 
- 		blk_mq_run_hw_queue(hctx, async);
-@@ -988,7 +988,7 @@ void blk_mq_start_stopped_hw_queues(struct request_queue *q, bool async)
- 	int i;
- 
- 	queue_for_each_hw_ctx(q, hctx, i) {
--		if (!test_bit(BLK_MQ_S_STOPPED, &hctx->state))
-+		if (!blk_mq_hctx_stopped(hctx))
- 			continue;
- 
- 		clear_bit(BLK_MQ_S_STOPPED, &hctx->state);
-@@ -1332,7 +1332,7 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
- 		blk_mq_put_ctx(data.ctx);
- 		if (!old_rq)
- 			goto done;
--		if (test_bit(BLK_MQ_S_STOPPED, &data.hctx->state) ||
-+		if (blk_mq_hctx_stopped(data.hctx) ||
- 		    blk_mq_direct_issue_request(old_rq, &cookie) != 0)
- 			blk_mq_insert_request(old_rq, false, true, true);
- 		goto done;
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index e5d2524..ac772da 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -100,6 +100,11 @@ static inline void blk_mq_set_alloc_data(struct blk_mq_alloc_data *data,
- 	data->hctx = hctx;
- }
- 
-+static inline bool blk_mq_hctx_stopped(struct blk_mq_hw_ctx *hctx)
-+{
-+	return test_bit(BLK_MQ_S_STOPPED, &hctx->state);
-+}
-+
- static inline bool blk_mq_hw_queue_mapped(struct blk_mq_hw_ctx *hctx)
- {
- 	return hctx->nr_ctx && hctx->tags;
--- 
-2.10.1
-
+T24gTW9uLCAyMDE2LTEwLTMxIGF0IDA5OjUzIC0wNDAwLCBMYXVyZW5jZSBPYmVybWFuIHdyb3Rl
+Og0KPiBBcHBsaWVkIGFsbCAxNCBwYXRjaGVzLCBhbHNvIGNvcnJlY3RlZCB0aGUgcGFydCBvZiB0
+aGUgeGVuLWJsa2Zyb250LmMgDQo+IGJsa2lmX3JlY292ZXIgcGF0Y2ggaW4gcGF0Y2h2NS01LzE0
+Lg0KPiANCj4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvYmxvY2sveGVuLWJsa2Zyb250LmMgYi9kcml2
+ZXJzL2Jsb2NrL3hlbi0NCj4gYmxrZnJvbnQuYw0KPiBpbmRleCA5OTA4NTk3Li42MGZmZjk5IDEw
+MDY0NA0KPiAtLS0gYS9kcml2ZXJzL2Jsb2NrL3hlbi1ibGtmcm9udC5jDQo+ICsrKyBiL2RyaXZl
+cnMvYmxvY2sveGVuLWJsa2Zyb250LmMNCj4gQEAgLTIwNDUsNiArMjA0NSw3IEBAIHN0YXRpYyBp
+bnQgYmxraWZfcmVjb3ZlcihzdHJ1Y3QgYmxrZnJvbnRfaW5mbw0KPiAqaW5mbykNCj4gwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoEJVR19PTihyZXEtPm5yX3BoeXNfc2VnbWVudHMg
+PiBzZWdzKTsNCj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGJsa19tcV9yZXF1
+ZXVlX3JlcXVlc3QocmVxKTsNCj4gwqDCoMKgwqDCoMKgwqDCoMKgfQ0KPiArwqDCoMKgwqDCoMKg
+wqDCoGJsa19tcV9zdGFydF9zdG9wcGVkX2h3X3F1ZXVlcyhpbmZycSwNCj4gdHJ1ZSk7wqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCoqKiBDb3JyZWN0ZWQNCj4gwqDCoMKg
+wqDCoMKgwqDCoMKgYmxrX21xX2tpY2tfcmVxdWV1ZV9saXN0KGluZnJxKTsNCj4gwqANCj4gwqDC
+oMKgwqDCoMKgwqDCoMKgd2hpbGUgKChiaW8gPSBiaW9fbGlzdF9wb3AoJmluZmJpb19saXN0KSkg
+IT0gTlVMTCkgew0KDQpIZWxsbyBMYXVyZW5jZSwNCg0KU29ycnkgZm9yIHRoZSBidWlsZCBmYWls
+dXJlLiBUaGUgd2F5IHlvdSBjaGFuZ2VkIHhlbi1ibGtmcm9udCBpcyBpbmRlZWQNCndoYXQgSSBp
+bnRlbmRlZC4gQXBwYXJlbnRseSBJIGZvcmdvdCB0byBlbmFibGUgWGVuIGluIG15IGtlcm5lbCBj
+b25maWcNCi4uLg0KDQpCYXJ0Lg==
