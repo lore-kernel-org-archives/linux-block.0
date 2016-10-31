@@ -1,77 +1,76 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-Date: Thu, 13 Oct 2016 11:44:41 +0200
-From: Jan Kara <jack@suse.cz>
-To: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Cc: Theodore Ts'o <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCHv3 17/41] filemap: handle huge pages in
- filemap_fdatawait_range()
-Message-ID: <20161013094441.GC26241@quack2.suse.cz>
-References: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
- <20160915115523.29737-18-kirill.shutemov@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20160915115523.29737-18-kirill.shutemov@linux.intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga14.intel.com ([192.55.52.115]:62596 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S947363AbcJaWDr (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 31 Oct 2016 18:03:47 -0400
+From: Scott Bauer <scott.bauer@intel.com>
+To: linux-nvme@lists.infradead.org
+Cc: Rafael.Antognolli@intel.com, axboe@fb.com, keith.busch@intel.com,
+        jonathan.derrick@intel.com, j.naumann@fu-berlin.de,
+        hch@infradead.org, linux-block@vger.kernel.org
+Subject: [RFC PATCH 0/6] Sed Opal
+Date: Mon, 31 Oct 2016 15:58:13 -0600
+Message-Id: <1477951099-3127-1-git-send-email-scott.bauer@intel.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Thu 15-09-16 14:54:59, Kirill A. Shutemov wrote:
-> We writeback whole huge page a time.
+This Patch series implements a large portion of the Opal protocol for
+self encrypting devices. The driver has the capability of storing a
+locking range's password, either directly in the driver, or in the
+Kernel's key managment. The password can then be replayed during a
+resume from previous suspend-to-RAM.
 
-This is one of the things I don't understand. Firstly I didn't see where
-changes of writeback like this would happen (maybe they come later).
-Secondly I'm not sure why e.g. writeback should behave atomically wrt huge
-pages. Is this because radix-tree multiorder entry tracks dirtiness for us
-at that granularity? BTW, can you also explain why do we need multiorder
-entries? What do they solve for us?
+The driver also supports logic to bring the device out of a factory
+default-inactive state into a functional Opal state.
 
-I'm sorry for these basic questions but I'd just like to understand how is
-this supposed to work...
+The following logic is supported in order to bring the tper into a
+working state:
 
-								Honza
+1) Taking Ownership of the drive (Setting the Admin CPIN).
+2) Activating the Locking SP (In Single User Mode or Normal Mode).
+3) Setting up Locking Ranges (Single User or Normal Mode).
+4) Adding users to Locking Ranges (Normal Mode Only).
+5) Locking or Unlocking Locking Rangs (Single User Mode or Normal Mode).
+6) Reverting the TPer (Restore to factory default).
+7) Setting LR/User passwords (Single User Mode or Normal Mode).
+8) Eabling/disabling Shadow MBR.
+9) Enabling Users in the LockingSP (Normal Mode Only).
+10) Saving Password for resume from suspend.
 
 
-> 
-> Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
-> ---
->  mm/filemap.c | 5 +++++
->  1 file changed, 5 insertions(+)
-> 
-> diff --git a/mm/filemap.c b/mm/filemap.c
-> index 05b42d3e5ed8..53da93156e60 100644
-> --- a/mm/filemap.c
-> +++ b/mm/filemap.c
-> @@ -372,9 +372,14 @@ static int __filemap_fdatawait_range(struct address_space *mapping,
->  			if (page->index > end)
->  				continue;
->  
-> +			page = compound_head(page);
->  			wait_on_page_writeback(page);
->  			if (TestClearPageError(page))
->  				ret = -EIO;
-> +			if (PageTransHuge(page)) {
-> +				index = page->index + HPAGE_PMD_NR;
-> +				i += index - pvec.pages[i]->index - 1;
-> +			}
->  		}
->  		pagevec_release(&pvec);
->  		cond_resched();
-> -- 
-> 2.9.3
-> 
-> 
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Each command above is exported through an ioctl in the block layer.
+
+We have userland tooling staged in nvme-cli which can be used for
+testing:
+https://github.com/linux-nvme/nvme-cli/pull/137
+
+Once we've fixed any nits and issues we will merge the userland tooling
+into the master branch of nvme-cli.
+
+I have a series of test scripts I've been using which can be helpful if
+people want to test or immediately start using and testing the code:
+
+https://github.com/ScottyBauer/nvme-cli-sed-sh
+
+
+At a high level the code works by declaring a set of opal_step functions,
+which we save in our opal_dev structure. The opal_step functions declare
+the functions which are necessary to do the opal command. We start
+dispatching the commands to the device, which return immediately. The
+thread from userland calls into wait_for_cmd_completion to wait until
+all the commands have finished. Each new command is issued in an interrupt
+that signaled the completion of the previous command.
+
+If a command requires information to complete we pass that information in
+the opal_dev structure in the func_data. If a command needs to save data
+to give to a future command it is saved in the prev_data.
+
+
+
+On a side note, since these files are new I assume we will need to add
+a new entry into MAINTAINERS for this code base, can anyone confirm that?
+
+
+
+
+
