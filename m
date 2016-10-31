@@ -1,216 +1,153 @@
-Return-Path: <BATV+6af1cd90af7787d7b353+4801+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: martin.petersen@oracle.com,
-	don.brace@microsemi.com
-Cc: axboe@kernel.dk,
-	linux-scsi@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH 3/3] smartpqi: switch to pci_alloc_irq_vectors
-Date: Sat, 15 Oct 2016 10:47:21 +0200
-Message-Id: <1476521241-32765-4-git-send-email-hch@lst.de>
-In-Reply-To: <1476521241-32765-1-git-send-email-hch@lst.de>
-References: <1476521241-32765-1-git-send-email-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-oi0-f49.google.com ([209.85.218.49]:35940 "EHLO
+        mail-oi0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S947958AbcJaXTO (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 31 Oct 2016 19:19:14 -0400
+Received: by mail-oi0-f49.google.com with SMTP id v84so98868291oie.3
+        for <linux-block@vger.kernel.org>; Mon, 31 Oct 2016 16:19:14 -0700 (PDT)
+Date: Mon, 31 Oct 2016 16:19:11 -0700
+From: Omar Sandoval <osandov@osandov.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: axboe@fb.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/2] block: fast-path for small and simple direct I/O
+ requests
+Message-ID: <20161031231911.GA20713@vader>
+References: <1477936765-8828-1-git-send-email-hch@lst.de>
+ <1477936765-8828-3-git-send-email-hch@lst.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1477936765-8828-3-git-send-email-hch@lst.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Which cleans up a lot of the MSI-X handling, and allows us to use the
-PCI IRQ layer provided vector mapping, which we can then expose to blk-mq.
+On Mon, Oct 31, 2016 at 11:59:25AM -0600, Christoph Hellwig wrote:
+> This patch adds a small and simple fast patch for small direct I/O
+> requests on block devices that don't use AIO.  Between the neat
+> bio_iov_iter_get_pages helper that avoids allocating a page array
+> for get_user_pages and the on-stack bio and biovec this avoid memory
+> allocations and atomic operations entirely in the direct I/O code
+> (lower levels might still do memory allocations and will usually
+> have at least some atomic operations, though).
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  fs/block_dev.c | 80 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 80 insertions(+)
+> 
+> diff --git a/fs/block_dev.c b/fs/block_dev.c
+> index 05b5533..d4134a3 100644
+> --- a/fs/block_dev.c
+> +++ b/fs/block_dev.c
+> @@ -30,6 +30,7 @@
+>  #include <linux/cleancache.h>
+>  #include <linux/dax.h>
+>  #include <linux/badblocks.h>
+> +#include <linux/task_io_accounting_ops.h>
+>  #include <linux/falloc.h>
+>  #include <asm/uaccess.h>
+>  #include "internal.h"
+> @@ -175,12 +176,91 @@ static struct inode *bdev_file_inode(struct file *file)
+>  	return file->f_mapping->host;
+>  }
+>  
+> +#define DIO_INLINE_BIO_VECS 4
+> +
+> +static void blkdev_bio_end_io_simple(struct bio *bio)
+> +{
+> +	struct task_struct *waiter = bio->bi_private;
+> +
+> +	WRITE_ONCE(bio->bi_private, NULL);
+> +	wake_up_process(waiter);
+> +}
+> +
+> +static ssize_t
+> +__blkdev_direct_IO_simple(struct kiocb *iocb, struct iov_iter *iter,
+> +		int nr_pages)
+> +{
+> +	struct file *file = iocb->ki_filp;
+> +	struct block_device *bdev = I_BDEV(bdev_file_inode(file));
+> +	unsigned blkbits = blksize_bits(bdev_logical_block_size(bdev));
+> +	struct bio_vec inline_vecs[DIO_INLINE_BIO_VECS], *bvec;
+> +	loff_t pos = iocb->ki_pos;
+> +	bool should_dirty = false;
+> +	struct bio bio;
+> +	ssize_t ret;
+> +	blk_qc_t qc;
+> +	int i;
+> +
+> +	if ((pos | iov_iter_alignment(iter)) & ((1 << blkbits) - 1))
+> +		return -EINVAL;
+> +
+> +	bio_init(&bio);
+> +	bio.bi_max_vecs = nr_pages;
+> +	bio.bi_io_vec = inline_vecs;
+> +	bio.bi_bdev = bdev;
+> +	bio.bi_iter.bi_sector = pos >> blkbits;
+> +	bio.bi_private = current;
+> +	bio.bi_end_io = blkdev_bio_end_io_simple;
+> +
+> +	ret = bio_iov_iter_get_pages(&bio, iter);
+> +	if (unlikely(ret))
+> +		return ret;
+> +	ret = bio.bi_iter.bi_size;
+> +
+> +	if (iov_iter_rw(iter) == READ) {
+> +		bio_set_op_attrs(&bio, REQ_OP_READ, 0);
+> +		if (iter->type == ITER_IOVEC)
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/scsi/smartpqi/smartpqi.h      |   2 -
- drivers/scsi/smartpqi/smartpqi_init.c | 102 +++++++++++-----------------------
- 2 files changed, 32 insertions(+), 72 deletions(-)
+Nit: iter_is_iovec()?
 
-diff --git a/drivers/scsi/smartpqi/smartpqi.h b/drivers/scsi/smartpqi/smartpqi.h
-index 07b6444..b673825 100644
---- a/drivers/scsi/smartpqi/smartpqi.h
-+++ b/drivers/scsi/smartpqi/smartpqi.h
-@@ -929,8 +929,6 @@ struct pqi_ctrl_info {
- 	int		max_msix_vectors;
- 	int		num_msix_vectors_enabled;
- 	int		num_msix_vectors_initialized;
--	u32		msix_vectors[PQI_MAX_MSIX_VECTORS];
--	void		*intr_data[PQI_MAX_MSIX_VECTORS];
- 	int		event_irq;
- 	struct Scsi_Host *scsi_host;
- 
-diff --git a/drivers/scsi/smartpqi/smartpqi_init.c b/drivers/scsi/smartpqi/smartpqi_init.c
-index a535b26..8702d9c 100644
---- a/drivers/scsi/smartpqi/smartpqi_init.c
-+++ b/drivers/scsi/smartpqi/smartpqi_init.c
-@@ -25,6 +25,7 @@
- #include <linux/rtc.h>
- #include <linux/bcd.h>
- #include <linux/cciss_ioctl.h>
-+#include <linux/blk-mq-pci.h>
- #include <scsi/scsi_host.h>
- #include <scsi/scsi_cmnd.h>
- #include <scsi/scsi_device.h>
-@@ -2887,19 +2888,19 @@ static irqreturn_t pqi_irq_handler(int irq, void *data)
- 
- static int pqi_request_irqs(struct pqi_ctrl_info *ctrl_info)
- {
-+	struct pci_dev *pdev = ctrl_info->pci_dev;
- 	int i;
- 	int rc;
- 
--	ctrl_info->event_irq = ctrl_info->msix_vectors[0];
-+	ctrl_info->event_irq = pci_irq_vector(pdev, 0);
- 
- 	for (i = 0; i < ctrl_info->num_msix_vectors_enabled; i++) {
--		rc = request_irq(ctrl_info->msix_vectors[i],
--			pqi_irq_handler, 0,
--			DRIVER_NAME_SHORT, ctrl_info->intr_data[i]);
-+		rc = request_irq(pci_irq_vector(pdev, i), pqi_irq_handler, 0,
-+			DRIVER_NAME_SHORT, &ctrl_info->queue_groups[i]);
- 		if (rc) {
--			dev_err(&ctrl_info->pci_dev->dev,
-+			dev_err(&pdev->dev,
- 				"irq %u init failed with error %d\n",
--				ctrl_info->msix_vectors[i], rc);
-+				pci_irq_vector(pdev, i), rc);
- 			return rc;
- 		}
- 		ctrl_info->num_msix_vectors_initialized++;
-@@ -2908,72 +2909,23 @@ static int pqi_request_irqs(struct pqi_ctrl_info *ctrl_info)
- 	return 0;
- }
- 
--static void pqi_free_irqs(struct pqi_ctrl_info *ctrl_info)
--{
--	int i;
--
--	for (i = 0; i < ctrl_info->num_msix_vectors_initialized; i++)
--		free_irq(ctrl_info->msix_vectors[i],
--			ctrl_info->intr_data[i]);
--}
--
- static int pqi_enable_msix_interrupts(struct pqi_ctrl_info *ctrl_info)
- {
--	unsigned int i;
--	int max_vectors;
--	int num_vectors_enabled;
--	struct msix_entry msix_entries[PQI_MAX_MSIX_VECTORS];
--
--	max_vectors = ctrl_info->num_queue_groups;
--
--	for (i = 0; i < max_vectors; i++)
--		msix_entries[i].entry = i;
--
--	num_vectors_enabled = pci_enable_msix_range(ctrl_info->pci_dev,
--		msix_entries, PQI_MIN_MSIX_VECTORS, max_vectors);
-+	int ret;
- 
--	if (num_vectors_enabled < 0) {
-+	ret = pci_alloc_irq_vectors(ctrl_info->pci_dev,
-+			PQI_MIN_MSIX_VECTORS, ctrl_info->num_queue_groups,
-+			PCI_IRQ_MSIX | PCI_IRQ_AFFINITY);
-+	if (ret < 0) {
- 		dev_err(&ctrl_info->pci_dev->dev,
--			"MSI-X init failed with error %d\n",
--			num_vectors_enabled);
--		return num_vectors_enabled;
--	}
--
--	ctrl_info->num_msix_vectors_enabled = num_vectors_enabled;
--	for (i = 0; i < num_vectors_enabled; i++) {
--		ctrl_info->msix_vectors[i] = msix_entries[i].vector;
--		ctrl_info->intr_data[i] = &ctrl_info->queue_groups[i];
-+			"MSI-X init failed with error %d\n", ret);
-+		return ret;
- 	}
- 
-+	ctrl_info->num_msix_vectors_enabled = ret;
- 	return 0;
- }
- 
--static void pqi_irq_set_affinity_hint(struct pqi_ctrl_info *ctrl_info)
--{
--	int i;
--	int rc;
--	int cpu;
--
--	cpu = cpumask_first(cpu_online_mask);
--	for (i = 0; i < ctrl_info->num_msix_vectors_initialized; i++) {
--		rc = irq_set_affinity_hint(ctrl_info->msix_vectors[i],
--			get_cpu_mask(cpu));
--		if (rc)
--			dev_err(&ctrl_info->pci_dev->dev,
--				"error %d setting affinity hint for irq vector %u\n",
--				rc, ctrl_info->msix_vectors[i]);
--		cpu = cpumask_next(cpu, cpu_online_mask);
--	}
--}
--
--static void pqi_irq_unset_affinity_hint(struct pqi_ctrl_info *ctrl_info)
--{
--	int i;
--
--	for (i = 0; i < ctrl_info->num_msix_vectors_initialized; i++)
--		irq_set_affinity_hint(ctrl_info->msix_vectors[i], NULL);
--}
--
- static int pqi_alloc_operational_queues(struct pqi_ctrl_info *ctrl_info)
- {
- 	unsigned int i;
-@@ -4743,6 +4695,13 @@ static int pqi_slave_configure(struct scsi_device *sdev)
- 	return 0;
- }
- 
-+static int pqi_map_queues(struct Scsi_Host *shost)
-+{
-+	struct pqi_ctrl_info *ctrl_info = shost_to_hba(shost);
-+
-+	return blk_mq_pci_map_queues(&shost->tag_set, ctrl_info->pci_dev);
-+}
-+
- static int pqi_getpciinfo_ioctl(struct pqi_ctrl_info *ctrl_info,
- 	void __user *arg)
- {
-@@ -5130,6 +5089,7 @@ static struct scsi_host_template pqi_driver_template = {
- 	.ioctl = pqi_ioctl,
- 	.slave_alloc = pqi_slave_alloc,
- 	.slave_configure = pqi_slave_configure,
-+	.map_queues = pqi_map_queues,
- 	.sdev_attrs = pqi_sdev_attrs,
- 	.shost_attrs = pqi_shost_attrs,
- };
-@@ -5159,7 +5119,7 @@ static int pqi_register_scsi(struct pqi_ctrl_info *ctrl_info)
- 	shost->cmd_per_lun = shost->can_queue;
- 	shost->sg_tablesize = ctrl_info->sg_tablesize;
- 	shost->transportt = pqi_sas_transport_template;
--	shost->irq = ctrl_info->msix_vectors[0];
-+	shost->irq = pci_irq_vector(ctrl_info->pci_dev, 0);
- 	shost->unique_id = shost->irq;
- 	shost->nr_hw_queues = ctrl_info->num_queue_groups;
- 	shost->hostdata[0] = (unsigned long)ctrl_info;
-@@ -5409,8 +5369,6 @@ static int pqi_ctrl_init(struct pqi_ctrl_info *ctrl_info)
- 	if (rc)
- 		return rc;
- 
--	pqi_irq_set_affinity_hint(ctrl_info);
--
- 	rc = pqi_create_queues(ctrl_info);
- 	if (rc)
- 		return rc;
-@@ -5557,10 +5515,14 @@ static inline void pqi_free_ctrl_info(struct pqi_ctrl_info *ctrl_info)
- 
- static void pqi_free_interrupts(struct pqi_ctrl_info *ctrl_info)
- {
--	pqi_irq_unset_affinity_hint(ctrl_info);
--	pqi_free_irqs(ctrl_info);
--	if (ctrl_info->num_msix_vectors_enabled)
--		pci_disable_msix(ctrl_info->pci_dev);
-+	int i;
-+
-+	for (i = 0; i < ctrl_info->num_msix_vectors_initialized; i++) {
-+		free_irq(pci_irq_vector(ctrl_info->pci_dev, i),
-+				&ctrl_info->queue_groups[i]);
-+	}
-+
-+	pci_free_irq_vectors(ctrl_info->pci_dev);
- }
- 
- static void pqi_free_ctrl_resources(struct pqi_ctrl_info *ctrl_info)
+> +			should_dirty = true;
+> +	} else {
+> +		bio_set_op_attrs(&bio, REQ_OP_WRITE, WRITE_ODIRECT);
+> +		task_io_account_write(ret);
+> +	}
+> +
+> +	qc = submit_bio(&bio);
+> +	for (;;) {
+> +		set_current_state(TASK_UNINTERRUPTIBLE);
+> +		if (!READ_ONCE(bio.bi_private))
+> +			break;
+> +		if (!(iocb->ki_flags & IOCB_HIPRI) ||
+> +		    !blk_poll(bdev_get_queue(bdev), qc))
+> +			io_schedule();
+> +	}
+> +	__set_current_state(TASK_RUNNING);
+> +
+> +	bio_for_each_segment_all(bvec, &bio, i) {
+> +		if (should_dirty && !PageCompound(bvec->bv_page))
+> +			set_page_dirty_lock(bvec->bv_page);
+> +		put_page(bvec->bv_page);
+> +	}
+> +
+> +	if (unlikely(bio.bi_error))
+> +		return bio.bi_error;
+> +	iocb->ki_pos += ret;
+> +	return ret;
+> +}
+> +
+>  static ssize_t
+>  blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter)
+>  {
+>  	struct file *file = iocb->ki_filp;
+>  	struct inode *inode = bdev_file_inode(file);
+> +	int nr_pages;
+>  
+> +	nr_pages = iov_iter_npages(iter, BIO_MAX_PAGES);
+> +	if (!nr_pages)
+> +		return 0;
+> +	if (is_sync_kiocb(iocb) && nr_pages <= DIO_INLINE_BIO_VECS)
+> +		return __blkdev_direct_IO_simple(iocb, iter, nr_pages);
+>  	return __blockdev_direct_IO(iocb, inode, I_BDEV(inode), iter,
+>  				    blkdev_get_block, NULL, NULL,
+>  				    DIO_SKIP_DIO_COUNT);
+
+The bio_iov_iter_get_pages() trick is nifty. Jens had a similarly
+stripped-down version of blkdev_direct_IO() for blk-mq as part of his
+blk-dio branch. Looks like he just had the page array on the stack but
+still had to allocate the bio.
+
 -- 
-2.1.4
+Omar
