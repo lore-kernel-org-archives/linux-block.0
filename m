@@ -1,75 +1,206 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from ale.deltatee.com ([207.54.116.67]:44321 "EHLO ale.deltatee.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752088AbcKHSQY (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 8 Nov 2016 13:16:24 -0500
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@lst.de>
-From: Logan Gunthorpe <logang@deltatee.com>
-Cc: linux-block@vger.kernel.org,
-        Stephen Bates <stephen.bates@microsemi.com>
-Message-ID: <366c9429-1bf8-a385-c8b3-a7e6c06a9907@deltatee.com>
-Date: Tue, 8 Nov 2016 11:16:20 -0700
-MIME-Version: 1.0
-Content-Type: multipart/mixed;
- boundary="------------ED5B86C66CB198DB454D75CD"
-Subject: BUG: Hung task timeouts in for-4.10/dio
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: [PATCH 08/16] block: replace REQ_NOIDLE with REQ_IDLE
+Date: Tue,  1 Nov 2016 07:40:09 -0600
+Message-Id: <1478007617-18715-9-git-send-email-hch@lst.de>
+In-Reply-To: <1478007617-18715-1-git-send-email-hch@lst.de>
+References: <1478007617-18715-1-git-send-email-hch@lst.de>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-This is a multi-part message in MIME format.
---------------ED5B86C66CB198DB454D75CD
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Noidle should be the default for writes as seen by all the compounds
+defintions in fs.h using it.  In fact only direct I/O really should
+be using NODILE, so turn the whole flag around to get the defaults
+right, which will make our life much easier especially onces the
+WRITE_* defines go away.
 
-Hi guys,
+This assumes all the existing "raw" users of REQ_SYNC for writes
+want noidle behavior, which seems to be spot on from a quick audit.
 
-We were looking at testing the new IO polling improvements and we built
-a kernel from the 'for-4.10/dio' (64ead7d) branch in linux-block.
-However this branch seems to cause hung tasks when booted. Most
-noticeably, dhclient seems to always hang as it tries to read from it's
-leases file, and that means networking does not work on the computers we
-tested on. Other tasks seemed to hang occasionally and randomly.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ Documentation/block/cfq-iosched.txt | 32 ++++++++++++++++----------------
+ block/cfq-iosched.c                 | 11 ++++++++---
+ drivers/block/drbd/drbd_actlog.c    |  2 +-
+ include/linux/blk_types.h           |  4 ++--
+ include/linux/fs.h                  | 10 +++++-----
+ include/trace/events/f2fs.h         |  2 +-
+ 6 files changed, 33 insertions(+), 28 deletions(-)
 
-We tested on two machines with radically different hardware but both
-running Debian Jessie.  (One is a dual-socket server system with the
-root FS on an HDD and the other is an off the shelf commodity
-motherboard with root on an SSD.)
+diff --git a/Documentation/block/cfq-iosched.txt b/Documentation/block/cfq-iosched.txt
+index 1e4f835..895bd38 100644
+--- a/Documentation/block/cfq-iosched.txt
++++ b/Documentation/block/cfq-iosched.txt
+@@ -240,11 +240,11 @@ All cfq queues doing synchronous sequential IO go on to sync-idle tree.
+ On this tree we idle on each queue individually.
+ 
+ All synchronous non-sequential queues go on sync-noidle tree. Also any
+-request which are marked with REQ_NOIDLE go on this service tree. On this
+-tree we do not idle on individual queues instead idle on the whole group
+-of queues or the tree. So if there are 4 queues waiting for IO to dispatch
+-we will idle only once last queue has dispatched the IO and there is
+-no more IO on this service tree.
++synchronous write request which is not marked with REQ_IDLE goes on this
++service tree. On this tree we do not idle on individual queues instead idle
++on the whole group of queues or the tree. So if there are 4 queues waiting
++for IO to dispatch we will idle only once last queue has dispatched the IO
++and there is no more IO on this service tree.
+ 
+ All async writes go on async service tree. There is no idling on async
+ queues.
+@@ -257,17 +257,17 @@ tree idling provides isolation with buffered write queues on async tree.
+ 
+ FAQ
+ ===
+-Q1. Why to idle at all on queues marked with REQ_NOIDLE.
++Q1. Why to idle at all on queues not marked with REQ_IDLE.
+ 
+-A1. We only do tree idle (all queues on sync-noidle tree) on queues marked
+-    with REQ_NOIDLE. This helps in providing isolation with all the sync-idle
++A1. We only do tree idle (all queues on sync-noidle tree) on queues not marked
++    with REQ_IDLE. This helps in providing isolation with all the sync-idle
+     queues. Otherwise in presence of many sequential readers, other
+     synchronous IO might not get fair share of disk.
+ 
+     For example, if there are 10 sequential readers doing IO and they get
+-    100ms each. If a REQ_NOIDLE request comes in, it will be scheduled
+-    roughly after 1 second. If after completion of REQ_NOIDLE request we
+-    do not idle, and after a couple of milli seconds a another REQ_NOIDLE
++    100ms each. If a !REQ_IDLE request comes in, it will be scheduled
++    roughly after 1 second. If after completion of !REQ_IDLE request we
++    do not idle, and after a couple of milli seconds a another !REQ_IDLE
+     request comes in, again it will be scheduled after 1second. Repeat it
+     and notice how a workload can lose its disk share and suffer due to
+     multiple sequential readers.
+@@ -276,16 +276,16 @@ A1. We only do tree idle (all queues on sync-noidle tree) on queues marked
+     context of fsync, and later some journaling data is written. Journaling
+     data comes in only after fsync has finished its IO (atleast for ext4
+     that seemed to be the case). Now if one decides not to idle on fsync
+-    thread due to REQ_NOIDLE, then next journaling write will not get
++    thread due to !REQ_IDLE, then next journaling write will not get
+     scheduled for another second. A process doing small fsync, will suffer
+     badly in presence of multiple sequential readers.
+ 
+-    Hence doing tree idling on threads using REQ_NOIDLE flag on requests
++    Hence doing tree idling on threads using !REQ_IDLE flag on requests
+     provides isolation from multiple sequential readers and at the same
+     time we do not idle on individual threads.
+ 
+-Q2. When to specify REQ_NOIDLE
+-A2. I would think whenever one is doing synchronous write and not expecting
++Q2. When to specify REQ_IDLE
++A2. I would think whenever one is doing synchronous write and expecting
+     more writes to be dispatched from same context soon, should be able
+-    to specify REQ_NOIDLE on writes and that probably should work well for
++    to specify REQ_IDLE on writes and that probably should work well for
+     most of the cases.
+diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
+index f28db97..dcbed8c 100644
+--- a/block/cfq-iosched.c
++++ b/block/cfq-iosched.c
+@@ -3914,6 +3914,12 @@ cfq_update_io_seektime(struct cfq_data *cfqd, struct cfq_queue *cfqq,
+ 		cfqq->seek_history |= (sdist > CFQQ_SEEK_THR);
+ }
+ 
++static inline bool req_noidle(struct request *req)
++{
++	return req_op(req) == REQ_OP_WRITE &&
++		(req->cmd_flags & (REQ_SYNC | REQ_IDLE)) == REQ_SYNC;
++}
++
+ /*
+  * Disable idle window if the process thinks too long or seeks so much that
+  * it doesn't matter
+@@ -3935,7 +3941,7 @@ cfq_update_idle_window(struct cfq_data *cfqd, struct cfq_queue *cfqq,
+ 	if (cfqq->queued[0] + cfqq->queued[1] >= 4)
+ 		cfq_mark_cfqq_deep(cfqq);
+ 
+-	if (cfqq->next_rq && (cfqq->next_rq->cmd_flags & REQ_NOIDLE))
++	if (cfqq->next_rq && req_noidle(cfqq->next_rq))
+ 		enable_idle = 0;
+ 	else if (!atomic_read(&cic->icq.ioc->active_ref) ||
+ 		 !cfqd->cfq_slice_idle ||
+@@ -4220,8 +4226,7 @@ static void cfq_completed_request(struct request_queue *q, struct request *rq)
+ 	const int sync = rq_is_sync(rq);
+ 	u64 now = ktime_get_ns();
+ 
+-	cfq_log_cfqq(cfqd, cfqq, "complete rqnoidle %d",
+-		     !!(rq->cmd_flags & REQ_NOIDLE));
++	cfq_log_cfqq(cfqd, cfqq, "complete rqnoidle %d", req_noidle(rq));
+ 
+ 	cfq_update_hw_tag(cfqd);
+ 
+diff --git a/drivers/block/drbd/drbd_actlog.c b/drivers/block/drbd/drbd_actlog.c
+index 2d3d50a..8d7bcfa 100644
+--- a/drivers/block/drbd/drbd_actlog.c
++++ b/drivers/block/drbd/drbd_actlog.c
+@@ -148,7 +148,7 @@ static int _drbd_md_sync_page_io(struct drbd_device *device,
+ 
+ 	if ((op == REQ_OP_WRITE) && !test_bit(MD_NO_FUA, &device->flags))
+ 		op_flags |= REQ_FUA | REQ_PREFLUSH;
+-	op_flags |= REQ_SYNC | REQ_NOIDLE;
++	op_flags |= REQ_SYNC;
+ 
+ 	bio = bio_alloc_drbd(GFP_NOIO);
+ 	bio->bi_bdev = bdev->md_bdev;
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index 107d23d..63b750a 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -175,7 +175,7 @@ enum req_flag_bits {
+ 	__REQ_META,		/* metadata io request */
+ 	__REQ_PRIO,		/* boost priority in cfq */
+ 	__REQ_NOMERGE,		/* don't touch this for merging */
+-	__REQ_NOIDLE,		/* don't anticipate more IO after this one */
++	__REQ_IDLE,		/* anticipate more IO after this one */
+ 	__REQ_INTEGRITY,	/* I/O includes block integrity payload */
+ 	__REQ_FUA,		/* forced unit access */
+ 	__REQ_PREFLUSH,		/* request for cache flush */
+@@ -190,7 +190,7 @@ enum req_flag_bits {
+ #define REQ_META		(1ULL << __REQ_META)
+ #define REQ_PRIO		(1ULL << __REQ_PRIO)
+ #define REQ_NOMERGE		(1ULL << __REQ_NOMERGE)
+-#define REQ_NOIDLE		(1ULL << __REQ_NOIDLE)
++#define REQ_IDLE		(1ULL << __REQ_IDLE)
+ #define REQ_INTEGRITY		(1ULL << __REQ_INTEGRITY)
+ #define REQ_FUA			(1ULL << __REQ_FUA)
+ #define REQ_PREFLUSH		(1ULL << __REQ_PREFLUSH)
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index ccedccb..46a7420 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -197,11 +197,11 @@ typedef int (dio_iodone_t)(struct kiocb *iocb, loff_t offset,
+ #define WRITE			REQ_OP_WRITE
+ 
+ #define READ_SYNC		0
+-#define WRITE_SYNC		(REQ_SYNC | REQ_NOIDLE)
+-#define WRITE_ODIRECT		REQ_SYNC
+-#define WRITE_FLUSH		(REQ_NOIDLE | REQ_PREFLUSH)
+-#define WRITE_FUA		(REQ_NOIDLE | REQ_FUA)
+-#define WRITE_FLUSH_FUA		(REQ_NOIDLE | REQ_PREFLUSH | REQ_FUA)
++#define WRITE_SYNC		REQ_SYNC
++#define WRITE_ODIRECT		(REQ_SYNC | REQ_IDLE)
++#define WRITE_FLUSH		REQ_PREFLUSH
++#define WRITE_FUA		REQ_FUA
++#define WRITE_FLUSH_FUA		(REQ_PREFLUSH | REQ_FUA)
+ 
+ /*
+  * Attribute flags.  These should be or-ed together to figure out what
+diff --git a/include/trace/events/f2fs.h b/include/trace/events/f2fs.h
+index 903a091..a9d3442 100644
+--- a/include/trace/events/f2fs.h
++++ b/include/trace/events/f2fs.h
+@@ -32,7 +32,7 @@ TRACE_DEFINE_ENUM(LFS);
+ TRACE_DEFINE_ENUM(SSR);
+ TRACE_DEFINE_ENUM(__REQ_RAHEAD);
+ TRACE_DEFINE_ENUM(__REQ_SYNC);
+-TRACE_DEFINE_ENUM(__REQ_NOIDLE);
++TRACE_DEFINE_ENUM(__REQ_IDLE);
+ TRACE_DEFINE_ENUM(__REQ_PREFLUSH);
+ TRACE_DEFINE_ENUM(__REQ_FUA);
+ TRACE_DEFINE_ENUM(__REQ_PRIO);
+-- 
+2.1.4
 
-We performed a bisect to find the culprit commit to be:
-
-[b685d3d65ac791406e0dfd8779cc9b3707fea5a3] block: treat REQ_FUA and
-REQ_PREFLUSH as synchronous
-
-I've attached a bisect log.
-
-Thanks,
-
-Logan
-
---------------ED5B86C66CB198DB454D75CD
-Content-Type: text/x-log;
- name="block-bisect.log"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
- filename="block-bisect.log"
-
-git bisect start
-# good: [1001354ca34179f3db924eb66672442a173147dc] Linux 4.9-rc1
-git bisect good 1001354ca34179f3db924eb66672442a173147dc
-# bad: [64ead7d24b34ed40e85577e9be8bd203835e57c4] blk-mq: make the polling code adaptive
-git bisect bad 64ead7d24b34ed40e85577e9be8bd203835e57c4
-# bad: [70fd76140a6cb63262bd47b68d57b42e889c10ee] block,fs: use REQ_* flags directly
-git bisect bad 70fd76140a6cb63262bd47b68d57b42e889c10ee
-# good: [2552e3f878c2b43b41d7728a328821d8220c28da] blk-mq: get rid of confusing blk_map_ctx structure
-git bisect good 2552e3f878c2b43b41d7728a328821d8220c28da
-# good: [aa39ebd404423e62f74cfd3e27e9ffe7e38b2a25] cfq-iosched: use op_is_sync instead of opencoding it
-git bisect good aa39ebd404423e62f74cfd3e27e9ffe7e38b2a25
-# good: [67f055c798c72c49ee0c844eae0cd6e9c83b1b16] btrfs: use op_is_sync to check for synchronous requests
-git bisect good 67f055c798c72c49ee0c844eae0cd6e9c83b1b16
-# bad: [b685d3d65ac791406e0dfd8779cc9b3707fea5a3] block: treat REQ_FUA and REQ_PREFLUSH as synchronous
-git bisect bad b685d3d65ac791406e0dfd8779cc9b3707fea5a3
-# good: [6f6b29171a192e84b666c816e49d2175afbbb09f] block: don't use REQ_SYNC in the READ_SYNC definition
-git bisect good 6f6b29171a192e84b666c816e49d2175afbbb09f
-# first bad commit: [b685d3d65ac791406e0dfd8779cc9b3707fea5a3] block: treat REQ_FUA and REQ_PREFLUSH as synchronous
-
---------------ED5B86C66CB198DB454D75CD--
