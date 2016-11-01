@@ -1,33 +1,26 @@
-Return-Path: <martin.petersen@oracle.com>
-To: Christoph Hellwig <hch@lst.de>
-Cc: martin.petersen@oracle.com, don.brace@microsemi.com, axboe@kernel.dk,
-        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: expose queue the queue mapping for SCSI drivers V2
-From: "Martin K. Petersen" <martin.petersen@oracle.com>
-References: <1478009569-19026-1-git-send-email-hch@lst.de>
-Date: Tue, 01 Nov 2016 13:37:46 -0400
-In-Reply-To: <1478009569-19026-1-git-send-email-hch@lst.de> (Christoph
-	Hellwig's message of "Tue, 1 Nov 2016 08:12:46 -0600")
-Message-ID: <yq1vaw7yuc5.fsf@sermon.lab.mkp.net>
-MIME-Version: 1.0
-Content-Type: text/plain
+Return-Path: <BATV+df6418b500677e5f9364+4818+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: martin.petersen@oracle.com,
+	don.brace@microsemi.com
+Cc: axboe@kernel.dk,
+	linux-scsi@vger.kernel.org,
+	linux-block@vger.kernel.org
+Subject: expose queue the queue mapping for SCSI drivers V2
+Date: Tue,  1 Nov 2016 08:12:46 -0600
+Message-Id: <1478009569-19026-1-git-send-email-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
->>>>> "Christoph" == Christoph Hellwig <hch@lst.de> writes:
+In 4.9 I've added support in the interrupt layer to automatically
+assign the interrupt affinity at interrupt allocation time, and
+expose that information to blk-mq.
 
-Christoph> In 4.9 I've added support in the interrupt layer to
-Christoph> automatically assign the interrupt affinity at interrupt
-Christoph> allocation time, and expose that information to blk-mq.
+This series extents that so that SCSI driver can pass on the information
+as well.  The SCSI part is fairly trivial, although we need to also
+export the default queue mapping function in blk-mq to keep things simple.
 
-Christoph> This series extents that so that SCSI driver can pass on the
-Christoph> information as well.  The SCSI part is fairly trivial,
-Christoph> although we need to also export the default queue mapping
-Christoph> function in blk-mq to keep things simple.
+I've also converted over the smartpqi driver as an example as it's the
+easiest of the multiqueue SCSI drivers to convert.
 
-Christoph> I've also converted over the smartpqi driver as an example as
-Christoph> it's the easiest of the multiqueue SCSI drivers to convert.
-
-Applied to 4.10/scsi-queue.
-
--- 
-Martin K. Petersen	Oracle Linux Engineering
+Changes since V1:
+ - move the EXPORT_SYMBOL of blk_mq_map_queues to the right patch
+ - added Reviewed-by, Acked-by and Tested-by tags
