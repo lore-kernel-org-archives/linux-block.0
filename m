@@ -1,42 +1,45 @@
-Return-Path: <prvs=011358c635=axboe@fb.com>
-From: Jens Axboe <axboe@fb.com>
-To: <axboe@kernel.dk>, <linux-kernel@vger.kernel.org>,
-        <linux-block@vger.kernel.org>
-CC: <hch@lst.de>
-Subject: [PATCHSET] block: IO polling improvements
-Date: Tue, 1 Nov 2016 15:05:21 -0600
-Message-ID: <1478034325-28232-1-git-send-email-axboe@fb.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: block device direct I/O fast path
+To: Christoph Hellwig <hch@lst.de>
+References: <1477936765-8828-1-git-send-email-hch@lst.de>
+ <20161101170019.GB9797@kernel.dk> <20161101170636.GA22639@lst.de>
+ <20161101175437.GC9797@kernel.dk>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <d7350267-e3ec-958f-3c52-db219e424b80@kernel.dk>
+Date: Tue, 1 Nov 2016 12:22:42 -0600
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20161101175437.GC9797@kernel.dk>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-This builds on top of Christophs simplified bdev O_DIRECT code,
-posted earlier today [1].
+On 11/01/2016 11:54 AM, Jens Axboe wrote:
+> On Tue, Nov 01 2016, Christoph Hellwig wrote:
+>> On Tue, Nov 01, 2016 at 11:00:19AM -0600, Jens Axboe wrote:
+>>> #2 is a bit more problematic, I'm pondering how we can implement that on
+>>> top of the bio approach. The nice thing about the request based approach
+>>> is that we have a 1:1 mapping with the unit on the driver side. And we
+>>> have a place to store the timer. I don't particularly love the embedded
+>>> timer, however, it'd be great to implement that differently. Trying to
+>>> think of options there, haven't found any yet.
+>>
+>> I have a couple ideas for that.  Give me a few weeks and I'll send
+>> patches.
+>
+> I'm not that patient :-)
+>
+> For the SYNC part, it should be easy enough to do by just using an
+> on-stack hrtimer. I guess that will do for now, since we don't have
+> poll support for async O_DIRECT right now anyway.
+>
+> http://git.kernel.dk/cgit/linux-block/commit/?h=for-4.10/dio&id=e96d9afd56791a61d463cb88f8f3b48393b71020
+>
+> Untested, but should get the point across. I'll fire up a test box.
 
-This patchset adds support for a hybrid polling mode, where a poll
-cycle can be split into an upfront sleep, then a busy poll. On the
-devices where we care about IO polling, generally we have fairly
-deterministic completion latencies. So this patchset pulls in
-the stats code from the buffered writeback code, and uses that to
-more intelligently poll a device.
+http://git.kernel.dk/cgit/linux-block/commit/?h=for-4.10/dio&id=b879a97d749c5c1755d1e2f20c721eb6fde0c291
 
-Let's assume a device completes IO in 8 usecs. When we poll now,
-we busy loop for 8 usec. It's a lot more efficient to sleep for
-a bit, then poll the last few usecs instead, if we know the
-rough completion time of the IO.
+Now tested, inadvertently used the absolute timer instead of the
+relative. Works for me.
 
-This adds a sysfs file, /sys/block/<dev>/queue/io_poll_delay, which
-makes the polling behave as follows:
-
--1	Never enter hybrid sleep, always poll
- 0	Use half of the completion mean for this request type for the
-	sleep delay
->0	Use this specific value as the sleep delay
-
-We default to -1, which is the old behavior. Initial testing with '0'
-has been positive, retaining 93% of the performance at roughly 50%
-CPU instead of the 100% with classic polling.
-
-You can also find this code in my for-4.10/dio branch.
-
-[1] https://marc.info/?l=linux-kernel&m=147793678521108&w=2
+-- 
+Jens Axboe
