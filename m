@@ -1,115 +1,128 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-bn3nam01on0071.outbound.protection.outlook.com ([104.47.33.71]:17488
-        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1753086AbcJ2AUH (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Oct 2016 20:20:07 -0400
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-Subject: [PATCH v5 0/14] Fix race conditions related to stopping block layer
- queues
-To: Jens Axboe <axboe@fb.com>
-CC: Christoph Hellwig <hch@lst.de>,
-        James Bottomley <jejb@linux.vnet.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Doug Ledford <dledford@redhat.com>,
-        Keith Busch <keith.busch@intel.com>,
-        Ming Lei <tom.leiming@gmail.com>,
-        "Konrad Rzeszutek Wilk" <konrad.wilk@oracle.com>,
-        =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-Message-ID: <7460e8b2-2cfd-c0d5-7ae7-7f662d89dad3@sandisk.com>
-Date: Fri, 28 Oct 2016 17:18:17 -0700
+Received: from mail-vk0-f65.google.com ([209.85.213.65]:34202 "EHLO
+        mail-vk0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S948415AbcKABFC (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 31 Oct 2016 21:05:02 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
+In-Reply-To: <1477936765-8828-2-git-send-email-hch@lst.de>
+References: <1477936765-8828-1-git-send-email-hch@lst.de> <1477936765-8828-2-git-send-email-hch@lst.de>
+From: Ming Lei <tom.leiming@gmail.com>
+Date: Tue, 1 Nov 2016 09:05:00 +0800
+Message-ID: <CACVXFVP_ybet0cYdt4voOoGGgXDj50qTajJD4hCmMci0W4juOQ@mail.gmail.com>
+Subject: Re: [PATCH 1/2] block: add bio_iov_iter_get_pages()
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@fb.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Kent Overstreet <kent.overstreet@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hello Jens,
+On Tue, Nov 1, 2016 at 1:59 AM, Christoph Hellwig <hch@lst.de> wrote:
+> From: Kent Overstreet <kent.overstreet@gmail.com>
+>
+> This is a helper that pins down a range from an iov_iter and adds it to
+> a bio without requiring a separate memory allocation for the page array.
+> It will be used for upcoming direct I/O implementations for block devices
+> and iomap based file systems.
+>
+> Signed-off-by: Kent Overstreet <kent.overstreet@gmail.com>
+> [hch: ported to the iov_iter interface, renamed and added comments.
+>       All blame should be directed to me and all fame should go to Kent
+>       after this!]
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  block/bio.c         | 49 +++++++++++++++++++++++++++++++++++++++++++++++++
+>  include/linux/bio.h |  1 +
+>  2 files changed, 50 insertions(+)
+>
+> diff --git a/block/bio.c b/block/bio.c
+> index db85c57..2cf6eba 100644
+> --- a/block/bio.c
+> +++ b/block/bio.c
+> @@ -847,6 +847,55 @@ int bio_add_page(struct bio *bio, struct page *page,
+>  }
+>  EXPORT_SYMBOL(bio_add_page);
+>
+> +/**
+> + * bio_iov_iter_get_pages - pin user or kernel pages and add them to a bio
+> + * @bio: bio to add pages to
+> + * @iter: iov iterator describing the region to be mapped
+> + *
+> + * Pins as many pages from *iter and appends them to @bio's bvec array. The
+> + * pages will have to be released using put_page() when done.
+> + */
+> +int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+> +{
+> +       unsigned short nr_pages = bio->bi_max_vecs - bio->bi_vcnt;
+> +       struct bio_vec *bv = bio->bi_io_vec + bio->bi_vcnt;
+> +       struct page **pages = (struct page **)bv;
+> +       size_t offset, diff;
+> +       ssize_t size;
+> +
+> +       size = iov_iter_get_pages(iter, pages, LONG_MAX, nr_pages, &offset);
 
-Multiple block drivers need the functionality to stop a request queue 
-and to wait until all ongoing request_fn() / queue_rq() calls have 
-finished without waiting until all outstanding requests have finished. 
-Hence this patch series that introduces the blk_mq_quiesce_queue() 
-function. The dm-mq, SRP and NVMe patches in this patch series are three 
-examples of where these functions are useful. These patches have been 
-tested on top of kernel v4.9-rc2. The following tests have been run to 
-verify this patch series:
-- Mike's mptest suite that stress-tests dm-multipath.
-- My own srp-test suite that stress-tests SRP on top of dm-multipath.
-- fio on top of the NVMeOF host driver that was connected to the NVMeOF
-   target driver on the same host.
-- Laurence verified the previous version (v3) of this patch series by
-   running it through the Red Hat SRP and NVMe test suites.
+BTW, if there is one multi-page version of get_user_pages_fast() and
+iov_iter_get_pages(), size of page array can be reduced too.
 
-The changes compared to the third version of this patch series are:
-- Added a blk_mq_stop_hw_queues() call in blk_mq_quiesce_queue() as
-   requested by Ming Lei.
-- Modified scsi_unblock_target() such that it waits until
-   .queuecommand() finished. Unexported scsi_wait_for_queuecommand().
-- Reordered the two NVMe patches.
-- Added a patch that avoids that blk_mq_requeue_work() restarts stopped
-   queues.
-- Added a patch that removes blk_mq_cancel_requeue_work().
+> +       if (unlikely(size <= 0))
+> +               return size ? size : -EFAULT;
+> +       nr_pages = (size + offset + PAGE_SIZE - 1) / PAGE_SIZE;
+> +
+> +       /*
+> +        * Deep magic below:  We need to walk the pinned pages backwards
+> +        * because we are abusing the space allocated for the bio_vecs
+> +        * for the page array.  Because the bio_vecs are larger than the
+> +        * page pointers by definition this will always work.  But it also
+> +        * means we can't use bio_add_page, so any changes to it's semantics
+> +        * need to be reflected here as well.
+> +        */
+> +       bio->bi_iter.bi_size += size;
+> +       bio->bi_vcnt += nr_pages;
+> +
+> +       diff = (nr_pages * PAGE_SIZE - offset) - size;
+> +       while (nr_pages--) {
+> +               bv[nr_pages].bv_page = pages[nr_pages];
+> +               bv[nr_pages].bv_len = PAGE_SIZE;
+> +               bv[nr_pages].bv_offset = 0;
+> +       }
+> +
+> +       bv[0].bv_offset += offset;
+> +       bv[0].bv_len -= offset;
+> +       if (diff)
+> +               bv[bio->bi_vcnt - 1].bv_len -= diff;
+> +
+> +       iov_iter_advance(iter, size);
+> +       return 0;
+> +}
+> +EXPORT_SYMBOL_GPL(bio_iov_iter_get_pages);
+> +
+>  struct submit_bio_ret {
+>         struct completion event;
+>         int error;
+> diff --git a/include/linux/bio.h b/include/linux/bio.h
+> index 87ce64d..c39fa0b 100644
+> --- a/include/linux/bio.h
+> +++ b/include/linux/bio.h
+> @@ -419,6 +419,7 @@ void bio_chain(struct bio *, struct bio *);
+>  extern int bio_add_page(struct bio *, struct page *, unsigned int,unsigned int);
+>  extern int bio_add_pc_page(struct request_queue *, struct bio *, struct page *,
+>                            unsigned int, unsigned int);
+> +int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter);
+>  struct rq_map_data;
+>  extern struct bio *bio_map_user_iov(struct request_queue *,
+>                                     const struct iov_iter *, gfp_t);
+> --
+> 2.1.4
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-block" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-Changes between v4 and v3:
-- Left out the dm changes from the patch that introduces
-   blk_mq_hctx_stopped() because a later patch deletes the changed code
-   from the dm core.
-- Moved the blk_mq_hctx_stopped() declaration from a public to a
-   private block layer header file.
-- Added a new patch that moves more code into
-   blk_mq_direct_issue_request(). This patch avoids that a new function
-   has to be introduced to avoid code duplication.
-- Explained the implemented algorithm in the patch that introduces
-   blk_mq_quiesce_queue() in the description of the patch that
-   introduces this function.
-- Added "select SRCU" to the patch that introduces
-   blk_mq_quiesce_queue() to avoid build failures.
-- Documented the shost argument in the scsi_wait_for_queuecommand()
-   kerneldoc header.
-- Fixed an unintended behavior change in the last patch of this series.
 
-Changes between v3 and v2:
-- Changed the order of the patches in this patch series.
-- Added several new patches: a patch that avoids that .queue_rq() gets
-   invoked from the direct submission path if a queue has been stopped
-   and also a patch that introduces the helper function
-   blk_mq_hctx_stopped().
-- blk_mq_quiesce_queue() has been reworked (thanks to Ming Lin and Sagi
-   for their feedback).
-- A bool 'kick' argument has been added to blk_mq_requeue_request().
-- As proposed by Christoph, the code that waits for queuecommand() has
-   been moved from the SRP transport driver to the SCSI core.
 
-Changes between v2 and v1:
-- Dropped the non-blk-mq changes from this patch series.
-- Added support for harware queues with BLK_MQ_F_BLOCKING set.
-- Added a call stack to the description of the dm race fix patch.
-- Dropped the non-scsi-mq changes from the SRP patch.
-- Added a patch that introduces blk_mq_queue_stopped() in the dm driver.
-
-The individual patches in this series are:
-
-0001-blk-mq-Do-not-invoke-.queue_rq-for-a-stopped-queue.patch
-0002-blk-mq-Introduce-blk_mq_hctx_stopped.patch
-0003-blk-mq-Introduce-blk_mq_queue_stopped.patch
-0004-blk-mq-Move-more-code-into-blk_mq_direct_issue_reque.patch
-0005-blk-mq-Avoid-that-requeueing-starts-stopped-queues.patch
-0006-blk-mq-Remove-blk_mq_cancel_requeue_work.patch
-0007-blk-mq-Introduce-blk_mq_quiesce_queue.patch
-0008-blk-mq-Add-a-kick_requeue_list-argument-to-blk_mq_re.patch
-0009-dm-Use-BLK_MQ_S_STOPPED-instead-of-QUEUE_FLAG_STOPPE.patch
-0010-dm-Fix-a-race-condition-related-to-stopping-and-star.patch
-0011-SRP-transport-Move-queuecommand-wait-code-to-SCSI-co.patch
-0012-SRP-transport-scsi-mq-Wait-for-.queue_rq-if-necessar.patch
-0013-nvme-Fix-a-race-condition-related-to-stopping-queues.patch
-0014-nvme-Use-BLK_MQ_S_STOPPED-instead-of-QUEUE_FLAG_STOP.patch
-
-Thanks,
-
-Bart.
+-- 
+Ming Lei
