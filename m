@@ -1,136 +1,179 @@
-Return-Path: <prvs=0115b0b9d1=axboe@fb.com>
+Return-Path: <prvs=011358c635=axboe@fb.com>
 From: Jens Axboe <axboe@fb.com>
 To: <axboe@kernel.dk>, <linux-kernel@vger.kernel.org>,
         <linux-block@vger.kernel.org>
 CC: <hch@lst.de>, Jens Axboe <axboe@fb.com>
-Subject: [PATCH 1/5] block: fast-path for small and simple direct I/O requests
-Date: Thu, 3 Nov 2016 13:45:03 -0600
-Message-ID: <1478202307-1947-2-git-send-email-axboe@fb.com>
-In-Reply-To: <1478202307-1947-1-git-send-email-axboe@fb.com>
-References: <1478202307-1947-1-git-send-email-axboe@fb.com>
+Subject: [PATCH 4/4] blk-mq: make the polling code adaptive
+Date: Tue, 1 Nov 2016 15:05:25 -0600
+Message-ID: <1478034325-28232-5-git-send-email-axboe@fb.com>
+In-Reply-To: <1478034325-28232-1-git-send-email-axboe@fb.com>
+References: <1478034325-28232-1-git-send-email-axboe@fb.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-From: Christoph Hellwig <hch@lst.de>
+The previous commit introduced the hybrid sleep/poll mode. Take
+that one step further, and use the completion latencies to
+automatically sleep for half the mean completion time. This is
+a good approximation.
 
-This patch adds a small and simple fast patch for small direct I/O
-requests on block devices that don't use AIO.  Between the neat
-bio_iov_iter_get_pages helper that avoids allocating a page array
-for get_user_pages and the on-stack bio and biovec this avoid memory
-allocations and atomic operations entirely in the direct I/O code
-(lower levels might still do memory allocations and will usually
-have at least some atomic operations, though).
+This changes the 'io_poll_delay' sysfs file a bit to expose the
+various options. Depending on the value, the polling code will
+behave differently:
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+-1	Never enter hybrid sleep mode
+ 0	Use half of the completion mean for the sleep delay
+>0	Use this specific value as the sleep delay
+
 Signed-off-by: Jens Axboe <axboe@fb.com>
 ---
- fs/block_dev.c | 80 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 80 insertions(+)
+ block/blk-mq.c         | 50 +++++++++++++++++++++++++++++++++++++++++++++++---
+ block/blk-sysfs.c      | 28 ++++++++++++++++++++--------
+ include/linux/blkdev.h |  2 +-
+ 3 files changed, 68 insertions(+), 12 deletions(-)
 
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 05b553368bb4..d01413da5319 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -30,6 +30,7 @@
- #include <linux/cleancache.h>
- #include <linux/dax.h>
- #include <linux/badblocks.h>
-+#include <linux/task_io_accounting_ops.h>
- #include <linux/falloc.h>
- #include <asm/uaccess.h>
- #include "internal.h"
-@@ -175,12 +176,91 @@ static struct inode *bdev_file_inode(struct file *file)
- 	return file->f_mapping->host;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index caa55bec9411..2af75b087ebd 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2353,13 +2353,57 @@ void blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set, int nr_hw_queues)
  }
+ EXPORT_SYMBOL_GPL(blk_mq_update_nr_hw_queues);
  
-+#define DIO_INLINE_BIO_VECS 4
-+
-+static void blkdev_bio_end_io_simple(struct bio *bio)
++static unsigned long blk_mq_poll_nsecs(struct blk_mq_hw_ctx *hctx,
++				       struct request *rq)
 +{
-+	struct task_struct *waiter = bio->bi_private;
++	struct blk_rq_stat stat[2];
++	unsigned long ret = 0;
 +
-+	WRITE_ONCE(bio->bi_private, NULL);
-+	wake_up_process(waiter);
-+}
++	/*
++	 * We don't have to do this once per IO, should optimize this
++	 * to just use the current window of stats until it changes
++	 */
++	memset(&stat, 0, sizeof(stat));
++	blk_hctx_stat_get(hctx, stat);
 +
-+static ssize_t
-+__blkdev_direct_IO_simple(struct kiocb *iocb, struct iov_iter *iter,
-+		int nr_pages)
-+{
-+	struct file *file = iocb->ki_filp;
-+	struct block_device *bdev = I_BDEV(bdev_file_inode(file));
-+	unsigned blkbits = blksize_bits(bdev_logical_block_size(bdev));
-+	struct bio_vec inline_vecs[DIO_INLINE_BIO_VECS], *bvec;
-+	loff_t pos = iocb->ki_pos;
-+	bool should_dirty = false;
-+	struct bio bio;
-+	ssize_t ret;
-+	blk_qc_t qc;
-+	int i;
++	/*
++	 * As an optimistic guess, use half of the mean service time
++	 * for this type of request
++	 */
++	if (req_op(rq) == REQ_OP_READ && stat[0].nr_samples)
++		ret = (stat[0].mean + 1) / 2;
++	else if (req_op(rq) == REQ_OP_WRITE && stat[1].nr_samples)
++		ret = (stat[1].mean + 1) / 2;
 +
-+	if ((pos | iov_iter_alignment(iter)) & ((1 << blkbits) - 1))
-+		return -EINVAL;
-+
-+	bio_init(&bio);
-+	bio.bi_max_vecs = nr_pages;
-+	bio.bi_io_vec = inline_vecs;
-+	bio.bi_bdev = bdev;
-+	bio.bi_iter.bi_sector = pos >> blkbits;
-+	bio.bi_private = current;
-+	bio.bi_end_io = blkdev_bio_end_io_simple;
-+
-+	ret = bio_iov_iter_get_pages(&bio, iter);
-+	if (unlikely(ret))
-+		return ret;
-+	ret = bio.bi_iter.bi_size;
-+
-+	if (iov_iter_rw(iter) == READ) {
-+		bio_set_op_attrs(&bio, REQ_OP_READ, 0);
-+		if (iter_is_iovec(iter))
-+			should_dirty = true;
-+	} else {
-+		bio_set_op_attrs(&bio, REQ_OP_WRITE, REQ_SYNC | REQ_IDLE);
-+		task_io_account_write(ret);
-+	}
-+
-+	qc = submit_bio(&bio);
-+	for (;;) {
-+		set_current_state(TASK_UNINTERRUPTIBLE);
-+		if (!READ_ONCE(bio.bi_private))
-+			break;
-+		if (!(iocb->ki_flags & IOCB_HIPRI) ||
-+		    !blk_poll(bdev_get_queue(bdev), qc))
-+			io_schedule();
-+	}
-+	__set_current_state(TASK_RUNNING);
-+
-+	bio_for_each_segment_all(bvec, &bio, i) {
-+		if (should_dirty && !PageCompound(bvec->bv_page))
-+			set_page_dirty_lock(bvec->bv_page);
-+		put_page(bvec->bv_page);
-+	}
-+
-+	if (unlikely(bio.bi_error))
-+		return bio.bi_error;
-+	iocb->ki_pos += ret;
 +	return ret;
 +}
 +
- static ssize_t
- blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter)
+ static void blk_mq_poll_hybrid_sleep(struct request_queue *q,
++				     struct blk_mq_hw_ctx *hctx,
+ 				     struct request *rq)
  {
- 	struct file *file = iocb->ki_filp;
- 	struct inode *inode = bdev_file_inode(file);
-+	int nr_pages;
+ 	struct hrtimer_sleeper hs;
++	unsigned int nsecs;
+ 	ktime_t kt;
  
-+	nr_pages = iov_iter_npages(iter, BIO_MAX_PAGES);
-+	if (!nr_pages)
-+		return 0;
-+	if (is_sync_kiocb(iocb) && nr_pages <= DIO_INLINE_BIO_VECS)
-+		return __blkdev_direct_IO_simple(iocb, iter, nr_pages);
- 	return __blockdev_direct_IO(iocb, inode, I_BDEV(inode), iter,
- 				    blkdev_get_block, NULL, NULL,
- 				    DIO_SKIP_DIO_COUNT);
+-	if (!q->poll_nsec || test_bit(REQ_ATOM_POLL_SLEPT, &rq->atomic_flags))
++	if (test_bit(REQ_ATOM_POLL_SLEPT, &rq->atomic_flags))
++		return;
++
++	/*
++	 * poll_nsec can be:
++	 *
++	 * -1:	don't ever hybrid sleep
++	 *  0:	use half of prev avg
++	 * >0:	use this specific value
++	 */
++	if (q->poll_nsec == -1)
++		return;
++	else if (q->poll_nsec > 0)
++		nsecs = q->poll_nsec;
++	else
++		nsecs = blk_mq_poll_nsecs(hctx, rq);
++
++	if (!nsecs)
+ 		return;
+ 
+ 	set_bit(REQ_ATOM_POLL_SLEPT, &rq->atomic_flags);
+@@ -2368,7 +2412,7 @@ static void blk_mq_poll_hybrid_sleep(struct request_queue *q,
+ 	 * This will be replaced with the stats tracking code, using
+ 	 * 'avg_completion_time / 2' as the pre-sleep target.
+ 	 */
+-	kt = ktime_set(0, q->poll_nsec);
++	kt = ktime_set(0, nsecs);
+ 
+ 	hrtimer_init_on_stack(&hs.timer, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
+ 	hrtimer_set_expires(&hs.timer, kt);
+@@ -2393,7 +2437,7 @@ bool blk_mq_poll(struct blk_mq_hw_ctx *hctx, struct request *rq)
+ 	struct request_queue *q = hctx->queue;
+ 	long state;
+ 
+-	blk_mq_poll_hybrid_sleep(q, rq);
++	blk_mq_poll_hybrid_sleep(q, hctx, rq);
+ 
+ 	hctx->poll_considered++;
+ 
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index 467b81c6713c..c668af57197b 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -338,24 +338,36 @@ queue_rq_affinity_store(struct request_queue *q, const char *page, size_t count)
+ 
+ static ssize_t queue_poll_delay_show(struct request_queue *q, char *page)
+ {
+-	return queue_var_show(q->poll_nsec / 1000, page);
++	int val;
++
++	if (q->poll_nsec == -1)
++		val = -1;
++	else
++		val = q->poll_nsec / 1000;
++
++	return sprintf(page, "%d\n", val);
+ }
+ 
+ static ssize_t queue_poll_delay_store(struct request_queue *q, const char *page,
+ 				size_t count)
+ {
+-	unsigned long poll_usec;
+-	ssize_t ret;
++	int err, val;
+ 
+ 	if (!q->mq_ops || !q->mq_ops->poll)
+ 		return -EINVAL;
+ 
+-	ret = queue_var_store(&poll_usec, page, count);
+-	if (ret < 0)
+-		return ret;
++	err = kstrtoint(page, 10, &val);
++	if (err < 0)
++		return err;
+ 
+-	q->poll_nsec = poll_usec * 1000;
+-	return ret;
++	printk(KERN_ERR "val=%d\n", val);
++
++	if (val == -1)
++		q->poll_nsec = -1;
++	else
++		q->poll_nsec = val * 1000;
++
++	return count;
+ }
+ 
+ static ssize_t queue_poll_show(struct request_queue *q, char *page)
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 6acd220dc3f3..857f866d2751 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -502,7 +502,7 @@ struct request_queue {
+ 	unsigned int		request_fn_active;
+ 
+ 	unsigned int		rq_timeout;
+-	unsigned int		poll_nsec;
++	int			poll_nsec;
+ 	struct timer_list	timeout;
+ 	struct work_struct	timeout_work;
+ 	struct list_head	timeout_list;
 -- 
 2.7.4
