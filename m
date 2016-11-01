@@ -1,97 +1,90 @@
-Return-Path: <Adam.Manzanares@wdc.com>
-From: Adam Manzanares <adam.manzanares@hgst.com>
-To: <axboe@kernel.dk>, <tj@kernel.org>, <dan.j.williams@intel.com>,
-	<hare@suse.de>, <martin.petersen@oracle.com>, <mchristi@redhat.com>,
-	<toshi.kani@hpe.com>, <ming.lei@canonical.com>,
-	<sathya.prakash@broadcom.com>, <chaitra.basappa@broadcom.com>,
-	<suganath-prabu.subramani@broadcom.com>
-CC: <linux-block@vger.kernel.org>, <linux-ide@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <MPT-FusionLinux.pdl@broadcom.com>,
-	<linux-scsi@vger.kernel.org>, Adam Manzanares <adam.manzanares@hgst.com>,
-	Adam Manzananares <adam.manzanares@wdc.com>
-Subject: [PATCH v5 1/4] block: Add iocontext priority to request
-Date: Thu, 13 Oct 2016 16:00:28 -0700
-Message-ID: <1476399631-5799-2-git-send-email-adam.manzanares@hgst.com>
-In-Reply-To: <1476399631-5799-1-git-send-email-adam.manzanares@hgst.com>
-References: <1476399631-5799-1-git-send-email-adam.manzanares@hgst.com>
+Return-Path: <mb@lightnvm.io>
+Return-Path: <mb@lightnvm.io>
+Subject: Re: [PATCH 4/7] lightnvm: drop reserve and release LUN callbacks
+To: Jens Axboe <axboe@kernel.dk>, =?UTF-8?Q?Javier_Gonz=c3=a1lez?=
+ <jg@lightnvm.io>
+References: <1477591299-26504-1-git-send-email-javier@cnexlabs.com>
+ <1477591299-26504-5-git-send-email-javier@cnexlabs.com>
+ <c22e65f3-5570-6042-a434-f84bf4db3c5a@lightnvm.io>
+ <9fc12698-de1b-b535-f8c4-d283a29a6099@kernel.dk>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@javigon.com>,
+ =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@cnexlabs.com>
+From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
+Message-ID: <846de705-2c2f-c636-39bd-e0ffc877ecaa@lightnvm.io>
+Date: Tue, 1 Nov 2016 01:38:23 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: adam.manzanares@hgst.com
+In-Reply-To: <9fc12698-de1b-b535-f8c4-d283a29a6099@kernel.dk>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Patch adds an association between iocontext ioprio and the ioprio of a
-request. This is done to enable request based drivers the ability to
-act on priority information stored in the request. An example being
-ATA devices that support command priorities. If the ATA driver discovers
-that the device supports command priorities and the request has valid
-priority information indicating the request is high priority, then a high
-priority command can be sent to the device. This should improve tail
-latencies for high priority IO on any device that queues requests
-internally and can make use of the priority information stored in the
-request.
+On 10/31/2016 09:22 PM, Jens Axboe wrote:
+> On 10/31/2016 07:08 AM, Matias Bjørling wrote:
+>> On 10/27/2016 08:01 PM, Javier González wrote:
+>>> From: Javier González <javier@javigon.com>
+>>>
+>>> On target initialization, targets use callbacks to the media manager to
+>>> configure the LUNs they use. In order to simplify the flow, drop this
+>>> callbacks and manage everything internally on the media manager.
+>>>
+>>> By making use of the newly introduce LUN management structure, the media
+>>> manager knows which target exclusively owns each target and can
+>>> therefore allocate and free all the necessary structures before
+>>> initializing the target. Not exclusively owned LUNs belong to the media
+>>> manager in any case.
+>>>
+>>> Adapt rrpc to not use the reserve_lun/release_lun callback functions.
+>>>
+>>> Signed-off-by: Javier González <javier@cnexlabs.com>
+>>> ---
+>>>  drivers/lightnvm/gennvm.c | 68
+>>> ++++++++++++++++++++++++++++++++++++-----------
+>>>  drivers/lightnvm/rrpc.c   | 12 +--------
+>>>  include/linux/lightnvm.h  |  5 +---
+>>>  3 files changed, 55 insertions(+), 30 deletions(-)
+>>>
+>>> diff --git a/drivers/lightnvm/gennvm.c b/drivers/lightnvm/gennvm.c
+>>> index 8bff725..a340685 100644
+>>> --- a/drivers/lightnvm/gennvm.c
+>>> +++ b/drivers/lightnvm/gennvm.c
+>>> @@ -35,6 +35,50 @@ static const struct block_device_operations
+>>> gen_fops = {
+>>>      .owner        = THIS_MODULE,
+>>>  };
+>>>
+>>> +static int gen_reserve_luns(struct nvm_dev *dev, int lun_begin, int
+>>> lun_end,
+>>> +                struct nvm_target *t)
+>>> +{
+>>> +    struct gen_dev *gn = dev->mp;
+>>> +    struct gen_lun *lun;
+>>> +    int i;
+>>> +
+>>> +    for (i = lun_begin; i <= lun_end; i++) {
+>>> +        if (test_and_set_bit(i, dev->lun_map)) {
+>>> +            pr_err("gennvm: lun %d is already allocated\n", i);
+>>> +            goto fail;
+>>> +        }
+>>> +
+>>> +        lun = &gn->luns[i];
+>>> +        lun->tgt = t;
+>>> +        lun->vlun.priv = lun->mgmt;
+>>> +    }
+>>> +
+>>> +    return 0;
+>>> +fail:
+>>> +    while (--i > lun_begin)
+>>> +        clear_bit(i, dev->lun_map);
+>>> +
+>>> +    return 1;
+>>
+>> return -EINVAL;
+> 
+> -EBUSY?
+> 
+>> Lad os lige snakke lidt om dette her senere også :)
+> 
+> And probably keep the public emails in English :-)
+> 
 
-The ioprio of the request is set in blk_rq_set_prio which takes the
-request and the ioc as arguments. If the ioc is valid in blk_rq_set_prio
-then the iopriority of the request is set as the iopriority of the ioc.
-In init_request_from_bio a check is made to see if the ioprio of the bio
-is valid and if so then the request prio comes from the bio.
-
-Signed-off-by: Adam Manzananares <adam.manzanares@wdc.com>
----
- block/blk-core.c       |  4 +++-
- include/linux/blkdev.h | 14 ++++++++++++++
- 2 files changed, 17 insertions(+), 1 deletion(-)
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 14d7c07..361b1b9 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1153,6 +1153,7 @@ static struct request *__get_request(struct request_list *rl, int op,
- 
- 	blk_rq_init(q, rq);
- 	blk_rq_set_rl(rq, rl);
-+	blk_rq_set_prio(rq, ioc);
- 	req_set_op_attrs(rq, op, op_flags | REQ_ALLOCED);
- 
- 	/* init elvpriv */
-@@ -1656,7 +1657,8 @@ void init_request_from_bio(struct request *req, struct bio *bio)
- 
- 	req->errors = 0;
- 	req->__sector = bio->bi_iter.bi_sector;
--	req->ioprio = bio_prio(bio);
-+	if (ioprio_valid(bio_prio(bio)))
-+		req->ioprio = bio_prio(bio);
- 	blk_rq_bio_prep(req->q, req, bio);
- }
- 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index c47c358..9a0ceaa 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -934,6 +934,20 @@ static inline unsigned int blk_rq_count_bios(struct request *rq)
- }
- 
- /*
-+ * blk_rq_set_prio - associate a request with prio from ioc
-+ * @rq: request of interest
-+ * @ioc: target iocontext
-+ *
-+ * Assocate request prio with ioc prio so request based drivers
-+ * can leverage priority information.
-+ */
-+static inline void blk_rq_set_prio(struct request *rq, struct io_context *ioc)
-+{
-+	if (ioc)
-+		rq->ioprio = ioc->ioprio;
-+}
-+
-+/*
-  * Request issue related functions.
-  */
- extern struct request *blk_peek_request(struct request_queue *q);
--- 
-2.1.4
-
-Western Digital Corporation (and its subsidiaries) E-mail Confidentiality Notice & Disclaimer:
-
-This e-mail and any files transmitted with it may contain confidential or legally privileged information of WDC and/or its affiliates, and are intended solely for the use of the individual or entity to which they are addressed. If you are not the intended recipient, any disclosure, copying, distribution or any action taken or omitted to be taken in reliance on it, is prohibited. If you have received this e-mail in error, please notify the sender immediately and delete the e-mail in its entirety from your system.
+Haha, will do. Good to spice up the mailing list a bit :)
