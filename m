@@ -1,17 +1,26 @@
-Return-Path: <sagigrim@gmail.com>
-Return-Path: <sagigrim@gmail.com>
+Return-Path: <martin.petersen@oracle.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: martin.petersen@oracle.com, don.brace@microsemi.com, axboe@kernel.dk,
+        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
 Subject: Re: [PATCH 1/3] blk-mq: export blk_mq_map_queues
-To: Christoph Hellwig <hch@lst.de>, martin.petersen@oracle.com,
- don.brace@microsemi.com
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
 References: <1478009569-19026-1-git-send-email-hch@lst.de>
- <1478009569-19026-2-git-send-email-hch@lst.de>
-Cc: axboe@kernel.dk, linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
-From: Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <472b5cf6-7cd8-b047-2e2b-6b0dbd2788a5@grimberg.me>
-Date: Tue, 1 Nov 2016 18:00:57 +0200
+	<1478009569-19026-2-git-send-email-hch@lst.de>
+Date: Tue, 01 Nov 2016 11:53:18 -0400
+In-Reply-To: <1478009569-19026-2-git-send-email-hch@lst.de> (Christoph
+	Hellwig's message of "Tue, 1 Nov 2016 08:12:47 -0600")
+Message-ID: <yq1lgx319jl.fsf@sermon.lab.mkp.net>
 MIME-Version: 1.0
-In-Reply-To: <1478009569-19026-2-git-send-email-hch@lst.de>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+>>>>> "Christoph" == Christoph Hellwig <hch@lst.de> writes:
+
+Christoph> This will allow SCSI to have a single blk_mq_ops structure
+Christoph> that either lets the LLDD map the queues to PCIe MSIx vectors
+Christoph> or use the default.
+
+Jens, any objection to me funneling this change through the SCSI tree?
+
+-- 
+Martin K. Petersen	Oracle Linux Engineering
