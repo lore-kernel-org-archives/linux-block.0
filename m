@@ -1,29 +1,17 @@
-Return-Path: <axboe@kernel.dk>
-Date: Tue, 1 Nov 2016 10:02:51 -0600
-From: Jens Axboe <axboe@kernel.dk>
-To: "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>, don.brace@microsemi.com,
-	linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
+Return-Path: <sagigrim@gmail.com>
+Return-Path: <sagigrim@gmail.com>
 Subject: Re: [PATCH 1/3] blk-mq: export blk_mq_map_queues
-Message-ID: <20161101160251.GA9797@kernel.dk>
+To: Christoph Hellwig <hch@lst.de>, martin.petersen@oracle.com,
+ don.brace@microsemi.com
 References: <1478009569-19026-1-git-send-email-hch@lst.de>
  <1478009569-19026-2-git-send-email-hch@lst.de>
- <yq1lgx319jl.fsf@sermon.lab.mkp.net>
+Cc: axboe@kernel.dk, linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
+From: Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <472b5cf6-7cd8-b047-2e2b-6b0dbd2788a5@grimberg.me>
+Date: Tue, 1 Nov 2016 18:00:57 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <yq1lgx319jl.fsf@sermon.lab.mkp.net>
+In-Reply-To: <1478009569-19026-2-git-send-email-hch@lst.de>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Nov 01 2016, Martin K. Petersen wrote:
-> >>>>> "Christoph" == Christoph Hellwig <hch@lst.de> writes:
-> 
-> Christoph> This will allow SCSI to have a single blk_mq_ops structure
-> Christoph> that either lets the LLDD map the queues to PCIe MSIx vectors
-> Christoph> or use the default.
-> 
-> Jens, any objection to me funneling this change through the SCSI tree?
-
-No, that's fine, you can add my reviewed-by.
-
--- 
-Jens Axboe
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
