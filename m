@@ -1,13 +1,13 @@
 Return-Path: <prvs=011358c635=axboe@fb.com>
 From: Jens Axboe <axboe@fb.com>
 To: <axboe@kernel.dk>, <linux-kernel@vger.kernel.org>,
-        <linux-fsdevel@vger.kernel.org>, <linux-block@vger.kernel.org>
-CC: <jack@suse.cz>, <hch@lst.de>, Jens Axboe <axboe@fb.com>
-Subject: [PATCH 6/8] block: add scalable completion tracking of requests
-Date: Tue, 1 Nov 2016 15:08:49 -0600
-Message-ID: <1478034531-28559-7-git-send-email-axboe@fb.com>
-In-Reply-To: <1478034531-28559-1-git-send-email-axboe@fb.com>
-References: <1478034531-28559-1-git-send-email-axboe@fb.com>
+        <linux-block@vger.kernel.org>
+CC: <hch@lst.de>, Jens Axboe <axboe@fb.com>
+Subject: [PATCH 1/4] block: add scalable completion tracking of requests
+Date: Tue, 1 Nov 2016 15:05:22 -0600
+Message-ID: <1478034325-28232-2-git-send-email-axboe@fb.com>
+In-Reply-To: <1478034325-28232-1-git-send-email-axboe@fb.com>
+References: <1478034325-28232-1-git-send-email-axboe@fb.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
@@ -542,10 +542,10 @@ index 488c2e28feb8..5bb4648f434a 100644
  };
  
 diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 562ac46cb790..4d0044d09984 100644
+index bb921028e7c5..a59a214c39ae 100644
 --- a/include/linux/blk_types.h
 +++ b/include/linux/blk_types.h
-@@ -250,4 +250,20 @@ static inline unsigned int blk_qc_t_to_tag(blk_qc_t cookie)
+@@ -248,4 +248,20 @@ static inline unsigned int blk_qc_t_to_tag(blk_qc_t cookie)
  	return cookie & ((1u << BLK_QC_T_SHIFT) - 1);
  }
  
@@ -567,7 +567,7 @@ index 562ac46cb790..4d0044d09984 100644
 +
  #endif /* __LINUX_BLK_TYPES_H */
 diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 0c677fb35ce4..6bd5eb56894e 100644
+index 8396da2bb698..dcd8d6e8801f 100644
 --- a/include/linux/blkdev.h
 +++ b/include/linux/blkdev.h
 @@ -197,6 +197,7 @@ struct request {
@@ -578,7 +578,7 @@ index 0c677fb35ce4..6bd5eb56894e 100644
  #ifdef CONFIG_BLK_CGROUP
  	struct request_list *rl;		/* rl this rq is alloced from */
  	unsigned long long start_time_ns;
-@@ -492,6 +493,9 @@ struct request_queue {
+@@ -490,6 +491,9 @@ struct request_queue {
  
  	unsigned int		nr_sorted;
  	unsigned int		in_flight[2];
