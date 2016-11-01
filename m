@@ -1,81 +1,33 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:52315 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1752892AbcKDAD5 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 3 Nov 2016 20:03:57 -0400
-Received: from pps.filterd (m0044012.ppops.net [127.0.0.1])
-        by mx0a-00082601.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id uA400FJc009360
-        for <linux-block@vger.kernel.org>; Thu, 3 Nov 2016 17:03:56 -0700
-Received: from mail.thefacebook.com ([199.201.64.23])
-        by mx0a-00082601.pphosted.com with ESMTP id 26gdwq0vxj-1
-        (version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT)
-        for <linux-block@vger.kernel.org>; Thu, 03 Nov 2016 17:03:56 -0700
-Received: from facebook.com (2401:db00:21:603d:face:0:19:0)     by
- mx-out.facebook.com (10.102.107.97) with ESMTP id
- 2d188010a22211e6b3050002c99331b0-e6d7f6d0 for <linux-block@vger.kernel.org>;
-        Thu, 03 Nov 2016 17:03:55 -0700
-From: Shaohua Li <shli@fb.com>
-To: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <Kernel-team@fb.com>, <axboe@fb.com>
-Subject: [PATCH V2 1/2] block: immediately dispatch big size request
-Date: Thu, 3 Nov 2016 17:03:53 -0700
-Message-ID: <05e8cb8c7e09903c7db36e81a6bbd0b39b24deff.1478217670.git.shli@fb.com>
+Received: from verein.lst.de ([213.95.11.211]:53539 "EHLO newverein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S966280AbcKAOSS (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 1 Nov 2016 10:18:18 -0400
+Date: Tue, 1 Nov 2016 15:18:16 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Omar Sandoval <osandov@osandov.com>
+Cc: Christoph Hellwig <hch@lst.de>, axboe@fb.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/2] block: fast-path for small and simple direct I/O
+        requests
+Message-ID: <20161101141816.GA17142@lst.de>
+References: <1477936765-8828-1-git-send-email-hch@lst.de> <1477936765-8828-3-git-send-email-hch@lst.de> <20161031231911.GA20713@vader>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20161031231911.GA20713@vader>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Currently block plug holds up to 16 non-mergeable requests. This makes
-sense if the request size is small, eg, reduce lock contention. But if
-request size is big enough, we don't need to worry about lock
-contention. Holding such request makes no sense and it lows the disk
-utilization.
+On Mon, Oct 31, 2016 at 04:19:11PM -0700, Omar Sandoval wrote:
+> > +	if (unlikely(ret))
+> > +		return ret;
+> > +	ret = bio.bi_iter.bi_size;
+> > +
+> > +	if (iov_iter_rw(iter) == READ) {
+> > +		bio_set_op_attrs(&bio, REQ_OP_READ, 0);
+> > +		if (iter->type == ITER_IOVEC)
+> 
+> Nit: iter_is_iovec()?
 
-In practice, this improves 10% throughput for my raid5 sequential write
-workload.
-
-The size (128k) is arbitrary right now, but it makes sure lock
-contention is small. This probably could be more intelligent, eg, check
-average request size holded. Since this is mainly for sequential IO,
-probably not worthy.
-
-V2: check the last request instead of the first request, so as long as
-there is one big size request we flush the plug.
-
-Signed-off-by: Shaohua Li <shli@fb.com>
----
- block/blk-core.c       | 4 +++-
- include/linux/blkdev.h | 1 +
- 2 files changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 14d7c07..6be6378 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1763,7 +1763,9 @@ static blk_qc_t blk_queue_bio(struct request_queue *q, struct bio *bio)
- 		if (!request_count)
- 			trace_block_plug(q);
- 		else {
--			if (request_count >= BLK_MAX_REQUEST_COUNT) {
-+			struct request *last = list_entry_rq(plug->list.prev);
-+			if (request_count >= BLK_MAX_REQUEST_COUNT ||
-+			    blk_rq_bytes(last) >= BLK_PLUG_FLUSH_SIZE) {
- 				blk_flush_plug_list(plug, false);
- 				trace_block_plug(q);
- 			}
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index c47c358..72fa505 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1078,6 +1078,7 @@ struct blk_plug {
- 	struct list_head cb_list; /* md requires an unplug callback */
- };
- #define BLK_MAX_REQUEST_COUNT 16
-+#define BLK_PLUG_FLUSH_SIZE (128 * 1024)
- 
- struct blk_plug_cb;
- typedef void (*blk_plug_cb_fn)(struct blk_plug_cb *, bool);
--- 
-2.9.3
+Fixed.
 
