@@ -1,109 +1,37 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Ming Lei <tom.leiming@gmail.com>
-To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Ming Lei <tom.leiming@gmail.com>,
-        Joern Engel <joern@logfs.org>,
-        Prasad Joshi <prasadjoshi.linux@gmail.com>,
-        logfs@logfs.org (open list:LogFS)
-Subject: [PATCH 10/12] fs: logfs: use bio_add_page() in __bdev_writeseg()
-Date: Fri, 11 Nov 2016 20:05:38 +0800
-Message-Id: <1478865957-25252-11-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1478865957-25252-1-git-send-email-tom.leiming@gmail.com>
-References: <1478865957-25252-1-git-send-email-tom.leiming@gmail.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([198.137.202.9]:50190 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1424284AbcKANkX (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Nov 2016 09:40:23 -0400
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: [PATCH 02/16] blk-cgroup: use op_is_sync to check for synchronous requests
+Date: Tue,  1 Nov 2016 07:40:03 -0600
+Message-Id: <1478007617-18715-3-git-send-email-hch@lst.de>
+In-Reply-To: <1478007617-18715-1-git-send-email-hch@lst.de>
+References: <1478007617-18715-1-git-send-email-hch@lst.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Also this patch simplify the code a bit.
-
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- fs/logfs/dev_bdev.c | 51 ++++++++++++++++++++-------------------------------
- 1 file changed, 20 insertions(+), 31 deletions(-)
+ include/linux/blk-cgroup.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/fs/logfs/dev_bdev.c b/fs/logfs/dev_bdev.c
-index e01075790600..a2e8511b89d6 100644
---- a/fs/logfs/dev_bdev.c
-+++ b/fs/logfs/dev_bdev.c
-@@ -71,56 +71,45 @@ static int __bdev_writeseg(struct super_block *sb, u64 ofs, pgoff_t index,
- {
- 	struct logfs_super *super = logfs_super(sb);
- 	struct address_space *mapping = super->s_mapping_inode->i_mapping;
--	struct bio *bio;
-+	struct bio *bio = NULL;
- 	struct page *page;
- 	unsigned int max_pages;
--	int i;
-+	int i, ret;
+diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
+index ddaf28d..01b62e7 100644
+--- a/include/linux/blk-cgroup.h
++++ b/include/linux/blk-cgroup.h
+@@ -599,7 +599,7 @@ static inline void blkg_rwstat_add(struct blkg_rwstat *rwstat,
  
- 	max_pages = min_t(size_t, nr_pages, BIO_MAX_PAGES);
+ 	__percpu_counter_add(cnt, val, BLKG_STAT_CPU_BATCH);
  
--	bio = bio_alloc(GFP_NOFS, max_pages);
--	BUG_ON(!bio);
--
- 	for (i = 0; i < nr_pages; i++) {
--		if (i >= max_pages) {
--			/* Block layer cannot split bios :( */
--			bio->bi_vcnt = i;
--			bio->bi_iter.bi_size = i * PAGE_SIZE;
-+		if (!bio) {
-+			bio = bio_alloc(GFP_NOFS, max_pages);
-+			BUG_ON(!bio);
-+
- 			bio->bi_bdev = super->s_bdev;
- 			bio->bi_iter.bi_sector = ofs >> 9;
- 			bio->bi_private = sb;
- 			bio->bi_end_io = writeseg_end_io;
- 			bio_set_op_attrs(bio, REQ_OP_WRITE, 0);
--			atomic_inc(&super->s_pending_writes);
--			submit_bio(bio);
--
--			ofs += i * PAGE_SIZE;
--			index += i;
--			nr_pages -= i;
--			i = 0;
--
--			bio = bio_alloc(GFP_NOFS, max_pages);
--			BUG_ON(!bio);
- 		}
- 		page = find_lock_page(mapping, index + i);
- 		BUG_ON(!page);
--		bio->bi_io_vec[i].bv_page = page;
--		bio->bi_io_vec[i].bv_len = PAGE_SIZE;
--		bio->bi_io_vec[i].bv_offset = 0;
-+		ret = bio_add_page(bio, page, PAGE_SIZE, 0);
- 
- 		BUG_ON(PageWriteback(page));
- 		set_page_writeback(page);
- 		unlock_page(page);
-+
-+		if (!ret) {
-+			/* Block layer cannot split bios :( */
-+			ofs += bio->bi_iter.bi_size;
-+			atomic_inc(&super->s_pending_writes);
-+			submit_bio(bio);
-+			bio = NULL;
-+		}
-+	}
-+
-+	if (bio) {
-+		atomic_inc(&super->s_pending_writes);
-+		submit_bio(bio);
- 	}
--	bio->bi_vcnt = nr_pages;
--	bio->bi_iter.bi_size = nr_pages * PAGE_SIZE;
--	bio->bi_bdev = super->s_bdev;
--	bio->bi_iter.bi_sector = ofs >> 9;
--	bio->bi_private = sb;
--	bio->bi_end_io = writeseg_end_io;
--	bio_set_op_attrs(bio, REQ_OP_WRITE, 0);
--	atomic_inc(&super->s_pending_writes);
--	submit_bio(bio);
- 	return 0;
- }
- 
+-	if (op & REQ_SYNC)
++	if (op_is_sync(op))
+ 		cnt = &rwstat->cpu_cnt[BLKG_RWSTAT_SYNC];
+ 	else
+ 		cnt = &rwstat->cpu_cnt[BLKG_RWSTAT_ASYNC];
 -- 
-2.7.4
+2.1.4
 
