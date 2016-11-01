@@ -1,43 +1,33 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from aserp1040.oracle.com ([141.146.126.69]:23832 "EHLO
-        aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750833AbcKAQMv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Nov 2016 12:12:51 -0400
-To: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@lst.de>,
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+Subject: Re: [PATCH v5 12/14] SRP transport, scsi-mq: Wait for .queue_rq() if
+ necessary
+To: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Jens Axboe <axboe@fb.com>
+References: <7460e8b2-2cfd-c0d5-7ae7-7f662d89dad3@sandisk.com>
+ <32accadb-3ed3-cd5d-e92f-655f8f3cb9bc@sandisk.com>
+Cc: Christoph Hellwig <hch@lst.de>,
         James Bottomley <jejb@linux.vnet.ibm.com>,
         "Martin K. Petersen" <martin.petersen@oracle.com>,
         Mike Snitzer <snitzer@redhat.com>,
         Doug Ledford <dledford@redhat.com>,
         Keith Busch <keith.busch@intel.com>,
         Ming Lei <tom.leiming@gmail.com>,
-        "Konrad Rzeszutek Wilk" <konrad.wilk@oracle.com>,
-        Roger Pau =?utf-8?Q?Monn=C3=A9?= <roger.pau@citrix.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>,
         Laurence Oberman <loberman@redhat.com>,
-        "linux-block\@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi\@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-rdma\@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-        "linux-nvme\@lists.infradead.org" <linux-nvme@lists.infradead.org>
-Subject: Re: [PATCH v5 12/14] SRP transport, scsi-mq: Wait for .queue_rq() if necessary
-From: "Martin K. Petersen" <martin.petersen@oracle.com>
-References: <7460e8b2-2cfd-c0d5-7ae7-7f662d89dad3@sandisk.com>
-        <32accadb-3ed3-cd5d-e92f-655f8f3cb9bc@sandisk.com>
-Date: Tue, 01 Nov 2016 12:12:07 -0400
-In-Reply-To: <32accadb-3ed3-cd5d-e92f-655f8f3cb9bc@sandisk.com> (Bart Van
-        Assche's message of "Fri, 28 Oct 2016 17:23:00 -0700")
-Message-ID: <yq1d1if18o8.fsf@sermon.lab.mkp.net>
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+From: Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <6fc88a33-7a93-2be4-5d38-6e476676cd6b@grimberg.me>
+Date: Tue, 1 Nov 2016 18:03:16 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <32accadb-3ed3-cd5d-e92f-655f8f3cb9bc@sandisk.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: linux-scsi-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
->>>>> "Bart" == Bart Van Assche <bart.vanassche@sandisk.com> writes:
+and again,
 
-Bart> Ensure that if scsi-mq is enabled that
-Bart> scsi_internal_device_block() waits until ongoing
-Bart> shost->hostt->queuecommand() calls have finished.
-
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-
--- 
-Martin K. Petersen	Oracle Linux Engineering
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
