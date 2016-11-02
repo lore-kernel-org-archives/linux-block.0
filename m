@@ -1,109 +1,97 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:55987 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S965030AbcKNWW1 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Nov 2016 17:22:27 -0500
-Received: from pps.filterd (m0044012.ppops.net [127.0.0.1])
-        by mx0a-00082601.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id uAEMJVMZ003002
-        for <linux-block@vger.kernel.org>; Mon, 14 Nov 2016 14:22:27 -0800
-Received: from mail.thefacebook.com ([199.201.64.23])
-        by mx0a-00082601.pphosted.com with ESMTP id 26qjtr93s2-2
-        (version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT)
-        for <linux-block@vger.kernel.org>; Mon, 14 Nov 2016 14:22:27 -0800
-Received: from facebook.com (2401:db00:21:603d:face:0:19:0)     by
- mx-out.facebook.com (10.223.100.99) with ESMTP id
- d153c13caab811e6822c24be05956610-870e8a50 for <linux-block@vger.kernel.org>;
-        Mon, 14 Nov 2016 14:22:24 -0800
-From: Shaohua Li <shli@fb.com>
-To: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <Kernel-team@fb.com>, <axboe@fb.com>, <tj@kernel.org>,
-        <vgoyal@redhat.com>
-Subject: [PATCH V4 08/15] blk-throttle: detect completed idle cgroup
-Date: Mon, 14 Nov 2016 14:22:15 -0800
-Message-ID: <35b46c97cff667510a86cb70f1fb75d6d495e317.1479161136.git.shli@fb.com>
-In-Reply-To: <cover.1479161136.git.shli@fb.com>
-References: <cover.1479161136.git.shli@fb.com>
+Received: from mail-ua0-f193.google.com ([209.85.217.193]:33524 "EHLO
+        mail-ua0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1756336AbcKBXrW (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Nov 2016 19:47:22 -0400
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20161102142454.GA9263@redhat.com>
+References: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
+ <1477728600-12938-10-git-send-email-tom.leiming@gmail.com>
+ <20161031152901.GD30919@infradead.org> <20161102030906.22vwlv3ktp6l4bcy@kmo-pixel>
+ <CACVXFVNxwL1Dm9Mbf=YXpjV4X5G45Ed_TOE1A=wAORWkEdaHCA@mail.gmail.com> <20161102142454.GA9263@redhat.com>
+From: Ming Lei <tom.leiming@gmail.com>
+Date: Thu, 3 Nov 2016 07:47:19 +0800
+Message-ID: <CACVXFVOhm4CceoAebWiVf07Je7Qw5Kv0G1fZuyB1GfnDseRr4A@mail.gmail.com>
+Subject: Re: [PATCH 09/60] dm: dm.c: replace 'bio->bi_vcnt == 1' with !bio_multiple_segments
+To: Mike Snitzer <snitzer@redhat.com>
+Cc: Kent Overstreet <kent.overstreet@gmail.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Jens Axboe <axboe@fb.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        Alasdair Kergon <agk@redhat.com>,
+        "maintainer:DEVICE-MAPPER (LVM)" <dm-devel@redhat.com>,
+        Shaohua Li <shli@kernel.org>,
+        "open list:SOFTWARE RAID (Multiple Disks) SUPPORT"
+        <linux-raid@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-cgroup could be assigned a limit, but doesn't dispatch enough IO, eg the
-cgroup is idle. When this happens, the cgroup doesn't hit its limit, so
-we can't move the state machine to higher level and all cgroups will be
-throttled to thier lower limit, so we waste bandwidth. Detecting idle
-cgroup is hard. This patch handles a simple case, a cgroup doesn't
-dispatch any IO. We ignore such cgroup's limit, so other cgroups can use
-the bandwidth.
+On Wed, Nov 2, 2016 at 10:24 PM, Mike Snitzer <snitzer@redhat.com> wrote:
+> On Wed, Nov 02 2016 at  3:56am -0400,
+> Ming Lei <tom.leiming@gmail.com> wrote:
+>
+>> On Wed, Nov 2, 2016 at 11:09 AM, Kent Overstreet
+>> <kent.overstreet@gmail.com> wrote:
+>> > On Mon, Oct 31, 2016 at 08:29:01AM -0700, Christoph Hellwig wrote:
+>> >> On Sat, Oct 29, 2016 at 04:08:08PM +0800, Ming Lei wrote:
+>> >> > Avoid to access .bi_vcnt directly, because it may be not what
+>> >> > the driver expected any more after supporting multipage bvec.
+>> >> >
+>> >> > Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+>> >>
+>> >> It would be really nice to have a comment in the code why it's
+>> >> even checking for multiple segments.
+>> >
+>> > Or ideally refactor the code to not care about multiple segments at all.
+>>
+>> The check on 'bio->bi_vcnt == 1' is introduced in commit de3ec86dff160(dm:
+>> don't start current request if it would've merged with the previous), which
+>> fixed one performance issue.[1]
+>>
+>> Looks the idea of the patch is to delay dispatching the rq if it
+>> would've merged with previous request and the rq is small(single bvec).
+>> I guess the motivation is to try to increase chance of merging with the delay.
+>>
+>> But why does the code check on 'bio->bi_vcnt == 1'? Once the bio is
+>> submitted, .bi_vcnt isn't changed any more and merging doesn't change
+>> it too. So should the check have been on blk_rq_bytes(rq)?
+>>
+>> Mike, please correct me if my understanding is wrong.
+>>
+>>
+>> [1] https://www.redhat.com/archives/dm-devel/2015-March/msg00014.html
+>
+> The patch was labored over for quite a while and is based on suggestions I
+> got from Jens when discussing a very problematic aspect of old
+> .request_fn request-based DM performance for a multi-threaded (64
+> threads) sequential IO benchmark (vdbench IIRC).  The issue was reported
+> by NetApp.
+>
+> The patch in question fixed the lack of merging that was seen with this
+> interleaved sequential IO benchmark.  The lack of merging was made worse
+> if a DM multipath device had more underlying paths (e.g. 4 instead of 2).
+>
+> As for your question, about using blk_rq_bytes(rq) vs 'bio->bi_vcnt == 1'
+> .. not sure how that would be a suitable replacement.  But it has been a
+> while since I've delved into these block core merge details of old
 
-Signed-off-by: Shaohua Li <shli@fb.com>
----
- block/blk-throttle.c | 19 ++++++++++++++++++-
- 1 file changed, 18 insertions(+), 1 deletion(-)
+Just last year, looks not long enough, :-)
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index e85b2b6..32cc6ec 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -144,6 +144,8 @@ struct throtl_grp {
- 
- 	unsigned long last_check_time;
- 
-+	unsigned long last_dispatch_time[2];
-+
- 	/* When did we start a new slice */
- 	unsigned long slice_start[2];
- 	unsigned long slice_end[2];
-@@ -438,11 +440,14 @@ static void tg_update_has_rules(struct throtl_grp *tg)
- 
- static void throtl_pd_online(struct blkg_policy_data *pd)
- {
-+	struct throtl_grp *tg = pd_to_tg(pd);
- 	/*
- 	 * We don't want new groups to escape the limits of its ancestors.
- 	 * Update has_rules[] after a new group is brought online.
- 	 */
--	tg_update_has_rules(pd_to_tg(pd));
-+	tg_update_has_rules(tg);
-+	tg->last_dispatch_time[READ] = jiffies;
-+	tg->last_dispatch_time[WRITE] = jiffies;
- }
- 
- static void blk_throtl_update_valid_limit(struct throtl_data *td)
-@@ -1611,6 +1616,12 @@ static bool throtl_upgrade_check_one(struct throtl_grp *tg)
- 	if (write_limit && sq->nr_queued[WRITE] &&
- 	    (!read_limit || sq->nr_queued[READ]))
- 		return true;
-+
-+	if (time_after_eq(jiffies,
-+	     tg->last_dispatch_time[READ] + tg->td->throtl_slice) &&
-+	    time_after_eq(jiffies,
-+	     tg->last_dispatch_time[WRITE] + tg->td->throtl_slice))
-+		return true;
- 	return false;
- }
- 
-@@ -1691,6 +1702,11 @@ static bool throtl_downgrade_check_one(struct throtl_grp *tg)
- 	struct throtl_data *td = tg->td;
- 	unsigned long now = jiffies;
- 
-+	if (time_after_eq(now, tg->last_dispatch_time[READ] +
-+					td->throtl_slice) &&
-+	    time_after_eq(now, tg->last_dispatch_time[WRITE] +
-+					td->throtl_slice))
-+		return false;
- 	/*
- 	 * If cgroup is below high limit, consider downgrade and throttle other
- 	 * cgroups
-@@ -1811,6 +1827,7 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
- 
- again:
- 	while (true) {
-+		tg->last_dispatch_time[rw] = jiffies;
- 		if (tg->last_high_overflow_time[rw] == 0)
- 			tg->last_high_overflow_time[rw] = jiffies;
- 		throtl_downgrade_check(tg);
--- 
-2.9.3
+> .request_fn but _please_ don't change the logic of this code simply
 
+As I explained before, neither .bi_vcnt will be changed after submitting,
+nor be changed during merging, so I think the checking is wrong,
+could you explain what is your initial motivation of checking on
+'bio->bi_vcnt == 1'?
+
+> because it is proving itself to be problematic for your current
+> patchset's cleanliness.
+
+Could you explain what is problematic for the cleanliness?
+
+Thanks,
+Ming Lei
