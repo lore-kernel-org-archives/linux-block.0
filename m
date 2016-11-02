@@ -1,64 +1,27 @@
-Return-Path: <BATV+df6418b500677e5f9364+4818+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: martin.petersen@oracle.com,
-	don.brace@microsemi.com
-Cc: axboe@kernel.dk,
-	linux-scsi@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH 1/3] blk-mq: export blk_mq_map_queues
-Date: Tue,  1 Nov 2016 08:12:47 -0600
-Message-Id: <1478009569-19026-2-git-send-email-hch@lst.de>
-In-Reply-To: <1478009569-19026-1-git-send-email-hch@lst.de>
-References: <1478009569-19026-1-git-send-email-hch@lst.de>
+Subject: Re: [PATCHSET] block: IO polling improvements
+To: Christoph Hellwig <hch@lst.de>
+References: <1478034325-28232-1-git-send-email-axboe@fb.com>
+ <20161102145148.GA13964@lst.de>
+Cc: axboe@kernel.dk, linux-kernel@vger.kernel.org,
+ linux-block@vger.kernel.org, Dave Chinner <david@fromorbit.com>
+From: Jens Axboe <axboe@fb.com>
+Message-ID: <1cc557ba-8030-8dd8-87bf-4b13817ffb8d@fb.com>
+Date: Wed, 2 Nov 2016 08:54:28 -0600
+MIME-Version: 1.0
+In-Reply-To: <20161102145148.GA13964@lst.de>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-This will allow SCSI to have a single blk_mq_ops structure that either
-lets the LLDD map the queues to PCIe MSIx vectors or use the default.
+On 11/02/2016 08:51 AM, Christoph Hellwig wrote:
+> On Tue, Nov 01, 2016 at 03:05:21PM -0600, Jens Axboe wrote:
+>> This builds on top of Christophs simplified bdev O_DIRECT code,
+>> posted earlier today [1].
+>
+> Btw, can you create a stable branch just for the
+> "block: add bio_iov_iter_get_pages()" so that we can use it as
+> a baseline for the iomap dio work?
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
----
- block/blk-mq-cpumap.c  | 1 +
- block/blk-mq.h         | 1 -
- include/linux/blk-mq.h | 1 +
- 3 files changed, 2 insertions(+), 1 deletion(-)
+Sure
 
-diff --git a/block/blk-mq-cpumap.c b/block/blk-mq-cpumap.c
-index 19b1d9c..8e61e86 100644
---- a/block/blk-mq-cpumap.c
-+++ b/block/blk-mq-cpumap.c
-@@ -87,6 +87,7 @@ int blk_mq_map_queues(struct blk_mq_tag_set *set)
- 	free_cpumask_var(cpus);
- 	return 0;
- }
-+EXPORT_SYMBOL_GPL(blk_mq_map_queues);
- 
- /*
-  * We have no quick way of doing reverse lookups. This is only used at
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index e5d2524..5347f01 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -38,7 +38,6 @@ void blk_mq_disable_hotplug(void);
- /*
-  * CPU -> queue mappings
-  */
--int blk_mq_map_queues(struct blk_mq_tag_set *set);
- extern int blk_mq_hw_queue_to_node(unsigned int *map, unsigned int);
- 
- static inline struct blk_mq_hw_ctx *blk_mq_map_queue(struct request_queue *q,
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 535ab2e..6c0fb25 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -237,6 +237,7 @@ void blk_mq_unfreeze_queue(struct request_queue *q);
- void blk_mq_freeze_queue_start(struct request_queue *q);
- int blk_mq_reinit_tagset(struct blk_mq_tag_set *set);
- 
-+int blk_mq_map_queues(struct blk_mq_tag_set *set);
- void blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set, int nr_hw_queues);
- 
- /*
 -- 
-2.1.4
+Jens Axboe
