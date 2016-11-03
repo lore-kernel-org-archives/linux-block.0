@@ -1,7 +1,11 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-Date: Mon, 7 Nov 2016 14:13:05 +0300
-From: "Kirill A. Shutemov" <kirill@shutemov.name>
-To: Christoph Hellwig <hch@infradead.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:48361 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1758732AbcKCUuP (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 3 Nov 2016 16:50:15 -0400
+Date: Thu, 3 Nov 2016 21:40:12 +0100
+From: Jan Kara <jack@suse.cz>
+To: "Kirill A. Shutemov" <kirill@shutemov.name>
 Cc: Jan Kara <jack@suse.cz>,
         "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
         Theodore Ts'o <tytso@mit.edu>,
@@ -20,39 +24,94 @@ Cc: Jan Kara <jack@suse.cz>,
         linux-block@vger.kernel.org
 Subject: Re: [PATCHv3 15/41] filemap: handle huge pages in
  do_generic_file_read()
-Message-ID: <20161107111305.GB13280@node.shutemov.name>
+Message-ID: <20161103204012.GC24234@quack2.suse.cz>
 References: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
  <20160915115523.29737-16-kirill.shutemov@linux.intel.com>
  <20161013093313.GB26241@quack2.suse.cz>
  <20161031181035.GA7007@node.shutemov.name>
  <20161101163940.GA5459@quack2.suse.cz>
- <20161102143612.GA4790@infradead.org>
+ <20161102083204.GB13949@node.shutemov.name>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20161102143612.GA4790@infradead.org>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <20161102083204.GB13949@node.shutemov.name>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Wed, Nov 02, 2016 at 07:36:12AM -0700, Christoph Hellwig wrote:
+On Wed 02-11-16 11:32:04, Kirill A. Shutemov wrote:
 > On Tue, Nov 01, 2016 at 05:39:40PM +0100, Jan Kara wrote:
+> > On Mon 31-10-16 21:10:35, Kirill A. Shutemov wrote:
+> > > > If I understand the motivation right, it is mostly about being able to mmap
+> > > > PMD-sized chunks to userspace. So my naive idea would be that we could just
+> > > > implement it by allocating PMD sized chunks of pages when adding pages to
+> > > > page cache, we don't even have to read them all unless we come from PMD
+> > > > fault path.
+> > > 
+> > > Well, no. We have one PG_{uptodate,dirty,writeback,mappedtodisk,etc}
+> > > per-hugepage, one common list of buffer heads...
+> > > 
+> > > PG_dirty and PG_uptodate behaviour inhered from anon-THP (where handling
+> > > it otherwise doesn't make sense) and handling it differently for file-THP
+> > > is nightmare from maintenance POV.
+> > 
+> > But the complexity of two different page sizes for page cache and *each*
+> > filesystem that wants to support it does not make the maintenance easy
+> > either.
+> 
+> I think with time we can make small pages just a subcase of huge pages.
+> And some generalization can be made once more than one filesystem with
+> backing storage will adopt huge pages.
+
+My objection is that IMHO currently the code is too ugly to go in. Too many
+places need to know about THP and I'm not even sure you have patched all
+the places or whether some corner cases remained unfixed and how should I
+find that out.
+
+> > So I'm not convinced that using the same rules for anon-THP and
+> > file-THP is a clear win.
+> 
+> We already have file-THP with the same rules: tmpfs. Backing storage is
+> what changes the picture.
+
+Right, the ugliness comes from access to backing storage having to deal
+with huge pages.
+
 > > I'd also note that having PMD-sized pages has some obvious disadvantages as
 > > well:
-> > 
+> >
 > > 1) I'm not sure buffer head handling code will quite scale to 512 or even
 > > 2048 buffer_heads on a linked list referenced from a page. It may work but
-> > I suspect the performance will suck. 
+> > I suspect the performance will suck.
 > 
-> buffer_head handling always sucks.  For the iomap based bufferd write
-> path I plan to support a buffer_head-less mode for the block size ==
-> PAGE_SIZE case in 4.11 latest, but if I get enough other things of my
-> plate in time even for 4.10.  I think that's the right way to go for
-> THP, especially if we require the fs to allocate the whole huge page
-> as a single extent, similar to the DAX PMD mapping case.
+> Yes, buffer_head list doesn't scale. That's the main reason (along with 4)
+> why syscall-based IO sucks. We spend a lot of time looking for desired
+> block.
 > 
+> We need to switch to some other data structure for storing buffer_heads.
+> Is there a reason why we have list there in first place?
+> Why not just array?
+> 
+> I will look into it, but this sounds like a separate infrastructure change
+> project.
+
+As Christoph said iomap code should help you with that and make things
+simpler. If things go as we imagine, we should be able to pretty much avoid
+buffer heads. But it will take some time to get there.
+
 > > 2) PMD-sized pages result in increased space & memory usage.
 > 
-> How so?
+> Space? Do you mean disk space? Not really: we still don't write beyond
+> i_size or into holes.
 > 
+> Behaviour wrt to holes may change with mmap()-IO as we have less
+> granularity, but the same can be seen just between different
+> architectures: 4k vs. 64k base page size.
+
+Yes, I meant different granularity of mmap based IO. And I agree it isn't a
+new problem but the scale of the problem is much larger with 2MB pages than
+with say 64K pages. And actually the overhead of higher IO granularity of
+64K pages has been one of the reasons we have switched SLES PPC kernels
+from 64K pages to 4K pages (we've got complaints from customers). 
+
 > > 3) In ext4 we have to estimate how much metadata we may need to modify when
 > > allocating blocks underlying a page in the worst case (you don't seem to
 > > update this estimate in your patch set). With 2048 blocks underlying a page,
@@ -61,22 +120,85 @@ On Wed, Nov 02, 2016 at 07:36:12AM -0700, Christoph Hellwig wrote:
 > > reserve such large transaction with the default journal size), which again
 > > makes things slower.
 > 
-> As said above I think we should only use huge page mappings if there is
-> a single underlying extent, same as in DAX to keep the complexity down.
+> I didn't saw this on profiles. And xfstests looks fine. I probably need to
+> run them with 1k blocks once again.
 
-It looks like a huge limitation to me.
+You wouldn't see this in profiles - it is a correctness thing. And it won't
+be triggered unless the file is heavily fragmented which likely does not
+happen with any test in xfstests. If it happens you'll notice though - the
+filesystem will just report error and shut itself down.
 
-> > 4) As you have noted some places like write_begin() still depend on 4k
-> > pages which creates a strange mix of places that use subpages and that use
-> > head pages.
+> The numbers below generated with fio. The working set is relatively small,
+> so it fits into page cache and writing set doesn't hit dirty_ratio.
 > 
-> Just use the iomap bufferd I/O code and all these issues will go away.
+> I think the mmap performance should be enough to justify initial inclusion
+> of an experimental feature: it useful for workloads that targets mmap()-IO.
+> It will take time to get feature mature anyway.
 
-Not really.
+I agree it will take time for feature to mature so I'me fine with
+suboptimal performance in some cases. But I'm not fine with some of the
+hacks you do currently because code maintenability is an issue even if
+people don't actually use the feature...
 
-I'm looking onto iomap_write_actor(): we still calculate 'offset' and
-'bytes' based on PAGE_SIZE before we even get the page.
-This way we limit outself to PAGE_SIZE per-iteration.
+> Configuration:
+>  - 2x E5-2697v2, 64G RAM;
+>  - INTEL SSDSC2CW24;
+>  - IO request size is 4k;
+>  - 8 processes, 512MB data set each;
 
+The numbers indeed look interesting for mmaped case. Can you post the fio
+cmdline? I'd like to compare profiles...
+
+								Honza
+> 
+> Workload
+>  read/write	baseline	stddev	huge=always	stddev		change
+> --------------------------------------------------------------------------------
+> sync-read
+>  read		  21439.00	348.14	  20297.33	259.62		 -5.33%
+> sync-write
+>  write		   6833.20	147.08	   3630.13	 52.86		-46.88%
+> sync-readwrite
+>  read		   4377.17	 17.53	   2366.33	 19.52		-45.94%
+>  write		   4378.50	 17.83	   2365.80	 19.94		-45.97%
+> sync-randread
+>  read		   5491.20	 66.66	  14664.00	288.29		167.05%
+> sync-randwrite
+>  write		   6396.13	 98.79	   2035.80	  8.17		-68.17%
+> sync-randrw
+>  read		   2927.30	115.81	   1036.08	 34.67		-64.61%
+>  write		   2926.47	116.45	   1036.11	 34.90		-64.60%
+> libaio-read
+>  read		    254.36	 12.49	    258.63	 11.29		  1.68%
+> libaio-write
+>  write		   4979.20	122.75	   2904.77	 17.93		-41.66%
+> libaio-readwrite
+>  read		   2738.57	142.72	   2045.80	  4.12		-25.30%
+>  write		   2729.93	141.80	   2039.77	  3.79		-25.28%
+> libaio-randread
+>  read		    113.63	  2.98	    210.63	  5.07		 85.37%
+> libaio-randwrite
+>  write		   4456.10	 76.21	   1649.63	  7.00		-62.98%
+> libaio-randrw
+>  read		     97.85	  8.03	    877.49	 28.27		796.80%
+>  write		     97.55	  7.99	    874.83	 28.19		796.77%
+> mmap-read
+>  read		  20654.67	304.48	  24696.33	1064.07		 19.57%
+> mmap-write
+>  write		   8652.33	272.44	  13187.33	499.10		 52.41%
+> mmap-readwrite
+>  read		   6620.57	 16.05	   9221.60	399.56		 39.29%
+>  write		   6623.63	 16.34	   9222.13	399.31		 39.23%
+> mmap-randread
+>  read		   6717.23	1360.55	  21939.33	326.38		226.61%
+> mmap-randwrite
+>  write		   3204.63	253.66	  12371.00	 61.49		286.03%
+> mmap-randrw
+>  read		   2150.50	 78.00	   7682.67	188.59		257.25%
+>  write		   2149.50	 78.00	   7685.40	188.35		257.54%
+> 
+> -- 
+>  Kirill A. Shutemov
 -- 
- Kirill A. Shutemov
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
