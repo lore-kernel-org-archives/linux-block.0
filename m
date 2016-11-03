@@ -1,64 +1,43 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
 Subject: Re: [PATCH 3/4] blk-mq: implement hybrid poll mode for sync O_DIRECT
-To: Jens Axboe <axboe@fb.com>, <axboe@kernel.dk>,
-	<linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>
+To: Ming Lei <tom.leiming@gmail.com>
 References: <1478034325-28232-1-git-send-email-axboe@fb.com>
  <1478034325-28232-4-git-send-email-axboe@fb.com>
-CC: <hch@lst.de>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-Message-ID: <1be37430-c75a-308b-04b7-9779a9fe3f56@sandisk.com>
-Date: Thu, 3 Nov 2016 08:01:41 -0600
+ <CACVXFVOoUz7dZ9y=-jqLQFWaekYHnoEQk-ao1s8ydsdh5PJbOw@mail.gmail.com>
+Cc: Jens Axboe <axboe@kernel.dk>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ linux-block <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>
+From: Jens Axboe <axboe@fb.com>
+Message-ID: <5762c14d-eb4e-b601-a15f-71ef5fbfec3d@fb.com>
+Date: Thu, 3 Nov 2016 07:41:28 -0600
 MIME-Version: 1.0
-In-Reply-To: <1478034325-28232-4-git-send-email-axboe@fb.com>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Return-Path: bart.vanassche@sandisk.com
+In-Reply-To: <CACVXFVOoUz7dZ9y=-jqLQFWaekYHnoEQk-ao1s8ydsdh5PJbOw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-On 11/01/2016 03:05 PM, Jens Axboe wrote:
-> +static void blk_mq_poll_hybrid_sleep(struct request_queue *q,
-> +				     struct request *rq)
-> +{
-> +	struct hrtimer_sleeper hs;
-> +	ktime_t kt;
-> +
-> +	if (!q->poll_nsec || test_bit(REQ_ATOM_POLL_SLEPT, &rq->atomic_flags))
-> +		return;
-> +
-> +	set_bit(REQ_ATOM_POLL_SLEPT, &rq->atomic_flags);
-> +
-> +	/*
-> +	 * This will be replaced with the stats tracking code, using
-> +	 * 'avg_completion_time / 2' as the pre-sleep target.
-> +	 */
-> +	kt = ktime_set(0, q->poll_nsec);
-> +
-> +	hrtimer_init_on_stack(&hs.timer, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
-> +	hrtimer_set_expires(&hs.timer, kt);
-> +
-> +	hrtimer_init_sleeper(&hs, current);
-> +	do {
-> +		if (test_bit(REQ_ATOM_COMPLETE, &rq->atomic_flags))
-> +			break;
-> +		set_current_state(TASK_INTERRUPTIBLE);
-> +		hrtimer_start_expires(&hs.timer, HRTIMER_MODE_REL);
-> +		if (hs.task)
-> +			io_schedule();
-> +		hrtimer_cancel(&hs.timer);
-> +	} while (hs.task && !signal_pending(current));
-> +
-> +	__set_current_state(TASK_RUNNING);
-> +	destroy_hrtimer_on_stack(&hs.timer);
-> +}
+On 11/03/2016 06:27 AM, Ming Lei wrote:
+> On Wed, Nov 2, 2016 at 5:05 AM, Jens Axboe <axboe@fb.com> wrote:
+>> This patch enables a hybrid polling mode. Instead of polling after IO
+>> submission, we can induce an artificial delay, and then poll after that.
+>> For example, if the IO is presumed to complete in 8 usecs from now, we
+>> can sleep for 4 usecs, wake up, and then do our polling. This still puts
+>
+> I guess in reality it isn't easy to figure a perfect poll time:
+>
+> - for one driver, different CPU and different drive/disk may cause different
+> completion time
+>
+> - for requests with different size, the completion time can be different too
+>
+> Is there one way to figure out the poll time automatically?
 
-Hello Jens,
+Yes, it's not easy to figure out the perfect time, the point is to try
+and make a guess that's a bit better than the current "let's poll the
+whole time". I suspect that for most real world cases, you are going to
+be polling for smallish IO of roughly the same size. Hence the stats
+should be useful.
 
-Will avg_completion_time/2 be a good choice for a polling interval if an 
-application submits requests of varying sizes, e.g. 4 KB and 64 KB?
+But we could extend the tracking a bit and make it smarter.
 
-Can avg_completion_time be smaller than the context switch time? If so, 
-do you think any other thread will be able to do any useful work after 
-the timer has been started and before the timer has expired?
 
-Thanks,
-
-Bart.
+-- 
+Jens Axboe
