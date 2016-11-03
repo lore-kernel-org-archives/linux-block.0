@@ -1,32 +1,37 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from gateway33.websitewelcome.com ([192.185.146.97]:52694 "EHLO
-        gateway33.websitewelcome.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1753029AbcKGP2e (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 7 Nov 2016 10:28:34 -0500
-Received: from cm1.websitewelcome.com (unknown [192.185.0.102])
-        by gateway33.websitewelcome.com (Postfix) with ESMTP id 974DCC74F97
-        for <linux-block@vger.kernel.org>; Mon,  7 Nov 2016 09:28:28 -0600 (CST)
-Date: Mon, 7 Nov 2016 08:28:25 -0700
-From: Stephen Bates <sbates@raithlin.com>
-To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        axboe@fb.com
-Subject: Re: [PATCHSET v2] block: IO polling improvements
-Message-ID: <20161107152824.GA20916@cgy1-donard.priv.deltatee.com>
-Reply-To: 1478202307-1947-1-git-send-email-axboe@fb.com
+Return-Path: <prvs=0115b0b9d1=axboe@fb.com>
+From: Jens Axboe <axboe@fb.com>
+To: <axboe@kernel.dk>, <linux-kernel@vger.kernel.org>,
+        <linux-block@vger.kernel.org>
+CC: <hch@lst.de>
+Subject: [PATCHSET v2] block: IO polling improvements
+Date: Thu, 3 Nov 2016 13:45:02 -0600
+Message-ID: <1478202307-1947-1-git-send-email-axboe@fb.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain
+List-ID: <linux-block@vger.kernel.org>
 
-> Fixed a few bugs in this, and addressed some review comments. Patches
-> are against my 4.10 block branch, for-4.10/block.
+Fixed a few bugs in this, and addressed some review comments. Patches
+are against my 4.10 block branch, for-4.10/block.
 
-Jens
+Some performance results, running random reads against a fast device,
+using either IRQ driven completions, classic polled, or the new hybrid
+polled:
 
-Thanks for proposing this. Looks very cool. I will try and get you a
-review and some testing this week...
+Method		IOPS		CPU%		IOPS/CPU%
+=========================================================
+IRQ		476K		48.45%		 9843
+Poll		897K		99.9%		 8982
+Hybrid		836K		68.1%		12273
 
-Cheers
+Classic polling is still a bit faster, but is uses a lot more CPU. The
+rightmost column is an efficiency metric, and with the new hybrid
+scheme, we're both faster and more efficient than IRQ driven. We should
+be able to close the speed gap as well, so you can have your cake and
+eat it too.
 
-Stephen
+I've adjusted the default, so that classic polling is the default poll
+method. To enable hybrid polling for a device, you would do:
+
+# echo 0 > /sys/block/<dev>/queue/io_poll_delay
+
+Also see the last patch for the other values this can be set to.
