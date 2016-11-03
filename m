@@ -1,177 +1,179 @@
-Return-Path: <prvs=011358c635=axboe@fb.com>
+Return-Path: <prvs=0115b0b9d1=axboe@fb.com>
 From: Jens Axboe <axboe@fb.com>
 To: <axboe@kernel.dk>, <linux-kernel@vger.kernel.org>,
         <linux-block@vger.kernel.org>
 CC: <hch@lst.de>, Jens Axboe <axboe@fb.com>
-Subject: [PATCH 4/4] blk-mq: make the polling code adaptive
-Date: Tue, 1 Nov 2016 15:05:25 -0600
-Message-ID: <1478034325-28232-5-git-send-email-axboe@fb.com>
-In-Reply-To: <1478034325-28232-1-git-send-email-axboe@fb.com>
-References: <1478034325-28232-1-git-send-email-axboe@fb.com>
+Subject: [PATCH 4/5] blk-mq: implement hybrid poll mode for sync O_DIRECT
+Date: Thu, 3 Nov 2016 13:45:06 -0600
+Message-ID: <1478202307-1947-5-git-send-email-axboe@fb.com>
+In-Reply-To: <1478202307-1947-1-git-send-email-axboe@fb.com>
+References: <1478202307-1947-1-git-send-email-axboe@fb.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-The previous commit introduced the hybrid sleep/poll mode. Take
-that one step further, and use the completion latencies to
-automatically sleep for half the mean completion time. This is
-a good approximation.
-
-This changes the 'io_poll_delay' sysfs file a bit to expose the
-various options. Depending on the value, the polling code will
-behave differently:
-
--1	Never enter hybrid sleep mode
- 0	Use half of the completion mean for the sleep delay
->0	Use this specific value as the sleep delay
+This patch enables a hybrid polling mode. Instead of polling after IO
+submission, we can induce an artificial delay, and then poll after that.
+For example, if the IO is presumed to complete in 8 usecs from now, we
+can sleep for 4 usecs, wake up, and then do our polling. This still puts
+a sleep/wakeup cycle in the IO path, but instead of the wakeup happening
+after the IO has completed, it'll happen before. With this hybrid
+scheme, we can achieve big latency reductions while still using the same
+(or less) amount of CPU.
 
 Signed-off-by: Jens Axboe <axboe@fb.com>
 ---
- block/blk-mq.c         | 50 +++++++++++++++++++++++++++++++++++++++++++++++---
- block/blk-sysfs.c      | 28 ++++++++++++++++++++--------
- include/linux/blkdev.h |  2 +-
- 3 files changed, 68 insertions(+), 12 deletions(-)
+ block/blk-mq.c         | 47 +++++++++++++++++++++++++++++++++++++++++++++++
+ block/blk-sysfs.c      | 29 +++++++++++++++++++++++++++++
+ block/blk.h            |  1 +
+ include/linux/blkdev.h |  1 +
+ 4 files changed, 78 insertions(+)
 
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index caa55bec9411..2af75b087ebd 100644
+index 4883c2d97ea9..4f1748d016a9 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -2353,13 +2353,57 @@ void blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set, int nr_hw_queues)
+@@ -302,6 +302,7 @@ static void __blk_mq_free_request(struct blk_mq_hw_ctx *hctx,
+ 	rq->rq_flags = 0;
+ 
+ 	clear_bit(REQ_ATOM_STARTED, &rq->atomic_flags);
++	clear_bit(REQ_ATOM_POLL_SLEPT, &rq->atomic_flags);
+ 	blk_mq_put_tag(hctx, ctx, tag);
+ 	blk_queue_exit(q);
+ }
+@@ -2357,11 +2358,57 @@ void blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set, int nr_hw_queues)
  }
  EXPORT_SYMBOL_GPL(blk_mq_update_nr_hw_queues);
  
-+static unsigned long blk_mq_poll_nsecs(struct blk_mq_hw_ctx *hctx,
-+				       struct request *rq)
++static bool blk_mq_poll_hybrid_sleep(struct request_queue *q,
++				     struct request *rq)
 +{
-+	struct blk_rq_stat stat[2];
-+	unsigned long ret = 0;
++	struct hrtimer_sleeper hs;
++	ktime_t kt;
++
++	if (!q->poll_nsec || test_bit(REQ_ATOM_POLL_SLEPT, &rq->atomic_flags))
++		return false;
++
++	set_bit(REQ_ATOM_POLL_SLEPT, &rq->atomic_flags);
 +
 +	/*
-+	 * We don't have to do this once per IO, should optimize this
-+	 * to just use the current window of stats until it changes
++	 * This will be replaced with the stats tracking code, using
++	 * 'avg_completion_time / 2' as the pre-sleep target.
 +	 */
-+	memset(&stat, 0, sizeof(stat));
-+	blk_hctx_stat_get(hctx, stat);
++	kt = ktime_set(0, q->poll_nsec);
 +
-+	/*
-+	 * As an optimistic guess, use half of the mean service time
-+	 * for this type of request
-+	 */
-+	if (req_op(rq) == REQ_OP_READ && stat[0].nr_samples)
-+		ret = (stat[0].mean + 1) / 2;
-+	else if (req_op(rq) == REQ_OP_WRITE && stat[1].nr_samples)
-+		ret = (stat[1].mean + 1) / 2;
++	hrtimer_init_on_stack(&hs.timer, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
++	hrtimer_set_expires(&hs.timer, kt);
 +
-+	return ret;
++	hrtimer_init_sleeper(&hs, current);
++	do {
++		if (test_bit(REQ_ATOM_COMPLETE, &rq->atomic_flags))
++			break;
++		set_current_state(TASK_UNINTERRUPTIBLE);
++		hrtimer_start_expires(&hs.timer, HRTIMER_MODE_REL);
++		if (hs.task)
++			io_schedule();
++		hrtimer_cancel(&hs.timer);
++	} while (hs.task && !signal_pending(current));
++
++	__set_current_state(TASK_RUNNING);
++	destroy_hrtimer_on_stack(&hs.timer);
++	return true;
 +}
 +
- static void blk_mq_poll_hybrid_sleep(struct request_queue *q,
-+				     struct blk_mq_hw_ctx *hctx,
- 				     struct request *rq)
+ bool blk_mq_poll(struct blk_mq_hw_ctx *hctx, struct request *rq)
  {
- 	struct hrtimer_sleeper hs;
-+	unsigned int nsecs;
- 	ktime_t kt;
- 
--	if (!q->poll_nsec || test_bit(REQ_ATOM_POLL_SLEPT, &rq->atomic_flags))
-+	if (test_bit(REQ_ATOM_POLL_SLEPT, &rq->atomic_flags))
-+		return;
-+
-+	/*
-+	 * poll_nsec can be:
-+	 *
-+	 * -1:	don't ever hybrid sleep
-+	 *  0:	use half of prev avg
-+	 * >0:	use this specific value
-+	 */
-+	if (q->poll_nsec == -1)
-+		return;
-+	else if (q->poll_nsec > 0)
-+		nsecs = q->poll_nsec;
-+	else
-+		nsecs = blk_mq_poll_nsecs(hctx, rq);
-+
-+	if (!nsecs)
- 		return;
- 
- 	set_bit(REQ_ATOM_POLL_SLEPT, &rq->atomic_flags);
-@@ -2368,7 +2412,7 @@ static void blk_mq_poll_hybrid_sleep(struct request_queue *q,
- 	 * This will be replaced with the stats tracking code, using
- 	 * 'avg_completion_time / 2' as the pre-sleep target.
- 	 */
--	kt = ktime_set(0, q->poll_nsec);
-+	kt = ktime_set(0, nsecs);
- 
- 	hrtimer_init_on_stack(&hs.timer, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
- 	hrtimer_set_expires(&hs.timer, kt);
-@@ -2393,7 +2437,7 @@ bool blk_mq_poll(struct blk_mq_hw_ctx *hctx, struct request *rq)
  	struct request_queue *q = hctx->queue;
  	long state;
  
--	blk_mq_poll_hybrid_sleep(q, rq);
-+	blk_mq_poll_hybrid_sleep(q, hctx, rq);
- 
++	/*
++	 * If we sleep, have the caller restart the poll loop to reset
++	 * the state. Like for the other success return cases, the
++	 * caller is responsible for checking if the IO completed. If
++	 * the IO isn't complete, we'll get called again and will go
++	 * straight to the busy poll loop.
++	 */
++	if (blk_mq_poll_hybrid_sleep(q, rq))
++		return true;
++
  	hctx->poll_considered++;
  
+ 	state = current->state;
 diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 467b81c6713c..c668af57197b 100644
+index 9cdb7247727a..edc0e491ee3b 100644
 --- a/block/blk-sysfs.c
 +++ b/block/blk-sysfs.c
-@@ -338,24 +338,36 @@ queue_rq_affinity_store(struct request_queue *q, const char *page, size_t count)
- 
- static ssize_t queue_poll_delay_show(struct request_queue *q, char *page)
- {
--	return queue_var_show(q->poll_nsec / 1000, page);
-+	int val;
-+
-+	if (q->poll_nsec == -1)
-+		val = -1;
-+	else
-+		val = q->poll_nsec / 1000;
-+
-+	return sprintf(page, "%d\n", val);
+@@ -336,6 +336,28 @@ queue_rq_affinity_store(struct request_queue *q, const char *page, size_t count)
+ 	return ret;
  }
  
- static ssize_t queue_poll_delay_store(struct request_queue *q, const char *page,
- 				size_t count)
- {
--	unsigned long poll_usec;
--	ssize_t ret;
-+	int err, val;
- 
- 	if (!q->mq_ops || !q->mq_ops->poll)
- 		return -EINVAL;
- 
--	ret = queue_var_store(&poll_usec, page, count);
--	if (ret < 0)
--		return ret;
-+	err = kstrtoint(page, 10, &val);
-+	if (err < 0)
-+		return err;
- 
--	q->poll_nsec = poll_usec * 1000;
--	return ret;
-+	printk(KERN_ERR "val=%d\n", val);
++static ssize_t queue_poll_delay_show(struct request_queue *q, char *page)
++{
++	return queue_var_show(q->poll_nsec / 1000, page);
++}
 +
-+	if (val == -1)
-+		q->poll_nsec = -1;
-+	else
-+		q->poll_nsec = val * 1000;
++static ssize_t queue_poll_delay_store(struct request_queue *q, const char *page,
++				size_t count)
++{
++	unsigned long poll_usec;
++	ssize_t ret;
 +
-+	return count;
- }
- 
++	if (!q->mq_ops || !q->mq_ops->poll)
++		return -EINVAL;
++
++	ret = queue_var_store(&poll_usec, page, count);
++	if (ret < 0)
++		return ret;
++
++	q->poll_nsec = poll_usec * 1000;
++	return ret;
++}
++
  static ssize_t queue_poll_show(struct request_queue *q, char *page)
+ {
+ 	return queue_var_show(test_bit(QUEUE_FLAG_POLL, &q->queue_flags), page);
+@@ -562,6 +584,12 @@ static struct queue_sysfs_entry queue_poll_entry = {
+ 	.store = queue_poll_store,
+ };
+ 
++static struct queue_sysfs_entry queue_poll_delay_entry = {
++	.attr = {.name = "io_poll_delay", .mode = S_IRUGO | S_IWUSR },
++	.show = queue_poll_delay_show,
++	.store = queue_poll_delay_store,
++};
++
+ static struct queue_sysfs_entry queue_wc_entry = {
+ 	.attr = {.name = "write_cache", .mode = S_IRUGO | S_IWUSR },
+ 	.show = queue_wc_show,
+@@ -608,6 +636,7 @@ static struct attribute *default_attrs[] = {
+ 	&queue_wc_entry.attr,
+ 	&queue_dax_entry.attr,
+ 	&queue_stats_entry.attr,
++	&queue_poll_delay_entry.attr,
+ 	NULL,
+ };
+ 
+diff --git a/block/blk.h b/block/blk.h
+index aa132dea598c..041185e5f129 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -111,6 +111,7 @@ void blk_account_io_done(struct request *req);
+ enum rq_atomic_flags {
+ 	REQ_ATOM_COMPLETE = 0,
+ 	REQ_ATOM_STARTED,
++	REQ_ATOM_POLL_SLEPT,
+ };
+ 
+ /*
 diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 6acd220dc3f3..857f866d2751 100644
+index b400c31b4a10..fbd8bb5e064c 100644
 --- a/include/linux/blkdev.h
 +++ b/include/linux/blkdev.h
-@@ -502,7 +502,7 @@ struct request_queue {
+@@ -504,6 +504,7 @@ struct request_queue {
  	unsigned int		request_fn_active;
  
  	unsigned int		rq_timeout;
--	unsigned int		poll_nsec;
-+	int			poll_nsec;
++	unsigned int		poll_nsec;
  	struct timer_list	timeout;
  	struct work_struct	timeout_work;
  	struct list_head	timeout_list;
