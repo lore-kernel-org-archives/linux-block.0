@@ -1,156 +1,171 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:33907 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S965083AbcKNWW1 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Nov 2016 17:22:27 -0500
-Received: from pps.filterd (m0001303.ppops.net [127.0.0.1])
-        by m0001303.ppops.net (8.16.0.17/8.16.0.17) with SMTP id uAEMLMab013063
-        for <linux-block@vger.kernel.org>; Mon, 14 Nov 2016 14:22:26 -0800
-Received: from mail.thefacebook.com ([199.201.64.23])
-        by m0001303.ppops.net with ESMTP id 26qkgf8wd5-1
-        (version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT)
-        for <linux-block@vger.kernel.org>; Mon, 14 Nov 2016 14:22:26 -0800
-Received: from facebook.com (2401:db00:21:603d:face:0:19:0)     by
- mx-out.facebook.com (10.223.100.99) with ESMTP id
- d15cf4aaaab811e6b87124be05956610-860e6a50 for <linux-block@vger.kernel.org>;
-        Mon, 14 Nov 2016 14:22:24 -0800
-From: Shaohua Li <shli@fb.com>
-To: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <Kernel-team@fb.com>, <axboe@fb.com>, <tj@kernel.org>,
-        <vgoyal@redhat.com>
-Subject: [PATCH V4 09/15] blk-throttle: make bandwidth change smooth
-Date: Mon, 14 Nov 2016 14:22:16 -0800
-Message-ID: <0e70ed3ab921ff6556cfe6a6c30428d4cfaf9e52.1479161136.git.shli@fb.com>
-In-Reply-To: <cover.1479161136.git.shli@fb.com>
-References: <cover.1479161136.git.shli@fb.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Received: from bombadil.infradead.org ([198.137.202.9]:52829 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S936176AbcKDQVX (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Nov 2016 12:21:23 -0400
+From: Christoph Hellwig <hch@lst.de>
+To: linux-xfs@vger.kernel.org
+Cc: axboe@fb.com, kent.overstreet@gmail.com,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        Peter Zijlstra <peterz@infradead.org>
+Subject: [PATCH 1/5] locking/lockdep: Provide a type check for lock_is_held
+Date: Fri,  4 Nov 2016 10:21:15 -0600
+Message-Id: <1478276479-10749-2-git-send-email-hch@lst.de>
+In-Reply-To: <1478276479-10749-1-git-send-email-hch@lst.de>
+References: <1478276479-10749-1-git-send-email-hch@lst.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-When cgroups all reach high limit, cgroups can dispatch more IO. This
-could make some cgroups dispatch more IO but others not, and even some
-cgroups could dispatch less IO than their high limit. For example, cg1
-high limit 10MB/s, cg2 limit 80MB/s, assume disk maximum bandwidth is
-120M/s for the workload. Their bps could something like this:
+From: Peter Zijlstra <peterz@infradead.org>
 
-cg1/cg2 bps: T1: 10/80 -> T2: 60/60 -> T3: 10/80
+Christoph requested lockdep_assert_held() variants that distinguish
+between held-for-read or held-for-write.
 
-At T1, all cgroups reach high limit, so they can dispatch more IO later.
-Then cg1 dispatch more IO and cg2 has no room to dispatch enough IO. At
-T2, cg2 only dispatches 60M/s. Since We detect cg2 dispatches less IO
-than its high limit 80M/s, we downgrade the queue from LIMIT_MAX to
-LIMIT_HIGH, then all cgroups are throttled to their high limit (T3). cg2
-will have bandwidth below its high limit at most time.
+Provide:
 
-The big problem here is we don't know the maximum bandwidth of the
-workload, so we can't make smart decision to avoid the situation. This
-patch makes cgroup bandwidth change smooth. After disk upgrades from
-LIMIT_HIGH to LIMIT_MAX, we don't allow cgroups use all bandwidth upto
-their max limit immediately. Their bandwidth limit will be increased
-gradually to avoid above situation. So above example will became
-something like:
+  int lock_is_held_type(struct lockdep_map *lock, int read)
 
-cg1/cg2 bps: 10/80 -> 15/105 -> 20/100 -> 25/95 -> 30/90 -> 35/85 -> 40/80
--> 45/75 -> 10/80
+which takes the same argument as lock_acquire(.read) and matches it to
+the held_lock instance.
 
-In this way cgroups bandwidth will be above their limit in majority
-time, this still doesn't fully utilize disk bandwidth, but that's
-something we pay for sharing.
+Use of this function should be gated by the debug_locks variable. When
+that is 0 the return value of the lock_is_held_type() function is
+undefined. This is done to allow both negative and positive tests for
+holding locks.
 
-Note this doesn't completely avoid cgroup running under its high limit.
-The best way to guarantee cgroup doesn't run under its limit is to set
-max limit. For example, if we set cg1 max limit to 40, cg2 will never
-run under its high limit.
+By default we provide (positive) lockdep_assert_held{,_exclusive,_read}()
+macros.
 
-Signed-off-by: Shaohua Li <shli@fb.com>
+Requested-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
 ---
- block/blk-throttle.c | 42 ++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 38 insertions(+), 4 deletions(-)
+ include/linux/lockdep.h  | 25 +++++++++++++++++++++++--
+ kernel/locking/lockdep.c | 20 ++++++++++++--------
+ 2 files changed, 35 insertions(+), 10 deletions(-)
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 32cc6ec..45a28c4 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -170,6 +170,8 @@ struct throtl_data
+diff --git a/include/linux/lockdep.h b/include/linux/lockdep.h
+index c1458fe..a87f3c9 100644
+--- a/include/linux/lockdep.h
++++ b/include/linux/lockdep.h
+@@ -338,9 +338,18 @@ extern void lock_acquire(struct lockdep_map *lock, unsigned int subclass,
+ extern void lock_release(struct lockdep_map *lock, int nested,
+ 			 unsigned long ip);
  
- 	unsigned long high_upgrade_time;
- 	unsigned long high_downgrade_time;
+-#define lockdep_is_held(lock)	lock_is_held(&(lock)->dep_map)
++/*
++ * Same "read" as for lock_acquire(), except -1 means any.
++ */
++extern int lock_is_held_type(struct lockdep_map *lock, int read);
 +
-+	unsigned int scale;
- };
++static inline int lock_is_held(struct lockdep_map *lock)
++{
++	return lock_is_held_type(lock, -1);
++}
  
- static void throtl_pending_timer_fn(unsigned long arg);
-@@ -224,12 +226,27 @@ static struct throtl_data *sq_to_td(struct throtl_service_queue *sq)
- static uint64_t tg_bps_limit(struct throtl_grp *tg, int rw)
+-extern int lock_is_held(struct lockdep_map *lock);
++#define lockdep_is_held(lock)		lock_is_held(&(lock)->dep_map)
++#define lockdep_is_held_type(lock, r)	lock_is_held_type(&(lock)->dep_map, (r))
+ 
+ extern void lock_set_class(struct lockdep_map *lock, const char *name,
+ 			   struct lock_class_key *key, unsigned int subclass,
+@@ -372,6 +381,14 @@ extern void lock_unpin_lock(struct lockdep_map *lock, struct pin_cookie);
+ 		WARN_ON(debug_locks && !lockdep_is_held(l));	\
+ 	} while (0)
+ 
++#define lockdep_assert_held_exclusive(l)	do {			\
++		WARN_ON(debug_locks && !lockdep_is_held_type(l, 0));	\
++	} while (0)
++
++#define lockdep_assert_held_read(l)	do {				\
++		WARN_ON(debug_locks && !lockdep_is_held_type(l, 1));	\
++	} while (0)
++
+ #define lockdep_assert_held_once(l)	do {				\
+ 		WARN_ON_ONCE(debug_locks && !lockdep_is_held(l));	\
+ 	} while (0)
+@@ -428,7 +445,11 @@ struct lock_class_key { };
+ 
+ #define lockdep_depth(tsk)	(0)
+ 
++#define lockdep_is_held_type(l, r)		do { (void)(l); } while (0)
++
+ #define lockdep_assert_held(l)			do { (void)(l); } while (0)
++#define lockdep_assert_held_exclusive(l)	do { (void)(l); } while (0)
++#define lockdep_assert_held_read(l)		do { (void)(l); } while (0)
+ #define lockdep_assert_held_once(l)		do { (void)(l); } while (0)
+ 
+ #define lockdep_recursing(tsk)			(0)
+diff --git a/kernel/locking/lockdep.c b/kernel/locking/lockdep.c
+index 589d763..cff580a 100644
+--- a/kernel/locking/lockdep.c
++++ b/kernel/locking/lockdep.c
+@@ -3188,7 +3188,7 @@ print_lock_nested_lock_not_held(struct task_struct *curr,
+ 	return 0;
+ }
+ 
+-static int __lock_is_held(struct lockdep_map *lock);
++static int __lock_is_held(struct lockdep_map *lock, int read);
+ 
+ /*
+  * This gets called for every mutex_lock*()/spin_lock*() operation.
+@@ -3329,7 +3329,7 @@ static int __lock_acquire(struct lockdep_map *lock, unsigned int subclass,
+ 	}
+ 	chain_key = iterate_chain_key(chain_key, class_idx);
+ 
+-	if (nest_lock && !__lock_is_held(nest_lock))
++	if (nest_lock && !__lock_is_held(nest_lock, -1))
+ 		return print_lock_nested_lock_not_held(curr, hlock, ip);
+ 
+ 	if (!validate_chain(curr, lock, hlock, chain_head, chain_key))
+@@ -3576,7 +3576,7 @@ __lock_release(struct lockdep_map *lock, int nested, unsigned long ip)
+ 	return 1;
+ }
+ 
+-static int __lock_is_held(struct lockdep_map *lock)
++static int __lock_is_held(struct lockdep_map *lock, int read)
  {
- 	struct blkcg_gq *blkg = tg_to_blkg(tg);
-+	struct throtl_data *td;
- 	uint64_t ret;
+ 	struct task_struct *curr = current;
+ 	int i;
+@@ -3584,8 +3584,12 @@ static int __lock_is_held(struct lockdep_map *lock)
+ 	for (i = 0; i < curr->lockdep_depth; i++) {
+ 		struct held_lock *hlock = curr->held_locks + i;
  
- 	if (cgroup_subsys_on_dfl(io_cgrp_subsys) && !blkg->parent)
- 		return -1;
--	ret = tg->bps[rw][tg->td->limit_index];
--	if (ret == -1 && tg->td->limit_index == LIMIT_HIGH)
-+	td = tg->td;
-+	ret = tg->bps[rw][td->limit_index];
-+	if (td->limit_index == LIMIT_MAX && tg->bps[rw][LIMIT_HIGH] != -1) {
-+		uint64_t increase;
+-		if (match_held_lock(hlock, lock))
+-			return 1;
++		if (match_held_lock(hlock, lock)) {
++			if (read == -1 || hlock->read == read)
++				return 1;
 +
-+		if (td->scale < 4096 && time_after_eq(jiffies,
-+		    td->high_upgrade_time + td->scale * td->throtl_slice)) {
-+			unsigned int time = jiffies - td->high_upgrade_time;
-+
-+			td->scale = time / td->throtl_slice;
++			return 0;
 +		}
-+		increase = (tg->bps[rw][LIMIT_HIGH] >> 1) * td->scale;
-+		ret = min(tg->bps[rw][LIMIT_MAX],
-+			tg->bps[rw][LIMIT_HIGH] + increase);
-+	}
-+	if (ret == -1 && td->limit_index == LIMIT_HIGH)
- 		return tg->bps[rw][LIMIT_MAX];
+ 	}
  
- 	return ret;
-@@ -238,12 +255,28 @@ static uint64_t tg_bps_limit(struct throtl_grp *tg, int rw)
- static unsigned int tg_iops_limit(struct throtl_grp *tg, int rw)
+ 	return 0;
+@@ -3769,7 +3773,7 @@ void lock_release(struct lockdep_map *lock, int nested,
+ }
+ EXPORT_SYMBOL_GPL(lock_release);
+ 
+-int lock_is_held(struct lockdep_map *lock)
++int lock_is_held_type(struct lockdep_map *lock, int read)
  {
- 	struct blkcg_gq *blkg = tg_to_blkg(tg);
-+	struct throtl_data *td;
- 	unsigned int ret;
+ 	unsigned long flags;
+ 	int ret = 0;
+@@ -3781,13 +3785,13 @@ int lock_is_held(struct lockdep_map *lock)
+ 	check_flags(flags);
  
- 	if (cgroup_subsys_on_dfl(io_cgrp_subsys) && !blkg->parent)
- 		return -1;
--	ret = tg->iops[rw][tg->td->limit_index];
--	if (ret == -1 && tg->td->limit_index == LIMIT_HIGH)
-+	td = tg->td;
-+	ret = tg->iops[rw][td->limit_index];
-+	if (td->limit_index == LIMIT_MAX && tg->iops[rw][LIMIT_HIGH] != -1) {
-+		uint64_t increase;
-+
-+		if (td->scale < 4096 && time_after_eq(jiffies,
-+		    td->high_upgrade_time + td->scale * td->throtl_slice)) {
-+			unsigned int time = jiffies - td->high_upgrade_time;
-+
-+			td->scale = time / td->throtl_slice;
-+		}
-+
-+		increase = (tg->iops[rw][LIMIT_HIGH] >> 1) * td->scale;
-+		ret = min(tg->iops[rw][LIMIT_MAX],
-+			tg->iops[rw][LIMIT_HIGH] + (unsigned int)increase);
-+	}
-+	if (ret == -1 && td->limit_index == LIMIT_HIGH)
- 		return tg->iops[rw][LIMIT_MAX];
+ 	current->lockdep_recursion = 1;
+-	ret = __lock_is_held(lock);
++	ret = __lock_is_held(lock, read);
+ 	current->lockdep_recursion = 0;
+ 	raw_local_irq_restore(flags);
+ 
  	return ret;
  }
-@@ -1676,6 +1709,7 @@ static void throtl_upgrade_state(struct throtl_data *td)
+-EXPORT_SYMBOL_GPL(lock_is_held);
++EXPORT_SYMBOL_GPL(lock_is_held_type);
  
- 	td->limit_index = LIMIT_MAX;
- 	td->high_upgrade_time = jiffies;
-+	td->scale = 0;
- 	rcu_read_lock();
- 	blkg_for_each_descendant_post(blkg, pos_css, td->queue->root_blkg) {
- 		struct throtl_grp *tg = blkg_to_tg(blkg);
+ struct pin_cookie lock_pin_lock(struct lockdep_map *lock)
+ {
 -- 
-2.9.3
+2.1.4
 
