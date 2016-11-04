@@ -1,37 +1,44 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.9]:50190 "EHLO
+Received: from bombadil.infradead.org ([198.137.202.9]:52751 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1424284AbcKANkX (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Nov 2016 09:40:23 -0400
+        with ESMTP id S936176AbcKDQVV (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Nov 2016 12:21:21 -0400
 From: Christoph Hellwig <hch@lst.de>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: [PATCH 02/16] blk-cgroup: use op_is_sync to check for synchronous requests
-Date: Tue,  1 Nov 2016 07:40:03 -0600
-Message-Id: <1478007617-18715-3-git-send-email-hch@lst.de>
-In-Reply-To: <1478007617-18715-1-git-send-email-hch@lst.de>
-References: <1478007617-18715-1-git-send-email-hch@lst.de>
+To: linux-xfs@vger.kernel.org
+Cc: axboe@fb.com, kent.overstreet@gmail.com,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: an iomap-based direct I/O implementation V2
+Date: Fri,  4 Nov 2016 10:21:14 -0600
+Message-Id: <1478276479-10749-1-git-send-email-hch@lst.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- include/linux/blk-cgroup.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Hi all,
 
-diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
-index ddaf28d..01b62e7 100644
---- a/include/linux/blk-cgroup.h
-+++ b/include/linux/blk-cgroup.h
-@@ -599,7 +599,7 @@ static inline void blkg_rwstat_add(struct blkg_rwstat *rwstat,
- 
- 	__percpu_counter_add(cnt, val, BLKG_STAT_CPU_BATCH);
- 
--	if (op & REQ_SYNC)
-+	if (op_is_sync(op))
- 		cnt = &rwstat->cpu_cnt[BLKG_RWSTAT_SYNC];
- 	else
- 		cnt = &rwstat->cpu_cnt[BLKG_RWSTAT_ASYNC];
--- 
-2.1.4
+this series adds a new direct I/O implementation based on the iomap
+interface, and switches XFS to use it.
 
+The first two patches are a resend of my earlier series to remove the
+XFS iolock.  They are needed for the lockdep assert in the new iomap
+code.
+
+The rest implements a new iomap_dio_rw direct I/O implementation and
+switches XFS to use it.
+
+Note that this series is on top of a merge of the XFS for-next
+tree with the block tree, which has a new helper needed for this
+implementation.  This is the block tree it's on top of:
+
+    git://git.kernel.dk/linux-block for-4.10/block
+
+To make everyones life easier І also have a git tree with the merge
+plus the patches in this series available here:
+
+    git://git.infradead.org/users/hch/vfs.git iomap-dio.2
+
+Changes since V1:
+ - dropped the bio_iov_iter_get_pages patch, now merged in the block tree
+ - rebased on top of a merge of the XFS tree with the block tree
+ - stopped using WRITE_ODIRECT which has been removed in the block tree
