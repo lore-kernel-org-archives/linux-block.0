@@ -1,52 +1,34 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.9]:50283 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1424312AbcKANkf (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Nov 2016 09:40:35 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: [PATCH 13/16] arm, arm64: don't include blk_types.h in <asm/io.h>
-Date: Tue,  1 Nov 2016 07:40:14 -0600
-Message-Id: <1478007617-18715-14-git-send-email-hch@lst.de>
-In-Reply-To: <1478007617-18715-1-git-send-email-hch@lst.de>
-References: <1478007617-18715-1-git-send-email-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Subject: Re: [PATCH V2 2/2] blk-mq: immediately dispatch big size request
+To: Christoph Hellwig <hch@infradead.org>
+References: <05e8cb8c7e09903c7db36e81a6bbd0b39b24deff.1478217670.git.shli@fb.com>
+ <6297c9a39cf21c94c65d5a9b3a19e54ba5b8b573.1478217671.git.shli@fb.com>
+ <20161104000954.GA10266@infradead.org>
+ <20161104001353.GA58908@omida-mbp.local.dhcp.thefacebook.com>
+ <32bef0f6-c194-e31e-3a85-5aa21a6e81a4@fb.com>
+ <20161104144614.GA18373@infradead.org>
+Cc: Shaohua Li <shli@fb.com>, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Kernel-team@fb.com
+From: Jens Axboe <axboe@fb.com>
+Message-ID: <3d7144e3-47e5-3c98-489f-e92d97b60817@fb.com>
+Date: Fri, 4 Nov 2016 09:29:07 -0600
+MIME-Version: 1.0
+In-Reply-To: <20161104144614.GA18373@infradead.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+List-ID: <linux-block@vger.kernel.org>
 
-No need for it - we only use struct bio_vec in prototypes and already have
-forward declarations for it.
+On 11/04/2016 08:46 AM, Christoph Hellwig wrote:
+> On Thu, Nov 03, 2016 at 10:00:58PM -0600, Jens Axboe wrote:
+>> I've applied 1-2 for 4.10, but we probably should look into unifying
+>> those parts of sq and mq in general. For instance, it doesn't seem to
+>> make a lot of sense why we'd depth limit sq and not mq.
+>
+> I've spent some time looking the the make_request_fn and to be honest
+> I think that whole sq vs mq split is pointless.  They are about 70-80%
+> the same anyway, and I think everyone would be served much better
+> by merging them.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- arch/arm/include/asm/io.h   | 1 -
- arch/arm64/include/asm/io.h | 1 -
- 2 files changed, 2 deletions(-)
+Yeah, that was my point, at least if we can do it without having too
+many extra conditionals. Or at least split some of it into helpers.
 
-diff --git a/arch/arm/include/asm/io.h b/arch/arm/include/asm/io.h
-index 021692c..42871fb 100644
---- a/arch/arm/include/asm/io.h
-+++ b/arch/arm/include/asm/io.h
-@@ -25,7 +25,6 @@
- 
- #include <linux/string.h>
- #include <linux/types.h>
--#include <linux/blk_types.h>
- #include <asm/byteorder.h>
- #include <asm/memory.h>
- #include <asm-generic/pci_iomap.h>
-diff --git a/arch/arm64/include/asm/io.h b/arch/arm64/include/asm/io.h
-index 0bba427..0c00c87 100644
---- a/arch/arm64/include/asm/io.h
-+++ b/arch/arm64/include/asm/io.h
-@@ -22,7 +22,6 @@
- #ifdef __KERNEL__
- 
- #include <linux/types.h>
--#include <linux/blk_types.h>
- 
- #include <asm/byteorder.h>
- #include <asm/barrier.h>
 -- 
-2.1.4
-
+Jens Axboe
