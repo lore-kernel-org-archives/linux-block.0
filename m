@@ -1,38 +1,36 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f41.google.com ([74.125.82.41]:34400 "EHLO
-        mail-wm0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754524AbcKESOS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 5 Nov 2016 14:14:18 -0400
-Received: by mail-wm0-f41.google.com with SMTP id u144so18598338wmu.1
-        for <linux-block@vger.kernel.org>; Sat, 05 Nov 2016 11:14:17 -0700 (PDT)
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Date: Sat, 5 Nov 2016 07:10:49 -0800
+From: Kent Overstreet <kent.overstreet@gmail.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-xfs@vger.kernel.org, axboe@fb.com,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
 Subject: Re: [PATCH 4/5] iomap: implement direct I/O
-To: Christoph Hellwig <hch@lst.de>, linux-xfs@vger.kernel.org
+Message-ID: <20161105151049.ocvrfh6fjsotnpxx@kmo-pixel>
 References: <1478276479-10749-1-git-send-email-hch@lst.de>
  <1478276479-10749-5-git-send-email-hch@lst.de>
-Cc: axboe@fb.com, kent.overstreet@gmail.com,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
-From: Avi Kivity <avi@scylladb.com>
-Message-ID: <2dabe3ec-193b-3ecf-af5c-a5ba976de6eb@scylladb.com>
-Date: Sat, 5 Nov 2016 20:14:14 +0200
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <1478276479-10749-5-git-send-email-hch@lst.de>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Hello,
-
-
-On 11/04/2016 06:21 PM, Christoph Hellwig wrote:
+On Fri, Nov 04, 2016 at 10:21:18AM -0600, Christoph Hellwig wrote:
 > This adds a full fledget direct I/O implementation using the iomap
 > interface. Full fledged in this case means all features are supported:
 > AIO, vectored I/O, any iov_iter type including kernel pointers, bvecs
-> and pipes, support for hole filling and async apending writes.
+> and pipes, support for hole filling and async apending writes.  It does
+> not mean supporting all the warts of the old generic code.  We expect
+> i_rwsem to be held over the duration of the call, and we expect to
+> maintain i_dio_count ourselves, and we pass on any kinds of mapping
+> to the file system for now.
+> 
+> The algorithm used is very simple: We use iomap_apply to iterate over
+> the range of the I/O, and then we use the new bio_iov_iter_get_pages
+> helper to lock down the user range for the size of the extent.
+> bio_iov_iter_get_pages can currently lock down twice as many pages as
+> the old direct I/O code did, which means that we will have a better
+> batch factor for everything but overwrites of badly fragmented files.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-Does this include support for more than one concurrent appending write 
-for the same file?
-
-If so, that's great, but please make this feature discoverable. Right 
-now applications have to benchmark or guess how fully asynchronous the 
-aio implementation is.
-
+Reviewed-by: Kent Overstreet <kent.overstreet@gmail.com>
