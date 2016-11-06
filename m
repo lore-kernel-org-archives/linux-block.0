@@ -1,98 +1,150 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from verein.lst.de ([213.95.11.211]:57034 "EHLO newverein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S932119AbcKGPIJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 7 Nov 2016 10:08:09 -0500
-Date: Mon, 7 Nov 2016 16:08:07 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Dave Chinner <david@fromorbit.com>
-Cc: Christoph Hellwig <hch@lst.de>, linux-xfs@vger.kernel.org,
-        axboe@fb.com, kent.overstreet@gmail.com,
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Date: Mon, 7 Nov 2016 09:40:49 +1100
+From: Dave Chinner <david@fromorbit.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-xfs@vger.kernel.org, axboe@fb.com, kent.overstreet@gmail.com,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
 Subject: Re: [PATCH 4/5] iomap: implement direct I/O
-Message-ID: <20161107150807.GA10865@lst.de>
-References: <1478276479-10749-1-git-send-email-hch@lst.de> <1478276479-10749-5-git-send-email-hch@lst.de> <20161106224049.GP14023@dastard>
+Message-ID: <20161106224049.GP14023@dastard>
+References: <1478276479-10749-1-git-send-email-hch@lst.de>
+ <1478276479-10749-5-git-send-email-hch@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20161106224049.GP14023@dastard>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <1478276479-10749-5-git-send-email-hch@lst.de>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Nov 07, 2016 at 09:40:49AM +1100, Dave Chinner wrote:
-> > +	case IOMAP_HOLE:
-> > +		/*
-> > +		 * We return -ENOTBLK to fall back to buffered I/O for file
-> > +		 * systems that can't fill holes from direct writes.
-> > +		 */
-> > +		if (dio->flags & IOMAP_DIO_WRITE)
-> > +			return -ENOTBLK;
-> > +		/*FALLTHRU*/
+On Fri, Nov 04, 2016 at 10:21:18AM -0600, Christoph Hellwig wrote:
+> This adds a full fledget direct I/O implementation using the iomap
+> interface. Full fledged in this case means all features are supported:
+> AIO, vectored I/O, any iov_iter type including kernel pointers, bvecs
+> and pipes, support for hole filling and async apending writes.  It does
+> not mean supporting all the warts of the old generic code.  We expect
+> i_rwsem to be held over the duration of the call, and we expect to
+> maintain i_dio_count ourselves, and we pass on any kinds of mapping
+> to the file system for now.
 > 
-> This is preventing direct IO writes from being done into holes for
-> all filesystems.
-
-It's not.  Hint:  the whole iomap code very much assumes a file system
-fills holes before applying the actor on writes.
-
-That being said I should remove this check - as-is it's dead, untested
-code that I only used for my aborted ext2 conversion, so we're better
-off not having it.
-
-> > +	iov_iter_truncate(&iter, length);
+> The algorithm used is very simple: We use iomap_apply to iterate over
+> the range of the I/O, and then we use the new bio_iov_iter_get_pages
+> helper to lock down the user range for the size of the extent.
+> bio_iov_iter_get_pages can currently lock down twice as many pages as
+> the old direct I/O code did, which means that we will have a better
+> batch factor for everything but overwrites of badly fragmented files.
 > 
-> Won't this truncate the entire DIO down to the length of the first
-> extent that is mapped? 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+.....
+> +static loff_t
+> +iomap_dio_actor(struct inode *inode, loff_t pos, loff_t length,
+> +		void *data, struct iomap *iomap)
+> +{
+> +	struct iomap_dio *dio = data;
+> +	unsigned blkbits = blksize_bits(bdev_logical_block_size(iomap->bdev));
+> +	unsigned fs_block_size = (1 << inode->i_blkbits), pad;
+> +	struct iov_iter iter = *dio->submit.iter;
+> +	struct bio *bio;
+> +	bool may_zero = false;
+> +	int nr_pages, ret;
+> +
+> +	if ((pos | length | iov_iter_alignment(&iter)) & ((1 << blkbits) - 1))
+> +		return -EINVAL;
+> +
+> +	switch (iomap->type) {
+> +	case IOMAP_HOLE:
+> +		/*
+> +		 * We return -ENOTBLK to fall back to buffered I/O for file
+> +		 * systems that can't fill holes from direct writes.
+> +		 */
+> +		if (dio->flags & IOMAP_DIO_WRITE)
+> +			return -ENOTBLK;
+> +		/*FALLTHRU*/
 
-It truncates a copy of the main iter down to the length of the extent
-we're working on.  That allows us to limit all the iov_iter based helper
-(most importantly get_user_pages) to only operate on a given extent.
-Later in the function we then advance the primary iter when moving to
-the next extent.
+This is preventing direct IO writes from being done into holes for
+all filesystems.
 
-> 
-> > +	if (may_zero) {
-> > +		pad = pos & (fs_block_size - 1);
-> > +		if (pad)
-> > +			iomap_dio_zero(dio, iomap, pos, fs_block_size - pad);
-> > +	}
-> 
-> Repeated zeroing code. helper function?
+> +	case IOMAP_UNWRITTEN:
+> +		if (!(dio->flags & IOMAP_DIO_WRITE)) {
+> +			iov_iter_zero(length, dio->submit.iter);
+> +			dio->size += length;
+> +			return length;
+> +		}
+> +		dio->flags |= IOMAP_DIO_UNWRITTEN;
+> +		may_zero = true;
+> +		break;
+> +	case IOMAP_MAPPED:
+> +		if (iomap->flags & IOMAP_F_SHARED)
+> +			dio->flags |= IOMAP_DIO_COW;
+> +		if (iomap->flags & IOMAP_F_NEW)
+> +			may_zero = true;
+> +		break;
+> +	default:
+> +		WARN_ON_ONCE(1);
+> +		return -EIO;
+> +	}
+> +
+> +	iov_iter_truncate(&iter, length);
 
-The actual repeated code is in iomap_dio_zero.  Because we once zero
-the beginning of a block and once the end the arithmetics looks somewhat
-similar but actually are different. We could do a trick like the end
-parameter to dio_zero_block in the old dio code to save a line of code
-or two, but I think it's highly confusing to the reader.
+Won't this truncate the entire DIO down to the length of the first
+extent that is mapped? 
 
-> > +	do {
-> > +		ret = iomap_apply(inode, pos, count, flags, ops, dio,
-> > +				iomap_dio_actor);
-> > +		if (ret <= 0) {
-> > +			/* magic error code to fall back to buffered I/O */
-> > +			if (ret == -ENOTBLK)
-> > +				ret = 0;
-> > +			break;
-> > +		}
-> > +		pos += ret;
-> > +	} while ((count = iov_iter_count(iter)) > 0);
-> > +	blk_finish_plug(&plug);
-> > +
-> > +	if (ret < 0)
-> > +		cmpxchg(&dio->error, 0, ret);
-> 
-> Why cmpxchg? What are we racing with here? Helper (e.g.
-> dio_set_error())?
+> +	if (may_zero) {
+> +		pad = pos & (fs_block_size - 1);
+> +		if (pad)
+> +			iomap_dio_zero(dio, iomap, pos, fs_block_size - pad);
+> +	}
 
-The submission thread against I/O completions (which in the worst
-case could come from multiple threads as well).  Same reason as
-the one in xfs_buf_bio_end_io added in commit 9bdd9bd69b
-("xfs: buffer ->bi_end_io function requires irq-safe lock")
+Repeated zeroing code. helper function?
 
-> Comment decribing use?
+> +	inode_dio_begin(inode);
+> +
+> +	blk_start_plug(&plug);
+> +	do {
+> +		ret = iomap_apply(inode, pos, count, flags, ops, dio,
+> +				iomap_dio_actor);
+> +		if (ret <= 0) {
+> +			/* magic error code to fall back to buffered I/O */
+> +			if (ret == -ENOTBLK)
+> +				ret = 0;
+> +			break;
+> +		}
+> +		pos += ret;
+> +	} while ((count = iov_iter_count(iter)) > 0);
+> +	blk_finish_plug(&plug);
+> +
+> +	if (ret < 0)
+> +		cmpxchg(&dio->error, 0, ret);
 
-Sure.
+Why cmpxchg? What are we racing with here? Helper (e.g.
+dio_set_error())?
 
-> Comment on the context the new flags are used under and what they
-> mean?
+> --- a/include/linux/iomap.h
+> +++ b/include/linux/iomap.h
+> @@ -49,6 +49,7 @@ struct iomap {
+>  #define IOMAP_WRITE		(1 << 0) /* writing, must allocate blocks */
+>  #define IOMAP_ZERO		(1 << 1) /* zeroing operation, may skip holes */
+>  #define IOMAP_REPORT		(1 << 2) /* report extent status, e.g. FIEMAP */
+> +#define IOMAP_DIRECT		(1 << 3)
 
-Ok.
+Comment decribing use?
+
+>  struct iomap_ops {
+>  	/*
+> @@ -82,4 +83,11 @@ int iomap_page_mkwrite(struct vm_area_struct *vma, struct vm_fault *vmf,
+>  int iomap_fiemap(struct inode *inode, struct fiemap_extent_info *fieinfo,
+>  		loff_t start, loff_t len, struct iomap_ops *ops);
+>  
+> +#define IOMAP_DIO_UNWRITTEN	(1 << 0)
+> +#define IOMAP_DIO_COW		(1 << 1)
+> +typedef int (iomap_dio_end_io_t)(struct kiocb *iocb, ssize_t ret,
+> +		unsigned flags);
+> +ssize_t iomap_dio_rw(struct kiocb *iocb, struct iov_iter *iter,
+> +		struct iomap_ops *ops, iomap_dio_end_io_t end_io);
+
+Comment on the context the new flags are used under and what they
+mean?
+
+Cheers,
+
+Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
