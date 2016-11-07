@@ -1,53 +1,55 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.9]:52962 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S936176AbcKDQV0 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Nov 2016 12:21:26 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: linux-xfs@vger.kernel.org
-Cc: axboe@fb.com, kent.overstreet@gmail.com,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
-Subject: [PATCH 3/5] fs: make sb_init_dio_done_wq available outside of direct-io.c
-Date: Fri,  4 Nov 2016 10:21:17 -0600
-Message-Id: <1478276479-10749-4-git-send-email-hch@lst.de>
-In-Reply-To: <1478276479-10749-1-git-send-email-hch@lst.de>
-References: <1478276479-10749-1-git-send-email-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Date: Mon, 7 Nov 2016 19:03:17 +0300
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: "Kirill A. Shutemov" <kirill@shutemov.name>,
+        Jan Kara <jack@suse.cz>, Theodore Ts'o <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCHv3 15/41] filemap: handle huge pages in
+ do_generic_file_read()
+Message-ID: <20161107160317.jwdbqopivo7g2j2i@black.fi.intel.com>
+References: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
+ <20160915115523.29737-16-kirill.shutemov@linux.intel.com>
+ <20161013093313.GB26241@quack2.suse.cz>
+ <20161031181035.GA7007@node.shutemov.name>
+ <20161101163940.GA5459@quack2.suse.cz>
+ <20161102143612.GA4790@infradead.org>
+ <20161107111305.GB13280@node.shutemov.name>
+ <20161107150103.GA17451@infradead.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20161107150103.GA17451@infradead.org>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-We want to use the per-sb completion workqueue from the new iomap
-direct I/O code.
+On Mon, Nov 07, 2016 at 07:01:03AM -0800, Christoph Hellwig wrote:
+> On Mon, Nov 07, 2016 at 02:13:05PM +0300, Kirill A. Shutemov wrote:
+> > It looks like a huge limitation to me.
+> 
+> The DAX PMD fault code can live just fine with it.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- fs/direct-io.c | 2 +-
- fs/internal.h  | 3 +++
- 2 files changed, 4 insertions(+), 1 deletion(-)
+There's no way out for DAX as we map backing storage directly into
+userspace. There's no such limitation for page-cache. And I don't see a
+point to introduce such limitation artificially.
 
-diff --git a/fs/direct-io.c b/fs/direct-io.c
-index a5138c5..39547ac 100644
---- a/fs/direct-io.c
-+++ b/fs/direct-io.c
-@@ -554,7 +554,7 @@ static inline int dio_bio_reap(struct dio *dio, struct dio_submit *sdio)
-  * filesystems that don't need it and also allows us to create the workqueue
-  * late enough so the we can include s_id in the name of the workqueue.
-  */
--static int sb_init_dio_done_wq(struct super_block *sb)
-+int sb_init_dio_done_wq(struct super_block *sb)
- {
- 	struct workqueue_struct *old;
- 	struct workqueue_struct *wq = alloc_workqueue("dio/%s",
-diff --git a/fs/internal.h b/fs/internal.h
-index f4da334..4fcf517 100644
---- a/fs/internal.h
-+++ b/fs/internal.h
-@@ -184,3 +184,6 @@ typedef loff_t (*iomap_actor_t)(struct inode *inode, loff_t pos, loff_t len,
- loff_t iomap_apply(struct inode *inode, loff_t pos, loff_t length,
- 		unsigned flags, struct iomap_ops *ops, void *data,
- 		iomap_actor_t actor);
-+
-+/* direct-io.c: */
-+int sb_init_dio_done_wq(struct super_block *sb);
+Backing storage fragmentation can be a weight on decision whether we want
+to allocate huge page, but it shouldn't be show-stopper.
+
+> And without it performance would suck anyway.
+
+It depends on workload, obviously.
+
 -- 
-2.1.4
-
+ Kirill A. Shutemov
