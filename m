@@ -1,120 +1,53 @@
-Return-Path: <tglx@linutronix.de>
-Date: Mon, 7 Nov 2016 16:53:02 +0100 (CET)
-From: Thomas Gleixner <tglx@linutronix.de>
-To: Christoph Hellwig <hch@lst.de>
-cc: axboe@kernel.dk, linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
-    linux-kernel@vger.kernel.org
+Return-Path: <hare@suse.de>
 Subject: Re: [PATCH 1/2] irq,pci: allow drivers to specify complex affinity
  requirement
-In-Reply-To: <1478473646-12524-2-git-send-email-hch@lst.de>
-Message-ID: <alpine.DEB.2.20.1611071643500.3709@nanos>
-References: <1478473646-12524-1-git-send-email-hch@lst.de> <1478473646-12524-2-git-send-email-hch@lst.de>
+To: Christoph Hellwig <hch@lst.de>, tglx@linutronix.de
+References: <1478473646-12524-1-git-send-email-hch@lst.de>
+ <1478473646-12524-2-git-send-email-hch@lst.de>
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <249e2534-5a68-9bd0-e0e4-a9d4d42aa51d@suse.de>
+Date: Mon, 7 Nov 2016 09:36:40 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <1478473646-12524-2-git-send-email-hch@lst.de>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-block@vger.kernel.org>
 
-On Sun, 6 Nov 2016, Christoph Hellwig wrote:
+On 11/07/2016 12:07 AM, Christoph Hellwig wrote:
+> Some drivers (various network and RDMA adapter for example) have a MSI-X
+> vector layout where most of the vectors are used for I/O queues and should
+> have CPU affinity assigned to them, but some (usually 1 but sometimes more)
+> at the beginning or end are used for low-performance admin or configuration
+> work and should not have any explicit affinity assigned to them.
+> 
+> This adds a new irq_affinity structure passed through a variant of
+> pci_irq_alloc_vectors that allows to specify these requirements (and is
+> extensible to any future quirks in that area) so that the core IRQ
+> affinity algorithm can take this quirks into account.
+> 
+> It also removes the unused irq_affinity mask in struct pci_dev.  If we
+> ever need that sort of functionality it should be passed through
+> struct irq_affinity.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
 >  drivers/pci/msi.c         | 61 ++++++++++++++++++++++++--------------------
 >  include/linux/interrupt.h | 26 ++++++++++++++++---
 >  include/linux/pci.h       | 14 ++++++----
 >  kernel/irq/affinity.c     | 65 ++++++++++++++++++++++++-----------------------
-
-Can you please split that up in bits and pieces. This change it all patch
-is not fun to review.
-
 >  4 files changed, 98 insertions(+), 68 deletions(-)
 > 
-> diff --git a/drivers/pci/msi.c b/drivers/pci/msi.c
-> index bfdd074..c312535 100644
-> --- a/drivers/pci/msi.c
-> +++ b/drivers/pci/msi.c
-> @@ -551,14 +551,15 @@ static int populate_msi_sysfs(struct pci_dev *pdev)
->  }
->  
->  static struct msi_desc *
-> -msi_setup_entry(struct pci_dev *dev, int nvec, bool affinity)
-> +msi_setup_entry(struct pci_dev *dev, int nvec, bool affinity,
-> +		struct irq_affinity *desc)
+Good idea.
 
-This should be 'const struct ....'. And can we please name this *affd or
-something like that?
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
->  {
->  	struct cpumask *masks = NULL;
->  	struct msi_desc *entry;
->  	u16 control;
->  
->  	if (affinity) {
+Cheers,
 
-If we do it right, then we can get rid of the bool and depend on that irq
-affinity pointer. We just have to push down the flag evaluation to
-pci_alloc_irq_vectors[_affinity].
-
-> --- a/include/linux/interrupt.h
-> +++ b/include/linux/interrupt.h
-> @@ -232,6 +232,24 @@ struct irq_affinity_notify {
->  	void (*release)(struct kref *ref);
->  };
->  
-> +/*
-> + * This structure allows drivers to optionally specify complex IRQ affinity
-> + * requirements.
-> + */
-> +struct irq_affinity {
-> +	/*
-> +	 * Number of vectors before the main affinity vectors that should not
-> +	 * have have any CPU affinity:
-> +	 */
-
-Please make that kernel doc.
-
-> +	int		pre_vectors;
-> +
-> +	/*
-> +	 * Number of vectors after the main affinity vectors that should not
-> +	 * have have any CPU affinity:
-> +	 */
-> +	int		post_vectors;
-> +};
-> +
-
-> diff --git a/include/linux/pci.h b/include/linux/pci.h
-> index 0e49f70..be0abd2 100644
-> --- a/include/linux/pci.h
-> +++ b/include/linux/pci.h
-...  
-> +#define pci_alloc_irq_vectors(dev, min_vecs, max_vecs, flags) \
-> +	pci_alloc_irq_vectors_affinity(dev, min_vecs, max_vecs, flags, NULL)
-
-static inline please
-
->  #endif /* LINUX_PCI_H */
-> diff --git a/kernel/irq/affinity.c b/kernel/irq/affinity.c
-> index 17f51d63..151b285 100644
-> --- a/kernel/irq/affinity.c
-> +++ b/kernel/irq/affinity.c
-> @@ -51,16 +51,16 @@ static int get_nodes_in_cpumask(const struct cpumask *mask, nodemask_t *nodemsk)
->  
->  /**
->   * irq_create_affinity_masks - Create affinity masks for multiqueue spreading
-> - * @affinity:		The affinity mask to spread. If NULL cpu_online_mask
-> - *			is used
-> + * @desc:		description of the affinity requirements
-
-@affd and sentence starts with an uppercase letter, please.
-
->   * @nvecs:		The number of vectors
-
-If you rename the argument then you want to rename this as well.
-
->   *
->   * Returns the masks pointer or NULL if allocation failed.
->   */
-> -struct cpumask *irq_create_affinity_masks(const struct cpumask *affinity,
-> -					  int nvec)
-> +struct cpumask *irq_create_affinity_masks(struct irq_affinity *desc,
-> +					  int total_nvec)
-
-Thanks,
-
-	tglx
+Hannes
+-- 
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: F. Imend�rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG N�rnberg)
