@@ -1,131 +1,26 @@
-Return-Path: <BATV+25dcfc0f7ff0c40b5b4f+4826+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: tglx@linutronix.de
-Cc: axboe@kernel.dk,
-	linux-block@vger.kernel.org,
-	linux-pci@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 2/7] genirq/affinity: Handle pre/post vectors in irq_calc_affinity_vectors()
-Date: Tue,  8 Nov 2016 17:15:02 -0800
-Message-Id: <1478654107-7384-3-git-send-email-hch@lst.de>
-In-Reply-To: <1478654107-7384-1-git-send-email-hch@lst.de>
-References: <1478654107-7384-1-git-send-email-hch@lst.de>
+Subject: Re: [PATCHSET v2] block: IO polling improvements
+To: 1478202307-1947-1-git-send-email-axboe@fb.com,
+ linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+References: <20161107152824.GA20916@cgy1-donard.priv.deltatee.com>
+From: Jens Axboe <axboe@fb.com>
+Message-ID: <13f97b32-bdd6-6013-2b99-6690af125a4c@fb.com>
+Date: Mon, 7 Nov 2016 08:29:57 -0700
+MIME-Version: 1.0
+In-Reply-To: <20161107152824.GA20916@cgy1-donard.priv.deltatee.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-Only calculate the affinity for the main I/O vectors, and skip the
-pre or post vectors specified by struct irq_affinity.
+On 11/07/2016 08:28 AM, Stephen Bates wrote:
+>> Fixed a few bugs in this, and addressed some review comments. Patches
+>> are against my 4.10 block branch, for-4.10/block.
+>
+> Jens
+>
+> Thanks for proposing this. Looks very cool. I will try and get you a
+> review and some testing this week...
 
-Also remove the irq_affinity cpumask argument that has never been used.
-If we ever need it in the future we can pass it through struct
-irq_affinity.
+Sounds good. Be sure to use the latest git branch (for-4.10/dio),
+there's been some fixes since the posting.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/pci/msi.c         |  8 ++++----
- include/linux/interrupt.h |  4 ++--
- kernel/irq/affinity.c     | 24 ++++++++++--------------
- 3 files changed, 16 insertions(+), 20 deletions(-)
-
-diff --git a/drivers/pci/msi.c b/drivers/pci/msi.c
-index ad70507..dad2da7 100644
---- a/drivers/pci/msi.c
-+++ b/drivers/pci/msi.c
-@@ -1061,6 +1061,7 @@ EXPORT_SYMBOL(pci_msi_enabled);
- static int __pci_enable_msi_range(struct pci_dev *dev, int minvec, int maxvec,
- 		unsigned int flags)
- {
-+	static const struct irq_affinity default_affd;
- 	bool affinity = flags & PCI_IRQ_AFFINITY;
- 	int nvec;
- 	int rc;
-@@ -1091,8 +1092,7 @@ static int __pci_enable_msi_range(struct pci_dev *dev, int minvec, int maxvec,
- 
- 	for (;;) {
- 		if (affinity) {
--			nvec = irq_calc_affinity_vectors(dev->irq_affinity,
--					nvec);
-+			nvec = irq_calc_affinity_vectors(nvec, &default_affd);
- 			if (nvec < minvec)
- 				return -ENOSPC;
- 		}
-@@ -1132,6 +1132,7 @@ static int __pci_enable_msix_range(struct pci_dev *dev,
- 		struct msix_entry *entries, int minvec, int maxvec,
- 		unsigned int flags)
- {
-+	static const struct irq_affinity default_affd;
- 	bool affinity = flags & PCI_IRQ_AFFINITY;
- 	int rc, nvec = maxvec;
- 
-@@ -1140,8 +1141,7 @@ static int __pci_enable_msix_range(struct pci_dev *dev,
- 
- 	for (;;) {
- 		if (affinity) {
--			nvec = irq_calc_affinity_vectors(dev->irq_affinity,
--					nvec);
-+			nvec = irq_calc_affinity_vectors(nvec, &default_affd);
- 			if (nvec < minvec)
- 				return -ENOSPC;
- 		}
-diff --git a/include/linux/interrupt.h b/include/linux/interrupt.h
-index 6b52686..9081f23b 100644
---- a/include/linux/interrupt.h
-+++ b/include/linux/interrupt.h
-@@ -291,7 +291,7 @@ extern int
- irq_set_affinity_notifier(unsigned int irq, struct irq_affinity_notify *notify);
- 
- struct cpumask *irq_create_affinity_masks(const struct cpumask *affinity, int nvec);
--int irq_calc_affinity_vectors(const struct cpumask *affinity, int maxvec);
-+int irq_calc_affinity_vectors(int maxvec, const struct irq_affinity *affd);
- 
- #else /* CONFIG_SMP */
- 
-@@ -331,7 +331,7 @@ irq_create_affinity_masks(const struct cpumask *affinity, int nvec)
- }
- 
- static inline int
--irq_calc_affinity_vectors(const struct cpumask *affinity, int maxvec)
-+irq_calc_affinity_vectors(int maxvec, const struct irq_affinity *affd)
- {
- 	return maxvec;
- }
-diff --git a/kernel/irq/affinity.c b/kernel/irq/affinity.c
-index 17f51d63..8d92597 100644
---- a/kernel/irq/affinity.c
-+++ b/kernel/irq/affinity.c
-@@ -131,24 +131,20 @@ struct cpumask *irq_create_affinity_masks(const struct cpumask *affinity,
- }
- 
- /**
-- * irq_calc_affinity_vectors - Calculate to optimal number of vectors for a given affinity mask
-- * @affinity:		The affinity mask to spread. If NULL cpu_online_mask
-- *			is used
-- * @maxvec:		The maximum number of vectors available
-+ * irq_calc_affinity_vectors - Calculate the optimal number of vectors
-+ * @maxvec:	The maximum number of vectors available
-+ * @affd:	Description of the affinity requirements
-  */
--int irq_calc_affinity_vectors(const struct cpumask *affinity, int maxvec)
-+int irq_calc_affinity_vectors(int maxvec, const struct irq_affinity *affd)
- {
--	int cpus, ret;
-+	int resv = affd->pre_vectors + affd->post_vectors;
-+	int vecs = maxvec - resv;
-+	int cpus;
- 
- 	/* Stabilize the cpumasks */
- 	get_online_cpus();
--	/* If the supplied affinity mask is NULL, use cpu online mask */
--	if (!affinity)
--		affinity = cpu_online_mask;
--
--	cpus = cpumask_weight(affinity);
--	ret = (cpus < maxvec) ? cpus : maxvec;
--
-+	cpus = cpumask_weight(cpu_online_mask);
- 	put_online_cpus();
--	return ret;
-+
-+	return min(cpus, vecs) + resv;
- }
 -- 
-2.1.4
+Jens Axboe
