@@ -1,101 +1,26 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv5 12/36] brd: make it handle huge pages
-Date: Tue, 29 Nov 2016 14:22:40 +0300
-Message-Id: <20161129112304.90056-13-kirill.shutemov@linux.intel.com>
-In-Reply-To: <20161129112304.90056-1-kirill.shutemov@linux.intel.com>
-References: <20161129112304.90056-1-kirill.shutemov@linux.intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <tglx@linutronix.de>
+Date: Tue, 8 Nov 2016 15:40:22 +0100 (CET)
+From: Thomas Gleixner <tglx@linutronix.de>
+To: Hannes Reinecke <hare@suse.de>
+cc: Christoph Hellwig <hch@lst.de>, axboe@kernel.dk,
+    linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
+    linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/7] genirq/affinity: Handle pre/post vectors in
+ irq_calc_affinity_vectors()
+In-Reply-To: <1daf8fb5-d58e-9cf4-5b33-b39de1db4c20@suse.de>
+Message-ID: <alpine.DEB.2.20.1611081538530.3501@nanos>
+References: <1478544462-9549-1-git-send-email-hch@lst.de> <1478544462-9549-3-git-send-email-hch@lst.de> <1daf8fb5-d58e-9cf4-5b33-b39de1db4c20@suse.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 List-ID: <linux-block@vger.kernel.org>
 
-Do not assume length of bio segment is never larger than PAGE_SIZE.
-With huge pages it's HPAGE_PMD_SIZE (2M on x86-64).
+On Tue, 8 Nov 2016, Hannes Reinecke wrote:
+> Shouldn't you check for NULL affd here?
 
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
----
- drivers/block/brd.c | 17 ++++++++++++-----
- 1 file changed, 12 insertions(+), 5 deletions(-)
+No. The introduction of the default affinity struct should happen in that
+patch and it should be handed down instead of NULL. Ditto for the next
+patch.
 
-diff --git a/drivers/block/brd.c b/drivers/block/brd.c
-index ad793f35632c..fd050445c5d7 100644
---- a/drivers/block/brd.c
-+++ b/drivers/block/brd.c
-@@ -202,12 +202,15 @@ static int copy_to_brd_setup(struct brd_device *brd, sector_t sector, size_t n)
- 	size_t copy;
- 
- 	copy = min_t(size_t, n, PAGE_SIZE - offset);
-+	n -= copy;
- 	if (!brd_insert_page(brd, sector))
- 		return -ENOSPC;
--	if (copy < n) {
-+	while (n) {
- 		sector += copy >> SECTOR_SHIFT;
- 		if (!brd_insert_page(brd, sector))
- 			return -ENOSPC;
-+		copy = min_t(size_t, n, PAGE_SIZE);
-+		n -= copy;
- 	}
- 	return 0;
- }
-@@ -242,6 +245,7 @@ static void copy_to_brd(struct brd_device *brd, const void *src,
- 	size_t copy;
- 
- 	copy = min_t(size_t, n, PAGE_SIZE - offset);
-+	n -= copy;
- 	page = brd_lookup_page(brd, sector);
- 	BUG_ON(!page);
- 
-@@ -249,10 +253,11 @@ static void copy_to_brd(struct brd_device *brd, const void *src,
- 	memcpy(dst + offset, src, copy);
- 	kunmap_atomic(dst);
- 
--	if (copy < n) {
-+	while (n) {
- 		src += copy;
- 		sector += copy >> SECTOR_SHIFT;
--		copy = n - copy;
-+		copy = min_t(size_t, n, PAGE_SIZE);
-+		n -= copy;
- 		page = brd_lookup_page(brd, sector);
- 		BUG_ON(!page);
- 
-@@ -274,6 +279,7 @@ static void copy_from_brd(void *dst, struct brd_device *brd,
- 	size_t copy;
- 
- 	copy = min_t(size_t, n, PAGE_SIZE - offset);
-+	n -= copy;
- 	page = brd_lookup_page(brd, sector);
- 	if (page) {
- 		src = kmap_atomic(page);
-@@ -282,10 +288,11 @@ static void copy_from_brd(void *dst, struct brd_device *brd,
- 	} else
- 		memset(dst, 0, copy);
- 
--	if (copy < n) {
-+	while (n) {
- 		dst += copy;
- 		sector += copy >> SECTOR_SHIFT;
--		copy = n - copy;
-+		copy = min_t(size_t, n, PAGE_SIZE);
-+		n -= copy;
- 		page = brd_lookup_page(brd, sector);
- 		if (page) {
- 			src = kmap_atomic(page);
--- 
-2.10.2
+Thanks,
 
+	tglx
