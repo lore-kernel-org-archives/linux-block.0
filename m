@@ -1,60 +1,41 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:37738 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752289AbcKHDe7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 7 Nov 2016 22:34:59 -0500
-Date: Mon, 7 Nov 2016 22:34:57 -0500
-From: Mike Snitzer <snitzer@redhat.com>
-To: "Martin K. Petersen" <martin.petersen@oracle.com>
+Return-Path: <martin.petersen@oracle.com>
+To: Mike Snitzer <snitzer@redhat.com>
 Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        dm-devel@redhat.com
-Subject: Re: [PATCH v2] block: disallow changing max_sectors_kb on a request
- stacking device
-Message-ID: <20161108033457.GA30325@redhat.com>
+        dm-devel@redhat.com, "Martin K. Petersen" <martin.petersen@oracle.com>
+Subject: Re: [PATCH v2] block: disallow changing max_sectors_kb on a request stacking device
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
 References: <20161028194549.14556-1-snitzer@redhat.com>
- <20161107164029.GA27464@redhat.com>
- <20161107192646.GA11572@redhat.com>
- <8d0f16fe-7293-3b1c-1c60-32a50c77fa89@kernel.dk>
- <20161107212732.GA28478@redhat.com>
- <yq1zilau1rz.fsf@sermon.lab.mkp.net>
+	<20161107164029.GA27464@redhat.com>
+	<20161107192646.GA11572@redhat.com>
+	<8d0f16fe-7293-3b1c-1c60-32a50c77fa89@kernel.dk>
+	<20161107212732.GA28478@redhat.com>
+Date: Mon, 07 Nov 2016 21:46:24 -0500
+In-Reply-To: <20161107212732.GA28478@redhat.com> (Mike Snitzer's message of
+	"Mon, 7 Nov 2016 16:27:34 -0500")
+Message-ID: <yq1zilau1rz.fsf@sermon.lab.mkp.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <yq1zilau1rz.fsf@sermon.lab.mkp.net>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain
+List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Nov 07 2016 at  9:46pm -0500,
-Martin K. Petersen <martin.petersen@oracle.com> wrote:
+>>>>> "Mike" == Mike Snitzer <snitzer@redhat.com> writes:
 
-> >>>>> "Mike" == Mike Snitzer <snitzer@redhat.com> writes:
-> 
-> Mike,
-> 
-> Mike> You're suggesting that when the DM multipath device's limits are
-> Mike> stacked up from the underlying devices: cap the mpath's
-> Mike> max_hw_sectors to the underlying devices' max_sectors?
-> 
-> That will break SG_IO, firmware upgrades, etc. (things you probably
-> shouldn't do on the MP device in the first place but which users often
-> do).
-> 
-> However, doesn't it make more sense to tweak limits on DM device instead
-> of the underlying ones? It seems a bit counter-intuitive to me to change
-> max_sectors_kb on a different device than the one where the filesystem
-> whose max I/O size you want to change is located.
+Mike,
 
-As you know, the limits are stacked from the bottom-up.
+Mike> You're suggesting that when the DM multipath device's limits are
+Mike> stacked up from the underlying devices: cap the mpath's
+Mike> max_hw_sectors to the underlying devices' max_sectors?
 
-> I guess this brings us back to the desire to be able to restack the
-> limits at will when something changes somewhere...
+That will break SG_IO, firmware upgrades, etc. (things you probably
+shouldn't do on the MP device in the first place but which users often
+do).
 
-Tough to do that in a race-free way when DM multipath requests are
-cloned for submission to the underlying devices.
+However, doesn't it make more sense to tweak limits on DM device instead
+of the underlying ones? It seems a bit counter-intuitive to me to change
+max_sectors_kb on a different device than the one where the filesystem
+whose max I/O size you want to change is located.
 
-As the commit header from this thread mentioned, what I've arrived at is
-to have multipathd establish a desired max_sectors_kb (if configured to
-do so in multipath.conf) on the underlying paths _before_ the multipath
-device is created.  Yet to check with Ben Marzinski or others but it
-seems like a reasonable feature (and really the cleaniset way to deal
-with this issue IMHO.. no need for lots of kernel code changes for
-something so niche).
+I guess this brings us back to the desire to be able to restack the
+limits at will when something changes somewhere...
+
+-- 
+Martin K. Petersen	Oracle Linux Engineering
