@@ -1,154 +1,52 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:58259 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753204AbcKAQjr (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 1 Nov 2016 12:39:47 -0400
-Date: Tue, 1 Nov 2016 17:39:40 +0100
-From: Jan Kara <jack@suse.cz>
-To: "Kirill A. Shutemov" <kirill@shutemov.name>
-Cc: Jan Kara <jack@suse.cz>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        Theodore Ts'o <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCHv3 15/41] filemap: handle huge pages in
- do_generic_file_read()
-Message-ID: <20161101163940.GA5459@quack2.suse.cz>
-References: <20160915115523.29737-1-kirill.shutemov@linux.intel.com>
- <20160915115523.29737-16-kirill.shutemov@linux.intel.com>
- <20161013093313.GB26241@quack2.suse.cz>
- <20161031181035.GA7007@node.shutemov.name>
+Return-Path: <martin.petersen@oracle.com>
+To: Mike Snitzer <snitzer@redhat.com>
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        dm-devel@redhat.com
+Subject: Re: [PATCH v2] block: disallow changing max_sectors_kb on a request stacking device
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <20161028194549.14556-1-snitzer@redhat.com>
+	<20161107164029.GA27464@redhat.com>
+	<20161107192646.GA11572@redhat.com>
+	<8d0f16fe-7293-3b1c-1c60-32a50c77fa89@kernel.dk>
+	<20161107212732.GA28478@redhat.com>
+	<yq1zilau1rz.fsf@sermon.lab.mkp.net>
+	<20161108033457.GA30325@redhat.com>
+Date: Tue, 08 Nov 2016 16:10:02 -0500
+In-Reply-To: <20161108033457.GA30325@redhat.com> (Mike Snitzer's message of
+	"Mon, 7 Nov 2016 22:34:57 -0500")
+Message-ID: <yq1wpgdsmol.fsf@sermon.lab.mkp.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20161031181035.GA7007@node.shutemov.name>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain
+List-ID: <linux-block@vger.kernel.org>
 
-On Mon 31-10-16 21:10:35, Kirill A. Shutemov wrote:
-> [ My mail system got broken and original reply didn't get to through. Resent. ]
+>>>>> "Mike" == Mike Snitzer <snitzer@redhat.com> writes:
 
-OK, this answers some of my questions from previous email so disregard that
-one.
+Mike,
 
-> On Thu, Oct 13, 2016 at 11:33:13AM +0200, Jan Kara wrote:
-> > On Thu 15-09-16 14:54:57, Kirill A. Shutemov wrote:
-> > > Most of work happans on head page. Only when we need to do copy data to
-> > > userspace we find relevant subpage.
-> > > 
-> > > We are still limited by PAGE_SIZE per iteration. Lifting this limitation
-> > > would require some more work.
-> >
-> > Hum, I'm kind of lost.
-> 
-> The limitation here comes from how copy_page_to_iter() and
-> copy_page_from_iter() work wrt. highmem: it can only handle one small
-> page a time.
-> 
-> On write side, we also have problem with assuming small page: write length
-> and offset within page calculated before we know if small or huge page is
-> allocated. It's not easy to fix. Looks like it would require change in
-> ->write_begin() interface to accept len > PAGE_SIZE.
->
-> > Can you point me to some design document / email that would explain some
-> > high level ideas how are huge pages in page cache supposed to work?
-> 
-> I'll elaborate more in cover letter to next revision.
-> 
-> > When are we supposed to operate on the head page and when on subpage?
-> 
-> It's case-by-case. See above explanation why we're limited to PAGE_SIZE
-> here.
-> 
-> > What is protected by the page lock of the head page?
-> 
-> Whole huge page. As with anon pages.
-> 
-> > Do page locks of subpages play any role?
-> 
-> lock_page() on any subpage would lock whole huge page.
-> 
-> > If understand right, e.g.  pagecache_get_page() will return subpages but
-> > is it generally safe to operate on subpages individually or do we have
-> > to be aware that they are part of a huge page?
-> 
-> I tried to make it as transparent as possible: page flag operations will
-> be redirected to head page, if necessary. Things like page_mapping() and
-> page_to_pgoff() know about huge pages.
-> 
-> Direct access to struct page fields must be avoided for tail pages as most
-> of them doesn't have meaning you would expect for small pages.
+>> However, doesn't it make more sense to tweak limits on DM device
+>> instead of the underlying ones? It seems a bit counter-intuitive to
+>> me to change max_sectors_kb on a different device than the one where
+>> the filesystem whose max I/O size you want to change is located.
 
-OK, good to know.
+Mike> As you know, the limits are stacked from the bottom-up.
 
-> > If I understand the motivation right, it is mostly about being able to mmap
-> > PMD-sized chunks to userspace. So my naive idea would be that we could just
-> > implement it by allocating PMD sized chunks of pages when adding pages to
-> > page cache, we don't even have to read them all unless we come from PMD
-> > fault path.
-> 
-> Well, no. We have one PG_{uptodate,dirty,writeback,mappedtodisk,etc}
-> per-hugepage, one common list of buffer heads...
-> 
-> PG_dirty and PG_uptodate behaviour inhered from anon-THP (where handling
-> it otherwise doesn't make sense) and handling it differently for file-THP
-> is nightmare from maintenance POV.
+Yep, but since max_sectors_kb is a performance tunable and not something
+enforced by the hardware, maybe we should consider treating it
+differently?
 
-But the complexity of two different page sizes for page cache and *each*
-filesystem that wants to support it does not make the maintenance easy
-either. So I'm not convinced that using the same rules for anon-THP and
-file-THP is a clear win. And if we have these two options neither of which
-has negligible maintenance cost, I'd also like to see more justification
-for why it is a good idea to have file-THP for normal filesystems. Do you
-have any performance numbers that show it is a win under some realistic
-workload?
+Mike> As the commit header from this thread mentioned, what I've arrived
+Mike> at is to have multipathd establish a desired max_sectors_kb (if
+Mike> configured to do so in multipath.conf) on the underlying paths
+Mike> _before_ the multipath device is created.  Yet to check with Ben
+Mike> Marzinski or others but it seems like a reasonable feature (and
+Mike> really the cleaniset way to deal with this issue IMHO.. no need
+Mike> for lots of kernel code changes for something so niche).
 
-I'd also note that having PMD-sized pages has some obvious disadvantages as
-well:
+That's fine. Another option would be to use the max_dev_sectors queue
+limit to contain the minimum max_sectors from below. It was really only
+envisioned as a LLD limit but it may be useful in this case.
+queue_max_sectors_store() already enforces it.
 
-1) I'm not sure buffer head handling code will quite scale to 512 or even
-2048 buffer_heads on a linked list referenced from a page. It may work but
-I suspect the performance will suck. 
-
-2) PMD-sized pages result in increased space & memory usage.
-
-3) In ext4 we have to estimate how much metadata we may need to modify when
-allocating blocks underlying a page in the worst case (you don't seem to
-update this estimate in your patch set). With 2048 blocks underlying a page,
-each possibly in a different block group, it is a lot of metadata forcing
-us to reserve a large transaction (not sure if you'll be able to even
-reserve such large transaction with the default journal size), which again
-makes things slower.
-
-4) As you have noted some places like write_begin() still depend on 4k
-pages which creates a strange mix of places that use subpages and that use
-head pages.
-
-All this would be a non-issue (well, except 2 I guess) if we just didn't
-expose filesystems to the fact that something like file-THP exists.
-
-> > Reclaim may need to be aware not to split pages unnecessarily
-> > but that's about it. So I'd like to understand what's wrong with this
-> > naive idea and why do filesystems need to be aware that someone wants to
-> > map in PMD sized chunks...
-> 
-> In addition to flags, THP uses some space in struct page of tail pages to
-> encode additional information. See compound_{mapcount,head,dtor,order},
-> page_deferred_list().
-
-Thanks, I'll check that.
-
-								Honza
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Martin K. Petersen	Oracle Linux Engineering
