@@ -1,66 +1,31 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.136]:51300 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S932655AbcKHVVD (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 8 Nov 2016 16:21:03 -0500
-Date: Tue, 8 Nov 2016 15:20:59 -0600
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: tglx@linutronix.de, axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org
+Return-Path: <hch@lst.de>
+Date: Tue, 8 Nov 2016 17:33:17 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Thomas Gleixner <tglx@linutronix.de>
+Cc: Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
+	axboe@kernel.dk, linux-block@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org
 Subject: Re: [PATCH 3/7] genirq/affinity: Handle pre/post vectors in
- irq_create_affinity_masks()
-Message-ID: <20161108212059.GE14322@bhelgaas-glaptop.roam.corp.google.com>
-References: <1478544462-9549-1-git-send-email-hch@lst.de>
- <1478544462-9549-4-git-send-email-hch@lst.de>
+	irq_create_affinity_masks()
+Message-ID: <20161108163317.GA17383@lst.de>
+References: <1478544462-9549-1-git-send-email-hch@lst.de> <1478544462-9549-4-git-send-email-hch@lst.de> <a7e25633-b9fb-468f-fd33-28dbc0368cc1@suse.de> <20161108145508.GA12519@lst.de> <c9ba9026-8ff8-8717-60dc-92672724d5d8@suse.de> <20161108150040.GA13184@lst.de> <alpine.DEB.2.20.1611081727410.3501@nanos>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1478544462-9549-4-git-send-email-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <alpine.DEB.2.20.1611081727410.3501@nanos>
+List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Nov 07, 2016 at 10:47:38AM -0800, Christoph Hellwig wrote:
-> From: Christogh Hellwig <hch@lst.de>
+On Tue, Nov 08, 2016 at 05:27:52PM +0100, Thomas Gleixner wrote:
+> On Tue, 8 Nov 2016, Christoph Hellwig wrote:
 > 
-> Only calculate the affinity for the main I/O vectors, and skip the
-> pre or post vectors specified by struct irq_affinity.
+> > On Tue, Nov 08, 2016 at 03:59:16PM +0100, Hannes Reinecke wrote:
+> > >
+> > > Which you don't in this patch:
+> > 
+> > True.  We will always in the end, but the split isn't right, we'll
+> > need to pass the non-NULL argument starting in this patch.
 > 
-> Also remove the irq_affinity cpumask argument that has never been used.
-> If we ever need it in the future we can pass it through struct
-> irq_affinity.
-> 
-> Signed-off-by: Christogh Hellwig <hch@lst.de>
+> No, in the previous one ....
 
-s/Christogh/Christoph/ (also above, and maybe other patches too?)
-
-Acked-by: Bjorn Helgaas <bhelgaas@google.com>
-
-> ---
->  drivers/pci/msi.c         |  4 ++--
->  include/linux/interrupt.h |  4 ++--
->  kernel/irq/affinity.c     | 46 +++++++++++++++++++++++++---------------------
->  3 files changed, 29 insertions(+), 25 deletions(-)
-> 
-> diff --git a/drivers/pci/msi.c b/drivers/pci/msi.c
-> index c58d3c2..1761b8a 100644
-> --- a/drivers/pci/msi.c
-> +++ b/drivers/pci/msi.c
-> @@ -558,7 +558,7 @@ msi_setup_entry(struct pci_dev *dev, int nvec, bool affinity)
->  	u16 control;
->  
->  	if (affinity) {
-> -		masks = irq_create_affinity_masks(dev->irq_affinity, nvec);
-> +		masks = irq_create_affinity_masks(nvec, NULL);
->  		if (!masks)
->  			pr_err("Unable to allocate affinity masks, ignoring\n");
->  	}
-> @@ -697,7 +697,7 @@ static int msix_setup_entries(struct pci_dev *dev, void __iomem *base,
->  	int ret, i;
->  
->  	if (affinity) {
-> -		masks = irq_create_affinity_masks(dev->irq_affinity, nvec);
-> +		masks = irq_create_affinity_masks(nvec, NULL);
->  		if (!masks)
->  			pr_err("Unable to allocate affinity masks, ignoring\n");
-
-Not caused by this patch, but can we use dev_err() here and above?
+That too, but it's for different functions.  I have a rebased version
+that does this, I'll run it through quick testing and will repost
+it later today.
