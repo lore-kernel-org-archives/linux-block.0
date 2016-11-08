@@ -1,74 +1,68 @@
-Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
-From: Alana Alexander-Rutledge <Alana.Alexander-Rutledge@microsemi.com>
-To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-Subject: Higher block layer latency in kernel v4.8-r6 vs. v4.4.16 for NVMe
-Date: Wed, 9 Nov 2016 01:43:55 +0000
-Message-ID: <33507ACF7FF43A4FBE532BA768AFA4243AF0BECC@avsrvexchmbx1.microsemi.net>
+Return-Path: <prvs=01205f8ab4=axboe@fb.com>
+Subject: Re: [PATCH 8/8] block: hook up writeback throttling
+To: Jan Kara <jack@suse.cz>
+References: <1478034531-28559-1-git-send-email-axboe@fb.com>
+ <1478034531-28559-9-git-send-email-axboe@fb.com>
+ <20161108134233.GR32353@quack2.suse.cz>
+CC: <axboe@kernel.dk>, <linux-kernel@vger.kernel.org>,
+        <linux-fsdevel@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <hch@lst.de>
+From: Jens Axboe <axboe@fb.com>
+Message-ID: <7f0701c4-d8b6-85ad-30a6-ff48401a66f3@fb.com>
+Date: Tue, 8 Nov 2016 08:16:35 -0700
 MIME-Version: 1.0
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
-List-Post: <mailto:linux-nvme@lists.infradead.org>
-List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
-Cc: Stephen Bates <stephen.bates@microsemi.com>
-Content-Type: text/plain; charset="us-ascii"
-Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
-Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
+In-Reply-To: <20161108134233.GR32353@quack2.suse.cz>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-Hi,
+On 11/08/2016 06:42 AM, Jan Kara wrote:
+> On Tue 01-11-16 15:08:51, Jens Axboe wrote:
+>> Enable throttling of buffered writeback to make it a lot
+>> more smooth, and has way less impact on other system activity.
+>> Background writeback should be, by definition, background
+>> activity. The fact that we flush huge bundles of it at the time
+>> means that it potentially has heavy impacts on foreground workloads,
+>> which isn't ideal. We can't easily limit the sizes of writes that
+>> we do, since that would impact file system layout in the presence
+>> of delayed allocation. So just throttle back buffered writeback,
+>> unless someone is waiting for it.
+>>
+>> The algorithm for when to throttle takes its inspiration in the
+>> CoDel networking scheduling algorithm. Like CoDel, blk-wb monitors
+>> the minimum latencies of requests over a window of time. In that
+>> window of time, if the minimum latency of any request exceeds a
+>> given target, then a scale count is incremented and the queue depth
+>> is shrunk. The next monitoring window is shrunk accordingly. Unlike
+>> CoDel, if we hit a window that exhibits good behavior, then we
+>> simply increment the scale count and re-calculate the limits for that
+>> scale value. This prevents us from oscillating between a
+>> close-to-ideal value and max all the time, instead remaining in the
+>> windows where we get good behavior.
+>>
+>> Unlike CoDel, blk-wb allows the scale count to to negative. This
+>> happens if we primarily have writes going on. Unlike positive
+>> scale counts, this doesn't change the size of the monitoring window.
+>> When the heavy writers finish, blk-bw quickly snaps back to it's
+>> stable state of a zero scale count.
+>>
+>> The patch registers two sysfs entries. The first one, 'wb_window_usec',
+>> defines the window of monitoring. The second one, 'wb_lat_usec',
+>> sets the latency target for the window. It defaults to 2 msec for
+>> non-rotational storage, and 75 msec for rotational storage. Setting
+>> this value to '0' disables blk-wb. Generally, a user would not have
+>> to touch these settings.
+>>
+>> We don't enable WBT on devices that are managed with CFQ, and have
+>> a non-root block cgroup attached. If we have a proportional share setup
+>> on this particular disk, then the wbt throttling will interfere with
+>> that. We don't have a strong need for wbt for that case, since we will
+>> rely on CFQ doing that for us.
+>
+> Just one nit: Don't you miss wbt_exit() call for legacy block layer? I
+> don't see where that happens.
 
-I have been profiling the performance of the NVMe and SAS IO stacks on Linux.  I used blktrace and blkparse to collect block layer trace points and a custom analysis script on the trace points to average out the latencies of each trace point interval of each IO.
+Huh yes, good point, that must have been lost along the way. I'll readd
+it.
 
-I started with Linux kernel v4.4.16 but then switched to v4.8-r6.  One thing that stood out is that for measurements at queue depth = 1, the average Q2D latency was quite a bit higher in the NVMe path with the newer version of the kernel.
-
-The Q, G, I, and D below refer to blktrace/blkparse trace points (queued, get request, inserted, and issued).
-
-Queue Depth = 1       
-Interval   Average - v4.4.16 (us) Average - v4.8-rc6 (us)
-Q2G         0.212                             0.573
-G2I           0.944                             1.507
-I2D           0.435                             0.837
-Q2D         1.592                             2.917
-
-For other queue depths, Q2D was similar for both versions of the kernel.
-
-Queue Depth     Average Q2D - v4.4.16 (us)  Average Q2D - v4.8-rc6 (us)
-2                          1.893                                        1.736
-4                          1.289                                        1.38
-8                          1.223                                        1.162
-16                        1.14                                          1.178
-32                        1.007                                        1.425
-64                        0.964                                        0.978
-128                      0.915                                        0.941
-
-I did not see this as a problem with the 12G SAS SSD that I measured.
-
-Queue Depth = 1
-Interval   Average - v4.4.16 (us) Average - v4.8-rc6 (us)
-Q2G        0.264                              0.301           
-G2I          0.917                              0.864
-I2D          0.432                              0.397
-Q2D        1.613                              1.561
-
-Is this a known change or do you know what the reason for this is?
-
-My data flows were 4KB random reads, 4KB aligned, generated with fio/libaio.  I am running IOs against a 4G file on an ext4 file system.  The above measurements are the averaged over 1 million IOs.
-
-I am using a Ubuntu 16.04.1
-
-I am running on a Supermicro server with an Intel Xeon CPU E5-2690 v3 @ 2.6 GHz, 12 cores.  Hyperthreading is enabled and SpeedStep is disabled.
-
-My NVMe drive is an Intel SSD P3700 Series, 400 GB.
-
-Thanks,
-
-Alana
-
-_______________________________________________
-Linux-nvme mailing list
-Linux-nvme@lists.infradead.org
-http://lists.infradead.org/mailman/listinfo/linux-nvme
+-- 
+Jens Axboe
