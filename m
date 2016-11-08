@@ -1,64 +1,101 @@
-Return-Path: <prvs=011358c635=axboe@fb.com>
-From: Jens Axboe <axboe@fb.com>
-To: <axboe@kernel.dk>, <linux-kernel@vger.kernel.org>,
-        <linux-fsdevel@vger.kernel.org>, <linux-block@vger.kernel.org>
-CC: <jack@suse.cz>, <hch@lst.de>, Jens Axboe <axboe@fb.com>
-Subject: [PATCH 4/8] writeback: track if we're sleeping on progress in balance_dirty_pages()
-Date: Tue, 1 Nov 2016 15:08:47 -0600
-Message-ID: <1478034531-28559-5-git-send-email-axboe@fb.com>
-In-Reply-To: <1478034531-28559-1-git-send-email-axboe@fb.com>
-References: <1478034531-28559-1-git-send-email-axboe@fb.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from ipmail07.adl2.internode.on.net ([150.101.137.131]:18099 "EHLO
+        ipmail07.adl2.internode.on.net" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1752225AbcKHBkF (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 7 Nov 2016 20:40:05 -0500
+Date: Tue, 8 Nov 2016 12:38:05 +1100
+From: Dave Chinner <david@fromorbit.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-xfs@vger.kernel.org, axboe@fb.com, kent.overstreet@gmail.com,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH 4/5] iomap: implement direct I/O
+Message-ID: <20161108013805.GA28922@dastard>
+References: <1478276479-10749-1-git-send-email-hch@lst.de>
+ <1478276479-10749-5-git-send-email-hch@lst.de>
+ <20161106224049.GP14023@dastard>
+ <20161107150807.GA10865@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20161107150807.GA10865@lst.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Note in the bdi_writeback structure whenever a task ends up sleeping
-waiting for progress. We can use that information in the lower layers
-to increase the priority of writes.
+On Mon, Nov 07, 2016 at 04:08:07PM +0100, Christoph Hellwig wrote:
+> On Mon, Nov 07, 2016 at 09:40:49AM +1100, Dave Chinner wrote:
+> > > +	case IOMAP_HOLE:
+> > > +		/*
+> > > +		 * We return -ENOTBLK to fall back to buffered I/O for file
+> > > +		 * systems that can't fill holes from direct writes.
+> > > +		 */
+> > > +		if (dio->flags & IOMAP_DIO_WRITE)
+> > > +			return -ENOTBLK;
+> > > +		/*FALLTHRU*/
+> > 
+> > This is preventing direct IO writes from being done into holes for
+> > all filesystems.
+> 
+> It's not.  Hint:  the whole iomap code very much assumes a file system
+> fills holes before applying the actor on writes.
+> 
+> That being said I should remove this check - as-is it's dead, untested
+> code that I only used for my aborted ext2 conversion, so we're better
+> off not having it.
 
-Signed-off-by: Jens Axboe <axboe@fb.com>
----
- include/linux/backing-dev-defs.h | 2 ++
- mm/backing-dev.c                 | 1 +
- mm/page-writeback.c              | 1 +
- 3 files changed, 4 insertions(+)
+Yup, agreed.
 
-diff --git a/include/linux/backing-dev-defs.h b/include/linux/backing-dev-defs.h
-index c357f27d5483..dc5f76d7f648 100644
---- a/include/linux/backing-dev-defs.h
-+++ b/include/linux/backing-dev-defs.h
-@@ -116,6 +116,8 @@ struct bdi_writeback {
- 	struct list_head work_list;
- 	struct delayed_work dwork;	/* work item used for writeback */
- 
-+	unsigned long dirty_sleep;	/* last wait */
-+
- 	struct list_head bdi_node;	/* anchored at bdi->wb_list */
- 
- #ifdef CONFIG_CGROUP_WRITEBACK
-diff --git a/mm/backing-dev.c b/mm/backing-dev.c
-index 8fde443f36d7..3bfed5ab2475 100644
---- a/mm/backing-dev.c
-+++ b/mm/backing-dev.c
-@@ -310,6 +310,7 @@ static int wb_init(struct bdi_writeback *wb, struct backing_dev_info *bdi,
- 	spin_lock_init(&wb->work_lock);
- 	INIT_LIST_HEAD(&wb->work_list);
- 	INIT_DELAYED_WORK(&wb->dwork, wb_workfn);
-+	wb->dirty_sleep = jiffies;
- 
- 	wb->congested = wb_congested_get_create(bdi, blkcg_id, gfp);
- 	if (!wb->congested)
-diff --git a/mm/page-writeback.c b/mm/page-writeback.c
-index 439cc63ad903..52e2f8e3b472 100644
---- a/mm/page-writeback.c
-+++ b/mm/page-writeback.c
-@@ -1778,6 +1778,7 @@ static void balance_dirty_pages(struct address_space *mapping,
- 					  pause,
- 					  start_time);
- 		__set_current_state(TASK_KILLABLE);
-+		wb->dirty_sleep = now;
- 		io_schedule_timeout(pause);
- 
- 		current->dirty_paused_when = now + pause;
+> > > +	iov_iter_truncate(&iter, length);
+> > 
+> > Won't this truncate the entire DIO down to the length of the first
+> > extent that is mapped? 
+> 
+> It truncates a copy of the main iter down to the length of the extent
+> we're working on.  That allows us to limit all the iov_iter based helper
+> (most importantly get_user_pages) to only operate on a given extent.
+> Later in the function we then advance the primary iter when moving to
+> the next extent.
+
+Hmmm, I must be missing something here. iomap_dio_rw() stores a
+pointer to the primary iter in the dio structure, and that gets
+passed to the actor function, and then it....
+
+Oh, bloody hell, Christoph! :/ You hid a structure copy in the
+variable initialisations and used the same variable name for the
+copy as the primary pointer:
+
+	struct iov_iter iter = *dio->submit.iter;
+
+That's really subtle and easy for idiots like me to miss when
+reading the code. Please make it clear that we're working on
+a copy of the primary iter here, not the primary iter itself.
+
+> > > +		if (ret <= 0) {
+> > > +			/* magic error code to fall back to buffered I/O */
+> > > +			if (ret == -ENOTBLK)
+> > > +				ret = 0;
+> > > +			break;
+> > > +		}
+> > > +		pos += ret;
+> > > +	} while ((count = iov_iter_count(iter)) > 0);
+> > > +	blk_finish_plug(&plug);
+> > > +
+> > > +	if (ret < 0)
+> > > +		cmpxchg(&dio->error, 0, ret);
+> > 
+> > Why cmpxchg? What are we racing with here? Helper (e.g.
+> > dio_set_error())?
+> 
+> The submission thread against I/O completions (which in the worst
+> case could come from multiple threads as well).  Same reason as
+> the one in xfs_buf_bio_end_io added in commit 9bdd9bd69b
+> ("xfs: buffer ->bi_end_io function requires irq-safe lock")
+
+Yup, that's what I suspected - a comment is needed at least, though,
+IMO, a helper w/ comment is the most maintainable approach here.
+
+Cheers,
+
+Dave.
 -- 
-2.7.4
+Dave Chinner
+david@fromorbit.com
