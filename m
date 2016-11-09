@@ -1,49 +1,37 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-by2nam01on0084.outbound.protection.outlook.com ([104.47.34.84]:34957
-        "EHLO NAM01-BY2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S933528AbcKNQzh (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Nov 2016 11:55:37 -0500
-Subject: Re: [PATCH] bsg: Add sparse annotations to bsg_request_fn()
-To: Jens Axboe <axboe@fb.com>
-References: <6dfb1793-ca6a-c3b6-b3fc-272e68ca6880@sandisk.com>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-Message-ID: <b8f96aed-5cd5-26f0-5c14-4f1ace05dd51@sandisk.com>
-Date: Mon, 14 Nov 2016 08:55:22 -0800
+Return-Path: <tglx@linutronix.de>
+Date: Wed, 9 Nov 2016 16:09:00 +0100 (CET)
+From: Thomas Gleixner <tglx@linutronix.de>
+To: Christoph Hellwig <hch@infradead.org>
+cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+    linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
+    linux-kernel@vger.kernel.org
+Subject: Re: support for partial irq affinity assignment V3
+In-Reply-To: <20161109151027.GA25267@infradead.org>
+Message-ID: <alpine.DEB.2.20.1611091608220.3501@nanos>
+References: <1478654107-7384-1-git-send-email-hch@lst.de> <f5270fd9-488f-a954-ba3c-1f7800820731@kernel.dk> <alpine.DEB.2.20.1611090849450.3501@nanos> <20161109151027.GA25267@infradead.org>
 MIME-Version: 1.0
-In-Reply-To: <6dfb1793-ca6a-c3b6-b3fc-272e68ca6880@sandisk.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+List-ID: <linux-block@vger.kernel.org>
 
-On 09/25/2016 07:54 PM, Bart Van Assche wrote:
-> Avoid that sparse complains about unbalanced lock actions.
->
-> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-> ---
->  block/bsg-lib.c | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/block/bsg-lib.c b/block/bsg-lib.c
-> index 650f427..b2a61e3 100644
-> --- a/block/bsg-lib.c
-> +++ b/block/bsg-lib.c
-> @@ -161,6 +161,8 @@ failjob_rls_job:
->   * Drivers/subsys should pass this to the queue init function.
->   */
->  void bsg_request_fn(struct request_queue *q)
-> +	__releases(q->queue_lock)
-> +	__acquires(q->queue_lock)
->  {
->  	struct device *dev = q->queuedata;
->  	struct request *req;
->
+On Wed, 9 Nov 2016, Christoph Hellwig wrote:
+> On Wed, Nov 09, 2016 at 08:51:35AM +0100, Thomas Gleixner wrote:
+> > It's available from
+> > 
+> >   git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git irq/for-block
+> > 
+> > for you to pull into the block tree so you can apply the block changes.
+> 
+> I don't actually need them in the block tree, but in the SCSI tree..
+> So the block tree is a bad place for this, that's why I initially
+> wanted you to pick it up.  But thinking about it the SCSI tree might
+> a better idea as we could avoid a non-bisectability with that.
 
-Hi Jens,
+Right.
+ 
+> I'll coordinate it with Jens and Martin and we'll leave you off the
+> hook.  Thanks for all the help!
 
-Do you agree with this patch? If so, can you queue it for kernel v4.10?
+You're welcome!
 
-Thanks,
-
-Bart.
+       tglx
+ 
