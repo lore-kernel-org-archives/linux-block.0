@@ -1,29 +1,29 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: support for partial irq affinity assignment V3
-To: Christoph Hellwig <hch@lst.de>, tglx@linutronix.de
-References: <1478654107-7384-1-git-send-email-hch@lst.de>
-Cc: linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
- linux-kernel@vger.kernel.org
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <f5270fd9-488f-a954-ba3c-1f7800820731@kernel.dk>
-Date: Tue, 8 Nov 2016 21:38:11 -0700
-MIME-Version: 1.0
-In-Reply-To: <1478654107-7384-1-git-send-email-hch@lst.de>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Return-Path: <BATV+25dcfc0f7ff0c40b5b4f+4826+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: tglx@linutronix.de
+Cc: axboe@kernel.dk,
+	linux-block@vger.kernel.org,
+	linux-pci@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: support for partial irq affinity assignment V3
+Date: Tue,  8 Nov 2016 17:15:00 -0800
+Message-Id: <1478654107-7384-1-git-send-email-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-On 11/08/2016 06:15 PM, Christoph Hellwig wrote:
-> This series adds support for automatic interrupt assignment to devices
-> that have a few vectors that are set aside for admin or config purposes
-> and thus should not fall into the general per-cpu assginment pool.
->
-> The first patch adds that support to the core IRQ and PCI/msi code,
-> and the second is a small tweak to a block layer helper to make use
-> of it.  I'd love to have both go into the same tree so that consumers
-> of this (e.g. the virtio, scsi and rdma trees) only need to pull in
-> one of these trees as dependency.
+This series adds support for automatic interrupt assignment to devices
+that have a few vectors that are set aside for admin or config purposes
+and thus should not fall into the general per-cpu assginment pool.
 
-Series looks good to me, you can add my Acked-by to all of them.
+The first patch adds that support to the core IRQ and PCI/msi code,
+and the second is a small tweak to a block layer helper to make use
+of it.  I'd love to have both go into the same tree so that consumers
+of this (e.g. the virtio, scsi and rdma trees) only need to pull in
+one of these trees as dependency.
 
--- 
-Jens Axboe
+Changes since V3:
+ - lots of typo fixes
+ - fixed an argument name
+
+Changes since V1:
+ - split up into more patches (thanks to Thomas for the initial work)
+ - simplify internal parameter passing a bit (also thanks to Thomas)
