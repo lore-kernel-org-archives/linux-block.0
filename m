@@ -1,21 +1,38 @@
-Return-Path: <BATV+fbdc7abeb5f03b4a914d+4823+infradead.org+hch@bombadil.srs.infradead.org>
+Return-Path: <BATV+25dcfc0f7ff0c40b5b4f+4826+infradead.org+hch@bombadil.srs.infradead.org>
 From: Christoph Hellwig <hch@lst.de>
 To: tglx@linutronix.de
 Cc: axboe@kernel.dk,
 	linux-block@vger.kernel.org,
 	linux-pci@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: support for partial irq affinity assignment
-Date: Sun,  6 Nov 2016 15:07:24 -0800
-Message-Id: <1478473646-12524-1-git-send-email-hch@lst.de>
+Subject: [PATCH 6/7] PCI: Remove the irq_affinity mask from struct pci_dev
+Date: Tue,  8 Nov 2016 17:15:06 -0800
+Message-Id: <1478654107-7384-7-git-send-email-hch@lst.de>
+In-Reply-To: <1478654107-7384-1-git-send-email-hch@lst.de>
+References: <1478654107-7384-1-git-send-email-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-This series adds support for automatic interrupt assignment to devices
-that have a few vectors that are set aside for admin or config purposes
-and thus should not fall into the general per-cpu assginment pool.
+This has never been used, and now is totally unreferenced.  Nuke it.
 
-The first patch adds that support to the core IRQ and PCI/msi code,
-and the second is a small tweak to a block layer helper to make use
-of it.  I'd love to have both go into the same tree so that consumers
-of this (e.g. the virtio, scsi and rdma trees) only need to pull in
-one of these trees as dependency.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Acked-by: Bjorn Helgaas <bhelgaas@google.com>
+---
+ include/linux/pci.h | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/include/linux/pci.h b/include/linux/pci.h
+index 7090f5f..f2ba6ac 100644
+--- a/include/linux/pci.h
++++ b/include/linux/pci.h
+@@ -333,7 +333,6 @@ struct pci_dev {
+ 	 * directly, use the values stored here. They might be different!
+ 	 */
+ 	unsigned int	irq;
+-	struct cpumask	*irq_affinity;
+ 	struct resource resource[DEVICE_COUNT_RESOURCE]; /* I/O and memory regions + expansion ROMs */
+ 
+ 	bool match_driver;		/* Skip attaching driver */
+-- 
+2.1.4
