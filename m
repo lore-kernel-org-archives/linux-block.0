@@ -1,53 +1,38 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f193.google.com ([209.85.192.193]:35253 "EHLO
-        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933254AbcKKMHE (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 11 Nov 2016 07:07:04 -0500
-From: Ming Lei <tom.leiming@gmail.com>
-To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Ming Lei <tom.leiming@gmail.com>,
-        Joern Engel <joern@logfs.org>,
-        Prasad Joshi <prasadjoshi.linux@gmail.com>,
-        logfs@logfs.org (open list:LogFS)
-Subject: [PATCH 09/12] fs: logfs: convert to bio_add_page() in sync_request()
-Date: Fri, 11 Nov 2016 20:05:37 +0800
-Message-Id: <1478865957-25252-10-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1478865957-25252-1-git-send-email-tom.leiming@gmail.com>
-References: <1478865957-25252-1-git-send-email-tom.leiming@gmail.com>
+Received: from verein.lst.de ([213.95.11.211]:41096 "EHLO newverein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S965893AbcKJUHU (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 10 Nov 2016 15:07:20 -0500
+Date: Thu, 10 Nov 2016 21:07:17 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Dan Carpenter <dan.carpenter@oracle.com>
+Cc: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@lst.de>,
+        Mike Christie <mchristi@redhat.com>,
+        Shaun Tancheff <shaun.tancheff@seagate.com>,
+        Hannes Reinecke <hare@suse.com>,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Bart Van Assche <bart.vanassche@sandisk.com>,
+        Ming Lei <ming.lei@canonical.com>, linux-block@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: Re: [patch] block: precedence bug in bio_set_op_attrs() macro
+Message-ID: <20161110200717.GA21893@lst.de>
+References: <20161110200438.GA22854@mwanda>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20161110200438.GA22854@mwanda>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Always bio_add_page() is the standard and preferred way to
-do the task.
+On Thu, Nov 10, 2016 at 11:04:38PM +0300, Dan Carpenter wrote:
+> This code causes a problem for flush_epd_write_bio() because | has
+> higher precedence than ?: so it basically turns into:
+> 
+> 	((bio)->bi_opf |= REQ_SYNC;
+> 
+> Which is wrong.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
----
- fs/logfs/dev_bdev.c | 6 +-----
- 1 file changed, 1 insertion(+), 5 deletions(-)
+Its is.  And while we're at it the macro should really be doing a
+= instead of |=.
 
-diff --git a/fs/logfs/dev_bdev.c b/fs/logfs/dev_bdev.c
-index dc8cafeee038..e01075790600 100644
---- a/fs/logfs/dev_bdev.c
-+++ b/fs/logfs/dev_bdev.c
-@@ -20,13 +20,9 @@ static int sync_request(struct page *page, struct block_device *bdev, int op)
- 	struct bio_vec bio_vec;
- 
- 	bio_init(&bio, &bio_vec, 1);
--	bio_vec.bv_page = page;
--	bio_vec.bv_len = PAGE_SIZE;
--	bio_vec.bv_offset = 0;
--	bio.bi_vcnt = 1;
- 	bio.bi_bdev = bdev;
-+	bio_add_page(&bio, page, PAGE_SIZE, 0);
- 	bio.bi_iter.bi_sector = page->index * (PAGE_SIZE >> 9);
--	bio.bi_iter.bi_size = PAGE_SIZE;
- 	bio_set_op_attrs(&bio, op, 0);
- 
- 	return submit_bio_wait(&bio);
--- 
-2.7.4
-
+And we really should stop using it, at least in the block core even
+ASAP.
