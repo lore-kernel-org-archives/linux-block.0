@@ -1,123 +1,27 @@
-Return-Path: <prvs=0123dbb5f9=axboe@fb.com>
+Subject: Re: [PATCH] LightNVM fix for 4.9-rc5
+To: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <m@bjorling.me>,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <1478777191-10160-1-git-send-email-m@bjorling.me>
+Cc: keith.busch@intel.com
 From: Jens Axboe <axboe@fb.com>
-To: <axboe@kernel.dk>, <linux-block@vger.kernel.org>
-CC: <jack@suse.cz>, Jens Axboe <axboe@fb.com>
-Subject: [PATCH 1/2] blk-wbt: store queue instead of bdi
-Date: Fri, 11 Nov 2016 08:21:56 -0700
-Message-ID: <1478877717-19624-2-git-send-email-axboe@fb.com>
-In-Reply-To: <1478877717-19624-1-git-send-email-axboe@fb.com>
-References: <1478877717-19624-1-git-send-email-axboe@fb.com>
+Message-ID: <37163de8-1e1a-a6d3-56f5-8343c2d3954f@fb.com>
+Date: Thu, 10 Nov 2016 08:03:41 -0700
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <1478777191-10160-1-git-send-email-m@bjorling.me>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-The bdi was a leftover from when the code was block layer agnostic.
-Now that we just support a block layer user, store the queue directly.
+On 11/10/2016 04:26 AM, Matias Bjørling wrote:
+> Hi Jens,
+>
+> A small calculation bug sneaked into 4.9, which led to data loss using the rrpc
+> FTL.
+>
+> Can the fix be picked up for next -rc, or should I mark it for stable after the
+> 4.9 release?
 
-Signed-off-by: Jens Axboe <axboe@fb.com>
----
- block/blk-wbt.c | 20 ++++++++++++--------
- block/blk-wbt.h |  4 +---
- 2 files changed, 13 insertions(+), 11 deletions(-)
+We can put it in this release, it's a regression fix for a bug
+introduced in this cycle. I'll add it.
 
-diff --git a/block/blk-wbt.c b/block/blk-wbt.c
-index 889c17ff8503..4ab9cebc8003 100644
---- a/block/blk-wbt.c
-+++ b/block/blk-wbt.c
-@@ -96,7 +96,7 @@ static void wb_timestamp(struct rq_wb *rwb, unsigned long *var)
-  */
- static bool wb_recent_wait(struct rq_wb *rwb)
- {
--	struct bdi_writeback *wb = &rwb->bdi->wb;
-+	struct bdi_writeback *wb = &rwb->queue->backing_dev_info.wb;
- 
- 	return time_before(jiffies, wb->dirty_sleep + HZ);
- }
-@@ -279,6 +279,7 @@ enum {
- 
- static int __latency_exceeded(struct rq_wb *rwb, struct blk_rq_stat *stat)
- {
-+	struct backing_dev_info *bdi = &rwb->queue->backing_dev_info;
- 	u64 thislat;
- 
- 	/*
-@@ -293,7 +294,7 @@ static int __latency_exceeded(struct rq_wb *rwb, struct blk_rq_stat *stat)
- 	thislat = rwb_sync_issue_lat(rwb);
- 	if (thislat > rwb->cur_win_nsec ||
- 	    (thislat > rwb->min_lat_nsec && !stat[0].nr_samples)) {
--		trace_wbt_lat(rwb->bdi, thislat);
-+		trace_wbt_lat(bdi, thislat);
- 		return LAT_EXCEEDED;
- 	}
- 
-@@ -317,13 +318,13 @@ static int __latency_exceeded(struct rq_wb *rwb, struct blk_rq_stat *stat)
- 	 * If the 'min' latency exceeds our target, step down.
- 	 */
- 	if (stat[0].min > rwb->min_lat_nsec) {
--		trace_wbt_lat(rwb->bdi, stat[0].min);
--		trace_wbt_stat(rwb->bdi, stat);
-+		trace_wbt_lat(bdi, stat[0].min);
-+		trace_wbt_stat(bdi, stat);
- 		return LAT_EXCEEDED;
- 	}
- 
- 	if (rwb->scale_step)
--		trace_wbt_stat(rwb->bdi, stat);
-+		trace_wbt_stat(bdi, stat);
- 
- 	return LAT_OK;
- }
-@@ -338,7 +339,9 @@ static int latency_exceeded(struct rq_wb *rwb)
- 
- static void rwb_trace_step(struct rq_wb *rwb, const char *msg)
- {
--	trace_wbt_step(rwb->bdi, msg, rwb->scale_step, rwb->cur_win_nsec,
-+	struct backing_dev_info *bdi = &rwb->queue->backing_dev_info;
-+
-+	trace_wbt_step(bdi, msg, rwb->scale_step, rwb->cur_win_nsec,
- 			rwb->wb_background, rwb->wb_normal, rwb->wb_max);
- }
- 
-@@ -420,7 +423,8 @@ static void wb_timer_fn(unsigned long data)
- 
- 	status = latency_exceeded(rwb);
- 
--	trace_wbt_timer(rwb->bdi, status, rwb->scale_step, inflight);
-+	trace_wbt_timer(&rwb->queue->backing_dev_info, status, rwb->scale_step,
-+			inflight);
- 
- 	/*
- 	 * If we exceeded the latency target, step down. If we did not,
-@@ -700,7 +704,7 @@ int wbt_init(struct request_queue *q, struct wb_stat_ops *ops)
- 	rwb->wc = 1;
- 	rwb->queue_depth = RWB_DEF_DEPTH;
- 	rwb->last_comp = rwb->last_issue = jiffies;
--	rwb->bdi = &q->backing_dev_info;
-+	rwb->queue = q;
- 	rwb->win_nsec = RWB_WINDOW_NSEC;
- 	rwb->stat_ops = ops;
- 	rwb->ops_data = q;
-diff --git a/block/blk-wbt.h b/block/blk-wbt.h
-index e57700337c26..09c61a3f8295 100644
---- a/block/blk-wbt.h
-+++ b/block/blk-wbt.h
-@@ -87,7 +87,7 @@ struct rq_wb {
- 	unsigned long last_issue;		/* last non-throttled issue */
- 	unsigned long last_comp;		/* last non-throttled comp */
- 	unsigned long min_lat_nsec;
--	struct backing_dev_info *bdi;
-+	struct request_queue *queue;
- 	struct rq_wait rq_wait[WBT_NUM_RWQ];
- 
- 	struct wb_stat_ops *stat_ops;
-@@ -104,8 +104,6 @@ static inline unsigned int wbt_inflight(struct rq_wb *rwb)
- 	return ret;
- }
- 
--struct backing_dev_info;
--
- #ifdef CONFIG_BLK_WBT
- 
- void __wbt_done(struct rq_wb *, enum wbt_flags);
 -- 
-2.7.4
+Jens Axboe
