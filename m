@@ -1,45 +1,33 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-vk0-f48.google.com ([209.85.213.48]:32956 "EHLO
+        mail-vk0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1756076AbcKKIjF (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 11 Nov 2016 03:39:05 -0500
+Received: by mail-vk0-f48.google.com with SMTP id 137so8302844vkl.0
+        for <linux-block@vger.kernel.org>; Fri, 11 Nov 2016 00:39:04 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <20161110193523.GA11452@infradead.org>
+References: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
+ <1477728600-12938-5-git-send-email-tom.leiming@gmail.com> <20161110193523.GA11452@infradead.org>
 From: Ming Lei <tom.leiming@gmail.com>
-To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Ming Lei <tom.leiming@gmail.com>,
-        Jiri Kosina <jikos@kernel.org>,
-        Mike Christie <mchristi@redhat.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>
-Subject: [PATCH 03/12] block: floppy: use bio_add_page()
-Date: Fri, 11 Nov 2016 20:05:31 +0800
-Message-Id: <1478865957-25252-4-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1478865957-25252-1-git-send-email-tom.leiming@gmail.com>
-References: <1478865957-25252-1-git-send-email-tom.leiming@gmail.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Date: Fri, 11 Nov 2016 16:39:03 +0800
+Message-ID: <CACVXFVPey6N60rKH5vgh7F7zQ778=RpcUbHCw_C1VCLRbOpYyA@mail.gmail.com>
+Subject: Re: [PATCH 04/60] block: floppy: use bio_add_page()
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Jens Axboe <axboe@fb.com>,
+        linux-block <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
----
- drivers/block/floppy.c | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
+On Fri, Nov 11, 2016 at 3:35 AM, Christoph Hellwig <hch@infradead.org> wrote:
+> Hi Ming,
+>
+> any chance you could send out a series with the various bio_add_page
+> soon-ish?  I'd really like to get all the good prep work in for
 
-diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
-index 6a3ff2b2e3ae..a391a3cfb3fe 100644
---- a/drivers/block/floppy.c
-+++ b/drivers/block/floppy.c
-@@ -3807,12 +3807,9 @@ static int __floppy_read_block_0(struct block_device *bdev, int drive)
- 	cbdata.drive = drive;
- 
- 	bio_init(&bio, &bio_vec, 1);
--	bio_vec.bv_page = page;
--	bio_vec.bv_len = size;
--	bio_vec.bv_offset = 0;
--	bio.bi_vcnt = 1;
--	bio.bi_iter.bi_size = size;
- 	bio.bi_bdev = bdev;
-+	bio_add_page(&bio, page, size, 0);
-+
- 	bio.bi_iter.bi_sector = 0;
- 	bio.bi_flags |= (1 << BIO_QUIET);
- 	bio.bi_private = &cbdata;
--- 
-2.7.4
+No problem, will post out v1 later
 
+thanks,
+Ming Lei
