@@ -1,36 +1,58 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:33322 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752054AbcKUOt1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Nov 2016 09:49:27 -0500
-Date: Mon, 21 Nov 2016 09:49:26 -0500
-From: Mike Snitzer <snitzer@redhat.com>
-To: Ming Lei <tom.leiming@gmail.com>
-Cc: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Ming Lei <tom.leiming@gmail.com>
+To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
+Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         Christoph Hellwig <hch@infradead.org>,
+        Ming Lei <tom.leiming@gmail.com>,
         Alasdair Kergon <agk@redhat.com>,
-        "maintainer:DEVICE-MAPPER (LVM)" <dm-devel@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        dm-devel@redhat.com (maintainer:DEVICE-MAPPER (LVM)),
         Shaohua Li <shli@kernel.org>,
-        "open list:SOFTWARE RAID (Multiple Disks) SUPPORT"
-        <linux-raid@vger.kernel.org>
-Subject: Re: [PATCH 06/12] dm: crypt: use bio_add_page()
-Message-ID: <20161121144925.GA23051@redhat.com>
+        linux-raid@vger.kernel.org (open list:SOFTWARE RAID (Multiple Disks)
+        SUPPORT)
+Subject: [PATCH 06/12] dm: crypt: use bio_add_page()
+Date: Fri, 11 Nov 2016 20:05:34 +0800
+Message-Id: <1478865957-25252-7-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1478865957-25252-1-git-send-email-tom.leiming@gmail.com>
 References: <1478865957-25252-1-git-send-email-tom.leiming@gmail.com>
- <1478865957-25252-7-git-send-email-tom.leiming@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1478865957-25252-7-git-send-email-tom.leiming@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-On Fri, Nov 11 2016 at  7:05am -0500,
-Ming Lei <tom.leiming@gmail.com> wrote:
+We have the standard interface to add page to bio, so don't
+do that in hacking way.
 
-> We have the standard interface to add page to bio, so don't
-> do that in hacking way.
-> 
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+---
+ drivers/md/dm-crypt.c | 8 +-------
+ 1 file changed, 1 insertion(+), 7 deletions(-)
 
-I've staged this for 4.10
+diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
+index 68a9eb4f3f36..e4f86bead9d3 100644
+--- a/drivers/md/dm-crypt.c
++++ b/drivers/md/dm-crypt.c
+@@ -994,7 +994,6 @@ static struct bio *crypt_alloc_buffer(struct dm_crypt_io *io, unsigned size)
+ 	gfp_t gfp_mask = GFP_NOWAIT | __GFP_HIGHMEM;
+ 	unsigned i, len, remaining_size;
+ 	struct page *page;
+-	struct bio_vec *bvec;
+ 
+ retry:
+ 	if (unlikely(gfp_mask & __GFP_DIRECT_RECLAIM))
+@@ -1019,12 +1018,7 @@ static struct bio *crypt_alloc_buffer(struct dm_crypt_io *io, unsigned size)
+ 
+ 		len = (remaining_size > PAGE_SIZE) ? PAGE_SIZE : remaining_size;
+ 
+-		bvec = &clone->bi_io_vec[clone->bi_vcnt++];
+-		bvec->bv_page = page;
+-		bvec->bv_len = len;
+-		bvec->bv_offset = 0;
+-
+-		clone->bi_iter.bi_size += len;
++		bio_add_page(clone, page, len, 0);
+ 
+ 		remaining_size -= len;
+ 	}
+-- 
+2.7.4
+
