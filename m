@@ -1,29 +1,59 @@
-Return-Path: <BATV+25dcfc0f7ff0c40b5b4f+4826+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: tglx@linutronix.de
-Cc: axboe@kernel.dk,
-	linux-block@vger.kernel.org,
-	linux-pci@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: support for partial irq affinity assignment V3
-Date: Tue,  8 Nov 2016 17:15:00 -0800
-Message-Id: <1478654107-7384-1-git-send-email-hch@lst.de>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Ming Lei <tom.leiming@gmail.com>
+To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
+Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Ming Lei <tom.leiming@gmail.com>,
+        Philipp Reisner <philipp.reisner@linbit.com>,
+        Lars Ellenberg <lars.ellenberg@linbit.com>,
+        drbd-dev@lists.linbit.com (open list:DRBD DRIVER)
+Subject: [PATCH 02/12] block: drbd: remove impossible failure handling
+Date: Fri, 11 Nov 2016 20:05:30 +0800
+Message-Id: <1478865957-25252-3-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1478865957-25252-1-git-send-email-tom.leiming@gmail.com>
+References: <1478865957-25252-1-git-send-email-tom.leiming@gmail.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-This series adds support for automatic interrupt assignment to devices
-that have a few vectors that are set aside for admin or config purposes
-and thus should not fall into the general per-cpu assginment pool.
+For a non-cloned bio, bio_add_page() only returns failure when
+the io vec table is full, but in that case, bio->bi_vcnt can't
+be zero at all.
 
-The first patch adds that support to the core IRQ and PCI/msi code,
-and the second is a small tweak to a block layer helper to make use
-of it.  I'd love to have both go into the same tree so that consumers
-of this (e.g. the virtio, scsi and rdma trees) only need to pull in
-one of these trees as dependency.
+So remove the impossible failure handling.
 
-Changes since V3:
- - lots of typo fixes
- - fixed an argument name
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Acked-by: Lars Ellenberg <lars.ellenberg@linbit.com>
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+---
+ drivers/block/drbd/drbd_receiver.c | 14 +-------------
+ 1 file changed, 1 insertion(+), 13 deletions(-)
 
-Changes since V1:
- - split up into more patches (thanks to Thomas for the initial work)
- - simplify internal parameter passing a bit (also thanks to Thomas)
+diff --git a/drivers/block/drbd/drbd_receiver.c b/drivers/block/drbd/drbd_receiver.c
+index a89538cb3eaa..c7728dd77230 100644
+--- a/drivers/block/drbd/drbd_receiver.c
++++ b/drivers/block/drbd/drbd_receiver.c
+@@ -1648,20 +1648,8 @@ int drbd_submit_peer_request(struct drbd_device *device,
+ 
+ 	page_chain_for_each(page) {
+ 		unsigned len = min_t(unsigned, data_size, PAGE_SIZE);
+-		if (!bio_add_page(bio, page, len, 0)) {
+-			/* A single page must always be possible!
+-			 * But in case it fails anyways,
+-			 * we deal with it, and complain (below). */
+-			if (bio->bi_vcnt == 0) {
+-				drbd_err(device,
+-					"bio_add_page failed for len=%u, "
+-					"bi_vcnt=0 (bi_sector=%llu)\n",
+-					len, (uint64_t)bio->bi_iter.bi_sector);
+-				err = -ENOSPC;
+-				goto fail;
+-			}
++		if (!bio_add_page(bio, page, len, 0))
+ 			goto next_bio;
+-		}
+ 		data_size -= len;
+ 		sector += len >> 9;
+ 		--nr_pages;
+-- 
+2.7.4
+
