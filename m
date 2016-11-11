@@ -1,54 +1,56 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.9]:52538 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753010AbcKLRmj (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sat, 12 Nov 2016 12:42:39 -0500
-Date: Sat, 12 Nov 2016 09:42:38 -0800
-From: Christoph Hellwig <hch@infradead.org>
-To: Shaohua Li <shli@kernel.org>
-Cc: Christoph Hellwig <hch@infradead.org>, linux-raid@vger.kernel.org,
-        linux-block@vger.kernel.org, neilb@suse.com
+Received: from mail.kernel.org ([198.145.29.136]:49994 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S936325AbcKKTC2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 11 Nov 2016 14:02:28 -0500
+Date: Fri, 11 Nov 2016 11:02:23 -0800
+From: Shaohua Li <shli@kernel.org>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
+        neilb@suse.com
 Subject: Re: "creative" bio usage in the RAID code
-Message-ID: <20161112174238.GA11518@infradead.org>
+Message-ID: <20161111190223.4xrq3vvvvohzgs5e@kernel.org>
 References: <20161110194636.GA32241@infradead.org>
- <20161111190223.4xrq3vvvvohzgs5e@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20161111190223.4xrq3vvvvohzgs5e@kernel.org>
+In-Reply-To: <20161110194636.GA32241@infradead.org>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Fri, Nov 11, 2016 at 11:02:23AM -0800, Shaohua Li wrote:
-> > It's mostly about the RAID1 and RAID10 code which does a lot of funny
-> > things with the bi_iov_vec and bi_vcnt fields, which we'd prefer that
-> > drivers don't touch.  One example is the r1buf_pool_alloc code,
-> > which I think should simply use bio_clone for the MD_RECOVERY_REQUESTED
-> > case, which would also take care of r1buf_pool_free.  I'm not sure
-> > about all the others cases, as some bits don't fully make sense to me,
+On Thu, Nov 10, 2016 at 11:46:36AM -0800, Christoph Hellwig wrote:
+> Hi Shaohua,
 > 
-> The problem is we use the iov_vec to track the pages allocated. We will read
-> data to the pages and write out later for resync. If we add new fields to track
-> the pages in r1bio, we could use standard API bio_kmalloc/bio_add_page and
-> avoid the tricky parts. This should work for both the resync and writebehind
-> cases.
-
-I don't think we need to track the pages specificly - if we clone
-a bio we share the bio_vec, e.g. for the !MD_RECOVERY_REQUESTED
-we do one bio_kmalloc, then bio_alloc_pages then clone it for the
-others bios.  for MD_RECOVERY_REQUESTED we do a bio_kmalloc +
-bio_alloc_pages for each.
-
-While we're at it - I find the way MD_RECOVERY_REQUESTED is used highly
-confusing, and I'm not 100% sure it's correct.  After all we check it
-in r1buf_pool_alloc, which is a mempool alloc callback, so we rely
-on these callbacks being done after the flag has been raise / cleared,
-which makes me bit suspicious, and also question why we even need the
-mempool.
-
+> one of the major issues with Ming Lei's multipage biovec works
+> is that we can't easily enabled the MD RAID code for it.  I had
+> a quick chat on that with Chris and Jens and they suggested talking
+> to you about it.
 > 
-> > e.g. why we're trying to do single page I/O out of a bigger bio.
-> 
-> what's this one?
+> It's mostly about the RAID1 and RAID10 code which does a lot of funny
+> things with the bi_iov_vec and bi_vcnt fields, which we'd prefer that
+> drivers don't touch.  One example is the r1buf_pool_alloc code,
+> which I think should simply use bio_clone for the MD_RECOVERY_REQUESTED
+> case, which would also take care of r1buf_pool_free.  I'm not sure
+> about all the others cases, as some bits don't fully make sense to me,
 
-fix_sync_read_error
+The problem is we use the iov_vec to track the pages allocated. We will read
+data to the pages and write out later for resync. If we add new fields to track
+the pages in r1bio, we could use standard API bio_kmalloc/bio_add_page and
+avoid the tricky parts. This should work for both the resync and writebehind
+cases.
+
+> e.g. why we're trying to do single page I/O out of a bigger bio.
+
+what's this one?
+
+> Maybe you have some better ideas what's going on there?
+> 
+> Another not quite as urgent issue is how the RAID5 code abuses
+> ->bi_phys_segments as and outstanding I/O counter, and I have no
+> really good answer to that either.
+
+I don't have good idea for this one either if we don't want to allocate extra
+memory. The good side is we never dispatch the original bio to under layer
+disks.
+
+Thanks,
+Shaohua
