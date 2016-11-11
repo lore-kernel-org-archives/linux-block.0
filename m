@@ -1,40 +1,27 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga05.intel.com ([192.55.52.43]:55780 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S932886AbcKPXZR (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Nov 2016 18:25:17 -0500
-From: Scott Bauer <scott.bauer@intel.com>
-To: linux-nvme@lists.infradead.org
-Cc: Rafael.Antognolli@intel.com, axboe@fb.com, keith.busch@intel.com,
-        jonathan.derrick@intel.com, j.naumann@fu-berlin.de,
-        hch@infradead.org, linux-block@vger.kernel.org, sagi@grimberg.me,
-        Scott Bauer <scott.bauer@intel.com>
-Subject: [PATCH v1 4/7] include: Add sec_ops to block device operations
-Date: Wed, 16 Nov 2016 16:17:29 -0700
-Message-Id: <1479338252-8777-5-git-send-email-scott.bauer@intel.com>
-In-Reply-To: <1479338252-8777-1-git-send-email-scott.bauer@intel.com>
-References: <1479338252-8777-1-git-send-email-scott.bauer@intel.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: Regression: nvme timeouts and oopses
+To: Bart Van Assche <bart.vanassche@sandisk.com>
+References: <af308491-a381-f13d-2d87-89bbca68d99e@kernel.dk>
+ <50342d6b-e185-d125-c04c-e72d6fc45ccd@sandisk.com>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ Christoph Hellwig <hch@lst.de>, Keith Busch <keith.busch@intel.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <99eec845-06d2-4871-4365-0064de1995e7@kernel.dk>
+Date: Fri, 11 Nov 2016 12:28:51 -0700
+MIME-Version: 1.0
+In-Reply-To: <50342d6b-e185-d125-c04c-e72d6fc45ccd@sandisk.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Scott Bauer <scott.bauer@intel.com>
-Signed-off-by: Rafael Antognolli <Rafael.Antognolli@intel.com>
----
- include/linux/blkdev.h | 1 +
- 1 file changed, 1 insertion(+)
+On 11/11/2016 12:23 PM, Bart Van Assche wrote:
+> On 11/11/2016 10:47 AM, Jens Axboe wrote:
+>> I've been running into problems when stability testing my 4.10 branch,
+>
+> Hello Jens,
+>
+> Can you try the patch below instead of the revert?
 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index c47c358..6fceff1 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1690,6 +1690,7 @@ struct block_device_operations {
- 	void (*swap_slot_free_notify) (struct block_device *, unsigned long);
- 	struct module *owner;
- 	const struct pr_ops *pr_ops;
-+	struct sec_ops *sec_ops;
- };
- 
- extern int __blkdev_driver_ioctl(struct block_device *, fmode_t, unsigned int,
+See my mails from earlier.
+
 -- 
-2.7.4
-
+Jens Axboe
