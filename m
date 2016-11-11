@@ -1,108 +1,72 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-it0-f45.google.com ([209.85.214.45]:37213 "EHLO
-        mail-it0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750825AbcKKK0c (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 11 Nov 2016 05:26:32 -0500
-Received: by mail-it0-f45.google.com with SMTP id u205so112314209itc.0
-        for <linux-block@vger.kernel.org>; Fri, 11 Nov 2016 02:26:32 -0800 (PST)
-From: Kashyap Desai <kashyap.desai@broadcom.com>
-References: <72489f3f-d181-09a2-fc17-27ba36ad9620@suse.de> <0d0f1e6f-0f61-c316-8db8-112c4de1d8c9@kernel.dk>
-In-Reply-To: <0d0f1e6f-0f61-c316-8db8-112c4de1d8c9@kernel.dk>
-MIME-Version: 1.0
-Date: Fri, 11 Nov 2016 15:56:29 +0530
-Message-ID: <db715a3a74c33343f1ac387a30dfcdab@mail.gmail.com>
+Return-Path: <elliott@hpe.com>
+From: "Elliott, Robert (Persistent Memory)" <elliott@hpe.com>
+To: Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@kernel.dk>, "Christoph
+ Hellwig" <hch@lst.de>
+CC: SCSI Mailing List <linux-scsi@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Subject: RE: Reduced latency is killing performance
-To: Jens Axboe <axboe@kernel.dk>, Hannes Reinecke <hare@suse.de>,
-        Christoph Hellwig <hch@lst.de>
-Cc: SCSI Mailing List <linux-scsi@vger.kernel.org>,
-        linux-block@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Date: Fri, 11 Nov 2016 07:02:45 +0000
+Message-ID: <DF4PR84MB0169E701F447438730B8E954ABBB0@DF4PR84MB0169.NAMPRD84.PROD.OUTLOOK.COM>
+References: <72489f3f-d181-09a2-fc17-27ba36ad9620@suse.de>
+In-Reply-To: <72489f3f-d181-09a2-fc17-27ba36ad9620@suse.de>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+List-ID: <linux-block@vger.kernel.org>
 
-> -----Original Message-----
-> From: linux-scsi-owner@vger.kernel.org [mailto:linux-scsi-
-> owner@vger.kernel.org] On Behalf Of Jens Axboe
-> Sent: Thursday, November 10, 2016 10:18 PM
-> To: Hannes Reinecke; Christoph Hellwig
-> Cc: SCSI Mailing List; linux-block@vger.kernel.org
-> Subject: Re: Reduced latency is killing performance
->
-> On 11/10/2016 09:04 AM, Hannes Reinecke wrote:
-> > Hi all,
-> >
-> > this really feels like a follow-up to the discussion we've had in
-> > Santa Fe, but finally I'm able to substantiate it with some numbers.
-> >
-> > I've made a patch to enable the megaraid_sas driver for multiqueue.
-> > While this is pretty straightforward (I'll be sending the patchset
-> > later on), the results are ... interesting.
-> >
-> > I've run the 'ssd-test.fio' script from Jens' repository, and these
-> > results for MQ/SQ (- is mq, + is sq):
-> >
-> >  Run status group 0 (all jobs):
-> > -   READ: io=10641MB, aggrb=181503KB/s, minb=181503KB/s,
-> > maxb=181503KB/s, mint=60033msec, maxt=60033msec
-> > +   READ: io=18370MB, aggrb=312572KB/s, minb=312572KB/s,
-> > maxb=312572KB/s, mint=60181msec, maxt=60181msec
-> >
-> >  Run status group 1 (all jobs):
-> > -   READ: io=441444KB, aggrb=7303KB/s, minb=7303KB/s, maxb=7303KB/s,
-> > mint=60443msec, maxt=60443msec
-> > +   READ: io=223108KB, aggrb=3707KB/s, minb=3707KB/s, maxb=3707KB/s,
-> > mint=60182msec, maxt=60182msec
-> >
-> >  Run status group 2 (all jobs):
-> > -  WRITE: io=22485MB, aggrb=383729KB/s, minb=383729KB/s,
-> > maxb=383729KB/s, mint=60001msec, maxt=60001msec
-> > +  WRITE: io=47421MB, aggrb=807581KB/s, minb=807581KB/s,
-> > maxb=807581KB/s, mint=60129msec, maxt=60129msec
-> >
-> >  Run status group 3 (all jobs):
-> > -  WRITE: io=489852KB, aggrb=8110KB/s, minb=8110KB/s, maxb=8110KB/s,
-> > mint=60399msec, maxt=60399msec
-> > +  WRITE: io=489748KB, aggrb=8134KB/s, minb=8134KB/s, maxb=8134KB/s,
-> > mint=60207msec, maxt=60207msec
-> >
-> >  Disk stats (read/write):
-> > -  sda: ios=2834412/5878578, merge=0/0, ticks=86269292/48364836,
-> > in_queue=135345876, util=99.20%
-> > +  sda: ios=205278/2680329, merge=4552593/9580622,
-> > ticks=12539912/12965228, in_queue=25512312, util=99.59%
-> >
-> > As you can see, we're really losing performance in the multiqueue case.
-> > And the main reason for that is that we submit about _10 times_ as
-> > much I/O as we do for the single-queue case.
->
-> What's the setup like? I'm going to need more details.
->
-> The baseline test is using the legacy path, single queue. The new test is
-> multiqueue, scsi-mq. What's sda?
-
-Hannes -
-
-Please share setup/config details so that I can also validate and post my
-findings.
-
-` Kashyap
-
->
-> > So I guess having an I/O scheduler is critical, even for the scsi-mq
-> > case.
->
-> Each of these sections is a single job. For some reason we are not merging
-> as
-> well as we should, that's the reason for the performance loss. In fact,
-> we're not
-> merging at all. That's not IO scheduling.
->
-> --
-> Jens Axboe
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-scsi" in
-> the body of
-> a message to majordomo@vger.kernel.org More majordomo info at
-> http://vger.kernel.org/majordomo-info.html
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogbGludXgtYmxvY2stb3du
+ZXJAdmdlci5rZXJuZWwub3JnIFttYWlsdG86bGludXgtYmxvY2stDQo+IG93bmVyQHZnZXIua2Vy
+bmVsLm9yZ10gT24gQmVoYWxmIE9mIEhhbm5lcyBSZWluZWNrZQ0KPiBTZW50OiBUaHVyc2RheSwg
+Tm92ZW1iZXIgMTAsIDIwMTYgMTA6MDUgQU0NCj4gVG86IEplbnMgQXhib2UgPGF4Ym9lQGtlcm5l
+bC5kaz47IENocmlzdG9waCBIZWxsd2lnIDxoY2hAbHN0LmRlPg0KPiBDYzogU0NTSSBNYWlsaW5n
+IExpc3QgPGxpbnV4LXNjc2lAdmdlci5rZXJuZWwub3JnPjsgbGludXgtDQo+IGJsb2NrQHZnZXIu
+a2VybmVsLm9yZw0KPiBTdWJqZWN0OiBSZWR1Y2VkIGxhdGVuY3kgaXMga2lsbGluZyBwZXJmb3Jt
+YW5jZQ0KPiANCj4gSGkgYWxsLA0KPiANCj4gdGhpcyByZWFsbHkgZmVlbHMgbGlrZSBhIGZvbGxv
+dy11cCB0byB0aGUgZGlzY3Vzc2lvbiB3ZSd2ZSBoYWQgaW4NCj4gU2FudGEgRmUsIGJ1dCBmaW5h
+bGx5IEknbSBhYmxlIHRvIHN1YnN0YW50aWF0ZSBpdCB3aXRoIHNvbWUgbnVtYmVycy4NCj4gDQo+
+IEkndmUgbWFkZSBhIHBhdGNoIHRvIGVuYWJsZSB0aGUgbWVnYXJhaWRfc2FzIGRyaXZlciBmb3Ig
+bXVsdGlxdWV1ZS4NCj4gV2hpbGUgdGhpcyBpcyBwcmV0dHkgc3RyYWlnaHRmb3J3YXJkIChJJ2xs
+IGJlIHNlbmRpbmcgdGhlIHBhdGNoc2V0DQo+IGxhdGVyIG9uKSwgdGhlIHJlc3VsdHMgYXJlIC4u
+LiBpbnRlcmVzdGluZy4NCj4gDQo+IEkndmUgcnVuIHRoZSAnc3NkLXRlc3QuZmlvJyBzY3JpcHQg
+ZnJvbSBKZW5zJyByZXBvc2l0b3J5LCBhbmQgdGhlc2UNCj4gcmVzdWx0cyBmb3IgTVEvU1EgKC0g
+aXMgbXEsICsgaXMgc3EpOg0KPiANCj4gIFJ1biBzdGF0dXMgZ3JvdXAgMCAoYWxsIGpvYnMpOiAg
+WzQgS2lCIHNlcXVlbnRpYWwgcmVhZHNdDQo+IC0gICBSRUFEOiBpbz0xMDY0MU1CLCBhZ2dyYj0x
+ODE1MDNLQi9zDQo+ICsgICBSRUFEOiBpbz0xODM3ME1CLCBhZ2dyYj0zMTI1NzJLQi9zDQo+IA0K
+PiAgUnVuIHN0YXR1cyBncm91cCAxIChhbGwgam9icyk6ICBbNCBLaUIgcmFuZG9tIHJlYWRzXQ0K
+PiAtICAgUkVBRDogaW89NDQxNDQ0S0IsIGFnZ3JiPTczMDNLQi9zDQo+ICsgICBSRUFEOiBpbz0y
+MjMxMDhLQiwgYWdncmI9MzcwN0tCL3MNCj4gDQo+ICBSdW4gc3RhdHVzIGdyb3VwIDIgKGFsbCBq
+b2JzKTogIFs0IEtpQiBzZXF1ZW50aWFsIHdyaXRlc10NCj4gLSAgV1JJVEU6IGlvPTIyNDg1TUIs
+IGFnZ3JiPTM4MzcyOUtCL3MNCj4gKyAgV1JJVEU6IGlvPTQ3NDIxTUIsIGFnZ3JiPTgwNzU4MUtC
+L3MNCj4gDQo+ICBSdW4gc3RhdHVzIGdyb3VwIDMgKGFsbCBqb2JzKTogIFs0IEtpQiByYW5kb20g
+d3JpdGVzXQ0KPiAtICBXUklURTogaW89NDg5ODUyS0IsIGFnZ3JiPTgxMTBLQi9zDQo+ICsgIFdS
+SVRFOiBpbz00ODk3NDhLQiwgYWdncmI9ODEzNEtCL3MNCj4gDQo+ICBEaXNrIHN0YXRzIChyZWFk
+L3dyaXRlKToNCj4gLSAgc2RhOiBpb3M9MjgzNDQxMi81ODc4NTc4LCBtZXJnZT0wLzANCj4gKyAg
+c2RhOiBpb3M9MjA1Mjc4LzI2ODAzMjksIG1lcmdlPTQ1NTI1OTMvOTU4MDYyMg0KDQpbZGVsZXRl
+ZCBtaW5iLCBtYXhiLCBtaW50LCBtYXh0LCB0aWNrcywgaW5fcXVldWUsIGFuZCB1dGlsIGFib3Zl
+XQ0KDQo+IA0KPiBBcyB5b3UgY2FuIHNlZSwgd2UncmUgcmVhbGx5IGxvc2luZyBwZXJmb3JtYW5j
+ZSBpbiB0aGUgbXVsdGlxdWV1ZQ0KPiBjYXNlLg0KPiBBbmQgdGhlIG1haW4gcmVhc29uIGZvciB0
+aGF0IGlzIHRoYXQgd2Ugc3VibWl0IGFib3V0IF8xMCB0aW1lc18gYXMNCj4gbXVjaCBJL08gYXMg
+d2UgZG8gZm9yIHRoZSBzaW5nbGUtcXVldWUgY2FzZS4NCg0KVGhhdCBzY3JpcHQgaXMgcnVubmlu
+ZzoNCjApIDQgS2lCIHNlcXVlbnRpYWwgcmVhZHMNCjEpIDQgS2lCIHJhbmRvbSByZWFkcw0KMikg
+NCBLaUIgc2VxdWVudGlhbCB3cml0ZXMNCjMpIDQgS2lCIHJhbmRvbSB3cml0ZXMNCg0KSSB0aGlu
+ayB5b3UncmUganVzdCBzZWVpbmcgYSBsYWNrIG9mIG1lcmdlcyBmb3IgdGhlIHRpbnkgc2VxdWVu
+dGlhbA0Kd29ya2xvYWRzLiAgVGhvc2UgYXJlIHRoZSBvbmVzIHdoZXJlIG1xIGhhcyBsb3dlciBh
+Z2dyYiByZXN1bHRzLg0KDQpDaGVjayB0aGUgdmFsdWUgaW4gL3N5cy9ibG9jay9zZGEvcXVldWUv
+bm9tZXJnZXMuIFRoZSB2YWx1ZXMgYXJlDQogICAgMD1zZWFyY2ggZm9yIGZhc3QgYW5kIHNsb3dl
+ciBtZXJnZXMNCiAgICAxPW9ubHkgYXR0ZW1wdCBmYXN0IG1lcmdlcw0KICAgIDI9ZG9uJ3QgYXR0
+ZW1wdCBhbnkgbWVyZ2VzDQoNClRoZSBTTklBIEVudGVycHJpc2UgU29saWQgU3RhdGUgU3RvcmFn
+ZSBQZXJmb3JtYW5jZSBUZXN0IFNwZWNpZmljYXRpb24NCihTU1MgUFRTLUUpIG9ubHkgbWVhc3Vy
+ZXMgMTI4IEtpQiBhbmQgMSBNaUIgc2VxdWVudGlhbCBJT3MgLSBpdCBkb2Vzbid0DQp0ZXN0IHRp
+bnkgc2VxdWVudGlhbCBJT3MuICBBcHBsaWNhdGlvbnMgbWF5IGRvIGFueXRoaW5nLCBidXQgSSB0
+aGluaw0KbW9zdCB1bmRlcnN0YW5kIHRoYXQgZmV3ZXIsIGJpZ2dlciB0cmFuc2ZlcnMgYXJlIG1v
+cmUgZWZmaWNpZW50IA0KdGhyb3VnaG91dCB0aGUgSU8gc3RhY2suICBBIGJsb2Nrc2l6ZSBvZiAx
+MjggS2lCIHdvdWxkIHJlZHVjZSB0aG9zZQ0KSU9zIGJ5IDk2JS4NCg0KRm9yIGhwc2EsIHdlIG9m
+dGVuIHR1cm5lZCB0aGVtIG9mZiB0byBhdm9pZCB0aGUgb3ZlcmhlYWQgd2hpbGUgcnVubmluZw0K
+YXBwbGljYXRpb25zIGdlbmVyYXRpbmcgZGVjZW50LXNpemVkIElPcyBvbiB0aGVpciBvd24uDQoN
+Ck5vdGUgdGhhdCB0aGUgcmFuZG9tIHJlYWQgYWdncmIgdmFsdWUgZG91YmxlZCB3aXRoIG1xLCBh
+bmQgcmFuZG9tDQp3cml0ZXMgc2hvd2VkIG5vIGltcGFjdC4NCg0KWW91IG1pZ2h0IGFsc28gd2Fu
+dCB0byBzZXQgDQogICAgY3B1c19hbGxvd2VkX3BvbGljeT1zcGxpdA0KdG8ga2VlcCB0aHJlYWRz
+IGZyb20gd2FuZGVyaW5nIGFjcm9zcyBDUFVzIChhbmQgdGh1cyBjaGFuZ2luZyBxdWV1ZXMpLg0K
+DQo+IFNvIEkgZ3Vlc3MgaGF2aW5nIGFuIEkvTyBzY2hlZHVsZXIgaXMgY3JpdGljYWwsIGV2ZW4g
+Zm9yIHRoZSBzY3NpLW1xDQo+IGNhc2UuDQoNCmJsay1tcSBzdGlsbCBzdXBwb3J0cyBtZXJnZXMg
+d2l0aG91dCBhbnkgc2NoZWR1bGVyLg0KDQotLS0NClJvYmVydCBFbGxpb3R0LCBIUEUgUGVyc2lz
+dGVudCBNZW1vcnkNCg0KDQoNCg==
