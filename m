@@ -1,75 +1,26 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga06.intel.com ([134.134.136.31]:21031 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1757104AbcK2LXd (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 29 Nov 2016 06:23:33 -0500
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv5 14/36] thp: introduce hpage_size() and hpage_mask()
-Date: Tue, 29 Nov 2016 14:22:42 +0300
-Message-Id: <20161129112304.90056-15-kirill.shutemov@linux.intel.com>
-In-Reply-To: <20161129112304.90056-1-kirill.shutemov@linux.intel.com>
-References: <20161129112304.90056-1-kirill.shutemov@linux.intel.com>
+Received: from mail-wm0-f44.google.com ([74.125.82.44]:35099 "EHLO
+        mail-wm0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750873AbcKLVhY (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sat, 12 Nov 2016 16:37:24 -0500
+Subject: Re: [PATCH 04/12] target: avoid to access .bi_vcnt directly
+To: Ming Lei <tom.leiming@gmail.com>, Jens Axboe <axboe@fb.com>,
+        linux-kernel@vger.kernel.org
+References: <1478865957-25252-1-git-send-email-tom.leiming@gmail.com>
+ <1478865957-25252-5-git-send-email-tom.leiming@gmail.com>
+Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        "Nicholas A. Bellinger" <nab@linux-iscsi.org>,
+        "open list:TARGET SUBSYSTEM" <linux-scsi@vger.kernel.org>,
+        "open list:TARGET SUBSYSTEM" <target-devel@vger.kernel.org>
+From: Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <9376d0b7-9bcd-595d-9894-c4938d4f401e@grimberg.me>
+Date: Sat, 12 Nov 2016 23:37:20 +0200
+MIME-Version: 1.0
+In-Reply-To: <1478865957-25252-5-git-send-email-tom.leiming@gmail.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Introduce new helpers which return size/mask of the page:
-HPAGE_PMD_SIZE/HPAGE_PMD_MASK if the page is PageTransHuge() and
-PAGE_SIZE/PAGE_MASK otherwise.
-
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
----
- include/linux/huge_mm.h | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
-
-diff --git a/include/linux/huge_mm.h b/include/linux/huge_mm.h
-index 97e478d6b690..e5c9c26d2439 100644
---- a/include/linux/huge_mm.h
-+++ b/include/linux/huge_mm.h
-@@ -142,6 +142,20 @@ static inline int hpage_nr_pages(struct page *page)
- 	return 1;
- }
- 
-+static inline int hpage_size(struct page *page)
-+{
-+	if (unlikely(PageTransHuge(page)))
-+		return HPAGE_PMD_SIZE;
-+	return PAGE_SIZE;
-+}
-+
-+static inline unsigned long hpage_mask(struct page *page)
-+{
-+	if (unlikely(PageTransHuge(page)))
-+		return HPAGE_PMD_MASK;
-+	return PAGE_MASK;
-+}
-+
- extern int do_huge_pmd_numa_page(struct vm_fault *vmf, pmd_t orig_pmd);
- 
- extern struct page *huge_zero_page;
-@@ -167,6 +181,8 @@ void mm_put_huge_zero_page(struct mm_struct *mm);
- #define HPAGE_PMD_SIZE ({ BUILD_BUG(); 0; })
- 
- #define hpage_nr_pages(x) 1
-+#define hpage_size(x) PAGE_SIZE
-+#define hpage_mask(x) PAGE_MASK
- 
- #define transparent_hugepage_enabled(__vma) 0
- 
--- 
-2.10.2
-
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
