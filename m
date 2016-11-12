@@ -1,170 +1,103 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:33913 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S965114AbcKNWW2 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Nov 2016 17:22:28 -0500
-Received: from pps.filterd (m0001303.ppops.net [127.0.0.1])
-        by m0001303.ppops.net (8.16.0.17/8.16.0.17) with SMTP id uAEMLMad013063
-        for <linux-block@vger.kernel.org>; Mon, 14 Nov 2016 14:22:27 -0800
-Received: from mail.thefacebook.com ([199.201.64.23])
-        by m0001303.ppops.net with ESMTP id 26qkgf8wd5-3
-        (version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT)
-        for <linux-block@vger.kernel.org>; Mon, 14 Nov 2016 14:22:27 -0800
-Received: from facebook.com (2401:db00:21:603d:face:0:19:0)     by
- mx-out.facebook.com (10.212.236.87) with ESMTP id
- d1ee8596aab811e68f2c0002c9521c9e-612dba50 for <linux-block@vger.kernel.org>;
-        Mon, 14 Nov 2016 14:22:25 -0800
-From: Shaohua Li <shli@fb.com>
-To: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <Kernel-team@fb.com>, <axboe@fb.com>, <tj@kernel.org>,
-        <vgoyal@redhat.com>
-Subject: [PATCH V4 15/15] blk-throttle: add latency target support
-Date: Mon, 14 Nov 2016 14:22:22 -0800
-Message-ID: <420a0f26dd7a20ad8316258c81cb64043134bc86.1479161136.git.shli@fb.com>
-In-Reply-To: <cover.1479161136.git.shli@fb.com>
-References: <cover.1479161136.git.shli@fb.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 6/8] block: add scalable completion tracking of requests
+To: Jan Kara <jack@suse.cz>
+References: <1478034531-28559-1-git-send-email-axboe@fb.com>
+ <1478034531-28559-7-git-send-email-axboe@fb.com>
+ <20161108133007.GP32353@quack2.suse.cz>
+ <cbd840e8-1807-5cf9-913b-bc62dbc7ac9e@fb.com>
+ <20161109090157.GZ32353@quack2.suse.cz>
+ <3c7e3183-a7e3-4219-54ca-65c9f45b6d5b@fb.com>
+ <d07a75a1-6b8d-2cf0-d18f-93938ad86215@kernel.dk>
+ <20161110193808.GF31098@quack2.suse.cz>
+Cc: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org, hch@lst.de
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <9a412943-1194-b12f-e728-7c3504041a4c@kernel.dk>
+Date: Fri, 11 Nov 2016 22:19:37 -0700
 MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <20161110193808.GF31098@quack2.suse.cz>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+List-ID: <linux-block@vger.kernel.org>
 
-One hard problem adding .high limit is to detect idle cgroup. If one
-cgroup doesn't dispatch enough IO against its high limit, we must have a
-mechanism to determine if other cgroups dispatch more IO. We added the
-think time detection mechanism before, but it doesn't work for all
-workloads. Here we add a latency based approach.
+On 11/10/2016 12:38 PM, Jan Kara wrote:
+> On Wed 09-11-16 12:52:25, Jens Axboe wrote:
+>> On 11/09/2016 09:09 AM, Jens Axboe wrote:
+>>> On 11/09/2016 02:01 AM, Jan Kara wrote:
+>>>> On Tue 08-11-16 08:25:52, Jens Axboe wrote:
+>>>>> On 11/08/2016 06:30 AM, Jan Kara wrote:
+>>>>>> On Tue 01-11-16 15:08:49, Jens Axboe wrote:
+>>>>>>> For legacy block, we simply track them in the request queue. For
+>>>>>>> blk-mq, we track them on a per-sw queue basis, which we can then
+>>>>>>> sum up through the hardware queues and finally to a per device
+>>>>>>> state.
+>>>>>>>
+>>>>>>> The stats are tracked in, roughly, 0.1s interval windows.
+>>>>>>>
+>>>>>>> Add sysfs files to display the stats.
+>>>>>>>
+>>>>>>> Signed-off-by: Jens Axboe <axboe@fb.com>
+>>>>>>
+>>>>>> This patch looks mostly good to me but I have one concern: You track
+>>>>>> statistics in a fixed 134ms window, stats get cleared at the
+>>>>>> beginning of
+>>>>>> each window. Now this can interact with the writeback window and
+>>>>>> latency
+>>>>>> settings which are dynamic and settable from userspace - so if the
+>>>>>> writeback code observation window gets set larger than the stats
+>>>>>> window,
+>>>>>> things become strange since you'll likely miss quite some observations
+>>>>>> about read latencies. So I think you need to make sure stats window is
+>>>>>> always larger than writeback window. Or actually, why do you have
+>>>>>> something
+>>>>>> like stats window and don't leave clearing of statistics completely
+>>>>>> to the
+>>>>>> writeback tracking code?
+>>>>>
+>>>>> That's a good point, and there actually used to be a comment to that
+>>>>> effect in the code. I think the best solution here would be to make the
+>>>>> stats code mask available somewhere, and allow a consumer of the stats
+>>>>> to request a larger window.
+>>>>>
+>>>>> Similarly, we could make the stat window be driven by the consumer, as
+>>>>> you suggest.
+>>>>>
+>>>>> Currently there are two pending submissions that depend on the stats
+>>>>> code. One is this writeback series, and the other one is the hybrid
+>>>>> polling code. The latter does not really care about the window size as
+>>>>> such, since it has no monitoring window of its own, and it wants the
+>>>>> auto-clearing as well.
+>>>>>
+>>>>> I don't mind working on additions for this, but I'd prefer if we could
+>>>>> layer them on top of the existing series instead of respinning it.
+>>>>> There's considerable test time on the existing patchset. Would that work
+>>>>> for you? Especially collapsing the stats and wbt windows would require
+>>>>> some re-architecting.
+>>>>
+>>>> OK, that works for me. Actually, when thinking about this, I have one
+>>>> more
+>>>> suggestion: Do we really want to expose the wbt window as a sysfs
+>>>> tunable?
+>>>> I guess it is good for initial experiments but longer term having the wbt
+>>>> window length be a function of target read latency might be better.
+>>>> Generally you want the window length to be considerably larger than the
+>>>> target latency but OTOH not too large so that the algorithm can react
+>>>> reasonably quickly so that suggests it could really be autotuned (and we
+>>>> scale the window anyway to adapt it to current situation).
+>>>
+>>> That's not a bad idea, I have thought about that as well before. We
+>>> don't need the window tunable, and you are right, it can be a function
+>>> of the desired latency.
+>>>
+>>> I'll hardwire the 100msec latency window for now and get rid of the
+>>> exposed tunable. It's harder to remove sysfs files once they have made
+>>> it into the kernel...
+>>
+>> Killed the sysfs variable, so for now it'll be a 100msec window by
+>> default.
+>
+> OK, I guess good enough to get this merged.
 
-We calculate the average request size and average latency of a cgroup.
-Then we can calculate the target latency for the cgroup with the average
-request size and the equation. In queue LIMIT_HIGH state, if a cgroup
-doesn't dispatch enough IO against high limit but its average latency is
-lower than its target latency, we treat the cgroup idle. In this case
-other cgroups can dispatch more IO, eg, across their high limit.
-Similarly in queue LIMIT_MAX state, if a cgroup doesn't dispatch enough
-IO but its average latency is higher than its target latency, we treat
-the cgroup busy. In this case, we should throttle other cgroups to make
-the first cgroup's latency lower.
+Thanks Jan!
 
-If cgroup's average request size is big (currently sets to 128k), we
-always treat the cgroup busy (the think time check is still effective
-though).
-
-Currently this latency target check is only for SSD as we can't
-calcualte the latency target for hard disk. And this is only for cgroup
-leaf node so far.
-
-Signed-off-by: Shaohua Li <shli@fb.com>
----
- block/blk-throttle.c      | 58 ++++++++++++++++++++++++++++++++++++++++++++---
- include/linux/blk_types.h |  1 +
- 2 files changed, 56 insertions(+), 3 deletions(-)
-
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index ac4d9ea..d07f332 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -156,6 +156,12 @@ struct throtl_grp {
- 	u64 last_finish_time;
- 	u64 checked_last_finish_time;
- 	u64 avg_ttime;
-+
-+	unsigned int bio_batch;
-+	u64 total_latency;
-+	u64 avg_latency;
-+	u64 total_size;
-+	u64 avg_size;
- };
- 
- /* We measure latency for request size from 4k to 4k * ( 1 << 4) */
-@@ -1734,12 +1740,30 @@ static unsigned long tg_last_high_overflow_time(struct throtl_grp *tg)
- 	return ret;
- }
- 
-+static u64 throtl_target_latency(struct throtl_data *td,
-+	struct throtl_grp *tg)
-+{
-+	if (td->line_slope == 0 || tg->latency_target == 0)
-+		return 0;
-+
-+	/* latency_target + f(avg_size) - f(4k) */
-+	return td->line_slope * ((tg->avg_size >> 10) - 4) +
-+		tg->latency_target;
-+}
-+
- static bool throtl_tg_is_idle(struct throtl_grp *tg)
- {
--	/* cgroup is idle if average think time is more than threshold */
--	return ktime_get_ns() - tg->last_finish_time >
-+	/*
-+	 * cgroup is idle if:
-+	 * 1. average think time is higher than threshold
-+	 * 2. average request size is small and average latency is higher
-+	 *    than target
-+	 */
-+	return (ktime_get_ns() - tg->last_finish_time >
- 		4 * tg->td->idle_ttime_threshold ||
--	       tg->avg_ttime > tg->td->idle_ttime_threshold;
-+		tg->avg_ttime > tg->td->idle_ttime_threshold) ||
-+	       (tg->avg_latency && tg->avg_size && tg->avg_size <= 128 * 1024 &&
-+		tg->avg_latency < throtl_target_latency(tg->td, tg));
- }
- 
- static bool throtl_upgrade_check_one(struct throtl_grp *tg)
-@@ -2123,6 +2147,7 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
- 	bio_associate_current(bio);
- 	bio->bi_cg_private = q;
- 	bio->bi_cg_size = bio_sectors(bio);
-+	bio->bi_cg_enter_time = ktime_get_ns();
- 
- 	blk_throtl_update_ttime(tg);
- 
-@@ -2264,6 +2289,33 @@ void blk_throtl_bio_endio(struct bio *bio)
- 		}
- 	}
- 
-+	if (bio->bi_cg_enter_time && finish_time > bio->bi_cg_enter_time &&
-+	    tg->latency_target) {
-+		lat = finish_time - bio->bi_cg_enter_time;
-+		tg->total_latency += lat;
-+		tg->total_size += bio->bi_cg_size << 9;
-+		tg->bio_batch++;
-+	}
-+
-+	if (tg->bio_batch >= 8) {
-+		int batch = tg->bio_batch;
-+		u64 size = tg->total_size;
-+
-+		lat = tg->total_latency;
-+
-+		tg->bio_batch = 0;
-+		tg->total_latency = 0;
-+		tg->total_size = 0;
-+
-+		if (batch) {
-+			do_div(lat, batch);
-+			tg->avg_latency = (tg->avg_latency * 7 +
-+				lat) >> 3;
-+			do_div(size, batch);
-+			tg->avg_size = (tg->avg_size * 7 + size) >> 3;
-+		}
-+	}
-+
- end:
- 	rcu_read_unlock();
- }
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 45bb437..fe87a20 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -61,6 +61,7 @@ struct bio {
- 	struct cgroup_subsys_state *bi_css;
- 	void *bi_cg_private;
- 	u64 bi_cg_issue_time;
-+	u64 bi_cg_enter_time;
- 	sector_t bi_cg_size;
- #endif
- 	union {
 -- 
-2.9.3
-
+Jens Axboe
