@@ -1,177 +1,187 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f48.google.com ([74.125.82.48]:37445 "EHLO
-        mail-wm0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753567AbcKROoJ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Nov 2016 09:44:09 -0500
-Received: by mail-wm0-f48.google.com with SMTP id t79so41901681wmt.0
-        for <linux-block@vger.kernel.org>; Fri, 18 Nov 2016 06:44:08 -0800 (PST)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH 14/20] lightnvm: remove get_lun operation on gennvm
-Date: Fri, 18 Nov 2016 15:43:36 +0100
-Message-Id: <1479480222-18790-15-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1479480222-18790-1-git-send-email-javier@cnexlabs.com>
-References: <1479480222-18790-1-git-send-email-javier@cnexlabs.com>
+Return-Path: <BATV+5d766ac08998254da04f+4829+infradead.org+hch@bombadil.srs.infradead.org>
+Date: Sat, 12 Nov 2016 09:59:43 -0800
+From: Christoph Hellwig <hch@infradead.org>
+To: Ming Lei <tom.leiming@gmail.com>
+Cc: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>,
+	Jiri Kosina <jikos@kernel.org>,
+	Kent Overstreet <kent.overstreet@gmail.com>,
+	Shaohua Li <shli@kernel.org>, Alasdair Kergon <agk@redhat.com>,
+	Mike Snitzer <snitzer@redhat.com>,
+	"maintainer:DEVICE-MAPPER (LVM)" <dm-devel@redhat.com>,
+	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
+	Joern Engel <joern@logfs.org>,
+	Prasad Joshi <prasadjoshi.linux@gmail.com>,
+	Mike Christie <mchristi@redhat.com>,
+	Hannes Reinecke <hare@suse.com>,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	Guoqing Jiang <gqjiang@suse.com>,
+	Eric Wheeler <git@linux.ewheeler.net>,
+	Yijing Wang <wangyijing@huawei.com>, Coly Li <colyli@suse.de>,
+	Zheng Liu <wenqing.lz@taobao.com>,
+	Keith Busch <keith.busch@intel.com>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	"open list:BCACHE (BLOCK LAYER CACHE)" <linux-bcache@vger.kernel.org>,
+	"open list:SOFTWARE RAID (Multiple Disks) SUPPORT" <linux-raid@vger.kernel.org>,
+	"open list:NVM EXPRESS TARGET DRIVER" <linux-nvme@lists.infradead.org>,
+	"open list:LogFS" <logfs@logfs.org>
+Subject: Re: [PATCH 01/12] block: bio: pass bvec table to bio_init()
+Message-ID: <20161112175943.GA4814@infradead.org>
+References: <1478865957-25252-1-git-send-email-tom.leiming@gmail.com>
+ <1478865957-25252-2-git-send-email-tom.leiming@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1478865957-25252-2-git-send-email-tom.leiming@gmail.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Since LUNs are managed internally on the target, there is no need for
-the media manager to implement a get_lun operation.
+On Fri, Nov 11, 2016 at 08:05:29PM +0800, Ming Lei wrote:
+> Some drivers often use external bvec table, so introduce
+> this helper for this case. It is always safe to access the
+> bio->bi_io_vec in this way for this case.
+> 
+> After converting to this usage, it will becomes a bit easier
+> to evaluate the remaining direct access to bio->bi_io_vec,
+> so it can help to prepare for the following multipage bvec
+> support.
+> 
+> Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+> ---
+>  block/bio.c                   |  8 ++++++--
+>  drivers/block/floppy.c        |  3 +--
+>  drivers/md/bcache/io.c        |  4 +---
+>  drivers/md/bcache/journal.c   |  4 +---
+>  drivers/md/bcache/movinggc.c  |  6 ++----
+>  drivers/md/bcache/request.c   |  2 +-
+>  drivers/md/bcache/super.c     | 12 +++---------
+>  drivers/md/bcache/writeback.c |  5 ++---
+>  drivers/md/dm-bufio.c         |  4 +---
+>  drivers/md/dm.c               |  2 +-
+>  drivers/md/multipath.c        |  2 +-
+>  drivers/md/raid5-cache.c      |  2 +-
+>  drivers/md/raid5.c            |  9 ++-------
+>  drivers/nvme/target/io-cmd.c  |  4 +---
+>  fs/logfs/dev_bdev.c           |  4 +---
+>  include/linux/bio.h           |  3 ++-
+>  16 files changed, 27 insertions(+), 47 deletions(-)
+> 
+> diff --git a/block/bio.c b/block/bio.c
+> index 2cf6ebabc68c..de257ced69b1 100644
+> --- a/block/bio.c
+> +++ b/block/bio.c
+> @@ -270,11 +270,15 @@ static void bio_free(struct bio *bio)
+>  	}
+>  }
+>  
+> -void bio_init(struct bio *bio)
+> +void bio_init(struct bio *bio, struct bio_vec *table,
+> +	      unsigned short max_vecs)
+>  {
+>  	memset(bio, 0, sizeof(*bio));
+>  	atomic_set(&bio->__bi_remaining, 1);
+>  	atomic_set(&bio->__bi_cnt, 1);
+> +
+> +	bio->bi_io_vec = table;
+> +	bio->bi_max_vecs = max_vecs;
+>  }
+>  EXPORT_SYMBOL(bio_init);
+>  
+> @@ -480,7 +484,7 @@ struct bio *bio_alloc_bioset(gfp_t gfp_mask, int nr_iovecs, struct bio_set *bs)
+>  		return NULL;
+>  
+>  	bio = p + front_pad;
+> -	bio_init(bio);
+> +	bio_init(bio, NULL, 0);
+>  
+>  	if (nr_iovecs > inline_vecs) {
+>  		unsigned long idx = 0;
+> diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
+> index e3d8e4ced4a2..6a3ff2b2e3ae 100644
+> --- a/drivers/block/floppy.c
+> +++ b/drivers/block/floppy.c
+> @@ -3806,8 +3806,7 @@ static int __floppy_read_block_0(struct block_device *bdev, int drive)
+>  
+>  	cbdata.drive = drive;
+>  
+> -	bio_init(&bio);
+> -	bio.bi_io_vec = &bio_vec;
+> +	bio_init(&bio, &bio_vec, 1);
+>  	bio_vec.bv_page = page;
+>  	bio_vec.bv_len = size;
+>  	bio_vec.bv_offset = 0;
+> diff --git a/drivers/md/bcache/io.c b/drivers/md/bcache/io.c
+> index e97b0acf7b8d..db45a88c0ce9 100644
+> --- a/drivers/md/bcache/io.c
+> +++ b/drivers/md/bcache/io.c
+> @@ -24,9 +24,7 @@ struct bio *bch_bbio_alloc(struct cache_set *c)
+>  	struct bbio *b = mempool_alloc(c->bio_meta, GFP_NOIO);
+>  	struct bio *bio = &b->bio;
+>  
+> -	bio_init(bio);
+> -	bio->bi_max_vecs	 = bucket_pages(c);
+> -	bio->bi_io_vec		 = bio->bi_inline_vecs;
+> +	bio_init(bio, bio->bi_inline_vecs, bucket_pages(c));
+>  
+>  	return bio;
+>  }
+> diff --git a/drivers/md/bcache/journal.c b/drivers/md/bcache/journal.c
+> index 6925023e12d4..1198e53d5670 100644
+> --- a/drivers/md/bcache/journal.c
+> +++ b/drivers/md/bcache/journal.c
+> @@ -448,13 +448,11 @@ static void do_journal_discard(struct cache *ca)
+>  
+>  		atomic_set(&ja->discard_in_flight, DISCARD_IN_FLIGHT);
+>  
+> -		bio_init(bio);
+> +		bio_init(bio, bio->bi_inline_vecs, 1);
+>  		bio_set_op_attrs(bio, REQ_OP_DISCARD, 0);
+>  		bio->bi_iter.bi_sector	= bucket_to_sector(ca->set,
+>  						ca->sb.d[ja->discard_idx]);
+>  		bio->bi_bdev		= ca->bdev;
+> -		bio->bi_max_vecs	= 1;
+> -		bio->bi_io_vec		= bio->bi_inline_vecs;
+>  		bio->bi_iter.bi_size	= bucket_bytes(ca);
+>  		bio->bi_end_io		= journal_discard_endio;
+>  
+> diff --git a/drivers/md/bcache/movinggc.c b/drivers/md/bcache/movinggc.c
+> index 5c4bddecfaf0..13b8a907006d 100644
+> --- a/drivers/md/bcache/movinggc.c
+> +++ b/drivers/md/bcache/movinggc.c
+> @@ -77,15 +77,13 @@ static void moving_init(struct moving_io *io)
+>  {
+>  	struct bio *bio = &io->bio.bio;
+>  
+> -	bio_init(bio);
+> +	bio_init(bio, bio->bi_inline_vecs,
+> +		 DIV_ROUND_UP(KEY_SIZE(&io->w->key), PAGE_SECTORS));
+>  	bio_get(bio);
+>  	bio_set_prio(bio, IOPRIO_PRIO_VALUE(IOPRIO_CLASS_IDLE, 0));
+>  
+>  	bio->bi_iter.bi_size	= KEY_SIZE(&io->w->key) << 9;
+> -	bio->bi_max_vecs	= DIV_ROUND_UP(KEY_SIZE(&io->w->key),
+> -					       PAGE_SECTORS);
+>  	bio->bi_private		= &io->cl;
+> -	bio->bi_io_vec		= bio->bi_inline_vecs;
+>  	bch_bio_map(bio, NULL);
+>  }
+>  
+> diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
+> index 0d99b5f4b3e6..f49c5417527d 100644
+> --- a/drivers/md/bcache/request.c
+> +++ b/drivers/md/bcache/request.c
+> @@ -623,7 +623,7 @@ static void do_bio_hook(struct search *s, struct bio *orig_bio)
+>  {
+>  	struct bio *bio = &s->bio.bio;
+>  
+> -	bio_init(bio);
+> +	bio_init(bio, NULL, 0);
+>  	__bio_clone_fast(bio, orig_bio);
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
----
- drivers/lightnvm/gennvm.c | 13 +------------
- drivers/lightnvm/rrpc.c   | 23 +++++++++++------------
- include/linux/lightnvm.h  |  8 ++------
- 3 files changed, 14 insertions(+), 30 deletions(-)
+We have this pattern multiple times, and it almost screams for a helper.
+But I think we're better off letting your patch go in as-is and sort
+that out later instead of delaying it.
 
-diff --git a/drivers/lightnvm/gennvm.c b/drivers/lightnvm/gennvm.c
-index 8791a2a..3cf5d59 100644
---- a/drivers/lightnvm/gennvm.c
-+++ b/drivers/lightnvm/gennvm.c
-@@ -159,7 +159,7 @@ static int gen_create_tgt(struct nvm_dev *dev, struct nvm_ioctl_create *create)
- 	tdisk->fops = &gen_fops;
- 	tdisk->queue = tqueue;
- 
--	targetdata = tt->init(tgt_dev, tdisk, s->lun_begin, s->lun_end);
-+	targetdata = tt->init(tgt_dev, tdisk, &t->lun_list);
- 	if (IS_ERR(targetdata))
- 		goto err_init;
- 
-@@ -613,16 +613,6 @@ static int gen_erase_blk(struct nvm_dev *dev, struct nvm_block *blk, int flags)
- 	return nvm_erase_ppa(dev, &addr, 1, flags);
- }
- 
--static struct nvm_lun *gen_get_lun(struct nvm_dev *dev, int lunid)
--{
--	struct gen_dev *gn = dev->mp;
--
--	if (unlikely(lunid >= dev->geo.nr_luns))
--		return NULL;
--
--	return &gn->luns[lunid];
--}
--
- static void gen_lun_info_print(struct nvm_dev *dev)
- {
- 	struct gen_dev *gn = dev->mp;
-@@ -655,7 +645,6 @@ static struct nvmm_type gen = {
- 
- 	.mark_blk		= gen_mark_blk,
- 
--	.get_lun		= gen_get_lun,
- 	.lun_info_print		= gen_lun_info_print,
- 
- 	.get_area		= gen_get_area,
-diff --git a/drivers/lightnvm/rrpc.c b/drivers/lightnvm/rrpc.c
-index 5377c7a..165b9d3 100644
---- a/drivers/lightnvm/rrpc.c
-+++ b/drivers/lightnvm/rrpc.c
-@@ -1199,10 +1199,11 @@ static void rrpc_luns_free(struct rrpc *rrpc)
- 	kfree(rrpc->luns);
- }
- 
--static int rrpc_luns_init(struct rrpc *rrpc, int lun_begin, int lun_end)
-+static int rrpc_luns_init(struct rrpc *rrpc, struct list_head *lun_list)
- {
- 	struct nvm_tgt_dev *dev = rrpc->dev;
- 	struct nvm_geo *geo = &dev->geo;
-+	struct nvm_lun *lun;
- 	struct rrpc_lun *rlun;
- 	int i, j, ret = -EINVAL;
- 
-@@ -1218,16 +1219,11 @@ static int rrpc_luns_init(struct rrpc *rrpc, int lun_begin, int lun_end)
- 	if (!rrpc->luns)
- 		return -ENOMEM;
- 
-+	i = 0;
-+
- 	/* 1:1 mapping */
--	for (i = 0; i < rrpc->nr_luns; i++) {
--		int lunid = lun_begin + i;
--		struct nvm_lun *lun;
--
--		lun = dev->mt->get_lun(dev->parent, lunid);
--		if (!lun)
--			goto err;
--
--		rlun = &rrpc->luns[i];
-+	list_for_each_entry(lun, lun_list, list) {
-+		rlun = &rrpc->luns[i++];
- 		rlun->parent = lun;
- 		rlun->blocks = vzalloc(sizeof(struct rrpc_block) *
- 							geo->blks_per_lun);
-@@ -1256,6 +1252,8 @@ static int rrpc_luns_init(struct rrpc *rrpc, int lun_begin, int lun_end)
- 		spin_lock_init(&rlun->lock);
- 	}
- 
-+	WARN_ON(i != rrpc->nr_luns);
-+
- 	return 0;
- err:
- 	return ret;
-@@ -1410,12 +1408,13 @@ static int rrpc_luns_configure(struct rrpc *rrpc)
- static struct nvm_tgt_type tt_rrpc;
- 
- static void *rrpc_init(struct nvm_tgt_dev *dev, struct gendisk *tdisk,
--						int lun_begin, int lun_end)
-+						struct list_head *lun_list)
- {
- 	struct request_queue *bqueue = dev->q;
- 	struct request_queue *tqueue = tdisk->queue;
- 	struct nvm_geo *geo = &dev->geo;
- 	struct rrpc *rrpc;
-+	int lun_begin = (list_first_entry(lun_list, struct nvm_lun, list))->id;
- 	sector_t soffset;
- 	int ret;
- 
-@@ -1450,7 +1449,7 @@ static void *rrpc_init(struct nvm_tgt_dev *dev, struct gendisk *tdisk,
- 	}
- 	rrpc->soffset = soffset;
- 
--	ret = rrpc_luns_init(rrpc, lun_begin, lun_end);
-+	ret = rrpc_luns_init(rrpc, lun_list);
- 	if (ret) {
- 		pr_err("nvm: rrpc: could not initialize luns\n");
- 		goto err;
-diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
-index 1f1588c..e56c352 100644
---- a/include/linux/lightnvm.h
-+++ b/include/linux/lightnvm.h
-@@ -504,8 +504,8 @@ static inline int ppa_to_slc(struct nvm_dev *dev, int slc_pg)
- 
- typedef blk_qc_t (nvm_tgt_make_rq_fn)(struct request_queue *, struct bio *);
- typedef sector_t (nvm_tgt_capacity_fn)(void *);
--typedef void *(nvm_tgt_init_fn)(struct nvm_tgt_dev *, struct gendisk *, int,
--				int);
-+typedef void *(nvm_tgt_init_fn)(struct nvm_tgt_dev *, struct gendisk *,
-+				struct list_head *lun_list);
- typedef void (nvm_tgt_exit_fn)(void *);
- 
- struct nvm_tgt_type {
-@@ -541,7 +541,6 @@ typedef int (nvmm_remove_tgt_fn)(struct nvm_dev *, struct nvm_ioctl_remove *);
- typedef int (nvmm_submit_io_fn)(struct nvm_dev *, struct nvm_rq *);
- typedef int (nvmm_erase_blk_fn)(struct nvm_dev *, struct nvm_block *, int);
- typedef void (nvmm_mark_blk_fn)(struct nvm_dev *, struct ppa_addr, int);
--typedef struct nvm_lun *(nvmm_get_lun_fn)(struct nvm_dev *, int);
- typedef void (nvmm_lun_info_print_fn)(struct nvm_dev *);
- 
- typedef int (nvmm_get_area_fn)(struct nvm_dev *, sector_t *, sector_t);
-@@ -563,9 +562,6 @@ struct nvmm_type {
- 	/* Bad block mgmt */
- 	nvmm_mark_blk_fn *mark_blk;
- 
--	/* Configuration management */
--	nvmm_get_lun_fn *get_lun;
--
- 	/* Statistics */
- 	nvmm_lun_info_print_fn *lun_info_print;
- 
--- 
-2.7.4
+Otherwise this looks fine:
 
+Reviewed-by: Christoph Hellwig <hch@lst.de>
