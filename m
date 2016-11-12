@@ -1,46 +1,52 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f48.google.com ([74.125.82.48]:35991 "EHLO
-        mail-wm0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753388AbcKROoG (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Nov 2016 09:44:06 -0500
-Received: by mail-wm0-f48.google.com with SMTP id g23so42651617wme.1
-        for <linux-block@vger.kernel.org>; Fri, 18 Nov 2016 06:44:05 -0800 (PST)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH 10/20] lightnvm: use constant name instead of value
-Date: Fri, 18 Nov 2016 15:43:32 +0100
-Message-Id: <1479480222-18790-11-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1479480222-18790-1-git-send-email-javier@cnexlabs.com>
-References: <1479480222-18790-1-git-send-email-javier@cnexlabs.com>
+Subject: Re: [GIT PULL] Block fixes for 4.9-rc
+To: Linus Torvalds <torvalds@linux-foundation.org>
+References: <21b1c040-ea27-847d-326a-266224516814@fb.com>
+ <CA+55aFzjUTzokY8MHYXFPhr0W037Qzhu1EchGoAkkFUgrkV+CA@mail.gmail.com>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+From: Jens Axboe <axboe@fb.com>
+Message-ID: <88377c67-f091-ce96-f508-376d633adb7e@fb.com>
+Date: Fri, 11 Nov 2016 18:24:31 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <CA+55aFzjUTzokY8MHYXFPhr0W037Qzhu1EchGoAkkFUgrkV+CA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+List-ID: <linux-block@vger.kernel.org>
 
-There is a constant to refer to free blocks. Use it when marking bad
-blocks instead of using a constant value
+On 11/11/2016 05:45 PM, Linus Torvalds wrote:
+> On Fri, Nov 11, 2016 at 4:11 PM, Jens Axboe <axboe@fb.com> wrote:
+>> Hi Linus,
+>>
+>> Three small (really, one liners all of them!) fixes that should go into
+>> this series:
+>
+> What about the aoeblk one? That seems to have come in with a tester
+> lately. From your original email:
+>
+>  "I'm wondering if this is bio iteration breakage. aoeblk does this weird
+>   inc/dec of page counts, which should not be needed. At least others
+>   would be hit by this as well. In any case, should suffice for a test,
+>   before we look further. Can anyone test with this debug patch?"
+>
+> Anyway, that bug seems to have been around forever and I'm not seeing
+> a lot of complaints, but I thought I'd ask.
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
----
- drivers/lightnvm/gennvm.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I was going to queue that one up for 4.10, but we can go with 4.9 as
+well. I don't think it's a huge deal. And, as per the below, looks like
+I'm sending another round next week anyway.
 
-diff --git a/drivers/lightnvm/gennvm.c b/drivers/lightnvm/gennvm.c
-index e969e3a..aee5b72 100644
---- a/drivers/lightnvm/gennvm.c
-+++ b/drivers/lightnvm/gennvm.c
-@@ -279,7 +279,7 @@ static int gen_block_bb(struct gen_dev *gn, struct ppa_addr ppa,
- 	lun = &gn->luns[(dev->luns_per_chnl * ppa.g.ch) + ppa.g.lun];
- 
- 	for (i = 0; i < nr_blks; i++) {
--		if (blks[i] == 0)
-+		if (blks[i] == NVM_BLK_T_FREE)
- 			continue;
- 
- 		blk = &lun->vlun.blocks[i];
+> Your oneliners pulled. Except when I pull, I don't actually get this one:
+>
+>     Matias Bjørling (1):
+>           lightnvm: invalid offset calculation for lba_shift
+>
+> but since you know how very deeply I care about lighnvm, I'm not
+> finding it in myself to worry about why that one was missing.
+
+Yes, I remember you made that clear :-)
+
+I forgot to push that one out after applying the other day, apparently,
+and missed that git request-pull complained. But worry not, I'll include
+that in the next round. It's still a merge window regression.
+
 -- 
-2.7.4
-
+Jens Axboe
