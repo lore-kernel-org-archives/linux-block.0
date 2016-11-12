@@ -1,70 +1,181 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wj0-f194.google.com ([209.85.210.194]:34157 "EHLO
-        mail-wj0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755646AbcK1Vj5 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Nov 2016 16:39:57 -0500
-Received: by mail-wj0-f194.google.com with SMTP id xy5so15802796wjc.1
-        for <linux-block@vger.kernel.org>; Mon, 28 Nov 2016 13:39:56 -0800 (PST)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: axboe@fb.com, =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <jg@lightnvm.io>,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [PATCH 21/23] lightnvm: introduce max_phys_sects helper function
-Date: Mon, 28 Nov 2016 22:39:12 +0100
-Message-Id: <20161128213914.12516-22-m@bjorling.me>
-In-Reply-To: <20161128213914.12516-1-m@bjorling.me>
-References: <20161128213914.12516-1-m@bjorling.me>
+Return-Path: <prvs=012435efd5=axboe@fb.com>
+From: Jens Axboe <axboe@fb.com>
+To: <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
+        <linux-fsdevel@vger.kernel.org>
+CC: <hch@infradead.org>, Jens Axboe <axboe@fb.com>
+Subject: [PATCH 2/3] blk-mq: implement hybrid poll mode for sync O_DIRECT
+Date: Fri, 11 Nov 2016 22:11:26 -0700
+Message-ID: <1478927487-12998-3-git-send-email-axboe@fb.com>
+In-Reply-To: <1478927487-12998-1-git-send-email-axboe@fb.com>
+References: <1478927487-12998-1-git-send-email-axboe@fb.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain
+List-ID: <linux-block@vger.kernel.org>
 
-From: Javier González <jg@lightnvm.io>
+This patch enables a hybrid polling mode. Instead of polling after IO
+submission, we can induce an artificial delay, and then poll after that.
+For example, if the IO is presumed to complete in 8 usecs from now, we
+can sleep for 4 usecs, wake up, and then do our polling. This still puts
+a sleep/wakeup cycle in the IO path, but instead of the wakeup happening
+after the IO has completed, it'll happen before. With this hybrid
+scheme, we can achieve big latency reductions while still using the same
+(or less) amount of CPU.
 
-Target devices do not have access to the device driver operations.
-Introduce a helper function that exposes the max. number of physical
-sectors supported by the underlying device.
-
-Signed-off-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <m@bjorling.me>
+Signed-off-by: Jens Axboe <axboe@fb.com>
 ---
- drivers/lightnvm/core.c  | 8 ++++++++
- include/linux/lightnvm.h | 1 +
- 2 files changed, 9 insertions(+)
+ block/blk-mq.c         | 47 +++++++++++++++++++++++++++++++++++++++++++++++
+ block/blk-sysfs.c      | 29 +++++++++++++++++++++++++++++
+ block/blk.h            |  1 +
+ include/linux/blkdev.h |  1 +
+ 4 files changed, 78 insertions(+)
 
-diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-index 69f261e..3d8eaac 100644
---- a/drivers/lightnvm/core.c
-+++ b/drivers/lightnvm/core.c
-@@ -203,6 +203,14 @@ int nvm_set_bb_tbl(struct nvm_dev *dev, struct ppa_addr *ppas, int nr_ppas,
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index ae8df5ec20d3..2c77a2da123a 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -332,6 +332,7 @@ static void __blk_mq_free_request(struct blk_mq_hw_ctx *hctx,
+ 	rq->rq_flags = 0;
+ 
+ 	clear_bit(REQ_ATOM_STARTED, &rq->atomic_flags);
++	clear_bit(REQ_ATOM_POLL_SLEPT, &rq->atomic_flags);
+ 	blk_mq_put_tag(hctx, ctx, tag);
+ 	blk_queue_exit(q);
  }
- EXPORT_SYMBOL(nvm_set_bb_tbl);
+@@ -2461,11 +2462,57 @@ void blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set, int nr_hw_queues)
+ }
+ EXPORT_SYMBOL_GPL(blk_mq_update_nr_hw_queues);
  
-+int nvm_max_phys_sects(struct nvm_tgt_dev *tgt_dev)
++static bool blk_mq_poll_hybrid_sleep(struct request_queue *q,
++				     struct request *rq)
 +{
-+	struct nvm_dev *dev = tgt_dev->parent;
++	struct hrtimer_sleeper hs;
++	ktime_t kt;
 +
-+	return dev->ops->max_phys_sect;
++	if (!q->poll_nsec || test_bit(REQ_ATOM_POLL_SLEPT, &rq->atomic_flags))
++		return false;
++
++	set_bit(REQ_ATOM_POLL_SLEPT, &rq->atomic_flags);
++
++	/*
++	 * This will be replaced with the stats tracking code, using
++	 * 'avg_completion_time / 2' as the pre-sleep target.
++	 */
++	kt = ktime_set(0, q->poll_nsec);
++
++	hrtimer_init_on_stack(&hs.timer, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
++	hrtimer_set_expires(&hs.timer, kt);
++
++	hrtimer_init_sleeper(&hs, current);
++	do {
++		if (test_bit(REQ_ATOM_COMPLETE, &rq->atomic_flags))
++			break;
++		set_current_state(TASK_UNINTERRUPTIBLE);
++		hrtimer_start_expires(&hs.timer, HRTIMER_MODE_REL);
++		if (hs.task)
++			io_schedule();
++		hrtimer_cancel(&hs.timer);
++	} while (hs.task && !signal_pending(current));
++
++	__set_current_state(TASK_RUNNING);
++	destroy_hrtimer_on_stack(&hs.timer);
++	return true;
 +}
-+EXPORT_SYMBOL(nvm_max_phys_sects);
 +
- int nvm_submit_io(struct nvm_tgt_dev *tgt_dev, struct nvm_rq *rqd)
+ static bool __blk_mq_poll(struct blk_mq_hw_ctx *hctx, struct request *rq)
  {
- 	struct nvm_dev *dev = tgt_dev->parent;
-diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
-index 99cd1e7..9637531 100644
---- a/include/linux/lightnvm.h
-+++ b/include/linux/lightnvm.h
-@@ -529,6 +529,7 @@ extern void nvm_unregister(struct nvm_dev *);
- extern int nvm_set_bb_tbl(struct nvm_dev *dev, struct ppa_addr *ppas,
- 							int nr_ppas, int type);
+ 	struct request_queue *q = hctx->queue;
+ 	long state;
  
-+extern int nvm_max_phys_sects(struct nvm_tgt_dev *);
- extern int nvm_submit_io(struct nvm_tgt_dev *, struct nvm_rq *);
- extern void nvm_generic_to_addr_mode(struct nvm_dev *, struct nvm_rq *);
- extern void nvm_addr_to_generic_mode(struct nvm_dev *, struct nvm_rq *);
++	/*
++	 * If we sleep, have the caller restart the poll loop to reset
++	 * the state. Like for the other success return cases, the
++	 * caller is responsible for checking if the IO completed. If
++	 * the IO isn't complete, we'll get called again and will go
++	 * straight to the busy poll loop.
++	 */
++	if (blk_mq_poll_hybrid_sleep(q, rq))
++		return true;
++
+ 	hctx->poll_considered++;
+ 
+ 	state = current->state;
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index 9262d2d60a09..b87f992fdbd7 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -350,6 +350,28 @@ queue_rq_affinity_store(struct request_queue *q, const char *page, size_t count)
+ 	return ret;
+ }
+ 
++static ssize_t queue_poll_delay_show(struct request_queue *q, char *page)
++{
++	return queue_var_show(q->poll_nsec / 1000, page);
++}
++
++static ssize_t queue_poll_delay_store(struct request_queue *q, const char *page,
++				size_t count)
++{
++	unsigned long poll_usec;
++	ssize_t ret;
++
++	if (!q->mq_ops || !q->mq_ops->poll)
++		return -EINVAL;
++
++	ret = queue_var_store(&poll_usec, page, count);
++	if (ret < 0)
++		return ret;
++
++	q->poll_nsec = poll_usec * 1000;
++	return ret;
++}
++
+ static ssize_t queue_poll_show(struct request_queue *q, char *page)
+ {
+ 	return queue_var_show(test_bit(QUEUE_FLAG_POLL, &q->queue_flags), page);
+@@ -602,6 +624,12 @@ static struct queue_sysfs_entry queue_poll_entry = {
+ 	.store = queue_poll_store,
+ };
+ 
++static struct queue_sysfs_entry queue_poll_delay_entry = {
++	.attr = {.name = "io_poll_delay", .mode = S_IRUGO | S_IWUSR },
++	.show = queue_poll_delay_show,
++	.store = queue_poll_delay_store,
++};
++
+ static struct queue_sysfs_entry queue_wc_entry = {
+ 	.attr = {.name = "write_cache", .mode = S_IRUGO | S_IWUSR },
+ 	.show = queue_wc_show,
+@@ -655,6 +683,7 @@ static struct attribute *default_attrs[] = {
+ 	&queue_dax_entry.attr,
+ 	&queue_stats_entry.attr,
+ 	&queue_wb_lat_entry.attr,
++	&queue_poll_delay_entry.attr,
+ 	NULL,
+ };
+ 
+diff --git a/block/blk.h b/block/blk.h
+index aa132dea598c..041185e5f129 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -111,6 +111,7 @@ void blk_account_io_done(struct request *req);
+ enum rq_atomic_flags {
+ 	REQ_ATOM_COMPLETE = 0,
+ 	REQ_ATOM_STARTED,
++	REQ_ATOM_POLL_SLEPT,
+ };
+ 
+ /*
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index bab18ee5810d..37ed4ea705c8 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -509,6 +509,7 @@ struct request_queue {
+ 	unsigned int		request_fn_active;
+ 
+ 	unsigned int		rq_timeout;
++	unsigned int		poll_nsec;
+ 	struct timer_list	timeout;
+ 	struct work_struct	timeout_work;
+ 	struct list_head	timeout_list;
 -- 
-2.9.3
-
+2.7.4
