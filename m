@@ -1,138 +1,192 @@
-Return-Path: <prvs=012435efd5=axboe@fb.com>
-From: Jens Axboe <axboe@fb.com>
-To: <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
-        <linux-fsdevel@vger.kernel.org>
-CC: <hch@infradead.org>, Christoph Hellwig <hch@lst.de>,
-        Jens Axboe
-	<axboe@fb.com>
-Subject: [PATCH 1/3] block: fast-path for small and simple direct I/O requests
-Date: Fri, 11 Nov 2016 22:11:25 -0700
-Message-ID: <1478927487-12998-2-git-send-email-axboe@fb.com>
-In-Reply-To: <1478927487-12998-1-git-send-email-axboe@fb.com>
-References: <1478927487-12998-1-git-send-email-axboe@fb.com>
+Return-Path: <jack@suse.cz>
+Date: Mon, 14 Nov 2016 10:01:32 +0100
+From: Jan Kara <jack@suse.cz>
+To: Jens Axboe <axboe@fb.com>
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org, jack@suse.cz
+Subject: Re: [PATCH 2/2] blk-wbt: remove stat ops
+Message-ID: <20161114090132.GE2524@quack2.suse.cz>
+References: <1478877717-19624-1-git-send-email-axboe@fb.com>
+ <1478877717-19624-3-git-send-email-axboe@fb.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1478877717-19624-3-git-send-email-axboe@fb.com>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Christoph Hellwig <hch@lst.de>
+On Fri 11-11-16 08:21:57, Jens Axboe wrote:
+> Again a leftover from when the throttling code was generic. Now that we
+> just have the block user, get rid of the stat ops and indirections.
+> 
+> Signed-off-by: Jens Axboe <axboe@fb.com>
 
-This patch adds a small and simple fast patch for small direct I/O
-requests on block devices that don't use AIO.  Between the neat
-bio_iov_iter_get_pages helper that avoids allocating a page array
-for get_user_pages and the on-stack bio and biovec this avoid memory
-allocations and atomic operations entirely in the direct I/O code
-(lower levels might still do memory allocations and will usually
-have at least some atomic operations, though).
+Looks good to me. You can add:
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Jens Axboe <axboe@fb.com>
----
- fs/block_dev.c | 80 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 80 insertions(+)
+Reviewed-by: Jan Kara <jack@suse.cz>
 
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 05b553368bb4..7c3ec6049073 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -30,6 +30,7 @@
- #include <linux/cleancache.h>
- #include <linux/dax.h>
- #include <linux/badblocks.h>
-+#include <linux/task_io_accounting_ops.h>
- #include <linux/falloc.h>
- #include <asm/uaccess.h>
- #include "internal.h"
-@@ -175,12 +176,91 @@ static struct inode *bdev_file_inode(struct file *file)
- 	return file->f_mapping->host;
- }
- 
-+#define DIO_INLINE_BIO_VECS 4
-+
-+static void blkdev_bio_end_io_simple(struct bio *bio)
-+{
-+	struct task_struct *waiter = bio->bi_private;
-+
-+	WRITE_ONCE(bio->bi_private, NULL);
-+	wake_up_process(waiter);
-+}
-+
-+static ssize_t
-+__blkdev_direct_IO_simple(struct kiocb *iocb, struct iov_iter *iter,
-+		int nr_pages)
-+{
-+	struct file *file = iocb->ki_filp;
-+	struct block_device *bdev = I_BDEV(bdev_file_inode(file));
-+	unsigned blkbits = blksize_bits(bdev_logical_block_size(bdev));
-+	struct bio_vec inline_vecs[DIO_INLINE_BIO_VECS], *bvec;
-+	loff_t pos = iocb->ki_pos;
-+	bool should_dirty = false;
-+	struct bio bio;
-+	ssize_t ret;
-+	blk_qc_t qc;
-+	int i;
-+
-+	if ((pos | iov_iter_alignment(iter)) & ((1 << blkbits) - 1))
-+		return -EINVAL;
-+
-+	bio_init(&bio);
-+	bio.bi_max_vecs = nr_pages;
-+	bio.bi_io_vec = inline_vecs;
-+	bio.bi_bdev = bdev;
-+	bio.bi_iter.bi_sector = pos >> blkbits;
-+	bio.bi_private = current;
-+	bio.bi_end_io = blkdev_bio_end_io_simple;
-+
-+	ret = bio_iov_iter_get_pages(&bio, iter);
-+	if (unlikely(ret))
-+		return ret;
-+	ret = bio.bi_iter.bi_size;
-+
-+	if (iov_iter_rw(iter) == READ) {
-+		bio_set_op_attrs(&bio, REQ_OP_READ, 0);
-+		if (iter_is_iovec(iter))
-+			should_dirty = true;
-+	} else {
-+		bio_set_op_attrs(&bio, REQ_OP_WRITE, REQ_SYNC | REQ_IDLE);
-+		task_io_account_write(ret);
-+	}
-+
-+	qc = submit_bio(&bio);
-+	for (;;) {
-+		set_current_state(TASK_UNINTERRUPTIBLE);
-+		if (!READ_ONCE(bio.bi_private))
-+			break;
-+		if (!(iocb->ki_flags & IOCB_HIPRI) ||
-+		    !blk_mq_poll(bdev_get_queue(bdev), qc))
-+			io_schedule();
-+	}
-+	__set_current_state(TASK_RUNNING);
-+
-+	bio_for_each_segment_all(bvec, &bio, i) {
-+		if (should_dirty && !PageCompound(bvec->bv_page))
-+			set_page_dirty_lock(bvec->bv_page);
-+		put_page(bvec->bv_page);
-+	}
-+
-+	if (unlikely(bio.bi_error))
-+		return bio.bi_error;
-+	iocb->ki_pos += ret;
-+	return ret;
-+}
-+
- static ssize_t
- blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter)
- {
- 	struct file *file = iocb->ki_filp;
- 	struct inode *inode = bdev_file_inode(file);
-+	int nr_pages;
- 
-+	nr_pages = iov_iter_npages(iter, BIO_MAX_PAGES);
-+	if (!nr_pages)
-+		return 0;
-+	if (is_sync_kiocb(iocb) && nr_pages <= DIO_INLINE_BIO_VECS)
-+		return __blkdev_direct_IO_simple(iocb, iter, nr_pages);
- 	return __blockdev_direct_IO(iocb, inode, I_BDEV(inode), iter,
- 				    blkdev_get_block, NULL, NULL,
- 				    DIO_SKIP_DIO_COUNT);
+								Honza
+
+> ---
+>  block/blk-sysfs.c | 23 +----------------------
+>  block/blk-wbt.c   | 15 +++++----------
+>  block/blk-wbt.h   | 13 ++-----------
+>  3 files changed, 8 insertions(+), 43 deletions(-)
+> 
+> diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+> index 9262d2d60a09..415e764807d0 100644
+> --- a/block/blk-sysfs.c
+> +++ b/block/blk-sysfs.c
+> @@ -770,27 +770,6 @@ struct kobj_type blk_queue_ktype = {
+>  	.release	= blk_release_queue,
+>  };
+>  
+> -static void blk_wb_stat_get(void *data, struct blk_rq_stat *stat)
+> -{
+> -	blk_queue_stat_get(data, stat);
+> -}
+> -
+> -static void blk_wb_stat_clear(void *data)
+> -{
+> -	blk_stat_clear(data);
+> -}
+> -
+> -static bool blk_wb_stat_is_current(struct blk_rq_stat *stat)
+> -{
+> -	return blk_stat_is_current(stat);
+> -}
+> -
+> -static struct wb_stat_ops wb_stat_ops = {
+> -	.get		= blk_wb_stat_get,
+> -	.is_current	= blk_wb_stat_is_current,
+> -	.clear		= blk_wb_stat_clear,
+> -};
+> -
+>  static void blk_wb_init(struct request_queue *q)
+>  {
+>  #ifndef CONFIG_BLK_WBT_MQ
+> @@ -805,7 +784,7 @@ static void blk_wb_init(struct request_queue *q)
+>  	/*
+>  	 * If this fails, we don't get throttling
+>  	 */
+> -	wbt_init(q, &wb_stat_ops);
+> +	wbt_init(q);
+>  }
+>  
+>  int blk_register_queue(struct gendisk *disk)
+> diff --git a/block/blk-wbt.c b/block/blk-wbt.c
+> index 4ab9cebc8003..f6ec7e587fa6 100644
+> --- a/block/blk-wbt.c
+> +++ b/block/blk-wbt.c
+> @@ -308,7 +308,7 @@ static int __latency_exceeded(struct rq_wb *rwb, struct blk_rq_stat *stat)
+>  		 * waited or still has writes in flights, consider us doing
+>  		 * just writes as well.
+>  		 */
+> -		if ((stat[1].nr_samples && rwb->stat_ops->is_current(stat)) ||
+> +		if ((stat[1].nr_samples && blk_stat_is_current(stat)) ||
+>  		    wb_recent_wait(rwb) || wbt_inflight(rwb))
+>  			return LAT_UNKNOWN_WRITES;
+>  		return LAT_UNKNOWN;
+> @@ -333,7 +333,7 @@ static int latency_exceeded(struct rq_wb *rwb)
+>  {
+>  	struct blk_rq_stat stat[2];
+>  
+> -	rwb->stat_ops->get(rwb->ops_data, stat);
+> +	blk_queue_stat_get(rwb->queue, stat);
+>  	return __latency_exceeded(rwb, stat);
+>  }
+>  
+> @@ -355,7 +355,7 @@ static void scale_up(struct rq_wb *rwb)
+>  
+>  	rwb->scale_step--;
+>  	rwb->unknown_cnt = 0;
+> -	rwb->stat_ops->clear(rwb->ops_data);
+> +	blk_stat_clear(rwb->queue);
+>  
+>  	rwb->scaled_max = calc_wb_limits(rwb);
+>  
+> @@ -385,7 +385,7 @@ static void scale_down(struct rq_wb *rwb, bool hard_throttle)
+>  
+>  	rwb->scaled_max = false;
+>  	rwb->unknown_cnt = 0;
+> -	rwb->stat_ops->clear(rwb->ops_data);
+> +	blk_stat_clear(rwb->queue);
+>  	calc_wb_limits(rwb);
+>  	rwb_trace_step(rwb, "step down");
+>  }
+> @@ -675,7 +675,7 @@ void wbt_disable(struct rq_wb *rwb)
+>  }
+>  EXPORT_SYMBOL_GPL(wbt_disable);
+>  
+> -int wbt_init(struct request_queue *q, struct wb_stat_ops *ops)
+> +int wbt_init(struct request_queue *q)
+>  {
+>  	struct rq_wb *rwb;
+>  	int i;
+> @@ -688,9 +688,6 @@ int wbt_init(struct request_queue *q, struct wb_stat_ops *ops)
+>  	BUILD_BUG_ON(RWB_WINDOW_NSEC > BLK_STAT_NSEC);
+>  	BUILD_BUG_ON(WBT_NR_BITS > BLK_STAT_RES_BITS);
+>  
+> -	if (!ops->get || !ops->is_current || !ops->clear)
+> -		return -EINVAL;
+> -
+>  	rwb = kzalloc(sizeof(*rwb), GFP_KERNEL);
+>  	if (!rwb)
+>  		return -ENOMEM;
+> @@ -706,8 +703,6 @@ int wbt_init(struct request_queue *q, struct wb_stat_ops *ops)
+>  	rwb->last_comp = rwb->last_issue = jiffies;
+>  	rwb->queue = q;
+>  	rwb->win_nsec = RWB_WINDOW_NSEC;
+> -	rwb->stat_ops = ops;
+> -	rwb->ops_data = q;
+>  	wbt_update_limits(rwb);
+>  
+>  	/*
+> diff --git a/block/blk-wbt.h b/block/blk-wbt.h
+> index 09c61a3f8295..44dc2173dc1f 100644
+> --- a/block/blk-wbt.h
+> +++ b/block/blk-wbt.h
+> @@ -46,12 +46,6 @@ static inline bool wbt_is_read(struct blk_issue_stat *stat)
+>  	return (stat->time >> BLK_STAT_SHIFT) & WBT_READ;
+>  }
+>  
+> -struct wb_stat_ops {
+> -	void (*get)(void *, struct blk_rq_stat *);
+> -	bool (*is_current)(struct blk_rq_stat *);
+> -	void (*clear)(void *);
+> -};
+> -
+>  struct rq_wait {
+>  	wait_queue_head_t wait;
+>  	atomic_t inflight;
+> @@ -89,9 +83,6 @@ struct rq_wb {
+>  	unsigned long min_lat_nsec;
+>  	struct request_queue *queue;
+>  	struct rq_wait rq_wait[WBT_NUM_RWQ];
+> -
+> -	struct wb_stat_ops *stat_ops;
+> -	void *ops_data;
+>  };
+>  
+>  static inline unsigned int wbt_inflight(struct rq_wb *rwb)
+> @@ -109,7 +100,7 @@ static inline unsigned int wbt_inflight(struct rq_wb *rwb)
+>  void __wbt_done(struct rq_wb *, enum wbt_flags);
+>  void wbt_done(struct rq_wb *, struct blk_issue_stat *);
+>  enum wbt_flags wbt_wait(struct rq_wb *, struct bio *, spinlock_t *);
+> -int wbt_init(struct request_queue *, struct wb_stat_ops *);
+> +int wbt_init(struct request_queue *);
+>  void wbt_exit(struct request_queue *);
+>  void wbt_update_limits(struct rq_wb *);
+>  void wbt_requeue(struct rq_wb *, struct blk_issue_stat *);
+> @@ -132,7 +123,7 @@ static inline enum wbt_flags wbt_wait(struct rq_wb *rwb, struct bio *bio,
+>  {
+>  	return 0;
+>  }
+> -static inline int wbt_init(struct request_queue *q, struct wb_stat_ops *ops)
+> +static inline int wbt_init(struct request_queue *q)
+>  {
+>  	return -EINVAL;
+>  }
+> -- 
+> 2.7.4
+> 
 -- 
-2.7.4
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
