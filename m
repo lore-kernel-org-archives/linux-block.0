@@ -1,50 +1,98 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.136]:35652 "EHLO mail.kernel.org"
+Received: from mx2.suse.de ([195.135.220.15]:57645 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1755212AbcKOAOB (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Nov 2016 19:14:01 -0500
-Date: Mon, 14 Nov 2016 16:13:57 -0800
-From: Shaohua Li <shli@kernel.org>
+        id S1753821AbcKNJvv (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 14 Nov 2016 04:51:51 -0500
+From: NeilBrown <neilb@suse.com>
 To: Christoph Hellwig <hch@infradead.org>
-Cc: linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
-        neilb@suse.com
+Date: Mon, 14 Nov 2016 20:51:38 +1100
+Cc: Christoph Hellwig <hch@infradead.org>,
+        Shaohua Li <shli@kernel.org>, linux-raid@vger.kernel.org,
+        linux-block@vger.kernel.org
 Subject: Re: "creative" bio usage in the RAID code
-Message-ID: <20161115001357.sb5242j5t7bsurjd@kernel.org>
-References: <20161110194636.GA32241@infradead.org>
- <20161111190223.4xrq3vvvvohzgs5e@kernel.org>
- <20161112174238.GA11518@infradead.org>
+In-Reply-To: <20161114085720.GB8405@infradead.org>
+References: <20161110194636.GA32241@infradead.org> <20161111190223.4xrq3vvvvohzgs5e@kernel.org> <20161112174238.GA11518@infradead.org> <87vavrj8jp.fsf@notabene.neil.brown.name> <20161114085720.GB8405@infradead.org>
+Message-ID: <87polyie39.fsf@notabene.neil.brown.name>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20161112174238.GA11518@infradead.org>
+Content-Type: multipart/signed; boundary="=-=-=";
+        micalg=pgp-sha256; protocol="application/pgp-signature"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Sat, Nov 12, 2016 at 09:42:38AM -0800, Christoph Hellwig wrote:
-> On Fri, Nov 11, 2016 at 11:02:23AM -0800, Shaohua Li wrote:
-> > > It's mostly about the RAID1 and RAID10 code which does a lot of funny
-> > > things with the bi_iov_vec and bi_vcnt fields, which we'd prefer that
-> > > drivers don't touch.  One example is the r1buf_pool_alloc code,
-> > > which I think should simply use bio_clone for the MD_RECOVERY_REQUESTED
-> > > case, which would also take care of r1buf_pool_free.  I'm not sure
-> > > about all the others cases, as some bits don't fully make sense to me,
-> > 
-> > The problem is we use the iov_vec to track the pages allocated. We will read
-> > data to the pages and write out later for resync. If we add new fields to track
-> > the pages in r1bio, we could use standard API bio_kmalloc/bio_add_page and
-> > avoid the tricky parts. This should work for both the resync and writebehind
-> > cases.
-> 
-> I don't think we need to track the pages specificly - if we clone
-> a bio we share the bio_vec, e.g. for the !MD_RECOVERY_REQUESTED
-> we do one bio_kmalloc, then bio_alloc_pages then clone it for the
-> others bios.  for MD_RECOVERY_REQUESTED we do a bio_kmalloc +
-> bio_alloc_pages for each.
+--=-=-=
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
-Sure, for r1buf_pool_alloc, what you suggested should work well. There are a
-lot of other places we are using bi_vcnt/bi_io_vec. I'm not sure if it's easy
-to replace them with bio iterator. But having a separate data structue to track
-the memory we read/rewite/sync and so on definitively will make things easier.
-I'm not saying to add the extra data structure in bio but instead in r1bio.
+On Mon, Nov 14 2016, Christoph Hellwig wrote:
+
+> On Mon, Nov 14, 2016 at 09:53:46AM +1100, NeilBrown wrote:
+>> > While we're at it - I find the way MD_RECOVERY_REQUESTED is used highly
+>> > confusing, and I'm not 100% sure it's correct.  After all we check it
+>> > in r1buf_pool_alloc, which is a mempool alloc callback, so we rely
+>> > on these callbacks being done after the flag has been raise / cleared,
+>> > which makes me bit suspicious, and also question why we even need the
+>> > mempool.
+>>=20
+>> MD_RECOVERY_REQUEST is only set or cleared when no recovery is running.
+>> The ->reconfig_mutex and MD_RECOVERY_RUNNING flags ensure there are no
+>> races there.
+>> The r1buf_pool mempool is created are the start of resync, so at that
+>> time MD_RECOVERY_RUNNING will be stable, and it will remain stable until
+>> after the mempool is freed.
+>>=20
+>> To perform a resync we need a pool of memory buffers.  We don't want to
+>> have to cope with kmalloc failing, but are quite able to cope with
+>> mempool_alloc() blocking.
+>> We probably don't need nearly as many bufs as we allocate (4 is probably
+>> plenty), but having a pool is certainly convenient.
+>
+> Would it be good to create/delete the pool explicitly through methods
+> to start/emd the sync?  Right now the behavior looks very, very
+> confusing.
+
+Maybe.  It is created the first time ->sync_request is called,
+and destroyed when it is called with a sector_nr at-or-beyond the end of
+the device.  I guess some of that could be made a bit more obvious.
+I'm not strongly against adding new methods for "start_sync" and "stop_sync"
+but I don't see that it is really needed.
+
+>
+>> The "bigger bio" might cover a large number of sectors.  If there are
+>> media errors, there might be only one sector that is bad.  So we repeat
+>> the read with finer granularity (pages in the current code, though
+>> device block would be ideal) and only recovery bad blocks for individual
+>> pages which are bad and cannot be fixed.
+>
+> i have no problems with the behavior - the point is that these days
+> this should be without poking into the bio internals, but by using
+> a bio iterator for just the range you want to re-read.  Potentially
+> using a bio clone if we can't reusing the existing bio, although I'm
+> not sure we even need that from looking at the code.
+
+Fair enough.  The code predates bio iterators and "if it ain't broke,
+don't fix it".  If it is now causing problems, then maybe it is now
+"broke" and should be "fixed".
 
 Thanks,
-Shaohua
+NeilBrown
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBCAAGBQJYKYkqAAoJEDnsnt1WYoG5mmIP/RIa/DJLZgOdiDCOFogGCyzq
+3tzcxDxJoqePmNx6O+uL23eCR+vrBEq1HIGhpwcyKjCNjpKjVPKYyoZu207Sjc+Z
+6Ykx55s1nvksi8ghcKtC5gO9BynPKQsWkENH9ZvNWMbaUVJCso78ZXqzsdcICLi2
+wT3RFdvmhLGL4xZvuiJ5SDrPe5yO91SJMx5jDlPkTvKUqFB4khd9gcDnwvTs2YyC
+NuNywC2zXX27AKzRjXNrK7kMUpGeF4taG279t1RYS4Xkhwp9HMpRKbF9kujRYyi8
+sBUtWqHWPXpv7iBcD43jC6BEBcaZ07PADjdi67Z5YUpwVUcKUs0oiFz63lEghllk
+SVYFnhWLbJxOQsT1tu5KEDs/RFWBi+4eIaJvXFSRv+qRSXSUb73/XLo+oOOWS+d8
+jRlsZH01bLtJr5Xc/YLAq6NQi0TDrofkDXKGgZmYHhwsTJab0emRCXSFtND+IyQg
+h9U4/znhyRy0W9aPXBkHBzkUW1PhUUWMtdBJHx8Tyq6fOHNDAW1Dll/2Sn7S2vXD
+i1z5en+1CVk19HTzZNfI/XVMcK2+/QcRwfDm+cGs/OFRVZdgYq4E98lbfkvYknX9
+ZlvxdfTCtcUOGQ8Pi4DJlc0MKnRMEtpjeEHosuUrg5DWHZQE1mv08ffPiCaLPTAt
+hfiofXDYwvKfQTwC5ZVv
+=mLZV
+-----END PGP SIGNATURE-----
+--=-=-=--
