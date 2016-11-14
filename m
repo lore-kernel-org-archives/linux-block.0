@@ -1,60 +1,40 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.9]:34031 "EHLO
+Received: from bombadil.infradead.org ([198.137.202.9]:58354 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754403AbcKNI5W (ORCPT
+        with ESMTP id S1751648AbcKNIvx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Nov 2016 03:57:22 -0500
-Date: Mon, 14 Nov 2016 00:57:20 -0800
+        Mon, 14 Nov 2016 03:51:53 -0500
+Date: Mon, 14 Nov 2016 00:51:51 -0800
 From: Christoph Hellwig <hch@infradead.org>
 To: NeilBrown <neilb@suse.com>
 Cc: Christoph Hellwig <hch@infradead.org>,
         Shaohua Li <shli@kernel.org>, linux-raid@vger.kernel.org,
         linux-block@vger.kernel.org
 Subject: Re: "creative" bio usage in the RAID code
-Message-ID: <20161114085720.GB8405@infradead.org>
+Message-ID: <20161114085151.GA8405@infradead.org>
 References: <20161110194636.GA32241@infradead.org>
- <20161111190223.4xrq3vvvvohzgs5e@kernel.org>
- <20161112174238.GA11518@infradead.org>
- <87vavrj8jp.fsf@notabene.neil.brown.name>
+ <87shqvj83r.fsf@notabene.neil.brown.name>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <87vavrj8jp.fsf@notabene.neil.brown.name>
+In-Reply-To: <87shqvj83r.fsf@notabene.neil.brown.name>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Mon, Nov 14, 2016 at 09:53:46AM +1100, NeilBrown wrote:
-> > While we're at it - I find the way MD_RECOVERY_REQUESTED is used highly
-> > confusing, and I'm not 100% sure it's correct.  After all we check it
-> > in r1buf_pool_alloc, which is a mempool alloc callback, so we rely
-> > on these callbacks being done after the flag has been raise / cleared,
-> > which makes me bit suspicious, and also question why we even need the
-> > mempool.
+On Mon, Nov 14, 2016 at 10:03:20AM +1100, NeilBrown wrote:
+> I would suggest adding a "bi_dev_private" field to the bio which is for
+> use by the lowest-level driver (much as bi_private is for use by the
+> top-level initiator).
+> That could be in a union with any or all of:
+> 	unsigned int		bi_phys_segments;
+> 	unsigned int		bi_seg_front_size;
+> 	unsigned int		bi_seg_back_size;
 > 
-> MD_RECOVERY_REQUEST is only set or cleared when no recovery is running.
-> The ->reconfig_mutex and MD_RECOVERY_RUNNING flags ensure there are no
-> races there.
-> The r1buf_pool mempool is created are the start of resync, so at that
-> time MD_RECOVERY_RUNNING will be stable, and it will remain stable until
-> after the mempool is freed.
+> (any driver that needs those, would see a 'request' rather than a 'bio'
+> and so could use rq->special)
 > 
-> To perform a resync we need a pool of memory buffers.  We don't want to
-> have to cope with kmalloc failing, but are quite able to cope with
-> mempool_alloc() blocking.
-> We probably don't need nearly as many bufs as we allocate (4 is probably
-> plenty), but having a pool is certainly convenient.
+> raid5.c could then use bi_dev_private (or bi_special, or whatever it is call).
 
-Would it be good to create/delete the pool explicitly through methods
-to start/emd the sync?  Right now the behavior looks very, very
-confusing.
-
-> The "bigger bio" might cover a large number of sectors.  If there are
-> media errors, there might be only one sector that is bad.  So we repeat
-> the read with finer granularity (pages in the current code, though
-> device block would be ideal) and only recovery bad blocks for individual
-> pages which are bad and cannot be fixed.
-
-i have no problems with the behavior - the point is that these days
-this should be without poking into the bio internals, but by using
-a bio iterator for just the range you want to re-read.  Potentially
-using a bio clone if we can't reusing the existing bio, although I'm
-not sure we even need that from looking at the code.
+All the three above fields are those that could go away with a full
+implementation of the multipage bvec scheme.  So any field for driver
+use would still be be overhead.  If it's just for raid5 it could
+be a smaller 16 bit (or maybe even just 8 bit) one.
