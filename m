@@ -1,98 +1,109 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from gateway33.websitewelcome.com ([192.185.145.33]:43985 "EHLO
-        gateway33.websitewelcome.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1751830AbcKFO1v (ORCPT
+Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:55987 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S965030AbcKNWW1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 6 Nov 2016 09:27:51 -0500
-Received: from cm2.websitewelcome.com (cm2.websitewelcome.com [192.185.178.13])
-        by gateway33.websitewelcome.com (Postfix) with ESMTP id 2328AFE83265D
-        for <linux-block@vger.kernel.org>; Sun,  6 Nov 2016 08:06:01 -0600 (CST)
-Message-ID: <b714bf30ee6577c5006f347b12b4f2fe.squirrel@webmail.raithlin.com>
-In-Reply-To: <20161025211903.GD14023@dastard>
-References: <1476826937-20665-1-git-send-email-sbates@raithlin.com>
-    <CAPcyv4gJ_c-6s2BUjsu6okR1EF53R+KNuXnOc5jv0fuwJaa3cQ@mail.gmail.com>
-    <20161019184814.GC16550@cgy1-donard.priv.deltatee.com>
-    <20161020232239.GQ23194@dastard> <20161021095714.GA12209@infradead.org>
-    <20161021111253.GQ14023@dastard>
-    <20161025115043.GA14986@cgy1-donard.priv.deltatee.com>
-    <20161025211903.GD14023@dastard>
-Date: Sun, 6 Nov 2016 08:05:59 -0600
-Subject: Re: [PATCH 0/3] iopmem : A block device for PCIe memory
-From: "Stephen Bates" <sbates@raithlin.com>
-To: "Dave Chinner" <david@fromorbit.com>
-Cc: "Stephen Bates" <sbates@raithlin.com>,
-        "Christoph Hellwig" <hch@infradead.org>,
-        "Dan Williams" <dan.j.williams@intel.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-nvdimm@lists.01.org" <linux-nvdimm@ml01.01.org>,
-        linux-rdma@vger.kernel.org, linux-block@vger.kernel.org,
-        "Linux MM" <linux-mm@kvack.org>,
-        "Ross Zwisler" <ross.zwisler@linux.intel.com>,
-        "Matthew Wilcox" <willy@linux.intel.com>,
-        jgunthorpe@obsidianresearch.com, haggaie@mellanox.com,
-        "Jens Axboe" <axboe@fb.com>, "Jonathan Corbet" <corbet@lwn.net>,
-        jim.macdonald@everspin.com, sbates@raithin.com,
-        "Logan Gunthorpe" <logang@deltatee.com>,
-        "David Woodhouse" <dwmw2@infradead.org>,
-        "Raj, Ashok" <ashok.raj@intel.com>
+        Mon, 14 Nov 2016 17:22:27 -0500
+Received: from pps.filterd (m0044012.ppops.net [127.0.0.1])
+        by mx0a-00082601.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id uAEMJVMZ003002
+        for <linux-block@vger.kernel.org>; Mon, 14 Nov 2016 14:22:27 -0800
+Received: from mail.thefacebook.com ([199.201.64.23])
+        by mx0a-00082601.pphosted.com with ESMTP id 26qjtr93s2-2
+        (version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT)
+        for <linux-block@vger.kernel.org>; Mon, 14 Nov 2016 14:22:27 -0800
+Received: from facebook.com (2401:db00:21:603d:face:0:19:0)     by
+ mx-out.facebook.com (10.223.100.99) with ESMTP id
+ d153c13caab811e6822c24be05956610-870e8a50 for <linux-block@vger.kernel.org>;
+        Mon, 14 Nov 2016 14:22:24 -0800
+From: Shaohua Li <shli@fb.com>
+To: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <Kernel-team@fb.com>, <axboe@fb.com>, <tj@kernel.org>,
+        <vgoyal@redhat.com>
+Subject: [PATCH V4 08/15] blk-throttle: detect completed idle cgroup
+Date: Mon, 14 Nov 2016 14:22:15 -0800
+Message-ID: <35b46c97cff667510a86cb70f1fb75d6d495e317.1479161136.git.shli@fb.com>
+In-Reply-To: <cover.1479161136.git.shli@fb.com>
+References: <cover.1479161136.git.shli@fb.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Tue, October 25, 2016 3:19 pm, Dave Chinner wrote:
-> On Tue, Oct 25, 2016 at 05:50:43AM -0600, Stephen Bates wrote:
->>
->> Dave are you saying that even for local mappings of files on a DAX
->> capable system it is possible for the mappings to move on you unless the
->> FS supports locking?
->>
->
-> Yes.
->
->
->> Does that not mean DAX on such FS is
->> inherently broken?
->
-> No. DAX is accessed through a virtual mapping layer that abstracts
-> the physical location from userspace applications.
->
-> Example: think copy-on-write overwrites. It occurs atomically from
-> the perspective of userspace and starts by invalidating any current
-> mappings userspace has of that physical location. The location is changes,
-> the data copied in, and then when the locks are released userspace can
-> fault in a new page table mapping on the next access....
+cgroup could be assigned a limit, but doesn't dispatch enough IO, eg the
+cgroup is idle. When this happens, the cgroup doesn't hit its limit, so
+we can't move the state machine to higher level and all cgroups will be
+throttled to thier lower limit, so we waste bandwidth. Detecting idle
+cgroup is hard. This patch handles a simple case, a cgroup doesn't
+dispatch any IO. We ignore such cgroup's limit, so other cgroups can use
+the bandwidth.
 
-Dave
+Signed-off-by: Shaohua Li <shli@fb.com>
+---
+ block/blk-throttle.c | 19 ++++++++++++++++++-
+ 1 file changed, 18 insertions(+), 1 deletion(-)
 
-Thanks for the good input and for correcting some of my DAX
-misconceptions! We will certainly be taking this into account as we
-consider v1.
-
->
->>>> And at least for XFS we have such a mechanism :)  E.g. I have a
->>>> prototype of a pNFS layout that uses XFS+DAX to allow clients to do
->>>> RDMA directly to XFS files, with the same locking mechanism we use
->>>> for the current block and scsi layout in xfs_pnfs.c.
->>
->> Thanks for fixing this issue on XFS Christoph! I assume this problem
->> continues to exist on the other DAX capable FS?
->
-> Yes, but it they implement the exportfs API that supplies this
-> capability, they'll be able to use pNFS, too.
->
->> One more reason to consider a move to /dev/dax I guess ;-)...
->>
->
-> That doesn't get rid of the need for sane access control arbitration
-> across all machines that are directly accessing the storage. That's the
-> problem pNFS solves, regardless of whether your direct access target is a
-> filesystem, a block device or object storage...
-
-Fair point. I am still hoping for a bit more discussion on the best choice
-of user-space interface for this work. If/When that happens we will take
-it into account when we look at spinning the patchset.
-
-
-Stephen
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index e85b2b6..32cc6ec 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -144,6 +144,8 @@ struct throtl_grp {
+ 
+ 	unsigned long last_check_time;
+ 
++	unsigned long last_dispatch_time[2];
++
+ 	/* When did we start a new slice */
+ 	unsigned long slice_start[2];
+ 	unsigned long slice_end[2];
+@@ -438,11 +440,14 @@ static void tg_update_has_rules(struct throtl_grp *tg)
+ 
+ static void throtl_pd_online(struct blkg_policy_data *pd)
+ {
++	struct throtl_grp *tg = pd_to_tg(pd);
+ 	/*
+ 	 * We don't want new groups to escape the limits of its ancestors.
+ 	 * Update has_rules[] after a new group is brought online.
+ 	 */
+-	tg_update_has_rules(pd_to_tg(pd));
++	tg_update_has_rules(tg);
++	tg->last_dispatch_time[READ] = jiffies;
++	tg->last_dispatch_time[WRITE] = jiffies;
+ }
+ 
+ static void blk_throtl_update_valid_limit(struct throtl_data *td)
+@@ -1611,6 +1616,12 @@ static bool throtl_upgrade_check_one(struct throtl_grp *tg)
+ 	if (write_limit && sq->nr_queued[WRITE] &&
+ 	    (!read_limit || sq->nr_queued[READ]))
+ 		return true;
++
++	if (time_after_eq(jiffies,
++	     tg->last_dispatch_time[READ] + tg->td->throtl_slice) &&
++	    time_after_eq(jiffies,
++	     tg->last_dispatch_time[WRITE] + tg->td->throtl_slice))
++		return true;
+ 	return false;
+ }
+ 
+@@ -1691,6 +1702,11 @@ static bool throtl_downgrade_check_one(struct throtl_grp *tg)
+ 	struct throtl_data *td = tg->td;
+ 	unsigned long now = jiffies;
+ 
++	if (time_after_eq(now, tg->last_dispatch_time[READ] +
++					td->throtl_slice) &&
++	    time_after_eq(now, tg->last_dispatch_time[WRITE] +
++					td->throtl_slice))
++		return false;
+ 	/*
+ 	 * If cgroup is below high limit, consider downgrade and throttle other
+ 	 * cgroups
+@@ -1811,6 +1827,7 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
+ 
+ again:
+ 	while (true) {
++		tg->last_dispatch_time[rw] = jiffies;
+ 		if (tg->last_high_overflow_time[rw] == 0)
+ 			tg->last_high_overflow_time[rw] = jiffies;
+ 		throtl_downgrade_check(tg);
+-- 
+2.9.3
 
