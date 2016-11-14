@@ -1,171 +1,135 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.9]:52829 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S936176AbcKDQVX (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Nov 2016 12:21:23 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: linux-xfs@vger.kernel.org
-Cc: axboe@fb.com, kent.overstreet@gmail.com,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        Peter Zijlstra <peterz@infradead.org>
-Subject: [PATCH 1/5] locking/lockdep: Provide a type check for lock_is_held
-Date: Fri,  4 Nov 2016 10:21:15 -0600
-Message-Id: <1478276479-10749-2-git-send-email-hch@lst.de>
-In-Reply-To: <1478276479-10749-1-git-send-email-hch@lst.de>
-References: <1478276479-10749-1-git-send-email-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jack@suse.cz>
+Date: Mon, 14 Nov 2016 10:01:13 +0100
+From: Jan Kara <jack@suse.cz>
+To: Jens Axboe <axboe@fb.com>
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org, jack@suse.cz
+Subject: Re: [PATCH 1/2] blk-wbt: store queue instead of bdi
+Message-ID: <20161114090113.GD2524@quack2.suse.cz>
+References: <1478877717-19624-1-git-send-email-axboe@fb.com>
+ <1478877717-19624-2-git-send-email-axboe@fb.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1478877717-19624-2-git-send-email-axboe@fb.com>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Peter Zijlstra <peterz@infradead.org>
+On Fri 11-11-16 08:21:56, Jens Axboe wrote:
+> The bdi was a leftover from when the code was block layer agnostic.
+> Now that we just support a block layer user, store the queue directly.
+> 
+> Signed-off-by: Jens Axboe <axboe@fb.com>
 
-Christoph requested lockdep_assert_held() variants that distinguish
-between held-for-read or held-for-write.
+Looks good to me. You can add:
 
-Provide:
+Reviewed-by: Jan Kara <jack@suse.cz>
 
-  int lock_is_held_type(struct lockdep_map *lock, int read)
-
-which takes the same argument as lock_acquire(.read) and matches it to
-the held_lock instance.
-
-Use of this function should be gated by the debug_locks variable. When
-that is 0 the return value of the lock_is_held_type() function is
-undefined. This is done to allow both negative and positive tests for
-holding locks.
-
-By default we provide (positive) lockdep_assert_held{,_exclusive,_read}()
-macros.
-
-Requested-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
----
- include/linux/lockdep.h  | 25 +++++++++++++++++++++++--
- kernel/locking/lockdep.c | 20 ++++++++++++--------
- 2 files changed, 35 insertions(+), 10 deletions(-)
-
-diff --git a/include/linux/lockdep.h b/include/linux/lockdep.h
-index c1458fe..a87f3c9 100644
---- a/include/linux/lockdep.h
-+++ b/include/linux/lockdep.h
-@@ -338,9 +338,18 @@ extern void lock_acquire(struct lockdep_map *lock, unsigned int subclass,
- extern void lock_release(struct lockdep_map *lock, int nested,
- 			 unsigned long ip);
- 
--#define lockdep_is_held(lock)	lock_is_held(&(lock)->dep_map)
-+/*
-+ * Same "read" as for lock_acquire(), except -1 means any.
-+ */
-+extern int lock_is_held_type(struct lockdep_map *lock, int read);
-+
-+static inline int lock_is_held(struct lockdep_map *lock)
-+{
-+	return lock_is_held_type(lock, -1);
-+}
- 
--extern int lock_is_held(struct lockdep_map *lock);
-+#define lockdep_is_held(lock)		lock_is_held(&(lock)->dep_map)
-+#define lockdep_is_held_type(lock, r)	lock_is_held_type(&(lock)->dep_map, (r))
- 
- extern void lock_set_class(struct lockdep_map *lock, const char *name,
- 			   struct lock_class_key *key, unsigned int subclass,
-@@ -372,6 +381,14 @@ extern void lock_unpin_lock(struct lockdep_map *lock, struct pin_cookie);
- 		WARN_ON(debug_locks && !lockdep_is_held(l));	\
- 	} while (0)
- 
-+#define lockdep_assert_held_exclusive(l)	do {			\
-+		WARN_ON(debug_locks && !lockdep_is_held_type(l, 0));	\
-+	} while (0)
-+
-+#define lockdep_assert_held_read(l)	do {				\
-+		WARN_ON(debug_locks && !lockdep_is_held_type(l, 1));	\
-+	} while (0)
-+
- #define lockdep_assert_held_once(l)	do {				\
- 		WARN_ON_ONCE(debug_locks && !lockdep_is_held(l));	\
- 	} while (0)
-@@ -428,7 +445,11 @@ struct lock_class_key { };
- 
- #define lockdep_depth(tsk)	(0)
- 
-+#define lockdep_is_held_type(l, r)		do { (void)(l); } while (0)
-+
- #define lockdep_assert_held(l)			do { (void)(l); } while (0)
-+#define lockdep_assert_held_exclusive(l)	do { (void)(l); } while (0)
-+#define lockdep_assert_held_read(l)		do { (void)(l); } while (0)
- #define lockdep_assert_held_once(l)		do { (void)(l); } while (0)
- 
- #define lockdep_recursing(tsk)			(0)
-diff --git a/kernel/locking/lockdep.c b/kernel/locking/lockdep.c
-index 589d763..cff580a 100644
---- a/kernel/locking/lockdep.c
-+++ b/kernel/locking/lockdep.c
-@@ -3188,7 +3188,7 @@ print_lock_nested_lock_not_held(struct task_struct *curr,
- 	return 0;
- }
- 
--static int __lock_is_held(struct lockdep_map *lock);
-+static int __lock_is_held(struct lockdep_map *lock, int read);
- 
- /*
-  * This gets called for every mutex_lock*()/spin_lock*() operation.
-@@ -3329,7 +3329,7 @@ static int __lock_acquire(struct lockdep_map *lock, unsigned int subclass,
- 	}
- 	chain_key = iterate_chain_key(chain_key, class_idx);
- 
--	if (nest_lock && !__lock_is_held(nest_lock))
-+	if (nest_lock && !__lock_is_held(nest_lock, -1))
- 		return print_lock_nested_lock_not_held(curr, hlock, ip);
- 
- 	if (!validate_chain(curr, lock, hlock, chain_head, chain_key))
-@@ -3576,7 +3576,7 @@ __lock_release(struct lockdep_map *lock, int nested, unsigned long ip)
- 	return 1;
- }
- 
--static int __lock_is_held(struct lockdep_map *lock)
-+static int __lock_is_held(struct lockdep_map *lock, int read)
- {
- 	struct task_struct *curr = current;
- 	int i;
-@@ -3584,8 +3584,12 @@ static int __lock_is_held(struct lockdep_map *lock)
- 	for (i = 0; i < curr->lockdep_depth; i++) {
- 		struct held_lock *hlock = curr->held_locks + i;
- 
--		if (match_held_lock(hlock, lock))
--			return 1;
-+		if (match_held_lock(hlock, lock)) {
-+			if (read == -1 || hlock->read == read)
-+				return 1;
-+
-+			return 0;
-+		}
- 	}
- 
- 	return 0;
-@@ -3769,7 +3773,7 @@ void lock_release(struct lockdep_map *lock, int nested,
- }
- EXPORT_SYMBOL_GPL(lock_release);
- 
--int lock_is_held(struct lockdep_map *lock)
-+int lock_is_held_type(struct lockdep_map *lock, int read)
- {
- 	unsigned long flags;
- 	int ret = 0;
-@@ -3781,13 +3785,13 @@ int lock_is_held(struct lockdep_map *lock)
- 	check_flags(flags);
- 
- 	current->lockdep_recursion = 1;
--	ret = __lock_is_held(lock);
-+	ret = __lock_is_held(lock, read);
- 	current->lockdep_recursion = 0;
- 	raw_local_irq_restore(flags);
- 
- 	return ret;
- }
--EXPORT_SYMBOL_GPL(lock_is_held);
-+EXPORT_SYMBOL_GPL(lock_is_held_type);
- 
- struct pin_cookie lock_pin_lock(struct lockdep_map *lock)
- {
+									Honza
+> ---
+>  block/blk-wbt.c | 20 ++++++++++++--------
+>  block/blk-wbt.h |  4 +---
+>  2 files changed, 13 insertions(+), 11 deletions(-)
+> 
+> diff --git a/block/blk-wbt.c b/block/blk-wbt.c
+> index 889c17ff8503..4ab9cebc8003 100644
+> --- a/block/blk-wbt.c
+> +++ b/block/blk-wbt.c
+> @@ -96,7 +96,7 @@ static void wb_timestamp(struct rq_wb *rwb, unsigned long *var)
+>   */
+>  static bool wb_recent_wait(struct rq_wb *rwb)
+>  {
+> -	struct bdi_writeback *wb = &rwb->bdi->wb;
+> +	struct bdi_writeback *wb = &rwb->queue->backing_dev_info.wb;
+>  
+>  	return time_before(jiffies, wb->dirty_sleep + HZ);
+>  }
+> @@ -279,6 +279,7 @@ enum {
+>  
+>  static int __latency_exceeded(struct rq_wb *rwb, struct blk_rq_stat *stat)
+>  {
+> +	struct backing_dev_info *bdi = &rwb->queue->backing_dev_info;
+>  	u64 thislat;
+>  
+>  	/*
+> @@ -293,7 +294,7 @@ static int __latency_exceeded(struct rq_wb *rwb, struct blk_rq_stat *stat)
+>  	thislat = rwb_sync_issue_lat(rwb);
+>  	if (thislat > rwb->cur_win_nsec ||
+>  	    (thislat > rwb->min_lat_nsec && !stat[0].nr_samples)) {
+> -		trace_wbt_lat(rwb->bdi, thislat);
+> +		trace_wbt_lat(bdi, thislat);
+>  		return LAT_EXCEEDED;
+>  	}
+>  
+> @@ -317,13 +318,13 @@ static int __latency_exceeded(struct rq_wb *rwb, struct blk_rq_stat *stat)
+>  	 * If the 'min' latency exceeds our target, step down.
+>  	 */
+>  	if (stat[0].min > rwb->min_lat_nsec) {
+> -		trace_wbt_lat(rwb->bdi, stat[0].min);
+> -		trace_wbt_stat(rwb->bdi, stat);
+> +		trace_wbt_lat(bdi, stat[0].min);
+> +		trace_wbt_stat(bdi, stat);
+>  		return LAT_EXCEEDED;
+>  	}
+>  
+>  	if (rwb->scale_step)
+> -		trace_wbt_stat(rwb->bdi, stat);
+> +		trace_wbt_stat(bdi, stat);
+>  
+>  	return LAT_OK;
+>  }
+> @@ -338,7 +339,9 @@ static int latency_exceeded(struct rq_wb *rwb)
+>  
+>  static void rwb_trace_step(struct rq_wb *rwb, const char *msg)
+>  {
+> -	trace_wbt_step(rwb->bdi, msg, rwb->scale_step, rwb->cur_win_nsec,
+> +	struct backing_dev_info *bdi = &rwb->queue->backing_dev_info;
+> +
+> +	trace_wbt_step(bdi, msg, rwb->scale_step, rwb->cur_win_nsec,
+>  			rwb->wb_background, rwb->wb_normal, rwb->wb_max);
+>  }
+>  
+> @@ -420,7 +423,8 @@ static void wb_timer_fn(unsigned long data)
+>  
+>  	status = latency_exceeded(rwb);
+>  
+> -	trace_wbt_timer(rwb->bdi, status, rwb->scale_step, inflight);
+> +	trace_wbt_timer(&rwb->queue->backing_dev_info, status, rwb->scale_step,
+> +			inflight);
+>  
+>  	/*
+>  	 * If we exceeded the latency target, step down. If we did not,
+> @@ -700,7 +704,7 @@ int wbt_init(struct request_queue *q, struct wb_stat_ops *ops)
+>  	rwb->wc = 1;
+>  	rwb->queue_depth = RWB_DEF_DEPTH;
+>  	rwb->last_comp = rwb->last_issue = jiffies;
+> -	rwb->bdi = &q->backing_dev_info;
+> +	rwb->queue = q;
+>  	rwb->win_nsec = RWB_WINDOW_NSEC;
+>  	rwb->stat_ops = ops;
+>  	rwb->ops_data = q;
+> diff --git a/block/blk-wbt.h b/block/blk-wbt.h
+> index e57700337c26..09c61a3f8295 100644
+> --- a/block/blk-wbt.h
+> +++ b/block/blk-wbt.h
+> @@ -87,7 +87,7 @@ struct rq_wb {
+>  	unsigned long last_issue;		/* last non-throttled issue */
+>  	unsigned long last_comp;		/* last non-throttled comp */
+>  	unsigned long min_lat_nsec;
+> -	struct backing_dev_info *bdi;
+> +	struct request_queue *queue;
+>  	struct rq_wait rq_wait[WBT_NUM_RWQ];
+>  
+>  	struct wb_stat_ops *stat_ops;
+> @@ -104,8 +104,6 @@ static inline unsigned int wbt_inflight(struct rq_wb *rwb)
+>  	return ret;
+>  }
+>  
+> -struct backing_dev_info;
+> -
+>  #ifdef CONFIG_BLK_WBT
+>  
+>  void __wbt_done(struct rq_wb *, enum wbt_flags);
+> -- 
+> 2.7.4
+> 
 -- 
-2.1.4
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
