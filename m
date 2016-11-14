@@ -1,59 +1,30 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Ming Lei <tom.leiming@gmail.com>
-To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Ming Lei <tom.leiming@gmail.com>,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        Lars Ellenberg <lars.ellenberg@linbit.com>,
-        drbd-dev@lists.linbit.com (open list:DRBD DRIVER)
-Subject: [PATCH 02/12] block: drbd: remove impossible failure handling
-Date: Fri, 11 Nov 2016 20:05:30 +0800
-Message-Id: <1478865957-25252-3-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1478865957-25252-1-git-send-email-tom.leiming@gmail.com>
-References: <1478865957-25252-1-git-send-email-tom.leiming@gmail.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <sagigrim@gmail.com>
+Return-Path: <sagigrim@gmail.com>
+Subject: Re: [PATCH 2/3] irq-poll: micro optimize some branch predictions
+To: Christoph Hellwig <hch@lst.de>
+References: <1478991755-28153-1-git-send-email-sagi@grimberg.me>
+ <1478991755-28153-3-git-send-email-sagi@grimberg.me>
+ <20161113151312.GC7578@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+From: Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <ec78c118-a4be-8f0c-ec47-2965d9e2d14b@grimberg.me>
+Date: Mon, 14 Nov 2016 02:49:17 +0200
+MIME-Version: 1.0
+In-Reply-To: <20161113151312.GC7578@lst.de>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-For a non-cloned bio, bio_add_page() only returns failure when
-the io vec table is full, but in that case, bio->bi_vcnt can't
-be zero at all.
+> Are they really that unlikely?  I don't like these annotations unless
+> it's clearly an error path or they have a high, demonstrable benefit.
 
-So remove the impossible failure handling.
+IRQ_POLL_F_DISABLE is set when disabling the iop (in the end of the
+world). IRQ_POLL_F_SCHED is set on irq_poll_sched() itself so this cond
+would match only if the user called irq_poll_sched() twice which it
+shouldn't ever do.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Acked-by: Lars Ellenberg <lars.ellenberg@linbit.com>
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
----
- drivers/block/drbd/drbd_receiver.c | 14 +-------------
- 1 file changed, 1 insertion(+), 13 deletions(-)
+So yes, I think these are really unlikely()
 
-diff --git a/drivers/block/drbd/drbd_receiver.c b/drivers/block/drbd/drbd_receiver.c
-index a89538cb3eaa..c7728dd77230 100644
---- a/drivers/block/drbd/drbd_receiver.c
-+++ b/drivers/block/drbd/drbd_receiver.c
-@@ -1648,20 +1648,8 @@ int drbd_submit_peer_request(struct drbd_device *device,
- 
- 	page_chain_for_each(page) {
- 		unsigned len = min_t(unsigned, data_size, PAGE_SIZE);
--		if (!bio_add_page(bio, page, len, 0)) {
--			/* A single page must always be possible!
--			 * But in case it fails anyways,
--			 * we deal with it, and complain (below). */
--			if (bio->bi_vcnt == 0) {
--				drbd_err(device,
--					"bio_add_page failed for len=%u, "
--					"bi_vcnt=0 (bi_sector=%llu)\n",
--					len, (uint64_t)bio->bi_iter.bi_sector);
--				err = -ENOSPC;
--				goto fail;
--			}
-+		if (!bio_add_page(bio, page, len, 0))
- 			goto next_bio;
--		}
- 		data_size -= len;
- 		sector += len >> 9;
- 		--nr_pages;
--- 
-2.7.4
+But now I noticed that I typo'ed the IRQ_POLL_F_SCHED from
+unlikely to likely :(
 
+need to fix that...
