@@ -1,38 +1,32 @@
-Return-Path: <BATV+25dcfc0f7ff0c40b5b4f+4826+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: tglx@linutronix.de
-Cc: axboe@kernel.dk,
-	linux-block@vger.kernel.org,
-	linux-pci@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 6/7] PCI: Remove the irq_affinity mask from struct pci_dev
-Date: Tue,  8 Nov 2016 17:15:06 -0800
-Message-Id: <1478654107-7384-7-git-send-email-hch@lst.de>
-In-Reply-To: <1478654107-7384-1-git-send-email-hch@lst.de>
-References: <1478654107-7384-1-git-send-email-hch@lst.de>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] sd_zbc: Force use of READ16/WRITE16
+To: Damien Le Moal <damien.lemoal@wdc.com>
+References: <1478843606-15647-1-git-send-email-damien.lemoal@wdc.com>
+Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+ Christoph Hellwig <hch@lst.de>,
+ "Martin K . Petersen" <martin.petersen@oracle.com>,
+ Hannes Reinecke <hare@suse.de>, Shaun Tancheff <shaun@tancheff.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <e85daf9e-30d5-f069-26ce-57f9c21ed29d@kernel.dk>
+Date: Mon, 14 Nov 2016 13:17:02 -0700
+MIME-Version: 1.0
+In-Reply-To: <1478843606-15647-1-git-send-email-damien.lemoal@wdc.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-This has never been used, and now is totally unreferenced.  Nuke it.
+On 11/10/2016 10:53 PM, Damien Le Moal wrote:
+> Normally, sd_read_capacity sets sdp->use_16_for_rw to 1 based on the
+> disk capacity so that READ16/WRITE16 are used for large drives.
+> However, for a zoned disk with RC_BASIS set to 0, the capacity reported
+> through READ_CAPACITY may be very small, leading to use_16_for_rw not being
+> set and READ10/WRITE10 commands being used, even after the actual zoned disk
+> capacity is corrected in sd_zbc_read_zones. This causes LBA offset overflow for
+> accesses beyond 2TB.
+>
+> As the ZBC standard makes it mandatory for ZBC drives to support
+> the READ16/WRITE16 commands anyway, make sure that use_16_for_rw is set.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
-Acked-by: Bjorn Helgaas <bhelgaas@google.com>
----
- include/linux/pci.h | 1 -
- 1 file changed, 1 deletion(-)
+Added to the 4.10 branch, thanks.
 
-diff --git a/include/linux/pci.h b/include/linux/pci.h
-index 7090f5f..f2ba6ac 100644
---- a/include/linux/pci.h
-+++ b/include/linux/pci.h
-@@ -333,7 +333,6 @@ struct pci_dev {
- 	 * directly, use the values stored here. They might be different!
- 	 */
- 	unsigned int	irq;
--	struct cpumask	*irq_affinity;
- 	struct resource resource[DEVICE_COUNT_RESOURCE]; /* I/O and memory regions + expansion ROMs */
- 
- 	bool match_driver;		/* Skip attaching driver */
 -- 
-2.1.4
+Jens Axboe
