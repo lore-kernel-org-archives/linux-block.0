@@ -1,82 +1,73 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:34741 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751582AbcKITIf (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 9 Nov 2016 14:08:35 -0500
-From: Jeff Moyer <jmoyer@redhat.com>
-To: "Dan J. Williams" <dan.j.williams@intel.com>,
-        linux-nvdimm@ml01.01.org
-Cc: linux-block@vger.kernel.org
-Subject: [patch] nd_blk,nd_pmem,nd_btt: add endio blktrace events
-Date: Wed, 09 Nov 2016 14:08:33 -0500
-Message-ID: <x49twbgo4i6.fsf@segfault.boston.devel.redhat.com>
+Return-Path: <prvs=0126aabdb8=axboe@fb.com>
+From: Jens Axboe <axboe@fb.com>
+To: <axboe@kernel.dk>, <linux-block@vger.kernel.org>
+CC: <hch@infradead.org>, Jens Axboe <axboe@fb.com>
+Subject: [PATCH 1/2] block: support any sized IO for simplified bdev direct-io
+Date: Mon, 14 Nov 2016 10:28:38 -0700
+Message-ID: <1479144519-15738-2-git-send-email-axboe@fb.com>
+In-Reply-To: <1479144519-15738-1-git-send-email-axboe@fb.com>
+References: <1479144519-15738-1-git-send-email-axboe@fb.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Right now, any of the above three drivers will report Q events in
-blktrace but no corresponding C events.  Fix it.
+Just alloc the bio_vec array if we exceed the inline limit.
 
-Signed-off-by: Jeff Moyer <jmoyer@redhat.com>
+Signed-off-by: Jens Axboe <axboe@fb.com>
+---
+ fs/block_dev.c | 17 ++++++++++++++---
+ 1 file changed, 14 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/nvdimm/blk.c b/drivers/nvdimm/blk.c
-index 9faaa96..90676f3 100644
---- a/drivers/nvdimm/blk.c
-+++ b/drivers/nvdimm/blk.c
-@@ -19,6 +19,7 @@
- #include <linux/moduleparam.h>
- #include <linux/nd.h>
- #include <linux/sizes.h>
-+#include <trace/events/block.h>
- #include "nd.h"
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index 7c3ec6049073..2010997fd326 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -193,7 +193,7 @@ __blkdev_direct_IO_simple(struct kiocb *iocb, struct iov_iter *iter,
+ 	struct file *file = iocb->ki_filp;
+ 	struct block_device *bdev = I_BDEV(bdev_file_inode(file));
+ 	unsigned blkbits = blksize_bits(bdev_logical_block_size(bdev));
+-	struct bio_vec inline_vecs[DIO_INLINE_BIO_VECS], *bvec;
++	struct bio_vec inline_vecs[DIO_INLINE_BIO_VECS], *vecs, *bvec;
+ 	loff_t pos = iocb->ki_pos;
+ 	bool should_dirty = false;
+ 	struct bio bio;
+@@ -204,9 +204,17 @@ __blkdev_direct_IO_simple(struct kiocb *iocb, struct iov_iter *iter,
+ 	if ((pos | iov_iter_alignment(iter)) & ((1 << blkbits) - 1))
+ 		return -EINVAL;
  
- static u32 nsblk_meta_size(struct nd_namespace_blk *nsblk)
-@@ -213,6 +214,7 @@ static blk_qc_t nd_blk_make_request(struct request_queue *q, struct bio *bio)
- 		nd_iostat_end(bio, start);
++	if (nr_pages <= DIO_INLINE_BIO_VECS)
++		vecs = inline_vecs;
++	else {
++		vecs = kmalloc(nr_pages * sizeof(struct bio_vec), GFP_KERNEL);
++		if (!vecs)
++			return -ENOMEM;
++	}
++
+ 	bio_init(&bio);
+ 	bio.bi_max_vecs = nr_pages;
+-	bio.bi_io_vec = inline_vecs;
++	bio.bi_io_vec = vecs;
+ 	bio.bi_bdev = bdev;
+ 	bio.bi_iter.bi_sector = pos >> blkbits;
+ 	bio.bi_private = current;
+@@ -243,6 +251,9 @@ __blkdev_direct_IO_simple(struct kiocb *iocb, struct iov_iter *iter,
+ 		put_page(bvec->bv_page);
+ 	}
  
-  out:
-+	trace_block_bio_complete(q, bio, bio->bi_error);
- 	bio_endio(bio);
- 	return BLK_QC_T_NONE;
- }
-diff --git a/drivers/nvdimm/btt.c b/drivers/nvdimm/btt.c
-index 368795a..a11c00d 100644
---- a/drivers/nvdimm/btt.c
-+++ b/drivers/nvdimm/btt.c
-@@ -23,6 +23,7 @@
- #include <linux/ndctl.h>
- #include <linux/fs.h>
- #include <linux/nd.h>
-+#include <trace/events/block.h>
- #include "btt.h"
- #include "nd.h"
- 
-@@ -1195,6 +1196,7 @@ static blk_qc_t btt_make_request(struct request_queue *q, struct bio *bio)
- 		nd_iostat_end(bio, start);
- 
- out:
-+	trace_block_bio_complete(q, bio, bio->bi_error);
- 	bio_endio(bio);
- 	return BLK_QC_T_NONE;
- }
-diff --git a/drivers/nvdimm/pmem.c b/drivers/nvdimm/pmem.c
-index 42b3a82..4ea3b9f 100644
---- a/drivers/nvdimm/pmem.c
-+++ b/drivers/nvdimm/pmem.c
-@@ -29,6 +29,7 @@
- #include <linux/slab.h>
- #include <linux/pmem.h>
- #include <linux/nd.h>
-+#include <trace/events/block.h>
- #include "pmem.h"
- #include "pfn.h"
- #include "nd.h"
-@@ -165,6 +166,7 @@ static blk_qc_t pmem_make_request(struct request_queue *q, struct bio *bio)
- 	if (bio->bi_opf & REQ_FUA)
- 		nvdimm_flush(nd_region);
- 
-+	trace_block_bio_complete(q, bio, bio->bi_error);
- 	bio_endio(bio);
- 	return BLK_QC_T_NONE;
- }
++	if (vecs != inline_vecs)
++		kfree(vecs);
++
+ 	if (unlikely(bio.bi_error))
+ 		return bio.bi_error;
+ 	iocb->ki_pos += ret;
+@@ -259,7 +270,7 @@ blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter)
+ 	nr_pages = iov_iter_npages(iter, BIO_MAX_PAGES);
+ 	if (!nr_pages)
+ 		return 0;
+-	if (is_sync_kiocb(iocb) && nr_pages <= DIO_INLINE_BIO_VECS)
++	if (is_sync_kiocb(iocb))
+ 		return __blkdev_direct_IO_simple(iocb, iter, nr_pages);
+ 	return __blockdev_direct_IO(iocb, inode, I_BDEV(inode), iter,
+ 				    blkdev_get_block, NULL, NULL,
+-- 
+2.7.4
