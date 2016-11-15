@@ -1,121 +1,24 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:51634 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1756396AbcK2LXc (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 29 Nov 2016 06:23:32 -0500
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv5 13/36] mm: make write_cache_pages() work on huge pages
-Date: Tue, 29 Nov 2016 14:22:41 +0300
-Message-Id: <20161129112304.90056-14-kirill.shutemov@linux.intel.com>
-In-Reply-To: <20161129112304.90056-1-kirill.shutemov@linux.intel.com>
-References: <20161129112304.90056-1-kirill.shutemov@linux.intel.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 1/2] nvme: untangle 0 and BLK_MQ_RQ_QUEUE_OK
+To: Omar Sandoval <osandov@osandov.com>, linux-block@vger.kernel.org
+References: <ec8930a71efdc30f9d5e5c69954f5b10cfab9927.1479236597.git.osandov@fb.com>
+Cc: linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
+ kernel-team@fb.com
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <96ea1cf1-3d84-5e08-e55f-5d903070fed2@kernel.dk>
+Date: Tue, 15 Nov 2016 12:51:01 -0700
+MIME-Version: 1.0
+In-Reply-To: <ec8930a71efdc30f9d5e5c69954f5b10cfab9927.1479236597.git.osandov@fb.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+List-ID: <linux-block@vger.kernel.org>
 
-We writeback whole huge page a time. Let's adjust iteration this way.
+On 11/15/2016 12:11 PM, Omar Sandoval wrote:
+> From: Omar Sandoval <osandov@fb.com>
+>
+> Let's not depend on any of the BLK_MQ_RQ_QUEUE_* constants having
+> specific values. No functional change.
 
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
----
- include/linux/mm.h      |  1 +
- include/linux/pagemap.h |  1 +
- mm/page-writeback.c     | 17 ++++++++++++-----
- 3 files changed, 14 insertions(+), 5 deletions(-)
+Thanks Omar, applied both for 4.10.
 
-diff --git a/include/linux/mm.h b/include/linux/mm.h
-index 4424784ac374..582844ca0b23 100644
---- a/include/linux/mm.h
-+++ b/include/linux/mm.h
-@@ -1045,6 +1045,7 @@ extern pgoff_t __page_file_index(struct page *page);
-  */
- static inline pgoff_t page_index(struct page *page)
- {
-+	page = compound_head(page);
- 	if (unlikely(PageSwapCache(page)))
- 		return __page_file_index(page);
- 	return page->index;
-diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
-index e530e7b3b6b2..faa3fa173939 100644
---- a/include/linux/pagemap.h
-+++ b/include/linux/pagemap.h
-@@ -546,6 +546,7 @@ static inline void wait_on_page_locked(struct page *page)
-  */
- static inline void wait_on_page_writeback(struct page *page)
- {
-+	page = compound_head(page);
- 	if (PageWriteback(page))
- 		wait_on_page_bit(page, PG_writeback);
- }
-diff --git a/mm/page-writeback.c b/mm/page-writeback.c
-index 290e8b7d3181..47d5b12c460e 100644
---- a/mm/page-writeback.c
-+++ b/mm/page-writeback.c
-@@ -2209,7 +2209,7 @@ int write_cache_pages(struct address_space *mapping,
- 			 * mapping. However, page->index will not change
- 			 * because we have a reference on the page.
- 			 */
--			if (page->index > end) {
-+			if (page_to_pgoff(page) > end) {
- 				/*
- 				 * can't be range_cyclic (1st pass) because
- 				 * end == -1 in that case.
-@@ -2218,7 +2218,12 @@ int write_cache_pages(struct address_space *mapping,
- 				break;
- 			}
- 
--			done_index = page->index;
-+			done_index = page_to_pgoff(page);
-+			if (PageTransCompound(page)) {
-+				index = round_up(index + 1, HPAGE_PMD_NR);
-+				i += HPAGE_PMD_NR -
-+					done_index % HPAGE_PMD_NR - 1;
-+			}
- 
- 			lock_page(page);
- 
-@@ -2230,7 +2235,7 @@ int write_cache_pages(struct address_space *mapping,
- 			 * even if there is now a new, dirty page at the same
- 			 * pagecache address.
- 			 */
--			if (unlikely(page->mapping != mapping)) {
-+			if (unlikely(page_mapping(page) != mapping)) {
- continue_unlock:
- 				unlock_page(page);
- 				continue;
-@@ -2268,7 +2273,8 @@ int write_cache_pages(struct address_space *mapping,
- 					 * not be suitable for data integrity
- 					 * writeout).
- 					 */
--					done_index = page->index + 1;
-+					done_index = compound_head(page)->index
-+						+ hpage_nr_pages(page);
- 					done = 1;
- 					break;
- 				}
-@@ -2280,7 +2286,8 @@ int write_cache_pages(struct address_space *mapping,
- 			 * keep going until we have written all the pages
- 			 * we tagged for writeback prior to entering this loop.
- 			 */
--			if (--wbc->nr_to_write <= 0 &&
-+			wbc->nr_to_write -= hpage_nr_pages(page);
-+			if (wbc->nr_to_write <= 0 &&
- 			    wbc->sync_mode == WB_SYNC_NONE) {
- 				done = 1;
- 				break;
 -- 
-2.10.2
-
+Jens Axboe
