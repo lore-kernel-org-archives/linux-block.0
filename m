@@ -1,112 +1,24 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv5 28/36] ext4: make ext4_block_write_begin() aware about huge pages
-Date: Tue, 29 Nov 2016 14:22:56 +0300
-Message-Id: <20161129112304.90056-29-kirill.shutemov@linux.intel.com>
-In-Reply-To: <20161129112304.90056-1-kirill.shutemov@linux.intel.com>
-References: <20161129112304.90056-1-kirill.shutemov@linux.intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <hch@lst.de>
+Date: Tue, 15 Nov 2016 14:49:32 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@fb.com>
+Cc: Omar Sandoval <osandov@osandov.com>, axboe@kernel.dk,
+	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	hch@infradead.org, Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH 1/3] block: fast-path for small and simple direct I/O
+	requests
+Message-ID: <20161115134932.GA28632@lst.de>
+References: <1478927487-12998-1-git-send-email-axboe@fb.com> <1478927487-12998-2-git-send-email-axboe@fb.com> <20161114193339.GA31821@vader.DHCP.thefacebook.com> <b10995da-5a09-d015-36f2-c7a52c0abcc4@fb.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <b10995da-5a09-d015-36f2-c7a52c0abcc4@fb.com>
 List-ID: <linux-block@vger.kernel.org>
 
-It simply matches changes to __block_write_begin_int().
+On Mon, Nov 14, 2016 at 01:00:09PM -0700, Jens Axboe wrote:
+> Prefetches like that tend to grow stale, in my experience. So we should
+> probably just evaluate the new path cache behavior and see if it makes
+> sense.
 
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
----
- fs/ext4/inode.c | 35 +++++++++++++++++++++--------------
- 1 file changed, 21 insertions(+), 14 deletions(-)
-
-diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
-index d3143dfe9962..21662bcbbbcb 100644
---- a/fs/ext4/inode.c
-+++ b/fs/ext4/inode.c
-@@ -1094,9 +1094,8 @@ int do_journal_get_write_access(handle_t *handle,
- static int ext4_block_write_begin(struct page *page, loff_t pos, unsigned len,
- 				  get_block_t *get_block)
- {
--	unsigned from = pos & (PAGE_SIZE - 1);
--	unsigned to = from + len;
--	struct inode *inode = page->mapping->host;
-+	unsigned from, to;
-+	struct inode *inode = page_mapping(page)->host;
- 	unsigned block_start, block_end;
- 	sector_t block;
- 	int err = 0;
-@@ -1104,10 +1103,14 @@ static int ext4_block_write_begin(struct page *page, loff_t pos, unsigned len,
- 	unsigned bbits;
- 	struct buffer_head *bh, *head, *wait[2], **wait_bh = wait;
- 	bool decrypt = false;
-+	bool uptodate = PageUptodate(page);
- 
-+	page = compound_head(page);
-+	from = pos & ~hpage_mask(page);
-+	to = from + len;
- 	BUG_ON(!PageLocked(page));
--	BUG_ON(from > PAGE_SIZE);
--	BUG_ON(to > PAGE_SIZE);
-+	BUG_ON(from > hpage_size(page));
-+	BUG_ON(to > hpage_size(page));
- 	BUG_ON(from > to);
- 
- 	if (!page_has_buffers(page))
-@@ -1120,10 +1123,8 @@ static int ext4_block_write_begin(struct page *page, loff_t pos, unsigned len,
- 	    block++, block_start = block_end, bh = bh->b_this_page) {
- 		block_end = block_start + blocksize;
- 		if (block_end <= from || block_start >= to) {
--			if (PageUptodate(page)) {
--				if (!buffer_uptodate(bh))
--					set_buffer_uptodate(bh);
--			}
-+			if (uptodate && !buffer_uptodate(bh))
-+				set_buffer_uptodate(bh);
- 			continue;
- 		}
- 		if (buffer_new(bh))
-@@ -1135,19 +1136,25 @@ static int ext4_block_write_begin(struct page *page, loff_t pos, unsigned len,
- 				break;
- 			if (buffer_new(bh)) {
- 				clean_bdev_bh_alias(bh);
--				if (PageUptodate(page)) {
-+				if (uptodate) {
- 					clear_buffer_new(bh);
- 					set_buffer_uptodate(bh);
- 					mark_buffer_dirty(bh);
- 					continue;
- 				}
--				if (block_end > to || block_start < from)
--					zero_user_segments(page, to, block_end,
--							   block_start, from);
-+				if (block_end > to || block_start < from) {
-+					BUG_ON(to - from  > PAGE_SIZE);
-+					zero_user_segments(page +
-+							block_start / PAGE_SIZE,
-+							to % PAGE_SIZE,
-+							(block_start % PAGE_SIZE) + blocksize,
-+							block_start % PAGE_SIZE,
-+							from % PAGE_SIZE);
-+				}
- 				continue;
- 			}
- 		}
--		if (PageUptodate(page)) {
-+		if (uptodate) {
- 			if (!buffer_uptodate(bh))
- 				set_buffer_uptodate(bh);
- 			continue;
--- 
-2.10.2
-
+Yes.  I've tested the patches with that in place, but it didn't
+make a difference.  Probably because we're not wasting many cycles
+between the possible place for the prefetch and the use of it anyway.
