@@ -1,26 +1,66 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.9]:37799 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752397AbcKJTfY (ORCPT
+Received: from mail-pg0-f50.google.com ([74.125.83.50]:35848 "EHLO
+        mail-pg0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S935064AbcKOTMI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Nov 2016 14:35:24 -0500
-Date: Thu, 10 Nov 2016 11:35:23 -0800
-From: Christoph Hellwig <hch@infradead.org>
-To: Ming Lei <tom.leiming@gmail.com>
-Cc: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Subject: Re: [PATCH 04/60] block: floppy: use bio_add_page()
-Message-ID: <20161110193523.GA11452@infradead.org>
-References: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
- <1477728600-12938-5-git-send-email-tom.leiming@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1477728600-12938-5-git-send-email-tom.leiming@gmail.com>
+        Tue, 15 Nov 2016 14:12:08 -0500
+Received: by mail-pg0-f50.google.com with SMTP id f188so69457274pgc.3
+        for <linux-block@vger.kernel.org>; Tue, 15 Nov 2016 11:12:07 -0800 (PST)
+From: Omar Sandoval <osandov@osandov.com>
+To: linux-block@vger.kernel.org
+Cc: linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
+        kernel-team@fb.com
+Subject: [PATCH 2/2] scsi_lib: untangle 0 and BLK_MQ_RQ_QUEUE_OK
+Date: Tue, 15 Nov 2016 11:11:59 -0800
+Message-Id: <f4d1d248035a6d9ae110464a700272d8c2ef98e0.1479236597.git.osandov@fb.com>
+In-Reply-To: <ec8930a71efdc30f9d5e5c69954f5b10cfab9927.1479236597.git.osandov@fb.com>
+References: <ec8930a71efdc30f9d5e5c69954f5b10cfab9927.1479236597.git.osandov@fb.com>
+In-Reply-To: <ec8930a71efdc30f9d5e5c69954f5b10cfab9927.1479236597.git.osandov@fb.com>
+References: <ec8930a71efdc30f9d5e5c69954f5b10cfab9927.1479236597.git.osandov@fb.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hi Ming,
+From: Omar Sandoval <osandov@fb.com>
 
-any chance you could send out a series with the various bio_add_page
-soon-ish?  I'd really like to get all the good prep work in for
-this merge window, so that we can look at the real multipage-bvec
-work for the next one.
+Let's not depend on any of the BLK_MQ_RQ_QUEUE_* constants having
+specific values. No functional change.
+
+Signed-off-by: Omar Sandoval <osandov@fb.com>
+---
+ drivers/scsi/scsi_lib.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index 2e35132..47a5c87 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -1810,7 +1810,7 @@ static inline int prep_to_mq(int ret)
+ {
+ 	switch (ret) {
+ 	case BLKPREP_OK:
+-		return 0;
++		return BLK_MQ_RQ_QUEUE_OK;
+ 	case BLKPREP_DEFER:
+ 		return BLK_MQ_RQ_QUEUE_BUSY;
+ 	default:
+@@ -1897,7 +1897,7 @@ static int scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 	int reason;
+ 
+ 	ret = prep_to_mq(scsi_prep_state_check(sdev, req));
+-	if (ret)
++	if (ret != BLK_MQ_RQ_QUEUE_OK)
+ 		goto out;
+ 
+ 	ret = BLK_MQ_RQ_QUEUE_BUSY;
+@@ -1914,7 +1914,7 @@ static int scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 
+ 	if (!(req->rq_flags & RQF_DONTPREP)) {
+ 		ret = prep_to_mq(scsi_mq_prep_fn(req));
+-		if (ret)
++		if (ret != BLK_MQ_RQ_QUEUE_OK)
+ 			goto out_dec_host_busy;
+ 		req->rq_flags |= RQF_DONTPREP;
+ 	} else {
+-- 
+2.10.2
+
