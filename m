@@ -1,52 +1,36 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f45.google.com ([74.125.82.45]:38633 "EHLO
-        mail-wm0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753237AbcKROoC (ORCPT
+Received: from mail-pg0-f67.google.com ([74.125.83.67]:32939 "EHLO
+        mail-pg0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751245AbcKPGvA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Nov 2016 09:44:02 -0500
-Received: by mail-wm0-f45.google.com with SMTP id f82so41997802wmf.1
-        for <linux-block@vger.kernel.org>; Fri, 18 Nov 2016 06:44:01 -0800 (PST)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <jg@lightnvm.io>,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [PATCH 05/20] lightnvm: rrpc: split bios of size > 256kb
-Date: Fri, 18 Nov 2016 15:43:27 +0100
-Message-Id: <1479480222-18790-6-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1479480222-18790-1-git-send-email-javier@cnexlabs.com>
-References: <1479480222-18790-1-git-send-email-javier@cnexlabs.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+        Wed, 16 Nov 2016 01:51:00 -0500
+Received: by mail-pg0-f67.google.com with SMTP id 3so13871290pgd.0
+        for <linux-block@vger.kernel.org>; Tue, 15 Nov 2016 22:51:00 -0800 (PST)
+From: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
+To: axboe@fb.com
+Cc: martin.petersen@oracle.com, keith.busch@intel.com,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
+Subject: [PATCHSET] Add support for write zeroes operation in Block layer and NVMe Driver.
+Date: Tue, 15 Nov 2016 22:50:34 -0800
+Message-Id: <1479279039-25818-1-git-send-email-chaitanya.kulkarni@hgst.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Javier González <jg@lightnvm.io>
+1. Block layer implementation details :-
+    a. Introducing __blkdev_issue_zeroout variant of exiting code.
+    b. Introducing new request operation flag REQ_OP_WRITE_ZEROES to represent
+       write zeroes operation.
+    c. Mechanism to issue bios without payload with the help of
+       __blkdev_issue_write_zeroes block library function. In block layer 
+       blkdev_issue_zeroout/__blkdev_issue_zeroout APIs are exported to execute 
+       write zeroes operation. Based on the device support these 
+       functions will :-
+       1. Try to execute optimized Write Zeroes (REQ_OP_WRITE_ZEROES).
+       2. If REQ_OP_WRITE_ZEROES is not supported, it will try to write zeroes
+          using write same (REQ_OP_WRITE_SAME) operation.
+       3. In case write zeroes and write same are not supported zeroes are
+          written using regular write (REQ_OP_WRITE) operation.
 
-rrpc cannot handle bios of size > 256kb due to NVMe using a 64 bit
-bitmap to signal I/O completion. If a larger bio comes, split it
-explicitly.
-
-Signed-off-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <m@bjorling.me>
----
- drivers/lightnvm/rrpc.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/drivers/lightnvm/rrpc.c b/drivers/lightnvm/rrpc.c
-index 2b71b7e..60ca9d4 100644
---- a/drivers/lightnvm/rrpc.c
-+++ b/drivers/lightnvm/rrpc.c
-@@ -943,6 +943,8 @@ static blk_qc_t rrpc_make_rq(struct request_queue *q, struct bio *bio)
- 	struct nvm_rq *rqd;
- 	int err;
- 
-+	blk_queue_split(q, &bio, q->bio_split);
-+
- 	if (bio_op(bio) == REQ_OP_DISCARD) {
- 		rrpc_discard(rrpc, bio);
- 		return BLK_QC_T_NONE;
--- 
-2.7.4
-
+2. NVMe over Fabric Driver implementation details :-
+       1. NVMe write zeroes command definitions for host and target.
+       2. NVMe write zeroes command implementation for host and target.
