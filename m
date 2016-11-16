@@ -1,226 +1,192 @@
 Return-Path: <axboe@kernel.dk>
-To: Andrew Morton <akpm@linux-foundation.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Cc: linux-mm@kvack.org,
+Subject: Re: [PATCH/RFC] mm: don't cap request size based on read-ahead
+ setting
+To: Johannes Weiner <hannes@cmpxchg.org>
+References: <7d8739c2-09ea-8c1f-cef7-9b8b40766c6a@kernel.dk>
+ <20161115222734.GA2300@cmpxchg.org>
+ <65f0b407-6fe5-8ba9-4c10-5259e195a038@kernel.dk>
+ <20161116174425.GA18090@cmpxchg.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
  "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- Linus Torvalds <torvalds@linux-foundation.org>,
- Johannes Weiner <hannes@cmpxchg.org>
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 From: Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH v3] mm: don't cap request size based on read-ahead setting
-Message-ID: <6e3daf1e-d333-dd40-698b-8099337ddf11@kernel.dk>
-Date: Wed, 16 Nov 2016 12:31:23 -0700
+Message-ID: <a5e7b28b-3139-6878-1ca1-d5ef7545aa13@kernel.dk>
+Date: Wed, 16 Nov 2016 11:47:56 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20161116174425.GA18090@cmpxchg.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-We ran into a funky issue, where someone doing 256K buffered reads saw
-128K requests at the device level. Turns out it is read-ahead capping
-the request size, since we use 128K as the default setting. This doesn't
-make a lot of sense - if someone is issuing 256K reads, they should see
-256K reads, regardless of the read-ahead setting, if the underlying
-device can support a 256K read in a single command.
+On 11/16/2016 10:44 AM, Johannes Weiner wrote:
+> On Tue, Nov 15, 2016 at 03:41:58PM -0700, Jens Axboe wrote:
+>> On 11/15/2016 03:27 PM, Johannes Weiner wrote:
+>>> Hi Jens,
+>>>
+>>> On Thu, Nov 10, 2016 at 10:00:37AM -0700, Jens Axboe wrote:
+>>>> Hi,
+>>>>
+>>>> We ran into a funky issue, where someone doing 256K buffered reads saw
+>>>> 128K requests at the device level. Turns out it is read-ahead capping
+>>>> the request size, since we use 128K as the default setting. This doesn't
+>>>> make a lot of sense - if someone is issuing 256K reads, they should see
+>>>> 256K reads, regardless of the read-ahead setting.
+>>>>
+>>>> To make matters more confusing, there's an odd interaction with the
+>>>> fadvise hint setting. If we tell the kernel we're doing sequential IO on
+>>>> this file descriptor, we can get twice the read-ahead size. But if we
+>>>> tell the kernel that we are doing random IO, hence disabling read-ahead,
+>>>> we do get nice 256K requests at the lower level. An application
+>>>> developer will be, rightfully, scratching his head at this point,
+>>>> wondering wtf is going on. A good one will dive into the kernel source,
+>>>> and silently weep.
+>>>>
+>>>> This patch introduces a bdi hint, io_pages. This is the soft max IO size
+>>>> for the lower level, I've hooked it up to the bdev settings here.
+>>>> Read-ahead is modified to issue the maximum of the user request size,
+>>>> and the read-ahead max size, but capped to the max request size on the
+>>>> device side. The latter is done to avoid reading ahead too much, if the
+>>>> application asks for a huge read. With this patch, the kernel behaves
+>>>> like the application expects.
+>>>>
+>>>>
+>>>> diff --git a/block/blk-settings.c b/block/blk-settings.c
+>>>> index f679ae122843..65f16cf4f850 100644
+>>>> --- a/block/blk-settings.c
+>>>> +++ b/block/blk-settings.c
+>>>> @@ -249,6 +249,7 @@ void blk_queue_max_hw_sectors(struct request_queue *q,
+>>>> unsigned int max_hw_secto
+>>>>  	max_sectors = min_not_zero(max_hw_sectors, limits->max_dev_sectors);
+>>>>  	max_sectors = min_t(unsigned int, max_sectors, BLK_DEF_MAX_SECTORS);
+>>>>  	limits->max_sectors = max_sectors;
+>>>> +	q->backing_dev_info.io_pages = max_sectors >> (PAGE_SHIFT - 9);
+>>>
+>>> Could we simply set q->backing_dev_info.ra_pages here? This would
+>>> start the disk out with a less magical readahead setting than the
+>>> current 128k default, while retaining the ability for the user to
+>>> override it in sysfs later on. Plus, one less attribute to juggle.
+>>
+>> We could, but then we'd have two places that tweak the same knob. I
+>> think it's perfectly valid to have the read-ahead size be bigger than
+>> the max request size, if you want some pipelining, for instance.
+>
+> I'm not sure I follow. Which would be the two places and which knob?
 
-To make matters more confusing, there's an odd interaction with the
-fadvise hint setting. If we tell the kernel we're doing sequential IO on
-this file descriptor, we can get twice the read-ahead size. But if we
-tell the kernel that we are doing random IO, hence disabling read-ahead,
-we do get nice 256K requests at the lower level. This is because
-ondemand and forced read-ahead behave differently, with the latter doing
-the right thing. An application developer will be, rightfully,
-scratching his head at this point, wondering wtf is going on. A good one
-will dive into the kernel source, and silently weep.
+It's actually three knobs, since I looked:
 
-This patch introduces a bdi hint, io_pages. This is the soft max IO size
-for the lower level, I've hooked it up to the bdev settings here.
-Read-ahead is modified to issue the maximum of the user request size,
-and the read-ahead max size, but capped to the max request size on the
-device side. The latter is done to avoid reading ahead too much, if the
-application asks for a huge read. With this patch, the kernel behaves
-like the application expects.
+1) /sys/block/<dev>/queue/read_ahead_kb
+2) /sys/class/bdi/<dev>/read_ahead_kb
+3) /sys/block/<dev>/queue/max_sectors_kb
 
-Signed-off-by: Jens Axboe <axboe@fb.com>
+The first 2 control the same thing, bdi->ra_pages. If we update ->pages
+from max_sectors_kb as well, that'd make three. At least the first two
+tell you what they do, don't like having the max_sectors_kb fiddle it
+automatically too.
 
----
+> What I meant how it could work is this: when the queue gets allocated,
+> we set ra_pages to the hard-coded 128K, like we do right now. When the
+> driver initializes and calls blk_queue_max_hw_sectors() it would set
+> ra_pages to the more informed, device-optimized max_sectors >>
+> (PAGE_SHIFT - 9). And once it's all initialized, the user can still
+> make adjustments to the default we picked in the kernel heuristic.
+>
+>> The 128k default is silly, though, that should be smarter. It should
+>> probably default to the max request size.
+>
+> Could you clarify the difference between max request size and what
+> blk_queue_max_hw_sectors() sets? The way I understood your patch is
+> that we want to use a readahead cap that's better suited to the
+> underlying IO device than the magic 128K. What am I missing?
 
-Changes since v2:
+This ties in with the above, so I'm just replying here. max_hw_sectors
+is a hardware limit, the max size for a single command. max_sectors is a
+user setting. For latency reasons, we don't necessarily want to issue
+IOs up to the full hardware size, so we cap the kernel initiated size.
+Eg for most hardware that can do 32-64MB in a command, we still limit
+the default size to 512k.
 
-- Fix up the last minute typo on io_pages (Johannes/Hillf)
-- Apply the same limit to force_page_cache_readahead().
+The limit I added limits us to the user setting, not the hardware
+setting.
 
-  block/blk-settings.c             |    1
-  block/blk-sysfs.c                |    1
-  include/linux/backing-dev-defs.h |    1
-  mm/readahead.c                   |   48 
-++++++++++++++++++++++++++++++---------
-  4 files changed, 40 insertions(+), 11 deletions(-)
+>>>> @@ -369,10 +369,18 @@ ondemand_readahead(struct address_space *mapping,
+>>>>  		   bool hit_readahead_marker, pgoff_t offset,
+>>>>  		   unsigned long req_size)
+>>>>  {
+>>>> -	unsigned long max = ra->ra_pages;
+>>>> +	unsigned long max_pages;
+>>>>  	pgoff_t prev_offset;
+>>>>
+>>>>  	/*
+>>>> +	 * Use the max of the read-ahead pages setting and the requested IO
+>>>> +	 * size, and then the min of that and the soft IO size for the
+>>>> +	 * underlying device.
+>>>> +	 */
+>>>> +	max_pages = max_t(unsigned long, ra->ra_pages, req_size);
+>>>> +	max_pages = min_not_zero(inode_to_bdi(mapping->host)->io_pages, max_pages);
+>>>
+>>> This code would then go away, and it would apply the benefit of this
+>>> patch automatically to explicit readahead(2) and FADV_WILLNEED calls
+>>> going through force_page_cache_readahead() as well.
+>>
+>> The path from the force actually works, which is why you get the weird
+>> behavior with a file marked as RANDOM getting the full request size, and
+>> not being limited by ra_pages.
+>
+> How so? do_generic_file_read() calls page_cache_sync_readahead(), and
+> if the file is marked random it goes to force_page_cache_readahead():
+>
+> void page_cache_sync_readahead(struct address_space *mapping,
+> 			       struct file_ra_state *ra, struct file *filp,
+> 			       pgoff_t offset, unsigned long req_size)
+> {
+> 	/* no read-ahead */
+> 	if (!ra->ra_pages)
+> 		return;
+>
+> 	/* be dumb */
+> 	if (filp && (filp->f_mode & FMODE_RANDOM)) {
+> 		force_page_cache_readahead(mapping, filp, offset, req_size);
+> 		return;
+> 	}
+>
+> 	/* do read-ahead */
+> 	ondemand_readahead(mapping, ra, filp, false, offset, req_size);
+> }
+>
+> That function in turn still caps the reads to the default 128K ra_pages:
+>
+> int force_page_cache_readahead(struct address_space *mapping, struct file *filp,
+> 		pgoff_t offset, unsigned long nr_to_read)
+> {
+> 	if (unlikely(!mapping->a_ops->readpage && !mapping->a_ops->readpages))
+> 		return -EINVAL;
+>
+> 	nr_to_read = min(nr_to_read, inode_to_bdi(mapping->host)->ra_pages);
+> 	while (nr_to_read) {
+> 		int err;
+>
+> 		unsigned long this_chunk = (2 * 1024 * 1024) / PAGE_SIZE;
+>
+> 		if (this_chunk > nr_to_read)
+> 			this_chunk = nr_to_read;
+> 		err = __do_page_cache_readahead(mapping, filp,
+> 						offset, this_chunk, 0);
+> 		if (err < 0)
+> 			return err;
+>
+> 		offset += this_chunk;
+> 		nr_to_read -= this_chunk;
+> 	}
+> 	return 0;
+> }
+>
+> How could you get IO requests bigger than the 128k ra_pages there?
 
+Sorry, what I meant is that if we mark it random through fadvise, then
+read-ahead doesn't get in the way and we get the full size. If we end up
+through read-ahead, we get limited. So you are right, I should fix up
+force_page_cache_readahead as well.
 
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index f679ae122843..65f16cf4f850 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -249,6 +249,7 @@ void blk_queue_max_hw_sectors(struct request_queue 
-*q, unsigned int max_hw_secto
-  	max_sectors = min_not_zero(max_hw_sectors, limits->max_dev_sectors);
-  	max_sectors = min_t(unsigned int, max_sectors, BLK_DEF_MAX_SECTORS);
-  	limits->max_sectors = max_sectors;
-+	q->backing_dev_info.io_pages = max_sectors >> (PAGE_SHIFT - 9);
-  }
-  EXPORT_SYMBOL(blk_queue_max_hw_sectors);
-
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 9cc8d7c5439a..ea374e820775 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -212,6 +212,7 @@ queue_max_sectors_store(struct request_queue *q, 
-const char *page, size_t count)
-
-  	spin_lock_irq(q->queue_lock);
-  	q->limits.max_sectors = max_sectors_kb << 1;
-+	q->backing_dev_info.io_pages = max_sectors_kb >> (PAGE_SHIFT - 10);
-  	spin_unlock_irq(q->queue_lock);
-
-  	return ret;
-diff --git a/include/linux/backing-dev-defs.h 
-b/include/linux/backing-dev-defs.h
-index c357f27d5483..b8144b2d59ce 100644
---- a/include/linux/backing-dev-defs.h
-+++ b/include/linux/backing-dev-defs.h
-@@ -136,6 +136,7 @@ struct bdi_writeback {
-  struct backing_dev_info {
-  	struct list_head bdi_list;
-  	unsigned long ra_pages;	/* max readahead in PAGE_SIZE units */
-+	unsigned long io_pages;	/* max allowed IO size */
-  	unsigned int capabilities; /* Device capabilities */
-  	congested_fn *congested_fn; /* Function pointer if device is md/dm */
-  	void *congested_data;	/* Pointer to aux data for congested func */
-diff --git a/mm/readahead.c b/mm/readahead.c
-index c8a955b1297e..189b09ffb3c6 100644
---- a/mm/readahead.c
-+++ b/mm/readahead.c
-@@ -202,17 +202,42 @@ int __do_page_cache_readahead(struct address_space 
-*mapping, struct file *filp,
-  	return ret;
-  }
-
-+static unsigned long pages_to_readahead(struct backing_dev_info *bdi,
-+					struct file_ra_state *ra,
-+					unsigned long req_size)
-+{
-+	/*
-+	 * If bdi->io_pages is set, that indicates the (soft) max IO size
-+	 * per command for that device. If we have that available, use
-+	 * that as the max suitable read-ahead size for this IO. Instead of
-+	 * capping read-ahead at ra_pages if req_size is larger, we can go
-+	 * up to io_pages. If io_pages isn't set, fall back to using
-+	 * ra_pages as a safe max.
-+	 */
-+	if (bdi->io_pages) {
-+		unsigned long ret;
-+
-+		ret = max_t(unsigned long, ra->ra_pages, req_size);
-+		return min(bdi->io_pages, ret);
-+	}
-+
-+	return ra->ra_pages;
-+}
-+
-  /*
-   * Chunk the readahead into 2 megabyte units, so that we don't pin too 
-much
-   * memory at once.
-   */
-  int force_page_cache_readahead(struct address_space *mapping, struct 
-file *filp,
--		pgoff_t offset, unsigned long nr_to_read)
-+		               pgoff_t offset, unsigned long nr_to_read)
-  {
-+	struct backing_dev_info *bdi = inode_to_bdi(mapping->host);
-+	struct file_ra_state *ra = &filp->f_ra;
-+
-  	if (unlikely(!mapping->a_ops->readpage && !mapping->a_ops->readpages))
-  		return -EINVAL;
-
--	nr_to_read = min(nr_to_read, inode_to_bdi(mapping->host)->ra_pages);
-+	nr_to_read = pages_to_readahead(bdi, ra, nr_to_read);
-  	while (nr_to_read) {
-  		int err;
-
-@@ -369,7 +394,8 @@ ondemand_readahead(struct address_space *mapping,
-  		   bool hit_readahead_marker, pgoff_t offset,
-  		   unsigned long req_size)
-  {
--	unsigned long max = ra->ra_pages;
-+	struct backing_dev_info *bdi = inode_to_bdi(mapping->host);
-+	unsigned long max_pages = pages_to_readahead(bdi, ra, req_size);
-  	pgoff_t prev_offset;
-
-  	/*
-@@ -385,7 +411,7 @@ ondemand_readahead(struct address_space *mapping,
-  	if ((offset == (ra->start + ra->size - ra->async_size) ||
-  	     offset == (ra->start + ra->size))) {
-  		ra->start += ra->size;
--		ra->size = get_next_ra_size(ra, max);
-+		ra->size = get_next_ra_size(ra, max_pages);
-  		ra->async_size = ra->size;
-  		goto readit;
-  	}
-@@ -400,16 +426,16 @@ ondemand_readahead(struct address_space *mapping,
-  		pgoff_t start;
-
-  		rcu_read_lock();
--		start = page_cache_next_hole(mapping, offset + 1, max);
-+		start = page_cache_next_hole(mapping, offset + 1, max_pages);
-  		rcu_read_unlock();
-
--		if (!start || start - offset > max)
-+		if (!start || start - offset > max_pages)
-  			return 0;
-
-  		ra->start = start;
-  		ra->size = start - offset;	/* old async_size */
-  		ra->size += req_size;
--		ra->size = get_next_ra_size(ra, max);
-+		ra->size = get_next_ra_size(ra, max_pages);
-  		ra->async_size = ra->size;
-  		goto readit;
-  	}
-@@ -417,7 +443,7 @@ ondemand_readahead(struct address_space *mapping,
-  	/*
-  	 * oversize read
-  	 */
--	if (req_size > max)
-+	if (req_size > max_pages)
-  		goto initial_readahead;
-
-  	/*
-@@ -433,7 +459,7 @@ ondemand_readahead(struct address_space *mapping,
-  	 * Query the page cache and look for the traces(cached history pages)
-  	 * that a sequential stream would leave behind.
-  	 */
--	if (try_context_readahead(mapping, ra, offset, req_size, max))
-+	if (try_context_readahead(mapping, ra, offset, req_size, max_pages))
-  		goto readit;
-
-  	/*
-@@ -444,7 +470,7 @@ ondemand_readahead(struct address_space *mapping,
-
-  initial_readahead:
-  	ra->start = offset;
--	ra->size = get_init_ra_size(req_size, max);
-+	ra->size = get_init_ra_size(req_size, max_pages);
-  	ra->async_size = ra->size > req_size ? ra->size - req_size : ra->size;
-
-  readit:
-@@ -454,7 +480,7 @@ ondemand_readahead(struct address_space *mapping,
-  	 * the resulted next readahead window into the current one.
-  	 */
-  	if (offset == ra->start && ra->size == ra->async_size) {
--		ra->async_size = get_next_ra_size(ra, max);
-+		ra->async_size = get_next_ra_size(ra, max_pages);
-  		ra->size += ra->async_size;
-  	}
-
+I'll send out a v3.
 
 -- 
 Jens Axboe
