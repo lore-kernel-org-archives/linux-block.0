@@ -1,333 +1,226 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org,
-        Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv5 22/36] mm, hugetlb: switch hugetlbfs to multi-order radix-tree entries
-Date: Tue, 29 Nov 2016 14:22:50 +0300
-Message-Id: <20161129112304.90056-23-kirill.shutemov@linux.intel.com>
-In-Reply-To: <20161129112304.90056-1-kirill.shutemov@linux.intel.com>
-References: <20161129112304.90056-1-kirill.shutemov@linux.intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+To: Andrew Morton <akpm@linux-foundation.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Cc: linux-mm@kvack.org,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ Linus Torvalds <torvalds@linux-foundation.org>,
+ Johannes Weiner <hannes@cmpxchg.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH v3] mm: don't cap request size based on read-ahead setting
+Message-ID: <6e3daf1e-d333-dd40-698b-8099337ddf11@kernel.dk>
+Date: Wed, 16 Nov 2016 12:31:23 -0700
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-From: Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>
+We ran into a funky issue, where someone doing 256K buffered reads saw
+128K requests at the device level. Turns out it is read-ahead capping
+the request size, since we use 128K as the default setting. This doesn't
+make a lot of sense - if someone is issuing 256K reads, they should see
+256K reads, regardless of the read-ahead setting, if the underlying
+device can support a 256K read in a single command.
 
-Currently, hugetlb pages are linked to page cache on the basis of hugepage
-offset (derived from vma_hugecache_offset()) for historical reason, which
-doesn't match to the generic usage of page cache and requires some routines
-to covert page offset <=> hugepage offset in common path. This patch
-adjusts code for multi-order radix-tree to avoid the situation.
+To make matters more confusing, there's an odd interaction with the
+fadvise hint setting. If we tell the kernel we're doing sequential IO on
+this file descriptor, we can get twice the read-ahead size. But if we
+tell the kernel that we are doing random IO, hence disabling read-ahead,
+we do get nice 256K requests at the lower level. This is because
+ondemand and forced read-ahead behave differently, with the latter doing
+the right thing. An application developer will be, rightfully,
+scratching his head at this point, wondering wtf is going on. A good one
+will dive into the kernel source, and silently weep.
 
-Main change is on the behavior of page->index for hugetlbfs. Before this
-patch, it represented hugepage offset, but with this patch it represents
-page offset. So index-related code have to be updated.
-Note that hugetlb_fault_mutex_hash() and reservation region handling are
-still working with hugepage offset.
+This patch introduces a bdi hint, io_pages. This is the soft max IO size
+for the lower level, I've hooked it up to the bdev settings here.
+Read-ahead is modified to issue the maximum of the user request size,
+and the read-ahead max size, but capped to the max request size on the
+device side. The latter is done to avoid reading ahead too much, if the
+application asks for a huge read. With this patch, the kernel behaves
+like the application expects.
 
-Signed-off-by: Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>
-[kirill.shutemov@linux.intel.com: reject fixed]
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+Signed-off-by: Jens Axboe <axboe@fb.com>
+
 ---
- fs/hugetlbfs/inode.c    | 22 ++++++++++------------
- include/linux/pagemap.h | 23 +++--------------------
- mm/filemap.c            | 12 +++++-------
- mm/hugetlb.c            | 19 ++++++-------------
- mm/truncate.c           |  8 ++++----
- 5 files changed, 28 insertions(+), 56 deletions(-)
 
-diff --git a/fs/hugetlbfs/inode.c b/fs/hugetlbfs/inode.c
-index 4fb7b10f3a05..45992c839794 100644
---- a/fs/hugetlbfs/inode.c
-+++ b/fs/hugetlbfs/inode.c
-@@ -388,8 +388,8 @@ static void remove_inode_hugepages(struct inode *inode, loff_t lstart,
- {
- 	struct hstate *h = hstate_inode(inode);
- 	struct address_space *mapping = &inode->i_data;
--	const pgoff_t start = lstart >> huge_page_shift(h);
--	const pgoff_t end = lend >> huge_page_shift(h);
-+	const pgoff_t start = lstart >> PAGE_SHIFT;
-+	const pgoff_t end = lend >> PAGE_SHIFT;
- 	struct vm_area_struct pseudo_vma;
- 	struct pagevec pvec;
- 	pgoff_t next;
-@@ -446,8 +446,7 @@ static void remove_inode_hugepages(struct inode *inode, loff_t lstart,
- 
- 				i_mmap_lock_write(mapping);
- 				hugetlb_vmdelete_list(&mapping->i_mmap,
--					next * pages_per_huge_page(h),
--					(next + 1) * pages_per_huge_page(h));
-+					next, next + 1);
- 				i_mmap_unlock_write(mapping);
- 			}
- 
-@@ -466,7 +465,8 @@ static void remove_inode_hugepages(struct inode *inode, loff_t lstart,
- 			freed++;
- 			if (!truncate_op) {
- 				if (unlikely(hugetlb_unreserve_pages(inode,
--							next, next + 1, 1)))
-+						(next) << huge_page_order(h),
-+						(next + 1) << huge_page_order(h), 1)))
- 					hugetlb_fix_reserve_counts(inode);
- 			}
- 
-@@ -550,8 +550,6 @@ static long hugetlbfs_fallocate(struct file *file, int mode, loff_t offset,
- 	struct hstate *h = hstate_inode(inode);
- 	struct vm_area_struct pseudo_vma;
- 	struct mm_struct *mm = current->mm;
--	loff_t hpage_size = huge_page_size(h);
--	unsigned long hpage_shift = huge_page_shift(h);
- 	pgoff_t start, index, end;
- 	int error;
- 	u32 hash;
-@@ -567,8 +565,8 @@ static long hugetlbfs_fallocate(struct file *file, int mode, loff_t offset,
- 	 * For this range, start is rounded down and end is rounded up
- 	 * as well as being converted to page offsets.
- 	 */
--	start = offset >> hpage_shift;
--	end = (offset + len + hpage_size - 1) >> hpage_shift;
-+	start = offset >> PAGE_SHIFT;
-+	end = (offset + len + huge_page_size(h) - 1) >> PAGE_SHIFT;
- 
- 	inode_lock(inode);
- 
-@@ -586,7 +584,7 @@ static long hugetlbfs_fallocate(struct file *file, int mode, loff_t offset,
- 	pseudo_vma.vm_flags = (VM_HUGETLB | VM_MAYSHARE | VM_SHARED);
- 	pseudo_vma.vm_file = file;
- 
--	for (index = start; index < end; index++) {
-+	for (index = start; index < end; index += pages_per_huge_page(h)) {
- 		/*
- 		 * This is supposed to be the vaddr where the page is being
- 		 * faulted in, but we have no vaddr here.
-@@ -607,10 +605,10 @@ static long hugetlbfs_fallocate(struct file *file, int mode, loff_t offset,
- 		}
- 
- 		/* Set numa allocation policy based on index */
--		hugetlb_set_vma_policy(&pseudo_vma, inode, index);
-+		hugetlb_set_vma_policy(&pseudo_vma, inode, index >> huge_page_order(h));
- 
- 		/* addr is the offset within the file (zero based) */
--		addr = index * hpage_size;
-+		addr = index << PAGE_SHIFT & ~huge_page_mask(h);
- 
- 		/* mutex taken here, fault path and hole punch */
- 		hash = hugetlb_fault_mutex_hash(h, mm, &pseudo_vma, mapping,
-diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
-index faa3fa173939..bb0b7022421e 100644
---- a/include/linux/pagemap.h
-+++ b/include/linux/pagemap.h
-@@ -398,10 +398,9 @@ static inline struct page *read_mapping_page(struct address_space *mapping,
- }
- 
- /*
-- * Get index of the page with in radix-tree
-- * (TODO: remove once hugetlb pages will have ->index in PAGE_SIZE)
-+ * Get the offset in PAGE_SIZE.
-  */
--static inline pgoff_t page_to_index(struct page *page)
-+static inline pgoff_t page_to_pgoff(struct page *page)
- {
- 	pgoff_t pgoff;
- 
-@@ -418,18 +417,6 @@ static inline pgoff_t page_to_index(struct page *page)
- }
- 
- /*
-- * Get the offset in PAGE_SIZE.
-- * (TODO: hugepage should have ->index in PAGE_SIZE)
-- */
--static inline pgoff_t page_to_pgoff(struct page *page)
--{
--	if (unlikely(PageHeadHuge(page)))
--		return page->index << compound_order(page);
--
--	return page_to_index(page);
--}
--
--/*
-  * Return byte-offset into filesystem object for page.
-  */
- static inline loff_t page_offset(struct page *page)
-@@ -442,15 +429,11 @@ static inline loff_t page_file_offset(struct page *page)
- 	return ((loff_t)page_index(page)) << PAGE_SHIFT;
- }
- 
--extern pgoff_t linear_hugepage_index(struct vm_area_struct *vma,
--				     unsigned long address);
--
- static inline pgoff_t linear_page_index(struct vm_area_struct *vma,
- 					unsigned long address)
- {
- 	pgoff_t pgoff;
--	if (unlikely(is_vm_hugetlb_page(vma)))
--		return linear_hugepage_index(vma, address);
+Changes since v2:
+
+- Fix up the last minute typo on io_pages (Johannes/Hillf)
+- Apply the same limit to force_page_cache_readahead().
+
+  block/blk-settings.c             |    1
+  block/blk-sysfs.c                |    1
+  include/linux/backing-dev-defs.h |    1
+  mm/readahead.c                   |   48 
+++++++++++++++++++++++++++++++---------
+  4 files changed, 40 insertions(+), 11 deletions(-)
+
+
+diff --git a/block/blk-settings.c b/block/blk-settings.c
+index f679ae122843..65f16cf4f850 100644
+--- a/block/blk-settings.c
++++ b/block/blk-settings.c
+@@ -249,6 +249,7 @@ void blk_queue_max_hw_sectors(struct request_queue 
+*q, unsigned int max_hw_secto
+  	max_sectors = min_not_zero(max_hw_sectors, limits->max_dev_sectors);
+  	max_sectors = min_t(unsigned int, max_sectors, BLK_DEF_MAX_SECTORS);
+  	limits->max_sectors = max_sectors;
++	q->backing_dev_info.io_pages = max_sectors >> (PAGE_SHIFT - 9);
+  }
+  EXPORT_SYMBOL(blk_queue_max_hw_sectors);
+
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index 9cc8d7c5439a..ea374e820775 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -212,6 +212,7 @@ queue_max_sectors_store(struct request_queue *q, 
+const char *page, size_t count)
+
+  	spin_lock_irq(q->queue_lock);
+  	q->limits.max_sectors = max_sectors_kb << 1;
++	q->backing_dev_info.io_pages = max_sectors_kb >> (PAGE_SHIFT - 10);
+  	spin_unlock_irq(q->queue_lock);
+
+  	return ret;
+diff --git a/include/linux/backing-dev-defs.h 
+b/include/linux/backing-dev-defs.h
+index c357f27d5483..b8144b2d59ce 100644
+--- a/include/linux/backing-dev-defs.h
++++ b/include/linux/backing-dev-defs.h
+@@ -136,6 +136,7 @@ struct bdi_writeback {
+  struct backing_dev_info {
+  	struct list_head bdi_list;
+  	unsigned long ra_pages;	/* max readahead in PAGE_SIZE units */
++	unsigned long io_pages;	/* max allowed IO size */
+  	unsigned int capabilities; /* Device capabilities */
+  	congested_fn *congested_fn; /* Function pointer if device is md/dm */
+  	void *congested_data;	/* Pointer to aux data for congested func */
+diff --git a/mm/readahead.c b/mm/readahead.c
+index c8a955b1297e..189b09ffb3c6 100644
+--- a/mm/readahead.c
++++ b/mm/readahead.c
+@@ -202,17 +202,42 @@ int __do_page_cache_readahead(struct address_space 
+*mapping, struct file *filp,
+  	return ret;
+  }
+
++static unsigned long pages_to_readahead(struct backing_dev_info *bdi,
++					struct file_ra_state *ra,
++					unsigned long req_size)
++{
++	/*
++	 * If bdi->io_pages is set, that indicates the (soft) max IO size
++	 * per command for that device. If we have that available, use
++	 * that as the max suitable read-ahead size for this IO. Instead of
++	 * capping read-ahead at ra_pages if req_size is larger, we can go
++	 * up to io_pages. If io_pages isn't set, fall back to using
++	 * ra_pages as a safe max.
++	 */
++	if (bdi->io_pages) {
++		unsigned long ret;
 +
- 	pgoff = (address - vma->vm_start) >> PAGE_SHIFT;
- 	pgoff += vma->vm_pgoff;
- 	return pgoff;
-diff --git a/mm/filemap.c b/mm/filemap.c
-index 52be2b457208..33974ad1a8ec 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -165,10 +165,7 @@ static void page_cache_tree_delete(struct address_space *mapping,
- {
- 	struct radix_tree_node *node;
- 	void **slot;
--	int nr;
--
--	/* hugetlb pages are represented by one entry in the radix tree */
--	nr = PageHuge(page) ? 1 : hpage_nr_pages(page);
-+	int nr = hpage_nr_pages(page);
- 
- 	VM_BUG_ON_PAGE(!PageLocked(page), page);
- 	VM_BUG_ON_PAGE(PageTail(page), page);
-@@ -1420,16 +1417,17 @@ unsigned find_get_pages(struct address_space *mapping, pgoff_t start,
- 		}
- 
- 		/* For multi-order entries, find relevant subpage */
--		if (PageTransHuge(page)) {
-+		if (PageCompound(page)) {
- 			VM_BUG_ON(index - page->index < 0);
--			VM_BUG_ON(index - page->index >= HPAGE_PMD_NR);
-+			VM_BUG_ON(index - page->index >=
-+					1 << compound_order(page));
- 			page += index - page->index;
- 		}
- 
- 		pages[ret] = page;
- 		if (++ret == nr_pages)
- 			break;
--		if (!PageTransCompound(page))
-+		if (PageHuge(page) || !PageTransCompound(page))
- 			continue;
- 		for (refs = 0; ret < nr_pages &&
- 				(index + 1) % HPAGE_PMD_NR;
-diff --git a/mm/hugetlb.c b/mm/hugetlb.c
-index 3faec05b1875..f359653f31ff 100644
---- a/mm/hugetlb.c
-+++ b/mm/hugetlb.c
-@@ -622,13 +622,6 @@ static pgoff_t vma_hugecache_offset(struct hstate *h,
- 			(vma->vm_pgoff >> huge_page_order(h));
- }
- 
--pgoff_t linear_hugepage_index(struct vm_area_struct *vma,
--				     unsigned long address)
--{
--	return vma_hugecache_offset(hstate_vma(vma), vma, address);
--}
--EXPORT_SYMBOL_GPL(linear_hugepage_index);
--
- /*
-  * Return the size of the pages allocated when backing a VMA. In the majority
-  * cases this will be same size as used by the page table entries.
-@@ -3658,7 +3651,7 @@ static struct page *hugetlbfs_pagecache_page(struct hstate *h,
- 	pgoff_t idx;
- 
- 	mapping = vma->vm_file->f_mapping;
--	idx = vma_hugecache_offset(h, vma, address);
-+	idx = linear_page_index(vma, address);
- 
- 	return find_lock_page(mapping, idx);
- }
-@@ -3675,7 +3668,7 @@ static bool hugetlbfs_pagecache_present(struct hstate *h,
- 	struct page *page;
- 
- 	mapping = vma->vm_file->f_mapping;
--	idx = vma_hugecache_offset(h, vma, address);
-+	idx = linear_page_index(vma, address);
- 
- 	page = find_get_page(mapping, idx);
- 	if (page)
-@@ -3730,7 +3723,7 @@ static int hugetlb_no_page(struct mm_struct *mm, struct vm_area_struct *vma,
- retry:
- 	page = find_lock_page(mapping, idx);
- 	if (!page) {
--		size = i_size_read(mapping->host) >> huge_page_shift(h);
-+		size = i_size_read(mapping->host) >> PAGE_SHIFT;
- 		if (idx >= size)
- 			goto out;
- 		page = alloc_huge_page(vma, address, 0);
-@@ -3791,7 +3784,7 @@ static int hugetlb_no_page(struct mm_struct *mm, struct vm_area_struct *vma,
- 	}
- 
- 	ptl = huge_pte_lock(h, mm, ptep);
--	size = i_size_read(mapping->host) >> huge_page_shift(h);
-+	size = i_size_read(mapping->host) >> PAGE_SHIFT;
- 	if (idx >= size)
- 		goto backout;
- 
-@@ -3839,7 +3832,7 @@ u32 hugetlb_fault_mutex_hash(struct hstate *h, struct mm_struct *mm,
- 
- 	if (vma->vm_flags & VM_SHARED) {
- 		key[0] = (unsigned long) mapping;
--		key[1] = idx;
-+		key[1] = idx >> huge_page_order(h);
- 	} else {
- 		key[0] = (unsigned long) mm;
- 		key[1] = address >> huge_page_shift(h);
-@@ -3895,7 +3888,7 @@ int hugetlb_fault(struct mm_struct *mm, struct vm_area_struct *vma,
- 	}
- 
- 	mapping = vma->vm_file->f_mapping;
--	idx = vma_hugecache_offset(h, vma, address);
-+	idx = linear_page_index(vma, address);
- 
- 	/*
- 	 * Serialize hugepage allocation and instantiation, so that we don't
-diff --git a/mm/truncate.c b/mm/truncate.c
-index 6df4b06a190f..7508c2c7e4ed 100644
---- a/mm/truncate.c
-+++ b/mm/truncate.c
-@@ -267,7 +267,7 @@ void truncate_inode_pages_range(struct address_space *mapping,
- 
- 			if (!trylock_page(page))
- 				continue;
--			WARN_ON(page_to_index(page) != index);
-+			WARN_ON(page_to_pgoff(page) != index);
- 			if (PageWriteback(page)) {
- 				unlock_page(page);
- 				continue;
-@@ -383,7 +383,7 @@ restart:	cond_resched();
- 			}
- 
- 			lock_page(page);
--			WARN_ON(page_to_index(page) != index);
-+			WARN_ON(page_to_pgoff(page) != index);
- 			wait_on_page_writeback(page);
- 
- 			if (PageTransHuge(page)) {
-@@ -533,7 +533,7 @@ unsigned long invalidate_mapping_pages(struct address_space *mapping,
- 			if (!trylock_page(page))
- 				continue;
- 
--			WARN_ON(page_to_index(page) != index);
-+			WARN_ON(page_to_pgoff(page) != index);
- 
- 			/* Is 'start' or 'end' in the middle of THP ? */
- 			if (PageTransHuge(page) &&
-@@ -650,7 +650,7 @@ int invalidate_inode_pages2_range(struct address_space *mapping,
- 			}
- 
- 			lock_page(page);
--			WARN_ON(page_to_index(page) != index);
-+			WARN_ON(page_to_pgoff(page) != index);
- 			if (page->mapping != mapping) {
- 				unlock_page(page);
- 				continue;
--- 
-2.10.2
++		ret = max_t(unsigned long, ra->ra_pages, req_size);
++		return min(bdi->io_pages, ret);
++	}
++
++	return ra->ra_pages;
++}
++
+  /*
+   * Chunk the readahead into 2 megabyte units, so that we don't pin too 
+much
+   * memory at once.
+   */
+  int force_page_cache_readahead(struct address_space *mapping, struct 
+file *filp,
+-		pgoff_t offset, unsigned long nr_to_read)
++		               pgoff_t offset, unsigned long nr_to_read)
+  {
++	struct backing_dev_info *bdi = inode_to_bdi(mapping->host);
++	struct file_ra_state *ra = &filp->f_ra;
++
+  	if (unlikely(!mapping->a_ops->readpage && !mapping->a_ops->readpages))
+  		return -EINVAL;
 
+-	nr_to_read = min(nr_to_read, inode_to_bdi(mapping->host)->ra_pages);
++	nr_to_read = pages_to_readahead(bdi, ra, nr_to_read);
+  	while (nr_to_read) {
+  		int err;
+
+@@ -369,7 +394,8 @@ ondemand_readahead(struct address_space *mapping,
+  		   bool hit_readahead_marker, pgoff_t offset,
+  		   unsigned long req_size)
+  {
+-	unsigned long max = ra->ra_pages;
++	struct backing_dev_info *bdi = inode_to_bdi(mapping->host);
++	unsigned long max_pages = pages_to_readahead(bdi, ra, req_size);
+  	pgoff_t prev_offset;
+
+  	/*
+@@ -385,7 +411,7 @@ ondemand_readahead(struct address_space *mapping,
+  	if ((offset == (ra->start + ra->size - ra->async_size) ||
+  	     offset == (ra->start + ra->size))) {
+  		ra->start += ra->size;
+-		ra->size = get_next_ra_size(ra, max);
++		ra->size = get_next_ra_size(ra, max_pages);
+  		ra->async_size = ra->size;
+  		goto readit;
+  	}
+@@ -400,16 +426,16 @@ ondemand_readahead(struct address_space *mapping,
+  		pgoff_t start;
+
+  		rcu_read_lock();
+-		start = page_cache_next_hole(mapping, offset + 1, max);
++		start = page_cache_next_hole(mapping, offset + 1, max_pages);
+  		rcu_read_unlock();
+
+-		if (!start || start - offset > max)
++		if (!start || start - offset > max_pages)
+  			return 0;
+
+  		ra->start = start;
+  		ra->size = start - offset;	/* old async_size */
+  		ra->size += req_size;
+-		ra->size = get_next_ra_size(ra, max);
++		ra->size = get_next_ra_size(ra, max_pages);
+  		ra->async_size = ra->size;
+  		goto readit;
+  	}
+@@ -417,7 +443,7 @@ ondemand_readahead(struct address_space *mapping,
+  	/*
+  	 * oversize read
+  	 */
+-	if (req_size > max)
++	if (req_size > max_pages)
+  		goto initial_readahead;
+
+  	/*
+@@ -433,7 +459,7 @@ ondemand_readahead(struct address_space *mapping,
+  	 * Query the page cache and look for the traces(cached history pages)
+  	 * that a sequential stream would leave behind.
+  	 */
+-	if (try_context_readahead(mapping, ra, offset, req_size, max))
++	if (try_context_readahead(mapping, ra, offset, req_size, max_pages))
+  		goto readit;
+
+  	/*
+@@ -444,7 +470,7 @@ ondemand_readahead(struct address_space *mapping,
+
+  initial_readahead:
+  	ra->start = offset;
+-	ra->size = get_init_ra_size(req_size, max);
++	ra->size = get_init_ra_size(req_size, max_pages);
+  	ra->async_size = ra->size > req_size ? ra->size - req_size : ra->size;
+
+  readit:
+@@ -454,7 +480,7 @@ ondemand_readahead(struct address_space *mapping,
+  	 * the resulted next readahead window into the current one.
+  	 */
+  	if (offset == ra->start && ra->size == ra->async_size) {
+-		ra->async_size = get_next_ra_size(ra, max);
++		ra->async_size = get_next_ra_size(ra, max_pages);
+  		ra->size += ra->async_size;
+  	}
+
+
+-- 
+Jens Axboe
