@@ -1,27 +1,70 @@
-Subject: Re: [PATCH] block: deal with stale req count of plug list
-To: Ming Lei <ming.lei@canonical.com>, linux-kernel@vger.kernel.org
-References: <1479290825-23201-1-git-send-email-ming.lei@canonical.com>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
- Shaohua Li <shli@fb.com>, Jens Axboe <axboe@kernel.dk>
-From: Jens Axboe <axboe@fb.com>
-Message-ID: <320f5131-f61a-9a33-31f4-b510857a4a30@fb.com>
-Date: Wed, 16 Nov 2016 08:10:18 -0700
-MIME-Version: 1.0
-In-Reply-To: <1479290825-23201-1-git-send-email-ming.lei@canonical.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Return-Path: <tom.leiming@gmail.com>
+Return-Path: <tom.leiming@gmail.com>
+From: Ming Lei <ming.lei@canonical.com>
+To: Jens Axboe <axboe@fb.com>,
+	linux-kernel@vger.kernel.org
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>,
+	Ming Lei <ming.lei@canonical.com>,
+	Shaohua Li <shli@fb.com>,
+	Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH] block: deal with stale req count of plug list
+Date: Wed, 16 Nov 2016 18:07:05 +0800
+Message-Id: <1479290825-23201-1-git-send-email-ming.lei@canonical.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On 11/16/2016 03:07 AM, Ming Lei wrote:
-> In both legacy and mq path, req count of plug list is computed
-> before allocating request, so the number can be stale when falling
-> back to slept allocation, also the new introduced wbt can sleep
-> too.
->
-> This patch deals with the case by checking if plug list becomes
-> empty, and fixes the KASAN report of 'BUG: KASAN: stack-out-of-bounds'
-> which is introduced by Shaohua's patches of dispatching big request.
+In both legacy and mq path, req count of plug list is computed
+before allocating request, so the number can be stale when falling
+back to slept allocation, also the new introduced wbt can sleep
+too.
 
-Thanks Ming, added for 4.10.
+This patch deals with the case by checking if plug list becomes
+empty, and fixes the KASAN report of 'BUG: KASAN: stack-out-of-bounds'
+which is introduced by Shaohua's patches of dispatching big request.
 
+Fixes: 600271d900002(blk-mq: immediately dispatch big size request)
+Fixes: 50d24c34403c6(block: immediately dispatch big size request)
+Cc: Shaohua Li <shli@fb.com>
+Signed-off-by: Ming Lei <ming.lei@canonical.com>
+---
+ block/blk-core.c | 5 ++++-
+ block/blk-mq.c   | 7 +++++++
+ 2 files changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/block/blk-core.c b/block/blk-core.c
+index eea246567884..473dd698effd 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -1753,8 +1753,11 @@ static blk_qc_t blk_queue_bio(struct request_queue *q, struct bio *bio)
+ 		/*
+ 		 * If this is the first request added after a plug, fire
+ 		 * of a plug trace.
++		 *
++		 * @request_count may become stale because of schedule
++		 * out, so check plug list again.
+ 		 */
+-		if (!request_count)
++		if (!request_count || list_empty(&plug->list))
+ 			trace_block_plug(q);
+ 		else {
+ 			struct request *last = list_entry_rq(plug->list.prev);
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index ae8df5ec20d3..f39e69c732cc 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1497,6 +1497,13 @@ static blk_qc_t blk_sq_make_request(struct request_queue *q, struct bio *bio)
+ 		struct request *last = NULL;
+ 
+ 		blk_mq_bio_to_request(rq, bio);
++
++		/*
++		 * @request_count may become stale because of schedule
++		 * out, so check the list again.
++		 */
++		if (list_empty(&plug->mq_list))
++			request_count = 0;
+ 		if (!request_count)
+ 			trace_block_plug(q);
+ 		else
 -- 
-Jens Axboe
+2.7.4
