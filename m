@@ -1,6 +1,15 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([198.137.202.9]:44276 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750866AbcKQVEt (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 17 Nov 2016 16:04:49 -0500
+Date: Thu, 17 Nov 2016 13:04:48 -0800
+From: Christoph Hellwig <hch@infradead.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@infradead.org>, linux-block@vger.kernel.org
 Subject: Re: [PATCHSET] Add support for simplified async direct-io
-To: Christoph Hellwig <hch@infradead.org>
+Message-ID: <20161117210448.GA25566@infradead.org>
 References: <20161116163147.GA25038@infradead.org>
  <72b1725a-0363-d33e-f890-251b1ac88998@kernel.dk>
  <20161116171652.GA30008@infradead.org>
@@ -11,32 +20,22 @@ References: <20161116163147.GA25038@infradead.org>
  <87823f67-a2ec-e959-1a23-9ecf3d6fe6d4@kernel.dk>
  <20161117201749.GA15072@infradead.org>
  <721c8908-ea89-a2f4-0bfd-7243a9aa4c03@kernel.dk>
- <20161117210448.GA25566@infradead.org>
-Cc: linux-block@vger.kernel.org
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <d5b16e63-9af0-5e78-35c2-3fa2f67a4f9f@kernel.dk>
-Date: Thu, 17 Nov 2016 14:06:01 -0700
 MIME-Version: 1.0
-In-Reply-To: <20161117210448.GA25566@infradead.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <721c8908-ea89-a2f4-0bfd-7243a9aa4c03@kernel.dk>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On 11/17/2016 02:04 PM, Christoph Hellwig wrote:
-> On Thu, Nov 17, 2016 at 01:30:12PM -0700, Jens Axboe wrote:
->> The last patch seems to have some issues:
->>
->> +       bool is_sync = is_sync = is_sync_kiocb(iocb);
->>
->> and it's reverting part of the dio->is_sync that was part of my union
->> waiter/iocb change. So I'll leave that out for now, for those reasons.
->
-> dio->is_sync isn't needed once the completion handlers are split.
-> That beeing said I wonder how the above statement even compiled,
-> there should just be a single assignment obviously.
->
-> Did I mention that I don't like the split anyway? :)
+On Thu, Nov 17, 2016 at 01:30:12PM -0700, Jens Axboe wrote:
+> The last patch seems to have some issues:
+> 
+> +       bool is_sync = is_sync = is_sync_kiocb(iocb);
+> 
+> and it's reverting part of the dio->is_sync that was part of my union
+> waiter/iocb change. So I'll leave that out for now, for those reasons.
 
-Alright alright, let's drop the split ;-)
+dio->is_sync isn't needed once the completion handlers are split.
+That beeing said I wonder how the above statement even compiled,
+there should just be a single assignment obviously.
 
--- 
-Jens Axboe
+Did I mention that I don't like the split anyway? :)
