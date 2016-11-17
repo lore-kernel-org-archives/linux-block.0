@@ -1,15 +1,10 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.9]:57565 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752142AbcKQURu (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Nov 2016 15:17:50 -0500
-Date: Thu, 17 Nov 2016 12:17:49 -0800
+Return-Path: <BATV+c11f2a9076c546b906d6+4834+infradead.org+hch@bombadil.srs.infradead.org>
+Date: Thu, 17 Nov 2016 07:16:36 -0800
 From: Christoph Hellwig <hch@infradead.org>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: Christoph Hellwig <hch@infradead.org>, linux-block@vger.kernel.org
 Subject: Re: [PATCHSET] Add support for simplified async direct-io
-Message-ID: <20161117201749.GA15072@infradead.org>
+Message-ID: <20161117151636.GA13511@infradead.org>
 References: <20161114181119.GA9396@infradead.org>
  <f8c29e81-7323-7362-b507-1b7c61e8a19a@fb.com>
  <20161116163147.GA25038@infradead.org>
@@ -21,24 +16,15 @@ References: <20161114181119.GA9396@infradead.org>
  <204d4a18-e5da-1806-433e-a3ff1b6ca575@kernel.dk>
  <87823f67-a2ec-e959-1a23-9ecf3d6fe6d4@kernel.dk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 In-Reply-To: <87823f67-a2ec-e959-1a23-9ecf3d6fe6d4@kernel.dk>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Ok, the updated tree is here:
+On Thu, Nov 17, 2016 at 08:03:46AM -0700, Jens Axboe wrote:
+> > Looks like I forgot to push out the latest changes, that is gone. We're
+> > just using + 1 now to see if we should use the multibio function or not.
+> 
+> Just to clarify, the correct tip is:
 
-http://git.infradead.org/users/hch/block.git/shortlog/refs/heads/new-dio
-
-This moves your O_SYNC patch earlier and makes it not directly
-assign bi_opf.
-
-Then comes the main direct I/O path with the various folds, and
-a use after free fix ported from the iomap code in the completion
-handler.
-
-Last comes the I/O completion handler split - I don't think it's
-worth it, but if you prefer it that way go ahead and fold it in.
-
-I couldn't do the bio_kmalloc conversion as bio_kmalloc seems
-to not like the front pad.
+Re-checking for-4.10/dio now everything ѕeems to be fine.  Not sure
+how I managed to pick up an old head.
