@@ -1,42 +1,38 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-qk0-f194.google.com ([209.85.220.194]:34637 "EHLO
-        mail-qk0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752434AbcKQW2N (ORCPT
+Received: from userp1040.oracle.com ([156.151.31.81]:35191 "EHLO
+        userp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752377AbcKQCsj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Nov 2016 17:28:13 -0500
-Received: by mail-qk0-f194.google.com with SMTP id 124so28607510qkh.1
-        for <linux-block@vger.kernel.org>; Thu, 17 Nov 2016 14:28:13 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <yq1h976akkd.fsf@sermon.lab.mkp.net>
-References: <1479279039-25818-1-git-send-email-chaitanya.kulkarni@hgst.com>
- <1479279039-25818-3-git-send-email-chaitanya.kulkarni@hgst.com>
- <20161116175906.GA10050@localhost.localdomain> <yq1h976akkd.fsf@sermon.lab.mkp.net>
-From: chaitany kulkarni <ckulkarnilinux@gmail.com>
-Date: Thu, 17 Nov 2016 14:28:12 -0800
-Message-ID: <CAK0tqi=rMd9EqXLzAVXp0RnTGpv3USLcu95=vwhZPbK-qZos5A@mail.gmail.com>
-Subject: Re: [PATCH 2/5] block: add support for REQ_OP_WRITE_ZEROES
-To: "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: Keith Busch <keith.busch@intel.com>, axboe@fb.com,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        Wed, 16 Nov 2016 21:48:39 -0500
+To: Keith Busch <keith.busch@intel.com>
+Cc: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>, axboe@fb.com,
+        martin.petersen@oracle.com, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org,
         Chaitanya Kulkarni <chaitanya.kulkarni@hgst.com>
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [PATCH 2/5] block: add support for REQ_OP_WRITE_ZEROES
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <1479279039-25818-1-git-send-email-chaitanya.kulkarni@hgst.com>
+        <1479279039-25818-3-git-send-email-chaitanya.kulkarni@hgst.com>
+        <20161116175906.GA10050@localhost.localdomain>
+Date: Wed, 16 Nov 2016 21:48:02 -0500
+In-Reply-To: <20161116175906.GA10050@localhost.localdomain> (Keith Busch's
+        message of "Wed, 16 Nov 2016 12:59:07 -0500")
+Message-ID: <yq1h976akkd.fsf@sermon.lab.mkp.net>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Incorporated the comments and sent new patch.
+>>>>> "Keith" == Keith Busch <keith.busch@intel.com> writes:
 
-On Wed, Nov 16, 2016 at 6:48 PM, Martin K. Petersen
-<martin.petersen@oracle.com> wrote:
->>>>>> "Keith" == Keith Busch <keith.busch@intel.com> writes:
->
-> Keith> Your maximum bi_size exceeds the 2-bytes an NVMe Write Zeroes
-> Keith> command provides for the block count. Instead of having a simple
-> Keith> queue flag for write zeroes support, have it take a max sectors
-> Keith> value instead.
->
-> Yes, please. Make it a queue limit and make sure it is properly stacked.
->
-> The rest looks sensible to me. I'll wire up the SCSI pieces.
->
-> --
-> Martin K. Petersen      Oracle Linux Engineering
+Keith> Your maximum bi_size exceeds the 2-bytes an NVMe Write Zeroes
+Keith> command provides for the block count. Instead of having a simple
+Keith> queue flag for write zeroes support, have it take a max sectors
+Keith> value instead.
+
+Yes, please. Make it a queue limit and make sure it is properly stacked.
+
+The rest looks sensible to me. I'll wire up the SCSI pieces.
+
+-- 
+Martin K. Petersen	Oracle Linux Engineering
