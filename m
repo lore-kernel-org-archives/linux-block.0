@@ -1,46 +1,64 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from aserp1040.oracle.com ([141.146.126.69]:25669 "EHLO
-        aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932825AbcKJNeh (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Nov 2016 08:34:37 -0500
-Date: Thu, 10 Nov 2016 16:34:26 +0300
-From: Dan Carpenter <dan.carpenter@oracle.com>
-To: tj@kernel.org
-Cc: linux-block@vger.kernel.org
-Subject: [bug report] blkcg: replace blkcg_policy->cpd_size with
- ->cpd_alloc/free_fn() methods
-Message-ID: <20161110133426.GA30610@mwanda>
+Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
+Date: Thu, 17 Nov 2016 05:16:51 -0800
+From: Christoph Hellwig <hch@infradead.org>
+To: Scott Bauer <scott.bauer@intel.com>
+Subject: Re: [PATCH v1 6/7] nvme: Implement SED Unlock from suspend
+Message-ID: <20161117131651.GB15852@infradead.org>
+References: <1479338252-8777-1-git-send-email-scott.bauer@intel.com>
+ <1479338252-8777-7-git-send-email-scott.bauer@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <1479338252-8777-7-git-send-email-scott.bauer@intel.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
+List-Post: <mailto:linux-nvme@lists.infradead.org>
+List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
+Cc: hch@infradead.org, sagi@grimberg.me, axboe@fb.com,
+ linux-nvme@lists.infradead.org, keith.busch@intel.com,
+ Rafael.Antognolli@intel.com, linux-block@vger.kernel.org,
+ jonathan.derrick@intel.com, j.naumann@fu-berlin.de
+Content-Type: text/plain; charset="us-ascii"
+Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
+Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
+List-ID: <linux-block@vger.kernel.org>
 
-[ No idea why it's suddenly complaining about year old code - dan ]
+> +{
+> +	struct opal_suspend_unlk ulk = { 0 };
+> +	struct nvme_ns *ns;
+> +	char diskname[DISK_NAME_LEN];
+> +	mutex_lock(&ctrl->namespaces_mutex);
+> +	if (list_empty(&ctrl->namespaces))
+> +		goto out_no_namespace;
+> +	ulk.data = ns =list_first_entry(&ctrl->namespaces, struct nvme_ns, list);
 
-Hello Tejun Heo,
+Simply grabbing a namespace without locking is broken.  That being
+said..
 
-The patch e4a9bde9589f: "blkcg: replace blkcg_policy->cpd_size with
-->cpd_alloc/free_fn() methods" from Aug 18, 2015, leads to the
-following static checker warning:
+> +	mutex_unlock(&ctrl->namespaces_mutex);
+> +	snprintf(diskname, sizeof(diskname), "%sn%d",
+> +		 dev_name(ctrl->device), ns->instance);
+> +	ulk.name = diskname;
+> +
+> +	ulk.ops.send = nvme_sec_send;
+> +	ulk.ops.recv = nvme_sec_recv;
+> +	opal_unlock_from_suspend(&ulk);
 
-	block/cfq-iosched.c:1589 cfq_cpd_alloc()
-	warn: use 'gfp' here instead of GFP_XXX?
+passing a device _name_ to a lower level interface is even more
+broken.  The Security Send/Receive commands operate on the NVMe
+admin queue, and for SCSI and ATA that'd operate on the device.
+So what we need to do here is to pass an object that identifies
+the device - either the request queue if the opal code wants
+to use it directly, or an opaqueue object that allows us to find
+the nvme_ctrl.
 
-block/cfq-iosched.c
-  1585  static struct blkcg_policy_data *cfq_cpd_alloc(gfp_t gfp)
-  1586  {
-  1587          struct cfq_group_data *cgd;
-  1588  
-  1589          cgd = kzalloc(sizeof(*cgd), GFP_KERNEL);
+Looking a bit at the actual low-level OPAL code it seems
+like the driver should allocate the opal_dev structure when
+setting up the device, and we should always pass it in.  But
+maybe I need to understand that code a bit better first.
 
-It does feels weird to pass "gfp" and never use it.
-
-  1590          if (!cgd)
-  1591                  return NULL;
-  1592          return &cgd->cpd;
-  1593  }
-
-
-regards,
-dan carpenter
+_______________________________________________
+Linux-nvme mailing list
+Linux-nvme@lists.infradead.org
+http://lists.infradead.org/mailman/listinfo/linux-nvme
