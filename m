@@ -1,165 +1,114 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga05.intel.com ([192.55.52.43]:55780 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S932658AbcKPXZS (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Nov 2016 18:25:18 -0500
-From: Scott Bauer <scott.bauer@intel.com>
-To: linux-nvme@lists.infradead.org
-Cc: Rafael.Antognolli@intel.com, axboe@fb.com, keith.busch@intel.com,
-        jonathan.derrick@intel.com, j.naumann@fu-berlin.de,
-        hch@infradead.org, linux-block@vger.kernel.org, sagi@grimberg.me,
-        Scott Bauer <scott.bauer@intel.com>
-Subject: [PATCH v1 5/7] nvme: Implement SED Security Operations
-Date: Wed, 16 Nov 2016 16:17:30 -0700
-Message-Id: <1479338252-8777-6-git-send-email-scott.bauer@intel.com>
-In-Reply-To: <1479338252-8777-1-git-send-email-scott.bauer@intel.com>
-References: <1479338252-8777-1-git-send-email-scott.bauer@intel.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <BATV+c11f2a9076c546b906d6+4834+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: mst@redhat.com
+Cc: axboe@kernel.dk,
+	virtualization@lists.linux-foundation.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 06/11] virtio_pci: use msix_enable flag in struct pci_dev
+Date: Thu, 17 Nov 2016 11:43:18 +0100
+Message-Id: <1479379403-27880-7-git-send-email-hch@lst.de>
+In-Reply-To: <1479379403-27880-1-git-send-email-hch@lst.de>
+References: <1479379403-27880-1-git-send-email-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-This patch implements the sec_ops functions for sending OPAL
-packets to the controller.
+Instead of duplicating it.
 
-Signed-off-by: Scott Bauer <scott.bauer@intel.com>
-Signed-off-by: Rafael Antognolli <Rafael.Antognolli@intel.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/nvme/host/core.c | 94 ++++++++++++++++++++++++++++++++++++++++++++++++
- drivers/nvme/host/nvme.h |  3 +-
- 2 files changed, 96 insertions(+), 1 deletion(-)
+ drivers/virtio/virtio_pci_common.c | 7 ++-----
+ drivers/virtio/virtio_pci_common.h | 2 --
+ drivers/virtio/virtio_pci_legacy.c | 2 +-
+ drivers/virtio/virtio_pci_modern.c | 2 +-
+ include/uapi/linux/virtio_pci.h    | 2 +-
+ 5 files changed, 5 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 79e679d..e8b6804 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -28,6 +28,8 @@
- #include <linux/t10-pi.h>
- #include <scsi/sg.h>
- #include <asm/unaligned.h>
-+#include <linux/sed.h>
-+#include <linux/sed-opal.h>
+diff --git a/drivers/virtio/virtio_pci_common.c b/drivers/virtio/virtio_pci_common.c
+index 9e6c9d8..03d3a3b 100644
+--- a/drivers/virtio/virtio_pci_common.c
++++ b/drivers/virtio/virtio_pci_common.c
+@@ -133,7 +133,6 @@ static int vp_setup_msix_vectors(struct virtio_device *vdev, int nvectors)
+ 			PCI_IRQ_MSIX);
+ 	if (err < 0)
+ 		goto error;
+-	vp_dev->msix_enabled = 1;
  
- #include "nvme.h"
- #include "fabrics.h"
-@@ -1067,6 +1069,97 @@ static const struct pr_ops nvme_pr_ops = {
- 	.pr_clear	= nvme_pr_clear,
- };
+ 	/* Set the vector used for configuration */
+ 	snprintf(vp_dev->msix_names[0], sizeof(*vp_dev->msix_names),
+@@ -225,12 +224,10 @@ void vp_del_vqs(struct virtio_device *vdev)
+ 		if (vp_dev->msix_affinity_masks[i])
+ 			free_cpumask_var(vp_dev->msix_affinity_masks[i]);
  
-+struct sed_cb_data {
-+	sec_cb	*cb;
-+	void	*cb_data;
-+	struct nvme_command cmd;
-+};
-+
-+static void sec_submit_endio(struct request *req, int error)
-+{
-+	struct sed_cb_data *sed_data = req->end_io_data;
-+
-+	if (sed_data->cb)
-+		sed_data->cb(error, sed_data->cb_data);
-+
-+	kfree(sed_data);
-+	blk_mq_free_request(req);
-+}
-+
-+static int nvme_sec_submit(void *data, u8 opcode, u16 SPSP,
-+			   u8 SECP, void *buffer, size_t len,
-+			   sec_cb *cb, void *cb_data)
-+{
-+	struct request_queue *q;
-+	struct request *req;
-+	struct sed_cb_data *sed_data;
-+	struct nvme_ns *ns;
-+	struct nvme_command *cmd;
-+	int ret;
-+
-+	ns = data;
-+
-+	sed_data = kzalloc(sizeof(*sed_data), GFP_NOWAIT);
-+	if (!sed_data)
-+		return -ENOMEM;
-+	sed_data->cb = cb;
-+	sed_data->cb_data = cb_data;
-+	cmd = &sed_data->cmd;
-+
-+	cmd->common.opcode = opcode;
-+	cmd->common.nsid = ns->ns_id;
-+	cmd->common.cdw10[0] = SECP << 24 | SPSP << 8;
-+	cmd->common.cdw10[1] = len;
-+
-+	q = ns->ctrl->admin_q;
-+
-+	req = nvme_alloc_request(q, cmd, 0, NVME_QID_ANY);
-+	if (IS_ERR(req)) {
-+		ret = PTR_ERR(req);
-+		goto err_free;
-+	}
-+
-+	req->timeout = ADMIN_TIMEOUT;
-+	req->special = NULL;
-+
-+	if (buffer && len) {
-+		ret = blk_rq_map_kern(q, req, buffer, len, GFP_NOWAIT);
-+		if (ret) {
-+			blk_mq_free_request(req);
-+			goto err_free;
-+		}
-+	}
-+
-+	req->end_io_data = sed_data;
-+
-+	blk_execute_rq_nowait(q, ns->disk, req, 1, sec_submit_endio);
-+	return 0;
-+
-+err_free:
-+	kfree(sed_data);
-+}
-+
-+static int nvme_sec_recv(void *data, u16 SPSP, u8 SECP,
-+			 void *buffer, size_t len,
-+			 sec_cb *cb, void *cb_data)
-+{
-+	return nvme_sec_submit(data, nvme_admin_security_recv, SPSP, SECP,
-+			       buffer, len, cb, cb_data);
-+}
-+
-+static int nvme_sec_send(void *data, u16 SPSP, u8 SECP,
-+			 void *buffer, size_t len,
-+			 sec_cb *cb, void *cb_data)
-+{
-+	return nvme_sec_submit(data, nvme_admin_security_send, SPSP, SECP,
-+			       buffer, len, cb, cb_data);
-+}
-+
-+static struct sec_ops nvme_sec_ops = {
-+	.send	= nvme_sec_send,
-+	.recv	= nvme_sec_recv,
-+};
-+
- static const struct block_device_operations nvme_fops = {
- 	.owner		= THIS_MODULE,
- 	.ioctl		= nvme_ioctl,
-@@ -1076,6 +1169,7 @@ static const struct block_device_operations nvme_fops = {
- 	.getgeo		= nvme_getgeo,
- 	.revalidate_disk= nvme_revalidate_disk,
- 	.pr_ops		= &nvme_pr_ops,
-+	.sec_ops	= &nvme_sec_ops,
- };
+-	if (vp_dev->msix_enabled) {
++	if (vp_dev->pci_dev->msix_enabled) {
+ 		/* Disable the vector used for configuration */
+ 		vp_dev->config_vector(vp_dev, VIRTIO_MSI_NO_VECTOR);
+-
+ 		pci_free_irq_vectors(vp_dev->pci_dev);
+-		vp_dev->msix_enabled = 0;
+ 	}
  
- static int nvme_wait_ready(struct nvme_ctrl *ctrl, u64 cap, bool enabled)
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index d47f5a5..977c631 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -240,7 +240,8 @@ static inline int nvme_error_status(u16 status)
+ 	vp_dev->msix_vectors = 0;
+@@ -391,7 +388,7 @@ int vp_set_vq_affinity(struct virtqueue *vq, int cpu)
+ 	if (!vq->callback)
+ 		return -EINVAL;
  
- static inline bool nvme_req_needs_retry(struct request *req, u16 status)
- {
--	return !(status & NVME_SC_DNR || blk_noretry_request(req)) &&
-+	return !(status & NVME_SC_DNR || status & NVME_SC_ACCESS_DENIED ||
-+		 blk_noretry_request(req)) &&
- 		(jiffies - req->start_time) < req->timeout &&
- 		req->retries < nvme_max_retries;
- }
+-	if (vp_dev->msix_enabled) {
++	if (vp_dev->pci_dev->msix_enabled) {
+ 		mask = vp_dev->msix_affinity_masks[info->msix_vector];
+ 		irq = pci_irq_vector(vp_dev->pci_dev, info->msix_vector);
+ 		if (cpu == -1)
+diff --git a/drivers/virtio/virtio_pci_common.h b/drivers/virtio/virtio_pci_common.h
+index 93f3e4f..d041cce 100644
+--- a/drivers/virtio/virtio_pci_common.h
++++ b/drivers/virtio/virtio_pci_common.h
+@@ -82,8 +82,6 @@ struct virtio_pci_device {
+ 	/* array of all queues for house-keeping */
+ 	struct virtio_pci_vq_info **vqs;
+ 
+-	/* MSI-X support */
+-	int msix_enabled;
+ 	cpumask_var_t *msix_affinity_masks;
+ 	/* Name strings for interrupts. This size should be enough,
+ 	 * and I'm too lazy to allocate each name separately. */
+diff --git a/drivers/virtio/virtio_pci_legacy.c b/drivers/virtio/virtio_pci_legacy.c
+index 6d9e517..f83829f 100644
+--- a/drivers/virtio/virtio_pci_legacy.c
++++ b/drivers/virtio/virtio_pci_legacy.c
+@@ -169,7 +169,7 @@ static void del_vq(struct virtio_pci_vq_info *info)
+ 
+ 	iowrite16(vq->index, vp_dev->ioaddr + VIRTIO_PCI_QUEUE_SEL);
+ 
+-	if (vp_dev->msix_enabled) {
++	if (vp_dev->pci_dev->msix_enabled) {
+ 		iowrite16(VIRTIO_MSI_NO_VECTOR,
+ 			  vp_dev->ioaddr + VIRTIO_MSI_QUEUE_VECTOR);
+ 		/* Flush the write out to device */
+diff --git a/drivers/virtio/virtio_pci_modern.c b/drivers/virtio/virtio_pci_modern.c
+index e76bd91..e18d0b0 100644
+--- a/drivers/virtio/virtio_pci_modern.c
++++ b/drivers/virtio/virtio_pci_modern.c
+@@ -416,7 +416,7 @@ static void del_vq(struct virtio_pci_vq_info *info)
+ 
+ 	vp_iowrite16(vq->index, &vp_dev->common->queue_select);
+ 
+-	if (vp_dev->msix_enabled) {
++	if (vp_dev->pci_dev->msix_enabled) {
+ 		vp_iowrite16(VIRTIO_MSI_NO_VECTOR,
+ 			     &vp_dev->common->queue_msix_vector);
+ 		/* Flush the write out to device */
+diff --git a/include/uapi/linux/virtio_pci.h b/include/uapi/linux/virtio_pci.h
+index 90007a1..15b4385 100644
+--- a/include/uapi/linux/virtio_pci.h
++++ b/include/uapi/linux/virtio_pci.h
+@@ -79,7 +79,7 @@
+  * configuration space */
+ #define VIRTIO_PCI_CONFIG_OFF(msix_enabled)	((msix_enabled) ? 24 : 20)
+ /* Deprecated: please use VIRTIO_PCI_CONFIG_OFF instead */
+-#define VIRTIO_PCI_CONFIG(dev)	VIRTIO_PCI_CONFIG_OFF((dev)->msix_enabled)
++#define VIRTIO_PCI_CONFIG(dev)	VIRTIO_PCI_CONFIG_OFF((dev)->pci_dev->msix_enabled)
+ 
+ /* Virtio ABI version, this must match exactly */
+ #define VIRTIO_PCI_ABI_VERSION		0
 -- 
-2.7.4
-
+2.1.4
