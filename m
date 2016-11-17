@@ -1,47 +1,36 @@
-Return-Path: <tklauser@distanz.ch>
-From: Tobias Klauser <tklauser@distanz.ch>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: Mika Westerberg <mika.westerberg@linux.intel.com>
-Subject: [PATCH v2] block: Change extern inline to static inline
-Date: Fri, 18 Nov 2016 15:16:06 +0100
-Message-Id: <20161118141606.9520-1-tklauser@distanz.ch>
+Return-Path: <BATV+c11f2a9076c546b906d6+4834+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: mst@redhat.com
+Cc: axboe@kernel.dk,
+	virtualization@lists.linux-foundation.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 02/11] virtio_pci: remove the call to vp_free_vectors in vp_request_msix_vectors
+Date: Thu, 17 Nov 2016 11:43:14 +0100
+Message-Id: <1479379403-27880-3-git-send-email-hch@lst.de>
+In-Reply-To: <1479379403-27880-1-git-send-email-hch@lst.de>
+References: <1479379403-27880-1-git-send-email-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-With compilers which follow the C99 standard (like modern versions of
-gcc and clang), "extern inline" does the opposite thing from older
-versions of gcc (emits code for an externally linkable version of the
-inline function).
+vp_request_msix_vectors is only called by vp_try_to_find_vqs, which already
+calls vp_free_vectors through vp_del_vqs in the failure case.
 
-"static inline" does the intended behavior in all cases instead.
-
-Description taken from commit 6d91857d4826 ("staging, rtl8192e,
-LLVMLinux: Change extern inline to static inline").
-
-This also fixes the following GCC warning when building with CONFIG_PM
-disabled:
-
-  ./include/linux/blkdev.h:1143:20: warning: no previous prototype for 'blk_set_runtime_active' [-Wmissing-prototypes]
-
-Fixes: d07ab6d11477 ("block: Add blk_set_runtime_active()")
-Reviewed-by: Mika Westerberg <mika.westerberg@linux.intel.com>
-Signed-off-by: Tobias Klauser <tklauser@distanz.ch>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- include/linux/blkdev.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/virtio/virtio_pci_common.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 00eb55e63d33..5fdad2d7e895 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1187,7 +1187,7 @@ static inline int blk_pre_runtime_suspend(struct request_queue *q)
- static inline void blk_post_runtime_suspend(struct request_queue *q, int err) {}
- static inline void blk_pre_runtime_resume(struct request_queue *q) {}
- static inline void blk_post_runtime_resume(struct request_queue *q, int err) {}
--extern inline void blk_set_runtime_active(struct request_queue *q) {}
-+static inline void blk_set_runtime_active(struct request_queue *q) {}
- #endif
+diff --git a/drivers/virtio/virtio_pci_common.c b/drivers/virtio/virtio_pci_common.c
+index f5e2751..93700c5 100644
+--- a/drivers/virtio/virtio_pci_common.c
++++ b/drivers/virtio/virtio_pci_common.c
+@@ -197,7 +197,6 @@ static int vp_request_msix_vectors(struct virtio_device *vdev, int nvectors,
+ 	}
+ 	return 0;
+ error:
+-	vp_free_vectors(vdev);
+ 	return err;
+ }
  
- /*
 -- 
-2.11.0.rc0.7.gbe5a750
+2.1.4
