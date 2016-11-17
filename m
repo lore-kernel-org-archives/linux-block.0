@@ -1,183 +1,52 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wj0-f193.google.com ([209.85.210.193]:32951 "EHLO
-        mail-wj0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755287AbcK1Vjp (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Nov 2016 16:39:45 -0500
-Received: by mail-wj0-f193.google.com with SMTP id kp2so15789083wjc.0
-        for <linux-block@vger.kernel.org>; Mon, 28 Nov 2016 13:39:45 -0800 (PST)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: axboe@fb.com, =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <jg@lightnvm.io>,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [PATCH 08/23] lightnvm: remove sysfs configuration interface
-Date: Mon, 28 Nov 2016 22:38:59 +0100
-Message-Id: <20161128213914.12516-9-m@bjorling.me>
-In-Reply-To: <20161128213914.12516-1-m@bjorling.me>
-References: <20161128213914.12516-1-m@bjorling.me>
+Received: from mga09.intel.com ([134.134.136.24]:25066 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751464AbcKQTj3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 17 Nov 2016 14:39:29 -0500
+Date: Thu, 17 Nov 2016 12:33:23 -0700
+From: Scott Bauer <scott.bauer@intel.com>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: linux-block@vger.kernel.org, sagi@grimberg.me,
+        Rafael.Antognolli@intel.com, axboe@fb.com,
+        linux-nvme@lists.infradead.org, keith.busch@intel.com,
+        jonathan.derrick@intel.com, j.naumann@fu-berlin.de
+Subject: Re: [PATCH v1 0/7] SED OPAL Library
+Message-ID: <20161117193322.GA3044@sbauer-Z170X-UD5>
+References: <1479338252-8777-1-git-send-email-scott.bauer@intel.com>
+ <20161117131251.GA15852@infradead.org>
+ <20161117173613.GA13865@sbauer-Z170X-UD5>
+ <20161117192807.GA31515@infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20161117192807.GA31515@infradead.org>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Javier González <jg@lightnvm.io>
+On Thu, Nov 17, 2016 at 11:28:07AM -0800, Christoph Hellwig wrote:
+> On Thu, Nov 17, 2016 at 10:36:14AM -0700, Scott Bauer wrote:
+> > 
+> > I want some further clarification, if you don't mind. We call sec_ops
+> > inside the actual logic for the opal code. Which is only accessible via the
+> > ioctls, is that what you were meaning?  When you say "the driver calls"
+> > do you mean that the nvme/sata/et al drivers would implement some generic
+> > block sed function that would be called via ioctl?
+> > So the call chain would be:
+> > 
+> > Userland
+> >  block/ioctl  ops->blkdev_sed()
+> > 
+> >   nvme/et al (implements blkdev_sed()) which calls:
+> > 
+> >    sed.c blkdev_sed_ioctl(with passed in combined fn to get data to controller)?
+> > 
+> > Is this what you were thinking, if so I agree it will alleviate a bunch of clutter
+> > in block/ioctl.c. If this isn't what you were thinking please let me know.
+> 
+> Similar, but not quite the same.  We already have an ioctl method in
+> struct block_device_operations, so in that we'd do something like
+> this for nvme:
 
-LightNVM used to be managed and configured through sysfs. Since the
-introduction of management ioctls this interface is redundant and
-outdated. Get rid of it.
+Ah okay this was the piece I was missing. I was mixed up on how we would
+agnostically get it into the nvme drive and allow sata etc to do the same.
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <m@bjorling.me>
----
- drivers/lightnvm/core.c | 134 ------------------------------------------------
- 1 file changed, 134 deletions(-)
-
-diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-index 6527cf6..d4433d3 100644
---- a/drivers/lightnvm/core.c
-+++ b/drivers/lightnvm/core.c
-@@ -780,140 +780,6 @@ static int __nvm_configure_create(struct nvm_ioctl_create *create)
- 	return dev->mt->create_tgt(dev, create);
- }
- 
--#ifdef CONFIG_NVM_DEBUG
--static int nvm_configure_show(const char *val)
--{
--	struct nvm_dev *dev;
--	char opcode, devname[DISK_NAME_LEN];
--	int ret;
--
--	ret = sscanf(val, "%c %32s", &opcode, devname);
--	if (ret != 2) {
--		pr_err("nvm: invalid command. Use \"opcode devicename\".\n");
--		return -EINVAL;
--	}
--
--	down_write(&nvm_lock);
--	dev = nvm_find_nvm_dev(devname);
--	up_write(&nvm_lock);
--	if (!dev) {
--		pr_err("nvm: device not found\n");
--		return -EINVAL;
--	}
--
--	if (!dev->mt)
--		return 0;
--
--	dev->mt->lun_info_print(dev);
--
--	return 0;
--}
--
--static int nvm_configure_remove(const char *val)
--{
--	struct nvm_ioctl_remove remove;
--	struct nvm_dev *dev;
--	char opcode;
--	int ret = 0;
--
--	ret = sscanf(val, "%c %256s", &opcode, remove.tgtname);
--	if (ret != 2) {
--		pr_err("nvm: invalid command. Use \"d targetname\".\n");
--		return -EINVAL;
--	}
--
--	remove.flags = 0;
--
--	list_for_each_entry(dev, &nvm_devices, devices) {
--		ret = dev->mt->remove_tgt(dev, &remove);
--		if (!ret)
--			break;
--	}
--
--	return ret;
--}
--
--static int nvm_configure_create(const char *val)
--{
--	struct nvm_ioctl_create create;
--	char opcode;
--	int lun_begin, lun_end, ret;
--
--	ret = sscanf(val, "%c %256s %256s %48s %u:%u", &opcode, create.dev,
--						create.tgtname, create.tgttype,
--						&lun_begin, &lun_end);
--	if (ret != 6) {
--		pr_err("nvm: invalid command. Use \"opcode device name tgttype lun_begin:lun_end\".\n");
--		return -EINVAL;
--	}
--
--	create.flags = 0;
--	create.conf.type = NVM_CONFIG_TYPE_SIMPLE;
--	create.conf.s.lun_begin = lun_begin;
--	create.conf.s.lun_end = lun_end;
--
--	return __nvm_configure_create(&create);
--}
--
--
--/* Exposes administrative interface through /sys/module/lnvm/configure_by_str */
--static int nvm_configure_by_str_event(const char *val,
--					const struct kernel_param *kp)
--{
--	char opcode;
--	int ret;
--
--	ret = sscanf(val, "%c", &opcode);
--	if (ret != 1) {
--		pr_err("nvm: string must have the format of \"cmd ...\"\n");
--		return -EINVAL;
--	}
--
--	switch (opcode) {
--	case 'a':
--		return nvm_configure_create(val);
--	case 'd':
--		return nvm_configure_remove(val);
--	case 's':
--		return nvm_configure_show(val);
--	default:
--		pr_err("nvm: invalid command\n");
--		return -EINVAL;
--	}
--
--	return 0;
--}
--
--static int nvm_configure_get(char *buf, const struct kernel_param *kp)
--{
--	int sz;
--	struct nvm_dev *dev;
--
--	sz = sprintf(buf, "available devices:\n");
--	down_write(&nvm_lock);
--	list_for_each_entry(dev, &nvm_devices, devices) {
--		if (sz > 4095 - DISK_NAME_LEN - 2)
--			break;
--		sz += sprintf(buf + sz, " %32s\n", dev->name);
--	}
--	up_write(&nvm_lock);
--
--	return sz;
--}
--
--static const struct kernel_param_ops nvm_configure_by_str_event_param_ops = {
--	.set	= nvm_configure_by_str_event,
--	.get	= nvm_configure_get,
--};
--
--#undef MODULE_PARAM_PREFIX
--#define MODULE_PARAM_PREFIX	"lnvm."
--
--module_param_cb(configure_debug, &nvm_configure_by_str_event_param_ops, NULL,
--									0644);
--
--#endif /* CONFIG_NVM_DEBUG */
--
- static long nvm_ioctl_info(struct file *file, void __user *arg)
- {
- 	struct nvm_ioctl_info *info;
--- 
-2.9.3
-
+Thanks for your help i'll get working.
