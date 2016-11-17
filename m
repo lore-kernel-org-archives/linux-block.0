@@ -1,35 +1,103 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from userp1040.oracle.com ([156.151.31.81]:33152 "EHLO
-        userp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S964981AbcKXLfB (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Nov 2016 06:35:01 -0500
-Date: Thu, 24 Nov 2016 14:34:07 +0300
-From: Dan Carpenter <dan.carpenter@oracle.com>
-To: linux-block@vger.kernel.org, Jens Axboe <axboe@fb.com>
-Cc: kernel-janitors@vger.kernel.org,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>
-Subject: [patch] swim3: remove some dead code
-Message-ID: <20161124112817.GO17225@mwanda>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jthumshirn@suse.de>
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: James Bottomley <jejb@linux.vnet.ibm.com>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>
+Cc: Hannes Reinecke <hare@suse.de>,
+	Christoph Hellwig <hch@infradead.org>,
+	Linux SCSI Mailinglist <linux-scsi@vger.kernel.org>,
+	Linux Kernel Mailinglist <linux-kernel@vger.kernel.org>,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org (open list:BLOCK LAYER)
+Subject: [PATCH RESEND v4 11/15] scsi: fc: use bsg_softirq_done
+Date: Thu, 17 Nov 2016 16:09:34 +0100
+Message-Id: <d45b043c5f84759fbd12f7f392d53a7c625098e9.1479374720.git.jthumshirn@suse.de>
+In-Reply-To: <cover.1479374719.git.jthumshirn@suse.de>
+References: <cover.1479374719.git.jthumshirn@suse.de>
+In-Reply-To: <cover.1479374719.git.jthumshirn@suse.de>
+References: <cover.1479374719.git.jthumshirn@suse.de>
+List-ID: <linux-block@vger.kernel.org>
 
-The goto is correct.  "rc" is already set to -EBUSY so there is no need
-to do anything with that.
+bsg_softirq_done() and fc_bsg_softirq_done() are copies of each other, so
+ditch the fc specific one.
 
-Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+Signed-off-by: Johannes Thumshirn <jthumshirn@suse.de>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+---
+ block/bsg-lib.c                  |  3 ++-
+ drivers/scsi/scsi_transport_fc.c | 15 ++-------------
+ include/linux/bsg-lib.h          |  1 +
+ 3 files changed, 5 insertions(+), 14 deletions(-)
 
-diff --git a/drivers/block/swim3.c b/drivers/block/swim3.c
-index c264f2d..59b4a41 100644
---- a/drivers/block/swim3.c
-+++ b/drivers/block/swim3.c
-@@ -1179,7 +1179,6 @@ static int swim3_add_device(struct macio_dev *mdev, int index)
- 		swim3_err("%s", "Couldn't request interrupt\n");
- 		pmac_call_feature(PMAC_FTR_SWIM3_ENABLE, swim, 0, 0);
- 		goto out_unmap;
--		return -EBUSY;
- 	}
+diff --git a/block/bsg-lib.c b/block/bsg-lib.c
+index 9f1e8fd..6661f82 100644
+--- a/block/bsg-lib.c
++++ b/block/bsg-lib.c
+@@ -85,12 +85,13 @@ void bsg_job_done(struct bsg_job *job, int result,
+  * bsg_softirq_done - softirq done routine for destroying the bsg requests
+  * @rq: BSG request that holds the job to be destroyed
+  */
+-static void bsg_softirq_done(struct request *rq)
++void bsg_softirq_done(struct request *rq)
+ {
+ 	struct bsg_job *job = rq->special;
  
- 	init_timer(&fs->timeout);
+ 	kref_put(&job->kref, bsg_destroy_job);
+ }
++EXPORT_SYMBOL_GPL(bsg_softirq_done);
+ 
+ static int bsg_map_buffer(struct bsg_buffer *buf, struct request *req)
+ {
+diff --git a/drivers/scsi/scsi_transport_fc.c b/drivers/scsi/scsi_transport_fc.c
+index 0f350b7..30f4338 100644
+--- a/drivers/scsi/scsi_transport_fc.c
++++ b/drivers/scsi/scsi_transport_fc.c
+@@ -3591,17 +3591,6 @@ void fc_bsg_jobdone(struct bsg_job *job, int result,
+ EXPORT_SYMBOL_GPL(fc_bsg_jobdone);
+ 
+ /**
+- * fc_bsg_softirq_done - softirq done routine for destroying the bsg requests
+- * @rq:        BSG request that holds the job to be destroyed
+- */
+-static void fc_bsg_softirq_done(struct request *rq)
+-{
+-	struct bsg_job *job = rq->special;
+-
+-	kref_put(&job->kref, bsg_destroy_job);
+-}
+-
+-/**
+  * fc_bsg_job_timeout - handler for when a bsg request timesout
+  * @req:	request that timed out
+  */
+@@ -4033,7 +4022,7 @@ enum fc_dispatch_result {
+ 
+ 	q->queuedata = shost;
+ 	queue_flag_set_unlocked(QUEUE_FLAG_BIDI, q);
+-	blk_queue_softirq_done(q, fc_bsg_softirq_done);
++	blk_queue_softirq_done(q, bsg_softirq_done);
+ 	blk_queue_rq_timed_out(q, fc_bsg_job_timeout);
+ 	blk_queue_rq_timeout(q, FC_DEFAULT_BSG_TIMEOUT);
+ 
+@@ -4079,7 +4068,7 @@ enum fc_dispatch_result {
+ 
+ 	q->queuedata = rport;
+ 	queue_flag_set_unlocked(QUEUE_FLAG_BIDI, q);
+-	blk_queue_softirq_done(q, fc_bsg_softirq_done);
++	blk_queue_softirq_done(q, bsg_softirq_done);
+ 	blk_queue_rq_timed_out(q, fc_bsg_job_timeout);
+ 	blk_queue_rq_timeout(q, BLK_DEFAULT_SG_TIMEOUT);
+ 
+diff --git a/include/linux/bsg-lib.h b/include/linux/bsg-lib.h
+index 67f7de6..09f3044 100644
+--- a/include/linux/bsg-lib.h
++++ b/include/linux/bsg-lib.h
+@@ -70,5 +70,6 @@ int bsg_setup_queue(struct device *dev, struct request_queue *q, char *name,
+ 		    bsg_job_fn *job_fn, int dd_job_size);
+ void bsg_request_fn(struct request_queue *q);
+ void bsg_destroy_job(struct kref *kref);
++void bsg_softirq_done(struct request *rq);
+ 
+ #endif
+-- 
+1.8.5.6
