@@ -1,81 +1,42 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:57811 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S965031AbcKNWWZ (ORCPT
+Received: from mail-qk0-f194.google.com ([209.85.220.194]:34637 "EHLO
+        mail-qk0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752434AbcKQW2N (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Nov 2016 17:22:25 -0500
-Received: from pps.filterd (m0001255.ppops.net [127.0.0.1])
-        by mx0b-00082601.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id uAEMLP3d016476
-        for <linux-block@vger.kernel.org>; Mon, 14 Nov 2016 14:22:24 -0800
-Received: from mail.thefacebook.com ([199.201.64.23])
-        by mx0b-00082601.pphosted.com with ESMTP id 26p2f2t49u-2
-        (version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT)
-        for <linux-block@vger.kernel.org>; Mon, 14 Nov 2016 14:22:24 -0800
-Received: from facebook.com (2401:db00:21:603d:face:0:19:0)     by
- mx-out.facebook.com (10.223.100.99) with ESMTP id
- d06a7194aab811e6985324be05956610-81dfda50 for <linux-block@vger.kernel.org>;
-        Mon, 14 Nov 2016 14:22:23 -0800
-From: Shaohua Li <shli@fb.com>
-To: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <Kernel-team@fb.com>, <axboe@fb.com>, <tj@kernel.org>,
-        <vgoyal@redhat.com>
-Subject: [PATCH V4 03/15] blk-throttle: configure bps/iops limit for cgroup in high limit
-Date: Mon, 14 Nov 2016 14:22:10 -0800
-Message-ID: <7a4f1b1b0f67bb02d0caadae808c1a89413c202d.1479161136.git.shli@fb.com>
-In-Reply-To: <cover.1479161136.git.shli@fb.com>
-References: <cover.1479161136.git.shli@fb.com>
+        Thu, 17 Nov 2016 17:28:13 -0500
+Received: by mail-qk0-f194.google.com with SMTP id 124so28607510qkh.1
+        for <linux-block@vger.kernel.org>; Thu, 17 Nov 2016 14:28:13 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <yq1h976akkd.fsf@sermon.lab.mkp.net>
+References: <1479279039-25818-1-git-send-email-chaitanya.kulkarni@hgst.com>
+ <1479279039-25818-3-git-send-email-chaitanya.kulkarni@hgst.com>
+ <20161116175906.GA10050@localhost.localdomain> <yq1h976akkd.fsf@sermon.lab.mkp.net>
+From: chaitany kulkarni <ckulkarnilinux@gmail.com>
+Date: Thu, 17 Nov 2016 14:28:12 -0800
+Message-ID: <CAK0tqi=rMd9EqXLzAVXp0RnTGpv3USLcu95=vwhZPbK-qZos5A@mail.gmail.com>
+Subject: Re: [PATCH 2/5] block: add support for REQ_OP_WRITE_ZEROES
+To: "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: Keith Busch <keith.busch@intel.com>, axboe@fb.com,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        Chaitanya Kulkarni <chaitanya.kulkarni@hgst.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-each queue will have a state machine. Initially queue is in LIMIT_HIGH
-state, which means all cgroups will be throttled according to their high
-limit. After all cgroups with high limit cross the limit, the queue state
-gets upgraded to LIMIT_MAX state.
-cgroups without high limit will use max limit for their high limit.
+Incorporated the comments and sent new patch.
 
-Signed-off-by: Shaohua Li <shli@fb.com>
----
- block/blk-throttle.c | 21 +++++++++++++++++++--
- 1 file changed, 19 insertions(+), 2 deletions(-)
-
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index a564215..ec53671 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -208,12 +208,29 @@ static struct throtl_data *sq_to_td(struct throtl_service_queue *sq)
- 
- static uint64_t tg_bps_limit(struct throtl_grp *tg, int rw)
- {
--	return tg->bps[rw][tg->td->limit_index];
-+	struct blkcg_gq *blkg = tg_to_blkg(tg);
-+	uint64_t ret;
-+
-+	if (cgroup_subsys_on_dfl(io_cgrp_subsys) && !blkg->parent)
-+		return -1;
-+	ret = tg->bps[rw][tg->td->limit_index];
-+	if (ret == -1 && tg->td->limit_index == LIMIT_HIGH)
-+		return tg->bps[rw][LIMIT_MAX];
-+
-+	return ret;
- }
- 
- static unsigned int tg_iops_limit(struct throtl_grp *tg, int rw)
- {
--	return tg->iops[rw][tg->td->limit_index];
-+	struct blkcg_gq *blkg = tg_to_blkg(tg);
-+	unsigned int ret;
-+
-+	if (cgroup_subsys_on_dfl(io_cgrp_subsys) && !blkg->parent)
-+		return -1;
-+	ret = tg->iops[rw][tg->td->limit_index];
-+	if (ret == -1 && tg->td->limit_index == LIMIT_HIGH)
-+		return tg->iops[rw][LIMIT_MAX];
-+	return ret;
- }
- 
- /**
--- 
-2.9.3
-
+On Wed, Nov 16, 2016 at 6:48 PM, Martin K. Petersen
+<martin.petersen@oracle.com> wrote:
+>>>>>> "Keith" == Keith Busch <keith.busch@intel.com> writes:
+>
+> Keith> Your maximum bi_size exceeds the 2-bytes an NVMe Write Zeroes
+> Keith> command provides for the block count. Instead of having a simple
+> Keith> queue flag for write zeroes support, have it take a max sectors
+> Keith> value instead.
+>
+> Yes, please. Make it a queue limit and make sure it is properly stacked.
+>
+> The rest looks sensible to me. I'll wire up the SCSI pieces.
+>
+> --
+> Martin K. Petersen      Oracle Linux Engineering
