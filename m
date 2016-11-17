@@ -1,114 +1,42 @@
-Return-Path: <BATV+c11f2a9076c546b906d6+4834+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: mst@redhat.com
-Cc: axboe@kernel.dk,
-	virtualization@lists.linux-foundation.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 06/11] virtio_pci: use msix_enable flag in struct pci_dev
-Date: Thu, 17 Nov 2016 11:43:18 +0100
-Message-Id: <1479379403-27880-7-git-send-email-hch@lst.de>
-In-Reply-To: <1479379403-27880-1-git-send-email-hch@lst.de>
-References: <1479379403-27880-1-git-send-email-hch@lst.de>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCHSET] Add support for simplified async direct-io
+To: Christoph Hellwig <hch@infradead.org>
+References: <20161116163147.GA25038@infradead.org>
+ <72b1725a-0363-d33e-f890-251b1ac88998@kernel.dk>
+ <20161116171652.GA30008@infradead.org>
+ <c46c5e60-a5eb-2862-2b1b-f994fd0d3fe3@kernel.dk>
+ <c2e20890-16ce-a3bd-c696-c53ae14a583a@kernel.dk>
+ <20161117125037.GB14814@infradead.org>
+ <204d4a18-e5da-1806-433e-a3ff1b6ca575@kernel.dk>
+ <87823f67-a2ec-e959-1a23-9ecf3d6fe6d4@kernel.dk>
+ <20161117201749.GA15072@infradead.org>
+ <721c8908-ea89-a2f4-0bfd-7243a9aa4c03@kernel.dk>
+ <20161117210448.GA25566@infradead.org>
+Cc: linux-block@vger.kernel.org
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <d5b16e63-9af0-5e78-35c2-3fa2f67a4f9f@kernel.dk>
+Date: Thu, 17 Nov 2016 14:06:01 -0700
+MIME-Version: 1.0
+In-Reply-To: <20161117210448.GA25566@infradead.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-Instead of duplicating it.
+On 11/17/2016 02:04 PM, Christoph Hellwig wrote:
+> On Thu, Nov 17, 2016 at 01:30:12PM -0700, Jens Axboe wrote:
+>> The last patch seems to have some issues:
+>>
+>> +       bool is_sync = is_sync = is_sync_kiocb(iocb);
+>>
+>> and it's reverting part of the dio->is_sync that was part of my union
+>> waiter/iocb change. So I'll leave that out for now, for those reasons.
+>
+> dio->is_sync isn't needed once the completion handlers are split.
+> That beeing said I wonder how the above statement even compiled,
+> there should just be a single assignment obviously.
+>
+> Did I mention that I don't like the split anyway? :)
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/virtio/virtio_pci_common.c | 7 ++-----
- drivers/virtio/virtio_pci_common.h | 2 --
- drivers/virtio/virtio_pci_legacy.c | 2 +-
- drivers/virtio/virtio_pci_modern.c | 2 +-
- include/uapi/linux/virtio_pci.h    | 2 +-
- 5 files changed, 5 insertions(+), 10 deletions(-)
+Alright alright, let's drop the split ;-)
 
-diff --git a/drivers/virtio/virtio_pci_common.c b/drivers/virtio/virtio_pci_common.c
-index 9e6c9d8..03d3a3b 100644
---- a/drivers/virtio/virtio_pci_common.c
-+++ b/drivers/virtio/virtio_pci_common.c
-@@ -133,7 +133,6 @@ static int vp_setup_msix_vectors(struct virtio_device *vdev, int nvectors)
- 			PCI_IRQ_MSIX);
- 	if (err < 0)
- 		goto error;
--	vp_dev->msix_enabled = 1;
- 
- 	/* Set the vector used for configuration */
- 	snprintf(vp_dev->msix_names[0], sizeof(*vp_dev->msix_names),
-@@ -225,12 +224,10 @@ void vp_del_vqs(struct virtio_device *vdev)
- 		if (vp_dev->msix_affinity_masks[i])
- 			free_cpumask_var(vp_dev->msix_affinity_masks[i]);
- 
--	if (vp_dev->msix_enabled) {
-+	if (vp_dev->pci_dev->msix_enabled) {
- 		/* Disable the vector used for configuration */
- 		vp_dev->config_vector(vp_dev, VIRTIO_MSI_NO_VECTOR);
--
- 		pci_free_irq_vectors(vp_dev->pci_dev);
--		vp_dev->msix_enabled = 0;
- 	}
- 
- 	vp_dev->msix_vectors = 0;
-@@ -391,7 +388,7 @@ int vp_set_vq_affinity(struct virtqueue *vq, int cpu)
- 	if (!vq->callback)
- 		return -EINVAL;
- 
--	if (vp_dev->msix_enabled) {
-+	if (vp_dev->pci_dev->msix_enabled) {
- 		mask = vp_dev->msix_affinity_masks[info->msix_vector];
- 		irq = pci_irq_vector(vp_dev->pci_dev, info->msix_vector);
- 		if (cpu == -1)
-diff --git a/drivers/virtio/virtio_pci_common.h b/drivers/virtio/virtio_pci_common.h
-index 93f3e4f..d041cce 100644
---- a/drivers/virtio/virtio_pci_common.h
-+++ b/drivers/virtio/virtio_pci_common.h
-@@ -82,8 +82,6 @@ struct virtio_pci_device {
- 	/* array of all queues for house-keeping */
- 	struct virtio_pci_vq_info **vqs;
- 
--	/* MSI-X support */
--	int msix_enabled;
- 	cpumask_var_t *msix_affinity_masks;
- 	/* Name strings for interrupts. This size should be enough,
- 	 * and I'm too lazy to allocate each name separately. */
-diff --git a/drivers/virtio/virtio_pci_legacy.c b/drivers/virtio/virtio_pci_legacy.c
-index 6d9e517..f83829f 100644
---- a/drivers/virtio/virtio_pci_legacy.c
-+++ b/drivers/virtio/virtio_pci_legacy.c
-@@ -169,7 +169,7 @@ static void del_vq(struct virtio_pci_vq_info *info)
- 
- 	iowrite16(vq->index, vp_dev->ioaddr + VIRTIO_PCI_QUEUE_SEL);
- 
--	if (vp_dev->msix_enabled) {
-+	if (vp_dev->pci_dev->msix_enabled) {
- 		iowrite16(VIRTIO_MSI_NO_VECTOR,
- 			  vp_dev->ioaddr + VIRTIO_MSI_QUEUE_VECTOR);
- 		/* Flush the write out to device */
-diff --git a/drivers/virtio/virtio_pci_modern.c b/drivers/virtio/virtio_pci_modern.c
-index e76bd91..e18d0b0 100644
---- a/drivers/virtio/virtio_pci_modern.c
-+++ b/drivers/virtio/virtio_pci_modern.c
-@@ -416,7 +416,7 @@ static void del_vq(struct virtio_pci_vq_info *info)
- 
- 	vp_iowrite16(vq->index, &vp_dev->common->queue_select);
- 
--	if (vp_dev->msix_enabled) {
-+	if (vp_dev->pci_dev->msix_enabled) {
- 		vp_iowrite16(VIRTIO_MSI_NO_VECTOR,
- 			     &vp_dev->common->queue_msix_vector);
- 		/* Flush the write out to device */
-diff --git a/include/uapi/linux/virtio_pci.h b/include/uapi/linux/virtio_pci.h
-index 90007a1..15b4385 100644
---- a/include/uapi/linux/virtio_pci.h
-+++ b/include/uapi/linux/virtio_pci.h
-@@ -79,7 +79,7 @@
-  * configuration space */
- #define VIRTIO_PCI_CONFIG_OFF(msix_enabled)	((msix_enabled) ? 24 : 20)
- /* Deprecated: please use VIRTIO_PCI_CONFIG_OFF instead */
--#define VIRTIO_PCI_CONFIG(dev)	VIRTIO_PCI_CONFIG_OFF((dev)->msix_enabled)
-+#define VIRTIO_PCI_CONFIG(dev)	VIRTIO_PCI_CONFIG_OFF((dev)->pci_dev->msix_enabled)
- 
- /* Virtio ABI version, this must match exactly */
- #define VIRTIO_PCI_ABI_VERSION		0
 -- 
-2.1.4
+Jens Axboe
