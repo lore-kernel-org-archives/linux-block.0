@@ -1,51 +1,92 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wj0-f193.google.com ([209.85.210.193]:35602 "EHLO
-        mail-wj0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755559AbcK1Vjo (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Nov 2016 16:39:44 -0500
-Received: by mail-wj0-f193.google.com with SMTP id he10so1527354wjc.2
-        for <linux-block@vger.kernel.org>; Mon, 28 Nov 2016 13:39:43 -0800 (PST)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: axboe@fb.com, =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <jg@lightnvm.io>,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [PATCH 07/23] lightnvm: rrpc: split bios of size > 256kb
-Date: Mon, 28 Nov 2016 22:38:58 +0100
-Message-Id: <20161128213914.12516-8-m@bjorling.me>
-In-Reply-To: <20161128213914.12516-1-m@bjorling.me>
-References: <20161128213914.12516-1-m@bjorling.me>
+Received: from mx2.suse.de ([195.135.220.15]:42161 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752280AbcKRFRV (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 18 Nov 2016 00:17:21 -0500
+From: NeilBrown <neilb@suse.com>
+To: Shaohua Li <shli@kernel.org>
+Date: Fri, 18 Nov 2016 16:16:12 +1100
+Subject: [md PATCH 4/6] md/raid1: add failfast handling for writes.
+Cc: linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>, linux-kernel@vger.kernel.org,
+        hare@suse.de
+Message-ID: <147944617205.3302.7745455065767031472.stgit@noble>
+In-Reply-To: <147944614789.3302.1959091446949640579.stgit@noble>
+References: <147944614789.3302.1959091446949640579.stgit@noble>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Javier González <jg@lightnvm.io>
+When writing to a fastfail device we use MD_FASTFAIL unless
+it is the only device being written to.
 
-rrpc cannot handle bios of size > 256kb due to NVMe using a 64 bit
-bitmap to signal I/O completion. If a larger bio comes, split it
-explicitly.
+For resync/recovery, assume there was a working device to
+read from so always use REQ_FASTFAIL_DEV.
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <m@bjorling.me>
+If a write for resync/recovery fails, we just fail the
+device - there is not much else to do.
+
+If a normal failfast write fails, but the device cannot be
+failed (must be only one left), we queue for write error
+handling.  This will call narrow_write_error() to retry the
+write synchronously and without any FAILFAST flags.
+
+Signed-off-by: NeilBrown <neilb@suse.com>
 ---
- drivers/lightnvm/rrpc.c | 2 ++
- 1 file changed, 2 insertions(+)
+ drivers/md/raid1.c |   26 +++++++++++++++++++++++++-
+ 1 file changed, 25 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/lightnvm/rrpc.c b/drivers/lightnvm/rrpc.c
-index 2b71b7e..60ca9d4 100644
---- a/drivers/lightnvm/rrpc.c
-+++ b/drivers/lightnvm/rrpc.c
-@@ -943,6 +943,8 @@ static blk_qc_t rrpc_make_rq(struct request_queue *q, struct bio *bio)
- 	struct nvm_rq *rqd;
- 	int err;
+diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
+index 44f93297698d..731fd9fe79ef 100644
+--- a/drivers/md/raid1.c
++++ b/drivers/md/raid1.c
+@@ -423,7 +423,24 @@ static void raid1_end_write_request(struct bio *bio)
+ 			set_bit(MD_RECOVERY_NEEDED, &
+ 				conf->mddev->recovery);
  
-+	blk_queue_split(q, &bio, q->bio_split);
+-		set_bit(R1BIO_WriteError, &r1_bio->state);
++		if (test_bit(FailFast, &rdev->flags) &&
++		    (bio->bi_opf & MD_FAILFAST) &&
++		    /* We never try FailFast to WriteMostly devices */
++		    !test_bit(WriteMostly, &rdev->flags)) {
++			md_error(r1_bio->mddev, rdev);
++			if (!test_bit(Faulty, &rdev->flags))
++				/* This is the only remaining device,
++				 * We need to retry the write without
++				 * FailFast
++				 */
++				set_bit(R1BIO_WriteError, &r1_bio->state);
++			else {
++				/* Finished with this branch */
++				r1_bio->bios[mirror] = NULL;
++				to_put = bio;
++			}
++		} else
++			set_bit(R1BIO_WriteError, &r1_bio->state);
+ 	} else {
+ 		/*
+ 		 * Set R1BIO_Uptodate in our master bio, so that we
+@@ -1393,6 +1410,10 @@ static void raid1_make_request(struct mddev *mddev, struct bio * bio)
+ 		mbio->bi_bdev = conf->mirrors[i].rdev->bdev;
+ 		mbio->bi_end_io	= raid1_end_write_request;
+ 		bio_set_op_attrs(mbio, op, do_flush_fua | do_sync);
++		if (test_bit(FailFast, &conf->mirrors[i].rdev->flags) &&
++		    !test_bit(WriteMostly, &conf->mirrors[i].rdev->flags) &&
++		    conf->raid_disks - mddev->degraded > 1)
++			mbio->bi_opf |= MD_FAILFAST;
+ 		mbio->bi_private = r1_bio;
+ 
+ 		atomic_inc(&r1_bio->remaining);
+@@ -2061,6 +2082,9 @@ static void sync_request_write(struct mddev *mddev, struct r1bio *r1_bio)
+ 			continue;
+ 
+ 		bio_set_op_attrs(wbio, REQ_OP_WRITE, 0);
++		if (test_bit(FailFast, &conf->mirrors[i].rdev->flags))
++			wbio->bi_opf |= MD_FAILFAST;
 +
- 	if (bio_op(bio) == REQ_OP_DISCARD) {
- 		rrpc_discard(rrpc, bio);
- 		return BLK_QC_T_NONE;
--- 
-2.9.3
+ 		wbio->bi_end_io = end_sync_write;
+ 		atomic_inc(&r1_bio->remaining);
+ 		md_sync_acct(conf->mirrors[i].rdev->bdev, bio_sectors(wbio));
+
 
