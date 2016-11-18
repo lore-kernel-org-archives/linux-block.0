@@ -1,183 +1,231 @@
-Return-Path: <BATV+c11f2a9076c546b906d6+4834+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: mst@redhat.com
-Cc: axboe@kernel.dk,
-	virtualization@lists.linux-foundation.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 04/11] virtio_pci: split vp_try_to_find_vqs into INTx and MSI-X variants
-Date: Thu, 17 Nov 2016 11:43:16 +0100
-Message-Id: <1479379403-27880-5-git-send-email-hch@lst.de>
-In-Reply-To: <1479379403-27880-1-git-send-email-hch@lst.de>
-References: <1479379403-27880-1-git-send-email-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f51.google.com ([74.125.82.51]:33315 "EHLO
+        mail-wm0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752280AbcKROvv (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 18 Nov 2016 09:51:51 -0500
+Received: by mail-wm0-f51.google.com with SMTP id c184so6350396wmd.0
+        for <linux-block@vger.kernel.org>; Fri, 18 Nov 2016 06:51:50 -0800 (PST)
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
+To: mb@lightnvm.io
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
+Subject: [PATCH 12/20] lightnvm: manage lun partitions internally in mm
+Date: Fri, 18 Nov 2016 15:43:34 +0100
+Message-Id: <1479480222-18790-13-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1479480222-18790-1-git-send-email-javier@cnexlabs.com>
+References: <1479480222-18790-1-git-send-email-javier@cnexlabs.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-There is basically no shared logic between the INTx and MSI-X case in
-vp_try_to_find_vqs, so split the function into two and clean them up
-a little bit.
+LUNs are exclusively owned by targets implementing a block device FTL.
+Doing this reservation requires at the moment a 2-way callback gennvm
+<-> target. The reason behind this is that LUNs were not assumed to
+always be exclusively owned by targets. However, this design decision
+goes against I/O determinism QoS (two targets would mix I/O on the same
+parallel unit in the device).
 
-Also remove the fairly pointless vp_request_intx wrapper while we're at it.
+This patch makes LUN reservation as part of the target creation on the
+media manager. This makes that LUNs are always exclusively owned by the
+target instantiated on top of them. LUN stripping and/or sharing should
+be implemented on the target itself or the layers on top.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Javier González <javier@cnexlabs.com>
 ---
- drivers/virtio/virtio_pci_common.c | 97 ++++++++++++++++++++++----------------
- 1 file changed, 57 insertions(+), 40 deletions(-)
+ drivers/lightnvm/gennvm.c | 62 +++++++++++++++++++++++++++++++++++++----------
+ drivers/lightnvm/rrpc.c   |  7 ------
+ include/linux/lightnvm.h  |  6 ++---
+ 3 files changed, 51 insertions(+), 24 deletions(-)
 
-diff --git a/drivers/virtio/virtio_pci_common.c b/drivers/virtio/virtio_pci_common.c
-index f6c5499..9a9826e 100644
---- a/drivers/virtio/virtio_pci_common.c
-+++ b/drivers/virtio/virtio_pci_common.c
-@@ -167,18 +167,6 @@ static int vp_request_msix_vectors(struct virtio_device *vdev, int nvectors,
- 	return err;
- }
+diff --git a/drivers/lightnvm/gennvm.c b/drivers/lightnvm/gennvm.c
+index 3572ebb..9671e11 100644
+--- a/drivers/lightnvm/gennvm.c
++++ b/drivers/lightnvm/gennvm.c
+@@ -35,6 +35,45 @@ static const struct block_device_operations gen_fops = {
+ 	.owner		= THIS_MODULE,
+ };
  
--static int vp_request_intx(struct virtio_device *vdev)
--{
--	int err;
--	struct virtio_pci_device *vp_dev = to_vp_device(vdev);
--
--	err = request_irq(vp_dev->pci_dev->irq, vp_interrupt,
--			  IRQF_SHARED, dev_name(&vdev->dev), vp_dev);
--	if (!err)
--		vp_dev->intx_enabled = 1;
--	return err;
--}
--
- static struct virtqueue *vp_setup_vq(struct virtio_device *vdev, unsigned index,
- 				     void (*callback)(struct virtqueue *vq),
- 				     const char *name,
-@@ -277,50 +265,44 @@ void vp_del_vqs(struct virtio_device *vdev)
- 	vp_dev->vqs = NULL;
- }
- 
--static int vp_try_to_find_vqs(struct virtio_device *vdev, unsigned nvqs,
-+static int vp_find_vqs_msix(struct virtio_device *vdev, unsigned nvqs,
- 			      struct virtqueue *vqs[],
- 			      vq_callback_t *callbacks[],
- 			      const char * const names[],
--			      bool use_msix,
- 			      bool per_vq_vectors)
- {
- 	struct virtio_pci_device *vp_dev = to_vp_device(vdev);
- 	u16 msix_vec;
- 	int i, err, nvectors, allocated_vectors;
- 
--	vp_dev->vqs = kmalloc(nvqs * sizeof *vp_dev->vqs, GFP_KERNEL);
-+	vp_dev->vqs = kcalloc(nvqs, sizeof(*vp_dev->vqs), GFP_KERNEL);
- 	if (!vp_dev->vqs)
- 		return -ENOMEM;
- 
--	if (!use_msix) {
--		/* Old style: one normal interrupt for change and all vqs. */
--		err = vp_request_intx(vdev);
--		if (err)
--			goto error_find;
-+	if (per_vq_vectors) {
-+		/* Best option: one for change interrupt, one per vq. */
-+		nvectors = 1;
-+		for (i = 0; i < nvqs; ++i)
-+			if (callbacks[i])
-+				++nvectors;
- 	} else {
--		if (per_vq_vectors) {
--			/* Best option: one for change interrupt, one per vq. */
--			nvectors = 1;
--			for (i = 0; i < nvqs; ++i)
--				if (callbacks[i])
--					++nvectors;
--		} else {
--			/* Second best: one for change, shared for all vqs. */
--			nvectors = 2;
--		}
--
--		err = vp_request_msix_vectors(vdev, nvectors, per_vq_vectors);
--		if (err)
--			goto error_find;
-+		/* Second best: one for change, shared for all vqs. */
-+		nvectors = 2;
- 	}
- 
-+	err = vp_request_msix_vectors(vdev, nvectors, per_vq_vectors);
-+	if (err)
-+		goto error_find;
-+
- 	vp_dev->per_vq_vectors = per_vq_vectors;
- 	allocated_vectors = vp_dev->msix_used_vectors;
- 	for (i = 0; i < nvqs; ++i) {
- 		if (!names[i]) {
- 			vqs[i] = NULL;
- 			continue;
--		} else if (!callbacks[i] || !vp_dev->msix_enabled)
-+		}
-+
-+		if (!callbacks[i])
- 			msix_vec = VIRTIO_MSI_NO_VECTOR;
- 		else if (vp_dev->per_vq_vectors)
- 			msix_vec = allocated_vectors++;
-@@ -356,6 +338,43 @@ static int vp_try_to_find_vqs(struct virtio_device *vdev, unsigned nvqs,
- 	return err;
- }
- 
-+static int vp_find_vqs_intx(struct virtio_device *vdev, unsigned nvqs,
-+		struct virtqueue *vqs[], vq_callback_t *callbacks[],
-+		const char * const names[])
++static int gen_reserve_luns(struct nvm_dev *dev, struct nvm_target *t,
++			    int lun_begin, int lun_end)
 +{
-+	struct virtio_pci_device *vp_dev = to_vp_device(vdev);
-+	int i, err;
++	struct gen_dev *gn = dev->mp;
++	struct nvm_lun *lun;
++	int i;
 +
-+	vp_dev->vqs = kcalloc(nvqs, sizeof(*vp_dev->vqs), GFP_KERNEL);
-+	if (!vp_dev->vqs)
-+		return -ENOMEM;
-+
-+	err = request_irq(vp_dev->pci_dev->irq, vp_interrupt, IRQF_SHARED,
-+			dev_name(&vdev->dev), vp_dev);
-+	if (err)
-+		goto out_del_vqs;
-+
-+	vp_dev->intx_enabled = 1;
-+	vp_dev->per_vq_vectors = false;
-+	for (i = 0; i < nvqs; ++i) {
-+		if (!names[i]) {
-+			vqs[i] = NULL;
-+			continue;
++	for (i = lun_begin; i <= lun_end; i++) {
++		if (test_and_set_bit(i, dev->lun_map)) {
++			pr_err("nvm: lun %d already allocated\n", i);
++			goto err;
 +		}
-+		vqs[i] = vp_setup_vq(vdev, i, callbacks[i], names[i],
-+				VIRTIO_MSI_NO_VECTOR);
-+		if (IS_ERR(vqs[i])) {
-+			err = PTR_ERR(vqs[i]);
-+			goto out_del_vqs;
-+		}
++
++		lun = &gn->luns[i];
++		list_add_tail(&lun->list, &t->lun_list);
 +	}
 +
 +	return 0;
-+out_del_vqs:
-+	vp_del_vqs(vdev);
-+	return err;
++
++err:
++	while (--i > lun_begin) {
++		lun = &gn->luns[i];
++		clear_bit(i, dev->lun_map);
++		list_del(&lun->list);
++	}
++
++	return -EBUSY;
 +}
 +
- /* the config->find_vqs() implementation */
- int vp_find_vqs(struct virtio_device *vdev, unsigned nvqs,
- 		struct virtqueue *vqs[],
-@@ -365,17 +384,15 @@ int vp_find_vqs(struct virtio_device *vdev, unsigned nvqs,
- 	int err;
++static void gen_release_luns(struct nvm_dev *dev, struct nvm_target *t)
++{
++	struct nvm_lun *lun, *tmp;
++
++	list_for_each_entry_safe(lun, tmp, &t->lun_list, list) {
++		WARN_ON(!test_and_clear_bit(lun->id, dev->lun_map));
++		list_del(&lun->list);
++	}
++}
++
+ static int gen_create_tgt(struct nvm_dev *dev, struct nvm_ioctl_create *create)
+ {
+ 	struct gen_dev *gn = dev->mp;
+@@ -64,9 +103,14 @@ static int gen_create_tgt(struct nvm_dev *dev, struct nvm_ioctl_create *create)
+ 	if (!t)
+ 		return -ENOMEM;
  
- 	/* Try MSI-X with one vector per queue. */
--	err = vp_try_to_find_vqs(vdev, nvqs, vqs, callbacks, names, true, true);
-+	err = vp_find_vqs_msix(vdev, nvqs, vqs, callbacks, names, true);
- 	if (!err)
- 		return 0;
- 	/* Fallback: MSI-X with one vector for config, one shared for queues. */
--	err = vp_try_to_find_vqs(vdev, nvqs, vqs, callbacks, names,
--				 true, false);
-+	err = vp_find_vqs_msix(vdev, nvqs, vqs, callbacks, names, false);
- 	if (!err)
- 		return 0;
- 	/* Finally fall back to regular interrupts. */
--	return vp_try_to_find_vqs(vdev, nvqs, vqs, callbacks, names,
--				  false, false);
-+	return vp_find_vqs_intx(vdev, nvqs, vqs, callbacks, names);
++	INIT_LIST_HEAD(&t->lun_list);
++
++	if (gen_reserve_luns(dev, t, s->lun_begin, s->lun_end))
++		goto err_t;
++
+ 	tqueue = blk_alloc_queue_node(GFP_KERNEL, dev->q->node);
+ 	if (!tqueue)
+-		goto err_t;
++		goto err_reserve;
+ 	blk_queue_make_request(tqueue, tt->make_rq);
+ 
+ 	tdisk = alloc_disk(0);
+@@ -105,6 +149,8 @@ static int gen_create_tgt(struct nvm_dev *dev, struct nvm_ioctl_create *create)
+ 	put_disk(tdisk);
+ err_queue:
+ 	blk_cleanup_queue(tqueue);
++err_reserve:
++	gen_release_luns(dev, t);
+ err_t:
+ 	kfree(t);
+ 	return -ENOMEM;
+@@ -122,6 +168,7 @@ static void __gen_remove_target(struct nvm_target *t)
+ 	if (tt->exit)
+ 		tt->exit(tdisk->private_data);
+ 
++	gen_release_luns(t->dev, t);
+ 	put_disk(tdisk);
+ 
+ 	list_del(&t->list);
+@@ -253,6 +300,7 @@ static int gen_luns_init(struct nvm_dev *dev, struct gen_dev *gn)
+ 		INIT_LIST_HEAD(&lun->free_list);
+ 		INIT_LIST_HEAD(&lun->used_list);
+ 		INIT_LIST_HEAD(&lun->bb_list);
++		INIT_LIST_HEAD(&lun->list);
+ 
+ 		spin_lock_init(&lun->lock);
+ 
+@@ -569,16 +617,6 @@ static int gen_erase_blk(struct nvm_dev *dev, struct nvm_block *blk, int flags)
+ 	return nvm_erase_ppa(dev, &addr, 1, flags);
  }
  
- const char *vp_bus_name(struct virtio_device *vdev)
+-static int gen_reserve_lun(struct nvm_dev *dev, int lunid)
+-{
+-	return test_and_set_bit(lunid, dev->lun_map);
+-}
+-
+-static void gen_release_lun(struct nvm_dev *dev, int lunid)
+-{
+-	WARN_ON(!test_and_clear_bit(lunid, dev->lun_map));
+-}
+-
+ static struct nvm_lun *gen_get_lun(struct nvm_dev *dev, int lunid)
+ {
+ 	struct gen_dev *gn = dev->mp;
+@@ -625,8 +663,6 @@ static struct nvmm_type gen = {
+ 	.mark_blk		= gen_mark_blk,
+ 
+ 	.get_lun		= gen_get_lun,
+-	.reserve_lun		= gen_reserve_lun,
+-	.release_lun		= gen_release_lun,
+ 	.lun_info_print		= gen_lun_info_print,
+ 
+ 	.get_area		= gen_get_area,
+diff --git a/drivers/lightnvm/rrpc.c b/drivers/lightnvm/rrpc.c
+index 34d2ebf..88e0d06 100644
+--- a/drivers/lightnvm/rrpc.c
++++ b/drivers/lightnvm/rrpc.c
+@@ -1126,7 +1126,6 @@ static void rrpc_core_free(struct rrpc *rrpc)
+ 
+ static void rrpc_luns_free(struct rrpc *rrpc)
+ {
+-	struct nvm_dev *dev = rrpc->dev;
+ 	struct nvm_lun *lun;
+ 	struct rrpc_lun *rlun;
+ 	int i;
+@@ -1139,7 +1138,6 @@ static void rrpc_luns_free(struct rrpc *rrpc)
+ 		lun = rlun->parent;
+ 		if (!lun)
+ 			break;
+-		dev->mt->release_lun(dev, lun->id);
+ 		vfree(rlun->blocks);
+ 	}
+ 
+@@ -1169,11 +1167,6 @@ static int rrpc_luns_init(struct rrpc *rrpc, int lun_begin, int lun_end)
+ 		int lunid = lun_begin + i;
+ 		struct nvm_lun *lun;
+ 
+-		if (dev->mt->reserve_lun(dev, lunid)) {
+-			pr_err("rrpc: lun %u is already allocated\n", lunid);
+-			goto err;
+-		}
+-
+ 		lun = dev->mt->get_lun(dev, lunid);
+ 		if (!lun)
+ 			goto err;
+diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
+index 33940bd..89c6954 100644
+--- a/include/linux/lightnvm.h
++++ b/include/linux/lightnvm.h
+@@ -210,6 +210,7 @@ struct nvm_id {
+ 
+ struct nvm_target {
+ 	struct list_head list;
++	struct list_head lun_list;
+ 	struct nvm_dev *dev;
+ 	struct nvm_tgt_type *type;
+ 	struct gendisk *disk;
+@@ -273,6 +274,7 @@ struct nvm_lun {
+ 	int lun_id;
+ 	int chnl_id;
+ 
++	struct list_head list;
+ 	spinlock_t lock;
+ 
+ 	/* lun block lists */
+@@ -521,8 +523,6 @@ typedef int (nvmm_submit_io_fn)(struct nvm_dev *, struct nvm_rq *);
+ typedef int (nvmm_erase_blk_fn)(struct nvm_dev *, struct nvm_block *, int);
+ typedef void (nvmm_mark_blk_fn)(struct nvm_dev *, struct ppa_addr, int);
+ typedef struct nvm_lun *(nvmm_get_lun_fn)(struct nvm_dev *, int);
+-typedef int (nvmm_reserve_lun)(struct nvm_dev *, int);
+-typedef void (nvmm_release_lun)(struct nvm_dev *, int);
+ typedef void (nvmm_lun_info_print_fn)(struct nvm_dev *);
+ 
+ typedef int (nvmm_get_area_fn)(struct nvm_dev *, sector_t *, sector_t);
+@@ -550,8 +550,6 @@ struct nvmm_type {
+ 
+ 	/* Configuration management */
+ 	nvmm_get_lun_fn *get_lun;
+-	nvmm_reserve_lun *reserve_lun;
+-	nvmm_release_lun *release_lun;
+ 
+ 	/* Statistics */
+ 	nvmm_lun_info_print_fn *lun_info_print;
 -- 
-2.1.4
+2.7.4
+
