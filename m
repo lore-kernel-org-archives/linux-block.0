@@ -1,33 +1,35 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.136]:59836 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1754718AbcKVDxS (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Nov 2016 22:53:18 -0500
-Date: Mon, 21 Nov 2016 18:02:38 -0800
-From: Shaohua Li <shli@kernel.org>
-To: NeilBrown <neilb@suse.com>
-Cc: linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>, linux-kernel@vger.kernel.org,
-        hare@suse.de
-Subject: Re: [PATCH/RFC] add "failfast" support for raid1/raid10.
-Message-ID: <20161122020238.qtuxwo5etcwmts4r@kernel.org>
-References: <147944614789.3302.1959091446949640579.stgit@noble>
+Received: from mail-qt0-f194.google.com ([209.85.216.194]:36086 "EHLO
+        mail-qt0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751716AbcKRPlT (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 18 Nov 2016 10:41:19 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <147944614789.3302.1959091446949640579.stgit@noble>
+References: <147944614789.3302.1959091446949640579.stgit@noble>
+From: Jack Wang <jack.wang.usish@gmail.com>
+Date: Fri, 18 Nov 2016 16:41:18 +0100
+Message-ID: <CA+res+TZD2Lx4CaGPx6SjTc6VKGLUc=qyYBgi15oSYU1bBuHew@mail.gmail.com>
+Subject: Re: [PATCH/RFC] add "failfast" support for raid1/raid10.
+To: NeilBrown <neilb@suse.com>
+Cc: Shaohua Li <shli@kernel.org>,
+        linux-raid <linux-raid@vger.kernel.org>,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        linux-kernel@vger.kernel.org, hare@suse.de
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Fri, Nov 18, 2016 at 04:16:11PM +1100, Neil Brown wrote:
+2016-11-18 6:16 GMT+01:00 NeilBrown <neilb@suse.com>:
 > Hi,
-> 
+>
 >  I've been sitting on these patches for a while because although they
 >  solve a real problem, it is a fairly limited use-case, and I don't
 >  really like some of the details.
-> 
+>
 >  So I'm posting them as RFC in the hope that a different perspective
 >  might help me like them better, or find a better approach.
-> 
+>
 >  The core idea is that when you have multiple copies of data
 >  (i.e. mirrored drives) it doesn't make sense to wait for a read from
 >  a drive that seems to be having problems.  It will probably be faster
@@ -35,7 +37,7 @@ On Fri, Nov 18, 2016 at 04:16:11PM +1100, Neil Brown wrote:
 >  Similarly, in some circumstances, it might be better to fail a drive
 >  that is being slow to respond to writes, rather than cause all writes
 >  to be very slow.
-> 
+>
 >  The particular context where this comes up is when mirroring across
 >  storage arrays, where the storage arrays can temporarily take an
 >  unusually long time to respond to requests (firmware updates have
@@ -46,72 +48,74 @@ On Fri, Nov 18, 2016 at 04:16:11PM +1100, Neil Brown wrote:
 >  occasionally having latency issues because one array needs to do some
 >  maintenance for a few minutes.  The particular storage arrays in
 >  question are DASD devices which are part of the s390 ecosystem.
-> 
->  Linux block layer has "failfast" flags to direct drivers to fail more
->  quickly.  These patches allow devices in an md array to be given a
->  "failfast" flag, which will cause IO requests to be marked as
->  "failfast" providing there is another device available.  Once the
->  array becomes degraded, we stop using failfast, as that could result
->  in data loss.
-> 
->  I don't like the whole "failfast" concept because it is not at all
->  clear how fast "fast" is.  In fact, these block-layer flags are
->  really a misnomer.  They should be "noretry" flags.
->  REQ_FAILFAST_DEV means "don't retry requests which reported an error
->  which seems to come from the device.
->  REQ_FAILFAST_TRANSPORT means "don't retry requests which seem to
->  indicate a problem with the transport, rather than the device"
->  REQ_FAILFAST_DRIVER means  .... I'm not exactly sure.  I think it
->  means whatever a particular driver wants it to mean, basically "I
->  cannot seem to handle this right now, just resend and I'll probably
->  be more in control next time".  It seems to be for internal-use only.
-> 
->  Multipath code uses REQ_FAILFAST_TRANSPORT only, which makes sense.
->  btrfs uses REQ_FAILFAST_DEV only (for read-ahead) which doesn't seem
->  to make sense.... why would you ever use _DEV without _TRANSPORT?
-> 
->  None of these actually change the timeouts in the driver or in the
->  device, which is what I would expect for "failfast", so to get real
->  "fast failure" you need to enable failfast, and adjust the timeouts.
->  That is what we do for our customers with DASD.
-> 
->  Anyway, it seems to make sense to use _TRANSPORT and _DEV for
->  requests from md where there is somewhere to fall-back on.
->  If we get an error from a "failfast" request, and the array is still
->  non-degraded, we just fail the device.  We don't try to repair read
->  errors (which is pointless on storage arrays).
-> 
->  It is assumed that some user-space code will notice the failure,
->  monitor the device to see when it becomes available again, and then
->  --re-add it.  Assuming the array has a bitmap, the --re-add should be
->  fast and the array will become optimal again without experiencing
->  excessive latencies.
-> 
->  My two main concerns are:
->   - does this functionality have any use-case outside of mirrored
->     storage arrays, and are there other storage arrays which
->     occasionally inserted excessive latency (seems like a serious
->     misfeature to me, but I know few of the details)?
->   - would it be at all possible to have "real" failfast functionality
->     in the block layer?  I.e. something that is based on time rather
->     than retry count.  Maybe in some cases a retry would be
->     appropriate if the first failure was very fast.
->     I.e. it would reduce timeouts and decide on retries based on
->     elapsed time rather than number of attempts.
->     With this would come the question of "how fast is fast" and I
->     don't have a really good answer.  Maybe md would need to set a
->     timeout, which it would double whenever it got failures on all
->     drives.  Otherwise the timeout would drift towards (say) 10 times
->     the typical response time.
-> 
->  So: comments most welcome.  As I say, this does address a genuine
->  need.  Just find it hard to like it :-(
 
-Patches looks good. As long as these don't break normal raid array (while they
-don't if the superblock bit isn't set), I have no objection to apply the
-patches even they are for special usage. I'll add the series to the next tree.
+Hi Neil,
 
-Just curious: will the FAILFAST increase the chance IO failure?
+Thanks for pushing this feature also to mainline.
+We at Profitbricks use raid1 across IB network, one pserver with
+raid1, both legs on 2 remote storages.
+We've noticed if one remote storage crash , and raid1 still keep
+sending IO to the faulty leg, even after 5 minutes,
+md still redirect I/Os, and md refuse to remove active disks, eg:
 
-Thanks,
-Shaohua
+2016-10-27T19:47:07.776233+02:00 pserver25 kernel: [184749.101984]
+md/raid1:md23: Disk failure on ibnbd47, disabling device.
+
+2016-10-27T19:47:07.776243+02:00 pserver25 kernel: [184749.101984]
+md/raid1:md23: Operation continuing on 1 devices.
+
+[...]
+
+2016-10-27T19:47:16.171694+02:00 pserver25 kernel: [184757.498693]
+md/raid1:md23: redirecting sector 79104 to other mirror: ibnbd46
+
+[...]
+
+2016-10-27T19:47:21.301732+02:00 pserver25 kernel: [184762.627288]
+md/raid1:md23: redirecting sector 79232 to other mirror: ibnbd46
+
+[...]
+
+2016-10-27T19:47:35.501725+02:00 pserver25 kernel: [184776.829069] md:
+cannot remove active disk ibnbd47 from md23 ...
+
+2016-10-27T19:47:36.801769+02:00 pserver25 kernel: [184778.128856] md:
+cannot remove active disk ibnbd47 from md23 ...
+
+[...]
+
+2016-10-27T19:52:33.401816+02:00 pserver25 kernel: [185074.727859]
+md/raid1:md23: redirecting sector 72832 to other mirror: ibnbd46
+
+2016-10-27T19:52:36.601693+02:00 pserver25 kernel: [185077.924835]
+md/raid1:md23: redirecting sector 78336 to other mirror: ibnbd46
+
+2016-10-27T19:52:36.601728+02:00 pserver25 kernel: [185077.925083]
+RAID1 conf printout:
+
+2016-10-27T19:52:36.601731+02:00 pserver25 kernel: [185077.925087]
+--- wd:1 rd:2
+
+2016-10-27T19:52:36.601733+02:00 pserver25 kernel: [185077.925091]
+disk 0, wo:0, o:1, dev:ibnbd46
+
+2016-10-27T19:52:36.601735+02:00 pserver25 kernel: [185077.925093]
+disk 1, wo:1, o:0, dev:ibnbd47
+
+2016-10-27T19:52:36.681691+02:00 pserver25 kernel: [185078.003392]
+RAID1 conf printout:
+
+2016-10-27T19:52:36.681706+02:00 pserver25 kernel: [185078.003404]
+--- wd:1 rd:2
+
+2016-10-27T19:52:36.681709+02:00 pserver25 kernel: [185078.003409]
+disk 0, wo:0, o:1, dev:ibnbd46
+
+I tried to port you patch from SLES[1], with the patchset, it reduce
+the time to ~30 seconds.
+
+I'm happy to see this feature upstream :)
+I will test again this new patchset.
+
+Cheers,
+Jack Wang
