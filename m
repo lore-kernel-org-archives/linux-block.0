@@ -1,116 +1,122 @@
-Return-Path: <BATV+c11f2a9076c546b906d6+4834+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: mst@redhat.com
-Cc: axboe@kernel.dk,
-	virtualization@lists.linux-foundation.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 09/11] virtio: provide a method to get the IRQ affinity mask for a virtqueue
-Date: Thu, 17 Nov 2016 11:43:21 +0100
-Message-Id: <1479379403-27880-10-git-send-email-hch@lst.de>
-In-Reply-To: <1479379403-27880-1-git-send-email-hch@lst.de>
-References: <1479379403-27880-1-git-send-email-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f53.google.com ([74.125.82.53]:35510 "EHLO
+        mail-wm0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753299AbcKROoE (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 18 Nov 2016 09:44:04 -0500
+Received: by mail-wm0-f53.google.com with SMTP id a197so42649149wmd.0
+        for <linux-block@vger.kernel.org>; Fri, 18 Nov 2016 06:44:04 -0800 (PST)
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
+To: mb@lightnvm.io
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
+Subject: [PATCH 08/20] lightnvm: make address conversion functions global
+Date: Fri, 18 Nov 2016 15:43:30 +0100
+Message-Id: <1479480222-18790-9-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1479480222-18790-1-git-send-email-javier@cnexlabs.com>
+References: <1479480222-18790-1-git-send-email-javier@cnexlabs.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This basically passed up the pci_irq_get_affinity information through
-virtio through an optional get_vq_affinity method.  It is only implemented
-by the PCI backend for now, and only when we use per-virtqueue IRQs.
+Targets are assumed to used the same generic ppa format, where the
+address is partitioned on ch:lun:block:pg:pl:sec. Thus, make the
+function in charge of transforming the ppa address from a linear format
+to the generic one available to all targets.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+This function will be needed by the media manager in order to do target
+mapping translations when targets are divided on different physical
+partitions.
+
+Signed-off-by: Javier González <javier@cnexlabs.com>
 ---
- drivers/virtio/virtio_pci_common.c | 10 ++++++++++
- drivers/virtio/virtio_pci_common.h |  2 ++
- drivers/virtio/virtio_pci_legacy.c |  1 +
- drivers/virtio/virtio_pci_modern.c |  2 ++
- include/linux/virtio_config.h      |  3 +++
- 5 files changed, 18 insertions(+)
+ drivers/lightnvm/rrpc.c  | 30 ------------------------------
+ include/linux/lightnvm.h | 30 ++++++++++++++++++++++++++++++
+ 2 files changed, 30 insertions(+), 30 deletions(-)
 
-diff --git a/drivers/virtio/virtio_pci_common.c b/drivers/virtio/virtio_pci_common.c
-index df7164e..25622da 100644
---- a/drivers/virtio/virtio_pci_common.c
-+++ b/drivers/virtio/virtio_pci_common.c
-@@ -405,6 +405,16 @@ int vp_set_vq_affinity(struct virtqueue *vq, int cpu)
- 	return 0;
+diff --git a/drivers/lightnvm/rrpc.c b/drivers/lightnvm/rrpc.c
+index 60ca9d4..9253acc 100644
+--- a/drivers/lightnvm/rrpc.c
++++ b/drivers/lightnvm/rrpc.c
+@@ -136,36 +136,6 @@ static u64 block_to_addr(struct rrpc *rrpc, struct rrpc_block *rblk)
+ 	return blk->id * rrpc->dev->sec_per_blk;
  }
  
-+const struct cpumask *vp_get_vq_affinity(struct virtio_device *vdev, int index)
+-static struct ppa_addr linear_to_generic_addr(struct nvm_dev *dev,
+-							struct ppa_addr r)
+-{
+-	struct ppa_addr l;
+-	int secs, pgs, blks, luns;
+-	sector_t ppa = r.ppa;
+-
+-	l.ppa = 0;
+-
+-	div_u64_rem(ppa, dev->sec_per_pg, &secs);
+-	l.g.sec = secs;
+-
+-	sector_div(ppa, dev->sec_per_pg);
+-	div_u64_rem(ppa, dev->pgs_per_blk, &pgs);
+-	l.g.pg = pgs;
+-
+-	sector_div(ppa, dev->pgs_per_blk);
+-	div_u64_rem(ppa, dev->blks_per_lun, &blks);
+-	l.g.blk = blks;
+-
+-	sector_div(ppa, dev->blks_per_lun);
+-	div_u64_rem(ppa, dev->luns_per_chnl, &luns);
+-	l.g.lun = luns;
+-
+-	sector_div(ppa, dev->luns_per_chnl);
+-	l.g.ch = ppa;
+-
+-	return l;
+-}
+-
+ static struct ppa_addr rrpc_ppa_to_gaddr(struct nvm_dev *dev, u64 addr)
+ {
+ 	struct ppa_addr paddr;
+diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
+index e598308..98278a9 100644
+--- a/include/linux/lightnvm.h
++++ b/include/linux/lightnvm.h
+@@ -361,6 +361,36 @@ struct nvm_dev {
+ 	spinlock_t lock;
+ };
+ 
++static inline struct ppa_addr linear_to_generic_addr(struct nvm_dev *dev,
++							struct ppa_addr r)
 +{
-+	struct virtio_pci_device *vp_dev = to_vp_device(vdev);
-+	int vec = vp_dev->vqs[index]->msix_vector;
++	struct ppa_addr l;
++	int secs, pgs, blks, luns;
++	sector_t ppa = r.ppa;
 +
-+	if (vec == VIRTIO_MSI_NO_VECTOR)
-+		return NULL;
-+	return pci_irq_get_affinity(vp_dev->pci_dev, vec);
++	l.ppa = 0;
++
++	div_u64_rem(ppa, dev->sec_per_pg, &secs);
++	l.g.sec = secs;
++
++	sector_div(ppa, dev->sec_per_pg);
++	div_u64_rem(ppa, dev->pgs_per_blk, &pgs);
++	l.g.pg = pgs;
++
++	sector_div(ppa, dev->pgs_per_blk);
++	div_u64_rem(ppa, dev->blks_per_lun, &blks);
++	l.g.blk = blks;
++
++	sector_div(ppa, dev->blks_per_lun);
++	div_u64_rem(ppa, dev->luns_per_chnl, &luns);
++	l.g.lun = luns;
++
++	sector_div(ppa, dev->luns_per_chnl);
++	l.g.ch = ppa;
++
++	return l;
 +}
 +
- #ifdef CONFIG_PM_SLEEP
- static int virtio_pci_freeze(struct device *dev)
+ static inline struct ppa_addr generic_to_dev_addr(struct nvm_dev *dev,
+ 						struct ppa_addr r)
  {
-diff --git a/drivers/virtio/virtio_pci_common.h b/drivers/virtio/virtio_pci_common.h
-index 85010f0..d6c29c5 100644
---- a/drivers/virtio/virtio_pci_common.h
-+++ b/drivers/virtio/virtio_pci_common.h
-@@ -125,6 +125,8 @@ const char *vp_bus_name(struct virtio_device *vdev);
-  */
- int vp_set_vq_affinity(struct virtqueue *vq, int cpu);
- 
-+const struct cpumask *vp_get_vq_affinity(struct virtio_device *vdev, int index);
-+
- #if IS_ENABLED(CONFIG_VIRTIO_PCI_LEGACY)
- int virtio_pci_legacy_probe(struct virtio_pci_device *);
- void virtio_pci_legacy_remove(struct virtio_pci_device *);
-diff --git a/drivers/virtio/virtio_pci_legacy.c b/drivers/virtio/virtio_pci_legacy.c
-index f83829f..4930b23 100644
---- a/drivers/virtio/virtio_pci_legacy.c
-+++ b/drivers/virtio/virtio_pci_legacy.c
-@@ -194,6 +194,7 @@ static const struct virtio_config_ops virtio_pci_config_ops = {
- 	.finalize_features = vp_finalize_features,
- 	.bus_name	= vp_bus_name,
- 	.set_vq_affinity = vp_set_vq_affinity,
-+	.get_vq_affinity = vp_get_vq_affinity,
- };
- 
- /* the PCI probing function */
-diff --git a/drivers/virtio/virtio_pci_modern.c b/drivers/virtio/virtio_pci_modern.c
-index 975197b..cd09d78 100644
---- a/drivers/virtio/virtio_pci_modern.c
-+++ b/drivers/virtio/virtio_pci_modern.c
-@@ -441,6 +441,7 @@ static const struct virtio_config_ops virtio_pci_config_nodev_ops = {
- 	.finalize_features = vp_finalize_features,
- 	.bus_name	= vp_bus_name,
- 	.set_vq_affinity = vp_set_vq_affinity,
-+	.get_vq_affinity = vp_get_vq_affinity,
- };
- 
- static const struct virtio_config_ops virtio_pci_config_ops = {
-@@ -456,6 +457,7 @@ static const struct virtio_config_ops virtio_pci_config_ops = {
- 	.finalize_features = vp_finalize_features,
- 	.bus_name	= vp_bus_name,
- 	.set_vq_affinity = vp_set_vq_affinity,
-+	.get_vq_affinity = vp_get_vq_affinity,
- };
- 
- /**
-diff --git a/include/linux/virtio_config.h b/include/linux/virtio_config.h
-index 2ebe506..8355bab 100644
---- a/include/linux/virtio_config.h
-+++ b/include/linux/virtio_config.h
-@@ -58,6 +58,7 @@ struct irq_affinity;
-  *      This returns a pointer to the bus name a la pci_name from which
-  *      the caller can then copy.
-  * @set_vq_affinity: set the affinity for a virtqueue.
-+ * @get_vq_affinity: get the affinity for a virtqueue (optional).
-  */
- typedef void vq_callback_t(struct virtqueue *);
- struct virtio_config_ops {
-@@ -77,6 +78,8 @@ struct virtio_config_ops {
- 	int (*finalize_features)(struct virtio_device *vdev);
- 	const char *(*bus_name)(struct virtio_device *vdev);
- 	int (*set_vq_affinity)(struct virtqueue *vq, int cpu);
-+	const struct cpumask *(*get_vq_affinity)(struct virtio_device *vdev,
-+			int index);
- };
- 
- /* If driver didn't advertise the feature, it will never appear. */
 -- 
-2.1.4
+2.7.4
+
