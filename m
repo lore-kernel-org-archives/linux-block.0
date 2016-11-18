@@ -1,93 +1,170 @@
-Return-Path: <Damien.LeMoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Shaun Tancheff <shaun@tancheff.com>,
-	Damien Le Moal <damien.lemoal@wdc.com>
-Subject: [PATCH] block: Check partition alignment on zoned block devices
-Date: Wed, 30 Nov 2016 17:22:19 +0900
-Message-Id: <1480494139-1658-1-git-send-email-damien.lemoal@wdc.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f48.google.com ([74.125.82.48]:35848 "EHLO
+        mail-wm0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752804AbcKROn7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 18 Nov 2016 09:43:59 -0500
+Received: by mail-wm0-f48.google.com with SMTP id g23so42644916wme.1
+        for <linux-block@vger.kernel.org>; Fri, 18 Nov 2016 06:43:58 -0800 (PST)
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
+To: mb@lightnvm.io
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <jg@lightnvm.io>,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+Subject: [PATCH 01/20] lightnvm: enable to send hint to erase command
+Date: Fri, 18 Nov 2016 15:43:23 +0100
+Message-Id: <1479480222-18790-2-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1479480222-18790-1-git-send-email-javier@cnexlabs.com>
+References: <1479480222-18790-1-git-send-email-javier@cnexlabs.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: damien.lemoal@wdc.com
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Both blkdev_report_zones and blkdev_reset_zones can operate on a partition of
-a zoned block device. However, the first and last zones reported for a
-partition make sense only if the partition start sector and size are aligned
-on the device zone size. The same applies for zone reset. Resetting the first
-or the last zone of a partition straddling zones may impact neighboring
-partitions. Finally, if a partition start sector is not at the beginning of a
-sequential zone, it will be impossible to write to the first sectors of the
-partition on a host-managed device.
-Avoid all these problems and incoherencies by ignoring partitions that are not
-zone aligned.
+From: Javier González <jg@lightnvm.io>
 
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+Erases might be subject to host hints. An example is multi-plane
+programming to erase blocks in parallel. Enable targets to specify this
+hints.
+
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <m@bjorling.me>
 ---
- block/partition-generic.c | 39 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 39 insertions(+)
+ drivers/lightnvm/core.c      | 9 ++++++---
+ drivers/lightnvm/gennvm.c    | 5 ++---
+ drivers/lightnvm/rrpc.c      | 2 +-
+ drivers/lightnvm/sysblk.c    | 4 ++--
+ drivers/nvme/host/lightnvm.c | 1 +
+ include/linux/lightnvm.h     | 7 +++----
+ 6 files changed, 15 insertions(+), 13 deletions(-)
 
-diff --git a/block/partition-generic.c b/block/partition-generic.c
-index 71d9ed9..c5914b2 100644
---- a/block/partition-generic.c
-+++ b/block/partition-generic.c
-@@ -430,6 +430,29 @@ static int drop_partitions(struct gendisk *disk, struct block_device *bdev)
- 	return 0;
+diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+index 1111740..8664fe0 100644
+--- a/drivers/lightnvm/core.c
++++ b/drivers/lightnvm/core.c
+@@ -202,9 +202,9 @@ int nvm_submit_io(struct nvm_dev *dev, struct nvm_rq *rqd)
+ }
+ EXPORT_SYMBOL(nvm_submit_io);
+ 
+-int nvm_erase_blk(struct nvm_dev *dev, struct nvm_block *blk)
++int nvm_erase_blk(struct nvm_dev *dev, struct nvm_block *blk, int flags)
+ {
+-	return dev->mt->erase_blk(dev, blk, 0);
++	return dev->mt->erase_blk(dev, blk, flags);
+ }
+ EXPORT_SYMBOL(nvm_erase_blk);
+ 
+@@ -285,7 +285,8 @@ void nvm_free_rqd_ppalist(struct nvm_dev *dev, struct nvm_rq *rqd)
+ }
+ EXPORT_SYMBOL(nvm_free_rqd_ppalist);
+ 
+-int nvm_erase_ppa(struct nvm_dev *dev, struct ppa_addr *ppas, int nr_ppas)
++int nvm_erase_ppa(struct nvm_dev *dev, struct ppa_addr *ppas, int nr_ppas,
++								int flags)
+ {
+ 	struct nvm_rq rqd;
+ 	int ret;
+@@ -301,6 +302,8 @@ int nvm_erase_ppa(struct nvm_dev *dev, struct ppa_addr *ppas, int nr_ppas)
+ 
+ 	nvm_generic_to_addr_mode(dev, &rqd);
+ 
++	rqd.flags = flags;
++
+ 	ret = dev->ops->erase_block(dev, &rqd);
+ 
+ 	nvm_free_rqd_ppalist(dev, &rqd);
+diff --git a/drivers/lightnvm/gennvm.c b/drivers/lightnvm/gennvm.c
+index b74174c..730d736 100644
+--- a/drivers/lightnvm/gennvm.c
++++ b/drivers/lightnvm/gennvm.c
+@@ -593,12 +593,11 @@ static int gen_submit_io(struct nvm_dev *dev, struct nvm_rq *rqd)
+ 	return dev->ops->submit_io(dev, rqd);
  }
  
-+#ifdef CONFIG_BLK_DEV_ZONED
-+static bool part_zone_aligned(struct gendisk *disk,
-+			      struct block_device *bdev,
-+			      sector_t from, sector_t size)
-+{
-+	sector_t zone_size = bdev_zone_size(bdev);
-+
-+	/* Check partition start alignement */
-+	if (from & (zone_size - 1))
-+		return false;
-+
-+	/*
-+	 * Check partition end alignement.
-+	 * Ignore eventual last smaller zone.
-+	 */
-+	if ((from + size) < get_capacity(disk) &&
-+	    (size & (zone_size - 1)))
-+		return false;
-+
-+	return true;
-+}
-+#endif
-+
- int rescan_partitions(struct gendisk *disk, struct block_device *bdev)
+-static int gen_erase_blk(struct nvm_dev *dev, struct nvm_block *blk,
+-							unsigned long flags)
++static int gen_erase_blk(struct nvm_dev *dev, struct nvm_block *blk, int flags)
  {
- 	struct parsed_partitions *state = NULL;
-@@ -529,6 +552,22 @@ int rescan_partitions(struct gendisk *disk, struct block_device *bdev)
- 			}
- 		}
+ 	struct ppa_addr addr = block_to_ppa(dev, blk);
  
-+#ifdef CONFIG_BLK_DEV_ZONED
-+		/*
-+		 * On a zoned block device, partitions should be aligned on the
-+		 * device zone size (i.e. zone boundary crossing not allowed).
-+		 * Otherwise, resetting the write pointer of the last zone of
-+		 * one partition may impact the following partition.
-+		 */
-+		if (bdev_is_zoned(bdev) &&
-+		    !part_zone_aligned(disk, bdev, from, size)) {
-+			printk(KERN_WARNING
-+			       "%s: p%d start %llu is not zone unaligned\n",
-+			       disk->disk_name, p, (unsigned long long) from);
-+			continue;
-+		}
-+#endif
-+
- 		part = add_partition(disk, p, from, size,
- 				     state->parts[p].flags,
- 				     &state->parts[p].info);
+-	return nvm_erase_ppa(dev, &addr, 1);
++	return nvm_erase_ppa(dev, &addr, 1, flags);
+ }
+ 
+ static int gen_reserve_lun(struct nvm_dev *dev, int lunid)
+diff --git a/drivers/lightnvm/rrpc.c b/drivers/lightnvm/rrpc.c
+index 37fcaad..067e890 100644
+--- a/drivers/lightnvm/rrpc.c
++++ b/drivers/lightnvm/rrpc.c
+@@ -404,7 +404,7 @@ static void rrpc_block_gc(struct work_struct *work)
+ 	if (rrpc_move_valid_pages(rrpc, rblk))
+ 		goto put_back;
+ 
+-	if (nvm_erase_blk(dev, rblk->parent))
++	if (nvm_erase_blk(dev, rblk->parent, 0))
+ 		goto put_back;
+ 
+ 	rrpc_put_blk(rrpc, rblk);
+diff --git a/drivers/lightnvm/sysblk.c b/drivers/lightnvm/sysblk.c
+index a75bd28..d229067 100644
+--- a/drivers/lightnvm/sysblk.c
++++ b/drivers/lightnvm/sysblk.c
+@@ -379,7 +379,7 @@ static int nvm_prepare_new_sysblks(struct nvm_dev *dev, struct sysblk_scan *s)
+ 		ppa = &s->ppas[scan_ppa_idx(i, nxt_blk)];
+ 		ppa->g.pg = ppa_to_slc(dev, 0);
+ 
+-		ret = nvm_erase_ppa(dev, ppa, 1);
++		ret = nvm_erase_ppa(dev, ppa, 1, 0);
+ 		if (ret)
+ 			return ret;
+ 
+@@ -725,7 +725,7 @@ int nvm_dev_factory(struct nvm_dev *dev, int flags)
+ 	/* continue to erase until list of blks until empty */
+ 	while ((ppa_cnt =
+ 			nvm_fact_get_blks(dev, ppas, max_ppas, blk_bitmap)) > 0)
+-		nvm_erase_ppa(dev, ppas, ppa_cnt);
++		nvm_erase_ppa(dev, ppas, ppa_cnt, 0);
+ 
+ 	/* mark host reserved blocks free */
+ 	if (flags & NVM_FACTORY_RESET_HOST_BLKS) {
+diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
+index f23e6fe..037dff5 100644
+--- a/drivers/nvme/host/lightnvm.c
++++ b/drivers/nvme/host/lightnvm.c
+@@ -526,6 +526,7 @@ static int nvme_nvm_erase_block(struct nvm_dev *dev, struct nvm_rq *rqd)
+ 	c.erase.nsid = cpu_to_le32(ns->ns_id);
+ 	c.erase.spba = cpu_to_le64(rqd->ppa_addr.ppa);
+ 	c.erase.length = cpu_to_le16(rqd->nr_ppas - 1);
++	c.erase.control = cpu_to_le16(rqd->flags);
+ 
+ 	return nvme_submit_sync_cmd(q, (struct nvme_command *)&c, NULL, 0);
+ }
+diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
+index fb2e601..d87be02 100644
+--- a/include/linux/lightnvm.h
++++ b/include/linux/lightnvm.h
+@@ -470,8 +470,7 @@ typedef int (nvmm_open_blk_fn)(struct nvm_dev *, struct nvm_block *);
+ typedef int (nvmm_close_blk_fn)(struct nvm_dev *, struct nvm_block *);
+ typedef void (nvmm_flush_blk_fn)(struct nvm_dev *, struct nvm_block *);
+ typedef int (nvmm_submit_io_fn)(struct nvm_dev *, struct nvm_rq *);
+-typedef int (nvmm_erase_blk_fn)(struct nvm_dev *, struct nvm_block *,
+-								unsigned long);
++typedef int (nvmm_erase_blk_fn)(struct nvm_dev *, struct nvm_block *, int);
+ typedef void (nvmm_mark_blk_fn)(struct nvm_dev *, struct ppa_addr, int);
+ typedef struct nvm_lun *(nvmm_get_lun_fn)(struct nvm_dev *, int);
+ typedef int (nvmm_reserve_lun)(struct nvm_dev *, int);
+@@ -537,8 +536,8 @@ extern void nvm_addr_to_generic_mode(struct nvm_dev *, struct nvm_rq *);
+ extern int nvm_set_rqd_ppalist(struct nvm_dev *, struct nvm_rq *,
+ 					const struct ppa_addr *, int, int);
+ extern void nvm_free_rqd_ppalist(struct nvm_dev *, struct nvm_rq *);
+-extern int nvm_erase_ppa(struct nvm_dev *, struct ppa_addr *, int);
+-extern int nvm_erase_blk(struct nvm_dev *, struct nvm_block *);
++extern int nvm_erase_ppa(struct nvm_dev *, struct ppa_addr *, int, int);
++extern int nvm_erase_blk(struct nvm_dev *, struct nvm_block *, int);
+ extern void nvm_end_io(struct nvm_rq *, int);
+ extern int nvm_submit_ppa(struct nvm_dev *, struct ppa_addr *, int, int, int,
+ 								void *, int);
 -- 
 2.7.4
 
-Western Digital Corporation (and its subsidiaries) E-mail Confidentiality Notice & Disclaimer:
-
-This e-mail and any files transmitted with it may contain confidential or legally privileged information of WDC and/or its affiliates, and are intended solely for the use of the individual or entity to which they are addressed. If you are not the intended recipient, any disclosure, copying, distribution or any action taken or omitted to be taken in reliance on it, is prohibited. If you have received this e-mail in error, please notify the sender immediately and delete the e-mail in its entirety from your system.
