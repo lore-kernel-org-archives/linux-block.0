@@ -1,49 +1,35 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.9]:45267 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932200AbcKUPSX (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Nov 2016 10:18:23 -0500
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org
-Subject: [PATCH] block: clear all of bi_opf in bio_set_op_attrs
-Date: Mon, 21 Nov 2016 16:18:18 +0100
-Message-Id: <1479741498-12592-1-git-send-email-hch@lst.de>
+Received: from mga09.intel.com ([134.134.136.24]:32768 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752090AbcKRPbU (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 18 Nov 2016 10:31:20 -0500
+Date: Fri, 18 Nov 2016 10:41:29 -0500
+From: Keith Busch <keith.busch@intel.com>
+To: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
+Cc: axboe@fb.com, martin.petersen@oracle.com,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        Chaitanya Kulkarni <chaitanya.kulkarni@hgst.com>
+Subject: Re: [PATCH v2 2/5] block: add support for REQ_OP_WRITE_ZEROES
+Message-ID: <20161118154129.GE12377@localhost.localdomain>
+References: <1479421031-6060-1-git-send-email-ckulkarnilinux@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1479421031-6060-1-git-send-email-ckulkarnilinux@gmail.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Since commit 87374179 ("block: add a proper block layer data direction
-encoding") we only or the new op and flags into bi_opf in bio_set_op_attrs
-instead of clearing the old value.  I've not seen any breakage with the
-new behavior, but it seems dangerous.
+On Thu, Nov 17, 2016 at 02:17:11PM -0800, Chaitanya Kulkarni wrote:
+> From: Chaitanya Kulkarni <chaitanya.kulkarni@hgst.com>
+> 
+> This adds a new block layer operation to zero out a range of
+> LBAs. This allows to implement zeroing for devices that don't use
+> either discard with a predictable zero pattern or WRITE SAME of zeroes.
+> The prominent example of that is NVMe with the Write Zeroes command,
+> but in the future this should also help with improving the way
+> zeroing discards work.
+> 
+> Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@hgst.com>
+> ---
 
-Also convert it to an inline function to make the argument passing
-safer.
-
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- include/linux/blk_types.h | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
-
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 4d0044d..f57458a 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -207,8 +207,11 @@ enum req_flag_bits {
- 	((req)->cmd_flags & REQ_OP_MASK)
- 
- /* obsolete, don't use in new code */
--#define bio_set_op_attrs(bio, op, op_flags) \
--	((bio)->bi_opf |= (op | op_flags))
-+static inline void bio_set_op_attrs(struct bio *bio, unsigned op,
-+		unsigned op_flags)
-+{
-+	bio->bi_opf = op | op_flags;
-+}
- 
- static inline bool op_is_write(unsigned int op)
- {
--- 
-2.1.4
-
+I think we also to assign queue_limits for stacked devices in
+blk_stack_limits. Otherwise, looks good.
