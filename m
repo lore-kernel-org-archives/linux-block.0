@@ -1,121 +1,84 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-qt0-f194.google.com ([209.85.216.194]:36086 "EHLO
-        mail-qt0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751716AbcKRPlT (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Nov 2016 10:41:19 -0500
+Received: from mx2.suse.de ([195.135.220.15]:48251 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751243AbcKRHJo (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 18 Nov 2016 02:09:44 -0500
+Subject: Re: [PATCH/RFC] add "failfast" support for raid1/raid10.
+To: NeilBrown <neilb@suse.com>, Shaohua Li <shli@kernel.org>
+References: <147944614789.3302.1959091446949640579.stgit@noble>
+Cc: linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>, linux-kernel@vger.kernel.org
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <df842afd-c15a-b37d-269a-dba7d08e59e0@suse.de>
+Date: Fri, 18 Nov 2016 08:09:41 +0100
 MIME-Version: 1.0
 In-Reply-To: <147944614789.3302.1959091446949640579.stgit@noble>
-References: <147944614789.3302.1959091446949640579.stgit@noble>
-From: Jack Wang <jack.wang.usish@gmail.com>
-Date: Fri, 18 Nov 2016 16:41:18 +0100
-Message-ID: <CA+res+TZD2Lx4CaGPx6SjTc6VKGLUc=qyYBgi15oSYU1bBuHew@mail.gmail.com>
-Subject: Re: [PATCH/RFC] add "failfast" support for raid1/raid10.
-To: NeilBrown <neilb@suse.com>
-Cc: Shaohua Li <shli@kernel.org>,
-        linux-raid <linux-raid@vger.kernel.org>,
-        linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        linux-kernel@vger.kernel.org, hare@suse.de
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-2016-11-18 6:16 GMT+01:00 NeilBrown <neilb@suse.com>:
+(Seeing that it was me who initiated those patches I guess I should
+speak up here)
+
+On 11/18/2016 06:16 AM, NeilBrown wrote:
 > Hi,
->
+> 
 >  I've been sitting on these patches for a while because although they
 >  solve a real problem, it is a fairly limited use-case, and I don't
 >  really like some of the details.
->
+> 
 >  So I'm posting them as RFC in the hope that a different perspective
 >  might help me like them better, or find a better approach.
->
->  The core idea is that when you have multiple copies of data
->  (i.e. mirrored drives) it doesn't make sense to wait for a read from
->  a drive that seems to be having problems.  It will probably be faster
->  to just cancel that read, and read from the other device.
->  Similarly, in some circumstances, it might be better to fail a drive
->  that is being slow to respond to writes, rather than cause all writes
->  to be very slow.
->
->  The particular context where this comes up is when mirroring across
->  storage arrays, where the storage arrays can temporarily take an
->  unusually long time to respond to requests (firmware updates have
->  been mentioned).  As the array will have redundancy internally, there
->  is little risk to the data.  The mirrored pair is really only for
->  disaster recovery, and it is deemed better to lose the last few
->  minutes of updates in the case of a serious disaster, rather than
->  occasionally having latency issues because one array needs to do some
->  maintenance for a few minutes.  The particular storage arrays in
->  question are DASD devices which are part of the s390 ecosystem.
+> 
+[ .. ]
+>  My two main concerns are:
+>   - does this functionality have any use-case outside of mirrored
+>     storage arrays, and are there other storage arrays which
+>     occasionally inserted excessive latency (seems like a serious
+>     misfeature to me, but I know few of the details)?
+Yes, there are.
+I've come across some storage arrays which really take some liberty when
+doing internal error recovery; some even take up to 20 minutes
+before sending a command completion (the response was "there's nothing
+in the SCSI spec which forbids us to do so")
 
-Hi Neil,
+>   - would it be at all possible to have "real" failfast functionality
+>     in the block layer?  I.e. something that is based on time rather
+>     than retry count.  Maybe in some cases a retry would be
+>     appropriate if the first failure was very fast.
+>     I.e. it would reduce timeouts and decide on retries based on
+>     elapsed time rather than number of attempts.
+>     With this would come the question of "how fast is fast" and I
+>     don't have a really good answer.  Maybe md would need to set a
+>     timeout, which it would double whenever it got failures on all
+>     drives.  Otherwise the timeout would drift towards (say) 10 times
+>     the typical response time.
+> 
+The current 'failfast' is rather a 'do not attempt error recovery' flag;
+ie the SCSI stack should _not_ start error recovery but rather pass the
+request upwards in case of failure.
+Problem is that there is no real upper limit on the time error recovery
+could take, and it's virtually impossible to give an I/O response time
+guarantees once error recovery had been invoked.
+And to make matters worse, in most cases error recovery won't work
+_anyway_ if the transport is severed.
+So this is more to do with error recovery, and not so much on the time
+each request can/should spend on the fly.
 
-Thanks for pushing this feature also to mainline.
-We at Profitbricks use raid1 across IB network, one pserver with
-raid1, both legs on 2 remote storages.
-We've noticed if one remote storage crash , and raid1 still keep
-sending IO to the faulty leg, even after 5 minutes,
-md still redirect I/Os, and md refuse to remove active disks, eg:
+The S/390 DASD case is even worse, as the DASD driver _by design_ will
+always have to wait for an answer from the storage array. So if the link
+to the array is severed you are in deep trouble, as you'll never get a
+completion (or any status, for that matter) until the array is reconnected.
 
-2016-10-27T19:47:07.776233+02:00 pserver25 kernel: [184749.101984]
-md/raid1:md23: Disk failure on ibnbd47, disabling device.
-
-2016-10-27T19:47:07.776243+02:00 pserver25 kernel: [184749.101984]
-md/raid1:md23: Operation continuing on 1 devices.
-
-[...]
-
-2016-10-27T19:47:16.171694+02:00 pserver25 kernel: [184757.498693]
-md/raid1:md23: redirecting sector 79104 to other mirror: ibnbd46
-
-[...]
-
-2016-10-27T19:47:21.301732+02:00 pserver25 kernel: [184762.627288]
-md/raid1:md23: redirecting sector 79232 to other mirror: ibnbd46
-
-[...]
-
-2016-10-27T19:47:35.501725+02:00 pserver25 kernel: [184776.829069] md:
-cannot remove active disk ibnbd47 from md23 ...
-
-2016-10-27T19:47:36.801769+02:00 pserver25 kernel: [184778.128856] md:
-cannot remove active disk ibnbd47 from md23 ...
-
-[...]
-
-2016-10-27T19:52:33.401816+02:00 pserver25 kernel: [185074.727859]
-md/raid1:md23: redirecting sector 72832 to other mirror: ibnbd46
-
-2016-10-27T19:52:36.601693+02:00 pserver25 kernel: [185077.924835]
-md/raid1:md23: redirecting sector 78336 to other mirror: ibnbd46
-
-2016-10-27T19:52:36.601728+02:00 pserver25 kernel: [185077.925083]
-RAID1 conf printout:
-
-2016-10-27T19:52:36.601731+02:00 pserver25 kernel: [185077.925087]
---- wd:1 rd:2
-
-2016-10-27T19:52:36.601733+02:00 pserver25 kernel: [185077.925091]
-disk 0, wo:0, o:1, dev:ibnbd46
-
-2016-10-27T19:52:36.601735+02:00 pserver25 kernel: [185077.925093]
-disk 1, wo:1, o:0, dev:ibnbd47
-
-2016-10-27T19:52:36.681691+02:00 pserver25 kernel: [185078.003392]
-RAID1 conf printout:
-
-2016-10-27T19:52:36.681706+02:00 pserver25 kernel: [185078.003404]
---- wd:1 rd:2
-
-2016-10-27T19:52:36.681709+02:00 pserver25 kernel: [185078.003409]
-disk 0, wo:0, o:1, dev:ibnbd46
-
-I tried to port you patch from SLES[1], with the patchset, it reduce
-the time to ~30 seconds.
-
-I'm happy to see this feature upstream :)
-I will test again this new patchset.
+So while the FAILFAST flag is a mere convenience for SCSI, it's a
+positive must for S/390 if you want to have a functional RAID.
 
 Cheers,
-Jack Wang
+
+Hannes
+-- 
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
