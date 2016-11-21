@@ -1,49 +1,41 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wj0-f194.google.com ([209.85.210.194]:34088 "EHLO
-        mail-wj0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755546AbcK1Vjn (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Nov 2016 16:39:43 -0500
-Received: by mail-wj0-f194.google.com with SMTP id xy5so15802189wjc.1
-        for <linux-block@vger.kernel.org>; Mon, 28 Nov 2016 13:39:43 -0800 (PST)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: axboe@fb.com, =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <jg@lightnvm.io>,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [PATCH 06/23] lightnvm: add ECC error codes
-Date: Mon, 28 Nov 2016 22:38:57 +0100
-Message-Id: <20161128213914.12516-7-m@bjorling.me>
-In-Reply-To: <20161128213914.12516-1-m@bjorling.me>
-References: <20161128213914.12516-1-m@bjorling.me>
+Subject: Re: [PATCH] mm: don't cap request size based on read-ahead setting
+To: Hillf Danton <hillf.zj@alibaba-inc.com>, akpm@linux-foundation.org
+References: <1479498073-8657-1-git-send-email-axboe@fb.com>
+ <00f001d243b1$f489a720$dd9cf560$@alibaba-inc.com>
+Cc: hannes@cmpxchg.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+ linux-block@vger.kernel.org
+From: Jens Axboe <axboe@fb.com>
+Message-ID: <2c4651e5-dcab-6cda-cc8c-ad0b9350a240@fb.com>
+Date: Mon, 21 Nov 2016 06:12:56 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <00f001d243b1$f489a720$dd9cf560$@alibaba-inc.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+List-ID: <linux-block@vger.kernel.org>
 
-From: Javier González <jg@lightnvm.io>
+On 11/20/2016 09:44 PM, Hillf Danton wrote:
+> On Saturday, November 19, 2016 3:41 AM Jens Axboe wrote:
+>> We ran into a funky issue, where someone doing 256K buffered reads saw
+>> 128K requests at the device level. Turns out it is read-ahead capping
+>> the request size, since we use 128K as the default setting. This doesn't
+>> make a lot of sense - if someone is issuing 256K reads, they should see
+>> 256K reads, regardless of the read-ahead setting, if the underlying
+>> device can support a 256K read in a single command.
+>>
+> Is it also making any sense to see 4M reads to meet 4M requests if
+> the underlying device can support 4M IO?
 
-Add ECC error codes to enable the appropriate handling in the target.
+Depends on the device, but yes. Big raid set? You definitely want larger
+requests. Which is why we have the distinction between max hardware and
+kernel IO size.
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <m@bjorling.me>
----
- include/linux/lightnvm.h | 2 ++
- 1 file changed, 2 insertions(+)
+By default we limit the soft IO size to 1280k for a block device. See
+also:
 
-diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
-index 4480d1c..6b26a32 100644
---- a/include/linux/lightnvm.h
-+++ b/include/linux/lightnvm.h
-@@ -107,6 +107,8 @@ enum {
- 	NVM_RSP_NOT_CHANGEABLE	= 0x1,
- 	NVM_RSP_ERR_FAILWRITE	= 0x40ff,
- 	NVM_RSP_ERR_EMPTYPAGE	= 0x42ff,
-+	NVM_RSP_ERR_FAILECC	= 0x4281,
-+	NVM_RSP_WARN_HIGHECC	= 0x4700,
- 
- 	/* Device opcodes */
- 	NVM_OP_HBREAD		= 0x02,
+commit d2be537c3ba3568acd79cd178327b842e60d035e
+Author: Jeff Moyer <jmoyer@redhat.com>
+Date:   Thu Aug 13 14:57:57 2015 -0400
+
+     block: bump BLK_DEF_MAX_SECTORS to 2560
+
 -- 
-2.9.3
-
+Jens Axboe
