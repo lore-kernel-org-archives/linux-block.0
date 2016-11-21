@@ -1,168 +1,140 @@
-Return-Path: <prvs=011358c635=axboe@fb.com>
-From: Jens Axboe <axboe@fb.com>
-To: <axboe@kernel.dk>, <linux-kernel@vger.kernel.org>,
-        <linux-fsdevel@vger.kernel.org>, <linux-block@vger.kernel.org>
-CC: <jack@suse.cz>, <hch@lst.de>, Jens Axboe <axboe@fb.com>
-Subject: [PATCH 2/8] writeback: add wbc_to_write_flags()
-Date: Tue, 1 Nov 2016 15:08:45 -0600
-Message-ID: <1478034531-28559-3-git-send-email-axboe@fb.com>
-In-Reply-To: <1478034531-28559-1-git-send-email-axboe@fb.com>
-References: <1478034531-28559-1-git-send-email-axboe@fb.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f44.google.com ([74.125.82.44]:38200 "EHLO
+        mail-wm0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754061AbcKUMLJ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 21 Nov 2016 07:11:09 -0500
+Received: by mail-wm0-f44.google.com with SMTP id f82so141188984wmf.1
+        for <linux-block@vger.kernel.org>; Mon, 21 Nov 2016 04:11:08 -0800 (PST)
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
+To: mb@lightnvm.io
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
+Subject: [PATCH 6/8] lightnvm: introduce helpers for generic ops in rrpc
+Date: Mon, 21 Nov 2016 13:10:35 +0100
+Message-Id: <1479730237-20797-7-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1479730237-20797-1-git-send-email-javier@cnexlabs.com>
+References: <1479730237-20797-1-git-send-email-javier@cnexlabs.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Add wbc_to_write_flags(), which returns the write modifier flags to use,
-based on a struct writeback_control. No functional changes in this
-patch, but it prepares us for factoring other wbc fields for write type.
+Avoid calling media manager and device-specific operations directly from
+rrpc. Create helper functions on lightnvm's core instead.
 
-Signed-off-by: Jens Axboe <axboe@fb.com>
-Reviewed-by: Jan Kara <jack@suse.cz>
+Signed-off-by: Javier González <javier@cnexlabs.com>
 ---
- fs/buffer.c               | 2 +-
- fs/f2fs/data.c            | 2 +-
- fs/f2fs/node.c            | 2 +-
- fs/gfs2/meta_io.c         | 3 +--
- fs/mpage.c                | 2 +-
- fs/xfs/xfs_aops.c         | 8 ++------
- include/linux/writeback.h | 9 +++++++++
- mm/page_io.c              | 5 +----
- 8 files changed, 17 insertions(+), 16 deletions(-)
+ drivers/lightnvm/core.c   | 22 ++++++++++++++++++++++
+ drivers/lightnvm/gennvm.c |  2 --
+ drivers/lightnvm/rrpc.c   | 11 +++--------
+ include/linux/lightnvm.h  |  3 ---
+ 4 files changed, 25 insertions(+), 13 deletions(-)
 
-diff --git a/fs/buffer.c b/fs/buffer.c
-index bc7c2bb30a9b..af5776da814a 100644
---- a/fs/buffer.c
-+++ b/fs/buffer.c
-@@ -1697,7 +1697,7 @@ int __block_write_full_page(struct inode *inode, struct page *page,
- 	struct buffer_head *bh, *head;
- 	unsigned int blocksize, bbits;
- 	int nr_underway = 0;
--	int write_flags = (wbc->sync_mode == WB_SYNC_ALL ? REQ_SYNC : 0);
-+	int write_flags = wbc_to_write_flags(wbc);
- 
- 	head = create_page_buffers(page, inode,
- 					(1 << BH_Dirty)|(1 << BH_Uptodate));
-diff --git a/fs/f2fs/data.c b/fs/f2fs/data.c
-index b80bf10603d7..9e5561fa4cb6 100644
---- a/fs/f2fs/data.c
-+++ b/fs/f2fs/data.c
-@@ -1249,7 +1249,7 @@ static int f2fs_write_data_page(struct page *page,
- 		.sbi = sbi,
- 		.type = DATA,
- 		.op = REQ_OP_WRITE,
--		.op_flags = (wbc->sync_mode == WB_SYNC_ALL) ? REQ_SYNC : 0,
-+		.op_flags = wbc_to_write_flags(wbc),
- 		.page = page,
- 		.encrypted_page = NULL,
- 	};
-diff --git a/fs/f2fs/node.c b/fs/f2fs/node.c
-index 932f3f8bb57b..d1e29deb4598 100644
---- a/fs/f2fs/node.c
-+++ b/fs/f2fs/node.c
-@@ -1570,7 +1570,7 @@ static int f2fs_write_node_page(struct page *page,
- 		.sbi = sbi,
- 		.type = NODE,
- 		.op = REQ_OP_WRITE,
--		.op_flags = (wbc->sync_mode == WB_SYNC_ALL) ? REQ_SYNC : 0,
-+		.op_flags = wbc_to_write_flags(wbc),
- 		.page = page,
- 		.encrypted_page = NULL,
- 	};
-diff --git a/fs/gfs2/meta_io.c b/fs/gfs2/meta_io.c
-index e562b1191c9c..49db8ef13fdf 100644
---- a/fs/gfs2/meta_io.c
-+++ b/fs/gfs2/meta_io.c
-@@ -37,8 +37,7 @@ static int gfs2_aspace_writepage(struct page *page, struct writeback_control *wb
- {
- 	struct buffer_head *bh, *head;
- 	int nr_underway = 0;
--	int write_flags = REQ_META | REQ_PRIO |
--		(wbc->sync_mode == WB_SYNC_ALL ? REQ_SYNC : 0);
-+	int write_flags = REQ_META | REQ_PRIO | wbc_to_write_flags(wbc);
- 
- 	BUG_ON(!PageLocked(page));
- 	BUG_ON(!page_has_buffers(page));
-diff --git a/fs/mpage.c b/fs/mpage.c
-index f35e2819d0c6..98fc11aa7e0b 100644
---- a/fs/mpage.c
-+++ b/fs/mpage.c
-@@ -489,7 +489,7 @@ static int __mpage_writepage(struct page *page, struct writeback_control *wbc,
- 	struct buffer_head map_bh;
- 	loff_t i_size = i_size_read(inode);
- 	int ret = 0;
--	int op_flags = (wbc->sync_mode == WB_SYNC_ALL ? REQ_SYNC : 0);
-+	int op_flags = wbc_to_write_flags(wbc);
- 
- 	if (page_has_buffers(page)) {
- 		struct buffer_head *head = page_buffers(page);
-diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
-index 594e02c485b2..6be5204a06d3 100644
---- a/fs/xfs/xfs_aops.c
-+++ b/fs/xfs/xfs_aops.c
-@@ -495,9 +495,7 @@ xfs_submit_ioend(
- 
- 	ioend->io_bio->bi_private = ioend;
- 	ioend->io_bio->bi_end_io = xfs_end_bio;
--	ioend->io_bio->bi_opf = REQ_OP_WRITE;
--	if (wbc->sync_mode == WB_SYNC_ALL)
--		ioend->io_bio->bi_opf |= REQ_SYNC;
-+	ioend->io_bio->bi_opf = REQ_OP_WRITE | wbc_to_write_flags(wbc);
- 
- 	/*
- 	 * If we are failing the IO now, just mark the ioend with an
-@@ -569,9 +567,7 @@ xfs_chain_bio(
- 
- 	bio_chain(ioend->io_bio, new);
- 	bio_get(ioend->io_bio);		/* for xfs_destroy_ioend */
--	ioend->io_bio->bi_opf = REQ_OP_WRITE;
--	if (wbc->sync_mode == WB_SYNC_ALL)
--		ioend->io_bio->bi_opf |= REQ_SYNC;
-+	ioend->io_bio->bi_opf = REQ_OP_WRITE | wbc_to_write_flags(wbc);
- 	submit_bio(ioend->io_bio);
- 	ioend->io_bio = new;
+diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+index 23d582f..69f261e 100644
+--- a/drivers/lightnvm/core.c
++++ b/drivers/lightnvm/core.c
+@@ -219,6 +219,28 @@ int nvm_erase_blk(struct nvm_tgt_dev *tgt_dev, struct ppa_addr *p, int flags)
  }
-diff --git a/include/linux/writeback.h b/include/linux/writeback.h
-index e4c38703bf4e..50c96ee8108f 100644
---- a/include/linux/writeback.h
-+++ b/include/linux/writeback.h
-@@ -9,6 +9,7 @@
- #include <linux/fs.h>
- #include <linux/flex_proportions.h>
- #include <linux/backing-dev-defs.h>
-+#include <linux/blk_types.h>
+ EXPORT_SYMBOL(nvm_erase_blk);
  
- struct bio;
- 
-@@ -102,6 +103,14 @@ struct writeback_control {
- #endif
- };
- 
-+static inline int wbc_to_write_flags(struct writeback_control *wbc)
++int nvm_get_l2p_tbl(struct nvm_dev *dev, u64 slba, u32 nlb,
++		    nvm_l2p_update_fn *update_l2p, void *priv)
 +{
-+	if (wbc->sync_mode == WB_SYNC_ALL)
-+		return REQ_SYNC;
++	if (!dev->ops->get_l2p_tbl)
++		return 0;
 +
-+	return 0;
++	return dev->ops->get_l2p_tbl(dev, slba, nlb, update_l2p, priv);
 +}
++EXPORT_SYMBOL(nvm_get_l2p_tbl);
 +
- /*
-  * A wb_domain represents a domain that wb's (bdi_writeback's) belong to
-  * and are measured against each other in.  There always is one global
-diff --git a/mm/page_io.c b/mm/page_io.c
-index a2651f58c86a..23f6d0d3470f 100644
---- a/mm/page_io.c
-+++ b/mm/page_io.c
-@@ -320,10 +320,7 @@ int __swap_writepage(struct page *page, struct writeback_control *wbc,
- 		ret = -ENOMEM;
- 		goto out;
++int nvm_get_area(struct nvm_dev *dev, sector_t *lba, sector_t len)
++{
++	return dev->mt->get_area(dev, lba, len);
++}
++EXPORT_SYMBOL(nvm_get_area);
++
++void nvm_put_area(struct nvm_dev *dev, sector_t lba)
++{
++	dev->mt->put_area(dev, lba);
++}
++EXPORT_SYMBOL(nvm_put_area);
++
+ void nvm_addr_to_generic_mode(struct nvm_dev *dev, struct nvm_rq *rqd)
+ {
+ 	int i;
+diff --git a/drivers/lightnvm/gennvm.c b/drivers/lightnvm/gennvm.c
+index 5d7c8c4..befa828 100644
+--- a/drivers/lightnvm/gennvm.c
++++ b/drivers/lightnvm/gennvm.c
+@@ -175,8 +175,6 @@ static struct nvm_tgt_dev *gen_create_tgt_dev(struct nvm_dev *dev,
+ 	tgt_dev->geo.luns_per_chnl = (lun_balanced) ? prev_nr_luns : -1;
+ 	tgt_dev->total_secs = nr_luns * tgt_dev->geo.sec_per_lun;
+ 	tgt_dev->q = dev->q;
+-	tgt_dev->ops = dev->ops;
+-	tgt_dev->mt = dev->mt;
+ 	tgt_dev->map = dev_map;
+ 	tgt_dev->luns = luns;
+ 	memcpy(&tgt_dev->identity, &dev->identity, sizeof(struct nvm_id));
+diff --git a/drivers/lightnvm/rrpc.c b/drivers/lightnvm/rrpc.c
+index 75ed12a..5826c6b 100644
+--- a/drivers/lightnvm/rrpc.c
++++ b/drivers/lightnvm/rrpc.c
+@@ -1166,11 +1166,8 @@ static int rrpc_map_init(struct rrpc *rrpc)
+ 		r->addr = ADDR_EMPTY;
  	}
--	if (wbc->sync_mode == WB_SYNC_ALL)
--		bio_set_op_attrs(bio, REQ_OP_WRITE, REQ_SYNC);
--	else
--		bio_set_op_attrs(bio, REQ_OP_WRITE, 0);
-+	bio->bi_opf = REQ_OP_WRITE | wbc_to_write_flags(wbc);
- 	count_vm_event(PSWPOUT);
- 	set_page_writeback(page);
- 	unlock_page(page);
+ 
+-	if (!dev->ops->get_l2p_tbl)
+-		return 0;
+-
+ 	/* Bring up the mapping table from device */
+-	ret = dev->ops->get_l2p_tbl(dev->parent, rrpc->soffset, rrpc->nr_sects,
++	ret = nvm_get_l2p_tbl(dev->parent, rrpc->soffset, rrpc->nr_sects,
+ 					rrpc_l2p_update, rrpc);
+ 	if (ret) {
+ 		pr_err("nvm: rrpc: could not read L2P table.\n");
+@@ -1370,13 +1367,12 @@ static int rrpc_luns_init(struct rrpc *rrpc, struct ppa_addr *luns)
+ static int rrpc_area_init(struct rrpc *rrpc, sector_t *begin)
+ {
+ 	struct nvm_tgt_dev *dev = rrpc->dev;
+-	struct nvmm_type *mt = dev->mt;
+ 	sector_t size = rrpc->nr_sects * dev->geo.sec_size;
+ 	int ret;
+ 
+ 	size >>= 9;
+ 
+-	ret = mt->get_area(dev->parent, begin, size);
++	ret = nvm_get_area(dev->parent, begin, size);
+ 	if (!ret)
+ 		*begin >>= (ilog2(dev->geo.sec_size) - 9);
+ 
+@@ -1386,10 +1382,9 @@ static int rrpc_area_init(struct rrpc *rrpc, sector_t *begin)
+ static void rrpc_area_free(struct rrpc *rrpc)
+ {
+ 	struct nvm_tgt_dev *dev = rrpc->dev;
+-	struct nvmm_type *mt = dev->mt;
+ 	sector_t begin = rrpc->soffset << (ilog2(dev->geo.sec_size) - 9);
+ 
+-	mt->put_area(dev->parent, begin);
++	nvm_put_area(dev->parent, begin);
+ }
+ 
+ static void rrpc_free(struct rrpc *rrpc)
+diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
+index 2222853..b3ca603 100644
+--- a/include/linux/lightnvm.h
++++ b/include/linux/lightnvm.h
+@@ -320,9 +320,6 @@ struct nvm_tgt_dev {
+ 	struct nvm_id identity;
+ 	struct request_queue *q;
+ 
+-	struct nvmm_type *mt;
+-	struct nvm_dev_ops *ops;
+-
+ 	void *parent;
+ 	void *map;
+ };
 -- 
 2.7.4
+
