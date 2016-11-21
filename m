@@ -1,50 +1,36 @@
-Return-Path: <Damien.LeMoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, Damien Le
- Moal <damien.lemoal@wdc.com>
-Subject: [PATCH 1/1] block_dev: Fixed direct I/O bio sector calculation
-Date: Tue, 22 Nov 2016 15:38:49 +0900
-Message-ID: <1479796729-25517-1-git-send-email-damien.lemoal@wdc.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:33322 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752054AbcKUOt1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 21 Nov 2016 09:49:27 -0500
+Date: Mon, 21 Nov 2016 09:49:26 -0500
+From: Mike Snitzer <snitzer@redhat.com>
+To: Ming Lei <tom.leiming@gmail.com>
+Cc: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Alasdair Kergon <agk@redhat.com>,
+        "maintainer:DEVICE-MAPPER (LVM)" <dm-devel@redhat.com>,
+        Shaohua Li <shli@kernel.org>,
+        "open list:SOFTWARE RAID (Multiple Disks) SUPPORT"
+        <linux-raid@vger.kernel.org>
+Subject: Re: [PATCH 06/12] dm: crypt: use bio_add_page()
+Message-ID: <20161121144925.GA23051@redhat.com>
+References: <1478865957-25252-1-git-send-email-tom.leiming@gmail.com>
+ <1478865957-25252-7-git-send-email-tom.leiming@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: damien.lemoal@wdc.com
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1478865957-25252-7-git-send-email-tom.leiming@gmail.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-A direct I/O alignment must be always checked against the device blocks size,
-but the I/O offset (bio->bi_iter.bi_sector must always use 512B sector unit, and
-not the actual logical block size.
+On Fri, Nov 11 2016 at  7:05am -0500,
+Ming Lei <tom.leiming@gmail.com> wrote:
 
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
----
- fs/block_dev.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+> We have the standard interface to add page to bio, so don't
+> do that in hacking way.
+> 
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 35cc494..e49fb79 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -226,7 +226,7 @@ __blkdev_direct_IO_simple(struct kiocb *iocb, struct iov_iter *iter,
- 	bio.bi_max_vecs = nr_pages;
- 	bio.bi_io_vec = vecs;
- 	bio.bi_bdev = bdev;
--	bio.bi_iter.bi_sector = pos >> blkbits;
-+	bio.bi_iter.bi_sector = pos >> 9;
- 	bio.bi_private = current;
- 	bio.bi_end_io = blkdev_bio_end_io_simple;
- 
-@@ -358,7 +358,7 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
- 
- 	for (;;) {
- 		bio->bi_bdev = bdev;
--		bio->bi_iter.bi_sector = pos >> blkbits;
-+		bio->bi_iter.bi_sector = pos >> 9;
- 		bio->bi_private = dio;
- 		bio->bi_end_io = blkdev_bio_end_io;
- 
--- 
-2.7.4
-
-Western Digital Corporation (and its subsidiaries) E-mail Confidentiality Notice & Disclaimer:
-
-This e-mail and any files transmitted with it may contain confidential or legally privileged information of WDC and/or its affiliates, and are intended solely for the use of the individual or entity to which they are addressed. If you are not the intended recipient, any disclosure, copying, distribution or any action taken or omitted to be taken in reliance on it, is prohibited. If you have received this e-mail in error, please notify the sender immediately and delete the e-mail in its entirety from your system.
+I've staged this for 4.10
