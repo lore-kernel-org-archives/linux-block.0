@@ -1,73 +1,30 @@
-Return-Path: <BATV+df6418b500677e5f9364+4818+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: martin.petersen@oracle.com,
-	don.brace@microsemi.com
-Cc: axboe@kernel.dk,
-	linux-scsi@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH 2/3] scsi: allow LLDDs to expose the queue mapping to blk-mq
-Date: Tue,  1 Nov 2016 08:12:48 -0600
-Message-Id: <1478009569-19026-3-git-send-email-hch@lst.de>
-In-Reply-To: <1478009569-19026-1-git-send-email-hch@lst.de>
-References: <1478009569-19026-1-git-send-email-hch@lst.de>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH v2] Apply blk_partition_remap to REQ_OP_ZONE_RESET
+To: Shaun Tancheff <shaun@tancheff.com>
+References: <f32c3115-dabb-d04b-2b77-2b2169e2229a@kernel.dk>
+ <20161121215223.31658-1-shaun@tancheff.com>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+ Damien Le Moal <damien.lemoal@hgst.com>, Hannes Reinecke <hare@suse.de>,
+ Michael T Lombardi <michael.t.lombardi@seagate.com>,
+ Shaun Tancheff <shaun.tancheff@seagate.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <6e67e6ce-9756-c6bf-1c2e-c4b5f0dd57e3@kernel.dk>
+Date: Mon, 21 Nov 2016 15:07:58 -0700
+MIME-Version: 1.0
+In-Reply-To: <20161121215223.31658-1-shaun@tancheff.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-Just hand through the blk-mq map_queues method in the host template.
+On 11/21/2016 02:52 PM, Shaun Tancheff wrote:
+> If a ZBC device is partitioned and operations are performed on the partition
+> the zone information is rebased to the partition, however the zone reset
+> is not mapped from the partition to device as are other operations.
+>
+> This causes the API (report zones / reset zone) to be unbalanced in this
+> regard. Checking for the zone reset op code explicitly will balance the
+> API.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
----
- drivers/scsi/scsi_lib.c  | 10 ++++++++++
- include/scsi/scsi_host.h |  8 ++++++++
- 2 files changed, 18 insertions(+)
+Much better, thanks. Applied for 4.10.
 
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 2cca9cf..f23ec24 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -1990,6 +1990,15 @@ static void scsi_exit_request(void *data, struct request *rq,
- 	kfree(cmd->sense_buffer);
- }
- 
-+static int scsi_map_queues(struct blk_mq_tag_set *set)
-+{
-+	struct Scsi_Host *shost = container_of(set, struct Scsi_Host, tag_set);
-+
-+	if (shost->hostt->map_queues)
-+		return shost->hostt->map_queues(shost);
-+	return blk_mq_map_queues(set);
-+}
-+
- static u64 scsi_calculate_bounce_limit(struct Scsi_Host *shost)
- {
- 	struct device *host_dev;
-@@ -2082,6 +2091,7 @@ static struct blk_mq_ops scsi_mq_ops = {
- 	.timeout	= scsi_timeout,
- 	.init_request	= scsi_init_request,
- 	.exit_request	= scsi_exit_request,
-+	.map_queues	= scsi_map_queues,
- };
- 
- struct request_queue *scsi_mq_alloc_queue(struct scsi_device *sdev)
-diff --git a/include/scsi/scsi_host.h b/include/scsi/scsi_host.h
-index 7e4cd53..36680f1 100644
---- a/include/scsi/scsi_host.h
-+++ b/include/scsi/scsi_host.h
-@@ -278,6 +278,14 @@ struct scsi_host_template {
- 	int (* change_queue_depth)(struct scsi_device *, int);
- 
- 	/*
-+	 * This functions lets the driver expose the queue mapping
-+	 * to the block layer.
-+	 *
-+	 * Status: OPTIONAL
-+	 */
-+	int (* map_queues)(struct Scsi_Host *shost);
-+
-+	/*
- 	 * This function determines the BIOS parameters for a given
- 	 * harddisk.  These tend to be numbers that are made up by
- 	 * the host adapter.  Parameters:
 -- 
-2.1.4
+Jens Axboe
