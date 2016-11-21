@@ -1,363 +1,177 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv5 07/36] filemap: allocate huge page in page_cache_read(), if allowed
-Date: Tue, 29 Nov 2016 14:22:35 +0300
-Message-Id: <20161129112304.90056-8-kirill.shutemov@linux.intel.com>
-In-Reply-To: <20161129112304.90056-1-kirill.shutemov@linux.intel.com>
-References: <20161129112304.90056-1-kirill.shutemov@linux.intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f50.google.com ([74.125.82.50]:35114 "EHLO
+        mail-wm0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753623AbcKUMLF (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 21 Nov 2016 07:11:05 -0500
+Received: by mail-wm0-f50.google.com with SMTP id a197so143070372wmd.0
+        for <linux-block@vger.kernel.org>; Mon, 21 Nov 2016 04:11:05 -0800 (PST)
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
+To: mb@lightnvm.io
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
+Subject: [PATCH 2/8] lightnvm: remove get_lun operation on gennvm
+Date: Mon, 21 Nov 2016 13:10:31 +0100
+Message-Id: <1479730237-20797-3-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1479730237-20797-1-git-send-email-javier@cnexlabs.com>
+References: <1479730237-20797-1-git-send-email-javier@cnexlabs.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This patch adds basic functionality to put huge page into page cache.
+Since LUNs are managed internally on the target, there is no need for
+the media manager to implement a get_lun operation.
 
-At the moment we only put huge pages into radix-tree if the range covered
-by the huge page is empty.
-
-We ignore shadow entires for now, just remove them from the tree before
-inserting huge page.
-
-Later we can add logic to accumulate information from shadow entires to
-return to caller (average eviction time?).
-
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+Signed-off-by: Javier González <javier@cnexlabs.com>
 ---
- include/linux/fs.h      |   5 ++
- include/linux/pagemap.h |  21 ++++++-
- mm/filemap.c            | 155 ++++++++++++++++++++++++++++++++++++++----------
- 3 files changed, 147 insertions(+), 34 deletions(-)
+ drivers/lightnvm/gennvm.c | 13 +------------
+ drivers/lightnvm/rrpc.c   | 23 +++++++++++------------
+ include/linux/lightnvm.h  |  8 ++------
+ 3 files changed, 14 insertions(+), 30 deletions(-)
 
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 03a5a398ae83..be94b922a22f 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -1799,6 +1799,11 @@ struct super_operations {
- #else
- #define S_DAX		0	/* Make all the DAX code disappear */
- #endif
-+#define S_HUGE_MODE		0xc000
-+#define S_HUGE_NEVER		0x0000
-+#define S_HUGE_ALWAYS		0x4000
-+#define S_HUGE_WITHIN_SIZE	0x8000
-+#define S_HUGE_ADVISE		0xc000
+diff --git a/drivers/lightnvm/gennvm.c b/drivers/lightnvm/gennvm.c
+index 8791a2a..3cf5d59 100644
+--- a/drivers/lightnvm/gennvm.c
++++ b/drivers/lightnvm/gennvm.c
+@@ -159,7 +159,7 @@ static int gen_create_tgt(struct nvm_dev *dev, struct nvm_ioctl_create *create)
+ 	tdisk->fops = &gen_fops;
+ 	tdisk->queue = tqueue;
  
- /*
-  * Note that nosuid etc flags are inode-specific: setting some file-system
-diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
-index f88d69e2419d..e530e7b3b6b2 100644
---- a/include/linux/pagemap.h
-+++ b/include/linux/pagemap.h
-@@ -201,14 +201,20 @@ static inline int page_cache_add_speculative(struct page *page, int count)
+-	targetdata = tt->init(tgt_dev, tdisk, s->lun_begin, s->lun_end);
++	targetdata = tt->init(tgt_dev, tdisk, &t->lun_list);
+ 	if (IS_ERR(targetdata))
+ 		goto err_init;
+ 
+@@ -613,16 +613,6 @@ static int gen_erase_blk(struct nvm_dev *dev, struct nvm_block *blk, int flags)
+ 	return nvm_erase_ppa(dev, &addr, 1, flags);
  }
  
- #ifdef CONFIG_NUMA
--extern struct page *__page_cache_alloc(gfp_t gfp);
-+extern struct page *__page_cache_alloc_order(gfp_t gfp, unsigned int order);
- #else
--static inline struct page *__page_cache_alloc(gfp_t gfp)
-+static inline struct page *__page_cache_alloc_order(gfp_t gfp,
-+		unsigned int order)
+-static struct nvm_lun *gen_get_lun(struct nvm_dev *dev, int lunid)
+-{
+-	struct gen_dev *gn = dev->mp;
+-
+-	if (unlikely(lunid >= dev->geo.nr_luns))
+-		return NULL;
+-
+-	return &gn->luns[lunid];
+-}
+-
+ static void gen_lun_info_print(struct nvm_dev *dev)
  {
--	return alloc_pages(gfp, 0);
-+	return alloc_pages(gfp, order);
+ 	struct gen_dev *gn = dev->mp;
+@@ -655,7 +645,6 @@ static struct nvmm_type gen = {
+ 
+ 	.mark_blk		= gen_mark_blk,
+ 
+-	.get_lun		= gen_get_lun,
+ 	.lun_info_print		= gen_lun_info_print,
+ 
+ 	.get_area		= gen_get_area,
+diff --git a/drivers/lightnvm/rrpc.c b/drivers/lightnvm/rrpc.c
+index 5377c7a..165b9d3 100644
+--- a/drivers/lightnvm/rrpc.c
++++ b/drivers/lightnvm/rrpc.c
+@@ -1199,10 +1199,11 @@ static void rrpc_luns_free(struct rrpc *rrpc)
+ 	kfree(rrpc->luns);
  }
- #endif
  
-+static inline struct page *__page_cache_alloc(gfp_t gfp)
-+{
-+	return __page_cache_alloc_order(gfp, 0);
-+}
-+
- static inline struct page *page_cache_alloc(struct address_space *x)
+-static int rrpc_luns_init(struct rrpc *rrpc, int lun_begin, int lun_end)
++static int rrpc_luns_init(struct rrpc *rrpc, struct list_head *lun_list)
  {
- 	return __page_cache_alloc(mapping_gfp_mask(x));
-@@ -225,6 +231,15 @@ static inline gfp_t readahead_gfp_mask(struct address_space *x)
- 				  __GFP_COLD | __GFP_NORETRY | __GFP_NOWARN;
- }
+ 	struct nvm_tgt_dev *dev = rrpc->dev;
+ 	struct nvm_geo *geo = &dev->geo;
++	struct nvm_lun *lun;
+ 	struct rrpc_lun *rlun;
+ 	int i, j, ret = -EINVAL;
  
-+extern bool __page_cache_allow_huge(struct address_space *x, pgoff_t offset);
-+static inline bool page_cache_allow_huge(struct address_space *x,
-+		pgoff_t offset)
-+{
-+	if (!IS_ENABLED(CONFIG_TRANSPARENT_HUGEPAGE))
-+		return false;
-+	return __page_cache_allow_huge(x, offset);
-+}
+@@ -1218,16 +1219,11 @@ static int rrpc_luns_init(struct rrpc *rrpc, int lun_begin, int lun_end)
+ 	if (!rrpc->luns)
+ 		return -ENOMEM;
+ 
++	i = 0;
 +
- typedef int filler_t(void *, struct page *);
- 
- pgoff_t page_cache_next_hole(struct address_space *mapping,
-diff --git a/mm/filemap.c b/mm/filemap.c
-index 16d39340c106..74341f8b831e 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -113,37 +113,50 @@
- static int page_cache_tree_insert(struct address_space *mapping,
- 				  struct page *page, void **shadowp)
- {
--	struct radix_tree_node *node;
--	void **slot;
-+	struct radix_tree_iter iter;
-+	void **slot, *p;
- 	int error;
- 
--	error = __radix_tree_create(&mapping->page_tree, page->index, 0,
--				    &node, &slot);
--	if (error)
--		return error;
--	if (*slot) {
--		void *p;
-+	/* Wipe shadow entires */
-+	radix_tree_for_each_slot(slot, &mapping->page_tree, &iter,
-+			page->index) {
-+		if (iter.index >= page->index + hpage_nr_pages(page))
-+			break;
- 
- 		p = radix_tree_deref_slot_protected(slot, &mapping->tree_lock);
--		if (!radix_tree_exceptional_entry(p))
-+		if (!p)
-+			continue;
-+
-+		if (!radix_tree_exception(p))
- 			return -EEXIST;
- 
-+		__radix_tree_replace(&mapping->page_tree, iter.node, slot, NULL,
-+				workingset_update_node, mapping);
-+
- 		mapping->nrexceptional--;
--		if (!dax_mapping(mapping)) {
--			if (shadowp)
--				*shadowp = p;
--		} else {
-+		if (dax_mapping(mapping)) {
- 			/* DAX can replace empty locked entry with a hole */
- 			WARN_ON_ONCE(p !=
- 				dax_radix_locked_entry(0, RADIX_DAX_EMPTY));
- 			/* Wakeup waiters for exceptional entry lock */
- 			dax_wake_mapping_entry_waiter(mapping, page->index, p,
- 						      false);
-+		} else if (!PageTransHuge(page) && shadowp) {
-+			*shadowp = p;
- 		}
+ 	/* 1:1 mapping */
+-	for (i = 0; i < rrpc->nr_luns; i++) {
+-		int lunid = lun_begin + i;
+-		struct nvm_lun *lun;
+-
+-		lun = dev->mt->get_lun(dev->parent, lunid);
+-		if (!lun)
+-			goto err;
+-
+-		rlun = &rrpc->luns[i];
++	list_for_each_entry(lun, lun_list, list) {
++		rlun = &rrpc->luns[i++];
+ 		rlun->parent = lun;
+ 		rlun->blocks = vzalloc(sizeof(struct rrpc_block) *
+ 							geo->blks_per_lun);
+@@ -1256,6 +1252,8 @@ static int rrpc_luns_init(struct rrpc *rrpc, int lun_begin, int lun_end)
+ 		spin_lock_init(&rlun->lock);
  	}
--	__radix_tree_replace(&mapping->page_tree, node, slot, page,
--			     workingset_update_node, mapping);
--	mapping->nrpages++;
+ 
++	WARN_ON(i != rrpc->nr_luns);
 +
-+	error = __radix_tree_insert(&mapping->page_tree,
-+			page->index, compound_order(page), page);
-+	/* This shouldn't happen */
-+	if (WARN_ON_ONCE(error))
-+		return error;
-+
-+	mapping->nrpages += hpage_nr_pages(page);
-+	if (PageTransHuge(page) && !PageHuge(page)) {
-+		count_vm_event(THP_FILE_ALLOC);
-+		__inc_node_page_state(page, NR_FILE_THPS);
-+	}
  	return 0;
- }
+ err:
+ 	return ret;
+@@ -1410,12 +1408,13 @@ static int rrpc_luns_configure(struct rrpc *rrpc)
+ static struct nvm_tgt_type tt_rrpc;
  
-@@ -600,14 +613,14 @@ static int __add_to_page_cache_locked(struct page *page,
- 				      pgoff_t offset, gfp_t gfp_mask,
- 				      void **shadowp)
+ static void *rrpc_init(struct nvm_tgt_dev *dev, struct gendisk *tdisk,
+-						int lun_begin, int lun_end)
++						struct list_head *lun_list)
  {
--	int huge = PageHuge(page);
-+	int hugetlb = PageHuge(page);
- 	struct mem_cgroup *memcg;
- 	int error;
- 
- 	VM_BUG_ON_PAGE(!PageLocked(page), page);
- 	VM_BUG_ON_PAGE(PageSwapBacked(page), page);
- 
--	if (!huge) {
-+	if (!hugetlb) {
- 		error = mem_cgroup_try_charge(page, current->mm,
- 					      gfp_mask, &memcg, false);
- 		if (error)
-@@ -616,7 +629,7 @@ static int __add_to_page_cache_locked(struct page *page,
- 
- 	error = radix_tree_maybe_preload(gfp_mask & ~__GFP_HIGHMEM);
- 	if (error) {
--		if (!huge)
-+		if (!hugetlb)
- 			mem_cgroup_cancel_charge(page, memcg, false);
- 		return error;
- 	}
-@@ -632,10 +645,11 @@ static int __add_to_page_cache_locked(struct page *page,
- 		goto err_insert;
- 
- 	/* hugetlb pages do not participate in page cache accounting. */
--	if (!huge)
--		__inc_node_page_state(page, NR_FILE_PAGES);
-+	if (!hugetlb)
-+		__mod_node_page_state(page_pgdat(page), NR_FILE_PAGES,
-+				hpage_nr_pages(page));
- 	spin_unlock_irq(&mapping->tree_lock);
--	if (!huge)
-+	if (!hugetlb)
- 		mem_cgroup_commit_charge(page, memcg, false, false);
- 	trace_mm_filemap_add_to_page_cache(page);
- 	return 0;
-@@ -643,7 +657,7 @@ static int __add_to_page_cache_locked(struct page *page,
- 	page->mapping = NULL;
- 	/* Leave page->index set: truncation relies upon it */
- 	spin_unlock_irq(&mapping->tree_lock);
--	if (!huge)
-+	if (!hugetlb)
- 		mem_cgroup_cancel_charge(page, memcg, false);
- 	put_page(page);
- 	return error;
-@@ -700,7 +714,7 @@ int add_to_page_cache_lru(struct page *page, struct address_space *mapping,
- EXPORT_SYMBOL_GPL(add_to_page_cache_lru);
- 
- #ifdef CONFIG_NUMA
--struct page *__page_cache_alloc(gfp_t gfp)
-+struct page *__page_cache_alloc_order(gfp_t gfp, unsigned int order)
- {
- 	int n;
- 	struct page *page;
-@@ -710,14 +724,14 @@ struct page *__page_cache_alloc(gfp_t gfp)
- 		do {
- 			cpuset_mems_cookie = read_mems_allowed_begin();
- 			n = cpuset_mem_spread_node();
--			page = __alloc_pages_node(n, gfp, 0);
-+			page = __alloc_pages_node(n, gfp, order);
- 		} while (!page && read_mems_allowed_retry(cpuset_mems_cookie));
- 
- 		return page;
- 	}
--	return alloc_pages(gfp, 0);
-+	return alloc_pages(gfp, order);
- }
--EXPORT_SYMBOL(__page_cache_alloc);
-+EXPORT_SYMBOL(__page_cache_alloc_order);
- #endif
- 
- /*
-@@ -1102,6 +1116,69 @@ struct page *find_lock_entry(struct address_space *mapping, pgoff_t offset)
- }
- EXPORT_SYMBOL(find_lock_entry);
- 
-+bool __page_cache_allow_huge(struct address_space *mapping, pgoff_t offset)
-+{
-+	struct inode *inode = mapping->host;
-+	struct radix_tree_iter iter;
-+	void **slot;
-+	struct page *page;
-+
-+	if (!IS_ENABLED(CONFIG_TRANSPARENT_HUGE_PAGECACHE))
-+		return false;
-+
-+	offset = round_down(offset, HPAGE_PMD_NR);
-+
-+	switch (inode->i_flags & S_HUGE_MODE) {
-+	case S_HUGE_NEVER:
-+		return false;
-+	case S_HUGE_ALWAYS:
-+		break;
-+	case S_HUGE_WITHIN_SIZE:
-+		if (DIV_ROUND_UP(i_size_read(inode), PAGE_SIZE) <
-+				offset + HPAGE_PMD_NR)
-+			return false;
-+		break;
-+	case S_HUGE_ADVISE:
-+		/* TODO */
-+		return false;
-+	default:
-+		WARN_ON_ONCE(1);
-+		return false;
-+	}
-+
-+	rcu_read_lock();
-+	radix_tree_for_each_slot(slot, &mapping->page_tree, &iter, offset) {
-+		if (iter.index >= offset + HPAGE_PMD_NR)
-+			break;
-+
-+		/* Shadow entires are fine */
-+		page = radix_tree_deref_slot(slot);
-+		if (page && !radix_tree_exception(page)) {
-+			rcu_read_unlock();
-+			return false;
-+		}
-+	}
-+	rcu_read_unlock();
-+
-+	return true;
-+
-+}
-+
-+static struct page *page_cache_alloc_huge(struct address_space *mapping,
-+		pgoff_t offset, gfp_t gfp_mask)
-+{
-+	struct page *page;
-+
-+	if (!page_cache_allow_huge(mapping, offset))
-+		return NULL;
-+
-+	gfp_mask |= __GFP_COMP | __GFP_NORETRY | __GFP_NOWARN;
-+	page = __page_cache_alloc_order(gfp_mask, HPAGE_PMD_ORDER);
-+	if (page)
-+		prep_transhuge_page(page);
-+	return page;
-+}
-+
- /**
-  * pagecache_get_page - find and get a page reference
-  * @mapping: the address_space to search
-@@ -1941,18 +2018,34 @@ static int page_cache_read(struct file *file, pgoff_t offset, gfp_t gfp_mask)
- {
- 	struct address_space *mapping = file->f_mapping;
- 	struct page *page;
-+	pgoff_t hoffset;
+ 	struct request_queue *bqueue = dev->q;
+ 	struct request_queue *tqueue = tdisk->queue;
+ 	struct nvm_geo *geo = &dev->geo;
+ 	struct rrpc *rrpc;
++	int lun_begin = (list_first_entry(lun_list, struct nvm_lun, list))->id;
+ 	sector_t soffset;
  	int ret;
  
- 	do {
--		page = __page_cache_alloc(gfp_mask|__GFP_COLD);
-+		page = page_cache_alloc_huge(mapping, offset, gfp_mask);
-+no_huge:
-+		if (!page)
-+			page = __page_cache_alloc(gfp_mask|__GFP_COLD);
- 		if (!page)
- 			return -ENOMEM;
+@@ -1450,7 +1449,7 @@ static void *rrpc_init(struct nvm_tgt_dev *dev, struct gendisk *tdisk,
+ 	}
+ 	rrpc->soffset = soffset;
  
--		ret = add_to_page_cache_lru(page, mapping, offset, gfp_mask & GFP_KERNEL);
--		if (ret == 0)
-+		if (PageTransHuge(page))
-+			hoffset = round_down(offset, HPAGE_PMD_NR);
-+		else
-+			hoffset = offset;
-+
-+		ret = add_to_page_cache_lru(page, mapping, hoffset,
-+				gfp_mask & GFP_KERNEL);
-+
-+		if (ret == -EEXIST && PageTransHuge(page)) {
-+			put_page(page);
-+			page = NULL;
-+			goto no_huge;
-+		} else if (ret == 0) {
- 			ret = mapping->a_ops->readpage(file, page);
--		else if (ret == -EEXIST)
-+		} else if (ret == -EEXIST) {
- 			ret = 0; /* losing race to add is OK */
-+		}
+-	ret = rrpc_luns_init(rrpc, lun_begin, lun_end);
++	ret = rrpc_luns_init(rrpc, lun_list);
+ 	if (ret) {
+ 		pr_err("nvm: rrpc: could not initialize luns\n");
+ 		goto err;
+diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
+index 1f1588c..e56c352 100644
+--- a/include/linux/lightnvm.h
++++ b/include/linux/lightnvm.h
+@@ -504,8 +504,8 @@ static inline int ppa_to_slc(struct nvm_dev *dev, int slc_pg)
  
- 		put_page(page);
+ typedef blk_qc_t (nvm_tgt_make_rq_fn)(struct request_queue *, struct bio *);
+ typedef sector_t (nvm_tgt_capacity_fn)(void *);
+-typedef void *(nvm_tgt_init_fn)(struct nvm_tgt_dev *, struct gendisk *, int,
+-				int);
++typedef void *(nvm_tgt_init_fn)(struct nvm_tgt_dev *, struct gendisk *,
++				struct list_head *lun_list);
+ typedef void (nvm_tgt_exit_fn)(void *);
+ 
+ struct nvm_tgt_type {
+@@ -541,7 +541,6 @@ typedef int (nvmm_remove_tgt_fn)(struct nvm_dev *, struct nvm_ioctl_remove *);
+ typedef int (nvmm_submit_io_fn)(struct nvm_dev *, struct nvm_rq *);
+ typedef int (nvmm_erase_blk_fn)(struct nvm_dev *, struct nvm_block *, int);
+ typedef void (nvmm_mark_blk_fn)(struct nvm_dev *, struct ppa_addr, int);
+-typedef struct nvm_lun *(nvmm_get_lun_fn)(struct nvm_dev *, int);
+ typedef void (nvmm_lun_info_print_fn)(struct nvm_dev *);
+ 
+ typedef int (nvmm_get_area_fn)(struct nvm_dev *, sector_t *, sector_t);
+@@ -563,9 +562,6 @@ struct nvmm_type {
+ 	/* Bad block mgmt */
+ 	nvmm_mark_blk_fn *mark_blk;
+ 
+-	/* Configuration management */
+-	nvmm_get_lun_fn *get_lun;
+-
+ 	/* Statistics */
+ 	nvmm_lun_info_print_fn *lun_info_print;
  
 -- 
-2.10.2
+2.7.4
 
