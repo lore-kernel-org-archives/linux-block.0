@@ -1,62 +1,25 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv5 06/36] thp: handle write-protection faults for file THP
-Date: Tue, 29 Nov 2016 14:22:34 +0300
-Message-Id: <20161129112304.90056-7-kirill.shutemov@linux.intel.com>
-In-Reply-To: <20161129112304.90056-1-kirill.shutemov@linux.intel.com>
-References: <20161129112304.90056-1-kirill.shutemov@linux.intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Subject: Re: [PATCH] block: clear all of bi_opf in bio_set_op_attrs
+To: Christoph Hellwig <hch@lst.de>
+References: <1479741498-12592-1-git-send-email-hch@lst.de>
+Cc: linux-block@vger.kernel.org
+From: Jens Axboe <axboe@fb.com>
+Message-ID: <c09d1382-724e-f101-ea1f-5764234a516a@fb.com>
+Date: Mon, 21 Nov 2016 09:35:30 -0700
+MIME-Version: 1.0
+In-Reply-To: <1479741498-12592-1-git-send-email-hch@lst.de>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-For filesystems that wants to be write-notified (has mkwrite), we will
-encount write-protection faults for huge PMDs in shared mappings.
+On 11/21/2016 08:18 AM, Christoph Hellwig wrote:
+> Since commit 87374179 ("block: add a proper block layer data direction
+> encoding") we only or the new op and flags into bi_opf in bio_set_op_attrs
+> instead of clearing the old value.  I've not seen any breakage with the
+> new behavior, but it seems dangerous.
+>
+> Also convert it to an inline function to make the argument passing
+> safer.
 
-The easiest way to handle them is to clear the PMD and let it refault as
-wriable.
+Agree, this is safer. Applied for 4.10.
 
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
-Reviewed-by: Jan Kara <jack@suse.cz>
----
- mm/memory.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
-
-diff --git a/mm/memory.c b/mm/memory.c
-index 455c3e628d52..e3d7cea8cc6a 100644
---- a/mm/memory.c
-+++ b/mm/memory.c
-@@ -3495,8 +3495,16 @@ static int wp_huge_pmd(struct vm_fault *vmf, pmd_t orig_pmd)
- 		return vmf->vma->vm_ops->pmd_fault(vmf->vma, vmf->address,
- 						   vmf->pmd, vmf->flags);
- 
-+	if (vmf->vma->vm_flags & VM_SHARED) {
-+		/* Clear PMD */
-+		zap_page_range_single(vmf->vma, vmf->address & HPAGE_PMD_MASK,
-+				HPAGE_PMD_SIZE, NULL);
-+
-+		/* Refault to establish writable PMD */
-+		return 0;
-+	}
-+
- 	/* COW handled on pte level: split pmd */
--	VM_BUG_ON_VMA(vmf->vma->vm_flags & VM_SHARED, vmf->vma);
- 	__split_huge_pmd(vmf->vma, vmf->pmd, vmf->address, false, NULL);
- 
- 	return VM_FAULT_FALLBACK;
 -- 
-2.10.2
-
+Jens Axboe
