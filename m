@@ -1,82 +1,70 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-qk0-f194.google.com ([209.85.220.194]:35583 "EHLO
-        mail-qk0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751028AbcKPHG7 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Nov 2016 02:06:59 -0500
-Received: by mail-qk0-f194.google.com with SMTP id n204so20013656qke.2
-        for <linux-block@vger.kernel.org>; Tue, 15 Nov 2016 23:06:59 -0800 (PST)
+Received: from latin.grep.be ([46.4.76.168]:57495 "EHLO latin.grep.be"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1754238AbcKVRfY (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 22 Nov 2016 12:35:24 -0500
+Date: Tue, 22 Nov 2016 18:19:11 +0100
+From: Wouter Verhelst <w@uter.be>
+To: Josef Bacik <jbacik@fb.com>
+Cc: axboe@fb.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kernel-team@fb.com, alex@alex.org.uk,
+        nbd-general@lists.sourceforge.net
+Subject: Re: [PATCH][V4] nbd: add multi-connection support
+Message-ID: <20161122171911.bvzlhli24lscbqa3@grep.be>
+References: <1479414450-7999-1-git-send-email-jbacik@fb.com>
 MIME-Version: 1.0
-From: chaitany kulkarni <ckulkarnilinux@gmail.com>
-Date: Tue, 15 Nov 2016 23:06:58 -0800
-Message-ID: <CAK0tqik5oMda+Avk17pR8rX_CS0vCpoPPp3LioEtcgyG3Ex8Ww@mail.gmail.com>
-Subject: [PATCH 3/5] nvme.h: add Write Zeroes definitions
-To: axboe@fb.com
-Cc: martin.petersen@oracle.com, keith.busch@intel.com,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1479414450-7999-1-git-send-email-jbacik@fb.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Add the command structure, optional command set support (ONCS) bit and
-a new error code for the Write Zeroes command.
+Hi Josef,
 
-Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@hgst.com>
----
- include/linux/nvme.h | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+[cc to nbd-general added]
 
-diff --git a/include/linux/nvme.h b/include/linux/nvme.h
-index 9f3b488..5bf1d2d 100644
---- a/include/linux/nvme.h
-+++ b/include/linux/nvme.h
-@@ -242,6 +242,7 @@ enum {
-  NVME_CTRL_ONCS_COMPARE = 1 << 0,
-  NVME_CTRL_ONCS_WRITE_UNCORRECTABLE = 1 << 1,
-  NVME_CTRL_ONCS_DSM = 1 << 2,
-+ NVME_CTRL_ONCS_WRITE_ZEROES = 1 << 3,
-  NVME_CTRL_VWC_PRESENT = 1 << 0,
- };
+On Thu, Nov 17, 2016 at 03:27:30PM -0500, Josef Bacik wrote:
+> NBD can become contended on its single connection.  We have to serialize all
+> writes and we can only process one read response at a time.  Fix this by
+> allowing userspace to provide multiple connections to a single nbd device.  This
+> coupled with block-mq drastically increases performance in multi-process cases.
+> Thanks,
+> 
+> Signed-off-by: Josef Bacik <jbacik@fb.com>
+> ---
+> V3->V4:
+> -Fixed a problem where fast completes (or early completes) would crash because
+>  we were still accessing the bio's on the submit side.
+> -Added a flag to disallow multi-connection support if the server doesn't
+>  explicitly allow for them.
+[...]
+> +		if (num_connections > 1 &&
+> +		    !(nbd->flags & NBD_FLAG_CAN_MULTI_CONN)) {
+> +			dev_err(disk_to_dev(nbd->disk), "server does not support multiple connections per device.\n");
+> +			goto out_err;
+> +		}
 
-@@ -558,6 +559,23 @@ struct nvme_dsm_range {
-  __le64 slba;
- };
+I'm not sure whether the kernel needs to check this. I agree that the
+flag can be useful, but it's probably something for userspace to check,
+rather than for the kernel; I could imagine a --force parameter to be
+useful in some corner cases.
 
-+struct nvme_write_zeroes_cmd {
-+ __u8 opcode;
-+ __u8 flags;
-+ __u16 command_id;
-+ __le32 nsid;
-+ __u64 rsvd2;
-+ __le64 metadata;
-+ union nvme_data_ptr dptr;
-+ __le64 slba;
-+ __le16 length;
-+ __le16 control;
-+ __le32 dsmgmt;
-+ __le32 reftag;
-+ __le16 apptag;
-+ __le16 appmask;
-+};
-+
- /* Admin commands */
+Having said that, implementing such a parameter could also be done by
+artificially adding particular flags, so I'm certainly not opposed to
+this.
 
- enum nvme_admin_opcode {
-@@ -857,6 +875,7 @@ struct nvme_command {
-  struct nvme_download_firmware dlfw;
-  struct nvme_format_cmd format;
-  struct nvme_dsm_cmd dsm;
-+ struct nvme_write_zeroes_cmd write_zeroes;
-  struct nvme_abort_cmd abort;
-  struct nvme_get_log_page_command get_log_page;
-  struct nvmf_common_command fabrics;
-@@ -947,6 +966,7 @@ enum {
-  NVME_SC_BAD_ATTRIBUTES = 0x180,
-  NVME_SC_INVALID_PI = 0x181,
-  NVME_SC_READ_ONLY = 0x182,
-+ NVME_SC_ONCS_NOT_SUPPORTED = 0x183,
+[...]
+> +#define NBD_FLAG_CAN_MULTI_CONN	(1 << 6)	/* Server supports multiple connections per export. */
 
-  /*
-  * I/O Command Set Specific - Fabrics commands:
+NAK, that is already specified in the protocol spec at
+https://github.com/NetworkBlockDevice/nbd/blob/master/doc/proto.md to be
+NBD_FLAG_SEND_WRITE_ZEROES. Bit 7 is also taken already, so please use
+bit 8 instead.
+
+(I'll reserve that bit in that document to be "export is multi-conn safe" in a
+minute)
+
 -- 
-1.8.3.1
+< ron> I mean, the main *practical* problem with C++, is there's like a dozen
+       people in the world who think they really understand all of its rules,
+       and pretty much all of them are just lying to themselves too.
+ -- #debian-devel, OFTC, 2016-02-12
