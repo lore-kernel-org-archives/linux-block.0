@@ -1,48 +1,52 @@
-Return-Path: <kent.overstreet@gmail.com>
-Return-Path: <kent.overstreet@gmail.com>
-Date: Tue, 1 Nov 2016 19:08:13 -0800
-From: Kent Overstreet <kent.overstreet@gmail.com>
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Ming Lei <tom.leiming@gmail.com>, Jens Axboe <axboe@fb.com>,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-	Jens Axboe <axboe@kernel.dk>, Hannes Reinecke <hare@suse.de>,
-	Mike Christie <mchristi@redhat.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Toshi Kani <toshi.kani@hpe.com>
-Subject: Re: [PATCH 28/60] block: introduce QUEUE_FLAG_SPLIT_MP
-Message-ID: <20161102030813.spwwymvdrym3lrah@kmo-pixel>
-References: <1477728600-12938-1-git-send-email-tom.leiming@gmail.com>
- <1477728600-12938-29-git-send-email-tom.leiming@gmail.com>
- <20161031153915.GL30919@infradead.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:45784 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S933981AbcKVXik (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 22 Nov 2016 18:38:40 -0500
+Date: Tue, 22 Nov 2016 15:38:24 -0800
+From: Shaohua Li <shli@fb.com>
+To: Tejun Heo <tj@kernel.org>
+CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <Kernel-team@fb.com>, <axboe@fb.com>, <vgoyal@redhat.com>
+Subject: Re: [PATCH V4 05/15] blk-throttle: add downgrade logic
+Message-ID: <20161122233824.GD14628@shli-mbp.local>
+References: <cover.1479161136.git.shli@fb.com>
+ <d5670c98a3e4239202c4dad8f16add803a629f15.1479161136.git.shli@fb.com>
+ <20161122212121.GC17534@htj.duckdns.org>
+ <20161122214200.GE17534@htj.duckdns.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20161031153915.GL30919@infradead.org>
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <20161122214200.GE17534@htj.duckdns.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Mon, Oct 31, 2016 at 08:39:15AM -0700, Christoph Hellwig wrote:
-> On Sat, Oct 29, 2016 at 04:08:27PM +0800, Ming Lei wrote:
-> > Some drivers(such as dm) should be capable of dealing with multipage
-> > bvec, but the incoming bio may be too big, such as, a new singlepage bvec
-> > bio can't be cloned from the bio, or can't be allocated to singlepage
-> > bvec with same size.
-> > 
-> > At least crypt dm, log writes and bcache have this kind of issue.
+On Tue, Nov 22, 2016 at 04:42:00PM -0500, Tejun Heo wrote:
+> Hello,
 > 
-> We already have the segment_size limitation for request based drivers.
-> I'd rather extent it to bio drivers if really needed.
+> On Tue, Nov 22, 2016 at 04:21:21PM -0500, Tejun Heo wrote:
+> > 1. A cgroup and its high and max limits don't have much to do with
+> >    other cgroups and their limits.  I don't get how the choice between
+> >    high and max limits can be a td-wide state.
 > 
-> But then again we should look into not having this limitation.  E.g.
-> for bcache I'd be really surprised if it's that limited, given that
-> Kent came up with this whole multipage bvec scheme.
+> Ah, okay, this combines with idle cgroup detection to determine
+> whether the cgroups should be allowed to exceed high limits.  It makes
+> more sense to me now.  In that case, for the high/max limit range
+> issues, the enforced high/max limits can simply follow what's implied
+> by the configuration.  e.g. if high=100 max=80, just behave as if both
+> high and max are 80.
+> 
+> > 2. Comparing parent's and child's limits and saying that either can be
+> >    ignored because one is higher than the other isn't correct.  A
+> >    parent's limit doesn't apply to each child separately.  It has to
+> >    be aggregated.  e.g. you can ignore a parent's setting if the sum
+> >    of all children's limits is smaller than the parent's but then
+> >    again there could still be a lower limit higher up the tree, so
+> >    they would still have to be examined.
+> 
+> This part still seems weird tho.  What am I misunderstanding?
 
-AFAIK the only issue is with drivers that may have to bounce bios - pages that
-were contiguous in the original bio won't necessarily be contiguous in the
-bounced bio, thus bouncing might require more than BIO_MAX_SEGMENTS bvecs.
+You are right, the checks are unncessary. I'll delete them.
 
-I don't know what Ming's referring to by "singlepage bvec bios".
-
-Anyways, bouncing comes up in multiple places so we probably need to come up
-with a generic solution for that. Other than that, there shouldn't be any issues
-or limitations - if you're not bouncing, there's no need to clone the bvecs.
+Thanks,
+Shaohua
