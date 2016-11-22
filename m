@@ -1,114 +1,114 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f54.google.com ([74.125.82.54]:37362 "EHLO
-        mail-wm0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932214AbcKROoP (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Nov 2016 09:44:15 -0500
-Received: by mail-wm0-f54.google.com with SMTP id t79so41897611wmt.0
-        for <linux-block@vger.kernel.org>; Fri, 18 Nov 2016 06:44:09 -0800 (PST)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH 09/20] lightnvm: remove unnecessary variables in rrpc
-Date: Fri, 18 Nov 2016 15:43:31 +0100
-Message-Id: <1479480222-18790-10-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1479480222-18790-1-git-send-email-javier@cnexlabs.com>
-References: <1479480222-18790-1-git-send-email-javier@cnexlabs.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <krisman@linux.vnet.ibm.com>
+From: Gabriel Krisman Bertazi <krisman@linux.vnet.ibm.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Gabriel Krisman Bertazi <krisman@linux.vnet.ibm.com>,
+        Brian King <brking@linux.vnet.ibm.com>,
+        Douglas Miller <dougmill@linux.vnet.ibm.com>,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
+Subject: [PATCH v2 2/2] blk-mq: Avoid memory reclaim when remapping queues
+Date: Tue, 22 Nov 2016 15:54:29 -0200
+In-Reply-To: <1479837269-5742-1-git-send-email-krisman@linux.vnet.ibm.com>
+References: <1479837269-5742-1-git-send-email-krisman@linux.vnet.ibm.com>
+Message-Id: <1479837269-5742-2-git-send-email-krisman@linux.vnet.ibm.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Before vectored I/Os were supported on rrpc, the physical address was
-stored as part of the nvm_rqd request. This variable become obsolete
-when the ppa_list was introduced. Cleanup this variable.
+While stressing memory and IO at the same time we changed SMT settings,
+we were able to consistently trigger deadlocks in the mm system, which
+froze the entire machine.
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
+I think that under memory stress conditions, the large allocations
+performed by blk_mq_init_rq_map may trigger a reclaim, which stalls
+waiting on the block layer remmaping completion, thus deadlocking the
+system.  The trace below was collected after the machine stalled,
+waiting for the hotplug event completion.
+
+The simplest fix for this is to make allocations in this path
+non-reclaimable, with GFP_NOIO.  With this patch, We couldn't hit the
+issue anymore.
+
+This should apply on top of Jen's for-next branch cleanly.
+
+Changes since v1:
+  - Use GFP_NOIO instead of GFP_NOWAIT.
+
+ Call Trace:
+[c000000f0160aaf0] [c000000f0160ab50] 0xc000000f0160ab50 (unreliable)
+[c000000f0160acc0] [c000000000016624] __switch_to+0x2e4/0x430
+[c000000f0160ad20] [c000000000b1a880] __schedule+0x310/0x9b0
+[c000000f0160ae00] [c000000000b1af68] schedule+0x48/0xc0
+[c000000f0160ae30] [c000000000b1b4b0] schedule_preempt_disabled+0x20/0x30
+[c000000f0160ae50] [c000000000b1d4fc] __mutex_lock_slowpath+0xec/0x1f0
+[c000000f0160aed0] [c000000000b1d678] mutex_lock+0x78/0xa0
+[c000000f0160af00] [d000000019413cac] xfs_reclaim_inodes_ag+0x33c/0x380 [xfs]
+[c000000f0160b0b0] [d000000019415164] xfs_reclaim_inodes_nr+0x54/0x70 [xfs]
+[c000000f0160b0f0] [d0000000194297f8] xfs_fs_free_cached_objects+0x38/0x60 [xfs]
+[c000000f0160b120] [c0000000003172c8] super_cache_scan+0x1f8/0x210
+[c000000f0160b190] [c00000000026301c] shrink_slab.part.13+0x21c/0x4c0
+[c000000f0160b2d0] [c000000000268088] shrink_zone+0x2d8/0x3c0
+[c000000f0160b380] [c00000000026834c] do_try_to_free_pages+0x1dc/0x520
+[c000000f0160b450] [c00000000026876c] try_to_free_pages+0xdc/0x250
+[c000000f0160b4e0] [c000000000251978] __alloc_pages_nodemask+0x868/0x10d0
+[c000000f0160b6f0] [c000000000567030] blk_mq_init_rq_map+0x160/0x380
+[c000000f0160b7a0] [c00000000056758c] blk_mq_map_swqueue+0x33c/0x360
+[c000000f0160b820] [c000000000567904] blk_mq_queue_reinit+0x64/0xb0
+[c000000f0160b850] [c00000000056a16c] blk_mq_queue_reinit_notify+0x19c/0x250
+[c000000f0160b8a0] [c0000000000f5d38] notifier_call_chain+0x98/0x100
+[c000000f0160b8f0] [c0000000000c5fb0] __cpu_notify+0x70/0xe0
+[c000000f0160b930] [c0000000000c63c4] notify_prepare+0x44/0xb0
+[c000000f0160b9b0] [c0000000000c52f4] cpuhp_invoke_callback+0x84/0x250
+[c000000f0160ba10] [c0000000000c570c] cpuhp_up_callbacks+0x5c/0x120
+[c000000f0160ba60] [c0000000000c7cb8] _cpu_up+0xf8/0x1d0
+[c000000f0160bac0] [c0000000000c7eb0] do_cpu_up+0x120/0x150
+[c000000f0160bb40] [c0000000006fe024] cpu_subsys_online+0x64/0xe0
+[c000000f0160bb90] [c0000000006f5124] device_online+0xb4/0x120
+[c000000f0160bbd0] [c0000000006f5244] online_store+0xb4/0xc0
+[c000000f0160bc20] [c0000000006f0a68] dev_attr_store+0x68/0xa0
+[c000000f0160bc60] [c0000000003ccc30] sysfs_kf_write+0x80/0xb0
+[c000000f0160bca0] [c0000000003cbabc] kernfs_fop_write+0x17c/0x250
+[c000000f0160bcf0] [c00000000030fe6c] __vfs_write+0x6c/0x1e0
+[c000000f0160bd90] [c000000000311490] vfs_write+0xd0/0x270
+[c000000f0160bde0] [c0000000003131fc] SyS_write+0x6c/0x110
+[c000000f0160be30] [c000000000009204] system_call+0x38/0xec
+
+Signed-off-by: Gabriel Krisman Bertazi <krisman@linux.vnet.ibm.com>
+Cc: Brian King <brking@linux.vnet.ibm.com>
+Cc: Douglas Miller <dougmill@linux.vnet.ibm.com>
+Cc: linux-block@vger.kernel.org
+Cc: linux-scsi@vger.kernel.org
 ---
- drivers/lightnvm/rrpc.c | 6 ------
- drivers/lightnvm/rrpc.h | 3 ---
- 2 files changed, 9 deletions(-)
+ block/blk-mq.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/lightnvm/rrpc.c b/drivers/lightnvm/rrpc.c
-index 9253acc..34d2ebf 100644
---- a/drivers/lightnvm/rrpc.c
-+++ b/drivers/lightnvm/rrpc.c
-@@ -758,7 +758,6 @@ static int rrpc_read_ppalist_rq(struct rrpc *rrpc, struct bio *bio,
- static int rrpc_read_rq(struct rrpc *rrpc, struct bio *bio, struct nvm_rq *rqd,
- 							unsigned long flags)
- {
--	struct rrpc_rq *rrqd = nvm_rq_to_pdu(rqd);
- 	int is_gc = flags & NVM_IOTYPE_GC;
- 	sector_t laddr = rrpc_get_laddr(bio);
- 	struct rrpc_addr *gp;
-@@ -778,7 +777,6 @@ static int rrpc_read_rq(struct rrpc *rrpc, struct bio *bio, struct nvm_rq *rqd,
- 	}
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 8cc58f23b2c2..db0eac3b9538 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1605,7 +1605,7 @@ static struct blk_mq_tags *blk_mq_init_rq_map(struct blk_mq_tag_set *set,
+ 	INIT_LIST_HEAD(&tags->page_list);
  
- 	rqd->opcode = NVM_OP_HBREAD;
--	rrqd->addr = gp;
+ 	tags->rqs = kzalloc_node(set->queue_depth * sizeof(struct request *),
+-				 GFP_KERNEL | __GFP_NOWARN | __GFP_NORETRY,
++				 GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY,
+ 				 set->numa_node);
+ 	if (!tags->rqs) {
+ 		blk_mq_free_tags(tags);
+@@ -1631,7 +1631,7 @@ static struct blk_mq_tags *blk_mq_init_rq_map(struct blk_mq_tag_set *set,
  
- 	return NVM_IO_OK;
- }
-@@ -821,7 +819,6 @@ static int rrpc_write_ppalist_rq(struct rrpc *rrpc, struct bio *bio,
- static int rrpc_write_rq(struct rrpc *rrpc, struct bio *bio,
- 				struct nvm_rq *rqd, unsigned long flags)
- {
--	struct rrpc_rq *rrqd = nvm_rq_to_pdu(rqd);
- 	struct rrpc_addr *p;
- 	int is_gc = flags & NVM_IOTYPE_GC;
- 	sector_t laddr = rrpc_get_laddr(bio);
-@@ -839,7 +836,6 @@ static int rrpc_write_rq(struct rrpc *rrpc, struct bio *bio,
- 
- 	rqd->ppa_addr = rrpc_ppa_to_gaddr(rrpc->dev, p->addr);
- 	rqd->opcode = NVM_OP_HBWRITE;
--	rrqd->addr = p;
- 
- 	return NVM_IO_OK;
- }
-@@ -1389,7 +1385,6 @@ static void *rrpc_init(struct nvm_dev *dev, struct gendisk *tdisk,
- 	INIT_WORK(&rrpc->ws_requeue, rrpc_requeue);
- 
- 	rrpc->nr_luns = lun_end - lun_begin + 1;
--	rrpc->total_blocks = (unsigned long)dev->blks_per_lun * rrpc->nr_luns;
- 	rrpc->nr_sects = (unsigned long long)dev->sec_per_lun * rrpc->nr_luns;
- 
- 	/* simple round-robin strategy */
-@@ -1409,7 +1404,6 @@ static void *rrpc_init(struct nvm_dev *dev, struct gendisk *tdisk,
- 	}
- 
- 	rrpc->poffset = dev->sec_per_lun * lun_begin;
--	rrpc->lun_offset = lun_begin;
- 
- 	ret = rrpc_core_init(rrpc);
- 	if (ret) {
-diff --git a/drivers/lightnvm/rrpc.h b/drivers/lightnvm/rrpc.h
-index 5e87d52..bed49ba 100644
---- a/drivers/lightnvm/rrpc.h
-+++ b/drivers/lightnvm/rrpc.h
-@@ -48,7 +48,6 @@ struct rrpc_inflight_rq {
- 
- struct rrpc_rq {
- 	struct rrpc_inflight_rq inflight_rq;
--	struct rrpc_addr *addr;
- 	unsigned long flags;
- };
- 
-@@ -92,14 +91,12 @@ struct rrpc {
- 
- 	sector_t soffset; /* logical sector offset */
- 	u64 poffset; /* physical page offset */
--	int lun_offset;
- 
- 	int nr_luns;
- 	struct rrpc_lun *luns;
- 
- 	/* calculated values */
- 	unsigned long long nr_sects;
--	unsigned long total_blocks;
- 
- 	/* Write strategy variables. Move these into each for structure for each
- 	 * strategy
+ 		do {
+ 			page = alloc_pages_node(set->numa_node,
+-				GFP_KERNEL | __GFP_NOWARN | __GFP_NORETRY | __GFP_ZERO,
++				GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY | __GFP_ZERO,
+ 				this_order);
+ 			if (page)
+ 				break;
+@@ -1652,7 +1652,7 @@ static struct blk_mq_tags *blk_mq_init_rq_map(struct blk_mq_tag_set *set,
+ 		 * Allow kmemleak to scan these pages as they contain pointers
+ 		 * to additional allocations like via ops->init_request().
+ 		 */
+-		kmemleak_alloc(p, order_to_size(this_order), 1, GFP_KERNEL);
++		kmemleak_alloc(p, order_to_size(this_order), 1, GFP_NOIO);
+ 		entries_per_page = order_to_size(this_order) / rq_size;
+ 		to_do = min(entries_per_page, set->queue_depth - i);
+ 		left -= to_do * rq_size;
 -- 
 2.7.4
-
