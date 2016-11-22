@@ -1,8 +1,15 @@
 Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-Date: Mon, 21 Nov 2016 23:28:44 -0800
-From: Christoph Hellwig <hch@infradead.org>
-To: Ming Lei <tom.leiming@gmail.com>
-Cc: Mike Snitzer <snitzer@redhat.com>, Jens Axboe <axboe@fb.com>,
+MIME-Version: 1.0
+In-Reply-To: <20161121144956.GB23051@redhat.com>
+References: <1478865957-25252-1-git-send-email-tom.leiming@gmail.com>
+ <1478865957-25252-8-git-send-email-tom.leiming@gmail.com> <20161121144956.GB23051@redhat.com>
+From: Ming Lei <tom.leiming@gmail.com>
+Date: Tue, 22 Nov 2016 08:26:19 +0800
+Message-ID: <CACVXFVOHLMC+qHZco7S675PnbbNQyDH+qobcjdtJEyTE41gEmw@mail.gmail.com>
+Subject: Re: [PATCH 07/12] dm: use bvec iterator helpers to implement
+ .get_page and .next_page
+To: Mike Snitzer <snitzer@redhat.com>
+Cc: Jens Axboe <axboe@fb.com>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         linux-block <linux-block@vger.kernel.org>,
         Linux FS Devel <linux-fsdevel@vger.kernel.org>,
@@ -12,17 +19,23 @@ Cc: Mike Snitzer <snitzer@redhat.com>, Jens Axboe <axboe@fb.com>,
         Shaohua Li <shli@kernel.org>,
         "open list:SOFTWARE RAID (Multiple Disks) SUPPORT"
         <linux-raid@vger.kernel.org>
-Subject: Re: [PATCH 07/12] dm: use bvec iterator helpers to implement
- .get_page and .next_page
-Message-ID: <20161122072844.GA21761@infradead.org>
-References: <1478865957-25252-1-git-send-email-tom.leiming@gmail.com>
- <1478865957-25252-8-git-send-email-tom.leiming@gmail.com>
- <20161121144956.GB23051@redhat.com>
- <CACVXFVOHLMC+qHZco7S675PnbbNQyDH+qobcjdtJEyTE41gEmw@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CACVXFVOHLMC+qHZco7S675PnbbNQyDH+qobcjdtJEyTE41gEmw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Jens, can you apply the non-dm patches?
+On Mon, Nov 21, 2016 at 10:49 PM, Mike Snitzer <snitzer@redhat.com> wrote:
+> On Fri, Nov 11 2016 at  7:05am -0500,
+> Ming Lei <tom.leiming@gmail.com> wrote:
+>
+>> Firstly we have mature bvec/bio iterator helper for iterate each
+>> page in one bio, not necessary to reinvent a wheel to do that.
+>>
+>> Secondly the coming multipage bvecs requires this patch.
+>>
+>> Also add comments about the direct access to bvec table.
+>>
+>> Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+>
+> I've staged this for 4.10
+
+Thanks Mike!
