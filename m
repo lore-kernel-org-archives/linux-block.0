@@ -1,69 +1,70 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Ming Lei <tom.leiming@gmail.com>
-To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Ming Lei <tom.leiming@gmail.com>,
-        Kent Overstreet <kent.overstreet@gmail.com>,
-        Shaohua Li <shli@kernel.org>,
-        Mike Christie <mchristi@redhat.com>,
-        Guoqing Jiang <gqjiang@suse.com>,
-        linux-bcache@vger.kernel.org (open list:BCACHE (BLOCK LAYER CACHE)),
-        linux-raid@vger.kernel.org (open list:SOFTWARE RAID (Multiple Disks)
-        SUPPORT)
-Subject: [PATCH 05/12] bcache: debug: avoid to access .bi_io_vec directly
-Date: Fri, 11 Nov 2016 20:05:33 +0800
-Message-Id: <1478865957-25252-6-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1478865957-25252-1-git-send-email-tom.leiming@gmail.com>
+Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
+Subject: Re: [PATCH 00/12] block: cleanup direct access to bvec table
+To: Ming Lei <tom.leiming@gmail.com>, <linux-kernel@vger.kernel.org>
 References: <1478865957-25252-1-git-send-email-tom.leiming@gmail.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+From: Jens Axboe <axboe@fb.com>
+Message-ID: <167c2511-349f-a8e6-17d1-f7ce438b2f14@fb.com>
+Date: Tue, 22 Nov 2016 08:53:00 -0700
+MIME-Version: 1.0
+In-Reply-To: <1478865957-25252-1-git-send-email-tom.leiming@gmail.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
+List-Post: <mailto:linux-nvme@lists.infradead.org>
+List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
+Cc: Mike Snitzer <snitzer@redhat.com>,
+ Rasmus Villemoes <linux@rasmusvillemoes.dk>, "open
+ list:NVM EXPRESS TARGET DRIVER" <linux-nvme@lists.infradead.org>,
+ Keith Busch <keith.busch@intel.com>, "open
+ list:DEVICE-MAPPER \(LVM\)" <dm-devel@redhat.com>, "open
+ list:TARGET SUBSYSTEM" <target-devel@vger.kernel.org>,
+ Yijing Wang <wangyijing@huawei.com>,
+ "open list:DRBD DRIVER" <drbd-dev@lists.linbit.com>,
+ Hannes Reinecke <hare@suse.com>,
+ "open list:TARGET SUBSYSTEM" <linux-scsi@vger.kernel.org>,
+ Christoph Hellwig <hch@infradead.org>, Mike Christie <mchristi@redhat.com>,
+ Guoqing Jiang <gqjiang@suse.com>, Johannes Thumshirn <jthumshirn@suse.de>,
+ Kent Overstreet <kent.overstreet@gmail.com>, Coly Li <colyli@suse.de>, "open
+ list:SOFTWARE RAID \(Multiple Disks\) SUPPORT" <linux-raid@vger.kernel.org>,
+ "open list:BCACHE \(BLOCK LAYER CACHE\)" <linux-bcache@vger.kernel.org>,
+ linux-block@vger.kernel.org, Jiri Kosina <jkosina@suse.cz>,
+ Adrian Hunter <adrian.hunter@intel.com>, "open list:LogFS" <logfs@logfs.org>,
+ Zheng Liu <wenqing.lz@taobao.com>, linux-fsdevel@vger.kernel.org,
+ Eric Wheeler <git@linux.ewheeler.net>
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
+Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
 List-ID: <linux-block@vger.kernel.org>
 
-Instead we use standard iterator way to do that.
+On 11/11/2016 05:05 AM, Ming Lei wrote:
+> Hi,
+>
+> This patchset cleans up direct access to bvec table.
+>
+> The 1st patch passes bvec table to bio_init(), so that
+> direct access to bvec table in bio initialization is avoided.
+>
+> For other patches, most of them uses bio_add_page()
+> to replace hardcode style of adding page to bvec,
+> and others avoids to access bio->bi_vcnt.
+>
+> The most special one is to use bvec iterator helpers
+> to implement .get_page/.next_page for dm-io.c
+>
+> One big motivation is to prepare for supporting multipage
+> bvec, but this patchset is one good cleanup too even not
+> for that purpose.
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
----
- drivers/md/bcache/debug.c | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+I've added the series, except 6-8, the dm parts. I updated some of the
+descriptions/subjects to read a little better.
 
-diff --git a/drivers/md/bcache/debug.c b/drivers/md/bcache/debug.c
-index 1c9130ae0073..06f55056aaae 100644
---- a/drivers/md/bcache/debug.c
-+++ b/drivers/md/bcache/debug.c
-@@ -107,8 +107,8 @@ void bch_data_verify(struct cached_dev *dc, struct bio *bio)
- {
- 	char name[BDEVNAME_SIZE];
- 	struct bio *check;
--	struct bio_vec bv;
--	struct bvec_iter iter;
-+	struct bio_vec bv, cbv;
-+	struct bvec_iter iter, citer = { 0 };
- 
- 	check = bio_clone(bio, GFP_NOIO);
- 	if (!check)
-@@ -120,9 +120,13 @@ void bch_data_verify(struct cached_dev *dc, struct bio *bio)
- 
- 	submit_bio_wait(check);
- 
-+	citer.bi_size = UINT_MAX;
- 	bio_for_each_segment(bv, bio, iter) {
- 		void *p1 = kmap_atomic(bv.bv_page);
--		void *p2 = page_address(check->bi_io_vec[iter.bi_idx].bv_page);
-+		void *p2;
-+
-+		cbv = bio_iter_iovec(check, citer);
-+		p2 = page_address(cbv.bv_page);
- 
- 		cache_set_err_on(memcmp(p1 + bv.bv_offset,
- 					p2 + bv.bv_offset,
-@@ -133,6 +137,7 @@ void bch_data_verify(struct cached_dev *dc, struct bio *bio)
- 				 (uint64_t) bio->bi_iter.bi_sector);
- 
- 		kunmap_atomic(p1);
-+		bio_advance_iter(check, &citer, bv.bv_len);
- 	}
- 
- 	bio_free_pages(check);
 -- 
-2.7.4
+Jens Axboe
 
+
+_______________________________________________
+Linux-nvme mailing list
+Linux-nvme@lists.infradead.org
+http://lists.infradead.org/mailman/listinfo/linux-nvme
