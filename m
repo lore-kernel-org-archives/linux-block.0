@@ -1,69 +1,65 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv5 03/36] page-flags: relax page flag policy for few flags
-Date: Tue, 29 Nov 2016 14:22:31 +0300
-Message-Id: <20161129112304.90056-4-kirill.shutemov@linux.intel.com>
-In-Reply-To: <20161129112304.90056-1-kirill.shutemov@linux.intel.com>
-References: <20161129112304.90056-1-kirill.shutemov@linux.intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f52.google.com ([74.125.82.52]:35730 "EHLO
+        mail-wm0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S936362AbcKWMQR (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 23 Nov 2016 07:16:17 -0500
+Received: by mail-wm0-f52.google.com with SMTP id a197so75283015wmd.0
+        for <linux-block@vger.kernel.org>; Wed, 23 Nov 2016 04:16:16 -0800 (PST)
+Content-Type: text/plain; charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 10.1 \(3251\))
+Subject: Re: [PATCH 0/8] lightnvm: simplify media manager V2
+From: =?utf-8?Q?Javier_Gonz=C3=A1lez?= <jg@lightnvm.io>
+In-Reply-To: <a61ef190-d698-d388-55e0-3f406f6181b9@lightnvm.io>
+Date: Wed, 23 Nov 2016 13:08:06 +0100
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Message-Id: <AF90E9BB-7E1E-45A8-B6D9-A66976E477D8@lightnvm.io>
+References: <1479730237-20797-1-git-send-email-javier@cnexlabs.com>
+ <a61ef190-d698-d388-55e0-3f406f6181b9@lightnvm.io>
+To: =?utf-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-These flags are in use for filesystems with backing storage: PG_error,
-PG_writeback and PG_readahead.
+> On 23 Nov 2016, at 13.06, Matias Bj=C3=B8rling <mb@lightnvm.io> wrote:
+>=20
+> On 11/21/2016 01:10 PM, Javier Gonz=C3=A1lez wrote:
+>> V2:
+>>  - Fix 2 bad memory free on error rrpc init error handling. Reported =
+by
+>>    kbuild.
+>>=20
+>> This patchset simplifies the generic media manager interface and =
+moves
+>> lun and block functionality to lightnvm targets. This makes that
+>> rrpc-specific functionality is not exposed on the media manager. This =
+is
+>> done in preparation for the pblk target.
+>>=20
+>> Javier Gonz=C3=A1lez (8):
+>>  lightnvm: move block provisioning to targets
+>>  lightnvm: remove get_lun operation on gennvm
+>>  lightnvm: remove debug lun statistics from gennvm
+>>  lightnvm: eliminate nvm_block abstraction on mm
+>>  lightnvm: eliminate nvm_lun abstraction in mm
+>>  lightnvm: introduce helpers for generic ops in rrpc
+>>  lightnvm: introduce max_phys_sects helper function
+>>  lightnvm: use target nvm on target-specific ops.
+>>=20
+>> drivers/lightnvm/core.c      | 154 ++++++-----
+>> drivers/lightnvm/gennvm.c    | 612 =
+++++++++++++++++++++-----------------------
+>> drivers/lightnvm/gennvm.h    |  20 +-
+>> drivers/lightnvm/rrpc.c      | 443 +++++++++++++++++++++----------
+>> drivers/lightnvm/rrpc.h      |  62 ++++-
+>> drivers/lightnvm/sysblk.c    |  65 +++--
+>> drivers/nvme/host/lightnvm.c |  14 +-
+>> include/linux/lightnvm.h     | 217 +++++++--------
+>> 8 files changed, 885 insertions(+), 702 deletions(-)
+>=20
+> Thanks Javier. Picked up for 4.10. Please note I fixed up an
+> initialization bug with null_blk device in the "lightnvm: introduce
+> helpers for generic ops in rrpc" patch.
 
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
----
- include/linux/page-flags.h | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+Great. Thanks!
 
-diff --git a/include/linux/page-flags.h b/include/linux/page-flags.h
-index 74e4dda91238..a2bef9a41bcf 100644
---- a/include/linux/page-flags.h
-+++ b/include/linux/page-flags.h
-@@ -253,7 +253,7 @@ static inline int TestClearPage##uname(struct page *page) { return 0; }
- 	TESTSETFLAG_FALSE(uname) TESTCLEARFLAG_FALSE(uname)
- 
- __PAGEFLAG(Locked, locked, PF_NO_TAIL)
--PAGEFLAG(Error, error, PF_NO_COMPOUND) TESTCLEARFLAG(Error, error, PF_NO_COMPOUND)
-+PAGEFLAG(Error, error, PF_NO_TAIL) TESTCLEARFLAG(Error, error, PF_NO_TAIL)
- PAGEFLAG(Referenced, referenced, PF_HEAD)
- 	TESTCLEARFLAG(Referenced, referenced, PF_HEAD)
- 	__SETPAGEFLAG(Referenced, referenced, PF_HEAD)
-@@ -293,15 +293,15 @@ PAGEFLAG(OwnerPriv1, owner_priv_1, PF_ANY)
-  * Only test-and-set exist for PG_writeback.  The unconditional operators are
-  * risky: they bypass page accounting.
-  */
--TESTPAGEFLAG(Writeback, writeback, PF_NO_COMPOUND)
--	TESTSCFLAG(Writeback, writeback, PF_NO_COMPOUND)
-+TESTPAGEFLAG(Writeback, writeback, PF_NO_TAIL)
-+	TESTSCFLAG(Writeback, writeback, PF_NO_TAIL)
- PAGEFLAG(MappedToDisk, mappedtodisk, PF_NO_TAIL)
- 
- /* PG_readahead is only used for reads; PG_reclaim is only for writes */
- PAGEFLAG(Reclaim, reclaim, PF_NO_TAIL)
- 	TESTCLEARFLAG(Reclaim, reclaim, PF_NO_TAIL)
--PAGEFLAG(Readahead, reclaim, PF_NO_COMPOUND)
--	TESTCLEARFLAG(Readahead, reclaim, PF_NO_COMPOUND)
-+PAGEFLAG(Readahead, reclaim, PF_NO_TAIL)
-+	TESTCLEARFLAG(Readahead, reclaim, PF_NO_TAIL)
- 
- #ifdef CONFIG_HIGHMEM
- /*
--- 
-2.10.2
-
+Javier=
