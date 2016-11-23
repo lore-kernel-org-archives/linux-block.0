@@ -1,40 +1,50 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f45.google.com ([74.125.82.45]:36573 "EHLO
-        mail-wm0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754747AbcKJL0m (ORCPT
+Received: from mail-qt0-f173.google.com ([209.85.216.173]:34607 "EHLO
+        mail-qt0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755788AbcKWVLN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Nov 2016 06:26:42 -0500
-Received: by mail-wm0-f45.google.com with SMTP id g23so34689391wme.1
-        for <linux-block@vger.kernel.org>; Thu, 10 Nov 2016 03:26:41 -0800 (PST)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        axboe@fb.com
-Cc: keith.busch@intel.com,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [PATCH] LightNVM fix for 4.9-rc5
-Date: Thu, 10 Nov 2016 12:26:30 +0100
-Message-Id: <1478777191-10160-1-git-send-email-m@bjorling.me>
+        Wed, 23 Nov 2016 16:11:13 -0500
+Date: Wed, 23 Nov 2016 16:11:10 -0500
+From: Tejun Heo <tj@kernel.org>
+To: Shaohua Li <shli@fb.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Kernel-team@fb.com, axboe@fb.com, vgoyal@redhat.com
+Subject: Re: [PATCH V4 02/15] blk-throttle: add .high interface
+Message-ID: <20161123211018.GA11306@mtj.duckdns.org>
+References: <cover.1479161136.git.shli@fb.com>
+ <239e20c62e028b570f48403faea1419c4d84f2bd.1479161136.git.shli@fb.com>
+ <20161122200253.GA17534@htj.duckdns.org>
+ <20161122230836.GA14628@shli-mbp.local>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20161122230836.GA14628@shli-mbp.local>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hi Jens,
+Hello,
 
-A small calculation bug sneaked into 4.9, which led to data loss using the rrpc
-FTL.
+On Tue, Nov 22, 2016 at 03:08:36PM -0800, Shaohua Li wrote:
+> Yep, the limit could be high or max. It's doable moving the restrictions on
+> input, but will increase trouble using the limits. If high is bigger than max,
+> can I set high to max? if not, I'd prefer to keep the restrictions.
 
-Can the fix be picked up for next -rc, or should I mark it for stable after the
-4.9 release?
+You can do that internally but userland should keep seeing what it
+configured.
 
--Matias
+> > I haven't read the whole thing yet but this looks a bit suspicious.  A
+> > css going offline indicates that the destruction of the css started.
+> > I don't get why that'd reset high limits.  There can be a lot of async
+> > IOs after offline.
+> 
+> Ok. We do want to reset the limits. Because if no cgroup has high limit, we
+> definitively should use max limit for all cgroups. The whole state machine
+> (switching between high and max limit) is meaningless in that case.
+> 
+> Is pd_free_fn a good place to guarantee anyc IOs finish?
 
-Matias Bjørling (1):
-  lightnvm: invalid offset calculation for lba_shift
+Yeap.
 
- drivers/nvme/host/lightnvm.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Thanks.
 
 -- 
-2.1.4
-
+tejun
