@@ -1,56 +1,89 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f195.google.com ([209.85.192.195]:35220 "EHLO
-        mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933254AbcKKMHA (ORCPT
+Received: from mail-qk0-f193.google.com ([209.85.220.193]:33786 "EHLO
+        mail-qk0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753015AbcKXQGp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 11 Nov 2016 07:07:00 -0500
-From: Ming Lei <tom.leiming@gmail.com>
-To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Ming Lei <tom.leiming@gmail.com>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        dm-devel@redhat.com (maintainer:DEVICE-MAPPER (LVM)),
-        Shaohua Li <shli@kernel.org>,
-        linux-raid@vger.kernel.org (open list:SOFTWARE RAID (Multiple Disks)
-        SUPPORT)
-Subject: [PATCH 08/12] dm: dm.c: replace 'bio->bi_vcnt == 1' with !bio_multiple_segments
-Date: Fri, 11 Nov 2016 20:05:36 +0800
-Message-Id: <1478865957-25252-9-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1478865957-25252-1-git-send-email-tom.leiming@gmail.com>
-References: <1478865957-25252-1-git-send-email-tom.leiming@gmail.com>
+        Thu, 24 Nov 2016 11:06:45 -0500
+MIME-Version: 1.0
+In-Reply-To: <877f7tbi20.fsf@notabene.neil.brown.name>
+References: <147944614789.3302.1959091446949640579.stgit@noble>
+ <CA+res+TZD2Lx4CaGPx6SjTc6VKGLUc=qyYBgi15oSYU1bBuHew@mail.gmail.com> <877f7tbi20.fsf@notabene.neil.brown.name>
+From: Jack Wang <jack.wang.usish@gmail.com>
+Date: Thu, 24 Nov 2016 17:06:43 +0100
+Message-ID: <CA+res+RAfMahJqsUboqYzUmfzKmvNY1WO_EbwxfNb4iT+_Rf+w@mail.gmail.com>
+Subject: Re: [PATCH/RFC] add "failfast" support for raid1/raid10.
+To: NeilBrown <neilb@suse.com>
+Cc: Shaohua Li <shli@kernel.org>,
+        linux-raid <linux-raid@vger.kernel.org>,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        linux-kernel@vger.kernel.org, hare@suse.de
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Avoid to access .bi_vcnt directly, because the bio can be
-splitted from block layer, and .bi_vcnt should never have
-been used here.
+Hi Neil,
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
----
- drivers/md/dm-rq.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+2016-11-24 5:47 GMT+01:00 NeilBrown <neilb@suse.com>:
+> On Sat, Nov 19 2016, Jack Wang wrote:
+>
+>> 2016-11-18 6:16 GMT+01:00 NeilBrown <neilb@suse.com>:
+>>> Hi,
+>>>
+>>>  I've been sitting on these patches for a while because although they
+>>>  solve a real problem, it is a fairly limited use-case, and I don't
+>>>  really like some of the details.
+>>>
+>>>  So I'm posting them as RFC in the hope that a different perspective
+>>>  might help me like them better, or find a better approach.
+>>>
+>>>  The core idea is that when you have multiple copies of data
+>>>  (i.e. mirrored drives) it doesn't make sense to wait for a read from
+>>>  a drive that seems to be having problems.  It will probably be faster
+>>>  to just cancel that read, and read from the other device.
+>>>  Similarly, in some circumstances, it might be better to fail a drive
+>>>  that is being slow to respond to writes, rather than cause all writes
+>>>  to be very slow.
+>>>
+>>>  The particular context where this comes up is when mirroring across
+>>>  storage arrays, where the storage arrays can temporarily take an
+>>>  unusually long time to respond to requests (firmware updates have
+>>>  been mentioned).  As the array will have redundancy internally, there
+>>>  is little risk to the data.  The mirrored pair is really only for
+>>>  disaster recovery, and it is deemed better to lose the last few
+>>>  minutes of updates in the case of a serious disaster, rather than
+>>>  occasionally having latency issues because one array needs to do some
+>>>  maintenance for a few minutes.  The particular storage arrays in
+>>>  question are DASD devices which are part of the s390 ecosystem.
+>>
+>> Hi Neil,
+>>
+>> Thanks for pushing this feature also to mainline.
+>> We at Profitbricks use raid1 across IB network, one pserver with
+>> raid1, both legs on 2 remote storages.
+>> We've noticed if one remote storage crash , and raid1 still keep
+>> sending IO to the faulty leg, even after 5 minutes,
+>> md still redirect I/Os, and md refuse to remove active disks, eg:
+>
+> That make sense.  It cannot remove the active disk until all pending IO
+> completes, either with an error or with success.
+>
+> If the target has a long timeout, that can delay progress a lot.
+>
+>>
+>> I tried to port you patch from SLES[1], with the patchset, it reduce
+>> the time to ~30 seconds.
+>>
+>> I'm happy to see this feature upstream :)
+>> I will test again this new patchset.
+>
+> Thanks for your confirmation that this is more generally useful than I
+> thought, and I'm always happy to hear for more testing :-)
+>
+> Thanks,
+> NeilBrown
 
-diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
-index b2a9e2d161e4..d9cc8324e597 100644
---- a/drivers/md/dm-rq.c
-+++ b/drivers/md/dm-rq.c
-@@ -797,8 +797,13 @@ static void dm_old_request_fn(struct request_queue *q)
- 		if (req_op(rq) != REQ_OP_FLUSH)
- 			pos = blk_rq_pos(rq);
- 
-+		/*
-+		 * bio can be splitted from block layer, so use
-+		 * !bio_multiple_segments instead of 'bio->bi_vcnt == 1'
-+		 */
- 		if ((dm_old_request_peeked_before_merge_deadline(md) &&
--		     md_in_flight(md) && rq->bio && rq->bio->bi_vcnt == 1 &&
-+		     md_in_flight(md) && rq->bio &&
-+		     !bio_multiple_segments(rq->bio) &&
- 		     md->last_rq_pos == pos && md->last_rq_rw == rq_data_dir(rq)) ||
- 		    (ti->type->busy && ti->type->busy(ti))) {
- 			blk_delay_queue(q, 10);
--- 
-2.7.4
+Just want to update test result, so far it's working fine, no regression :)
+Will report if anything breaks.
 
+Thanks
+Jack
