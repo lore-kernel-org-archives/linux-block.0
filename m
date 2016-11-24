@@ -1,57 +1,35 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f51.google.com ([74.125.82.51]:35864 "EHLO
-        mail-wm0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753022AbcKROn7 (ORCPT
+Received: from userp1040.oracle.com ([156.151.31.81]:33152 "EHLO
+        userp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S964981AbcKXLfB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Nov 2016 09:43:59 -0500
-Received: by mail-wm0-f51.google.com with SMTP id g23so42645615wme.1
-        for <linux-block@vger.kernel.org>; Fri, 18 Nov 2016 06:43:59 -0800 (PST)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <jg@lightnvm.io>,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [PATCH 02/20] lightnvm: do not protect block 0
-Date: Fri, 18 Nov 2016 15:43:24 +0100
-Message-Id: <1479480222-18790-3-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1479480222-18790-1-git-send-email-javier@cnexlabs.com>
-References: <1479480222-18790-1-git-send-email-javier@cnexlabs.com>
+        Thu, 24 Nov 2016 06:35:01 -0500
+Date: Thu, 24 Nov 2016 14:34:07 +0300
+From: Dan Carpenter <dan.carpenter@oracle.com>
+To: linux-block@vger.kernel.org, Jens Axboe <axboe@fb.com>
+Cc: kernel-janitors@vger.kernel.org,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Subject: [patch] swim3: remove some dead code
+Message-ID: <20161124112817.GO17225@mwanda>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Javier González <jg@lightnvm.io>
+The goto is correct.  "rc" is already set to -EBUSY so there is no need
+to do anything with that.
 
-Device blocks should be marked by the device and considered as bad
-blocks by the media manager. Thus, do not make assumptions on which
-blocks are going to be used by the device. In doing so we might lose
-valid blocks from the free list.
+Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <m@bjorling.me>
----
- drivers/lightnvm/gennvm.c | 6 ------
- 1 file changed, 6 deletions(-)
-
-diff --git a/drivers/lightnvm/gennvm.c b/drivers/lightnvm/gennvm.c
-index 730d736..a7e17fa 100644
---- a/drivers/lightnvm/gennvm.c
-+++ b/drivers/lightnvm/gennvm.c
-@@ -371,12 +371,6 @@ static int gen_blocks_init(struct nvm_dev *dev, struct gen_dev *gn)
- 			block->lun = &lun->vlun;
- 			block->id = cur_block_id++;
+diff --git a/drivers/block/swim3.c b/drivers/block/swim3.c
+index c264f2d..59b4a41 100644
+--- a/drivers/block/swim3.c
++++ b/drivers/block/swim3.c
+@@ -1179,7 +1179,6 @@ static int swim3_add_device(struct macio_dev *mdev, int index)
+ 		swim3_err("%s", "Couldn't request interrupt\n");
+ 		pmac_call_feature(PMAC_FTR_SWIM3_ENABLE, swim, 0, 0);
+ 		goto out_unmap;
+-		return -EBUSY;
+ 	}
  
--			/* First block is reserved for device */
--			if (unlikely(lun_iter == 0 && blk_iter == 0)) {
--				lun->vlun.nr_free_blocks--;
--				continue;
--			}
--
- 			list_add_tail(&block->list, &lun->free_list);
- 		}
- 
--- 
-2.7.4
-
+ 	init_timer(&fs->timeout);
