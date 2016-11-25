@@ -1,103 +1,144 @@
-Return-Path: <Damien.LeMoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Shaun Tancheff <shaun@tancheff.com>,
-	Damien Le Moal <damien.lemoal@wdc.com>
-Subject: [PATCH v2] block: Check partition alignment on zoned block devices
-Date: Thu,  1 Dec 2016 09:22:15 +0900
-Message-Id: <1480551735-9288-1-git-send-email-damien.lemoal@wdc.com>
+Return-Path: <dvyukov@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: damien.lemoal@wdc.com
+From: Dmitry Vyukov <dvyukov@google.com>
+Date: Fri, 25 Nov 2016 20:08:17 +0100
+Message-ID: <CACT4Y+aBd+1pssnsVx2x145n7Q1nDMU=xc7NAiOCtpy-MA-EDg@mail.gmail.com>
+Subject: scsi: use-after-free in bio_copy_from_iter
+To: Doug Gilbert <dgilbert@interlog.com>, jejb@linux.vnet.ibm.com,
+	"Martin K. Petersen" <martin.petersen@oracle.com>, linux-scsi <linux-scsi@vger.kernel.org>,
+	LKML <linux-kernel@vger.kernel.org>, axboe@kernel.dk, linux-block@vger.kernel.org
+Cc: syzkaller <syzkaller@googlegroups.com>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
-Both blkdev_report_zones and blkdev_reset_zones can operate on a partition of
-a zoned block device. However, the first and last zones reported for a
-partition make sense only if the partition start sector and size are aligned
-on the device zone size. The same applies for zone reset. Resetting the first
-or the last zone of a partition straddling zones may impact neighboring
-partitions. Finally, if a partition start sector is not at the beginning of a
-sequential zone, it will be impossible to write to the first sectors of the
-partition on a host-managed device.
-Avoid all these problems and incoherencies by ignoring partitions that are not
-zone aligned.
+Hello,
 
-Note: Even with CONFIG_BLK_DEV_ZONED disabled, bdev_is_zoned() will report the
-correct disk zoning type (host-aware, host-managed or none) but
-bdev_zone_size() will always return 0 for zoned block devices (i.e. the zone
-size is unknown). So test this as a way to ensure that a zoned block device is
-being handled as such. As a result, for a host-aware devices, unaligned zone
-partitions will be accepted with CONFIG_BLK_DEV_ZONED disabled. That is, the
-disk will be treated as a regular block device (as it should). If zoned block
-device support is enabled, only aligned partitions will be accepted.
+The following program triggers use-after-free in bio_copy_from_iter:
+https://gist.githubusercontent.com/dvyukov/80cd94b4e4c288f16ee4c787d404118b/raw/10536069562444da51b758bb39655b514ff93b45/gistfile1.txt
 
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
----
- block/partition-generic.c | 40 ++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 40 insertions(+)
 
-diff --git a/block/partition-generic.c b/block/partition-generic.c
-index 71d9ed9..3bb9f13 100644
---- a/block/partition-generic.c
-+++ b/block/partition-generic.c
-@@ -430,6 +430,27 @@ static int drop_partitions(struct gendisk *disk, struct block_device *bdev)
- 	return 0;
- }
- 
-+static bool part_zone_aligned(struct gendisk *disk,
-+			      struct block_device *bdev,
-+			      sector_t from, sector_t size)
-+{
-+	sector_t zone_size = bdev_zone_size(bdev);
-+
-+	/* Check partition start alignement */
-+	if (from & (zone_size - 1))
-+		return false;
-+
-+	/*
-+	 * Check partition end alignement.
-+	 * Ignore eventual last smaller zone.
-+	 */
-+	if ((from + size) < get_capacity(disk) &&
-+	    (size & (zone_size - 1)))
-+		return false;
-+
-+	return true;
-+}
-+
- int rescan_partitions(struct gendisk *disk, struct block_device *bdev)
- {
- 	struct parsed_partitions *state = NULL;
-@@ -529,6 +550,25 @@ int rescan_partitions(struct gendisk *disk, struct block_device *bdev)
- 			}
- 		}
- 
-+		/*
-+		 * On a zoned block device, partitions should be aligned on the
-+		 * device zone size (i.e. zone boundary crossing not allowed).
-+		 * Otherwise, resetting the write pointer of the last zone of
-+		 * one partition may impact the following partition. Note that
-+		 * bdev_is_zoned() always returns the correct device zoning type
-+		 * (host-aware, host-managed or none), even when support for
-+		 * zoned block devices is disabled. However, in this last case,
-+		 * the zone size will be reported as 0.
-+		 */
-+		if (bdev_is_zoned(bdev) &&
-+		    bdev_zone_size(bdev) &&
-+		    !part_zone_aligned(disk, bdev, from, size)) {
-+			printk(KERN_WARNING
-+			       "%s: p%d start %llu is not zone unaligned\n",
-+			       disk->disk_name, p, (unsigned long long) from);
-+			continue;
-+		}
-+
- 		part = add_partition(disk, p, from, size,
- 				     state->parts[p].flags,
- 				     &state->parts[p].info);
--- 
-2.7.4
+==================================================================
+BUG: KASAN: use-after-free in copy_from_iter+0xf30/0x15e0 at addr
+ffff880062c6e02a
+Read of size 4096 by task a.out/8529
+page:ffffea00018b1b80 count:2 mapcount:0 mapping:ffff88006c80e9d0 index:0x1695
+flags: 0x5fffc0000000864(referenced|lru|active|private)
+page dumped because: kasan: bad access detected
+page->mem_cgroup:ffff88003ebcea00
+CPU: 1 PID: 8529 Comm: a.out Not tainted 4.9.0-rc6+ #55
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Bochs 01/01/2011
+ ffff880039ca6770 ffffffff834c3bb9 ffffffff00000001 1ffff10007394c81
+ ffffed0007394c79 0000000041b58ab3 ffffffff89575c30 ffffffff834c38cb
+ 0000000000000000 0000000000000000 0000000000000001 0000000000000000
+Call Trace:
+ [<     inline     >] __dump_stack lib/dump_stack.c:15
+ [<ffffffff834c3bb9>] dump_stack+0x2ee/0x3f5 lib/dump_stack.c:51
+ [<     inline     >] print_address_description mm/kasan/report.c:211
+ [<     inline     >] kasan_report_error mm/kasan/report.c:285
+ [<ffffffff819f18b8>] kasan_report+0x418/0x440 mm/kasan/report.c:305
+ [<     inline     >] check_memory_region_inline mm/kasan/kasan.c:308
+ [<ffffffff819f0509>] check_memory_region+0x139/0x190 mm/kasan/kasan.c:315
+ [<ffffffff819f0a43>] memcpy+0x23/0x50 mm/kasan/kasan.c:350
+ [<ffffffff83525d10>] copy_from_iter+0xf30/0x15e0 lib/iov_iter.c:559
+ [<ffffffff83526834>] copy_page_from_iter+0x474/0x860 lib/iov_iter.c:614
+ [<     inline     >] bio_copy_from_iter block/bio.c:1025
+ [<ffffffff833dfc10>] bio_copy_user_iov+0xb50/0xf10 block/bio.c:1226
+ [<     inline     >] __blk_rq_map_user_iov block/blk-map.c:56
+ [<ffffffff83421c15>] blk_rq_map_user_iov+0x295/0x930 block/blk-map.c:130
+ [<ffffffff834223e9>] blk_rq_map_user+0x139/0x1e0 block/blk-map.c:159
+ [<     inline     >] sg_start_req drivers/scsi/sg.c:1757
+ [<ffffffff8470269a>] sg_common_write.isra.20+0x12da/0x1b20
+drivers/scsi/sg.c:772
+ [<ffffffff8470774a>] sg_write+0x78a/0xda0 drivers/scsi/sg.c:675
+ [<ffffffff81a6fabe>] __vfs_write+0x65e/0x830 fs/read_write.c:510
+ [<ffffffff81a6fd7c>] __kernel_write+0xec/0x340 fs/read_write.c:532
+ [<ffffffff81b41e7c>] write_pipe_buf+0x19c/0x260 fs/splice.c:814
+ [<     inline     >] splice_from_pipe_feed fs/splice.c:519
+ [<ffffffff81b426af>] __splice_from_pipe+0x31f/0x750 fs/splice.c:643
+ [<ffffffff81b45dcc>] splice_from_pipe+0x1dc/0x300 fs/splice.c:678
+ [<ffffffff81b45f95>] default_file_splice_write+0x45/0x90 fs/splice.c:826
+ [<     inline     >] do_splice_from fs/splice.c:868
+ [<ffffffff81b3e2ba>] direct_splice_actor+0x12a/0x190 fs/splice.c:1035
+ [<ffffffff81b40706>] splice_direct_to_actor+0x2c6/0x840 fs/splice.c:990
+ [<ffffffff81b40f4e>] do_splice_direct+0x2ce/0x470 fs/splice.c:1078
+ [<ffffffff81a7459f>] do_sendfile+0x73f/0x1060 fs/read_write.c:1401
+ [<     inline     >] SYSC_sendfile64 fs/read_write.c:1456
+ [<ffffffff81a7677e>] SyS_sendfile64+0xee/0x1a0 fs/read_write.c:1448
+ [<ffffffff8814cf85>] entry_SYSCALL_64_fastpath+0x23/0xc6
+arch/x86/entry/entry_64.S:209
+Memory state around the buggy address:
+ ffff880062c6ef00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+ ffff880062c6ef80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>ffff880062c6f000: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+                   ^
+ ffff880062c6f080: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+ ffff880062c6f100: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+==================================================================
+Disabling lock debugging due to kernel taint
+BUG: unable to handle kernel paging request at ffff880062c6f000
+IP: [<ffffffff835051c2>] __memcpy+0x12/0x20 arch/x86/lib/memcpy_64.S:37
+PGD c53d067 [  494.351750] PUD c540067
+PMD 7fdea067 [  494.351750] PTE 8000000062c6f060
 
-Western Digital Corporation (and its subsidiaries) E-mail Confidentiality Notice & Disclaimer:
+Oops: 0000 [#1] SMP DEBUG_PAGEALLOC KASAN
+Modules linked in:
+CPU: 1 PID: 8529 Comm: a.out Tainted: G    B           4.9.0-rc6+ #55
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Bochs 01/01/2011
+task: ffff88003c54e3c0 task.stack: ffff880039ca0000
+RIP: 0010:[<ffffffff835051c2>]  [<ffffffff835051c2>]
+__memcpy+0x12/0x20 arch/x86/lib/memcpy_64.S:37
+RSP: 0018:ffff880039ca6838  EFLAGS: 00010246
+RAX: ffff880031b99000 RBX: 0000000000001000 RCX: 0000000000000006
+RDX: 0000000000000000 RSI: ffff880062c6effa RDI: ffff880031b99fd0
+RBP: ffff880039ca6858 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000200 R11: ffffed00063733ff R12: ffff880031b99000
+R13: ffff880062c6e02a R14: ffff880039ca6f70 R15: ffff880039ca6d18
+FS:  00007f7a78013700(0000) GS:ffff88003ed00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: ffff880062c6f000 CR3: 000000006411f000 CR4: 00000000000006e0
+Stack:
+ ffffffff819f0a65 ffff880039ca71a0 0000000000001000 0000000000002000
+ ffff880039ca6d40 ffffffff83525d10 0000000041b58ab3 ffffffff89576240
+ ffffffff00000001 0000000000000000 0000000041b58ab3 ffffffff894d07b0
+Call Trace:
+ [<ffffffff83525d10>] copy_from_iter+0xf30/0x15e0 lib/iov_iter.c:559
+ [<ffffffff83526834>] copy_page_from_iter+0x474/0x860 lib/iov_iter.c:614
+ [<     inline     >] bio_copy_from_iter block/bio.c:1025
+ [<ffffffff833dfc10>] bio_copy_user_iov+0xb50/0xf10 block/bio.c:1226
+ [<     inline     >] __blk_rq_map_user_iov block/blk-map.c:56
+ [<ffffffff83421c15>] blk_rq_map_user_iov+0x295/0x930 block/blk-map.c:130
+ [<ffffffff834223e9>] blk_rq_map_user+0x139/0x1e0 block/blk-map.c:159
+ [<     inline     >] sg_start_req drivers/scsi/sg.c:1757
+ [<ffffffff8470269a>] sg_common_write.isra.20+0x12da/0x1b20
+drivers/scsi/sg.c:772
+ [<ffffffff8470774a>] sg_write+0x78a/0xda0 drivers/scsi/sg.c:675
+ [<ffffffff81a6fabe>] __vfs_write+0x65e/0x830 fs/read_write.c:510
+ [<ffffffff81a6fd7c>] __kernel_write+0xec/0x340 fs/read_write.c:532
+ [<ffffffff81b41e7c>] write_pipe_buf+0x19c/0x260 fs/splice.c:814
+ [<     inline     >] splice_from_pipe_feed fs/splice.c:519
+ [<ffffffff81b426af>] __splice_from_pipe+0x31f/0x750 fs/splice.c:643
+ [<ffffffff81b45dcc>] splice_from_pipe+0x1dc/0x300 fs/splice.c:678
+ [<ffffffff81b45f95>] default_file_splice_write+0x45/0x90 fs/splice.c:826
+ [<     inline     >] do_splice_from fs/splice.c:868
+ [<ffffffff81b3e2ba>] direct_splice_actor+0x12a/0x190 fs/splice.c:1035
+ [<ffffffff81b40706>] splice_direct_to_actor+0x2c6/0x840 fs/splice.c:990
+ [<ffffffff81b40f4e>] do_splice_direct+0x2ce/0x470 fs/splice.c:1078
+ [<ffffffff81a7459f>] do_sendfile+0x73f/0x1060 fs/read_write.c:1401
+ [<     inline     >] SYSC_sendfile64 fs/read_write.c:1456
+ [<ffffffff81a7677e>] SyS_sendfile64+0xee/0x1a0 fs/read_write.c:1448
+ [<ffffffff8814cf85>] entry_SYSCALL_64_fastpath+0x23/0xc6
+arch/x86/entry/entry_64.S:209
+Code: 4e fe e9 4d ff ff ff e8 9d c7 4e fe eb 8f e8 96 c7 4e fe e9 66
+ff ff ff 90 0f 1f 44 00 00 48 89 f8 48 89 d1 48 c1 e9 03 83 e2 07 <f3>
+48 a5 89 d1 f3 a4 c3 66 0f 1f 44 00 00 48 89 f8 48 89 d1 f3
+RIP  [<ffffffff835051c2>] __memcpy+0x12/0x20 arch/x86/lib/memcpy_64.S:37
+ RSP <ffff880039ca6838>
+CR2: ffff880062c6f000
+---[ end trace 13b61a6864c2c008 ]---
+==================================================================
 
-This e-mail and any files transmitted with it may contain confidential or legally privileged information of WDC and/or its affiliates, and are intended solely for the use of the individual or entity to which they are addressed. If you are not the intended recipient, any disclosure, copying, distribution or any action taken or omitted to be taken in reliance on it, is prohibited. If you have received this e-mail in error, please notify the sender immediately and delete the e-mail in its entirety from your system.
+
+There are no alloc/free stacks in the report, so maybe it is not
+use-after-free but rather an out-of-bounds.
+
+On commit 16ae16c6e5616c084168740990fc508bda6655d4 (Nov 24).
