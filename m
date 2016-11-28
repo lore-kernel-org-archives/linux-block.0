@@ -1,100 +1,193 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f194.google.com ([209.85.192.194]:33582 "EHLO
-        mail-pf0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751245AbcKPGvN (ORCPT
+Received: from mail-wm0-f65.google.com ([74.125.82.65]:36016 "EHLO
+        mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755375AbcK1VkC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Nov 2016 01:51:13 -0500
-Received: by mail-pf0-f194.google.com with SMTP id 144so9293690pfv.0
-        for <linux-block@vger.kernel.org>; Tue, 15 Nov 2016 22:51:12 -0800 (PST)
-From: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
-To: axboe@fb.com
-Cc: martin.petersen@oracle.com, keith.busch@intel.com,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        Chaitanya Kulkarni <chaitanya.kulkarni@hgst.com>
-Subject: [PATCH 5/5] nvmet: add support for the Write Zeroes command
-Date: Tue, 15 Nov 2016 22:50:39 -0800
-Message-Id: <1479279039-25818-6-git-send-email-chaitanya.kulkarni@hgst.com>
-In-Reply-To: <1479279039-25818-1-git-send-email-chaitanya.kulkarni@hgst.com>
-References: <1479279039-25818-1-git-send-email-chaitanya.kulkarni@hgst.com>
+        Mon, 28 Nov 2016 16:40:02 -0500
+Received: by mail-wm0-f65.google.com with SMTP id m203so21232054wma.3
+        for <linux-block@vger.kernel.org>; Mon, 28 Nov 2016 13:40:01 -0800 (PST)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: axboe@fb.com, =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <jg@lightnvm.io>,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+Subject: [PATCH 20/23] lightnvm: introduce helpers for generic ops in rrpc
+Date: Mon, 28 Nov 2016 22:39:11 +0100
+Message-Id: <20161128213914.12516-21-m@bjorling.me>
+In-Reply-To: <20161128213914.12516-1-m@bjorling.me>
+References: <20161128213914.12516-1-m@bjorling.me>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Add support for handling write zeroes command on target.
-Call into __blkdev_issue_zeroout, which the block layer expands into the
-best suitable variant of zeroing the LBAs.
+From: Javier González <jg@lightnvm.io>
 
-Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@hgst.com>
+Avoid calling media manager and device-specific operations directly from
+rrpc. Create helper functions on lightnvm's core instead.
+
+Signed-off-by: Javier González <javier@cnexlabs.com>
+
+Made it work with null_blk as well.
+Signed-off-by: Matias Bjørling <m@bjorling.me>
+
+Signed-off-by: Matias Bjørling <m@bjorling.me>
 ---
- drivers/nvme/target/admin-cmd.c |  3 ++-
- drivers/nvme/target/io-cmd.c    | 34 ++++++++++++++++++++++++++++++++++
- 2 files changed, 36 insertions(+), 1 deletion(-)
+ drivers/lightnvm/core.c   | 22 ++++++++++++++++++++++
+ drivers/lightnvm/gennvm.c |  2 --
+ drivers/lightnvm/rrpc.c   | 27 +++++++++++++--------------
+ include/linux/lightnvm.h  |  5 +----
+ 4 files changed, 36 insertions(+), 20 deletions(-)
 
-diff --git a/drivers/nvme/target/admin-cmd.c b/drivers/nvme/target/admin-cmd.c
-index 6fe4c48..ec1ad2a 100644
---- a/drivers/nvme/target/admin-cmd.c
-+++ b/drivers/nvme/target/admin-cmd.c
-@@ -237,7 +237,8 @@ static void nvmet_execute_identify_ctrl(struct nvmet_req *req)
- 	id->maxcmd = cpu_to_le16(NVMET_MAX_CMD);
+diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+index 23d582f..69f261e 100644
+--- a/drivers/lightnvm/core.c
++++ b/drivers/lightnvm/core.c
+@@ -219,6 +219,28 @@ int nvm_erase_blk(struct nvm_tgt_dev *tgt_dev, struct ppa_addr *p, int flags)
+ }
+ EXPORT_SYMBOL(nvm_erase_blk);
  
- 	id->nn = cpu_to_le32(ctrl->subsys->max_nsid);
--	id->oncs = cpu_to_le16(NVME_CTRL_ONCS_DSM);
-+	id->oncs = cpu_to_le16(NVME_CTRL_ONCS_DSM |
-+			NVME_CTRL_ONCS_WRITE_ZEROES);
- 
- 	/* XXX: don't report vwc if the underlying device is write through */
- 	id->vwc = NVME_CTRL_VWC_PRESENT;
-diff --git a/drivers/nvme/target/io-cmd.c b/drivers/nvme/target/io-cmd.c
-index ef52b1e..7d4b022 100644
---- a/drivers/nvme/target/io-cmd.c
-+++ b/drivers/nvme/target/io-cmd.c
-@@ -172,6 +172,37 @@ static void nvmet_execute_dsm(struct nvmet_req *req)
++int nvm_get_l2p_tbl(struct nvm_dev *dev, u64 slba, u32 nlb,
++		    nvm_l2p_update_fn *update_l2p, void *priv)
++{
++	if (!dev->ops->get_l2p_tbl)
++		return 0;
++
++	return dev->ops->get_l2p_tbl(dev, slba, nlb, update_l2p, priv);
++}
++EXPORT_SYMBOL(nvm_get_l2p_tbl);
++
++int nvm_get_area(struct nvm_dev *dev, sector_t *lba, sector_t len)
++{
++	return dev->mt->get_area(dev, lba, len);
++}
++EXPORT_SYMBOL(nvm_get_area);
++
++void nvm_put_area(struct nvm_dev *dev, sector_t lba)
++{
++	dev->mt->put_area(dev, lba);
++}
++EXPORT_SYMBOL(nvm_put_area);
++
+ void nvm_addr_to_generic_mode(struct nvm_dev *dev, struct nvm_rq *rqd)
+ {
+ 	int i;
+diff --git a/drivers/lightnvm/gennvm.c b/drivers/lightnvm/gennvm.c
+index 5d7c8c4..befa828 100644
+--- a/drivers/lightnvm/gennvm.c
++++ b/drivers/lightnvm/gennvm.c
+@@ -175,8 +175,6 @@ static struct nvm_tgt_dev *gen_create_tgt_dev(struct nvm_dev *dev,
+ 	tgt_dev->geo.luns_per_chnl = (lun_balanced) ? prev_nr_luns : -1;
+ 	tgt_dev->total_secs = nr_luns * tgt_dev->geo.sec_per_lun;
+ 	tgt_dev->q = dev->q;
+-	tgt_dev->ops = dev->ops;
+-	tgt_dev->mt = dev->mt;
+ 	tgt_dev->map = dev_map;
+ 	tgt_dev->luns = luns;
+ 	memcpy(&tgt_dev->identity, &dev->identity, sizeof(struct nvm_id));
+diff --git a/drivers/lightnvm/rrpc.c b/drivers/lightnvm/rrpc.c
+index 75ed12a..e4678b7 100644
+--- a/drivers/lightnvm/rrpc.c
++++ b/drivers/lightnvm/rrpc.c
+@@ -1166,11 +1166,8 @@ static int rrpc_map_init(struct rrpc *rrpc)
+ 		r->addr = ADDR_EMPTY;
  	}
+ 
+-	if (!dev->ops->get_l2p_tbl)
+-		return 0;
+-
+ 	/* Bring up the mapping table from device */
+-	ret = dev->ops->get_l2p_tbl(dev->parent, rrpc->soffset, rrpc->nr_sects,
++	ret = nvm_get_l2p_tbl(dev->parent, rrpc->soffset, rrpc->nr_sects,
+ 					rrpc_l2p_update, rrpc);
+ 	if (ret) {
+ 		pr_err("nvm: rrpc: could not read L2P table.\n");
+@@ -1258,6 +1255,9 @@ static int rrpc_bb_discovery(struct nvm_tgt_dev *dev, struct rrpc_lun *rlun)
+ 	int i;
+ 	int ret;
+ 
++	if (!dev->parent->ops->get_bb_tbl)
++		return 0;
++
+ 	nr_blks = geo->blks_per_lun * geo->plane_mode;
+ 	blks = kmalloc(nr_blks, GFP_KERNEL);
+ 	if (!blks)
+@@ -1277,7 +1277,6 @@ static int rrpc_bb_discovery(struct nvm_tgt_dev *dev, struct rrpc_lun *rlun)
+ 	if (nr_blks < 0)
+ 		return nr_blks;
+ 
+-	rlun->nr_free_blocks = geo->blks_per_lun;
+ 	for (i = 0; i < nr_blks; i++) {
+ 		if (blks[i] == NVM_BLK_T_FREE)
+ 			continue;
+@@ -1348,17 +1347,19 @@ static int rrpc_luns_init(struct rrpc *rrpc, struct ppa_addr *luns)
+ 			list_add_tail(&rblk->list, &rlun->free_list);
+ 		}
+ 
+-		if (rrpc_bb_discovery(dev, rlun))
+-			goto err;
+-
+-		rlun->reserved_blocks = 2; /* for GC only */
+-
+ 		rlun->rrpc = rrpc;
++		rlun->nr_free_blocks = geo->blks_per_lun;
++		rlun->reserved_blocks = 2; /* for GC only */
++
+ 		INIT_LIST_HEAD(&rlun->prio_list);
+ 		INIT_LIST_HEAD(&rlun->wblk_list);
+ 
+ 		INIT_WORK(&rlun->ws_gc, rrpc_lun_gc);
+ 		spin_lock_init(&rlun->lock);
++
++		if (rrpc_bb_discovery(dev, rlun))
++			goto err;
++
+ 	}
+ 
+ 	return 0;
+@@ -1370,13 +1371,12 @@ static int rrpc_luns_init(struct rrpc *rrpc, struct ppa_addr *luns)
+ static int rrpc_area_init(struct rrpc *rrpc, sector_t *begin)
+ {
+ 	struct nvm_tgt_dev *dev = rrpc->dev;
+-	struct nvmm_type *mt = dev->mt;
+ 	sector_t size = rrpc->nr_sects * dev->geo.sec_size;
+ 	int ret;
+ 
+ 	size >>= 9;
+ 
+-	ret = mt->get_area(dev->parent, begin, size);
++	ret = nvm_get_area(dev->parent, begin, size);
+ 	if (!ret)
+ 		*begin >>= (ilog2(dev->geo.sec_size) - 9);
+ 
+@@ -1386,10 +1386,9 @@ static int rrpc_area_init(struct rrpc *rrpc, sector_t *begin)
+ static void rrpc_area_free(struct rrpc *rrpc)
+ {
+ 	struct nvm_tgt_dev *dev = rrpc->dev;
+-	struct nvmm_type *mt = dev->mt;
+ 	sector_t begin = rrpc->soffset << (ilog2(dev->geo.sec_size) - 9);
+ 
+-	mt->put_area(dev->parent, begin);
++	nvm_put_area(dev->parent, begin);
  }
  
-+static void nvmet_execute_write_zeroes(struct nvmet_req *req)
-+{
-+	struct nvme_write_zeroes_cmd *write_zeroes = &req->cmd->write_zeroes;
-+	struct bio *bio = NULL;
-+	u16 status = NVME_SC_SUCCESS;
-+	sector_t sector;
-+	sector_t nr_sector;
-+
-+	sector = le64_to_cpu(write_zeroes->slba) <<
-+		(req->ns->blksize_shift - 9);
-+	nr_sector = (((sector_t)le32_to_cpu(write_zeroes->length)) <<
-+		(req->ns->blksize_shift - 9)) + 1;
-+
-+	if (__blkdev_issue_zeroout(req->ns->bdev, sector, nr_sector,
-+				GFP_KERNEL, &bio, false))
-+		status = NVME_SC_INTERNAL | NVME_SC_DNR;
-+
-+	if (bio) {
-+		bio->bi_private = req;
-+		bio->bi_end_io = nvmet_bio_done;
-+		if (status) {
-+			bio->bi_error = -EIO;
-+			bio_endio(bio);
-+		} else {
-+			submit_bio(bio);
-+		}
-+	} else {
-+		nvmet_req_complete(req, status);
-+	}
-+}
-+
- int nvmet_parse_io_cmd(struct nvmet_req *req)
- {
- 	struct nvme_command *cmd = req->cmd;
-@@ -209,6 +240,9 @@ int nvmet_parse_io_cmd(struct nvmet_req *req)
- 		req->data_len = le32_to_cpu(cmd->dsm.nr + 1) *
- 			sizeof(struct nvme_dsm_range);
- 		return 0;
-+	case nvme_cmd_write_zeroes:
-+		req->execute = nvmet_execute_write_zeroes;
-+		return 0;
- 	default:
- 		pr_err("nvmet: unhandled cmd %d\n", cmd->common.opcode);
- 		return NVME_SC_INVALID_OPCODE | NVME_SC_DNR;
+ static void rrpc_free(struct rrpc *rrpc)
+diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
+index 2222853..99cd1e7 100644
+--- a/include/linux/lightnvm.h
++++ b/include/linux/lightnvm.h
+@@ -320,10 +320,7 @@ struct nvm_tgt_dev {
+ 	struct nvm_id identity;
+ 	struct request_queue *q;
+ 
+-	struct nvmm_type *mt;
+-	struct nvm_dev_ops *ops;
+-
+-	void *parent;
++	struct nvm_dev *parent;
+ 	void *map;
+ };
+ 
 -- 
-1.8.3.1
+2.9.3
 
