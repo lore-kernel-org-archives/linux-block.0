@@ -1,107 +1,183 @@
-Return-Path: <BATV+c11f2a9076c546b906d6+4834+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: mst@redhat.com
-Cc: axboe@kernel.dk,
-	virtualization@lists.linux-foundation.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 03/11] virtio_pci: merge vp_free_vectors into vp_del_vqs
-Date: Thu, 17 Nov 2016 11:43:15 +0100
-Message-Id: <1479379403-27880-4-git-send-email-hch@lst.de>
-In-Reply-To: <1479379403-27880-1-git-send-email-hch@lst.de>
-References: <1479379403-27880-1-git-send-email-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wj0-f193.google.com ([209.85.210.193]:32951 "EHLO
+        mail-wj0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755287AbcK1Vjp (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 28 Nov 2016 16:39:45 -0500
+Received: by mail-wj0-f193.google.com with SMTP id kp2so15789083wjc.0
+        for <linux-block@vger.kernel.org>; Mon, 28 Nov 2016 13:39:45 -0800 (PST)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: axboe@fb.com, =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <jg@lightnvm.io>,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+Subject: [PATCH 08/23] lightnvm: remove sysfs configuration interface
+Date: Mon, 28 Nov 2016 22:38:59 +0100
+Message-Id: <20161128213914.12516-9-m@bjorling.me>
+In-Reply-To: <20161128213914.12516-1-m@bjorling.me>
+References: <20161128213914.12516-1-m@bjorling.me>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+From: Javier González <jg@lightnvm.io>
+
+LightNVM used to be managed and configured through sysfs. Since the
+introduction of management ioctls this interface is redundant and
+outdated. Get rid of it.
+
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <m@bjorling.me>
 ---
- drivers/virtio/virtio_pci_common.c | 61 +++++++++++++++++---------------------
- 1 file changed, 27 insertions(+), 34 deletions(-)
+ drivers/lightnvm/core.c | 134 ------------------------------------------------
+ 1 file changed, 134 deletions(-)
 
-diff --git a/drivers/virtio/virtio_pci_common.c b/drivers/virtio/virtio_pci_common.c
-index 93700c5..f6c5499 100644
---- a/drivers/virtio/virtio_pci_common.c
-+++ b/drivers/virtio/virtio_pci_common.c
-@@ -102,39 +102,6 @@ static irqreturn_t vp_interrupt(int irq, void *opaque)
- 	return vp_vring_interrupt(irq, opaque);
+diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+index 6527cf6..d4433d3 100644
+--- a/drivers/lightnvm/core.c
++++ b/drivers/lightnvm/core.c
+@@ -780,140 +780,6 @@ static int __nvm_configure_create(struct nvm_ioctl_create *create)
+ 	return dev->mt->create_tgt(dev, create);
  }
  
--static void vp_free_vectors(struct virtio_device *vdev)
+-#ifdef CONFIG_NVM_DEBUG
+-static int nvm_configure_show(const char *val)
 -{
--	struct virtio_pci_device *vp_dev = to_vp_device(vdev);
--	int i;
+-	struct nvm_dev *dev;
+-	char opcode, devname[DISK_NAME_LEN];
+-	int ret;
 -
--	if (vp_dev->intx_enabled) {
--		free_irq(vp_dev->pci_dev->irq, vp_dev);
--		vp_dev->intx_enabled = 0;
+-	ret = sscanf(val, "%c %32s", &opcode, devname);
+-	if (ret != 2) {
+-		pr_err("nvm: invalid command. Use \"opcode devicename\".\n");
+-		return -EINVAL;
 -	}
 -
--	for (i = 0; i < vp_dev->msix_used_vectors; ++i)
--		free_irq(pci_irq_vector(vp_dev->pci_dev, i), vp_dev);
--
--	for (i = 0; i < vp_dev->msix_vectors; i++)
--		if (vp_dev->msix_affinity_masks[i])
--			free_cpumask_var(vp_dev->msix_affinity_masks[i]);
--
--	if (vp_dev->msix_enabled) {
--		/* Disable the vector used for configuration */
--		vp_dev->config_vector(vp_dev, VIRTIO_MSI_NO_VECTOR);
--
--		pci_free_irq_vectors(vp_dev->pci_dev);
--		vp_dev->msix_enabled = 0;
+-	down_write(&nvm_lock);
+-	dev = nvm_find_nvm_dev(devname);
+-	up_write(&nvm_lock);
+-	if (!dev) {
+-		pr_err("nvm: device not found\n");
+-		return -EINVAL;
 -	}
 -
--	vp_dev->msix_vectors = 0;
--	vp_dev->msix_used_vectors = 0;
--	kfree(vp_dev->msix_names);
--	vp_dev->msix_names = NULL;
--	kfree(vp_dev->msix_affinity_masks);
--	vp_dev->msix_affinity_masks = NULL;
+-	if (!dev->mt)
+-		return 0;
+-
+-	dev->mt->lun_info_print(dev);
+-
+-	return 0;
 -}
 -
- static int vp_request_msix_vectors(struct virtio_device *vdev, int nvectors,
- 				   bool per_vq_vectors)
+-static int nvm_configure_remove(const char *val)
+-{
+-	struct nvm_ioctl_remove remove;
+-	struct nvm_dev *dev;
+-	char opcode;
+-	int ret = 0;
+-
+-	ret = sscanf(val, "%c %256s", &opcode, remove.tgtname);
+-	if (ret != 2) {
+-		pr_err("nvm: invalid command. Use \"d targetname\".\n");
+-		return -EINVAL;
+-	}
+-
+-	remove.flags = 0;
+-
+-	list_for_each_entry(dev, &nvm_devices, devices) {
+-		ret = dev->mt->remove_tgt(dev, &remove);
+-		if (!ret)
+-			break;
+-	}
+-
+-	return ret;
+-}
+-
+-static int nvm_configure_create(const char *val)
+-{
+-	struct nvm_ioctl_create create;
+-	char opcode;
+-	int lun_begin, lun_end, ret;
+-
+-	ret = sscanf(val, "%c %256s %256s %48s %u:%u", &opcode, create.dev,
+-						create.tgtname, create.tgttype,
+-						&lun_begin, &lun_end);
+-	if (ret != 6) {
+-		pr_err("nvm: invalid command. Use \"opcode device name tgttype lun_begin:lun_end\".\n");
+-		return -EINVAL;
+-	}
+-
+-	create.flags = 0;
+-	create.conf.type = NVM_CONFIG_TYPE_SIMPLE;
+-	create.conf.s.lun_begin = lun_begin;
+-	create.conf.s.lun_end = lun_end;
+-
+-	return __nvm_configure_create(&create);
+-}
+-
+-
+-/* Exposes administrative interface through /sys/module/lnvm/configure_by_str */
+-static int nvm_configure_by_str_event(const char *val,
+-					const struct kernel_param *kp)
+-{
+-	char opcode;
+-	int ret;
+-
+-	ret = sscanf(val, "%c", &opcode);
+-	if (ret != 1) {
+-		pr_err("nvm: string must have the format of \"cmd ...\"\n");
+-		return -EINVAL;
+-	}
+-
+-	switch (opcode) {
+-	case 'a':
+-		return nvm_configure_create(val);
+-	case 'd':
+-		return nvm_configure_remove(val);
+-	case 's':
+-		return nvm_configure_show(val);
+-	default:
+-		pr_err("nvm: invalid command\n");
+-		return -EINVAL;
+-	}
+-
+-	return 0;
+-}
+-
+-static int nvm_configure_get(char *buf, const struct kernel_param *kp)
+-{
+-	int sz;
+-	struct nvm_dev *dev;
+-
+-	sz = sprintf(buf, "available devices:\n");
+-	down_write(&nvm_lock);
+-	list_for_each_entry(dev, &nvm_devices, devices) {
+-		if (sz > 4095 - DISK_NAME_LEN - 2)
+-			break;
+-		sz += sprintf(buf + sz, " %32s\n", dev->name);
+-	}
+-	up_write(&nvm_lock);
+-
+-	return sz;
+-}
+-
+-static const struct kernel_param_ops nvm_configure_by_str_event_param_ops = {
+-	.set	= nvm_configure_by_str_event,
+-	.get	= nvm_configure_get,
+-};
+-
+-#undef MODULE_PARAM_PREFIX
+-#define MODULE_PARAM_PREFIX	"lnvm."
+-
+-module_param_cb(configure_debug, &nvm_configure_by_str_event_param_ops, NULL,
+-									0644);
+-
+-#endif /* CONFIG_NVM_DEBUG */
+-
+ static long nvm_ioctl_info(struct file *file, void __user *arg)
  {
-@@ -266,6 +233,7 @@ void vp_del_vqs(struct virtio_device *vdev)
- {
- 	struct virtio_pci_device *vp_dev = to_vp_device(vdev);
- 	struct virtqueue *vq, *n;
-+	int i;
- 
- 	list_for_each_entry_safe(vq, n, &vdev->vqs, list) {
- 		if (vp_dev->per_vq_vectors) {
-@@ -279,7 +247,32 @@ void vp_del_vqs(struct virtio_device *vdev)
- 	}
- 	vp_dev->per_vq_vectors = false;
- 
--	vp_free_vectors(vdev);
-+	if (vp_dev->intx_enabled) {
-+		free_irq(vp_dev->pci_dev->irq, vp_dev);
-+		vp_dev->intx_enabled = 0;
-+	}
-+
-+	for (i = 0; i < vp_dev->msix_used_vectors; ++i)
-+		free_irq(pci_irq_vector(vp_dev->pci_dev, i), vp_dev);
-+
-+	for (i = 0; i < vp_dev->msix_vectors; i++)
-+		if (vp_dev->msix_affinity_masks[i])
-+			free_cpumask_var(vp_dev->msix_affinity_masks[i]);
-+
-+	if (vp_dev->msix_enabled) {
-+		/* Disable the vector used for configuration */
-+		vp_dev->config_vector(vp_dev, VIRTIO_MSI_NO_VECTOR);
-+
-+		pci_free_irq_vectors(vp_dev->pci_dev);
-+		vp_dev->msix_enabled = 0;
-+	}
-+
-+	vp_dev->msix_vectors = 0;
-+	vp_dev->msix_used_vectors = 0;
-+	kfree(vp_dev->msix_names);
-+	vp_dev->msix_names = NULL;
-+	kfree(vp_dev->msix_affinity_masks);
-+	vp_dev->msix_affinity_masks = NULL;
- 	kfree(vp_dev->vqs);
- 	vp_dev->vqs = NULL;
- }
+ 	struct nvm_ioctl_info *info;
 -- 
-2.1.4
+2.9.3
+
