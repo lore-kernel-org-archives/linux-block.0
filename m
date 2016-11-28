@@ -1,104 +1,48 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga07.intel.com ([134.134.136.100]:4800 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1757313AbcK2LX7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 29 Nov 2016 06:23:59 -0500
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv5 05/36] thp: try to free page's buffers before attempt split
-Date: Tue, 29 Nov 2016 14:22:33 +0300
-Message-Id: <20161129112304.90056-6-kirill.shutemov@linux.intel.com>
-In-Reply-To: <20161129112304.90056-1-kirill.shutemov@linux.intel.com>
-References: <20161129112304.90056-1-kirill.shutemov@linux.intel.com>
+Received: from mail-wm0-f68.google.com ([74.125.82.68]:35883 "EHLO
+        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754361AbcK1Vjj (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 28 Nov 2016 16:39:39 -0500
+Received: by mail-wm0-f68.google.com with SMTP id m203so21231045wma.3
+        for <linux-block@vger.kernel.org>; Mon, 28 Nov 2016 13:39:38 -0800 (PST)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: axboe@fb.com, =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+Subject: [PATCH 01/23] nvme: lightnvm: frees wrong cmd structure
+Date: Mon, 28 Nov 2016 22:38:52 +0100
+Message-Id: <20161128213914.12516-2-m@bjorling.me>
+In-Reply-To: <20161128213914.12516-1-m@bjorling.me>
+References: <20161128213914.12516-1-m@bjorling.me>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-We want page to be isolated from the rest of the system before spliting
-it. We rely on page count to be 2 for file pages to make sure nobody
-uses the page: one pin to caller, one to radix-tree.
+When struct nvme_request was introduced, the nvme_nvm_submit_io was
+converted to the new interface. The interface moves nvme_nvm_command
+data structure into the struct request pdu. On io completion, rq->cmd is
+freed, which should have been the dereferenced pdu nvme_request->cmd.
 
-Filesystems with backing storage can have page count increased if it has
-buffers.
-
-Let's try to free them, before attempt split. And remove one guarding
-VM_BUG_ON_PAGE().
-
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+Fixes: d49187e97e94 "nvme: introduce struct nvme_request"
+Signed-off-by: Matias Bjørling <m@bjorling.me>
 ---
- include/linux/buffer_head.h |  1 +
- mm/huge_memory.c            | 19 ++++++++++++++++++-
- 2 files changed, 19 insertions(+), 1 deletion(-)
+ drivers/nvme/host/lightnvm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/linux/buffer_head.h b/include/linux/buffer_head.h
-index d67ab83823ad..fd4134ce9c54 100644
---- a/include/linux/buffer_head.h
-+++ b/include/linux/buffer_head.h
-@@ -400,6 +400,7 @@ extern int __set_page_dirty_buffers(struct page *page);
- #else /* CONFIG_BLOCK */
+diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
+index 442f677..de3dc87 100644
+--- a/drivers/nvme/host/lightnvm.c
++++ b/drivers/nvme/host/lightnvm.c
+@@ -477,7 +477,7 @@ static void nvme_nvm_end_io(struct request *rq, int error)
+ 	rqd->ppa_status = nvme_req(rq)->result.u64;
+ 	nvm_end_io(rqd, error);
  
- static inline void buffer_init(void) {}
-+static inline int page_has_buffers(struct page *page) { return 0; }
- static inline int try_to_free_buffers(struct page *page) { return 1; }
- static inline int inode_has_buffers(struct inode *inode) { return 0; }
- static inline void invalidate_inode_buffers(struct inode *inode) {}
-diff --git a/mm/huge_memory.c b/mm/huge_memory.c
-index 91dbab9644be..a15d566b14f6 100644
---- a/mm/huge_memory.c
-+++ b/mm/huge_memory.c
-@@ -30,6 +30,7 @@
- #include <linux/userfaultfd_k.h>
- #include <linux/page_idle.h>
- #include <linux/shmem_fs.h>
-+#include <linux/buffer_head.h>
+-	kfree(rq->cmd);
++	kfree(nvme_req(rq)->cmd);
+ 	blk_mq_free_request(rq);
+ }
  
- #include <asm/tlb.h>
- #include <asm/pgalloc.h>
-@@ -2111,7 +2112,6 @@ int split_huge_page_to_list(struct page *page, struct list_head *list)
- 
- 	VM_BUG_ON_PAGE(is_huge_zero_page(page), page);
- 	VM_BUG_ON_PAGE(!PageLocked(page), page);
--	VM_BUG_ON_PAGE(!PageSwapBacked(page), page);
- 	VM_BUG_ON_PAGE(!PageCompound(page), page);
- 
- 	if (PageAnon(head)) {
-@@ -2140,6 +2140,23 @@ int split_huge_page_to_list(struct page *page, struct list_head *list)
- 			goto out;
- 		}
- 
-+		/* Try to free buffers before attempt split */
-+		if (!PageSwapBacked(head) && PagePrivate(page)) {
-+			/*
-+			 * We cannot trigger writeback from here due possible
-+			 * recursion if triggered from vmscan, only wait.
-+			 *
-+			 * Caller can trigger writeback it on its own, if safe.
-+			 */
-+			wait_on_page_writeback(head);
-+
-+			if (page_has_buffers(head) && !try_to_release_page(head,
-+						GFP_KERNEL)) {
-+				ret = -EBUSY;
-+				goto out;
-+			}
-+		}
-+
- 		/* Addidional pin from radix tree */
- 		extra_pins = 1;
- 		anon_vma = NULL;
 -- 
-2.10.2
+2.9.3
 
