@@ -1,210 +1,239 @@
-Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
-From: Scott Bauer <scott.bauer@intel.com>
-To: linux-nvme@lists.infradead.org
-Subject: [PATCH v2 3/4] nvme: Implement resume_from_suspend and sed block ioctl
-Date: Tue, 29 Nov 2016 14:52:01 -0700
-Message-Id: <1480456322-27339-4-git-send-email-scott.bauer@intel.com>
-In-Reply-To: <1480456322-27339-1-git-send-email-scott.bauer@intel.com>
-References: <1480456322-27339-1-git-send-email-scott.bauer@intel.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
-List-Post: <mailto:linux-nvme@lists.infradead.org>
-List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
-Cc: keith.busch@intel.com, sagi@grimberg.me, hch@infradead.org,
- Rafael.Antognolli@intel.com, axboe@fb.com, linux-block@vger.kernel.org,
- Scott Bauer <scott.bauer@intel.com>, jonathan.derrick@intel.com,
- j.naumann@fu-berlin.de
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wj0-f193.google.com ([209.85.210.193]:35936 "EHLO
+        mail-wj0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755661AbcK1VkE (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 28 Nov 2016 16:40:04 -0500
+Received: by mail-wj0-f193.google.com with SMTP id jb2so15789890wjb.3
+        for <linux-block@vger.kernel.org>; Mon, 28 Nov 2016 13:39:58 -0800 (PST)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: axboe@fb.com,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+Subject: [PATCH 23/23] lightnvm: transform target get/set bad block
+Date: Mon, 28 Nov 2016 22:39:14 +0100
+Message-Id: <20161128213914.12516-24-m@bjorling.me>
+In-Reply-To: <20161128213914.12516-1-m@bjorling.me>
+References: <20161128213914.12516-1-m@bjorling.me>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
-Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This patch implements the necessary logic to unlock a SED
-enabled device coming back from an S3.
+From: Javier González <javier@cnexlabs.com>
 
-The patch also implements the ioctl handling from the block
-layer.
+Since targets are given a virtual target device, it is necessary to
+translate all communication between targets and the backend device.
+Implement the translation layer for get/set bad block table.
 
-Signed-off-by: Scott Bauer <scott.bauer@intel.com>
-Signed-off-by: Rafael Antognolli <Rafael.Antognolli@intel.com>
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <m@bjorling.me>
 ---
- drivers/nvme/host/core.c | 76 ++++++++++++++++++++++++++++++++++++++++++++++++
- drivers/nvme/host/nvme.h |  4 ++-
- drivers/nvme/host/pci.c  |  7 ++++-
- 3 files changed, 85 insertions(+), 2 deletions(-)
+ drivers/lightnvm/core.c   | 58 +++++++++++++++++++++++++++++++++++++++++++++++
+ drivers/lightnvm/gennvm.c | 19 +++++++++++-----
+ drivers/lightnvm/rrpc.c   |  4 ++--
+ include/linux/lightnvm.h  | 15 +++++++++---
+ 4 files changed, 85 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 79e679d..9a3eb41 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -28,6 +28,8 @@
- #include <linux/t10-pi.h>
- #include <scsi/sg.h>
- #include <asm/unaligned.h>
-+#include <linux/sed.h>
-+#include <linux/sed-opal.h>
- 
- #include "nvme.h"
- #include "fabrics.h"
-@@ -778,11 +780,57 @@ static int nvme_user_cmd(struct nvme_ctrl *ctrl, struct nvme_ns *ns,
- 	return status;
+diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+index 07bf989..7622e3d 100644
+--- a/drivers/lightnvm/core.c
++++ b/drivers/lightnvm/core.c
+@@ -175,6 +175,26 @@ static struct nvm_dev *nvm_find_nvm_dev(const char *name)
+ 	return NULL;
  }
  
-+static int nvme_sec_submit(void *data, u16 spsp, u8 secp, void *buffer,
-+			   size_t len, bool send)
++static void nvm_tgt_generic_to_addr_mode(struct nvm_tgt_dev *tgt_dev,
++					 struct nvm_rq *rqd)
 +{
-+	struct request_queue *q;
-+	struct request *req;
-+	struct nvme_ns *ns;
-+	struct nvme_command cmd = { 0 };
++	struct nvm_dev *dev = tgt_dev->parent;
++	int i;
++
++	if (rqd->nr_ppas > 1) {
++		for (i = 0; i < rqd->nr_ppas; i++) {
++			rqd->ppa_list[i] = dev->mt->trans_ppa(tgt_dev,
++					rqd->ppa_list[i], TRANS_TGT_TO_DEV);
++			rqd->ppa_list[i] = generic_to_dev_addr(dev,
++							rqd->ppa_list[i]);
++		}
++	} else {
++		rqd->ppa_addr = dev->mt->trans_ppa(tgt_dev, rqd->ppa_addr,
++						TRANS_TGT_TO_DEV);
++		rqd->ppa_addr = generic_to_dev_addr(dev, rqd->ppa_addr);
++	}
++}
++
+ int nvm_set_bb_tbl(struct nvm_dev *dev, struct ppa_addr *ppas, int nr_ppas,
+ 								int type)
+ {
+@@ -202,6 +222,34 @@ int nvm_set_bb_tbl(struct nvm_dev *dev, struct ppa_addr *ppas, int nr_ppas,
+ }
+ EXPORT_SYMBOL(nvm_set_bb_tbl);
+ 
++int nvm_set_tgt_bb_tbl(struct nvm_tgt_dev *tgt_dev, struct ppa_addr *ppas,
++		       int nr_ppas, int type)
++{
++	struct nvm_dev *dev = tgt_dev->parent;
++	struct nvm_rq rqd;
 +	int ret;
 +
-+	ns = data;
-+
-+	if (send)
-+		cmd.common.opcode = (u8)nvme_admin_security_send;
-+	else
-+		cmd.common.opcode = (u8)nvme_admin_security_recv;
-+
-+	cmd.common.nsid = ns->ns_id;
-+	cmd.common.cdw10[0] = cpu_to_le32(((u32)secp) << 24 | ((u32)spsp) << 8);
-+	cmd.common.cdw10[1] = cpu_to_le32(len);
-+
-+	q = ns->ctrl->admin_q;
-+
-+	req = nvme_alloc_request(q, &cmd, 0, NVME_QID_ANY);
-+	if (IS_ERR(req)) {
-+		ret = PTR_ERR(req);
-+		return ret;
++	if (nr_ppas > dev->ops->max_phys_sect) {
++		pr_err("nvm: unable to update all blocks atomically\n");
++		return -EINVAL;
 +	}
 +
-+	req->timeout = ADMIN_TIMEOUT;
-+	req->special = NULL;
++	memset(&rqd, 0, sizeof(struct nvm_rq));
 +
-+	if (buffer && len) {
-+		ret = blk_rq_map_kern(q, req, buffer, len, GFP_KERNEL);
-+		if (ret)
-+			goto out;
++	nvm_set_rqd_ppalist(dev, &rqd, ppas, nr_ppas, 1);
++	nvm_tgt_generic_to_addr_mode(tgt_dev, &rqd);
++
++	ret = dev->ops->set_bb_tbl(dev, &rqd.ppa_addr, rqd.nr_ppas, type);
++	nvm_free_rqd_ppalist(dev, &rqd);
++	if (ret) {
++		pr_err("nvm: sysblk failed bb mark\n");
++		return -EINVAL;
 +	}
 +
-+	ret = blk_execute_rq(req->q, ns->disk, req, 1);
-+ out:
-+	blk_mq_free_request(req);
-+	return ret;
++	return 0;
++}
++EXPORT_SYMBOL(nvm_set_tgt_bb_tbl);
++
+ int nvm_max_phys_sects(struct nvm_tgt_dev *tgt_dev)
+ {
+ 	struct nvm_dev *dev = tgt_dev->parent;
+@@ -519,6 +567,16 @@ int nvm_get_bb_tbl(struct nvm_dev *dev, struct ppa_addr ppa, u8 *blks)
+ }
+ EXPORT_SYMBOL(nvm_get_bb_tbl);
+ 
++int nvm_get_tgt_bb_tbl(struct nvm_tgt_dev *tgt_dev, struct ppa_addr ppa,
++		       u8 *blks)
++{
++	struct nvm_dev *dev = tgt_dev->parent;
++
++	ppa = dev->mt->trans_ppa(tgt_dev, ppa, TRANS_TGT_TO_DEV);
++	return nvm_get_bb_tbl(dev, ppa, blks);
++}
++EXPORT_SYMBOL(nvm_get_tgt_bb_tbl);
++
+ static int nvm_init_slc_tbl(struct nvm_dev *dev, struct nvm_id_group *grp)
+ {
+ 	struct nvm_geo *geo = &dev->geo;
+diff --git a/drivers/lightnvm/gennvm.c b/drivers/lightnvm/gennvm.c
+index befa828..ca78800 100644
+--- a/drivers/lightnvm/gennvm.c
++++ b/drivers/lightnvm/gennvm.c
+@@ -482,12 +482,6 @@ static void gen_unregister(struct nvm_dev *dev)
+ 	module_put(THIS_MODULE);
+ }
+ 
+-enum {
+-	TRANS_TGT_TO_DEV =	0x0,
+-	TRANS_DEV_TO_TGT =	0x1,
+-};
+-
+-
+ static int gen_map_to_dev(struct nvm_tgt_dev *tgt_dev, struct ppa_addr *p)
+ {
+ 	struct gen_dev_map *dev_map = tgt_dev->map;
+@@ -584,6 +578,18 @@ static int gen_erase_blk(struct nvm_tgt_dev *tgt_dev, struct ppa_addr *p,
+ 	return nvm_erase_ppa(tgt_dev->parent, p, 1, flags);
+ }
+ 
++static struct ppa_addr gen_trans_ppa(struct nvm_tgt_dev *tgt_dev,
++				     struct ppa_addr p, int direction)
++{
++	gen_trans_fn *f;
++	struct ppa_addr ppa = p;
++
++	f = (direction == TRANS_TGT_TO_DEV) ? gen_map_to_dev : gen_map_to_tgt;
++	f(tgt_dev, &ppa);
++
++	return ppa;
 +}
 +
- static int nvme_ioctl(struct block_device *bdev, fmode_t mode,
- 		unsigned int cmd, unsigned long arg)
+ static void gen_part_to_tgt(struct nvm_dev *dev, sector_t *entries,
+ 			       int len)
  {
- 	struct nvme_ns *ns = bdev->bd_disk->private_data;
+@@ -631,6 +637,7 @@ static struct nvmm_type gen = {
+ 	.get_area		= gen_get_area,
+ 	.put_area		= gen_put_area,
  
-+	if (is_sed_ioctl(cmd))
-+		return blkdev_sed_ioctl(bdev, mode, cmd, arg,
-+					ns, nvme_sec_submit);
- 	switch (cmd) {
- 	case NVME_IOCTL_ID:
- 		force_successful_syscall_return();
-@@ -1067,6 +1115,34 @@ static const struct pr_ops nvme_pr_ops = {
- 	.pr_clear	= nvme_pr_clear,
++	.trans_ppa		= gen_trans_ppa,
+ 	.part_to_tgt		= gen_part_to_tgt,
  };
  
-+void nvme_unlock_from_suspend(struct nvme_ctrl *ctrl)
-+{
-+	struct opal_suspend_unlk ulk = { 0 };
-+	struct nvme_ns *ns;
-+
-+	mutex_lock(&ctrl->namespaces_mutex);
-+	if (list_empty(&ctrl->namespaces))
-+		goto out_no_namespace;
-+
-+	ulk.submit_data = ns = list_first_entry(&ctrl->namespaces, struct nvme_ns, list);
-+	kref_get(&ns->kref);
-+
-+	mutex_unlock(&ctrl->namespaces_mutex);
-+
-+	ulk.submit_fn = nvme_sec_submit;
-+	ulk.dev = disk_devt(ns->disk);
-+
-+	if (opal_unlock_from_suspend(&ulk))
-+		pr_warn("Failed to unlock one or more locking ranges!\n");
-+
-+	nvme_put_ns(ns);
-+	return;
-+
-+ out_no_namespace:
-+	mutex_unlock(&ctrl->namespaces_mutex);
-+}
-+EXPORT_SYMBOL_GPL(nvme_unlock_from_suspend);
-+
- static const struct block_device_operations nvme_fops = {
- 	.owner		= THIS_MODULE,
- 	.ioctl		= nvme_ioctl,
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index d47f5a5..ac7e5b1 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -240,7 +240,8 @@ static inline int nvme_error_status(u16 status)
+diff --git a/drivers/lightnvm/rrpc.c b/drivers/lightnvm/rrpc.c
+index 8a27bcc..9fb7de3 100644
+--- a/drivers/lightnvm/rrpc.c
++++ b/drivers/lightnvm/rrpc.c
+@@ -735,7 +735,7 @@ static void __rrpc_mark_bad_block(struct rrpc *rrpc, struct ppa_addr ppa)
+ 	rblk = &rlun->blocks[ppa.g.blk];
+ 	rblk->state = NVM_BLK_ST_BAD;
  
- static inline bool nvme_req_needs_retry(struct request *req, u16 status)
- {
--	return !(status & NVME_SC_DNR || blk_noretry_request(req)) &&
-+	return !(status & NVME_SC_DNR || status & NVME_SC_ACCESS_DENIED ||
-+		 blk_noretry_request(req)) &&
- 		(jiffies - req->start_time) < req->timeout &&
- 		req->retries < nvme_max_retries;
+-	nvm_set_bb_tbl(dev->parent, &ppa, 1, NVM_BLK_T_GRWN_BAD);
++	nvm_set_tgt_bb_tbl(dev, &ppa, 1, NVM_BLK_T_GRWN_BAD);
  }
-@@ -259,6 +260,7 @@ int nvme_init_identify(struct nvme_ctrl *ctrl);
  
- void nvme_queue_scan(struct nvme_ctrl *ctrl);
- void nvme_remove_namespaces(struct nvme_ctrl *ctrl);
-+void nvme_unlock_from_suspend(struct nvme_ctrl *ctrl);
+ static void rrpc_mark_bad_block(struct rrpc *rrpc, struct nvm_rq *rqd)
+@@ -1267,7 +1267,7 @@ static int rrpc_bb_discovery(struct nvm_tgt_dev *dev, struct rrpc_lun *rlun)
+ 	ppa.g.ch = rlun->bppa.g.ch;
+ 	ppa.g.lun = rlun->bppa.g.lun;
  
- #define NVME_NR_AERS	1
- void nvme_complete_async_event(struct nvme_ctrl *ctrl,
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index 5e52034..1a1fc9b 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -43,6 +43,7 @@
- #include <linux/types.h>
- #include <linux/io-64-nonatomic-lo-hi.h>
- #include <asm/unaligned.h>
-+#include <linux/sed-opal.h>
- 
- #include "nvme.h"
- 
-@@ -1748,10 +1749,11 @@ static void nvme_reset_work(struct work_struct *work)
- {
- 	struct nvme_dev *dev = container_of(work, struct nvme_dev, reset_work);
- 	int result = -ENODEV;
--
-+	bool was_suspend = false;
- 	if (WARN_ON(dev->ctrl.state == NVME_CTRL_RESETTING))
+-	ret = nvm_get_bb_tbl(dev->parent, ppa, blks);
++	ret = nvm_get_tgt_bb_tbl(dev, ppa, blks);
+ 	if (ret) {
+ 		pr_err("rrpc: could not get BB table\n");
  		goto out;
+diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
+index e76f9c4..7c273bb 100644
+--- a/include/linux/lightnvm.h
++++ b/include/linux/lightnvm.h
+@@ -496,8 +496,15 @@ typedef int (nvmm_submit_io_fn)(struct nvm_tgt_dev *, struct nvm_rq *);
+ typedef int (nvmm_erase_blk_fn)(struct nvm_tgt_dev *, struct ppa_addr *, int);
+ typedef int (nvmm_get_area_fn)(struct nvm_dev *, sector_t *, sector_t);
+ typedef void (nvmm_put_area_fn)(struct nvm_dev *, sector_t);
++typedef struct ppa_addr (nvmm_trans_ppa_fn)(struct nvm_tgt_dev *,
++					    struct ppa_addr, int);
+ typedef void (nvmm_part_to_tgt_fn)(struct nvm_dev *, sector_t*, int);
  
-+	was_suspend = !!(dev->ctrl.ctrl_config & NVME_CC_SHN_NORMAL);
- 	/*
- 	 * If we're called to reset a live controller first shut it down before
- 	 * moving on.
-@@ -1779,6 +1781,9 @@ static void nvme_reset_work(struct work_struct *work)
- 	if (result)
- 		goto out;
- 
-+	if (was_suspend)
-+		nvme_unlock_from_suspend(&dev->ctrl);
++enum {
++	TRANS_TGT_TO_DEV =	0x0,
++	TRANS_DEV_TO_TGT =	0x1,
++};
 +
- 	result = nvme_setup_io_queues(dev);
- 	if (result)
- 		goto out;
+ struct nvmm_type {
+ 	const char *name;
+ 	unsigned int version[3];
+@@ -514,6 +521,7 @@ struct nvmm_type {
+ 	nvmm_get_area_fn *get_area;
+ 	nvmm_put_area_fn *put_area;
+ 
++	nvmm_trans_ppa_fn *trans_ppa;
+ 	nvmm_part_to_tgt_fn *part_to_tgt;
+ 
+ 	struct list_head list;
+@@ -526,9 +534,9 @@ extern struct nvm_dev *nvm_alloc_dev(int);
+ extern int nvm_register(struct nvm_dev *);
+ extern void nvm_unregister(struct nvm_dev *);
+ 
+-extern int nvm_set_bb_tbl(struct nvm_dev *dev, struct ppa_addr *ppas,
+-							int nr_ppas, int type);
+-
++extern int nvm_set_bb_tbl(struct nvm_dev *, struct ppa_addr *, int, int);
++extern int nvm_set_tgt_bb_tbl(struct nvm_tgt_dev *, struct ppa_addr *,
++			      int, int);
+ extern int nvm_max_phys_sects(struct nvm_tgt_dev *);
+ extern int nvm_submit_io(struct nvm_tgt_dev *, struct nvm_rq *);
+ extern void nvm_generic_to_addr_mode(struct nvm_dev *, struct nvm_rq *);
+@@ -549,6 +557,7 @@ extern int nvm_submit_ppa_list(struct nvm_dev *, struct ppa_addr *, int, int,
+ 							int, void *, int);
+ extern int nvm_bb_tbl_fold(struct nvm_dev *, u8 *, int);
+ extern int nvm_get_bb_tbl(struct nvm_dev *, struct ppa_addr, u8 *);
++extern int nvm_get_tgt_bb_tbl(struct nvm_tgt_dev *, struct ppa_addr, u8 *);
+ 
+ /* sysblk.c */
+ #define NVM_SYSBLK_MAGIC 0x4E564D53 /* "NVMS" */
 -- 
-2.7.4
+2.9.3
 
-
-_______________________________________________
-Linux-nvme mailing list
-Linux-nvme@lists.infradead.org
-http://lists.infradead.org/mailman/listinfo/linux-nvme
