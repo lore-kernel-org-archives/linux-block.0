@@ -1,50 +1,60 @@
-Return-Path: <Yang.Shi@windriver.com>
-To: <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
-From: Yang Shi <yang.shi@windriver.com>
-Subject: Is it a possible memory leak in CFQ?
-Message-ID: <06441268-93be-5ce0-58c9-f7eec027a07d@windriver.com>
-Date: Tue, 22 Nov 2016 09:29:01 -0800
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wj0-f195.google.com ([209.85.210.195]:34114 "EHLO
+        mail-wj0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755574AbcK1Vjq (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 28 Nov 2016 16:39:46 -0500
+Received: by mail-wj0-f195.google.com with SMTP id xy5so15802357wjc.1
+        for <linux-block@vger.kernel.org>; Mon, 28 Nov 2016 13:39:45 -0800 (PST)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: axboe@fb.com, =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <jg@lightnvm.io>,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+Subject: [PATCH 09/23] lightnvm: cleanup unused target operations
+Date: Mon, 28 Nov 2016 22:39:00 +0100
+Message-Id: <20161128213914.12516-10-m@bjorling.me>
+In-Reply-To: <20161128213914.12516-1-m@bjorling.me>
+References: <20161128213914.12516-1-m@bjorling.me>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Hi folks,
+From: Javier González <jg@lightnvm.io>
 
+Cleanup definition leftovers from old gennvm interface
 
-When I create some big file (i.e. dd if=/dev/zero of=/home/test/big_file 
-bs=1024k count=10240, then run sync, umount) with kmemleak enabled, 
-kmemleak may report some memory leak occasionally. I would say it 
-happens randomly. Please see the below log:
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <m@bjorling.me>
+---
+ include/linux/lightnvm.h | 6 ------
+ 1 file changed, 6 deletions(-)
 
+diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
+index 6b26a32..e598308 100644
+--- a/include/linux/lightnvm.h
++++ b/include/linux/lightnvm.h
+@@ -477,9 +477,6 @@ typedef int (nvmm_remove_tgt_fn)(struct nvm_dev *, struct nvm_ioctl_remove *);
+ typedef struct nvm_block *(nvmm_get_blk_fn)(struct nvm_dev *,
+ 					      struct nvm_lun *, unsigned long);
+ typedef void (nvmm_put_blk_fn)(struct nvm_dev *, struct nvm_block *);
+-typedef int (nvmm_open_blk_fn)(struct nvm_dev *, struct nvm_block *);
+-typedef int (nvmm_close_blk_fn)(struct nvm_dev *, struct nvm_block *);
+-typedef void (nvmm_flush_blk_fn)(struct nvm_dev *, struct nvm_block *);
+ typedef int (nvmm_submit_io_fn)(struct nvm_dev *, struct nvm_rq *);
+ typedef int (nvmm_erase_blk_fn)(struct nvm_dev *, struct nvm_block *, int);
+ typedef void (nvmm_mark_blk_fn)(struct nvm_dev *, struct ppa_addr, int);
+@@ -504,9 +501,6 @@ struct nvmm_type {
+ 	/* Block administration callbacks */
+ 	nvmm_get_blk_fn *get_blk;
+ 	nvmm_put_blk_fn *put_blk;
+-	nvmm_open_blk_fn *open_blk;
+-	nvmm_close_blk_fn *close_blk;
+-	nvmm_flush_blk_fn *flush_blk;
+ 
+ 	nvmm_submit_io_fn *submit_io;
+ 	nvmm_erase_blk_fn *erase_blk;
+-- 
+2.9.3
 
-unreferenced object 0x99249e70 (size 176):
-   comm "kworker/u4:2", pid 2872, jiffies 1263855 (age 435.790s)
-   hex dump (first 32 bytes):
-     01 00 00 00 10 00 00 00 00 08 c5 b3 7c 9e 24 99 ............|.$.
-     00 00 00 00 00 00 00 00 27 dd 75 42 c4 0b 00 00 ........'.uB....
-   backtrace:
-     [<809c47cc>] kmemleak_alloc+0x40/0x74
-     [<80348534>] kmem_cache_alloc+0x140/0x2c8
-     [<805d0d70>] cfq_get_queue+0xf4/0x238
-     [<805d2150>] cfq_set_request+0x100/0x290
-     [<805ae8e0>] elv_set_request+0x2c/0x38
-     [<805b3520>] get_request+0x6b4/0x7e0
-     [<805b5ef0>] blk_queue_bio+0x90/0x3a0
-     [<805b3fb8>] generic_make_request+0xc0/0x174
-     [<805b40b4>] submit_bio+0x48/0x14c
-     [<8039038c>] submit_bh_wbc+0x1a8/0x1bc
-     [<80390608>] __block_write_full_page+0x268/0x3a0
-     [<803908bc>] block_write_full_page+0x88/0xf4
-     [<803931f8>] blkdev_writepage+0x20/0x28
-     [<80306974>] __writepage+0x24/0x48
-     [<80307324>] write_cache_pages+0x358/0x42c
-     [<80307444>] generic_writepages+0x4c/0x68
-
-
-Not sure if this is a real memory leak or false positive.
-
-
-Thanks,
-
-Yang
