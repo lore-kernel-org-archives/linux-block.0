@@ -1,134 +1,118 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:42120 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751252AbcKRFQy (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Nov 2016 00:16:54 -0500
-From: NeilBrown <neilb@suse.com>
-To: Shaohua Li <shli@kernel.org>
-Date: Fri, 18 Nov 2016 16:16:11 +1100
-Subject: [PATCH/RFC] add "failfast" support for raid1/raid10.
-Cc: linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>, linux-kernel@vger.kernel.org,
-        hare@suse.de
-Message-ID: <147944614789.3302.1959091446949640579.stgit@noble>
+Received: from mail-wj0-f196.google.com ([209.85.210.196]:32966 "EHLO
+        mail-wj0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755384AbcK1Vjr (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 28 Nov 2016 16:39:47 -0500
+Received: by mail-wj0-f196.google.com with SMTP id kp2so15789216wjc.0
+        for <linux-block@vger.kernel.org>; Mon, 28 Nov 2016 13:39:47 -0800 (PST)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: axboe@fb.com, =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <jg@lightnvm.io>,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+Subject: [PATCH 11/23] lightnvm: remove unnecessary variables in rrpc
+Date: Mon, 28 Nov 2016 22:39:02 +0100
+Message-Id: <20161128213914.12516-12-m@bjorling.me>
+In-Reply-To: <20161128213914.12516-1-m@bjorling.me>
+References: <20161128213914.12516-1-m@bjorling.me>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hi,
+From: Javier González <jg@lightnvm.io>
 
- I've been sitting on these patches for a while because although they
- solve a real problem, it is a fairly limited use-case, and I don't
- really like some of the details.
+Before vectored I/Os were supported on rrpc, the physical address was
+stored as part of the nvm_rqd request. This variable become obsolete
+when the ppa_list was introduced. Cleanup this variable.
 
- So I'm posting them as RFC in the hope that a different perspective
- might help me like them better, or find a better approach.
-
- The core idea is that when you have multiple copies of data
- (i.e. mirrored drives) it doesn't make sense to wait for a read from
- a drive that seems to be having problems.  It will probably be faster
- to just cancel that read, and read from the other device.
- Similarly, in some circumstances, it might be better to fail a drive
- that is being slow to respond to writes, rather than cause all writes
- to be very slow.
-
- The particular context where this comes up is when mirroring across
- storage arrays, where the storage arrays can temporarily take an
- unusually long time to respond to requests (firmware updates have
- been mentioned).  As the array will have redundancy internally, there
- is little risk to the data.  The mirrored pair is really only for
- disaster recovery, and it is deemed better to lose the last few
- minutes of updates in the case of a serious disaster, rather than
- occasionally having latency issues because one array needs to do some
- maintenance for a few minutes.  The particular storage arrays in
- question are DASD devices which are part of the s390 ecosystem.
-
- Linux block layer has "failfast" flags to direct drivers to fail more
- quickly.  These patches allow devices in an md array to be given a
- "failfast" flag, which will cause IO requests to be marked as
- "failfast" providing there is another device available.  Once the
- array becomes degraded, we stop using failfast, as that could result
- in data loss.
-
- I don't like the whole "failfast" concept because it is not at all
- clear how fast "fast" is.  In fact, these block-layer flags are
- really a misnomer.  They should be "noretry" flags.
- REQ_FAILFAST_DEV means "don't retry requests which reported an error
- which seems to come from the device.
- REQ_FAILFAST_TRANSPORT means "don't retry requests which seem to
- indicate a problem with the transport, rather than the device"
- REQ_FAILFAST_DRIVER means  .... I'm not exactly sure.  I think it
- means whatever a particular driver wants it to mean, basically "I
- cannot seem to handle this right now, just resend and I'll probably
- be more in control next time".  It seems to be for internal-use only.
-
- Multipath code uses REQ_FAILFAST_TRANSPORT only, which makes sense.
- btrfs uses REQ_FAILFAST_DEV only (for read-ahead) which doesn't seem
- to make sense.... why would you ever use _DEV without _TRANSPORT?
-
- None of these actually change the timeouts in the driver or in the
- device, which is what I would expect for "failfast", so to get real
- "fast failure" you need to enable failfast, and adjust the timeouts.
- That is what we do for our customers with DASD.
-
- Anyway, it seems to make sense to use _TRANSPORT and _DEV for
- requests from md where there is somewhere to fall-back on.
- If we get an error from a "failfast" request, and the array is still
- non-degraded, we just fail the device.  We don't try to repair read
- errors (which is pointless on storage arrays).
-
- It is assumed that some user-space code will notice the failure,
- monitor the device to see when it becomes available again, and then
- --re-add it.  Assuming the array has a bitmap, the --re-add should be
- fast and the array will become optimal again without experiencing
- excessive latencies.
-
- My two main concerns are:
-  - does this functionality have any use-case outside of mirrored
-    storage arrays, and are there other storage arrays which
-    occasionally inserted excessive latency (seems like a serious
-    misfeature to me, but I know few of the details)?
-  - would it be at all possible to have "real" failfast functionality
-    in the block layer?  I.e. something that is based on time rather
-    than retry count.  Maybe in some cases a retry would be
-    appropriate if the first failure was very fast.
-    I.e. it would reduce timeouts and decide on retries based on
-    elapsed time rather than number of attempts.
-    With this would come the question of "how fast is fast" and I
-    don't have a really good answer.  Maybe md would need to set a
-    timeout, which it would double whenever it got failures on all
-    drives.  Otherwise the timeout would drift towards (say) 10 times
-    the typical response time.
-
- So: comments most welcome.  As I say, this does address a genuine
- need.  Just find it hard to like it :-(
-
-
-Thanks,
-NeilBrown
-
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <m@bjorling.me>
 ---
+ drivers/lightnvm/rrpc.c | 6 ------
+ drivers/lightnvm/rrpc.h | 3 ---
+ 2 files changed, 9 deletions(-)
 
-NeilBrown (6):
-      md/failfast:  add failfast flag for md to be used by some personalities.
-      md: Use REQ_FAILFAST_* on metadata writes where appropriate
-      md/raid1: add failfast handling for reads.
-      md/raid1: add failfast handling for writes.
-      md/raid10: add failfast handling for reads.
-      md/raid10: add failfast handling for writes.
-
-
- drivers/md/bitmap.c            |   15 ++++++--
- drivers/md/md.c                |   71 +++++++++++++++++++++++++++++++-----
- drivers/md/md.h                |   27 +++++++++++++-
- drivers/md/raid1.c             |   79 ++++++++++++++++++++++++++++++++++------
- drivers/md/raid1.h             |    1 +
- drivers/md/raid10.c            |   79 +++++++++++++++++++++++++++++++++++++---
- drivers/md/raid10.h            |    2 +
- include/uapi/linux/raid/md_p.h |    7 +++-
- 8 files changed, 249 insertions(+), 32 deletions(-)
-
---
-Signature
+diff --git a/drivers/lightnvm/rrpc.c b/drivers/lightnvm/rrpc.c
+index 9253acc..34d2ebf 100644
+--- a/drivers/lightnvm/rrpc.c
++++ b/drivers/lightnvm/rrpc.c
+@@ -758,7 +758,6 @@ static int rrpc_read_ppalist_rq(struct rrpc *rrpc, struct bio *bio,
+ static int rrpc_read_rq(struct rrpc *rrpc, struct bio *bio, struct nvm_rq *rqd,
+ 							unsigned long flags)
+ {
+-	struct rrpc_rq *rrqd = nvm_rq_to_pdu(rqd);
+ 	int is_gc = flags & NVM_IOTYPE_GC;
+ 	sector_t laddr = rrpc_get_laddr(bio);
+ 	struct rrpc_addr *gp;
+@@ -778,7 +777,6 @@ static int rrpc_read_rq(struct rrpc *rrpc, struct bio *bio, struct nvm_rq *rqd,
+ 	}
+ 
+ 	rqd->opcode = NVM_OP_HBREAD;
+-	rrqd->addr = gp;
+ 
+ 	return NVM_IO_OK;
+ }
+@@ -821,7 +819,6 @@ static int rrpc_write_ppalist_rq(struct rrpc *rrpc, struct bio *bio,
+ static int rrpc_write_rq(struct rrpc *rrpc, struct bio *bio,
+ 				struct nvm_rq *rqd, unsigned long flags)
+ {
+-	struct rrpc_rq *rrqd = nvm_rq_to_pdu(rqd);
+ 	struct rrpc_addr *p;
+ 	int is_gc = flags & NVM_IOTYPE_GC;
+ 	sector_t laddr = rrpc_get_laddr(bio);
+@@ -839,7 +836,6 @@ static int rrpc_write_rq(struct rrpc *rrpc, struct bio *bio,
+ 
+ 	rqd->ppa_addr = rrpc_ppa_to_gaddr(rrpc->dev, p->addr);
+ 	rqd->opcode = NVM_OP_HBWRITE;
+-	rrqd->addr = p;
+ 
+ 	return NVM_IO_OK;
+ }
+@@ -1389,7 +1385,6 @@ static void *rrpc_init(struct nvm_dev *dev, struct gendisk *tdisk,
+ 	INIT_WORK(&rrpc->ws_requeue, rrpc_requeue);
+ 
+ 	rrpc->nr_luns = lun_end - lun_begin + 1;
+-	rrpc->total_blocks = (unsigned long)dev->blks_per_lun * rrpc->nr_luns;
+ 	rrpc->nr_sects = (unsigned long long)dev->sec_per_lun * rrpc->nr_luns;
+ 
+ 	/* simple round-robin strategy */
+@@ -1409,7 +1404,6 @@ static void *rrpc_init(struct nvm_dev *dev, struct gendisk *tdisk,
+ 	}
+ 
+ 	rrpc->poffset = dev->sec_per_lun * lun_begin;
+-	rrpc->lun_offset = lun_begin;
+ 
+ 	ret = rrpc_core_init(rrpc);
+ 	if (ret) {
+diff --git a/drivers/lightnvm/rrpc.h b/drivers/lightnvm/rrpc.h
+index 5e87d52..bed49ba 100644
+--- a/drivers/lightnvm/rrpc.h
++++ b/drivers/lightnvm/rrpc.h
+@@ -48,7 +48,6 @@ struct rrpc_inflight_rq {
+ 
+ struct rrpc_rq {
+ 	struct rrpc_inflight_rq inflight_rq;
+-	struct rrpc_addr *addr;
+ 	unsigned long flags;
+ };
+ 
+@@ -92,14 +91,12 @@ struct rrpc {
+ 
+ 	sector_t soffset; /* logical sector offset */
+ 	u64 poffset; /* physical page offset */
+-	int lun_offset;
+ 
+ 	int nr_luns;
+ 	struct rrpc_lun *luns;
+ 
+ 	/* calculated values */
+ 	unsigned long long nr_sects;
+-	unsigned long total_blocks;
+ 
+ 	/* Write strategy variables. Move these into each for structure for each
+ 	 * strategy
+-- 
+2.9.3
 
