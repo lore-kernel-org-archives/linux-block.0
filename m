@@ -1,271 +1,263 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:42136 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751989AbcKRFRH (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Nov 2016 00:17:07 -0500
-From: NeilBrown <neilb@suse.com>
-To: Shaohua Li <shli@kernel.org>
-Date: Fri, 18 Nov 2016 16:16:11 +1100
-Subject: [md PATCH 2/6] md: Use REQ_FAILFAST_* on metadata writes where
- appropriate
-Cc: linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>, linux-kernel@vger.kernel.org,
-        hare@suse.de
-Message-ID: <147944617167.3302.15513574606815740403.stgit@noble>
-In-Reply-To: <147944614789.3302.1959091446949640579.stgit@noble>
-References: <147944614789.3302.1959091446949640579.stgit@noble>
+Received: from mail-wj0-f194.google.com ([209.85.210.194]:34083 "EHLO
+        mail-wj0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755541AbcK1Vjn (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 28 Nov 2016 16:39:43 -0500
+Received: by mail-wj0-f194.google.com with SMTP id xy5so15802157wjc.1
+        for <linux-block@vger.kernel.org>; Mon, 28 Nov 2016 13:39:42 -0800 (PST)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: axboe@fb.com, =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <jg@lightnvm.io>,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+Subject: [PATCH 05/23] lightnvm: export set bad block table
+Date: Mon, 28 Nov 2016 22:38:56 +0100
+Message-Id: <20161128213914.12516-6-m@bjorling.me>
+In-Reply-To: <20161128213914.12516-1-m@bjorling.me>
+References: <20161128213914.12516-1-m@bjorling.me>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-This can only be supported on personalities which ensure
-that md_error() never causes an array to enter the 'failed'
-state.  i.e. if marking a device Faulty would cause some
-data to be inaccessible, the device is status is left as
-non-Faulty.  This is true for RAID1 and RAID10.
+From: Javier González <jg@lightnvm.io>
 
-If we get a failure writing metadata but the device doesn't
-fail, it must be the last device so we re-write without
-FAILFAST to improve chance of success.  We also flag the
-device as LastDev so that future metadata updates don't
-waste time on failfast writes.
+Bad blocks should be managed by block owners. This would be either
+targets for data blocks or sysblk for system blocks.
 
-Signed-off-by: NeilBrown <neilb@suse.com>
+In order to support this, export two functions: One to mark a block as
+an specific type (e.g., bad block) and another to update the bad block
+table on the device.
+
+Move bad block management to rrpc.
+
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <m@bjorling.me>
 ---
- drivers/md/bitmap.c |   15 ++++++++++++---
- drivers/md/md.c     |   44 ++++++++++++++++++++++++++++++++++----------
- drivers/md/md.h     |   21 ++++++++++++++++++++-
- drivers/md/raid1.c  |    1 +
- drivers/md/raid10.c |    1 +
- 5 files changed, 68 insertions(+), 14 deletions(-)
+ drivers/lightnvm/core.c   | 27 +++++++++++++++++++++++++++
+ drivers/lightnvm/gennvm.c | 24 ------------------------
+ drivers/lightnvm/rrpc.c   | 34 +++++++++++++++++++++++++++++++++-
+ drivers/lightnvm/sysblk.c | 29 +++++------------------------
+ include/linux/lightnvm.h  | 13 ++++++++++++-
+ 5 files changed, 77 insertions(+), 50 deletions(-)
 
-diff --git a/drivers/md/bitmap.c b/drivers/md/bitmap.c
-index cf77cbf9ed22..c4621571b718 100644
---- a/drivers/md/bitmap.c
-+++ b/drivers/md/bitmap.c
-@@ -209,11 +209,13 @@ static struct md_rdev *next_active_rdev(struct md_rdev *rdev, struct mddev *mdde
- 
- static int write_sb_page(struct bitmap *bitmap, struct page *page, int wait)
- {
--	struct md_rdev *rdev = NULL;
-+	struct md_rdev *rdev;
- 	struct block_device *bdev;
- 	struct mddev *mddev = bitmap->mddev;
- 	struct bitmap_storage *store = &bitmap->storage;
- 
-+restart:
-+	rdev = NULL;
- 	while ((rdev = next_active_rdev(rdev, mddev)) != NULL) {
- 		int size = PAGE_SIZE;
- 		loff_t offset = mddev->bitmap_info.offset;
-@@ -269,8 +271,8 @@ static int write_sb_page(struct bitmap *bitmap, struct page *page, int wait)
- 			       page);
- 	}
- 
--	if (wait)
--		md_super_wait(mddev);
-+	if (wait && md_super_wait(mddev) < 0)
-+		goto restart;
- 	return 0;
- 
-  bad_alignment:
-@@ -428,6 +430,13 @@ static void bitmap_wait_writes(struct bitmap *bitmap)
- 		wait_event(bitmap->write_wait,
- 			   atomic_read(&bitmap->pending_writes)==0);
- 	else
-+		/* Note that we ignore the return value.  The writes
-+		 * might have failed, but that would just mean that
-+		 * some bits which should be cleared haven't been,
-+		 * which is safe.  The relevant bitmap blocks will
-+		 * probably get written again, but there is no great
-+		 * loss if they aren't.
-+		 */
- 		md_super_wait(bitmap->mddev);
+diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+index 8664fe0..6527cf6 100644
+--- a/drivers/lightnvm/core.c
++++ b/drivers/lightnvm/core.c
+@@ -196,6 +196,33 @@ void nvm_mark_blk(struct nvm_dev *dev, struct ppa_addr ppa, int type)
  }
+ EXPORT_SYMBOL(nvm_mark_blk);
  
-diff --git a/drivers/md/md.c b/drivers/md/md.c
-index 0d1a9fd9d1c1..047e7db1381b 100644
---- a/drivers/md/md.c
-+++ b/drivers/md/md.c
-@@ -726,7 +726,13 @@ static void super_written(struct bio *bio)
- 	if (bio->bi_error) {
- 		pr_err("md: super_written gets error=%d\n", bio->bi_error);
- 		md_error(mddev, rdev);
--	}
-+		if (!test_bit(Faulty, &rdev->flags)
-+		    && (bio->bi_opf & MD_FAILFAST)) {
-+			set_bit(MD_NEED_REWRITE, &mddev->flags);
-+			set_bit(LastDev, &rdev->flags);
-+		}
-+	} else
-+		clear_bit(LastDev, &rdev->flags);
- 
- 	if (atomic_dec_and_test(&mddev->pending_writes))
- 		wake_up(&mddev->sb_wait);
-@@ -743,7 +749,13 @@ void md_super_write(struct mddev *mddev, struct md_rdev *rdev,
- 	 * if zero is reached.
- 	 * If an error occurred, call md_error
- 	 */
--	struct bio *bio = bio_alloc_mddev(GFP_NOIO, 1, mddev);
-+	struct bio *bio;
-+	int ff = 0;
++int nvm_set_bb_tbl(struct nvm_dev *dev, struct ppa_addr *ppas, int nr_ppas,
++								int type)
++{
++	struct nvm_rq rqd;
++	int ret;
 +
-+	if (test_bit(Faulty, &rdev->flags))
-+		return;
++	if (nr_ppas > dev->ops->max_phys_sect) {
++		pr_err("nvm: unable to update all sysblocks atomically\n");
++		return -EINVAL;
++	}
 +
-+	bio = bio_alloc_mddev(GFP_NOIO, 1, mddev);
- 
- 	atomic_inc(&rdev->nr_pending);
- 
-@@ -752,16 +764,24 @@ void md_super_write(struct mddev *mddev, struct md_rdev *rdev,
- 	bio_add_page(bio, page, size, 0);
- 	bio->bi_private = rdev;
- 	bio->bi_end_io = super_written;
--	bio_set_op_attrs(bio, REQ_OP_WRITE, WRITE_FLUSH_FUA);
++	memset(&rqd, 0, sizeof(struct nvm_rq));
 +
-+	if (test_bit(MD_FAILFAST_SUPPORTED, &mddev->flags) &&
-+	    test_bit(FailFast, &rdev->flags) &&
-+	    !test_bit(LastDev, &rdev->flags))
-+		ff = MD_FAILFAST;
-+	bio_set_op_attrs(bio, REQ_OP_WRITE, WRITE_FLUSH_FUA | ff);
- 
- 	atomic_inc(&mddev->pending_writes);
- 	submit_bio(bio);
- }
- 
--void md_super_wait(struct mddev *mddev)
-+int md_super_wait(struct mddev *mddev)
- {
- 	/* wait for all superblock writes that were scheduled to complete */
- 	wait_event(mddev->sb_wait, atomic_read(&mddev->pending_writes)==0);
-+	if (test_and_clear_bit(MD_NEED_REWRITE, &mddev->flags))
-+		return -EAGAIN;
++	nvm_set_rqd_ppalist(dev, &rqd, ppas, nr_ppas, 1);
++	nvm_generic_to_addr_mode(dev, &rqd);
++
++	ret = dev->ops->set_bb_tbl(dev, &rqd.ppa_addr, rqd.nr_ppas, type);
++	nvm_free_rqd_ppalist(dev, &rqd);
++	if (ret) {
++		pr_err("nvm: sysblk failed bb mark\n");
++		return -EINVAL;
++	}
++
 +	return 0;
++}
++EXPORT_SYMBOL(nvm_set_bb_tbl);
++
+ int nvm_submit_io(struct nvm_dev *dev, struct nvm_rq *rqd)
+ {
+ 	return dev->mt->submit_io(dev, rqd);
+diff --git a/drivers/lightnvm/gennvm.c b/drivers/lightnvm/gennvm.c
+index a7e17fa..e969e3a 100644
+--- a/drivers/lightnvm/gennvm.c
++++ b/drivers/lightnvm/gennvm.c
+@@ -543,34 +543,10 @@ static void gen_mark_blk(struct nvm_dev *dev, struct ppa_addr ppa, int type)
+ 	blk->state = type;
  }
  
- int sync_page_io(struct md_rdev *rdev, sector_t sector, int size,
-@@ -1333,9 +1353,10 @@ super_90_rdev_size_change(struct md_rdev *rdev, sector_t num_sectors)
- 	if (IS_ENABLED(CONFIG_LBDAF) && (u64)num_sectors >= (2ULL << 32) &&
- 	    rdev->mddev->level >= 1)
- 		num_sectors = (sector_t)(2ULL << 32) - 2;
--	md_super_write(rdev->mddev, rdev, rdev->sb_start, rdev->sb_size,
-+	do
-+		md_super_write(rdev->mddev, rdev, rdev->sb_start, rdev->sb_size,
- 		       rdev->sb_page);
--	md_super_wait(rdev->mddev);
-+	while (md_super_wait(rdev->mddev) < 0);
- 	return num_sectors;
+-/*
+- * mark block bad in gen. It is expected that the target recovers separately
+- */
+-static void gen_mark_blk_bad(struct nvm_dev *dev, struct nvm_rq *rqd)
+-{
+-	int bit = -1;
+-	int max_secs = dev->ops->max_phys_sect;
+-	void *comp_bits = &rqd->ppa_status;
+-
+-	nvm_addr_to_generic_mode(dev, rqd);
+-
+-	/* look up blocks and mark them as bad */
+-	if (rqd->nr_ppas == 1) {
+-		gen_mark_blk(dev, rqd->ppa_addr, NVM_BLK_ST_BAD);
+-		return;
+-	}
+-
+-	while ((bit = find_next_bit(comp_bits, max_secs, bit + 1)) < max_secs)
+-		gen_mark_blk(dev, rqd->ppa_list[bit], NVM_BLK_ST_BAD);
+-}
+-
+ static void gen_end_io(struct nvm_rq *rqd)
+ {
+ 	struct nvm_tgt_instance *ins = rqd->ins;
+ 
+-	if (rqd->error == NVM_RSP_ERR_FAILWRITE)
+-		gen_mark_blk_bad(rqd->dev, rqd);
+-
+ 	ins->tt->end_io(rqd);
  }
  
-@@ -1876,9 +1897,10 @@ super_1_rdev_size_change(struct md_rdev *rdev, sector_t num_sectors)
- 	sb->data_size = cpu_to_le64(num_sectors);
- 	sb->super_offset = rdev->sb_start;
- 	sb->sb_csum = calc_sb_1_csum(sb);
--	md_super_write(rdev->mddev, rdev, rdev->sb_start, rdev->sb_size,
--		       rdev->sb_page);
--	md_super_wait(rdev->mddev);
-+	do
-+		md_super_write(rdev->mddev, rdev, rdev->sb_start, rdev->sb_size,
-+			       rdev->sb_page);
-+	while (md_super_wait(rdev->mddev) < 0);
- 	return num_sectors;
- 
+diff --git a/drivers/lightnvm/rrpc.c b/drivers/lightnvm/rrpc.c
+index 067e890..2b71b7e 100644
+--- a/drivers/lightnvm/rrpc.c
++++ b/drivers/lightnvm/rrpc.c
+@@ -675,6 +675,34 @@ static void rrpc_run_gc(struct rrpc *rrpc, struct rrpc_block *rblk)
+ 	queue_work(rrpc->kgc_wq, &gcb->ws_gc);
  }
-@@ -2413,6 +2435,7 @@ void md_update_sb(struct mddev *mddev, int force_change)
- 	pr_debug("md: updating %s RAID superblock on device (in sync %d)\n",
- 		 mdname(mddev), mddev->in_sync);
  
-+rewrite:
- 	bitmap_update_sb(mddev->bitmap);
- 	rdev_for_each(rdev, mddev) {
- 		char b[BDEVNAME_SIZE];
-@@ -2444,7 +2467,8 @@ void md_update_sb(struct mddev *mddev, int force_change)
- 			/* only need to write one superblock... */
- 			break;
++static void __rrpc_mark_bad_block(struct nvm_dev *dev, struct ppa_addr *ppa)
++{
++		nvm_mark_blk(dev, *ppa, NVM_BLK_ST_BAD);
++		nvm_set_bb_tbl(dev, ppa, 1, NVM_BLK_T_GRWN_BAD);
++}
++
++static void rrpc_mark_bad_block(struct rrpc *rrpc, struct nvm_rq *rqd)
++{
++	struct nvm_dev *dev = rrpc->dev;
++	void *comp_bits = &rqd->ppa_status;
++	struct ppa_addr ppa, prev_ppa;
++	int nr_ppas = rqd->nr_ppas;
++	int bit;
++
++	if (rqd->nr_ppas == 1)
++		__rrpc_mark_bad_block(dev, &rqd->ppa_addr);
++
++	ppa_set_empty(&prev_ppa);
++	bit = -1;
++	while ((bit = find_next_bit(comp_bits, nr_ppas, bit + 1)) < nr_ppas) {
++		ppa = rqd->ppa_list[bit];
++		if (ppa_cmp_blk(ppa, prev_ppa))
++			continue;
++
++		__rrpc_mark_bad_block(dev, &ppa);
++	}
++}
++
+ static void rrpc_end_io_write(struct rrpc *rrpc, struct rrpc_rq *rrqd,
+ 						sector_t laddr, uint8_t npages)
+ {
+@@ -701,8 +729,12 @@ static void rrpc_end_io(struct nvm_rq *rqd)
+ 	uint8_t npages = rqd->nr_ppas;
+ 	sector_t laddr = rrpc_get_laddr(rqd->bio) - npages;
+ 
+-	if (bio_data_dir(rqd->bio) == WRITE)
++	if (bio_data_dir(rqd->bio) == WRITE) {
++		if (rqd->error == NVM_RSP_ERR_FAILWRITE)
++			rrpc_mark_bad_block(rrpc, rqd);
++
+ 		rrpc_end_io_write(rrpc, rrqd, laddr, npages);
++	}
+ 
+ 	bio_put(rqd->bio);
+ 
+diff --git a/drivers/lightnvm/sysblk.c b/drivers/lightnvm/sysblk.c
+index d229067..fa644af 100644
+--- a/drivers/lightnvm/sysblk.c
++++ b/drivers/lightnvm/sysblk.c
+@@ -267,29 +267,10 @@ static int nvm_scan_block(struct nvm_dev *dev, struct ppa_addr *ppa,
+ 	return found;
+ }
+ 
+-static int nvm_set_bb_tbl(struct nvm_dev *dev, struct sysblk_scan *s, int type)
++static int nvm_sysblk_set_bb_tbl(struct nvm_dev *dev, struct sysblk_scan *s,
++								int type)
+ {
+-	struct nvm_rq rqd;
+-	int ret;
+-
+-	if (s->nr_ppas > dev->ops->max_phys_sect) {
+-		pr_err("nvm: unable to update all sysblocks atomically\n");
+-		return -EINVAL;
+-	}
+-
+-	memset(&rqd, 0, sizeof(struct nvm_rq));
+-
+-	nvm_set_rqd_ppalist(dev, &rqd, s->ppas, s->nr_ppas, 1);
+-	nvm_generic_to_addr_mode(dev, &rqd);
+-
+-	ret = dev->ops->set_bb_tbl(dev, &rqd.ppa_addr, rqd.nr_ppas, type);
+-	nvm_free_rqd_ppalist(dev, &rqd);
+-	if (ret) {
+-		pr_err("nvm: sysblk failed bb mark\n");
+-		return -EINVAL;
+-	}
+-
+-	return 0;
++	return nvm_set_bb_tbl(dev, s->ppas, s->nr_ppas, type);
+ }
+ 
+ static int nvm_write_and_verify(struct nvm_dev *dev, struct nvm_sb_info *info,
+@@ -573,7 +554,7 @@ int nvm_init_sysblock(struct nvm_dev *dev, struct nvm_sb_info *info)
+ 	if (ret)
+ 		goto err_mark;
+ 
+-	ret = nvm_set_bb_tbl(dev, &s, NVM_BLK_T_HOST);
++	ret = nvm_sysblk_set_bb_tbl(dev, &s, NVM_BLK_T_HOST);
+ 	if (ret)
+ 		goto err_mark;
+ 
+@@ -733,7 +714,7 @@ int nvm_dev_factory(struct nvm_dev *dev, int flags)
+ 		mutex_lock(&dev->mlock);
+ 		ret = nvm_get_all_sysblks(dev, &s, sysblk_ppas, 0);
+ 		if (!ret)
+-			ret = nvm_set_bb_tbl(dev, &s, NVM_BLK_T_FREE);
++			ret = nvm_sysblk_set_bb_tbl(dev, &s, NVM_BLK_T_FREE);
+ 		mutex_unlock(&dev->mlock);
  	}
--	md_super_wait(mddev);
-+	if (md_super_wait(mddev) < 0)
-+		goto rewrite;
- 	/* if there was a failure, MD_CHANGE_DEVS was set, and we re-write super */
+ err_ppas:
+diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
+index d87be02..4480d1c 100644
+--- a/include/linux/lightnvm.h
++++ b/include/linux/lightnvm.h
+@@ -423,6 +423,15 @@ static inline struct ppa_addr block_to_ppa(struct nvm_dev *dev,
+ 	return ppa;
+ }
  
- 	if (mddev_is_clustered(mddev) && ret == 0)
-diff --git a/drivers/md/md.h b/drivers/md/md.h
-index bc6712ef8c81..5c08f84101fa 100644
---- a/drivers/md/md.h
-+++ b/drivers/md/md.h
-@@ -30,6 +30,16 @@
- #define MaxSector (~(sector_t)0)
++static inline int ppa_cmp_blk(struct ppa_addr ppa1, struct ppa_addr ppa2)
++{
++	if (ppa_empty(ppa1) || ppa_empty(ppa2))
++		return 0;
++
++	return ((ppa1.g.ch == ppa2.g.ch) && (ppa1.g.lun == ppa2.g.lun) &&
++					(ppa1.g.blk == ppa2.g.blk));
++}
++
+ static inline int ppa_to_slc(struct nvm_dev *dev, int slc_pg)
+ {
+ 	return dev->lptbl[slc_pg];
+@@ -528,7 +537,9 @@ extern struct nvm_dev *nvm_alloc_dev(int);
+ extern int nvm_register(struct nvm_dev *);
+ extern void nvm_unregister(struct nvm_dev *);
  
- /*
-+ * These flags should really be called "NO_RETRY" rather than
-+ * "FAILFAST" because they don't make any promise about time lapse,
-+ * only about the number of retries, which will be zero.
-+ * REQ_FAILFAST_DRIVER is not included because
-+ * Commit: 4a27446f3e39 ("[SCSI] modify scsi to handle new fail fast flags.")
-+ * seems to suggest that the errors it avoids retrying should usually
-+ * be retried.
-+ */
-+#define	MD_FAILFAST	(REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT)
-+/*
-  * MD's 'extended' device
-  */
- struct md_rdev {
-@@ -177,6 +187,10 @@ enum flag_bits {
- 				 * It is expects that no bad block log
- 				 * is present.
- 				 */
-+	LastDev,		/* Seems to be the last working dev as
-+				 * it didn't fail, so don't use FailFast
-+				 * any more for metadata
-+				 */
- };
+-void nvm_mark_blk(struct nvm_dev *dev, struct ppa_addr ppa, int type);
++extern void nvm_mark_blk(struct nvm_dev *dev, struct ppa_addr ppa, int type);
++extern int nvm_set_bb_tbl(struct nvm_dev *dev, struct ppa_addr *ppas,
++							int nr_ppas, int type);
  
- static inline int is_badblock(struct md_rdev *rdev, sector_t s, int sectors,
-@@ -213,6 +227,11 @@ enum mddev_flags {
- 	MD_CLUSTER_RESYNC_LOCKED, /* cluster raid only, which means node
- 				   * already took resync lock, need to
- 				   * release the lock */
-+	MD_FAILFAST_SUPPORTED,	/* Using MD_FAILFAST on metadata writes is
-+				 * supported as calls to md_error() will
-+				 * never cause the array to become failed.
-+				 */
-+	MD_NEED_REWRITE,	/* metadata write needs to be repeated */
- };
- #define MD_UPDATE_SB_FLAGS (BIT(MD_CHANGE_DEVS) | \
- 			    BIT(MD_CHANGE_CLEAN) | \
-@@ -628,7 +647,7 @@ extern int mddev_congested(struct mddev *mddev, int bits);
- extern void md_flush_request(struct mddev *mddev, struct bio *bio);
- extern void md_super_write(struct mddev *mddev, struct md_rdev *rdev,
- 			   sector_t sector, int size, struct page *page);
--extern void md_super_wait(struct mddev *mddev);
-+extern int md_super_wait(struct mddev *mddev);
- extern int sync_page_io(struct md_rdev *rdev, sector_t sector, int size,
- 			struct page *page, int op, int op_flags,
- 			bool metadata_op);
-diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
-index 96474f0af1b8..cfd73730e6af 100644
---- a/drivers/md/raid1.c
-+++ b/drivers/md/raid1.c
-@@ -2989,6 +2989,7 @@ static int raid1_run(struct mddev *mddev)
- 	mddev->thread = conf->thread;
- 	conf->thread = NULL;
- 	mddev->private = conf;
-+	set_bit(MD_FAILFAST_SUPPORTED, &mddev->flags);
- 
- 	md_set_array_sectors(mddev, raid1_size(mddev, 0, 0));
- 
-diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
-index b53610c59104..763ca45b6b32 100644
---- a/drivers/md/raid10.c
-+++ b/drivers/md/raid10.c
-@@ -3728,6 +3728,7 @@ static int raid10_run(struct mddev *mddev)
- 	size = raid10_size(mddev, 0, 0);
- 	md_set_array_sectors(mddev, size);
- 	mddev->resync_max_sectors = size;
-+	set_bit(MD_FAILFAST_SUPPORTED, &mddev->flags);
- 
- 	if (mddev->queue) {
- 		int stripe = conf->geo.raid_disks *
-
+ extern int nvm_submit_io(struct nvm_dev *, struct nvm_rq *);
+ extern void nvm_generic_to_addr_mode(struct nvm_dev *, struct nvm_rq *);
+-- 
+2.9.3
 
