@@ -1,66 +1,47 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:37683 "EHLO
+Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:38227 "EHLO
         mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S965030AbcKNWWZ (ORCPT
+        by vger.kernel.org with ESMTP id S1754917AbcK1WOb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Nov 2016 17:22:25 -0500
-Received: from pps.filterd (m0044010.ppops.net [127.0.0.1])
-        by mx0a-00082601.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id uAEMK1sN008239
-        for <linux-block@vger.kernel.org>; Mon, 14 Nov 2016 14:22:24 -0800
-Received: from mail.thefacebook.com ([199.201.64.23])
-        by mx0a-00082601.pphosted.com with ESMTP id 26qj6dhcn4-3
-        (version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT)
-        for <linux-block@vger.kernel.org>; Mon, 14 Nov 2016 14:22:24 -0800
-Received: from facebook.com (2401:db00:21:603d:face:0:19:0)     by
- mx-out.facebook.com (10.223.100.99) with ESMTP id
- d0eef5eaaab811e6822c24be05956610-870e8a50 for <linux-block@vger.kernel.org>;
-        Mon, 14 Nov 2016 14:22:23 -0800
+        Mon, 28 Nov 2016 17:14:31 -0500
+Date: Mon, 28 Nov 2016 14:14:16 -0800
 From: Shaohua Li <shli@fb.com>
-To: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <Kernel-team@fb.com>, <axboe@fb.com>, <tj@kernel.org>,
-        <vgoyal@redhat.com>
-Subject: [PATCH V4 06/15] blk-throttle: make sure expire time isn't too big
-Date: Mon, 14 Nov 2016 14:22:13 -0800
-Message-ID: <9ec659c894ba328a113c4f51596175fcdbbbe571.1479161136.git.shli@fb.com>
-In-Reply-To: <cover.1479161136.git.shli@fb.com>
+To: Tejun Heo <tj@kernel.org>
+CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <Kernel-team@fb.com>, <axboe@fb.com>, <vgoyal@redhat.com>
+Subject: Re: [PATCH V4 11/15] blk-throttle: add interface to configure think
+ time threshold
+Message-ID: <20161128221415.GA94530@shli-mbp.local>
 References: <cover.1479161136.git.shli@fb.com>
+ <52aae27038728bf0fd1b2b3b6536fcc28c9f2e6c.1479161136.git.shli@fb.com>
+ <20161123213243.GD11306@mtj.duckdns.org>
+ <20161124010629.GB4724@ksenks-mbp.dhcp.thefacebook.com>
+ <20161128220818.GA12948@htj.duckdns.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <20161128220818.GA12948@htj.duckdns.org>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-cgroup could be throttled to a limit but when all cgroups cross high
-limit, queue enters a higher state and so the group should be throttled
-to a higher limit. It's possible the cgroup is sleeping because of
-throttle and other cgroups don't dispatch IO any more. In this case,
-nobody can trigger current downgrade/upgrade logic. To fix this issue,
-we could either set up a timer to wakeup the cgroup if other cgroups are
-idle or make sure this cgroup doesn't sleep too long. Setting up a timer
-means we must change the timer very frequently. This patch chooses the
-latter. Making cgroup sleep time not too big wouldn't change cgroup
-bps/iops, but could make it wakeup more frequently, which isn't a big
-issue because throtl_slice * 8 is already quite big.
+On Mon, Nov 28, 2016 at 05:08:18PM -0500, Tejun Heo wrote:
+> Hello, Shaohua.
+> 
+> On Wed, Nov 23, 2016 at 05:06:30PM -0800, Shaohua Li wrote:
+> > > Shouldn't this be a per-cgroup setting along with latency target?
+> > > These two are the parameters which define how the cgroup should be
+> > > treated time-wise.
+> > 
+> > It should be easy to make it per-cgroup. Just not sure if it should be
+> > per-cgroup. The logic is if the disk is faster, wait time should be shorter to
+> > not harm performance. So it sounds like a per-disk characteristic.
+> 
+> Yes, this is something dependent on the device, but also on the
+> workload.  For both this parameter and the latency target, it seems
+> that they should be specified along with the actual device limits so
+> that they follow the same convention and can be specified per cgroup *
+> block device.  What do you think?
 
-Signed-off-by: Shaohua Li <shli@fb.com>
----
- block/blk-throttle.c | 4 ++++
- 1 file changed, 4 insertions(+)
+That's ok, I'm totally fine to make it per cgroup and per disk.
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index d177252..eff3120 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -589,6 +589,10 @@ static void throtl_dequeue_tg(struct throtl_grp *tg)
- static void throtl_schedule_pending_timer(struct throtl_service_queue *sq,
- 					  unsigned long expires)
- {
-+	unsigned long max_expire = jiffies + 8 * throtl_slice;
-+
-+	if (time_after(expires, max_expire))
-+		expires = max_expire;
- 	mod_timer(&sq->pending_timer, expires);
- 	throtl_log(sq, "schedule timer. delay=%lu jiffies=%lu",
- 		   expires - jiffies, jiffies);
--- 
-2.9.3
-
+Thanks,
+Shaohua
