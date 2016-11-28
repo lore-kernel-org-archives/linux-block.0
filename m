@@ -1,188 +1,347 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:37259 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1757270AbcK2LXp (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 29 Nov 2016 06:23:45 -0500
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv5 31/36] ext4: handle writeback with huge pages
-Date: Tue, 29 Nov 2016 14:22:59 +0300
-Message-Id: <20161129112304.90056-32-kirill.shutemov@linux.intel.com>
-In-Reply-To: <20161129112304.90056-1-kirill.shutemov@linux.intel.com>
-References: <20161129112304.90056-1-kirill.shutemov@linux.intel.com>
+Received: from mail-wm0-f66.google.com ([74.125.82.66]:35966 "EHLO
+        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755588AbcK1Vjt (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 28 Nov 2016 16:39:49 -0500
+Received: by mail-wm0-f66.google.com with SMTP id m203so21231629wma.3
+        for <linux-block@vger.kernel.org>; Mon, 28 Nov 2016 13:39:49 -0800 (PST)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: axboe@fb.com, =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <jg@lightnvm.io>,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+Subject: [PATCH 13/23] lightnvm: remove gen_lun abstraction
+Date: Mon, 28 Nov 2016 22:39:04 +0100
+Message-Id: <20161128213914.12516-14-m@bjorling.me>
+In-Reply-To: <20161128213914.12516-1-m@bjorling.me>
+References: <20161128213914.12516-1-m@bjorling.me>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Modify mpage_map_and_submit_buffers() and mpage_release_unused_pages()
-to deal with huge pages.
+From: Javier González <jg@lightnvm.io>
 
-Mostly result of try-and-error. Critical view would be appriciated.
+The gen_lun abstraction in the generic media manager was conceived on
+the assumption that a single target would instantiated on top of it.
+This has complicated target design to implement multi-instances. Remove
+this abstraction and move its logic to nvm_lun, which manages physical
+lun geometry and operations.
 
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <m@bjorling.me>
 ---
- fs/ext4/inode.c | 61 ++++++++++++++++++++++++++++++++++++++++-----------------
- 1 file changed, 43 insertions(+), 18 deletions(-)
+ drivers/lightnvm/gennvm.c | 85 +++++++++++++++++++++++------------------------
+ drivers/lightnvm/gennvm.h | 16 +--------
+ include/linux/lightnvm.h  | 10 ++++++
+ 3 files changed, 53 insertions(+), 58 deletions(-)
 
-diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
-index 035256019e16..ff4f460d3625 100644
---- a/fs/ext4/inode.c
-+++ b/fs/ext4/inode.c
-@@ -1666,20 +1666,32 @@ static void mpage_release_unused_pages(struct mpage_da_data *mpd,
- 		if (nr_pages == 0)
+diff --git a/drivers/lightnvm/gennvm.c b/drivers/lightnvm/gennvm.c
+index aee5b72..3572ebb 100644
+--- a/drivers/lightnvm/gennvm.c
++++ b/drivers/lightnvm/gennvm.c
+@@ -223,13 +223,13 @@ static void gen_put_area(struct nvm_dev *dev, sector_t begin)
+ static void gen_blocks_free(struct nvm_dev *dev)
+ {
+ 	struct gen_dev *gn = dev->mp;
+-	struct gen_lun *lun;
++	struct nvm_lun *lun;
+ 	int i;
+ 
+ 	gen_for_each_lun(gn, lun, i) {
+-		if (!lun->vlun.blocks)
++		if (!lun->blocks)
  			break;
- 		for (i = 0; i < nr_pages; i++) {
--			struct page *page = pvec.pages[i];
-+			struct page *page = compound_head(pvec.pages[i]);
-+
- 			if (page->index > end)
- 				break;
- 			BUG_ON(!PageLocked(page));
- 			BUG_ON(PageWriteback(page));
- 			if (invalidate) {
-+				unsigned long offset, len;
-+
-+				offset = (index % hpage_nr_pages(page));
-+				len = min_t(unsigned long, end - page->index,
-+						hpage_nr_pages(page));
-+
- 				if (page_mapped(page))
- 					clear_page_dirty_for_io(page);
--				block_invalidatepage(page, 0, PAGE_SIZE);
-+				block_invalidatepage(page, offset << PAGE_SHIFT,
-+						len << PAGE_SHIFT);
- 				ClearPageUptodate(page);
- 			}
- 			unlock_page(page);
-+			if (PageTransHuge(page))
-+				break;
- 		}
--		index = pvec.pages[nr_pages - 1]->index + 1;
-+		index = page_to_pgoff(pvec.pages[nr_pages - 1]) + 1;
-+		if (PageTransCompound(pvec.pages[nr_pages - 1]))
-+			index = round_up(index, HPAGE_PMD_NR);
- 		pagevec_release(&pvec);
+-		vfree(lun->vlun.blocks);
++		vfree(lun->blocks);
  	}
  }
-@@ -2113,16 +2125,16 @@ static int mpage_submit_page(struct mpage_da_data *mpd, struct page *page)
- 	loff_t size = i_size_read(mpd->inode);
- 	int err;
  
--	BUG_ON(page->index != mpd->first_page);
--	if (page->index == size >> PAGE_SHIFT)
--		len = size & ~PAGE_MASK;
--	else
--		len = PAGE_SIZE;
-+	page = compound_head(page);
-+	len = hpage_size(page);
-+	if (page->index + hpage_nr_pages(page) - 1 == size >> PAGE_SHIFT)
-+		len = size & ~hpage_mask(page);
+@@ -242,24 +242,24 @@ static void gen_luns_free(struct nvm_dev *dev)
+ 
+ static int gen_luns_init(struct nvm_dev *dev, struct gen_dev *gn)
+ {
+-	struct gen_lun *lun;
++	struct nvm_lun *lun;
+ 	int i;
+ 
+-	gn->luns = kcalloc(dev->nr_luns, sizeof(struct gen_lun), GFP_KERNEL);
++	gn->luns = kcalloc(dev->nr_luns, sizeof(struct nvm_lun), GFP_KERNEL);
+ 	if (!gn->luns)
+ 		return -ENOMEM;
+ 
+ 	gen_for_each_lun(gn, lun, i) {
+-		spin_lock_init(&lun->vlun.lock);
+ 		INIT_LIST_HEAD(&lun->free_list);
+ 		INIT_LIST_HEAD(&lun->used_list);
+ 		INIT_LIST_HEAD(&lun->bb_list);
+ 
+-		lun->reserved_blocks = 2; /* for GC only */
+-		lun->vlun.id = i;
+-		lun->vlun.lun_id = i % dev->luns_per_chnl;
+-		lun->vlun.chnl_id = i / dev->luns_per_chnl;
+-		lun->vlun.nr_free_blocks = dev->blks_per_lun;
++		spin_lock_init(&lun->lock);
 +
- 	clear_page_dirty_for_io(page);
- 	err = ext4_bio_write_page(&mpd->io_submit, page, len, mpd->wbc, false);
- 	if (!err)
--		mpd->wbc->nr_to_write--;
--	mpd->first_page++;
-+		mpd->wbc->nr_to_write -= hpage_nr_pages(page);
-+	mpd->first_page = round_up(mpd->first_page + 1, hpage_nr_pages(page));
- 
- 	return err;
- }
-@@ -2270,12 +2282,16 @@ static int mpage_map_and_submit_buffers(struct mpage_da_data *mpd)
- 			break;
- 		for (i = 0; i < nr_pages; i++) {
- 			struct page *page = pvec.pages[i];
-+			unsigned long diff;
- 
--			if (page->index > end)
-+			if (page_to_pgoff(page) > end)
- 				break;
- 			/* Up to 'end' pages must be contiguous */
--			BUG_ON(page->index != start);
-+			BUG_ON(page_to_pgoff(page) != start);
-+			diff = (page - compound_head(page)) << bpp_bits;
- 			bh = head = page_buffers(page);
-+			while (diff--)
-+				bh = bh->b_this_page;
- 			do {
- 				if (lblk < mpd->map.m_lblk)
- 					continue;
-@@ -2312,7 +2328,10 @@ static int mpage_map_and_submit_buffers(struct mpage_da_data *mpd)
- 			 * supports blocksize < pagesize as we will try to
- 			 * convert potentially unmapped parts of inode.
- 			 */
--			mpd->io_submit.io_end->size += PAGE_SIZE;
-+			if (PageTransCompound(page))
-+				mpd->io_submit.io_end->size += HPAGE_PMD_SIZE;
-+			else
-+				mpd->io_submit.io_end->size += PAGE_SIZE;
- 			/* Page fully mapped - let IO run! */
- 			err = mpage_submit_page(mpd, page);
- 			if (err < 0) {
-@@ -2320,6 +2339,10 @@ static int mpage_map_and_submit_buffers(struct mpage_da_data *mpd)
- 				return err;
- 			}
- 			start++;
-+			if (PageTransCompound(page)) {
-+				start = round_up(start, HPAGE_PMD_NR);
-+				break;
-+			}
- 		}
- 		pagevec_release(&pvec);
++		lun->id = i;
++		lun->lun_id = i % dev->luns_per_chnl;
++		lun->chnl_id = i / dev->luns_per_chnl;
++		lun->nr_free_blocks = dev->blks_per_lun;
  	}
-@@ -2556,7 +2579,7 @@ static int mpage_prepare_extent_to_map(struct mpage_da_data *mpd)
- 			 * mapping. However, page->index will not change
- 			 * because we have a reference on the page.
+ 	return 0;
+ }
+@@ -268,7 +268,7 @@ static int gen_block_bb(struct gen_dev *gn, struct ppa_addr ppa,
+ 							u8 *blks, int nr_blks)
+ {
+ 	struct nvm_dev *dev = gn->dev;
+-	struct gen_lun *lun;
++	struct nvm_lun *lun;
+ 	struct nvm_block *blk;
+ 	int i;
+ 
+@@ -282,9 +282,10 @@ static int gen_block_bb(struct gen_dev *gn, struct ppa_addr ppa,
+ 		if (blks[i] == NVM_BLK_T_FREE)
+ 			continue;
+ 
+-		blk = &lun->vlun.blocks[i];
++		blk = &lun->blocks[i];
+ 		list_move_tail(&blk->list, &lun->bb_list);
+-		lun->vlun.nr_free_blocks--;
++		blk->state = NVM_BLK_ST_BAD;
++		lun->nr_free_blocks--;
+ 	}
+ 
+ 	return 0;
+@@ -295,7 +296,7 @@ static int gen_block_map(u64 slba, u32 nlb, __le64 *entries, void *private)
+ 	struct nvm_dev *dev = private;
+ 	struct gen_dev *gn = dev->mp;
+ 	u64 elba = slba + nlb;
+-	struct gen_lun *lun;
++	struct nvm_lun *lun;
+ 	struct nvm_block *blk;
+ 	u64 i;
+ 	int lun_id;
+@@ -326,7 +327,7 @@ static int gen_block_map(u64 slba, u32 nlb, __le64 *entries, void *private)
+ 
+ 		/* Calculate block offset into lun */
+ 		pba = pba - (dev->sec_per_lun * lun_id);
+-		blk = &lun->vlun.blocks[div_u64(pba, dev->sec_per_blk)];
++		blk = &lun->blocks[div_u64(pba, dev->sec_per_blk)];
+ 
+ 		if (!blk->state) {
+ 			/* at this point, we don't know anything about the
+@@ -335,7 +336,7 @@ static int gen_block_map(u64 slba, u32 nlb, __le64 *entries, void *private)
  			 */
--			if (page->index > end)
-+			if (page_to_pgoff(page) > end)
- 				goto out;
+ 			list_move_tail(&blk->list, &lun->used_list);
+ 			blk->state = NVM_BLK_ST_TGT;
+-			lun->vlun.nr_free_blocks--;
++			lun->nr_free_blocks--;
+ 		}
+ 	}
  
- 			/*
-@@ -2571,7 +2594,7 @@ static int mpage_prepare_extent_to_map(struct mpage_da_data *mpd)
- 				goto out;
+@@ -344,7 +345,7 @@ static int gen_block_map(u64 slba, u32 nlb, __le64 *entries, void *private)
  
- 			/* If we can't merge this page, we are done. */
--			if (mpd->map.m_len > 0 && mpd->next_page != page->index)
-+			if (mpd->map.m_len > 0 && mpd->next_page != page_to_pgoff(page))
- 				goto out;
+ static int gen_blocks_init(struct nvm_dev *dev, struct gen_dev *gn)
+ {
+-	struct gen_lun *lun;
++	struct nvm_lun *lun;
+ 	struct nvm_block *block;
+ 	sector_t lun_iter, blk_iter, cur_block_id = 0;
+ 	int ret, nr_blks;
+@@ -356,19 +357,19 @@ static int gen_blocks_init(struct nvm_dev *dev, struct gen_dev *gn)
+ 		return -ENOMEM;
  
- 			lock_page(page);
-@@ -2585,7 +2608,7 @@ static int mpage_prepare_extent_to_map(struct mpage_da_data *mpd)
- 			if (!PageDirty(page) ||
- 			    (PageWriteback(page) &&
- 			     (mpd->wbc->sync_mode == WB_SYNC_NONE)) ||
--			    unlikely(page->mapping != mapping)) {
-+			    unlikely(page_mapping(page) != mapping)) {
- 				unlock_page(page);
- 				continue;
- 			}
-@@ -2594,8 +2617,10 @@ static int mpage_prepare_extent_to_map(struct mpage_da_data *mpd)
- 			BUG_ON(PageWriteback(page));
+ 	gen_for_each_lun(gn, lun, lun_iter) {
+-		lun->vlun.blocks = vzalloc(sizeof(struct nvm_block) *
++		lun->blocks = vzalloc(sizeof(struct nvm_block) *
+ 							dev->blks_per_lun);
+-		if (!lun->vlun.blocks) {
++		if (!lun->blocks) {
+ 			kfree(blks);
+ 			return -ENOMEM;
+ 		}
  
- 			if (mpd->map.m_len == 0)
--				mpd->first_page = page->index;
--			mpd->next_page = page->index + 1;
-+				mpd->first_page = page_to_pgoff(page);
-+			page = compound_head(page);
-+			mpd->next_page = round_up(page->index + 1,
-+					hpage_nr_pages(page));
- 			/* Add all dirty buffers to mpd */
- 			lblk = ((ext4_lblk_t)page->index) <<
- 				(PAGE_SHIFT - blkbits);
+ 		for (blk_iter = 0; blk_iter < dev->blks_per_lun; blk_iter++) {
+-			block = &lun->vlun.blocks[blk_iter];
++			block = &lun->blocks[blk_iter];
+ 
+ 			INIT_LIST_HEAD(&block->list);
+ 
+-			block->lun = &lun->vlun;
++			block->lun = lun;
+ 			block->id = cur_block_id++;
+ 
+ 			list_add_tail(&block->list, &lun->free_list);
+@@ -378,8 +379,8 @@ static int gen_blocks_init(struct nvm_dev *dev, struct gen_dev *gn)
+ 			struct ppa_addr ppa;
+ 
+ 			ppa.ppa = 0;
+-			ppa.g.ch = lun->vlun.chnl_id;
+-			ppa.g.lun = lun->vlun.lun_id;
++			ppa.g.ch = lun->chnl_id;
++			ppa.g.lun = lun->lun_id;
+ 
+ 			ret = nvm_get_bb_tbl(dev, ppa, blks);
+ 			if (ret)
+@@ -468,41 +469,39 @@ static void gen_unregister(struct nvm_dev *dev)
+ }
+ 
+ static struct nvm_block *gen_get_blk(struct nvm_dev *dev,
+-				struct nvm_lun *vlun, unsigned long flags)
++				struct nvm_lun *lun, unsigned long flags)
+ {
+-	struct gen_lun *lun = container_of(vlun, struct gen_lun, vlun);
+ 	struct nvm_block *blk = NULL;
+ 	int is_gc = flags & NVM_IOTYPE_GC;
+ 
+-	spin_lock(&vlun->lock);
++	spin_lock(&lun->lock);
+ 	if (list_empty(&lun->free_list)) {
+ 		pr_err_ratelimited("gen: lun %u have no free pages available",
+-								lun->vlun.id);
++								lun->id);
+ 		goto out;
+ 	}
+ 
+-	if (!is_gc && lun->vlun.nr_free_blocks < lun->reserved_blocks)
++	if (!is_gc && lun->nr_free_blocks < lun->reserved_blocks)
+ 		goto out;
+ 
+ 	blk = list_first_entry(&lun->free_list, struct nvm_block, list);
+ 
+ 	list_move_tail(&blk->list, &lun->used_list);
+ 	blk->state = NVM_BLK_ST_TGT;
+-	lun->vlun.nr_free_blocks--;
++	lun->nr_free_blocks--;
+ out:
+-	spin_unlock(&vlun->lock);
++	spin_unlock(&lun->lock);
+ 	return blk;
+ }
+ 
+ static void gen_put_blk(struct nvm_dev *dev, struct nvm_block *blk)
+ {
+-	struct nvm_lun *vlun = blk->lun;
+-	struct gen_lun *lun = container_of(vlun, struct gen_lun, vlun);
++	struct nvm_lun *lun = blk->lun;
+ 
+-	spin_lock(&vlun->lock);
++	spin_lock(&lun->lock);
+ 	if (blk->state & NVM_BLK_ST_TGT) {
+ 		list_move_tail(&blk->list, &lun->free_list);
+-		lun->vlun.nr_free_blocks++;
++		lun->nr_free_blocks++;
+ 		blk->state = NVM_BLK_ST_FREE;
+ 	} else if (blk->state & NVM_BLK_ST_BAD) {
+ 		list_move_tail(&blk->list, &lun->bb_list);
+@@ -513,13 +512,13 @@ static void gen_put_blk(struct nvm_dev *dev, struct nvm_block *blk)
+ 							blk->id, blk->state);
+ 		list_move_tail(&blk->list, &lun->bb_list);
+ 	}
+-	spin_unlock(&vlun->lock);
++	spin_unlock(&lun->lock);
+ }
+ 
+ static void gen_mark_blk(struct nvm_dev *dev, struct ppa_addr ppa, int type)
+ {
+ 	struct gen_dev *gn = dev->mp;
+-	struct gen_lun *lun;
++	struct nvm_lun *lun;
+ 	struct nvm_block *blk;
+ 
+ 	pr_debug("gen: ppa  (ch: %u lun: %u blk: %u pg: %u) -> %u\n",
+@@ -537,7 +536,7 @@ static void gen_mark_blk(struct nvm_dev *dev, struct ppa_addr ppa, int type)
+ 	}
+ 
+ 	lun = &gn->luns[(dev->luns_per_chnl * ppa.g.ch) + ppa.g.lun];
+-	blk = &lun->vlun.blocks[ppa.g.blk];
++	blk = &lun->blocks[ppa.g.blk];
+ 
+ 	/* will be moved to bb list on put_blk from target */
+ 	blk->state = type;
+@@ -587,23 +586,23 @@ static struct nvm_lun *gen_get_lun(struct nvm_dev *dev, int lunid)
+ 	if (unlikely(lunid >= dev->nr_luns))
+ 		return NULL;
+ 
+-	return &gn->luns[lunid].vlun;
++	return &gn->luns[lunid];
+ }
+ 
+ static void gen_lun_info_print(struct nvm_dev *dev)
+ {
+ 	struct gen_dev *gn = dev->mp;
+-	struct gen_lun *lun;
++	struct nvm_lun *lun;
+ 	unsigned int i;
+ 
+ 
+ 	gen_for_each_lun(gn, lun, i) {
+-		spin_lock(&lun->vlun.lock);
++		spin_lock(&lun->lock);
+ 
+ 		pr_info("%s: lun%8u\t%u\n", dev->name, i,
+-						lun->vlun.nr_free_blocks);
++						lun->nr_free_blocks);
+ 
+-		spin_unlock(&lun->vlun.lock);
++		spin_unlock(&lun->lock);
+ 	}
+ }
+ 
+diff --git a/drivers/lightnvm/gennvm.h b/drivers/lightnvm/gennvm.h
+index 8ecfa81..d167f39 100644
+--- a/drivers/lightnvm/gennvm.h
++++ b/drivers/lightnvm/gennvm.h
+@@ -20,25 +20,11 @@
+ 
+ #include <linux/lightnvm.h>
+ 
+-struct gen_lun {
+-	struct nvm_lun vlun;
+-
+-	int reserved_blocks;
+-	/* lun block lists */
+-	struct list_head used_list;	/* In-use blocks */
+-	struct list_head free_list;	/* Not used blocks i.e. released
+-					 * and ready for use
+-					 */
+-	struct list_head bb_list;	/* Bad blocks. Mutually exclusive with
+-					 * free_list and used_list
+-					 */
+-};
+-
+ struct gen_dev {
+ 	struct nvm_dev *dev;
+ 
+ 	int nr_luns;
+-	struct gen_lun *luns;
++	struct nvm_lun *luns;
+ 	struct list_head area_list;
+ 
+ 	struct mutex lock;
+diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
+index 98278a9..33940bd 100644
+--- a/include/linux/lightnvm.h
++++ b/include/linux/lightnvm.h
+@@ -275,7 +275,17 @@ struct nvm_lun {
+ 
+ 	spinlock_t lock;
+ 
++	/* lun block lists */
++	struct list_head used_list;	/* In-use blocks */
++	struct list_head free_list;	/* Not used blocks i.e. released
++					 * and ready for use
++					 */
++	struct list_head bb_list;	/* Bad blocks. Mutually exclusive with
++					 * free_list and used_list
++					 */
+ 	unsigned int nr_free_blocks;	/* Number of unused blocks */
++	int reserved_blocks;
++
+ 	struct nvm_block *blocks;
+ };
+ 
 -- 
-2.10.2
+2.9.3
 
