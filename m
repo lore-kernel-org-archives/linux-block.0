@@ -1,47 +1,51 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f67.google.com ([74.125.82.67]:35215 "EHLO
-        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751685AbcKRLjG (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Nov 2016 06:39:06 -0500
-Received: by mail-wm0-f67.google.com with SMTP id a20so5275114wme.2
-        for <linux-block@vger.kernel.org>; Fri, 18 Nov 2016 03:39:06 -0800 (PST)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: axboe@fb.com, keith.busch@intel.com,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [PATCH 0/2] nvme: lightnvm: fix and wire up
-Date: Fri, 18 Nov 2016 12:38:12 +0100
-Message-Id: <1479469094-1337-1-git-send-email-m@bjorling.me>
+Received: from mx1.redhat.com ([209.132.183.28]:37674 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S932283AbcK1NxK (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 28 Nov 2016 08:53:10 -0500
+From: Jes Sorensen <Jes.Sorensen@redhat.com>
+To: NeilBrown <neilb@suse.com>
+Cc: Shaohua Li <shli@kernel.org>, linux-raid@vger.kernel.org,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        linux-kernel@vger.kernel.org, hare@suse.de
+Subject: Re: [mdadm PATCH] Add failfast support.
+References: <147944614789.3302.1959091446949640579.stgit@noble>
+        <20161122020238.qtuxwo5etcwmts4r@kernel.org>
+        <87polka0vu.fsf@notabene.neil.brown.name>
+Date: Mon, 28 Nov 2016 08:53:08 -0500
+In-Reply-To: <87polka0vu.fsf@notabene.neil.brown.name> (NeilBrown's message of
+        "Fri, 25 Nov 2016 10:55:49 +1100")
+Message-ID: <wrfjfumbpv7f.fsf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hi all,
+NeilBrown <neilb@suse.com> writes:
+> Allow per-device "failfast" flag to be set when creating an
+> array or adding devices to an array.
+>
+> When re-adding a device which had the failfast flag, it can be removed
+> using --nofailfast.
+>
+> failfast status is printed in --detail and --examine output.
+>
+> Signed-off-by: NeilBrown <neilb@suse.com>
+> ---
+>
+> Hi Jes,
+>  this patch adds mdadm support for the failfast functionality that
+> Shaohua recently included in his for-next.
+> Hopefully the man-page additions provide all necessary context.
+> If there is anything that seems to be missing, I'll be very happy to
+> add it.
 
-The first patch is a small fix to the freeing of the cmd structure in
-lightnvm, and the second patch wires up the lightnvm sysfs interface to
-the nvme gendisk.
+Hi Neil,
 
--Matias
+It looks reasonable. The only minor concern I have is over the use of
+hardcoded magic numbers like 'dv->failfast = 2' rather than using an
+enum or defines with descriptive names. Something that can be addressed
+later, so patch applied.
 
-Matias Bjørling (2):
-  nvme: lightnvm: frees wrong cmd structure
-  nvme: lightnvm: attach lightnvm sysfs to nvme block device
-
- drivers/lightnvm/Makefile    |   2 +-
- drivers/lightnvm/core.c      |  15 +---
- drivers/lightnvm/lightnvm.h  |  35 --------
- drivers/lightnvm/sysfs.c     | 198 -------------------------------------------
- drivers/nvme/host/core.c     |  45 +++++-----
- drivers/nvme/host/lightnvm.c | 177 +++++++++++++++++++++++++++++++++++---
- drivers/nvme/host/nvme.h     |  31 +++----
- include/linux/lightnvm.h     |   2 -
- 8 files changed, 202 insertions(+), 303 deletions(-)
- delete mode 100644 drivers/lightnvm/lightnvm.h
- delete mode 100644 drivers/lightnvm/sysfs.c
-
--- 
-2.1.4
-
+Cheers,
+Jes
