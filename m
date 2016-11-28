@@ -1,83 +1,50 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv5 32/36] ext4: make EXT4_IOC_MOVE_EXT work with huge pages
-Date: Tue, 29 Nov 2016 14:23:00 +0300
-Message-Id: <20161129112304.90056-33-kirill.shutemov@linux.intel.com>
-In-Reply-To: <20161129112304.90056-1-kirill.shutemov@linux.intel.com>
-References: <20161129112304.90056-1-kirill.shutemov@linux.intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wj0-f196.google.com ([209.85.210.196]:32969 "EHLO
+        mail-wj0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755581AbcK1Vjs (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 28 Nov 2016 16:39:48 -0500
+Received: by mail-wj0-f196.google.com with SMTP id kp2so15789241wjc.0
+        for <linux-block@vger.kernel.org>; Mon, 28 Nov 2016 13:39:48 -0800 (PST)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: axboe@fb.com, =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <jg@lightnvm.io>,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+Subject: [PATCH 12/23] lightnvm: use constant name instead of value
+Date: Mon, 28 Nov 2016 22:39:03 +0100
+Message-Id: <20161128213914.12516-13-m@bjorling.me>
+In-Reply-To: <20161128213914.12516-1-m@bjorling.me>
+References: <20161128213914.12516-1-m@bjorling.me>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Adjust how we find relevant block within page and how we clear the
-required part of the page.
+From: Javier González <jg@lightnvm.io>
 
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+There is a constant to refer to free blocks. Use it when marking bad
+blocks instead of using a constant value
+
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <m@bjorling.me>
 ---
- fs/ext4/move_extent.c | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+ drivers/lightnvm/gennvm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/fs/ext4/move_extent.c b/fs/ext4/move_extent.c
-index 6fc14def0c70..2efa9deb47a9 100644
---- a/fs/ext4/move_extent.c
-+++ b/fs/ext4/move_extent.c
-@@ -210,7 +210,9 @@ mext_page_mkuptodate(struct page *page, unsigned from, unsigned to)
- 				return err;
- 			}
- 			if (!buffer_mapped(bh)) {
--				zero_user(page, block_start, blocksize);
-+				zero_user(page + block_start / PAGE_SIZE,
-+						block_start % PAGE_SIZE,
-+						blocksize);
- 				set_buffer_uptodate(bh);
- 				continue;
- 			}
-@@ -267,10 +269,11 @@ move_extent_per_page(struct file *o_filp, struct inode *donor_inode,
- 	unsigned int tmp_data_size, data_size, replaced_size;
- 	int i, err2, jblocks, retries = 0;
- 	int replaced_count = 0;
--	int from = data_offset_in_page << orig_inode->i_blkbits;
-+	int from;
- 	int blocks_per_page = PAGE_SIZE >> orig_inode->i_blkbits;
- 	struct super_block *sb = orig_inode->i_sb;
- 	struct buffer_head *bh = NULL;
-+	int diff;
+diff --git a/drivers/lightnvm/gennvm.c b/drivers/lightnvm/gennvm.c
+index e969e3a..aee5b72 100644
+--- a/drivers/lightnvm/gennvm.c
++++ b/drivers/lightnvm/gennvm.c
+@@ -279,7 +279,7 @@ static int gen_block_bb(struct gen_dev *gn, struct ppa_addr ppa,
+ 	lun = &gn->luns[(dev->luns_per_chnl * ppa.g.ch) + ppa.g.lun];
  
- 	/*
- 	 * It needs twice the amount of ordinary journal buffers because
-@@ -355,6 +358,9 @@ move_extent_per_page(struct file *o_filp, struct inode *donor_inode,
- 		goto unlock_pages;
- 	}
- data_copy:
-+	diff = (pagep[0] - compound_head(pagep[0])) * blocks_per_page;
-+	from = (data_offset_in_page + diff) << orig_inode->i_blkbits;
-+	pagep[0] = compound_head(pagep[0]);
- 	*err = mext_page_mkuptodate(pagep[0], from, from + replaced_size);
- 	if (*err)
- 		goto unlock_pages;
-@@ -384,7 +390,7 @@ move_extent_per_page(struct file *o_filp, struct inode *donor_inode,
- 	if (!page_has_buffers(pagep[0]))
- 		create_empty_buffers(pagep[0], 1 << orig_inode->i_blkbits, 0);
- 	bh = page_buffers(pagep[0]);
--	for (i = 0; i < data_offset_in_page; i++)
-+	for (i = 0; i < data_offset_in_page + diff; i++)
- 		bh = bh->b_this_page;
- 	for (i = 0; i < block_len_in_page; i++) {
- 		*err = ext4_get_block(orig_inode, orig_blk_offset + i, bh, 0);
+ 	for (i = 0; i < nr_blks; i++) {
+-		if (blks[i] == 0)
++		if (blks[i] == NVM_BLK_T_FREE)
+ 			continue;
+ 
+ 		blk = &lun->vlun.blocks[i];
 -- 
-2.10.2
+2.9.3
 
