@@ -15,228 +15,143 @@ Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         linux-block@vger.kernel.org,
         "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv5 20/36] truncate: make truncate_inode_pages_range() aware about huge pages
-Date: Tue, 29 Nov 2016 14:22:48 +0300
-Message-Id: <20161129112304.90056-21-kirill.shutemov@linux.intel.com>
+Subject: [PATCHv5 02/36] Revert "radix-tree: implement radix_tree_maybe_preload_order()"
+Date: Tue, 29 Nov 2016 14:22:30 +0300
+Message-Id: <20161129112304.90056-3-kirill.shutemov@linux.intel.com>
 In-Reply-To: <20161129112304.90056-1-kirill.shutemov@linux.intel.com>
 References: <20161129112304.90056-1-kirill.shutemov@linux.intel.com>
 Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-As with shmem_undo_range(), truncate_inode_pages_range() removes huge
-pages, if it fully within range.
+This reverts commit 356e1c23292a4f63cfdf1daf0e0ddada51f32de8.
 
-Partial truncate of huge pages zero out this part of THP.
-
-Unlike with shmem, it doesn't prevent us having holes in the middle of
-huge page we still can skip writeback not touched buffers.
-
-With memory-mapped IO we would loose holes in some cases when we have
-THP in page cache, since we cannot track access on 4k level in this
-case.
+After conversion of huge tmpfs to multi-order entries, we don't need
+this anymore.
 
 Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- fs/buffer.c        |  2 +-
- include/linux/mm.h |  9 +++++-
- mm/truncate.c      | 86 ++++++++++++++++++++++++++++++++++++++++++++----------
- 3 files changed, 80 insertions(+), 17 deletions(-)
+ include/linux/radix-tree.h |  1 -
+ lib/radix-tree.c           | 74 ----------------------------------------------
+ 2 files changed, 75 deletions(-)
 
-diff --git a/fs/buffer.c b/fs/buffer.c
-index 8e000021513c..24daf7b9bdb0 100644
---- a/fs/buffer.c
-+++ b/fs/buffer.c
-@@ -1534,7 +1534,7 @@ void block_invalidatepage(struct page *page, unsigned int offset,
- 	/*
- 	 * Check for overflow
- 	 */
--	BUG_ON(stop > PAGE_SIZE || stop < length);
-+	BUG_ON(stop > hpage_size(page) || stop < length);
+diff --git a/include/linux/radix-tree.h b/include/linux/radix-tree.h
+index d0690691d9bf..6563fe64cf69 100644
+--- a/include/linux/radix-tree.h
++++ b/include/linux/radix-tree.h
+@@ -323,7 +323,6 @@ unsigned int radix_tree_gang_lookup_slot(struct radix_tree_root *root,
+ 			unsigned long first_index, unsigned int max_items);
+ int radix_tree_preload(gfp_t gfp_mask);
+ int radix_tree_maybe_preload(gfp_t gfp_mask);
+-int radix_tree_maybe_preload_order(gfp_t gfp_mask, int order);
+ void radix_tree_init(void);
+ void *radix_tree_tag_set(struct radix_tree_root *root,
+ 			unsigned long index, unsigned int tag);
+diff --git a/lib/radix-tree.c b/lib/radix-tree.c
+index 5e8fc32697b1..d298ddbbbfec 100644
+--- a/lib/radix-tree.c
++++ b/lib/radix-tree.c
+@@ -39,9 +39,6 @@
+ #include <linux/string.h>
  
- 	head = page_buffers(page);
- 	bh = head;
-diff --git a/include/linux/mm.h b/include/linux/mm.h
-index 582844ca0b23..59e74dc57359 100644
---- a/include/linux/mm.h
-+++ b/include/linux/mm.h
-@@ -1328,8 +1328,15 @@ int get_kernel_page(unsigned long start, int write, struct page **pages);
- struct page *get_dump_page(unsigned long addr);
  
- extern int try_to_release_page(struct page * page, gfp_t gfp_mask);
--extern void do_invalidatepage(struct page *page, unsigned int offset,
-+extern void __do_invalidatepage(struct page *page, unsigned int offset,
- 			      unsigned int length);
-+static inline void do_invalidatepage(struct page *page, unsigned int offset,
-+		unsigned int length)
-+{
-+	if (page_has_private(page))
-+		__do_invalidatepage(page, offset, length);
-+}
-+
- 
- int __set_page_dirty_nobuffers(struct page *page);
- int __set_page_dirty_no_writeback(struct page *page);
-diff --git a/mm/truncate.c b/mm/truncate.c
-index eb3a3a45feb6..d2d95f283ec3 100644
---- a/mm/truncate.c
-+++ b/mm/truncate.c
-@@ -70,12 +70,12 @@ static void clear_exceptional_entry(struct address_space *mapping,
-  * point.  Because the caller is about to free (and possibly reuse) those
-  * blocks on-disk.
+-/* Number of nodes in fully populated tree of given height */
+-static unsigned long height_to_maxnodes[RADIX_TREE_MAX_PATH + 1] __read_mostly;
+-
+ /*
+  * Radix tree node cache.
   */
--void do_invalidatepage(struct page *page, unsigned int offset,
-+void __do_invalidatepage(struct page *page, unsigned int offset,
- 		       unsigned int length)
- {
- 	void (*invalidatepage)(struct page *, unsigned int, unsigned int);
- 
--	invalidatepage = page->mapping->a_ops->invalidatepage;
-+	invalidatepage = page_mapping(page)->a_ops->invalidatepage;
- #ifdef CONFIG_BLOCK
- 	if (!invalidatepage)
- 		invalidatepage = block_invalidatepage;
-@@ -100,8 +100,7 @@ truncate_complete_page(struct address_space *mapping, struct page *page)
- 	if (page->mapping != mapping)
- 		return -EIO;
- 
--	if (page_has_private(page))
--		do_invalidatepage(page, 0, PAGE_SIZE);
-+	do_invalidatepage(page, 0, hpage_size(page));
- 
- 	/*
- 	 * Some filesystems seem to re-dirty the page even after
-@@ -273,13 +272,35 @@ void truncate_inode_pages_range(struct address_space *mapping,
- 				unlock_page(page);
- 				continue;
- 			}
-+
-+			if (PageTransHuge(page)) {
-+				int j, first = 0, last = HPAGE_PMD_NR - 1;
-+
-+				if (start > page->index)
-+					first = start & (HPAGE_PMD_NR - 1);
-+				if (index == round_down(end, HPAGE_PMD_NR))
-+					last = (end - 1) & (HPAGE_PMD_NR - 1);
-+
-+				/* Range starts or ends in the middle of THP */
-+				if (first != 0 || last != HPAGE_PMD_NR - 1) {
-+					int off, len;
-+					for (j = first; j <= last; j++)
-+						clear_highpage(page + j);
-+					off = first * PAGE_SIZE;
-+					len = (last + 1) * PAGE_SIZE - off;
-+					do_invalidatepage(page, off, len);
-+					unlock_page(page);
-+					continue;
-+				}
-+			}
-+
- 			truncate_inode_page(mapping, page);
- 			unlock_page(page);
- 		}
- 		pagevec_remove_exceptionals(&pvec);
-+		index += pvec.nr ? hpage_nr_pages(pvec.pages[pvec.nr - 1]) : 1;
- 		pagevec_release(&pvec);
- 		cond_resched();
--		index++;
- 	}
- 
- 	if (partial_start) {
-@@ -294,9 +315,12 @@ void truncate_inode_pages_range(struct address_space *mapping,
- 			wait_on_page_writeback(page);
- 			zero_user_segment(page, partial_start, top);
- 			cleancache_invalidate_page(mapping, page);
--			if (page_has_private(page))
--				do_invalidatepage(page, partial_start,
--						  top - partial_start);
-+			if (page_has_private(page)) {
-+				int off = page - compound_head(page);
-+				do_invalidatepage(compound_head(page),
-+						off * PAGE_SIZE + partial_start,
-+						top - partial_start);
-+			}
- 			unlock_page(page);
- 			put_page(page);
- 		}
-@@ -307,9 +331,12 @@ void truncate_inode_pages_range(struct address_space *mapping,
- 			wait_on_page_writeback(page);
- 			zero_user_segment(page, 0, partial_end);
- 			cleancache_invalidate_page(mapping, page);
--			if (page_has_private(page))
--				do_invalidatepage(page, 0,
--						  partial_end);
-+			if (page_has_private(page)) {
-+				int off = page - compound_head(page);
-+				do_invalidatepage(compound_head(page),
-+						off * PAGE_SIZE,
-+						partial_end);
-+			}
- 			unlock_page(page);
- 			put_page(page);
- 		}
-@@ -323,7 +350,7 @@ void truncate_inode_pages_range(struct address_space *mapping,
- 
- 	index = start;
- 	for ( ; ; ) {
--		cond_resched();
-+restart:	cond_resched();
- 		if (!pagevec_lookup_entries(&pvec, mapping, index,
- 			min(end - index, (pgoff_t)PAGEVEC_SIZE), indices)) {
- 			/* If all gone from start onwards, we're done */
-@@ -346,8 +373,8 @@ void truncate_inode_pages_range(struct address_space *mapping,
- 			index = indices[i];
- 			if (index >= end) {
- 				/* Restart punch to make sure all gone */
--				index = start - 1;
--				break;
-+				index = start;
-+				goto restart;
- 			}
- 
- 			if (radix_tree_exceptional_entry(page)) {
-@@ -358,12 +385,41 @@ void truncate_inode_pages_range(struct address_space *mapping,
- 			lock_page(page);
- 			WARN_ON(page_to_index(page) != index);
- 			wait_on_page_writeback(page);
-+
-+			if (PageTransHuge(page)) {
-+				int j, first = 0, last = HPAGE_PMD_NR - 1;
-+
-+				if (start > page->index)
-+					first = start & (HPAGE_PMD_NR - 1);
-+				if (index == round_down(end, HPAGE_PMD_NR))
-+					last = (end - 1) & (HPAGE_PMD_NR - 1);
-+
-+				/*
-+				 * On Partial thp truncate due 'start' in
-+				 * middle of THP: don't need to look on these
-+				 * pages again on !pvec.nr restart.
-+				 */
-+				start = page->index + HPAGE_PMD_NR;
-+
-+				/* Range starts or ends in the middle of THP */
-+				if (first != 0 || last != HPAGE_PMD_NR - 1) {
-+					int off, len;
-+					for (j = first; j <= last; j++)
-+						clear_highpage(page + j);
-+					off = first * PAGE_SIZE;
-+					len = (last + 1) * PAGE_SIZE - off;
-+					do_invalidatepage(page, off, len);
-+					unlock_page(page);
-+					continue;
-+				}
-+			}
-+
- 			truncate_inode_page(mapping, page);
- 			unlock_page(page);
- 		}
- 		pagevec_remove_exceptionals(&pvec);
-+		index += pvec.nr ? hpage_nr_pages(pvec.pages[pvec.nr - 1]) : 1;
- 		pagevec_release(&pvec);
--		index++;
- 	}
- 	cleancache_invalidate_inode(mapping);
+@@ -523,51 +520,6 @@ int radix_tree_split_preload(unsigned int old_order, unsigned int new_order,
  }
+ #endif
+ 
+-/*
+- * The same as function above, but preload number of nodes required to insert
+- * (1 << order) continuous naturally-aligned elements.
+- */
+-int radix_tree_maybe_preload_order(gfp_t gfp_mask, int order)
+-{
+-	unsigned long nr_subtrees;
+-	int nr_nodes, subtree_height;
+-
+-	/* Preloading doesn't help anything with this gfp mask, skip it */
+-	if (!gfpflags_allow_blocking(gfp_mask)) {
+-		preempt_disable();
+-		return 0;
+-	}
+-
+-	/*
+-	 * Calculate number and height of fully populated subtrees it takes to
+-	 * store (1 << order) elements.
+-	 */
+-	nr_subtrees = 1 << order;
+-	for (subtree_height = 0; nr_subtrees > RADIX_TREE_MAP_SIZE;
+-			subtree_height++)
+-		nr_subtrees >>= RADIX_TREE_MAP_SHIFT;
+-
+-	/*
+-	 * The worst case is zero height tree with a single item at index 0 and
+-	 * then inserting items starting at ULONG_MAX - (1 << order).
+-	 *
+-	 * This requires RADIX_TREE_MAX_PATH nodes to build branch from root to
+-	 * 0-index item.
+-	 */
+-	nr_nodes = RADIX_TREE_MAX_PATH;
+-
+-	/* Plus branch to fully populated subtrees. */
+-	nr_nodes += RADIX_TREE_MAX_PATH - subtree_height;
+-
+-	/* Root node is shared. */
+-	nr_nodes--;
+-
+-	/* Plus nodes required to build subtrees. */
+-	nr_nodes += nr_subtrees * height_to_maxnodes[subtree_height];
+-
+-	return __radix_tree_preload(gfp_mask, nr_nodes);
+-}
+-
+ static unsigned radix_tree_load_root(struct radix_tree_root *root,
+ 		struct radix_tree_node **nodep, unsigned long *maxindex)
+ {
+@@ -2454,31 +2406,6 @@ radix_tree_node_ctor(void *arg)
+ 	INIT_LIST_HEAD(&node->private_list);
+ }
+ 
+-static __init unsigned long __maxindex(unsigned int height)
+-{
+-	unsigned int width = height * RADIX_TREE_MAP_SHIFT;
+-	int shift = RADIX_TREE_INDEX_BITS - width;
+-
+-	if (shift < 0)
+-		return ~0UL;
+-	if (shift >= BITS_PER_LONG)
+-		return 0UL;
+-	return ~0UL >> shift;
+-}
+-
+-static __init void radix_tree_init_maxnodes(void)
+-{
+-	unsigned long height_to_maxindex[RADIX_TREE_MAX_PATH + 1];
+-	unsigned int i, j;
+-
+-	for (i = 0; i < ARRAY_SIZE(height_to_maxindex); i++)
+-		height_to_maxindex[i] = __maxindex(i);
+-	for (i = 0; i < ARRAY_SIZE(height_to_maxnodes); i++) {
+-		for (j = i; j > 0; j--)
+-			height_to_maxnodes[i] += height_to_maxindex[j - 1] + 1;
+-	}
+-}
+-
+ static int radix_tree_cpu_dead(unsigned int cpu)
+ {
+ 	struct radix_tree_preload *rtp;
+@@ -2502,7 +2429,6 @@ void __init radix_tree_init(void)
+ 			sizeof(struct radix_tree_node), 0,
+ 			SLAB_PANIC | SLAB_RECLAIM_ACCOUNT,
+ 			radix_tree_node_ctor);
+-	radix_tree_init_maxnodes();
+ 	ret = cpuhp_setup_state_nocalls(CPUHP_RADIX_DEAD, "lib/radix:dead",
+ 					NULL, radix_tree_cpu_dead);
+ 	WARN_ON(ret < 0);
 -- 
 2.10.2
 
