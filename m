@@ -1,4 +1,8 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga01.intel.com ([192.55.52.88]:29422 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1757334AbcK2LYM (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 29 Nov 2016 06:24:12 -0500
 From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
 To: "Theodore Ts'o" <tytso@mit.edu>,
         Andreas Dilger <adilger.kernel@dilger.ca>,
@@ -15,215 +19,293 @@ Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         linux-block@vger.kernel.org,
         "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv5 04/36] mm, rmap: account file thp pages
-Date: Tue, 29 Nov 2016 14:22:32 +0300
-Message-Id: <20161129112304.90056-5-kirill.shutemov@linux.intel.com>
+Subject: [PATCHv5 23/36] mm: account huge pages to dirty, writaback, reclaimable, etc.
+Date: Tue, 29 Nov 2016 14:22:51 +0300
+Message-Id: <20161129112304.90056-24-kirill.shutemov@linux.intel.com>
 In-Reply-To: <20161129112304.90056-1-kirill.shutemov@linux.intel.com>
 References: <20161129112304.90056-1-kirill.shutemov@linux.intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Let's add FileHugePages and FilePmdMapped fields into meminfo and smaps.
-It indicates how many times we allocate and map file THP.
+We need to account huge pages according to its size to get background
+writaback work properly.
 
 Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- drivers/base/node.c    |  6 ++++++
- fs/proc/meminfo.c      |  4 ++++
- fs/proc/task_mmu.c     |  5 ++++-
- include/linux/mmzone.h |  2 ++
- mm/filemap.c           |  3 ++-
- mm/huge_memory.c       |  5 ++++-
- mm/page_alloc.c        |  5 +++++
- mm/rmap.c              | 12 ++++++++----
- mm/vmstat.c            |  2 ++
- 9 files changed, 37 insertions(+), 7 deletions(-)
+ fs/fs-writeback.c           | 10 +++---
+ include/linux/backing-dev.h | 10 ++++++
+ include/linux/memcontrol.h  | 22 ++-----------
+ mm/migrate.c                |  1 +
+ mm/page-writeback.c         | 80 +++++++++++++++++++++++++++++----------------
+ mm/rmap.c                   |  4 +--
+ 6 files changed, 74 insertions(+), 53 deletions(-)
 
-diff --git a/drivers/base/node.c b/drivers/base/node.c
-index 5548f9686016..45be0ddb84ed 100644
---- a/drivers/base/node.c
-+++ b/drivers/base/node.c
-@@ -116,6 +116,8 @@ static ssize_t node_read_meminfo(struct device *dev,
- 		       "Node %d AnonHugePages:  %8lu kB\n"
- 		       "Node %d ShmemHugePages: %8lu kB\n"
- 		       "Node %d ShmemPmdMapped: %8lu kB\n"
-+		       "Node %d FileHugePages: %8lu kB\n"
-+		       "Node %d FilePmdMapped: %8lu kB\n"
- #endif
- 			,
- 		       nid, K(node_page_state(pgdat, NR_FILE_DIRTY)),
-@@ -139,6 +141,10 @@ static ssize_t node_read_meminfo(struct device *dev,
- 		       nid, K(node_page_state(pgdat, NR_SHMEM_THPS) *
- 				       HPAGE_PMD_NR),
- 		       nid, K(node_page_state(pgdat, NR_SHMEM_PMDMAPPED) *
-+				       HPAGE_PMD_NR),
-+		       nid, K(node_page_state(pgdat, NR_FILE_THPS) *
-+				       HPAGE_PMD_NR),
-+		       nid, K(node_page_state(pgdat, NR_FILE_PMDMAPPED) *
- 				       HPAGE_PMD_NR));
- #else
- 		       nid, K(sum_zone_node_page_state(nid, NR_SLAB_UNRECLAIMABLE)));
-diff --git a/fs/proc/meminfo.c b/fs/proc/meminfo.c
-index 8a428498d6b2..8396843be7a7 100644
---- a/fs/proc/meminfo.c
-+++ b/fs/proc/meminfo.c
-@@ -146,6 +146,10 @@ static int meminfo_proc_show(struct seq_file *m, void *v)
- 		    global_node_page_state(NR_SHMEM_THPS) * HPAGE_PMD_NR);
- 	show_val_kb(m, "ShmemPmdMapped: ",
- 		    global_node_page_state(NR_SHMEM_PMDMAPPED) * HPAGE_PMD_NR);
-+	show_val_kb(m, "FileHugePages: ",
-+		    global_node_page_state(NR_FILE_THPS) * HPAGE_PMD_NR);
-+	show_val_kb(m, "FilePmdMapped: ",
-+		    global_node_page_state(NR_FILE_PMDMAPPED) * HPAGE_PMD_NR);
- #endif
- 
- #ifdef CONFIG_CMA
-diff --git a/fs/proc/task_mmu.c b/fs/proc/task_mmu.c
-index d47c723e7bc2..06840421fae3 100644
---- a/fs/proc/task_mmu.c
-+++ b/fs/proc/task_mmu.c
-@@ -442,6 +442,7 @@ struct mem_size_stats {
- 	unsigned long anonymous;
- 	unsigned long anonymous_thp;
- 	unsigned long shmem_thp;
-+	unsigned long file_thp;
- 	unsigned long swap;
- 	unsigned long shared_hugetlb;
- 	unsigned long private_hugetlb;
-@@ -581,7 +582,7 @@ static void smaps_pmd_entry(pmd_t *pmd, unsigned long addr,
- 	else if (is_zone_device_page(page))
- 		/* pass */;
- 	else
--		VM_BUG_ON_PAGE(1, page);
-+		mss->file_thp += HPAGE_PMD_SIZE;
- 	mss->rss_pmd += PMD_SIZE;
- 	smaps_account(mss, page, true, pmd_young(*pmd), pmd_dirty(*pmd));
- }
-@@ -848,6 +849,7 @@ static int show_smap(struct seq_file *m, void *v, int is_pid)
- 		   "Anonymous:      %8lu kB\n"
- 		   "AnonHugePages:  %8lu kB\n"
- 		   "ShmemPmdMapped: %8lu kB\n"
-+		   "FilePmdMapped:  %8lu kB\n"
- 		   "Shared_Hugetlb: %8lu kB\n"
- 		   "Private_Hugetlb: %7lu kB\n"
- 		   "Swap:           %8lu kB\n"
-@@ -866,6 +868,7 @@ static int show_smap(struct seq_file *m, void *v, int is_pid)
- 		   mss.anonymous >> 10,
- 		   mss.anonymous_thp >> 10,
- 		   mss.shmem_thp >> 10,
-+		   mss.file_thp >> 10,
- 		   mss.shared_hugetlb >> 10,
- 		   mss.private_hugetlb >> 10,
- 		   mss.swap >> 10,
-diff --git a/include/linux/mmzone.h b/include/linux/mmzone.h
-index 0f088f3a2fed..44a43f576d52 100644
---- a/include/linux/mmzone.h
-+++ b/include/linux/mmzone.h
-@@ -163,6 +163,8 @@ enum node_stat_item {
- 	NR_SHMEM,		/* shmem pages (included tmpfs/GEM pages) */
- 	NR_SHMEM_THPS,
- 	NR_SHMEM_PMDMAPPED,
-+	NR_FILE_THPS,
-+	NR_FILE_PMDMAPPED,
- 	NR_ANON_THPS,
- 	NR_UNSTABLE_NFS,	/* NFS unstable pages */
- 	NR_VMSCAN_WRITE,
-diff --git a/mm/filemap.c b/mm/filemap.c
-index f8607ab7b7e4..16d39340c106 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -240,7 +240,8 @@ void __delete_from_page_cache(struct page *page, void *shadow)
- 		if (PageTransHuge(page))
- 			__dec_node_page_state(page, NR_SHMEM_THPS);
- 	} else {
--		VM_BUG_ON_PAGE(PageTransHuge(page) && !PageHuge(page), page);
-+		if (PageTransHuge(page) && !PageHuge(page))
-+			__dec_node_page_state(page, NR_FILE_THPS);
+diff --git a/fs/fs-writeback.c b/fs/fs-writeback.c
+index ef600591d96f..e1c9faddc9e1 100644
+--- a/fs/fs-writeback.c
++++ b/fs/fs-writeback.c
+@@ -366,8 +366,9 @@ static void inode_switch_wbs_work_fn(struct work_struct *work)
+ 		struct page *page = radix_tree_deref_slot_protected(slot,
+ 							&mapping->tree_lock);
+ 		if (likely(page) && PageDirty(page)) {
+-			__dec_wb_stat(old_wb, WB_RECLAIMABLE);
+-			__inc_wb_stat(new_wb, WB_RECLAIMABLE);
++			int nr = hpage_nr_pages(page);
++			__add_wb_stat(old_wb, WB_RECLAIMABLE, -nr);
++			__add_wb_stat(new_wb, WB_RECLAIMABLE, nr);
+ 		}
  	}
  
- 	/*
-diff --git a/mm/huge_memory.c b/mm/huge_memory.c
-index 7680797b287e..91dbab9644be 100644
---- a/mm/huge_memory.c
-+++ b/mm/huge_memory.c
-@@ -1936,7 +1936,10 @@ static void __split_huge_page(struct page *page, struct list_head *list,
- 		struct radix_tree_iter iter;
- 		void **slot;
+@@ -376,9 +377,10 @@ static void inode_switch_wbs_work_fn(struct work_struct *work)
+ 		struct page *page = radix_tree_deref_slot_protected(slot,
+ 							&mapping->tree_lock);
+ 		if (likely(page)) {
++			int nr = hpage_nr_pages(page);
+ 			WARN_ON_ONCE(!PageWriteback(page));
+-			__dec_wb_stat(old_wb, WB_WRITEBACK);
+-			__inc_wb_stat(new_wb, WB_WRITEBACK);
++			__add_wb_stat(old_wb, WB_WRITEBACK, -nr);
++			__add_wb_stat(new_wb, WB_WRITEBACK, nr);
+ 		}
+ 	}
  
--		__dec_node_page_state(head, NR_SHMEM_THPS);
-+		if (PageSwapBacked(page))
-+			__dec_node_page_state(page, NR_SHMEM_THPS);
-+		else
-+			__dec_node_page_state(page, NR_FILE_THPS);
+diff --git a/include/linux/backing-dev.h b/include/linux/backing-dev.h
+index 43b93a947e61..e63487f78824 100644
+--- a/include/linux/backing-dev.h
++++ b/include/linux/backing-dev.h
+@@ -61,6 +61,16 @@ static inline void __add_wb_stat(struct bdi_writeback *wb,
+ 	__percpu_counter_add(&wb->stat[item], amount, WB_STAT_BATCH);
+ }
  
- 		radix_tree_split(&mapping->page_tree, head->index, 0);
- 		radix_tree_for_each_slot(slot, &mapping->page_tree, &iter,
-diff --git a/mm/page_alloc.c b/mm/page_alloc.c
-index bb668eab5ee4..916be2f49f9a 100644
---- a/mm/page_alloc.c
-+++ b/mm/page_alloc.c
-@@ -4336,6 +4336,8 @@ void show_free_areas(unsigned int filter)
- #ifdef CONFIG_TRANSPARENT_HUGEPAGE
- 			" shmem_thp: %lukB"
- 			" shmem_pmdmapped: %lukB"
-+			" file_thp: %lukB"
-+			" file_pmdmapped: %lukB"
- 			" anon_thp: %lukB"
- #endif
- 			" writeback_tmp:%lukB"
-@@ -4358,6 +4360,9 @@ void show_free_areas(unsigned int filter)
- 			K(node_page_state(pgdat, NR_SHMEM_THPS) * HPAGE_PMD_NR),
- 			K(node_page_state(pgdat, NR_SHMEM_PMDMAPPED)
- 					* HPAGE_PMD_NR),
-+			K(node_page_state(pgdat, NR_FILE_THPS) * HPAGE_PMD_NR),
-+			K(node_page_state(pgdat, NR_FILE_PMDMAPPED)
-+					* HPAGE_PMD_NR),
- 			K(node_page_state(pgdat, NR_ANON_THPS) * HPAGE_PMD_NR),
- #endif
- 			K(node_page_state(pgdat, NR_SHMEM)),
++static inline void add_wb_stat(struct bdi_writeback *wb,
++				 enum wb_stat_item item, s64 amount)
++{
++	unsigned long flags;
++
++	local_irq_save(flags);
++	__add_wb_stat(wb, item, amount);
++	local_irq_restore(flags);
++}
++
+ static inline void __inc_wb_stat(struct bdi_writeback *wb,
+ 				 enum wb_stat_item item)
+ {
+diff --git a/include/linux/memcontrol.h b/include/linux/memcontrol.h
+index 61d20c17f3b7..df014eff82da 100644
+--- a/include/linux/memcontrol.h
++++ b/include/linux/memcontrol.h
+@@ -29,6 +29,7 @@
+ #include <linux/mmzone.h>
+ #include <linux/writeback.h>
+ #include <linux/page-flags.h>
++#include <linux/mm.h>
+ 
+ struct mem_cgroup;
+ struct page;
+@@ -503,18 +504,6 @@ static inline void mem_cgroup_update_page_stat(struct page *page,
+ 		this_cpu_add(page->mem_cgroup->stat->count[idx], val);
+ }
+ 
+-static inline void mem_cgroup_inc_page_stat(struct page *page,
+-					    enum mem_cgroup_stat_index idx)
+-{
+-	mem_cgroup_update_page_stat(page, idx, 1);
+-}
+-
+-static inline void mem_cgroup_dec_page_stat(struct page *page,
+-					    enum mem_cgroup_stat_index idx)
+-{
+-	mem_cgroup_update_page_stat(page, idx, -1);
+-}
+-
+ unsigned long mem_cgroup_soft_limit_reclaim(pg_data_t *pgdat, int order,
+ 						gfp_t gfp_mask,
+ 						unsigned long *total_scanned);
+@@ -719,13 +708,8 @@ static inline bool mem_cgroup_oom_synchronize(bool wait)
+ 	return false;
+ }
+ 
+-static inline void mem_cgroup_inc_page_stat(struct page *page,
+-					    enum mem_cgroup_stat_index idx)
+-{
+-}
+-
+-static inline void mem_cgroup_dec_page_stat(struct page *page,
+-					    enum mem_cgroup_stat_index idx)
++static inline void mem_cgroup_update_page_stat(struct page *page,
++				 enum mem_cgroup_stat_index idx, int val)
+ {
+ }
+ 
+diff --git a/mm/migrate.c b/mm/migrate.c
+index 0ed24b1fa77b..c274f9d8ac2b 100644
+--- a/mm/migrate.c
++++ b/mm/migrate.c
+@@ -505,6 +505,7 @@ int migrate_page_move_mapping(struct address_space *mapping,
+ 	 * are mapped to swap space.
+ 	 */
+ 	if (newzone != oldzone) {
++		BUG_ON(PageTransHuge(page));
+ 		__dec_node_state(oldzone->zone_pgdat, NR_FILE_PAGES);
+ 		__inc_node_state(newzone->zone_pgdat, NR_FILE_PAGES);
+ 		if (PageSwapBacked(page) && !PageSwapCache(page)) {
+diff --git a/mm/page-writeback.c b/mm/page-writeback.c
+index 47d5b12c460e..d7b905d66add 100644
+--- a/mm/page-writeback.c
++++ b/mm/page-writeback.c
+@@ -2430,19 +2430,22 @@ void account_page_dirtied(struct page *page, struct address_space *mapping)
+ 
+ 	if (mapping_cap_account_dirty(mapping)) {
+ 		struct bdi_writeback *wb;
++		struct zone *zone = page_zone(page);
++		pg_data_t *pgdat = page_pgdat(page);
++		int nr = hpage_nr_pages(page);
+ 
+ 		inode_attach_wb(inode, page);
+ 		wb = inode_to_wb(inode);
+ 
+-		mem_cgroup_inc_page_stat(page, MEM_CGROUP_STAT_DIRTY);
+-		__inc_node_page_state(page, NR_FILE_DIRTY);
+-		__inc_zone_page_state(page, NR_ZONE_WRITE_PENDING);
+-		__inc_node_page_state(page, NR_DIRTIED);
+-		__inc_wb_stat(wb, WB_RECLAIMABLE);
+-		__inc_wb_stat(wb, WB_DIRTIED);
+-		task_io_account_write(PAGE_SIZE);
+-		current->nr_dirtied++;
+-		this_cpu_inc(bdp_ratelimits);
++		mem_cgroup_update_page_stat(page, MEM_CGROUP_STAT_DIRTY, nr);
++		__mod_node_page_state(pgdat, NR_FILE_DIRTY, nr);
++		__mod_zone_page_state(zone, NR_ZONE_WRITE_PENDING, nr);
++		__mod_node_page_state(pgdat, NR_DIRTIED, nr);
++		__add_wb_stat(wb, WB_RECLAIMABLE, nr);
++		__add_wb_stat(wb, WB_DIRTIED, nr);
++		task_io_account_write(nr * PAGE_SIZE);
++		current->nr_dirtied += nr;
++		this_cpu_add(bdp_ratelimits, nr);
+ 	}
+ }
+ EXPORT_SYMBOL(account_page_dirtied);
+@@ -2456,11 +2459,15 @@ void account_page_cleaned(struct page *page, struct address_space *mapping,
+ 			  struct bdi_writeback *wb)
+ {
+ 	if (mapping_cap_account_dirty(mapping)) {
+-		mem_cgroup_dec_page_stat(page, MEM_CGROUP_STAT_DIRTY);
+-		dec_node_page_state(page, NR_FILE_DIRTY);
+-		dec_zone_page_state(page, NR_ZONE_WRITE_PENDING);
+-		dec_wb_stat(wb, WB_RECLAIMABLE);
+-		task_io_account_cancelled_write(PAGE_SIZE);
++		struct zone *zone = page_zone(page);
++		pg_data_t *pgdat = page_pgdat(page);
++		int nr = hpage_nr_pages(page);
++
++		mem_cgroup_update_page_stat(page, MEM_CGROUP_STAT_DIRTY, -nr);
++		mod_node_page_state(pgdat, NR_FILE_DIRTY, -nr);
++		mod_zone_page_state(zone, NR_ZONE_WRITE_PENDING, -nr);
++		add_wb_stat(wb, WB_RECLAIMABLE, -nr);
++		task_io_account_cancelled_write(PAGE_SIZE * nr);
+ 	}
+ }
+ 
+@@ -2520,14 +2527,16 @@ void account_page_redirty(struct page *page)
+ 	struct address_space *mapping = page->mapping;
+ 
+ 	if (mapping && mapping_cap_account_dirty(mapping)) {
++		pg_data_t *pgdat = page_pgdat(page);
++		int nr = hpage_nr_pages(page);
+ 		struct inode *inode = mapping->host;
+ 		struct bdi_writeback *wb;
+ 		bool locked;
+ 
+ 		wb = unlocked_inode_to_wb_begin(inode, &locked);
+-		current->nr_dirtied--;
+-		dec_node_page_state(page, NR_DIRTIED);
+-		dec_wb_stat(wb, WB_DIRTIED);
++		current->nr_dirtied -= nr;
++		mod_node_page_state(pgdat, NR_DIRTIED, -nr);
++		add_wb_stat(wb, WB_DIRTIED, -nr);
+ 		unlocked_inode_to_wb_end(inode, locked);
+ 	}
+ }
+@@ -2713,10 +2722,15 @@ int clear_page_dirty_for_io(struct page *page)
+ 		 */
+ 		wb = unlocked_inode_to_wb_begin(inode, &locked);
+ 		if (TestClearPageDirty(page)) {
+-			mem_cgroup_dec_page_stat(page, MEM_CGROUP_STAT_DIRTY);
+-			dec_node_page_state(page, NR_FILE_DIRTY);
+-			dec_zone_page_state(page, NR_ZONE_WRITE_PENDING);
+-			dec_wb_stat(wb, WB_RECLAIMABLE);
++			struct zone *zone = page_zone(page);
++			pg_data_t *pgdat = page_pgdat(page);
++			int nr = hpage_nr_pages(page);
++
++			mem_cgroup_update_page_stat(page,
++					MEM_CGROUP_STAT_DIRTY, -nr);
++			mod_node_page_state(pgdat, NR_FILE_DIRTY, -nr);
++			mod_zone_page_state(zone, NR_ZONE_WRITE_PENDING, -nr);
++			add_wb_stat(wb, WB_RECLAIMABLE, -nr);
+ 			ret = 1;
+ 		}
+ 		unlocked_inode_to_wb_end(inode, locked);
+@@ -2760,10 +2774,15 @@ int test_clear_page_writeback(struct page *page)
+ 		ret = TestClearPageWriteback(page);
+ 	}
+ 	if (ret) {
+-		mem_cgroup_dec_page_stat(page, MEM_CGROUP_STAT_WRITEBACK);
+-		dec_node_page_state(page, NR_WRITEBACK);
+-		dec_zone_page_state(page, NR_ZONE_WRITE_PENDING);
+-		inc_node_page_state(page, NR_WRITTEN);
++		struct zone *zone = page_zone(page);
++		pg_data_t *pgdat = page_pgdat(page);
++		int nr = hpage_nr_pages(page);
++
++		mem_cgroup_update_page_stat(page,
++				MEM_CGROUP_STAT_WRITEBACK, -nr);
++		mod_node_page_state(pgdat, NR_WRITEBACK, -nr);
++		mod_zone_page_state(zone, NR_ZONE_WRITE_PENDING, -nr);
++		mod_node_page_state(pgdat, NR_WRITTEN, nr);
+ 	}
+ 	unlock_page_memcg(page);
+ 	return ret;
+@@ -2815,9 +2834,14 @@ int __test_set_page_writeback(struct page *page, bool keep_write)
+ 		ret = TestSetPageWriteback(page);
+ 	}
+ 	if (!ret) {
+-		mem_cgroup_inc_page_stat(page, MEM_CGROUP_STAT_WRITEBACK);
+-		inc_node_page_state(page, NR_WRITEBACK);
+-		inc_zone_page_state(page, NR_ZONE_WRITE_PENDING);
++		struct zone *zone = page_zone(page);
++		pg_data_t *pgdat = page_pgdat(page);
++		int nr = hpage_nr_pages(page);
++
++		mem_cgroup_update_page_stat(page,
++				MEM_CGROUP_STAT_WRITEBACK, nr);
++		mod_node_page_state(pgdat, NR_WRITEBACK, nr);
++		mod_zone_page_state(zone, NR_ZONE_WRITE_PENDING, nr);
+ 	}
+ 	unlock_page_memcg(page);
+ 	return ret;
 diff --git a/mm/rmap.c b/mm/rmap.c
-index 1ef36404e7b2..48c7310639bd 100644
+index 48c7310639bd..b9570e784405 100644
 --- a/mm/rmap.c
 +++ b/mm/rmap.c
-@@ -1281,8 +1281,10 @@ void page_add_file_rmap(struct page *page, bool compound)
- 		}
- 		if (!atomic_inc_and_test(compound_mapcount_ptr(page)))
+@@ -1297,7 +1297,7 @@ void page_add_file_rmap(struct page *page, bool compound)
  			goto out;
--		VM_BUG_ON_PAGE(!PageSwapBacked(page), page);
--		__inc_node_page_state(page, NR_SHMEM_PMDMAPPED);
-+		if (PageSwapBacked(page))
-+			__inc_node_page_state(page, NR_SHMEM_PMDMAPPED);
-+		else
-+			__inc_node_page_state(page, NR_FILE_PMDMAPPED);
- 	} else {
- 		if (PageTransCompound(page) && page_mapping(page)) {
- 			VM_WARN_ON_ONCE(!PageLocked(page));
-@@ -1322,8 +1324,10 @@ static void page_remove_file_rmap(struct page *page, bool compound)
- 		}
- 		if (!atomic_add_negative(-1, compound_mapcount_ptr(page)))
- 			goto out;
--		VM_BUG_ON_PAGE(!PageSwapBacked(page), page);
--		__dec_node_page_state(page, NR_SHMEM_PMDMAPPED);
-+		if (PageSwapBacked(page))
-+			__dec_node_page_state(page, NR_SHMEM_PMDMAPPED);
-+		else
-+			__dec_node_page_state(page, NR_FILE_PMDMAPPED);
- 	} else {
- 		if (!atomic_add_negative(-1, &page->_mapcount))
- 			goto out;
-diff --git a/mm/vmstat.c b/mm/vmstat.c
-index 604f26a4f696..04dc6bd8ee43 100644
---- a/mm/vmstat.c
-+++ b/mm/vmstat.c
-@@ -967,6 +967,8 @@ const char * const vmstat_text[] = {
- 	"nr_shmem",
- 	"nr_shmem_hugepages",
- 	"nr_shmem_pmdmapped",
-+	"nr_file_hugepaged",
-+	"nr_file_pmdmapped",
- 	"nr_anon_transparent_hugepages",
- 	"nr_unstable",
- 	"nr_vmscan_write",
+ 	}
+ 	__mod_node_page_state(page_pgdat(page), NR_FILE_MAPPED, nr);
+-	mem_cgroup_inc_page_stat(page, MEM_CGROUP_STAT_FILE_MAPPED);
++	mem_cgroup_update_page_stat(page, MEM_CGROUP_STAT_FILE_MAPPED, nr);
+ out:
+ 	unlock_page_memcg(page);
+ }
+@@ -1339,7 +1339,7 @@ static void page_remove_file_rmap(struct page *page, bool compound)
+ 	 * pte lock(a spinlock) is held, which implies preemption disabled.
+ 	 */
+ 	__mod_node_page_state(page_pgdat(page), NR_FILE_MAPPED, -nr);
+-	mem_cgroup_dec_page_stat(page, MEM_CGROUP_STAT_FILE_MAPPED);
++	mem_cgroup_update_page_stat(page, MEM_CGROUP_STAT_FILE_MAPPED, -nr);
+ 
+ 	if (unlikely(PageMlocked(page)))
+ 		clear_page_mlock(page);
 -- 
 2.10.2
 
