@@ -1,88 +1,121 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f68.google.com ([74.125.82.68]:34199 "EHLO
-        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753284AbcK1Vji (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Nov 2016 16:39:38 -0500
-Received: by mail-wm0-f68.google.com with SMTP id g23so21318568wme.1
-        for <linux-block@vger.kernel.org>; Mon, 28 Nov 2016 13:39:37 -0800 (PST)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: axboe@fb.com, =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [PATCH 00/23] LightNVM patches for 4.10
-Date: Mon, 28 Nov 2016 22:38:51 +0100
-Message-Id: <20161128213914.12516-1-m@bjorling.me>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Received: from mga09.intel.com ([134.134.136.24]:51634 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1756396AbcK2LXc (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 29 Nov 2016 06:23:32 -0500
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv5 13/36] mm: make write_cache_pages() work on huge pages
+Date: Tue, 29 Nov 2016 14:22:41 +0300
+Message-Id: <20161129112304.90056-14-kirill.shutemov@linux.intel.com>
+In-Reply-To: <20161129112304.90056-1-kirill.shutemov@linux.intel.com>
+References: <20161129112304.90056-1-kirill.shutemov@linux.intel.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hi Jens,
+We writeback whole huge page a time. Let's adjust iteration this way.
 
-A bunch of patches for 4.10 have been prepared.
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+---
+ include/linux/mm.h      |  1 +
+ include/linux/pagemap.h |  1 +
+ mm/page-writeback.c     | 17 ++++++++++++-----
+ 3 files changed, 14 insertions(+), 5 deletions(-)
 
-Javier has been busy eliminating abstractions in the LightNVM
-interface. Mainly killing generic nvm_block and nvm_lun, which
-simplifies the locking mechanism within targets. He also added a couple
-of new hints and error codes that are useful for the hardware.
-
-I have a small fix to fix a wrong free, and also a larger patch that
-attaches the sysfs entries added in 4.9 to attach to the native nvme
-gendisk.
-
-
-With these patches, the pblk target is ready to be upstreamed. If
-nothing comes along to delay it, we will push it in the next cycle.
-
-Please pick up.
-
-Thanks,
-Matias
-
-Javier González (21):
-  lightnvm: enable to send hint to erase command
-  lightnvm: do not protect block 0
-  lightnvm: export set bad block table
-  lightnvm: add ECC error codes
-  lightnvm: rrpc: split bios of size > 256kb
-  lightnvm: remove sysfs configuration interface
-  lightnvm: cleanup unused target operations
-  lightnvm: make address conversion functions global
-  lightnvm: remove unnecessary variables in rrpc
-  lightnvm: use constant name instead of value
-  lightnvm: remove gen_lun abstraction
-  lightnvm: manage lun partitions internally in mm
-  lightnvm: move block provisioning to targets
-  lightnvm: remove get_lun operation on gennvm
-  lightnvm: remove debug lun statistics from gennvm
-  lightnvm: eliminate nvm_block abstraction on mm
-  lightnvm: eliminate nvm_lun abstraction in mm
-  lightnvm: introduce helpers for generic ops in rrpc
-  lightnvm: introduce max_phys_sects helper function
-  lightnvm: use target nvm on target-specific ops.
-  lightnvm: transform target get/set bad block
-
-Matias Bjørling (2):
-  nvme: lightnvm: frees wrong cmd structure
-  nvme: lightnvm: attach lightnvm sysfs to nvme block device
-
- drivers/lightnvm/Makefile    |   2 +-
- drivers/lightnvm/core.c      | 375 +++++++++++-------------
- drivers/lightnvm/gennvm.c    | 663 +++++++++++++++++++++----------------------
- drivers/lightnvm/gennvm.h    |  34 ++-
- drivers/lightnvm/lightnvm.h  |  35 ---
- drivers/lightnvm/rrpc.c      | 514 +++++++++++++++++++++------------
- drivers/lightnvm/rrpc.h      |  65 ++++-
- drivers/lightnvm/sysblk.c    |  98 +++----
- drivers/lightnvm/sysfs.c     | 198 -------------
- drivers/nvme/host/core.c     |  45 ++-
- drivers/nvme/host/lightnvm.c | 192 ++++++++++++-
- drivers/nvme/host/nvme.h     |  31 +-
- include/linux/lightnvm.h     | 244 ++++++++--------
- 13 files changed, 1278 insertions(+), 1218 deletions(-)
- delete mode 100644 drivers/lightnvm/lightnvm.h
- delete mode 100644 drivers/lightnvm/sysfs.c
-
+diff --git a/include/linux/mm.h b/include/linux/mm.h
+index 4424784ac374..582844ca0b23 100644
+--- a/include/linux/mm.h
++++ b/include/linux/mm.h
+@@ -1045,6 +1045,7 @@ extern pgoff_t __page_file_index(struct page *page);
+  */
+ static inline pgoff_t page_index(struct page *page)
+ {
++	page = compound_head(page);
+ 	if (unlikely(PageSwapCache(page)))
+ 		return __page_file_index(page);
+ 	return page->index;
+diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
+index e530e7b3b6b2..faa3fa173939 100644
+--- a/include/linux/pagemap.h
++++ b/include/linux/pagemap.h
+@@ -546,6 +546,7 @@ static inline void wait_on_page_locked(struct page *page)
+  */
+ static inline void wait_on_page_writeback(struct page *page)
+ {
++	page = compound_head(page);
+ 	if (PageWriteback(page))
+ 		wait_on_page_bit(page, PG_writeback);
+ }
+diff --git a/mm/page-writeback.c b/mm/page-writeback.c
+index 290e8b7d3181..47d5b12c460e 100644
+--- a/mm/page-writeback.c
++++ b/mm/page-writeback.c
+@@ -2209,7 +2209,7 @@ int write_cache_pages(struct address_space *mapping,
+ 			 * mapping. However, page->index will not change
+ 			 * because we have a reference on the page.
+ 			 */
+-			if (page->index > end) {
++			if (page_to_pgoff(page) > end) {
+ 				/*
+ 				 * can't be range_cyclic (1st pass) because
+ 				 * end == -1 in that case.
+@@ -2218,7 +2218,12 @@ int write_cache_pages(struct address_space *mapping,
+ 				break;
+ 			}
+ 
+-			done_index = page->index;
++			done_index = page_to_pgoff(page);
++			if (PageTransCompound(page)) {
++				index = round_up(index + 1, HPAGE_PMD_NR);
++				i += HPAGE_PMD_NR -
++					done_index % HPAGE_PMD_NR - 1;
++			}
+ 
+ 			lock_page(page);
+ 
+@@ -2230,7 +2235,7 @@ int write_cache_pages(struct address_space *mapping,
+ 			 * even if there is now a new, dirty page at the same
+ 			 * pagecache address.
+ 			 */
+-			if (unlikely(page->mapping != mapping)) {
++			if (unlikely(page_mapping(page) != mapping)) {
+ continue_unlock:
+ 				unlock_page(page);
+ 				continue;
+@@ -2268,7 +2273,8 @@ int write_cache_pages(struct address_space *mapping,
+ 					 * not be suitable for data integrity
+ 					 * writeout).
+ 					 */
+-					done_index = page->index + 1;
++					done_index = compound_head(page)->index
++						+ hpage_nr_pages(page);
+ 					done = 1;
+ 					break;
+ 				}
+@@ -2280,7 +2286,8 @@ int write_cache_pages(struct address_space *mapping,
+ 			 * keep going until we have written all the pages
+ 			 * we tagged for writeback prior to entering this loop.
+ 			 */
+-			if (--wbc->nr_to_write <= 0 &&
++			wbc->nr_to_write -= hpage_nr_pages(page);
++			if (wbc->nr_to_write <= 0 &&
+ 			    wbc->sync_mode == WB_SYNC_NONE) {
+ 				done = 1;
+ 				break;
 -- 
-2.9.3
+2.10.2
 
