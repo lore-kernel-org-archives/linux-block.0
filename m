@@ -1,97 +1,161 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Ming Lei <tom.leiming@gmail.com>
-To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Ming Lei <tom.leiming@gmail.com>,
-        Joern Engel <joern@logfs.org>,
-        Prasad Joshi <prasadjoshi.linux@gmail.com>,
-        logfs@logfs.org (open list:LogFS)
-Subject: [PATCH 11/12] fs: logfs: use bio_add_page() in do_erase()
-Date: Fri, 11 Nov 2016 20:05:39 +0800
-Message-Id: <1478865957-25252-12-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1478865957-25252-1-git-send-email-tom.leiming@gmail.com>
-References: <1478865957-25252-1-git-send-email-tom.leiming@gmail.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga09.intel.com ([134.134.136.24]:51634 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1757250AbcK2LXm (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 29 Nov 2016 06:23:42 -0500
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv5 17/36] fs: make block_read_full_page() be able to read huge page
+Date: Tue, 29 Nov 2016 14:22:45 +0300
+Message-Id: <20161129112304.90056-18-kirill.shutemov@linux.intel.com>
+In-Reply-To: <20161129112304.90056-1-kirill.shutemov@linux.intel.com>
+References: <20161129112304.90056-1-kirill.shutemov@linux.intel.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Also code gets simplified a bit.
+The approach is straight-forward: for compound pages we read out whole
+huge page.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+For huge page we cannot have array of buffer head pointers on stack --
+it's 4096 pointers on x86-64 -- 'arr' is allocated with kmalloc() for
+huge pages.
+
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- fs/logfs/dev_bdev.c | 44 +++++++++++++++-----------------------------
- 1 file changed, 15 insertions(+), 29 deletions(-)
+ fs/buffer.c                 | 22 +++++++++++++++++-----
+ include/linux/buffer_head.h |  9 +++++----
+ include/linux/page-flags.h  |  2 +-
+ 3 files changed, 23 insertions(+), 10 deletions(-)
 
-diff --git a/fs/logfs/dev_bdev.c b/fs/logfs/dev_bdev.c
-index a2e8511b89d6..b9188be0bf83 100644
---- a/fs/logfs/dev_bdev.c
-+++ b/fs/logfs/dev_bdev.c
-@@ -153,49 +153,35 @@ static int do_erase(struct super_block *sb, u64 ofs, pgoff_t index,
- 		size_t nr_pages)
+diff --git a/fs/buffer.c b/fs/buffer.c
+index d21771fcf7d3..090f7edfa6b7 100644
+--- a/fs/buffer.c
++++ b/fs/buffer.c
+@@ -871,7 +871,7 @@ struct buffer_head *alloc_page_buffers(struct page *page, unsigned long size,
+ 
+ try_again:
+ 	head = NULL;
+-	offset = PAGE_SIZE;
++	offset = hpage_size(page);
+ 	while ((offset -= size) >= 0) {
+ 		bh = alloc_buffer_head(GFP_NOFS);
+ 		if (!bh)
+@@ -1466,7 +1466,7 @@ void set_bh_page(struct buffer_head *bh,
+ 		struct page *page, unsigned long offset)
  {
- 	struct logfs_super *super = logfs_super(sb);
--	struct bio *bio;
-+	struct bio *bio = NULL;
- 	unsigned int max_pages;
--	int i;
-+	int i, ret;
+ 	bh->b_page = page;
+-	BUG_ON(offset >= PAGE_SIZE);
++	BUG_ON(offset >= hpage_size(page));
+ 	if (PageHighMem(page))
+ 		/*
+ 		 * This catches illegal uses and preserves the offset:
+@@ -2280,11 +2280,13 @@ int block_read_full_page(struct page *page, get_block_t *get_block)
+ {
+ 	struct inode *inode = page->mapping->host;
+ 	sector_t iblock, lblock;
+-	struct buffer_head *bh, *head, *arr[MAX_BUF_PER_PAGE];
++	struct buffer_head *arr_on_stack[MAX_BUF_PER_PAGE];
++	struct buffer_head *bh, *head, **arr = arr_on_stack;
+ 	unsigned int blocksize, bbits;
+ 	int nr, i;
+ 	int fully_mapped = 1;
  
- 	max_pages = min_t(size_t, nr_pages, BIO_MAX_PAGES);
++	VM_BUG_ON_PAGE(PageTail(page), page);
+ 	head = create_page_buffers(page, inode, 0);
+ 	blocksize = head->b_size;
+ 	bbits = block_size_bits(blocksize);
+@@ -2295,6 +2297,11 @@ int block_read_full_page(struct page *page, get_block_t *get_block)
+ 	nr = 0;
+ 	i = 0;
  
--	bio = bio_alloc(GFP_NOFS, max_pages);
--	BUG_ON(!bio);
--
- 	for (i = 0; i < nr_pages; i++) {
--		if (i >= max_pages) {
--			/* Block layer cannot split bios :( */
--			bio->bi_vcnt = i;
--			bio->bi_iter.bi_size = i * PAGE_SIZE;
-+		if (!bio) {
-+			bio = bio_alloc(GFP_NOFS, max_pages);
-+			BUG_ON(!bio);
-+
- 			bio->bi_bdev = super->s_bdev;
- 			bio->bi_iter.bi_sector = ofs >> 9;
- 			bio->bi_private = sb;
- 			bio->bi_end_io = erase_end_io;
- 			bio_set_op_attrs(bio, REQ_OP_WRITE, 0);
-+		}
-+		ret = bio_add_page(bio, super->s_erase_page, PAGE_SIZE, 0);
-+		if (!ret) {
-+			/* Block layer cannot split bios :( */
-+			ofs += bio->bi_iter.bi_size;
- 			atomic_inc(&super->s_pending_writes);
- 			submit_bio(bio);
--
--			ofs += i * PAGE_SIZE;
--			index += i;
--			nr_pages -= i;
--			i = 0;
--
--			bio = bio_alloc(GFP_NOFS, max_pages);
--			BUG_ON(!bio);
- 		}
--		bio->bi_io_vec[i].bv_page = super->s_erase_page;
--		bio->bi_io_vec[i].bv_len = PAGE_SIZE;
--		bio->bi_io_vec[i].bv_offset = 0;
- 	}
--	bio->bi_vcnt = nr_pages;
--	bio->bi_iter.bi_size = nr_pages * PAGE_SIZE;
--	bio->bi_bdev = super->s_bdev;
--	bio->bi_iter.bi_sector = ofs >> 9;
--	bio->bi_private = sb;
--	bio->bi_end_io = erase_end_io;
--	bio_set_op_attrs(bio, REQ_OP_WRITE, 0);
--	atomic_inc(&super->s_pending_writes);
--	submit_bio(bio);
-+	if (bio) {
-+		atomic_inc(&super->s_pending_writes);
-+		submit_bio(bio);
++	if (PageTransHuge(page)) {
++		arr = kmalloc(sizeof(struct buffer_head *) * HPAGE_PMD_NR *
++				MAX_BUF_PER_PAGE, GFP_NOFS);
 +	}
++
+ 	do {
+ 		if (buffer_uptodate(bh))
+ 			continue;
+@@ -2310,7 +2317,9 @@ int block_read_full_page(struct page *page, get_block_t *get_block)
+ 					SetPageError(page);
+ 			}
+ 			if (!buffer_mapped(bh)) {
+-				zero_user(page, i * blocksize, blocksize);
++				zero_user(page + (i * blocksize / PAGE_SIZE),
++						i * blocksize % PAGE_SIZE,
++						blocksize);
+ 				if (!err)
+ 					set_buffer_uptodate(bh);
+ 				continue;
+@@ -2336,7 +2345,7 @@ int block_read_full_page(struct page *page, get_block_t *get_block)
+ 		if (!PageError(page))
+ 			SetPageUptodate(page);
+ 		unlock_page(page);
+-		return 0;
++		goto out;
+ 	}
+ 
+ 	/* Stage two: lock the buffers */
+@@ -2358,6 +2367,9 @@ int block_read_full_page(struct page *page, get_block_t *get_block)
+ 		else
+ 			submit_bh(REQ_OP_READ, 0, bh);
+ 	}
++out:
++	if (arr != arr_on_stack)
++		kfree(arr);
  	return 0;
  }
+ EXPORT_SYMBOL(block_read_full_page);
+diff --git a/include/linux/buffer_head.h b/include/linux/buffer_head.h
+index fd4134ce9c54..f12f6293ed44 100644
+--- a/include/linux/buffer_head.h
++++ b/include/linux/buffer_head.h
+@@ -131,13 +131,14 @@ BUFFER_FNS(Meta, meta)
+ BUFFER_FNS(Prio, prio)
+ BUFFER_FNS(Defer_Completion, defer_completion)
  
+-#define bh_offset(bh)		((unsigned long)(bh)->b_data & ~PAGE_MASK)
++#define bh_offset(bh)	((unsigned long)(bh)->b_data & ~hpage_mask(bh->b_page))
+ 
+ /* If we *know* page->private refers to buffer_heads */
+-#define page_buffers(page)					\
++#define page_buffers(__page)					\
+ 	({							\
+-		BUG_ON(!PagePrivate(page));			\
+-		((struct buffer_head *)page_private(page));	\
++		struct page *p = compound_head(__page);		\
++		BUG_ON(!PagePrivate(p));			\
++		((struct buffer_head *)page_private(p));	\
+ 	})
+ #define page_has_buffers(page)	PagePrivate(page)
+ 
+diff --git a/include/linux/page-flags.h b/include/linux/page-flags.h
+index a2bef9a41bcf..20b7684e9298 100644
+--- a/include/linux/page-flags.h
++++ b/include/linux/page-flags.h
+@@ -730,7 +730,7 @@ static inline void ClearPageSlabPfmemalloc(struct page *page)
+  */
+ static inline int page_has_private(struct page *page)
+ {
+-	return !!(page->flags & PAGE_FLAGS_PRIVATE);
++	return !!(compound_head(page)->flags & PAGE_FLAGS_PRIVATE);
+ }
+ 
+ #undef PF_ANY
 -- 
-2.7.4
+2.10.2
 
