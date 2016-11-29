@@ -1,164 +1,167 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36269 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S933656AbcKNTYz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Nov 2016 14:24:55 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id uAEJOLwm035256
-        for <linux-block@vger.kernel.org>; Mon, 14 Nov 2016 14:24:54 -0500
-Received: from e24smtp05.br.ibm.com (e24smtp05.br.ibm.com [32.104.18.26])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 26qdd4bqby-1
-        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-        for <linux-block@vger.kernel.org>; Mon, 14 Nov 2016 14:24:54 -0500
-Received: from localhost
-        by e24smtp05.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-block@vger.kernel.org> from <krisman@linux.vnet.ibm.com>;
-        Mon, 14 Nov 2016 17:24:52 -0200
-From: Gabriel Krisman Bertazi <krisman@linux.vnet.ibm.com>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org,
-        Gabriel Krisman Bertazi <krisman@linux.vnet.ibm.com>,
-        Brian King <brking@linux.vnet.ibm.com>,
-        Douglas Miller <dougmill@linux.vnet.ibm.com>,
-        linux-scsi@vger.kernel.org
-Subject: [PATCH 1/2] blk-mq: Fix failed allocation path when mapping queues
-Date: Mon, 14 Nov 2016 17:24:37 -0200
-Message-Id: <1479151478-19725-1-git-send-email-krisman@linux.vnet.ibm.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv5 36/36] ext4, vfs: add huge= mount option
+Date: Tue, 29 Nov 2016 14:23:04 +0300
+Message-Id: <20161129112304.90056-37-kirill.shutemov@linux.intel.com>
+In-Reply-To: <20161129112304.90056-1-kirill.shutemov@linux.intel.com>
+References: <20161129112304.90056-1-kirill.shutemov@linux.intel.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-In blk_mq_map_swqueue, there is a memory optimization that frees the
-tags of a queue that has gone unmapped.  Later, if that hctx is remapped
-after another topology change, the tags need to be reallocated.
+The same four values as in tmpfs case.
 
-If this allocation fails, a simple WARN_ON triggers, but the block layer
-ends up with an active hctx without any corresponding set of tags.
-Then, any income IO to that hctx can trigger an Oops.
+Encyption code is not yet ready to handle huge page, so we disable huge
+pages support if the inode has EXT4_INODE_ENCRYPT.
 
-I can reproduce it consistently by running IO, flipping CPUs on and off
-and eventually injecting a memory allocation failure in that path.
-
-In the fix below, if the system experiences a failed allocation of any
-hctx's tags, we remap all the ctxs of that queue to the hctx_0, which
-should always keep it's tags.  There is a minor performance hit, since
-our mapping just got worse after the error path, but this is
-the simplest solution to handle this error path.  The performance hit
-will disappear after another successful remap.
-
-I considered dropping the memory optimization all together, but it
-seemed a bad trade-off to handle this very specific error case.
-
-My one concern about this patch is if remapping an arbitrary queue to
-hctx_0 could result in outstanding requests getting submitted to the
-wrong hctx.  I couldn't observe this happening during tests, but I'm not
-entirely sure it'll never happen.  I believe the queue will be empty if
-we are trying to allocate tags for it, unless it was using another alive
-hctx queue and for some reason got reassigned to this new hctx.  is this
-possible at all?
-
-This should apply cleanly on top of Jen's for-next branch.
-
-The Oops is the one below:
-
-SP (3fff935ce4d0) is in userspace
-1:mon> e
-cpu 0x1: Vector: 300 (Data Access) at [c000000fe99eb110]
-    pc: c0000000005e868c: __sbitmap_queue_get+0x2c/0x180
-    lr: c000000000575328: __bt_get+0x48/0xd0
-    sp: c000000fe99eb390
-   msr: 900000010280b033
-   dar: 28
- dsisr: 40000000
-  current = 0xc000000fe9966800
-  paca    = 0xc000000007e80300   softe: 0        irq_happened: 0x01
-    pid   = 11035, comm = aio-stress
-Linux version 4.8.0-rc6+ (root@bean) (gcc version 5.4.0 20160609
-(Ubuntu/IBM 5.4.0-6ubuntu1~16.04.2) ) #3 SMP Mon Oct 10 20:16:53 CDT 2016
-1:mon> s
-[c000000fe99eb3d0] c000000000575328 __bt_get+0x48/0xd0
-[c000000fe99eb400] c000000000575838 bt_get.isra.1+0x78/0x2d0
-[c000000fe99eb480] c000000000575cb4 blk_mq_get_tag+0x44/0x100
-[c000000fe99eb4b0] c00000000056f6f4 __blk_mq_alloc_request+0x44/0x220
-[c000000fe99eb500] c000000000570050 blk_mq_map_request+0x100/0x1f0
-[c000000fe99eb580] c000000000574650 blk_mq_make_request+0xf0/0x540
-[c000000fe99eb640] c000000000561c44 generic_make_request+0x144/0x230
-[c000000fe99eb690] c000000000561e00 submit_bio+0xd0/0x200
-[c000000fe99eb740] c0000000003ef740 ext4_io_submit+0x90/0xb0
-[c000000fe99eb770] c0000000003e95d8 ext4_writepages+0x588/0xdd0
-[c000000fe99eb910] c00000000025a9f0 do_writepages+0x60/0xc0
-[c000000fe99eb940] c000000000246c88 __filemap_fdatawrite_range+0xf8/0x180
-[c000000fe99eb9e0] c000000000246f90 filemap_write_and_wait_range+0x70/0xf0
-[c000000fe99eba20] c0000000003dd844 ext4_sync_file+0x214/0x540
-[c000000fe99eba80] c000000000364718 vfs_fsync_range+0x78/0x130
-[c000000fe99ebad0] c0000000003dd46c ext4_file_write_iter+0x35c/0x430
-[c000000fe99ebb90] c00000000038c280 aio_run_iocb+0x3b0/0x450
-[c000000fe99ebce0] c00000000038dc28 do_io_submit+0x368/0x730
-[c000000fe99ebe30] c000000000009404 system_call+0x38/0xec
-
-Signed-off-by: Gabriel Krisman Bertazi <krisman@linux.vnet.ibm.com>
-Cc: Brian King <brking@linux.vnet.ibm.com>
-Cc: Douglas Miller <dougmill@linux.vnet.ibm.com>
-Cc: linux-block@vger.kernel.org
-Cc: linux-scsi@vger.kernel.org
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- block/blk-mq.c | 21 +++++++++++++++------
- 1 file changed, 15 insertions(+), 6 deletions(-)
+ fs/ext4/ext4.h  |  5 +++++
+ fs/ext4/inode.c | 30 +++++++++++++++++++++++-------
+ fs/ext4/super.c | 24 ++++++++++++++++++++++++
+ 3 files changed, 52 insertions(+), 7 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 3c5aaead71bb..7f7c4ba91adf 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1862,7 +1862,7 @@ static void blk_mq_init_cpu_queues(struct request_queue *q,
- static void blk_mq_map_swqueue(struct request_queue *q,
- 			       const struct cpumask *online_mask)
+diff --git a/fs/ext4/ext4.h b/fs/ext4/ext4.h
+index aff204f040fc..fb3f81863b53 100644
+--- a/fs/ext4/ext4.h
++++ b/fs/ext4/ext4.h
+@@ -1133,6 +1133,11 @@ struct ext4_inode_info {
+ #define EXT4_MOUNT_DIOREAD_NOLOCK	0x400000 /* Enable support for dio read nolocking */
+ #define EXT4_MOUNT_JOURNAL_CHECKSUM	0x800000 /* Journal checksums */
+ #define EXT4_MOUNT_JOURNAL_ASYNC_COMMIT	0x1000000 /* Journal Async Commit */
++#define EXT4_MOUNT_HUGE_MODE		0x6000000 /* Huge support mode: */
++#define EXT4_MOUNT_HUGE_NEVER		0x0000000
++#define EXT4_MOUNT_HUGE_ALWAYS		0x2000000
++#define EXT4_MOUNT_HUGE_WITHIN_SIZE	0x4000000
++#define EXT4_MOUNT_HUGE_ADVISE		0x6000000
+ #define EXT4_MOUNT_DELALLOC		0x8000000 /* Delalloc support */
+ #define EXT4_MOUNT_DATA_ERR_ABORT	0x10000000 /* Abort on file data write */
+ #define EXT4_MOUNT_BLOCK_VALIDITY	0x20000000 /* Block validity checking */
+diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
+index 17a767c21dc3..4c37fd9fb219 100644
+--- a/fs/ext4/inode.c
++++ b/fs/ext4/inode.c
+@@ -4472,7 +4472,7 @@ int ext4_get_inode_loc(struct inode *inode, struct ext4_iloc *iloc)
+ void ext4_set_inode_flags(struct inode *inode)
  {
--	unsigned int i;
-+	unsigned int i, hctx_idx;
- 	struct blk_mq_hw_ctx *hctx;
- 	struct blk_mq_ctx *ctx;
- 	struct blk_mq_tag_set *set = q->tag_set;
-@@ -1885,6 +1885,15 @@ static void blk_mq_map_swqueue(struct request_queue *q,
- 		if (!cpumask_test_cpu(i, online_mask))
- 			continue;
+ 	unsigned int flags = EXT4_I(inode)->i_flags;
+-	unsigned int new_fl = 0;
++	unsigned int mask, new_fl = 0;
  
-+		hctx_idx = q->mq_map[i];
-+		/* unmapped hw queue can be remapped after CPU topo changed */
-+		if (!set->tags[hctx_idx]) {
-+			set->tags[hctx_idx] = blk_mq_init_rq_map(set, hctx_idx);
-+
-+			if (!set->tags[hctx_idx])
-+				q->mq_map[i] = 0;
+ 	if (flags & EXT4_SYNC_FL)
+ 		new_fl |= S_SYNC;
+@@ -4484,12 +4484,28 @@ void ext4_set_inode_flags(struct inode *inode)
+ 		new_fl |= S_NOATIME;
+ 	if (flags & EXT4_DIRSYNC_FL)
+ 		new_fl |= S_DIRSYNC;
+-	if (test_opt(inode->i_sb, DAX) && S_ISREG(inode->i_mode) &&
+-	    !ext4_should_journal_data(inode) && !ext4_has_inline_data(inode) &&
+-	    !ext4_encrypted_inode(inode))
+-		new_fl |= S_DAX;
+-	inode_set_flags(inode, new_fl,
+-			S_SYNC|S_APPEND|S_IMMUTABLE|S_NOATIME|S_DIRSYNC|S_DAX);
++	if (S_ISREG(inode->i_mode) && !ext4_encrypted_inode(inode)) {
++		if (test_opt(inode->i_sb, DAX) &&
++				!ext4_should_journal_data(inode) &&
++				!ext4_has_inline_data(inode))
++			new_fl |= S_DAX;
++		switch (test_opt(inode->i_sb, HUGE_MODE)) {
++		case EXT4_MOUNT_HUGE_NEVER:
++			break;
++		case EXT4_MOUNT_HUGE_ALWAYS:
++			new_fl |= S_HUGE_ALWAYS;
++			break;
++		case EXT4_MOUNT_HUGE_WITHIN_SIZE:
++			new_fl |= S_HUGE_WITHIN_SIZE;
++			break;
++		case EXT4_MOUNT_HUGE_ADVISE:
++			new_fl |= S_HUGE_ADVISE;
++			break;
 +		}
-+
- 		ctx = per_cpu_ptr(q->queue_ctx, i);
- 		hctx = blk_mq_map_queue(q, i);
++	}
++	mask = S_SYNC | S_APPEND | S_IMMUTABLE | S_NOATIME |
++		S_DIRSYNC | S_DAX | S_HUGE_MODE;
++	inode_set_flags(inode, new_fl, mask);
+ }
  
-@@ -1901,7 +1910,10 @@ static void blk_mq_map_swqueue(struct request_queue *q,
- 		 * disable it and free the request entries.
- 		 */
- 		if (!hctx->nr_ctx) {
--			if (set->tags[i]) {
-+			/* Never unmap queue 0.  We need it as a
-+			 * fallback in case of a new remap fails
-+			 * allocation. */
-+			if (i && set->tags[i]) {
- 				blk_mq_free_rq_map(set, set->tags[i], i);
- 				set->tags[i] = NULL;
- 			}
-@@ -1909,11 +1921,8 @@ static void blk_mq_map_swqueue(struct request_queue *q,
- 			continue;
- 		}
+ /* Propagate flags from i_flags to EXT4_I(inode)->i_flags */
+diff --git a/fs/ext4/super.c b/fs/ext4/super.c
+index 72b459d2b244..127ddfeae1e0 100644
+--- a/fs/ext4/super.c
++++ b/fs/ext4/super.c
+@@ -1296,6 +1296,7 @@ enum {
+ 	Opt_dioread_nolock, Opt_dioread_lock,
+ 	Opt_discard, Opt_nodiscard, Opt_init_itable, Opt_noinit_itable,
+ 	Opt_max_dir_size_kb, Opt_nojournal_checksum,
++	Opt_huge_never, Opt_huge_always, Opt_huge_within_size, Opt_huge_advise,
+ };
  
--		/* unmapped hw queue can be remapped after CPU topo changed */
--		if (!set->tags[i])
--			set->tags[i] = blk_mq_init_rq_map(set, i);
- 		hctx->tags = set->tags[i];
--		WARN_ON(!hctx->tags);
-+		BUG_ON(!hctx->tags);
+ static const match_table_t tokens = {
+@@ -1376,6 +1377,10 @@ static const match_table_t tokens = {
+ 	{Opt_init_itable, "init_itable"},
+ 	{Opt_noinit_itable, "noinit_itable"},
+ 	{Opt_max_dir_size_kb, "max_dir_size_kb=%u"},
++	{Opt_huge_never, "huge=never"},
++	{Opt_huge_always, "huge=always"},
++	{Opt_huge_within_size, "huge=within_size"},
++	{Opt_huge_advise, "huge=advise"},
+ 	{Opt_test_dummy_encryption, "test_dummy_encryption"},
+ 	{Opt_removed, "check=none"},	/* mount option from ext2/3 */
+ 	{Opt_removed, "nocheck"},	/* mount option from ext2/3 */
+@@ -1494,6 +1499,11 @@ static int clear_qf_name(struct super_block *sb, int qtype)
+ #define MOPT_NO_EXT3	0x0200
+ #define MOPT_EXT4_ONLY	(MOPT_NO_EXT2 | MOPT_NO_EXT3)
+ #define MOPT_STRING	0x0400
++#ifdef CONFIG_TRANSPARENT_HUGE_PAGECACHE
++#define MOPT_HUGE	0x1000
++#else
++#define MOPT_HUGE	MOPT_NOSUPPORT
++#endif
  
- 		/*
- 		 * Set the map size to the number of mapped software queues.
+ static const struct mount_opts {
+ 	int	token;
+@@ -1581,6 +1591,10 @@ static const struct mount_opts {
+ 	{Opt_jqfmt_vfsv0, QFMT_VFS_V0, MOPT_QFMT},
+ 	{Opt_jqfmt_vfsv1, QFMT_VFS_V1, MOPT_QFMT},
+ 	{Opt_max_dir_size_kb, 0, MOPT_GTE0},
++	{Opt_huge_never, EXT4_MOUNT_HUGE_NEVER, MOPT_HUGE},
++	{Opt_huge_always, EXT4_MOUNT_HUGE_ALWAYS, MOPT_HUGE},
++	{Opt_huge_within_size, EXT4_MOUNT_HUGE_WITHIN_SIZE, MOPT_HUGE},
++	{Opt_huge_advise, EXT4_MOUNT_HUGE_ADVISE, MOPT_HUGE},
+ 	{Opt_test_dummy_encryption, 0, MOPT_GTE0},
+ 	{Opt_err, 0, 0}
+ };
+@@ -1662,6 +1676,16 @@ static int handle_mount_opt(struct super_block *sb, char *opt, int token,
+ 		} else
+ 			return -1;
+ 	}
++	if (MOPT_HUGE != MOPT_NOSUPPORT && m->flags & MOPT_HUGE) {
++		sbi->s_mount_opt &= ~EXT4_MOUNT_HUGE_MODE;
++		sbi->s_mount_opt |= m->mount_opt;
++		if (m->mount_opt) {
++			ext4_msg(sb, KERN_WARNING, "Warning: "
++					"Support of huge pages is EXPERIMENTAL,"
++					" use at your own risk");
++		}
++		return 1;
++	}
+ 	if (m->flags & MOPT_CLEAR_ERR)
+ 		clear_opt(sb, ERRORS_MASK);
+ 	if (token == Opt_noquota && sb_any_quota_loaded(sb)) {
 -- 
-2.7.4
+2.10.2
 
