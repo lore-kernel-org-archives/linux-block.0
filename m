@@ -1,140 +1,71 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f50.google.com ([74.125.82.50]:36126 "EHLO
-        mail-wm0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932185AbcKROoN (ORCPT
+Received: from mail-yw0-f193.google.com ([209.85.161.193]:33427 "EHLO
+        mail-yw0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751602AbcK2RIm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Nov 2016 09:44:13 -0500
-Received: by mail-wm0-f50.google.com with SMTP id g23so42658233wme.1
-        for <linux-block@vger.kernel.org>; Fri, 18 Nov 2016 06:44:12 -0800 (PST)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io
+        Tue, 29 Nov 2016 12:08:42 -0500
+Date: Tue, 29 Nov 2016 12:08:40 -0500
+From: Tejun Heo <tj@kernel.org>
+To: Shaohua Li <shli@fb.com>
 Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH 18/20] lightnvm: introduce helpers for generic ops in rrpc
-Date: Fri, 18 Nov 2016 15:43:40 +0100
-Message-Id: <1479480222-18790-19-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1479480222-18790-1-git-send-email-javier@cnexlabs.com>
-References: <1479480222-18790-1-git-send-email-javier@cnexlabs.com>
+        Kernel-team@fb.com, axboe@fb.com, vgoyal@redhat.com
+Subject: Re: [PATCH V4 10/15] blk-throttle: add a simple idle detection
+Message-ID: <20161129170840.GD19454@htj.duckdns.org>
+References: <cover.1479161136.git.shli@fb.com>
+ <ba2d677b381e94a2f6c4bf5108f4906c78e99d4f.1479161136.git.shli@fb.com>
+ <20161123214619.GE11306@mtj.duckdns.org>
+ <20161124011517.GC4724@ksenks-mbp.dhcp.thefacebook.com>
+ <20161128222148.GB12948@htj.duckdns.org>
+ <20161128231017.GA99394@shli-mbp.local>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20161128231017.GA99394@shli-mbp.local>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Avoid calling media manager and device-specific operations directly from
-rrpc. Create helper functions on lightnvm's core instead.
+Hello, Shaohua.
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
----
- drivers/lightnvm/core.c   | 22 ++++++++++++++++++++++
- drivers/lightnvm/gennvm.c |  2 --
- drivers/lightnvm/rrpc.c   | 11 +++--------
- include/linux/lightnvm.h  |  3 ---
- 4 files changed, 25 insertions(+), 13 deletions(-)
+On Mon, Nov 28, 2016 at 03:10:18PM -0800, Shaohua Li wrote:
+> > But we can increase sharing by upping the target latency.  That should
+> > be the main knob - if low, the user wants stricter service guarantee
+> > at the cost of lower overall utilization; if high, the workload can
+> > deal with higher latency and the system can achieve higher overall
+> > utilization.  I think the idle detection should be an extra mechanism
+> > which can be used to ignore cgroup-disk combinations which are staying
+> > idle for a long time.
+> 
+> Yes, we can increase target latency to increase sharing. But latency and think
+> time are different. In the example I mentioned earlier, we must increase the
+> latency target very big to increase sharing even the cgroup just sends 1 IO per
+> second. Don't think this's what users want. In a summary, we can't only use
+> latency to determine if cgroups could dispatch more IO.
+> 
+> Currently the think time idle detection is an extra mechanism to ignore cgroup
+> limit. So we currently we only ignore cgroup limit when think time is big or
+> latency is small. This does make the behavior a little bit difficult to
+> predict, eg, not respect latency target sometimes, but this is necessary to
+> have better sharing.
 
-diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-index 23d582f..69f261e 100644
---- a/drivers/lightnvm/core.c
-+++ b/drivers/lightnvm/core.c
-@@ -219,6 +219,28 @@ int nvm_erase_blk(struct nvm_tgt_dev *tgt_dev, struct ppa_addr *p, int flags)
- }
- EXPORT_SYMBOL(nvm_erase_blk);
- 
-+int nvm_get_l2p_tbl(struct nvm_dev *dev, u64 slba, u32 nlb,
-+		    nvm_l2p_update_fn *update_l2p, void *priv)
-+{
-+	if (!dev->ops->get_l2p_tbl)
-+		return 0;
-+
-+	return dev->ops->get_l2p_tbl(dev, slba, nlb, update_l2p, priv);
-+}
-+EXPORT_SYMBOL(nvm_get_l2p_tbl);
-+
-+int nvm_get_area(struct nvm_dev *dev, sector_t *lba, sector_t len)
-+{
-+	return dev->mt->get_area(dev, lba, len);
-+}
-+EXPORT_SYMBOL(nvm_get_area);
-+
-+void nvm_put_area(struct nvm_dev *dev, sector_t lba)
-+{
-+	dev->mt->put_area(dev, lba);
-+}
-+EXPORT_SYMBOL(nvm_put_area);
-+
- void nvm_addr_to_generic_mode(struct nvm_dev *dev, struct nvm_rq *rqd)
- {
- 	int i;
-diff --git a/drivers/lightnvm/gennvm.c b/drivers/lightnvm/gennvm.c
-index 5d7c8c4..befa828 100644
---- a/drivers/lightnvm/gennvm.c
-+++ b/drivers/lightnvm/gennvm.c
-@@ -175,8 +175,6 @@ static struct nvm_tgt_dev *gen_create_tgt_dev(struct nvm_dev *dev,
- 	tgt_dev->geo.luns_per_chnl = (lun_balanced) ? prev_nr_luns : -1;
- 	tgt_dev->total_secs = nr_luns * tgt_dev->geo.sec_per_lun;
- 	tgt_dev->q = dev->q;
--	tgt_dev->ops = dev->ops;
--	tgt_dev->mt = dev->mt;
- 	tgt_dev->map = dev_map;
- 	tgt_dev->luns = luns;
- 	memcpy(&tgt_dev->identity, &dev->identity, sizeof(struct nvm_id));
-diff --git a/drivers/lightnvm/rrpc.c b/drivers/lightnvm/rrpc.c
-index 08a633c..150b5f30 100644
---- a/drivers/lightnvm/rrpc.c
-+++ b/drivers/lightnvm/rrpc.c
-@@ -1167,11 +1167,8 @@ static int rrpc_map_init(struct rrpc *rrpc)
- 		r->addr = ADDR_EMPTY;
- 	}
- 
--	if (!dev->ops->get_l2p_tbl)
--		return 0;
--
- 	/* Bring up the mapping table from device */
--	ret = dev->ops->get_l2p_tbl(dev->parent, rrpc->soffset, rrpc->nr_sects,
-+	ret = nvm_get_l2p_tbl(dev->parent, rrpc->soffset, rrpc->nr_sects,
- 					rrpc_l2p_update, rrpc);
- 	if (ret) {
- 		pr_err("nvm: rrpc: could not read L2P table.\n");
-@@ -1372,13 +1369,12 @@ static int rrpc_luns_init(struct rrpc *rrpc, struct ppa_addr *luns)
- static int rrpc_area_init(struct rrpc *rrpc, sector_t *begin)
- {
- 	struct nvm_tgt_dev *dev = rrpc->dev;
--	struct nvmm_type *mt = dev->mt;
- 	sector_t size = rrpc->nr_sects * dev->geo.sec_size;
- 	int ret;
- 
- 	size >>= 9;
- 
--	ret = mt->get_area(dev->parent, begin, size);
-+	ret = nvm_get_area(dev->parent, begin, size);
- 	if (!ret)
- 		*begin >>= (ilog2(dev->geo.sec_size) - 9);
- 
-@@ -1388,10 +1384,9 @@ static int rrpc_area_init(struct rrpc *rrpc, sector_t *begin)
- static void rrpc_area_free(struct rrpc *rrpc)
- {
- 	struct nvm_tgt_dev *dev = rrpc->dev;
--	struct nvmm_type *mt = dev->mt;
- 	sector_t begin = rrpc->soffset << (ilog2(dev->geo.sec_size) - 9);
- 
--	mt->put_area(dev->parent, begin);
-+	nvm_put_area(dev->parent, begin);
- }
- 
- static void rrpc_free(struct rrpc *rrpc)
-diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
-index 2222853..b3ca603 100644
---- a/include/linux/lightnvm.h
-+++ b/include/linux/lightnvm.h
-@@ -320,9 +320,6 @@ struct nvm_tgt_dev {
- 	struct nvm_id identity;
- 	struct request_queue *q;
- 
--	struct nvmm_type *mt;
--	struct nvm_dev_ops *ops;
--
- 	void *parent;
- 	void *map;
- };
+So, it's not like we can get better sharing for free.  It always comes
+at the cost of (best effort) latency guarantee.  Using thinktime for
+idle detection doesn't mean that we get higher utilization for free.
+If we get higher utilization by using thinktime instead of plain idle
+detection, it means that we're sacrificing latency guarantee more with
+thinktime, so I don't think the argument that using thinktime leads to
+higher utilization is a clear winner.
+
+That is not to say that there's no benefit to thinktime.  I can
+imagine cases where it'd allow us to ride the line between acceptable
+latency and good overall utilization better; however, that also comes
+with cases where one has to wonder "what's going on?  I have no idea
+what it's doing".
+
+Given that blk-throttle is gonna ask for explicit and detailed
+configuration from its users, I think it's vital that it has config
+knobs which are immediately clear.  Being tedious is already a burden
+and I don't think adding unpredictability there is a good idea.
+
+Thanks.
+
 -- 
-2.7.4
-
+tejun
