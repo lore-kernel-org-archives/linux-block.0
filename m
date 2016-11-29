@@ -1,139 +1,240 @@
-Return-Path: <axboe@kernel.dk>
-To: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- Christoph Hellwig <hch@lst.de>, Keith Busch <keith.busch@intel.com>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: Regression: nvme timeouts and oopses
-Message-ID: <af308491-a381-f13d-2d87-89bbca68d99e@kernel.dk>
-Date: Fri, 11 Nov 2016 11:47:21 -0700
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv5 35/36] mm, fs, ext4: expand use of page_mapping() and page_to_pgoff()
+Date: Tue, 29 Nov 2016 14:23:03 +0300
+Message-Id: <20161129112304.90056-36-kirill.shutemov@linux.intel.com>
+In-Reply-To: <20161129112304.90056-1-kirill.shutemov@linux.intel.com>
+References: <20161129112304.90056-1-kirill.shutemov@linux.intel.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Hi,
+With huge pages in page cache we see tail pages in more code paths.
+This patch replaces direct access to struct page fields with macros
+which can handle tail pages properly.
 
-I've been running into problems when stability testing my 4.10 branch,
-and I finally got an easy reproducer today (on the laptop, no less) and
-was able to bisect it. Boils down to this:
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+---
+ fs/buffer.c         |  2 +-
+ fs/ext4/inode.c     |  4 ++--
+ mm/filemap.c        | 24 +++++++++++++-----------
+ mm/memory.c         |  2 +-
+ mm/page-writeback.c |  2 +-
+ mm/truncate.c       |  5 +++--
+ 6 files changed, 21 insertions(+), 18 deletions(-)
 
-2253efc850c4cf690516bbc07854eeb1077202ba is the first bad commit
-commit 2253efc850c4cf690516bbc07854eeb1077202ba
-Author: Bart Van Assche <bart.vanassche@sandisk.com>
-Date:   Fri Oct 28 17:20:02 2016 -0700
-
-     blk-mq: Move more code into blk_mq_direct_issue_request()
-
-The symptoms are one of two things:
-
-1) We get command timeouts:
-
-nvme nvme0: I/O 567 QID 14 timeout, aborting
-nvme nvme0: Abort status: 0x0
-nvme nvme0: I/O 567 QID 14 timeout, reset controller
-nvme nvme0: completing aborted command with status:
-
-blk_update_request: I/O error, dev nvme0n1, sector
-
-EXT4-fs warning (device nvme0n1): ext4_end_bio:314: I/O
-g to inode 20185097 (offset 0 size 8388608 starting block
-
-Buffer I/O error on device nvme0n1, logical block 247040
-Buffer I/O error on device nvme0n1, logical block 247041
-Buffer I/O error on device nvme0n1, logical block 247042
-Buffer I/O error on device nvme0n1, logical block 247043
-Buffer I/O error on device nvme0n1, logical block 247044
-Buffer I/O error on device nvme0n1, logical block 247045
-Buffer I/O error on device nvme0n1, logical block 247046
-Buffer I/O error on device nvme0n1, logical block 247047
-Buffer I/O error on device nvme0n1, logical block 247048
-Buffer I/O error on device nvme0n1, logical block 247049
-
-No corruption though, the data has been written.
-
-2) We oops in __blk_mq_complete_request(), because __nvme_process_cq()
-   -> blk_mq_complete_request() -> __blk_mq_complete_request() gets a
-   request that has NULL ->q, ->bio, ->biotail, etc.
-
-I did a manual revert of the patch, see below, and it seems to work fine
-with this applied. I'll take a look at why this is, since it isn't
-immediately obvious to me. Sending this to get it out there while I take
-a deeper look.
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index d180c989a0e5..365ae17c3f2b 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1291,11 +1291,11 @@ static struct request *blk_mq_map_request(struct 
-request_queue *q,
-  	return rq;
-  }
-
--static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
--				      struct request *rq, blk_qc_t *cookie)
-+static int blk_mq_direct_issue_request(struct request *rq, blk_qc_t 
-*cookie)
-  {
-  	int ret;
-  	struct request_queue *q = rq->q;
-+	struct blk_mq_hw_ctx *hctx = blk_mq_map_queue(q, rq->mq_ctx->cpu);
-  	struct blk_mq_queue_data bd = {
-  		.rq = rq,
-  		.list = NULL,
-@@ -1303,9 +1303,6 @@ static void blk_mq_try_issue_directly(struct 
-blk_mq_hw_ctx *hctx,
-  	};
-  	blk_qc_t new_cookie = blk_tag_to_qc_t(rq->tag, hctx->queue_num);
-
--	if (blk_mq_hctx_stopped(hctx))
--		goto insert;
--
-  	/*
-  	 * For OK queue, we are done. For error, kill it. Any other
-  	 * error (busy), just add it to our list as we previously
-@@ -1314,7 +1311,7 @@ static void blk_mq_try_issue_directly(struct 
-blk_mq_hw_ctx *hctx,
-  	ret = q->mq_ops->queue_rq(hctx, &bd);
-  	if (ret == BLK_MQ_RQ_QUEUE_OK) {
-  		*cookie = new_cookie;
--		return;
-+		return 0;
-  	}
-
-  	__blk_mq_requeue_request(rq);
-@@ -1323,11 +1320,10 @@ static void blk_mq_try_issue_directly(struct 
-blk_mq_hw_ctx *hctx,
-  		*cookie = BLK_QC_T_NONE;
-  		rq->errors = -EIO;
-  		blk_mq_end_request(rq, rq->errors);
--		return;
-+		return 0;
-  	}
-
--insert:
--	blk_mq_insert_request(rq, false, true, true);
-+	return -1;
-  }
-
-  /*
-@@ -1414,11 +1410,15 @@ static blk_qc_t blk_mq_make_request(struct 
-request_queue *q, struct bio *bio)
-
-  		if (!(data.hctx->flags & BLK_MQ_F_BLOCKING)) {
-  			rcu_read_lock();
--			blk_mq_try_issue_directly(data.hctx, old_rq, &cookie);
-+			if (blk_mq_hctx_stopped(data.hctx) ||
-+			    blk_mq_direct_issue_request(old_rq, &cookie) != 0)
-+				blk_mq_insert_request(old_rq, false, true, true);
-  			rcu_read_unlock();
-  		} else {
-  			srcu_idx = srcu_read_lock(&data.hctx->queue_rq_srcu);
--			blk_mq_try_issue_directly(data.hctx, old_rq, &cookie);
-+			if (blk_mq_hctx_stopped(data.hctx) ||
-+			    blk_mq_direct_issue_request(old_rq, &cookie) != 0)
-+				blk_mq_insert_request(old_rq, false, true, true);
-  			srcu_read_unlock(&data.hctx->queue_rq_srcu, srcu_idx);
-  		}
-  		goto done;
-
+diff --git a/fs/buffer.c b/fs/buffer.c
+index 24daf7b9bdb0..c7fe6c9bae25 100644
+--- a/fs/buffer.c
++++ b/fs/buffer.c
+@@ -631,7 +631,7 @@ static void __set_page_dirty(struct page *page, struct address_space *mapping,
+ 	unsigned long flags;
+ 
+ 	spin_lock_irqsave(&mapping->tree_lock, flags);
+-	if (page->mapping) {	/* Race with truncate? */
++	if (page_mapping(page)) {	/* Race with truncate? */
+ 		WARN_ON_ONCE(warn && !PageUptodate(page));
+ 		account_page_dirtied(page, mapping);
+ 		radix_tree_tag_set(&mapping->page_tree,
+diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
+index 263b53ace613..17a767c21dc3 100644
+--- a/fs/ext4/inode.c
++++ b/fs/ext4/inode.c
+@@ -1237,7 +1237,7 @@ static int ext4_write_begin(struct file *file, struct address_space *mapping,
+ 	}
+ 
+ 	lock_page(page);
+-	if (page->mapping != mapping) {
++	if (page_mapping(page) != mapping) {
+ 		/* The page got truncated from under us */
+ 		unlock_page(page);
+ 		put_page(page);
+@@ -2974,7 +2974,7 @@ static int ext4_da_write_begin(struct file *file, struct address_space *mapping,
+ 	}
+ 
+ 	lock_page(page);
+-	if (page->mapping != mapping) {
++	if (page_mapping(page) != mapping) {
+ 		/* The page got truncated from under us */
+ 		unlock_page(page);
+ 		put_page(page);
+diff --git a/mm/filemap.c b/mm/filemap.c
+index 33974ad1a8ec..be8ccadb915f 100644
+--- a/mm/filemap.c
++++ b/mm/filemap.c
+@@ -399,7 +399,7 @@ static int __filemap_fdatawait_range(struct address_space *mapping,
+ 			struct page *page = pvec.pages[i];
+ 
+ 			/* until radix tree lookup accepts end_index */
+-			if (page->index > end)
++			if (page_to_pgoff(page) > end)
+ 				continue;
+ 
+ 			page = compound_head(page);
+@@ -1227,7 +1227,7 @@ struct page *pagecache_get_page(struct address_space *mapping, pgoff_t offset,
+ 		}
+ 
+ 		/* Has the page been truncated? */
+-		if (unlikely(page->mapping != mapping)) {
++		if (unlikely(page_mapping(page) != mapping)) {
+ 			unlock_page(page);
+ 			put_page(page);
+ 			goto repeat;
+@@ -1504,7 +1504,8 @@ unsigned find_get_pages_contig(struct address_space *mapping, pgoff_t start,
+ 		 * otherwise we can get both false positives and false
+ 		 * negatives, which is just confusing to the caller.
+ 		 */
+-		if (page->mapping == NULL || page_to_pgoff(page) != index) {
++		if (page_mapping(page) == NULL ||
++				page_to_pgoff(page) != index) {
+ 			put_page(page);
+ 			break;
+ 		}
+@@ -1792,7 +1793,7 @@ static ssize_t do_generic_file_read(struct file *filp, loff_t *ppos,
+ 			if (!trylock_page(page))
+ 				goto page_not_up_to_date;
+ 			/* Did it get truncated before we got the lock? */
+-			if (!page->mapping)
++			if (!page_mapping(page))
+ 				goto page_not_up_to_date_locked;
+ 			if (!mapping->a_ops->is_partially_uptodate(page,
+ 							offset, iter->count))
+@@ -1872,7 +1873,7 @@ static ssize_t do_generic_file_read(struct file *filp, loff_t *ppos,
+ 
+ page_not_up_to_date_locked:
+ 		/* Did it get truncated before we got the lock? */
+-		if (!page->mapping) {
++		if (!page_mapping(page)) {
+ 			unlock_page(page);
+ 			put_page(page);
+ 			continue;
+@@ -1908,7 +1909,7 @@ static ssize_t do_generic_file_read(struct file *filp, loff_t *ppos,
+ 			if (unlikely(error))
+ 				goto readpage_error;
+ 			if (!PageUptodate(page)) {
+-				if (page->mapping == NULL) {
++				if (page_mapping(page) == NULL) {
+ 					/*
+ 					 * invalidate_mapping_pages got it
+ 					 */
+@@ -2207,12 +2208,12 @@ int filemap_fault(struct vm_area_struct *vma, struct vm_fault *vmf)
+ 	}
+ 
+ 	/* Did it get truncated? */
+-	if (unlikely(page->mapping != mapping)) {
++	if (unlikely(page_mapping(page) != mapping)) {
+ 		unlock_page(page);
+ 		put_page(page);
+ 		goto retry_find;
+ 	}
+-	VM_BUG_ON_PAGE(page->index != offset, page);
++	VM_BUG_ON_PAGE(page_to_pgoff(page) != offset, page);
+ 
+ 	/*
+ 	 * We have a locked page in the page cache, now we need to check
+@@ -2388,7 +2389,7 @@ int filemap_page_mkwrite(struct vm_area_struct *vma, struct vm_fault *vmf)
+ 	sb_start_pagefault(inode->i_sb);
+ 	file_update_time(vma->vm_file);
+ 	lock_page(page);
+-	if (page->mapping != inode->i_mapping) {
++	if (page_mapping(page) != inode->i_mapping) {
+ 		unlock_page(page);
+ 		ret = VM_FAULT_NOPAGE;
+ 		goto out;
+@@ -2537,7 +2538,7 @@ static struct page *do_read_cache_page(struct address_space *mapping,
+ 	lock_page(page);
+ 
+ 	/* Case c or d, restart the operation */
+-	if (!page->mapping) {
++	if (!page_mapping(page)) {
+ 		unlock_page(page);
+ 		put_page(page);
+ 		goto repeat;
+@@ -2993,12 +2994,13 @@ EXPORT_SYMBOL(generic_file_write_iter);
+  */
+ int try_to_release_page(struct page *page, gfp_t gfp_mask)
+ {
+-	struct address_space * const mapping = page->mapping;
++	struct address_space * const mapping = page_mapping(page);
+ 
+ 	BUG_ON(!PageLocked(page));
+ 	if (PageWriteback(page))
+ 		return 0;
+ 
++	page = compound_head(page);
+ 	if (mapping && mapping->a_ops->releasepage)
+ 		return mapping->a_ops->releasepage(page, gfp_mask);
+ 	return try_to_free_buffers(page);
+diff --git a/mm/memory.c b/mm/memory.c
+index e3d7cea8cc6a..804b0e972bd3 100644
+--- a/mm/memory.c
++++ b/mm/memory.c
+@@ -2049,7 +2049,7 @@ static int do_page_mkwrite(struct vm_fault *vmf)
+ 		return ret;
+ 	if (unlikely(!(ret & VM_FAULT_LOCKED))) {
+ 		lock_page(page);
+-		if (!page->mapping) {
++		if (!page_mapping(page)) {
+ 			unlock_page(page);
+ 			return 0; /* retry */
+ 		}
+diff --git a/mm/page-writeback.c b/mm/page-writeback.c
+index d7b905d66add..3ebbac70681f 100644
+--- a/mm/page-writeback.c
++++ b/mm/page-writeback.c
+@@ -2869,7 +2869,7 @@ EXPORT_SYMBOL(mapping_tagged);
+  */
+ void wait_for_stable_page(struct page *page)
+ {
+-	if (bdi_cap_stable_pages_required(inode_to_bdi(page->mapping->host)))
++	if (bdi_cap_stable_pages_required(inode_to_bdi(page_mapping(page)->host)))
+ 		wait_on_page_writeback(page);
+ }
+ EXPORT_SYMBOL_GPL(wait_for_stable_page);
+diff --git a/mm/truncate.c b/mm/truncate.c
+index 7508c2c7e4ed..8cc0c17d95d5 100644
+--- a/mm/truncate.c
++++ b/mm/truncate.c
+@@ -575,6 +575,7 @@ invalidate_complete_page2(struct address_space *mapping, struct page *page)
+ {
+ 	unsigned long flags;
+ 
++	page = compound_head(page);
+ 	if (page->mapping != mapping)
+ 		return 0;
+ 
+@@ -603,7 +604,7 @@ static int do_launder_page(struct address_space *mapping, struct page *page)
+ {
+ 	if (!PageDirty(page))
+ 		return 0;
+-	if (page->mapping != mapping || mapping->a_ops->launder_page == NULL)
++	if (page_mapping(page) != mapping || mapping->a_ops->launder_page == NULL)
+ 		return 0;
+ 	return mapping->a_ops->launder_page(page);
+ }
+@@ -651,7 +652,7 @@ int invalidate_inode_pages2_range(struct address_space *mapping,
+ 
+ 			lock_page(page);
+ 			WARN_ON(page_to_pgoff(page) != index);
+-			if (page->mapping != mapping) {
++			if (page_mapping(page) != mapping) {
+ 				unlock_page(page);
+ 				continue;
+ 			}
 -- 
-Jens Axboe
+2.10.2
+
