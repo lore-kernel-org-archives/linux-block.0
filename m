@@ -1,44 +1,112 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f178.google.com ([209.85.192.178]:34239 "EHLO
-        mail-pf0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755028AbcKBQCO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Nov 2016 12:02:14 -0400
-Received: by mail-pf0-f178.google.com with SMTP id n85so14221918pfi.1
-        for <linux-block@vger.kernel.org>; Wed, 02 Nov 2016 09:02:14 -0700 (PDT)
-Subject: Re: [PATCH 0/7] LightNVM patchset V2
-To: =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <jg@lightnvm.io>
-References: <1477591299-26504-1-git-send-email-javier@cnexlabs.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
-Message-ID: <08d61d55-388c-bfbb-1e32-4d3aa2ca7feb@lightnvm.io>
-Date: Wed, 2 Nov 2016 17:02:11 +0100
-MIME-Version: 1.0
-In-Reply-To: <1477591299-26504-1-git-send-email-javier@cnexlabs.com>
-Content-Type: text/plain; charset=utf-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv5 28/36] ext4: make ext4_block_write_begin() aware about huge pages
+Date: Tue, 29 Nov 2016 14:22:56 +0300
+Message-Id: <20161129112304.90056-29-kirill.shutemov@linux.intel.com>
+In-Reply-To: <20161129112304.90056-1-kirill.shutemov@linux.intel.com>
+References: <20161129112304.90056-1-kirill.shutemov@linux.intel.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-On 10/27/2016 08:01 PM, Javier González wrote:
-> V2: Rebase patches on Matias' for-next
-> 
-> Javier González (7):
->   lightnvm: enable to send hint to erase command
->   lightnvm: do not decide on device blocks
->   lightnvm: manage block list on LUN owner
->   lightnvm: drop reserve and release LUN callbacks
->   lightnvm: export set bad block table
->   lightnvm: add ECC error codes
->   lightnvm: rrpc: split bios of size > 256kb
-> 
->  drivers/lightnvm/core.c      |  41 ++++++++--
->  drivers/lightnvm/gennvm.c    | 180 +++++++++++++++++++++++++------------------
->  drivers/lightnvm/gennvm.h    |  19 ++---
->  drivers/lightnvm/rrpc.c      | 128 ++++++++++++++++++++++++------
->  drivers/lightnvm/rrpc.h      |   4 +
->  drivers/lightnvm/sysblk.c    |  33 ++------
->  drivers/nvme/host/lightnvm.c |   1 +
->  include/linux/lightnvm.h     |  52 +++++++++----
->  8 files changed, 305 insertions(+), 153 deletions(-)
-> 
+It simply matches changes to __block_write_begin_int().
 
-Thanks Javier. I've picked 1-2 and 5-7 to my for-next.
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+---
+ fs/ext4/inode.c | 35 +++++++++++++++++++++--------------
+ 1 file changed, 21 insertions(+), 14 deletions(-)
+
+diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
+index d3143dfe9962..21662bcbbbcb 100644
+--- a/fs/ext4/inode.c
++++ b/fs/ext4/inode.c
+@@ -1094,9 +1094,8 @@ int do_journal_get_write_access(handle_t *handle,
+ static int ext4_block_write_begin(struct page *page, loff_t pos, unsigned len,
+ 				  get_block_t *get_block)
+ {
+-	unsigned from = pos & (PAGE_SIZE - 1);
+-	unsigned to = from + len;
+-	struct inode *inode = page->mapping->host;
++	unsigned from, to;
++	struct inode *inode = page_mapping(page)->host;
+ 	unsigned block_start, block_end;
+ 	sector_t block;
+ 	int err = 0;
+@@ -1104,10 +1103,14 @@ static int ext4_block_write_begin(struct page *page, loff_t pos, unsigned len,
+ 	unsigned bbits;
+ 	struct buffer_head *bh, *head, *wait[2], **wait_bh = wait;
+ 	bool decrypt = false;
++	bool uptodate = PageUptodate(page);
+ 
++	page = compound_head(page);
++	from = pos & ~hpage_mask(page);
++	to = from + len;
+ 	BUG_ON(!PageLocked(page));
+-	BUG_ON(from > PAGE_SIZE);
+-	BUG_ON(to > PAGE_SIZE);
++	BUG_ON(from > hpage_size(page));
++	BUG_ON(to > hpage_size(page));
+ 	BUG_ON(from > to);
+ 
+ 	if (!page_has_buffers(page))
+@@ -1120,10 +1123,8 @@ static int ext4_block_write_begin(struct page *page, loff_t pos, unsigned len,
+ 	    block++, block_start = block_end, bh = bh->b_this_page) {
+ 		block_end = block_start + blocksize;
+ 		if (block_end <= from || block_start >= to) {
+-			if (PageUptodate(page)) {
+-				if (!buffer_uptodate(bh))
+-					set_buffer_uptodate(bh);
+-			}
++			if (uptodate && !buffer_uptodate(bh))
++				set_buffer_uptodate(bh);
+ 			continue;
+ 		}
+ 		if (buffer_new(bh))
+@@ -1135,19 +1136,25 @@ static int ext4_block_write_begin(struct page *page, loff_t pos, unsigned len,
+ 				break;
+ 			if (buffer_new(bh)) {
+ 				clean_bdev_bh_alias(bh);
+-				if (PageUptodate(page)) {
++				if (uptodate) {
+ 					clear_buffer_new(bh);
+ 					set_buffer_uptodate(bh);
+ 					mark_buffer_dirty(bh);
+ 					continue;
+ 				}
+-				if (block_end > to || block_start < from)
+-					zero_user_segments(page, to, block_end,
+-							   block_start, from);
++				if (block_end > to || block_start < from) {
++					BUG_ON(to - from  > PAGE_SIZE);
++					zero_user_segments(page +
++							block_start / PAGE_SIZE,
++							to % PAGE_SIZE,
++							(block_start % PAGE_SIZE) + blocksize,
++							block_start % PAGE_SIZE,
++							from % PAGE_SIZE);
++				}
+ 				continue;
+ 			}
+ 		}
+-		if (PageUptodate(page)) {
++		if (uptodate) {
+ 			if (!buffer_uptodate(bh))
+ 				set_buffer_uptodate(bh);
+ 			continue;
+-- 
+2.10.2
+
