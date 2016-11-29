@@ -1,46 +1,69 @@
-Return-Path: <krisman@linux.vnet.ibm.com>
-From: Gabriel Krisman Bertazi <krisman@linux.vnet.ibm.com>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org5,
-        Gabriel Krisman Bertazi <krisman@linux.vnet.ibm.com>,
-        Ming Lei <ming.lei@canonical.com>
-Subject: [PATCH] blk-mq: Drop explicit timeout sync in hotplug
-Date: Mon, 28 Nov 2016 14:48:05 -0200
-Message-Id: <1480351685-3369-1-git-send-email-krisman@linux.vnet.ibm.com>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv5 03/36] page-flags: relax page flag policy for few flags
+Date: Tue, 29 Nov 2016 14:22:31 +0300
+Message-Id: <20161129112304.90056-4-kirill.shutemov@linux.intel.com>
+In-Reply-To: <20161129112304.90056-1-kirill.shutemov@linux.intel.com>
+References: <20161129112304.90056-1-kirill.shutemov@linux.intel.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-After commit 287922eb0b18 ("block: defer timeouts to a workqueue"),
-deleting the timeout work after freezing the queue shouldn't be
-necessary, since the synchronization is already enforced by the
-acquisition of a q_usage_counter reference in blk_mq_timeout_work.
+These flags are in use for filesystems with backing storage: PG_error,
+PG_writeback and PG_readahead.
 
-Signed-off-by: Gabriel Krisman Bertazi <krisman@linux.vnet.ibm.com>
-Cc: Ming Lei <ming.lei@canonical.com>
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- block/blk-mq.c | 9 +--------
- 1 file changed, 1 insertion(+), 8 deletions(-)
+ include/linux/page-flags.h | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 9d4a1d630d0b..bac12caece06 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2220,16 +2220,9 @@ static void blk_mq_queue_reinit_work(void)
- 	 */
- 	list_for_each_entry(q, &all_q_list, all_q_node)
- 		blk_mq_freeze_queue_start(q);
--	list_for_each_entry(q, &all_q_list, all_q_node) {
-+	list_for_each_entry(q, &all_q_list, all_q_node)
- 		blk_mq_freeze_queue_wait(q);
+diff --git a/include/linux/page-flags.h b/include/linux/page-flags.h
+index 74e4dda91238..a2bef9a41bcf 100644
+--- a/include/linux/page-flags.h
++++ b/include/linux/page-flags.h
+@@ -253,7 +253,7 @@ static inline int TestClearPage##uname(struct page *page) { return 0; }
+ 	TESTSETFLAG_FALSE(uname) TESTCLEARFLAG_FALSE(uname)
  
--		/*
--		 * timeout handler can't touch hw queue during the
--		 * reinitialization
--		 */
--		del_timer_sync(&q->timeout);
--	}
--
- 	list_for_each_entry(q, &all_q_list, all_q_node)
- 		blk_mq_queue_reinit(q, &cpuhp_online_new);
+ __PAGEFLAG(Locked, locked, PF_NO_TAIL)
+-PAGEFLAG(Error, error, PF_NO_COMPOUND) TESTCLEARFLAG(Error, error, PF_NO_COMPOUND)
++PAGEFLAG(Error, error, PF_NO_TAIL) TESTCLEARFLAG(Error, error, PF_NO_TAIL)
+ PAGEFLAG(Referenced, referenced, PF_HEAD)
+ 	TESTCLEARFLAG(Referenced, referenced, PF_HEAD)
+ 	__SETPAGEFLAG(Referenced, referenced, PF_HEAD)
+@@ -293,15 +293,15 @@ PAGEFLAG(OwnerPriv1, owner_priv_1, PF_ANY)
+  * Only test-and-set exist for PG_writeback.  The unconditional operators are
+  * risky: they bypass page accounting.
+  */
+-TESTPAGEFLAG(Writeback, writeback, PF_NO_COMPOUND)
+-	TESTSCFLAG(Writeback, writeback, PF_NO_COMPOUND)
++TESTPAGEFLAG(Writeback, writeback, PF_NO_TAIL)
++	TESTSCFLAG(Writeback, writeback, PF_NO_TAIL)
+ PAGEFLAG(MappedToDisk, mappedtodisk, PF_NO_TAIL)
  
+ /* PG_readahead is only used for reads; PG_reclaim is only for writes */
+ PAGEFLAG(Reclaim, reclaim, PF_NO_TAIL)
+ 	TESTCLEARFLAG(Reclaim, reclaim, PF_NO_TAIL)
+-PAGEFLAG(Readahead, reclaim, PF_NO_COMPOUND)
+-	TESTCLEARFLAG(Readahead, reclaim, PF_NO_COMPOUND)
++PAGEFLAG(Readahead, reclaim, PF_NO_TAIL)
++	TESTCLEARFLAG(Readahead, reclaim, PF_NO_TAIL)
+ 
+ #ifdef CONFIG_HIGHMEM
+ /*
 -- 
-2.7.4
+2.10.2
+
