@@ -1,25 +1,188 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-Content-Type: text/plain; charset=us-ascii
-Subject: blk-mq: preparation of the ground for BFQ inclusion
-Date: Mon, 14 Nov 2016 23:13:06 +0100
-Message-Id: <347F26BB-2D0A-4DBE-9FC5-BA6C05AE02B2@linaro.org>
-Cc: Linus Walleij <linus.walleij@linaro.org>,
- Mark Brown <broonie@kernel.org>,
- Ulf Hansson <ulf.hansson@linaro.org>,
- Omar Sandoval <osandov@osandov.com>,
- Jan Kara <jack@suse.cz>,
- Bart Van Assche <bart.vanassche@sandisk.com>,
- linux-block@vger.kernel.org,
- Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv5 18/36] fs: make block_write_{begin,end}() be able to handle huge pages
+Date: Tue, 29 Nov 2016 14:22:46 +0300
+Message-Id: <20161129112304.90056-19-kirill.shutemov@linux.intel.com>
+In-Reply-To: <20161129112304.90056-1-kirill.shutemov@linux.intel.com>
+References: <20161129112304.90056-1-kirill.shutemov@linux.intel.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Jens,
-have you had time to look into the first extensions/changes required?
-Any time plan?
+It's more or less straight-forward.
 
-Thanks,
-Paolo
+Most changes are around getting offset/len withing page right and zero
+out desired part of the page.
+
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+---
+ fs/buffer.c | 70 +++++++++++++++++++++++++++++++++++--------------------------
+ 1 file changed, 40 insertions(+), 30 deletions(-)
+
+diff --git a/fs/buffer.c b/fs/buffer.c
+index 090f7edfa6b7..7d333621ccfb 100644
+--- a/fs/buffer.c
++++ b/fs/buffer.c
+@@ -1902,6 +1902,7 @@ void page_zero_new_buffers(struct page *page, unsigned from, unsigned to)
+ {
+ 	unsigned int block_start, block_end;
+ 	struct buffer_head *head, *bh;
++	bool uptodate = PageUptodate(page);
+ 
+ 	BUG_ON(!PageLocked(page));
+ 	if (!page_has_buffers(page))
+@@ -1912,21 +1913,21 @@ void page_zero_new_buffers(struct page *page, unsigned from, unsigned to)
+ 	do {
+ 		block_end = block_start + bh->b_size;
+ 
+-		if (buffer_new(bh)) {
+-			if (block_end > from && block_start < to) {
+-				if (!PageUptodate(page)) {
+-					unsigned start, size;
++		if (buffer_new(bh) && block_end > from && block_start < to) {
++			if (!uptodate) {
++				unsigned start, size;
+ 
+-					start = max(from, block_start);
+-					size = min(to, block_end) - start;
++				start = max(from, block_start);
++				size = min(to, block_end) - start;
+ 
+-					zero_user(page, start, size);
+-					set_buffer_uptodate(bh);
+-				}
+-
+-				clear_buffer_new(bh);
+-				mark_buffer_dirty(bh);
++				zero_user(page + block_start / PAGE_SIZE,
++						start % PAGE_SIZE,
++						size);
++				set_buffer_uptodate(bh);
+ 			}
++
++			clear_buffer_new(bh);
++			mark_buffer_dirty(bh);
+ 		}
+ 
+ 		block_start = block_end;
+@@ -1992,18 +1993,21 @@ iomap_to_bh(struct inode *inode, sector_t block, struct buffer_head *bh,
+ int __block_write_begin_int(struct page *page, loff_t pos, unsigned len,
+ 		get_block_t *get_block, struct iomap *iomap)
+ {
+-	unsigned from = pos & (PAGE_SIZE - 1);
+-	unsigned to = from + len;
+-	struct inode *inode = page->mapping->host;
++	unsigned from, to;
++	struct inode *inode = page_mapping(page)->host;
+ 	unsigned block_start, block_end;
+ 	sector_t block;
+ 	int err = 0;
+ 	unsigned blocksize, bbits;
+ 	struct buffer_head *bh, *head, *wait[2], **wait_bh=wait;
++	bool uptodate = PageUptodate(page);
+ 
++	page = compound_head(page);
++	from = pos & ~hpage_mask(page);
++	to = from + len;
+ 	BUG_ON(!PageLocked(page));
+-	BUG_ON(from > PAGE_SIZE);
+-	BUG_ON(to > PAGE_SIZE);
++	BUG_ON(from > hpage_size(page));
++	BUG_ON(to > hpage_size(page));
+ 	BUG_ON(from > to);
+ 
+ 	head = create_page_buffers(page, inode, 0);
+@@ -2016,10 +2020,8 @@ int __block_write_begin_int(struct page *page, loff_t pos, unsigned len,
+ 	    block++, block_start=block_end, bh = bh->b_this_page) {
+ 		block_end = block_start + blocksize;
+ 		if (block_end <= from || block_start >= to) {
+-			if (PageUptodate(page)) {
+-				if (!buffer_uptodate(bh))
+-					set_buffer_uptodate(bh);
+-			}
++			if (uptodate && !buffer_uptodate(bh))
++				set_buffer_uptodate(bh);
+ 			continue;
+ 		}
+ 		if (buffer_new(bh))
+@@ -2036,23 +2038,28 @@ int __block_write_begin_int(struct page *page, loff_t pos, unsigned len,
+ 
+ 			if (buffer_new(bh)) {
+ 				clean_bdev_bh_alias(bh);
+-				if (PageUptodate(page)) {
++				if (uptodate) {
+ 					clear_buffer_new(bh);
+ 					set_buffer_uptodate(bh);
+ 					mark_buffer_dirty(bh);
+ 					continue;
+ 				}
+-				if (block_end > to || block_start < from)
+-					zero_user_segments(page,
+-						to, block_end,
+-						block_start, from);
++				if (block_end > to || block_start < from) {
++					BUG_ON(to - from  > PAGE_SIZE);
++					zero_user_segments(page +
++							block_start / PAGE_SIZE,
++						to % PAGE_SIZE,
++						(block_start % PAGE_SIZE) + blocksize,
++						block_start % PAGE_SIZE,
++						from % PAGE_SIZE);
++				}
+ 				continue;
+ 			}
+ 		}
+-		if (PageUptodate(page)) {
++		if (uptodate) {
+ 			if (!buffer_uptodate(bh))
+ 				set_buffer_uptodate(bh);
+-			continue; 
++			continue;
+ 		}
+ 		if (!buffer_uptodate(bh) && !buffer_delay(bh) &&
+ 		    !buffer_unwritten(bh) &&
+@@ -2089,6 +2096,7 @@ static int __block_commit_write(struct inode *inode, struct page *page,
+ 	unsigned blocksize;
+ 	struct buffer_head *bh, *head;
+ 
++	VM_BUG_ON_PAGE(PageTail(page), page);
+ 	bh = head = page_buffers(page);
+ 	blocksize = bh->b_size;
+ 
+@@ -2102,7 +2110,8 @@ static int __block_commit_write(struct inode *inode, struct page *page,
+ 			set_buffer_uptodate(bh);
+ 			mark_buffer_dirty(bh);
+ 		}
+-		clear_buffer_new(bh);
++		if (buffer_new(bh))
++			clear_buffer_new(bh);
+ 
+ 		block_start = block_end;
+ 		bh = bh->b_this_page;
+@@ -2155,7 +2164,8 @@ int block_write_end(struct file *file, struct address_space *mapping,
+ 	struct inode *inode = mapping->host;
+ 	unsigned start;
+ 
+-	start = pos & (PAGE_SIZE - 1);
++	page = compound_head(page);
++	start = pos & ~hpage_mask(page);
+ 
+ 	if (unlikely(copied < len)) {
+ 		/*
+-- 
+2.10.2
+
