@@ -1,163 +1,366 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:44644 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S932501AbcKVRyv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Nov 2016 12:54:51 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id uAMHsKM1014187
-        for <linux-block@vger.kernel.org>; Tue, 22 Nov 2016 12:54:51 -0500
-Received: from e24smtp02.br.ibm.com (e24smtp02.br.ibm.com [32.104.18.86])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 26vse6egvm-1
-        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-        for <linux-block@vger.kernel.org>; Tue, 22 Nov 2016 12:54:50 -0500
-Received: from localhost
-        by e24smtp02.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-block@vger.kernel.org> from <krisman@linux.vnet.ibm.com>;
-        Tue, 22 Nov 2016 15:54:48 -0200
-From: Gabriel Krisman Bertazi <krisman@linux.vnet.ibm.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Gabriel Krisman Bertazi <krisman@linux.vnet.ibm.com>,
-        Brian King <brking@linux.vnet.ibm.com>,
-        Douglas Miller <dougmill@linux.vnet.ibm.com>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
-Subject: [PATCH v2 1/2] blk-mq: Fix failed allocation path when mapping queues
-Date: Tue, 22 Nov 2016 15:54:28 -0200
-Message-Id: <1479837269-5742-1-git-send-email-krisman@linux.vnet.ibm.com>
+Received: from mga06.intel.com ([134.134.136.31]:53212 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1756396AbcK2LYb (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 29 Nov 2016 06:24:31 -0500
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv5 00/36] ext4: support of huge pages
+Date: Tue, 29 Nov 2016 14:22:28 +0300
+Message-Id: <20161129112304.90056-1-kirill.shutemov@linux.intel.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-In blk_mq_map_swqueue, there is a memory optimization that frees the
-tags of a queue that has gone unmapped.  Later, if that hctx is remapped
-after another topology change, the tags need to be reallocated.
+Here's respin of my huge ext4 patchset on top of Matthew's patchset with
+few changes and fixes (see below).
 
-If this allocation fails, a simple WARN_ON triggers, but the block layer
-ends up with an active hctx without any corresponding set of tags.
-Then, any income IO to that hctx can trigger an Oops.
+Please review and consider applying.
 
-I can reproduce it consistently by running IO, flipping CPUs on and off
-and eventually injecting a memory allocation failure in that path.
+I don't see any xfstests regressions with huge pages enabled. Patch with
+new configurations for xfstests-bld is below.
 
-In the fix below, if the system experiences a failed allocation of any
-hctx's tags, we remap all the ctxs of that queue to the hctx_0, which
-should always keep it's tags.  There is a minor performance hit, since
-our mapping just got worse after the error path, but this is
-the simplest solution to handle this error path.  The performance hit
-will disappear after another successful remap.
+The basics are the same as with tmpfs[1] which is in Linus' tree now and
+ext4 built on top of it. The main difference is that we need to handle
+read out from and write-back to backing storage.
 
-I considered dropping the memory optimization all together, but it
-seemed a bad trade-off to handle this very specific error case.
+As with other THPs, the implementation is build around compound pages:
+a naturally aligned collection of pages that memory management subsystem
+[in most cases] treat as a single entity:
 
-My one concern about this patch is if remapping an arbitrary queue to
-hctx_0 could result in outstanding requests getting submitted to the
-wrong hctx.  I couldn't observe this happening during tests, but I'm not
-entirely sure it'll never happen.  I believe the queue will be empty if
-we are trying to allocate tags for it, unless it was using another alive
-hctx queue and for some reason got reassigned to this new hctx.  is this
-possible at all?
+  - head page (the first subpage) on LRU represents whole huge page;
+  - head page's flags represent state of whole huge page (with few
+    exceptions);
+  - mm can't migrate subpages of the compound page individually;
 
-This should apply cleanly on top of Jen's for-next branch.
+For THP, we use PMD-sized huge pages.
 
-The Oops is the one below:
+Head page links buffer heads for whole huge page. Dirty/writeback/etc.
+tracking happens on per-hugepage level as all subpages share the same page
+flags.
 
-SP (3fff935ce4d0) is in userspace
-1:mon> e
-cpu 0x1: Vector: 300 (Data Access) at [c000000fe99eb110]
-    pc: c0000000005e868c: __sbitmap_queue_get+0x2c/0x180
-    lr: c000000000575328: __bt_get+0x48/0xd0
-    sp: c000000fe99eb390
-   msr: 900000010280b033
-   dar: 28
- dsisr: 40000000
-  current = 0xc000000fe9966800
-  paca    = 0xc000000007e80300   softe: 0        irq_happened: 0x01
-    pid   = 11035, comm = aio-stress
-Linux version 4.8.0-rc6+ (root@bean) (gcc version 5.4.0 20160609
-(Ubuntu/IBM 5.4.0-6ubuntu1~16.04.2) ) #3 SMP Mon Oct 10 20:16:53 CDT 2016
-1:mon> s
-[c000000fe99eb3d0] c000000000575328 __bt_get+0x48/0xd0
-[c000000fe99eb400] c000000000575838 bt_get.isra.1+0x78/0x2d0
-[c000000fe99eb480] c000000000575cb4 blk_mq_get_tag+0x44/0x100
-[c000000fe99eb4b0] c00000000056f6f4 __blk_mq_alloc_request+0x44/0x220
-[c000000fe99eb500] c000000000570050 blk_mq_map_request+0x100/0x1f0
-[c000000fe99eb580] c000000000574650 blk_mq_make_request+0xf0/0x540
-[c000000fe99eb640] c000000000561c44 generic_make_request+0x144/0x230
-[c000000fe99eb690] c000000000561e00 submit_bio+0xd0/0x200
-[c000000fe99eb740] c0000000003ef740 ext4_io_submit+0x90/0xb0
-[c000000fe99eb770] c0000000003e95d8 ext4_writepages+0x588/0xdd0
-[c000000fe99eb910] c00000000025a9f0 do_writepages+0x60/0xc0
-[c000000fe99eb940] c000000000246c88 __filemap_fdatawrite_range+0xf8/0x180
-[c000000fe99eb9e0] c000000000246f90 filemap_write_and_wait_range+0x70/0xf0
-[c000000fe99eba20] c0000000003dd844 ext4_sync_file+0x214/0x540
-[c000000fe99eba80] c000000000364718 vfs_fsync_range+0x78/0x130
-[c000000fe99ebad0] c0000000003dd46c ext4_file_write_iter+0x35c/0x430
-[c000000fe99ebb90] c00000000038c280 aio_run_iocb+0x3b0/0x450
-[c000000fe99ebce0] c00000000038dc28 do_io_submit+0x368/0x730
-[c000000fe99ebe30] c000000000009404 system_call+0x38/0xec
+lock_page() on any subpage would lock whole hugepage for the same reason.
 
-Signed-off-by: Gabriel Krisman Bertazi <krisman@linux.vnet.ibm.com>
-Cc: Brian King <brking@linux.vnet.ibm.com>
-Cc: Douglas Miller <dougmill@linux.vnet.ibm.com>
-Cc: linux-block@vger.kernel.org
-Cc: linux-scsi@vger.kernel.org
+On radix-tree, a huge page represented as a multi-order entry of the same
+order (HPAGE_PMD_ORDER). This allows us to track dirty/writeback on
+radix-tree tags with the same granularity as on struct page.
+
+On IO via syscalls, we are still limited by copying upto PAGE_SIZE per
+iteration. The limitation here comes from how copy_page_to_iter() and
+copy_page_from_iter() work wrt. highmem: it can only handle one small
+page a time.
+
+On write side, we also have problem with assuming small pages: write
+length and offset within page calculated before we know if small or huge
+page is allocated. It's not easy to fix. Looks like it would require
+change in ->write_begin() interface to accept len > PAGE_SIZE.
+
+On split_huge_page() we need to free buffers before splitting the page.
+Page buffers takes additional pin on the page and can be a vector to mess
+with the page during split. We want to avoid this.
+If try_to_free_buffers() fails, split_huge_page() would return -EBUSY.
+
+Readahead doesn't play with huge pages well: 128k max readahead window,
+assumption on page size, PageReadahead() to track hit/miss.  I've got it
+to allocate huge pages, but it doesn't provide any readahead as such.
+I don't know how to do this right. It's not clear at this point if we
+really need readahead with huge pages. I guess it's good enough for now.
+
+Shadow entries ignored on allocation -- recently evicted page is not
+promoted to active list. Not sure if current workingset logic is adequate
+for huge pages. On eviction, we split the huge page and setup 4k shadow
+entries as usual.
+
+Unlike tmpfs, ext4 makes use of tags in radix-tree. The approach I used
+for tmpfs -- 512 entries in radix-tree per-hugepages -- doesn't work well
+if we want to have coherent view on tags. So the first patch converts
+tmpfs to use multi-order entries in radix-tree. The same infrastructure
+used for ext4.
+
+Encryption doesn't handle huge pages yet. To avoid regressions we just
+disable huge pages for the inode if it has EXT4_INODE_ENCRYPT.
+
+Tested with 4k, 1k, encryption and bigalloc. All with and without
+huge=always. I think it's reasonable coverage.
+
+The patchset is also in git:
+
+git://git.kernel.org/pub/scm/linux/kernel/git/kas/linux.git hugeext4/v5
+
+[1] http://lkml.kernel.org/r/1465222029-45942-1-git-send-email-kirill.shutemov@linux.intel.com
+
+Changes since v4:
+  - Rebase onto updated radix-tree interface;
+  - Change interface to page cache lookups wrt. multi-order entries;
+  - Do not mess with BIO_MAX_PAGES: ext4_mpage_readpages() now uses
+    block_read_full_page() for THP read out;
+  - Fix work with memcg enabled;
+  - Drop bogus VM_BUG_ON() from wp_huge_pmd();
+
+Changes since v3:
+  - account huge page to dirty/writeback/reclaimable/etc. according to its
+    size. It fixes background writback.
+  - move code that adds huge page to radix-tree to
+    page_cache_tree_insert() (Jan);
+  - make ramdisk work with huge pages;
+  - fix unaccont of shadow entries (Jan);
+  - use try_to_release_page() instead of try_to_free_buffers() in
+    split_huge_page() (Jan);
+  -  make thp_get_unmapped_area() respect S_HUGE_MODE;
+  - use huge-page aligned address to zap page range in wp_huge_pmd();
+  - use ext4_kvmalloc in ext4_mpage_readpages() instead of
+    kmalloc() (Andreas);
+
+Changes since v2:
+  - fix intermittent crash in generic/299;
+  - typo (condition inversion) in do_generic_file_read(),
+    reported by Jitendra;
+
+TODO:
+  - on IO via syscalls, copy more than PAGE_SIZE per iteration to/from
+    userspace;
+  - readahead ?;
+  - wire up madvise()/fadvise();
+  - encryption with huge pages;
+  - reclaim of file huge pages can be optimized -- split_huge_page() is not
+    required for pages with backing storage;
+
+>From f523dd3aad026f5a3f8cbabc0ec69958a0618f6b Mon Sep 17 00:00:00 2001
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Date: Fri, 12 Aug 2016 19:44:30 +0300
+Subject: [PATCH] Add few more configurations to test ext4 with huge pages
+
+Four new configurations: huge_4k, huge_1k, huge_bigalloc, huge_encrypt.
+
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- block/blk-mq.c | 21 +++++++++++++++------
- 1 file changed, 15 insertions(+), 6 deletions(-)
+ .../test-appliance/files/root/fs/ext4/cfg/all.list       |  4 ++++
+ .../test-appliance/files/root/fs/ext4/cfg/huge_1k        |  6 ++++++
+ .../test-appliance/files/root/fs/ext4/cfg/huge_4k        |  6 ++++++
+ .../test-appliance/files/root/fs/ext4/cfg/huge_bigalloc  | 14 ++++++++++++++
+ .../files/root/fs/ext4/cfg/huge_bigalloc.exclude         |  7 +++++++
+ .../test-appliance/files/root/fs/ext4/cfg/huge_encrypt   |  5 +++++
+ .../files/root/fs/ext4/cfg/huge_encrypt.exclude          | 16 ++++++++++++++++
+ kvm-xfstests/util/parse_cli                              |  1 +
+ 8 files changed, 59 insertions(+)
+ create mode 100644 kvm-xfstests/test-appliance/files/root/fs/ext4/cfg/huge_1k
+ create mode 100644 kvm-xfstests/test-appliance/files/root/fs/ext4/cfg/huge_4k
+ create mode 100644 kvm-xfstests/test-appliance/files/root/fs/ext4/cfg/huge_bigalloc
+ create mode 100644 kvm-xfstests/test-appliance/files/root/fs/ext4/cfg/huge_bigalloc.exclude
+ create mode 100644 kvm-xfstests/test-appliance/files/root/fs/ext4/cfg/huge_encrypt
+ create mode 100644 kvm-xfstests/test-appliance/files/root/fs/ext4/cfg/huge_encrypt.exclude
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index a6af66ae01e5..8cc58f23b2c2 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1870,7 +1870,7 @@ static void blk_mq_init_cpu_queues(struct request_queue *q,
- static void blk_mq_map_swqueue(struct request_queue *q,
- 			       const struct cpumask *online_mask)
- {
--	unsigned int i;
-+	unsigned int i, hctx_idx;
- 	struct blk_mq_hw_ctx *hctx;
- 	struct blk_mq_ctx *ctx;
- 	struct blk_mq_tag_set *set = q->tag_set;
-@@ -1893,6 +1893,15 @@ static void blk_mq_map_swqueue(struct request_queue *q,
- 		if (!cpumask_test_cpu(i, online_mask))
- 			continue;
- 
-+		hctx_idx = q->mq_map[i];
-+		/* unmapped hw queue can be remapped after CPU topo changed */
-+		if (!set->tags[hctx_idx]) {
-+			set->tags[hctx_idx] = blk_mq_init_rq_map(set, hctx_idx);
+diff --git a/kvm-xfstests/test-appliance/files/root/fs/ext4/cfg/all.list b/kvm-xfstests/test-appliance/files/root/fs/ext4/cfg/all.list
+index 7ec37f4bafaa..14a8e72d2e6e 100644
+--- a/kvm-xfstests/test-appliance/files/root/fs/ext4/cfg/all.list
++++ b/kvm-xfstests/test-appliance/files/root/fs/ext4/cfg/all.list
+@@ -9,3 +9,7 @@ dioread_nolock
+ data_journal
+ bigalloc
+ bigalloc_1k
++huge_4k
++huge_1k
++huge_bigalloc
++huge_encrypt
+diff --git a/kvm-xfstests/test-appliance/files/root/fs/ext4/cfg/huge_1k b/kvm-xfstests/test-appliance/files/root/fs/ext4/cfg/huge_1k
+new file mode 100644
+index 000000000000..209c76a8a6c1
+--- /dev/null
++++ b/kvm-xfstests/test-appliance/files/root/fs/ext4/cfg/huge_1k
+@@ -0,0 +1,6 @@
++export FS=ext4
++export TEST_DEV=$SM_TST_DEV
++export TEST_DIR=$SM_TST_MNT
++export MKFS_OPTIONS="-q -b 1024"
++export EXT_MOUNT_OPTIONS="huge=always"
++TESTNAME="Ext4 1k block with huge pages"
+diff --git a/kvm-xfstests/test-appliance/files/root/fs/ext4/cfg/huge_4k b/kvm-xfstests/test-appliance/files/root/fs/ext4/cfg/huge_4k
+new file mode 100644
+index 000000000000..bae901cb2bab
+--- /dev/null
++++ b/kvm-xfstests/test-appliance/files/root/fs/ext4/cfg/huge_4k
+@@ -0,0 +1,6 @@
++export FS=ext4
++export TEST_DEV=$PRI_TST_DEV
++export TEST_DIR=$PRI_TST_MNT
++export MKFS_OPTIONS="-q"
++export EXT_MOUNT_OPTIONS="huge=always"
++TESTNAME="Ext4 4k block with huge pages"
+diff --git a/kvm-xfstests/test-appliance/files/root/fs/ext4/cfg/huge_bigalloc b/kvm-xfstests/test-appliance/files/root/fs/ext4/cfg/huge_bigalloc
+new file mode 100644
+index 000000000000..b3d87562bce6
+--- /dev/null
++++ b/kvm-xfstests/test-appliance/files/root/fs/ext4/cfg/huge_bigalloc
+@@ -0,0 +1,14 @@
++SIZE=large
++export MKFS_OPTIONS="-O bigalloc"
++export EXT_MOUNT_OPTIONS="huge=always"
 +
-+			if (!set->tags[hctx_idx])
-+				q->mq_map[i] = 0;
-+		}
++# Until we can teach xfstests the difference between cluster size and
++# block size, avoid collapse_range, insert_range, and zero_range since
++# these will fail due the fact that these operations require
++# cluster-aligned ranges.
++export FSX_AVOID="-C -I -z"
++export FSSTRESS_AVOID="-f collapse=0 -f insert=0 -f zero=0"
++export XFS_IO_AVOID="fcollapse finsert zero"
 +
- 		ctx = per_cpu_ptr(q->queue_ctx, i);
- 		hctx = blk_mq_map_queue(q, i);
- 
-@@ -1909,7 +1918,10 @@ static void blk_mq_map_swqueue(struct request_queue *q,
- 		 * disable it and free the request entries.
- 		 */
- 		if (!hctx->nr_ctx) {
--			if (set->tags[i]) {
-+			/* Never unmap queue 0.  We need it as a
-+			 * fallback in case of a new remap fails
-+			 * allocation. */
-+			if (i && set->tags[i]) {
- 				blk_mq_free_rq_map(set, set->tags[i], i);
- 				set->tags[i] = NULL;
- 			}
-@@ -1917,11 +1929,8 @@ static void blk_mq_map_swqueue(struct request_queue *q,
- 			continue;
- 		}
- 
--		/* unmapped hw queue can be remapped after CPU topo changed */
--		if (!set->tags[i])
--			set->tags[i] = blk_mq_init_rq_map(set, i);
- 		hctx->tags = set->tags[i];
--		WARN_ON(!hctx->tags);
-+		BUG_ON(!hctx->tags);
- 
- 		/*
- 		 * Set the map size to the number of mapped software queues.
++TESTNAME="Ext4 4k block w/bigalloc"
++
+diff --git a/kvm-xfstests/test-appliance/files/root/fs/ext4/cfg/huge_bigalloc.exclude b/kvm-xfstests/test-appliance/files/root/fs/ext4/cfg/huge_bigalloc.exclude
+new file mode 100644
+index 000000000000..bd779be99518
+--- /dev/null
++++ b/kvm-xfstests/test-appliance/files/root/fs/ext4/cfg/huge_bigalloc.exclude
+@@ -0,0 +1,7 @@
++# bigalloc does not support on-line defrag
++ext4/301
++ext4/302
++ext4/303
++ext4/304
++ext4/307
++ext4/308
+diff --git a/kvm-xfstests/test-appliance/files/root/fs/ext4/cfg/huge_encrypt b/kvm-xfstests/test-appliance/files/root/fs/ext4/cfg/huge_encrypt
+new file mode 100644
+index 000000000000..29f058ba937d
+--- /dev/null
++++ b/kvm-xfstests/test-appliance/files/root/fs/ext4/cfg/huge_encrypt
+@@ -0,0 +1,5 @@
++SIZE=small
++export MKFS_OPTIONS=""
++export EXT_MOUNT_OPTIONS="test_dummy_encryption,huge=always"
++REQUIRE_FEATURE=encryption
++TESTNAME="Ext4 encryption"
+diff --git a/kvm-xfstests/test-appliance/files/root/fs/ext4/cfg/huge_encrypt.exclude b/kvm-xfstests/test-appliance/files/root/fs/ext4/cfg/huge_encrypt.exclude
+new file mode 100644
+index 000000000000..b91cc58b5aa3
+--- /dev/null
++++ b/kvm-xfstests/test-appliance/files/root/fs/ext4/cfg/huge_encrypt.exclude
+@@ -0,0 +1,16 @@
++ext4/004	# dump/restore doesn't handle quotas
++
++# encryption doesn't play well with quota
++generic/082
++generic/219
++generic/230
++generic/231
++generic/232
++generic/233
++generic/235
++generic/270
++
++# generic/204 tests ENOSPC handling; it doesn't correctly
++# anticipate the external extended attribute required when
++# using a 1k block size
++generic/204
+diff --git a/kvm-xfstests/util/parse_cli b/kvm-xfstests/util/parse_cli
+index 83400ea71985..ba64ce5df016 100644
+--- a/kvm-xfstests/util/parse_cli
++++ b/kvm-xfstests/util/parse_cli
+@@ -36,6 +36,7 @@ print_help ()
+     echo "Common file system configurations are:"
+     echo "	4k 1k ext3 nojournal ext3conv metacsum dioread_nolock "
+     echo "	data_journal bigalloc bigalloc_1k inline"
++    echo "	huge_4k huge_1k huge_bigalloc huge_encrypt"
+     echo ""
+     echo "xfstest names have the form: ext4/NNN generic/NNN shared/NNN"
+     echo ""
 -- 
-2.7.4
+2.9.3
+
+Kirill A. Shutemov (35):
+  mm, shmem: swich huge tmpfs to multi-order radix-tree entries
+  Revert "radix-tree: implement radix_tree_maybe_preload_order()"
+  page-flags: relax page flag policy for few flags
+  mm, rmap: account file thp pages
+  thp: try to free page's buffers before attempt split
+  thp: handle write-protection faults for file THP
+  filemap: allocate huge page in page_cache_read(), if allowed
+  filemap: handle huge pages in do_generic_file_read()
+  filemap: allocate huge page in pagecache_get_page(), if allowed
+  filemap: handle huge pages in filemap_fdatawait_range()
+  HACK: readahead: alloc huge pages, if allowed
+  brd: make it handle huge pages
+  mm: make write_cache_pages() work on huge pages
+  thp: introduce hpage_size() and hpage_mask()
+  thp: do not threat slab pages as huge in hpage_{nr_pages,size,mask}
+  thp: make thp_get_unmapped_area() respect S_HUGE_MODE
+  fs: make block_read_full_page() be able to read huge page
+  fs: make block_write_{begin,end}() be able to handle huge pages
+  fs: make block_page_mkwrite() aware about huge pages
+  truncate: make truncate_inode_pages_range() aware about huge pages
+  truncate: make invalidate_inode_pages2_range() aware about huge pages
+  mm: account huge pages to dirty, writaback, reclaimable, etc.
+  ext4: make ext4_mpage_readpages() hugepage-aware
+  ext4: make ext4_writepage() work on huge pages
+  ext4: handle huge pages in ext4_page_mkwrite()
+  ext4: handle huge pages in __ext4_block_zero_page_range()
+  ext4: make ext4_block_write_begin() aware about huge pages
+  ext4: handle huge pages in ext4_da_write_end()
+  ext4: make ext4_da_page_release_reservation() aware about huge pages
+  ext4: handle writeback with huge pages
+  ext4: make EXT4_IOC_MOVE_EXT work with huge pages
+  ext4: fix SEEK_DATA/SEEK_HOLE for huge pages
+  ext4: make fallocate() operations work with huge pages
+  mm, fs, ext4: expand use of page_mapping() and page_to_pgoff()
+  ext4, vfs: add huge= mount option
+
+Naoya Horiguchi (1):
+  mm, hugetlb: switch hugetlbfs to multi-order radix-tree entries
+
+ drivers/base/node.c         |   6 +
+ drivers/block/brd.c         |  17 +-
+ fs/buffer.c                 | 106 ++++++-----
+ fs/ext4/ext4.h              |   5 +
+ fs/ext4/extents.c           |  10 +-
+ fs/ext4/file.c              |  18 +-
+ fs/ext4/inode.c             | 175 +++++++++++------
+ fs/ext4/move_extent.c       |  12 +-
+ fs/ext4/page-io.c           |  11 +-
+ fs/ext4/readpage.c          |   2 +-
+ fs/ext4/super.c             |  24 +++
+ fs/fs-writeback.c           |  10 +-
+ fs/hugetlbfs/inode.c        |  22 +--
+ fs/proc/meminfo.c           |   4 +
+ fs/proc/task_mmu.c          |   5 +-
+ include/linux/backing-dev.h |  10 +
+ include/linux/buffer_head.h |  10 +-
+ include/linux/fs.h          |   5 +
+ include/linux/huge_mm.h     |  18 +-
+ include/linux/memcontrol.h  |  22 +--
+ include/linux/mm.h          |  10 +-
+ include/linux/mmzone.h      |   2 +
+ include/linux/page-flags.h  |  12 +-
+ include/linux/pagemap.h     |  54 +++---
+ include/linux/radix-tree.h  |   1 -
+ lib/radix-tree.c            |  74 --------
+ mm/filemap.c                | 447 ++++++++++++++++++++++++++++----------------
+ mm/huge_memory.c            |  74 ++++++--
+ mm/hugetlb.c                |  19 +-
+ mm/khugepaged.c             |  26 +--
+ mm/memory.c                 |  12 +-
+ mm/migrate.c                |   1 +
+ mm/page-writeback.c         |  99 ++++++----
+ mm/page_alloc.c             |   5 +
+ mm/readahead.c              |  17 +-
+ mm/rmap.c                   |  16 +-
+ mm/shmem.c                  | 117 +++++-------
+ mm/truncate.c               | 137 ++++++++++----
+ mm/vmstat.c                 |   2 +
+ 39 files changed, 998 insertions(+), 619 deletions(-)
+
+-- 
+2.10.2
 
