@@ -15,174 +15,76 @@ Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         linux-block@vger.kernel.org,
         "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv5 18/36] fs: make block_write_{begin,end}() be able to handle huge pages
-Date: Tue, 29 Nov 2016 14:22:46 +0300
-Message-Id: <20161129112304.90056-19-kirill.shutemov@linux.intel.com>
+Subject: [PATCHv5 11/36] HACK: readahead: alloc huge pages, if allowed
+Date: Tue, 29 Nov 2016 14:22:39 +0300
+Message-Id: <20161129112304.90056-12-kirill.shutemov@linux.intel.com>
 In-Reply-To: <20161129112304.90056-1-kirill.shutemov@linux.intel.com>
 References: <20161129112304.90056-1-kirill.shutemov@linux.intel.com>
 Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-It's more or less straight-forward.
+Most page cache allocation happens via readahead (sync or async), so if
+we want to have significant number of huge pages in page cache we need
+to find a ways to allocate them from readahead.
 
-Most changes are around getting offset/len withing page right and zero
-out desired part of the page.
+Unfortunately, huge pages doesn't fit into current readahead design:
+128 max readahead window, assumption on page size, PageReadahead() to
+track hit/miss.
+
+I haven't found a ways to get it right yet.
+
+This patch just allocates huge page if allowed, but doesn't really
+provide any readahead if huge page is allocated. We read out 2M a time
+and I would expect spikes in latancy without readahead.
+
+Therefore HACK.
+
+Having that said, I don't think it should prevent huge page support to
+be applied. Future will show if lacking readahead is a big deal with
+huge pages in page cache.
+
+Any suggestions are welcome.
 
 Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- fs/buffer.c | 70 +++++++++++++++++++++++++++++++++++--------------------------
- 1 file changed, 40 insertions(+), 30 deletions(-)
+ mm/readahead.c | 17 ++++++++++++++++-
+ 1 file changed, 16 insertions(+), 1 deletion(-)
 
-diff --git a/fs/buffer.c b/fs/buffer.c
-index 090f7edfa6b7..7d333621ccfb 100644
---- a/fs/buffer.c
-+++ b/fs/buffer.c
-@@ -1902,6 +1902,7 @@ void page_zero_new_buffers(struct page *page, unsigned from, unsigned to)
- {
- 	unsigned int block_start, block_end;
- 	struct buffer_head *head, *bh;
-+	bool uptodate = PageUptodate(page);
+diff --git a/mm/readahead.c b/mm/readahead.c
+index fb4c99f85618..87e38b522645 100644
+--- a/mm/readahead.c
++++ b/mm/readahead.c
+@@ -174,6 +174,21 @@ int __do_page_cache_readahead(struct address_space *mapping, struct file *filp,
+ 		if (page_offset > end_index)
+ 			break;
  
- 	BUG_ON(!PageLocked(page));
- 	if (!page_has_buffers(page))
-@@ -1912,21 +1913,21 @@ void page_zero_new_buffers(struct page *page, unsigned from, unsigned to)
- 	do {
- 		block_end = block_start + bh->b_size;
- 
--		if (buffer_new(bh)) {
--			if (block_end > from && block_start < to) {
--				if (!PageUptodate(page)) {
--					unsigned start, size;
-+		if (buffer_new(bh) && block_end > from && block_start < to) {
-+			if (!uptodate) {
-+				unsigned start, size;
- 
--					start = max(from, block_start);
--					size = min(to, block_end) - start;
-+				start = max(from, block_start);
-+				size = min(to, block_end) - start;
- 
--					zero_user(page, start, size);
--					set_buffer_uptodate(bh);
--				}
--
--				clear_buffer_new(bh);
--				mark_buffer_dirty(bh);
-+				zero_user(page + block_start / PAGE_SIZE,
-+						start % PAGE_SIZE,
-+						size);
-+				set_buffer_uptodate(bh);
- 			}
++		if (IS_ENABLED(CONFIG_TRANSPARENT_HUGE_PAGECACHE) &&
++				(!page_idx || !(page_offset % HPAGE_PMD_NR)) &&
++				page_cache_allow_huge(mapping, page_offset)) {
++			page = __page_cache_alloc_order(gfp_mask | __GFP_COMP,
++					HPAGE_PMD_ORDER);
++			if (page) {
++				prep_transhuge_page(page);
++				page->index = round_down(page_offset,
++						HPAGE_PMD_NR);
++				list_add(&page->lru, &page_pool);
++				ret++;
++				goto start_io;
++			}
++		}
 +
-+			clear_buffer_new(bh);
-+			mark_buffer_dirty(bh);
- 		}
- 
- 		block_start = block_end;
-@@ -1992,18 +1993,21 @@ iomap_to_bh(struct inode *inode, sector_t block, struct buffer_head *bh,
- int __block_write_begin_int(struct page *page, loff_t pos, unsigned len,
- 		get_block_t *get_block, struct iomap *iomap)
- {
--	unsigned from = pos & (PAGE_SIZE - 1);
--	unsigned to = from + len;
--	struct inode *inode = page->mapping->host;
-+	unsigned from, to;
-+	struct inode *inode = page_mapping(page)->host;
- 	unsigned block_start, block_end;
- 	sector_t block;
- 	int err = 0;
- 	unsigned blocksize, bbits;
- 	struct buffer_head *bh, *head, *wait[2], **wait_bh=wait;
-+	bool uptodate = PageUptodate(page);
- 
-+	page = compound_head(page);
-+	from = pos & ~hpage_mask(page);
-+	to = from + len;
- 	BUG_ON(!PageLocked(page));
--	BUG_ON(from > PAGE_SIZE);
--	BUG_ON(to > PAGE_SIZE);
-+	BUG_ON(from > hpage_size(page));
-+	BUG_ON(to > hpage_size(page));
- 	BUG_ON(from > to);
- 
- 	head = create_page_buffers(page, inode, 0);
-@@ -2016,10 +2020,8 @@ int __block_write_begin_int(struct page *page, loff_t pos, unsigned len,
- 	    block++, block_start=block_end, bh = bh->b_this_page) {
- 		block_end = block_start + blocksize;
- 		if (block_end <= from || block_start >= to) {
--			if (PageUptodate(page)) {
--				if (!buffer_uptodate(bh))
--					set_buffer_uptodate(bh);
--			}
-+			if (uptodate && !buffer_uptodate(bh))
-+				set_buffer_uptodate(bh);
- 			continue;
- 		}
- 		if (buffer_new(bh))
-@@ -2036,23 +2038,28 @@ int __block_write_begin_int(struct page *page, loff_t pos, unsigned len,
- 
- 			if (buffer_new(bh)) {
- 				clean_bdev_bh_alias(bh);
--				if (PageUptodate(page)) {
-+				if (uptodate) {
- 					clear_buffer_new(bh);
- 					set_buffer_uptodate(bh);
- 					mark_buffer_dirty(bh);
- 					continue;
- 				}
--				if (block_end > to || block_start < from)
--					zero_user_segments(page,
--						to, block_end,
--						block_start, from);
-+				if (block_end > to || block_start < from) {
-+					BUG_ON(to - from  > PAGE_SIZE);
-+					zero_user_segments(page +
-+							block_start / PAGE_SIZE,
-+						to % PAGE_SIZE,
-+						(block_start % PAGE_SIZE) + blocksize,
-+						block_start % PAGE_SIZE,
-+						from % PAGE_SIZE);
-+				}
- 				continue;
- 			}
- 		}
--		if (PageUptodate(page)) {
-+		if (uptodate) {
- 			if (!buffer_uptodate(bh))
- 				set_buffer_uptodate(bh);
--			continue; 
-+			continue;
- 		}
- 		if (!buffer_uptodate(bh) && !buffer_delay(bh) &&
- 		    !buffer_unwritten(bh) &&
-@@ -2089,6 +2096,7 @@ static int __block_commit_write(struct inode *inode, struct page *page,
- 	unsigned blocksize;
- 	struct buffer_head *bh, *head;
- 
-+	VM_BUG_ON_PAGE(PageTail(page), page);
- 	bh = head = page_buffers(page);
- 	blocksize = bh->b_size;
- 
-@@ -2102,7 +2110,8 @@ static int __block_commit_write(struct inode *inode, struct page *page,
- 			set_buffer_uptodate(bh);
- 			mark_buffer_dirty(bh);
- 		}
--		clear_buffer_new(bh);
-+		if (buffer_new(bh))
-+			clear_buffer_new(bh);
- 
- 		block_start = block_end;
- 		bh = bh->b_this_page;
-@@ -2155,7 +2164,8 @@ int block_write_end(struct file *file, struct address_space *mapping,
- 	struct inode *inode = mapping->host;
- 	unsigned start;
- 
--	start = pos & (PAGE_SIZE - 1);
-+	page = compound_head(page);
-+	start = pos & ~hpage_mask(page);
- 
- 	if (unlikely(copied < len)) {
- 		/*
+ 		rcu_read_lock();
+ 		page = radix_tree_lookup(&mapping->page_tree, page_offset);
+ 		rcu_read_unlock();
+@@ -189,7 +204,7 @@ int __do_page_cache_readahead(struct address_space *mapping, struct file *filp,
+ 			SetPageReadahead(page);
+ 		ret++;
+ 	}
+-
++start_io:
+ 	/*
+ 	 * Now start the IO.  We ignore I/O errors - if the page is not
+ 	 * uptodate then the caller will launch readpage again, and
 -- 
 2.10.2
 
