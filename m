@@ -1,100 +1,97 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga05.intel.com ([192.55.52.43]:8520 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1754180AbcKPXZN (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Nov 2016 18:25:13 -0500
-From: Scott Bauer <scott.bauer@intel.com>
-To: linux-nvme@lists.infradead.org
-Cc: Rafael.Antognolli@intel.com, axboe@fb.com, keith.busch@intel.com,
-        jonathan.derrick@intel.com, j.naumann@fu-berlin.de,
-        hch@infradead.org, linux-block@vger.kernel.org, sagi@grimberg.me
-Subject: [PATCH v1 0/7] SED OPAL Library
-Date: Wed, 16 Nov 2016 16:17:25 -0700
-Message-Id: <1479338252-8777-1-git-send-email-scott.bauer@intel.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv5 33/36] ext4: fix SEEK_DATA/SEEK_HOLE for huge pages
+Date: Tue, 29 Nov 2016 14:23:01 +0300
+Message-Id: <20161129112304.90056-34-kirill.shutemov@linux.intel.com>
+In-Reply-To: <20161129112304.90056-1-kirill.shutemov@linux.intel.com>
+References: <20161129112304.90056-1-kirill.shutemov@linux.intel.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Changes from V0->V1:
-1) Split the Nvme patche into two different patches (SEC_OPS and unlock)
-2) Created work queues to send commands to the controllers:
-  2a) Allows us to use correct blk API (blk_execute_rq_nowait)
-  2b) Commands are no longer being sent in an IRQ but in the system_wq
-3) Clean up left-over crud in nvme: pci.c and core.c
-4) Implement fixes suggested by Jonathan Derrick
-5) Actually allow a user to enable the Global Locking Range
+ext4_find_unwritten_pgoff() needs few tweaks to work with huge pages.
+Mostly trivial page_mapping()/page_to_pgoff() and adjustment to how we
+find relevant block.
 
+Signe-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+---
+ fs/ext4/file.c | 18 ++++++++++++++----
+ 1 file changed, 14 insertions(+), 4 deletions(-)
 
-This Patch series implements a large portion of the Opal protocol for
-self encrypting devices. The driver has the capability of storing a
-locking range's password, either directly in the driver, or in the
-Kernel's key managment. The password can then be replayed during a
-resume from previous suspend-to-RAM.
-
-The driver also supports logic to bring the device out of a factory
-default-inactive state into a functional Opal state.
-
-The following logic is supported in order to bring the tper into a
-working state:
-
-1) Taking Ownership of the drive (Setting the Admin CPIN).
-2) Activating the Locking SP (In Single User Mode or Normal Mode).
-3) Setting up Locking Ranges (Single User or Normal Mode).
-4) Adding users to Locking Ranges (Normal Mode Only).
-5) Locking or Unlocking Locking Rangs (Single User Mode or Normal Mode).
-6) Reverting the TPer (Restore to factory default).
-7) Setting LR/User passwords (Single User Mode or Normal Mode).
-8) Eabling/disabling Shadow MBR.
-9) Enabling Users in the LockingSP (Normal Mode Only).
-10) Saving Password for resume from suspend.
-
-
-Each command above is exported through an ioctl in the block layer.
-
-We have userland tooling staged in nvme-cli which can be used for
-testing:
-https://github.com/linux-nvme/nvme-cli/pull/137
-
-Once we've fixed any nits and issues we will merge the userland tooling
-into the master branch of nvme-cli.
-
-I have a series of test scripts I've been using which can be helpful if
-people want to test or immediately start using and testing the code:
-
-https://github.com/ScottyBauer/nvme-cli-sed-sh
-
-Scott Bauer (7):
-  Include: Add definitions for sed
-  lib: Add Sed-opal library
-  lib: Add Sed to Kconfig and Makefile
-  include: Add sec_ops to block device operations
-  nvme: Implement SED Security Operations
-  nvme: Implement SED Unlock from suspend
-  block: ioctl: Wire up Sed to block ioctls
-
- block/compat_ioctl.c          |   14 +
- block/ioctl.c                 |  200 ++-
- drivers/nvme/host/core.c      |  118 ++
- drivers/nvme/host/nvme.h      |    4 +-
- drivers/nvme/host/pci.c       |    7 +-
- include/linux/blkdev.h        |    1 +
- include/linux/sed-opal.h      |   58 +
- include/linux/sed.h           |   91 ++
- include/uapi/linux/sed-opal.h |  118 ++
- include/uapi/linux/sed.h      |   55 +
- lib/Kconfig                   |   12 +
- lib/Makefile                  |    7 +
- lib/sed-opal.c                | 3338 +++++++++++++++++++++++++++++++++++++++++
- lib/sed-opal_internal.h       |  587 ++++++++
- lib/sed-opal_key.c            |   46 +
- lib/sed.c                     |  250 +++
- 16 files changed, 4903 insertions(+), 3 deletions(-)
- create mode 100644 include/linux/sed-opal.h
- create mode 100644 include/linux/sed.h
- create mode 100644 include/uapi/linux/sed-opal.h
- create mode 100644 include/uapi/linux/sed.h
- create mode 100644 lib/sed-opal.c
- create mode 100644 lib/sed-opal_internal.h
- create mode 100644 lib/sed-opal_key.c
- create mode 100644 lib/sed.c
-
+diff --git a/fs/ext4/file.c b/fs/ext4/file.c
+index b5f184493c57..7998ac1483c4 100644
+--- a/fs/ext4/file.c
++++ b/fs/ext4/file.c
+@@ -547,7 +547,7 @@ static int ext4_find_unwritten_pgoff(struct inode *inode,
+ 			 * range, it will be a hole.
+ 			 */
+ 			if (lastoff < endoff && whence == SEEK_HOLE &&
+-			    page->index > end) {
++			    page_to_pgoff(page) > end) {
+ 				found = 1;
+ 				*offset = lastoff;
+ 				goto out;
+@@ -555,7 +555,7 @@ static int ext4_find_unwritten_pgoff(struct inode *inode,
+ 
+ 			lock_page(page);
+ 
+-			if (unlikely(page->mapping != inode->i_mapping)) {
++			if (unlikely(page_mapping(page) != inode->i_mapping)) {
+ 				unlock_page(page);
+ 				continue;
+ 			}
+@@ -566,8 +566,12 @@ static int ext4_find_unwritten_pgoff(struct inode *inode,
+ 			}
+ 
+ 			if (page_has_buffers(page)) {
++				int diff;
+ 				lastoff = page_offset(page);
+ 				bh = head = page_buffers(page);
++				diff = (page - compound_head(page)) << inode->i_blkbits;
++				while (diff--)
++					bh = bh->b_this_page;
+ 				do {
+ 					if (buffer_uptodate(bh) ||
+ 					    buffer_unwritten(bh)) {
+@@ -588,8 +592,12 @@ static int ext4_find_unwritten_pgoff(struct inode *inode,
+ 				} while (bh != head);
+ 			}
+ 
+-			lastoff = page_offset(page) + PAGE_SIZE;
++			lastoff = page_offset(page) + hpage_size(page);
+ 			unlock_page(page);
++			if (PageTransCompound(page)) {
++				i++;
++				break;
++			}
+ 		}
+ 
+ 		/*
+@@ -602,7 +610,9 @@ static int ext4_find_unwritten_pgoff(struct inode *inode,
+ 			break;
+ 		}
+ 
+-		index = pvec.pages[i - 1]->index + 1;
++		index = page_to_pgoff(pvec.pages[i - 1]) + 1;
++		if (PageTransCompound(pvec.pages[i - 1]))
++			index = round_up(index, HPAGE_PMD_NR);
+ 		pagevec_release(&pvec);
+ 	} while (index <= end);
+ 
+-- 
+2.10.2
 
