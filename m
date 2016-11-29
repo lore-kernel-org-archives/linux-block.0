@@ -15,58 +15,76 @@ Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         linux-block@vger.kernel.org,
         "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv5 19/36] fs: make block_page_mkwrite() aware about huge pages
-Date: Tue, 29 Nov 2016 14:22:47 +0300
-Message-Id: <20161129112304.90056-20-kirill.shutemov@linux.intel.com>
+Subject: [PATCHv5 34/36] ext4: make fallocate() operations work with huge pages
+Date: Tue, 29 Nov 2016 14:23:02 +0300
+Message-Id: <20161129112304.90056-35-kirill.shutemov@linux.intel.com>
 In-Reply-To: <20161129112304.90056-1-kirill.shutemov@linux.intel.com>
 References: <20161129112304.90056-1-kirill.shutemov@linux.intel.com>
 Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Adjust check on whether part of the page beyond file size and apply
-compound_head() and page_mapping() where appropriate.
+__ext4_block_zero_page_range() adjusted to calculate starting iblock
+correctry for huge pages.
+
+ext4_{collapse,insert}_range() requires page cache invalidation. We need
+the invalidation to be aligning to huge page border if huge pages are
+possible in page cache.
 
 Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- fs/buffer.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ fs/ext4/extents.c | 10 ++++++++--
+ fs/ext4/inode.c   |  3 +--
+ 2 files changed, 9 insertions(+), 4 deletions(-)
 
-diff --git a/fs/buffer.c b/fs/buffer.c
-index 7d333621ccfb..8e000021513c 100644
---- a/fs/buffer.c
-+++ b/fs/buffer.c
-@@ -2544,7 +2544,7 @@ EXPORT_SYMBOL(block_commit_write);
- int block_page_mkwrite(struct vm_area_struct *vma, struct vm_fault *vmf,
- 			 get_block_t get_block)
+diff --git a/fs/ext4/extents.c b/fs/ext4/extents.c
+index 7d29ef0f5f5c..99632945b3f5 100644
+--- a/fs/ext4/extents.c
++++ b/fs/ext4/extents.c
+@@ -5501,7 +5501,10 @@ int ext4_collapse_range(struct inode *inode, loff_t offset, loff_t len)
+ 	 * Need to round down offset to be aligned with page size boundary
+ 	 * for page size > block size.
+ 	 */
+-	ioffset = round_down(offset, PAGE_SIZE);
++	if (IS_ENABLED(CONFIG_TRANSPARENT_HUGE_PAGECACHE))
++		ioffset = round_down(offset, HPAGE_PMD_SIZE);
++	else
++		ioffset = round_down(offset, PAGE_SIZE);
+ 	/*
+ 	 * Write tail of the last page before removed range since it will get
+ 	 * removed from the page cache below.
+@@ -5650,7 +5653,10 @@ int ext4_insert_range(struct inode *inode, loff_t offset, loff_t len)
+ 	 * Need to round down to align start offset to page size boundary
+ 	 * for page size > block size.
+ 	 */
+-	ioffset = round_down(offset, PAGE_SIZE);
++	if (IS_ENABLED(CONFIG_TRANSPARENT_HUGE_PAGECACHE))
++		ioffset = round_down(offset, HPAGE_PMD_SIZE);
++	else
++		ioffset = round_down(offset, PAGE_SIZE);
+ 	/* Write out all dirty pages */
+ 	ret = filemap_write_and_wait_range(inode->i_mapping, ioffset,
+ 			LLONG_MAX);
+diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
+index ff4f460d3625..263b53ace613 100644
+--- a/fs/ext4/inode.c
++++ b/fs/ext4/inode.c
+@@ -3807,7 +3807,6 @@ void ext4_set_aops(struct inode *inode)
+ static int __ext4_block_zero_page_range(handle_t *handle,
+ 		struct address_space *mapping, loff_t from, loff_t length)
  {
--	struct page *page = vmf->page;
-+	struct page *page = compound_head(vmf->page);
- 	struct inode *inode = file_inode(vma->vm_file);
- 	unsigned long end;
- 	loff_t size;
-@@ -2552,7 +2552,7 @@ int block_page_mkwrite(struct vm_area_struct *vma, struct vm_fault *vmf,
+-	ext4_fsblk_t index = from >> PAGE_SHIFT;
+ 	unsigned offset;
+ 	unsigned blocksize, pos;
+ 	ext4_lblk_t iblock;
+@@ -3826,7 +3825,7 @@ static int __ext4_block_zero_page_range(handle_t *handle,
  
- 	lock_page(page);
- 	size = i_size_read(inode);
--	if ((page->mapping != inode->i_mapping) ||
-+	if ((page_mapping(page) != inode->i_mapping) ||
- 	    (page_offset(page) > size)) {
- 		/* We overload EFAULT to mean page got truncated */
- 		ret = -EFAULT;
-@@ -2560,10 +2560,10 @@ int block_page_mkwrite(struct vm_area_struct *vma, struct vm_fault *vmf,
- 	}
+ 	blocksize = inode->i_sb->s_blocksize;
  
- 	/* page is wholly or partially inside EOF */
--	if (((page->index + 1) << PAGE_SHIFT) > size)
--		end = size & ~PAGE_MASK;
-+	if (((page->index + hpage_nr_pages(page)) << PAGE_SHIFT) > size)
-+		end = size & ~hpage_mask(page);
- 	else
--		end = PAGE_SIZE;
-+		end = hpage_size(page);
+-	iblock = index << (PAGE_SHIFT - inode->i_sb->s_blocksize_bits);
++	iblock = page->index << (PAGE_SHIFT - inode->i_sb->s_blocksize_bits);
  
- 	ret = __block_write_begin(page, 0, end, get_block);
- 	if (!ret)
+ 	if (!page_has_buffers(page))
+ 		create_empty_buffers(page, blocksize, 0);
 -- 
 2.10.2
 
