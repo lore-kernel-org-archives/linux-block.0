@@ -1,66 +1,95 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f41.google.com ([74.125.82.41]:36368 "EHLO
-        mail-wm0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753674AbcKROuJ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Nov 2016 09:50:09 -0500
-Received: by mail-wm0-f41.google.com with SMTP id g23so42999746wme.1
-        for <linux-block@vger.kernel.org>; Fri, 18 Nov 2016 06:50:08 -0800 (PST)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH 19/20] lightnvm: introduce max_phys_sects helper function
-Date: Fri, 18 Nov 2016 15:43:41 +0100
-Message-Id: <1479480222-18790-20-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1479480222-18790-1-git-send-email-javier@cnexlabs.com>
-References: <1479480222-18790-1-git-send-email-javier@cnexlabs.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Received: from mga09.intel.com ([134.134.136.24]:40220 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1757240AbcK2LXi (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 29 Nov 2016 06:23:38 -0500
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv5 21/36] truncate: make invalidate_inode_pages2_range() aware about huge pages
+Date: Tue, 29 Nov 2016 14:22:49 +0300
+Message-Id: <20161129112304.90056-22-kirill.shutemov@linux.intel.com>
+In-Reply-To: <20161129112304.90056-1-kirill.shutemov@linux.intel.com>
+References: <20161129112304.90056-1-kirill.shutemov@linux.intel.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Target devices do not have access to the device driver operations.
-Introduce a helper function that exposes the max. number of physical
-sectors supported by the underlying device.
+For huge pages we need to unmap whole range covered by the huge page.
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- drivers/lightnvm/core.c  | 8 ++++++++
- include/linux/lightnvm.h | 1 +
- 2 files changed, 9 insertions(+)
+ mm/truncate.c | 23 ++++++++++++++---------
+ 1 file changed, 14 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-index 69f261e..3d8eaac 100644
---- a/drivers/lightnvm/core.c
-+++ b/drivers/lightnvm/core.c
-@@ -203,6 +203,14 @@ int nvm_set_bb_tbl(struct nvm_dev *dev, struct ppa_addr *ppas, int nr_ppas,
- }
- EXPORT_SYMBOL(nvm_set_bb_tbl);
- 
-+int nvm_max_phys_sects(struct nvm_tgt_dev *tgt_dev)
-+{
-+	struct nvm_dev *dev = tgt_dev->parent;
+diff --git a/mm/truncate.c b/mm/truncate.c
+index d2d95f283ec3..6df4b06a190f 100644
+--- a/mm/truncate.c
++++ b/mm/truncate.c
+@@ -656,27 +656,32 @@ int invalidate_inode_pages2_range(struct address_space *mapping,
+ 				continue;
+ 			}
+ 			wait_on_page_writeback(page);
 +
-+	return dev->ops->max_phys_sect;
-+}
-+EXPORT_SYMBOL(nvm_max_phys_sects);
+ 			if (page_mapped(page)) {
++				loff_t begin, len;
 +
- int nvm_submit_io(struct nvm_tgt_dev *tgt_dev, struct nvm_rq *rqd)
- {
- 	struct nvm_dev *dev = tgt_dev->parent;
-diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
-index b3ca603..44780ef 100644
---- a/include/linux/lightnvm.h
-+++ b/include/linux/lightnvm.h
-@@ -529,6 +529,7 @@ extern void nvm_unregister(struct nvm_dev *);
- extern int nvm_set_bb_tbl(struct nvm_dev *dev, struct ppa_addr *ppas,
- 							int nr_ppas, int type);
- 
-+extern int nvm_max_phys_sects(struct nvm_tgt_dev *);
- extern int nvm_submit_io(struct nvm_tgt_dev *, struct nvm_rq *);
- extern void nvm_generic_to_addr_mode(struct nvm_dev *, struct nvm_rq *);
- extern void nvm_addr_to_generic_mode(struct nvm_dev *, struct nvm_rq *);
++				begin = index << PAGE_SHIFT;
+ 				if (!did_range_unmap) {
+ 					/*
+ 					 * Zap the rest of the file in one hit.
+ 					 */
++					len = (loff_t)(1 + end - index) <<
++						PAGE_SHIFT;
++					if (len < hpage_size(page))
++						len = hpage_size(page);
+ 					unmap_mapping_range(mapping,
+-					   (loff_t)index << PAGE_SHIFT,
+-					   (loff_t)(1 + end - index)
+-							 << PAGE_SHIFT,
+-							 0);
++							begin, len, 0);
+ 					did_range_unmap = 1;
+ 				} else {
+ 					/*
+ 					 * Just zap this page
+ 					 */
+-					unmap_mapping_range(mapping,
+-					   (loff_t)index << PAGE_SHIFT,
+-					   PAGE_SIZE, 0);
++					len = hpage_size(page);
++					unmap_mapping_range(mapping, begin,
++							len, 0);
+ 				}
+ 			}
+-			BUG_ON(page_mapped(page));
++			VM_BUG_ON_PAGE(page_mapped(page), page);
+ 			ret2 = do_launder_page(mapping, page);
+ 			if (ret2 == 0) {
+ 				if (!invalidate_complete_page2(mapping, page))
+@@ -687,9 +692,9 @@ int invalidate_inode_pages2_range(struct address_space *mapping,
+ 			unlock_page(page);
+ 		}
+ 		pagevec_remove_exceptionals(&pvec);
++		index += pvec.nr ? hpage_nr_pages(pvec.pages[pvec.nr - 1]) : 1;
+ 		pagevec_release(&pvec);
+ 		cond_resched();
+-		index++;
+ 	}
+ 	cleancache_invalidate_inode(mapping);
+ 	return ret;
 -- 
-2.7.4
+2.10.2
 
