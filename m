@@ -1,63 +1,73 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f51.google.com ([74.125.82.51]:38545 "EHLO
-        mail-wm0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752707AbcKROn6 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Nov 2016 09:43:58 -0500
-Received: by mail-wm0-f51.google.com with SMTP id f82so41993709wmf.1
-        for <linux-block@vger.kernel.org>; Fri, 18 Nov 2016 06:43:57 -0800 (PST)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH 00/20] lightnvm: simplify media manager
-Date: Fri, 18 Nov 2016 15:43:22 +0100
-Message-Id: <1479480222-18790-1-git-send-email-javier@cnexlabs.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Received: from mga09.intel.com ([134.134.136.24]:40220 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1757216AbcK2LXd (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 29 Nov 2016 06:23:33 -0500
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv5 15/36] thp: do not threat slab pages as huge in hpage_{nr_pages,size,mask}
+Date: Tue, 29 Nov 2016 14:22:43 +0300
+Message-Id: <20161129112304.90056-16-kirill.shutemov@linux.intel.com>
+In-Reply-To: <20161129112304.90056-1-kirill.shutemov@linux.intel.com>
+References: <20161129112304.90056-1-kirill.shutemov@linux.intel.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-This patchset simplifies the generic media manager interface and moves
-lun and block functionality to lightnvm targets. This makes that
-rrpc-specific functionality is not exposed on the media manager. This is
-done in preparation for the pblk target.
+Slab pages can be compound, but we shouldn't threat them as THP for
+pupose of hpage_* helpers, otherwise it would lead to confusing results.
 
-Matias: patches 0 - 4 have been posted before. Patches apply to you
-for-4.10/core
+For instance, ext4 uses slab pages for journal pages and we shouldn't
+confuse them with THPs. The easiest way is to exclude them in hpage_*
+helpers.
 
-Javier González (20):
-  lightnvm: enable to send hint to erase command
-  lightnvm: do not protect block 0
-  lightnvm: export set bad block table
-  lightnvm: add ECC error codes
-  lightnvm: rrpc: split bios of size > 256kb
-  lightnvm: remove sysfs configuration interface
-  lightnvm: cleanup unused target operations
-  lightnvm: make address conversion functions global
-  lightnvm: remove unnecessary variables in rrpc
-  lightnvm: use constant name instead of value
-  lightnvm: remove gen_lun abstraction
-  lightnvm: manage lun partitions internally in mm
-  lightnvm: move block provisioning to targets
-  lightnvm: remove get_lun operation on gennvm
-  lightnvm: remove debug lun statistics from gennvm
-  lightnvm: eliminate nvm_block abstraction on mm
-  lightnvm: eliminate nvm_lun abstraction in mm
-  lightnvm: introduce helpers for generic ops in rrpc
-  lightnvm: introduce max_phys_sects helper function
-  lightnvm: use target nvm on target-specific ops.
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+---
+ include/linux/huge_mm.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
- drivers/lightnvm/core.c      | 306 ++++++++------------
- drivers/lightnvm/gennvm.c    | 664 ++++++++++++++++++++-----------------------
- drivers/lightnvm/gennvm.h    |  34 ++-
- drivers/lightnvm/rrpc.c      | 512 +++++++++++++++++++++------------
- drivers/lightnvm/rrpc.h      |  65 ++++-
- drivers/lightnvm/sysblk.c    |  98 +++----
- drivers/nvme/host/lightnvm.c |  15 +-
- include/linux/lightnvm.h     | 231 +++++++--------
- 8 files changed, 1005 insertions(+), 920 deletions(-)
-
+diff --git a/include/linux/huge_mm.h b/include/linux/huge_mm.h
+index e5c9c26d2439..5e6c408f5b47 100644
+--- a/include/linux/huge_mm.h
++++ b/include/linux/huge_mm.h
+@@ -137,21 +137,21 @@ static inline spinlock_t *pmd_trans_huge_lock(pmd_t *pmd,
+ }
+ static inline int hpage_nr_pages(struct page *page)
+ {
+-	if (unlikely(PageTransHuge(page)))
++	if (unlikely(!PageSlab(page) && PageTransHuge(page)))
+ 		return HPAGE_PMD_NR;
+ 	return 1;
+ }
+ 
+ static inline int hpage_size(struct page *page)
+ {
+-	if (unlikely(PageTransHuge(page)))
++	if (unlikely(!PageSlab(page) && PageTransHuge(page)))
+ 		return HPAGE_PMD_SIZE;
+ 	return PAGE_SIZE;
+ }
+ 
+ static inline unsigned long hpage_mask(struct page *page)
+ {
+-	if (unlikely(PageTransHuge(page)))
++	if (unlikely(!PageSlab(page) && PageTransHuge(page)))
+ 		return HPAGE_PMD_MASK;
+ 	return PAGE_MASK;
+ }
 -- 
-2.7.4
+2.10.2
 
