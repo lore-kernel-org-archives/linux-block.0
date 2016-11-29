@@ -1,36 +1,73 @@
-Return-Path: <ozgur.root@gmail.com>
-Return-Path: <ozgur.root@gmail.com>
-From: Ozgur Karatas <ozgur.root@gmail.com>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Ozgur Karatas <mueddib@openldap.org>
-Subject: [PATCH] block: bio-integrity fixed a Oracle Copyright year.
-Date: Fri, 18 Nov 2016 14:54:47 +0300
-Message-Id: <1479470087-7654-1-git-send-email-mueddib@goosey.org>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga11.intel.com ([192.55.52.93]:52808 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1757311AbcK2LX4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 29 Nov 2016 06:23:56 -0500
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv5 08/36] filemap: handle huge pages in do_generic_file_read()
+Date: Tue, 29 Nov 2016 14:22:36 +0300
+Message-Id: <20161129112304.90056-9-kirill.shutemov@linux.intel.com>
+In-Reply-To: <20161129112304.90056-1-kirill.shutemov@linux.intel.com>
+References: <20161129112304.90056-1-kirill.shutemov@linux.intel.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Ozgur Karatas <mueddib@openldap.org>
+Most of work happans on head page. Only when we need to do copy data to
+userspace we find relevant subpage.
 
-Fixed a on the github request issue.
+We are still limited by PAGE_SIZE per iteration. Lifting this limitation
+would require some more work.
 
-Signed-off-by: Ozgur Karatas <mueddib@goosey.org>
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- block/bio-integrity.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ mm/filemap.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/block/bio-integrity.c b/block/bio-integrity.c
-index 5384713..775d83e 100644
---- a/block/bio-integrity.c
-+++ b/block/bio-integrity.c
-@@ -1,7 +1,7 @@
- /*
-  * bio-integrity.c - bio data integrity extensions
-  *
-- * Copyright (C) 2007, 2008, 2009 Oracle Corporation
-+ * Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012 Oracle Corporation
-  * Written by: Martin K. Petersen <martin.petersen@oracle.com>
-  *
-  * This program is free software; you can redistribute it and/or
+diff --git a/mm/filemap.c b/mm/filemap.c
+index 74341f8b831e..6a2f9ea521fb 100644
+--- a/mm/filemap.c
++++ b/mm/filemap.c
+@@ -1749,6 +1749,7 @@ static ssize_t do_generic_file_read(struct file *filp, loff_t *ppos,
+ 			if (unlikely(page == NULL))
+ 				goto no_cached_page;
+ 		}
++		page = compound_head(page);
+ 		if (PageReadahead(page)) {
+ 			page_cache_async_readahead(mapping,
+ 					ra, filp, page,
+@@ -1830,7 +1831,8 @@ static ssize_t do_generic_file_read(struct file *filp, loff_t *ppos,
+ 		 * now we can copy it to user space...
+ 		 */
+ 
+-		ret = copy_page_to_iter(page, offset, nr, iter);
++		ret = copy_page_to_iter(page + index - page->index, offset,
++				nr, iter);
+ 		offset += ret;
+ 		index += offset >> PAGE_SHIFT;
+ 		offset &= ~PAGE_MASK;
+@@ -2248,6 +2250,7 @@ int filemap_fault(struct vm_area_struct *vma, struct vm_fault *vmf)
+ 	 * because there really aren't any performance issues here
+ 	 * and we need to check for errors.
+ 	 */
++	page = compound_head(page);
+ 	ClearPageError(page);
+ 	error = mapping->a_ops->readpage(file, page);
+ 	if (!error) {
 -- 
-2.1.4
+2.10.2
+
