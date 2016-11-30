@@ -1,67 +1,35 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.9]:50233 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1424317AbcKANk0 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Nov 2016 09:40:26 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: [PATCH 07/16] block: treat REQ_FUA and REQ_PREFLUSH as synchronous
-Date: Tue,  1 Nov 2016 07:40:08 -0600
-Message-Id: <1478007617-18715-8-git-send-email-hch@lst.de>
-In-Reply-To: <1478007617-18715-1-git-send-email-hch@lst.de>
-References: <1478007617-18715-1-git-send-email-hch@lst.de>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] block: Check partition alignment on zoned block devices
+To: Damien Le Moal <damien.lemoal@wdc.com>
+References: <1480494139-1658-1-git-send-email-damien.lemoal@wdc.com>
+Cc: linux-block@vger.kernel.org, Shaun Tancheff <shaun@tancheff.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <b35953aa-09c2-6cf3-4a79-7ec6af77e156@kernel.dk>
+Date: Wed, 30 Nov 2016 08:20:55 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <1480494139-1658-1-git-send-email-damien.lemoal@wdc.com>
+Content-Type: text/plain; charset=windows-1252
+List-ID: <linux-block@vger.kernel.org>
 
-Instead of requiring everyone to specify the REQ_SYNC flag aѕ well.
+On 11/30/2016 01:22 AM, Damien Le Moal wrote:
+> Both blkdev_report_zones and blkdev_reset_zones can operate on a partition of
+> a zoned block device. However, the first and last zones reported for a
+> partition make sense only if the partition start sector and size are aligned
+> on the device zone size. The same applies for zone reset. Resetting the first
+> or the last zone of a partition straddling zones may impact neighboring
+> partitions. Finally, if a partition start sector is not at the beginning of a
+> sequential zone, it will be impossible to write to the first sectors of the
+> partition on a host-managed device.
+> Avoid all these problems and incoherencies by ignoring partitions that are not
+> zone aligned.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- include/linux/blk_types.h | 8 +++++++-
- include/linux/fs.h        | 6 +++---
- 2 files changed, 10 insertions(+), 4 deletions(-)
+Let's try and keep the ZONED ifdefs to a minimum, I absolutely hate
+having those sprinkled throughout the code. Less of an issue in the
+headers.
 
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 3fa62ca..107d23d 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -216,9 +216,15 @@ static inline bool op_is_write(unsigned int op)
- 	return (op & 1);
- }
- 
-+/*
-+ * Reads are always treated as synchronous, as are requests with the FUA or
-+ * PREFLUSH flag.  Other operations may be marked as synchronous using the
-+ * REQ_SYNC flag.
-+ */
- static inline bool op_is_sync(unsigned int op)
- {
--	return (op & REQ_OP_MASK) == REQ_OP_READ || (op & REQ_SYNC);
-+	return (op & REQ_OP_MASK) == REQ_OP_READ ||
-+		(op & (REQ_SYNC | REQ_FUA | REQ_PREFLUSH));
- }
- 
- typedef unsigned int blk_qc_t;
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 5e0078f..ccedccb 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -199,9 +199,9 @@ typedef int (dio_iodone_t)(struct kiocb *iocb, loff_t offset,
- #define READ_SYNC		0
- #define WRITE_SYNC		(REQ_SYNC | REQ_NOIDLE)
- #define WRITE_ODIRECT		REQ_SYNC
--#define WRITE_FLUSH		(REQ_SYNC | REQ_NOIDLE | REQ_PREFLUSH)
--#define WRITE_FUA		(REQ_SYNC | REQ_NOIDLE | REQ_FUA)
--#define WRITE_FLUSH_FUA		(REQ_SYNC | REQ_NOIDLE | REQ_PREFLUSH | REQ_FUA)
-+#define WRITE_FLUSH		(REQ_NOIDLE | REQ_PREFLUSH)
-+#define WRITE_FUA		(REQ_NOIDLE | REQ_FUA)
-+#define WRITE_FLUSH_FUA		(REQ_NOIDLE | REQ_PREFLUSH | REQ_FUA)
- 
- /*
-  * Attribute flags.  These should be or-ed together to figure out what
+bdev_is_zoned() is safe to call without the ifdef, and let's kill it
+around the part_zone_aligned() function too. There's no need for either
+one of the ifdefs below, as far as I can tell.
+
 -- 
-2.1.4
-
+Jens Axboe
