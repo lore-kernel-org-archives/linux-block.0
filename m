@@ -1,137 +1,81 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:55726 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S965102AbcKNWW1 (ORCPT
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:16841 "EHLO
+        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1757922AbcK3U3e (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Nov 2016 17:22:27 -0500
-Received: from pps.filterd (m0044008.ppops.net [127.0.0.1])
-        by mx0a-00082601.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id uAEMJNK1008040
-        for <linux-block@vger.kernel.org>; Mon, 14 Nov 2016 14:22:27 -0800
-Received: from mail.thefacebook.com ([199.201.64.23])
-        by mx0a-00082601.pphosted.com with ESMTP id 26qkrj8s6a-1
-        (version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT)
-        for <linux-block@vger.kernel.org>; Mon, 14 Nov 2016 14:22:27 -0800
-Received: from facebook.com (2401:db00:21:603d:face:0:19:0)     by
- mx-out.facebook.com (10.223.100.99) with ESMTP id
- d1b8cd84aab811e6822c24be05956610-870e8a50 for <linux-block@vger.kernel.org>;
-        Mon, 14 Nov 2016 14:22:25 -0800
-From: Shaohua Li <shli@fb.com>
-To: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <Kernel-team@fb.com>, <axboe@fb.com>, <tj@kernel.org>,
-        <vgoyal@redhat.com>
-Subject: [PATCH V4 12/15] blk-throttle: ignore idle cgroup limit
-Date: Mon, 14 Nov 2016 14:22:19 -0800
-Message-ID: <81c80afa8e1124e53d67f2d61dade2ce9768e4c7.1479161136.git.shli@fb.com>
-In-Reply-To: <cover.1479161136.git.shli@fb.com>
-References: <cover.1479161136.git.shli@fb.com>
+        Wed, 30 Nov 2016 15:29:34 -0500
+From: Chaitanya Kulkarni <chaitanya.kulkarni@hgst.com>
+To: axboe@fb.com
+Cc: martin.petersen@oracle.com, keith.busch@intel.com,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        Chaitanya Kulkarni <chaitanya.kulkarni@hgst.com>
+Subject: [PATCH V2 4/5] nvme: add support for the Write Zeroes command
+Date: Wed, 30 Nov 2016 12:29:01 -0800
+Message-Id: <1480537742-15190-4-git-send-email-chaitanya.kulkarni@hgst.com>
+In-Reply-To: <1480537742-15190-1-git-send-email-chaitanya.kulkarni@hgst.com>
+References: <1480537742-15190-1-git-send-email-chaitanya.kulkarni@hgst.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Last patch introduces a way to detect idle cgroup. We use it to make
-upgrade/downgrade decision. And the new algorithm can detect completely
-idle cgroup too, so we can delete the corresponding code.
+Allow write zeroes operations (REQ_OP_WRITE_ZEROES) on the block
+device, if the device supports optional command bit set for write
+zeroes. Add support to setup write zeroes command. Set maximum possible
+write zeroes sectors in one write zeroes command according to
+nvme write zeroes command definition.
 
-Signed-off-by: Shaohua Li <shli@fb.com>
+Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@hgst.com>
 ---
- block/blk-throttle.c | 39 +++++++++++++++++++++++++--------------
- 1 file changed, 25 insertions(+), 14 deletions(-)
+ drivers/nvme/host/core.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index e403e88..01b494d 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -146,8 +146,7 @@ struct throtl_grp {
- 
- 	unsigned long last_check_time;
- 
--	unsigned long last_dispatch_time[2];
--
-+	int upgrade_check_batch;
- 	/* When did we start a new slice */
- 	unsigned long slice_start[2];
- 	unsigned long slice_end[2];
-@@ -487,8 +486,6 @@ static void throtl_pd_online(struct blkg_policy_data *pd)
- 	 * Update has_rules[] after a new group is brought online.
- 	 */
- 	tg_update_has_rules(tg);
--	tg->last_dispatch_time[READ] = jiffies;
--	tg->last_dispatch_time[WRITE] = jiffies;
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 44f8a53..16a315d 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -272,6 +272,21 @@ static inline int nvme_setup_discard(struct nvme_ns *ns, struct request *req,
+ 	return BLK_MQ_RQ_QUEUE_OK;
  }
  
- static void blk_throtl_update_valid_limit(struct throtl_data *td)
-@@ -1667,9 +1664,8 @@ static bool throtl_upgrade_check_one(struct throtl_grp *tg)
- 		return true;
- 
- 	if (time_after_eq(jiffies,
--	     tg->last_dispatch_time[READ] + tg->td->throtl_slice) &&
--	    time_after_eq(jiffies,
--	     tg->last_dispatch_time[WRITE] + tg->td->throtl_slice))
-+		tg_last_high_overflow_time(tg) + tg->td->throtl_slice) &&
-+	    throtl_tg_is_idle(tg))
- 		return true;
- 	return false;
- }
-@@ -1718,6 +1714,24 @@ static bool throtl_can_upgrade(struct throtl_data *td,
- 	return true;
- }
- 
-+static void throtl_upgrade_check(struct throtl_grp *tg)
++static inline void nvme_setup_write_zeroes(struct nvme_ns *ns,
++		struct request *req, struct nvme_command *cmnd)
 +{
-+	if (tg->td->limit_index != LIMIT_HIGH)
-+		return;
++	struct nvme_write_zeroes_cmd *write_zeroes = &cmnd->write_zeroes;
 +
-+	if (!time_after_eq(jiffies,
-+	     __tg_last_high_overflow_time(tg) + tg->td->throtl_slice))
-+		return;
-+
-+	tg->upgrade_check_batch++;
-+	if (tg->upgrade_check_batch < 16)
-+		return;
-+	tg->upgrade_check_batch = 0;
-+
-+	if (throtl_can_upgrade(tg->td, NULL))
-+		throtl_upgrade_state(tg->td);
++	memset(cmnd, 0, sizeof(*cmnd));
++	write_zeroes->opcode = nvme_cmd_write_zeroes;
++	write_zeroes->nsid = cpu_to_le32(ns->ns_id);
++	write_zeroes->slba =
++		cpu_to_le64(nvme_block_nr(ns, blk_rq_pos(req)));
++	write_zeroes->length =
++		cpu_to_le16((blk_rq_bytes(req) >> ns->lba_shift) - 1);
++	write_zeroes->control = 0;
 +}
 +
- static void throtl_upgrade_state(struct throtl_data *td)
+ static inline void nvme_setup_rw(struct nvme_ns *ns, struct request *req,
+ 		struct nvme_command *cmnd)
  {
- 	struct cgroup_subsys_state *pos_css;
-@@ -1752,18 +1766,15 @@ static bool throtl_downgrade_check_one(struct throtl_grp *tg)
- 	struct throtl_data *td = tg->td;
- 	unsigned long now = jiffies;
+@@ -325,6 +340,8 @@ int nvme_setup_cmd(struct nvme_ns *ns, struct request *req,
+ 		nvme_setup_flush(ns, cmd);
+ 	else if (req_op(req) == REQ_OP_DISCARD)
+ 		ret = nvme_setup_discard(ns, req, cmd);
++	else if (req_op(req) == REQ_OP_WRITE_ZEROES)
++		nvme_setup_write_zeroes(ns, req, cmd);
+ 	else
+ 		nvme_setup_rw(ns, req, cmd);
  
--	if (time_after_eq(now, tg->last_dispatch_time[READ] +
--					td->throtl_slice) &&
--	    time_after_eq(now, tg->last_dispatch_time[WRITE] +
--					td->throtl_slice))
--		return false;
- 	/*
- 	 * If cgroup is below high limit, consider downgrade and throttle other
- 	 * cgroups
- 	 */
- 	if (time_after_eq(now, td->high_upgrade_time + td->throtl_slice) &&
- 	    time_after_eq(now, tg_last_high_overflow_time(tg) +
--					td->throtl_slice))
-+					td->throtl_slice) &&
-+	    (!throtl_tg_is_idle(tg) ||
-+	     !list_empty(&tg_to_blkg(tg)->blkcg->css.children)))
- 		return true;
- 	return false;
+@@ -943,6 +960,10 @@ static void __nvme_revalidate_disk(struct gendisk *disk, struct nvme_id_ns *id)
+ 
+ 	if (ns->ctrl->oncs & NVME_CTRL_ONCS_DSM)
+ 		nvme_config_discard(ns);
++	if (ns->ctrl->oncs & NVME_CTRL_ONCS_WRITE_ZEROES)
++		blk_queue_max_write_zeroes_sectors(ns->queue,
++				((u32)(USHRT_MAX + 1) * bs) >> 9);
++
+ 	blk_mq_unfreeze_queue(disk->queue);
  }
-@@ -1902,10 +1913,10 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
  
- again:
- 	while (true) {
--		tg->last_dispatch_time[rw] = jiffies;
- 		if (tg->last_high_overflow_time[rw] == 0)
- 			tg->last_high_overflow_time[rw] = jiffies;
- 		throtl_downgrade_check(tg);
-+		throtl_upgrade_check(tg);
- 		/* throtl is FIFO - if bios are already queued, should queue */
- 		if (sq->nr_queued[rw])
- 			break;
 -- 
-2.9.3
+1.8.3.1
 
