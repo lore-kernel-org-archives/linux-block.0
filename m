@@ -1,100 +1,247 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:37259 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1757249AbcK2LXm (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 29 Nov 2016 06:23:42 -0500
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv5 25/36] ext4: make ext4_writepage() work on huge pages
-Date: Tue, 29 Nov 2016 14:22:53 +0300
-Message-Id: <20161129112304.90056-26-kirill.shutemov@linux.intel.com>
-In-Reply-To: <20161129112304.90056-1-kirill.shutemov@linux.intel.com>
-References: <20161129112304.90056-1-kirill.shutemov@linux.intel.com>
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:16841 "EHLO
+        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753868AbcK3U33 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 30 Nov 2016 15:29:29 -0500
+From: Chaitanya Kulkarni <chaitanya.kulkarni@hgst.com>
+To: axboe@fb.com
+Cc: martin.petersen@oracle.com, keith.busch@intel.com,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        Chaitanya Kulkarni <chaitanya.kulkarni@hgst.com>
+Subject: [PATCH V2 1/5] block: add async variant of blkdev_issue_zeroout
+Date: Wed, 30 Nov 2016 12:28:58 -0800
+Message-Id: <1480537742-15190-1-git-send-email-chaitanya.kulkarni@hgst.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Change ext4_writepage() and underlying ext4_bio_write_page().
+Similar to __blkdev_issue_discard this variant allows submitting
+the final bio asynchronously and chaining multiple ranges
+into a single completion.
 
-It basically removes assumption on page size, infer it from struct page
-instead.
-
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@hgst.com>
 ---
- fs/ext4/inode.c   | 10 +++++-----
- fs/ext4/page-io.c | 11 +++++++++--
- 2 files changed, 14 insertions(+), 7 deletions(-)
+ block/blk-lib.c        | 115 ++++++++++++++++++++++++++++++++++---------------
+ include/linux/blkdev.h |   3 ++
+ 2 files changed, 84 insertions(+), 34 deletions(-)
 
-diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
-index ebccc535b15e..fa4467e4b129 100644
---- a/fs/ext4/inode.c
-+++ b/fs/ext4/inode.c
-@@ -2037,10 +2037,10 @@ static int ext4_writepage(struct page *page,
+diff --git a/block/blk-lib.c b/block/blk-lib.c
+index 18abda8..bfb28b0 100644
+--- a/block/blk-lib.c
++++ b/block/blk-lib.c
+@@ -137,24 +137,24 @@ int blkdev_issue_discard(struct block_device *bdev, sector_t sector,
+ EXPORT_SYMBOL(blkdev_issue_discard);
  
- 	trace_ext4_writepage(page);
- 	size = i_size_read(inode);
--	if (page->index == size >> PAGE_SHIFT)
--		len = size & ~PAGE_MASK;
--	else
--		len = PAGE_SIZE;
+ /**
+- * blkdev_issue_write_same - queue a write same operation
++ * __blkdev_issue_write_same - generate number of bios with same page
+  * @bdev:	target blockdev
+  * @sector:	start sector
+  * @nr_sects:	number of sectors to write
+  * @gfp_mask:	memory allocation flags (for bio_alloc)
+  * @page:	page containing data to write
++ * @biop:	pointer to anchor bio
+  *
+  * Description:
+- *    Issue a write same request for the sectors in question.
++ *  Generate and issue number of bios(REQ_OP_WRITE_SAME) with same page.
+  */
+-int blkdev_issue_write_same(struct block_device *bdev, sector_t sector,
+-			    sector_t nr_sects, gfp_t gfp_mask,
+-			    struct page *page)
++static int __blkdev_issue_write_same(struct block_device *bdev, sector_t sector,
++		sector_t nr_sects, gfp_t gfp_mask, struct page *page,
++		struct bio **biop)
+ {
+ 	struct request_queue *q = bdev_get_queue(bdev);
+ 	unsigned int max_write_same_sectors;
+-	struct bio *bio = NULL;
+-	int ret = 0;
++	struct bio *bio = *biop;
+ 	sector_t bs_mask;
+ 
+ 	if (!q)
+@@ -164,6 +164,9 @@ int blkdev_issue_write_same(struct block_device *bdev, sector_t sector,
+ 	if ((sector | nr_sects) & bs_mask)
+ 		return -EINVAL;
+ 
++	if (!bdev_write_same(bdev))
++		return -EOPNOTSUPP;
 +
-+	len = hpage_size(page);
-+	if (page->index + hpage_nr_pages(page) - 1 == size >> PAGE_SHIFT)
-+			len = size & ~hpage_mask(page);
+ 	/* Ensure that max_write_same_sectors doesn't overflow bi_size */
+ 	max_write_same_sectors = UINT_MAX >> 9;
  
- 	page_bufs = page_buffers(page);
- 	/*
-@@ -2064,7 +2064,7 @@ static int ext4_writepage(struct page *page,
- 				   ext4_bh_delay_or_unwritten)) {
- 		redirty_page_for_writepage(wbc, page);
- 		if ((current->flags & PF_MEMALLOC) ||
--		    (inode->i_sb->s_blocksize == PAGE_SIZE)) {
-+		    (inode->i_sb->s_blocksize == hpage_size(page))) {
- 			/*
- 			 * For memory cleaning there's no point in writing only
- 			 * some buffers. So just bail out. Warn if we came here
-diff --git a/fs/ext4/page-io.c b/fs/ext4/page-io.c
-index d83b0f3c5fe9..360c74daec5c 100644
---- a/fs/ext4/page-io.c
-+++ b/fs/ext4/page-io.c
-@@ -413,6 +413,7 @@ int ext4_bio_write_page(struct ext4_io_submit *io,
+@@ -185,32 +188,63 @@ int blkdev_issue_write_same(struct block_device *bdev, sector_t sector,
+ 			bio->bi_iter.bi_size = nr_sects << 9;
+ 			nr_sects = 0;
+ 		}
++		cond_resched();
+ 	}
  
- 	BUG_ON(!PageLocked(page));
- 	BUG_ON(PageWriteback(page));
-+	BUG_ON(PageTail(page));
+-	if (bio) {
++	*biop = bio;
++	return 0;
++}
++
++/**
++ * blkdev_issue_write_same - queue a write same operation
++ * @bdev:	target blockdev
++ * @sector:	start sector
++ * @nr_sects:	number of sectors to write
++ * @gfp_mask:	memory allocation flags (for bio_alloc)
++ * @page:	page containing data
++ *
++ * Description:
++ *    Issue a write same request for the sectors in question.
++ */
++int blkdev_issue_write_same(struct block_device *bdev, sector_t sector,
++				sector_t nr_sects, gfp_t gfp_mask,
++				struct page *page)
++{
++	struct bio *bio = NULL;
++	struct blk_plug plug;
++	int ret;
++
++	blk_start_plug(&plug);
++	ret = __blkdev_issue_write_same(bdev, sector, nr_sects, gfp_mask, page,
++			&bio);
++	if (ret == 0 && bio) {
+ 		ret = submit_bio_wait(bio);
+ 		bio_put(bio);
+ 	}
++	blk_finish_plug(&plug);
+ 	return ret;
+ }
+ EXPORT_SYMBOL(blkdev_issue_write_same);
  
- 	if (keep_towrite)
- 		set_page_writeback_keepwrite(page);
-@@ -429,8 +430,14 @@ int ext4_bio_write_page(struct ext4_io_submit *io,
- 	 * the page size, the remaining memory is zeroed when mapped, and
- 	 * writes to that region are not written out to the file."
- 	 */
--	if (len < PAGE_SIZE)
--		zero_user_segment(page, len, PAGE_SIZE);
-+	if (len < hpage_size(page)) {
-+		page += len / PAGE_SIZE;
-+		if (len % PAGE_SIZE)
-+			zero_user_segment(page, len % PAGE_SIZE, PAGE_SIZE);
-+		while (page + 1 == compound_head(page))
-+			clear_highpage(++page);
-+		page = compound_head(page);
+ /**
+- * blkdev_issue_zeroout - generate number of zero filed write bios
++ * __blkdev_issue_zeroout - generate number of zero filed write bios
+  * @bdev:	blockdev to issue
+  * @sector:	start sector
+  * @nr_sects:	number of sectors to write
+  * @gfp_mask:	memory allocation flags (for bio_alloc)
++ * @biop:	pointer to anchor bio
++ * @discard:	discard flag
+  *
+  * Description:
+  *  Generate and issue number of bios with zerofiled pages.
+  */
+-
+-static int __blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
+-				  sector_t nr_sects, gfp_t gfp_mask)
++int __blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
++		sector_t nr_sects, gfp_t gfp_mask, struct bio **biop,
++		bool discard)
+ {
+ 	int ret;
+-	struct bio *bio = NULL;
++	int bi_size = 0;
++	struct bio *bio = *biop;
+ 	unsigned int sz;
+ 	sector_t bs_mask;
+ 
+@@ -218,6 +252,19 @@ static int __blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
+ 	if ((sector | nr_sects) & bs_mask)
+ 		return -EINVAL;
+ 
++	if (discard) {
++		ret = __blkdev_issue_discard(bdev, sector, nr_sects, gfp_mask,
++				BLKDEV_DISCARD_ZERO, biop);
++		if (ret == 0 || (ret && ret != -EOPNOTSUPP))
++			goto out;
 +	}
- 	/*
- 	 * In the first loop we prepare and mark buffers to submit. We have to
- 	 * mark all buffers in the page before submitting so that
++
++	ret = __blkdev_issue_write_same(bdev, sector, nr_sects, gfp_mask,
++			ZERO_PAGE(0), biop);
++	if (ret == 0 || (ret && ret != -EOPNOTSUPP))
++		goto out;
++
++	ret = 0;
+ 	while (nr_sects != 0) {
+ 		bio = next_bio(bio, min(nr_sects, (sector_t)BIO_MAX_PAGES),
+ 				gfp_mask);
+@@ -227,21 +274,20 @@ static int __blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
+ 
+ 		while (nr_sects != 0) {
+ 			sz = min((sector_t) PAGE_SIZE >> 9 , nr_sects);
+-			ret = bio_add_page(bio, ZERO_PAGE(0), sz << 9, 0);
+-			nr_sects -= ret >> 9;
+-			sector += ret >> 9;
+-			if (ret < (sz << 9))
++			bi_size = bio_add_page(bio, ZERO_PAGE(0), sz << 9, 0);
++			nr_sects -= bi_size >> 9;
++			sector += bi_size >> 9;
++			if (bi_size < (sz << 9))
+ 				break;
+ 		}
++		cond_resched();
+ 	}
+ 
+-	if (bio) {
+-		ret = submit_bio_wait(bio);
+-		bio_put(bio);
+-		return ret;
+-	}
+-	return 0;
++	*biop = bio;
++out:
++	return ret;
+ }
++EXPORT_SYMBOL(__blkdev_issue_zeroout);
+ 
+ /**
+  * blkdev_issue_zeroout - zero-fill a block range
+@@ -263,21 +309,22 @@ static int __blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
+  *  clearing the block range. Otherwise the zeroing will be performed
+  *  using regular WRITE calls.
+  */
+-
+ int blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
+ 			 sector_t nr_sects, gfp_t gfp_mask, bool discard)
+ {
+-	if (discard) {
+-		if (!blkdev_issue_discard(bdev, sector, nr_sects, gfp_mask,
+-				BLKDEV_DISCARD_ZERO))
+-			return 0;
+-	}
++	int ret;
++	struct bio *bio = NULL;
++	struct blk_plug plug;
+ 
+-	if (bdev_write_same(bdev) &&
+-	    blkdev_issue_write_same(bdev, sector, nr_sects, gfp_mask,
+-				    ZERO_PAGE(0)) == 0)
+-		return 0;
++	blk_start_plug(&plug);
++	ret = __blkdev_issue_zeroout(bdev, sector, nr_sects, gfp_mask,
++			&bio, discard);
++	if (ret == 0 && bio) {
++		ret = submit_bio_wait(bio);
++		bio_put(bio);
++	}
++	blk_finish_plug(&plug);
+ 
+-	return __blkdev_issue_zeroout(bdev, sector, nr_sects, gfp_mask);
++	return ret;
+ }
+ EXPORT_SYMBOL(blkdev_issue_zeroout);
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 541fdd8..7e9d8a0 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1269,6 +1269,9 @@ extern int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
+ 		struct bio **biop);
+ extern int blkdev_issue_write_same(struct block_device *bdev, sector_t sector,
+ 		sector_t nr_sects, gfp_t gfp_mask, struct page *page);
++extern int __blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
++		sector_t nr_sects, gfp_t gfp_mask, struct bio **biop,
++		bool discard);
+ extern int blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
+ 		sector_t nr_sects, gfp_t gfp_mask, bool discard);
+ static inline int sb_issue_discard(struct super_block *sb, sector_t block,
 -- 
-2.10.2
+1.8.3.1
 
