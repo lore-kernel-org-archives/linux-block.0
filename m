@@ -1,114 +1,130 @@
-Return-Path: <krisman@linux.vnet.ibm.com>
-From: Gabriel Krisman Bertazi <krisman@linux.vnet.ibm.com>
+Return-Path: <Damien.LeMoal@wdc.com>
+From: Damien Le Moal <damien.lemoal@wdc.com>
 To: Jens Axboe <axboe@kernel.dk>
-Cc: Gabriel Krisman Bertazi <krisman@linux.vnet.ibm.com>,
-        Brian King <brking@linux.vnet.ibm.com>,
-        Douglas Miller <dougmill@linux.vnet.ibm.com>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
-Subject: [PATCH v2 2/2] blk-mq: Avoid memory reclaim when remapping queues
-Date: Tue, 22 Nov 2016 15:54:29 -0200
-In-Reply-To: <1479837269-5742-1-git-send-email-krisman@linux.vnet.ibm.com>
-References: <1479837269-5742-1-git-send-email-krisman@linux.vnet.ibm.com>
-Message-Id: <1479837269-5742-2-git-send-email-krisman@linux.vnet.ibm.com>
+Cc: linux-block@vger.kernel.org,
+	Shaun Tancheff <shaun@tancheff.com>,
+	Damien Le Moal <damien.lemoal@wdc.com>
+Subject: [PATCH v4] block: Check partition alignment on zoned block devices
+Date: Thu,  1 Dec 2016 16:00:25 +0900
+Message-Id: <1480575625-32134-1-git-send-email-damien.lemoal@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Return-Path: damien.lemoal@wdc.com
 List-ID: <linux-block@vger.kernel.org>
 
-While stressing memory and IO at the same time we changed SMT settings,
-we were able to consistently trigger deadlocks in the mm system, which
-froze the entire machine.
+Both blkdev_report_zones and blkdev_reset_zones can operate on a partition of
+a zoned block device. However, the first and last zones reported for a
+partition make sense only if the partition start sector and size are aligned
+on the device zone size. The same applies for zone reset. Resetting the first
+or the last zone of a partition straddling zones may impact neighboring
+partitions. Finally, if a partition start sector is not at the beginning of a
+sequential zone, it will be impossible to write to the first sectors of the
+partition on a host-managed device.
+Avoid all these problems and incoherencies by ignoring partitions that are not
+zone aligned.
 
-I think that under memory stress conditions, the large allocations
-performed by blk_mq_init_rq_map may trigger a reclaim, which stalls
-waiting on the block layer remmaping completion, thus deadlocking the
-system.  The trace below was collected after the machine stalled,
-waiting for the hotplug event completion.
+Note: Even with CONFIG_BLK_DEV_ZONED disabled, bdev_is_zoned() will report the
+correct disk zoning type (host-aware, host-managed or none) but
+bdev_zone_size() will always return 0 for zoned block devices (i.e. the zone
+size is unknown). So test this as a way to ensure that a zoned block device is
+being handled as such. As a result, for a host-aware devices, unaligned zone
+partitions will be accepted with CONFIG_BLK_DEV_ZONED disabled. That is, the
+disk will be treated as a regular block device (as it should). If zoned block
+device support is enabled, only aligned partitions will be accepted.
 
-The simplest fix for this is to make allocations in this path
-non-reclaimable, with GFP_NOIO.  With this patch, We couldn't hit the
-issue anymore.
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-This should apply on top of Jen's for-next branch cleanly.
-
-Changes since v1:
-  - Use GFP_NOIO instead of GFP_NOWAIT.
-
- Call Trace:
-[c000000f0160aaf0] [c000000f0160ab50] 0xc000000f0160ab50 (unreliable)
-[c000000f0160acc0] [c000000000016624] __switch_to+0x2e4/0x430
-[c000000f0160ad20] [c000000000b1a880] __schedule+0x310/0x9b0
-[c000000f0160ae00] [c000000000b1af68] schedule+0x48/0xc0
-[c000000f0160ae30] [c000000000b1b4b0] schedule_preempt_disabled+0x20/0x30
-[c000000f0160ae50] [c000000000b1d4fc] __mutex_lock_slowpath+0xec/0x1f0
-[c000000f0160aed0] [c000000000b1d678] mutex_lock+0x78/0xa0
-[c000000f0160af00] [d000000019413cac] xfs_reclaim_inodes_ag+0x33c/0x380 [xfs]
-[c000000f0160b0b0] [d000000019415164] xfs_reclaim_inodes_nr+0x54/0x70 [xfs]
-[c000000f0160b0f0] [d0000000194297f8] xfs_fs_free_cached_objects+0x38/0x60 [xfs]
-[c000000f0160b120] [c0000000003172c8] super_cache_scan+0x1f8/0x210
-[c000000f0160b190] [c00000000026301c] shrink_slab.part.13+0x21c/0x4c0
-[c000000f0160b2d0] [c000000000268088] shrink_zone+0x2d8/0x3c0
-[c000000f0160b380] [c00000000026834c] do_try_to_free_pages+0x1dc/0x520
-[c000000f0160b450] [c00000000026876c] try_to_free_pages+0xdc/0x250
-[c000000f0160b4e0] [c000000000251978] __alloc_pages_nodemask+0x868/0x10d0
-[c000000f0160b6f0] [c000000000567030] blk_mq_init_rq_map+0x160/0x380
-[c000000f0160b7a0] [c00000000056758c] blk_mq_map_swqueue+0x33c/0x360
-[c000000f0160b820] [c000000000567904] blk_mq_queue_reinit+0x64/0xb0
-[c000000f0160b850] [c00000000056a16c] blk_mq_queue_reinit_notify+0x19c/0x250
-[c000000f0160b8a0] [c0000000000f5d38] notifier_call_chain+0x98/0x100
-[c000000f0160b8f0] [c0000000000c5fb0] __cpu_notify+0x70/0xe0
-[c000000f0160b930] [c0000000000c63c4] notify_prepare+0x44/0xb0
-[c000000f0160b9b0] [c0000000000c52f4] cpuhp_invoke_callback+0x84/0x250
-[c000000f0160ba10] [c0000000000c570c] cpuhp_up_callbacks+0x5c/0x120
-[c000000f0160ba60] [c0000000000c7cb8] _cpu_up+0xf8/0x1d0
-[c000000f0160bac0] [c0000000000c7eb0] do_cpu_up+0x120/0x150
-[c000000f0160bb40] [c0000000006fe024] cpu_subsys_online+0x64/0xe0
-[c000000f0160bb90] [c0000000006f5124] device_online+0xb4/0x120
-[c000000f0160bbd0] [c0000000006f5244] online_store+0xb4/0xc0
-[c000000f0160bc20] [c0000000006f0a68] dev_attr_store+0x68/0xa0
-[c000000f0160bc60] [c0000000003ccc30] sysfs_kf_write+0x80/0xb0
-[c000000f0160bca0] [c0000000003cbabc] kernfs_fop_write+0x17c/0x250
-[c000000f0160bcf0] [c00000000030fe6c] __vfs_write+0x6c/0x1e0
-[c000000f0160bd90] [c000000000311490] vfs_write+0xd0/0x270
-[c000000f0160bde0] [c0000000003131fc] SyS_write+0x6c/0x110
-[c000000f0160be30] [c000000000009204] system_call+0x38/0xec
-
-Signed-off-by: Gabriel Krisman Bertazi <krisman@linux.vnet.ibm.com>
-Cc: Brian King <brking@linux.vnet.ibm.com>
-Cc: Douglas Miller <dougmill@linux.vnet.ibm.com>
-Cc: linux-block@vger.kernel.org
-Cc: linux-scsi@vger.kernel.org
 ---
- block/blk-mq.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ block/partition-generic.c | 65 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 65 insertions(+)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 8cc58f23b2c2..db0eac3b9538 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1605,7 +1605,7 @@ static struct blk_mq_tags *blk_mq_init_rq_map(struct blk_mq_tag_set *set,
- 	INIT_LIST_HEAD(&tags->page_list);
+diff --git a/block/partition-generic.c b/block/partition-generic.c
+index 71d9ed9..d7beb6b 100644
+--- a/block/partition-generic.c
++++ b/block/partition-generic.c
+@@ -430,6 +430,56 @@ static int drop_partitions(struct gendisk *disk, struct block_device *bdev)
+ 	return 0;
+ }
  
- 	tags->rqs = kzalloc_node(set->queue_depth * sizeof(struct request *),
--				 GFP_KERNEL | __GFP_NOWARN | __GFP_NORETRY,
-+				 GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY,
- 				 set->numa_node);
- 	if (!tags->rqs) {
- 		blk_mq_free_tags(tags);
-@@ -1631,7 +1631,7 @@ static struct blk_mq_tags *blk_mq_init_rq_map(struct blk_mq_tag_set *set,
++static bool part_zone_aligned(struct gendisk *disk,
++			      struct block_device *bdev,
++			      sector_t from, sector_t size)
++{
++	unsigned int zone_size = bdev_zone_size(bdev);
++
++	/*
++	 * If this function is called, then the disk is a zoned block device
++	 * (host-aware or host-managed). This can be detected even if the
++	 * zoned block device support is disabled (CONFIG_BLK_DEV_ZONED not
++	 * set). In this case, however, only host-aware devices will be seen
++	 * as a block device is not created for host-managed devices. Without
++	 * zoned block device support, host-aware drives can still be used as
++	 * regular block devices (no zone operation) and their zone size will
++	 * be reported as 0. Allow this case.
++	 */
++	if (!zone_size)
++		return true;
++
++	/*
++	 * Check partition start and size alignement. If the drive has a
++	 * smaller last runt zone, ignore it and allow the partition to
++	 * use it. Check the zone size too: it should be a power of 2 number
++	 * of sectors.
++	 */
++	if (WARN_ON_ONCE(!is_power_of_2(zone_size))) {
++		u32 rem;
++
++		div_u64_rem(from, zone_size, &rem);
++		if (rem)
++			return false;
++		if ((from + size) < get_capacity(disk)) {
++			div_u64_rem(size, zone_size, &rem);
++			if (rem)
++				return false;
++		}
++
++	} else {
++
++		if (from & (zone_size - 1))
++			return false;
++		if ((from + size) < get_capacity(disk) &&
++		    (size & (zone_size - 1)))
++			return false;
++
++	}
++
++	return true;
++}
++
+ int rescan_partitions(struct gendisk *disk, struct block_device *bdev)
+ {
+ 	struct parsed_partitions *state = NULL;
+@@ -529,6 +579,21 @@ int rescan_partitions(struct gendisk *disk, struct block_device *bdev)
+ 			}
+ 		}
  
- 		do {
- 			page = alloc_pages_node(set->numa_node,
--				GFP_KERNEL | __GFP_NOWARN | __GFP_NORETRY | __GFP_ZERO,
-+				GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY | __GFP_ZERO,
- 				this_order);
- 			if (page)
- 				break;
-@@ -1652,7 +1652,7 @@ static struct blk_mq_tags *blk_mq_init_rq_map(struct blk_mq_tag_set *set,
- 		 * Allow kmemleak to scan these pages as they contain pointers
- 		 * to additional allocations like via ops->init_request().
- 		 */
--		kmemleak_alloc(p, order_to_size(this_order), 1, GFP_KERNEL);
-+		kmemleak_alloc(p, order_to_size(this_order), 1, GFP_NOIO);
- 		entries_per_page = order_to_size(this_order) / rq_size;
- 		to_do = min(entries_per_page, set->queue_depth - i);
- 		left -= to_do * rq_size;
++		/*
++		 * On a zoned block device, partitions should be aligned on the
++		 * device zone size (i.e. zone boundary crossing not allowed).
++		 * Otherwise, resetting the write pointer of the last zone of
++		 * one partition may impact the following partition.
++		 */
++		if (bdev_is_zoned(bdev) &&
++		    !part_zone_aligned(disk, bdev, from, size)) {
++			printk(KERN_WARNING
++			       "%s: p%d start %llu+%llu is not zone aligned\n",
++			       disk->disk_name, p, (unsigned long long) from,
++			       (unsigned long long) size);
++			continue;
++		}
++
+ 		part = add_partition(disk, p, from, size,
+ 				     state->parts[p].flags,
+ 				     &state->parts[p].info);
 -- 
 2.7.4
+
+Western Digital Corporation (and its subsidiaries) E-mail Confidentiality Notice & Disclaimer:
+
+This e-mail and any files transmitted with it may contain confidential or legally privileged information of WDC and/or its affiliates, and are intended solely for the use of the individual or entity to which they are addressed. If you are not the intended recipient, any disclosure, copying, distribution or any action taken or omitted to be taken in reliance on it, is prohibited. If you have received this e-mail in error, please notify the sender immediately and delete the e-mail in its entirety from your system.
