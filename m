@@ -1,34 +1,63 @@
-Return-Path: <BATV+c11f2a9076c546b906d6+4834+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: mst@redhat.com
-Cc: axboe@kernel.dk,
-	virtualization@lists.linux-foundation.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: automatic IRQ affinity for virtio
-Date: Thu, 17 Nov 2016 11:43:12 +0100
-Message-Id: <1479379403-27880-1-git-send-email-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from out0-151.mail.aliyun.com ([140.205.0.151]:36875 "EHLO
+        out0-151.mail.aliyun.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751673AbcLADSs (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 30 Nov 2016 22:18:48 -0500
+Reply-To: "Hillf Danton" <hillf.zj@alibaba-inc.com>
+From: "Hillf Danton" <hillf.zj@alibaba-inc.com>
+To: "'Kirill A. Shutemov'" <kirill.shutemov@linux.intel.com>
+Cc: "'Theodore Ts'o'" <tytso@mit.edu>,
+        "'Andreas Dilger'" <adilger.kernel@dilger.ca>,
+        "'Jan Kara'" <jack@suse.com>,
+        "'Andrew Morton'" <akpm@linux-foundation.org>,
+        "'Alexander Viro'" <viro@zeniv.linux.org.uk>,
+        "'Hugh Dickins'" <hughd@google.com>,
+        "'Andrea Arcangeli'" <aarcange@redhat.com>,
+        "'Dave Hansen'" <dave.hansen@intel.com>,
+        "'Vlastimil Babka'" <vbabka@suse.cz>,
+        "'Matthew Wilcox'" <willy@infradead.org>,
+        "'Ross Zwisler'" <ross.zwisler@linux.intel.com>,
+        <linux-ext4@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-mm@kvack.org>,
+        <linux-block@vger.kernel.org>,
+        "'Naoya Horiguchi'" <n-horiguchi@ah.jp.nec.com>
+References: <20161129112304.90056-1-kirill.shutemov@linux.intel.com> <20161129112304.90056-23-kirill.shutemov@linux.intel.com> <017501d24aee$d9a189c0$8ce49d40$@alibaba-inc.com> <20161130131534.3k35cigsn36d7ku6@black.fi.intel.com>
+In-Reply-To: <20161130131534.3k35cigsn36d7ku6@black.fi.intel.com>
+Subject: Re: [PATCHv5 22/36] mm, hugetlb: switch hugetlbfs to multi-order radix-tree entries
+Date: Thu, 01 Dec 2016 11:10:52 +0800
+Message-ID: <018c01d24b80$86b85490$9428fdb0$@alibaba-inc.com>
+MIME-Version: 1.0
+Content-Type: text/plain;
+        charset="us-ascii"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Hi Michael,
+On Wednesday, November 30, 2016 9:16 PM Kirill A. Shutemov wrote:
+> On Wed, Nov 30, 2016 at 05:48:05PM +0800, Hillf Danton wrote:
+> > On Tuesday, November 29, 2016 7:23 PM Kirill A. Shutemov wrote:
+> > > @@ -607,10 +605,10 @@ static long hugetlbfs_fallocate(struct file *file, int mode, loff_t offset,
+> > >  		}
+> > >
+> > >  		/* Set numa allocation policy based on index */
+> > > -		hugetlb_set_vma_policy(&pseudo_vma, inode, index);
+> > > +		hugetlb_set_vma_policy(&pseudo_vma, inode, index >> huge_page_order(h));
+> > >
+> > >  		/* addr is the offset within the file (zero based) */
+> > > -		addr = index * hpage_size;
+> > > +		addr = index << PAGE_SHIFT & ~huge_page_mask(h);
+> > >
+> > >  		/* mutex taken here, fault path and hole punch */
+> > >  		hash = hugetlb_fault_mutex_hash(h, mm, &pseudo_vma, mapping,
+> >
+> > Seems we can't use index in computing hash as long as it isn't in huge page size.
+> 
+> Look at changes in hugetlb_fault_mutex_hash(): we shift the index right by
+> huge_page_order(), before calculating the hash. I don't see a problem
+> here.
+> 
+You are right. I missed that critical point.
 
-this series contains a couple cleanups for the virtio_pci interrupt
-handling code, including a switch to the new pci_irq_alloc_vectors
-helper, and support for automatic affinity by the PCI layer if the
-consumers ask for it.  It then converts over virtio_blk to use this
-functionality so that it's blk-mq queues are aligned to the MSI-X
-vector routing.  I have a similar patch in the queue for virtio-scsi,
-but that would require pulling in the SCSI tree, so I'm not sure if
-you'd like it for this window, but if you do I can send it in another
-series.  The third driver using per-CPU virtqueues is virtio_net,
-but that will take some more time as I haven't started work on the
-networking infrastructure yet.
+thanks
+Hillf
 
-Note that these patches require core IRQ changes from a stable
-branch in the tip tree to be pulled in first:
-
-	git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git irq/for-block
-
-Gitweb:
-
-	https://git.kernel.org/cgit/linux/kernel/git/tip/tip.git/log/?h=irq/for-block
