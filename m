@@ -1,163 +1,73 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f68.google.com ([74.125.83.68]:36356 "EHLO
-        mail-pg0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933133AbcL0QHq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Dec 2016 11:07:46 -0500
-From: Ming Lei <tom.leiming@gmail.com>
-To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        Ming Lei <tom.leiming@gmail.com>,
-        Mike Christie <mchristi@redhat.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Kent Overstreet <kent.overstreet@gmail.com>,
-        Chaitanya Kulkarni <chaitanya.kulkarni@hgst.com>,
-        Johannes Berg <johannes.berg@intel.com>
-Subject: [PATCH v1 16/54] block: introduce bio_for_each_segment_mp()
-Date: Tue, 27 Dec 2016 23:56:05 +0800
-Message-Id: <1482854250-13481-17-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1482854250-13481-1-git-send-email-tom.leiming@gmail.com>
-References: <1482854250-13481-1-git-send-email-tom.leiming@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] block: protect iterate_bdevs() against concurrent close
+To: Jan Kara <jack@suse.cz>
+References: <1480580308-15342-1-git-send-email-jack@suse.cz>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Wei Fang
+ <fangwei1@huawei.com>, linux-block@vger.kernel.org,
+ Christoph Hellwig <hch@infradead.org>, Rabin Vincent <rabinv@axis.com>,
+ stable@vger.kernel.org
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <7f9c4672-127e-efb6-a971-89ee7020c323@kernel.dk>
+Date: Thu, 1 Dec 2016 08:27:22 -0700
+MIME-Version: 1.0
+In-Reply-To: <1480580308-15342-1-git-send-email-jack@suse.cz>
+Content-Type: text/plain; charset=windows-1252
+List-ID: <linux-block@vger.kernel.org>
 
-This helper is used to iterate multipage bvec and it is
-required in bio_clone().
+On 12/01/2016 01:18 AM, Jan Kara wrote:
+> From: Rabin Vincent <rabinv@axis.com>
+> 
+> If a block device is closed while iterate_bdevs() is handling it, the
+> following NULL pointer dereference occurs because bdev->b_disk is NULL
+> in bdev_get_queue(), which is called from blk_get_backing_dev_info() (in
+> turn called by the mapping_cap_writeback_dirty() call in
+> __filemap_fdatawrite_range()):
+> 
+>  BUG: unable to handle kernel NULL pointer dereference at 0000000000000508
+>  IP: [<ffffffff81314790>] blk_get_backing_dev_info+0x10/0x20
+>  PGD 9e62067 PUD 9ee8067 PMD 0
+>  Oops: 0000 [#1] PREEMPT SMP DEBUG_PAGEALLOC
+>  Modules linked in:
+>  CPU: 1 PID: 2422 Comm: sync Not tainted 4.5.0-rc7+ #400
+>  Hardware name: QEMU Standard PC (i440FX + PIIX, 1996)
+>  task: ffff880009f4d700 ti: ffff880009f5c000 task.ti: ffff880009f5c000
+>  RIP: 0010:[<ffffffff81314790>]  [<ffffffff81314790>] blk_get_backing_dev_info+0x10/0x20
+>  RSP: 0018:ffff880009f5fe68  EFLAGS: 00010246
+>  RAX: 0000000000000000 RBX: ffff88000ec17a38 RCX: ffffffff81a4e940
+>  RDX: 7fffffffffffffff RSI: 0000000000000000 RDI: ffff88000ec176c0
+>  RBP: ffff880009f5fe68 R08: 0000000000000000 R09: 0000000000000000
+>  R10: 0000000000000001 R11: 0000000000000000 R12: ffff88000ec17860
+>  R13: ffffffff811b25c0 R14: ffff88000ec178e0 R15: ffff88000ec17a38
+>  FS:  00007faee505d700(0000) GS:ffff88000fb00000(0000) knlGS:0000000000000000
+>  CS:  0010 DS: 0000 ES: 0000 CR0: 000000008005003b
+>  CR2: 0000000000000508 CR3: 0000000009e8a000 CR4: 00000000000006e0
+>  Stack:
+>   ffff880009f5feb8 ffffffff8112e7f5 0000000000000000 7fffffffffffffff
+>   0000000000000000 0000000000000000 7fffffffffffffff 0000000000000001
+>   ffff88000ec178e0 ffff88000ec17860 ffff880009f5fec8 ffffffff8112e81f
+>  Call Trace:
+>   [<ffffffff8112e7f5>] __filemap_fdatawrite_range+0x85/0x90
+>   [<ffffffff8112e81f>] filemap_fdatawrite+0x1f/0x30
+>   [<ffffffff811b25d6>] fdatawrite_one_bdev+0x16/0x20
+>   [<ffffffff811bc402>] iterate_bdevs+0xf2/0x130
+>   [<ffffffff811b2763>] sys_sync+0x63/0x90
+>   [<ffffffff815d4272>] entry_SYSCALL_64_fastpath+0x12/0x76
+>  Code: 0f 1f 44 00 00 48 8b 87 f0 00 00 00 55 48 89 e5 <48> 8b 80 08 05 00 00 5d
+>  RIP  [<ffffffff81314790>] blk_get_backing_dev_info+0x10/0x20
+>   RSP <ffff880009f5fe68>
+>  CR2: 0000000000000508
+>  ---[ end trace 2487336ceb3de62d ]---
+> 
+> The crash is easily reproducible by running the following command, if an
+> msleep(100) is inserted before the call to func() in iterate_devs():
+> 
+>  while :; do head -c1 /dev/nullb0; done > /dev/null & while :; do sync; done
+> 
+> Fix it by holding the bd_mutex across the func() call and only calling
+> func() if the bdev is opened.
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
----
- include/linux/bio.h  | 39 ++++++++++++++++++++++++++++++++++-----
- include/linux/bvec.h | 37 ++++++++++++++++++++++++++++++++-----
- 2 files changed, 66 insertions(+), 10 deletions(-)
+I've added this to the 4.10 branch since it's a bit late in the cycle,
+and the regression is really old.
 
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 714fbf495af7..2bd4e6f2087a 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -68,6 +68,9 @@
- #define bio_data_dir(bio) \
- 	(op_is_write(bio_op(bio)) ? WRITE : READ)
- 
-+#define bio_iter_iovec_mp(bio, iter)				\
-+	bvec_iter_bvec_mp((bio)->bi_io_vec, (iter))
-+
- /*
-  * Check whether this bio carries any data or not. A NULL bio is allowed.
-  */
-@@ -164,15 +167,31 @@ static inline void *bio_data(struct bio *bio)
- #define bio_for_each_segment_all(bvl, bio, i)				\
- 	for (i = 0, bvl = (bio)->bi_io_vec; i < (bio)->bi_vcnt; i++, bvl++)
- 
--static inline void bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
--				    unsigned bytes)
-+static inline void __bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
-+				      unsigned bytes, bool mp)
- {
- 	iter->bi_sector += bytes >> 9;
- 
--	if (bio_no_advance_iter(bio))
-+	if (bio_no_advance_iter(bio)) {
- 		iter->bi_size -= bytes;
--	else
--		bvec_iter_advance(bio->bi_io_vec, iter, bytes);
-+	} else {
-+		if (!mp)
-+			bvec_iter_advance(bio->bi_io_vec, iter, bytes);
-+		else
-+			bvec_iter_advance_mp(bio->bi_io_vec, iter, bytes);
-+	}
-+}
-+
-+static inline void bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
-+				    unsigned bytes)
-+{
-+	__bio_advance_iter(bio, iter, bytes, false);
-+}
-+
-+static inline void bio_advance_iter_mp(struct bio *bio, struct bvec_iter *iter,
-+				       unsigned bytes)
-+{
-+	__bio_advance_iter(bio, iter, bytes, true);
- }
- 
- #define __bio_for_each_segment(bvl, bio, iter, start)			\
-@@ -188,6 +207,16 @@ static inline void bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
- #define bio_for_each_segment(bvl, bio, iter)				\
- 	__bio_for_each_segment(bvl, bio, iter, (bio)->bi_iter)
- 
-+#define __bio_for_each_segment_mp(bvl, bio, iter, start)		\
-+	for (iter = (start);						\
-+	     (iter).bi_size &&						\
-+		((bvl = bio_iter_iovec_mp((bio), (iter))), 1);		\
-+	     bio_advance_iter_mp((bio), &(iter), (bvl).bv_len))
-+
-+/* returns one real segment(multipage bvec) each time */
-+#define bio_for_each_segment_mp(bvl, bio, iter)				\
-+	__bio_for_each_segment_mp(bvl, bio, iter, (bio)->bi_iter)
-+
- #define bio_iter_last(bvec, iter) ((iter).bi_size == (bvec).bv_len)
- 
- static inline unsigned bio_segments(struct bio *bio)
-diff --git a/include/linux/bvec.h b/include/linux/bvec.h
-index d77c3cabce8c..f8a8b293cd32 100644
---- a/include/linux/bvec.h
-+++ b/include/linux/bvec.h
-@@ -128,16 +128,29 @@ struct bvec_iter {
- 	.bv_offset	= bvec_iter_offset((bvec), (iter)),	\
- })
- 
--static inline void bvec_iter_advance(const struct bio_vec *bv,
--				     struct bvec_iter *iter,
--				     unsigned bytes)
-+#define bvec_iter_bvec_mp(bvec, iter)				\
-+((struct bio_vec) {						\
-+	.bv_page	= bvec_iter_page_mp((bvec), (iter)),	\
-+	.bv_len		= bvec_iter_len_mp((bvec), (iter)),	\
-+	.bv_offset	= bvec_iter_offset_mp((bvec), (iter)),	\
-+})
-+
-+static inline void __bvec_iter_advance(const struct bio_vec *bv,
-+				       struct bvec_iter *iter,
-+				       unsigned bytes, bool mp)
- {
- 	WARN_ONCE(bytes > iter->bi_size,
- 		  "Attempted to advance past end of bvec iter\n");
- 
- 	while (bytes) {
--		unsigned iter_len = bvec_iter_len(bv, *iter);
--		unsigned len = min(bytes, iter_len);
-+		unsigned len;
-+
-+		if (mp)
-+			len = bvec_iter_len_mp(bv, *iter);
-+		else
-+			len = bvec_iter_len_sp(bv, *iter);
-+
-+		len = min(bytes, len);
- 
- 		bytes -= len;
- 		iter->bi_size -= len;
-@@ -150,6 +163,20 @@ static inline void bvec_iter_advance(const struct bio_vec *bv,
- 	}
- }
- 
-+static inline void bvec_iter_advance(const struct bio_vec *bv,
-+				     struct bvec_iter *iter,
-+				     unsigned bytes)
-+{
-+	__bvec_iter_advance(bv, iter, bytes, false);
-+}
-+
-+static inline void bvec_iter_advance_mp(const struct bio_vec *bv,
-+					struct bvec_iter *iter,
-+					unsigned bytes)
-+{
-+	__bvec_iter_advance(bv, iter, bytes, true);
-+}
-+
- #define for_each_bvec(bvl, bio_vec, iter, start)			\
- 	for (iter = (start);						\
- 	     (iter).bi_size &&						\
 -- 
-2.7.4
-
+Jens Axboe
