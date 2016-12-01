@@ -1,22 +1,25 @@
-Subject: Re: [PATCH V2 1/5] block: add async variant of blkdev_issue_zeroout
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([198.137.202.9]:48743 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754686AbcLAKAV (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Dec 2016 05:00:21 -0500
+Date: Thu, 1 Dec 2016 02:00:19 -0800
+From: Christoph Hellwig <hch@infradead.org>
 To: Chaitanya Kulkarni <chaitanya.kulkarni@hgst.com>
+Cc: axboe@fb.com, keith.busch@intel.com, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org, martin.petersen@oracle.com
+Subject: Re: [PATCH V2 1/5] block: add async variant of blkdev_issue_zeroout
+Message-ID: <20161201100019.GA8791@infradead.org>
 References: <1480537742-15190-1-git-send-email-chaitanya.kulkarni@hgst.com>
-Cc: martin.petersen@oracle.com, keith.busch@intel.com,
- linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
-From: Jens Axboe <axboe@fb.com>
-Message-ID: <5b985e6b-2904-9899-3b16-32747434b901@fb.com>
-Date: Thu, 1 Dec 2016 07:59:37 -0700
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <1480537742-15190-1-git-send-email-chaitanya.kulkarni@hgst.com>
-Content-Type: text/plain; charset=windows-1252
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On 11/30/2016 01:28 PM, Chaitanya Kulkarni wrote:
-> Similar to __blkdev_issue_discard this variant allows submitting
-> the final bio asynchronously and chaining multiple ranges
-> into a single completion.
+Looks good,
 
-Applied this, and the other 4, for 4.10. Thanks.
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 
--- 
-Jens Axboe
+[although normally a cover letter for the series would be nice, like
+the last time around]
