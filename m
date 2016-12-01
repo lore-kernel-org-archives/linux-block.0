@@ -1,80 +1,140 @@
-Return-Path: <BATV+c11f2a9076c546b906d6+4834+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: mst@redhat.com
-Cc: axboe@kernel.dk,
-	virtualization@lists.linux-foundation.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 11/11] virtio_blk: use virtio IRQ affinity
-Date: Thu, 17 Nov 2016 11:43:23 +0100
-Message-Id: <1479379403-27880-12-git-send-email-hch@lst.de>
-In-Reply-To: <1479379403-27880-1-git-send-email-hch@lst.de>
-References: <1479379403-27880-1-git-send-email-hch@lst.de>
+Return-Path: <hare@suse.de>
+Subject: Re: [PATCH v3] block: Check partition alignment on zoned block
+ devices
+To: Damien Le Moal <damien.lemoal@wdc.com>, Jens Axboe <axboe@kernel.dk>
+References: <1480573523-30381-1-git-send-email-damien.lemoal@wdc.com>
+Cc: linux-block@vger.kernel.org, Shaun Tancheff <shaun@tancheff.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <0bea3cc0-f30e-3625-27d4-a39fee03a781@suse.de>
+Date: Thu, 1 Dec 2016 07:50:51 +0100
+MIME-Version: 1.0
+In-Reply-To: <1480573523-30381-1-git-send-email-damien.lemoal@wdc.com>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-block@vger.kernel.org>
 
-Use automatic IRQ affinity assignment in the virtio layer if available,
-and build the blk-mq queues based on it.
+On 12/01/2016 07:25 AM, Damien Le Moal wrote:
+> Both blkdev_report_zones and blkdev_reset_zones can operate on a partition of
+> a zoned block device. However, the first and last zones reported for a
+> partition make sense only if the partition start sector and size are aligned
+> on the device zone size. The same applies for zone reset. Resetting the first
+> or the last zone of a partition straddling zones may impact neighboring
+> partitions. Finally, if a partition start sector is not at the beginning of a
+> sequential zone, it will be impossible to write to the first sectors of the
+> partition on a host-managed device.
+> Avoid all these problems and incoherencies by ignoring partitions that are not
+> zone aligned.
+> 
+> Note: If CONFIG_BLK_DEV_ZONED is disabled, bdev_is_zoned() will still report
+> the correct disk zoning type (host-aware, host-managed or none) but
+> bdev_zone_size() will always return 0 for zoned block devices (i.e. the zone
+> size is unknown). So test this as a way to ensure that a zoned block device is
+> being handled as such. As a result, for a host-aware devices, unaligned zone
+> partitions will be accepted with CONFIG_BLK_DEV_ZONED disabled. That is, the
+> disk will be treated as a regular block device (as it should). If zoned block
+> device support is enabled, only aligned partitions will be accepted.
+> 
+> Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+> ---
+>  block/partition-generic.c | 66 +++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 66 insertions(+)
+> 
+> diff --git a/block/partition-generic.c b/block/partition-generic.c
+> index 71d9ed9..a60ac7f 100644
+> --- a/block/partition-generic.c
+> +++ b/block/partition-generic.c
+> @@ -430,6 +430,57 @@ static int drop_partitions(struct gendisk *disk, struct block_device *bdev)
+>  	return 0;
+>  }
+>  
+> +static bool part_zone_aligned(struct gendisk *disk,
+> +			      struct block_device *bdev,
+> +			      sector_t from, sector_t size)
+> +{
+> +	unsigned int zone_size = bdev_zone_size(bdev);
+> +
+> +	/*
+> +	 * If this function is called, then the disk is a zoned block device
+> +	 * (host-aware or host-managed). This can be detected even if the
+> +	 * zoned block device support is disabled (CONFIG_BLK_DEV_ZONED not
+> +	 * set). In this case, however, only host-aware devices will be seen
+> +	 * as a block device is not created for host-managed devices. Without
+> +	 * zoned block device support, host-aware drives can still be used as
+> +	 * regular block devices (no zone operation) and their zone size will
+> +	 * be reported as 0. Allow this case.
+> +	 */
+> +	if (!zone_size)
+> +		return true;
+> +
+> +	/*
+> +	 * Check partition start and size alignement. If the drive has a
+> +	 * smaller last runt zone, ignore it and allow the partition to
+> +	 * use it. Check the zone size too: it should be a power of 2 number
+> +	 * of sectors.
+> +	 */
+> +	WARN_ON_ONCE(!is_power_of_2(zone_size));
+> +	if (!is_power_of_2(zone_size)) {
+Can be merged into 'if (WARN_ON_ONCE(! ...'
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/block/virtio_blk.c | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+> +		u32 rem;
+> +
+> +		div_u64_rem(from, zone_size, &rem);
+> +		if (rem)
+> +			return false;
+> +		if ((from + size) < get_capacity(disk)) {
+> +			div_u64_rem(size, zone_size, &rem);
+> +			if (rem)
+> +				return false;
+> +		}
+> +
+> +	} else {
+> +
+> +		if (from & (zone_size - 1))
+> +			return false;
+> +		if ((from + size) < get_capacity(disk) &&
+> +		    (size & (zone_size - 1)))
+> +			return false;
+> +
+> +	}
+> +
+> +	return true;
+> +}
+> +
+>  int rescan_partitions(struct gendisk *disk, struct block_device *bdev)
+>  {
+>  	struct parsed_partitions *state = NULL;
+> @@ -529,6 +580,21 @@ int rescan_partitions(struct gendisk *disk, struct block_device *bdev)
+>  			}
+>  		}
+>  
+> +		/*
+> +		 * On a zoned block device, partitions should be aligned on the
+> +		 * device zone size (i.e. zone boundary crossing not allowed).
+> +		 * Otherwise, resetting the write pointer of the last zone of
+> +		 * one partition may impact the following partition.
+> +		 */
+> +		if (bdev_is_zoned(bdev) &&
+> +		    !part_zone_aligned(disk, bdev, from, size)) {
+> +			printk(KERN_WARNING
+> +			       "%s: p%d start %llu+%llu is not zone aligned\n",
+> +			       disk->disk_name, p, (unsigned long long) from,
+> +			       (unsigned long long) size);
+> +			continue;
+> +		}
+> +
+>  		part = add_partition(disk, p, from, size,
+>  				     state->parts[p].flags,
+>  				     &state->parts[p].info);
+> 
+Otherwise looks good.
 
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index 689e790..7982090 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -5,6 +5,7 @@
- #include <linux/hdreg.h>
- #include <linux/module.h>
- #include <linux/mutex.h>
-+#include <linux/interrupt.h>
- #include <linux/virtio.h>
- #include <linux/virtio_blk.h>
- #include <linux/scatterlist.h>
-@@ -12,6 +13,7 @@
- #include <scsi/scsi_cmnd.h>
- #include <linux/idr.h>
- #include <linux/blk-mq.h>
-+#include <linux/blk-mq-virtio.h>
- #include <linux/numa.h>
- 
- #define PART_BITS 4
-@@ -383,6 +385,7 @@ static int init_vq(struct virtio_blk *vblk)
- 	struct virtqueue **vqs;
- 	unsigned short num_vqs;
- 	struct virtio_device *vdev = vblk->vdev;
-+	struct irq_affinity desc = { 0, };
- 
- 	err = virtio_cread_feature(vdev, VIRTIO_BLK_F_MQ,
- 				   struct virtio_blk_config, num_queues,
-@@ -410,7 +413,7 @@ static int init_vq(struct virtio_blk *vblk)
- 
- 	/* Discover virtqueues and write information to configuration.  */
- 	err = vdev->config->find_vqs(vdev, num_vqs, vqs, callbacks, names,
--			NULL);
-+			&desc);
- 	if (err)
- 		goto out;
- 
-@@ -541,10 +544,18 @@ static int virtblk_init_request(void *data, struct request *rq,
- 	return 0;
- }
- 
-+static int virtblk_map_queues(struct blk_mq_tag_set *set)
-+{
-+	struct virtio_blk *vblk = set->driver_data;
-+
-+	return blk_mq_virtio_map_queues(set, vblk->vdev, 0);
-+}
-+
- static struct blk_mq_ops virtio_mq_ops = {
- 	.queue_rq	= virtio_queue_rq,
- 	.complete	= virtblk_request_done,
- 	.init_request	= virtblk_init_request,
-+	.map_queues	= virtblk_map_queues,
- };
- 
- static unsigned int virtblk_queue_depth;
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+
+Cheers,
+
+Hannes
 -- 
-2.1.4
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: F. Imend�rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG N�rnberg)
