@@ -1,181 +1,29 @@
-Return-Path: <prvs=11505706e0=axboe@fb.com>
-From: Jens Axboe <axboe@fb.com>
-To: <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-CC: <paolo.valente@linaro.org>, <osandov@fb.com>, Jens Axboe <axboe@fb.com>
-Subject: [PATCH 2/7] blk-mq: abstract out blk_mq_dispatch_rq_list() helper
-Date: Thu, 8 Dec 2016 13:13:20 -0700
-Message-ID: <1481228005-9245-3-git-send-email-axboe@fb.com>
-In-Reply-To: <1481228005-9245-1-git-send-email-axboe@fb.com>
-References: <1481228005-9245-1-git-send-email-axboe@fb.com>
+Return-Path: <m.mizuma@jp.fujitsu.com>
+Message-ID: <5840C25A.9070601@jp.fujitsu.com>
+Date: Fri, 2 Dec 2016 09:37:46 +0900
+From: Masayoshi Mizuma <m.mizuma@jp.fujitsu.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>
+Subject: Re: [PATCH] block: avoid incorrect bdi_unregiter call in blk_cleanup_queue
+References: <583FE310.7040607@jp.fujitsu.com> <d89155e1-4b52-b0a4-9db2-978e8c62cbfd@kernel.dk>
+In-Reply-To: <d89155e1-4b52-b0a4-9db2-978e8c62cbfd@kernel.dk>
+Content-Type: text/plain; charset="iso-2022-jp"
 List-ID: <linux-block@vger.kernel.org>
 
-Takes a list of requests, and dispatches it. Moves any residual
-requests to the dispatch list.
+Hi Jens,
 
-Signed-off-by: Jens Axboe <axboe@fb.com>
----
- block/blk-mq.c | 85 ++++++++++++++++++++++++++++++++--------------------------
- block/blk-mq.h |  1 +
- 2 files changed, 48 insertions(+), 38 deletions(-)
+On Thu, 1 Dec 2016 08:04:33 -0700 Jens Axboe wrote:
+> On 12/01/2016 01:45 AM, Masayoshi Mizuma wrote:
+>> blk_cleanup_queue() should call bdi_unregister() only if WB_registered
+>> is set to bdi->wb.state. Because, blk_cleanup_queue() may be called
+>> before bdi_register() is called, for example, error path.
+> 
+> Should this logic be in bdi_unregister() instead?
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index b216746be9d3..abbf7cca4d0d 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -821,41 +821,13 @@ static inline unsigned int queued_to_index(unsigned int queued)
- 	return min(BLK_MQ_MAX_DISPATCH_ORDER - 1, ilog2(queued) + 1);
- }
- 
--/*
-- * Run this hardware queue, pulling any software queues mapped to it in.
-- * Note that this function currently has various problems around ordering
-- * of IO. In particular, we'd like FIFO behaviour on handling existing
-- * items on the hctx->dispatch list. Ignore that for now.
-- */
--static void blk_mq_process_rq_list(struct blk_mq_hw_ctx *hctx)
-+bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list)
- {
- 	struct request_queue *q = hctx->queue;
- 	struct request *rq;
--	LIST_HEAD(rq_list);
- 	LIST_HEAD(driver_list);
- 	struct list_head *dptr;
--	int queued;
--
--	if (unlikely(blk_mq_hctx_stopped(hctx)))
--		return;
--
--	hctx->run++;
--
--	/*
--	 * Touch any software queue that has pending entries.
--	 */
--	flush_busy_ctxs(hctx, &rq_list);
--
--	/*
--	 * If we have previous entries on our dispatch list, grab them
--	 * and stuff them at the front for more fair dispatch.
--	 */
--	if (!list_empty_careful(&hctx->dispatch)) {
--		spin_lock(&hctx->lock);
--		if (!list_empty(&hctx->dispatch))
--			list_splice_init(&hctx->dispatch, &rq_list);
--		spin_unlock(&hctx->lock);
--	}
-+	int queued, ret = BLK_MQ_RQ_QUEUE_OK;
- 
- 	/*
- 	 * Start off with dptr being NULL, so we start the first request
-@@ -867,16 +839,15 @@ static void blk_mq_process_rq_list(struct blk_mq_hw_ctx *hctx)
- 	 * Now process all the entries, sending them to the driver.
- 	 */
- 	queued = 0;
--	while (!list_empty(&rq_list)) {
-+	while (!list_empty(list)) {
- 		struct blk_mq_queue_data bd;
--		int ret;
- 
--		rq = list_first_entry(&rq_list, struct request, queuelist);
-+		rq = list_first_entry(list, struct request, queuelist);
- 		list_del_init(&rq->queuelist);
- 
- 		bd.rq = rq;
- 		bd.list = dptr;
--		bd.last = list_empty(&rq_list);
-+		bd.last = list_empty(list);
- 
- 		ret = q->mq_ops->queue_rq(hctx, &bd);
- 		switch (ret) {
-@@ -884,7 +855,7 @@ static void blk_mq_process_rq_list(struct blk_mq_hw_ctx *hctx)
- 			queued++;
- 			break;
- 		case BLK_MQ_RQ_QUEUE_BUSY:
--			list_add(&rq->queuelist, &rq_list);
-+			list_add(&rq->queuelist, list);
- 			__blk_mq_requeue_request(rq);
- 			break;
- 		default:
-@@ -902,7 +873,7 @@ static void blk_mq_process_rq_list(struct blk_mq_hw_ctx *hctx)
- 		 * We've done the first request. If we have more than 1
- 		 * left in the list, set dptr to defer issue.
- 		 */
--		if (!dptr && rq_list.next != rq_list.prev)
-+		if (!dptr && list->next != list->prev)
- 			dptr = &driver_list;
- 	}
- 
-@@ -912,10 +883,11 @@ static void blk_mq_process_rq_list(struct blk_mq_hw_ctx *hctx)
- 	 * Any items that need requeuing? Stuff them into hctx->dispatch,
- 	 * that is where we will continue on next queue run.
- 	 */
--	if (!list_empty(&rq_list)) {
-+	if (!list_empty(list)) {
- 		spin_lock(&hctx->lock);
--		list_splice(&rq_list, &hctx->dispatch);
-+		list_splice(list, &hctx->dispatch);
- 		spin_unlock(&hctx->lock);
-+
- 		/*
- 		 * the queue is expected stopped with BLK_MQ_RQ_QUEUE_BUSY, but
- 		 * it's possible the queue is stopped and restarted again
-@@ -927,6 +899,43 @@ static void blk_mq_process_rq_list(struct blk_mq_hw_ctx *hctx)
- 		 **/
- 		blk_mq_run_hw_queue(hctx, true);
- 	}
-+
-+	return ret != BLK_MQ_RQ_QUEUE_BUSY;
-+}
-+
-+/*
-+ * Run this hardware queue, pulling any software queues mapped to it in.
-+ * Note that this function currently has various problems around ordering
-+ * of IO. In particular, we'd like FIFO behaviour on handling existing
-+ * items on the hctx->dispatch list. Ignore that for now.
-+ */
-+static void blk_mq_process_rq_list(struct blk_mq_hw_ctx *hctx)
-+{
-+	LIST_HEAD(rq_list);
-+	LIST_HEAD(driver_list);
-+
-+	if (unlikely(blk_mq_hctx_stopped(hctx)))
-+		return;
-+
-+	hctx->run++;
-+
-+	/*
-+	 * Touch any software queue that has pending entries.
-+	 */
-+	flush_busy_ctxs(hctx, &rq_list);
-+
-+	/*
-+	 * If we have previous entries on our dispatch list, grab them
-+	 * and stuff them at the front for more fair dispatch.
-+	 */
-+	if (!list_empty_careful(&hctx->dispatch)) {
-+		spin_lock(&hctx->lock);
-+		if (!list_empty(&hctx->dispatch))
-+			list_splice_init(&hctx->dispatch, &rq_list);
-+		spin_unlock(&hctx->lock);
-+	}
-+
-+	blk_mq_dispatch_rq_list(hctx, &rq_list);
- }
- 
- static void __blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx)
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index b444370ae05b..3a54dd32a6fc 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -31,6 +31,7 @@ void blk_mq_freeze_queue(struct request_queue *q);
- void blk_mq_free_queue(struct request_queue *q);
- int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr);
- void blk_mq_wake_waiters(struct request_queue *q);
-+bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *, struct list_head *);
- 
- /*
-  * CPU hotplug helpers
--- 
-2.7.4
+Thank you for pointed it out! I think your suggestion is better.
+I will rewrite the patch.
+
+- Masayoshi Mizuma
+
+> 
