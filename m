@@ -1,48 +1,62 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f66.google.com ([74.125.83.66]:36446 "EHLO
-        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755672AbcL0QB3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Dec 2016 11:01:29 -0500
-From: Ming Lei <tom.leiming@gmail.com>
-To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        Ming Lei <tom.leiming@gmail.com>,
-        Johannes Berg <johannes.berg@intel.com>
-Subject: [PATCH v1 18/54] bvec_iter: introduce BVEC_ITER_ALL_INIT
-Date: Tue, 27 Dec 2016 23:56:07 +0800
-Message-Id: <1482854250-13481-19-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1482854250-13481-1-git-send-email-tom.leiming@gmail.com>
-References: <1482854250-13481-1-git-send-email-tom.leiming@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: blk-mq: preparation of the ground for BFQ inclusion
+To: Paolo Valente <paolo.valente@linaro.org>
+References: <347F26BB-2D0A-4DBE-9FC5-BA6C05AE02B2@linaro.org>
+ <1b5b6b66-1561-0bf2-f543-15342b00e90f@kernel.dk>
+ <4c23fa60-9ea4-8040-0a06-7f4c1baf3537@kernel.dk>
+ <e2d7dff1-06fa-c510-4897-5c828c05c26b@kernel.dk>
+ <308A0D96-4A0D-4751-AE6F-005A418DC899@linaro.org>
+Cc: Linus Walleij <linus.walleij@linaro.org>, Mark Brown
+ <broonie@kernel.org>, Ulf Hansson <ulf.hansson@linaro.org>,
+ Omar Sandoval <osandov@osandov.com>, Jan Kara <jack@suse.cz>,
+ Bart Van Assche <bart.vanassche@sandisk.com>, linux-block@vger.kernel.org,
+ Christoph Hellwig <hch@lst.de>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <51c22709-44fb-8eaf-f350-56b21c9e9c0a@kernel.dk>
+Date: Fri, 2 Dec 2016 07:38:43 -0700
+MIME-Version: 1.0
+In-Reply-To: <308A0D96-4A0D-4751-AE6F-005A418DC899@linaro.org>
+Content-Type: text/plain; charset=windows-1252
+List-ID: <linux-block@vger.kernel.org>
 
-Introduce BVEC_ITER_ALL_INIT for iterating one bio
-from start to end.
+On 12/02/2016 12:38 AM, Paolo Valente wrote:
+> 
+>> Il giorno 02 dic 2016, alle ore 01:27, Jens Axboe <axboe@kernel.dk> ha scritto:
+>>
+>> On 12/01/2016 02:03 PM, Jens Axboe wrote:
+>>> On 11/14/2016 03:42 PM, Jens Axboe wrote:
+>>>> On 11/14/2016 03:13 PM, Paolo Valente wrote:
+>>>>> Hi Jens,
+>>>>> have you had time to look into the first extensions/changes required?
+>>>>> Any time plan?
+>>>>
+>>>> I was busy last week on the writeback and on the polling. I should have
+>>>> something end this week.
+>>>
+>>> It's coming together, running some testing and fixing some issues. But I
+>>> now have unmodified legacy IO schedulers running under blk-mq, for
+>>> single queue devices. Scheduler queue depth is independent of the device
+>>> queue depth.
+>>
+>> Here is the branch, btw:
+>>
+>> http://git.kernel.dk/cgit/linux-block/log/?h=for-4.11/blk-mq-legacy-sched
+>>
+>> if you want to look at it or test it. It's not in a clean state, I
+>> wanted to get this reasonably working before cleaning it up. Should be
+>> ready for testing, I've successfully run various IO tests on deadline
+>> and CFQ with null_blk loaded with queue_mode=2 submit_queues=1
+>> use_sched=1.
+>>
+> 
+> Good news!
+> 
+> I'm familiarizing with your patch.  To avoid useless, too-early report,
+> tell me if/when I can start doing some test too.
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
----
- include/linux/bvec.h | 9 +++++++++
- 1 file changed, 9 insertions(+)
+Hopefully after today, trying to shake out a bug related to non file
+system requests that's making SCSI probing broken. Once that's fixed up,
+stability should be fine for testing.
 
-diff --git a/include/linux/bvec.h b/include/linux/bvec.h
-index f8a8b293cd32..5c51c58fe202 100644
---- a/include/linux/bvec.h
-+++ b/include/linux/bvec.h
-@@ -183,4 +183,13 @@ static inline void bvec_iter_advance_mp(const struct bio_vec *bv,
- 		((bvl = bvec_iter_bvec((bio_vec), (iter))), 1);	\
- 	     bvec_iter_advance((bio_vec), &(iter), (bvl).bv_len))
- 
-+/* for iterating one bio from start to end */
-+#define BVEC_ITER_ALL_INIT (struct bvec_iter)				\
-+{									\
-+	.bi_sector	= 0,						\
-+	.bi_size	= UINT_MAX,					\
-+	.bi_idx		= 0,						\
-+	.bi_bvec_done	= 0,						\
-+}
-+
- #endif /* __LINUX_BVEC_ITER_H */
 -- 
-2.7.4
-
+Jens Axboe
