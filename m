@@ -1,46 +1,110 @@
-Return-Path: <jthumshirn@suse.de>
-Date: Mon, 5 Dec 2016 10:01:05 +0100
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Jens Axboe <axboe@fb.com>
-Cc: axboe@kernel.dk, linux-block@vger.kernel.org, paolo.valente@linaro.org
-Subject: Re: [PATCH 3/7] block: use appropriate queue running functions
-Message-ID: <20161205090105.GB8481@linux-x5ow.site>
+Return-Path: <prvs=11458901a0=axboe@fb.com>
+From: Jens Axboe <axboe@fb.com>
+To: <axboe@kernel.dk>, <linux-block@vger.kernel.org>
+CC: <paolo.valente@linaro.org>, Jens Axboe <axboe@fb.com>
+Subject: [PATCH 3/7] block: use appropriate queue running functions
+Date: Fri, 2 Dec 2016 20:15:17 -0700
+Message-ID: <1480734921-23701-4-git-send-email-axboe@fb.com>
+In-Reply-To: <1480734921-23701-1-git-send-email-axboe@fb.com>
 References: <1480734921-23701-1-git-send-email-axboe@fb.com>
- <1480734921-23701-4-git-send-email-axboe@fb.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1480734921-23701-4-git-send-email-axboe@fb.com>
+Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-On Fri, Dec 02, 2016 at 08:15:17PM -0700, Jens Axboe wrote:
-> Use MQ variants for MQ, legacy ones for legacy.
-> 
-> Signed-off-by: Jens Axboe <axboe@fb.com>
-> ---
->  block/blk-core.c  |  5 ++++-
->  block/blk-exec.c  | 10 ++++++++--
->  block/blk-flush.c | 14 ++++++++++----
->  block/elevator.c  |  5 ++++-
->  4 files changed, 26 insertions(+), 8 deletions(-)
-> 
-> diff --git a/block/blk-core.c b/block/blk-core.c
-> index 0e23589ab3bf..3591f5419509 100644
-> --- a/block/blk-core.c
-> +++ b/block/blk-core.c
-> @@ -340,7 +340,10 @@ void __blk_run_queue(struct request_queue *q)
->  	if (unlikely(blk_queue_stopped(q)))
->  		return;
->  
-> -	__blk_run_queue_uncond(q);
+Use MQ variants for MQ, legacy ones for legacy.
 
-I don't quite get the WARN_ON_ONCE() is it for debug purposes? And similarly
-blk_use_mq_path() + the other occurences below as well?
+Signed-off-by: Jens Axboe <axboe@fb.com>
+---
+ block/blk-core.c  |  5 ++++-
+ block/blk-exec.c  | 10 ++++++++--
+ block/blk-flush.c | 14 ++++++++++----
+ block/elevator.c  |  5 ++++-
+ 4 files changed, 26 insertions(+), 8 deletions(-)
 
-
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 0e23589ab3bf..3591f5419509 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -340,7 +340,10 @@ void __blk_run_queue(struct request_queue *q)
+ 	if (unlikely(blk_queue_stopped(q)))
+ 		return;
+ 
+-	__blk_run_queue_uncond(q);
++	if (WARN_ON_ONCE(q->mq_ops))
++		blk_mq_run_hw_queues(q, true);
++	else
++		__blk_run_queue_uncond(q);
+ }
+ EXPORT_SYMBOL(__blk_run_queue);
+ 
+diff --git a/block/blk-exec.c b/block/blk-exec.c
+index 73b8a701ae6d..27e4d82564ed 100644
+--- a/block/blk-exec.c
++++ b/block/blk-exec.c
+@@ -80,8 +80,14 @@ void blk_execute_rq_nowait(struct request_queue *q, struct gendisk *bd_disk,
+ 	}
+ 
+ 	__elv_add_request(q, rq, where);
+-	__blk_run_queue(q);
+-	spin_unlock_irq(q->queue_lock);
++
++	if (q->mq_ops) {
++		spin_unlock_irq(q->queue_lock);
++		blk_mq_run_hw_queues(q, false);
++	} else {
++		__blk_run_queue(q);
++		spin_unlock_irq(q->queue_lock);
++	}
+ }
+ EXPORT_SYMBOL_GPL(blk_execute_rq_nowait);
+ 
+diff --git a/block/blk-flush.c b/block/blk-flush.c
+index 0b68a1258bdd..620d69909b8d 100644
+--- a/block/blk-flush.c
++++ b/block/blk-flush.c
+@@ -265,8 +265,10 @@ static void flush_end_io(struct request *flush_rq, int error)
+ 	 * kblockd.
+ 	 */
+ 	if (queued || fq->flush_queue_delayed) {
+-		WARN_ON(q->mq_ops);
+-		blk_run_queue_async(q);
++		if (q->mq_ops)
++			blk_mq_run_hw_queues(q, true);
++		else
++			blk_run_queue_async(q);
+ 	}
+ 	fq->flush_queue_delayed = 0;
+ 	if (blk_use_mq_path(q))
+@@ -346,8 +348,12 @@ static void flush_data_end_io(struct request *rq, int error)
+ 	 * After populating an empty queue, kick it to avoid stall.  Read
+ 	 * the comment in flush_end_io().
+ 	 */
+-	if (blk_flush_complete_seq(rq, fq, REQ_FSEQ_DATA, error))
+-		blk_run_queue_async(q);
++	if (blk_flush_complete_seq(rq, fq, REQ_FSEQ_DATA, error)) {
++		if (q->mq_ops)
++			blk_mq_run_hw_queues(q, true);
++		else
++			blk_run_queue_async(q);
++	}
+ }
+ 
+ static void mq_flush_data_end_io(struct request *rq, int error)
+diff --git a/block/elevator.c b/block/elevator.c
+index a18a5db274e4..11d2cfee2bc1 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -627,7 +627,10 @@ void __elv_add_request(struct request_queue *q, struct request *rq, int where)
+ 		 *   with anything.  There's no point in delaying queue
+ 		 *   processing.
+ 		 */
+-		__blk_run_queue(q);
++		if (q->mq_ops)
++			blk_mq_run_hw_queues(q, true);
++		else
++			__blk_run_queue(q);
+ 		break;
+ 
+ 	case ELEVATOR_INSERT_SORT_MERGE:
 -- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: Felix Imend�rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N�rnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+2.7.4
