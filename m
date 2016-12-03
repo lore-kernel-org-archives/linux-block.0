@@ -1,74 +1,59 @@
-Return-Path: <prvs=11505706e0=axboe@fb.com>
+Return-Path: <prvs=11458901a0=axboe@fb.com>
 From: Jens Axboe <axboe@fb.com>
-To: <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-CC: <paolo.valente@linaro.org>, <osandov@fb.com>, Jens Axboe <axboe@fb.com>
-Subject: [PATCH 3/7] elevator: make the rqhash helpers exported
-Date: Thu, 8 Dec 2016 13:13:21 -0700
-Message-ID: <1481228005-9245-4-git-send-email-axboe@fb.com>
-In-Reply-To: <1481228005-9245-1-git-send-email-axboe@fb.com>
-References: <1481228005-9245-1-git-send-email-axboe@fb.com>
+To: <axboe@kernel.dk>, <linux-block@vger.kernel.org>
+CC: <paolo.valente@linaro.org>, Jens Axboe <axboe@fb.com>
+Subject: [PATCH 7/7] null_blk: add parameters to ask for mq-sched and write cache
+Date: Fri, 2 Dec 2016 20:15:21 -0700
+Message-ID: <1480734921-23701-8-git-send-email-axboe@fb.com>
+In-Reply-To: <1480734921-23701-1-git-send-email-axboe@fb.com>
+References: <1480734921-23701-1-git-send-email-axboe@fb.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
 Signed-off-by: Jens Axboe <axboe@fb.com>
 ---
- block/elevator.c         | 8 ++++----
- include/linux/elevator.h | 5 +++++
- 2 files changed, 9 insertions(+), 4 deletions(-)
+ drivers/block/null_blk.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-diff --git a/block/elevator.c b/block/elevator.c
-index a18a5db274e4..40f0c04e5ad3 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -248,13 +248,13 @@ static inline void __elv_rqhash_del(struct request *rq)
- 	rq->rq_flags &= ~RQF_HASHED;
- }
+diff --git a/drivers/block/null_blk.c b/drivers/block/null_blk.c
+index 4943ee22716e..f2726936cd1a 100644
+--- a/drivers/block/null_blk.c
++++ b/drivers/block/null_blk.c
+@@ -117,6 +117,14 @@ static bool use_lightnvm;
+ module_param(use_lightnvm, bool, S_IRUGO);
+ MODULE_PARM_DESC(use_lightnvm, "Register as a LightNVM device");
  
--static void elv_rqhash_del(struct request_queue *q, struct request *rq)
-+void elv_rqhash_del(struct request_queue *q, struct request *rq)
- {
- 	if (ELV_ON_HASH(rq))
- 		__elv_rqhash_del(rq);
- }
- 
--static void elv_rqhash_add(struct request_queue *q, struct request *rq)
-+void elv_rqhash_add(struct request_queue *q, struct request *rq)
- {
- 	struct elevator_queue *e = q->elevator;
- 
-@@ -263,13 +263,13 @@ static void elv_rqhash_add(struct request_queue *q, struct request *rq)
- 	rq->rq_flags |= RQF_HASHED;
- }
- 
--static void elv_rqhash_reposition(struct request_queue *q, struct request *rq)
-+void elv_rqhash_reposition(struct request_queue *q, struct request *rq)
- {
- 	__elv_rqhash_del(rq);
- 	elv_rqhash_add(q, rq);
- }
- 
--static struct request *elv_rqhash_find(struct request_queue *q, sector_t offset)
-+struct request *elv_rqhash_find(struct request_queue *q, sector_t offset)
- {
- 	struct elevator_queue *e = q->elevator;
- 	struct hlist_node *next;
-diff --git a/include/linux/elevator.h b/include/linux/elevator.h
-index f219c9aed360..b276e9ef0e0b 100644
---- a/include/linux/elevator.h
-+++ b/include/linux/elevator.h
-@@ -108,6 +108,11 @@ struct elevator_type
- 
- #define ELV_HASH_BITS 6
- 
-+void elv_rqhash_del(struct request_queue *q, struct request *rq);
-+void elv_rqhash_add(struct request_queue *q, struct request *rq);
-+void elv_rqhash_reposition(struct request_queue *q, struct request *rq);
-+struct request *elv_rqhash_find(struct request_queue *q, sector_t offset);
++static bool use_sched;
++module_param(use_sched, bool, S_IRUGO);
++MODULE_PARM_DESC(use_sched, "Ask for blk-mq scheduling");
 +
- /*
-  * each queue has an elevator_queue associated with it
-  */
++static bool wc;
++module_param(wc, bool, S_IRUGO);
++MODULE_PARM_DESC(use_sched, "Claim volatile write cache");
++
+ static int irqmode = NULL_IRQ_SOFTIRQ;
+ 
+ static int null_set_irqmode(const char *str, const struct kernel_param *kp)
+@@ -724,6 +732,9 @@ static int null_add_dev(void)
+ 		nullb->tag_set.flags = BLK_MQ_F_SHOULD_MERGE;
+ 		nullb->tag_set.driver_data = nullb;
+ 
++		if (use_sched)
++			nullb->tag_set.flags |= BLK_MQ_F_SQ_SCHED;
++
+ 		rv = blk_mq_alloc_tag_set(&nullb->tag_set);
+ 		if (rv)
+ 			goto out_cleanup_queues;
+@@ -760,6 +771,9 @@ static int null_add_dev(void)
+ 	queue_flag_set_unlocked(QUEUE_FLAG_NONROT, nullb->q);
+ 	queue_flag_clear_unlocked(QUEUE_FLAG_ADD_RANDOM, nullb->q);
+ 
++	if (wc)
++		blk_queue_write_cache(nullb->q, true, false);
++
+ 	mutex_lock(&lock);
+ 	nullb->index = nullb_indexes++;
+ 	mutex_unlock(&lock);
 -- 
 2.7.4
