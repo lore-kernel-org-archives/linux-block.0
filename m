@@ -1,59 +1,23 @@
-Return-Path: <tom.leiming@gmail.com>
-Return-Path: <tom.leiming@gmail.com>
-From: Ming Lei <tom.leiming@gmail.com>
-To: Jens Axboe <axboe@fb.com>,
-	linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Ming Lei <tom.leiming@gmail.com>,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH v1 54/54] block: enable multipage bvecs
-Date: Wed, 28 Dec 2016 00:05:03 +0800
-Message-Id: <1482854706-14128-23-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1482854706-14128-1-git-send-email-tom.leiming@gmail.com>
-References: <1482854706-14128-1-git-send-email-tom.leiming@gmail.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] nbd: use loff_t for blocksize and nbd_set_size args
+To: Josef Bacik <jbacik@fb.com>, linux-block@vger.kernel.org,
+ mpa@pengutronix.de, nbd-general@lists.sourceforge.net, kernel-team@fb.com
+References: <1480713552-3535-1-git-send-email-jbacik@fb.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <dd4b264f-5529-54f5-5471-5ced434e1b90@kernel.dk>
+Date: Fri, 2 Dec 2016 21:06:40 -0700
+MIME-Version: 1.0
+In-Reply-To: <1480713552-3535-1-git-send-email-jbacik@fb.com>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-block@vger.kernel.org>
 
-This patch pulls the trigger for multipage bvecs.
+On 12/02/2016 02:19 PM, Josef Bacik wrote:
+> If we have large devices (say like the 40t drive I was trying to test with) we
+> will end up overflowing the int arguments to nbd_set_size and not get the right
+> size for our device.  Fix this by using loff_t everywhere so I don't have to
+> think about this again.  Thanks,
 
-Any request queue which doesn't set QUEUE_FLAG_NO_MP
-should support to handle multipage bvecs.
+Added, thanks Josef.
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
----
- block/bio.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
-
-diff --git a/block/bio.c b/block/bio.c
-index 9acc3db0f2df..a2ad9c577aff 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -843,6 +843,11 @@ int bio_add_page(struct bio *bio, struct page *page,
- 	 * a consecutive offset.  Optimize this special case.
- 	 */
- 	if (bio->bi_vcnt > 0) {
-+		struct request_queue *q = NULL;
-+
-+		if (bio->bi_bdev)
-+			q = bdev_get_queue(bio->bi_bdev);
-+
- 		bv = &bio->bi_io_vec[bio->bi_vcnt - 1];
- 
- 		if (page == bv->bv_page &&
-@@ -850,6 +855,14 @@ int bio_add_page(struct bio *bio, struct page *page,
- 			bv->bv_len += len;
- 			goto done;
- 		}
-+
-+		/* disable multipage bvec too if cluster isn't enabled */
-+		if (q && !blk_queue_no_mp(q) && blk_queue_cluster(q) &&
-+		    (bvec_to_phys(bv) + bv->bv_len ==
-+		     page_to_phys(page) + offset)) {
-+			bv->bv_len += len;
-+			goto done;
-+		}
- 	}
- 
- 	if (bio->bi_vcnt >= bio->bi_max_vecs)
 -- 
-2.7.4
+Jens Axboe
