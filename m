@@ -1,71 +1,59 @@
-Return-Path: <prvs=11505706e0=axboe@fb.com>
-From: Jens Axboe <axboe@fb.com>
-To: <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-CC: <paolo.valente@linaro.org>, <osandov@fb.com>, Jens Axboe <axboe@fb.com>
-Subject: [PATCH 1/7] blk-mq: add blk_mq_start_stopped_hw_queue()
-Date: Thu, 8 Dec 2016 13:13:19 -0700
-Message-ID: <1481228005-9245-2-git-send-email-axboe@fb.com>
-In-Reply-To: <1481228005-9245-1-git-send-email-axboe@fb.com>
-References: <1481228005-9245-1-git-send-email-axboe@fb.com>
+Return-Path: <jthumshirn@suse.de>
+Date: Mon, 5 Dec 2016 16:18:54 +0100
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Jens Axboe <axboe@fb.com>
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org, paolo.valente@linaro.org
+Subject: Re: [PATCH 2/7] cfq-iosched: use appropriate run queue function
+Message-ID: <20161205151854.GJ8481@linux-x5ow.site>
+References: <1480734921-23701-1-git-send-email-axboe@fb.com>
+ <1480734921-23701-3-git-send-email-axboe@fb.com>
+ <20161205084826.GA8481@linux-x5ow.site>
+ <d7717e7a-b1eb-693e-145b-a165f1e446f0@fb.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <d7717e7a-b1eb-693e-145b-a165f1e446f0@fb.com>
 List-ID: <linux-block@vger.kernel.org>
 
-We have a variant for all hardware queues, but not one for a single
-hardware queue.
+On Mon, Dec 05, 2016 at 08:12:16AM -0700, Jens Axboe wrote:
+> On 12/05/2016 01:48 AM, Johannes Thumshirn wrote:
+> > On Fri, Dec 02, 2016 at 08:15:16PM -0700, Jens Axboe wrote:
+> >> For MQ devices, we have to use other functions to run the queue.
+> >> No functional changes in this patch, just a prep patch for
+> >> support legacy schedulers on blk-mq.
+> >>
+> >> Signed-off-by: Jens Axboe <axboe@fb.com>
+> >> ---
+> >>  block/cfq-iosched.c | 22 +++++++++++++++++++---
+> >>  1 file changed, 19 insertions(+), 3 deletions(-)
+> >>
+> >> diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
+> >> index c73a6fcaeb9d..d6d454a72bd4 100644
+> >> --- a/block/cfq-iosched.c
+> >> +++ b/block/cfq-iosched.c
+> >> @@ -919,8 +919,14 @@ static inline struct cfq_data *cic_to_cfqd(struct cfq_io_cq *cic)
+> >>  static inline void cfq_schedule_dispatch(struct cfq_data *cfqd)
+> >>  {
+> >>  	if (cfqd->busy_queues) {
+> >> +		struct request_queue *q = cfqd->queue;
+> >> +
+> >>  		cfq_log(cfqd, "schedule dispatch");
+> >> -		kblockd_schedule_work(&cfqd->unplug_work);
+> >> +
+> >> +		if (q->mq_ops)
+> > 
+> > You've introduced blk_use_mq_path() in patch 1, so why don't you use it here
+> > as well?
+> 
+> There's a difference. q->mq_ops means "this driver is blk-mq",
+> blk_use_mq_path() checks for ->elevator as well, which means "for this
+> driver, allocate and insert requests via the legacy IO scheduler path".
 
-Signed-off-by: Jens Axboe <axboe@fb.com>
----
- block/blk-mq.c         | 18 +++++++++++-------
- include/linux/blk-mq.h |  1 +
- 2 files changed, 12 insertions(+), 7 deletions(-)
+Ah OK, that clarifies it. thanks
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 90db5b490df9..b216746be9d3 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1064,18 +1064,22 @@ void blk_mq_start_hw_queues(struct request_queue *q)
- }
- EXPORT_SYMBOL(blk_mq_start_hw_queues);
- 
-+void blk_mq_start_stopped_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
-+{
-+	if (!blk_mq_hctx_stopped(hctx))
-+		return;
-+
-+	clear_bit(BLK_MQ_S_STOPPED, &hctx->state);
-+	blk_mq_run_hw_queue(hctx, async);
-+}
-+
- void blk_mq_start_stopped_hw_queues(struct request_queue *q, bool async)
- {
- 	struct blk_mq_hw_ctx *hctx;
- 	int i;
- 
--	queue_for_each_hw_ctx(q, hctx, i) {
--		if (!blk_mq_hctx_stopped(hctx))
--			continue;
--
--		clear_bit(BLK_MQ_S_STOPPED, &hctx->state);
--		blk_mq_run_hw_queue(hctx, async);
--	}
-+	queue_for_each_hw_ctx(q, hctx, i)
-+		blk_mq_start_stopped_hw_queue(hctx, async);
- }
- EXPORT_SYMBOL(blk_mq_start_stopped_hw_queues);
- 
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 35a0af5ede6d..87e404aae267 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -231,6 +231,7 @@ void blk_mq_stop_hw_queue(struct blk_mq_hw_ctx *hctx);
- void blk_mq_start_hw_queue(struct blk_mq_hw_ctx *hctx);
- void blk_mq_stop_hw_queues(struct request_queue *q);
- void blk_mq_start_hw_queues(struct request_queue *q);
-+void blk_mq_start_stopped_hw_queue(struct blk_mq_hw_ctx *hctx, bool async);
- void blk_mq_start_stopped_hw_queues(struct request_queue *q, bool async);
- void blk_mq_run_hw_queues(struct request_queue *q, bool async);
- void blk_mq_delay_queue(struct blk_mq_hw_ctx *hctx, unsigned long msecs);
 -- 
-2.7.4
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
