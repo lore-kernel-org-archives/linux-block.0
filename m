@@ -1,14 +1,14 @@
-Return-Path: <BATV+942a091854393eb11ca5+4852+infradead.org+hch@bombadil.srs.infradead.org>
-Date: Mon, 5 Dec 2016 05:07:52 -0800
-From: Christoph Hellwig <hch@infradead.org>
+Return-Path: <jthumshirn@suse.de>
+Date: Mon, 5 Dec 2016 10:01:05 +0100
+From: Johannes Thumshirn <jthumshirn@suse.de>
 To: Jens Axboe <axboe@fb.com>
 Cc: axboe@kernel.dk, linux-block@vger.kernel.org, paolo.valente@linaro.org
 Subject: Re: [PATCH 3/7] block: use appropriate queue running functions
-Message-ID: <20161205130752.GC7100@infradead.org>
+Message-ID: <20161205090105.GB8481@linux-x5ow.site>
 References: <1480734921-23701-1-git-send-email-axboe@fb.com>
  <1480734921-23701-4-git-send-email-axboe@fb.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 In-Reply-To: <1480734921-23701-4-git-send-email-axboe@fb.com>
 List-ID: <linux-block@vger.kernel.org>
 
@@ -32,26 +32,15 @@ On Fri, Dec 02, 2016 at 08:15:17PM -0700, Jens Axboe wrote:
 >  		return;
 >  
 > -	__blk_run_queue_uncond(q);
-> +	if (WARN_ON_ONCE(q->mq_ops))
-> +		blk_mq_run_hw_queues(q, true);
-> +	else
 
-This looks odd with the WARN_ON..
+I don't quite get the WARN_ON_ONCE() is it for debug purposes? And similarly
+blk_use_mq_path() + the other occurences below as well?
 
-> +++ b/block/blk-exec.c
-> @@ -80,8 +80,14 @@ void blk_execute_rq_nowait(struct request_queue *q, struct gendisk *bd_disk,
->  	}
->  
->  	__elv_add_request(q, rq, where);
-> -	__blk_run_queue(q);
-> -	spin_unlock_irq(q->queue_lock);
-> +
-> +	if (q->mq_ops) {
-> +		spin_unlock_irq(q->queue_lock);
-> +		blk_mq_run_hw_queues(q, false);
-> +	} else {
-> +		__blk_run_queue(q);
-> +		spin_unlock_irq(q->queue_lock);
-> +	}
 
-We already branch out to the blk-mq path earlier in the function.
+-- 
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
