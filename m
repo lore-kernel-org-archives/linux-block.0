@@ -1,98 +1,96 @@
-Return-Path: <linux@rasmusvillemoes.dk>
-Return-Path: <linux@rasmusvillemoes.dk>
-From: Rasmus Villemoes <linux@rasmusvillemoes.dk>
-To: Tejun Heo <tj@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>
-Cc: linux-kernel@vger.kernel.org,
-	Lai Jiangshan <jiangshanlai@gmail.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-	linux-block@vger.kernel.org
-Subject: [RFC 06/10] block: use tida as small id allocator
-Date: Thu,  8 Dec 2016 02:23:01 +0100
-Message-Id: <1481160187-9652-7-git-send-email-linux@rasmusvillemoes.dk>
-In-Reply-To: <1481160187-9652-1-git-send-email-linux@rasmusvillemoes.dk>
-References: <1481160187-9652-1-git-send-email-linux@rasmusvillemoes.dk>
+Return-Path: <prvs=1147fe7fca=axboe@fb.com>
+From: Jens Axboe <axboe@fb.com>
+To: <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+CC: <paolo.valente@linaro.org>, Jens Axboe <axboe@fb.com>
+Subject: [PATCH 7/7] block: drop irq+lock when flushing queue plugs
+Date: Mon, 5 Dec 2016 11:27:06 -0700
+Message-ID: <1480962426-15767-8-git-send-email-axboe@fb.com>
+In-Reply-To: <1480962426-15767-1-git-send-email-axboe@fb.com>
+References: <1480962426-15767-1-git-send-email-axboe@fb.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-A struct ida ends up costing > 16 KB of runtime memory, which is quite
-a lot for something which on my laptop as of this writing has handed
-out 27 ids in its lifetime. So use the simpler and lighter-weight
-struct tida.
+Not convinced this is a faster approach, and it does look IRQs off
+longer than otherwise. With mq+scheduling, it's a problem since
+it forces us to offload the queue running. If we get rid of it,
+we can run the queue without the queue lock held.
 
-Signed-off-by: Rasmus Villemoes <linux@rasmusvillemoes.dk>
+Signed-off-by: Jens Axboe <axboe@fb.com>
 ---
- block/blk-core.c  | 6 +++---
- block/blk-sysfs.c | 2 +-
- block/blk.h       | 4 ++--
- 3 files changed, 6 insertions(+), 6 deletions(-)
+ block/blk-core.c | 32 ++++++++++++++------------------
+ 1 file changed, 14 insertions(+), 18 deletions(-)
 
 diff --git a/block/blk-core.c b/block/blk-core.c
-index 14d7c0740dc0..6919a519d797 100644
+index 8be12ba91f8e..2c61d2020c3f 100644
 --- a/block/blk-core.c
 +++ b/block/blk-core.c
-@@ -46,7 +46,7 @@ EXPORT_TRACEPOINT_SYMBOL_GPL(block_bio_complete);
- EXPORT_TRACEPOINT_SYMBOL_GPL(block_split);
- EXPORT_TRACEPOINT_SYMBOL_GPL(block_unplug);
+@@ -3204,18 +3204,21 @@ static int plug_rq_cmp(void *priv, struct list_head *a, struct list_head *b)
+  * plugger did not intend it.
+  */
+ static void queue_unplugged(struct request_queue *q, unsigned int depth,
+-			    bool from_schedule)
++			    bool from_schedule, unsigned long flags)
+ 	__releases(q->queue_lock)
+ {
+ 	trace_block_unplug(q, depth, !from_schedule);
  
--DEFINE_IDA(blk_queue_ida);
-+DEFINE_TIDA(blk_queue_ida);
- 
- /*
-  * For the allocated request tables
-@@ -699,7 +699,7 @@ struct request_queue *blk_alloc_queue_node(gfp_t gfp_mask, int node_id)
- 	if (!q)
- 		return NULL;
- 
--	q->id = ida_simple_get(&blk_queue_ida, 0, 0, gfp_mask);
-+	q->id = tida_get(&blk_queue_ida, gfp_mask);
- 	if (q->id < 0)
- 		goto fail_q;
- 
-@@ -771,7 +771,7 @@ struct request_queue *blk_alloc_queue_node(gfp_t gfp_mask, int node_id)
- fail_split:
- 	bioset_free(q->bio_split);
- fail_id:
--	ida_simple_remove(&blk_queue_ida, q->id);
-+	tida_put(&blk_queue_ida, q->id);
- fail_q:
- 	kmem_cache_free(blk_requestq_cachep, q);
- 	return NULL;
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 9cc8d7c5439a..5a04dd6cb20d 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -652,7 +652,7 @@ static void blk_release_queue(struct kobject *kobj)
- 	if (q->bio_split)
- 		bioset_free(q->bio_split);
- 
--	ida_simple_remove(&blk_queue_ida, q->id);
-+	tida_put(&blk_queue_ida, q->id);
- 	call_rcu(&q->rcu_head, blk_free_queue_rcu);
+-	if (q->mq_ops)
+-		blk_mq_run_hw_queues(q, true);
+-	else if (from_schedule)
+-		blk_run_queue_async(q);
+-	else
+-		__blk_run_queue(q);
+-	spin_unlock(q->queue_lock);
++	if (q->mq_ops) {
++		spin_unlock_irqrestore(q->queue_lock, flags);
++		blk_mq_run_hw_queues(q, from_schedule);
++	} else {
++		if (from_schedule)
++			blk_run_queue_async(q);
++		else
++			__blk_run_queue(q);
++		spin_unlock_irqrestore(q->queue_lock, flags);
++	}
  }
  
-diff --git a/block/blk.h b/block/blk.h
-index 74444c49078f..a0a606efed91 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -1,7 +1,7 @@
- #ifndef BLK_INTERNAL_H
- #define BLK_INTERNAL_H
+ static void flush_plug_callbacks(struct blk_plug *plug, bool from_schedule)
+@@ -3283,11 +3286,6 @@ void blk_flush_plug_list(struct blk_plug *plug, bool from_schedule)
+ 	q = NULL;
+ 	depth = 0;
  
--#include <linux/idr.h>
-+#include <linux/tida.h>
- #include <linux/blk-mq.h>
- #include "blk-mq.h"
+-	/*
+-	 * Save and disable interrupts here, to avoid doing it for every
+-	 * queue lock we have to take.
+-	 */
+-	local_irq_save(flags);
+ 	while (!list_empty(&list)) {
+ 		rq = list_entry_rq(list.next);
+ 		list_del_init(&rq->queuelist);
+@@ -3297,10 +3295,10 @@ void blk_flush_plug_list(struct blk_plug *plug, bool from_schedule)
+ 			 * This drops the queue lock
+ 			 */
+ 			if (q)
+-				queue_unplugged(q, depth, from_schedule);
++				queue_unplugged(q, depth, from_schedule, flags);
+ 			q = rq->q;
+ 			depth = 0;
+-			spin_lock(q->queue_lock);
++			spin_lock_irqsave(q->queue_lock, flags);
+ 		}
  
-@@ -34,7 +34,7 @@ struct blk_flush_queue {
- extern struct kmem_cache *blk_requestq_cachep;
- extern struct kmem_cache *request_cachep;
- extern struct kobj_type blk_queue_ktype;
--extern struct ida blk_queue_ida;
-+extern struct tida blk_queue_ida;
+ 		/*
+@@ -3329,9 +3327,7 @@ void blk_flush_plug_list(struct blk_plug *plug, bool from_schedule)
+ 	 * This drops the queue lock
+ 	 */
+ 	if (q)
+-		queue_unplugged(q, depth, from_schedule);
+-
+-	local_irq_restore(flags);
++		queue_unplugged(q, depth, from_schedule, flags);
+ }
  
- static inline struct blk_flush_queue *blk_get_flush_queue(
- 		struct request_queue *q, struct blk_mq_ctx *ctx)
+ void blk_finish_plug(struct blk_plug *plug)
 -- 
-2.1.4
+2.7.4
