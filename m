@@ -1,181 +1,80 @@
-Return-Path: <prvs=1149acddfc=axboe@fb.com>
+Return-Path: <prvs=1147fe7fca=axboe@fb.com>
 From: Jens Axboe <axboe@fb.com>
 To: <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>
-CC: <paolo.valente@linaro.org>, <osandov@fb.com>, Jens Axboe <axboe@fb.com>
-Subject: [PATCH 2/7] blk-mq: abstract out blk_mq_dispatch_rq_list() helper
-Date: Wed, 7 Dec 2016 16:09:56 -0700
-Message-ID: <1481152201-27461-3-git-send-email-axboe@fb.com>
-In-Reply-To: <1481152201-27461-1-git-send-email-axboe@fb.com>
-References: <1481152201-27461-1-git-send-email-axboe@fb.com>
+CC: <paolo.valente@linaro.org>, Jens Axboe <axboe@fb.com>
+Subject: [PATCH 2/7] cfq-iosched: use appropriate run queue function
+Date: Mon, 5 Dec 2016 11:27:01 -0700
+Message-ID: <1480962426-15767-3-git-send-email-axboe@fb.com>
+In-Reply-To: <1480962426-15767-1-git-send-email-axboe@fb.com>
+References: <1480962426-15767-1-git-send-email-axboe@fb.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-Takes a list of requests, and dispatches it. Moves any residual
-requests to the dispatch list.
+For MQ devices, we have to use other functions to run the queue.
+No functional changes in this patch, just a prep patch for
+support legacy schedulers on blk-mq.
 
 Signed-off-by: Jens Axboe <axboe@fb.com>
 ---
- block/blk-mq.c | 85 ++++++++++++++++++++++++++++++++--------------------------
- block/blk-mq.h |  1 +
- 2 files changed, 48 insertions(+), 38 deletions(-)
+ block/cfq-iosched.c | 22 +++++++++++++++++++---
+ 1 file changed, 19 insertions(+), 3 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index b216746be9d3..abbf7cca4d0d 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -821,41 +821,13 @@ static inline unsigned int queued_to_index(unsigned int queued)
- 	return min(BLK_MQ_MAX_DISPATCH_ORDER - 1, ilog2(queued) + 1);
+diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
+index c73a6fcaeb9d..d6d454a72bd4 100644
+--- a/block/cfq-iosched.c
++++ b/block/cfq-iosched.c
+@@ -919,8 +919,14 @@ static inline struct cfq_data *cic_to_cfqd(struct cfq_io_cq *cic)
+ static inline void cfq_schedule_dispatch(struct cfq_data *cfqd)
+ {
+ 	if (cfqd->busy_queues) {
++		struct request_queue *q = cfqd->queue;
++
+ 		cfq_log(cfqd, "schedule dispatch");
+-		kblockd_schedule_work(&cfqd->unplug_work);
++
++		if (q->mq_ops)
++			blk_mq_run_hw_queues(q, true);
++		else
++			kblockd_schedule_work(&cfqd->unplug_work);
+ 	}
  }
  
--/*
-- * Run this hardware queue, pulling any software queues mapped to it in.
-- * Note that this function currently has various problems around ordering
-- * of IO. In particular, we'd like FIFO behaviour on handling existing
-- * items on the hctx->dispatch list. Ignore that for now.
-- */
--static void blk_mq_process_rq_list(struct blk_mq_hw_ctx *hctx)
-+bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list)
- {
- 	struct request_queue *q = hctx->queue;
- 	struct request *rq;
--	LIST_HEAD(rq_list);
- 	LIST_HEAD(driver_list);
- 	struct list_head *dptr;
--	int queued;
--
--	if (unlikely(blk_mq_hctx_stopped(hctx)))
--		return;
--
--	hctx->run++;
--
--	/*
--	 * Touch any software queue that has pending entries.
--	 */
--	flush_busy_ctxs(hctx, &rq_list);
--
--	/*
--	 * If we have previous entries on our dispatch list, grab them
--	 * and stuff them at the front for more fair dispatch.
--	 */
--	if (!list_empty_careful(&hctx->dispatch)) {
--		spin_lock(&hctx->lock);
--		if (!list_empty(&hctx->dispatch))
--			list_splice_init(&hctx->dispatch, &rq_list);
--		spin_unlock(&hctx->lock);
--	}
-+	int queued, ret = BLK_MQ_RQ_QUEUE_OK;
+@@ -4086,6 +4092,16 @@ static void cfq_preempt_queue(struct cfq_data *cfqd, struct cfq_queue *cfqq)
+ 	cfq_mark_cfqq_slice_new(cfqq);
+ }
  
- 	/*
- 	 * Start off with dptr being NULL, so we start the first request
-@@ -867,16 +839,15 @@ static void blk_mq_process_rq_list(struct blk_mq_hw_ctx *hctx)
- 	 * Now process all the entries, sending them to the driver.
- 	 */
- 	queued = 0;
--	while (!list_empty(&rq_list)) {
-+	while (!list_empty(list)) {
- 		struct blk_mq_queue_data bd;
--		int ret;
- 
--		rq = list_first_entry(&rq_list, struct request, queuelist);
-+		rq = list_first_entry(list, struct request, queuelist);
- 		list_del_init(&rq->queuelist);
- 
- 		bd.rq = rq;
- 		bd.list = dptr;
--		bd.last = list_empty(&rq_list);
-+		bd.last = list_empty(list);
- 
- 		ret = q->mq_ops->queue_rq(hctx, &bd);
- 		switch (ret) {
-@@ -884,7 +855,7 @@ static void blk_mq_process_rq_list(struct blk_mq_hw_ctx *hctx)
- 			queued++;
- 			break;
- 		case BLK_MQ_RQ_QUEUE_BUSY:
--			list_add(&rq->queuelist, &rq_list);
-+			list_add(&rq->queuelist, list);
- 			__blk_mq_requeue_request(rq);
- 			break;
- 		default:
-@@ -902,7 +873,7 @@ static void blk_mq_process_rq_list(struct blk_mq_hw_ctx *hctx)
- 		 * We've done the first request. If we have more than 1
- 		 * left in the list, set dptr to defer issue.
- 		 */
--		if (!dptr && rq_list.next != rq_list.prev)
-+		if (!dptr && list->next != list->prev)
- 			dptr = &driver_list;
- 	}
- 
-@@ -912,10 +883,11 @@ static void blk_mq_process_rq_list(struct blk_mq_hw_ctx *hctx)
- 	 * Any items that need requeuing? Stuff them into hctx->dispatch,
- 	 * that is where we will continue on next queue run.
- 	 */
--	if (!list_empty(&rq_list)) {
-+	if (!list_empty(list)) {
- 		spin_lock(&hctx->lock);
--		list_splice(&rq_list, &hctx->dispatch);
-+		list_splice(list, &hctx->dispatch);
- 		spin_unlock(&hctx->lock);
++static void cfq_run_queue(struct cfq_data *cfqd)
++{
++	struct request_queue *q = cfqd->queue;
 +
- 		/*
- 		 * the queue is expected stopped with BLK_MQ_RQ_QUEUE_BUSY, but
- 		 * it's possible the queue is stopped and restarted again
-@@ -927,6 +899,43 @@ static void blk_mq_process_rq_list(struct blk_mq_hw_ctx *hctx)
- 		 **/
- 		blk_mq_run_hw_queue(hctx, true);
- 	}
-+
-+	return ret != BLK_MQ_RQ_QUEUE_BUSY;
++	if (q->mq_ops)
++		blk_mq_run_hw_queues(q, true);
++	else
++		__blk_run_queue(q);
 +}
 +
-+/*
-+ * Run this hardware queue, pulling any software queues mapped to it in.
-+ * Note that this function currently has various problems around ordering
-+ * of IO. In particular, we'd like FIFO behaviour on handling existing
-+ * items on the hctx->dispatch list. Ignore that for now.
-+ */
-+static void blk_mq_process_rq_list(struct blk_mq_hw_ctx *hctx)
-+{
-+	LIST_HEAD(rq_list);
-+	LIST_HEAD(driver_list);
-+
-+	if (unlikely(blk_mq_hctx_stopped(hctx)))
-+		return;
-+
-+	hctx->run++;
-+
-+	/*
-+	 * Touch any software queue that has pending entries.
-+	 */
-+	flush_busy_ctxs(hctx, &rq_list);
-+
-+	/*
-+	 * If we have previous entries on our dispatch list, grab them
-+	 * and stuff them at the front for more fair dispatch.
-+	 */
-+	if (!list_empty_careful(&hctx->dispatch)) {
-+		spin_lock(&hctx->lock);
-+		if (!list_empty(&hctx->dispatch))
-+			list_splice_init(&hctx->dispatch, &rq_list);
-+		spin_unlock(&hctx->lock);
-+	}
-+
-+	blk_mq_dispatch_rq_list(hctx, &rq_list);
+ /*
+  * Called when a new fs request (rq) is added (to cfqq). Check if there's
+  * something we should do about it
+@@ -4122,7 +4138,7 @@ cfq_rq_enqueued(struct cfq_data *cfqd, struct cfq_queue *cfqq,
+ 			    cfqd->busy_queues > 1) {
+ 				cfq_del_timer(cfqd, cfqq);
+ 				cfq_clear_cfqq_wait_request(cfqq);
+-				__blk_run_queue(cfqd->queue);
++				cfq_run_queue(cfqd);
+ 			} else {
+ 				cfqg_stats_update_idle_time(cfqq->cfqg);
+ 				cfq_mark_cfqq_must_dispatch(cfqq);
+@@ -4136,7 +4152,7 @@ cfq_rq_enqueued(struct cfq_data *cfqd, struct cfq_queue *cfqq,
+ 		 * this new queue is RT and the current one is BE
+ 		 */
+ 		cfq_preempt_queue(cfqd, cfqq);
+-		__blk_run_queue(cfqd->queue);
++		cfq_run_queue(cfqd);
+ 	}
  }
  
- static void __blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx)
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index b444370ae05b..3a54dd32a6fc 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -31,6 +31,7 @@ void blk_mq_freeze_queue(struct request_queue *q);
- void blk_mq_free_queue(struct request_queue *q);
- int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr);
- void blk_mq_wake_waiters(struct request_queue *q);
-+bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *, struct list_head *);
- 
- /*
-  * CPU hotplug helpers
 -- 
 2.7.4
