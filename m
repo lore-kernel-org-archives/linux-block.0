@@ -1,81 +1,50 @@
-Return-Path: <mauricfo@linux.vnet.ibm.com>
-From: Mauricio Faria de Oliveira <mauricfo@linux.vnet.ibm.com>
-To: axboe@kernel.dk, linux-block@vger.kernel.org
-Cc: hch@infradead.org, linux-scsi@vger.kernel.org,
-        linux-kernel@vger.kernel.org, pbonzini@redhat.com,
-        latha@linux.vnet.ibm.com, manjuhr1@in.ibm.com
-Subject: [PATCH RESEND] block: allow WRITE_SAME commands with the SG_IO ioctl
-Date: Thu, 15 Dec 2016 11:48:18 -0600
-Message-Id: <1481824098-5555-1-git-send-email-mauricfo@linux.vnet.ibm.com>
+Return-Path: <prvs=1147fe7fca=axboe@fb.com>
+From: Jens Axboe <axboe@fb.com>
+To: <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+CC: <paolo.valente@linaro.org>, Jens Axboe <axboe@fb.com>
+Subject: [PATCH 5/7] blk-mq: add BLK_MQ_F_NO_SCHED flag
+Date: Mon, 5 Dec 2016 11:27:04 -0700
+Message-ID: <1480962426-15767-6-git-send-email-axboe@fb.com>
+In-Reply-To: <1480962426-15767-1-git-send-email-axboe@fb.com>
+References: <1480962426-15767-1-git-send-email-axboe@fb.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-The WRITE_SAME commands are not present in the blk_default_cmd_filter
-write_ok list, and thus are failed with -EPERM when the SG_IO ioctl()
-is executed without CAP_SYS_RAWIO capability (e.g., unprivileged users).
-[ sg_io() -> blk_fill_sghdr_rq() > blk_verify_command() -> -EPERM ]
+Drivers can use this to prevent IO scheduling on a queue. Use this
+for NVMe, for the admin queue, which doesn't handle file system
+requests.
 
-The problem can be reproduced with the sg_write_same command
-
-  # sg_write_same --num 1 --xferlen 512 /dev/sda
-  #
-
-  # capsh --drop=cap_sys_rawio -- -c \
-    'sg_write_same --num 1 --xferlen 512 /dev/sda'
-    Write same: pass through os error: Operation not permitted
-  #
-
-For comparison, the WRITE_VERIFY command does not observe this problem,
-since it is in that list:
-
-  # capsh --drop=cap_sys_rawio -- -c \
-    'sg_write_verify --num 1 --ilen 512 --lba 0 /dev/sda'
-  #
-
-So, this patch adds the WRITE_SAME commands to the list, in order
-for the SG_IO ioctl to finish successfully:
-
-  # capsh --drop=cap_sys_rawio -- -c \
-    'sg_write_same --num 1 --xferlen 512 /dev/sda'
-  #
-
-That case happens to be exercised by QEMU KVM guests with 'scsi-block' devices
-(qemu "-device scsi-block" [1], libvirt "<disk type='block' device='lun'>" [2]),
-which employs the SG_IO ioctl() and runs as an unprivileged user (libvirt-qemu).
-
-In that scenario, when a filesystem (e.g., ext4) performs its zero-out calls,
-which are translated to write-same calls in the guest kernel, and then into
-SG_IO ioctls to the host kernel, SCSI I/O errors may be observed in the guest:
-
-  [...] sd 0:0:0:0: [sda] tag#0 FAILED Result: hostbyte=DID_OK driverbyte=DRIVER_SENSE
-  [...] sd 0:0:0:0: [sda] tag#0 Sense Key : Aborted Command [current]
-  [...] sd 0:0:0:0: [sda] tag#0 Add. Sense: I/O process terminated
-  [...] sd 0:0:0:0: [sda] tag#0 CDB: Write Same(10) 41 00 01 04 e0 78 00 00 08 00
-  [...] blk_update_request: I/O error, dev sda, sector 17096824
-
-Links:
-[1] http://git.qemu.org/?p=qemu.git;a=commit;h=336a6915bc7089fb20fea4ba99972ad9a97c5f52
-[2] https://libvirt.org/formatdomain.html#elementsDisks (see 'disk' -> 'device')
-
-Signed-off-by: Mauricio Faria de Oliveira <mauricfo@linux.vnet.ibm.com>
-Signed-off-by: Brahadambal Srinivasan <latha@linux.vnet.ibm.com>
-Reported-by: Manjunatha H R <manjuhr1@in.ibm.com>
+Signed-off-by: Jens Axboe <axboe@fb.com>
 ---
- block/scsi_ioctl.c | 3 +++
- 1 file changed, 3 insertions(+)
+ drivers/nvme/host/pci.c | 1 +
+ include/linux/blk-mq.h  | 1 +
+ 2 files changed, 2 insertions(+)
 
-diff --git a/block/scsi_ioctl.c b/block/scsi_ioctl.c
-index 0774799..c6fee74 100644
---- a/block/scsi_ioctl.c
-+++ b/block/scsi_ioctl.c
-@@ -182,6 +182,9 @@ static void blk_set_cmd_filter_defaults(struct blk_cmd_filter *filter)
- 	__set_bit(WRITE_16, filter->write_ok);
- 	__set_bit(WRITE_LONG, filter->write_ok);
- 	__set_bit(WRITE_LONG_2, filter->write_ok);
-+	__set_bit(WRITE_SAME, filter->write_ok);
-+	__set_bit(WRITE_SAME_16, filter->write_ok);
-+	__set_bit(WRITE_SAME_32, filter->write_ok);
- 	__set_bit(ERASE, filter->write_ok);
- 	__set_bit(GPCMD_MODE_SELECT_10, filter->write_ok);
- 	__set_bit(MODE_SELECT, filter->write_ok);
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index d58f8e4e2c06..4560575f0a39 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -1187,6 +1187,7 @@ static int nvme_alloc_admin_tags(struct nvme_dev *dev)
+ 		dev->admin_tagset.timeout = ADMIN_TIMEOUT;
+ 		dev->admin_tagset.numa_node = dev_to_node(dev->dev);
+ 		dev->admin_tagset.cmd_size = nvme_cmd_size(dev);
++		dev->admin_tagset.flags = BLK_MQ_F_NO_SCHED;
+ 		dev->admin_tagset.driver_data = dev;
+ 
+ 		if (blk_mq_alloc_tag_set(&dev->admin_tagset))
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 35a0af5ede6d..a85bd83bb218 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -151,6 +151,7 @@ enum {
+ 	BLK_MQ_F_SG_MERGE	= 1 << 2,
+ 	BLK_MQ_F_DEFER_ISSUE	= 1 << 4,
+ 	BLK_MQ_F_BLOCKING	= 1 << 5,
++	BLK_MQ_F_NO_SCHED	= 1 << 6,
+ 	BLK_MQ_F_ALLOC_POLICY_START_BIT = 8,
+ 	BLK_MQ_F_ALLOC_POLICY_BITS = 1,
+ 
 -- 
 2.7.4
