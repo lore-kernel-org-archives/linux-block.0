@@ -1,29 +1,92 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:5718 "EHLO mga11.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751677AbcLLDrK (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 11 Dec 2016 22:47:10 -0500
-Date: Mon, 12 Dec 2016 11:56:23 +0800
-From: Chen Yu <yu.c.chen@intel.com>
-To: Jens Axboe <axboe@kernel.dk>, Freddy Xin <freddy@asix.com.tw>,
-        Robert Foss <robert.foss@collabora.com>
-Cc: linux-block@vger.kernel.org, Rui Zhang <rui.zhang@intel.com>,
-        Len Brown <lenb@kernel.org>
-Subject: [RFC] Why ax88772a_hw_reset sleeps for 200ms? Can we reduce the
- value?
-Message-ID: <20161212035623.GA4101@yu-desktop-1.sh.intel.com>
+Return-Path: <Adam.Manzanares@wdc.com>
+From: Adam Manzanares <adam.manzanares@hgst.com>
+To: <axboe@kernel.dk>, <hare@suse.de>, <mchristi@redhat.com>,
+	<dan.j.williams@intel.com>, <martin.petersen@oracle.com>,
+	<toshi.kani@hpe.com>, <damien.lemoal@hgst.com>, <ming.lei@canonical.com>,
+	<tj@kernel.org>
+CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-ide@vger.kernel.org>, Adam Manzanares <adam.manzanares@wdc.com>
+Subject: [PATCH v7 1/4] block: Add iocontext priority to request
+Date: Tue, 6 Dec 2016 09:18:02 -0800
+Message-ID: <1481044685-2803-2-git-send-email-adam.manzanares@hgst.com>
+In-Reply-To: <1481044685-2803-1-git-send-email-adam.manzanares@hgst.com>
+References: <1481044685-2803-1-git-send-email-adam.manzanares@hgst.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain
+Return-Path: Adam.Manzanares@wdc.com
+List-ID: <linux-block@vger.kernel.org>
 
-Hi guys,
-Currently I'm experiencing long time latency of resuming
-from S3 on my MacBookPro 2015, according to the log of ftrace,
-one of the suspicious time consumers is ax88772a_hw_reset has an
-explicit msleep of 200ms in the code, is this mandatory or
-can we reduce this sleep time of it?
-https://bugzilla.kernel.org/show_bug.cgi?id=190111
+From: Adam Manzanares <adam.manzanares@wdc.com>
 
-Thanks in advance,
-Yu
+Patch adds an association between iocontext ioprio and the ioprio of a
+request. This is done to enable request based drivers the ability to
+act on priority information stored in the request. An example being
+ATA devices that support command priorities. If the ATA driver discovers
+that the device supports command priorities and the request has valid
+priority information indicating the request is high priority, then a high
+priority command can be sent to the device. This should improve tail
+latencies for high priority IO on any device that queues requests
+internally and can make use of the priority information stored in the
+request.
+
+The ioprio of the request is set in blk_rq_set_prio which takes the
+request and the ioc as arguments. If the ioc is valid in blk_rq_set_prio
+then the iopriority of the request is set as the iopriority of the ioc.
+In init_request_from_bio a check is made to see if the ioprio of the bio
+is valid and if so then the request prio comes from the bio.
+
+Signed-off-by: Adam Manzananares <adam.manzanares@wdc.com>
+---
+ block/blk-core.c       |  4 +++-
+ include/linux/blkdev.h | 14 ++++++++++++++
+ 2 files changed, 17 insertions(+), 1 deletion(-)
+
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 6c4a425..4d1d1f9 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -1154,6 +1154,7 @@ static struct request *__get_request(struct request_list *rl, unsigned int op,
+ 
+ 	blk_rq_init(q, rq);
+ 	blk_rq_set_rl(rq, rl);
++	blk_rq_set_prio(rq, ioc);
+ 	rq->cmd_flags = op;
+ 	rq->rq_flags = rq_flags;
+ 
+@@ -1658,7 +1659,8 @@ void init_request_from_bio(struct request *req, struct bio *bio)
+ 
+ 	req->errors = 0;
+ 	req->__sector = bio->bi_iter.bi_sector;
+-	req->ioprio = bio_prio(bio);
++	if (ioprio_valid(bio_prio(bio)))
++		req->ioprio = bio_prio(bio);
+ 	blk_rq_bio_prep(req->q, req, bio);
+ }
+ 
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 541fdd8..8c2a1ef 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1050,6 +1050,20 @@ static inline unsigned int blk_rq_count_bios(struct request *rq)
+ }
+ 
+ /*
++ * blk_rq_set_prio - associate a request with prio from ioc
++ * @rq: request of interest
++ * @ioc: target iocontext
++ *
++ * Assocate request prio with ioc prio so request based drivers
++ * can leverage priority information.
++ */
++static inline void blk_rq_set_prio(struct request *rq, struct io_context *ioc)
++{
++	if (ioc)
++		rq->ioprio = ioc->ioprio;
++}
++
++/*
+  * Request issue related functions.
+  */
+ extern struct request *blk_peek_request(struct request_queue *q);
+-- 
+2.7.4
