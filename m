@@ -1,131 +1,92 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-Message-ID: <1482859147.2771.5.camel@poochiereds.net>
-Subject: LSF/MM 2017: Call for Proposals
-From: Jeff Layton <jlayton@poochiereds.net>
-To: linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org,
-        linux-cifs@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-ide@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-nfs@vger.kernel.org, linux-scsi@vger.kernel.org,
-        "xfs@oss.sgi.com" <xfs@oss.sgi.com>, ceph-devel@vger.kernel.org,
-        linux-nvme@lists.infradead.org
-Cc: "lsf-pc@lists.linux-foundation.org"
-        <lsf-pc@lists.linux-foundation.org>
-Date: Tue, 27 Dec 2016 12:19:07 -0500
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Sender: linux-scsi-owner@vger.kernel.org
+Return-Path: <Adam.Manzanares@wdc.com>
+From: Adam Manzanares <adam.manzanares@hgst.com>
+To: <axboe@kernel.dk>, <hare@suse.de>, <mchristi@redhat.com>,
+	<dan.j.williams@intel.com>, <martin.petersen@oracle.com>,
+	<toshi.kani@hpe.com>, <damien.lemoal@hgst.com>, <ming.lei@canonical.com>,
+	<tj@kernel.org>
+CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-ide@vger.kernel.org>, Adam Manzanares <adam.manzanares@wdc.com>
+Subject: [PATCH v7 4/4] ata: set ncq_prio_enabled iff device has support
+Date: Tue, 6 Dec 2016 09:18:05 -0800
+Message-ID: <1481044685-2803-5-git-send-email-adam.manzanares@hgst.com>
+In-Reply-To: <1481044685-2803-1-git-send-email-adam.manzanares@hgst.com>
+References: <1481044685-2803-1-git-send-email-adam.manzanares@hgst.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Return-Path: Adam.Manzanares@wdc.com
 List-ID: <linux-block@vger.kernel.org>
 
-We initially sent this pretty early this year, so this is a resend in           
-case anyone missed the first posting. The call for topics and attendance        
-requests is open until January 15th, 2017.
+From: Adam Manzanares <adam.manzanares@wdc.com>
 
-The original message follows:
+We previously had a check to see if the device has support for
+prioritized ncq commands and a check to see if a device flag
+is set, through a sysfs variable, in order to send a prioritized
+command.
 
-----------------------8<------------------------
+This patch only allows the sysfs variable to be set if the device
+supports prioritized commands enabling one check in ata_build_rw_tf
+in order to determine whether or not to send a prioritized command.
 
-The annual Linux Storage, Filesystem and Memory Management (LSF/MM)
-Summit for 2017 will be held on March 20th and 21st at the Hyatt
-Cambridge, Cambridge, MA. LSF/MM is an invitation-only technical
-workshop to map out improvements to the Linux storage, filesystem and
-memory management subsystems that will make their way into the mainline
-kernel within the coming years.
+This patch depends on ata: ATA Command Priority Disabled By Default
 
-    http://events.linuxfoundation.org/events/linux-storage-filesystem-and-mm-summit
+tj: Minor subject and formatting updates.
 
-Like last year, LSF/MM will be colocated with the Linux Foundation Vault
-conference which takes place on March 22nd and 23rd in the same Venue.
-For those that do not know, Vault is designed to be an event where open
-source storage and filesystem practitioners meet storage implementors
-and, as such, it would be of benefit for LSF/MM attendees to attend.
+Signed-off-by: Adam Manzanares <adam.manzanares@wdc.com>
+---
+ drivers/ata/libata-core.c |  3 +--
+ drivers/ata/libata-scsi.c | 21 +++++++++++++++------
+ 2 files changed, 16 insertions(+), 8 deletions(-)
 
-Unlike past years, Vault admission is not free for LSF/MM attendees this
-year unless they're giving a talk. There is a discount for LSF/MM
-attendees, however we would also like to encourage folks to submit talk
-proposals to speak at the Vault conference.
-
-    http://events.linuxfoundation.org/events/vault
-
-On behalf of the committee I am issuing a call for agenda proposals that
-are suitable for cross-track discussion as well as technical subjects
-for the breakout sessions.
-
-If advance notice is required for visa applications then please point
-that out in your proposal or request to attend, and submit the topic
-as soon as possible.
-
-1) Proposals for agenda topics should be sent before January 15th, 2016
-to:
-
-    lsf-pc@lists.linux-foundation.org
-
-and cc the Linux list or lists that are relevant for the topic in
-question:
-
-    ATA:   linux-ide@vger.kernel.org
-    Block: linux-block@vger.kernel.org
-    FS:    linux-fsdevel@vger.kernel.org
-    MM:    linux-mm@kvack.org
-    SCSI:  linux-scsi@vger.kernel.org
-    NVMe:  linux-nvme@lists.infradead.org
-
-Please tag your proposal with [LSF/MM TOPIC] to make it easier to track.
-In addition, please make sure to start a new thread for each topic
-rather than following up to an existing one.  Agenda topics and
-attendees will be selected by the program committee, but the final
-agenda will be formed by consensus of the attendees on the day.
-
-2) Requests to attend the summit for those that are not proposing a
-topic should be sent to:
-
-    lsf-pc@lists.linux-foundation.org
-
-Please summarise what expertise you will bring to the meeting, and what
-you would like to discuss. Please also tag your email with [LSF/MM
-ATTEND] and send it as a new thread so there is less chance of it
-getting lost.
-
-We will try to cap attendance at around 25-30 per track to facilitate
-discussions although the final numbers will depend on the room sizes at
-the venue.
-
-Brief presentations are allowed to guide discussion, but are strongly
-discouraged. There will be no recording or audio bridge. However, we
-expect that written minutes will be published as we did in previous
-years:
-
-2016: https://lwn.net/Articles/lsfmm2016/
-
-2015: https://lwn.net/Articles/lsfmm2015/
-
-2014: http://lwn.net/Articles/LSFMM2014/
-
-2013: http://lwn.net/Articles/548089/
-
-3) If you have feedback on last year's meeting that we can use to
-improve this year's, please also send that to:
-
-    lsf-pc@lists.linux-foundation.org
-
-Thank you on behalf of the program committee:
-
-Storage:
-    James Bottomley
-    Martin K. Petersen (track chair)
-    Sagi Grimberg
-
-Filesystems:
-    Anna Schumaker
-    Chris Mason
-    Eric Sandeen
-    Jan Kara
-    Jeff Layton (summit chair)
-    Josef Bacik (track chair)
-    Trond Myklebust
-
-MM:
-    Johannes Weiner
-    Rik van Riel (track chair)
+diff --git a/drivers/ata/libata-core.c b/drivers/ata/libata-core.c
+index f6a631a..324e76e 100644
+--- a/drivers/ata/libata-core.c
++++ b/drivers/ata/libata-core.c
+@@ -787,8 +787,7 @@ int ata_build_rw_tf(struct ata_taskfile *tf, struct ata_device *dev,
+ 		if (tf->flags & ATA_TFLAG_FUA)
+ 			tf->device |= 1 << 7;
+ 
+-		if ((dev->flags & ATA_DFLAG_NCQ_PRIO) &&
+-		    (dev->flags & ATA_DFLAG_NCQ_PRIO_ENABLE)) {
++		if (dev->flags & ATA_DFLAG_NCQ_PRIO_ENABLE) {
+ 			if (class == IOPRIO_CLASS_RT)
+ 				tf->hob_nsect |= ATA_PRIO_HIGH <<
+ 						 ATA_SHIFT_PRIO;
+diff --git a/drivers/ata/libata-scsi.c b/drivers/ata/libata-scsi.c
+index 328a601..c24cbf1 100644
+--- a/drivers/ata/libata-scsi.c
++++ b/drivers/ata/libata-scsi.c
+@@ -317,17 +317,26 @@ static ssize_t ata_ncq_prio_enable_store(struct device *device,
+ 
+ 	ap = ata_shost_to_port(sdev->host);
+ 
+-	spin_lock_irqsave(ap->lock, flags);
+ 	dev = ata_scsi_find_dev(ap, sdev);
+-	if (unlikely(!dev)) {
+-		rc = -ENODEV;
+-		goto unlock;
++	if (unlikely(!dev))
++		return  -ENODEV;
++
++	if (!(dev->flags & ATA_DFLAG_NCQ_PRIO)) {
++		if (ata_id_has_ncq_prio(dev->id))
++			ata_dev_config_ncq_prio(dev);
+ 	}
+ 
+-	if (input)
++	spin_lock_irqsave(ap->lock, flags);
++	if (input) {
++		if (!(dev->flags & ATA_DFLAG_NCQ_PRIO)) {
++			rc = -EOPNOTSUPP;
++			goto unlock;
++		}
++
+ 		dev->flags |= ATA_DFLAG_NCQ_PRIO_ENABLE;
+-	else
++	} else {
+ 		dev->flags &= ~ATA_DFLAG_NCQ_PRIO_ENABLE;
++	}
+ 
+ unlock:
+ 	spin_unlock_irqrestore(ap->lock, flags);
 -- 
-Jeff Layton <jlayton@poochiereds.net>
+2.7.4
