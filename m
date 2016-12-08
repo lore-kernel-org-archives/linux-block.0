@@ -1,41 +1,52 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f66.google.com ([74.125.83.66]:35620 "EHLO
-        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932461AbcL0QFr (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Dec 2016 11:05:47 -0500
-From: Ming Lei <tom.leiming@gmail.com>
-To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        Ming Lei <tom.leiming@gmail.com>,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        Lars Ellenberg <lars.ellenberg@linbit.com>,
-        drbd-dev@lists.linbit.com (open list:DRBD DRIVER)
-Subject: [PATCH v1 01/54] block: drbd: comment on direct access bvec table
-Date: Tue, 27 Dec 2016 23:55:50 +0800
-Message-Id: <1482854250-13481-2-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1482854250-13481-1-git-send-email-tom.leiming@gmail.com>
-References: <1482854250-13481-1-git-send-email-tom.leiming@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+Date: Thu, 8 Dec 2016 16:37:40 +0100
+From: Michal Hocko <mhocko@kernel.org>
+To: James Bottomley <James.Bottomley@HansenPartnership.com>
+Cc: Jeff Layton <jlayton@poochiereds.net>, linux-block@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-nfs@vger.kernel.org,
+        linux-scsi@vger.kernel.org, "xfs@oss.sgi.com" <xfs@oss.sgi.com>,
+        ceph-devel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        "lsf-pc@lists.linux-foundation.org"
+        <lsf-pc@lists.linux-foundation.org>
+Subject: Re: LSF/MM 2017: Call for Proposals
+Message-ID: <20161208153740.GF26530@dhcp22.suse.cz>
+References: <1480601506.2511.7.camel@poochiereds.net>
+ <1481122626.2354.14.camel@HansenPartnership.com>
+ <20161208122619.GA26535@dhcp22.suse.cz>
+ <1481211043.2361.1.camel@HansenPartnership.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1481211043.2361.1.camel@HansenPartnership.com>
+Sender: linux-scsi-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
----
- drivers/block/drbd/drbd_bitmap.c | 1 +
- 1 file changed, 1 insertion(+)
+On Thu 08-12-16 07:30:43, James Bottomley wrote:
+> On Thu, 2016-12-08 at 13:26 +0100, Michal Hocko wrote:
+> > On Wed 07-12-16 06:57:06, James Bottomley wrote:
+> > [...]
+> > > Just on this point, since there seems to be a lot of confusion: lsf
+> > > -pc
+> > > is the list for contacting the programme committee, so you cannot
+> > > subscribe to it.
+> > > 
+> > > There is no -discuss equivalent, like kernel summit has, because we
+> > > expect you to cc the relevant existing mailing list and have the
+> > > discussion there instead rather than expecting people to subscribe
+> > > to a
+> > > new list.
+> > 
+> > There used to be lsf@lists.linux-foundation.org. Is it not active
+> > anymore?
+> 
+> Not until we get the list of invitees sorted out.  And then it's only
+> for stuff actually to do with lsf (like logistics, bof or session
+> requests or other meetups).  Any technical stuff should still be cc'd
+> to the relevant mailing list.
 
-diff --git a/drivers/block/drbd/drbd_bitmap.c b/drivers/block/drbd/drbd_bitmap.c
-index ab62b81c2ca7..ce9506da30ad 100644
---- a/drivers/block/drbd/drbd_bitmap.c
-+++ b/drivers/block/drbd/drbd_bitmap.c
-@@ -953,6 +953,7 @@ static void drbd_bm_endio(struct bio *bio)
- 	struct drbd_bm_aio_ctx *ctx = bio->bi_private;
- 	struct drbd_device *device = ctx->device;
- 	struct drbd_bitmap *b = device->bitmap;
-+	/* single page bio, safe for multipage bvec */
- 	unsigned int idx = bm_page_to_idx(bio->bi_io_vec[0].bv_page);
- 
- 	if ((ctx->flags & BM_AIO_COPY_PAGES) == 0 &&
+OK, I tend to forget about that. Thanks for the clarification!
 -- 
-2.7.4
-
+Michal Hocko
+SUSE Labs
