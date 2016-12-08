@@ -1,138 +1,116 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:47685 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1756404AbcLOUdV (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Dec 2016 15:33:21 -0500
-Received: from pps.filterd (m0001255.ppops.net [127.0.0.1])
-        by mx0b-00082601.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id uBFKVv1Y023911
-        for <linux-block@vger.kernel.org>; Thu, 15 Dec 2016 12:33:10 -0800
-Received: from mail.thefacebook.com ([199.201.64.23])
-        by mx0b-00082601.pphosted.com with ESMTP id 27bdne5btk-3
-        (version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT)
-        for <linux-block@vger.kernel.org>; Thu, 15 Dec 2016 12:33:10 -0800
-Received: from facebook.com (2401:db00:21:603d:face:0:19:0)     by
- mx-out.facebook.com (10.102.107.99) with ESMTP id
- b099e236c30511e6b0fd0002c99293a0-765faa50 for <linux-block@vger.kernel.org>;
-        Thu, 15 Dec 2016 12:33:08 -0800
-From: Shaohua Li <shli@fb.com>
-To: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <kernel-team@fb.com>, <axboe@fb.com>, <tj@kernel.org>,
-        <vgoyal@redhat.com>
-Subject: [PATCH V5 01/17] blk-throttle: use U64_MAX/UINT_MAX to replace -1
-Date: Thu, 15 Dec 2016 12:32:52 -0800
-Message-ID: <92ac507820069ff539918830280bdf76a9bebed4.1481833017.git.shli@fb.com>
-In-Reply-To: <cover.1481833017.git.shli@fb.com>
-References: <cover.1481833017.git.shli@fb.com>
+Received: from mail-wm0-f67.google.com ([74.125.82.67]:35284 "EHLO
+        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752139AbcLHMG7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Dec 2016 07:06:59 -0500
+Received: by mail-wm0-f67.google.com with SMTP id a20so3161147wme.2
+        for <linux-block@vger.kernel.org>; Thu, 08 Dec 2016 04:06:54 -0800 (PST)
+Subject: Re: [bug report] lightnvm: core on-disk initialization
+To: Dan Carpenter <dan.carpenter@oracle.com>
+References: <20161208104731.GA11393@elgon.mountain>
+Cc: linux-block@vger.kernel.org
+From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <m@bjorling.me>
+Message-ID: <a10e67a7-9fed-0967-b3fd-70f77d4ebbf5@bjorling.me>
+Date: Thu, 8 Dec 2016 13:06:51 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20161208104731.GA11393@elgon.mountain>
+Content-Type: text/plain; charset=windows-1252
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-clean up the code to avoid using -1
+On 12/08/2016 11:47 AM, Dan Carpenter wrote:
+> Hello Matias Bj�rling,
+> 
+> The patch e3eb3799f7e0: "lightnvm: core on-disk initialization" from
+> Jan 12, 2016, leads to the following static checker warning:
+> 
+> 	drivers/lightnvm/sysblk.c:409 nvm_get_sysblock()
+> 	warn: missing error code here? 'kzalloc()' failed.
+> 
+> drivers/lightnvm/sysblk.c
+>    398          mutex_lock(&dev->mlock);
+>    399          ret = nvm_get_all_sysblks(dev, &s, sysblk_ppas, 0);
+>    400          if (ret)
+>    401                  goto err_sysblk;
+>    402  
+>    403          /* no sysblocks initialized */
+>    404          if (!s.nr_ppas)
+>    405                  goto err_sysblk;
+> 
+> Do we want to return 0 or an error code here?  I'm not sure.
+> 
+>    406  
+>    407          cur = kzalloc(sizeof(struct nvm_system_block), GFP_KERNEL);
+>    408          if (!cur)
+>    409                  goto err_sysblk;
+> 
+> We should set "ret = -ENOMEM;" before the goto.
+> 
+>    410  
+>    411          /* find the latest block across all sysblocks */
+>    412          for (i = 0; i < s.nr_rows; i++) {
+>    413                  for (j = 0; j < MAX_BLKS_PR_SYSBLK; j++) {
+>    414                          struct ppa_addr ppa = s.ppas[scan_ppa_idx(i, j)];
+>    415  
+>    416                          ret = nvm_scan_block(dev, &ppa, cur);
+>    417                          if (ret > 0)
+>    418                                  found = 1;
+>    419                          else if (ret < 0)
+>    420                                  break;
+>    421                  }
+>    422          }
+>    423  
+>    424          nvm_sysblk_to_cpu(info, cur);
+>    425  
+>    426          kfree(cur);
+>    427  err_sysblk:
+>    428          mutex_unlock(&dev->mlock);
+>    429  
+>    430          if (found)
+>    431                  return 1;
+>    432          return ret;
+>    433  }
+>    434  
+>    435  int nvm_update_sysblock(struct nvm_dev *dev, struct nvm_sb_info *new)
+>    436  {
+>    437          /* 1. for each latest superblock
+>    438           * 2. if room
+>    439           *    a. write new flash page entry with the updated information
+>    440           * 3. if no room
+>    441           *    a. find next available block on lun (linear search)
+>    442           *       if none, continue to next lun
+>    443           *       if none at all, report error. also report that it wasn't
+>    444           *       possible to write to all superblocks.
+>    445           *    c. write data to block.
+>    446           */
+>    447          struct ppa_addr sysblk_ppas[MAX_SYSBLKS];
+>    448          struct sysblk_scan s;
+>    449          struct nvm_system_block *cur;
+>    450          int i, j, ppaidx, found = 0;
+>    451          int ret = -ENOMEM;
+>    452  
+>    453          if (!dev->ops->get_bb_tbl)
+>    454                  return -EINVAL;
+>    455  
+>    456          nvm_setup_sysblk_scan(dev, &s, sysblk_ppas);
+>    457  
+>    458          mutex_lock(&dev->mlock);
+>    459          ret = nvm_get_all_sysblks(dev, &s, sysblk_ppas, 0);
+>    460          if (ret)
+>    461                  goto err_sysblk;
+>    462  
+>    463          cur = kzalloc(sizeof(struct nvm_system_block), GFP_KERNEL);
+>    464          if (!cur)
+>    465                  goto err_sysblk;
+> 
+> Same here as well.
+> 
+>    466  
+> 
+> regards,
+> dan carpenter
+> 
 
-Signed-off-by: Shaohua Li <shli@fb.com>
----
- block/blk-throttle.c | 32 ++++++++++++++++----------------
- 1 file changed, 16 insertions(+), 16 deletions(-)
-
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index a6bb4fe..e45bf50 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -334,10 +334,10 @@ static struct blkg_policy_data *throtl_pd_alloc(gfp_t gfp, int node)
- 	}
- 
- 	RB_CLEAR_NODE(&tg->rb_node);
--	tg->bps[READ] = -1;
--	tg->bps[WRITE] = -1;
--	tg->iops[READ] = -1;
--	tg->iops[WRITE] = -1;
-+	tg->bps[READ] = U64_MAX;
-+	tg->bps[WRITE] = U64_MAX;
-+	tg->iops[READ] = UINT_MAX;
-+	tg->iops[WRITE] = UINT_MAX;
- 
- 	return &tg->pd;
- }
-@@ -380,7 +380,7 @@ static void tg_update_has_rules(struct throtl_grp *tg)
- 
- 	for (rw = READ; rw <= WRITE; rw++)
- 		tg->has_rules[rw] = (parent_tg && parent_tg->has_rules[rw]) ||
--				    (tg->bps[rw] != -1 || tg->iops[rw] != -1);
-+			(tg->bps[rw] != U64_MAX || tg->iops[rw] != UINT_MAX);
- }
- 
- static void throtl_pd_online(struct blkg_policy_data *pd)
-@@ -771,7 +771,7 @@ static bool tg_may_dispatch(struct throtl_grp *tg, struct bio *bio,
- 	       bio != throtl_peek_queued(&tg->service_queue.queued[rw]));
- 
- 	/* If tg->bps = -1, then BW is unlimited */
--	if (tg->bps[rw] == -1 && tg->iops[rw] == -1) {
-+	if (tg->bps[rw] == U64_MAX && tg->iops[rw] == UINT_MAX) {
- 		if (wait)
- 			*wait = 0;
- 		return true;
-@@ -1110,7 +1110,7 @@ static u64 tg_prfill_conf_u64(struct seq_file *sf, struct blkg_policy_data *pd,
- 	struct throtl_grp *tg = pd_to_tg(pd);
- 	u64 v = *(u64 *)((void *)tg + off);
- 
--	if (v == -1)
-+	if (v == U64_MAX)
- 		return 0;
- 	return __blkg_prfill_u64(sf, pd, v);
- }
-@@ -1121,7 +1121,7 @@ static u64 tg_prfill_conf_uint(struct seq_file *sf, struct blkg_policy_data *pd,
- 	struct throtl_grp *tg = pd_to_tg(pd);
- 	unsigned int v = *(unsigned int *)((void *)tg + off);
- 
--	if (v == -1)
-+	if (v == UINT_MAX)
- 		return 0;
- 	return __blkg_prfill_u64(sf, pd, v);
- }
-@@ -1195,7 +1195,7 @@ static ssize_t tg_set_conf(struct kernfs_open_file *of,
- 	if (sscanf(ctx.body, "%llu", &v) != 1)
- 		goto out_finish;
- 	if (!v)
--		v = -1;
-+		v = U64_MAX;
- 
- 	tg = blkg_to_tg(ctx.blkg);
- 
-@@ -1270,17 +1270,17 @@ static u64 tg_prfill_max(struct seq_file *sf, struct blkg_policy_data *pd,
- 
- 	if (!dname)
- 		return 0;
--	if (tg->bps[READ] == -1 && tg->bps[WRITE] == -1 &&
--	    tg->iops[READ] == -1 && tg->iops[WRITE] == -1)
-+	if (tg->bps[READ] == U64_MAX && tg->bps[WRITE] == U64_MAX &&
-+	    tg->iops[READ] == UINT_MAX && tg->iops[WRITE] == UINT_MAX)
- 		return 0;
- 
--	if (tg->bps[READ] != -1)
-+	if (tg->bps[READ] != U64_MAX)
- 		snprintf(bufs[0], sizeof(bufs[0]), "%llu", tg->bps[READ]);
--	if (tg->bps[WRITE] != -1)
-+	if (tg->bps[WRITE] != U64_MAX)
- 		snprintf(bufs[1], sizeof(bufs[1]), "%llu", tg->bps[WRITE]);
--	if (tg->iops[READ] != -1)
-+	if (tg->iops[READ] != UINT_MAX)
- 		snprintf(bufs[2], sizeof(bufs[2]), "%u", tg->iops[READ]);
--	if (tg->iops[WRITE] != -1)
-+	if (tg->iops[WRITE] != UINT_MAX)
- 		snprintf(bufs[3], sizeof(bufs[3]), "%u", tg->iops[WRITE]);
- 
- 	seq_printf(sf, "%s rbps=%s wbps=%s riops=%s wiops=%s\n",
-@@ -1318,7 +1318,7 @@ static ssize_t tg_set_max(struct kernfs_open_file *of,
- 	while (true) {
- 		char tok[27];	/* wiops=18446744073709551616 */
- 		char *p;
--		u64 val = -1;
-+		u64 val = U64_MAX;
- 		int len;
- 
- 		if (sscanf(ctx.body, "%26s%n", tok, &len) != 1)
--- 
-2.9.3
-
+Great catch! Thanks for taking the time to find it. The return value
+should be set. I'm planning to remove the sysblk code for 4.11. That'll
+remove this code.
