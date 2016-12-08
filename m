@@ -1,39 +1,40 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH v4] block: Check partition alignment on zoned block
- devices
-To: Damien Le Moal <damien.lemoal@wdc.com>
-References: <1480575625-32134-1-git-send-email-damien.lemoal@wdc.com>
-Cc: linux-block@vger.kernel.org, Shaun Tancheff <shaun@tancheff.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <475c6798-5be1-4842-857e-2ad35056ede6@kernel.dk>
-Date: Thu, 1 Dec 2016 07:57:31 -0700
+Return-Path: <gregkh@linuxfoundation.org>
+Date: Thu, 8 Dec 2016 12:02:29 +0100
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Rasmus Villemoes <linux@rasmusvillemoes.dk>
+Cc: Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-kernel@vger.kernel.org,
+	Lai Jiangshan <jiangshanlai@gmail.com>, linux-block@vger.kernel.org
+Subject: Re: [RFC 06/10] block: use tida as small id allocator
+Message-ID: <20161208110229.GA28572@kroah.com>
+References: <1481160187-9652-1-git-send-email-linux@rasmusvillemoes.dk>
+ <1481160187-9652-7-git-send-email-linux@rasmusvillemoes.dk>
+ <b422a160-3d04-324c-e142-1099bc0380c0@kernel.dk>
 MIME-Version: 1.0
-In-Reply-To: <1480575625-32134-1-git-send-email-damien.lemoal@wdc.com>
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <b422a160-3d04-324c-e142-1099bc0380c0@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-On 12/01/2016 12:00 AM, Damien Le Moal wrote:
-> Both blkdev_report_zones and blkdev_reset_zones can operate on a partition of
-> a zoned block device. However, the first and last zones reported for a
-> partition make sense only if the partition start sector and size are aligned
-> on the device zone size. The same applies for zone reset. Resetting the first
-> or the last zone of a partition straddling zones may impact neighboring
-> partitions. Finally, if a partition start sector is not at the beginning of a
-> sequential zone, it will be impossible to write to the first sectors of the
-> partition on a host-managed device.
-> Avoid all these problems and incoherencies by ignoring partitions that are not
-> zone aligned.
+On Wed, Dec 07, 2016 at 08:56:27PM -0700, Jens Axboe wrote:
+> On 12/07/2016 06:23 PM, Rasmus Villemoes wrote:
+> > A struct ida ends up costing > 16 KB of runtime memory, which is quite
+> > a lot for something which on my laptop as of this writing has handed
+> > out 27 ids in its lifetime. So use the simpler and lighter-weight
+> > struct tida.
 > 
-> Note: Even with CONFIG_BLK_DEV_ZONED disabled, bdev_is_zoned() will report the
-> correct disk zoning type (host-aware, host-managed or none) but
-> bdev_zone_size() will always return 0 for zoned block devices (i.e. the zone
-> size is unknown). So test this as a way to ensure that a zoned block device is
-> being handled as such. As a result, for a host-aware devices, unaligned zone
-> partitions will be accepted with CONFIG_BLK_DEV_ZONED disabled. That is, the
-> disk will be treated as a regular block device (as it should). If zoned block
-> device support is enabled, only aligned partitions will be accepted.
+> I'm worried that your example of your laptop isn't an all encompassing
+> test case. How well does the simplified ida allocator work for tens of
+> thousands of disks, at scan time? SCSI is notorious for setting up and
+> tearing down a ton of queues at probe time.
+> 
+> Unless we have more testing than 'it works on my laptop and saves 16k',
+> I'm not super intereted in the patch.
 
-Thanks Damien, applied.
+Rasmus, you can create 30k virtual scsi devices on your laptop to test
+if this really does work or saves any real time or memory.  I'd
+recommend doing that if you want to get patches like this ever accepted.
 
--- 
-Jens Axboe
+good luck!
+
+greg k-h
