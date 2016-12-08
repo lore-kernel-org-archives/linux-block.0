@@ -1,21 +1,41 @@
-Subject: Re: [PATCH] nbd: reset the setup task for NBD_CLEAR_SOCK
-To: Josef Bacik <jbacik@fb.com>, linux-block@vger.kernel.org,
- nbd-general@lists.sourceforge.net, kernel-team@fb.com
-References: <1481208755-24700-1-git-send-email-jbacik@fb.com>
-From: Jens Axboe <axboe@fb.com>
-Message-ID: <2365ed5f-849e-9999-1a3c-10393abeeb07@fb.com>
-Date: Thu, 8 Dec 2016 15:27:09 -0700
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:44845 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1753428AbcLHOwx (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 8 Dec 2016 09:52:53 -0500
+From: Josef Bacik <jbacik@fb.com>
+To: <linux-block@vger.kernel.org>, <nbd-general@lists.sourceforge.net>,
+        <axboe@fb.com>, <kernel-team@fb.com>
+Subject: [PATCH] nbd: reset the setup task for NBD_CLEAR_SOCK
+Date: Thu, 8 Dec 2016 09:52:35 -0500
+Message-ID: <1481208755-24700-1-git-send-email-jbacik@fb.com>
 MIME-Version: 1.0
-In-Reply-To: <1481208755-24700-1-git-send-email-jbacik@fb.com>
-Content-Type: text/plain; charset=windows-1252
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On 12/08/2016 07:52 AM, Josef Bacik wrote:
-> If an app exits before running NBD_DO_IT but after adding sockets we can
-> end up not being allowed to do a new nbd device.  Fix this by making
-> NBD_CLEAR_SOCK reset the setup_task.
+If an app exits before running NBD_DO_IT but after adding sockets we can
+end up not being allowed to do a new nbd device.  Fix this by making
+NBD_CLEAR_SOCK reset the setup_task.
 
-Applied, thanks Josef.
+Signed-off-by: Josef Bacik <jbacik@fb.com>
+---
+ drivers/block/nbd.c | 1 +
+ 1 file changed, 1 insertion(+)
 
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index 0e6e52df..99c8446 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -705,6 +705,7 @@ static int __nbd_ioctl(struct block_device *bdev, struct nbd_device *nbd,
+ 			kfree(nbd->socks);
+ 			nbd->socks = NULL;
+ 			nbd->num_connections = 0;
++			nbd->task_setup = NULL;
+ 		}
+ 		return 0;
+ 
 -- 
-Jens Axboe
+2.5.5
+
