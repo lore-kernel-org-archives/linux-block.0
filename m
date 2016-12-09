@@ -1,50 +1,29 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:32859 "EHLO mx2.suse.de"
+Received: from mx1.redhat.com ([209.132.183.28]:54230 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752399AbcLIGoB (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 9 Dec 2016 01:44:01 -0500
-Subject: Re: [LSF/MM TOPIC ATTEND] multipath for NVMe over Fabrics
-To: Mike Snitzer <snitzer@redhat.com>,
-        lsf-pc@lists.linux-foundation.org
-References: <20161209011656.GA320@redhat.com>
+        id S1752013AbcLIBRT (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 8 Dec 2016 20:17:19 -0500
+Date: Thu, 8 Dec 2016 20:16:56 -0500
+From: Mike Snitzer <snitzer@redhat.com>
+To: lsf-pc@lists.linux-foundation.org
 Cc: linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
         linux-block@vger.kernel.org, dm-devel@redhat.com
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <cacc9915-97c0-d5ef-1b9f-cb05f20619b4@suse.de>
-Date: Fri, 9 Dec 2016 07:43:59 +0100
+Subject: [LSF/MM TOPIC ATTEND] multipath for NVMe over Fabrics
+Message-ID: <20161209011656.GA320@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20161209011656.GA320@redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 12/09/2016 02:16 AM, Mike Snitzer wrote:
-> I'd like to discuss $subject.  I haven't heard of much progress on this
-> (but I'm also not tracking NVMe development at the moment).
->
-> Last I heard about getting DM multipath to work with NVMe over Fabrics
-> was this: https://patchwork.kernel.org/patch/9208997/
->
-> I've reintroduced bio-based support for the DM multipath target.
-> Between now and LSF I hope to come to terms with what the various work
-> items are for making DM multipath work for NVMeoF.  I welcome any
-> ideas/thoughts others might have.
->
-Funny that you mention it.
+I'd like to discuss $subject.  I haven't heard of much progress on this
+(but I'm also not tracking NVMe development at the moment).
 
-I've got fed up with the mess that is multipath-tools, and decided to 
-rework the entire thing. Including the kernel side.
-I hope to have something ready soon, will be sending out an RFC once 
-it's presentable.
+Last I heard about getting DM multipath to work with NVMe over Fabrics
+was this: https://patchwork.kernel.org/patch/9208997/
 
-So yes, I'd _definitely_ be interested in that.
+I've reintroduced bio-based support for the DM multipath target.
+Between now and LSF I hope to come to terms with what the various work
+items are for making DM multipath work for NVMeoF.  I welcome any
+ideas/thoughts others might have.
 
-Cheers,
-
-Hannes
--- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: F. Imend�rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG N�rnberg)
+Mike
