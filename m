@@ -1,28 +1,25 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail.linuxfoundation.org ([140.211.169.12]:36894 "EHLO
-        mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751064AbcLIWBE (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Dec 2016 17:01:04 -0500
-Date: Fri, 9 Dec 2016 14:01:40 -0800
-From: Andrew Morton <akpm@linux-foundation.org>
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Fri, 9 Dec 2016 08:49:14 -0500
+From: Tejun Heo <tj@kernel.org>
 To: Rasmus Villemoes <linux@rasmusvillemoes.dk>
-Cc: Tejun Heo <tj@kernel.org>, linux-kernel@vger.kernel.org,
-        Lai Jiangshan <jiangshanlai@gmail.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-block@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        Matthew Wilcox <mawilcox@microsoft.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	linux-block@vger.kernel.org, dri-devel@lists.freedesktop.org
 Subject: Re: [RFC 00/10] implement alternative and much simpler id allocator
-Message-Id: <20161209140140.5e0a68e2e1cf9861335bdf3b@linux-foundation.org>
-In-Reply-To: <1481160187-9652-1-git-send-email-linux@rasmusvillemoes.dk>
+Message-ID: <20161209134914.GC30394@mtj.duckdns.org>
 References: <1481160187-9652-1-git-send-email-linux@rasmusvillemoes.dk>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1481160187-9652-1-git-send-email-linux@rasmusvillemoes.dk>
+List-ID: <linux-block@vger.kernel.org>
 
-On Thu,  8 Dec 2016 02:22:55 +0100 Rasmus Villemoes <linux@rasmusvillemoes.dk> wrote:
+Hello, Rasmus.
 
+On Thu, Dec 08, 2016 at 02:22:55AM +0100, Rasmus Villemoes wrote:
 > TL;DR: these patches save 250 KB of memory, with more low-hanging
 > fruit ready to pick.
 > 
@@ -35,10 +32,36 @@ On Thu,  8 Dec 2016 02:22:55 +0100 Rasmus Villemoes <linux@rasmusvillemoes.dk> w
 > ida_get_new_above(), and we only free one, leaving at least 6 (usually
 > 7) idr_layers in the free list.
 
-Please be aware of
+So, if you take a look at idr_layer_alloc(), there are two alternative
+preloading mechanisms.  The one based on per-idr freelist -
+get_from_free_list() - and the one using per-cpu preload cache.  idr
+currently uses the new percpu path and ida uses the old path.  There
+isn't anything fundamental to this difference.  It's just that we
+introduced the new perpcu path to idr and haven't converted ida over
+to it yet.
 
-http://ozlabs.org/~akpm/mmots/broken-out/reimplement-idr-and-ida-using-the-radix-tree.patch
-http://lkml.kernel.org/r/1480369871-5271-68-git-send-email-mawilcox@linuxonhyperv.com
+> Patches 1 and 2 are minor optimization opportunities, while patch 3 is
+> an attempt at making the 'free the extra idr_layers one at a time'
+> actually work. But it's not a very good solution, since it doesn't
+> help the users who never do more than a handful of allocations, nor
+> does it help those who call ida_pre_get/ida_get_new
+> directly. Moreover, even if we somehow had perfect heuristics and got
+> rid of all excess idr_layers and ida_bitmap (another 128 bytes we
+> usually have hanging around), the minimum overhead of sizeof(struct
+> idr_layer)+sizeof(struct ida_bitmap) ~ 2200 bytes is quite a lot for
+> the many ida users who never allocate more than 100 ids.
+> 
+> So instead/in addition, I suggest we introduce a much simpler
+> allocator based on a dynamically growing bitmap. Patches 4-10
+> introduce struct tida and has a few examples of replacing ida with
+> tida. [Yeah, tida is not a good name, and probably _get and _put are also
+> bad.]
 
-I expect we'll be merging patches 1-32 of that series into 4.10-rc1 and
-the above patch (#33) into 4.11-rc1.
+So, instead of creating something new, it'd be a lot better to
+implement the same per-cpu preload behavior for ida so that caching is
+per-cpu instead of per-ida.
+
+Thanks.
+
+-- 
+tejun
