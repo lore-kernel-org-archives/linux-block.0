@@ -1,171 +1,91 @@
-Return-Path: <Adam.Manzanares@wdc.com>
-From: Adam Manzanares <adam.manzanares@hgst.com>
-To: <axboe@kernel.dk>, <hare@suse.de>, <mchristi@redhat.com>,
-	<dan.j.williams@intel.com>, <martin.petersen@oracle.com>,
-	<toshi.kani@hpe.com>, <damien.lemoal@hgst.com>, <ming.lei@canonical.com>,
-	<tj@kernel.org>
-CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-ide@vger.kernel.org>, Adam Manzanares <adam.manzanares@wdc.com>
-Subject: [PATCH v7 3/4] ata: ATA Command Priority Disabled By Default
-Date: Tue, 6 Dec 2016 09:18:04 -0800
-Message-ID: <1481044685-2803-4-git-send-email-adam.manzanares@hgst.com>
-In-Reply-To: <1481044685-2803-1-git-send-email-adam.manzanares@hgst.com>
-References: <1481044685-2803-1-git-send-email-adam.manzanares@hgst.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH resend] block_dev: don't test bdev->bd_contains when it is
+ not stable.
+To: NeilBrown <neilb@suse.com>, Alexander Viro <viro@zeniv.linux.org.uk>,
+ Andrew Morton <akpm@linux-foundation.org>
+References: <87mvgo9vgy.fsf@notabene.neil.brown.name>
+ <87d1gy0z2r.fsf@notabene.neil.brown.name>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <e53e9442-9e9f-f938-9cef-3185f26c99b2@kernel.dk>
+Date: Mon, 12 Dec 2016 08:20:18 -0700
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Adam.Manzanares@wdc.com
+In-Reply-To: <87d1gy0z2r.fsf@notabene.neil.brown.name>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-block@vger.kernel.org>
 
-From: Adam Manzanares <adam.manzanares@wdc.com>
+On 12/11/2016 05:29 PM, NeilBrown wrote:
+> 
+> bdev->bd_contains is not stable before calling __blkdev_get().
+> When __blkdev_get() is called on a parition with ->bd_openers == 0
+> it sets
+>   bdev->bd_contains = bdev;
+> which is not correct for a partition.
+> After a call to __blkdev_get() succeeds, ->bd_openers will be > 0
+> and then ->bd_contains is stable.
+> 
+> When FMODE_EXCL is used, blkdev_get() calls
+>    bd_start_claiming() ->  bd_prepare_to_claim() -> bd_may_claim()
+> 
+> This call happens before __blkdev_get() is called, so ->bd_contains
+> is not stable.  So bd_may_claim() cannot safely use ->bd_contains.
+> It currently tries to use it, and this can lead to a BUG_ON().
+> 
+> This happens when a whole device is open with a bd_holder (in use by
+> dm in my particular example) and two threads race to open a partition
+> for the first time, one opening with O_EXCL and one without.
+> 
+> The thread that doesn't use O_EXCL gets through blkdev_get() to
+> __blkdev_get(), gains the ->bd_mutex, and sets bdev->bd_contains = bdev;
+> 
+> Immediately thereafter the other thread, using FMODE_EXCL, calls
+> bd_start_claiming from blkdev_get().  This should fail because the
+> whole device has a holder, but because bdev->bd_contains == bdev
+> bd_may_claim() incorrectly reports success.
+> 
+> This thread continues and blocks on bd_mutex.
+> The first thread then sets bdev->bd_contains correctly and drops the mutex.
+> The thread using FMODE_EXCL then continues and when it calls bd_may_claim()
+> again in:
+> 			BUG_ON(!bd_may_claim(bdev, whole, holder));
+> The BUG_ON fires.
+> 
+> Fix this by removing the dependency on ->bd_contains in
+> bd_may_claim().  As bd_may_claim() have direct access to the whole
+> device, it can simply test if the target bdev is the whole device.
+> 
+> Fixes: 6b4517a7913a ("block: implement bd_claiming and claiming block")
+> Cc: stable@vger.kernel.org (v2.6.35+)
+> Signed-off-by: NeilBrown <neilb@suse.com>
+> ---
+> 
+> 
+> No reply after 2 weeks, and this didn't appear in -next, so I'm adding a
+> couple more addresses - hopefully someone can take it.
+> Thanks,
+> NeilBrown
+> 
+> 
+>  fs/block_dev.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/fs/block_dev.c b/fs/block_dev.c
+> index 05b553368bb4..9166b9f63d33 100644
+> --- a/fs/block_dev.c
+> +++ b/fs/block_dev.c
+> @@ -832,7 +832,7 @@ static bool bd_may_claim(struct block_device *bdev, struct block_device *whole,
+>  		return true;	 /* already a holder */
+>  	else if (bdev->bd_holder != NULL)
+>  		return false; 	 /* held by someone else */
+> -	else if (bdev->bd_contains == bdev)
+> +	else if (whole == bdev)
+>  		return true;  	 /* is a whole device which isn't held */
+>  
+>  	else if (whole->bd_holder == bd_may_claim)
+> 
 
-Add a sysfs entry to turn on priority information being passed
-to a ATA device. By default this feature is turned off.
+Looks good to me, Neil. I'll get it applied, thanks.
 
-This patch depends on ata: Enabling ATA Command Priorities
-
-tj: Renamed ncq_prio_on to ncq_prio_enable and removed trivial
-    ata_ncq_prio_on() and open-coded the test.
-
-Signed-off-by: Adam Manzanares <adam.manzanares@wdc.com>
----
- drivers/ata/libahci.c     |  1 +
- drivers/ata/libata-core.c |  3 ++-
- drivers/ata/libata-scsi.c | 69 +++++++++++++++++++++++++++++++++++++++++++++++
- include/linux/libata.h    |  2 ++
- 4 files changed, 74 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/ata/libahci.c b/drivers/ata/libahci.c
-index 0d028ea..ee7db31 100644
---- a/drivers/ata/libahci.c
-+++ b/drivers/ata/libahci.c
-@@ -140,6 +140,7 @@ EXPORT_SYMBOL_GPL(ahci_shost_attrs);
- struct device_attribute *ahci_sdev_attrs[] = {
- 	&dev_attr_sw_activity,
- 	&dev_attr_unload_heads,
-+	&dev_attr_ncq_prio_enable,
- 	NULL
- };
- EXPORT_SYMBOL_GPL(ahci_sdev_attrs);
-diff --git a/drivers/ata/libata-core.c b/drivers/ata/libata-core.c
-index 5d16363..f6a631a 100644
---- a/drivers/ata/libata-core.c
-+++ b/drivers/ata/libata-core.c
-@@ -787,7 +787,8 @@ int ata_build_rw_tf(struct ata_taskfile *tf, struct ata_device *dev,
- 		if (tf->flags & ATA_TFLAG_FUA)
- 			tf->device |= 1 << 7;
- 
--		if (dev->flags & ATA_DFLAG_NCQ_PRIO) {
-+		if ((dev->flags & ATA_DFLAG_NCQ_PRIO) &&
-+		    (dev->flags & ATA_DFLAG_NCQ_PRIO_ENABLE)) {
- 			if (class == IOPRIO_CLASS_RT)
- 				tf->hob_nsect |= ATA_PRIO_HIGH <<
- 						 ATA_SHIFT_PRIO;
-diff --git a/drivers/ata/libata-scsi.c b/drivers/ata/libata-scsi.c
-index 2bccc3c..328a601 100644
---- a/drivers/ata/libata-scsi.c
-+++ b/drivers/ata/libata-scsi.c
-@@ -271,6 +271,74 @@ DEVICE_ATTR(unload_heads, S_IRUGO | S_IWUSR,
- 	    ata_scsi_park_show, ata_scsi_park_store);
- EXPORT_SYMBOL_GPL(dev_attr_unload_heads);
- 
-+static ssize_t ata_ncq_prio_enable_show(struct device *device,
-+					struct device_attribute *attr,
-+					char *buf)
-+{
-+	struct scsi_device *sdev = to_scsi_device(device);
-+	struct ata_port *ap;
-+	struct ata_device *dev;
-+	bool ncq_prio_enable;
-+	int rc = 0;
-+
-+	ap = ata_shost_to_port(sdev->host);
-+
-+	spin_lock_irq(ap->lock);
-+	dev = ata_scsi_find_dev(ap, sdev);
-+	if (!dev) {
-+		rc = -ENODEV;
-+		goto unlock;
-+	}
-+
-+	ncq_prio_enable = dev->flags & ATA_DFLAG_NCQ_PRIO_ENABLE;
-+
-+unlock:
-+	spin_unlock_irq(ap->lock);
-+
-+	return rc ? rc : snprintf(buf, 20, "%u\n", ncq_prio_enable);
-+}
-+
-+static ssize_t ata_ncq_prio_enable_store(struct device *device,
-+					 struct device_attribute *attr,
-+					 const char *buf, size_t len)
-+{
-+	struct scsi_device *sdev = to_scsi_device(device);
-+	struct ata_port *ap;
-+	struct ata_device *dev;
-+	long int input;
-+	unsigned long flags;
-+	int rc;
-+
-+	rc = kstrtol(buf, 10, &input);
-+	if (rc)
-+		return rc;
-+	if ((input < 0) || (input > 1))
-+		return -EINVAL;
-+
-+	ap = ata_shost_to_port(sdev->host);
-+
-+	spin_lock_irqsave(ap->lock, flags);
-+	dev = ata_scsi_find_dev(ap, sdev);
-+	if (unlikely(!dev)) {
-+		rc = -ENODEV;
-+		goto unlock;
-+	}
-+
-+	if (input)
-+		dev->flags |= ATA_DFLAG_NCQ_PRIO_ENABLE;
-+	else
-+		dev->flags &= ~ATA_DFLAG_NCQ_PRIO_ENABLE;
-+
-+unlock:
-+	spin_unlock_irqrestore(ap->lock, flags);
-+
-+	return rc ? rc : len;
-+}
-+
-+DEVICE_ATTR(ncq_prio_enable, S_IRUGO | S_IWUSR,
-+	    ata_ncq_prio_enable_show, ata_ncq_prio_enable_store);
-+EXPORT_SYMBOL_GPL(dev_attr_ncq_prio_enable);
-+
- void ata_scsi_set_sense(struct ata_device *dev, struct scsi_cmnd *cmd,
- 			u8 sk, u8 asc, u8 ascq)
- {
-@@ -402,6 +470,7 @@ EXPORT_SYMBOL_GPL(dev_attr_sw_activity);
- 
- struct device_attribute *ata_common_sdev_attrs[] = {
- 	&dev_attr_unload_heads,
-+	&dev_attr_ncq_prio_enable,
- 	NULL
- };
- EXPORT_SYMBOL_GPL(ata_common_sdev_attrs);
-diff --git a/include/linux/libata.h b/include/linux/libata.h
-index 90b69a6..c170be5 100644
---- a/include/linux/libata.h
-+++ b/include/linux/libata.h
-@@ -167,6 +167,7 @@ enum {
- 	ATA_DFLAG_UNLOCK_HPA	= (1 << 18), /* unlock HPA */
- 	ATA_DFLAG_NCQ_SEND_RECV = (1 << 19), /* device supports NCQ SEND and RECV */
- 	ATA_DFLAG_NCQ_PRIO	= (1 << 20), /* device supports NCQ priority */
-+	ATA_DFLAG_NCQ_PRIO_ENABLE = (1 << 21), /* Priority cmds sent to dev */
- 	ATA_DFLAG_INIT_MASK	= (1 << 24) - 1,
- 
- 	ATA_DFLAG_DETACH	= (1 << 24),
-@@ -545,6 +546,7 @@ typedef void (*ata_postreset_fn_t)(struct ata_link *link, unsigned int *classes)
- 
- extern struct device_attribute dev_attr_link_power_management_policy;
- extern struct device_attribute dev_attr_unload_heads;
-+extern struct device_attribute dev_attr_ncq_prio_enable;
- extern struct device_attribute dev_attr_em_message_type;
- extern struct device_attribute dev_attr_em_message;
- extern struct device_attribute dev_attr_sw_activity;
 -- 
-2.7.4
+Jens Axboe
