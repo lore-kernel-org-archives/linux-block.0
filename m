@@ -1,58 +1,45 @@
-Return-Path: <htejun@gmail.com>
-Return-Path: <htejun@gmail.com>
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Mon, 12 Dec 2016 13:05:01 -0500
-From: Tejun Heo <tj@kernel.org>
-To: Matthew Wilcox <mawilcox@microsoft.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Lai Jiangshan <jiangshanlai@gmail.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
-	"kent.overstreet@gmail.com" <kent.overstreet@gmail.com>
-Subject: Re: [RFC 00/10] implement alternative and much simpler id allocator
-Message-ID: <20161212180501.GD13864@htj.duckdns.org>
+Return-Path: <mawilcox@microsoft.com>
+From: Matthew Wilcox <mawilcox@microsoft.com>
+To: Tejun Heo <tj@kernel.org>, Andrew Morton <akpm@linux-foundation.org>
+CC: Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Lai Jiangshan
+	<jiangshanlai@gmail.com>, Jens Axboe <axboe@kernel.dk>, Greg Kroah-Hartman
+	<gregkh@linuxfoundation.org>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "dri-devel@lists.freedesktop.org"
+	<dri-devel@lists.freedesktop.org>, "kent.overstreet@gmail.com"
+	<kent.overstreet@gmail.com>
+Subject: RE: [RFC 00/10] implement alternative and much simpler id allocator
+Date: Mon, 12 Dec 2016 17:35:17 +0000
+Message-ID: <BY2PR21MB0036238FFF7D84F17509B651CB980@BY2PR21MB0036.namprd21.prod.outlook.com>
 References: <1481160187-9652-1-git-send-email-linux@rasmusvillemoes.dk>
  <20161209140140.5e0a68e2e1cf9861335bdf3b@linux-foundation.org>
  <20161212170959.GB13864@htj.duckdns.org>
- <BY2PR21MB0036238FFF7D84F17509B651CB980@BY2PR21MB0036.namprd21.prod.outlook.com>
+In-Reply-To: <20161212170959.GB13864@htj.duckdns.org>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <BY2PR21MB0036238FFF7D84F17509B651CB980@BY2PR21MB0036.namprd21.prod.outlook.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Hello, Matthew.
-
-On Mon, Dec 12, 2016 at 05:35:17PM +0000, Matthew Wilcox wrote:
-> I know the preload followed by preload_end looks wrong.  I don't
-> think it's broken though.  If we get preempted, then the worst
-> situation is that we'll end up with the memory we preallocated being
-> allocated to somebody else.  Then the attempt to allocate memory can
-> fail, and we'll return -EAGAIN, at which point all callers are
-> supposed to return to the pre_get() stage.  Certainly that's what
-> ida_simple_get() does.
-
-Ah, right, ida_pre_get() doesn't have any protection against other
-task allocating inbetween pre_get and the actual allocation, so it
-should retry on failure.  Yeah, then the proposed preloading wouldn't
-be wrong.  It'd be nice to explain what's going on tho.
-
-> I'd definitely be open to changing the IDA API.  I know Kent had
-> some thoughts on that including splitting the simple lock into a
-> per-IDA lock.  His last work on it was here, I believe:
-> 
-> https://evilpiepirate.org/git/linux-bcache.git/log/?h=idr
-
-Yeah, that was a big re-write, but for now I think it'd be nice to
-replace ida's pre_get mechanism with something similar to idr's
-preload so that they're more consistent.  There aren't that many
-direct users of ida_pre_get(), so it shouldn't be too difficult to
-change.
-
-Thanks.
-
--- 
-tejun
+RnJvbTogVGVqdW4gSGVvIFttYWlsdG86aHRlanVuQGdtYWlsLmNvbV0gT24gQmVoYWxmIE9mIFRl
+anVuIEhlbw0KPiBBaCwgeWVhaCwgZ3JlYXQgdG8gc2VlIHRoZSBzaWxseSBpbXBsZW1lbnRhdGlv
+biBiZWluZyByZXBsYWNlZCB0aGUNCj4gcmFkaXggdHJlZS4gIGlkYV9wcmVfZ2V0KCkgbG9va3Mg
+c3VzcGljaW91cyB0aG8uICBpZHJfcHJlbG9hZCgpDQo+IGltbWVkaWNhdGVseSBiZWluZyBmb2xs
+b3dlZCBieSBpZHJfcHJlbG9hZF9lbmQoKSBwcm9iYWJseSBpcyBicm9rZW4uDQo+IE1heWJlIHdo
+YXQgd2UgbmVlZCBpcyBtb3ZpbmcgaWRhIHRvIGlkciBsaWtlIHByZWxvYWQgaW50ZXJmYWNlIGFu
+ZA0KPiB0aGVuIGNvbnZlcnQgaXQgdG8gcmFkaXggYmFzZWQgaW50ZXJmYWNlPyAgaWRhIGN1cnJl
+bnRseSBhc3N1bWVzDQo+IHBlci1pZGEgcHJlbG9hZGluZy4NCg0KSGV5IFRlanVuISAgR3JlYXQg
+dG8gaGF2ZSB5b3VyIGNvbW1lbnRzIG9uIHRoaXMgcmVpbXBsZW1lbnRhdGlvbi4NCg0KSSBrbm93
+IHRoZSBwcmVsb2FkIGZvbGxvd2VkIGJ5IHByZWxvYWRfZW5kIGxvb2tzIHdyb25nLiAgSSBkb24n
+dCB0aGluayBpdCdzIGJyb2tlbiB0aG91Z2guICBJZiB3ZSBnZXQgcHJlZW1wdGVkLCB0aGVuIHRo
+ZSB3b3JzdCBzaXR1YXRpb24gaXMgdGhhdCB3ZSdsbCBlbmQgdXAgd2l0aCB0aGUgbWVtb3J5IHdl
+IHByZWFsbG9jYXRlZCBiZWluZyBhbGxvY2F0ZWQgdG8gc29tZWJvZHkgZWxzZS4gIFRoZW4gdGhl
+IGF0dGVtcHQgdG8gYWxsb2NhdGUgbWVtb3J5IGNhbiBmYWlsLCBhbmQgd2UnbGwgcmV0dXJuIC1F
+QUdBSU4sIGF0IHdoaWNoIHBvaW50IGFsbCBjYWxsZXJzIGFyZSBzdXBwb3NlZCB0byByZXR1cm4g
+dG8gdGhlIHByZV9nZXQoKSBzdGFnZS4gIENlcnRhaW5seSB0aGF0J3Mgd2hhdCBpZGFfc2ltcGxl
+X2dldCgpIGRvZXMuDQoNCkhtbSAuLi4gbG9va2luZyBhdCB0aGUgaW1wbGVtZW50YXRpb24gYWdh
+aW4sIHdlIG1pZ2h0IHJldHVybiAtRU5PTUVNIHdoZW4gd2Ugc2hvdWxkIHJldHVybiAtRUFHQUlO
+LiAgTGV0IG1lIGZpeCB0aGF0IChhbmQgdGhlIHRlc3Qgc3VpdGUgLi4uKQ0KDQpJJ2QgZGVmaW5p
+dGVseSBiZSBvcGVuIHRvIGNoYW5naW5nIHRoZSBJREEgQVBJLiAgSSBrbm93IEtlbnQgaGFkIHNv
+bWUgdGhvdWdodHMgb24gdGhhdCBpbmNsdWRpbmcgc3BsaXR0aW5nIHRoZSBzaW1wbGUgbG9jayBp
+bnRvIGEgcGVyLUlEQSBsb2NrLiAgSGlzIGxhc3Qgd29yayBvbiBpdCB3YXMgaGVyZSwgSSBiZWxp
+ZXZlOg0KDQpodHRwczovL2V2aWxwaWVwaXJhdGUub3JnL2dpdC9saW51eC1iY2FjaGUuZ2l0L2xv
+Zy8/aD1pZHINCg0K
