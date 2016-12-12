@@ -1,68 +1,58 @@
-Return-Path: <mawilcox@microsoft.com>
-From: Matthew Wilcox <mawilcox@microsoft.com>
-To: Rasmus Villemoes <linux@rasmusvillemoes.dk>
-CC: Tejun Heo <tj@kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, Lai Jiangshan <jiangshanlai@gmail.com>, "Jens
- Axboe" <axboe@kernel.dk>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Mon, 12 Dec 2016 13:05:01 -0500
+From: Tejun Heo <tj@kernel.org>
+To: Matthew Wilcox <mawilcox@microsoft.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>, "Andrew
- Morton" <akpm@linux-foundation.org>
-Subject: RE: [RFC 00/10] implement alternative and much simpler id allocator
-Date: Fri, 16 Dec 2016 19:14:11 +0000
-Message-ID: <BY2PR21MB00364EEDE35645341BEC695CCB9C0@BY2PR21MB0036.namprd21.prod.outlook.com>
+	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+	"kent.overstreet@gmail.com" <kent.overstreet@gmail.com>
+Subject: Re: [RFC 00/10] implement alternative and much simpler id allocator
+Message-ID: <20161212180501.GD13864@htj.duckdns.org>
 References: <1481160187-9652-1-git-send-email-linux@rasmusvillemoes.dk>
  <20161209140140.5e0a68e2e1cf9861335bdf3b@linux-foundation.org>
-In-Reply-To: <20161209140140.5e0a68e2e1cf9861335bdf3b@linux-foundation.org>
-Content-Type: text/plain; charset="utf-8"
+ <20161212170959.GB13864@htj.duckdns.org>
+ <BY2PR21MB0036238FFF7D84F17509B651CB980@BY2PR21MB0036.namprd21.prod.outlook.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <BY2PR21MB0036238FFF7D84F17509B651CB980@BY2PR21MB0036.namprd21.prod.outlook.com>
 List-ID: <linux-block@vger.kernel.org>
 
-RnJvbTogQW5kcmV3IE1vcnRvbiBbbWFpbHRvOmFrcG1AbGludXgtZm91bmRhdGlvbi5vcmddDQo+
-IE9uIFRodSwgIDggRGVjIDIwMTYgMDI6MjI6NTUgKzAxMDAgUmFzbXVzIFZpbGxlbW9lcw0KPiA8
-bGludXhAcmFzbXVzdmlsbGVtb2VzLmRrPiB3cm90ZToNCj4gPiBUTDtEUjogdGhlc2UgcGF0Y2hl
-cyBzYXZlIDI1MCBLQiBvZiBtZW1vcnksIHdpdGggbW9yZSBsb3ctaGFuZ2luZw0KPiA+IGZydWl0
-IHJlYWR5IHRvIHBpY2suDQo+ID4NCj4gPiBXaGlsZSBicm93c2luZyB0aHJvdWdoIHRoZSBsaWIv
-aWRyLmMgY29kZSwgSSBub3RpY2VkIHRoYXQgdGhlIGNvZGUgYXQNCj4gPiB0aGUgZW5kIG9mIGlk
-YV9nZXRfbmV3X2Fib3ZlKCkgcHJvYmFibHkgZG9lc24ndCB3b3JrIGFzIGludGVuZGVkOiBNb3N0
-DQo+ID4gdXNlcnMgb2YgaWRhIHVzZSBpdCB2aWEgaWRhX3NpbXBsZV9nZXQoKSwgYW5kIHRoYXQg
-c3RhcnRzIGJ5DQo+ID4gdW5jb25kaXRpb25hbGx5IGNhbGxpbmcgaWRhX3ByZV9nZXQoKSwgZW5z
-dXJpbmcgdGhhdCBpZGEtPmlkciBoYXMNCj4gPiA4PT1NQVhfSURSX0ZSRUUgaWRyX2xheWVycyBp
-biBpdHMgZnJlZSBsaXN0IGlkX2ZyZWUuIEluIHRoZSBjb21tb24NCj4gPiBjYXNlLCBub25lIChv
-ciBhdCBtb3N0IG9uZSkgb2YgdGhlc2UgZ2V0IHVzZWQgZHVyaW5nDQo+ID4gaWRhX2dldF9uZXdf
-YWJvdmUoKSwgYW5kIHdlIG9ubHkgZnJlZSBvbmUsIGxlYXZpbmcgYXQgbGVhc3QgNiAodXN1YWxs
-eQ0KPiA+IDcpIGlkcl9sYXllcnMgaW4gdGhlIGZyZWUgbGlzdC4NCj4gDQo+IEkgZXhwZWN0IHdl
-J2xsIGJlIG1lcmdpbmcgcGF0Y2hlcyAxLTMyIG9mIHRoYXQgc2VyaWVzIGludG8gNC4xMC1yYzEg
-YW5kDQo+IHRoZSBhYm92ZSBwYXRjaCAoIzMzKSBpbnRvIDQuMTEtcmMxLg0KDQpIaSBSYXNtdXMs
-DQoNClRoYW5rcyBmb3IgeW91ciB3b3JrIG9uIHRoaXM7IHlvdSd2ZSByZWFsbHkgcHV0IHNvbWUg
-ZWZmb3J0IGludG8gcHJvdmluZyB5b3VyIHdvcmsgaGFzIHZhbHVlLiAgTXkgbW90aXZhdGlvbiB3
-YXMgcHVyZWx5IGFlc3RoZXRpYywgYnV0IHlvdSd2ZSBnb3Qgc29tZSBnZW51aW5lIHNhdmluZ3Mg
-aGVyZSAoYWRtaXR0ZWRseSBpdCdzIGFib3V0IGEgcXVhcnRlciBvZiBhIGNlbnQncyB3b3J0aCBv
-ZiBtZW1vcnkgd2l0aCBEUkFNIHNlbGxpbmcgZm9yICQxMC9HQikuICBOZXZlcnRoZWxlc3MsIHRo
-YXQgYWRkcyB1cCBvdmVyIGEgYmlsbGlvbiBkZXZpY2VzLCBhbmQgdGhlcmUgYXJlIHN0aWxsIHBl
-b3BsZSB0cnlpbmcgdG8gZml0IExpbnV4IGludG8gNE1CIGVtYmVkZGVkIGRldmljZXMuDQoNCkkg
-dGhpbmsgbXkgcmVpbXBsZW1lbnRhdGlvbiBvZiB0aGUgSURBIG9uIHRvcCBvZiB0aGUgcmFkaXgg
-dHJlZSBpcyBjbG9zZSBlbm91Z2ggdG8geW91ciB0SURBIGluIG1lbW9yeSBjb25zdW1wdGlvbiB0
-aGF0IGl0IGRvZXNuJ3Qgd2FycmFudCBhIG5ldyBkYXRhIHN0cnVjdHVyZS4NCg0KT24gYSA2NC1i
-aXQgbWFjaGluZSwgeW91ciB0SURBIHJvb3QgaXMgMjQgYnl0ZXM7IG15IG5ldyBJREEgcm9vdCBp
-cyAxNiBieXRlcy4gIElmIHlvdSBhbGxvY2F0ZSBvbmx5IG9uZSBlbnRyeSwgeW91J2xsIGFsbG9j
-YXRlIDggYnl0ZXMuICBUaGFua3MgdG8gdGhlIHNsYWIgYWxsb2NhdG9yLCB0aGF0IGdldHMgcm91
-bmRlZCB1cCB0byAzMiBieXRlcy4gIEkgYWxsb2NhdGUgdGhlIGZ1bGwgMTI4IGJ5dGUgbGVhZiwg
-YnV0IEkgc3RvcmUgdGhlIHBvaW50ZXIgdG8gaXQgaW4gdGhlIHJvb3QgKHVubGlrZSB0aGUgSURS
-LCB0aGUgcmFkaXggdHJlZSBkb2Vzbid0IG5lZWQgdG8gYWxsb2NhdGUgYSBsYXllciBmb3IgYSBz
-aW5nbGUgZW50cnkpLiAgU28gdElEQSB3aW5zIG9uIG1lbW9yeSBjb25zdW1wdGlvbiBiZXR3ZWVu
-IDEgYW5kIDUxMSBJRHMsIGFuZCBuZXdJREEgaXMgc2xpZ2h0bHkgYWhlYWQgYmV0d2VlbiA1MTIg
-YW5kIDEwMjMgSURzLiAgQWJvdmUgMTAyNCBJRHMsIEkgYWxsb2NhdGUgYSBsYXllciAoNTc2IGJ5
-dGVzKSwgYW5kIGEgc2Vjb25kIGxlYWYgKDgzMiBieXRlcyB0b3RhbCksIHdoaWxlIHlvdSBqdXN0
-IGRvdWJsZSB0byAyNTYgYnl0ZXMuICBJIHRoaW5rIHRJREEncyBtZW1vcnkgY29uc3VtcHRpb24g
-dGhlbiBzdGF5cyBhaGVhZCBvZiBuZXcgSURBLiAgQnV0IHBlcmZvcm1hbmNlIG9mICdhbGxvY2F0
-ZSBuZXcgSUQnIHNob3VsZCBiZSBiZXR0ZXIgZm9yIG5ld0lEQSB0aGFuIHRJREEgYXMgbmV3SURB
-IGNhbiBza2lwIG92ZXIgYWxsIHRoZSBjYWNoZWxpbmVzIG9mIGZ1bGwgYml0bWFwcy4NCg0KWWVz
-dGVyZGF5LCBJIGZvdW5kIGEgbmV3IHByb2JsZW0gd2l0aCB0aGUgSURBIGFsbG9jYXRvciB0aGF0
-IHlvdSBoYWRuJ3QgbWVudGlvbmVkIC0tIGFib3V0IGhhbGYgb2YgdGhlIHVzZXJzIG9mIHRoZSBJ
-REEgZGF0YSBzdHJ1Y3R1cmUgbmV2ZXIgY2FsbCBkZXN0cm95X2lkYSgpLiAgV2hpY2ggbWVhbnMg
-dGhhdCB0aGV5J3JlIGxlYWtpbmcgdGhlIHByZWxvYWRlZCBiaXRtYXAuICBJIGhhdmUgYSBwYXRj
-aCB3aGljaCBtb3ZlcyB0aGUgcHJlbG9hZGVkIElEQSBiaXRtYXAgZnJvbSBiZWluZyBzdG9yZWQg
-aW4gdGhlIElEQSB0byBiZWluZyBzdG9yZWQgaW4gYSBwZXJjcHUgdmFyaWFibGUuICBZb3UgY2Fu
-IGZpbmQgaXQgaGVyZTogaHR0cDovL2dpdC5pbmZyYWRlYWQub3JnL3VzZXJzL3dpbGx5L2xpbnV4
-LWRheC5naXQvc2hvcnRsb2cvcmVmcy9oZWFkcy9pZHItMjAxNi0xMi0xNiBJJ2Qgd2VsY29tZSBt
-b3JlIHRlc3RpbmcgYW5kIGNvZGUgcmV2aWV3Lg0K
+Hello, Matthew.
+
+On Mon, Dec 12, 2016 at 05:35:17PM +0000, Matthew Wilcox wrote:
+> I know the preload followed by preload_end looks wrong.  I don't
+> think it's broken though.  If we get preempted, then the worst
+> situation is that we'll end up with the memory we preallocated being
+> allocated to somebody else.  Then the attempt to allocate memory can
+> fail, and we'll return -EAGAIN, at which point all callers are
+> supposed to return to the pre_get() stage.  Certainly that's what
+> ida_simple_get() does.
+
+Ah, right, ida_pre_get() doesn't have any protection against other
+task allocating inbetween pre_get and the actual allocation, so it
+should retry on failure.  Yeah, then the proposed preloading wouldn't
+be wrong.  It'd be nice to explain what's going on tho.
+
+> I'd definitely be open to changing the IDA API.  I know Kent had
+> some thoughts on that including splitting the simple lock into a
+> per-IDA lock.  His last work on it was here, I believe:
+> 
+> https://evilpiepirate.org/git/linux-bcache.git/log/?h=idr
+
+Yeah, that was a big re-write, but for now I think it'd be nice to
+replace ida's pre_get mechanism with something similar to idr's
+preload so that they're more consistent.  There aren't that many
+direct users of ida_pre_get(), so it shouldn't be too difficult to
+change.
+
+Thanks.
+
+-- 
+tejun
