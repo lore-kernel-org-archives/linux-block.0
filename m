@@ -1,51 +1,29 @@
-Return-Path: <axboe@kernel.dk>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- linux-fsdevel@vger.kernel.org
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] fs meta data unmap
-Message-ID: <db91490b-dcfb-983b-52be-265e842dcf0e@kernel.dk>
-Date: Wed, 14 Dec 2016 15:54:19 -0700
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga11.intel.com ([192.55.52.93]:5718 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751677AbcLLDrK (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 11 Dec 2016 22:47:10 -0500
+Date: Mon, 12 Dec 2016 11:56:23 +0800
+From: Chen Yu <yu.c.chen@intel.com>
+To: Jens Axboe <axboe@kernel.dk>, Freddy Xin <freddy@asix.com.tw>,
+        Robert Foss <robert.foss@collabora.com>
+Cc: linux-block@vger.kernel.org, Rui Zhang <rui.zhang@intel.com>,
+        Len Brown <lenb@kernel.org>
+Subject: [RFC] Why ax88772a_hw_reset sleeps for 200ms? Can we reduce the
+ value?
+Message-ID: <20161212035623.GA4101@yu-desktop-1.sh.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Hi Linus,
+Hi guys,
+Currently I'm experiencing long time latency of resuming
+from S3 on my MacBookPro 2015, according to the log of ftrace,
+one of the suspicious time consumers is ax88772a_hw_reset has an
+explicit msleep of 200ms in the code, is this mandatory or
+can we reduce this sleep time of it?
+https://bugzilla.kernel.org/show_bug.cgi?id=190111
 
-A series from Jan Kara, providing a more efficient way for unmapping
-meta data from in the buffer cache than doing it block-by-block. Provide
-a general helper that existing callers can use.
-
-Please pull!
-
-
-  git://git.kernel.dk/linux-block.git for-4.10/fs-unmap
-
-
-----------------------------------------------------------------
-Jan Kara (6):
-      fs: Provide function to unmap metadata for a range of blocks
-      direct-io: Use clean_bdev_aliases() instead of handmade iteration
-      ext4: Use clean_bdev_aliases() instead of iteration
-      ext2: Use clean_bdev_aliases() instead of iteration
-      fs: Add helper to clean bdev aliases under a bh and use it
-      fs: Remove unmap_underlying_metadata
-
- fs/buffer.c                 | 104 +++++++++++++++++++++++++++++++-------------
- fs/direct-io.c              |  28 +++---------
- fs/ext2/inode.c             |   9 ++--
- fs/ext4/extents.c           |  13 +-----
- fs/ext4/inode.c             |  18 +++-----
- fs/ext4/page-io.c           |   2 +-
- fs/mpage.c                  |   3 +-
- fs/ntfs/aops.c              |   2 +-
- fs/ntfs/file.c              |   5 +--
- fs/ocfs2/aops.c             |   2 +-
- fs/ufs/balloc.c             |   3 +-
- fs/ufs/inode.c              |   3 +-
- include/linux/buffer_head.h |   7 ++-
- 13 files changed, 104 insertions(+), 95 deletions(-)
-
--- 
-Jens Axboe
+Thanks in advance,
+Yu
