@@ -1,129 +1,132 @@
-Return-Path: <Damien.LeMoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Shaun Tancheff <shaun@tancheff.com>,
-	Damien Le Moal <damien.lemoal@wdc.com>
-Subject: [PATCH v3] block: Check partition alignment on zoned block devices
-Date: Thu,  1 Dec 2016 15:25:23 +0900
-Message-Id: <1480573523-30381-1-git-send-email-damien.lemoal@wdc.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:52898 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751721AbcLLDSI (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 11 Dec 2016 22:18:08 -0500
+From: NeilBrown <neilb@suse.com>
+To: Coly Li <colyli@suse.de>, Shaohua Li <shli@kernel.org>
+Date: Mon, 12 Dec 2016 14:17:58 +1100
+Cc: Avi Kivity <avi@scylladb.com>, linux-raid@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: Re: raid0 vs. mkfs
+In-Reply-To: <14867138-b0ea-fb58-dae6-70f30a3ddcc8@suse.de>
+References: <56c83c4e-d451-07e5-88e2-40b085d8681c@scylladb.com> <87oa108a1x.fsf@notabene.neil.brown.name> <286a5fc1-eda3-0421-a88e-b03c09403259@scylladb.com> <87inr880au.fsf@notabene.neil.brown.name> <df73ebc4-9b78-09b5-022b-089c30dea17c@scylladb.com> <87d1he7zv9.fsf@notabene.neil.brown.name> <33bb250a-4dfd-0acc-9958-30fdac10918c@scylladb.com> <ccf447df-e7b5-0a08-7753-67ee4ad574ef@suse.de> <20161207165933.isq64dbkxye772nz@kernel.org> <c384d070-457c-cfee-e35f-53b9195ace10@suse.de> <20161208191906.ealqsudmgopn7wa3@kernel.org> <14867138-b0ea-fb58-dae6-70f30a3ddcc8@suse.de>
+Message-ID: <87y3zlzvh5.fsf@notabene.neil.brown.name>
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: damien.lemoal@wdc.com
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: multipart/signed; boundary="=-=-=";
+        micalg=pgp-sha256; protocol="application/pgp-signature"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Both blkdev_report_zones and blkdev_reset_zones can operate on a partition of
-a zoned block device. However, the first and last zones reported for a
-partition make sense only if the partition start sector and size are aligned
-on the device zone size. The same applies for zone reset. Resetting the first
-or the last zone of a partition straddling zones may impact neighboring
-partitions. Finally, if a partition start sector is not at the beginning of a
-sequential zone, it will be impossible to write to the first sectors of the
-partition on a host-managed device.
-Avoid all these problems and incoherencies by ignoring partitions that are not
-zone aligned.
+--=-=-=
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Note: If CONFIG_BLK_DEV_ZONED is disabled, bdev_is_zoned() will still report
-the correct disk zoning type (host-aware, host-managed or none) but
-bdev_zone_size() will always return 0 for zoned block devices (i.e. the zone
-size is unknown). So test this as a way to ensure that a zoned block device is
-being handled as such. As a result, for a host-aware devices, unaligned zone
-partitions will be accepted with CONFIG_BLK_DEV_ZONED disabled. That is, the
-disk will be treated as a regular block device (as it should). If zoned block
-device support is enabled, only aligned partitions will be accepted.
+On Fri, Dec 09 2016, Coly Li wrote:
 
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
----
- block/partition-generic.c | 66 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 66 insertions(+)
+> On 2016/12/9 =E4=B8=8A=E5=8D=883:19, Shaohua Li wrote:
+>> On Fri, Dec 09, 2016 at 12:44:57AM +0800, Coly Li wrote:
+>>> On 2016/12/8 =E4=B8=8A=E5=8D=8812:59, Shaohua Li wrote:
+>>>> On Wed, Dec 07, 2016 at 07:50:33PM +0800, Coly Li wrote:
+>>> [snip]
+>>>> Thanks for doing this, Coly! For raid0, this totally makes sense. The =
+raid0
+>>>> zones make things a little complicated though. I just had a brief look=
+ of your
+>>>> proposed patch, which looks really complicated. I'd suggest something =
+like
+>>>> this:
+>>>> 1. split the bio according to zone boundary.
+>>>> 2. handle the splitted bio. since the bio is within zone range, calcul=
+ating
+>>>> the start and end sector for each rdev should be easy.
+>>>>
+>>>
+>>> Hi Shaohua,
+>>>
+>>> Thanks for your suggestion! I try to modify the code by your suggestion,
+>>> it is even more hard to make the code that way ...
+>>>
+>>> Because even split bios for each zone, all the corner cases still exist
+>>> and should be taken care in every zoon. The code will be more complicat=
+ed.
+>>=20
+>> Not sure why it makes the code more complicated. Probably I'm wrong, but=
+ Just
+>> want to make sure we are in the same page: split the bio according to zo=
+ne
+>> boundary, then handle the splitted bio separately. Calculating end/start=
+ point
+>> of each rdev for the new bio within a zone should be simple. we then clo=
+ne a
+>> bio for each rdev and dispatch. So for example:
+>> Disk 0: D0 D2 D4 D6 D7
+>> Disk 1: D1 D3 D5
+>> zone 0 is from D0 - D5, zone 1 is from D6 - D7
+>> If bio is from D1 to D7, we split it to 2 bios, one is D1 - D5, the othe=
+r D6 - D7.
+>> For D1 - D5, we dispatch 2 bios. D1 - D5 for disk 1, D2 - D4 for disk 0
+>> For D6 - D7, we just dispatch to disk 0.
+>> What kind of corner case makes this more complicated?
+>>=20=20
+>
+> Let me explain the corner cases.
+>
+> When upper layer code issues a DISCARD bio, the bio->bi_iter.bi_sector
+> may not be chunk size aligned, and bio->bi_iter.bi_size may not be
+> (chunk_sects*nb_dev) sectors aligned. In raid0, we can't simply round
+> up/down them into chunk size aligned number, otherwise data
+> lost/corruption will happen.
+>
+> Therefore for each DISCARD bio that raid0_make_request() receive, the
+> beginning and ending parts of this bio should be treat very carefully.
+> All the corner cases *come from here*, they are not about number of
+> zones or rdevs, it is about whether bio->bi_iter.bi_sector and
+> bio->bi_iter.bi_size are chunk size aligned or not.
+>
+> - beginning of the bio
+>   If bio->bi_iter.bi_sector is not chunk size aligned, current raid0
+> code will split the beginning part into split bio which only contains
+> sectors from bio->bi_iter.sector to next chunk size aligned offset, and
+> issue this bio by generic_make_request(). But in
+> discard_large_discard_bio() we can't issue the split bio now, we have to
+> record lenth of this split bio into a per-device structure, and issue a
 
-diff --git a/block/partition-generic.c b/block/partition-generic.c
-index 71d9ed9..a60ac7f 100644
---- a/block/partition-generic.c
-+++ b/block/partition-generic.c
-@@ -430,6 +430,57 @@ static int drop_partitions(struct gendisk *disk, struct block_device *bdev)
- 	return 0;
- }
- 
-+static bool part_zone_aligned(struct gendisk *disk,
-+			      struct block_device *bdev,
-+			      sector_t from, sector_t size)
-+{
-+	unsigned int zone_size = bdev_zone_size(bdev);
-+
-+	/*
-+	 * If this function is called, then the disk is a zoned block device
-+	 * (host-aware or host-managed). This can be detected even if the
-+	 * zoned block device support is disabled (CONFIG_BLK_DEV_ZONED not
-+	 * set). In this case, however, only host-aware devices will be seen
-+	 * as a block device is not created for host-managed devices. Without
-+	 * zoned block device support, host-aware drives can still be used as
-+	 * regular block devices (no zone operation) and their zone size will
-+	 * be reported as 0. Allow this case.
-+	 */
-+	if (!zone_size)
-+		return true;
-+
-+	/*
-+	 * Check partition start and size alignement. If the drive has a
-+	 * smaller last runt zone, ignore it and allow the partition to
-+	 * use it. Check the zone size too: it should be a power of 2 number
-+	 * of sectors.
-+	 */
-+	WARN_ON_ONCE(!is_power_of_2(zone_size));
-+	if (!is_power_of_2(zone_size)) {
-+		u32 rem;
-+
-+		div_u64_rem(from, zone_size, &rem);
-+		if (rem)
-+			return false;
-+		if ((from + size) < get_capacity(disk)) {
-+			div_u64_rem(size, zone_size, &rem);
-+			if (rem)
-+				return false;
-+		}
-+
-+	} else {
-+
-+		if (from & (zone_size - 1))
-+			return false;
-+		if ((from + size) < get_capacity(disk) &&
-+		    (size & (zone_size - 1)))
-+			return false;
-+
-+	}
-+
-+	return true;
-+}
-+
- int rescan_partitions(struct gendisk *disk, struct block_device *bdev)
- {
- 	struct parsed_partitions *state = NULL;
-@@ -529,6 +580,21 @@ int rescan_partitions(struct gendisk *disk, struct block_device *bdev)
- 			}
- 		}
- 
-+		/*
-+		 * On a zoned block device, partitions should be aligned on the
-+		 * device zone size (i.e. zone boundary crossing not allowed).
-+		 * Otherwise, resetting the write pointer of the last zone of
-+		 * one partition may impact the following partition.
-+		 */
-+		if (bdev_is_zoned(bdev) &&
-+		    !part_zone_aligned(disk, bdev, from, size)) {
-+			printk(KERN_WARNING
-+			       "%s: p%d start %llu+%llu is not zone aligned\n",
-+			       disk->disk_name, p, (unsigned long long) from,
-+			       (unsigned long long) size);
-+			continue;
-+		}
-+
- 		part = add_partition(disk, p, from, size,
- 				     state->parts[p].flags,
- 				     &state->parts[p].info);
--- 
-2.7.4
+Why?
 
-Western Digital Corporation (and its subsidiaries) E-mail Confidentiality Notice & Disclaimer:
+Why cannot you just split of the start of the bio and chain it with the
+rest of the bio?
 
-This e-mail and any files transmitted with it may contain confidential or legally privileged information of WDC and/or its affiliates, and are intended solely for the use of the individual or entity to which they are addressed. If you are not the intended recipient, any disclosure, copying, distribution or any action taken or omitted to be taken in reliance on it, is prohibited. If you have received this e-mail in error, please notify the sender immediately and delete the e-mail in its entirety from your system.
+If the bio doesn't start at the beginning of a stripe, just split of the
+first (partial) chunk exactly was we currently do.
+
+If it does start at the beginning of a stripe, then split off a whole
+number of stripes and allocate one bio for each device.  Chain those to
+the original bio together with any remainder (which isn't a whole
+stripe).
+
+I think that if you make use of bio_split() and bio_chain() properly,
+the code will be much simpler.
+
+NeilBrown
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEG8Yp69OQ2HB7X0l6Oeye3VZigbkFAlhOFuYACgkQOeye3VZi
+gbnzAw/+JO99Fg18nYJBK9FDyinZ410PFC/tsjzJIkQO8HM3QFEz2igjwJHTo9f7
+M1ODeoK33EmRC7mBmgrVxLcD3hS168xcC8njduJru7OelksSIS8Q01UZf5JDcUHj
+Ev5tvHdV32dyS7I4APfPRO7nz8Tish75sdtNVe9a3cPZssdcDpZjrotng4T+xJGC
+Kzlj9ZXUTbFEM8+KR7wfhRrhx+j2NmIdzJlFUoYV7P4pbgqrsYI+meAQSo7RByZE
+cf4PKorutOv6RIXKm9b1QPUzbQn84t16XvdUu8elj6fR/PF9xif4BPW9GcG1OXio
+9N6zmLAVG0WXRdHTLUPFWZpkhbrKoF8XulzLAtG6wIAJwSlZ/Bf1iTEueU40nJ7b
+pf98DWTyHj2/N4Q97ct5EFF0SLZv/niAzRV9NikTVfik7t9MuRXd8ccj/j1yusth
+teYzPYZWqMiGtDGhVavKYuPIQXxM9WsSyyVawtdK7krvWETs6WdRh9ev7fjG1kt5
+y8gy1z0tYwsyLGSI/k05ygQ6CwxcM5nxRfviENiMAMMcvJlF1e9/GPZQSkUFvS1L
+4fh3XDaPpYwYqDaAc//bqFJ793cFmib02l9KtooJKjGmPUYPhUC3GFhblnvKy/vH
+ZxaiMcSHSrLojRJacVbDxZILrht5gKW/GefTdpIl0Z+ufGEp1To=
+=el9/
+-----END PGP SIGNATURE-----
+--=-=-=--
