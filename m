@@ -1,23 +1,18 @@
-Return-Path: <sfr@canb.auug.org.au>
-Date: Wed, 14 Dec 2016 10:31:23 +1100
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Jens Axboe <axboe@kernel.dk>, "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>, "linux-block@vger.kernel.org"
- <linux-block@vger.kernel.org>, David Chinner <david@fromorbit.com>,
- linux-xfs@vger.kernel.org, Christoph  Hellwig <hch@lst.de>
+Return-Path: <axboe@kernel.dk>
 Subject: Re: [GIT PULL] Block core changes for 4.10
-Message-ID: <20161214103123.20d9b2d0@canb.auug.org.au>
-In-Reply-To: <6176de36-7f4f-040b-f277-e872cc98eb5e@kernel.dk>
+To: Linus Torvalds <torvalds@linux-foundation.org>
 References: <6176de36-7f4f-040b-f277-e872cc98eb5e@kernel.dk>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <e2104bea-8028-dafe-cb64-e376fa7e45fb@kernel.dk>
+Date: Tue, 13 Dec 2016 13:19:21 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <6176de36-7f4f-040b-f277-e872cc98eb5e@kernel.dk>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Linus,
-
-On Sun, 11 Dec 2016 18:52:29 -0700 Jens Axboe <axboe@kernel.dk> wrote:
->
+On 12/11/2016 06:52 PM, Jens Axboe wrote:
 > Note that this pull will throw 3 trivial merge conflicts, since we had
 > patches that went into mainline after 4.9-rc1 (upon which this branch is
 > based), and one that will not show up in block/blk-flush.c. The latter
@@ -40,65 +35,10 @@ On Sun, 11 Dec 2016 18:52:29 -0700 Jens Axboe <axboe@kernel.dk> wrote:
 > 
 > and the three merge conflicts that do show up are trivially resolvable.
 
-I have also been carrying a fix patch for the merge between the block
-tree and the xfs tree:
-
-Commits
-
-  70fd76140a6c ("block,fs: use REQ_* flags directly")
-  bbd7bb7017d5 ("block: move poll code to blk-mq")
-
-from the block tree interacting with commit
-
-  ff6a9292e6f6 ("iomap: implement direct I/O")
-
-from the xfs tree.
-
-
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-Date: Thu, 1 Dec 2016 13:45:33 +1100
-Subject: [PATCH] iomap: fix up for blk_poll and WRITE_ODIRECT change
-
-Signed-off-by: Stephen Rothwell <sfr@canb.auug.org.au>
----
- fs/iomap.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/fs/iomap.c b/fs/iomap.c
-index fc2446242935..c9d6c1176345 100644
---- a/fs/iomap.c
-+++ b/fs/iomap.c
-@@ -722,7 +722,7 @@ iomap_dio_zero(struct iomap_dio *dio, struct iomap *iomap, loff_t pos,
- 	get_page(page);
- 	if (bio_add_page(bio, page, len, 0) != len)
- 		BUG();
--	bio_set_op_attrs(bio, REQ_OP_WRITE, WRITE_ODIRECT);
-+	bio_set_op_attrs(bio, REQ_OP_WRITE, REQ_SYNC | REQ_IDLE);
- 
- 	atomic_inc(&dio->ref);
- 	return submit_bio(bio);
-@@ -805,7 +805,7 @@ iomap_dio_actor(struct inode *inode, loff_t pos, loff_t length,
- 		}
- 
- 		if (dio->flags & IOMAP_DIO_WRITE) {
--			bio_set_op_attrs(bio, REQ_OP_WRITE, WRITE_ODIRECT);
-+			bio_set_op_attrs(bio, REQ_OP_WRITE, REQ_SYNC | REQ_IDLE);
- 			task_io_account_write(bio->bi_iter.bi_size);
- 		} else {
- 			bio_set_op_attrs(bio, REQ_OP_READ, 0);
-@@ -930,7 +930,7 @@ iomap_dio_rw(struct kiocb *iocb, struct iov_iter *iter, struct iomap_ops *ops,
- 
- 			if (!(iocb->ki_flags & IOCB_HIPRI) ||
- 			    !dio->submit.last_queue ||
--			    !blk_poll(dio->submit.last_queue,
-+			    !blk_mq_poll(dio->submit.last_queue,
- 					dio->submit.cookie))
- 				io_schedule();
- 		}
--- 
-2.10.2
-
+Since you have merged trees since that contain block drivers, you are
+going to get a new merge conflict. There's one with mmc block now, which
+is again just a switch from rq->cmd_flags to rq->rq_flags and using
+RQF_foo instead of REQ_foo.
 
 -- 
-Cheers,
-Stephen Rothwell
+Jens Axboe
