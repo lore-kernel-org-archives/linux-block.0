@@ -1,96 +1,42 @@
-Return-Path: <prvs=1147fe7fca=axboe@fb.com>
+Subject: Re: [PATCH 7/7] blk-mq-sched: allow setting of default IO scheduler
+To: Bart Van Assche <bart.vanassche@sandisk.com>, axboe@kernel.dk,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <1481228005-9245-1-git-send-email-axboe@fb.com>
+ <1481228005-9245-8-git-send-email-axboe@fb.com>
+ <3e4483e3-6018-5c6c-9fe2-128ed68c01f4@sandisk.com>
+Cc: paolo.valente@linaro.org, osandov@fb.com
 From: Jens Axboe <axboe@fb.com>
-To: <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-CC: <paolo.valente@linaro.org>, Jens Axboe <axboe@fb.com>
-Subject: [PATCH 7/7] block: drop irq+lock when flushing queue plugs
-Date: Mon, 5 Dec 2016 11:27:06 -0700
-Message-ID: <1480962426-15767-8-git-send-email-axboe@fb.com>
-In-Reply-To: <1480962426-15767-1-git-send-email-axboe@fb.com>
-References: <1480962426-15767-1-git-send-email-axboe@fb.com>
+Message-ID: <f6e98baa-7b11-8c5c-74b9-5d40bccc97a2@fb.com>
+Date: Tue, 13 Dec 2016 08:06:53 -0700
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <3e4483e3-6018-5c6c-9fe2-128ed68c01f4@sandisk.com>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-block@vger.kernel.org>
 
-Not convinced this is a faster approach, and it does look IRQs off
-longer than otherwise. With mq+scheduling, it's a problem since
-it forces us to offload the queue running. If we get rid of it,
-we can run the queue without the queue lock held.
+On 12/13/2016 03:13 AM, Bart Van Assche wrote:
+> On 12/08/2016 09:13 PM, Jens Axboe wrote:
+>> +config DEFAULT_MQ_IOSCHED
+>> +	string
+>> +	default "mq-deadline" if DEFAULT_MQ_DEADLINE
+>> +	default "none" if DEFAULT_MQ_NONE
+>> +
+>>  endmenu
+>>
+>> +config MQ_IOSCHED_ONLY_SQ
+>> +	bool "Enable blk-mq IO scheduler only for single queue devices"
+>> +	default y
+>> +	help
+>> +	  Say Y here, if you only want to enable IO scheduling on block
+>> +	  devices that have a single queue registered.
+>> +
+>>  endif
+> 
+> Hello Jens,
+> 
+> Shouln't the MQ_IOSCHED_ONLY_SQ entry be placed before "endmenu" such 
+> that it is displayed in the I/O scheduler menu instead of the block menu?
 
-Signed-off-by: Jens Axboe <axboe@fb.com>
----
- block/blk-core.c | 32 ++++++++++++++------------------
- 1 file changed, 14 insertions(+), 18 deletions(-)
+Good catch, yes it should. I'll move it.
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 8be12ba91f8e..2c61d2020c3f 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -3204,18 +3204,21 @@ static int plug_rq_cmp(void *priv, struct list_head *a, struct list_head *b)
-  * plugger did not intend it.
-  */
- static void queue_unplugged(struct request_queue *q, unsigned int depth,
--			    bool from_schedule)
-+			    bool from_schedule, unsigned long flags)
- 	__releases(q->queue_lock)
- {
- 	trace_block_unplug(q, depth, !from_schedule);
- 
--	if (q->mq_ops)
--		blk_mq_run_hw_queues(q, true);
--	else if (from_schedule)
--		blk_run_queue_async(q);
--	else
--		__blk_run_queue(q);
--	spin_unlock(q->queue_lock);
-+	if (q->mq_ops) {
-+		spin_unlock_irqrestore(q->queue_lock, flags);
-+		blk_mq_run_hw_queues(q, from_schedule);
-+	} else {
-+		if (from_schedule)
-+			blk_run_queue_async(q);
-+		else
-+			__blk_run_queue(q);
-+		spin_unlock_irqrestore(q->queue_lock, flags);
-+	}
- }
- 
- static void flush_plug_callbacks(struct blk_plug *plug, bool from_schedule)
-@@ -3283,11 +3286,6 @@ void blk_flush_plug_list(struct blk_plug *plug, bool from_schedule)
- 	q = NULL;
- 	depth = 0;
- 
--	/*
--	 * Save and disable interrupts here, to avoid doing it for every
--	 * queue lock we have to take.
--	 */
--	local_irq_save(flags);
- 	while (!list_empty(&list)) {
- 		rq = list_entry_rq(list.next);
- 		list_del_init(&rq->queuelist);
-@@ -3297,10 +3295,10 @@ void blk_flush_plug_list(struct blk_plug *plug, bool from_schedule)
- 			 * This drops the queue lock
- 			 */
- 			if (q)
--				queue_unplugged(q, depth, from_schedule);
-+				queue_unplugged(q, depth, from_schedule, flags);
- 			q = rq->q;
- 			depth = 0;
--			spin_lock(q->queue_lock);
-+			spin_lock_irqsave(q->queue_lock, flags);
- 		}
- 
- 		/*
-@@ -3329,9 +3327,7 @@ void blk_flush_plug_list(struct blk_plug *plug, bool from_schedule)
- 	 * This drops the queue lock
- 	 */
- 	if (q)
--		queue_unplugged(q, depth, from_schedule);
--
--	local_irq_restore(flags);
-+		queue_unplugged(q, depth, from_schedule, flags);
- }
- 
- void blk_finish_plug(struct blk_plug *plug)
 -- 
-2.7.4
+Jens Axboe
