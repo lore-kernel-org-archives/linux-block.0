@@ -1,62 +1,93 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:35201 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S933767AbcLMPUn (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 13 Dec 2016 10:20:43 -0500
+Date: Tue, 13 Dec 2016 08:20:38 -0700
+From: Jens Axboe <axboe@fb.com>
+To: Bart Van Assche <bart.vanassche@sandisk.com>
+CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <paolo.valente@linaro.org>, <osandov@fb.com>
 Subject: Re: [PATCH 5/7] blk-mq-sched: add framework for MQ capable IO
  schedulers
-To: Jens Axboe <axboe@fb.com>, <axboe@kernel.dk>,
-	<linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Message-ID: <20161213152038.GB32618@kernel.dk>
 References: <1481228005-9245-1-git-send-email-axboe@fb.com>
  <1481228005-9245-6-git-send-email-axboe@fb.com>
- <69c1261a-1a21-7347-c753-0bcb9a2ab65e@sandisk.com>
- <e4928ada-c1f5-32a0-bbc4-3a1f3c83dde9@fb.com>
-CC: <paolo.valente@linaro.org>, <osandov@fb.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-Message-ID: <cb5d74ae-6f27-a1c4-4e8b-93398f556b94@sandisk.com>
-Date: Wed, 14 Dec 2016 11:31:46 +0100
+ <d013a3c6-39d8-725a-6752-6a02b5284242@sandisk.com>
 MIME-Version: 1.0
-In-Reply-To: <e4928ada-c1f5-32a0-bbc4-3a1f3c83dde9@fb.com>
-Content-Type: text/plain; charset="windows-1252"
-Return-Path: bart.vanassche@sandisk.com
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <d013a3c6-39d8-725a-6752-6a02b5284242@sandisk.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On 12/13/2016 04:14 PM, Jens Axboe wrote:
-> On 12/13/2016 06:56 AM, Bart Van Assche wrote:
->> On 12/08/2016 09:13 PM, Jens Axboe wrote:
->>> +struct request *blk_mq_sched_alloc_shadow_request(struct request_queue *q,
->>> +						  struct blk_mq_alloc_data *data,
->>> +						  struct blk_mq_tags *tags,
->>> +						  atomic_t *wait_index)
->>> +{
->>
->> Using the word "shadow" in the function name suggests to me that there 
->> is a shadow request for every request and a request for every shadow 
->> request. However, my understanding from the code is that there can be 
->> requests without shadow requests (for e.g. a flush) and shadow requests 
->> without requests. Shouldn't the name of this function reflect that, e.g. 
->> by using "sched" or "elv" in the function name instead of "shadow"?
+On Tue, Dec 13 2016, Bart Van Assche wrote:
+> On 12/08/2016 09:13 PM, Jens Axboe wrote:
+> >+static inline void blk_mq_sched_put_request(struct request *rq)
+> >+{
+> >+	struct request_queue *q = rq->q;
+> >+	struct elevator_queue *e = q->elevator;
+> >+
+> >+	if (e && e->type->mq_ops.put_request)
+> >+		e->type->mq_ops.put_request(rq);
+> >+	else
+> >+		blk_mq_free_request(rq);
+> >+}
 > 
-> Shadow might not be the best name. Most do have shadows though, it's
-> only the rare exception like the flush, that you mention. I'll see if I
-> can come up with a better name.
+> blk_mq_free_request() always triggers a call of blk_queue_exit().
+> dd_put_request() only triggers a call of blk_queue_exit() if it is not a
+> shadow request. Is that on purpose?
 
-Hello Jens,
+If the scheduler doesn't define get/put requests, then the lifetime
+follows the normal setup. If we do define them, then dd_put_request()
+only wants to put the request if it's one where we did setup a shadow.
 
-One aspect of this patch series that might turn out to be a maintenance
-burden is the copying between original and shadow requests. It is easy
-to overlook that rq_copy() has to be updated if a field would ever be
-added to struct request. Additionally, having to allocate two requests
-structures per I/O instead of one will have a runtime overhead. Do you
-think the following approach would work?
-- Instead of using two request structures per I/O, only use a single
-  request structure.
-- Instead of storing one tag in the request structure, store two tags
-  in that structure. One tag comes from the I/O scheduler tag set
-  (size: nr_requests) and the other from the tag set associated with
-  the block driver (size: HBA queue depth).
-- Only add a request to the hctx dispatch list after a block driver tag
-  has been assigned. This means that an I/O scheduler must keep a
-  request structure on a list it manages itself as long as no block
-  driver tag has been assigned.
-- sysfs_list_show() is modified such that it shows both tags.
+> >+static inline struct request *
+> >+blk_mq_sched_get_request(struct request_queue *q, unsigned int op,
+> >+			 struct blk_mq_alloc_data *data)
+> >+{
+> >+	struct elevator_queue *e = q->elevator;
+> >+	struct blk_mq_hw_ctx *hctx;
+> >+	struct blk_mq_ctx *ctx;
+> >+	struct request *rq;
+> >+
+> >+	blk_queue_enter_live(q);
+> >+	ctx = blk_mq_get_ctx(q);
+> >+	hctx = blk_mq_map_queue(q, ctx->cpu);
+> >+
+> >+	blk_mq_set_alloc_data(data, q, 0, ctx, hctx);
+> >+
+> >+	if (e && e->type->mq_ops.get_request)
+> >+		rq = e->type->mq_ops.get_request(q, op, data);
+> >+	else
+> >+		rq = __blk_mq_alloc_request(data, op);
+> >+
+> >+	if (rq)
+> >+		data->hctx->queued++;
+> >+
+> >+	return rq;
+> >+
+> >+}
+> 
+> Some but not all callers of blk_mq_sched_get_request() call blk_queue_exit()
+> if this function returns NULL. Please consider to move the blk_queue_exit()
+> call from the blk_mq_alloc_request() error path into this function. I think
+> that will make it a lot easier to verify whether or not the
+> blk_queue_enter() / blk_queue_exit() calls are balanced properly.
 
-Thanks,
+Agree, I'll make the change, it'll be easier to read then.
 
-Bart.
+> Additionally, since blk_queue_enter() / blk_queue_exit() calls by
+> blk_mq_sched_get_request() and blk_mq_sched_put_request() must be balanced
+> and since the latter function only calls blk_queue_exit() for non-shadow
+> requests, shouldn't blk_mq_sched_get_request() call blk_queue_enter_live()
+> only if __blk_mq_alloc_request() is called?
+
+I'll double check that part, there might be a bug or at least a chance
+to clean this up a bit. I did verify most of this at some point, and
+tested it with the scheduler switching. That part falls apart pretty
+quickly, if the references aren't matched exactly.
+
+-- 
+Jens Axboe
+
