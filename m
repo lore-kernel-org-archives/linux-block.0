@@ -1,130 +1,71 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from ipmail06.adl6.internode.on.net ([150.101.137.145]:61760 "EHLO
-        ipmail06.adl6.internode.on.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1750899AbcLNA3b (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Dec 2016 19:29:31 -0500
-Date: Wed, 14 Dec 2016 11:14:22 +1100
-From: Dave Chinner <david@fromorbit.com>
-To: Jerome Glisse <jglisse@redhat.com>
-Cc: lsf-pc@lists.linux-foundation.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Received: from mx1.redhat.com ([209.132.183.28]:46676 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751977AbcLMXDC (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 13 Dec 2016 18:03:02 -0500
+Date: Tue, 13 Dec 2016 18:02:58 -0500
+From: Jerome Glisse <jglisse@redhat.com>
+To: Dave Hansen <dave.hansen@intel.com>
+Cc: Dave Chinner <david@fromorbit.com>,
+        lsf-pc@lists.linux-foundation.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        "Williams, Dan J" <dan.j.williams@intel.com>
 Subject: Re: [LSF/MM TOPIC] Un-addressable device memory and block/fs
  implications
-Message-ID: <20161214001422.GE4326@dastard>
+Message-ID: <20161213230257.GH2305@redhat.com>
 References: <20161213181511.GB2305@redhat.com>
  <20161213201515.GB4326@dastard>
  <20161213203112.GE2305@redhat.com>
  <20161213211041.GC4326@dastard>
  <20161213212433.GF2305@redhat.com>
- <20161213221322.GD4326@dastard>
- <20161213225523.GG2305@redhat.com>
+ <4accd272-7214-c702-aed3-fb131f178162@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20161213225523.GG2305@redhat.com>
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <4accd272-7214-c702-aed3-fb131f178162@intel.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Tue, Dec 13, 2016 at 05:55:24PM -0500, Jerome Glisse wrote:
-> On Wed, Dec 14, 2016 at 09:13:22AM +1100, Dave Chinner wrote:
-> > On Tue, Dec 13, 2016 at 04:24:33PM -0500, Jerome Glisse wrote:
-> > > On Wed, Dec 14, 2016 at 08:10:41AM +1100, Dave Chinner wrote:
-> > > > > From kernel point of view such memory is almost like any other, it
-> > > > > has a struct page and most of the mm code is non the wiser, nor need
-> > > > > to be about it. CPU access trigger a migration back to regular CPU
-> > > > > accessible page.
-> > > > 
-> > > > That sounds ... complex. Page migration on page cache access inside
-> > > > the filesytem IO path locking during read()/write() sounds like
-> > > > a great way to cause deadlocks....
-> > > 
-> > > There are few restriction on device page, no one can do GUP on them and
-> > > thus no one can pin them. Hence they can always be migrated back. Yes
-> > > each fs need modification, most of it (if not all) is isolated in common
-> > > filemap helpers.
+On Tue, Dec 13, 2016 at 02:08:22PM -0800, Dave Hansen wrote:
+> On 12/13/2016 01:24 PM, Jerome Glisse wrote:
 > > 
-> > Sure, but you haven't answered my question: how do you propose we
-> > address the issue of placing all the mm locks required for migration
-> > under the filesystem IO path locks?
+> >>> > > From kernel point of view such memory is almost like any other, it
+> >>> > > has a struct page and most of the mm code is non the wiser, nor need
+> >>> > > to be about it. CPU access trigger a migration back to regular CPU
+> >>> > > accessible page.
+> >> > 
+> >> > That sounds ... complex. Page migration on page cache access inside
+> >> > the filesytem IO path locking during read()/write() sounds like
+> >> > a great way to cause deadlocks....
+> > There are few restriction on device page, no one can do GUP on them and
+> > thus no one can pin them. Hence they can always be migrated back. Yes
+> > each fs need modification, most of it (if not all) is isolated in common
+> > filemap helpers.
 > 
-> Two different plans (which are non exclusive of each other). First is to use
-> workqueue and have read/write wait on the workqueue to be done migrating the
-> page back.
-
-Pushing something to a workqueue and then waiting on the workqueue
-to complete the work doesn't change lock ordering problems - it
-just hides them away and makes them harder to debug.
-
-> Second solution is to use a bounce page during I/O so that there is no need
-> for migration.
-
-Which means the page in the device is left with out-of-date
-contents, right?
-
-If so, how do you prevent data corruption/loss when the device
-has modified the page out of sight of the CPU and the bounce page
-doesn't contain those modifications? Or if the dirty device page is
-written back directly without containing the changes made in the
-bounce page?
-
-Hmmm - what happens when we invalidate and release a range of
-file pages that have been migrated to a device? e.g. on truncate?
-
-> > > > > But for thing like writeback i want to be able to do writeback with-
-> > > > > out having to migrate page back first. So that data can stay on the
-> > > > > device while writeback is happening.
-> > > > 
-> > > > Why can't you do writeback before migration, so only clean pages get
-> > > > moved?
-> > > 
-> > > Because device can write to the page while the page is inside the device
-> > > memory and we might want to writeback to disk while page stays in device
-> > > memory and computation continues.
-> > 
-> > Ok. So how does the device trigger ->page_mkwrite on a clean page to
-> > tell the filesystem that the page has been dirtied? So that, for
-> > example, if the page covers a hole because the file is sparse the
-> > filesytem can do the required block allocation and data
-> > initialisation (i.e. zero the cached page) before it gets marked
-> > dirty and any data gets written to it?
-> > 
-> > And if zeroing the page during such a fault requires CPU access to
-> > the data, how do you propose we handle page migration in the middle
-> > of the page fault to allow the CPU to zero the page? Seems like more
-> > lock order/inversion problems there, too...
+> Huh, that's pretty different from the other ZONE_DEVICE uses.  For
+> those, you *can* do get_user_pages().
 > 
-> File back page are never allocated on device, at least we have no incentive
-> for usecase we care about today to do so. So a regular page is first use
-> and initialize (to zero for hole) before being migrated to device.
-> So i do not believe there should be any major concern on ->page_mkwrite.
+> I'd be really interested to see the feature set that these pages have
+> and how it differs from regular memory and the ZONE_DEVICE memory that
+> have have in-kernel today.
 
-Such deja vu - inodes are not static objects as modern filesystems
-are highly dynamic. If you want to have safe, reliable non-coherent
-mmap-based file data offload to devices, then I suspect that we're
-going to need pretty much all of the same restrictions the pmem
-programming model requires for userspace data flushing. i.e.:
+Well i can do a list for current patchset where i do not allow migration
+of file back page. Roughly you can not kmap and GUP. But GUP has many more
+implications like direct I/O (source or destination of direct I/O) ...
 
-https://lkml.org/lkml/2016/9/15/33
+> 
+> BTW, how is this restriction implemented?  I would have expected to see
+> follow_page_pte() or vm_normal_page() getting modified.  I don't see a
+> single reference to get_user_pages or "GUP" in any of the latest HMM
+> patch set or the changelogs.
+> 
+> As best I can tell, the slow GUP path will get stuck in a loop inside
+> follow_page_pte(), while the fast GUP path will allow you to acquire a
+> reference to the page.  But, maybe I'm reading the code wrong.
 
-At which point I have to ask: why is mmap considered to be the right
-model for transfering data in and out of devices that are not
-directly CPU addressable? 
-
-> At least
-> this was my impression when i look at generic filemap one, but for some
-> filesystem this might need be problematic.
-
-Definitely problematic for XFS, btrfs, f2fs, ocfs2, and probably
-ext4 and others as well.
-
-> and allowing control by userspace to block such
-> migration for given fs.
-
-How do you propose doing that?
+It is a side effect of having a special swap pte so follow_page_pte()
+returns NULL which trigger page fault through handle_mm_fault() which
+trigger migration back to regular page. Same for fast GUP version.
+There is never a valid pte for an un-addressable page.
 
 Cheers,
-
-Dave.
--- 
-Dave Chinner
-david@fromorbit.com
+J�rome
