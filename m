@@ -1,34 +1,62 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: blk-mq: preparation of the ground for BFQ inclusion
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:48666 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S933168AbcLMVxh (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 13 Dec 2016 16:53:37 -0500
+Subject: Re: [PATCHSET/RFC v2] blk-mq scheduling framework
 To: Paolo Valente <paolo.valente@linaro.org>
-References: <347F26BB-2D0A-4DBE-9FC5-BA6C05AE02B2@linaro.org>
- <1b5b6b66-1561-0bf2-f543-15342b00e90f@kernel.dk>
-Cc: Linus Walleij <linus.walleij@linaro.org>, Mark Brown
- <broonie@kernel.org>, Ulf Hansson <ulf.hansson@linaro.org>,
- Omar Sandoval <osandov@osandov.com>, Jan Kara <jack@suse.cz>,
- Bart Van Assche <bart.vanassche@sandisk.com>, linux-block@vger.kernel.org,
- Christoph Hellwig <hch@lst.de>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <4c23fa60-9ea4-8040-0a06-7f4c1baf3537@kernel.dk>
-Date: Thu, 1 Dec 2016 14:03:07 -0700
+References: <1481228005-9245-1-git-send-email-axboe@fb.com>
+ <9D1F7CB5-4043-448B-A553-D6A9804D5089@linaro.org>
+ <20161213151739.GA32618@kernel.dk>
+ <DB8071E8-E3C2-4DA1-9716-987D84C078C3@linaro.org>
+ <a4a9d8fb-9239-da76-946c-4361785889ad@fb.com>
+CC: <linux-block@vger.kernel.org>,
+        Linux-Kernal <linux-kernel@vger.kernel.org>, <osandov@fb.com>
+From: Jens Axboe <axboe@fb.com>
+Message-ID: <b4a0fd3c-422e-2d23-bd8c-74bb0325b4fb@fb.com>
+Date: Tue, 13 Dec 2016 14:51:27 -0700
 MIME-Version: 1.0
-In-Reply-To: <1b5b6b66-1561-0bf2-f543-15342b00e90f@kernel.dk>
-Content-Type: text/plain; charset=windows-1252
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <a4a9d8fb-9239-da76-946c-4361785889ad@fb.com>
+Content-Type: text/plain; charset="windows-1252"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On 11/14/2016 03:42 PM, Jens Axboe wrote:
-> On 11/14/2016 03:13 PM, Paolo Valente wrote:
->> Hi Jens,
->> have you had time to look into the first extensions/changes required?
->> Any time plan?
+On 12/13/2016 09:28 AM, Jens Axboe wrote:
+>>> No worries, ask away if you have questions. As you might have seen, it's
+>>> still a little bit of a moving target, but it's getting closer every
+>>> day. I'll post a v3 later today hopefully that will be a good fix point
+>>> for you. I'll need to add the io context setup etc, that's not there
+>>> yet, as only cfq/bfq uses that.
+>>>
+>>
+>> You anticipated the question that was worrying me more, how to handle
+>> iocontexts :) I'll go on studying your patches while waiting for this
+>> (last, right?) missing piece for bfq.
 > 
-> I was busy last week on the writeback and on the polling. I should have
-> something end this week.
+> It's the last missing larger piece. We probably have a few hooks that
+> BFQ/CFQ currently uses that aren't wired up yet in the elevator_ops for
+> mq, so you'll probably have to do those as you go. I can take a look,
+> but I would prefer if they be done one a as-needed basis. Perhaps we can
+> get rid of some of them.
 
-It's coming together, running some testing and fixing some issues. But I
-now have unmodified legacy IO schedulers running under blk-mq, for
-single queue devices. Scheduler queue depth is independent of the device
-queue depth.
+The current 'blk-mq-sched' branch has support for getting the IO
+contexts setup, and assigned to requests. Only works off the task
+io_context for now, we ignore anything set in the bio. But that's a
+minor thing, generally it should work for you.
+
+Note that the mq ops have different naming than the classic elevator
+ops. For instance, the set_request/put_request are
+get_rq_priv/put_rq_priv instead. Others are different as well. In
+general, refer to mq-deadline.c for how the hooks work and you can
+compare with deadline-iosched.c, since they are still very close.
+
+Note that the io context linking uses the embedded queue lock,
+q->queue_lock, whereas for other things you are free to use a lock
+embedded in the your elevator data. Again, refer to mq-deadline, it uses
+dd->lock to protect the hash/rbtree. If mq-deadline used io contexts, it
+would manage those behind q->queue_lock.
 
 -- 
 Jens Axboe
+
