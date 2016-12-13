@@ -1,52 +1,47 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-Date: Tue, 13 Dec 2016 15:31:13 -0500
-From: Jerome Glisse <jglisse@redhat.com>
-To: Dave Chinner <david@fromorbit.com>
-Cc: lsf-pc@lists.linux-foundation.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga14.intel.com ([192.55.52.115]:54785 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S934564AbcLMU1z (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 13 Dec 2016 15:27:55 -0500
 Subject: Re: [LSF/MM TOPIC] Un-addressable device memory and block/fs
  implications
-Message-ID: <20161213203112.GE2305@redhat.com>
+To: James Bottomley <James.Bottomley@HansenPartnership.com>,
+        Jerome Glisse <jglisse@redhat.com>
 References: <20161213181511.GB2305@redhat.com>
- <20161213201515.GB4326@dastard>
+ <1481653252.2473.51.camel@HansenPartnership.com>
+ <20161213185545.GC2305@redhat.com>
+ <1481659264.2473.59.camel@HansenPartnership.com>
+Cc: lsf-pc@lists.linux-foundation.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
+From: Dave Hansen <dave.hansen@intel.com>
+Message-ID: <4878d525-70cd-fa0e-b17f-4222c3166e74@intel.com>
+Date: Tue, 13 Dec 2016 12:27:53 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <20161213201515.GB4326@dastard>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <1481659264.2473.59.camel@HansenPartnership.com>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Wed, Dec 14, 2016 at 07:15:15AM +1100, Dave Chinner wrote:
-> On Tue, Dec 13, 2016 at 01:15:11PM -0500, Jerome Glisse wrote:
-> > I would like to discuss un-addressable device memory in the context of
-> > filesystem and block device. Specificaly how to handle write-back, read,
-> > ... when a filesystem page is migrated to device memory that CPU can not
-> > access.
-> 
-> You mean pmem that is DAX-capable that suddenly, without warning,
-> becomes non-DAX capable?
-> 
-> If you are not talking about pmem and DAX, then exactly what does
-> "when a filesystem page is migrated to device memory that CPU can
-> not access" mean? What "filesystem page" are we talking about that
-> can get migrated from main RAM to something the CPU can't access?
+On 12/13/2016 12:01 PM, James Bottomley wrote:
+>> > Second aspect is that even if memory i am dealing with is un
+>> > -addressable i still have struct page for it and i want to be able to 
+>> > use regular page migration.
+> Tmem keeps a struct page ... what's the problem with page migration?
+> the fact that tmem locks the page when it's not addressable and you
+> want to be able to migrate the page even when it's not addressable?
 
-I am talking about GPU, FPGA, ... any PCIE device that have fast on
-board memory that can not be expose transparently to the CPU. I am
-reusing ZONE_DEVICE for this, you can see HMM patchset on linux-mm
-https://lwn.net/Articles/706856/
+Hi James,
 
-So in my case i am only considering non DAX/PMEM filesystem ie any
-"regular" filesystem back by a "regular" block device. I want to be
-able to migrate mmaped area of such filesystem to device memory while
-the device is actively using that memory.
+Why do you say that tmem keeps a 'struct page'?  For instance, its
+->put_page operation _takes_ a 'struct page', but that's in the
+delete_from_page_cache() path where the page's last reference has been
+dropped and it is about to go away.  The role of 'struct page' here is
+just to help create a key so that tmem can find the contents later
+*without* the original 'struct page'.
 
->From kernel point of view such memory is almost like any other, it
-has a struct page and most of the mm code is non the wiser, nor need
-to be about it. CPU access trigger a migration back to regular CPU
-accessible page.
+Jerome's pages here are a new class of half-crippled 'struct page' which
+support more VM features than ZONE_DEVICE pages, but not quite a full
+feature set.  It supports (and needs to support) a heck of a lot more VM
+features than memory in tmem would, though.
 
-But for thing like writeback i want to be able to do writeback with-
-out having to migrate page back first. So that data can stay on the
-device while writeback is happening.
 
-J�r�me
