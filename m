@@ -1,328 +1,69 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:60568 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1756280AbcLOUdL (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Dec 2016 15:33:11 -0500
-Received: from pps.filterd (m0001303.ppops.net [127.0.0.1])
-        by m0001303.ppops.net (8.16.0.17/8.16.0.17) with SMTP id uBFKW86D003300
-        for <linux-block@vger.kernel.org>; Thu, 15 Dec 2016 12:33:10 -0800
-Received: from mail.thefacebook.com ([199.201.64.23])
-        by m0001303.ppops.net with ESMTP id 27c263827s-3
-        (version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT)
-        for <linux-block@vger.kernel.org>; Thu, 15 Dec 2016 12:33:10 -0800
-Received: from facebook.com (2401:db00:21:603d:face:0:19:0)     by
- mx-out.facebook.com (10.102.107.97) with ESMTP id
- b0d2db04c30511e6b71d0002c99331b0-853efa50 for <linux-block@vger.kernel.org>;
-        Thu, 15 Dec 2016 12:33:09 -0800
-From: Shaohua Li <shli@fb.com>
-To: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <kernel-team@fb.com>, <axboe@fb.com>, <tj@kernel.org>,
-        <vgoyal@redhat.com>
-Subject: [PATCH V5 08/17] blk-throttle: make throtl_slice tunable
-Date: Thu, 15 Dec 2016 12:32:59 -0800
-Message-ID: <3341ed56034ecbcdaaaa63a87345ea7f16178339.1481833017.git.shli@fb.com>
-In-Reply-To: <cover.1481833017.git.shli@fb.com>
-References: <cover.1481833017.git.shli@fb.com>
+Subject: Re: [PATCH 5/7] blk-mq-sched: add framework for MQ capable IO
+ schedulers
+To: Bart Van Assche <bart.vanassche@sandisk.com>, axboe@kernel.dk,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <1481228005-9245-1-git-send-email-axboe@fb.com>
+ <1481228005-9245-6-git-send-email-axboe@fb.com>
+ <69c1261a-1a21-7347-c753-0bcb9a2ab65e@sandisk.com>
+ <e4928ada-c1f5-32a0-bbc4-3a1f3c83dde9@fb.com>
+ <cb5d74ae-6f27-a1c4-4e8b-93398f556b94@sandisk.com>
+Cc: paolo.valente@linaro.org, osandov@fb.com
+From: Jens Axboe <axboe@fb.com>
+Message-ID: <decbb34b-1825-7fe8-4b02-446b364c2ccb@fb.com>
+Date: Wed, 14 Dec 2016 08:05:12 -0700
 MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <cb5d74ae-6f27-a1c4-4e8b-93398f556b94@sandisk.com>
+Content-Type: text/plain; charset=windows-1252
+List-ID: <linux-block@vger.kernel.org>
 
-throtl_slice is important for blk-throttling. It's called slice
-internally but it really is a time window blk-throttling samples data.
-blk-throttling will make decision based on the samplings. An example is
-bandwidth measurement. A cgroup's bandwidth is measured in the time
-interval of throtl_slice.
+On 12/14/2016 03:31 AM, Bart Van Assche wrote:
+> On 12/13/2016 04:14 PM, Jens Axboe wrote:
+>> On 12/13/2016 06:56 AM, Bart Van Assche wrote:
+>>> On 12/08/2016 09:13 PM, Jens Axboe wrote:
+>>>> +struct request *blk_mq_sched_alloc_shadow_request(struct request_queue *q,
+>>>> +						  struct blk_mq_alloc_data *data,
+>>>> +						  struct blk_mq_tags *tags,
+>>>> +						  atomic_t *wait_index)
+>>>> +{
+>>>
+>>> Using the word "shadow" in the function name suggests to me that there 
+>>> is a shadow request for every request and a request for every shadow 
+>>> request. However, my understanding from the code is that there can be 
+>>> requests without shadow requests (for e.g. a flush) and shadow requests 
+>>> without requests. Shouldn't the name of this function reflect that, e.g. 
+>>> by using "sched" or "elv" in the function name instead of "shadow"?
+>>
+>> Shadow might not be the best name. Most do have shadows though, it's
+>> only the rare exception like the flush, that you mention. I'll see if I
+>> can come up with a better name.
+> 
+> Hello Jens,
+> 
+> One aspect of this patch series that might turn out to be a maintenance
+> burden is the copying between original and shadow requests. It is easy
+> to overlook that rq_copy() has to be updated if a field would ever be
+> added to struct request. Additionally, having to allocate two requests
+> structures per I/O instead of one will have a runtime overhead. Do you
+> think the following approach would work?
+> - Instead of using two request structures per I/O, only use a single
+>   request structure.
+> - Instead of storing one tag in the request structure, store two tags
+>   in that structure. One tag comes from the I/O scheduler tag set
+>   (size: nr_requests) and the other from the tag set associated with
+>   the block driver (size: HBA queue depth).
+> - Only add a request to the hctx dispatch list after a block driver tag
+>   has been assigned. This means that an I/O scheduler must keep a
+>   request structure on a list it manages itself as long as no block
+>   driver tag has been assigned.
+> - sysfs_list_show() is modified such that it shows both tags.
 
-A small throtl_slice meanse cgroups have smoother throughput but burn
-more CPUs. It has 100ms default value, which is not appropriate for all
-disks. A fast SSD can dispatch a lot of IOs in 100ms. This patch makes
-it tunable.
+I have considered doing exactly that, decided to go down the other path.
+I may still revisit, it's not that I'm a huge fan of the shadow requests
+and the necessary copying. We don't update the request that often, so I
+don't think it's going to be a big maintenance burden. But it'd be hard
+to claim that it's super pretty...
 
-Since throtl_slice isn't a time slice, the sysfs name
-'throttle_sample_time' reflects its character better.
+I'll play with the idea.
 
-Signed-off-by: Shaohua Li <shli@fb.com>
----
- Documentation/block/queue-sysfs.txt |  6 +++
- block/blk-sysfs.c                   | 10 +++++
- block/blk-throttle.c                | 77 ++++++++++++++++++++++++++-----------
- block/blk.h                         |  3 ++
- 4 files changed, 74 insertions(+), 22 deletions(-)
-
-diff --git a/Documentation/block/queue-sysfs.txt b/Documentation/block/queue-sysfs.txt
-index 5164215..91f371d 100644
---- a/Documentation/block/queue-sysfs.txt
-+++ b/Documentation/block/queue-sysfs.txt
-@@ -192,5 +192,11 @@ scaling back writes. Writing a value of '0' to this file disables the
- feature. Writing a value of '-1' to this file resets the value to the
- default setting.
- 
-+throttle_sample_time (RW)
-+-------------------------
-+This is the time window that blk-throttle samples data, in millisecond.
-+blk-throttle makes decision based on the samplings. Lower time means cgroups
-+have more smooth throughput, but higher CPU overhead. This exists only when
-+CONFIG_BLK_DEV_THROTTLING is enabled.
- 
- Jens Axboe <jens.axboe@oracle.com>, February 2009
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 1dbce05..0e3fb2a 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -690,6 +690,13 @@ static struct queue_sysfs_entry queue_wb_lat_entry = {
- 	.show = queue_wb_lat_show,
- 	.store = queue_wb_lat_store,
- };
-+#ifdef CONFIG_BLK_DEV_THROTTLING
-+static struct queue_sysfs_entry throtl_sample_time_entry = {
-+	.attr = {.name = "throttle_sample_time", .mode = S_IRUGO | S_IWUSR },
-+	.show = blk_throtl_sample_time_show,
-+	.store = blk_throtl_sample_time_store,
-+};
-+#endif
- 
- static struct attribute *default_attrs[] = {
- 	&queue_requests_entry.attr,
-@@ -724,6 +731,9 @@ static struct attribute *default_attrs[] = {
- 	&queue_stats_entry.attr,
- 	&queue_wb_lat_entry.attr,
- 	&queue_poll_delay_entry.attr,
-+#ifdef CONFIG_BLK_DEV_THROTTLING
-+	&throtl_sample_time_entry.attr,
-+#endif
- 	NULL,
- };
- 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 41ec72c..cd10c65 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -19,7 +19,8 @@ static int throtl_grp_quantum = 8;
- static int throtl_quantum = 32;
- 
- /* Throttling is performed over 100ms slice and after that slice is renewed */
--static unsigned long throtl_slice = HZ/10;	/* 100 ms */
-+#define DFL_THROTL_SLICE (HZ / 10)
-+#define MAX_THROTL_SLICE (HZ / 5)
- 
- static struct blkcg_policy blkcg_policy_throtl;
- 
-@@ -162,6 +163,8 @@ struct throtl_data
- 	/* Total Number of queued bios on READ and WRITE lists */
- 	unsigned int nr_queued[2];
- 
-+	unsigned int throtl_slice;
-+
- 	/* Work for dispatching throttled bios */
- 	struct work_struct dispatch_work;
- 	unsigned int limit_index;
-@@ -588,7 +591,7 @@ static void throtl_dequeue_tg(struct throtl_grp *tg)
- static void throtl_schedule_pending_timer(struct throtl_service_queue *sq,
- 					  unsigned long expires)
- {
--	unsigned long max_expire = jiffies + 8 * throtl_slice;
-+	unsigned long max_expire = jiffies + 8 * sq_to_tg(sq)->td->throtl_slice;
- 
- 	if (time_after(expires, max_expire))
- 		expires = max_expire;
-@@ -649,7 +652,7 @@ static inline void throtl_start_new_slice_with_credit(struct throtl_grp *tg,
- 	if (time_after_eq(start, tg->slice_start[rw]))
- 		tg->slice_start[rw] = start;
- 
--	tg->slice_end[rw] = jiffies + throtl_slice;
-+	tg->slice_end[rw] = jiffies + tg->td->throtl_slice;
- 	throtl_log(&tg->service_queue,
- 		   "[%c] new slice with credit start=%lu end=%lu jiffies=%lu",
- 		   rw == READ ? 'R' : 'W', tg->slice_start[rw],
-@@ -661,7 +664,7 @@ static inline void throtl_start_new_slice(struct throtl_grp *tg, bool rw)
- 	tg->bytes_disp[rw] = 0;
- 	tg->io_disp[rw] = 0;
- 	tg->slice_start[rw] = jiffies;
--	tg->slice_end[rw] = jiffies + throtl_slice;
-+	tg->slice_end[rw] = jiffies + tg->td->throtl_slice;
- 	throtl_log(&tg->service_queue,
- 		   "[%c] new slice start=%lu end=%lu jiffies=%lu",
- 		   rw == READ ? 'R' : 'W', tg->slice_start[rw],
-@@ -671,13 +674,13 @@ static inline void throtl_start_new_slice(struct throtl_grp *tg, bool rw)
- static inline void throtl_set_slice_end(struct throtl_grp *tg, bool rw,
- 					unsigned long jiffy_end)
- {
--	tg->slice_end[rw] = roundup(jiffy_end, throtl_slice);
-+	tg->slice_end[rw] = roundup(jiffy_end, tg->td->throtl_slice);
- }
- 
- static inline void throtl_extend_slice(struct throtl_grp *tg, bool rw,
- 				       unsigned long jiffy_end)
- {
--	tg->slice_end[rw] = roundup(jiffy_end, throtl_slice);
-+	tg->slice_end[rw] = roundup(jiffy_end, tg->td->throtl_slice);
- 	throtl_log(&tg->service_queue,
- 		   "[%c] extend slice start=%lu end=%lu jiffies=%lu",
- 		   rw == READ ? 'R' : 'W', tg->slice_start[rw],
-@@ -717,19 +720,20 @@ static inline void throtl_trim_slice(struct throtl_grp *tg, bool rw)
- 	 * is bad because it does not allow new slice to start.
- 	 */
- 
--	throtl_set_slice_end(tg, rw, jiffies + throtl_slice);
-+	throtl_set_slice_end(tg, rw, jiffies + tg->td->throtl_slice);
- 
- 	time_elapsed = jiffies - tg->slice_start[rw];
- 
--	nr_slices = time_elapsed / throtl_slice;
-+	nr_slices = time_elapsed / tg->td->throtl_slice;
- 
- 	if (!nr_slices)
- 		return;
--	tmp = tg_bps_limit(tg, rw) * throtl_slice * nr_slices;
-+	tmp = tg_bps_limit(tg, rw) * tg->td->throtl_slice * nr_slices;
- 	do_div(tmp, HZ);
- 	bytes_trim = tmp;
- 
--	io_trim = (tg_iops_limit(tg, rw) * throtl_slice * nr_slices) / HZ;
-+	io_trim = (tg_iops_limit(tg, rw) * tg->td->throtl_slice * nr_slices) /
-+		HZ;
- 
- 	if (!bytes_trim && !io_trim)
- 		return;
-@@ -744,7 +748,7 @@ static inline void throtl_trim_slice(struct throtl_grp *tg, bool rw)
- 	else
- 		tg->io_disp[rw] = 0;
- 
--	tg->slice_start[rw] += nr_slices * throtl_slice;
-+	tg->slice_start[rw] += nr_slices * tg->td->throtl_slice;
- 
- 	throtl_log(&tg->service_queue,
- 		   "[%c] trim slice nr=%lu bytes=%llu io=%lu start=%lu end=%lu jiffies=%lu",
-@@ -764,9 +768,9 @@ static bool tg_with_in_iops_limit(struct throtl_grp *tg, struct bio *bio,
- 
- 	/* Slice has just started. Consider one slice interval */
- 	if (!jiffy_elapsed)
--		jiffy_elapsed_rnd = throtl_slice;
-+		jiffy_elapsed_rnd = tg->td->throtl_slice;
- 
--	jiffy_elapsed_rnd = roundup(jiffy_elapsed_rnd, throtl_slice);
-+	jiffy_elapsed_rnd = roundup(jiffy_elapsed_rnd, tg->td->throtl_slice);
- 
- 	/*
- 	 * jiffy_elapsed_rnd should not be a big value as minimum iops can be
-@@ -813,9 +817,9 @@ static bool tg_with_in_bps_limit(struct throtl_grp *tg, struct bio *bio,
- 
- 	/* Slice has just started. Consider one slice interval */
- 	if (!jiffy_elapsed)
--		jiffy_elapsed_rnd = throtl_slice;
-+		jiffy_elapsed_rnd = tg->td->throtl_slice;
- 
--	jiffy_elapsed_rnd = roundup(jiffy_elapsed_rnd, throtl_slice);
-+	jiffy_elapsed_rnd = roundup(jiffy_elapsed_rnd, tg->td->throtl_slice);
- 
- 	tmp = tg_bps_limit(tg, rw) * jiffy_elapsed_rnd;
- 	do_div(tmp, HZ);
-@@ -881,8 +885,10 @@ static bool tg_may_dispatch(struct throtl_grp *tg, struct bio *bio,
- 	if (throtl_slice_used(tg, rw) && !(tg->service_queue.nr_queued[rw]))
- 		throtl_start_new_slice(tg, rw);
- 	else {
--		if (time_before(tg->slice_end[rw], jiffies + throtl_slice))
--			throtl_extend_slice(tg, rw, jiffies + throtl_slice);
-+		if (time_before(tg->slice_end[rw],
-+		    jiffies + tg->td->throtl_slice))
-+			throtl_extend_slice(tg, rw,
-+				jiffies + tg->td->throtl_slice);
- 	}
- 
- 	if (tg_with_in_bps_limit(tg, bio, &bps_wait) &&
-@@ -1601,7 +1607,7 @@ static bool throtl_can_upgrade(struct throtl_data *td,
- 	if (td->limit_index != LIMIT_LOW)
- 		return false;
- 
--	if (time_before(jiffies, td->low_downgrade_time + throtl_slice))
-+	if (time_before(jiffies, td->low_downgrade_time + td->throtl_slice))
- 		return false;
- 
- 	rcu_read_lock();
-@@ -1658,8 +1664,9 @@ static bool throtl_tg_can_downgrade(struct throtl_grp *tg)
- 	 * If cgroup is below low limit, consider downgrade and throttle other
- 	 * cgroups
- 	 */
--	if (time_after_eq(now, td->low_upgrade_time + throtl_slice) &&
--	    time_after_eq(now, tg_last_low_overflow_time(tg) + throtl_slice))
-+	if (time_after_eq(now, td->low_upgrade_time + td->throtl_slice) &&
-+	    time_after_eq(now, tg_last_low_overflow_time(tg) +
-+					td->throtl_slice))
- 		return true;
- 	return false;
- }
-@@ -1689,13 +1696,14 @@ static void throtl_downgrade_check(struct throtl_grp *tg)
- 		return;
- 	if (!list_empty(&tg_to_blkg(tg)->blkcg->css.children))
- 		return;
--	if (time_after(tg->last_check_time + throtl_slice, now))
-+	if (time_after(tg->last_check_time + tg->td->throtl_slice, now))
- 		return;
- 
- 	elapsed_time = now - tg->last_check_time;
- 	tg->last_check_time = now;
- 
--	if (time_before(now, tg_last_low_overflow_time(tg) + throtl_slice))
-+	if (time_before(now, tg_last_low_overflow_time(tg) +
-+			tg->td->throtl_slice))
- 		return;
- 
- 	if (tg->bps[READ][LIMIT_LOW] != U64_MAX) {
-@@ -1923,6 +1931,7 @@ int blk_throtl_init(struct request_queue *q)
- 
- 	q->td = td;
- 	td->queue = q;
-+	td->throtl_slice = DFL_THROTL_SLICE;
- 
- 	td->limit_valid[LIMIT_MAX] = true;
- 	td->limit_index = LIMIT_MAX;
-@@ -1943,6 +1952,30 @@ void blk_throtl_exit(struct request_queue *q)
- 	kfree(q->td);
- }
- 
-+ssize_t blk_throtl_sample_time_show(struct request_queue *q, char *page)
-+{
-+	if (!q->td)
-+		return -EINVAL;
-+	return sprintf(page, "%u\n", jiffies_to_msecs(q->td->throtl_slice));
-+}
-+
-+ssize_t blk_throtl_sample_time_store(struct request_queue *q,
-+	const char *page, size_t count)
-+{
-+	unsigned long v;
-+	unsigned long t;
-+
-+	if (!q->td)
-+		return -EINVAL;
-+	if (kstrtoul(page, 10, &v))
-+		return -EINVAL;
-+	t = msecs_to_jiffies(v);
-+	if (t == 0 || t > MAX_THROTL_SLICE)
-+		return -EINVAL;
-+	q->td->throtl_slice = t;
-+	return count;
-+}
-+
- static int __init throtl_init(void)
- {
- 	kthrotld_workqueue = alloc_workqueue("kthrotld", WQ_MEM_RECLAIM, 0);
-diff --git a/block/blk.h b/block/blk.h
-index 041185e..e83e757 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -290,6 +290,9 @@ static inline struct io_context *create_io_context(gfp_t gfp_mask, int node)
- extern void blk_throtl_drain(struct request_queue *q);
- extern int blk_throtl_init(struct request_queue *q);
- extern void blk_throtl_exit(struct request_queue *q);
-+extern ssize_t blk_throtl_sample_time_show(struct request_queue *q, char *page);
-+extern ssize_t blk_throtl_sample_time_store(struct request_queue *q,
-+	const char *page, size_t count);
- #else /* CONFIG_BLK_DEV_THROTTLING */
- static inline void blk_throtl_drain(struct request_queue *q) { }
- static inline int blk_throtl_init(struct request_queue *q) { return 0; }
 -- 
-2.9.3
-
+Jens Axboe
