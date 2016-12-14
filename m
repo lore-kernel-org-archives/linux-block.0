@@ -1,288 +1,108 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:59092 "EHLO mx1.redhat.com"
+Received: from mx2.suse.de ([195.135.220.15]:55527 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753943AbcLNQf3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 14 Dec 2016 11:35:29 -0500
-Date: Wed, 14 Dec 2016 11:35:26 -0500
-From: Jerome Glisse <jglisse@redhat.com>
-To: Dave Chinner <david@fromorbit.com>
-Cc: lsf-pc@lists.linux-foundation.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: Re: [LSF/MM TOPIC] Un-addressable device memory and block/fs
- implications
-Message-ID: <20161214163525.GA14755@redhat.com>
+        id S932170AbcLNLNy (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 14 Dec 2016 06:13:54 -0500
+Date: Wed, 14 Dec 2016 12:13:51 +0100
+From: Jan Kara <jack@suse.cz>
+To: Jerome Glisse <jglisse@redhat.com>
+Cc: Dave Chinner <david@fromorbit.com>, linux-block@vger.kernel.org,
+        linux-mm@kvack.org, lsf-pc@lists.linux-foundation.org,
+        linux-fsdevel@vger.kernel.org
+Subject: Re: [Lsf-pc] [LSF/MM TOPIC] Un-addressable device memory and
+ block/fs implications
+Message-ID: <20161214111351.GC18624@quack2.suse.cz>
 References: <20161213181511.GB2305@redhat.com>
  <20161213201515.GB4326@dastard>
  <20161213203112.GE2305@redhat.com>
  <20161213211041.GC4326@dastard>
  <20161213212433.GF2305@redhat.com>
- <20161213221322.GD4326@dastard>
- <20161213225523.GG2305@redhat.com>
- <20161214001422.GE4326@dastard>
- <20161214010755.GA2182@redhat.com>
- <20161214042313.GF4326@dastard>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <20161214042313.GF4326@dastard>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20161213212433.GF2305@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Wed, Dec 14, 2016 at 03:23:13PM +1100, Dave Chinner wrote:
-> On Tue, Dec 13, 2016 at 08:07:58PM -0500, Jerome Glisse wrote:
-> > On Wed, Dec 14, 2016 at 11:14:22AM +1100, Dave Chinner wrote:
-> > > On Tue, Dec 13, 2016 at 05:55:24PM -0500, Jerome Glisse wrote:
-> > > > On Wed, Dec 14, 2016 at 09:13:22AM +1100, Dave Chinner wrote:
-> > > > > On Tue, Dec 13, 2016 at 04:24:33PM -0500, Jerome Glisse wrote:
-> > > > > > On Wed, Dec 14, 2016 at 08:10:41AM +1100, Dave Chinner wrote:
-> > > > > > > > From kernel point of view such memory is almost like any other, it
-> > > > > > > > has a struct page and most of the mm code is non the wiser, nor need
-> > > > > > > > to be about it. CPU access trigger a migration back to regular CPU
-> > > > > > > > accessible page.
-> > > > > > > 
-> > > > > > > That sounds ... complex. Page migration on page cache access inside
-> > > > > > > the filesytem IO path locking during read()/write() sounds like
-> > > > > > > a great way to cause deadlocks....
-> > > > > > 
-> > > > > > There are few restriction on device page, no one can do GUP on them and
-> > > > > > thus no one can pin them. Hence they can always be migrated back. Yes
-> > > > > > each fs need modification, most of it (if not all) is isolated in common
-> > > > > > filemap helpers.
-> > > > > 
-> > > > > Sure, but you haven't answered my question: how do you propose we
-> > > > > address the issue of placing all the mm locks required for migration
-> > > > > under the filesystem IO path locks?
+On Tue 13-12-16 16:24:33, Jerome Glisse wrote:
+> On Wed, Dec 14, 2016 at 08:10:41AM +1100, Dave Chinner wrote:
+> > On Tue, Dec 13, 2016 at 03:31:13PM -0500, Jerome Glisse wrote:
+> > > On Wed, Dec 14, 2016 at 07:15:15AM +1100, Dave Chinner wrote:
+> > > > On Tue, Dec 13, 2016 at 01:15:11PM -0500, Jerome Glisse wrote:
+> > > > > I would like to discuss un-addressable device memory in the context of
+> > > > > filesystem and block device. Specificaly how to handle write-back, read,
+> > > > > ... when a filesystem page is migrated to device memory that CPU can not
+> > > > > access.
 > > > > 
-> > > > Two different plans (which are non exclusive of each other). First is to use
-> > > > workqueue and have read/write wait on the workqueue to be done migrating the
-> > > > page back.
-> > > 
-> > > Pushing something to a workqueue and then waiting on the workqueue
-> > > to complete the work doesn't change lock ordering problems - it
-> > > just hides them away and makes them harder to debug.
-> > 
-> > Migration doesn't need many lock below is a list and i don't see any lock issue
-> > in respect to ->read or ->write.
-> > 
-> >  lock_page(page);
-> >  spin_lock_irq(&mapping->tree_lock);
-> >  lock_buffer(bh); // if page has buffer_head
-> >  i_mmap_lock_read(mapping);
-> >  vma_interval_tree_foreach(vma, &mapping->i_mmap, pgoff, pgoff) {
-> >     // page table lock for each entry
-> >  }
-> 
-> We can't take the page or mapping tree locks that while we hold
-> various filesystem locks.
-> 
-> e.g. The IO path lock order is, in places:
-> 
-> inode->i_rwsem
->   get page from page cache
->   lock_page(page)
->   inode->allocation lock
->     zero page data
-> 
-> Filesystems are allowed to do this, because the IO path has
-> guaranteed them access to the page cache data on the page that is
-> locked. Your ZONE_DEVICE proposal breaks this guarantee - we might
-> have a locked page, but we don't have access to it's data.
-> 
-> Further, in various filesystems once the allocation lock is taken
-> (e.g. the i_lock in XFS) we're not allowed to lock pages or the
-> mapping tree as that leads to deadlocks with truncate, hole punch,
-> etc. Hence if the "zero page data" operation occurs on a ZONE_DEVICE page that
-> requires migration before the zeroing can occur, we can't perform
-> migration here.
-> 
-> Why are we even considering migration in situations where we already
-> hold the ZONE_DEVICE page locked, hold other filesystem locks inside
-> the page lock, and have an open dirty filesystem transaction as well?
-> 
-> Even if migration si possible and succeeds, the struct page in the
-> mapping tree for the file offset we are operating on is going to be
-> different after migration. That implies we need to completely
-> restart the operation. But given that we've already made changes,
-> backing out at this point is ...  complex and may not even be
-> possible.
-
-So i skim through xfs code and i still think this is doable. So in the
-above sequence:
-
-  inode->i_rwsem
-  page = find_get_page();
-  if (device_unaddressable(page)) {
-     page = migratepage();
-  }
-  ...
-
-Now there is thing like filemap_write_and_wait...() but thus can be
-handled by the bio bounce buffer like i said ie a the block layer we
-allocate temporary page, page are already read only on the device as
-device obey regular thing like page_mkclean(). So page content is
-stable.
-
-The migrate page is using buffer_migrate_page() and i don't see any
-deadlock there. So i am not seeing any problem in doing migrate early
-on right after page lookup.
-
-
-> 
-> i.e. we have an architectural assumption that page contents are
-> always accessable when we have a locked struct page, and your
-> proposal would appear to violate that assumption...
-
-And it is, data might be in device memory but you can use bounce
-page to access it and you can write protect it on the device so
-that it doesn't change.
-
-Looking at xfs, it never does a kmap() directly, only through some
-of the generic code and thus are place where we can use bounce page.
-
-
- 
-> > > > Second solution is to use a bounce page during I/O so that there is no need
-> > > > for migration.
-> > > 
-> > > Which means the page in the device is left with out-of-date
-> > > contents, right?
-> > >
-> > > If so, how do you prevent data corruption/loss when the device
-> > > has modified the page out of sight of the CPU and the bounce page
-> > > doesn't contain those modifications? Or if the dirty device page is
-> > > written back directly without containing the changes made in the
-> > > bounce page?
-> > 
-> > There is no issue here, if bounce page is use then the page is mark as read
-> > only on the device until write is done and device copy is updated with what
-> > we have been ask to write. So no coherency issue between the 2 copy.
-> 
-> What if the page is already dirty on the device? You can't just
-> "mark it read only" because then you lose any data the device had
-> written that was not directly overwritten by the IO that needed
-> bouncing.
-> 
-> Partial page overwrites do occur...
-
-I should have been more explicit you:
-  - write protect page on device
-  - alloc bounce page
-  - dma device data to bounce page
-  - perform write on bounce page
-  - dma bounce page back to device data
-  - write io end
-
-It is just like it would be on CPU. There is no data hazard, no loss
-of data or incoherency here.
-
-> > > > > And if zeroing the page during such a fault requires CPU access to
-> > > > > the data, how do you propose we handle page migration in the middle
-> > > > > of the page fault to allow the CPU to zero the page? Seems like more
-> > > > > lock order/inversion problems there, too...
+> > > > You mean pmem that is DAX-capable that suddenly, without warning,
+> > > > becomes non-DAX capable?
 > > > > 
-> > > > File back page are never allocated on device, at least we have no incentive
-> > > > for usecase we care about today to do so. So a regular page is first use
-> > > > and initialize (to zero for hole) before being migrated to device.
-> > > > So i do not believe there should be any major concern on ->page_mkwrite.
+> > > > If you are not talking about pmem and DAX, then exactly what does
+> > > > "when a filesystem page is migrated to device memory that CPU can
+> > > > not access" mean? What "filesystem page" are we talking about that
+> > > > can get migrated from main RAM to something the CPU can't access?
 > > > 
-> > > Such deja vu - inodes are not static objects as modern filesystems
-> > > are highly dynamic. If you want to have safe, reliable non-coherent
-> > > mmap-based file data offload to devices, then I suspect that we're
-> > > going to need pretty much all of the same restrictions the pmem
-> > > programming model requires for userspace data flushing. i.e.:
-> > > 
-> > > https://lkml.org/lkml/2016/9/15/33
+> > > I am talking about GPU, FPGA, ... any PCIE device that have fast on
+> > > board memory that can not be expose transparently to the CPU. I am
+> > > reusing ZONE_DEVICE for this, you can see HMM patchset on linux-mm
+> > > https://lwn.net/Articles/706856/
 > > 
-> > I don't see any of the issues in that email applying to my case. Like i said
-> > from fs/mm point of view my page are _exactly_ like regular page.
+> > So ZONE_DEVICE memory that is a DMA target but not CPU addressable?
 > 
-> Except they aren't...
+> Well not only target, it can be source too. But the device can read
+> and write any system memory and dma to/from that memory to its on
+> board memory.
 > 
-> > Only thing
-> > is no CPU access.
-> 
-> ... because filesystems need direct CPU access to the data the page
-> points at when migration does not appear to be possible.
-
-And it can, the data is always accessible, it is just a matter of using
-a bounce page. I did a grep on kmap() and 99% of call site are about
-meta-data page which i don't want to migrate. Then there is some in
-generic helper for read/write/aio ... this are place where bounce page
-can be use if the page is not migrated earlier in the i/o process.
-
-> 
-> FWIW, another nasty corner case I just realised: the file data
-> requires some kind of data transformation on writeback. e.g.
-> compression, encryption, parity calculations for RAID, etc. IOWs, it
-> could be the block device underneath the filesystem that requires
-> ZONE_DEVICE->ZONE_NORMAL migration to occur. And to make matters
-> worse, that can occur in code paths that operate in a "must
-> guarantee forwards progress" memory allocation context...
-
-Well my proposal is about using the bio bounce code, which was done for
-ISA block device and i don't see any issue there. We allocate bounce page
-copy data from device into bounce page, the block layer does its thing
-(compress, encrypt, ...) on the bounce page. It is non the wiser. There
-is no migration happening. Note that at this point the page is already
-write protected on the device like it would be on the CPU.
-
-
-> > > At which point I have to ask: why is mmap considered to be the right
-> > > model for transfering data in and out of devices that are not
-> > > directly CPU addressable? 
 > > 
-> > That is where the industry is going, OpenCL 2.0/3.0, C++ concurrency and
-> > parallelism, OpenACC, OpenMP, HSA, Cuda ... all those API require unified
-> > address space and transparent use of device memory.
-> 
-> Sure, but that doesn't mean you can just map random files into the
-> user address space and then hand it off to random hardware and
-> expect the filesystem to be perfectly happy with that. 
-
-I am not expecting filesystem will be happy as it is but i am expecting
-there is way to make it happy :)
-
-
-> > > > migration for given fs.
-> > > 
-> > > How do you propose doing that?
+> > > So in my case i am only considering non DAX/PMEM filesystem ie any
+> > > "regular" filesystem back by a "regular" block device. I want to be
+> > > able to migrate mmaped area of such filesystem to device memory while
+> > > the device is actively using that memory.
 > > 
-> > As a mount flag option is my first idea but i have no strong opinion here.
+> > "migrate mmapped area of such filesystem" means what, exactly?
 > 
-> No, absolutely not. Mount options are not for controlling random
-> special interest behaviours in filesystems. That makes it impossible
-> to mix "incompatible" technologies in the same filesystem.
+> fd = open("/path/to/some/file")
+> ptr = mmap(fd, ...);
+> gpu_compute_something(ptr);
+> 
+> > 
+> > Are you talking about file data contents that have been copied into
+> > the page cache and mmapped into a user process address space?
+> > IOWs, migrating ZONE_NORMAL page cache page content and state
+> > to a new ZONE_DEVICE page, and then migrating back again somehow?
+> 
+> Take any existing application that mmap a file and allow to migrate
+> chunk of that mmaped file to device memory without the application
+> even knowing about it. So nothing special in respect to that mmaped
+> file. It is a regular file on your filesystem.
 
-I don't have strong opinion here. I just would like to allow sys-admin
-to decide somehow if they don't want to allow some fs to be migrated
-to device. I don't have good knowledge on what interface would be
-appropriate for this.
+OK, so I share most of Dave's concerns about this. But let's talk about
+what we can do and what you need and we may find something usable. First
+let me understand what is doable / what are the costs on your side.
 
-> 
-> > It might make sense for finer granularity but i don't believe so.
-> 
-> Then you're just not thinking about complex computation engines the
-> right way, are you?
-> 
-> e.g. you have a pmem filesystem as the central high-speed data store
-> for you computation engine. Some apps in the pipeline use DAX for
-> their data access because it's 10x faster than using traditional
-> buffered mmap access, so the filesystem is mounted "-o dax". But
-> then you want to add a hardware accelerator to speed up a different
-> stage of the pipeline by 10x, but it requires page based ZONE_DEVICE
-> management.
-> 
-> Unfortuantely the "-o zone_device" mount option is incompatible with
-> "-o dax" and because "it doesn't make sense for DAX to be a fine
-> grained option" you can't combine the two technologies into the one
-> pipeline....
-> 
-> That'd really suck, wouldn't it?
+So we have a page cache page that you'd like to migrate to the device.
+Fine. You are willing to sacrifice direct IO - even better. We can fall
+back to buffered IO in that case (well, except for XFS which does not do it
+but that's a minor detail). One thing I'm not sure about: When a page is
+migrated to the device, is its contents available and is just possibly stale
+or will something bad happen if we try to access (or even modify) page data?
 
-Well i don't to allow migration for dax fs because dax is a different
-problem. I think it is only use with pmem and i don't think i want to
-allow pmem migration. It would break some assumption people have about
-pmem. People using both technology would have to do extra work in there
-program to leverage both.
+And by migration you really mean page migration? Be aware that migration of
+pagecache pages may be a problem for some pages of some filesystems on its
+own - e. g. page migration may fail because there is a filesystem transaction
+outstanding modifying that page. For userspace these will be really hard
+to understand sporadic errors because it's really filesystem internal
+thing. So far page migration was widely used only for free space
+defragmentation and for that purpose if page is not migratable for a minute
+who cares.
 
-Cheers,
-J�r�me
+So won't it be easier to leave the pagecache page where it is and *copy* it
+to the device? Can the device notify us *before* it is going to modify a
+page, not just after it has modified it? Possibly if we just give it the
+page read-only and it will have to ask CPU to get write permission? If yes,
+then I belive this could work and even fs support should be doable.
+
+								Honza
+
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
