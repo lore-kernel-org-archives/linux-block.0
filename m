@@ -1,294 +1,170 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f195.google.com ([209.85.192.195]:35124 "EHLO
-        mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933007AbcL0QGz (ORCPT
+Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:57272 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1754508AbcLOUdW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Dec 2016 11:06:55 -0500
-From: Ming Lei <tom.leiming@gmail.com>
-To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        Ming Lei <tom.leiming@gmail.com>, Chris Mason <clm@fb.com>,
-        Josef Bacik <jbacik@fb.com>, David Sterba <dsterba@suse.com>,
-        linux-btrfs@vger.kernel.org (open list:BTRFS FILE SYSTEM)
-Subject: [PATCH v1 47/54] fs/btrfs: convert to bio_for_each_segment_all_sp()
-Date: Wed, 28 Dec 2016 00:04:56 +0800
-Message-Id: <1482854706-14128-16-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1482854706-14128-1-git-send-email-tom.leiming@gmail.com>
-References: <1482854706-14128-1-git-send-email-tom.leiming@gmail.com>
+        Thu, 15 Dec 2016 15:33:22 -0500
+Received: from pps.filterd (m0044010.ppops.net [127.0.0.1])
+        by mx0a-00082601.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id uBFKUZH9024779
+        for <linux-block@vger.kernel.org>; Thu, 15 Dec 2016 12:33:16 -0800
+Received: from mail.thefacebook.com ([199.201.64.23])
+        by mx0a-00082601.pphosted.com with ESMTP id 27bxsyagmv-3
+        (version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT)
+        for <linux-block@vger.kernel.org>; Thu, 15 Dec 2016 12:33:16 -0800
+Received: from facebook.com (2401:db00:21:603d:face:0:19:0)     by
+ mx-out.facebook.com (10.103.99.99) with ESMTP  id
+ b0f5d730c30511e6b9200002c9dfb610-2e9f7a50 for <linux-block@vger.kernel.org>;
+        Thu, 15 Dec 2016 12:33:09 -0800
+From: Shaohua Li <shli@fb.com>
+To: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <kernel-team@fb.com>, <axboe@fb.com>, <tj@kernel.org>,
+        <vgoyal@redhat.com>
+Subject: [PATCH V5 10/17] blk-throttle: make bandwidth change smooth
+Date: Thu, 15 Dec 2016 12:33:01 -0800
+Message-ID: <390c68366acef5f3ce6ac6c5ce868826f07fd993.1481833017.git.shli@fb.com>
+In-Reply-To: <cover.1481833017.git.shli@fb.com>
+References: <cover.1481833017.git.shli@fb.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
----
- fs/btrfs/check-integrity.c |  5 +++--
- fs/btrfs/compression.c     |  3 ++-
- fs/btrfs/disk-io.c         |  3 ++-
- fs/btrfs/extent_io.c       |  9 ++++++---
- fs/btrfs/file-item.c       |  6 ++++--
- fs/btrfs/inode.c           | 15 ++++++++++-----
- fs/btrfs/raid56.c          |  6 ++++--
- 7 files changed, 31 insertions(+), 16 deletions(-)
+When cgroups all reach low limit, cgroups can dispatch more IO. This
+could make some cgroups dispatch more IO but others not, and even some
+cgroups could dispatch less IO than their low limit. For example, cg1
+low limit 10MB/s, cg2 limit 80MB/s, assume disk maximum bandwidth is
+120M/s for the workload. Their bps could something like this:
 
-diff --git a/fs/btrfs/check-integrity.c b/fs/btrfs/check-integrity.c
-index ab14c2e635ca..e3cc7b18fe8b 100644
---- a/fs/btrfs/check-integrity.c
-+++ b/fs/btrfs/check-integrity.c
-@@ -2828,6 +2828,7 @@ static void __btrfsic_submit_bio(struct bio *bio)
- 		struct bio_vec *bvec;
- 		int bio_is_patched;
- 		char **mapped_datav;
-+		struct bvec_iter_all bia;
+cg1/cg2 bps: T1: 10/80 -> T2: 60/60 -> T3: 10/80
+
+At T1, all cgroups reach low limit, so they can dispatch more IO later.
+Then cg1 dispatch more IO and cg2 has no room to dispatch enough IO. At
+T2, cg2 only dispatches 60M/s. Since We detect cg2 dispatches less IO
+than its low limit 80M/s, we downgrade the queue from LIMIT_MAX to
+LIMIT_LOW, then all cgroups are throttled to their low limit (T3). cg2
+will have bandwidth below its low limit at most time.
+
+The big problem here is we don't know the maximum bandwidth of the
+workload, so we can't make smart decision to avoid the situation. This
+patch makes cgroup bandwidth change smooth. After disk upgrades from
+LIMIT_LOW to LIMIT_MAX, we don't allow cgroups use all bandwidth upto
+their max limit immediately. Their bandwidth limit will be increased
+gradually to avoid above situation. So above example will became
+something like:
+
+cg1/cg2 bps: 10/80 -> 15/105 -> 20/100 -> 25/95 -> 30/90 -> 35/85 -> 40/80
+-> 45/75 -> 22/98
+
+In this way cgroups bandwidth will be above their limit in majority
+time, this still doesn't fully utilize disk bandwidth, but that's
+something we pay for sharing.
+
+Note this doesn't completely avoid cgroup running under its low limit.
+The best way to guarantee cgroup doesn't run under its limit is to set
+max limit. For example, if we set cg1 max limit to 40, cg2 will never
+run under its low limit.
+
+Signed-off-by: Shaohua Li <shli@fb.com>
+---
+ block/blk-throttle.c | 51 +++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 49 insertions(+), 2 deletions(-)
+
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index a0ba961..6b2f365 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -174,6 +174,8 @@ struct throtl_data
  
- 		dev_bytenr = 512 * bio->bi_iter.bi_sector;
- 		bio_is_patched = 0;
-@@ -2844,7 +2845,7 @@ static void __btrfsic_submit_bio(struct bio *bio)
- 			goto leave;
- 		cur_bytenr = dev_bytenr;
+ 	unsigned long low_upgrade_time;
+ 	unsigned long low_downgrade_time;
++
++	unsigned int scale;
+ };
  
--		bio_for_each_segment_all(bvec, bio, i) {
-+		bio_for_each_segment_all_sp(bvec, bio, i, bia) {
- 			BUG_ON(bvec->bv_len != PAGE_SIZE);
- 			mapped_datav[i] = kmap(bvec->bv_page);
- 
-@@ -2858,7 +2859,7 @@ static void __btrfsic_submit_bio(struct bio *bio)
- 					      mapped_datav, bio->bi_vcnt,
- 					      bio, &bio_is_patched,
- 					      NULL, bio->bi_opf);
--		bio_for_each_segment_all(bvec, bio, i)
-+		bio_for_each_segment_all_sp(bvec, bio, i, bia)
- 			kunmap(bvec->bv_page);
- 		kfree(mapped_datav);
- 	} else if (NULL != dev_state && (bio->bi_opf & REQ_PREFLUSH)) {
-diff --git a/fs/btrfs/compression.c b/fs/btrfs/compression.c
-index 7f390849343b..adcf5568f010 100644
---- a/fs/btrfs/compression.c
-+++ b/fs/btrfs/compression.c
-@@ -198,12 +198,13 @@ static void end_compressed_bio_read(struct bio *bio)
- 	} else {
- 		int i;
- 		struct bio_vec *bvec;
-+		struct bvec_iter_all bia;
- 
- 		/*
- 		 * we have verified the checksum already, set page
- 		 * checked so the end_io handlers know about it
- 		 */
--		bio_for_each_segment_all(bvec, cb->orig_bio, i)
-+		bio_for_each_segment_all_sp(bvec, cb->orig_bio, i, bia)
- 			SetPageChecked(bvec->bv_page);
- 
- 		bio_endio(cb->orig_bio);
-diff --git a/fs/btrfs/disk-io.c b/fs/btrfs/disk-io.c
-index 18004169552c..c2f9a42cd200 100644
---- a/fs/btrfs/disk-io.c
-+++ b/fs/btrfs/disk-io.c
-@@ -965,8 +965,9 @@ static int btree_csum_one_bio(struct bio *bio)
- 	struct bio_vec *bvec;
- 	struct btrfs_root *root;
- 	int i, ret = 0;
-+	struct bvec_iter_all bia;
- 
--	bio_for_each_segment_all(bvec, bio, i) {
-+	bio_for_each_segment_all_sp(bvec, bio, i, bia) {
- 		root = BTRFS_I(bvec->bv_page->mapping->host)->root;
- 		ret = csum_dirty_buffer(root->fs_info, bvec->bv_page);
- 		if (ret)
-diff --git a/fs/btrfs/extent_io.c b/fs/btrfs/extent_io.c
-index 4ac383a3a649..137f95063c85 100644
---- a/fs/btrfs/extent_io.c
-+++ b/fs/btrfs/extent_io.c
-@@ -2471,8 +2471,9 @@ static void end_bio_extent_writepage(struct bio *bio)
- 	u64 start;
- 	u64 end;
- 	int i;
-+	struct bvec_iter_all bia;
- 
--	bio_for_each_segment_all(bvec, bio, i) {
-+	bio_for_each_segment_all_sp(bvec, bio, i, bia) {
- 		struct page *page = bvec->bv_page;
- 		struct inode *inode = page->mapping->host;
- 		struct btrfs_fs_info *fs_info = btrfs_sb(inode->i_sb);
-@@ -2541,8 +2542,9 @@ static void end_bio_extent_readpage(struct bio *bio)
- 	int mirror;
- 	int ret;
- 	int i;
-+	struct bvec_iter_all bia;
- 
--	bio_for_each_segment_all(bvec, bio, i) {
-+	bio_for_each_segment_all_sp(bvec, bio, i, bia) {
- 		struct page *page = bvec->bv_page;
- 		struct inode *inode = page->mapping->host;
- 		struct btrfs_fs_info *fs_info = btrfs_sb(inode->i_sb);
-@@ -3692,8 +3694,9 @@ static void end_bio_extent_buffer_writepage(struct bio *bio)
- 	struct bio_vec *bvec;
- 	struct extent_buffer *eb;
- 	int i, done;
-+	struct bvec_iter_all bia;
- 
--	bio_for_each_segment_all(bvec, bio, i) {
-+	bio_for_each_segment_all_sp(bvec, bio, i, bia) {
- 		struct page *page = bvec->bv_page;
- 
- 		eb = (struct extent_buffer *)page->private;
-diff --git a/fs/btrfs/file-item.c b/fs/btrfs/file-item.c
-index e97e322c28f0..c281df0e6485 100644
---- a/fs/btrfs/file-item.c
-+++ b/fs/btrfs/file-item.c
-@@ -179,6 +179,7 @@ static int __btrfs_lookup_bio_sums(struct inode *inode, struct bio *bio,
- 	int nblocks;
- 	int count = 0, i;
- 	u16 csum_size = btrfs_super_csum_size(fs_info->super_copy);
-+	struct bvec_iter_all bia;
- 
- 	path = btrfs_alloc_path();
- 	if (!path)
-@@ -223,7 +224,7 @@ static int __btrfs_lookup_bio_sums(struct inode *inode, struct bio *bio,
- 	if (dio)
- 		offset = logical_offset;
- 
--	bio_for_each_segment_all(bvec, bio, i) {
-+	bio_for_each_segment_all_sp(bvec, bio, i, bia) {
- 		page_bytes_left = bvec->bv_len;
- 		if (count)
- 			goto next;
-@@ -447,6 +448,7 @@ int btrfs_csum_one_bio(struct inode *inode, struct bio *bio,
- 	unsigned long total_bytes = 0;
- 	unsigned long this_sum_bytes = 0;
- 	u64 offset;
-+	struct bvec_iter_all bia;
- 
- 	WARN_ON(bio->bi_vcnt <= 0);
- 	sums = kzalloc(btrfs_ordered_sum_size(fs_info, bio->bi_iter.bi_size),
-@@ -465,7 +467,7 @@ int btrfs_csum_one_bio(struct inode *inode, struct bio *bio,
- 	sums->bytenr = (u64)bio->bi_iter.bi_sector << 9;
- 	index = 0;
- 
--	bio_for_each_segment_all(bvec, bio, j) {
-+	bio_for_each_segment_all_sp(bvec, bio, j, bia) {
- 		if (!contig)
- 			offset = page_offset(bvec->bv_page) + bvec->bv_offset;
- 
-diff --git a/fs/btrfs/inode.c b/fs/btrfs/inode.c
-index f2b281ad7af6..544e1cf9a552 100644
---- a/fs/btrfs/inode.c
-+++ b/fs/btrfs/inode.c
-@@ -7955,6 +7955,7 @@ static void btrfs_retry_endio_nocsum(struct bio *bio)
- 	struct inode *inode;
- 	struct bio_vec *bvec;
- 	int i;
-+	struct bvec_iter_all bia;
- 
- 	if (bio->bi_error)
- 		goto end;
-@@ -7964,7 +7965,7 @@ static void btrfs_retry_endio_nocsum(struct bio *bio)
- 	ASSERT(bio->bi_io_vec->bv_len == btrfs_inode_sectorsize(inode));
- 
- 	done->uptodate = 1;
--	bio_for_each_segment_all(bvec, bio, i)
-+	bio_for_each_segment_all_sp(bvec, bio, i, bia)
- 		clean_io_failure(done->inode, done->start, bvec->bv_page, 0);
- end:
- 	complete(&done->done);
-@@ -7983,6 +7984,7 @@ static int __btrfs_correct_data_nocsum(struct inode *inode,
- 	int nr_sectors;
- 	int i;
- 	int ret;
-+	struct bvec_iter_all bia;
- 
- 	fs_info = BTRFS_I(inode)->root->fs_info;
- 	sectorsize = fs_info->sectorsize;
-@@ -7990,7 +7992,7 @@ static int __btrfs_correct_data_nocsum(struct inode *inode,
- 	start = io_bio->logical;
- 	done.inode = inode;
- 
--	bio_for_each_segment_all(bvec, &io_bio->bio, i) {
-+	bio_for_each_segment_all_sp(bvec, &io_bio->bio, i, bia) {
- 		nr_sectors = BTRFS_BYTES_TO_BLKS(fs_info, bvec->bv_len);
- 		pgoff = bvec->bv_offset;
- 
-@@ -8034,6 +8036,7 @@ static void btrfs_retry_endio(struct bio *bio)
- 	int uptodate;
- 	int ret;
- 	int i;
-+	struct bvec_iter_all bia;
- 
- 	if (bio->bi_error)
- 		goto end;
-@@ -8046,7 +8049,7 @@ static void btrfs_retry_endio(struct bio *bio)
- 	inode = bio->bi_io_vec->bv_page->mapping->host;
- 	ASSERT(bio->bi_io_vec->bv_len == btrfs_inode_sectorsize(inode));
- 
--	bio_for_each_segment_all(bvec, bio, i) {
-+	bio_for_each_segment_all_sp(bvec, bio, i, bia) {
- 		ret = __readpage_endio_check(done->inode, io_bio, i,
- 					bvec->bv_page, bvec->bv_offset,
- 					done->start, bvec->bv_len);
-@@ -8077,6 +8080,7 @@ static int __btrfs_subio_endio_read(struct inode *inode,
- 	int csum_pos;
- 	int i;
- 	int ret;
-+	struct bvec_iter_all bia;
- 
- 	fs_info = BTRFS_I(inode)->root->fs_info;
- 	sectorsize = fs_info->sectorsize;
-@@ -8085,7 +8089,7 @@ static int __btrfs_subio_endio_read(struct inode *inode,
- 	start = io_bio->logical;
- 	done.inode = inode;
- 
--	bio_for_each_segment_all(bvec, &io_bio->bio, i) {
-+	bio_for_each_segment_all_sp(bvec, &io_bio->bio, i, bia) {
- 		nr_sectors = BTRFS_BYTES_TO_BLKS(fs_info, bvec->bv_len);
- 
- 		pgoff = bvec->bv_offset;
-@@ -8380,6 +8384,7 @@ static int btrfs_submit_direct_hook(struct btrfs_dio_private *dip,
- 	int nr_sectors;
- 	int ret;
- 	int i, j;
-+	struct bvec_iter_all bia;
- 
- 	map_length = orig_bio->bi_iter.bi_size;
- 	ret = btrfs_map_block(fs_info, btrfs_op(orig_bio), start_sector << 9,
-@@ -8409,7 +8414,7 @@ static int btrfs_submit_direct_hook(struct btrfs_dio_private *dip,
- 	btrfs_io_bio(bio)->logical = file_offset;
- 	atomic_inc(&dip->pending_bios);
- 
--	bio_for_each_segment_all(bvec, orig_bio, j) {
-+	bio_for_each_segment_all_sp(bvec, orig_bio, j, bia) {
- 		nr_sectors = BTRFS_BYTES_TO_BLKS(fs_info, bvec->bv_len);
- 		i = 0;
- next_block:
-diff --git a/fs/btrfs/raid56.c b/fs/btrfs/raid56.c
-index d2a9a1ee5361..b218c4084c26 100644
---- a/fs/btrfs/raid56.c
-+++ b/fs/btrfs/raid56.c
-@@ -1150,6 +1150,7 @@ static void index_rbio_pages(struct btrfs_raid_bio *rbio)
- 	unsigned long stripe_offset;
- 	unsigned long page_index;
- 	int i;
-+	struct bvec_iter_all bia;
- 
- 	spin_lock_irq(&rbio->bio_list_lock);
- 	bio_list_for_each(bio, &rbio->bio_list) {
-@@ -1157,7 +1158,7 @@ static void index_rbio_pages(struct btrfs_raid_bio *rbio)
- 		stripe_offset = start - rbio->bbio->raid_map[0];
- 		page_index = stripe_offset >> PAGE_SHIFT;
- 
--		bio_for_each_segment_all(bvec, bio, i)
-+		bio_for_each_segment_all_sp(bvec, bio, i, bia)
- 			rbio->bio_pages[page_index + i] = bvec->bv_page;
- 	}
- 	spin_unlock_irq(&rbio->bio_list_lock);
-@@ -1434,8 +1435,9 @@ static void set_bio_pages_uptodate(struct bio *bio)
+ static void throtl_pending_timer_fn(unsigned long arg);
+@@ -228,21 +230,58 @@ static struct throtl_data *sq_to_td(struct throtl_service_queue *sq)
+ static uint64_t tg_bps_limit(struct throtl_grp *tg, int rw)
  {
- 	struct bio_vec *bvec;
- 	int i;
-+	struct bvec_iter_all bia;
+ 	struct blkcg_gq *blkg = tg_to_blkg(tg);
++	struct throtl_data *td;
+ 	uint64_t ret;
  
--	bio_for_each_segment_all(bvec, bio, i)
-+	bio_for_each_segment_all_sp(bvec, bio, i, bia)
- 		SetPageUptodate(bvec->bv_page);
+ 	if (cgroup_subsys_on_dfl(io_cgrp_subsys) && !blkg->parent)
+ 		return U64_MAX;
+-	return tg->bps[rw][tg->td->limit_index];
++
++	td = tg->td;
++	ret = tg->bps[rw][td->limit_index];
++	if (td->limit_index == LIMIT_MAX && tg->bps[rw][LIMIT_LOW] !=
++	    tg->bps[rw][LIMIT_MAX]) {
++		uint64_t increase;
++
++		if (td->scale < 4096 && time_after_eq(jiffies,
++		    td->low_upgrade_time + td->scale * td->throtl_slice)) {
++			unsigned int time = jiffies - td->low_upgrade_time;
++
++			td->scale = time / td->throtl_slice;
++		}
++		increase = (tg->bps[rw][LIMIT_LOW] >> 1) * td->scale;
++		ret = min(tg->bps[rw][LIMIT_MAX],
++			tg->bps[rw][LIMIT_LOW] + increase);
++	}
++	return ret;
  }
  
+ static unsigned int tg_iops_limit(struct throtl_grp *tg, int rw)
+ {
+ 	struct blkcg_gq *blkg = tg_to_blkg(tg);
++	struct throtl_data *td;
+ 	unsigned int ret;
+ 
+ 	if (cgroup_subsys_on_dfl(io_cgrp_subsys) && !blkg->parent)
+ 		return UINT_MAX;
+-	return tg->iops[rw][tg->td->limit_index];
++
++	td = tg->td;
++	ret = tg->iops[rw][td->limit_index];
++	if (td->limit_index == LIMIT_MAX && tg->iops[rw][LIMIT_LOW] !=
++	    tg->iops[rw][LIMIT_MAX]) {
++		uint64_t increase;
++
++		if (td->scale < 4096 && time_after_eq(jiffies,
++		    td->low_upgrade_time + td->scale * td->throtl_slice)) {
++			unsigned int time = jiffies - td->low_upgrade_time;
++
++			td->scale = time / td->throtl_slice;
++		}
++
++		increase = (tg->iops[rw][LIMIT_LOW] >> 1) * td->scale;
++		ret = min(tg->iops[rw][LIMIT_MAX],
++			tg->iops[rw][LIMIT_LOW] + (unsigned int)increase);
++	}
++	return ret;
+ }
+ 
+ /**
+@@ -1645,6 +1684,7 @@ static void throtl_upgrade_state(struct throtl_data *td)
+ 
+ 	td->limit_index = LIMIT_MAX;
+ 	td->low_upgrade_time = jiffies;
++	td->scale = 0;
+ 	rcu_read_lock();
+ 	blkg_for_each_descendant_post(blkg, pos_css, td->queue->root_blkg) {
+ 		struct throtl_grp *tg = blkg_to_tg(blkg);
+@@ -1662,6 +1702,13 @@ static void throtl_upgrade_state(struct throtl_data *td)
+ 
+ static void throtl_downgrade_state(struct throtl_data *td, int new)
+ {
++	td->scale /= 2;
++
++	if (td->scale) {
++		td->low_upgrade_time = jiffies - td->scale * td->throtl_slice;
++		return;
++	}
++
+ 	td->limit_index = new;
+ 	td->low_downgrade_time = jiffies;
+ }
 -- 
-2.7.4
+2.9.3
 
