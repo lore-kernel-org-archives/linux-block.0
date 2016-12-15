@@ -1,58 +1,92 @@
-Return-Path: <decui@microsoft.com>
-From: Dexuan Cui <decui@microsoft.com>
-To: Ming Lei <tom.leiming@gmail.com>
-CC: Jens Axboe <axboe@kernel.dk>, Theodore Ts'o <tytso@mit.edu>, "Andreas
- Dilger" <adilger.kernel@dilger.ca>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "linux-ext4@vger.kernel.org"
-	<linux-ext4@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, Abel Hu <Chou.Hu@microsoft.com>, Thomas Shao
-	<huishao@microsoft.com>, Matthew Wilcox <matthew@wil.cx>, Long Li
-	<longli@microsoft.com>, KY Srinivasan <kys@microsoft.com>
-Subject: RE: Big I/O requests are split into small ones due to unaligned ext4
- partition boundary?
-Date: Thu, 15 Dec 2016 13:53:52 +0000
-Message-ID: <MWHPR03MB2669356D00948A188BB50BCEBF9D0@MWHPR03MB2669.namprd03.prod.outlook.com>
-References: <MWHPR03MB26692343C35CE591E277A816BF9D0@MWHPR03MB2669.namprd03.prod.outlook.com>
- <CACVXFVMfuqT6ZoCECaCyhiM1hosZzAjpgv1kibbpqizxKT2f3w@mail.gmail.com>
-In-Reply-To: <CACVXFVMfuqT6ZoCECaCyhiM1hosZzAjpgv1kibbpqizxKT2f3w@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
+Return-Path: <tom.leiming@gmail.com>
 MIME-Version: 1.0
+In-Reply-To: <MWHPR03MB26692343C35CE591E277A816BF9D0@MWHPR03MB2669.namprd03.prod.outlook.com>
+References: <MWHPR03MB26692343C35CE591E277A816BF9D0@MWHPR03MB2669.namprd03.prod.outlook.com>
+From: Ming Lei <tom.leiming@gmail.com>
+Date: Thu, 15 Dec 2016 20:43:07 +0800
+Message-ID: <CACVXFVMfuqT6ZoCECaCyhiM1hosZzAjpgv1kibbpqizxKT2f3w@mail.gmail.com>
+Subject: Re: Big I/O requests are split into small ones due to unaligned ext4
+ partition boundary?
+To: Dexuan Cui <decui@microsoft.com>
+Cc: Jens Axboe <axboe@kernel.dk>, "Theodore Ts'o" <tytso@mit.edu>,
+	Andreas Dilger <adilger.kernel@dilger.ca>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-ext4@vger.kernel.org" <linux-ext4@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Abel Hu <Chou.Hu@microsoft.com>,
+	Thomas Shao <huishao@microsoft.com>, Matthew Wilcox <matthew@wil.cx>, Long Li <longli@microsoft.com>,
+	KY Srinivasan <kys@microsoft.com>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
-PiBGcm9tOiBNaW5nIExlaSBbbWFpbHRvOnRvbS5sZWltaW5nQGdtYWlsLmNvbV0NCj4gU2VudDog
-VGh1cnNkYXksIERlY2VtYmVyIDE1LCAyMDE2IDIwOjQzDQo+IA0KPiBPbiBUaHUsIERlYyAxNSwg
-MjAxNiBhdCA3OjQ3IFBNLCBEZXh1YW4gQ3VpIDxkZWN1aUBtaWNyb3NvZnQuY29tPiB3cm90ZToN
-Cj4gPiBIaSwgd2hlbiBJIHJ1biAibWtmcy5leHQ0IC9kZXYvc2RjMiIgaW4gYSBMaW51eCB2aXJ0
-dWFsIG1hY2hpbmUgb24gSHlwZXItViwNCj4gPiB3aGVyZSBhIGRpc2sgSU9QUz01MDAgbGltaXQg
-aXMgYXBwbGllZCBieSBtZSBbMF0sICB0aGUgY29tbWFuZCB0YWtlcyBtdWNoDQo+ID4gbW9yZSB0
-aW1lLCBpZiB0aGUgZXh0NCBwYXJ0aXRpb24gYm91bmRhcnkgaXMgbm90IHByb3Blcmx5IGFsaWdu
-ZWQ6DQo+ID4NCj4gPiBFeGFtcGxlIDEgWzFdOiBpdCB0YWtlcyB+NyBtaW51dGVzIHdpdGggYXZl
-cmFnZSB3TUIvcyA9IDAuMyAgIChzbG93KQ0KPiA+IEV4YW1wbGUgMiBbMl06IGl0IHRha2VzIH4z
-LjUgbWludXRlcyB3aXRoIGF2ZXJhZ2Ugd01CL3MgPSAwLjYgKHNsb3cpDQo+ID4gRXhhbXBsZSAz
-IFszXTogaXQgdGFrZXMgfjAuNSBtaW51dGUgd2l0aCBhdmVyYWdlIHdNQi9zID0gNCAoZXhwZWN0
-ZWQpDQo+ID4NCj4gPiBzdHJhY2Ugc2hvd3MgdGhlIG1rZnMuZXh0MyBwcm9ncmFtIGNhbGxzIHNl
-ZWsoKS93cml0ZSgpIGEgbG90IGFuZCBtb3N0IG9mDQo+ID4gdGhlIHdyaXRlcyB1c2UgMzJLQiBi
-dWZmZXJzICh0aGlzIHNob3VsZCBiZSBiaWcgZW5vdWdoKSwgYW5kIHRoZSBwcm9ncmFtDQo+ID4g
-b25seSBpbnZva2VzIGZzeW5jKCkgb25jZSwgYWZ0ZXIgaXQgaXNzdWVzIGFsbCB0aGUgd3JpdGVz
-IC0tIHRoZSBmc3luYygpIHRha2VzDQo+ID4+OTklIG9mIHRoZSB0aW1lLg0KPiA+DQo+ID4gQnkg
-bG9nZ2luZyBTQ1NJIGNvbW1hbmRzLCB0aGUgU0NTSSBXcml0ZSgxMCkgY29tbWFuZCBpcyB1c2Vk
-IGhlcmUgZm9yIHRoZQ0KPiA+IHVzZXJzcGFjZSAzMktCIHdyaXRlOg0KPiA+IGluIGV4YW1wbGUg
-MSwgKmVhY2gqIGNvbW1hbmQgd3JpdGVzIDEgb3IgMiBzZWN0b3JzIG9ubHkgKDEgc2VjdG9yID0g
-NTEyDQo+IGJ5dGVzKTsNCj4gPiBpbiBleGFtcGxlIDIsICplYWNoKiBjb21tYW5kIHdyaXRlcyAy
-IG9yIDQgc2VjdG9ycyBvbmx5Ow0KPiA+IGluIGV4YW1wbGUgMywgZWFjaCBjb21tYW5kIHdyaXRl
-cyAxMDI0IHNlY3RvcnMuDQo+ID4NCj4gPiBJdCBsb29rcyB0aGUga2VybmVsIGJsb2NrIEkvTyBs
-YXllciBjYW4gc29tZWhvdyBzcGxpdCBiaWcgdXNlci1zcGFjZSBidWZmZXJzDQo+ID4gaW50byBy
-ZWFsbHkgc21hbGwgd3JpdGUgcmVxdWVzdHMgKDEsIDIsIGFuZCA0IHNlY3RvcnMpPw0KPiA+IFRo
-aXMgbG9va3MgcmVhbGx5IHN0cmFuZ2UgdG8gbWUuDQo+ID4NCj4gPiBOb3RlOiBpbiBteSB0ZXN0
-LCB0aGlzIHN0cmFuZ2UgaXNzdWUgaGFwcGVucyB0byA0LjQgYW5kIHRoZSBtYWlubGluZSA0Ljkg
-a2VybmVscywNCj4gPiBidXQgdGhlIHN0YWJsZSAzLjE4LjQ1IGtlcm5lbCBkb2Vzbid0IGhhdmUg
-dGhlIGlzc3VlLCBpLmUuIGFsbCB0aGUgMyBhYm92ZSB0ZXN0DQo+ID4gZXhhbXBsZXMgY2FuIGZp
-bmlzaCBpbiB+MC41IG1pbnV0ZS4NCj4gPg0KPiA+IEFueSBjb21tZW50Pw0KPiANCj4gSSByZW1l
-bWJlciB0aGF0IHdlIGRpc2N1c3NlZCB0aGlzIGtpbmQgb2YgaXNzdWUsIHBsZWFzZSBzZWUgdGhl
-IGRpc2N1c3Npb25bMV0NCj4gYW5kIGNoZWNrIGlmIHRoZSBwYXRjaFsyXSBjYW4gZml4IHlvdXIg
-aXNzdWUuDQo+IA0KPiBbMV0gaHR0cDovL21hcmMuaW5mby8/dD0xNDU4MDU1MjU1MDAwMDImcj0x
-Jnc9Mg0KPiBbMl0gaHR0cDovL21hcmMuaW5mby8/bD1saW51eC1rZXJuZWwmbT0xNDU5MzQzMjU0
-MjkxNTImdz0yDQo+IA0KPiBNaW5nDQogDQpUaGFuayB5b3UgdmVyeSBtdWNoLCBNaW5nISBUaGUg
-cGF0Y2ggY2FuIGZpeCBteSBpc3N1ZSENCkl0IGxvb2tzIHlvdXIgcGF0Y2ggd2FzIG5vdCBtZXJn
-ZWQgaW50byB0aGUgdXBzdHJlYW0gc29tZWhvdy4NCldvdWxkIHlvdSBwbGVhc2Ugc3VibWl0IHRo
-ZSBwYXRjaCBhZ2Fpbj8NCg0KVGhhbmtzLA0KLS0gRGV4dWFuDQo=
+On Thu, Dec 15, 2016 at 7:47 PM, Dexuan Cui <decui@microsoft.com> wrote:
+> Hi, when I run "mkfs.ext4 /dev/sdc2" in a Linux virtual machine on Hyper-V,
+> where a disk IOPS=500 limit is applied by me [0],  the command takes much
+> more time, if the ext4 partition boundary is not properly aligned:
+>
+> Example 1 [1]: it takes ~7 minutes with average wMB/s = 0.3   (slow)
+> Example 2 [2]: it takes ~3.5 minutes with average wMB/s = 0.6 (slow)
+> Example 3 [3]: it takes ~0.5 minute with average wMB/s = 4 (expected)
+>
+> strace shows the mkfs.ext3 program calls seek()/write() a lot and most of
+> the writes use 32KB buffers (this should be big enough), and the program
+> only invokes fsync() once, after it issues all the writes -- the fsync() takes
+>>99% of the time.
+>
+> By logging SCSI commands, the SCSI Write(10) command is used here for the
+> userspace 32KB write:
+> in example 1, *each* command writes 1 or 2 sectors only (1 sector = 512 bytes);
+> in example 2, *each* command writes 2 or 4 sectors only;
+> in example 3, each command writes 1024 sectors.
+>
+> It looks the kernel block I/O layer can somehow split big user-space buffers
+> into really small write requests (1, 2, and 4 sectors)?
+> This looks really strange to me.
+>
+> Note: in my test, this strange issue happens to 4.4 and the mainline 4.9 kernels,
+> but the stable 3.18.45 kernel doesn't have the issue, i.e. all the 3 above test
+> examples can finish in ~0.5 minute.
+>
+> Any comment?
+
+I remember that we discussed this kind of issue, please see the discussion[1]
+and check if the patch[2] can fix your issue.
+
+[1] http://marc.info/?t=145805525500002&r=1&w=2
+[2] http://marc.info/?l=linux-kernel&m=145934325429152&w=2
+
+
+Thanks,
+Ming
+
+
+>
+> Thanks!
+> -- Dexuan
+>
+>
+> [0] The max IOPS are measured in 8KB increments, meaning the max
+>  throughput is 8KB * 500 = 4000KB.
+>
+> [1] This is the partition info of my 20GB disk:
+> # fdisk -l /dev/sdc
+> Disk /dev/sdc: 20 GiB, 21474836480 bytes, 41943040 sectors
+> Units: sectors of 1 * 512 = 512 bytes
+> Sector size (logical/physical): 512 bytes / 4096 bytes
+> I/O size (minimum/optimal): 4096 bytes / 4096 bytes
+> Disklabel type: dos
+> Disk identifier: 0x00000000
+>
+> Device     Boot    Start      End  Sectors  Size Id Type
+> /dev/sdc1              1 14281784 14281784  6.8G 82 Linux swap / Solaris
+> /dev/sdc2       14281785 41929649 27647865 13.2G 83 Linux
+>
+> Here, start_sector = 14281785, end_sector = 41929649.
+>
+> [2] start_sector = 14282752, end_sector = 41929649
+>
+> [3] start_sector = 14282752, end_sector = 41943039
+
+
+
+-- 
+Ming Lei
