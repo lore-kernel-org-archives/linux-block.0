@@ -1,27 +1,27 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:60167 "EHLO
+Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:47685 "EHLO
         mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1756281AbcLOUdL (ORCPT
+        by vger.kernel.org with ESMTP id S1756404AbcLOUdV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Dec 2016 15:33:11 -0500
-Received: from pps.filterd (m0089730.ppops.net [127.0.0.1])
-        by m0089730.ppops.net (8.16.0.17/8.16.0.17) with SMTP id uBFKUVnp003250
-        for <linux-block@vger.kernel.org>; Thu, 15 Dec 2016 12:33:11 -0800
+        Thu, 15 Dec 2016 15:33:21 -0500
+Received: from pps.filterd (m0001255.ppops.net [127.0.0.1])
+        by mx0b-00082601.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id uBFKVv1Y023911
+        for <linux-block@vger.kernel.org>; Thu, 15 Dec 2016 12:33:10 -0800
 Received: from mail.thefacebook.com ([199.201.64.23])
-        by m0089730.ppops.net with ESMTP id 27bvqb475d-3
+        by mx0b-00082601.pphosted.com with ESMTP id 27bdne5btk-3
         (version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT)
-        for <linux-block@vger.kernel.org>; Thu, 15 Dec 2016 12:33:11 -0800
+        for <linux-block@vger.kernel.org>; Thu, 15 Dec 2016 12:33:10 -0800
 Received: from facebook.com (2401:db00:21:603d:face:0:19:0)     by
- mx-out.facebook.com (10.103.99.99) with ESMTP  id
- b0ea7124c30511e699290002c9dfb610-2d9f5a50 for <linux-block@vger.kernel.org>;
-        Thu, 15 Dec 2016 12:33:09 -0800
+ mx-out.facebook.com (10.102.107.99) with ESMTP id
+ b099e236c30511e6b0fd0002c99293a0-765faa50 for <linux-block@vger.kernel.org>;
+        Thu, 15 Dec 2016 12:33:08 -0800
 From: Shaohua Li <shli@fb.com>
 To: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
 CC: <kernel-team@fb.com>, <axboe@fb.com>, <tj@kernel.org>,
         <vgoyal@redhat.com>
-Subject: [PATCH V5 09/17] blk-throttle: detect completed idle cgroup
-Date: Thu, 15 Dec 2016 12:33:00 -0800
-Message-ID: <9c3254d92f47a5172e83fc1e84c09fca8243a1e7.1481833017.git.shli@fb.com>
+Subject: [PATCH V5 01/17] blk-throttle: use U64_MAX/UINT_MAX to replace -1
+Date: Thu, 15 Dec 2016 12:32:52 -0800
+Message-ID: <92ac507820069ff539918830280bdf76a9bebed4.1481833017.git.shli@fb.com>
 In-Reply-To: <cover.1481833017.git.shli@fb.com>
 References: <cover.1481833017.git.shli@fb.com>
 MIME-Version: 1.0
@@ -29,81 +29,110 @@ Content-Type: text/plain
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-cgroup could be assigned a limit, but doesn't dispatch enough IO, eg the
-cgroup is idle. When this happens, the cgroup doesn't hit its limit, so
-we can't move the state machine to higher level and all cgroups will be
-throttled to their lower limit, so we waste bandwidth. Detecting idle
-cgroup is hard. This patch handles a simple case, a cgroup doesn't
-dispatch any IO. We ignore such cgroup's limit, so other cgroups can use
-the bandwidth.
+clean up the code to avoid using -1
 
 Signed-off-by: Shaohua Li <shli@fb.com>
 ---
- block/blk-throttle.c | 19 ++++++++++++++++++-
- 1 file changed, 18 insertions(+), 1 deletion(-)
+ block/blk-throttle.c | 32 ++++++++++++++++----------------
+ 1 file changed, 16 insertions(+), 16 deletions(-)
 
 diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index cd10c65..a0ba961 100644
+index a6bb4fe..e45bf50 100644
 --- a/block/blk-throttle.c
 +++ b/block/blk-throttle.c
-@@ -148,6 +148,8 @@ struct throtl_grp {
+@@ -334,10 +334,10 @@ static struct blkg_policy_data *throtl_pd_alloc(gfp_t gfp, int node)
+ 	}
  
- 	unsigned long last_check_time;
+ 	RB_CLEAR_NODE(&tg->rb_node);
+-	tg->bps[READ] = -1;
+-	tg->bps[WRITE] = -1;
+-	tg->iops[READ] = -1;
+-	tg->iops[WRITE] = -1;
++	tg->bps[READ] = U64_MAX;
++	tg->bps[WRITE] = U64_MAX;
++	tg->iops[READ] = UINT_MAX;
++	tg->iops[WRITE] = UINT_MAX;
  
-+	unsigned long last_dispatch_time[2];
-+
- 	/* When did we start a new slice */
- 	unsigned long slice_start[2];
- 	unsigned long slice_end[2];
-@@ -437,11 +439,14 @@ static void tg_update_has_rules(struct throtl_grp *tg)
+ 	return &tg->pd;
+ }
+@@ -380,7 +380,7 @@ static void tg_update_has_rules(struct throtl_grp *tg)
+ 
+ 	for (rw = READ; rw <= WRITE; rw++)
+ 		tg->has_rules[rw] = (parent_tg && parent_tg->has_rules[rw]) ||
+-				    (tg->bps[rw] != -1 || tg->iops[rw] != -1);
++			(tg->bps[rw] != U64_MAX || tg->iops[rw] != UINT_MAX);
+ }
  
  static void throtl_pd_online(struct blkg_policy_data *pd)
- {
-+	struct throtl_grp *tg = pd_to_tg(pd);
- 	/*
- 	 * We don't want new groups to escape the limits of its ancestors.
- 	 * Update has_rules[] after a new group is brought online.
- 	 */
--	tg_update_has_rules(pd_to_tg(pd));
-+	tg_update_has_rules(tg);
-+	tg->last_dispatch_time[READ] = jiffies;
-+	tg->last_dispatch_time[WRITE] = jiffies;
- }
+@@ -771,7 +771,7 @@ static bool tg_may_dispatch(struct throtl_grp *tg, struct bio *bio,
+ 	       bio != throtl_peek_queued(&tg->service_queue.queued[rw]));
  
- static void blk_throtl_update_valid_limit(struct throtl_data *td)
-@@ -1582,6 +1587,12 @@ static bool throtl_tg_can_upgrade(struct throtl_grp *tg)
- 	if (write_limit && sq->nr_queued[WRITE] &&
- 	    (!read_limit || sq->nr_queued[READ]))
+ 	/* If tg->bps = -1, then BW is unlimited */
+-	if (tg->bps[rw] == -1 && tg->iops[rw] == -1) {
++	if (tg->bps[rw] == U64_MAX && tg->iops[rw] == UINT_MAX) {
+ 		if (wait)
+ 			*wait = 0;
  		return true;
-+
-+	if (time_after_eq(jiffies,
-+	     tg->last_dispatch_time[READ] + tg->td->throtl_slice) &&
-+	    time_after_eq(jiffies,
-+	     tg->last_dispatch_time[WRITE] + tg->td->throtl_slice))
-+		return true;
- 	return false;
+@@ -1110,7 +1110,7 @@ static u64 tg_prfill_conf_u64(struct seq_file *sf, struct blkg_policy_data *pd,
+ 	struct throtl_grp *tg = pd_to_tg(pd);
+ 	u64 v = *(u64 *)((void *)tg + off);
+ 
+-	if (v == -1)
++	if (v == U64_MAX)
+ 		return 0;
+ 	return __blkg_prfill_u64(sf, pd, v);
  }
+@@ -1121,7 +1121,7 @@ static u64 tg_prfill_conf_uint(struct seq_file *sf, struct blkg_policy_data *pd,
+ 	struct throtl_grp *tg = pd_to_tg(pd);
+ 	unsigned int v = *(unsigned int *)((void *)tg + off);
  
-@@ -1660,6 +1671,11 @@ static bool throtl_tg_can_downgrade(struct throtl_grp *tg)
- 	struct throtl_data *td = tg->td;
- 	unsigned long now = jiffies;
+-	if (v == -1)
++	if (v == UINT_MAX)
+ 		return 0;
+ 	return __blkg_prfill_u64(sf, pd, v);
+ }
+@@ -1195,7 +1195,7 @@ static ssize_t tg_set_conf(struct kernfs_open_file *of,
+ 	if (sscanf(ctx.body, "%llu", &v) != 1)
+ 		goto out_finish;
+ 	if (!v)
+-		v = -1;
++		v = U64_MAX;
  
-+	if (time_after_eq(now, tg->last_dispatch_time[READ] +
-+					td->throtl_slice) &&
-+	    time_after_eq(now, tg->last_dispatch_time[WRITE] +
-+					td->throtl_slice))
-+		return false;
- 	/*
- 	 * If cgroup is below low limit, consider downgrade and throttle other
- 	 * cgroups
-@@ -1769,6 +1785,7 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
+ 	tg = blkg_to_tg(ctx.blkg);
  
- again:
+@@ -1270,17 +1270,17 @@ static u64 tg_prfill_max(struct seq_file *sf, struct blkg_policy_data *pd,
+ 
+ 	if (!dname)
+ 		return 0;
+-	if (tg->bps[READ] == -1 && tg->bps[WRITE] == -1 &&
+-	    tg->iops[READ] == -1 && tg->iops[WRITE] == -1)
++	if (tg->bps[READ] == U64_MAX && tg->bps[WRITE] == U64_MAX &&
++	    tg->iops[READ] == UINT_MAX && tg->iops[WRITE] == UINT_MAX)
+ 		return 0;
+ 
+-	if (tg->bps[READ] != -1)
++	if (tg->bps[READ] != U64_MAX)
+ 		snprintf(bufs[0], sizeof(bufs[0]), "%llu", tg->bps[READ]);
+-	if (tg->bps[WRITE] != -1)
++	if (tg->bps[WRITE] != U64_MAX)
+ 		snprintf(bufs[1], sizeof(bufs[1]), "%llu", tg->bps[WRITE]);
+-	if (tg->iops[READ] != -1)
++	if (tg->iops[READ] != UINT_MAX)
+ 		snprintf(bufs[2], sizeof(bufs[2]), "%u", tg->iops[READ]);
+-	if (tg->iops[WRITE] != -1)
++	if (tg->iops[WRITE] != UINT_MAX)
+ 		snprintf(bufs[3], sizeof(bufs[3]), "%u", tg->iops[WRITE]);
+ 
+ 	seq_printf(sf, "%s rbps=%s wbps=%s riops=%s wiops=%s\n",
+@@ -1318,7 +1318,7 @@ static ssize_t tg_set_max(struct kernfs_open_file *of,
  	while (true) {
-+		tg->last_dispatch_time[rw] = jiffies;
- 		if (tg->last_low_overflow_time[rw] == 0)
- 			tg->last_low_overflow_time[rw] = jiffies;
- 		throtl_downgrade_check(tg);
+ 		char tok[27];	/* wiops=18446744073709551616 */
+ 		char *p;
+-		u64 val = -1;
++		u64 val = U64_MAX;
+ 		int len;
+ 
+ 		if (sscanf(ctx.body, "%26s%n", tok, &len) != 1)
 -- 
 2.9.3
 
