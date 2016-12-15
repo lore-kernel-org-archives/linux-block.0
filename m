@@ -1,412 +1,697 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:57298 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1756493AbcLOUd1 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Dec 2016 15:33:27 -0500
-Received: from pps.filterd (m0044010.ppops.net [127.0.0.1])
-        by mx0a-00082601.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id uBFKUYSF024749
-        for <linux-block@vger.kernel.org>; Thu, 15 Dec 2016 12:33:21 -0800
-Received: from mail.thefacebook.com ([199.201.64.23])
-        by mx0a-00082601.pphosted.com with ESMTP id 27bxsyagmy-13
-        (version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT)
-        for <linux-block@vger.kernel.org>; Thu, 15 Dec 2016 12:33:21 -0800
-Received: from facebook.com (2401:db00:21:603d:face:0:19:0)     by
- mx-out.facebook.com (10.103.99.99) with ESMTP  id
- b12eb4bac30511e6b9200002c9dfb610-2e9f7a50 for <linux-block@vger.kernel.org>;
-        Thu, 15 Dec 2016 12:33:09 -0800
-From: Shaohua Li <shli@fb.com>
-To: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <kernel-team@fb.com>, <axboe@fb.com>, <tj@kernel.org>,
-        <vgoyal@redhat.com>
-Subject: [PATCH V5 16/17] blk-throttle: add a mechanism to estimate IO latency
-Date: Thu, 15 Dec 2016 12:33:07 -0800
-Message-ID: <53ba1d9ed13cf6d3fd5a51ad84ae3219571d6c2f.1481833017.git.shli@fb.com>
-In-Reply-To: <cover.1481833017.git.shli@fb.com>
-References: <cover.1481833017.git.shli@fb.com>
+Return-Path: <prvs=1157cbc043=axboe@fb.com>
+From: Jens Axboe <axboe@fb.com>
+To: <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+CC: <paolo.valente@linaro.org>, <osandov@fb.com>, Jens Axboe <axboe@fb.com>
+Subject: [PATCH 6/7] mq-deadline: add blk-mq adaptation of the deadline IO scheduler
+Date: Wed, 14 Dec 2016 22:26:07 -0700
+Message-ID: <1481779568-10642-7-git-send-email-axboe@fb.com>
+In-Reply-To: <1481779568-10642-1-git-send-email-axboe@fb.com>
+References: <1481779568-10642-1-git-send-email-axboe@fb.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-User configures latency target, but the latency threshold for each
-request size isn't fixed. For a SSD, the IO latency highly depends on
-request size. To calculate latency threshold, we sample some data, eg,
-average latency for request size 4k, 8k, 16k, 32k .. 1M. The latency
-threshold of each request size will be the sample latency (I'll call it
-base latency) plus latency target. For example, the base latency for
-request size 4k is 80us and user configures latency target 60us. The 4k
-latency threshold will be 80 + 60 = 140us.
-
-To sample data, we calculate the order base 2 of rounded up IO sectors.
-If the IO size is bigger than 1M, it will be accounted as 1M. Since the
-calculation does round up, the base latency will be slightly smaller
-than actual value. Also if there isn't any IO dispatched for a specific
-IO size, we will use the base latency of smaller IO size for this IO
-size.
-
-But we shouldn't sample data at any time. The base latency is supposed
-to be latency where disk isn't congested, because we use latency
-threshold to schedule IOs between cgroups. If disk is congested, the
-latency is higher, using it for scheduling is meaningless. Hence we only
-do the sampling when block throttling is in the LOW limit, with
-assumption disk isn't congested in such state. If the assumption isn't
-true, eg, low limit is too high, calculated latency threshold will be
-higher.
-
-Hard disk is completely different. Latency depends on spindle seek
-instead of request size. Currently this feature is SSD only, we probably
-can use a fixed threshold like 4ms for hard disk though.
-
-Signed-off-by: Shaohua Li <shli@fb.com>
+Signed-off-by: Jens Axboe <axboe@fb.com>
 ---
- block/blk-stat.c          |   4 ++
- block/blk-throttle.c      | 159 +++++++++++++++++++++++++++++++++++++++++++++-
- block/blk.h               |   2 +
- include/linux/blk_types.h |   9 +--
- 4 files changed, 168 insertions(+), 6 deletions(-)
+ block/Kconfig.iosched |   6 +
+ block/Makefile        |   1 +
+ block/mq-deadline.c   | 638 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 645 insertions(+)
+ create mode 100644 block/mq-deadline.c
 
-diff --git a/block/blk-stat.c b/block/blk-stat.c
-index 0469855..15c1621 100644
---- a/block/blk-stat.c
-+++ b/block/blk-stat.c
-@@ -7,6 +7,7 @@
- #include <linux/blk-mq.h>
+diff --git a/block/Kconfig.iosched b/block/Kconfig.iosched
+index 421bef9c4c48..490ef2850fae 100644
+--- a/block/Kconfig.iosched
++++ b/block/Kconfig.iosched
+@@ -32,6 +32,12 @@ config IOSCHED_CFQ
  
- #include "blk-stat.h"
+ 	  This is the default I/O scheduler.
+ 
++config MQ_IOSCHED_DEADLINE
++	tristate "MQ deadline I/O scheduler"
++	default y
++	---help---
++	  MQ version of the deadline IO scheduler.
++
+ config CFQ_GROUP_IOSCHED
+ 	bool "CFQ Group Scheduling support"
+ 	depends on IOSCHED_CFQ && BLK_CGROUP
+diff --git a/block/Makefile b/block/Makefile
+index 2eee9e1bb6db..3ee0abd7205a 100644
+--- a/block/Makefile
++++ b/block/Makefile
+@@ -18,6 +18,7 @@ obj-$(CONFIG_BLK_DEV_THROTTLING)	+= blk-throttle.o
+ obj-$(CONFIG_IOSCHED_NOOP)	+= noop-iosched.o
+ obj-$(CONFIG_IOSCHED_DEADLINE)	+= deadline-iosched.o
+ obj-$(CONFIG_IOSCHED_CFQ)	+= cfq-iosched.o
++obj-$(CONFIG_MQ_IOSCHED_DEADLINE)	+= mq-deadline.o
+ 
+ obj-$(CONFIG_BLOCK_COMPAT)	+= compat_ioctl.o
+ obj-$(CONFIG_BLK_CMDLINE_PARSER)	+= cmdline-parser.o
+diff --git a/block/mq-deadline.c b/block/mq-deadline.c
+new file mode 100644
+index 000000000000..6114779cdc68
+--- /dev/null
++++ b/block/mq-deadline.c
+@@ -0,0 +1,638 @@
++/*
++ *  MQ Deadline i/o scheduler - adaptation of the legacy deadline scheduler,
++ *  for the blk-mq scheduling framework
++ *
++ *  Copyright (C) 2016 Jens Axboe <axboe@kernel.dk>
++ */
++#include <linux/kernel.h>
++#include <linux/fs.h>
++#include <linux/blkdev.h>
++#include <linux/blk-mq.h>
++#include <linux/elevator.h>
++#include <linux/bio.h>
++#include <linux/module.h>
++#include <linux/slab.h>
++#include <linux/init.h>
++#include <linux/compiler.h>
++#include <linux/rbtree.h>
++#include <linux/sbitmap.h>
++
 +#include "blk.h"
- #include "blk-mq.h"
- 
- static void blk_stat_flush_batch(struct blk_rq_stat *stat)
-@@ -204,6 +205,9 @@ void blk_stat_add(struct blk_rq_stat *stat, struct request *rq)
- 		__blk_stat_init(stat, now);
- 
- 	value = now - blk_stat_time(&rq->issue_stat);
++#include "blk-mq.h"
++#include "blk-mq-tag.h"
++#include "blk-mq-sched.h"
 +
-+	blk_throtl_stat_add(rq, value);
-+
- 	if (value > stat->max)
- 		stat->max = value;
- 	if (value < stat->min)
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 3431b1d..1dc707a 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -25,6 +25,8 @@ static int throtl_quantum = 32;
- #define DFL_IDLE_THRESHOLD_HD (1000 * 1000) /* 1 ms */
- #define MAX_IDLE_TIME (500L * 1000 * 1000) /* 500 ms */
- 
-+#define SKIP_TRACK (((u64)1) << BLK_STAT_RES_SHIFT)
-+
- static struct blkcg_policy blkcg_policy_throtl;
- 
- /* A workqueue to queue throttle related work */
-@@ -162,6 +164,19 @@ struct throtl_grp {
- 	u64 idle_ttime_threshold;
- };
- 
-+/* We measure latency for request size from <= 4k to >= 1M */
-+#define LATENCY_BUCKET_SIZE 9
-+
-+struct latency_bucket {
-+	u64 total_latency;
-+	int samples;
-+};
-+
-+struct avg_latency_bucket {
-+	u64 latency;
-+	bool valid;
-+};
-+
- struct throtl_data
- {
- 	/* service tree for active throtl groups */
-@@ -185,6 +200,13 @@ struct throtl_data
- 	unsigned long low_downgrade_time;
- 
- 	unsigned int scale;
-+
-+	struct latency_bucket tmp_buckets[LATENCY_BUCKET_SIZE];
-+	struct avg_latency_bucket avg_buckets[LATENCY_BUCKET_SIZE];
-+	struct latency_bucket __percpu *latency_buckets;
-+	unsigned long last_calculate_time;
-+
-+	unsigned int track_bio_latency;
- };
- 
- static void throtl_pending_timer_fn(unsigned long arg);
-@@ -293,6 +315,13 @@ static unsigned int tg_iops_limit(struct throtl_grp *tg, int rw)
- 	return ret;
- }
- 
-+static int request_bucket_index(sector_t sectors)
++static inline bool dd_rq_is_shadow(struct request *rq)
 +{
-+	int order = order_base_2(sectors);
-+
-+	return clamp_t(int, order - 3, 0, LATENCY_BUCKET_SIZE - 1);
++	return rq->rq_flags & RQF_ALLOCED;
 +}
 +
- /**
-  * throtl_log - log debug message via blktrace
-  * @sq: the service_queue being reported
-@@ -1896,12 +1925,74 @@ static void blk_throtl_update_ttime(struct throtl_grp *tg)
- 	tg->checked_last_finish_time = last_finish_time;
- }
- 
-+static void throtl_update_latency_buckets(struct throtl_data *td)
++/*
++ * See Documentation/block/deadline-iosched.txt
++ */
++static const int read_expire = HZ / 2;  /* max time before a read is submitted. */
++static const int write_expire = 5 * HZ; /* ditto for writes, these limits are SOFT! */
++static const int writes_starved = 2;    /* max times reads can starve a write */
++static const int fifo_batch = 16;       /* # of sequential requests treated as one
++				     by the above parameters. For throughput. */
++
++struct deadline_data {
++	/*
++	 * run time data
++	 */
++
++	/*
++	 * requests (deadline_rq s) are present on both sort_list and fifo_list
++	 */
++	struct rb_root sort_list[2];
++	struct list_head fifo_list[2];
++
++	/*
++	 * next in sort order. read, write or both are NULL
++	 */
++	struct request *next_rq[2];
++	unsigned int batching;		/* number of sequential requests made */
++	unsigned int starved;		/* times reads have starved writes */
++
++	/*
++	 * settings that change how the i/o scheduler behaves
++	 */
++	int fifo_expire[2];
++	int fifo_batch;
++	int writes_starved;
++	int front_merges;
++
++	spinlock_t lock;
++	struct list_head dispatch;
++	struct blk_mq_tags *tags;
++	atomic_t wait_index;
++};
++
++static inline struct rb_root *
++deadline_rb_root(struct deadline_data *dd, struct request *rq)
 +{
-+	struct avg_latency_bucket avg_latency[LATENCY_BUCKET_SIZE];
-+	int i, cpu;
-+	u64 last_latency = 0;
-+	u64 latency;
++	return &dd->sort_list[rq_data_dir(rq)];
++}
 +
-+	if (!blk_queue_nonrot(td->queue))
-+		return;
-+	if (time_before(jiffies, td->last_calculate_time + HZ))
-+		return;
-+	td->last_calculate_time = jiffies;
++/*
++ * get the request after `rq' in sector-sorted order
++ */
++static inline struct request *
++deadline_latter_request(struct request *rq)
++{
++	struct rb_node *node = rb_next(&rq->rb_node);
 +
-+	memset(avg_latency, 0, sizeof(avg_latency));
-+	for (i = 0; i < LATENCY_BUCKET_SIZE; i++) {
-+		struct latency_bucket *tmp = &td->tmp_buckets[i];
++	if (node)
++		return rb_entry_rq(node);
 +
-+		for_each_possible_cpu(cpu) {
-+			struct latency_bucket *bucket;
++	return NULL;
++}
 +
-+			/* this isn't race free, but ok in practice */
-+			bucket = per_cpu_ptr(td->latency_buckets, cpu);
-+			tmp->total_latency += bucket[i].total_latency;
-+			tmp->samples += bucket[i].samples;
-+			bucket[i].total_latency = 0;
-+			bucket[i].samples = 0;
-+		}
++static void
++deadline_add_rq_rb(struct deadline_data *dd, struct request *rq)
++{
++	struct rb_root *root = deadline_rb_root(dd, rq);
 +
-+		if (tmp->samples >= 32) {
-+			int samples = tmp->samples;
++	elv_rb_add(root, rq);
++}
 +
-+			latency = tmp->total_latency;
++static inline void
++deadline_del_rq_rb(struct deadline_data *dd, struct request *rq)
++{
++	const int data_dir = rq_data_dir(rq);
 +
-+			tmp->total_latency = 0;
-+			tmp->samples = 0;
-+			do_div(latency, samples);
-+			if (latency == 0)
-+				continue;
-+			avg_latency[i].latency = latency;
-+		}
-+	}
++	if (dd->next_rq[data_dir] == rq)
++		dd->next_rq[data_dir] = deadline_latter_request(rq);
 +
-+	for (i = 0; i < LATENCY_BUCKET_SIZE; i++) {
-+		if (!avg_latency[i].latency) {
-+			if (td->avg_buckets[i].latency < last_latency)
-+				td->avg_buckets[i].latency = last_latency;
-+			continue;
-+		}
++	elv_rb_del(deadline_rb_root(dd, rq), rq);
++}
 +
-+		if (!td->avg_buckets[i].valid)
-+			latency = avg_latency[i].latency;
-+		else
-+			latency = (td->avg_buckets[i].latency * 7 +
-+				avg_latency[i].latency) >> 3;
++/*
++ * remove rq from rbtree and fifo.
++ */
++static void deadline_remove_request(struct request_queue *q, struct request *rq)
++{
++	struct deadline_data *dd = q->elevator->elevator_data;
 +
-+		td->avg_buckets[i].latency = max(latency, last_latency);
-+		td->avg_buckets[i].valid = true;
-+		last_latency = td->avg_buckets[i].latency;
++	list_del_init(&rq->queuelist);
++	deadline_del_rq_rb(dd, rq);
++
++	elv_rqhash_del(q, rq);
++	if (q->last_merge == rq)
++		q->last_merge = NULL;
++}
++
++static void dd_request_merged(struct request_queue *q, struct request *req,
++			      int type)
++{
++	struct deadline_data *dd = q->elevator->elevator_data;
++
++	/*
++	 * if the merge was a front merge, we need to reposition request
++	 */
++	if (type == ELEVATOR_FRONT_MERGE) {
++		elv_rb_del(deadline_rb_root(dd, req), req);
++		deadline_add_rq_rb(dd, req);
 +	}
 +}
 +
- bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
- 		    struct bio *bio)
- {
- 	struct throtl_qnode *qn = NULL;
- 	struct throtl_grp *tg = blkg_to_tg(blkg ?: q->root_blkg);
- 	struct throtl_service_queue *sq;
-+	struct throtl_data *td;
- 	bool rw = bio_data_dir(bio);
- 	bool throttled = false;
- 	int ret;
-@@ -1919,12 +2010,21 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
- 				tg->idle_ttime_threshold;
- 	}
- 
-+	td = tg->td;
-+	if (td->track_bio_latency == UINT_MAX) {
-+		td->track_bio_latency = !q->mq_ops && !q->request_fn;
-+		if (!td->track_bio_latency)
-+			blk_stat_enable(q);
++static void dd_merged_requests(struct request_queue *q, struct request *req,
++			       struct request *next)
++{
++	/*
++	 * if next expires before rq, assign its expire time to rq
++	 * and move into next position (next will be deleted) in fifo
++	 */
++	if (!list_empty(&req->queuelist) && !list_empty(&next->queuelist)) {
++		if (time_before((unsigned long)next->fifo_time,
++				(unsigned long)req->fifo_time)) {
++			list_move(&req->queuelist, &next->queuelist);
++			req->fifo_time = next->fifo_time;
++		}
 +	}
 +
- 	/* see throtl_charge_bio() */
- 	if (bio_flagged(bio, BIO_THROTTLED) || !tg->has_rules[rw])
- 		goto out;
- 
- 	spin_lock_irq(q->queue_lock);
- 
-+	throtl_update_latency_buckets(tg->td);
++	/*
++	 * kill knowledge of next, this one is a goner
++	 */
++	deadline_remove_request(q, next);
++}
 +
- 	if (unlikely(blk_queue_bypass(q)))
- 		goto out_unlock;
- 
-@@ -1932,6 +2032,8 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
- 	if (ret == 0 || ret == -EBUSY)
- 		bio->bi_cg_private = tg;
- 
-+	blk_stat_set_issue(&bio->bi_issue_stat, bio_sectors(bio));
++/*
++ * move an entry to dispatch queue
++ */
++static void
++deadline_move_request(struct deadline_data *dd, struct request *rq)
++{
++	const int data_dir = rq_data_dir(rq);
 +
- 	blk_throtl_update_ttime(tg);
- 
- 	sq = &tg->service_queue;
-@@ -2019,19 +2121,62 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
- 	 */
- 	if (!throttled)
- 		bio_clear_flag(bio, BIO_THROTTLED);
++	dd->next_rq[READ] = NULL;
++	dd->next_rq[WRITE] = NULL;
++	dd->next_rq[data_dir] = deadline_latter_request(rq);
++
++	/*
++	 * take it off the sort and fifo list
++	 */
++	deadline_remove_request(rq->q, rq);
++}
++
++/*
++ * deadline_check_fifo returns 0 if there are no expired requests on the fifo,
++ * 1 otherwise. Requires !list_empty(&dd->fifo_list[data_dir])
++ */
++static inline int deadline_check_fifo(struct deadline_data *dd, int ddir)
++{
++	struct request *rq = rq_entry_fifo(dd->fifo_list[ddir].next);
++
++	/*
++	 * rq is expired!
++	 */
++	if (time_after_eq(jiffies, (unsigned long)rq->fifo_time))
++		return 1;
++
++	return 0;
++}
++
++/*
++ * deadline_dispatch_requests selects the best request according to
++ * read/write expire, fifo_batch, etc
++ */
++static struct request *__dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
++{
++	struct deadline_data *dd = hctx->queue->elevator->elevator_data;
++	struct request *rq;
++	bool reads, writes;
++	int data_dir;
++
++	spin_lock(&dd->lock);
++
++	if (!list_empty(&dd->dispatch)) {
++		rq = list_first_entry(&dd->dispatch, struct request, queuelist);
++		list_del_init(&rq->queuelist);
++		goto done;
++	}
++
++	reads = !list_empty(&dd->fifo_list[READ]);
++	writes = !list_empty(&dd->fifo_list[WRITE]);
++
++	/*
++	 * batches are currently reads XOR writes
++	 */
++	if (dd->next_rq[WRITE])
++		rq = dd->next_rq[WRITE];
 +	else
-+		bio->bi_issue_stat.stat |= SKIP_TRACK;
- 	return throttled;
- }
- 
-+static void throtl_track_latency(struct throtl_data *td, sector_t size,
-+	int op, u64 time)
-+{
-+	struct latency_bucket *latency;
-+	int index;
++		rq = dd->next_rq[READ];
 +
-+	if (!td || td->limit_index != LIMIT_LOW || op != REQ_OP_READ ||
-+	    !blk_queue_nonrot(td->queue))
-+		return;
++	if (rq && dd->batching < dd->fifo_batch)
++		/* we have a next request are still entitled to batch */
++		goto dispatch_request;
 +
-+	index = request_bucket_index(size);
++	/*
++	 * at this point we are not running a batch. select the appropriate
++	 * data direction (read / write)
++	 */
 +
-+	latency = get_cpu_ptr(td->latency_buckets);
-+	latency[index].total_latency += time;
-+	latency[index].samples++;
-+	put_cpu_ptr(td->latency_buckets);
-+}
++	if (reads) {
++		BUG_ON(RB_EMPTY_ROOT(&dd->sort_list[READ]));
 +
-+void blk_throtl_stat_add(struct request *rq, u64 time)
-+{
-+	struct request_queue *q = rq->q;
-+	struct throtl_data *td = q->td;
++		if (writes && (dd->starved++ >= dd->writes_starved))
++			goto dispatch_writes;
 +
-+	throtl_track_latency(td, blk_stat_size(&rq->issue_stat),
-+		req_op(rq), time);
-+}
++		data_dir = READ;
 +
- void blk_throtl_bio_endio(struct bio *bio)
- {
- 	struct throtl_grp *tg;
-+	u64 finish_time;
-+	u64 start_time;
-+	u64 lat;
- 
- 	tg = bio->bi_cg_private;
- 	if (!tg)
- 		return;
- 	bio->bi_cg_private = NULL;
- 
--	tg->last_finish_time = ktime_get_ns();
-+	finish_time = ktime_get_ns();
-+	tg->last_finish_time = finish_time;
-+
-+	start_time = blk_stat_time(&bio->bi_issue_stat);
-+	finish_time = __blk_stat_time(finish_time);
-+	if (start_time && finish_time > start_time &&
-+	    tg->td->track_bio_latency == 1 &&
-+	    !(bio->bi_issue_stat.stat & SKIP_TRACK)) {
-+		lat = finish_time - start_time;
-+		throtl_track_latency(tg->td, blk_stat_size(&bio->bi_issue_stat),
-+			bio_op(bio), lat);
++		goto dispatch_find_request;
 +	}
- }
- 
- /*
-@@ -2106,6 +2251,12 @@ int blk_throtl_init(struct request_queue *q)
- 	td = kzalloc_node(sizeof(*td), GFP_KERNEL, q->node);
- 	if (!td)
- 		return -ENOMEM;
-+	td->latency_buckets = __alloc_percpu(sizeof(struct latency_bucket) *
-+		LATENCY_BUCKET_SIZE, __alignof__(u64));
-+	if (!td->latency_buckets) {
-+		kfree(td);
++
++	/*
++	 * there are either no reads or writes have been starved
++	 */
++
++	if (writes) {
++dispatch_writes:
++		BUG_ON(RB_EMPTY_ROOT(&dd->sort_list[WRITE]));
++
++		dd->starved = 0;
++
++		data_dir = WRITE;
++
++		goto dispatch_find_request;
++	}
++
++	spin_unlock(&dd->lock);
++	return NULL;
++
++dispatch_find_request:
++	/*
++	 * we are not running a batch, find best request for selected data_dir
++	 */
++	if (deadline_check_fifo(dd, data_dir) || !dd->next_rq[data_dir]) {
++		/*
++		 * A deadline has expired, the last request was in the other
++		 * direction, or we have run out of higher-sectored requests.
++		 * Start again from the request with the earliest expiry time.
++		 */
++		rq = rq_entry_fifo(dd->fifo_list[data_dir].next);
++	} else {
++		/*
++		 * The last req was the same dir and we have a next request in
++		 * sort order. No expired requests so continue on from here.
++		 */
++		rq = dd->next_rq[data_dir];
++	}
++
++	dd->batching = 0;
++
++dispatch_request:
++	/*
++	 * rq is the selected appropriate request.
++	 */
++	dd->batching++;
++	deadline_move_request(dd, rq);
++done:
++	rq->rq_flags |= RQF_STARTED;
++	spin_unlock(&dd->lock);
++	return rq;
++}
++
++static void dd_dispatch_requests(struct blk_mq_hw_ctx *hctx,
++				 struct list_head *rq_list)
++{
++	blk_mq_sched_dispatch_shadow_requests(hctx, rq_list, __dd_dispatch_request);
++}
++
++static void dd_exit_queue(struct elevator_queue *e)
++{
++	struct deadline_data *dd = e->elevator_data;
++
++	BUG_ON(!list_empty(&dd->fifo_list[READ]));
++	BUG_ON(!list_empty(&dd->fifo_list[WRITE]));
++
++	blk_mq_sched_free_requests(dd->tags);
++	kfree(dd);
++}
++
++/*
++ * initialize elevator private data (deadline_data).
++ */
++static int dd_init_queue(struct request_queue *q, struct elevator_type *e)
++{
++	struct deadline_data *dd;
++	struct elevator_queue *eq;
++
++	eq = elevator_alloc(q, e);
++	if (!eq)
++		return -ENOMEM;
++
++	dd = kzalloc_node(sizeof(*dd), GFP_KERNEL, q->node);
++	if (!dd) {
++		kobject_put(&eq->kobj);
 +		return -ENOMEM;
 +	}
- 
- 	INIT_WORK(&td->dispatch_work, blk_throtl_dispatch_work_fn);
- 	throtl_service_queue_init(&td->service_queue);
-@@ -2119,10 +2270,13 @@ int blk_throtl_init(struct request_queue *q)
- 	td->low_upgrade_time = jiffies;
- 	td->low_downgrade_time = jiffies;
- 
-+	td->track_bio_latency = UINT_MAX;
- 	/* activate policy */
- 	ret = blkcg_activate_policy(q, &blkcg_policy_throtl);
--	if (ret)
-+	if (ret) {
-+		free_percpu(td->latency_buckets);
- 		kfree(td);
++	eq->elevator_data = dd;
++
++	dd->tags = blk_mq_sched_alloc_requests(256, q->node);
++	if (!dd->tags) {
++		kfree(dd);
++		kobject_put(&eq->kobj);
++		return -ENOMEM;
 +	}
- 	return ret;
- }
- 
-@@ -2131,6 +2285,7 @@ void blk_throtl_exit(struct request_queue *q)
- 	BUG_ON(!q->td);
- 	throtl_shutdown_wq(q);
- 	blkcg_deactivate_policy(q, &blkcg_policy_throtl);
-+	free_percpu(q->td->latency_buckets);
- 	kfree(q->td);
- }
- 
-diff --git a/block/blk.h b/block/blk.h
-index 921d04f..dfb44e6 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -294,11 +294,13 @@ extern ssize_t blk_throtl_sample_time_show(struct request_queue *q, char *page);
- extern ssize_t blk_throtl_sample_time_store(struct request_queue *q,
- 	const char *page, size_t count);
- extern void blk_throtl_bio_endio(struct bio *bio);
-+extern void blk_throtl_stat_add(struct request *rq, u64 time);
- #else /* CONFIG_BLK_DEV_THROTTLING */
- static inline void blk_throtl_drain(struct request_queue *q) { }
- static inline int blk_throtl_init(struct request_queue *q) { return 0; }
- static inline void blk_throtl_exit(struct request_queue *q) { }
- static inline void blk_throtl_bio_endio(struct bio *bio) { }
-+static inline void blk_throtl_stat_add(struct request *rq, u64 time) { }
- #endif /* CONFIG_BLK_DEV_THROTTLING */
- 
- #endif /* BLK_INTERNAL_H */
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 8159a6c..d88a3c0 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -17,6 +17,10 @@ struct io_context;
- struct cgroup_subsys_state;
- typedef void (bio_end_io_t) (struct bio *);
- 
-+struct blk_issue_stat {
-+	u64 stat;
++
++	INIT_LIST_HEAD(&dd->fifo_list[READ]);
++	INIT_LIST_HEAD(&dd->fifo_list[WRITE]);
++	dd->sort_list[READ] = RB_ROOT;
++	dd->sort_list[WRITE] = RB_ROOT;
++	dd->fifo_expire[READ] = read_expire;
++	dd->fifo_expire[WRITE] = write_expire;
++	dd->writes_starved = writes_starved;
++	dd->front_merges = 1;
++	dd->fifo_batch = fifo_batch;
++	spin_lock_init(&dd->lock);
++	INIT_LIST_HEAD(&dd->dispatch);
++	atomic_set(&dd->wait_index, 0);
++
++	q->elevator = eq;
++	return 0;
++}
++
++static int dd_request_merge(struct request_queue *q, struct request **rq,
++			    struct bio *bio)
++{
++	struct deadline_data *dd = q->elevator->elevator_data;
++	sector_t sector = bio_end_sector(bio);
++	struct request *__rq;
++
++	if (!dd->front_merges)
++		return ELEVATOR_NO_MERGE;
++
++	__rq = elv_rb_find(&dd->sort_list[bio_data_dir(bio)], sector);
++	if (__rq) {
++		BUG_ON(sector != blk_rq_pos(__rq));
++
++		if (elv_bio_merge_ok(__rq, bio)) {
++			*rq = __rq;
++			return ELEVATOR_FRONT_MERGE;
++		}
++	}
++
++	return ELEVATOR_NO_MERGE;
++}
++
++static bool dd_bio_merge(struct blk_mq_hw_ctx *hctx, struct bio *bio)
++{
++	struct request_queue *q = hctx->queue;
++	struct deadline_data *dd = q->elevator->elevator_data;
++	int ret;
++
++	spin_lock(&dd->lock);
++	ret = blk_mq_sched_try_merge(q, bio);
++	spin_unlock(&dd->lock);
++
++	return ret;
++}
++
++/*
++ * add rq to rbtree and fifo
++ */
++static void dd_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
++			      bool at_head)
++{
++	struct request_queue *q = hctx->queue;
++	struct deadline_data *dd = q->elevator->elevator_data;
++	const int data_dir = rq_data_dir(rq);
++
++	blk_mq_sched_request_inserted(rq);
++
++	/*
++	 * If we're trying to insert a real request, just send it directly
++	 * to the hardware dispatch list. This only happens for a requeue,
++	 * or FUA/FLUSH requests.
++	 */
++	if (!dd_rq_is_shadow(rq)) {
++		spin_lock(&hctx->lock);
++		list_add_tail(&rq->queuelist, &hctx->dispatch);
++		spin_unlock(&hctx->lock);
++		return;
++	}
++
++	if (at_head || rq->cmd_type != REQ_TYPE_FS) {
++		if (at_head)
++			list_add(&rq->queuelist, &dd->dispatch);
++		else
++			list_add_tail(&rq->queuelist, &dd->dispatch);
++	} else {
++		deadline_add_rq_rb(dd, rq);
++
++		if (rq_mergeable(rq)) {
++			elv_rqhash_add(q, rq);
++			if (!q->last_merge)
++				q->last_merge = rq;
++		}
++
++		/*
++		 * set expire time and add to fifo list
++		 */
++		rq->fifo_time = jiffies + dd->fifo_expire[data_dir];
++		list_add_tail(&rq->queuelist, &dd->fifo_list[data_dir]);
++	}
++}
++
++static void dd_insert_requests(struct blk_mq_hw_ctx *hctx,
++			       struct list_head *list, bool at_head)
++{
++	struct request_queue *q = hctx->queue;
++	struct deadline_data *dd = q->elevator->elevator_data;
++
++	spin_lock(&dd->lock);
++	while (!list_empty(list)) {
++		struct request *rq;
++
++		rq = list_first_entry(list, struct request, queuelist);
++		list_del_init(&rq->queuelist);
++		dd_insert_request(hctx, rq, at_head);
++	}
++	spin_unlock(&dd->lock);
++}
++
++static struct request *dd_get_request(struct request_queue *q, unsigned int op,
++				      struct blk_mq_alloc_data *data)
++{
++	struct deadline_data *dd = q->elevator->elevator_data;
++	struct request *rq;
++
++	/*
++	 * The flush machinery intercepts before we insert the request. As
++	 * a work-around, just hand it back a real request.
++	 */
++	if (unlikely(op & (REQ_PREFLUSH | REQ_FUA)))
++		rq = __blk_mq_alloc_request(data, op);
++	else {
++		rq = blk_mq_sched_alloc_shadow_request(q, data, dd->tags, &dd->wait_index);
++		if (rq)
++			blk_mq_rq_ctx_init(q, data->ctx, rq, op);
++	}
++
++	return rq;
++}
++
++static bool dd_put_request(struct request *rq)
++{
++	/*
++	 * If it's a real request, we just have to free it. For a shadow
++	 * request, we should only free it if we haven't started it. A
++	 * started request is mapped to a real one, and the real one will
++	 * free it. We can get here with request merges, since we then
++	 * free the request before we start/issue it.
++	 */
++	if (!dd_rq_is_shadow(rq))
++		return false;
++
++	if (!(rq->rq_flags & RQF_STARTED)) {
++		struct request_queue *q = rq->q;
++		struct deadline_data *dd = q->elevator->elevator_data;
++
++		/*
++		 * IO completion would normally do this, but if we merge
++		 * and free before we issue the request, drop both the
++		 * tag and queue ref
++		 */
++		blk_mq_sched_free_shadow_request(dd->tags, rq);
++		blk_queue_exit(q);
++	}
++
++	return true;
++}
++
++static void dd_completed_request(struct blk_mq_hw_ctx *hctx, struct request *rq)
++{
++	struct request *sched_rq = rq->end_io_data;
++
++	/*
++	 * sched_rq can be NULL, if we haven't setup the shadow yet
++	 * because we failed getting one.
++	 */
++	if (sched_rq) {
++		struct deadline_data *dd = hctx->queue->elevator->elevator_data;
++
++		blk_mq_sched_free_shadow_request(dd->tags, sched_rq);
++		blk_mq_start_stopped_hw_queue(hctx, true);
++	}
++}
++
++static bool dd_has_work(struct blk_mq_hw_ctx *hctx)
++{
++	struct deadline_data *dd = hctx->queue->elevator->elevator_data;
++
++	return !list_empty_careful(&dd->dispatch) ||
++		!list_empty_careful(&dd->fifo_list[0]) ||
++		!list_empty_careful(&dd->fifo_list[1]);
++}
++
++/*
++ * sysfs parts below
++ */
++static ssize_t
++deadline_var_show(int var, char *page)
++{
++	return sprintf(page, "%d\n", var);
++}
++
++static ssize_t
++deadline_var_store(int *var, const char *page, size_t count)
++{
++	char *p = (char *) page;
++
++	*var = simple_strtol(p, &p, 10);
++	return count;
++}
++
++#define SHOW_FUNCTION(__FUNC, __VAR, __CONV)				\
++static ssize_t __FUNC(struct elevator_queue *e, char *page)		\
++{									\
++	struct deadline_data *dd = e->elevator_data;			\
++	int __data = __VAR;						\
++	if (__CONV)							\
++		__data = jiffies_to_msecs(__data);			\
++	return deadline_var_show(__data, (page));			\
++}
++SHOW_FUNCTION(deadline_read_expire_show, dd->fifo_expire[READ], 1);
++SHOW_FUNCTION(deadline_write_expire_show, dd->fifo_expire[WRITE], 1);
++SHOW_FUNCTION(deadline_writes_starved_show, dd->writes_starved, 0);
++SHOW_FUNCTION(deadline_front_merges_show, dd->front_merges, 0);
++SHOW_FUNCTION(deadline_fifo_batch_show, dd->fifo_batch, 0);
++#undef SHOW_FUNCTION
++
++#define STORE_FUNCTION(__FUNC, __PTR, MIN, MAX, __CONV)			\
++static ssize_t __FUNC(struct elevator_queue *e, const char *page, size_t count)	\
++{									\
++	struct deadline_data *dd = e->elevator_data;			\
++	int __data;							\
++	int ret = deadline_var_store(&__data, (page), count);		\
++	if (__data < (MIN))						\
++		__data = (MIN);						\
++	else if (__data > (MAX))					\
++		__data = (MAX);						\
++	if (__CONV)							\
++		*(__PTR) = msecs_to_jiffies(__data);			\
++	else								\
++		*(__PTR) = __data;					\
++	return ret;							\
++}
++STORE_FUNCTION(deadline_read_expire_store, &dd->fifo_expire[READ], 0, INT_MAX, 1);
++STORE_FUNCTION(deadline_write_expire_store, &dd->fifo_expire[WRITE], 0, INT_MAX, 1);
++STORE_FUNCTION(deadline_writes_starved_store, &dd->writes_starved, INT_MIN, INT_MAX, 0);
++STORE_FUNCTION(deadline_front_merges_store, &dd->front_merges, 0, 1, 0);
++STORE_FUNCTION(deadline_fifo_batch_store, &dd->fifo_batch, 0, INT_MAX, 0);
++#undef STORE_FUNCTION
++
++#define DD_ATTR(name) \
++	__ATTR(name, S_IRUGO|S_IWUSR, deadline_##name##_show, \
++				      deadline_##name##_store)
++
++static struct elv_fs_entry deadline_attrs[] = {
++	DD_ATTR(read_expire),
++	DD_ATTR(write_expire),
++	DD_ATTR(writes_starved),
++	DD_ATTR(front_merges),
++	DD_ATTR(fifo_batch),
++	__ATTR_NULL
 +};
 +
- /*
-  * main unit of I/O for the block layer and lower layers (ie drivers and
-  * stacking drivers)
-@@ -59,6 +63,7 @@ struct bio {
- 	struct io_context	*bi_ioc;
- 	struct cgroup_subsys_state *bi_css;
- 	void			*bi_cg_private;
-+	struct blk_issue_stat	bi_issue_stat;
- #endif
- 	union {
- #if defined(CONFIG_BLK_DEV_INTEGRITY)
-@@ -256,10 +261,6 @@ static inline unsigned int blk_qc_t_to_tag(blk_qc_t cookie)
- 	return cookie & ((1u << BLK_QC_T_SHIFT) - 1);
- }
- 
--struct blk_issue_stat {
--	u64 stat;
--};
--
- #define BLK_RQ_STAT_BATCH	64
- 
- struct blk_rq_stat {
++static struct elevator_type mq_deadline = {
++	.ops.mq = {
++		.get_request		= dd_get_request,
++		.put_request		= dd_put_request,
++		.insert_requests	= dd_insert_requests,
++		.dispatch_requests	= dd_dispatch_requests,
++		.completed_request	= dd_completed_request,
++		.next_request		= elv_rb_latter_request,
++		.former_request		= elv_rb_former_request,
++		.bio_merge		= dd_bio_merge,
++		.request_merge		= dd_request_merge,
++		.requests_merged	= dd_merged_requests,
++		.request_merged		= dd_request_merged,
++		.has_work		= dd_has_work,
++		.init_sched		= dd_init_queue,
++		.exit_sched		= dd_exit_queue,
++	},
++
++	.uses_mq	= true,
++	.elevator_attrs = deadline_attrs,
++	.elevator_name = "mq-deadline",
++	.elevator_owner = THIS_MODULE,
++};
++
++static int __init deadline_init(void)
++{
++	return elv_register(&mq_deadline);
++}
++
++static void __exit deadline_exit(void)
++{
++	elv_unregister(&mq_deadline);
++}
++
++module_init(deadline_init);
++module_exit(deadline_exit);
++
++MODULE_AUTHOR("Jens Axboe");
++MODULE_LICENSE("GPL");
++MODULE_DESCRIPTION("MQ deadline IO scheduler");
 -- 
-2.9.3
-
+2.7.4
