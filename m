@@ -1,66 +1,40 @@
 Return-Path: <Damien.LeMoal@wdc.com>
 Subject: Re: [RFC] block: check partition alignment
-To: Christoph Hellwig <hch@infradead.org>,
- Stefan Haberland <sth@linux.vnet.ibm.com>
+To: Stefan Haberland <sth@linux.vnet.ibm.com>, axboe@kernel.dk,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
 References: <20161214164706.45543-1-sth@linux.vnet.ibm.com>
- <20161214170719.GA3599@infradead.org>
-Cc: axboe@kernel.dk, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, hoeppner@linux.vnet.ibm.com,
- sebott@linux.vnet.ibm.com
+ <40f04360-5137-8504-fd2c-0861c7856a7a@wdc.com>
+Cc: hoeppner@linux.vnet.ibm.com, sebott@linux.vnet.ibm.com
 From: Damien Le Moal <damien.lemoal@wdc.com>
-Message-ID: <5824c17b-a7d7-60a1-6bb7-287257aaf67a@wdc.com>
-Date: Thu, 15 Dec 2016 10:33:47 +0900
+Message-ID: <64f82273-adc6-ce79-5d1f-ae4b54efd240@wdc.com>
+Date: Thu, 15 Dec 2016 09:55:36 +0900
 MIME-Version: 1.0
-In-Reply-To: <20161214170719.GA3599@infradead.org>
+In-Reply-To: <40f04360-5137-8504-fd2c-0861c7856a7a@wdc.com>
 Return-Path: damien.lemoal@wdc.com
 Content-Type: text/plain; charset="windows-1252"
 List-ID: <linux-block@vger.kernel.org>
 
 
-Christoph,
-
-On 12/15/16 02:07, Christoph Hellwig wrote:
->> To prevent partitions that are not aligned to the physical blocksize
->> of a device check for the alignment in the blkpg_ioctl.
+> sd.c ensures that the logical block size (sector size in sd.c) is a
+> power of 2 between 512 and 4096. So you can use:
 > =
 
-> We'd also need to reject this when reading partitions from disk, right?
+> if (p.start & (bdev_physical_block_size(bdev) - 1))
 
-Only for DASD devices, no ?
-
-Logical block size aligned partitions are fine for regular block
-devices. Not aligning on the physical block size is indeed very stupid,
-but will not generate errors and an application can see that through
-bdev_alignment_offset() and the sysfs alignment_offset file of the
-partition.
+Sorry, that was a little too short as a complete proof:
+sd.c ensures that the logical block size (sector size in sd.c) is a
+power of 2 between 512 and 4096, and the physical block size is a power
+of 2 number of logical blocks. So the physical block size is also always
+a power of 2.
 
 > =
 
->> +			/* check if partition is aligned to blocksize */
->> +			if (p.start % bdev_physical_block_size(bdev) !=3D 0)
+> Or use div_u64_rem to avoid an error on 32 bits builds.
 > =
 
-> And this should be bdev_logical_block_size, as the logical block size
-> is the only thing that matters for the OS - exposing the physical block
-> size is just an optional hint to prevent users from doing stupid
-> things (like creating unaligned partitions :))
+> Best regards.
+> =
 
-For a regular block device, I agree. But in Stephan case, I think that
-the check really needs to be against the physical block size, with the
-added condition that the bdev is a DASD device (similarly to the zone
-alignment check for zoned block devices).
-
-So this should become something like:
-
-if (p.start & (bdev_logical_block_size(bdev) - 1))
-	return -EINVAL;
-if (bdev_is_dasd(bdev) &&
-    p.start & (bdev_physical_block_size(bdev) - 1))
-	return -EINVAL;
-
-I am not sure however how bdev_is_dasd can be implemented though.
-
-Best regards.
 
 -- =
 
