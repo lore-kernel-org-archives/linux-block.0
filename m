@@ -1,20 +1,21 @@
+Return-Path: <axboe@kernel.dk>
+Date: Thu, 15 Dec 2016 13:14:36 -0700
+From: Jens Axboe <axboe@kernel.dk>
+To: Omar Sandoval <osandov@osandov.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	paolo.valente@linaro.org, osandov@fb.com
 Subject: Re: [PATCH 5/7] blk-mq-sched: add framework for MQ capable IO
  schedulers
-To: Omar Sandoval <osandov@osandov.com>
+Message-ID: <20161215201436.GA29056@kernel.dk>
 References: <1481779568-10642-1-git-send-email-axboe@fb.com>
  <1481779568-10642-6-git-send-email-axboe@fb.com>
  <20161215192940.GA29747@vader.dhcp.TheFacebook.com>
-Cc: axboe@kernel.dk, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, paolo.valente@linaro.org, osandov@fb.com
-From: Jens Axboe <axboe@fb.com>
-Message-ID: <82dd217d-2631-131a-a006-8b80908bf0ee@fb.com>
-Date: Thu, 15 Dec 2016 14:44:17 -0700
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <20161215192940.GA29747@vader.dhcp.TheFacebook.com>
-Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-block@vger.kernel.org>
 
-On 12/15/2016 12:29 PM, Omar Sandoval wrote:
+On Thu, Dec 15 2016, Omar Sandoval wrote:
 > Hey, Jens, a couple of minor nits below.
 > 
 > One bigger note: adding the blk_mq_sched_*() helpers and keeping the
@@ -27,10 +28,49 @@ On 12/15/2016 12:29 PM, Omar Sandoval wrote:
 > Can we get rid of the old, non-sched functions? Or maybe even make old
 > interface do the sched stuff instead of adding blk_mq_sched_*()?
 
-I fixed this up. blk_mq_free_request() is now what we still use as an
-exported interface, and that just calls blk_mq_sched_put_request().  The
-old (__)blk_mq_free_request() are now (__)blk_mq_finish_request() and
-internal only.
+You are right, that is a concern. I'll think of some ways to lessen that
+risk, it's much better to have build time breakage than runtime.
+
+> > diff --git a/block/blk-mq.c b/block/blk-mq.c
+> > index 8d1cec8e25d1..d10a246a3bc7 100644
+> > --- a/block/blk-mq.c
+> > +++ b/block/blk-mq.c
+> > @@ -2267,10 +2229,10 @@ static int blk_mq_queue_reinit_dead(unsigned int cpu)
+> >   * Now CPU1 is just onlined and a request is inserted into ctx1->rq_list
+> >   * and set bit0 in pending bitmap as ctx1->index_hw is still zero.
+> >   *
+> > - * And then while running hw queue, flush_busy_ctxs() finds bit0 is set in
+> > - * pending bitmap and tries to retrieve requests in hctx->ctxs[0]->rq_list.
+> > - * But htx->ctxs[0] is a pointer to ctx0, so the request in ctx1->rq_list
+> > - * is ignored.
+> > + * And then while running hw queue, blk_mq_flush_busy_ctxs() finds bit0 is set
+> > + * in pending bitmap and tries to retrieve requests in hctx->ctxs[0]->rq_list.
+> > + * But htx->ctxs[0] is a pointer to ctx0, so the request in ctx1->rq_list is
+> > + * ignored.
+> >   */
+> 
+> This belongs in patch 4 where flush_busy_ctxs() got renamed.
+
+Fixed, thanks!
+
+> >  static int blk_mq_queue_reinit_prepare(unsigned int cpu)
+> >  {
+> > diff --git a/block/blk-mq.h b/block/blk-mq.h
+> > index e59f5ca520a2..a5ddc860b220 100644
+> > --- a/block/blk-mq.h
+> > +++ b/block/blk-mq.h
+> > @@ -47,6 +47,9 @@ struct blk_mq_tags *blk_mq_init_rq_map(struct blk_mq_tag_set *set,
+> >   */
+> >  void __blk_mq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
+> >  				bool at_head);
+> > +void blk_mq_insert_requests(struct blk_mq_hw_ctx *hctx, struct blk_mq_ctx *ctx,
+> > +				struct list_head *list);
+> > +void blk_mq_process_sw_list(struct blk_mq_hw_ctx *hctx);
+> 
+> Looks like the declaration of blk_mq_process_sw_list() survived a rebase
+> even though it doesn't exist anymore.
+
+Indeed, now killed.
 
 -- 
 Jens Axboe
