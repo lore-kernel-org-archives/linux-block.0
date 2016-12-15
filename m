@@ -1,342 +1,78 @@
-Return-Path: <prvs=1159fc908b=axboe@fb.com>
+Return-Path: <prvs=1157cbc043=axboe@fb.com>
 From: Jens Axboe <axboe@fb.com>
 To: <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>
 CC: <paolo.valente@linaro.org>, <osandov@fb.com>, Jens Axboe <axboe@fb.com>
-Subject: [PATCH 1/8] block: move existing elevator ops to union
-Date: Fri, 16 Dec 2016 17:12:09 -0700
-Message-ID: <1481933536-12844-2-git-send-email-axboe@fb.com>
-In-Reply-To: <1481933536-12844-1-git-send-email-axboe@fb.com>
-References: <1481933536-12844-1-git-send-email-axboe@fb.com>
+Subject: [PATCH 3/7] block: move rq_ioc() to blk.h
+Date: Wed, 14 Dec 2016 22:26:04 -0700
+Message-ID: <1481779568-10642-4-git-send-email-axboe@fb.com>
+In-Reply-To: <1481779568-10642-1-git-send-email-axboe@fb.com>
+References: <1481779568-10642-1-git-send-email-axboe@fb.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-Prep patch for adding MQ ops as well, since doing anon unions with
-named initializers doesn't work on older compilers.
+We want to use it outside of blk-core.c.
 
 Signed-off-by: Jens Axboe <axboe@fb.com>
 ---
- block/blk-ioc.c          |  8 +++----
- block/blk-merge.c        |  4 ++--
- block/blk.h              | 10 ++++----
- block/cfq-iosched.c      |  2 +-
- block/deadline-iosched.c |  2 +-
- block/elevator.c         | 60 ++++++++++++++++++++++++------------------------
- block/noop-iosched.c     |  2 +-
- include/linux/elevator.h |  4 +++-
- 8 files changed, 47 insertions(+), 45 deletions(-)
+ block/blk-core.c | 16 ----------------
+ block/blk.h      | 16 ++++++++++++++++
+ 2 files changed, 16 insertions(+), 16 deletions(-)
 
-diff --git a/block/blk-ioc.c b/block/blk-ioc.c
-index 381cb50a673c..ab372092a57d 100644
---- a/block/blk-ioc.c
-+++ b/block/blk-ioc.c
-@@ -43,8 +43,8 @@ static void ioc_exit_icq(struct io_cq *icq)
- 	if (icq->flags & ICQ_EXITED)
- 		return;
- 
--	if (et->ops.elevator_exit_icq_fn)
--		et->ops.elevator_exit_icq_fn(icq);
-+	if (et->ops.sq.elevator_exit_icq_fn)
-+		et->ops.sq.elevator_exit_icq_fn(icq);
- 
- 	icq->flags |= ICQ_EXITED;
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 61ba08c58b64..92baea07acbc 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -1040,22 +1040,6 @@ static bool blk_rq_should_init_elevator(struct bio *bio)
  }
-@@ -383,8 +383,8 @@ struct io_cq *ioc_create_icq(struct io_context *ioc, struct request_queue *q,
- 	if (likely(!radix_tree_insert(&ioc->icq_tree, q->id, icq))) {
- 		hlist_add_head(&icq->ioc_node, &ioc->icq_list);
- 		list_add(&icq->q_node, &q->icq_list);
--		if (et->ops.elevator_init_icq_fn)
--			et->ops.elevator_init_icq_fn(icq);
-+		if (et->ops.sq.elevator_init_icq_fn)
-+			et->ops.sq.elevator_init_icq_fn(icq);
- 	} else {
- 		kmem_cache_free(et->icq_cache, icq);
- 		icq = ioc_lookup_icq(ioc, q);
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 182398cb1524..480570b691dc 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -763,8 +763,8 @@ int blk_attempt_req_merge(struct request_queue *q, struct request *rq,
- {
- 	struct elevator_queue *e = q->elevator;
  
--	if (e->type->ops.elevator_allow_rq_merge_fn)
--		if (!e->type->ops.elevator_allow_rq_merge_fn(q, rq, next))
-+	if (e->type->ops.sq.elevator_allow_rq_merge_fn)
-+		if (!e->type->ops.sq.elevator_allow_rq_merge_fn(q, rq, next))
- 			return 0;
- 
- 	return attempt_merge(q, rq, next);
+ /**
+- * rq_ioc - determine io_context for request allocation
+- * @bio: request being allocated is for this bio (can be %NULL)
+- *
+- * Determine io_context to use for request allocation for @bio.  May return
+- * %NULL if %current->io_context doesn't exist.
+- */
+-static struct io_context *rq_ioc(struct bio *bio)
+-{
+-#ifdef CONFIG_BLK_CGROUP
+-	if (bio && bio->bi_ioc)
+-		return bio->bi_ioc;
+-#endif
+-	return current->io_context;
+-}
+-
+-/**
+  * __get_request - get a free request
+  * @rl: request list to allocate from
+  * @op: operation and flags
 diff --git a/block/blk.h b/block/blk.h
-index 041185e5f129..f46c0ac8ae3d 100644
+index f46c0ac8ae3d..9a716b5925a4 100644
 --- a/block/blk.h
 +++ b/block/blk.h
-@@ -167,7 +167,7 @@ static inline struct request *__elv_next_request(struct request_queue *q)
- 			return NULL;
- 		}
- 		if (unlikely(blk_queue_bypass(q)) ||
--		    !q->elevator->type->ops.elevator_dispatch_fn(q, 0))
-+		    !q->elevator->type->ops.sq.elevator_dispatch_fn(q, 0))
- 			return NULL;
- 	}
- }
-@@ -176,16 +176,16 @@ static inline void elv_activate_rq(struct request_queue *q, struct request *rq)
- {
- 	struct elevator_queue *e = q->elevator;
+@@ -264,6 +264,22 @@ void ioc_clear_queue(struct request_queue *q);
+ int create_task_io_context(struct task_struct *task, gfp_t gfp_mask, int node);
  
--	if (e->type->ops.elevator_activate_req_fn)
--		e->type->ops.elevator_activate_req_fn(q, rq);
-+	if (e->type->ops.sq.elevator_activate_req_fn)
-+		e->type->ops.sq.elevator_activate_req_fn(q, rq);
- }
- 
- static inline void elv_deactivate_rq(struct request_queue *q, struct request *rq)
- {
- 	struct elevator_queue *e = q->elevator;
- 
--	if (e->type->ops.elevator_deactivate_req_fn)
--		e->type->ops.elevator_deactivate_req_fn(q, rq);
-+	if (e->type->ops.sq.elevator_deactivate_req_fn)
-+		e->type->ops.sq.elevator_deactivate_req_fn(q, rq);
- }
- 
- #ifdef CONFIG_FAIL_IO_TIMEOUT
-diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
-index c73a6fcaeb9d..37aeb20fa454 100644
---- a/block/cfq-iosched.c
-+++ b/block/cfq-iosched.c
-@@ -4837,7 +4837,7 @@ static struct elv_fs_entry cfq_attrs[] = {
- };
- 
- static struct elevator_type iosched_cfq = {
--	.ops = {
-+	.ops.sq = {
- 		.elevator_merge_fn = 		cfq_merge,
- 		.elevator_merged_fn =		cfq_merged_request,
- 		.elevator_merge_req_fn =	cfq_merged_requests,
-diff --git a/block/deadline-iosched.c b/block/deadline-iosched.c
-index 55e0bb6d7da7..05fc0ea25a98 100644
---- a/block/deadline-iosched.c
-+++ b/block/deadline-iosched.c
-@@ -439,7 +439,7 @@ static struct elv_fs_entry deadline_attrs[] = {
- };
- 
- static struct elevator_type iosched_deadline = {
--	.ops = {
-+	.ops.sq = {
- 		.elevator_merge_fn = 		deadline_merge,
- 		.elevator_merged_fn =		deadline_merged_request,
- 		.elevator_merge_req_fn =	deadline_merged_requests,
-diff --git a/block/elevator.c b/block/elevator.c
-index 40f0c04e5ad3..022a26830297 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -58,8 +58,8 @@ static int elv_iosched_allow_bio_merge(struct request *rq, struct bio *bio)
- 	struct request_queue *q = rq->q;
- 	struct elevator_queue *e = q->elevator;
- 
--	if (e->type->ops.elevator_allow_bio_merge_fn)
--		return e->type->ops.elevator_allow_bio_merge_fn(q, rq, bio);
-+	if (e->type->ops.sq.elevator_allow_bio_merge_fn)
-+		return e->type->ops.sq.elevator_allow_bio_merge_fn(q, rq, bio);
- 
- 	return 1;
- }
-@@ -224,7 +224,7 @@ int elevator_init(struct request_queue *q, char *name)
- 		}
- 	}
- 
--	err = e->ops.elevator_init_fn(q, e);
-+	err = e->ops.sq.elevator_init_fn(q, e);
- 	if (err)
- 		elevator_put(e);
- 	return err;
-@@ -234,8 +234,8 @@ EXPORT_SYMBOL(elevator_init);
- void elevator_exit(struct elevator_queue *e)
- {
- 	mutex_lock(&e->sysfs_lock);
--	if (e->type->ops.elevator_exit_fn)
--		e->type->ops.elevator_exit_fn(e);
-+	if (e->type->ops.sq.elevator_exit_fn)
-+		e->type->ops.sq.elevator_exit_fn(e);
- 	mutex_unlock(&e->sysfs_lock);
- 
- 	kobject_put(&e->kobj);
-@@ -443,8 +443,8 @@ int elv_merge(struct request_queue *q, struct request **req, struct bio *bio)
- 		return ELEVATOR_BACK_MERGE;
- 	}
- 
--	if (e->type->ops.elevator_merge_fn)
--		return e->type->ops.elevator_merge_fn(q, req, bio);
-+	if (e->type->ops.sq.elevator_merge_fn)
-+		return e->type->ops.sq.elevator_merge_fn(q, req, bio);
- 
- 	return ELEVATOR_NO_MERGE;
- }
-@@ -495,8 +495,8 @@ void elv_merged_request(struct request_queue *q, struct request *rq, int type)
- {
- 	struct elevator_queue *e = q->elevator;
- 
--	if (e->type->ops.elevator_merged_fn)
--		e->type->ops.elevator_merged_fn(q, rq, type);
-+	if (e->type->ops.sq.elevator_merged_fn)
-+		e->type->ops.sq.elevator_merged_fn(q, rq, type);
- 
- 	if (type == ELEVATOR_BACK_MERGE)
- 		elv_rqhash_reposition(q, rq);
-@@ -510,8 +510,8 @@ void elv_merge_requests(struct request_queue *q, struct request *rq,
- 	struct elevator_queue *e = q->elevator;
- 	const int next_sorted = next->rq_flags & RQF_SORTED;
- 
--	if (next_sorted && e->type->ops.elevator_merge_req_fn)
--		e->type->ops.elevator_merge_req_fn(q, rq, next);
-+	if (next_sorted && e->type->ops.sq.elevator_merge_req_fn)
-+		e->type->ops.sq.elevator_merge_req_fn(q, rq, next);
- 
- 	elv_rqhash_reposition(q, rq);
- 
-@@ -528,8 +528,8 @@ void elv_bio_merged(struct request_queue *q, struct request *rq,
- {
- 	struct elevator_queue *e = q->elevator;
- 
--	if (e->type->ops.elevator_bio_merged_fn)
--		e->type->ops.elevator_bio_merged_fn(q, rq, bio);
-+	if (e->type->ops.sq.elevator_bio_merged_fn)
-+		e->type->ops.sq.elevator_bio_merged_fn(q, rq, bio);
- }
- 
- #ifdef CONFIG_PM
-@@ -578,7 +578,7 @@ void elv_drain_elevator(struct request_queue *q)
- 
- 	lockdep_assert_held(q->queue_lock);
- 
--	while (q->elevator->type->ops.elevator_dispatch_fn(q, 1))
-+	while (q->elevator->type->ops.sq.elevator_dispatch_fn(q, 1))
- 		;
- 	if (q->nr_sorted && printed++ < 10) {
- 		printk(KERN_ERR "%s: forced dispatching is broken "
-@@ -653,7 +653,7 @@ void __elv_add_request(struct request_queue *q, struct request *rq, int where)
- 		 * rq cannot be accessed after calling
- 		 * elevator_add_req_fn.
- 		 */
--		q->elevator->type->ops.elevator_add_req_fn(q, rq);
-+		q->elevator->type->ops.sq.elevator_add_req_fn(q, rq);
- 		break;
- 
- 	case ELEVATOR_INSERT_FLUSH:
-@@ -682,8 +682,8 @@ struct request *elv_latter_request(struct request_queue *q, struct request *rq)
- {
- 	struct elevator_queue *e = q->elevator;
- 
--	if (e->type->ops.elevator_latter_req_fn)
--		return e->type->ops.elevator_latter_req_fn(q, rq);
-+	if (e->type->ops.sq.elevator_latter_req_fn)
-+		return e->type->ops.sq.elevator_latter_req_fn(q, rq);
- 	return NULL;
- }
- 
-@@ -691,8 +691,8 @@ struct request *elv_former_request(struct request_queue *q, struct request *rq)
- {
- 	struct elevator_queue *e = q->elevator;
- 
--	if (e->type->ops.elevator_former_req_fn)
--		return e->type->ops.elevator_former_req_fn(q, rq);
-+	if (e->type->ops.sq.elevator_former_req_fn)
-+		return e->type->ops.sq.elevator_former_req_fn(q, rq);
- 	return NULL;
- }
- 
-@@ -701,8 +701,8 @@ int elv_set_request(struct request_queue *q, struct request *rq,
- {
- 	struct elevator_queue *e = q->elevator;
- 
--	if (e->type->ops.elevator_set_req_fn)
--		return e->type->ops.elevator_set_req_fn(q, rq, bio, gfp_mask);
-+	if (e->type->ops.sq.elevator_set_req_fn)
-+		return e->type->ops.sq.elevator_set_req_fn(q, rq, bio, gfp_mask);
- 	return 0;
- }
- 
-@@ -710,16 +710,16 @@ void elv_put_request(struct request_queue *q, struct request *rq)
- {
- 	struct elevator_queue *e = q->elevator;
- 
--	if (e->type->ops.elevator_put_req_fn)
--		e->type->ops.elevator_put_req_fn(rq);
-+	if (e->type->ops.sq.elevator_put_req_fn)
-+		e->type->ops.sq.elevator_put_req_fn(rq);
- }
- 
- int elv_may_queue(struct request_queue *q, unsigned int op)
- {
- 	struct elevator_queue *e = q->elevator;
- 
--	if (e->type->ops.elevator_may_queue_fn)
--		return e->type->ops.elevator_may_queue_fn(q, op);
-+	if (e->type->ops.sq.elevator_may_queue_fn)
-+		return e->type->ops.sq.elevator_may_queue_fn(q, op);
- 
- 	return ELV_MQUEUE_MAY;
- }
-@@ -734,8 +734,8 @@ void elv_completed_request(struct request_queue *q, struct request *rq)
- 	if (blk_account_rq(rq)) {
- 		q->in_flight[rq_is_sync(rq)]--;
- 		if ((rq->rq_flags & RQF_SORTED) &&
--		    e->type->ops.elevator_completed_req_fn)
--			e->type->ops.elevator_completed_req_fn(q, rq);
-+		    e->type->ops.sq.elevator_completed_req_fn)
-+			e->type->ops.sq.elevator_completed_req_fn(q, rq);
- 	}
- }
- 
-@@ -803,8 +803,8 @@ int elv_register_queue(struct request_queue *q)
- 		}
- 		kobject_uevent(&e->kobj, KOBJ_ADD);
- 		e->registered = 1;
--		if (e->type->ops.elevator_registered_fn)
--			e->type->ops.elevator_registered_fn(q);
-+		if (e->type->ops.sq.elevator_registered_fn)
-+			e->type->ops.sq.elevator_registered_fn(q);
- 	}
- 	return error;
- }
-@@ -912,7 +912,7 @@ static int elevator_switch(struct request_queue *q, struct elevator_type *new_e)
- 	spin_unlock_irq(q->queue_lock);
- 
- 	/* allocate, init and register new elevator */
--	err = new_e->ops.elevator_init_fn(q, new_e);
-+	err = new_e->ops.sq.elevator_init_fn(q, new_e);
- 	if (err)
- 		goto fail_init;
- 
-diff --git a/block/noop-iosched.c b/block/noop-iosched.c
-index a163c487cf38..2d1b15d89b45 100644
---- a/block/noop-iosched.c
-+++ b/block/noop-iosched.c
-@@ -92,7 +92,7 @@ static void noop_exit_queue(struct elevator_queue *e)
- }
- 
- static struct elevator_type elevator_noop = {
--	.ops = {
-+	.ops.sq = {
- 		.elevator_merge_req_fn		= noop_merged_requests,
- 		.elevator_dispatch_fn		= noop_dispatch,
- 		.elevator_add_req_fn		= noop_add_request,
-diff --git a/include/linux/elevator.h b/include/linux/elevator.h
-index b276e9ef0e0b..2a9e966eed03 100644
---- a/include/linux/elevator.h
-+++ b/include/linux/elevator.h
-@@ -94,7 +94,9 @@ struct elevator_type
- 	struct kmem_cache *icq_cache;
- 
- 	/* fields provided by elevator implementation */
--	struct elevator_ops ops;
-+	union {
-+		struct elevator_ops sq;
-+	} ops;
- 	size_t icq_size;	/* see iocontext.h */
- 	size_t icq_align;	/* ditto */
- 	struct elv_fs_entry *elevator_attrs;
+ /**
++ * rq_ioc - determine io_context for request allocation
++ * @bio: request being allocated is for this bio (can be %NULL)
++ *
++ * Determine io_context to use for request allocation for @bio.  May return
++ * %NULL if %current->io_context doesn't exist.
++ */
++static inline struct io_context *rq_ioc(struct bio *bio)
++{
++#ifdef CONFIG_BLK_CGROUP
++	if (bio && bio->bi_ioc)
++		return bio->bi_ioc;
++#endif
++	return current->io_context;
++}
++
++/**
+  * create_io_context - try to create task->io_context
+  * @gfp_mask: allocation mask
+  * @node: allocation node
 -- 
 2.7.4
