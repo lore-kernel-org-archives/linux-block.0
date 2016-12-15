@@ -1,20 +1,64 @@
-Return-Path: <bart.vanassche@gmail.com>
-Return-Path: <bart.vanassche@gmail.com>
-From: Bart Van Assche <bart.vanassche@gmail.com>
-Subject: Re: [PATCH 2/7] blk-mq: make mq_ops a const pointer
-To: Jens Axboe <axboe@fb.com>, axboe@kernel.dk, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org
+Return-Path: <prvs=1157cbc043=axboe@fb.com>
+From: Jens Axboe <axboe@fb.com>
+To: <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+CC: <paolo.valente@linaro.org>, <osandov@fb.com>, Jens Axboe <axboe@fb.com>
+Subject: [PATCH 2/7] blk-mq: make mq_ops a const pointer
+Date: Wed, 14 Dec 2016 22:26:03 -0700
+Message-ID: <1481779568-10642-3-git-send-email-axboe@fb.com>
+In-Reply-To: <1481779568-10642-1-git-send-email-axboe@fb.com>
 References: <1481779568-10642-1-git-send-email-axboe@fb.com>
- <1481779568-10642-3-git-send-email-axboe@fb.com>
-Cc: paolo.valente@linaro.org, osandov@fb.com
-Message-ID: <98bea114-b9e5-90c4-b309-5960dc08bddf@acm.org>
-Date: Thu, 15 Dec 2016 17:23:03 +0100
 MIME-Version: 1.0
-In-Reply-To: <1481779568-10642-3-git-send-email-axboe@fb.com>
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-On 12/15/2016 06:26 AM, Jens Axboe wrote:
-> We never change it, make that clear.
+We never change it, make that clear.
 
-Reviewed-by: Bart Van Assche <bart.vanassche@sandisk.com>
+Signed-off-by: Jens Axboe <axboe@fb.com>
+---
+ block/blk-mq.c         | 2 +-
+ include/linux/blk-mq.h | 2 +-
+ include/linux/blkdev.h | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index d79fdc11b1ee..87b7eaa1cb74 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -639,7 +639,7 @@ struct blk_mq_timeout_data {
+ 
+ void blk_mq_rq_timed_out(struct request *req, bool reserved)
+ {
+-	struct blk_mq_ops *ops = req->q->mq_ops;
++	const struct blk_mq_ops *ops = req->q->mq_ops;
+ 	enum blk_eh_timer_return ret = BLK_EH_RESET_TIMER;
+ 
+ 	/*
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 4a2ab5d99ff7..afc81d77e471 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -60,7 +60,7 @@ struct blk_mq_hw_ctx {
+ 
+ struct blk_mq_tag_set {
+ 	unsigned int		*mq_map;
+-	struct blk_mq_ops	*ops;
++	const struct blk_mq_ops	*ops;
+ 	unsigned int		nr_hw_queues;
+ 	unsigned int		queue_depth;	/* max hw supported */
+ 	unsigned int		reserved_tags;
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 286b2a264383..7c40fb838b44 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -408,7 +408,7 @@ struct request_queue {
+ 	dma_drain_needed_fn	*dma_drain_needed;
+ 	lld_busy_fn		*lld_busy_fn;
+ 
+-	struct blk_mq_ops	*mq_ops;
++	const struct blk_mq_ops	*mq_ops;
+ 
+ 	unsigned int		*mq_map;
+ 
+-- 
+2.7.4
