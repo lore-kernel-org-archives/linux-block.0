@@ -1,59 +1,55 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga03.intel.com ([134.134.136.65]:45553 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1755303AbcLSPUQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 19 Dec 2016 10:20:16 -0500
-Date: Mon, 19 Dec 2016 08:20:14 -0700
-From: Jon Derrick <jonathan.derrick@intel.com>
-To: Stephen Bates <sbates@raithlin.com>
-Cc: linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, axboe@fb.com, sagi@grimberg.me,
-        james_p_freyensee@linux.intel.com
-Subject: Re: [PATCH 1/2] nvme : Use correct scnprintf in cmb show
-Message-ID: <20161219152013.GA3512@localhost.localdomain>
+Received: from gateway30.websitewelcome.com ([192.185.150.24]:37484 "EHLO
+        gateway30.websitewelcome.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1754556AbcLPTt7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 16 Dec 2016 14:49:59 -0500
+Received: from cm6.websitewelcome.com (cm6.websitewelcome.com [108.167.139.19])
+        by gateway30.websitewelcome.com (Postfix) with ESMTP id 6A14360D8F
+        for <linux-block@vger.kernel.org>; Fri, 16 Dec 2016 12:54:58 -0600 (CST)
+From: Stephen Bates <sbates@raithlin.com>
+To: linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, axboe@fb.com
+Cc: sagi@grimberg.me, james_p_freyensee@linux.intel.com,
+        jonathan.derrick@intel.com, Stephen Bates <sbates@raithlin.com>
+Subject: [PATCH 1/2] nvme : Use correct scnprintf in cmb show
+Date: Fri, 16 Dec 2016 11:54:50 -0700
+Message-Id: <1481914491-21456-2-git-send-email-sbates@raithlin.com>
+In-Reply-To: <1481914491-21456-1-git-send-email-sbates@raithlin.com>
 References: <1481914491-21456-1-git-send-email-sbates@raithlin.com>
- <1481914491-21456-2-git-send-email-sbates@raithlin.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1481914491-21456-2-git-send-email-sbates@raithlin.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Looks good. Thanks Stephen.
+Make sure we are using the correct scnprintf in the sysfs show
+function for the CMB.
 
-Reviewed-by Jon Derrick: <jonathan.derrick@intel.com>
+Signed-off-by: Stephen Bates <sbates@raithlin.com>
+---
+ drivers/nvme/host/pci.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-On Fri, Dec 16, 2016 at 11:54:50AM -0700, Stephen Bates wrote:
-> Make sure we are using the correct scnprintf in the sysfs show
-> function for the CMB.
-> 
-> Signed-off-by: Stephen Bates <sbates@raithlin.com>
-> ---
->  drivers/nvme/host/pci.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-> index 5e52034..be10860 100644
-> --- a/drivers/nvme/host/pci.c
-> +++ b/drivers/nvme/host/pci.c
-> @@ -50,7 +50,7 @@
->  #define NVME_AQ_DEPTH		256
->  #define SQ_SIZE(depth)		(depth * sizeof(struct nvme_command))
->  #define CQ_SIZE(depth)		(depth * sizeof(struct nvme_completion))
-> -		
-> +
->  /*
->   * We handle AEN commands ourselves and don't even let the
->   * block layer know about them.
-> @@ -1332,7 +1332,7 @@ static ssize_t nvme_cmb_show(struct device *dev,
->  {
->  	struct nvme_dev *ndev = to_nvme_dev(dev_get_drvdata(dev));
->  
-> -	return snprintf(buf, PAGE_SIZE, "cmbloc : x%08x\ncmbsz  : x%08x\n",
-> +	return scnprintf(buf, PAGE_SIZE, "cmbloc : x%08x\ncmbsz  : x%08x\n",
->  		       ndev->cmbloc, ndev->cmbsz);
->  }
->  static DEVICE_ATTR(cmb, S_IRUGO, nvme_cmb_show, NULL);
-> -- 
-> 2.1.4
-> 
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index 5e52034..be10860 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -50,7 +50,7 @@
+ #define NVME_AQ_DEPTH		256
+ #define SQ_SIZE(depth)		(depth * sizeof(struct nvme_command))
+ #define CQ_SIZE(depth)		(depth * sizeof(struct nvme_completion))
+-		
++
+ /*
+  * We handle AEN commands ourselves and don't even let the
+  * block layer know about them.
+@@ -1332,7 +1332,7 @@ static ssize_t nvme_cmb_show(struct device *dev,
+ {
+ 	struct nvme_dev *ndev = to_nvme_dev(dev_get_drvdata(dev));
+ 
+-	return snprintf(buf, PAGE_SIZE, "cmbloc : x%08x\ncmbsz  : x%08x\n",
++	return scnprintf(buf, PAGE_SIZE, "cmbloc : x%08x\ncmbsz  : x%08x\n",
+ 		       ndev->cmbloc, ndev->cmbsz);
+ }
+ static DEVICE_ATTR(cmb, S_IRUGO, nvme_cmb_show, NULL);
+-- 
+2.1.4
+
