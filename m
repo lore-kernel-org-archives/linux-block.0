@@ -1,64 +1,55 @@
-Return-Path: <prvs=1157cbc043=axboe@fb.com>
-From: Jens Axboe <axboe@fb.com>
-To: <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-CC: <paolo.valente@linaro.org>, <osandov@fb.com>, Jens Axboe <axboe@fb.com>
-Subject: [PATCH 2/7] blk-mq: make mq_ops a const pointer
-Date: Wed, 14 Dec 2016 22:26:03 -0700
-Message-ID: <1481779568-10642-3-git-send-email-axboe@fb.com>
-In-Reply-To: <1481779568-10642-1-git-send-email-axboe@fb.com>
-References: <1481779568-10642-1-git-send-email-axboe@fb.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mgwym01.jp.fujitsu.com ([211.128.242.40]:50258 "EHLO
+        mgwym01.jp.fujitsu.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750799AbcLPFB5 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 16 Dec 2016 00:01:57 -0500
+Received: from g01jpfmpwkw02.exch.g01.fujitsu.local (g01jpfmpwkw02.exch.g01.fujitsu.local [10.0.193.56])
+        by yt-mxoi1.gw.nic.fujitsu.com (Postfix) with ESMTP id 43CE1AC01F8
+        for <linux-block@vger.kernel.org>; Fri, 16 Dec 2016 14:01:47 +0900 (JST)
+Message-ID: <585374F0.6040407@jp.fujitsu.com>
+Date: Fri, 16 Dec 2016 14:00:32 +0900
+From: Masayoshi Mizuma <m.mizuma@jp.fujitsu.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-List-ID: <linux-block@vger.kernel.org>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-mm@kvack.org>, <linux-block@vger.kernel.org>
+Subject: Re: [PATCH v2] block: avoid incorrect bdi_unregiter call
+References: <584101D2.4090200@jp.fujitsu.com>
+In-Reply-To: <584101D2.4090200@jp.fujitsu.com>
+Content-Type: text/plain; charset="iso-2022-jp"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-We never change it, make that clear.
+Hi Jens,
 
-Signed-off-by: Jens Axboe <axboe@fb.com>
----
- block/blk-mq.c         | 2 +-
- include/linux/blk-mq.h | 2 +-
- include/linux/blkdev.h | 2 +-
- 3 files changed, 3 insertions(+), 3 deletions(-)
+Could you add this patch for 4.10?
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index d79fdc11b1ee..87b7eaa1cb74 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -639,7 +639,7 @@ struct blk_mq_timeout_data {
- 
- void blk_mq_rq_timed_out(struct request *req, bool reserved)
- {
--	struct blk_mq_ops *ops = req->q->mq_ops;
-+	const struct blk_mq_ops *ops = req->q->mq_ops;
- 	enum blk_eh_timer_return ret = BLK_EH_RESET_TIMER;
- 
- 	/*
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 4a2ab5d99ff7..afc81d77e471 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -60,7 +60,7 @@ struct blk_mq_hw_ctx {
- 
- struct blk_mq_tag_set {
- 	unsigned int		*mq_map;
--	struct blk_mq_ops	*ops;
-+	const struct blk_mq_ops	*ops;
- 	unsigned int		nr_hw_queues;
- 	unsigned int		queue_depth;	/* max hw supported */
- 	unsigned int		reserved_tags;
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 286b2a264383..7c40fb838b44 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -408,7 +408,7 @@ struct request_queue {
- 	dma_drain_needed_fn	*dma_drain_needed;
- 	lld_busy_fn		*lld_busy_fn;
- 
--	struct blk_mq_ops	*mq_ops;
-+	const struct blk_mq_ops	*mq_ops;
- 
- 	unsigned int		*mq_map;
- 
--- 
-2.7.4
+- Masayoshi Mizuma
+
+On Fri, 2 Dec 2016 14:08:34 +0900 Masayoshi Mizuma wrote:
+> bdi_unregister() should be called after bdi_register() is called,
+> so we should check whether WB_registered flag is set.
+> 
+> For example of the situation, error path in device driver may call
+> blk_cleanup_queue() before the driver calls bdi_register().
+> 
+> Signed-off-by: Masayoshi Mizuma <m.mizuma@jp.fujitsu.com>
+> ---
+>   mm/backing-dev.c | 3 +++
+>   1 file changed, 3 insertions(+)
+> 
+> diff --git a/mm/backing-dev.c b/mm/backing-dev.c
+> index 8fde443..f8b07d4 100644
+> --- a/mm/backing-dev.c
+> +++ b/mm/backing-dev.c
+> @@ -853,6 +853,9 @@ static void bdi_remove_from_list(struct backing_dev_info *bdi)
+>   
+>   void bdi_unregister(struct backing_dev_info *bdi)
+>   {
+> +	if (!test_bit(WB_registered, &bdi->wb.state))
+> +		return;
+> +
+>   	/* make sure nobody finds us on the bdi_list anymore */
+>   	bdi_remove_from_list(bdi);
+>   	wb_shutdown(&bdi->wb);
+> 
