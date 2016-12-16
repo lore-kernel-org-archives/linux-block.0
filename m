@@ -1,65 +1,75 @@
-Return-Path: <mawilcox@microsoft.com>
-From: Matthew Wilcox <mawilcox@microsoft.com>
-To: Rasmus Villemoes <linux@rasmusvillemoes.dk>
-CC: Tejun Heo <tj@kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, Lai Jiangshan <jiangshanlai@gmail.com>, "Jens
- Axboe" <axboe@kernel.dk>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>, "Andrew
- Morton" <akpm@linux-foundation.org>
-Subject: RE: [RFC 00/10] implement alternative and much simpler id allocator
-Date: Fri, 16 Dec 2016 21:09:07 +0000
-Message-ID: <BY2PR21MB0036CE87953D422A5AA06498CB9C0@BY2PR21MB0036.namprd21.prod.outlook.com>
+Return-Path: <linux@rasmusvillemoes.dk>
+Return-Path: <linux@rasmusvillemoes.dk>
+From: Rasmus Villemoes <linux@rasmusvillemoes.dk>
+To: Matthew Wilcox <mawilcox@microsoft.com>
+Cc: Tejun Heo <tj@kernel.org>,  "linux-kernel\@vger.kernel.org" <linux-kernel@vger.kernel.org>,  Lai Jiangshan <jiangshanlai@gmail.com>,  "Jens Axboe" <axboe@kernel.dk>,  Greg Kroah-Hartman <gregkh@linuxfoundation.org>,  "linux-block\@vger.kernel.org" <linux-block@vger.kernel.org>,  "dri-devel\@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,  "Andrew Morton" <akpm@linux-foundation.org>
+Subject: Re: [RFC 00/10] implement alternative and much simpler id allocator
 References: <1481160187-9652-1-git-send-email-linux@rasmusvillemoes.dk>
 	<20161209140140.5e0a68e2e1cf9861335bdf3b@linux-foundation.org>
 	<BY2PR21MB00364EEDE35645341BEC695CCB9C0@BY2PR21MB0036.namprd21.prod.outlook.com>
- <87inqj8vjo.fsf@rasmusvillemoes.dk>
-In-Reply-To: <87inqj8vjo.fsf@rasmusvillemoes.dk>
-Content-Type: text/plain; charset="utf-8"
+Date: Fri, 16 Dec 2016 21:32:11 +0100
+In-Reply-To: <BY2PR21MB00364EEDE35645341BEC695CCB9C0@BY2PR21MB0036.namprd21.prod.outlook.com>
+	(Matthew Wilcox's message of "Fri, 16 Dec 2016 19:14:11 +0000")
+Message-ID: <87inqj8vjo.fsf@rasmusvillemoes.dk>
 MIME-Version: 1.0
+Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-RnJvbTogUmFzbXVzIFZpbGxlbW9lcyBbbWFpbHRvOmxpbnV4QHJhc211c3ZpbGxlbW9lcy5ka10N
-Cj4gT24gRnJpLCBEZWMgMTYgMjAxNiwgTWF0dGhldyBXaWxjb3ggPG1hd2lsY294QG1pY3Jvc29m
-dC5jb20+IHdyb3RlOg0KPiA+IFRoYW5rcyBmb3IgeW91ciB3b3JrIG9uIHRoaXM7IHlvdSd2ZSBy
-ZWFsbHkgcHV0IHNvbWUgZWZmb3J0IGludG8NCj4gPiBwcm92aW5nIHlvdXIgd29yayBoYXMgdmFs
-dWUuICBNeSBtb3RpdmF0aW9uIHdhcyBwdXJlbHkgYWVzdGhldGljLCBidXQNCj4gPiB5b3UndmUg
-Z290IHNvbWUgZ2VudWluZSBzYXZpbmdzIGhlcmUgKGFkbWl0dGVkbHkgaXQncyBhYm91dCBhIHF1
-YXJ0ZXINCj4gPiBvZiBhIGNlbnQncyB3b3J0aCBvZiBtZW1vcnkgd2l0aCBEUkFNIHNlbGxpbmcg
-Zm9yICQxMC9HQikuDQo+ID4gTmV2ZXJ0aGVsZXNzLCB0aGF0IGFkZHMgdXAgb3ZlciBhIGJpbGxp
-b24gZGV2aWNlcywgYW5kIHRoZXJlIGFyZSBzdGlsbA0KPiA+IHBlb3BsZSB0cnlpbmcgdG8gZml0
-IExpbnV4IGludG8gNE1CIGVtYmVkZGVkIGRldmljZXMuDQo+ID4NCj4gDQo+IFllYWgsIG15IG1h
-aW4gbW90aXZhdGlvbiB3YXMgZW1iZWRkZWQgZGV2aWNlcyB3aGljaCBkb24ndCBoYXZlIHRoZQ0K
-PiBsdXh1cnkgb2YgbWVhc3VyaW5nIHRoZWlyIFJBTSBpbiBHQi4gRS5nLiwgaXQncyBjcmF6eSB0
-aGF0IHRoZQ0KPiB3YXRjaGRvZ19pZGEgZWZmZWN0aXZlbHkgdXNlIG1vcmUgbWVtb3J5IHRoYW4g
-dGhlIC50ZXh0IG9mIHRoZSB3YXRjaGRvZw0KPiBzdWJzeXN0ZW0sIGFuZCBzaW1pbGFybHkgZm9y
-IHRoZSBrdGhyZWFkIHdvcmtlcnMsIGV0Yy4sIGV0Yy4uIEkgZGlkbid0DQo+IG1lYW4gZm9yIG15
-IHBhdGNoZXMgdG8gZ28gaW4gYXMgaXMsIG1vcmUgdG8gcHJvdm9rZSBzb21lIGRpc2N1c3Npb24u
-IEkNCj4gd2Fzbid0IGF3YXJlIG9mIHlvdXIgcmVpbXBsZW1lbnRhdGlvbiwgYnV0IGl0IHNlZW1z
-IHRoYXQgbWF5IG1ha2UgdGhlDQo+IHByb2JsZW0gZ28gYXdheS4NCg0KSXQgY2VydGFpbmx5IHNo
-cmlua3MgdGhlIHByb2JsZW0gZG93biB0byBhIHNpemUgd2hlcmUgaXQgbWF5IG5vdCBiZSB3b3J0
-aCBpbnRyb2R1Y2luZyBhbm90aGVyIGltcGxlbWVudGF0aW9uLg0KDQo+ID4gT24gYSA2NC1iaXQg
-bWFjaGluZSwgeW91ciB0SURBIHJvb3QgaXMgMjQgYnl0ZXM7IG15IG5ldyBJREEgcm9vdCBpcyAx
-Ng0KPiA+IGJ5dGVzLiAgSWYgeW91IGFsbG9jYXRlIG9ubHkgb25lIGVudHJ5LCB5b3UnbGwgYWxs
-b2NhdGUgOCBieXRlcy4NCj4gPiBUaGFua3MgdG8gdGhlIHNsYWIgYWxsb2NhdG9yLCB0aGF0IGdl
-dHMgcm91bmRlZCB1cCB0byAzMiBieXRlcy4gIEkNCj4gPiBhbGxvY2F0ZSB0aGUgZnVsbCAxMjgg
-Ynl0ZSBsZWFmLCBidXQgSSBzdG9yZSB0aGUgcG9pbnRlciB0byBpdCBpbiB0aGUNCj4gPiByb290
-ICh1bmxpa2UgdGhlIElEUiwgdGhlIHJhZGl4IHRyZWUgZG9lc24ndCBuZWVkIHRvIGFsbG9jYXRl
-IGEgbGF5ZXINCj4gPiBmb3IgYSBzaW5nbGUgZW50cnkpLiAgU28gdElEQSB3aW5zIG9uIG1lbW9y
-eSBjb25zdW1wdGlvbiBiZXR3ZWVuIDEgYW5kDQo+ID4gNTExIElEcywgYW5kIG5ld0lEQSBpcyBz
-bGlnaHRseSBhaGVhZCBiZXR3ZWVuIDUxMiBhbmQgMTAyMyBJRHMuDQo+IA0KPiBUaGlzIHNvdW5k
-cyBnb29kLiBJIHRoaW5rIHRoZXJlIG1heSBzdGlsbCBiZSBhIGxvdCBvZiB1c2VycyB0aGF0IG5l
-dmVyDQo+IGFsbG9jYXRlIG1vcmUgdGhhbiBhIGhhbmRmdWwgb2YgSURBcywgbWFraW5nIGEgMTI4
-IGJ5dGUgYWxsb2NhdGlvbiBzdGlsbA0KPiBzb21ld2hhdCBleGNlc3NpdmUuIE9uZSB0aGluZyBJ
-IGNvbnNpZGVyZWQgd2FzIChleGFjdGx5IGFzIGl0J3MgZG9uZSBmb3INCj4gZmlsZSBkZXNjcmlw
-dG9yIHRhYmxlcykgdG8gZW1iZWQgYSBzaW5nbGUgd29yZCBpbiB0aGUgc3RydWN0IGlkYSBhbmQN
-Cj4gdXNlIHRoYXQgaW5pdGlhbGx5OyBJIGhhdmVuJ3QgbG9va2VkIGNsb3NlbHkgYXQgbmV3SURB
-LCBzbyBJIGRvbid0IGtub3cNCj4gaG93IGVhc3kgdGhhdCB3b3VsZCBiZSBvciBpZiBpdHMgd29y
-dGggdGhlIGNvbXBsZXhpdHkuDQoNCkhlaCwgSSB3YXMgdGhpbmtpbmcgYWJvdXQgdGhhdCB0b28u
-ICBUaGUgcmFkaXggdHJlZSBzdXBwb3J0cyAiZXhjZXB0aW9uYWwgZW50cmllcyIgd2hpY2ggaGF2
-ZSB0aGUgYm90dG9tIGJpdCBzZXQuICBPbiBhIDY0LWJpdCBtYWNoaW5lLCB3ZSBjb3VsZCB1c2Ug
-NjIgb2YgdGhlIGJpdHMgaW4gdGhlIHJhZGl4IHRyZWUgcm9vdCB0byBzdG9yZSB0aGUgSUQgYml0
-bWFwLiAgSSdtIGEgbGl0dGxlIHdhcnkgb2YgdGhlIHBvdGVudGlhbCBjb21wbGV4aXR5LCBidXQg
-d2Ugc2hvdWxkIHRyeSBpdCBvdXQuDQoNCkRpZCB5b3UgY29tZSB1cCB3aXRoIGFueSBmdW4gdGVz
-dHMgdGhhdCBjb3VsZCBiZSBhZGRlZCB0byB0aGUgdGVzdC1zdWl0ZT8gIEl0IGZlZWxzIGEgbGl0
-dGxlIHNsZW5kZXIgcmlnaHQgbm93Lg0K
+On Fri, Dec 16 2016, Matthew Wilcox <mawilcox@microsoft.com> wrote:
+
+> From: Andrew Morton [mailto:akpm@linux-foundation.org]
+>> On Thu,  8 Dec 2016 02:22:55 +0100 Rasmus Villemoes
+>> <linux@rasmusvillemoes.dk> wrote:
+>> > TL;DR: these patches save 250 KB of memory, with more low-hanging
+>> > fruit ready to pick.
+>> >
+>> > While browsing through the lib/idr.c code, I noticed that the code at
+>> > the end of ida_get_new_above() probably doesn't work as intended: Most
+>> > users of ida use it via ida_simple_get(), and that starts by
+>> > unconditionally calling ida_pre_get(), ensuring that ida->idr has
+>> > 8==MAX_IDR_FREE idr_layers in its free list id_free. In the common
+>> > case, none (or at most one) of these get used during
+>> > ida_get_new_above(), and we only free one, leaving at least 6 (usually
+>> > 7) idr_layers in the free list.
+>> 
+>> I expect we'll be merging patches 1-32 of that series into 4.10-rc1 and
+>> the above patch (#33) into 4.11-rc1.
+>
+> Hi Rasmus,
+>
+> Thanks for your work on this; you've really put some effort into
+> proving your work has value.  My motivation was purely aesthetic, but
+> you've got some genuine savings here (admittedly it's about a quarter
+> of a cent's worth of memory with DRAM selling for $10/GB).
+> Nevertheless, that adds up over a billion devices, and there are still
+> people trying to fit Linux into 4MB embedded devices.
+>
+
+Yeah, my main motivation was embedded devices which don't have the
+luxury of measuring their RAM in GB. E.g., it's crazy that the
+watchdog_ida effectively use more memory than the .text of the watchdog
+subsystem, and similarly for the kthread workers, etc., etc.. I didn't
+mean for my patches to go in as is, more to provoke some discussion. I
+wasn't aware of your reimplementation, but it seems that may make the
+problem go away.
+
+> I think my reimplementation of the IDA on top of the radix tree is
+> close enough to your tIDA in memory consumption that it doesn't
+> warrant a new data structure.
+>
+> On a 64-bit machine, your tIDA root is 24 bytes; my new IDA root is 16
+> bytes.  If you allocate only one entry, you'll allocate 8 bytes.
+> Thanks to the slab allocator, that gets rounded up to 32 bytes.  I
+> allocate the full 128 byte leaf, but I store the pointer to it in the
+> root (unlike the IDR, the radix tree doesn't need to allocate a layer
+> for a single entry).  So tIDA wins on memory consumption between 1 and
+> 511 IDs, and newIDA is slightly ahead between 512 and 1023 IDs.
+
+This sounds good. I think there may still be a lot of users that never
+allocate more than a handful of IDAs, making a 128 byte allocation still
+somewhat excessive. One thing I considered was (exactly as it's done for
+file descriptor tables) to embed a single word in the struct ida and
+use that initially; I haven't looked closely at newIDA, so I don't know
+how easy that would be or if its worth the complexity.
+
+Rasmus
