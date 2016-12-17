@@ -1,47 +1,59 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f193.google.com ([209.85.192.193]:34126 "EHLO
-        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933114AbcL0QHk (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Dec 2016 11:07:40 -0500
-From: Ming Lei <tom.leiming@gmail.com>
-To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        Ming Lei <tom.leiming@gmail.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Mike Christie <mchristi@redhat.com>,
-        Jeff Moyer <jmoyer@redhat.com>,
-        Minfei Huang <mnghuan@gmail.com>,
-        Omar Sandoval <osandov@fb.com>, Petr Mladek <pmladek@suse.com>
-Subject: [PATCH v1 02/54] block: loop: comment on direct access to bvec table
-Date: Tue, 27 Dec 2016 23:55:51 +0800
-Message-Id: <1482854250-13481-3-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1482854250-13481-1-git-send-email-tom.leiming@gmail.com>
-References: <1482854250-13481-1-git-send-email-tom.leiming@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=1159fc908b=axboe@fb.com>
+From: Jens Axboe <axboe@fb.com>
+To: <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+CC: <paolo.valente@linaro.org>, <osandov@fb.com>, Jens Axboe <axboe@fb.com>
+Subject: [PATCH 4/8] blk-mq: un-export blk_mq_free_hctx_request()
+Date: Fri, 16 Dec 2016 17:12:12 -0700
+Message-ID: <1481933536-12844-5-git-send-email-axboe@fb.com>
+In-Reply-To: <1481933536-12844-1-git-send-email-axboe@fb.com>
+References: <1481933536-12844-1-git-send-email-axboe@fb.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+It's only used in blk-mq, kill it from the main exported header
+and kill the symbol export as well.
+
+Signed-off-by: Jens Axboe <axboe@fb.com>
 ---
- drivers/block/loop.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ block/blk-mq.c         | 5 ++---
+ include/linux/blk-mq.h | 1 -
+ 2 files changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index f347285c67ec..be1cc51815ac 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -485,6 +485,11 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
- 	/* nomerge for loop request queue */
- 	WARN_ON(cmd->rq->bio != cmd->rq->biotail);
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 87b7eaa1cb74..6eeae30cc027 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -337,15 +337,14 @@ static void __blk_mq_free_request(struct blk_mq_hw_ctx *hctx,
+ 	blk_queue_exit(q);
+ }
  
-+	/*
-+	 * For multipage bvec support, it is safe to pass the bvec
-+	 * table to iov iterator, because iov iter still uses bvec
-+	 * iter helpers to travese bvec.
-+	 */
- 	bvec = __bvec_iter_bvec(bio->bi_io_vec, bio->bi_iter);
- 	iov_iter_bvec(&iter, ITER_BVEC | rw, bvec,
- 		      bio_segments(bio), blk_rq_bytes(cmd->rq));
+-void blk_mq_free_hctx_request(struct blk_mq_hw_ctx *hctx, struct request *rq)
++static void blk_mq_free_hctx_request(struct blk_mq_hw_ctx *hctx,
++				     struct request *rq)
+ {
+ 	struct blk_mq_ctx *ctx = rq->mq_ctx;
+ 
+ 	ctx->rq_completed[rq_is_sync(rq)]++;
+ 	__blk_mq_free_request(hctx, ctx, rq);
+-
+ }
+-EXPORT_SYMBOL_GPL(blk_mq_free_hctx_request);
+ 
+ void blk_mq_free_request(struct request *rq)
+ {
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index afc81d77e471..2686f9e7302a 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -181,7 +181,6 @@ void blk_mq_flush_plug_list(struct blk_plug *plug, bool from_schedule);
+ 
+ void blk_mq_insert_request(struct request *, bool, bool, bool);
+ void blk_mq_free_request(struct request *rq);
+-void blk_mq_free_hctx_request(struct blk_mq_hw_ctx *, struct request *rq);
+ bool blk_mq_can_queue(struct blk_mq_hw_ctx *);
+ 
+ enum {
 -- 
 2.7.4
-
