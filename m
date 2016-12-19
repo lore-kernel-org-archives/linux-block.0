@@ -1,29 +1,27 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:54230 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752013AbcLIBRT (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 8 Dec 2016 20:17:19 -0500
-Date: Thu, 8 Dec 2016 20:16:56 -0500
-From: Mike Snitzer <snitzer@redhat.com>
-To: lsf-pc@lists.linux-foundation.org
-Cc: linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
-        linux-block@vger.kernel.org, dm-devel@redhat.com
-Subject: [LSF/MM TOPIC ATTEND] multipath for NVMe over Fabrics
-Message-ID: <20161209011656.GA320@redhat.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH RESEND] block: allow WRITE_SAME commands with the SG_IO
+ ioctl
+To: Mauricio Faria de Oliveira <mauricfo@linux.vnet.ibm.com>,
+ linux-block@vger.kernel.org
+References: <1481824098-5555-1-git-send-email-mauricfo@linux.vnet.ibm.com>
+Cc: hch@infradead.org, linux-scsi@vger.kernel.org,
+ linux-kernel@vger.kernel.org, pbonzini@redhat.com, latha@linux.vnet.ibm.com,
+ manjuhr1@in.ibm.com
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <b62fd71d-0831-c402-1d09-c78779dee060@kernel.dk>
+Date: Mon, 19 Dec 2016 08:34:33 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <1481824098-5555-1-git-send-email-mauricfo@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=windows-1252
+List-ID: <linux-block@vger.kernel.org>
 
-I'd like to discuss $subject.  I haven't heard of much progress on this
-(but I'm also not tracking NVMe development at the moment).
+On 12/15/2016 10:48 AM, Mauricio Faria de Oliveira wrote:
+> The WRITE_SAME commands are not present in the blk_default_cmd_filter
+> write_ok list, and thus are failed with -EPERM when the SG_IO ioctl()
+> is executed without CAP_SYS_RAWIO capability (e.g., unprivileged users).
+> [ sg_io() -> blk_fill_sghdr_rq() > blk_verify_command() -> -EPERM ]
 
-Last I heard about getting DM multipath to work with NVMe over Fabrics
-was this: https://patchwork.kernel.org/patch/9208997/
+Added for 4.10, thanks.
 
-I've reintroduced bio-based support for the DM multipath target.
-Between now and LSF I hope to come to terms with what the various work
-items are for making DM multipath work for NVMeoF.  I welcome any
-ideas/thoughts others might have.
-
-Mike
+-- 
+Jens Axboe
