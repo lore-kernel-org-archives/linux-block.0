@@ -1,711 +1,132 @@
-Return-Path: <prvs=1159fc908b=axboe@fb.com>
-From: Jens Axboe <axboe@fb.com>
-To: <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-CC: <paolo.valente@linaro.org>, <osandov@fb.com>, Jens Axboe <axboe@fb.com>
-Subject: [PATCH 7/8] mq-deadline: add blk-mq adaptation of the deadline IO scheduler
-Date: Fri, 16 Dec 2016 17:12:15 -0700
-Message-ID: <1481933536-12844-8-git-send-email-axboe@fb.com>
-In-Reply-To: <1481933536-12844-1-git-send-email-axboe@fb.com>
-References: <1481933536-12844-1-git-send-email-axboe@fb.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57413 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1762421AbcLSRAn (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 19 Dec 2016 12:00:43 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id uBJGwtJe106685
+        for <linux-block@vger.kernel.org>; Mon, 19 Dec 2016 12:00:42 -0500
+Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 27efv575qv-1
+        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+        for <linux-block@vger.kernel.org>; Mon, 19 Dec 2016 12:00:42 -0500
+Received: from localhost
+        by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <linux-block@vger.kernel.org> from <aneesh.kumar@linux.vnet.ibm.com>;
+        Mon, 19 Dec 2016 10:00:41 -0700
+From: "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>
+To: Jan Kara <jack@suse.cz>, Jerome Glisse <jglisse@redhat.com>
+Cc: Dave Chinner <david@fromorbit.com>, linux-block@vger.kernel.org,
+        linux-mm@kvack.org, lsf-pc@lists.linux-foundation.org,
+        linux-fsdevel@vger.kernel.org
+Subject: Re: [Lsf-pc] [LSF/MM TOPIC] Un-addressable device memory and block/fs implications
+In-Reply-To: <20161214111351.GC18624@quack2.suse.cz>
+References: <20161213181511.GB2305@redhat.com> <20161213201515.GB4326@dastard> <20161213203112.GE2305@redhat.com> <20161213211041.GC4326@dastard> <20161213212433.GF2305@redhat.com> <20161214111351.GC18624@quack2.suse.cz>
+Date: Mon, 19 Dec 2016 22:30:06 +0530
 MIME-Version: 1.0
 Content-Type: text/plain
-List-ID: <linux-block@vger.kernel.org>
+Message-Id: <87shpjua5l.fsf@linux.vnet.ibm.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This is basically identical to deadline-iosched, except it registers
-as a MQ capable scheduler. This is still a single queue design.
+Jan Kara <jack@suse.cz> writes:
 
-Signed-off-by: Jens Axboe <axboe@fb.com>
----
- block/Kconfig.iosched |   6 +
- block/Makefile        |   1 +
- block/mq-deadline.c   | 649 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 656 insertions(+)
- create mode 100644 block/mq-deadline.c
+> On Tue 13-12-16 16:24:33, Jerome Glisse wrote:
+>> On Wed, Dec 14, 2016 at 08:10:41AM +1100, Dave Chinner wrote:
+>> > On Tue, Dec 13, 2016 at 03:31:13PM -0500, Jerome Glisse wrote:
+>> > > On Wed, Dec 14, 2016 at 07:15:15AM +1100, Dave Chinner wrote:
+>> > > > On Tue, Dec 13, 2016 at 01:15:11PM -0500, Jerome Glisse wrote:
+>> > > > > I would like to discuss un-addressable device memory in the context of
+>> > > > > filesystem and block device. Specificaly how to handle write-back, read,
+>> > > > > ... when a filesystem page is migrated to device memory that CPU can not
+>> > > > > access.
+>> > > > 
+>> > > > You mean pmem that is DAX-capable that suddenly, without warning,
+>> > > > becomes non-DAX capable?
+>> > > > 
+>> > > > If you are not talking about pmem and DAX, then exactly what does
+>> > > > "when a filesystem page is migrated to device memory that CPU can
+>> > > > not access" mean? What "filesystem page" are we talking about that
+>> > > > can get migrated from main RAM to something the CPU can't access?
+>> > > 
+>> > > I am talking about GPU, FPGA, ... any PCIE device that have fast on
+>> > > board memory that can not be expose transparently to the CPU. I am
+>> > > reusing ZONE_DEVICE for this, you can see HMM patchset on linux-mm
+>> > > https://lwn.net/Articles/706856/
+>> > 
+>> > So ZONE_DEVICE memory that is a DMA target but not CPU addressable?
+>> 
+>> Well not only target, it can be source too. But the device can read
+>> and write any system memory and dma to/from that memory to its on
+>> board memory.
+>> 
+>> > 
+>> > > So in my case i am only considering non DAX/PMEM filesystem ie any
+>> > > "regular" filesystem back by a "regular" block device. I want to be
+>> > > able to migrate mmaped area of such filesystem to device memory while
+>> > > the device is actively using that memory.
+>> > 
+>> > "migrate mmapped area of such filesystem" means what, exactly?
+>> 
+>> fd = open("/path/to/some/file")
+>> ptr = mmap(fd, ...);
+>> gpu_compute_something(ptr);
+>> 
+>> > 
+>> > Are you talking about file data contents that have been copied into
+>> > the page cache and mmapped into a user process address space?
+>> > IOWs, migrating ZONE_NORMAL page cache page content and state
+>> > to a new ZONE_DEVICE page, and then migrating back again somehow?
+>> 
+>> Take any existing application that mmap a file and allow to migrate
+>> chunk of that mmaped file to device memory without the application
+>> even knowing about it. So nothing special in respect to that mmaped
+>> file. It is a regular file on your filesystem.
+>
+> OK, so I share most of Dave's concerns about this. But let's talk about
+> what we can do and what you need and we may find something usable. First
+> let me understand what is doable / what are the costs on your side.
+>
+> So we have a page cache page that you'd like to migrate to the device.
+> Fine. You are willing to sacrifice direct IO - even better. We can fall
+> back to buffered IO in that case (well, except for XFS which does not do it
+> but that's a minor detail). One thing I'm not sure about: When a page is
+> migrated to the device, is its contents available and is just possibly stale
+> or will something bad happen if we try to access (or even modify) page data?
 
-diff --git a/block/Kconfig.iosched b/block/Kconfig.iosched
-index 421bef9c4c48..490ef2850fae 100644
---- a/block/Kconfig.iosched
-+++ b/block/Kconfig.iosched
-@@ -32,6 +32,12 @@ config IOSCHED_CFQ
- 
- 	  This is the default I/O scheduler.
- 
-+config MQ_IOSCHED_DEADLINE
-+	tristate "MQ deadline I/O scheduler"
-+	default y
-+	---help---
-+	  MQ version of the deadline IO scheduler.
-+
- config CFQ_GROUP_IOSCHED
- 	bool "CFQ Group Scheduling support"
- 	depends on IOSCHED_CFQ && BLK_CGROUP
-diff --git a/block/Makefile b/block/Makefile
-index 2eee9e1bb6db..3ee0abd7205a 100644
---- a/block/Makefile
-+++ b/block/Makefile
-@@ -18,6 +18,7 @@ obj-$(CONFIG_BLK_DEV_THROTTLING)	+= blk-throttle.o
- obj-$(CONFIG_IOSCHED_NOOP)	+= noop-iosched.o
- obj-$(CONFIG_IOSCHED_DEADLINE)	+= deadline-iosched.o
- obj-$(CONFIG_IOSCHED_CFQ)	+= cfq-iosched.o
-+obj-$(CONFIG_MQ_IOSCHED_DEADLINE)	+= mq-deadline.o
- 
- obj-$(CONFIG_BLOCK_COMPAT)	+= compat_ioctl.o
- obj-$(CONFIG_BLK_CMDLINE_PARSER)	+= cmdline-parser.o
-diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-new file mode 100644
-index 000000000000..3cb9de21ab21
---- /dev/null
-+++ b/block/mq-deadline.c
-@@ -0,0 +1,649 @@
-+/*
-+ *  MQ Deadline i/o scheduler - adaptation of the legacy deadline scheduler,
-+ *  for the blk-mq scheduling framework
-+ *
-+ *  Copyright (C) 2016 Jens Axboe <axboe@kernel.dk>
-+ */
-+#include <linux/kernel.h>
-+#include <linux/fs.h>
-+#include <linux/blkdev.h>
-+#include <linux/blk-mq.h>
-+#include <linux/elevator.h>
-+#include <linux/bio.h>
-+#include <linux/module.h>
-+#include <linux/slab.h>
-+#include <linux/init.h>
-+#include <linux/compiler.h>
-+#include <linux/rbtree.h>
-+#include <linux/sbitmap.h>
-+
-+#include "blk.h"
-+#include "blk-mq.h"
-+#include "blk-mq-tag.h"
-+#include "blk-mq-sched.h"
-+
-+static unsigned int queue_depth = 256;
-+module_param(queue_depth, uint, 0644);
-+MODULE_PARM_DESC(queue_depth, "Use this value as the scheduler queue depth");
-+
-+/*
-+ * See Documentation/block/deadline-iosched.txt
-+ */
-+static const int read_expire = HZ / 2;  /* max time before a read is submitted. */
-+static const int write_expire = 5 * HZ; /* ditto for writes, these limits are SOFT! */
-+static const int writes_starved = 2;    /* max times reads can starve a write */
-+static const int fifo_batch = 16;       /* # of sequential requests treated as one
-+				     by the above parameters. For throughput. */
-+
-+struct deadline_data {
-+	/*
-+	 * run time data
-+	 */
-+
-+	/*
-+	 * requests (deadline_rq s) are present on both sort_list and fifo_list
-+	 */
-+	struct rb_root sort_list[2];
-+	struct list_head fifo_list[2];
-+
-+	/*
-+	 * next in sort order. read, write or both are NULL
-+	 */
-+	struct request *next_rq[2];
-+	unsigned int batching;		/* number of sequential requests made */
-+	unsigned int starved;		/* times reads have starved writes */
-+
-+	/*
-+	 * settings that change how the i/o scheduler behaves
-+	 */
-+	int fifo_expire[2];
-+	int fifo_batch;
-+	int writes_starved;
-+	int front_merges;
-+
-+	spinlock_t lock;
-+	struct list_head dispatch;
-+	struct blk_mq_tags *tags;
-+	atomic_t wait_index;
-+};
-+
-+static inline struct rb_root *
-+deadline_rb_root(struct deadline_data *dd, struct request *rq)
-+{
-+	return &dd->sort_list[rq_data_dir(rq)];
-+}
-+
-+/*
-+ * get the request after `rq' in sector-sorted order
-+ */
-+static inline struct request *
-+deadline_latter_request(struct request *rq)
-+{
-+	struct rb_node *node = rb_next(&rq->rb_node);
-+
-+	if (node)
-+		return rb_entry_rq(node);
-+
-+	return NULL;
-+}
-+
-+static void
-+deadline_add_rq_rb(struct deadline_data *dd, struct request *rq)
-+{
-+	struct rb_root *root = deadline_rb_root(dd, rq);
-+
-+	elv_rb_add(root, rq);
-+}
-+
-+static inline void
-+deadline_del_rq_rb(struct deadline_data *dd, struct request *rq)
-+{
-+	const int data_dir = rq_data_dir(rq);
-+
-+	if (dd->next_rq[data_dir] == rq)
-+		dd->next_rq[data_dir] = deadline_latter_request(rq);
-+
-+	elv_rb_del(deadline_rb_root(dd, rq), rq);
-+}
-+
-+/*
-+ * remove rq from rbtree and fifo.
-+ */
-+static void deadline_remove_request(struct request_queue *q, struct request *rq)
-+{
-+	struct deadline_data *dd = q->elevator->elevator_data;
-+
-+	list_del_init(&rq->queuelist);
-+
-+	/*
-+	 * We might not be on the rbtree, if we are doing an insert merge
-+	 */
-+	if (!RB_EMPTY_NODE(&rq->rb_node))
-+		deadline_del_rq_rb(dd, rq);
-+
-+	elv_rqhash_del(q, rq);
-+	if (q->last_merge == rq)
-+		q->last_merge = NULL;
-+}
-+
-+static void dd_request_merged(struct request_queue *q, struct request *req,
-+			      int type)
-+{
-+	struct deadline_data *dd = q->elevator->elevator_data;
-+
-+	/*
-+	 * if the merge was a front merge, we need to reposition request
-+	 */
-+	if (type == ELEVATOR_FRONT_MERGE) {
-+		elv_rb_del(deadline_rb_root(dd, req), req);
-+		deadline_add_rq_rb(dd, req);
-+	}
-+}
-+
-+static void dd_merged_requests(struct request_queue *q, struct request *req,
-+			       struct request *next)
-+{
-+	/*
-+	 * if next expires before rq, assign its expire time to rq
-+	 * and move into next position (next will be deleted) in fifo
-+	 */
-+	if (!list_empty(&req->queuelist) && !list_empty(&next->queuelist)) {
-+		if (time_before((unsigned long)next->fifo_time,
-+				(unsigned long)req->fifo_time)) {
-+			list_move(&req->queuelist, &next->queuelist);
-+			req->fifo_time = next->fifo_time;
-+		}
-+	}
-+
-+	/*
-+	 * kill knowledge of next, this one is a goner
-+	 */
-+	deadline_remove_request(q, next);
-+}
-+
-+/*
-+ * move an entry to dispatch queue
-+ */
-+static void
-+deadline_move_request(struct deadline_data *dd, struct request *rq)
-+{
-+	const int data_dir = rq_data_dir(rq);
-+
-+	dd->next_rq[READ] = NULL;
-+	dd->next_rq[WRITE] = NULL;
-+	dd->next_rq[data_dir] = deadline_latter_request(rq);
-+
-+	/*
-+	 * take it off the sort and fifo list
-+	 */
-+	deadline_remove_request(rq->q, rq);
-+}
-+
-+/*
-+ * deadline_check_fifo returns 0 if there are no expired requests on the fifo,
-+ * 1 otherwise. Requires !list_empty(&dd->fifo_list[data_dir])
-+ */
-+static inline int deadline_check_fifo(struct deadline_data *dd, int ddir)
-+{
-+	struct request *rq = rq_entry_fifo(dd->fifo_list[ddir].next);
-+
-+	/*
-+	 * rq is expired!
-+	 */
-+	if (time_after_eq(jiffies, (unsigned long)rq->fifo_time))
-+		return 1;
-+
-+	return 0;
-+}
-+
-+/*
-+ * deadline_dispatch_requests selects the best request according to
-+ * read/write expire, fifo_batch, etc
-+ */
-+static struct request *__dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
-+{
-+	struct deadline_data *dd = hctx->queue->elevator->elevator_data;
-+	struct request *rq;
-+	bool reads, writes;
-+	int data_dir;
-+
-+	spin_lock(&dd->lock);
-+
-+	if (!list_empty(&dd->dispatch)) {
-+		rq = list_first_entry(&dd->dispatch, struct request, queuelist);
-+		list_del_init(&rq->queuelist);
-+		goto done;
-+	}
-+
-+	reads = !list_empty(&dd->fifo_list[READ]);
-+	writes = !list_empty(&dd->fifo_list[WRITE]);
-+
-+	/*
-+	 * batches are currently reads XOR writes
-+	 */
-+	if (dd->next_rq[WRITE])
-+		rq = dd->next_rq[WRITE];
-+	else
-+		rq = dd->next_rq[READ];
-+
-+	if (rq && dd->batching < dd->fifo_batch)
-+		/* we have a next request are still entitled to batch */
-+		goto dispatch_request;
-+
-+	/*
-+	 * at this point we are not running a batch. select the appropriate
-+	 * data direction (read / write)
-+	 */
-+
-+	if (reads) {
-+		BUG_ON(RB_EMPTY_ROOT(&dd->sort_list[READ]));
-+
-+		if (writes && (dd->starved++ >= dd->writes_starved))
-+			goto dispatch_writes;
-+
-+		data_dir = READ;
-+
-+		goto dispatch_find_request;
-+	}
-+
-+	/*
-+	 * there are either no reads or writes have been starved
-+	 */
-+
-+	if (writes) {
-+dispatch_writes:
-+		BUG_ON(RB_EMPTY_ROOT(&dd->sort_list[WRITE]));
-+
-+		dd->starved = 0;
-+
-+		data_dir = WRITE;
-+
-+		goto dispatch_find_request;
-+	}
-+
-+	spin_unlock(&dd->lock);
-+	return NULL;
-+
-+dispatch_find_request:
-+	/*
-+	 * we are not running a batch, find best request for selected data_dir
-+	 */
-+	if (deadline_check_fifo(dd, data_dir) || !dd->next_rq[data_dir]) {
-+		/*
-+		 * A deadline has expired, the last request was in the other
-+		 * direction, or we have run out of higher-sectored requests.
-+		 * Start again from the request with the earliest expiry time.
-+		 */
-+		rq = rq_entry_fifo(dd->fifo_list[data_dir].next);
-+	} else {
-+		/*
-+		 * The last req was the same dir and we have a next request in
-+		 * sort order. No expired requests so continue on from here.
-+		 */
-+		rq = dd->next_rq[data_dir];
-+	}
-+
-+	dd->batching = 0;
-+
-+dispatch_request:
-+	/*
-+	 * rq is the selected appropriate request.
-+	 */
-+	dd->batching++;
-+	deadline_move_request(dd, rq);
-+done:
-+	rq->rq_flags |= RQF_STARTED;
-+	spin_unlock(&dd->lock);
-+	return rq;
-+}
-+
-+static void dd_dispatch_requests(struct blk_mq_hw_ctx *hctx,
-+				 struct list_head *rq_list)
-+{
-+	blk_mq_sched_dispatch_shadow_requests(hctx, rq_list, __dd_dispatch_request);
-+}
-+
-+static void dd_exit_queue(struct elevator_queue *e)
-+{
-+	struct deadline_data *dd = e->elevator_data;
-+
-+	BUG_ON(!list_empty(&dd->fifo_list[READ]));
-+	BUG_ON(!list_empty(&dd->fifo_list[WRITE]));
-+
-+	blk_mq_sched_free_requests(dd->tags);
-+	kfree(dd);
-+}
-+
-+/*
-+ * initialize elevator private data (deadline_data).
-+ */
-+static int dd_init_queue(struct request_queue *q, struct elevator_type *e)
-+{
-+	struct deadline_data *dd;
-+	struct elevator_queue *eq;
-+
-+	eq = elevator_alloc(q, e);
-+	if (!eq)
-+		return -ENOMEM;
-+
-+	dd = kzalloc_node(sizeof(*dd), GFP_KERNEL, q->node);
-+	if (!dd) {
-+		kobject_put(&eq->kobj);
-+		return -ENOMEM;
-+	}
-+	eq->elevator_data = dd;
-+
-+	dd->tags = blk_mq_sched_alloc_requests(queue_depth, q->node);
-+	if (!dd->tags) {
-+		kfree(dd);
-+		kobject_put(&eq->kobj);
-+		return -ENOMEM;
-+	}
-+
-+	INIT_LIST_HEAD(&dd->fifo_list[READ]);
-+	INIT_LIST_HEAD(&dd->fifo_list[WRITE]);
-+	dd->sort_list[READ] = RB_ROOT;
-+	dd->sort_list[WRITE] = RB_ROOT;
-+	dd->fifo_expire[READ] = read_expire;
-+	dd->fifo_expire[WRITE] = write_expire;
-+	dd->writes_starved = writes_starved;
-+	dd->front_merges = 1;
-+	dd->fifo_batch = fifo_batch;
-+	spin_lock_init(&dd->lock);
-+	INIT_LIST_HEAD(&dd->dispatch);
-+	atomic_set(&dd->wait_index, 0);
-+
-+	q->elevator = eq;
-+	return 0;
-+}
-+
-+static int dd_request_merge(struct request_queue *q, struct request **rq,
-+			    struct bio *bio)
-+{
-+	struct deadline_data *dd = q->elevator->elevator_data;
-+	sector_t sector = bio_end_sector(bio);
-+	struct request *__rq;
-+
-+	if (!dd->front_merges)
-+		return ELEVATOR_NO_MERGE;
-+
-+	__rq = elv_rb_find(&dd->sort_list[bio_data_dir(bio)], sector);
-+	if (__rq) {
-+		BUG_ON(sector != blk_rq_pos(__rq));
-+
-+		if (elv_bio_merge_ok(__rq, bio)) {
-+			*rq = __rq;
-+			return ELEVATOR_FRONT_MERGE;
-+		}
-+	}
-+
-+	return ELEVATOR_NO_MERGE;
-+}
-+
-+static bool dd_bio_merge(struct blk_mq_hw_ctx *hctx, struct bio *bio)
-+{
-+	struct request_queue *q = hctx->queue;
-+	struct deadline_data *dd = q->elevator->elevator_data;
-+	int ret;
-+
-+	spin_lock(&dd->lock);
-+	ret = blk_mq_sched_try_merge(q, bio);
-+	spin_unlock(&dd->lock);
-+
-+	return ret;
-+}
-+
-+/*
-+ * add rq to rbtree and fifo
-+ */
-+static void dd_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
-+			      bool at_head)
-+{
-+	struct request_queue *q = hctx->queue;
-+	struct deadline_data *dd = q->elevator->elevator_data;
-+	const int data_dir = rq_data_dir(rq);
-+
-+	if (blk_mq_sched_try_insert_merge(q, rq))
-+		return;
-+
-+	blk_mq_sched_request_inserted(rq);
-+
-+	/*
-+	 * If we're trying to insert a real request, just send it directly
-+	 * to the hardware dispatch list. This only happens for a requeue,
-+	 * or FUA/FLUSH requests.
-+	 */
-+	if (!blk_mq_sched_rq_is_shadow(rq)) {
-+		spin_lock(&hctx->lock);
-+		list_add_tail(&rq->queuelist, &hctx->dispatch);
-+		spin_unlock(&hctx->lock);
-+		return;
-+	}
-+
-+	if (at_head || rq->cmd_type != REQ_TYPE_FS) {
-+		if (at_head)
-+			list_add(&rq->queuelist, &dd->dispatch);
-+		else
-+			list_add_tail(&rq->queuelist, &dd->dispatch);
-+	} else {
-+		deadline_add_rq_rb(dd, rq);
-+
-+		if (rq_mergeable(rq)) {
-+			elv_rqhash_add(q, rq);
-+			if (!q->last_merge)
-+				q->last_merge = rq;
-+		}
-+
-+		/*
-+		 * set expire time and add to fifo list
-+		 */
-+		rq->fifo_time = jiffies + dd->fifo_expire[data_dir];
-+		list_add_tail(&rq->queuelist, &dd->fifo_list[data_dir]);
-+	}
-+}
-+
-+static void dd_insert_requests(struct blk_mq_hw_ctx *hctx,
-+			       struct list_head *list, bool at_head)
-+{
-+	struct request_queue *q = hctx->queue;
-+	struct deadline_data *dd = q->elevator->elevator_data;
-+
-+	spin_lock(&dd->lock);
-+	while (!list_empty(list)) {
-+		struct request *rq;
-+
-+		rq = list_first_entry(list, struct request, queuelist);
-+		list_del_init(&rq->queuelist);
-+		dd_insert_request(hctx, rq, at_head);
-+	}
-+	spin_unlock(&dd->lock);
-+}
-+
-+static struct request *dd_get_request(struct request_queue *q, unsigned int op,
-+				      struct blk_mq_alloc_data *data)
-+{
-+	struct deadline_data *dd = q->elevator->elevator_data;
-+	struct request *rq;
-+
-+	/*
-+	 * The flush machinery intercepts before we insert the request. As
-+	 * a work-around, just hand it back a real request.
-+	 */
-+	if (unlikely(op & (REQ_PREFLUSH | REQ_FUA)))
-+		rq = __blk_mq_alloc_request(data, op);
-+	else {
-+		rq = blk_mq_sched_alloc_shadow_request(q, data, dd->tags, &dd->wait_index);
-+		if (rq)
-+			blk_mq_rq_ctx_init(q, data->ctx, rq, op);
-+	}
-+
-+	return rq;
-+}
-+
-+static bool dd_put_request(struct request *rq)
-+{
-+	/*
-+	 * If it's a real request, we just have to free it. For a shadow
-+	 * request, we should only free it if we haven't started it. A
-+	 * started request is mapped to a real one, and the real one will
-+	 * free it. We can get here with request merges, since we then
-+	 * free the request before we start/issue it.
-+	 */
-+	if (!blk_mq_sched_rq_is_shadow(rq))
-+		return false;
-+
-+	if (!(rq->rq_flags & RQF_STARTED)) {
-+		struct request_queue *q = rq->q;
-+		struct deadline_data *dd = q->elevator->elevator_data;
-+
-+		/*
-+		 * IO completion would normally do this, but if we merge
-+		 * and free before we issue the request, drop both the
-+		 * tag and queue ref
-+		 */
-+		blk_mq_sched_free_shadow_request(dd->tags, rq);
-+		blk_queue_exit(q);
-+	}
-+
-+	return true;
-+}
-+
-+static void dd_completed_request(struct blk_mq_hw_ctx *hctx, struct request *rq)
-+{
-+	struct request *sched_rq = rq->end_io_data;
-+
-+	/*
-+	 * sched_rq can be NULL, if we haven't setup the shadow yet
-+	 * because we failed getting one.
-+	 */
-+	if (sched_rq) {
-+		struct deadline_data *dd = hctx->queue->elevator->elevator_data;
-+
-+		blk_mq_sched_free_shadow_request(dd->tags, sched_rq);
-+		blk_mq_start_stopped_hw_queue(hctx, true);
-+	}
-+}
-+
-+static bool dd_has_work(struct blk_mq_hw_ctx *hctx)
-+{
-+	struct deadline_data *dd = hctx->queue->elevator->elevator_data;
-+
-+	return !list_empty_careful(&dd->dispatch) ||
-+		!list_empty_careful(&dd->fifo_list[0]) ||
-+		!list_empty_careful(&dd->fifo_list[1]);
-+}
-+
-+/*
-+ * sysfs parts below
-+ */
-+static ssize_t
-+deadline_var_show(int var, char *page)
-+{
-+	return sprintf(page, "%d\n", var);
-+}
-+
-+static ssize_t
-+deadline_var_store(int *var, const char *page, size_t count)
-+{
-+	char *p = (char *) page;
-+
-+	*var = simple_strtol(p, &p, 10);
-+	return count;
-+}
-+
-+#define SHOW_FUNCTION(__FUNC, __VAR, __CONV)				\
-+static ssize_t __FUNC(struct elevator_queue *e, char *page)		\
-+{									\
-+	struct deadline_data *dd = e->elevator_data;			\
-+	int __data = __VAR;						\
-+	if (__CONV)							\
-+		__data = jiffies_to_msecs(__data);			\
-+	return deadline_var_show(__data, (page));			\
-+}
-+SHOW_FUNCTION(deadline_read_expire_show, dd->fifo_expire[READ], 1);
-+SHOW_FUNCTION(deadline_write_expire_show, dd->fifo_expire[WRITE], 1);
-+SHOW_FUNCTION(deadline_writes_starved_show, dd->writes_starved, 0);
-+SHOW_FUNCTION(deadline_front_merges_show, dd->front_merges, 0);
-+SHOW_FUNCTION(deadline_fifo_batch_show, dd->fifo_batch, 0);
-+#undef SHOW_FUNCTION
-+
-+#define STORE_FUNCTION(__FUNC, __PTR, MIN, MAX, __CONV)			\
-+static ssize_t __FUNC(struct elevator_queue *e, const char *page, size_t count)	\
-+{									\
-+	struct deadline_data *dd = e->elevator_data;			\
-+	int __data;							\
-+	int ret = deadline_var_store(&__data, (page), count);		\
-+	if (__data < (MIN))						\
-+		__data = (MIN);						\
-+	else if (__data > (MAX))					\
-+		__data = (MAX);						\
-+	if (__CONV)							\
-+		*(__PTR) = msecs_to_jiffies(__data);			\
-+	else								\
-+		*(__PTR) = __data;					\
-+	return ret;							\
-+}
-+STORE_FUNCTION(deadline_read_expire_store, &dd->fifo_expire[READ], 0, INT_MAX, 1);
-+STORE_FUNCTION(deadline_write_expire_store, &dd->fifo_expire[WRITE], 0, INT_MAX, 1);
-+STORE_FUNCTION(deadline_writes_starved_store, &dd->writes_starved, INT_MIN, INT_MAX, 0);
-+STORE_FUNCTION(deadline_front_merges_store, &dd->front_merges, 0, 1, 0);
-+STORE_FUNCTION(deadline_fifo_batch_store, &dd->fifo_batch, 0, INT_MAX, 0);
-+#undef STORE_FUNCTION
-+
-+#define DD_ATTR(name) \
-+	__ATTR(name, S_IRUGO|S_IWUSR, deadline_##name##_show, \
-+				      deadline_##name##_store)
-+
-+static struct elv_fs_entry deadline_attrs[] = {
-+	DD_ATTR(read_expire),
-+	DD_ATTR(write_expire),
-+	DD_ATTR(writes_starved),
-+	DD_ATTR(front_merges),
-+	DD_ATTR(fifo_batch),
-+	__ATTR_NULL
-+};
-+
-+static struct elevator_type mq_deadline = {
-+	.ops.mq = {
-+		.get_request		= dd_get_request,
-+		.put_request		= dd_put_request,
-+		.insert_requests	= dd_insert_requests,
-+		.dispatch_requests	= dd_dispatch_requests,
-+		.completed_request	= dd_completed_request,
-+		.next_request		= elv_rb_latter_request,
-+		.former_request		= elv_rb_former_request,
-+		.bio_merge		= dd_bio_merge,
-+		.request_merge		= dd_request_merge,
-+		.requests_merged	= dd_merged_requests,
-+		.request_merged		= dd_request_merged,
-+		.has_work		= dd_has_work,
-+		.init_sched		= dd_init_queue,
-+		.exit_sched		= dd_exit_queue,
-+	},
-+
-+	.uses_mq	= true,
-+	.elevator_attrs = deadline_attrs,
-+	.elevator_name = "mq-deadline",
-+	.elevator_owner = THIS_MODULE,
-+};
-+
-+static int __init deadline_init(void)
-+{
-+	if (!queue_depth) {
-+		pr_err("mq-deadline: queue depth must be > 0\n");
-+		return -EINVAL;
-+	}
-+	return elv_register(&mq_deadline);
-+}
-+
-+static void __exit deadline_exit(void)
-+{
-+	elv_unregister(&mq_deadline);
-+}
-+
-+module_init(deadline_init);
-+module_exit(deadline_exit);
-+
-+MODULE_AUTHOR("Jens Axboe");
-+MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("MQ deadline IO scheduler");
--- 
-2.7.4
+For Coherent Device Memory case, the CPU can continue to access these
+device pages.
+
+
+>
+> And by migration you really mean page migration? Be aware that migration of
+> pagecache pages may be a problem for some pages of some filesystems on its
+> own - e. g. page migration may fail because there is a filesystem transaction
+> outstanding modifying that page. For userspace these will be really hard
+> to understand sporadic errors because it's really filesystem internal
+> thing. So far page migration was widely used only for free space
+> defragmentation and for that purpose if page is not migratable for a minute
+> who cares.
+
+On the device driver side, i guess we should be able to handle page
+migration failures and retry. For the reverse, i guess we need the
+guarantee that a CPU access can always migrate back these pages without
+failures ? Are there failure condition we need to handle when migrating
+pages back to system memory ?
+
+
+>
+> So won't it be easier to leave the pagecache page where it is and *copy* it
+> to the device? Can the device notify us *before* it is going to modify a
+> page, not just after it has modified it? Possibly if we just give it the
+> page read-only and it will have to ask CPU to get write permission? If yes,
+> then I belive this could work and even fs support should be doable.
+>
+
+For coherent device memory scenario, we can live with one copy and both
+cpu/device can access these pages. In CDM case the decision to migrate
+is driven by the frequency of access from the device.
+
+-aneesh
+
