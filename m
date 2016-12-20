@@ -1,187 +1,45 @@
-Return-Path: <prvs=1159fc908b=axboe@fb.com>
-From: Jens Axboe <axboe@fb.com>
-To: <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-CC: <paolo.valente@linaro.org>, <osandov@fb.com>, Jens Axboe <axboe@fb.com>
-Subject: [PATCH 8/8] blk-mq-sched: allow setting of default IO scheduler
-Date: Fri, 16 Dec 2016 17:12:16 -0700
-Message-ID: <1481933536-12844-9-git-send-email-axboe@fb.com>
-In-Reply-To: <1481933536-12844-1-git-send-email-axboe@fb.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:57345 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1753370AbcLTWOX (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 20 Dec 2016 17:14:23 -0500
+Subject: Re: [PATCH 3/8] block: move rq_ioc() to blk.h
+To: Paolo Valente <paolo.valente@linaro.org>
 References: <1481933536-12844-1-git-send-email-axboe@fb.com>
+ <1481933536-12844-4-git-send-email-axboe@fb.com>
+ <5A31E864-F10C-4CB4-B780-BB16524E3590@linaro.org>
+ <f9d3a21d-0ffc-4b54-6e27-48d8befab1b5@fb.com>
+CC: <linux-block@vger.kernel.org>,
+        Linux-Kernal <linux-kernel@vger.kernel.org>, <osandov@fb.com>
+From: Jens Axboe <axboe@fb.com>
+Message-ID: <2dc5af5b-1e0c-9b4b-5cc4-2bf8518a5e40@fb.com>
+Date: Tue, 20 Dec 2016 15:14:13 -0700
 MIME-Version: 1.0
-Content-Type: text/plain
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <f9d3a21d-0ffc-4b54-6e27-48d8befab1b5@fb.com>
+Content-Type: text/plain; charset="windows-1252"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Add Kconfig entries to manage what devices get assigned an MQ
-scheduler, and add a blk-mq flag for drivers to opt out of scheduling.
-The latter is useful for admin type queues that still allocate a blk-mq
-queue and tag set, but aren't use for normal IO.
+On 12/20/2016 08:46 AM, Jens Axboe wrote:
+> On 12/20/2016 03:12 AM, Paolo Valente wrote:
+>>
+>>> Il giorno 17 dic 2016, alle ore 01:12, Jens Axboe <axboe@fb.com> ha scritto:
+>>>
+>>> We want to use it outside of blk-core.c.
+>>>
+>>
+>> Hi Jens,
+>> no hooks equivalent to elevator_init_icq_fn and elevator_exit_icq_fn
+>> are invoked.  In particular, the second hook let bfq (as with cfq)
+>> know when it could finally exit the queue associated with the icq.
+>> I'm trying to figure out how to make it without these hooks/signals,
+>> but at no avail so far ...
+> 
+> Yep, those need to be added.
 
-Signed-off-by: Jens Axboe <axboe@fb.com>
----
- block/Kconfig.iosched   | 43 +++++++++++++++++++++++++++++++++++++------
- block/blk-mq-sched.c    | 19 +++++++++++++++++++
- block/blk-mq-sched.h    |  2 ++
- block/blk-mq.c          |  3 +++
- block/elevator.c        |  5 ++++-
- drivers/nvme/host/pci.c |  1 +
- include/linux/blk-mq.h  |  1 +
- 7 files changed, 67 insertions(+), 7 deletions(-)
+Done, pushed out.
 
-diff --git a/block/Kconfig.iosched b/block/Kconfig.iosched
-index 490ef2850fae..96216cf18560 100644
---- a/block/Kconfig.iosched
-+++ b/block/Kconfig.iosched
-@@ -32,12 +32,6 @@ config IOSCHED_CFQ
- 
- 	  This is the default I/O scheduler.
- 
--config MQ_IOSCHED_DEADLINE
--	tristate "MQ deadline I/O scheduler"
--	default y
--	---help---
--	  MQ version of the deadline IO scheduler.
--
- config CFQ_GROUP_IOSCHED
- 	bool "CFQ Group Scheduling support"
- 	depends on IOSCHED_CFQ && BLK_CGROUP
-@@ -69,6 +63,43 @@ config DEFAULT_IOSCHED
- 	default "cfq" if DEFAULT_CFQ
- 	default "noop" if DEFAULT_NOOP
- 
-+config MQ_IOSCHED_DEADLINE
-+	tristate "MQ deadline I/O scheduler"
-+	default y
-+	---help---
-+	  MQ version of the deadline IO scheduler.
-+
-+config MQ_IOSCHED_NONE
-+	bool
-+	default y
-+
-+choice
-+	prompt "Default MQ I/O scheduler"
-+	default MQ_IOSCHED_NONE
-+	help
-+	  Select the I/O scheduler which will be used by default for all
-+	  blk-mq managed block devices.
-+
-+	config DEFAULT_MQ_DEADLINE
-+		bool "MQ Deadline" if MQ_IOSCHED_DEADLINE=y
-+
-+	config DEFAULT_MQ_NONE
-+		bool "None"
-+
-+endchoice
-+
-+config DEFAULT_MQ_IOSCHED
-+	string
-+	default "mq-deadline" if DEFAULT_MQ_DEADLINE
-+	default "none" if DEFAULT_MQ_NONE
-+
-+config MQ_IOSCHED_ONLY_SQ
-+	bool "Enable blk-mq IO scheduler only for single queue devices"
-+	default y
-+	help
-+	  Say Y here, if you only want to enable IO scheduling on block
-+	  devices that have a single queue registered.
-+
- endmenu
- 
- endif
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index b7e1839d4785..1f06efcdaa2d 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -432,3 +432,22 @@ void blk_mq_sched_request_inserted(struct request *rq)
- 	trace_block_rq_insert(rq->q, rq);
- }
- EXPORT_SYMBOL_GPL(blk_mq_sched_request_inserted);
-+
-+int blk_mq_sched_init(struct request_queue *q)
-+{
-+	int ret;
-+
-+#if defined(CONFIG_DEFAULT_MQ_NONE)
-+	return 0;
-+#endif
-+#if defined(CONFIG_MQ_IOSCHED_ONLY_SQ)
-+	if (q->nr_hw_queues > 1)
-+		return 0;
-+#endif
-+
-+	mutex_lock(&q->sysfs_lock);
-+	ret = elevator_init(q, NULL);
-+	mutex_unlock(&q->sysfs_lock);
-+
-+	return ret;
-+}
-diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
-index 1d1a4e9ce6ca..826f3e6991e3 100644
---- a/block/blk-mq-sched.h
-+++ b/block/blk-mq-sched.h
-@@ -37,6 +37,8 @@ bool blk_mq_sched_try_insert_merge(struct request_queue *q, struct request *rq);
- 
- void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx);
- 
-+int blk_mq_sched_init(struct request_queue *q);
-+
- static inline bool
- blk_mq_sched_bio_merge(struct request_queue *q, struct bio *bio)
- {
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 032dca4a27bf..0d8ea45b8562 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2105,6 +2105,9 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
- 	INIT_LIST_HEAD(&q->requeue_list);
- 	spin_lock_init(&q->requeue_lock);
- 
-+	if (!(set->flags & BLK_MQ_F_NO_SCHED))
-+		blk_mq_sched_init(q);
-+
- 	if (q->nr_hw_queues > 1)
- 		blk_queue_make_request(q, blk_mq_make_request);
- 	else
-diff --git a/block/elevator.c b/block/elevator.c
-index e6b523360231..eb34c26f675f 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -219,7 +219,10 @@ int elevator_init(struct request_queue *q, char *name)
- 	}
- 
- 	if (!e) {
--		e = elevator_get(CONFIG_DEFAULT_IOSCHED, false);
-+		if (q->mq_ops)
-+			e = elevator_get(CONFIG_DEFAULT_MQ_IOSCHED, false);
-+		else
-+			e = elevator_get(CONFIG_DEFAULT_IOSCHED, false);
- 		if (!e) {
- 			printk(KERN_ERR
- 				"Default I/O scheduler not found. " \
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index d6e6bce93d0c..063410d9b3cc 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -1188,6 +1188,7 @@ static int nvme_alloc_admin_tags(struct nvme_dev *dev)
- 		dev->admin_tagset.timeout = ADMIN_TIMEOUT;
- 		dev->admin_tagset.numa_node = dev_to_node(dev->dev);
- 		dev->admin_tagset.cmd_size = nvme_cmd_size(dev);
-+		dev->admin_tagset.flags = BLK_MQ_F_NO_SCHED;
- 		dev->admin_tagset.driver_data = dev;
- 
- 		if (blk_mq_alloc_tag_set(&dev->admin_tagset))
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index e3159be841ff..9255ccb043f2 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -152,6 +152,7 @@ enum {
- 	BLK_MQ_F_SG_MERGE	= 1 << 2,
- 	BLK_MQ_F_DEFER_ISSUE	= 1 << 4,
- 	BLK_MQ_F_BLOCKING	= 1 << 5,
-+	BLK_MQ_F_NO_SCHED	= 1 << 6,
- 	BLK_MQ_F_ALLOC_POLICY_START_BIT = 8,
- 	BLK_MQ_F_ALLOC_POLICY_BITS = 1,
- 
 -- 
-2.7.4
+Jens Axboe
+
