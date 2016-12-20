@@ -1,45 +1,46 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <Bart.VanAssche@sandisk.com>
-To: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, "axboe@fb.com"
-	<axboe@fb.com>, "axboe@kernel.dk" <axboe@kernel.dk>
-CC: "osandov@fb.com" <osandov@fb.com>, "paolo.valente@linaro.org"
-	<paolo.valente@linaro.org>
-Subject: Re: [PATCH 7/8] mq-deadline: add blk-mq adaptation of the deadline
- IO scheduler
-Date: Wed, 21 Dec 2016 11:59:28 +0000
-Message-ID: <1482321550.2644.10.camel@sandisk.com>
+Return-Path: <prvs=1162d78414=axboe@fb.com>
+Subject: Re: [PATCH 7/8] mq-deadline: add blk-mq adaptation of the deadline IO
+ scheduler
+To: Paolo Valente <paolo.valente@linaro.org>
 References: <1481933536-12844-1-git-send-email-axboe@fb.com>
-	 <1481933536-12844-8-git-send-email-axboe@fb.com>
-In-Reply-To: <1481933536-12844-8-git-send-email-axboe@fb.com>
-Content-Type: text/plain; charset="utf-8"
+ <1481933536-12844-8-git-send-email-axboe@fb.com>
+ <99111D0B-F051-4D8F-94EF-E7962F47FFD9@linaro.org>
+CC: Jens Axboe <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
+        Linux-Kernal
+	<linux-kernel@vger.kernel.org>, <osandov@fb.com>
+From: Jens Axboe <axboe@fb.com>
+Message-ID: <ae644260-2290-021f-24dc-4379766a4603@fb.com>
+Date: Tue, 20 Dec 2016 08:46:19 -0700
 MIME-Version: 1.0
-Return-Path: Bart.VanAssche@sandisk.com
+In-Reply-To: <99111D0B-F051-4D8F-94EF-E7962F47FFD9@linaro.org>
+Content-Type: text/plain; charset="windows-1252"
 List-ID: <linux-block@vger.kernel.org>
 
-T24gMTIvMTcvMjAxNiAwMToxMiBBTSwgSmVucyBBeGJvZSB3cm90ZToNCj4gK3N0YXRpYyBib29s
-IGRkX3B1dF9yZXF1ZXN0KHN0cnVjdCByZXF1ZXN0ICpycSkNCj4gK3sNCj4gKwkvKg0KPiArCcKg
-KiBJZiBpdCdzIGEgcmVhbCByZXF1ZXN0LCB3ZSBqdXN0IGhhdmUgdG8NCmZyZWUgaXQuIEZvciBh
-IHNoYWRvdw0KPiArCcKgKiByZXF1ZXN0LCB3ZSBzaG91bGQgb25seSBmcmVlIGl0IGlmIHdlIGhh
-dmVuJ3Qgc3RhcnRlZCBpdC4gQQ0KPiArCcKgKiBzdGFydGVkIHJlcXVlc3QgaXMgbWFwcGVkIHRv
-IGEgcmVhbCBvbmUsIGFuZCB0aGUNCnJlYWwgb25lIHdpbGwNCj4gKwnCoCogZnJlZSBpdC4gV2Ug
-Y2FuIGdldCBoZXJlIHdpdGggcmVxdWVzdCBtZXJnZXMsIHNpbmNlIHdlIHRoZW4NCj4gKwnCoCog
-ZnJlZSB0aGUgcmVxdWVzdCBiZWZvcmUgd2Ugc3RhcnQvaXNzdWUgaXQuDQo+ICsJwqAqLw0KPiAr
-CQ0KaWYgKCFibGtfbXFfc2NoZWRfcnFfaXNfc2hhZG93KHJxKSkNCj4gKwkJcmV0dXJuIGZhbHNl
-Ow0KPiArDQo+ICsJaWYgKCEocnEtPnJxX2ZsYWdzICYgUlFGX1NUQVJURUQpKSB7DQo+ICsJCXN0
-cnVjdCByZXF1ZXN0X3F1ZXVlICpxDQo9IHJxLT5xOw0KPiArCQlzdHJ1Y3QgZGVhZGxpbmVfZGF0
-YSAqZGQgPSBxLT5lbGV2YXRvci0+ZWxldmF0b3JfZGF0YTsNCj4gKw0KPiArCQkvKg0KPiArCQnC
-oCogSU8gY29tcGxldGlvbiB3b3VsZCBub3JtYWxseSBkbw0KdGhpcywgYnV0IGlmIHdlIG1lcmdl
-DQo+ICsJCcKgKiBhbmQgZnJlZSBiZWZvcmUgd2UgaXNzdWUgdGhlIHJlcXVlc3QsIGRyb3AgYm90
-aCB0aGUNCj4gKwkJwqAqIHRhZyBhbmQgcXVldWUgcmVmDQo+ICsJCcKgKi8NCj4gKwkNCglibGtf
-bXFfc2NoZWRfZnJlZV9zaGFkb3dfcmVxdWVzdChkZC0+dGFncywgcnEpOw0KPiArCQlibGtfcXVl
-dWVfZXhpdChxKTsNCj4gKwl9DQo+ICsNCj4gKwlyZXR1cm4gdHJ1ZTsNCj4gK30NCg0KSGVsbG8g
-SmVucywNCg0KU2luY2UgdGhpcyBwYXRjaCBpcyB0aGUgZmlyc3QgcGF0Y2ggdGhhdCBpbnRyb2R1
-Y2VzIGEgY2FsbCB0byBibGtfcXVldWVfZXhpdCgpDQpmcm9tIGEgbW9kdWxlIG90aGVyIHRoYW4g
-dGhlIGJsb2NrIGxheWVyIGNvcmUsIHNob3VsZG4ndCB0aGlzIHBhdGNoIGV4cG9ydCB0aGUNCmJs
-a19xdWV1ZV9leGl0KCkgZnVuY3Rpb24/IEFuIGF0dGVtcHQgdG8gYnVpbGQgbXEtZGVhZGxpbmUg
-YXMgYSBtb2R1bGUgcmVzdWx0ZWQNCmluIHRoZSBmb2xsb3dpbmc6DQoNCkVSUk9SOiAiYmxrX3F1
-ZXVlX2V4aXQiIFtibG9jay9tcS1kZWFkbGluZS5rb10gdW5kZWZpbmVkIQ0KbWFrZVsxXTogKioq
-IFtzY3JpcHRzL01ha2VmaWxlLm1vZHBvc3Q6OTE6IF9fbW9kcG9zdF0gRXJyb3IgMQ0KbWFrZTog
-KioqIFtNYWtlZmlsZToxMTk4OiBtb2R1bGVzXSBFcnJvciAyDQpFeGVjdXRpb24gZmFpbGVkOiBt
-YWtlIGFsbA0KDQpCYXJ0Lg==
+On 12/20/2016 02:34 AM, Paolo Valente wrote:
+> 
+>> Il giorno 17 dic 2016, alle ore 01:12, Jens Axboe <axboe@fb.com> ha scritto:
+>>
+>> This is basically identical to deadline-iosched, except it registers
+>> as a MQ capable scheduler. This is still a single queue design.
+>>
+>> Signed-off-by: Jens Axboe <axboe@fb.com>
+>> ...
+>> +
+>> +static bool dd_has_work(struct blk_mq_hw_ctx *hctx)
+>> +{
+>> +	struct deadline_data *dd = hctx->queue->elevator->elevator_data;
+>> +
+>> +	return !list_empty_careful(&dd->dispatch) ||
+>> +		!list_empty_careful(&dd->fifo_list[0]) ||
+>> +		!list_empty_careful(&dd->fifo_list[1]);
+> 
+> Just a request for clarification: if I'm not mistaken,
+> list_empty_careful can be used safely only if the only possible other
+> concurrent access is a delete.  Or am I missing something?
+
+We can "solve" that with memory barriers. For now, it's safe to ignore
+on your end.
+
+
+-- 
+Jens Axboe
