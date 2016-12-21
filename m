@@ -1,85 +1,136 @@
-Return-Path: <linus.walleij@linaro.org>
-MIME-Version: 1.0
-In-Reply-To: <0fec238b-3c3c-6928-71ec-c3d4bcc6d267@codeaurora.org>
-References: <1482242508-26131-1-git-send-email-linus.walleij@linaro.org> <0fec238b-3c3c-6928-71ec-c3d4bcc6d267@codeaurora.org>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Tue, 27 Dec 2016 13:21:28 +0100
-Message-ID: <CACRpkdazLSk1i37ERs4YwuwXnmbmrnyAX1T5kRXjKcPSaAYd7Q@mail.gmail.com>
+Return-Path: <riteshh@codeaurora.org>
 Subject: Re: [PATCH v2] RFD: switch MMC/SD to use blk-mq multiqueueing
-To: Ritesh Harjani <riteshh@codeaurora.org>
-Cc: Ulf Hansson <ulf.hansson@linaro.org>, Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-	"linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>, linux-block@vger.kernel.org,
-	Chunyan Zhang <zhang.chunyan@linaro.org>, Baolin Wang <baolin.wang@linaro.org>,
-	Arnd Bergmann <arnd@arndb.de>, Paolo Valente <paolo.valente@linaro.org>
-Content-Type: text/plain; charset=UTF-8
+To: Linus Walleij <linus.walleij@linaro.org>,
+ Ulf Hansson <ulf.hansson@linaro.org>, Christoph Hellwig <hch@lst.de>,
+ Jens Axboe <axboe@kernel.dk>
+References: <1482242508-26131-1-git-send-email-linus.walleij@linaro.org>
+Cc: linux-mmc@vger.kernel.org, linux-block@vger.kernel.org,
+ Chunyan Zhang <zhang.chunyan@linaro.org>,
+ Baolin Wang <baolin.wang@linaro.org>, Arnd Bergmann <arnd@arndb.de>,
+ Paolo Valente <paolo.valente@linaro.org>
+From: Ritesh Harjani <riteshh@codeaurora.org>
+Message-ID: <0fec238b-3c3c-6928-71ec-c3d4bcc6d267@codeaurora.org>
+Date: Wed, 21 Dec 2016 22:52:01 +0530
+MIME-Version: 1.0
+In-Reply-To: <1482242508-26131-1-git-send-email-linus.walleij@linaro.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed, Dec 21, 2016 at 6:22 PM, Ritesh Harjani <riteshh@codeaurora.org> wrote:
+Hi,
 
-> I may have some silly queries here. Please bear with my little understanding
-> on blk-mq.
+I may have some silly queries here. Please bear with my little 
+understanding on blk-mq.
 
-It's OK we need to build consensus.
-
-> On 12/20/2016 7:31 PM, Linus Walleij wrote:
-
->> This hack switches the MMC/SD subsystem from using the legacy blk
->> layer to using blk-mq. It does this by registering one single
->> hardware queue, since MMC/SD has only one command pipe. I kill
+On 12/20/2016 7:31 PM, Linus Walleij wrote:
+> HACK ALERT: DO NOT MERGE THIS! IT IS A FYI PATCH FOR DISCUSSION
+> ONLY.
 >
-> Could you please confirm on this- does even the HW/SW CMDQ in emmc would use
-> only 1 hardware queue with (say ~31) as queue depth, of that HW queue? Is
-> this understanding correct?
+> This hack switches the MMC/SD subsystem from using the legacy blk
+> layer to using blk-mq. It does this by registering one single
+> hardware queue, since MMC/SD has only one command pipe. I kill
+Could you please confirm on this- does even the HW/SW CMDQ in emmc would 
+use only 1 hardware queue with (say ~31) as queue depth, of that HW 
+queue? Is this understanding correct?
 
-Yes as far as I can tell.
+Or will it be possible to have more than 1 HW Queue with lesser queue 
+depth per HW queue?
 
-But you may have to tell me, because I'm not an expert in CMDQ.
 
-Multiple queues are for when you can issue different request truly parallel
-without taking any previous and later request into account. CMDQ on
-MMC seems to require rollback etc if any of the issued requests after
-a certain request fail, and then it is essentially one queue, like a pipeline,
-and if one request fails all requests after that request needs to be backed
-out, correct?
+> off the worker thread altogether and let the MQ core logic fire
+> sleepable requests directly into the MMC core.
+>
+> We emulate the 2 elements deep pipeline by specifying queue depth
+> 2, which is an elaborate lie that makes the block layer issue
+> another request while a previous request is in transit. It't not
+> neat but it works.
+>
+> As the pipeline needs to be flushed by pushing in a NULL request
+> after the last block layer request I added a delayed work with a
+> timeout of zero. This will fire as soon as the block layer stops
+> pushing in requests: as long as there are new requests the MQ
+> block layer will just repeatedly cancel this pipeline flush work
+> and push new requests into the pipeline, but once the requests
+> stop coming the NULL request will be flushed into the pipeline.
+>
+> It's not pretty but it works... Look at the following performance
+> statistics:
+I understand that the block drivers are moving to blk-mq framework.
+But keeping that reason apart, do we also anticipate any theoretical 
+performance gains in moving mmc driver to blk-mq framework  - for both 
+in case of legacy emmc, and SW/HW CMDQ in emmc ? And by how much?
 
-> Or will it be possible to have more than 1 HW Queue with lesser queue depth
-> per HW queue?
+It would be even better to know if adding of scheduler to blk-mq will 
+make any difference in perf gains or not in this case?
 
-Depends on the above.
+Do we any rough estimate or study on that?
+This is only out of curiosity and for information purpose.
 
-Each queue must have its own error handling, and work isolated from
-the other queues to be considered a real hardware queue.
+Regards
+Ritesh
 
-If the requests have dependencies, like referring each other, or
-as pointed out, needing to be cancelled if there is an error on a totally
-different request, it is just a deep pipeline, single hardware queue.
-
-> I understand that the block drivers are moving to blk-mq framework.
-> But keeping that reason apart, do we also anticipate any theoretical
-> performance gains in moving mmc driver to blk-mq framework  - for both in
-> case of legacy emmc, and SW/HW CMDQ in emmc ? And by how much?
-
-On the contrary we expect a performance regression as mq has no
-scheduling. MQ is created for the usecase where you have multiple
-hardware queues and they are so hungry for work that you have a problem
-feeding them all. Needless to say, on eMMC/SD we don't have that problem
-right now atleast.
-
-> It would be even better to know if adding of scheduler to blk-mq will make
-> any difference in perf gains or not in this case?
-
-The tentative plan as I see it is to shunt in BFQ as the default scheduler
-for MQ in the single-hw-queue case. The old block layer schedulers getting
-deprecated in the process. But this is really up to the block layer developers.
-
-> Do we any rough estimate or study on that?
-> This is only out of curiosity and for information purpose.
-
-No it is a venture into the unknown to go where no man has gone before.
-
-I just have a good feeling about this and confidence that it will work out.
-
-So I am doing RFD patches like this one to see if I'm right.
-
-Yours,
-Linus Walleij
+>
+> BEFORE this patch:
+>
+> time dd if=/dev/mmcblk0 of=/dev/null bs=1M count=1024
+> 1024+0 records in
+> 1024+0 records out
+> 1073741824 bytes (1.0GB) copied, 45.145874 seconds, 22.7MB/s
+> real    0m 45.15s
+> user    0m 0.02s
+> sys     0m 7.51s
+>
+> mount /dev/mmcblk0p1 /mnt/
+> cd /mnt/
+> time find . > /dev/null
+> real    0m 3.70s
+> user    0m 0.29s
+> sys     0m 1.63s
+>
+> AFTER this patch:
+>
+> time dd if=/dev/mmcblk0 of=/dev/null bs=1M count=1024
+> 1024+0 records in
+> 1024+0 records out
+> 1073741824 bytes (1.0GB) copied, 45.285431 seconds, 22.6MB/s
+> real    0m 45.29s
+> user    0m 0.02s
+> sys     0m 6.58s
+>
+> mount /dev/mmcblk0p1 /mnt/
+> cd /mnt/
+> time find . > /dev/null
+> real    0m 4.37s
+> user    0m 0.27s
+> sys     0m 1.65s
+>
+> The results are consistent.
+>
+> As you can see, for a straight dd-like task, we get more or less the
+> same nice parallelism as for the old framework. I have confirmed
+> through debugprints that indeed this is because the two-stage pipeline
+> is full at all times.
+>
+> However, for spurious reads in the find command, we already see a big
+> performance regression.
+>
+> This is because there are many small operations requireing a flush of
+> the pipeline, which used to happen immediately with the old block
+> layer interface code that used to pull a few NULL requests off the
+> queue and feed them into the pipeline immediately after the last
+> request, but happens after the delayed work is executed in this
+> new framework. The delayed work is never quick enough to terminate
+> all these small operations even if we schedule it immediately after
+> the last request.
+>
+> AFAICT the only way forward to provide proper performance with MQ
+> for MMC/SD is to get the requests to complete out-of-sync, i.e. when
+> the driver calls back to MMC/SD core to notify that a request is
+> complete, it should not notify any main thread with a completion
+> as is done right now, but instead directly call blk_end_request_all()
+> and only schedule some extra communication with the card if necessary
+> for example to handle an error condition.
+>
+> This rework needs a bigger rewrite so we can get rid of the paradigm
+> of the block layer "driving" the requests throgh the pipeline.
+>
+> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
