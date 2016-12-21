@@ -1,38 +1,45 @@
-Return-Path: <prvs=1163f1b61b=axboe@fb.com>
-Subject: Re: [PATCH 7/8] mq-deadline: add blk-mq adaptation of the deadline IO
- scheduler
-To: Bart Van Assche <Bart.VanAssche@sandisk.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "axboe@kernel.dk" <axboe@kernel.dk>
-References: <1481933536-12844-1-git-send-email-axboe@fb.com>
- <1481933536-12844-8-git-send-email-axboe@fb.com>
- <1482321550.2644.10.camel@sandisk.com>
-CC: "osandov@fb.com" <osandov@fb.com>,
-        "paolo.valente@linaro.org"
+Return-Path: <Bart.VanAssche@sandisk.com>
+From: Bart Van Assche <Bart.VanAssche@sandisk.com>
+To: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, "axboe@fb.com"
+	<axboe@fb.com>, "axboe@kernel.dk" <axboe@kernel.dk>
+CC: "osandov@fb.com" <osandov@fb.com>, "paolo.valente@linaro.org"
 	<paolo.valente@linaro.org>
-From: Jens Axboe <axboe@fb.com>
-Message-ID: <705f3ab2-5829-1d30-20ea-dc167cca6582@fb.com>
-Date: Wed, 21 Dec 2016 07:22:37 -0700
-MIME-Version: 1.0
-In-Reply-To: <1482321550.2644.10.camel@sandisk.com>
+Subject: Re: [PATCH 7/8] mq-deadline: add blk-mq adaptation of the deadline
+ IO scheduler
+Date: Wed, 21 Dec 2016 11:59:28 +0000
+Message-ID: <1482321550.2644.10.camel@sandisk.com>
+References: <1481933536-12844-1-git-send-email-axboe@fb.com>
+	 <1481933536-12844-8-git-send-email-axboe@fb.com>
+In-Reply-To: <1481933536-12844-8-git-send-email-axboe@fb.com>
 Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Return-Path: Bart.VanAssche@sandisk.com
 List-ID: <linux-block@vger.kernel.org>
 
-On 12/21/2016 04:59 AM, Bart Van Assche wrote:
-> Since this patch is the first patch that introduces a call to
-> blk_queue_exit() from a module other than the block layer core,
-> shouldn't this patch export the blk_queue_exit() function? An attempt
-> to build mq-deadline as a module resulted in the following:
-> 
-> ERROR: "blk_queue_exit" [block/mq-deadline.ko] undefined!
-> make[1]: *** [scripts/Makefile.modpost:91: __modpost] Error 1
-> make: *** [Makefile:1198: modules] Error 2
-> Execution failed: make all
-
-Yes, it should. I'll make the export for now, I want to move that check
-and free/drop into the generic code so that the schedulers don't have to
-worry about it.
-
--- 
-Jens Axboe
+T24gMTIvMTcvMjAxNiAwMToxMiBBTSwgSmVucyBBeGJvZSB3cm90ZToNCj4gK3N0YXRpYyBib29s
+IGRkX3B1dF9yZXF1ZXN0KHN0cnVjdCByZXF1ZXN0ICpycSkNCj4gK3sNCj4gKwkvKg0KPiArCcKg
+KiBJZiBpdCdzIGEgcmVhbCByZXF1ZXN0LCB3ZSBqdXN0IGhhdmUgdG8NCmZyZWUgaXQuIEZvciBh
+IHNoYWRvdw0KPiArCcKgKiByZXF1ZXN0LCB3ZSBzaG91bGQgb25seSBmcmVlIGl0IGlmIHdlIGhh
+dmVuJ3Qgc3RhcnRlZCBpdC4gQQ0KPiArCcKgKiBzdGFydGVkIHJlcXVlc3QgaXMgbWFwcGVkIHRv
+IGEgcmVhbCBvbmUsIGFuZCB0aGUNCnJlYWwgb25lIHdpbGwNCj4gKwnCoCogZnJlZSBpdC4gV2Ug
+Y2FuIGdldCBoZXJlIHdpdGggcmVxdWVzdCBtZXJnZXMsIHNpbmNlIHdlIHRoZW4NCj4gKwnCoCog
+ZnJlZSB0aGUgcmVxdWVzdCBiZWZvcmUgd2Ugc3RhcnQvaXNzdWUgaXQuDQo+ICsJwqAqLw0KPiAr
+CQ0KaWYgKCFibGtfbXFfc2NoZWRfcnFfaXNfc2hhZG93KHJxKSkNCj4gKwkJcmV0dXJuIGZhbHNl
+Ow0KPiArDQo+ICsJaWYgKCEocnEtPnJxX2ZsYWdzICYgUlFGX1NUQVJURUQpKSB7DQo+ICsJCXN0
+cnVjdCByZXF1ZXN0X3F1ZXVlICpxDQo9IHJxLT5xOw0KPiArCQlzdHJ1Y3QgZGVhZGxpbmVfZGF0
+YSAqZGQgPSBxLT5lbGV2YXRvci0+ZWxldmF0b3JfZGF0YTsNCj4gKw0KPiArCQkvKg0KPiArCQnC
+oCogSU8gY29tcGxldGlvbiB3b3VsZCBub3JtYWxseSBkbw0KdGhpcywgYnV0IGlmIHdlIG1lcmdl
+DQo+ICsJCcKgKiBhbmQgZnJlZSBiZWZvcmUgd2UgaXNzdWUgdGhlIHJlcXVlc3QsIGRyb3AgYm90
+aCB0aGUNCj4gKwkJwqAqIHRhZyBhbmQgcXVldWUgcmVmDQo+ICsJCcKgKi8NCj4gKwkNCglibGtf
+bXFfc2NoZWRfZnJlZV9zaGFkb3dfcmVxdWVzdChkZC0+dGFncywgcnEpOw0KPiArCQlibGtfcXVl
+dWVfZXhpdChxKTsNCj4gKwl9DQo+ICsNCj4gKwlyZXR1cm4gdHJ1ZTsNCj4gK30NCg0KSGVsbG8g
+SmVucywNCg0KU2luY2UgdGhpcyBwYXRjaCBpcyB0aGUgZmlyc3QgcGF0Y2ggdGhhdCBpbnRyb2R1
+Y2VzIGEgY2FsbCB0byBibGtfcXVldWVfZXhpdCgpDQpmcm9tIGEgbW9kdWxlIG90aGVyIHRoYW4g
+dGhlIGJsb2NrIGxheWVyIGNvcmUsIHNob3VsZG4ndCB0aGlzIHBhdGNoIGV4cG9ydCB0aGUNCmJs
+a19xdWV1ZV9leGl0KCkgZnVuY3Rpb24/IEFuIGF0dGVtcHQgdG8gYnVpbGQgbXEtZGVhZGxpbmUg
+YXMgYSBtb2R1bGUgcmVzdWx0ZWQNCmluIHRoZSBmb2xsb3dpbmc6DQoNCkVSUk9SOiAiYmxrX3F1
+ZXVlX2V4aXQiIFtibG9jay9tcS1kZWFkbGluZS5rb10gdW5kZWZpbmVkIQ0KbWFrZVsxXTogKioq
+IFtzY3JpcHRzL01ha2VmaWxlLm1vZHBvc3Q6OTE6IF9fbW9kcG9zdF0gRXJyb3IgMQ0KbWFrZTog
+KioqIFtNYWtlZmlsZToxMTk4OiBtb2R1bGVzXSBFcnJvciAyDQpFeGVjdXRpb24gZmFpbGVkOiBt
+YWtlIGFsbA0KDQpCYXJ0Lg==
