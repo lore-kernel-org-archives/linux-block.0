@@ -1,144 +1,800 @@
-Return-Path: <dm-devel@lists.ewheeler.net>
-Date: Fri, 16 Dec 2016 14:29:46 -0800 (PST)
-From: Eric Wheeler <dm-devel@lists.ewheeler.net>
-To: dm-devel@redhat.com
-cc: Mikulas Patocka <mpatocka@redhat.com>, Alasdair Kergon <agk@redhat.com>,
-    Mike Snitzer <snitzer@redhat.com>, Shaohua Li <shli@kernel.org>,
-    Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-    linux-bcache@vger.kernel.org
-Subject: Re: [dm-devel] [PATCH] dm-crypt: fix lost ioprio when queuing crypto
- bios from task with ioprio
-In-Reply-To: <alpine.LRH.2.11.1612141049250.13402@mail.ewheeler.net>
-Message-ID: <alpine.LRH.2.11.1612161414280.9898@mail.ewheeler.net>
-References: <alpine.LRH.2.11.1612141049250.13402@mail.ewheeler.net>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Subject: Re: [PATCH 7/8] mq-deadline: add blk-mq adaptation of the deadline IO scheduler
+From: Paolo Valente <paolo.valente@linaro.org>
+In-Reply-To: <1481933536-12844-8-git-send-email-axboe@fb.com>
+Date: Thu, 22 Dec 2016 17:49:58 +0100
+Cc: Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org,
+ Linux-Kernal <linux-kernel@vger.kernel.org>,
+ osandov@fb.com
+Message-Id: <2B1CBA75-606E-48FA-A2FC-A435FBB3968E@linaro.org>
+References: <1481933536-12844-1-git-send-email-axboe@fb.com> <1481933536-12844-8-git-send-email-axboe@fb.com>
+To: Jens Axboe <axboe@fb.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed, 14 Dec 2016, Eric Wheeler wrote:
-> Since dm-crypt queues writes (and sometimes reads) to a different kernel
-> thread (workqueue), the bios will dispatch from tasks with different
-> io_context->ioprio settings than the submitting task, thus giving
-> incorrect ioprio hints to the io scheduler.
 
-The motivation of this patch is for ioprio-driven writebackup/bypass 
-hinting inside bcache when bcache is under dm-crypt which Jens is picking 
-up for 4.10:
-  https://lkml.org/lkml/2016/12/6/607
+> Il giorno 17 dic 2016, alle ore 01:12, Jens Axboe <axboe@fb.com> ha =
+scritto:
+>=20
+> This is basically identical to deadline-iosched, except it registers
+> as a MQ capable scheduler. This is still a single queue design.
+>=20
 
-Without assigning the ioprio before queuing to the en/decrypt queues, 
-bcache isn't notified of the priority---and presumably neither is the IO 
-scheduler.
+One last question (for today ...):in mq-deadline there are no
+"schedule dispatch" or "unplug work" functions.  In blk, CFQ and BFQ
+do these schedules/unplugs in a lot of cases.  What's the right
+replacement?  Just doing nothing?
 
-The ioprio aware schedulers like CFQ and BFQ also benefit with more 
-knowledge about the bio's when passing through dm-crypt.  It would be 
-great if this can be accepted for 4.10, too.
+Thanks,
+Paolo
 
---
-Eric Wheeler
-
-> 
-> By assigning the ioprio to the bio before queuing to a workqueue, the
-> original submitting task's io_context->ioprio setting can be retained
-> through the life of the bio.  We only set the bio's ioprio in dm-crypt
-> if not already set (by somewhere else, higher in the stack).
-> 
-> Signed-off-by: Eric Wheeler <dm-devel@linux.ewheeler.net>
-> Cc: Mikulas Patocka <mpatocka@redhat.com>
-> Cc: Alasdair Kergon <agk@redhat.com>
-> Cc: Mike Snitzer <snitzer@redhat.com>
-> Cc: Shaohua Li <shli@kernel.org>
-> Cc: Jens Axboe <axboe@kernel.dk>
-> Cc: stable@vger.kernel.org
+> Signed-off-by: Jens Axboe <axboe@fb.com>
 > ---
->  block/bio.c           |  1 +
->  drivers/md/dm-crypt.c | 11 +++++++++--
->  include/linux/bio.h   | 23 +++++++++++++++++++++++
->  3 files changed, 33 insertions(+), 2 deletions(-)
-> 
-> diff --git a/block/bio.c b/block/bio.c
-> index db85c57..1a529ff 100644
-> --- a/block/bio.c
-> +++ b/block/bio.c
-> @@ -584,6 +584,7 @@ void __bio_clone_fast(struct bio *bio, struct bio *bio_src)
->  	bio->bi_iter = bio_src->bi_iter;
->  	bio->bi_io_vec = bio_src->bi_io_vec;
->  
-> +	bio_set_prio(bio, bio_prio(bio_src));
->  	bio_clone_blkcg_association(bio, bio_src);
->  }
->  EXPORT_SYMBOL(__bio_clone_fast);
-> diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
-> index 9b99ee9..ea7e102 100644
-> --- a/drivers/md/dm-crypt.c
-> +++ b/drivers/md/dm-crypt.c
-> @@ -1133,6 +1133,7 @@ static void clone_init(struct dm_crypt_io *io, struct bio *clone)
->  	clone->bi_private = io;
->  	clone->bi_end_io  = crypt_endio;
->  	clone->bi_bdev    = cc->dev->bdev;
-> +	bio_set_prio(clone, bio_prio(io->base_bio));
->  	bio_set_op_attrs(clone, bio_op(io->base_bio), bio_flags(io->base_bio));
->  }
->  
-> @@ -2070,10 +2071,16 @@ static int crypt_map(struct dm_target *ti, struct bio *bio)
->  	io->ctx.req = (struct skcipher_request *)(io + 1);
->  
->  	if (bio_data_dir(io->base_bio) == READ) {
-> -		if (kcryptd_io_read(io, GFP_NOWAIT))
-> +		if (kcryptd_io_read(io, GFP_NOWAIT)) {
-> +			if (!ioprio_valid(bio_prio(io->base_bio)))
-> +				bio_set_task_prio(io->base_bio, current);
->  			kcryptd_queue_read(io);
-> -	} else
-> +		}
-> +	} else {
-> +		if (!ioprio_valid(bio_prio(io->base_bio)))
-> +			bio_set_task_prio(io->base_bio, current);
->  		kcryptd_queue_crypt(io);
-> +	}
->  
->  	return DM_MAPIO_SUBMITTED;
->  }
-> diff --git a/include/linux/bio.h b/include/linux/bio.h
-> index 97cb48f..0b4f8bb 100644
-> --- a/include/linux/bio.h
-> +++ b/include/linux/bio.h
-> @@ -62,6 +62,29 @@
->  #define bio_sectors(bio)	((bio)->bi_iter.bi_size >> 9)
->  #define bio_end_sector(bio)	((bio)->bi_iter.bi_sector + bio_sectors((bio)))
->  
-> +/* Set the bio's ioprio to that of the task's io_context->ioprio, if any.
-> + * Always returns io_context->ioprio (or 0 if none); bio can be NULL.
+> block/Kconfig.iosched |   6 +
+> block/Makefile        |   1 +
+> block/mq-deadline.c   | 649 =
+++++++++++++++++++++++++++++++++++++++++++++++++++
+> 3 files changed, 656 insertions(+)
+> create mode 100644 block/mq-deadline.c
+>=20
+> diff --git a/block/Kconfig.iosched b/block/Kconfig.iosched
+> index 421bef9c4c48..490ef2850fae 100644
+> --- a/block/Kconfig.iosched
+> +++ b/block/Kconfig.iosched
+> @@ -32,6 +32,12 @@ config IOSCHED_CFQ
+>=20
+> 	  This is the default I/O scheduler.
+>=20
+> +config MQ_IOSCHED_DEADLINE
+> +	tristate "MQ deadline I/O scheduler"
+> +	default y
+> +	---help---
+> +	  MQ version of the deadline IO scheduler.
+> +
+> config CFQ_GROUP_IOSCHED
+> 	bool "CFQ Group Scheduling support"
+> 	depends on IOSCHED_CFQ && BLK_CGROUP
+> diff --git a/block/Makefile b/block/Makefile
+> index 2eee9e1bb6db..3ee0abd7205a 100644
+> --- a/block/Makefile
+> +++ b/block/Makefile
+> @@ -18,6 +18,7 @@ obj-$(CONFIG_BLK_DEV_THROTTLING)	+=3D =
+blk-throttle.o
+> obj-$(CONFIG_IOSCHED_NOOP)	+=3D noop-iosched.o
+> obj-$(CONFIG_IOSCHED_DEADLINE)	+=3D deadline-iosched.o
+> obj-$(CONFIG_IOSCHED_CFQ)	+=3D cfq-iosched.o
+> +obj-$(CONFIG_MQ_IOSCHED_DEADLINE)	+=3D mq-deadline.o
+>=20
+> obj-$(CONFIG_BLOCK_COMPAT)	+=3D compat_ioctl.o
+> obj-$(CONFIG_BLK_CMDLINE_PARSER)	+=3D cmdline-parser.o
+> diff --git a/block/mq-deadline.c b/block/mq-deadline.c
+> new file mode 100644
+> index 000000000000..3cb9de21ab21
+> --- /dev/null
+> +++ b/block/mq-deadline.c
+> @@ -0,0 +1,649 @@
+> +/*
+> + *  MQ Deadline i/o scheduler - adaptation of the legacy deadline =
+scheduler,
+> + *  for the blk-mq scheduling framework
+> + *
+> + *  Copyright (C) 2016 Jens Axboe <axboe@kernel.dk>
 > + */
-> +static inline unsigned short bio_set_task_prio(
-> +	struct bio *bio, struct task_struct *task)
+> +#include <linux/kernel.h>
+> +#include <linux/fs.h>
+> +#include <linux/blkdev.h>
+> +#include <linux/blk-mq.h>
+> +#include <linux/elevator.h>
+> +#include <linux/bio.h>
+> +#include <linux/module.h>
+> +#include <linux/slab.h>
+> +#include <linux/init.h>
+> +#include <linux/compiler.h>
+> +#include <linux/rbtree.h>
+> +#include <linux/sbitmap.h>
+> +
+> +#include "blk.h"
+> +#include "blk-mq.h"
+> +#include "blk-mq-tag.h"
+> +#include "blk-mq-sched.h"
+> +
+> +static unsigned int queue_depth =3D 256;
+> +module_param(queue_depth, uint, 0644);
+> +MODULE_PARM_DESC(queue_depth, "Use this value as the scheduler queue =
+depth");
+> +
+> +/*
+> + * See Documentation/block/deadline-iosched.txt
+> + */
+> +static const int read_expire =3D HZ / 2;  /* max time before a read =
+is submitted. */
+> +static const int write_expire =3D 5 * HZ; /* ditto for writes, these =
+limits are SOFT! */
+> +static const int writes_starved =3D 2;    /* max times reads can =
+starve a write */
+> +static const int fifo_batch =3D 16;       /* # of sequential requests =
+treated as one
+> +				     by the above parameters. For =
+throughput. */
+> +
+> +struct deadline_data {
+> +	/*
+> +	 * run time data
+> +	 */
+> +
+> +	/*
+> +	 * requests (deadline_rq s) are present on both sort_list and =
+fifo_list
+> +	 */
+> +	struct rb_root sort_list[2];
+> +	struct list_head fifo_list[2];
+> +
+> +	/*
+> +	 * next in sort order. read, write or both are NULL
+> +	 */
+> +	struct request *next_rq[2];
+> +	unsigned int batching;		/* number of sequential requests =
+made */
+> +	unsigned int starved;		/* times reads have starved =
+writes */
+> +
+> +	/*
+> +	 * settings that change how the i/o scheduler behaves
+> +	 */
+> +	int fifo_expire[2];
+> +	int fifo_batch;
+> +	int writes_starved;
+> +	int front_merges;
+> +
+> +	spinlock_t lock;
+> +	struct list_head dispatch;
+> +	struct blk_mq_tags *tags;
+> +	atomic_t wait_index;
+> +};
+> +
+> +static inline struct rb_root *
+> +deadline_rb_root(struct deadline_data *dd, struct request *rq)
 > +{
-> +	struct io_context *ioc;
-> +	unsigned short ioprio = 0;
-> +
-> +	ioc = get_task_io_context(current, GFP_NOIO, NUMA_NO_NODE);
-> +	if (ioc) {
-> +		if (ioprio_valid(ioc->ioprio)) {
-> +			ioprio = ioc->ioprio;
-> +			put_io_context(ioc);
-> +		}
-> +
-> +		if (bio != NULL && ioprio_valid(ioprio))
-> +			bio_set_prio(bio, ioc->ioprio);
-> +	}
-> +
-> +	return ioprio;
+> +	return &dd->sort_list[rq_data_dir(rq)];
 > +}
 > +
->  /*
->   * Check whether this bio carries any data or not. A NULL bio is allowed.
->   */
-> -- 
-> 1.8.3.1
-> 
-> 
-> --
-> dm-devel mailing list
-> dm-devel@redhat.com
-> https://www.redhat.com/mailman/listinfo/dm-devel
-> 
+> +/*
+> + * get the request after `rq' in sector-sorted order
+> + */
+> +static inline struct request *
+> +deadline_latter_request(struct request *rq)
+> +{
+> +	struct rb_node *node =3D rb_next(&rq->rb_node);
+> +
+> +	if (node)
+> +		return rb_entry_rq(node);
+> +
+> +	return NULL;
+> +}
+> +
+> +static void
+> +deadline_add_rq_rb(struct deadline_data *dd, struct request *rq)
+> +{
+> +	struct rb_root *root =3D deadline_rb_root(dd, rq);
+> +
+> +	elv_rb_add(root, rq);
+> +}
+> +
+> +static inline void
+> +deadline_del_rq_rb(struct deadline_data *dd, struct request *rq)
+> +{
+> +	const int data_dir =3D rq_data_dir(rq);
+> +
+> +	if (dd->next_rq[data_dir] =3D=3D rq)
+> +		dd->next_rq[data_dir] =3D deadline_latter_request(rq);
+> +
+> +	elv_rb_del(deadline_rb_root(dd, rq), rq);
+> +}
+> +
+> +/*
+> + * remove rq from rbtree and fifo.
+> + */
+> +static void deadline_remove_request(struct request_queue *q, struct =
+request *rq)
+> +{
+> +	struct deadline_data *dd =3D q->elevator->elevator_data;
+> +
+> +	list_del_init(&rq->queuelist);
+> +
+> +	/*
+> +	 * We might not be on the rbtree, if we are doing an insert =
+merge
+> +	 */
+> +	if (!RB_EMPTY_NODE(&rq->rb_node))
+> +		deadline_del_rq_rb(dd, rq);
+> +
+> +	elv_rqhash_del(q, rq);
+> +	if (q->last_merge =3D=3D rq)
+> +		q->last_merge =3D NULL;
+> +}
+> +
+> +static void dd_request_merged(struct request_queue *q, struct request =
+*req,
+> +			      int type)
+> +{
+> +	struct deadline_data *dd =3D q->elevator->elevator_data;
+> +
+> +	/*
+> +	 * if the merge was a front merge, we need to reposition request
+> +	 */
+> +	if (type =3D=3D ELEVATOR_FRONT_MERGE) {
+> +		elv_rb_del(deadline_rb_root(dd, req), req);
+> +		deadline_add_rq_rb(dd, req);
+> +	}
+> +}
+> +
+> +static void dd_merged_requests(struct request_queue *q, struct =
+request *req,
+> +			       struct request *next)
+> +{
+> +	/*
+> +	 * if next expires before rq, assign its expire time to rq
+> +	 * and move into next position (next will be deleted) in fifo
+> +	 */
+> +	if (!list_empty(&req->queuelist) && =
+!list_empty(&next->queuelist)) {
+> +		if (time_before((unsigned long)next->fifo_time,
+> +				(unsigned long)req->fifo_time)) {
+> +			list_move(&req->queuelist, &next->queuelist);
+> +			req->fifo_time =3D next->fifo_time;
+> +		}
+> +	}
+> +
+> +	/*
+> +	 * kill knowledge of next, this one is a goner
+> +	 */
+> +	deadline_remove_request(q, next);
+> +}
+> +
+> +/*
+> + * move an entry to dispatch queue
+> + */
+> +static void
+> +deadline_move_request(struct deadline_data *dd, struct request *rq)
+> +{
+> +	const int data_dir =3D rq_data_dir(rq);
+> +
+> +	dd->next_rq[READ] =3D NULL;
+> +	dd->next_rq[WRITE] =3D NULL;
+> +	dd->next_rq[data_dir] =3D deadline_latter_request(rq);
+> +
+> +	/*
+> +	 * take it off the sort and fifo list
+> +	 */
+> +	deadline_remove_request(rq->q, rq);
+> +}
+> +
+> +/*
+> + * deadline_check_fifo returns 0 if there are no expired requests on =
+the fifo,
+> + * 1 otherwise. Requires !list_empty(&dd->fifo_list[data_dir])
+> + */
+> +static inline int deadline_check_fifo(struct deadline_data *dd, int =
+ddir)
+> +{
+> +	struct request *rq =3D rq_entry_fifo(dd->fifo_list[ddir].next);
+> +
+> +	/*
+> +	 * rq is expired!
+> +	 */
+> +	if (time_after_eq(jiffies, (unsigned long)rq->fifo_time))
+> +		return 1;
+> +
+> +	return 0;
+> +}
+> +
+> +/*
+> + * deadline_dispatch_requests selects the best request according to
+> + * read/write expire, fifo_batch, etc
+> + */
+> +static struct request *__dd_dispatch_request(struct blk_mq_hw_ctx =
+*hctx)
+> +{
+> +	struct deadline_data *dd =3D =
+hctx->queue->elevator->elevator_data;
+> +	struct request *rq;
+> +	bool reads, writes;
+> +	int data_dir;
+> +
+> +	spin_lock(&dd->lock);
+> +
+> +	if (!list_empty(&dd->dispatch)) {
+> +		rq =3D list_first_entry(&dd->dispatch, struct request, =
+queuelist);
+> +		list_del_init(&rq->queuelist);
+> +		goto done;
+> +	}
+> +
+> +	reads =3D !list_empty(&dd->fifo_list[READ]);
+> +	writes =3D !list_empty(&dd->fifo_list[WRITE]);
+> +
+> +	/*
+> +	 * batches are currently reads XOR writes
+> +	 */
+> +	if (dd->next_rq[WRITE])
+> +		rq =3D dd->next_rq[WRITE];
+> +	else
+> +		rq =3D dd->next_rq[READ];
+> +
+> +	if (rq && dd->batching < dd->fifo_batch)
+> +		/* we have a next request are still entitled to batch */
+> +		goto dispatch_request;
+> +
+> +	/*
+> +	 * at this point we are not running a batch. select the =
+appropriate
+> +	 * data direction (read / write)
+> +	 */
+> +
+> +	if (reads) {
+> +		BUG_ON(RB_EMPTY_ROOT(&dd->sort_list[READ]));
+> +
+> +		if (writes && (dd->starved++ >=3D dd->writes_starved))
+> +			goto dispatch_writes;
+> +
+> +		data_dir =3D READ;
+> +
+> +		goto dispatch_find_request;
+> +	}
+> +
+> +	/*
+> +	 * there are either no reads or writes have been starved
+> +	 */
+> +
+> +	if (writes) {
+> +dispatch_writes:
+> +		BUG_ON(RB_EMPTY_ROOT(&dd->sort_list[WRITE]));
+> +
+> +		dd->starved =3D 0;
+> +
+> +		data_dir =3D WRITE;
+> +
+> +		goto dispatch_find_request;
+> +	}
+> +
+> +	spin_unlock(&dd->lock);
+> +	return NULL;
+> +
+> +dispatch_find_request:
+> +	/*
+> +	 * we are not running a batch, find best request for selected =
+data_dir
+> +	 */
+> +	if (deadline_check_fifo(dd, data_dir) || !dd->next_rq[data_dir]) =
+{
+> +		/*
+> +		 * A deadline has expired, the last request was in the =
+other
+> +		 * direction, or we have run out of higher-sectored =
+requests.
+> +		 * Start again from the request with the earliest expiry =
+time.
+> +		 */
+> +		rq =3D rq_entry_fifo(dd->fifo_list[data_dir].next);
+> +	} else {
+> +		/*
+> +		 * The last req was the same dir and we have a next =
+request in
+> +		 * sort order. No expired requests so continue on from =
+here.
+> +		 */
+> +		rq =3D dd->next_rq[data_dir];
+> +	}
+> +
+> +	dd->batching =3D 0;
+> +
+> +dispatch_request:
+> +	/*
+> +	 * rq is the selected appropriate request.
+> +	 */
+> +	dd->batching++;
+> +	deadline_move_request(dd, rq);
+> +done:
+> +	rq->rq_flags |=3D RQF_STARTED;
+> +	spin_unlock(&dd->lock);
+> +	return rq;
+> +}
+> +
+> +static void dd_dispatch_requests(struct blk_mq_hw_ctx *hctx,
+> +				 struct list_head *rq_list)
+> +{
+> +	blk_mq_sched_dispatch_shadow_requests(hctx, rq_list, =
+__dd_dispatch_request);
+> +}
+> +
+> +static void dd_exit_queue(struct elevator_queue *e)
+> +{
+> +	struct deadline_data *dd =3D e->elevator_data;
+> +
+> +	BUG_ON(!list_empty(&dd->fifo_list[READ]));
+> +	BUG_ON(!list_empty(&dd->fifo_list[WRITE]));
+> +
+> +	blk_mq_sched_free_requests(dd->tags);
+> +	kfree(dd);
+> +}
+> +
+> +/*
+> + * initialize elevator private data (deadline_data).
+> + */
+> +static int dd_init_queue(struct request_queue *q, struct =
+elevator_type *e)
+> +{
+> +	struct deadline_data *dd;
+> +	struct elevator_queue *eq;
+> +
+> +	eq =3D elevator_alloc(q, e);
+> +	if (!eq)
+> +		return -ENOMEM;
+> +
+> +	dd =3D kzalloc_node(sizeof(*dd), GFP_KERNEL, q->node);
+> +	if (!dd) {
+> +		kobject_put(&eq->kobj);
+> +		return -ENOMEM;
+> +	}
+> +	eq->elevator_data =3D dd;
+> +
+> +	dd->tags =3D blk_mq_sched_alloc_requests(queue_depth, q->node);
+> +	if (!dd->tags) {
+> +		kfree(dd);
+> +		kobject_put(&eq->kobj);
+> +		return -ENOMEM;
+> +	}
+> +
+> +	INIT_LIST_HEAD(&dd->fifo_list[READ]);
+> +	INIT_LIST_HEAD(&dd->fifo_list[WRITE]);
+> +	dd->sort_list[READ] =3D RB_ROOT;
+> +	dd->sort_list[WRITE] =3D RB_ROOT;
+> +	dd->fifo_expire[READ] =3D read_expire;
+> +	dd->fifo_expire[WRITE] =3D write_expire;
+> +	dd->writes_starved =3D writes_starved;
+> +	dd->front_merges =3D 1;
+> +	dd->fifo_batch =3D fifo_batch;
+> +	spin_lock_init(&dd->lock);
+> +	INIT_LIST_HEAD(&dd->dispatch);
+> +	atomic_set(&dd->wait_index, 0);
+> +
+> +	q->elevator =3D eq;
+> +	return 0;
+> +}
+> +
+> +static int dd_request_merge(struct request_queue *q, struct request =
+**rq,
+> +			    struct bio *bio)
+> +{
+> +	struct deadline_data *dd =3D q->elevator->elevator_data;
+> +	sector_t sector =3D bio_end_sector(bio);
+> +	struct request *__rq;
+> +
+> +	if (!dd->front_merges)
+> +		return ELEVATOR_NO_MERGE;
+> +
+> +	__rq =3D elv_rb_find(&dd->sort_list[bio_data_dir(bio)], sector);
+> +	if (__rq) {
+> +		BUG_ON(sector !=3D blk_rq_pos(__rq));
+> +
+> +		if (elv_bio_merge_ok(__rq, bio)) {
+> +			*rq =3D __rq;
+> +			return ELEVATOR_FRONT_MERGE;
+> +		}
+> +	}
+> +
+> +	return ELEVATOR_NO_MERGE;
+> +}
+> +
+> +static bool dd_bio_merge(struct blk_mq_hw_ctx *hctx, struct bio *bio)
+> +{
+> +	struct request_queue *q =3D hctx->queue;
+> +	struct deadline_data *dd =3D q->elevator->elevator_data;
+> +	int ret;
+> +
+> +	spin_lock(&dd->lock);
+> +	ret =3D blk_mq_sched_try_merge(q, bio);
+> +	spin_unlock(&dd->lock);
+> +
+> +	return ret;
+> +}
+> +
+> +/*
+> + * add rq to rbtree and fifo
+> + */
+> +static void dd_insert_request(struct blk_mq_hw_ctx *hctx, struct =
+request *rq,
+> +			      bool at_head)
+> +{
+> +	struct request_queue *q =3D hctx->queue;
+> +	struct deadline_data *dd =3D q->elevator->elevator_data;
+> +	const int data_dir =3D rq_data_dir(rq);
+> +
+> +	if (blk_mq_sched_try_insert_merge(q, rq))
+> +		return;
+> +
+> +	blk_mq_sched_request_inserted(rq);
+> +
+> +	/*
+> +	 * If we're trying to insert a real request, just send it =
+directly
+> +	 * to the hardware dispatch list. This only happens for a =
+requeue,
+> +	 * or FUA/FLUSH requests.
+> +	 */
+> +	if (!blk_mq_sched_rq_is_shadow(rq)) {
+> +		spin_lock(&hctx->lock);
+> +		list_add_tail(&rq->queuelist, &hctx->dispatch);
+> +		spin_unlock(&hctx->lock);
+> +		return;
+> +	}
+> +
+> +	if (at_head || rq->cmd_type !=3D REQ_TYPE_FS) {
+> +		if (at_head)
+> +			list_add(&rq->queuelist, &dd->dispatch);
+> +		else
+> +			list_add_tail(&rq->queuelist, &dd->dispatch);
+> +	} else {
+> +		deadline_add_rq_rb(dd, rq);
+> +
+> +		if (rq_mergeable(rq)) {
+> +			elv_rqhash_add(q, rq);
+> +			if (!q->last_merge)
+> +				q->last_merge =3D rq;
+> +		}
+> +
+> +		/*
+> +		 * set expire time and add to fifo list
+> +		 */
+> +		rq->fifo_time =3D jiffies + dd->fifo_expire[data_dir];
+> +		list_add_tail(&rq->queuelist, &dd->fifo_list[data_dir]);
+> +	}
+> +}
+> +
+> +static void dd_insert_requests(struct blk_mq_hw_ctx *hctx,
+> +			       struct list_head *list, bool at_head)
+> +{
+> +	struct request_queue *q =3D hctx->queue;
+> +	struct deadline_data *dd =3D q->elevator->elevator_data;
+> +
+> +	spin_lock(&dd->lock);
+> +	while (!list_empty(list)) {
+> +		struct request *rq;
+> +
+> +		rq =3D list_first_entry(list, struct request, =
+queuelist);
+> +		list_del_init(&rq->queuelist);
+> +		dd_insert_request(hctx, rq, at_head);
+> +	}
+> +	spin_unlock(&dd->lock);
+> +}
+> +
+> +static struct request *dd_get_request(struct request_queue *q, =
+unsigned int op,
+> +				      struct blk_mq_alloc_data *data)
+> +{
+> +	struct deadline_data *dd =3D q->elevator->elevator_data;
+> +	struct request *rq;
+> +
+> +	/*
+> +	 * The flush machinery intercepts before we insert the request. =
+As
+> +	 * a work-around, just hand it back a real request.
+> +	 */
+> +	if (unlikely(op & (REQ_PREFLUSH | REQ_FUA)))
+> +		rq =3D __blk_mq_alloc_request(data, op);
+> +	else {
+> +		rq =3D blk_mq_sched_alloc_shadow_request(q, data, =
+dd->tags, &dd->wait_index);
+> +		if (rq)
+> +			blk_mq_rq_ctx_init(q, data->ctx, rq, op);
+> +	}
+> +
+> +	return rq;
+> +}
+> +
+> +static bool dd_put_request(struct request *rq)
+> +{
+> +	/*
+> +	 * If it's a real request, we just have to free it. For a shadow
+> +	 * request, we should only free it if we haven't started it. A
+> +	 * started request is mapped to a real one, and the real one =
+will
+> +	 * free it. We can get here with request merges, since we then
+> +	 * free the request before we start/issue it.
+> +	 */
+> +	if (!blk_mq_sched_rq_is_shadow(rq))
+> +		return false;
+> +
+> +	if (!(rq->rq_flags & RQF_STARTED)) {
+> +		struct request_queue *q =3D rq->q;
+> +		struct deadline_data *dd =3D q->elevator->elevator_data;
+> +
+> +		/*
+> +		 * IO completion would normally do this, but if we merge
+> +		 * and free before we issue the request, drop both the
+> +		 * tag and queue ref
+> +		 */
+> +		blk_mq_sched_free_shadow_request(dd->tags, rq);
+> +		blk_queue_exit(q);
+> +	}
+> +
+> +	return true;
+> +}
+> +
+> +static void dd_completed_request(struct blk_mq_hw_ctx *hctx, struct =
+request *rq)
+> +{
+> +	struct request *sched_rq =3D rq->end_io_data;
+> +
+> +	/*
+> +	 * sched_rq can be NULL, if we haven't setup the shadow yet
+> +	 * because we failed getting one.
+> +	 */
+> +	if (sched_rq) {
+> +		struct deadline_data *dd =3D =
+hctx->queue->elevator->elevator_data;
+> +
+> +		blk_mq_sched_free_shadow_request(dd->tags, sched_rq);
+> +		blk_mq_start_stopped_hw_queue(hctx, true);
+> +	}
+> +}
+> +
+> +static bool dd_has_work(struct blk_mq_hw_ctx *hctx)
+> +{
+> +	struct deadline_data *dd =3D =
+hctx->queue->elevator->elevator_data;
+> +
+> +	return !list_empty_careful(&dd->dispatch) ||
+> +		!list_empty_careful(&dd->fifo_list[0]) ||
+> +		!list_empty_careful(&dd->fifo_list[1]);
+> +}
+> +
+> +/*
+> + * sysfs parts below
+> + */
+> +static ssize_t
+> +deadline_var_show(int var, char *page)
+> +{
+> +	return sprintf(page, "%d\n", var);
+> +}
+> +
+> +static ssize_t
+> +deadline_var_store(int *var, const char *page, size_t count)
+> +{
+> +	char *p =3D (char *) page;
+> +
+> +	*var =3D simple_strtol(p, &p, 10);
+> +	return count;
+> +}
+> +
+> +#define SHOW_FUNCTION(__FUNC, __VAR, __CONV)				=
+\
+> +static ssize_t __FUNC(struct elevator_queue *e, char *page)		=
+\
+> +{									=
+\
+> +	struct deadline_data *dd =3D e->elevator_data;			=
+\
+> +	int __data =3D __VAR;						=
+\
+> +	if (__CONV)							=
+\
+> +		__data =3D jiffies_to_msecs(__data);			=
+\
+> +	return deadline_var_show(__data, (page));			=
+\
+> +}
+> +SHOW_FUNCTION(deadline_read_expire_show, dd->fifo_expire[READ], 1);
+> +SHOW_FUNCTION(deadline_write_expire_show, dd->fifo_expire[WRITE], 1);
+> +SHOW_FUNCTION(deadline_writes_starved_show, dd->writes_starved, 0);
+> +SHOW_FUNCTION(deadline_front_merges_show, dd->front_merges, 0);
+> +SHOW_FUNCTION(deadline_fifo_batch_show, dd->fifo_batch, 0);
+> +#undef SHOW_FUNCTION
+> +
+> +#define STORE_FUNCTION(__FUNC, __PTR, MIN, MAX, __CONV)			=
+\
+> +static ssize_t __FUNC(struct elevator_queue *e, const char *page, =
+size_t count)	\
+> +{									=
+\
+> +	struct deadline_data *dd =3D e->elevator_data;			=
+\
+> +	int __data;							=
+\
+> +	int ret =3D deadline_var_store(&__data, (page), count);		=
+\
+> +	if (__data < (MIN))						=
+\
+> +		__data =3D (MIN);						=
+\
+> +	else if (__data > (MAX))					=
+\
+> +		__data =3D (MAX);						=
+\
+> +	if (__CONV)							=
+\
+> +		*(__PTR) =3D msecs_to_jiffies(__data);			=
+\
+> +	else								=
+\
+> +		*(__PTR) =3D __data;					=
+\
+> +	return ret;							=
+\
+> +}
+> +STORE_FUNCTION(deadline_read_expire_store, &dd->fifo_expire[READ], 0, =
+INT_MAX, 1);
+> +STORE_FUNCTION(deadline_write_expire_store, &dd->fifo_expire[WRITE], =
+0, INT_MAX, 1);
+> +STORE_FUNCTION(deadline_writes_starved_store, &dd->writes_starved, =
+INT_MIN, INT_MAX, 0);
+> +STORE_FUNCTION(deadline_front_merges_store, &dd->front_merges, 0, 1, =
+0);
+> +STORE_FUNCTION(deadline_fifo_batch_store, &dd->fifo_batch, 0, =
+INT_MAX, 0);
+> +#undef STORE_FUNCTION
+> +
+> +#define DD_ATTR(name) \
+> +	__ATTR(name, S_IRUGO|S_IWUSR, deadline_##name##_show, \
+> +				      deadline_##name##_store)
+> +
+> +static struct elv_fs_entry deadline_attrs[] =3D {
+> +	DD_ATTR(read_expire),
+> +	DD_ATTR(write_expire),
+> +	DD_ATTR(writes_starved),
+> +	DD_ATTR(front_merges),
+> +	DD_ATTR(fifo_batch),
+> +	__ATTR_NULL
+> +};
+> +
+> +static struct elevator_type mq_deadline =3D {
+> +	.ops.mq =3D {
+> +		.get_request		=3D dd_get_request,
+> +		.put_request		=3D dd_put_request,
+> +		.insert_requests	=3D dd_insert_requests,
+> +		.dispatch_requests	=3D dd_dispatch_requests,
+> +		.completed_request	=3D dd_completed_request,
+> +		.next_request		=3D elv_rb_latter_request,
+> +		.former_request		=3D elv_rb_former_request,
+> +		.bio_merge		=3D dd_bio_merge,
+> +		.request_merge		=3D dd_request_merge,
+> +		.requests_merged	=3D dd_merged_requests,
+> +		.request_merged		=3D dd_request_merged,
+> +		.has_work		=3D dd_has_work,
+> +		.init_sched		=3D dd_init_queue,
+> +		.exit_sched		=3D dd_exit_queue,
+> +	},
+> +
+> +	.uses_mq	=3D true,
+> +	.elevator_attrs =3D deadline_attrs,
+> +	.elevator_name =3D "mq-deadline",
+> +	.elevator_owner =3D THIS_MODULE,
+> +};
+> +
+> +static int __init deadline_init(void)
+> +{
+> +	if (!queue_depth) {
+> +		pr_err("mq-deadline: queue depth must be > 0\n");
+> +		return -EINVAL;
+> +	}
+> +	return elv_register(&mq_deadline);
+> +}
+> +
+> +static void __exit deadline_exit(void)
+> +{
+> +	elv_unregister(&mq_deadline);
+> +}
+> +
+> +module_init(deadline_init);
+> +module_exit(deadline_exit);
+> +
+> +MODULE_AUTHOR("Jens Axboe");
+> +MODULE_LICENSE("GPL");
+> +MODULE_DESCRIPTION("MQ deadline IO scheduler");
+> --=20
+> 2.7.4
+>=20
