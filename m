@@ -1,47 +1,29 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f196.google.com ([209.85.192.196]:33915 "EHLO
-        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932797AbcL0QF7 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Dec 2016 11:05:59 -0500
-From: Ming Lei <tom.leiming@gmail.com>
-To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        Ming Lei <tom.leiming@gmail.com>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        dm-devel@redhat.com (maintainer:DEVICE-MAPPER (LVM)),
-        Shaohua Li <shli@kernel.org>,
-        linux-raid@vger.kernel.org (open list:SOFTWARE RAID (Multiple Disks)
-        SUPPORT)
-Subject: [PATCH v1 37/54] dm-crypt: convert to bio_for_each_segment_all_sp()
-Date: Wed, 28 Dec 2016 00:04:46 +0800
-Message-Id: <1482854706-14128-6-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1482854706-14128-1-git-send-email-tom.leiming@gmail.com>
-References: <1482854706-14128-1-git-send-email-tom.leiming@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Subject: Re: [PATCH] block: add back plugging in __blkdev_direct_IO
+To: Christoph Hellwig <hch@infradead.org>
+References: <1482430845-28938-1-git-send-email-hch@lst.de>
+ <b6c3764a-f43d-dc47-655f-3d38ea8276ff@fb.com>
+ <20161222182912.GA22997@infradead.org>
+Cc: Christoph Hellwig <hch@lst.de>, loberman@redhat.com,
+ linux-block@vger.kernel.org
+From: Jens Axboe <axboe@fb.com>
+Message-ID: <3dd795f7-dd94-a71b-e797-8f0a0a655e33@fb.com>
+Date: Thu, 22 Dec 2016 11:31:02 -0700
+MIME-Version: 1.0
+In-Reply-To: <20161222182912.GA22997@infradead.org>
+Content-Type: text/plain; charset=windows-1252
+List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
----
- drivers/md/dm-crypt.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+On 12/22/2016 11:29 AM, Christoph Hellwig wrote:
+> On Thu, Dec 22, 2016 at 11:22:25AM -0700, Jens Axboe wrote:
+>> On 12/22/2016 11:20 AM, Christoph Hellwig wrote:
+>>> This allows sending larger than 1 MB requess to devices that support
+>>> large I/O sizes.
+>>
+>> Thanks, I'll queue it up for this series.
+> 
+> btw, s/requess/request/ above as just pointed out off-list.
 
-diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
-index 593cdf88bf5f..c6932fb85418 100644
---- a/drivers/md/dm-crypt.c
-+++ b/drivers/md/dm-crypt.c
-@@ -1038,8 +1038,9 @@ static void crypt_free_buffer_pages(struct crypt_config *cc, struct bio *clone)
- {
- 	unsigned int i;
- 	struct bio_vec *bv;
-+	struct bvec_iter_all bia;
- 
--	bio_for_each_segment_all(bv, clone, i) {
-+	bio_for_each_segment_all_sp(bv, clone, i, bia) {
- 		BUG_ON(!bv->bv_page);
- 		mempool_free(bv->bv_page, cc->page_pool);
- 	}
+I fixed it up.
+
 -- 
-2.7.4
-
+Jens Axboe
