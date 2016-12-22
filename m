@@ -1,43 +1,38 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <Bart.VanAssche@sandisk.com>
-To: "osandov@osandov.com" <osandov@osandov.com>
-CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, "osandov@fb.com"
-	<osandov@fb.com>, "axboe@fb.com" <axboe@fb.com>, "axboe@kernel.dk"
-	<axboe@kernel.dk>, "paolo.valente@linaro.org" <paolo.valente@linaro.org>
+Return-Path: <osandov@osandov.com>
+Return-Path: <osandov@osandov.com>
+Date: Thu, 22 Dec 2016 09:12:24 -0800
+From: Omar Sandoval <osandov@osandov.com>
+To: Bart Van Assche <Bart.VanAssche@sandisk.com>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"osandov@fb.com" <osandov@fb.com>, "axboe@fb.com" <axboe@fb.com>,
+	"axboe@kernel.dk" <axboe@kernel.dk>,
+	"paolo.valente@linaro.org" <paolo.valente@linaro.org>
 Subject: Re: [PATCHSET v4] blk-mq-scheduling framework
-Date: Thu, 22 Dec 2016 17:39:56 +0000
-Message-ID: <1482428377.2682.13.camel@sandisk.com>
+Message-ID: <20161222171224.GA26830@vader>
 References: <1481933536-12844-1-git-send-email-axboe@fb.com>
-	 <1482423775.2682.6.camel@sandisk.com> <20161222165207.GA25717@vader>
-	 <1482425838.2682.9.camel@sandisk.com> <20161222171224.GA26830@vader>
-In-Reply-To: <20161222171224.GA26830@vader>
-Content-Type: text/plain; charset="utf-8"
+ <1482423775.2682.6.camel@sandisk.com>
+ <20161222165207.GA25717@vader>
+ <1482425838.2682.9.camel@sandisk.com>
 MIME-Version: 1.0
-Return-Path: Bart.VanAssche@sandisk.com
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1482425838.2682.9.camel@sandisk.com>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gVGh1LCAyMDE2LTEyLTIyIGF0IDA5OjEyIC0wODAwLCBPbWFyIFNhbmRvdmFsIHdyb3RlOg0K
-PiBPbiBUaHUsIERlYyAyMiwgMjAxNiBhdCAwNDo1NzozNlBNICswMDAwLCBCYXJ0IFZhbiBBc3Nj
-aGUgd3JvdGU6DQo+ID4gT24gVGh1LCAyMDE2LTEyLTIyIGF0IDA4OjUyIC0wODAwLCBPbWFyIFNh
-bmRvdmFsIHdyb3RlOg0KPiA+ID4gVGhpcyBhcHByb2FjaCBvY2N1cnJlZCB0byB1cywgYnV0IHdl
-IGNvdWxkbid0IGZpZ3VyZSBvdXQgYSB3YXkgdG8gbWFrZQ0KPiA+ID4gYmxrX21xX3RhZ190b19y
-cSgpIHdvcmsgd2l0aCBpdC4gRnJvbSBza2ltbWluZyBvdmVyIHRoZSBwYXRjaGVzLCBJDQo+ID4g
-PiBkaWRuJ3Qgc2VlIGEgc29sdXRpb24gdG8gdGhhdCBwcm9ibGVtLg0KPiA+IA0KPiA+IENhbiB5
-b3UgY2xhcmlmeSB5b3VyIGNvbW1lbnQ/IFNpbmNlIG15IHBhdGNoZXMgaW5pdGlhbGl6ZSBib3Ro
-IHRhZ3MtPnJxc1tdDQo+ID4gYW5kIHNjaGVkX3RhZ3MtPnJxc1tdIHRoZSBmdW5jdGlvbiBibGtf
-bXFfdGFnX3RvX3JxKCkgc2hvdWxkIHN0aWxsIHdvcmsuDQo+IA0KPiBTb3JyeSwgeW91J3JlIHJp
-Z2h0LCBpdCBkb2VzIHdvcmssIGJ1dCB0YWdzLT5ycXNbXSBlbmRzIHVwIGJlaW5nIHRoZQ0KPiBl
-eHRyYSBsb29rdXAgdGFibGUuIEkgc3VzcGVjdCB0aGF0IHRoZSBydW50aW1lIG92ZXJoZWFkIG9m
-IGtlZXBpbmcgdGhhdA0KPiB1cCB0byBkYXRlIGNvdWxkIGJlIHdvcnNlIHRoYW4gY29weWluZyB0
-aGUgcnEgZmllbGRzIGlmIHlvdSBoYXZlIGxvdHMgb2YNCj4gQ1BVcyBidXQgb25seSBvbmUgaGFy
-ZHdhcmUgcXVldWUuDQoNCkhlbGxvIE9tYXIsDQoNCkknbSBub3Qgc3VyZSB0aGF0IGFueXRoaW5n
-IGNhbiBiZSBkb25lIGlmIHRoZSBudW1iZXIgb2YgQ1BVcyB0aGF0IGlzIHN1Ym1pdHRpbmcNCkkv
-TyBpcyBsYXJnZSBjb21wYXJlZCB0byB0aGUgcXVldWUgZGVwdGggc28gSSBkb24ndCB0aGluayB3
-ZSBzaG91bGQgc3BlbmQgb3VyDQp0aW1lIG9uIHRoYXQgY2FzZS4gSWYgdGhlIHF1ZXVlIGRlcHRo
-IGlzIGxhcmdlIGVub3VnaCB0aGVuIHRoZSBzYml0bWFwIGNvZGUgd2lsbA0KYWxsb2NhdGUgdGFn
-cyBzdWNoIHRoYXQgZGlmZmVyZW50IENQVXMgdXNlIGRpZmZlcmVudCBycXNbXSBlbGVtZW50cy4N
-Cg0KVGhlIGFkdmFudGFnZXMgb2YgdGhlIGFwcHJvYWNoIEkgcHJvcG9zZWQgYXJlIHN1Y2ggdGhh
-dCBJIGFtIGNvbnZpbmNlZCB0aGF0IGlzDQp3aGF0IHdlIHNob3VsZCBzdGFydCBmcm9tIGFuZCBh
-ZGRyZXNzIGNvbnRlbnRpb24gb24gdGhlIHRhZ3MtPnJxc1tdIGFycmF5IGlmIGl0DQptZWFzdXJl
-bWVudHMgc2hvdyB0aGF0IGl0IGlzIG5lY2Vzc2FyeSB0byBhZGRyZXNzIGl0Lg0KDQpCYXJ0Lg==
+On Thu, Dec 22, 2016 at 04:57:36PM +0000, Bart Van Assche wrote:
+> On Thu, 2016-12-22 at 08:52 -0800, Omar Sandoval wrote:
+> > This approach occurred to us, but we couldn't figure out a way to make
+> > blk_mq_tag_to_rq() work with it. From skimming over the patches, I
+> > didn't see a solution to that problem.
+> 
+> Hello Omar,
+> 
+> Can you clarify your comment? Since my patches initialize both tags->rqs[]
+> and sched_tags->rqs[] the function blk_mq_tag_to_rq() should still work.
+> 
+> Bart.
+
+Sorry, you're right, it does work, but tags->rqs[] ends up being the
+extra lookup table. I suspect that the runtime overhead of keeping that
+up to date could be worse than copying the rq fields if you have lots of
+CPUs but only one hardware queue.
