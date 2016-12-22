@@ -1,68 +1,73 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Ming Lei <tom.leiming@gmail.com>
-To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        Ming Lei <tom.leiming@gmail.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        linux-fsdevel@vger.kernel.org (open list:FILESYSTEMS (VFS and
-        infrastructure))
-Subject: [PATCH v1 50/54] fs/buffer.c: use bvec iterator to truncate the bio
-Date: Wed, 28 Dec 2016 00:04:59 +0800
-Message-Id: <1482854706-14128-19-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1482854706-14128-1-git-send-email-tom.leiming@gmail.com>
-References: <1482854706-14128-1-git-send-email-tom.leiming@gmail.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:38535 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1757887AbcLVQPJ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 22 Dec 2016 11:15:09 -0500
+To: Linus Torvalds <torvalds@linux-foundation.org>
+CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@fb.com>
+Subject: [GIT PULL] Block fixes for 4.10-rc1
+Message-ID: <df33ee1e-2874-6594-1d65-feb9c914f72b@fb.com>
+Date: Thu, 22 Dec 2016 09:14:44 -0700
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-For making multipage bvec working well.
+Hi Linus,
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
----
- fs/buffer.c | 21 +++++++++++++--------
- 1 file changed, 13 insertions(+), 8 deletions(-)
+Just a set of small fixes that have either been queued up after the
+original pull for this merge window, or just missed the original pull
+request.
 
-diff --git a/fs/buffer.c b/fs/buffer.c
-index 63d2f40c21fd..014892593f57 100644
---- a/fs/buffer.c
-+++ b/fs/buffer.c
-@@ -3063,8 +3063,7 @@ void guard_bio_eod(int op, struct bio *bio)
- 	unsigned truncated_bytes;
- 	/*
- 	 * It is safe to truncate the last bvec in the following way
--	 * even though multipage bvec is supported, but we need to
--	 * fix the parameters passed to zero_user().
-+	 * even though multipage bvec is supported.
- 	 */
- 	struct bio_vec *bvec = &bio->bi_io_vec[bio->bi_vcnt - 1];
- 
-@@ -3087,15 +3086,21 @@ void guard_bio_eod(int op, struct bio *bio)
- 	/* Uhhuh. We've got a bio that straddles the device size! */
- 	truncated_bytes = bio->bi_iter.bi_size - (maxsector << 9);
- 
--	/* Truncate the bio.. */
--	bio->bi_iter.bi_size -= truncated_bytes;
--	bvec->bv_len -= truncated_bytes;
--
- 	/* ..and clear the end of the buffer for reads */
- 	if (op == REQ_OP_READ) {
--		zero_user(bvec->bv_page, bvec->bv_offset + bvec->bv_len,
--				truncated_bytes);
-+		struct bvec_iter start = BVEC_ITER_ALL_INIT;
-+		struct bvec_iter iter;
-+		struct bio_vec bv;
-+
-+		start.bi_bvec_done = bvec->bv_len - truncated_bytes;
-+
-+		__bvec_for_each_sp_bvec(bv, bvec, iter, start)
-+			zero_user(bv.bv_page, bv.bv_offset, bv.bv_len);
- 	}
-+
-+	/* Truncate the bio.. */
-+	bio->bi_iter.bi_size -= truncated_bytes;
-+	bvec->bv_len -= truncated_bytes;
- }
- 
- static int submit_bh_wbc(int op, int op_flags, struct buffer_head *bh,
+- A few bcache fixes/changes from Eric and Kent.
+
+- Adding WRITE_SAME to the command filter whitelist frm Mauricio.
+
+- Kill an unused struct member from Ritesh.
+
+- Partition IO alignment fix from Stefan.
+
+- nvme sysfs printf fix from Stephen.
+
+Please pull!
+
+
+  git://git.kernel.dk/linux-block.git for-linus
+
+
+----------------------------------------------------------------
+Eric Wheeler (1):
+      bcache: partition support: add 16 minors per bcacheN device
+
+Kent Overstreet (1):
+      bcache: Make gc wakeup sane, remove set_task_state()
+
+Mauricio Faria de Oliveira (1):
+      block: allow WRITE_SAME commands with the SG_IO ioctl
+
+Ritesh Harjani (1):
+      block: Remove unused member (busy) from struct blk_queue_tag
+
+Stefan Haberland (1):
+      block: check partition alignment
+
+Stephen Bates (1):
+      nvme : Use correct scnprintf in cmb show
+
+ block/ioctl.c               |  3 +++
+ block/scsi_ioctl.c          |  3 +++
+ drivers/md/bcache/bcache.h  |  4 ++--
+ drivers/md/bcache/btree.c   | 39 ++++++++++++++++++++-------------------
+ drivers/md/bcache/btree.h   |  3 +--
+ drivers/md/bcache/request.c |  4 +---
+ drivers/md/bcache/super.c   |  7 ++++++-
+ drivers/nvme/host/pci.c     |  4 ++--
+ include/linux/blkdev.h      |  1 -
+ 9 files changed, 38 insertions(+), 30 deletions(-)
+
 -- 
-2.7.4
+Jens Axboe
 
