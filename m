@@ -1,74 +1,102 @@
-Return-Path: <mawilcox@microsoft.com>
-From: Matthew Wilcox <mawilcox@microsoft.com>
-To: Rasmus Villemoes <linux@rasmusvillemoes.dk>
-CC: Tejun Heo <tj@kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, Lai Jiangshan <jiangshanlai@gmail.com>, "Jens
- Axboe" <axboe@kernel.dk>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>, "Andrew
- Morton" <akpm@linux-foundation.org>
-Subject: RE: [RFC 00/10] implement alternative and much simpler id allocator
-Date: Fri, 23 Dec 2016 17:03:51 +0000
-Message-ID: <BY2PR21MB003659BCA2EC02603245CD2ACB950@BY2PR21MB0036.namprd21.prod.outlook.com>
+Return-Path: <linux@rasmusvillemoes.dk>
+Return-Path: <linux@rasmusvillemoes.dk>
+From: Rasmus Villemoes <linux@rasmusvillemoes.dk>
+To: Matthew Wilcox <mawilcox@microsoft.com>
+Cc: Tejun Heo <tj@kernel.org>,  "linux-kernel\@vger.kernel.org" <linux-kernel@vger.kernel.org>,  Lai Jiangshan <jiangshanlai@gmail.com>,  "Jens Axboe" <axboe@kernel.dk>,  Greg Kroah-Hartman <gregkh@linuxfoundation.org>,  "linux-block\@vger.kernel.org" <linux-block@vger.kernel.org>,  "dri-devel\@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,  "Andrew Morton" <akpm@linux-foundation.org>
+Subject: Re: [RFC 00/10] implement alternative and much simpler id allocator
 References: <1481160187-9652-1-git-send-email-linux@rasmusvillemoes.dk>
 	<20161209140140.5e0a68e2e1cf9861335bdf3b@linux-foundation.org>
 	<BY2PR21MB00364EEDE35645341BEC695CCB9C0@BY2PR21MB0036.namprd21.prod.outlook.com>
 	<87inqj8vjo.fsf@rasmusvillemoes.dk>
 	<BY2PR21MB003683A1186A143D4B4D1244CB9F0@BY2PR21MB0036.namprd21.prod.outlook.com>
- <87pokjjznr.fsf@rasmusvillemoes.dk>
-In-Reply-To: <87pokjjznr.fsf@rasmusvillemoes.dk>
-Content-Type: text/plain; charset="utf-8"
+Date: Fri, 23 Dec 2016 00:46:00 +0100
+In-Reply-To: <BY2PR21MB003683A1186A143D4B4D1244CB9F0@BY2PR21MB0036.namprd21.prod.outlook.com>
+	(Matthew Wilcox's message of "Sat, 17 Dec 2016 13:28:50 +0000")
+Message-ID: <87pokjjznr.fsf@rasmusvillemoes.dk>
 MIME-Version: 1.0
+Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-RnJvbTogUmFzbXVzIFZpbGxlbW9lcyBbbWFpbHRvOmxpbnV4QHJhc211c3ZpbGxlbW9lcy5ka10N
-Cj4gTmljZSB3b3JrISBBIGZldyByYW5kb20gY29tbWVudHMvcXVlc3Rpb25zOg0KPiANCj4gLSBJ
-dCBkb2VzIGFkZCBzb21lIGNvbXBsZXhpdHksIGJ1dCBJIHRoaW5rIGEgZmV3IGNvbW1lbnRzIHdv
-dWxkIG1ha2UgaXQNCj4gICBtb3JlIGRpZ2VzdGFibGUuDQoNCkknbSBvcGVuIHRvIGFkZGluZyBz
-b21lIGNvbW1lbnRzIC4uLiBJIG5lZWQgc29tZSB0aW1lIGJldHdlZW4gd3JpdGluZyB0aGUgY29k
-ZSBhbmQgd3JpdGluZyB0aGUgY29tbWVudHMgdG8gYmUgc3VyZSB3aGF0IGNvbW1lbnRzIGFyZSB1
-c2VmdWwuDQoNCj4gLSBIbSwgbWF5YmUgSSdtIGNvbmZ1c2VkLCBhbmQgSSBjZXJ0YWlubHkgZG9u
-J3QgdW5kZXJzdGFuZCBob3cgdGhlIHdob2xlDQo+ICAgcmFkaXggdHJlZSB3b3Jrcy4gQnV0IGRv
-IHlvdSB1c2UgZXZlcnkgbGVhZiBub2RlIGFzIGFuIGV4Y2VwdGlvbmFsDQo+ICAgZW50cnkgaW5p
-dGlhbGx5LCB0byBhbGxvY2F0ZSB0aGUgZmlyc3QgNjIgaWRzIGZyb20gdGhhdCBsZXZlbD8gVGhp
-cw0KPiAgIGNvZGUNCg0KSSBkbyEgIEFuZCB0aGF0IHF1ZXN0aW9uIHRlbGxzIG1lIG9uZSB1c2Vm
-dWwgY29tbWVudCB0byBhZGQhDQoNCj4gCWlmICgoYml0ICsgUkFESVhfVFJFRV9FWENFUFRJT05B
-TF9TSElGVCkgPA0KPiAJCQkJCUJJVFNfUEVSX0xPTkcpIHsNCj4gCQliaXQgKz0gUkFESVhfVFJF
-RV9FWENFUFRJT05BTF9TSElGVDsNCj4gCQlyYWRpeF90cmVlX2l0ZXJfcmVwbGFjZShyb290LCAm
-aXRlciwgc2xvdCwNCj4gCQkJCSh2b2lkICopKCgxVUwgPDwgYml0KSB8DQo+IAkJCQlSQURJWF9U
-UkVFX0VYQ0VQVElPTkFMX0VOVFJZKSk7DQo+IAkJKmlkID0gbmV3Ow0KPiAJCXJldHVybiAwOw0K
-PiAJfQ0KPiANCj4gICAgb3BlcmF0ZXMgb24gYml0LCB3aGljaCBpcyB0aGUgb2Zmc2V0IGZyb20g
-aW5kZXgqSURBX0JJVE1BUF9CSVRTLCBhbmQNCj4gICAgaXQgc2VlbXMgdG8gY3JlYXRlIGFuIGV4
-Y2VwdGlvbmFsIGVudHJ5IHNvbWV3aGVyZSBkb3duIHRoZSB0cmVlDQo+ICAgICh3aGljaCBtYXkg
-b2YgY291cnNlIGJlIHRoZSByb290KS4NCj4gDQo+ICAgIEJ1dCB3ZSBkb24ndCBzZWVtIHRvIGFs
-bG9jYXRlIGFub3RoZXIgYml0IGZyb20gdGhhdCBleGNlcHRpb25hbCBlbnRyeQ0KPiAgICBldmVy
-IHVubGVzcyBpdCBoYXBwZW5lZCB0byBzaXQgYXQgaW5kZXggMDsgdGhlIGNvZGUNCj4gDQo+IAl1
-bnNpZ25lZCBsb25nIHRtcCA9ICh1bnNpZ25lZCBsb25nKWJpdG1hcDsNCj4gCWlmIChzdGFydCA8
-IEJJVFNfUEVSX0xPTkcpIHsNCj4gCQl1bnNpZ25lZCB0Yml0ID0gZmluZF9uZXh0X3plcm9fYml0
-KCZ0bXAsDQo+IAkJCQkJQklUU19QRVJfTE9ORywgc3RhcnQpOw0KPiAJCWlmICh0Yml0IDwgQklU
-U19QRVJfTE9ORykgew0KPiAJCQl0bXAgfD0gMVVMIDw8IHRiaXQ7DQo+IAkJCXJjdV9hc3NpZ25f
-cG9pbnRlcigqc2xvdCwgKHZvaWQgKil0bXApOw0KPiAJCQkqaWQgPSBuZXcgKyB0Yml0IC0NCj4g
-CQkJCVJBRElYX1RSRUVfRVhDRVBUSU9OQUxfU0hJRlQ7DQo+IAkJCXJldHVybiAwOw0KPiAJCX0N
-Cj4gCX0NCj4gDQo+ICAgIGlzIG9ubHkgdXNlZCBmb3Igc21hbGwgdmFsdWVzIG9mIHN0YXJ0ICh0
-aG91Z2ggaXQgZG9lcyBzZWVtIHRvDQo+ICAgIGFjY291bnQgZm9yIGEgbm9uLXplcm8gdmFsdWUg
-b2YgbmV3ID09IGl0ZXIuaW5kZXggKiBJREFfQklUTUFQX0JJVFMpLg0KDQpBaGguICBZb3UncmUg
-cmVhZGluZyB0aGUgY29kZSB3cm9uZywgYW5kIEkgd3JvdGUgdGhlIGNvZGUgd3JvbmdseSB0b28s
-IHNvIGl0J3MgY2xlYXJseSBvdmVybHkgY29tcGxleC4gIEkgd2FzIHRlc3Rpbmcgd2l0aCAnc3Rh
-cnQnIHNldCB0byAwLCBhbGxvY2F0aW5nIE4gZW50cmllcywgYW5kIHRoZW4gZnJlZWluZyB0aGVt
-LiAgSWYgSSdkIHNldCBzdGFydCB0byAxMDI0IGFuZCBhbGxvY2F0ZWQgdHdvIGVudHJpZXMsIEkn
-ZCd2ZSBzZWVuIHRoZSBmYWlsdXJlLg0KDQpQbGVhc2Ugc2VlIHRoZSB0b3AgY29tbWl0IGhlcmUg
-KCJJbXByb3ZlIElEQSBleGNlcHRpb25hbCBlbnRyeSBoYW5kbGluZyIpOiBodHRwOi8vZ2l0Lmlu
-ZnJhZGVhZC5vcmcvdXNlcnMvd2lsbHkvbGludXgtZGF4LmdpdC9zaG9ydGxvZy9yZWZzL2hlYWRz
-L2lkci0yMDE2LTEyLTIwDQoNCg0KPiAtIEluIHRoZSBtaWNyby1vcHRpbWl6YXRpb24gZGVwYXJ0
-bWVudCwgSSB0aGluayB3ZSBzaG91bGQgYXZvaWQNCj4gICBmaW5kX25leHRfemVyb19iaXQgb24g
-YSBzaW5nbGUgd29yZCwgYW5kIGluc3RlYWQgdXNlIF9fZmZzLiBTb21ldGhpbmcNCj4gICBsaWtl
-IChhc3N1bWluZyB3ZSBjYW4gdXNlIGJpdCBpbnN0ZWFkIG9mIHN0YXJ0KQ0KPiANCj4gICBpZiAo
-Yml0ICsgUkFESVhfVFJFRV9FWENFUFRJT05BTF9TSElGVCA8IEJJVFNfUEVSX0xPTkcpIHsNCj4g
-ICAgIHRtcCA9ICh+KHVuc2lnbmVkIGxvbmcpYml0bWFwKSA+PiAoYml0ICsgUkFESVhfVFJFRV9F
-WENFUFRJT05BTF9TSElGVCk7DQo+ICAgICBpZiAodG1wKSB7DQo+ICAgICAgIHRiaXQgPSBfX2Zm
-cyh0bXApICsgYml0ICsgUkFESVhfVFJFRV9FWENFUFRJT05BTF9TSElGVDsNCj4gICAgICAgdG1w
-ID0gKHVuc2lnbmVkIGxvbmcpYml0bWFwIHwgKDFVTCA8PCB0Yml0KTsNCj4gICAgICAgcmN1X2Fz
-c2lnbl9wb2ludGVyKCpzbG90LCAodm9pZCAqKXRtcCk7DQo+ICAgICAgICppZCA9IG5ldyArIHRi
-aXQgLSBSQURJWF9UUkVFX0VYQ0VQVElPTkFMX1NISUZUOw0KPiAgICAgICByZXR1cm4gMDsNCj4g
-ICAgIH0NCj4gICB9DQoNCkknbSBjZXJ0YWlubHkgb3BlbiB0byBtaWNyb29wdGltaXNhdGlvbnMs
-IGJ1dCBJJ2xsIGhhdmUgdG8gdGhpbmsgYWJvdXQgdGhpcyBvbmUgZm9yIGEgYml0Lg0K
+On Sat, Dec 17 2016, Matthew Wilcox <mawilcox@microsoft.com> wrote:
+
+> From: Matthew Wilcox
+>> From: Rasmus Villemoes [mailto:linux@rasmusvillemoes.dk]
+>> > This sounds good. I think there may still be a lot of users that never
+>> > allocate more than a handful of IDAs, making a 128 byte allocation still
+>> > somewhat excessive. One thing I considered was (exactly as it's done for
+>> > file descriptor tables) to embed a single word in the struct ida and
+>> > use that initially; I haven't looked closely at newIDA, so I don't know
+>> > how easy that would be or if its worth the complexity.
+>> 
+>> Heh, I was thinking about that too.  The radix tree supports "exceptional
+>> entries" which have the bottom bit set.  On a 64-bit machine, we could use 62
+>> of the bits in the radix tree root to store the ID bitmap.  I'm a little wary of the
+>> potential complexity, but we should try it out.
+>
+> Test patch here: http://git.infradead.org/users/willy/linux-dax.git/shortlog/refs/heads/idr-2016-12-16
+> It passes the test suite ... which I actually had to adjust because it
+> now succeeds in cases where it hadn't (allocating ID 0 without
+> preallocating), and it will now fail in cases where it hadn't
+> previously (assuming a single preallocation would be enough).  There
+> shouldn't be any examples of that in the kernel proper; it was simply
+> me being lazy when I wrote the test suite.
+
+Nice work! A few random comments/questions:
+
+- It does add some complexity, but I think a few comments would make it
+  more digestable.
+
+- Hm, maybe I'm confused, and I certainly don't understand how the whole
+  radix tree works. But do you use every leaf node as an exceptional
+  entry initially, to allocate the first 62 ids from that level? This
+  code
+
+	if ((bit + RADIX_TREE_EXCEPTIONAL_SHIFT) <
+					BITS_PER_LONG) {
+		bit += RADIX_TREE_EXCEPTIONAL_SHIFT;
+		radix_tree_iter_replace(root, &iter, slot,
+				(void *)((1UL << bit) |
+				RADIX_TREE_EXCEPTIONAL_ENTRY));
+		*id = new;
+		return 0;
+	}
+
+   operates on bit, which is the offset from index*IDA_BITMAP_BITS, and
+   it seems to create an exceptional entry somewhere down the tree
+   (which may of course be the root).
+
+   But we don't seem to allocate another bit from that exceptional entry
+   ever unless it happened to sit at index 0; the code
+
+	unsigned long tmp = (unsigned long)bitmap;
+	if (start < BITS_PER_LONG) {
+		unsigned tbit = find_next_zero_bit(&tmp,
+					BITS_PER_LONG, start);
+		if (tbit < BITS_PER_LONG) {
+			tmp |= 1UL << tbit;
+			rcu_assign_pointer(*slot, (void *)tmp);
+			*id = new + tbit -
+				RADIX_TREE_EXCEPTIONAL_SHIFT;
+			return 0;
+		}
+	}
+
+   is only used for small values of start (though it does seem to
+   account for a non-zero value of new == iter.index * IDA_BITMAP_BITS).
+   
+- In the micro-optimization department, I think we should avoid
+  find_next_zero_bit on a single word, and instead use __ffs. Something
+  like (assuming we can use bit instead of start)
+
+  if (bit + RADIX_TREE_EXCEPTIONAL_SHIFT < BITS_PER_LONG) {
+    tmp = (~(unsigned long)bitmap) >> (bit + RADIX_TREE_EXCEPTIONAL_SHIFT);
+    if (tmp) {
+      tbit = __ffs(tmp) + bit + RADIX_TREE_EXCEPTIONAL_SHIFT;
+      tmp = (unsigned long)bitmap | (1UL << tbit);
+      rcu_assign_pointer(*slot, (void *)tmp);
+      *id = new + tbit - RADIX_TREE_EXCEPTIONAL_SHIFT;
+      return 0;
+    }
+  }
+
+Rasmus
