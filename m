@@ -1,44 +1,43 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f193.google.com ([209.85.192.193]:36546 "EHLO
-        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932860AbcL0QGQ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Dec 2016 11:06:16 -0500
-From: Ming Lei <tom.leiming@gmail.com>
-To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        Ming Lei <tom.leiming@gmail.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        linux-fsdevel@vger.kernel.org (open list:FILESYSTEMS (VFS and
-        infrastructure))
-Subject: [PATCH v1 40/54] fs/direct-io: convert to bio_for_each_segment_all_sp()
-Date: Wed, 28 Dec 2016 00:04:49 +0800
-Message-Id: <1482854706-14128-9-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1482854706-14128-1-git-send-email-tom.leiming@gmail.com>
-References: <1482854706-14128-1-git-send-email-tom.leiming@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <Bart.VanAssche@sandisk.com>
+From: Bart Van Assche <Bart.VanAssche@sandisk.com>
+To: "osandov@osandov.com" <osandov@osandov.com>
+CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, "osandov@fb.com"
+	<osandov@fb.com>, "axboe@fb.com" <axboe@fb.com>, "axboe@kernel.dk"
+	<axboe@kernel.dk>, "paolo.valente@linaro.org" <paolo.valente@linaro.org>
+Subject: Re: [PATCHSET v4] blk-mq-scheduling framework
+Date: Thu, 22 Dec 2016 17:39:56 +0000
+Message-ID: <1482428377.2682.13.camel@sandisk.com>
+References: <1481933536-12844-1-git-send-email-axboe@fb.com>
+	 <1482423775.2682.6.camel@sandisk.com> <20161222165207.GA25717@vader>
+	 <1482425838.2682.9.camel@sandisk.com> <20161222171224.GA26830@vader>
+In-Reply-To: <20161222171224.GA26830@vader>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Return-Path: Bart.VanAssche@sandisk.com
+List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
----
- fs/direct-io.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/fs/direct-io.c b/fs/direct-io.c
-index aeae8c063451..e2ecd9fbbffb 100644
---- a/fs/direct-io.c
-+++ b/fs/direct-io.c
-@@ -487,7 +487,9 @@ static int dio_bio_complete(struct dio *dio, struct bio *bio)
- 		err = bio->bi_error;
- 		bio_check_pages_dirty(bio);	/* transfers ownership */
- 	} else {
--		bio_for_each_segment_all(bvec, bio, i) {
-+		struct bvec_iter_all bia;
-+
-+		bio_for_each_segment_all_sp(bvec, bio, i, bia) {
- 			struct page *page = bvec->bv_page;
- 
- 			if (dio->op == REQ_OP_READ && !PageCompound(page) &&
--- 
-2.7.4
-
+T24gVGh1LCAyMDE2LTEyLTIyIGF0IDA5OjEyIC0wODAwLCBPbWFyIFNhbmRvdmFsIHdyb3RlOg0K
+PiBPbiBUaHUsIERlYyAyMiwgMjAxNiBhdCAwNDo1NzozNlBNICswMDAwLCBCYXJ0IFZhbiBBc3Nj
+aGUgd3JvdGU6DQo+ID4gT24gVGh1LCAyMDE2LTEyLTIyIGF0IDA4OjUyIC0wODAwLCBPbWFyIFNh
+bmRvdmFsIHdyb3RlOg0KPiA+ID4gVGhpcyBhcHByb2FjaCBvY2N1cnJlZCB0byB1cywgYnV0IHdl
+IGNvdWxkbid0IGZpZ3VyZSBvdXQgYSB3YXkgdG8gbWFrZQ0KPiA+ID4gYmxrX21xX3RhZ190b19y
+cSgpIHdvcmsgd2l0aCBpdC4gRnJvbSBza2ltbWluZyBvdmVyIHRoZSBwYXRjaGVzLCBJDQo+ID4g
+PiBkaWRuJ3Qgc2VlIGEgc29sdXRpb24gdG8gdGhhdCBwcm9ibGVtLg0KPiA+IA0KPiA+IENhbiB5
+b3UgY2xhcmlmeSB5b3VyIGNvbW1lbnQ/IFNpbmNlIG15IHBhdGNoZXMgaW5pdGlhbGl6ZSBib3Ro
+IHRhZ3MtPnJxc1tdDQo+ID4gYW5kIHNjaGVkX3RhZ3MtPnJxc1tdIHRoZSBmdW5jdGlvbiBibGtf
+bXFfdGFnX3RvX3JxKCkgc2hvdWxkIHN0aWxsIHdvcmsuDQo+IA0KPiBTb3JyeSwgeW91J3JlIHJp
+Z2h0LCBpdCBkb2VzIHdvcmssIGJ1dCB0YWdzLT5ycXNbXSBlbmRzIHVwIGJlaW5nIHRoZQ0KPiBl
+eHRyYSBsb29rdXAgdGFibGUuIEkgc3VzcGVjdCB0aGF0IHRoZSBydW50aW1lIG92ZXJoZWFkIG9m
+IGtlZXBpbmcgdGhhdA0KPiB1cCB0byBkYXRlIGNvdWxkIGJlIHdvcnNlIHRoYW4gY29weWluZyB0
+aGUgcnEgZmllbGRzIGlmIHlvdSBoYXZlIGxvdHMgb2YNCj4gQ1BVcyBidXQgb25seSBvbmUgaGFy
+ZHdhcmUgcXVldWUuDQoNCkhlbGxvIE9tYXIsDQoNCkknbSBub3Qgc3VyZSB0aGF0IGFueXRoaW5n
+IGNhbiBiZSBkb25lIGlmIHRoZSBudW1iZXIgb2YgQ1BVcyB0aGF0IGlzIHN1Ym1pdHRpbmcNCkkv
+TyBpcyBsYXJnZSBjb21wYXJlZCB0byB0aGUgcXVldWUgZGVwdGggc28gSSBkb24ndCB0aGluayB3
+ZSBzaG91bGQgc3BlbmQgb3VyDQp0aW1lIG9uIHRoYXQgY2FzZS4gSWYgdGhlIHF1ZXVlIGRlcHRo
+IGlzIGxhcmdlIGVub3VnaCB0aGVuIHRoZSBzYml0bWFwIGNvZGUgd2lsbA0KYWxsb2NhdGUgdGFn
+cyBzdWNoIHRoYXQgZGlmZmVyZW50IENQVXMgdXNlIGRpZmZlcmVudCBycXNbXSBlbGVtZW50cy4N
+Cg0KVGhlIGFkdmFudGFnZXMgb2YgdGhlIGFwcHJvYWNoIEkgcHJvcG9zZWQgYXJlIHN1Y2ggdGhh
+dCBJIGFtIGNvbnZpbmNlZCB0aGF0IGlzDQp3aGF0IHdlIHNob3VsZCBzdGFydCBmcm9tIGFuZCBh
+ZGRyZXNzIGNvbnRlbnRpb24gb24gdGhlIHRhZ3MtPnJxc1tdIGFycmF5IGlmIGl0DQptZWFzdXJl
+bWVudHMgc2hvdyB0aGF0IGl0IGlzIG5lY2Vzc2FyeSB0byBhZGRyZXNzIGl0Lg0KDQpCYXJ0Lg==
