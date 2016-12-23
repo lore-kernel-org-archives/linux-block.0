@@ -1,109 +1,74 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f66.google.com ([74.125.83.66]:33216 "EHLO
-        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752551AbcL0P7v (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Dec 2016 10:59:51 -0500
-From: Ming Lei <tom.leiming@gmail.com>
-To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        Ming Lei <tom.leiming@gmail.com>,
-        Kent Overstreet <kent.overstreet@gmail.com>,
-        Shaohua Li <shli@kernel.org>, Guoqing Jiang <gqjiang@suse.com>,
-        Zheng Liu <gnehzuil.liu@gmail.com>,
-        Mike Christie <mchristi@redhat.com>,
-        Jiri Kosina <jkosina@suse.cz>,
-        Eric Wheeler <git@linux.ewheeler.net>,
-        Yijing Wang <wangyijing@huawei.com>,
-        Al Viro <viro@ZenIV.linux.org.uk>,
-        linux-bcache@vger.kernel.org (open list:BCACHE (BLOCK LAYER CACHE)),
-        linux-raid@vger.kernel.org (open list:SOFTWARE RAID (Multiple Disks)
-        SUPPORT)
-Subject: [PATCH v1 07/54] bcache: comment on direct access to bvec table
-Date: Tue, 27 Dec 2016 23:55:56 +0800
-Message-Id: <1482854250-13481-8-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1482854250-13481-1-git-send-email-tom.leiming@gmail.com>
-References: <1482854250-13481-1-git-send-email-tom.leiming@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <mawilcox@microsoft.com>
+From: Matthew Wilcox <mawilcox@microsoft.com>
+To: Rasmus Villemoes <linux@rasmusvillemoes.dk>
+CC: Tejun Heo <tj@kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, Lai Jiangshan <jiangshanlai@gmail.com>, "Jens
+ Axboe" <axboe@kernel.dk>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>, "Andrew
+ Morton" <akpm@linux-foundation.org>
+Subject: RE: [RFC 00/10] implement alternative and much simpler id allocator
+Date: Fri, 23 Dec 2016 17:03:51 +0000
+Message-ID: <BY2PR21MB003659BCA2EC02603245CD2ACB950@BY2PR21MB0036.namprd21.prod.outlook.com>
+References: <1481160187-9652-1-git-send-email-linux@rasmusvillemoes.dk>
+	<20161209140140.5e0a68e2e1cf9861335bdf3b@linux-foundation.org>
+	<BY2PR21MB00364EEDE35645341BEC695CCB9C0@BY2PR21MB0036.namprd21.prod.outlook.com>
+	<87inqj8vjo.fsf@rasmusvillemoes.dk>
+	<BY2PR21MB003683A1186A143D4B4D1244CB9F0@BY2PR21MB0036.namprd21.prod.outlook.com>
+ <87pokjjznr.fsf@rasmusvillemoes.dk>
+In-Reply-To: <87pokjjznr.fsf@rasmusvillemoes.dk>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+List-ID: <linux-block@vger.kernel.org>
 
-Looks all are safe after multipage bvec is supported.
-
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
----
- drivers/md/bcache/btree.c | 1 +
- drivers/md/bcache/super.c | 6 ++++++
- drivers/md/bcache/util.c  | 7 +++++++
- 3 files changed, 14 insertions(+)
-
-diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
-index a43eedd5804d..fc35cfb4d0f1 100644
---- a/drivers/md/bcache/btree.c
-+++ b/drivers/md/bcache/btree.c
-@@ -428,6 +428,7 @@ static void do_btree_node_write(struct btree *b)
- 
- 		continue_at(cl, btree_node_write_done, NULL);
- 	} else {
-+		/* No harm for multipage bvec since the new is just allocated */
- 		b->bio->bi_vcnt = 0;
- 		bch_bio_map(b->bio, i);
- 
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index 3a19cbc8b230..607b022259dc 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -208,6 +208,7 @@ static void write_bdev_super_endio(struct bio *bio)
- 
- static void __write_super(struct cache_sb *sb, struct bio *bio)
- {
-+	/* single page bio, safe for multipage bvec */
- 	struct cache_sb *out = page_address(bio->bi_io_vec[0].bv_page);
- 	unsigned i;
- 
-@@ -1156,6 +1157,8 @@ static void register_bdev(struct cache_sb *sb, struct page *sb_page,
- 	dc->bdev->bd_holder = dc;
- 
- 	bio_init(&dc->sb_bio, dc->sb_bio.bi_inline_vecs, 1);
-+
-+	/* single page bio, safe for multipage bvec */
- 	dc->sb_bio.bi_io_vec[0].bv_page = sb_page;
- 	get_page(sb_page);
- 
-@@ -1799,6 +1802,7 @@ void bch_cache_release(struct kobject *kobj)
- 	for (i = 0; i < RESERVE_NR; i++)
- 		free_fifo(&ca->free[i]);
- 
-+	/* single page bio, safe for multipage bvec */
- 	if (ca->sb_bio.bi_inline_vecs[0].bv_page)
- 		put_page(ca->sb_bio.bi_io_vec[0].bv_page);
- 
-@@ -1854,6 +1858,8 @@ static int register_cache(struct cache_sb *sb, struct page *sb_page,
- 	ca->bdev->bd_holder = ca;
- 
- 	bio_init(&ca->sb_bio, ca->sb_bio.bi_inline_vecs, 1);
-+
-+	/* single page bio, safe for multipage bvec */
- 	ca->sb_bio.bi_io_vec[0].bv_page = sb_page;
- 	get_page(sb_page);
- 
-diff --git a/drivers/md/bcache/util.c b/drivers/md/bcache/util.c
-index dde6172f3f10..5cc0b49a65fb 100644
---- a/drivers/md/bcache/util.c
-+++ b/drivers/md/bcache/util.c
-@@ -222,6 +222,13 @@ uint64_t bch_next_delay(struct bch_ratelimit *d, uint64_t done)
- 		: 0;
- }
- 
-+/*
-+ * Generally it isn't good to access .bi_io_vec and .bi_vcnt
-+ * directly, the preferred way is bio_add_page, but in
-+ * this case, bch_bio_map() supposes that the bvec table
-+ * is empty, so it is safe to access .bi_vcnt & .bi_io_vec
-+ * in this way even after multipage bvec is supported.
-+ */
- void bch_bio_map(struct bio *bio, void *base)
- {
- 	size_t size = bio->bi_iter.bi_size;
--- 
-2.7.4
-
+RnJvbTogUmFzbXVzIFZpbGxlbW9lcyBbbWFpbHRvOmxpbnV4QHJhc211c3ZpbGxlbW9lcy5ka10N
+Cj4gTmljZSB3b3JrISBBIGZldyByYW5kb20gY29tbWVudHMvcXVlc3Rpb25zOg0KPiANCj4gLSBJ
+dCBkb2VzIGFkZCBzb21lIGNvbXBsZXhpdHksIGJ1dCBJIHRoaW5rIGEgZmV3IGNvbW1lbnRzIHdv
+dWxkIG1ha2UgaXQNCj4gICBtb3JlIGRpZ2VzdGFibGUuDQoNCkknbSBvcGVuIHRvIGFkZGluZyBz
+b21lIGNvbW1lbnRzIC4uLiBJIG5lZWQgc29tZSB0aW1lIGJldHdlZW4gd3JpdGluZyB0aGUgY29k
+ZSBhbmQgd3JpdGluZyB0aGUgY29tbWVudHMgdG8gYmUgc3VyZSB3aGF0IGNvbW1lbnRzIGFyZSB1
+c2VmdWwuDQoNCj4gLSBIbSwgbWF5YmUgSSdtIGNvbmZ1c2VkLCBhbmQgSSBjZXJ0YWlubHkgZG9u
+J3QgdW5kZXJzdGFuZCBob3cgdGhlIHdob2xlDQo+ICAgcmFkaXggdHJlZSB3b3Jrcy4gQnV0IGRv
+IHlvdSB1c2UgZXZlcnkgbGVhZiBub2RlIGFzIGFuIGV4Y2VwdGlvbmFsDQo+ICAgZW50cnkgaW5p
+dGlhbGx5LCB0byBhbGxvY2F0ZSB0aGUgZmlyc3QgNjIgaWRzIGZyb20gdGhhdCBsZXZlbD8gVGhp
+cw0KPiAgIGNvZGUNCg0KSSBkbyEgIEFuZCB0aGF0IHF1ZXN0aW9uIHRlbGxzIG1lIG9uZSB1c2Vm
+dWwgY29tbWVudCB0byBhZGQhDQoNCj4gCWlmICgoYml0ICsgUkFESVhfVFJFRV9FWENFUFRJT05B
+TF9TSElGVCkgPA0KPiAJCQkJCUJJVFNfUEVSX0xPTkcpIHsNCj4gCQliaXQgKz0gUkFESVhfVFJF
+RV9FWENFUFRJT05BTF9TSElGVDsNCj4gCQlyYWRpeF90cmVlX2l0ZXJfcmVwbGFjZShyb290LCAm
+aXRlciwgc2xvdCwNCj4gCQkJCSh2b2lkICopKCgxVUwgPDwgYml0KSB8DQo+IAkJCQlSQURJWF9U
+UkVFX0VYQ0VQVElPTkFMX0VOVFJZKSk7DQo+IAkJKmlkID0gbmV3Ow0KPiAJCXJldHVybiAwOw0K
+PiAJfQ0KPiANCj4gICAgb3BlcmF0ZXMgb24gYml0LCB3aGljaCBpcyB0aGUgb2Zmc2V0IGZyb20g
+aW5kZXgqSURBX0JJVE1BUF9CSVRTLCBhbmQNCj4gICAgaXQgc2VlbXMgdG8gY3JlYXRlIGFuIGV4
+Y2VwdGlvbmFsIGVudHJ5IHNvbWV3aGVyZSBkb3duIHRoZSB0cmVlDQo+ICAgICh3aGljaCBtYXkg
+b2YgY291cnNlIGJlIHRoZSByb290KS4NCj4gDQo+ICAgIEJ1dCB3ZSBkb24ndCBzZWVtIHRvIGFs
+bG9jYXRlIGFub3RoZXIgYml0IGZyb20gdGhhdCBleGNlcHRpb25hbCBlbnRyeQ0KPiAgICBldmVy
+IHVubGVzcyBpdCBoYXBwZW5lZCB0byBzaXQgYXQgaW5kZXggMDsgdGhlIGNvZGUNCj4gDQo+IAl1
+bnNpZ25lZCBsb25nIHRtcCA9ICh1bnNpZ25lZCBsb25nKWJpdG1hcDsNCj4gCWlmIChzdGFydCA8
+IEJJVFNfUEVSX0xPTkcpIHsNCj4gCQl1bnNpZ25lZCB0Yml0ID0gZmluZF9uZXh0X3plcm9fYml0
+KCZ0bXAsDQo+IAkJCQkJQklUU19QRVJfTE9ORywgc3RhcnQpOw0KPiAJCWlmICh0Yml0IDwgQklU
+U19QRVJfTE9ORykgew0KPiAJCQl0bXAgfD0gMVVMIDw8IHRiaXQ7DQo+IAkJCXJjdV9hc3NpZ25f
+cG9pbnRlcigqc2xvdCwgKHZvaWQgKil0bXApOw0KPiAJCQkqaWQgPSBuZXcgKyB0Yml0IC0NCj4g
+CQkJCVJBRElYX1RSRUVfRVhDRVBUSU9OQUxfU0hJRlQ7DQo+IAkJCXJldHVybiAwOw0KPiAJCX0N
+Cj4gCX0NCj4gDQo+ICAgIGlzIG9ubHkgdXNlZCBmb3Igc21hbGwgdmFsdWVzIG9mIHN0YXJ0ICh0
+aG91Z2ggaXQgZG9lcyBzZWVtIHRvDQo+ICAgIGFjY291bnQgZm9yIGEgbm9uLXplcm8gdmFsdWUg
+b2YgbmV3ID09IGl0ZXIuaW5kZXggKiBJREFfQklUTUFQX0JJVFMpLg0KDQpBaGguICBZb3UncmUg
+cmVhZGluZyB0aGUgY29kZSB3cm9uZywgYW5kIEkgd3JvdGUgdGhlIGNvZGUgd3JvbmdseSB0b28s
+IHNvIGl0J3MgY2xlYXJseSBvdmVybHkgY29tcGxleC4gIEkgd2FzIHRlc3Rpbmcgd2l0aCAnc3Rh
+cnQnIHNldCB0byAwLCBhbGxvY2F0aW5nIE4gZW50cmllcywgYW5kIHRoZW4gZnJlZWluZyB0aGVt
+LiAgSWYgSSdkIHNldCBzdGFydCB0byAxMDI0IGFuZCBhbGxvY2F0ZWQgdHdvIGVudHJpZXMsIEkn
+ZCd2ZSBzZWVuIHRoZSBmYWlsdXJlLg0KDQpQbGVhc2Ugc2VlIHRoZSB0b3AgY29tbWl0IGhlcmUg
+KCJJbXByb3ZlIElEQSBleGNlcHRpb25hbCBlbnRyeSBoYW5kbGluZyIpOiBodHRwOi8vZ2l0Lmlu
+ZnJhZGVhZC5vcmcvdXNlcnMvd2lsbHkvbGludXgtZGF4LmdpdC9zaG9ydGxvZy9yZWZzL2hlYWRz
+L2lkci0yMDE2LTEyLTIwDQoNCg0KPiAtIEluIHRoZSBtaWNyby1vcHRpbWl6YXRpb24gZGVwYXJ0
+bWVudCwgSSB0aGluayB3ZSBzaG91bGQgYXZvaWQNCj4gICBmaW5kX25leHRfemVyb19iaXQgb24g
+YSBzaW5nbGUgd29yZCwgYW5kIGluc3RlYWQgdXNlIF9fZmZzLiBTb21ldGhpbmcNCj4gICBsaWtl
+IChhc3N1bWluZyB3ZSBjYW4gdXNlIGJpdCBpbnN0ZWFkIG9mIHN0YXJ0KQ0KPiANCj4gICBpZiAo
+Yml0ICsgUkFESVhfVFJFRV9FWENFUFRJT05BTF9TSElGVCA8IEJJVFNfUEVSX0xPTkcpIHsNCj4g
+ICAgIHRtcCA9ICh+KHVuc2lnbmVkIGxvbmcpYml0bWFwKSA+PiAoYml0ICsgUkFESVhfVFJFRV9F
+WENFUFRJT05BTF9TSElGVCk7DQo+ICAgICBpZiAodG1wKSB7DQo+ICAgICAgIHRiaXQgPSBfX2Zm
+cyh0bXApICsgYml0ICsgUkFESVhfVFJFRV9FWENFUFRJT05BTF9TSElGVDsNCj4gICAgICAgdG1w
+ID0gKHVuc2lnbmVkIGxvbmcpYml0bWFwIHwgKDFVTCA8PCB0Yml0KTsNCj4gICAgICAgcmN1X2Fz
+c2lnbl9wb2ludGVyKCpzbG90LCAodm9pZCAqKXRtcCk7DQo+ICAgICAgICppZCA9IG5ldyArIHRi
+aXQgLSBSQURJWF9UUkVFX0VYQ0VQVElPTkFMX1NISUZUOw0KPiAgICAgICByZXR1cm4gMDsNCj4g
+ICAgIH0NCj4gICB9DQoNCkknbSBjZXJ0YWlubHkgb3BlbiB0byBtaWNyb29wdGltaXNhdGlvbnMs
+IGJ1dCBJJ2xsIGhhdmUgdG8gdGhpbmsgYWJvdXQgdGhpcyBvbmUgZm9yIGEgYml0Lg0K
