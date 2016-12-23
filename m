@@ -1,57 +1,82 @@
 Return-Path: <linux-scsi-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <20161223100014.GA29467@lst.de>
-References: <20161216185906.t2wmrr6wqjdsrduw@straylight.hirudinean.org>
- <20161221221638.GD4758@dastard> <CA+55aFyb1jcdpavyZgZ4nedA0=6tLognyWcJXfOJjMPFTm5GWA@mail.gmail.com>
- <20161222001303.nvrtm22szn3hgxar@straylight.hirudinean.org>
- <20161222051322.GF4758@dastard> <CA+55aFza=cv6TGYh+Be1xz2x-G-U=vruhbmfGpHSqY1ocZrBeg@mail.gmail.com>
- <20161222065012.GI4758@dastard> <20161222185030.so4btkuzzkih3owz@straylight.hirudinean.org>
- <CACVXFVOGoh+AEGSSMsbxfdAjZQS5k_t+7uR-+qwusm0vfauHEA@mail.gmail.com>
- <20161223000356.dxwkgsei32w7hc4f@straylight.hirudinean.org> <20161223100014.GA29467@lst.de>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Fri, 23 Dec 2016 11:42:45 -0800
-Message-ID: <CA+55aFxA1LE+4jdR8YXZyRVJ-MpOCUVob=ESBsMPuW=Qb=px-A@mail.gmail.com>
-Subject: Re: [4.10, panic, regression] iscsi: null pointer deref at iscsi_tcp_segment_done+0x20d/0x2e0
-To: Christoph Hellwig <hch@lst.de>
-Cc: Chris Leech <cleech@redhat.com>, Ming Lei <tom.leiming@gmail.com>,
+Date: Fri, 23 Dec 2016 11:00:14 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Chris Leech <cleech@redhat.com>, Ming Lei <tom.leiming@gmail.com>,
         Dave Chinner <david@fromorbit.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
         Johannes Weiner <hannes@cmpxchg.org>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         Lee Duncan <lduncan@suse.com>, open-iscsi@googlegroups.com,
         Linux SCSI List <linux-scsi@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Jens Axboe <axboe@fb.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>
-Content-Type: text/plain; charset=UTF-8
+        linux-block <linux-block@vger.kernel.org>, axboe@fb.com,
+        mst@redhat.com
+Subject: Re: [4.10, panic, regression] iscsi: null pointer deref at
+        iscsi_tcp_segment_done+0x20d/0x2e0
+Message-ID: <20161223100014.GA29467@lst.de>
+References: <20161216185906.t2wmrr6wqjdsrduw@straylight.hirudinean.org> <20161221221638.GD4758@dastard> <CA+55aFyb1jcdpavyZgZ4nedA0=6tLognyWcJXfOJjMPFTm5GWA@mail.gmail.com> <20161222001303.nvrtm22szn3hgxar@straylight.hirudinean.org> <20161222051322.GF4758@dastard> <CA+55aFza=cv6TGYh+Be1xz2x-G-U=vruhbmfGpHSqY1ocZrBeg@mail.gmail.com> <20161222065012.GI4758@dastard> <20161222185030.so4btkuzzkih3owz@straylight.hirudinean.org> <CACVXFVOGoh+AEGSSMsbxfdAjZQS5k_t+7uR-+qwusm0vfauHEA@mail.gmail.com> <20161223000356.dxwkgsei32w7hc4f@straylight.hirudinean.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20161223000356.dxwkgsei32w7hc4f@straylight.hirudinean.org>
 Sender: linux-scsi-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-On Fri, Dec 23, 2016 at 2:00 AM, Christoph Hellwig <hch@lst.de> wrote:
->
-> From: Christoph Hellwig <hch@lst.de>
-> Date: Fri, 23 Dec 2016 10:57:06 +0100
-> Subject: virtio_blk: avoid DMA to stack for the sense buffer
->
-> Most users of BLOCK_PC requests allocate the sense buffer on the stack,
-> so to avoid DMA to the stack copy them to a field in the heap allocated
-> virtblk_req structure.  Without that any attempt at SCSI passthrough I/O,
-> including the SG_IO ioctl from userspace will crash the kernel.  Note that
-> this includes running tools like hdparm even when the host does not have
-> SCSI passthrough enabled.
+On Thu, Dec 22, 2016 at 04:03:56PM -0800, Chris Leech wrote:
+> Of course, looks like I've screwed up my bisect run on this so I'm still
+> taking a look.  It triggers for me with 'hdparm -B /dev/vda' but may
+> also depend on kernel configuration.
+> 
+> I started with the fedora rawhide config with a lot of debug on and
+> trimed it down with a localmodconfig run in the VM to speed up rebuilds.
 
-Ugh. This patch is nasty.
+I think the configuration dependency is CONFIG_HAVE_ARCH_VMAP_STACK,
+I've just reproduce the issue with it, and the backtrace points to
+__virtblk_add_req when setting up the sense buffer.   And it turns out
+that blk_execute_rq tries to do I/O to the on-stack sense buffer.
+At least SCSI always has a kmalloced sense buffer, so I guess we'll
+need something similar for virtio_blk for now.  For 4.11 I plan to
+rework how BLOCK_PC commands work entirely, so hopefull we can make
+the sense buffer handling a lot less wasteful.
 
-I think we should just fix blk_execute_rq() instead.
+---
+>From 0a77bc424ed907c1e99b4756bb498370b498183a Mon Sep 17 00:00:00 2001
+From: Christoph Hellwig <hch@lst.de>
+Date: Fri, 23 Dec 2016 10:57:06 +0100
+Subject: virtio_blk: avoid DMA to stack for the sense buffer
 
-But from a quick look, we also have at least sg_scsi_ioctl() and
-sg_io() doing the same thing.
+Most users of BLOCK_PC requests allocate the sense buffer on the stack,
+so to avoid DMA to the stack copy them to a field in the heap allocated
+virtblk_req structure.  Without that any attempt at SCSI passthrough I/O,
+including the SG_IO ioctl from userspace will crash the kernel.  Note that
+this includes running tools like hdparm even when the host does not have
+SCSI passthrough enabled.
 
-And the SG_IO thing in bsg_ioctl(). And spi_execute() in scsi_transport_spi.c
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/block/virtio_blk.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-And resp_requests() in scsi_debug.c.
+diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+index 5545a67..3c3b8f6 100644
+--- a/drivers/block/virtio_blk.c
++++ b/drivers/block/virtio_blk.c
+@@ -56,6 +56,7 @@ struct virtblk_req {
+ 	struct virtio_blk_outhdr out_hdr;
+ 	struct virtio_scsi_inhdr in_hdr;
+ 	u8 status;
++	u8 sense[SCSI_SENSE_BUFFERSIZE];
+ 	struct scatterlist sg[];
+ };
+ 
+@@ -102,7 +103,8 @@ static int __virtblk_add_req(struct virtqueue *vq,
+ 	}
+ 
+ 	if (type == cpu_to_virtio32(vq->vdev, VIRTIO_BLK_T_SCSI_CMD)) {
+-		sg_init_one(&sense, vbr->req->sense, SCSI_SENSE_BUFFERSIZE);
++		memcpy(vbr->sense, vbr->req->sense, SCSI_SENSE_BUFFERSIZE);
++		sg_init_one(&sense, vbr->sense, SCSI_SENSE_BUFFERSIZE);
+ 		sgs[num_out + num_in++] = &sense;
+ 		sg_init_one(&inhdr, &vbr->in_hdr, sizeof(vbr->in_hdr));
+ 		sgs[num_out + num_in++] = &inhdr;
+-- 
+2.1.4
 
-So I guess ugly it may need to be, and the rule is that the sense
-buffer really can be on the stack and you can't DMA to/from it.
-Comments from others?
-
-                Linus
