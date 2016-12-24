@@ -1,12 +1,10 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from verein.lst.de ([213.95.11.211]:35527 "EHLO newverein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751152AbcLXKH7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 24 Dec 2016 05:07:59 -0500
-Date: Sat, 24 Dec 2016 11:07:56 +0100
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+Date: Sat, 24 Dec 2016 10:49:05 +0100
 From: Christoph Hellwig <hch@lst.de>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Christoph Hellwig <hch@lst.de>, Chris Leech <cleech@redhat.com>,
+To: Jens Axboe <axboe@fb.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Chris Leech <cleech@redhat.com>,
         Ming Lei <tom.leiming@gmail.com>,
         Dave Chinner <david@fromorbit.com>,
         Johannes Weiner <hannes@cmpxchg.org>,
@@ -14,35 +12,28 @@ Cc: Christoph Hellwig <hch@lst.de>, Chris Leech <cleech@redhat.com>,
         Lee Duncan <lduncan@suse.com>, open-iscsi@googlegroups.com,
         Linux SCSI List <linux-scsi@vger.kernel.org>,
         linux-block <linux-block@vger.kernel.org>,
-        Jens Axboe <axboe@fb.com>,
         "Michael S. Tsirkin" <mst@redhat.com>
 Subject: Re: [4.10, panic, regression] iscsi: null pointer deref at
         iscsi_tcp_segment_done+0x20d/0x2e0
-Message-ID: <20161224100756.GA16741@lst.de>
-References: <CA+55aFyb1jcdpavyZgZ4nedA0=6tLognyWcJXfOJjMPFTm5GWA@mail.gmail.com> <20161222001303.nvrtm22szn3hgxar@straylight.hirudinean.org> <20161222051322.GF4758@dastard> <CA+55aFza=cv6TGYh+Be1xz2x-G-U=vruhbmfGpHSqY1ocZrBeg@mail.gmail.com> <20161222065012.GI4758@dastard> <20161222185030.so4btkuzzkih3owz@straylight.hirudinean.org> <CACVXFVOGoh+AEGSSMsbxfdAjZQS5k_t+7uR-+qwusm0vfauHEA@mail.gmail.com> <20161223000356.dxwkgsei32w7hc4f@straylight.hirudinean.org> <20161223100014.GA29467@lst.de> <CA+55aFxA1LE+4jdR8YXZyRVJ-MpOCUVob=ESBsMPuW=Qb=px-A@mail.gmail.com>
+Message-ID: <20161224094905.GA16518@lst.de>
+References: <20161222001303.nvrtm22szn3hgxar@straylight.hirudinean.org> <20161222051322.GF4758@dastard> <CA+55aFza=cv6TGYh+Be1xz2x-G-U=vruhbmfGpHSqY1ocZrBeg@mail.gmail.com> <20161222065012.GI4758@dastard> <20161222185030.so4btkuzzkih3owz@straylight.hirudinean.org> <CACVXFVOGoh+AEGSSMsbxfdAjZQS5k_t+7uR-+qwusm0vfauHEA@mail.gmail.com> <20161223000356.dxwkgsei32w7hc4f@straylight.hirudinean.org> <20161223100014.GA29467@lst.de> <CA+55aFxA1LE+4jdR8YXZyRVJ-MpOCUVob=ESBsMPuW=Qb=px-A@mail.gmail.com> <fadbf3d2-23c1-f822-cf0f-50182227a2dc@fb.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CA+55aFxA1LE+4jdR8YXZyRVJ-MpOCUVob=ESBsMPuW=Qb=px-A@mail.gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <fadbf3d2-23c1-f822-cf0f-50182227a2dc@fb.com>
+Sender: linux-scsi-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-On Fri, Dec 23, 2016 at 11:42:45AM -0800, Linus Torvalds wrote:
-> Ugh. This patch is nasty.
+On Fri, Dec 23, 2016 at 07:45:45PM -0700, Jens Axboe wrote:
+> It's not that it's technically hard to fix up, it's more that it's a
+> pain in the ass to have to do it. For instance, for blk_execute_rq(), we
+> either should enforce that the caller allocates it dynamically and then
+> free it, or we need nasty hack where the caller needs to know he has to
+> free it. Pretty obvious what I would prefer there.
+> 
+> And yes, there would be a good chunk of other places where this would
+> nede to be fixed up...
 
-It's the same SCSI has done for ages - except that is uses a separate
-kmalloc for the sense buffer.
-
-> I think we should just fix blk_execute_rq() instead.
-
-As you found out below it's not just blk_execute_rq, it's the whole
-architecture of the BLOCK_PC code, which expects a caller provided
-sense buffer.  But with the way blk-mq allocates request structures
-we can actually fix it, but I first need to extent the way it allows
-drivers to allocate private data to the old request code.  I've
-actually already implemented that for SCSI long time ago, and have
-started to life it to the block layer.
-
-Once that is done the callers won't need a sense buffer at all, and
-can just look at the driver provided one.  Which currently is missing
-in virtio-blk, so we'd need something similar to the above patch
-anyway.
+My planned rework for the BLOCK_PC code (split all fields for them out
+of struct request and move them into a separate, driver-allocate structure)
+would fix this up as a side-effect.  I really wanted to get it into 4.10,
+but I didn't manage to fix it up.  I'll try to get it into 4.11 early.
