@@ -1,66 +1,38 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:60569 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1755879AbcLOUdL (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Dec 2016 15:33:11 -0500
-Received: from pps.filterd (m0001303.ppops.net [127.0.0.1])
-        by m0001303.ppops.net (8.16.0.17/8.16.0.17) with SMTP id uBFKWDpT003347
-        for <linux-block@vger.kernel.org>; Thu, 15 Dec 2016 12:33:11 -0800
-Received: from mail.thefacebook.com ([199.201.64.23])
-        by m0001303.ppops.net with ESMTP id 27c263827r-4
-        (version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT)
-        for <linux-block@vger.kernel.org>; Thu, 15 Dec 2016 12:33:11 -0800
-Received: from facebook.com (2401:db00:21:603d:face:0:19:0)     by
- mx-out.facebook.com (10.102.107.97) with ESMTP id
- b0dde72ec30511e696cd0002c99331b0-88bf6a50 for <linux-block@vger.kernel.org>;
-        Thu, 15 Dec 2016 12:33:09 -0800
-From: Shaohua Li <shli@fb.com>
-To: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <kernel-team@fb.com>, <axboe@fb.com>, <tj@kernel.org>,
-        <vgoyal@redhat.com>
-Subject: [PATCH V5 07/17] blk-throttle: make sure expire time isn't too big
-Date: Thu, 15 Dec 2016 12:32:58 -0800
-Message-ID: <977d7661612aa15e1647690dd2d450ab5e3db1a6.1481833017.git.shli@fb.com>
-In-Reply-To: <cover.1481833017.git.shli@fb.com>
-References: <cover.1481833017.git.shli@fb.com>
+Received: from verein.lst.de ([213.95.11.211]:36076 "EHLO newverein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753820AbcLXNTu (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 24 Dec 2016 08:19:50 -0500
+Date: Sat, 24 Dec 2016 14:19:48 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Hannes Reinecke <hare@suse.de>
+Cc: Christoph Hellwig <hch@lst.de>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Chris Leech <cleech@redhat.com>,
+        Ming Lei <tom.leiming@gmail.com>,
+        Dave Chinner <david@fromorbit.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Lee Duncan <lduncan@suse.com>, open-iscsi@googlegroups.com,
+        Linux SCSI List <linux-scsi@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Jens Axboe <axboe@fb.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>
+Subject: Re: [4.10, panic, regression] iscsi: null pointer deref at
+        iscsi_tcp_segment_done+0x20d/0x2e0
+Message-ID: <20161224131948.GA18948@lst.de>
+References: <20161222051322.GF4758@dastard> <CA+55aFza=cv6TGYh+Be1xz2x-G-U=vruhbmfGpHSqY1ocZrBeg@mail.gmail.com> <20161222065012.GI4758@dastard> <20161222185030.so4btkuzzkih3owz@straylight.hirudinean.org> <CACVXFVOGoh+AEGSSMsbxfdAjZQS5k_t+7uR-+qwusm0vfauHEA@mail.gmail.com> <20161223000356.dxwkgsei32w7hc4f@straylight.hirudinean.org> <20161223100014.GA29467@lst.de> <CA+55aFxA1LE+4jdR8YXZyRVJ-MpOCUVob=ESBsMPuW=Qb=px-A@mail.gmail.com> <20161224100756.GA16741@lst.de> <a9fc4c0b-8521-84cc-66f6-48396c095539@suse.de>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <a9fc4c0b-8521-84cc-66f6-48396c095539@suse.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-cgroup could be throttled to a limit but when all cgroups cross high
-limit, queue enters a higher state and so the group should be throttled
-to a higher limit. It's possible the cgroup is sleeping because of
-throttle and other cgroups don't dispatch IO any more. In this case,
-nobody can trigger current downgrade/upgrade logic. To fix this issue,
-we could either set up a timer to wakeup the cgroup if other cgroups are
-idle or make sure this cgroup doesn't sleep too long. Setting up a timer
-means we must change the timer very frequently. This patch chooses the
-latter. Making cgroup sleep time not too big wouldn't change cgroup
-bps/iops, but could make it wakeup more frequently, which isn't a big
-issue because throtl_slice * 8 is already quite big.
+On Sat, Dec 24, 2016 at 02:17:26PM +0100, Hannes Reinecke wrote:
+> Christoph, do you have a pointer to your patchset?
+> Not that I'll be able to do any meaningful work until next year, but having 
+> a look would be nice. Just to get a feeling where you want to head to; I 
+> might be able to work on this start of January.
 
-Signed-off-by: Shaohua Li <shli@fb.com>
----
- block/blk-throttle.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 0f65fce..41ec72c 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -588,6 +588,10 @@ static void throtl_dequeue_tg(struct throtl_grp *tg)
- static void throtl_schedule_pending_timer(struct throtl_service_queue *sq,
- 					  unsigned long expires)
- {
-+	unsigned long max_expire = jiffies + 8 * throtl_slice;
-+
-+	if (time_after(expires, max_expire))
-+		expires = max_expire;
- 	mod_timer(&sq->pending_timer, expires);
- 	throtl_log(sq, "schedule timer. delay=%lu jiffies=%lu",
- 		   expires - jiffies, jiffies);
--- 
-2.9.3
-
+I'll push out a branch once it's revieable and not my current unbisectable
+mess, should be soon.
