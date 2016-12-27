@@ -1,86 +1,42 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f68.google.com ([74.125.83.68]:34724 "EHLO
-        mail-pg0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755691AbcL0QB3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Dec 2016 11:01:29 -0500
+Return-Path: <tom.leiming@gmail.com>
+Return-Path: <tom.leiming@gmail.com>
 From: Ming Lei <tom.leiming@gmail.com>
-To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        Ming Lei <tom.leiming@gmail.com>,
-        Kent Overstreet <kent.overstreet@gmail.com>,
-        Shaohua Li <shli@kernel.org>,
-        Mike Christie <mchristi@redhat.com>,
-        Guoqing Jiang <gqjiang@suse.com>,
-        linux-bcache@vger.kernel.org (open list:BCACHE (BLOCK LAYER CACHE)),
-        linux-raid@vger.kernel.org (open list:SOFTWARE RAID (Multiple Disks)
-        SUPPORT)
-Subject: [PATCH v1 23/54] bcache: handle bio_clone() & bvec updating for multipage bvecs
-Date: Tue, 27 Dec 2016 23:56:12 +0800
-Message-Id: <1482854250-13481-24-git-send-email-tom.leiming@gmail.com>
+To: Jens Axboe <axboe@fb.com>,
+	linux-kernel@vger.kernel.org
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>,
+	Ming Lei <tom.leiming@gmail.com>,
+	Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH v1 09/54] block: comment on bio_iov_iter_get_pages()
+Date: Tue, 27 Dec 2016 23:55:58 +0800
+Message-Id: <1482854250-13481-10-git-send-email-tom.leiming@gmail.com>
 In-Reply-To: <1482854250-13481-1-git-send-email-tom.leiming@gmail.com>
 References: <1482854250-13481-1-git-send-email-tom.leiming@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-The incoming bio may be too big to be cloned into
-one singlepage bvecs bio, so split the bio and
-check the splitted bio one by one.
+bio_iov_iter_get_pages() used unused bvec spaces for
+storing page pointer array temporarily, and this patch
+comments on this usage wrt. multipage bvec support.
 
 Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- drivers/md/bcache/debug.c | 24 ++++++++++++++++++++++--
- 1 file changed, 22 insertions(+), 2 deletions(-)
+ block/bio.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/drivers/md/bcache/debug.c b/drivers/md/bcache/debug.c
-index 48d03e8b3385..18b2d2d138e3 100644
---- a/drivers/md/bcache/debug.c
-+++ b/drivers/md/bcache/debug.c
-@@ -103,7 +103,7 @@ void bch_btree_verify(struct btree *b)
- 	up(&b->io_mutex);
- }
- 
--void bch_data_verify(struct cached_dev *dc, struct bio *bio)
-+static void __bch_data_verify(struct cached_dev *dc, struct bio *bio)
+diff --git a/block/bio.c b/block/bio.c
+index d4a1e0b63ea0..10398969353b 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -859,6 +859,10 @@ EXPORT_SYMBOL(bio_add_page);
+  *
+  * Pins as many pages from *iter and appends them to @bio's bvec array. The
+  * pages will have to be released using put_page() when done.
++ *
++ * The hacking way of using bvec table as page pointer array is safe
++ * even after multipage bvec is introduced because that space can be
++ * thought as unused by bio_add_page().
+  */
+ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
  {
- 	char name[BDEVNAME_SIZE];
- 	struct bio *check;
-@@ -116,7 +116,7 @@ void bch_data_verify(struct cached_dev *dc, struct bio *bio)
- 	 * in the new cloned bio because each single page need
- 	 * to assign to each bvec of the new bio.
- 	 */
--	check = bio_clone(bio, GFP_NOIO);
-+	check = bio_clone_sp(bio, GFP_NOIO);
- 	if (!check)
- 		return;
- 	check->bi_opf = REQ_OP_READ;
-@@ -151,6 +151,26 @@ void bch_data_verify(struct cached_dev *dc, struct bio *bio)
- 	bio_put(check);
- }
- 
-+void bch_data_verify(struct cached_dev *dc, struct bio *bio)
-+{
-+	struct request_queue *q = bdev_get_queue(bio->bi_bdev);
-+	struct bio *clone = bio_clone_fast(bio, GFP_NOIO, q->bio_split);
-+	unsigned sectors;
-+
-+	while (!bio_can_convert_to_sp(clone, &sectors)) {
-+		struct bio *split = bio_split(clone, sectors,
-+					      GFP_NOIO, q->bio_split);
-+
-+		__bch_data_verify(dc, split);
-+		bio_put(split);
-+	}
-+
-+	if (bio_sectors(clone))
-+		__bch_data_verify(dc, clone);
-+
-+	bio_put(clone);
-+}
-+
- #endif
- 
- #ifdef CONFIG_DEBUG_FS
 -- 
 2.7.4
-
