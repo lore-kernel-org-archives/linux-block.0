@@ -1,78 +1,77 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f67.google.com ([74.125.83.67]:35792 "EHLO
-        mail-pg0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755684AbcL0QB3 (ORCPT
+Received: from mail-pg0-f68.google.com ([74.125.83.68]:35399 "EHLO
+        mail-pg0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933171AbcL0QIP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Dec 2016 11:01:29 -0500
+        Tue, 27 Dec 2016 11:08:15 -0500
 From: Ming Lei <tom.leiming@gmail.com>
 To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
 Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
         Ming Lei <tom.leiming@gmail.com>,
-        Mike Christie <mchristi@redhat.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Kent Overstreet <kent.overstreet@gmail.com>,
-        Chaitanya Kulkarni <chaitanya.kulkarni@hgst.com>
-Subject: [PATCH v1 21/54] block: introduce bio_can_convert_to_sp()
-Date: Tue, 27 Dec 2016 23:56:10 +0800
-Message-Id: <1482854250-13481-22-git-send-email-tom.leiming@gmail.com>
+        Johannes Berg <johannes.berg@intel.com>
+Subject: [PATCH v1 15/54] block: implement sp version of bvec iterator helpers
+Date: Tue, 27 Dec 2016 23:56:04 +0800
+Message-Id: <1482854250-13481-16-git-send-email-tom.leiming@gmail.com>
 In-Reply-To: <1482854250-13481-1-git-send-email-tom.leiming@gmail.com>
 References: <1482854250-13481-1-git-send-email-tom.leiming@gmail.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-This patch introduces bio_can_convert_to_sp() for checking
-if one multipage bio can be converted into one singlepage
-bio. If not, returns how many sectors we need to split for
-converting the splitted one into singlepage bio.
+This patch implements singlepage version of the following
+3 helpers:
+	- bvec_iter_offset_sp()
+	- bvec_iter_len_sp()
+	- bvec_iter_page_sp()
 
-In the following patches, block bounce and bcache will use
-the helper.
+So that one multipage bvec can be splited to singlepage
+bvec, and make users of current bvec iterator happy.
 
 Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- include/linux/bio.h | 29 +++++++++++++++++++++++++++++
- 1 file changed, 29 insertions(+)
+ include/linux/bvec.h | 18 +++++++++++++++---
+ 1 file changed, 15 insertions(+), 3 deletions(-)
 
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 0f2859f96468..79079bc5a1be 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -262,6 +262,35 @@ static inline unsigned bio_segments_mp(struct bio *bio)
- }
+diff --git a/include/linux/bvec.h b/include/linux/bvec.h
+index 307a387eb29c..d77c3cabce8c 100644
+--- a/include/linux/bvec.h
++++ b/include/linux/bvec.h
+@@ -22,6 +22,7 @@
+ 
+ #include <linux/kernel.h>
+ #include <linux/bug.h>
++#include <linux/mm.h>
  
  /*
-+ * This helper checks @bio and see if we can convert it into one
-+ * singlepage bvec based bio. Return true if yes, otherwise false
-+ * is returned.
-+ *
-+ * @sectors returns how many sectors we need to split for converting
-+ * the splitted one into a singlepage bio if the whole bio can't be
-+ * converted into a singlepage bio.
-+ */
-+static inline bool bio_can_convert_to_sp(struct bio *bio, unsigned *sectors)
-+{
-+	struct bio_vec bv;
-+	struct bvec_iter iter;
-+	unsigned len = 0;
-+	bool ret = true;
-+	unsigned segs = 0;
+  * What is multipage bvecs(segment)?
+@@ -95,14 +96,25 @@ struct bvec_iter {
+ #define bvec_iter_offset_mp(bvec, iter)				\
+ 	(__bvec_iter_bvec((bvec), (iter))->bv_offset + (iter).bi_bvec_done)
+ 
++#define bvec_iter_page_idx_mp(bvec, iter)			\
++	(bvec_iter_offset_mp((bvec), (iter)) / PAGE_SIZE)
 +
-+	bio_for_each_segment(bv, bio, iter) {
-+		if (++segs > BIO_MAX_PAGES) {
-+			ret = false;
-+			*sectors = len >> 9;
-+			break;
-+		}
-+		len += bv.bv_len;
-+	}
 +
-+	return ret;
-+}
-+
-+/*
-  * get a reference to a bio, so it won't disappear. the intended use is
-  * something like:
+ /*
+  * <page, offset,length> of singlepage(sp) segment.
   *
+  * This helpers will be implemented for building sp bvec in flight.
+  */
+-#define bvec_iter_offset_sp(bvec, iter)	bvec_iter_offset_mp((bvec), (iter))
+-#define bvec_iter_len_sp(bvec, iter)	bvec_iter_len_mp((bvec), (iter))
+-#define bvec_iter_page_sp(bvec, iter)	bvec_iter_page_mp((bvec), (iter))
++#define bvec_iter_offset_sp(bvec, iter)					\
++	(bvec_iter_offset_mp((bvec), (iter)) % PAGE_SIZE)
++
++#define bvec_iter_len_sp(bvec, iter)					\
++	min_t(unsigned, bvec_iter_len_mp((bvec), (iter)),		\
++	    (PAGE_SIZE - (bvec_iter_offset_sp((bvec), (iter)))))
++
++#define bvec_iter_page_sp(bvec, iter)					\
++	nth_page(bvec_iter_page_mp((bvec), (iter)),			\
++		 bvec_iter_page_idx_mp((bvec), (iter)))
+ 
+ /* current interfaces support sp style at default */
+ #define bvec_iter_page(bvec, iter)	bvec_iter_page_sp((bvec), (iter))
 -- 
 2.7.4
 
