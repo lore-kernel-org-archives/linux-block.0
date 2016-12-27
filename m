@@ -7,53 +7,34 @@ Cc: linux-block@vger.kernel.org,
 	Christoph Hellwig <hch@infradead.org>,
 	Ming Lei <tom.leiming@gmail.com>,
 	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH v1 19/54] block: bounce: avoid direct access to bvec table
-Date: Tue, 27 Dec 2016 23:56:08 +0800
-Message-Id: <1482854250-13481-20-git-send-email-tom.leiming@gmail.com>
+Subject: [PATCH v1 26/54] block: blk-merge: remove unnecessary check
+Date: Tue, 27 Dec 2016 23:56:15 +0800
+Message-Id: <1482854250-13481-27-git-send-email-tom.leiming@gmail.com>
 In-Reply-To: <1482854250-13481-1-git-send-email-tom.leiming@gmail.com>
 References: <1482854250-13481-1-git-send-email-tom.leiming@gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
-We will support multipage bvecs in the future, so change to
-iterator way for getting bv_page of bvec from original bio.
+In this case, 'sectors' can't be zero at all, so remove the check.
 
 Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- block/bounce.c | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
+ block/blk-merge.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/block/bounce.c b/block/bounce.c
-index 1cb5dd3a5da1..babd3f224ca0 100644
---- a/block/bounce.c
-+++ b/block/bounce.c
-@@ -126,21 +126,23 @@ static void copy_to_high_bio_irq(struct bio *to, struct bio *from)
- static void bounce_end_io(struct bio *bio, mempool_t *pool)
- {
- 	struct bio *bio_orig = bio->bi_private;
--	struct bio_vec *bvec, *org_vec;
-+	struct bio_vec *bvec, orig_vec;
- 	int i;
--	int start = bio_orig->bi_iter.bi_idx;
-+	struct bvec_iter orig_iter = bio_orig->bi_iter;
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index a801f62a104b..05b6a3ef63f6 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -136,9 +136,7 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
+ 				nsegs++;
+ 				sectors = max_sectors;
+ 			}
+-			if (sectors)
+-				goto split;
+-			/* Make this single bvec as the 1st segment */
++			goto split;
+ 		}
  
- 	/*
- 	 * free up bounce indirect pages used
- 	 */
- 	bio_for_each_segment_all(bvec, bio, i) {
--		org_vec = bio_orig->bi_io_vec + i + start;
- 
--		if (bvec->bv_page == org_vec->bv_page)
--			continue;
-+		orig_vec = bio_iter_iovec(bio_orig, orig_iter);
-+		if (bvec->bv_page == orig_vec.bv_page)
-+			goto next;
- 
- 		dec_zone_page_state(bvec->bv_page, NR_BOUNCE);
- 		mempool_free(bvec->bv_page, pool);
-+ next:
-+		bio_advance_iter(bio_orig, &orig_iter, orig_vec.bv_len);
- 	}
- 
- 	bio_orig->bi_error = bio->bi_error;
+ 		if (bvprvp && blk_queue_cluster(q)) {
 -- 
 2.7.4
