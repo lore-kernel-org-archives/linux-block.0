@@ -1,103 +1,66 @@
-Return-Path: <jack@suse.cz>
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	Wei Fang <fangwei1@huawei.com>,
-	linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Rabin Vincent <rabinv@axis.com>,
-	stable@vger.kernel.org,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH] block: protect iterate_bdevs() against concurrent close
-Date: Thu,  1 Dec 2016 09:18:28 +0100
-Message-Id: <1480580308-15342-1-git-send-email-jack@suse.cz>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pg0-f68.google.com ([74.125.83.68]:35422 "EHLO
+        mail-pg0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933378AbcL0QKf (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 27 Dec 2016 11:10:35 -0500
+From: Ming Lei <tom.leiming@gmail.com>
+To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        Ming Lei <tom.leiming@gmail.com>,
+        Mike Christie <mchristi@redhat.com>,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        Hannes Reinecke <hare@suse.com>,
+        Chaitanya Kulkarni <chaitanya.kulkarni@hgst.com>
+Subject: [PATCH v1 31/54] block: introduce bio_segments_all()
+Date: Tue, 27 Dec 2016 23:56:20 +0800
+Message-Id: <1482854250-13481-32-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1482854250-13481-1-git-send-email-tom.leiming@gmail.com>
+References: <1482854250-13481-1-git-send-email-tom.leiming@gmail.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Rabin Vincent <rabinv@axis.com>
+There are still several direct access to .bi_vcnt, so
+introduce this helper to replace that usage for supporting
+multipage bvec.
 
-If a block device is closed while iterate_bdevs() is handling it, the
-following NULL pointer dereference occurs because bdev->b_disk is NULL
-in bdev_get_queue(), which is called from blk_get_backing_dev_info() (in
-turn called by the mapping_cap_writeback_dirty() call in
-__filemap_fdatawrite_range()):
-
- BUG: unable to handle kernel NULL pointer dereference at 0000000000000508
- IP: [<ffffffff81314790>] blk_get_backing_dev_info+0x10/0x20
- PGD 9e62067 PUD 9ee8067 PMD 0
- Oops: 0000 [#1] PREEMPT SMP DEBUG_PAGEALLOC
- Modules linked in:
- CPU: 1 PID: 2422 Comm: sync Not tainted 4.5.0-rc7+ #400
- Hardware name: QEMU Standard PC (i440FX + PIIX, 1996)
- task: ffff880009f4d700 ti: ffff880009f5c000 task.ti: ffff880009f5c000
- RIP: 0010:[<ffffffff81314790>]  [<ffffffff81314790>] blk_get_backing_dev_info+0x10/0x20
- RSP: 0018:ffff880009f5fe68  EFLAGS: 00010246
- RAX: 0000000000000000 RBX: ffff88000ec17a38 RCX: ffffffff81a4e940
- RDX: 7fffffffffffffff RSI: 0000000000000000 RDI: ffff88000ec176c0
- RBP: ffff880009f5fe68 R08: 0000000000000000 R09: 0000000000000000
- R10: 0000000000000001 R11: 0000000000000000 R12: ffff88000ec17860
- R13: ffffffff811b25c0 R14: ffff88000ec178e0 R15: ffff88000ec17a38
- FS:  00007faee505d700(0000) GS:ffff88000fb00000(0000) knlGS:0000000000000000
- CS:  0010 DS: 0000 ES: 0000 CR0: 000000008005003b
- CR2: 0000000000000508 CR3: 0000000009e8a000 CR4: 00000000000006e0
- Stack:
-  ffff880009f5feb8 ffffffff8112e7f5 0000000000000000 7fffffffffffffff
-  0000000000000000 0000000000000000 7fffffffffffffff 0000000000000001
-  ffff88000ec178e0 ffff88000ec17860 ffff880009f5fec8 ffffffff8112e81f
- Call Trace:
-  [<ffffffff8112e7f5>] __filemap_fdatawrite_range+0x85/0x90
-  [<ffffffff8112e81f>] filemap_fdatawrite+0x1f/0x30
-  [<ffffffff811b25d6>] fdatawrite_one_bdev+0x16/0x20
-  [<ffffffff811bc402>] iterate_bdevs+0xf2/0x130
-  [<ffffffff811b2763>] sys_sync+0x63/0x90
-  [<ffffffff815d4272>] entry_SYSCALL_64_fastpath+0x12/0x76
- Code: 0f 1f 44 00 00 48 8b 87 f0 00 00 00 55 48 89 e5 <48> 8b 80 08 05 00 00 5d
- RIP  [<ffffffff81314790>] blk_get_backing_dev_info+0x10/0x20
-  RSP <ffff880009f5fe68>
- CR2: 0000000000000508
- ---[ end trace 2487336ceb3de62d ]---
-
-The crash is easily reproducible by running the following command, if an
-msleep(100) is inserted before the call to func() in iterate_devs():
-
- while :; do head -c1 /dev/nullb0; done > /dev/null & while :; do sync; done
-
-Fix it by holding the bd_mutex across the func() call and only calling
-func() if the bdev is opened.
-
-Cc: stable@vger.kernel.org
-Fixes: 5c0d6b60a0ba46d45020547eacf7199171920935
-Reported-and-tested-by: Wei Fang <fangwei1@huawei.com>
-Signed-off-by: Rabin Vincent <rabinv@axis.com>
-Signed-off-by: Jan Kara <jack@suse.cz>
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- fs/block_dev.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ include/linux/bio.h | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 05b553368bb4..899fa8ccc347 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -1950,6 +1950,7 @@ void iterate_bdevs(void (*func)(struct block_device *, void *), void *arg)
- 	spin_lock(&blockdev_superblock->s_inode_list_lock);
- 	list_for_each_entry(inode, &blockdev_superblock->s_inodes, i_sb_list) {
- 		struct address_space *mapping = inode->i_mapping;
-+		struct block_device *bdev;
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index efa0b3627735..b0929cf8c7fe 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -391,6 +391,27 @@ static inline void bio_get_last_bvec(struct bio *bio, struct bio_vec *bv)
+ 		bv->bv_len = iter.bi_bvec_done;
+ }
  
- 		spin_lock(&inode->i_lock);
- 		if (inode->i_state & (I_FREEING|I_WILL_FREE|I_NEW) ||
-@@ -1970,8 +1971,12 @@ void iterate_bdevs(void (*func)(struct block_device *, void *), void *arg)
- 		 */
- 		iput(old_inode);
- 		old_inode = inode;
-+		bdev = I_BDEV(inode);
- 
--		func(I_BDEV(inode), arg);
-+		mutex_lock(&bdev->bd_mutex);
-+		if (bdev->bd_openers)
-+			func(bdev, arg);
-+		mutex_unlock(&bdev->bd_mutex);
- 
- 		spin_lock(&blockdev_superblock->s_inode_list_lock);
- 	}
++/*
++ * Return how many singlepage bvecs included in this bio,
++ * and this helper is only used for some fs to replace
++ * bio->bi_vcnt.
++ */
++static inline unsigned bio_segments_all(struct bio *bio)
++{
++	unsigned segs = 0;
++	int i;
++	struct bio_vec *bv;
++	struct bvec_iter_all bia;
++
++	WARN_ON_ONCE(bio_flagged(bio, BIO_CLONED));
++
++	bio_for_each_segment_all_sp(bv, bio, i, bia)
++		segs++;
++
++	return segs;
++}
++
++
+ enum bip_flags {
+ 	BIP_BLOCK_INTEGRITY	= 1 << 0, /* block layer owns integrity data */
+ 	BIP_MAPPED_INTEGRITY	= 1 << 1, /* ref tag has been remapped */
 -- 
-2.6.6
+2.7.4
+
