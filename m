@@ -1,66 +1,41 @@
-Return-Path: <prvs=11505706e0=axboe@fb.com>
-From: Jens Axboe <axboe@fb.com>
-To: <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-CC: <paolo.valente@linaro.org>, <osandov@fb.com>
-Subject: [PATCHSET/RFC v2] blk-mq scheduling framework
-Date: Thu, 8 Dec 2016 13:13:18 -0700
-Message-ID: <1481228005-9245-1-git-send-email-axboe@fb.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pg0-f66.google.com ([74.125.83.66]:35620 "EHLO
+        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932461AbcL0QFr (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 27 Dec 2016 11:05:47 -0500
+From: Ming Lei <tom.leiming@gmail.com>
+To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        Ming Lei <tom.leiming@gmail.com>,
+        Philipp Reisner <philipp.reisner@linbit.com>,
+        Lars Ellenberg <lars.ellenberg@linbit.com>,
+        drbd-dev@lists.linbit.com (open list:DRBD DRIVER)
+Subject: [PATCH v1 01/54] block: drbd: comment on direct access bvec table
+Date: Tue, 27 Dec 2016 23:55:50 +0800
+Message-Id: <1482854250-13481-2-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1482854250-13481-1-git-send-email-tom.leiming@gmail.com>
+References: <1482854250-13481-1-git-send-email-tom.leiming@gmail.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-As a followup to this posting from yesterday:
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+---
+ drivers/block/drbd/drbd_bitmap.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-https://marc.info/?l=linux-block&m=148115232806065&w=2
+diff --git a/drivers/block/drbd/drbd_bitmap.c b/drivers/block/drbd/drbd_bitmap.c
+index ab62b81c2ca7..ce9506da30ad 100644
+--- a/drivers/block/drbd/drbd_bitmap.c
++++ b/drivers/block/drbd/drbd_bitmap.c
+@@ -953,6 +953,7 @@ static void drbd_bm_endio(struct bio *bio)
+ 	struct drbd_bm_aio_ctx *ctx = bio->bi_private;
+ 	struct drbd_device *device = ctx->device;
+ 	struct drbd_bitmap *b = device->bitmap;
++	/* single page bio, safe for multipage bvec */
+ 	unsigned int idx = bm_page_to_idx(bio->bi_io_vec[0].bv_page);
+ 
+ 	if ((ctx->flags & BM_AIO_COPY_PAGES) == 0 &&
+-- 
+2.7.4
 
-this is version 2. I wanted to post a new one fairly quickly, as there
-ended up being a number of potential crashes in v1. This one should be
-solid, I've run mq-deadline on both NVMe and regular rotating storage,
-and we handle the various merging cases correctly.
-
-You can download it from git as well:
-
-git://git.kernel.dk/linux-block blk-mq-sched.2
-
-Note that this is based on for-4.10/block, which is in turn based on
-v4.9-rc1. I suggest pulling it into my for-next branch, which would
-then merge nicely with 'master' as well.
-
-Changes since v1:
-
-- Add Kconfig entries to allow the user to choose what the default
-  scheduler should be for blk-mq, and whether that depends on the
-  number of hardware queues.
-
-- Properly abstract the whole get/put of a request, so we can manage
-  the life time properly.
-
-- Enable full merging on mq-deadline (front/back, bio-to-rq, rq-to-rq).
-  Has full feature parity with deadline now.
-
-- Export necessary symbols for compiling mq-deadline as a module.
-
-- Various API adjustments for the mq schedulers.
-
-- Various cleanups and improvements.
-
-- Fix a lot of bugs. A lot. Upgrade!
-
- block/Kconfig.iosched    |   37 ++
- block/Makefile           |    3 
- block/blk-core.c         |    9 
- block/blk-exec.c         |    3 
- block/blk-flush.c        |    7 
- block/blk-merge.c        |    3 
- block/blk-mq-sched.c     |  265 +++++++++++++++++++
- block/blk-mq-sched.h     |  188 +++++++++++++
- block/blk-mq-tag.c       |    1 
- block/blk-mq.c           |  254 ++++++++++--------
- block/blk-mq.h           |   35 +-
- block/elevator.c         |  194 ++++++++++----
- block/mq-deadline.c      |  647 +++++++++++++++++++++++++++++++++++++++++++++++
- drivers/nvme/host/pci.c  |    1 
- include/linux/blk-mq.h   |    4 
- include/linux/elevator.h |   34 ++
- 16 files changed, 1495 insertions(+), 190 deletions(-)
