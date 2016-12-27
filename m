@@ -1,70 +1,47 @@
-Return-Path: <tom.leiming@gmail.com>
-Return-Path: <tom.leiming@gmail.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pg0-f67.google.com ([74.125.83.67]:35500 "EHLO
+        mail-pg0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753224AbcL0QFa (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 27 Dec 2016 11:05:30 -0500
 From: Ming Lei <tom.leiming@gmail.com>
-To: Jens Axboe <axboe@fb.com>,
-	linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Ming Lei <tom.leiming@gmail.com>,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH v1 24/54] blk-merge: compute bio->bi_seg_front_size efficiently
-Date: Tue, 27 Dec 2016 23:56:13 +0800
-Message-Id: <1482854250-13481-25-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1482854250-13481-1-git-send-email-tom.leiming@gmail.com>
-References: <1482854250-13481-1-git-send-email-tom.leiming@gmail.com>
-List-ID: <linux-block@vger.kernel.org>
+To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        Ming Lei <tom.leiming@gmail.com>,
+        Johannes Berg <johannes.berg@intel.com>
+Subject: [PATCH v1 32/54] block: introduce bvec_get_last_sp()
+Date: Wed, 28 Dec 2016 00:04:41 +0800
+Message-Id: <1482854706-14128-1-git-send-email-tom.leiming@gmail.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-It is enough to check and compute bio->bi_seg_front_size just
-after the 1st segment is found, but current code checks that
-for each bvec, which is inefficient.
-
-This patch follows the way in  __blk_recalc_rq_segments()
-for computing bio->bi_seg_front_size, and it is more efficient
-and code becomes more readable too.
+BTRFS need to get the last singlepage bvec, so introduce
+this helper to make it happy.
 
 Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- block/blk-merge.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+ include/linux/bvec.h | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 182398cb1524..e3abc835e4b7 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -153,22 +153,21 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
- 			bvprvp = &bvprv;
- 			sectors += bv.bv_len >> 9;
+diff --git a/include/linux/bvec.h b/include/linux/bvec.h
+index baf379d56106..e9a623067c52 100644
+--- a/include/linux/bvec.h
++++ b/include/linux/bvec.h
+@@ -206,4 +206,14 @@ static inline void bvec_iter_advance_mp(const struct bio_vec *bv,
+ #define bvec_for_each_sp_bvec(sp_bvl, mp_bvec, iter)			\
+ 	__bvec_for_each_sp_bvec(sp_bvl, mp_bvec, iter, BVEC_ITER_ALL_INIT)
  
--			if (nsegs == 1 && seg_size > front_seg_size)
--				front_seg_size = seg_size;
- 			continue;
- 		}
- new_segment:
- 		if (nsegs == queue_max_segments(q))
- 			goto split;
- 
-+		if (nsegs == 1 && seg_size > front_seg_size)
-+			front_seg_size = seg_size;
++/* get the last singlepage bvec from the multipage bvec  */
++static inline void bvec_get_last_sp(struct bio_vec *mp_bv,
++				    struct bio_vec *sp_bv)
++{
++	struct bvec_iter iter;
 +
- 		nsegs++;
- 		bvprv = bv;
- 		bvprvp = &bvprv;
- 		seg_size = bv.bv_len;
- 		sectors += bv.bv_len >> 9;
- 
--		if (nsegs == 1 && seg_size > front_seg_size)
--			front_seg_size = seg_size;
- 	}
- 
- 	do_split = false;
-@@ -181,6 +180,8 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
- 			bio = new;
- 	}
- 
-+	if (nsegs == 1 && seg_size > front_seg_size)
-+		front_seg_size = seg_size;
- 	bio->bi_seg_front_size = front_seg_size;
- 	if (seg_size > bio->bi_seg_back_size)
- 		bio->bi_seg_back_size = seg_size;
++	bvec_for_each_sp_bvec(*sp_bv, mp_bv, iter)
++		;
++}
++
+ #endif /* __LINUX_BVEC_ITER_H */
 -- 
 2.7.4
+
