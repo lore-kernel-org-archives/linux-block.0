@@ -1,199 +1,49 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:37150 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1756277AbcLOUdK (ORCPT
+Received: from mail-pg0-f66.google.com ([74.125.83.66]:33052 "EHLO
+        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932916AbcL0QGZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Dec 2016 15:33:10 -0500
-Received: from pps.filterd (m0044008.ppops.net [127.0.0.1])
-        by mx0a-00082601.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id uBFKVQoj022626
-        for <linux-block@vger.kernel.org>; Thu, 15 Dec 2016 12:33:10 -0800
-Received: from mail.thefacebook.com ([199.201.64.23])
-        by mx0a-00082601.pphosted.com with ESMTP id 27bwxukbm0-3
-        (version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT)
-        for <linux-block@vger.kernel.org>; Thu, 15 Dec 2016 12:33:10 -0800
-Received: from facebook.com (2401:db00:21:603d:face:0:19:0)     by
- mx-out.facebook.com (10.102.107.99) with ESMTP id
- b138119ac30511e6ae870002c99293a0-76dfba50 for <linux-block@vger.kernel.org>;
-        Thu, 15 Dec 2016 12:33:09 -0800
-From: Shaohua Li <shli@fb.com>
-To: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <kernel-team@fb.com>, <axboe@fb.com>, <tj@kernel.org>,
-        <vgoyal@redhat.com>
-Subject: [PATCH V5 15/17] block: track request size in blk_issue_stat
-Date: Thu, 15 Dec 2016 12:33:06 -0800
-Message-ID: <76954496f30da4902288fc027a0ed74a232535e5.1481833017.git.shli@fb.com>
-In-Reply-To: <cover.1481833017.git.shli@fb.com>
-References: <cover.1481833017.git.shli@fb.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+        Tue, 27 Dec 2016 11:06:25 -0500
+From: Ming Lei <tom.leiming@gmail.com>
+To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        Ming Lei <tom.leiming@gmail.com>,
+        Dave Chinner <david@fromorbit.com>,
+        linux-xfs@vger.kernel.org (supporter:XFS FILESYSTEM)
+Subject: [PATCH v1 42/54] xfs: convert to bio_for_each_segment_all_sp()
+Date: Wed, 28 Dec 2016 00:04:51 +0800
+Message-Id: <1482854706-14128-11-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1482854706-14128-1-git-send-email-tom.leiming@gmail.com>
+References: <1482854706-14128-1-git-send-email-tom.leiming@gmail.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Currently there is no way to know the request size when the request is
-finished. Next patch will need this info, so add to blk_issue_stat. With
-this, we will have 49bits to track time, which still is very long time.
-
-Signed-off-by: Shaohua Li <shli@fb.com>
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- block/blk-core.c          |  2 +-
- block/blk-mq.c            |  2 +-
- block/blk-stat.c          |  7 ++++---
- block/blk-stat.h          | 29 +++++++++++++++++++++++------
- block/blk-wbt.h           | 10 +++++-----
- include/linux/blk_types.h |  2 +-
- 6 files changed, 35 insertions(+), 17 deletions(-)
+ fs/xfs/xfs_aops.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 61ba08c..485c32d 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -2459,7 +2459,7 @@ void blk_start_request(struct request *req)
- 	blk_dequeue_request(req);
+diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
+index 0f56fcd3a5d5..1acd6162aec1 100644
+--- a/fs/xfs/xfs_aops.c
++++ b/fs/xfs/xfs_aops.c
+@@ -139,6 +139,7 @@ xfs_destroy_ioend(
+ 	for (bio = &ioend->io_inline_bio; bio; bio = next) {
+ 		struct bio_vec	*bvec;
+ 		int		i;
++		struct bvec_iter_all bia;
  
- 	if (test_bit(QUEUE_FLAG_STATS, &req->q->queue_flags)) {
--		blk_stat_set_issue_time(&req->issue_stat);
-+		blk_stat_set_issue(&req->issue_stat, blk_rq_sectors(req));
- 		req->rq_flags |= RQF_STATS;
- 		wbt_issue(req->q->rq_wb, &req->issue_stat);
- 	}
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 4bf850e..891db62 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -474,7 +474,7 @@ void blk_mq_start_request(struct request *rq)
- 		rq->next_rq->resid_len = blk_rq_bytes(rq->next_rq);
+ 		/*
+ 		 * For the last bio, bi_private points to the ioend, so we
+@@ -150,7 +151,7 @@ xfs_destroy_ioend(
+ 			next = bio->bi_private;
  
- 	if (test_bit(QUEUE_FLAG_STATS, &q->queue_flags)) {
--		blk_stat_set_issue_time(&rq->issue_stat);
-+		blk_stat_set_issue(&rq->issue_stat, blk_rq_sectors(rq));
- 		rq->rq_flags |= RQF_STATS;
- 		wbt_issue(q->rq_wb, &rq->issue_stat);
- 	}
-diff --git a/block/blk-stat.c b/block/blk-stat.c
-index 9b43efb..0469855 100644
---- a/block/blk-stat.c
-+++ b/block/blk-stat.c
-@@ -236,10 +236,11 @@ void blk_stat_clear(struct request_queue *q)
- 	}
- }
+ 		/* walk each page on bio, ending page IO on them */
+-		bio_for_each_segment_all(bvec, bio, i)
++		bio_for_each_segment_all_sp(bvec, bio, i, bia)
+ 			xfs_finish_page_writeback(inode, bvec, error);
  
--void blk_stat_set_issue_time(struct blk_issue_stat *stat)
-+void blk_stat_set_issue(struct blk_issue_stat *stat, sector_t size)
- {
--	stat->time = (stat->time & BLK_STAT_MASK) |
--			(ktime_to_ns(ktime_get()) & BLK_STAT_TIME_MASK);
-+	stat->stat = (stat->stat & BLK_STAT_RES_MASK) |
-+		(ktime_to_ns(ktime_get()) & BLK_STAT_TIME_MASK) |
-+		(blk_capped_size(size) << BLK_STAT_SIZE_SHIFT);
- }
- 
- /*
-diff --git a/block/blk-stat.h b/block/blk-stat.h
-index a2050a0..462197f 100644
---- a/block/blk-stat.h
-+++ b/block/blk-stat.h
-@@ -8,12 +8,19 @@
- #define BLK_STAT_NSEC_MASK	~(BLK_STAT_NSEC - 1)
- 
- /*
-- * Upper 3 bits can be used elsewhere
-+ * from upper:
-+ * 3 bits: reserved for other usage
-+ * 12 bits: size
-+ * 49 bits: time
-  */
- #define BLK_STAT_RES_BITS	3
--#define BLK_STAT_SHIFT		(64 - BLK_STAT_RES_BITS)
--#define BLK_STAT_TIME_MASK	((1ULL << BLK_STAT_SHIFT) - 1)
--#define BLK_STAT_MASK		~BLK_STAT_TIME_MASK
-+#define BLK_STAT_SIZE_BITS	12
-+#define BLK_STAT_RES_SHIFT	(64 - BLK_STAT_RES_BITS)
-+#define BLK_STAT_SIZE_SHIFT	(BLK_STAT_RES_SHIFT - BLK_STAT_SIZE_BITS)
-+#define BLK_STAT_TIME_MASK	((1ULL << BLK_STAT_SIZE_SHIFT) - 1)
-+#define BLK_STAT_SIZE_MASK	\
-+	(((1ULL << BLK_STAT_SIZE_BITS) - 1) << BLK_STAT_SIZE_SHIFT)
-+#define BLK_STAT_RES_MASK	(~((1ULL << BLK_STAT_RES_SHIFT) - 1))
- 
- enum {
- 	BLK_STAT_READ	= 0,
-@@ -26,7 +33,7 @@ void blk_queue_stat_get(struct request_queue *, struct blk_rq_stat *);
- void blk_stat_clear(struct request_queue *);
- void blk_stat_init(struct blk_rq_stat *);
- bool blk_stat_is_current(struct blk_rq_stat *);
--void blk_stat_set_issue_time(struct blk_issue_stat *);
-+void blk_stat_set_issue(struct blk_issue_stat *stat, sector_t size);
- bool blk_stat_enable(struct request_queue *);
- 
- static inline u64 __blk_stat_time(u64 time)
-@@ -36,7 +43,17 @@ static inline u64 __blk_stat_time(u64 time)
- 
- static inline u64 blk_stat_time(struct blk_issue_stat *stat)
- {
--	return __blk_stat_time(stat->time);
-+	return __blk_stat_time(stat->stat);
-+}
-+
-+static inline sector_t blk_capped_size(sector_t size)
-+{
-+	return size & ((1ULL << BLK_STAT_SIZE_BITS) - 1);
-+}
-+
-+static inline sector_t blk_stat_size(struct blk_issue_stat *stat)
-+{
-+	return (stat->stat & BLK_STAT_SIZE_MASK) >> BLK_STAT_SIZE_SHIFT;
- }
- 
- #endif
-diff --git a/block/blk-wbt.h b/block/blk-wbt.h
-index 65f1de5..7265f1f 100644
---- a/block/blk-wbt.h
-+++ b/block/blk-wbt.h
-@@ -32,27 +32,27 @@ enum {
- 
- static inline void wbt_clear_state(struct blk_issue_stat *stat)
- {
--	stat->time &= BLK_STAT_TIME_MASK;
-+	stat->stat &= ~BLK_STAT_RES_MASK;
- }
- 
- static inline enum wbt_flags wbt_stat_to_mask(struct blk_issue_stat *stat)
- {
--	return (stat->time & BLK_STAT_MASK) >> BLK_STAT_SHIFT;
-+	return (stat->stat & BLK_STAT_RES_MASK) >> BLK_STAT_RES_SHIFT;
- }
- 
- static inline void wbt_track(struct blk_issue_stat *stat, enum wbt_flags wb_acct)
- {
--	stat->time |= ((u64) wb_acct) << BLK_STAT_SHIFT;
-+	stat->stat |= ((u64) wb_acct) << BLK_STAT_RES_SHIFT;
- }
- 
- static inline bool wbt_is_tracked(struct blk_issue_stat *stat)
- {
--	return (stat->time >> BLK_STAT_SHIFT) & WBT_TRACKED;
-+	return (stat->stat >> BLK_STAT_RES_SHIFT) & WBT_TRACKED;
- }
- 
- static inline bool wbt_is_read(struct blk_issue_stat *stat)
- {
--	return (stat->time >> BLK_STAT_SHIFT) & WBT_READ;
-+	return (stat->stat >> BLK_STAT_RES_SHIFT) & WBT_READ;
- }
- 
- struct rq_wait {
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 01019a7..8159a6c 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -257,7 +257,7 @@ static inline unsigned int blk_qc_t_to_tag(blk_qc_t cookie)
- }
- 
- struct blk_issue_stat {
--	u64 time;
-+	u64 stat;
- };
- 
- #define BLK_RQ_STAT_BATCH	64
+ 		bio_put(bio);
 -- 
-2.9.3
+2.7.4
 
