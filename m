@@ -1,35 +1,67 @@
-Return-Path: <chandan@linux.vnet.ibm.com>
-From: Chandan Rajendra <chandan@linux.vnet.ibm.com>
-To: axboe@kernel.dk, jack@suse.cz
-Cc: Chandan Rajendra <chandan@linux.vnet.ibm.com>, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] clean_bdev_aliases: Prevent cleaning blocks that are not in block range
-Date: Sun, 25 Dec 2016 19:01:03 +0530
-Message-Id: <1482672663-17122-1-git-send-email-chandan@linux.vnet.ibm.com>
+Return-Path: <tom.leiming@gmail.com>
+Return-Path: <tom.leiming@gmail.com>
+From: Ming Lei <tom.leiming@gmail.com>
+To: Jens Axboe <axboe@fb.com>,
+	linux-kernel@vger.kernel.org
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>,
+	Ming Lei <tom.leiming@gmail.com>,
+	Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH v1 20/54] block: bounce: don't access bio->bi_io_vec in copy_to_high_bio_irq
+Date: Tue, 27 Dec 2016 23:56:09 +0800
+Message-Id: <1482854250-13481-21-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1482854250-13481-1-git-send-email-tom.leiming@gmail.com>
+References: <1482854250-13481-1-git-send-email-tom.leiming@gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
-The first block to be cleaned may start at a non-zero page offset. In
-such a scenario clean_bdev_aliases() will end up cleaning blocks that
-do not fall in the range of blocks to be cleaned. This commit fixes the
-issue by skipping blocks that do not fall in valid block range.
+As we need to support multipage bvecs, so don't access bio->bi_io_vec
+in copy_to_high_bio_irq(), and just use the standard iterator
+to do that.
 
-Signed-off-by: Chandan Rajendra <chandan@linux.vnet.ibm.com>
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- fs/buffer.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block/bounce.c | 16 +++++++++++-----
+ 1 file changed, 11 insertions(+), 5 deletions(-)
 
-diff --git a/fs/buffer.c b/fs/buffer.c
-index 1df2bd5..28484b3 100644
---- a/fs/buffer.c
-+++ b/fs/buffer.c
-@@ -1660,7 +1660,7 @@ void clean_bdev_aliases(struct block_device *bdev, sector_t block, sector_t len)
- 			head = page_buffers(page);
- 			bh = head;
- 			do {
--				if (!buffer_mapped(bh))
-+				if (!buffer_mapped(bh) || (bh->b_blocknr < block))
- 					goto next;
- 				if (bh->b_blocknr >= block + len)
- 					break;
+diff --git a/block/bounce.c b/block/bounce.c
+index babd3f224ca0..a42f7b98b7e6 100644
+--- a/block/bounce.c
++++ b/block/bounce.c
+@@ -102,24 +102,30 @@ int init_emergency_isa_pool(void)
+ static void copy_to_high_bio_irq(struct bio *to, struct bio *from)
+ {
+ 	unsigned char *vfrom;
+-	struct bio_vec tovec, *fromvec = from->bi_io_vec;
++	struct bio_vec tovec, fromvec;
+ 	struct bvec_iter iter;
++	/*
++	 * @from bio is created by bounce, so we can iterate from
++	 * start and can't trust @from->bi_iter because it might be
++	 * changed by splitting.
++	 */
++	struct bvec_iter from_iter = BVEC_ITER_ALL_INIT;
+ 
+ 	bio_for_each_segment(tovec, to, iter) {
+-		if (tovec.bv_page != fromvec->bv_page) {
++		fromvec = bio_iter_iovec(from, from_iter);
++		if (tovec.bv_page != fromvec.bv_page) {
+ 			/*
+ 			 * fromvec->bv_offset and fromvec->bv_len might have
+ 			 * been modified by the block layer, so use the original
+ 			 * copy, bounce_copy_vec already uses tovec->bv_len
+ 			 */
+-			vfrom = page_address(fromvec->bv_page) +
++			vfrom = page_address(fromvec.bv_page) +
+ 				tovec.bv_offset;
+ 
+ 			bounce_copy_vec(&tovec, vfrom);
+ 			flush_dcache_page(tovec.bv_page);
+ 		}
+-
+-		fromvec++;
++		bio_advance_iter(from, &from_iter, tovec.bv_len);
+ 	}
+ }
+ 
 -- 
-2.5.5
+2.7.4
