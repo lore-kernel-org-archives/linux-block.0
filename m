@@ -1,71 +1,57 @@
-Return-Path: <prvs=1147fe7fca=axboe@fb.com>
-From: Jens Axboe <axboe@fb.com>
-To: <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-CC: <paolo.valente@linaro.org>
-Subject: [PATCHSET/RFC v2] Make legacy IO schedulers work with blk-mq
-Date: Mon, 5 Dec 2016 11:26:59 -0700
-Message-ID: <1480962426-15767-1-git-send-email-axboe@fb.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pf0-f196.google.com ([209.85.192.196]:35217 "EHLO
+        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753065AbcL0P7v (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 27 Dec 2016 10:59:51 -0500
+From: Ming Lei <tom.leiming@gmail.com>
+To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        Ming Lei <tom.leiming@gmail.com>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        dm-devel@redhat.com (maintainer:DEVICE-MAPPER (LVM)),
+        Shaohua Li <shli@kernel.org>,
+        linux-raid@vger.kernel.org (open list:SOFTWARE RAID (Multiple Disks)
+        SUPPORT)
+Subject: [PATCH v1 12/54] dm: limit the max bio size as BIO_MAX_PAGES * PAGE_SIZE
+Date: Tue, 27 Dec 2016 23:56:01 +0800
+Message-Id: <1482854250-13481-13-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1482854250-13481-1-git-send-email-tom.leiming@gmail.com>
+References: <1482854250-13481-1-git-send-email-tom.leiming@gmail.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Version 2 of the hack/patchset, that enables blk-mq to use the legacy
-IO schedulers with single queue devices. Original posting is here:
+For BIO based DM, some targets aren't ready for dealing with
+bigger incoming bio than 1Mbyte, such as crypt target.
 
-https://marc.info/?l=linux-block&m=148073493203664&w=2
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+---
+ drivers/md/dm.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-You can also found this version in the following git branch:
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index 3086da5664f3..6139bf7623f7 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -899,7 +899,16 @@ int dm_set_target_max_io_len(struct dm_target *ti, sector_t len)
+ 		return -EINVAL;
+ 	}
+ 
+-	ti->max_io_len = (uint32_t) len;
++	/*
++	 * BIO based queue uses its own splitting. When multipage bvecs
++	 * is switched on, size of the incoming bio may be too big to
++	 * be handled in some targets, such as crypt.
++	 *
++	 * When these targets are ready for the big bio, we can remove
++	 * the limit.
++	 */
++	ti->max_io_len = min_t(uint32_t, len,
++			       (BIO_MAX_PAGES * PAGE_SIZE));
+ 
+ 	return 0;
+ }
+-- 
+2.7.4
 
-git://git.kernel.dk/linux-block blk-mq-legacy-sched.2
-
-and new developments/fixes will happen in the 'blk-mq-legacy-sched'
-branch.
-
-Changes since v1:
-
-- Remove the default 'deadline' hard wiring, and provide Kconfig
-  entries to set the blk-mq scheduler. This now works like for legacy
-  devices.
-
-- Rename blk_use_mq_path() to blk_use_sched_path() to make it more
-  clear. Suggested by Johannes Thumshirn.
-
-- Fixup a spot where we did not use the accessor function to determine
-  what path to use.
-
-- Flush mq software queues, even if IO scheduler managed. This should
-  make paths work that are MQ aware, and using only MQ interfaces.
-
-- Cleanup free path of MQ request.
-
-- Account when IO was queued to a hardware context, similarly to the
-  regular MQ path.
-
-- Add BLK_MQ_F_NO_SCHED flag, so that drivers can explicitly ask for
-  no scheduling on a queue. Add this for NVMe admin queues.
-
-- Kill BLK_MQ_F_SCHED, since we now have Kconfig entries for setting
-  the desired IO scheduler.
-
-- Fix issues with live scheduler switching through sysfs. Should now
-  be solid, even with lots of IO running on the device.
-
-- Drop null_blk and SCSI changes, not needed anymore.
-
-
- block/Kconfig.iosched   |   29 ++++
- block/blk-core.c        |   77 ++++++-----
- block/blk-exec.c        |   12 +
- block/blk-flush.c       |   40 +++--
- block/blk-merge.c       |    5 
- block/blk-mq.c          |  332 +++++++++++++++++++++++++++++++++++++++++++++---
- block/blk-mq.h          |    1 
- block/blk-sysfs.c       |    2 
- block/blk.h             |   16 ++
- block/cfq-iosched.c     |   22 ++-
- block/elevator.c        |  125 ++++++++++++------
- drivers/nvme/host/pci.c |    1 
- include/linux/blk-mq.h  |    1 
- include/linux/blkdev.h  |    2 
- 14 files changed, 555 insertions(+), 110 deletions(-)
