@@ -1,124 +1,163 @@
-Return-Path: <tom.leiming@gmail.com>
-Return-Path: <tom.leiming@gmail.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pg0-f68.google.com ([74.125.83.68]:36356 "EHLO
+        mail-pg0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933133AbcL0QHq (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 27 Dec 2016 11:07:46 -0500
 From: Ming Lei <tom.leiming@gmail.com>
-To: Jens Axboe <axboe@fb.com>,
-	linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Ming Lei <tom.leiming@gmail.com>,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH v1 28/54] block: use bio_for_each_segment_mp() to map sg
-Date: Tue, 27 Dec 2016 23:56:17 +0800
-Message-Id: <1482854250-13481-29-git-send-email-tom.leiming@gmail.com>
+To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        Ming Lei <tom.leiming@gmail.com>,
+        Mike Christie <mchristi@redhat.com>,
+        Hannes Reinecke <hare@suse.com>,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        Chaitanya Kulkarni <chaitanya.kulkarni@hgst.com>,
+        Johannes Berg <johannes.berg@intel.com>
+Subject: [PATCH v1 16/54] block: introduce bio_for_each_segment_mp()
+Date: Tue, 27 Dec 2016 23:56:05 +0800
+Message-Id: <1482854250-13481-17-git-send-email-tom.leiming@gmail.com>
 In-Reply-To: <1482854250-13481-1-git-send-email-tom.leiming@gmail.com>
 References: <1482854250-13481-1-git-send-email-tom.leiming@gmail.com>
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-It is more efficient to use bio_for_each_segment_mp()
-for mapping sg, meantime we have to consider splitting
-multipage bvec as done in blk_bio_segment_split().
+This helper is used to iterate multipage bvec and it is
+required in bio_clone().
 
 Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- block/blk-merge.c | 72 +++++++++++++++++++++++++++++++++++++++----------------
- 1 file changed, 52 insertions(+), 20 deletions(-)
+ include/linux/bio.h  | 39 ++++++++++++++++++++++++++++++++++-----
+ include/linux/bvec.h | 37 ++++++++++++++++++++++++++++++++-----
+ 2 files changed, 66 insertions(+), 10 deletions(-)
 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index a0e97959db7b..55c5866ea77a 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -450,6 +450,56 @@ static int blk_phys_contig_segment(struct request_queue *q, struct bio *bio,
- 	return 0;
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index 714fbf495af7..2bd4e6f2087a 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -68,6 +68,9 @@
+ #define bio_data_dir(bio) \
+ 	(op_is_write(bio_op(bio)) ? WRITE : READ)
+ 
++#define bio_iter_iovec_mp(bio, iter)				\
++	bvec_iter_bvec_mp((bio)->bi_io_vec, (iter))
++
+ /*
+  * Check whether this bio carries any data or not. A NULL bio is allowed.
+  */
+@@ -164,15 +167,31 @@ static inline void *bio_data(struct bio *bio)
+ #define bio_for_each_segment_all(bvl, bio, i)				\
+ 	for (i = 0, bvl = (bio)->bi_io_vec; i < (bio)->bi_vcnt; i++, bvl++)
+ 
+-static inline void bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
+-				    unsigned bytes)
++static inline void __bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
++				      unsigned bytes, bool mp)
+ {
+ 	iter->bi_sector += bytes >> 9;
+ 
+-	if (bio_no_advance_iter(bio))
++	if (bio_no_advance_iter(bio)) {
+ 		iter->bi_size -= bytes;
+-	else
+-		bvec_iter_advance(bio->bi_io_vec, iter, bytes);
++	} else {
++		if (!mp)
++			bvec_iter_advance(bio->bi_io_vec, iter, bytes);
++		else
++			bvec_iter_advance_mp(bio->bi_io_vec, iter, bytes);
++	}
++}
++
++static inline void bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
++				    unsigned bytes)
++{
++	__bio_advance_iter(bio, iter, bytes, false);
++}
++
++static inline void bio_advance_iter_mp(struct bio *bio, struct bvec_iter *iter,
++				       unsigned bytes)
++{
++	__bio_advance_iter(bio, iter, bytes, true);
  }
  
-+static inline struct scatterlist *blk_next_sg(struct scatterlist **sg,
-+		struct scatterlist *sglist)
+ #define __bio_for_each_segment(bvl, bio, iter, start)			\
+@@ -188,6 +207,16 @@ static inline void bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
+ #define bio_for_each_segment(bvl, bio, iter)				\
+ 	__bio_for_each_segment(bvl, bio, iter, (bio)->bi_iter)
+ 
++#define __bio_for_each_segment_mp(bvl, bio, iter, start)		\
++	for (iter = (start);						\
++	     (iter).bi_size &&						\
++		((bvl = bio_iter_iovec_mp((bio), (iter))), 1);		\
++	     bio_advance_iter_mp((bio), &(iter), (bvl).bv_len))
++
++/* returns one real segment(multipage bvec) each time */
++#define bio_for_each_segment_mp(bvl, bio, iter)				\
++	__bio_for_each_segment_mp(bvl, bio, iter, (bio)->bi_iter)
++
+ #define bio_iter_last(bvec, iter) ((iter).bi_size == (bvec).bv_len)
+ 
+ static inline unsigned bio_segments(struct bio *bio)
+diff --git a/include/linux/bvec.h b/include/linux/bvec.h
+index d77c3cabce8c..f8a8b293cd32 100644
+--- a/include/linux/bvec.h
++++ b/include/linux/bvec.h
+@@ -128,16 +128,29 @@ struct bvec_iter {
+ 	.bv_offset	= bvec_iter_offset((bvec), (iter)),	\
+ })
+ 
+-static inline void bvec_iter_advance(const struct bio_vec *bv,
+-				     struct bvec_iter *iter,
+-				     unsigned bytes)
++#define bvec_iter_bvec_mp(bvec, iter)				\
++((struct bio_vec) {						\
++	.bv_page	= bvec_iter_page_mp((bvec), (iter)),	\
++	.bv_len		= bvec_iter_len_mp((bvec), (iter)),	\
++	.bv_offset	= bvec_iter_offset_mp((bvec), (iter)),	\
++})
++
++static inline void __bvec_iter_advance(const struct bio_vec *bv,
++				       struct bvec_iter *iter,
++				       unsigned bytes, bool mp)
+ {
+ 	WARN_ONCE(bytes > iter->bi_size,
+ 		  "Attempted to advance past end of bvec iter\n");
+ 
+ 	while (bytes) {
+-		unsigned iter_len = bvec_iter_len(bv, *iter);
+-		unsigned len = min(bytes, iter_len);
++		unsigned len;
++
++		if (mp)
++			len = bvec_iter_len_mp(bv, *iter);
++		else
++			len = bvec_iter_len_sp(bv, *iter);
++
++		len = min(bytes, len);
+ 
+ 		bytes -= len;
+ 		iter->bi_size -= len;
+@@ -150,6 +163,20 @@ static inline void bvec_iter_advance(const struct bio_vec *bv,
+ 	}
+ }
+ 
++static inline void bvec_iter_advance(const struct bio_vec *bv,
++				     struct bvec_iter *iter,
++				     unsigned bytes)
 +{
-+	if (!*sg)
-+		return sglist;
-+	else {
-+		/*
-+		 * If the driver previously mapped a shorter
-+		 * list, we could see a termination bit
-+		 * prematurely unless it fully inits the sg
-+		 * table on each mapping. We KNOW that there
-+		 * must be more entries here or the driver
-+		 * would be buggy, so force clear the
-+		 * termination bit to avoid doing a full
-+		 * sg_init_table() in drivers for each command.
-+		 */
-+		sg_unmark_end(*sg);
-+		return sg_next(*sg);
-+	}
++	__bvec_iter_advance(bv, iter, bytes, false);
 +}
 +
-+static inline unsigned
-+blk_bvec_map_sg(struct request_queue *q, struct bio_vec *bvec,
-+		struct scatterlist *sglist, struct scatterlist **sg)
++static inline void bvec_iter_advance_mp(const struct bio_vec *bv,
++					struct bvec_iter *iter,
++					unsigned bytes)
 +{
-+	unsigned nbytes = bvec->bv_len;
-+	unsigned nsegs = 0, total = 0;
-+
-+	while (nbytes > 0) {
-+		unsigned seg_size;
-+		struct page *pg;
-+		unsigned offset, idx;
-+
-+		*sg = blk_next_sg(sg, sglist);
-+
-+		seg_size = min(nbytes, queue_max_segment_size(q));
-+		offset = (total + bvec->bv_offset) % PAGE_SIZE;
-+		idx = (total + bvec->bv_offset) / PAGE_SIZE;
-+		pg = nth_page(bvec->bv_page, idx);
-+
-+		sg_set_page(*sg, pg, seg_size, offset);
-+
-+		total += seg_size;
-+		nbytes -= seg_size;
-+		nsegs++;
-+	}
-+
-+	return nsegs;
++	__bvec_iter_advance(bv, iter, bytes, true);
 +}
 +
- static inline void
- __blk_segment_map_sg(struct request_queue *q, struct bio_vec *bvec,
- 		     struct scatterlist *sglist, struct bio_vec *bvprv,
-@@ -483,25 +533,7 @@ __blk_segment_map_sg(struct request_queue *q, struct bio_vec *bvec,
- 		(*sg)->length += nbytes;
- 	} else {
- new_segment:
--		if (!*sg)
--			*sg = sglist;
--		else {
--			/*
--			 * If the driver previously mapped a shorter
--			 * list, we could see a termination bit
--			 * prematurely unless it fully inits the sg
--			 * table on each mapping. We KNOW that there
--			 * must be more entries here or the driver
--			 * would be buggy, so force clear the
--			 * termination bit to avoid doing a full
--			 * sg_init_table() in drivers for each command.
--			 */
--			sg_unmark_end(*sg);
--			*sg = sg_next(*sg);
--		}
--
--		sg_set_page(*sg, bvec->bv_page, nbytes, bvec->bv_offset);
--		(*nsegs)++;
-+		(*nsegs) += blk_bvec_map_sg(q, bvec, sglist, sg);
- 
- 		/* for making iterator happy */
- 		bvec->bv_offset -= advance;
-@@ -527,7 +559,7 @@ static int __blk_bios_map_sg(struct request_queue *q, struct bio *bio,
- 	int cluster = blk_queue_cluster(q), nsegs = 0;
- 
- 	for_each_bio(bio)
--		bio_for_each_segment(bvec, bio, iter)
-+		bio_for_each_segment_mp(bvec, bio, iter)
- 			__blk_segment_map_sg(q, &bvec, sglist, &bvprv, sg,
- 					     &nsegs, &cluster);
- 
+ #define for_each_bvec(bvl, bio_vec, iter, start)			\
+ 	for (iter = (start);						\
+ 	     (iter).bi_size &&						\
 -- 
 2.7.4
+
