@@ -1,49 +1,59 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f66.google.com ([74.125.83.66]:33052 "EHLO
-        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932916AbcL0QGZ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Dec 2016 11:06:25 -0500
+Return-Path: <tom.leiming@gmail.com>
+Return-Path: <tom.leiming@gmail.com>
 From: Ming Lei <tom.leiming@gmail.com>
-To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        Ming Lei <tom.leiming@gmail.com>,
-        Dave Chinner <david@fromorbit.com>,
-        linux-xfs@vger.kernel.org (supporter:XFS FILESYSTEM)
-Subject: [PATCH v1 42/54] xfs: convert to bio_for_each_segment_all_sp()
-Date: Wed, 28 Dec 2016 00:04:51 +0800
-Message-Id: <1482854706-14128-11-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1482854706-14128-1-git-send-email-tom.leiming@gmail.com>
-References: <1482854706-14128-1-git-send-email-tom.leiming@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+To: Jens Axboe <axboe@fb.com>,
+	linux-kernel@vger.kernel.org
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>,
+	Ming Lei <tom.leiming@gmail.com>,
+	Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH v1 19/54] block: bounce: avoid direct access to bvec table
+Date: Tue, 27 Dec 2016 23:56:08 +0800
+Message-Id: <1482854250-13481-20-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1482854250-13481-1-git-send-email-tom.leiming@gmail.com>
+References: <1482854250-13481-1-git-send-email-tom.leiming@gmail.com>
+List-ID: <linux-block@vger.kernel.org>
+
+We will support multipage bvecs in the future, so change to
+iterator way for getting bv_page of bvec from original bio.
 
 Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- fs/xfs/xfs_aops.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ block/bounce.c | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
 
-diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
-index 0f56fcd3a5d5..1acd6162aec1 100644
---- a/fs/xfs/xfs_aops.c
-+++ b/fs/xfs/xfs_aops.c
-@@ -139,6 +139,7 @@ xfs_destroy_ioend(
- 	for (bio = &ioend->io_inline_bio; bio; bio = next) {
- 		struct bio_vec	*bvec;
- 		int		i;
-+		struct bvec_iter_all bia;
+diff --git a/block/bounce.c b/block/bounce.c
+index 1cb5dd3a5da1..babd3f224ca0 100644
+--- a/block/bounce.c
++++ b/block/bounce.c
+@@ -126,21 +126,23 @@ static void copy_to_high_bio_irq(struct bio *to, struct bio *from)
+ static void bounce_end_io(struct bio *bio, mempool_t *pool)
+ {
+ 	struct bio *bio_orig = bio->bi_private;
+-	struct bio_vec *bvec, *org_vec;
++	struct bio_vec *bvec, orig_vec;
+ 	int i;
+-	int start = bio_orig->bi_iter.bi_idx;
++	struct bvec_iter orig_iter = bio_orig->bi_iter;
  
- 		/*
- 		 * For the last bio, bi_private points to the ioend, so we
-@@ -150,7 +151,7 @@ xfs_destroy_ioend(
- 			next = bio->bi_private;
+ 	/*
+ 	 * free up bounce indirect pages used
+ 	 */
+ 	bio_for_each_segment_all(bvec, bio, i) {
+-		org_vec = bio_orig->bi_io_vec + i + start;
  
- 		/* walk each page on bio, ending page IO on them */
--		bio_for_each_segment_all(bvec, bio, i)
-+		bio_for_each_segment_all_sp(bvec, bio, i, bia)
- 			xfs_finish_page_writeback(inode, bvec, error);
+-		if (bvec->bv_page == org_vec->bv_page)
+-			continue;
++		orig_vec = bio_iter_iovec(bio_orig, orig_iter);
++		if (bvec->bv_page == orig_vec.bv_page)
++			goto next;
  
- 		bio_put(bio);
+ 		dec_zone_page_state(bvec->bv_page, NR_BOUNCE);
+ 		mempool_free(bvec->bv_page, pool);
++ next:
++		bio_advance_iter(bio_orig, &orig_iter, orig_vec.bv_len);
+ 	}
+ 
+ 	bio_orig->bi_error = bio->bi_error;
 -- 
 2.7.4
-
