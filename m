@@ -1,89 +1,61 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f196.google.com ([209.85.192.196]:34779 "EHLO
-        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752729AbcLQKth (ORCPT
+Received: from mail-pg0-f67.google.com ([74.125.83.67]:34796 "EHLO
+        mail-pg0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933016AbcL0QHB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 17 Dec 2016 05:49:37 -0500
-From: Ming Lei <ming.lei@canonical.com>
+        Tue, 27 Dec 2016 11:07:01 -0500
+From: Ming Lei <tom.leiming@gmail.com>
 To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
 Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        Dexuan Cui <decui@microsoft.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Ming Lei <ming.lei@canonical.com>,
-        Keith Busch <keith.busch@intel.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Mike Christie <mchristi@redhat.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Toshi Kani <toshi.kani@hpe.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Damien Le Moal <damien.lemoal@hgst.com>
-Subject: [PATCH] block: loose check on sg gap
-Date: Sat, 17 Dec 2016 18:49:09 +0800
-Message-Id: <1481971751-4016-1-git-send-email-ming.lei@canonical.com>
+        Ming Lei <tom.leiming@gmail.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        linux-fsdevel@vger.kernel.org (open list:FILESYSTEMS (VFS and
+        infrastructure))
+Subject: [PATCH v1 48/54] fs/block_dev.c: convert to bio_for_each_segment_all_sp()
+Date: Wed, 28 Dec 2016 00:04:57 +0800
+Message-Id: <1482854706-14128-17-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1482854706-14128-1-git-send-email-tom.leiming@gmail.com>
+References: <1482854706-14128-1-git-send-email-tom.leiming@gmail.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-If the last bvec of the 1st bio and the 1st bvec of the next
-bio are contineous physically, and the latter can be merged
-to last segment of the 1st bio, we should think they don't
-violate sg gap(or virt boundary) limit.
-
-Both Vitaly and Dexuan reported lots of unmergeable small bios
-are observed when running mkfs on Hyper-V virtual storage, and
-performance becomes quite low, so this patch is figured out for
-fixing the performance issue.
-
-The same issue should exist on NVMe too sine it sets virt boundary too.
-
-Reported-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-Reported-by: Dexuan Cui <decui@microsoft.com>
-Tested-by: Dexuan Cui <decui@microsoft.com>
-Cc: Keith Busch <keith.busch@intel.com>
-Signed-off-by: Ming Lei <ming.lei@canonical.com>
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- include/linux/blkdev.h | 22 +++++++++++++++++++++-
- 1 file changed, 21 insertions(+), 1 deletion(-)
+ fs/block_dev.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 286b2a264383..1ce26e771bcc 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1608,6 +1608,25 @@ static inline bool bvec_gap_to_prev(struct request_queue *q,
- 	return __bvec_gap_to_prev(q, bprv, offset);
- }
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index 6254cee8f8f3..644b94460348 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -209,6 +209,7 @@ __blkdev_direct_IO_simple(struct kiocb *iocb, struct iov_iter *iter,
+ 	ssize_t ret;
+ 	blk_qc_t qc;
+ 	int i;
++	struct bvec_iter_all bia;
  
-+/*
-+ * Check if the two bvecs from two bios can be merged to one segment.
-+ * If yes, no need to check gap between the two bios since the 1st bio
-+ * and the 1st bvec in the 2nd bio can be handled in one segment.
-+ */
-+static inline bool bios_segs_mergeable(struct request_queue *q,
-+		struct bio *prev, struct bio_vec *prev_last_bv,
-+		struct bio_vec *next_first_bv)
-+{
-+	if (!BIOVEC_PHYS_MERGEABLE(prev_last_bv, next_first_bv))
-+		return false;
-+	if (!BIOVEC_SEG_BOUNDARY(q, prev_last_bv, next_first_bv))
-+		return false;
-+	if (prev->bi_seg_back_size + next_first_bv->bv_len >
-+			queue_max_segment_size(q))
-+		return false;
-+	return true;
-+}
-+
- static inline bool bio_will_gap(struct request_queue *q, struct bio *prev,
- 			 struct bio *next)
- {
-@@ -1617,7 +1636,8 @@ static inline bool bio_will_gap(struct request_queue *q, struct bio *prev,
- 		bio_get_last_bvec(prev, &pb);
- 		bio_get_first_bvec(next, &nb);
- 
--		return __bvec_gap_to_prev(q, &pb, nb.bv_offset);
-+		if (!bios_segs_mergeable(q, prev, &pb, &nb))
-+			return __bvec_gap_to_prev(q, &pb, nb.bv_offset);
+ 	if ((pos | iov_iter_alignment(iter)) &
+ 	    (bdev_logical_block_size(bdev) - 1))
+@@ -253,7 +254,7 @@ __blkdev_direct_IO_simple(struct kiocb *iocb, struct iov_iter *iter,
  	}
+ 	__set_current_state(TASK_RUNNING);
  
- 	return false;
+-	bio_for_each_segment_all(bvec, &bio, i) {
++	bio_for_each_segment_all_sp(bvec, &bio, i, bia) {
+ 		if (should_dirty && !PageCompound(bvec->bv_page))
+ 			set_page_dirty_lock(bvec->bv_page);
+ 		put_page(bvec->bv_page);
+@@ -315,8 +316,9 @@ static void blkdev_bio_end_io(struct bio *bio)
+ 	} else {
+ 		struct bio_vec *bvec;
+ 		int i;
++		struct bvec_iter_all bia;
+ 
+-		bio_for_each_segment_all(bvec, bio, i)
++		bio_for_each_segment_all_sp(bvec, bio, i, bia)
+ 			put_page(bvec->bv_page);
+ 		bio_put(bio);
+ 	}
 -- 
 2.7.4
 
