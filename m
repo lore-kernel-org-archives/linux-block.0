@@ -1,66 +1,66 @@
-Return-Path: <tom.leiming@gmail.com>
-Return-Path: <tom.leiming@gmail.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pf0-f195.google.com ([209.85.192.195]:32777 "EHLO
+        mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932972AbcL0QGl (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 27 Dec 2016 11:06:41 -0500
 From: Ming Lei <tom.leiming@gmail.com>
-To: Jens Axboe <axboe@fb.com>,
-	linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Ming Lei <tom.leiming@gmail.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Kent Overstreet <kent.overstreet@gmail.com>,
-	Shaohua Li <shli@kernel.org>,
-	Mike Christie <mchristi@redhat.com>,
-	Guoqing Jiang <gqjiang@suse.com>,
-	Hannes Reinecke <hare@suse.com>,
-	linux-bcache@vger.kernel.org (open list:BCACHE (BLOCK LAYER CACHE)),
-	linux-raid@vger.kernel.org (open list:SOFTWARE RAID (Multiple Disks) SUPPORT)
-Subject: [PATCH v1 08/54] block: comment on bio_alloc_pages()
-Date: Tue, 27 Dec 2016 23:55:57 +0800
-Message-Id: <1482854250-13481-9-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1482854250-13481-1-git-send-email-tom.leiming@gmail.com>
-References: <1482854250-13481-1-git-send-email-tom.leiming@gmail.com>
-List-ID: <linux-block@vger.kernel.org>
-
-This patch adds comment on usage of bio_alloc_pages(),
-also comments on one special case of bch_data_verify().
+To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        Ming Lei <tom.leiming@gmail.com>,
+        Boaz Harrosh <ooo@electrozaur.com>,
+        Benny Halevy <bhalevy@primarydata.com>,
+        osd-dev@open-osd.org (open list:OSD LIBRARY and FILESYSTEM)
+Subject: [PATCH v1 45/54] exofs: convert to bio_for_each_segment_all_sp()
+Date: Wed, 28 Dec 2016 00:04:54 +0800
+Message-Id: <1482854706-14128-14-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1482854706-14128-1-git-send-email-tom.leiming@gmail.com>
+References: <1482854706-14128-1-git-send-email-tom.leiming@gmail.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
 Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- block/bio.c               | 4 +++-
- drivers/md/bcache/debug.c | 6 ++++++
- 2 files changed, 9 insertions(+), 1 deletion(-)
+ fs/exofs/ore.c      | 3 ++-
+ fs/exofs/ore_raid.c | 3 ++-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index 2b375020fc49..d4a1e0b63ea0 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -961,7 +961,9 @@ EXPORT_SYMBOL(bio_advance);
-  * @bio: bio to allocate pages for
-  * @gfp_mask: flags for allocation
-  *
-- * Allocates pages up to @bio->bi_vcnt.
-+ * Allocates pages up to @bio->bi_vcnt, and this function should only
-+ * be called on a new initialized bio, which means all pages aren't added
-+ * to the bio via bio_add_page() yet.
-  *
-  * Returns 0 on success, -ENOMEM on failure. On failure, any allocated pages are
-  * freed.
-diff --git a/drivers/md/bcache/debug.c b/drivers/md/bcache/debug.c
-index 06f55056aaae..48d03e8b3385 100644
---- a/drivers/md/bcache/debug.c
-+++ b/drivers/md/bcache/debug.c
-@@ -110,6 +110,12 @@ void bch_data_verify(struct cached_dev *dc, struct bio *bio)
- 	struct bio_vec bv, cbv;
- 	struct bvec_iter iter, citer = { 0 };
+diff --git a/fs/exofs/ore.c b/fs/exofs/ore.c
+index 8bb72807e70d..38a7d8bfdd4c 100644
+--- a/fs/exofs/ore.c
++++ b/fs/exofs/ore.c
+@@ -406,8 +406,9 @@ static void _clear_bio(struct bio *bio)
+ {
+ 	struct bio_vec *bv;
+ 	unsigned i;
++	struct bvec_iter_all bia;
  
-+	/*
-+	 * Once multipage bvec is supported, the bio_clone()
-+	 * has to make sure page count in this bio can be held
-+	 * in the new cloned bio because each single page need
-+	 * to assign to each bvec of the new bio.
-+	 */
- 	check = bio_clone(bio, GFP_NOIO);
- 	if (!check)
- 		return;
+-	bio_for_each_segment_all(bv, bio, i) {
++	bio_for_each_segment_all_sp(bv, bio, i, bia) {
+ 		unsigned this_count = bv->bv_len;
+ 
+ 		if (likely(PAGE_SIZE == this_count))
+diff --git a/fs/exofs/ore_raid.c b/fs/exofs/ore_raid.c
+index 27cbdb697649..37c0a9aa2ec2 100644
+--- a/fs/exofs/ore_raid.c
++++ b/fs/exofs/ore_raid.c
+@@ -429,6 +429,7 @@ static void _mark_read4write_pages_uptodate(struct ore_io_state *ios, int ret)
+ {
+ 	struct bio_vec *bv;
+ 	unsigned i, d;
++	struct bvec_iter_all bia;
+ 
+ 	/* loop on all devices all pages */
+ 	for (d = 0; d < ios->numdevs; d++) {
+@@ -437,7 +438,7 @@ static void _mark_read4write_pages_uptodate(struct ore_io_state *ios, int ret)
+ 		if (!bio)
+ 			continue;
+ 
+-		bio_for_each_segment_all(bv, bio, i) {
++		bio_for_each_segment_all_sp(bv, bio, i, bia) {
+ 			struct page *page = bv->bv_page;
+ 
+ 			SetPageUptodate(page);
 -- 
 2.7.4
+
