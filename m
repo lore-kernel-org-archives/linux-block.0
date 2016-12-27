@@ -1,92 +1,70 @@
-Return-Path: <Adam.Manzanares@wdc.com>
-From: Adam Manzanares <adam.manzanares@hgst.com>
-To: <axboe@kernel.dk>, <hare@suse.de>, <mchristi@redhat.com>,
-	<dan.j.williams@intel.com>, <martin.petersen@oracle.com>,
-	<toshi.kani@hpe.com>, <damien.lemoal@hgst.com>, <ming.lei@canonical.com>,
-	<tj@kernel.org>
-CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-ide@vger.kernel.org>, Adam Manzanares <adam.manzanares@wdc.com>
-Subject: [PATCH v7 1/4] block: Add iocontext priority to request
-Date: Tue, 6 Dec 2016 09:18:02 -0800
-Message-ID: <1481044685-2803-2-git-send-email-adam.manzanares@hgst.com>
-In-Reply-To: <1481044685-2803-1-git-send-email-adam.manzanares@hgst.com>
-References: <1481044685-2803-1-git-send-email-adam.manzanares@hgst.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Adam.Manzanares@wdc.com
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pg0-f66.google.com ([74.125.83.66]:33889 "EHLO
+        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933088AbcL0QH0 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 27 Dec 2016 11:07:26 -0500
+From: Ming Lei <tom.leiming@gmail.com>
+To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        Ming Lei <tom.leiming@gmail.com>, Chris Mason <clm@fb.com>,
+        Josef Bacik <jbacik@fb.com>, David Sterba <dsterba@suse.com>,
+        linux-btrfs@vger.kernel.org (open list:BTRFS FILE SYSTEM)
+Subject: [PATCH v1 52/54] btrfs: use bvec_get_last_sp to get the last singlepage bvec
+Date: Wed, 28 Dec 2016 00:05:01 +0800
+Message-Id: <1482854706-14128-21-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1482854706-14128-1-git-send-email-tom.leiming@gmail.com>
+References: <1482854706-14128-1-git-send-email-tom.leiming@gmail.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Adam Manzanares <adam.manzanares@wdc.com>
+Preparing for supporting multipage bvec.
 
-Patch adds an association between iocontext ioprio and the ioprio of a
-request. This is done to enable request based drivers the ability to
-act on priority information stored in the request. An example being
-ATA devices that support command priorities. If the ATA driver discovers
-that the device supports command priorities and the request has valid
-priority information indicating the request is high priority, then a high
-priority command can be sent to the device. This should improve tail
-latencies for high priority IO on any device that queues requests
-internally and can make use of the priority information stored in the
-request.
-
-The ioprio of the request is set in blk_rq_set_prio which takes the
-request and the ioc as arguments. If the ioc is valid in blk_rq_set_prio
-then the iopriority of the request is set as the iopriority of the ioc.
-In init_request_from_bio a check is made to see if the ioprio of the bio
-is valid and if so then the request prio comes from the bio.
-
-Signed-off-by: Adam Manzananares <adam.manzanares@wdc.com>
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- block/blk-core.c       |  4 +++-
- include/linux/blkdev.h | 14 ++++++++++++++
- 2 files changed, 17 insertions(+), 1 deletion(-)
+ fs/btrfs/compression.c | 5 ++++-
+ fs/btrfs/extent_io.c   | 8 ++++++--
+ 2 files changed, 10 insertions(+), 3 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 6c4a425..4d1d1f9 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1154,6 +1154,7 @@ static struct request *__get_request(struct request_list *rl, unsigned int op,
+diff --git a/fs/btrfs/compression.c b/fs/btrfs/compression.c
+index adcf5568f010..485a60923bba 100644
+--- a/fs/btrfs/compression.c
++++ b/fs/btrfs/compression.c
+@@ -448,8 +448,11 @@ int btrfs_submit_compressed_write(struct inode *inode, u64 start,
+ static u64 bio_end_offset(struct bio *bio)
+ {
+ 	struct bio_vec *last = &bio->bi_io_vec[bio->bi_vcnt - 1];
++	struct bio_vec uninitialized_var(bv);
  
- 	blk_rq_init(q, rq);
- 	blk_rq_set_rl(rq, rl);
-+	blk_rq_set_prio(rq, ioc);
- 	rq->cmd_flags = op;
- 	rq->rq_flags = rq_flags;
- 
-@@ -1658,7 +1659,8 @@ void init_request_from_bio(struct request *req, struct bio *bio)
- 
- 	req->errors = 0;
- 	req->__sector = bio->bi_iter.bi_sector;
--	req->ioprio = bio_prio(bio);
-+	if (ioprio_valid(bio_prio(bio)))
-+		req->ioprio = bio_prio(bio);
- 	blk_rq_bio_prep(req->q, req, bio);
- }
- 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 541fdd8..8c2a1ef 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1050,6 +1050,20 @@ static inline unsigned int blk_rq_count_bios(struct request *rq)
- }
- 
- /*
-+ * blk_rq_set_prio - associate a request with prio from ioc
-+ * @rq: request of interest
-+ * @ioc: target iocontext
-+ *
-+ * Assocate request prio with ioc prio so request based drivers
-+ * can leverage priority information.
-+ */
-+static inline void blk_rq_set_prio(struct request *rq, struct io_context *ioc)
-+{
-+	if (ioc)
-+		rq->ioprio = ioc->ioprio;
-+}
+-	return page_offset(last->bv_page) + last->bv_len + last->bv_offset;
++	bvec_get_last_sp(last, &bv);
 +
-+/*
-  * Request issue related functions.
-  */
- extern struct request *blk_peek_request(struct request_queue *q);
++	return page_offset(bv.bv_page) + bv.bv_len + bv.bv_offset;
+ }
+ 
+ static noinline int add_ra_bio_pages(struct inode *inode,
+diff --git a/fs/btrfs/extent_io.c b/fs/btrfs/extent_io.c
+index 3c021f4dd8bf..4a1c81cee883 100644
+--- a/fs/btrfs/extent_io.c
++++ b/fs/btrfs/extent_io.c
+@@ -2733,11 +2733,15 @@ static int __must_check submit_one_bio(struct bio *bio, int mirror_num,
+ {
+ 	int ret = 0;
+ 	struct bio_vec *bvec = bio->bi_io_vec + bio->bi_vcnt - 1;
+-	struct page *page = bvec->bv_page;
+ 	struct extent_io_tree *tree = bio->bi_private;
++	struct bio_vec uninitialized_var(bv);
++	struct page *page;
+ 	u64 start;
+ 
+-	start = page_offset(page) + bvec->bv_offset;
++	bvec_get_last_sp(bvec, &bv);
++	page = bv.bv_page;
++
++	start = page_offset(page) + bv.bv_offset;
+ 
+ 	bio->bi_private = NULL;
+ 	bio_get(bio);
 -- 
 2.7.4
+
