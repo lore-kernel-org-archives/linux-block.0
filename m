@@ -1,61 +1,95 @@
-Return-Path: <prvs=1159fc908b=axboe@fb.com>
-From: Jens Axboe <axboe@fb.com>
-To: <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-CC: <paolo.valente@linaro.org>, <osandov@fb.com>
-Subject: [PATCHSET v4] blk-mq-scheduling framework
-Date: Fri, 16 Dec 2016 17:12:08 -0700
-Message-ID: <1481933536-12844-1-git-send-email-axboe@fb.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pg0-f68.google.com ([74.125.83.68]:34638 "EHLO
+        mail-pg0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933116AbcL0QJp (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 27 Dec 2016 11:09:45 -0500
+From: Ming Lei <tom.leiming@gmail.com>
+To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        Ming Lei <tom.leiming@gmail.com>,
+        Mike Christie <mchristi@redhat.com>,
+        Hannes Reinecke <hare@suse.com>,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        Chaitanya Kulkarni <chaitanya.kulkarni@hgst.com>,
+        Shaun Tancheff <shaun.tancheff@seagate.com>,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Bart Van Assche <bart.vanassche@sandisk.com>
+Subject: [PATCH v1 30/54] block: bio: introduce single/multi page version of bio_for_each_segment_all()
+Date: Tue, 27 Dec 2016 23:56:19 +0800
+Message-Id: <1482854250-13481-31-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1482854250-13481-1-git-send-email-tom.leiming@gmail.com>
+References: <1482854250-13481-1-git-send-email-tom.leiming@gmail.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This is version 4 of this patchset, version 3 was posted here:
+This patches introduce bio_for_each_segment_all_sp() and
+bio_for_each_segment_all_mp().
 
-https://marc.info/?l=linux-block&m=148178513407631&w=2
+bio_for_each_segment_all_sp() is for replacing bio_for_each_segment_all()
+in case that the returned bvec has to be single page bvec.
 
->From the discussion last time, I looked into the feasibility of having
-two sets of tags for the same request pool, to avoid having to copy
-some of the request fields at dispatch and completion time. To do that,
-we'd have to replace the driver tag map(s) with our own, and augment
-that with tag map(s) on the side representing the device queue depth.
-Queuing IO with the scheduler would allocate from the new map, and
-dispatching would acquire the "real" tag. We would need to change
-drivers to do this, or add an extra indirection table to map a real
-tag to the scheduler tag. We would also need a 1:1 mapping between
-scheduler and hardware tag pools, or additional info to track it.
-Unless someone can convince me otherwise, I think the current approach
-is cleaner.
+bio_for_each_segment_all_mp() is for replacing bio_for_each_segment_all()
+in case that user wants to update the returned bvec via the pointer.
 
-I wasn't going to post v4 so soon, but I discovered a bug that led
-to drastically decreased merging. Especially on rotating storage,
-this release should be fast, and on par with the merging that we
-get through the legacy schedulers.
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+---
+ include/linux/bio.h       | 24 ++++++++++++++++++++++++
+ include/linux/blk_types.h |  6 ++++++
+ 2 files changed, 30 insertions(+)
 
-Changes since v3:
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index 79079bc5a1be..efa0b3627735 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -217,6 +217,30 @@ static inline void bio_advance_iter_mp(struct bio *bio, struct bvec_iter *iter,
+ #define bio_for_each_segment_mp(bvl, bio, iter)				\
+ 	__bio_for_each_segment_mp(bvl, bio, iter, (bio)->bi_iter)
+ 
++/*
++ * This helper returns each bvec stored in bvec table directly,
++ * so the returned bvec points to one multipage bvec in the table
++ * and caller can update the bvec via the returnd pointer.
++ */
++#define bio_for_each_segment_all_mp(bvl, bio, i)                       \
++	bio_for_each_segment_all((bvl), (bio), (i))
++
++/*
++ * This helper returns singlepage bvec to caller, and the sp bvec
++ * is generated in-flight from multipage bvec stored in bvec table.
++ * So we can _not_ change the bvec stored in bio->bi_io_vec[] via
++ * this helper.
++ *
++ * If someone need to update bvec in the table, please use
++ * bio_for_each_segment_all_mp() and make sure it is correctly used
++ * since the bvec points to one multipage bvec.
++ */
++#define bio_for_each_segment_all_sp(bvl, bio, i, bi)			\
++	for ((bi).iter = BVEC_ITER_ALL_INIT, i = 0, bvl = &(bi).bv;	\
++	     (bi).iter.bi_idx < (bio)->bi_vcnt &&			\
++		(((bi).bv = bio_iter_iovec((bio), (bi).iter)), 1);	\
++	     bio_advance_iter((bio), &(bi).iter, (bi).bv.bv_len), i++)
++
+ #define bio_iter_last(bvec, iter) ((iter).bi_size == (bvec).bv_len)
+ 
+ static inline unsigned __bio_segments(struct bio *bio, bool mp)
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index 519ea2c9df61..ef8e30abb099 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -89,6 +89,12 @@ struct bio {
+ 
+ #define BIO_RESET_BYTES		offsetof(struct bio, bi_max_vecs)
+ 
++/* this iter is only for implementing bio_for_each_segment_rd() */
++struct bvec_iter_all {
++	struct bvec_iter	iter;
++	struct bio_vec		bv;      /* in-flight singlepage bvec */
++};
++
+ /*
+  * bio flags
+  */
+-- 
+2.7.4
 
-- Keep the blk_mq_free_request/__blk_mq_free_request() as the
-  interface, and have those functions call the scheduler API
-  instead.
-
-- Add insertion merging from unplugging.
-
-- Ensure that RQF_STARTED is cleared when we get a new shadow
-  request, or merging will fail if it is already set.
-
-- Improve the blk_mq_sched_init_hctx_data() implementation. From Omar.
-
-- Make the shadow alloc/free interface more usable by schedulers
-  that use the software queues. From Omar.
-
-- Fix a bug in the io context code.
-
-- Put the is_shadow() helper in generic code, instead of in mq-deadline.
-
-- Add prep patch that unexports blk_mq_free_hctx_request(), it's not
-  used by anyone.
-
-- Remove the magic '256' queue depth from mq-deadline, replace with a
-  module parameter, 'queue_depth', that defaults to 256.
-
-- Various cleanups.
