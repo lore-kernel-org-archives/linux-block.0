@@ -1,177 +1,59 @@
-Return-Path: <prvs=11458901a0=axboe@fb.com>
-From: Jens Axboe <axboe@fb.com>
-To: <axboe@kernel.dk>, <linux-block@vger.kernel.org>
-CC: <paolo.valente@linaro.org>, Jens Axboe <axboe@fb.com>
-Subject: [PATCH 1/7] block: use legacy path for flush requests for MQ with a scheduler
-Date: Fri, 2 Dec 2016 20:15:15 -0700
-Message-ID: <1480734921-23701-2-git-send-email-axboe@fb.com>
-In-Reply-To: <1480734921-23701-1-git-send-email-axboe@fb.com>
-References: <1480734921-23701-1-git-send-email-axboe@fb.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Return-Path: <tom.leiming@gmail.com>
+Return-Path: <tom.leiming@gmail.com>
+From: Ming Lei <tom.leiming@gmail.com>
+To: Jens Axboe <axboe@fb.com>,
+	linux-kernel@vger.kernel.org
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>,
+	Ming Lei <tom.leiming@gmail.com>,
+	Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH v1 54/54] block: enable multipage bvecs
+Date: Wed, 28 Dec 2016 00:05:03 +0800
+Message-Id: <1482854706-14128-23-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1482854706-14128-1-git-send-email-tom.leiming@gmail.com>
+References: <1482854706-14128-1-git-send-email-tom.leiming@gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
-No functional changes with this patch, it's just in preparation for
-supporting legacy schedulers on blk-mq.
+This patch pulls the trigger for multipage bvecs.
 
-Signed-off-by: Jens Axboe <axboe@fb.com>
+Any request queue which doesn't set QUEUE_FLAG_NO_MP
+should support to handle multipage bvecs.
+
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- block/blk-core.c  |  2 +-
- block/blk-exec.c  |  2 +-
- block/blk-flush.c | 26 ++++++++++++++------------
- block/blk.h       | 12 +++++++++++-
- 4 files changed, 27 insertions(+), 15 deletions(-)
+ block/bio.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 3f2eb8d80189..0e23589ab3bf 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1310,7 +1310,7 @@ static struct request *blk_old_get_request(struct request_queue *q, int rw,
- 
- struct request *blk_get_request(struct request_queue *q, int rw, gfp_t gfp_mask)
- {
--	if (q->mq_ops)
-+	if (blk_use_mq_path(q))
- 		return blk_mq_alloc_request(q, rw,
- 			(gfp_mask & __GFP_DIRECT_RECLAIM) ?
- 				0 : BLK_MQ_REQ_NOWAIT);
-diff --git a/block/blk-exec.c b/block/blk-exec.c
-index 3ecb00a6cf45..73b8a701ae6d 100644
---- a/block/blk-exec.c
-+++ b/block/blk-exec.c
-@@ -64,7 +64,7 @@ void blk_execute_rq_nowait(struct request_queue *q, struct gendisk *bd_disk,
- 	 * don't check dying flag for MQ because the request won't
- 	 * be reused after dying flag is set
+diff --git a/block/bio.c b/block/bio.c
+index 9acc3db0f2df..a2ad9c577aff 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -843,6 +843,11 @@ int bio_add_page(struct bio *bio, struct page *page,
+ 	 * a consecutive offset.  Optimize this special case.
  	 */
--	if (q->mq_ops) {
-+	if (blk_use_mq_path(q)) {
- 		blk_mq_insert_request(rq, at_head, true, false);
- 		return;
- 	}
-diff --git a/block/blk-flush.c b/block/blk-flush.c
-index 1bdbb3d3e5f5..0b68a1258bdd 100644
---- a/block/blk-flush.c
-+++ b/block/blk-flush.c
-@@ -133,14 +133,16 @@ static void blk_flush_restore_request(struct request *rq)
- 
- static bool blk_flush_queue_rq(struct request *rq, bool add_front)
- {
--	if (rq->q->mq_ops) {
-+	struct request_queue *q = rq->q;
+ 	if (bio->bi_vcnt > 0) {
++		struct request_queue *q = NULL;
 +
-+	if (blk_use_mq_path(q)) {
- 		blk_mq_add_to_requeue_list(rq, add_front, true);
- 		return false;
- 	} else {
- 		if (add_front)
--			list_add(&rq->queuelist, &rq->q->queue_head);
-+			list_add(&rq->queuelist, &q->queue_head);
- 		else
--			list_add_tail(&rq->queuelist, &rq->q->queue_head);
-+			list_add_tail(&rq->queuelist, &q->queue_head);
- 		return true;
- 	}
- }
-@@ -201,7 +203,7 @@ static bool blk_flush_complete_seq(struct request *rq,
- 		BUG_ON(!list_empty(&rq->queuelist));
- 		list_del_init(&rq->flush.list);
- 		blk_flush_restore_request(rq);
--		if (q->mq_ops)
-+		if (blk_use_mq_path(q))
- 			blk_mq_end_request(rq, error);
- 		else
- 			__blk_end_request_all(rq, error);
-@@ -224,7 +226,7 @@ static void flush_end_io(struct request *flush_rq, int error)
- 	unsigned long flags = 0;
- 	struct blk_flush_queue *fq = blk_get_flush_queue(q, flush_rq->mq_ctx);
- 
--	if (q->mq_ops) {
-+	if (blk_use_mq_path(q)) {
- 		struct blk_mq_hw_ctx *hctx;
- 
- 		/* release the tag's ownership to the req cloned from */
-@@ -240,7 +242,7 @@ static void flush_end_io(struct request *flush_rq, int error)
- 	/* account completion of the flush request */
- 	fq->flush_running_idx ^= 1;
- 
--	if (!q->mq_ops)
-+	if (!blk_use_mq_path(q))
- 		elv_completed_request(q, flush_rq);
- 
- 	/* and push the waiting requests to the next stage */
-@@ -267,7 +269,7 @@ static void flush_end_io(struct request *flush_rq, int error)
- 		blk_run_queue_async(q);
- 	}
- 	fq->flush_queue_delayed = 0;
--	if (q->mq_ops)
-+	if (blk_use_mq_path(q))
- 		spin_unlock_irqrestore(&fq->mq_flush_lock, flags);
- }
- 
-@@ -315,7 +317,7 @@ static bool blk_kick_flush(struct request_queue *q, struct blk_flush_queue *fq)
- 	 * be in flight at the same time. And acquire the tag's
- 	 * ownership for flush req.
- 	 */
--	if (q->mq_ops) {
-+	if (blk_use_mq_path(q)) {
- 		struct blk_mq_hw_ctx *hctx;
- 
- 		flush_rq->mq_ctx = first_rq->mq_ctx;
-@@ -409,7 +411,7 @@ void blk_insert_flush(struct request *rq)
- 	 * complete the request.
- 	 */
- 	if (!policy) {
--		if (q->mq_ops)
-+		if (blk_use_mq_path(q))
- 			blk_mq_end_request(rq, 0);
- 		else
- 			__blk_end_bidi_request(rq, 0, 0, 0);
-@@ -425,9 +427,9 @@ void blk_insert_flush(struct request *rq)
- 	 */
- 	if ((policy & REQ_FSEQ_DATA) &&
- 	    !(policy & (REQ_FSEQ_PREFLUSH | REQ_FSEQ_POSTFLUSH))) {
--		if (q->mq_ops) {
-+		if (blk_use_mq_path(q))
- 			blk_mq_insert_request(rq, false, false, true);
--		} else
-+		else
- 			list_add_tail(&rq->queuelist, &q->queue_head);
- 		return;
- 	}
-@@ -440,7 +442,7 @@ void blk_insert_flush(struct request *rq)
- 	INIT_LIST_HEAD(&rq->flush.list);
- 	rq->rq_flags |= RQF_FLUSH_SEQ;
- 	rq->flush.saved_end_io = rq->end_io; /* Usually NULL */
--	if (q->mq_ops) {
-+	if (blk_use_mq_path(q)) {
- 		rq->end_io = mq_flush_data_end_io;
- 
- 		spin_lock_irq(&fq->mq_flush_lock);
-diff --git a/block/blk.h b/block/blk.h
-index 041185e5f129..094fc10429c3 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -36,10 +36,20 @@ extern struct kmem_cache *request_cachep;
- extern struct kobj_type blk_queue_ktype;
- extern struct ida blk_queue_ida;
- 
-+/*
-+ * Use the MQ path if we have mq_ops, but not if we are using an IO
-+ * scheduler. For the scheduler, we should use the legacy path. Only
-+ * for internal use in the block layer.
-+ */
-+static inline bool blk_use_mq_path(struct request_queue *q)
-+{
-+	return q->mq_ops && !q->elevator;
-+}
++		if (bio->bi_bdev)
++			q = bdev_get_queue(bio->bi_bdev);
 +
- static inline struct blk_flush_queue *blk_get_flush_queue(
- 		struct request_queue *q, struct blk_mq_ctx *ctx)
- {
--	if (q->mq_ops)
-+	if (blk_use_mq_path(q))
- 		return blk_mq_map_queue(q, ctx->cpu)->fq;
- 	return q->fq;
- }
+ 		bv = &bio->bi_io_vec[bio->bi_vcnt - 1];
+ 
+ 		if (page == bv->bv_page &&
+@@ -850,6 +855,14 @@ int bio_add_page(struct bio *bio, struct page *page,
+ 			bv->bv_len += len;
+ 			goto done;
+ 		}
++
++		/* disable multipage bvec too if cluster isn't enabled */
++		if (q && !blk_queue_no_mp(q) && blk_queue_cluster(q) &&
++		    (bvec_to_phys(bv) + bv->bv_len ==
++		     page_to_phys(page) + offset)) {
++			bv->bv_len += len;
++			goto done;
++		}
+ 	}
+ 
+ 	if (bio->bi_vcnt >= bio->bi_max_vecs)
 -- 
 2.7.4
