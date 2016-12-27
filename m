@@ -1,47 +1,124 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f67.google.com ([74.125.83.67]:35500 "EHLO
-        mail-pg0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753224AbcL0QFa (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Dec 2016 11:05:30 -0500
+Return-Path: <tom.leiming@gmail.com>
+Return-Path: <tom.leiming@gmail.com>
 From: Ming Lei <tom.leiming@gmail.com>
-To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        Ming Lei <tom.leiming@gmail.com>,
-        Johannes Berg <johannes.berg@intel.com>
-Subject: [PATCH v1 32/54] block: introduce bvec_get_last_sp()
-Date: Wed, 28 Dec 2016 00:04:41 +0800
-Message-Id: <1482854706-14128-1-git-send-email-tom.leiming@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+To: Jens Axboe <axboe@fb.com>,
+	linux-kernel@vger.kernel.org
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>,
+	Ming Lei <tom.leiming@gmail.com>,
+	Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH v1 28/54] block: use bio_for_each_segment_mp() to map sg
+Date: Tue, 27 Dec 2016 23:56:17 +0800
+Message-Id: <1482854250-13481-29-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1482854250-13481-1-git-send-email-tom.leiming@gmail.com>
+References: <1482854250-13481-1-git-send-email-tom.leiming@gmail.com>
+List-ID: <linux-block@vger.kernel.org>
 
-BTRFS need to get the last singlepage bvec, so introduce
-this helper to make it happy.
+It is more efficient to use bio_for_each_segment_mp()
+for mapping sg, meantime we have to consider splitting
+multipage bvec as done in blk_bio_segment_split().
 
 Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- include/linux/bvec.h | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ block/blk-merge.c | 72 +++++++++++++++++++++++++++++++++++++++----------------
+ 1 file changed, 52 insertions(+), 20 deletions(-)
 
-diff --git a/include/linux/bvec.h b/include/linux/bvec.h
-index baf379d56106..e9a623067c52 100644
---- a/include/linux/bvec.h
-+++ b/include/linux/bvec.h
-@@ -206,4 +206,14 @@ static inline void bvec_iter_advance_mp(const struct bio_vec *bv,
- #define bvec_for_each_sp_bvec(sp_bvl, mp_bvec, iter)			\
- 	__bvec_for_each_sp_bvec(sp_bvl, mp_bvec, iter, BVEC_ITER_ALL_INIT)
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index a0e97959db7b..55c5866ea77a 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -450,6 +450,56 @@ static int blk_phys_contig_segment(struct request_queue *q, struct bio *bio,
+ 	return 0;
+ }
  
-+/* get the last singlepage bvec from the multipage bvec  */
-+static inline void bvec_get_last_sp(struct bio_vec *mp_bv,
-+				    struct bio_vec *sp_bv)
++static inline struct scatterlist *blk_next_sg(struct scatterlist **sg,
++		struct scatterlist *sglist)
 +{
-+	struct bvec_iter iter;
-+
-+	bvec_for_each_sp_bvec(*sp_bv, mp_bv, iter)
-+		;
++	if (!*sg)
++		return sglist;
++	else {
++		/*
++		 * If the driver previously mapped a shorter
++		 * list, we could see a termination bit
++		 * prematurely unless it fully inits the sg
++		 * table on each mapping. We KNOW that there
++		 * must be more entries here or the driver
++		 * would be buggy, so force clear the
++		 * termination bit to avoid doing a full
++		 * sg_init_table() in drivers for each command.
++		 */
++		sg_unmark_end(*sg);
++		return sg_next(*sg);
++	}
 +}
 +
- #endif /* __LINUX_BVEC_ITER_H */
++static inline unsigned
++blk_bvec_map_sg(struct request_queue *q, struct bio_vec *bvec,
++		struct scatterlist *sglist, struct scatterlist **sg)
++{
++	unsigned nbytes = bvec->bv_len;
++	unsigned nsegs = 0, total = 0;
++
++	while (nbytes > 0) {
++		unsigned seg_size;
++		struct page *pg;
++		unsigned offset, idx;
++
++		*sg = blk_next_sg(sg, sglist);
++
++		seg_size = min(nbytes, queue_max_segment_size(q));
++		offset = (total + bvec->bv_offset) % PAGE_SIZE;
++		idx = (total + bvec->bv_offset) / PAGE_SIZE;
++		pg = nth_page(bvec->bv_page, idx);
++
++		sg_set_page(*sg, pg, seg_size, offset);
++
++		total += seg_size;
++		nbytes -= seg_size;
++		nsegs++;
++	}
++
++	return nsegs;
++}
++
+ static inline void
+ __blk_segment_map_sg(struct request_queue *q, struct bio_vec *bvec,
+ 		     struct scatterlist *sglist, struct bio_vec *bvprv,
+@@ -483,25 +533,7 @@ __blk_segment_map_sg(struct request_queue *q, struct bio_vec *bvec,
+ 		(*sg)->length += nbytes;
+ 	} else {
+ new_segment:
+-		if (!*sg)
+-			*sg = sglist;
+-		else {
+-			/*
+-			 * If the driver previously mapped a shorter
+-			 * list, we could see a termination bit
+-			 * prematurely unless it fully inits the sg
+-			 * table on each mapping. We KNOW that there
+-			 * must be more entries here or the driver
+-			 * would be buggy, so force clear the
+-			 * termination bit to avoid doing a full
+-			 * sg_init_table() in drivers for each command.
+-			 */
+-			sg_unmark_end(*sg);
+-			*sg = sg_next(*sg);
+-		}
+-
+-		sg_set_page(*sg, bvec->bv_page, nbytes, bvec->bv_offset);
+-		(*nsegs)++;
++		(*nsegs) += blk_bvec_map_sg(q, bvec, sglist, sg);
+ 
+ 		/* for making iterator happy */
+ 		bvec->bv_offset -= advance;
+@@ -527,7 +559,7 @@ static int __blk_bios_map_sg(struct request_queue *q, struct bio *bio,
+ 	int cluster = blk_queue_cluster(q), nsegs = 0;
+ 
+ 	for_each_bio(bio)
+-		bio_for_each_segment(bvec, bio, iter)
++		bio_for_each_segment_mp(bvec, bio, iter)
+ 			__blk_segment_map_sg(q, &bvec, sglist, &bvprv, sg,
+ 					     &nsegs, &cluster);
+ 
 -- 
 2.7.4
-
