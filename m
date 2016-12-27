@@ -1,42 +1,47 @@
-Return-Path: <tom.leiming@gmail.com>
-Return-Path: <tom.leiming@gmail.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pf0-f196.google.com ([209.85.192.196]:33915 "EHLO
+        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932797AbcL0QF7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 27 Dec 2016 11:05:59 -0500
 From: Ming Lei <tom.leiming@gmail.com>
-To: Jens Axboe <axboe@fb.com>,
-	linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Ming Lei <tom.leiming@gmail.com>,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH v1 09/54] block: comment on bio_iov_iter_get_pages()
-Date: Tue, 27 Dec 2016 23:55:58 +0800
-Message-Id: <1482854250-13481-10-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1482854250-13481-1-git-send-email-tom.leiming@gmail.com>
-References: <1482854250-13481-1-git-send-email-tom.leiming@gmail.com>
-List-ID: <linux-block@vger.kernel.org>
-
-bio_iov_iter_get_pages() used unused bvec spaces for
-storing page pointer array temporarily, and this patch
-comments on this usage wrt. multipage bvec support.
+To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        Ming Lei <tom.leiming@gmail.com>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        dm-devel@redhat.com (maintainer:DEVICE-MAPPER (LVM)),
+        Shaohua Li <shli@kernel.org>,
+        linux-raid@vger.kernel.org (open list:SOFTWARE RAID (Multiple Disks)
+        SUPPORT)
+Subject: [PATCH v1 37/54] dm-crypt: convert to bio_for_each_segment_all_sp()
+Date: Wed, 28 Dec 2016 00:04:46 +0800
+Message-Id: <1482854706-14128-6-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1482854706-14128-1-git-send-email-tom.leiming@gmail.com>
+References: <1482854706-14128-1-git-send-email-tom.leiming@gmail.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
 Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- block/bio.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ drivers/md/dm-crypt.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index d4a1e0b63ea0..10398969353b 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -859,6 +859,10 @@ EXPORT_SYMBOL(bio_add_page);
-  *
-  * Pins as many pages from *iter and appends them to @bio's bvec array. The
-  * pages will have to be released using put_page() when done.
-+ *
-+ * The hacking way of using bvec table as page pointer array is safe
-+ * even after multipage bvec is introduced because that space can be
-+ * thought as unused by bio_add_page().
-  */
- int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
+index 593cdf88bf5f..c6932fb85418 100644
+--- a/drivers/md/dm-crypt.c
++++ b/drivers/md/dm-crypt.c
+@@ -1038,8 +1038,9 @@ static void crypt_free_buffer_pages(struct crypt_config *cc, struct bio *clone)
  {
+ 	unsigned int i;
+ 	struct bio_vec *bv;
++	struct bvec_iter_all bia;
+ 
+-	bio_for_each_segment_all(bv, clone, i) {
++	bio_for_each_segment_all_sp(bv, clone, i, bia) {
+ 		BUG_ON(!bv->bv_page);
+ 		mempool_free(bv->bv_page, cc->page_pool);
+ 	}
 -- 
 2.7.4
+
