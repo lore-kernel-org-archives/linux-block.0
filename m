@@ -1,122 +1,43 @@
-Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
-From: Stephen Bates <sbates@raithlin.com>
-To: linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
- linux-block@vger.kernel.org, axboe@fb.com
-Subject: [PATCH 2/2] nvme: improve cmb sysfs reporting
-Date: Fri, 16 Dec 2016 11:54:51 -0700
-Message-Id: <1481914491-21456-3-git-send-email-sbates@raithlin.com>
-In-Reply-To: <1481914491-21456-1-git-send-email-sbates@raithlin.com>
-References: <1481914491-21456-1-git-send-email-sbates@raithlin.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
-List-Post: <mailto:linux-nvme@lists.infradead.org>
-List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
-Cc: james_p_freyensee@linux.intel.com, sagi@grimberg.me,
- jonathan.derrick@intel.com, Stephen Bates <sbates@raithlin.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
-Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pg0-f66.google.com ([74.125.83.66]:36679 "EHLO
+        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752415AbcL0P7v (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 27 Dec 2016 10:59:51 -0500
+From: Ming Lei <tom.leiming@gmail.com>
+To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        Ming Lei <tom.leiming@gmail.com>,
+        Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <yuchao0@huawei.com>,
+        linux-f2fs-devel@lists.sourceforge.net (open list:F2FS FILE SYSTEM)
+Subject: [PATCH v1 06/54] f2fs: f2fs_read_end_io: comment on direct access to bvec table
+Date: Tue, 27 Dec 2016 23:55:55 +0800
+Message-Id: <1482854250-13481-7-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1482854250-13481-1-git-send-email-tom.leiming@gmail.com>
+References: <1482854250-13481-1-git-send-email-tom.leiming@gmail.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Add more information to the NVMe CMB sysfs entry. This includes
-information about the CMB size, location and capabilities.
-
-Signed-off-by: Stephen Bates <sbates@raithlin.com>
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- drivers/nvme/host/pci.c | 31 +++++++++++++++++++++++++++++--
- include/linux/nvme.h    |  8 ++++++++
- 2 files changed, 37 insertions(+), 2 deletions(-)
+ fs/f2fs/data.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index be10860..1f70630 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -98,6 +98,7 @@ struct nvme_dev {
- 	void __iomem *cmb;
- 	dma_addr_t cmb_dma_addr;
- 	u64 cmb_size;
-+	u64 cmb_offset;
- 	u32 cmbsz;
- 	u32 cmbloc;
- 	struct nvme_ctrl ctrl;
-@@ -1326,14 +1327,39 @@ static int nvme_create_io_queues(struct nvme_dev *dev)
- 	return ret >= 0 ? 0 : ret;
- }
+diff --git a/fs/f2fs/data.c b/fs/f2fs/data.c
+index 9ac262564fa6..5d1a192e1c3c 100644
+--- a/fs/f2fs/data.c
++++ b/fs/f2fs/data.c
+@@ -55,6 +55,10 @@ static void f2fs_read_end_io(struct bio *bio)
+ 	int i;
  
-+static const char * const cmb_caps[] = {
-+	[NVME_CMB_CAP_SQS] = "SQS",
-+	[NVME_CMB_CAP_CQS] = "CQS",
-+	[NVME_CMB_CAP_LISTS] = "LISTS",
-+	[NVME_CMB_CAP_RDS] = "RDS",
-+	[NVME_CMB_CAP_WDS] = "WDS",
-+};
-+
- static ssize_t nvme_cmb_show(struct device *dev,
- 			     struct device_attribute *attr,
- 			     char *buf)
- {
- 	struct nvme_dev *ndev = to_nvme_dev(dev_get_drvdata(dev));
-+	unsigned int i, len = 0;
-+
-+	len += scnprintf(buf+len, PAGE_SIZE-len,
-+			"cmbloc  : 0x%08x\ncmbsz   : 0x%08x\n\n",
-+			ndev->cmbloc, ndev->cmbsz);
-+
-+	len += scnprintf(buf+len, PAGE_SIZE-len,
-+			"OFFSET   : 0x%016llx\nSIZE     : %llu Bytes\n" \
-+			"DMA ADDR : %pad\n\n",
-+			ndev->cmb_offset, ndev->cmb_size,
-+			&ndev->cmb_dma_addr);
-+
-+	for (i = NVME_CMB_CAP_SQS; i <= NVME_CMB_CAP_WDS; i++)
-+		len += scnprintf(buf+len, PAGE_SIZE-len, "%-7s: %s\n",
-+				 cmb_caps[i],
-+				 ((ndev->cmbsz) & (1<<i)) ? "SUPPORTED" :
-+				 "NOT SUPPORTED");
-+
-+	return len;
- 
--	return scnprintf(buf, PAGE_SIZE, "cmbloc : x%08x\ncmbsz  : x%08x\n",
--		       ndev->cmbloc, ndev->cmbsz);
- }
- static DEVICE_ATTR(cmb, S_IRUGO, nvme_cmb_show, NULL);
- 
-@@ -1376,6 +1402,7 @@ static void __iomem *nvme_map_cmb(struct nvme_dev *dev)
- 
- 	dev->cmb_dma_addr = dma_addr;
- 	dev->cmb_size = size;
-+	dev->cmb_offset = offset;
- 	return cmb;
- }
- 
-diff --git a/include/linux/nvme.h b/include/linux/nvme.h
-index fc3c242..cd0d324 100644
---- a/include/linux/nvme.h
-+++ b/include/linux/nvme.h
-@@ -121,6 +121,14 @@ enum {
- #define NVME_CMB_CQS(cmbsz)	((cmbsz) & 0x2)
- #define NVME_CMB_SQS(cmbsz)	((cmbsz) & 0x1)
- 
-+enum {
-+	NVME_CMB_CAP_SQS = 0,
-+	NVME_CMB_CAP_CQS,
-+	NVME_CMB_CAP_LISTS,
-+	NVME_CMB_CAP_RDS,
-+	NVME_CMB_CAP_WDS,
-+};
-+
- /*
-  * Submission and Completion Queue Entry Sizes for the NVM command set.
-  * (In bytes and specified as a power of two (2^n)).
+ #ifdef CONFIG_F2FS_FAULT_INJECTION
++	/*
++	 * It is still safe to retrieve the 1st page of the bio
++	 * in this way after supporting multipage bvec.
++	 */
+ 	if (time_to_inject(F2FS_P_SB(bio->bi_io_vec->bv_page), FAULT_IO))
+ 		bio->bi_error = -EIO;
+ #endif
 -- 
-2.1.4
+2.7.4
 
-
-_______________________________________________
-Linux-nvme mailing list
-Linux-nvme@lists.infradead.org
-http://lists.infradead.org/mailman/listinfo/linux-nvme
