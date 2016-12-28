@@ -1,67 +1,63 @@
-Return-Path: <tom.leiming@gmail.com>
-Return-Path: <tom.leiming@gmail.com>
-From: Ming Lei <tom.leiming@gmail.com>
-To: Jens Axboe <axboe@fb.com>,
-	linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Ming Lei <tom.leiming@gmail.com>,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH v1 20/54] block: bounce: don't access bio->bi_io_vec in copy_to_high_bio_irq
-Date: Tue, 27 Dec 2016 23:56:09 +0800
-Message-Id: <1482854250-13481-21-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1482854250-13481-1-git-send-email-tom.leiming@gmail.com>
-References: <1482854250-13481-1-git-send-email-tom.leiming@gmail.com>
+Return-Path: <linus.walleij@linaro.org>
+MIME-Version: 1.0
+In-Reply-To: <20161228085503.GA340@lst.de>
+References: <1482242508-26131-1-git-send-email-linus.walleij@linaro.org>
+ <0fec238b-3c3c-6928-71ec-c3d4bcc6d267@codeaurora.org> <CACRpkdazLSk1i37ERs4YwuwXnmbmrnyAX1T5kRXjKcPSaAYd7Q@mail.gmail.com>
+ <20161228085503.GA340@lst.de>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Thu, 29 Dec 2016 00:59:51 +0100
+Message-ID: <CACRpkdb2zyjRz_zniT5nLxWCeLwagn1ZiTWwXc6bHW229NmfPQ@mail.gmail.com>
+Subject: Re: [PATCH v2] RFD: switch MMC/SD to use blk-mq multiqueueing
+To: Christoph Hellwig <hch@lst.de>
+Cc: Ritesh Harjani <riteshh@codeaurora.org>, Ulf Hansson <ulf.hansson@linaro.org>,
+	Jens Axboe <axboe@kernel.dk>, "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>, linux-block@vger.kernel.org,
+	Chunyan Zhang <zhang.chunyan@linaro.org>, Baolin Wang <baolin.wang@linaro.org>,
+	Arnd Bergmann <arnd@arndb.de>, Paolo Valente <paolo.valente@linaro.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
-As we need to support multipage bvecs, so don't access bio->bi_io_vec
-in copy_to_high_bio_irq(), and just use the standard iterator
-to do that.
+On Wed, Dec 28, 2016 at 9:55 AM, Christoph Hellwig <hch@lst.de> wrote:
+> On Tue, Dec 27, 2016 at 01:21:28PM +0100, Linus Walleij wrote:
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
----
- block/bounce.c | 16 +++++++++++-----
- 1 file changed, 11 insertions(+), 5 deletions(-)
+>> On the contrary we expect a performance regression as mq has no
+>> scheduling. MQ is created for the usecase where you have multiple
+>> hardware queues and they are so hungry for work that you have a problem
+>> feeding them all. Needless to say, on eMMC/SD we don't have that problem
+>> right now atleast.
+>
+> That's not entirely correct.  blk-mq is designed to replace the legacy
+> request code eventually.  The focus is on not wasting CPU cycles, and
+> to support multiple queues (but not require them).
 
-diff --git a/block/bounce.c b/block/bounce.c
-index babd3f224ca0..a42f7b98b7e6 100644
---- a/block/bounce.c
-+++ b/block/bounce.c
-@@ -102,24 +102,30 @@ int init_emergency_isa_pool(void)
- static void copy_to_high_bio_irq(struct bio *to, struct bio *from)
- {
- 	unsigned char *vfrom;
--	struct bio_vec tovec, *fromvec = from->bi_io_vec;
-+	struct bio_vec tovec, fromvec;
- 	struct bvec_iter iter;
-+	/*
-+	 * @from bio is created by bounce, so we can iterate from
-+	 * start and can't trust @from->bi_iter because it might be
-+	 * changed by splitting.
-+	 */
-+	struct bvec_iter from_iter = BVEC_ITER_ALL_INIT;
- 
- 	bio_for_each_segment(tovec, to, iter) {
--		if (tovec.bv_page != fromvec->bv_page) {
-+		fromvec = bio_iter_iovec(from, from_iter);
-+		if (tovec.bv_page != fromvec.bv_page) {
- 			/*
- 			 * fromvec->bv_offset and fromvec->bv_len might have
- 			 * been modified by the block layer, so use the original
- 			 * copy, bounce_copy_vec already uses tovec->bv_len
- 			 */
--			vfrom = page_address(fromvec->bv_page) +
-+			vfrom = page_address(fromvec.bv_page) +
- 				tovec.bv_offset;
- 
- 			bounce_copy_vec(&tovec, vfrom);
- 			flush_dcache_page(tovec.bv_page);
- 		}
--
--		fromvec++;
-+		bio_advance_iter(from, &from_iter, tovec.bv_len);
- 	}
- }
- 
--- 
-2.7.4
+OK! Performance is paramount, so this indeed confirms that we need
+to re-engineer the MMC/SD stack to not rely on this kthread to "drive"
+transactions, instead we need to complete them quickly from the driver
+callbacks and let MQ drive.
+
+A problem here is that issueing the requests are in blocking context
+while completion is in IRQ context (for most drivers) so we need to
+look into this.
+
+>  Sequential workloads
+> should always be as fast as the legacy path and use less CPU cycles,
+
+That seems more or less confirmed by my dd-test in the commit
+message. sys time is really small with the simple time+dd tests.
+
+> for random workloads we might have to wait for I/O scheduler support,
+> which is under way now:
+>
+>     http://git.kernel.dk/cgit/linux-block/log/?h=blk-mq-sched
+
+Awesome.
+
+> All that assumes a properly converted driver, which as seen by your
+> experiments isn't easy for MMC as it's a very convoluted beast thanks
+> the hardware interface which isn't up to the standards we expect from
+> block storage protocols.
+
+I think we can hash it out, we just need to rewrite the MMC/SD
+core request handling a bit.
+
+Yours,
+Linus Walleij
