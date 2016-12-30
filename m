@@ -1,4 +1,4 @@
-Return-Path: <colyli@suse.de>
+Return-Path: <i@coly.li>
 Subject: Re: [PATCH v1 08/54] block: comment on bio_alloc_pages()
 To: Ming Lei <tom.leiming@gmail.com>, Jens Axboe <axboe@fb.com>,
  linux-kernel@vger.kernel.org
@@ -11,9 +11,9 @@ Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
  "open list:BCACHE (BLOCK LAYER CACHE)" <linux-bcache@vger.kernel.org>,
  "open list:SOFTWARE RAID (Multiple Disks) SUPPORT"
  <linux-raid@vger.kernel.org>
-From: Coly Li <colyli@suse.de>
-Message-ID: <a9d5cf1c-91f4-4dbd-5b2f-e7b4998b6e34@suse.de>
-Date: Fri, 30 Dec 2016 19:06:02 +0800
+From: Coly Li <i@coly.li>
+Message-ID: <fe35d1e8-3d3f-9857-d236-cbc26016e0b2@coly.li>
+Date: Fri, 30 Dec 2016 18:40:16 +0800
 MIME-Version: 1.0
 In-Reply-To: <1482854250-13481-9-git-send-email-tom.leiming@gmail.com>
 Content-Type: text/plain; charset=utf-8
@@ -63,3 +63,6 @@ On 2016/12/27 下午11:55, Ming Lei wrote:
 >  		return;
 > 
 Acked-by: Coly Li <colyli@suse.de>
+
+-- 
+Coly Li
