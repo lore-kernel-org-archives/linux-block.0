@@ -1,44 +1,114 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f66.google.com ([74.125.83.66]:35079 "EHLO
-        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933045AbcL0QHH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Dec 2016 11:07:07 -0500
-From: Ming Lei <tom.leiming@gmail.com>
-To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        Ming Lei <tom.leiming@gmail.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        linux-fsdevel@vger.kernel.org (open list:FILESYSTEMS (VFS and
-        infrastructure))
-Subject: [PATCH v1 49/54] fs/iomap.c: convert to bio_for_each_segment_all_sp()
-Date: Wed, 28 Dec 2016 00:04:58 +0800
-Message-Id: <1482854706-14128-18-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1482854706-14128-1-git-send-email-tom.leiming@gmail.com>
-References: <1482854706-14128-1-git-send-email-tom.leiming@gmail.com>
+Received: from mx2.suse.de ([195.135.220.15]:59389 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751280AbcL3Q5C (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 30 Dec 2016 11:57:02 -0500
+Subject: Re: [PATCH v1 07/54] bcache: comment on direct access to bvec table
+To: Ming Lei <tom.leiming@gmail.com>
+References: <1482854250-13481-1-git-send-email-tom.leiming@gmail.com>
+ <1482854250-13481-8-git-send-email-tom.leiming@gmail.com>
+Cc: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        Shaohua Li <shli@kernel.org>, Guoqing Jiang <gqjiang@suse.com>,
+        Zheng Liu <gnehzuil.liu@gmail.com>,
+        Mike Christie <mchristi@redhat.com>,
+        Jiri Kosina <jkosina@suse.cz>,
+        Eric Wheeler <git@linux.ewheeler.net>,
+        Yijing Wang <wangyijing@huawei.com>,
+        Al Viro <viro@ZenIV.linux.org.uk>,
+        "open list:BCACHE (BLOCK LAYER CACHE)" <linux-bcache@vger.kernel.org>,
+        "open list:SOFTWARE RAID (Multiple Disks) SUPPORT"
+        <linux-raid@vger.kernel.org>
+From: Coly Li <colyli@suse.de>
+Message-ID: <f88ea6e0-d2e4-15ea-0eb6-19be3d9d317d@suse.de>
+Date: Sat, 31 Dec 2016 00:56:41 +0800
+MIME-Version: 1.0
+In-Reply-To: <1482854250-13481-8-git-send-email-tom.leiming@gmail.com>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
----
- fs/iomap.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+On 2016/12/27 下午11:55, Ming Lei wrote:
+> Looks all are safe after multipage bvec is supported.
+> 
+> Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+> ---
+>  drivers/md/bcache/btree.c | 1 +
+>  drivers/md/bcache/super.c | 6 ++++++
+>  drivers/md/bcache/util.c  | 7 +++++++
+>  3 files changed, 14 insertions(+)
+> 
+> diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
+> index a43eedd5804d..fc35cfb4d0f1 100644
+> --- a/drivers/md/bcache/btree.c
+> +++ b/drivers/md/bcache/btree.c
+> @@ -428,6 +428,7 @@ static void do_btree_node_write(struct btree *b)
+>  
+>  		continue_at(cl, btree_node_write_done, NULL);
+>  	} else {
+> +		/* No harm for multipage bvec since the new is just allocated */
+>  		b->bio->bi_vcnt = 0;
+>  		bch_bio_map(b->bio, i);
+>  
+> diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+> index 3a19cbc8b230..607b022259dc 100644
+> --- a/drivers/md/bcache/super.c
+> +++ b/drivers/md/bcache/super.c
+> @@ -208,6 +208,7 @@ static void write_bdev_super_endio(struct bio *bio)
+>  
+>  static void __write_super(struct cache_sb *sb, struct bio *bio)
+>  {
+> +	/* single page bio, safe for multipage bvec */
+>  	struct cache_sb *out = page_address(bio->bi_io_vec[0].bv_page);
+>  	unsigned i;
+>  
+> @@ -1156,6 +1157,8 @@ static void register_bdev(struct cache_sb *sb, struct page *sb_page,
+>  	dc->bdev->bd_holder = dc;
+>  
+>  	bio_init(&dc->sb_bio, dc->sb_bio.bi_inline_vecs, 1);
+> +
+> +	/* single page bio, safe for multipage bvec */
+>  	dc->sb_bio.bi_io_vec[0].bv_page = sb_page;
+>  	get_page(sb_page);
+>  
+> @@ -1799,6 +1802,7 @@ void bch_cache_release(struct kobject *kobj)
+>  	for (i = 0; i < RESERVE_NR; i++)
+>  		free_fifo(&ca->free[i]);
+>  
+> +	/* single page bio, safe for multipage bvec */
+>  	if (ca->sb_bio.bi_inline_vecs[0].bv_page)
+>  		put_page(ca->sb_bio.bi_io_vec[0].bv_page);
+>  
+> @@ -1854,6 +1858,8 @@ static int register_cache(struct cache_sb *sb, struct page *sb_page,
+>  	ca->bdev->bd_holder = ca;
+>  
+>  	bio_init(&ca->sb_bio, ca->sb_bio.bi_inline_vecs, 1);
+> +
+> +	/* single page bio, safe for multipage bvec */
+>  	ca->sb_bio.bi_io_vec[0].bv_page = sb_page;
+>  	get_page(sb_page);
+>  
+> diff --git a/drivers/md/bcache/util.c b/drivers/md/bcache/util.c
+> index dde6172f3f10..5cc0b49a65fb 100644
+> --- a/drivers/md/bcache/util.c
+> +++ b/drivers/md/bcache/util.c
+> @@ -222,6 +222,13 @@ uint64_t bch_next_delay(struct bch_ratelimit *d, uint64_t done)
+>  		: 0;
+>  }
+>  
+> +/*
+> + * Generally it isn't good to access .bi_io_vec and .bi_vcnt
+> + * directly, the preferred way is bio_add_page, but in
+> + * this case, bch_bio_map() supposes that the bvec table
+> + * is empty, so it is safe to access .bi_vcnt & .bi_io_vec
+> + * in this way even after multipage bvec is supported.
+> + */
+>  void bch_bio_map(struct bio *bio, void *base)
+>  {
+>  	size_t size = bio->bi_iter.bi_size;
+> 
 
-diff --git a/fs/iomap.c b/fs/iomap.c
-index 354a123f170e..11da77b24599 100644
---- a/fs/iomap.c
-+++ b/fs/iomap.c
-@@ -698,8 +698,9 @@ static void iomap_dio_bio_end_io(struct bio *bio)
- 	} else {
- 		struct bio_vec *bvec;
- 		int i;
-+		struct bvec_iter_all bia;
- 
--		bio_for_each_segment_all(bvec, bio, i)
-+		bio_for_each_segment_all_sp(bvec, bio, i, bia)
- 			put_page(bvec->bv_page);
- 		bio_put(bio);
- 	}
--- 
-2.7.4
+Acked-by: Coly Li <colyli@suse.de>
+
 
