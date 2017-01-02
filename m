@@ -1,42 +1,36 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
+Message-ID: <1483398761.2440.4.camel@dubeyko.com>
 Subject: Re: [LSF/MM TOPIC][LSF/MM ATTEND] OCSSDs - SMR, Hierarchical
  Interface, and Vector I/Os
-To: Viacheslav Dubeyko <slava@dubeyko.com>,
-        lsf-pc@lists.linux-foundation.org
+From: Viacheslav Dubeyko <slava@dubeyko.com>
+To: Matias =?ISO-8859-1?Q?Bj=F8rling?= <m@bjorling.me>,
+ lsf-pc@lists.linux-foundation.org
+Date: Mon, 02 Jan 2017 15:12:41 -0800
+In-Reply-To: <05204e9d-ed4d-f97a-88f0-41b5e008af43@bjorling.me>
 References: <05204e9d-ed4d-f97a-88f0-41b5e008af43@bjorling.me>
- <1483398761.2440.4.camel@dubeyko.com>
+Mime-Version: 1.0
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
+List-Post: <mailto:linux-nvme@lists.infradead.org>
+List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
 Cc: Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        linux-nvme@lists.infradead.org
-From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <m@bjorling.me>
-Message-ID: <e42ff0c8-6568-d211-331f-7bfa6af94e2e@bjorling.me>
-Date: Tue, 3 Jan 2017 09:56:36 +0100
-MIME-Version: 1.0
-In-Reply-To: <1483398761.2440.4.camel@dubeyko.com>
-Content-Type: text/plain; charset=utf-8
-Sender: linux-fsdevel-owner@vger.kernel.org
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ linux-nvme@lists.infradead.org
+Content-Type: text/plain; charset="utf-8"
+Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
+Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
 List-ID: <linux-block@vger.kernel.org>
 
-On 01/03/2017 12:12 AM, Viacheslav Dubeyko wrote:
-> On Mon, 2017-01-02 at 22:06 +0100, Matias Bjørling wrote:
->> Hi,
->>
->> The open-channel SSD subsystem is maturing, and drives are beginning
->> to 
->> become available on the market. 
-> 
-> What do you mean? We still have nothing on the market. I haven't
-> opportunity to access to any of such device. Could you share your
-> knowledge where and what device can be bought on the market?
-> 
-
-Hi Vyacheslav,
-
-You are right that they are not available off the shelf at a convenient
-store. You may contact one of these vendors for availability: CNEX Labs
-(Westlake LightNVM SDK), Radian Memory Systems (RMS-325), and/or EMC (OX
-Controller + Dragon Fire card).
-
-> Thanks,
-> Vyacheslav Dubeyko.
-> 
+T24gTW9uLCAyMDE3LTAxLTAyIGF0IDIyOjA2ICswMTAwLCBNYXRpYXMgQmrDuHJsaW5nIHdyb3Rl
+Ogo+IEhpLAo+IAo+IFRoZSBvcGVuLWNoYW5uZWwgU1NEIHN1YnN5c3RlbSBpcyBtYXR1cmluZywg
+YW5kIGRyaXZlcyBhcmUgYmVnaW5uaW5nCj4gdG/CoAo+IGJlY29tZSBhdmFpbGFibGUgb24gdGhl
+IG1hcmtldC4gCgpXaGF0IGRvIHlvdSBtZWFuPyBXZSBzdGlsbCBoYXZlIG5vdGhpbmcgb24gdGhl
+IG1hcmtldC4gSSBoYXZlbid0Cm9wcG9ydHVuaXR5IHRvIGFjY2VzcyB0byBhbnkgb2Ygc3VjaCBk
+ZXZpY2UuIENvdWxkIHlvdSBzaGFyZSB5b3VyCmtub3dsZWRnZSB3aGVyZSBhbmQgd2hhdCBkZXZp
+Y2UgY2FuIGJlIGJvdWdodCBvbiB0aGUgbWFya2V0PwoKVGhhbmtzLApWeWFjaGVzbGF2IER1YmV5
+a28uCgoKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KTGlu
+dXgtbnZtZSBtYWlsaW5nIGxpc3QKTGludXgtbnZtZUBsaXN0cy5pbmZyYWRlYWQub3JnCmh0dHA6
+Ly9saXN0cy5pbmZyYWRlYWQub3JnL21haWxtYW4vbGlzdGluZm8vbGludXgtbnZtZQo=
