@@ -1,67 +1,34 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:34470 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S935416AbdACQnN (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 3 Jan 2017 11:43:13 -0500
-Date: Tue, 3 Jan 2017 11:43:13 -0500
-From: Mike Snitzer <snitzer@redhat.com>
-To: Ming Lei <tom.leiming@gmail.com>
-Cc: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        linux-block@vger.kernel.org,
-        "maintainer:DEVICE-MAPPER LVM, Shaohua Li <shli@kernel.org>,
-        linux-raid@vger.kernel.org open list:SOFTWARE RAID Multiple DisksSUPPORT"
-        <dm-devel@redhat.com>, Alasdair Kergon <agk@redhat.com>
-Subject: Re: [PATCH v1 12/54] dm: limit the max bio size as BIO_MAX_PAGES *
- PAGE_SIZE
-Message-ID: <20170103164312.GA20421@redhat.com>
-References: <1482854250-13481-1-git-send-email-tom.leiming@gmail.com>
- <1482854250-13481-13-git-send-email-tom.leiming@gmail.com>
+Received: from mail-sn1nam02on0041.outbound.protection.outlook.com ([104.47.36.41]:22240
+        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S932653AbdABNPG (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 2 Jan 2017 08:15:06 -0500
+From: Bart Van Assche <Bart.VanAssche@sandisk.com>
+To: "axboe@fb.com" <axboe@fb.com>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: [PATCH 1/2] block: Make wbt_wait() definition consistent with
+ declaration
+Date: Mon, 2 Jan 2017 13:14:59 +0000
+Message-ID: <1483362841.3592.59.camel@sandisk.com>
+References: <1483362698.3592.58.camel@sandisk.com>
+In-Reply-To: <1483362698.3592.58.camel@sandisk.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1482854250-13481-13-git-send-email-tom.leiming@gmail.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Tue, Dec 27 2016 at 10:56am -0500,
-Ming Lei <tom.leiming@gmail.com> wrote:
-
-> For BIO based DM, some targets aren't ready for dealing with
-> bigger incoming bio than 1Mbyte, such as crypt target.
-> 
-> Signed-off-by: Ming Lei <tom.leiming@gmail.com>
-> ---
->  drivers/md/dm.c | 11 ++++++++++-
->  1 file changed, 10 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-> index 3086da5664f3..6139bf7623f7 100644
-> --- a/drivers/md/dm.c
-> +++ b/drivers/md/dm.c
-> @@ -899,7 +899,16 @@ int dm_set_target_max_io_len(struct dm_target *ti, sector_t len)
->  		return -EINVAL;
->  	}
->  
-> -	ti->max_io_len = (uint32_t) len;
-> +	/*
-> +	 * BIO based queue uses its own splitting. When multipage bvecs
-> +	 * is switched on, size of the incoming bio may be too big to
-> +	 * be handled in some targets, such as crypt.
-> +	 *
-> +	 * When these targets are ready for the big bio, we can remove
-> +	 * the limit.
-> +	 */
-> +	ti->max_io_len = min_t(uint32_t, len,
-> +			       (BIO_MAX_PAGES * PAGE_SIZE));
->  
->  	return 0;
->  }
-> -- 
-> 2.7.4
-
-dm_set_target_max_io_len() is already meant to be called by the .ctr
-hook for each DM target.  So why not just have the dm-crypt target (and
-other targets if needed) pass your reduced $len?
-
-That way only targets that need to be fixed (e.g. dm-crypt) impose this
-limit.
+Rml4ZXM6IGUzNGNiZDMwNzQ3NyAoImJsay13YnQ6IGFkZCBnZW5lcmFsIHRocm90dGxpbmcgbWVj
+aGFuaXNtIikNClNpZ25lZC1vZmYtYnk6IEJhcnQgVmFuIEFzc2NoZSA8YmFydC52YW5hc3NjaGVA
+c2FuZGlzay5jb20+DQotLS0NCsKgYmxvY2svYmxrLXdidC5jIHwgMiArLQ0KwqAxIGZpbGUgY2hh
+bmdlZCwNCjEgaW5zZXJ0aW9uKCspLCAxIGRlbGV0aW9uKC0pDQoNCmRpZmYgLS1naXQgYS9ibG9j
+ay9ibGstd2J0LmMgYi9ibG9jay9ibGstd2J0LmMNCmluZGV4IDZlODI3NjlmNDA0Mi4uZmQyOGMy
+ODA2NDA2IDEwMDY0NA0KLS0tIGEvYmxvY2svYmxrLXdidC5jDQorKysgYi9ibG9jay9ibGstd2J0
+LmMNCkBAIC01OTUsNyArNTk1LDcgQEAgc3RhdGljIGlubGluZSBib29sIHdidF9zaG91bGRfdGhy
+b3R0bGUoc3RydWN0IHJxX3diICpyd2IsIHN0cnVjdCBiaW8gKmJpbykNCsKgICogaW4gYW4gaXJx
+IGhlbGQgc3BpbmxvY2ssIGlmIGl0IGhvbGRzIG9uZSB3aGVuIGNhbGxpbmcgdGhpcyBmdW5jdGlv
+bi4NCsKgICogSWYgd2UgZG8gc2xlZXAsIHdlJ2xsIHJlbGVhc2UgYW5kIHJlLWdyYWIgaXQuDQrC
+oCAqLw0KLXVuc2lnbmVkIGludCB3YnRfd2FpdChzdHJ1Y3QgcnFfd2IgKnJ3Yiwgc3RydWN0IGJp
+byAqYmlvLCBzcGlubG9ja190ICpsb2NrKQ0KK2VudW0gd2J0X2ZsYWdzIHdidF93YWl0KHN0cnVj
+dCBycV93YiAqcndiLCBzdHJ1Y3QgYmlvICpiaW8sIHNwaW5sb2NrX3QgKmxvY2spDQrCoHsNCsKg
+CXVuc2lnbmVkIGludCByZXQgPSAwOw0KwqANCi0twqANCjIuMTEuMA0K
