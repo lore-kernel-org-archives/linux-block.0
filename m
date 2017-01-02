@@ -1,176 +1,82 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:25810 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750800AbdA1Inu (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 28 Jan 2017 03:43:50 -0500
-Subject: [RFC PATCH 07/17] brd: add dax_operations support
-From: Dan Williams <dan.j.williams@intel.com>
-To: linux-nvdimm@lists.01.org
-Cc: snitzer@redhat.com, toshi.kani@hpe.com, mawilcox@microsoft.com,
-        linux-block@vger.kernel.org, jmoyer@redhat.com,
-        linux-fsdevel@vger.kernel.org, ross.zwisler@linux.intel.com,
-        hch@lst.de
-Date: Sat, 28 Jan 2017 00:36:41 -0800
-Message-ID: <148559260182.11180.12359489023506043402.stgit@dwillia2-desk3.amr.corp.intel.com>
-In-Reply-To: <148559256378.11180.8957776806175202312.stgit@dwillia2-desk3.amr.corp.intel.com>
-References: <148559256378.11180.8957776806175202312.stgit@dwillia2-desk3.amr.corp.intel.com>
+Return-Path: <jack@suse.cz>
+Date: Mon, 2 Jan 2017 17:46:20 +0100
+From: Jan Kara <jack@suse.cz>
+To: Eryu Guan <guaneryu@gmail.com>
+Cc: Jan Kara <jack@suse.cz>, Chandan Rajendra <chandan@linux.vnet.ibm.com>,
+	axboe@kernel.dk, linux-block@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] clean_bdev_aliases: Prevent cleaning blocks that are not
+ in block range
+Message-ID: <20170102164620.GI18058@quack2.suse.cz>
+References: <1482672663-17122-1-git-send-email-chandan@linux.vnet.ibm.com>
+ <20170102155803.GH18058@quack2.suse.cz>
+ <20170102162145.GA1946@eguan.usersys.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170102162145.GA1946@eguan.usersys.redhat.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Setup a dax_inode to have the same lifetime as the brd block device and
-add a ->direct_access() method that is equivalent to
-brd_direct_access(). Once fs/dax.c has been converted to use
-dax_operations the old brd_direct_access() will be removed.
+On Tue 03-01-17 00:21:45, Eryu Guan wrote:
+> On Mon, Jan 02, 2017 at 04:58:03PM +0100, Jan Kara wrote:
+> > On Sun 25-12-16 19:01:03, Chandan Rajendra wrote:
+> > > The first block to be cleaned may start at a non-zero page offset. In
+> > > such a scenario clean_bdev_aliases() will end up cleaning blocks that
+> > > do not fall in the range of blocks to be cleaned. This commit fixes the
+> > > issue by skipping blocks that do not fall in valid block range.
+> > > 
+> > > Signed-off-by: Chandan Rajendra <chandan@linux.vnet.ibm.com>
+> > 
+> > Ah, very good catch! How did you spot this?
+> 
+> I failed to notice this patch, and I came up with a same patch today
+> myself, and I'm still testing it.
+> 
+> I found this by xfstests, many tests (tens of tests) failed fsck after
+> test when testing extN if blocksize < pagesize. E.g. generic/013 could
+> reproduce the fs corruption quite reliablely for me.
+> 
+> Reviewed-by: Eryu Guan <eguan@redhat.com>
 
-Signed-off-by: Dan Williams <dan.j.williams@intel.com>
----
- drivers/block/Kconfig |    1 +
- drivers/block/brd.c   |   57 +++++++++++++++++++++++++++++++++++++++++--------
- 2 files changed, 49 insertions(+), 9 deletions(-)
+Thanks! Yeah, I had run xfstests with those patches but not with blocksize
+< pagesize :-| Shit happens... need to be more careful next time.
 
-diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
-index 223ff2fcae7e..604b51a884b6 100644
---- a/drivers/block/Kconfig
-+++ b/drivers/block/Kconfig
-@@ -337,6 +337,7 @@ config BLK_DEV_SX8
- 
- config BLK_DEV_RAM
- 	tristate "RAM block device support"
-+	select DAX if BLK_DEV_RAM_DAX
- 	---help---
- 	  Saying Y here will allow you to use a portion of your RAM memory as
- 	  a block device, so that you can make file systems on it, read and
-diff --git a/drivers/block/brd.c b/drivers/block/brd.c
-index 3adc32a3153b..1279df4dc07c 100644
---- a/drivers/block/brd.c
-+++ b/drivers/block/brd.c
-@@ -21,6 +21,7 @@
- #include <linux/slab.h>
- #ifdef CONFIG_BLK_DEV_RAM_DAX
- #include <linux/pfn_t.h>
-+#include <linux/dax.h>
- #endif
- 
- #include <linux/uaccess.h>
-@@ -41,6 +42,9 @@ struct brd_device {
- 
- 	struct request_queue	*brd_queue;
- 	struct gendisk		*brd_disk;
-+#ifdef CONFIG_BLK_DEV_RAM_DAX
-+	struct dax_inode	*dax_inode;
-+#endif
- 	struct list_head	brd_list;
- 
- 	/*
-@@ -375,15 +379,14 @@ static int brd_rw_page(struct block_device *bdev, sector_t sector,
- }
- 
- #ifdef CONFIG_BLK_DEV_RAM_DAX
--static long brd_direct_access(struct block_device *bdev, sector_t sector,
-+static long __brd_direct_access(struct brd_device *brd, phys_addr_t dev_addr,
- 			void **kaddr, pfn_t *pfn, long size)
- {
--	struct brd_device *brd = bdev->bd_disk->private_data;
- 	struct page *page;
- 
- 	if (!brd)
- 		return -ENODEV;
--	page = brd_insert_page(brd, sector);
-+	page = brd_insert_page(brd, dev_addr / 512);
- 	if (!page)
- 		return -ENOSPC;
- 	*kaddr = page_address(page);
-@@ -391,14 +394,34 @@ static long brd_direct_access(struct block_device *bdev, sector_t sector,
- 
- 	return PAGE_SIZE;
- }
-+
-+static long brd_blk_direct_access(struct block_device *bdev, sector_t sector,
-+			void **kaddr, pfn_t *pfn, long size)
-+{
-+	struct brd_device *brd = bdev->bd_disk->private_data;
-+
-+	return __brd_direct_access(brd, sector * 512, kaddr, pfn, size);
-+}
-+
-+static long brd_dax_direct_access(struct dax_inode *dax_inode,
-+		phys_addr_t dev_addr, void **kaddr, pfn_t *pfn, long size)
-+{
-+	struct brd_device *brd = dax_inode_get_private(dax_inode);
-+
-+	return __brd_direct_access(brd, dev_addr, kaddr, pfn, size);
-+}
-+
-+static const struct dax_operations brd_dax_ops = {
-+	.direct_access = brd_dax_direct_access,
-+};
- #else
--#define brd_direct_access NULL
-+#define brd_blk_direct_access NULL
- #endif
- 
- static const struct block_device_operations brd_fops = {
- 	.owner =		THIS_MODULE,
- 	.rw_page =		brd_rw_page,
--	.direct_access =	brd_direct_access,
-+	.direct_access =	brd_blk_direct_access,
- };
- 
- /*
-@@ -441,7 +464,9 @@ static struct brd_device *brd_alloc(int i)
- {
- 	struct brd_device *brd;
- 	struct gendisk *disk;
--
-+#ifdef CONFIG_BLK_DEV_RAM_DAX
-+	struct dax_inode *dax_inode;
-+#endif
- 	brd = kzalloc(sizeof(*brd), GFP_KERNEL);
- 	if (!brd)
- 		goto out;
-@@ -469,9 +494,6 @@ static struct brd_device *brd_alloc(int i)
- 	blk_queue_max_discard_sectors(brd->brd_queue, UINT_MAX);
- 	brd->brd_queue->limits.discard_zeroes_data = 1;
- 	queue_flag_set_unlocked(QUEUE_FLAG_DISCARD, brd->brd_queue);
--#ifdef CONFIG_BLK_DEV_RAM_DAX
--	queue_flag_set_unlocked(QUEUE_FLAG_DAX, brd->brd_queue);
--#endif
- 	disk = brd->brd_disk = alloc_disk(max_part);
- 	if (!disk)
- 		goto out_free_queue;
-@@ -484,8 +506,21 @@ static struct brd_device *brd_alloc(int i)
- 	sprintf(disk->disk_name, "ram%d", i);
- 	set_capacity(disk, rd_size * 2);
- 
-+#ifdef CONFIG_BLK_DEV_RAM_DAX
-+	queue_flag_set_unlocked(QUEUE_FLAG_DAX, brd->brd_queue);
-+	dax_inode = alloc_dax_inode(brd, disk->disk_name, &brd_dax_ops);
-+	if (!dax_inode)
-+		goto out_free_inode;
-+#endif
-+
-+
- 	return brd;
- 
-+#ifdef CONFIG_BLK_DEV_RAM_DAX
-+out_free_inode:
-+	kill_dax_inode(dax_inode);
-+	put_dax_inode(dax_inode);
-+#endif
- out_free_queue:
- 	blk_cleanup_queue(brd->brd_queue);
- out_free_dev:
-@@ -525,6 +560,10 @@ static struct brd_device *brd_init_one(int i, bool *new)
- static void brd_del_one(struct brd_device *brd)
- {
- 	list_del(&brd->brd_list);
-+#ifdef CONFIG_BLK_DEV_RAM_DAX
-+	kill_dax_inode(brd->dax_inode);
-+	put_dax_inode(brd->dax_inode);
-+#endif
- 	del_gendisk(brd->brd_disk);
- 	brd_free(brd);
- }
+								Honza
 
+> > The patch looks good. You can add:
+> > 
+> > Reviewed-by: Jan Kara <jack@suse.cz>
+> > 
+> > Jens, please merge this fix quickly as we may end up discarding changes to
+> > innocent metadata blocks due to this... Thanks!
+> > 
+> > 								Honza
+> > > ---
+> > >  fs/buffer.c | 2 +-
+> > >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > > 
+> > > diff --git a/fs/buffer.c b/fs/buffer.c
+> > > index 1df2bd5..28484b3 100644
+> > > --- a/fs/buffer.c
+> > > +++ b/fs/buffer.c
+> > > @@ -1660,7 +1660,7 @@ void clean_bdev_aliases(struct block_device *bdev, sector_t block, sector_t len)
+> > >  			head = page_buffers(page);
+> > >  			bh = head;
+> > >  			do {
+> > > -				if (!buffer_mapped(bh))
+> > > +				if (!buffer_mapped(bh) || (bh->b_blocknr < block))
+> > >  					goto next;
+> > >  				if (bh->b_blocknr >= block + len)
+> > >  					break;
+> > > -- 
+> > > 2.5.5
+> > > 
+> > -- 
+> > Jan Kara <jack@suse.com>
+> > SUSE Labs, CR
+> > --
+> > To unsubscribe from this list: send the line "unsubscribe linux-block" in
+> > the body of a message to majordomo@vger.kernel.org
+> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
