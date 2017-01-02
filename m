@@ -1,94 +1,110 @@
-Return-Path: <arnd@arndb.de>
-From: Arnd Bergmann <arnd@arndb.de>
-To: Hannes Reinecke <hare@suse.de>
-Cc: Linus Walleij <linus.walleij@linaro.org>, Christoph Hellwig <hch@lst.de>, Ritesh Harjani <riteshh@codeaurora.org>, Ulf Hansson <ulf.hansson@linaro.org>, Jens Axboe <axboe@kernel.dk>, "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>, linux-block@vger.kernel.org, Chunyan Zhang <zhang.chunyan@linaro.org>, Baolin Wang <baolin.wang@linaro.org>, Paolo Valente <paolo.valente@linaro.org>
+Return-Path: <adrian.hunter@intel.com>
 Subject: Re: [PATCH v2] RFD: switch MMC/SD to use blk-mq multiqueueing
-Date: Mon, 02 Jan 2017 18:08:10 +0100
-Message-ID: <2740034.Ea571nGSEf@wuerfel>
-In-Reply-To: <68863f25-7faa-88b5-78bb-21027f772ab6@suse.de>
-References: <1482242508-26131-1-git-send-email-linus.walleij@linaro.org> <2360959.cyJgAELf50@wuerfel> <68863f25-7faa-88b5-78bb-21027f772ab6@suse.de>
+To: Christoph Hellwig <hch@lst.de>, Linus Walleij <linus.walleij@linaro.org>
+References: <1482242508-26131-1-git-send-email-linus.walleij@linaro.org>
+ <0fec238b-3c3c-6928-71ec-c3d4bcc6d267@codeaurora.org>
+ <CACRpkdazLSk1i37ERs4YwuwXnmbmrnyAX1T5kRXjKcPSaAYd7Q@mail.gmail.com>
+ <20161228085503.GA340@lst.de>
+Cc: Ritesh Harjani <riteshh@codeaurora.org>,
+ Ulf Hansson <ulf.hansson@linaro.org>, Jens Axboe <axboe@kernel.dk>,
+ "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
+ linux-block@vger.kernel.org, Chunyan Zhang <zhang.chunyan@linaro.org>,
+ Baolin Wang <baolin.wang@linaro.org>, Arnd Bergmann <arnd@arndb.de>,
+ Paolo Valente <paolo.valente@linaro.org>
+From: Adrian Hunter <adrian.hunter@intel.com>
+Message-ID: <38ec2c14-fc54-b059-1b29-0144ef87e14a@intel.com>
+Date: Mon, 2 Jan 2017 15:56:40 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <20161228085503.GA340@lst.de>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On Monday, January 2, 2017 12:06:04 PM CET Hannes Reinecke wrote:
-> On 01/02/2017 10:40 AM, Arnd Bergmann wrote:
-> > b) without MMC CMDQ support:
-> >   - report queue depth of '2'
-> >   - first request gets handled as above
-> >   - if one request is pending, prepare the second request and
-> >     add a pointer to the mmc host structure (not that different
-> >     from what we do today)
-> >   - when the host driver completes a request, have it immediately
-> >     issue the next one from the interrupt handler. In case we need
-> >     to sleep here, use a threaded IRQ, or a workqueue. This should
-> >     avoid the need for the NULL requests
-> > 
-> > c) possible optimization for command packing without CMDQ:
-> >    - similar to b)
-> >    - report a longer queue (e.g. 8, maybe user selectable, to
-> >      balance throughput against latency)
-> >    - any request of the same type (read or write) as the one that
-> >      is currently added to the host as the 'next' one can be
-> >      added to that request so they get issued together
-> >    - if the types are different, report the queue to be busy
-> > 
-> Hmm. But that would amount to implement yet another queuing mechanism
-> within the driver/mmc subsystem, wouldn't it?
+On 28/12/16 10:55, Christoph Hellwig wrote:
+> On Tue, Dec 27, 2016 at 01:21:28PM +0100, Linus Walleij wrote:
+>>> Could you please confirm on this- does even the HW/SW CMDQ in emmc would use
+>>> only 1 hardware queue with (say ~31) as queue depth, of that HW queue? Is
+>>> this understanding correct?
+>>
+>> Yes as far as I can tell.
+>>
+>> But you may have to tell me, because I'm not an expert in CMDQ.
+>>
+>> Multiple queues are for when you can issue different request truly parallel
+>> without taking any previous and later request into account. CMDQ on
+>> MMC seems to require rollback etc if any of the issued requests after
+>> a certain request fail, and then it is essentially one queue, like a pipeline,
+>> and if one request fails all requests after that request needs to be backed
+>> out, correct?
 > 
-> Which is, incidentally, the same method the S/390 DASD driver uses
-> nowadays; report an arbitrary queue depth to the block layer and queue
-> all requests internally to better saturate the device.
+> I'm not an expert on the MMC CMDQ feature, but I know blk-mq pretty
+> well, so based on that and the decription of the series CMDQ finally
+> allows MMC to implement one single queue almost properly, but certainly
+> not multiple queues.
 > 
-> However I'd really like to get rid of this, and tweak the block layer to
-> handle these cases.
-> 
-> One idea I had was to use a 'prep' function for mq; it would be executed
-> once the request is added to the queue.
-> Key point here is that 'prep' and 'queue_rq' would be two distinct
-> steps; the driver could do all required setup functionality during
-> 'prep', and then do the actual submission via 'queue_rq'.
+> In block storage terms a queue is something where the OS can send
+> multiple commands to the device and let the device operate on them in
+> parallel (or at least pseudo-parallel).  Even with the MMC CMDQ feature
+> is seems after queueing up command the host still needs to control
+> execution ordering by talking to the hardware again for each command,
+> which isn't up to par with what other standards have been doing for the
+> last decades.  It's certainly not support for multiple queues, which
+> is defined as hardware features where the host allows multiple issuers
+> to use queue entirely independently of each other.
 
-Right, I had the same idea and I think even talked to you about that.
-I think this would address case 'b)' above perfectly, but I don't
-see how we can fit case 'c)' in that scheme.
+eMMC can only do one thing at a time.  However when the host controller has
+a command queue engine (CQE), then the engine takes care of executing tasks
+in the queue, so the driver only needs to queue transfers and handle
+completions.
 
-Maybe if we could teach blk_mq that a device might be able to not
-just merge consecutive requests but also a limited set of
-non-consecutive requests in a way that MMC needs them? Unfortunately,
-the 'packed command' is rather MMC specific, and it might even
-be worthwhile to do some optimization regarding what commands
-get packed (e.g. only writes, only small requests, or only up to
-a total size).
+Unfortunately there is a complication.  EMMC can be blocked for a number of
+reasons:
 
-While there are some parallels to DASD, but it's not completely
-the same, even if we ignore the command packing.
+First, eMMC has a number of internal partitions that are represented as
+disks with their own (block-layer) queues.  Because eMMC can only do one
+thing at a time, the queues must be synchronized with each other, and there
+is a switch command that must be issued to switch the eMMC between internal
+partitions.  Currently that synchronization is provided by "claiming" the
+host controller.  A queue (mmc_queue_thread) is blocked until it claims the
+host.
 
-- MMC wants the 'prepare' stage to reduce the latency from
-  dma_map_sg() calls. This is actually more related to the
-  CPU/SoC architecture and really important on most ARM systems
-  as they are not cache coherent, but it's not just specific
-  to MMC other than MMC performance on low-end ARM being
-  really important to a lot of people since it's used in all
-  Android phones.
-  If we could find a way to get blk_mq to call blk_rq_map_sg()
-  for us, we wouldn't need a ->prepare() step or a fake queue
-  for case 'b)', and we could make use of that in other drivers
-  too.
+Secondly, MMC block driver has an IOCTL interface that bypasses the queue,
+and consequently also needs to be synchronized - again currently by claiming
+the host.  There is also a proposed RPMB interface that works similarly.
 
-- DASD in contrast wants to build the channel programs while
-  other I/O is running, and this is very specific to that
-  driver. There are probably some other things it does in its
-  own queue implementation that are also driver specific.
+Thirdly, discards are not (properly) supported by the CQE or (at all by)
+eMMC CMDQ.  A discard (or erase) requires 3 commands to be sent in
+succession.  Even if the CQE supports direct commands (DCMD) as described by
+the Command Queue Host Controller (CQHCI) specification, only one DCMD can
+be issued at a time.  That means no new reads/writes can be issued while the
+first 2 commands are being issued, and no new discards can be issued until
+the previous one completes.  However it is possible there are CQE that don't
+support DCMD anyway - which would just mean the queue is halted/blocked
+until the discard completes.
 
-> That would allow to better distribute the load for timing-sensitive
-> devices, and with a bit of luck remove the need for a separate queuing
-> inside the driver.
-> 
-> In any case, it looks like a proper subject for LSF/MM...
-> Linus? Arnd? Are you up for it?
+Fourthly, eMMC/SD make use of runtime PM for both the host controller and
+the card.  The card might require a full reinitialization sequence to be
+resumed.
 
-I'm probably not going to work on it myself, but I think it would
-be great for Linus and/or Ulf to bring this up at LSF/MM.
+Fifthly, although it is a minor point, the CQHCI spec specifies that the CQE
+must be halted to handle any error, and indeed the CQE must be halted to
+send commands to perform recovery anyway.
 
-	Arnd
+Sixthly, there are debugfs files that issue commands and are also
+synchronized by claiming the host.
+
+The problem with blocking is that it leaves up to queue_depth requests
+sitting in a (local or dispatch) list unavailable for merging or
+prioritizing.  That won't matter if the queue_depth is 2, but it might if
+the queue_depth is the eMMC CMDQ maximum of 32.
+
+If we assume it doesn't matter to have up to queue_depth requests
+unavailable for merging or prioritizing, then a switch to blk-mq can be done
+most simply by having ->queue_rq() put requests on a list, and have the
+existing mmc_queue_thread() process them the same way it does now.  One
+disadvantage of that approach is that the mmc_queue_thread() would not get
+woken until ->queue_rq() is called which is done by scheduled work for async
+requests.
+
+If it does matter that all requests are still available for merging or
+prioritizing when the queue is blocked, then AFAICT mmc will need more
+support from blk-mq.
