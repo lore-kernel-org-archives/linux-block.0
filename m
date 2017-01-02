@@ -1,28 +1,25 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <Bart.VanAssche@sandisk.com>
-To: "axboe@kernel.dk" <axboe@kernel.dk>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Return-Path: <axboe@kernel.dk>
+Date: Mon, 2 Jan 2017 09:49:58 -0700
+From: Jens Axboe <axboe@kernel.dk>
+To: Bart Van Assche <Bart.VanAssche@sandisk.com>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Subject: Re: [PATCH 0/2] Two small fixes that address issues introduced in
  kernel v4.10-rc1
-Date: Thu, 5 Jan 2017 10:58:57 +0000
-Message-ID: <1483613920.2811.16.camel@sandisk.com>
+Message-ID: <20170102164958.GA26921@kernel.dk>
 References: <1483362698.3592.58.camel@sandisk.com>
-	 <20170102164958.GA26921@kernel.dk>
-In-Reply-To: <20170102164958.GA26921@kernel.dk>
-Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
-Return-Path: Bart.VanAssche@sandisk.com
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1483362698.3592.58.camel@sandisk.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, 2017-01-02 at 09:49 -0700, Jens Axboe wrote:
-> I hand applied both of these, came through mangled for some reason.
+On Mon, Jan 02 2017, Bart Van Assche wrote:
+> Hello Jens,
+> 
+> The two patches in this series suppress sparse complaints that were
+> introduced during the v4.10 merge window. It would be appreciated if these
+> patches would be considered for inclusion in the upstream kernel.
 
-Hello Jens,
+I hand applied both of these, came through mangled for some reason.
 
-Sorry that the patches came through mangled. Since my employer is
-migrating mailboxes from the @sandisk.com domain to the @wdc.com
-domain the only option I have for sending patches from my work
-address without using a VPN is by using the Evolution e-mail client.
-I will double check the configuration of this e-mail client.
-
-Bart.=
+-- 
+Jens Axboe
