@@ -1,127 +1,99 @@
-Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
-From: Slava Dubeyko <Vyacheslav.Dubeyko@wdc.com>
-To: =?utf-8?B?TWF0aWFzIEJqw7hybGluZw==?= <m@bjorling.me>, Viacheslav Dubeyko
- <slava@dubeyko.com>, "lsf-pc@lists.linux-foundation.org"
- <lsf-pc@lists.linux-foundation.org>
-Subject: RE: [LSF/MM TOPIC][LSF/MM ATTEND] OCSSDs - SMR, Hierarchical
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-lf0-f65.google.com ([209.85.215.65]:33868 "EHLO
+        mail-lf0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753183AbdACTLK (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Jan 2017 14:11:10 -0500
+Received: by mail-lf0-f65.google.com with SMTP id d16so30888891lfb.1
+        for <linux-block@vger.kernel.org>; Tue, 03 Jan 2017 11:10:41 -0800 (PST)
+Subject: Re: [LSF/MM TOPIC][LSF/MM ATTEND] OCSSDs - SMR, Hierarchical
  Interface, and Vector I/Os
-Date: Wed, 4 Jan 2017 02:59:39 +0000
-Message-ID: <SN2PR04MB219184580108939442EBDA7E88610@SN2PR04MB2191.namprd04.prod.outlook.com>
+To: Viacheslav Dubeyko <slava@dubeyko.com>,
+        lsf-pc@lists.linux-foundation.org
 References: <05204e9d-ed4d-f97a-88f0-41b5e008af43@bjorling.me>
  <1483398761.2440.4.camel@dubeyko.com>
  <e42ff0c8-6568-d211-331f-7bfa6af94e2e@bjorling.me>
  <1483464921.2440.19.camel@dubeyko.com>
- <9319ce16-8355-3560-95b6-45e3f07220de@bjorling.me>
-In-Reply-To: <9319ce16-8355-3560-95b6-45e3f07220de@bjorling.me>
-MIME-Version: 1.0
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
-List-Post: <mailto:linux-nvme@lists.infradead.org>
-List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
 Cc: Linux FS Devel <linux-fsdevel@vger.kernel.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-Content-Type: text/plain; charset="utf-8"
-Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
-Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
-List-ID: <linux-block@vger.kernel.org>
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        linux-nvme@lists.infradead.org, Vyacheslav.Dubeyko@wdc.com
+From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <m@bjorling.me>
+Message-ID: <9319ce16-8355-3560-95b6-45e3f07220de@bjorling.me>
+Date: Tue, 3 Jan 2017 20:10:38 +0100
+MIME-Version: 1.0
+In-Reply-To: <1483464921.2440.19.camel@dubeyko.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-DQotLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KRnJvbTogTWF0aWFzIEJqw7hybGluZyBbbWFp
-bHRvOm1AYmpvcmxpbmcubWVdIA0KU2VudDogVHVlc2RheSwgSmFudWFyeSAzLCAyMDE3IDExOjEx
-IEFNDQpUbzogVmlhY2hlc2xhdiBEdWJleWtvIDxzbGF2YUBkdWJleWtvLmNvbT47IGxzZi1wY0Bs
-aXN0cy5saW51eC1mb3VuZGF0aW9uLm9yZw0KQ2M6IExpbnV4IEZTIERldmVsIDxsaW51eC1mc2Rl
-dmVsQHZnZXIua2VybmVsLm9yZz47IGxpbnV4LWJsb2NrQHZnZXIua2VybmVsLm9yZzsgbGludXgt
-bnZtZUBsaXN0cy5pbmZyYWRlYWQub3JnOyBTbGF2YSBEdWJleWtvIDxWeWFjaGVzbGF2LkR1YmV5
-a29Ad2RjLmNvbT4NClN1YmplY3Q6IFJlOiBbTFNGL01NIFRPUElDXVtMU0YvTU0gQVRURU5EXSBP
-Q1NTRHMgLSBTTVIsIEhpZXJhcmNoaWNhbCBJbnRlcmZhY2UsIGFuZCBWZWN0b3IgSS9Pcw0KDQo8
-c2tpcHBlZD4NCg0KPiBBbGwgb2YgdGhlIG9wZW4tY2hhbm5lbCBTU0Qgd29yayBpcyBkb25lIGlu
-IHRoZSBvcGVuLg0KPiBQYXRjaGVzLCBuZXcgdGFyZ2V0cywgYW5kIHNvIGZvcnRoIGFyZSBiZWlu
-ZyBkZXZlbG9wZWQgZm9yIGV2ZXJ5b25lIHRvIHNlZS4gDQo+IFNpbWlsYXJseSwgdGhlIE5WTWUg
-aG9zdCBpbnRlcmZhY2UgaXMgZGV2ZWxvcGVkIGluIHRoZSBvcGVuIGFzIHdlbGwuDQo+IFRoZSBp
-bnRlcmZhY2UgYWxsb3dzIG9uZSB0byBpbXBsZW1lbnRzIHN1cHBvcnRpbmcgZmlybXdhcmUuIFRo
-ZSAiZnJvbnQtZW5kIg0KPiBvZiB0aGUgRlRMIG9uIHRoZSBTU0QsIGlzIHJlbW92ZWQsIGFuZCB0
-aGUgImJhY2stZW5kIiBlbmdpbmUgaXMgZXhwb3NlZC4gDQo+IEl0IGlzIG5vdCBtdWNoIHdvcmsg
-YW5kIGdpdmVuIEhHU1QgYWxyZWFkeSBoYXZlIGFuIFNTRCBmaXJtd2FyZSBpbXBsZW1lbnRhdGlv
-bi4NCj4gSSBiZXQgeW91IGd1eXMgY2FuIHdoaXAgdXAgYW4gaW50ZXJuYWwgaW1wbGVtZW50YXRp
-b24gaW4gYSBtYXR0ZXIgb2Ygd2Vla3MuDQo+IElmIHlvdSBjaG9vc2UgdG8gZG8gc28sIEkgd2ls
-bCBiZW5kIG92ZXIgYmFja3dhcmRzIHRvIGhlbHAgeW91IHNvcnQgb3V0IGFueSBxdWlya3MgdGhh
-dCBtaWdodCBiZS4NCg0KSSBzZWUgeW91ciBwb2ludC4gQnV0IEkgYW0gdGhlIHJlc2VhcmNoIGd1
-eSBhbmQgSSBoYXZlIHNvZnR3YXJlIHByb2plY3QuIFNvLCBpdCdzIGNvbXBsZXRlbHkgdW5yZWFz
-b25hYmxlIGZvciBtZQ0KdG8gc3BlbmQgdGhlIHRpbWUgb24gU1NEIGZpcm13YXJlLiBJIHNpbXBs
-eSBuZWVkIGluIHJlYWR5LW1hZGUgaGFyZHdhcmUgZm9yIHRlc3RpbmcvYmVuY2htYXJraW5nDQpt
-eSBzb2Z0d2FyZSBhbmQgdG8gY2hlY2sgdGhlIGFzc3VtcHRpb25zIHRoYXQgaXQgd2FzIG1hZGUu
-IFRoYXQncyBhbGwuIElmIEkgaGF2ZW4ndCB0aGUgaGFyZHdhcmUgcmlnaHQgbm93DQp0aGVuIEkg
-bmVlZCB0byB3YWl0IHRoZSBiZXR0ZXIgdGltZXMuIA0KDQo+IEFub3RoZXIgb3B0aW9uIGlzIHRv
-IHVzZSB0aGUgcWVtdSBleHRlbnNpb24uIFdlIGFyZSBpbXByb3ZpbmcgaXQgY29udGludW91c2x5
-DQo+IHRvIG1ha2Ugc3VyZSBpdCBmb2xsb3dzIHRoZSBpbXBsZW1lbnRhdGlvbiBvZiBhIHJlYWwg
-aGFyZHdhcmUgT0NTU0RzLg0KPiBUb2RheSB3ZSBkbyA5MCUgb2Ygb3VyIEZUTCB3b3JrIHVzaW5n
-IHFlbXUsIGFuZCBtb3N0IG9mIHRoZSB0aW1lDQo+IGl0IGp1c3Qgd29ya3Mgd2hlbiB3ZSBydW4g
-dGhlIEZUTCBjb2RlIG9uIHJlYWwgaGFyZHdhcmUuDQoNCkkgcmVhbGx5IGRpc2xpa2UgdG8gdXNl
-IHRoZSBxZW11IGZvciBmaWxlIHN5c3RlbSBiZW5jaG1hcmtpbmcuDQoNCj4gU2ltaWxhcmx5IHRv
-IHZlbmRvcnMgdGhhdCBwcm92aWRlIG5ldyBDUFVzLCBOVkRJTU1zLCBhbmQgZ3JhcGhpYyBkcml2
-ZXJzLg0KPiBTb21lIGNvZGUgYW5kIHJlZmFjdG9yaW5nIGdvIGluIHllYXJzIGluIGFkdmFuY2Uu
-IFdoYXQgSSBhbSBwcm9wb3NpbmcgaGVyZSBpcyB0byBkaXNjdXNzIGhvdyBPQ1NTRHMNCj4gZml0
-cyBpbnRvIHRoZSBzdG9yYWdlIHN0YWNrLCBhbmQgd2hhdCB3ZSBjYW4gZG8gdG8gaW1wcm92ZSBp
-dC4gT3B0aW1hbGx5LCBtb3N0IG9mIHRoZSBsaWdodG52bSBzdWJzeXN0ZW0NCj4gY2FuIGJlIHJl
-bW92ZWQgYnkgZXhwb3NpbmcgdmVjdG9yZWQgSS9Pcy4gV2hpY2ggdGhlbiBlbmFibGVzIGltcGxl
-bWVudGF0aW9uIG9mIGEgdGFyZ2V0IHRvIGJlDQo+IGEgdHJhZGl0aW9uYWwgZGV2aWNlIG1hcHBl
-ciBtb2R1bGUuIFRoYXQgd291bGQgYmUgZ3JlYXQhDQoNCk9LLiBGcm9tIG9uZSBwb2ludCBvZiB2
-aWV3LCBJIGxpa2UgdGhlIGlkZWEgb2YgU01SIGNvbXBhdGliaWxpdHkuIEJ1dCwgZnJvbSBhbm90
-aGVyIHBvaW50IG9mIHZpZXcsDQpJIGFtIHNsaWdodGx5IHNrZXB0aWNhbCBhYm91dCBzdWNoIGFw
-cHJvYWNoLiBJIGJlbGlldmUgeW91IHNlZSB0aGUgYnJpZ2h0IHNpZGUgb2YgeW91ciBzdWdnZXN0
-aW9uLg0KU28sIGxldCBtZSB0YWtlIGEgbG9vayBvbiB5b3VyIGFwcHJvYWNoIGZyb20gdGhlIGRh
-cmsgc2lkZS4NCg0KV2hhdCdzIHRoZSBnb2FsIG9mIFNNUiBjb21wYXRpYmlsaXR5PyBBbnkgdW5p
-ZmljYXRpb24gb3IgaW50ZXJmYWNlIGFic3RyYWN0aW9uIGhhcyB0aGUgZ29hbCB0byBoaWRlDQp0
-aGUgcGVjdWxpYXJpdGllcyBvZiB1bmRlcmx5aW5nIGhhcmR3YXJlLiBCdXQgd2UgaGF2ZSBibG9j
-ayBkZXZpY2UgYWJzdHJhY3Rpb24gdGhhdCBoaWRlcyBhbGwNCmhhcmR3YXJlJ3MgcGVjdWxpYXJp
-dGllcyBwZXJmZWN0bHkuIEFsc28gRlRMIChvciBhbnkgb3RoZXIgVHJhbnNsYXRpb24gTGF5ZXIp
-IGlzIGFibGUgdG8gcmVwcmVzZW50DQp0aGUgZGV2aWNlIGFzIHNlcXVlbmNlIG9mIHBoeXNpY2Fs
-IHNlY3RvcnMgd2l0aG91dCByZWFsIGtub3dsZWRnZSBvbiBzb2Z0d2FyZSBzaWRlIGFib3V0DQpz
-b3BoaXN0aWNhdGVkIG1hbmFnZW1lbnQgYWN0aXZpdHkgb24gdGhlIGRldmljZSBzaWRlLiBBbmQs
-IGZpbmFsbHksIGd1eXMgd2lsbCBiZSBjb21wbGV0ZWx5IGhhcHB5DQp0byB1c2UgdGhlIHJlZ3Vs
-YXIgZmlsZSBzeXN0ZW1zIChleHQ0LCB4ZnMpIHdpdGhvdXQgbmVjZXNzaXR5IHRvIG1vZGlmeSBz
-b2Z0d2FyZSBzdGFjay4gQnV0IEkgYmVsaWV2ZSB0aGF0DQp0aGUgZ29hbCBvZiBPcGVuLWNoYW5u
-ZWwgU1NEIGFwcHJvYWNoIGlzIGNvbXBsZXRlbHkgb3Bwb3NpdGUuIE5hbWVseSwgcHJvdmlkZSB0
-aGUgb3Bwb3J0dW5pdHkNCmZvciBzb2Z0d2FyZSBzaWRlIChmaWxlIHN5c3RlbSwgZm9yIGV4YW1w
-bGUpIHRvIG1hbmFnZSB0aGUgT3Blbi1jaGFubmVsIFNTRCBkZXZpY2Ugd2l0aCBzbWFydGVyDQpw
-b2xpY3kuDQoNClNvLCBteSBrZXkgd29ycnkgdGhhdCB0aGUgdHJ5aW5nIHRvIGhpZGUgdW5kZXIg
-dGhlIHNhbWUgaW50ZXJmYWNlIHRoZSB0d28gZGlmZmVyZW50IHRlY2hub2xvZ2llcw0KKFNNUiBh
-bmQgTkFORCBmbGFzaCkgd2lsbCBiZSByZXN1bHRlZCBpbiB0aGUgbG9zcyBvZiBvcHBvcnR1bml0
-eSB0byBtYW5hZ2UgdGhlIGRldmljZSBpbg0KbW9yZSBzbWFydGVyIHdheS4gQmVjYXVzZSBhbnkg
-dW5pZmljYXRpb24gaGFzIHRoZSBnb2FsIHRvIGNyZWF0ZSBhIHNpbXBsZSBpbnRlcmZhY2UuIEJ1
-dCBTTVINCmFuZCBOQU5EIGZsYXNoIGFyZSBzaWduaWZpY2FudGx5IGRpZmZlcmVudCB0ZWNobm9s
-b2dpZXMuIEFuZCBpZiBzb21lYm9keSBjcmVhdGVzIHRlY2hub2xvZ3ktb3JpZW50ZWQNCmZpbGUg
-c3lzdGVtLCBmb3IgZXhhbXBsZSwgdGhlbiBpdCBuZWVkcyB0byBoYXZlIGFjY2VzcyB0byByZWFs
-bHkgc3BlY2lhbCBmZWF0dXJlcyBvZiB0aGUgdGVjaG5vbG9neS4NCk90aGVyd2lzZSwgaW50ZXJm
-YWNlIHdpbGwgYmUgb3ZlcmxvYWRlZCBieSBmZWF0dXJlcyBvZiBib3RoIHRlY2hub2xvZ2llcyBh
-bmQgaXQgd2lsbCBsb29rcyBsaWtlIGFzDQphIG1lc3MuDQoNClNNUiB6b25lIGFuZCBOQU5EIGZs
-YXNoIGVyYXNlIGJsb2NrIGxvb2sgY29tcGFyYWJsZSBidXQsIGZpbmFsbHksIGl0IHNpZ25pZmlj
-YW50bHkgZGlmZmVyZW50IHN0dWZmLg0KVXN1YWxseSwgU01SIHpvbmUgaGFzIDI2NSBNQiBpbiBz
-aXplIGJ1dCBOQU5EIGZsYXNoIGVyYXNlIGJsb2NrIGNhbiB2YXJ5IGZyb20gNTEyIEtCIHRvIDgg
-TUINCihpdCB3aWxsIGJlIHNsaWdodGx5IGxhcmdlciBpbiB0aGUgZnV0dXJlIGJ1dCBub3QgbW9y
-ZSB0aGFuIDMyIE1CLCBJIHN1cHBvc2UpLg0KSXQgaXMgcG9zc2libGUgdG8gZ3JvdXAgc2V2ZXJh
-bCBlcmFzZSBibG9ja3MgaW50byBhZ2dyZWdhdGVkIGVudGl0eSBidXQgaXQgY291bGQgYmUgbm90
-IHZlcnkgZ29vZA0KcG9saWN5IGZyb20gZmlsZSBzeXN0ZW0gcG9pbnQgb2Ygdmlldy4gQW5vdGhl
-ciBwb2ludCB0aGF0IFFMQyBkZXZpY2UgY291bGQgaGF2ZSBtb3JlIHRyaWNreSBmZWF0dXJlcw0K
-b2YgZXJhc2UgYmxvY2tzIG1hbmFnZW1lbnQuIEFsc28gd2Ugc2hvdWxkIGFwcGx5IGVyYXNlIG9w
-ZXJhdGlvbiBvbiBOQU5EIGZsYXNoIGVyYXNlIGJsb2NrDQpidXQgaXQgaXMgbm90IG1hbmRhdG9y
-eSBmb3IgdGhlIGNhc2Ugb2YgU01SIHpvbmUuIEJlY2F1c2UgU01SIHpvbmUgY291bGQgYmUgc2lt
-cGx5IHJlLXdyaXR0ZW4NCmluIHNlcXVlbnRpYWwgb3JkZXIgaWYgYWxsIHpvbmUncyBkYXRhIGlz
-IGludmFsaWQsIGZvciBleGFtcGxlLiBBbHNvIGNvbnZlbnRpb25hbCB6b25lIGNvdWxkIGJlIHJl
-YWxseSB0cmlja3kNCnBvaW50LiBCZWNhdXNlIGl0IGlzIG9uZSB6b25lIG9ubHkgZm9yIHRoZSB3
-aG9sZSBkZXZpY2UgdGhhdCBjb3VsZCBiZSB1cGRhdGVkIGluLXBsYWNlLg0KUmF3IE5BTkQgZmxh
-c2gsIHVzdWFsbHksIGhhc24ndCBsaWtld2lzZSBjb252ZW50aW9uYWwgem9uZS4NCg0KRmluYWxs
-eSwgaWYgSSByZWFsbHkgbGlrZSB0byBkZXZlbG9wIFNNUi0gb3IgTkFORCBmbGFzaCBvcmllbnRl
-ZCBmaWxlIHN5c3RlbSB0aGVuIEkgd291bGQgbGlrZSB0byBwbGF5DQp3aXRoIHBlY3VsaWFyaXRp
-ZXMgb2YgY29uY3JldGUgdGVjaG5vbG9naWVzLiBBbmQgYW55IHVuaWZpZWQgaW50ZXJmYWNlIHdp
-bGwgZGVzdHJveSB0aGUgb3Bwb3J0dW5pdHkNCnRvIGNyZWF0ZSB0aGUgcmVhbGx5IGVmZmljaWVu
-dCBzb2x1dGlvbi4gRmluYWxseSwgaWYgbXkgc29mdHdhcmUgc29sdXRpb24gaXMgdW5hYmxlIHRv
-IHByb3ZpZGUgc29tZQ0KZmFuY3kgYW5kIGVmZmljaWVudCBmZWF0dXJlcyB0aGVuIGd1eXMgd2ls
-bCBwcmVmZXIgdG8gdXNlIHRoZSByZWd1bGFyIHN0YWNrIChleHQ0LCB4ZnMgKyBibG9jayBsYXll
-cikuDQoNClRoYW5rcywNClZ5YWNoZXNsYXYgRHViZXlrby4NCg0KDQoNCg0KX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KTGludXgtbnZtZSBtYWlsaW5nIGxp
-c3QKTGludXgtbnZtZUBsaXN0cy5pbmZyYWRlYWQub3JnCmh0dHA6Ly9saXN0cy5pbmZyYWRlYWQu
-b3JnL21haWxtYW4vbGlzdGluZm8vbGludXgtbnZtZQo=
+On 01/03/2017 06:35 PM, Viacheslav Dubeyko wrote:
+> Hi Matias,
+>
+> On Tue, 2017-01-03 at 09:56 +0100, Matias Bjørling wrote:
+>> On 01/03/2017 12:12 AM, Viacheslav Dubeyko wrote:
+>>>
+>>> On Mon, 2017-01-02 at 22:06 +0100, Matias Bjørling wrote:
+>>>>
+>>>> Hi,
+>>>>
+>>>> The open-channel SSD subsystem is maturing, and drives are
+>>>> beginning
+>>>> to
+>>>> become available on the market.
+>>> What do you mean? We still have nothing on the market. I haven't
+>>> opportunity to access to any of such device. Could you share your
+>>> knowledge where and what device can be bought on the market?
+>>>
+>> Hi Vyacheslav,
+>>
+>> You are right that they are not available off the shelf at a
+>> convenient
+>> store. You may contact one of these vendors for availability: CNEX
+>> Labs
+>> (Westlake LightNVM SDK), Radian Memory Systems (RMS-325), and/or EMC
+>> (OX
+>> Controller + Dragon Fire card).
+>
+> We, Western Digital, contacted with CNEX Labs about a half year ago.
+> Our request was refused. Also we contacted with Radian Memory Systems
+> about a year ago. Our negotiations finished with no sucess at all. And
+> I doubt that EMC will share with us something. So, such situation looks
+> really weird, especially for the case of open-source community. We
+> cannot access or test any Open-channel SSD nor for money nor under NDA.
+> Usually, open-source means that everybody has access to hardware and we
+> can discuss implementation, architecture or approach without any
+> restrictions. But we haven't access to hardware right now. I understand
+> the business model and blah, blah, blah. But it looks like that,
+> finally, we have nothing like Open-channel SSD on the market, from my
+> personal point of view. And I suppose that it's really tricky way to
+> discuss software interface or any other details about something that
+> doesn't exist at all. Because if I cannot take and test some hardware
+> then I cannot build my own opinion about this technology.
+>
+
+I understand your frustration. It is annoying not having easy access to 
+hardware. As you properly are aware, similarly with host-managed SMR 
+drives, there are customers that use your drives, while not being 
+available off-the-shelf.
+
+All of the open-channel SSD work is done in the open. Patches, new 
+targets, and so forth are being developed for everyone to see. 
+Similarly, the NVMe host interface is developed in the open as well. The 
+interface allows one to implements supporting firmware. The "front-end" 
+of the FTL on the SSD, is removed, and the "back-end" engine is exposed. 
+It is not much work and given HGST already have an SSD firmware 
+implementation. I bet you guys can whip up an internal implementation in 
+a matter of weeks. If you choose to do so, I will bend over backwards to 
+help you sort out any quirks that might be.
+
+Another option is to use the qemu extension. We are improving it 
+continuously to make sure it follows the implementation of a real 
+hardware OCSSDs. Today we do 90% of our FTL work using qemu, and most of 
+the time it just works when we run the FTL code on real hardware.
+
+Similarly to vendors that provide new CPUs, NVDIMMs, and graphic 
+drivers. Some code and refactoring go in years in advance. What I am 
+proposing here is to discuss how OCSSDs fits into the storage stack, and 
+what we can do to improve it. Optimally, most of the lightnvm subsystem 
+can be removed by exposing vectored I/Os. Which then enables 
+implementation of a target to be a traditional device mapper module. 
+That would be great!
