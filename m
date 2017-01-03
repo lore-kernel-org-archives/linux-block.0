@@ -1,134 +1,73 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wj0-f180.google.com ([209.85.210.180]:36768 "EHLO
-        mail-wj0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S934163AbdACJj1 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Jan 2017 04:39:27 -0500
-Received: by mail-wj0-f180.google.com with SMTP id c11so235656614wjx.3
-        for <linux-block@vger.kernel.org>; Tue, 03 Jan 2017 01:39:26 -0800 (PST)
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-Subject: Re: [LSF/MM ATTEND AND AGENDA TOPIC] request to attend the summit
-From: Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <1483431417.2911.1.camel@sandisk.com>
-Date: Tue, 3 Jan 2017 10:39:17 +0100
-Cc: "lsf-pc@lists.linux-foundation.org"
-        <lsf-pc@lists.linux-foundation.org>,
-        "ulf.hansson@linaro.org" <ulf.hansson@linaro.org>,
+Received: from mail-cys01nam02on0052.outbound.protection.outlook.com ([104.47.37.52]:18592
+        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S934006AbdACIRX (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 3 Jan 2017 03:17:23 -0500
+From: Bart Van Assche <Bart.VanAssche@sandisk.com>
+To: "paolo.valente@linaro.org" <paolo.valente@linaro.org>,
+        "lsf-pc@lists.linux-foundation.org"
+        <lsf-pc@lists.linux-foundation.org>
+CC: "ulf.hansson@linaro.org" <ulf.hansson@linaro.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "linus.walleij@linaro.org" <linus.walleij@linaro.org>,
         "broonie@linaro.org" <broonie@linaro.org>
-Message-Id: <C805E81A-2266-4E8D-A8BD-8023165A27FC@linaro.org>
-References: <771BC555-46A4-4AE1-BDD5-BFB4E3F065F0@linaro.org> <1483431417.2911.1.camel@sandisk.com>
-To: Bart Van Assche <Bart.VanAssche@sandisk.com>
+Subject: Re: [LSF/MM ATTEND AND AGENDA TOPIC] request to attend the summit
+Date: Tue, 3 Jan 2017 08:17:15 +0000
+Message-ID: <1483431417.2911.1.camel@sandisk.com>
+References: <771BC555-46A4-4AE1-BDD5-BFB4E3F065F0@linaro.org>
+In-Reply-To: <771BC555-46A4-4AE1-BDD5-BFB4E3F065F0@linaro.org>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-
-> Il giorno 03 gen 2017, alle ore 09:17, Bart Van Assche =
-<Bart.VanAssche@sandisk.com> ha scritto:
->=20
-> On Mon, 2017-01-02 at 19:14 +0100, Paolo Valente wrote:
->> This is to retry to request to attend the summit.  This time I'm
->> trying to propose and agenda topic too.
->>=20
->> I would like to attend, and propose a topic, because:
->> 1) the project for adding (only) the BFQ I/O scheduler to blk-mq has
->> entered a quite active phase: the framework prepared by Jens seems
->> mostly ready and complete, and I need just a few details to complete
->> the port of BFQ.
->> 2) the landing of BFQ into blk-mq might have possibly important
->> consequences, in a way or the other.
->>=20
->> So, it might be quite useful for me, and possibly for other
->> developers/stakeholders interested in these changes and consequences,
->> to have the opportunity to talk with each other, exactly when, or
->> right after these changes happen.
->>=20
->> In addition, a few months ago Greg KH and James Bottomley even
->> suggested to postpone to this summit, or Vault, the KS discussion =
-that
->> I proposed on the unsolved latency problems for which BFQ has been
->> devised.  So, my topic proposal would be exactly this:
->> "Unsolved latency problems, related to I/O, in Linux: consequences on
->> lsb-compliant and Android systems, solutions proposed so far, =
-possible
->> next solutions".
->=20
-> Hello Paolo,
->=20
-
-Hi Bart
-
-> I agree that it would be useful to discuss blk-mq I/O scheduling =
-during
-> LSF/MM. However, blk-mq I/O scheduling involves more than what has =
-been
-> described above.
-
-Definitely.
-
-> The topics I would like to see being discussed are:
-
-I agree on discussing all the points you mention. Some details below.
-
-> * How to add an I/O scheduling API to the blk-mq core. This is what =
-Jens
->  is working on =
-(http://git.kernel.dk/cgit/linux-block/log/?h=3Dblk-mq-sched).
-> * The BFQ for blk-mq patch series once this patch series has been =
-posted.
->  If the rules for this edition of LSF/MM are similar to those of =
-previous
->  editions then I expect that the LSF/MM program committee will want to
->  see a BFQ for blk-mq implementation posted as patches on a Linux =
-kernel
->  mailing list before adding a session about BFQ for blk-mq to the =
-LSF/MM
->  agenda.
-
-In this respect, I hope that the committee does not meet too soon.
-I'm waiting just for some replies from Jens to complete a first,
-postable patch series.  Anyway, even if no patch series is available
-yet, I hope it is clear that we are well on the way.  Probably a
-matter of one month at most ...
-
-> * Since BFQ has been designed for hard disks and since the approach in =
-BFQ
->  for handling deceptive idleness reduces bandwidth, what scheduling
->  algorithm to use for storage media that do not have any moving parts
->  (SSDs and MMC).
-
-I would really like to have the opportunity to debunk this false myth.
-BFQ is optimized for rotational as well as non-rotational device.  BFQ
-does not keep up only if IOPS go beyond ~50k.  And I'm already
-working on this limitation, but, as agreed with Jens, the priority for
-the moment is pushing BFQ as it is.
-
-> * How to port the MMC driver to blk-mq. See also Linus Walleij, =
-"[PATCH
->  v2] RFD: switch MMC/SD to use blk-mq multiqueueing"
->  (https://www.spinics.net/lists/linux-block/msg07360.html).
->=20
-> Something that would also be useful is to describe what you would like =
-to
-> discuss in a session about BFQ that has not yet been explained in any =
-of
-> the papers about BFQ, e.g. "High Throughput Disk Scheduling with Fair
-> Bandwidth Distribution"
-> (http://algo.ing.unimo.it/people/paolo/disk_sched/bfq-techreport.pdf)?
->=20
-
-Yes, I would really like to share the additional ideas that I put in
-BFQ.  In fact, for me BFQ is more a collection of ideas than a
-monolithic object.  Some of the components I would like to talk about
-are, e.g., the automatic detection of soft real-time applications, and
-the use of preemption to boost throughput without breaking bandwidth
-and latency guarantees.
-
-Thanks,
-Paolo
-
-> Thanks,
->=20
-> Bart.
-
+T24gTW9uLCAyMDE3LTAxLTAyIGF0IDE5OjE0ICswMTAwLCBQYW9sbyBWYWxlbnRlIHdyb3RlOg0K
+PiBUaGlzIGlzIHRvIHJldHJ5IHRvIHJlcXVlc3QgdG8gYXR0ZW5kIHRoZSBzdW1taXQuICBUaGlz
+IHRpbWUgSSdtDQo+IHRyeWluZyB0byBwcm9wb3NlIGFuZCBhZ2VuZGEgdG9waWMgdG9vLg0KPiAN
+Cj4gSSB3b3VsZCBsaWtlIHRvIGF0dGVuZCwgYW5kIHByb3Bvc2UgYSB0b3BpYywgYmVjYXVzZToN
+Cj4gMSkgdGhlIHByb2plY3QgZm9yIGFkZGluZyAob25seSkgdGhlIEJGUSBJL08gc2NoZWR1bGVy
+IHRvIGJsay1tcSBoYXMNCj4gZW50ZXJlZCBhIHF1aXRlIGFjdGl2ZSBwaGFzZTogdGhlIGZyYW1l
+d29yayBwcmVwYXJlZCBieSBKZW5zIHNlZW1zDQo+IG1vc3RseSByZWFkeSBhbmQgY29tcGxldGUs
+IGFuZCBJIG5lZWQganVzdCBhIGZldyBkZXRhaWxzIHRvIGNvbXBsZXRlDQo+IHRoZSBwb3J0IG9m
+IEJGUS4NCj4gMikgdGhlIGxhbmRpbmcgb2YgQkZRIGludG8gYmxrLW1xIG1pZ2h0IGhhdmUgcG9z
+c2libHkgaW1wb3J0YW50DQo+IGNvbnNlcXVlbmNlcywgaW4gYSB3YXkgb3IgdGhlIG90aGVyLg0K
+PiANCj4gU28sIGl0IG1pZ2h0IGJlIHF1aXRlIHVzZWZ1bCBmb3IgbWUsIGFuZCBwb3NzaWJseSBm
+b3Igb3RoZXINCj4gZGV2ZWxvcGVycy9zdGFrZWhvbGRlcnMgaW50ZXJlc3RlZCBpbiB0aGVzZSBj
+aGFuZ2VzIGFuZCBjb25zZXF1ZW5jZXMsDQo+IHRvIGhhdmUgdGhlIG9wcG9ydHVuaXR5IHRvIHRh
+bGsgd2l0aCBlYWNoIG90aGVyLCBleGFjdGx5IHdoZW4sIG9yDQo+IHJpZ2h0IGFmdGVyIHRoZXNl
+IGNoYW5nZXMgaGFwcGVuLg0KPiANCj4gSW4gYWRkaXRpb24sIGEgZmV3IG1vbnRocyBhZ28gR3Jl
+ZyBLSCBhbmQgSmFtZXMgQm90dG9tbGV5IGV2ZW4NCj4gc3VnZ2VzdGVkIHRvIHBvc3Rwb25lIHRv
+IHRoaXMgc3VtbWl0LCBvciBWYXVsdCwgdGhlIEtTIGRpc2N1c3Npb24gdGhhdA0KPiBJIHByb3Bv
+c2VkIG9uIHRoZSB1bnNvbHZlZCBsYXRlbmN5IHByb2JsZW1zIGZvciB3aGljaCBCRlEgaGFzIGJl
+ZW4NCj4gZGV2aXNlZC4gIFNvLCBteSB0b3BpYyBwcm9wb3NhbCB3b3VsZCBiZSBleGFjdGx5IHRo
+aXM6DQo+ICJVbnNvbHZlZCBsYXRlbmN5IHByb2JsZW1zLCByZWxhdGVkIHRvIEkvTywgaW4gTGlu
+dXg6IGNvbnNlcXVlbmNlcyBvbg0KPiBsc2ItY29tcGxpYW50IGFuZCBBbmRyb2lkIHN5c3RlbXMs
+IHNvbHV0aW9ucyBwcm9wb3NlZCBzbyBmYXIsIHBvc3NpYmxlDQo+IG5leHQgc29sdXRpb25zIi4N
+Cg0KSGVsbG8gUGFvbG8sDQoNCkkgYWdyZWUgdGhhdCBpdCB3b3VsZCBiZSB1c2VmdWwgdG8gZGlz
+Y3VzcyBibGstbXEgSS9PIHNjaGVkdWxpbmcgZHVyaW5nDQpMU0YvTU0uIEhvd2V2ZXIsIGJsay1t
+cSBJL08gc2NoZWR1bGluZyBpbnZvbHZlcyBtb3JlIHRoYW4gd2hhdCBoYXMgYmVlbg0KZGVzY3Jp
+YmVkIGFib3ZlLiBUaGUgdG9waWNzIEkgd291bGQgbGlrZSB0byBzZWUgYmVpbmcgZGlzY3Vzc2Vk
+IGFyZToNCiogSG93IHRvIGFkZCBhbiBJL08gc2NoZWR1bGluZyBBUEkgdG8gdGhlIGJsay1tcSBj
+b3JlLiBUaGlzIGlzIHdoYXQgSmVucw0KICBpcyB3b3JraW5nIG9uIChodHRwOi8vZ2l0Lmtlcm5l
+bC5kay9jZ2l0L2xpbnV4LWJsb2NrL2xvZy8/aD1ibGstbXEtc2NoZWQpLg0KKiBUaGUgQkZRIGZv
+ciBibGstbXEgcGF0Y2ggc2VyaWVzIG9uY2UgdGhpcyBwYXRjaCBzZXJpZXMgaGFzIGJlZW4gcG9z
+dGVkLg0KICBJZiB0aGUgcnVsZXMgZm9yIHRoaXMgZWRpdGlvbiBvZiBMU0YvTU0gYXJlIHNpbWls
+YXIgdG8gdGhvc2Ugb2YgcHJldmlvdXMNCiAgZWRpdGlvbnMgdGhlbiBJIGV4cGVjdCB0aGF0IHRo
+ZSBMU0YvTU0gcHJvZ3JhbSBjb21taXR0ZWUgd2lsbCB3YW50IHRvDQogIHNlZSBhIEJGUSBmb3Ig
+YmxrLW1xIGltcGxlbWVudGF0aW9uIHBvc3RlZCBhcyBwYXRjaGVzIG9uIGEgTGludXgga2VybmVs
+DQogIG1haWxpbmcgbGlzdCBiZWZvcmUgYWRkaW5nIGEgc2Vzc2lvbiBhYm91dCBCRlEgZm9yIGJs
+ay1tcSB0byB0aGUgTFNGL01NDQogIGFnZW5kYS4NCiogU2luY2UgQkZRIGhhcyBiZWVuIGRlc2ln
+bmVkIGZvciBoYXJkIGRpc2tzIGFuZCBzaW5jZSB0aGUgYXBwcm9hY2ggaW4gQkZRDQogIGZvciBo
+YW5kbGluZyBkZWNlcHRpdmUgaWRsZW5lc3MgcmVkdWNlcyBiYW5kd2lkdGgsIHdoYXQgc2NoZWR1
+bGluZw0KICBhbGdvcml0aG0gdG8gdXNlIGZvciBzdG9yYWdlIG1lZGlhIHRoYXQgZG8gbm90IGhh
+dmUgYW55IG1vdmluZyBwYXJ0cw0KICAoU1NEcyBhbmQgTU1DKS4NCiogSG93IHRvIHBvcnQgdGhl
+IE1NQyBkcml2ZXIgdG8gYmxrLW1xLiBTZWUgYWxzbyBMaW51cyBXYWxsZWlqLCAiW1BBVENIDQog
+IHYyXSBSRkQ6IHN3aXRjaCBNTUMvU0QgdG8gdXNlIGJsay1tcSBtdWx0aXF1ZXVlaW5nIg0KICAo
+aHR0cHM6Ly93d3cuc3Bpbmljcy5uZXQvbGlzdHMvbGludXgtYmxvY2svbXNnMDczNjAuaHRtbCku
+DQoNClNvbWV0aGluZyB0aGF0IHdvdWxkIGFsc28gYmUgdXNlZnVsIGlzIHRvIGRlc2NyaWJlIHdo
+YXQgeW91IHdvdWxkIGxpa2UgdG8NCmRpc2N1c3MgaW4gYSBzZXNzaW9uIGFib3V0IEJGUSB0aGF0
+IGhhcyBub3QgeWV0IGJlZW4gZXhwbGFpbmVkIGluIGFueSBvZg0KdGhlIHBhcGVycyBhYm91dCBC
+RlEsIGUuZy4gIkhpZ2ggVGhyb3VnaHB1dCBEaXNrIFNjaGVkdWxpbmcgd2l0aCBGYWlyDQpCYW5k
+d2lkdGggRGlzdHJpYnV0aW9uIg0KKGh0dHA6Ly9hbGdvLmluZy51bmltby5pdC9wZW9wbGUvcGFv
+bG8vZGlza19zY2hlZC9iZnEtdGVjaHJlcG9ydC5wZGYpPw0KDQpUaGFua3MsDQoNCkJhcnQu
