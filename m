@@ -1,65 +1,42 @@
-Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
-Message-ID: <1483464921.2440.19.camel@dubeyko.com>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
 Subject: Re: [LSF/MM TOPIC][LSF/MM ATTEND] OCSSDs - SMR, Hierarchical
  Interface, and Vector I/Os
-From: Viacheslav Dubeyko <slava@dubeyko.com>
-To: Matias =?ISO-8859-1?Q?Bj=F8rling?= <m@bjorling.me>,
- lsf-pc@lists.linux-foundation.org
-Date: Tue, 03 Jan 2017 09:35:21 -0800
-In-Reply-To: <e42ff0c8-6568-d211-331f-7bfa6af94e2e@bjorling.me>
+To: Viacheslav Dubeyko <slava@dubeyko.com>,
+        lsf-pc@lists.linux-foundation.org
 References: <05204e9d-ed4d-f97a-88f0-41b5e008af43@bjorling.me>
  <1483398761.2440.4.camel@dubeyko.com>
- <e42ff0c8-6568-d211-331f-7bfa6af94e2e@bjorling.me>
-Mime-Version: 1.0
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
-List-Post: <mailto:linux-nvme@lists.infradead.org>
-List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
 Cc: Linux FS Devel <linux-fsdevel@vger.kernel.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- Vyacheslav.Dubeyko@wdc.com, linux-nvme@lists.infradead.org
-Content-Type: text/plain; charset="utf-8"
-Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
-Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        linux-nvme@lists.infradead.org
+From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <m@bjorling.me>
+Message-ID: <e42ff0c8-6568-d211-331f-7bfa6af94e2e@bjorling.me>
+Date: Tue, 3 Jan 2017 09:56:36 +0100
+MIME-Version: 1.0
+In-Reply-To: <1483398761.2440.4.camel@dubeyko.com>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-SGkgTWF0aWFzLAoKT24gVHVlLCAyMDE3LTAxLTAzIGF0IDA5OjU2ICswMTAwLCBNYXRpYXMgQmrD
-uHJsaW5nIHdyb3RlOgo+IE9uIDAxLzAzLzIwMTcgMTI6MTIgQU0sIFZpYWNoZXNsYXYgRHViZXlr
-byB3cm90ZToKPiA+IAo+ID4gT24gTW9uLCAyMDE3LTAxLTAyIGF0IDIyOjA2ICswMTAwLCBNYXRp
-YXMgQmrDuHJsaW5nIHdyb3RlOgo+ID4gPiAKPiA+ID4gSGksCj4gPiA+IAo+ID4gPiBUaGUgb3Bl
-bi1jaGFubmVsIFNTRCBzdWJzeXN0ZW0gaXMgbWF0dXJpbmcsIGFuZCBkcml2ZXMgYXJlCj4gPiA+
-IGJlZ2lubmluZwo+ID4gPiB0b8KgCj4gPiA+IGJlY29tZSBhdmFpbGFibGUgb24gdGhlIG1hcmtl
-dC7CoAo+ID4gV2hhdCBkbyB5b3UgbWVhbj8gV2Ugc3RpbGwgaGF2ZSBub3RoaW5nIG9uIHRoZSBt
-YXJrZXQuIEkgaGF2ZW4ndAo+ID4gb3Bwb3J0dW5pdHkgdG8gYWNjZXNzIHRvIGFueSBvZiBzdWNo
-IGRldmljZS4gQ291bGQgeW91IHNoYXJlIHlvdXIKPiA+IGtub3dsZWRnZSB3aGVyZSBhbmQgd2hh
-dCBkZXZpY2UgY2FuIGJlIGJvdWdodCBvbiB0aGUgbWFya2V0Pwo+ID4gCj4gSGkgVnlhY2hlc2xh
-diwKPiAKPiBZb3UgYXJlIHJpZ2h0IHRoYXQgdGhleSBhcmUgbm90IGF2YWlsYWJsZSBvZmYgdGhl
-IHNoZWxmIGF0IGEKPiBjb252ZW5pZW50Cj4gc3RvcmUuIFlvdSBtYXkgY29udGFjdCBvbmUgb2Yg
-dGhlc2UgdmVuZG9ycyBmb3IgYXZhaWxhYmlsaXR5OiBDTkVYCj4gTGFicwo+IChXZXN0bGFrZSBM
-aWdodE5WTSBTREspLCBSYWRpYW4gTWVtb3J5IFN5c3RlbXMgKFJNUy0zMjUpLCBhbmQvb3IgRU1D
-Cj4gKE9YCj4gQ29udHJvbGxlciArIERyYWdvbiBGaXJlIGNhcmQpLgoKV2UsIFdlc3Rlcm4gRGln
-aXRhbCwgY29udGFjdGVkIHdpdGggQ05FWCBMYWJzIGFib3V0IGEgaGFsZiB5ZWFyIGFnby4KT3Vy
-IHJlcXVlc3Qgd2FzIHJlZnVzZWQuIEFsc28gd2UgY29udGFjdGVkIHdpdGjCoFJhZGlhbiBNZW1v
-cnkgU3lzdGVtcwphYm91dCBhIHllYXIgYWdvLiBPdXIgbmVnb3RpYXRpb25zIGZpbmlzaGVkIHdp
-dGggbm8gc3VjZXNzIGF0IGFsbC4gQW5kCkkgZG91YnQgdGhhdCBFTUMgd2lsbCBzaGFyZSB3aXRo
-IHVzIHNvbWV0aGluZy4gU28sIHN1Y2ggc2l0dWF0aW9uIGxvb2tzCnJlYWxseSB3ZWlyZCwgZXNw
-ZWNpYWxseSBmb3IgdGhlIGNhc2Ugb2Ygb3Blbi1zb3VyY2UgY29tbXVuaXR5LiBXZQpjYW5ub3Qg
-YWNjZXNzIG9yIHRlc3QgYW55IE9wZW4tY2hhbm5lbCBTU0Qgbm9yIGZvciBtb25leSBub3IgdW5k
-ZXIgTkRBLgpVc3VhbGx5LCBvcGVuLXNvdXJjZSBtZWFucyB0aGF0IGV2ZXJ5Ym9keSBoYXMgYWNj
-ZXNzIHRvIGhhcmR3YXJlIGFuZCB3ZQpjYW4gZGlzY3VzcyBpbXBsZW1lbnRhdGlvbiwgYXJjaGl0
-ZWN0dXJlIG9yIGFwcHJvYWNoIHdpdGhvdXQgYW55CnJlc3RyaWN0aW9ucy4gQnV0IHdlIGhhdmVu
-J3QgYWNjZXNzIHRvIGhhcmR3YXJlIHJpZ2h0IG5vdy4gSSB1bmRlcnN0YW5kCnRoZSBidXNpbmVz
-cyBtb2RlbCBhbmQgYmxhaCwgYmxhaCwgYmxhaC4gQnV0IGl0IGxvb2tzIGxpa2UgdGhhdCwKZmlu
-YWxseSwgd2UgaGF2ZSBub3RoaW5nIGxpa2UgT3Blbi1jaGFubmVsIFNTRCBvbiB0aGUgbWFya2V0
-LCBmcm9tIG15CnBlcnNvbmFsIHBvaW50IG9mIHZpZXcuIEFuZCBJIHN1cHBvc2UgdGhhdCBpdCdz
-IHJlYWxseSB0cmlja3kgd2F5IHRvCmRpc2N1c3Mgc29mdHdhcmUgaW50ZXJmYWNlIG9yIGFueSBv
-dGhlciBkZXRhaWxzIGFib3V0IHNvbWV0aGluZyB0aGF0CmRvZXNuJ3QgZXhpc3QgYXQgYWxsLiBC
-ZWNhdXNlIGlmIEkgY2Fubm90IHRha2UgYW5kIHRlc3Qgc29tZSBoYXJkd2FyZQp0aGVuIEkgY2Fu
-bm90IGJ1aWxkIG15IG93biBvcGluaW9uIGFib3V0IHRoaXMgdGVjaG5vbG9neS4KClRoYW5rcywK
-VnlhY2hlc2xhdiBEdWJleWtvLgoKCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fCkxpbnV4LW52bWUgbWFpbGluZyBsaXN0CkxpbnV4LW52bWVAbGlzdHMuaW5m
-cmFkZWFkLm9yZwpodHRwOi8vbGlzdHMuaW5mcmFkZWFkLm9yZy9tYWlsbWFuL2xpc3RpbmZvL2xp
-bnV4LW52bWUK
+On 01/03/2017 12:12 AM, Viacheslav Dubeyko wrote:
+> On Mon, 2017-01-02 at 22:06 +0100, Matias Bjørling wrote:
+>> Hi,
+>>
+>> The open-channel SSD subsystem is maturing, and drives are beginning
+>> to 
+>> become available on the market. 
+> 
+> What do you mean? We still have nothing on the market. I haven't
+> opportunity to access to any of such device. Could you share your
+> knowledge where and what device can be bought on the market?
+> 
+
+Hi Vyacheslav,
+
+You are right that they are not available off the shelf at a convenient
+store. You may contact one of these vendors for availability: CNEX Labs
+(Westlake LightNVM SDK), Radian Memory Systems (RMS-325), and/or EMC (OX
+Controller + Dragon Fire card).
+
+> Thanks,
+> Vyacheslav Dubeyko.
+> 
