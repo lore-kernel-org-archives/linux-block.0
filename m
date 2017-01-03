@@ -1,52 +1,33 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wj0-f177.google.com ([209.85.210.177]:33694 "EHLO
-        mail-wj0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S965275AbdACR3q (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Jan 2017 12:29:46 -0500
-Received: by mail-wj0-f177.google.com with SMTP id tq7so213294590wjb.0
-        for <linux-block@vger.kernel.org>; Tue, 03 Jan 2017 09:29:45 -0800 (PST)
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-Subject: Re: [LSF/MM ATTEND AND AGENDA TOPIC] request to attend the summit
-From: Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <1483444794.2911.5.camel@sandisk.com>
-Date: Tue, 3 Jan 2017 18:23:17 +0100
-Cc: "ulf.hansson@linaro.org" <ulf.hansson@linaro.org>,
+Received: from mail-bn3nam01on0081.outbound.protection.outlook.com ([104.47.33.81]:54675
+        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1756583AbdACMAc (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 3 Jan 2017 07:00:32 -0500
+From: Bart Van Assche <Bart.VanAssche@sandisk.com>
+To: "paolo.valente@linaro.org" <paolo.valente@linaro.org>
+CC: "ulf.hansson@linaro.org" <ulf.hansson@linaro.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "lsf-pc@lists.linux-foundation.org"
         <lsf-pc@lists.linux-foundation.org>,
         "linus.walleij@linaro.org" <linus.walleij@linaro.org>,
         "broonie@linaro.org" <broonie@linaro.org>
-Message-Id: <AB3AF3AB-B6BC-47E7-A67D-793411F46B31@linaro.org>
-References: <771BC555-46A4-4AE1-BDD5-BFB4E3F065F0@linaro.org> <1483431417.2911.1.camel@sandisk.com> <C805E81A-2266-4E8D-A8BD-8023165A27FC@linaro.org> <1483444794.2911.5.camel@sandisk.com>
-To: Bart Van Assche <bart.vanassche@sandisk.com>
+Subject: Re: [LSF/MM ATTEND AND AGENDA TOPIC] request to attend the summit
+Date: Tue, 3 Jan 2017 12:00:23 +0000
+Message-ID: <1483444794.2911.5.camel@sandisk.com>
+References: <771BC555-46A4-4AE1-BDD5-BFB4E3F065F0@linaro.org>
+         <1483431417.2911.1.camel@sandisk.com>
+         <C805E81A-2266-4E8D-A8BD-8023165A27FC@linaro.org>
+In-Reply-To: <C805E81A-2266-4E8D-A8BD-8023165A27FC@linaro.org>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-
-> Il giorno 03 gen 2017, alle ore 13:00, Bart Van Assche =
-<bart.vanassche@sandisk.com> ha scritto:
->=20
-> On Tue, 2017-01-03 at 10:39 +0100, Paolo Valente wrote:
->> In this respect, I hope that the committee does not meet too soon.
->=20
-> Hello Paolo,
->=20
-
-Hi
-
-> I don't know when the program committee will meet. However, what I
-> remember from previous editions of the LSF/MM is that changes of the
-> agenda happened not only during the weeks before the LSF/MM but even
-> during the LSF/MM.
->=20
-
-That would be perfectly fine.  The only piece of information that I
-would need in advance is whether my request to attend is accepted, so
-that I can organize my travel and really participate.
-
-Thanks,
-Paolo
-
-> Bart.
-
+T24gVHVlLCAyMDE3LTAxLTAzIGF0IDEwOjM5ICswMTAwLCBQYW9sbyBWYWxlbnRlIHdyb3RlOg0K
+PiBJbiB0aGlzIHJlc3BlY3QsIEkgaG9wZSB0aGF0IHRoZSBjb21taXR0ZWUgZG9lcyBub3QgbWVl
+dCB0b28gc29vbi4NCg0KSGVsbG8gUGFvbG8sDQoNCkkgZG9uJ3Qga25vdyB3aGVuIHRoZSBwcm9n
+cmFtIGNvbW1pdHRlZSB3aWxsIG1lZXQuIEhvd2V2ZXIsIHdoYXQgSQ0KcmVtZW1iZXIgZnJvbSBw
+cmV2aW91cyBlZGl0aW9ucyBvZiB0aGUgTFNGL01NIGlzIHRoYXQgY2hhbmdlcyBvZiB0aGUNCmFn
+ZW5kYSBoYXBwZW5lZCBub3Qgb25seSBkdXJpbmcgdGhlIHdlZWtzIGJlZm9yZSB0aGUgTFNGL01N
+IGJ1dCBldmVuDQpkdXJpbmcgdGhlIExTRi9NTS4NCg0KQmFydC4=
