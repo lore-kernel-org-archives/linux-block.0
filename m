@@ -1,34 +1,110 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-Date: Wed, 4 Jan 2017 15:07:17 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Hannes Reinecke <hare@suse.de>
-Cc: Christoph Hellwig <hch@lst.de>,
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:50789 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1758561AbdACM2b (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 3 Jan 2017 07:28:31 -0500
+Date: Tue, 3 Jan 2017 13:28:25 +0100
+From: Jan Kara <jack@suse.cz>
+To: Johannes Weiner <hannes@cmpxchg.org>
+Cc: Hugh Dickins <hughd@google.com>,
         Linus Torvalds <torvalds@linux-foundation.org>,
-        Chris Leech <cleech@redhat.com>,
-        Ming Lei <tom.leiming@gmail.com>,
         Dave Chinner <david@fromorbit.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
+        Chris Leech <cleech@redhat.com>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         Lee Duncan <lduncan@suse.com>, open-iscsi@googlegroups.com,
         Linux SCSI List <linux-scsi@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Jens Axboe <axboe@fb.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Jan Kara <jack@suse.cz>, Andrea Arcangeli <aarcange@redhat.com>
 Subject: Re: [4.10, panic, regression] iscsi: null pointer deref at
-        iscsi_tcp_segment_done+0x20d/0x2e0
-Message-ID: <20170104140717.GA24608@lst.de>
-References: <20161222051322.GF4758@dastard> <CA+55aFza=cv6TGYh+Be1xz2x-G-U=vruhbmfGpHSqY1ocZrBeg@mail.gmail.com> <20161222065012.GI4758@dastard> <20161222185030.so4btkuzzkih3owz@straylight.hirudinean.org> <CACVXFVOGoh+AEGSSMsbxfdAjZQS5k_t+7uR-+qwusm0vfauHEA@mail.gmail.com> <20161223000356.dxwkgsei32w7hc4f@straylight.hirudinean.org> <20161223100014.GA29467@lst.de> <CA+55aFxA1LE+4jdR8YXZyRVJ-MpOCUVob=ESBsMPuW=Qb=px-A@mail.gmail.com> <20161224100756.GA16741@lst.de> <a9fc4c0b-8521-84cc-66f6-48396c095539@suse.de>
+ iscsi_tcp_segment_done+0x20d/0x2e0
+Message-ID: <20170103122825.GC3780@quack2.suse.cz>
+References: <20161216185906.t2wmrr6wqjdsrduw@straylight.hirudinean.org>
+ <20161221221638.GD4758@dastard>
+ <CA+55aFyb1jcdpavyZgZ4nedA0=6tLognyWcJXfOJjMPFTm5GWA@mail.gmail.com>
+ <20161222001303.nvrtm22szn3hgxar@straylight.hirudinean.org>
+ <20161222051322.GF4758@dastard>
+ <CA+55aFza=cv6TGYh+Be1xz2x-G-U=vruhbmfGpHSqY1ocZrBeg@mail.gmail.com>
+ <alpine.LSU.2.11.1612221204510.4476@eggly.anvils>
+ <20161223073241.GA13584@cmpxchg.org>
+ <20161223083329.GA13952@cmpxchg.org>
+ <20170102211136.GA3189@cmpxchg.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <a9fc4c0b-8521-84cc-66f6-48396c095539@suse.de>
-Sender: linux-scsi-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <20170102211136.GA3189@cmpxchg.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Sat, Dec 24, 2016 at 02:17:26PM +0100, Hannes Reinecke wrote:
-> Christoph, do you have a pointer to your patchset?
+On Mon 02-01-17 16:11:36, Johannes Weiner wrote:
+> On Fri, Dec 23, 2016 at 03:33:29AM -0500, Johannes Weiner wrote:
+> > On Fri, Dec 23, 2016 at 02:32:41AM -0500, Johannes Weiner wrote:
+> > > On Thu, Dec 22, 2016 at 12:22:27PM -0800, Hugh Dickins wrote:
+> > > > On Wed, 21 Dec 2016, Linus Torvalds wrote:
+> > > > > On Wed, Dec 21, 2016 at 9:13 PM, Dave Chinner <david@fromorbit.com> wrote:
+> > > > > > I unmounted the fs, mkfs'd it again, ran the
+> > > > > > workload again and about a minute in this fired:
+> > > > > >
+> > > > > > [628867.607417] ------------[ cut here ]------------
+> > > > > > [628867.608603] WARNING: CPU: 2 PID: 16925 at mm/workingset.c:461 shadow_lru_isolate+0x171/0x220
+> > > > > 
+> > > > > Well, part of the changes during the merge window were the shadow
+> > > > > entry tracking changes that came in through Andrew's tree. Adding
+> > > > > Johannes Weiner to the participants.
+> > > > > 
+> > > > > > Now, this workload does not touch the page cache at all - it's
+> > > > > > entirely an XFS metadata workload, so it should not really be
+> > > > > > affecting the working set code.
+> > > > > 
+> > > > > Well, I suspect that anything that creates memory pressure will end up
+> > > > > triggering the working set code, so ..
+> > > > > 
+> > > > > That said, obviously memory corruption could be involved and result in
+> > > > > random issues too, but I wouldn't really expect that in this code.
+> > > > > 
+> > > > > It would probably be really useful to get more data points - is the
+> > > > > problem reliably in this area, or is it going to be random and all
+> > > > > over the place.
+> > > > 
+> > > > Data point: kswapd got WARNING on mm/workingset.c:457 in shadow_lru_isolate,
+> > > > soon followed by NULL pointer deref in list_lru_isolate, one time when
+> > > > I tried out Sunday's git tree.  Not seen since, I haven't had time to
+> > > > investigate, just set it aside as something to worry about if it happens
+> > > > again.  But it looks like shadow_lru_isolate() has issues beyond Dave's
+> > > > case (I've no XFS and no iscsi), suspect unrelated to his other problems.
+> > > 
+> > > This seems consistent with what Dave observed: we encounter regular
+> > > pages in radix tree nodes on the shadow LRU that should only contain
+> > > nodes full of exceptional shadow entries. It could be an issue in the
+> > > new slot replacement code and the node tracking callback.
+> > 
+> > Both encounters seem to indicate use-after-free. Dave's node didn't
+> > warn about an unexpected node->count / node->exceptional state, but
+> > had entries that were inconsistent with that. Hugh got the counter
+> > warning but crashed on a list_head that's not NULLed in a live node.
+> > 
+> > workingset_update_node() should be called on page cache radix tree
+> > leaf nodes that go empty. I must be missing an update_node callback
+> > where a leaf node gets freed somewhere.
+> 
+> Sorry for dropping silent on this. I'm traveling over the holidays
+> with sporadic access to my emails and no access to real equipment.
+> 
+> The times I managed to sneak away to look at the code didn't turn up
+> anything useful yet.
+> 
+> Andrea encountered the warning as well and I gave him a debugging
+> patch (attached below), but he hasn't been able to reproduce this
+> condition. I've personally never seen the warning trigger, even though
+> the patches have been running on my main development machine for quite
+> a while now. Albeit against an older base; I've updated to Linus's
+> master branch now in case it's an interaction with other new code.
+> 
+> If anybody manages to reproduce this, that would be helpful. Any extra
+> eyes on this would be much appreciated too until I'm back at my desk.
 
-Here is a pointer to the current one after splitting it into properly
-bisectable chunks.  Besides proper changelogs the biggest item left
-is fixing up dm-mpath to not allocate its own request structures.
+I was looking into this but I didn't find a way how we could possibly leave
+radix tree node on LRU. So your debug patch looks like a good way forward.
 
-http://git.infradead.org/users/hch/block.git/shortlog/refs/heads/block-pc-refactor
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
