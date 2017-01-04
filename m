@@ -1,45 +1,44 @@
-Return-Path: <hare@suse.de>
+Return-Path: <jmoyer@redhat.com>
+From: Jeff Moyer <jmoyer@redhat.com>
 To: Jens Axboe <axboe@kernel.dk>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "linux-scsi@vger.kernel.org" <Linux-scsi@vger.kernel.org>,
- Christoph Hellwig <hch@lst.de>
-From: Hannes Reinecke <hare@suse.de>
-Subject: requeue failure with blk-mq-sched
-Message-ID: <fb509d83-c895-ba78-e181-145c77542eac@suse.de>
-Date: Thu, 19 Jan 2017 13:27:04 +0100
+Cc: linux-block@vger.kernel.org
+Subject: Re: [patch] block: fix up io_poll documentation
+References: <x49zij74v0q.fsf@segfault.boston.devel.redhat.com>
+	<87783960-96e2-fd51-6d70-5e8a74a0d25b@kernel.dk>
+Date: Wed, 04 Jan 2017 09:49:44 -0500
+In-Reply-To: <87783960-96e2-fd51-6d70-5e8a74a0d25b@kernel.dk> (Jens Axboe's
+	message of "Tue, 3 Jan 2017 16:46:53 -0700")
+Message-ID: <x49r34iyj5j.fsf@segfault.boston.devel.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Jens,
+Jens Axboe <axboe@kernel.dk> writes:
 
-upon further testing with your blk-mq-sched branch I hit a queue stall
-during requeing:
+> On 01/03/2017 03:51 PM, Jeff Moyer wrote:
+>> 
+>> /sys/block/<dev>/queue/io_poll is a boolean.  Fix the docs.
+>> 
+>> Signed-off-by: Jeff Moyer <jmoyer@redhat.com>
+>> 
+>> diff --git a/Documentation/block/queue-sysfs.txt b/Documentation/block/queue-sysfs.txt
+>> index 5164215..c0a3bb5 100644
+>> --- a/Documentation/block/queue-sysfs.txt
+>> +++ b/Documentation/block/queue-sysfs.txt
+>> @@ -54,9 +54,9 @@ This is the hardware sector size of the device, in bytes.
+>>  
+>>  io_poll (RW)
+>>  ------------
+>> -When read, this file shows the total number of block IO polls and how
+>> -many returned success.  Writing '0' to this file will disable polling
+>> -for this device.  Writing any non-zero value will enable this feature.
+>> +When read, this file shows whether polling is enabled (1) or disabled
+>> +(0).  Writing '0' to this file will disable polling for this device.
+>> +Writing any non-zero value will enable this feature.
+>
+> It seems to be describing the mq hw queue io_poll file description when
+> read, for the queue/ one it's different. I'll apply the patch, thanks.
 
-[  202.340959] sd 3:0:4:1: tag#473 Send: scmd 0xffff880422e7a440
-[  202.340962] sd 3:0:4:1: tag#473 CDB: Test Unit Ready 00 00 00 00 00 00
-[  202.341161] sd 3:0:4:1: tag#473 Done: ADD_TO_MLQUEUE Result:
-hostbyte=DID_OK driverbyte=DRIVER_OK
-[  202.341164] sd 3:0:4:1: tag#473 CDB: Test Unit Ready 00 00 00 00 00 00
-[  202.341167] sd 3:0:4:1: tag#473 Sense Key : Unit Attention [current]
-[  202.341171] sd 3:0:4:1: tag#473 Add. Sense: Power on, reset, or bus
-device reset occurred
-[  202.341173] sd 3:0:4:1: tag#473 scsi host busy 1 failed 0
-[  202.341176] sd 3:0:4:1: tag#473 Inserting command ffff880422e7a440
-into mlqueue
+Right.  It's probably time to create an mq-sysfs.txt file.
 
-... and that is the last ever heard of that device.
-The 'device_busy' count remains at '1' and no further commands will be
-sent to the device.
-
-Debugging continues.
-
-Cheers,
-
-Hannes
--- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG Nürnberg)
+-Jeff
