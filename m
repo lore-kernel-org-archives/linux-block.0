@@ -1,32 +1,29 @@
-Return-Path: <jmoyer@redhat.com>
-From: Jeff Moyer <jmoyer@redhat.com>
-To: axboe@kernel.dk, linux-block@vger.kernel.org
-Subject: [patch] block: fix up io_poll documentation
-Date: Tue, 03 Jan 2017 17:51:33 -0500
-Message-ID: <x49zij74v0q.fsf@segfault.boston.devel.redhat.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [GIT PULL] minor floppy fix
+To: Jiri Kosina <jikos@kernel.org>
+References: <alpine.LSU.2.20.1701041315560.28985@cbobk.fhfr.pm>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <e04f6124-c003-e57d-9f7c-80bbdfd3b80d@kernel.dk>
+Date: Wed, 4 Jan 2017 13:53:15 -0700
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <alpine.LSU.2.20.1701041315560.28985@cbobk.fhfr.pm>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-block@vger.kernel.org>
 
+On 01/04/2017 07:15 AM, Jiri Kosina wrote:
+> Jens,
+> 
+> please pull from
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/jikos/linux-block.git for-jens
+> 
+> (based on your current for-next branch)
+> 
+> to get minor memory allocation fix for floppy driver, from Vlastimil 
+> Babka.
 
-/sys/block/<dev>/queue/io_poll is a boolean.  Fix the docs.
+Added for 4.11, thanks.
 
-Signed-off-by: Jeff Moyer <jmoyer@redhat.com>
-
-diff --git a/Documentation/block/queue-sysfs.txt b/Documentation/block/queue-sysfs.txt
-index 5164215..c0a3bb5 100644
---- a/Documentation/block/queue-sysfs.txt
-+++ b/Documentation/block/queue-sysfs.txt
-@@ -54,9 +54,9 @@ This is the hardware sector size of the device, in bytes.
- 
- io_poll (RW)
- ------------
--When read, this file shows the total number of block IO polls and how
--many returned success.  Writing '0' to this file will disable polling
--for this device.  Writing any non-zero value will enable this feature.
-+When read, this file shows whether polling is enabled (1) or disabled
-+(0).  Writing '0' to this file will disable polling for this device.
-+Writing any non-zero value will enable this feature.
- 
- io_poll_delay (RW)
- ------------------
+-- 
+Jens Axboe
