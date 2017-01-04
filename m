@@ -1,119 +1,61 @@
-Return-Path: <BATV+3cdfc0cdff764882efbb+4905+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: mst@redhat.com,
-	jasowang@redhat.com
-Cc: axboe@kernel.dk,
-	pbonzini@redhat.com,
-	virtualization@lists.linux-foundation.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 6/9] virtio: provide a method to get the IRQ affinity mask for a virtqueue
-Date: Fri, 27 Jan 2017 09:16:34 +0100
-Message-Id: <1485504997-17584-7-git-send-email-hch@lst.de>
-In-Reply-To: <1485504997-17584-1-git-send-email-hch@lst.de>
-References: <1485504997-17584-1-git-send-email-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-qk0-f170.google.com ([209.85.220.170]:35425 "EHLO
+        mail-qk0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752296AbdADKSQ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Jan 2017 05:18:16 -0500
+Received: by mail-qk0-f170.google.com with SMTP id u25so390893474qki.2
+        for <linux-block@vger.kernel.org>; Wed, 04 Jan 2017 02:18:15 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <1483464618-16133-1-git-send-email-b.zolnierkie@samsung.com>
+References: <CGME20170103173113epcas5p3bcc48e614ca71c27917a966640321138@epcas5p3.samsung.com>
+ <1483464618-16133-1-git-send-email-b.zolnierkie@samsung.com>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Wed, 4 Jan 2017 11:18:14 +0100
+Message-ID: <CACRpkdYEqbpU0sc+-CvJh32hnrM0G=SYQBhb5r34ofmYyBoD3g@mail.gmail.com>
+Subject: Re: [PATCH PoCv2 0/2] mmc: add blk-mq support
+To: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
+Cc: Ulf Hansson <ulf.hansson@linaro.org>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Jens Axboe <axboe@fb.com>, Hannes Reinecke <hare@suse.com>,
+        Tejun Heo <tj@kernel.org>, Omar Sandoval <osandov@osandov.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <Bart.VanAssche@sandisk.com>,
+        Baolin Wang <baolin.wang@linaro.org>,
+        Ritesh Harjani <riteshh@codeaurora.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Chunyan Zhang <zhang.chunyan@linaro.org>,
+        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
+        linux-block@vger.kernel.org,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This basically passed up the pci_irq_get_affinity information through
-virtio through an optional get_vq_affinity method.  It is only implemented
-by the PCI backend for now, and only when we use per-virtqueue IRQs.
+On Tue, Jan 3, 2017 at 6:30 PM, Bartlomiej Zolnierkiewicz
+<b.zolnierkie@samsung.com> wrote:
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/virtio/virtio_pci_common.c | 11 +++++++++++
- drivers/virtio/virtio_pci_common.h |  2 ++
- drivers/virtio/virtio_pci_legacy.c |  1 +
- drivers/virtio/virtio_pci_modern.c |  2 ++
- include/linux/virtio_config.h      |  3 +++
- 5 files changed, 19 insertions(+)
+Interesting patch!
 
-diff --git a/drivers/virtio/virtio_pci_common.c b/drivers/virtio/virtio_pci_common.c
-index c244212..31ba259 100644
---- a/drivers/virtio/virtio_pci_common.c
-+++ b/drivers/virtio/virtio_pci_common.c
-@@ -361,6 +361,17 @@ int vp_set_vq_affinity(struct virtqueue *vq, int cpu)
- 	return 0;
- }
- 
-+const struct cpumask *vp_get_vq_affinity(struct virtio_device *vdev, int index)
-+{
-+	struct virtio_pci_device *vp_dev = to_vp_device(vdev);
-+	unsigned int *map = vp_dev->msix_vector_map;
-+
-+	if (!map || map[index] == VIRTIO_MSI_NO_VECTOR)
-+		return NULL;
-+
-+	return pci_irq_get_affinity(vp_dev->pci_dev, map[index]);
-+}
-+
- #ifdef CONFIG_PM_SLEEP
- static int virtio_pci_freeze(struct device *dev)
- {
-diff --git a/drivers/virtio/virtio_pci_common.h b/drivers/virtio/virtio_pci_common.h
-index a6ad9ec..ac8c9d7 100644
---- a/drivers/virtio/virtio_pci_common.h
-+++ b/drivers/virtio/virtio_pci_common.h
-@@ -108,6 +108,8 @@ const char *vp_bus_name(struct virtio_device *vdev);
-  */
- int vp_set_vq_affinity(struct virtqueue *vq, int cpu);
- 
-+const struct cpumask *vp_get_vq_affinity(struct virtio_device *vdev, int index);
-+
- #if IS_ENABLED(CONFIG_VIRTIO_PCI_LEGACY)
- int virtio_pci_legacy_probe(struct virtio_pci_device *);
- void virtio_pci_legacy_remove(struct virtio_pci_device *);
-diff --git a/drivers/virtio/virtio_pci_legacy.c b/drivers/virtio/virtio_pci_legacy.c
-index 2ab6aee..f7362c5 100644
---- a/drivers/virtio/virtio_pci_legacy.c
-+++ b/drivers/virtio/virtio_pci_legacy.c
-@@ -190,6 +190,7 @@ static const struct virtio_config_ops virtio_pci_config_ops = {
- 	.finalize_features = vp_finalize_features,
- 	.bus_name	= vp_bus_name,
- 	.set_vq_affinity = vp_set_vq_affinity,
-+	.get_vq_affinity = vp_get_vq_affinity,
- };
- 
- /* the PCI probing function */
-diff --git a/drivers/virtio/virtio_pci_modern.c b/drivers/virtio/virtio_pci_modern.c
-index a7a0981..7bc3004 100644
---- a/drivers/virtio/virtio_pci_modern.c
-+++ b/drivers/virtio/virtio_pci_modern.c
-@@ -437,6 +437,7 @@ static const struct virtio_config_ops virtio_pci_config_nodev_ops = {
- 	.finalize_features = vp_finalize_features,
- 	.bus_name	= vp_bus_name,
- 	.set_vq_affinity = vp_set_vq_affinity,
-+	.get_vq_affinity = vp_get_vq_affinity,
- };
- 
- static const struct virtio_config_ops virtio_pci_config_ops = {
-@@ -452,6 +453,7 @@ static const struct virtio_config_ops virtio_pci_config_ops = {
- 	.finalize_features = vp_finalize_features,
- 	.bus_name	= vp_bus_name,
- 	.set_vq_affinity = vp_set_vq_affinity,
-+	.get_vq_affinity = vp_get_vq_affinity,
- };
- 
- /**
-diff --git a/include/linux/virtio_config.h b/include/linux/virtio_config.h
-index 2ebe506..8355bab 100644
---- a/include/linux/virtio_config.h
-+++ b/include/linux/virtio_config.h
-@@ -58,6 +58,7 @@ struct irq_affinity;
-  *      This returns a pointer to the bus name a la pci_name from which
-  *      the caller can then copy.
-  * @set_vq_affinity: set the affinity for a virtqueue.
-+ * @get_vq_affinity: get the affinity for a virtqueue (optional).
-  */
- typedef void vq_callback_t(struct virtqueue *);
- struct virtio_config_ops {
-@@ -77,6 +78,8 @@ struct virtio_config_ops {
- 	int (*finalize_features)(struct virtio_device *vdev);
- 	const char *(*bus_name)(struct virtio_device *vdev);
- 	int (*set_vq_affinity)(struct virtqueue *vq, int cpu);
-+	const struct cpumask *(*get_vq_affinity)(struct virtio_device *vdev,
-+			int index);
- };
- 
- /* If driver didn't advertise the feature, it will never appear. */
--- 
-2.1.4
+> The differences between these patches and Linus' RFD patch:
+> - request completion is handled from the IRQ handler
+>   (or tasklet context as happens in dw_mmc host driver)
+
+I think we need to make a patch like this separately to the
+current (only old blk) code, to stop the kthread from forcing
+in NULL requests to clean the pipeline.
+
+We should also avoid sending any completion at
+all: if we know we only get one request at a time as your
+patch does, there is no reason to wait for a completion: we
+will always be complete when a new request arrives.
+
+Same with two requests in parallel, we can trust the block
+layer to not send more than 2 (the queue depth) so there is
+no reason to wait for a completion.
+
+I'm trying to work in this direction at least, your patch is great
+inspiration!
+
+Yours,
+Linus Walleij
