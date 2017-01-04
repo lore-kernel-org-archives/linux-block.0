@@ -1,83 +1,58 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-co1nam03on0087.outbound.protection.outlook.com ([104.47.40.87]:17702
-        "EHLO NAM03-CO1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1034709AbdAFXGD (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 6 Jan 2017 18:06:03 -0500
-Date: Fri, 6 Jan 2017 15:05:54 -0800
-From: Adam Manzanares <adam.manzanares@wdc.com>
+Received: from mx2.suse.de ([195.135.220.15]:47968 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1757150AbdADHle (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 4 Jan 2017 02:41:34 -0500
+Date: Wed, 4 Jan 2017 08:41:31 +0100
+From: Jan Kara <jack@suse.cz>
 To: Paolo Valente <paolo.valente@linaro.org>
-CC: <lsf-pc@lists.linux-foundation.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Mark Brown <broonie@linaro.org>, <linux-block@vger.kernel.org>,
-        <cyril.guyot@wdc.com>
-Subject: Re: [LSF/MM ATTEND AND AGENDA TOPIC] request to attend the summit
-Message-ID: <20170106230553.GA23927@hgst.com>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "ulf.hansson@linaro.org" <ulf.hansson@linaro.org>,
+        "lsf-pc@lists.linux-foundation.org"
+        <lsf-pc@lists.linux-foundation.org>,
+        "linus.walleij@linaro.org" <linus.walleij@linaro.org>,
+        "broonie@linaro.org" <broonie@linaro.org>
+Subject: Re: [Lsf-pc] [LSF/MM ATTEND AND AGENDA TOPIC] request to attend the
+ summit
+Message-ID: <20170104074131.GG3780@quack2.suse.cz>
 References: <771BC555-46A4-4AE1-BDD5-BFB4E3F065F0@linaro.org>
+ <1483431417.2911.1.camel@sandisk.com>
+ <C805E81A-2266-4E8D-A8BD-8023165A27FC@linaro.org>
+ <1483444794.2911.5.camel@sandisk.com>
+ <AB3AF3AB-B6BC-47E7-A67D-793411F46B31@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-In-Reply-To: <771BC555-46A4-4AE1-BDD5-BFB4E3F065F0@linaro.org>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <AB3AF3AB-B6BC-47E7-A67D-793411F46B31@linaro.org>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-The 01/02/2017 19:14, Paolo Valente wrote:
-> Hi,
-> this is to retry to request to attend the summit.  This time I'm
-> trying to propose and agenda topic too.
+On Tue 03-01-17 18:23:17, Paolo Valente wrote:
 > 
-> I would like to attend, and propose a topic, because:
-> 1) the project for adding (only) the BFQ I/O scheduler to blk-mq has
-> entered a quite active phase: the framework prepared by Jens seems
-> mostly ready and complete, and I need just a few details to complete
-> the port of BFQ.
-> 2) the landing of BFQ into blk-mq might have possibly important
-> consequences, in a way or the other.
+> > Il giorno 03 gen 2017, alle ore 13:00, Bart Van Assche <bart.vanassche@sandisk.com> ha scritto:
+> > 
+> > On Tue, 2017-01-03 at 10:39 +0100, Paolo Valente wrote:
+> >> In this respect, I hope that the committee does not meet too soon.
+> > 
+> > Hello Paolo,
+> > 
 > 
-> So, it might be quite useful for me, and possibly for other
-> developers/stakeholders interested in these changes and consequences,
-> to have the opportunity to talk with each other, exactly when, or
-> right after these changes happen.
+> Hi
 > 
-> In addition, a few months ago Greg KH and James Bottomley even
-> suggested to postpone to this summit, or Vault, the KS discussion that
-> I proposed on the unsolved latency problems for which BFQ has been
-> devised.  So, my topic proposal would be exactly this:
-> "Unsolved latency problems, related to I/O, in Linux: consequences on
-> lsb-compliant and Android systems, solutions proposed so far, possible
-> next solutions".
+> > I don't know when the program committee will meet. However, what I
+> > remember from previous editions of the LSF/MM is that changes of the
+> > agenda happened not only during the weeks before the LSF/MM but even
+> > during the LSF/MM.
+> > 
+> 
+> That would be perfectly fine.  The only piece of information that I
+> would need in advance is whether my request to attend is accepted, so
+> that I can organize my travel and really participate.
 
-Hello,
+We certainly notify selected people (and also rejected ones) enough in
+advance.
 
-We are also interested in the unsolved latency problems. In 4.10 we got 
-some patches merged that deal with iopriority being passed from the 
-application to device drivers that send commands to SATA HDDs. This allows an 
-application to achieve better tail latencies for prioritized workloads 
-when queuing is enabled at the device. 
-
-We would like to discuss the implications of adapting this work to block-mq 
-and BFQ. In addition we would like to discuss potential applications and 
-devices (including device driver changes) that would benefit from having 
-iopriority information.
-
-Thanks,
-Adam 
-
-> 
-> If needed, I can provide more details on this topic.
-> 
-> As for the expertise that I may bring, I'm somehow expert in:
-> guaranteeing a good system and application responsiveness (a low lag
-> in typical Android terminology), providing strong low-latency
-> guarantees to video/audio playing/streaming applications, guaranteeing
-> a fair share of the bandwidth, and not just the time, of I/O
-> resources.
-> 
-> I would like to submit a talk proposal to Vault too.
-> 
-> Thanks,
-> Paolo
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-block" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
