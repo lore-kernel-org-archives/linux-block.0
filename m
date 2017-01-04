@@ -1,179 +1,127 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:15147 "EHLO
-        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S964784AbdADHY7 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Jan 2017 02:24:59 -0500
-Subject: Re: [LSF/MM TOPIC][LSF/MM ATTEND] OCSSDs - SMR, Hierarchical
+Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
+From: Slava Dubeyko <Vyacheslav.Dubeyko@wdc.com>
+To: =?utf-8?B?TWF0aWFzIEJqw7hybGluZw==?= <m@bjorling.me>, Viacheslav Dubeyko
+ <slava@dubeyko.com>, "lsf-pc@lists.linux-foundation.org"
+ <lsf-pc@lists.linux-foundation.org>
+Subject: RE: [LSF/MM TOPIC][LSF/MM ATTEND] OCSSDs - SMR, Hierarchical
  Interface, and Vector I/Os
-To: Slava Dubeyko <Vyacheslav.Dubeyko@wdc.com>,
-        =?UTF-8?Q?Matias_Bj=c3=b8rling?= <m@bjorling.me>,
-        Viacheslav Dubeyko <slava@dubeyko.com>,
-        "lsf-pc@lists.linux-foundation.org"
-        <lsf-pc@lists.linux-foundation.org>
+Date: Wed, 4 Jan 2017 02:59:39 +0000
+Message-ID: <SN2PR04MB219184580108939442EBDA7E88610@SN2PR04MB2191.namprd04.prod.outlook.com>
 References: <05204e9d-ed4d-f97a-88f0-41b5e008af43@bjorling.me>
  <1483398761.2440.4.camel@dubeyko.com>
  <e42ff0c8-6568-d211-331f-7bfa6af94e2e@bjorling.me>
  <1483464921.2440.19.camel@dubeyko.com>
  <9319ce16-8355-3560-95b6-45e3f07220de@bjorling.me>
- <SN2PR04MB219184580108939442EBDA7E88610@SN2PR04MB2191.namprd04.prod.outlook.com>
-Cc: Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-Message-ID: <a5acdf89-99c0-774d-cb08-76cb5d846f29@wdc.com>
-Date: Wed, 4 Jan 2017 16:24:39 +0900
+In-Reply-To: <9319ce16-8355-3560-95b6-45e3f07220de@bjorling.me>
 MIME-Version: 1.0
-In-Reply-To: <SN2PR04MB219184580108939442EBDA7E88610@SN2PR04MB2191.namprd04.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
+List-Post: <mailto:linux-nvme@lists.infradead.org>
+List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
+Cc: Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+Content-Type: text/plain; charset="utf-8"
+Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
+Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
+List-ID: <linux-block@vger.kernel.org>
 
-
-Slava,
-
-On 1/4/17 11:59, Slava Dubeyko wrote:
-> What's the goal of SMR compatibility? Any unification or interface
-> abstraction has the goal to hide the peculiarities of underlying
-> hardware. But we have block device abstraction that hides all 
-> hardware's peculiarities perfectly. Also FTL (or any other
-> Translation Layer) is able to represent the device as sequence of
-> physical sectors without real knowledge on software side about 
-> sophisticated management activity on the device side. And, finally,
-> guys will be completely happy to use the regular file systems (ext4,
-> xfs) without necessity to modify software stack. But I believe that 
-> the goal of Open-channel SSD approach is completely opposite. Namely,
-> provide the opportunity for software side (file system, for example)
-> to manage the Open-channel SSD device with smarter policy.
-
-The Zoned Block Device API is part of the block layer. So as such, it
-does abstract many aspects of the device characteristics, as so many
-other API of the block layer do (look at blkdev_issue_discard or zeroout
-implementations to see how far this can be pushed).
-
-Regarding the use of open channel SSDs, I think you are absolutely
-correct: (1) some users may be very happy to use a regular, unmodified
-ext4 or xfs on top of an open channel SSD, as long as the FTL
-implementation does a complete abstraction of the device special
-features and presents a regular block device to upper layers. And
-conversely, (2) some file system implementations may prefer to directly
-use those special features and characteristics of open channel SSDs. No
-arguing with this.
-
-But you are missing the parallel with SMR. For SMR, or more correctly
-zoned block devices since the ZBC or ZAC standards can equally apply to
-HDDs and SSDs, 3 models exists: drive-managed, host-aware and host-managed.
-
-Case (1) above corresponds *exactly* to the drive managed model, with
-the difference that the abstraction of the device characteristics (SMR
-here) is in the drive FW and not in a host-level FTL implementation as
-it would be for open channel SSDs. Case (2) above corresponds to the
-host-managed model, that is, the device user has to deal with the device
-characteristics itself and use it correctly. The host-aware model lies
-in between these 2 extremes: it offers the possibility of complete
-abstraction by default, but also allows a user to optimize its operation
-for the device by allowing access to the device characteristics. So this
-would correspond to a possible third way of implementing an FTL for open
-channel SSDs.
-
-> So, my key worry that the trying to hide under the same interface the
-> two different technologies (SMR and NAND flash) will be resulted in
-> the loss of opportunity to manage the device in more smarter way.
-> Because any unification has the goal to create a simple interface.
-> But SMR and NAND flash are significantly different technologies. And
-> if somebody creates technology-oriented file system, for example,
-> then it needs to have access to really special features of the
-> technology. Otherwise, interface will be overloaded by features of
-> both technologies and it will looks like as a mess.
-
-I do not think so, as long as the device "model" is exposed to the user
-as the zoned block device interface does. This allows a user to adjust
-its operation depending on the device. This is true of course as long as
-each "model" has a clearly defined set of features associated. Again,
-that is the case for zoned block devices and an example of how this can
-be used is now in f2fs (which allows different operation modes for
-host-aware devices, but only one for host-managed devices). Again, I can
-see a clear parallel with open channel SSDs here.
-
-> SMR zone and NAND flash erase block look comparable but, finally, it
-> significantly different stuff. Usually, SMR zone has 265 MB in size
-> but NAND flash erase block can vary from 512 KB to 8 MB (it will be
-> slightly larger in the future but not more than 32 MB, I suppose). It
-> is possible to group several erase blocks into aggregated entity but
-> it could be not very good policy from file system point of view.
-
-Why not? For f2fs, the 2MB segments are grouped together into sections
-with a size matching the device zone size. That works well and can
-actually even reduce the garbage collection overhead in some cases.
-Nothing in the kernel zoned block device support limits the zone size to
-a particular minimum or maximum. The only direct implication of the zone
-size on the block I/O stack is that BIOs and requests cannot cross zone
-boundaries. In an extreme setup, a zone size of 4KB would work too and
-result in read/write commands of 4KB at most to the device.
-
-> Another point that QLC device could have more tricky features of
-> erase blocks management. Also we should apply erase operation on NAND
-> flash erase block but it is not mandatory for the case of SMR zone.
-
-Incorrect: host-managed devices require a zone "reset" (equivalent to
-discard/trim) to be reused after being written once. So again, the
-"tricky features" you mention will depend on the device "model",
-whatever this ends up to be for an open channel SSD.
-
-> Because SMR zone could be simply re-written in sequential order if
-> all zone's data is invalid, for example. Also conventional zone could
-> be really tricky point. Because it is one zone only for the whole
-> device that could be updated in-place. Raw NAND flash, usually,
-> hasn't likewise conventional zone.
-
-Conventional zones are optional in zoned block devices. There may be
-none at all and an implementation may well decide to not support a
-device without any conventional zones if some are required.
-In the case of open channel SSDs, the FTL implementation may well decide
-to expose a particular range of LBAs as "conventional zones" and have a
-lower level exposure for the remaining capacity whcih can then be
-optimally used by the file system based on the features available for
-that remaining LBA range. Again, a parallel is possible with SMR.
-
-> Finally, if I really like to develop SMR- or NAND flash oriented file
-> system then I would like to play with peculiarities of concrete
-> technologies. And any unified interface will destroy the opportunity 
-> to create the really efficient solution. Finally, if my software
-> solution is unable to provide some fancy and efficient features then
-> guys will prefer to use the regular stack (ext4, xfs + block layer).
-
-Not necessarily. Again think in terms of device "model" and associated
-feature set. An FS implementation may decide to support all possible
-models, with likely a resulting incredible complexity. More likely,
-similarly with what is happening with SMR, only models that make sense
-will be supported by FS implementation that can be easily modified.
-Example again here of f2fs: changes to support SMR were rather simple,
-whereas the initial effort to support SMR with ext4 was pretty much
-abandoned as it was too complex to integrate in the existing code while
-keeping the existing on-disk format.
-
-Your argument above is actually making the same point: you want your
-implementation to use the device features directly. That is, your
-implementation wants a "host-managed" like device model. Using ext4 will
-require a "host-aware" or "drive-managed" model, which could be provided
-through a different FTL or device-mapper implementation in the case of
-open channel SSDs.
-
-I am not trying to argue that open channel SSDs and zoned block devices
-should be supported under the exact same API. But I can definitely see
-clear parallels worth a discussion. As a first step, I would suggest
-trying to try defining open channel SSDs "models" and their feature set
-and see how these fit with the existing ZBC/ZAC defined models and at
-least estimate the implications on the block I/O stack. If adding the
-new models only results in the addition of a few top level functions or
-ioctls, it may be entirely feasible to integrate the two together.
-
-Best regards.
-
--- 
-Damien Le Moal, Ph.D.
-Sr Manager, System Software Research Group,
-Western Digital
-Damien.LeMoal@hgst.com
-Tel: (+81) 0466-98-3593 (Ext. 51-3593)
-1 kirihara-cho, Fujisawa, Kanagawa, 252-0888 Japan
-www.wdc.com, www.hgst.com
+DQotLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KRnJvbTogTWF0aWFzIEJqw7hybGluZyBbbWFp
+bHRvOm1AYmpvcmxpbmcubWVdIA0KU2VudDogVHVlc2RheSwgSmFudWFyeSAzLCAyMDE3IDExOjEx
+IEFNDQpUbzogVmlhY2hlc2xhdiBEdWJleWtvIDxzbGF2YUBkdWJleWtvLmNvbT47IGxzZi1wY0Bs
+aXN0cy5saW51eC1mb3VuZGF0aW9uLm9yZw0KQ2M6IExpbnV4IEZTIERldmVsIDxsaW51eC1mc2Rl
+dmVsQHZnZXIua2VybmVsLm9yZz47IGxpbnV4LWJsb2NrQHZnZXIua2VybmVsLm9yZzsgbGludXgt
+bnZtZUBsaXN0cy5pbmZyYWRlYWQub3JnOyBTbGF2YSBEdWJleWtvIDxWeWFjaGVzbGF2LkR1YmV5
+a29Ad2RjLmNvbT4NClN1YmplY3Q6IFJlOiBbTFNGL01NIFRPUElDXVtMU0YvTU0gQVRURU5EXSBP
+Q1NTRHMgLSBTTVIsIEhpZXJhcmNoaWNhbCBJbnRlcmZhY2UsIGFuZCBWZWN0b3IgSS9Pcw0KDQo8
+c2tpcHBlZD4NCg0KPiBBbGwgb2YgdGhlIG9wZW4tY2hhbm5lbCBTU0Qgd29yayBpcyBkb25lIGlu
+IHRoZSBvcGVuLg0KPiBQYXRjaGVzLCBuZXcgdGFyZ2V0cywgYW5kIHNvIGZvcnRoIGFyZSBiZWlu
+ZyBkZXZlbG9wZWQgZm9yIGV2ZXJ5b25lIHRvIHNlZS4gDQo+IFNpbWlsYXJseSwgdGhlIE5WTWUg
+aG9zdCBpbnRlcmZhY2UgaXMgZGV2ZWxvcGVkIGluIHRoZSBvcGVuIGFzIHdlbGwuDQo+IFRoZSBp
+bnRlcmZhY2UgYWxsb3dzIG9uZSB0byBpbXBsZW1lbnRzIHN1cHBvcnRpbmcgZmlybXdhcmUuIFRo
+ZSAiZnJvbnQtZW5kIg0KPiBvZiB0aGUgRlRMIG9uIHRoZSBTU0QsIGlzIHJlbW92ZWQsIGFuZCB0
+aGUgImJhY2stZW5kIiBlbmdpbmUgaXMgZXhwb3NlZC4gDQo+IEl0IGlzIG5vdCBtdWNoIHdvcmsg
+YW5kIGdpdmVuIEhHU1QgYWxyZWFkeSBoYXZlIGFuIFNTRCBmaXJtd2FyZSBpbXBsZW1lbnRhdGlv
+bi4NCj4gSSBiZXQgeW91IGd1eXMgY2FuIHdoaXAgdXAgYW4gaW50ZXJuYWwgaW1wbGVtZW50YXRp
+b24gaW4gYSBtYXR0ZXIgb2Ygd2Vla3MuDQo+IElmIHlvdSBjaG9vc2UgdG8gZG8gc28sIEkgd2ls
+bCBiZW5kIG92ZXIgYmFja3dhcmRzIHRvIGhlbHAgeW91IHNvcnQgb3V0IGFueSBxdWlya3MgdGhh
+dCBtaWdodCBiZS4NCg0KSSBzZWUgeW91ciBwb2ludC4gQnV0IEkgYW0gdGhlIHJlc2VhcmNoIGd1
+eSBhbmQgSSBoYXZlIHNvZnR3YXJlIHByb2plY3QuIFNvLCBpdCdzIGNvbXBsZXRlbHkgdW5yZWFz
+b25hYmxlIGZvciBtZQ0KdG8gc3BlbmQgdGhlIHRpbWUgb24gU1NEIGZpcm13YXJlLiBJIHNpbXBs
+eSBuZWVkIGluIHJlYWR5LW1hZGUgaGFyZHdhcmUgZm9yIHRlc3RpbmcvYmVuY2htYXJraW5nDQpt
+eSBzb2Z0d2FyZSBhbmQgdG8gY2hlY2sgdGhlIGFzc3VtcHRpb25zIHRoYXQgaXQgd2FzIG1hZGUu
+IFRoYXQncyBhbGwuIElmIEkgaGF2ZW4ndCB0aGUgaGFyZHdhcmUgcmlnaHQgbm93DQp0aGVuIEkg
+bmVlZCB0byB3YWl0IHRoZSBiZXR0ZXIgdGltZXMuIA0KDQo+IEFub3RoZXIgb3B0aW9uIGlzIHRv
+IHVzZSB0aGUgcWVtdSBleHRlbnNpb24uIFdlIGFyZSBpbXByb3ZpbmcgaXQgY29udGludW91c2x5
+DQo+IHRvIG1ha2Ugc3VyZSBpdCBmb2xsb3dzIHRoZSBpbXBsZW1lbnRhdGlvbiBvZiBhIHJlYWwg
+aGFyZHdhcmUgT0NTU0RzLg0KPiBUb2RheSB3ZSBkbyA5MCUgb2Ygb3VyIEZUTCB3b3JrIHVzaW5n
+IHFlbXUsIGFuZCBtb3N0IG9mIHRoZSB0aW1lDQo+IGl0IGp1c3Qgd29ya3Mgd2hlbiB3ZSBydW4g
+dGhlIEZUTCBjb2RlIG9uIHJlYWwgaGFyZHdhcmUuDQoNCkkgcmVhbGx5IGRpc2xpa2UgdG8gdXNl
+IHRoZSBxZW11IGZvciBmaWxlIHN5c3RlbSBiZW5jaG1hcmtpbmcuDQoNCj4gU2ltaWxhcmx5IHRv
+IHZlbmRvcnMgdGhhdCBwcm92aWRlIG5ldyBDUFVzLCBOVkRJTU1zLCBhbmQgZ3JhcGhpYyBkcml2
+ZXJzLg0KPiBTb21lIGNvZGUgYW5kIHJlZmFjdG9yaW5nIGdvIGluIHllYXJzIGluIGFkdmFuY2Uu
+IFdoYXQgSSBhbSBwcm9wb3NpbmcgaGVyZSBpcyB0byBkaXNjdXNzIGhvdyBPQ1NTRHMNCj4gZml0
+cyBpbnRvIHRoZSBzdG9yYWdlIHN0YWNrLCBhbmQgd2hhdCB3ZSBjYW4gZG8gdG8gaW1wcm92ZSBp
+dC4gT3B0aW1hbGx5LCBtb3N0IG9mIHRoZSBsaWdodG52bSBzdWJzeXN0ZW0NCj4gY2FuIGJlIHJl
+bW92ZWQgYnkgZXhwb3NpbmcgdmVjdG9yZWQgSS9Pcy4gV2hpY2ggdGhlbiBlbmFibGVzIGltcGxl
+bWVudGF0aW9uIG9mIGEgdGFyZ2V0IHRvIGJlDQo+IGEgdHJhZGl0aW9uYWwgZGV2aWNlIG1hcHBl
+ciBtb2R1bGUuIFRoYXQgd291bGQgYmUgZ3JlYXQhDQoNCk9LLiBGcm9tIG9uZSBwb2ludCBvZiB2
+aWV3LCBJIGxpa2UgdGhlIGlkZWEgb2YgU01SIGNvbXBhdGliaWxpdHkuIEJ1dCwgZnJvbSBhbm90
+aGVyIHBvaW50IG9mIHZpZXcsDQpJIGFtIHNsaWdodGx5IHNrZXB0aWNhbCBhYm91dCBzdWNoIGFw
+cHJvYWNoLiBJIGJlbGlldmUgeW91IHNlZSB0aGUgYnJpZ2h0IHNpZGUgb2YgeW91ciBzdWdnZXN0
+aW9uLg0KU28sIGxldCBtZSB0YWtlIGEgbG9vayBvbiB5b3VyIGFwcHJvYWNoIGZyb20gdGhlIGRh
+cmsgc2lkZS4NCg0KV2hhdCdzIHRoZSBnb2FsIG9mIFNNUiBjb21wYXRpYmlsaXR5PyBBbnkgdW5p
+ZmljYXRpb24gb3IgaW50ZXJmYWNlIGFic3RyYWN0aW9uIGhhcyB0aGUgZ29hbCB0byBoaWRlDQp0
+aGUgcGVjdWxpYXJpdGllcyBvZiB1bmRlcmx5aW5nIGhhcmR3YXJlLiBCdXQgd2UgaGF2ZSBibG9j
+ayBkZXZpY2UgYWJzdHJhY3Rpb24gdGhhdCBoaWRlcyBhbGwNCmhhcmR3YXJlJ3MgcGVjdWxpYXJp
+dGllcyBwZXJmZWN0bHkuIEFsc28gRlRMIChvciBhbnkgb3RoZXIgVHJhbnNsYXRpb24gTGF5ZXIp
+IGlzIGFibGUgdG8gcmVwcmVzZW50DQp0aGUgZGV2aWNlIGFzIHNlcXVlbmNlIG9mIHBoeXNpY2Fs
+IHNlY3RvcnMgd2l0aG91dCByZWFsIGtub3dsZWRnZSBvbiBzb2Z0d2FyZSBzaWRlIGFib3V0DQpz
+b3BoaXN0aWNhdGVkIG1hbmFnZW1lbnQgYWN0aXZpdHkgb24gdGhlIGRldmljZSBzaWRlLiBBbmQs
+IGZpbmFsbHksIGd1eXMgd2lsbCBiZSBjb21wbGV0ZWx5IGhhcHB5DQp0byB1c2UgdGhlIHJlZ3Vs
+YXIgZmlsZSBzeXN0ZW1zIChleHQ0LCB4ZnMpIHdpdGhvdXQgbmVjZXNzaXR5IHRvIG1vZGlmeSBz
+b2Z0d2FyZSBzdGFjay4gQnV0IEkgYmVsaWV2ZSB0aGF0DQp0aGUgZ29hbCBvZiBPcGVuLWNoYW5u
+ZWwgU1NEIGFwcHJvYWNoIGlzIGNvbXBsZXRlbHkgb3Bwb3NpdGUuIE5hbWVseSwgcHJvdmlkZSB0
+aGUgb3Bwb3J0dW5pdHkNCmZvciBzb2Z0d2FyZSBzaWRlIChmaWxlIHN5c3RlbSwgZm9yIGV4YW1w
+bGUpIHRvIG1hbmFnZSB0aGUgT3Blbi1jaGFubmVsIFNTRCBkZXZpY2Ugd2l0aCBzbWFydGVyDQpw
+b2xpY3kuDQoNClNvLCBteSBrZXkgd29ycnkgdGhhdCB0aGUgdHJ5aW5nIHRvIGhpZGUgdW5kZXIg
+dGhlIHNhbWUgaW50ZXJmYWNlIHRoZSB0d28gZGlmZmVyZW50IHRlY2hub2xvZ2llcw0KKFNNUiBh
+bmQgTkFORCBmbGFzaCkgd2lsbCBiZSByZXN1bHRlZCBpbiB0aGUgbG9zcyBvZiBvcHBvcnR1bml0
+eSB0byBtYW5hZ2UgdGhlIGRldmljZSBpbg0KbW9yZSBzbWFydGVyIHdheS4gQmVjYXVzZSBhbnkg
+dW5pZmljYXRpb24gaGFzIHRoZSBnb2FsIHRvIGNyZWF0ZSBhIHNpbXBsZSBpbnRlcmZhY2UuIEJ1
+dCBTTVINCmFuZCBOQU5EIGZsYXNoIGFyZSBzaWduaWZpY2FudGx5IGRpZmZlcmVudCB0ZWNobm9s
+b2dpZXMuIEFuZCBpZiBzb21lYm9keSBjcmVhdGVzIHRlY2hub2xvZ3ktb3JpZW50ZWQNCmZpbGUg
+c3lzdGVtLCBmb3IgZXhhbXBsZSwgdGhlbiBpdCBuZWVkcyB0byBoYXZlIGFjY2VzcyB0byByZWFs
+bHkgc3BlY2lhbCBmZWF0dXJlcyBvZiB0aGUgdGVjaG5vbG9neS4NCk90aGVyd2lzZSwgaW50ZXJm
+YWNlIHdpbGwgYmUgb3ZlcmxvYWRlZCBieSBmZWF0dXJlcyBvZiBib3RoIHRlY2hub2xvZ2llcyBh
+bmQgaXQgd2lsbCBsb29rcyBsaWtlIGFzDQphIG1lc3MuDQoNClNNUiB6b25lIGFuZCBOQU5EIGZs
+YXNoIGVyYXNlIGJsb2NrIGxvb2sgY29tcGFyYWJsZSBidXQsIGZpbmFsbHksIGl0IHNpZ25pZmlj
+YW50bHkgZGlmZmVyZW50IHN0dWZmLg0KVXN1YWxseSwgU01SIHpvbmUgaGFzIDI2NSBNQiBpbiBz
+aXplIGJ1dCBOQU5EIGZsYXNoIGVyYXNlIGJsb2NrIGNhbiB2YXJ5IGZyb20gNTEyIEtCIHRvIDgg
+TUINCihpdCB3aWxsIGJlIHNsaWdodGx5IGxhcmdlciBpbiB0aGUgZnV0dXJlIGJ1dCBub3QgbW9y
+ZSB0aGFuIDMyIE1CLCBJIHN1cHBvc2UpLg0KSXQgaXMgcG9zc2libGUgdG8gZ3JvdXAgc2V2ZXJh
+bCBlcmFzZSBibG9ja3MgaW50byBhZ2dyZWdhdGVkIGVudGl0eSBidXQgaXQgY291bGQgYmUgbm90
+IHZlcnkgZ29vZA0KcG9saWN5IGZyb20gZmlsZSBzeXN0ZW0gcG9pbnQgb2Ygdmlldy4gQW5vdGhl
+ciBwb2ludCB0aGF0IFFMQyBkZXZpY2UgY291bGQgaGF2ZSBtb3JlIHRyaWNreSBmZWF0dXJlcw0K
+b2YgZXJhc2UgYmxvY2tzIG1hbmFnZW1lbnQuIEFsc28gd2Ugc2hvdWxkIGFwcGx5IGVyYXNlIG9w
+ZXJhdGlvbiBvbiBOQU5EIGZsYXNoIGVyYXNlIGJsb2NrDQpidXQgaXQgaXMgbm90IG1hbmRhdG9y
+eSBmb3IgdGhlIGNhc2Ugb2YgU01SIHpvbmUuIEJlY2F1c2UgU01SIHpvbmUgY291bGQgYmUgc2lt
+cGx5IHJlLXdyaXR0ZW4NCmluIHNlcXVlbnRpYWwgb3JkZXIgaWYgYWxsIHpvbmUncyBkYXRhIGlz
+IGludmFsaWQsIGZvciBleGFtcGxlLiBBbHNvIGNvbnZlbnRpb25hbCB6b25lIGNvdWxkIGJlIHJl
+YWxseSB0cmlja3kNCnBvaW50LiBCZWNhdXNlIGl0IGlzIG9uZSB6b25lIG9ubHkgZm9yIHRoZSB3
+aG9sZSBkZXZpY2UgdGhhdCBjb3VsZCBiZSB1cGRhdGVkIGluLXBsYWNlLg0KUmF3IE5BTkQgZmxh
+c2gsIHVzdWFsbHksIGhhc24ndCBsaWtld2lzZSBjb252ZW50aW9uYWwgem9uZS4NCg0KRmluYWxs
+eSwgaWYgSSByZWFsbHkgbGlrZSB0byBkZXZlbG9wIFNNUi0gb3IgTkFORCBmbGFzaCBvcmllbnRl
+ZCBmaWxlIHN5c3RlbSB0aGVuIEkgd291bGQgbGlrZSB0byBwbGF5DQp3aXRoIHBlY3VsaWFyaXRp
+ZXMgb2YgY29uY3JldGUgdGVjaG5vbG9naWVzLiBBbmQgYW55IHVuaWZpZWQgaW50ZXJmYWNlIHdp
+bGwgZGVzdHJveSB0aGUgb3Bwb3J0dW5pdHkNCnRvIGNyZWF0ZSB0aGUgcmVhbGx5IGVmZmljaWVu
+dCBzb2x1dGlvbi4gRmluYWxseSwgaWYgbXkgc29mdHdhcmUgc29sdXRpb24gaXMgdW5hYmxlIHRv
+IHByb3ZpZGUgc29tZQ0KZmFuY3kgYW5kIGVmZmljaWVudCBmZWF0dXJlcyB0aGVuIGd1eXMgd2ls
+bCBwcmVmZXIgdG8gdXNlIHRoZSByZWd1bGFyIHN0YWNrIChleHQ0LCB4ZnMgKyBibG9jayBsYXll
+cikuDQoNClRoYW5rcywNClZ5YWNoZXNsYXYgRHViZXlrby4NCg0KDQoNCg0KX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KTGludXgtbnZtZSBtYWlsaW5nIGxp
+c3QKTGludXgtbnZtZUBsaXN0cy5pbmZyYWRlYWQub3JnCmh0dHA6Ly9saXN0cy5pbmZyYWRlYWQu
+b3JnL21haWxtYW4vbGlzdGluZm8vbGludXgtbnZtZQo=
