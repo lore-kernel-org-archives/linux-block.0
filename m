@@ -1,40 +1,41 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:53818 "EHLO mx1.redhat.com"
+Received: from mx2.suse.de ([195.135.220.15]:50926 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S936459AbdADRRf (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 4 Jan 2017 12:17:35 -0500
-From: Jeff Moyer <jmoyer@redhat.com>
-To: Hannes Reinecke <hare@suse.de>
-Cc: lsf-pc@lists.linux-foundation.org,
-        "linux-block\@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi\@vger.kernel.org" <linux-scsi@vger.kernel.org>
-Subject: Re: [LSF/MM TOPIC] blk-trace update vs API stability
-References: <62463a62-2dcb-639c-364c-3cc8b50628d2@suse.de>
-Date: Wed, 04 Jan 2017 12:17:34 -0500
-In-Reply-To: <62463a62-2dcb-639c-364c-3cc8b50628d2@suse.de> (Hannes Reinecke's
-        message of "Wed, 4 Jan 2017 09:49:33 +0100")
-Message-ID: <x49d1g2ycb5.fsf@segfault.boston.devel.redhat.com>
+        id S1757987AbdADIuJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 4 Jan 2017 03:50:09 -0500
+To: lsf-pc@lists.linux-foundation.org
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>
+From: Hannes Reinecke <hare@suse.de>
+Subject: [LSF/MM TOPIC] blk-trace update vs API stability
+Message-ID: <62463a62-2dcb-639c-364c-3cc8b50628d2@suse.de>
+Date: Wed, 4 Jan 2017 09:49:33 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hannes Reinecke <hare@suse.de> writes:
+Hi all,
 
-> At LSF I'd like to discuss
-> - Do we consider blktrace (and any other tracepoint in eg SCSI) as a
-> stable API?
+during investigating performance issues I frequently have the need to
+include the request tag in the scsi tracepoints. While this can be
+easily done for scsi, including it in block trace output is not that
+easy due to the interdependency with the blktrace utilities.
 
-I don't have a strong opinion on this.
+Also there had been some discussion on KS last year, but with no
+conclusive result IIRC.
 
-> - How do we go about modifying blktrace?
-
-Blktrace has a version number associated with trace events.  Bump the
-version for non-backward-compatible changes.
-
-> - Is this even desired?
-
-Yes.
+At LSF I'd like to discuss
+- Do we consider blktrace (and any other tracepoint in eg SCSI) as a
+stable API?
+- How do we go about modifying blktrace? Is this even desired?
+  Or should any trace event modification be opaque to blktrace output?
 
 Cheers,
-Jeff
+
+Hannes
+-- 
+Dr. Hannes Reinecke		      zSeries & Storage
+hare@suse.de			      +49 911 74053 688
+SUSE LINUX Products GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: J. Hawn, J. Guild, F. Imendörffer, HRB 16746 (AG Nürnberg)
