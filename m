@@ -1,18 +1,11 @@
 Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-Date: Wed, 4 Jan 2017 11:57:45 -0500
-From: Theodore Ts'o <tytso@mit.edu>
-To: Damien Le Moal <damien.lemoal@wdc.com>
-Cc: Slava Dubeyko <Vyacheslav.Dubeyko@wdc.com>,
-        Matias =?iso-8859-1?Q?Bj=F8rling?= <m@bjorling.me>,
-        Viacheslav Dubeyko <slava@dubeyko.com>,
-        "lsf-pc@lists.linux-foundation.org"
-        <lsf-pc@lists.linux-foundation.org>,
-        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
 Subject: Re: [LSF/MM TOPIC][LSF/MM ATTEND] OCSSDs - SMR, Hierarchical
  Interface, and Vector I/Os
-Message-ID: <20170104165745.7uuwl6phm6g6kouu@thunk.org>
+To: Damien Le Moal <damien.lemoal@wdc.com>,
+        Slava Dubeyko <Vyacheslav.Dubeyko@wdc.com>,
+        Viacheslav Dubeyko <slava@dubeyko.com>,
+        "lsf-pc@lists.linux-foundation.org"
+        <lsf-pc@lists.linux-foundation.org>
 References: <05204e9d-ed4d-f97a-88f0-41b5e008af43@bjorling.me>
  <1483398761.2440.4.camel@dubeyko.com>
  <e42ff0c8-6568-d211-331f-7bfa6af94e2e@bjorling.me>
@@ -20,57 +13,132 @@ References: <05204e9d-ed4d-f97a-88f0-41b5e008af43@bjorling.me>
  <9319ce16-8355-3560-95b6-45e3f07220de@bjorling.me>
  <SN2PR04MB219184580108939442EBDA7E88610@SN2PR04MB2191.namprd04.prod.outlook.com>
  <a5acdf89-99c0-774d-cb08-76cb5d846f29@wdc.com>
+Cc: Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <m@bjorling.me>
+Message-ID: <2dc2b0eb-7083-733e-61a2-e9d0ca2cfda9@bjorling.me>
+Date: Wed, 4 Jan 2017 13:39:18 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <a5acdf89-99c0-774d-cb08-76cb5d846f29@wdc.com>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-I agree with Damien, but I'd also add that in the future there may
-very well be some new Zone types added to the ZBC model.  So we
-shouldn't assume that the ZBC model is a fixed one.  And who knows?
-Perhaps T10 standards body will come up with a simpler model for
-interfacing with SCSI/SATA-attached SSD's that might leverage the ZBC
-model --- or not.
-
-Either way, that's not really relevant as far as the Linux block layer
-is concerned, since the Linux block layer is designed to be an
-abstraction on top of hardware --- and in some cases we can use a
-similar abstraction on top of eMMC's, SCSI's, and SATA's
-implementation definition of TRIM/DISCARD/WRITE SAME/SECURE
-TRIM/QUEUED TRIM, even though they are different in some subtle ways,
-and may have different performance characteristics and semantics.
-
-The trick is to expose similarities where the differences won't matter
-to the upper layers, but also to expose the fine distinctions and
-allow the file system and/or user space to use the protocol-specific
-differences when it matters to them.
-
-Designing that is going to be important, and I can guarantee we won't
-get it right at first.  Which is why it's a good thing that internal
-kernel interfaces aren't cast into concrete, and can be subject to
-change as new revisions to ZBC, or new interfaces (like perhaps
-OCSSD's) get promulgated by various standards bodies or by various
-vendors.
-
-> > Another point that QLC device could have more tricky features of
-> > erase blocks management. Also we should apply erase operation on NAND
-> > flash erase block but it is not mandatory for the case of SMR zone.
+On 01/04/2017 08:24 AM, Damien Le Moal wrote:
+> 
+> Slava,
+> 
+> On 1/4/17 11:59, Slava Dubeyko wrote:
+>> What's the goal of SMR compatibility? Any unification or interface
+>> abstraction has the goal to hide the peculiarities of underlying
+>> hardware. But we have block device abstraction that hides all 
+>> hardware's peculiarities perfectly. Also FTL (or any other
+>> Translation Layer) is able to represent the device as sequence of
+>> physical sectors without real knowledge on software side about 
+>> sophisticated management activity on the device side. And, finally,
+>> guys will be completely happy to use the regular file systems (ext4,
+>> xfs) without necessity to modify software stack. But I believe that 
+>> the goal of Open-channel SSD approach is completely opposite. Namely,
+>> provide the opportunity for software side (file system, for example)
+>> to manage the Open-channel SSD device with smarter policy.
+> 
+> The Zoned Block Device API is part of the block layer. So as such, it
+> does abstract many aspects of the device characteristics, as so many
+> other API of the block layer do (look at blkdev_issue_discard or zeroout
+> implementations to see how far this can be pushed).
+> 
+> Regarding the use of open channel SSDs, I think you are absolutely
+> correct: (1) some users may be very happy to use a regular, unmodified
+> ext4 or xfs on top of an open channel SSD, as long as the FTL
+> implementation does a complete abstraction of the device special
+> features and presents a regular block device to upper layers. And
+> conversely, (2) some file system implementations may prefer to directly
+> use those special features and characteristics of open channel SSDs. No
+> arguing with this.
+> 
+> But you are missing the parallel with SMR. For SMR, or more correctly
+> zoned block devices since the ZBC or ZAC standards can equally apply to
+> HDDs and SSDs, 3 models exists: drive-managed, host-aware and host-managed.
+> 
+> Case (1) above corresponds *exactly* to the drive managed model, with
+> the difference that the abstraction of the device characteristics (SMR
+> here) is in the drive FW and not in a host-level FTL implementation as
+> it would be for open channel SSDs. Case (2) above corresponds to the
+> host-managed model, that is, the device user has to deal with the device
+> characteristics itself and use it correctly. The host-aware model lies
+> in between these 2 extremes: it offers the possibility of complete
+> abstraction by default, but also allows a user to optimize its operation
+> for the device by allowing access to the device characteristics. So this
+> would correspond to a possible third way of implementing an FTL for open
+> channel SSDs.
+> 
+>> So, my key worry that the trying to hide under the same interface the
+>> two different technologies (SMR and NAND flash) will be resulted in
+>> the loss of opportunity to manage the device in more smarter way.
+>> Because any unification has the goal to create a simple interface.
+>> But SMR and NAND flash are significantly different technologies. And
+>> if somebody creates technology-oriented file system, for example,
+>> then it needs to have access to really special features of the
+>> technology. Otherwise, interface will be overloaded by features of
+>> both technologies and it will looks like as a mess.
+> 
+> I do not think so, as long as the device "model" is exposed to the user
+> as the zoned block device interface does. This allows a user to adjust
+> its operation depending on the device. This is true of course as long as
+> each "model" has a clearly defined set of features associated. Again,
+> that is the case for zoned block devices and an example of how this can
+> be used is now in f2fs (which allows different operation modes for
+> host-aware devices, but only one for host-managed devices). Again, I can
+> see a clear parallel with open channel SSDs here.
+> 
+>> SMR zone and NAND flash erase block look comparable but, finally, it
+>> significantly different stuff. Usually, SMR zone has 265 MB in size
+>> but NAND flash erase block can vary from 512 KB to 8 MB (it will be
+>> slightly larger in the future but not more than 32 MB, I suppose). It
+>> is possible to group several erase blocks into aggregated entity but
+>> it could be not very good policy from file system point of view.
+> 
+> Why not? For f2fs, the 2MB segments are grouped together into sections
+> with a size matching the device zone size. That works well and can
+> actually even reduce the garbage collection overhead in some cases.
+> Nothing in the kernel zoned block device support limits the zone size to
+> a particular minimum or maximum. The only direct implication of the zone
+> size on the block I/O stack is that BIOs and requests cannot cross zone
+> boundaries. In an extreme setup, a zone size of 4KB would work too and
+> result in read/write commands of 4KB at most to the device.
+> 
+>> Another point that QLC device could have more tricky features of
+>> erase blocks management. Also we should apply erase operation on NAND
+>> flash erase block but it is not mandatory for the case of SMR zone.
 > 
 > Incorrect: host-managed devices require a zone "reset" (equivalent to
 > discard/trim) to be reused after being written once. So again, the
 > "tricky features" you mention will depend on the device "model",
 > whatever this ends up to be for an open channel SSD.
-
-... and this is exposed by having different zone types (sequential
-write required vs sequential write preferred vs conventional).  And if
-OCSSD's "zones" don't fit into the current ZBC zone types, we can
-easily add new ones.  I would suggest however, that we explicitly
-disclaim that the block device layer's code points for zone types is
-an exact match with the ZBC zone types numbering, precisely so we can
-add new zone types that correspond to abstractions from different
-hardware types, such as OCSSD.
-
+> 
+>> Because SMR zone could be simply re-written in sequential order if
+>> all zone's data is invalid, for example. Also conventional zone could
+>> be really tricky point. Because it is one zone only for the whole
+>> device that could be updated in-place. Raw NAND flash, usually,
+>> hasn't likewise conventional zone.
+> 
+> Conventional zones are optional in zoned block devices. There may be
+> none at all and an implementation may well decide to not support a
+> device without any conventional zones if some are required.
+> In the case of open channel SSDs, the FTL implementation may well decide
+> to expose a particular range of LBAs as "conventional zones" and have a
+> lower level exposure for the remaining capacity whcih can then be
+> optimally used by the file system based on the features available for
+> that remaining LBA range. Again, a parallel is possible with SMR.
+> 
+>> Finally, if I really like to develop SMR- or NAND flash oriented file
+>> system then I would like to play with peculiarities of concrete
+>> technologies. And any unified interface will destroy the opportunity 
+>> to create the really efficient solution. Finally, if my software
+>> solution is unable to provide some fancy and efficient features then
+>> guys will prefer to use the regular stack (ext4, xfs + block layer).
+> 
 > Not necessarily. Again think in terms of device "model" and associated
 > feature set. An FS implementation may decide to support all possible
 > models, with likely a resulting incredible complexity. More likely,
@@ -80,30 +148,39 @@ hardware types, such as OCSSD.
 > whereas the initial effort to support SMR with ext4 was pretty much
 > abandoned as it was too complex to integrate in the existing code while
 > keeping the existing on-disk format.
+> 
+> Your argument above is actually making the same point: you want your
+> implementation to use the device features directly. That is, your
+> implementation wants a "host-managed" like device model. Using ext4 will
+> require a "host-aware" or "drive-managed" model, which could be provided
+> through a different FTL or device-mapper implementation in the case of
+> open channel SSDs.
+> 
+> I am not trying to argue that open channel SSDs and zoned block devices
+> should be supported under the exact same API. But I can definitely see
+> clear parallels worth a discussion. As a first step, I would suggest
+> trying to try defining open channel SSDs "models" and their feature set
+> and see how these fit with the existing ZBC/ZAC defined models and at
+> least estimate the implications on the block I/O stack. If adding the
+> new models only results in the addition of a few top level functions or
+> ioctls, it may be entirely feasible to integrate the two together.
+> 
 
-I'll note that Abutalib Aghayev and I will be presenting a paper at
-the 2017 FAST conference detailing a way to optimize ext4 for
-Host-Aware SMR drives by making a surprisingly small set of changes to
-ext4's journalling layer, with some very promising performance
-improvements for certain workloads, which we tested on both Seagate
-and WD HA drives and achieved 2x performance improvements.  Patches
-are on the unstable portion of the ext4 patch queue, and I hope to get
-them into an upstream acceptable shape (as opposed to "good enough for
-a research paper") in the next few months.
+Thanks Damien. I couldn't have said it better my self.
 
-So it may very well be that small changes can be made to file systems
-to support exotic devices if there are ways that we can expose the
-right information about underlying storage devices, and offering the
-right abstractions to enable the right kind of minimal I/O tagging, or
-hints, or commands as necessary such that the changes we do need to
-make to the file system can be kept small, and kept easily testable
-even if hardware is not available.
+The OCSSD 1.3 specification has been made with an eye towards the SMR
+interface:
 
-For example, by creating device mapper emulators of the feature sets
-of these advanced storage interfaces that are exposed via the block
-layer abstractions, whether it be for ZBC zones, or hardware
-encryption acceleration, etc.
+ - "Identification" - Follows the same "global" size definitions, and
+also supports that each zone has its own local size.
+ - "Get Report" command follows a very similar structure as SMR, such
+that it can sit behind the "Report Zones" interface.
+ - "Erase/Prepare Block" command follows the Reset block interface.
 
-Cheers,
+Those should fit right in. If the layout is planar, such that the OCSSD
+only exposes a set of zones, it should be able to fit right into the
+framework with minor modifications.
 
-					- Ted
+A couple of details are added when going towards managing multiple
+parallel units, which is some of the things that require a bit of
+discussion.
