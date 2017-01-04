@@ -1,57 +1,51 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:54094 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751429AbdAYRZg (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 Jan 2017 12:25:36 -0500
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@fb.com>
-Cc: Mike Snitzer <snitzer@redhat.com>,
-        Junichi Nomura <j-nomura@ce.jp.nec.com>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-raid@vger.kernel.org, dm-devel@redhat.com
-Subject: [PATCH 02/18] md: cleanup bio op / flags handling in raid1_write_request
-Date: Wed, 25 Jan 2017 18:25:10 +0100
-Message-Id: <1485365126-23210-3-git-send-email-hch@lst.de>
-In-Reply-To: <1485365126-23210-1-git-send-email-hch@lst.de>
-References: <1485365126-23210-1-git-send-email-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <keith.busch@intel.com>
+From: Keith Busch <keith.busch@intel.com>
+To: linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>,
+	Jens Axboe <axboe@fb.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Thomas Gleixner <tglx@linutronix.de>
+Cc: Marc Merlin <marc@merlins.org>,
+	Keith Busch <keith.busch@intel.com>
+Subject: [PATCH 0/6] NVMe related fixes
+Date: Wed,  4 Jan 2017 17:41:05 -0500
+Message-Id: <1483569671-1462-1-git-send-email-keith.busch@intel.com>
+List-ID: <linux-block@vger.kernel.org>
 
-No need for the local variables, the bio is still live and we can just
-assigned the bits we want directly.  Make me wonder why we can't assign
-all the bio flags to start with.
+I've been looking into an old regression origianlly reported here:
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/md/raid1.c | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
+  http://lists.infradead.org/pipermail/linux-nvme/2016-August/005699.html
 
-diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
-index 7b0f647..67b0365 100644
---- a/drivers/md/raid1.c
-+++ b/drivers/md/raid1.c
-@@ -1170,10 +1170,6 @@ static void raid1_write_request(struct mddev *mddev, struct bio *bio,
- 	int i, disks;
- 	struct bitmap *bitmap = mddev->bitmap;
- 	unsigned long flags;
--	const int op = bio_op(bio);
--	const unsigned long do_sync = (bio->bi_opf & REQ_SYNC);
--	const unsigned long do_flush_fua = (bio->bi_opf &
--						(REQ_PREFLUSH | REQ_FUA));
- 	struct md_rdev *blocked_rdev;
- 	struct blk_plug_cb *cb;
- 	struct raid1_plug_cb *plug = NULL;
-@@ -1389,7 +1385,8 @@ static void raid1_write_request(struct mddev *mddev, struct bio *bio,
- 				   conf->mirrors[i].rdev->data_offset);
- 		mbio->bi_bdev = conf->mirrors[i].rdev->bdev;
- 		mbio->bi_end_io	= raid1_end_write_request;
--		bio_set_op_attrs(mbio, op, do_flush_fua | do_sync);
-+		mbio->bi_opf = bio_op(bio) |
-+			(bio->bi_opf & (REQ_SYNC | REQ_PREFLUSH | REQ_FUA));
- 		if (test_bit(FailFast, &conf->mirrors[i].rdev->flags) &&
- 		    !test_bit(WriteMostly, &conf->mirrors[i].rdev->flags) &&
- 		    conf->raid_disks - mddev->degraded > 1)
+The root cause is blk-mq's hot cpu notifier is stuck indefinitely during
+suspend on requests that entered a stopped hardware context, and that
+hardware context will not be restarted until suspend completes.
+
+I originally set out to unwind the requests and block on reentry,
+but blk-mq doesn't support doing that: once a request enters a hardware
+context, it needs to complete on that context. Since the context won't be
+starting again, we need to do _something_ with those entered requests,
+and unfortunately ending them in error is the simplest way to resolve
+the deadlock.
+
+Alternatively, it might have been nice if we didn't need to freeze at
+all if we could leverage the new blk_mq_quiesce_queue, but that wouldn't
+work when the queue map needs to be redone...
+
+Any feedback appreciated. Thanks!
+
+Keith Busch (6):
+  irq/affinity: Assign all online CPUs to vectors
+  irq/affinity: Assign offline CPUs a vector
+  nvme/pci: Start queues after tagset is updated
+  blk-mq: Update queue map when changing queue count
+  blk-mq: Fix freeze deadlock
+  blk-mq: Remove unused variable
+
+ block/blk-mq.c          | 86 +++++++++++++++++++++++++++++++++++++++++--------
+ drivers/nvme/host/pci.c |  2 +-
+ kernel/irq/affinity.c   | 17 ++++++++--
+ 3 files changed, 87 insertions(+), 18 deletions(-)
+
 -- 
-2.1.4
-
+2.5.5
