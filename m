@@ -1,58 +1,83 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-sn1nam02on0085.outbound.protection.outlook.com ([104.47.36.85]:52916
-        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
+Received: from mail-co1nam03on0087.outbound.protection.outlook.com ([104.47.40.87]:17702
+        "EHLO NAM03-CO1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752816AbdAHQbA (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 8 Jan 2017 11:31:00 -0500
-From: Bart Van Assche <Bart.VanAssche@sandisk.com>
-To: "paolo.valente@linaro.org" <paolo.valente@linaro.org>
-CC: "ulf.hansson@linaro.org" <ulf.hansson@linaro.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "lsf-pc@lists.linux-foundation.org"
-        <lsf-pc@lists.linux-foundation.org>,
-        "linus.walleij@linaro.org" <linus.walleij@linaro.org>,
-        "broonie@linaro.org" <broonie@linaro.org>
+        id S1034709AbdAFXGD (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 6 Jan 2017 18:06:03 -0500
+Date: Fri, 6 Jan 2017 15:05:54 -0800
+From: Adam Manzanares <adam.manzanares@wdc.com>
+To: Paolo Valente <paolo.valente@linaro.org>
+CC: <lsf-pc@lists.linux-foundation.org>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Mark Brown <broonie@linaro.org>, <linux-block@vger.kernel.org>,
+        <cyril.guyot@wdc.com>
 Subject: Re: [LSF/MM ATTEND AND AGENDA TOPIC] request to attend the summit
-Date: Sun, 8 Jan 2017 16:30:51 +0000
-Message-ID: <1483893030.6744.1.camel@sandisk.com>
+Message-ID: <20170106230553.GA23927@hgst.com>
 References: <771BC555-46A4-4AE1-BDD5-BFB4E3F065F0@linaro.org>
-         <1483431417.2911.1.camel@sandisk.com>
-         <C805E81A-2266-4E8D-A8BD-8023165A27FC@linaro.org>
-In-Reply-To: <C805E81A-2266-4E8D-A8BD-8023165A27FC@linaro.org>
-Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <771BC555-46A4-4AE1-BDD5-BFB4E3F065F0@linaro.org>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-T24gVHVlLCAyMDE3LTAxLTAzIGF0IDEwOjM5ICswMTAwLCBQYW9sbyBWYWxlbnRlIHdyb3RlOg0K
-PiA+IElsIGdpb3JubyAwMyBnZW4gMjAxNywgYWxsZSBvcmUgMDk6MTcsIEJhcnQgVmFuIEFzc2No
-ZSA8QmFydC5WYW5Bc3MNCj4gPiBjaGVAc2FuZGlzay5jb20+IGhhIHNjcml0dG86DQo+ID4gDQo+
-ID4gKiBTaW5jZSBCRlEgaGFzIGJlZW4gZGVzaWduZWQgZm9yIGhhcmQgZGlza3MgYW5kIHNpbmNl
-IHRoZSBhcHByb2FjaA0KPiA+IGluIEJGUcKgZm9yIGhhbmRsaW5nIGRlY2VwdGl2ZSBpZGxlbmVz
-cyByZWR1Y2VzIGJhbmR3aWR0aCwgd2hhdA0KPiA+IHNjaGVkdWxpbmfCoGFsZ29yaXRobSB0byB1
-c2UgZm9yIHN0b3JhZ2UgbWVkaWEgdGhhdCBkbyBub3QgaGF2ZSBhbnkNCj4gPiBtb3ZpbmcgcGFy
-dHPCoChTU0RzIGFuZCBNTUMpLg0KPiANCj4gSSB3b3VsZCByZWFsbHkgbGlrZSB0byBoYXZlIHRo
-ZSBvcHBvcnR1bml0eSB0byBkZWJ1bmsgdGhpcyBmYWxzZQ0KPiBteXRoLiBCRlEgaXMgb3B0aW1p
-emVkIGZvciByb3RhdGlvbmFsIGFzIHdlbGwgYXMgbm9uLXJvdGF0aW9uYWwNCj4gZGV2aWNlLsKg
-QkZRIGRvZXMgbm90IGtlZXAgdXAgb25seSBpZiBJT1BTIGdvIGJleW9uZCB+NTBrLsKgwqBBbmQg
-SSdtDQo+IGFscmVhZHkgd29ya2luZyBvbiB0aGlzIGxpbWl0YXRpb24sIGJ1dCwgYXMgYWdyZWVk
-IHdpdGggSmVucywgdGhlDQo+IHByaW9yaXR5IGZvciB0aGUgbW9tZW50IGlzIHB1c2hpbmcgQkZR
-IGFzIGl0IGlzLg0KDQpIZWxsbyBQYW9sbywNCg0KQSBxdW90ZSBmcm9tIHRoZSBzZWN0aW9uICJT
-ZXJ2aWNlIFByb3BlcnRpZXMiIGZyb20gYSBwYXBlciBmcm9tIDIwMTANCmFib3V0IEJGUTogIklu
-IHRoaXMgc2VjdGlvbiB3ZSByZXBvcnQgdGhlIHNlcnZpY2UgcHJvcGVydGllcyBvZiBCRlEsIGlu
-DQpib3RoIHNlY3RvciAoYmFuZHdpZHRoIGRpc3RyaWJ1dGlvbikgYW5kIHRpbWUgZG9tYWlucy4g
-WyAuLi4gXSBBcyBhDQpjb25zZXF1ZW5jZSwgb25lIHdvdWxkIHNldCBUd2FpdCBhcyBoaWdoIGFz
-IHBvc3NpYmxlIHRvIGluY2x1ZGUgYXMgbWFueQ0KYXBwbGljYXRpb25zIGFzIHBvc3NpYmxlLiBI
-b3dldmVyLCB0aGUgdmFsdWUgb2YgVHdhaXQgaGFzIGFuIGltcG9ydGFudA0KaW1wYWN0IG9uIHRo
-ZSBkaXNrIHRocm91Z2hwdXQuIEl0IG1heSBwcm92aWRlIHNpZ25pZmljYW50IGJvb3N0aW5nIGlu
-DQpwcmVzZW5jZSBvZiBkZWNlcHRpdmUgaWRsZW5lc3MsIGJ1dCBvbmx5IGlmIGl0cyB2YWx1ZSBp
-cyBpbiB0aGUgb3JkZXINCm9mIHRoZSBzZWVrIGFuZCByb3RhdGlvbmFsIGxhdGVuY2llcyBbMV0s
-IG5hbWVseSBhIGZldyBtaWxsaXNlY29uZHMuIEluDQpjb250cmFzdCwgaGlnaGVyIHZhbHVlcyBt
-YXkgY2F1c2UgcHJvZ3Jlc3NpdmUgcGVyZm9ybWFuY2UgZGVncmFkYXRpb24sDQphcyB0aGUgZGlz
-ayBtYXkgYmUgbGVmdCBpZGxlIGZvciB0b28gbG9uZy4iDQoNCkRpZCBJIHVuZGVyc3RhbmQgY29y
-cmVjdGx5IHRoYXQgQkZRIHVzZXMgZGlzayBpZGxpbmcgdG8gaW1wcm92ZQ0Kc2VxdWVudGlhbCBJ
-L08gdGhyb3VnaHB1dCBmb3IgaGFyZGRpc2tzPyBJZiBzbywgbXkgcXVlc3Rpb24gaXMgd2h5IHlv
-dQ0KdGhpbmsgdGhhdCBkaXNrIGlkbGluZyB3aWxsIG5vdCByZWR1Y2UgdGhyb3VnaHB1dCBmb3Ig
-U1NEcyBzaW5jZSBkaXNrDQppZGxpbmcga2VlcHMgdGhlIHF1ZXVlIGRlcHRoIGxvdyB3aGlsZSBT
-U0RzIHBlcmZvcm0gYmVzdCBmb3Igd29ya2xvYWRzDQp3aXRoIGEgaGlnaCBxdWV1ZSBkZXB0aD8N
-Cg0KVGhhbmtzLA0KDQpCYXJ0Lg==
+The 01/02/2017 19:14, Paolo Valente wrote:
+> Hi,
+> this is to retry to request to attend the summit.  This time I'm
+> trying to propose and agenda topic too.
+> 
+> I would like to attend, and propose a topic, because:
+> 1) the project for adding (only) the BFQ I/O scheduler to blk-mq has
+> entered a quite active phase: the framework prepared by Jens seems
+> mostly ready and complete, and I need just a few details to complete
+> the port of BFQ.
+> 2) the landing of BFQ into blk-mq might have possibly important
+> consequences, in a way or the other.
+> 
+> So, it might be quite useful for me, and possibly for other
+> developers/stakeholders interested in these changes and consequences,
+> to have the opportunity to talk with each other, exactly when, or
+> right after these changes happen.
+> 
+> In addition, a few months ago Greg KH and James Bottomley even
+> suggested to postpone to this summit, or Vault, the KS discussion that
+> I proposed on the unsolved latency problems for which BFQ has been
+> devised.  So, my topic proposal would be exactly this:
+> "Unsolved latency problems, related to I/O, in Linux: consequences on
+> lsb-compliant and Android systems, solutions proposed so far, possible
+> next solutions".
+
+Hello,
+
+We are also interested in the unsolved latency problems. In 4.10 we got 
+some patches merged that deal with iopriority being passed from the 
+application to device drivers that send commands to SATA HDDs. This allows an 
+application to achieve better tail latencies for prioritized workloads 
+when queuing is enabled at the device. 
+
+We would like to discuss the implications of adapting this work to block-mq 
+and BFQ. In addition we would like to discuss potential applications and 
+devices (including device driver changes) that would benefit from having 
+iopriority information.
+
+Thanks,
+Adam 
+
+> 
+> If needed, I can provide more details on this topic.
+> 
+> As for the expertise that I may bring, I'm somehow expert in:
+> guaranteeing a good system and application responsiveness (a low lag
+> in typical Android terminology), providing strong low-latency
+> guarantees to video/audio playing/streaming applications, guaranteeing
+> a fair share of the bandwidth, and not just the time, of I/O
+> resources.
+> 
+> I would like to submit a talk proposal to Vault too.
+> 
+> Thanks,
+> Paolo
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-block" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
