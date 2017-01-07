@@ -1,49 +1,150 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-bn3nam01on0058.outbound.protection.outlook.com ([104.47.33.58]:53760
-        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752043AbdAaMSk (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 31 Jan 2017 07:18:40 -0500
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
-To: <axboe@fb.com>
-CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <jg@lightnvm.io>,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
-Subject: [PATCH 11/12] lightnvm: free properly on target creation error
-Date: Tue, 31 Jan 2017 13:17:19 +0100
-Message-ID: <20170131121720.10971-12-matias@cnexlabs.com>
-In-Reply-To: <20170131121720.10971-1-matias@cnexlabs.com>
-References: <20170131121720.10971-1-matias@cnexlabs.com>
+Received: from mga05.intel.com ([192.55.52.43]:60845 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1163219AbdAGBHE (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 6 Jan 2017 20:07:04 -0500
+Subject: [RFC PATCH v2 1/2] block: fix lifetime of request_queue /
+ backing_dev_info relative to bdev
+From: Dan Williams <dan.j.williams@intel.com>
+To: linux-block@vger.kernel.org
+Cc: Jan Kara <jack@suse.cz>, linux-nvdimm@lists.01.org,
+        linux-kernel@vger.kernel.org, Jens Axboe <axboe@fb.com>,
+        Jeff Moyer <jmoyer@redhat.com>, linux-fsdevel@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>
+Date: Fri, 06 Jan 2017 17:02:56 -0800
+Message-ID: <148375097659.37020.8663217538744770382.stgit@dwillia2-desk3.amr.corp.intel.com>
+In-Reply-To: <148375097100.37020.495735345355345658.stgit@dwillia2-desk3.amr.corp.intel.com>
+References: <148375097100.37020.495735345355345658.stgit@dwillia2-desk3.amr.corp.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Javier González <jg@lightnvm.io>
+By definition the lifetime of a struct block_device is equal to the
+lifetime of its corresponding inode since they both live in struct
+bdev_inode. Up until the inode is destroyed it may be the target of
+delayed write-back requests. Issuing write-back to a block_device
+requires a lookup of the bdev backing_dev_info that is embedded in the
+request_queue.
 
-Fix a memory leak when target creation fails. More specifically, free
-the entire device structure given to the target (tgt_dev).
+It follows that a struct request_queue must be alive as long as a
+corresponding block device inode is the active target of requests.
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
+Match the lifetimes of backing_dev_info and its usage in
+inode-write-back by arranging for the bdev to take a reference against
+its request_queue when the bdev is instantiated. Release the
+request_queue reference when the inode is freed.
+
+Cc: Jens Axboe <axboe@fb.com>
+Cc: Jeff Moyer <jmoyer@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Reported-by: Jan Kara <jack@suse.cz>
+Signed-off-by: Dan Williams <dan.j.williams@intel.com>
 ---
- drivers/lightnvm/core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block/blk-core.c   |    3 ++-
+ fs/block_dev.c     |   25 +++++++++++++++----------
+ include/linux/fs.h |    1 +
+ 3 files changed, 18 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-index 4f4db99..b2cd3d6 100644
---- a/drivers/lightnvm/core.c
-+++ b/drivers/lightnvm/core.c
-@@ -303,7 +303,7 @@ static int nvm_create_tgt(struct nvm_dev *dev, struct nvm_ioctl_create *create)
- err_queue:
- 	blk_cleanup_queue(tqueue);
- err_dev:
--	kfree(tgt_dev);
-+	nvm_remove_tgt_dev(tgt_dev);
- err_t:
- 	kfree(t);
- err_reserve:
--- 
-2.9.3
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 14d7c0740dc0..e8713137b846 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -378,7 +378,8 @@ EXPORT_SYMBOL(blk_run_queue);
+ 
+ void blk_put_queue(struct request_queue *q)
+ {
+-	kobject_put(&q->kobj);
++	if (q)
++		kobject_put(&q->kobj);
+ }
+ EXPORT_SYMBOL(blk_put_queue);
+ 
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index 899fa8ccc347..8f94b74bfc7d 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -589,12 +589,22 @@ static struct inode *bdev_alloc_inode(struct super_block *sb)
+ 	return &ei->vfs_inode;
+ }
+ 
++static void bdev_release(struct work_struct *w)
++{
++	struct block_device *bdev = container_of(w, typeof(*bdev), bd_release);
++	struct bdev_inode *bdi = container_of(bdev, typeof(*bdi), bdev);
++
++	blk_put_queue(bdev->bd_queue);
++	kmem_cache_free(bdev_cachep, bdi);
++}
++
+ static void bdev_i_callback(struct rcu_head *head)
+ {
+ 	struct inode *inode = container_of(head, struct inode, i_rcu);
+-	struct bdev_inode *bdi = BDEV_I(inode);
++	struct block_device *bdev = &BDEV_I(inode)->bdev;
+ 
+-	kmem_cache_free(bdev_cachep, bdi);
++	/* blk_put_queue needs process context */
++	schedule_work(&bdev->bd_release);
+ }
+ 
+ static void bdev_destroy_inode(struct inode *inode)
+@@ -613,6 +623,7 @@ static void init_once(void *foo)
+ #ifdef CONFIG_SYSFS
+ 	INIT_LIST_HEAD(&bdev->bd_holder_disks);
+ #endif
++	INIT_WORK(&bdev->bd_release, bdev_release);
+ 	inode_init_once(&ei->vfs_inode);
+ 	/* Initialize mutex for freeze. */
+ 	mutex_init(&bdev->bd_fsfreeze_mutex);
+@@ -1268,6 +1279,8 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
+ 	mutex_lock_nested(&bdev->bd_mutex, for_part);
+ 	if (!bdev->bd_openers) {
+ 		bdev->bd_disk = disk;
++		if (!blk_get_queue(disk->queue))
++			goto out_clear;
+ 		bdev->bd_queue = disk->queue;
+ 		bdev->bd_contains = bdev;
+ 
+@@ -1288,7 +1301,6 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
+ 					disk_put_part(bdev->bd_part);
+ 					bdev->bd_part = NULL;
+ 					bdev->bd_disk = NULL;
+-					bdev->bd_queue = NULL;
+ 					mutex_unlock(&bdev->bd_mutex);
+ 					disk_unblock_events(disk);
+ 					put_disk(disk);
+@@ -1364,7 +1376,6 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
+ 	disk_put_part(bdev->bd_part);
+ 	bdev->bd_disk = NULL;
+ 	bdev->bd_part = NULL;
+-	bdev->bd_queue = NULL;
+ 	if (bdev != bdev->bd_contains)
+ 		__blkdev_put(bdev->bd_contains, mode, 1);
+ 	bdev->bd_contains = NULL;
+@@ -1586,12 +1597,6 @@ static void __blkdev_put(struct block_device *bdev, fmode_t mode, int for_part)
+ 		kill_bdev(bdev);
+ 
+ 		bdev_write_inode(bdev);
+-		/*
+-		 * Detaching bdev inode from its wb in __destroy_inode()
+-		 * is too late: the queue which embeds its bdi (along with
+-		 * root wb) can be gone as soon as we put_disk() below.
+-		 */
+-		inode_detach_wb(bdev->bd_inode);
+ 	}
+ 	if (bdev->bd_contains == bdev) {
+ 		if (disk->fops->release)
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index dc0478c07b2a..f084e4a2198b 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -488,6 +488,7 @@ struct block_device {
+ 	int			bd_fsfreeze_count;
+ 	/* Mutex for freeze */
+ 	struct mutex		bd_fsfreeze_mutex;
++	struct work_struct	bd_release;
+ };
+ 
+ /*
 
