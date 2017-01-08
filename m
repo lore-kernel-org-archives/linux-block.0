@@ -1,73 +1,40 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-Date: Mon, 9 Jan 2017 21:30:05 +0100
-From: Jan Kara <jack@suse.cz>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-it0-f66.google.com ([209.85.214.66]:36137 "EHLO
+        mail-it0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933053AbdAHCRO (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 7 Jan 2017 21:17:14 -0500
+MIME-Version: 1.0
+In-Reply-To: <20170108020200.GA16312@cmpxchg.org>
+References: <20161221221638.GD4758@dastard> <CA+55aFyb1jcdpavyZgZ4nedA0=6tLognyWcJXfOJjMPFTm5GWA@mail.gmail.com>
+ <20161222001303.nvrtm22szn3hgxar@straylight.hirudinean.org>
+ <20161222051322.GF4758@dastard> <CA+55aFza=cv6TGYh+Be1xz2x-G-U=vruhbmfGpHSqY1ocZrBeg@mail.gmail.com>
+ <alpine.LSU.2.11.1612221204510.4476@eggly.anvils> <20161223073241.GA13584@cmpxchg.org>
+ <20161223083329.GA13952@cmpxchg.org> <20170102211136.GA3189@cmpxchg.org>
+ <20170103122825.GC3780@quack2.suse.cz> <20170108020200.GA16312@cmpxchg.org>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Sat, 7 Jan 2017 18:17:12 -0800
+Message-ID: <CA+55aFz8O1zxateQH0VZyi=vgTJvmzNVURae1nshSkkzsQynGA@mail.gmail.com>
+Subject: Re: [4.10, panic, regression] iscsi: null pointer deref at iscsi_tcp_segment_done+0x20d/0x2e0
 To: Johannes Weiner <hannes@cmpxchg.org>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
+Cc: Andrew Morton <akpm@linux-foundation.org>,
         Hugh Dickins <hughd@google.com>,
         Dave Chinner <david@fromorbit.com>,
         Chris Leech <cleech@redhat.com>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         Lee Duncan <lduncan@suse.com>, open-iscsi@googlegroups.com,
         Linux SCSI List <linux-scsi@vger.kernel.org>,
-        linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        linux-block <linux-block@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
         Andrea Arcangeli <aarcange@redhat.com>,
         Dave Jones <davej@codemonkey.org.uk>, Jan Kara <jack@suse.cz>
-Subject: Re: [4.10, panic, regression] iscsi: null pointer deref at
- iscsi_tcp_segment_done+0x20d/0x2e0
-Message-ID: <20170109203005.GE18524@quack2.suse.cz>
-References: <CA+55aFyb1jcdpavyZgZ4nedA0=6tLognyWcJXfOJjMPFTm5GWA@mail.gmail.com>
- <20161222001303.nvrtm22szn3hgxar@straylight.hirudinean.org>
- <20161222051322.GF4758@dastard>
- <CA+55aFza=cv6TGYh+Be1xz2x-G-U=vruhbmfGpHSqY1ocZrBeg@mail.gmail.com>
- <alpine.LSU.2.11.1612221204510.4476@eggly.anvils>
- <20161223073241.GA13584@cmpxchg.org>
- <20161223083329.GA13952@cmpxchg.org>
- <20170102211136.GA3189@cmpxchg.org>
- <20170103122825.GC3780@quack2.suse.cz>
- <20170108020200.GA16312@cmpxchg.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170108020200.GA16312@cmpxchg.org>
-Sender: linux-scsi-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Sat 07-01-17 21:02:00, Johannes Weiner wrote:
-> On Tue, Jan 03, 2017 at 01:28:25PM +0100, Jan Kara wrote:
-> > On Mon 02-01-17 16:11:36, Johannes Weiner wrote:
-> > > On Fri, Dec 23, 2016 at 03:33:29AM -0500, Johannes Weiner wrote:
-> > > > On Fri, Dec 23, 2016 at 02:32:41AM -0500, Johannes Weiner wrote:
-> > > > > On Thu, Dec 22, 2016 at 12:22:27PM -0800, Hugh Dickins wrote:
-> > > > > > On Wed, 21 Dec 2016, Linus Torvalds wrote:
-> > > > > > > On Wed, Dec 21, 2016 at 9:13 PM, Dave Chinner <david@fromorbit.com> wrote:
-> > > > > > > > I unmounted the fs, mkfs'd it again, ran the
-> > > > > > > > workload again and about a minute in this fired:
-> > > > > > > >
-> > > > > > > > [628867.607417] ------------[ cut here ]------------
-> > > > > > > > [628867.608603] WARNING: CPU: 2 PID: 16925 at mm/workingset.c:461 shadow_lru_isolate+0x171/0x220
-> > > > > > > 
-> > > > > > > Well, part of the changes during the merge window were the shadow
-> > > > > > > entry tracking changes that came in through Andrew's tree. Adding
-> > > > > > > Johannes Weiner to the participants.
-> 
-> Okay, the below patch should address this problem. Dave Jones managed
-> to reproduce it with the added WARN_ONs, and they made it obvious. He
-> cannot trigger it anymore with this fix applied. Thanks Dave!
+On Sat, Jan 7, 2017 at 6:02 PM, Johannes Weiner <hannes@cmpxchg.org> wrote:
+>
+> Linus? Andrew?
 
-FWIW the patch looks good to me. I'd just note that the need to pass the
-callback to deletion function and the fact that we do it only in cases
-where we think it is needed appears errorprone. With the warning you've
-added it should at least catch the cases where we got it wrong but more
-robust would be if the radix tree root contained a pointer to the callback
-function so that we would not rely on passing the callback to every place
-which can possibly free a node. Also conceptually this would make more
-sense to me since the fact that we may need to do some cleanup on node
-deletion is a property of the particular radix tree and how we use it.
-OTOH that would mean growing radix tree root by one pointer which would be
-unpopular I guess.
+Looks fine to me. Will apply.
 
-								Honza
-
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+               Linus
