@@ -1,66 +1,116 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f41.google.com ([74.125.82.41]:38265 "EHLO
-        mail-wm0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1759923AbdAJJz0 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Jan 2017 04:55:26 -0500
-Received: by mail-wm0-f41.google.com with SMTP id k184so153797239wme.1
-        for <linux-block@vger.kernel.org>; Tue, 10 Jan 2017 01:55:25 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <1483431417.2911.1.camel@sandisk.com>
-References: <771BC555-46A4-4AE1-BDD5-BFB4E3F065F0@linaro.org> <1483431417.2911.1.camel@sandisk.com>
-From: Ulf Hansson <ulf.hansson@linaro.org>
-Date: Tue, 10 Jan 2017 10:55:23 +0100
-Message-ID: <CAPDyKFqZrgspJcyaPiwqpsds2NogKMoLt2_5sWPRM6ydSo4oYg@mail.gmail.com>
+Received: from mail-wj0-f172.google.com ([209.85.210.172]:34962 "EHLO
+        mail-wj0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S968301AbdAHQ5T (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 8 Jan 2017 11:57:19 -0500
+Received: by mail-wj0-f172.google.com with SMTP id i20so56238430wjn.2
+        for <linux-block@vger.kernel.org>; Sun, 08 Jan 2017 08:57:14 -0800 (PST)
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
 Subject: Re: [LSF/MM ATTEND AND AGENDA TOPIC] request to attend the summit
-To: Bart Van Assche <Bart.VanAssche@sandisk.com>
-Cc: "paolo.valente@linaro.org" <paolo.valente@linaro.org>,
+From: Paolo Valente <paolo.valente@linaro.org>
+In-Reply-To: <1483893030.6744.1.camel@sandisk.com>
+Date: Sun, 8 Jan 2017 17:56:57 +0100
+Cc: "ulf.hansson@linaro.org" <ulf.hansson@linaro.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "lsf-pc@lists.linux-foundation.org"
         <lsf-pc@lists.linux-foundation.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "linus.walleij@linaro.org" <linus.walleij@linaro.org>,
         "broonie@linaro.org" <broonie@linaro.org>
-Content-Type: text/plain; charset=UTF-8
+Message-Id: <4B59AFC4-2638-416B-88E6-255A2D3DCB54@linaro.org>
+References: <771BC555-46A4-4AE1-BDD5-BFB4E3F065F0@linaro.org> <1483431417.2911.1.camel@sandisk.com> <C805E81A-2266-4E8D-A8BD-8023165A27FC@linaro.org> <1483893030.6744.1.camel@sandisk.com>
+To: Bart Van Assche <Bart.VanAssche@sandisk.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-[...]
 
->
-> I agree that it would be useful to discuss blk-mq I/O scheduling during
-> LSF/MM. However, blk-mq I/O scheduling involves more than what has been
-> described above. The topics I would like to see being discussed are:
-> * How to add an I/O scheduling API to the blk-mq core. This is what Jens
->   is working on (http://git.kernel.dk/cgit/linux-block/log/?h=blk-mq-sched).
-> * The BFQ for blk-mq patch series once this patch series has been posted.
->   If the rules for this edition of LSF/MM are similar to those of previous
->   editions then I expect that the LSF/MM program committee will want to
->   see a BFQ for blk-mq implementation posted as patches on a Linux kernel
->   mailing list before adding a session about BFQ for blk-mq to the LSF/MM
->   agenda.
-> * Since BFQ has been designed for hard disks and since the approach in BFQ
->   for handling deceptive idleness reduces bandwidth, what scheduling
->   algorithm to use for storage media that do not have any moving parts
->   (SSDs and MMC).
-> * How to port the MMC driver to blk-mq. See also Linus Walleij, "[PATCH
->   v2] RFD: switch MMC/SD to use blk-mq multiqueueing"
->   (https://www.spinics.net/lists/linux-block/msg07360.html).
+> Il giorno 08 gen 2017, alle ore 17:30, Bart Van Assche =
+<Bart.VanAssche@sandisk.com> ha scritto:
+>=20
+> On Tue, 2017-01-03 at 10:39 +0100, Paolo Valente wrote:
+>>> Il giorno 03 gen 2017, alle ore 09:17, Bart Van Assche <Bart.VanAss
+>>> che@sandisk.com> ha scritto:
+>>>=20
+>>> * Since BFQ has been designed for hard disks and since the approach
+>>> in BFQ for handling deceptive idleness reduces bandwidth, what
+>>> scheduling algorithm to use for storage media that do not have any
+>>> moving parts (SSDs and MMC).
+>>=20
+>> I would really like to have the opportunity to debunk this false
+>> myth. BFQ is optimized for rotational as well as non-rotational
+>> device. BFQ does not keep up only if IOPS go beyond ~50k.  And I'm
+>> already working on this limitation, but, as agreed with Jens, the
+>> priority for the moment is pushing BFQ as it is.
+>=20
+> Hello Paolo,
+>=20
+> A quote from the section "Service Properties" from a paper from 2010
+> about BFQ: "In this section we report the service properties of BFQ, =
+in
+> both sector (bandwidth distribution) and time domains. [ ... ] As a
+> consequence, one would set Twait as high as possible to include as =
+many
+> applications as possible. However, the value of Twait has an important
+> impact on the disk throughput. It may provide significant boosting in
+> presence of deceptive idleness, but only if its value is in the order
+> of the seek and rotational latencies [1], namely a few milliseconds. =
+In
+> contrast, higher values may cause progressive performance degradation,
+> as the disk may be left idle for too long."
+>=20
+> Did I understand correctly that BFQ uses disk idling to improve
+> sequential I/O throughput for hard disks?
 
-Hi Bart,
+Definitely.
 
-As the MMC maintainer I am also interested in participating in all the
-above BFQ/MMC related discussions.
+> If so, my question is why you
+> think that disk idling will not reduce throughput for SSDs since disk
+> idling keeps the queue depth low while SSDs perform best for workloads
+> with a high queue depth?
+>=20
 
-Regarding the blk-mq port for MMC, I would also like to add a detail,
-which perhaps may influence the generic blkmq interface.
+Because BFQ disables idling for non-rotational devices, especially if
+NCQ-capable.  More precisely, on non-rotations devices, BFQ does not
+idle to boost throughput, because idling would yield the opposite
+result.  Unfortunately, this is one of the small improvements that I
+had not the occasion to describe in any paper.  However, you can find
+a detailed description of this improvement, in,.e.g., the commit
+message for the patch that makes this change within the last BFQ patch
+series I have submitted (October 26).  I have pasted this message
+below for your convenience.
 
-The MMC block device driver implements a asynchronous request
-mechanism, which increases performance for architectures where DMA
-mapping operations are slow (cache flushes/bounce buffering when using
-non-coherent DMAs). Ideally I would like to remove this hack from the
-MMC subsystem, if it makes sense to extend blkmq to support this. And
-if not, perhaps we can discuss on the best method to implement it for
-MMC.
+Thanks,
+Paolo
 
-Kind regards
-Uffe
+block, bfq: boost the throughput on NCQ-capable flash-based devices
+
+This patch boosts the throughput on NCQ-capable flash-based devices,
+while still preserving latency guarantees for interactive and soft
+real-time applications. The throughput is boosted by just not idling
+the device when the in-service queue remains empty, even if the queue
+is sync and has a non-null idle window. This helps to keep the drive's
+internal queue full, which is necessary to achieve maximum
+performance. This solution to boost the throughput is a port of
+commits a68bbdd and f7d7b7a for CFQ.
+
+As already highlighted in a previous patch, allowing the device to
+prefetch and internally reorder requests trivially causes loss of
+control on the request service order, and hence on service guarantees.
+Fortunately, as discussed in detail in the comments on the function
+bfq_bfqq_may_idle(), if every process has to receive the same
+fraction of the throughput, then the service order enforced by the
+internal scheduler of a flash-based device is relatively close to that
+enforced by BFQ. In particular, it is close enough to let service
+guarantees be substantially preserved.
+
+Things change in an asymmetric scenario, i.e., if not every process
+has to receive the same fraction of the throughput. In this case, to
+guarantee the desired throughput distribution, the device must be
+prevented from prefetching requests. This is exactly what this patch
+does in asymmetric scenarios.
+
+
+> Thanks,
+>=20
+> Bart.
+
