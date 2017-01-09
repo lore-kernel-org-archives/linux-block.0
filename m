@@ -1,82 +1,46 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-bn3nam01on0043.outbound.protection.outlook.com ([104.47.33.43]:32224
-        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751513AbdAaMRu (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 31 Jan 2017 07:17:50 -0500
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
-To: <axboe@fb.com>
-CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
-Subject: [PATCH 00/12] lightnvm: 4.11 patches
-Date: Tue, 31 Jan 2017 13:17:08 +0100
-Message-ID: <20170131121720.10971-1-matias@cnexlabs.com>
+Received: from mail-qk0-f195.google.com ([209.85.220.195]:36208 "EHLO
+        mail-qk0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S936117AbdAIU4v (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Jan 2017 15:56:51 -0500
+Date: Mon, 9 Jan 2017 15:56:43 -0500
+From: Tejun Heo <tj@kernel.org>
+To: Shaohua Li <shli@fb.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kernel-team@fb.com, axboe@fb.com, vgoyal@redhat.com
+Subject: Re: [PATCH V5 11/17] blk-throttle: add a simple idle detection
+Message-ID: <20170109205643.GP12827@mtj.duckdns.org>
+References: <cover.1481833017.git.shli@fb.com>
+ <b2a4b3d57a248e406a8687bbe2cce6f37c1b0749.1481833017.git.shli@fb.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <b2a4b3d57a248e406a8687bbe2cce6f37c1b0749.1481833017.git.shli@fb.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hi Jens,
+On Thu, Dec 15, 2016 at 12:33:02PM -0800, Shaohua Li wrote:
+>  /* Throttling is performed over 100ms slice and after that slice is renewed */
+>  #define DFL_THROTL_SLICE (HZ / 10)
+>  #define MAX_THROTL_SLICE (HZ / 5)
+> +#define DFL_IDLE_THRESHOLD_SSD (50 * 1000) /* 50 us */
+> +#define DFL_IDLE_THRESHOLD_HD (1000 * 1000) /* 1 ms */
+> +#define MAX_IDLE_TIME (500L * 1000 * 1000) /* 500 ms */
 
-Here are the patches for the 4.11 window. The following changes have
-been made:
+Hmm... why are we capping idle time so low?  This is a value to be
+configured by userland.  Does it make sense to cap it this low?  Also,
+wouldn't it make sense to start with higher default value given that
+the user has to explicitly enable low limit for it to be effective and
+thus explicitly requesting best effort latency target which will be
+added later?
 
- - New ioctls for vectored I/Os. Now liblightnvm is fully supported and
-   applications can begin to use the liblightnvm API to integrate with
-   Open-Channel SSDs.
+I'm really uncomfortable with pitting these two knobs against each
+other in the similar time ranges.  It's really difficult tell what
+latency target of 25us means and predict its behavior and when the
+idle timeout is 50us.  It's fine if some people fiddle with them but
+it'd be great if the defaults clearly indicate that they're operating
+in mostly separate time scales.
 
- - Merging of the general media manager with the lightnvm core. This
-   removes the need to instantiate the media manager before initializing
-   targets, and also eliminates the persistent metadata that was used
-   by gennvm.
-
- - Interface cleanups for target implementations. Enables pblk to be
-   simplified.
-
- - Fix memory leak on target creation failure.
-
- - Clean up end_io() path so that it follows the same approach as bio
-   structures to end ios.
-
-Please pick up.
-
--Matias
-
-Javier González (3):
-  lightnvm: Add CRC read error
-  lightnvm: free properly on target creation error
-  lightnvm: allow targets to use sysfs
-
-Matias Bjørling (9):
-  lightnvm: merge gennvm with core
-  lightnvm: collapse nvm_erase_ppa and nvm_erase_blk
-  lightnvm: remove nvm_submit_ppa* functions
-  lightnvm: remove nvm_get_bb_tbl and nvm_set_bb_tbl
-  lightnvm: make nvm_map_* return void
-  lightnvm: cleanup nvm transformation functions
-  lightnvm: reduce number of nvm_id groups to one
-  lightnvm: add ioctls for vector I/Os
-  lightnvm: use end_io callback instead of instance
-
- drivers/block/null_blk.c      |    6 +-
- drivers/lightnvm/Kconfig      |    9 -
- drivers/lightnvm/Makefile     |    3 +-
- drivers/lightnvm/core.c       | 1024 ++++++++++++++++++++++++-----------------
- drivers/lightnvm/gennvm.c     |  657 --------------------------
- drivers/lightnvm/gennvm.h     |   62 ---
- drivers/lightnvm/rrpc.c       |    7 +-
- drivers/lightnvm/rrpc.h       |    3 -
- drivers/lightnvm/sysblk.c     |  733 -----------------------------
- drivers/nvme/host/core.c      |    4 +
- drivers/nvme/host/lightnvm.c  |  317 +++++++++++--
- drivers/nvme/host/nvme.h      |    6 +
- include/linux/lightnvm.h      |  138 +-----
- include/uapi/linux/lightnvm.h |   50 ++
- 14 files changed, 965 insertions(+), 2054 deletions(-)
- delete mode 100644 drivers/lightnvm/gennvm.c
- delete mode 100644 drivers/lightnvm/gennvm.h
- delete mode 100644 drivers/lightnvm/sysblk.c
+Thanks.
 
 -- 
-2.9.3
-
+tejun
