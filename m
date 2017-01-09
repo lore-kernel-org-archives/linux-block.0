@@ -1,92 +1,67 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:54122 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751841AbdAYRZq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 Jan 2017 12:25:46 -0500
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@fb.com>
-Cc: Mike Snitzer <snitzer@redhat.com>,
-        Junichi Nomura <j-nomura@ce.jp.nec.com>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-raid@vger.kernel.org, dm-devel@redhat.com
-Subject: [PATCH 03/18] block: fix elevator init check
-Date: Wed, 25 Jan 2017 18:25:11 +0100
-Message-Id: <1485365126-23210-4-git-send-email-hch@lst.de>
-In-Reply-To: <1485365126-23210-1-git-send-email-hch@lst.de>
-References: <1485365126-23210-1-git-send-email-hch@lst.de>
+Received: from mail-qk0-f194.google.com ([209.85.220.194]:34737 "EHLO
+        mail-qk0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933381AbdAIVOH (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Jan 2017 16:14:07 -0500
+Date: Mon, 9 Jan 2017 16:14:04 -0500
+From: Tejun Heo <tj@kernel.org>
+To: Shaohua Li <shli@fb.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kernel-team@fb.com, axboe@fb.com, vgoyal@redhat.com
+Subject: Re: [PATCH V5 14/17] blk-throttle: add interface for per-cgroup
+ target latency
+Message-ID: <20170109211404.GS12827@mtj.duckdns.org>
+References: <cover.1481833017.git.shli@fb.com>
+ <780b07f3e3163f5fbacaa32a4eb808e3b7940f2e.1481833017.git.shli@fb.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <780b07f3e3163f5fbacaa32a4eb808e3b7940f2e.1481833017.git.shli@fb.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-We can't initalize the elevator fields for flushes as flush share space
-in struct request with the elevator data.  But currently we can't
-commnicate that a request is a flush through blk_get_request as we
-can only pass READ or WRITE, and the low-level code looks at the
-possible NULL bio to check for a flush.
+Hello,
 
-Fix this by allowing to pass any block op and flags, and by checking for
-the flush flags in __get_request.
+On Thu, Dec 15, 2016 at 12:33:05PM -0800, Shaohua Li wrote:
+> @@ -438,6 +439,11 @@ static struct blkg_policy_data *throtl_pd_alloc(gfp_t gfp, int node)
+>  	}
+>  	tg->idle_ttime_threshold = U64_MAX;
+>  
+> +	/*
+> +	 * target latency default 0, eg, latency threshold is 0, which means
+> +	 * cgroup's latency is always higher than threshold
+> +	 */
+> +
+>  	return &tg->pd;
+>  }
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
----
- block/blk-core.c | 26 ++++----------------------
- 1 file changed, 4 insertions(+), 22 deletions(-)
+So, this is something which bothers me regarding the default settings.
+I suspect the reason why the earlier patch went for tight idle time
+was because we're setting default latency to zero, so to achieve good
+utilization, the idle timeout must be shortened so that it neutralizes
+the 0 latency target here.
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index b830e14..a84c1b9 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1022,25 +1022,6 @@ int blk_update_nr_requests(struct request_queue *q, unsigned int nr)
- 	return 0;
- }
- 
--/*
-- * Determine if elevator data should be initialized when allocating the
-- * request associated with @bio.
-- */
--static bool blk_rq_should_init_elevator(struct bio *bio)
--{
--	if (!bio)
--		return true;
--
--	/*
--	 * Flush requests do not use the elevator so skip initialization.
--	 * This allows a request to share the flush and elevator data.
--	 */
--	if (op_is_flush(bio->bi_opf))
--		return false;
--
--	return true;
--}
--
- /**
-  * __get_request - get a free request
-  * @rl: request list to allocate from
-@@ -1119,10 +1100,13 @@ static struct request *__get_request(struct request_list *rl, unsigned int op,
- 	 * request is freed.  This guarantees icq's won't be destroyed and
- 	 * makes creating new ones safe.
- 	 *
-+	 * Flush requests do not use the elevator so skip initialization.
-+	 * This allows a request to share the flush and elevator data.
-+	 *
- 	 * Also, lookup icq while holding queue_lock.  If it doesn't exist,
- 	 * it will be created after releasing queue_lock.
- 	 */
--	if (blk_rq_should_init_elevator(bio) && !blk_queue_bypass(q)) {
-+	if (!op_is_flush(op) && !blk_queue_bypass(q)) {
- 		rq_flags |= RQF_ELVPRIV;
- 		q->nr_rqs_elvpriv++;
- 		if (et->icq_cache && ioc)
-@@ -1276,8 +1260,6 @@ static struct request *blk_old_get_request(struct request_queue *q, int rw,
- {
- 	struct request *rq;
- 
--	BUG_ON(rw != READ && rw != WRITE);
--
- 	/* create ioc upfront */
- 	create_io_context(gfp_mask, q->node);
- 
+I don't think this is a good default configuration.  Latency target
+should be the mechanism which determines how shareable an active
+cgroup which is under its low limit is.  That's the only thing it can
+do anyway.  Idle time mechanism should serve a different purpose, not
+an overlapping one.
+
+If we want to default to latency guarantee, we can go for 0 latency
+and a long idle timeout, even infinity.  If we want to default to good
+utilization, we should pick a reasonable latency target (which is tied
+to the device latency) with a reasonable idle timeout (which is tied
+to how human perceives something to be idle).
+
+Please note that it's kinda clear that we're misconfiguring it in the
+previous patch in that we're altering idle timeout on device type.
+Idle timeout is about the application behavior.  This isn't really
+decided by request completion latency.  On the other hand, latency
+target is the parameter which is device dependent.  The fact that it
+was picking different idle time depending on device type means that
+the roles of idle timeout and latency target are overlapping.  They
+shouldn't.  It gets really confusing.
+
+Thanks.
+
 -- 
-2.1.4
-
+tejun
