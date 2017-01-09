@@ -1,19 +1,21 @@
-Return-Path: <chandan@linux.vnet.ibm.com>
-From: Chandan Rajendra <chandan@linux.vnet.ibm.com>
-To: Jeff Moyer <jmoyer@redhat.com>
-Cc: axboe@kernel.dk, jack@suse.cz, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        anton@samba.org, linuxppc-dev@lists.ozlabs.org
-Subject: Re: [PATCH] direct-io: don't introduce another read of inode->i_blkbits
-Date: Tue, 10 Jan 2017 10:57:55 +0530
-In-Reply-To: <x49r34bgba5.fsf@segfault.boston.devel.redhat.com>
-References: <1483886830-23878-1-git-send-email-chandan@linux.vnet.ibm.com> <x49r34bgba5.fsf@segfault.boston.devel.redhat.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] direct-io: don't introduce another read of
+ inode->i_blkbits
+To: Jeff Moyer <jmoyer@redhat.com>,
+ Chandan Rajendra <chandan@linux.vnet.ibm.com>
+References: <1483886830-23878-1-git-send-email-chandan@linux.vnet.ibm.com>
+ <x49r34bgba5.fsf@segfault.boston.devel.redhat.com>
+Cc: jack@suse.cz, linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ linux-kernel@vger.kernel.org, anton@samba.org, linuxppc-dev@lists.ozlabs.org
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <899a8860-90d8-1856-f7b6-b4cc76227d34@kernel.dk>
+Date: Mon, 9 Jan 2017 14:44:46 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Message-Id: <4971281.Bg9JD0zqnv@localhost.localdomain>
+In-Reply-To: <x49r34bgba5.fsf@segfault.boston.devel.redhat.com>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-block@vger.kernel.org>
 
-On Monday, January 09, 2017 04:42:58 PM Jeff Moyer wrote:
+On 01/09/2017 02:42 PM, Jeff Moyer wrote:
 > Commit 20ce44d545844 ("do_direct_IO: Use inode->i_blkbits to compute
 > block count to be cleaned") introduced a regression: if the block size
 > of the block device is changed while a direct I/O request is being
@@ -29,9 +31,7 @@ On Monday, January 09, 2017 04:42:58 PM Jeff Moyer wrote:
 > ---
 > Chandan, can you please test this to ensure this still fixes your problem?
 
-This patch fixes the failure,
-
-Tested-by: Chandan Rajendra <chandan@linux.vnet.ibm.com>
+Please, that would be great. And if so, then let's fold the two.
 
 -- 
-chandan
+Jens Axboe
