@@ -1,58 +1,66 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:47057 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1751134AbdARXf5 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Jan 2017 18:35:57 -0500
-From: Song Liu <songliubraving@fb.com>
-To: "lsf-pc@lists.linux-foundation.org"
-        <lsf-pc@lists.linux-foundation.org>
-CC: Jens Axboe <axboe@fb.com>, Kernel Team <Kernel-team@fb.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: [LSF/MM TOPIC] block level event logging for storage media management
-Date: Wed, 18 Jan 2017 23:34:48 +0000
-Message-ID: <6040124E-4928-4FC8-8A52-35115D9CA1DF@fb.com>
-Content-Type: text/plain; charset="us-ascii"
+Return-Path: <jack@suse.cz>
+Date: Mon, 9 Jan 2017 21:20:18 +0100
+From: Jan Kara <jack@suse.cz>
+To: Chandan Rajendra <chandan@linux.vnet.ibm.com>
+Cc: axboe@kernel.dk, jack@suse.cz, linux-block@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+	anton@samba.org, linuxppc-dev@lists.ozlabs.org
+Subject: Re: [PATCH] do_direct_IO: Use inode->i_blkbits to compute block
+ count to be cleaned
+Message-ID: <20170109202018.GD18524@quack2.suse.cz>
+References: <1483886830-23878-1-git-send-email-chandan@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1483886830-23878-1-git-send-email-chandan@linux.vnet.ibm.com>
+List-ID: <linux-block@vger.kernel.org>
 
+On Sun 08-01-17 20:17:10, Chandan Rajendra wrote:
+> The code currently uses sdio->blkbits to compute the number of blocks to
+> be cleaned. However sdio->blkbits is derived from the logical block size
+> of the underlying block device (Refer to the definition of
+> do_blockdev_direct_IO()). Due to this, generic/299 test would rarely
+> fail when executed on an ext4 filesystem with 64k as the block size and
+> when using a virtio based disk (having 512 byte as the logical block
+> size) inside a kvm guest.
+> 
+> This commit fixes the bug by using inode->i_blkbits to compute the
+> number of blocks to be cleaned.
 
-Media health monitoring is very important for large scale distributed stora=
-ge systems.=20
-Traditionally, enterprise storage controllers maintain event logs for attac=
-hed storage
-devices. However, these controller managed logs do not scale well for large=
- scale=20
-distributed systems.=20
+Ah, good catch. You can add:
 
-While designing a more flexible and scalable event logging systems, we thin=
-k it is better
-to build the log in block layer. Block level event logging covers all major=
- storage media
-(SCSI, SATA, NVMe), and thus minimizes redundant work for different protoco=
-ls.=20
+Reviewed-by: Jan Kara <jack@suse.cz>
 
-In this LSF/MM, we would like to discuss the following topics with the comm=
-unity:
-    1. Mechanism for drivers report events (or errors) to block layer.=20
-       Basically, we will need a traceable function for the drivers to repo=
-rt errors=20
-       (most likely right before calling end_request or bio_endio). =20
- =20
-    2. What mechanism (ftrace, BPF, etc.) is mostly preferred for the event=
- logging?
+								Honza
 
-    3. How should we categorize different events?
-       Currently, there are existing code that translates ATA error (ata_to=
-_sense_error)=20
-       and NVMe error (nvme_trans_status_code) to SCSI sense code. So we ca=
-n=20
-       leverage SCSI Key Code Qualifier for event categorizations.=20
-
-    4. Detailed discussions on data structure for event logging.=20
-
-We will be able to show a prototype implementation during LSF/MM.=20
-
-Thanks,
-Song=
+> Signed-off-by: Chandan Rajendra <chandan@linux.vnet.ibm.com>
+> ---
+>  fs/direct-io.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/fs/direct-io.c b/fs/direct-io.c
+> index aeae8c0..b20adf9 100644
+> --- a/fs/direct-io.c
+> +++ b/fs/direct-io.c
+> @@ -905,6 +905,7 @@ static inline void dio_zero_block(struct dio *dio, struct dio_submit *sdio,
+>  static int do_direct_IO(struct dio *dio, struct dio_submit *sdio,
+>  			struct buffer_head *map_bh)
+>  {
+> +	const unsigned i_blkbits = dio->inode->i_blkbits;
+>  	const unsigned blkbits = sdio->blkbits;
+>  	int ret = 0;
+>  
+> @@ -949,7 +950,7 @@ static int do_direct_IO(struct dio *dio, struct dio_submit *sdio,
+>  					clean_bdev_aliases(
+>  						map_bh->b_bdev,
+>  						map_bh->b_blocknr,
+> -						map_bh->b_size >> blkbits);
+> +						map_bh->b_size >> i_blkbits);
+>  				}
+>  
+>  				if (!sdio->blkfactor)
+> -- 
+> 2.5.5
+> 
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
