@@ -1,130 +1,44 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-Date: Mon, 2 Jan 2017 16:11:36 -0500
-From: Johannes Weiner <hannes@cmpxchg.org>
-To: Hugh Dickins <hughd@google.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>,
-        Dave Chinner <david@fromorbit.com>,
-        Chris Leech <cleech@redhat.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Lee Duncan <lduncan@suse.com>, open-iscsi@googlegroups.com,
-        Linux SCSI List <linux-scsi@vger.kernel.org>,
-        linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Jan Kara <jack@suse.cz>, Andrea Arcangeli <aarcange@redhat.com>
-Subject: Re: [4.10, panic, regression] iscsi: null pointer deref at
- iscsi_tcp_segment_done+0x20d/0x2e0
-Message-ID: <20170102211136.GA3189@cmpxchg.org>
-References: <20161214222953.GI4326@dastard>
- <20161216185906.t2wmrr6wqjdsrduw@straylight.hirudinean.org>
- <20161221221638.GD4758@dastard>
- <CA+55aFyb1jcdpavyZgZ4nedA0=6tLognyWcJXfOJjMPFTm5GWA@mail.gmail.com>
- <20161222001303.nvrtm22szn3hgxar@straylight.hirudinean.org>
- <20161222051322.GF4758@dastard>
- <CA+55aFza=cv6TGYh+Be1xz2x-G-U=vruhbmfGpHSqY1ocZrBeg@mail.gmail.com>
- <alpine.LSU.2.11.1612221204510.4476@eggly.anvils>
- <20161223073241.GA13584@cmpxchg.org>
- <20161223083329.GA13952@cmpxchg.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-qt0-f196.google.com ([209.85.216.196]:36580 "EHLO
+        mail-qt0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1764067AbdAIUIu (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Jan 2017 15:08:50 -0500
+Date: Mon, 9 Jan 2017 15:08:43 -0500
+From: Tejun Heo <tj@kernel.org>
+To: Shaohua Li <shli@fb.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kernel-team@fb.com, axboe@fb.com, vgoyal@redhat.com
+Subject: Re: [PATCH V5 08/17] blk-throttle: make throtl_slice tunable
+Message-ID: <20170109200843.GL12827@mtj.duckdns.org>
+References: <cover.1481833017.git.shli@fb.com>
+ <3341ed56034ecbcdaaaa63a87345ea7f16178339.1481833017.git.shli@fb.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20161223083329.GA13952@cmpxchg.org>
-Sender: linux-scsi-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <3341ed56034ecbcdaaaa63a87345ea7f16178339.1481833017.git.shli@fb.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Fri, Dec 23, 2016 at 03:33:29AM -0500, Johannes Weiner wrote:
-> On Fri, Dec 23, 2016 at 02:32:41AM -0500, Johannes Weiner wrote:
-> > On Thu, Dec 22, 2016 at 12:22:27PM -0800, Hugh Dickins wrote:
-> > > On Wed, 21 Dec 2016, Linus Torvalds wrote:
-> > > > On Wed, Dec 21, 2016 at 9:13 PM, Dave Chinner <david@fromorbit.com> wrote:
-> > > > > I unmounted the fs, mkfs'd it again, ran the
-> > > > > workload again and about a minute in this fired:
-> > > > >
-> > > > > [628867.607417] ------------[ cut here ]------------
-> > > > > [628867.608603] WARNING: CPU: 2 PID: 16925 at mm/workingset.c:461 shadow_lru_isolate+0x171/0x220
-> > > > 
-> > > > Well, part of the changes during the merge window were the shadow
-> > > > entry tracking changes that came in through Andrew's tree. Adding
-> > > > Johannes Weiner to the participants.
-> > > > 
-> > > > > Now, this workload does not touch the page cache at all - it's
-> > > > > entirely an XFS metadata workload, so it should not really be
-> > > > > affecting the working set code.
-> > > > 
-> > > > Well, I suspect that anything that creates memory pressure will end up
-> > > > triggering the working set code, so ..
-> > > > 
-> > > > That said, obviously memory corruption could be involved and result in
-> > > > random issues too, but I wouldn't really expect that in this code.
-> > > > 
-> > > > It would probably be really useful to get more data points - is the
-> > > > problem reliably in this area, or is it going to be random and all
-> > > > over the place.
-> > > 
-> > > Data point: kswapd got WARNING on mm/workingset.c:457 in shadow_lru_isolate,
-> > > soon followed by NULL pointer deref in list_lru_isolate, one time when
-> > > I tried out Sunday's git tree.  Not seen since, I haven't had time to
-> > > investigate, just set it aside as something to worry about if it happens
-> > > again.  But it looks like shadow_lru_isolate() has issues beyond Dave's
-> > > case (I've no XFS and no iscsi), suspect unrelated to his other problems.
-> > 
-> > This seems consistent with what Dave observed: we encounter regular
-> > pages in radix tree nodes on the shadow LRU that should only contain
-> > nodes full of exceptional shadow entries. It could be an issue in the
-> > new slot replacement code and the node tracking callback.
+Hello,
+
+On Thu, Dec 15, 2016 at 12:32:59PM -0800, Shaohua Li wrote:
+> throtl_slice is important for blk-throttling. It's called slice
+> internally but it really is a time window blk-throttling samples data.
+> blk-throttling will make decision based on the samplings. An example is
+> bandwidth measurement. A cgroup's bandwidth is measured in the time
+> interval of throtl_slice.
 > 
-> Both encounters seem to indicate use-after-free. Dave's node didn't
-> warn about an unexpected node->count / node->exceptional state, but
-> had entries that were inconsistent with that. Hugh got the counter
-> warning but crashed on a list_head that's not NULLed in a live node.
+> A small throtl_slice meanse cgroups have smoother throughput but burn
+> more CPUs. It has 100ms default value, which is not appropriate for all
+> disks. A fast SSD can dispatch a lot of IOs in 100ms. This patch makes
+> it tunable.
 > 
-> workingset_update_node() should be called on page cache radix tree
-> leaf nodes that go empty. I must be missing an update_node callback
-> where a leaf node gets freed somewhere.
+> Since throtl_slice isn't a time slice, the sysfs name
+> 'throttle_sample_time' reflects its character better.
 
-Sorry for dropping silent on this. I'm traveling over the holidays
-with sporadic access to my emails and no access to real equipment.
+Generally looks good.  I think some documentation would be great.
+Also, do we wannt set it to a lower number if blk_queue_nonrot()?
 
-The times I managed to sneak away to look at the code didn't turn up
-anything useful yet.
+Thanks.
 
-Andrea encountered the warning as well and I gave him a debugging
-patch (attached below), but he hasn't been able to reproduce this
-condition. I've personally never seen the warning trigger, even though
-the patches have been running on my main development machine for quite
-a while now. Albeit against an older base; I've updated to Linus's
-master branch now in case it's an interaction with other new code.
-
-If anybody manages to reproduce this, that would be helpful. Any extra
-eyes on this would be much appreciated too until I'm back at my desk.
-
-Thanks
-
-diff --git a/lib/radix-tree.c b/lib/radix-tree.c
-index 6f382e07de77..0783af1c0ebb 100644
---- a/lib/radix-tree.c
-+++ b/lib/radix-tree.c
-@@ -640,6 +640,8 @@ static inline void radix_tree_shrink(struct radix_tree_root *root,
- 				update_node(node, private);
- 		}
- 
-+		WARN_ON_ONCE(!list_empty(&node->private_list));
-+
- 		radix_tree_node_free(node);
- 	}
- }
-@@ -666,6 +668,8 @@ static void delete_node(struct radix_tree_root *root,
- 			root->rnode = NULL;
- 		}
- 
-+		WARN_ON_ONCE(!list_empty(&node->private_list));
-+
- 		radix_tree_node_free(node);
- 
- 		node = parent;
-@@ -767,6 +771,7 @@ static void radix_tree_free_nodes(struct radix_tree_node *node)
- 			struct radix_tree_node *old = child;
- 			offset = child->offset + 1;
- 			child = child->parent;
-+			WARN_ON_ONCE(!list_empty(&node->private_list));
- 			radix_tree_node_free(old);
- 			if (old == entry_to_node(node))
- 				return;
-
+-- 
+tejun
