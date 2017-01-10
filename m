@@ -1,150 +1,66 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@fb.com>
-Cc: Mike Snitzer <snitzer@redhat.com>, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org, dm-devel@redhat.com
-Subject: [PATCH 12/15] scsi: remove __scsi_alloc_queue
-Date: Tue, 10 Jan 2017 16:06:17 +0100
-Message-Id: <1484060780-15592-13-git-send-email-hch@lst.de>
-In-Reply-To: <1484060780-15592-1-git-send-email-hch@lst.de>
-References: <1484060780-15592-1-git-send-email-hch@lst.de>
-Sender: linux-scsi-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f41.google.com ([74.125.82.41]:38265 "EHLO
+        mail-wm0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1759923AbdAJJz0 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 10 Jan 2017 04:55:26 -0500
+Received: by mail-wm0-f41.google.com with SMTP id k184so153797239wme.1
+        for <linux-block@vger.kernel.org>; Tue, 10 Jan 2017 01:55:25 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <1483431417.2911.1.camel@sandisk.com>
+References: <771BC555-46A4-4AE1-BDD5-BFB4E3F065F0@linaro.org> <1483431417.2911.1.camel@sandisk.com>
+From: Ulf Hansson <ulf.hansson@linaro.org>
+Date: Tue, 10 Jan 2017 10:55:23 +0100
+Message-ID: <CAPDyKFqZrgspJcyaPiwqpsds2NogKMoLt2_5sWPRM6ydSo4oYg@mail.gmail.com>
+Subject: Re: [LSF/MM ATTEND AND AGENDA TOPIC] request to attend the summit
+To: Bart Van Assche <Bart.VanAssche@sandisk.com>
+Cc: "paolo.valente@linaro.org" <paolo.valente@linaro.org>,
+        "lsf-pc@lists.linux-foundation.org"
+        <lsf-pc@lists.linux-foundation.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linus.walleij@linaro.org" <linus.walleij@linaro.org>,
+        "broonie@linaro.org" <broonie@linaro.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Instead do an internal export of __scsi_init_queue for the transport
-classes that export BSG nodes.
+[...]
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/scsi/scsi_lib.c             | 19 ++++---------------
- drivers/scsi/scsi_transport_fc.c    |  6 ++++--
- drivers/scsi/scsi_transport_iscsi.c |  3 ++-
- include/scsi/scsi_host.h            |  2 --
- include/scsi/scsi_transport.h       |  2 ++
- 5 files changed, 12 insertions(+), 20 deletions(-)
+>
+> I agree that it would be useful to discuss blk-mq I/O scheduling during
+> LSF/MM. However, blk-mq I/O scheduling involves more than what has been
+> described above. The topics I would like to see being discussed are:
+> * How to add an I/O scheduling API to the blk-mq core. This is what Jens
+>   is working on (http://git.kernel.dk/cgit/linux-block/log/?h=blk-mq-sched).
+> * The BFQ for blk-mq patch series once this patch series has been posted.
+>   If the rules for this edition of LSF/MM are similar to those of previous
+>   editions then I expect that the LSF/MM program committee will want to
+>   see a BFQ for blk-mq implementation posted as patches on a Linux kernel
+>   mailing list before adding a session about BFQ for blk-mq to the LSF/MM
+>   agenda.
+> * Since BFQ has been designed for hard disks and since the approach in BFQ
+>   for handling deceptive idleness reduces bandwidth, what scheduling
+>   algorithm to use for storage media that do not have any moving parts
+>   (SSDs and MMC).
+> * How to port the MMC driver to blk-mq. See also Linus Walleij, "[PATCH
+>   v2] RFD: switch MMC/SD to use blk-mq multiqueueing"
+>   (https://www.spinics.net/lists/linux-block/msg07360.html).
 
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index e5ebb3a..898af1a 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -2082,7 +2082,7 @@ static u64 scsi_calculate_bounce_limit(struct Scsi_Host *shost)
- 	return bounce_limit;
- }
- 
--static void __scsi_init_queue(struct Scsi_Host *shost, struct request_queue *q)
-+void __scsi_init_queue(struct Scsi_Host *shost, struct request_queue *q)
- {
- 	struct device *dev = shost->dma_dev;
- 
-@@ -2117,28 +2117,17 @@ static void __scsi_init_queue(struct Scsi_Host *shost, struct request_queue *q)
- 	 */
- 	blk_queue_dma_alignment(q, 0x03);
- }
--
--struct request_queue *__scsi_alloc_queue(struct Scsi_Host *shost,
--					 request_fn_proc *request_fn)
--{
--	struct request_queue *q;
--
--	q = blk_init_queue(request_fn, NULL);
--	if (!q)
--		return NULL;
--	__scsi_init_queue(shost, q);
--	return q;
--}
--EXPORT_SYMBOL(__scsi_alloc_queue);
-+EXPORT_SYMBOL_GPL(__scsi_init_queue);
- 
- struct request_queue *scsi_alloc_queue(struct scsi_device *sdev)
- {
- 	struct request_queue *q;
- 
--	q = __scsi_alloc_queue(sdev->host, scsi_request_fn);
-+	q = blk_init_queue(scsi_request_fn, NULL);
- 	if (!q)
- 		return NULL;
- 
-+	__scsi_init_queue(sdev->host, q);
- 	blk_queue_prep_rq(q, scsi_prep_fn);
- 	blk_queue_unprep_rq(q, scsi_unprep_fn);
- 	blk_queue_softirq_done(q, scsi_softirq_done);
-diff --git a/drivers/scsi/scsi_transport_fc.c b/drivers/scsi/scsi_transport_fc.c
-index 03577bd..afcedec 100644
---- a/drivers/scsi/scsi_transport_fc.c
-+++ b/drivers/scsi/scsi_transport_fc.c
-@@ -3776,7 +3776,7 @@ fc_bsg_hostadd(struct Scsi_Host *shost, struct fc_host_attrs *fc_host)
- 	snprintf(bsg_name, sizeof(bsg_name),
- 		 "fc_host%d", shost->host_no);
- 
--	q = __scsi_alloc_queue(shost, bsg_request_fn);
-+	q = blk_init_queue(bsg_request_fn, NULL);
- 	if (!q) {
- 		dev_err(dev,
- 			"fc_host%d: bsg interface failed to initialize - no request queue\n",
-@@ -3784,6 +3784,7 @@ fc_bsg_hostadd(struct Scsi_Host *shost, struct fc_host_attrs *fc_host)
- 		return -ENOMEM;
- 	}
- 
-+	__scsi_init_queue(shost, q);
- 	err = bsg_setup_queue(dev, q, bsg_name, fc_bsg_dispatch,
- 				 i->f->dd_bsg_size);
- 	if (err) {
-@@ -3831,12 +3832,13 @@ fc_bsg_rportadd(struct Scsi_Host *shost, struct fc_rport *rport)
- 	if (!i->f->bsg_request)
- 		return -ENOTSUPP;
- 
--	q = __scsi_alloc_queue(shost, bsg_request_fn);
-+	q = blk_init_queue(bsg_request_fn, NULL);
- 	if (!q) {
- 		dev_err(dev, "bsg interface failed to initialize - no request queue\n");
- 		return -ENOMEM;
- 	}
- 
-+	__scsi_init_queue(shost, q);
- 	err = bsg_setup_queue(dev, q, NULL, fc_bsg_dispatch, i->f->dd_bsg_size);
- 	if (err) {
- 		dev_err(dev, "failed to setup bsg queue\n");
-diff --git a/drivers/scsi/scsi_transport_iscsi.c b/drivers/scsi/scsi_transport_iscsi.c
-index 42bca61..04ebe6e 100644
---- a/drivers/scsi/scsi_transport_iscsi.c
-+++ b/drivers/scsi/scsi_transport_iscsi.c
-@@ -1544,10 +1544,11 @@ iscsi_bsg_host_add(struct Scsi_Host *shost, struct iscsi_cls_host *ihost)
- 
- 	snprintf(bsg_name, sizeof(bsg_name), "iscsi_host%d", shost->host_no);
- 
--	q = __scsi_alloc_queue(shost, bsg_request_fn);
-+	q = blk_init_queue(bsg_request_fn, NULL);
- 	if (!q)
- 		return -ENOMEM;
- 
-+	__scsi_init_queue(shost, q);
- 	ret = bsg_setup_queue(dev, q, bsg_name, iscsi_bsg_host_dispatch, 0);
- 	if (ret) {
- 		shost_printk(KERN_ERR, shost, "bsg interface failed to "
-diff --git a/include/scsi/scsi_host.h b/include/scsi/scsi_host.h
-index 36680f1..f4964d7 100644
---- a/include/scsi/scsi_host.h
-+++ b/include/scsi/scsi_host.h
-@@ -826,8 +826,6 @@ extern void scsi_block_requests(struct Scsi_Host *);
- 
- struct class_container;
- 
--extern struct request_queue *__scsi_alloc_queue(struct Scsi_Host *shost,
--						void (*) (struct request_queue *));
- /*
-  * These two functions are used to allocate and free a pseudo device
-  * which will connect to the host adapter itself rather than any
-diff --git a/include/scsi/scsi_transport.h b/include/scsi/scsi_transport.h
-index 8129239..b6e07b5 100644
---- a/include/scsi/scsi_transport.h
-+++ b/include/scsi/scsi_transport.h
-@@ -119,4 +119,6 @@ scsi_transport_device_data(struct scsi_device *sdev)
- 		+ shost->transportt->device_private_offset;
- }
- 
-+void __scsi_init_queue(struct Scsi_Host *shost, struct request_queue *q);
-+
- #endif /* SCSI_TRANSPORT_H */
--- 
-2.1.4
+Hi Bart,
 
+As the MMC maintainer I am also interested in participating in all the
+above BFQ/MMC related discussions.
+
+Regarding the blk-mq port for MMC, I would also like to add a detail,
+which perhaps may influence the generic blkmq interface.
+
+The MMC block device driver implements a asynchronous request
+mechanism, which increases performance for architectures where DMA
+mapping operations are slow (cache flushes/bounce buffering when using
+non-coherent DMAs). Ideally I would like to remove this hack from the
+MMC subsystem, if it makes sense to extend blkmq to support this. And
+if not, perhaps we can discuss on the best method to implement it for
+MMC.
+
+Kind regards
+Uffe
