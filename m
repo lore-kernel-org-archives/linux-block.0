@@ -1,40 +1,39 @@
-Return-Path: <prvs=21847f6d31=jbacik@fb.com>
-From: Josef Bacik <jbacik@fb.com>
-To: <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
-        <nbd-general@lists.sourceforge.net>, <kernel-team@fb.com>
-Subject: [PATCH] MAINTAINERS: Update maintainer entry for NBD
-Date: Wed, 11 Jan 2017 15:41:40 -0500
-Message-ID: <1484167300-23220-1-git-send-email-jbacik@fb.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@fb.com>
+Cc: Mike Snitzer <snitzer@redhat.com>, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org, dm-devel@redhat.com
+Subject: [PATCH 02/15] nvme-rdma: fix nvme_rdma_queue_is_ready
+Date: Tue, 10 Jan 2017 16:06:07 +0100
+Message-Id: <1484060780-15592-3-git-send-email-hch@lst.de>
+In-Reply-To: <1484060780-15592-1-git-send-email-hch@lst.de>
+References: <1484060780-15592-1-git-send-email-hch@lst.de>
+Sender: linux-scsi-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-The old maintainers email is bouncing and I've rewritten most of this
-driver in the recent months.  Also add linux-block to the mailinglist
-and remove the old tree, I will send patches through the linux-block
-tree.  Thanks,
+Now that we don't abuse the cmd field in struct request for nvme command
+passthrough this function needs to be converted to the proper accessor
+as well.
 
-Signed-off-by: Josef Bacik <jbacik@fb.com>
+Fixes: d49187e97e ("nvme: introduce struct nvme_request")
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- MAINTAINERS | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/nvme/host/rdma.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 1174508..4c07e01 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -8539,10 +8539,10 @@ S:	Maintained
- F:	drivers/net/ethernet/netronome/
+diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
+index f587af3..34e5648 100644
+--- a/drivers/nvme/host/rdma.c
++++ b/drivers/nvme/host/rdma.c
+@@ -1422,7 +1422,7 @@ static inline bool nvme_rdma_queue_is_ready(struct nvme_rdma_queue *queue,
+ 		struct request *rq)
+ {
+ 	if (unlikely(!test_bit(NVME_RDMA_Q_LIVE, &queue->flags))) {
+-		struct nvme_command *cmd = (struct nvme_command *)rq->cmd;
++		struct nvme_command *cmd = nvme_req(rq)->cmd;
  
- NETWORK BLOCK DEVICE (NBD)
--M:	Markus Pargmann <mpa@pengutronix.de>
-+M:	Josef Bacik <jbacik@fb.com>
- S:	Maintained
-+L:	linux-block@vger.kernel.org
- L:	nbd-general@lists.sourceforge.net
--T:	git git://git.pengutronix.de/git/mpa/linux-nbd.git
- F:	Documentation/blockdev/nbd.txt
- F:	drivers/block/nbd.c
- F:	include/uapi/linux/nbd.h
+ 		if (rq->cmd_type != REQ_TYPE_DRV_PRIV ||
+ 		    cmd->common.opcode != nvme_fabrics_command ||
 -- 
-2.5.5
+2.1.4
+
