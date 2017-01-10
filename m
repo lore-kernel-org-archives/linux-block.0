@@ -1,300 +1,150 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:46916 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1752239AbdATV5U (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 Jan 2017 16:57:20 -0500
-From: Josef Bacik <jbacik@fb.com>
-To: <arnd@arndb.de>, <gregkh@linuxfoundation.org>, <axboe@fb.com>,
-        <nbd-general@lists.sourceforge.net>, <linux-block@vger.kernel.org>,
-        <kernel-team@fb.com>
-Subject: [PATCH 3/4] nbd: use an idr to keep track of nbd devices
-Date: Fri, 20 Jan 2017 16:56:51 -0500
-Message-ID: <1484949412-6903-3-git-send-email-jbacik@fb.com>
-In-Reply-To: <1484949412-6903-1-git-send-email-jbacik@fb.com>
-References: <1484949412-6903-1-git-send-email-jbacik@fb.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@fb.com>
+Cc: Mike Snitzer <snitzer@redhat.com>, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org, dm-devel@redhat.com
+Subject: [PATCH 12/15] scsi: remove __scsi_alloc_queue
+Date: Tue, 10 Jan 2017 16:06:17 +0100
+Message-Id: <1484060780-15592-13-git-send-email-hch@lst.de>
+In-Reply-To: <1484060780-15592-1-git-send-email-hch@lst.de>
+References: <1484060780-15592-1-git-send-email-hch@lst.de>
+Sender: linux-scsi-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-To prepare for dynamically adding new nbd devices to the system switch
-from using an array for the nbd devices and instead use an idr.  This
-copies what loop does for keeping track of its devices.
+Instead do an internal export of __scsi_init_queue for the transport
+classes that export BSG nodes.
 
-Signed-off-by: Josef Bacik <jbacik@fb.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/block/nbd.c | 213 ++++++++++++++++++++++++++++------------------------
- 1 file changed, 115 insertions(+), 98 deletions(-)
+ drivers/scsi/scsi_lib.c             | 19 ++++---------------
+ drivers/scsi/scsi_transport_fc.c    |  6 ++++--
+ drivers/scsi/scsi_transport_iscsi.c |  3 ++-
+ include/scsi/scsi_host.h            |  2 --
+ include/scsi/scsi_transport.h       |  2 ++
+ 5 files changed, 12 insertions(+), 20 deletions(-)
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 9fe9763..96f7681 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -41,6 +41,9 @@
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index e5ebb3a..898af1a 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -2082,7 +2082,7 @@ static u64 scsi_calculate_bounce_limit(struct Scsi_Host *shost)
+ 	return bounce_limit;
+ }
  
- #include <linux/nbd.h>
- 
-+static DEFINE_IDR(nbd_index_idr);
-+static DEFINE_MUTEX(nbd_index_mutex);
-+
- struct nbd_sock {
- 	struct socket *sock;
- 	struct mutex tx_lock;
-@@ -89,9 +92,9 @@ static struct dentry *nbd_dbg_dir;
- #define NBD_MAGIC 0x68797548
- 
- static unsigned int nbds_max = 16;
--static struct nbd_device *nbd_dev;
- static int max_part;
- static struct workqueue_struct *recv_workqueue;
-+static int part_shift;
- 
- static inline struct device *nbd_to_dev(struct nbd_device *nbd)
+-static void __scsi_init_queue(struct Scsi_Host *shost, struct request_queue *q)
++void __scsi_init_queue(struct Scsi_Host *shost, struct request_queue *q)
  {
-@@ -997,6 +1000,103 @@ static struct blk_mq_ops nbd_mq_ops = {
- 	.timeout	= nbd_xmit_timeout,
- };
+ 	struct device *dev = shost->dma_dev;
  
-+static void nbd_dev_remove(struct nbd_device *nbd)
-+{
-+	struct gendisk *disk = nbd->disk;
-+	nbd->magic = 0;
-+	if (disk) {
-+		del_gendisk(disk);
-+		blk_cleanup_queue(disk->queue);
-+		blk_mq_free_tag_set(&nbd->tag_set);
-+		put_disk(disk);
-+	}
-+	kfree(nbd);
-+}
-+
-+static int nbd_dev_add(int index)
-+{
-+	struct nbd_device *nbd;
-+	struct gendisk *disk;
-+	struct request_queue *q;
-+	int err = -ENOMEM;
-+
-+	nbd = kzalloc(sizeof(struct nbd_device), GFP_KERNEL);
-+	if (!nbd)
-+		goto out;
-+
-+	disk = alloc_disk(1 << part_shift);
-+	if (!disk)
-+		goto out_free_nbd;
-+
-+	if (index >= 0) {
-+		err = idr_alloc(&nbd_index_idr, nbd, index, index + 1,
-+				GFP_KERNEL);
-+		if (err == -ENOSPC)
-+			err = -EEXIST;
-+	} else {
-+		err = idr_alloc(&nbd_index_idr, nbd, 0, 0, GFP_KERNEL);
-+		if (err >= 0)
-+			index = err;
-+	}
-+	if (err < 0)
-+		goto out_free_disk;
-+
-+	nbd->disk = disk;
-+	nbd->tag_set.ops = &nbd_mq_ops;
-+	nbd->tag_set.nr_hw_queues = 1;
-+	nbd->tag_set.queue_depth = 128;
-+	nbd->tag_set.numa_node = NUMA_NO_NODE;
-+	nbd->tag_set.cmd_size = sizeof(struct nbd_cmd);
-+	nbd->tag_set.flags = BLK_MQ_F_SHOULD_MERGE |
-+		BLK_MQ_F_SG_MERGE | BLK_MQ_F_BLOCKING;
-+	nbd->tag_set.driver_data = nbd;
-+
-+	err = blk_mq_alloc_tag_set(&nbd->tag_set);
-+	if (err)
-+		goto out_free_idr;
-+
-+	q = blk_mq_init_queue(&nbd->tag_set);
-+	if (IS_ERR(q)) {
-+		err = PTR_ERR(q);
-+		goto out_free_tags;
-+	}
-+	disk->queue = q;
-+
-+	/*
-+	 * Tell the block layer that we are not a rotational device
-+	 */
-+	queue_flag_set_unlocked(QUEUE_FLAG_NONROT, disk->queue);
-+	queue_flag_clear_unlocked(QUEUE_FLAG_ADD_RANDOM, disk->queue);
-+	disk->queue->limits.discard_granularity = 512;
-+	blk_queue_max_discard_sectors(disk->queue, UINT_MAX);
-+	disk->queue->limits.discard_zeroes_data = 0;
-+	blk_queue_max_hw_sectors(disk->queue, 65536);
-+	disk->queue->limits.max_sectors = 256;
-+
-+	nbd->magic = NBD_MAGIC;
-+	mutex_init(&nbd->config_lock);
-+	disk->major = NBD_MAJOR;
-+	disk->first_minor = index << part_shift;
-+	disk->fops = &nbd_fops;
-+	disk->private_data = nbd;
-+	sprintf(disk->disk_name, "nbd%d", index);
-+	init_waitqueue_head(&nbd->recv_wq);
-+	nbd_reset(nbd);
-+	add_disk(disk);
-+	return index;
-+
-+out_free_tags:
-+	blk_mq_free_tag_set(&nbd->tag_set);
-+out_free_idr:
-+	idr_remove(&nbd_index_idr, index);
-+out_free_disk:
-+	put_disk(disk);
-+out_free_nbd:
-+	kfree(nbd);
-+out:
-+	return err;
-+}
-+
- /*
-  * And here should be modules and kernel interface 
-  *  (Just smiley confuses emacs :-)
-@@ -1004,9 +1104,7 @@ static struct blk_mq_ops nbd_mq_ops = {
+@@ -2117,28 +2117,17 @@ static void __scsi_init_queue(struct Scsi_Host *shost, struct request_queue *q)
+ 	 */
+ 	blk_queue_dma_alignment(q, 0x03);
+ }
+-
+-struct request_queue *__scsi_alloc_queue(struct Scsi_Host *shost,
+-					 request_fn_proc *request_fn)
+-{
+-	struct request_queue *q;
+-
+-	q = blk_init_queue(request_fn, NULL);
+-	if (!q)
+-		return NULL;
+-	__scsi_init_queue(shost, q);
+-	return q;
+-}
+-EXPORT_SYMBOL(__scsi_alloc_queue);
++EXPORT_SYMBOL_GPL(__scsi_init_queue);
  
- static int __init nbd_init(void)
+ struct request_queue *scsi_alloc_queue(struct scsi_device *sdev)
  {
--	int err = -ENOMEM;
- 	int i;
--	int part_shift;
+ 	struct request_queue *q;
  
- 	BUILD_BUG_ON(sizeof(struct nbd_request) != 28);
+-	q = __scsi_alloc_queue(sdev->host, scsi_request_fn);
++	q = blk_init_queue(scsi_request_fn, NULL);
+ 	if (!q)
+ 		return NULL;
  
-@@ -1040,114 +1138,33 @@ static int __init nbd_init(void)
- 	if (!recv_workqueue)
++	__scsi_init_queue(sdev->host, q);
+ 	blk_queue_prep_rq(q, scsi_prep_fn);
+ 	blk_queue_unprep_rq(q, scsi_unprep_fn);
+ 	blk_queue_softirq_done(q, scsi_softirq_done);
+diff --git a/drivers/scsi/scsi_transport_fc.c b/drivers/scsi/scsi_transport_fc.c
+index 03577bd..afcedec 100644
+--- a/drivers/scsi/scsi_transport_fc.c
++++ b/drivers/scsi/scsi_transport_fc.c
+@@ -3776,7 +3776,7 @@ fc_bsg_hostadd(struct Scsi_Host *shost, struct fc_host_attrs *fc_host)
+ 	snprintf(bsg_name, sizeof(bsg_name),
+ 		 "fc_host%d", shost->host_no);
+ 
+-	q = __scsi_alloc_queue(shost, bsg_request_fn);
++	q = blk_init_queue(bsg_request_fn, NULL);
+ 	if (!q) {
+ 		dev_err(dev,
+ 			"fc_host%d: bsg interface failed to initialize - no request queue\n",
+@@ -3784,6 +3784,7 @@ fc_bsg_hostadd(struct Scsi_Host *shost, struct fc_host_attrs *fc_host)
+ 		return -ENOMEM;
+ 	}
+ 
++	__scsi_init_queue(shost, q);
+ 	err = bsg_setup_queue(dev, q, bsg_name, fc_bsg_dispatch,
+ 				 i->f->dd_bsg_size);
+ 	if (err) {
+@@ -3831,12 +3832,13 @@ fc_bsg_rportadd(struct Scsi_Host *shost, struct fc_rport *rport)
+ 	if (!i->f->bsg_request)
+ 		return -ENOTSUPP;
+ 
+-	q = __scsi_alloc_queue(shost, bsg_request_fn);
++	q = blk_init_queue(bsg_request_fn, NULL);
+ 	if (!q) {
+ 		dev_err(dev, "bsg interface failed to initialize - no request queue\n");
+ 		return -ENOMEM;
+ 	}
+ 
++	__scsi_init_queue(shost, q);
+ 	err = bsg_setup_queue(dev, q, NULL, fc_bsg_dispatch, i->f->dd_bsg_size);
+ 	if (err) {
+ 		dev_err(dev, "failed to setup bsg queue\n");
+diff --git a/drivers/scsi/scsi_transport_iscsi.c b/drivers/scsi/scsi_transport_iscsi.c
+index 42bca61..04ebe6e 100644
+--- a/drivers/scsi/scsi_transport_iscsi.c
++++ b/drivers/scsi/scsi_transport_iscsi.c
+@@ -1544,10 +1544,11 @@ iscsi_bsg_host_add(struct Scsi_Host *shost, struct iscsi_cls_host *ihost)
+ 
+ 	snprintf(bsg_name, sizeof(bsg_name), "iscsi_host%d", shost->host_no);
+ 
+-	q = __scsi_alloc_queue(shost, bsg_request_fn);
++	q = blk_init_queue(bsg_request_fn, NULL);
+ 	if (!q)
  		return -ENOMEM;
  
--	nbd_dev = kcalloc(nbds_max, sizeof(*nbd_dev), GFP_KERNEL);
--	if (!nbd_dev) {
--		destroy_workqueue(recv_workqueue);
--		return -ENOMEM;
--	}
--
--	for (i = 0; i < nbds_max; i++) {
--		struct request_queue *q;
--		struct gendisk *disk = alloc_disk(1 << part_shift);
--		if (!disk)
--			goto out;
--		nbd_dev[i].disk = disk;
--
--		nbd_dev[i].tag_set.ops = &nbd_mq_ops;
--		nbd_dev[i].tag_set.nr_hw_queues = 1;
--		nbd_dev[i].tag_set.queue_depth = 128;
--		nbd_dev[i].tag_set.numa_node = NUMA_NO_NODE;
--		nbd_dev[i].tag_set.cmd_size = sizeof(struct nbd_cmd);
--		nbd_dev[i].tag_set.flags = BLK_MQ_F_SHOULD_MERGE |
--			BLK_MQ_F_SG_MERGE | BLK_MQ_F_BLOCKING;
--		nbd_dev[i].tag_set.driver_data = &nbd_dev[i];
--
--		err = blk_mq_alloc_tag_set(&nbd_dev[i].tag_set);
--		if (err) {
--			put_disk(disk);
--			goto out;
--		}
--
--		/*
--		 * The new linux 2.5 block layer implementation requires
--		 * every gendisk to have its very own request_queue struct.
--		 * These structs are big so we dynamically allocate them.
--		 */
--		q = blk_mq_init_queue(&nbd_dev[i].tag_set);
--		if (IS_ERR(q)) {
--			blk_mq_free_tag_set(&nbd_dev[i].tag_set);
--			put_disk(disk);
--			goto out;
--		}
--		disk->queue = q;
--
--		/*
--		 * Tell the block layer that we are not a rotational device
--		 */
--		queue_flag_set_unlocked(QUEUE_FLAG_NONROT, disk->queue);
--		queue_flag_clear_unlocked(QUEUE_FLAG_ADD_RANDOM, disk->queue);
--		disk->queue->limits.discard_granularity = 512;
--		blk_queue_max_discard_sectors(disk->queue, UINT_MAX);
--		disk->queue->limits.discard_zeroes_data = 0;
--		blk_queue_max_hw_sectors(disk->queue, 65536);
--		disk->queue->limits.max_sectors = 256;
--	}
--
--	if (register_blkdev(NBD_MAJOR, "nbd")) {
--		err = -EIO;
--		goto out;
--	}
--
--	printk(KERN_INFO "nbd: registered device at major %d\n", NBD_MAJOR);
-+	if (register_blkdev(NBD_MAJOR, "nbd"))
-+		return -EIO;
++	__scsi_init_queue(shost, q);
+ 	ret = bsg_setup_queue(dev, q, bsg_name, iscsi_bsg_host_dispatch, 0);
+ 	if (ret) {
+ 		shost_printk(KERN_ERR, shost, "bsg interface failed to "
+diff --git a/include/scsi/scsi_host.h b/include/scsi/scsi_host.h
+index 36680f1..f4964d7 100644
+--- a/include/scsi/scsi_host.h
++++ b/include/scsi/scsi_host.h
+@@ -826,8 +826,6 @@ extern void scsi_block_requests(struct Scsi_Host *);
  
- 	nbd_dbg_init();
+ struct class_container;
  
--	for (i = 0; i < nbds_max; i++) {
--		struct gendisk *disk = nbd_dev[i].disk;
--		nbd_dev[i].magic = NBD_MAGIC;
--		mutex_init(&nbd_dev[i].config_lock);
--		disk->major = NBD_MAJOR;
--		disk->first_minor = i << part_shift;
--		disk->fops = &nbd_fops;
--		disk->private_data = &nbd_dev[i];
--		sprintf(disk->disk_name, "nbd%d", i);
--		init_waitqueue_head(&nbd_dev[i].recv_wq);
--		nbd_reset(&nbd_dev[i]);
--		add_disk(disk);
--	}
-+	mutex_lock(&nbd_index_mutex);
-+	for (i = 0; i < nbds_max; i++)
-+		nbd_dev_add(i);
-+	mutex_unlock(&nbd_index_mutex);
-+	return 0;
-+}
- 
-+static int nbd_exit_cb(int id, void *ptr, void *data)
-+{
-+	struct nbd_device *nbd = ptr;
-+	nbd_dev_remove(nbd);
- 	return 0;
--out:
--	while (i--) {
--		blk_mq_free_tag_set(&nbd_dev[i].tag_set);
--		blk_cleanup_queue(nbd_dev[i].disk->queue);
--		put_disk(nbd_dev[i].disk);
--	}
--	kfree(nbd_dev);
--	destroy_workqueue(recv_workqueue);
--	return err;
+-extern struct request_queue *__scsi_alloc_queue(struct Scsi_Host *shost,
+-						void (*) (struct request_queue *));
+ /*
+  * These two functions are used to allocate and free a pseudo device
+  * which will connect to the host adapter itself rather than any
+diff --git a/include/scsi/scsi_transport.h b/include/scsi/scsi_transport.h
+index 8129239..b6e07b5 100644
+--- a/include/scsi/scsi_transport.h
++++ b/include/scsi/scsi_transport.h
+@@ -119,4 +119,6 @@ scsi_transport_device_data(struct scsi_device *sdev)
+ 		+ shost->transportt->device_private_offset;
  }
  
- static void __exit nbd_cleanup(void)
- {
--	int i;
--
- 	nbd_dbg_close();
- 
--	for (i = 0; i < nbds_max; i++) {
--		struct gendisk *disk = nbd_dev[i].disk;
--		nbd_dev[i].magic = 0;
--		if (disk) {
--			del_gendisk(disk);
--			blk_cleanup_queue(disk->queue);
--			blk_mq_free_tag_set(&nbd_dev[i].tag_set);
--			put_disk(disk);
--		}
--	}
-+	idr_for_each(&nbd_index_idr, &nbd_exit_cb, NULL);
-+	idr_destroy(&nbd_index_idr);
- 	destroy_workqueue(recv_workqueue);
- 	unregister_blkdev(NBD_MAJOR, "nbd");
--	kfree(nbd_dev);
--	printk(KERN_INFO "nbd: unregistered device at major %d\n", NBD_MAJOR);
- }
- 
- module_init(nbd_init);
++void __scsi_init_queue(struct Scsi_Host *shost, struct request_queue *q);
++
+ #endif /* SCSI_TRANSPORT_H */
 -- 
-2.7.4
+2.1.4
 
