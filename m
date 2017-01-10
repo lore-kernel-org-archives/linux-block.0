@@ -1,44 +1,50 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:40679 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753097AbdAKI0w (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Jan 2017 03:26:52 -0500
-Date: Wed, 11 Jan 2017 09:26:46 +0100
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@fb.com>, Mike Snitzer <snitzer@redhat.com>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        dm-devel@redhat.com
-Subject: Re: [PATCH 01/15] virtio_blk: avoid DMA to stack for the sense buffer
-Message-ID: <20170111082646.GA6286@linux-x5ow.site>
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@fb.com>
+Cc: Mike Snitzer <snitzer@redhat.com>, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org, dm-devel@redhat.com
+Subject: [PATCH 01/15] virtio_blk: avoid DMA to stack for the sense buffer
+Date: Tue, 10 Jan 2017 16:06:06 +0100
+Message-Id: <1484060780-15592-2-git-send-email-hch@lst.de>
+In-Reply-To: <1484060780-15592-1-git-send-email-hch@lst.de>
 References: <1484060780-15592-1-git-send-email-hch@lst.de>
- <1484060780-15592-2-git-send-email-hch@lst.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1484060780-15592-2-git-send-email-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Sender: linux-scsi-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Jan 10, 2017 at 04:06:06PM +0100, Christoph Hellwig wrote:
-> Most users of BLOCK_PC requests allocate the sense buffer on the stack,
-> so to avoid DMA to the stack copy them to a field in the heap allocated
-> virtblk_req structure.  Without that any attempt at SCSI passthrough I/O,
-> including the SG_IO ioctl from userspace will crash the kernel.  Note that
-> this includes running tools like hdparm even when the host does not have
-> SCSI passthrough enabled.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
+Most users of BLOCK_PC requests allocate the sense buffer on the stack,
+so to avoid DMA to the stack copy them to a field in the heap allocated
+virtblk_req structure.  Without that any attempt at SCSI passthrough I/O,
+including the SG_IO ioctl from userspace will crash the kernel.  Note that
+this includes running tools like hdparm even when the host does not have
+SCSI passthrough enabled.
 
-Isn't that one already queued in Jens' tree?
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/block/virtio_blk.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-Byte,
-	Johannes
-
+diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+index 5545a67..3c3b8f6 100644
+--- a/drivers/block/virtio_blk.c
++++ b/drivers/block/virtio_blk.c
+@@ -56,6 +56,7 @@ struct virtblk_req {
+ 	struct virtio_blk_outhdr out_hdr;
+ 	struct virtio_scsi_inhdr in_hdr;
+ 	u8 status;
++	u8 sense[SCSI_SENSE_BUFFERSIZE];
+ 	struct scatterlist sg[];
+ };
+ 
+@@ -102,7 +103,8 @@ static int __virtblk_add_req(struct virtqueue *vq,
+ 	}
+ 
+ 	if (type == cpu_to_virtio32(vq->vdev, VIRTIO_BLK_T_SCSI_CMD)) {
+-		sg_init_one(&sense, vbr->req->sense, SCSI_SENSE_BUFFERSIZE);
++		memcpy(vbr->sense, vbr->req->sense, SCSI_SENSE_BUFFERSIZE);
++		sg_init_one(&sense, vbr->sense, SCSI_SENSE_BUFFERSIZE);
+ 		sgs[num_out + num_in++] = &sense;
+ 		sg_init_one(&inhdr, &vbr->in_hdr, sizeof(vbr->in_hdr));
+ 		sgs[num_out + num_in++] = &inhdr;
 -- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: Felix Imend�rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N�rnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+2.1.4
+
