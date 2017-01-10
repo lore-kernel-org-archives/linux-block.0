@@ -1,67 +1,36 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:35965 "EHLO
-        mx0b-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1753067AbdAKVkN (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Jan 2017 16:40:13 -0500
-From: Jens Axboe <axboe@fb.com>
-To: <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>
-CC: <osandov@osandov.com>, <bart.vanassche@sandisk.com>
-Subject: [PATCHSET v6] blk-mq scheduling framework
-Date: Wed, 11 Jan 2017 14:39:53 -0700
-Message-ID: <1484170803-9311-1-git-send-email-axboe@fb.com>
+Received: from verein.lst.de ([213.95.11.211]:56093 "EHLO newverein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S932476AbdAJP5y (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 10 Jan 2017 10:57:54 -0500
+Date: Tue, 10 Jan 2017 16:57:51 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Jan Kara <jack@suse.cz>
+Cc: Dan Williams <dan.j.williams@intel.com>, axboe@fb.com,
+        Andi Kleen <ak@linux.intel.com>,
+        Rabin Vincent <rabinv@axis.com>, linux-kernel@vger.kernel.org,
+        stable@vger.kernel.org, linux-block@vger.kernel.org,
+        Jeff Moyer <jmoyer@redhat.com>, Wei Fang <fangwei1@huawei.com>,
+        Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH] block: fix blk_get_backing_dev_info() crash, use
+        bdev->bd_queue
+Message-ID: <20170110155751.GA28921@lst.de>
+References: <148366547505.38941.646379357860772670.stgit@dwillia2-desk3.amr.corp.intel.com> <20170106102330.GB3533@quack2.suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170106102330.GB3533@quack2.suse.cz>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Another year, another posting of this patchset. The previous posting
-was here:
+On Fri, Jan 06, 2017 at 11:23:30AM +0100, Jan Kara wrote:
+> So what I think needs to be done is that we make backing_dev_info
+> independently allocated structure with different lifetime rules to gendisk
+> or request_queue - definitely I want it to live as long as block device
+> inode exists. However it needs more thought what the exact lifetime rules
+> will be.
 
-https://www.spinics.net/lists/kernel/msg2406106.html
-
-(yes, I've skipped v5, it was fixes on top of v4, not the rework).
-
-I've reworked bits of this to get rid of the shadow requests, thanks
-to Bart for the inspiration. The missing piece, for me, was the fact
-that we have the tags->rqs[] indirection array already. I've done this
-somewhat differently, though, by having the internal scheduler tag
-map be allocated/torn down when an IO scheduler is attached or
-detached. This also means that when we run without a scheduler, we
-don't have to do double tag allocations, it'll work like before.
-
-The patchset applies on top of 4.10-rc3, or can be pulled here:
-
-git://git.kernel.dk/linux-block blk-mq-sched.6
-
-
- block/Kconfig.iosched    |   50 ++++
- block/Makefile           |    3 
- block/blk-core.c         |   19 -
- block/blk-exec.c         |    3 
- block/blk-flush.c        |   15 -
- block/blk-ioc.c          |   12 
- block/blk-merge.c        |    4 
- block/blk-mq-sched.c     |  354 +++++++++++++++++++++++++++++
- block/blk-mq-sched.h     |  157 ++++++++++++
- block/blk-mq-sysfs.c     |   13 +
- block/blk-mq-tag.c       |   58 ++--
- block/blk-mq-tag.h       |    4 
- block/blk-mq.c           |  413 +++++++++++++++++++---------------
- block/blk-mq.h           |   40 +++
- block/blk-tag.c          |    1 
- block/blk.h              |   26 +-
- block/cfq-iosched.c      |    2 
- block/deadline-iosched.c |    2 
- block/elevator.c         |  247 +++++++++++++++-----
- block/mq-deadline.c      |  569 +++++++++++++++++++++++++++++++++++++++++++++++
- block/noop-iosched.c     |    2 
- drivers/nvme/host/pci.c  |    1 
- include/linux/blk-mq.h   |    9 
- include/linux/blkdev.h   |    6 
- include/linux/elevator.h |   36 ++
- 25 files changed, 1732 insertions(+), 314 deletions(-)
-
--- 
-Jens Axboe
-
+Yes, moving the backing dev out (or keeping the request_queue memoery alive)
+is something we need to do.  And we need to look into the other half
+of the backing_dev life time isssues - we need to make sure the name
+and sysfs resources are released as soon as the devices goes away so that
+we aren't going to run into reuse races.
