@@ -1,77 +1,44 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f175.google.com ([209.85.192.175]:32977 "EHLO
-        mail-pf0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750796AbdAaXBG (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 31 Jan 2017 18:01:06 -0500
-Received: by mail-pf0-f175.google.com with SMTP id y143so112699878pfb.0
-        for <linux-block@vger.kernel.org>; Tue, 31 Jan 2017 15:01:05 -0800 (PST)
-From: Omar Sandoval <osandov@osandov.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: kernel-team@fb.com
-Subject: [PATCH 6/6] blktrace: use existing disk debugfs directory
-Date: Tue, 31 Jan 2017 14:53:22 -0800
-Message-Id: <d5352b86e54c7596cfb8c511868b54b724110d09.1485902856.git.osandov@fb.com>
-In-Reply-To: <cover.1485902856.git.osandov@fb.com>
-References: <cover.1485902856.git.osandov@fb.com>
-In-Reply-To: <cover.1485902856.git.osandov@fb.com>
-References: <cover.1485902856.git.osandov@fb.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] direct-io: don't introduce another read of
+ inode->i_blkbits
+To: Chandan Rajendra <chandan@linux.vnet.ibm.com>,
+ Jeff Moyer <jmoyer@redhat.com>
+References: <1483886830-23878-1-git-send-email-chandan@linux.vnet.ibm.com>
+ <x49r34bgba5.fsf@segfault.boston.devel.redhat.com>
+ <4971281.Bg9JD0zqnv@localhost.localdomain>
+Cc: jack@suse.cz, linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ linux-kernel@vger.kernel.org, anton@samba.org, linuxppc-dev@lists.ozlabs.org
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <eff698ef-2677-bb7c-1caf-2b99d95050e7@kernel.dk>
+Date: Tue, 10 Jan 2017 13:31:11 -0700
+MIME-Version: 1.0
+In-Reply-To: <4971281.Bg9JD0zqnv@localhost.localdomain>
+Content-Type: text/plain; charset=windows-1252
+List-ID: <linux-block@vger.kernel.org>
 
-From: Omar Sandoval <osandov@fb.com>
+On 01/09/2017 10:27 PM, Chandan Rajendra wrote:
+> On Monday, January 09, 2017 04:42:58 PM Jeff Moyer wrote:
+>> Commit 20ce44d545844 ("do_direct_IO: Use inode->i_blkbits to compute
+>> block count to be cleaned") introduced a regression: if the block size
+>> of the block device is changed while a direct I/O request is being
+>> setup, it can result in a panic.  See commit ab73857e354ab ("direct-io:
+>> don't read inode->i_blkbits multiple times") for the reasoning, and
+>> commit b87570f5d3496 ("Fix a crash when block device is read and block
+>> size is changed at the same time") for a more detailed problem
+>> description and reproducer.
+>>
+>> Fixes: 20ce44d545844
+>> Signed-off-by: Jeff Moyer <jmoyer@redhat.com>
+>>
+>> ---
+>> Chandan, can you please test this to ensure this still fixes your problem?
+> 
+> This patch fixes the failure,
+> 
+> Tested-by: Chandan Rajendra <chandan@linux.vnet.ibm.com>
+> 
 
-We may already have a directory to put the blktrace stuff in if
+I've updated the patch, thanks guys.
 
-1. The disk uses blk-mq
-2. CONFIG_BLK_DEBUG_FS is enabled
-3. We are tracing the whole disk and not a partition
-
-Instead of hardcoding this very specific case, let's use the new
-debugfs_lookup(). If the directory exists, we use it, otherwise we
-create one and clean it up later.
-
-Fixes: 07e4fead45e6 ("blk-mq: create debugfs directory tree")
-Signed-off-by: Omar Sandoval <osandov@fb.com>
----
- kernel/trace/blktrace.c | 13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
-
-diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-index 38052f625a0f..cc9d23692a35 100644
---- a/kernel/trace/blktrace.c
-+++ b/kernel/trace/blktrace.c
-@@ -470,12 +470,12 @@ static int do_blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
- 	if (!blk_debugfs_root)
- 		goto err;
- 
--	dir = debugfs_create_dir(buts->name, blk_debugfs_root);
--
-+	dir = debugfs_lookup(buts->name, blk_debugfs_root);
-+	if (!dir)
-+		bt->dir = dir = debugfs_create_dir(buts->name, blk_debugfs_root);
- 	if (!dir)
- 		goto err;
- 
--	bt->dir = dir;
- 	bt->dev = dev;
- 	atomic_set(&bt->dropped, 0);
- 	INIT_LIST_HEAD(&bt->running_list);
-@@ -517,9 +517,12 @@ static int do_blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
- 	if (atomic_inc_return(&blk_probes_ref) == 1)
- 		blk_register_tracepoints();
- 
--	return 0;
-+	ret = 0;
- err:
--	blk_trace_free(bt);
-+	if (dir && !bt->dir)
-+		dput(dir);
-+	if (ret)
-+		blk_trace_free(bt);
- 	return ret;
- }
- 
 -- 
-2.11.0
-
+Jens Axboe
