@@ -1,210 +1,137 @@
 Return-Path: <linux-scsi-owner@vger.kernel.org>
 From: Christoph Hellwig <hch@lst.de>
 To: Jens Axboe <axboe@fb.com>
-Cc: Mike Snitzer <snitzer@redhat.com>,
-        Junichi Nomura <j-nomura@ce.jp.nec.com>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-raid@vger.kernel.org, dm-devel@redhat.com
-Subject: [PATCH 16/18] block/bsg: move queue creation into bsg_setup_queue
-Date: Wed, 25 Jan 2017 18:25:24 +0100
-Message-Id: <1485365126-23210-17-git-send-email-hch@lst.de>
-In-Reply-To: <1485365126-23210-1-git-send-email-hch@lst.de>
-References: <1485365126-23210-1-git-send-email-hch@lst.de>
+Cc: Mike Snitzer <snitzer@redhat.com>, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org, dm-devel@redhat.com
+Subject: [PATCH 03/15] block: simplify blk_init_allocated_queue
+Date: Tue, 10 Jan 2017 16:06:08 +0100
+Message-Id: <1484060780-15592-4-git-send-email-hch@lst.de>
+In-Reply-To: <1484060780-15592-1-git-send-email-hch@lst.de>
+References: <1484060780-15592-1-git-send-email-hch@lst.de>
 Sender: linux-scsi-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Simply the boilerplate code needed for bsg nodes a bit.
+Return an errno value instead of the passed in queue so that the callers
+don't have to keep track of two queues, and move the assignment of the
+request_fn and lock to the caller as passing them as argument doesn't
+simplify anything.  While we're at it also remove two pointless NULL
+assignments, given that the request structure is zeroed on allocation.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
 ---
- block/bsg-lib.c                     | 21 +++++++++++----------
- drivers/scsi/scsi_transport_fc.c    | 36 ++++++++----------------------------
- drivers/scsi/scsi_transport_iscsi.c | 15 ++++-----------
- include/linux/bsg-lib.h             |  5 ++---
- 4 files changed, 25 insertions(+), 52 deletions(-)
+ block/blk-core.c       | 38 +++++++++++++++-----------------------
+ drivers/md/dm-rq.c     |  3 ++-
+ include/linux/blkdev.h |  3 +--
+ 3 files changed, 18 insertions(+), 26 deletions(-)
 
-diff --git a/block/bsg-lib.c b/block/bsg-lib.c
-index 9d652a9..c74acf4 100644
---- a/block/bsg-lib.c
-+++ b/block/bsg-lib.c
-@@ -177,7 +177,7 @@ static int bsg_create_job(struct device *dev, struct request *req)
-  *
-  * Drivers/subsys should pass this to the queue init function.
-  */
--void bsg_request_fn(struct request_queue *q)
-+static void bsg_request_fn(struct request_queue *q)
- 	__releases(q->queue_lock)
- 	__acquires(q->queue_lock)
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 61ba08c..761cee8 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -821,15 +821,19 @@ EXPORT_SYMBOL(blk_init_queue);
+ struct request_queue *
+ blk_init_queue_node(request_fn_proc *rfn, spinlock_t *lock, int node_id)
  {
-@@ -214,24 +214,24 @@ void bsg_request_fn(struct request_queue *q)
- 	put_device(dev);
- 	spin_lock_irq(q->queue_lock);
- }
--EXPORT_SYMBOL_GPL(bsg_request_fn);
- 
- /**
-  * bsg_setup_queue - Create and add the bsg hooks so we can receive requests
-  * @dev: device to attach bsg device to
-- * @q: request queue setup by caller
-  * @name: device to give bsg device
-  * @job_fn: bsg job handler
-  * @dd_job_size: size of LLD data needed for each job
-- *
-- * The caller should have setup the reuqest queue with bsg_request_fn
-- * as the request_fn.
-  */
--int bsg_setup_queue(struct device *dev, struct request_queue *q,
--		    char *name, bsg_job_fn *job_fn, int dd_job_size)
-+struct request_queue *bsg_setup_queue(struct device *dev, char *name,
-+		bsg_job_fn *job_fn, int dd_job_size)
- {
+-	struct request_queue *uninit_q, *q;
 +	struct request_queue *q;
- 	int ret;
  
-+	q = blk_init_queue(bsg_request_fn, NULL);
+-	uninit_q = blk_alloc_queue_node(GFP_KERNEL, node_id);
+-	if (!uninit_q)
++	q = blk_alloc_queue_node(GFP_KERNEL, node_id);
 +	if (!q)
-+		return ERR_PTR(-ENOMEM);
-+
- 	q->queuedata = dev;
- 	q->bsg_job_size = dd_job_size;
- 	q->bsg_job_fn = job_fn;
-@@ -243,9 +243,10 @@ int bsg_setup_queue(struct device *dev, struct request_queue *q,
- 	if (ret) {
- 		printk(KERN_ERR "%s: bsg interface failed to "
- 		       "initialize - register queue\n", dev->kobj.name);
--		return ret;
-+		blk_cleanup_queue(q);
-+		return ERR_PTR(ret);
- 	}
+ 		return NULL;
  
--	return 0;
-+	return q;
- }
- EXPORT_SYMBOL_GPL(bsg_setup_queue);
-diff --git a/drivers/scsi/scsi_transport_fc.c b/drivers/scsi/scsi_transport_fc.c
-index afcedec..13dcb9b 100644
---- a/drivers/scsi/scsi_transport_fc.c
-+++ b/drivers/scsi/scsi_transport_fc.c
-@@ -3765,7 +3765,6 @@ fc_bsg_hostadd(struct Scsi_Host *shost, struct fc_host_attrs *fc_host)
- 	struct device *dev = &shost->shost_gendev;
- 	struct fc_internal *i = to_fc_internal(shost->transportt);
- 	struct request_queue *q;
--	int err;
- 	char bsg_name[20];
- 
- 	fc_host->rqst_q = NULL;
-@@ -3776,24 +3775,14 @@ fc_bsg_hostadd(struct Scsi_Host *shost, struct fc_host_attrs *fc_host)
- 	snprintf(bsg_name, sizeof(bsg_name),
- 		 "fc_host%d", shost->host_no);
- 
--	q = blk_init_queue(bsg_request_fn, NULL);
--	if (!q) {
--		dev_err(dev,
--			"fc_host%d: bsg interface failed to initialize - no request queue\n",
--			shost->host_no);
--		return -ENOMEM;
--	}
--
--	__scsi_init_queue(shost, q);
--	err = bsg_setup_queue(dev, q, bsg_name, fc_bsg_dispatch,
--				 i->f->dd_bsg_size);
--	if (err) {
-+	q = bsg_setup_queue(dev, bsg_name, fc_bsg_dispatch, i->f->dd_bsg_size);
-+	if (IS_ERR(q)) {
- 		dev_err(dev,
- 			"fc_host%d: bsg interface failed to initialize - setup queue\n",
- 			shost->host_no);
--		blk_cleanup_queue(q);
--		return err;
-+		return PTR_ERR(q);
- 	}
-+	__scsi_init_queue(shost, q);
- 	blk_queue_rq_timed_out(q, fc_bsg_job_timeout);
- 	blk_queue_rq_timeout(q, FC_DEFAULT_BSG_TIMEOUT);
- 	fc_host->rqst_q = q;
-@@ -3825,27 +3814,18 @@ fc_bsg_rportadd(struct Scsi_Host *shost, struct fc_rport *rport)
- 	struct device *dev = &rport->dev;
- 	struct fc_internal *i = to_fc_internal(shost->transportt);
- 	struct request_queue *q;
--	int err;
- 
- 	rport->rqst_q = NULL;
- 
- 	if (!i->f->bsg_request)
- 		return -ENOTSUPP;
- 
--	q = blk_init_queue(bsg_request_fn, NULL);
--	if (!q) {
--		dev_err(dev, "bsg interface failed to initialize - no request queue\n");
--		return -ENOMEM;
--	}
--
--	__scsi_init_queue(shost, q);
--	err = bsg_setup_queue(dev, q, NULL, fc_bsg_dispatch, i->f->dd_bsg_size);
--	if (err) {
-+	q = bsg_setup_queue(dev, NULL, fc_bsg_dispatch, i->f->dd_bsg_size);
-+	if (IS_ERR(q)) {
- 		dev_err(dev, "failed to setup bsg queue\n");
--		blk_cleanup_queue(q);
--		return err;
-+		return PTR_ERR(q);
- 	}
--
-+	__scsi_init_queue(shost, q);
- 	blk_queue_prep_rq(q, fc_bsg_rport_prep);
- 	blk_queue_rq_timed_out(q, fc_bsg_job_timeout);
- 	blk_queue_rq_timeout(q, BLK_DEFAULT_SG_TIMEOUT);
-diff --git a/drivers/scsi/scsi_transport_iscsi.c b/drivers/scsi/scsi_transport_iscsi.c
-index 04ebe6e..568c9f2 100644
---- a/drivers/scsi/scsi_transport_iscsi.c
-+++ b/drivers/scsi/scsi_transport_iscsi.c
-@@ -1537,25 +1537,18 @@ iscsi_bsg_host_add(struct Scsi_Host *shost, struct iscsi_cls_host *ihost)
- 	struct iscsi_internal *i = to_iscsi_internal(shost->transportt);
- 	struct request_queue *q;
- 	char bsg_name[20];
--	int ret;
- 
- 	if (!i->iscsi_transport->bsg_request)
- 		return -ENOTSUPP;
- 
- 	snprintf(bsg_name, sizeof(bsg_name), "iscsi_host%d", shost->host_no);
--
--	q = blk_init_queue(bsg_request_fn, NULL);
+-	q = blk_init_allocated_queue(uninit_q, rfn, lock);
 -	if (!q)
--		return -ENOMEM;
+-		blk_cleanup_queue(uninit_q);
++	q->request_fn = rfn;
++	if (lock)
++		q->queue_lock = lock;
++	if (blk_init_allocated_queue(q) < 0) {
++		blk_cleanup_queue(q);
++		return NULL;
++	}
+ 
+ 	return q;
+ }
+@@ -837,30 +841,19 @@ EXPORT_SYMBOL(blk_init_queue_node);
+ 
+ static blk_qc_t blk_queue_bio(struct request_queue *q, struct bio *bio);
+ 
+-struct request_queue *
+-blk_init_allocated_queue(struct request_queue *q, request_fn_proc *rfn,
+-			 spinlock_t *lock)
+-{
+-	if (!q)
+-		return NULL;
+ 
++int blk_init_allocated_queue(struct request_queue *q)
++{
+ 	q->fq = blk_alloc_flush_queue(q, NUMA_NO_NODE, 0);
+ 	if (!q->fq)
+-		return NULL;
++		return -ENOMEM;
+ 
+ 	if (blk_init_rl(&q->root_rl, q, GFP_KERNEL))
+ 		goto fail;
+ 
+ 	INIT_WORK(&q->timeout_work, blk_timeout_work);
+-	q->request_fn		= rfn;
+-	q->prep_rq_fn		= NULL;
+-	q->unprep_rq_fn		= NULL;
+ 	q->queue_flags		|= QUEUE_FLAG_DEFAULT;
+ 
+-	/* Override internal queue lock with supplied lock pointer */
+-	if (lock)
+-		q->queue_lock		= lock;
 -
--	__scsi_init_queue(shost, q);
--	ret = bsg_setup_queue(dev, q, bsg_name, iscsi_bsg_host_dispatch, 0);
--	if (ret) {
-+	q = bsg_setup_queue(dev, bsg_name, iscsi_bsg_host_dispatch, 0);
-+	if (IS_ERR(q)) {
- 		shost_printk(KERN_ERR, shost, "bsg interface failed to "
- 			     "initialize - no request queue\n");
--		blk_cleanup_queue(q);
--		return ret;
-+		return PTR_ERR(q);
+ 	/*
+ 	 * This also sets hw/phys segments, boundary and size
+ 	 */
+@@ -878,13 +871,12 @@ blk_init_allocated_queue(struct request_queue *q, request_fn_proc *rfn,
  	}
-+	__scsi_init_queue(shost, q);
  
- 	ihost->bsg_q = q;
- 	return 0;
-diff --git a/include/linux/bsg-lib.h b/include/linux/bsg-lib.h
-index 657a718..e34dde2 100644
---- a/include/linux/bsg-lib.h
-+++ b/include/linux/bsg-lib.h
-@@ -66,9 +66,8 @@ struct bsg_job {
+ 	mutex_unlock(&q->sysfs_lock);
+-
+-	return q;
++	return 0;
  
- void bsg_job_done(struct bsg_job *job, int result,
- 		  unsigned int reply_payload_rcv_len);
--int bsg_setup_queue(struct device *dev, struct request_queue *q, char *name,
--		    bsg_job_fn *job_fn, int dd_job_size);
--void bsg_request_fn(struct request_queue *q);
-+struct request_queue *bsg_setup_queue(struct device *dev, char *name,
-+		bsg_job_fn *job_fn, int dd_job_size);
- void bsg_job_put(struct bsg_job *job);
- int __must_check bsg_job_get(struct bsg_job *job);
+ fail:
+ 	blk_free_flush_queue(q->fq);
+ 	wbt_exit(q);
+-	return NULL;
++	return -ENOMEM;
+ }
+ EXPORT_SYMBOL(blk_init_allocated_queue);
  
+diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
+index 9d7275f..93f6e9f 100644
+--- a/drivers/md/dm-rq.c
++++ b/drivers/md/dm-rq.c
+@@ -823,7 +823,8 @@ static void dm_old_request_fn(struct request_queue *q)
+ int dm_old_init_request_queue(struct mapped_device *md)
+ {
+ 	/* Fully initialize the queue */
+-	if (!blk_init_allocated_queue(md->queue, dm_old_request_fn, NULL))
++	md->queue->request_fn = dm_old_request_fn;
++	if (blk_init_allocated_queue(md->queue) < 0)
+ 		return -EINVAL;
+ 
+ 	/* disable dm_old_request_fn's merge heuristic by default */
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 8369564..9a6f3ab 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1116,8 +1116,7 @@ extern void blk_unprep_request(struct request *);
+ extern struct request_queue *blk_init_queue_node(request_fn_proc *rfn,
+ 					spinlock_t *lock, int node_id);
+ extern struct request_queue *blk_init_queue(request_fn_proc *, spinlock_t *);
+-extern struct request_queue *blk_init_allocated_queue(struct request_queue *,
+-						      request_fn_proc *, spinlock_t *);
++extern int blk_init_allocated_queue(struct request_queue *);
+ extern void blk_cleanup_queue(struct request_queue *);
+ extern void blk_queue_make_request(struct request_queue *, make_request_fn *);
+ extern void blk_queue_bounce_limit(struct request_queue *, u64);
 -- 
 2.1.4
 
