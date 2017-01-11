@@ -1,61 +1,62 @@
-Return-Path: <sbates@raithlin.com>
-Message-ID: <43b3038b57ed5c00a73ebc5457d048d5.squirrel@webmail.raithlin.com>
-In-Reply-To: <cc00cc1f-17d7-105e-ef2c-61791b7cc676@kernel.dk>
-References: <20170111134312.GH6286@linux-x5ow.site>
-    <cc00cc1f-17d7-105e-ef2c-61791b7cc676@kernel.dk>
-Date: Wed, 11 Jan 2017 22:36:51 -0600
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:42184 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752377AbdAKQpM (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 11 Jan 2017 11:45:12 -0500
 Subject: Re: [LSF/MM TOPIC][LSF/MM ATTEND] NAPI polling for block drivers
-From: "Stephen Bates" <sbates@raithlin.com>
-To: "Jens Axboe" <axboe@kernel.dk>
-Cc: "Johannes Thumshirn" <jthumshirn@suse.de>,
- "lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>,
- "Christoph Hellwig" <hch@infradead.org>,
- "Sagi Grimberg" <sagi@grimberg.me>,
- linux-scsi@vger.kernel.org,
- linux-nvme@lists.infradead.org,
- linux-block@vger.kernel.org,
- "Keith Busch" <keith.busch@intel.com>
+To: Bart Van Assche <Bart.VanAssche@sandisk.com>,
+        "hch@infradead.org" <hch@infradead.org>
+References: <20170111134312.GH6286@linux-x5ow.site>
+ <1484150893.2619.1.camel@sandisk.com> <20170111161238.GA18881@infradead.org>
+ <2aff05af-5e83-7d3d-f879-2cce02b6d88c@suse.de>
+ <1484151982.2619.6.camel@sandisk.com>
+Cc: "Linux-scsi@vger.kernel.org" <Linux-scsi@vger.kernel.org>,
+        "keith.busch@intel.com" <keith.busch@intel.com>,
+        "jthumshirn@suse.de" <jthumshirn@suse.de>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "lsf-pc@lists.linux-foundation.org"
+        <lsf-pc@lists.linux-foundation.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "sagi@grimberg.me" <sagi@grimberg.me>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <28c79600-3ed2-727d-7c5a-354c2684ace6@suse.de>
+Date: Wed, 11 Jan 2017 17:45:08 +0100
 MIME-Version: 1.0
-Content-Type: text/plain;charset=iso-8859-1
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <1484151982.2619.6.camel@sandisk.com>
+Content-Type: text/plain; charset=windows-1252
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
+On 01/11/2017 05:26 PM, Bart Van Assche wrote:
+> On Wed, 2017-01-11 at 17:22 +0100, Hannes Reinecke wrote:
+>> On 01/11/2017 05:12 PM, hch@infradead.org wrote:
+>>> On Wed, Jan 11, 2017 at 04:08:31PM +0000, Bart Van Assche wrote:
+>>>> A typical Ethernet network adapter delays the generation of an
+>>>> interrupt
+>>>> after it has received a packet. A typical block device or HBA does not
+>>>> delay
+>>>> the generation of an interrupt that reports an I/O completion.
+>>>
+>>> NVMe allows for configurable interrupt coalescing, as do a few modern
+>>> SCSI HBAs.
 >>
->> I'd like to attend LSF/MM and would like to discuss polling for block
->> drivers.
->>
->> Currently there is blk-iopoll but it is neither as widely used as NAPI
->> in the networking field and accoring to Sagi's findings in [1]
->> performance with polling is not on par with IRQ usage.
->>
->> On LSF/MM I'd like to whether it is desirable to have NAPI like polling
->> in more block drivers and how to overcome the currently seen performance
->> issues.
->
-> It would be an interesting topic to discuss, as it is a shame that
-> blk-iopoll isn't used more widely.
->
-> --
-> Jens Axboe
->
+>> Essentially every modern SCSI HBA does interrupt coalescing; otherwise
+>> the queuing interface won't work efficiently.
+> 
+> Hello Hannes,
+> 
+> The first e-mail in this e-mail thread referred to measurements against a
+> block device for which interrupt coalescing was not enabled. I think that
+> the measurements have to be repeated against a block device for which
+> interrupt coalescing is enabled.
+> 
+Guess what we'll be doing in the next few days ...
 
-I'd also be interested in this topic. Given that iopoll only really makes
-sense for low-latency, low queue depth environments (i.e. down below
-10-20us) I'd like to discuss which drivers we think will need/want to be
-upgraded (aside from NVMe ;-)).
+Cheers,
 
-I'd also be interested in discussing how best to enable and disable
-polling. In the past some of us have pushed for a "big hammer" to turn
-polling on for a given device or HW queue [1]. I'd like to discuss this
-again as well as looking at other methods above and beyond the preadv2
-system call and the HIPRI flag.
-
-Stephen
-
-[1] http://marc.info/?l=linux-block&m=146307410101827&w=2
-
-> _______________________________________________
-> Linux-nvme mailing list
-> Linux-nvme@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-nvme
->
->
+Hannes
+-- 
+Dr. Hannes Reinecke		      zSeries & Storage
+hare@suse.de			      +49 911 74053 688
+SUSE LINUX Products GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: J. Hawn, J. Guild, F. Imend�rffer, HRB 16746 (AG N�rnberg)
