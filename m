@@ -1,30 +1,30 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:46097 "EHLO mx2.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:37289 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1762890AbdAKJTt (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Jan 2017 04:19:49 -0500
-Date: Wed, 11 Jan 2017 10:19:45 +0100
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-Cc: "lsf-pc@lists.linux-foundation.org"
-        <lsf-pc@lists.linux-foundation.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        id S1750710AbdAKHmg (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 11 Jan 2017 02:42:36 -0500
+Subject: Re: [LFS/MM TOPIC][LFS/MM ATTEND]: - Storage Stack and Driver Testing
+ methodology.
+To: Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
+        "lsf-pc@lists.linux-foundation.org"
+        <lsf-pc@lists.linux-foundation.org>
+References: <CO2PR04MB218427BF42159B20FB26F74186670@CO2PR04MB2184.namprd04.prod.outlook.com>
+ <CO2PR04MB2184DB653C04FB620B41435486670@CO2PR04MB2184.namprd04.prod.outlook.com>
+Cc: "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
         "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
         "linux-ide@vger.kernel.org" <linux-ide@vger.kernel.org>
-Subject: Re: [LFS/MM TOPIC][LFS/MM ATTEND]: - Storage Stack and Driver
- Testing methodology.
-Message-ID: <20170111091945.GD6286@linux-x5ow.site>
-References: <CO2PR04MB218427BF42159B20FB26F74186670@CO2PR04MB2184.namprd04.prod.outlook.com>
- <CO2PR04MB2184DB653C04FB620B41435486670@CO2PR04MB2184.namprd04.prod.outlook.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <6aa8ee3e-a74b-41c7-e2f8-aba0f8f4236c@suse.de>
+Date: Wed, 11 Jan 2017 08:42:33 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
 In-Reply-To: <CO2PR04MB2184DB653C04FB620B41435486670@CO2PR04MB2184.namprd04.prod.outlook.com>
+Content-Type: text/plain; charset=windows-1252
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Tue, Jan 10, 2017 at 10:40:53PM +0000, Chaitanya Kulkarni wrote:
+On 01/10/2017 11:40 PM, Chaitanya Kulkarni wrote:
 > Resending it at as a plain text.
 > 
 > From: Chaitanya Kulkarni
@@ -32,7 +32,7 @@ On Tue, Jan 10, 2017 at 10:40:53PM +0000, Chaitanya Kulkarni wrote:
 > To: lsf-pc@lists.linux-foundation.org
 > Cc: linux-fsdevel@vger.kernel.org; linux-block@vger.kernel.org; linux-nvme@lists.infradead.org; linux-scsi@vger.kernel.org; linux-ide@vger.kernel.org
 > Subject: [LFS/MM TOPIC][LFS/MM ATTEND]: - Storage Stack and Driver Testing methodology.
-> � 
+>   
 > 
 > Hi Folks,
 > 
@@ -40,59 +40,66 @@ On Tue, Jan 10, 2017 at 10:40:53PM +0000, Chaitanya Kulkarni wrote:
 > 
 > Purpose:-
 > -------------
-> The main objective of this discussion is to address the need for�
+> The main objective of this discussion is to address the need for 
 > a Unified Test Automation Framework which can be used by different subsystems
 > in the kernel in order to improve the overall development and stability
 > of the storage stack.
 > 
-> For Example:-�
+> For Example:- 
 > From my previous experience, I've worked on the NVMe driver testing last year and we
 > have developed simple unit test framework
-> �(https://github.com/linux-nvme/nvme-cli/tree/master/tests).�
+>  (https://github.com/linux-nvme/nvme-cli/tree/master/tests). 
 > In current implementation Upstream NVMe Driver supports following subsystems:-
 > 1. PCI Host.
 > 2. RDMA Target.
 > 3. Fiber Channel Target (in progress).
-> Today due to lack of centralized automated test framework NVMe Driver testing is�
-> scattered and performed using the combination of various utilities like nvme-cli/tests,�
+> Today due to lack of centralized automated test framework NVMe Driver testing is 
+> scattered and performed using the combination of various utilities like nvme-cli/tests, 
 > nvmet-cli, shell scripts (git://git.infradead.org/nvme-fabrics.git nvmf-selftests) etc.
 > 
 > In order to improve overall driver stability with various subsystems, it will be beneficial
 > to have a Unified Test Automation Framework (UTAF) which will centralize overall
-> testing.�
+> testing. 
 > 
-> This topic will allow developers from various subsystem engage in the discussion about�
+> This topic will allow developers from various subsystem engage in the discussion about 
 > how to collaborate efficiently instead of having discussions on lengthy email threads.
 > 
 > Participants:-
 > ------------------
-> I'd like to invite developers from different subsystems to discuss an approach towards�
-> a unified testing methodology for storage stack and device drivers belongs to�
+> I'd like to invite developers from different subsystems to discuss an approach towards 
+> a unified testing methodology for storage stack and device drivers belongs to 
 > different subsystems.
 > 
 > Topics for Discussion:-
 > ------------------------------
 > As a part of discussion following are some of the key points which we can focus on:-
 > 1. What are the common components of the kernel used by the various subsystems?
-> 2. What are the potential target drivers which can benefit from this approach?�
-> � (e.g. NVMe, NVMe Over Fabric, Open Channel Solid State Drives etc.)
+> 2. What are the potential target drivers which can benefit from this approach? 
+>   (e.g. NVMe, NVMe Over Fabric, Open Channel Solid State Drives etc.)
 > 3. What are the desired features that can be implemented in this Framework?
-> � (code coverage, unit tests, stress testings, regression, generating Coccinelle reports etc.)�
+>   (code coverage, unit tests, stress testings, regression, generating Coccinelle reports etc.) 
 > 4. Desirable Report generation mechanism?
 > 5. Basic performance validation?
-> 6. Whether QEMU can be used to emulate some of the H/W functionality to create a test�
-> � platform? (Optional subsystem specific)
+> 6. Whether QEMU can be used to emulate some of the H/W functionality to create a test 
+>   platform? (Optional subsystem specific)
+> 
+> Some background about myself I'm Chaitanya Kulkarni, I worked as a team lead 
+> which was responsible for delivering scalable multiplatform Automated Test 
+> Framework for device drivers testing at HGST. It's been used for more than 1 year on 
+> Linux/Windows for unit testing/regression/performance validation of the NVMe Linux and
+> Windows driver successfully. I've also recently started contributing to the 
+> 
+> NVMe Host and NVMe over Fabrics Target driver.
+> 
+Oh, yes, please.
+That's a discussion I'd like to have, too.
 
-Well, something I was thinking about but didn't find enough time to actually
-implement is making a xfstestes like test suite written using sg3_utils for
-SCSI. This idea could very well be extented to NVMe, AHCI, blk, etc...
+Cheers,
 
-Byte,
-	Johannes
+Hannes
 -- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
 SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+GF: F. Imend�rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
 HRB 21284 (AG N�rnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
