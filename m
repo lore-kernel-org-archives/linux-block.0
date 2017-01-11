@@ -1,54 +1,61 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:35004 "EHLO mx1.redhat.com"
+Received: from mx2.suse.de ([195.135.220.15]:48046 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752192AbdAKWBX (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Jan 2017 17:01:23 -0500
-Date: Wed, 11 Jan 2017 17:01:22 -0500
-From: Mike Snitzer <snitzer@redhat.com>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>, Jens Axboe <axboe@fb.com>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        dm-devel@redhat.com
+        id S1751005AbdAKJhQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 11 Jan 2017 04:37:16 -0500
 Subject: Re: [PATCH 14/15] block/bsg: move queue creation into bsg_setup_queue
-Message-ID: <20170111220122.GA19051@redhat.com>
+To: Christoph Hellwig <hch@lst.de>
 References: <1484060780-15592-1-git-send-email-hch@lst.de>
  <1484060780-15592-15-git-send-email-hch@lst.de>
- <20170111084218.GB6286@linux-x5ow.site>
- <20170111084512.GA6937@lst.de>
+ <20170111084218.GB6286@linux-x5ow.site> <20170111084512.GA6937@lst.de>
+ <8810984d-9929-8937-e82c-94639fd0b8ea@suse.de> <20170111090112.GA7239@lst.de>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>, Jens Axboe <axboe@fb.com>,
+        Mike Snitzer <snitzer@redhat.com>, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org, dm-devel@redhat.com
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <69ad74c4-2741-058a-97fa-3aa2b69571f4@suse.de>
+Date: Wed, 11 Jan 2017 10:37:13 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170111084512.GA6937@lst.de>
+In-Reply-To: <20170111090112.GA7239@lst.de>
+Content-Type: text/plain; charset=windows-1252
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Wed, Jan 11 2017 at  3:45am -0500,
-Christoph Hellwig <hch@lst.de> wrote:
-
-> On Wed, Jan 11, 2017 at 09:42:44AM +0100, Johannes Thumshirn wrote:
-> > On Tue, Jan 10, 2017 at 04:06:19PM +0100, Christoph Hellwig wrote:
-> > > Simply the boilerplate code needed for bsg nodes a bit.
-> > > 
-> > > Signed-off-by: Christoph Hellwig <hch@lst.de>
-> > > ---
-> > 
-> > that reminds me of posting my SAS bsg-lib patch...
+On 01/11/2017 10:01 AM, Christoph Hellwig wrote:
+> On Wed, Jan 11, 2017 at 09:59:17AM +0100, Hannes Reinecke wrote:
+>> I'd advocate to discuss this at LSF.
+>> Now that Mike moved the bio-based mpath stuff back in things got even
+>> more complex.
 > 
-> Yes.  Having SAS use bsg-lib, and bsg-lib switched away from abusing
-> struct request_queue would make this series a lot cleaner.
+> Yeah.  If we'd _only_ have bio based support it would simplify things
+> a lot, but as a third parallel path it's not exactly making things easier.
 > 
-> So maybe we should get that into the scsi tree for 4.10 together
-> with the prep patches in this series as a priority and defer the actual
-> struct request changes once again.  That should also give us some more
-> time to sort out the dm-mpath story..
+>> I'll be posting a patchset for reimplementing multipath as a stand-alone
+>> driver shortly; that'll give us a good starting point on how we want
+>> multipath to evolve.
+>>
+>> Who knows; we might even manage to move multipath out of device-mapper
+>> altogether.
+>> That would make Mike very happy, and I wouldn't mind, either :-)
+> 
+> Heh.  I'm curious how you want to do that while keeping existing setups
+> working, though.
 
-I'm not aware of the story you're referring to.  I'm missing the actual
-challenge you're facing.
+which will become challenging, indeed.
 
-But I've seen you reference the need to stop multipath from allocating
-its own requests.  Are you referring to old request_fn request-based
-multipath's clone_old_rq:alloc_old_clone_request?
+ATM it's just a testbed on how things could work; we've got most of the
+required infrastucture in the kernel nowadays, so that we can just drop
+most of the complexity from the present multipath-tools mess.
 
-Or how blk-mq request-based multipath gets a request from the blk-mq tag
-space (via blk_mq_alloc_request)?
+In the end it might even boil down to update the existing device-mapper
+multipath implementation. We'll see.
 
-Or both?  How is that holding you back?
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: F. Imend�rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG N�rnberg)
