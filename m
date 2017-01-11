@@ -1,26 +1,44 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from verein.lst.de ([213.95.11.211]:34207 "EHLO newverein.lst.de"
+Received: from mx2.suse.de ([195.135.220.15]:40679 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1756243AbdAKInI (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Jan 2017 03:43:08 -0500
-Date: Wed, 11 Jan 2017 09:43:06 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@fb.com>,
-        Mike Snitzer <snitzer@redhat.com>, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org, dm-devel@redhat.com
-Subject: Re: [PATCH 01/15] virtio_blk: avoid DMA to stack for the sense
-        buffer
-Message-ID: <20170111084306.GA6913@lst.de>
-References: <1484060780-15592-1-git-send-email-hch@lst.de> <1484060780-15592-2-git-send-email-hch@lst.de> <20170111082646.GA6286@linux-x5ow.site>
+        id S1753097AbdAKI0w (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 11 Jan 2017 03:26:52 -0500
+Date: Wed, 11 Jan 2017 09:26:46 +0100
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@fb.com>, Mike Snitzer <snitzer@redhat.com>,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        dm-devel@redhat.com
+Subject: Re: [PATCH 01/15] virtio_blk: avoid DMA to stack for the sense buffer
+Message-ID: <20170111082646.GA6286@linux-x5ow.site>
+References: <1484060780-15592-1-git-send-email-hch@lst.de>
+ <1484060780-15592-2-git-send-email-hch@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170111082646.GA6286@linux-x5ow.site>
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <1484060780-15592-2-git-send-email-hch@lst.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Wed, Jan 11, 2017 at 09:26:46AM +0100, Johannes Thumshirn wrote:
-> Isn't that one already queued in Jens' tree?
+On Tue, Jan 10, 2017 at 04:06:06PM +0100, Christoph Hellwig wrote:
+> Most users of BLOCK_PC requests allocate the sense buffer on the stack,
+> so to avoid DMA to the stack copy them to a field in the heap allocated
+> virtblk_req structure.  Without that any attempt at SCSI passthrough I/O,
+> including the SG_IO ioctl from userspace will crash the kernel.  Note that
+> this includes running tools like hdparm even when the host does not have
+> SCSI passthrough enabled.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
 
-Yes, it's now queued up.  Patch 2 was submitted as well and should
-hopefully go into the next 4.10 RC.
+Isn't that one already queued in Jens' tree?
+
+Byte,
+	Johannes
+
+-- 
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
