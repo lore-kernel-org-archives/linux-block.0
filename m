@@ -1,126 +1,89 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:11161 "EHLO
-        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755099AbdALBdV (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Jan 2017 20:33:21 -0500
-Subject: [LSF/MM ATTEND] OCSSDs - SMR, Hierarchical Interface, and Vector I/Os
-To: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <m@bjorling.me>,
-        lsf-pc@lists.linux-foundation.org
+Received: from mx2.suse.de ([195.135.220.15]:37560 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1755892AbdAKHtO (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 11 Jan 2017 02:49:14 -0500
+Subject: Re: [LSF/MM TOPIC][LSF/MM ATTEND] OCSSDs - SMR, Hierarchical
+ Interface, and Vector I/Os
+To: Damien Le Moal <damien.lemoal@wdc.com>,
+        Matias Bjorling <m@bjorling.me>, Theodore Ts'o <tytso@mit.edu>
 References: <05204e9d-ed4d-f97a-88f0-41b5e008af43@bjorling.me>
-Cc: Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+ <1483398761.2440.4.camel@dubeyko.com>
+ <e42ff0c8-6568-d211-331f-7bfa6af94e2e@bjorling.me>
+ <1483464921.2440.19.camel@dubeyko.com>
+ <9319ce16-8355-3560-95b6-45e3f07220de@bjorling.me>
+ <SN2PR04MB219184580108939442EBDA7E88610@SN2PR04MB2191.namprd04.prod.outlook.com>
+ <a5acdf89-99c0-774d-cb08-76cb5d846f29@wdc.com>
+ <20170104165745.7uuwl6phm6g6kouu@thunk.org>
+ <1b457b77-34d8-ab82-ae1d-279e86053af9@wdc.com>
+ <20170110042442.ixxxi4yhj5gu7byh@thunk.org>
+ <ddeefd67-afb6-72a4-f59b-6fe623fbfbc3@bjorling.me>
+ <03f7ac72-c0a6-3101-7f07-e8322dcd32f5@wdc.com>
+Cc: Slava Dubeyko <Vyacheslav.Dubeyko@wdc.com>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        linux-nvme@lists.infradead.org
-From: Damien Le Moal <damien.lemoal@wdc.com>
-Message-ID: <e1c0b8e0-da91-563a-5913-a9a0db613ab3@wdc.com>
-Date: Thu, 12 Jan 2017 10:33:14 +0900
+        Viacheslav Dubeyko <slava@dubeyko.com>,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        "lsf-pc@lists.linux-foundation.org"
+        <lsf-pc@lists.linux-foundation.org>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <a545cf3e-26b1-9b35-5d5f-1f6180dabb1c@suse.de>
+Date: Wed, 11 Jan 2017 08:49:10 +0100
 MIME-Version: 1.0
-In-Reply-To: <05204e9d-ed4d-f97a-88f0-41b5e008af43@bjorling.me>
+In-Reply-To: <03f7ac72-c0a6-3101-7f07-e8322dcd32f5@wdc.com>
 Content-Type: text/plain; charset=windows-1252
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hello,
+On 01/11/2017 05:07 AM, Damien Le Moal wrote:
+> 
+> Matias,
+> 
+> On 1/10/17 22:06, Matias Bjorling wrote:
+>> On 01/10/2017 05:24 AM, Theodore Ts'o wrote:
+>>> This may be an area where if we can create the right framework, and
+>>> fund some research work, we might be able to get some researchers and
+>>> their graduate students interested in doing some work in figuring out
+>>> what sort of divisions of responsibilities and hints back and forth
+>>> between the storage device and host have the most benefit.
+>>>
+>>
+>> That is a good idea. There is a couple of papers at FAST with
+>> Open-Channel SSDs this year.  They look into the interface and various
+>> ways to reduce latency fluctuations.
+>>
+>> One thing I've heard a couple of times is the feature to move the GC
+>> read/write process into the firmware. Enabling the host to offload GC
+>> data movement, while the keeping the host in control. Would this be
+>> beneficial for SMR?
+> 
+> Host-aware SMR drives already have GC internally implemented (for cases
+> when the host does not write sequentially). Host-managed drives do not.
+> As for moving an application specific GC code into the device, well,
+> code injection in the storage device is not for tomorrow, and likely not
+> ever.
+> 
+> There are however other clever ways to reduce GC related host overhead
+> with basic commands. For SCSI, these may be WRITE SCATTERED, EXTENDED
+> COPY, and some others can greatly improve overhead over a simple
+> read+write loop. A better approach to GC offload may not be a "GC"
+> command, but something more generic for moving around LBAs internally
+> within the device. That is, if existing commands are not satisfactory.
+> 
+Logical head depop rears its head again...
 
-A long discussion on the list followed this initial topic proposal from
-Matias. I think this is a worthy topic to discuss at LSF in order to
-steer development of the zoned block device interface in the right
-direction. Considering the relation and implication to ZBC/ZAC support,
-I would like to attend LSF/MM to participate in this discussion.
+But yes, I think it's more sensible to have I/O functions which help GC
+(like UNMAP) instead of influencing the GC itself.
 
-Thank you.
+Anyway. Given the length of this thread I guess this is a worthy topic
+for LSF.
 
-Best regards.
+Cheers,
 
-On 1/3/17 06:06, Matias Bj�rling wrote:
-> Hi,
-> 
-> The open-channel SSD subsystem is maturing, and drives are beginning to 
-> become available on the market. The open-channel SSD interface is very 
-> similar to the one exposed by SMR hard-drives. They both have a set of 
-> chunks (zones) exposed, and zones are managed using open/close logic. 
-> The main difference on open-channel SSDs is that it additionally exposes 
-> multiple sets of zones through a hierarchical interface, which covers a 
-> numbers levels (X channels, Y LUNs per channel, Z zones per LUN).
-> 
-> Given that the SMR interface is similar to OCSSDs interface, I like to 
-> propose to discuss this at LSF/MM to align the efforts and make a clear 
-> path forward:
-> 
-> 1. SMR Compatibility
-> 
-> Can the SMR host interface be adapted to Open-Channel SSDs? For example, 
-> the interface may be exposed as a single-level set of zones, which 
-> ignore the channel and lun concept for simplicity. Another approach 
-> might be to extend the SMR implementation sysfs entries to expose the 
-> hierarchy of the device (channels with X LUNs and each luns have a set 
-> of zones).
-> 
-> 2. How to expose the tens of LUNs that OCSSDs have?
-> 
-> An open-channel SSDs typically has 64-256 LUNs that each acts as a 
-> parallel unit. How can these be efficiently exposed?
-> 
-> One may expose these as separate namespaces/partitions. For a DAS with 
-> 24 drives, that will be 1536-6144 separate LUNs to manage. That many 
-> LUNs will blow up the host with gendisk instances. While if we do, then 
-> we have an excellent 1:1 mapping between the SMR interface and the OCSSD 
-> interface.
-> 
-> On the other hand, one could expose the device LUNs within a single LBA 
-> address space and lay the LUNs out linearly. In that case, the block 
-> layer may expose a variable that enables applications to understand this 
-> hierarchy. Mainly the channels with LUNs. Any warm feelings towards this?
-> 
-> Currently, a shortcut is taken with the geometry and hierarchy, which 
-> expose it through the /lightnvm sysfs entries. These (or a type thereof) 
-> can be moved to the block layer /queue directory.
-> 
-> If keeping the LUNs exposed on the same gendisk, vector I/Os becomes a 
-> viable path:
-> 
-> 3. Vector I/Os
-> 
-> To derive parallelism from an open-channel SSD (and SSDs in parallel), 
-> one need to access them in parallel. Parallelism is achieved either by 
-> issuing I/Os for each LUN (similar to driving multiple SSDs today) or 
-> using a vector interface (encapsulating a list of LBAs, length, and data 
-> buffer) into the kernel. The latter approach allows I/Os to be 
-> vectorized and sent as a single unit to hardware.
-> 
-> Implementing this in generic block layer code might be overkill if only 
-> open-channel SSDs use it. I like to hear other use-cases (e.g., 
-> preadv/pwritev, file-systems, virtio?) that can take advantage of 
-> vectored I/Os. If it makes sense, then which level to implement: 
-> bio/request level, SGLs, or a new structure?
-> 
-> Device drivers that support vectored I/Os should be able to opt into the 
-> interface, while the block layer may automatically roll out for device 
-> drivers that don't have the support.
-> 
-> What has the history been in the Linux kernel about vector I/Os? What 
-> have reasons in the past been that such an interface was not adopted?
-> 
-> I will post RFC SMR patches before LSF/MM, such that we have a firm 
-> ground to discuss how it may be integrated.
-> 
-> -- Besides OCSSDs, I also like to participate in the discussions of 
-> XCOPY, NVMe, multipath, multi-queue interrupt management as well.
-> 
-> -Matias
-> 
-> _______________________________________________
-> Linux-nvme mailing list
-> Linux-nvme@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-nvme
-> 
-
+Hannes
 -- 
-Damien Le Moal, Ph.D.
-Sr. Manager, System Software Research Group,
-Western Digital Corporation
-Damien.LeMoal@wdc.com
-(+81) 0466-98-3593 (ext. 513593)
-1 kirihara-cho, Fujisawa,
-Kanagawa, 252-0888 Japan
-www.wdc.com, www.hgst.com
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: F. Imend�rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG N�rnberg)
