@@ -1,37 +1,72 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:44512 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750872AbdALKO3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Jan 2017 05:14:29 -0500
-Date: Thu, 12 Jan 2017 11:14:24 +0100
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Jens Axboe <axboe@fb.com>
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        osandov@osandov.com, bart.vanassche@sandisk.com
-Subject: Re: [PATCH 02/10] blk-mq: make mq_ops a const pointer
-Message-ID: <20170112101424.GE3598@linux-x5ow.site>
+Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:33460 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1752955AbdAKVkM (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 11 Jan 2017 16:40:12 -0500
+From: Jens Axboe <axboe@fb.com>
+To: <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>
+CC: <osandov@osandov.com>, <bart.vanassche@sandisk.com>,
+        Jens Axboe <axboe@fb.com>
+Subject: [PATCH 02/10] blk-mq: make mq_ops a const pointer
+Date: Wed, 11 Jan 2017 14:39:55 -0700
+Message-ID: <1484170803-9311-3-git-send-email-axboe@fb.com>
+In-Reply-To: <1484170803-9311-1-git-send-email-axboe@fb.com>
 References: <1484170803-9311-1-git-send-email-axboe@fb.com>
- <1484170803-9311-3-git-send-email-axboe@fb.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1484170803-9311-3-git-send-email-axboe@fb.com>
+Content-Type: text/plain
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Wed, Jan 11, 2017 at 02:39:55PM -0700, Jens Axboe wrote:
-> We never change it, make that clear.
-> 
-> Signed-off-by: Jens Axboe <axboe@fb.com>
-> Reviewed-by: Bart Van Assche <bart.vanassche@sandisk.com>
-> ---
+We never change it, make that clear.
 
-Looks good,
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Signed-off-by: Jens Axboe <axboe@fb.com>
+Reviewed-by: Bart Van Assche <bart.vanassche@sandisk.com>
+---
+ block/blk-mq.c         | 2 +-
+ include/linux/blk-mq.h | 2 +-
+ include/linux/blkdev.h | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
 
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index a8e67a155d04..79e1cb0f7b15 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -639,7 +639,7 @@ struct blk_mq_timeout_data {
+ 
+ void blk_mq_rq_timed_out(struct request *req, bool reserved)
+ {
+-	struct blk_mq_ops *ops = req->q->mq_ops;
++	const struct blk_mq_ops *ops = req->q->mq_ops;
+ 	enum blk_eh_timer_return ret = BLK_EH_RESET_TIMER;
+ 
+ 	/*
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 4a2ab5d99ff7..afc81d77e471 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -60,7 +60,7 @@ struct blk_mq_hw_ctx {
+ 
+ struct blk_mq_tag_set {
+ 	unsigned int		*mq_map;
+-	struct blk_mq_ops	*ops;
++	const struct blk_mq_ops	*ops;
+ 	unsigned int		nr_hw_queues;
+ 	unsigned int		queue_depth;	/* max hw supported */
+ 	unsigned int		reserved_tags;
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 83695641bd5e..e19fc8e01fb2 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -407,7 +407,7 @@ struct request_queue {
+ 	dma_drain_needed_fn	*dma_drain_needed;
+ 	lld_busy_fn		*lld_busy_fn;
+ 
+-	struct blk_mq_ops	*mq_ops;
++	const struct blk_mq_ops	*mq_ops;
+ 
+ 	unsigned int		*mq_map;
+ 
 -- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: Felix Imend�rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N�rnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+2.7.4
+
