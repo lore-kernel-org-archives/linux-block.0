@@ -1,12 +1,15 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:37560 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1755892AbdAKHtO (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Jan 2017 02:49:14 -0500
+Received: from mail-pg0-f67.google.com ([74.125.83.67]:36640 "EHLO
+        mail-pg0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755793AbdAKGGU (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 11 Jan 2017 01:06:20 -0500
+Received: by mail-pg0-f67.google.com with SMTP id 75so14536001pgf.3
+        for <linux-block@vger.kernel.org>; Tue, 10 Jan 2017 22:06:19 -0800 (PST)
 Subject: Re: [LSF/MM TOPIC][LSF/MM ATTEND] OCSSDs - SMR, Hierarchical
  Interface, and Vector I/Os
 To: Damien Le Moal <damien.lemoal@wdc.com>,
-        Matias Bjorling <m@bjorling.me>, Theodore Ts'o <tytso@mit.edu>
+        Theodore Ts'o <tytso@mit.edu>
 References: <05204e9d-ed4d-f97a-88f0-41b5e008af43@bjorling.me>
  <1483398761.2440.4.camel@dubeyko.com>
  <e42ff0c8-6568-d211-331f-7bfa6af94e2e@bjorling.me>
@@ -20,15 +23,15 @@ References: <05204e9d-ed4d-f97a-88f0-41b5e008af43@bjorling.me>
  <ddeefd67-afb6-72a4-f59b-6fe623fbfbc3@bjorling.me>
  <03f7ac72-c0a6-3101-7f07-e8322dcd32f5@wdc.com>
 Cc: Slava Dubeyko <Vyacheslav.Dubeyko@wdc.com>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         Viacheslav Dubeyko <slava@dubeyko.com>,
-        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
         "lsf-pc@lists.linux-foundation.org"
-        <lsf-pc@lists.linux-foundation.org>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <a545cf3e-26b1-9b35-5d5f-1f6180dabb1c@suse.de>
-Date: Wed, 11 Jan 2017 08:49:10 +0100
+        <lsf-pc@lists.linux-foundation.org>,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+From: Matias Bjorling <m@bjorling.me>
+Message-ID: <9f8b4f74-c48a-1b66-8870-a2610306345b@bjorling.me>
+Date: Wed, 11 Jan 2017 07:06:12 +0100
 MIME-Version: 1.0
 In-Reply-To: <03f7ac72-c0a6-3101-7f07-e8322dcd32f5@wdc.com>
 Content-Type: text/plain; charset=windows-1252
@@ -69,21 +72,15 @@ On 01/11/2017 05:07 AM, Damien Le Moal wrote:
 > read+write loop. A better approach to GC offload may not be a "GC"
 > command, but something more generic for moving around LBAs internally
 > within the device. That is, if existing commands are not satisfactory.
-> 
-Logical head depop rears its head again...
 
-But yes, I think it's more sensible to have I/O functions which help GC
-(like UNMAP) instead of influencing the GC itself.
+Hi Damien,
 
-Anyway. Given the length of this thread I guess this is a worthy topic
-for LSF.
+You're right. I was thinking of something similar to scattered
+read/write to move data from one place to another. There is no
+sector-granularity mapping table maintained by the OCSSD, which leaves
+the logic up to the host.
 
-Cheers,
+Let me know if you decide to kick of a standardized interface for code
+injection. Such an interface is long overdue. ;)
 
-Hannes
--- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: F. Imend�rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG N�rnberg)
+
