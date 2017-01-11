@@ -1,94 +1,60 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from merlin.infradead.org ([205.233.59.134]:43202 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750932AbdALLBs (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Jan 2017 06:01:48 -0500
-Subject: Re: [Lsf-pc] [LFS/MM TOPIC][LFS/MM ATTEND]: - Storage Stack and
- Driver Testing methodology.
-To: Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
-        "lsf-pc@lists.linux-foundation.org"
-        <lsf-pc@lists.linux-foundation.org>
+Return-Path: <linux-ide-owner@vger.kernel.org>
+Subject: Re: [LFS/MM TOPIC][LFS/MM ATTEND]: - Storage Stack and Driver Testing
+ methodology.
+To: Christoph Hellwig <hch@infradead.org>,
+        Johannes Thumshirn <jthumshirn@suse.de>
 References: <CO2PR04MB218427BF42159B20FB26F74186670@CO2PR04MB2184.namprd04.prod.outlook.com>
-Cc: "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ <CO2PR04MB2184DB653C04FB620B41435486670@CO2PR04MB2184.namprd04.prod.outlook.com>
+ <20170111091945.GD6286@linux-x5ow.site>
+ <20170111092447.GA13600@infradead.org>
+Cc: Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
         "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
         "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-ide@vger.kernel.org" <linux-ide@vger.kernel.org>
-From: Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <74f07f96-4741-1bbc-d570-1aea0a31b41e@grimberg.me>
-Date: Thu, 12 Jan 2017 13:01:35 +0200
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-ide@vger.kernel.org" <linux-ide@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "lsf-pc@lists.linux-foundation.org"
+        <lsf-pc@lists.linux-foundation.org>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <0ac6509a-738b-e1f4-871c-13fd62cf9cca@suse.de>
+Date: Wed, 11 Jan 2017 10:40:41 +0100
 MIME-Version: 1.0
-In-Reply-To: <CO2PR04MB218427BF42159B20FB26F74186670@CO2PR04MB2184.namprd04.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <20170111092447.GA13600@infradead.org>
+Content-Type: text/plain; charset=windows-1252
+Sender: linux-ide-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
+On 01/11/2017 10:24 AM, Christoph Hellwig wrote:
+> On Wed, Jan 11, 2017 at 10:19:45AM +0100, Johannes Thumshirn wrote:
+>> Well, something I was thinking about but didn't find enough time to actually
+>> implement is making a xfstestes like test suite written using sg3_utils for
+>> SCSI.
+> 
+> Ronnie's libiscsi testsuite can use SG_IO for a new years now:
+> 
+> https://github.com/sahlberg/libiscsi/tree/master/test-tool
+> 
+> and has been very useful to find bus in various protocol
+> implementations.
+> 
+>> This idea could very well be extented to NVMe
+> 
+> Chaitanya suite is doing something similar for NVMe, although the
+> coverage is still much more limited so far.
+> 
+One of the discussion points here indeed would be if we want to go in
+the direction of a protocol-specific testsuites (of which we already
+have several) or if it makes sense to move to functional testing.
 
-> Hi Folks,
->
-> I would like to propose a general discussion on Storage stack and device driver testing.
+And if we can have a common interface / documentation on how these
+things should run.
 
-I think its very useful and needed.
+Cheers,
 
-> Purpose:-
-> -------------
-> The main objective of this discussion is to address the need for
-> a Unified Test Automation Framework which can be used by different subsystems
-> in the kernel in order to improve the overall development and stability
-> of the storage stack.
->
-> For Example:-
-> From my previous experience, I've worked on the NVMe driver testing last year and we
-> have developed simple unit test framework
->  (https://github.com/linux-nvme/nvme-cli/tree/master/tests).
-> In current implementation Upstream NVMe Driver supports following subsystems:-
-> 1. PCI Host.
-> 2. RDMA Target.
-> 3. Fiber Channel Target (in progress).
-> Today due to lack of centralized automated test framework NVMe Driver testing is
-> scattered and performed using the combination of various utilities like nvme-cli/tests,
-> nvmet-cli, shell scripts (git://git.infradead.org/nvme-fabrics.git nvmf-selftests) etc.
->
-> In order to improve overall driver stability with various subsystems, it will be beneficial
-> to have a Unified Test Automation Framework (UTAF) which will centralize overall
-> testing.
->
-> This topic will allow developers from various subsystem engage in the discussion about
-> how to collaborate efficiently instead of having discussions on lengthy email threads.
-
-While a unified test framework for all sounds great, I suspect that the
-difference might be too large. So I think that for this framework to be
-maintainable, it needs to be carefully designed such that we don't have
-too much code churn.
-
-For example we should start by classifying tests and then see where
-sharing is feasible:
-
-1. basic management - I think not a lot can be shared
-2. spec compliance - again, not much sharing here
-3. data-verification - probably everything can be shared
-4. basic performance - probably a lot can be shared
-5. vectored-io - probably everything can be shared
-6. error handling - I can think of some sharing that can be used.
-
-This repository can also store some useful tracing scripts (ebpf and
-friends) that are useful for performance analysis.
-
-So I think that for this to happen, we can start with the shared
-test under block/, then migrate proto specific tests into
-scsi/, nvme/, and then add transport specific tests so
-we can have something like:
-
-├── block
-├── lib
-├── nvme
-│   ├── fabrics
-│   │   ├── loop
-│   │   └── rdma
-│   └── pci
-└── scsi
-     ├── fc
-     └── iscsi
-
-Thoughts?
+Hannes
+-- 
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: F. Imend�rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG N�rnberg)
