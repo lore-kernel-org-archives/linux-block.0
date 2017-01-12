@@ -1,78 +1,60 @@
-Return-Path: <jthumshirn@suse.de>
-Date: Thu, 12 Jan 2017 11:02:51 +0100
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Sagi Grimberg <sagi@grimberg.me>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	"lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>,
-	linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-	Keith Busch <keith.busch@intel.com>, linux-nvme@lists.infradead.org,
-	Linux-scsi@vger.kernel.org
-Subject: Re: [LSF/MM TOPIC][LSF/MM ATTEND] NAPI polling for block drivers
-Message-ID: <20170112100251.GB3598@linux-x5ow.site>
-References: <20170111134312.GH6286@linux-x5ow.site>
- <cc00cc1f-17d7-105e-ef2c-61791b7cc676@kernel.dk>
- <d60d4499-6ed8-0a69-edbf-db205a6dba6a@kernel.dk>
- <8b47ca34-d2ff-26dc-721e-2cb1e18f1efc@grimberg.me>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-lf0-f66.google.com ([209.85.215.66]:34297 "EHLO
+        mail-lf0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750864AbdALIw3 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 12 Jan 2017 03:52:29 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <8b47ca34-d2ff-26dc-721e-2cb1e18f1efc@grimberg.me>
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <1484151982.2619.6.camel@sandisk.com>
+References: <20170111134312.GH6286@linux-x5ow.site> <1484150893.2619.1.camel@sandisk.com>
+ <20170111161238.GA18881@infradead.org> <2aff05af-5e83-7d3d-f879-2cce02b6d88c@suse.de>
+ <1484151982.2619.6.camel@sandisk.com>
+From: sagi grimberg <sagi@grimberg.me>
+Date: Thu, 12 Jan 2017 10:52:25 +0200
+Message-ID: <CAB5WxwdZVdBUOGEsS045h3PQVtXBMfgH3a5vh_UmTBso9FPLcw@mail.gmail.com>
+Subject: Re: [LSF/MM TOPIC][LSF/MM ATTEND] NAPI polling for block drivers
+To: Bart Van Assche <Bart.VanAssche@sandisk.com>,
+        "hch@infradead.org" <hch@infradead.org>,
+        "hare@suse.de" <hare@suse.de>
+Cc: "Linux-scsi@vger.kernel.org" <Linux-scsi@vger.kernel.org>,
+        "keith.busch@intel.com" <keith.busch@intel.com>,
+        "jthumshirn@suse.de" <jthumshirn@suse.de>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "lsf-pc@lists.linux-foundation.org"
+        <lsf-pc@lists.linux-foundation.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Thu, Jan 12, 2017 at 10:23:47AM +0200, Sagi Grimberg wrote:
-> 
-> >>>Hi all,
-> >>>
-> >>>I'd like to attend LSF/MM and would like to discuss polling for block drivers.
-> >>>
-> >>>Currently there is blk-iopoll but it is neither as widely used as NAPI in the
-> >>>networking field and accoring to Sagi's findings in [1] performance with
-> >>>polling is not on par with IRQ usage.
-> >>>
-> >>>On LSF/MM I'd like to whether it is desirable to have NAPI like polling in
-> >>>more block drivers and how to overcome the currently seen performance issues.
-> >>
-> >>It would be an interesting topic to discuss, as it is a shame that blk-iopoll
-> >>isn't used more widely.
-> >
-> >Forgot to mention - it should only be a topic, if experimentation has
-> >been done and results gathered to pin point what the issues are, so we
-> >have something concrete to discus. I'm not at all interested in a hand
-> >wavy discussion on the topic.
-> >
-> 
-> Hey all,
-> 
-> Indeed I attempted to convert nvme to use irq-poll (let's use its
-> new name) but experienced some unexplained performance degradations.
-> 
-> Keith reported a 700ns degradation for QD=1 with his Xpoint devices,
-> this sort of degradation are acceptable I guess because we do schedule
-> a soft-irq before consuming the completion, but I noticed ~10% IOPs
-> degradation fr QD=32 which is not acceptable.
-> 
-> I agree with Jens that we'll need some analysis if we want the
-> discussion to be affective, and I can spend some time this if I
-> can find volunteers with high-end nvme devices (I only have access
-> to client nvme devices.
+>>>> A typical Ethernet network adapter delays the generation of an
+>>>> interrupt
+>>>> after it has received a packet. A typical block device or HBA does not
+>>>> delay
+>>>> the generation of an interrupt that reports an I/O completion.
+>>>
+>>> NVMe allows for configurable interrupt coalescing, as do a few modern
+>>> SCSI HBAs.
+>>
+>> Essentially every modern SCSI HBA does interrupt coalescing; otherwise
+>> the queuing interface won't work efficiently.
+>
+> Hello Hannes,
+>
+> The first e-mail in this e-mail thread referred to measurements against a
+> block device for which interrupt coalescing was not enabled. I think that
+> the measurements have to be repeated against a block device for which
+> interrupt coalescing is enabled.
 
-I have a P3700 but somehow burned the FW. Let me see if I can bring it back to
-live. 
+Hey Bart,
 
-I also have converted AHCI to the irq_poll interface and will run some tests.
-I do also have some hpsa devices on which I could run tests once the driver is
-adopted.
+I see how interrupt coalescing can help, but even without it, I think it
+should be better.
 
-But can we come to a common testing methology not to compare apples with
-oranges? Sagi do you still have the fio job file from your last tests laying
-somewhere and if yes could you share it?
+Moreover, I don't think that strict moderation is something that can
+work. The only way interrupt moderation can be effective, is if it's
+adaptive and adjusts itself to the workload. Note that this feature
+is on by default in most of the modern Ethernet devices (adaptive-rx).
 
-Byte,
-	Johannes
-
--- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: Felix Imend�rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N�rnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+IMHO, irq-poll vs. interrupt polling should be compared without relying
+on the underlying device capabilities.
