@@ -1,85 +1,55 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:57354 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1758175AbdAKVkO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Jan 2017 16:40:14 -0500
-From: Jens Axboe <axboe@fb.com>
-To: <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>
-CC: <osandov@osandov.com>, <bart.vanassche@sandisk.com>,
-        Jens Axboe <axboe@fb.com>
-Subject: [PATCH 03/10] block: move rq_ioc() to blk.h
-Date: Wed, 11 Jan 2017 14:39:56 -0700
-Message-ID: <1484170803-9311-4-git-send-email-axboe@fb.com>
-In-Reply-To: <1484170803-9311-1-git-send-email-axboe@fb.com>
-References: <1484170803-9311-1-git-send-email-axboe@fb.com>
+Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
+Message-ID: <7742bcaf65d9f4dc3c0dfede53a85b84.squirrel@webmail.raithlin.com>
+Date: Wed, 11 Jan 2017 23:09:13 -0600
+Subject: [LSF/MM TOPIC][LSF/MM ATTEND] IO completion polling for block drivers
+From: "Stephen Bates" <sbates@raithlin.com>
+To: "lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>,
+ "Christoph Hellwig" <hch@infradead.org>,
+ "Sagi Grimberg" <sagi@grimberg.me>, linux-scsi@vger.kernel.org,
+ linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
 MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
+List-Post: <mailto:linux-nvme@lists.infradead.org>
+List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
+Cc: linux-block@vger.kernel.org, Sagi Grimberg <sagi@grimberg.me>,
+ linux-scsi@vger.kernel.org, linux-nvme@lists.infradead.org,
+ Christoph Hellwig <hch@infradead.org>, Keith Busch <keith.busch@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
+Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
+List-ID: <linux-block@vger.kernel.org>
 
-We want to use it outside of blk-core.c.
+Hi
 
-Signed-off-by: Jens Axboe <axboe@fb.com>
----
- block/blk-core.c | 16 ----------------
- block/blk.h      | 16 ++++++++++++++++
- 2 files changed, 16 insertions(+), 16 deletions(-)
+I'd like to discuss the ongoing work in the kernel to enable high priority
+IO via polling for completion in the blk-mq subsystem.
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 61ba08c58b64..92baea07acbc 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1040,22 +1040,6 @@ static bool blk_rq_should_init_elevator(struct bio *bio)
- }
- 
- /**
-- * rq_ioc - determine io_context for request allocation
-- * @bio: request being allocated is for this bio (can be %NULL)
-- *
-- * Determine io_context to use for request allocation for @bio.  May return
-- * %NULL if %current->io_context doesn't exist.
-- */
--static struct io_context *rq_ioc(struct bio *bio)
--{
--#ifdef CONFIG_BLK_CGROUP
--	if (bio && bio->bi_ioc)
--		return bio->bi_ioc;
--#endif
--	return current->io_context;
--}
--
--/**
-  * __get_request - get a free request
-  * @rl: request list to allocate from
-  * @op: operation and flags
-diff --git a/block/blk.h b/block/blk.h
-index f46c0ac8ae3d..9a716b5925a4 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -264,6 +264,22 @@ void ioc_clear_queue(struct request_queue *q);
- int create_task_io_context(struct task_struct *task, gfp_t gfp_mask, int node);
- 
- /**
-+ * rq_ioc - determine io_context for request allocation
-+ * @bio: request being allocated is for this bio (can be %NULL)
-+ *
-+ * Determine io_context to use for request allocation for @bio.  May return
-+ * %NULL if %current->io_context doesn't exist.
-+ */
-+static inline struct io_context *rq_ioc(struct bio *bio)
-+{
-+#ifdef CONFIG_BLK_CGROUP
-+	if (bio && bio->bi_ioc)
-+		return bio->bi_ioc;
-+#endif
-+	return current->io_context;
-+}
-+
-+/**
-  * create_io_context - try to create task->io_context
-  * @gfp_mask: allocation mask
-  * @node: allocation node
--- 
-2.7.4
+Given that iopoll only really makes sense for low-latency, low queue depth
+environments (i.e. down below 10-20us) I'd like to discuss which drivers
+we think will need/want to be upgraded (aside from NVMe ;-)).
 
+I'd also be interested in discussing how best to enable and disable
+polling. In the past some of us have pushed for a "big hammer" to turn
+polling on for a given device or HW queue [1]. I'd like to discuss this
+again as well as looking at other methods above and beyond the preadv2
+system call and the HIPRI flag.
+
+Finally I'd like to discuss some of the recent work to improve the
+heuristics around when to poll and when not to poll. I'd like to see if we
+can come up with more optimal balance between CPU load and average
+completion times [2].
+
+Stephen Bates
+
+[1] http://marc.info/?l=linux-block&m=146307410101827&w=2
+[2] http://marc.info/?l=linux-block&m=147803441801858&w=2
+
+
+_______________________________________________
+Linux-nvme mailing list
+Linux-nvme@lists.infradead.org
+http://lists.infradead.org/mailman/listinfo/linux-nvme
