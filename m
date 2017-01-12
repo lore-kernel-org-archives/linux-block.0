@@ -1,25 +1,37 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.9]:38154 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751167AbdAMIRK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Jan 2017 03:17:10 -0500
-Date: Fri, 13 Jan 2017 00:16:35 -0800
-From: Christoph Hellwig <hch@infradead.org>
+Received: from mx2.suse.de ([195.135.220.15]:44512 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750872AbdALKO3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 12 Jan 2017 05:14:29 -0500
+Date: Thu, 12 Jan 2017 11:14:24 +0100
+From: Johannes Thumshirn <jthumshirn@suse.de>
 To: Jens Axboe <axboe@fb.com>
 Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
         osandov@osandov.com, bart.vanassche@sandisk.com
 Subject: Re: [PATCH 02/10] blk-mq: make mq_ops a const pointer
-Message-ID: <20170113081635.GA637@infradead.org>
+Message-ID: <20170112101424.GE3598@linux-x5ow.site>
 References: <1484170803-9311-1-git-send-email-axboe@fb.com>
  <1484170803-9311-3-git-send-email-axboe@fb.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 In-Reply-To: <1484170803-9311-3-git-send-email-axboe@fb.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Looks fine, even totally independent of any sched work, like most
-of the cleanups following this one
+On Wed, Jan 11, 2017 at 02:39:55PM -0700, Jens Axboe wrote:
+> We never change it, make that clear.
+> 
+> Signed-off-by: Jens Axboe <axboe@fb.com>
+> Reviewed-by: Bart Van Assche <bart.vanassche@sandisk.com>
+> ---
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Looks good,
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+
+-- 
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
