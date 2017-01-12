@@ -1,100 +1,94 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv6 05/37] thp: try to free page's buffers before attempt split
-Date: Thu, 26 Jan 2017 14:57:47 +0300
-Message-Id: <20170126115819.58875-6-kirill.shutemov@linux.intel.com>
-In-Reply-To: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
-References: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from merlin.infradead.org ([205.233.59.134]:43202 "EHLO
+        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750932AbdALLBs (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 12 Jan 2017 06:01:48 -0500
+Subject: Re: [Lsf-pc] [LFS/MM TOPIC][LFS/MM ATTEND]: - Storage Stack and
+ Driver Testing methodology.
+To: Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
+        "lsf-pc@lists.linux-foundation.org"
+        <lsf-pc@lists.linux-foundation.org>
+References: <CO2PR04MB218427BF42159B20FB26F74186670@CO2PR04MB2184.namprd04.prod.outlook.com>
+Cc: "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-ide@vger.kernel.org" <linux-ide@vger.kernel.org>
+From: Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <74f07f96-4741-1bbc-d570-1aea0a31b41e@grimberg.me>
+Date: Thu, 12 Jan 2017 13:01:35 +0200
+MIME-Version: 1.0
+In-Reply-To: <CO2PR04MB218427BF42159B20FB26F74186670@CO2PR04MB2184.namprd04.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-We want page to be isolated from the rest of the system before splitting
-it. We rely on page count to be 2 for file pages to make sure nobody
-uses the page: one pin to caller, one to radix-tree.
 
-Filesystems with backing storage can have page count increased if it has
-buffers.
+> Hi Folks,
+>
+> I would like to propose a general discussion on Storage stack and device driver testing.
 
-Let's try to free them, before attempt split. And remove one guarding
-VM_BUG_ON_PAGE().
+I think its very useful and needed.
 
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
----
- include/linux/buffer_head.h |  1 +
- mm/huge_memory.c            | 19 ++++++++++++++++++-
- 2 files changed, 19 insertions(+), 1 deletion(-)
+> Purpose:-
+> -------------
+> The main objective of this discussion is to address the need for
+> a Unified Test Automation Framework which can be used by different subsystems
+> in the kernel in order to improve the overall development and stability
+> of the storage stack.
+>
+> For Example:-
+> From my previous experience, I've worked on the NVMe driver testing last year and we
+> have developed simple unit test framework
+>  (https://github.com/linux-nvme/nvme-cli/tree/master/tests).
+> In current implementation Upstream NVMe Driver supports following subsystems:-
+> 1. PCI Host.
+> 2. RDMA Target.
+> 3. Fiber Channel Target (in progress).
+> Today due to lack of centralized automated test framework NVMe Driver testing is
+> scattered and performed using the combination of various utilities like nvme-cli/tests,
+> nvmet-cli, shell scripts (git://git.infradead.org/nvme-fabrics.git nvmf-selftests) etc.
+>
+> In order to improve overall driver stability with various subsystems, it will be beneficial
+> to have a Unified Test Automation Framework (UTAF) which will centralize overall
+> testing.
+>
+> This topic will allow developers from various subsystem engage in the discussion about
+> how to collaborate efficiently instead of having discussions on lengthy email threads.
 
-diff --git a/include/linux/buffer_head.h b/include/linux/buffer_head.h
-index d67ab83823ad..fd4134ce9c54 100644
---- a/include/linux/buffer_head.h
-+++ b/include/linux/buffer_head.h
-@@ -400,6 +400,7 @@ extern int __set_page_dirty_buffers(struct page *page);
- #else /* CONFIG_BLOCK */
- 
- static inline void buffer_init(void) {}
-+static inline int page_has_buffers(struct page *page) { return 0; }
- static inline int try_to_free_buffers(struct page *page) { return 1; }
- static inline int inode_has_buffers(struct inode *inode) { return 0; }
- static inline void invalidate_inode_buffers(struct inode *inode) {}
-diff --git a/mm/huge_memory.c b/mm/huge_memory.c
-index 89819fe4debc..55aee62e8444 100644
---- a/mm/huge_memory.c
-+++ b/mm/huge_memory.c
-@@ -30,6 +30,7 @@
- #include <linux/userfaultfd_k.h>
- #include <linux/page_idle.h>
- #include <linux/shmem_fs.h>
-+#include <linux/buffer_head.h>
- 
- #include <asm/tlb.h>
- #include <asm/pgalloc.h>
-@@ -2117,7 +2118,6 @@ int split_huge_page_to_list(struct page *page, struct list_head *list)
- 
- 	VM_BUG_ON_PAGE(is_huge_zero_page(page), page);
- 	VM_BUG_ON_PAGE(!PageLocked(page), page);
--	VM_BUG_ON_PAGE(!PageSwapBacked(page), page);
- 	VM_BUG_ON_PAGE(!PageCompound(page), page);
- 
- 	if (PageAnon(head)) {
-@@ -2146,6 +2146,23 @@ int split_huge_page_to_list(struct page *page, struct list_head *list)
- 			goto out;
- 		}
- 
-+		/* Try to free buffers before attempt split */
-+		if (!PageSwapBacked(head) && PagePrivate(page)) {
-+			/*
-+			 * We cannot trigger writeback from here due possible
-+			 * recursion if triggered from vmscan, only wait.
-+			 *
-+			 * Caller can trigger writeback it on its own, if safe.
-+			 */
-+			wait_on_page_writeback(head);
-+
-+			if (page_has_buffers(head) && !try_to_release_page(head,
-+						GFP_KERNEL)) {
-+				ret = -EBUSY;
-+				goto out;
-+			}
-+		}
-+
- 		/* Addidional pin from radix tree */
- 		extra_pins = 1;
- 		anon_vma = NULL;
--- 
-2.11.0
+While a unified test framework for all sounds great, I suspect that the
+difference might be too large. So I think that for this framework to be
+maintainable, it needs to be carefully designed such that we don't have
+too much code churn.
 
+For example we should start by classifying tests and then see where
+sharing is feasible:
+
+1. basic management - I think not a lot can be shared
+2. spec compliance - again, not much sharing here
+3. data-verification - probably everything can be shared
+4. basic performance - probably a lot can be shared
+5. vectored-io - probably everything can be shared
+6. error handling - I can think of some sharing that can be used.
+
+This repository can also store some useful tracing scripts (ebpf and
+friends) that are useful for performance analysis.
+
+So I think that for this to happen, we can start with the shared
+test under block/, then migrate proto specific tests into
+scsi/, nvme/, and then add transport specific tests so
+we can have something like:
+
+├── block
+├── lib
+├── nvme
+│   ├── fabrics
+│   │   ├── loop
+│   │   └── rdma
+│   └── pci
+└── scsi
+     ├── fc
+     └── iscsi
+
+Thoughts?
