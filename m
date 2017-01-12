@@ -1,81 +1,45 @@
-Return-Path: <alden.tondettar@gmail.com>
-Return-Path: <alden.tondettar@gmail.com>
-From: Alden Tondettar <alden.tondettar@gmail.com>
-To: Davidlohr Bueso <dave@stgolabs.net>,
-	Jens Axboe <axboe@kernel.dk>,
-	linux-efi@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Alden Tondettar <alden.tondettar@gmail.com>
-Subject: [PATCH] partitions/efi: Fix integer overflow in GPT size calculation
-Date: Sun, 15 Jan 2017 15:31:56 -0700
-Message-Id: <1484519516-18295-1-git-send-email-alden.tondettar@gmail.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bedivere.hansenpartnership.com ([66.63.167.143]:58524 "EHLO
+        bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1751959AbdALCiU (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 11 Jan 2017 21:38:20 -0500
+Message-ID: <1484188698.2509.39.camel@HansenPartnership.com>
+Subject: Re: [Lsf-pc] [LSF/MM ATTEND] OCSSDs - SMR, Hierarchical Interface,
+ and Vector I/Os
+From: James Bottomley <James.Bottomley@HansenPartnership.com>
+To: Damien Le Moal <damien.lemoal@wdc.com>,
+        Matias =?ISO-8859-1?Q?Bj=F8rling?= <m@bjorling.me>,
+        lsf-pc@lists.linux-foundation.org
+Cc: Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        linux-nvme@lists.infradead.org
+Date: Wed, 11 Jan 2017 18:38:18 -0800
+In-Reply-To: <89ffd371-9b6c-f54c-7ad4-21708349b209@wdc.com>
+References: <05204e9d-ed4d-f97a-88f0-41b5e008af43@bjorling.me>
+         <e1c0b8e0-da91-563a-5913-a9a0db613ab3@wdc.com>
+         <1484187520.2509.37.camel@HansenPartnership.com>
+         <89ffd371-9b6c-f54c-7ad4-21708349b209@wdc.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-If a GUID Partition Table claims to have more than 2**25 entries, the
-calculation of the partition table size in alloc_read_gpt_entries() will
-overflow a 32-bit integer and not enough space will be allocated for the
-table.
+On Thu, 2017-01-12 at 11:35 +0900, Damien Le Moal wrote:
+> > Just a note for the poor admin looking after the lists: to find all 
+> > the ATTEND and TOPIC requests for the lists I fold up the threads 
+> > to the top.  If you frame your attend request as a reply, it's 
+> > possible it won't get counted because I didn't find it
+> > 
+> > so please *start a new thread* for ATTEND and TOPIC requests.
+> 
+> My apologies for the overhead. I will resend.
+> Thank you.
 
-Nothing seems to get written out of bounds, but later efi_partition() will
-read up to 32768 bytes from a 128 byte buffer, possibly OOPSing or exposing
-information to /proc/partitions and uevents.
+You don't need to resend ... I've got you on the list.  I replied
+publicly just in case there were any other people who did this that I
+didn't notice.
 
-The problem exists on both 64-bit and 32-bit platforms.
+James
 
-Fix the overflow and also print a meaningful debug message if the table
-size is too large.
 
-Signed-off-by: Alden Tondettar <alden.tondettar@gmail.com>
----
- block/partitions/efi.c | 17 ++++++++++++-----
- 1 file changed, 12 insertions(+), 5 deletions(-)
-
-diff --git a/block/partitions/efi.c b/block/partitions/efi.c
-index bcd86e5..39f70d9 100644
---- a/block/partitions/efi.c
-+++ b/block/partitions/efi.c
-@@ -293,7 +293,7 @@ static gpt_entry *alloc_read_gpt_entries(struct parsed_partitions *state,
- 	if (!gpt)
- 		return NULL;
- 
--	count = le32_to_cpu(gpt->num_partition_entries) *
-+	count = (size_t)le32_to_cpu(gpt->num_partition_entries) *
-                 le32_to_cpu(gpt->sizeof_partition_entry);
- 	if (!count)
- 		return NULL;
-@@ -352,7 +352,7 @@ static int is_gpt_valid(struct parsed_partitions *state, u64 lba,
- 			gpt_header **gpt, gpt_entry **ptes)
- {
- 	u32 crc, origcrc;
--	u64 lastlba;
-+	u64 lastlba, pt_size;
- 
- 	if (!ptes)
- 		return 0;
-@@ -434,13 +434,20 @@ static int is_gpt_valid(struct parsed_partitions *state, u64 lba,
- 		goto fail;
- 	}
- 
-+	/* Sanity check partition table size */
-+	pt_size = (u64)le32_to_cpu((*gpt)->num_partition_entries) *
-+		le32_to_cpu((*gpt)->sizeof_partition_entry);
-+	if (pt_size > KMALLOC_MAX_SIZE) {
-+		pr_debug("GUID Partition Table is too large: %llu > %lu bytes\n",
-+			 (unsigned long long)pt_size, KMALLOC_MAX_SIZE);
-+		goto fail;
-+	}
-+
- 	if (!(*ptes = alloc_read_gpt_entries(state, *gpt)))
- 		goto fail;
- 
- 	/* Check the GUID Partition Entry Array CRC */
--	crc = efi_crc32((const unsigned char *) (*ptes),
--			le32_to_cpu((*gpt)->num_partition_entries) *
--			le32_to_cpu((*gpt)->sizeof_partition_entry));
-+	crc = efi_crc32((const unsigned char *) (*ptes), pt_size);
- 
- 	if (crc != le32_to_cpu((*gpt)->partition_entry_array_crc32)) {
- 		pr_debug("GUID Partition Entry Array CRC check failed.\n");
--- 
-2.1.4
