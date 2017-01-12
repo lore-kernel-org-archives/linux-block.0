@@ -1,64 +1,43 @@
-Return-Path: <sagigrim@gmail.com>
-Return-Path: <sagigrim@gmail.com>
-From: Sagi Grimberg <sagi@grimberg.me>
-Subject: Re: [LSF/MM TOPIC][LSF/MM ATTEND] NAPI polling for block drivers
-To: Jens Axboe <axboe@kernel.dk>, Johannes Thumshirn <jthumshirn@suse.de>,
- "lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>
+Return-Path: <sbates@raithlin.com>
+Message-ID: <466066478645ecdc414e0d5de4178c41.squirrel@webmail.raithlin.com>
+In-Reply-To: <43b42605-0c97-ca33-2e39-5ec58b441bcc@kernel.dk>
 References: <20170111134312.GH6286@linux-x5ow.site>
- <cc00cc1f-17d7-105e-ef2c-61791b7cc676@kernel.dk>
- <d60d4499-6ed8-0a69-edbf-db205a6dba6a@kernel.dk>
-Cc: linux-block@vger.kernel.org, Linux-scsi@vger.kernel.org,
- linux-nvme@lists.infradead.org, Christoph Hellwig <hch@infradead.org>,
- Keith Busch <keith.busch@intel.com>
-Message-ID: <8b47ca34-d2ff-26dc-721e-2cb1e18f1efc@grimberg.me>
-Date: Thu, 12 Jan 2017 10:23:47 +0200
+    <cc00cc1f-17d7-105e-ef2c-61791b7cc676@kernel.dk>
+    <43b3038b57ed5c00a73ebc5457d048d5.squirrel@webmail.raithlin.com>
+    <43b42605-0c97-ca33-2e39-5ec58b441bcc@kernel.dk>
+Date: Wed, 11 Jan 2017 22:56:12 -0600
+Subject: Re: [LSF/MM TOPIC][LSF/MM ATTEND] NAPI polling for block drivers
+From: "Stephen Bates" <sbates@raithlin.com>
+To: "Jens Axboe" <axboe@kernel.dk>
+Cc: "Johannes Thumshirn" <jthumshirn@suse.de>,
+ "lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>,
+ "Christoph Hellwig" <hch@infradead.org>,
+ "Sagi Grimberg" <sagi@grimberg.me>,
+ linux-scsi@vger.kernel.org,
+ linux-nvme@lists.infradead.org,
+ linux-block@vger.kernel.org,
+ "Keith Busch" <keith.busch@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <d60d4499-6ed8-0a69-edbf-db205a6dba6a@kernel.dk>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Type: text/plain;charset=iso-8859-1
 List-ID: <linux-block@vger.kernel.org>
 
-
->>> Hi all,
->>>
->>> I'd like to attend LSF/MM and would like to discuss polling for block drivers.
->>>
->>> Currently there is blk-iopoll but it is neither as widely used as NAPI in the
->>> networking field and accoring to Sagi's findings in [1] performance with
->>> polling is not on par with IRQ usage.
->>>
->>> On LSF/MM I'd like to whether it is desirable to have NAPI like polling in
->>> more block drivers and how to overcome the currently seen performance issues.
->>
->> It would be an interesting topic to discuss, as it is a shame that blk-iopoll
->> isn't used more widely.
 >
-> Forgot to mention - it should only be a topic, if experimentation has
-> been done and results gathered to pin point what the issues are, so we
-> have something concrete to discus. I'm not at all interested in a hand
-> wavy discussion on the topic.
+> This is a separate topic. The initial proposal is for polling for
+> interrupt mitigation, you are talking about polling in the context of
+> polling for completion of an IO.
+>
+> We can definitely talk about this form of polling as well, but it should
+> be a separate topic and probably proposed independently.
+>
+> --
+> Jens Axboe
+>
 >
 
-Hey all,
+Jens
 
-Indeed I attempted to convert nvme to use irq-poll (let's use its
-new name) but experienced some unexplained performance degradations.
+Oh thanks for the clarification. I will propose this as a separate topic.
 
-Keith reported a 700ns degradation for QD=1 with his Xpoint devices,
-this sort of degradation are acceptable I guess because we do schedule
-a soft-irq before consuming the completion, but I noticed ~10% IOPs
-degradation fr QD=32 which is not acceptable.
+Thanks
 
-I agree with Jens that we'll need some analysis if we want the
-discussion to be affective, and I can spend some time this if I
-can find volunteers with high-end nvme devices (I only have access
-to client nvme devices.
-
-I can add debugfs statistics on average the number of completions I
-consume per intererupt, I can also trace the interrupt and the soft-irq
-start,end. Any other interesting stats I can add?
-
-I also tried a hybrid mode where the first 4 completions were handled
-in the interrupt and the rest in soft-irq but that didn't make much
-of a difference.
-
-Any other thoughts?
+Stephen
