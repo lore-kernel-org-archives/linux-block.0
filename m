@@ -1,38 +1,75 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-Subject: Re: [Lsf-pc] [LSF/MM TOPIC][LSF/MM ATTEND] NAPI polling for block
- drivers
-To: Johannes Thumshirn <jthumshirn@suse.de>
+Return-Path: <jthumshirn@suse.de>
+Date: Thu, 12 Jan 2017 13:53:38 +0100
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Sagi Grimberg <sagi@grimberg.me>
+Cc: Jens Axboe <axboe@kernel.dk>,
+	"lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>,
+	linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+	Keith Busch <keith.busch@intel.com>, linux-nvme@lists.infradead.org,
+	Linux-scsi@vger.kernel.org
+Subject: Re: [LSF/MM TOPIC][LSF/MM ATTEND] NAPI polling for block drivers
+Message-ID: <20170112125338.GH3598@linux-x5ow.site>
 References: <20170111134312.GH6286@linux-x5ow.site>
  <cc00cc1f-17d7-105e-ef2c-61791b7cc676@kernel.dk>
  <d60d4499-6ed8-0a69-edbf-db205a6dba6a@kernel.dk>
  <8b47ca34-d2ff-26dc-721e-2cb1e18f1efc@grimberg.me>
  <20170112100251.GB3598@linux-x5ow.site>
  <879a91ba-eff7-682d-12a9-5d83f26e7e09@grimberg.me>
- <20170112125338.GH3598@linux-x5ow.site>
-Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <keith.busch@intel.com>,
-        Linux-scsi@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        "lsf-pc@lists.linux-foundation.org"
-        <lsf-pc@lists.linux-foundation.org>
-From: Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <91262998-8dd7-107a-06e7-6f333df59a91@grimberg.me>
-Date: Thu, 12 Jan 2017 16:41:00 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170112125338.GH3598@linux-x5ow.site>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Sender: linux-scsi-owner@vger.kernel.org
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <879a91ba-eff7-682d-12a9-5d83f26e7e09@grimberg.me>
 List-ID: <linux-block@vger.kernel.org>
 
+On Thu, Jan 12, 2017 at 01:44:05PM +0200, Sagi Grimberg wrote:
+[...]
+> Its pretty basic:
+> --
+> [global]
+> group_reporting
+> cpus_allowed=0
+> cpus_allowed_policy=split
+> rw=randrw
+> bs=4k
+> numjobs=4
+> iodepth=32
+> runtime=60
+> time_based
+> loops=1
+> ioengine=libaio
+> direct=1
+> invalidate=1
+> randrepeat=1
+> norandommap
+> exitall
+> 
+> [job]
+> --
+> 
+> **Note: when I ran multiple threads on more cpus the performance
+> degradation phenomenon disappeared, but I tested on a VM with
+> qemu emulation backed by null_blk so I figured I had some other
+> bottleneck somewhere (that's why I asked for some more testing).
 
->> **Note: when I ran multiple threads on more cpus the performance
->> degradation phenomenon disappeared, but I tested on a VM with
->> qemu emulation backed by null_blk so I figured I had some other
->> bottleneck somewhere (that's why I asked for some more testing).
->
-> That could be because of the vmexits as every MMIO access in the guest
-> triggers a vmexit and if you poll with a low budget you do more MMIOs hence
-> you have more vmexits.
->
-> Did you do testing only in qemu or with real H/W as well?
+That could be because of the vmexits as every MMIO access in the guest
+triggers a vmexit and if you poll with a low budget you do more MMIOs hence
+you have more vmexits.
 
-I tried once. IIRC, I saw the same phenomenons...
+Did you do testing only in qemu or with real H/W as well?
+
+> 
+> Note that I ran randrw because I was backed with null_blk, testing
+> with a real nvme device, you should either run randread or write, and
+> if you do a write, you can't run it multi-threaded (well you can, but
+> you'll get unpredictable performance...).
+
+Noted, thanks.
+
+Byte,
+	Johannes
+-- 
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
