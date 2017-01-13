@@ -1,85 +1,56 @@
-Return-Path: <axboe@kernel.dk>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 4.10-rc
-Message-ID: <f91e953a-dfa8-b0e5-ba27-3618c8d36932@kernel.dk>
-Date: Sat, 14 Jan 2017 17:28:57 -0700
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:63054 "EHLO
+        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750781AbdAMAOs (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 12 Jan 2017 19:14:48 -0500
+Subject: Re: RFC: 512e ZBC host-managed disks
+To: Jeff Moyer <jmoyer@redhat.com>, Christoph Hellwig <hch@lst.de>
+References: <38404478-7b9a-35ed-8148-81a05bd01ac8@wdc.com>
+ <20170112082048.GA8276@lst.de>
+ <x49eg08codc.fsf@segfault.boston.devel.redhat.com>
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
+        James Bottomley <james.bottomley@hansenpartnership.com>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        Hannes Reinecke <hare@suse.de>,
+        Shaun Tancheff <shaun@tancheff.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Damien Le Moal <damien.lemoal@wdc.com>
+Message-ID: <1f93b23c-fc62-4e07-0550-3b6eefe2a7dc@wdc.com>
+Date: Fri, 13 Jan 2017 09:14:41 +0900
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-List-ID: <linux-block@vger.kernel.org>
-
-Hi Linus,
-
-Here's a set of fixes for the current series. This pull request
-contains:
-
-- The virtio_blk stack DMA corruption fix from Christoph, fixing and
-  issue with VMAP stacks.
-
-- O_DIRECT blkbits calculation fix from Chandan.
-
-- Discard regression fix from Christoph.
-
-- Queue init error handling fixes for nbd and virtio_blk, from Omar and
-  Jeff.
-
-- Two small nvme fixes, from Christoph and Guilherme.
-
-- Rename of blk_queue_zone_size and bdev_zone_size to _sectors instead,
-  to more closely follow what we do in other places in the block layer.
-  This interface is new for this series, so let's get the naming right
-  before releasing a kernel with this feature. From Damien.
-
-Please pull!
+In-Reply-To: <x49eg08codc.fsf@segfault.boston.devel.redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
 
-  git://git.kernel.dk/linux-block.git for-linus
 
+On 1/13/17 00:02, Jeff Moyer wrote:
+> Christoph Hellwig <hch@lst.de> writes:
+> 
+>> On Thu, Jan 12, 2017 at 05:13:52PM +0900, Damien Le Moal wrote:
+>>> (3) Any other idea ?
+>>
+>> Do nothing and ignore the problem.  This whole idea so braindead that
+>> the person coming up with the T10 language should be shot.  Either a device
+>> has 511 logical sectors or 4k but not this crazy mix.
+>>
+>> And make sure no one ships such a piece of crap because we are hell
+>> not going to support it.
+> 
+> Agreed.  This is insane.
 
-----------------------------------------------------------------
-Chandan Rajendra (1):
-      do_direct_IO: Use inode->i_blkbits to compute block count to be cleaned
+Christoph, Jeff,
 
-Christoph Hellwig (7):
-      virtio_blk: avoid DMA to stack for the sense buffer
-      nvme-rdma: fix nvme_rdma_queue_is_ready
-      block: add blk_rq_payload_bytes
-      scsi: use blk_rq_payload_bytes
-      nvme: use blk_rq_payload_bytes
-      sd: remove __data_len hack for WRITE SAME
-      block: don't try to discard from __blkdev_issue_zeroout
-
-Damien Le Moal (1):
-      block: Rename blk_queue_zone_size and bdev_zone_size
-
-Guilherme G. Piccoli (1):
-      nvme: apply DELAY_BEFORE_CHK_RDY quirk at probe time too
-
-Jeff Moyer (1):
-      nbd: blk_mq_init_queue returns an error code on failure, not NULL
-
-Omar Sandoval (1):
-      virtio_blk: fix panic in initialization error path
-
- block/blk-lib.c            | 13 ++++++-------
- block/blk-zoned.c          |  4 ++--
- block/partition-generic.c  | 14 +++++++-------
- drivers/block/nbd.c        |  6 ++++--
- drivers/block/virtio_blk.c |  7 +++++--
- drivers/nvme/host/core.c   |  7 +------
- drivers/nvme/host/fc.c     |  5 ++---
- drivers/nvme/host/nvme.h   |  8 --------
- drivers/nvme/host/pci.c    | 19 ++++++++-----------
- drivers/nvme/host/rdma.c   | 15 ++++++---------
- drivers/scsi/scsi_lib.c    |  2 +-
- drivers/scsi/sd.c          | 17 +----------------
- fs/direct-io.c             |  3 ++-
- fs/f2fs/segment.c          |  4 ++--
- fs/f2fs/super.c            |  6 +++---
- include/linux/blkdev.h     | 19 ++++++++++++++++---
- 16 files changed, 66 insertions(+), 83 deletions(-)
+Thank you for the feedback.
 
 -- 
-Jens Axboe
+Damien Le Moal, Ph.D.
+Sr. Manager, System Software Research Group,
+Western Digital Corporation
+Damien.LeMoal@wdc.com
+(+81) 0466-98-3593 (ext. 513593)
+1 kirihara-cho, Fujisawa,
+Kanagawa, 252-0888 Japan
+www.wdc.com, www.hgst.com
