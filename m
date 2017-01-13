@@ -1,62 +1,58 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv6 06/37] thp: handle write-protection faults for file THP
-Date: Thu, 26 Jan 2017 14:57:48 +0300
-Message-Id: <20170126115819.58875-7-kirill.shutemov@linux.intel.com>
-In-Reply-To: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
-References: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from verein.lst.de ([213.95.11.211]:53871 "EHLO newverein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751157AbdAMIXb (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 13 Jan 2017 03:23:31 -0500
+Date: Fri, 13 Jan 2017 09:14:16 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Mike Snitzer <snitzer@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@fb.com>,
+        linux-block@vger.kernel.org, dm-devel@redhat.com,
+        linux-scsi@vger.kernel.org
+Subject: Re: [PATCH 05/15] dm: remove incomple BLOCK_PC support
+Message-ID: <20170113081416.GA26337@lst.de>
+References: <1484060780-15592-1-git-send-email-hch@lst.de> <1484060780-15592-6-git-send-email-hch@lst.de> <20170112010936.GA19953@redhat.com> <20170112080054.GD7567@lst.de> <20170112222845.GA25349@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170112222845.GA25349@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-For filesystems that wants to be write-notified (has mkwrite), we will
-encount write-protection faults for huge PMDs in shared mappings.
+On Thu, Jan 12, 2017 at 05:28:45PM -0500, Mike Snitzer wrote:
+> What is "incomplete" about request-based DM's BLOCK_PC support?
 
-The easiest way to handle them is to clear the PMD and let it refault as
-wriable.
+BLOCK_PC requests are always aomething issued by the driver itself
+(for a broad defintion of the driver, aka everything under the block
+layer that works together is a driver for this purpose, e.g. all
+of the SCSI subsystem).  If a driver doesn't issue BLOCK_PC
+requests itself or through library functions only called from the
+driver (e.g. scsi_cmd_ioctl) it is incomplete because it can't
+be used.
 
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
-Reviewed-by: Jan Kara <jack@suse.cz>
----
- mm/memory.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+> I'm also missing how you're saying the new blk-mq request-based DM will
+> work with your new model.  I appreciate that we get the request from the
+> underlying blk-mq request_queue and it'll be properly sized.  But
+> wouldn't we need to pass data back up for these SCSI pass-through
+> requests?  So wouldn't the top-level multipath request_queue need to
+> setup cmd_size?
 
-diff --git a/mm/memory.c b/mm/memory.c
-index 6bf2b471e30c..903d9d3e01c0 100644
---- a/mm/memory.c
-+++ b/mm/memory.c
-@@ -3488,8 +3488,16 @@ static int wp_huge_pmd(struct vm_fault *vmf, pmd_t orig_pmd)
- 		return vmf->vma->vm_ops->pmd_fault(vmf->vma, vmf->address,
- 						   vmf->pmd, vmf->flags);
- 
-+	if (vmf->vma->vm_flags & VM_SHARED) {
-+		/* Clear PMD */
-+		zap_page_range_single(vmf->vma, vmf->address & HPAGE_PMD_MASK,
-+				HPAGE_PMD_SIZE, NULL);
-+
-+		/* Refault to establish writable PMD */
-+		return 0;
-+	}
-+
- 	/* COW handled on pte level: split pmd */
--	VM_BUG_ON_VMA(vmf->vma->vm_flags & VM_SHARED, vmf->vma);
- 	__split_huge_pmd(vmf->vma, vmf->pmd, vmf->address, false, NULL);
- 
- 	return VM_FAULT_FALLBACK;
--- 
-2.11.0
+As said above - supporting BLOCK_PC for dm does not make sense, as
+it's an internal passthrough mechanism for driver internal use.
+It just happened we standardized it at the block layer because SCSI
+commands are a standard supported by a few different drivers, e.g.
+SCSI itself, the old ide code for ATAPI and CCISS and virtio_blk
+which primarily are block drivers but allow some SCSI passthrough.
 
+To be honest I'd love to just fold BLOCK_PC into the SCSI layer sooner
+or later - the old IDE code and CCISS should die off sooner or later,
+and virtio_blk scsi passthrough was a horrible idea to start with
+(and I say that as the person who had the idea back then and implemented
+it..)
+
+> Sorry for the naive questions (that clearly speak to me not
+> understanding how this aspect of the block and SCSI code work).. but I'd
+> like to understand where DM will be lacking going forward.
+
+At least in terms of BLOCK_PC nothing will change for dm, the code
+was simply dead on arrival.  Maybe I should change the subject
+to say that more clearly.
