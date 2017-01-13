@@ -1,16 +1,16 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:45401 "EHLO mx2.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:58616 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751305AbdAMKJt (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Jan 2017 05:09:49 -0500
+        id S1751240AbdAMIdx (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 13 Jan 2017 03:33:53 -0500
 Subject: Re: [PATCHSET v6] blk-mq scheduling framework
 To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org,
         linux-block@vger.kernel.org
 References: <1484170803-9311-1-git-send-email-axboe@fb.com>
 Cc: osandov@osandov.com, bart.vanassche@sandisk.com
 From: Hannes Reinecke <hare@suse.de>
-Message-ID: <878e9633-bbb1-755a-c070-4105beecc300@suse.de>
-Date: Fri, 13 Jan 2017 11:09:46 +0100
+Message-ID: <e1f8f6c5-5347-d8d8-57a2-0367d828dd22@suse.de>
+Date: Fri, 13 Jan 2017 09:15:20 +0100
 MIME-Version: 1.0
 In-Reply-To: <1484170803-9311-1-git-send-email-axboe@fb.com>
 Content-Type: text/plain; charset=windows-1252
@@ -37,52 +37,33 @@ On 01/11/2017 10:39 PM, Jens Axboe wrote:
 > 
 > git://git.kernel.dk/linux-block blk-mq-sched.6
 > 
-Fun continues:
+Well ... something's wrong here on my machine:
 
-[   28.976708] ata3.00: configured for UDMA/100
-[   28.987625] BUG: unable to handle kernel NULL pointer dereference at
-0000000000000048
-[   28.987632] IP: deadline_add_request+0x15/0x70
-[   28.987633] PGD 0
-[   28.987634]
-[   28.987636] Oops: 0000 [#1] SMP
-[   28.987638] Modules linked in: ahci libahci libata uhci_hcd(+)
-mgag200(+) i2c_algo_bit drm_kms_helper syscopyarea sysfillrect sysimgblt
-fb_sys_fops ttm drm tg3 libphy ehci_pci ehci_hcd usbcore usb_common
-ixgbe mdio hpsa(+) dca ptp pps_core scsi_transport_sas fjes(+) sg
-dm_multipath dm_mod scsi_dh_rdac scsi_dh_emc scsi_dh_alua autofs4
-[   28.987654] CPU: 0 PID: 268 Comm: kworker/u2:2 Not tainted
-4.10.0-rc3+ #535
-[   28.987655] Hardware name: HP ProLiant ML350p Gen8, BIOS P72 09/08/2013
-[   28.987660] Workqueue: events_unbound async_run_entry_fn
-[   28.987661] task: ffff880029391600 task.stack: ffffc9000038c000
-[   28.987663] RIP: 0010:deadline_add_request+0x15/0x70
-[   28.987664] RSP: 0018:ffffc9000038fb00 EFLAGS: 00010286
-[   28.987665] RAX: ffff88003260c400 RBX: 0000000000000000 RCX:
-0000000000000000
-[   28.987666] RDX: ffffc9000038fb68 RSI: 0000000000000000 RDI:
-ffff8800293b9040
-[   28.987666] RBP: ffffc9000038fb18 R08: 000000000087668] R13:
-ffff88003260c400 R14: 0000000000000000 R15: 0000000000000000
-[   28.987670] FS:  0000000000000000(0000) GS:ffff880035c00000(0000)
-knlGS:0000000000000000
-[   28.987670] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[   28.987671] CR2: 0000000000000048 CR3: 0000000032b64000 CR4:
-00000000000406f0
-[   28.987672] Call Trace:
-[   28.987677]  blk_mq_sched_get_request+0x12e/0x310
-[   28.987678]  ? blk_mq_sched_get_request+0x5/0x310
-[   28.987681]  blk_mq_alloc_request+0x40/0x90
-[   28.987684]  blk_get_request+0x35/0x110
-[   28.987689]  __scsi_execute.isra.24+0x3c/0x160
-[   28.987691]  scsi_execute_req_flags+0x94/0x100
-[   28.987694]  scsi_probe_and_add_lun+0x207/0xd60
-[   28.987699]  ? __pm_rme_resume+0x5c/0x80
-[   28.987701]  __scsi_add_device+0x103/0x120
-[   28.987709]  ata_scsi_scan_host+0xa3/0x1d0 [libata]
-[   28.987716]  async_port_probe+0x43/0x60 [libata]
-[   28.987718]  async_run_entry_fn+0x37/0x150
-[   28.987722]  process_one_work+0x1d0/0x660
+[   39.886886] ------------[ cut here ]------------
+[   39.886895] WARNING: CPU: 9 PID: 62 at block/blk-mq.c:342
+__blk_mq_finish_request+0x124/0x140
+[   39.886895] Modules linked in: sd_mod ahci uhci_hcd ehci_pci
+mpt3sas(+) libahci ehci_hcd serio_raw crc32c_intel raid_class drm libata
+usbcore hpsa usb_common scsi_transport_sas sg dm_multipath dm_mod
+scsi_dh_rdac scsi_dh_emc scsi_dh_alua autofs4
+[   39.886910] CPU: 9 PID: 62 Comm: kworker/u130:0 Not tainted
+4.10.0-rc3+ #528
+[   39.886911] Hardware name: HP ProLiant ML350p Gen8, BIOS P72 09/08/2013
+[   39.886917] Workqueue: events_unbound async_run_entry_fn
+[   39.886918] Call Trace:
+[   39.886923]  dump_stack+0x85/0xc9
+[   39.886927]  __warn+0xd1/0xf0
+[   39.886928]  warn_slowpath_null+0x1d/0x20
+[   39.886930]  __blk_mq_finish_request+0x124/0x140
+[   39.886932]  blk_mq_finish_request+0x55/0x60
+[   39.886934]  blk_mq_sched_put_request+0x78/0x80
+[   39.886936]  blk_mq_free_request+0xe/0x10
+[   39.886938]  blk_put_request+0x25/0x60
+[   39.886944]  __scsi_execute.isra.24+0x104/0x160
+[   39.886946]  scsi_execute_req_flags+0x94/0x100
+[   39.886948]  scsi_report_opcode+0xab/0x100
+
+checking ...
 
 Cheers,
 
