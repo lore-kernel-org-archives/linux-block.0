@@ -1,59 +1,46 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@fb.com>
-Cc: Mike Snitzer <snitzer@redhat.com>, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org, dm-devel@redhat.com
-Subject: [PATCH 05/15] dm: remove incomple BLOCK_PC support
-Date: Tue, 10 Jan 2017 16:06:10 +0100
-Message-Id: <1484060780-15592-6-git-send-email-hch@lst.de>
-In-Reply-To: <1484060780-15592-1-git-send-email-hch@lst.de>
-References: <1484060780-15592-1-git-send-email-hch@lst.de>
-Sender: linux-scsi-owner@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Slava Dubeyko <Vyacheslav.Dubeyko@wdc.com>
+To: "lsf-pc@lists.linux-foundation.org"
+        <lsf-pc@lists.linux-foundation.org>
+CC: =?iso-8859-1?Q?Matias_Bj=F8rling?= <m@bjorling.me>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        Viacheslav Dubeyko <slava@dubeyko.com>,
+        Cyril Guyot <cyril.guyot@wdc.com>
+Subject: [LSF/MM ATTEND] Flash-friendly file system for the host-managed model
+ of OCSSDs
+Date: Fri, 13 Jan 2017 21:28:10 +0000
+Message-ID: <SN2PR04MB2191EDB5D8667816944BFA2D88780@SN2PR04MB2191.namprd04.prod.outlook.com>
+Content-Type: text/plain; charset="iso-8859-1"
+MIME-Version: 1.0
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-DM tries to copy a few fields around for BLOCK_PC requests, but given
-that no dm-target ever wires up scsi_cmd_ioctl BLOCK_PC can't actually
-be sent to dm.
+Hello,
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/md/dm-rq.c | 16 ----------------
- 1 file changed, 16 deletions(-)
+I would like to attend LSF/MM with the goal to participate in the discussio=
+n
+related to the OCSSDs - SMR, Hierarchical Interface, and Vector I/Os topic.
+I am implementing the flash-friendly file system for the host-managed
+SSD device model. When we started our project we haven't any restrictions
+on the model of interaction with SSD device. And we've used approaches in f=
+ile
+system architecture that could be affected by this discussion. Finally, I w=
+ould
+like to share my vision of distinction between host-aware and host-managed
+models of SSD device. I believe that it's really important to discuss the S=
+MR-like
+zone model from the flash-friendly file systems point of view too.
 
-diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
-index 93f6e9f..3f12916 100644
---- a/drivers/md/dm-rq.c
-+++ b/drivers/md/dm-rq.c
-@@ -270,19 +270,6 @@ static void dm_end_request(struct request *clone, int error)
- 	struct mapped_device *md = tio->md;
- 	struct request *rq = tio->orig;
- 
--	if (rq->cmd_type == REQ_TYPE_BLOCK_PC) {
--		rq->errors = clone->errors;
--		rq->resid_len = clone->resid_len;
--
--		if (rq->sense)
--			/*
--			 * We are using the sense buffer of the original
--			 * request.
--			 * So setting the length of the sense data is enough.
--			 */
--			rq->sense_len = clone->sense_len;
--	}
--
- 	free_rq_clone(clone);
- 	rq_end_stats(md, rq);
- 	if (!rq->q->mq_ops)
-@@ -511,9 +498,6 @@ static int setup_clone(struct request *clone, struct request *rq,
- 	if (r)
- 		return r;
- 
--	clone->cmd = rq->cmd;
--	clone->cmd_len = rq->cmd_len;
--	clone->sense = rq->sense;
- 	clone->end_io = end_clone_request;
- 	clone->end_io_data = tio;
- 
--- 
-2.1.4
+Thanks,
+Viacheslav Dubeyko.
+
+----------------------------------------------------------
+Viacheslav Dubeyko=20
+Principal Research Engineer
+Western Digital Corporation
+e.  (Vyacheslav.Dubeyko@wdc.com)
+591 SanDisk Drive, Milipitas, CA 95035, WDC Research Center
+www.wdc.com=A0
 
