@@ -1,89 +1,30 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:56422 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750950AbdAWP33 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Jan 2017 10:29:29 -0500
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@fb.com>
-Cc: Mike Snitzer <snitzer@redhat.com>, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org, dm-devel@redhat.com
-Subject: [PATCH 01/16] block: fix elevator init check
-Date: Mon, 23 Jan 2017 16:29:06 +0100
-Message-Id: <1485185361-29786-2-git-send-email-hch@lst.de>
-In-Reply-To: <1485185361-29786-1-git-send-email-hch@lst.de>
-References: <1485185361-29786-1-git-send-email-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+From: Jens Axboe <axboe@kernel.dk>
+Date: Fri, 13 Jan 2017 08:00:09 -0700
+To: Christoph Hellwig <hch@infradead.org>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	osandov@osandov.com, bart.vanassche@sandisk.com
+Subject: Re: [PATCH 01/10] block: move existing elevator ops to union
+Message-ID: <20170113150009.GA23338@kernel.dk>
+References: <1484170803-9311-1-git-send-email-axboe@fb.com>
+ <1484170803-9311-2-git-send-email-axboe@fb.com>
+ <20170113083420.GB16676@infradead.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170113083420.GB16676@infradead.org>
+List-ID: <linux-block@vger.kernel.org>
 
-We can't initalize the elevator fields for flushes as flush share space
-in struct request with the elevator data.  But currently we can't
-commnicate that a request is a flush through blk_get_request as we
-can only pass READ or WRITE, and the low-level code looks at the
-possible NULL bio to check for a flush.
+On Fri, Jan 13 2017, Christoph Hellwig wrote:
+> On Wed, Jan 11, 2017 at 02:39:54PM -0700, Jens Axboe wrote:
+> > Prep patch for adding MQ ops as well, since doing anon unions with
+> > named initializers doesn't work on older compilers.
+> 
+> My gut feeling tells me MQ schedulers shouldn't share elevator_type.
+> I'll play around a bit with the code later to see if my gut was right.
 
-Fix this by allowing to pass any block op and flags, and by checking for
-the flush flags in __get_request.
+It's crazy to re-invent a new framework just for MQ schedulers, imho. So
+you're going to have to come up with something better than a gut
+feeling.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-core.c | 26 ++++----------------------
- 1 file changed, 4 insertions(+), 22 deletions(-)
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index a61f140..732b719 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1022,25 +1022,6 @@ int blk_update_nr_requests(struct request_queue *q, unsigned int nr)
- 	return 0;
- }
- 
--/*
-- * Determine if elevator data should be initialized when allocating the
-- * request associated with @bio.
-- */
--static bool blk_rq_should_init_elevator(struct bio *bio)
--{
--	if (!bio)
--		return true;
--
--	/*
--	 * Flush requests do not use the elevator so skip initialization.
--	 * This allows a request to share the flush and elevator data.
--	 */
--	if (bio->bi_opf & (REQ_PREFLUSH | REQ_FUA))
--		return false;
--
--	return true;
--}
--
- /**
-  * __get_request - get a free request
-  * @rl: request list to allocate from
-@@ -1119,10 +1100,13 @@ static struct request *__get_request(struct request_list *rl, unsigned int op,
- 	 * request is freed.  This guarantees icq's won't be destroyed and
- 	 * makes creating new ones safe.
- 	 *
-+	 * Flush requests do not use the elevator so skip initialization.
-+	 * This allows a request to share the flush and elevator data.
-+	 *
- 	 * Also, lookup icq while holding queue_lock.  If it doesn't exist,
- 	 * it will be created after releasing queue_lock.
- 	 */
--	if (blk_rq_should_init_elevator(bio) && !blk_queue_bypass(q)) {
-+	if (!(op & (REQ_PREFLUSH | REQ_FUA)) && !blk_queue_bypass(q)) {
- 		rq_flags |= RQF_ELVPRIV;
- 		q->nr_rqs_elvpriv++;
- 		if (et->icq_cache && ioc)
-@@ -1276,8 +1260,6 @@ static struct request *blk_old_get_request(struct request_queue *q, int rw,
- {
- 	struct request *rq;
- 
--	BUG_ON(rw != READ && rw != WRITE);
--
- 	/* create ioc upfront */
- 	create_io_context(gfp_mask, q->node);
- 
 -- 
-2.1.4
-
+Jens Axboe
