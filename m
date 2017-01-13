@@ -1,112 +1,42 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv6 28/37] ext4: make ext4_block_write_begin() aware about huge pages
-Date: Thu, 26 Jan 2017 14:58:10 +0300
-Message-Id: <20170126115819.58875-29-kirill.shutemov@linux.intel.com>
-In-Reply-To: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
-References: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from merlin.infradead.org ([205.233.59.134]:52054 "EHLO
+        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751031AbdAMU0n (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 13 Jan 2017 15:26:43 -0500
+Subject: Re: [PATCH 2/6] irq/affinity: Assign offline CPUs a vector
+To: Christoph Hellwig <hch@lst.de>, Keith Busch <keith.busch@intel.com>
+References: <1483569671-1462-1-git-send-email-keith.busch@intel.com>
+ <1483569671-1462-3-git-send-email-keith.busch@intel.com>
+ <20170108100152.GA26025@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Jens Axboe <axboe@fb.com>,
+        Marc Merlin <marc@merlins.org>, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>
+From: Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <76b3779d-18e3-51c4-84c9-efdbc68f6d84@grimberg.me>
+Date: Fri, 13 Jan 2017 22:26:33 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170108100152.GA26025@lst.de>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-It simply matches changes to __block_write_begin_int().
+>> The offline CPUs need to assigned to something incase they come online
+>> later, otherwise anyone using the mapping for things other than affinity
+>> will have blank entries for that online CPU.
+>
+> I don't really like the idea behind it.  Back when we came up with
+> this code I had some discussion with Thomas if we should do the
+> assignment only for online CPUs, or maybe for all possible CPUs.
+>
+> Except for some big iron with physical node hotplug the difference
+> usually is just that some nodes have been temporarily offlined.  So
+> maybe we need to bite the bullet and move the irq and block code
+> to consider all possible cpus.
 
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
----
- fs/ext4/inode.c | 35 +++++++++++++++++++++--------------
- 1 file changed, 21 insertions(+), 14 deletions(-)
+I tend to agree.
 
-diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
-index 7e65a5b78cf1..3eae2d058fd0 100644
---- a/fs/ext4/inode.c
-+++ b/fs/ext4/inode.c
-@@ -1093,9 +1093,8 @@ int do_journal_get_write_access(handle_t *handle,
- static int ext4_block_write_begin(struct page *page, loff_t pos, unsigned len,
- 				  get_block_t *get_block)
- {
--	unsigned from = pos & (PAGE_SIZE - 1);
--	unsigned to = from + len;
--	struct inode *inode = page->mapping->host;
-+	unsigned from, to;
-+	struct inode *inode = page_mapping(page)->host;
- 	unsigned block_start, block_end;
- 	sector_t block;
- 	int err = 0;
-@@ -1103,10 +1102,14 @@ static int ext4_block_write_begin(struct page *page, loff_t pos, unsigned len,
- 	unsigned bbits;
- 	struct buffer_head *bh, *head, *wait[2], **wait_bh = wait;
- 	bool decrypt = false;
-+	bool uptodate = PageUptodate(page);
- 
-+	page = compound_head(page);
-+	from = pos & ~hpage_mask(page);
-+	to = from + len;
- 	BUG_ON(!PageLocked(page));
--	BUG_ON(from > PAGE_SIZE);
--	BUG_ON(to > PAGE_SIZE);
-+	BUG_ON(from > hpage_size(page));
-+	BUG_ON(to > hpage_size(page));
- 	BUG_ON(from > to);
- 
- 	if (!page_has_buffers(page))
-@@ -1119,10 +1122,8 @@ static int ext4_block_write_begin(struct page *page, loff_t pos, unsigned len,
- 	    block++, block_start = block_end, bh = bh->b_this_page) {
- 		block_end = block_start + blocksize;
- 		if (block_end <= from || block_start >= to) {
--			if (PageUptodate(page)) {
--				if (!buffer_uptodate(bh))
--					set_buffer_uptodate(bh);
--			}
-+			if (uptodate && !buffer_uptodate(bh))
-+				set_buffer_uptodate(bh);
- 			continue;
- 		}
- 		if (buffer_new(bh))
-@@ -1134,19 +1135,25 @@ static int ext4_block_write_begin(struct page *page, loff_t pos, unsigned len,
- 				break;
- 			if (buffer_new(bh)) {
- 				clean_bdev_bh_alias(bh);
--				if (PageUptodate(page)) {
-+				if (uptodate) {
- 					clear_buffer_new(bh);
- 					set_buffer_uptodate(bh);
- 					mark_buffer_dirty(bh);
- 					continue;
- 				}
--				if (block_end > to || block_start < from)
--					zero_user_segments(page, to, block_end,
--							   block_start, from);
-+				if (block_end > to || block_start < from) {
-+					BUG_ON(to - from  > PAGE_SIZE);
-+					zero_user_segments(page +
-+							block_start / PAGE_SIZE,
-+							to % PAGE_SIZE,
-+							(block_start % PAGE_SIZE) + blocksize,
-+							block_start % PAGE_SIZE,
-+							from % PAGE_SIZE);
-+				}
- 				continue;
- 			}
- 		}
--		if (PageUptodate(page)) {
-+		if (uptodate) {
- 			if (!buffer_uptodate(bh))
- 				set_buffer_uptodate(bh);
- 			continue;
--- 
-2.11.0
-
+Would be great if we could have a cpuhp_register() for external users
+that would get ops + state mask structure to act on (this case would
+need CPUHP_OFFLINE, CPUHP_ONLINE). We do have something similar
+for mmu (mmu_notifier).
