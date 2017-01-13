@@ -1,61 +1,53 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-Subject: Re: [PATCH 1/4] block: add blk_rq_payload_bytes
-To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@fb.com>
-References: <1484306953-3194-1-git-send-email-hch@lst.de>
- <1484306953-3194-2-git-send-email-hch@lst.de>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([198.137.202.9]:48992 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751448AbdAML3Z (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 13 Jan 2017 06:29:25 -0500
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@fb.com>
 Cc: Dexuan Cui <decui@microsoft.com>, linux-block@vger.kernel.org,
         linux-scsi@vger.kernel.org, linux-nvme@lists.infradead.org
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <69e13261-dc68-a3f1-7c57-4d42da78df6c@suse.de>
-Date: Fri, 13 Jan 2017 12:43:06 +0100
-MIME-Version: 1.0
-In-Reply-To: <1484306953-3194-2-git-send-email-hch@lst.de>
-Content-Type: text/plain; charset=windows-1252
-Sender: linux-scsi-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Subject: [PATCH 1/4] block: add blk_rq_payload_bytes
+Date: Fri, 13 Jan 2017 12:29:10 +0100
+Message-Id: <1484306953-3194-2-git-send-email-hch@lst.de>
+In-Reply-To: <1484306953-3194-1-git-send-email-hch@lst.de>
+References: <1484306953-3194-1-git-send-email-hch@lst.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On 01/13/2017 12:29 PM, Christoph Hellwig wrote:
-> Add a helper to calculate the actual data transfer size for special
-> payload requests.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  include/linux/blkdev.h | 13 +++++++++++++
->  1 file changed, 13 insertions(+)
-> 
-> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-> index ff3d774..1ca8e8f 100644
-> --- a/include/linux/blkdev.h
-> +++ b/include/linux/blkdev.h
-> @@ -1000,6 +1000,19 @@ static inline unsigned int blk_rq_cur_sectors(const struct request *rq)
->  	return blk_rq_cur_bytes(rq) >> 9;
->  }
->  
-> +/*
-> + * Some commands like WRITE SAME have a payload or data transfer size which
-> + * is different from the size of the request.  Any driver that supports such
-> + * commands using the RQF_SPECIAL_PAYLOAD flag needs to use this helper to
-> + * calculate the data transfer size.
-> + */
-> +static inline unsigned int blk_rq_payload_bytes(struct request *rq)
-> +{
-> +	if (rq->rq_flags & RQF_SPECIAL_PAYLOAD)
-> +		return rq->special_vec.bv_len;
-> +	return blk_rq_bytes(rq);
-> +}
-> +
->  static inline unsigned int blk_queue_get_max_sectors(struct request_queue *q,
->  						     int op)
->  {
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+Add a helper to calculate the actual data transfer size for special
+payload requests.
 
-Cheers,
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ include/linux/blkdev.h | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-Hannes
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index ff3d774..1ca8e8f 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1000,6 +1000,19 @@ static inline unsigned int blk_rq_cur_sectors(const struct request *rq)
+ 	return blk_rq_cur_bytes(rq) >> 9;
+ }
+ 
++/*
++ * Some commands like WRITE SAME have a payload or data transfer size which
++ * is different from the size of the request.  Any driver that supports such
++ * commands using the RQF_SPECIAL_PAYLOAD flag needs to use this helper to
++ * calculate the data transfer size.
++ */
++static inline unsigned int blk_rq_payload_bytes(struct request *rq)
++{
++	if (rq->rq_flags & RQF_SPECIAL_PAYLOAD)
++		return rq->special_vec.bv_len;
++	return blk_rq_bytes(rq);
++}
++
+ static inline unsigned int blk_queue_get_max_sectors(struct request_queue *q,
+ 						     int op)
+ {
 -- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: F. Imend�rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG N�rnberg)
+2.1.4
+
