@@ -1,137 +1,106 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@fb.com>
-Cc: Mike Snitzer <snitzer@redhat.com>, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org, dm-devel@redhat.com
-Subject: [PATCH 03/15] block: simplify blk_init_allocated_queue
-Date: Tue, 10 Jan 2017 16:06:08 +0100
-Message-Id: <1484060780-15592-4-git-send-email-hch@lst.de>
-In-Reply-To: <1484060780-15592-1-git-send-email-hch@lst.de>
-References: <1484060780-15592-1-git-send-email-hch@lst.de>
-Sender: linux-scsi-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:41109 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750951AbdAMRno (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 13 Jan 2017 12:43:44 -0500
+Subject: Re: [PATCH 08/10] blk-mq-sched: add framework for MQ capable IO
+ schedulers
+To: Omar Sandoval <osandov@osandov.com>
+References: <1484170803-9311-1-git-send-email-axboe@fb.com>
+ <1484170803-9311-9-git-send-email-axboe@fb.com>
+ <a4c0edfa-7cb1-2b0d-141d-2ea9e0fb07ca@suse.de> <20170113164153.GA15751@vader>
+Cc: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, bart.vanassche@sandisk.com
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <9d76b1ce-34c5-d3e2-085e-1d78d6c2fa44@suse.de>
+Date: Fri, 13 Jan 2017 18:43:41 +0100
+MIME-Version: 1.0
+In-Reply-To: <20170113164153.GA15751@vader>
+Content-Type: text/plain; charset=windows-1252
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Return an errno value instead of the passed in queue so that the callers
-don't have to keep track of two queues, and move the assignment of the
-request_fn and lock to the caller as passing them as argument doesn't
-simplify anything.  While we're at it also remove two pointless NULL
-assignments, given that the request structure is zeroed on allocation.
+On 01/13/2017 05:41 PM, Omar Sandoval wrote:
+> On Fri, Jan 13, 2017 at 12:15:17PM +0100, Hannes Reinecke wrote:
+>> On 01/11/2017 10:40 PM, Jens Axboe wrote:
+>>> This adds a set of hooks that intercepts the blk-mq path of
+>>> allocating/inserting/issuing/completing requests, allowing
+>>> us to develop a scheduler within that framework.
+>>>
+>>> We reuse the existing elevator scheduler API on the registration
+>>> side, but augment that with the scheduler flagging support for
+>>> the blk-mq interfce, and with a separate set of ops hooks for MQ
+>>> devices.
+>>>
+>>> We split driver and scheduler tags, so we can run the scheduling
+>>> independent of device queue depth.
+>>>
+>>> Signed-off-by: Jens Axboe <axboe@fb.com>
+>> [ .. ]
+>>> @@ -823,6 +847,35 @@ static inline unsigned int queued_to_index(unsigned int queued)
+>>>  	return min(BLK_MQ_MAX_DISPATCH_ORDER - 1, ilog2(queued) + 1);
+>>>  }
+>>>  
+>>> +static bool blk_mq_get_driver_tag(struct request *rq,
+>>> +				  struct blk_mq_hw_ctx **hctx, bool wait)
+>>> +{
+>>> +	struct blk_mq_alloc_data data = {
+>>> +		.q = rq->q,
+>>> +		.ctx = rq->mq_ctx,
+>>> +		.hctx = blk_mq_map_queue(rq->q, rq->mq_ctx->cpu),
+>>> +		.flags = wait ? 0 : BLK_MQ_REQ_NOWAIT,
+>>> +	};
+>>> +
+>>> +	if (blk_mq_hctx_stopped(data.hctx))
+>>> +		return false;
+>>> +
+>>> +	if (rq->tag != -1) {
+>>> +done:
+>>> +		if (hctx)
+>>> +			*hctx = data.hctx;
+>>> +		return true;
+>>> +	}
+>>> +
+>>> +	rq->tag = blk_mq_get_tag(&data);
+>>> +	if (rq->tag >= 0) {
+>>> +		data.hctx->tags->rqs[rq->tag] = rq;
+>>> +		goto done;
+>>> +	}
+>>> +
+>>> +	return false;
+>>> +}
+>>> +
+>> What happens with the existing request at 'rqs[rq->tag]' ?
+>> Surely there is one already, right?
+>> Things like '->init_request' assume a fully populated array, so moving
+>> one entry to another location is ... interesting.
+>>
+>> I would have thought we need to do a request cloning here,
+>> otherwise this would introduce a memory leak, right?
+>> (Not to mention a potential double completion, as the request is now at
+>> two positions in the array)
+>>
+>> Cheers,
+>>
+>> Hannes
+> 
+> The entries in tags->rqs aren't slab objects, they're pointers into
+> pages allocated separately and tracked on tags->page_list. See
+> blk_mq_alloc_rqs(). In blk_mq_free_rqs(), we free all of the pages on
+> tags->page_list, so there shouldn't be a memory leak.
+> 
+> As for hctx->tags->rqs, entries are only overwritten when a scheduler is
+> enabled. In that case, the rqs array is storing pointers to requests
+> actually from hctx->sched_tags, so overwriting/leaking isn't an issue.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-core.c       | 38 +++++++++++++++-----------------------
- drivers/md/dm-rq.c     |  3 ++-
- include/linux/blkdev.h |  3 +--
- 3 files changed, 18 insertions(+), 26 deletions(-)
+Ah. Thanks.
+That explains it.
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 61ba08c..761cee8 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -821,15 +821,19 @@ EXPORT_SYMBOL(blk_init_queue);
- struct request_queue *
- blk_init_queue_node(request_fn_proc *rfn, spinlock_t *lock, int node_id)
- {
--	struct request_queue *uninit_q, *q;
-+	struct request_queue *q;
- 
--	uninit_q = blk_alloc_queue_node(GFP_KERNEL, node_id);
--	if (!uninit_q)
-+	q = blk_alloc_queue_node(GFP_KERNEL, node_id);
-+	if (!q)
- 		return NULL;
- 
--	q = blk_init_allocated_queue(uninit_q, rfn, lock);
--	if (!q)
--		blk_cleanup_queue(uninit_q);
-+	q->request_fn = rfn;
-+	if (lock)
-+		q->queue_lock = lock;
-+	if (blk_init_allocated_queue(q) < 0) {
-+		blk_cleanup_queue(q);
-+		return NULL;
-+	}
- 
- 	return q;
- }
-@@ -837,30 +841,19 @@ EXPORT_SYMBOL(blk_init_queue_node);
- 
- static blk_qc_t blk_queue_bio(struct request_queue *q, struct bio *bio);
- 
--struct request_queue *
--blk_init_allocated_queue(struct request_queue *q, request_fn_proc *rfn,
--			 spinlock_t *lock)
--{
--	if (!q)
--		return NULL;
- 
-+int blk_init_allocated_queue(struct request_queue *q)
-+{
- 	q->fq = blk_alloc_flush_queue(q, NUMA_NO_NODE, 0);
- 	if (!q->fq)
--		return NULL;
-+		return -ENOMEM;
- 
- 	if (blk_init_rl(&q->root_rl, q, GFP_KERNEL))
- 		goto fail;
- 
- 	INIT_WORK(&q->timeout_work, blk_timeout_work);
--	q->request_fn		= rfn;
--	q->prep_rq_fn		= NULL;
--	q->unprep_rq_fn		= NULL;
- 	q->queue_flags		|= QUEUE_FLAG_DEFAULT;
- 
--	/* Override internal queue lock with supplied lock pointer */
--	if (lock)
--		q->queue_lock		= lock;
--
- 	/*
- 	 * This also sets hw/phys segments, boundary and size
- 	 */
-@@ -878,13 +871,12 @@ blk_init_allocated_queue(struct request_queue *q, request_fn_proc *rfn,
- 	}
- 
- 	mutex_unlock(&q->sysfs_lock);
--
--	return q;
-+	return 0;
- 
- fail:
- 	blk_free_flush_queue(q->fq);
- 	wbt_exit(q);
--	return NULL;
-+	return -ENOMEM;
- }
- EXPORT_SYMBOL(blk_init_allocated_queue);
- 
-diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
-index 9d7275f..93f6e9f 100644
---- a/drivers/md/dm-rq.c
-+++ b/drivers/md/dm-rq.c
-@@ -823,7 +823,8 @@ static void dm_old_request_fn(struct request_queue *q)
- int dm_old_init_request_queue(struct mapped_device *md)
- {
- 	/* Fully initialize the queue */
--	if (!blk_init_allocated_queue(md->queue, dm_old_request_fn, NULL))
-+	md->queue->request_fn = dm_old_request_fn;
-+	if (blk_init_allocated_queue(md->queue) < 0)
- 		return -EINVAL;
- 
- 	/* disable dm_old_request_fn's merge heuristic by default */
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 8369564..9a6f3ab 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1116,8 +1116,7 @@ extern void blk_unprep_request(struct request *);
- extern struct request_queue *blk_init_queue_node(request_fn_proc *rfn,
- 					spinlock_t *lock, int node_id);
- extern struct request_queue *blk_init_queue(request_fn_proc *, spinlock_t *);
--extern struct request_queue *blk_init_allocated_queue(struct request_queue *,
--						      request_fn_proc *, spinlock_t *);
-+extern int blk_init_allocated_queue(struct request_queue *);
- extern void blk_cleanup_queue(struct request_queue *);
- extern void blk_queue_make_request(struct request_queue *, make_request_fn *);
- extern void blk_queue_bounce_limit(struct request_queue *, u64);
+Cheers,
+
+Hannes
 -- 
-2.1.4
-
+Dr. Hannes Reinecke		      zSeries & Storage
+hare@suse.de			      +49 911 74053 688
+SUSE LINUX Products GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: J. Hawn, J. Guild, F. Imend�rffer, HRB 16746 (AG N�rnberg)
