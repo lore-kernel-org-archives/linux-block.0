@@ -1,26 +1,23 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-Date: Fri, 13 Jan 2017 08:01:05 -0700
-To: Christoph Hellwig <hch@infradead.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([198.137.202.9]:38248 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751187AbdAMIRP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 13 Jan 2017 03:17:15 -0500
+Date: Fri, 13 Jan 2017 00:17:14 -0800
+From: Christoph Hellwig <hch@infradead.org>
+To: Jens Axboe <axboe@fb.com>
 Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	osandov@osandov.com, bart.vanassche@sandisk.com
+        osandov@osandov.com, bart.vanassche@sandisk.com
 Subject: Re: [PATCH 05/10] blk-mq: export some helpers we need to the
  scheduling framework
-Message-ID: <20170113150105.GB23338@kernel.dk>
+Message-ID: <20170113081714.GC637@infradead.org>
 References: <1484170803-9311-1-git-send-email-axboe@fb.com>
  <1484170803-9311-6-git-send-email-axboe@fb.com>
- <20170113081714.GC637@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170113081714.GC637@infradead.org>
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <1484170803-9311-6-git-send-email-axboe@fb.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Fri, Jan 13 2017, Christoph Hellwig wrote:
-> Do we really need to make any of the blk-mq scheduling modular?
-
-I think so - I want to be able to turn it on and off. And since we
-already have a framework for this (see reply in other patch), I don't
-see a reason NOT to do this.
-
--- 
-Jens Axboe
+Do we really need to make any of the blk-mq scheduling modular?
