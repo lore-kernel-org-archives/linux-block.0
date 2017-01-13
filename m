@@ -1,54 +1,26 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:39966 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1762677AbdAIQj4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 9 Jan 2017 11:39:56 -0500
-From: Coly Li <colyli@suse.de>
-Subject: [LSF/MM TOPIC] [LSF/MM ATTEND] md raid general discussion
-Cc: "open list:SOFTWARE RAID (Multiple Disks) SUPPORT"
-        <linux-raid@vger.kernel.org>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        Shaohua Li <shli@kernel.org>, NeilBrown <neilb@suse.com>,
-        songliubraving@fb.com, Guoqing Jiang <gqjiang@suse.com>,
-        pawel.baldysiak@intel.com, mariusz.dabrowski@intel.com,
-        artur.paszkiewicz@intel.com, Jes.Sorensen@redhat.com,
-        Hannes Reinecke <hare@suse.de>
-To: lsf-pc@lists.linux-foundation.org
-Message-ID: <79796ea4-2631-c762-b8a1-50bcdcbc602e@suse.de>
-Date: Tue, 10 Jan 2017 00:38:03 +0800
+Return-Path: <axboe@kernel.dk>
+From: Jens Axboe <axboe@kernel.dk>
+Date: Fri, 13 Jan 2017 08:01:05 -0700
+To: Christoph Hellwig <hch@infradead.org>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	osandov@osandov.com, bart.vanassche@sandisk.com
+Subject: Re: [PATCH 05/10] blk-mq: export some helpers we need to the
+ scheduling framework
+Message-ID: <20170113150105.GB23338@kernel.dk>
+References: <1484170803-9311-1-git-send-email-axboe@fb.com>
+ <1484170803-9311-6-git-send-email-axboe@fb.com>
+ <20170113081714.GC637@infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170113081714.GC637@infradead.org>
+List-ID: <linux-block@vger.kernel.org>
 
-Hi Folks,
+On Fri, Jan 13 2017, Christoph Hellwig wrote:
+> Do we really need to make any of the blk-mq scheduling modular?
 
-I'd like to propose a general md raid discussion, it is quite necessary
-for most of active md raid developers sit together to discuss current
-challenge of Linux software raid and development trends.
+I think so - I want to be able to turn it on and off. And since we
+already have a framework for this (see reply in other patch), I don't
+see a reason NOT to do this.
 
-In the last years, we have many development activities in md raid, e.g.
-raid5 cache, raid1 clustering, partial parity log, fast fail
-upstreaming, and some effort for raid1 & raid0 performance improvement.
-
-I see there are some kind of functionality overlap between r5cache
-(raid5 cache) and PPL (partial parity log), currently I have no idea
-where we will go for these two development activities.
-Also I receive reports from users that raid1 performance is desired when
-it is built on NVMe SSDs as a cache (maybe bcache or dm-cache). I am
-working on some raid1 performance improvement (e.g. new raid1 I/O
-barrier and lockless raid1 I/O submit), and have some more ideas to discuss.
-
-Therefore, if md raid developers may have a chance to sit together,
-discuss how to efficiently collaborate in next year, it will be much
-more productive then communicating on mailing list.
-
-Finally let me introduce myself for people don't know me. My name is
-Coly Li, I used to work on OCFS2, Ext4 for SUSE Linux, now I work with
-Neil Brown and Hannes Reinecke to maintain block layer code for SUSE
-Linux, mostly focus on drivers/md/*
-
-Thanks.
-
-Coly Li
-
+-- 
+Jens Axboe
