@@ -1,73 +1,55 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f46.google.com ([74.125.82.46]:38406 "EHLO
-        mail-wm0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751260AbdAWOHO (ORCPT
+Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:57943 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1751831AbdANV2e (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Jan 2017 09:07:14 -0500
-Received: by mail-wm0-f46.google.com with SMTP id r144so156981327wme.1
-        for <linux-block@vger.kernel.org>; Mon, 23 Jan 2017 06:07:14 -0800 (PST)
-From: Alexander Potapenko <glider@google.com>
-To: dvyukov@google.com, kcc@google.com, axboe@fb.com, tahsin@google.com
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Subject: [PATCH] block: Initialize cfqq->ioprio_class in cfq_get_queue()
-Date: Mon, 23 Jan 2017 15:06:43 +0100
-Message-Id: <20170123140643.32805-1-glider@google.com>
+        Sat, 14 Jan 2017 16:28:34 -0500
+From: Josef Bacik <jbacik@fb.com>
+To: Sagi Grimberg <sagi@grimberg.me>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH] nbd: create a recv workqueue per nbd device
+Date: Sat, 14 Jan 2017 21:27:29 +0000
+Message-ID: <3E2E6362-6863-4633-904C-C758B862AA8A@fb.com>
+References: <1484322673-10606-1-git-send-email-jbacik@fb.com>
+ <ef333dc1-64c6-ac46-5dd3-c62509e7dd89@grimberg.me>
+ <C2506CBE-045B-4644-A0FD-4A8BA2F4EFD1@fb.com>,<cd41cf6a-ea9b-8759-ce26-de850ef04e16@grimberg.me>
+In-Reply-To: <cd41cf6a-ea9b-8759-ce26-de850ef04e16@grimberg.me>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-KMSAN (KernelMemorySanitizer, a new error detection tool) reports use of
-uninitialized memory in cfq_init_cfqq():
 
-==================================================================
-BUG: KMSAN: use of unitialized memory
-...
-Call Trace:
- [<     inline     >] __dump_stack lib/dump_stack.c:15
- [<ffffffff8202ac97>] dump_stack+0x157/0x1d0 lib/dump_stack.c:51
- [<ffffffff813e9b65>] kmsan_report+0x205/0x360 ??:?
- [<ffffffff813eabbb>] __msan_warning+0x5b/0xb0 ??:?
- [<     inline     >] cfq_init_cfqq block/cfq-iosched.c:3754
- [<ffffffff8201e110>] cfq_get_queue+0xc80/0x14d0 block/cfq-iosched.c:3857
-...
-origin:
- [<ffffffff8103ab37>] save_stack_trace+0x27/0x50 arch/x86/kernel/stacktrace.c:67
- [<ffffffff813e836b>] kmsan_internal_poison_shadow+0xab/0x150 ??:?
- [<ffffffff813e88ab>] kmsan_poison_slab+0xbb/0x120 ??:?
- [<     inline     >] allocate_slab mm/slub.c:1627
- [<ffffffff813e533f>] new_slab+0x3af/0x4b0 mm/slub.c:1641
- [<     inline     >] new_slab_objects mm/slub.c:2407
- [<ffffffff813e0ef3>] ___slab_alloc+0x323/0x4a0 mm/slub.c:2564
- [<     inline     >] __slab_alloc mm/slub.c:2606
- [<     inline     >] slab_alloc_node mm/slub.c:2669
- [<ffffffff813dfb42>] kmem_cache_alloc_node+0x1d2/0x1f0 mm/slub.c:2746
- [<ffffffff8201d90d>] cfq_get_queue+0x47d/0x14d0 block/cfq-iosched.c:3850
-...
-==================================================================
-(the line numbers are relative to 4.8-rc6, but the bug persists
-upstream)
+> On Jan 14, 2017, at 4:15 PM, Sagi Grimberg <sagi@grimberg.me> wrote:
+>=20
+>=20
+>>> Hey Josef,
+>>>=20
+>>>> Since we are in the memory reclaim path we need our recv work to be on=
+ a
+>>>> workqueue that has WQ_MEM_RECLAIM set so we can avoid deadlocks.  Also
+>>>> set WQ_HIGHPRI since we are in the completion path for IO.
+>>>=20
+>>> Really a workqueue per device?? Did this really give performance
+>>> advantage? Can this really scale with number of devices?
+>>=20
+>> I don't see why not, especially since these things run the whole time th=
+e device is active.  I have patches forthcoming to make device creation dyn=
+amic so we don't have a bunch all at once.  That being said I'm not married=
+ to the idea, just seemed like a good idea at the time and not particularly=
+ harmful.  Thanks,
+>=20
+> I just don't see how having a worqueue per device helps anything? There
+> are plenty of active workers per workqueue and even if its not enough
+> you can specify more with max_active.
+>=20
+> I guess what I'm trying to say is that I don't understand what this is
+> solving. The commit message explains why you need WQ_MEM_RECLAIM and why
+> you want WQ_HIGHPRI, but does not explain why workqueue per device is
+> helping/solving anything.
 
-The uninitialized struct cfq_queue is created by kmem_cache_alloc_node()
-and then passed to cfq_init_cfqq(), which accesses cfqq->ioprio_class
-before it's initialized.
+There's no reason for it, that's just the way I did it. I will test both wa=
+ys on Tuesday and if there's no measurable difference then I'll do a global=
+ one.  Thanks,
 
-Signed-off-by: Alexander Potapenko <glider@google.com>
----
- block/cfq-iosched.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
-index c73a6fcaeb9d..611061ae470a 100644
---- a/block/cfq-iosched.c
-+++ b/block/cfq-iosched.c
-@@ -3864,6 +3864,8 @@ cfq_get_queue(struct cfq_data *cfqd, bool is_sync, struct cfq_io_cq *cic,
- 		goto out;
- 	}
- 
-+	/* cfq_init_cfqq() assumes cfqq->ioprio_class is initialized. */
-+	cfqq->ioprio_class = IOPRIO_CLASS_NONE;
- 	cfq_init_cfqq(cfqd, cfqq, current->pid, is_sync);
- 	cfq_init_prio_data(cfqq, cic);
- 	cfq_link_cfqq_cfqg(cfqq, cfqg);
--- 
-2.11.0.483.g087da7b7c-goog
-
+Josef=
