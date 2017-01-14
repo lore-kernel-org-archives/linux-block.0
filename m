@@ -1,60 +1,96 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f175.google.com ([209.85.192.175]:36327 "EHLO
-        mail-pf0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751122AbdAPAT6 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 15 Jan 2017 19:19:58 -0500
-Received: by mail-pf0-f175.google.com with SMTP id 189so48627739pfu.3
-        for <linux-block@vger.kernel.org>; Sun, 15 Jan 2017 16:19:58 -0800 (PST)
-Message-ID: <1484525991.27533.31.camel@dubeyko.com>
-Subject: Re: [LSF/MM TOPIC] Future direction of DAX
-From: Viacheslav Dubeyko <slava@dubeyko.com>
-To: "Darrick J. Wong" <darrick.wong@oracle.com>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Date: Sat, 14 Jan 2017 00:26:21 -0800
+From: "Darrick J. Wong" <darrick.wong@oracle.com>
+To: Ross Zwisler <ross.zwisler@linux.intel.com>,
         lsf-pc@lists.linux-foundation.org, linux-fsdevel@vger.kernel.org,
         linux-nvdimm@ml01.01.org, linux-block@vger.kernel.org,
         linux-mm@kvack.org
-Date: Sun, 15 Jan 2017 16:19:51 -0800
-In-Reply-To: <20170114082621.GC10498@birch.djwong.org>
+Subject: Re: [LSF/MM TOPIC] Future direction of DAX
+Message-ID: <20170114082621.GC10498@birch.djwong.org>
 References: <20170114002008.GA25379@linux.intel.com>
-         <20170114082621.GC10498@birch.djwong.org>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170114002008.GA25379@linux.intel.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-On Sat, 2017-01-14 at 00:26 -0800, Darrick J. Wong wrote:
+On Fri, Jan 13, 2017 at 05:20:08PM -0700, Ross Zwisler wrote:
+> This past year has seen a lot of new DAX development.  We have added support
+> for fsync/msync, moved to the new iomap I/O data structure, introduced radix
+> tree based locking, re-enabled PMD support (twice!), and have fixed a bunch of
+> bugs.
+> 
+> We still have a lot of work to do, though, and I'd like to propose a discussion
+> around what features people would like to see enabled in the coming year as
+> well as what what use cases their customers have that we might not be aware of.
+> 
+> Here are a few topics to start the conversation:
+> 
+> - The current plan to allow users to safely flush dirty data from userspace is
+>   built around the PMEM_IMMUTABLE feature [1].  I'm hoping that by LSF/MM we
+>   will have at least started work on PMEM_IMMUTABLE, but I'm guessing there
+>   will be more to discuss.
 
-<skipped>
+Yes, probably. :)
 
-> Some day we'll start designing a pmem-native fs, I guess. :P
+> - The DAX fsync/msync model was built for platforms that need to flush dirty
+>   processor cache lines in order to make data durable on NVDIMMs.  There exist
+>   platforms, however, that are set up so that the processor caches are
+>   effectively part of the ADR safe zone.  This means that dirty data can be
+>   assumed to be durable even in the processor cache, obviating the need to
+>   manually flush the cache during fsync/msync.  These platforms still need to
+>   call fsync/msync to ensure that filesystem metadata updates are properly
+>   written to media.  Our first idea on how to properly support these platforms
+>   would be for DAX to be made aware that in some cases doesn't need to keep
+>   metadata about dirty cache lines.  A similar issue exists for volatile uses
+>   of DAX such as with BRD or with PMEM and the memmap command line parameter,
+>   and we'd like a solution that covers them all.
+> 
+> - If I recall correctly, at one point Dave Chinner suggested that we change
+>   DAX so that I/O would use cached stores instead of the non-temporal stores
+>   that it currently uses.  We would then track pages that were written to by
+>   DAX in the radix tree so that they would be flushed later during
+>   fsync/msync.  Does this sound like a win?  Also, assuming that we can find a
+>   solution for platforms where the processor cache is part of the ADR safe
+>   zone (above topic) this would be a clear improvement, moving us from using
+>   non-temporal stores to faster cached stores with no downside.
+> 
+> - Jan suggested [2] that we could use the radix tree as a cache to service DAX
+>   faults without needing to call into the filesystem.  Are there any issues
+>   with this approach, and should we move forward with it as an optimization?
+> 
+> - Whenever you mount a filesystem with DAX, it spits out a message that says
+>   "DAX enabled. Warning: EXPERIMENTAL, use at your own risk".  What criteria
+>   needs to be met for DAX to no longer be considered experimental?
 
-There are research efforts in this direction already ([1]-[15]). The
-latest one is NOVA, as far as I can see. But, frankly speaking, I
-believe that we need in new hardware paradigm/architecture and new OS
-paradigm for the next generation of NVM memory. The DAX is
-simple palliative, temporary solution. But, from my point of view,
-pmem-native fs is also not good direction because, anyway, memory
-subsystem will be affected significantly. And, finally, evolution of
-memory subsystem will reveal something completely different that we can
-imagine right now.
+For XFS I'd like to get reflink working with it, for starters.  We
+probably need a bunch more verification work to show that file IO
+doesn't adopt any bad quirks having turned on the per-inode DAX flag.
 
-Thanks,
-Vyacheslav Dubeyko. 
+Some day we'll start designing a pmem-native fs, I guess. :P
 
-[1] http://pages.cs.wisc.edu/~swift/papers/eurosys14-aerie.pdf
-[2] https://www.researchgate.net/publication/282792714_A_User-Level_File_System_for_Fast_Storage_Devices
-[3] https://people.eecs.berkeley.edu/~dcoetzee/publications/Better%20IO%20Through%20Byte-Addressable,%20Persistent%20Memory.pdf
-[4] https://www.computer.org/csdl/proceedings/msst/2013/0217/00/06558440.pdf
-[5] https://users.soe.ucsc.edu/~scott/papers/MASCOTS04b.pdf
-[6] http://ieeexplore.ieee.org/document/4142472/
-[7] https://cseweb.ucsd.edu/~swanson/papers/FAST2016NOVA.pdf
-[8] http://cesg.tamu.edu/wp-content/uploads/2012/02/MSST13.pdf
-[9] http://ieeexplore.ieee.org/document/5487498/
-[10] https://pdfs.semanticscholar.org/544c/1ddf24b90c3dfba7b1934049911b869c99b4.pdf
-[11] http://pramfs.sourceforge.net/tech.html
-[12] https://pdfs.semanticscholar.org/2981/b5abcbe1023b9f3cd962b0be7ef8bd45acfd.pdf
-[13] http://ieeexplore.ieee.org/document/6232378/
-[14] http://ieeexplore.ieee.org/document/7304365/
-[15] http://ieeexplore.ieee.org/document/6272446/
+> - When we msync() a huge page, if the range is less than the entire huge page,
+>   should we flush the entire huge page and mark it clean in the radix tree, or
+>   should we only flush the requested range and leave the radix tree entry
+>   dirty?
+> 
+> - Should we enable 1 GiB huge pages in filesystem DAX?  Does anyone have any
+>   specific customer requests for this or performance data suggesting it would
+>   be a win?  If so, what work needs to be done to get 1 GiB sized and aligned
+>   filesystem block allocations, to get the required enabling in the MM layer,
+>   etc?
 
+<giggle> :)
+
+--D
+
+> 
+> Thanks,
+> - Ross
+> 
+> [1] https://lkml.org/lkml/2016/12/19/571
+> [2] https://lkml.org/lkml/2016/10/12/70
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-fsdevel" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
