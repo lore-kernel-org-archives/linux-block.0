@@ -1,40 +1,40 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mailgw-02.dd24.net ([193.46.215.43]:36186 "EHLO
+Received: from mailgw-02.dd24.net ([193.46.215.43]:60192 "EHLO
         mailgw-02.dd24.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750718AbdAOGQ5 (ORCPT
+        with ESMTP id S1750757AbdAOB1a (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 15 Jan 2017 01:16:57 -0500
-Message-ID: <1484454473.7110.35.camel@scientia.net>
+        Sat, 14 Jan 2017 20:27:30 -0500
+Message-ID: <1484443645.7110.33.camel@scientia.net>
 Subject: Re: NBD: exported files over something around 1 TiB get an insane
  device size on the client side and are actually empty
 From: Christoph Anton Mitterer <calestyo@scientia.net>
 To: Josef Bacik <jbacik@fb.com>
 Cc: linux-block@vger.kernel.org, nbd-general@lists.sourceforge.net
+Date: Sun, 15 Jan 2017 02:27:25 +0100
 In-Reply-To: <1484442228.7132.0@smtp.office365.com>
 References: <1484436698.7110.29.camel@scientia.net>
          <1484442228.7132.0@smtp.office365.com>
 Content-Type: multipart/signed; micalg="sha-512";
         protocol="application/x-pkcs7-signature";
-        boundary="=-aaKt/3az/FGypDE8oY0W"
-Date: Sun, 15 Jan 2017 05:27:53 +0100
+        boundary="=-rufkOvLBZbXqjGZsPP89"
 Mime-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
 
---=-aaKt/3az/FGypDE8oY0W
+--=-rufkOvLBZbXqjGZsPP89
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 On Sat, 2017-01-14 at 20:03 -0500, Josef Bacik wrote:
 > nbd: use loff_t for blocksize and nbd_set_size args
 
-Tested it, and it seems to fix the issue :-)
-
+I'm just trying your patch, which does however not apply to 4.9.2 (but
+I've adapted it)... will tell later if it worked for me.
 
 Cheers,
 Chris.
---=-aaKt/3az/FGypDE8oY0W
+--=-rufkOvLBZbXqjGZsPP89
 Content-Type: application/x-pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -126,25 +126,25 @@ Yeq6UTW/JmfxF4xcbkNK/rv9ISBg9K+mZtg2QXr+P/CJBtej2RLUMYIEfjCCBHoCAQEwgYkwdTEL
 MAkGA1UEBhMCSUwxFjAUBgNVBAoTDVN0YXJ0Q29tIEx0ZC4xKTAnBgNVBAsTIFN0YXJ0Q29tIENl
 cnRpZmljYXRpb24gQXV0aG9yaXR5MSMwIQYDVQQDExpTdGFydENvbSBDbGFzcyAyIENsaWVudCBD
 QQIQPZ6tDP/RHLwcz1F+2kRADzANBglghkgBZQMEAgMFAKCCAcUwGAYJKoZIhvcNAQkDMQsGCSqG
-SIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMTcwMTE1MDQyNzUzWjBPBgkqhkiG9w0BCQQxQgRAL0/Q
-fLOr7BYYnYoSKr7TIxtNmtGzZETVlDAvcfNlUOwcGsqse+3uZQrnksYRInoOwI/qqXFwDpEbiodD
-3BcnMDCBmgYJKwYBBAGCNxAEMYGMMIGJMHUxCzAJBgNVBAYTAklMMRYwFAYDVQQKEw1TdGFydENv
+SIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMTcwMTE1MDEyNzI1WjBPBgkqhkiG9w0BCQQxQgRAN8cE
+ETQWWwKIbo/vSB/qRt/n4m4XFffiBleQYxaQFzcs0+uW4+/dXJm7SAGm6tuov6XE619yVP4icMxt
+bk0USTCBmgYJKwYBBAGCNxAEMYGMMIGJMHUxCzAJBgNVBAYTAklMMRYwFAYDVQQKEw1TdGFydENv
 bSBMdGQuMSkwJwYDVQQLEyBTdGFydENvbSBDZXJ0aWZpY2F0aW9uIEF1dGhvcml0eTEjMCEGA1UE
 AxMaU3RhcnRDb20gQ2xhc3MgMiBDbGllbnQgQ0ECED2erQz/0Ry8HM9RftpEQA8wgZwGCyqGSIb3
 DQEJEAILMYGMoIGJMHUxCzAJBgNVBAYTAklMMRYwFAYDVQQKEw1TdGFydENvbSBMdGQuMSkwJwYD
 VQQLEyBTdGFydENvbSBDZXJ0aWZpY2F0aW9uIEF1dGhvcml0eTEjMCEGA1UEAxMaU3RhcnRDb20g
-Q2xhc3MgMiBDbGllbnQgQ0ECED2erQz/0Ry8HM9RftpEQA8wDQYJKoZIhvcNAQEBBQAEggIAJibb
-Cx/6JJHkBsYSA1zEyojlHfyaAAzoO0etsRtClnoFodLak+9IRdK9NgE/JEzWyGhTBraLhDofPO27
-YZ7/KJ9IbncnzSfuaIOrazvfjOa6GZ3xmHeBXYMITDyYf7ZJ66Dic8uRLderQcMalgqsaaFxSEsj
-xLS3CHEimVH8J4G8RQ0qp7r5krazDF2kPePKTHD6KB9o6aFLtG/64FoJSwnxz+XIvE9r2+yUbGgb
-VkogsHgvN1FavGXQwbOg/hf6NzDXQEtAw2f/l5ny1mbXF9z4qFE7zTbhoZipYfCKDOTGcmDY5/Lm
-pmoJfI8Tutb2dtjoWN8Q/XaXqyS5evibCD68Set/byPY4i+hZygGipLQZkLaqkxft1b+wrdmFh4g
-xe6PfCSi5TiENbHdvxwRxAPuTGbHxZUhP6AswEmBKkAslBToA37dkjyF43NxcvurdSu87qo6Db9D
-XShohQwxtIPaIAFFpVuJ8OMFw4+lAjIFHrpbIsWw6DwjDyKGwJMAEauCwoAurhL2ZIWha9iztdCK
-g2TRG7/gnz1hVe/qjDsXNaq4iBTpBG+63CrG81rYdpS0qTwIMFZJHSboXoVZHYjlkNbEfhilLzDJ
-EoyLcuw32I0YVyAapGT5U5MGW9UaCeMl1uAVBF62OKG/t8fmcuUaKpq0iheYd4VAXul8Fh0AAAAA
+Q2xhc3MgMiBDbGllbnQgQ0ECED2erQz/0Ry8HM9RftpEQA8wDQYJKoZIhvcNAQEBBQAEggIAiIig
+rBdgorPjX0ANwJy156eXJipsRh+hlEcEzdsqG/hd8QQuyOwTKinpJJauD+GXmz4ZX+XoaFZ3RhG1
+Lur7os2ja4d+WLdnGWjJaXZoDA8rkkugMBDwh9L6qGBjsgACCntsz0vmO2bt6ARrBYjTzujhlTc0
+S4lnZ/T6BKj9vH1TJUmw32m388Ta8ROxZbp2Ojhbc52TDTXAxtnCuYqbC6efzn57W1T+CGbi/ehn
+tw089cYjO91vktcuEdU1CwKeAlOH4penxMdf6GFSxSw4hQGdb4h5FltQ1dej+GMUuDUNsMmuOV9c
+yKX5U04DKOMTRNgf8GmcqNI7918jytdfyEbJf57cb5gUKmKRkBR44yGHm/W9CnZYDRr9Ya7TIZqT
+73cUpvsxepEBi/rq5wmmTOibXnvhY5nD6N26C4T35vjqYi15SV77DxfrIZ1RSZLm5SKoNGZ1jhCl
+55Tu+e8Kju3N4iIsQKwjpSQHFIBlcp/90NinUwIh56ZiS4j5uB3dz2WXKey3ys1ZWYpLRQNQYdKX
+z2s/Wbh0fpVwxwlrvWDao5fjlAuAmAchQ+yFTFyrIpy5fYL7ll4/Ir8L0zoo/zA02XaS1RKR2LGw
+ORjDaVFNy8wp0G2xeoKh/yRi2f4QjysEAUB91+tFWqRf3/8IEBk9M1KIWvzfe/prYU6huj8AAAAA
 AAA=
 
 
---=-aaKt/3az/FGypDE8oY0W--
+--=-rufkOvLBZbXqjGZsPP89--
 
