@@ -1,349 +1,315 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:33462 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1753989AbdAKVkN (ORCPT
+Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:47057 "EHLO
+        mx0b-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1750836AbdAODmh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Jan 2017 16:40:13 -0500
-From: Jens Axboe <axboe@fb.com>
+        Sat, 14 Jan 2017 22:42:37 -0500
+Received: from pps.filterd (m0109331.ppops.net [127.0.0.1])
+        by mx0a-00082601.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id v0F3bxRS021009
+        for <linux-block@vger.kernel.org>; Sat, 14 Jan 2017 19:42:36 -0800
+Received: from mail.thefacebook.com ([199.201.64.23])
+        by mx0a-00082601.pphosted.com with ESMTP id 27yjpg9bk5-1
+        (version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT)
+        for <linux-block@vger.kernel.org>; Sat, 14 Jan 2017 19:42:36 -0800
+Received: from facebook.com (2401:db00:21:603d:face:0:19:0)     by
+ mx-out.facebook.com (10.103.99.99) with ESMTP  id
+ a7300ee6dad411e6a0890002c9dfb610-975af6d0 for <linux-block@vger.kernel.org>;
+        Sat, 14 Jan 2017 19:42:35 -0800
+From: Shaohua Li <shli@fb.com>
 To: <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>
-CC: <osandov@osandov.com>, <bart.vanassche@sandisk.com>,
-        Jens Axboe <axboe@fb.com>
-Subject: [PATCH 01/10] block: move existing elevator ops to union
-Date: Wed, 11 Jan 2017 14:39:54 -0700
-Message-ID: <1484170803-9311-2-git-send-email-axboe@fb.com>
-In-Reply-To: <1484170803-9311-1-git-send-email-axboe@fb.com>
-References: <1484170803-9311-1-git-send-email-axboe@fb.com>
+CC: <Kernel-team@fb.com>, <tj@kernel.org>, <axboe@fb.com>,
+        <vgoyal@redhat.com>
+Subject: [PATCH V6 02/18] blk-throttle: prepare support multiple limits
+Date: Sat, 14 Jan 2017 19:42:19 -0800
+Message-ID: <75b81790e65afd577e6686c6cd1b71d77155cf74.1484451062.git.shli@fb.com>
+In-Reply-To: <cover.1484451062.git.shli@fb.com>
+References: <cover.1484451062.git.shli@fb.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Prep patch for adding MQ ops as well, since doing anon unions with
-named initializers doesn't work on older compilers.
+We are going to support low/max limit, each cgroup will have 2 limits
+after that. This patch prepares for the multiple limits change.
 
-Signed-off-by: Jens Axboe <axboe@fb.com>
+Signed-off-by: Shaohua Li <shli@fb.com>
 ---
- block/blk-ioc.c          |  8 +++----
- block/blk-merge.c        |  4 ++--
- block/blk.h              | 10 ++++----
- block/cfq-iosched.c      |  2 +-
- block/deadline-iosched.c |  2 +-
- block/elevator.c         | 60 ++++++++++++++++++++++++------------------------
- block/noop-iosched.c     |  2 +-
- include/linux/elevator.h |  4 +++-
- 8 files changed, 47 insertions(+), 45 deletions(-)
+ block/blk-throttle.c | 110 ++++++++++++++++++++++++++++++++-------------------
+ 1 file changed, 70 insertions(+), 40 deletions(-)
 
-diff --git a/block/blk-ioc.c b/block/blk-ioc.c
-index 381cb50a673c..ab372092a57d 100644
---- a/block/blk-ioc.c
-+++ b/block/blk-ioc.c
-@@ -43,8 +43,8 @@ static void ioc_exit_icq(struct io_cq *icq)
- 	if (icq->flags & ICQ_EXITED)
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index e45bf50..b08369b 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -83,6 +83,11 @@ enum tg_state_flags {
+ 
+ #define rb_entry_tg(node)	rb_entry((node), struct throtl_grp, rb_node)
+ 
++enum {
++	LIMIT_MAX,
++	LIMIT_CNT,
++};
++
+ struct throtl_grp {
+ 	/* must be the first member */
+ 	struct blkg_policy_data pd;
+@@ -120,10 +125,10 @@ struct throtl_grp {
+ 	bool has_rules[2];
+ 
+ 	/* bytes per second rate limits */
+-	uint64_t bps[2];
++	uint64_t bps[2][LIMIT_CNT];
+ 
+ 	/* IOPS limits */
+-	unsigned int iops[2];
++	unsigned int iops[2][LIMIT_CNT];
+ 
+ 	/* Number of bytes disptached in current slice */
+ 	uint64_t bytes_disp[2];
+@@ -147,6 +152,8 @@ struct throtl_data
+ 
+ 	/* Work for dispatching throttled bios */
+ 	struct work_struct dispatch_work;
++	unsigned int limit_index;
++	bool limit_valid[LIMIT_CNT];
+ };
+ 
+ static void throtl_pending_timer_fn(unsigned long arg);
+@@ -198,6 +205,16 @@ static struct throtl_data *sq_to_td(struct throtl_service_queue *sq)
+ 		return container_of(sq, struct throtl_data, service_queue);
+ }
+ 
++static uint64_t tg_bps_limit(struct throtl_grp *tg, int rw)
++{
++	return tg->bps[rw][tg->td->limit_index];
++}
++
++static unsigned int tg_iops_limit(struct throtl_grp *tg, int rw)
++{
++	return tg->iops[rw][tg->td->limit_index];
++}
++
+ /**
+  * throtl_log - log debug message via blktrace
+  * @sq: the service_queue being reported
+@@ -334,10 +351,10 @@ static struct blkg_policy_data *throtl_pd_alloc(gfp_t gfp, int node)
+ 	}
+ 
+ 	RB_CLEAR_NODE(&tg->rb_node);
+-	tg->bps[READ] = U64_MAX;
+-	tg->bps[WRITE] = U64_MAX;
+-	tg->iops[READ] = UINT_MAX;
+-	tg->iops[WRITE] = UINT_MAX;
++	tg->bps[READ][LIMIT_MAX] = U64_MAX;
++	tg->bps[WRITE][LIMIT_MAX] = U64_MAX;
++	tg->iops[READ][LIMIT_MAX] = UINT_MAX;
++	tg->iops[WRITE][LIMIT_MAX] = UINT_MAX;
+ 
+ 	return &tg->pd;
+ }
+@@ -376,11 +393,14 @@ static void throtl_pd_init(struct blkg_policy_data *pd)
+ static void tg_update_has_rules(struct throtl_grp *tg)
+ {
+ 	struct throtl_grp *parent_tg = sq_to_tg(tg->service_queue.parent_sq);
++	struct throtl_data *td = tg->td;
+ 	int rw;
+ 
+ 	for (rw = READ; rw <= WRITE; rw++)
+ 		tg->has_rules[rw] = (parent_tg && parent_tg->has_rules[rw]) ||
+-			(tg->bps[rw] != U64_MAX || tg->iops[rw] != UINT_MAX);
++			(td->limit_valid[td->limit_index] &&
++			 (tg_bps_limit(tg, rw) != U64_MAX ||
++			  tg_iops_limit(tg, rw) != UINT_MAX));
+ }
+ 
+ static void throtl_pd_online(struct blkg_policy_data *pd)
+@@ -632,11 +652,11 @@ static inline void throtl_trim_slice(struct throtl_grp *tg, bool rw)
+ 
+ 	if (!nr_slices)
  		return;
+-	tmp = tg->bps[rw] * throtl_slice * nr_slices;
++	tmp = tg_bps_limit(tg, rw) * throtl_slice * nr_slices;
+ 	do_div(tmp, HZ);
+ 	bytes_trim = tmp;
  
--	if (et->ops.elevator_exit_icq_fn)
--		et->ops.elevator_exit_icq_fn(icq);
-+	if (et->ops.sq.elevator_exit_icq_fn)
-+		et->ops.sq.elevator_exit_icq_fn(icq);
+-	io_trim = (tg->iops[rw] * throtl_slice * nr_slices)/HZ;
++	io_trim = (tg_iops_limit(tg, rw) * throtl_slice * nr_slices) / HZ;
  
- 	icq->flags |= ICQ_EXITED;
- }
-@@ -383,8 +383,8 @@ struct io_cq *ioc_create_icq(struct io_context *ioc, struct request_queue *q,
- 	if (likely(!radix_tree_insert(&ioc->icq_tree, q->id, icq))) {
- 		hlist_add_head(&icq->ioc_node, &ioc->icq_list);
- 		list_add(&icq->q_node, &q->icq_list);
--		if (et->ops.elevator_init_icq_fn)
--			et->ops.elevator_init_icq_fn(icq);
-+		if (et->ops.sq.elevator_init_icq_fn)
-+			et->ops.sq.elevator_init_icq_fn(icq);
- 	} else {
- 		kmem_cache_free(et->icq_cache, icq);
- 		icq = ioc_lookup_icq(ioc, q);
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 182398cb1524..480570b691dc 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -763,8 +763,8 @@ int blk_attempt_req_merge(struct request_queue *q, struct request *rq,
- {
- 	struct elevator_queue *e = q->elevator;
+ 	if (!bytes_trim && !io_trim)
+ 		return;
+@@ -682,7 +702,7 @@ static bool tg_with_in_iops_limit(struct throtl_grp *tg, struct bio *bio,
+ 	 * have been trimmed.
+ 	 */
  
--	if (e->type->ops.elevator_allow_rq_merge_fn)
--		if (!e->type->ops.elevator_allow_rq_merge_fn(q, rq, next))
-+	if (e->type->ops.sq.elevator_allow_rq_merge_fn)
-+		if (!e->type->ops.sq.elevator_allow_rq_merge_fn(q, rq, next))
- 			return 0;
+-	tmp = (u64)tg->iops[rw] * jiffy_elapsed_rnd;
++	tmp = (u64)tg_iops_limit(tg, rw) * jiffy_elapsed_rnd;
+ 	do_div(tmp, HZ);
  
- 	return attempt_merge(q, rq, next);
-diff --git a/block/blk.h b/block/blk.h
-index 041185e5f129..f46c0ac8ae3d 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -167,7 +167,7 @@ static inline struct request *__elv_next_request(struct request_queue *q)
- 			return NULL;
- 		}
- 		if (unlikely(blk_queue_bypass(q)) ||
--		    !q->elevator->type->ops.elevator_dispatch_fn(q, 0))
-+		    !q->elevator->type->ops.sq.elevator_dispatch_fn(q, 0))
- 			return NULL;
- 	}
- }
-@@ -176,16 +176,16 @@ static inline void elv_activate_rq(struct request_queue *q, struct request *rq)
- {
- 	struct elevator_queue *e = q->elevator;
- 
--	if (e->type->ops.elevator_activate_req_fn)
--		e->type->ops.elevator_activate_req_fn(q, rq);
-+	if (e->type->ops.sq.elevator_activate_req_fn)
-+		e->type->ops.sq.elevator_activate_req_fn(q, rq);
- }
- 
- static inline void elv_deactivate_rq(struct request_queue *q, struct request *rq)
- {
- 	struct elevator_queue *e = q->elevator;
- 
--	if (e->type->ops.elevator_deactivate_req_fn)
--		e->type->ops.elevator_deactivate_req_fn(q, rq);
-+	if (e->type->ops.sq.elevator_deactivate_req_fn)
-+		e->type->ops.sq.elevator_deactivate_req_fn(q, rq);
- }
- 
- #ifdef CONFIG_FAIL_IO_TIMEOUT
-diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
-index c73a6fcaeb9d..37aeb20fa454 100644
---- a/block/cfq-iosched.c
-+++ b/block/cfq-iosched.c
-@@ -4837,7 +4837,7 @@ static struct elv_fs_entry cfq_attrs[] = {
- };
- 
- static struct elevator_type iosched_cfq = {
--	.ops = {
-+	.ops.sq = {
- 		.elevator_merge_fn = 		cfq_merge,
- 		.elevator_merged_fn =		cfq_merged_request,
- 		.elevator_merge_req_fn =	cfq_merged_requests,
-diff --git a/block/deadline-iosched.c b/block/deadline-iosched.c
-index 55e0bb6d7da7..05fc0ea25a98 100644
---- a/block/deadline-iosched.c
-+++ b/block/deadline-iosched.c
-@@ -439,7 +439,7 @@ static struct elv_fs_entry deadline_attrs[] = {
- };
- 
- static struct elevator_type iosched_deadline = {
--	.ops = {
-+	.ops.sq = {
- 		.elevator_merge_fn = 		deadline_merge,
- 		.elevator_merged_fn =		deadline_merged_request,
- 		.elevator_merge_req_fn =	deadline_merged_requests,
-diff --git a/block/elevator.c b/block/elevator.c
-index 40f0c04e5ad3..022a26830297 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -58,8 +58,8 @@ static int elv_iosched_allow_bio_merge(struct request *rq, struct bio *bio)
- 	struct request_queue *q = rq->q;
- 	struct elevator_queue *e = q->elevator;
- 
--	if (e->type->ops.elevator_allow_bio_merge_fn)
--		return e->type->ops.elevator_allow_bio_merge_fn(q, rq, bio);
-+	if (e->type->ops.sq.elevator_allow_bio_merge_fn)
-+		return e->type->ops.sq.elevator_allow_bio_merge_fn(q, rq, bio);
- 
- 	return 1;
- }
-@@ -224,7 +224,7 @@ int elevator_init(struct request_queue *q, char *name)
- 		}
+ 	if (tmp > UINT_MAX)
+@@ -697,7 +717,7 @@ static bool tg_with_in_iops_limit(struct throtl_grp *tg, struct bio *bio,
  	}
  
--	err = e->ops.elevator_init_fn(q, e);
-+	err = e->ops.sq.elevator_init_fn(q, e);
- 	if (err)
- 		elevator_put(e);
- 	return err;
-@@ -234,8 +234,8 @@ EXPORT_SYMBOL(elevator_init);
- void elevator_exit(struct elevator_queue *e)
- {
- 	mutex_lock(&e->sysfs_lock);
--	if (e->type->ops.elevator_exit_fn)
--		e->type->ops.elevator_exit_fn(e);
-+	if (e->type->ops.sq.elevator_exit_fn)
-+		e->type->ops.sq.elevator_exit_fn(e);
- 	mutex_unlock(&e->sysfs_lock);
+ 	/* Calc approx time to dispatch */
+-	jiffy_wait = ((tg->io_disp[rw] + 1) * HZ)/tg->iops[rw] + 1;
++	jiffy_wait = ((tg->io_disp[rw] + 1) * HZ) / tg_iops_limit(tg, rw) + 1;
  
- 	kobject_put(&e->kobj);
-@@ -443,8 +443,8 @@ int elv_merge(struct request_queue *q, struct request **req, struct bio *bio)
- 		return ELEVATOR_BACK_MERGE;
+ 	if (jiffy_wait > jiffy_elapsed)
+ 		jiffy_wait = jiffy_wait - jiffy_elapsed;
+@@ -724,7 +744,7 @@ static bool tg_with_in_bps_limit(struct throtl_grp *tg, struct bio *bio,
+ 
+ 	jiffy_elapsed_rnd = roundup(jiffy_elapsed_rnd, throtl_slice);
+ 
+-	tmp = tg->bps[rw] * jiffy_elapsed_rnd;
++	tmp = tg_bps_limit(tg, rw) * jiffy_elapsed_rnd;
+ 	do_div(tmp, HZ);
+ 	bytes_allowed = tmp;
+ 
+@@ -736,7 +756,7 @@ static bool tg_with_in_bps_limit(struct throtl_grp *tg, struct bio *bio,
+ 
+ 	/* Calc approx time to dispatch */
+ 	extra_bytes = tg->bytes_disp[rw] + bio->bi_iter.bi_size - bytes_allowed;
+-	jiffy_wait = div64_u64(extra_bytes * HZ, tg->bps[rw]);
++	jiffy_wait = div64_u64(extra_bytes * HZ, tg_bps_limit(tg, rw));
+ 
+ 	if (!jiffy_wait)
+ 		jiffy_wait = 1;
+@@ -771,7 +791,8 @@ static bool tg_may_dispatch(struct throtl_grp *tg, struct bio *bio,
+ 	       bio != throtl_peek_queued(&tg->service_queue.queued[rw]));
+ 
+ 	/* If tg->bps = -1, then BW is unlimited */
+-	if (tg->bps[rw] == U64_MAX && tg->iops[rw] == UINT_MAX) {
++	if (tg_bps_limit(tg, rw) == U64_MAX &&
++	    tg_iops_limit(tg, rw) == UINT_MAX) {
+ 		if (wait)
+ 			*wait = 0;
+ 		return true;
+@@ -1148,8 +1169,8 @@ static void tg_conf_updated(struct throtl_grp *tg)
+ 
+ 	throtl_log(&tg->service_queue,
+ 		   "limit change rbps=%llu wbps=%llu riops=%u wiops=%u",
+-		   tg->bps[READ], tg->bps[WRITE],
+-		   tg->iops[READ], tg->iops[WRITE]);
++		   tg_bps_limit(tg, READ), tg_bps_limit(tg, WRITE),
++		   tg_iops_limit(tg, READ), tg_iops_limit(tg, WRITE));
+ 
+ 	/*
+ 	 * Update has_rules[] flags for the updated tg's subtree.  A tg is
+@@ -1226,25 +1247,25 @@ static ssize_t tg_set_conf_uint(struct kernfs_open_file *of,
+ static struct cftype throtl_legacy_files[] = {
+ 	{
+ 		.name = "throttle.read_bps_device",
+-		.private = offsetof(struct throtl_grp, bps[READ]),
++		.private = offsetof(struct throtl_grp, bps[READ][LIMIT_MAX]),
+ 		.seq_show = tg_print_conf_u64,
+ 		.write = tg_set_conf_u64,
+ 	},
+ 	{
+ 		.name = "throttle.write_bps_device",
+-		.private = offsetof(struct throtl_grp, bps[WRITE]),
++		.private = offsetof(struct throtl_grp, bps[WRITE][LIMIT_MAX]),
+ 		.seq_show = tg_print_conf_u64,
+ 		.write = tg_set_conf_u64,
+ 	},
+ 	{
+ 		.name = "throttle.read_iops_device",
+-		.private = offsetof(struct throtl_grp, iops[READ]),
++		.private = offsetof(struct throtl_grp, iops[READ][LIMIT_MAX]),
+ 		.seq_show = tg_print_conf_uint,
+ 		.write = tg_set_conf_uint,
+ 	},
+ 	{
+ 		.name = "throttle.write_iops_device",
+-		.private = offsetof(struct throtl_grp, iops[WRITE]),
++		.private = offsetof(struct throtl_grp, iops[WRITE][LIMIT_MAX]),
+ 		.seq_show = tg_print_conf_uint,
+ 		.write = tg_set_conf_uint,
+ 	},
+@@ -1270,18 +1291,25 @@ static u64 tg_prfill_max(struct seq_file *sf, struct blkg_policy_data *pd,
+ 
+ 	if (!dname)
+ 		return 0;
+-	if (tg->bps[READ] == U64_MAX && tg->bps[WRITE] == U64_MAX &&
+-	    tg->iops[READ] == UINT_MAX && tg->iops[WRITE] == UINT_MAX)
++
++	if (tg->bps[READ][LIMIT_MAX] == U64_MAX &&
++	    tg->bps[WRITE][LIMIT_MAX] == U64_MAX &&
++	    tg->iops[READ][LIMIT_MAX] == UINT_MAX &&
++	    tg->iops[WRITE][LIMIT_MAX] == UINT_MAX)
+ 		return 0;
+ 
+-	if (tg->bps[READ] != U64_MAX)
+-		snprintf(bufs[0], sizeof(bufs[0]), "%llu", tg->bps[READ]);
+-	if (tg->bps[WRITE] != U64_MAX)
+-		snprintf(bufs[1], sizeof(bufs[1]), "%llu", tg->bps[WRITE]);
+-	if (tg->iops[READ] != UINT_MAX)
+-		snprintf(bufs[2], sizeof(bufs[2]), "%u", tg->iops[READ]);
+-	if (tg->iops[WRITE] != UINT_MAX)
+-		snprintf(bufs[3], sizeof(bufs[3]), "%u", tg->iops[WRITE]);
++	if (tg->bps[READ][LIMIT_MAX] != U64_MAX)
++		snprintf(bufs[0], sizeof(bufs[0]), "%llu",
++			tg->bps[READ][LIMIT_MAX]);
++	if (tg->bps[WRITE][LIMIT_MAX] != U64_MAX)
++		snprintf(bufs[1], sizeof(bufs[1]), "%llu",
++			tg->bps[WRITE][LIMIT_MAX]);
++	if (tg->iops[READ][LIMIT_MAX] != UINT_MAX)
++		snprintf(bufs[2], sizeof(bufs[2]), "%u",
++			tg->iops[READ][LIMIT_MAX]);
++	if (tg->iops[WRITE][LIMIT_MAX] != UINT_MAX)
++		snprintf(bufs[3], sizeof(bufs[3]), "%u",
++			tg->iops[WRITE][LIMIT_MAX]);
+ 
+ 	seq_printf(sf, "%s rbps=%s wbps=%s riops=%s wiops=%s\n",
+ 		   dname, bufs[0], bufs[1], bufs[2], bufs[3]);
+@@ -1310,10 +1338,10 @@ static ssize_t tg_set_max(struct kernfs_open_file *of,
+ 
+ 	tg = blkg_to_tg(ctx.blkg);
+ 
+-	v[0] = tg->bps[READ];
+-	v[1] = tg->bps[WRITE];
+-	v[2] = tg->iops[READ];
+-	v[3] = tg->iops[WRITE];
++	v[0] = tg->bps[READ][LIMIT_MAX];
++	v[1] = tg->bps[WRITE][LIMIT_MAX];
++	v[2] = tg->iops[READ][LIMIT_MAX];
++	v[3] = tg->iops[WRITE][LIMIT_MAX];
+ 
+ 	while (true) {
+ 		char tok[27];	/* wiops=18446744073709551616 */
+@@ -1350,10 +1378,10 @@ static ssize_t tg_set_max(struct kernfs_open_file *of,
+ 			goto out_finish;
  	}
  
--	if (e->type->ops.elevator_merge_fn)
--		return e->type->ops.elevator_merge_fn(q, req, bio);
-+	if (e->type->ops.sq.elevator_merge_fn)
-+		return e->type->ops.sq.elevator_merge_fn(q, req, bio);
+-	tg->bps[READ] = v[0];
+-	tg->bps[WRITE] = v[1];
+-	tg->iops[READ] = v[2];
+-	tg->iops[WRITE] = v[3];
++	tg->bps[READ][LIMIT_MAX] = v[0];
++	tg->bps[WRITE][LIMIT_MAX] = v[1];
++	tg->iops[READ][LIMIT_MAX] = v[2];
++	tg->iops[WRITE][LIMIT_MAX] = v[3];
  
- 	return ELEVATOR_NO_MERGE;
- }
-@@ -495,8 +495,8 @@ void elv_merged_request(struct request_queue *q, struct request *rq, int type)
- {
- 	struct elevator_queue *e = q->elevator;
+ 	tg_conf_updated(tg);
+ 	ret = 0;
+@@ -1451,8 +1479,9 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
+ 	/* out-of-limit, queue to @tg */
+ 	throtl_log(sq, "[%c] bio. bdisp=%llu sz=%u bps=%llu iodisp=%u iops=%u queued=%d/%d",
+ 		   rw == READ ? 'R' : 'W',
+-		   tg->bytes_disp[rw], bio->bi_iter.bi_size, tg->bps[rw],
+-		   tg->io_disp[rw], tg->iops[rw],
++		   tg->bytes_disp[rw], bio->bi_iter.bi_size,
++		   tg_bps_limit(tg, rw),
++		   tg->io_disp[rw], tg_iops_limit(tg, rw),
+ 		   sq->nr_queued[READ], sq->nr_queued[WRITE]);
  
--	if (e->type->ops.elevator_merged_fn)
--		e->type->ops.elevator_merged_fn(q, rq, type);
-+	if (e->type->ops.sq.elevator_merged_fn)
-+		e->type->ops.sq.elevator_merged_fn(q, rq, type);
+ 	bio_associate_current(bio);
+@@ -1563,6 +1592,7 @@ int blk_throtl_init(struct request_queue *q)
+ 	q->td = td;
+ 	td->queue = q;
  
- 	if (type == ELEVATOR_BACK_MERGE)
- 		elv_rqhash_reposition(q, rq);
-@@ -510,8 +510,8 @@ void elv_merge_requests(struct request_queue *q, struct request *rq,
- 	struct elevator_queue *e = q->elevator;
- 	const int next_sorted = next->rq_flags & RQF_SORTED;
- 
--	if (next_sorted && e->type->ops.elevator_merge_req_fn)
--		e->type->ops.elevator_merge_req_fn(q, rq, next);
-+	if (next_sorted && e->type->ops.sq.elevator_merge_req_fn)
-+		e->type->ops.sq.elevator_merge_req_fn(q, rq, next);
- 
- 	elv_rqhash_reposition(q, rq);
- 
-@@ -528,8 +528,8 @@ void elv_bio_merged(struct request_queue *q, struct request *rq,
- {
- 	struct elevator_queue *e = q->elevator;
- 
--	if (e->type->ops.elevator_bio_merged_fn)
--		e->type->ops.elevator_bio_merged_fn(q, rq, bio);
-+	if (e->type->ops.sq.elevator_bio_merged_fn)
-+		e->type->ops.sq.elevator_bio_merged_fn(q, rq, bio);
- }
- 
- #ifdef CONFIG_PM
-@@ -578,7 +578,7 @@ void elv_drain_elevator(struct request_queue *q)
- 
- 	lockdep_assert_held(q->queue_lock);
- 
--	while (q->elevator->type->ops.elevator_dispatch_fn(q, 1))
-+	while (q->elevator->type->ops.sq.elevator_dispatch_fn(q, 1))
- 		;
- 	if (q->nr_sorted && printed++ < 10) {
- 		printk(KERN_ERR "%s: forced dispatching is broken "
-@@ -653,7 +653,7 @@ void __elv_add_request(struct request_queue *q, struct request *rq, int where)
- 		 * rq cannot be accessed after calling
- 		 * elevator_add_req_fn.
- 		 */
--		q->elevator->type->ops.elevator_add_req_fn(q, rq);
-+		q->elevator->type->ops.sq.elevator_add_req_fn(q, rq);
- 		break;
- 
- 	case ELEVATOR_INSERT_FLUSH:
-@@ -682,8 +682,8 @@ struct request *elv_latter_request(struct request_queue *q, struct request *rq)
- {
- 	struct elevator_queue *e = q->elevator;
- 
--	if (e->type->ops.elevator_latter_req_fn)
--		return e->type->ops.elevator_latter_req_fn(q, rq);
-+	if (e->type->ops.sq.elevator_latter_req_fn)
-+		return e->type->ops.sq.elevator_latter_req_fn(q, rq);
- 	return NULL;
- }
- 
-@@ -691,8 +691,8 @@ struct request *elv_former_request(struct request_queue *q, struct request *rq)
- {
- 	struct elevator_queue *e = q->elevator;
- 
--	if (e->type->ops.elevator_former_req_fn)
--		return e->type->ops.elevator_former_req_fn(q, rq);
-+	if (e->type->ops.sq.elevator_former_req_fn)
-+		return e->type->ops.sq.elevator_former_req_fn(q, rq);
- 	return NULL;
- }
- 
-@@ -701,8 +701,8 @@ int elv_set_request(struct request_queue *q, struct request *rq,
- {
- 	struct elevator_queue *e = q->elevator;
- 
--	if (e->type->ops.elevator_set_req_fn)
--		return e->type->ops.elevator_set_req_fn(q, rq, bio, gfp_mask);
-+	if (e->type->ops.sq.elevator_set_req_fn)
-+		return e->type->ops.sq.elevator_set_req_fn(q, rq, bio, gfp_mask);
- 	return 0;
- }
- 
-@@ -710,16 +710,16 @@ void elv_put_request(struct request_queue *q, struct request *rq)
- {
- 	struct elevator_queue *e = q->elevator;
- 
--	if (e->type->ops.elevator_put_req_fn)
--		e->type->ops.elevator_put_req_fn(rq);
-+	if (e->type->ops.sq.elevator_put_req_fn)
-+		e->type->ops.sq.elevator_put_req_fn(rq);
- }
- 
- int elv_may_queue(struct request_queue *q, unsigned int op)
- {
- 	struct elevator_queue *e = q->elevator;
- 
--	if (e->type->ops.elevator_may_queue_fn)
--		return e->type->ops.elevator_may_queue_fn(q, op);
-+	if (e->type->ops.sq.elevator_may_queue_fn)
-+		return e->type->ops.sq.elevator_may_queue_fn(q, op);
- 
- 	return ELV_MQUEUE_MAY;
- }
-@@ -734,8 +734,8 @@ void elv_completed_request(struct request_queue *q, struct request *rq)
- 	if (blk_account_rq(rq)) {
- 		q->in_flight[rq_is_sync(rq)]--;
- 		if ((rq->rq_flags & RQF_SORTED) &&
--		    e->type->ops.elevator_completed_req_fn)
--			e->type->ops.elevator_completed_req_fn(q, rq);
-+		    e->type->ops.sq.elevator_completed_req_fn)
-+			e->type->ops.sq.elevator_completed_req_fn(q, rq);
- 	}
- }
- 
-@@ -803,8 +803,8 @@ int elv_register_queue(struct request_queue *q)
- 		}
- 		kobject_uevent(&e->kobj, KOBJ_ADD);
- 		e->registered = 1;
--		if (e->type->ops.elevator_registered_fn)
--			e->type->ops.elevator_registered_fn(q);
-+		if (e->type->ops.sq.elevator_registered_fn)
-+			e->type->ops.sq.elevator_registered_fn(q);
- 	}
- 	return error;
- }
-@@ -912,7 +912,7 @@ static int elevator_switch(struct request_queue *q, struct elevator_type *new_e)
- 	spin_unlock_irq(q->queue_lock);
- 
- 	/* allocate, init and register new elevator */
--	err = new_e->ops.elevator_init_fn(q, new_e);
-+	err = new_e->ops.sq.elevator_init_fn(q, new_e);
- 	if (err)
- 		goto fail_init;
- 
-diff --git a/block/noop-iosched.c b/block/noop-iosched.c
-index a163c487cf38..2d1b15d89b45 100644
---- a/block/noop-iosched.c
-+++ b/block/noop-iosched.c
-@@ -92,7 +92,7 @@ static void noop_exit_queue(struct elevator_queue *e)
- }
- 
- static struct elevator_type elevator_noop = {
--	.ops = {
-+	.ops.sq = {
- 		.elevator_merge_req_fn		= noop_merged_requests,
- 		.elevator_dispatch_fn		= noop_dispatch,
- 		.elevator_add_req_fn		= noop_add_request,
-diff --git a/include/linux/elevator.h b/include/linux/elevator.h
-index b276e9ef0e0b..2a9e966eed03 100644
---- a/include/linux/elevator.h
-+++ b/include/linux/elevator.h
-@@ -94,7 +94,9 @@ struct elevator_type
- 	struct kmem_cache *icq_cache;
- 
- 	/* fields provided by elevator implementation */
--	struct elevator_ops ops;
-+	union {
-+		struct elevator_ops sq;
-+	} ops;
- 	size_t icq_size;	/* see iocontext.h */
- 	size_t icq_align;	/* ditto */
- 	struct elv_fs_entry *elevator_attrs;
++	td->limit_valid[LIMIT_MAX] = true;
+ 	/* activate policy */
+ 	ret = blkcg_activate_policy(q, &blkcg_policy_throtl);
+ 	if (ret)
 -- 
-2.7.4
+2.9.3
 
