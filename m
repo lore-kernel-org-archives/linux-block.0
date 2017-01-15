@@ -1,307 +1,279 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv6 23/37] mm: account huge pages to dirty, writaback, reclaimable, etc.
-Date: Thu, 26 Jan 2017 14:58:05 +0300
-Message-Id: <20170126115819.58875-24-kirill.shutemov@linux.intel.com>
-In-Reply-To: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
-References: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:33960 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1750901AbdAODmi (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sat, 14 Jan 2017 22:42:38 -0500
+Received: from pps.filterd (m0001255.ppops.net [127.0.0.1])
+        by mx0b-00082601.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id v0F3gPXv005112
+        for <linux-block@vger.kernel.org>; Sat, 14 Jan 2017 19:42:37 -0800
+Received: from mail.thefacebook.com ([199.201.64.23])
+        by mx0b-00082601.pphosted.com with ESMTP id 27ygp5hj20-4
+        (version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT)
+        for <linux-block@vger.kernel.org>; Sat, 14 Jan 2017 19:42:37 -0800
+Received: from facebook.com (2401:db00:21:603d:face:0:19:0)     by
+ mx-out.facebook.com (10.102.107.97) with ESMTP id
+ a76646f0dad411e68b690002c99331b0-d8df2a50 for <linux-block@vger.kernel.org>;
+        Sat, 14 Jan 2017 19:42:35 -0800
+From: Shaohua Li <shli@fb.com>
+To: <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>
+CC: <Kernel-team@fb.com>, <tj@kernel.org>, <axboe@fb.com>,
+        <vgoyal@redhat.com>
+Subject: [PATCH V6 06/18] blk-throttle: add downgrade logic
+Date: Sat, 14 Jan 2017 19:42:23 -0800
+Message-ID: <99aba1c01eac41df0e288d34817c5de4ad74d26f.1484451062.git.shli@fb.com>
+In-Reply-To: <cover.1484451062.git.shli@fb.com>
+References: <cover.1484451062.git.shli@fb.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-We need to account huge pages according to its size to get background
-writaback work properly.
+When queue state machine is in LIMIT_MAX state, but a cgroup is below
+its low limit for some time, the queue should be downgraded to lower
+state as one cgroup's low limit isn't met.
 
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+Signed-off-by: Shaohua Li <shli@fb.com>
 ---
- fs/fs-writeback.c           | 10 +++---
- include/linux/backing-dev.h | 10 ++++++
- include/linux/memcontrol.h  | 22 ++-----------
- mm/migrate.c                |  1 +
- mm/page-writeback.c         | 80 +++++++++++++++++++++++++++++----------------
- mm/rmap.c                   |  4 +--
- 6 files changed, 74 insertions(+), 53 deletions(-)
+ block/blk-throttle.c | 156 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 156 insertions(+)
 
-diff --git a/fs/fs-writeback.c b/fs/fs-writeback.c
-index ef600591d96f..e1c9faddc9e1 100644
---- a/fs/fs-writeback.c
-+++ b/fs/fs-writeback.c
-@@ -366,8 +366,9 @@ static void inode_switch_wbs_work_fn(struct work_struct *work)
- 		struct page *page = radix_tree_deref_slot_protected(slot,
- 							&mapping->tree_lock);
- 		if (likely(page) && PageDirty(page)) {
--			__dec_wb_stat(old_wb, WB_RECLAIMABLE);
--			__inc_wb_stat(new_wb, WB_RECLAIMABLE);
-+			int nr = hpage_nr_pages(page);
-+			__add_wb_stat(old_wb, WB_RECLAIMABLE, -nr);
-+			__add_wb_stat(new_wb, WB_RECLAIMABLE, nr);
- 		}
- 	}
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index 4cc066f..9dbbc94d 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -140,6 +140,13 @@ struct throtl_grp {
+ 	/* Number of bio's dispatched in current slice */
+ 	unsigned int io_disp[2];
  
-@@ -376,9 +377,10 @@ static void inode_switch_wbs_work_fn(struct work_struct *work)
- 		struct page *page = radix_tree_deref_slot_protected(slot,
- 							&mapping->tree_lock);
- 		if (likely(page)) {
-+			int nr = hpage_nr_pages(page);
- 			WARN_ON_ONCE(!PageWriteback(page));
--			__dec_wb_stat(old_wb, WB_WRITEBACK);
--			__inc_wb_stat(new_wb, WB_WRITEBACK);
-+			__add_wb_stat(old_wb, WB_WRITEBACK, -nr);
-+			__add_wb_stat(new_wb, WB_WRITEBACK, nr);
- 		}
- 	}
- 
-diff --git a/include/linux/backing-dev.h b/include/linux/backing-dev.h
-index 43b93a947e61..e63487f78824 100644
---- a/include/linux/backing-dev.h
-+++ b/include/linux/backing-dev.h
-@@ -61,6 +61,16 @@ static inline void __add_wb_stat(struct bdi_writeback *wb,
- 	__percpu_counter_add(&wb->stat[item], amount, WB_STAT_BATCH);
- }
- 
-+static inline void add_wb_stat(struct bdi_writeback *wb,
-+				 enum wb_stat_item item, s64 amount)
-+{
-+	unsigned long flags;
++	unsigned long last_low_overflow_time[2];
 +
-+	local_irq_save(flags);
-+	__add_wb_stat(wb, item, amount);
-+	local_irq_restore(flags);
++	uint64_t last_bytes_disp[2];
++	unsigned int last_io_disp[2];
++
++	unsigned long last_check_time;
++
+ 	/* When did we start a new slice */
+ 	unsigned long slice_start[2];
+ 	unsigned long slice_end[2];
+@@ -159,6 +166,9 @@ struct throtl_data
+ 	struct work_struct dispatch_work;
+ 	unsigned int limit_index;
+ 	bool limit_valid[LIMIT_CNT];
++
++	unsigned long low_upgrade_time;
++	unsigned long low_downgrade_time;
+ };
+ 
+ static void throtl_pending_timer_fn(unsigned long arg);
+@@ -898,6 +908,8 @@ static void throtl_charge_bio(struct throtl_grp *tg, struct bio *bio)
+ 	/* Charge the bio to the group */
+ 	tg->bytes_disp[rw] += bio->bi_iter.bi_size;
+ 	tg->io_disp[rw]++;
++	tg->last_bytes_disp[rw] += bio->bi_iter.bi_size;
++	tg->last_io_disp[rw]++;
+ 
+ 	/*
+ 	 * BIO_THROTTLED is used to prevent the same bio to be throttled
+@@ -1523,6 +1535,45 @@ static struct blkcg_policy blkcg_policy_throtl = {
+ 	.pd_free_fn		= throtl_pd_free,
+ };
+ 
++static unsigned long __tg_last_low_overflow_time(struct throtl_grp *tg)
++{
++	unsigned long rtime = jiffies, wtime = jiffies;
++
++	if (tg->bps[READ][LIMIT_LOW] || tg->iops[READ][LIMIT_LOW])
++		rtime = tg->last_low_overflow_time[READ];
++	if (tg->bps[WRITE][LIMIT_LOW] || tg->iops[WRITE][LIMIT_LOW])
++		wtime = tg->last_low_overflow_time[WRITE];
++	return min(rtime, wtime);
 +}
 +
- static inline void __inc_wb_stat(struct bdi_writeback *wb,
- 				 enum wb_stat_item item)
++/* tg should not be an intermediate node */
++static unsigned long tg_last_low_overflow_time(struct throtl_grp *tg)
++{
++	struct throtl_service_queue *parent_sq;
++	struct throtl_grp *parent = tg;
++	unsigned long ret = __tg_last_low_overflow_time(tg);
++
++	while (true) {
++		parent_sq = parent->service_queue.parent_sq;
++		parent = sq_to_tg(parent_sq);
++		if (!parent)
++			break;
++
++		/*
++		 * The parent doesn't have low limit, it always reaches low
++		 * limit. Its overflow time is useless for children
++		 */
++		if (!parent->bps[READ][LIMIT_LOW] &&
++		    !parent->iops[READ][LIMIT_LOW] &&
++		    !parent->bps[WRITE][LIMIT_LOW] &&
++		    !parent->iops[WRITE][LIMIT_LOW])
++			continue;
++		if (time_after(__tg_last_low_overflow_time(parent), ret))
++			ret = __tg_last_low_overflow_time(parent);
++	}
++	return ret;
++}
++
+ static bool throtl_tg_can_upgrade(struct throtl_grp *tg)
  {
-diff --git a/include/linux/memcontrol.h b/include/linux/memcontrol.h
-index 254698856b8f..7a341b01937f 100644
---- a/include/linux/memcontrol.h
-+++ b/include/linux/memcontrol.h
-@@ -29,6 +29,7 @@
- #include <linux/mmzone.h>
- #include <linux/writeback.h>
- #include <linux/page-flags.h>
-+#include <linux/mm.h>
+ 	struct throtl_service_queue *sq = &tg->service_queue;
+@@ -1566,6 +1617,9 @@ static bool throtl_can_upgrade(struct throtl_data *td,
+ 	if (td->limit_index != LIMIT_LOW)
+ 		return false;
  
- struct mem_cgroup;
- struct page;
-@@ -517,18 +518,6 @@ static inline void mem_cgroup_update_page_stat(struct page *page,
- 		this_cpu_add(page->mem_cgroup->stat->count[idx], val);
++	if (time_before(jiffies, td->low_downgrade_time + throtl_slice))
++		return false;
++
+ 	rcu_read_lock();
+ 	blkg_for_each_descendant_post(blkg, pos_css, td->queue->root_blkg) {
+ 		struct throtl_grp *tg = blkg_to_tg(blkg);
+@@ -1589,6 +1643,7 @@ static void throtl_upgrade_state(struct throtl_data *td)
+ 	struct blkcg_gq *blkg;
+ 
+ 	td->limit_index = LIMIT_MAX;
++	td->low_upgrade_time = jiffies;
+ 	rcu_read_lock();
+ 	blkg_for_each_descendant_post(blkg, pos_css, td->queue->root_blkg) {
+ 		struct throtl_grp *tg = blkg_to_tg(blkg);
+@@ -1604,6 +1659,99 @@ static void throtl_upgrade_state(struct throtl_data *td)
+ 	queue_work(kthrotld_workqueue, &td->dispatch_work);
  }
  
--static inline void mem_cgroup_inc_page_stat(struct page *page,
--					    enum mem_cgroup_stat_index idx)
--{
--	mem_cgroup_update_page_stat(page, idx, 1);
--}
--
--static inline void mem_cgroup_dec_page_stat(struct page *page,
--					    enum mem_cgroup_stat_index idx)
--{
--	mem_cgroup_update_page_stat(page, idx, -1);
--}
--
- unsigned long mem_cgroup_soft_limit_reclaim(pg_data_t *pgdat, int order,
- 						gfp_t gfp_mask,
- 						unsigned long *total_scanned);
-@@ -739,13 +728,8 @@ static inline bool mem_cgroup_oom_synchronize(bool wait)
- 	return false;
- }
- 
--static inline void mem_cgroup_inc_page_stat(struct page *page,
--					    enum mem_cgroup_stat_index idx)
--{
--}
--
--static inline void mem_cgroup_dec_page_stat(struct page *page,
--					    enum mem_cgroup_stat_index idx)
-+static inline void mem_cgroup_update_page_stat(struct page *page,
-+				 enum mem_cgroup_stat_index idx, int val)
++static void throtl_downgrade_state(struct throtl_data *td, int new)
++{
++	td->limit_index = new;
++	td->low_downgrade_time = jiffies;
++}
++
++static bool throtl_tg_can_downgrade(struct throtl_grp *tg)
++{
++	struct throtl_data *td = tg->td;
++	unsigned long now = jiffies;
++
++	/*
++	 * If cgroup is below low limit, consider downgrade and throttle other
++	 * cgroups
++	 */
++	if (time_after_eq(now, td->low_upgrade_time + throtl_slice) &&
++	    time_after_eq(now, tg_last_low_overflow_time(tg) + throtl_slice))
++		return true;
++	return false;
++}
++
++static bool throtl_hierarchy_can_downgrade(struct throtl_grp *tg)
++{
++	while (true) {
++		if (!throtl_tg_can_downgrade(tg))
++			return false;
++		tg = sq_to_tg(tg->service_queue.parent_sq);
++		if (!tg || !tg_to_blkg(tg)->parent)
++			break;
++	}
++	return true;
++}
++
++static void throtl_downgrade_check(struct throtl_grp *tg)
++{
++	uint64_t bps;
++	unsigned int iops;
++	unsigned long elapsed_time;
++	unsigned long now = jiffies;
++
++	if (tg->td->limit_index != LIMIT_MAX ||
++	    !tg->td->limit_valid[LIMIT_LOW])
++		return;
++	if (!list_empty(&tg_to_blkg(tg)->blkcg->css.children))
++		return;
++	if (time_after(tg->last_check_time + throtl_slice, now))
++		return;
++
++	elapsed_time = now - tg->last_check_time;
++	tg->last_check_time = now;
++
++	if (time_before(now, tg_last_low_overflow_time(tg) + throtl_slice))
++		return;
++
++	if (tg->bps[READ][LIMIT_LOW]) {
++		bps = tg->last_bytes_disp[READ] * HZ;
++		do_div(bps, elapsed_time);
++		if (bps >= tg->bps[READ][LIMIT_LOW])
++			tg->last_low_overflow_time[READ] = now;
++	}
++
++	if (tg->bps[WRITE][LIMIT_LOW]) {
++		bps = tg->last_bytes_disp[WRITE] * HZ;
++		do_div(bps, elapsed_time);
++		if (bps >= tg->bps[WRITE][LIMIT_LOW])
++			tg->last_low_overflow_time[WRITE] = now;
++	}
++
++	if (tg->iops[READ][LIMIT_LOW]) {
++		iops = tg->last_io_disp[READ] * HZ / elapsed_time;
++		if (iops >= tg->iops[READ][LIMIT_LOW])
++			tg->last_low_overflow_time[READ] = now;
++	}
++
++	if (tg->iops[WRITE][LIMIT_LOW]) {
++		iops = tg->last_io_disp[WRITE] * HZ / elapsed_time;
++		if (iops >= tg->iops[WRITE][LIMIT_LOW])
++			tg->last_low_overflow_time[WRITE] = now;
++	}
++
++	/*
++	 * If cgroup is below low limit, consider downgrade and throttle other
++	 * cgroups
++	 */
++	if (throtl_hierarchy_can_downgrade(tg))
++		throtl_downgrade_state(tg->td, LIMIT_LOW);
++
++	tg->last_bytes_disp[READ] = 0;
++	tg->last_bytes_disp[WRITE] = 0;
++	tg->last_io_disp[READ] = 0;
++	tg->last_io_disp[WRITE] = 0;
++}
++
+ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
+ 		    struct bio *bio)
  {
- }
+@@ -1628,12 +1776,16 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
  
-diff --git a/mm/migrate.c b/mm/migrate.c
-index 366466ed7fdc..20a9ce2fcc64 100644
---- a/mm/migrate.c
-+++ b/mm/migrate.c
-@@ -485,6 +485,7 @@ int migrate_page_move_mapping(struct address_space *mapping,
- 	 * are mapped to swap space.
- 	 */
- 	if (newzone != oldzone) {
-+		BUG_ON(PageTransHuge(page));
- 		__dec_node_state(oldzone->zone_pgdat, NR_FILE_PAGES);
- 		__inc_node_state(newzone->zone_pgdat, NR_FILE_PAGES);
- 		if (PageSwapBacked(page) && !PageSwapCache(page)) {
-diff --git a/mm/page-writeback.c b/mm/page-writeback.c
-index 47d5b12c460e..d7b905d66add 100644
---- a/mm/page-writeback.c
-+++ b/mm/page-writeback.c
-@@ -2430,19 +2430,22 @@ void account_page_dirtied(struct page *page, struct address_space *mapping)
+ again:
+ 	while (true) {
++		if (tg->last_low_overflow_time[rw] == 0)
++			tg->last_low_overflow_time[rw] = jiffies;
++		throtl_downgrade_check(tg);
+ 		/* throtl is FIFO - if bios are already queued, should queue */
+ 		if (sq->nr_queued[rw])
+ 			break;
  
- 	if (mapping_cap_account_dirty(mapping)) {
- 		struct bdi_writeback *wb;
-+		struct zone *zone = page_zone(page);
-+		pg_data_t *pgdat = page_pgdat(page);
-+		int nr = hpage_nr_pages(page);
+ 		/* if above limits, break to queue */
+ 		if (!tg_may_dispatch(tg, bio, NULL)) {
++			tg->last_low_overflow_time[rw] = jiffies;
+ 			if (throtl_can_upgrade(tg->td, tg)) {
+ 				throtl_upgrade_state(tg->td);
+ 				goto again;
+@@ -1677,6 +1829,8 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
+ 		   tg->io_disp[rw], tg_iops_limit(tg, rw),
+ 		   sq->nr_queued[READ], sq->nr_queued[WRITE]);
  
- 		inode_attach_wb(inode, page);
- 		wb = inode_to_wb(inode);
- 
--		mem_cgroup_inc_page_stat(page, MEM_CGROUP_STAT_DIRTY);
--		__inc_node_page_state(page, NR_FILE_DIRTY);
--		__inc_zone_page_state(page, NR_ZONE_WRITE_PENDING);
--		__inc_node_page_state(page, NR_DIRTIED);
--		__inc_wb_stat(wb, WB_RECLAIMABLE);
--		__inc_wb_stat(wb, WB_DIRTIED);
--		task_io_account_write(PAGE_SIZE);
--		current->nr_dirtied++;
--		this_cpu_inc(bdp_ratelimits);
-+		mem_cgroup_update_page_stat(page, MEM_CGROUP_STAT_DIRTY, nr);
-+		__mod_node_page_state(pgdat, NR_FILE_DIRTY, nr);
-+		__mod_zone_page_state(zone, NR_ZONE_WRITE_PENDING, nr);
-+		__mod_node_page_state(pgdat, NR_DIRTIED, nr);
-+		__add_wb_stat(wb, WB_RECLAIMABLE, nr);
-+		__add_wb_stat(wb, WB_DIRTIED, nr);
-+		task_io_account_write(nr * PAGE_SIZE);
-+		current->nr_dirtied += nr;
-+		this_cpu_add(bdp_ratelimits, nr);
- 	}
- }
- EXPORT_SYMBOL(account_page_dirtied);
-@@ -2456,11 +2459,15 @@ void account_page_cleaned(struct page *page, struct address_space *mapping,
- 			  struct bdi_writeback *wb)
- {
- 	if (mapping_cap_account_dirty(mapping)) {
--		mem_cgroup_dec_page_stat(page, MEM_CGROUP_STAT_DIRTY);
--		dec_node_page_state(page, NR_FILE_DIRTY);
--		dec_zone_page_state(page, NR_ZONE_WRITE_PENDING);
--		dec_wb_stat(wb, WB_RECLAIMABLE);
--		task_io_account_cancelled_write(PAGE_SIZE);
-+		struct zone *zone = page_zone(page);
-+		pg_data_t *pgdat = page_pgdat(page);
-+		int nr = hpage_nr_pages(page);
++	tg->last_low_overflow_time[rw] = jiffies;
 +
-+		mem_cgroup_update_page_stat(page, MEM_CGROUP_STAT_DIRTY, -nr);
-+		mod_node_page_state(pgdat, NR_FILE_DIRTY, -nr);
-+		mod_zone_page_state(zone, NR_ZONE_WRITE_PENDING, -nr);
-+		add_wb_stat(wb, WB_RECLAIMABLE, -nr);
-+		task_io_account_cancelled_write(PAGE_SIZE * nr);
- 	}
- }
+ 	bio_associate_current(bio);
+ 	tg->td->nr_queued[rw]++;
+ 	throtl_add_bio_tg(bio, qn, tg);
+@@ -1787,6 +1941,8 @@ int blk_throtl_init(struct request_queue *q)
  
-@@ -2520,14 +2527,16 @@ void account_page_redirty(struct page *page)
- 	struct address_space *mapping = page->mapping;
- 
- 	if (mapping && mapping_cap_account_dirty(mapping)) {
-+		pg_data_t *pgdat = page_pgdat(page);
-+		int nr = hpage_nr_pages(page);
- 		struct inode *inode = mapping->host;
- 		struct bdi_writeback *wb;
- 		bool locked;
- 
- 		wb = unlocked_inode_to_wb_begin(inode, &locked);
--		current->nr_dirtied--;
--		dec_node_page_state(page, NR_DIRTIED);
--		dec_wb_stat(wb, WB_DIRTIED);
-+		current->nr_dirtied -= nr;
-+		mod_node_page_state(pgdat, NR_DIRTIED, -nr);
-+		add_wb_stat(wb, WB_DIRTIED, -nr);
- 		unlocked_inode_to_wb_end(inode, locked);
- 	}
- }
-@@ -2713,10 +2722,15 @@ int clear_page_dirty_for_io(struct page *page)
- 		 */
- 		wb = unlocked_inode_to_wb_begin(inode, &locked);
- 		if (TestClearPageDirty(page)) {
--			mem_cgroup_dec_page_stat(page, MEM_CGROUP_STAT_DIRTY);
--			dec_node_page_state(page, NR_FILE_DIRTY);
--			dec_zone_page_state(page, NR_ZONE_WRITE_PENDING);
--			dec_wb_stat(wb, WB_RECLAIMABLE);
-+			struct zone *zone = page_zone(page);
-+			pg_data_t *pgdat = page_pgdat(page);
-+			int nr = hpage_nr_pages(page);
-+
-+			mem_cgroup_update_page_stat(page,
-+					MEM_CGROUP_STAT_DIRTY, -nr);
-+			mod_node_page_state(pgdat, NR_FILE_DIRTY, -nr);
-+			mod_zone_page_state(zone, NR_ZONE_WRITE_PENDING, -nr);
-+			add_wb_stat(wb, WB_RECLAIMABLE, -nr);
- 			ret = 1;
- 		}
- 		unlocked_inode_to_wb_end(inode, locked);
-@@ -2760,10 +2774,15 @@ int test_clear_page_writeback(struct page *page)
- 		ret = TestClearPageWriteback(page);
- 	}
- 	if (ret) {
--		mem_cgroup_dec_page_stat(page, MEM_CGROUP_STAT_WRITEBACK);
--		dec_node_page_state(page, NR_WRITEBACK);
--		dec_zone_page_state(page, NR_ZONE_WRITE_PENDING);
--		inc_node_page_state(page, NR_WRITTEN);
-+		struct zone *zone = page_zone(page);
-+		pg_data_t *pgdat = page_pgdat(page);
-+		int nr = hpage_nr_pages(page);
-+
-+		mem_cgroup_update_page_stat(page,
-+				MEM_CGROUP_STAT_WRITEBACK, -nr);
-+		mod_node_page_state(pgdat, NR_WRITEBACK, -nr);
-+		mod_zone_page_state(zone, NR_ZONE_WRITE_PENDING, -nr);
-+		mod_node_page_state(pgdat, NR_WRITTEN, nr);
- 	}
- 	unlock_page_memcg(page);
- 	return ret;
-@@ -2815,9 +2834,14 @@ int __test_set_page_writeback(struct page *page, bool keep_write)
- 		ret = TestSetPageWriteback(page);
- 	}
- 	if (!ret) {
--		mem_cgroup_inc_page_stat(page, MEM_CGROUP_STAT_WRITEBACK);
--		inc_node_page_state(page, NR_WRITEBACK);
--		inc_zone_page_state(page, NR_ZONE_WRITE_PENDING);
-+		struct zone *zone = page_zone(page);
-+		pg_data_t *pgdat = page_pgdat(page);
-+		int nr = hpage_nr_pages(page);
-+
-+		mem_cgroup_update_page_stat(page,
-+				MEM_CGROUP_STAT_WRITEBACK, nr);
-+		mod_node_page_state(pgdat, NR_WRITEBACK, nr);
-+		mod_zone_page_state(zone, NR_ZONE_WRITE_PENDING, nr);
- 	}
- 	unlock_page_memcg(page);
- 	return ret;
-diff --git a/mm/rmap.c b/mm/rmap.c
-index d9daa54dc316..38f1682f8dfc 100644
---- a/mm/rmap.c
-+++ b/mm/rmap.c
-@@ -1154,7 +1154,7 @@ void page_add_file_rmap(struct page *page, bool compound)
- 			goto out;
- 	}
- 	__mod_node_page_state(page_pgdat(page), NR_FILE_MAPPED, nr);
--	mem_cgroup_inc_page_stat(page, MEM_CGROUP_STAT_FILE_MAPPED);
-+	mem_cgroup_update_page_stat(page, MEM_CGROUP_STAT_FILE_MAPPED, nr);
- out:
- 	unlock_page_memcg(page);
- }
-@@ -1196,7 +1196,7 @@ static void page_remove_file_rmap(struct page *page, bool compound)
- 	 * pte lock(a spinlock) is held, which implies preemption disabled.
- 	 */
- 	__mod_node_page_state(page_pgdat(page), NR_FILE_MAPPED, -nr);
--	mem_cgroup_dec_page_stat(page, MEM_CGROUP_STAT_FILE_MAPPED);
-+	mem_cgroup_update_page_stat(page, MEM_CGROUP_STAT_FILE_MAPPED, -nr);
- 
- 	if (unlikely(PageMlocked(page)))
- 		clear_page_mlock(page);
+ 	td->limit_valid[LIMIT_MAX] = true;
+ 	td->limit_index = LIMIT_MAX;
++	td->low_upgrade_time = jiffies;
++	td->low_downgrade_time = jiffies;
+ 	/* activate policy */
+ 	ret = blkcg_activate_policy(q, &blkcg_policy_throtl);
+ 	if (ret)
 -- 
-2.11.0
+2.9.3
 
