@@ -1,72 +1,45 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:33460 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1752955AbdAKVkM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Jan 2017 16:40:12 -0500
-From: Jens Axboe <axboe@fb.com>
-To: <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>
-CC: <osandov@osandov.com>, <bart.vanassche@sandisk.com>,
-        Jens Axboe <axboe@fb.com>
-Subject: [PATCH 02/10] blk-mq: make mq_ops a const pointer
-Date: Wed, 11 Jan 2017 14:39:55 -0700
-Message-ID: <1484170803-9311-3-git-send-email-axboe@fb.com>
-In-Reply-To: <1484170803-9311-1-git-send-email-axboe@fb.com>
-References: <1484170803-9311-1-git-send-email-axboe@fb.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Received: from mail.avalus.com ([89.16.176.221]:53535 "EHLO mail.avalus.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750802AbdAOHWy (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 15 Jan 2017 02:22:54 -0500
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Subject: Re: [Nbd] NBD: exported files over something around 1 TiB get an insane device size on the client side and are actually empty
+From: Alex Bligh <alex@alex.org.uk>
+In-Reply-To: <1484442228.7132.0@smtp.office365.com>
+Date: Sun, 15 Jan 2017 07:13:02 +0000
+Cc: Alex Bligh <alex@alex.org.uk>,
+        Christoph Anton Mitterer <calestyo@scientia.net>,
+        linux-block@vger.kernel.org,
+        "nbd-general@lists.sourceforge.net"
+        <nbd-general@lists.sourceforge.net>
+Message-Id: <3F2D624F-3576-4A29-A41E-88E6DE32026E@alex.org.uk>
+References: <1484436698.7110.29.camel@scientia.net> <1484442228.7132.0@smtp.office365.com>
+To: Josef Bacik <jbacik@fb.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-We never change it, make that clear.
 
-Signed-off-by: Jens Axboe <axboe@fb.com>
-Reviewed-by: Bart Van Assche <bart.vanassche@sandisk.com>
----
- block/blk-mq.c         | 2 +-
- include/linux/blk-mq.h | 2 +-
- include/linux/blkdev.h | 2 +-
- 3 files changed, 3 insertions(+), 3 deletions(-)
+> On 15 Jan 2017, at 01:03, Josef Bacik <jbacik@fb.com> wrote:
+>=20
+> Yeah I noticed this in testing, there's a bug with NBD since it's=20
+> inception where it uses a 32 bit number for keeping track of the size=20=
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index a8e67a155d04..79e1cb0f7b15 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -639,7 +639,7 @@ struct blk_mq_timeout_data {
- 
- void blk_mq_rq_timed_out(struct request *req, bool reserved)
- {
--	struct blk_mq_ops *ops = req->q->mq_ops;
-+	const struct blk_mq_ops *ops = req->q->mq_ops;
- 	enum blk_eh_timer_return ret = BLK_EH_RESET_TIMER;
- 
- 	/*
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 4a2ab5d99ff7..afc81d77e471 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -60,7 +60,7 @@ struct blk_mq_hw_ctx {
- 
- struct blk_mq_tag_set {
- 	unsigned int		*mq_map;
--	struct blk_mq_ops	*ops;
-+	const struct blk_mq_ops	*ops;
- 	unsigned int		nr_hw_queues;
- 	unsigned int		queue_depth;	/* max hw supported */
- 	unsigned int		reserved_tags;
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 83695641bd5e..e19fc8e01fb2 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -407,7 +407,7 @@ struct request_queue {
- 	dma_drain_needed_fn	*dma_drain_needed;
- 	lld_busy_fn		*lld_busy_fn;
- 
--	struct blk_mq_ops	*mq_ops;
-+	const struct blk_mq_ops	*mq_ops;
- 
- 	unsigned int		*mq_map;
- 
--- 
-2.7.4
+> of the device, I fixed it with
+>=20
+> nbd: use loff_t for blocksize and nbd_set_size args
+>=20
+> It'll be in 4.10.  Thanks,
+
+Interestingly enough, this is a regression, as the random 3.x kernel I =
+tried did not show the issue.
+
+Thanks for the fix Josef.
+
+--=20
+Alex Bligh
+
+
+
 
