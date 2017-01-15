@@ -1,27 +1,27 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:33960 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1750901AbdAODmi (ORCPT
+Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:59141 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1750812AbdAODmh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 14 Jan 2017 22:42:38 -0500
-Received: from pps.filterd (m0001255.ppops.net [127.0.0.1])
-        by mx0b-00082601.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id v0F3gPXv005112
-        for <linux-block@vger.kernel.org>; Sat, 14 Jan 2017 19:42:37 -0800
+        Sat, 14 Jan 2017 22:42:37 -0500
+Received: from pps.filterd (m0109333.ppops.net [127.0.0.1])
+        by mx0a-00082601.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id v0F3eDI1002202
+        for <linux-block@vger.kernel.org>; Sat, 14 Jan 2017 19:42:36 -0800
 Received: from mail.thefacebook.com ([199.201.64.23])
-        by mx0b-00082601.pphosted.com with ESMTP id 27ygp5hj20-4
+        by mx0a-00082601.pphosted.com with ESMTP id 27ygw69px9-1
         (version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT)
-        for <linux-block@vger.kernel.org>; Sat, 14 Jan 2017 19:42:37 -0800
+        for <linux-block@vger.kernel.org>; Sat, 14 Jan 2017 19:42:36 -0800
 Received: from facebook.com (2401:db00:21:603d:face:0:19:0)     by
- mx-out.facebook.com (10.102.107.97) with ESMTP id
- a76646f0dad411e68b690002c99331b0-d8df2a50 for <linux-block@vger.kernel.org>;
+ mx-out.facebook.com (10.102.107.99) with ESMTP id
+ a7510f88dad411e68df70002c99293a0-729f7a50 for <linux-block@vger.kernel.org>;
         Sat, 14 Jan 2017 19:42:35 -0800
 From: Shaohua Li <shli@fb.com>
 To: <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>
 CC: <Kernel-team@fb.com>, <tj@kernel.org>, <axboe@fb.com>,
         <vgoyal@redhat.com>
-Subject: [PATCH V6 06/18] blk-throttle: add downgrade logic
-Date: Sat, 14 Jan 2017 19:42:23 -0800
-Message-ID: <99aba1c01eac41df0e288d34817c5de4ad74d26f.1484451062.git.shli@fb.com>
+Subject: [PATCH V6 04/18] blk-throttle: configure bps/iops limit for cgroup in low limit
+Date: Sat, 14 Jan 2017 19:42:21 -0800
+Message-ID: <f2c640aba4ba65d364fb26b300850d2531619c7d.1484451062.git.shli@fb.com>
 In-Reply-To: <cover.1484451062.git.shli@fb.com>
 References: <cover.1484451062.git.shli@fb.com>
 MIME-Version: 1.0
@@ -29,251 +29,56 @@ Content-Type: text/plain
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-When queue state machine is in LIMIT_MAX state, but a cgroup is below
-its low limit for some time, the queue should be downgraded to lower
-state as one cgroup's low limit isn't met.
+each queue will have a state machine. Initially queue is in LIMIT_LOW
+state, which means all cgroups will be throttled according to their low
+limit. After all cgroups with low limit cross the limit, the queue state
+gets upgraded to LIMIT_MAX state.
+For max limit, cgroup will use the limit configured by user.
+For low limit, cgroup will use the minimal value between low limit and
+max limit configured by user. If the minimal value is 0, which means the
+cgroup doesn't configure low limit, we will use max limit to throttle
+the cgroup and the cgroup is ready to upgrade to LIMIT_MAX
 
 Signed-off-by: Shaohua Li <shli@fb.com>
 ---
- block/blk-throttle.c | 156 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 156 insertions(+)
+ block/blk-throttle.c | 20 ++++++++++++++++++--
+ 1 file changed, 18 insertions(+), 2 deletions(-)
 
 diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 4cc066f..9dbbc94d 100644
+index d3ad43c..3bc6deb 100644
 --- a/block/blk-throttle.c
 +++ b/block/blk-throttle.c
-@@ -140,6 +140,13 @@ struct throtl_grp {
- 	/* Number of bio's dispatched in current slice */
- 	unsigned int io_disp[2];
+@@ -212,12 +212,28 @@ static struct throtl_data *sq_to_td(struct throtl_service_queue *sq)
  
-+	unsigned long last_low_overflow_time[2];
-+
-+	uint64_t last_bytes_disp[2];
-+	unsigned int last_io_disp[2];
-+
-+	unsigned long last_check_time;
-+
- 	/* When did we start a new slice */
- 	unsigned long slice_start[2];
- 	unsigned long slice_end[2];
-@@ -159,6 +166,9 @@ struct throtl_data
- 	struct work_struct dispatch_work;
- 	unsigned int limit_index;
- 	bool limit_valid[LIMIT_CNT];
-+
-+	unsigned long low_upgrade_time;
-+	unsigned long low_downgrade_time;
- };
- 
- static void throtl_pending_timer_fn(unsigned long arg);
-@@ -898,6 +908,8 @@ static void throtl_charge_bio(struct throtl_grp *tg, struct bio *bio)
- 	/* Charge the bio to the group */
- 	tg->bytes_disp[rw] += bio->bi_iter.bi_size;
- 	tg->io_disp[rw]++;
-+	tg->last_bytes_disp[rw] += bio->bi_iter.bi_size;
-+	tg->last_io_disp[rw]++;
- 
- 	/*
- 	 * BIO_THROTTLED is used to prevent the same bio to be throttled
-@@ -1523,6 +1535,45 @@ static struct blkcg_policy blkcg_policy_throtl = {
- 	.pd_free_fn		= throtl_pd_free,
- };
- 
-+static unsigned long __tg_last_low_overflow_time(struct throtl_grp *tg)
-+{
-+	unsigned long rtime = jiffies, wtime = jiffies;
-+
-+	if (tg->bps[READ][LIMIT_LOW] || tg->iops[READ][LIMIT_LOW])
-+		rtime = tg->last_low_overflow_time[READ];
-+	if (tg->bps[WRITE][LIMIT_LOW] || tg->iops[WRITE][LIMIT_LOW])
-+		wtime = tg->last_low_overflow_time[WRITE];
-+	return min(rtime, wtime);
-+}
-+
-+/* tg should not be an intermediate node */
-+static unsigned long tg_last_low_overflow_time(struct throtl_grp *tg)
-+{
-+	struct throtl_service_queue *parent_sq;
-+	struct throtl_grp *parent = tg;
-+	unsigned long ret = __tg_last_low_overflow_time(tg);
-+
-+	while (true) {
-+		parent_sq = parent->service_queue.parent_sq;
-+		parent = sq_to_tg(parent_sq);
-+		if (!parent)
-+			break;
-+
-+		/*
-+		 * The parent doesn't have low limit, it always reaches low
-+		 * limit. Its overflow time is useless for children
-+		 */
-+		if (!parent->bps[READ][LIMIT_LOW] &&
-+		    !parent->iops[READ][LIMIT_LOW] &&
-+		    !parent->bps[WRITE][LIMIT_LOW] &&
-+		    !parent->iops[WRITE][LIMIT_LOW])
-+			continue;
-+		if (time_after(__tg_last_low_overflow_time(parent), ret))
-+			ret = __tg_last_low_overflow_time(parent);
-+	}
-+	return ret;
-+}
-+
- static bool throtl_tg_can_upgrade(struct throtl_grp *tg)
+ static uint64_t tg_bps_limit(struct throtl_grp *tg, int rw)
  {
- 	struct throtl_service_queue *sq = &tg->service_queue;
-@@ -1566,6 +1617,9 @@ static bool throtl_can_upgrade(struct throtl_data *td,
- 	if (td->limit_index != LIMIT_LOW)
- 		return false;
- 
-+	if (time_before(jiffies, td->low_downgrade_time + throtl_slice))
-+		return false;
+-	return tg->bps[rw][tg->td->limit_index];
++	struct blkcg_gq *blkg = tg_to_blkg(tg);
++	uint64_t ret;
 +
- 	rcu_read_lock();
- 	blkg_for_each_descendant_post(blkg, pos_css, td->queue->root_blkg) {
- 		struct throtl_grp *tg = blkg_to_tg(blkg);
-@@ -1589,6 +1643,7 @@ static void throtl_upgrade_state(struct throtl_data *td)
- 	struct blkcg_gq *blkg;
- 
- 	td->limit_index = LIMIT_MAX;
-+	td->low_upgrade_time = jiffies;
- 	rcu_read_lock();
- 	blkg_for_each_descendant_post(blkg, pos_css, td->queue->root_blkg) {
- 		struct throtl_grp *tg = blkg_to_tg(blkg);
-@@ -1604,6 +1659,99 @@ static void throtl_upgrade_state(struct throtl_data *td)
- 	queue_work(kthrotld_workqueue, &td->dispatch_work);
++	if (cgroup_subsys_on_dfl(io_cgrp_subsys) && !blkg->parent)
++		return U64_MAX;
++	ret = tg->bps[rw][tg->td->limit_index];
++	if (ret == 0 && tg->td->limit_index == LIMIT_LOW)
++		return tg->bps[rw][LIMIT_MAX];
++	return ret;
  }
  
-+static void throtl_downgrade_state(struct throtl_data *td, int new)
-+{
-+	td->limit_index = new;
-+	td->low_downgrade_time = jiffies;
-+}
-+
-+static bool throtl_tg_can_downgrade(struct throtl_grp *tg)
-+{
-+	struct throtl_data *td = tg->td;
-+	unsigned long now = jiffies;
-+
-+	/*
-+	 * If cgroup is below low limit, consider downgrade and throttle other
-+	 * cgroups
-+	 */
-+	if (time_after_eq(now, td->low_upgrade_time + throtl_slice) &&
-+	    time_after_eq(now, tg_last_low_overflow_time(tg) + throtl_slice))
-+		return true;
-+	return false;
-+}
-+
-+static bool throtl_hierarchy_can_downgrade(struct throtl_grp *tg)
-+{
-+	while (true) {
-+		if (!throtl_tg_can_downgrade(tg))
-+			return false;
-+		tg = sq_to_tg(tg->service_queue.parent_sq);
-+		if (!tg || !tg_to_blkg(tg)->parent)
-+			break;
-+	}
-+	return true;
-+}
-+
-+static void throtl_downgrade_check(struct throtl_grp *tg)
-+{
-+	uint64_t bps;
-+	unsigned int iops;
-+	unsigned long elapsed_time;
-+	unsigned long now = jiffies;
-+
-+	if (tg->td->limit_index != LIMIT_MAX ||
-+	    !tg->td->limit_valid[LIMIT_LOW])
-+		return;
-+	if (!list_empty(&tg_to_blkg(tg)->blkcg->css.children))
-+		return;
-+	if (time_after(tg->last_check_time + throtl_slice, now))
-+		return;
-+
-+	elapsed_time = now - tg->last_check_time;
-+	tg->last_check_time = now;
-+
-+	if (time_before(now, tg_last_low_overflow_time(tg) + throtl_slice))
-+		return;
-+
-+	if (tg->bps[READ][LIMIT_LOW]) {
-+		bps = tg->last_bytes_disp[READ] * HZ;
-+		do_div(bps, elapsed_time);
-+		if (bps >= tg->bps[READ][LIMIT_LOW])
-+			tg->last_low_overflow_time[READ] = now;
-+	}
-+
-+	if (tg->bps[WRITE][LIMIT_LOW]) {
-+		bps = tg->last_bytes_disp[WRITE] * HZ;
-+		do_div(bps, elapsed_time);
-+		if (bps >= tg->bps[WRITE][LIMIT_LOW])
-+			tg->last_low_overflow_time[WRITE] = now;
-+	}
-+
-+	if (tg->iops[READ][LIMIT_LOW]) {
-+		iops = tg->last_io_disp[READ] * HZ / elapsed_time;
-+		if (iops >= tg->iops[READ][LIMIT_LOW])
-+			tg->last_low_overflow_time[READ] = now;
-+	}
-+
-+	if (tg->iops[WRITE][LIMIT_LOW]) {
-+		iops = tg->last_io_disp[WRITE] * HZ / elapsed_time;
-+		if (iops >= tg->iops[WRITE][LIMIT_LOW])
-+			tg->last_low_overflow_time[WRITE] = now;
-+	}
-+
-+	/*
-+	 * If cgroup is below low limit, consider downgrade and throttle other
-+	 * cgroups
-+	 */
-+	if (throtl_hierarchy_can_downgrade(tg))
-+		throtl_downgrade_state(tg->td, LIMIT_LOW);
-+
-+	tg->last_bytes_disp[READ] = 0;
-+	tg->last_bytes_disp[WRITE] = 0;
-+	tg->last_io_disp[READ] = 0;
-+	tg->last_io_disp[WRITE] = 0;
-+}
-+
- bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
- 		    struct bio *bio)
+ static unsigned int tg_iops_limit(struct throtl_grp *tg, int rw)
  {
-@@ -1628,12 +1776,16 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
- 
- again:
- 	while (true) {
-+		if (tg->last_low_overflow_time[rw] == 0)
-+			tg->last_low_overflow_time[rw] = jiffies;
-+		throtl_downgrade_check(tg);
- 		/* throtl is FIFO - if bios are already queued, should queue */
- 		if (sq->nr_queued[rw])
- 			break;
- 
- 		/* if above limits, break to queue */
- 		if (!tg_may_dispatch(tg, bio, NULL)) {
-+			tg->last_low_overflow_time[rw] = jiffies;
- 			if (throtl_can_upgrade(tg->td, tg)) {
- 				throtl_upgrade_state(tg->td);
- 				goto again;
-@@ -1677,6 +1829,8 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
- 		   tg->io_disp[rw], tg_iops_limit(tg, rw),
- 		   sq->nr_queued[READ], sq->nr_queued[WRITE]);
- 
-+	tg->last_low_overflow_time[rw] = jiffies;
+-	return tg->iops[rw][tg->td->limit_index];
++	struct blkcg_gq *blkg = tg_to_blkg(tg);
++	unsigned int ret;
 +
- 	bio_associate_current(bio);
- 	tg->td->nr_queued[rw]++;
- 	throtl_add_bio_tg(bio, qn, tg);
-@@ -1787,6 +1941,8 @@ int blk_throtl_init(struct request_queue *q)
++	if (cgroup_subsys_on_dfl(io_cgrp_subsys) && !blkg->parent)
++		return UINT_MAX;
++	ret = tg->iops[rw][tg->td->limit_index];
++	if (ret == 0 && tg->td->limit_index == LIMIT_LOW)
++		return tg->iops[rw][LIMIT_MAX];
++	return ret;
+ }
  
- 	td->limit_valid[LIMIT_MAX] = true;
- 	td->limit_index = LIMIT_MAX;
-+	td->low_upgrade_time = jiffies;
-+	td->low_downgrade_time = jiffies;
- 	/* activate policy */
- 	ret = blkcg_activate_policy(q, &blkcg_policy_throtl);
- 	if (ret)
+ /**
 -- 
 2.9.3
 
