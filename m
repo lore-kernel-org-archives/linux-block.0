@@ -1,236 +1,244 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from aserp1040.oracle.com ([141.146.126.69]:48463 "EHLO
-        aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750770AbdAQGeH (ORCPT
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:1349 "EHLO
+        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751246AbdAPC15 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Jan 2017 01:34:07 -0500
-Date: Mon, 16 Jan 2017 22:33:55 -0800
-From: "Darrick J. Wong" <darrick.wong@oracle.com>
+        Sun, 15 Jan 2017 21:27:57 -0500
+From: Slava Dubeyko <Vyacheslav.Dubeyko@wdc.com>
 To: Vishal Verma <vishal.l.verma@intel.com>
-Cc: Slava Dubeyko <Vyacheslav.Dubeyko@wdc.com>,
-        "lsf-pc@lists.linux-foundation.org"
+CC: "lsf-pc@lists.linux-foundation.org"
         <lsf-pc@lists.linux-foundation.org>,
-        "linux-nvdimm@lists.01.org" <linux-nvdimm@ml01.01.org>,
+        "linux-nvdimm@lists.01.org" <linux-nvdimm@lists.01.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         Linux FS Devel <linux-fsdevel@vger.kernel.org>,
         Viacheslav Dubeyko <slava@dubeyko.com>
-Subject: Re: [LSF/MM TOPIC] Badblocks checking/representation in filesystems
-Message-ID: <20170117063355.GL14033@birch.djwong.org>
+Subject: RE: [LSF/MM TOPIC] Badblocks checking/representation in filesystems
+Date: Mon, 16 Jan 2017 02:27:52 +0000
+Message-ID: <SN2PR04MB2191A6EDB7203AF86600FD25887D0@SN2PR04MB2191.namprd04.prod.outlook.com>
 References: <at1mp6pou4lenesjdgh22k4p.1484345585589@email.android.com>
  <b9rbflutjt10mb4ofherta8j.1484345610771@email.android.com>
  <SN2PR04MB2191756EABCB0E9DAA3B5328887B0@SN2PR04MB2191.namprd04.prod.outlook.com>
  <20170114004910.GA4880@omniknight.lm.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
 In-Reply-To: <20170114004910.GA4880@omniknight.lm.intel.com>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Fri, Jan 13, 2017 at 05:49:10PM -0700, Vishal Verma wrote:
-> On 01/14, Slava Dubeyko wrote:
-> > 
-> > ---- Original Message ----
-> > Subject: [LSF/MM TOPIC] Badblocks checking/representation in filesystems
-> > Sent: Jan 13, 2017 1:40 PM
-> > From: "Verma, Vishal L" <vishal.l.verma@intel.com>
-> > To: lsf-pc@lists.linux-foundation.org
-> > Cc: linux-nvdimm@lists.01.org, linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-> > 
-> > > The current implementation of badblocks, where we consult the badblocks
-> > > list for every IO in the block driver works, and is a last option
-> > > failsafe, but from a user perspective, it isn't the easiest interface to
-> > > work with.
-> > 
-> > As I remember, FAT and HFS+ specifications contain description of bad blocks
-> > (physical sectors) table. I believe that this table was used for the case of
-> > floppy media. But, finally, this table becomes to be the completely obsolete
-> > artefact because mostly storage devices are reliably enough. Why do you need
 
-ext4 has a badblocks inode to own all the bad spots on disk, but ISTR it
-doesn't support(??) extents or 64-bit filesystems, and might just be a
-vestigial organ at this point.  XFS doesn't have anything to track bad
-blocks currently....
+-----Original Message-----
+From: Vishal Verma [mailto:vishal.l.verma@intel.com]=20
+Sent: Friday, January 13, 2017 4:49 PM
+To: Slava Dubeyko <Vyacheslav.Dubeyko@wdc.com>
+Cc: lsf-pc@lists.linux-foundation.org; linux-nvdimm@lists.01.org; linux-blo=
+ck@vger.kernel.org; Linux FS Devel <linux-fsdevel@vger.kernel.org>; Viaches=
+lav Dubeyko <slava@dubeyko.com>
+Subject: Re: [LSF/MM TOPIC] Badblocks checking/representation in filesystem=
+s
 
-> > in exposing the bad blocks on the file system level?  Do you expect that next
-> > generation of NVM memory will be so unreliable that file system needs to manage
-> > bad blocks? What's about erasure coding schemes? Do file system really need to suffer
-> > from the bad block issue? 
-> > 
-> > Usually, we are using LBAs and it is the responsibility of storage device to map
-> > a bad physical block/page/sector into valid one. Do you mean that we have
-> > access to physical NVM memory address directly? But it looks like that we can
-> > have a "bad block" issue even we will access data into page cache's memory
-> > page (if we will use NVM memory for page cache, of course). So, what do you
-> > imply by "bad block" issue? 
-> 
-> We don't have direct physical access to the device's address space, in
-> the sense the device is still free to perform remapping of chunks of NVM
-> underneath us. The problem is that when a block or address range (as
-> small as a cache line) goes bad, the device maintains a poison bit for
-> every affected cache line. Behind the scenes, it may have already
-> remapped the range, but the cache line poison has to be kept so that
-> there is a notification to the user/owner of the data that something has
-> been lost. Since NVM is byte addressable memory sitting on the memory
-> bus, such a poisoned cache line results in memory errors and SIGBUSes.
-> Compared to tradational storage where an app will get nice and friendly
-> (relatively speaking..) -EIOs. The whole badblocks implementation was
-> done so that the driver can intercept IO (i.e. reads) to _known_ bad
-> locations, and short-circuit them with an EIO. If the driver doesn't
-> catch these, the reads will turn into a memory bus access, and the
-> poison will cause a SIGBUS.
+<skipped>
 
-"driver" ... you mean XFS?  Or do you mean the thing that makes pmem
-look kind of like a traditional block device? :)
+> We don't have direct physical access to the device's address space, in th=
+e sense
+> the device is still free to perform remapping of chunks of NVM underneath=
+ us.
+> The problem is that when a block or address range (as small as a cache li=
+ne) goes bad,
+> the device maintains a poison bit for every affected cache line. Behind t=
+he scenes,
+> it may have already remapped the range, but the cache line poison has to =
+be kept so that
+> there is a notification to the user/owner of the data that something has =
+been lost.
+> Since NVM is byte addressable memory sitting on the memory bus, such a po=
+isoned
+> cache line results in memory errors and SIGBUSes.
+> Compared to tradational storage where an app will get nice and friendly (=
+relatively speaking..) -EIOs.
+> The whole badblocks implementation was done so that the driver can interc=
+ept IO (i.e. reads)
+> to _known_ bad locations, and short-circuit them with an EIO. If the driv=
+er doesn't catch these,
+> the reads will turn into a memory bus access, and the poison will cause a=
+ SIGBUS.
+>
+> This effort is to try and make this badblock checking smarter - and try a=
+nd reduce the penalty
+> on every IO to a smaller range, which only the filesystem can do.
 
-> This effort is to try and make this badblock checking smarter - and try
-> and reduce the penalty on every IO to a smaller range, which only the
-> filesystem can do.
+I still slightly puzzled and I cannot understand why the situation looks li=
+ke a dead end.
+As far as I can see, first of all, a NVM device is able to use hardware-bas=
+ed LDPC,
+Reed-Solomon error correction or any other fancy code. It could provide som=
+e error
+correction basis. Also it can provide the way of estimation of BER value. S=
+o, if a NVM memory's
+address range degrades gradually (during weeks or months) then, practically=
+, it's possible
+to remap and to migrate the affected address ranges in the background. Othe=
+rwise,
+if a NVM memory so unreliable that address range is able to degrade during =
+seconds or minutes
+then who will use such NVM memory?
 
-Though... now that XFS merged the reverse mapping support, I've been
-wondering if there'll be a resubmission of the device errors callback?
-It still would be useful to be able to inform the user that part of
-their fs has gone bad, or, better yet, if the buffer is still in memory
-someplace else, just write it back out.
+OK. Let's imagine that NVM memory device hasn't any internal error correcti=
+on hardware-based
+scheme. Next level of defense could be any erasure coding scheme on device =
+driver level. So, any
+piece of data can be protected by parities. And device driver will be respo=
+nsible for management
+of erasure coding scheme. It will increase latency of read operation for th=
+e case of necessity
+to recover the affected memory page. But, finally, all recovering activity =
+will be behind the scene
+and file system will be unaware about such recovering activity.
 
-Or I suppose if we had some kind of raid1 set up between memories we
-could read one of the other copies and rewrite it into the failing
-region immediately.
+If you are going not to provide any erasure coding or error correction sche=
+me then it's really
+bad case. The fsck tool is not regular case tool but the last resort. If yo=
+u are going to rely on
+the fsck tool then simply forget about using your hardware. Some file syste=
+ms haven't the fsck
+tool at all. Some guys really believe that file system has to work without =
+support of the fsck tool.
+Even if a mature file system has reliable fsck tool then the probability of=
+ file system recovering
+is very low in the case of serious metadata corruptions. So, it means that =
+you are trying to suggest
+the technique when we will lose the whole file system volumes on regular ba=
+sis without any hope
+to recover data. Even if file system has snapshots then, again, we haven't =
+hope because we can
+suffer from read error and for operation with snapshot.
 
-> > > A while back, Dave Chinner had suggested a move towards smarter
-> > > handling, and I posted initial RFC patches [1], but since then the topic
-> > > hasn't really moved forward.
-> > > 
+But if we will have support of any erasure coding scheme and NVM device dis=
+covers poisoned
+cache line for some memory page then, I suppose, that such situation could =
+looks like as page fault
+and memory subsystem will need to re-read the page with background recovery=
+ of memory page's
+content.
+
+It sounds for me that we simply have some poorly designed hardware. And it =
+is impossible
+to push such issue on file system level. I believe that such issue can be m=
+anaged by block
+device or DAX subsystem in the presence of any erasure coding scheme. Other=
+wise, no
+file system is able to survive in such wild environment. Because, I assume =
+that any file
+system volume will be in unrecoverable state in 50% (or significantly more)=
+ cases of bad block
+discovering. Because any affection of metadata block can be resulted in sev=
+erely inconsistent
+state of file system's metadata structures. And it's very non-trivial task =
+to recover the consistent
+state of file system's metadata structures in the case of losing some part =
+of it.
+
+> > >=20
+> > > A while back, Dave Chinner had suggested a move towards smarter=20
+> > > handling, and I posted initial RFC patches [1], but since then the=20
+> > > topic hasn't really moved forward.
+> > >=20
 > > > I'd like to propose and have a discussion about the following new
 > > > functionality:
-> > > 
-> > > 1. Filesystems develop a native representation of badblocks. For
-> > > example, in xfs, this would (presumably) be linked to the reverse
-> > > mapping btree. The filesystem representation has the potential to be�
-> > > more efficient than the block driver doing the check, as the fs can
-> > > check the IO happening on a file against just that file's range. 
-
-OTOH that means we'd have to check /every/ file IO request against the
-rmapbt, which will make things reaaaaaally slow.  I suspect it might be
-preferable just to let the underlying pmem driver throw an error at us.
-
-(Or possibly just cache the bad extents in memory.)
-
+> > >=20
+> > > 1. Filesystems develop a native representation of badblocks. For=20
+> > > example, in xfs, this would (presumably) be linked to the reverse=20
+> > > mapping btree. The filesystem representation has the potential to be=
+=20
+> > > more efficient than the block driver doing the check, as the fs can=20
+> > > check the IO happening on a file against just that file's range.
+> >=20
 > > What do you mean by "file system can check the IO happening on a file"?
 > > Do you mean read or write operation? What's about metadata?
-> 
-> For the purpose described above, i.e. returning early EIOs when
-> possible, this will be limited to reads and metadata reads. If we're
-> about to do a metadata read, and realize the block(s) about to be read
-> are on the badblocks list, then we do the same thing as when we discover
-> other kinds of metadata corruption.
+>
+> For the purpose described above, i.e. returning early EIOs when possible,
+> this will be limited to reads and metadata reads. If we're about to do a =
+metadata
+> read, and realize the block(s) about to be read are on the badblocks list=
+, then
+> we do the same thing as when we discover other kinds of metadata corrupti=
+on.
 
-...fail and shut down? :)
+Frankly speaking, I cannot follow how badblock list is able to help the fil=
+e system
+driver to survive. Every time when file system driver encounters the bad bl=
+ock
+presence then it stops the activity with: (1) unrecovered read error; (2) r=
+emount
+in RO mode; (3) simple crash. It means that it needs to unmount a file syst=
+em volume
+(if driver hasn't crashed) and to run fsck tool. So, file system driver can=
+not gain
+from tracking bad blocks in the special list because, mostly, it will stop =
+the regular
+operation in the case of access the bad block. Even if the file system driv=
+er extracts
+the badblock list from some low-level driver then what can be done by file =
+system
+driver? Let's imagine that file system driver knows that LBA#N is bad then =
+the best
+behavior will be simply panic or remount in RO state, nothing more.
 
-Actually, for metadata either we look at the xfs_bufs to see if it's in
-memory (XFS doesn't directly access metadata) and write it back out; or
-we could fire up the online repair tool to rebuild the metadata.
+<skipped>
 
-> > If we are talking about the discovering a bad block on read operation then
-> > rare modern file system is able to survive as for the case of metadata as
-> > for the case of user data. Let's imagine that we have really mature file
-> > system driver then what does it mean to encounter a bad block? The failure
-> > to read a logical block of some metadata (bad block) means that we are
-> > unable to extract some part of a metadata structure. From file system
-> > driver point of view, it looks like that our file system is corrupted, we need
-> > to stop the file system operations and, finally, to check and recover file
-> > system volume by means of fsck tool. If we find a bad block for some
-> > user file then, again, it looks like an issue. Some file systems simply
-> > return "unrecovered read error". Another one, theoretically, is able
-> > to survive because of snapshots, for example. But, anyway, it will look
-> > like as Read-Only mount state and the user will need to resolve such
-> > trouble by hands.
-> 
-> As far as I can tell, all of these things remain the same. The goal here
-> isn't to survive more NVM badblocks than we would've before, and lost
-> data or lost metadata will continue to have the same consequences as
-> before, and will need the same recovery actions/intervention as before.
+> As far as I can tell, all of these things remain the same. The goal here =
+isn't to survive
+> more NVM badblocks than we would've before, and lost data or
+> lost metadata will continue to have the same consequences as before, and
+> will need the same recovery actions/intervention as before.
 > The goal is to make the failure model similar to what users expect
-> today, and as much as possible make recovery actions too similarly
-> intuitive.
-> 
-> > 
-> > If we are talking about discovering a bad block during write operation then,
-> > again, we are in trouble. Usually, we are using asynchronous model
-> > of write/flush operation. We are preparing the consistent state of all our
-> > metadata structures in the memory, at first. The flush operations for metadata
-> > and user data can be done in different times. And what should be done if we
-> > discover bad block for any piece of metadata or user data? Simple tracking of
-> > bad blocks is not enough at all. Let's consider user data, at first. If we cannot
-> > write some file's block successfully then we have two ways: (1) forget about
-> > this piece of data; (2) try to change the associated LBA for this piece of data.
-> > The operation of re-allocation LBA number for discovered bad block
-> > (user data case) sounds as real pain. Because you need to rebuild the metadata
-> > that track the location of this part of file. And it sounds as practically
-> > impossible operation, for the case of LFS file system, for example.
-> > If we have trouble with flushing any part of metadata then it sounds as
-> > complete disaster for any file system.
-> 
-> Writes can get more complicated in certain cases. If it is a regular
-> page cache writeback, or any aligned write that goes through the block
-> driver, that is completely fine. The block driver will check that the
-> block was previously marked as bad, do a "clear poison" operation
-> (defined in the ACPI spec), which tells the firmware that the poison bit
-> is not OK to be cleared, and writes the new data. This also removes the
-> block from the badblocks list, and in this scheme, triggers a
-> notification to the filesystem that it too can remove the block from its
-> accounting. mmap writes and DAX can get more complicated, and at times
-> they will just trigger a SIGBUS, and there's no way around that.
-> 
-> > 
-> > Are you really sure that file system should process bad block issue?
-> > 
-> > >In contrast, today, the block driver checks against the whole block device
-> > > range for every IO. On encountering badblocks, the filesystem can
-> > > generate a better notification/error message that points the user to�
-> > > (file, offset) as opposed to the block driver, which can only provide
-> > > (block-device, sector).
+> today, and as much as possible make recovery actions too similarly intuit=
+ive.
 
-<shrug> We can do the translation with the backref info...
+OK. Nowadays, user expects that hardware is reliably enough. It's the same
+situation like for NAND flash. NAND flash can have bad erase blocks. But FT=
+L
+hides this reality from a file system. Otherwise, file system should be
+NAND flash oriented and to be able to manage bad erase blocks presence.
+Your suggestion will increase probability of unrecoverable state of file
+system volume dramatically. So, it's hard to see the point for such approac=
+h.
 
-> > > 2. The block layer adds a notifier to badblock addition/removal
-> > > operations, which the filesystem subscribes to, and uses to maintain its
-> > > badblocks accounting. (This part is implemented as a proof of concept in
-> > > the RFC mentioned above [1]).
-> > 
-> > I am not sure that any bad block notification during/after IO operation
-> > is valuable for file system. Maybe, it could help if file system simply will
-> > know about bad block beforehand the operation of logical block allocation.
-> > But what subsystem will discover bad blocks before any IO operations?
-> > How file system will receive information or some bad block table?
-> 
-> The driver populates its badblocks lists whenever an Address Range Scrub
-> is started (also via ACPI methods). This is always done at
-> initialization time, so that it can build an in-memory representation of
-> the badblocks. Additionally, this can also be triggered manually. And
-> finally badblocks can also get populated for new latent errors when a
-> machine check exception occurs. All of these can trigger notification to
-> the file system without actual user reads happening.
-> 
-> > I am not convinced that suggested badblocks approach is really feasible.
-> > Also I am not sure that file system should see the bad blocks at all.
-> > Why hardware cannot manage this issue for us?
-> 
-> Hardware does manage the actual badblocks issue for us in the sense that
-> when it discovers a badblock it will do the remapping. But since this is
-> on the memory bus, and has different error signatures than applications
-> are used to, we want to make the error handling similar to the existing
-> storage model.
+> Writes can get more complicated in certain cases. If it is a regular page=
+ cache
+> writeback, or any aligned write that goes through the block driver, that =
+is completely
+> fine. The block driver will check that the block was previously marked as=
+ bad,
+> do a "clear poison" operation (defined in the ACPI spec), which tells the=
+ firmware that
+> the poison bit is not OK to be cleared, and writes the new data. This als=
+o removes
+> the block from the badblocks list, and in this scheme, triggers a notific=
+ation to
+> the filesystem that it too can remove the block from its accounting.
+> mmap writes and DAX can get more complicated, and at times they will just
+>trigger a SIGBUS, and there's no way around that.
 
-Yes please and thank you, to the "error handling similar to the existing
-storage model".  Even better if this just gets added to a layer
-underneath the fs so that IO to bad regions returns EIO. 8-)
+If page cache writeback finishes with writing data in valid location then
+no troubles here at all. But I assume that critical point will on the read =
+path.
+Because, we still will have the same troubles as I mentioned above.
 
-(Sleeeeep...)
+<skipped>
 
---D
+> Hardware does manage the actual badblocks issue for us
+> in the sense that when it discovers a badblock it will do the remapping.
+> But since this is on the memory bus, and has different error signatures
+> than applications are used to, we want to make the error handling
+> similar to the existing storage model.
 
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-fsdevel" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+So, if hardware is able to do the remapping of bad portions of memory page
+then it is possible to see the valid logical page always. The key point her=
+e
+that hardware controller should manage migration of data from aged/pre-bad
+NVM memory ranges into valid ones. Or it needs to use some fancy
+error-correction techniques or erasure coding schemes.
+
+Thanks,
+Vyacheslav Dubeyko.
+
