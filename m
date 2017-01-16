@@ -1,76 +1,124 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:29130 "EHLO
-        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750727AbdALIOE (ORCPT
+Received: from hqemgate15.nvidia.com ([216.228.121.64]:14075 "EHLO
+        hqemgate15.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751128AbdAPXAK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Jan 2017 03:14:04 -0500
-To: "Martin K. Petersen" <martin.petersen@oracle.com>,
-        James Bottomley <james.bottomley@hansenpartnership.com>
-Cc: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>,
-        Shaun Tancheff <shaun@tancheff.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-Subject: RFC: 512e ZBC host-managed disks
-Message-ID: <38404478-7b9a-35ed-8148-81a05bd01ac8@wdc.com>
-Date: Thu, 12 Jan 2017 17:13:52 +0900
+        Mon, 16 Jan 2017 18:00:10 -0500
+Subject: Re: [LSF/MM TOPIC] Memory hotplug, ZONE_DEVICE, and the future of
+ struct page
+To: Anshuman Khandual <khandual@linux.vnet.ibm.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Linux MM <linux-mm@kvack.org>,
+        <lsf-pc@lists.linux-foundation.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        "linux-nvdimm@lists.01.org" <linux-nvdimm@lists.01.org>,
+        <linux-block@vger.kernel.org>
+References: <CAPcyv4hWNL7=MmnUj65A+gz=eHAnUrVzqV+24QiNQDW--ag8WQ@mail.gmail.com>
+ <729bbe0c-d305-f4bd-7fed-b937dafd16ef@linux.vnet.ibm.com>
+CC: Stephen Bates <sbates@raithlin.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Jason Gunthorpe <jgunthorpe@obsidianresearch.com>
+From: John Hubbard <jhubbard@nvidia.com>
+Message-ID: <ff9d7b04-e13e-bc17-d95b-1e19dd172e69@nvidia.com>
+Date: Mon, 16 Jan 2017 14:59:36 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <729bbe0c-d305-f4bd-7fed-b937dafd16ef@linux.vnet.ibm.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
 
-Regular block devices are always accessible in units of logical block
-sizes, regardless of the actual physical block size that the device has.
-For hard disks, the common cases are:
 
-512n: 512 B logical and physical blocks
-512e: 512B logical blocks and 4096B physical blocks
-4Kn: 4096B logical and physical blocks
+On 01/16/2017 04:58 AM, Anshuman Khandual wrote:
+> On 01/13/2017 04:13 AM, Dan Williams wrote:
+>> Back when we were first attempting to support DMA for DAX mappings of
+>> persistent memory the plan was to forgo 'struct page' completely and
+>> develop a pfn-to-scatterlist capability for the dma-mapping-api. That
+>> effort died in this thread:
+>>
+>>     https://lkml.org/lkml/2015/8/14/3
+>>
+>> ...where we learned that the dependencies on struct page for dma
+>> mapping are deeper than a PFN_PHYS() conversion for some
+>> architectures. That was the moment we pivoted to ZONE_DEVICE and
+>> arranged for a 'struct page' to be available for any persistent memory
+>> range that needs to be the target of DMA. ZONE_DEVICE enables any
+>> device-driver that can target "System RAM" to also be able to target
+>> persistent memory through a DAX mapping.
+>>
+>> Since that time the "page-less" DAX path has continued to mature [1]
+>> without growing new dependencies on struct page, but at the same time
+>> continuing to rely on ZONE_DEVICE to satisfy get_user_pages().
+>>
+>> Peer-to-peer DMA appears to be evolving from a niche embedded use case
+>> to something general purpose platforms will need to comprehend. The
+>> "map_peer_resource" [2] approach looks to be headed to the same
+>> destination as the pfn-to-scatterlist effort. It's difficult to avoid
+>> 'struct page' for describing DMA operations without custom driver
+>> code.
+>>
+>> With that background, a statement and a question to discuss at LSF/MM:
+>>
+>> General purpose DMA, i.e. any DMA setup through the dma-mapping-api,
+>> requires pfn_to_page() support across the entire physical address
+>> range mapped.
+>>
+>> Is ZONE_DEVICE the proper vehicle for this? We've already seen that it
+>> collides with platform alignment assumptions [3], and if there's a
+>> wider effort to rework memory hotplug [4] it seems DMA support should
+>> be part of the discussion.
+>
+> I had experimented with ZONE_DEVICE representation from migration point of
+> view. Tried migration of both anonymous pages as well as file cache pages
+> into and away from ZONE_DEVICE memory. Learned that the lack of 'page->lru'
+> element in the struct page of the ZONE_DEVICE memory makes it difficult
+> for it to represent file backed mapping in it's present form. But given
 
-and the sd.c in the kernel checks requests 512B "sectors" position and
-size alignment against the disk declared logical block size. All is fine
-with this, nothing new.
+That reminds me: while testing out HMM in our device driver, we had some early difficulties with the 
+LRU system (including pagevec) in general. For example, sometimes HMM was forced to say "I cannot 
+migrate your page range, because a page is still on the very most recently used list". If the number 
+of pages was very small, then *all* the pages might be on that list. :)  HMM avoids the problem by 
+forcing it, but it reminds me that the LRU and pagevec were never really intended to intersect with 
+device memory.
 
-However, for host-managed zoned block devices (ZBC), the 512e case
-breaks this model: the standard allows for 512B logical block reads,
-*but* writes MUST be aligned on 4KB boundaries within sequential zones
-(still using the 512B logical block size addressing). This is a problem
-for users of the disk, e.g. an FS, who may wrongly believe that writing
-512B units is possible (and so that it can use 512B FS block size).
-Host-aware devices do not have this restriction. Nor does the
-restriction apply to writes in conventional zones of host-managed devices.
+Another point that may seem unrelated at first: using struct pages and pfns to back device memory is 
+still under discussion:
 
-Summary: for HM 512e block devices, reads are 512e compliant, but writes
-in sequential zones are 4Kn compliant.
+    a)  Need to avoid using pfns that can ever be needed for other hotpluggable memory
 
-I would like an opinion on if we should do something about this. I see
-the following possible options:
+    b) *Very* hard to justify adding any fields to struct page, or flags for it, of course.
 
-(1) Do nothing and let the disk user deal with the write alignment
-problem. It already has to do so anyway as writes must be sequential.
-But this would force in-kernel users to go and look at the device
-physical block size, which is not something usually done by layers above
-the block layer (FS, device mappers etc).
+...but given this new-ish requirement to support these types of devices, maybe (b) actually makes 
+sense. Something to discuss.
 
-(2) For 512e host-managed devices, always report to the block layer
-(device queue) a larger logical block size of 4096B to allow for disk
-users to seamlessly adjust to the disk type without having to deal with
-the physical sector size. I do not think that this would actually not
-require changing the scsi_disk->sector_size field to that incorrect
-value so that command addressing does not break. But I wonder if this
-may not break a lot of things because of the difference introduced.
+thanks,
+John Hubbard
+NVIDIA
 
-(3) Any other idea ?
 
-Best regards.
+> that ZONE_DEVICE was created to enable direct mapping (DAX) bypassing page
+> cache, it came as no surprise. My objective has been how ZONE_DEVICE can
+> accommodate movable coherent device memory. In our HMM discussions I had
+> brought to the attention how ZONE_DEVICE going forward should evolve to
+> represent all these three types of device memory.
+>
+> * Unmovable addressable device memory   (persistent memory)
+> * Movable addressable device memory     (similar memory represented as CDM)
+> * Movable un-addressable device memory  (similar memory represented as HMM)
+>
+> I would like to attend to discuss on the road map for ZONE_DEVICE, struct
+> pages and device memory in general.
+>
+> --
+> To unsubscribe, send a message with 'unsubscribe linux-mm' in
+> the body to majordomo@kvack.org.  For more info on Linux MM,
+> see: http://www.linux-mm.org/ .
+> Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
+>
 
--- 
-Damien Le Moal, Ph.D.
-Sr. Manager, System Software Research Group,
-Western Digital Corporation
-Damien.LeMoal@wdc.com
-(+81) 0466-98-3593 (ext. 513593)
-1 kirihara-cho, Fujisawa,
-Kanagawa, 252-0888 Japan
-www.wdc.com, www.hgst.com
+-----------------------------------------------------------------------------------
+This email message is for the sole use of the intended recipient(s) and may contain
+confidential information.  Any unauthorized review, use, disclosure or distribution
+is prohibited.  If you are not the intended recipient, please contact the sender by
+reply email and destroy all copies of the original message.
+-----------------------------------------------------------------------------------
