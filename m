@@ -1,36 +1,71 @@
-Return-Path: <prvs=2190b29283=axboe@fb.com>
 Subject: Re: [PATCH 7/8] mq-deadline: add blk-mq adaptation of the deadline IO
  scheduler
 To: Paolo Valente <paolo.valente@linaro.org>
 References: <1481933536-12844-1-git-send-email-axboe@fb.com>
  <1481933536-12844-8-git-send-email-axboe@fb.com>
- <2B1CBA75-606E-48FA-A2FC-A435FBB3968E@linaro.org>
-CC: Jens Axboe <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
-        Linux-Kernal
-	<linux-kernel@vger.kernel.org>, <osandov@fb.com>
+ <A59E28FD-C451-45C0-814C-560A8CA758E3@linaro.org>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+ Linux-Kernal <linux-kernel@vger.kernel.org>, osandov@fb.com
 From: Jens Axboe <axboe@fb.com>
-Message-ID: <048a5a0a-1793-4698-4bc0-213d36fad161@fb.com>
-Date: Mon, 16 Jan 2017 18:47:19 -0800
+Message-ID: <e0ef6987-adb9-c53d-d540-1d50cdc967bc@fb.com>
+Date: Mon, 16 Jan 2017 18:47:18 -0800
 MIME-Version: 1.0
-In-Reply-To: <2B1CBA75-606E-48FA-A2FC-A435FBB3968E@linaro.org>
-Content-Type: text/plain; charset="windows-1252"
+In-Reply-To: <A59E28FD-C451-45C0-814C-560A8CA758E3@linaro.org>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-block@vger.kernel.org>
 
-On 12/22/2016 09:49 AM, Paolo Valente wrote:
+On 12/22/2016 09:07 AM, Paolo Valente wrote:
 > 
 >> Il giorno 17 dic 2016, alle ore 01:12, Jens Axboe <axboe@fb.com> ha scritto:
 >>
 >> This is basically identical to deadline-iosched, except it registers
 >> as a MQ capable scheduler. This is still a single queue design.
 >>
+>> Signed-off-by: Jens Axboe <axboe@fb.com>
+>> ---
 > 
-> One last question (for today ...):in mq-deadline there are no
-> "schedule dispatch" or "unplug work" functions.  In blk, CFQ and BFQ
-> do these schedules/unplugs in a lot of cases.  What's the right
-> replacement?  Just doing nothing?
+> ...
+> 
+>> diff --git a/block/mq-deadline.c b/block/mq-deadline.c
+>> new file mode 100644
+>> index 000000000000..3cb9de21ab21
+>> --- /dev/null
+>> +++ b/block/mq-deadline.c
+>> ...
+>> +/*
+>> + * remove rq from rbtree and fifo.
+>> + */
+>> +static void deadline_remove_request(struct request_queue *q, struct request *rq)
+>> +{
+>> +	struct deadline_data *dd = q->elevator->elevator_data;
+>> +
+>> +	list_del_init(&rq->queuelist);
+>> +
+>> +	/*
+>> +	 * We might not be on the rbtree, if we are doing an insert merge
+>> +	 */
+>> +	if (!RB_EMPTY_NODE(&rq->rb_node))
+>> +		deadline_del_rq_rb(dd, rq);
+>> +
+> 
+> I've been scratching my head on the last three instructions, but at no
+> avail.  If I understand correctly, the
+> list_del_init(&rq->queue list);
+> removes rq from the fifo list.  But, if so, I don't understand how it
+> could be possible that rq has not been added to the rb_tree too.
+>
+> Another interpretation that I tried is that the above three lines
+> handle correctly the following case where rq has not been inserted at
+> all into deadline fifo queue and rb tree: when dd_insert_request was
+> executed for rq, blk_mq_sched_try_insert_merge succeeded.  Yet, the
+> list_del_init(&rq->queue list);
+> does not seem to make sense.
+> 
+> Could you please shed some light on this for me?
 
-You just use blk_mq_run_hw_queue() or variants thereof to kick off queue
-runs.
+I think you are correct, we don't need to touch ->queuelist for the case
+where RB_EMPTY_NODE() is true. Minor detail, the list is already empty,
+so it does no harm.
 
 -- 
 Jens Axboe
