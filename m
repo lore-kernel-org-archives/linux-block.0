@@ -12,13 +12,41 @@ References: <20170111134312.GH6286@linux-x5ow.site>
 Cc: linux-block@vger.kernel.org, Linux-scsi@vger.kernel.org,
  linux-nvme@lists.infradead.org, Christoph Hellwig <hch@infradead.org>,
  Keith Busch <keith.busch@intel.com>
-Message-ID: <53a3fb6c-c75a-519a-f669-2bcab404e01d@grimberg.me>
-Date: Tue, 17 Jan 2017 18:15:43 +0200
+Message-ID: <f10b8508-22a2-2959-c369-2dd29f271d2c@grimberg.me>
+Date: Tue, 17 Jan 2017 17:45:53 +0200
 MIME-Version: 1.0
 In-Reply-To: <499af528-7810-f82d-1f11-cbf8f3a5b21c@grimberg.me>
 Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-Oh, and the current code that was tested can be found at:
 
-git://git.infradead.org/nvme.git nvme-irqpoll
+> --
+> [1]
+> queue = b'nvme0q1'
+>      usecs               : count     distribution
+>          0 -> 1          : 7310 |****************************************|
+>          2 -> 3          : 11       |      |
+>          4 -> 7          : 10       |      |
+>          8 -> 15         : 20       |      |
+>         16 -> 31         : 0        |      |
+>         32 -> 63         : 0        |      |
+>         64 -> 127        : 1        |      |
+>
+> [2]
+> queue = b'nvme0q1'
+>      usecs               : count     distribution
+>          0 -> 1          : 7309 |****************************************|
+>          2 -> 3          : 14       |      |
+>          4 -> 7          : 7        |      |
+>          8 -> 15         : 17       |      |
+>
+
+Rrr, email made the histograms look funky (tabs vs. spaces...)
+The count is what's important anyways...
+
+Just adding that I used an Intel P3500 nvme device.
+
+> We can see that most of the time our latency is pretty good (<1ns) but with
+> huge tail latencies (some 8-15 ns and even one in 32-63 ns).
+
+Obviously is micro-seconds and not nano-seconds (I wish...)
