@@ -1,34 +1,47 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from verein.lst.de ([213.95.11.211]:42615 "EHLO newverein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751354AbdARJJX (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Jan 2017 04:09:23 -0500
-Date: Wed, 18 Jan 2017 10:09:21 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Sagi Grimberg <sagi@grimberg.me>
-Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@fb.com>,
-        linux-block@vger.kernel.org, Dexuan Cui <decui@microsoft.com>,
-        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org
+Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
 Subject: Re: [PATCH 3/4] nvme: use blk_rq_payload_bytes
-Message-ID: <20170118090921.GA24058@lst.de>
-References: <1484306953-3194-1-git-send-email-hch@lst.de> <1484306953-3194-4-git-send-email-hch@lst.de> <7532e18a-6cd3-294f-085d-e1ecdc48af6e@grimberg.me>
+To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@fb.com>
+References: <1484306953-3194-1-git-send-email-hch@lst.de>
+ <1484306953-3194-4-git-send-email-hch@lst.de>
+From: Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <7532e18a-6cd3-294f-085d-e1ecdc48af6e@grimberg.me>
+Date: Tue, 17 Jan 2017 22:06:51 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <7532e18a-6cd3-294f-085d-e1ecdc48af6e@grimberg.me>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <1484306953-3194-4-git-send-email-hch@lst.de>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
+List-Post: <mailto:linux-nvme@lists.infradead.org>
+List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
+Cc: linux-block@vger.kernel.org, Dexuan Cui <decui@microsoft.com>,
+ linux-scsi@vger.kernel.org, linux-nvme@lists.infradead.org
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
+Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
+List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Jan 17, 2017 at 10:06:51PM +0200, Sagi Grimberg wrote:
+
+> @@ -1014,9 +1013,9 @@ static int nvme_rdma_map_data(struct nvme_rdma_queue *queue,
+>  	}
 >
->> @@ -1014,9 +1013,9 @@ static int nvme_rdma_map_data(struct nvme_rdma_queue *queue,
->>  	}
->>
+
+Christoph, a little above here we still look at blk_rq_bytes(),
+shouldn't that look at blk_rq_payload_bytes() too?
+
+>  	if (count == 1) {
+> -		if (rq_data_dir(rq) == WRITE &&
+> -		    map_len <= nvme_rdma_inline_data_size(queue) &&
+> -		    nvme_rdma_queue_idx(queue))
+> +		if (rq_data_dir(rq) == WRITE && nvme_rdma_queue_idx(queue) &&
+> +		    blk_rq_payload_bytes(rq) <=
+> +				nvme_rdma_inline_data_size(queue))
+>  			return nvme_rdma_map_sg_inline(queue, req, c);
 >
-> Christoph, a little above here we still look at blk_rq_bytes(),
-> shouldn't that look at blk_rq_payload_bytes() too?
+>  		if (dev->pd->flags & IB_PD_UNSAFE_GLOBAL_RKEY)
 
-The check is ok for now as it's just zero vs non-zero.  It's somewhat
-broken for Write Zeroes, though.  I've fixed it in this series
-which I need to submit:
-
-	http://git.infradead.org/users/hch/block.git/shortlog/refs/heads/write-zeroes-take-2
+_______________________________________________
+Linux-nvme mailing list
+Linux-nvme@lists.infradead.org
+http://lists.infradead.org/mailman/listinfo/linux-nvme
