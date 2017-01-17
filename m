@@ -1,71 +1,62 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wj0-f196.google.com ([209.85.210.196]:36775 "EHLO
-        mail-wj0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S935440AbdACO6w (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Jan 2017 09:58:52 -0500
-Subject: Re: [PATCH v1 45/54] exofs: convert to bio_for_each_segment_all_sp()
-To: Ming Lei <tom.leiming@gmail.com>, Jens Axboe <axboe@fb.com>,
-        linux-kernel@vger.kernel.org
-References: <1482854706-14128-1-git-send-email-tom.leiming@gmail.com>
- <1482854706-14128-14-git-send-email-tom.leiming@gmail.com>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        Benny Halevy <bhalevy@primarydata.com>,
-        "open list:OSD LIBRARY and FILESYSTEM" <osd-dev@open-osd.org>
-From: Boaz Harrosh <ooo@electrozaur.com>
-Message-ID: <7a405d59-7d59-4db2-a511-4c109f7f8017@electrozaur.com>
-Date: Tue, 3 Jan 2017 16:58:48 +0200
+Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:48027 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1750728AbdAQASW (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 16 Jan 2017 19:18:22 -0500
+Date: Mon, 16 Jan 2017 18:17:44 -0600
+From: Josef Bacik <jbacik@fb.com>
+Subject: Re: [PATCH] nbd: use an idr to keep track of nbd devices
+To: Sagi Grimberg <sagi@grimberg.me>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Kernel Team <Kernel-team@fb.com>
+Message-ID: <1484612264.10374.0@smtp.office365.com>
+In-Reply-To: <7c2ddd83-5d09-5ffb-3c39-524d17c24796@grimberg.me>
+References: <1484334292-29933-1-git-send-email-jbacik@fb.com>
+        <0439c54d-228c-78fb-4790-94095ef39c93@grimberg.me>
+        <DB56A2D2-42FA-46F4-A250-F5E987CB5E61@fb.com>
+        <45c6936a-a38b-e612-90d6-6087de8cab91@grimberg.me>
+        <1484442837.7132.1@smtp.office365.com>
+        <7c2ddd83-5d09-5ffb-3c39-524d17c24796@grimberg.me>
 MIME-Version: 1.0
-In-Reply-To: <1482854706-14128-14-git-send-email-tom.leiming@gmail.com>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 12/27/2016 06:04 PM, Ming Lei wrote:
-> Signed-off-by: Ming Lei <tom.leiming@gmail.com>
-
-Cool
-ACK-by: Boaz Harrosh <ooo@electrozaur.com>
-
-> ---
->  fs/exofs/ore.c      | 3 ++-
->  fs/exofs/ore_raid.c | 3 ++-
->  2 files changed, 4 insertions(+), 2 deletions(-)
+On Mon, Jan 16, 2017 at 3:29 PM, Sagi Grimberg <sagi@grimberg.me> wrote:
+> Hey Josef,
 > 
-> diff --git a/fs/exofs/ore.c b/fs/exofs/ore.c
-> index 8bb72807e70d..38a7d8bfdd4c 100644
-> --- a/fs/exofs/ore.c
-> +++ b/fs/exofs/ore.c
-> @@ -406,8 +406,9 @@ static void _clear_bio(struct bio *bio)
->  {
->  	struct bio_vec *bv;
->  	unsigned i;
-> +	struct bvec_iter_all bia;
->  
-> -	bio_for_each_segment_all(bv, bio, i) {
-> +	bio_for_each_segment_all_sp(bv, bio, i, bia) {
->  		unsigned this_count = bv->bv_len;
->  
->  		if (likely(PAGE_SIZE == this_count))
-> diff --git a/fs/exofs/ore_raid.c b/fs/exofs/ore_raid.c
-> index 27cbdb697649..37c0a9aa2ec2 100644
-> --- a/fs/exofs/ore_raid.c
-> +++ b/fs/exofs/ore_raid.c
-> @@ -429,6 +429,7 @@ static void _mark_read4write_pages_uptodate(struct ore_io_state *ios, int ret)
->  {
->  	struct bio_vec *bv;
->  	unsigned i, d;
-> +	struct bvec_iter_all bia;
->  
->  	/* loop on all devices all pages */
->  	for (d = 0; d < ios->numdevs; d++) {
-> @@ -437,7 +438,7 @@ static void _mark_read4write_pages_uptodate(struct ore_io_state *ios, int ret)
->  		if (!bio)
->  			continue;
->  
-> -		bio_for_each_segment_all(bv, bio, i) {
-> +		bio_for_each_segment_all_sp(bv, bio, i, bia) {
->  			struct page *page = bv->bv_page;
->  
->  			SetPageUptodate(page);
+>> I'm going to use it the same way loop does, there will be a
+>> /dev/nbd-control where you can say ADD, REMOVE, and GET_NEXT. I need 
+>> the
+>> search functionality to see if we are adding something that already
+>> exists, and to see what is the next unused device that can be used 
+>> for a
+>> connection.  Looking at the ida api it does not appear I can do 
+>> that. If
+>> I'm wrong then please point out an example I can look at, because I
+>> haven't been able to find one.  Thanks,
 > 
+> Nope, ida doesn't have search functionality. Having said that, will it
+> suffice to have the idr tree without a separate data structure? 
+> because
+> the tree mutation under idr_for_each is not allowed. For example,
+> I'd expect that nbd module unload will iterate over the existing
+> devices and destroy them which requires a separate tracking of
+> them, also, I think that the idr user needs to take care of locking
+> (unlike ida).
+
+So I don't plan on messing with it under idr_for_each.  I'm basically 
+copying+pasting what loop is doing and doing :1,$s/loop/nbd/g and 
+hoping for the best.  I'm going to add reference counting to the nbd 
+devices obviously to keep us from removing in use nbd devices.  The 
+idr_for_each in the unload doesn't actually remove the devices from the 
+idr, it just free's them.
+
+Also so I don't have to find the other thread I did manage to test with 
+per-device workqueues and a global workqueue and the performance was 
+the same, I'll make that change to the other patch and resend it when I 
+finish all this work so you can see the full picture.  Thanks!
+
+Josef
 
