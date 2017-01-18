@@ -1,94 +1,23 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga05.intel.com ([192.55.52.43]:54066 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753607AbdAZL7X (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 26 Jan 2017 06:59:23 -0500
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv6 34/37] ext4: make fallocate() operations work with huge pages
-Date: Thu, 26 Jan 2017 14:58:16 +0300
-Message-Id: <20170126115819.58875-35-kirill.shutemov@linux.intel.com>
-In-Reply-To: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
-References: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Subject: Re: [PATCH 1/2] sbitmap: use smp_mb__after_atomic() in sbq_wake_up()
+To: Omar Sandoval <osandov@osandov.com>, linux-block@vger.kernel.org
+References: <b8c8740615f38f36e3a5f726f97903ca2af9f549.1484769083.git.osandov@fb.com>
+Cc: Martin Raiber <martin@urbackup.org>, kernel-team@fb.com
+From: Jens Axboe <axboe@fb.com>
+Message-ID: <2521c6b9-7b4e-0fd7-5ce0-f27e1494b7da@fb.com>
+Date: Wed, 18 Jan 2017 12:42:24 -0800
+MIME-Version: 1.0
+In-Reply-To: <b8c8740615f38f36e3a5f726f97903ca2af9f549.1484769083.git.osandov@fb.com>
+Content-Type: text/plain; charset=windows-1252
+List-ID: <linux-block@vger.kernel.org>
 
-__ext4_block_zero_page_range() adjusted to calculate starting iblock
-correctry for huge pages.
+On 01/18/2017 11:55 AM, Omar Sandoval wrote:
+> From: Omar Sandoval <osandov@fb.com>
+> 
+> We always do an atomic clear_bit() right before we call sbq_wake_up(),
+> so we can use smp_mb__after_atomic(). While we're here, comment the
+> memory barriers in here a little more.
 
-ext4_{collapse,insert}_range() requires page cache invalidation. We need
-the invalidation to be aligning to huge page border if huge pages are
-possible in page cache.
+Thanks Omar, applied 1-2.
 
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
----
- fs/ext4/extents.c | 10 ++++++++--
- fs/ext4/inode.c   |  3 +--
- 2 files changed, 9 insertions(+), 4 deletions(-)
-
-diff --git a/fs/ext4/extents.c b/fs/ext4/extents.c
-index 3e295d3350a9..f743e772b44f 100644
---- a/fs/ext4/extents.c
-+++ b/fs/ext4/extents.c
-@@ -5501,7 +5501,10 @@ int ext4_collapse_range(struct inode *inode, loff_t offset, loff_t len)
- 	 * Need to round down offset to be aligned with page size boundary
- 	 * for page size > block size.
- 	 */
--	ioffset = round_down(offset, PAGE_SIZE);
-+	if (IS_ENABLED(CONFIG_TRANSPARENT_HUGE_PAGECACHE))
-+		ioffset = round_down(offset, HPAGE_PMD_SIZE);
-+	else
-+		ioffset = round_down(offset, PAGE_SIZE);
- 	/*
- 	 * Write tail of the last page before removed range since it will get
- 	 * removed from the page cache below.
-@@ -5650,7 +5653,10 @@ int ext4_insert_range(struct inode *inode, loff_t offset, loff_t len)
- 	 * Need to round down to align start offset to page size boundary
- 	 * for page size > block size.
- 	 */
--	ioffset = round_down(offset, PAGE_SIZE);
-+	if (IS_ENABLED(CONFIG_TRANSPARENT_HUGE_PAGECACHE))
-+		ioffset = round_down(offset, HPAGE_PMD_SIZE);
-+	else
-+		ioffset = round_down(offset, PAGE_SIZE);
- 	/* Write out all dirty pages */
- 	ret = filemap_write_and_wait_range(inode->i_mapping, ioffset,
- 			LLONG_MAX);
-diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
-index 409ebd81e436..5bf68bbe65ec 100644
---- a/fs/ext4/inode.c
-+++ b/fs/ext4/inode.c
-@@ -3816,7 +3816,6 @@ void ext4_set_aops(struct inode *inode)
- static int __ext4_block_zero_page_range(handle_t *handle,
- 		struct address_space *mapping, loff_t from, loff_t length)
- {
--	ext4_fsblk_t index = from >> PAGE_SHIFT;
- 	unsigned offset;
- 	unsigned blocksize, pos;
- 	ext4_lblk_t iblock;
-@@ -3835,7 +3834,7 @@ static int __ext4_block_zero_page_range(handle_t *handle,
- 
- 	blocksize = inode->i_sb->s_blocksize;
- 
--	iblock = index << (PAGE_SHIFT - inode->i_sb->s_blocksize_bits);
-+	iblock = page->index << (PAGE_SHIFT - inode->i_sb->s_blocksize_bits);
- 
- 	if (!page_has_buffers(page))
- 		create_empty_buffers(page, blocksize, 0);
 -- 
-2.11.0
-
+Jens Axboe
