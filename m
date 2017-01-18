@@ -1,72 +1,67 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv6 19/37] fs: make block_page_mkwrite() aware about huge pages
-Date: Thu, 26 Jan 2017 14:58:01 +0300
-Message-Id: <20170126115819.58875-20-kirill.shutemov@linux.intel.com>
-In-Reply-To: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
-References: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: kernel oops with blk-mq-sched latest
+To: Hannes Reinecke <hare@suse.de>
+References: <b6ce1c64-3577-8f86-b6a4-44a3a4ad2cbc@suse.de>
+ <55b21574-baf3-25d9-a920-299fa2d04d72@kernel.dk>
+ <10ffc7ea-564f-8eb0-ee00-5c1277c7efc3@kernel.dk>
+ <a27c56a6-fbe8-90a6-ebbe-dcfbce67c4ba@suse.de>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ Christoph Hellwig <hch@lst.de>,
+ device-mapper development <dm-devel@redhat.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <89485b8b-b0f9-3a6c-7ccb-deb161efb7fc@kernel.dk>
+Date: Wed, 18 Jan 2017 06:40:06 -0800
+MIME-Version: 1.0
+In-Reply-To: <a27c56a6-fbe8-90a6-ebbe-dcfbce67c4ba@suse.de>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Adjust check on whether part of the page beyond file size and apply
-compound_head() and page_mapping() where appropriate.
+On 01/18/2017 03:48 AM, Hannes Reinecke wrote:
+> Nearly there.
+> You're missing a 'blk_mq_start_hw_queues(q)' after
+> blk_mq_unfreeze_queue(); without it the queue will stall after switching
+> the scheduler.
 
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
----
- fs/buffer.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+Yes indeed, forgot that. Needed after the quiesce.
 
-diff --git a/fs/buffer.c b/fs/buffer.c
-index d05524f14846..17167b299d0f 100644
---- a/fs/buffer.c
-+++ b/fs/buffer.c
-@@ -2544,7 +2544,7 @@ EXPORT_SYMBOL(block_commit_write);
- int block_page_mkwrite(struct vm_area_struct *vma, struct vm_fault *vmf,
- 			 get_block_t get_block)
- {
--	struct page *page = vmf->page;
-+	struct page *page = compound_head(vmf->page);
- 	struct inode *inode = file_inode(vma->vm_file);
- 	unsigned long end;
- 	loff_t size;
-@@ -2552,7 +2552,7 @@ int block_page_mkwrite(struct vm_area_struct *vma, struct vm_fault *vmf,
- 
- 	lock_page(page);
- 	size = i_size_read(inode);
--	if ((page->mapping != inode->i_mapping) ||
-+	if ((page_mapping(page) != inode->i_mapping) ||
- 	    (page_offset(page) > size)) {
- 		/* We overload EFAULT to mean page got truncated */
- 		ret = -EFAULT;
-@@ -2560,10 +2560,10 @@ int block_page_mkwrite(struct vm_area_struct *vma, struct vm_fault *vmf,
- 	}
- 
- 	/* page is wholly or partially inside EOF */
--	if (((page->index + 1) << PAGE_SHIFT) > size)
--		end = size & ~PAGE_MASK;
-+	if (((page->index + hpage_nr_pages(page)) << PAGE_SHIFT) > size)
-+		end = size & ~hpage_mask(page);
- 	else
--		end = PAGE_SIZE;
-+		end = hpage_size(page);
- 
- 	ret = __block_write_begin(page, 0, end, get_block);
- 	if (!ret)
+> Also what's quite suspicious is this:
+> 
+> struct blkcg_gq *blkg_lookup_create(struct blkcg *blkcg,
+> 				    struct request_queue *q)
+> {
+> 	struct blkcg_gq *blkg;
+> 
+> 	WARN_ON_ONCE(!rcu_read_lock_held());
+> 	lockdep_assert_held(q->queue_lock);
+> 
+> 	/*
+> 	 * This could be the first entry point of blkcg implementation and
+> 	 * we shouldn't allow anything to go through for a bypassing queue.
+> 	 */
+> 	if (unlikely(blk_queue_bypass(q)))
+> 		return ERR_PTR(blk_queue_dying(q) ? -ENODEV : -EBUSY);
+> 
+> which now won't work as the respective flags aren't set anymore.
+> Not sure if that's a problem, though.
+> But you might want to look at that, too.
+
+dying is still used on blk-mq, but yes, the bypass check should now be
+frozen for blk-mq. Not really directly related to the above change,
+but it should be fixed up.
+
+> Nevertheless, with the mentioned modifications to your patch the crashes
+> don't occur anymore.
+
+Great
+
+> Sad news is that it doesn't help _that_ much on spinning rust mpt3sas;
+> there I still see a ~50% performance penalty on reads.
+> Write's slightly better than sq performance, though.
+
+What is the test case? Full details please, from hardware to what you
+are running. As I've mentioned before, I don't necessarily think your
+performance issues are related to scheduling. Would be nice to get
+to the bottom of it, though. And for that, I need more details.
+
 -- 
-2.11.0
-
+Jens Axboe
