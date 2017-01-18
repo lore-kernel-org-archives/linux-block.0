@@ -1,123 +1,105 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wj0-f194.google.com ([209.85.210.194]:36028 "EHLO
-        mail-wj0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750800AbdAWMAU (ORCPT
+Received: from mail-pf0-f171.google.com ([209.85.192.171]:36480 "EHLO
+        mail-pf0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751896AbdART4u (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Jan 2017 07:00:20 -0500
-Received: by mail-wj0-f194.google.com with SMTP id kq3so1730461wjc.3
-        for <linux-block@vger.kernel.org>; Mon, 23 Jan 2017 03:59:45 -0800 (PST)
-From: "=?UTF-8?q?Matias=20Bj=C3=B8rling?=" <m@bjorling.me>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
-Subject: [PATCH 2/8] lightnvm: collapse nvm_erase_ppa and nvm_erase_blk
-Date: Mon, 23 Jan 2017 12:59:13 +0100
-Message-Id: <20170123115919.14339-3-matias@cnexlabs.com>
-In-Reply-To: <20170123115919.14339-1-matias@cnexlabs.com>
-References: <20170123115919.14339-1-matias@cnexlabs.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+        Wed, 18 Jan 2017 14:56:50 -0500
+Received: by mail-pf0-f171.google.com with SMTP id 189so6665086pfu.3
+        for <linux-block@vger.kernel.org>; Wed, 18 Jan 2017 11:55:53 -0800 (PST)
+From: Omar Sandoval <osandov@osandov.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
+Cc: Martin Raiber <martin@urbackup.org>, kernel-team@fb.com
+Subject: [PATCH 2/2] sbitmap: fix wakeup hang after sbq resize
+Date: Wed, 18 Jan 2017 11:55:22 -0800
+Message-Id: <42f692970c8e8f6a6c967cfc150cfb190c936c9d.1484769083.git.osandov@fb.com>
+In-Reply-To: <b8c8740615f38f36e3a5f726f97903ca2af9f549.1484769083.git.osandov@fb.com>
+References: <b8c8740615f38f36e3a5f726f97903ca2af9f549.1484769083.git.osandov@fb.com>
+In-Reply-To: <b8c8740615f38f36e3a5f726f97903ca2af9f549.1484769083.git.osandov@fb.com>
+References: <b8c8740615f38f36e3a5f726f97903ca2af9f549.1484769083.git.osandov@fb.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-After gennvm and core have been merged, there are no more callers to
-nvm_erase_ppa. Therefore collapse the device specific and target
-specific erase functions.
+From: Omar Sandoval <osandov@fb.com>
 
-Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
+When we resize a struct sbitmap_queue, we update the wakeup batch size,
+but we don't update the wait count in the struct sbq_wait_states. If we
+resized down from a size which could use a bigger batch size, these
+counts could be too large and cause us to miss necessary wakeups. To fix
+this, update the wait counts when we resize (ensuring some careful
+memory ordering so that it's safe w.r.t. concurrent clears).
+
+This also fixes a theoretical issue where two threads could end up
+bumping the wait count up by the batch size, which could also
+potentially lead to hangs.
+
+Reported-by: Martin Raiber <martin@urbackup.org>
+Fixes: e3a2b3f931f5 ("blk-mq: allow changing of queue depth through sysfs")
+Fixes: 2971c35f3588 ("blk-mq: bitmap tag: fix race on blk_mq_bitmap_tags::wake_cnt")
+Signed-off-by: Omar Sandoval <osandov@fb.com>
 ---
- drivers/lightnvm/core.c  | 57 ++++++++++++++++++++++--------------------------
- include/linux/lightnvm.h |  1 -
- 2 files changed, 26 insertions(+), 32 deletions(-)
+ lib/sbitmap.c | 35 ++++++++++++++++++++++++++++++-----
+ 1 file changed, 30 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-index e9a4956..a4e2e3b 100644
---- a/drivers/lightnvm/core.c
-+++ b/drivers/lightnvm/core.c
-@@ -683,12 +683,34 @@ int nvm_submit_io(struct nvm_tgt_dev *tgt_dev, struct nvm_rq *rqd)
- }
- EXPORT_SYMBOL(nvm_submit_io);
+diff --git a/lib/sbitmap.c b/lib/sbitmap.c
+index df4e472df8a3..8f5c3b268c77 100644
+--- a/lib/sbitmap.c
++++ b/lib/sbitmap.c
+@@ -239,7 +239,19 @@ EXPORT_SYMBOL_GPL(sbitmap_queue_init_node);
  
--int nvm_erase_blk(struct nvm_tgt_dev *tgt_dev, struct ppa_addr *p, int flags)
-+int nvm_erase_blk(struct nvm_tgt_dev *tgt_dev, struct ppa_addr *ppas, int flags)
+ void sbitmap_queue_resize(struct sbitmap_queue *sbq, unsigned int depth)
  {
--	/* Convert address space */
--	nvm_map_to_dev(tgt_dev, p);
-+	struct nvm_dev *dev = tgt_dev->parent;
-+	struct nvm_rq rqd;
-+	int ret;
- 
--	return nvm_erase_ppa(tgt_dev->parent, p, 1, flags);
-+	if (!dev->ops->erase_block)
-+		return 0;
+-	sbq->wake_batch = sbq_calc_wake_batch(depth);
++	unsigned int wake_batch = sbq_calc_wake_batch(depth);
++	int i;
 +
-+	ret = nvm_map_to_dev(tgt_dev, ppas);
-+	if (ret)
-+		return ret;
-+
-+	memset(&rqd, 0, sizeof(struct nvm_rq));
-+
-+	ret = nvm_set_rqd_ppalist(dev, &rqd, ppas, 1, 1);
-+	if (ret)
-+		return ret;
-+
-+	nvm_generic_to_addr_mode(dev, &rqd);
-+
-+	rqd.flags = flags;
-+
-+	ret = dev->ops->erase_block(dev, &rqd);
-+
-+	nvm_free_rqd_ppalist(dev, &rqd);
-+
-+	return ret;
++	if (sbq->wake_batch != wake_batch) {
++		WRITE_ONCE(sbq->wake_batch, wake_batch);
++		/*
++		 * Pairs with the memory barrier in sbq_wake_up() to ensure that
++		 * the batch size is updated before the wait counts.
++		 */
++		smp_mb__before_atomic();
++		for (i = 0; i < SBQ_WAIT_QUEUES; i++)
++			atomic_set(&sbq->ws[i].wait_cnt, 1);
++	}
+ 	sbitmap_resize(&sbq->sb, depth);
  }
- EXPORT_SYMBOL(nvm_erase_blk);
- 
-@@ -847,33 +869,6 @@ void nvm_free_rqd_ppalist(struct nvm_dev *dev, struct nvm_rq *rqd)
- }
- EXPORT_SYMBOL(nvm_free_rqd_ppalist);
- 
--int nvm_erase_ppa(struct nvm_dev *dev, struct ppa_addr *ppas, int nr_ppas,
--								int flags)
--{
--	struct nvm_rq rqd;
--	int ret;
--
--	if (!dev->ops->erase_block)
--		return 0;
--
--	memset(&rqd, 0, sizeof(struct nvm_rq));
--
--	ret = nvm_set_rqd_ppalist(dev, &rqd, ppas, nr_ppas, 1);
--	if (ret)
--		return ret;
--
--	nvm_generic_to_addr_mode(dev, &rqd);
--
--	rqd.flags = flags;
--
--	ret = dev->ops->erase_block(dev, &rqd);
--
--	nvm_free_rqd_ppalist(dev, &rqd);
--
--	return ret;
--}
--EXPORT_SYMBOL(nvm_erase_ppa);
--
- void nvm_end_io(struct nvm_rq *rqd, int error)
+ EXPORT_SYMBOL_GPL(sbitmap_queue_resize);
+@@ -297,6 +309,7 @@ static struct sbq_wait_state *sbq_wake_ptr(struct sbitmap_queue *sbq)
+ static void sbq_wake_up(struct sbitmap_queue *sbq)
  {
- 	struct nvm_tgt_dev *tgt_dev = rqd->dev;
-diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
-index 84309fe..f2007b2 100644
---- a/include/linux/lightnvm.h
-+++ b/include/linux/lightnvm.h
-@@ -483,7 +483,6 @@ extern void nvm_addr_to_generic_mode(struct nvm_dev *, struct nvm_rq *);
- extern int nvm_set_rqd_ppalist(struct nvm_dev *, struct nvm_rq *,
- 					const struct ppa_addr *, int, int);
- extern void nvm_free_rqd_ppalist(struct nvm_dev *, struct nvm_rq *);
--extern int nvm_erase_ppa(struct nvm_dev *, struct ppa_addr *, int, int);
- extern int nvm_erase_blk(struct nvm_tgt_dev *, struct ppa_addr *, int);
- extern int nvm_get_l2p_tbl(struct nvm_tgt_dev *, u64, u32, nvm_l2p_update_fn *,
- 			   void *);
+ 	struct sbq_wait_state *ws;
++	unsigned int wake_batch;
+ 	int wait_cnt;
+ 
+ 	/*
+@@ -313,10 +326,22 @@ static void sbq_wake_up(struct sbitmap_queue *sbq)
+ 		return;
+ 
+ 	wait_cnt = atomic_dec_return(&ws->wait_cnt);
+-	if (unlikely(wait_cnt < 0))
+-		wait_cnt = atomic_inc_return(&ws->wait_cnt);
+-	if (wait_cnt == 0) {
+-		atomic_add(sbq->wake_batch, &ws->wait_cnt);
++	if (wait_cnt <= 0) {
++		wake_batch = READ_ONCE(sbq->wake_batch);
++		/*
++		 * Pairs with the memory barrier in sbitmap_queue_resize() to
++		 * ensure that we see the batch size update before the wait
++		 * count is reset.
++		 */
++		smp_mb__before_atomic();
++		/*
++		 * If there are concurrent callers to sbq_wake_up(), the last
++		 * one to decrement the wait count below zero will bump it back
++		 * up. If there is a concurrent resize, the count reset will
++		 * either cause the cmpxchg to fail or overwrite after the
++		 * cmpxchg.
++		 */
++		atomic_cmpxchg(&ws->wait_cnt, wait_cnt, wait_cnt + wake_batch);
+ 		sbq_index_atomic_inc(&sbq->wake_index);
+ 		wake_up(&ws->wait);
+ 	}
 -- 
-2.7.4
+2.11.0
 
