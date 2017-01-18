@@ -1,150 +1,145 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga05.intel.com ([192.55.52.43]:60845 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1163219AbdAGBHE (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 6 Jan 2017 20:07:04 -0500
-Subject: [RFC PATCH v2 1/2] block: fix lifetime of request_queue /
- backing_dev_info relative to bdev
-From: Dan Williams <dan.j.williams@intel.com>
-To: linux-block@vger.kernel.org
-Cc: Jan Kara <jack@suse.cz>, linux-nvdimm@lists.01.org,
-        linux-kernel@vger.kernel.org, Jens Axboe <axboe@fb.com>,
-        Jeff Moyer <jmoyer@redhat.com>, linux-fsdevel@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>
-Date: Fri, 06 Jan 2017 17:02:56 -0800
-Message-ID: <148375097659.37020.8663217538744770382.stgit@dwillia2-desk3.amr.corp.intel.com>
-In-Reply-To: <148375097100.37020.495735345355345658.stgit@dwillia2-desk3.amr.corp.intel.com>
-References: <148375097100.37020.495735345355345658.stgit@dwillia2-desk3.amr.corp.intel.com>
+Return-Path: <wangyijing@huawei.com>
+From: Yijing Wang <wangyijing@huawei.com>
+To: <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+CC: <miaoxie@huawei.com>, <fangwei1@huawei.com>,
+        <sreekanth.reddy@broadcom.com>, Yijing Wang <wangyijing@huawei.com>
+Subject: [PATCH v2] block: Don't register a registered bdi device
+Date: Wed, 18 Jan 2017 15:28:46 +0800
+Message-ID: <1484724526-36168-1-git-send-email-wangyijing@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain
+List-ID: <linux-block@vger.kernel.org>
 
-By definition the lifetime of a struct block_device is equal to the
-lifetime of its corresponding inode since they both live in struct
-bdev_inode. Up until the inode is destroyed it may be the target of
-delayed write-back requests. Issuing write-back to a block_device
-requires a lookup of the bdev backing_dev_info that is embedded in the
-request_queue.
+Following calltrace is quoted from Sreekanth Reddy's
+patch email, we found the same issue in our platform.
+link:https://patchwork.kernel.org/patch/9394471/
 
-It follows that a struct request_queue must be alive as long as a
-corresponding block device inode is the active target of requests.
+Observing below kernel panic while creating second raid disk
+on LSI SAS3008 HBA card.
+[  +0.000055] ------------[ cut here ]------------
+[  +0.000007] WARNING: CPU: 2 PID: 281 at fs/sysfs/dir.c:31 sysfs_warn_dup+0x62/0x80
+[  +0.000002] sysfs: cannot create duplicate filename '/devices/virtual/bdi/8:32'
+[  +0.000001] Modules linked in: mptctl mptbase xt_CHECKSUM iptable_mangle ipt_MASQUERADE nf_nat_masquerade_ipv4 iptable_nat  nf_conntrack tun bridge stp llc ebtable_filter ebtables ip6table_filter ip6_tables intel_rapl sb_edac edac_core x86_pkg_temp_pclmul joydev ghash_clmulni_intel iTCO_wdt ipmi_ssif mei_me pcspkr mei iTCO_vendor_support ipmi_si i2c_i801 lpc_ich mfd_corema acpi_pad wmi acpi_power_meter nfsd auth_rpcgss nfs_acl lockd grace binfmt_misc sunrpc xfs libcrc32c ast i2c_algo_bit drm_kore raid_class nvme_core scsi_transport_sas dca
+[  +0.000067] CPU: 2 PID: 281 Comm: kworker/u49:5 Not tainted 4.9.0-rc2 #1
+[  +0.000002] Hardware name: Supermicro SYS-2028U-TNRT+/X10DRU-i+, BIOS 1.1 07/22/2015
+[  +0.000005] Workqueue: events_unbound async_run_entry_fn
+[  +0.000004] Call Trace:
+[  +0.000009]  [<ffffffff813ca51e>] dump_stack+0x63/0x85
+[  +0.000005]  [<ffffffff810a5bfb>] __warn+0xcb/0xf0
+[  +0.000004]  [<ffffffff810a5c7f>] warn_slowpath_fmt+0x5f/0x80
+[  +0.000006]  [<ffffffff812bf17f>] ? kernfs_path_from_node+0x4f/0x60
+[  +0.000002]  [<ffffffff812c2942>] sysfs_warn_dup+0x62/0x80
+[  +0.000002]  [<ffffffff812c2a27>] sysfs_create_dir_ns+0x77/0x90
+[  +0.000004]  [<ffffffff813ccef9>] kobject_add_internal+0x99/0x330
+[  +0.000003]  [<ffffffff813d6efb>] ? vsnprintf+0x35b/0x4c0
+[  +0.000003]  [<ffffffff813cd6f5>] kobject_add+0x75/0xd0
+[  +0.000006]  [<ffffffff81514e43>] ? device_private_init+0x23/0x70
+[  +0.000007]  [<ffffffff817cb652>] ? mutex_lock+0x12/0x30
+[  +0.000003]  [<ffffffff81514fa9>] device_add+0x119/0x670
+[  +0.000004]  [<ffffffff815156f0>] device_create_groups_vargs+0xe0/0xf0
+[  +0.000003]  [<ffffffff8151571c>] device_create_vargs+0x1c/0x20
+[  +0.000006]  [<ffffffff811d712c>] bdi_register+0x8c/0x180
+[  +0.000003]  [<ffffffff811d7506>] bdi_register_owner+0x36/0x60
+[  +0.000006]  [<ffffffff813ad778>] device_add_disk+0x168/0x480
+[  +0.000005]  [<ffffffff81524891>] ? update_autosuspend+0x51/0x60
+[  +0.000005]  [<ffffffff81557770>] sd_probe_async+0x110/0x1c0
+[  +0.000002]  [<ffffffff810c8a49>] async_run_entry_fn+0x39/0x140
+[  +0.000003]  [<ffffffff810bfa5f>] process_one_work+0x15f/0x430
+[  +0.000002]  [<ffffffff810bfd7e>] worker_thread+0x4e/0x490
+[  +0.000002]  [<ffffffff810bfd30>] ? process_one_work+0x430/0x430
+[  +0.000003]  [<ffffffff810c55a9>] kthread+0xd9/0xf0
+[  +0.000003]  [<ffffffff810c54d0>] ? kthread_park+0x60/0x60
+[  +0.000003]  [<ffffffff817ce595>] ret_from_fork+0x25/0x30
+[  +0.000002] ------------[ cut here ]------------
+[  +0.000004] WARNING: CPU: 2 PID: 281 at lib/kobject.c:240 kobject_add_internal+0x2bd/0x330
+[  +0.000001] kobject_add_internal failed for 8:32 with -EEXIST, don't try to register things with the same name in the same
+[  +0.000001] Modules linked in: mptctl mptbase xt_CHECKSUM iptable_mangle ipt_MASQUERADE nf_nat_masquerade_ipv4 iptable_nat  nf_conntrack tun bridge stp llc ebtable_filter ebtables ip6table_filter ip6_tables intel_rapl sb_edac edac_core x86_pkg_temp_pclmul joydev ghash_clmulni_intel iTCO_wdt ipmi_ssif mei_me pcspkr mei iTCO_vendor_support ipmi_si i2c_i801 lpc_ich mfd_corema acpi_pad wmi acpi_power_meter nfsd auth_rpcgss nfs_acl lockd grace binfmt_misc sunrpc xfs libcrc32c ast i2c_algo_bit drm_kore raid_class nvme_core scsi_transport_sas dca
+[  +0.000043] CPU: 2 PID: 281 Comm: kworker/u49:5 Tainted: G        W       4.9.0-rc2 #1
+[  +0.000001] Hardware name: Supermicro SYS-2028U-TNRT+/X10DRU-i+, BIOS 1.1 07/22/2015
+[  +0.000002] Workqueue: events_unbound async_run_entry_fn
+[  +0.000003] Call Trace:
+[  +0.000003]  [<ffffffff813ca51e>] dump_stack+0x63/0x85
+[  +0.000003]  [<ffffffff810a5bfb>] __warn+0xcb/0xf0
+[  +0.000004]  [<ffffffff810a5c7f>] warn_slowpath_fmt+0x5f/0x80
+[  +0.000002]  [<ffffffff812c294a>] ? sysfs_warn_dup+0x6a/0x80
+[  +0.000003]  [<ffffffff813cd11d>] kobject_add_internal+0x2bd/0x330
+[  +0.000003]  [<ffffffff813d6efb>] ? vsnprintf+0x35b/0x4c0
+[  +0.000003]  [<ffffffff813cd6f5>] kobject_add+0x75/0xd0
+[  +0.000003]  [<ffffffff81514e43>] ? device_private_init+0x23/0x70
+[  +0.000004]  [<ffffffff817cb652>] ? mutex_lock+0x12/0x30
+[  +0.000002]  [<ffffffff81514fa9>] device_add+0x119/0x670
+[  +0.000004]  [<ffffffff815156f0>] device_create_groups_vargs+0xe0/0xf0
+[  +0.000003]  [<ffffffff8151571c>] device_create_vargs+0x1c/0x20
+[  +0.000003]  [<ffffffff811d712c>] bdi_register+0x8c/0x180
+[  +0.000003]  [<ffffffff811d7506>] bdi_register_owner+0x36/0x60
+[  +0.000004]  [<ffffffff813ad778>] device_add_disk+0x168/0x480
+[  +0.000003]  [<ffffffff81524891>] ? update_autosuspend+0x51/0x60
+[  +0.000002]  [<ffffffff81557770>] sd_probe_async+0x110/0x1c0
+[  +0.000002]  [<ffffffff810c8a49>] async_run_entry_fn+0x39/0x140
+[  +0.000002]  [<ffffffff810bfa5f>] process_one_work+0x15f/0x430
+[  +0.000002]  [<ffffffff810bfd7e>] worker_thread+0x4e/0x490
+[  +0.000002]  [<ffffffff810bfd30>] ? process_one_work+0x430/0x430
+[  +0.000003]  [<ffffffff810c55a9>] kthread+0xd9/0xf0
+[  +0.000003]  [<ffffffff810c54d0>] ? kthread_park+0x60/0x60
+[  +0.000003]  [<ffffffff817ce595>] ret_from_fork+0x25/0x30
+[  +0.000949] BUG: unable to handle kernel
+[  +0.005263] NULL pointer dereference
+[  +0.002853] IP: [<ffffffff812c2c64>] sysfs_do_create_link_sd.isra.2+0x34/0xb0
+[  +0.008584] PGD 0
 
-Match the lifetimes of backing_dev_info and its usage in
-inode-write-back by arranging for the bdev to take a reference against
-its request_queue when the bdev is instantiated. Release the
-request_queue reference when the inode is freed.
+[  +0.006115] Oops: 0000 [#1] SMP
+[  +0.004531] Modules linked in: mptctl mptbase xt_CHECKSUM iptable_mangle ipt_MASQUERADE nf_nat_masquerade_ipv4 iptable_nat  nf_conntrack tun bridge stp llc ebtable_filter ebtables ip6table_filter ip6_tables intel_rapl sb_edac edac_core x86_pkg_temp_pclmul joydev ghash_clmulni_intel iTCO_wdt ipmi_ssif mei_me pcspkr mei iTCO_vendor_support ipmi_si i2c_i801 lpc_ich mfd_corema acpi_pad wmi acpi_power_meter nfsd auth_rpcgss nfs_acl lockd grace binfmt_misc sunrpc xfs libcrc32c ast i2c_algo_bit drm_kore raid_class nvme_core scsi_transport_sas dca
+[  +0.080566] CPU: 17 PID: 281 Comm: kworker/u49:5 Tainted: G        W       4.9.0-rc2 #1
+[  +0.009472] Hardware name: Supermicro SYS-2028U-TNRT+/X10DRU-i+, BIOS 1.1 07/22/2015
+[  +0.009169] Workqueue: events_unbound async_run_entry_fn
+[  +0.007340] RIP: 0010:[<ffffffff812c2c64>]  [<ffffffff812c2c64>] sysfs_do_create_link_sd.isra.2+0x34/0xb0
+[  +0.010294] Call Trace:
+[  +0.005269]  [<ffffffff812c2d05>] sysfs_create_link+0x25/0x40
+[  +0.008568]  [<ffffffff813ad80c>] device_add_disk+0x1fc/0x480
+[  +0.008551]  [<ffffffff81557770>] sd_probe_async+0x110/0x1c0
+[  +0.008456]  [<ffffffff810c8a49>] async_run_entry_fn+0x39/0x140
+[  +0.010021]  [<ffffffff810bfa5f>] process_one_work+0x15f/0x430
+[  +0.009623]  [<ffffffff810bfd7e>] worker_thread+0x4e/0x490
+[  +0.007422]  [<ffffffff810bfd30>] ? process_one_work+0x430/0x430
+[  +0.008728]  [<ffffffff810c55a9>] kthread+0xd9/0xf0
+[  +0.007578]  [<ffffffff810c54d0>] ? kthread_park+0x60/0x60
+[  +0.006816]  [<ffffffff817ce595>] ret_from_fork+0x25/0x30
+[  +0.006814] Code: 75 48 85 ff 74 70 55 48 89 e5 41 57 41 56 41 55 41 54 49 89 fe 53 48 c7 c7 90 74 01 82 48 89 f3 41 89 cc  c5 ff ff c6 05 15 48 d5
+[  +0.022853] RIP  [<ffffffff812c2c64>] sysfs_do_create_link_sd.isra.2+0x34/0xb0
+[  +0.008679]  RSP <ffffc90019c3fd10>
+[  +0.006129] BUG: unable to handle kernel
 
-Cc: Jens Axboe <axboe@fb.com>
-Cc: Jeff Moyer <jmoyer@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Reported-by: Jan Kara <jack@suse.cz>
-Signed-off-by: Dan Williams <dan.j.williams@intel.com>
+While create the first raid disk, we hide first raid disk's PD devices
+(remove sdx device), but leave the bdi device in kernel, we won't call
+bdi_unregister() in del_gendisk. So if we cancal the raid, and create
+second raid disk, kernel try to register the bdi device again, then
+the warning calltrace dump, bcause the bdi device already exist in kernel.
+This patch check the bdi device state before register a new bdi device,
+avoid register a registered bdi device again.
+
+-v2: remove the spin lock protect, because the sd_probe caller should
+     guarantee the scsi_device valid, and the bdi device is unregister
+	 when scsi_device/block queue removed.
+
+Signed-off-by: Yijing Wang <wangyijing@huawei.com>
 ---
- block/blk-core.c   |    3 ++-
- fs/block_dev.c     |   25 +++++++++++++++----------
- include/linux/fs.h |    1 +
- 3 files changed, 18 insertions(+), 11 deletions(-)
+ block/genhd.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 14d7c0740dc0..e8713137b846 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -378,7 +378,8 @@ EXPORT_SYMBOL(blk_run_queue);
+diff --git a/block/genhd.c b/block/genhd.c
+index fcd6d4f..fbb2a96 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -614,7 +614,8 @@ void device_add_disk(struct device *parent, struct gendisk *disk)
  
- void blk_put_queue(struct request_queue *q)
- {
--	kobject_put(&q->kobj);
-+	if (q)
-+		kobject_put(&q->kobj);
- }
- EXPORT_SYMBOL(blk_put_queue);
+ 	/* Register BDI before referencing it from bdev */
+ 	bdi = &disk->queue->backing_dev_info;
+-	bdi_register_owner(bdi, disk_to_dev(disk));
++	if (!test_bit(WB_registered, &bdi->wb.state))
++		bdi_register_owner(bdi, disk_to_dev(disk));
  
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 899fa8ccc347..8f94b74bfc7d 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -589,12 +589,22 @@ static struct inode *bdev_alloc_inode(struct super_block *sb)
- 	return &ei->vfs_inode;
- }
- 
-+static void bdev_release(struct work_struct *w)
-+{
-+	struct block_device *bdev = container_of(w, typeof(*bdev), bd_release);
-+	struct bdev_inode *bdi = container_of(bdev, typeof(*bdi), bdev);
-+
-+	blk_put_queue(bdev->bd_queue);
-+	kmem_cache_free(bdev_cachep, bdi);
-+}
-+
- static void bdev_i_callback(struct rcu_head *head)
- {
- 	struct inode *inode = container_of(head, struct inode, i_rcu);
--	struct bdev_inode *bdi = BDEV_I(inode);
-+	struct block_device *bdev = &BDEV_I(inode)->bdev;
- 
--	kmem_cache_free(bdev_cachep, bdi);
-+	/* blk_put_queue needs process context */
-+	schedule_work(&bdev->bd_release);
- }
- 
- static void bdev_destroy_inode(struct inode *inode)
-@@ -613,6 +623,7 @@ static void init_once(void *foo)
- #ifdef CONFIG_SYSFS
- 	INIT_LIST_HEAD(&bdev->bd_holder_disks);
- #endif
-+	INIT_WORK(&bdev->bd_release, bdev_release);
- 	inode_init_once(&ei->vfs_inode);
- 	/* Initialize mutex for freeze. */
- 	mutex_init(&bdev->bd_fsfreeze_mutex);
-@@ -1268,6 +1279,8 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
- 	mutex_lock_nested(&bdev->bd_mutex, for_part);
- 	if (!bdev->bd_openers) {
- 		bdev->bd_disk = disk;
-+		if (!blk_get_queue(disk->queue))
-+			goto out_clear;
- 		bdev->bd_queue = disk->queue;
- 		bdev->bd_contains = bdev;
- 
-@@ -1288,7 +1301,6 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
- 					disk_put_part(bdev->bd_part);
- 					bdev->bd_part = NULL;
- 					bdev->bd_disk = NULL;
--					bdev->bd_queue = NULL;
- 					mutex_unlock(&bdev->bd_mutex);
- 					disk_unblock_events(disk);
- 					put_disk(disk);
-@@ -1364,7 +1376,6 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
- 	disk_put_part(bdev->bd_part);
- 	bdev->bd_disk = NULL;
- 	bdev->bd_part = NULL;
--	bdev->bd_queue = NULL;
- 	if (bdev != bdev->bd_contains)
- 		__blkdev_put(bdev->bd_contains, mode, 1);
- 	bdev->bd_contains = NULL;
-@@ -1586,12 +1597,6 @@ static void __blkdev_put(struct block_device *bdev, fmode_t mode, int for_part)
- 		kill_bdev(bdev);
- 
- 		bdev_write_inode(bdev);
--		/*
--		 * Detaching bdev inode from its wb in __destroy_inode()
--		 * is too late: the queue which embeds its bdi (along with
--		 * root wb) can be gone as soon as we put_disk() below.
--		 */
--		inode_detach_wb(bdev->bd_inode);
- 	}
- 	if (bdev->bd_contains == bdev) {
- 		if (disk->fops->release)
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index dc0478c07b2a..f084e4a2198b 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -488,6 +488,7 @@ struct block_device {
- 	int			bd_fsfreeze_count;
- 	/* Mutex for freeze */
- 	struct mutex		bd_fsfreeze_mutex;
-+	struct work_struct	bd_release;
- };
- 
- /*
-
+ 	blk_register_region(disk_devt(disk), disk->minors, NULL,
+ 			    exact_match, exact_lock, disk);
+-- 
+2.5.0
