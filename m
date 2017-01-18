@@ -1,8 +1,6 @@
-Return-Path: <sagigrim@gmail.com>
-Return-Path: <sagigrim@gmail.com>
-From: Sagi Grimberg <sagi@grimberg.me>
+Return-Path: <hare@suse.de>
 Subject: Re: [LSF/MM TOPIC][LSF/MM ATTEND] NAPI polling for block drivers
-To: Hannes Reinecke <hare@suse.de>, Johannes Thumshirn <jthumshirn@suse.de>
+To: Johannes Thumshirn <jthumshirn@suse.de>, Sagi Grimberg <sagi@grimberg.me>
 References: <d60d4499-6ed8-0a69-edbf-db205a6dba6a@kernel.dk>
  <8b47ca34-d2ff-26dc-721e-2cb1e18f1efc@grimberg.me>
  <499af528-7810-f82d-1f11-cbf8f3a5b21c@grimberg.me>
@@ -14,59 +12,77 @@ References: <d60d4499-6ed8-0a69-edbf-db205a6dba6a@kernel.dk>
  <20170118145816.GI3514@linux-x5ow.site>
  <c7eabe1c-5dcd-9859-2b41-9683f68a0534@grimberg.me>
  <20170118151643.GJ3514@linux-x5ow.site>
- <aaf5c35f-7e81-fa44-d467-53b574debdd4@suse.de>
 Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@infradead.org>,
  Linux-scsi@vger.kernel.org, linux-nvme@lists.infradead.org,
  linux-block@vger.kernel.org, Keith Busch <keith.busch@intel.com>,
  "lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>
-Message-ID: <97a3f3d3-3619-871d-55f3-75449b0c34cf@grimberg.me>
-Date: Thu, 19 Jan 2017 10:12:17 +0200
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <aaf5c35f-7e81-fa44-d467-53b574debdd4@suse.de>
+Date: Wed, 18 Jan 2017 16:39:19 +0100
 MIME-Version: 1.0
-In-Reply-To: <aaf5c35f-7e81-fa44-d467-53b574debdd4@suse.de>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+In-Reply-To: <20170118151643.GJ3514@linux-x5ow.site>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-block@vger.kernel.org>
 
-
->>> I think you missed:
->>> http://git.infradead.org/nvme.git/commit/49c91e3e09dc3c9dd1718df85112a8cce3ab7007
+On 01/18/2017 04:16 PM, Johannes Thumshirn wrote:
+> On Wed, Jan 18, 2017 at 05:14:36PM +0200, Sagi Grimberg wrote:
 >>
->> I indeed did, thanks.
+>>> Hannes just spotted this:
+>>> static int nvme_queue_rq(struct blk_mq_hw_ctx *hctx,
+>>>                         const struct blk_mq_queue_data *bd)
+>>> {
+>>> [...]
+>>>        __nvme_submit_cmd(nvmeq, &cmnd);
+>>>        nvme_process_cq(nvmeq);
+>>>        spin_unlock_irq(&nvmeq->q_lock);
+>>>        return BLK_MQ_RQ_QUEUE_OK;
+>>> out_cleanup_iod:
+>>>        nvme_free_iod(dev, req);
+>>> out_free_cmd:
+>>>        nvme_cleanup_cmd(req);
+>>>        return ret;
+>>> }
+>>>
+>>> So we're draining the CQ on submit. This of cause makes polling for
+>>> completions in the IRQ handler rather pointless as we already did in the
+>>> submission path.
 >>
-> But it doesn't help.
->
-> We're still having to wait for the first interrupt, and if we're really
-> fast that's the only completion we have to process.
->
-> Try this:
->
->
-> diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-> index b4b32e6..e2dd9e2 100644
-> --- a/drivers/nvme/host/pci.c
-> +++ b/drivers/nvme/host/pci.c
-> @@ -623,6 +623,8 @@ static int nvme_queue_rq(struct blk_mq_hw_ctx *hctx,
->         }
->         __nvme_submit_cmd(nvmeq, &cmnd);
->         spin_unlock(&nvmeq->sq_lock);
-> +       disable_irq_nosync(nvmeq_irq(irq));
-> +       irq_poll_sched(&nvmeq->iop);
+>> I think you missed:
+>> http://git.infradead.org/nvme.git/commit/49c91e3e09dc3c9dd1718df85112a8cce3ab7007
+> 
+> I indeed did, thanks.
+> 
+But it doesn't help.
 
-a. This would trigger a condition that we disable irq twice which
-is wrong at least because it will generate a warning.
+We're still having to wait for the first interrupt, and if we're really
+fast that's the only completion we have to process.
 
-b. This would cause a way-too-much triggers of ksoftirqd. In order for
-it to be effective we need to to run only when it should and optimally
-when the completion queue has a batch of completions waiting.
+Try this:
 
-After a deeper analysis, I agree with Bart that interrupt coalescing is
-needed for it to work. The problem with nvme coalescing as Jens said, is
-a death penalty of 100us granularity. Hannes, Johannes, how does it look
-like with the devices you are testing with?
 
-Also, I think that adaptive moderation is needed in order for it to
-work well. I know that some networking drivers implemented adaptive
-moderation in SW before having HW support for it. It can be done by
-maintaining stats and having a periodic work that looks at it and
-changes the moderation parameters.
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index b4b32e6..e2dd9e2 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -623,6 +623,8 @@ static int nvme_queue_rq(struct blk_mq_hw_ctx *hctx,
+        }
+        __nvme_submit_cmd(nvmeq, &cmnd);
+        spin_unlock(&nvmeq->sq_lock);
++       disable_irq_nosync(nvmeq_irq(irq));
++       irq_poll_sched(&nvmeq->iop);
+        return BLK_MQ_RQ_QUEUE_OK;
+ out_cleanup_iod:
+        nvme_free_iod(dev, req);
 
-Does anyone think that this is something we should consider?
+That should avoid the first interrupt, and with a bit of lock reduce the
+number of interrupts _drastically_.
+
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: F. Imend�rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG N�rnberg)
