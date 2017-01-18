@@ -1,44 +1,51 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:48231 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751140AbdAWOHf (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Jan 2017 09:07:35 -0500
-To: Jens Axboe <axboe@fb.com>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Hannes Reinecke <hare@suse.de>
-Subject: __blk_mq_tag_busy() weirdness
-Message-ID: <6e2db454-b2f7-16a1-acc6-999ee09fdf10@suse.de>
-Date: Mon, 23 Jan 2017 15:07:32 +0100
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Date: Wed, 18 Jan 2017 12:00:57 +0100
+From: Jan Kara <jack@suse.cz>
+To: "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>
+Cc: Jerome Glisse <jglisse@redhat.com>,
+        lsf-pc@lists.linux-foundation.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: Re: [Lsf-pc] [LSF/MM ATTEND] Un-addressable device memory and
+ block/fs implications
+Message-ID: <20170118110057.GA31377@quack2.suse.cz>
+References: <20161213181511.GB2305@redhat.com>
+ <87lgvgwoos.fsf@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <87lgvgwoos.fsf@linux.vnet.ibm.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Hi Jens,
+On Fri 16-12-16 08:44:11, Aneesh Kumar K.V wrote:
+> Jerome Glisse <jglisse@redhat.com> writes:
+> 
+> > I would like to discuss un-addressable device memory in the context of
+> > filesystem and block device. Specificaly how to handle write-back, read,
+> > ... when a filesystem page is migrated to device memory that CPU can not
+> > access.
+> >
+> > I intend to post a patchset leveraging the same idea as the existing
+> > block bounce helper (block/bounce.c) to handle this. I believe this is
+> > worth discussing during summit see how people feels about such plan and
+> > if they have better ideas.
+> >
+> >
+> > I also like to join discussions on:
+> >   - Peer-to-Peer DMAs between PCIe devices
+> >   - CDM coherent device memory
+> >   - PMEM
+> >   - overall mm discussions
+> 
+> I would like to attend this discussion. I can talk about coherent device
+> memory and how having HMM handle that will make it easy to have one
+> interface for device driver. For Coherent device case we definitely need
+> page cache migration support.
 
-while hunting yet another queue stall I've been looking at
-__blk_mq_tag_busy():
+Aneesh, did you intend this as your request to attend? You posted it as a
+reply to another email so it is not really clear. Note that each attend
+request should be a separate email so that it does not get lost...
 
-bool __blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx)
-{
-	if (!test_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state) &&
-	    !test_and_set_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
-		atomic_inc(&hctx->tags->active_queues);
-
-	return true;
-}
-
-Is this some subtle usage of bitops (and I just didn't grasp it) or is
-the first test_bit() pointless?
-If the former I _really_ would like to have some comments on why this is
-required.
-
-Cheers,
-
-Hannes
+								Honza
 -- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG Nürnberg)
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
