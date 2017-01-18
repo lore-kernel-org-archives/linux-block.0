@@ -1,97 +1,49 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv6 33/37] ext4: fix SEEK_DATA/SEEK_HOLE for huge pages
-Date: Thu, 26 Jan 2017 14:58:15 +0300
-Message-Id: <20170126115819.58875-34-kirill.shutemov@linux.intel.com>
-In-Reply-To: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
-References: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga11.intel.com ([192.55.52.93]:11488 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750981AbdARRYF (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 18 Jan 2017 12:24:05 -0500
+Date: Wed, 18 Jan 2017 10:22:16 -0700
+From: Ross Zwisler <ross.zwisler@linux.intel.com>
+To: willy@bombadil.infradead.org
+Cc: Ross Zwisler <ross.zwisler@linux.intel.com>,
+        lsf-pc@lists.linux-foundation.org, linux-fsdevel@vger.kernel.org,
+        linux-nvdimm@lists.01.org, linux-block@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: Re: [LSF/MM TOPIC] Future direction of DAX
+Message-ID: <20170118172216.GA20111@linux.intel.com>
+References: <20170114002008.GA25379@linux.intel.com>
+ <20170118052533.GA18349@bombadil.infradead.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170118052533.GA18349@bombadil.infradead.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-ext4_find_unwritten_pgoff() needs few tweaks to work with huge pages.
-Mostly trivial page_mapping()/page_to_pgoff() and adjustment to how we
-find relevant block.
+On Tue, Jan 17, 2017 at 09:25:33PM -0800, willy@bombadil.infradead.org wrote:
+> On Fri, Jan 13, 2017 at 05:20:08PM -0700, Ross Zwisler wrote:
+> > We still have a lot of work to do, though, and I'd like to propose a discussion
+> > around what features people would like to see enabled in the coming year as
+> > well as what what use cases their customers have that we might not be aware of.
+> 
+> +1 to the discussion
+> 
+> > - Jan suggested [2] that we could use the radix tree as a cache to service DAX
+> >   faults without needing to call into the filesystem.  Are there any issues
+> >   with this approach, and should we move forward with it as an optimization?
+> 
+> Ahem.  I believe I proposed this at last year's LSFMM.  And I sent
+> patches to start that work.  And Dan blocked it.  So I'm not terribly
+> amused to see somebody else given credit for the idea.
+> 
+> It's not just an optimisation.  It's also essential for supporting
+> filesystems which don't have block devices.  I'm aware of at least two
+> customer demands for this in different domains.
+> 
+> 1. Embedded uses with NOR flash
+> 2. Cloud/virt uses with multiple VMs on a single piece of hardware
 
-Signe-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
----
- fs/ext4/file.c | 18 ++++++++++++++----
- 1 file changed, 14 insertions(+), 4 deletions(-)
+Yea, I didn't mean the full move to having PFNs in the tree, just using the
+sector number in the radix tree instead of calling into the filesystem.
 
-diff --git a/fs/ext4/file.c b/fs/ext4/file.c
-index d663d3d7c81c..0b11aadfb75f 100644
---- a/fs/ext4/file.c
-+++ b/fs/ext4/file.c
-@@ -519,7 +519,7 @@ static int ext4_find_unwritten_pgoff(struct inode *inode,
- 			 * range, it will be a hole.
- 			 */
- 			if (lastoff < endoff && whence == SEEK_HOLE &&
--			    page->index > end) {
-+			    page_to_pgoff(page) > end) {
- 				found = 1;
- 				*offset = lastoff;
- 				goto out;
-@@ -527,7 +527,7 @@ static int ext4_find_unwritten_pgoff(struct inode *inode,
- 
- 			lock_page(page);
- 
--			if (unlikely(page->mapping != inode->i_mapping)) {
-+			if (unlikely(page_mapping(page) != inode->i_mapping)) {
- 				unlock_page(page);
- 				continue;
- 			}
-@@ -538,8 +538,12 @@ static int ext4_find_unwritten_pgoff(struct inode *inode,
- 			}
- 
- 			if (page_has_buffers(page)) {
-+				int diff;
- 				lastoff = page_offset(page);
- 				bh = head = page_buffers(page);
-+				diff = (page - compound_head(page)) << inode->i_blkbits;
-+				while (diff--)
-+					bh = bh->b_this_page;
- 				do {
- 					if (buffer_uptodate(bh) ||
- 					    buffer_unwritten(bh)) {
-@@ -560,8 +564,12 @@ static int ext4_find_unwritten_pgoff(struct inode *inode,
- 				} while (bh != head);
- 			}
- 
--			lastoff = page_offset(page) + PAGE_SIZE;
-+			lastoff = page_offset(page) + hpage_size(page);
- 			unlock_page(page);
-+			if (PageTransCompound(page)) {
-+				i++;
-+				break;
-+			}
- 		}
- 
- 		/*
-@@ -574,7 +582,9 @@ static int ext4_find_unwritten_pgoff(struct inode *inode,
- 			break;
- 		}
- 
--		index = pvec.pages[i - 1]->index + 1;
-+		index = page_to_pgoff(pvec.pages[i - 1]) + 1;
-+		if (PageTransCompound(pvec.pages[i - 1]))
-+			index = round_up(index, HPAGE_PMD_NR);
- 		pagevec_release(&pvec);
- 	} while (index <= end);
- 
--- 
-2.11.0
-
+My apologies if you feel I didn't give you proper credit.
