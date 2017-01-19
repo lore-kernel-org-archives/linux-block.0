@@ -1,59 +1,54 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wj0-f195.google.com ([209.85.210.195]:34527 "EHLO
-        mail-wj0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750742AbdAWMAU (ORCPT
+Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:35163 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1752673AbdASOMm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Jan 2017 07:00:20 -0500
-Received: by mail-wj0-f195.google.com with SMTP id ip10so1729274wjb.1
-        for <linux-block@vger.kernel.org>; Mon, 23 Jan 2017 03:59:43 -0800 (PST)
-From: "=?UTF-8?q?Matias=20Bj=C3=B8rling?=" <m@bjorling.me>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
-Subject: [PATCH 0/8] lightnvm: cleanups and support for vector ioctls
-Date: Mon, 23 Jan 2017 12:59:11 +0100
-Message-Id: <20170123115919.14339-1-matias@cnexlabs.com>
+        Thu, 19 Jan 2017 09:12:42 -0500
+Subject: Re: [bug report] blk-mq-sched: add framework for MQ capable IO
+ schedulers
+To: Dan Carpenter <dan.carpenter@oracle.com>
+References: <20170119073238.GA9834@mwanda>
+CC: <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@fb.com>
+Message-ID: <2b6d2aa1-a7eb-04d1-ac4a-643f35615160@fb.com>
+Date: Thu, 19 Jan 2017 06:11:45 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20170119073238.GA9834@mwanda>
+Content-Type: text/plain; charset="windows-1252"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-A couple of patches. The first seven patches is cleanup patches, that
-cleans up the codebase for when pblk is added to the kernel, and
-prepare the code such that a device can be used as a normal block device
-(as long as the access rules are respected).
+On 01/18/2017 11:32 PM, Dan Carpenter wrote:
+> Hello Jens Axboe,
+> 
+> This is a semi-automatic email about new static checker warnings.
+> 
+> The patch bd166ef183c2: "blk-mq-sched: add framework for MQ capable
+> IO schedulers" from Jan 17, 2017, leads to the following Smatch
+> complaint:
+> 
+> block/elevator.c:234 elevator_init()
+> 	 error: we previously assumed 'e' could be null (see line 229)
+> 
+> block/elevator.c
+>    228	
+>    229			if (!e) {
+>                             ^^
+> Null.
+> 
+>    230				printk(KERN_ERR
+>    231					"Default I/O scheduler not found. " \
+>    232					"Using noop/none.\n");
+>    233				if (q->mq_ops) {
+>    234					elevator_put(e);
+>                                         ^^^^^^^^^^^^^^^
+> This will Oops.
+> 
+>    235					return 0;
+>    236				}
 
-The last patch adds ioctls for vectored I/Os, which enables liblightnvm
-to integrate without any kernel modifications.
-
--Matias
-
-Matias Bjørling (8):
-  lightnvm: merge gennvm with core
-  lightnvm: collapse nvm_erase_ppa and nvm_erase_blk
-  lightnvm: remove nvm_submit_ppa* functions
-  lightnvm: remove nvm_get_bb_tbl and nvm_set_bb_tbl
-  lightnvm: make nvm_map_* return void
-  lightnvm: cleanup nvm transformation functions
-  lightnvm: reduce number of nvm_id groups to one
-  lightnvm: add ioctls for vector I/Os
-
- drivers/block/null_blk.c      |    3 +-
- drivers/lightnvm/Kconfig      |    9 -
- drivers/lightnvm/Makefile     |    3 +-
- drivers/lightnvm/core.c       | 1016 ++++++++++++++++++++++++-----------------
- drivers/lightnvm/gennvm.c     |  657 --------------------------
- drivers/lightnvm/gennvm.h     |   62 ---
- drivers/lightnvm/sysblk.c     |  733 -----------------------------
- drivers/nvme/host/core.c      |    4 +
- drivers/nvme/host/lightnvm.c  |  314 +++++++++++--
- drivers/nvme/host/nvme.h      |    6 +
- include/linux/lightnvm.h      |  121 +----
- include/uapi/linux/lightnvm.h |   50 ++
- 12 files changed, 940 insertions(+), 2038 deletions(-)
- delete mode 100644 drivers/lightnvm/gennvm.c
- delete mode 100644 drivers/lightnvm/gennvm.h
- delete mode 100644 drivers/lightnvm/sysblk.c
+Good find, thanks Dan. I've killed the elevator_put().
 
 -- 
-2.7.4
+Jens Axboe
 
