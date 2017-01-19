@@ -1,116 +1,117 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:17831 "EHLO mga01.intel.com"
+Received: from mga09.intel.com ([134.134.136.24]:40566 "EHLO mga09.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751952AbdATAcR (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Jan 2017 19:32:17 -0500
-From: "Verma, Vishal L" <vishal.l.verma@intel.com>
-To: "andiry@gmail.com" <andiry@gmail.com>
-CC: "darrick.wong@oracle.com" <darrick.wong@oracle.com>,
-        "Vyacheslav.Dubeyko@wdc.com" <Vyacheslav.Dubeyko@wdc.com>,
+        id S1751349AbdASVS2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 19 Jan 2017 16:18:28 -0500
+Date: Thu, 19 Jan 2017 14:17:19 -0700
+From: Vishal Verma <vishal.l.verma@intel.com>
+To: Jan Kara <jack@suse.cz>
+Cc: Andiry Xu <andiry@gmail.com>,
+        Slava Dubeyko <Vyacheslav.Dubeyko@wdc.com>,
+        "Darrick J. Wong" <darrick.wong@oracle.com>,
+        "linux-nvdimm@lists.01.org" <linux-nvdimm@ml01.01.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "slava@dubeyko.com" <slava@dubeyko.com>,
+        Viacheslav Dubeyko <slava@dubeyko.com>,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
         "lsf-pc@lists.linux-foundation.org"
-        <lsf-pc@lists.linux-foundation.org>,
-        "linux-nvdimm@ml01.01.org" <linux-nvdimm@ml01.01.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>
-Subject: Re: [LSF/MM TOPIC] Badblocks checking/representation in filesystems
-Date: Fri, 20 Jan 2017 00:32:14 +0000
-Message-ID: <1484872265.4857.1.camel@intel.com>
+        <lsf-pc@lists.linux-foundation.org>
+Subject: Re: [Lsf-pc] [LSF/MM TOPIC] Badblocks checking/representation in
+ filesystems
+Message-ID: <20170119211719.GG4880@omniknight.lm.intel.com>
 References: <at1mp6pou4lenesjdgh22k4p.1484345585589@email.android.com>
-         <b9rbflutjt10mb4ofherta8j.1484345610771@email.android.com>
-         <SN2PR04MB2191756EABCB0E9DAA3B5328887B0@SN2PR04MB2191.namprd04.prod.outlook.com>
-         <20170114004910.GA4880@omniknight.lm.intel.com>
-         <20170117063355.GL14033@birch.djwong.org>
-         <20170117213549.GB4880@omniknight.lm.intel.com>
-         <CAOvWMLYMR-VvAVNuVjXPC-woxY6afQX5-hMC=Vj2p=3AGj9tyA@mail.gmail.com>
-         <20170117223705.GD4880@omniknight.lm.intel.com>
-         <CAOvWMLYcP9PN6LT51gwJvmyCTfRRrVeDTrjN-8_zTKhD+UmDiw@mail.gmail.com>
-         <20170117235150.GE4880@omniknight.lm.intel.com>
-         <CAOvWMLZCt39EDg-1uppVVUeRG40JvOo9sKLY2XMuynZdnc0W9w@mail.gmail.com>
-In-Reply-To: <CAOvWMLZCt39EDg-1uppVVUeRG40JvOo9sKLY2XMuynZdnc0W9w@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
+ <b9rbflutjt10mb4ofherta8j.1484345610771@email.android.com>
+ <SN2PR04MB2191756EABCB0E9DAA3B5328887B0@SN2PR04MB2191.namprd04.prod.outlook.com>
+ <20170114004910.GA4880@omniknight.lm.intel.com>
+ <20170117063355.GL14033@birch.djwong.org>
+ <20170117213549.GB4880@omniknight.lm.intel.com>
+ <CAOvWMLYMR-VvAVNuVjXPC-woxY6afQX5-hMC=Vj2p=3AGj9tyA@mail.gmail.com>
+ <20170117223705.GD4880@omniknight.lm.intel.com>
+ <20170118093801.GA24789@quack2.suse.cz>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170118093801.GA24789@quack2.suse.cz>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-T24gVHVlLCAyMDE3LTAxLTE3IGF0IDE3OjU4IC0wODAwLCBBbmRpcnkgWHUgd3JvdGU6DQo+IE9u
-IFR1ZSwgSmFuIDE3LCAyMDE3IGF0IDM6NTEgUE0sIFZpc2hhbCBWZXJtYSA8dmlzaGFsLmwudmVy
-bWFAaW50ZWwuY28NCj4gbT4gd3JvdGU6DQo+ID4gT24gMDEvMTcsIEFuZGlyeSBYdSB3cm90ZToN
-Cj4gPiANCj4gPiA8c25pcD4NCj4gPiANCj4gPiA+ID4gPiANCj4gPiA+ID4gPiBUaGUgcG1lbV9k
-b19idmVjKCkgcmVhZCBsb2dpYyBpcyBsaWtlIHRoaXM6DQo+ID4gPiA+ID4gDQo+ID4gPiA+ID4g
-cG1lbV9kb19idmVjKCkNCj4gPiA+ID4gPiDCoMKgwqDCoGlmIChpc19iYWRfcG1lbSgpKQ0KPiA+
-ID4gPiA+IMKgwqDCoMKgwqDCoMKgwqByZXR1cm4gLUVJTzsNCj4gPiA+ID4gPiDCoMKgwqDCoGVs
-c2UNCj4gPiA+ID4gPiDCoMKgwqDCoMKgwqDCoMKgbWVtY3B5X2Zyb21fcG1lbSgpOw0KPiA+ID4g
-PiA+IA0KPiA+ID4gPiA+IE5vdGUgbWVtY3B5X2Zyb21fcG1lbSgpIGlzIGNhbGxpbmcgbWVtY3B5
-X21jc2FmZSgpLiBEb2VzIHRoaXMNCj4gPiA+ID4gPiBpbXBseQ0KPiA+ID4gPiA+IHRoYXQgZXZl
-biBpZiBhIGJsb2NrIGlzIG5vdCBpbiB0aGUgYmFkYmxvY2sgbGlzdCwgaXQgc3RpbGwgY2FuDQo+
-ID4gPiA+ID4gYmUgYmFkDQo+ID4gPiA+ID4gYW5kIGNhdXNlcyBNQ0U/IERvZXMgdGhlIGJhZGJs
-b2NrIGxpc3QgZ2V0IGNoYW5nZWQgZHVyaW5nIGZpbGUNCj4gPiA+ID4gPiBzeXN0ZW0NCj4gPiA+
-ID4gPiBydW5uaW5nPyBJZiB0aGF0IGlzIHRoZSBjYXNlLCBzaG91bGQgdGhlIGZpbGUgc3lzdGVt
-IGdldCBhDQo+ID4gPiA+ID4gbm90aWZpY2F0aW9uIHdoZW4gaXQgZ2V0cyBjaGFuZ2VkPyBJZiBh
-IGJsb2NrIGlzIGdvb2Qgd2hlbiBJDQo+ID4gPiA+ID4gZmlyc3QNCj4gPiA+ID4gPiByZWFkIGl0
-LCBjYW4gSSBzdGlsbCB0cnVzdCBpdCB0byBiZSBnb29kIGZvciB0aGUgc2Vjb25kDQo+ID4gPiA+
-ID4gYWNjZXNzPw0KPiA+ID4gPiANCj4gPiA+ID4gWWVzLCBpZiBhIGJsb2NrIGlzIG5vdCBpbiB0
-aGUgYmFkYmxvY2tzIGxpc3QsIGl0IGNhbiBzdGlsbCBjYXVzZQ0KPiA+ID4gPiBhbg0KPiA+ID4g
-PiBNQ0UuIFRoaXMgaXMgdGhlIGxhdGVudCBlcnJvciBjYXNlIEkgZGVzY3JpYmVkIGFib3ZlLiBG
-b3IgYQ0KPiA+ID4gPiBzaW1wbGUgcmVhZCgpDQo+ID4gPiA+IHZpYSB0aGUgcG1lbSBkcml2ZXIs
-IHRoaXMgd2lsbCBnZXQgaGFuZGxlZCBieSBtZW1jcHlfbWNzYWZlLiBGb3INCj4gPiA+ID4gbW1h
-cCwNCj4gPiA+ID4gYW4gTUNFIGlzIGluZXZpdGFibGUuDQo+ID4gPiA+IA0KPiA+ID4gPiBZZXMg
-dGhlIGJhZGJsb2NrcyBsaXN0IG1heSBjaGFuZ2Ugd2hpbGUgYSBmaWxlc3lzdGVtIGlzIHJ1bm5p
-bmcuDQo+ID4gPiA+IFRoZSBSRkMNCj4gPiA+ID4gcGF0Y2hlc1sxXSBJIGxpbmtlZCB0byBhZGQg
-YSBub3RpZmljYXRpb24gZm9yIHRoZSBmaWxlc3lzdGVtDQo+ID4gPiA+IHdoZW4gdGhpcw0KPiA+
-ID4gPiBoYXBwZW5zLg0KPiA+ID4gPiANCj4gPiA+IA0KPiA+ID4gVGhpcyBpcyByZWFsbHkgYmFk
-IGFuZCBpdCBtYWtlcyBmaWxlIHN5c3RlbSBpbXBsZW1lbnRhdGlvbiBtdWNoDQo+ID4gPiBtb3Jl
-DQo+ID4gPiBjb21wbGljYXRlZC4gQW5kIGJhZGJsb2NrIG5vdGlmaWNhdGlvbiBkb2VzIG5vdCBo
-ZWxwIHZlcnkgbXVjaCwNCj4gPiA+IGJlY2F1c2UgYW55IGJsb2NrIGNhbiBiZSBiYWQgcG90ZW50
-aWFsbHksIG5vIG1hdHRlciBpdCBpcyBpbg0KPiA+ID4gYmFkYmxvY2sNCj4gPiA+IGxpc3Qgb3Ig
-bm90LiBBbmQgZmlsZSBzeXN0ZW0gaGFzIHRvIHBlcmZvcm0gY2hlY2tpbmcgZm9yIGV2ZXJ5DQo+
-ID4gPiByZWFkLA0KPiA+ID4gdXNpbmcgbWVtY3B5X21jc2FmZS4gVGhpcyBpcyBkaXNhc3RlciBm
-b3IgZmlsZSBzeXN0ZW0gbGlrZSBOT1ZBLA0KPiA+ID4gd2hpY2gNCj4gPiA+IHVzZXMgcG9pbnRl
-ciBkZS1yZWZlcmVuY2UgdG8gYWNjZXNzIGRhdGEgc3RydWN0dXJlcyBvbiBwbWVtLiBOb3cNCj4g
-PiA+IGlmIEkNCj4gPiA+IHdhbnQgdG8gcmVhZCBhIGZpZWxkIGluIGFuIGlub2RlIG9uIHBtZW0s
-IEkgaGF2ZSB0byBjb3B5IGl0IHRvDQo+ID4gPiBEUkFNDQo+ID4gPiBmaXJzdCBhbmQgbWFrZSBz
-dXJlIG1lbWNweV9tY3NhZmUoKSBkb2VzIG5vdCByZXBvcnQgYW55dGhpbmcNCj4gPiA+IHdyb25n
-Lg0KPiA+IA0KPiA+IFlvdSBoYXZlIGEgZ29vZCBwb2ludCwgYW5kIEkgZG9uJ3Qga25vdyBpZiBJ
-IGhhdmUgYW4gYW5zd2VyIGZvcg0KPiA+IHRoaXMuLg0KPiA+IEFzc3VtaW5nIGEgc3lzdGVtIHdp
-dGggTUNFIHJlY292ZXJ5LCBtYXliZSBOT1ZBIGNhbiBhZGQgYSBtY2UNCj4gPiBoYW5kbGVyDQo+
-ID4gc2ltaWxhciB0byBuZml0X2hhbmRsZV9tY2UoKSwgYW5kIGhhbmRsZSBlcnJvcnMgYXMgdGhl
-eSBoYXBwZW4sIGJ1dA0KPiA+IEknbQ0KPiA+IGJlaW5nIHZlcnkgaGFuZC13YXZleSBoZXJlIGFu
-ZCBkb24ndCBrbm93IGhvdyBtdWNoL2hvdyB3ZWxsIHRoYXQNCj4gPiBtaWdodA0KPiA+IHdvcmsu
-Lg0KPiA+IA0KPiA+ID4gDQo+ID4gPiA+IE5vLCBpZiB0aGUgbWVkaWEsIGZvciBzb21lIHJlYXNv
-biwgJ2R2ZWxvcHMnIGEgYmFkIGNlbGwsIGENCj4gPiA+ID4gc2Vjb25kDQo+ID4gPiA+IGNvbnNl
-Y3V0aXZlIHJlYWQgZG9lcyBoYXZlIGEgY2hhbmNlIG9mIGJlaW5nIGJhZC4gT25jZSBhDQo+ID4g
-PiA+IGxvY2F0aW9uIGhhcw0KPiA+ID4gPiBiZWVuIG1hcmtlZCBhcyBiYWQsIGl0IHdpbGwgc3Rh
-eSBiYWQgdGlsbCB0aGUgQUNQSSBjbGVhciBlcnJvcg0KPiA+ID4gPiAnRFNNJyBoYXMNCj4gPiA+
-ID4gYmVlbiBjYWxsZWQgdG8gbWFyayBpdCBhcyBjbGVhbi4NCj4gPiA+ID4gDQo+ID4gPiANCj4g
-PiA+IEkgd29uZGVyIHdoYXQgaGFwcGVucyB0byB3cml0ZSBpbiB0aGlzIGNhc2U/IElmIGEgYmxv
-Y2sgaXMgYmFkIGJ1dA0KPiA+ID4gbm90DQo+ID4gPiByZXBvcnRlZCBpbiBiYWRibG9jayBsaXN0
-LiBOb3cgSSB3cml0ZSB0byBpdCB3aXRob3V0IHJlYWRpbmcNCj4gPiA+IGZpcnN0LiBEbw0KPiA+
-ID4gSSBjbGVhciB0aGUgcG9pc29uIHdpdGggdGhlIHdyaXRlPyBPciBzdGlsbCByZXF1aXJlIGEg
-QUNQSSBEU00/DQo+ID4gDQo+ID4gV2l0aCB3cml0ZXMsIG15IHVuZGVyc3RhbmRpbmcgaXMgdGhl
-cmUgaXMgc3RpbGwgYSBwb3NzaWJpbGl0eSB0aGF0DQo+ID4gYW4NCj4gPiBpbnRlcm5hbCByZWFk
-LW1vZGlmeS13cml0ZSBjYW4gaGFwcGVuLCBhbmQgY2F1c2UgYSBNQ0UgKHRoaXMgaXMgdGhlDQo+
-ID4gc2FtZQ0KPiA+IGFzIHdyaXRpbmcgdG8gYSBiYWQgRFJBTSBjZWxsLCB3aGljaCBjYW4gYWxz
-byBjYXVzZSBhbiBNQ0UpLiBZb3UNCj4gPiBjYW4ndA0KPiA+IHJlYWxseSB1c2UgdGhlIEFDUEkg
-RFNNIHByZWVtcHRpdmVseSBiZWNhdXNlIHlvdSBkb24ndCBrbm93IHdoZXRoZXINCj4gPiB0aGUN
-Cj4gPiBsb2NhdGlvbiB3YXMgYmFkLiBUaGUgZXJyb3IgZmxvdyB3aWxsIGJlIHNvbWV0aGluZyBs
-aWtlIHdyaXRlIGNhdXNlcw0KPiA+IHRoZQ0KPiA+IE1DRSwgYSBiYWRibG9jayBnZXRzIGFkZGVk
-IChlaXRoZXIgdGhyb3VnaCB0aGUgbWNlIGhhbmRsZXIgb3IgYWZ0ZXINCj4gPiB0aGUNCj4gPiBu
-ZXh0IHJlYm9vdCksIGFuZCB0aGUgcmVjb3ZlcnkgcGF0aCBpcyBub3cgdGhlIHNhbWUgYXMgYSBy
-ZWd1bGFyDQo+ID4gYmFkYmxvY2suDQo+ID4gDQo+IA0KPiBUaGlzIGlzIGRpZmZlcmVudCBmcm9t
-IG15IHVuZGVyc3RhbmRpbmcuIFJpZ2h0IG5vdyB3cml0ZV9wbWVtKCkgaW4NCj4gcG1lbV9kb19i
-dmVjKCkgZG9lcyBub3QgdXNlIG1lbWNweV9tY3NhZmUoKS4gSWYgdGhlIGJsb2NrIGlzIGJhZCBp
-dA0KPiBjbGVhcnMgcG9pc29uIGFuZCB3cml0ZXMgdG8gcG1lbSBhZ2Fpbi4gU2VlbXMgdG8gbWUg
-d3JpdGluZyB0byBiYWQNCj4gYmxvY2tzIGRvZXMgbm90IGNhdXNlIE1DRS4gRG8gd2UgbmVlZCBt
-ZW1jcHlfbWNzYWZlIGZvciBwbWVtIHN0b3Jlcz8NCg0KWW91IGFyZSByaWdodCwgd3JpdGVzIGRv
-bid0IHVzZSBtZW1jcHlfbWNzYWZlLCBhbmQgd2lsbCBub3QgZGlyZWN0bHkNCmNhdXNlIGFuIE1D
-RS4gSG93ZXZlciBhIHdyaXRlIGNhbiBjYXVzZSBhbiBhc3luY2hyb25vdXMgJ0NNQ0knIC0NCmNv
-cnJlY3RlZCBtYWNoaW5lIGNoZWNrIGludGVycnVwdCwgYnV0IHRoaXMgaXMgbm90IGNyaXRpY2Fs
-LCBhbmQgd29udCBiZQ0KYSBtZW1vcnkgZXJyb3IgYXMgdGhlIGNvcmUgZGlkbid0IGNvbnN1bWUg
-cG9pc29uLiBtZW1jcHlfbWNzYWZlIGNhbm5vdA0KcHJvdGVjdCBhZ2FpbnN0IHRoaXMgYmVjYXVz
-ZSB0aGUgd3JpdGUgaXMgJ3Bvc3RlZCcgYW5kIHRoZSBDTUNJIGlzIG5vdA0Kc3luY2hyb25vdXMu
-IE5vdGUgdGhhdCB0aGlzIGlzIG9ubHkgaW4gdGhlIGxhdGVudCBlcnJvciBvciBtZW1tYXAtc3Rv
-cmUNCmNhc2UuDQoNCj4gDQo+IFRoYW5rcywNCj4gQW5kaXJ5DQo+IA0KPiA+ID4gDQo+ID4gPiA+
-IFsxXTogaHR0cDovL3d3dy5saW51eC5zZ2kuY29tL2FyY2hpdmVzL3hmcy8yMDE2LTA2L21zZzAw
-Mjk5Lmh0bWwNCj4gPiA+ID4gDQo+ID4gPiANCj4gPiA+IFRoYW5rIHlvdSBmb3IgdGhlIHBhdGNo
-c2V0LiBJIHdpbGwgbG9vayBpbnRvIGl0Lg0KPiA+ID4g
+On 01/18, Jan Kara wrote:
+> On Tue 17-01-17 15:37:05, Vishal Verma wrote:
+> > I do mean that in the filesystem, for every IO, the badblocks will be
+> > checked. Currently, the pmem driver does this, and the hope is that the
+> > filesystem can do a better job at it. The driver unconditionally checks
+> > every IO for badblocks on the whole device. Depending on how the
+> > badblocks are represented in the filesystem, we might be able to quickly
+> > tell if a file/range has existing badblocks, and error out the IO
+> > accordingly.
+> > 
+> > At mount the the fs would read the existing badblocks on the block
+> > device, and build its own representation of them. Then during normal
+> > use, if the underlying badblocks change, the fs would get a notification
+> > that would allow it to also update its own representation.
+> 
+> So I believe we have to distinguish three cases so that we are on the same
+> page.
+> 
+> 1) PMEM is exposed only via a block interface for legacy filesystems to
+> use. Here, all the bad blocks handling IMO must happen in NVDIMM driver.
+> Looking from outside, the IO either returns with EIO or succeeds. As a
+> result you cannot ever ger rid of bad blocks handling in the NVDIMM driver.
+
+Correct.
+
+> 
+> 2) PMEM is exposed for DAX aware filesystem. This seems to be what you are
+> mostly interested in. We could possibly do something more efficient than
+> what NVDIMM driver does however the complexity would be relatively high and
+> frankly I'm far from convinced this is really worth it. If there are so
+> many badblocks this would matter, the HW has IMHO bigger problems than
+> performance.
+
+Correct, and Dave was of the opinion that once at least XFS has reverse
+mapping support (which it does now), adding badblocks information to
+that should not be a hard lift, and should be a better solution. I
+suppose should try to benchmark how much of a penalty the current badblock
+checking in the NVVDIMM driver imposes. The penalty is not because there
+may be a large number of badblocks, but just due to the fact that we
+have to do this check for every IO, in fact, every 'bvec' in a bio.
+
+> 
+> 3) PMEM filesystem - there things are even more difficult as was already
+> noted elsewhere in the thread. But for now I'd like to leave those aside
+> not to complicate things too much.
+
+Agreed that that merits consideration and a whole discussion  by itself,
+based on the points Audiry raised.
+
+> 
+> Now my question: Why do we bother with badblocks at all? In cases 1) and 2)
+> if the platform can recover from MCE, we can just always access persistent
+> memory using memcpy_mcsafe(), if that fails, return -EIO. Actually that
+> seems to already happen so we just need to make sure all places handle
+> returned errors properly (e.g. fs/dax.c does not seem to) and we are done.
+> No need for bad blocks list at all, no slow down unless we hit a bad cell
+> and in that case who cares about performance when the data is gone...
+
+Even when we have MCE recovery, we cannot do away with the badblocks
+list:
+1. My understanding is that the hardware's ability to do MCE recovery is
+limited/best-effort, and is not guaranteed. There can be circumstances
+that cause a "Processor Context Corrupt" state, which is unrecoverable.
+2. We still need to maintain a badblocks list so that we know what
+blocks need to be cleared (via the ACPI method) on writes.
+
+> 
+> For platforms that cannot recover from MCE - just buy better hardware ;).
+> Seriously, I have doubts people can seriously use a machine that will
+> unavoidably randomly reboot (as there is always a risk you hit error that
+> has not been uncovered by background scrub). But maybe for big cloud providers
+> the cost savings may offset for the inconvenience, I don't know. But still
+> for that case a bad blocks handling in NVDIMM code like we do now looks
+> good enough?
+
+The current handling is good enough for those systems, yes.
+
+> 
+> 								Honza
+> -- 
+> Jan Kara <jack@suse.com>
+> SUSE Labs, CR
