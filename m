@@ -1,100 +1,99 @@
 Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Jeff Moyer <jmoyer@redhat.com>
-To: Slava Dubeyko <Vyacheslav.Dubeyko@wdc.com>
-Cc: Jan Kara <jack@suse.cz>,
-        "linux-nvdimm\@lists.01.org" <linux-nvdimm@ml01.01.org>,
-        "linux-block\@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Viacheslav Dubeyko <slava@dubeyko.com>,
-        "Linux FS Devel" <linux-fsdevel@vger.kernel.org>,
-        "lsf-pc\@lists.linux-foundation.org"
-        <lsf-pc@lists.linux-foundation.org>
-Subject: Re: [Lsf-pc] [LSF/MM TOPIC] Badblocks checking/representation in filesystems
-References: <at1mp6pou4lenesjdgh22k4p.1484345585589@email.android.com>
-        <b9rbflutjt10mb4ofherta8j.1484345610771@email.android.com>
-        <SN2PR04MB2191756EABCB0E9DAA3B5328887B0@SN2PR04MB2191.namprd04.prod.outlook.com>
-        <20170114004910.GA4880@omniknight.lm.intel.com>
-        <SN2PR04MB2191A6EDB7203AF86600FD25887D0@SN2PR04MB2191.namprd04.prod.outlook.com>
-        <20170117143703.GP2517@quack2.suse.cz>
-        <SN2PR04MB219128E4C8C4FD4AF3452C7C887C0@SN2PR04MB2191.namprd04.prod.outlook.com>
-        <x49mveo6qom.fsf@segfault.boston.devel.redhat.com>
-        <SN2PR04MB21916B138434803EA9AF4C18887E0@SN2PR04MB2191.namprd04.prod.outlook.com>
-Date: Thu, 19 Jan 2017 14:33:45 -0500
-In-Reply-To: <SN2PR04MB21916B138434803EA9AF4C18887E0@SN2PR04MB2191.namprd04.prod.outlook.com>
-        (Slava Dubeyko's message of "Thu, 19 Jan 2017 02:56:39 +0000")
-Message-ID: <x4937gergiu.fsf@segfault.boston.devel.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20170119185910.GF4880@omniknight.lm.intel.com>
+References: <20170114004910.GA4880@omniknight.lm.intel.com>
+ <SN2PR04MB2191A6EDB7203AF86600FD25887D0@SN2PR04MB2191.namprd04.prod.outlook.com>
+ <20170117143703.GP2517@quack2.suse.cz> <20170117221421.GC4880@omniknight.lm.intel.com>
+ <20170118101641.GD24789@quack2.suse.cz> <x49r3406r2i.fsf@segfault.boston.devel.redhat.com>
+ <20170118210241.GE10498@birch.djwong.org> <CAPcyv4hd7bpCa7d9msX0Y8gLz7WsqXT3VExQwwLuAcsmMxVTPg@mail.gmail.com>
+ <1484776549.4358.33.camel@intel.com> <20170119081011.GA2565@quack2.suse.cz> <20170119185910.GF4880@omniknight.lm.intel.com>
+From: Dan Williams <dan.j.williams@intel.com>
+Date: Thu, 19 Jan 2017 11:03:12 -0800
+Message-ID: <CAPcyv4jZz_iqLutd0gPEL3udqbFxvBH8CZY5oDgUjG5dGbC2gg@mail.gmail.com>
+Subject: Re: [Lsf-pc] [LSF/MM TOPIC] Badblocks checking/representation in filesystems
+To: Vishal Verma <vishal.l.verma@intel.com>
+Cc: Jan Kara <jack@suse.cz>,
+        "darrick.wong@oracle.com" <darrick.wong@oracle.com>,
+        "Vyacheslav.Dubeyko@wdc.com" <Vyacheslav.Dubeyko@wdc.com>,
+        "linux-nvdimm@ml01.01.org" <linux-nvdimm@ml01.01.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "slava@dubeyko.com" <slava@dubeyko.com>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "lsf-pc@lists.linux-foundation.org"
+        <lsf-pc@lists.linux-foundation.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Hi, Slava,
-
-Slava Dubeyko <Vyacheslav.Dubeyko@wdc.com> writes:
-
->>The data is lost, that's why you're getting an ECC.  It's tantamount
->>to -EIO for a disk block access.
->
-> I see the three possible cases here:
-> (1) bad block has been discovered (no remap, no recovering) -> data is
->> lost; -EIO for a disk block access, block is always bad;
-
-This is, of course, a possiblity.  In that case, attempts to clear the
-error will not succeed.
-
-> (2) bad block has been discovered and remapped -> data is lost; -EIO
-> for a disk block access.
-
-Right, and the error is cleared when new data is provided (i.e. through
-a write system call or fallocate).
-
-> (3) bad block has been discovered, remapped and recovered -> no data is lost.
-
-This is transparent to the OS and the application.
-
->>> Let's imagine that the affected address range will equal to 64 bytes. 
->>> It sounds for me that for the case of block device it will affect the 
->>> whole logical block (4 KB).
+On Thu, Jan 19, 2017 at 10:59 AM, Vishal Verma <vishal.l.verma@intel.com> wrote:
+> On 01/19, Jan Kara wrote:
+>> On Wed 18-01-17 21:56:58, Verma, Vishal L wrote:
+>> > On Wed, 2017-01-18 at 13:32 -0800, Dan Williams wrote:
+>> > > On Wed, Jan 18, 2017 at 1:02 PM, Darrick J. Wong
+>> > > <darrick.wong@oracle.com> wrote:
+>> > > > On Wed, Jan 18, 2017 at 03:39:17PM -0500, Jeff Moyer wrote:
+>> > > > > Jan Kara <jack@suse.cz> writes:
+>> > > > >
+>> > > > > > On Tue 17-01-17 15:14:21, Vishal Verma wrote:
+>> > > > > > > Your note on the online repair does raise another tangentially
+>> > > > > > > related
+>> > > > > > > topic. Currently, if there are badblocks, writes via the bio
+>> > > > > > > submission
+>> > > > > > > path will clear the error (if the hardware is able to remap
+>> > > > > > > the bad
+>> > > > > > > locations). However, if the filesystem is mounted eith DAX,
+>> > > > > > > even
+>> > > > > > > non-mmap operations - read() and write() will go through the
+>> > > > > > > dax paths
+>> > > > > > > (dax_do_io()). We haven't found a good/agreeable way to
+>> > > > > > > perform
+>> > > > > > > error-clearing in this case. So currently, if a dax mounted
+>> > > > > > > filesystem
+>> > > > > > > has badblocks, the only way to clear those badblocks is to
+>> > > > > > > mount it
+>> > > > > > > without DAX, and overwrite/zero the bad locations. This is a
+>> > > > > > > pretty
+>> > > > > > > terrible user experience, and I'm hoping this can be solved in
+>> > > > > > > a better
+>> > > > > > > way.
+>> > > > > >
+>> > > > > > Please remind me, what is the problem with DAX code doing
+>> > > > > > necessary work to
+>> > > > > > clear the error when it gets EIO from memcpy on write?
+>> > > > >
+>> > > > > You won't get an MCE for a store;  only loads generate them.
+>> > > > >
+>> > > > > Won't fallocate FL_ZERO_RANGE clear bad blocks when mounted with
+>> > > > > -o dax?
+>> > > >
+>> > > > Not necessarily; XFS usually implements this by punching out the
+>> > > > range
+>> > > > and then reallocating it as unwritten blocks.
+>> > > >
+>> > >
+>> > > That does clear the error because the unwritten blocks are zeroed and
+>> > > errors cleared when they become allocated again.
+>> >
+>> > Yes, the problem was that writes won't clear errors. zeroing through
+>> > either hole-punch, truncate, unlinking the file should all work
+>> > (assuming the hole-punch or truncate ranges wholly contain the
+>> > 'badblock' sector).
 >>
->> 512 bytes, and yes, that's the granularity at which we track errors
->> in the block layer, so that's the minimum amount of data you lose.
->
-> I think it depends what granularity hardware supports. It could be 512
-> bytes, 4 KB, maybe greater.
-
-Of course, though I expect the ECC protection in the NVDIMMs to cover a
-range much smaller than a page.
-
->>> The situation is more critical for the case of DAX approach. Correct 
->>> me if I wrong but my understanding is the goal of DAX is to provide 
->>> the direct access to file's memory pages with minimal file system 
->>> overhead. So, it looks like that raising bad block issue on file 
->>> system level will affect a user-space application. Because, finally, 
->>> user-space application will need to process such trouble (bad block 
->>> issue). It sounds for me as really weird situation. What can protect a 
->>> user-space application from encountering the issue with partially 
->>> incorrect memory page?
+>> Let me repeat my question: You have mentioned that if we do IO through DAX,
+>> writes won't clear errors and we should fall back to normal block path to
+>> do write to clear the error. What does prevent us from directly clearing
+>> the error from DAX path?
 >>
->> Applications need to deal with -EIO today.  This is the same sort of thing.
->> If an application trips over a bad block during a load from persistent memory,
->> they will get a signal, and they can either handle it or not.
->>
->> Have a read through this specification and see if it clears anything up for you:
->>  http://www.snia.org/tech_activities/standards/curr_standards/npm
->
-> Thank you for sharing this. So, if a user-space application follows to the
-> NVM Programming Model then it will be able to survive by means of catching
-> and processing the exceptions. But these applications have to be implemented yet.
-> Also such applications need in special technique(s) of recovering. It sounds
-> that legacy user-space applications are unable to survive for the NVM.PM.FILE mode
-> in the case of load/store operation's failure.
+> With DAX, all IO goes through DAX paths. There are two cases:
+> 1. mmap and loads/stores: Obviously there is no kernel intervention
+> here, and no badblocks handling is possible.
+> 2. read() or write() IO: In the absence of dax, this would go through
+> the bio submission path, through the pmem driver, and that would handle
+> error clearing. With DAX, this goes through dax_iomap_actor, which also
+> doesn't go through the pmem driver (it does a dax mapping, followed by
+> essentially memcpy), and hence cannot handle badblocks.
 
-By legacy, I assume you mean those applications which mmap file data and
-use msync.  Those applications already have to deal with SIGBUS today
-when a disk block is bad.  There is no change in behavior.
-
-If you meant legacy applications that use read/write, they also should
-see no change in behavior.  Bad blocks are tracked in the block layer,
-and any attempt to read from a bad area of memory will get -EIO.
-
-Cheers,
-Jeff
+Hmm, that may no longer be true after my changes to push dax flushing
+to the driver. I.e. we could have a copy_from_iter() implementation
+that attempts to clear errors... I'll get that series out and we can
+discuss there.
