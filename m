@@ -1,8 +1,8 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:42963 "EHLO mx2.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:42470 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751041AbdASGsZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Jan 2017 01:48:25 -0500
+        id S1750977AbdASGcz (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 19 Jan 2017 01:32:55 -0500
 Subject: Re: [LSF/MM TOPIC] block level event logging for storage media
  management
 To: Song Liu <songliubraving@fb.com>,
@@ -11,16 +11,16 @@ To: Song Liu <songliubraving@fb.com>,
 References: <6040124E-4928-4FC8-8A52-35115D9CA1DF@fb.com>
 Cc: Jens Axboe <axboe@fb.com>, Kernel Team <Kernel-team@fb.com>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <7d4e5cd4-a0fa-5ced-e9c0-de9ea9e3a251@suse.de>
-Date: Thu, 19 Jan 2017 07:48:23 +0100
+From: Coly Li <colyli@suse.de>
+Message-ID: <f053f641-3fbd-0276-faff-fba954985b66@suse.de>
+Date: Thu, 19 Jan 2017 14:32:45 +0800
 MIME-Version: 1.0
 In-Reply-To: <6040124E-4928-4FC8-8A52-35115D9CA1DF@fb.com>
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 01/19/2017 12:34 AM, Song Liu wrote:
+On 2017/1/19 上午7:34, Song Liu wrote:
 > 
 > Media health monitoring is very important for large scale distributed storage systems. 
 > Traditionally, enterprise storage controllers maintain event logs for attached storage
@@ -46,18 +46,13 @@ On 01/19/2017 12:34 AM, Song Liu wrote:
 >     4. Detailed discussions on data structure for event logging. 
 > 
 > We will be able to show a prototype implementation during LSF/MM. 
-> 
-Very good topic; I'm very much in favour of it.
 
-That ties in rather nicely with my multipath redesign, where I've added
-a notifier chain for block events.
+This is an interesting topic. For stacked block devices, all layers
+higher than the fault layer will observe the media error, reporting the
+underlying failure in every layer may introduce quite a lot noise.
 
-Cheers,
+Yes, I am willing to attend this discussion.
 
-Hannes
--- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: F. Imend�rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG N�rnberg)
+Thanks.
+
+Coly Li
