@@ -1,91 +1,48 @@
-Return-Path: <jack@suse.cz>
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
-	Laurent Dufour <ldufour@linux.vnet.ibm.com>,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH 1/4] block: Unhash block device inodes on gendisk destruction
-Date: Tue, 31 Jan 2017 13:54:26 +0100
-Message-Id: <20170131125429.14303-2-jack@suse.cz>
-In-Reply-To: <20170131125429.14303-1-jack@suse.cz>
-References: <20170131125429.14303-1-jack@suse.cz>
+Return-Path: <sagigrim@gmail.com>
+Return-Path: <sagigrim@gmail.com>
+From: Sagi Grimberg <sagi@grimberg.me>
+Subject: Re: [PATCH 5/6] blk-mq: Fix queue freeze deadlock
+To: Keith Busch <keith.busch@intel.com>
+References: <1483569671-1462-1-git-send-email-keith.busch@intel.com>
+ <1483569671-1462-6-git-send-email-keith.busch@intel.com>
+ <1031ba43-4c5e-f6a7-e12f-f6169eae5edf@grimberg.me>
+ <20170117180008.GB8989@localhost.localdomain>
+Cc: linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+ Jens Axboe <axboe@kernel.dk>, Jens Axboe <axboe@fb.com>,
+ Christoph Hellwig <hch@lst.de>, Thomas Gleixner <tglx@linutronix.de>,
+ Marc Merlin <marc@merlins.org>
+Message-ID: <c17c426c-44c3-2b3a-b351-a1717e36ce35@grimberg.me>
+Date: Thu, 19 Jan 2017 09:54:23 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170117180008.GB8989@localhost.localdomain>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-Currently, block device inodes stay around after corresponding gendisk
-hash died until memory reclaim finds them and frees them. Since we will
-make block device inode pin the bdi, we want to free the block device
-inode as soon as the device goes away so that bdi does not stay around
-unnecessarily. Furthermore we need to avoid issues when new device with
-the same major,minor pair gets created since reusing the bdi structure
-would be rather difficult in this case.
 
-Unhashing block device inode on gendisk destruction nicely deals with
-these problems. Once last block device inode reference is dropped (which
-may be directly in del_gendisk()), the inode gets evicted. Furthermore if
-the major,minor pair gets reallocated, we are guaranteed to get new
-block device inode even if old block device inode is not yet evicted and
-thus we avoid issues with possible reuse of bdi.
+>>> If hardware queues are stopped for some event, like the device has been
+>>> suspended by power management, requests allocated on that hardware queue
+>>> are indefinitely stuck causing a queue freeze to wait forever.
+>>
+>> I have a problem with this patch. IMO, this is a general issue so, so
+>> why do we tie a fix to calling blk_mq_update_nr_hw_queues()? We might
+>> not need to update nr_hw_queues at all. I'm fine with the
+>> blk_mq_abandon_stopped_requests but not with its call-site.
+>>
+>> Usually a driver knows when it wants to abandon all busy requests
+>> blk_mq_tagset_busy_iter(), maybe the right approach is to add
+>> a hook for all allocated tags? Or have blk_mq_quisce_queue get a
+>> fail all requests parameter from the callers?
+>
+> This patch is overly aggressive on failing allocated requests. There
+> are scenarios where we wouldn't want to abandon them, like if the hw
+> context is about to be brough back online, but this patch assumes all
+> need to be abandoned. I'll see if there's some other tricks we can have
+> a driver do. Thanks for the suggestions.
 
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- block/genhd.c      |  2 ++
- fs/block_dev.c     | 15 +++++++++++++++
- include/linux/fs.h |  1 +
- 3 files changed, 18 insertions(+)
+I agree,
 
-diff --git a/block/genhd.c b/block/genhd.c
-index fcd6d4fae657..f2f22d0e8e14 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -648,6 +648,8 @@ void del_gendisk(struct gendisk *disk)
- 	disk_part_iter_init(&piter, disk,
- 			     DISK_PITER_INCL_EMPTY | DISK_PITER_REVERSE);
- 	while ((part = disk_part_iter_next(&piter))) {
-+		bdev_unhash_inode(MKDEV(disk->major,
-+					disk->first_minor + part->partno));
- 		invalidate_partition(disk, part->partno);
- 		delete_partition(disk, part->partno);
- 	}
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 5db5d1340d69..ed6a34be7a1e 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -954,6 +954,21 @@ static int bdev_set(struct inode *inode, void *data)
- 
- static LIST_HEAD(all_bdevs);
- 
-+/*
-+ * If there is a bdev inode for this device, unhash it so that it gets evicted
-+ * as soon as last inode reference is dropped.
-+ */
-+void bdev_unhash_inode(dev_t dev)
-+{
-+	struct inode *inode;
-+
-+	inode = ilookup5(blockdev_superblock, hash(dev), bdev_test, &dev);
-+	if (inode) {
-+		remove_inode_hash(inode);
-+		iput(inode);
-+	}
-+}
-+
- struct block_device *bdget(dev_t dev)
- {
- 	struct block_device *bdev;
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 2ba074328894..702cb6c50194 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -2342,6 +2342,7 @@ extern struct kmem_cache *names_cachep;
- #ifdef CONFIG_BLOCK
- extern int register_blkdev(unsigned int, const char *);
- extern void unregister_blkdev(unsigned int, const char *);
-+extern void bdev_unhash_inode(dev_t dev);
- extern struct block_device *bdget(dev_t);
- extern struct block_device *bdgrab(struct block_device *bdev);
- extern void bd_set_size(struct block_device *, loff_t size);
--- 
-2.10.2
+I do think though that this should be driven from the driver, because
+for fabrics, we might have some fabric error that triggers a periodic
+reconnect. So the "hw context is about to be brought back" is unknown
+from the driver pov, and when we delete the controller (because we give
+up) this is exactly where we need to abandon the allocated requests.
