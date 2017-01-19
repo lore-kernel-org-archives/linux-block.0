@@ -1,84 +1,36 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from userp1040.oracle.com ([156.151.31.81]:24668 "EHLO
-        userp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751596AbdASKzA (ORCPT
+Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:35104 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1751316AbdASVc5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Jan 2017 05:55:00 -0500
-Date: Thu, 19 Jan 2017 13:54:49 +0300
-From: Dan Carpenter <dan.carpenter@oracle.com>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org
-Subject: [bug report] blk-mq-tag: cleanup the normal/reserved tag allocation
-Message-ID: <20170119105449.GA18622@mwanda>
+        Thu, 19 Jan 2017 16:32:57 -0500
+Received: from pps.filterd (m0044010.ppops.net [127.0.0.1])
+        by mx0a-00082601.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id v0JLTokY030063
+        for <linux-block@vger.kernel.org>; Thu, 19 Jan 2017 13:32:56 -0800
+Received: from mail.thefacebook.com ([199.201.64.23])
+        by mx0a-00082601.pphosted.com with ESMTP id 28354rr217-1
+        (version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT)
+        for <linux-block@vger.kernel.org>; Thu, 19 Jan 2017 13:32:56 -0800
+Subject: Re: [PATCH] nbd: only set MSG_MORE when we have more to send
+To: Josef Bacik <jbacik@fb.com>, <linux-block@vger.kernel.org>
+References: <1484860129-14727-1-git-send-email-jbacik@fb.com>
+From: Jens Axboe <axboe@fb.com>
+Message-ID: <79f127ad-aadd-ed49-a60e-d7d36acfcc6d@fb.com>
+Date: Thu, 19 Jan 2017 13:32:39 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1484860129-14727-1-git-send-email-jbacik@fb.com>
+Content-Type: text/plain; charset="windows-1252"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hello Jens Axboe,
+On 01/19/2017 01:08 PM, Josef Bacik wrote:
+> A user noticed that write performance was horrible over loopback and we
+> traced it to an inversion of when we need to set MSG_MORE.  It should be
+> set when we have more bvec's to send, not when we are on the last bvec.
+> This patch made the test go from 20 iops to 78k iops.
 
-This is a semi-automatic email about new static checker warnings.
+Added for 4.10, thanks.
 
-The patch 4941115bef2b: "blk-mq-tag: cleanup the normal/reserved tag 
-allocation" from Jan 13, 2017, leads to the following Smatch 
-complaint:
+-- 
+Jens Axboe
 
-block/blk-mq-tag.c:142 blk_mq_get_tag()
-	 warn: variable dereferenced before check 'data->hctx' (see line 102)
-
-block/blk-mq-tag.c
-   101	{
-   102		struct blk_mq_tags *tags = blk_mq_tags_from_data(data);
-                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-We added a new "data->hctx" dereference here.
-
-   103		struct sbitmap_queue *bt;
-   104		struct sbq_wait_state *ws;
-   105		DEFINE_WAIT(wait);
-   106		unsigned int tag_offset;
-   107		int tag;
-   108	
-   109		if (data->flags & BLK_MQ_REQ_RESERVED) {
-   110			if (unlikely(!tags->nr_reserved_tags)) {
-   111				WARN_ON_ONCE(1);
-   112				return BLK_MQ_TAG_FAIL;
-   113			}
-   114			bt = &tags->breserved_tags;
-   115			tag_offset = 0;
-   116		} else {
-   117			bt = &tags->bitmap_tags;
-   118			tag_offset = tags->nr_reserved_tags;
-   119		}
-   120	
-   121		tag = __blk_mq_get_tag(data->hctx, bt);
-   122		if (tag != -1)
-   123			goto found_tag;
-   124	
-   125		if (data->flags & BLK_MQ_REQ_NOWAIT)
-   126			return BLK_MQ_TAG_FAIL;
-   127	
-   128		ws = bt_wait_ptr(bt, data->hctx);
-   129		do {
-   130			prepare_to_wait(&ws->wait, &wait, TASK_UNINTERRUPTIBLE);
-   131	
-   132			tag = __blk_mq_get_tag(data->hctx, bt);
-   133			if (tag != -1)
-   134				break;
-   135	
-   136			/*
-   137			 * We're out of tags on this hardware queue, kick any
-   138			 * pending IO submits before going to sleep waiting for
-   139			 * some to complete. Note that hctx can be NULL here for
-   140			 * reserved tag allocation.
-   141			 */
-   142			if (data->hctx)
-
-We're in a loop here so it's possible we don't need to check the first
-item in the list, but it's kind of new so I thought I would forward the
-message anyway even though it might be a false positive.
-
-   143				blk_mq_run_hw_queue(data->hctx, false);
-   144	
-
-regards,
-dan carpenter
