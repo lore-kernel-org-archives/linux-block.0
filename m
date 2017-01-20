@@ -1,53 +1,83 @@
-Return-Path: <linux-ide-owner@vger.kernel.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 04/10] ms_block: remove pointless prep_fn
-Date: Tue, 31 Jan 2017 16:57:25 +0100
-Message-Id: <1485878251-6107-5-git-send-email-hch@lst.de>
-In-Reply-To: <1485878251-6107-1-git-send-email-hch@lst.de>
-References: <1485878251-6107-1-git-send-email-hch@lst.de>
-Sender: linux-ide-owner@vger.kernel.org
+Return-Path: <jthumshirn@suse.de>
+Date: Fri, 20 Jan 2017 13:22:54 +0100
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Sagi Grimberg <sagi@grimberg.me>
+Cc: Jens Axboe <axboe@kernel.dk>,
+	"lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>,
+	linux-block@vger.kernel.org, Linux-scsi@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	Christoph Hellwig <hch@infradead.org>,
+	Keith Busch <keith.busch@intel.com>
+Subject: Re: [LSF/MM TOPIC][LSF/MM ATTEND] NAPI polling for block drivers
+Message-ID: <20170120122254.GA5947@linux-x5ow.site>
+References: <20170111134312.GH6286@linux-x5ow.site>
+ <cc00cc1f-17d7-105e-ef2c-61791b7cc676@kernel.dk>
+ <d60d4499-6ed8-0a69-edbf-db205a6dba6a@kernel.dk>
+ <8b47ca34-d2ff-26dc-721e-2cb1e18f1efc@grimberg.me>
+ <499af528-7810-f82d-1f11-cbf8f3a5b21c@grimberg.me>
+ <f10b8508-22a2-2959-c369-2dd29f271d2c@grimberg.me>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <f10b8508-22a2-2959-c369-2dd29f271d2c@grimberg.me>
 List-ID: <linux-block@vger.kernel.org>
 
-This driver will never see non-fs requests, and doesn't do anything
-else in the prep_fn.
+On Tue, Jan 17, 2017 at 05:45:53PM +0200, Sagi Grimberg wrote:
+> 
+> >--
+> >[1]
+> >queue = b'nvme0q1'
+> >     usecs               : count     distribution
+> >         0 -> 1          : 7310 |****************************************|
+> >         2 -> 3          : 11       |      |
+> >         4 -> 7          : 10       |      |
+> >         8 -> 15         : 20       |      |
+> >        16 -> 31         : 0        |      |
+> >        32 -> 63         : 0        |      |
+> >        64 -> 127        : 1        |      |
+> >
+> >[2]
+> >queue = b'nvme0q1'
+> >     usecs               : count     distribution
+> >         0 -> 1          : 7309 |****************************************|
+> >         2 -> 3          : 14       |      |
+> >         4 -> 7          : 7        |      |
+> >         8 -> 15         : 17       |      |
+> >
+> 
+> Rrr, email made the histograms look funky (tabs vs. spaces...)
+> The count is what's important anyways...
+> 
+> Just adding that I used an Intel P3500 nvme device.
+> 
+> >We can see that most of the time our latency is pretty good (<1ns) but with
+> >huge tail latencies (some 8-15 ns and even one in 32-63 ns).
+> 
+> Obviously is micro-seconds and not nano-seconds (I wish...)
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/memstick/core/ms_block.c | 11 -----------
- 1 file changed, 11 deletions(-)
+So to share yesterday's (and today's) findings:
 
-diff --git a/drivers/memstick/core/ms_block.c b/drivers/memstick/core/ms_block.c
-index f3512404..99e651c 100644
---- a/drivers/memstick/core/ms_block.c
-+++ b/drivers/memstick/core/ms_block.c
-@@ -2000,16 +2000,6 @@ static int msb_bd_getgeo(struct block_device *bdev,
- 	return 0;
- }
- 
--static int msb_prepare_req(struct request_queue *q, struct request *req)
--{
--	if (req->cmd_type != REQ_TYPE_FS) {
--		blk_dump_rq_flags(req, "MS unsupported request");
--		return BLKPREP_KILL;
--	}
--	req->rq_flags |= RQF_DONTPREP;
--	return BLKPREP_OK;
--}
--
- static void msb_submit_req(struct request_queue *q)
- {
- 	struct memstick_dev *card = q->queuedata;
-@@ -2132,7 +2122,6 @@ static int msb_init_disk(struct memstick_dev *card)
- 	}
- 
- 	msb->queue->queuedata = card;
--	blk_queue_prep_rq(msb->queue, msb_prepare_req);
- 
- 	blk_queue_bounce_limit(msb->queue, limit);
- 	blk_queue_max_hw_sectors(msb->queue, MS_BLOCK_MAX_PAGES);
+On AHCI I see only one completion polled as well.
+
+This probably is because in contrast to networking (with NAPI) in the block
+layer we do have a link between submission and completion whereas in networking
+RX and TX are decoupled. So if we're sending out one request we get the
+completion for it.
+
+What we'd need is a link to know "we've sent 10 requests out, now poll for the
+10 completions after the 1st IRQ". So basically what NVMe already did with
+calling __nvme_process_cq() after submission. Maybe we should even disable
+IRQs when submitting and re-enable after submitting so the
+submission patch doesn't get preempted by a completion.
+
+Does this make sense?
+
+Byte,
+	Johannes
+
 -- 
-2.1.4
-
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
