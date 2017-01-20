@@ -1,36 +1,46 @@
-Return-Path: <ebiggers3@gmail.com>
-Return-Path: <ebiggers3@gmail.com>
-From: Eric Biggers <ebiggers3@gmail.com>
-To: linux-block@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Eric Biggers <ebiggers@google.com>
-Subject: [PATCH] block: correct documentation for blkdev_issue_discard() flags
-Date: Mon, 23 Jan 2017 11:41:39 -0800
-Message-Id: <20170123194139.51469-1-ebiggers3@gmail.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:42417 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1752167AbdATO3A (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 20 Jan 2017 09:29:00 -0500
+Date: Fri, 20 Jan 2017 07:28:57 -0700
+From: Jens Axboe <axboe@fb.com>
+To: Paolo Valente <paolo.valente@linaro.org>
+CC: <linux-block@vger.kernel.org>,
+        Linux-Kernal <linux-kernel@vger.kernel.org>, <osandov@fb.com>
+Subject: Re: [PATCH 7/8] mq-deadline: add blk-mq adaptation of the deadline
+ IO scheduler
+Message-ID: <20170120142857.GC18162@kernel.dk>
+References: <1481933536-12844-1-git-send-email-axboe@fb.com>
+ <1481933536-12844-8-git-send-email-axboe@fb.com>
+ <2E4B3957-783C-41D4-A1BD-C329F6BDA65D@linaro.org>
+ <89FD5566-F9DE-492C-8AC1-CC2542D7CE7E@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <89FD5566-F9DE-492C-8AC1-CC2542D7CE7E@linaro.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Eric Biggers <ebiggers@google.com>
+On Fri, Jan 20 2017, Paolo Valente wrote:
+> 
+> > Il giorno 20 gen 2017, alle ore 14:14, Paolo Valente <paolo.valente@linaro.org> ha scritto:
+> > 
+> >> 
+> >> Il giorno 17 dic 2016, alle ore 01:12, Jens Axboe <axboe@fb.com> ha scritto:
+> >> 
+> >> This is basically identical to deadline-iosched, except it registers
+> >> as a MQ capable scheduler. This is still a single queue design.
+> >> 
+> > 
+> > Jens,
+> > no spin_lock_irq* in the code.  So, also request dispatches are
+> > guaranteed to never be executed in IRQ context?
+> 
+> Or maybe the opposite? That is, all scheduler functions invoked in IRQ context?
 
-BLKDEV_IFL_* flags no longer exist; blkdev_issue_discard() now actually
-takes BLKDEV_DISCARD_* flags.
+Nope
 
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- block/blk-lib.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/block/blk-lib.c b/block/blk-lib.c
-index ed89c8f4b2a0..463b76dd566f 100644
---- a/block/blk-lib.c
-+++ b/block/blk-lib.c
-@@ -109,7 +109,7 @@ EXPORT_SYMBOL(__blkdev_issue_discard);
-  * @sector:	start sector
-  * @nr_sects:	number of sectors to discard
-  * @gfp_mask:	memory allocation flags (for bio_alloc)
-- * @flags:	BLKDEV_IFL_* flags to control behaviour
-+ * @flags:	BLKDEV_DISCARD_* flags to control behaviour
-  *
-  * Description:
-  *    Issue a discard request for the sectors in question.
 -- 
-2.11.0.483.g087da7b7c-goog
+Jens Axboe
+
