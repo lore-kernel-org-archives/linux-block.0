@@ -1,83 +1,75 @@
-Return-Path: <jthumshirn@suse.de>
-Date: Fri, 20 Jan 2017 13:22:54 +0100
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Sagi Grimberg <sagi@grimberg.me>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	"lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>,
-	linux-block@vger.kernel.org, Linux-scsi@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Keith Busch <keith.busch@intel.com>
+Return-Path: <axboe@kernel.dk>
 Subject: Re: [LSF/MM TOPIC][LSF/MM ATTEND] NAPI polling for block drivers
-Message-ID: <20170120122254.GA5947@linux-x5ow.site>
+To: Hannes Reinecke <hare@suse.de>, Sagi Grimberg <sagi@grimberg.me>,
+ Andrey Kuzmin <andrey.v.kuzmin@gmail.com>
 References: <20170111134312.GH6286@linux-x5ow.site>
  <cc00cc1f-17d7-105e-ef2c-61791b7cc676@kernel.dk>
  <d60d4499-6ed8-0a69-edbf-db205a6dba6a@kernel.dk>
  <8b47ca34-d2ff-26dc-721e-2cb1e18f1efc@grimberg.me>
  <499af528-7810-f82d-1f11-cbf8f3a5b21c@grimberg.me>
- <f10b8508-22a2-2959-c369-2dd29f271d2c@grimberg.me>
+ <CANvN+emx1-F3iAY45t1_MQRcijw7sf1jPvjwv0uh8A3GzzQwMg@mail.gmail.com>
+ <e2b16f22-5743-23c8-cd20-13a20ec956b7@grimberg.me>
+ <4ad78959-3991-98f1-4c27-298b20163e52@suse.de>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>,
+ "lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>,
+ linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+ Keith Busch <keith.busch@intel.com>,
+ "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+ Linux-scsi@vger.kernel.org
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <0e0dd594-5348-9ccb-5929-b1ec73234f7c@kernel.dk>
+Date: Thu, 19 Jan 2017 16:13:40 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <f10b8508-22a2-2959-c369-2dd29f271d2c@grimberg.me>
+In-Reply-To: <4ad78959-3991-98f1-4c27-298b20163e52@suse.de>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Jan 17, 2017 at 05:45:53PM +0200, Sagi Grimberg wrote:
+On 01/18/2017 06:02 AM, Hannes Reinecke wrote:
+> On 01/17/2017 05:50 PM, Sagi Grimberg wrote:
+>>
+>>>     So it looks like we are super not efficient because most of the
+>>>     times we catch 1
+>>>     completion per interrupt and the whole point is that we need to find
+>>>     more! This fio
+>>>     is single threaded with QD=32 so I'd expect that we be somewhere in
+>>>     8-31 almost all
+>>>     the time... I also tried QD=1024, histogram is still the same.
+>>>
+>>>
+>>> It looks like it takes you longer to submit an I/O than to service an
+>>> interrupt,
+>>
+>> Well, with irq-poll we do practically nothing in the interrupt handler,
+>> only schedule irq-poll. Note that the latency measures are only from
+>> the point the interrupt arrives and the point we actually service it
+>> by polling for completions.
+>>
+>>> so increasing queue depth in the singe-threaded case doesn't
+>>> make much difference. You might want to try multiple threads per core
+>>> with QD, say, 32
+>>
+>> This is how I ran, QD=32.
 > 
-> >--
-> >[1]
-> >queue = b'nvme0q1'
-> >     usecs               : count     distribution
-> >         0 -> 1          : 7310 |****************************************|
-> >         2 -> 3          : 11       |      |
-> >         4 -> 7          : 10       |      |
-> >         8 -> 15         : 20       |      |
-> >        16 -> 31         : 0        |      |
-> >        32 -> 63         : 0        |      |
-> >        64 -> 127        : 1        |      |
-> >
-> >[2]
-> >queue = b'nvme0q1'
-> >     usecs               : count     distribution
-> >         0 -> 1          : 7309 |****************************************|
-> >         2 -> 3          : 14       |      |
-> >         4 -> 7          : 7        |      |
-> >         8 -> 15         : 17       |      |
-> >
+> The one thing which I found _really_ curious is this:
 > 
-> Rrr, email made the histograms look funky (tabs vs. spaces...)
-> The count is what's important anyways...
+>   IO depths    : 1=0.1%, 2=0.1%, 4=0.1%, 8=0.1%, 16=0.1%, 32=0.1%,
+>> =64=100.0%
+>      submit    : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%,
+>> =64=0.0%
+>      complete  : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%,
+>> =64=0.1%
+>      issued    : total=r=7673377/w=0/d=0, short=r=0/w=0/d=0,
+> drop=r=0/w=0/d=0
+>      latency   : target=0, window=0, percentile=100.00%, depth=256
 > 
-> Just adding that I used an Intel P3500 nvme device.
-> 
-> >We can see that most of the time our latency is pretty good (<1ns) but with
-> >huge tail latencies (some 8-15 ns and even one in 32-63 ns).
-> 
-> Obviously is micro-seconds and not nano-seconds (I wish...)
+> (note the lines starting with 'submit' and 'complete').
+> They are _always_ 4, irrespective of the hardware and/or tests which I
+> run. Jens, what are these numbers supposed to mean?
+> Is this intended?
 
-So to share yesterday's (and today's) findings:
-
-On AHCI I see only one completion polled as well.
-
-This probably is because in contrast to networking (with NAPI) in the block
-layer we do have a link between submission and completion whereas in networking
-RX and TX are decoupled. So if we're sending out one request we get the
-completion for it.
-
-What we'd need is a link to know "we've sent 10 requests out, now poll for the
-10 completions after the 1st IRQ". So basically what NVMe already did with
-calling __nvme_process_cq() after submission. Maybe we should even disable
-IRQs when submitting and re-enable after submitting so the
-submission patch doesn't get preempted by a completion.
-
-Does this make sense?
-
-Byte,
-	Johannes
+It's bucketized. 0=0.0% means that 0% of the submissions didn't submit
+anything (unsurprisingly), and ditto for the complete side. The next bucket
+is 1..4, so 100% of submissions and completions was in that range.
 
 -- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: Felix Imend�rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N�rnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+Jens Axboe
