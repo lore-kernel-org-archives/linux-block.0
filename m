@@ -1,117 +1,166 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:48790 "EHLO mx2.suse.de"
+Received: from mga14.intel.com ([192.55.52.115]:44329 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751510AbdATJYJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 Jan 2017 04:24:09 -0500
-Date: Fri, 20 Jan 2017 10:03:57 +0100
-From: Jan Kara <jack@suse.cz>
-To: Dan Williams <dan.j.williams@intel.com>
-Cc: Vishal Verma <vishal.l.verma@intel.com>, Jan Kara <jack@suse.cz>,
-        "darrick.wong@oracle.com" <darrick.wong@oracle.com>,
+        id S1751952AbdATAzS (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 19 Jan 2017 19:55:18 -0500
+From: "Verma, Vishal L" <vishal.l.verma@intel.com>
+To: "andiry@gmail.com" <andiry@gmail.com>,
+        "adilger@dilger.ca" <adilger@dilger.ca>
+CC: "darrick.wong@oracle.com" <darrick.wong@oracle.com>,
         "Vyacheslav.Dubeyko@wdc.com" <Vyacheslav.Dubeyko@wdc.com>,
-        "linux-nvdimm@ml01.01.org" <linux-nvdimm@ml01.01.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "slava@dubeyko.com" <slava@dubeyko.com>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
         "lsf-pc@lists.linux-foundation.org"
-        <lsf-pc@lists.linux-foundation.org>
-Subject: Re: [Lsf-pc] [LSF/MM TOPIC] Badblocks checking/representation in
- filesystems
-Message-ID: <20170120090357.GD14115@quack2.suse.cz>
-References: <20170117143703.GP2517@quack2.suse.cz>
- <20170117221421.GC4880@omniknight.lm.intel.com>
- <20170118101641.GD24789@quack2.suse.cz>
- <x49r3406r2i.fsf@segfault.boston.devel.redhat.com>
- <20170118210241.GE10498@birch.djwong.org>
- <CAPcyv4hd7bpCa7d9msX0Y8gLz7WsqXT3VExQwwLuAcsmMxVTPg@mail.gmail.com>
- <1484776549.4358.33.camel@intel.com>
- <20170119081011.GA2565@quack2.suse.cz>
- <20170119185910.GF4880@omniknight.lm.intel.com>
- <CAPcyv4jZz_iqLutd0gPEL3udqbFxvBH8CZY5oDgUjG5dGbC2gg@mail.gmail.com>
+        <lsf-pc@lists.linux-foundation.org>,
+        "linux-nvdimm@ml01.01.org" <linux-nvdimm@ml01.01.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>
+Subject: Re: [LSF/MM TOPIC] Badblocks checking/representation in filesystems
+Date: Fri, 20 Jan 2017 00:55:15 +0000
+Message-ID: <1484873646.4857.3.camel@intel.com>
+References: <at1mp6pou4lenesjdgh22k4p.1484345585589@email.android.com>
+         <b9rbflutjt10mb4ofherta8j.1484345610771@email.android.com>
+         <SN2PR04MB2191756EABCB0E9DAA3B5328887B0@SN2PR04MB2191.namprd04.prod.outlook.com>
+         <20170114004910.GA4880@omniknight.lm.intel.com>
+         <20170117063355.GL14033@birch.djwong.org>
+         <20170117213549.GB4880@omniknight.lm.intel.com>
+         <CAOvWMLYMR-VvAVNuVjXPC-woxY6afQX5-hMC=Vj2p=3AGj9tyA@mail.gmail.com>
+         <1BAF6FD6-1FDB-4F7C-A915-891F46E78B8C@dilger.ca>
+         <CAOvWMLZA092iUCnFxCxPZmDNX-hH08xbSnweBhK-E-m9Ko0yuw@mail.gmail.com>
+In-Reply-To: <CAOvWMLZA092iUCnFxCxPZmDNX-hH08xbSnweBhK-E-m9Ko0yuw@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CAPcyv4jZz_iqLutd0gPEL3udqbFxvBH8CZY5oDgUjG5dGbC2gg@mail.gmail.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Thu 19-01-17 11:03:12, Dan Williams wrote:
-> On Thu, Jan 19, 2017 at 10:59 AM, Vishal Verma <vishal.l.verma@intel.com> wrote:
-> > On 01/19, Jan Kara wrote:
-> >> On Wed 18-01-17 21:56:58, Verma, Vishal L wrote:
-> >> > On Wed, 2017-01-18 at 13:32 -0800, Dan Williams wrote:
-> >> > > On Wed, Jan 18, 2017 at 1:02 PM, Darrick J. Wong
-> >> > > <darrick.wong@oracle.com> wrote:
-> >> > > > On Wed, Jan 18, 2017 at 03:39:17PM -0500, Jeff Moyer wrote:
-> >> > > > > Jan Kara <jack@suse.cz> writes:
-> >> > > > >
-> >> > > > > > On Tue 17-01-17 15:14:21, Vishal Verma wrote:
-> >> > > > > > > Your note on the online repair does raise another tangentially
-> >> > > > > > > related
-> >> > > > > > > topic. Currently, if there are badblocks, writes via the bio
-> >> > > > > > > submission
-> >> > > > > > > path will clear the error (if the hardware is able to remap
-> >> > > > > > > the bad
-> >> > > > > > > locations). However, if the filesystem is mounted eith DAX,
-> >> > > > > > > even
-> >> > > > > > > non-mmap operations - read() and write() will go through the
-> >> > > > > > > dax paths
-> >> > > > > > > (dax_do_io()). We haven't found a good/agreeable way to
-> >> > > > > > > perform
-> >> > > > > > > error-clearing in this case. So currently, if a dax mounted
-> >> > > > > > > filesystem
-> >> > > > > > > has badblocks, the only way to clear those badblocks is to
-> >> > > > > > > mount it
-> >> > > > > > > without DAX, and overwrite/zero the bad locations. This is a
-> >> > > > > > > pretty
-> >> > > > > > > terrible user experience, and I'm hoping this can be solved in
-> >> > > > > > > a better
-> >> > > > > > > way.
-> >> > > > > >
-> >> > > > > > Please remind me, what is the problem with DAX code doing
-> >> > > > > > necessary work to
-> >> > > > > > clear the error when it gets EIO from memcpy on write?
-> >> > > > >
-> >> > > > > You won't get an MCE for a store;  only loads generate them.
-> >> > > > >
-> >> > > > > Won't fallocate FL_ZERO_RANGE clear bad blocks when mounted with
-> >> > > > > -o dax?
-> >> > > >
-> >> > > > Not necessarily; XFS usually implements this by punching out the
-> >> > > > range
-> >> > > > and then reallocating it as unwritten blocks.
-> >> > > >
-> >> > >
-> >> > > That does clear the error because the unwritten blocks are zeroed and
-> >> > > errors cleared when they become allocated again.
-> >> >
-> >> > Yes, the problem was that writes won't clear errors. zeroing through
-> >> > either hole-punch, truncate, unlinking the file should all work
-> >> > (assuming the hole-punch or truncate ranges wholly contain the
-> >> > 'badblock' sector).
-> >>
-> >> Let me repeat my question: You have mentioned that if we do IO through DAX,
-> >> writes won't clear errors and we should fall back to normal block path to
-> >> do write to clear the error. What does prevent us from directly clearing
-> >> the error from DAX path?
-> >>
-> > With DAX, all IO goes through DAX paths. There are two cases:
-> > 1. mmap and loads/stores: Obviously there is no kernel intervention
-> > here, and no badblocks handling is possible.
-> > 2. read() or write() IO: In the absence of dax, this would go through
-> > the bio submission path, through the pmem driver, and that would handle
-> > error clearing. With DAX, this goes through dax_iomap_actor, which also
-> > doesn't go through the pmem driver (it does a dax mapping, followed by
-> > essentially memcpy), and hence cannot handle badblocks.
-> 
-> Hmm, that may no longer be true after my changes to push dax flushing
-> to the driver. I.e. we could have a copy_from_iter() implementation
-> that attempts to clear errors... I'll get that series out and we can
-> discuss there.
-
-Yeah, that was precisely my point - doing copy_from_iter() that clears
-errors should be possible...
-
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+T24gVHVlLCAyMDE3LTAxLTE3IGF0IDE4OjAxIC0wODAwLCBBbmRpcnkgWHUgd3JvdGU6DQo+IE9u
+IFR1ZSwgSmFuIDE3LCAyMDE3IGF0IDQ6MTYgUE0sIEFuZHJlYXMgRGlsZ2VyIDxhZGlsZ2VyQGRp
+bGdlci5jYT4NCj4gd3JvdGU6DQo+ID4gT24gSmFuIDE3LCAyMDE3LCBhdCAzOjE1IFBNLCBBbmRp
+cnkgWHUgPGFuZGlyeUBnbWFpbC5jb20+IHdyb3RlOg0KPiA+ID4gT24gVHVlLCBKYW4gMTcsIDIw
+MTcgYXQgMTozNSBQTSwgVmlzaGFsIFZlcm1hIDx2aXNoYWwubC52ZXJtYUBpbnRlDQo+ID4gPiBs
+LmNvbT4gd3JvdGU6DQo+ID4gPiA+IE9uIDAxLzE2LCBEYXJyaWNrIEouIFdvbmcgd3JvdGU6DQo+
+ID4gPiA+ID4gT24gRnJpLCBKYW4gMTMsIDIwMTcgYXQgMDU6NDk6MTBQTSAtMDcwMCwgVmlzaGFs
+IFZlcm1hIHdyb3RlOg0KPiA+ID4gPiA+ID4gT24gMDEvMTQsIFNsYXZhIER1YmV5a28gd3JvdGU6
+DQo+ID4gPiA+ID4gPiA+IA0KPiA+ID4gPiA+ID4gPiAtLS0tIE9yaWdpbmFsIE1lc3NhZ2UgLS0t
+LQ0KPiA+ID4gPiA+ID4gPiBTdWJqZWN0OiBbTFNGL01NIFRPUElDXSBCYWRibG9ja3MgY2hlY2tp
+bmcvcmVwcmVzZW50YXRpb24NCj4gPiA+ID4gPiA+ID4gaW4gZmlsZXN5c3RlbXMNCj4gPiA+ID4g
+PiA+ID4gU2VudDogSmFuIDEzLCAyMDE3IDE6NDAgUE0NCj4gPiA+ID4gPiA+ID4gRnJvbTogIlZl
+cm1hLCBWaXNoYWwgTCIgPHZpc2hhbC5sLnZlcm1hQGludGVsLmNvbT4NCj4gPiA+ID4gPiA+ID4g
+VG86IGxzZi1wY0BsaXN0cy5saW51eC1mb3VuZGF0aW9uLm9yZw0KPiA+ID4gPiA+ID4gPiBDYzog
+bGludXgtbnZkaW1tQGxpc3RzLjAxLm9yZywgbGludXgtYmxvY2tAdmdlci5rZXJuZWwub3JnDQo+
+ID4gPiA+ID4gPiA+ICwgbGludXgtZnNkZXZlbEB2Z2VyLmtlcm5lbC5vcmcNCj4gPiA+ID4gPiA+
+ID4gDQo+ID4gPiA+ID4gPiA+ID4gVGhlIGN1cnJlbnQgaW1wbGVtZW50YXRpb24gb2YgYmFkYmxv
+Y2tzLCB3aGVyZSB3ZQ0KPiA+ID4gPiA+ID4gPiA+IGNvbnN1bHQgdGhlDQo+ID4gPiA+ID4gPiA+
+ID4gYmFkYmxvY2tzIGxpc3QgZm9yIGV2ZXJ5IElPIGluIHRoZSBibG9jayBkcml2ZXIgd29ya3Ms
+DQo+ID4gPiA+ID4gPiA+ID4gYW5kIGlzIGENCj4gPiA+ID4gPiA+ID4gPiBsYXN0IG9wdGlvbiBm
+YWlsc2FmZSwgYnV0IGZyb20gYSB1c2VyIHBlcnNwZWN0aXZlLCBpdA0KPiA+ID4gPiA+ID4gPiA+
+IGlzbid0IHRoZQ0KPiA+ID4gPiA+ID4gPiA+IGVhc2llc3QgaW50ZXJmYWNlIHRvIHdvcmsgd2l0
+aC4NCj4gPiA+ID4gPiA+ID4gDQo+ID4gPiA+ID4gPiA+IEFzIEkgcmVtZW1iZXIsIEZBVCBhbmQg
+SEZTKyBzcGVjaWZpY2F0aW9ucyBjb250YWluDQo+ID4gPiA+ID4gPiA+IGRlc2NyaXB0aW9uIG9m
+IGJhZCBibG9ja3MNCj4gPiA+ID4gPiA+ID4gKHBoeXNpY2FsIHNlY3RvcnMpIHRhYmxlLiBJIGJl
+bGlldmUgdGhhdCB0aGlzIHRhYmxlIHdhcw0KPiA+ID4gPiA+ID4gPiB1c2VkIGZvciB0aGUgY2Fz
+ZSBvZg0KPiA+ID4gPiA+ID4gPiBmbG9wcHkgbWVkaWEuIEJ1dCwgZmluYWxseSwgdGhpcyB0YWJs
+ZSBiZWNvbWVzIHRvIGJlIHRoZQ0KPiA+ID4gPiA+ID4gPiBjb21wbGV0ZWx5IG9ic29sZXRlDQo+
+ID4gPiA+ID4gPiA+IGFydGVmYWN0IGJlY2F1c2UgbW9zdGx5IHN0b3JhZ2UgZGV2aWNlcyBhcmUg
+cmVsaWFibHkNCj4gPiA+ID4gPiA+ID4gZW5vdWdoLiBXaHkgZG8geW91IG5lZWQNCj4gPiA+ID4g
+PiANCj4gPiA+ID4gPiBleHQ0IGhhcyBhIGJhZGJsb2NrcyBpbm9kZSB0byBvd24gYWxsIHRoZSBi
+YWQgc3BvdHMgb24gZGlzaywNCj4gPiA+ID4gPiBidXQgSVNUUiBpdA0KPiA+ID4gPiA+IGRvZXNu
+J3Qgc3VwcG9ydCg/PykgZXh0ZW50cyBvciA2NC1iaXQgZmlsZXN5c3RlbXMsIGFuZCBtaWdodA0K
+PiA+ID4gPiA+IGp1c3QgYmUgYQ0KPiA+ID4gPiA+IHZlc3RpZ2lhbCBvcmdhbiBhdCB0aGlzIHBv
+aW50LsKgwqBYRlMgZG9lc24ndCBoYXZlIGFueXRoaW5nIHRvDQo+ID4gPiA+ID4gdHJhY2sgYmFk
+DQo+ID4gPiA+ID4gYmxvY2tzIGN1cnJlbnRseS4uLi4NCj4gPiA+ID4gPiANCj4gPiA+ID4gPiA+
+ID4gaW4gZXhwb3NpbmcgdGhlIGJhZCBibG9ja3Mgb24gdGhlIGZpbGUgc3lzdGVtIGxldmVsP8Kg
+wqBEbw0KPiA+ID4gPiA+ID4gPiB5b3UgZXhwZWN0IHRoYXQgbmV4dA0KPiA+ID4gPiA+ID4gPiBn
+ZW5lcmF0aW9uIG9mIE5WTSBtZW1vcnkgd2lsbCBiZSBzbyB1bnJlbGlhYmxlIHRoYXQgZmlsZQ0K
+PiA+ID4gPiA+ID4gPiBzeXN0ZW0gbmVlZHMgdG8gbWFuYWdlDQo+ID4gPiA+ID4gPiA+IGJhZCBi
+bG9ja3M/IFdoYXQncyBhYm91dCBlcmFzdXJlIGNvZGluZyBzY2hlbWVzPyBEbyBmaWxlDQo+ID4g
+PiA+ID4gPiA+IHN5c3RlbSByZWFsbHkgbmVlZCB0byBzdWZmZXINCj4gPiA+ID4gPiA+ID4gZnJv
+bSB0aGUgYmFkIGJsb2NrIGlzc3VlPw0KPiA+ID4gPiA+ID4gPiANCj4gPiA+ID4gPiA+ID4gVXN1
+YWxseSwgd2UgYXJlIHVzaW5nIExCQXMgYW5kIGl0IGlzIHRoZSByZXNwb25zaWJpbGl0eSBvZg0K
+PiA+ID4gPiA+ID4gPiBzdG9yYWdlIGRldmljZSB0byBtYXANCj4gPiA+ID4gPiA+ID4gYSBiYWQg
+cGh5c2ljYWwgYmxvY2svcGFnZS9zZWN0b3IgaW50byB2YWxpZCBvbmUuIERvIHlvdQ0KPiA+ID4g
+PiA+ID4gPiBtZWFuIHRoYXQgd2UgaGF2ZQ0KPiA+ID4gPiA+ID4gPiBhY2Nlc3MgdG8gcGh5c2lj
+YWwgTlZNIG1lbW9yeSBhZGRyZXNzIGRpcmVjdGx5PyBCdXQgaXQNCj4gPiA+ID4gPiA+ID4gbG9v
+a3MgbGlrZSB0aGF0IHdlIGNhbg0KPiA+ID4gPiA+ID4gPiBoYXZlIGEgImJhZCBibG9jayIgaXNz
+dWUgZXZlbiB3ZSB3aWxsIGFjY2VzcyBkYXRhIGludG8NCj4gPiA+ID4gPiA+ID4gcGFnZSBjYWNo
+ZSdzIG1lbW9yeQ0KPiA+ID4gPiA+ID4gPiBwYWdlIChpZiB3ZSB3aWxsIHVzZSBOVk0gbWVtb3J5
+IGZvciBwYWdlIGNhY2hlLCBvZg0KPiA+ID4gPiA+ID4gPiBjb3Vyc2UpLiBTbywgd2hhdCBkbyB5
+b3UNCj4gPiA+ID4gPiA+ID4gaW1wbHkgYnkgImJhZCBibG9jayIgaXNzdWU/DQo+ID4gPiA+ID4g
+PiANCj4gPiA+ID4gPiA+IFdlIGRvbid0IGhhdmUgZGlyZWN0IHBoeXNpY2FsIGFjY2VzcyB0byB0
+aGUgZGV2aWNlJ3MgYWRkcmVzcw0KPiA+ID4gPiA+ID4gc3BhY2UsIGluDQo+ID4gPiA+ID4gPiB0
+aGUgc2Vuc2UgdGhlIGRldmljZSBpcyBzdGlsbCBmcmVlIHRvIHBlcmZvcm0gcmVtYXBwaW5nIG9m
+DQo+ID4gPiA+ID4gPiBjaHVua3Mgb2YgTlZNDQo+ID4gPiA+ID4gPiB1bmRlcm5lYXRoIHVzLiBU
+aGUgcHJvYmxlbSBpcyB0aGF0IHdoZW4gYSBibG9jayBvciBhZGRyZXNzDQo+ID4gPiA+ID4gPiBy
+YW5nZSAoYXMNCj4gPiA+ID4gPiA+IHNtYWxsIGFzIGEgY2FjaGUgbGluZSkgZ29lcyBiYWQsIHRo
+ZSBkZXZpY2UgbWFpbnRhaW5zIGENCj4gPiA+ID4gPiA+IHBvaXNvbiBiaXQgZm9yDQo+ID4gPiA+
+ID4gPiBldmVyeSBhZmZlY3RlZCBjYWNoZSBsaW5lLiBCZWhpbmQgdGhlIHNjZW5lcywgaXQgbWF5
+IGhhdmUNCj4gPiA+ID4gPiA+IGFscmVhZHkNCj4gPiA+ID4gPiA+IHJlbWFwcGVkIHRoZSByYW5n
+ZSwgYnV0IHRoZSBjYWNoZSBsaW5lIHBvaXNvbiBoYXMgdG8gYmUga2VwdA0KPiA+ID4gPiA+ID4g
+c28gdGhhdA0KPiA+ID4gPiA+ID4gdGhlcmUgaXMgYSBub3RpZmljYXRpb24gdG8gdGhlIHVzZXIv
+b3duZXIgb2YgdGhlIGRhdGEgdGhhdA0KPiA+ID4gPiA+ID4gc29tZXRoaW5nIGhhcw0KPiA+ID4g
+PiA+ID4gYmVlbiBsb3N0LiBTaW5jZSBOVk0gaXMgYnl0ZSBhZGRyZXNzYWJsZSBtZW1vcnkgc2l0
+dGluZyBvbg0KPiA+ID4gPiA+ID4gdGhlIG1lbW9yeQ0KPiA+ID4gPiA+ID4gYnVzLCBzdWNoIGEg
+cG9pc29uZWQgY2FjaGUgbGluZSByZXN1bHRzIGluIG1lbW9yeSBlcnJvcnMgYW5kDQo+ID4gPiA+
+ID4gPiBTSUdCVVNlcy4NCj4gPiA+ID4gPiA+IENvbXBhcmVkIHRvIHRyYWRhdGlvbmFsIHN0b3Jh
+Z2Ugd2hlcmUgYW4gYXBwIHdpbGwgZ2V0IG5pY2UNCj4gPiA+ID4gPiA+IGFuZCBmcmllbmRseQ0K
+PiA+ID4gPiA+ID4gKHJlbGF0aXZlbHkgc3BlYWtpbmcuLikgLUVJT3MuIFRoZSB3aG9sZSBiYWRi
+bG9ja3MNCj4gPiA+ID4gPiA+IGltcGxlbWVudGF0aW9uIHdhcw0KPiA+ID4gPiA+ID4gZG9uZSBz
+byB0aGF0IHRoZSBkcml2ZXIgY2FuIGludGVyY2VwdCBJTyAoaS5lLiByZWFkcykgdG8NCj4gPiA+
+ID4gPiA+IF9rbm93bl8gYmFkDQo+ID4gPiA+ID4gPiBsb2NhdGlvbnMsIGFuZCBzaG9ydC1jaXJj
+dWl0IHRoZW0gd2l0aCBhbiBFSU8uIElmIHRoZSBkcml2ZXINCj4gPiA+ID4gPiA+IGRvZXNuJ3QN
+Cj4gPiA+ID4gPiA+IGNhdGNoIHRoZXNlLCB0aGUgcmVhZHMgd2lsbCB0dXJuIGludG8gYSBtZW1v
+cnkgYnVzIGFjY2VzcywNCj4gPiA+ID4gPiA+IGFuZCB0aGUNCj4gPiA+ID4gPiA+IHBvaXNvbiB3
+aWxsIGNhdXNlIGEgU0lHQlVTLg0KPiA+ID4gPiA+IA0KPiA+ID4gPiA+ICJkcml2ZXIiIC4uLiB5
+b3UgbWVhbiBYRlM/wqDCoE9yIGRvIHlvdSBtZWFuIHRoZSB0aGluZyB0aGF0DQo+ID4gPiA+ID4g
+bWFrZXMgcG1lbQ0KPiA+ID4gPiA+IGxvb2sga2luZCBvZiBsaWtlIGEgdHJhZGl0aW9uYWwgYmxv
+Y2sgZGV2aWNlPyA6KQ0KPiA+ID4gPiANCj4gPiA+ID4gWWVzLCB0aGUgdGhpbmcgdGhhdCBtYWtl
+cyBwbWVtIGxvb2sgbGlrZSBhIGJsb2NrIGRldmljZSA6KSAtLQ0KPiA+ID4gPiBkcml2ZXJzL252
+ZGltbS9wbWVtLmMNCj4gPiA+ID4gDQo+ID4gPiA+ID4gDQo+ID4gPiA+ID4gPiBUaGlzIGVmZm9y
+dCBpcyB0byB0cnkgYW5kIG1ha2UgdGhpcyBiYWRibG9jayBjaGVja2luZw0KPiA+ID4gPiA+ID4g
+c21hcnRlciAtIGFuZCB0cnkNCj4gPiA+ID4gPiA+IGFuZCByZWR1Y2UgdGhlIHBlbmFsdHkgb24g
+ZXZlcnkgSU8gdG8gYSBzbWFsbGVyIHJhbmdlLCB3aGljaA0KPiA+ID4gPiA+ID4gb25seSB0aGUN
+Cj4gPiA+ID4gPiA+IGZpbGVzeXN0ZW0gY2FuIGRvLg0KPiA+ID4gPiA+IA0KPiA+ID4gPiA+IFRo
+b3VnaC4uLiBub3cgdGhhdCBYRlMgbWVyZ2VkIHRoZSByZXZlcnNlIG1hcHBpbmcgc3VwcG9ydCwN
+Cj4gPiA+ID4gPiBJJ3ZlIGJlZW4NCj4gPiA+ID4gPiB3b25kZXJpbmcgaWYgdGhlcmUnbGwgYmUg
+YSByZXN1Ym1pc3Npb24gb2YgdGhlIGRldmljZSBlcnJvcnMNCj4gPiA+ID4gPiBjYWxsYmFjaz8N
+Cj4gPiA+ID4gPiBJdCBzdGlsbCB3b3VsZCBiZSB1c2VmdWwgdG8gYmUgYWJsZSB0byBpbmZvcm0g
+dGhlIHVzZXIgdGhhdA0KPiA+ID4gPiA+IHBhcnQgb2YNCj4gPiA+ID4gPiB0aGVpciBmcyBoYXMg
+Z29uZSBiYWQsIG9yLCBiZXR0ZXIgeWV0LCBpZiB0aGUgYnVmZmVyIGlzIHN0aWxsDQo+ID4gPiA+
+ID4gaW4gbWVtb3J5DQo+ID4gPiA+ID4gc29tZXBsYWNlIGVsc2UsIGp1c3Qgd3JpdGUgaXQgYmFj
+ayBvdXQuDQo+ID4gPiA+ID4gDQo+ID4gPiA+ID4gT3IgSSBzdXBwb3NlIGlmIHdlIGhhZCBzb21l
+IGtpbmQgb2YgcmFpZDEgc2V0IHVwIGJldHdlZW4NCj4gPiA+ID4gPiBtZW1vcmllcyB3ZQ0KPiA+
+ID4gPiA+IGNvdWxkIHJlYWQgb25lIG9mIHRoZSBvdGhlciBjb3BpZXMgYW5kIHJld3JpdGUgaXQg
+aW50byB0aGUNCj4gPiA+ID4gPiBmYWlsaW5nDQo+ID4gPiA+ID4gcmVnaW9uIGltbWVkaWF0ZWx5
+Lg0KPiA+ID4gPiANCj4gPiA+ID4gWWVzLCB0aGF0IGlzIGtpbmQgb2Ygd2hhdCBJIHdhcyBob3Bp
+bmcgdG8gYWNjb21wbGlzaCB2aWEgdGhpcw0KPiA+ID4gPiBkaXNjdXNzaW9uLiBIb3cgbXVjaCB3
+b3VsZCBmaWxlc3lzdGVtcyB3YW50IHRvIGJlIGludm9sdmVkIGluDQo+ID4gPiA+IHRoaXMgc29y
+dA0KPiA+ID4gPiBvZiBiYWRibG9ja3MgaGFuZGxpbmcsIGlmIGF0IGFsbC4gSSBjYW4gcmVmcmVz
+aCBteSBwYXRjaGVzIHRoYXQNCj4gPiA+ID4gcHJvdmlkZQ0KPiA+ID4gPiB0aGUgZnMgbm90aWZp
+Y2F0aW9uLCBidXQgdGhhdCdzIHRoZSBlYXN5IGJpdCwgYW5kIGEgc3RhcnRpbmcNCj4gPiA+ID4g
+cG9pbnQuDQo+ID4gPiA+IA0KPiA+ID4gDQo+ID4gPiBJIGhhdmUgc29tZSBxdWVzdGlvbnMuIFdo
+eSBtb3ZpbmcgYmFkYmxvY2sgaGFuZGxpbmcgdG8gZmlsZSBzeXN0ZW0NCj4gPiA+IGxldmVsIGF2
+b2lkIHRoZSBjaGVja2luZyBwaGFzZT8gSW4gZmlsZSBzeXN0ZW0gbGV2ZWwgZm9yIGVhY2ggSS9P
+DQo+ID4gPiBJDQo+ID4gPiBzdGlsbCBoYXZlIHRvIGNoZWNrIHRoZSBiYWRibG9jayBsaXN0LCBy
+aWdodD8gRG8geW91IG1lYW4gZHVyaW5nDQo+ID4gPiBtb3VudA0KPiA+ID4gaXQgY2FuIGdvIHRo
+cm91Z2ggdGhlIHBtZW0gZGV2aWNlIGFuZCBsb2NhdGVzIGFsbCB0aGUgZGF0YQ0KPiA+ID4gc3Ry
+dWN0dXJlcw0KPiA+ID4gbWFuZ2xlZCBieSBiYWRibG9ja3MgYW5kIGhhbmRsZSB0aGVtIGFjY29y
+ZGluZ2x5LCBzbyB0aGF0IGR1cmluZw0KPiA+ID4gbm9ybWFsIHJ1bm5pbmcgdGhlIGJhZGJsb2Nr
+cyB3aWxsIG5ldmVyIGJlIGFjY2Vzc2VkPyBPciwgaWYgdGhlcmUNCj4gPiA+IGlzDQo+ID4gPiBy
+ZXBsaWNhdGFpb24vc25hcHNob3Qgc3VwcG9ydCwgdXNlIGEgY29weSB0byByZWNvdmVyIHRoZQ0K
+PiA+ID4gYmFkYmxvY2tzPw0KPiA+IA0KPiA+IFdpdGggZXh0NCBiYWRibG9ja3MsIHRoZSBtYWlu
+IG91dGNvbWUgaXMgdGhhdCB0aGUgYmFkIGJsb2NrcyB3b3VsZA0KPiA+IGJlDQo+ID4gcGVtYW5l
+bnRseSBtYXJrZWQgaW4gdGhlIGFsbG9jYXRpb24gYml0bWFwIGFzIGJlaW5nIHVzZWQsIGFuZCB0
+aGV5DQo+ID4gd291bGQNCj4gPiBuZXZlciBiZSBhbGxvY2F0ZWQgdG8gYSBmaWxlLCBzbyB0aGV5
+IHNob3VsZCBuZXZlciBiZSBhY2Nlc3NlZA0KPiA+IHVubGVzcw0KPiA+IGRvaW5nIGEgZnVsbCBk
+ZXZpY2Ugc2NhbiAod2hpY2ggZXh0NCBhbmQgZTJmc2NrIG5ldmVyIGRvKS7CoMKgVGhhdA0KPiA+
+IHdvdWxkDQo+ID4gYXZvaWQgdGhlIG5lZWQgdG8gY2hlY2sgZXZlcnkgSS9PIGFnYWluc3QgdGhl
+IGJhZCBibG9ja3MgbGlzdCwgaWYNCj4gPiB0aGUNCj4gPiBkcml2ZXIga25vd3MgdGhhdCB0aGUg
+ZmlsZXN5c3RlbSB3aWxsIGhhbmRsZSB0aGlzLg0KPiA+IA0KPiANCj4gVGhhbmsgeW91IGZvciBl
+eHBsYW5hdGlvbi4gSG93ZXZlciB0aGlzIG9ubHkgd29ya3MgZm9yIGZyZWUgYmxvY2tzLA0KPiBy
+aWdodD8gV2hhdCBhYm91dCBhbGxvY2F0ZWQgYmxvY2tzLCBsaWtlIGZpbGUgZGF0YSBhbmQgbWV0
+YWRhdGE/DQo+IA0KTGlrZSBBbmRyZWFzIHNhaWQsIHRoZSBleHQ0IGJhZGJsb2NrcyBmZWF0dXJl
+IGhhcyBub3QgYmVlbiBpbiB1c2UsIGFuZA0KdGhlIGN1cnJlbnQgYmxvY2sgbGF5ZXIgYmFkYmxv
+Y2tzIGFyZSBkaXN0aW5jdCBhbmQgdW5yZWxhdGVkIHRvIHRoZXNlLg0KQ2FuIHRoZSBleHQ0IGJh
+ZGJsb2NrcyBpbmZyYXN0cnVjdHVyZSBiZSByZXZpdmVkIGFuZCBleHRlbmRlZCBpZiB3ZQ0KZGVj
+aWRlIHRvIGFkZCBiYWRibG9ja3MgdG8gZmlsZXN5c3RlbXM/IE1heWJlIC0gdGhhdCB3YXMgb25l
+IG9mIHRoZQ0KdG9waWNzIEkgd2FzIGhvcGluZyB0byBkaXNjdXNzL2ZpbmQgb3V0IG1vcmUgYWJv
+dXQu
