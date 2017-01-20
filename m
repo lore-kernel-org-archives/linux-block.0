@@ -1,46 +1,67 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-qk0-f195.google.com ([209.85.220.195]:36208 "EHLO
-        mail-qk0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S936117AbdAIU4v (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Jan 2017 15:56:51 -0500
-Date: Mon, 9 Jan 2017 15:56:43 -0500
-From: Tejun Heo <tj@kernel.org>
-To: Shaohua Li <shli@fb.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel-team@fb.com, axboe@fb.com, vgoyal@redhat.com
-Subject: Re: [PATCH V5 11/17] blk-throttle: add a simple idle detection
-Message-ID: <20170109205643.GP12827@mtj.duckdns.org>
-References: <cover.1481833017.git.shli@fb.com>
- <b2a4b3d57a248e406a8687bbe2cce6f37c1b0749.1481833017.git.shli@fb.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [lkp-robot] [rcu] b332151a29: kernel_BUG_at_mm/slab.c
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+References: <20170119010216.GA8287@yexl-desktop>
+ <20170120160123.z4llgm4qaaemkp52@linutronix.de>
+ <32585b54-c2fd-66ea-e636-bdbd387133c1@kernel.dk>
+ <20170120162354.776bf2j75o247mzu@linutronix.de>
+ <daab32d4-6cbd-3217-df25-42ebf6f684ce@kernel.dk>
+ <20170120170907.u7ekube62edg32qr@linutronix.de>
+Cc: kernel test robot <xiaolong.ye@intel.com>,
+ "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>,
+ LKML <linux-kernel@vger.kernel.org>, lkp@01.org, linux-scsi@vger.kernel.org,
+ tglx@linutronix.de, linux-block@vger.kernel.org
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <e41a5dcf-eca8-cd3c-5e9b-4d2d6d31696e@kernel.dk>
+Date: Fri, 20 Jan 2017 09:15:28 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <b2a4b3d57a248e406a8687bbe2cce6f37c1b0749.1481833017.git.shli@fb.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <20170120170907.u7ekube62edg32qr@linutronix.de>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Dec 15, 2016 at 12:33:02PM -0800, Shaohua Li wrote:
->  /* Throttling is performed over 100ms slice and after that slice is renewed */
->  #define DFL_THROTL_SLICE (HZ / 10)
->  #define MAX_THROTL_SLICE (HZ / 5)
-> +#define DFL_IDLE_THRESHOLD_SSD (50 * 1000) /* 50 us */
-> +#define DFL_IDLE_THRESHOLD_HD (1000 * 1000) /* 1 ms */
-> +#define MAX_IDLE_TIME (500L * 1000 * 1000) /* 500 ms */
+On 01/20/2017 09:09 AM, Sebastian Andrzej Siewior wrote:
+> On 2017-01-20 08:32:37 [-0800], Jens Axboe wrote:
+>> That's alright, sounds like it's not a -next regression, but rather something
+>> that is already broken. I can reproduce a lot of breakage if I enable
+>> CONFIG_DEBUG_TEST_DRIVER_REMOVE, in fact my system doesn't boot at all. This
+>> is the first bug:
+>>
+>> [   18.247895] ------------[ cut here ]------------
+>> [   18.247907] WARNING: CPU: 21 PID: 2223 at drivers/ata/libata-core.c:6522 ata_host_detach+0x11b]
+>> [   18.247908] Modules linked in: igb(+) ahci(+) libahci i2c_algo_bit dca libata nvme(+) nvme_core
+>> [   18.247917] CPU: 21 PID: 2223 Comm: systemd-udevd Tainted: G        W       4.10.0-rc4+ #30
+>> [   18.247919] Hardware name: Dell Inc. PowerEdge T630/0NT78X, BIOS 2.3.4 11/09/2016
+>> [   18.247919] Call Trace:
+>> [   18.247928]  dump_stack+0x68/0x93
+>> [   18.247934]  __warn+0xc6/0xe0
+>> [   18.247937]  warn_slowpath_null+0x18/0x20
+>> [   18.247943]  ata_host_detach+0x11b/0x120 [libata]
+> …
+> 
+>> and it's even more downhill from there. That option is marked unstable, are we
+>> expecting it to work right now?
+> 
+> Well, as per 248ff0216543 ("driver core: Make Kconfig text for
+> DEBUG_TEST_DRIVER_REMOVE stronger"):
+> 
+> |   The current state of driver removal is not great.
+> |   CONFIG_DEBUG_TEST_DRIVER_REMOVE finds lots of errors. The help text
+> |   currently undersells exactly how many errors this option will find. Add
+> |   a bit more description to indicate this option shouldn't be turned on
+> |   unless you actually want to debug driver removal. The text can be
+> |   changed later when more drivers are fixed up.
+> 
+> so it looks like the option is working but it uncovers bugs. I've put
+> you in TO because the breakage in kvm test went away after I disabled
+> the MQ support in SCSI. So I *assumed* that MQ was not doing something
+> right in the removal path. I don't know if this libata-core backtrace is
+> a false positive or not.
 
-Hmm... why are we capping idle time so low?  This is a value to be
-configured by userland.  Does it make sense to cap it this low?  Also,
-wouldn't it make sense to start with higher default value given that
-the user has to explicitly enable low limit for it to be effective and
-thus explicitly requesting best effort latency target which will be
-added later?
+Sure, I get that, my question is just if it's always finding valid bugs,
+or if the test itself is buggy. The fact that I can't boot anything after
+enabling it makes me suspicious.
 
-I'm really uncomfortable with pitting these two knobs against each
-other in the similar time ranges.  It's really difficult tell what
-latency target of 25us means and predict its behavior and when the
-idle timeout is 50us.  It's fine if some people fiddle with them but
-it'd be great if the defaults clearly indicate that they're operating
-in mostly separate time scales.
-
-Thanks.
+Or maybe the state of load/remove/load is just pretty sad.
 
 -- 
-tejun
+Jens Axboe
