@@ -1,45 +1,79 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:48694 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S934256AbdAKJoL (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Jan 2017 04:44:11 -0500
-To: "lsf-pc@lists.linux-foundation.org"
-        <lsf-pc@lists.linux-foundation.org>
-Cc: device-mapper development <dm-devel@redhat.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <Linux-scsi@vger.kernel.org>,
-        Mike Snitzer <snitzer@redhat.com>
-From: Hannes Reinecke <hare@suse.de>
-Subject: [LSF/MM TOPIC][LSF/MM ATTEND] multipath redesign
-Message-ID: <00700606-3005-c82b-ee37-127417fbd201@suse.de>
-Date: Wed, 11 Jan 2017 10:44:08 +0100
+Received: from szxga03-in.huawei.com ([119.145.14.66]:23584 "EHLO
+        szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751759AbdATLTH (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 20 Jan 2017 06:19:07 -0500
+From: Hou Tao <houtao1@huawei.com>
+To: <dm-devel@redhat.com>, <linux-block@vger.kernel.org>
+CC: <agk@redhat.com>, <snitzer@redhat.com>, <ejt@redhat.com>,
+        <vgoyal@redhat.com>
+Subject: [PATCH RFC 4/4] dm thin: associate bio with current task if keep_bio_blkcg is enabled
+Date: Fri, 20 Jan 2017 19:15:52 +0800
+Message-ID: <1484910952-29820-5-git-send-email-houtao1@huawei.com>
+In-Reply-To: <1484910952-29820-1-git-send-email-houtao1@huawei.com>
+References: <1484910952-29820-1-git-send-email-houtao1@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hi all,
+If keep_bio_blkcg is enabled, assign the io_context and the blkcg of
+current task to bio before processing the bio.
 
-I'd like to attend LSF/MM this year, and would like to discuss a
-redesign of the multipath handling.
+Signed-off-by: Hou Tao <houtao1@huawei.com>
+---
+ drivers/md/dm-thin.c |  5 +++++
+ drivers/md/dm-thin.h | 17 +++++++++++++++++
+ 2 files changed, 22 insertions(+)
+ create mode 100644 drivers/md/dm-thin.h
 
-With recent kernels we've got quite some functionality required for
-multipathing already implemented, making some design decisions of the
-original multipath-tools implementation quite pointless.
-
-I'm working on a proof-of-concept implementation which just uses a
-simple configfs interface and doesn't require a daemon altogether.
-
-At LSF/MM I'd like to discuss how to move forward here, and whether we'd
-like to stay with the current device-mapper integration or move away
-from that towards a stand-alone implementation.
-
-Cheers,
-
-Hannes
+diff --git a/drivers/md/dm-thin.c b/drivers/md/dm-thin.c
+index 140cdae..0efbdbe 100644
+--- a/drivers/md/dm-thin.c
++++ b/drivers/md/dm-thin.c
+@@ -22,6 +22,8 @@
+ #include <linux/sort.h>
+ #include <linux/rbtree.h>
+ 
++#include "dm-thin.h"
++
+ #define	DM_MSG_PREFIX	"thin"
+ 
+ /*
+@@ -2629,6 +2631,9 @@ static int thin_bio_map(struct dm_target *ti, struct bio *bio)
+ 	struct dm_bio_prison_cell *virt_cell, *data_cell;
+ 	struct dm_cell_key key;
+ 
++	if (keep_pool_bio_blkcg(tc->pool))
++		thin_keep_bio_blkcg(bio);
++
+ 	thin_hook_bio(tc, bio);
+ 
+ 	if (tc->requeue_mode) {
+diff --git a/drivers/md/dm-thin.h b/drivers/md/dm-thin.h
+new file mode 100644
+index 0000000..09e920a
+--- /dev/null
++++ b/drivers/md/dm-thin.h
+@@ -0,0 +1,17 @@
++#ifndef DM_THIN_H
++#define DM_THIN_H
++
++#include <linux/bio.h>
++
++#ifdef CONFIG_BLK_CGROUP
++static inline void thin_keep_bio_blkcg(struct bio *bio)
++{
++	if (!bio->bi_css)
++		bio_associate_current(bio);
++}
++#else
++static inline void thin_keep_bio_blkcg(struct bio *bio) {}
++#endif /* CONFIG_BLK_CGROUP */
++
++#endif
++
 -- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG Nürnberg)
+2.5.0
+
