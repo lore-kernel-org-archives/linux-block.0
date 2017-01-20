@@ -1,67 +1,64 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:54164 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751841AbdAYRZs (ORCPT
+Received: from szxga02-in.huawei.com ([119.145.14.65]:1300 "EHLO
+        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751721AbdATLTH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 Jan 2017 12:25:48 -0500
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@fb.com>
-Cc: Mike Snitzer <snitzer@redhat.com>,
-        Junichi Nomura <j-nomura@ce.jp.nec.com>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-raid@vger.kernel.org, dm-devel@redhat.com
-Subject: [PATCH 06/18] dm: remove incomple BLOCK_PC support
-Date: Wed, 25 Jan 2017 18:25:14 +0100
-Message-Id: <1485365126-23210-7-git-send-email-hch@lst.de>
-In-Reply-To: <1485365126-23210-1-git-send-email-hch@lst.de>
-References: <1485365126-23210-1-git-send-email-hch@lst.de>
+        Fri, 20 Jan 2017 06:19:07 -0500
+From: Hou Tao <houtao1@huawei.com>
+To: <dm-devel@redhat.com>, <linux-block@vger.kernel.org>
+CC: <agk@redhat.com>, <snitzer@redhat.com>, <ejt@redhat.com>,
+        <vgoyal@redhat.com>
+Subject: [PATCH RFC 3/4] dm thin: show the enabled status of keep_bio_blkcg feature
+Date: Fri, 20 Jan 2017 19:15:51 +0800
+Message-ID: <1484910952-29820-4-git-send-email-houtao1@huawei.com>
+In-Reply-To: <1484910952-29820-1-git-send-email-houtao1@huawei.com>
+References: <1484910952-29820-1-git-send-email-houtao1@huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-DM tries to copy a few fields around for BLOCK_PC requests, but given
-that no dm-target ever wires up scsi_cmd_ioctl BLOCK_PC can't actually
-be sent to dm.
+If keep_bio_blkcg feature is enabled, we can ensure that
+by STATUSTYPE_TABLE or STATUSTYPE_INFO command.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+Signed-off-by: Hou Tao <houtao1@huawei.com>
 ---
- drivers/md/dm-rq.c | 16 ----------------
- 1 file changed, 16 deletions(-)
+ drivers/md/dm-thin.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
-index 93f6e9f..3f12916 100644
---- a/drivers/md/dm-rq.c
-+++ b/drivers/md/dm-rq.c
-@@ -270,19 +270,6 @@ static void dm_end_request(struct request *clone, int error)
- 	struct mapped_device *md = tio->md;
- 	struct request *rq = tio->orig;
+diff --git a/drivers/md/dm-thin.c b/drivers/md/dm-thin.c
+index 57d6202..140cdae 100644
+--- a/drivers/md/dm-thin.c
++++ b/drivers/md/dm-thin.c
+@@ -3760,7 +3760,7 @@ static void emit_flags(struct pool_features *pf, char *result,
+ {
+ 	unsigned count = !pf->zero_new_blocks + !pf->discard_enabled +
+ 		!pf->discard_passdown + (pf->mode == PM_READ_ONLY) +
+-		pf->error_if_no_space;
++		pf->error_if_no_space + pf->keep_bio_blkcg;
+ 	DMEMIT("%u ", count);
  
--	if (rq->cmd_type == REQ_TYPE_BLOCK_PC) {
--		rq->errors = clone->errors;
--		rq->resid_len = clone->resid_len;
--
--		if (rq->sense)
--			/*
--			 * We are using the sense buffer of the original
--			 * request.
--			 * So setting the length of the sense data is enough.
--			 */
--			rq->sense_len = clone->sense_len;
--	}
--
- 	free_rq_clone(clone);
- 	rq_end_stats(md, rq);
- 	if (!rq->q->mq_ops)
-@@ -511,9 +498,6 @@ static int setup_clone(struct request *clone, struct request *rq,
- 	if (r)
- 		return r;
+ 	if (!pf->zero_new_blocks)
+@@ -3777,6 +3777,9 @@ static void emit_flags(struct pool_features *pf, char *result,
  
--	clone->cmd = rq->cmd;
--	clone->cmd_len = rq->cmd_len;
--	clone->sense = rq->sense;
- 	clone->end_io = end_clone_request;
- 	clone->end_io_data = tio;
+ 	if (pf->error_if_no_space)
+ 		DMEMIT("error_if_no_space ");
++
++	if (pf->keep_bio_blkcg)
++		DMEMIT("keep_bio_blkcg ");
+ }
  
+ /*
+@@ -3885,6 +3888,9 @@ static void pool_status(struct dm_target *ti, status_type_t type,
+ 		else
+ 			DMEMIT("queue_if_no_space ");
+ 
++		if (pool->pf.keep_bio_blkcg)
++			DMEMIT("keep_bio_blkcg ");
++
+ 		if (dm_pool_metadata_needs_check(pool->pmd))
+ 			DMEMIT("needs_check ");
+ 		else
 -- 
-2.1.4
+2.5.0
 
