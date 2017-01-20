@@ -1,105 +1,62 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f171.google.com ([209.85.192.171]:36480 "EHLO
-        mail-pf0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751896AbdART4u (ORCPT
+Received: from szxga02-in.huawei.com ([119.145.14.65]:1301 "EHLO
+        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751740AbdATLTH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Jan 2017 14:56:50 -0500
-Received: by mail-pf0-f171.google.com with SMTP id 189so6665086pfu.3
-        for <linux-block@vger.kernel.org>; Wed, 18 Jan 2017 11:55:53 -0800 (PST)
-From: Omar Sandoval <osandov@osandov.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: Martin Raiber <martin@urbackup.org>, kernel-team@fb.com
-Subject: [PATCH 2/2] sbitmap: fix wakeup hang after sbq resize
-Date: Wed, 18 Jan 2017 11:55:22 -0800
-Message-Id: <42f692970c8e8f6a6c967cfc150cfb190c936c9d.1484769083.git.osandov@fb.com>
-In-Reply-To: <b8c8740615f38f36e3a5f726f97903ca2af9f549.1484769083.git.osandov@fb.com>
-References: <b8c8740615f38f36e3a5f726f97903ca2af9f549.1484769083.git.osandov@fb.com>
-In-Reply-To: <b8c8740615f38f36e3a5f726f97903ca2af9f549.1484769083.git.osandov@fb.com>
-References: <b8c8740615f38f36e3a5f726f97903ca2af9f549.1484769083.git.osandov@fb.com>
+        Fri, 20 Jan 2017 06:19:07 -0500
+From: Hou Tao <houtao1@huawei.com>
+To: <dm-devel@redhat.com>, <linux-block@vger.kernel.org>
+CC: <agk@redhat.com>, <snitzer@redhat.com>, <ejt@redhat.com>,
+        <vgoyal@redhat.com>
+Subject: [PATCH RFC 2/4] dm thin: parse "keep_bio_blkcg" from userspace tools
+Date: Fri, 20 Jan 2017 19:15:50 +0800
+Message-ID: <1484910952-29820-3-git-send-email-houtao1@huawei.com>
+In-Reply-To: <1484910952-29820-1-git-send-email-houtao1@huawei.com>
+References: <1484910952-29820-1-git-send-email-houtao1@huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Omar Sandoval <osandov@fb.com>
+keep_bio_blkcg feature is off by default, and it can
+be turned on by using "keep_bio_blkcg" argument.
 
-When we resize a struct sbitmap_queue, we update the wakeup batch size,
-but we don't update the wait count in the struct sbq_wait_states. If we
-resized down from a size which could use a bigger batch size, these
-counts could be too large and cause us to miss necessary wakeups. To fix
-this, update the wait counts when we resize (ensuring some careful
-memory ordering so that it's safe w.r.t. concurrent clears).
-
-This also fixes a theoretical issue where two threads could end up
-bumping the wait count up by the batch size, which could also
-potentially lead to hangs.
-
-Reported-by: Martin Raiber <martin@urbackup.org>
-Fixes: e3a2b3f931f5 ("blk-mq: allow changing of queue depth through sysfs")
-Fixes: 2971c35f3588 ("blk-mq: bitmap tag: fix race on blk_mq_bitmap_tags::wake_cnt")
-Signed-off-by: Omar Sandoval <osandov@fb.com>
+Signed-off-by: Hou Tao <houtao1@huawei.com>
 ---
- lib/sbitmap.c | 35 ++++++++++++++++++++++++++++++-----
- 1 file changed, 30 insertions(+), 5 deletions(-)
+ drivers/md/dm-thin.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/lib/sbitmap.c b/lib/sbitmap.c
-index df4e472df8a3..8f5c3b268c77 100644
---- a/lib/sbitmap.c
-+++ b/lib/sbitmap.c
-@@ -239,7 +239,19 @@ EXPORT_SYMBOL_GPL(sbitmap_queue_init_node);
- 
- void sbitmap_queue_resize(struct sbitmap_queue *sbq, unsigned int depth)
- {
--	sbq->wake_batch = sbq_calc_wake_batch(depth);
-+	unsigned int wake_batch = sbq_calc_wake_batch(depth);
-+	int i;
-+
-+	if (sbq->wake_batch != wake_batch) {
-+		WRITE_ONCE(sbq->wake_batch, wake_batch);
-+		/*
-+		 * Pairs with the memory barrier in sbq_wake_up() to ensure that
-+		 * the batch size is updated before the wait counts.
-+		 */
-+		smp_mb__before_atomic();
-+		for (i = 0; i < SBQ_WAIT_QUEUES; i++)
-+			atomic_set(&sbq->ws[i].wait_cnt, 1);
-+	}
- 	sbitmap_resize(&sbq->sb, depth);
+diff --git a/drivers/md/dm-thin.c b/drivers/md/dm-thin.c
+index 8178ee8..57d6202 100644
+--- a/drivers/md/dm-thin.c
++++ b/drivers/md/dm-thin.c
+@@ -2824,6 +2824,7 @@ static void pool_features_init(struct pool_features *pf)
+ 	pf->discard_enabled = true;
+ 	pf->discard_passdown = true;
+ 	pf->error_if_no_space = false;
++	pf->keep_bio_blkcg = false;
  }
- EXPORT_SYMBOL_GPL(sbitmap_queue_resize);
-@@ -297,6 +309,7 @@ static struct sbq_wait_state *sbq_wake_ptr(struct sbitmap_queue *sbq)
- static void sbq_wake_up(struct sbitmap_queue *sbq)
- {
- 	struct sbq_wait_state *ws;
-+	unsigned int wake_batch;
- 	int wait_cnt;
+ 
+ static void __pool_destroy(struct pool *pool)
+@@ -3053,7 +3054,7 @@ static int parse_pool_features(struct dm_arg_set *as, struct pool_features *pf,
+ 	const char *arg_name;
+ 
+ 	static struct dm_arg _args[] = {
+-		{0, 4, "Invalid number of pool feature arguments"},
++		{0, 5, "Invalid number of pool feature arguments"},
+ 	};
  
  	/*
-@@ -313,10 +326,22 @@ static void sbq_wake_up(struct sbitmap_queue *sbq)
- 		return;
+@@ -3085,6 +3086,9 @@ static int parse_pool_features(struct dm_arg_set *as, struct pool_features *pf,
+ 		else if (!strcasecmp(arg_name, "error_if_no_space"))
+ 			pf->error_if_no_space = true;
  
- 	wait_cnt = atomic_dec_return(&ws->wait_cnt);
--	if (unlikely(wait_cnt < 0))
--		wait_cnt = atomic_inc_return(&ws->wait_cnt);
--	if (wait_cnt == 0) {
--		atomic_add(sbq->wake_batch, &ws->wait_cnt);
-+	if (wait_cnt <= 0) {
-+		wake_batch = READ_ONCE(sbq->wake_batch);
-+		/*
-+		 * Pairs with the memory barrier in sbitmap_queue_resize() to
-+		 * ensure that we see the batch size update before the wait
-+		 * count is reset.
-+		 */
-+		smp_mb__before_atomic();
-+		/*
-+		 * If there are concurrent callers to sbq_wake_up(), the last
-+		 * one to decrement the wait count below zero will bump it back
-+		 * up. If there is a concurrent resize, the count reset will
-+		 * either cause the cmpxchg to fail or overwrite after the
-+		 * cmpxchg.
-+		 */
-+		atomic_cmpxchg(&ws->wait_cnt, wait_cnt, wait_cnt + wake_batch);
- 		sbq_index_atomic_inc(&sbq->wake_index);
- 		wake_up(&ws->wait);
- 	}
++		else if (!strcasecmp(arg_name, "keep_bio_blkcg"))
++			pf->keep_bio_blkcg = true;
++
+ 		else {
+ 			ti->error = "Unrecognised pool feature requested";
+ 			r = -EINVAL;
 -- 
-2.11.0
+2.5.0
 
