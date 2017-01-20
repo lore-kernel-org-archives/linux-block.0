@@ -1,22 +1,63 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.9]:48592 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751448AbdAML3W (ORCPT
+Received: from szxga02-in.huawei.com ([119.145.14.65]:1299 "EHLO
+        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751299AbdATLTH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Jan 2017 06:29:22 -0500
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@fb.com>
-Cc: Dexuan Cui <decui@microsoft.com>, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-nvme@lists.infradead.org
-Subject: fix data transfer size caculation for special payload requests
-Date: Fri, 13 Jan 2017 12:29:09 +0100
-Message-Id: <1484306953-3194-1-git-send-email-hch@lst.de>
+        Fri, 20 Jan 2017 06:19:07 -0500
+From: Hou Tao <houtao1@huawei.com>
+To: <dm-devel@redhat.com>, <linux-block@vger.kernel.org>
+CC: <agk@redhat.com>, <snitzer@redhat.com>, <ejt@redhat.com>,
+        <vgoyal@redhat.com>
+Subject: [PATCH RFC 1/4] dm thin: add a pool feature "keep_bio_blkcg"
+Date: Fri, 20 Jan 2017 19:15:49 +0800
+Message-ID: <1484910952-29820-2-git-send-email-houtao1@huawei.com>
+In-Reply-To: <1484910952-29820-1-git-send-email-houtao1@huawei.com>
+References: <1484910952-29820-1-git-send-email-houtao1@huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hi all,
+"keep_bio_blkcg" is used to control whether or not
+dm-thin needs to save the original blkcg of bio
 
-the first two fixes fix a regression in 4.10-rc1 where the data transfer
-size for discard commands wasn't set properly, leading to hangs with
-Hyper-V VMs.  The use the new data transfer size helper added in patch 1
-more widely.
+Signed-off-by: Hou Tao <houtao1@huawei.com>
+---
+ drivers/md/dm-thin.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/drivers/md/dm-thin.c b/drivers/md/dm-thin.c
+index d1c05c1..8178ee8 100644
+--- a/drivers/md/dm-thin.c
++++ b/drivers/md/dm-thin.c
+@@ -211,6 +211,7 @@ struct pool_features {
+ 	bool discard_enabled:1;
+ 	bool discard_passdown:1;
+ 	bool error_if_no_space:1;
++	bool keep_bio_blkcg:1;
+ };
+ 
+ struct thin_c;
+@@ -277,6 +278,7 @@ struct pool {
+ 
+ static enum pool_mode get_pool_mode(struct pool *pool);
+ static void metadata_operation_failed(struct pool *pool, const char *op, int r);
++static bool keep_pool_bio_blkcg(struct pool *pool);
+ 
+ /*
+  * Target context for a pool.
+@@ -2390,6 +2392,11 @@ static void noflush_work(struct thin_c *tc, void (*fn)(struct work_struct *))
+ 
+ /*----------------------------------------------------------------*/
+ 
++static bool keep_pool_bio_blkcg(struct pool *pool)
++{
++	return pool->pf.keep_bio_blkcg;
++}
++
+ static enum pool_mode get_pool_mode(struct pool *pool)
+ {
+ 	return pool->pf.mode;
+-- 
+2.5.0
+
