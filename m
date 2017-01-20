@@ -1,166 +1,222 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga14.intel.com ([192.55.52.115]:44329 "EHLO mga14.intel.com"
+Received: from mga01.intel.com ([192.55.52.88]:58939 "EHLO mga01.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751952AbdATAzS (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Jan 2017 19:55:18 -0500
-From: "Verma, Vishal L" <vishal.l.verma@intel.com>
-To: "andiry@gmail.com" <andiry@gmail.com>,
-        "adilger@dilger.ca" <adilger@dilger.ca>
-CC: "darrick.wong@oracle.com" <darrick.wong@oracle.com>,
-        "Vyacheslav.Dubeyko@wdc.com" <Vyacheslav.Dubeyko@wdc.com>,
+        id S1751961AbdATAvA (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 19 Jan 2017 19:51:00 -0500
+Date: Thu, 19 Jan 2017 17:46:33 -0700
+From: Vishal Verma <vishal.l.verma@intel.com>
+To: Lu Zhang <luzh@eng.ucsd.edu>
+Cc: Andiry Xu <andiry@gmail.com>, Andreas Dilger <adilger@dilger.ca>,
+        Slava Dubeyko <Vyacheslav.Dubeyko@wdc.com>,
+        "Darrick J. Wong" <darrick.wong@oracle.com>,
+        "linux-nvdimm@lists.01.org" <linux-nvdimm@ml01.01.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "slava@dubeyko.com" <slava@dubeyko.com>,
+        Viacheslav Dubeyko <slava@dubeyko.com>,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
         "lsf-pc@lists.linux-foundation.org"
-        <lsf-pc@lists.linux-foundation.org>,
-        "linux-nvdimm@ml01.01.org" <linux-nvdimm@ml01.01.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>
+        <lsf-pc@lists.linux-foundation.org>
 Subject: Re: [LSF/MM TOPIC] Badblocks checking/representation in filesystems
-Date: Fri, 20 Jan 2017 00:55:15 +0000
-Message-ID: <1484873646.4857.3.camel@intel.com>
+Message-ID: <20170120004633.GA14128@omniknight.lm.intel.com>
 References: <at1mp6pou4lenesjdgh22k4p.1484345585589@email.android.com>
-         <b9rbflutjt10mb4ofherta8j.1484345610771@email.android.com>
-         <SN2PR04MB2191756EABCB0E9DAA3B5328887B0@SN2PR04MB2191.namprd04.prod.outlook.com>
-         <20170114004910.GA4880@omniknight.lm.intel.com>
-         <20170117063355.GL14033@birch.djwong.org>
-         <20170117213549.GB4880@omniknight.lm.intel.com>
-         <CAOvWMLYMR-VvAVNuVjXPC-woxY6afQX5-hMC=Vj2p=3AGj9tyA@mail.gmail.com>
-         <1BAF6FD6-1FDB-4F7C-A915-891F46E78B8C@dilger.ca>
-         <CAOvWMLZA092iUCnFxCxPZmDNX-hH08xbSnweBhK-E-m9Ko0yuw@mail.gmail.com>
-In-Reply-To: <CAOvWMLZA092iUCnFxCxPZmDNX-hH08xbSnweBhK-E-m9Ko0yuw@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
+ <b9rbflutjt10mb4ofherta8j.1484345610771@email.android.com>
+ <SN2PR04MB2191756EABCB0E9DAA3B5328887B0@SN2PR04MB2191.namprd04.prod.outlook.com>
+ <20170114004910.GA4880@omniknight.lm.intel.com>
+ <20170117063355.GL14033@birch.djwong.org>
+ <20170117213549.GB4880@omniknight.lm.intel.com>
+ <CAOvWMLYMR-VvAVNuVjXPC-woxY6afQX5-hMC=Vj2p=3AGj9tyA@mail.gmail.com>
+ <1BAF6FD6-1FDB-4F7C-A915-891F46E78B8C@dilger.ca>
+ <CAOvWMLZA092iUCnFxCxPZmDNX-hH08xbSnweBhK-E-m9Ko0yuw@mail.gmail.com>
+ <CAL4pJv6MvJhTuPJbPAV-HXGrMST-dJs461O=wwfcpdvQA-amdA@mail.gmail.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CAL4pJv6MvJhTuPJbPAV-HXGrMST-dJs461O=wwfcpdvQA-amdA@mail.gmail.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-T24gVHVlLCAyMDE3LTAxLTE3IGF0IDE4OjAxIC0wODAwLCBBbmRpcnkgWHUgd3JvdGU6DQo+IE9u
-IFR1ZSwgSmFuIDE3LCAyMDE3IGF0IDQ6MTYgUE0sIEFuZHJlYXMgRGlsZ2VyIDxhZGlsZ2VyQGRp
-bGdlci5jYT4NCj4gd3JvdGU6DQo+ID4gT24gSmFuIDE3LCAyMDE3LCBhdCAzOjE1IFBNLCBBbmRp
-cnkgWHUgPGFuZGlyeUBnbWFpbC5jb20+IHdyb3RlOg0KPiA+ID4gT24gVHVlLCBKYW4gMTcsIDIw
-MTcgYXQgMTozNSBQTSwgVmlzaGFsIFZlcm1hIDx2aXNoYWwubC52ZXJtYUBpbnRlDQo+ID4gPiBs
-LmNvbT4gd3JvdGU6DQo+ID4gPiA+IE9uIDAxLzE2LCBEYXJyaWNrIEouIFdvbmcgd3JvdGU6DQo+
-ID4gPiA+ID4gT24gRnJpLCBKYW4gMTMsIDIwMTcgYXQgMDU6NDk6MTBQTSAtMDcwMCwgVmlzaGFs
-IFZlcm1hIHdyb3RlOg0KPiA+ID4gPiA+ID4gT24gMDEvMTQsIFNsYXZhIER1YmV5a28gd3JvdGU6
-DQo+ID4gPiA+ID4gPiA+IA0KPiA+ID4gPiA+ID4gPiAtLS0tIE9yaWdpbmFsIE1lc3NhZ2UgLS0t
-LQ0KPiA+ID4gPiA+ID4gPiBTdWJqZWN0OiBbTFNGL01NIFRPUElDXSBCYWRibG9ja3MgY2hlY2tp
-bmcvcmVwcmVzZW50YXRpb24NCj4gPiA+ID4gPiA+ID4gaW4gZmlsZXN5c3RlbXMNCj4gPiA+ID4g
-PiA+ID4gU2VudDogSmFuIDEzLCAyMDE3IDE6NDAgUE0NCj4gPiA+ID4gPiA+ID4gRnJvbTogIlZl
-cm1hLCBWaXNoYWwgTCIgPHZpc2hhbC5sLnZlcm1hQGludGVsLmNvbT4NCj4gPiA+ID4gPiA+ID4g
-VG86IGxzZi1wY0BsaXN0cy5saW51eC1mb3VuZGF0aW9uLm9yZw0KPiA+ID4gPiA+ID4gPiBDYzog
-bGludXgtbnZkaW1tQGxpc3RzLjAxLm9yZywgbGludXgtYmxvY2tAdmdlci5rZXJuZWwub3JnDQo+
-ID4gPiA+ID4gPiA+ICwgbGludXgtZnNkZXZlbEB2Z2VyLmtlcm5lbC5vcmcNCj4gPiA+ID4gPiA+
-ID4gDQo+ID4gPiA+ID4gPiA+ID4gVGhlIGN1cnJlbnQgaW1wbGVtZW50YXRpb24gb2YgYmFkYmxv
-Y2tzLCB3aGVyZSB3ZQ0KPiA+ID4gPiA+ID4gPiA+IGNvbnN1bHQgdGhlDQo+ID4gPiA+ID4gPiA+
-ID4gYmFkYmxvY2tzIGxpc3QgZm9yIGV2ZXJ5IElPIGluIHRoZSBibG9jayBkcml2ZXIgd29ya3Ms
-DQo+ID4gPiA+ID4gPiA+ID4gYW5kIGlzIGENCj4gPiA+ID4gPiA+ID4gPiBsYXN0IG9wdGlvbiBm
-YWlsc2FmZSwgYnV0IGZyb20gYSB1c2VyIHBlcnNwZWN0aXZlLCBpdA0KPiA+ID4gPiA+ID4gPiA+
-IGlzbid0IHRoZQ0KPiA+ID4gPiA+ID4gPiA+IGVhc2llc3QgaW50ZXJmYWNlIHRvIHdvcmsgd2l0
-aC4NCj4gPiA+ID4gPiA+ID4gDQo+ID4gPiA+ID4gPiA+IEFzIEkgcmVtZW1iZXIsIEZBVCBhbmQg
-SEZTKyBzcGVjaWZpY2F0aW9ucyBjb250YWluDQo+ID4gPiA+ID4gPiA+IGRlc2NyaXB0aW9uIG9m
-IGJhZCBibG9ja3MNCj4gPiA+ID4gPiA+ID4gKHBoeXNpY2FsIHNlY3RvcnMpIHRhYmxlLiBJIGJl
-bGlldmUgdGhhdCB0aGlzIHRhYmxlIHdhcw0KPiA+ID4gPiA+ID4gPiB1c2VkIGZvciB0aGUgY2Fz
-ZSBvZg0KPiA+ID4gPiA+ID4gPiBmbG9wcHkgbWVkaWEuIEJ1dCwgZmluYWxseSwgdGhpcyB0YWJs
-ZSBiZWNvbWVzIHRvIGJlIHRoZQ0KPiA+ID4gPiA+ID4gPiBjb21wbGV0ZWx5IG9ic29sZXRlDQo+
-ID4gPiA+ID4gPiA+IGFydGVmYWN0IGJlY2F1c2UgbW9zdGx5IHN0b3JhZ2UgZGV2aWNlcyBhcmUg
-cmVsaWFibHkNCj4gPiA+ID4gPiA+ID4gZW5vdWdoLiBXaHkgZG8geW91IG5lZWQNCj4gPiA+ID4g
-PiANCj4gPiA+ID4gPiBleHQ0IGhhcyBhIGJhZGJsb2NrcyBpbm9kZSB0byBvd24gYWxsIHRoZSBi
-YWQgc3BvdHMgb24gZGlzaywNCj4gPiA+ID4gPiBidXQgSVNUUiBpdA0KPiA+ID4gPiA+IGRvZXNu
-J3Qgc3VwcG9ydCg/PykgZXh0ZW50cyBvciA2NC1iaXQgZmlsZXN5c3RlbXMsIGFuZCBtaWdodA0K
-PiA+ID4gPiA+IGp1c3QgYmUgYQ0KPiA+ID4gPiA+IHZlc3RpZ2lhbCBvcmdhbiBhdCB0aGlzIHBv
-aW50LsKgwqBYRlMgZG9lc24ndCBoYXZlIGFueXRoaW5nIHRvDQo+ID4gPiA+ID4gdHJhY2sgYmFk
-DQo+ID4gPiA+ID4gYmxvY2tzIGN1cnJlbnRseS4uLi4NCj4gPiA+ID4gPiANCj4gPiA+ID4gPiA+
-ID4gaW4gZXhwb3NpbmcgdGhlIGJhZCBibG9ja3Mgb24gdGhlIGZpbGUgc3lzdGVtIGxldmVsP8Kg
-wqBEbw0KPiA+ID4gPiA+ID4gPiB5b3UgZXhwZWN0IHRoYXQgbmV4dA0KPiA+ID4gPiA+ID4gPiBn
-ZW5lcmF0aW9uIG9mIE5WTSBtZW1vcnkgd2lsbCBiZSBzbyB1bnJlbGlhYmxlIHRoYXQgZmlsZQ0K
-PiA+ID4gPiA+ID4gPiBzeXN0ZW0gbmVlZHMgdG8gbWFuYWdlDQo+ID4gPiA+ID4gPiA+IGJhZCBi
-bG9ja3M/IFdoYXQncyBhYm91dCBlcmFzdXJlIGNvZGluZyBzY2hlbWVzPyBEbyBmaWxlDQo+ID4g
-PiA+ID4gPiA+IHN5c3RlbSByZWFsbHkgbmVlZCB0byBzdWZmZXINCj4gPiA+ID4gPiA+ID4gZnJv
-bSB0aGUgYmFkIGJsb2NrIGlzc3VlPw0KPiA+ID4gPiA+ID4gPiANCj4gPiA+ID4gPiA+ID4gVXN1
-YWxseSwgd2UgYXJlIHVzaW5nIExCQXMgYW5kIGl0IGlzIHRoZSByZXNwb25zaWJpbGl0eSBvZg0K
-PiA+ID4gPiA+ID4gPiBzdG9yYWdlIGRldmljZSB0byBtYXANCj4gPiA+ID4gPiA+ID4gYSBiYWQg
-cGh5c2ljYWwgYmxvY2svcGFnZS9zZWN0b3IgaW50byB2YWxpZCBvbmUuIERvIHlvdQ0KPiA+ID4g
-PiA+ID4gPiBtZWFuIHRoYXQgd2UgaGF2ZQ0KPiA+ID4gPiA+ID4gPiBhY2Nlc3MgdG8gcGh5c2lj
-YWwgTlZNIG1lbW9yeSBhZGRyZXNzIGRpcmVjdGx5PyBCdXQgaXQNCj4gPiA+ID4gPiA+ID4gbG9v
-a3MgbGlrZSB0aGF0IHdlIGNhbg0KPiA+ID4gPiA+ID4gPiBoYXZlIGEgImJhZCBibG9jayIgaXNz
-dWUgZXZlbiB3ZSB3aWxsIGFjY2VzcyBkYXRhIGludG8NCj4gPiA+ID4gPiA+ID4gcGFnZSBjYWNo
-ZSdzIG1lbW9yeQ0KPiA+ID4gPiA+ID4gPiBwYWdlIChpZiB3ZSB3aWxsIHVzZSBOVk0gbWVtb3J5
-IGZvciBwYWdlIGNhY2hlLCBvZg0KPiA+ID4gPiA+ID4gPiBjb3Vyc2UpLiBTbywgd2hhdCBkbyB5
-b3UNCj4gPiA+ID4gPiA+ID4gaW1wbHkgYnkgImJhZCBibG9jayIgaXNzdWU/DQo+ID4gPiA+ID4g
-PiANCj4gPiA+ID4gPiA+IFdlIGRvbid0IGhhdmUgZGlyZWN0IHBoeXNpY2FsIGFjY2VzcyB0byB0
-aGUgZGV2aWNlJ3MgYWRkcmVzcw0KPiA+ID4gPiA+ID4gc3BhY2UsIGluDQo+ID4gPiA+ID4gPiB0
-aGUgc2Vuc2UgdGhlIGRldmljZSBpcyBzdGlsbCBmcmVlIHRvIHBlcmZvcm0gcmVtYXBwaW5nIG9m
-DQo+ID4gPiA+ID4gPiBjaHVua3Mgb2YgTlZNDQo+ID4gPiA+ID4gPiB1bmRlcm5lYXRoIHVzLiBU
-aGUgcHJvYmxlbSBpcyB0aGF0IHdoZW4gYSBibG9jayBvciBhZGRyZXNzDQo+ID4gPiA+ID4gPiBy
-YW5nZSAoYXMNCj4gPiA+ID4gPiA+IHNtYWxsIGFzIGEgY2FjaGUgbGluZSkgZ29lcyBiYWQsIHRo
-ZSBkZXZpY2UgbWFpbnRhaW5zIGENCj4gPiA+ID4gPiA+IHBvaXNvbiBiaXQgZm9yDQo+ID4gPiA+
-ID4gPiBldmVyeSBhZmZlY3RlZCBjYWNoZSBsaW5lLiBCZWhpbmQgdGhlIHNjZW5lcywgaXQgbWF5
-IGhhdmUNCj4gPiA+ID4gPiA+IGFscmVhZHkNCj4gPiA+ID4gPiA+IHJlbWFwcGVkIHRoZSByYW5n
-ZSwgYnV0IHRoZSBjYWNoZSBsaW5lIHBvaXNvbiBoYXMgdG8gYmUga2VwdA0KPiA+ID4gPiA+ID4g
-c28gdGhhdA0KPiA+ID4gPiA+ID4gdGhlcmUgaXMgYSBub3RpZmljYXRpb24gdG8gdGhlIHVzZXIv
-b3duZXIgb2YgdGhlIGRhdGEgdGhhdA0KPiA+ID4gPiA+ID4gc29tZXRoaW5nIGhhcw0KPiA+ID4g
-PiA+ID4gYmVlbiBsb3N0LiBTaW5jZSBOVk0gaXMgYnl0ZSBhZGRyZXNzYWJsZSBtZW1vcnkgc2l0
-dGluZyBvbg0KPiA+ID4gPiA+ID4gdGhlIG1lbW9yeQ0KPiA+ID4gPiA+ID4gYnVzLCBzdWNoIGEg
-cG9pc29uZWQgY2FjaGUgbGluZSByZXN1bHRzIGluIG1lbW9yeSBlcnJvcnMgYW5kDQo+ID4gPiA+
-ID4gPiBTSUdCVVNlcy4NCj4gPiA+ID4gPiA+IENvbXBhcmVkIHRvIHRyYWRhdGlvbmFsIHN0b3Jh
-Z2Ugd2hlcmUgYW4gYXBwIHdpbGwgZ2V0IG5pY2UNCj4gPiA+ID4gPiA+IGFuZCBmcmllbmRseQ0K
-PiA+ID4gPiA+ID4gKHJlbGF0aXZlbHkgc3BlYWtpbmcuLikgLUVJT3MuIFRoZSB3aG9sZSBiYWRi
-bG9ja3MNCj4gPiA+ID4gPiA+IGltcGxlbWVudGF0aW9uIHdhcw0KPiA+ID4gPiA+ID4gZG9uZSBz
-byB0aGF0IHRoZSBkcml2ZXIgY2FuIGludGVyY2VwdCBJTyAoaS5lLiByZWFkcykgdG8NCj4gPiA+
-ID4gPiA+IF9rbm93bl8gYmFkDQo+ID4gPiA+ID4gPiBsb2NhdGlvbnMsIGFuZCBzaG9ydC1jaXJj
-dWl0IHRoZW0gd2l0aCBhbiBFSU8uIElmIHRoZSBkcml2ZXINCj4gPiA+ID4gPiA+IGRvZXNuJ3QN
-Cj4gPiA+ID4gPiA+IGNhdGNoIHRoZXNlLCB0aGUgcmVhZHMgd2lsbCB0dXJuIGludG8gYSBtZW1v
-cnkgYnVzIGFjY2VzcywNCj4gPiA+ID4gPiA+IGFuZCB0aGUNCj4gPiA+ID4gPiA+IHBvaXNvbiB3
-aWxsIGNhdXNlIGEgU0lHQlVTLg0KPiA+ID4gPiA+IA0KPiA+ID4gPiA+ICJkcml2ZXIiIC4uLiB5
-b3UgbWVhbiBYRlM/wqDCoE9yIGRvIHlvdSBtZWFuIHRoZSB0aGluZyB0aGF0DQo+ID4gPiA+ID4g
-bWFrZXMgcG1lbQ0KPiA+ID4gPiA+IGxvb2sga2luZCBvZiBsaWtlIGEgdHJhZGl0aW9uYWwgYmxv
-Y2sgZGV2aWNlPyA6KQ0KPiA+ID4gPiANCj4gPiA+ID4gWWVzLCB0aGUgdGhpbmcgdGhhdCBtYWtl
-cyBwbWVtIGxvb2sgbGlrZSBhIGJsb2NrIGRldmljZSA6KSAtLQ0KPiA+ID4gPiBkcml2ZXJzL252
-ZGltbS9wbWVtLmMNCj4gPiA+ID4gDQo+ID4gPiA+ID4gDQo+ID4gPiA+ID4gPiBUaGlzIGVmZm9y
-dCBpcyB0byB0cnkgYW5kIG1ha2UgdGhpcyBiYWRibG9jayBjaGVja2luZw0KPiA+ID4gPiA+ID4g
-c21hcnRlciAtIGFuZCB0cnkNCj4gPiA+ID4gPiA+IGFuZCByZWR1Y2UgdGhlIHBlbmFsdHkgb24g
-ZXZlcnkgSU8gdG8gYSBzbWFsbGVyIHJhbmdlLCB3aGljaA0KPiA+ID4gPiA+ID4gb25seSB0aGUN
-Cj4gPiA+ID4gPiA+IGZpbGVzeXN0ZW0gY2FuIGRvLg0KPiA+ID4gPiA+IA0KPiA+ID4gPiA+IFRo
-b3VnaC4uLiBub3cgdGhhdCBYRlMgbWVyZ2VkIHRoZSByZXZlcnNlIG1hcHBpbmcgc3VwcG9ydCwN
-Cj4gPiA+ID4gPiBJJ3ZlIGJlZW4NCj4gPiA+ID4gPiB3b25kZXJpbmcgaWYgdGhlcmUnbGwgYmUg
-YSByZXN1Ym1pc3Npb24gb2YgdGhlIGRldmljZSBlcnJvcnMNCj4gPiA+ID4gPiBjYWxsYmFjaz8N
-Cj4gPiA+ID4gPiBJdCBzdGlsbCB3b3VsZCBiZSB1c2VmdWwgdG8gYmUgYWJsZSB0byBpbmZvcm0g
-dGhlIHVzZXIgdGhhdA0KPiA+ID4gPiA+IHBhcnQgb2YNCj4gPiA+ID4gPiB0aGVpciBmcyBoYXMg
-Z29uZSBiYWQsIG9yLCBiZXR0ZXIgeWV0LCBpZiB0aGUgYnVmZmVyIGlzIHN0aWxsDQo+ID4gPiA+
-ID4gaW4gbWVtb3J5DQo+ID4gPiA+ID4gc29tZXBsYWNlIGVsc2UsIGp1c3Qgd3JpdGUgaXQgYmFj
-ayBvdXQuDQo+ID4gPiA+ID4gDQo+ID4gPiA+ID4gT3IgSSBzdXBwb3NlIGlmIHdlIGhhZCBzb21l
-IGtpbmQgb2YgcmFpZDEgc2V0IHVwIGJldHdlZW4NCj4gPiA+ID4gPiBtZW1vcmllcyB3ZQ0KPiA+
-ID4gPiA+IGNvdWxkIHJlYWQgb25lIG9mIHRoZSBvdGhlciBjb3BpZXMgYW5kIHJld3JpdGUgaXQg
-aW50byB0aGUNCj4gPiA+ID4gPiBmYWlsaW5nDQo+ID4gPiA+ID4gcmVnaW9uIGltbWVkaWF0ZWx5
-Lg0KPiA+ID4gPiANCj4gPiA+ID4gWWVzLCB0aGF0IGlzIGtpbmQgb2Ygd2hhdCBJIHdhcyBob3Bp
-bmcgdG8gYWNjb21wbGlzaCB2aWEgdGhpcw0KPiA+ID4gPiBkaXNjdXNzaW9uLiBIb3cgbXVjaCB3
-b3VsZCBmaWxlc3lzdGVtcyB3YW50IHRvIGJlIGludm9sdmVkIGluDQo+ID4gPiA+IHRoaXMgc29y
-dA0KPiA+ID4gPiBvZiBiYWRibG9ja3MgaGFuZGxpbmcsIGlmIGF0IGFsbC4gSSBjYW4gcmVmcmVz
-aCBteSBwYXRjaGVzIHRoYXQNCj4gPiA+ID4gcHJvdmlkZQ0KPiA+ID4gPiB0aGUgZnMgbm90aWZp
-Y2F0aW9uLCBidXQgdGhhdCdzIHRoZSBlYXN5IGJpdCwgYW5kIGEgc3RhcnRpbmcNCj4gPiA+ID4g
-cG9pbnQuDQo+ID4gPiA+IA0KPiA+ID4gDQo+ID4gPiBJIGhhdmUgc29tZSBxdWVzdGlvbnMuIFdo
-eSBtb3ZpbmcgYmFkYmxvY2sgaGFuZGxpbmcgdG8gZmlsZSBzeXN0ZW0NCj4gPiA+IGxldmVsIGF2
-b2lkIHRoZSBjaGVja2luZyBwaGFzZT8gSW4gZmlsZSBzeXN0ZW0gbGV2ZWwgZm9yIGVhY2ggSS9P
-DQo+ID4gPiBJDQo+ID4gPiBzdGlsbCBoYXZlIHRvIGNoZWNrIHRoZSBiYWRibG9jayBsaXN0LCBy
-aWdodD8gRG8geW91IG1lYW4gZHVyaW5nDQo+ID4gPiBtb3VudA0KPiA+ID4gaXQgY2FuIGdvIHRo
-cm91Z2ggdGhlIHBtZW0gZGV2aWNlIGFuZCBsb2NhdGVzIGFsbCB0aGUgZGF0YQ0KPiA+ID4gc3Ry
-dWN0dXJlcw0KPiA+ID4gbWFuZ2xlZCBieSBiYWRibG9ja3MgYW5kIGhhbmRsZSB0aGVtIGFjY29y
-ZGluZ2x5LCBzbyB0aGF0IGR1cmluZw0KPiA+ID4gbm9ybWFsIHJ1bm5pbmcgdGhlIGJhZGJsb2Nr
-cyB3aWxsIG5ldmVyIGJlIGFjY2Vzc2VkPyBPciwgaWYgdGhlcmUNCj4gPiA+IGlzDQo+ID4gPiBy
-ZXBsaWNhdGFpb24vc25hcHNob3Qgc3VwcG9ydCwgdXNlIGEgY29weSB0byByZWNvdmVyIHRoZQ0K
-PiA+ID4gYmFkYmxvY2tzPw0KPiA+IA0KPiA+IFdpdGggZXh0NCBiYWRibG9ja3MsIHRoZSBtYWlu
-IG91dGNvbWUgaXMgdGhhdCB0aGUgYmFkIGJsb2NrcyB3b3VsZA0KPiA+IGJlDQo+ID4gcGVtYW5l
-bnRseSBtYXJrZWQgaW4gdGhlIGFsbG9jYXRpb24gYml0bWFwIGFzIGJlaW5nIHVzZWQsIGFuZCB0
-aGV5DQo+ID4gd291bGQNCj4gPiBuZXZlciBiZSBhbGxvY2F0ZWQgdG8gYSBmaWxlLCBzbyB0aGV5
-IHNob3VsZCBuZXZlciBiZSBhY2Nlc3NlZA0KPiA+IHVubGVzcw0KPiA+IGRvaW5nIGEgZnVsbCBk
-ZXZpY2Ugc2NhbiAod2hpY2ggZXh0NCBhbmQgZTJmc2NrIG5ldmVyIGRvKS7CoMKgVGhhdA0KPiA+
-IHdvdWxkDQo+ID4gYXZvaWQgdGhlIG5lZWQgdG8gY2hlY2sgZXZlcnkgSS9PIGFnYWluc3QgdGhl
-IGJhZCBibG9ja3MgbGlzdCwgaWYNCj4gPiB0aGUNCj4gPiBkcml2ZXIga25vd3MgdGhhdCB0aGUg
-ZmlsZXN5c3RlbSB3aWxsIGhhbmRsZSB0aGlzLg0KPiA+IA0KPiANCj4gVGhhbmsgeW91IGZvciBl
-eHBsYW5hdGlvbi4gSG93ZXZlciB0aGlzIG9ubHkgd29ya3MgZm9yIGZyZWUgYmxvY2tzLA0KPiBy
-aWdodD8gV2hhdCBhYm91dCBhbGxvY2F0ZWQgYmxvY2tzLCBsaWtlIGZpbGUgZGF0YSBhbmQgbWV0
-YWRhdGE/DQo+IA0KTGlrZSBBbmRyZWFzIHNhaWQsIHRoZSBleHQ0IGJhZGJsb2NrcyBmZWF0dXJl
-IGhhcyBub3QgYmVlbiBpbiB1c2UsIGFuZA0KdGhlIGN1cnJlbnQgYmxvY2sgbGF5ZXIgYmFkYmxv
-Y2tzIGFyZSBkaXN0aW5jdCBhbmQgdW5yZWxhdGVkIHRvIHRoZXNlLg0KQ2FuIHRoZSBleHQ0IGJh
-ZGJsb2NrcyBpbmZyYXN0cnVjdHVyZSBiZSByZXZpdmVkIGFuZCBleHRlbmRlZCBpZiB3ZQ0KZGVj
-aWRlIHRvIGFkZCBiYWRibG9ja3MgdG8gZmlsZXN5c3RlbXM/IE1heWJlIC0gdGhhdCB3YXMgb25l
-IG9mIHRoZQ0KdG9waWNzIEkgd2FzIGhvcGluZyB0byBkaXNjdXNzL2ZpbmQgb3V0IG1vcmUgYWJv
-dXQu
+On 01/17, Lu Zhang wrote:
+> I'm curious about the fault model and corresponding hardware ECC mechanisms
+> for NVDIMMs. In my understanding for memory accesses to trigger MCE, it
+> means the memory controller finds a detectable but uncorrectable error
+> (DUE). So if there is no hardware ECC support the media errors won't even
+> be noticed, not to mention badblocks or machine checks.
+> 
+> Current hardware ECC support for DRAM usually employs (72, 64) single-bit
+> error correction mechanism, and for advanced ECCs there are techniques like
+> Chipkill or SDDC which can tolerate a single DRAM chip failure. What is the
+> expected ECC mode for NVDIMMs, assuming that PCM or 3dXpoint based
+> technology might have higher error rates?
+
+I'm sure once NVDIMMs start becoming widely available, there will be
+more information on how they do ECC..
+
+> 
+> If DUE does happen and is flagged to the file system via MCE (somehow...),
+> and the fs finds that the error corrupts its allocated data page, or
+> metadata, now if the fs wants to recover its data the intuition is that
+> there needs to be a stronger error correction mechanism to correct the
+> hardware-uncorrectable errors. So knowing the hardware ECC baseline is
+> helpful for the file system to understand how severe are the faults in
+> badblocks, and develop its recovery methods.
+
+Like mentioned before, this discussion is more about presentation of
+errors in a known consumable format, rather than recovering from errors.
+While recovering from errors is interesting, we already have layers
+like RAID for that, and they are as applicable to NVDIMM backed storage
+as they have been for disk/SSD based storage.
+
+> 
+> Regards,
+> Lu
+> 
+> On Tue, Jan 17, 2017 at 6:01 PM, Andiry Xu <andiry@gmail.com> wrote:
+> 
+> > On Tue, Jan 17, 2017 at 4:16 PM, Andreas Dilger <adilger@dilger.ca> wrote:
+> > > On Jan 17, 2017, at 3:15 PM, Andiry Xu <andiry@gmail.com> wrote:
+> > >> On Tue, Jan 17, 2017 at 1:35 PM, Vishal Verma <vishal.l.verma@intel.com>
+> > wrote:
+> > >>> On 01/16, Darrick J. Wong wrote:
+> > >>>> On Fri, Jan 13, 2017 at 05:49:10PM -0700, Vishal Verma wrote:
+> > >>>>> On 01/14, Slava Dubeyko wrote:
+> > >>>>>>
+> > >>>>>> ---- Original Message ----
+> > >>>>>> Subject: [LSF/MM TOPIC] Badblocks checking/representation in
+> > filesystems
+> > >>>>>> Sent: Jan 13, 2017 1:40 PM
+> > >>>>>> From: "Verma, Vishal L" <vishal.l.verma@intel.com>
+> > >>>>>> To: lsf-pc@lists.linux-foundation.org
+> > >>>>>> Cc: linux-nvdimm@lists.01.org, linux-block@vger.kernel.org,
+> > linux-fsdevel@vger.kernel.org
+> > >>>>>>
+> > >>>>>>> The current implementation of badblocks, where we consult the
+> > >>>>>>> badblocks list for every IO in the block driver works, and is a
+> > >>>>>>> last option failsafe, but from a user perspective, it isn't the
+> > >>>>>>> easiest interface to work with.
+> > >>>>>>
+> > >>>>>> As I remember, FAT and HFS+ specifications contain description of
+> > bad blocks
+> > >>>>>> (physical sectors) table. I believe that this table was used for
+> > the case of
+> > >>>>>> floppy media. But, finally, this table becomes to be the completely
+> > obsolete
+> > >>>>>> artefact because mostly storage devices are reliably enough. Why do
+> > you need
+> > >>>>
+> > >>>> ext4 has a badblocks inode to own all the bad spots on disk, but ISTR
+> > it
+> > >>>> doesn't support(??) extents or 64-bit filesystems, and might just be a
+> > >>>> vestigial organ at this point.  XFS doesn't have anything to track bad
+> > >>>> blocks currently....
+> > >>>>
+> > >>>>>> in exposing the bad blocks on the file system level?  Do you expect
+> > that next
+> > >>>>>> generation of NVM memory will be so unreliable that file system
+> > needs to manage
+> > >>>>>> bad blocks? What's about erasure coding schemes? Do file system
+> > really need to suffer
+> > >>>>>> from the bad block issue?
+> > >>>>>>
+> > >>>>>> Usually, we are using LBAs and it is the responsibility of storage
+> > device to map
+> > >>>>>> a bad physical block/page/sector into valid one. Do you mean that
+> > we have
+> > >>>>>> access to physical NVM memory address directly? But it looks like
+> > that we can
+> > >>>>>> have a "bad block" issue even we will access data into page cache's
+> > memory
+> > >>>>>> page (if we will use NVM memory for page cache, of course). So,
+> > what do you
+> > >>>>>> imply by "bad block" issue?
+> > >>>>>
+> > >>>>> We don't have direct physical access to the device's address space,
+> > in
+> > >>>>> the sense the device is still free to perform remapping of chunks of
+> > NVM
+> > >>>>> underneath us. The problem is that when a block or address range (as
+> > >>>>> small as a cache line) goes bad, the device maintains a poison bit
+> > for
+> > >>>>> every affected cache line. Behind the scenes, it may have already
+> > >>>>> remapped the range, but the cache line poison has to be kept so that
+> > >>>>> there is a notification to the user/owner of the data that something
+> > has
+> > >>>>> been lost. Since NVM is byte addressable memory sitting on the memory
+> > >>>>> bus, such a poisoned cache line results in memory errors and
+> > SIGBUSes.
+> > >>>>> Compared to tradational storage where an app will get nice and
+> > friendly
+> > >>>>> (relatively speaking..) -EIOs. The whole badblocks implementation was
+> > >>>>> done so that the driver can intercept IO (i.e. reads) to _known_ bad
+> > >>>>> locations, and short-circuit them with an EIO. If the driver doesn't
+> > >>>>> catch these, the reads will turn into a memory bus access, and the
+> > >>>>> poison will cause a SIGBUS.
+> > >>>>
+> > >>>> "driver" ... you mean XFS?  Or do you mean the thing that makes pmem
+> > >>>> look kind of like a traditional block device? :)
+> > >>>
+> > >>> Yes, the thing that makes pmem look like a block device :) --
+> > >>> drivers/nvdimm/pmem.c
+> > >>>
+> > >>>>
+> > >>>>> This effort is to try and make this badblock checking smarter - and
+> > try
+> > >>>>> and reduce the penalty on every IO to a smaller range, which only the
+> > >>>>> filesystem can do.
+> > >>>>
+> > >>>> Though... now that XFS merged the reverse mapping support, I've been
+> > >>>> wondering if there'll be a resubmission of the device errors callback?
+> > >>>> It still would be useful to be able to inform the user that part of
+> > >>>> their fs has gone bad, or, better yet, if the buffer is still in
+> > memory
+> > >>>> someplace else, just write it back out.
+> > >>>>
+> > >>>> Or I suppose if we had some kind of raid1 set up between memories we
+> > >>>> could read one of the other copies and rewrite it into the failing
+> > >>>> region immediately.
+> > >>>
+> > >>> Yes, that is kind of what I was hoping to accomplish via this
+> > >>> discussion. How much would filesystems want to be involved in this sort
+> > >>> of badblocks handling, if at all. I can refresh my patches that provide
+> > >>> the fs notification, but that's the easy bit, and a starting point.
+> > >>>
+> > >>
+> > >> I have some questions. Why moving badblock handling to file system
+> > >> level avoid the checking phase? In file system level for each I/O I
+> > >> still have to check the badblock list, right? Do you mean during mount
+> > >> it can go through the pmem device and locates all the data structures
+> > >> mangled by badblocks and handle them accordingly, so that during
+> > >> normal running the badblocks will never be accessed? Or, if there is
+> > >> replicataion/snapshot support, use a copy to recover the badblocks?
+> > >
+> > > With ext4 badblocks, the main outcome is that the bad blocks would be
+> > > pemanently marked in the allocation bitmap as being used, and they would
+> > > never be allocated to a file, so they should never be accessed unless
+> > > doing a full device scan (which ext4 and e2fsck never do).  That would
+> > > avoid the need to check every I/O against the bad blocks list, if the
+> > > driver knows that the filesystem will handle this.
+> > >
+> >
+> > Thank you for explanation. However this only works for free blocks,
+> > right? What about allocated blocks, like file data and metadata?
+> >
+> > Thanks,
+> > Andiry
+> >
+> > > The one caveat is that ext4 only allows 32-bit block numbers in the
+> > > badblocks list, since this feature hasn't been used in a long time.
+> > > This is good for up to 16TB filesystems, but if there was a demand to
+> > > use this feature again it would be possible allow 64-bit block numbers.
+> > >
+> > > Cheers, Andreas
+> > >
+> > >
+> > >
+> > >
+> > >
+> > _______________________________________________
+> > Linux-nvdimm mailing list
+> > Linux-nvdimm@lists.01.org
+> > https://lists.01.org/mailman/listinfo/linux-nvdimm
+> >
+> _______________________________________________
+> Linux-nvdimm mailing list
+> Linux-nvdimm@lists.01.org
+> https://lists.01.org/mailman/listinfo/linux-nvdimm
