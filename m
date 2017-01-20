@@ -1,140 +1,59 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv6 35/37] ext4: reserve larger jounral transaction for huge pages
-Date: Thu, 26 Jan 2017 14:58:17 +0300
-Message-Id: <20170126115819.58875-36-kirill.shutemov@linux.intel.com>
-In-Reply-To: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
-References: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:36650 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752504AbdATP4X (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 20 Jan 2017 10:56:23 -0500
+Date: Fri, 20 Jan 2017 10:56:18 -0500
+From: Vivek Goyal <vgoyal@redhat.com>
+To: Jeff Moyer <jmoyer@redhat.com>
+Cc: Hou Tao <houtao1@huawei.com>, dm-devel@redhat.com,
+        linux-block@vger.kernel.org, agk@redhat.com, snitzer@redhat.com,
+        ejt@redhat.com
+Subject: Re: [PATCH RFC 0/4] dm thin: support blk-throttle on data and
+ metadata device
+Message-ID: <20170120155618.GA13969@redhat.com>
+References: <1484910952-29820-1-git-send-email-houtao1@huawei.com>
+ <x49bmv192th.fsf@segfault.boston.devel.redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <x49bmv192th.fsf@segfault.boston.devel.redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-If huge pages enabled, in worst case with 2048 blocks underlying a page,
-each possibly in a different block group we have much more metadata to
-commit.
+On Fri, Jan 20, 2017 at 10:19:22AM -0500, Jeff Moyer wrote:
+> Hou Tao <houtao1@huawei.com> writes:
+> 
+> > Hi all,
+> >
+> > We need to throttle the O_DIRECT IO on data and metadata device
+> > of a dm-thin pool and encounter some problems. If we set the
+> > limitation on the root blkcg, the throttle works. If we set the
+> > limitation on a child blkcg, the throttle doesn't work well.
+> >
+> > The reason why the throttle doesn't work is that dm-thin defers
+> > the process of bio when the physical block of bio has not been
+> > allocated. The bio will be submitted by the pool worker, and the
+> > blkcg of the bio will be the blkcg of the pool worker, namely,
+> > the root blkcg instead of the blkcg of the original IO thread.
+> > We only set a limitation on the blkcg of the original IO thread,
+> > so the blk-throttle doesn't work well.
+> >
+> > In order to handle the situation, we add a "keep_bio_blkcg" feature
+> > to dm-thin. If the feature is enabled, the original blkcg of bio
+> > will be saved at thin_map() and will be used during blk-throttle.
+> 
+> Why is this even an option?  I would think that you would always want
+> this behavior.
 
-Let's update estimates accordingly.
+Agreed that this should not be an optional feature.
 
-I was not able to trigger bad situation without the patch as it's hard to
-construct very fragmented filesystem, but hopefully this change would be
-enough to address the concern.
+One thing which always bothers me is that often we have dependencies
+on finishing of these bios. So if we assign bios to their original
+cgroups and if we create a cgroup with very low limit, then its
+possible that everything slows down.
 
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
----
- fs/ext4/ext4_jbd2.h | 16 +++++++++++++---
- fs/ext4/inode.c     | 34 +++++++++++++++++++++++++++-------
- 2 files changed, 40 insertions(+), 10 deletions(-)
+I guess answer to that is its a configuration issue and don't
+create groups with too small a limits. And don't allow unprivileged
+users to specify group limits.
 
-diff --git a/fs/ext4/ext4_jbd2.h b/fs/ext4/ext4_jbd2.h
-index f97611171023..6e4e534d6e98 100644
---- a/fs/ext4/ext4_jbd2.h
-+++ b/fs/ext4/ext4_jbd2.h
-@@ -353,11 +353,21 @@ static inline int ext4_journal_restart(handle_t *handle, int nblocks)
- 	return 0;
- }
- 
-+static inline int __ext4_journal_blocks_per_page(struct inode *inode, bool thp)
-+{
-+	int bpp = 0;
-+	if (EXT4_JOURNAL(inode) != NULL) {
-+		bpp = jbd2_journal_blocks_per_page(inode);
-+		if (thp)
-+			bpp <<= HPAGE_PMD_ORDER;
-+	}
-+	return bpp;
-+}
-+
- static inline int ext4_journal_blocks_per_page(struct inode *inode)
- {
--	if (EXT4_JOURNAL(inode) != NULL)
--		return jbd2_journal_blocks_per_page(inode);
--	return 0;
-+	return __ext4_journal_blocks_per_page(inode,
-+			(inode->i_flags & S_HUGE_MODE) != S_HUGE_NEVER);
- }
- 
- static inline int ext4_journal_force_commit(journal_t *journal)
-diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
-index 5bf68bbe65ec..c30562b6e685 100644
---- a/fs/ext4/inode.c
-+++ b/fs/ext4/inode.c
-@@ -141,6 +141,7 @@ static int __ext4_journalled_writepage(struct page *page, unsigned int len);
- static int ext4_bh_delay_or_unwritten(handle_t *handle, struct buffer_head *bh);
- static int ext4_meta_trans_blocks(struct inode *inode, int lblocks,
- 				  int pextents);
-+static int __ext4_writepage_trans_blocks(struct inode *inode, int bpp);
- 
- /*
-  * Test whether an inode is a fast symlink.
-@@ -4496,6 +4497,21 @@ void ext4_set_inode_flags(struct inode *inode)
- 	    !ext4_should_journal_data(inode) && !ext4_has_inline_data(inode) &&
- 	    !ext4_encrypted_inode(inode))
- 		new_fl |= S_DAX;
-+
-+	if ((new_fl & S_HUGE_MODE) != S_HUGE_NEVER &&
-+			EXT4_JOURNAL(inode) != NULL) {
-+		int bpp = __ext4_journal_blocks_per_page(inode, true);
-+		int credits = __ext4_writepage_trans_blocks(inode, bpp);
-+
-+		if (EXT4_JOURNAL(inode)->j_max_transaction_buffers < credits) {
-+			pr_warn_once("EXT4-fs (%s): "
-+					"journal is too small for huge pages. "
-+					"Disable huge pages support.\n",
-+					inode->i_sb->s_id);
-+			new_fl &= ~S_HUGE_MODE;
-+		}
-+	}
-+
- 	inode_set_flags(inode, new_fl,
- 			S_SYNC|S_APPEND|S_IMMUTABLE|S_NOATIME|S_DIRSYNC|S_DAX);
- }
-@@ -5471,6 +5487,16 @@ static int ext4_meta_trans_blocks(struct inode *inode, int lblocks,
- 	return ret;
- }
- 
-+static int __ext4_writepage_trans_blocks(struct inode *inode, int bpp)
-+{
-+	int ret = ext4_meta_trans_blocks(inode, bpp, bpp);
-+
-+	/* Account for data blocks for journalled mode */
-+	if (ext4_should_journal_data(inode))
-+		ret += bpp;
-+	return ret;
-+}
-+
- /*
-  * Calculate the total number of credits to reserve to fit
-  * the modification of a single pages into a single transaction,
-@@ -5484,14 +5510,8 @@ static int ext4_meta_trans_blocks(struct inode *inode, int lblocks,
- int ext4_writepage_trans_blocks(struct inode *inode)
- {
- 	int bpp = ext4_journal_blocks_per_page(inode);
--	int ret;
--
--	ret = ext4_meta_trans_blocks(inode, bpp, bpp);
- 
--	/* Account for data blocks for journalled mode */
--	if (ext4_should_journal_data(inode))
--		ret += bpp;
--	return ret;
-+	return __ext4_writepage_trans_blocks(inode, bpp);
- }
- 
- /*
--- 
-2.11.0
-
+Vivek
