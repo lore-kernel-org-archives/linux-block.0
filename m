@@ -1,83 +1,115 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-Date: Fri, 20 Jan 2017 10:47:50 +0100
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:48790 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751510AbdATJYJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 20 Jan 2017 04:24:09 -0500
+Date: Fri, 20 Jan 2017 10:03:57 +0100
 From: Jan Kara <jack@suse.cz>
-To: Vishal Verma <vishal.l.verma@intel.com>
-Cc: Jan Kara <jack@suse.cz>, Andiry Xu <andiry@gmail.com>,
-        Slava Dubeyko <Vyacheslav.Dubeyko@wdc.com>,
-        "Darrick J. Wong" <darrick.wong@oracle.com>,
-        "linux-nvdimm@lists.01.org" <linux-nvdimm@ml01.01.org>,
+To: Dan Williams <dan.j.williams@intel.com>
+Cc: Vishal Verma <vishal.l.verma@intel.com>, Jan Kara <jack@suse.cz>,
+        "darrick.wong@oracle.com" <darrick.wong@oracle.com>,
+        "Vyacheslav.Dubeyko@wdc.com" <Vyacheslav.Dubeyko@wdc.com>,
+        "linux-nvdimm@ml01.01.org" <linux-nvdimm@ml01.01.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Viacheslav Dubeyko <slava@dubeyko.com>,
-        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        "slava@dubeyko.com" <slava@dubeyko.com>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
         "lsf-pc@lists.linux-foundation.org"
         <lsf-pc@lists.linux-foundation.org>
 Subject: Re: [Lsf-pc] [LSF/MM TOPIC] Badblocks checking/representation in
  filesystems
-Message-ID: <20170120094750.GE14115@quack2.suse.cz>
-References: <at1mp6pou4lenesjdgh22k4p.1484345585589@email.android.com>
- <b9rbflutjt10mb4ofherta8j.1484345610771@email.android.com>
- <SN2PR04MB2191756EABCB0E9DAA3B5328887B0@SN2PR04MB2191.namprd04.prod.outlook.com>
- <20170114004910.GA4880@omniknight.lm.intel.com>
- <20170117063355.GL14033@birch.djwong.org>
- <20170117213549.GB4880@omniknight.lm.intel.com>
- <CAOvWMLYMR-VvAVNuVjXPC-woxY6afQX5-hMC=Vj2p=3AGj9tyA@mail.gmail.com>
- <20170117223705.GD4880@omniknight.lm.intel.com>
- <20170118093801.GA24789@quack2.suse.cz>
- <20170119211719.GG4880@omniknight.lm.intel.com>
+Message-ID: <20170120090357.GD14115@quack2.suse.cz>
+References: <20170117143703.GP2517@quack2.suse.cz>
+ <20170117221421.GC4880@omniknight.lm.intel.com>
+ <20170118101641.GD24789@quack2.suse.cz>
+ <x49r3406r2i.fsf@segfault.boston.devel.redhat.com>
+ <20170118210241.GE10498@birch.djwong.org>
+ <CAPcyv4hd7bpCa7d9msX0Y8gLz7WsqXT3VExQwwLuAcsmMxVTPg@mail.gmail.com>
+ <1484776549.4358.33.camel@intel.com>
+ <20170119081011.GA2565@quack2.suse.cz>
+ <20170119185910.GF4880@omniknight.lm.intel.com>
+ <CAPcyv4jZz_iqLutd0gPEL3udqbFxvBH8CZY5oDgUjG5dGbC2gg@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170119211719.GG4880@omniknight.lm.intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <CAPcyv4jZz_iqLutd0gPEL3udqbFxvBH8CZY5oDgUjG5dGbC2gg@mail.gmail.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Thu 19-01-17 14:17:19, Vishal Verma wrote:
-> On 01/18, Jan Kara wrote:
-> > On Tue 17-01-17 15:37:05, Vishal Verma wrote:
-> > 2) PMEM is exposed for DAX aware filesystem. This seems to be what you are
-> > mostly interested in. We could possibly do something more efficient than
-> > what NVDIMM driver does however the complexity would be relatively high and
-> > frankly I'm far from convinced this is really worth it. If there are so
-> > many badblocks this would matter, the HW has IMHO bigger problems than
-> > performance.
+On Thu 19-01-17 11:03:12, Dan Williams wrote:
+> On Thu, Jan 19, 2017 at 10:59 AM, Vishal Verma <vishal.l.verma@intel.com> wrote:
+> > On 01/19, Jan Kara wrote:
+> >> On Wed 18-01-17 21:56:58, Verma, Vishal L wrote:
+> >> > On Wed, 2017-01-18 at 13:32 -0800, Dan Williams wrote:
+> >> > > On Wed, Jan 18, 2017 at 1:02 PM, Darrick J. Wong
+> >> > > <darrick.wong@oracle.com> wrote:
+> >> > > > On Wed, Jan 18, 2017 at 03:39:17PM -0500, Jeff Moyer wrote:
+> >> > > > > Jan Kara <jack@suse.cz> writes:
+> >> > > > >
+> >> > > > > > On Tue 17-01-17 15:14:21, Vishal Verma wrote:
+> >> > > > > > > Your note on the online repair does raise another tangentially
+> >> > > > > > > related
+> >> > > > > > > topic. Currently, if there are badblocks, writes via the bio
+> >> > > > > > > submission
+> >> > > > > > > path will clear the error (if the hardware is able to remap
+> >> > > > > > > the bad
+> >> > > > > > > locations). However, if the filesystem is mounted eith DAX,
+> >> > > > > > > even
+> >> > > > > > > non-mmap operations - read() and write() will go through the
+> >> > > > > > > dax paths
+> >> > > > > > > (dax_do_io()). We haven't found a good/agreeable way to
+> >> > > > > > > perform
+> >> > > > > > > error-clearing in this case. So currently, if a dax mounted
+> >> > > > > > > filesystem
+> >> > > > > > > has badblocks, the only way to clear those badblocks is to
+> >> > > > > > > mount it
+> >> > > > > > > without DAX, and overwrite/zero the bad locations. This is a
+> >> > > > > > > pretty
+> >> > > > > > > terrible user experience, and I'm hoping this can be solved in
+> >> > > > > > > a better
+> >> > > > > > > way.
+> >> > > > > >
+> >> > > > > > Please remind me, what is the problem with DAX code doing
+> >> > > > > > necessary work to
+> >> > > > > > clear the error when it gets EIO from memcpy on write?
+> >> > > > >
+> >> > > > > You won't get an MCE for a store;  only loads generate them.
+> >> > > > >
+> >> > > > > Won't fallocate FL_ZERO_RANGE clear bad blocks when mounted with
+> >> > > > > -o dax?
+> >> > > >
+> >> > > > Not necessarily; XFS usually implements this by punching out the
+> >> > > > range
+> >> > > > and then reallocating it as unwritten blocks.
+> >> > > >
+> >> > >
+> >> > > That does clear the error because the unwritten blocks are zeroed and
+> >> > > errors cleared when they become allocated again.
+> >> >
+> >> > Yes, the problem was that writes won't clear errors. zeroing through
+> >> > either hole-punch, truncate, unlinking the file should all work
+> >> > (assuming the hole-punch or truncate ranges wholly contain the
+> >> > 'badblock' sector).
+> >>
+> >> Let me repeat my question: You have mentioned that if we do IO through DAX,
+> >> writes won't clear errors and we should fall back to normal block path to
+> >> do write to clear the error. What does prevent us from directly clearing
+> >> the error from DAX path?
+> >>
+> > With DAX, all IO goes through DAX paths. There are two cases:
+> > 1. mmap and loads/stores: Obviously there is no kernel intervention
+> > here, and no badblocks handling is possible.
+> > 2. read() or write() IO: In the absence of dax, this would go through
+> > the bio submission path, through the pmem driver, and that would handle
+> > error clearing. With DAX, this goes through dax_iomap_actor, which also
+> > doesn't go through the pmem driver (it does a dax mapping, followed by
+> > essentially memcpy), and hence cannot handle badblocks.
 > 
-> Correct, and Dave was of the opinion that once at least XFS has reverse
-> mapping support (which it does now), adding badblocks information to
-> that should not be a hard lift, and should be a better solution. I
-> suppose should try to benchmark how much of a penalty the current badblock
-> checking in the NVVDIMM driver imposes. The penalty is not because there
-> may be a large number of badblocks, but just due to the fact that we
-> have to do this check for every IO, in fact, every 'bvec' in a bio.
+> Hmm, that may no longer be true after my changes to push dax flushing
+> to the driver. I.e. we could have a copy_from_iter() implementation
+> that attempts to clear errors... I'll get that series out and we can
+> discuss there.
 
-Well, letting filesystem know is certainly good from error reporting quality
-POV. I guess I'll leave it upto XFS guys to tell whether they can be more
-efficient in checking whether current IO overlaps with any of given bad
-blocks.
- 
-> > Now my question: Why do we bother with badblocks at all? In cases 1) and 2)
-> > if the platform can recover from MCE, we can just always access persistent
-> > memory using memcpy_mcsafe(), if that fails, return -EIO. Actually that
-> > seems to already happen so we just need to make sure all places handle
-> > returned errors properly (e.g. fs/dax.c does not seem to) and we are done.
-> > No need for bad blocks list at all, no slow down unless we hit a bad cell
-> > and in that case who cares about performance when the data is gone...
-> 
-> Even when we have MCE recovery, we cannot do away with the badblocks
-> list:
-> 1. My understanding is that the hardware's ability to do MCE recovery is
-> limited/best-effort, and is not guaranteed. There can be circumstances
-> that cause a "Processor Context Corrupt" state, which is unrecoverable.
-
-Well, then they have to work on improving the hardware. Because having HW
-that just sometimes gets stuck instead of reporting bad storage is simply
-not acceptable. And no matter how hard you try you cannot avoid MCEs from
-OS when accessing persistent memory so OS just has no way to avoid that
-risk.
-
-> 2. We still need to maintain a badblocks list so that we know what
-> blocks need to be cleared (via the ACPI method) on writes.
-
-Well, why cannot we just do the write, see whether we got CMCI and if yes,
-clear the error via the ACPI method?
+Yeah, that was precisely my point - doing copy_from_iter() that clears
+errors should be possible...
 
 								Honza
 -- 
