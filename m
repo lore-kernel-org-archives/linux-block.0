@@ -1,58 +1,47 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f42.google.com ([74.125.82.42]:35168 "EHLO
-        mail-wm0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933382AbdABSPP (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Jan 2017 13:15:15 -0500
-Received: by mail-wm0-f42.google.com with SMTP id a197so370096725wmd.0
-        for <linux-block@vger.kernel.org>; Mon, 02 Jan 2017 10:15:14 -0800 (PST)
-From: Paolo Valente <paolo.valente@linaro.org>
-Content-Type: text/plain; charset=us-ascii
-Subject: [LSF/MM ATTEND AND AGENDA TOPIC] request to attend the summit
-Date: Mon, 2 Jan 2017 19:14:14 +0100
-Message-Id: <771BC555-46A4-4AE1-BDD5-BFB4E3F065F0@linaro.org>
-Cc: Ulf Hansson <ulf.hansson@linaro.org>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Mark Brown <broonie@linaro.org>, linux-block@vger.kernel.org
-To: lsf-pc@lists.linux-foundation.org
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <elfring@users.sourceforge.net>
+Subject: [PATCH 4/5] cfq-iosched: Move an assignment for the variable "ret" in
+ __cfqg_set_weight_device()
+To: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+References: <e734cafa-eec0-9d5b-b368-2de496a96c80@users.sourceforge.net>
+Cc: LKML <linux-kernel@vger.kernel.org>, kernel-janitors@vger.kernel.org
+From: SF Markus Elfring <elfring@users.sourceforge.net>
+Message-ID: <66f510a1-432a-260b-2785-6274a3e263b5@users.sourceforge.net>
+Date: Sun, 22 Jan 2017 09:34:03 +0100
+MIME-Version: 1.0
+In-Reply-To: <e734cafa-eec0-9d5b-b368-2de496a96c80@users.sourceforge.net>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-Hi,
-this is to retry to request to attend the summit.  This time I'm
-trying to propose and agenda topic too.
+From: Markus Elfring <elfring@users.sourceforge.net>
+Date: Sat, 21 Jan 2017 22:26:38 +0100
 
-I would like to attend, and propose a topic, because:
-1) the project for adding (only) the BFQ I/O scheduler to blk-mq has
-entered a quite active phase: the framework prepared by Jens seems
-mostly ready and complete, and I need just a few details to complete
-the port of BFQ.
-2) the landing of BFQ into blk-mq might have possibly important
-consequences, in a way or the other.
+A local variable was set to an error code before a concrete error situation
+was detected. Thus move the corresponding assignment into an if branch
+to indicate a software failure there.
 
-So, it might be quite useful for me, and possibly for other
-developers/stakeholders interested in these changes and consequences,
-to have the opportunity to talk with each other, exactly when, or
-right after these changes happen.
+This issue was detected by using the Coccinelle software.
 
-In addition, a few months ago Greg KH and James Bottomley even
-suggested to postpone to this summit, or Vault, the KS discussion that
-I proposed on the unsolved latency problems for which BFQ has been
-devised.  So, my topic proposal would be exactly this:
-"Unsolved latency problems, related to I/O, in Linux: consequences on
-lsb-compliant and Android systems, solutions proposed so far, possible
-next solutions".
+Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+---
+ block/cfq-iosched.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-If needed, I can provide more details on this topic.
-
-As for the expertise that I may bring, I'm somehow expert in:
-guaranteeing a good system and application responsiveness (a low lag
-in typical Android terminology), providing strong low-latency
-guarantees to video/audio playing/streaming applications, guaranteeing
-a fair share of the bandwidth, and not just the time, of I/O
-resources.
-
-I would like to submit a talk proposal to Vault too.
-
-Thanks,
-Paolo
+diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
+index c73a6fcaeb9d..454297fe8fd6 100644
+--- a/block/cfq-iosched.c
++++ b/block/cfq-iosched.c
+@@ -1788,9 +1788,10 @@ static ssize_t __cfqg_set_weight_device(struct kernfs_open_file *of,
+ 
+ 	if (sscanf(ctx.body, "%llu", &v) == 1) {
+ 		/* require "default" on dfl */
+-		ret = -ERANGE;
+-		if (!v && on_dfl)
++		if (!v && on_dfl) {
++			ret = -ERANGE;
+ 			goto out_finish;
++		}
+ 	} else if (!strcmp(strim(ctx.body), "default")) {
+ 		v = 0;
+ 	} else {
+-- 
+2.11.0
