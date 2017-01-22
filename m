@@ -1,39 +1,47 @@
-Return-Path: <jthumshirn@suse.de>
-Date: Mon, 23 Jan 2017 10:16:10 +0100
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: SF Markus Elfring <elfring@users.sourceforge.net>
-Cc: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-	LKML <linux-kernel@vger.kernel.org>,
-	kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH 2/5] blk-throttle: Move an assignment for the variable
- "ret" in tg_set_conf()
-Message-ID: <20170123091610.GB3517@linux-x5ow.site>
+Return-Path: <elfring@users.sourceforge.net>
+Subject: [PATCH 2/5] blk-throttle: Move an assignment for the variable "ret"
+ in tg_set_conf()
+To: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
 References: <e734cafa-eec0-9d5b-b368-2de496a96c80@users.sourceforge.net>
- <d20da6bc-b84a-3b2c-614c-68ace67db7e0@users.sourceforge.net>
+Cc: LKML <linux-kernel@vger.kernel.org>, kernel-janitors@vger.kernel.org
+From: SF Markus Elfring <elfring@users.sourceforge.net>
+Message-ID: <d20da6bc-b84a-3b2c-614c-68ace67db7e0@users.sourceforge.net>
+Date: Sun, 22 Jan 2017 09:32:19 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <d20da6bc-b84a-3b2c-614c-68ace67db7e0@users.sourceforge.net>
+In-Reply-To: <e734cafa-eec0-9d5b-b368-2de496a96c80@users.sourceforge.net>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On Sun, Jan 22, 2017 at 09:32:19AM +0100, SF Markus Elfring wrote:
-> From: Markus Elfring <elfring@users.sourceforge.net>
-> Date: Sat, 21 Jan 2017 21:40:38 +0100
-> 
-> A local variable was set to an error code before a concrete error situation
-> was detected. Thus move the corresponding assignment into an if branch
-> to indicate a software failure there.
-> 
-> This issue was detected by using the Coccinelle software.
-> 
-> Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
-> ---
+From: Markus Elfring <elfring@users.sourceforge.net>
+Date: Sat, 21 Jan 2017 21:40:38 +0100
 
-See my answer to the last patch.
+A local variable was set to an error code before a concrete error situation
+was detected. Thus move the corresponding assignment into an if branch
+to indicate a software failure there.
 
+This issue was detected by using the Coccinelle software.
+
+Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+---
+ block/blk-throttle.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index 51d112deb02e..b392b48310ba 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -1191,9 +1191,10 @@ static ssize_t tg_set_conf(struct kernfs_open_file *of,
+ 	if (ret)
+ 		return ret;
+ 
+-	ret = -EINVAL;
+-	if (sscanf(ctx.body, "%llu", &v) != 1)
++	if (sscanf(ctx.body, "%llu", &v) != 1) {
++		ret = -EINVAL;
+ 		goto out_finish;
++	}
+ 	if (!v)
+ 		v = -1;
+ 
 -- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: Felix Imend�rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N�rnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+2.11.0
