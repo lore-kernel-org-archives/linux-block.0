@@ -1,44 +1,155 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:52344 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750783AbdAXLI2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Jan 2017 06:08:28 -0500
-Subject: Re: [PATCH 12/16] scsi: remove __scsi_alloc_queue
-To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@fb.com>
-References: <1485185361-29786-1-git-send-email-hch@lst.de>
- <1485185361-29786-13-git-send-email-hch@lst.de>
+Received: from bombadil.infradead.org ([65.50.211.133]:56572 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750941AbdAWPaC (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 23 Jan 2017 10:30:02 -0500
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@fb.com>
 Cc: Mike Snitzer <snitzer@redhat.com>, linux-block@vger.kernel.org,
         linux-scsi@vger.kernel.org, dm-devel@redhat.com
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <05d9c12c-6899-ea99-2781-6fc7ecf5528a@suse.de>
-Date: Tue, 24 Jan 2017 12:08:25 +0100
-MIME-Version: 1.0
-In-Reply-To: <1485185361-29786-13-git-send-email-hch@lst.de>
-Content-Type: text/plain; charset=windows-1252
+Subject: [PATCH 12/16] scsi: remove __scsi_alloc_queue
+Date: Mon, 23 Jan 2017 16:29:17 +0100
+Message-Id: <1485185361-29786-13-git-send-email-hch@lst.de>
+In-Reply-To: <1485185361-29786-1-git-send-email-hch@lst.de>
+References: <1485185361-29786-1-git-send-email-hch@lst.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 01/23/2017 04:29 PM, Christoph Hellwig wrote:
-> Instead do an internal export of __scsi_init_queue for the transport
-> classes that export BSG nodes.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  drivers/scsi/scsi_lib.c             | 19 ++++---------------
->  drivers/scsi/scsi_transport_fc.c    |  6 ++++--
->  drivers/scsi/scsi_transport_iscsi.c |  3 ++-
->  include/scsi/scsi_host.h            |  2 --
->  include/scsi/scsi_transport.h       |  2 ++
->  5 files changed, 12 insertions(+), 20 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+Instead do an internal export of __scsi_init_queue for the transport
+classes that export BSG nodes.
 
-Cheers,
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/scsi/scsi_lib.c             | 19 ++++---------------
+ drivers/scsi/scsi_transport_fc.c    |  6 ++++--
+ drivers/scsi/scsi_transport_iscsi.c |  3 ++-
+ include/scsi/scsi_host.h            |  2 --
+ include/scsi/scsi_transport.h       |  2 ++
+ 5 files changed, 12 insertions(+), 20 deletions(-)
 
-Hannes
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index 3d6b364..7950516 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -2082,7 +2082,7 @@ static u64 scsi_calculate_bounce_limit(struct Scsi_Host *shost)
+ 	return bounce_limit;
+ }
+ 
+-static void __scsi_init_queue(struct Scsi_Host *shost, struct request_queue *q)
++void __scsi_init_queue(struct Scsi_Host *shost, struct request_queue *q)
+ {
+ 	struct device *dev = shost->dma_dev;
+ 
+@@ -2117,28 +2117,17 @@ static void __scsi_init_queue(struct Scsi_Host *shost, struct request_queue *q)
+ 	 */
+ 	blk_queue_dma_alignment(q, 0x03);
+ }
+-
+-struct request_queue *__scsi_alloc_queue(struct Scsi_Host *shost,
+-					 request_fn_proc *request_fn)
+-{
+-	struct request_queue *q;
+-
+-	q = blk_init_queue(request_fn, NULL);
+-	if (!q)
+-		return NULL;
+-	__scsi_init_queue(shost, q);
+-	return q;
+-}
+-EXPORT_SYMBOL(__scsi_alloc_queue);
++EXPORT_SYMBOL_GPL(__scsi_init_queue);
+ 
+ struct request_queue *scsi_alloc_queue(struct scsi_device *sdev)
+ {
+ 	struct request_queue *q;
+ 
+-	q = __scsi_alloc_queue(sdev->host, scsi_request_fn);
++	q = blk_init_queue(scsi_request_fn, NULL);
+ 	if (!q)
+ 		return NULL;
+ 
++	__scsi_init_queue(sdev->host, q);
+ 	blk_queue_prep_rq(q, scsi_prep_fn);
+ 	blk_queue_unprep_rq(q, scsi_unprep_fn);
+ 	blk_queue_softirq_done(q, scsi_softirq_done);
+diff --git a/drivers/scsi/scsi_transport_fc.c b/drivers/scsi/scsi_transport_fc.c
+index 03577bd..afcedec 100644
+--- a/drivers/scsi/scsi_transport_fc.c
++++ b/drivers/scsi/scsi_transport_fc.c
+@@ -3776,7 +3776,7 @@ fc_bsg_hostadd(struct Scsi_Host *shost, struct fc_host_attrs *fc_host)
+ 	snprintf(bsg_name, sizeof(bsg_name),
+ 		 "fc_host%d", shost->host_no);
+ 
+-	q = __scsi_alloc_queue(shost, bsg_request_fn);
++	q = blk_init_queue(bsg_request_fn, NULL);
+ 	if (!q) {
+ 		dev_err(dev,
+ 			"fc_host%d: bsg interface failed to initialize - no request queue\n",
+@@ -3784,6 +3784,7 @@ fc_bsg_hostadd(struct Scsi_Host *shost, struct fc_host_attrs *fc_host)
+ 		return -ENOMEM;
+ 	}
+ 
++	__scsi_init_queue(shost, q);
+ 	err = bsg_setup_queue(dev, q, bsg_name, fc_bsg_dispatch,
+ 				 i->f->dd_bsg_size);
+ 	if (err) {
+@@ -3831,12 +3832,13 @@ fc_bsg_rportadd(struct Scsi_Host *shost, struct fc_rport *rport)
+ 	if (!i->f->bsg_request)
+ 		return -ENOTSUPP;
+ 
+-	q = __scsi_alloc_queue(shost, bsg_request_fn);
++	q = blk_init_queue(bsg_request_fn, NULL);
+ 	if (!q) {
+ 		dev_err(dev, "bsg interface failed to initialize - no request queue\n");
+ 		return -ENOMEM;
+ 	}
+ 
++	__scsi_init_queue(shost, q);
+ 	err = bsg_setup_queue(dev, q, NULL, fc_bsg_dispatch, i->f->dd_bsg_size);
+ 	if (err) {
+ 		dev_err(dev, "failed to setup bsg queue\n");
+diff --git a/drivers/scsi/scsi_transport_iscsi.c b/drivers/scsi/scsi_transport_iscsi.c
+index 42bca61..04ebe6e 100644
+--- a/drivers/scsi/scsi_transport_iscsi.c
++++ b/drivers/scsi/scsi_transport_iscsi.c
+@@ -1544,10 +1544,11 @@ iscsi_bsg_host_add(struct Scsi_Host *shost, struct iscsi_cls_host *ihost)
+ 
+ 	snprintf(bsg_name, sizeof(bsg_name), "iscsi_host%d", shost->host_no);
+ 
+-	q = __scsi_alloc_queue(shost, bsg_request_fn);
++	q = blk_init_queue(bsg_request_fn, NULL);
+ 	if (!q)
+ 		return -ENOMEM;
+ 
++	__scsi_init_queue(shost, q);
+ 	ret = bsg_setup_queue(dev, q, bsg_name, iscsi_bsg_host_dispatch, 0);
+ 	if (ret) {
+ 		shost_printk(KERN_ERR, shost, "bsg interface failed to "
+diff --git a/include/scsi/scsi_host.h b/include/scsi/scsi_host.h
+index 36680f1..f4964d7 100644
+--- a/include/scsi/scsi_host.h
++++ b/include/scsi/scsi_host.h
+@@ -826,8 +826,6 @@ extern void scsi_block_requests(struct Scsi_Host *);
+ 
+ struct class_container;
+ 
+-extern struct request_queue *__scsi_alloc_queue(struct Scsi_Host *shost,
+-						void (*) (struct request_queue *));
+ /*
+  * These two functions are used to allocate and free a pseudo device
+  * which will connect to the host adapter itself rather than any
+diff --git a/include/scsi/scsi_transport.h b/include/scsi/scsi_transport.h
+index 8129239..b6e07b5 100644
+--- a/include/scsi/scsi_transport.h
++++ b/include/scsi/scsi_transport.h
+@@ -119,4 +119,6 @@ scsi_transport_device_data(struct scsi_device *sdev)
+ 		+ shost->transportt->device_private_offset;
+ }
+ 
++void __scsi_init_queue(struct Scsi_Host *shost, struct request_queue *q);
++
+ #endif /* SCSI_TRANSPORT_H */
 -- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: F. Imend�rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG N�rnberg)
+2.1.4
+
