@@ -1,45 +1,142 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:60102 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750705AbdAXHhU (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Jan 2017 02:37:20 -0500
-Subject: Re: [PATCH 02/16] block: simplify blk_init_allocated_queue
-To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@fb.com>
-References: <1485185361-29786-1-git-send-email-hch@lst.de>
- <1485185361-29786-3-git-send-email-hch@lst.de>
+Received: from bombadil.infradead.org ([65.50.211.133]:56432 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750732AbdAWP3d (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 23 Jan 2017 10:29:33 -0500
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@fb.com>
 Cc: Mike Snitzer <snitzer@redhat.com>, linux-block@vger.kernel.org,
         linux-scsi@vger.kernel.org, dm-devel@redhat.com
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <cb49deea-e15f-aaca-60ef-7a642532c2e9@suse.de>
-Date: Tue, 24 Jan 2017 08:37:16 +0100
-MIME-Version: 1.0
-In-Reply-To: <1485185361-29786-3-git-send-email-hch@lst.de>
-Content-Type: text/plain; charset=windows-1252
+Subject: [PATCH 02/16] block: simplify blk_init_allocated_queue
+Date: Mon, 23 Jan 2017 16:29:07 +0100
+Message-Id: <1485185361-29786-3-git-send-email-hch@lst.de>
+In-Reply-To: <1485185361-29786-1-git-send-email-hch@lst.de>
+References: <1485185361-29786-1-git-send-email-hch@lst.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 01/23/2017 04:29 PM, Christoph Hellwig wrote:
-> Return an errno value instead of the passed in queue so that the callers
-> don't have to keep track of two queues, and move the assignment of the
-> request_fn and lock to the caller as passing them as argument doesn't
-> simplify anything.  While we're at it also remove two pointless NULL
-> assignments, given that the request structure is zeroed on allocation.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  block/blk-core.c       | 38 +++++++++++++++-----------------------
->  drivers/md/dm-rq.c     |  3 ++-
->  include/linux/blkdev.h |  3 +--
->  3 files changed, 18 insertions(+), 26 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+Return an errno value instead of the passed in queue so that the callers
+don't have to keep track of two queues, and move the assignment of the
+request_fn and lock to the caller as passing them as argument doesn't
+simplify anything.  While we're at it also remove two pointless NULL
+assignments, given that the request structure is zeroed on allocation.
 
-Cheers,
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ block/blk-core.c       | 38 +++++++++++++++-----------------------
+ drivers/md/dm-rq.c     |  3 ++-
+ include/linux/blkdev.h |  3 +--
+ 3 files changed, 18 insertions(+), 26 deletions(-)
 
-Hannes
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 732b719..d2c2fc9 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -823,15 +823,19 @@ EXPORT_SYMBOL(blk_init_queue);
+ struct request_queue *
+ blk_init_queue_node(request_fn_proc *rfn, spinlock_t *lock, int node_id)
+ {
+-	struct request_queue *uninit_q, *q;
++	struct request_queue *q;
+ 
+-	uninit_q = blk_alloc_queue_node(GFP_KERNEL, node_id);
+-	if (!uninit_q)
++	q = blk_alloc_queue_node(GFP_KERNEL, node_id);
++	if (!q)
+ 		return NULL;
+ 
+-	q = blk_init_allocated_queue(uninit_q, rfn, lock);
+-	if (!q)
+-		blk_cleanup_queue(uninit_q);
++	q->request_fn = rfn;
++	if (lock)
++		q->queue_lock = lock;
++	if (blk_init_allocated_queue(q) < 0) {
++		blk_cleanup_queue(q);
++		return NULL;
++	}
+ 
+ 	return q;
+ }
+@@ -839,30 +843,19 @@ EXPORT_SYMBOL(blk_init_queue_node);
+ 
+ static blk_qc_t blk_queue_bio(struct request_queue *q, struct bio *bio);
+ 
+-struct request_queue *
+-blk_init_allocated_queue(struct request_queue *q, request_fn_proc *rfn,
+-			 spinlock_t *lock)
+-{
+-	if (!q)
+-		return NULL;
+ 
++int blk_init_allocated_queue(struct request_queue *q)
++{
+ 	q->fq = blk_alloc_flush_queue(q, NUMA_NO_NODE, 0);
+ 	if (!q->fq)
+-		return NULL;
++		return -ENOMEM;
+ 
+ 	if (blk_init_rl(&q->root_rl, q, GFP_KERNEL))
+ 		goto fail;
+ 
+ 	INIT_WORK(&q->timeout_work, blk_timeout_work);
+-	q->request_fn		= rfn;
+-	q->prep_rq_fn		= NULL;
+-	q->unprep_rq_fn		= NULL;
+ 	q->queue_flags		|= QUEUE_FLAG_DEFAULT;
+ 
+-	/* Override internal queue lock with supplied lock pointer */
+-	if (lock)
+-		q->queue_lock		= lock;
+-
+ 	/*
+ 	 * This also sets hw/phys segments, boundary and size
+ 	 */
+@@ -880,13 +873,12 @@ blk_init_allocated_queue(struct request_queue *q, request_fn_proc *rfn,
+ 	}
+ 
+ 	mutex_unlock(&q->sysfs_lock);
+-
+-	return q;
++	return 0;
+ 
+ fail:
+ 	blk_free_flush_queue(q->fq);
+ 	wbt_exit(q);
+-	return NULL;
++	return -ENOMEM;
+ }
+ EXPORT_SYMBOL(blk_init_allocated_queue);
+ 
+diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
+index 9d7275f..93f6e9f 100644
+--- a/drivers/md/dm-rq.c
++++ b/drivers/md/dm-rq.c
+@@ -823,7 +823,8 @@ static void dm_old_request_fn(struct request_queue *q)
+ int dm_old_init_request_queue(struct mapped_device *md)
+ {
+ 	/* Fully initialize the queue */
+-	if (!blk_init_allocated_queue(md->queue, dm_old_request_fn, NULL))
++	md->queue->request_fn = dm_old_request_fn;
++	if (blk_init_allocated_queue(md->queue) < 0)
+ 		return -EINVAL;
+ 
+ 	/* disable dm_old_request_fn's merge heuristic by default */
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 8e0b57e..a036c4a 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1131,8 +1131,7 @@ extern void blk_unprep_request(struct request *);
+ extern struct request_queue *blk_init_queue_node(request_fn_proc *rfn,
+ 					spinlock_t *lock, int node_id);
+ extern struct request_queue *blk_init_queue(request_fn_proc *, spinlock_t *);
+-extern struct request_queue *blk_init_allocated_queue(struct request_queue *,
+-						      request_fn_proc *, spinlock_t *);
++extern int blk_init_allocated_queue(struct request_queue *);
+ extern void blk_cleanup_queue(struct request_queue *);
+ extern void blk_queue_make_request(struct request_queue *, make_request_fn *);
+ extern void blk_queue_bounce_limit(struct request_queue *, u64);
 -- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: F. Imend�rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG N�rnberg)
+2.1.4
+
