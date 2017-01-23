@@ -1,41 +1,76 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:52178 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750817AbdAXLHl (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Jan 2017 06:07:41 -0500
-Subject: Re: [PATCH 11/16] scsi: remove scsi_cmd_dma_pool
-To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@fb.com>
-References: <1485185361-29786-1-git-send-email-hch@lst.de>
- <1485185361-29786-12-git-send-email-hch@lst.de>
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@fb.com>
 Cc: Mike Snitzer <snitzer@redhat.com>, linux-block@vger.kernel.org,
         linux-scsi@vger.kernel.org, dm-devel@redhat.com
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <73912b32-14a4-07ca-8144-5cb46f9d3149@suse.de>
-Date: Tue, 24 Jan 2017 12:07:28 +0100
-MIME-Version: 1.0
-In-Reply-To: <1485185361-29786-12-git-send-email-hch@lst.de>
-Content-Type: text/plain; charset=windows-1252
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Subject: [PATCH 11/16] scsi: remove scsi_cmd_dma_pool
+Date: Mon, 23 Jan 2017 16:29:16 +0100
+Message-Id: <1485185361-29786-12-git-send-email-hch@lst.de>
+In-Reply-To: <1485185361-29786-1-git-send-email-hch@lst.de>
+References: <1485185361-29786-1-git-send-email-hch@lst.de>
+Sender: linux-scsi-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-On 01/23/2017 04:29 PM, Christoph Hellwig wrote:
-> There is no need for GFP_DMA allocations of the scsi_cmnd structures
-> themselves, all that might be DMAed to or from is the actual payload,
-> or the sense buffers.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  drivers/scsi/scsi.c | 15 +--------------
->  1 file changed, 1 insertion(+), 14 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+There is no need for GFP_DMA allocations of the scsi_cmnd structures
+themselves, all that might be DMAed to or from is the actual payload,
+or the sense buffers.
 
-Cheers,
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/scsi/scsi.c | 15 +--------------
+ 1 file changed, 1 insertion(+), 14 deletions(-)
 
-Hannes
+diff --git a/drivers/scsi/scsi.c b/drivers/scsi/scsi.c
+index 469aa0f..2e24f31 100644
+--- a/drivers/scsi/scsi.c
++++ b/drivers/scsi/scsi.c
+@@ -102,17 +102,10 @@ struct scsi_host_cmd_pool {
+ 	struct kmem_cache	*cmd_slab;
+ 	unsigned int		users;
+ 	char			*cmd_name;
+-	unsigned int		slab_flags;
+ };
+ 
+ static struct scsi_host_cmd_pool scsi_cmd_pool = {
+ 	.cmd_name	= "scsi_cmd_cache",
+-	.slab_flags	= SLAB_HWCACHE_ALIGN,
+-};
+-
+-static struct scsi_host_cmd_pool scsi_cmd_dma_pool = {
+-	.cmd_name	= "scsi_cmd_cache(DMA)",
+-	.slab_flags	= SLAB_HWCACHE_ALIGN|SLAB_CACHE_DMA,
+ };
+ 
+ static DEFINE_MUTEX(host_cmd_pool_mutex);
+@@ -290,8 +283,6 @@ scsi_find_host_cmd_pool(struct Scsi_Host *shost)
+ {
+ 	if (shost->hostt->cmd_size)
+ 		return shost->hostt->cmd_pool;
+-	if (shost->unchecked_isa_dma)
+-		return &scsi_cmd_dma_pool;
+ 	return &scsi_cmd_pool;
+ }
+ 
+@@ -318,10 +309,6 @@ scsi_alloc_host_cmd_pool(struct Scsi_Host *shost)
+ 		return NULL;
+ 	}
+ 
+-	pool->slab_flags = SLAB_HWCACHE_ALIGN;
+-	if (shost->unchecked_isa_dma)
+-		pool->slab_flags |= SLAB_CACHE_DMA;
+-
+ 	if (hostt->cmd_size)
+ 		hostt->cmd_pool = pool;
+ 
+@@ -349,7 +336,7 @@ scsi_get_host_cmd_pool(struct Scsi_Host *shost)
+ 
+ 	if (!pool->users) {
+ 		pool->cmd_slab = kmem_cache_create(pool->cmd_name, cmd_size, 0,
+-						   pool->slab_flags, NULL);
++						   SLAB_HWCACHE_ALIGN, NULL);
+ 		if (!pool->cmd_slab)
+ 			goto out_free_pool;
+ 	}
 -- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: F. Imend�rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG N�rnberg)
+2.1.4
+
