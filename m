@@ -1,193 +1,363 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:57359 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1761548AbdAKVkP (ORCPT
+Received: from bombadil.infradead.org ([65.50.211.133]:56488 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751035AbdAWP3n (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Jan 2017 16:40:15 -0500
-From: Jens Axboe <axboe@fb.com>
-To: <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>
-CC: <osandov@osandov.com>, <bart.vanassche@sandisk.com>,
-        Jens Axboe <axboe@fb.com>
-Subject: [PATCH 05/10] blk-mq: export some helpers we need to the scheduling framework
-Date: Wed, 11 Jan 2017 14:39:58 -0700
-Message-ID: <1484170803-9311-6-git-send-email-axboe@fb.com>
-In-Reply-To: <1484170803-9311-1-git-send-email-axboe@fb.com>
-References: <1484170803-9311-1-git-send-email-axboe@fb.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+        Mon, 23 Jan 2017 10:29:43 -0500
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@fb.com>
+Cc: Mike Snitzer <snitzer@redhat.com>, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org, dm-devel@redhat.com,
+        Hannes Reinecke <hare@suse.de>, Hannes Reinecke <hare@suse.com>
+Subject: [PATCH 06/16] scsi_dh_rdac: switch to scsi_execute_req_flags()
+Date: Mon, 23 Jan 2017 16:29:11 +0100
+Message-Id: <1485185361-29786-7-git-send-email-hch@lst.de>
+In-Reply-To: <1485185361-29786-1-git-send-email-hch@lst.de>
+References: <1485185361-29786-1-git-send-email-hch@lst.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Signed-off-by: Jens Axboe <axboe@fb.com>
----
- block/blk-mq.c | 39 +++++++++++++++++++++------------------
- block/blk-mq.h | 25 +++++++++++++++++++++++++
- 2 files changed, 46 insertions(+), 18 deletions(-)
+From: Hannes Reinecke <hare@suse.de>
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index f49f6325b332..9fc521755e22 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -167,8 +167,8 @@ bool blk_mq_can_queue(struct blk_mq_hw_ctx *hctx)
- }
- EXPORT_SYMBOL(blk_mq_can_queue);
+Switch to scsi_execute_req_flags() and scsi_get_vpd_page() instead of
+open-coding it.  Using scsi_execute_req_flags() will set REQ_QUIET and
+REQ_PREEMPT, but this is okay as we're evaluating the errors anyway and
+should be able to send the command even if the device is quiesced.
+
+Signed-off-by: Hannes Reinecke <hare@suse.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/scsi/device_handler/scsi_dh_rdac.c | 174 +++++++++--------------------
+ 1 file changed, 51 insertions(+), 123 deletions(-)
+
+diff --git a/drivers/scsi/device_handler/scsi_dh_rdac.c b/drivers/scsi/device_handler/scsi_dh_rdac.c
+index 00d9c32..b64eaae 100644
+--- a/drivers/scsi/device_handler/scsi_dh_rdac.c
++++ b/drivers/scsi/device_handler/scsi_dh_rdac.c
+@@ -205,7 +205,6 @@ struct rdac_dh_data {
+ #define RDAC_NON_PREFERRED	1
+ 	char			preferred;
  
--static void blk_mq_rq_ctx_init(struct request_queue *q, struct blk_mq_ctx *ctx,
--			       struct request *rq, unsigned int op)
-+void blk_mq_rq_ctx_init(struct request_queue *q, struct blk_mq_ctx *ctx,
-+			struct request *rq, unsigned int op)
+-	unsigned char		sense[SCSI_SENSE_BUFFERSIZE];
+ 	union			{
+ 		struct c2_inquiry c2;
+ 		struct c4_inquiry c4;
+@@ -262,40 +261,12 @@ do { \
+ 		sdev_printk(KERN_INFO, sdev, RDAC_NAME ": " f "\n", ## arg); \
+ } while (0);
+ 
+-static struct request *get_rdac_req(struct scsi_device *sdev,
+-			void *buffer, unsigned buflen, int rw)
++static unsigned int rdac_failover_get(struct rdac_controller *ctlr,
++				      struct list_head *list,
++				      unsigned char *cdb)
  {
- 	INIT_LIST_HEAD(&rq->queuelist);
- 	/* csd/requeue_work/fifo_time is initialized before use */
-@@ -213,9 +213,10 @@ static void blk_mq_rq_ctx_init(struct request_queue *q, struct blk_mq_ctx *ctx,
+-	struct request *rq;
+-	struct request_queue *q = sdev->request_queue;
+-
+-	rq = blk_get_request(q, rw, GFP_NOIO);
+-
+-	if (IS_ERR(rq)) {
+-		sdev_printk(KERN_INFO, sdev,
+-				"get_rdac_req: blk_get_request failed.\n");
+-		return NULL;
+-	}
+-	blk_rq_set_block_pc(rq);
+-
+-	if (buflen && blk_rq_map_kern(q, rq, buffer, buflen, GFP_NOIO)) {
+-		blk_put_request(rq);
+-		sdev_printk(KERN_INFO, sdev,
+-				"get_rdac_req: blk_rq_map_kern failed.\n");
+-		return NULL;
+-	}
+-
+-	rq->cmd_flags |= REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT |
+-			 REQ_FAILFAST_DRIVER;
+-	rq->retries = RDAC_RETRIES;
+-	rq->timeout = RDAC_TIMEOUT;
+-
+-	return rq;
+-}
+-
+-static struct request *rdac_failover_get(struct scsi_device *sdev,
+-			struct rdac_dh_data *h, struct list_head *list)
+-{
+-	struct request *rq;
++	struct scsi_device *sdev = ctlr->ms_sdev;
++	struct rdac_dh_data *h = sdev->handler_data;
+ 	struct rdac_mode_common *common;
+ 	unsigned data_size;
+ 	struct rdac_queue_data *qdata;
+@@ -332,27 +303,17 @@ static struct request *rdac_failover_get(struct scsi_device *sdev,
+ 		lun_table[qdata->h->lun] = 0x81;
+ 	}
  
- 	ctx->rq_dispatched[op_is_sync(op)]++;
- }
-+EXPORT_SYMBOL_GPL(blk_mq_rq_ctx_init);
+-	/* get request for block layer packet command */
+-	rq = get_rdac_req(sdev, &h->ctlr->mode_select, data_size, WRITE);
+-	if (!rq)
+-		return NULL;
+-
+ 	/* Prepare the command. */
+ 	if (h->ctlr->use_ms10) {
+-		rq->cmd[0] = MODE_SELECT_10;
+-		rq->cmd[7] = data_size >> 8;
+-		rq->cmd[8] = data_size & 0xff;
++		cdb[0] = MODE_SELECT_10;
++		cdb[7] = data_size >> 8;
++		cdb[8] = data_size & 0xff;
+ 	} else {
+-		rq->cmd[0] = MODE_SELECT;
+-		rq->cmd[4] = data_size;
++		cdb[0] = MODE_SELECT;
++		cdb[4] = data_size;
+ 	}
+-	rq->cmd_len = COMMAND_SIZE(rq->cmd[0]);
+-
+-	rq->sense = h->sense;
+-	memset(rq->sense, 0, SCSI_SENSE_BUFFERSIZE);
+-	rq->sense_len = 0;
  
--static struct request *
--__blk_mq_alloc_request(struct blk_mq_alloc_data *data, unsigned int op)
-+struct request *__blk_mq_alloc_request(struct blk_mq_alloc_data *data,
-+				       unsigned int op)
- {
- 	struct request *rq;
- 	unsigned int tag;
-@@ -236,6 +237,7 @@ __blk_mq_alloc_request(struct blk_mq_alloc_data *data, unsigned int op)
- 
- 	return NULL;
- }
-+EXPORT_SYMBOL_GPL(__blk_mq_alloc_request);
- 
- struct request *blk_mq_alloc_request(struct request_queue *q, int rw,
- 		unsigned int flags)
-@@ -319,8 +321,8 @@ struct request *blk_mq_alloc_request_hctx(struct request_queue *q, int rw,
- }
- EXPORT_SYMBOL_GPL(blk_mq_alloc_request_hctx);
- 
--static void __blk_mq_free_request(struct blk_mq_hw_ctx *hctx,
--				  struct blk_mq_ctx *ctx, struct request *rq)
-+void __blk_mq_free_request(struct blk_mq_hw_ctx *hctx, struct blk_mq_ctx *ctx,
-+			   struct request *rq)
- {
- 	const int tag = rq->tag;
- 	struct request_queue *q = rq->q;
-@@ -802,7 +804,7 @@ static bool flush_busy_ctx(struct sbitmap *sb, unsigned int bitnr, void *data)
-  * Process software queues that have been marked busy, splicing them
-  * to the for-dispatch
-  */
--static void flush_busy_ctxs(struct blk_mq_hw_ctx *hctx, struct list_head *list)
-+void blk_mq_flush_busy_ctxs(struct blk_mq_hw_ctx *hctx, struct list_head *list)
- {
- 	struct flush_busy_ctx_data data = {
- 		.hctx = hctx,
-@@ -811,6 +813,7 @@ static void flush_busy_ctxs(struct blk_mq_hw_ctx *hctx, struct list_head *list)
- 
- 	sbitmap_for_each_set(&hctx->ctx_map, flush_busy_ctx, &data);
- }
-+EXPORT_SYMBOL_GPL(blk_mq_flush_busy_ctxs);
- 
- static inline unsigned int queued_to_index(unsigned int queued)
- {
-@@ -921,7 +924,7 @@ static void blk_mq_process_rq_list(struct blk_mq_hw_ctx *hctx)
- 	/*
- 	 * Touch any software queue that has pending entries.
- 	 */
--	flush_busy_ctxs(hctx, &rq_list);
-+	blk_mq_flush_busy_ctxs(hctx, &rq_list);
- 
- 	/*
- 	 * If we have previous entries on our dispatch list, grab them
-@@ -1135,8 +1138,8 @@ static inline void __blk_mq_insert_req_list(struct blk_mq_hw_ctx *hctx,
- 		list_add_tail(&rq->queuelist, &ctx->rq_list);
- }
- 
--static void __blk_mq_insert_request(struct blk_mq_hw_ctx *hctx,
--				    struct request *rq, bool at_head)
-+void __blk_mq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
-+			     bool at_head)
- {
- 	struct blk_mq_ctx *ctx = rq->mq_ctx;
- 
-@@ -1550,8 +1553,8 @@ static blk_qc_t blk_sq_make_request(struct request_queue *q, struct bio *bio)
- 	return cookie;
- }
- 
--static void blk_mq_free_rq_map(struct blk_mq_tag_set *set,
--		struct blk_mq_tags *tags, unsigned int hctx_idx)
-+void blk_mq_free_rq_map(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
-+			unsigned int hctx_idx)
- {
- 	struct page *page;
- 
-@@ -1588,8 +1591,8 @@ static size_t order_to_size(unsigned int order)
- 	return (size_t)PAGE_SIZE << order;
- }
- 
--static struct blk_mq_tags *blk_mq_init_rq_map(struct blk_mq_tag_set *set,
--		unsigned int hctx_idx)
-+struct blk_mq_tags *blk_mq_init_rq_map(struct blk_mq_tag_set *set,
-+				       unsigned int hctx_idx)
- {
- 	struct blk_mq_tags *tags;
- 	unsigned int i, j, entries_per_page, max_order = 4;
-@@ -2279,10 +2282,10 @@ static int blk_mq_queue_reinit_dead(unsigned int cpu)
-  * Now CPU1 is just onlined and a request is inserted into ctx1->rq_list
-  * and set bit0 in pending bitmap as ctx1->index_hw is still zero.
-  *
-- * And then while running hw queue, flush_busy_ctxs() finds bit0 is set in
-- * pending bitmap and tries to retrieve requests in hctx->ctxs[0]->rq_list.
-- * But htx->ctxs[0] is a pointer to ctx0, so the request in ctx1->rq_list
-- * is ignored.
-+ * And then while running hw queue, blk_mq_flush_busy_ctxs() finds bit0 is set
-+ * in pending bitmap and tries to retrieve requests in hctx->ctxs[0]->rq_list.
-+ * But htx->ctxs[0] is a pointer to ctx0, so the request in ctx1->rq_list is
-+ * ignored.
-  */
- static int blk_mq_queue_reinit_prepare(unsigned int cpu)
- {
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 63e9116cddbd..e59f5ca520a2 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -32,6 +32,21 @@ void blk_mq_free_queue(struct request_queue *q);
- int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr);
- void blk_mq_wake_waiters(struct request_queue *q);
- bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *, struct list_head *);
-+void blk_mq_flush_busy_ctxs(struct blk_mq_hw_ctx *hctx, struct list_head *list);
-+
-+/*
-+ * Internal helpers for allocating/freeing the request map
-+ */
-+void blk_mq_free_rq_map(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
-+			unsigned int hctx_idx);
-+struct blk_mq_tags *blk_mq_init_rq_map(struct blk_mq_tag_set *set,
-+					unsigned int hctx_idx);
-+
-+/*
-+ * Internal helpers for request insertion into sw queues
-+ */
-+void __blk_mq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
-+				bool at_head);
- 
- /*
-  * CPU hotplug helpers
-@@ -103,6 +118,16 @@ static inline void blk_mq_set_alloc_data(struct blk_mq_alloc_data *data,
- 	data->hctx = hctx;
+-	return rq;
++	return data_size;
  }
  
-+/*
-+ * Internal helpers for request allocation/init/free
-+ */
-+void blk_mq_rq_ctx_init(struct request_queue *q, struct blk_mq_ctx *ctx,
-+			struct request *rq, unsigned int op);
-+void __blk_mq_free_request(struct blk_mq_hw_ctx *hctx, struct blk_mq_ctx *ctx,
-+				struct request *rq);
-+struct request *__blk_mq_alloc_request(struct blk_mq_alloc_data *data,
-+					unsigned int op);
-+
- static inline bool blk_mq_hctx_stopped(struct blk_mq_hw_ctx *hctx)
+ static void release_controller(struct kref *kref)
+@@ -400,46 +361,14 @@ static struct rdac_controller *get_controller(int index, char *array_name,
+ 	return ctlr;
+ }
+ 
+-static int submit_inquiry(struct scsi_device *sdev, int page_code,
+-			  unsigned int len, struct rdac_dh_data *h)
+-{
+-	struct request *rq;
+-	struct request_queue *q = sdev->request_queue;
+-	int err = SCSI_DH_RES_TEMP_UNAVAIL;
+-
+-	rq = get_rdac_req(sdev, &h->inq, len, READ);
+-	if (!rq)
+-		goto done;
+-
+-	/* Prepare the command. */
+-	rq->cmd[0] = INQUIRY;
+-	rq->cmd[1] = 1;
+-	rq->cmd[2] = page_code;
+-	rq->cmd[4] = len;
+-	rq->cmd_len = COMMAND_SIZE(INQUIRY);
+-
+-	rq->sense = h->sense;
+-	memset(rq->sense, 0, SCSI_SENSE_BUFFERSIZE);
+-	rq->sense_len = 0;
+-
+-	err = blk_execute_rq(q, NULL, rq, 1);
+-	if (err == -EIO)
+-		err = SCSI_DH_IO;
+-
+-	blk_put_request(rq);
+-done:
+-	return err;
+-}
+-
+ static int get_lun_info(struct scsi_device *sdev, struct rdac_dh_data *h,
+ 			char *array_name, u8 *array_id)
  {
- 	return test_bit(BLK_MQ_S_STOPPED, &hctx->state);
+-	int err, i;
+-	struct c8_inquiry *inqp;
++	int err = SCSI_DH_IO, i;
++	struct c8_inquiry *inqp = &h->inq.c8;
+ 
+-	err = submit_inquiry(sdev, 0xC8, sizeof(struct c8_inquiry), h);
+-	if (err == SCSI_DH_OK) {
+-		inqp = &h->inq.c8;
++	if (!scsi_get_vpd_page(sdev, 0xC8, (unsigned char *)inqp,
++			       sizeof(struct c8_inquiry))) {
+ 		if (inqp->page_code != 0xc8)
+ 			return SCSI_DH_NOSYS;
+ 		if (inqp->page_id[0] != 'e' || inqp->page_id[1] != 'd' ||
+@@ -453,20 +382,20 @@ static int get_lun_info(struct scsi_device *sdev, struct rdac_dh_data *h,
+ 		*(array_name+ARRAY_LABEL_LEN-1) = '\0';
+ 		memset(array_id, 0, UNIQUE_ID_LEN);
+ 		memcpy(array_id, inqp->array_unique_id, inqp->array_uniq_id_len);
++		err = SCSI_DH_OK;
+ 	}
+ 	return err;
+ }
+ 
+ static int check_ownership(struct scsi_device *sdev, struct rdac_dh_data *h)
+ {
+-	int err, access_state;
++	int err = SCSI_DH_IO, access_state;
+ 	struct rdac_dh_data *tmp;
+-	struct c9_inquiry *inqp;
++	struct c9_inquiry *inqp = &h->inq.c9;
+ 
+ 	h->state = RDAC_STATE_ACTIVE;
+-	err = submit_inquiry(sdev, 0xC9, sizeof(struct c9_inquiry), h);
+-	if (err == SCSI_DH_OK) {
+-		inqp = &h->inq.c9;
++	if (!scsi_get_vpd_page(sdev, 0xC9, (unsigned char *)inqp,
++			       sizeof(struct c9_inquiry))) {
+ 		/* detect the operating mode */
+ 		if ((inqp->avte_cvp >> 5) & 0x1)
+ 			h->mode = RDAC_MODE_IOSHIP; /* LUN in IOSHIP mode */
+@@ -501,6 +430,7 @@ static int check_ownership(struct scsi_device *sdev, struct rdac_dh_data *h)
+ 			tmp->sdev->access_state = access_state;
+ 		}
+ 		rcu_read_unlock();
++		err = SCSI_DH_OK;
+ 	}
+ 
+ 	return err;
+@@ -509,12 +439,11 @@ static int check_ownership(struct scsi_device *sdev, struct rdac_dh_data *h)
+ static int initialize_controller(struct scsi_device *sdev,
+ 		struct rdac_dh_data *h, char *array_name, u8 *array_id)
+ {
+-	int err, index;
+-	struct c4_inquiry *inqp;
++	int err = SCSI_DH_IO, index;
++	struct c4_inquiry *inqp = &h->inq.c4;
+ 
+-	err = submit_inquiry(sdev, 0xC4, sizeof(struct c4_inquiry), h);
+-	if (err == SCSI_DH_OK) {
+-		inqp = &h->inq.c4;
++	if (!scsi_get_vpd_page(sdev, 0xC4, (unsigned char *)inqp,
++			       sizeof(struct c4_inquiry))) {
+ 		/* get the controller index */
+ 		if (inqp->slot_id[1] == 0x31)
+ 			index = 0;
+@@ -530,18 +459,18 @@ static int initialize_controller(struct scsi_device *sdev,
+ 			h->sdev = sdev;
+ 		}
+ 		spin_unlock(&list_lock);
++		err = SCSI_DH_OK;
+ 	}
+ 	return err;
+ }
+ 
+ static int set_mode_select(struct scsi_device *sdev, struct rdac_dh_data *h)
+ {
+-	int err;
+-	struct c2_inquiry *inqp;
++	int err = SCSI_DH_IO;
++	struct c2_inquiry *inqp = &h->inq.c2;
+ 
+-	err = submit_inquiry(sdev, 0xC2, sizeof(struct c2_inquiry), h);
+-	if (err == SCSI_DH_OK) {
+-		inqp = &h->inq.c2;
++	if (!scsi_get_vpd_page(sdev, 0xC2, (unsigned char *)inqp,
++			       sizeof(struct c2_inquiry))) {
+ 		/*
+ 		 * If more than MODE6_MAX_LUN luns are supported, use
+ 		 * mode select 10
+@@ -550,36 +479,35 @@ static int set_mode_select(struct scsi_device *sdev, struct rdac_dh_data *h)
+ 			h->ctlr->use_ms10 = 1;
+ 		else
+ 			h->ctlr->use_ms10 = 0;
++		err = SCSI_DH_OK;
+ 	}
+ 	return err;
+ }
+ 
+ static int mode_select_handle_sense(struct scsi_device *sdev,
+-					unsigned char *sensebuf)
++				    struct scsi_sense_hdr *sense_hdr)
+ {
+-	struct scsi_sense_hdr sense_hdr;
+-	int err = SCSI_DH_IO, ret;
++	int err = SCSI_DH_IO;
+ 	struct rdac_dh_data *h = sdev->handler_data;
+ 
+-	ret = scsi_normalize_sense(sensebuf, SCSI_SENSE_BUFFERSIZE, &sense_hdr);
+-	if (!ret)
++	if (!scsi_sense_valid(sense_hdr))
+ 		goto done;
+ 
+-	switch (sense_hdr.sense_key) {
++	switch (sense_hdr->sense_key) {
+ 	case NO_SENSE:
+ 	case ABORTED_COMMAND:
+ 	case UNIT_ATTENTION:
+ 		err = SCSI_DH_RETRY;
+ 		break;
+ 	case NOT_READY:
+-		if (sense_hdr.asc == 0x04 && sense_hdr.ascq == 0x01)
++		if (sense_hdr->asc == 0x04 && sense_hdr->ascq == 0x01)
+ 			/* LUN Not Ready and is in the Process of Becoming
+ 			 * Ready
+ 			 */
+ 			err = SCSI_DH_RETRY;
+ 		break;
+ 	case ILLEGAL_REQUEST:
+-		if (sense_hdr.asc == 0x91 && sense_hdr.ascq == 0x36)
++		if (sense_hdr->asc == 0x91 && sense_hdr->ascq == 0x36)
+ 			/*
+ 			 * Command Lock contention
+ 			 */
+@@ -592,7 +520,7 @@ static int mode_select_handle_sense(struct scsi_device *sdev,
+ 	RDAC_LOG(RDAC_LOG_FAILOVER, sdev, "array %s, ctlr %d, "
+ 		"MODE_SELECT returned with sense %02x/%02x/%02x",
+ 		(char *) h->ctlr->array_name, h->ctlr->index,
+-		sense_hdr.sense_key, sense_hdr.asc, sense_hdr.ascq);
++		sense_hdr->sense_key, sense_hdr->asc, sense_hdr->ascq);
+ 
+ done:
+ 	return err;
+@@ -602,13 +530,16 @@ static void send_mode_select(struct work_struct *work)
+ {
+ 	struct rdac_controller *ctlr =
+ 		container_of(work, struct rdac_controller, ms_work);
+-	struct request *rq;
+ 	struct scsi_device *sdev = ctlr->ms_sdev;
+ 	struct rdac_dh_data *h = sdev->handler_data;
+-	struct request_queue *q = sdev->request_queue;
+-	int err, retry_cnt = RDAC_RETRY_COUNT;
++	int err = SCSI_DH_OK, retry_cnt = RDAC_RETRY_COUNT;
+ 	struct rdac_queue_data *tmp, *qdata;
+ 	LIST_HEAD(list);
++	unsigned char cdb[COMMAND_SIZE(MODE_SELECT_10)];
++	struct scsi_sense_hdr sshdr;
++	unsigned int data_size;
++	u64 req_flags = REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT |
++		REQ_FAILFAST_DRIVER;
+ 
+ 	spin_lock(&ctlr->ms_lock);
+ 	list_splice_init(&ctlr->ms_head, &list);
+@@ -616,21 +547,19 @@ static void send_mode_select(struct work_struct *work)
+ 	ctlr->ms_sdev = NULL;
+ 	spin_unlock(&ctlr->ms_lock);
+ 
+-retry:
+-	err = SCSI_DH_RES_TEMP_UNAVAIL;
+-	rq = rdac_failover_get(sdev, h, &list);
+-	if (!rq)
+-		goto done;
++ retry:
++	data_size = rdac_failover_get(ctlr, &list, cdb);
+ 
+ 	RDAC_LOG(RDAC_LOG_FAILOVER, sdev, "array %s, ctlr %d, "
+ 		"%s MODE_SELECT command",
+ 		(char *) h->ctlr->array_name, h->ctlr->index,
+ 		(retry_cnt == RDAC_RETRY_COUNT) ? "queueing" : "retrying");
+ 
+-	err = blk_execute_rq(q, NULL, rq, 1);
+-	blk_put_request(rq);
+-	if (err != SCSI_DH_OK) {
+-		err = mode_select_handle_sense(sdev, h->sense);
++	if (scsi_execute_req_flags(sdev, cdb, DMA_TO_DEVICE,
++				   &h->ctlr->mode_select, data_size, &sshdr,
++				   RDAC_TIMEOUT * HZ,
++				   RDAC_RETRIES, NULL, req_flags, 0)) {
++		err = mode_select_handle_sense(sdev, &sshdr);
+ 		if (err == SCSI_DH_RETRY && retry_cnt--)
+ 			goto retry;
+ 		if (err == SCSI_DH_IMM_RETRY)
+@@ -643,7 +572,6 @@ static void send_mode_select(struct work_struct *work)
+ 				(char *) h->ctlr->array_name, h->ctlr->index);
+ 	}
+ 
+-done:
+ 	list_for_each_entry_safe(qdata, tmp, &list, entry) {
+ 		list_del(&qdata->entry);
+ 		if (err == SCSI_DH_OK)
 -- 
-2.7.4
+2.1.4
 
