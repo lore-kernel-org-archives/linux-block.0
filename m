@@ -1,155 +1,224 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:40488 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750800AbdA1Inp (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 28 Jan 2017 03:43:45 -0500
-Subject: [RFC PATCH 06/17] axon_ram: add dax_operations support
-From: Dan Williams <dan.j.williams@intel.com>
-To: linux-nvdimm@lists.01.org
-Cc: snitzer@redhat.com, toshi.kani@hpe.com, mawilcox@microsoft.com,
-        linux-block@vger.kernel.org, jmoyer@redhat.com,
-        linux-fsdevel@vger.kernel.org, ross.zwisler@linux.intel.com,
-        hch@lst.de
-Date: Sat, 28 Jan 2017 00:36:36 -0800
-Message-ID: <148559259666.11180.1133241048982729431.stgit@dwillia2-desk3.amr.corp.intel.com>
-In-Reply-To: <148559256378.11180.8957776806175202312.stgit@dwillia2-desk3.amr.corp.intel.com>
-References: <148559256378.11180.8957776806175202312.stgit@dwillia2-desk3.amr.corp.intel.com>
+Received: from mail-wj0-f194.google.com ([209.85.210.194]:34575 "EHLO
+        mail-wj0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751027AbdAWMAU (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 23 Jan 2017 07:00:20 -0500
+Received: by mail-wj0-f194.google.com with SMTP id ip10so1729758wjb.1
+        for <linux-block@vger.kernel.org>; Mon, 23 Jan 2017 03:59:49 -0800 (PST)
+From: "=?UTF-8?q?Matias=20Bj=C3=B8rling?=" <m@bjorling.me>
+To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
+Subject: [PATCH 7/8] lightnvm: reduce number of nvm_id groups to one
+Date: Mon, 23 Jan 2017 12:59:18 +0100
+Message-Id: <20170123115919.14339-8-matias@cnexlabs.com>
+In-Reply-To: <20170123115919.14339-1-matias@cnexlabs.com>
+References: <20170123115919.14339-1-matias@cnexlabs.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Setup a dax_inode to have the same lifetime as the axon_ram block device
-and add a ->direct_access() method that is equivalent to
-axon_ram_direct_access(). Once fs/dax.c has been converted to use
-dax_operations the old axon_ram_direct_access() will be removed.
----
- arch/powerpc/platforms/Kconfig |    1 +
- arch/powerpc/sysdev/axonram.c  |   46 +++++++++++++++++++++++++++++++++++-----
- 2 files changed, 41 insertions(+), 6 deletions(-)
+The number of configuration groups has been limited to one in current
+code, even if there is support for up to four. With the introduction
+of the open-channel SSD 1.3 specification, only a single
+group is exposed onwards. Reflect this in the nvm_id structure.
 
-diff --git a/arch/powerpc/platforms/Kconfig b/arch/powerpc/platforms/Kconfig
-index 7e3a2ebba29b..33244e3d9375 100644
---- a/arch/powerpc/platforms/Kconfig
-+++ b/arch/powerpc/platforms/Kconfig
-@@ -284,6 +284,7 @@ config CPM2
- config AXON_RAM
- 	tristate "Axon DDR2 memory device driver"
- 	depends on PPC_IBM_CELL_BLADE && BLOCK
-+	select DAX
- 	default m
- 	help
- 	  It registers one block device per Axon's DDR2 memory bank found
-diff --git a/arch/powerpc/sysdev/axonram.c b/arch/powerpc/sysdev/axonram.c
-index ada29eaed6e2..4e1f58187726 100644
---- a/arch/powerpc/sysdev/axonram.c
-+++ b/arch/powerpc/sysdev/axonram.c
-@@ -25,6 +25,7 @@
+Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
+---
+ drivers/block/null_blk.c     |  3 +-
+ drivers/lightnvm/core.c      | 12 ++----
+ drivers/nvme/host/lightnvm.c | 87 +++++++++++++++++++++-----------------------
+ include/linux/lightnvm.h     |  3 +-
+ 4 files changed, 47 insertions(+), 58 deletions(-)
+
+diff --git a/drivers/block/null_blk.c b/drivers/block/null_blk.c
+index c0e14e5..e666095 100644
+--- a/drivers/block/null_blk.c
++++ b/drivers/block/null_blk.c
+@@ -460,7 +460,6 @@ static int null_lnvm_id(struct nvm_dev *dev, struct nvm_id *id)
  
- #include <linux/bio.h>
- #include <linux/blkdev.h>
-+#include <linux/dax.h>
- #include <linux/device.h>
- #include <linux/errno.h>
- #include <linux/fs.h>
-@@ -62,6 +63,7 @@ static int azfs_major, azfs_minor;
- struct axon_ram_bank {
- 	struct platform_device	*device;
- 	struct gendisk		*disk;
-+	struct dax_inode	*dax_inode;
- 	unsigned int		irq_id;
- 	unsigned long		ph_addr;
- 	unsigned long		io_addr;
-@@ -137,25 +139,45 @@ axon_ram_make_request(struct request_queue *queue, struct bio *bio)
- 	return BLK_QC_T_NONE;
- }
+ 	id->ver_id = 0x1;
+ 	id->vmnt = 0;
+-	id->cgrps = 1;
+ 	id->cap = 0x2;
+ 	id->dom = 0x1;
  
-+static long
-+__axon_ram_direct_access(struct axon_ram_bank *bank, phys_addr_t offset,
-+		       void **kaddr, pfn_t *pfn, long size)
-+{
-+	*kaddr = (void *) bank->io_addr + offset;
-+	*pfn = phys_to_pfn_t(bank->ph_addr + offset, PFN_DEV);
-+	return bank->size - offset;
-+}
-+
- /**
-  * axon_ram_direct_access - direct_access() method for block device
-  * @device, @sector, @data: see block_device_operations method
-  */
- static long
--axon_ram_direct_access(struct block_device *device, sector_t sector,
-+axon_ram_blk_direct_access(struct block_device *device, sector_t sector,
- 		       void **kaddr, pfn_t *pfn, long size)
+@@ -479,7 +478,7 @@ static int null_lnvm_id(struct nvm_dev *dev, struct nvm_id *id)
+ 
+ 	sector_div(size, bs); /* convert size to pages */
+ 	size >>= 8; /* concert size to pgs pr blk */
+-	grp = &id->groups[0];
++	grp = &id->grp;
+ 	grp->mtype = 0;
+ 	grp->fmtype = 0;
+ 	grp->num_ch = 1;
+diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+index 0842c85..80cd767 100644
+--- a/drivers/lightnvm/core.c
++++ b/drivers/lightnvm/core.c
+@@ -884,7 +884,7 @@ static int nvm_init_mlc_tbl(struct nvm_dev *dev, struct nvm_id_group *grp)
+ static int nvm_core_init(struct nvm_dev *dev)
  {
- 	struct axon_ram_bank *bank = device->bd_disk->private_data;
--	loff_t offset = (loff_t)sector << AXON_RAM_SECTOR_SHIFT;
+ 	struct nvm_id *id = &dev->identity;
+-	struct nvm_id_group *grp = &id->groups[0];
++	struct nvm_id_group *grp = &id->grp;
+ 	struct nvm_geo *geo = &dev->geo;
+ 	int ret;
  
--	*kaddr = (void *) bank->io_addr + offset;
--	*pfn = phys_to_pfn_t(bank->ph_addr + offset, PFN_DEV);
--	return bank->size - offset;
-+	return __axon_ram_direct_access(bank, sector << AXON_RAM_SECTOR_SHIFT,
-+			kaddr, pfn, size);
- }
- 
- static const struct block_device_operations axon_ram_devops = {
- 	.owner		= THIS_MODULE,
--	.direct_access	= axon_ram_direct_access
-+	.direct_access	= axon_ram_blk_direct_access
-+};
-+
-+static long
-+axon_ram_dax_direct_access(struct dax_inode *dax_inode, phys_addr_t dev_addr,
-+		       void **kaddr, pfn_t *pfn, long size)
-+{
-+	struct axon_ram_bank *bank = dax_inode_get_private(dax_inode);
-+
-+	return __axon_ram_direct_access(bank, dev_addr, kaddr, pfn, size);
-+}
-+
-+static const struct dax_operations axon_ram_dax_ops = {
-+	.direct_access = axon_ram_dax_direct_access,
- };
- 
- /**
-@@ -219,6 +241,7 @@ static int axon_ram_probe(struct platform_device *device)
- 		goto failed;
+@@ -988,20 +988,14 @@ static int nvm_init(struct nvm_dev *dev)
+ 		goto err;
  	}
  
-+
- 	bank->disk->major = azfs_major;
- 	bank->disk->first_minor = azfs_minor;
- 	bank->disk->fops = &axon_ram_devops;
-@@ -227,6 +250,11 @@ static int axon_ram_probe(struct platform_device *device)
- 	sprintf(bank->disk->disk_name, "%s%d",
- 			AXON_RAM_DEVICE_NAME, axon_ram_bank_id);
+-	pr_debug("nvm: ver:%x nvm_vendor:%x groups:%u\n",
+-			dev->identity.ver_id, dev->identity.vmnt,
+-							dev->identity.cgrps);
++	pr_debug("nvm: ver:%x nvm_vendor:%x\n",
++			dev->identity.ver_id, dev->identity.vmnt);
  
-+	bank->dax_inode = alloc_dax_inode(bank, bank->disk->disk_name,
-+			&axon_ram_dax_ops);
-+	if (!bank->dax_inode)
-+		goto failed;
+ 	if (dev->identity.ver_id != 1) {
+ 		pr_err("nvm: device not supported by kernel.");
+ 		goto err;
+ 	}
+ 
+-	if (dev->identity.cgrps != 1) {
+-		pr_err("nvm: only one group configuration supported.");
+-		goto err;
+-	}
+-
+ 	ret = nvm_core_init(dev);
+ 	if (ret) {
+ 		pr_err("nvm: could not initialize core structures.\n");
+diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
+index ad54ec9..733992a 100644
+--- a/drivers/nvme/host/lightnvm.c
++++ b/drivers/nvme/host/lightnvm.c
+@@ -248,50 +248,48 @@ static int init_grps(struct nvm_id *nvm_id, struct nvme_nvm_id *nvme_nvm_id)
+ {
+ 	struct nvme_nvm_id_group *src;
+ 	struct nvm_id_group *dst;
+-	int i, end;
+-
+-	end = min_t(u32, 4, nvm_id->cgrps);
+-
+-	for (i = 0; i < end; i++) {
+-		src = &nvme_nvm_id->groups[i];
+-		dst = &nvm_id->groups[i];
+-
+-		dst->mtype = src->mtype;
+-		dst->fmtype = src->fmtype;
+-		dst->num_ch = src->num_ch;
+-		dst->num_lun = src->num_lun;
+-		dst->num_pln = src->num_pln;
+-
+-		dst->num_pg = le16_to_cpu(src->num_pg);
+-		dst->num_blk = le16_to_cpu(src->num_blk);
+-		dst->fpg_sz = le16_to_cpu(src->fpg_sz);
+-		dst->csecs = le16_to_cpu(src->csecs);
+-		dst->sos = le16_to_cpu(src->sos);
+-
+-		dst->trdt = le32_to_cpu(src->trdt);
+-		dst->trdm = le32_to_cpu(src->trdm);
+-		dst->tprt = le32_to_cpu(src->tprt);
+-		dst->tprm = le32_to_cpu(src->tprm);
+-		dst->tbet = le32_to_cpu(src->tbet);
+-		dst->tbem = le32_to_cpu(src->tbem);
+-		dst->mpos = le32_to_cpu(src->mpos);
+-		dst->mccap = le32_to_cpu(src->mccap);
+-
+-		dst->cpar = le16_to_cpu(src->cpar);
+-
+-		if (dst->fmtype == NVM_ID_FMTYPE_MLC) {
+-			memcpy(dst->lptbl.id, src->lptbl.id, 8);
+-			dst->lptbl.mlc.num_pairs =
+-					le16_to_cpu(src->lptbl.mlc.num_pairs);
+-
+-			if (dst->lptbl.mlc.num_pairs > NVME_NVM_LP_MLC_PAIRS) {
+-				pr_err("nvm: number of MLC pairs not supported\n");
+-				return -EINVAL;
+-			}
+-
+-			memcpy(dst->lptbl.mlc.pairs, src->lptbl.mlc.pairs,
+-						dst->lptbl.mlc.num_pairs);
 +
- 	bank->disk->queue = blk_alloc_queue(GFP_KERNEL);
- 	if (bank->disk->queue == NULL) {
- 		dev_err(&device->dev, "Cannot register disk queue\n");
-@@ -276,6 +304,10 @@ static int axon_ram_probe(struct platform_device *device)
- 						bank->disk->disk_name);
- 			del_gendisk(bank->disk);
++	if (nvme_nvm_id->cgrps != 1)
++		return -EINVAL;
++
++	src = &nvme_nvm_id->groups[0];
++	dst = &nvm_id->grp;
++
++	dst->mtype = src->mtype;
++	dst->fmtype = src->fmtype;
++	dst->num_ch = src->num_ch;
++	dst->num_lun = src->num_lun;
++	dst->num_pln = src->num_pln;
++
++	dst->num_pg = le16_to_cpu(src->num_pg);
++	dst->num_blk = le16_to_cpu(src->num_blk);
++	dst->fpg_sz = le16_to_cpu(src->fpg_sz);
++	dst->csecs = le16_to_cpu(src->csecs);
++	dst->sos = le16_to_cpu(src->sos);
++
++	dst->trdt = le32_to_cpu(src->trdt);
++	dst->trdm = le32_to_cpu(src->trdm);
++	dst->tprt = le32_to_cpu(src->tprt);
++	dst->tprm = le32_to_cpu(src->tprm);
++	dst->tbet = le32_to_cpu(src->tbet);
++	dst->tbem = le32_to_cpu(src->tbem);
++	dst->mpos = le32_to_cpu(src->mpos);
++	dst->mccap = le32_to_cpu(src->mccap);
++
++	dst->cpar = le16_to_cpu(src->cpar);
++
++	if (dst->fmtype == NVM_ID_FMTYPE_MLC) {
++		memcpy(dst->lptbl.id, src->lptbl.id, 8);
++		dst->lptbl.mlc.num_pairs =
++				le16_to_cpu(src->lptbl.mlc.num_pairs);
++
++		if (dst->lptbl.mlc.num_pairs > NVME_NVM_LP_MLC_PAIRS) {
++			pr_err("nvm: number of MLC pairs not supported\n");
++			return -EINVAL;
  		}
-+		if (bank->dax_inode) {
-+			kill_dax_inode(bank->dax_inode);
-+			put_dax_inode(bank->dax_inode);
-+		}
- 		device->dev.platform_data = NULL;
- 		if (bank->io_addr != 0)
- 			iounmap((void __iomem *) bank->io_addr);
-@@ -298,6 +330,8 @@ axon_ram_remove(struct platform_device *device)
++
++		memcpy(dst->lptbl.mlc.pairs, src->lptbl.mlc.pairs,
++					dst->lptbl.mlc.num_pairs);
+ 	}
  
- 	device_remove_file(&device->dev, &dev_attr_ecc);
- 	free_irq(bank->irq_id, device);
-+	kill_dax_inode(bank->dax_inode);
-+	put_dax_inode(bank->dax_inode);
- 	del_gendisk(bank->disk);
- 	iounmap((void __iomem *) bank->io_addr);
- 	kfree(bank);
+ 	return 0;
+@@ -321,7 +319,6 @@ static int nvme_nvm_identity(struct nvm_dev *nvmdev, struct nvm_id *nvm_id)
+ 
+ 	nvm_id->ver_id = nvme_nvm_id->ver_id;
+ 	nvm_id->vmnt = nvme_nvm_id->vmnt;
+-	nvm_id->cgrps = nvme_nvm_id->cgrps;
+ 	nvm_id->cap = le32_to_cpu(nvme_nvm_id->cap);
+ 	nvm_id->dom = le32_to_cpu(nvme_nvm_id->dom);
+ 	memcpy(&nvm_id->ppaf, &nvme_nvm_id->ppaf,
+@@ -622,7 +619,7 @@ static ssize_t nvm_dev_attr_show(struct device *dev,
+ 		return 0;
+ 
+ 	id = &ndev->identity;
+-	grp = &id->groups[0];
++	grp = &id->grp;
+ 	attr = &dattr->attr;
+ 
+ 	if (strcmp(attr->name, "version") == 0) {
+diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
+index faa0fbf..ce0b2da 100644
+--- a/include/linux/lightnvm.h
++++ b/include/linux/lightnvm.h
+@@ -200,11 +200,10 @@ struct nvm_addr_format {
+ struct nvm_id {
+ 	u8	ver_id;
+ 	u8	vmnt;
+-	u8	cgrps;
+ 	u32	cap;
+ 	u32	dom;
+ 	struct nvm_addr_format ppaf;
+-	struct nvm_id_group groups[4];
++	struct nvm_id_group grp;
+ } __packed;
+ 
+ struct nvm_target {
+-- 
+2.7.4
 
