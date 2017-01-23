@@ -1,64 +1,45 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from szxga02-in.huawei.com ([119.145.14.65]:1300 "EHLO
-        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751721AbdATLTH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 Jan 2017 06:19:07 -0500
-From: Hou Tao <houtao1@huawei.com>
-To: <dm-devel@redhat.com>, <linux-block@vger.kernel.org>
-CC: <agk@redhat.com>, <snitzer@redhat.com>, <ejt@redhat.com>,
-        <vgoyal@redhat.com>
-Subject: [PATCH RFC 3/4] dm thin: show the enabled status of keep_bio_blkcg feature
-Date: Fri, 20 Jan 2017 19:15:51 +0800
-Message-ID: <1484910952-29820-4-git-send-email-houtao1@huawei.com>
-In-Reply-To: <1484910952-29820-1-git-send-email-houtao1@huawei.com>
-References: <1484910952-29820-1-git-send-email-houtao1@huawei.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 3/5] blk-throttle: Adjust two function calls together with
+ a variable assignment
+To: Johannes Thumshirn <jthumshirn@suse.de>,
+ SF Markus Elfring <elfring@users.sourceforge.net>
+References: <e734cafa-eec0-9d5b-b368-2de496a96c80@users.sourceforge.net>
+ <7d68f93d-c14c-60aa-2b02-5005a0a62cad@users.sourceforge.net>
+ <20170123091821.GC3517@linux-x5ow.site>
+Cc: linux-block@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+ kernel-janitors@vger.kernel.org
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <bdd7466c-2f35-3279-1287-b08ba9eb373b@kernel.dk>
+Date: Mon, 23 Jan 2017 08:14:38 -0700
 MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <20170123091821.GC3517@linux-x5ow.site>
+Content-Type: text/plain; charset=windows-1252
+List-ID: <linux-block@vger.kernel.org>
 
-If keep_bio_blkcg feature is enabled, we can ensure that
-by STATUSTYPE_TABLE or STATUSTYPE_INFO command.
+On 01/23/2017 02:20 AM, Johannes Thumshirn wrote:
+> On Sun, Jan 22, 2017 at 09:33:08AM +0100, SF Markus Elfring wrote:
+>> From: Markus Elfring <elfring@users.sourceforge.net>
+>> Date: Sat, 21 Jan 2017 22:15:33 +0100
+>>
+>> The script "checkpatch.pl" pointed information out like the following.
+>>
+>> ERROR: do not use assignment in if condition
+>>
+>> Thus fix the affected source code places.
+>>
+>> Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+>> ---
+> 
+> Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+> if Jens wants doesn't mind.
 
-Signed-off-by: Hou Tao <houtao1@huawei.com>
----
- drivers/md/dm-thin.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+I don't mind these, but I completely agree on the patches for moving the
+'error' assignment. What ends up happening for those cases is that
+someone adds a new section and forgets to set 'error', and then all hell
+breaks lose.
 
-diff --git a/drivers/md/dm-thin.c b/drivers/md/dm-thin.c
-index 57d6202..140cdae 100644
---- a/drivers/md/dm-thin.c
-+++ b/drivers/md/dm-thin.c
-@@ -3760,7 +3760,7 @@ static void emit_flags(struct pool_features *pf, char *result,
- {
- 	unsigned count = !pf->zero_new_blocks + !pf->discard_enabled +
- 		!pf->discard_passdown + (pf->mode == PM_READ_ONLY) +
--		pf->error_if_no_space;
-+		pf->error_if_no_space + pf->keep_bio_blkcg;
- 	DMEMIT("%u ", count);
- 
- 	if (!pf->zero_new_blocks)
-@@ -3777,6 +3777,9 @@ static void emit_flags(struct pool_features *pf, char *result,
- 
- 	if (pf->error_if_no_space)
- 		DMEMIT("error_if_no_space ");
-+
-+	if (pf->keep_bio_blkcg)
-+		DMEMIT("keep_bio_blkcg ");
- }
- 
- /*
-@@ -3885,6 +3888,9 @@ static void pool_status(struct dm_target *ti, status_type_t type,
- 		else
- 			DMEMIT("queue_if_no_space ");
- 
-+		if (pool->pf.keep_bio_blkcg)
-+			DMEMIT("keep_bio_blkcg ");
-+
- 		if (dm_pool_metadata_needs_check(pool->pmd))
- 			DMEMIT("needs_check ");
- 		else
+So Markus, don't bother sending those patches again for the block layer
+or drivers, I'm not going to take them.
+
 -- 
-2.5.0
-
+Jens Axboe
