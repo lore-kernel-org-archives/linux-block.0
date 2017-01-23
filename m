@@ -1,210 +1,116 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:56454 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751035AbdAWP3f (ORCPT
+Received: from mail-wm0-f66.google.com ([74.125.82.66]:35340 "EHLO
+        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750997AbdAWMAU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Jan 2017 10:29:35 -0500
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@fb.com>
-Cc: Mike Snitzer <snitzer@redhat.com>, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org, dm-devel@redhat.com
-Subject: [PATCH 03/16] block: allow specifying size for extra command data
-Date: Mon, 23 Jan 2017 16:29:08 +0100
-Message-Id: <1485185361-29786-4-git-send-email-hch@lst.de>
-In-Reply-To: <1485185361-29786-1-git-send-email-hch@lst.de>
-References: <1485185361-29786-1-git-send-email-hch@lst.de>
+        Mon, 23 Jan 2017 07:00:20 -0500
+Received: by mail-wm0-f66.google.com with SMTP id d140so25934386wmd.2
+        for <linux-block@vger.kernel.org>; Mon, 23 Jan 2017 03:59:46 -0800 (PST)
+From: "=?UTF-8?q?Matias=20Bj=C3=B8rling?=" <m@bjorling.me>
+To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
+Subject: [PATCH 4/8] lightnvm: remove nvm_get_bb_tbl and nvm_set_bb_tbl
+Date: Mon, 23 Jan 2017 12:59:15 +0100
+Message-Id: <20170123115919.14339-5-matias@cnexlabs.com>
+In-Reply-To: <20170123115919.14339-1-matias@cnexlabs.com>
+References: <20170123115919.14339-1-matias@cnexlabs.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-This mirrors the blk-mq capabilities to allocate extra drivers-specific
-data behind struct request by setting a cmd_size field, as well as having
-a constructor / destructor for it.
+Since the merge of gennvm and core, there is no longer a need for the
+device specific bad block functions.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
 ---
- block/blk-core.c       | 59 ++++++++++++++++++++++++++++++++++++++++----------
- block/blk-flush.c      |  5 ++---
- block/blk-sysfs.c      |  7 ++++--
- include/linux/blkdev.h |  7 ++++++
- 4 files changed, 61 insertions(+), 17 deletions(-)
+ drivers/lightnvm/core.c  | 40 ++++------------------------------------
+ include/linux/lightnvm.h |  2 --
+ 2 files changed, 4 insertions(+), 38 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index d2c2fc9..793ef96 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -606,17 +606,41 @@ void blk_cleanup_queue(struct request_queue *q)
- EXPORT_SYMBOL(blk_cleanup_queue);
- 
- /* Allocate memory local to the request queue */
--static void *alloc_request_struct(gfp_t gfp_mask, void *data)
-+static void *alloc_request_simple(gfp_t gfp_mask, void *data)
- {
--	int nid = (int)(long)data;
--	return kmem_cache_alloc_node(request_cachep, gfp_mask, nid);
-+	struct request_queue *q = data;
-+
-+	return kmem_cache_alloc_node(request_cachep, gfp_mask, q->node);
- }
- 
--static void free_request_struct(void *element, void *unused)
-+static void free_request_simple(void *element, void *data)
- {
- 	kmem_cache_free(request_cachep, element);
- }
- 
-+static void *alloc_request_size(gfp_t gfp_mask, void *data)
-+{
-+	struct request_queue *q = data;
-+	struct request *rq;
-+
-+	rq = kmalloc_node(sizeof(struct request) + q->cmd_size, gfp_mask,
-+			q->node);
-+	if (rq && q->init_rq_fn && q->init_rq_fn(q, rq, gfp_mask) < 0) {
-+		kfree(rq);
-+		rq = NULL;
-+	}
-+	return rq;
-+}
-+
-+static void free_request_size(void *element, void *data)
-+{
-+	struct request_queue *q = data;
-+
-+	if (q->exit_rq_fn)
-+		q->exit_rq_fn(q, element);
-+	kfree(element);
-+}
-+
- int blk_init_rl(struct request_list *rl, struct request_queue *q,
- 		gfp_t gfp_mask)
- {
-@@ -629,10 +653,15 @@ int blk_init_rl(struct request_list *rl, struct request_queue *q,
- 	init_waitqueue_head(&rl->wait[BLK_RW_SYNC]);
- 	init_waitqueue_head(&rl->wait[BLK_RW_ASYNC]);
- 
--	rl->rq_pool = mempool_create_node(BLKDEV_MIN_RQ, alloc_request_struct,
--					  free_request_struct,
--					  (void *)(long)q->node, gfp_mask,
--					  q->node);
-+	if (q->cmd_size) {
-+		rl->rq_pool = mempool_create_node(BLKDEV_MIN_RQ,
-+				alloc_request_size, free_request_size,
-+				q, gfp_mask, q->node);
-+	} else {
-+		rl->rq_pool = mempool_create_node(BLKDEV_MIN_RQ,
-+				alloc_request_simple, free_request_simple,
-+				q, gfp_mask, q->node);
-+	}
- 	if (!rl->rq_pool)
- 		return -ENOMEM;
- 
-@@ -846,12 +875,15 @@ static blk_qc_t blk_queue_bio(struct request_queue *q, struct bio *bio);
- 
- int blk_init_allocated_queue(struct request_queue *q)
- {
--	q->fq = blk_alloc_flush_queue(q, NUMA_NO_NODE, 0);
-+	q->fq = blk_alloc_flush_queue(q, NUMA_NO_NODE, q->cmd_size);
- 	if (!q->fq)
- 		return -ENOMEM;
- 
-+	if (q->init_rq_fn && q->init_rq_fn(q, q->fq->flush_rq, GFP_KERNEL))
-+		goto out_free_flush_queue;
-+
- 	if (blk_init_rl(&q->root_rl, q, GFP_KERNEL))
--		goto fail;
-+		goto out_exit_flush_rq;
- 
- 	INIT_WORK(&q->timeout_work, blk_timeout_work);
- 	q->queue_flags		|= QUEUE_FLAG_DEFAULT;
-@@ -869,13 +901,16 @@ int blk_init_allocated_queue(struct request_queue *q)
- 	/* init elevator */
- 	if (elevator_init(q, NULL)) {
- 		mutex_unlock(&q->sysfs_lock);
--		goto fail;
-+		goto out_exit_flush_rq;
+diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+index ffdf048..18d4873 100644
+--- a/drivers/lightnvm/core.c
++++ b/drivers/lightnvm/core.c
+@@ -605,33 +605,6 @@ static void nvm_tgt_generic_to_addr_mode(struct nvm_tgt_dev *tgt_dev,
  	}
+ }
  
- 	mutex_unlock(&q->sysfs_lock);
- 	return 0;
- 
--fail:
-+out_exit_flush_rq:
-+	if (q->exit_rq_fn)
-+		q->exit_rq_fn(q, q->fq->flush_rq);
-+out_free_flush_queue:
- 	blk_free_flush_queue(q->fq);
- 	wbt_exit(q);
- 	return -ENOMEM;
-diff --git a/block/blk-flush.c b/block/blk-flush.c
-index d7de34e..bf3ba3c 100644
---- a/block/blk-flush.c
-+++ b/block/blk-flush.c
-@@ -547,11 +547,10 @@ struct blk_flush_queue *blk_alloc_flush_queue(struct request_queue *q,
- 	if (!fq)
- 		goto fail;
- 
--	if (q->mq_ops) {
-+	if (q->mq_ops)
- 		spin_lock_init(&fq->mq_flush_lock);
--		rq_sz = round_up(rq_sz + cmd_size, cache_line_size());
+-int nvm_set_bb_tbl(struct nvm_dev *dev, struct ppa_addr *ppas, int nr_ppas,
+-								int type)
+-{
+-	struct nvm_rq rqd;
+-	int ret;
+-
+-	if (nr_ppas > dev->ops->max_phys_sect) {
+-		pr_err("nvm: unable to update all sysblocks atomically\n");
+-		return -EINVAL;
 -	}
+-
+-	memset(&rqd, 0, sizeof(struct nvm_rq));
+-
+-	nvm_set_rqd_ppalist(dev, &rqd, ppas, nr_ppas, 1);
+-	nvm_generic_to_addr_mode(dev, &rqd);
+-
+-	ret = dev->ops->set_bb_tbl(dev, &rqd.ppa_addr, rqd.nr_ppas, type);
+-	nvm_free_rqd_ppalist(dev, &rqd);
+-	if (ret) {
+-		pr_err("nvm: sysblk failed bb mark\n");
+-		return -EINVAL;
+-	}
+-
+-	return 0;
+-}
+-EXPORT_SYMBOL(nvm_set_bb_tbl);
+-
+ int nvm_set_tgt_bb_tbl(struct nvm_tgt_dev *tgt_dev, struct ppa_addr *ppas,
+ 		       int nr_ppas, int type)
+ {
+@@ -919,20 +892,15 @@ int nvm_bb_tbl_fold(struct nvm_dev *dev, u8 *blks, int nr_blks)
+ }
+ EXPORT_SYMBOL(nvm_bb_tbl_fold);
  
-+	rq_sz = round_up(rq_sz + cmd_size, cache_line_size());
- 	fq->flush_rq = kzalloc_node(rq_sz, GFP_KERNEL, node);
- 	if (!fq->flush_rq)
- 		goto fail_rq;
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 1dbce05..894f773 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -814,10 +814,13 @@ static void blk_release_queue(struct kobject *kobj)
- 	if (q->queue_tags)
- 		__blk_queue_free_tags(q);
- 
--	if (!q->mq_ops)
-+	if (!q->mq_ops) {
-+		if (q->exit_rq_fn)
-+			q->exit_rq_fn(q, q->fq->flush_rq);
- 		blk_free_flush_queue(q->fq);
--	else
-+	} else {
- 		blk_mq_release(q);
-+	}
- 
- 	blk_trace_shutdown(q);
- 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index a036c4a..648ecf5 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -273,6 +273,8 @@ typedef void (softirq_done_fn)(struct request *);
- typedef int (dma_drain_needed_fn)(struct request *);
- typedef int (lld_busy_fn) (struct request_queue *q);
- typedef int (bsg_job_fn) (struct bsg_job *);
-+typedef int (init_rq_fn)(struct request_queue *, struct request *, gfp_t);
-+typedef void (exit_rq_fn)(struct request_queue *, struct request *);
- 
- enum blk_eh_timer_return {
- 	BLK_EH_NOT_HANDLED,
-@@ -408,6 +410,8 @@ struct request_queue {
- 	rq_timed_out_fn		*rq_timed_out_fn;
- 	dma_drain_needed_fn	*dma_drain_needed;
- 	lld_busy_fn		*lld_busy_fn;
-+	init_rq_fn		*init_rq_fn;
-+	exit_rq_fn		*exit_rq_fn;
- 
- 	const struct blk_mq_ops	*mq_ops;
- 
-@@ -572,6 +576,9 @@ struct request_queue {
- 	struct bio_set		*bio_split;
- 
- 	bool			mq_sysfs_init_done;
+-int nvm_get_bb_tbl(struct nvm_dev *dev, struct ppa_addr ppa, u8 *blks)
+-{
+-	ppa = generic_to_dev_addr(dev, ppa);
+-
+-	return dev->ops->get_bb_tbl(dev, ppa, blks);
+-}
+-EXPORT_SYMBOL(nvm_get_bb_tbl);
+-
+ int nvm_get_tgt_bb_tbl(struct nvm_tgt_dev *tgt_dev, struct ppa_addr ppa,
+ 		       u8 *blks)
+ {
++	struct nvm_dev *dev = tgt_dev->parent;
 +
-+	size_t			cmd_size;
-+	void			*rq_alloc_data;
- };
+ 	ppa = nvm_trans_ppa(tgt_dev, ppa, TRANS_TGT_TO_DEV);
++	ppa = generic_to_dev_addr(dev, ppa);
  
- #define QUEUE_FLAG_QUEUED	1	/* uses generic tag queueing */
+-	return nvm_get_bb_tbl(tgt_dev->parent, ppa, blks);
++	return dev->ops->get_bb_tbl(dev, ppa, blks);
+ }
+ EXPORT_SYMBOL(nvm_get_tgt_bb_tbl);
+ 
+diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
+index abb3d55..cad1e1c 100644
+--- a/include/linux/lightnvm.h
++++ b/include/linux/lightnvm.h
+@@ -473,7 +473,6 @@ extern struct nvm_dev *nvm_alloc_dev(int);
+ extern int nvm_register(struct nvm_dev *);
+ extern void nvm_unregister(struct nvm_dev *);
+ 
+-extern int nvm_set_bb_tbl(struct nvm_dev *, struct ppa_addr *, int, int);
+ extern int nvm_set_tgt_bb_tbl(struct nvm_tgt_dev *, struct ppa_addr *,
+ 			      int, int);
+ extern int nvm_max_phys_sects(struct nvm_tgt_dev *);
+@@ -490,7 +489,6 @@ extern int nvm_get_area(struct nvm_tgt_dev *, sector_t *, sector_t);
+ extern void nvm_put_area(struct nvm_tgt_dev *, sector_t);
+ extern void nvm_end_io(struct nvm_rq *, int);
+ extern int nvm_bb_tbl_fold(struct nvm_dev *, u8 *, int);
+-extern int nvm_get_bb_tbl(struct nvm_dev *, struct ppa_addr, u8 *);
+ extern int nvm_get_tgt_bb_tbl(struct nvm_tgt_dev *, struct ppa_addr, u8 *);
+ 
+ extern int nvm_dev_factory(struct nvm_dev *, int flags);
 -- 
-2.1.4
+2.7.4
 
