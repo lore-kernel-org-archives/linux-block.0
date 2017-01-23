@@ -1,89 +1,337 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:40923 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1751771AbdAMPvm (ORCPT
+Received: from bombadil.infradead.org ([65.50.211.133]:56526 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751035AbdAWP3t (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Jan 2017 10:51:42 -0500
-Received: from pps.filterd (m0001255.ppops.net [127.0.0.1])
-        by mx0b-00082601.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id v0DFpVFd007540
-        for <linux-block@vger.kernel.org>; Fri, 13 Jan 2017 07:51:31 -0800
-Received: from mail.thefacebook.com ([199.201.64.23])
-        by mx0b-00082601.pphosted.com with ESMTP id 27xxg6ge5j-1
-        (version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT)
-        for <linux-block@vger.kernel.org>; Fri, 13 Jan 2017 07:51:31 -0800
-From: Josef Bacik <jbacik@fb.com>
-To: <linux-block@vger.kernel.org>
-Subject: [PATCH] nbd: create a recv workqueue per nbd device
-Date: Fri, 13 Jan 2017 10:51:13 -0500
-Message-ID: <1484322673-10606-1-git-send-email-jbacik@fb.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+        Mon, 23 Jan 2017 10:29:49 -0500
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@fb.com>
+Cc: Mike Snitzer <snitzer@redhat.com>, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org, dm-devel@redhat.com,
+        Hannes Reinecke <hare@suse.de>, Hannes Reinecke <hare@suse.com>
+Subject: [PATCH 08/16] scsi_dh_hp_sw: switch to scsi_execute_req_flags()
+Date: Mon, 23 Jan 2017 16:29:13 +0100
+Message-Id: <1485185361-29786-9-git-send-email-hch@lst.de>
+In-Reply-To: <1485185361-29786-1-git-send-email-hch@lst.de>
+References: <1485185361-29786-1-git-send-email-hch@lst.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Since we are in the memory reclaim path we need our recv work to be on a
-workqueue that has WQ_MEM_RECLAIM set so we can avoid deadlocks.  Also
-set WQ_HIGHPRI since we are in the completion path for IO.
+From: Hannes Reinecke <hare@suse.de>
 
-Signed-off-by: Josef Bacik <jbacik@fb.com>
+Switch to scsi_execute_req_flags() instead of using the block interface
+directly.  This will set REQ_QUIET and REQ_PREEMPT, but this is okay as
+we're evaluating the errors anyway and should be able to send the command
+even if the device is quiesced.
+
+Signed-off-by: Hannes Reinecke <hare@suse.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/block/nbd.c | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
+ drivers/scsi/device_handler/scsi_dh_hp_sw.c | 222 ++++++++--------------------
+ 1 file changed, 65 insertions(+), 157 deletions(-)
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 99c8446..e0a8d51 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -70,6 +70,7 @@ struct nbd_device {
- 	struct task_struct *task_recv;
- 	struct task_struct *task_setup;
+diff --git a/drivers/scsi/device_handler/scsi_dh_hp_sw.c b/drivers/scsi/device_handler/scsi_dh_hp_sw.c
+index 308e871..be43c94 100644
+--- a/drivers/scsi/device_handler/scsi_dh_hp_sw.c
++++ b/drivers/scsi/device_handler/scsi_dh_hp_sw.c
+@@ -38,13 +38,10 @@
+ #define HP_SW_PATH_PASSIVE		1
  
-+	struct workqueue_struct *recv_workqueue;
- #if IS_ENABLED(CONFIG_DEBUG_FS)
- 	struct dentry *dbg_dir;
- #endif
-@@ -787,7 +788,7 @@ static int __nbd_ioctl(struct block_device *bdev, struct nbd_device *nbd,
- 			INIT_WORK(&args[i].work, recv_work);
- 			args[i].nbd = nbd;
- 			args[i].index = i;
--			queue_work(system_long_wq, &args[i].work);
-+			queue_work(nbd->recv_workqueue, &args[i].work);
- 		}
- 		wait_event_interruptible(nbd->recv_wq,
- 					 atomic_read(&nbd->recv_threads) == 0);
-@@ -1074,6 +1075,16 @@ static int __init nbd_init(void)
- 			goto out;
- 		}
+ struct hp_sw_dh_data {
+-	unsigned char sense[SCSI_SENSE_BUFFERSIZE];
+ 	int path_state;
+ 	int retries;
+ 	int retry_cnt;
+ 	struct scsi_device *sdev;
+-	activate_complete	callback_fn;
+-	void			*callback_data;
+ };
  
-+		nbd_dev[i].recv_workqueue =
-+			alloc_workqueue("knbd-recv",
-+					WQ_MEM_RECLAIM | WQ_HIGHPRI, 0);
-+		if (!nbd_dev[i].recv_workqueue) {
-+			blk_mq_free_tag_set(&nbd_dev[i].tag_set);
-+			blk_cleanup_queue(disk->queue);
-+			put_disk(disk);
-+			goto out;
+ static int hp_sw_start_stop(struct hp_sw_dh_data *);
+@@ -56,43 +53,34 @@ static int hp_sw_start_stop(struct hp_sw_dh_data *);
+  *
+  * Returns SCSI_DH_DEV_OFFLINED if the sdev is on the passive path
+  */
+-static int tur_done(struct scsi_device *sdev, unsigned char *sense)
++static int tur_done(struct scsi_device *sdev, struct hp_sw_dh_data *h,
++		    struct scsi_sense_hdr *sshdr)
+ {
+-	struct scsi_sense_hdr sshdr;
+-	int ret;
++	int ret = SCSI_DH_IO;
+ 
+-	ret = scsi_normalize_sense(sense, SCSI_SENSE_BUFFERSIZE, &sshdr);
+-	if (!ret) {
+-		sdev_printk(KERN_WARNING, sdev,
+-			    "%s: sending tur failed, no sense available\n",
+-			    HP_SW_NAME);
+-		ret = SCSI_DH_IO;
+-		goto done;
+-	}
+-	switch (sshdr.sense_key) {
++	switch (sshdr->sense_key) {
+ 	case UNIT_ATTENTION:
+ 		ret = SCSI_DH_IMM_RETRY;
+ 		break;
+ 	case NOT_READY:
+-		if ((sshdr.asc == 0x04) && (sshdr.ascq == 2)) {
++		if (sshdr->asc == 0x04 && sshdr->ascq == 2) {
+ 			/*
+ 			 * LUN not ready - Initialization command required
+ 			 *
+ 			 * This is the passive path
+ 			 */
+-			ret = SCSI_DH_DEV_OFFLINED;
++			h->path_state = HP_SW_PATH_PASSIVE;
++			ret = SCSI_DH_OK;
+ 			break;
+ 		}
+ 		/* Fallthrough */
+ 	default:
+ 		sdev_printk(KERN_WARNING, sdev,
+ 			   "%s: sending tur failed, sense %x/%x/%x\n",
+-			   HP_SW_NAME, sshdr.sense_key, sshdr.asc,
+-			   sshdr.ascq);
++			   HP_SW_NAME, sshdr->sense_key, sshdr->asc,
++			   sshdr->ascq);
+ 		break;
+ 	}
+-
+-done:
+ 	return ret;
+ }
+ 
+@@ -105,131 +93,36 @@ static int tur_done(struct scsi_device *sdev, unsigned char *sense)
+  */
+ static int hp_sw_tur(struct scsi_device *sdev, struct hp_sw_dh_data *h)
+ {
+-	struct request *req;
+-	int ret;
++	unsigned char cmd[6] = { TEST_UNIT_READY };
++	struct scsi_sense_hdr sshdr;
++	int ret = SCSI_DH_OK, res;
++	u64 req_flags = REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT |
++		REQ_FAILFAST_DRIVER;
+ 
+ retry:
+-	req = blk_get_request(sdev->request_queue, WRITE, GFP_NOIO);
+-	if (IS_ERR(req))
+-		return SCSI_DH_RES_TEMP_UNAVAIL;
+-
+-	blk_rq_set_block_pc(req);
+-	req->cmd_flags |= REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT |
+-			  REQ_FAILFAST_DRIVER;
+-	req->cmd_len = COMMAND_SIZE(TEST_UNIT_READY);
+-	req->cmd[0] = TEST_UNIT_READY;
+-	req->timeout = HP_SW_TIMEOUT;
+-	req->sense = h->sense;
+-	memset(req->sense, 0, SCSI_SENSE_BUFFERSIZE);
+-	req->sense_len = 0;
+-
+-	ret = blk_execute_rq(req->q, NULL, req, 1);
+-	if (ret == -EIO) {
+-		if (req->sense_len > 0) {
+-			ret = tur_done(sdev, h->sense);
+-		} else {
++	res = scsi_execute_req_flags(sdev, cmd, DMA_NONE, NULL, 0, &sshdr,
++				     HP_SW_TIMEOUT, HP_SW_RETRIES,
++				     NULL, req_flags, 0);
++	if (res) {
++		if (scsi_sense_valid(&sshdr))
++			ret = tur_done(sdev, h, &sshdr);
++		else {
+ 			sdev_printk(KERN_WARNING, sdev,
+ 				    "%s: sending tur failed with %x\n",
+-				    HP_SW_NAME, req->errors);
++				    HP_SW_NAME, res);
+ 			ret = SCSI_DH_IO;
+ 		}
+ 	} else {
+ 		h->path_state = HP_SW_PATH_ACTIVE;
+ 		ret = SCSI_DH_OK;
+ 	}
+-	if (ret == SCSI_DH_IMM_RETRY) {
+-		blk_put_request(req);
++	if (ret == SCSI_DH_IMM_RETRY)
+ 		goto retry;
+-	}
+-	if (ret == SCSI_DH_DEV_OFFLINED) {
+-		h->path_state = HP_SW_PATH_PASSIVE;
+-		ret = SCSI_DH_OK;
+-	}
+-
+-	blk_put_request(req);
+ 
+ 	return ret;
+ }
+ 
+ /*
+- * start_done - Handle START STOP UNIT return status
+- * @sdev: sdev the command has been sent to
+- * @errors: blk error code
+- */
+-static int start_done(struct scsi_device *sdev, unsigned char *sense)
+-{
+-	struct scsi_sense_hdr sshdr;
+-	int rc;
+-
+-	rc = scsi_normalize_sense(sense, SCSI_SENSE_BUFFERSIZE, &sshdr);
+-	if (!rc) {
+-		sdev_printk(KERN_WARNING, sdev,
+-			    "%s: sending start_stop_unit failed, "
+-			    "no sense available\n",
+-			    HP_SW_NAME);
+-		return SCSI_DH_IO;
+-	}
+-	switch (sshdr.sense_key) {
+-	case NOT_READY:
+-		if ((sshdr.asc == 0x04) && (sshdr.ascq == 3)) {
+-			/*
+-			 * LUN not ready - manual intervention required
+-			 *
+-			 * Switch-over in progress, retry.
+-			 */
+-			rc = SCSI_DH_RETRY;
+-			break;
+-		}
+-		/* fall through */
+-	default:
+-		sdev_printk(KERN_WARNING, sdev,
+-			   "%s: sending start_stop_unit failed, sense %x/%x/%x\n",
+-			   HP_SW_NAME, sshdr.sense_key, sshdr.asc,
+-			   sshdr.ascq);
+-		rc = SCSI_DH_IO;
+-	}
+-
+-	return rc;
+-}
+-
+-static void start_stop_endio(struct request *req, int error)
+-{
+-	struct hp_sw_dh_data *h = req->end_io_data;
+-	unsigned err = SCSI_DH_OK;
+-
+-	if (error || host_byte(req->errors) != DID_OK ||
+-			msg_byte(req->errors) != COMMAND_COMPLETE) {
+-		sdev_printk(KERN_WARNING, h->sdev,
+-			    "%s: sending start_stop_unit failed with %x\n",
+-			    HP_SW_NAME, req->errors);
+-		err = SCSI_DH_IO;
+-		goto done;
+-	}
+-
+-	if (req->sense_len > 0) {
+-		err = start_done(h->sdev, h->sense);
+-		if (err == SCSI_DH_RETRY) {
+-			err = SCSI_DH_IO;
+-			if (--h->retry_cnt) {
+-				blk_put_request(req);
+-				err = hp_sw_start_stop(h);
+-				if (err == SCSI_DH_OK)
+-					return;
+-			}
+-		}
+-	}
+-done:
+-	req->end_io_data = NULL;
+-	__blk_put_request(req->q, req);
+-	if (h->callback_fn) {
+-		h->callback_fn(h->callback_data, err);
+-		h->callback_fn = h->callback_data = NULL;
+-	}
+-	return;
+-
+-}
+-
+-/*
+  * hp_sw_start_stop - Send START STOP UNIT command
+  * @sdev: sdev command should be sent to
+  *
+@@ -237,26 +130,48 @@ static void start_stop_endio(struct request *req, int error)
+  */
+ static int hp_sw_start_stop(struct hp_sw_dh_data *h)
+ {
+-	struct request *req;
+-
+-	req = blk_get_request(h->sdev->request_queue, WRITE, GFP_ATOMIC);
+-	if (IS_ERR(req))
+-		return SCSI_DH_RES_TEMP_UNAVAIL;
+-
+-	blk_rq_set_block_pc(req);
+-	req->cmd_flags |= REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT |
+-			  REQ_FAILFAST_DRIVER;
+-	req->cmd_len = COMMAND_SIZE(START_STOP);
+-	req->cmd[0] = START_STOP;
+-	req->cmd[4] = 1;	/* Start spin cycle */
+-	req->timeout = HP_SW_TIMEOUT;
+-	req->sense = h->sense;
+-	memset(req->sense, 0, SCSI_SENSE_BUFFERSIZE);
+-	req->sense_len = 0;
+-	req->end_io_data = h;
++	unsigned char cmd[6] = { START_STOP, 0, 0, 0, 1, 0 };
++	struct scsi_sense_hdr sshdr;
++	struct scsi_device *sdev = h->sdev;
++	int res, rc = SCSI_DH_OK;
++	int retry_cnt = HP_SW_RETRIES;
++	u64 req_flags = REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT |
++		REQ_FAILFAST_DRIVER;
+ 
+-	blk_execute_rq_nowait(req->q, NULL, req, 1, start_stop_endio);
+-	return SCSI_DH_OK;
++retry:
++	res = scsi_execute_req_flags(sdev, cmd, DMA_NONE, NULL, 0, &sshdr,
++				     HP_SW_TIMEOUT, HP_SW_RETRIES,
++				     NULL, req_flags, 0);
++	if (res) {
++		if (!scsi_sense_valid(&sshdr)) {
++			sdev_printk(KERN_WARNING, sdev,
++				    "%s: sending start_stop_unit failed, "
++				    "no sense available\n", HP_SW_NAME);
++			return SCSI_DH_IO;
 +		}
-+
- 		/*
- 		 * Tell the block layer that we are not a rotational device
- 		 */
-@@ -1115,6 +1126,7 @@ static int __init nbd_init(void)
- 		blk_mq_free_tag_set(&nbd_dev[i].tag_set);
- 		blk_cleanup_queue(nbd_dev[i].disk->queue);
- 		put_disk(nbd_dev[i].disk);
-+		destroy_workqueue(nbd_dev[i].recv_workqueue);
- 	}
- 	kfree(nbd_dev);
- 	return err;
-@@ -1134,6 +1146,7 @@ static void __exit nbd_cleanup(void)
- 			blk_cleanup_queue(disk->queue);
- 			blk_mq_free_tag_set(&nbd_dev[i].tag_set);
- 			put_disk(disk);
-+			destroy_workqueue(nbd_dev[i].recv_workqueue);
- 		}
- 	}
- 	unregister_blkdev(NBD_MAJOR, "nbd");
++		switch (sshdr.sense_key) {
++		case NOT_READY:
++			if (sshdr.asc == 0x04 && sshdr.ascq == 3) {
++				/*
++				 * LUN not ready - manual intervention required
++				 *
++				 * Switch-over in progress, retry.
++				 */
++				if (--retry_cnt)
++					goto retry;
++				rc = SCSI_DH_RETRY;
++				break;
++			}
++			/* fall through */
++		default:
++			sdev_printk(KERN_WARNING, sdev,
++				    "%s: sending start_stop_unit failed, "
++				    "sense %x/%x/%x\n", HP_SW_NAME,
++				    sshdr.sense_key, sshdr.asc, sshdr.ascq);
++			rc = SCSI_DH_IO;
++		}
++	}
++	return rc;
+ }
+ 
+ static int hp_sw_prep_fn(struct scsi_device *sdev, struct request *req)
+@@ -290,15 +205,8 @@ static int hp_sw_activate(struct scsi_device *sdev,
+ 
+ 	ret = hp_sw_tur(sdev, h);
+ 
+-	if (ret == SCSI_DH_OK && h->path_state == HP_SW_PATH_PASSIVE) {
+-		h->retry_cnt = h->retries;
+-		h->callback_fn = fn;
+-		h->callback_data = data;
++	if (ret == SCSI_DH_OK && h->path_state == HP_SW_PATH_PASSIVE)
+ 		ret = hp_sw_start_stop(h);
+-		if (ret == SCSI_DH_OK)
+-			return 0;
+-		h->callback_fn = h->callback_data = NULL;
+-	}
+ 
+ 	if (fn)
+ 		fn(data, ret);
 -- 
-2.5.5
+2.1.4
 
