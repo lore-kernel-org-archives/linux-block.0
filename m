@@ -1,22 +1,37 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-Date: Mon, 23 Jan 2017 16:46:46 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@fb.com>
-Cc: Christoph Hellwig <hch@lst.de>, Mike Snitzer <snitzer@redhat.com>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        dm-devel@redhat.com
 Subject: Re: split scsi passthrough fields out of struct request
-Message-ID: <20170123154646.GA400@lst.de>
-References: <1485185361-29786-1-git-send-email-hch@lst.de> <ab371cbe-9abc-877e-b529-a7a3c39ff229@fb.com>
+To: Christoph Hellwig <hch@lst.de>
+References: <1485185361-29786-1-git-send-email-hch@lst.de>
+Cc: Mike Snitzer <snitzer@redhat.com>, linux-block@vger.kernel.org,
+ linux-scsi@vger.kernel.org, dm-devel@redhat.com
+From: Jens Axboe <axboe@fb.com>
+Message-ID: <ab371cbe-9abc-877e-b529-a7a3c39ff229@fb.com>
+Date: Mon, 23 Jan 2017 08:39:44 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <ab371cbe-9abc-877e-b529-a7a3c39ff229@fb.com>
-Sender: linux-scsi-owner@vger.kernel.org
+In-Reply-To: <1485185361-29786-1-git-send-email-hch@lst.de>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Jan 23, 2017 at 08:39:44AM -0700, Jens Axboe wrote:
-> I'd like to get this in sooner rather than later, so I'll spend some
-> time reviewing and testing it start this week. I'm assuming you are
-> targeting 4.11 with this change, right?
+On 01/23/2017 08:29 AM, Christoph Hellwig wrote:
+> Hi all,
+> 
+> this series splits the support for SCSI passthrough commands from the
+> main struct request used all over the block layer into a separate
+> scsi_request structure that drivers that want to support SCSI passthough
+> need to embedded as the first thing into their request-private data,
+> similar to how we handle NVMe passthrough commands.
+> 
+> To support this I've added support for that the private data after
+> request structure to the legacy request path instead, so that it can
+> be treated the same way as the blk-mq path.  Compare to the current
+> scsi_cmnd allocator that actually is a major simplification.
+> 
+> Compared to the previous RFC version the major change is that dm-mpath
+> works with this version.  To make it work I've switched the legacy
+> request dm-rq to use the same clone and map method as the blk-mq version.
 
-Yes.
+I'd like to get this in sooner rather than later, so I'll spend some
+time reviewing and testing it start this week. I'm assuming you are
+targeting 4.11 with this change, right?
+
+-- 
+Jens Axboe
