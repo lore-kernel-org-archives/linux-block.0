@@ -1,46 +1,89 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:58627 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750704AbdAXHC4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Jan 2017 02:02:56 -0500
-Subject: Re: [PATCH 01/16] block: fix elevator init check
-To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@fb.com>
-References: <1485185361-29786-1-git-send-email-hch@lst.de>
- <1485185361-29786-2-git-send-email-hch@lst.de>
+Received: from bombadil.infradead.org ([65.50.211.133]:56422 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750950AbdAWP33 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 23 Jan 2017 10:29:29 -0500
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@fb.com>
 Cc: Mike Snitzer <snitzer@redhat.com>, linux-block@vger.kernel.org,
         linux-scsi@vger.kernel.org, dm-devel@redhat.com
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <ebb3e9f6-df35-74a7-23a9-71521098a124@suse.de>
-Date: Tue, 24 Jan 2017 08:02:52 +0100
-MIME-Version: 1.0
-In-Reply-To: <1485185361-29786-2-git-send-email-hch@lst.de>
-Content-Type: text/plain; charset=windows-1252
+Subject: [PATCH 01/16] block: fix elevator init check
+Date: Mon, 23 Jan 2017 16:29:06 +0100
+Message-Id: <1485185361-29786-2-git-send-email-hch@lst.de>
+In-Reply-To: <1485185361-29786-1-git-send-email-hch@lst.de>
+References: <1485185361-29786-1-git-send-email-hch@lst.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 01/23/2017 04:29 PM, Christoph Hellwig wrote:
-> We can't initalize the elevator fields for flushes as flush share space
-> in struct request with the elevator data.  But currently we can't
-> commnicate that a request is a flush through blk_get_request as we
-> can only pass READ or WRITE, and the low-level code looks at the
-> possible NULL bio to check for a flush.
-> 
-> Fix this by allowing to pass any block op and flags, and by checking for
-> the flush flags in __get_request.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  block/blk-core.c | 26 ++++----------------------
->  1 file changed, 4 insertions(+), 22 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+We can't initalize the elevator fields for flushes as flush share space
+in struct request with the elevator data.  But currently we can't
+commnicate that a request is a flush through blk_get_request as we
+can only pass READ or WRITE, and the low-level code looks at the
+possible NULL bio to check for a flush.
 
-Cheers,
+Fix this by allowing to pass any block op and flags, and by checking for
+the flush flags in __get_request.
 
-Hannes
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ block/blk-core.c | 26 ++++----------------------
+ 1 file changed, 4 insertions(+), 22 deletions(-)
+
+diff --git a/block/blk-core.c b/block/blk-core.c
+index a61f140..732b719 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -1022,25 +1022,6 @@ int blk_update_nr_requests(struct request_queue *q, unsigned int nr)
+ 	return 0;
+ }
+ 
+-/*
+- * Determine if elevator data should be initialized when allocating the
+- * request associated with @bio.
+- */
+-static bool blk_rq_should_init_elevator(struct bio *bio)
+-{
+-	if (!bio)
+-		return true;
+-
+-	/*
+-	 * Flush requests do not use the elevator so skip initialization.
+-	 * This allows a request to share the flush and elevator data.
+-	 */
+-	if (bio->bi_opf & (REQ_PREFLUSH | REQ_FUA))
+-		return false;
+-
+-	return true;
+-}
+-
+ /**
+  * __get_request - get a free request
+  * @rl: request list to allocate from
+@@ -1119,10 +1100,13 @@ static struct request *__get_request(struct request_list *rl, unsigned int op,
+ 	 * request is freed.  This guarantees icq's won't be destroyed and
+ 	 * makes creating new ones safe.
+ 	 *
++	 * Flush requests do not use the elevator so skip initialization.
++	 * This allows a request to share the flush and elevator data.
++	 *
+ 	 * Also, lookup icq while holding queue_lock.  If it doesn't exist,
+ 	 * it will be created after releasing queue_lock.
+ 	 */
+-	if (blk_rq_should_init_elevator(bio) && !blk_queue_bypass(q)) {
++	if (!(op & (REQ_PREFLUSH | REQ_FUA)) && !blk_queue_bypass(q)) {
+ 		rq_flags |= RQF_ELVPRIV;
+ 		q->nr_rqs_elvpriv++;
+ 		if (et->icq_cache && ioc)
+@@ -1276,8 +1260,6 @@ static struct request *blk_old_get_request(struct request_queue *q, int rw,
+ {
+ 	struct request *rq;
+ 
+-	BUG_ON(rw != READ && rw != WRITE);
+-
+ 	/* create ioc upfront */
+ 	create_io_context(gfp_mask, q->node);
+ 
 -- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: F. Imend�rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG N�rnberg)
+2.1.4
+
