@@ -1,43 +1,67 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:43739 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750826AbdAXN2e (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Jan 2017 08:28:34 -0500
-Subject: Re: [PATCH 06/10] blk-mq: export software queue pending map to
- debugfs
-To: Omar Sandoval <osandov@osandov.com>, Jens Axboe <axboe@fb.com>,
-        linux-block@vger.kernel.org
-References: <cover.1485197480.git.osandov@fb.com>
- <9006e3aee4f0bdecdfb879ec5e227c50d9ff6256.1485197480.git.osandov@fb.com>
+Received: from mail-pg0-f51.google.com ([74.125.83.51]:34401 "EHLO
+        mail-pg0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751449AbdAWTAY (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 23 Jan 2017 14:00:24 -0500
+Received: by mail-pg0-f51.google.com with SMTP id 14so47093763pgg.1
+        for <linux-block@vger.kernel.org>; Mon, 23 Jan 2017 11:00:24 -0800 (PST)
+From: Omar Sandoval <osandov@osandov.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
 Cc: kernel-team@fb.com
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <f1af837c-03f0-c0d0-6b05-dfb3038be5ec@suse.de>
-Date: Tue, 24 Jan 2017 14:28:31 +0100
-MIME-Version: 1.0
-In-Reply-To: <9006e3aee4f0bdecdfb879ec5e227c50d9ff6256.1485197480.git.osandov@fb.com>
-Content-Type: text/plain; charset=windows-1252
+Subject: [PATCH 06/10] blk-mq: export software queue pending map to debugfs
+Date: Mon, 23 Jan 2017 10:59:43 -0800
+Message-Id: <9006e3aee4f0bdecdfb879ec5e227c50d9ff6256.1485197480.git.osandov@fb.com>
+In-Reply-To: <cover.1485197480.git.osandov@fb.com>
+References: <cover.1485197480.git.osandov@fb.com>
+In-Reply-To: <cover.1485197480.git.osandov@fb.com>
+References: <cover.1485197480.git.osandov@fb.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 01/23/2017 07:59 PM, Omar Sandoval wrote:
-> From: Omar Sandoval <osandov@fb.com>
-> 
-> This is useful for debugging problems where we've gotten stuck with
-> requests in the software queues.
-> 
-> Signed-off-by: Omar Sandoval <osandov@fb.com>
-> ---
->  block/blk-mq-debugfs.c | 15 +++++++++++++++
->  1 file changed, 15 insertions(+)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+From: Omar Sandoval <osandov@fb.com>
 
-Cheers,
+This is useful for debugging problems where we've gotten stuck with
+requests in the software queues.
 
-Hannes
+Signed-off-by: Omar Sandoval <osandov@fb.com>
+---
+ block/blk-mq-debugfs.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index ee947f2f605b..4ee6ab28f56f 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -134,6 +134,20 @@ static const struct file_operations hctx_dispatch_fops = {
+ 	.release	= seq_release,
+ };
+ 
++static int hctx_ctx_map_open(struct inode *inode, struct file *file)
++{
++	struct blk_mq_hw_ctx *hctx = inode->i_private;
++
++	return single_open(file, sbitmap_bitmap_show, &hctx->ctx_map);
++}
++
++static const struct file_operations hctx_ctx_map_fops = {
++	.open		= hctx_ctx_map_open,
++	.read		= seq_read,
++	.llseek		= seq_lseek,
++	.release	= single_release,
++};
++
+ static void *ctx_rq_list_start(struct seq_file *m, loff_t *pos)
+ {
+ 	struct blk_mq_ctx *ctx = m->private;
+@@ -179,6 +193,7 @@ static const struct blk_mq_debugfs_attr blk_mq_debugfs_hctx_attrs[] = {
+ 	{"state", 0400, &hctx_state_fops},
+ 	{"flags", 0400, &hctx_flags_fops},
+ 	{"dispatch", 0400, &hctx_dispatch_fops},
++	{"ctx_map", 0400, &hctx_ctx_map_fops},
+ };
+ 
+ static const struct blk_mq_debugfs_attr blk_mq_debugfs_ctx_attrs[] = {
 -- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: F. Imend�rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG N�rnberg)
+2.11.0
+
