@@ -1,43 +1,40 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:59079 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1752234AbdATV5U (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 Jan 2017 16:57:20 -0500
-From: Josef Bacik <jbacik@fb.com>
-To: <arnd@arndb.de>, <gregkh@linuxfoundation.org>, <axboe@fb.com>,
-        <nbd-general@lists.sourceforge.net>, <linux-block@vger.kernel.org>,
-        <kernel-team@fb.com>
-Subject: [PATCH 2/4] miscdevice: add a minor number for nbd-control
-Date: Fri, 20 Jan 2017 16:56:50 -0500
-Message-ID: <1484949412-6903-2-git-send-email-jbacik@fb.com>
-In-Reply-To: <1484949412-6903-1-git-send-email-jbacik@fb.com>
-References: <1484949412-6903-1-git-send-email-jbacik@fb.com>
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+Subject: Re: [PATCH 03/16] block: allow specifying size for extra command data
+To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@fb.com>
+References: <1485185361-29786-1-git-send-email-hch@lst.de>
+ <1485185361-29786-4-git-send-email-hch@lst.de>
+Cc: Mike Snitzer <snitzer@redhat.com>, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org, dm-devel@redhat.com
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <88ce26fc-53fa-04a6-6d88-3534b3c88939@suse.de>
+Date: Tue, 24 Jan 2017 09:10:53 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <1485185361-29786-4-git-send-email-hch@lst.de>
+Content-Type: text/plain; charset=windows-1252
+Sender: linux-scsi-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-NBD is moving to a loop-control esque way of managing it's device
-creation and deletion.  Reserver a minor number for the new device.
+On 01/23/2017 04:29 PM, Christoph Hellwig wrote:
+> This mirrors the blk-mq capabilities to allocate extra drivers-specific
+> data behind struct request by setting a cmd_size field, as well as having
+> a constructor / destructor for it.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  block/blk-core.c       | 59 ++++++++++++++++++++++++++++++++++++++++----------
+>  block/blk-flush.c      |  5 ++---
+>  block/blk-sysfs.c      |  7 ++++--
+>  include/linux/blkdev.h |  7 ++++++
+>  4 files changed, 61 insertions(+), 17 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Signed-off-by: Josef Bacik <jbacik@fb.com>
----
- include/linux/miscdevice.h | 1 +
- 1 file changed, 1 insertion(+)
+Cheers,
 
-diff --git a/include/linux/miscdevice.h b/include/linux/miscdevice.h
-index ed30d5d..7e5c140 100644
---- a/include/linux/miscdevice.h
-+++ b/include/linux/miscdevice.h
-@@ -44,6 +44,7 @@
- #define MISC_MCELOG_MINOR	227
- #define HPET_MINOR		228
- #define FUSE_MINOR		229
-+#define NBD_CTRL_MINOR		230
- #define KVM_MINOR		232
- #define BTRFS_MINOR		234
- #define AUTOFS_MINOR		235
+Hannes
 -- 
-2.7.4
-
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: F. Imend�rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG N�rnberg)
