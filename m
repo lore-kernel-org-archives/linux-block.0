@@ -1,355 +1,76 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f51.google.com ([74.125.83.51]:32879 "EHLO
-        mail-pg0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751466AbdAYQHb (ORCPT
+Received: from mail-lf0-f53.google.com ([209.85.215.53]:36266 "EHLO
+        mail-lf0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750951AbdAXKSX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 Jan 2017 11:07:31 -0500
-Received: by mail-pg0-f51.google.com with SMTP id 204so65718730pge.0
-        for <linux-block@vger.kernel.org>; Wed, 25 Jan 2017 08:07:31 -0800 (PST)
-From: Omar Sandoval <osandov@osandov.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: kernel-team@fb.com
-Subject: [PATCH v2 10/10] blk-mq: move hctx and ctx counters from sysfs to debugfs
-Date: Wed, 25 Jan 2017 08:06:49 -0800
-Message-Id: <15be78278142b408df6e56cd77e3bbffb1709501.1485360145.git.osandov@fb.com>
-In-Reply-To: <cover.1485360145.git.osandov@fb.com>
-References: <cover.1485360145.git.osandov@fb.com>
-In-Reply-To: <cover.1485360145.git.osandov@fb.com>
-References: <cover.1485360145.git.osandov@fb.com>
+        Tue, 24 Jan 2017 05:18:23 -0500
+Received: by mail-lf0-f53.google.com with SMTP id z134so108127486lff.3
+        for <linux-block@vger.kernel.org>; Tue, 24 Jan 2017 02:18:22 -0800 (PST)
+From: Linus Walleij <linus.walleij@linaro.org>
+To: linux-mmc@vger.kernel.org, linux-block@vger.kernel.org,
+        Ulf Hansson <ulf.hansson@linaro.org>
+Cc: Chunyan Zhang <zhang.chunyan@linaro.org>,
+        Baolin Wang <baolin.wang@linaro.org>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Linus Walleij <linus.walleij@linaro.org>
+Subject: [PATCH 5/6] mmc: block: introduce new_areq and old_areq
+Date: Tue, 24 Jan 2017 11:17:56 +0100
+Message-Id: <20170124101757.19676-6-linus.walleij@linaro.org>
+In-Reply-To: <20170124101757.19676-1-linus.walleij@linaro.org>
+References: <20170124101757.19676-1-linus.walleij@linaro.org>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Omar Sandoval <osandov@fb.com>
+Recycling the same variable in an x=x+1 fashion may seem
+clever here but it makes the code terse and hard to follow
+for humans. Introduce a new_areq and old_areq variable so
+we see what is going on.
 
-These counters aren't as out-of-place in sysfs as the other stuff, but
-debugfs is a slightly better home for them.
-
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Signed-off-by: Omar Sandoval <osandov@fb.com>
+Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
 ---
- block/blk-mq-debugfs.c | 181 +++++++++++++++++++++++++++++++++++++++++++++++++
- block/blk-mq-sysfs.c   |  64 -----------------
- 2 files changed, 181 insertions(+), 64 deletions(-)
+ drivers/mmc/core/block.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 28ca56dd2c4e..5cd2b435a9f5 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -399,6 +399,88 @@ static const struct file_operations hctx_dispatched_fops = {
- 	.release	= single_release,
- };
+diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
+index 4bbb3d16c09b..f3e0c778cdbd 100644
+--- a/drivers/mmc/core/block.c
++++ b/drivers/mmc/core/block.c
+@@ -1631,7 +1631,8 @@ static int mmc_blk_issue_rw_rq(struct mmc_queue *mq, struct request *rqc)
+ 	enum mmc_blk_status status;
+ 	struct mmc_queue_req *mq_rq;
+ 	struct request *req;
+-	struct mmc_async_req *areq;
++	struct mmc_async_req *new_areq;
++	struct mmc_async_req *old_areq;
  
-+static int hctx_queued_show(struct seq_file *m, void *v)
-+{
-+	struct blk_mq_hw_ctx *hctx = m->private;
-+
-+	seq_printf(m, "%lu\n", hctx->queued);
-+	return 0;
-+}
-+
-+static int hctx_queued_open(struct inode *inode, struct file *file)
-+{
-+	return single_open(file, hctx_queued_show, inode->i_private);
-+}
-+
-+static ssize_t hctx_queued_write(struct file *file, const char __user *buf,
-+				 size_t count, loff_t *ppos)
-+{
-+	struct seq_file *m = file->private_data;
-+	struct blk_mq_hw_ctx *hctx = m->private;
-+
-+	hctx->queued = 0;
-+	return count;
-+}
-+
-+static const struct file_operations hctx_queued_fops = {
-+	.open		= hctx_queued_open,
-+	.read		= seq_read,
-+	.write		= hctx_queued_write,
-+	.llseek		= seq_lseek,
-+	.release	= single_release,
-+};
-+
-+static int hctx_run_show(struct seq_file *m, void *v)
-+{
-+	struct blk_mq_hw_ctx *hctx = m->private;
-+
-+	seq_printf(m, "%lu\n", hctx->run);
-+	return 0;
-+}
-+
-+static int hctx_run_open(struct inode *inode, struct file *file)
-+{
-+	return single_open(file, hctx_run_show, inode->i_private);
-+}
-+
-+static ssize_t hctx_run_write(struct file *file, const char __user *buf,
-+				 size_t count, loff_t *ppos)
-+{
-+	struct seq_file *m = file->private_data;
-+	struct blk_mq_hw_ctx *hctx = m->private;
-+
-+	hctx->run = 0;
-+	return count;
-+}
-+
-+static const struct file_operations hctx_run_fops = {
-+	.open		= hctx_run_open,
-+	.read		= seq_read,
-+	.write		= hctx_run_write,
-+	.llseek		= seq_lseek,
-+	.release	= single_release,
-+};
-+
-+static int hctx_active_show(struct seq_file *m, void *v)
-+{
-+	struct blk_mq_hw_ctx *hctx = m->private;
-+
-+	seq_printf(m, "%d\n", atomic_read(&hctx->nr_active));
-+	return 0;
-+}
-+
-+static int hctx_active_open(struct inode *inode, struct file *file)
-+{
-+	return single_open(file, hctx_active_show, inode->i_private);
-+}
-+
-+static const struct file_operations hctx_active_fops = {
-+	.open		= hctx_active_open,
-+	.read		= seq_read,
-+	.llseek		= seq_lseek,
-+	.release	= single_release,
-+};
-+
- static void *ctx_rq_list_start(struct seq_file *m, loff_t *pos)
- {
- 	struct blk_mq_ctx *ctx = m->private;
-@@ -440,6 +522,99 @@ static const struct file_operations ctx_rq_list_fops = {
- 	.release	= seq_release,
- };
+ 	if (!rqc && !mq->mqrq_prev->req)
+ 		return 0;
+@@ -1651,11 +1652,12 @@ static int mmc_blk_issue_rw_rq(struct mmc_queue *mq, struct request *rqc)
+ 			}
  
-+static int ctx_dispatched_show(struct seq_file *m, void *v)
-+{
-+	struct blk_mq_ctx *ctx = m->private;
+ 			mmc_blk_rw_rq_prep(mq->mqrq_cur, card, 0, mq);
+-			areq = &mq->mqrq_cur->mmc_active;
++			new_areq = &mq->mqrq_cur->mmc_active;
+ 		} else
+-			areq = NULL;
+-		areq = mmc_start_req(card->host, areq, &status);
+-		if (!areq) {
++			new_areq = NULL;
 +
-+	seq_printf(m, "%lu %lu\n", ctx->rq_dispatched[1], ctx->rq_dispatched[0]);
-+	return 0;
-+}
-+
-+static int ctx_dispatched_open(struct inode *inode, struct file *file)
-+{
-+	return single_open(file, ctx_dispatched_show, inode->i_private);
-+}
-+
-+static ssize_t ctx_dispatched_write(struct file *file, const char __user *buf,
-+				    size_t count, loff_t *ppos)
-+{
-+	struct seq_file *m = file->private_data;
-+	struct blk_mq_ctx *ctx = m->private;
-+
-+	ctx->rq_dispatched[0] = ctx->rq_dispatched[1] = 0;
-+	return count;
-+}
-+
-+static const struct file_operations ctx_dispatched_fops = {
-+	.open		= ctx_dispatched_open,
-+	.read		= seq_read,
-+	.write		= ctx_dispatched_write,
-+	.llseek		= seq_lseek,
-+	.release	= single_release,
-+};
-+
-+static int ctx_merged_show(struct seq_file *m, void *v)
-+{
-+	struct blk_mq_ctx *ctx = m->private;
-+
-+	seq_printf(m, "%lu\n", ctx->rq_merged);
-+	return 0;
-+}
-+
-+static int ctx_merged_open(struct inode *inode, struct file *file)
-+{
-+	return single_open(file, ctx_merged_show, inode->i_private);
-+}
-+
-+static ssize_t ctx_merged_write(struct file *file, const char __user *buf,
-+				    size_t count, loff_t *ppos)
-+{
-+	struct seq_file *m = file->private_data;
-+	struct blk_mq_ctx *ctx = m->private;
-+
-+	ctx->rq_merged = 0;
-+	return count;
-+}
-+
-+static const struct file_operations ctx_merged_fops = {
-+	.open		= ctx_merged_open,
-+	.read		= seq_read,
-+	.write		= ctx_merged_write,
-+	.llseek		= seq_lseek,
-+	.release	= single_release,
-+};
-+
-+static int ctx_completed_show(struct seq_file *m, void *v)
-+{
-+	struct blk_mq_ctx *ctx = m->private;
-+
-+	seq_printf(m, "%lu %lu\n", ctx->rq_completed[1], ctx->rq_completed[0]);
-+	return 0;
-+}
-+
-+static int ctx_completed_open(struct inode *inode, struct file *file)
-+{
-+	return single_open(file, ctx_completed_show, inode->i_private);
-+}
-+
-+static ssize_t ctx_completed_write(struct file *file, const char __user *buf,
-+				   size_t count, loff_t *ppos)
-+{
-+	struct seq_file *m = file->private_data;
-+	struct blk_mq_ctx *ctx = m->private;
-+
-+	ctx->rq_completed[0] = ctx->rq_completed[1] = 0;
-+	return count;
-+}
-+
-+static const struct file_operations ctx_completed_fops = {
-+	.open		= ctx_completed_open,
-+	.read		= seq_read,
-+	.write		= ctx_completed_write,
-+	.llseek		= seq_lseek,
-+	.release	= single_release,
-+};
-+
- static const struct blk_mq_debugfs_attr blk_mq_debugfs_hctx_attrs[] = {
- 	{"state", 0400, &hctx_state_fops},
- 	{"flags", 0400, &hctx_flags_fops},
-@@ -452,10 +627,16 @@ static const struct blk_mq_debugfs_attr blk_mq_debugfs_hctx_attrs[] = {
- 	{"io_poll", 0600, &hctx_io_poll_fops},
- 	{"stats", 0600, &hctx_stats_fops},
- 	{"dispatched", 0600, &hctx_dispatched_fops},
-+	{"queued", 0600, &hctx_queued_fops},
-+	{"run", 0600, &hctx_run_fops},
-+	{"active", 0400, &hctx_active_fops},
- };
- 
- static const struct blk_mq_debugfs_attr blk_mq_debugfs_ctx_attrs[] = {
- 	{"rq_list", 0400, &ctx_rq_list_fops},
-+	{"dispatched", 0600, &ctx_dispatched_fops},
-+	{"merged", 0600, &ctx_merged_fops},
-+	{"completed", 0600, &ctx_completed_fops},
- };
- 
- int blk_mq_debugfs_register(struct request_queue *q, const char *name)
-diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
-index f505da2c542e..308b3f4fc310 100644
---- a/block/blk-mq-sysfs.c
-+++ b/block/blk-mq-sysfs.c
-@@ -122,34 +122,6 @@ static ssize_t blk_mq_hw_sysfs_store(struct kobject *kobj,
- 	return res;
- }
- 
--static ssize_t blk_mq_sysfs_dispatched_show(struct blk_mq_ctx *ctx, char *page)
--{
--	return sprintf(page, "%lu %lu\n", ctx->rq_dispatched[1],
--				ctx->rq_dispatched[0]);
--}
--
--static ssize_t blk_mq_sysfs_merged_show(struct blk_mq_ctx *ctx, char *page)
--{
--	return sprintf(page, "%lu\n", ctx->rq_merged);
--}
--
--static ssize_t blk_mq_sysfs_completed_show(struct blk_mq_ctx *ctx, char *page)
--{
--	return sprintf(page, "%lu %lu\n", ctx->rq_completed[1],
--				ctx->rq_completed[0]);
--}
--
--static ssize_t blk_mq_hw_sysfs_queued_show(struct blk_mq_hw_ctx *hctx,
--					   char *page)
--{
--	return sprintf(page, "%lu\n", hctx->queued);
--}
--
--static ssize_t blk_mq_hw_sysfs_run_show(struct blk_mq_hw_ctx *hctx, char *page)
--{
--	return sprintf(page, "%lu\n", hctx->run);
--}
--
- static ssize_t blk_mq_hw_sysfs_nr_tags_show(struct blk_mq_hw_ctx *hctx,
- 					    char *page)
- {
-@@ -162,11 +134,6 @@ static ssize_t blk_mq_hw_sysfs_nr_reserved_tags_show(struct blk_mq_hw_ctx *hctx,
- 	return sprintf(page, "%u\n", hctx->tags->nr_reserved_tags);
- }
- 
--static ssize_t blk_mq_hw_sysfs_active_show(struct blk_mq_hw_ctx *hctx, char *page)
--{
--	return sprintf(page, "%u\n", atomic_read(&hctx->nr_active));
--}
--
- static ssize_t blk_mq_hw_sysfs_cpus_show(struct blk_mq_hw_ctx *hctx, char *page)
- {
- 	unsigned int i, first = 1;
-@@ -185,34 +152,10 @@ static ssize_t blk_mq_hw_sysfs_cpus_show(struct blk_mq_hw_ctx *hctx, char *page)
- 	return ret;
- }
- 
--static struct blk_mq_ctx_sysfs_entry blk_mq_sysfs_dispatched = {
--	.attr = {.name = "dispatched", .mode = S_IRUGO },
--	.show = blk_mq_sysfs_dispatched_show,
--};
--static struct blk_mq_ctx_sysfs_entry blk_mq_sysfs_merged = {
--	.attr = {.name = "merged", .mode = S_IRUGO },
--	.show = blk_mq_sysfs_merged_show,
--};
--static struct blk_mq_ctx_sysfs_entry blk_mq_sysfs_completed = {
--	.attr = {.name = "completed", .mode = S_IRUGO },
--	.show = blk_mq_sysfs_completed_show,
--};
--
- static struct attribute *default_ctx_attrs[] = {
--	&blk_mq_sysfs_dispatched.attr,
--	&blk_mq_sysfs_merged.attr,
--	&blk_mq_sysfs_completed.attr,
- 	NULL,
- };
- 
--static struct blk_mq_hw_ctx_sysfs_entry blk_mq_hw_sysfs_queued = {
--	.attr = {.name = "queued", .mode = S_IRUGO },
--	.show = blk_mq_hw_sysfs_queued_show,
--};
--static struct blk_mq_hw_ctx_sysfs_entry blk_mq_hw_sysfs_run = {
--	.attr = {.name = "run", .mode = S_IRUGO },
--	.show = blk_mq_hw_sysfs_run_show,
--};
- static struct blk_mq_hw_ctx_sysfs_entry blk_mq_hw_sysfs_nr_tags = {
- 	.attr = {.name = "nr_tags", .mode = S_IRUGO },
- 	.show = blk_mq_hw_sysfs_nr_tags_show,
-@@ -221,22 +164,15 @@ static struct blk_mq_hw_ctx_sysfs_entry blk_mq_hw_sysfs_nr_reserved_tags = {
- 	.attr = {.name = "nr_reserved_tags", .mode = S_IRUGO },
- 	.show = blk_mq_hw_sysfs_nr_reserved_tags_show,
- };
--static struct blk_mq_hw_ctx_sysfs_entry blk_mq_hw_sysfs_active = {
--	.attr = {.name = "active", .mode = S_IRUGO },
--	.show = blk_mq_hw_sysfs_active_show,
--};
- static struct blk_mq_hw_ctx_sysfs_entry blk_mq_hw_sysfs_cpus = {
- 	.attr = {.name = "cpu_list", .mode = S_IRUGO },
- 	.show = blk_mq_hw_sysfs_cpus_show,
- };
- 
- static struct attribute *default_hw_ctx_attrs[] = {
--	&blk_mq_hw_sysfs_queued.attr,
--	&blk_mq_hw_sysfs_run.attr,
- 	&blk_mq_hw_sysfs_nr_tags.attr,
- 	&blk_mq_hw_sysfs_nr_reserved_tags.attr,
- 	&blk_mq_hw_sysfs_cpus.attr,
--	&blk_mq_hw_sysfs_active.attr,
- 	NULL,
- };
- 
++		old_areq = mmc_start_req(card->host, new_areq, &status);
++		if (!old_areq) {
+ 			/*
+ 			 * We have just put the first request into the pipeline
+ 			 * and there is nothing more to do until it is
+@@ -1670,7 +1672,7 @@ static int mmc_blk_issue_rw_rq(struct mmc_queue *mq, struct request *rqc)
+ 		 * An asynchronous request has been completed and we proceed
+ 		 * to handle the result of it.
+ 		 */
+-		mq_rq = container_of(areq, struct mmc_queue_req, mmc_active);
++		mq_rq =	container_of(old_areq, struct mmc_queue_req, mmc_active);
+ 		brq = &mq_rq->brq;
+ 		req = mq_rq->req;
+ 		type = rq_data_dir(req) == READ ? MMC_BLK_READ : MMC_BLK_WRITE;
 -- 
-2.11.0
+2.9.3
 
