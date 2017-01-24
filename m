@@ -1,37 +1,52 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-sn1nam01on0066.outbound.protection.outlook.com ([104.47.32.66]:59848
+        "EHLO NAM01-SN1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1750901AbdAXQbW (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 24 Jan 2017 11:31:22 -0500
+From: Bart Van Assche <Bart.VanAssche@sandisk.com>
+To: "hch@lst.de" <hch@lst.de>
+CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "axboe@fb.com" <axboe@fb.com>,
+        "snitzer@redhat.com" <snitzer@redhat.com>
 Subject: Re: [PATCH 15/16] block: split scsi_request out of struct request
-To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@fb.com>
+Date: Tue, 24 Jan 2017 16:31:13 +0000
+Message-ID: <1485275452.2715.1.camel@sandisk.com>
 References: <1485185361-29786-1-git-send-email-hch@lst.de>
- <1485185361-29786-16-git-send-email-hch@lst.de>
-CC: Mike Snitzer <snitzer@redhat.com>, <linux-block@vger.kernel.org>,
-        <linux-scsi@vger.kernel.org>, <dm-devel@redhat.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-Message-ID: <455a58ef-905c-abf9-ae59-ca98f003f31e@sandisk.com>
-Date: Thu, 26 Jan 2017 11:12:51 -0800
+         <1485185361-29786-16-git-send-email-hch@lst.de>
+         <1485217979.2825.20.camel@sandisk.com> <20170124080906.GA17018@lst.de>
+In-Reply-To: <20170124080906.GA17018@lst.de>
+Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
-In-Reply-To: <1485185361-29786-16-git-send-email-hch@lst.de>
-Content-Type: text/plain; charset="windows-1252"
-Sender: linux-scsi-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On 01/23/2017 07:29 AM, Christoph Hellwig wrote:
-> +int scsi_cmd_buf_len(struct request *rq)
-> +{
-> +	return scsi_req(rq)->cmd_len * 3;
-> +}
-> +EXPORT_SYMBOL(scsi_cmd_buf_len);
+On Tue, 2017-01-24 at 09:09 +0100, hch@lst.de wrote:
+> On Tue, Jan 24, 2017 at 12:33:13AM +0000, Bart Van Assche wrote:
+> > Do we perhaps need a check before the above memcpy() call whether or no=
+t
+> > sense =3D=3D NULL?
+>=20
+> Yes, probably.  I didn't think of the case where the caller wouldn't
+> pass a sense buffer.  Just curious, what's the callstack that caused
+> this?
 
 Hello Christoph,
 
-Where does the '* 3' come from? I think that deserves a comment.
-Additionally, this patch introduces a new warning when building with W=1:
+The call stack was as follows:
+* __scsi_execute()
+* scsi_execute_req_flags()
+* scsi_vpd_inquiry()
+* scsi_attach_vpd()
+* scsi_probe_and_add_lun()
+* __scsi_add_device()
+* ata_scsi_scan_host()
+* async_port_probe()
+* async_run_entry_fn()
+* process_one_work()
+* worker_thread()
+* kthread()
 
-block/scsi_ioctl.c:761:5: warning: no previous prototype for
-�scsi_cmd_buf_len� [-Wmissing-prototypes]
-
-Please consider adding #include <linux/blktrace_api.h> to the source
-file in which scsi_cmd_buf_len() is added.
-
-Thanks,
-
-Bart.
+Bart.=
