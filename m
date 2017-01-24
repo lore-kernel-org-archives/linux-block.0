@@ -1,17 +1,17 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:43305 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1751139AbdAXQJe (ORCPT
+Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:52875 "EHLO
+        mx0b-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1750714AbdAXQEY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Jan 2017 11:09:34 -0500
+        Tue, 24 Jan 2017 11:04:24 -0500
 Subject: Re: [PATCH] queue stall with blk-mq-sched
 To: Hannes Reinecke <hare@suse.de>
 References: <aa1c23e1-1beb-a26d-3e77-fe78aa281771@suse.de>
 CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         Omar Sandoval <osandov@osandov.com>
 From: Jens Axboe <axboe@fb.com>
-Message-ID: <762cb508-1de0-93e2-5643-3fe946428eb5@fb.com>
-Date: Tue, 24 Jan 2017 09:09:22 -0700
+Message-ID: <1c9beccc-c7cc-dd3e-703d-e91d8110ec86@fb.com>
+Date: Tue, 24 Jan 2017 09:03:26 -0700
 MIME-Version: 1.0
 In-Reply-To: <aa1c23e1-1beb-a26d-3e77-fe78aa281771@suse.de>
 Content-Type: text/plain; charset="utf-8"
@@ -30,24 +30,10 @@ On 01/24/2017 08:54 AM, Hannes Reinecke wrote:
 > We're already calling blk_mq_tag_busy() when fetching a tag, so I think
 > calling blk_mq_tag_idle() is required when retiring a tag.
 
-The patch isn't correct, the whole point of the un-idling is that it
-ISN'T happening for every request completion. Otherwise you throw
-away scalability. So a queue will go into active mode on the first
-request, and idle when it's been idle for a bit. The active count
-is used to divide up the tags.
-
-So I'm assuming we're missing a queue run somewhere when we fail
-getting a driver tag. The latter should only happen if the target
-has IO in flight already, and the restart marking should take care
-of it. Obviously there's a case where that is not true, since you
-are seeing stalls.
-
-> However, even with the attached patch I'm seeing some queue stalls;
-> looks like they're related to the 'stonewall' statement in fio.
-
-I think you are heading down the wrong path. Your patch will cause
-the symptoms to be a bit different, but you'll still run into cases
-where we fail giving out the tag and then stall.
+I'll take a look at this. It sounds like all your grief is related to
+shared tag maps, which I don't have anything that uses here. I'll see
+if we are leaking it, you should be able to check that by reading the
+'active' file in the sysfs directory.
 
 -- 
 Jens Axboe
