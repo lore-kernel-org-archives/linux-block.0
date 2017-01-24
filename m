@@ -1,47 +1,37 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f176.google.com ([209.85.192.176]:36502 "EHLO
-        mail-pf0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750828AbdAaWyI (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 31 Jan 2017 17:54:08 -0500
-Received: by mail-pf0-f176.google.com with SMTP id 189so112770027pfu.3
-        for <linux-block@vger.kernel.org>; Tue, 31 Jan 2017 14:54:08 -0800 (PST)
-From: Omar Sandoval <osandov@osandov.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
+Subject: Re: [PATCH] blk-mq-sched: fix possible crash if changing scheduler
+ fails
+To: Omar Sandoval <osandov@osandov.com>, linux-block@vger.kernel.org
+References: <b83737e281e311179615f93be9cfbae50addb1a0.1485215087.git.osandov@fb.com>
 Cc: kernel-team@fb.com
-Subject: [PATCH 2/6] block: fix debugfs config conditional in struct request_queue
-Date: Tue, 31 Jan 2017 14:53:18 -0800
-Message-Id: <cdde45aec458721ccba950ab3a42f2030e2c69b6.1485902856.git.osandov@fb.com>
-In-Reply-To: <cover.1485902856.git.osandov@fb.com>
-References: <cover.1485902856.git.osandov@fb.com>
-In-Reply-To: <cover.1485902856.git.osandov@fb.com>
-References: <cover.1485902856.git.osandov@fb.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+From: Jens Axboe <axboe@fb.com>
+Message-ID: <102a347a-28c4-3966-f360-55abc9740c8a@fb.com>
+Date: Tue, 24 Jan 2017 08:01:42 -0700
+MIME-Version: 1.0
+In-Reply-To: <b83737e281e311179615f93be9cfbae50addb1a0.1485215087.git.osandov@fb.com>
+Content-Type: text/plain; charset=windows-1252
+List-ID: <linux-block@vger.kernel.org>
 
-From: Omar Sandoval <osandov@fb.com>
+On 01/23/2017 04:47 PM, Omar Sandoval wrote:
+> From: Omar Sandoval <osandov@fb.com>
+> 
+> In elevator_switch(), we free the old scheduler's tags and then
+> initialize the new scheduler. If initializing the new scheduler fails,
+> we fall back to the old scheduler, but our tags have already been freed.
+> There's no reason to free the sched_tags only to reallocate them, so
+> let's just reuse them, which makes it possible to safely fall back to
+> the old scheduler.
 
-The debugfs dentries are only used for CONFIG_BLK_DEBUG_FS, so make them
-conditional on that instead of CONFIG_DEBUG_FS.
+Do we need a failure case on both ends? We never free the driver
+tags, so it's always perfectly safe to fall back to not running
+with a scheduler.
 
-Signed-off-by: Omar Sandoval <osandov@fb.com>
----
- include/linux/blkdev.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Since we were talking about making the scheduler depth configurable
+or dependent on the scheduler, reusing tags seems like something that
+would potentially be a short lived "feature".
 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 05675b1dfd20..0cd0066a3d48 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -571,7 +571,7 @@ struct request_queue {
- 	struct list_head	tag_set_list;
- 	struct bio_set		*bio_split;
- 
--#ifdef CONFIG_DEBUG_FS
-+#ifdef CONFIG_BLK_DEBUG_FS
- 	struct dentry		*debugfs_dir;
- 	struct dentry		*mq_debugfs_dir;
- #endif
+So I think I'd prefer if we teardown/setup like we do now, and just
+have the failure case be falling back to "none".
+
+
 -- 
-2.11.0
-
+Jens Axboe
