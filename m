@@ -1,35 +1,36 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:54066 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751072AbdAYRZg (ORCPT
+Received: from mail-wm0-f49.google.com ([74.125.82.49]:35368 "EHLO
+        mail-wm0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750721AbdAXNh1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 Jan 2017 12:25:36 -0500
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@fb.com>
-Cc: Mike Snitzer <snitzer@redhat.com>,
-        Junichi Nomura <j-nomura@ce.jp.nec.com>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-raid@vger.kernel.org, dm-devel@redhat.com
-Subject: split scsi passthrough fields out of struct request V2
-Date: Wed, 25 Jan 2017 18:25:08 +0100
-Message-Id: <1485365126-23210-1-git-send-email-hch@lst.de>
+        Tue, 24 Jan 2017 08:37:27 -0500
+Received: by mail-wm0-f49.google.com with SMTP id r126so182462997wmr.0
+        for <linux-block@vger.kernel.org>; Tue, 24 Jan 2017 05:37:27 -0800 (PST)
+Subject: Re: BUG: KASAN: Use-after-free
+To: Christoph Hellwig <hch@infradead.org>
+References: <0b458b92-62ee-bffc-8f3e-fbd6490b26fd@bjorling.me>
+ <20170123172021.GA28446@infradead.org>
+ <400b4572-0994-8950-582b-c3372333f6c8@bjorling.me>
+ <20170124095209.GA22003@infradead.org>
+ <60a5b26d-8819-4e8c-ecfa-b16659b0aa44@bjorling.me>
+ <20170124133418.GA18377@infradead.org>
+Cc: LKML <linux-kernel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <m@bjorling.me>
+Message-ID: <2049899a-e0cc-6eab-5b3c-cf962a6d6229@bjorling.me>
+Date: Tue, 24 Jan 2017 14:37:25 +0100
+MIME-Version: 1.0
+In-Reply-To: <20170124133418.GA18377@infradead.org>
+Content-Type: text/plain; charset=windows-1252
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hi all,
+On 01/24/2017 02:34 PM, Christoph Hellwig wrote:
+> On Tue, Jan 24, 2017 at 11:01:42AM +0100, Matias Bj�rling wrote:
+>> Yup. That fixes it. Should I put together the patch, or will you take
+>> care of it?
+> 
+> I'll send it out.  Of course with proper reporting credits for you.
+> 
 
-this series splits the support for SCSI passthrough commands from the
-main struct request used all over the block layer into a separate
-scsi_request structure that drivers that want to support SCSI passthough
-need to embedded as the first thing into their request-private data,
-similar to how we handle NVMe passthrough commands.
-
-To support this I've added support for that the private data after
-request structure to the legacy request path instead, so that it can
-be treated the same way as the blk-mq path.  Compare to the current
-scsi_cmnd allocator that actually is a major simplification.
-
-Changes since V1:
- - fix handling of a NULL sense pointer in __scsi_execute
- - clean up handling of the flush flags in the block layer and MD
- - additional small cleanup in dm-rq
+Awesome. Thanks
