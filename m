@@ -1,88 +1,108 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:48272 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751800AbdAYJ42 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 Jan 2017 04:56:28 -0500
-Date: Wed, 25 Jan 2017 10:56:13 +0100
-From: Jan Kara <jack@suse.cz>
+Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:32925 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1750995AbdAXXTU (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 24 Jan 2017 18:19:20 -0500
+From: Song Liu <songliubraving@fb.com>
 To: Oleg Drokin <green@linuxhacker.ru>
-Cc: Dan Williams <dan.j.williams@intel.com>,
-        linux-block@vger.kernel.org, Song Liu <songliubraving@fb.com>,
-        Andreas Dilger <andreas.dilger@intel.com>,
-        "Verma, Vishal L" <vishal.l.verma@intel.com>,
-        Jens Axboe <axboe@fb.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+CC: Dan Williams <dan.j.williams@intel.com>,
+        "lsf-pc@lists.linux-foundation.org"
+        <lsf-pc@lists.linux-foundation.org>, Jens Axboe <axboe@fb.com>,
         Kernel Team <Kernel-team@fb.com>,
-        lsf-pc@lists.linux-foundation.org
-Subject: Re: [Lsf-pc] [LSF/MM TOPIC] block level event logging for storage
- media management
-Message-ID: <20170125095613.GA18739@quack2.suse.cz>
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "Verma, Vishal L" <vishal.l.verma@intel.com>,
+        Andreas Dilger <andreas.dilger@intel.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: Re: [LSF/MM TOPIC] block level event logging for storage media
+ management
+Date: Tue, 24 Jan 2017 23:17:44 +0000
+Message-ID: <30E5E50B-C3FA-4377-91C2-D87FB03C0CF6@fb.com>
 References: <6040124E-4928-4FC8-8A52-35115D9CA1DF@fb.com>
  <CAA9_cmd_XMbw_26ePCSWLxP9PoTn36n8sO5buE2iTCoPnK+CHg@mail.gmail.com>
  <92E1CE17-4F28-4934-BB60-358FA334AA5F@fb.com>
  <CAPcyv4hrcS13ijDU2+Mp59EKCqkWLMv7uj=BhKKewiz02YZiPA@mail.gmail.com>
  <41FACF7F-7B70-47FC-92FB-B64C545BE434@linuxhacker.ru>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <41FACF7F-7B70-47FC-92FB-B64C545BE434@linuxhacker.ru>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Tue 24-01-17 15:18:57, Oleg Drokin wrote:
-> 
-> On Jan 23, 2017, at 2:27 AM, Dan Williams wrote:
-> 
-> > [ adding Oleg ]
-> > 
-> > On Sun, Jan 22, 2017 at 10:00 PM, Song Liu <songliubraving@fb.com> wrote:
-> >> Hi Dan,
-> >> 
-> >> I think the the block level event log is more like log only system. When en event
-> >> happens,  it is not necessary to take immediate action. (I guess this is different
-> >> to bad block list?).
-> >> 
-> >> I would hope the event log to track more information. Some of these individual
-> >> event may not be very interesting, for example, soft error or latency outliers.
-> >> However, when we gather event log for a fleet of devices, these "soft event"
-> >> may become valuable for health monitoring.
-> > 
-> > I'd be interested in this. It sounds like you're trying to fill a gap
-> > between tracing and console log messages which I believe others have
-> > encountered as well.
-> 
-> We have a somewhat similar problem problem in Lustre and I guess it's not
-> just Lustre.  Currently there are all sorts of conditional debug code all
-> over the place that goes to the console and when you enable it for
-> anything verbose, you quickly overflow your dmesg buffer no matter the
-> size, that might be mostly ok for local "block level" stuff, but once you
-> become distributed, it start to be a mess and once you get to be super
-> large it worsens even more since you need to somehow coordinate data from
-> multiple nodes, ensure all of it is not lost and still you don't end up
-> using a lot of it since only a few nodes end up being useful.  (I don't
-> know how NFS people manage to debug complicated issues using just this,
-> could not be super easy).
-> 
-> Having some sort of a buffer of a (potentially very) large size that
-> could be storing the data until it's needed, or eagerly polled by some
-> daemon for storage (helpful when you expect a lot of data that definitely
-> won't fit in RAM).
-> 
-> Tracepoints have the buffer and the daemon, but creating new messages is
-> very cumbersome, so converting every debug message into one does not look
-> very feasible.  Also it's convenient to have "event masks" one want
-> logged that I don't think you could do with tracepoints.
-
-So creating trace points IMO isn't that cumbersome. I agree that converting
-hundreds or thousands debug printks into tracepoints is a pain in the
-ass but still it is doable. WRT filtering, you can enable each tracepoint
-individually. Granted that is not exactly the 'event mask' feature you ask
-about but that can be easily scripted in userspace if you give some
-structure to tracepoint names. Finally tracepoints provide a fine grained
-control you never get with printk - e.g. you can make a tracepoint trigger
-only if specific inode is involved with trace filters which greatly reduces
-the amount of output.
-
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+DQo+IE9uIEphbiAyNCwgMjAxNywgYXQgMTI6MTggUE0sIE9sZWcgRHJva2luIDxncmVlbkBsaW51
+eGhhY2tlci5ydT4gd3JvdGU6DQo+IA0KPiANCj4gT24gSmFuIDIzLCAyMDE3LCBhdCAyOjI3IEFN
+LCBEYW4gV2lsbGlhbXMgd3JvdGU6DQo+IA0KPj4gWyBhZGRpbmcgT2xlZyBdDQo+PiANCj4+IE9u
+IFN1biwgSmFuIDIyLCAyMDE3IGF0IDEwOjAwIFBNLCBTb25nIExpdSA8c29uZ2xpdWJyYXZpbmdA
+ZmIuY29tPiB3cm90ZToNCj4+PiBIaSBEYW4sDQo+Pj4gDQo+Pj4gSSB0aGluayB0aGUgdGhlIGJs
+b2NrIGxldmVsIGV2ZW50IGxvZyBpcyBtb3JlIGxpa2UgbG9nIG9ubHkgc3lzdGVtLiBXaGVuIGVu
+IGV2ZW50DQo+Pj4gaGFwcGVucywgIGl0IGlzIG5vdCBuZWNlc3NhcnkgdG8gdGFrZSBpbW1lZGlh
+dGUgYWN0aW9uLiAoSSBndWVzcyB0aGlzIGlzIGRpZmZlcmVudA0KPj4+IHRvIGJhZCBibG9jayBs
+aXN0PykuDQo+Pj4gDQo+Pj4gSSB3b3VsZCBob3BlIHRoZSBldmVudCBsb2cgdG8gdHJhY2sgbW9y
+ZSBpbmZvcm1hdGlvbi4gU29tZSBvZiB0aGVzZSBpbmRpdmlkdWFsDQo+Pj4gZXZlbnQgbWF5IG5v
+dCBiZSB2ZXJ5IGludGVyZXN0aW5nLCBmb3IgZXhhbXBsZSwgc29mdCBlcnJvciBvciBsYXRlbmN5
+IG91dGxpZXJzLg0KPj4+IEhvd2V2ZXIsIHdoZW4gd2UgZ2F0aGVyIGV2ZW50IGxvZyBmb3IgYSBm
+bGVldCBvZiBkZXZpY2VzLCB0aGVzZSAic29mdCBldmVudCINCj4+PiBtYXkgYmVjb21lIHZhbHVh
+YmxlIGZvciBoZWFsdGggbW9uaXRvcmluZy4NCj4+IA0KPj4gSSdkIGJlIGludGVyZXN0ZWQgaW4g
+dGhpcy4gSXQgc291bmRzIGxpa2UgeW91J3JlIHRyeWluZyB0byBmaWxsIGEgZ2FwDQo+PiBiZXR3
+ZWVuIHRyYWNpbmcgYW5kIGNvbnNvbGUgbG9nIG1lc3NhZ2VzIHdoaWNoIEkgYmVsaWV2ZSBvdGhl
+cnMgaGF2ZQ0KPj4gZW5jb3VudGVyZWQgYXMgd2VsbC4NCj4gDQo+IFdlIGhhdmUgYSBzb21ld2hh
+dCBzaW1pbGFyIHByb2JsZW0gcHJvYmxlbSBpbiBMdXN0cmUgYW5kIEkgZ3Vlc3MgaXQncyBub3Qg
+anVzdCBMdXN0cmUuDQo+IEN1cnJlbnRseSB0aGVyZSBhcmUgYWxsIHNvcnRzIG9mIGNvbmRpdGlv
+bmFsIGRlYnVnIGNvZGUgYWxsIG92ZXIgdGhlIHBsYWNlIHRoYXQgZ29lcw0KPiB0byB0aGUgY29u
+c29sZSBhbmQgd2hlbiB5b3UgZW5hYmxlIGl0IGZvciBhbnl0aGluZyB2ZXJib3NlLCB5b3UgcXVp
+Y2tseSBvdmVyZmxvdw0KPiB5b3VyIGRtZXNnIGJ1ZmZlciBubyBtYXR0ZXIgdGhlIHNpemUsIHRo
+YXQgbWlnaHQgYmUgbW9zdGx5IG9rIGZvciBsb2NhbA0KPiAiYmxvY2sgbGV2ZWwiIHN0dWZmLCBi
+dXQgb25jZSB5b3UgYmVjb21lIGRpc3RyaWJ1dGVkLCBpdCBzdGFydCB0byBiZSBhIG1lc3MNCj4g
+YW5kIG9uY2UgeW91IGdldCB0byBiZSBzdXBlciBsYXJnZSBpdCB3b3JzZW5zIGV2ZW4gbW9yZSBz
+aW5jZSB5b3UgbmVlZCB0bw0KPiBzb21laG93IGNvb3JkaW5hdGUgZGF0YSBmcm9tIG11bHRpcGxl
+IG5vZGVzLCBlbnN1cmUgYWxsIG9mIGl0IGlzIG5vdCBsb3N0IGFuZCBzdGlsbA0KPiB5b3UgZG9u
+J3QgZW5kIHVwIHVzaW5nIGEgbG90IG9mIGl0IHNpbmNlIG9ubHkgYSBmZXcgbm9kZXMgZW5kIHVw
+IGJlaW5nIHVzZWZ1bC4NCj4gKEkgZG9uJ3Qga25vdyBob3cgTkZTIHBlb3BsZSBtYW5hZ2UgdG8g
+ZGVidWcgY29tcGxpY2F0ZWQgaXNzdWVzIHVzaW5nIGp1c3QgdGhpcywNCj4gY291bGQgbm90IGJl
+IHN1cGVyIGVhc3kpLg0KPiANCj4gSGF2aW5nIHNvbWUgc29ydCBvZiBhIGJ1ZmZlciBvZiBhIChw
+b3RlbnRpYWxseSB2ZXJ5KSBsYXJnZSBzaXplIHRoYXQgY291bGQgYmUNCj4gc3RvcmluZyB0aGUg
+ZGF0YSB1bnRpbCBpdCdzIG5lZWRlZCwgb3IgZWFnZXJseSBwb2xsZWQgYnkgc29tZSBkYWVtb24g
+Zm9yIHN0b3JhZ2UNCj4gKGhlbHBmdWwgd2hlbiB5b3UgZXhwZWN0IGEgbG90IG9mIGRhdGEgdGhh
+dCBkZWZpbml0ZWx5IHdvbid0IGZpdCBpbiBSQU0pLg0KPiANCj4gVHJhY2Vwb2ludHMgaGF2ZSB0
+aGUgYnVmZmVyIGFuZCB0aGUgZGFlbW9uLCBidXQgY3JlYXRpbmcgbmV3IG1lc3NhZ2VzIGlzDQo+
+IHZlcnkgY3VtYmVyc29tZSwgc28gY29udmVydGluZyBldmVyeSBkZWJ1ZyBtZXNzYWdlIGludG8g
+b25lIGRvZXMgbm90IGxvb2sgdmVyeSBmZWFzaWJsZS4NCj4gQWxzbyBpdCdzIGNvbnZlbmllbnQg
+dG8gaGF2ZSAiZXZlbnQgbWFza3MiIG9uZSB3YW50IGxvZ2dlZCB0aGF0IEkgZG9uJ3QgdGhpbmsg
+eW91IGNvdWxkDQo+IGRvIHdpdGggdHJhY2Vwb2ludHMuDQo+IA0KPiBJIGtub3cgeW91IHdlcmUg
+dGFsa2luZyBhYm91dCByZXBvcnRpbmcgZXZlbnRzIHRvIHRoZSBibG9jayBsYXllciwgYnV0IG90
+aGVyIHRoYW4gcGxhaW4NCj4gZXJyb3JzIHdoYXQgd291bGQgYmxvY2sgbGF5ZXIgZG8gd2l0aCB0
+aGVtPyBqdXN0IGEgY29udmVuaWVudCB3YXkgdG8gbWFwIG1lc3NhZ2VzDQo+IHRvIGEgcGFydGlj
+dWxhciBkZXZpY2U/IFlvdSBkb24ndCBwbGFuIHRvIHN0b3JlIGl0IG9uIHNvbWUgYmxvY2sgZGV2
+aWNlIGFzIHBhcnQNCj4gb2YgdGhlIGJsb2NrIGxheWVyLCByaWdodD8NCj4gDQo+IEltcGxlbWVu
+dGluZyBzdWNoIGEgYnVmZmVyIGFsbCBzb3J0cyBvZiBhZGRpdGlvbmFsIGdlbmVyaWMgZGF0YSBt
+aWdodCBiZQ0KPiBjb2xsZWN0ZWQgYXV0b21hdGljYWxseSBmb3IgYWxsIGV2ZW50cyBhcyBwYXJ0
+IG9mIHRoZSBidWZmZXIgZm9ybWF0IGxpa2UNCj4gd2hhdCBjcHUgZGlkIGVtaXQgaXQsIHRpbWUs
+IHN0YWNrIHVzYWdlIGluZm9ybWF0aW9uLCBjdXJyZW50IHBpZCwNCj4gYmFja3RyYWNlICh0cmFj
+ZXBvaW50LWFsaWtlIGNvdWxkIGJlIG9wdGlvbmFsKSwgYWN0dWFsIHNvdXJjZSBjb2RlIGxvY2F0
+aW9uIG9mDQo+IHRoZSBtZXNzYWdlLCDigKYNCj4gDQo+IEhhdmluZyBzb21ldGhpbmcgbGlrZSB0
+aGF0IGJlaW5nIHN0YW5kYXJkIHBhcnQgb2Yge2Rldixwcn1fe2RiZyx3YXJuLC4uLn0gYW5kIGZy
+aWVuZHMNCj4gd291bGQgYmUgc3VwZXIgYXdlc29tZSB0b28sIEkgaW1hZ2luZSAoYWRkaW5nIEdy
+ZWcgdG8gQ0MgZm9yIHRoYXQpLg0KPiANCg0KDQpIaSBPbGVnLCANCg0KVGhhbmtzIGZvciBzaGFy
+aW5nIHRoZXNlIGluc2lnaHRzLiANCg0KV2UgYnVpbHQgYW4gZXZlbnQgbG9nZ2VyIHRoYXQgcGFy
+c2VzIGRtZXNnIHRvIGdldCBldmVudHMuIEZvciBzaW1pbGFyIHJlYXNvbnMgYXMgeW91IGRlc2Ny
+aWJlZCANCmFib3ZlLCBpdCBkb2Vzbid0IHdvcmsgd2VsbC4gQW5kIG9uZSBvZiB0aGUgYmlnZ2Vz
+dCBpc3N1ZSBpcyBwb29yICJldmVudCBtYXNrIiBzdXBwb3J0LiBJIGFtIA0KaG9waW5nIGdldCBi
+ZXR0ZXIgZXZlbnQgbWFzayBpbiBuZXdlciBpbXBsZW1lbnRhdGlvbiwgZm9yIGV4YW1wbGUsIHdp
+dGgga2VybmVsIHRyYWNpbmcgZmlsdGVyLCBvciANCmltcGxlbWVudCBjdXN0b21pemVkIGxvZ2lj
+IGluIEJQRi4gDQoNCldpdGggYSByZWxhdGl2ZWx5IG1hdHVyZSBpbmZyYXN0cnVjdHVyZSwgd2Ug
+ZG9uJ3QgaGF2ZSBtdWNoIHByb2JsZW0gc3RvcmluZyBsb2dzIGZyb20gdGhlIGV2ZW50DQpsb2dn
+ZXIuIFNwZWNpZmljYWxseSwgd2UgdXNlIGEgZGFlbW9uIHRoYXQgY29sbGVjdHMgZXZlbnRzIGFu
+ZCBzZW5kIHRoZW0gdG8gZGlzdHJpYnV0ZWQgc3RvcmFnZQ0KKEhERlMrSElWRSkuIEl0IG1pZ2h0
+IGJlIGFuIG92ZXJraWxsIGZvciBzbWFsbGVyIGRlcGxveW1lbnQuIA0KDQpXZSBkbyB1c2UgaW5m
+b3JtYXRpb24gZnJvbSBzaW1pbGFyIChub3QgZXhhY3RseSB0aGUgb25lIGFib3ZlKSBsb2dzIHRv
+IG1ha2UgZGVjaXNpb24gYWJvdXQgDQpkZXZpY2UgaGFuZGxpbmcuIEZvciBleGFtcGxlLCBpZiBh
+IGRyaXZlIHRocm93cyB0b28gbXVjaCBtZWRpdW0gZXJyb3IgaW4gc2hvcnQgcGVyaW9kIG9mIHRp
+bWUsIA0Kd2Ugd2lsbCBraWNrIGl0IG91dCBvZiBwcm9kdWN0aW9uLiBJIHRoaW5rIGl0IGlzIG5v
+dCBuZWNlc3NhcnkgdG8gaW5jbHVkZSB0aGlzIGluIHRoZSBibG9jayBsYXllci4gDQoNCk92ZXJh
+bGwsIEkgYW0gaG9waW5nIHRoZSBrZXJuZWwgY2FuIGdlbmVyYXRlIGFjY3VyYXRlIGV2ZW50cywg
+d2l0aCBmbGV4aWJsZSBmaWx0ZXIvbWFzayBzdXBwb3J0LiANClRoZXJlIGFyZSBkaWZmZXJlbnQg
+d2F5cyB0byBzdG9yZSBhbmQgY29uc3VtZSB0aGVzZSBkYXRhLiBJIGd1ZXNzIG1vc3Qgb2YgdGhl
+c2Ugd2lsbCBiZSANCmltcGxlbWVudGVkIGluIHVzZXIgc3BhY2UuIExldCdzIGRpc2N1c3MgcG90
+ZW50aWFsIHVzZSBjYXNlcyBhbmQgcmVxdWlyZW1lbnRzLiBUaGVzZSANCmRpc2N1c3Npb25zIHNo
+b3VsZCBoZWxwIHVzIGJ1aWxkIHRoZSBrZXJuZWwgcGFydCBvZiB0aGUgZXZlbnQgbG9nLiANCg0K
+VGhhbmtzLA0KU29uZw0KDQoNCg0KDQoNCg0KDQoNCg==
