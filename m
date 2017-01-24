@@ -1,118 +1,102 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:50097 "EHLO
-        mx0b-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1750907AbdAODmi (ORCPT
+Received: from mail-lf0-f46.google.com ([209.85.215.46]:32874 "EHLO
+        mail-lf0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750940AbdAXKSU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 14 Jan 2017 22:42:38 -0500
-Received: from pps.filterd (m0109332.ppops.net [127.0.0.1])
-        by mx0a-00082601.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id v0F3dQ4c016909
-        for <linux-block@vger.kernel.org>; Sat, 14 Jan 2017 19:42:37 -0800
-Received: from mail.thefacebook.com ([199.201.64.23])
-        by mx0a-00082601.pphosted.com with ESMTP id 27yjkk1c0x-4
-        (version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT)
-        for <linux-block@vger.kernel.org>; Sat, 14 Jan 2017 19:42:37 -0800
-Received: from facebook.com (2401:db00:21:603d:face:0:19:0)     by
- mx-out.facebook.com (10.102.107.99) with ESMTP id
- a793079edad411e6ac470002c99293a0-721f6a50 for <linux-block@vger.kernel.org>;
-        Sat, 14 Jan 2017 19:42:36 -0800
-From: Shaohua Li <shli@fb.com>
-To: <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>
-CC: <Kernel-team@fb.com>, <tj@kernel.org>, <axboe@fb.com>,
-        <vgoyal@redhat.com>
-Subject: [PATCH V6 09/18] blk-throttle: choose a small throtl_slice for SSD
-Date: Sat, 14 Jan 2017 19:42:26 -0800
-Message-ID: <4705da8bf1e43a023c0613c5f303674d7f9b87f6.1484451062.git.shli@fb.com>
-In-Reply-To: <cover.1484451062.git.shli@fb.com>
-References: <cover.1484451062.git.shli@fb.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+        Tue, 24 Jan 2017 05:18:20 -0500
+Received: by mail-lf0-f46.google.com with SMTP id x1so21440045lff.0
+        for <linux-block@vger.kernel.org>; Tue, 24 Jan 2017 02:18:19 -0800 (PST)
+From: Linus Walleij <linus.walleij@linaro.org>
+To: linux-mmc@vger.kernel.org, linux-block@vger.kernel.org,
+        Ulf Hansson <ulf.hansson@linaro.org>
+Cc: Chunyan Zhang <zhang.chunyan@linaro.org>,
+        Baolin Wang <baolin.wang@linaro.org>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Linus Walleij <linus.walleij@linaro.org>
+Subject: [PATCH 4/6] mmc: block: inline command abortions
+Date: Tue, 24 Jan 2017 11:17:55 +0100
+Message-Id: <20170124101757.19676-5-linus.walleij@linaro.org>
+In-Reply-To: <20170124101757.19676-1-linus.walleij@linaro.org>
+References: <20170124101757.19676-1-linus.walleij@linaro.org>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-The throtl_slice is 100ms by default. This is a long time for SSD, a lot
-of IO can run. To make cgroups have smoother throughput, we choose a
-small value (20ms) for SSD.
+Setting rqc to NULL followed by a goto to cmd_abort is just a way
+to do unconditional abort without starting any new command.
+Inline the calls to mmc_blk_rw_cmd_abort() and return immediately
+in those cases.
 
-Signed-off-by: Shaohua Li <shli@fb.com>
+As a result, mmc_blk_rw_start_new() is not called with NULL
+requests, and we can remove the NULL check in the beginning of
+this function.
+
+Add some comments to the code flow so it is clear that this is
+where the asynchronous requests come back in and the result of
+them gets handled.
+
+Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
 ---
- block/blk-sysfs.c    |  2 ++
- block/blk-throttle.c | 18 +++++++++++++++---
- block/blk.h          |  2 ++
- 3 files changed, 19 insertions(+), 3 deletions(-)
+ drivers/mmc/core/block.c | 21 +++++++++++++--------
+ 1 file changed, 13 insertions(+), 8 deletions(-)
 
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 0e3fb2a..7285f74 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -907,6 +907,8 @@ int blk_register_queue(struct gendisk *disk)
- 
- 	blk_wb_init(q);
- 
-+	blk_throtl_register_queue(q);
-+
- 	if (!q->request_fn)
- 		return 0;
- 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 49cad9a..2d05c91 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -18,8 +18,9 @@ static int throtl_grp_quantum = 8;
- /* Total max dispatch from all groups in one round */
- static int throtl_quantum = 32;
- 
--/* Throttling is performed over 100ms slice and after that slice is renewed */
--#define DFL_THROTL_SLICE (HZ / 10)
-+/* Throttling is performed over a slice and after that slice is renewed */
-+#define DFL_THROTL_SLICE_HD (HZ / 10)
-+#define DFL_THROTL_SLICE_SSD (HZ / 50)
- #define MAX_THROTL_SLICE (HZ)
- 
- static struct blkcg_policy blkcg_policy_throtl;
-@@ -1957,7 +1958,6 @@ int blk_throtl_init(struct request_queue *q)
- 
- 	q->td = td;
- 	td->queue = q;
--	td->throtl_slice = DFL_THROTL_SLICE;
- 
- 	td->limit_valid[LIMIT_MAX] = true;
- 	td->limit_index = LIMIT_MAX;
-@@ -1978,6 +1978,18 @@ void blk_throtl_exit(struct request_queue *q)
- 	kfree(q->td);
- }
- 
-+void blk_throtl_register_queue(struct request_queue *q)
-+{
-+	struct throtl_data *td;
-+
-+	td = q->td;
-+	BUG_ON(!td);
-+	if (blk_queue_nonrot(q))
-+		td->throtl_slice = DFL_THROTL_SLICE_SSD;
-+	else
-+		td->throtl_slice = DFL_THROTL_SLICE_HD;
-+}
-+
- ssize_t blk_throtl_sample_time_show(struct request_queue *q, char *page)
+diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
+index 13e6fe060f26..4bbb3d16c09b 100644
+--- a/drivers/mmc/core/block.c
++++ b/drivers/mmc/core/block.c
+@@ -1612,9 +1612,6 @@ static void mmc_blk_rw_cmd_abort(struct mmc_card *card, struct request *req)
+ static void mmc_blk_rw_start_new(struct mmc_queue *mq, struct mmc_card *card,
+ 				 struct request *req)
  {
- 	if (!q->td)
-diff --git a/block/blk.h b/block/blk.h
-index e83e757..186c67d 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -293,10 +293,12 @@ extern void blk_throtl_exit(struct request_queue *q);
- extern ssize_t blk_throtl_sample_time_show(struct request_queue *q, char *page);
- extern ssize_t blk_throtl_sample_time_store(struct request_queue *q,
- 	const char *page, size_t count);
-+extern void blk_throtl_register_queue(struct request_queue *q);
- #else /* CONFIG_BLK_DEV_THROTTLING */
- static inline void blk_throtl_drain(struct request_queue *q) { }
- static inline int blk_throtl_init(struct request_queue *q) { return 0; }
- static inline void blk_throtl_exit(struct request_queue *q) { }
-+static inline void blk_throtl_register_queue(struct request_queue *q) { }
- #endif /* CONFIG_BLK_DEV_THROTTLING */
+-	if (!req)
+-		return;
+-
+ 	if (mmc_card_removed(card)) {
+ 		req->rq_flags |= RQF_QUIET;
+ 		blk_end_request_all(req, -EIO);
+@@ -1649,9 +1646,8 @@ static int mmc_blk_issue_rw_rq(struct mmc_queue *mq, struct request *rqc)
+ 				!IS_ALIGNED(blk_rq_sectors(rqc), 8)) {
+ 				pr_err("%s: Transfer size is not 4KB sector size aligned\n",
+ 					rqc->rq_disk->disk_name);
+-				req = rqc;
+-				rqc = NULL;
+-				goto cmd_abort;
++				mmc_blk_rw_cmd_abort(card, rqc);
++				return 0;
+ 			}
  
- #endif /* BLK_INTERNAL_H */
+ 			mmc_blk_rw_rq_prep(mq->mqrq_cur, card, 0, mq);
+@@ -1660,11 +1656,20 @@ static int mmc_blk_issue_rw_rq(struct mmc_queue *mq, struct request *rqc)
+ 			areq = NULL;
+ 		areq = mmc_start_req(card->host, areq, &status);
+ 		if (!areq) {
++			/*
++			 * We have just put the first request into the pipeline
++			 * and there is nothing more to do until it is
++			 * complete.
++			 */
+ 			if (status == MMC_BLK_NEW_REQUEST)
+ 				mq->flags |= MMC_QUEUE_NEW_REQUEST;
+ 			return 0;
+ 		}
+ 
++		/*
++		 * An asynchronous request has been completed and we proceed
++		 * to handle the result of it.
++		 */
+ 		mq_rq = container_of(areq, struct mmc_queue_req, mmc_active);
+ 		brq = &mq_rq->brq;
+ 		req = mq_rq->req;
+@@ -1691,8 +1696,8 @@ static int mmc_blk_issue_rw_rq(struct mmc_queue *mq, struct request *rqc)
+ 				pr_err("%s BUG rq_tot %d d_xfer %d\n",
+ 				       __func__, blk_rq_bytes(req),
+ 				       brq->data.bytes_xfered);
+-				rqc = NULL;
+-				goto cmd_abort;
++				mmc_blk_rw_cmd_abort(card, req);
++				return 0;
+ 			}
+ 			break;
+ 		case MMC_BLK_CMD_ERR:
 -- 
 2.9.3
 
