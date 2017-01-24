@@ -1,52 +1,39 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-sn1nam01on0066.outbound.protection.outlook.com ([104.47.32.66]:59848
-        "EHLO NAM01-SN1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1750901AbdAXQbW (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Jan 2017 11:31:22 -0500
-From: Bart Van Assche <Bart.VanAssche@sandisk.com>
-To: "hch@lst.de" <hch@lst.de>
-CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "axboe@fb.com" <axboe@fb.com>,
-        "snitzer@redhat.com" <snitzer@redhat.com>
+Received: from mx2.suse.de ([195.135.220.15]:43099 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750816AbdAXNVm (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 24 Jan 2017 08:21:42 -0500
 Subject: Re: [PATCH 15/16] block: split scsi_request out of struct request
-Date: Tue, 24 Jan 2017 16:31:13 +0000
-Message-ID: <1485275452.2715.1.camel@sandisk.com>
+To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@fb.com>
 References: <1485185361-29786-1-git-send-email-hch@lst.de>
-         <1485185361-29786-16-git-send-email-hch@lst.de>
-         <1485217979.2825.20.camel@sandisk.com> <20170124080906.GA17018@lst.de>
-In-Reply-To: <20170124080906.GA17018@lst.de>
-Content-Type: text/plain; charset="iso-8859-1"
+ <1485185361-29786-16-git-send-email-hch@lst.de>
+Cc: Mike Snitzer <snitzer@redhat.com>, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org, dm-devel@redhat.com
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <4a5c941f-5fc2-bb9d-b22f-8fc3bede3ae9@suse.de>
+Date: Tue, 24 Jan 2017 14:21:39 +0100
 MIME-Version: 1.0
+In-Reply-To: <1485185361-29786-16-git-send-email-hch@lst.de>
+Content-Type: text/plain; charset=windows-1252
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Tue, 2017-01-24 at 09:09 +0100, hch@lst.de wrote:
-> On Tue, Jan 24, 2017 at 12:33:13AM +0000, Bart Van Assche wrote:
-> > Do we perhaps need a check before the above memcpy() call whether or no=
-t
-> > sense =3D=3D NULL?
->=20
-> Yes, probably.  I didn't think of the case where the caller wouldn't
-> pass a sense buffer.  Just curious, what's the callstack that caused
-> this?
+On 01/23/2017 04:29 PM, Christoph Hellwig wrote:
+> And require all drivers that want to support BLOCK_PC to allocate it
+> as the first thing of their private data.  To support this the legacy
+> IDE and BSG code is switched to set cmd_size on their queues to let
+> the block layer allocate the additional space.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Hello Christoph,
+Cheers,
 
-The call stack was as follows:
-* __scsi_execute()
-* scsi_execute_req_flags()
-* scsi_vpd_inquiry()
-* scsi_attach_vpd()
-* scsi_probe_and_add_lun()
-* __scsi_add_device()
-* ata_scsi_scan_host()
-* async_port_probe()
-* async_run_entry_fn()
-* process_one_work()
-* worker_thread()
-* kthread()
-
-Bart.=
+Hannes
+-- 
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: F. Imend�rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG N�rnberg)
