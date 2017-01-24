@@ -1,62 +1,53 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga14.intel.com ([192.55.52.115]:22471 "EHLO mga14.intel.com"
+Received: from mx2.suse.de ([195.135.220.15]:43128 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S933163AbdAGBG6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 6 Jan 2017 20:06:58 -0500
-Subject: [RFC PATCH v2 0/2] block: fix backing_dev_info lifetime
-From: Dan Williams <dan.j.williams@intel.com>
-To: linux-block@vger.kernel.org
-Cc: Andi Kleen <ak@linux.intel.com>, Jan Kara <jack@suse.cz>,
-        Rabin Vincent <rabinv@axis.com>, linux-nvdimm@lists.01.org,
-        linux-kernel@vger.kernel.org, Jens Axboe <axboe@fb.com>,
-        Jeff Moyer <jmoyer@redhat.com>, Wei Fang <fangwei1@huawei.com>,
-        linux-fsdevel@vger.kernel.org, Christoph Hellwig <hch@lst.de>
-Date: Fri, 06 Jan 2017 17:02:51 -0800
-Message-ID: <148375097100.37020.495735345355345658.stgit@dwillia2-desk3.amr.corp.intel.com>
+        id S1750833AbdAXNWG (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 24 Jan 2017 08:22:06 -0500
+Subject: Re: [PATCH 16/16] block: don't assign cmd_flags in
+ __blk_rq_prep_clone
+To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@fb.com>
+References: <1485185361-29786-1-git-send-email-hch@lst.de>
+ <1485185361-29786-17-git-send-email-hch@lst.de>
+Cc: Mike Snitzer <snitzer@redhat.com>, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org, dm-devel@redhat.com
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <c3a9c8cf-ab8f-bf56-0a42-ffeada70242d@suse.de>
+Date: Tue, 24 Jan 2017 14:22:03 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <1485185361-29786-17-git-send-email-hch@lst.de>
+Content-Type: text/plain; charset=windows-1252
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-v1 of these changes [1] was a one line change to bdev_get_queue() to
-prevent a shutdown crash when del_gendisk() races the final
-__blkdev_put().
+On 01/23/2017 04:29 PM, Christoph Hellwig wrote:
+> These days we have the proper flags set since request allocation time.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  block/blk-core.c | 1 -
+>  1 file changed, 1 deletion(-)
+> 
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index fe5cc98..93a9e0b 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -2983,7 +2983,6 @@ EXPORT_SYMBOL_GPL(blk_rq_unprep_clone);
+>  static void __blk_rq_prep_clone(struct request *dst, struct request *src)
+>  {
+>  	dst->cpu = src->cpu;
+> -	dst->cmd_flags = src->cmd_flags | REQ_NOMERGE;
+>  	dst->cmd_type = src->cmd_type;
+>  	dst->__sector = blk_rq_pos(src);
+>  	dst->__data_len = blk_rq_bytes(src);
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-While it is known at del_gendisk() time that the queue is still alive,
-Jan Kara points to other paths [2] that are racing __blkdev_put() where
-the assumption that ->bd_queue, or inode->i_wb is valid does not hold.
+Cheers,
 
-Fix that broken assumption, make it the case that if you have a live
-block_device, or block_device-inode that the corresponding queue and
-inode-write-back data is still valid.
-
-These changes survive a run of the libnvdimm unit test suite which puts
-some stress on the block_device shutdown path.
-
----
-
-Changes since v1 [1]:
-
-* Introduce "block: fix lifetime of request_queue / backing_dev_info
-  relative to bdev" to keep the queue allocated and the inode attached
-  for writeback until ->destroy_inode() time.
-
-* Rework the comments in "block: fix blk_get_backing_dev_info() crash,
-  use bdev->bd_queue" to reflect the assumptions about the liveness of
-  ->bd_queue.
-
-[1]: http://marc.info/?l=linux-block&m=148366637105761&w=2
-[2]: http://www.spinics.net/lists/linux-fsdevel/msg105153.html
-
----
-
-Dan Williams (2):
-      block: fix lifetime of request_queue / backing_dev_info relative to bdev
-      block: fix blk_get_backing_dev_info() crash, use bdev->bd_queue
-
-
- block/blk-core.c       |    7 ++++---
- fs/block_dev.c         |   25 +++++++++++++++----------
- include/linux/blkdev.h |    6 +++++-
- include/linux/fs.h     |    1 +
- 4 files changed, 25 insertions(+), 14 deletions(-)
+Hannes
+-- 
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: F. Imend�rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG N�rnberg)
