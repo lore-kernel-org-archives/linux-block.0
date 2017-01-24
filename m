@@ -1,58 +1,47 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:24328 "EHLO mga11.intel.com"
+Received: from mx2.suse.de ([195.135.220.15]:41230 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751242AbdAMVk3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Jan 2017 16:40:29 -0500
-From: "Verma, Vishal L" <vishal.l.verma@intel.com>
-To: "lsf-pc@lists.linux-foundation.org"
-        <lsf-pc@lists.linux-foundation.org>
-CC: "linux-nvdimm@lists.01.org" <linux-nvdimm@lists.01.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>
-Subject: [LSF/MM TOPIC] Badblocks checking/representation in filesystems
-Date: Fri, 13 Jan 2017 21:40:26 +0000
-Message-ID: <1484343558.4358.26.camel@intel.com>
-Content-Type: text/plain; charset="utf-8"
+        id S1750753AbdAXM5N (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 24 Jan 2017 07:57:13 -0500
+Subject: Re: [PATCH 13/16] scsi: allocate scsi_cmnd structures as part of
+ struct request
+To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@fb.com>
+References: <1485185361-29786-1-git-send-email-hch@lst.de>
+ <1485185361-29786-14-git-send-email-hch@lst.de>
+Cc: Mike Snitzer <snitzer@redhat.com>, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org, dm-devel@redhat.com
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <76d411db-299d-9b8f-ec83-e4867da4cdc8@suse.de>
+Date: Tue, 24 Jan 2017 13:57:09 +0100
 MIME-Version: 1.0
+In-Reply-To: <1485185361-29786-14-git-send-email-hch@lst.de>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-VGhlIGN1cnJlbnQgaW1wbGVtZW50YXRpb24gb2YgYmFkYmxvY2tzLCB3aGVyZSB3ZSBjb25zdWx0
-IHRoZSBiYWRibG9ja3MNCmxpc3QgZm9yIGV2ZXJ5IElPIGluIHRoZSBibG9jayBkcml2ZXIgd29y
-a3MsIGFuZCBpcyBhIGxhc3Qgb3B0aW9uDQpmYWlsc2FmZSwgYnV0IGZyb20gYSB1c2VyIHBlcnNw
-ZWN0aXZlLCBpdCBpc24ndCB0aGUgZWFzaWVzdCBpbnRlcmZhY2UgdG8NCndvcmsgd2l0aC4NCg0K
-QSB3aGlsZSBiYWNrLCBEYXZlIENoaW5uZXIgaGFkIHN1Z2dlc3RlZCBhIG1vdmUgdG93YXJkcyBz
-bWFydGVyDQpoYW5kbGluZywgYW5kIEkgcG9zdGVkIGluaXRpYWwgUkZDIHBhdGNoZXMgWzFdLCBi
-dXQgc2luY2UgdGhlbiB0aGUgdG9waWMNCmhhc24ndCByZWFsbHkgbW92ZWQgZm9yd2FyZC4NCg0K
-SSdkIGxpa2UgdG8gcHJvcG9zZSBhbmQgaGF2ZSBhIGRpc2N1c3Npb24gYWJvdXQgdGhlIGZvbGxv
-d2luZyBuZXcNCmZ1bmN0aW9uYWxpdHk6DQoNCjEuIEZpbGVzeXN0ZW1zIGRldmVsb3AgYSBuYXRp
-dmUgcmVwcmVzZW50YXRpb24gb2YgYmFkYmxvY2tzLiBGb3INCmV4YW1wbGUsIGluIHhmcywgdGhp
-cyB3b3VsZCAocHJlc3VtYWJseSkgYmUgbGlua2VkIHRvIHRoZSByZXZlcnNlDQptYXBwaW5nIGJ0
-cmVlLiBUaGUgZmlsZXN5c3RlbSByZXByZXNlbnRhdGlvbiBoYXMgdGhlIHBvdGVudGlhbCB0byBi
-ZcKgDQptb3JlIGVmZmljaWVudCB0aGFuIHRoZSBibG9jayBkcml2ZXIgZG9pbmcgdGhlIGNoZWNr
-LCBhcyB0aGUgZnMgY2FuDQpjaGVjayB0aGUgSU8gaGFwcGVuaW5nIG9uIGEgZmlsZSBhZ2FpbnN0
-IGp1c3QgdGhhdCBmaWxlJ3MgcmFuZ2UuIEluDQpjb250cmFzdCwgdG9kYXksIHRoZSBibG9jayBk
-cml2ZXIgY2hlY2tzIGFnYWluc3QgdGhlIHdob2xlIGJsb2NrIGRldmljZQ0KcmFuZ2UgZm9yIGV2
-ZXJ5IElPLiBPbiBlbmNvdW50ZXJpbmcgYmFkYmxvY2tzLCB0aGUgZmlsZXN5c3RlbSBjYW4NCmdl
-bmVyYXRlIGEgYmV0dGVyIG5vdGlmaWNhdGlvbi9lcnJvciBtZXNzYWdlIHRoYXQgcG9pbnRzIHRo
-ZSB1c2VyIHRvwqANCihmaWxlLCBvZmZzZXQpIGFzIG9wcG9zZWQgdG8gdGhlIGJsb2NrIGRyaXZl
-ciwgd2hpY2ggY2FuIG9ubHkgcHJvdmlkZQ0KKGJsb2NrLWRldmljZSwgc2VjdG9yKS4NCg0KMi4g
-VGhlIGJsb2NrIGxheWVyIGFkZHMgYSBub3RpZmllciB0byBiYWRibG9jayBhZGRpdGlvbi9yZW1v
-dmFsDQpvcGVyYXRpb25zLCB3aGljaCB0aGUgZmlsZXN5c3RlbSBzdWJzY3JpYmVzIHRvLCBhbmQg
-dXNlcyB0byBtYWludGFpbiBpdHMNCmJhZGJsb2NrcyBhY2NvdW50aW5nLiAoVGhpcyBwYXJ0IGlz
-IGltcGxlbWVudGVkIGFzIGEgcHJvb2Ygb2YgY29uY2VwdCBpbg0KdGhlIFJGQyBtZW50aW9uZWQg
-YWJvdmUgWzFdKS4NCg0KMy4gVGhlIGZpbGVzeXN0ZW0gaGFzIGEgd2F5IG9mIHRlbGxpbmcgdGhl
-IGJsb2NrIGRyaXZlciAoYSBmbGFnPyBhDQpkaWZmZXJlbnQvbmV3IGludGVyZmFjZT8pIHRoYXQg
-aXQgaXMgcmVzcG9uc2libGUgZm9yIGJhZGJsb2NrIGNoZWNraW5nDQpzbyB0aGF0IHRoZSBkcml2
-ZXIgZG9lc24ndCBoYXZlIHRvIGRvIGl0cyBjaGVjay4gVGhlIGRyaXZlciBjaGVja2luZw0Kd2ls
-bCBoYXZlIHRvIHJlbWFpbiBpbiBwbGFjZSBhcyBhIGNhdGNoLWFsbCBmb3IgZmlsZXN5c3RlbXMv
-aW50ZXJmYWNlcw0KdGhhdCBkb24ndCBvciBhcmVuJ3QgY2FwYWJsZSBvZiBkb2luZyB0aGUgY2hl
-Y2tzIGF0IGEgaGlnaGVyIGxheWVyLg0KDQoNCkFkZGl0aW9uYWxseSwgSSBzYXcgc29tZSBkaXNj
-dXNzaW9uIGFib3V0IGxvZ2ljYWwgZGVwb3Agb24gdGhlIGxpc3RzDQphZ2FpbiwgYW5kIEkgd2Fz
-IGludm9sdmVkIHdpdGggZGlzY3Vzc2lvbnMgbGFzdCB5ZWFyIGFib3V0IGV4cGFuZGluZyB0aGUN
-CnRoZSBiYWRibG9ja3MgaW5mcmFzdHJ1Y3R1cmUgZm9yIHRoaXMgdXNlLiBJZiB0aGF0IGlzIGEg
-dG9waWMgYWdhaW4gdGhpcw0KeWVhciwgSSdkIGxpa2UgdG8gYmUgaW52b2x2ZWQgaW4gaXQgdG9v
-Lg0KDQpJJ20gYWxzbyBpbnRlcmVzdGVkIGluIHBhcnRpY2lwYXRpbmcgaW4gYW55IG90aGVyIHBt
-ZW0vTlZESU1NIHJlbGF0ZWQNCmRpc2N1c3Npb25zLg0KDQoNClRoYW5rIHlvdSwNCgktVmlzaGFs
-DQoNCg0KWzFdOiBodHRwOi8vd3d3LmxpbnV4LnNnaS5jb20vYXJjaGl2ZXMveGZzLzIwMTYtMDYv
-bXNnMDAyOTkuaHRtbA==
+On 01/23/2017 04:29 PM, Christoph Hellwig wrote:
+> Rely on the new block layer functionality to allocate additional driver
+> specific data behind struct request instead of implementing it in SCSI
+> itѕelf.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  drivers/scsi/hosts.c      |  20 +--
+>  drivers/scsi/scsi.c       | 319 ----------------------------------------------
+>  drivers/scsi/scsi_error.c |  17 ++-
+>  drivers/scsi/scsi_lib.c   | 122 ++++++++++++------
+>  drivers/scsi/scsi_priv.h  |   8 +-
+>  include/scsi/scsi_host.h  |   3 -
+>  6 files changed, 95 insertions(+), 394 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
