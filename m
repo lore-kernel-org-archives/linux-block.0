@@ -1,90 +1,112 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f45.google.com ([74.125.83.45]:33526 "EHLO
-        mail-pg0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750907AbdAWXsi (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Jan 2017 18:48:38 -0500
-Received: by mail-pg0-f45.google.com with SMTP id 204so49039045pge.0
-        for <linux-block@vger.kernel.org>; Mon, 23 Jan 2017 15:48:28 -0800 (PST)
-From: Omar Sandoval <osandov@osandov.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: kernel-team@fb.com
-Subject: [PATCH] blk-mq-sched: fix possible crash if changing scheduler fails
-Date: Mon, 23 Jan 2017 15:47:56 -0800
-Message-Id: <b83737e281e311179615f93be9cfbae50addb1a0.1485215087.git.osandov@fb.com>
+Received: from mga09.intel.com ([134.134.136.24]:28155 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750763AbdAXUAX (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 24 Jan 2017 15:00:23 -0500
+Date: Tue, 24 Jan 2017 12:59:14 -0700
+From: Vishal Verma <vishal.l.verma@intel.com>
+To: Jan Kara <jack@suse.cz>
+Cc: Dan Williams <dan.j.williams@intel.com>,
+        Slava Dubeyko <Vyacheslav.Dubeyko@wdc.com>,
+        "Darrick J. Wong" <darrick.wong@oracle.com>,
+        "linux-nvdimm@lists.01.org" <linux-nvdimm@ml01.01.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        Viacheslav Dubeyko <slava@dubeyko.com>,
+        Andiry Xu <andiry@gmail.com>,
+        "lsf-pc@lists.linux-foundation.org"
+        <lsf-pc@lists.linux-foundation.org>
+Subject: Re: [Lsf-pc] [LSF/MM TOPIC] Badblocks checking/representation in
+ filesystems
+Message-ID: <20170124195913.GB14128@omniknight.lm.intel.com>
+References: <20170114004910.GA4880@omniknight.lm.intel.com>
+ <20170117063355.GL14033@birch.djwong.org>
+ <20170117213549.GB4880@omniknight.lm.intel.com>
+ <CAOvWMLYMR-VvAVNuVjXPC-woxY6afQX5-hMC=Vj2p=3AGj9tyA@mail.gmail.com>
+ <20170117223705.GD4880@omniknight.lm.intel.com>
+ <20170118093801.GA24789@quack2.suse.cz>
+ <20170119211719.GG4880@omniknight.lm.intel.com>
+ <20170120094750.GE14115@quack2.suse.cz>
+ <CAA9_cmcH1AZmNr=cg-CMH1CiJDvZkqtm+eyiuJJiu+yRzY3PDg@mail.gmail.com>
+ <20170124074646.GA20153@quack2.suse.cz>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170124074646.GA20153@quack2.suse.cz>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Omar Sandoval <osandov@fb.com>
+On 01/24, Jan Kara wrote:
+> On Fri 20-01-17 07:42:09, Dan Williams wrote:
+> > On Fri, Jan 20, 2017 at 1:47 AM, Jan Kara <jack@suse.cz> wrote:
+> > > On Thu 19-01-17 14:17:19, Vishal Verma wrote:
+> > >> On 01/18, Jan Kara wrote:
+> > >> > On Tue 17-01-17 15:37:05, Vishal Verma wrote:
+> > >> > 2) PMEM is exposed for DAX aware filesystem. This seems to be what you are
+> > >> > mostly interested in. We could possibly do something more efficient than
+> > >> > what NVDIMM driver does however the complexity would be relatively high and
+> > >> > frankly I'm far from convinced this is really worth it. If there are so
+> > >> > many badblocks this would matter, the HW has IMHO bigger problems than
+> > >> > performance.
+> > >>
+> > >> Correct, and Dave was of the opinion that once at least XFS has reverse
+> > >> mapping support (which it does now), adding badblocks information to
+> > >> that should not be a hard lift, and should be a better solution. I
+> > >> suppose should try to benchmark how much of a penalty the current badblock
+> > >> checking in the NVVDIMM driver imposes. The penalty is not because there
+> > >> may be a large number of badblocks, but just due to the fact that we
+> > >> have to do this check for every IO, in fact, every 'bvec' in a bio.
+> > >
+> > > Well, letting filesystem know is certainly good from error reporting quality
+> > > POV. I guess I'll leave it upto XFS guys to tell whether they can be more
+> > > efficient in checking whether current IO overlaps with any of given bad
+> > > blocks.
+> > >
+> > >> > Now my question: Why do we bother with badblocks at all? In cases 1) and 2)
+> > >> > if the platform can recover from MCE, we can just always access persistent
+> > >> > memory using memcpy_mcsafe(), if that fails, return -EIO. Actually that
+> > >> > seems to already happen so we just need to make sure all places handle
+> > >> > returned errors properly (e.g. fs/dax.c does not seem to) and we are done.
+> > >> > No need for bad blocks list at all, no slow down unless we hit a bad cell
+> > >> > and in that case who cares about performance when the data is gone...
+> > >>
+> > >> Even when we have MCE recovery, we cannot do away with the badblocks
+> > >> list:
+> > >> 1. My understanding is that the hardware's ability to do MCE recovery is
+> > >> limited/best-effort, and is not guaranteed. There can be circumstances
+> > >> that cause a "Processor Context Corrupt" state, which is unrecoverable.
+> > >
+> > > Well, then they have to work on improving the hardware. Because having HW
+> > > that just sometimes gets stuck instead of reporting bad storage is simply
+> > > not acceptable. And no matter how hard you try you cannot avoid MCEs from
+> > > OS when accessing persistent memory so OS just has no way to avoid that
+> > > risk.
+> > >
+> > >> 2. We still need to maintain a badblocks list so that we know what
+> > >> blocks need to be cleared (via the ACPI method) on writes.
+> > >
+> > > Well, why cannot we just do the write, see whether we got CMCI and if yes,
+> > > clear the error via the ACPI method?
+> > 
+> > I would need to check if you get the address reported in the CMCI, but
+> > it would only fire if the write triggered a read-modify-write cycle. I
+> > suspect most copies to pmem, through something like
+> > arch_memcpy_to_pmem(), are not triggering any reads. It also triggers
+> > asynchronously, so what data do you write after clearing the error?
+> > There may have been more writes while the CMCI was being delivered.
+> 
+> OK, I see. And if we just write new data but don't clear error on write
+> through the ACPI method, will we still get MCE on following read of that
+> data? But regardless whether we get MCE or not, I suppose that the memory
+> location will be still marked as bad in some ACPI table, won't it?
 
-In elevator_switch(), we free the old scheduler's tags and then
-initialize the new scheduler. If initializing the new scheduler fails,
-we fall back to the old scheduler, but our tags have already been freed.
-There's no reason to free the sched_tags only to reallocate them, so
-let's just reuse them, which makes it possible to safely fall back to
-the old scheduler.
+Correct, the location will continue to result in MCEs on reads if it isn't
+marked as clear explicitly. I'm not sure that there is an ACPI table
+that keeps a list of bad locations, it is just a poison bit in the cache
+line, and presumable DIMMs will have some internal data structures that
+also mark bad locations.
 
-Signed-off-by: Omar Sandoval <osandov@fb.com>
----
-Applies to for-4.11/block. Reproduced the issue and verified the fix by
-sticking an err = -ENOMEM in the right place. As far as I can tell, it's
-safe to reuse the previously allocated sched_tags for the new scheduler.
-
- block/elevator.c | 20 +++++++++++++++-----
- 1 file changed, 15 insertions(+), 5 deletions(-)
-
-diff --git a/block/elevator.c b/block/elevator.c
-index ef7f59469acc..28283aaab04c 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -963,9 +963,6 @@ static int elevator_switch(struct request_queue *q, struct elevator_type *new_e)
- 	if (old) {
- 		old_registered = old->registered;
- 
--		if (old->uses_mq)
--			blk_mq_sched_teardown(q);
--
- 		if (!q->mq_ops)
- 			blk_queue_bypass_start(q);
- 
-@@ -981,7 +978,14 @@ static int elevator_switch(struct request_queue *q, struct elevator_type *new_e)
- 	/* allocate, init and register new elevator */
- 	if (new_e) {
- 		if (new_e->uses_mq) {
--			err = blk_mq_sched_setup(q);
-+			/*
-+			 * If we were previously using an I/O scheduler, the
-+			 * sched_tags are already allocated.
-+			 */
-+			if (old)
-+				err = 0;
-+			else
-+				err = blk_mq_sched_setup(q);
- 			if (!err)
- 				err = new_e->ops.mq.init_sched(q, new_e);
- 		} else
-@@ -997,6 +1001,12 @@ static int elevator_switch(struct request_queue *q, struct elevator_type *new_e)
- 
- 	/* done, kill the old one and finish */
- 	if (old) {
-+		/*
-+		 * If we switched to another I/O scheduler, then we shouldn't
-+		 * free sched_tags.
-+		 */
-+		if (old->uses_mq && !new_e)
-+			blk_mq_sched_teardown(q);
- 		elevator_exit(old);
- 		if (!q->mq_ops)
- 			blk_queue_bypass_end(q);
-@@ -1015,7 +1025,7 @@ static int elevator_switch(struct request_queue *q, struct elevator_type *new_e)
- 	return 0;
- 
- fail_register:
--	if (q->mq_ops)
-+	if (q->mq_ops && !old)
- 		blk_mq_sched_teardown(q);
- 	elevator_exit(q->elevator);
- fail_init:
--- 
-2.11.0
-
+> 
+> 								Honza
+> -- 
+> Jan Kara <jack@suse.com>
+> SUSE Labs, CR
