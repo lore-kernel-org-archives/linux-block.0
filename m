@@ -12,93 +12,87 @@ References: <aa1c23e1-1beb-a26d-3e77-fe78aa281771@suse.de>
  <be2e5182-9cd8-5fea-77ac-4efd64e869ff@kernel.dk>
  <57539c5d-be3b-ab26-c6d4-a7ff554ded8b@suse.de>
  <3261ba64-cd7b-a7da-c407-c3b9828c3b57@kernel.dk>
- <262c4739-be6c-94e9-8e8c-6e97a602e881@kernel.dk>
 Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
  Omar Sandoval <osandov@osandov.com>
 From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <1447bc07-9336-14f2-8495-a109113050ec@kernel.dk>
-Date: Wed, 25 Jan 2017 15:27:30 -0700
+Message-ID: <262c4739-be6c-94e9-8e8c-6e97a602e881@kernel.dk>
+Date: Wed, 25 Jan 2017 10:42:24 -0700
 MIME-Version: 1.0
-In-Reply-To: <262c4739-be6c-94e9-8e8c-6e97a602e881@kernel.dk>
+In-Reply-To: <3261ba64-cd7b-a7da-c407-c3b9828c3b57@kernel.dk>
 Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 01/25/2017 10:42 AM, Jens Axboe wrote:
-> On 01/25/2017 10:03 AM, Jens Axboe wrote:
->> On 01/25/2017 09:57 AM, Hannes Reinecke wrote:
->>> On 01/25/2017 04:52 PM, Jens Axboe wrote:
->>>> On 01/25/2017 04:10 AM, Hannes Reinecke wrote:
->>> [ .. ]
->>>>> Bah.
->>>>>
->>>>> Not quite. I'm still seeing some queues with state 'restart'.
->>>>>
->>>>> I've found that I need another patch on top of that:
->>>>>
->>>>> diff --git a/block/blk-mq.c b/block/blk-mq.c
->>>>> index e872555..edcbb44 100644
->>>>> --- a/block/blk-mq.c
->>>>> +++ b/block/blk-mq.c
->>>>> @@ -753,8 +754,10 @@ static void blk_mq_timeout_work(struct work_struct
->>>>> *work)
->>>>>
->>>>>                 queue_for_each_hw_ctx(q, hctx, i) {
->>>>>                         /* the hctx may be unmapped, so check it here */
->>>>> -                       if (blk_mq_hw_queue_mapped(hctx))
->>>>> +                       if (blk_mq_hw_queue_mapped(hctx)) {
->>>>>                                 blk_mq_tag_idle(hctx);
->>>>> +                               blk_mq_sched_restart(hctx);
->>>>> +                       }
->>>>>                 }
->>>>>         }
->>>>>         blk_queue_exit(q);
->>>>>
->>>>>
->>>>> Reasoning is that in blk_mq_get_tag() we might end up scheduling the
->>>>> request on another hctx, but the original hctx might still have the
->>>>> SCHED_RESTART bit set.
->>>>> Which will never cleared as we complete the request on a different hctx,
->>>>> so anything we do on the end_request side won't do us any good.
+On 01/25/2017 10:03 AM, Jens Axboe wrote:
+> On 01/25/2017 09:57 AM, Hannes Reinecke wrote:
+>> On 01/25/2017 04:52 PM, Jens Axboe wrote:
+>>> On 01/25/2017 04:10 AM, Hannes Reinecke wrote:
+>> [ .. ]
+>>>> Bah.
 >>>>
->>>> I think you are right, it'll potentially trigger with shared tags and
->>>> multiple hardware queues. I'll debug this today and come up with a
->>>> decent fix.
+>>>> Not quite. I'm still seeing some queues with state 'restart'.
 >>>>
->>>> I committed the previous patch, fwiw.
+>>>> I've found that I need another patch on top of that:
 >>>>
->>> THX.
+>>>> diff --git a/block/blk-mq.c b/block/blk-mq.c
+>>>> index e872555..edcbb44 100644
+>>>> --- a/block/blk-mq.c
+>>>> +++ b/block/blk-mq.c
+>>>> @@ -753,8 +754,10 @@ static void blk_mq_timeout_work(struct work_struct
+>>>> *work)
+>>>>
+>>>>                 queue_for_each_hw_ctx(q, hctx, i) {
+>>>>                         /* the hctx may be unmapped, so check it here */
+>>>> -                       if (blk_mq_hw_queue_mapped(hctx))
+>>>> +                       if (blk_mq_hw_queue_mapped(hctx)) {
+>>>>                                 blk_mq_tag_idle(hctx);
+>>>> +                               blk_mq_sched_restart(hctx);
+>>>> +                       }
+>>>>                 }
+>>>>         }
+>>>>         blk_queue_exit(q);
+>>>>
+>>>>
+>>>> Reasoning is that in blk_mq_get_tag() we might end up scheduling the
+>>>> request on another hctx, but the original hctx might still have the
+>>>> SCHED_RESTART bit set.
+>>>> Which will never cleared as we complete the request on a different hctx,
+>>>> so anything we do on the end_request side won't do us any good.
 >>>
->>> The above patch _does_ help in the sense that my testcase now completes 
->>> without stalls. And I even get a decent performance with the mq-sched 
->>> fixes: 82k IOPs sequential read with mq-deadline as compared to 44k IOPs 
->>> when running without I/O scheduling.
->>> Still some way off from the 132k IOPs I'm getting with CFQ, but we're 
->>> getting there.
+>>> I think you are right, it'll potentially trigger with shared tags and
+>>> multiple hardware queues. I'll debug this today and come up with a
+>>> decent fix.
 >>>
->>> However, I do get a noticeable stall during the stonewall sequence 
->>> before the timeout handler kicks in, so the must be a better way for 
->>> handling this.
+>>> I committed the previous patch, fwiw.
 >>>
->>> But nevertheless, thanks for all your work here.
->>> Very much appreciated.
+>> THX.
 >>
->> Yeah, the fix isn't really a fix, unless you are willing to tolerate
->> potentially tens of seconds of extra latency until we idle it out :-)
+>> The above patch _does_ help in the sense that my testcase now completes 
+>> without stalls. And I even get a decent performance with the mq-sched 
+>> fixes: 82k IOPs sequential read with mq-deadline as compared to 44k IOPs 
+>> when running without I/O scheduling.
+>> Still some way off from the 132k IOPs I'm getting with CFQ, but we're 
+>> getting there.
 >>
->> So we can't use the un-idling for this, but we can track it on the
->> shared state, which is the tags. The problem isn't that we are
->> switching to a new hardware queue, it's if we mark the hardware queue
->> as restart AND it has nothing pending. In that case, we'll never
->> get it restarted, since IO completion is what restarts it.
+>> However, I do get a noticeable stall during the stonewall sequence 
+>> before the timeout handler kicks in, so the must be a better way for 
+>> handling this.
 >>
->> I need to handle that case separately. Currently testing a patch, I
->> should have something for you to test later today.
+>> But nevertheless, thanks for all your work here.
+>> Very much appreciated.
 > 
-> Can you try this one?
+> Yeah, the fix isn't really a fix, unless you are willing to tolerate
+> potentially tens of seconds of extra latency until we idle it out :-)
+> 
+> So we can't use the un-idling for this, but we can track it on the
+> shared state, which is the tags. The problem isn't that we are
+> switching to a new hardware queue, it's if we mark the hardware queue
+> as restart AND it has nothing pending. In that case, we'll never
+> get it restarted, since IO completion is what restarts it.
+> 
+> I need to handle that case separately. Currently testing a patch, I
+> should have something for you to test later today.
 
-And another variant, this one should be better in that it should result
-in less queue runs and get better merging. Hope it works with your
-stalls as well.
+Can you try this one?
 
 
 diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
@@ -182,7 +176,7 @@ index 6b465bc..becbc78 100644
  
  static inline bool blk_mq_sched_needs_restart(struct blk_mq_hw_ctx *hctx)
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 4c3e667..4eb732a 100644
+index 4c3e667..3951b72 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
 @@ -40,7 +40,7 @@ static LIST_HEAD(all_q_list);
@@ -202,29 +196,7 @@ index 4c3e667..4eb732a 100644
  	blk_queue_exit(q);
  }
  
-@@ -879,6 +880,21 @@ static bool blk_mq_get_driver_tag(struct request *rq,
- 	return false;
- }
- 
-+static void blk_mq_put_driver_tag(struct blk_mq_hw_ctx *hctx,
-+				  struct request *rq)
-+{
-+	if (rq->tag == -1 || rq->internal_tag == -1)
-+		return;
-+
-+	blk_mq_put_tag(hctx, hctx->tags, rq->mq_ctx, rq->tag);
-+	rq->tag = -1;
-+
-+	if (rq->rq_flags & RQF_MQ_INFLIGHT) {
-+		rq->rq_flags &= ~RQF_MQ_INFLIGHT;
-+		atomic_dec(&hctx->nr_active);
-+	}
-+}
-+
- /*
-  * If we fail getting a driver tag because all the driver tags are already
-  * assigned and on the dispatch list, BUT the first entry does not have a
-@@ -928,8 +944,16 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list)
+@@ -928,8 +929,16 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list)
  		if (!blk_mq_get_driver_tag(rq, &hctx, false)) {
  			if (!queued && reorder_tags_to_front(list))
  				continue;
@@ -242,14 +214,6 @@ index 4c3e667..4eb732a 100644
  		}
  		list_del_init(&rq->queuelist);
  
-@@ -943,6 +967,7 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list)
- 			queued++;
- 			break;
- 		case BLK_MQ_RQ_QUEUE_BUSY:
-+			blk_mq_put_driver_tag(hctx, rq);
- 			list_add(&rq->queuelist, list);
- 			__blk_mq_requeue_request(rq);
- 			break;
 diff --git a/block/blk-mq.h b/block/blk-mq.h
 index 6c24b90..077a400 100644
 --- a/block/blk-mq.h
