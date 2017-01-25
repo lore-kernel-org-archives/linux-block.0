@@ -1,34 +1,57 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from aserp1040.oracle.com ([141.146.126.69]:48058 "EHLO
-        aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752478AbdAZC7w (ORCPT
+Received: from bombadil.infradead.org ([65.50.211.133]:54094 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751429AbdAYRZg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 Jan 2017 21:59:52 -0500
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@fb.com>, Mike Snitzer <snitzer@redhat.com>,
+        Wed, 25 Jan 2017 12:25:36 -0500
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@fb.com>
+Cc: Mike Snitzer <snitzer@redhat.com>,
         Junichi Nomura <j-nomura@ce.jp.nec.com>,
         linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
         linux-raid@vger.kernel.org, dm-devel@redhat.com
-Subject: Re: [PATCH 02/18] md: cleanup bio op / flags handling in raid1_write_request
-From: "Martin K. Petersen" <martin.petersen@oracle.com>
+Subject: [PATCH 02/18] md: cleanup bio op / flags handling in raid1_write_request
+Date: Wed, 25 Jan 2017 18:25:10 +0100
+Message-Id: <1485365126-23210-3-git-send-email-hch@lst.de>
+In-Reply-To: <1485365126-23210-1-git-send-email-hch@lst.de>
 References: <1485365126-23210-1-git-send-email-hch@lst.de>
-        <1485365126-23210-3-git-send-email-hch@lst.de>
-Date: Wed, 25 Jan 2017 21:59:33 -0500
-In-Reply-To: <1485365126-23210-3-git-send-email-hch@lst.de> (Christoph
-        Hellwig's message of "Wed, 25 Jan 2017 18:25:10 +0100")
-Message-ID: <yq1inp2a5m2.fsf@oracle.com>
-MIME-Version: 1.0
-Content-Type: text/plain
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
->>>>> "Christoph" == Christoph Hellwig <hch@lst.de> writes:
+No need for the local variables, the bio is still live and we can just
+assigned the bits we want directly.  Make me wonder why we can't assign
+all the bio flags to start with.
 
-Christoph> No need for the local variables, the bio is still live and we
-Christoph> can just assigned the bits we want directly.  Make me wonder
-Christoph> why we can't assign all the bio flags to start with.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/md/raid1.c | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-
+diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
+index 7b0f647..67b0365 100644
+--- a/drivers/md/raid1.c
++++ b/drivers/md/raid1.c
+@@ -1170,10 +1170,6 @@ static void raid1_write_request(struct mddev *mddev, struct bio *bio,
+ 	int i, disks;
+ 	struct bitmap *bitmap = mddev->bitmap;
+ 	unsigned long flags;
+-	const int op = bio_op(bio);
+-	const unsigned long do_sync = (bio->bi_opf & REQ_SYNC);
+-	const unsigned long do_flush_fua = (bio->bi_opf &
+-						(REQ_PREFLUSH | REQ_FUA));
+ 	struct md_rdev *blocked_rdev;
+ 	struct blk_plug_cb *cb;
+ 	struct raid1_plug_cb *plug = NULL;
+@@ -1389,7 +1385,8 @@ static void raid1_write_request(struct mddev *mddev, struct bio *bio,
+ 				   conf->mirrors[i].rdev->data_offset);
+ 		mbio->bi_bdev = conf->mirrors[i].rdev->bdev;
+ 		mbio->bi_end_io	= raid1_end_write_request;
+-		bio_set_op_attrs(mbio, op, do_flush_fua | do_sync);
++		mbio->bi_opf = bio_op(bio) |
++			(bio->bi_opf & (REQ_SYNC | REQ_PREFLUSH | REQ_FUA));
+ 		if (test_bit(FailFast, &conf->mirrors[i].rdev->flags) &&
+ 		    !test_bit(WriteMostly, &conf->mirrors[i].rdev->flags) &&
+ 		    conf->raid_disks - mddev->degraded > 1)
 -- 
-Martin K. Petersen	Oracle Linux Engineering
+2.1.4
+
