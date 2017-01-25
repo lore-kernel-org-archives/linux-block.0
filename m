@@ -1,39 +1,49 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@fb.com>
-Cc: Mike Snitzer <snitzer@redhat.com>, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org, dm-devel@redhat.com
-Subject: [PATCH 02/15] nvme-rdma: fix nvme_rdma_queue_is_ready
-Date: Tue, 10 Jan 2017 16:06:07 +0100
-Message-Id: <1484060780-15592-3-git-send-email-hch@lst.de>
-In-Reply-To: <1484060780-15592-1-git-send-email-hch@lst.de>
-References: <1484060780-15592-1-git-send-email-hch@lst.de>
-Sender: linux-scsi-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pf0-f174.google.com ([209.85.192.174]:33133 "EHLO
+        mail-pf0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751375AbdAYQHZ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 25 Jan 2017 11:07:25 -0500
+Received: by mail-pf0-f174.google.com with SMTP id y143so59229479pfb.0
+        for <linux-block@vger.kernel.org>; Wed, 25 Jan 2017 08:07:24 -0800 (PST)
+From: Omar Sandoval <osandov@osandov.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
+Cc: kernel-team@fb.com
+Subject: [PATCH v2 04/10] blk-mq: add extra request information to debugfs
+Date: Wed, 25 Jan 2017 08:06:43 -0800
+Message-Id: <79c2ac5add8fc2ba90d2ef3867f45065006ffd5a.1485360145.git.osandov@fb.com>
+In-Reply-To: <cover.1485360145.git.osandov@fb.com>
+References: <cover.1485360145.git.osandov@fb.com>
+In-Reply-To: <cover.1485360145.git.osandov@fb.com>
+References: <cover.1485360145.git.osandov@fb.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Now that we don't abuse the cmd field in struct request for nvme command
-passthrough this function needs to be converted to the proper accessor
-as well.
+From: Omar Sandoval <osandov@fb.com>
 
-Fixes: d49187e97e ("nvme: introduce struct nvme_request")
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+The request pointers by themselves aren't super useful.
+
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Signed-off-by: Omar Sandoval <osandov@fb.com>
 ---
- drivers/nvme/host/rdma.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block/blk-mq-debugfs.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
-index f587af3..34e5648 100644
---- a/drivers/nvme/host/rdma.c
-+++ b/drivers/nvme/host/rdma.c
-@@ -1422,7 +1422,7 @@ static inline bool nvme_rdma_queue_is_ready(struct nvme_rdma_queue *queue,
- 		struct request *rq)
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index 1967c06d80e0..ee947f2f605b 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -87,7 +87,9 @@ static int blk_mq_debugfs_rq_show(struct seq_file *m, void *v)
  {
- 	if (unlikely(!test_bit(NVME_RDMA_Q_LIVE, &queue->flags))) {
--		struct nvme_command *cmd = (struct nvme_command *)rq->cmd;
-+		struct nvme_command *cmd = nvme_req(rq)->cmd;
+ 	struct request *rq = list_entry_rq(v);
  
- 		if (rq->cmd_type != REQ_TYPE_DRV_PRIV ||
- 		    cmd->common.opcode != nvme_fabrics_command ||
+-	seq_printf(m, "%p\n", rq);
++	seq_printf(m, "%p {.cmd_type=%u, .cmd_flags=0x%x, .rq_flags=0x%x, .tag=%d, .internal_tag=%d}\n",
++		   rq, rq->cmd_type, rq->cmd_flags, (unsigned int)rq->rq_flags,
++		   rq->tag, rq->internal_tag);
+ 	return 0;
+ }
+ 
 -- 
-2.1.4
+2.11.0
 
