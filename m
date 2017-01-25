@@ -1,134 +1,33 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga06.intel.com ([134.134.136.31]:4708 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750800AbdA1Ip1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 28 Jan 2017 03:45:27 -0500
-Subject: [RFC PATCH 15/17] Revert "block: use DAX for partition table reads"
-From: Dan Williams <dan.j.williams@intel.com>
-To: linux-nvdimm@lists.01.org
-Cc: snitzer@redhat.com, toshi.kani@hpe.com, mawilcox@microsoft.com,
-        linux-block@vger.kernel.org, jmoyer@redhat.com,
-        linux-fsdevel@vger.kernel.org, ross.zwisler@linux.intel.com,
-        hch@lst.de
-Date: Sat, 28 Jan 2017 00:37:25 -0800
-Message-ID: <148559264511.11180.2929402243333588408.stgit@dwillia2-desk3.amr.corp.intel.com>
-In-Reply-To: <148559256378.11180.8957776806175202312.stgit@dwillia2-desk3.amr.corp.intel.com>
-References: <148559256378.11180.8957776806175202312.stgit@dwillia2-desk3.amr.corp.intel.com>
+Return-Path: <houtao1@huawei.com>
+From: Hou Tao <houtao1@huawei.com>
+To: <linux-block@vger.kernel.org>
+CC: <axboe@kernel.dk>
+Subject: [PATCH] blkcg: fix double free of new_blkg in blkcg_init_queue
+Date: Wed, 25 Jan 2017 08:37:36 +0800
+Message-ID: <1485304656-8844-1-git-send-email-houtao1@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain
+List-ID: <linux-block@vger.kernel.org>
 
-commit d1a5f2b4d8a1 ("block: use DAX for partition table reads") was
-part of a stalled effort to allow dax mappings of block devices. Since
-then the device-dax mechanism has filled the role of dax-mapping static
-device ranges.
+if blkg_create fails, new_blkg passed as an argument will
+be freed by blkg_create, so there is no need to free it again.
 
-Now that we are moving ->direct_access() from a block_device operation
-to a dax_inode operation we would need block devices to map and carry
-their own dax_inode reference.
-
-Unless / until we decide to revive dax mapping of raw block devices
-through the dax_inode scheme, there is no need to carry
-read_dax_sector(). Its removal in turn allows for the removal of
-bdev_direct_access() and should have been included in commit
-223757016837 ("block_dev: remove DAX leftovers").
-
-Signed-off-by: Dan Williams <dan.j.williams@intel.com>
+Signed-off-by: Hou Tao <houtao1@huawei.com>
 ---
- block/partition-generic.c |   17 ++---------------
- fs/dax.c                  |   20 --------------------
- include/linux/dax.h       |    6 ------
- 3 files changed, 2 insertions(+), 41 deletions(-)
+ block/blk-cgroup.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/block/partition-generic.c b/block/partition-generic.c
-index 7afb9907821f..5dfac337b0f2 100644
---- a/block/partition-generic.c
-+++ b/block/partition-generic.c
-@@ -16,7 +16,6 @@
- #include <linux/kmod.h>
- #include <linux/ctype.h>
- #include <linux/genhd.h>
--#include <linux/dax.h>
- #include <linux/blktrace_api.h>
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index 8ba0af7..58fb0dd 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -1080,7 +1080,6 @@ int blkcg_init_queue(struct request_queue *q)
+ 		radix_tree_preload_end();
  
- #include "partitions/check.h"
-@@ -631,24 +630,12 @@ int invalidate_partitions(struct gendisk *disk, struct block_device *bdev)
- 	return 0;
- }
+ 	if (IS_ERR(blkg)) {
+-		blkg_free(new_blkg);
+ 		return PTR_ERR(blkg);
+ 	}
  
--static struct page *read_pagecache_sector(struct block_device *bdev, sector_t n)
--{
--	struct address_space *mapping = bdev->bd_inode->i_mapping;
--
--	return read_mapping_page(mapping, (pgoff_t)(n >> (PAGE_SHIFT-9)),
--				 NULL);
--}
--
- unsigned char *read_dev_sector(struct block_device *bdev, sector_t n, Sector *p)
- {
-+	struct address_space *mapping = bdev->bd_inode->i_mapping;
- 	struct page *page;
- 
--	/* don't populate page cache for dax capable devices */
--	if (IS_DAX(bdev->bd_inode))
--		page = read_dax_sector(bdev, n);
--	else
--		page = read_pagecache_sector(bdev, n);
--
-+	page = read_mapping_page(mapping, (pgoff_t)(n >> (PAGE_SHIFT-9)), NULL);
- 	if (!IS_ERR(page)) {
- 		if (PageError(page))
- 			goto fail;
-diff --git a/fs/dax.c b/fs/dax.c
-index ddcddfeaa03b..a990211c8a3d 100644
---- a/fs/dax.c
-+++ b/fs/dax.c
-@@ -97,26 +97,6 @@ static int dax_is_empty_entry(void *entry)
- 	return (unsigned long)entry & RADIX_DAX_EMPTY;
- }
- 
--struct page *read_dax_sector(struct block_device *bdev, sector_t n)
--{
--	struct page *page = alloc_pages(GFP_KERNEL, 0);
--	struct blk_dax_ctl dax = {
--		.size = PAGE_SIZE,
--		.sector = n & ~((((int) PAGE_SIZE) / 512) - 1),
--	};
--	long rc;
--
--	if (!page)
--		return ERR_PTR(-ENOMEM);
--
--	rc = dax_map_atomic(bdev, &dax);
--	if (rc < 0)
--		return ERR_PTR(rc);
--	memcpy_from_pmem(page_address(page), dax.addr, PAGE_SIZE);
--	dax_unmap_atomic(bdev, &dax);
--	return page;
--}
--
- /*
-  * DAX radix tree locking
-  */
-diff --git a/include/linux/dax.h b/include/linux/dax.h
-index 2ef8e18e2587..10b742af3d56 100644
---- a/include/linux/dax.h
-+++ b/include/linux/dax.h
-@@ -65,15 +65,9 @@ void dax_wake_mapping_entry_waiter(struct address_space *mapping,
- 		pgoff_t index, void *entry, bool wake_all);
- 
- #ifdef CONFIG_FS_DAX
--struct page *read_dax_sector(struct block_device *bdev, sector_t n);
- int __dax_zero_page_range(struct block_device *bdev, sector_t sector,
- 		unsigned int offset, unsigned int length);
- #else
--static inline struct page *read_dax_sector(struct block_device *bdev,
--		sector_t n)
--{
--	return ERR_PTR(-ENXIO);
--}
- static inline int __dax_zero_page_range(struct block_device *bdev,
- 		sector_t sector, unsigned int offset, unsigned int length)
- {
-
+-- 
+2.5.0
