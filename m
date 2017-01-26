@@ -1,145 +1,73 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:54134 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751841AbdAYRZw (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 Jan 2017 12:25:52 -0500
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@fb.com>
-Cc: Mike Snitzer <snitzer@redhat.com>,
-        Junichi Nomura <j-nomura@ce.jp.nec.com>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-raid@vger.kernel.org, dm-devel@redhat.com
-Subject: [PATCH 04/18] block: simplify blk_init_allocated_queue
-Date: Wed, 25 Jan 2017 18:25:12 +0100
-Message-Id: <1485365126-23210-5-git-send-email-hch@lst.de>
-In-Reply-To: <1485365126-23210-1-git-send-email-hch@lst.de>
-References: <1485365126-23210-1-git-send-email-hch@lst.de>
+Received: from mga11.intel.com ([192.55.52.93]:56376 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753131AbdAZL66 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 26 Jan 2017 06:58:58 -0500
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv6 15/37] thp: do not threat slab pages as huge in hpage_{nr_pages,size,mask}
+Date: Thu, 26 Jan 2017 14:57:57 +0300
+Message-Id: <20170126115819.58875-16-kirill.shutemov@linux.intel.com>
+In-Reply-To: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
+References: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Return an errno value instead of the passed in queue so that the callers
-don't have to keep track of two queues, and move the assignment of the
-request_fn and lock to the caller as passing them as argument doesn't
-simplify anything.  While we're at it also remove two pointless NULL
-assignments, given that the request structure is zeroed on allocation.
+Slab pages can be compound, but we shouldn't threat them as THP for
+pupose of hpage_* helpers, otherwise it would lead to confusing results.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+For instance, ext4 uses slab pages for journal pages and we shouldn't
+confuse them with THPs. The easiest way is to exclude them in hpage_*
+helpers.
+
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- block/blk-core.c       | 38 +++++++++++++++-----------------------
- drivers/md/dm-rq.c     |  3 ++-
- include/linux/blkdev.h |  3 +--
- 3 files changed, 18 insertions(+), 26 deletions(-)
+ include/linux/huge_mm.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index a84c1b9..54b5512 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -823,15 +823,19 @@ EXPORT_SYMBOL(blk_init_queue);
- struct request_queue *
- blk_init_queue_node(request_fn_proc *rfn, spinlock_t *lock, int node_id)
- {
--	struct request_queue *uninit_q, *q;
-+	struct request_queue *q;
- 
--	uninit_q = blk_alloc_queue_node(GFP_KERNEL, node_id);
--	if (!uninit_q)
-+	q = blk_alloc_queue_node(GFP_KERNEL, node_id);
-+	if (!q)
- 		return NULL;
- 
--	q = blk_init_allocated_queue(uninit_q, rfn, lock);
--	if (!q)
--		blk_cleanup_queue(uninit_q);
-+	q->request_fn = rfn;
-+	if (lock)
-+		q->queue_lock = lock;
-+	if (blk_init_allocated_queue(q) < 0) {
-+		blk_cleanup_queue(q);
-+		return NULL;
-+	}
- 
- 	return q;
+diff --git a/include/linux/huge_mm.h b/include/linux/huge_mm.h
+index e5c9c26d2439..5e6c408f5b47 100644
+--- a/include/linux/huge_mm.h
++++ b/include/linux/huge_mm.h
+@@ -137,21 +137,21 @@ static inline spinlock_t *pmd_trans_huge_lock(pmd_t *pmd,
  }
-@@ -839,30 +843,19 @@ EXPORT_SYMBOL(blk_init_queue_node);
- 
- static blk_qc_t blk_queue_bio(struct request_queue *q, struct bio *bio);
- 
--struct request_queue *
--blk_init_allocated_queue(struct request_queue *q, request_fn_proc *rfn,
--			 spinlock_t *lock)
--{
--	if (!q)
--		return NULL;
- 
-+int blk_init_allocated_queue(struct request_queue *q)
-+{
- 	q->fq = blk_alloc_flush_queue(q, NUMA_NO_NODE, 0);
- 	if (!q->fq)
--		return NULL;
-+		return -ENOMEM;
- 
- 	if (blk_init_rl(&q->root_rl, q, GFP_KERNEL))
- 		goto fail;
- 
- 	INIT_WORK(&q->timeout_work, blk_timeout_work);
--	q->request_fn		= rfn;
--	q->prep_rq_fn		= NULL;
--	q->unprep_rq_fn		= NULL;
- 	q->queue_flags		|= QUEUE_FLAG_DEFAULT;
- 
--	/* Override internal queue lock with supplied lock pointer */
--	if (lock)
--		q->queue_lock		= lock;
--
- 	/*
- 	 * This also sets hw/phys segments, boundary and size
- 	 */
-@@ -880,13 +873,12 @@ blk_init_allocated_queue(struct request_queue *q, request_fn_proc *rfn,
- 	}
- 
- 	mutex_unlock(&q->sysfs_lock);
--
--	return q;
-+	return 0;
- 
- fail:
- 	blk_free_flush_queue(q->fq);
- 	wbt_exit(q);
--	return NULL;
-+	return -ENOMEM;
- }
- EXPORT_SYMBOL(blk_init_allocated_queue);
- 
-diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
-index 9d7275f..93f6e9f 100644
---- a/drivers/md/dm-rq.c
-+++ b/drivers/md/dm-rq.c
-@@ -823,7 +823,8 @@ static void dm_old_request_fn(struct request_queue *q)
- int dm_old_init_request_queue(struct mapped_device *md)
+ static inline int hpage_nr_pages(struct page *page)
  {
- 	/* Fully initialize the queue */
--	if (!blk_init_allocated_queue(md->queue, dm_old_request_fn, NULL))
-+	md->queue->request_fn = dm_old_request_fn;
-+	if (blk_init_allocated_queue(md->queue) < 0)
- 		return -EINVAL;
+-	if (unlikely(PageTransHuge(page)))
++	if (unlikely(!PageSlab(page) && PageTransHuge(page)))
+ 		return HPAGE_PMD_NR;
+ 	return 1;
+ }
  
- 	/* disable dm_old_request_fn's merge heuristic by default */
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 8e0b57e..a036c4a 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1131,8 +1131,7 @@ extern void blk_unprep_request(struct request *);
- extern struct request_queue *blk_init_queue_node(request_fn_proc *rfn,
- 					spinlock_t *lock, int node_id);
- extern struct request_queue *blk_init_queue(request_fn_proc *, spinlock_t *);
--extern struct request_queue *blk_init_allocated_queue(struct request_queue *,
--						      request_fn_proc *, spinlock_t *);
-+extern int blk_init_allocated_queue(struct request_queue *);
- extern void blk_cleanup_queue(struct request_queue *);
- extern void blk_queue_make_request(struct request_queue *, make_request_fn *);
- extern void blk_queue_bounce_limit(struct request_queue *, u64);
+ static inline int hpage_size(struct page *page)
+ {
+-	if (unlikely(PageTransHuge(page)))
++	if (unlikely(!PageSlab(page) && PageTransHuge(page)))
+ 		return HPAGE_PMD_SIZE;
+ 	return PAGE_SIZE;
+ }
+ 
+ static inline unsigned long hpage_mask(struct page *page)
+ {
+-	if (unlikely(PageTransHuge(page)))
++	if (unlikely(!PageSlab(page) && PageTransHuge(page)))
+ 		return HPAGE_PMD_MASK;
+ 	return PAGE_MASK;
+ }
 -- 
-2.1.4
+2.11.0
 
