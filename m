@@ -1,102 +1,37 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-bn3nam01on0043.outbound.protection.outlook.com ([104.47.33.43]:32224
-        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752003AbdAaMSu (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 31 Jan 2017 07:18:50 -0500
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
-To: <axboe@fb.com>
-CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <jg@lightnvm.io>,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
-Subject: [PATCH 12/12] lightnvm: allow targets to use sysfs
-Date: Tue, 31 Jan 2017 13:17:20 +0100
-Message-ID: <20170131121720.10971-13-matias@cnexlabs.com>
-In-Reply-To: <20170131121720.10971-1-matias@cnexlabs.com>
-References: <20170131121720.10971-1-matias@cnexlabs.com>
+Received: from userp1040.oracle.com ([156.151.31.81]:22499 "EHLO
+        userp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752453AbdAZDUv (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 25 Jan 2017 22:20:51 -0500
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@fb.com>, Mike Snitzer <snitzer@redhat.com>,
+        Junichi Nomura <j-nomura@ce.jp.nec.com>,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-raid@vger.kernel.org, dm-devel@redhat.com,
+        Hannes Reinecke <hare@suse.de>, Hannes Reinecke <hare@suse.com>
+Subject: Re: [PATCH 10/18] scsi_dh_hp_sw: switch to scsi_execute_req_flags()
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <1485365126-23210-1-git-send-email-hch@lst.de>
+        <1485365126-23210-11-git-send-email-hch@lst.de>
+Date: Wed, 25 Jan 2017 22:20:29 -0500
+In-Reply-To: <1485365126-23210-11-git-send-email-hch@lst.de> (Christoph
+        Hellwig's message of "Wed, 25 Jan 2017 18:25:18 +0100")
+Message-ID: <yq1sho68q2q.fsf@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Javier González <jg@lightnvm.io>
+>>>>> "Christoph" == Christoph Hellwig <hch@lst.de> writes:
 
-In order to register through the sysfs interface, a driver needs to know
-its kobject. On a disk structure, this happens when the partition
-information is added (device_add_disk), which for lightnvm takes place
-after the target has been initialized. This means that on target
-initialization, the kboject has not been created yet.
+Christoph> From: Hannes Reinecke <hare@suse.de> Switch to
+Christoph> scsi_execute_req_flags() instead of using the block interface
+Christoph> directly.  This will set REQ_QUIET and REQ_PREEMPT, but this
+Christoph> is okay as we're evaluating the errors anyway and should be
+Christoph> able to send the command even if the device is quiesced.
 
-This patch adds a target function to let targets initialize their own
-kboject as a child of the disk kobject.
+Acked-by: Martin K. Petersen <martin.petersen@oracle.com>
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
-Added exit typedef and passed gendisk instead of void pointer for exit.
-Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
----
- drivers/lightnvm/core.c  | 9 +++++++++
- include/linux/lightnvm.h | 6 ++++++
- 2 files changed, 15 insertions(+)
-
-diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-index b2cd3d6..9bfe035 100644
---- a/drivers/lightnvm/core.c
-+++ b/drivers/lightnvm/core.c
-@@ -289,6 +289,9 @@ static int nvm_create_tgt(struct nvm_dev *dev, struct nvm_ioctl_create *create)
- 	set_capacity(tdisk, tt->capacity(targetdata));
- 	add_disk(tdisk);
- 
-+	if (tt->sysfs_init && tt->sysfs_init(tdisk))
-+		goto err_sysfs;
-+
- 	t->type = tt;
- 	t->disk = tdisk;
- 	t->dev = tgt_dev;
-@@ -298,6 +301,9 @@ static int nvm_create_tgt(struct nvm_dev *dev, struct nvm_ioctl_create *create)
- 	mutex_unlock(&dev->mlock);
- 
- 	return 0;
-+err_sysfs:
-+	if (tt->exit)
-+		tt->exit(targetdata);
- err_init:
- 	put_disk(tdisk);
- err_queue:
-@@ -320,6 +326,9 @@ static void __nvm_remove_target(struct nvm_target *t)
- 	del_gendisk(tdisk);
- 	blk_cleanup_queue(q);
- 
-+	if (tt->sysfs_exit)
-+		tt->sysfs_exit(tdisk);
-+
- 	if (tt->exit)
- 		tt->exit(tdisk->private_data);
- 
-diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
-index bc282d2..ca45e4a 100644
---- a/include/linux/lightnvm.h
-+++ b/include/linux/lightnvm.h
-@@ -440,6 +440,8 @@ typedef blk_qc_t (nvm_tgt_make_rq_fn)(struct request_queue *, struct bio *);
- typedef sector_t (nvm_tgt_capacity_fn)(void *);
- typedef void *(nvm_tgt_init_fn)(struct nvm_tgt_dev *, struct gendisk *);
- typedef void (nvm_tgt_exit_fn)(void *);
-+typedef int (nvm_tgt_sysfs_init_fn)(struct gendisk *);
-+typedef void (nvm_tgt_sysfs_exit_fn)(struct gendisk *);
- 
- struct nvm_tgt_type {
- 	const char *name;
-@@ -453,6 +455,10 @@ struct nvm_tgt_type {
- 	nvm_tgt_init_fn *init;
- 	nvm_tgt_exit_fn *exit;
- 
-+	/* sysfs */
-+	nvm_tgt_sysfs_init_fn *sysfs_init;
-+	nvm_tgt_sysfs_exit_fn *sysfs_exit;
-+
- 	/* For internal use */
- 	struct list_head list;
- };
 -- 
-2.9.3
-
+Martin K. Petersen	Oracle Linux Engineering
