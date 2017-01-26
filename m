@@ -1,91 +1,41 @@
-Return-Path: <jack@suse.cz>
-From: Jan Kara <jack@suse.cz>
-To: linux-block@vger.kernel.org
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([65.50.211.133]:36058 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751843AbdAZNRP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 26 Jan 2017 08:17:15 -0500
+Date: Thu, 26 Jan 2017 05:17:09 -0800
+From: Christoph Hellwig <hch@infradead.org>
+To: Greg KH <gregkh@linuxfoundation.org>
 Cc: Christoph Hellwig <hch@infradead.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
-	Laurent Dufour <ldufour@linux.vnet.ibm.com>,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH 1/4] block: Unhash block device inodes on gendisk destruction
-Date: Thu, 26 Jan 2017 18:45:29 +0100
-Message-Id: <20170126174532.15189-2-jack@suse.cz>
-In-Reply-To: <20170126174532.15189-1-jack@suse.cz>
-References: <20170126174532.15189-1-jack@suse.cz>
-List-ID: <linux-block@vger.kernel.org>
+        Eric Blake <eblake@redhat.com>, Alex Bligh <alex@alex.org.uk>,
+        "nbd-general@lists.sourceforge.net"
+        <nbd-general@lists.sourceforge.net>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>, Josef Bacik <jbacik@fb.com>,
+        Jens Axboe <axboe@fb.com>, Kernel Team <Kernel-team@fb.com>,
+        Alex Gartrell <agartrell@fb.com>
+Subject: Re: [Nbd] [PATCH 4/4] nbd: add a nbd-control interface
+Message-ID: <20170126131709.GA26618@infradead.org>
+References: <1485186762.21123.1@smtp.office365.com>
+ <20170124071152.GB13251@kroah.com>
+ <1485352053.5902.0@smtp.office365.com>
+ <CAK8P3a10K-8GwwcZLd4HwYHzxcB8cwww3y73np_Th65af7m6gQ@mail.gmail.com>
+ <F7E2FE6F-B7A8-4A36-854D-AE1620D88762@fb.com>
+ <5F1F69A4-CDE1-4519-9FB4-C6B1DED5BBAE@alex.org.uk>
+ <20170125213004.GA6141@kroah.com>
+ <68e14c2e-e96e-ff8d-bd8a-0754fb970e77@redhat.com>
+ <20170126084047.GA9242@infradead.org>
+ <20170126091758.GB31667@kroah.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170126091758.GB31667@kroah.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Currently, block device inodes stay around after corresponding gendisk
-hash died until memory reclaim finds them and frees them. Since we will
-make block device inode pin the bdi, we want to free the block device
-inode as soon as the device goes away so that bdi does not stay around
-unnecessarily. Furthermore we need to avoid issues when new device with
-the same major,minor pair gets created since reusing the bdi structure
-would be rather difficult in this case.
+On Thu, Jan 26, 2017 at 10:17:58AM +0100, Greg KH wrote:
+> Ok, but do you feel the "loop method" of using a char device node to
+> create/control these devices is a good model to follow for new devices
+> like ndb?
 
-Unhashing block device inode on gendisk destruction nicely deals with
-these problems. Once last block device inode reference is dropped (which
-may be directly in del_gendisk()), the inode gets evicted. Furthermore if
-the major,minor pair gets reallocated, we are guaranteed to get new
-block device inode even if old block device inode is not yet evicted and
-thus we avoid issues with possible reuse of bdi.
-
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- block/genhd.c      |  2 ++
- fs/block_dev.c     | 15 +++++++++++++++
- include/linux/fs.h |  1 +
- 3 files changed, 18 insertions(+)
-
-diff --git a/block/genhd.c b/block/genhd.c
-index fcd6d4fae657..f2f22d0e8e14 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -648,6 +648,8 @@ void del_gendisk(struct gendisk *disk)
- 	disk_part_iter_init(&piter, disk,
- 			     DISK_PITER_INCL_EMPTY | DISK_PITER_REVERSE);
- 	while ((part = disk_part_iter_next(&piter))) {
-+		bdev_unhash_inode(MKDEV(disk->major,
-+					disk->first_minor + part->partno));
- 		invalidate_partition(disk, part->partno);
- 		delete_partition(disk, part->partno);
- 	}
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 5db5d1340d69..ed6a34be7a1e 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -954,6 +954,21 @@ static int bdev_set(struct inode *inode, void *data)
- 
- static LIST_HEAD(all_bdevs);
- 
-+/*
-+ * If there is a bdev inode for this device, unhash it so that it gets evicted
-+ * as soon as last inode reference is dropped.
-+ */
-+void bdev_unhash_inode(dev_t dev)
-+{
-+	struct inode *inode;
-+
-+	inode = ilookup5(blockdev_superblock, hash(dev), bdev_test, &dev);
-+	if (inode) {
-+		remove_inode_hash(inode);
-+		iput(inode);
-+	}
-+}
-+
- struct block_device *bdget(dev_t dev)
- {
- 	struct block_device *bdev;
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 2ba074328894..702cb6c50194 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -2342,6 +2342,7 @@ extern struct kmem_cache *names_cachep;
- #ifdef CONFIG_BLOCK
- extern int register_blkdev(unsigned int, const char *);
- extern void unregister_blkdev(unsigned int, const char *);
-+extern void bdev_unhash_inode(dev_t dev);
- extern struct block_device *bdget(dev_t);
- extern struct block_device *bdgrab(struct block_device *bdev);
- extern void bd_set_size(struct block_device *, loff_t size);
--- 
-2.10.2
+Yes. We've done the same for NVMe over fabrics.
