@@ -1,17 +1,17 @@
 Return-Path: <jack@suse.cz>
 From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
+To: linux-block@vger.kernel.org
+Cc: Christoph Hellwig <hch@infradead.org>,
+	Jens Axboe <axboe@kernel.dk>,
 	Dan Williams <dan.j.williams@intel.com>,
 	Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
 	Laurent Dufour <ldufour@linux.vnet.ibm.com>,
 	Jan Kara <jack@suse.cz>
 Subject: [PATCH 4/4] block: Make blk_get_backing_dev_info() safe without open bdev
-Date: Tue, 31 Jan 2017 13:54:29 +0100
-Message-Id: <20170131125429.14303-5-jack@suse.cz>
-In-Reply-To: <20170131125429.14303-1-jack@suse.cz>
-References: <20170131125429.14303-1-jack@suse.cz>
+Date: Thu, 26 Jan 2017 18:45:32 +0100
+Message-Id: <20170126174532.15189-5-jack@suse.cz>
+In-Reply-To: <20170126174532.15189-1-jack@suse.cz>
+References: <20170126174532.15189-1-jack@suse.cz>
 List-ID: <linux-block@vger.kernel.org>
 
 Currenly blk_get_backing_dev_info() is not safe to be called when the
@@ -59,7 +59,7 @@ Signed-off-by: Jan Kara <jack@suse.cz>
  3 files changed, 11 insertions(+), 5 deletions(-)
 
 diff --git a/block/blk-core.c b/block/blk-core.c
-index 545ccb4b96f3..84fabb51714a 100644
+index 5613d3e0821e..34056a37361c 100644
 --- a/block/blk-core.c
 +++ b/block/blk-core.c
 @@ -109,14 +109,12 @@ void blk_queue_congestion_threshold(struct request_queue *q)
