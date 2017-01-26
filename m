@@ -1,169 +1,157 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:3293 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751156AbdA1IoM (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 28 Jan 2017 03:44:12 -0500
-Subject: [RFC PATCH 10/17] block: introduce bdev_dax_direct_access()
-From: Dan Williams <dan.j.williams@intel.com>
-To: linux-nvdimm@lists.01.org
-Cc: snitzer@redhat.com, toshi.kani@hpe.com, mawilcox@microsoft.com,
-        linux-block@vger.kernel.org, jmoyer@redhat.com,
-        linux-fsdevel@vger.kernel.org, ross.zwisler@linux.intel.com,
-        hch@lst.de
-Date: Sat, 28 Jan 2017 00:36:58 -0800
-Message-ID: <148559261791.11180.12085685820239925499.stgit@dwillia2-desk3.amr.corp.intel.com>
-In-Reply-To: <148559256378.11180.8957776806175202312.stgit@dwillia2-desk3.amr.corp.intel.com>
-References: <148559256378.11180.8957776806175202312.stgit@dwillia2-desk3.amr.corp.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv6 17/37] fs: make block_read_full_page() be able to read huge page
+Date: Thu, 26 Jan 2017 14:57:59 +0300
+Message-Id: <20170126115819.58875-18-kirill.shutemov@linux.intel.com>
+In-Reply-To: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
+References: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Provide a replacement for bdev_direct_access() that uses
-dax_operations.direct_access() instead of
-block_device_operations.direct_access(). Once all consumers of the old
-api have been converted bdev_direct_access() will be deleted.
+The approach is straight-forward: for compound pages we read out whole
+huge page.
 
-Given that block device partitioning decisions can cause dax page
-alignment constraints to be violated we still need to validate the
-block_device before calling the dax ->direct_access method.
+For huge page we cannot have array of buffer head pointers on stack --
+it's 4096 pointers on x86-64 -- 'arr' is allocated with kmalloc() for
+huge pages.
 
-Signed-off-by: Dan Williams <dan.j.williams@intel.com>
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- block/Kconfig          |    1 +
- drivers/dax/super.c    |   33 +++++++++++++++++++++++++++++++++
- fs/block_dev.c         |   28 ++++++++++++++++++++++++++++
- include/linux/blkdev.h |    3 +++
- include/linux/dax.h    |    2 ++
- 5 files changed, 67 insertions(+)
+ fs/buffer.c                 | 22 +++++++++++++++++-----
+ include/linux/buffer_head.h |  9 +++++----
+ include/linux/page-flags.h  |  2 +-
+ 3 files changed, 23 insertions(+), 10 deletions(-)
 
-diff --git a/block/Kconfig b/block/Kconfig
-index 8bf114a3858a..9be785173280 100644
---- a/block/Kconfig
-+++ b/block/Kconfig
-@@ -6,6 +6,7 @@ menuconfig BLOCK
-        default y
-        select SBITMAP
-        select SRCU
-+       select DAX
-        help
- 	 Provide block layer support for the kernel.
+diff --git a/fs/buffer.c b/fs/buffer.c
+index 0e87401cf335..72462beca909 100644
+--- a/fs/buffer.c
++++ b/fs/buffer.c
+@@ -871,7 +871,7 @@ struct buffer_head *alloc_page_buffers(struct page *page, unsigned long size,
  
-diff --git a/drivers/dax/super.c b/drivers/dax/super.c
-index eb844ffea3cf..ab5b082df5dd 100644
---- a/drivers/dax/super.c
-+++ b/drivers/dax/super.c
-@@ -65,6 +65,39 @@ struct dax_inode {
- 	const struct dax_operations *ops;
- };
- 
-+long dax_direct_access(struct dax_inode *dax_inode, phys_addr_t dev_addr,
-+		void **kaddr, pfn_t *pfn, long size)
-+{
-+	long avail;
-+
-+	/*
-+	 * The device driver is allowed to sleep, in order to make the
-+	 * memory directly accessible.
-+	 */
-+	might_sleep();
-+
-+	if (!dax_inode)
-+		return -EOPNOTSUPP;
-+
-+	if (!dax_inode_alive(dax_inode))
-+		return -ENXIO;
-+
-+	if (size < 0)
-+		return size;
-+
-+	if (dev_addr % PAGE_SIZE)
-+		return -EINVAL;
-+
-+	avail = dax_inode->ops->direct_access(dax_inode, dev_addr, kaddr, pfn,
-+			size);
-+	if (!avail)
-+		return -ERANGE;
-+	if (avail > 0 && avail & ~PAGE_MASK)
-+		return -ENXIO;
-+	return min(avail, size);
-+}
-+EXPORT_SYMBOL_GPL(dax_direct_access);
-+
- bool dax_inode_alive(struct dax_inode *dax_inode)
+ try_again:
+ 	head = NULL;
+-	offset = PAGE_SIZE;
++	offset = hpage_size(page);
+ 	while ((offset -= size) >= 0) {
+ 		bh = alloc_buffer_head(GFP_NOFS);
+ 		if (!bh)
+@@ -1466,7 +1466,7 @@ void set_bh_page(struct buffer_head *bh,
+ 		struct page *page, unsigned long offset)
  {
- 	lockdep_assert_held(&dax_srcu);
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index edb1d2b16b8f..bf4b51a3a412 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -18,6 +18,7 @@
- #include <linux/module.h>
- #include <linux/blkpg.h>
- #include <linux/magic.h>
-+#include <linux/dax.h>
- #include <linux/buffer_head.h>
- #include <linux/swap.h>
- #include <linux/pagevec.h>
-@@ -763,6 +764,33 @@ long bdev_direct_access(struct block_device *bdev, struct blk_dax_ctl *dax)
- EXPORT_SYMBOL_GPL(bdev_direct_access);
+ 	bh->b_page = page;
+-	BUG_ON(offset >= PAGE_SIZE);
++	BUG_ON(offset >= hpage_size(page));
+ 	if (PageHighMem(page))
+ 		/*
+ 		 * This catches illegal uses and preserves the offset:
+@@ -2280,11 +2280,13 @@ int block_read_full_page(struct page *page, get_block_t *get_block)
+ {
+ 	struct inode *inode = page->mapping->host;
+ 	sector_t iblock, lblock;
+-	struct buffer_head *bh, *head, *arr[MAX_BUF_PER_PAGE];
++	struct buffer_head *arr_on_stack[MAX_BUF_PER_PAGE];
++	struct buffer_head *bh, *head, **arr = arr_on_stack;
+ 	unsigned int blocksize, bbits;
+ 	int nr, i;
+ 	int fully_mapped = 1;
  
- /**
-+ * bdev_dax_direct_access() - bdev-sector to pfn_t and kernel virtual address
-+ * @bdev: host block device for @dax_inode
-+ * @dax_inode: interface data and operations for a memory device
-+ * @dax: control and output parameters for ->direct_access
-+ *
-+ * Return: negative errno if an error occurs, otherwise the number of bytes
-+ * accessible at this address.
-+ *
-+ * Locking: must be called with dax_read_lock() held
-+ */
-+long bdev_dax_direct_access(struct block_device *bdev,
-+		struct dax_inode *dax_inode, struct blk_dax_ctl *dax)
-+{
-+	sector_t sector = dax->sector;
++	VM_BUG_ON_PAGE(PageTail(page), page);
+ 	head = create_page_buffers(page, inode, 0);
+ 	blocksize = head->b_size;
+ 	bbits = block_size_bits(blocksize);
+@@ -2295,6 +2297,11 @@ int block_read_full_page(struct page *page, get_block_t *get_block)
+ 	nr = 0;
+ 	i = 0;
+ 
++	if (PageTransHuge(page)) {
++		arr = kmalloc(sizeof(struct buffer_head *) * HPAGE_PMD_NR *
++				MAX_BUF_PER_PAGE, GFP_NOFS);
++	}
 +
-+	if (!blk_queue_dax(bdev->bd_queue))
-+		return -EOPNOTSUPP;
-+	if ((sector + DIV_ROUND_UP(dax->size, 512))
-+			> part_nr_sects_read(bdev->bd_part))
-+		return -ERANGE;
-+	sector += get_start_sect(bdev);
-+	return dax_direct_access(dax_inode, sector * 512, &dax->addr,
-+			&dax->pfn, dax->size);
-+}
-+EXPORT_SYMBOL_GPL(bdev_dax_direct_access);
-+
-+/**
-  * bdev_dax_supported() - Check if the device supports dax for filesystem
-  * @sb: The superblock of the device
-  * @blocksize: The block size of the device
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 5e7706f7d533..3b3c5ce376fd 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1903,6 +1903,9 @@ extern int bdev_read_page(struct block_device *, sector_t, struct page *);
- extern int bdev_write_page(struct block_device *, sector_t, struct page *,
- 						struct writeback_control *);
- extern long bdev_direct_access(struct block_device *, struct blk_dax_ctl *);
-+struct dax_inode;
-+extern long bdev_dax_direct_access(struct block_device *bdev,
-+		struct dax_inode *dax_inode, struct blk_dax_ctl *dax);
- extern int bdev_dax_supported(struct super_block *, int);
- #else /* CONFIG_BLOCK */
+ 	do {
+ 		if (buffer_uptodate(bh))
+ 			continue;
+@@ -2310,7 +2317,9 @@ int block_read_full_page(struct page *page, get_block_t *get_block)
+ 					SetPageError(page);
+ 			}
+ 			if (!buffer_mapped(bh)) {
+-				zero_user(page, i * blocksize, blocksize);
++				zero_user(page + (i * blocksize / PAGE_SIZE),
++						i * blocksize % PAGE_SIZE,
++						blocksize);
+ 				if (!err)
+ 					set_buffer_uptodate(bh);
+ 				continue;
+@@ -2336,7 +2345,7 @@ int block_read_full_page(struct page *page, get_block_t *get_block)
+ 		if (!PageError(page))
+ 			SetPageUptodate(page);
+ 		unlock_page(page);
+-		return 0;
++		goto out;
+ 	}
  
-diff --git a/include/linux/dax.h b/include/linux/dax.h
-index 5aa620e8e5a2..2ef8e18e2587 100644
---- a/include/linux/dax.h
-+++ b/include/linux/dax.h
-@@ -22,6 +22,8 @@ void *dax_inode_get_private(struct dax_inode *dax_inode);
- void put_dax_inode(struct dax_inode *dax_inode);
- bool dax_inode_alive(struct dax_inode *dax_inode);
- void kill_dax_inode(struct dax_inode *dax_inode);
-+long dax_direct_access(struct dax_inode *dax_inode, phys_addr_t dev_addr,
-+		void **kaddr, pfn_t *pfn, long size);
+ 	/* Stage two: lock the buffers */
+@@ -2358,6 +2367,9 @@ int block_read_full_page(struct page *page, get_block_t *get_block)
+ 		else
+ 			submit_bh(REQ_OP_READ, 0, bh);
+ 	}
++out:
++	if (arr != arr_on_stack)
++		kfree(arr);
+ 	return 0;
+ }
+ EXPORT_SYMBOL(block_read_full_page);
+diff --git a/include/linux/buffer_head.h b/include/linux/buffer_head.h
+index fd4134ce9c54..f12f6293ed44 100644
+--- a/include/linux/buffer_head.h
++++ b/include/linux/buffer_head.h
+@@ -131,13 +131,14 @@ BUFFER_FNS(Meta, meta)
+ BUFFER_FNS(Prio, prio)
+ BUFFER_FNS(Defer_Completion, defer_completion)
  
- /*
-  * We use lowest available bit in exceptional entry for locking, one bit for
+-#define bh_offset(bh)		((unsigned long)(bh)->b_data & ~PAGE_MASK)
++#define bh_offset(bh)	((unsigned long)(bh)->b_data & ~hpage_mask(bh->b_page))
+ 
+ /* If we *know* page->private refers to buffer_heads */
+-#define page_buffers(page)					\
++#define page_buffers(__page)					\
+ 	({							\
+-		BUG_ON(!PagePrivate(page));			\
+-		((struct buffer_head *)page_private(page));	\
++		struct page *p = compound_head(__page);		\
++		BUG_ON(!PagePrivate(p));			\
++		((struct buffer_head *)page_private(p));	\
+ 	})
+ #define page_has_buffers(page)	PagePrivate(page)
+ 
+diff --git a/include/linux/page-flags.h b/include/linux/page-flags.h
+index b85b73cfb1b3..23534bd47c08 100644
+--- a/include/linux/page-flags.h
++++ b/include/linux/page-flags.h
+@@ -746,7 +746,7 @@ static inline void ClearPageSlabPfmemalloc(struct page *page)
+  */
+ static inline int page_has_private(struct page *page)
+ {
+-	return !!(page->flags & PAGE_FLAGS_PRIVATE);
++	return !!(compound_head(page)->flags & PAGE_FLAGS_PRIVATE);
+ }
+ 
+ #undef PF_ANY
+-- 
+2.11.0
 
