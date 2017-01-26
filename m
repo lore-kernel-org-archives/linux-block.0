@@ -1,115 +1,70 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-bn3nam01on0058.outbound.protection.outlook.com ([104.47.33.58]:53760
-        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751943AbdAaMSF (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 31 Jan 2017 07:18:05 -0500
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
-To: <axboe@fb.com>
-CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
-Subject: [PATCH 04/12] lightnvm: remove nvm_get_bb_tbl and nvm_set_bb_tbl
-Date: Tue, 31 Jan 2017 13:17:12 +0100
-Message-ID: <20170131121720.10971-5-matias@cnexlabs.com>
-In-Reply-To: <20170131121720.10971-1-matias@cnexlabs.com>
-References: <20170131121720.10971-1-matias@cnexlabs.com>
+Received: from mail-it0-f48.google.com ([209.85.214.48]:38412 "EHLO
+        mail-it0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753167AbdAZPBD (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 26 Jan 2017 10:01:03 -0500
+Received: by mail-it0-f48.google.com with SMTP id c7so34942241itd.1
+        for <linux-block@vger.kernel.org>; Thu, 26 Jan 2017 07:01:03 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <54ba79f7-93f1-6a93-79eb-7a7ba0f0d623@linux.intel.com>
+References: <20170124101757.19676-1-linus.walleij@linaro.org>
+ <20170124101757.19676-2-linus.walleij@linaro.org> <54ba79f7-93f1-6a93-79eb-7a7ba0f0d623@linux.intel.com>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Thu, 26 Jan 2017 16:01:01 +0100
+Message-ID: <CACRpkdaatoF804RmOAo+TPag2kkUeb3OsAyqWH5UCXHaGZgMVg@mail.gmail.com>
+Subject: Re: [PATCH 1/6] mmc: block: break out mmc_blk_rw_cmd_abort()
+To: Mateusz Nowak <mateusz.nowak@linux.intel.com>
+Cc: "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
+        linux-block@vger.kernel.org, Ulf Hansson <ulf.hansson@linaro.org>,
+        Chunyan Zhang <zhang.chunyan@linaro.org>,
+        Baolin Wang <baolin.wang@linaro.org>,
+        Paolo Valente <paolo.valente@linaro.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Since the merge of gennvm and core, there is no longer a need for the
-device specific bad block functions.
+On Wed, Jan 25, 2017 at 10:23 AM, Mateusz Nowak
+<mateusz.nowak@linux.intel.com> wrote:
+> On 1/24/2017 11:17, Linus Walleij wrote:
+>>
+>> As a first step toward breaking apart the very complex function
+>> mmc_blk_issue_rw_rq() we break out the command abort code.
+>> This code assumes "ret" is != 0 and then repeatedly hammers
+>> blk_end_request() until the request to the block layer to end
+>> the request succeeds.
+>>
+>> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+>> ---
+>>  drivers/mmc/core/block.c | 17 ++++++++++++-----
+>>  1 file changed, 12 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
+>> index 7bd03381810d..14efe92a14ef 100644
+>> --- a/drivers/mmc/core/block.c
+>> +++ b/drivers/mmc/core/block.c
+>> @@ -1598,6 +1598,17 @@ static int mmc_blk_cmd_err(struct mmc_blk_data *md,
+>> struct mmc_card *card,
+>>         return ret;
+>>  }
+>>
+>> +static void mmc_blk_rw_cmd_abort(struct mmc_card *card, struct request
+>> *req)
+>> +{
+>> +       int ret = 1;
+>
+> blk_end_request is returning bool, so maybe this variable should have
+> matching type since it is only usage in this scope? And maybe it should have
+> more meaningful name for this case?
 
-Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
----
- drivers/lightnvm/core.c  | 40 ++++------------------------------------
- include/linux/lightnvm.h |  2 --
- 2 files changed, 4 insertions(+), 38 deletions(-)
+I am just moving/refactoring the code syntax without changing any
+semantics. It was an int in the old code so it is an int in the new
+code.
 
-diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-index ffdf048..18d4873 100644
---- a/drivers/lightnvm/core.c
-+++ b/drivers/lightnvm/core.c
-@@ -605,33 +605,6 @@ static void nvm_tgt_generic_to_addr_mode(struct nvm_tgt_dev *tgt_dev,
- 	}
- }
- 
--int nvm_set_bb_tbl(struct nvm_dev *dev, struct ppa_addr *ppas, int nr_ppas,
--								int type)
--{
--	struct nvm_rq rqd;
--	int ret;
--
--	if (nr_ppas > dev->ops->max_phys_sect) {
--		pr_err("nvm: unable to update all sysblocks atomically\n");
--		return -EINVAL;
--	}
--
--	memset(&rqd, 0, sizeof(struct nvm_rq));
--
--	nvm_set_rqd_ppalist(dev, &rqd, ppas, nr_ppas, 1);
--	nvm_generic_to_addr_mode(dev, &rqd);
--
--	ret = dev->ops->set_bb_tbl(dev, &rqd.ppa_addr, rqd.nr_ppas, type);
--	nvm_free_rqd_ppalist(dev, &rqd);
--	if (ret) {
--		pr_err("nvm: sysblk failed bb mark\n");
--		return -EINVAL;
--	}
--
--	return 0;
--}
--EXPORT_SYMBOL(nvm_set_bb_tbl);
--
- int nvm_set_tgt_bb_tbl(struct nvm_tgt_dev *tgt_dev, struct ppa_addr *ppas,
- 		       int nr_ppas, int type)
- {
-@@ -919,20 +892,15 @@ int nvm_bb_tbl_fold(struct nvm_dev *dev, u8 *blks, int nr_blks)
- }
- EXPORT_SYMBOL(nvm_bb_tbl_fold);
- 
--int nvm_get_bb_tbl(struct nvm_dev *dev, struct ppa_addr ppa, u8 *blks)
--{
--	ppa = generic_to_dev_addr(dev, ppa);
--
--	return dev->ops->get_bb_tbl(dev, ppa, blks);
--}
--EXPORT_SYMBOL(nvm_get_bb_tbl);
--
- int nvm_get_tgt_bb_tbl(struct nvm_tgt_dev *tgt_dev, struct ppa_addr ppa,
- 		       u8 *blks)
- {
-+	struct nvm_dev *dev = tgt_dev->parent;
-+
- 	ppa = nvm_trans_ppa(tgt_dev, ppa, TRANS_TGT_TO_DEV);
-+	ppa = generic_to_dev_addr(dev, ppa);
- 
--	return nvm_get_bb_tbl(tgt_dev->parent, ppa, blks);
-+	return dev->ops->get_bb_tbl(dev, ppa, blks);
- }
- EXPORT_SYMBOL(nvm_get_tgt_bb_tbl);
- 
-diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
-index abb3d55..cad1e1c 100644
---- a/include/linux/lightnvm.h
-+++ b/include/linux/lightnvm.h
-@@ -473,7 +473,6 @@ extern struct nvm_dev *nvm_alloc_dev(int);
- extern int nvm_register(struct nvm_dev *);
- extern void nvm_unregister(struct nvm_dev *);
- 
--extern int nvm_set_bb_tbl(struct nvm_dev *, struct ppa_addr *, int, int);
- extern int nvm_set_tgt_bb_tbl(struct nvm_tgt_dev *, struct ppa_addr *,
- 			      int, int);
- extern int nvm_max_phys_sects(struct nvm_tgt_dev *);
-@@ -490,7 +489,6 @@ extern int nvm_get_area(struct nvm_tgt_dev *, sector_t *, sector_t);
- extern void nvm_put_area(struct nvm_tgt_dev *, sector_t);
- extern void nvm_end_io(struct nvm_rq *, int);
- extern int nvm_bb_tbl_fold(struct nvm_dev *, u8 *, int);
--extern int nvm_get_bb_tbl(struct nvm_dev *, struct ppa_addr, u8 *);
- extern int nvm_get_tgt_bb_tbl(struct nvm_tgt_dev *, struct ppa_addr, u8 *);
- 
- extern int nvm_dev_factory(struct nvm_dev *, int flags);
--- 
-2.9.3
+It is possible to fix this and other problems as separate patches.
 
+As you can see it also spins here for all eternity if the function
+just returns != 0 all the time, that doesn't look good either.
+
+Yours,
+Linus Walleij
