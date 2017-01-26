@@ -1,8 +1,4 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga05.intel.com ([192.55.52.43]:48629 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752937AbdAZL66 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 26 Jan 2017 06:58:58 -0500
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
 From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
 To: "Theodore Ts'o" <tytso@mit.edu>,
         Andreas Dilger <adilger.kernel@dilger.ca>,
@@ -19,40 +15,66 @@ Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         linux-block@vger.kernel.org,
         "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv6 10/37] filemap: handle huge pages in filemap_fdatawait_range()
-Date: Thu, 26 Jan 2017 14:57:52 +0300
-Message-Id: <20170126115819.58875-11-kirill.shutemov@linux.intel.com>
+Subject: [PATCHv6 09/37] filemap: allocate huge page in pagecache_get_page(), if allowed
+Date: Thu, 26 Jan 2017 14:57:51 +0300
+Message-Id: <20170126115819.58875-10-kirill.shutemov@linux.intel.com>
 In-Reply-To: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
 References: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-We writeback whole huge page a time.
+Write path allocate pages using pagecache_get_page(). We should be able
+to allocate huge pages there, if it's allowed. As usually, fallback to
+small pages, if failed.
 
 Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- mm/filemap.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ mm/filemap.c | 17 +++++++++++++++--
+ 1 file changed, 15 insertions(+), 2 deletions(-)
 
 diff --git a/mm/filemap.c b/mm/filemap.c
-index 4e398d5e4134..f5cd654b3662 100644
+index 6cba69176ea9..4e398d5e4134 100644
 --- a/mm/filemap.c
 +++ b/mm/filemap.c
-@@ -405,9 +405,14 @@ static int __filemap_fdatawait_range(struct address_space *mapping,
- 			if (page->index > end)
- 				continue;
+@@ -1374,13 +1374,16 @@ struct page *pagecache_get_page(struct address_space *mapping, pgoff_t offset,
  
-+			page = compound_head(page);
- 			wait_on_page_writeback(page);
- 			if (TestClearPageError(page))
- 				ret = -EIO;
+ no_page:
+ 	if (!page && (fgp_flags & FGP_CREAT)) {
++		pgoff_t hoffset;
+ 		int err;
+ 		if ((fgp_flags & FGP_WRITE) && mapping_cap_account_dirty(mapping))
+ 			gfp_mask |= __GFP_WRITE;
+ 		if (fgp_flags & FGP_NOFS)
+ 			gfp_mask &= ~__GFP_FS;
+ 
+-		page = __page_cache_alloc(gfp_mask);
++		page = page_cache_alloc_huge(mapping, offset, gfp_mask);
++no_huge:	if (!page)
++			page = __page_cache_alloc(gfp_mask);
+ 		if (!page)
+ 			return NULL;
+ 
+@@ -1391,9 +1394,19 @@ struct page *pagecache_get_page(struct address_space *mapping, pgoff_t offset,
+ 		if (fgp_flags & FGP_ACCESSED)
+ 			__SetPageReferenced(page);
+ 
+-		err = add_to_page_cache_lru(page, mapping, offset,
++		if (PageTransHuge(page))
++			hoffset = round_down(offset, HPAGE_PMD_NR);
++		else
++			hoffset = offset;
++
++		err = add_to_page_cache_lru(page, mapping, hoffset,
+ 				gfp_mask & GFP_RECLAIM_MASK);
+ 		if (unlikely(err)) {
 +			if (PageTransHuge(page)) {
-+				index = page->index + HPAGE_PMD_NR;
-+				i += index - pvec.pages[i]->index - 1;
++				put_page(page);
++				page = NULL;
++				goto no_huge;
 +			}
- 		}
- 		pagevec_release(&pvec);
- 		cond_resched();
+ 			put_page(page);
+ 			page = NULL;
+ 			if (err == -EEXIST)
 -- 
 2.11.0
 
