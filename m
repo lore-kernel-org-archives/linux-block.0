@@ -1,49 +1,33 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-From: Bart Van Assche <Bart.VanAssche@sandisk.com>
-To: "hch@lst.de" <hch@lst.de>, "axboe@fb.com" <axboe@fb.com>
-CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-raid@vger.kernel.org" <linux-raid@vger.kernel.org>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "snitzer@redhat.com" <snitzer@redhat.com>,
-        "j-nomura@ce.jp.nec.com" <j-nomura@ce.jp.nec.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from aserp1040.oracle.com ([141.146.126.69]:18081 "EHLO
+        aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752576AbdAZDZT (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 25 Jan 2017 22:25:19 -0500
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@fb.com>, Mike Snitzer <snitzer@redhat.com>,
+        Junichi Nomura <j-nomura@ce.jp.nec.com>,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-raid@vger.kernel.org, dm-devel@redhat.com
 Subject: Re: [PATCH 14/18] scsi: remove __scsi_alloc_queue
-Date: Fri, 27 Jan 2017 17:58:02 +0000
-Message-ID: <1485539862.4267.17.camel@sandisk.com>
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
 References: <1485365126-23210-1-git-send-email-hch@lst.de>
-         <1485365126-23210-15-git-send-email-hch@lst.de>
-In-Reply-To: <1485365126-23210-15-git-send-email-hch@lst.de>
-Content-Type: text/plain; charset="iso-8859-1"
+        <1485365126-23210-15-git-send-email-hch@lst.de>
+Date: Wed, 25 Jan 2017 22:25:05 -0500
+In-Reply-To: <1485365126-23210-15-git-send-email-hch@lst.de> (Christoph
+        Hellwig's message of "Wed, 25 Jan 2017 18:25:22 +0100")
+Message-ID: <yq1bmuu8pv2.fsf@oracle.com>
 MIME-Version: 1.0
-Sender: linux-scsi-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Wed, 2017-01-25 at 18:25 +0100, Christoph Hellwig wrote:
-> diff --git a/include/scsi/scsi_transport.h b/include/scsi/scsi_transport.=
-h
-> index 8129239..b6e07b5 100644
-> --- a/include/scsi/scsi_transport.h
-> +++ b/include/scsi/scsi_transport.h
-> @@ -119,4 +119,6 @@ scsi_transport_device_data(struct scsi_device *sdev)
->  		+ shost->transportt->device_private_offset;
->  }
-> =20
-> +void __scsi_init_queue(struct Scsi_Host *shost, struct request_queue *q)=
-;
-> +
->  #endif /* SCSI_TRANSPORT_H */
+>>>>> "Christoph" == Christoph Hellwig <hch@lst.de> writes:
 
-Hello Christoph,
+Christoph> Instead do an internal export of __scsi_init_queue for the
+Christoph> transport classes that export BSG nodes.
 
-Since __scsi_init_queue() modifies data in the Scsi_Host structure, have yo=
-u
-considered to add the declaration for this function to <scsi/scsi_host.h>?
-If you want to keep this declaration in <scsi/scsi_transport.h> please add =
-a
-direct include of that header file to drivers/scsi/scsi_lib.c such that the
-declaration remains visible to the compiler if someone would minimize the
-number of #include directives in SCSI header files.
+Acked-by: Martin K. Petersen <martin.petersen@oracle.com>
 
-Thanks,
-
-Bart.=
+-- 
+Martin K. Petersen	Oracle Linux Engineering
