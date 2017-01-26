@@ -1,41 +1,62 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:34612 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752764AbdAZPor (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 26 Jan 2017 10:44:47 -0500
-Date: Thu, 26 Jan 2017 07:44:39 -0800
-From: Matthew Wilcox <willy@infradead.org>
-To: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Cc: Theodore Ts'o <tytso@mit.edu>,
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
         Andreas Dilger <adilger.kernel@dilger.ca>,
         Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
         Hugh Dickins <hughd@google.com>,
         Andrea Arcangeli <aarcange@redhat.com>,
         Dave Hansen <dave.hansen@intel.com>,
         Vlastimil Babka <vbabka@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
         Ross Zwisler <ross.zwisler@linux.intel.com>,
         linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCHv6 06/37] thp: handle write-protection faults for file THP
-Message-ID: <20170126154439.GB20495@bombadil.infradead.org>
+        linux-block@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv6 06/37] thp: handle write-protection faults for file THP
+Date: Thu, 26 Jan 2017 14:57:48 +0300
+Message-Id: <20170126115819.58875-7-kirill.shutemov@linux.intel.com>
+In-Reply-To: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
 References: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
- <20170126115819.58875-7-kirill.shutemov@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170126115819.58875-7-kirill.shutemov@linux.intel.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Jan 26, 2017 at 02:57:48PM +0300, Kirill A. Shutemov wrote:
-> For filesystems that wants to be write-notified (has mkwrite), we will
-> encount write-protection faults for huge PMDs in shared mappings.
-> 
-> The easiest way to handle them is to clear the PMD and let it refault as
-> wriable.
+For filesystems that wants to be write-notified (has mkwrite), we will
+encount write-protection faults for huge PMDs in shared mappings.
 
-... of course, the filesystem could implement ->pmd_fault, and then it
-wouldn't hit this case ...
+The easiest way to handle them is to clear the PMD and let it refault as
+wriable.
+
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+Reviewed-by: Jan Kara <jack@suse.cz>
+---
+ mm/memory.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/mm/memory.c b/mm/memory.c
+index 6bf2b471e30c..903d9d3e01c0 100644
+--- a/mm/memory.c
++++ b/mm/memory.c
+@@ -3488,8 +3488,16 @@ static int wp_huge_pmd(struct vm_fault *vmf, pmd_t orig_pmd)
+ 		return vmf->vma->vm_ops->pmd_fault(vmf->vma, vmf->address,
+ 						   vmf->pmd, vmf->flags);
+ 
++	if (vmf->vma->vm_flags & VM_SHARED) {
++		/* Clear PMD */
++		zap_page_range_single(vmf->vma, vmf->address & HPAGE_PMD_MASK,
++				HPAGE_PMD_SIZE, NULL);
++
++		/* Refault to establish writable PMD */
++		return 0;
++	}
++
+ 	/* COW handled on pte level: split pmd */
+-	VM_BUG_ON_VMA(vmf->vma->vm_flags & VM_SHARED, vmf->vma);
+ 	__split_huge_pmd(vmf->vma, vmf->pmd, vmf->address, false, NULL);
+ 
+ 	return VM_FAULT_FALLBACK;
+-- 
+2.11.0
+
