@@ -1,41 +1,29 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-by2nam01on0078.outbound.protection.outlook.com ([104.47.34.78]:32530
-        "EHLO NAM01-BY2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751353AbdABNQ1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 2 Jan 2017 08:16:27 -0500
+Return-Path: <linux-scsi-owner@vger.kernel.org>
 From: Bart Van Assche <Bart.VanAssche@sandisk.com>
-To: "axboe@fb.com" <axboe@fb.com>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: [PATCH 2/2] block: Avoid that sparse complains about context
- imbalance in __wbt_wait()
-Date: Mon, 2 Jan 2017 13:16:22 +0000
-Message-ID: <1483362874.3592.60.camel@sandisk.com>
-References: <1483362698.3592.58.camel@sandisk.com>
-In-Reply-To: <1483362698.3592.58.camel@sandisk.com>
-Content-Type: text/plain; charset="utf-8"
+To: "hch@lst.de" <hch@lst.de>, "axboe@fb.com" <axboe@fb.com>
+CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-raid@vger.kernel.org" <linux-raid@vger.kernel.org>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "snitzer@redhat.com" <snitzer@redhat.com>,
+        "j-nomura@ce.jp.nec.com" <j-nomura@ce.jp.nec.com>
+Subject: Re: [PATCH 02/18] md: cleanup bio op / flags handling in
+ raid1_write_request
+Date: Thu, 26 Jan 2017 23:18:53 +0000
+Message-ID: <1485472714.2540.21.camel@sandisk.com>
+References: <1485365126-23210-1-git-send-email-hch@lst.de>
+         <1485365126-23210-3-git-send-email-hch@lst.de>
+In-Reply-To: <1485365126-23210-3-git-send-email-hch@lst.de>
+Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Sender: linux-scsi-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-VGhpcyBwYXRjaCBkb2VzIG5vdCBjaGFuZ2UgYW55IGZ1bmN0aW9uYWxpdHkuDQoNCkZpeGVzOiBl
-MzRjYmQzMDc0NzcgKCJibGstd2J0OiBhZGQgZ2VuZXJhbCB0aHJvdHRsaW5nIG1lY2hhbmlzbSIp
-DQpTaWduZWQtb2ZmLWJ5OiBCYXJ0IFZhbiBBc3NjaGUgPGJhcnQudmFuYXNzY2hlQHNhbmRpc2su
-Y29tPg0KLS0tDQrCoGJsb2NrL2Jsay13YnQuYyB8IDEyICsrKysrKystLS0tLQ0KwqAxIGZpbGUg
-Y2hhbmdlZCwgNyBpbnNlcnRpb25zKCspLCA1IGRlbGV0aW9ucygtKQ0KDQpkaWZmIC0tZ2l0IGEv
-YmxvY2svYmxrLXdidC5jIGIvYmxvY2svYmxrLXdidC5jDQppbmRleCBmZDI4YzI4MDY0MDYuLmFh
-N2I5Y2NjNmZjNSAxMDA2NDQNCi0tLSBhL2Jsb2NrL2Jsay13YnQuYw0KKysrIGIvYmxvY2svYmxr
-LXdidC5jDQpAQCAtNTQ0LDYgKzU0NCw4IEBAIHN0YXRpYyBpbmxpbmUgYm9vbCBtYXlfcXVldWUo
-c3RydWN0IHJxX3diICpyd2IsIHN0cnVjdCBycV93YWl0ICpycXcsDQrCoCAqIHRoZSB0aW1lciB0
-byBraWNrIG9mZiBxdWV1aW5nIGFnYWluLg0KwqAgKi8NCsKgc3RhdGljIHZvaWQgX193YnRfd2Fp
-dChzdHJ1Y3QgcnFfd2IgKnJ3YiwgdW5zaWduZWQgbG9uZyBydywgc3BpbmxvY2tfdCAqbG9jaykN
-CisJX19yZWxlYXNlcyhsb2NrKQ0KKwlfX2FjcXVpcmVzKGxvY2spDQrCoHsNCsKgCXN0cnVjdCBy
-cV93YWl0ICpycXcgPSBnZXRfcnFfd2FpdChyd2IsIGN1cnJlbnRfaXNfa3N3YXBkKCkpOw0KwqAJ
-REVGSU5FX1dBSVQod2FpdCk7DQpAQCAtNTU4LDEzICs1NjAsMTMgQEAgc3RhdGljIHZvaWQgX193
-YnRfd2FpdChzdHJ1Y3QgcnFfd2IgKnJ3YiwgdW5zaWduZWQgbG9uZyBydywgc3BpbmxvY2tfdCAq
-bG9jaykNCsKgCQlpZiAobWF5X3F1ZXVlKHJ3YiwgcnF3LCAmd2FpdCwgcncpKQ0KwqAJCQlicmVh
-azsNCsKgDQotCQlpZiAobG9jaykNCisJCWlmIChsb2NrKSB7DQrCoAkJCXNwaW5fdW5sb2NrX2ly
-cShsb2NrKTsNCi0NCi0JCWlvX3NjaGVkdWxlKCk7DQotDQotCQlpZiAobG9jaykNCisJCQlpb19z
-Y2hlZHVsZSgpOw0KwqAJCQlzcGluX2xvY2tfaXJxKGxvY2spOw0KKwkJfSBlbHNlIHsNCisJCQlp
-b19zY2hlZHVsZSgpOw0KKwkJfQ0KwqAJfSB3aGlsZSAoMSk7DQrCoA0KwqAJZmluaXNoX3dhaXQo
-JnJxdy0+d2FpdCwgJndhaXQpOw0KLS3CoA0KMi4xMS4wDQo=
+On Wed, 2017-01-25 at 18:25 +0100, Christoph Hellwig wrote:
+> No need for the local variables, the bio is still live and we can just
+> assigned the bits we want directly.  Make me wonder why we can't assign
+> all the bio flags to start with.
+
+I assume that you ment "assign" in the patch description? Anyway:
+
+Reviewed-by: Bart Van Assche <bart.vanassche@sandisk.com>=
