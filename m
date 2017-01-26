@@ -1,4 +1,8 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga04.intel.com ([192.55.52.120]:61790 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751056AbdAZL6b (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 26 Jan 2017 06:58:31 -0500
 From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
 To: "Theodore Ts'o" <tytso@mit.edu>,
         Andreas Dilger <adilger.kernel@dilger.ca>,
@@ -15,87 +19,55 @@ Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         linux-block@vger.kernel.org,
         "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv6 12/37] brd: make it handle huge pages
-Date: Thu, 26 Jan 2017 14:57:54 +0300
-Message-Id: <20170126115819.58875-13-kirill.shutemov@linux.intel.com>
+Subject: [PATCHv6 03/37] page-flags: relax page flag policy for few flags
+Date: Thu, 26 Jan 2017 14:57:45 +0300
+Message-Id: <20170126115819.58875-4-kirill.shutemov@linux.intel.com>
 In-Reply-To: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
 References: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Do not assume length of bio segment is never larger than PAGE_SIZE.
-With huge pages it's HPAGE_PMD_SIZE (2M on x86-64).
+These flags are in use for filesystems with backing storage: PG_error,
+PG_writeback and PG_readahead.
 
 Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- drivers/block/brd.c | 17 ++++++++++++-----
- 1 file changed, 12 insertions(+), 5 deletions(-)
+ include/linux/page-flags.h | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/block/brd.c b/drivers/block/brd.c
-index 3adc32a3153b..d2f7dc87b545 100644
---- a/drivers/block/brd.c
-+++ b/drivers/block/brd.c
-@@ -202,12 +202,15 @@ static int copy_to_brd_setup(struct brd_device *brd, sector_t sector, size_t n)
- 	size_t copy;
+diff --git a/include/linux/page-flags.h b/include/linux/page-flags.h
+index 6b5818d6de32..b85b73cfb1b3 100644
+--- a/include/linux/page-flags.h
++++ b/include/linux/page-flags.h
+@@ -263,7 +263,7 @@ static inline int TestClearPage##uname(struct page *page) { return 0; }
  
- 	copy = min_t(size_t, n, PAGE_SIZE - offset);
-+	n -= copy;
- 	if (!brd_insert_page(brd, sector))
- 		return -ENOSPC;
--	if (copy < n) {
-+	while (n) {
- 		sector += copy >> SECTOR_SHIFT;
- 		if (!brd_insert_page(brd, sector))
- 			return -ENOSPC;
-+		copy = min_t(size_t, n, PAGE_SIZE);
-+		n -= copy;
- 	}
- 	return 0;
- }
-@@ -242,6 +245,7 @@ static void copy_to_brd(struct brd_device *brd, const void *src,
- 	size_t copy;
+ __PAGEFLAG(Locked, locked, PF_NO_TAIL)
+ PAGEFLAG(Waiters, waiters, PF_ONLY_HEAD) __CLEARPAGEFLAG(Waiters, waiters, PF_ONLY_HEAD)
+-PAGEFLAG(Error, error, PF_NO_COMPOUND) TESTCLEARFLAG(Error, error, PF_NO_COMPOUND)
++PAGEFLAG(Error, error, PF_NO_TAIL) TESTCLEARFLAG(Error, error, PF_NO_TAIL)
+ PAGEFLAG(Referenced, referenced, PF_HEAD)
+ 	TESTCLEARFLAG(Referenced, referenced, PF_HEAD)
+ 	__SETPAGEFLAG(Referenced, referenced, PF_HEAD)
+@@ -303,15 +303,15 @@ PAGEFLAG(OwnerPriv1, owner_priv_1, PF_ANY)
+  * Only test-and-set exist for PG_writeback.  The unconditional operators are
+  * risky: they bypass page accounting.
+  */
+-TESTPAGEFLAG(Writeback, writeback, PF_NO_COMPOUND)
+-	TESTSCFLAG(Writeback, writeback, PF_NO_COMPOUND)
++TESTPAGEFLAG(Writeback, writeback, PF_NO_TAIL)
++	TESTSCFLAG(Writeback, writeback, PF_NO_TAIL)
+ PAGEFLAG(MappedToDisk, mappedtodisk, PF_NO_TAIL)
  
- 	copy = min_t(size_t, n, PAGE_SIZE - offset);
-+	n -= copy;
- 	page = brd_lookup_page(brd, sector);
- 	BUG_ON(!page);
+ /* PG_readahead is only used for reads; PG_reclaim is only for writes */
+ PAGEFLAG(Reclaim, reclaim, PF_NO_TAIL)
+ 	TESTCLEARFLAG(Reclaim, reclaim, PF_NO_TAIL)
+-PAGEFLAG(Readahead, reclaim, PF_NO_COMPOUND)
+-	TESTCLEARFLAG(Readahead, reclaim, PF_NO_COMPOUND)
++PAGEFLAG(Readahead, reclaim, PF_NO_TAIL)
++	TESTCLEARFLAG(Readahead, reclaim, PF_NO_TAIL)
  
-@@ -249,10 +253,11 @@ static void copy_to_brd(struct brd_device *brd, const void *src,
- 	memcpy(dst + offset, src, copy);
- 	kunmap_atomic(dst);
- 
--	if (copy < n) {
-+	while (n) {
- 		src += copy;
- 		sector += copy >> SECTOR_SHIFT;
--		copy = n - copy;
-+		copy = min_t(size_t, n, PAGE_SIZE);
-+		n -= copy;
- 		page = brd_lookup_page(brd, sector);
- 		BUG_ON(!page);
- 
-@@ -274,6 +279,7 @@ static void copy_from_brd(void *dst, struct brd_device *brd,
- 	size_t copy;
- 
- 	copy = min_t(size_t, n, PAGE_SIZE - offset);
-+	n -= copy;
- 	page = brd_lookup_page(brd, sector);
- 	if (page) {
- 		src = kmap_atomic(page);
-@@ -282,10 +288,11 @@ static void copy_from_brd(void *dst, struct brd_device *brd,
- 	} else
- 		memset(dst, 0, copy);
- 
--	if (copy < n) {
-+	while (n) {
- 		dst += copy;
- 		sector += copy >> SECTOR_SHIFT;
--		copy = n - copy;
-+		copy = min_t(size_t, n, PAGE_SIZE);
-+		n -= copy;
- 		page = brd_lookup_page(brd, sector);
- 		if (page) {
- 			src = kmap_atomic(page);
+ #ifdef CONFIG_HIGHMEM
+ /*
 -- 
 2.11.0
 
