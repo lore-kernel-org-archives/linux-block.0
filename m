@@ -1,337 +1,307 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:56526 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751035AbdAWP3t (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Jan 2017 10:29:49 -0500
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@fb.com>
-Cc: Mike Snitzer <snitzer@redhat.com>, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org, dm-devel@redhat.com,
-        Hannes Reinecke <hare@suse.de>, Hannes Reinecke <hare@suse.com>
-Subject: [PATCH 08/16] scsi_dh_hp_sw: switch to scsi_execute_req_flags()
-Date: Mon, 23 Jan 2017 16:29:13 +0100
-Message-Id: <1485185361-29786-9-git-send-email-hch@lst.de>
-In-Reply-To: <1485185361-29786-1-git-send-email-hch@lst.de>
-References: <1485185361-29786-1-git-send-email-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv6 23/37] mm: account huge pages to dirty, writaback, reclaimable, etc.
+Date: Thu, 26 Jan 2017 14:58:05 +0300
+Message-Id: <20170126115819.58875-24-kirill.shutemov@linux.intel.com>
+In-Reply-To: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
+References: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-From: Hannes Reinecke <hare@suse.de>
+We need to account huge pages according to its size to get background
+writaback work properly.
 
-Switch to scsi_execute_req_flags() instead of using the block interface
-directly.  This will set REQ_QUIET and REQ_PREEMPT, but this is okay as
-we're evaluating the errors anyway and should be able to send the command
-even if the device is quiesced.
-
-Signed-off-by: Hannes Reinecke <hare@suse.com>
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- drivers/scsi/device_handler/scsi_dh_hp_sw.c | 222 ++++++++--------------------
- 1 file changed, 65 insertions(+), 157 deletions(-)
+ fs/fs-writeback.c           | 10 +++---
+ include/linux/backing-dev.h | 10 ++++++
+ include/linux/memcontrol.h  | 22 ++-----------
+ mm/migrate.c                |  1 +
+ mm/page-writeback.c         | 80 +++++++++++++++++++++++++++++----------------
+ mm/rmap.c                   |  4 +--
+ 6 files changed, 74 insertions(+), 53 deletions(-)
 
-diff --git a/drivers/scsi/device_handler/scsi_dh_hp_sw.c b/drivers/scsi/device_handler/scsi_dh_hp_sw.c
-index 308e871..be43c94 100644
---- a/drivers/scsi/device_handler/scsi_dh_hp_sw.c
-+++ b/drivers/scsi/device_handler/scsi_dh_hp_sw.c
-@@ -38,13 +38,10 @@
- #define HP_SW_PATH_PASSIVE		1
- 
- struct hp_sw_dh_data {
--	unsigned char sense[SCSI_SENSE_BUFFERSIZE];
- 	int path_state;
- 	int retries;
- 	int retry_cnt;
- 	struct scsi_device *sdev;
--	activate_complete	callback_fn;
--	void			*callback_data;
- };
- 
- static int hp_sw_start_stop(struct hp_sw_dh_data *);
-@@ -56,43 +53,34 @@ static int hp_sw_start_stop(struct hp_sw_dh_data *);
-  *
-  * Returns SCSI_DH_DEV_OFFLINED if the sdev is on the passive path
-  */
--static int tur_done(struct scsi_device *sdev, unsigned char *sense)
-+static int tur_done(struct scsi_device *sdev, struct hp_sw_dh_data *h,
-+		    struct scsi_sense_hdr *sshdr)
- {
--	struct scsi_sense_hdr sshdr;
--	int ret;
-+	int ret = SCSI_DH_IO;
- 
--	ret = scsi_normalize_sense(sense, SCSI_SENSE_BUFFERSIZE, &sshdr);
--	if (!ret) {
--		sdev_printk(KERN_WARNING, sdev,
--			    "%s: sending tur failed, no sense available\n",
--			    HP_SW_NAME);
--		ret = SCSI_DH_IO;
--		goto done;
--	}
--	switch (sshdr.sense_key) {
-+	switch (sshdr->sense_key) {
- 	case UNIT_ATTENTION:
- 		ret = SCSI_DH_IMM_RETRY;
- 		break;
- 	case NOT_READY:
--		if ((sshdr.asc == 0x04) && (sshdr.ascq == 2)) {
-+		if (sshdr->asc == 0x04 && sshdr->ascq == 2) {
- 			/*
- 			 * LUN not ready - Initialization command required
- 			 *
- 			 * This is the passive path
- 			 */
--			ret = SCSI_DH_DEV_OFFLINED;
-+			h->path_state = HP_SW_PATH_PASSIVE;
-+			ret = SCSI_DH_OK;
- 			break;
+diff --git a/fs/fs-writeback.c b/fs/fs-writeback.c
+index ef600591d96f..e1c9faddc9e1 100644
+--- a/fs/fs-writeback.c
++++ b/fs/fs-writeback.c
+@@ -366,8 +366,9 @@ static void inode_switch_wbs_work_fn(struct work_struct *work)
+ 		struct page *page = radix_tree_deref_slot_protected(slot,
+ 							&mapping->tree_lock);
+ 		if (likely(page) && PageDirty(page)) {
+-			__dec_wb_stat(old_wb, WB_RECLAIMABLE);
+-			__inc_wb_stat(new_wb, WB_RECLAIMABLE);
++			int nr = hpage_nr_pages(page);
++			__add_wb_stat(old_wb, WB_RECLAIMABLE, -nr);
++			__add_wb_stat(new_wb, WB_RECLAIMABLE, nr);
  		}
- 		/* Fallthrough */
- 	default:
- 		sdev_printk(KERN_WARNING, sdev,
- 			   "%s: sending tur failed, sense %x/%x/%x\n",
--			   HP_SW_NAME, sshdr.sense_key, sshdr.asc,
--			   sshdr.ascq);
-+			   HP_SW_NAME, sshdr->sense_key, sshdr->asc,
-+			   sshdr->ascq);
- 		break;
  	}
--
--done:
- 	return ret;
+ 
+@@ -376,9 +377,10 @@ static void inode_switch_wbs_work_fn(struct work_struct *work)
+ 		struct page *page = radix_tree_deref_slot_protected(slot,
+ 							&mapping->tree_lock);
+ 		if (likely(page)) {
++			int nr = hpage_nr_pages(page);
+ 			WARN_ON_ONCE(!PageWriteback(page));
+-			__dec_wb_stat(old_wb, WB_WRITEBACK);
+-			__inc_wb_stat(new_wb, WB_WRITEBACK);
++			__add_wb_stat(old_wb, WB_WRITEBACK, -nr);
++			__add_wb_stat(new_wb, WB_WRITEBACK, nr);
+ 		}
+ 	}
+ 
+diff --git a/include/linux/backing-dev.h b/include/linux/backing-dev.h
+index 43b93a947e61..e63487f78824 100644
+--- a/include/linux/backing-dev.h
++++ b/include/linux/backing-dev.h
+@@ -61,6 +61,16 @@ static inline void __add_wb_stat(struct bdi_writeback *wb,
+ 	__percpu_counter_add(&wb->stat[item], amount, WB_STAT_BATCH);
  }
  
-@@ -105,131 +93,36 @@ static int tur_done(struct scsi_device *sdev, unsigned char *sense)
-  */
- static int hp_sw_tur(struct scsi_device *sdev, struct hp_sw_dh_data *h)
++static inline void add_wb_stat(struct bdi_writeback *wb,
++				 enum wb_stat_item item, s64 amount)
++{
++	unsigned long flags;
++
++	local_irq_save(flags);
++	__add_wb_stat(wb, item, amount);
++	local_irq_restore(flags);
++}
++
+ static inline void __inc_wb_stat(struct bdi_writeback *wb,
+ 				 enum wb_stat_item item)
  {
--	struct request *req;
--	int ret;
-+	unsigned char cmd[6] = { TEST_UNIT_READY };
-+	struct scsi_sense_hdr sshdr;
-+	int ret = SCSI_DH_OK, res;
-+	u64 req_flags = REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT |
-+		REQ_FAILFAST_DRIVER;
+diff --git a/include/linux/memcontrol.h b/include/linux/memcontrol.h
+index 254698856b8f..7a341b01937f 100644
+--- a/include/linux/memcontrol.h
++++ b/include/linux/memcontrol.h
+@@ -29,6 +29,7 @@
+ #include <linux/mmzone.h>
+ #include <linux/writeback.h>
+ #include <linux/page-flags.h>
++#include <linux/mm.h>
  
- retry:
--	req = blk_get_request(sdev->request_queue, WRITE, GFP_NOIO);
--	if (IS_ERR(req))
--		return SCSI_DH_RES_TEMP_UNAVAIL;
--
--	blk_rq_set_block_pc(req);
--	req->cmd_flags |= REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT |
--			  REQ_FAILFAST_DRIVER;
--	req->cmd_len = COMMAND_SIZE(TEST_UNIT_READY);
--	req->cmd[0] = TEST_UNIT_READY;
--	req->timeout = HP_SW_TIMEOUT;
--	req->sense = h->sense;
--	memset(req->sense, 0, SCSI_SENSE_BUFFERSIZE);
--	req->sense_len = 0;
--
--	ret = blk_execute_rq(req->q, NULL, req, 1);
--	if (ret == -EIO) {
--		if (req->sense_len > 0) {
--			ret = tur_done(sdev, h->sense);
--		} else {
-+	res = scsi_execute_req_flags(sdev, cmd, DMA_NONE, NULL, 0, &sshdr,
-+				     HP_SW_TIMEOUT, HP_SW_RETRIES,
-+				     NULL, req_flags, 0);
-+	if (res) {
-+		if (scsi_sense_valid(&sshdr))
-+			ret = tur_done(sdev, h, &sshdr);
-+		else {
- 			sdev_printk(KERN_WARNING, sdev,
- 				    "%s: sending tur failed with %x\n",
--				    HP_SW_NAME, req->errors);
-+				    HP_SW_NAME, res);
- 			ret = SCSI_DH_IO;
- 		}
- 	} else {
- 		h->path_state = HP_SW_PATH_ACTIVE;
- 		ret = SCSI_DH_OK;
- 	}
--	if (ret == SCSI_DH_IMM_RETRY) {
--		blk_put_request(req);
-+	if (ret == SCSI_DH_IMM_RETRY)
- 		goto retry;
--	}
--	if (ret == SCSI_DH_DEV_OFFLINED) {
--		h->path_state = HP_SW_PATH_PASSIVE;
--		ret = SCSI_DH_OK;
--	}
--
--	blk_put_request(req);
- 
- 	return ret;
+ struct mem_cgroup;
+ struct page;
+@@ -517,18 +518,6 @@ static inline void mem_cgroup_update_page_stat(struct page *page,
+ 		this_cpu_add(page->mem_cgroup->stat->count[idx], val);
  }
  
- /*
-- * start_done - Handle START STOP UNIT return status
-- * @sdev: sdev the command has been sent to
-- * @errors: blk error code
-- */
--static int start_done(struct scsi_device *sdev, unsigned char *sense)
+-static inline void mem_cgroup_inc_page_stat(struct page *page,
+-					    enum mem_cgroup_stat_index idx)
 -{
--	struct scsi_sense_hdr sshdr;
--	int rc;
--
--	rc = scsi_normalize_sense(sense, SCSI_SENSE_BUFFERSIZE, &sshdr);
--	if (!rc) {
--		sdev_printk(KERN_WARNING, sdev,
--			    "%s: sending start_stop_unit failed, "
--			    "no sense available\n",
--			    HP_SW_NAME);
--		return SCSI_DH_IO;
--	}
--	switch (sshdr.sense_key) {
--	case NOT_READY:
--		if ((sshdr.asc == 0x04) && (sshdr.ascq == 3)) {
--			/*
--			 * LUN not ready - manual intervention required
--			 *
--			 * Switch-over in progress, retry.
--			 */
--			rc = SCSI_DH_RETRY;
--			break;
--		}
--		/* fall through */
--	default:
--		sdev_printk(KERN_WARNING, sdev,
--			   "%s: sending start_stop_unit failed, sense %x/%x/%x\n",
--			   HP_SW_NAME, sshdr.sense_key, sshdr.asc,
--			   sshdr.ascq);
--		rc = SCSI_DH_IO;
--	}
--
--	return rc;
+-	mem_cgroup_update_page_stat(page, idx, 1);
 -}
 -
--static void start_stop_endio(struct request *req, int error)
+-static inline void mem_cgroup_dec_page_stat(struct page *page,
+-					    enum mem_cgroup_stat_index idx)
 -{
--	struct hp_sw_dh_data *h = req->end_io_data;
--	unsigned err = SCSI_DH_OK;
--
--	if (error || host_byte(req->errors) != DID_OK ||
--			msg_byte(req->errors) != COMMAND_COMPLETE) {
--		sdev_printk(KERN_WARNING, h->sdev,
--			    "%s: sending start_stop_unit failed with %x\n",
--			    HP_SW_NAME, req->errors);
--		err = SCSI_DH_IO;
--		goto done;
--	}
--
--	if (req->sense_len > 0) {
--		err = start_done(h->sdev, h->sense);
--		if (err == SCSI_DH_RETRY) {
--			err = SCSI_DH_IO;
--			if (--h->retry_cnt) {
--				blk_put_request(req);
--				err = hp_sw_start_stop(h);
--				if (err == SCSI_DH_OK)
--					return;
--			}
--		}
--	}
--done:
--	req->end_io_data = NULL;
--	__blk_put_request(req->q, req);
--	if (h->callback_fn) {
--		h->callback_fn(h->callback_data, err);
--		h->callback_fn = h->callback_data = NULL;
--	}
--	return;
--
+-	mem_cgroup_update_page_stat(page, idx, -1);
 -}
 -
--/*
-  * hp_sw_start_stop - Send START STOP UNIT command
-  * @sdev: sdev command should be sent to
-  *
-@@ -237,26 +130,48 @@ static void start_stop_endio(struct request *req, int error)
-  */
- static int hp_sw_start_stop(struct hp_sw_dh_data *h)
- {
--	struct request *req;
--
--	req = blk_get_request(h->sdev->request_queue, WRITE, GFP_ATOMIC);
--	if (IS_ERR(req))
--		return SCSI_DH_RES_TEMP_UNAVAIL;
--
--	blk_rq_set_block_pc(req);
--	req->cmd_flags |= REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT |
--			  REQ_FAILFAST_DRIVER;
--	req->cmd_len = COMMAND_SIZE(START_STOP);
--	req->cmd[0] = START_STOP;
--	req->cmd[4] = 1;	/* Start spin cycle */
--	req->timeout = HP_SW_TIMEOUT;
--	req->sense = h->sense;
--	memset(req->sense, 0, SCSI_SENSE_BUFFERSIZE);
--	req->sense_len = 0;
--	req->end_io_data = h;
-+	unsigned char cmd[6] = { START_STOP, 0, 0, 0, 1, 0 };
-+	struct scsi_sense_hdr sshdr;
-+	struct scsi_device *sdev = h->sdev;
-+	int res, rc = SCSI_DH_OK;
-+	int retry_cnt = HP_SW_RETRIES;
-+	u64 req_flags = REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT |
-+		REQ_FAILFAST_DRIVER;
- 
--	blk_execute_rq_nowait(req->q, NULL, req, 1, start_stop_endio);
--	return SCSI_DH_OK;
-+retry:
-+	res = scsi_execute_req_flags(sdev, cmd, DMA_NONE, NULL, 0, &sshdr,
-+				     HP_SW_TIMEOUT, HP_SW_RETRIES,
-+				     NULL, req_flags, 0);
-+	if (res) {
-+		if (!scsi_sense_valid(&sshdr)) {
-+			sdev_printk(KERN_WARNING, sdev,
-+				    "%s: sending start_stop_unit failed, "
-+				    "no sense available\n", HP_SW_NAME);
-+			return SCSI_DH_IO;
-+		}
-+		switch (sshdr.sense_key) {
-+		case NOT_READY:
-+			if (sshdr.asc == 0x04 && sshdr.ascq == 3) {
-+				/*
-+				 * LUN not ready - manual intervention required
-+				 *
-+				 * Switch-over in progress, retry.
-+				 */
-+				if (--retry_cnt)
-+					goto retry;
-+				rc = SCSI_DH_RETRY;
-+				break;
-+			}
-+			/* fall through */
-+		default:
-+			sdev_printk(KERN_WARNING, sdev,
-+				    "%s: sending start_stop_unit failed, "
-+				    "sense %x/%x/%x\n", HP_SW_NAME,
-+				    sshdr.sense_key, sshdr.asc, sshdr.ascq);
-+			rc = SCSI_DH_IO;
-+		}
-+	}
-+	return rc;
+ unsigned long mem_cgroup_soft_limit_reclaim(pg_data_t *pgdat, int order,
+ 						gfp_t gfp_mask,
+ 						unsigned long *total_scanned);
+@@ -739,13 +728,8 @@ static inline bool mem_cgroup_oom_synchronize(bool wait)
+ 	return false;
  }
  
- static int hp_sw_prep_fn(struct scsi_device *sdev, struct request *req)
-@@ -290,15 +205,8 @@ static int hp_sw_activate(struct scsi_device *sdev,
+-static inline void mem_cgroup_inc_page_stat(struct page *page,
+-					    enum mem_cgroup_stat_index idx)
+-{
+-}
+-
+-static inline void mem_cgroup_dec_page_stat(struct page *page,
+-					    enum mem_cgroup_stat_index idx)
++static inline void mem_cgroup_update_page_stat(struct page *page,
++				 enum mem_cgroup_stat_index idx, int val)
+ {
+ }
  
- 	ret = hp_sw_tur(sdev, h);
+diff --git a/mm/migrate.c b/mm/migrate.c
+index 366466ed7fdc..20a9ce2fcc64 100644
+--- a/mm/migrate.c
++++ b/mm/migrate.c
+@@ -485,6 +485,7 @@ int migrate_page_move_mapping(struct address_space *mapping,
+ 	 * are mapped to swap space.
+ 	 */
+ 	if (newzone != oldzone) {
++		BUG_ON(PageTransHuge(page));
+ 		__dec_node_state(oldzone->zone_pgdat, NR_FILE_PAGES);
+ 		__inc_node_state(newzone->zone_pgdat, NR_FILE_PAGES);
+ 		if (PageSwapBacked(page) && !PageSwapCache(page)) {
+diff --git a/mm/page-writeback.c b/mm/page-writeback.c
+index 47d5b12c460e..d7b905d66add 100644
+--- a/mm/page-writeback.c
++++ b/mm/page-writeback.c
+@@ -2430,19 +2430,22 @@ void account_page_dirtied(struct page *page, struct address_space *mapping)
  
--	if (ret == SCSI_DH_OK && h->path_state == HP_SW_PATH_PASSIVE) {
--		h->retry_cnt = h->retries;
--		h->callback_fn = fn;
--		h->callback_data = data;
-+	if (ret == SCSI_DH_OK && h->path_state == HP_SW_PATH_PASSIVE)
- 		ret = hp_sw_start_stop(h);
--		if (ret == SCSI_DH_OK)
--			return 0;
--		h->callback_fn = h->callback_data = NULL;
--	}
+ 	if (mapping_cap_account_dirty(mapping)) {
+ 		struct bdi_writeback *wb;
++		struct zone *zone = page_zone(page);
++		pg_data_t *pgdat = page_pgdat(page);
++		int nr = hpage_nr_pages(page);
  
- 	if (fn)
- 		fn(data, ret);
+ 		inode_attach_wb(inode, page);
+ 		wb = inode_to_wb(inode);
+ 
+-		mem_cgroup_inc_page_stat(page, MEM_CGROUP_STAT_DIRTY);
+-		__inc_node_page_state(page, NR_FILE_DIRTY);
+-		__inc_zone_page_state(page, NR_ZONE_WRITE_PENDING);
+-		__inc_node_page_state(page, NR_DIRTIED);
+-		__inc_wb_stat(wb, WB_RECLAIMABLE);
+-		__inc_wb_stat(wb, WB_DIRTIED);
+-		task_io_account_write(PAGE_SIZE);
+-		current->nr_dirtied++;
+-		this_cpu_inc(bdp_ratelimits);
++		mem_cgroup_update_page_stat(page, MEM_CGROUP_STAT_DIRTY, nr);
++		__mod_node_page_state(pgdat, NR_FILE_DIRTY, nr);
++		__mod_zone_page_state(zone, NR_ZONE_WRITE_PENDING, nr);
++		__mod_node_page_state(pgdat, NR_DIRTIED, nr);
++		__add_wb_stat(wb, WB_RECLAIMABLE, nr);
++		__add_wb_stat(wb, WB_DIRTIED, nr);
++		task_io_account_write(nr * PAGE_SIZE);
++		current->nr_dirtied += nr;
++		this_cpu_add(bdp_ratelimits, nr);
+ 	}
+ }
+ EXPORT_SYMBOL(account_page_dirtied);
+@@ -2456,11 +2459,15 @@ void account_page_cleaned(struct page *page, struct address_space *mapping,
+ 			  struct bdi_writeback *wb)
+ {
+ 	if (mapping_cap_account_dirty(mapping)) {
+-		mem_cgroup_dec_page_stat(page, MEM_CGROUP_STAT_DIRTY);
+-		dec_node_page_state(page, NR_FILE_DIRTY);
+-		dec_zone_page_state(page, NR_ZONE_WRITE_PENDING);
+-		dec_wb_stat(wb, WB_RECLAIMABLE);
+-		task_io_account_cancelled_write(PAGE_SIZE);
++		struct zone *zone = page_zone(page);
++		pg_data_t *pgdat = page_pgdat(page);
++		int nr = hpage_nr_pages(page);
++
++		mem_cgroup_update_page_stat(page, MEM_CGROUP_STAT_DIRTY, -nr);
++		mod_node_page_state(pgdat, NR_FILE_DIRTY, -nr);
++		mod_zone_page_state(zone, NR_ZONE_WRITE_PENDING, -nr);
++		add_wb_stat(wb, WB_RECLAIMABLE, -nr);
++		task_io_account_cancelled_write(PAGE_SIZE * nr);
+ 	}
+ }
+ 
+@@ -2520,14 +2527,16 @@ void account_page_redirty(struct page *page)
+ 	struct address_space *mapping = page->mapping;
+ 
+ 	if (mapping && mapping_cap_account_dirty(mapping)) {
++		pg_data_t *pgdat = page_pgdat(page);
++		int nr = hpage_nr_pages(page);
+ 		struct inode *inode = mapping->host;
+ 		struct bdi_writeback *wb;
+ 		bool locked;
+ 
+ 		wb = unlocked_inode_to_wb_begin(inode, &locked);
+-		current->nr_dirtied--;
+-		dec_node_page_state(page, NR_DIRTIED);
+-		dec_wb_stat(wb, WB_DIRTIED);
++		current->nr_dirtied -= nr;
++		mod_node_page_state(pgdat, NR_DIRTIED, -nr);
++		add_wb_stat(wb, WB_DIRTIED, -nr);
+ 		unlocked_inode_to_wb_end(inode, locked);
+ 	}
+ }
+@@ -2713,10 +2722,15 @@ int clear_page_dirty_for_io(struct page *page)
+ 		 */
+ 		wb = unlocked_inode_to_wb_begin(inode, &locked);
+ 		if (TestClearPageDirty(page)) {
+-			mem_cgroup_dec_page_stat(page, MEM_CGROUP_STAT_DIRTY);
+-			dec_node_page_state(page, NR_FILE_DIRTY);
+-			dec_zone_page_state(page, NR_ZONE_WRITE_PENDING);
+-			dec_wb_stat(wb, WB_RECLAIMABLE);
++			struct zone *zone = page_zone(page);
++			pg_data_t *pgdat = page_pgdat(page);
++			int nr = hpage_nr_pages(page);
++
++			mem_cgroup_update_page_stat(page,
++					MEM_CGROUP_STAT_DIRTY, -nr);
++			mod_node_page_state(pgdat, NR_FILE_DIRTY, -nr);
++			mod_zone_page_state(zone, NR_ZONE_WRITE_PENDING, -nr);
++			add_wb_stat(wb, WB_RECLAIMABLE, -nr);
+ 			ret = 1;
+ 		}
+ 		unlocked_inode_to_wb_end(inode, locked);
+@@ -2760,10 +2774,15 @@ int test_clear_page_writeback(struct page *page)
+ 		ret = TestClearPageWriteback(page);
+ 	}
+ 	if (ret) {
+-		mem_cgroup_dec_page_stat(page, MEM_CGROUP_STAT_WRITEBACK);
+-		dec_node_page_state(page, NR_WRITEBACK);
+-		dec_zone_page_state(page, NR_ZONE_WRITE_PENDING);
+-		inc_node_page_state(page, NR_WRITTEN);
++		struct zone *zone = page_zone(page);
++		pg_data_t *pgdat = page_pgdat(page);
++		int nr = hpage_nr_pages(page);
++
++		mem_cgroup_update_page_stat(page,
++				MEM_CGROUP_STAT_WRITEBACK, -nr);
++		mod_node_page_state(pgdat, NR_WRITEBACK, -nr);
++		mod_zone_page_state(zone, NR_ZONE_WRITE_PENDING, -nr);
++		mod_node_page_state(pgdat, NR_WRITTEN, nr);
+ 	}
+ 	unlock_page_memcg(page);
+ 	return ret;
+@@ -2815,9 +2834,14 @@ int __test_set_page_writeback(struct page *page, bool keep_write)
+ 		ret = TestSetPageWriteback(page);
+ 	}
+ 	if (!ret) {
+-		mem_cgroup_inc_page_stat(page, MEM_CGROUP_STAT_WRITEBACK);
+-		inc_node_page_state(page, NR_WRITEBACK);
+-		inc_zone_page_state(page, NR_ZONE_WRITE_PENDING);
++		struct zone *zone = page_zone(page);
++		pg_data_t *pgdat = page_pgdat(page);
++		int nr = hpage_nr_pages(page);
++
++		mem_cgroup_update_page_stat(page,
++				MEM_CGROUP_STAT_WRITEBACK, nr);
++		mod_node_page_state(pgdat, NR_WRITEBACK, nr);
++		mod_zone_page_state(zone, NR_ZONE_WRITE_PENDING, nr);
+ 	}
+ 	unlock_page_memcg(page);
+ 	return ret;
+diff --git a/mm/rmap.c b/mm/rmap.c
+index d9daa54dc316..38f1682f8dfc 100644
+--- a/mm/rmap.c
++++ b/mm/rmap.c
+@@ -1154,7 +1154,7 @@ void page_add_file_rmap(struct page *page, bool compound)
+ 			goto out;
+ 	}
+ 	__mod_node_page_state(page_pgdat(page), NR_FILE_MAPPED, nr);
+-	mem_cgroup_inc_page_stat(page, MEM_CGROUP_STAT_FILE_MAPPED);
++	mem_cgroup_update_page_stat(page, MEM_CGROUP_STAT_FILE_MAPPED, nr);
+ out:
+ 	unlock_page_memcg(page);
+ }
+@@ -1196,7 +1196,7 @@ static void page_remove_file_rmap(struct page *page, bool compound)
+ 	 * pte lock(a spinlock) is held, which implies preemption disabled.
+ 	 */
+ 	__mod_node_page_state(page_pgdat(page), NR_FILE_MAPPED, -nr);
+-	mem_cgroup_dec_page_stat(page, MEM_CGROUP_STAT_FILE_MAPPED);
++	mem_cgroup_update_page_stat(page, MEM_CGROUP_STAT_FILE_MAPPED, -nr);
+ 
+ 	if (unlikely(PageMlocked(page)))
+ 		clear_page_mlock(page);
 -- 
-2.1.4
+2.11.0
 
