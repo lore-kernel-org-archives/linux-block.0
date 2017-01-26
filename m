@@ -1,49 +1,56 @@
-Return-Path: <elfring@users.sourceforge.net>
-Subject: [PATCH 3/5] blk-throttle: Adjust two function calls together with a
- variable assignment
-To: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-References: <e734cafa-eec0-9d5b-b368-2de496a96c80@users.sourceforge.net>
-Cc: LKML <linux-kernel@vger.kernel.org>, kernel-janitors@vger.kernel.org
-From: SF Markus Elfring <elfring@users.sourceforge.net>
-Message-ID: <7d68f93d-c14c-60aa-2b02-5005a0a62cad@users.sourceforge.net>
-Date: Sun, 22 Jan 2017 09:33:08 +0100
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from tyo185.gate.nec.co.jp ([114.179.232.185]:52425 "EHLO
+        tyo185.gate.nec.co.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752746AbdAZEwn (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 25 Jan 2017 23:52:43 -0500
+From: Junichi Nomura <j-nomura@ce.jp.nec.com>
+To: Mike Snitzer <snitzer@redhat.com>, Christoph Hellwig <hch@lst.de>
+CC: Jens Axboe <axboe@fb.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>
+Subject: Re: [PATCH 05/16] dm: always defer request allocation to the owner
+ of the request_queue
+Date: Thu, 26 Jan 2017 04:23:00 +0000
+Message-ID: <6b3a7fb3-f8f6-4605-b153-e193b3d2b500@ce.jp.nec.com>
+References: <1485185361-29786-1-git-send-email-hch@lst.de>
+ <1485185361-29786-6-git-send-email-hch@lst.de>
+ <20170124100538.GA6991@redhat.com> <20170124142054.GA26473@lst.de>
+ <20170124163951.GA9172@redhat.com>
+In-Reply-To: <20170124163951.GA9172@redhat.com>
+Content-Type: text/plain; charset="iso-2022-jp"
 MIME-Version: 1.0
-In-Reply-To: <e734cafa-eec0-9d5b-b368-2de496a96c80@users.sourceforge.net>
-Content-Type: text/plain; charset=utf-8
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Markus Elfring <elfring@users.sourceforge.net>
-Date: Sat, 21 Jan 2017 22:15:33 +0100
+On 01/25/17 01:39, Mike Snitzer wrote:
+> On Tue, Jan 24 2017 at  9:20am -0500, Christoph Hellwig <hch@lst.de> wrote:
+>> On Tue, Jan 24, 2017 at 05:05:39AM -0500, Mike Snitzer wrote:
+>>> possible and is welcomed cleanup.  The only concern I have is that using
+>>> get_request() for the old request_fn request_queue eliminates the
+>>> guaranteed availability of requests to allow for forward progress (on
+>>> path failure or for the purposes of swap over mpath, etc).  This isn't a
+>>> concern for blk-mq because as you know we have a fixed set of tags (and
+>>> associated preallocated requests).
+>>>
+>>> So I'm left unconvinced old request_fn request-based DM multipath isn't
+>>> regressing in how request resubmission can be assured a request will be
+>>> available when needed on retry in the face of path failure.
+>>
+>> Mempool only need a size where we can make guaranteed requests, so for
+>> get_request based drivers under dm the theoretical minimum size would be
+>> one as we never rely on a second request to finish the first one,
+>> and each request_queue has it's own mempool(s) to start with.
+> 
+> Fair enough.  Cc'ing Junichi just in case he sees anything we're
+> missing.
 
-The script "checkpatch.pl" pointed information out like the following.
+DM multipath could not use blk_get_request() because the function
+was not callable from interrupt-disabled context. E.g. request_fn.
 
-ERROR: do not use assignment in if condition
+However, since the current code no longer calls blk_get_request()
+from such a context, the change should be ok.
 
-Thus fix the affected source code places.
-
-Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
----
- block/blk-throttle.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index b392b48310ba..3cf7472fbba2 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -866,10 +866,12 @@ static void tg_update_disptime(struct throtl_grp *tg)
- 	unsigned long read_wait = -1, write_wait = -1, min_wait = -1, disptime;
- 	struct bio *bio;
- 
--	if ((bio = throtl_peek_queued(&sq->queued[READ])))
-+	bio = throtl_peek_queued(&sq->queued[READ]);
-+	if (bio)
- 		tg_may_dispatch(tg, bio, &read_wait);
- 
--	if ((bio = throtl_peek_queued(&sq->queued[WRITE])))
-+	bio = throtl_peek_queued(&sq->queued[WRITE]);
-+	if (bio)
- 		tg_may_dispatch(tg, bio, &write_wait);
- 
- 	min_wait = min(read_wait, write_wait);
 -- 
-2.11.0
+Jun'ichi Nomura, NEC Corporation / NEC Solution Innovators, Ltd.
