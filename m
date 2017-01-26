@@ -1,224 +1,97 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wj0-f194.google.com ([209.85.210.194]:34575 "EHLO
-        mail-wj0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751027AbdAWMAU (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Jan 2017 07:00:20 -0500
-Received: by mail-wj0-f194.google.com with SMTP id ip10so1729758wjb.1
-        for <linux-block@vger.kernel.org>; Mon, 23 Jan 2017 03:59:49 -0800 (PST)
-From: "=?UTF-8?q?Matias=20Bj=C3=B8rling?=" <m@bjorling.me>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
-Subject: [PATCH 7/8] lightnvm: reduce number of nvm_id groups to one
-Date: Mon, 23 Jan 2017 12:59:18 +0100
-Message-Id: <20170123115919.14339-8-matias@cnexlabs.com>
-In-Reply-To: <20170123115919.14339-1-matias@cnexlabs.com>
-References: <20170123115919.14339-1-matias@cnexlabs.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv6 33/37] ext4: fix SEEK_DATA/SEEK_HOLE for huge pages
+Date: Thu, 26 Jan 2017 14:58:15 +0300
+Message-Id: <20170126115819.58875-34-kirill.shutemov@linux.intel.com>
+In-Reply-To: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
+References: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-The number of configuration groups has been limited to one in current
-code, even if there is support for up to four. With the introduction
-of the open-channel SSD 1.3 specification, only a single
-group is exposed onwards. Reflect this in the nvm_id structure.
+ext4_find_unwritten_pgoff() needs few tweaks to work with huge pages.
+Mostly trivial page_mapping()/page_to_pgoff() and adjustment to how we
+find relevant block.
 
-Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
+Signe-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- drivers/block/null_blk.c     |  3 +-
- drivers/lightnvm/core.c      | 12 ++----
- drivers/nvme/host/lightnvm.c | 87 +++++++++++++++++++++-----------------------
- include/linux/lightnvm.h     |  3 +-
- 4 files changed, 47 insertions(+), 58 deletions(-)
+ fs/ext4/file.c | 18 ++++++++++++++----
+ 1 file changed, 14 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/block/null_blk.c b/drivers/block/null_blk.c
-index c0e14e5..e666095 100644
---- a/drivers/block/null_blk.c
-+++ b/drivers/block/null_blk.c
-@@ -460,7 +460,6 @@ static int null_lnvm_id(struct nvm_dev *dev, struct nvm_id *id)
+diff --git a/fs/ext4/file.c b/fs/ext4/file.c
+index d663d3d7c81c..0b11aadfb75f 100644
+--- a/fs/ext4/file.c
++++ b/fs/ext4/file.c
+@@ -519,7 +519,7 @@ static int ext4_find_unwritten_pgoff(struct inode *inode,
+ 			 * range, it will be a hole.
+ 			 */
+ 			if (lastoff < endoff && whence == SEEK_HOLE &&
+-			    page->index > end) {
++			    page_to_pgoff(page) > end) {
+ 				found = 1;
+ 				*offset = lastoff;
+ 				goto out;
+@@ -527,7 +527,7 @@ static int ext4_find_unwritten_pgoff(struct inode *inode,
  
- 	id->ver_id = 0x1;
- 	id->vmnt = 0;
--	id->cgrps = 1;
- 	id->cap = 0x2;
- 	id->dom = 0x1;
+ 			lock_page(page);
  
-@@ -479,7 +478,7 @@ static int null_lnvm_id(struct nvm_dev *dev, struct nvm_id *id)
+-			if (unlikely(page->mapping != inode->i_mapping)) {
++			if (unlikely(page_mapping(page) != inode->i_mapping)) {
+ 				unlock_page(page);
+ 				continue;
+ 			}
+@@ -538,8 +538,12 @@ static int ext4_find_unwritten_pgoff(struct inode *inode,
+ 			}
  
- 	sector_div(size, bs); /* convert size to pages */
- 	size >>= 8; /* concert size to pgs pr blk */
--	grp = &id->groups[0];
-+	grp = &id->grp;
- 	grp->mtype = 0;
- 	grp->fmtype = 0;
- 	grp->num_ch = 1;
-diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-index 0842c85..80cd767 100644
---- a/drivers/lightnvm/core.c
-+++ b/drivers/lightnvm/core.c
-@@ -884,7 +884,7 @@ static int nvm_init_mlc_tbl(struct nvm_dev *dev, struct nvm_id_group *grp)
- static int nvm_core_init(struct nvm_dev *dev)
- {
- 	struct nvm_id *id = &dev->identity;
--	struct nvm_id_group *grp = &id->groups[0];
-+	struct nvm_id_group *grp = &id->grp;
- 	struct nvm_geo *geo = &dev->geo;
- 	int ret;
+ 			if (page_has_buffers(page)) {
++				int diff;
+ 				lastoff = page_offset(page);
+ 				bh = head = page_buffers(page);
++				diff = (page - compound_head(page)) << inode->i_blkbits;
++				while (diff--)
++					bh = bh->b_this_page;
+ 				do {
+ 					if (buffer_uptodate(bh) ||
+ 					    buffer_unwritten(bh)) {
+@@ -560,8 +564,12 @@ static int ext4_find_unwritten_pgoff(struct inode *inode,
+ 				} while (bh != head);
+ 			}
  
-@@ -988,20 +988,14 @@ static int nvm_init(struct nvm_dev *dev)
- 		goto err;
- 	}
- 
--	pr_debug("nvm: ver:%x nvm_vendor:%x groups:%u\n",
--			dev->identity.ver_id, dev->identity.vmnt,
--							dev->identity.cgrps);
-+	pr_debug("nvm: ver:%x nvm_vendor:%x\n",
-+			dev->identity.ver_id, dev->identity.vmnt);
- 
- 	if (dev->identity.ver_id != 1) {
- 		pr_err("nvm: device not supported by kernel.");
- 		goto err;
- 	}
- 
--	if (dev->identity.cgrps != 1) {
--		pr_err("nvm: only one group configuration supported.");
--		goto err;
--	}
--
- 	ret = nvm_core_init(dev);
- 	if (ret) {
- 		pr_err("nvm: could not initialize core structures.\n");
-diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
-index ad54ec9..733992a 100644
---- a/drivers/nvme/host/lightnvm.c
-+++ b/drivers/nvme/host/lightnvm.c
-@@ -248,50 +248,48 @@ static int init_grps(struct nvm_id *nvm_id, struct nvme_nvm_id *nvme_nvm_id)
- {
- 	struct nvme_nvm_id_group *src;
- 	struct nvm_id_group *dst;
--	int i, end;
--
--	end = min_t(u32, 4, nvm_id->cgrps);
--
--	for (i = 0; i < end; i++) {
--		src = &nvme_nvm_id->groups[i];
--		dst = &nvm_id->groups[i];
--
--		dst->mtype = src->mtype;
--		dst->fmtype = src->fmtype;
--		dst->num_ch = src->num_ch;
--		dst->num_lun = src->num_lun;
--		dst->num_pln = src->num_pln;
--
--		dst->num_pg = le16_to_cpu(src->num_pg);
--		dst->num_blk = le16_to_cpu(src->num_blk);
--		dst->fpg_sz = le16_to_cpu(src->fpg_sz);
--		dst->csecs = le16_to_cpu(src->csecs);
--		dst->sos = le16_to_cpu(src->sos);
--
--		dst->trdt = le32_to_cpu(src->trdt);
--		dst->trdm = le32_to_cpu(src->trdm);
--		dst->tprt = le32_to_cpu(src->tprt);
--		dst->tprm = le32_to_cpu(src->tprm);
--		dst->tbet = le32_to_cpu(src->tbet);
--		dst->tbem = le32_to_cpu(src->tbem);
--		dst->mpos = le32_to_cpu(src->mpos);
--		dst->mccap = le32_to_cpu(src->mccap);
--
--		dst->cpar = le16_to_cpu(src->cpar);
--
--		if (dst->fmtype == NVM_ID_FMTYPE_MLC) {
--			memcpy(dst->lptbl.id, src->lptbl.id, 8);
--			dst->lptbl.mlc.num_pairs =
--					le16_to_cpu(src->lptbl.mlc.num_pairs);
--
--			if (dst->lptbl.mlc.num_pairs > NVME_NVM_LP_MLC_PAIRS) {
--				pr_err("nvm: number of MLC pairs not supported\n");
--				return -EINVAL;
--			}
--
--			memcpy(dst->lptbl.mlc.pairs, src->lptbl.mlc.pairs,
--						dst->lptbl.mlc.num_pairs);
-+
-+	if (nvme_nvm_id->cgrps != 1)
-+		return -EINVAL;
-+
-+	src = &nvme_nvm_id->groups[0];
-+	dst = &nvm_id->grp;
-+
-+	dst->mtype = src->mtype;
-+	dst->fmtype = src->fmtype;
-+	dst->num_ch = src->num_ch;
-+	dst->num_lun = src->num_lun;
-+	dst->num_pln = src->num_pln;
-+
-+	dst->num_pg = le16_to_cpu(src->num_pg);
-+	dst->num_blk = le16_to_cpu(src->num_blk);
-+	dst->fpg_sz = le16_to_cpu(src->fpg_sz);
-+	dst->csecs = le16_to_cpu(src->csecs);
-+	dst->sos = le16_to_cpu(src->sos);
-+
-+	dst->trdt = le32_to_cpu(src->trdt);
-+	dst->trdm = le32_to_cpu(src->trdm);
-+	dst->tprt = le32_to_cpu(src->tprt);
-+	dst->tprm = le32_to_cpu(src->tprm);
-+	dst->tbet = le32_to_cpu(src->tbet);
-+	dst->tbem = le32_to_cpu(src->tbem);
-+	dst->mpos = le32_to_cpu(src->mpos);
-+	dst->mccap = le32_to_cpu(src->mccap);
-+
-+	dst->cpar = le16_to_cpu(src->cpar);
-+
-+	if (dst->fmtype == NVM_ID_FMTYPE_MLC) {
-+		memcpy(dst->lptbl.id, src->lptbl.id, 8);
-+		dst->lptbl.mlc.num_pairs =
-+				le16_to_cpu(src->lptbl.mlc.num_pairs);
-+
-+		if (dst->lptbl.mlc.num_pairs > NVME_NVM_LP_MLC_PAIRS) {
-+			pr_err("nvm: number of MLC pairs not supported\n");
-+			return -EINVAL;
+-			lastoff = page_offset(page) + PAGE_SIZE;
++			lastoff = page_offset(page) + hpage_size(page);
+ 			unlock_page(page);
++			if (PageTransCompound(page)) {
++				i++;
++				break;
++			}
  		}
-+
-+		memcpy(dst->lptbl.mlc.pairs, src->lptbl.mlc.pairs,
-+					dst->lptbl.mlc.num_pairs);
- 	}
  
- 	return 0;
-@@ -321,7 +319,6 @@ static int nvme_nvm_identity(struct nvm_dev *nvmdev, struct nvm_id *nvm_id)
+ 		/*
+@@ -574,7 +582,9 @@ static int ext4_find_unwritten_pgoff(struct inode *inode,
+ 			break;
+ 		}
  
- 	nvm_id->ver_id = nvme_nvm_id->ver_id;
- 	nvm_id->vmnt = nvme_nvm_id->vmnt;
--	nvm_id->cgrps = nvme_nvm_id->cgrps;
- 	nvm_id->cap = le32_to_cpu(nvme_nvm_id->cap);
- 	nvm_id->dom = le32_to_cpu(nvme_nvm_id->dom);
- 	memcpy(&nvm_id->ppaf, &nvme_nvm_id->ppaf,
-@@ -622,7 +619,7 @@ static ssize_t nvm_dev_attr_show(struct device *dev,
- 		return 0;
+-		index = pvec.pages[i - 1]->index + 1;
++		index = page_to_pgoff(pvec.pages[i - 1]) + 1;
++		if (PageTransCompound(pvec.pages[i - 1]))
++			index = round_up(index, HPAGE_PMD_NR);
+ 		pagevec_release(&pvec);
+ 	} while (index <= end);
  
- 	id = &ndev->identity;
--	grp = &id->groups[0];
-+	grp = &id->grp;
- 	attr = &dattr->attr;
- 
- 	if (strcmp(attr->name, "version") == 0) {
-diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
-index faa0fbf..ce0b2da 100644
---- a/include/linux/lightnvm.h
-+++ b/include/linux/lightnvm.h
-@@ -200,11 +200,10 @@ struct nvm_addr_format {
- struct nvm_id {
- 	u8	ver_id;
- 	u8	vmnt;
--	u8	cgrps;
- 	u32	cap;
- 	u32	dom;
- 	struct nvm_addr_format ppaf;
--	struct nvm_id_group groups[4];
-+	struct nvm_id_group grp;
- } __packed;
- 
- struct nvm_target {
 -- 
-2.7.4
+2.11.0
 
