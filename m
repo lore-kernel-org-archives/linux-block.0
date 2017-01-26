@@ -1,255 +1,240 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f178.google.com ([209.85.192.178]:35966 "EHLO
-        mail-pf0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751457AbdAYQH2 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 Jan 2017 11:07:28 -0500
-Received: by mail-pf0-f178.google.com with SMTP id 189so59281335pfu.3
-        for <linux-block@vger.kernel.org>; Wed, 25 Jan 2017 08:07:27 -0800 (PST)
-From: Omar Sandoval <osandov@osandov.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: kernel-team@fb.com
-Subject: [PATCH v2 07/10] blk-mq: move tags and sched_tags info from sysfs to debugfs
-Date: Wed, 25 Jan 2017 08:06:46 -0800
-Message-Id: <86d3e6ab6c43a23c4a51a2f595d3f50b3df6d7a7.1485360145.git.osandov@fb.com>
-In-Reply-To: <cover.1485360145.git.osandov@fb.com>
-References: <cover.1485360145.git.osandov@fb.com>
-In-Reply-To: <cover.1485360145.git.osandov@fb.com>
-References: <cover.1485360145.git.osandov@fb.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv6 36/37] mm, fs, ext4: expand use of page_mapping() and page_to_pgoff()
+Date: Thu, 26 Jan 2017 14:58:18 +0300
+Message-Id: <20170126115819.58875-37-kirill.shutemov@linux.intel.com>
+In-Reply-To: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
+References: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-From: Omar Sandoval <osandov@fb.com>
+With huge pages in page cache we see tail pages in more code paths.
+This patch replaces direct access to struct page fields with macros
+which can handle tail pages properly.
 
-These are very tied to the blk-mq tag implementation, so exposing them
-to sysfs isn't a great idea. Move the debugging information to debugfs
-and add basic entries for the number of tags and the number of reserved
-tags to sysfs.
-
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Signed-off-by: Omar Sandoval <osandov@fb.com>
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- block/blk-mq-debugfs.c | 70 ++++++++++++++++++++++++++++++++++++++++++++++++++
- block/blk-mq-sysfs.c   | 33 ++++++++++++------------
- block/blk-mq-tag.c     | 27 -------------------
- block/blk-mq-tag.h     |  1 -
- 4 files changed, 86 insertions(+), 45 deletions(-)
+ fs/buffer.c         |  2 +-
+ fs/ext4/inode.c     |  4 ++--
+ mm/filemap.c        | 24 +++++++++++++-----------
+ mm/memory.c         |  2 +-
+ mm/page-writeback.c |  2 +-
+ mm/truncate.c       |  5 +++--
+ 6 files changed, 21 insertions(+), 18 deletions(-)
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 857bdadc6b1f..9f811007cf4f 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -20,6 +20,7 @@
+diff --git a/fs/buffer.c b/fs/buffer.c
+index f92090fed933..b2c220dd83b5 100644
+--- a/fs/buffer.c
++++ b/fs/buffer.c
+@@ -631,7 +631,7 @@ static void __set_page_dirty(struct page *page, struct address_space *mapping,
+ 	unsigned long flags;
  
- #include <linux/blk-mq.h>
- #include "blk-mq.h"
-+#include "blk-mq-tag.h"
+ 	spin_lock_irqsave(&mapping->tree_lock, flags);
+-	if (page->mapping) {	/* Race with truncate? */
++	if (page_mapping(page)) {	/* Race with truncate? */
+ 		WARN_ON_ONCE(warn && !PageUptodate(page));
+ 		account_page_dirtied(page, mapping);
+ 		radix_tree_tag_set(&mapping->page_tree,
+diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
+index c30562b6e685..e24ccf4c3694 100644
+--- a/fs/ext4/inode.c
++++ b/fs/ext4/inode.c
+@@ -1237,7 +1237,7 @@ static int ext4_write_begin(struct file *file, struct address_space *mapping,
+ 	}
  
- struct blk_mq_debugfs_attr {
- 	const char *name;
-@@ -154,6 +155,73 @@ static const struct file_operations hctx_ctx_map_fops = {
- 	.release	= single_release,
- };
+ 	lock_page(page);
+-	if (page->mapping != mapping) {
++	if (page_mapping(page) != mapping) {
+ 		/* The page got truncated from under us */
+ 		unlock_page(page);
+ 		put_page(page);
+@@ -2975,7 +2975,7 @@ static int ext4_da_write_begin(struct file *file, struct address_space *mapping,
+ 	}
  
-+static void blk_mq_debugfs_tags_show(struct seq_file *m,
-+				     struct blk_mq_tags *tags)
-+{
-+	seq_printf(m, "nr_tags=%u\n", tags->nr_tags);
-+	seq_printf(m, "nr_reserved_tags=%u\n", tags->nr_reserved_tags);
-+	seq_printf(m, "active_queues=%d\n",
-+		   atomic_read(&tags->active_queues));
-+
-+	seq_puts(m, "\nbitmap_tags:\n");
-+	sbitmap_queue_show(&tags->bitmap_tags, m);
-+
-+	if (tags->nr_reserved_tags) {
-+		seq_puts(m, "\nbreserved_tags:\n");
-+		sbitmap_queue_show(&tags->breserved_tags, m);
-+	}
-+}
-+
-+static int hctx_tags_show(struct seq_file *m, void *v)
-+{
-+	struct blk_mq_hw_ctx *hctx = m->private;
-+	struct request_queue *q = hctx->queue;
-+
-+	mutex_lock(&q->sysfs_lock);
-+	if (hctx->tags)
-+		blk_mq_debugfs_tags_show(m, hctx->tags);
-+	mutex_unlock(&q->sysfs_lock);
-+
-+	return 0;
-+}
-+
-+static int hctx_tags_open(struct inode *inode, struct file *file)
-+{
-+	return single_open(file, hctx_tags_show, inode->i_private);
-+}
-+
-+static const struct file_operations hctx_tags_fops = {
-+	.open		= hctx_tags_open,
-+	.read		= seq_read,
-+	.llseek		= seq_lseek,
-+	.release	= single_release,
-+};
-+
-+static int hctx_sched_tags_show(struct seq_file *m, void *v)
-+{
-+	struct blk_mq_hw_ctx *hctx = m->private;
-+	struct request_queue *q = hctx->queue;
-+
-+	mutex_lock(&q->sysfs_lock);
-+	if (hctx->sched_tags)
-+		blk_mq_debugfs_tags_show(m, hctx->sched_tags);
-+	mutex_unlock(&q->sysfs_lock);
-+
-+	return 0;
-+}
-+
-+static int hctx_sched_tags_open(struct inode *inode, struct file *file)
-+{
-+	return single_open(file, hctx_sched_tags_show, inode->i_private);
-+}
-+
-+static const struct file_operations hctx_sched_tags_fops = {
-+	.open		= hctx_sched_tags_open,
-+	.read		= seq_read,
-+	.llseek		= seq_lseek,
-+	.release	= single_release,
-+};
-+
- static void *ctx_rq_list_start(struct seq_file *m, loff_t *pos)
+ 	lock_page(page);
+-	if (page->mapping != mapping) {
++	if (page_mapping(page) != mapping) {
+ 		/* The page got truncated from under us */
+ 		unlock_page(page);
+ 		put_page(page);
+diff --git a/mm/filemap.c b/mm/filemap.c
+index 01a0f63fa597..7921a7f3cd2e 100644
+--- a/mm/filemap.c
++++ b/mm/filemap.c
+@@ -399,7 +399,7 @@ static int __filemap_fdatawait_range(struct address_space *mapping,
+ 			struct page *page = pvec.pages[i];
+ 
+ 			/* until radix tree lookup accepts end_index */
+-			if (page->index > end)
++			if (page_to_pgoff(page) > end)
+ 				continue;
+ 
+ 			page = compound_head(page);
+@@ -1364,7 +1364,7 @@ struct page *pagecache_get_page(struct address_space *mapping, pgoff_t offset,
+ 		}
+ 
+ 		/* Has the page been truncated? */
+-		if (unlikely(page->mapping != mapping)) {
++		if (unlikely(page_mapping(page) != mapping)) {
+ 			unlock_page(page);
+ 			put_page(page);
+ 			goto repeat;
+@@ -1641,7 +1641,8 @@ unsigned find_get_pages_contig(struct address_space *mapping, pgoff_t start,
+ 		 * otherwise we can get both false positives and false
+ 		 * negatives, which is just confusing to the caller.
+ 		 */
+-		if (page->mapping == NULL || page_to_pgoff(page) != index) {
++		if (page_mapping(page) == NULL ||
++				page_to_pgoff(page) != index) {
+ 			put_page(page);
+ 			break;
+ 		}
+@@ -1929,7 +1930,7 @@ static ssize_t do_generic_file_read(struct file *filp, loff_t *ppos,
+ 			if (!trylock_page(page))
+ 				goto page_not_up_to_date;
+ 			/* Did it get truncated before we got the lock? */
+-			if (!page->mapping)
++			if (!page_mapping(page))
+ 				goto page_not_up_to_date_locked;
+ 			if (!mapping->a_ops->is_partially_uptodate(page,
+ 							offset, iter->count))
+@@ -2009,7 +2010,7 @@ static ssize_t do_generic_file_read(struct file *filp, loff_t *ppos,
+ 
+ page_not_up_to_date_locked:
+ 		/* Did it get truncated before we got the lock? */
+-		if (!page->mapping) {
++		if (!page_mapping(page)) {
+ 			unlock_page(page);
+ 			put_page(page);
+ 			continue;
+@@ -2045,7 +2046,7 @@ static ssize_t do_generic_file_read(struct file *filp, loff_t *ppos,
+ 			if (unlikely(error))
+ 				goto readpage_error;
+ 			if (!PageUptodate(page)) {
+-				if (page->mapping == NULL) {
++				if (page_mapping(page) == NULL) {
+ 					/*
+ 					 * invalidate_mapping_pages got it
+ 					 */
+@@ -2344,12 +2345,12 @@ int filemap_fault(struct vm_area_struct *vma, struct vm_fault *vmf)
+ 	}
+ 
+ 	/* Did it get truncated? */
+-	if (unlikely(page->mapping != mapping)) {
++	if (unlikely(page_mapping(page) != mapping)) {
+ 		unlock_page(page);
+ 		put_page(page);
+ 		goto retry_find;
+ 	}
+-	VM_BUG_ON_PAGE(page->index != offset, page);
++	VM_BUG_ON_PAGE(page_to_pgoff(page) != offset, page);
+ 
+ 	/*
+ 	 * We have a locked page in the page cache, now we need to check
+@@ -2525,7 +2526,7 @@ int filemap_page_mkwrite(struct vm_area_struct *vma, struct vm_fault *vmf)
+ 	sb_start_pagefault(inode->i_sb);
+ 	file_update_time(vma->vm_file);
+ 	lock_page(page);
+-	if (page->mapping != inode->i_mapping) {
++	if (page_mapping(page) != inode->i_mapping) {
+ 		unlock_page(page);
+ 		ret = VM_FAULT_NOPAGE;
+ 		goto out;
+@@ -2674,7 +2675,7 @@ static struct page *do_read_cache_page(struct address_space *mapping,
+ 	lock_page(page);
+ 
+ 	/* Case c or d, restart the operation */
+-	if (!page->mapping) {
++	if (!page_mapping(page)) {
+ 		unlock_page(page);
+ 		put_page(page);
+ 		goto repeat;
+@@ -3130,12 +3131,13 @@ EXPORT_SYMBOL(generic_file_write_iter);
+  */
+ int try_to_release_page(struct page *page, gfp_t gfp_mask)
  {
- 	struct blk_mq_ctx *ctx = m->private;
-@@ -200,6 +268,8 @@ static const struct blk_mq_debugfs_attr blk_mq_debugfs_hctx_attrs[] = {
- 	{"flags", 0400, &hctx_flags_fops},
- 	{"dispatch", 0400, &hctx_dispatch_fops},
- 	{"ctx_map", 0400, &hctx_ctx_map_fops},
-+	{"tags", 0400, &hctx_tags_fops},
-+	{"sched_tags", 0400, &hctx_sched_tags_fops},
- };
+-	struct address_space * const mapping = page->mapping;
++	struct address_space * const mapping = page_mapping(page);
  
- static const struct blk_mq_debugfs_attr blk_mq_debugfs_ctx_attrs[] = {
-diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
-index ee3694d8c4ee..a0ae1f536ed0 100644
---- a/block/blk-mq-sysfs.c
-+++ b/block/blk-mq-sysfs.c
-@@ -184,17 +184,16 @@ static ssize_t blk_mq_hw_sysfs_dispatched_show(struct blk_mq_hw_ctx *hctx,
- 	return page - start_page;
- }
+ 	BUG_ON(!PageLocked(page));
+ 	if (PageWriteback(page))
+ 		return 0;
  
--static ssize_t blk_mq_hw_sysfs_sched_tags_show(struct blk_mq_hw_ctx *hctx, char *page)
-+static ssize_t blk_mq_hw_sysfs_nr_tags_show(struct blk_mq_hw_ctx *hctx,
-+					    char *page)
++	page = compound_head(page);
+ 	if (mapping && mapping->a_ops->releasepage)
+ 		return mapping->a_ops->releasepage(page, gfp_mask);
+ 	return try_to_free_buffers(page);
+diff --git a/mm/memory.c b/mm/memory.c
+index 903d9d3e01c0..86ab6ead5ecc 100644
+--- a/mm/memory.c
++++ b/mm/memory.c
+@@ -2049,7 +2049,7 @@ static int do_page_mkwrite(struct vm_fault *vmf)
+ 		return ret;
+ 	if (unlikely(!(ret & VM_FAULT_LOCKED))) {
+ 		lock_page(page);
+-		if (!page->mapping) {
++		if (!page_mapping(page)) {
+ 			unlock_page(page);
+ 			return 0; /* retry */
+ 		}
+diff --git a/mm/page-writeback.c b/mm/page-writeback.c
+index d7b905d66add..3ebbac70681f 100644
+--- a/mm/page-writeback.c
++++ b/mm/page-writeback.c
+@@ -2869,7 +2869,7 @@ EXPORT_SYMBOL(mapping_tagged);
+  */
+ void wait_for_stable_page(struct page *page)
  {
--	if (hctx->sched_tags)
--		return blk_mq_tag_sysfs_show(hctx->sched_tags, page);
--
--	return 0;
-+	return sprintf(page, "%u\n", hctx->tags->nr_tags);
+-	if (bdi_cap_stable_pages_required(inode_to_bdi(page->mapping->host)))
++	if (bdi_cap_stable_pages_required(inode_to_bdi(page_mapping(page)->host)))
+ 		wait_on_page_writeback(page);
  }
- 
--static ssize_t blk_mq_hw_sysfs_tags_show(struct blk_mq_hw_ctx *hctx, char *page)
-+static ssize_t blk_mq_hw_sysfs_nr_reserved_tags_show(struct blk_mq_hw_ctx *hctx,
-+						     char *page)
+ EXPORT_SYMBOL_GPL(wait_for_stable_page);
+diff --git a/mm/truncate.c b/mm/truncate.c
+index d7f5db6ff0f2..6d4629888d95 100644
+--- a/mm/truncate.c
++++ b/mm/truncate.c
+@@ -620,6 +620,7 @@ invalidate_complete_page2(struct address_space *mapping, struct page *page)
  {
--	return blk_mq_tag_sysfs_show(hctx->tags, page);
-+	return sprintf(page, "%u\n", hctx->tags->nr_reserved_tags);
- }
+ 	unsigned long flags;
  
- static ssize_t blk_mq_hw_sysfs_active_show(struct blk_mq_hw_ctx *hctx, char *page)
-@@ -293,18 +292,18 @@ static struct blk_mq_hw_ctx_sysfs_entry blk_mq_hw_sysfs_dispatched = {
- 	.attr = {.name = "dispatched", .mode = S_IRUGO },
- 	.show = blk_mq_hw_sysfs_dispatched_show,
- };
-+static struct blk_mq_hw_ctx_sysfs_entry blk_mq_hw_sysfs_nr_tags = {
-+	.attr = {.name = "nr_tags", .mode = S_IRUGO },
-+	.show = blk_mq_hw_sysfs_nr_tags_show,
-+};
-+static struct blk_mq_hw_ctx_sysfs_entry blk_mq_hw_sysfs_nr_reserved_tags = {
-+	.attr = {.name = "nr_reserved_tags", .mode = S_IRUGO },
-+	.show = blk_mq_hw_sysfs_nr_reserved_tags_show,
-+};
- static struct blk_mq_hw_ctx_sysfs_entry blk_mq_hw_sysfs_active = {
- 	.attr = {.name = "active", .mode = S_IRUGO },
- 	.show = blk_mq_hw_sysfs_active_show,
- };
--static struct blk_mq_hw_ctx_sysfs_entry blk_mq_hw_sysfs_sched_tags = {
--	.attr = {.name = "sched_tags", .mode = S_IRUGO },
--	.show = blk_mq_hw_sysfs_sched_tags_show,
--};
--static struct blk_mq_hw_ctx_sysfs_entry blk_mq_hw_sysfs_tags = {
--	.attr = {.name = "tags", .mode = S_IRUGO },
--	.show = blk_mq_hw_sysfs_tags_show,
--};
- static struct blk_mq_hw_ctx_sysfs_entry blk_mq_hw_sysfs_cpus = {
- 	.attr = {.name = "cpu_list", .mode = S_IRUGO },
- 	.show = blk_mq_hw_sysfs_cpus_show,
-@@ -324,8 +323,8 @@ static struct attribute *default_hw_ctx_attrs[] = {
- 	&blk_mq_hw_sysfs_queued.attr,
- 	&blk_mq_hw_sysfs_run.attr,
- 	&blk_mq_hw_sysfs_dispatched.attr,
--	&blk_mq_hw_sysfs_tags.attr,
--	&blk_mq_hw_sysfs_sched_tags.attr,
-+	&blk_mq_hw_sysfs_nr_tags.attr,
-+	&blk_mq_hw_sysfs_nr_reserved_tags.attr,
- 	&blk_mq_hw_sysfs_cpus.attr,
- 	&blk_mq_hw_sysfs_active.attr,
- 	&blk_mq_hw_sysfs_poll.attr,
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index 1b156ca79af6..f8de2dbbb29f 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -329,11 +329,6 @@ void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_iter_fn *fn,
++	page = compound_head(page);
+ 	if (page->mapping != mapping)
+ 		return 0;
  
- }
- 
--static unsigned int bt_unused_tags(const struct sbitmap_queue *bt)
--{
--	return bt->sb.depth - sbitmap_weight(&bt->sb);
--}
--
- static int bt_alloc(struct sbitmap_queue *bt, unsigned int depth,
- 		    bool round_robin, int node)
+@@ -648,7 +649,7 @@ static int do_launder_page(struct address_space *mapping, struct page *page)
  {
-@@ -469,25 +464,3 @@ u32 blk_mq_unique_tag(struct request *rq)
- 		(rq->tag & BLK_MQ_UNIQUE_TAG_MASK);
+ 	if (!PageDirty(page))
+ 		return 0;
+-	if (page->mapping != mapping || mapping->a_ops->launder_page == NULL)
++	if (page_mapping(page) != mapping || mapping->a_ops->launder_page == NULL)
+ 		return 0;
+ 	return mapping->a_ops->launder_page(page);
  }
- EXPORT_SYMBOL(blk_mq_unique_tag);
--
--ssize_t blk_mq_tag_sysfs_show(struct blk_mq_tags *tags, char *page)
--{
--	char *orig_page = page;
--	unsigned int free, res;
--
--	if (!tags)
--		return 0;
--
--	page += sprintf(page, "nr_tags=%u, reserved_tags=%u, "
--			"bits_per_word=%u\n",
--			tags->nr_tags, tags->nr_reserved_tags,
--			1U << tags->bitmap_tags.sb.shift);
--
--	free = bt_unused_tags(&tags->bitmap_tags);
--	res = bt_unused_tags(&tags->breserved_tags);
--
--	page += sprintf(page, "nr_free=%u, nr_reserved=%u\n", free, res);
--	page += sprintf(page, "active_queues=%u\n", atomic_read(&tags->active_queues));
--
--	return page - orig_page;
--}
-diff --git a/block/blk-mq-tag.h b/block/blk-mq-tag.h
-index ac22878462e7..63497423c5cd 100644
---- a/block/blk-mq-tag.h
-+++ b/block/blk-mq-tag.h
-@@ -28,7 +28,6 @@ extern unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data);
- extern void blk_mq_put_tag(struct blk_mq_hw_ctx *hctx, struct blk_mq_tags *tags,
- 			   struct blk_mq_ctx *ctx, unsigned int tag);
- extern bool blk_mq_has_free_tags(struct blk_mq_tags *tags);
--extern ssize_t blk_mq_tag_sysfs_show(struct blk_mq_tags *tags, char *page);
- extern int blk_mq_tag_update_depth(struct blk_mq_hw_ctx *hctx,
- 					struct blk_mq_tags **tags,
- 					unsigned int depth, bool can_grow);
+@@ -698,7 +699,7 @@ int invalidate_inode_pages2_range(struct address_space *mapping,
+ 
+ 			lock_page(page);
+ 			WARN_ON(page_to_pgoff(page) != index);
+-			if (page->mapping != mapping) {
++			if (page_mapping(page) != mapping) {
+ 				unlock_page(page);
+ 				continue;
+ 			}
 -- 
 2.11.0
 
