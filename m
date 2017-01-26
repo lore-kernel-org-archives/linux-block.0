@@ -1,69 +1,40 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv6 08/37] filemap: handle huge pages in do_generic_file_read()
-Date: Thu, 26 Jan 2017 14:57:50 +0300
-Message-Id: <20170126115819.58875-9-kirill.shutemov@linux.intel.com>
-In-Reply-To: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
-References: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+Subject: Re: [PATCH 15/16] block: split scsi_request out of struct request
+To: Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bart.vanassche@sandisk.com>
+References: <1485185361-29786-1-git-send-email-hch@lst.de>
+ <1485185361-29786-16-git-send-email-hch@lst.de>
+ <455a58ef-905c-abf9-ae59-ca98f003f31e@sandisk.com>
+ <20170126193734.GA26037@lst.de>
+CC: Mike Snitzer <snitzer@redhat.com>, <linux-block@vger.kernel.org>,
+        <linux-scsi@vger.kernel.org>, <dm-devel@redhat.com>
+From: Jens Axboe <axboe@fb.com>
+Message-ID: <ea250084-d740-375b-a1d0-9a2b51b04cbe@fb.com>
+Date: Thu, 26 Jan 2017 12:42:32 -0700
+MIME-Version: 1.0
+In-Reply-To: <20170126193734.GA26037@lst.de>
+Content-Type: text/plain; charset="windows-1252"
+Sender: linux-scsi-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Most of work happans on head page. Only when we need to do copy data to
-userspace we find relevant subpage.
+On 01/26/2017 12:37 PM, Christoph Hellwig wrote:
+> On Thu, Jan 26, 2017 at 11:12:51AM -0800, Bart Van Assche wrote:
+>> Where does the '* 3' come from? I think that deserves a comment.
+>> Additionally, this patch introduces a new warning when building with W=1:
+> 
+> It's a magic factor copied from the old code :(
+> 
+> That beeing said I really wonder if we should keep the tracing for
+> the scsi_requests fields at all.  We have tracing in SCSI, and poking
+> into these SCSI fields from block code is painful and just screams
+> layering violations.
+> 
+> Jens, any opinion on just removing the printout of the SCSI CDB
+> for blktrace?
 
-We are still limited by PAGE_SIZE per iteration. Lifting this limitation
-would require some more work.
+Kill it with fire, I don't think there's much value to having it
+there to begin with.
 
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
----
- mm/filemap.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/mm/filemap.c b/mm/filemap.c
-index 301327685a71..6cba69176ea9 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -1886,6 +1886,7 @@ static ssize_t do_generic_file_read(struct file *filp, loff_t *ppos,
- 			if (unlikely(page == NULL))
- 				goto no_cached_page;
- 		}
-+		page = compound_head(page);
- 		if (PageReadahead(page)) {
- 			page_cache_async_readahead(mapping,
- 					ra, filp, page,
-@@ -1967,7 +1968,8 @@ static ssize_t do_generic_file_read(struct file *filp, loff_t *ppos,
- 		 * now we can copy it to user space...
- 		 */
- 
--		ret = copy_page_to_iter(page, offset, nr, iter);
-+		ret = copy_page_to_iter(page + index - page->index, offset,
-+				nr, iter);
- 		offset += ret;
- 		index += offset >> PAGE_SHIFT;
- 		offset &= ~PAGE_MASK;
-@@ -2385,6 +2387,7 @@ int filemap_fault(struct vm_area_struct *vma, struct vm_fault *vmf)
- 	 * because there really aren't any performance issues here
- 	 * and we need to check for errors.
- 	 */
-+	page = compound_head(page);
- 	ClearPageError(page);
- 	error = mapping->a_ops->readpage(file, page);
- 	if (!error) {
 -- 
-2.11.0
+Jens Axboe
 
