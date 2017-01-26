@@ -1,400 +1,246 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wj0-f193.google.com ([209.85.210.193]:33739 "EHLO
-        mail-wj0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751032AbdAWMAU (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Jan 2017 07:00:20 -0500
-Received: by mail-wj0-f193.google.com with SMTP id un2so1731633wjb.0
-        for <linux-block@vger.kernel.org>; Mon, 23 Jan 2017 03:59:50 -0800 (PST)
-From: "=?UTF-8?q?Matias=20Bj=C3=B8rling?=" <m@bjorling.me>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>,
-        "Simon A . F . Lund" <slund@cnexlabs.com>
-Subject: [PATCH 8/8] lightnvm: add ioctls for vector I/Os
-Date: Mon, 23 Jan 2017 12:59:19 +0100
-Message-Id: <20170123115919.14339-9-matias@cnexlabs.com>
-In-Reply-To: <20170123115919.14339-1-matias@cnexlabs.com>
-References: <20170123115919.14339-1-matias@cnexlabs.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Received: from mga11.intel.com ([192.55.52.93]:43461 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753273AbdAZL7H (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 26 Jan 2017 06:59:07 -0500
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv6 20/37] truncate: make truncate_inode_pages_range() aware about huge pages
+Date: Thu, 26 Jan 2017 14:58:02 +0300
+Message-Id: <20170126115819.58875-21-kirill.shutemov@linux.intel.com>
+In-Reply-To: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
+References: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Enable user-space to issue vector I/O commands through ioctls. To issue
-a vector I/O, the ppa list with addresses is also required and must be
-mapped for the controller to access.
+As with shmem_undo_range(), truncate_inode_pages_range() removes huge
+pages, if it fully within range.
 
-For each ioctl, the result and status bits are returned as well, such
-that user-space can retrieve the open-channel SSD completion bits.
+Partial truncate of huge pages zero out this part of THP.
 
-The implementation covers the traditional use-cases of bad block
-management, and vectored read/write/erase.
+Unlike with shmem, it doesn't prevent us having holes in the middle of
+huge page we still can skip writeback not touched buffers.
 
-Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
-Metadata implementation, test, and fixes.
-Signed-off-by: Simon A.F. Lund <slund@cnexlabs.com>
-Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
+With memory-mapped IO we would loose holes in some cases when we have
+THP in page cache, since we cannot track access on 4k level in this
+case.
 
-Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- drivers/nvme/host/core.c      |   4 +
- drivers/nvme/host/lightnvm.c  | 220 ++++++++++++++++++++++++++++++++++++++++++
- drivers/nvme/host/nvme.h      |   6 ++
- include/uapi/linux/lightnvm.h |  50 ++++++++++
- 4 files changed, 280 insertions(+)
+ fs/buffer.c        |  2 +-
+ include/linux/mm.h |  9 +++++-
+ mm/truncate.c      | 86 ++++++++++++++++++++++++++++++++++++++++++++----------
+ 3 files changed, 80 insertions(+), 17 deletions(-)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 2fc86dc..037ee99 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -784,6 +784,10 @@ static int nvme_ioctl(struct block_device *bdev, fmode_t mode,
- 		return nvme_sg_io(ns, (void __user *)arg);
- #endif
- 	default:
-+#ifdef CONFIG_NVM
-+		if (ns->ndev)
-+			return nvme_nvm_ioctl(ns, cmd, arg);
-+#endif
- 		return -ENOTTY;
- 	}
- }
-diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
-index 733992a..dafdee5 100644
---- a/drivers/nvme/host/lightnvm.c
-+++ b/drivers/nvme/host/lightnvm.c
-@@ -26,6 +26,8 @@
- #include <linux/bitops.h>
- #include <linux/lightnvm.h>
- #include <linux/vmalloc.h>
-+#include <linux/sched/sysctl.h>
-+#include <uapi/linux/lightnvm.h>
+diff --git a/fs/buffer.c b/fs/buffer.c
+index 17167b299d0f..f92090fed933 100644
+--- a/fs/buffer.c
++++ b/fs/buffer.c
+@@ -1534,7 +1534,7 @@ void block_invalidatepage(struct page *page, unsigned int offset,
+ 	/*
+ 	 * Check for overflow
+ 	 */
+-	BUG_ON(stop > PAGE_SIZE || stop < length);
++	BUG_ON(stop > hpage_size(page) || stop < length);
  
- enum nvme_nvm_admin_opcode {
- 	nvme_nvm_admin_identity		= 0xe2,
-@@ -583,6 +585,224 @@ static struct nvm_dev_ops nvme_nvm_dev_ops = {
- 	.max_phys_sect		= 64,
- };
+ 	head = page_buffers(page);
+ 	bh = head;
+diff --git a/include/linux/mm.h b/include/linux/mm.h
+index 9e87155af456..41a97260f865 100644
+--- a/include/linux/mm.h
++++ b/include/linux/mm.h
+@@ -1328,8 +1328,15 @@ int get_kernel_page(unsigned long start, int write, struct page **pages);
+ struct page *get_dump_page(unsigned long addr);
  
-+static void nvme_nvm_end_user_vio(struct request *rq, int error)
+ extern int try_to_release_page(struct page * page, gfp_t gfp_mask);
+-extern void do_invalidatepage(struct page *page, unsigned int offset,
++extern void __do_invalidatepage(struct page *page, unsigned int offset,
+ 			      unsigned int length);
++static inline void do_invalidatepage(struct page *page, unsigned int offset,
++		unsigned int length)
 +{
-+	struct completion *waiting = rq->end_io_data;
-+
-+	complete(waiting);
++	if (page_has_private(page))
++		__do_invalidatepage(page, offset, length);
 +}
 +
-+static int nvme_nvm_submit_user_cmd(struct request_queue *q,
-+				struct nvme_ns *ns,
-+				struct nvme_nvm_command *vcmd,
-+				void __user *ubuf, unsigned int bufflen,
-+				void __user *meta_buf, unsigned int meta_len,
-+				void __user *ppa_buf, unsigned int ppa_len,
-+				u32 *result, u64 *status, unsigned int timeout)
-+{
-+	bool write = nvme_is_write((struct nvme_command *)vcmd);
-+	struct nvm_dev *dev = ns->ndev;
-+	struct gendisk *disk = ns->disk;
-+	struct request *rq;
-+	struct bio *bio = NULL;
-+	__le64 *ppa_list = NULL;
-+	dma_addr_t ppa_dma;
-+	__le64 *metadata = NULL;
-+	dma_addr_t metadata_dma;
-+	DECLARE_COMPLETION_ONSTACK(wait);
-+	int ret;
+ 
+ int __set_page_dirty_nobuffers(struct page *page);
+ int __set_page_dirty_no_writeback(struct page *page);
+diff --git a/mm/truncate.c b/mm/truncate.c
+index 3a1a1c1a654e..81e1a13acb63 100644
+--- a/mm/truncate.c
++++ b/mm/truncate.c
+@@ -112,12 +112,12 @@ static int invalidate_exceptional_entry2(struct address_space *mapping,
+  * point.  Because the caller is about to free (and possibly reuse) those
+  * blocks on-disk.
+  */
+-void do_invalidatepage(struct page *page, unsigned int offset,
++void __do_invalidatepage(struct page *page, unsigned int offset,
+ 		       unsigned int length)
+ {
+ 	void (*invalidatepage)(struct page *, unsigned int, unsigned int);
+ 
+-	invalidatepage = page->mapping->a_ops->invalidatepage;
++	invalidatepage = page_mapping(page)->a_ops->invalidatepage;
+ #ifdef CONFIG_BLOCK
+ 	if (!invalidatepage)
+ 		invalidatepage = block_invalidatepage;
+@@ -142,8 +142,7 @@ truncate_complete_page(struct address_space *mapping, struct page *page)
+ 	if (page->mapping != mapping)
+ 		return -EIO;
+ 
+-	if (page_has_private(page))
+-		do_invalidatepage(page, 0, PAGE_SIZE);
++	do_invalidatepage(page, 0, hpage_size(page));
+ 
+ 	/*
+ 	 * Some filesystems seem to re-dirty the page even after
+@@ -316,13 +315,35 @@ void truncate_inode_pages_range(struct address_space *mapping,
+ 				unlock_page(page);
+ 				continue;
+ 			}
 +
-+	rq = nvme_alloc_request(q, (struct nvme_command *)vcmd, 0,
-+			NVME_QID_ANY);
-+	if (IS_ERR(rq)) {
-+		ret = -ENOMEM;
-+		goto err_cmd;
-+	}
++			if (PageTransHuge(page)) {
++				int j, first = 0, last = HPAGE_PMD_NR - 1;
 +
-+	rq->timeout = timeout ? timeout : ADMIN_TIMEOUT;
++				if (start > page->index)
++					first = start & (HPAGE_PMD_NR - 1);
++				if (index == round_down(end, HPAGE_PMD_NR))
++					last = (end - 1) & (HPAGE_PMD_NR - 1);
 +
-+	rq->cmd_flags &= ~REQ_FAILFAST_DRIVER;
-+	rq->end_io_data = &wait;
-+
-+	if (ppa_buf && ppa_len) {
-+		ppa_list = dma_pool_alloc(dev->dma_pool, GFP_KERNEL, &ppa_dma);
-+		if (!ppa_list) {
-+			ret = -ENOMEM;
-+			goto err_rq;
-+		}
-+		if (copy_from_user(ppa_list, (void __user *)ppa_buf,
-+						sizeof(u64) * (ppa_len + 1))) {
-+			ret = -EFAULT;
-+			goto err_ppa;
-+		}
-+		vcmd->ph_rw.spba = cpu_to_le64(ppa_dma);
-+	} else {
-+		vcmd->ph_rw.spba = cpu_to_le64((uintptr_t)ppa_buf);
-+	}
-+
-+	if (ubuf && bufflen) {
-+		ret = blk_rq_map_user(q, rq, NULL, ubuf, bufflen, GFP_KERNEL);
-+		if (ret)
-+			goto err_ppa;
-+		bio = rq->bio;
-+
-+		if (meta_buf && meta_len) {
-+			metadata = dma_pool_alloc(dev->dma_pool, GFP_KERNEL,
-+								&metadata_dma);
-+			if (!metadata) {
-+				ret = -ENOMEM;
-+				goto err_map;
-+			}
-+
-+			if (write) {
-+				if (copy_from_user(metadata,
-+						(void __user *)meta_buf,
-+						meta_len)) {
-+					ret = -EFAULT;
-+					goto err_meta;
++				/* Range starts or ends in the middle of THP */
++				if (first != 0 || last != HPAGE_PMD_NR - 1) {
++					int off, len;
++					for (j = first; j <= last; j++)
++						clear_highpage(page + j);
++					off = first * PAGE_SIZE;
++					len = (last + 1) * PAGE_SIZE - off;
++					do_invalidatepage(page, off, len);
++					unlock_page(page);
++					continue;
 +				}
 +			}
-+			vcmd->ph_rw.metadata = cpu_to_le64(metadata_dma);
-+		}
 +
-+		if (!disk)
-+			goto submit;
+ 			truncate_inode_page(mapping, page);
+ 			unlock_page(page);
+ 		}
+ 		pagevec_remove_exceptionals(&pvec);
++		index += pvec.nr ? hpage_nr_pages(pvec.pages[pvec.nr - 1]) : 1;
+ 		pagevec_release(&pvec);
+ 		cond_resched();
+-		index++;
+ 	}
+ 
+ 	if (partial_start) {
+@@ -337,9 +358,12 @@ void truncate_inode_pages_range(struct address_space *mapping,
+ 			wait_on_page_writeback(page);
+ 			zero_user_segment(page, partial_start, top);
+ 			cleancache_invalidate_page(mapping, page);
+-			if (page_has_private(page))
+-				do_invalidatepage(page, partial_start,
+-						  top - partial_start);
++			if (page_has_private(page)) {
++				int off = page - compound_head(page);
++				do_invalidatepage(compound_head(page),
++						off * PAGE_SIZE + partial_start,
++						top - partial_start);
++			}
+ 			unlock_page(page);
+ 			put_page(page);
+ 		}
+@@ -350,9 +374,12 @@ void truncate_inode_pages_range(struct address_space *mapping,
+ 			wait_on_page_writeback(page);
+ 			zero_user_segment(page, 0, partial_end);
+ 			cleancache_invalidate_page(mapping, page);
+-			if (page_has_private(page))
+-				do_invalidatepage(page, 0,
+-						  partial_end);
++			if (page_has_private(page)) {
++				int off = page - compound_head(page);
++				do_invalidatepage(compound_head(page),
++						off * PAGE_SIZE,
++						partial_end);
++			}
+ 			unlock_page(page);
+ 			put_page(page);
+ 		}
+@@ -366,7 +393,7 @@ void truncate_inode_pages_range(struct address_space *mapping,
+ 
+ 	index = start;
+ 	for ( ; ; ) {
+-		cond_resched();
++restart:	cond_resched();
+ 		if (!pagevec_lookup_entries(&pvec, mapping, index,
+ 			min(end - index, (pgoff_t)PAGEVEC_SIZE), indices)) {
+ 			/* If all gone from start onwards, we're done */
+@@ -389,8 +416,8 @@ void truncate_inode_pages_range(struct address_space *mapping,
+ 			index = indices[i];
+ 			if (index >= end) {
+ 				/* Restart punch to make sure all gone */
+-				index = start - 1;
+-				break;
++				index = start;
++				goto restart;
+ 			}
+ 
+ 			if (radix_tree_exceptional_entry(page)) {
+@@ -402,12 +429,41 @@ void truncate_inode_pages_range(struct address_space *mapping,
+ 			lock_page(page);
+ 			WARN_ON(page_to_index(page) != index);
+ 			wait_on_page_writeback(page);
 +
-+		bio->bi_bdev = bdget_disk(disk, 0);
-+		if (!bio->bi_bdev) {
-+			ret = -ENODEV;
-+			goto err_meta;
-+		}
-+	}
++			if (PageTransHuge(page)) {
++				int j, first = 0, last = HPAGE_PMD_NR - 1;
 +
-+submit:
-+	blk_execute_rq_nowait(q, NULL, rq, 0, nvme_nvm_end_user_vio);
++				if (start > page->index)
++					first = start & (HPAGE_PMD_NR - 1);
++				if (index == round_down(end, HPAGE_PMD_NR))
++					last = (end - 1) & (HPAGE_PMD_NR - 1);
 +
-+	wait_for_completion_io(&wait);
++				/*
++				 * On Partial thp truncate due 'start' in
++				 * middle of THP: don't need to look on these
++				 * pages again on !pvec.nr restart.
++				 */
++				start = page->index + HPAGE_PMD_NR;
 +
-+	ret = nvme_error_status(rq->errors);
-+	if (result)
-+		*result = rq->errors & 0x7ff;
-+	if (status)
-+		*status = le64_to_cpu(nvme_req(rq)->result.u64);
++				/* Range starts or ends in the middle of THP */
++				if (first != 0 || last != HPAGE_PMD_NR - 1) {
++					int off, len;
++					for (j = first; j <= last; j++)
++						clear_highpage(page + j);
++					off = first * PAGE_SIZE;
++					len = (last + 1) * PAGE_SIZE - off;
++					do_invalidatepage(page, off, len);
++					unlock_page(page);
++					continue;
++				}
++			}
 +
-+	if (metadata && !ret && !write) {
-+		if (copy_to_user(meta_buf, (void *)metadata, meta_len))
-+			ret = -EFAULT;
-+	}
-+err_meta:
-+	if (meta_len)
-+		dma_pool_free(dev->dma_pool, metadata, metadata_dma);
-+err_map:
-+	if (bio) {
-+		if (disk && bio->bi_bdev)
-+			bdput(bio->bi_bdev);
-+		blk_rq_unmap_user(bio);
-+	}
-+err_ppa:
-+	if (ppa_len)
-+		dma_pool_free(dev->dma_pool, ppa_list, ppa_dma);
-+err_rq:
-+	blk_mq_free_request(rq);
-+err_cmd:
-+	return ret;
-+}
-+
-+static int nvme_nvm_submit_vio(struct nvme_ns *ns,
-+					struct nvm_user_vio __user *uvio)
-+{
-+	struct nvm_user_vio vio;
-+	struct nvme_nvm_command c;
-+	unsigned int length;
-+	int ret;
-+
-+	if (copy_from_user(&vio, uvio, sizeof(vio)))
-+		return -EFAULT;
-+	if (vio.flags)
-+		return -EINVAL;
-+
-+	memset(&c, 0, sizeof(c));
-+	c.ph_rw.opcode = vio.opcode;
-+	c.ph_rw.nsid = cpu_to_le32(ns->ns_id);
-+	c.ph_rw.control = cpu_to_le16(vio.control);
-+	c.ph_rw.length = cpu_to_le16(vio.nppas);
-+
-+	length = (vio.nppas + 1) << ns->lba_shift;
-+
-+	ret = nvme_nvm_submit_user_cmd(ns->queue, ns, &c,
-+			(void __user *)(uintptr_t)vio.addr, length,
-+			(void __user *)(uintptr_t)vio.metadata,
-+							vio.metadata_len,
-+			(void __user *)(uintptr_t)vio.ppa_list, vio.nppas,
-+			&vio.result, &vio.status, 0);
-+
-+	if (ret && copy_to_user(uvio, &vio, sizeof(vio)))
-+		return -EFAULT;
-+
-+	return ret;
-+}
-+
-+static int nvme_nvm_user_vcmd(struct nvme_ns *ns, int admin,
-+					struct nvm_passthru_vio __user *uvcmd)
-+{
-+	struct nvm_passthru_vio vcmd;
-+	struct nvme_nvm_command c;
-+	struct request_queue *q;
-+	unsigned int timeout = 0;
-+	int ret;
-+
-+	if (copy_from_user(&vcmd, uvcmd, sizeof(vcmd)))
-+		return -EFAULT;
-+	if ((vcmd.opcode != 0xF2) && (!capable(CAP_SYS_ADMIN)))
-+		return -EACCES;
-+	if (vcmd.flags)
-+		return -EINVAL;
-+
-+	memset(&c, 0, sizeof(c));
-+	c.common.opcode = vcmd.opcode;
-+	c.common.nsid = cpu_to_le32(ns->ns_id);
-+	c.common.cdw2[0] = cpu_to_le32(vcmd.cdw2);
-+	c.common.cdw2[1] = cpu_to_le32(vcmd.cdw3);
-+	/* cdw11-12 */
-+	c.ph_rw.length = cpu_to_le16(vcmd.nppas);
-+	c.ph_rw.control  = cpu_to_le32(vcmd.control);
-+	c.common.cdw10[3] = cpu_to_le32(vcmd.cdw13);
-+	c.common.cdw10[4] = cpu_to_le32(vcmd.cdw14);
-+	c.common.cdw10[5] = cpu_to_le32(vcmd.cdw15);
-+
-+	if (vcmd.timeout_ms)
-+		timeout = msecs_to_jiffies(vcmd.timeout_ms);
-+
-+	q = admin ? ns->ctrl->admin_q : ns->queue;
-+
-+	ret = nvme_nvm_submit_user_cmd(q, ns,
-+			(struct nvme_nvm_command *)&c,
-+			(void __user *)(uintptr_t)vcmd.addr, vcmd.data_len,
-+			(void __user *)(uintptr_t)vcmd.metadata,
-+							vcmd.metadata_len,
-+			(void __user *)(uintptr_t)vcmd.ppa_list, vcmd.nppas,
-+			&vcmd.result, &vcmd.status, timeout);
-+
-+	if (ret && copy_to_user(uvcmd, &vcmd, sizeof(vcmd)))
-+		return -EFAULT;
-+
-+	return ret;
-+}
-+
-+int nvme_nvm_ioctl(struct nvme_ns *ns, unsigned int cmd, unsigned long arg)
-+{
-+	switch (cmd) {
-+	case NVME_NVM_IOCTL_ADMIN_VIO:
-+		return nvme_nvm_user_vcmd(ns, 1, (void __user *)arg);
-+	case NVME_NVM_IOCTL_IO_VIO:
-+		return nvme_nvm_user_vcmd(ns, 0, (void __user *)arg);
-+	case NVME_NVM_IOCTL_SUBMIT_VIO:
-+		return nvme_nvm_submit_vio(ns, (void __user *)arg);
-+	default:
-+		return -ENOTTY;
-+	}
-+}
-+
- int nvme_nvm_register(struct nvme_ns *ns, char *disk_name, int node)
- {
- 	struct request_queue *q = ns->queue;
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index 6377e14..330713c 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -326,6 +326,7 @@ int nvme_nvm_register(struct nvme_ns *ns, char *disk_name, int node);
- void nvme_nvm_unregister(struct nvme_ns *ns);
- int nvme_nvm_register_sysfs(struct nvme_ns *ns);
- void nvme_nvm_unregister_sysfs(struct nvme_ns *ns);
-+int nvme_nvm_ioctl(struct nvme_ns *ns, unsigned int cmd, unsigned long arg);
- #else
- static inline int nvme_nvm_register(struct nvme_ns *ns, char *disk_name,
- 				    int node)
-@@ -343,6 +344,11 @@ static inline int nvme_nvm_ns_supported(struct nvme_ns *ns, struct nvme_id_ns *i
- {
- 	return 0;
+ 			truncate_inode_page(mapping, page);
+ 			unlock_page(page);
+ 		}
+ 		pagevec_remove_exceptionals(&pvec);
++		index += pvec.nr ? hpage_nr_pages(pvec.pages[pvec.nr - 1]) : 1;
+ 		pagevec_release(&pvec);
+-		index++;
+ 	}
+ 	cleancache_invalidate_inode(mapping);
  }
-+static inline int nvme_nvm_ioctl(struct nvme_ns *ns, unsigned int cmd,
-+							unsigned long arg)
-+{
-+	return -ENOTTY;
-+}
- #endif /* CONFIG_NVM */
- 
- static inline struct nvme_ns *nvme_get_ns_from_dev(struct device *dev)
-diff --git a/include/uapi/linux/lightnvm.h b/include/uapi/linux/lightnvm.h
-index 774a431..fd19f36 100644
---- a/include/uapi/linux/lightnvm.h
-+++ b/include/uapi/linux/lightnvm.h
-@@ -122,6 +122,44 @@ struct nvm_ioctl_dev_factory {
- 	__u32 flags;
- };
- 
-+struct nvm_user_vio {
-+	__u8 opcode;
-+	__u8 flags;
-+	__u16 control;
-+	__u16 nppas;
-+	__u16 rsvd;
-+	__u64 metadata;
-+	__u64 addr;
-+	__u64 ppa_list;
-+	__u32 metadata_len;
-+	__u32 data_len;
-+	__u64 status;
-+	__u32 result;
-+	__u32 rsvd3[3];
-+};
-+
-+struct nvm_passthru_vio {
-+	__u8 opcode;
-+	__u8 flags;
-+	__u8 rsvd[2];
-+	__u32 nsid;
-+	__u32 cdw2;
-+	__u32 cdw3;
-+	__u64 metadata;
-+	__u64 addr;
-+	__u32 metadata_len;
-+	__u32 data_len;
-+	__u64 ppa_list;
-+	__u16 nppas;
-+	__u16 control;
-+	__u32 cdw13;
-+	__u32 cdw14;
-+	__u32 cdw15;
-+	__u64 status;
-+	__u32 result;
-+	__u32 timeout_ms;
-+};
-+
- /* The ioctl type, 'L', 0x20 - 0x2F documented in ioctl-number.txt */
- enum {
- 	/* top level cmds */
-@@ -137,6 +175,11 @@ enum {
- 
- 	/* Factory reset device */
- 	NVM_DEV_FACTORY_CMD,
-+
-+	/* Vector user I/O */
-+	NVM_DEV_VIO_ADMIN_CMD = 0x41,
-+	NVM_DEV_VIO_CMD = 0x42,
-+	NVM_DEV_VIO_USER_CMD = 0x43,
- };
- 
- #define NVM_IOCTL 'L' /* 0x4c */
-@@ -154,6 +197,13 @@ enum {
- #define NVM_DEV_FACTORY		_IOW(NVM_IOCTL, NVM_DEV_FACTORY_CMD, \
- 						struct nvm_ioctl_dev_factory)
- 
-+#define NVME_NVM_IOCTL_IO_VIO		_IOWR(NVM_IOCTL, NVM_DEV_VIO_USER_CMD, \
-+						struct nvm_passthru_vio)
-+#define NVME_NVM_IOCTL_ADMIN_VIO	_IOWR(NVM_IOCTL, NVM_DEV_VIO_ADMIN_CMD,\
-+						struct nvm_passthru_vio)
-+#define NVME_NVM_IOCTL_SUBMIT_VIO	_IOWR(NVM_IOCTL, NVM_DEV_VIO_CMD,\
-+						struct nvm_user_vio)
-+
- #define NVM_VERSION_MAJOR	1
- #define NVM_VERSION_MINOR	0
- #define NVM_VERSION_PATCHLEVEL	0
 -- 
-2.7.4
+2.11.0
 
