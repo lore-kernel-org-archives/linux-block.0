@@ -1,148 +1,95 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga06.intel.com ([134.134.136.31]:64074 "EHLO mga06.intel.com"
+Received: from mga05.intel.com ([192.55.52.43]:48629 "EHLO mga05.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750873AbdA1Imf (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 28 Jan 2017 03:42:35 -0500
-Subject: [RFC PATCH 14/17] ext2, ext4,
- xfs: retrieve dax_inode through iomap operations
-From: Dan Williams <dan.j.williams@intel.com>
-To: linux-nvdimm@lists.01.org
-Cc: snitzer@redhat.com, toshi.kani@hpe.com, mawilcox@microsoft.com,
-        linux-block@vger.kernel.org, jmoyer@redhat.com,
-        linux-fsdevel@vger.kernel.org, ross.zwisler@linux.intel.com,
-        hch@lst.de
-Date: Sat, 28 Jan 2017 00:37:19 -0800
-Message-ID: <148559263958.11180.13062024115072920011.stgit@dwillia2-desk3.amr.corp.intel.com>
-In-Reply-To: <148559256378.11180.8957776806175202312.stgit@dwillia2-desk3.amr.corp.intel.com>
-References: <148559256378.11180.8957776806175202312.stgit@dwillia2-desk3.amr.corp.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+        id S1753266AbdAZL7J (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 26 Jan 2017 06:59:09 -0500
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv6 21/37] truncate: make invalidate_inode_pages2_range() aware about huge pages
+Date: Thu, 26 Jan 2017 14:58:03 +0300
+Message-Id: <20170126115819.58875-22-kirill.shutemov@linux.intel.com>
+In-Reply-To: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
+References: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-In preparation for converting fs/dax.c to use bdev_dax_direct_access()
-instead of bdev_direct_access(), add the plumbing to retrieve the
-dax_inode determined at mount through ->iomap_begin.
+For huge pages we need to unmap whole range covered by the huge page.
 
-Signed-off-by: Dan Williams <dan.j.williams@intel.com>
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- fs/ext2/inode.c       |    1 +
- fs/ext4/inode.c       |    1 +
- fs/xfs/xfs_aops.c     |   13 +++++++++++++
- fs/xfs/xfs_aops.h     |    1 +
- fs/xfs/xfs_buf.h      |    1 +
- fs/xfs/xfs_iomap.c    |    1 +
- fs/xfs/xfs_super.c    |    3 +++
- include/linux/iomap.h |    1 +
- 8 files changed, 22 insertions(+)
+ mm/truncate.c | 23 ++++++++++++++---------
+ 1 file changed, 14 insertions(+), 9 deletions(-)
 
-diff --git a/fs/ext2/inode.c b/fs/ext2/inode.c
-index f073bfca694b..c83f84748ec9 100644
---- a/fs/ext2/inode.c
-+++ b/fs/ext2/inode.c
-@@ -813,6 +813,7 @@ static int ext2_iomap_begin(struct inode *inode, loff_t offset, loff_t length,
- 
- 	iomap->flags = 0;
- 	iomap->bdev = inode->i_sb->s_bdev;
-+	iomap->dax_inode = inode->i_sb->s_dax;
- 	iomap->offset = (u64)first_block << blkbits;
- 
- 	if (ret == 0) {
-diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
-index 88d57af1b516..ae6fa6a78d0d 100644
---- a/fs/ext4/inode.c
-+++ b/fs/ext4/inode.c
-@@ -3344,6 +3344,7 @@ static int ext4_iomap_begin(struct inode *inode, loff_t offset, loff_t length,
- 
- 	iomap->flags = 0;
- 	iomap->bdev = inode->i_sb->s_bdev;
-+	iomap->dax_inode = inode->i_sb->s_dax;
- 	iomap->offset = first_block << blkbits;
- 
- 	if (ret == 0) {
-diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
-index 631e7c0e0a29..7d22938a4d8b 100644
---- a/fs/xfs/xfs_aops.c
-+++ b/fs/xfs/xfs_aops.c
-@@ -80,6 +80,19 @@ xfs_find_bdev_for_inode(
- 		return mp->m_ddev_targp->bt_bdev;
- }
- 
-+struct dax_inode *
-+xfs_find_dax_for_inode(
-+	struct inode		*inode)
-+{
-+	struct xfs_inode	*ip = XFS_I(inode);
-+	struct xfs_mount	*mp = ip->i_mount;
+diff --git a/mm/truncate.c b/mm/truncate.c
+index 81e1a13acb63..ddb615e6a193 100644
+--- a/mm/truncate.c
++++ b/mm/truncate.c
+@@ -703,27 +703,32 @@ int invalidate_inode_pages2_range(struct address_space *mapping,
+ 				continue;
+ 			}
+ 			wait_on_page_writeback(page);
 +
-+	if (XFS_IS_REALTIME_INODE(ip))
-+		return NULL;
-+	else
-+		return mp->m_ddev_targp->bt_dax;
-+}
+ 			if (page_mapped(page)) {
++				loff_t begin, len;
 +
- /*
-  * We're now finished for good with this page.  Update the page state via the
-  * associated buffer_heads, paying attention to the start and end offsets that
-diff --git a/fs/xfs/xfs_aops.h b/fs/xfs/xfs_aops.h
-index cc174ec6c2fd..e5b65f436acf 100644
---- a/fs/xfs/xfs_aops.h
-+++ b/fs/xfs/xfs_aops.h
-@@ -59,5 +59,6 @@ int	xfs_setfilesize(struct xfs_inode *ip, xfs_off_t offset, size_t size);
- 
- extern void xfs_count_page_state(struct page *, int *, int *);
- extern struct block_device *xfs_find_bdev_for_inode(struct inode *);
-+extern struct dax_inode *xfs_find_dax_for_inode(struct inode *);
- 
- #endif /* __XFS_AOPS_H__ */
-diff --git a/fs/xfs/xfs_buf.h b/fs/xfs/xfs_buf.h
-index 8a9d3a9599f0..1ff83f398649 100644
---- a/fs/xfs/xfs_buf.h
-+++ b/fs/xfs/xfs_buf.h
-@@ -109,6 +109,7 @@ typedef unsigned int xfs_buf_flags_t;
- typedef struct xfs_buftarg {
- 	dev_t			bt_dev;
- 	struct block_device	*bt_bdev;
-+	struct dax_inode	*bt_dax;
- 	struct backing_dev_info	*bt_bdi;
- 	struct xfs_mount	*bt_mount;
- 	unsigned int		bt_meta_sectorsize;
-diff --git a/fs/xfs/xfs_iomap.c b/fs/xfs/xfs_iomap.c
-index 0d147428971e..1d08bd2433d5 100644
---- a/fs/xfs/xfs_iomap.c
-+++ b/fs/xfs/xfs_iomap.c
-@@ -69,6 +69,7 @@ xfs_bmbt_to_iomap(
- 	iomap->offset = XFS_FSB_TO_B(mp, imap->br_startoff);
- 	iomap->length = XFS_FSB_TO_B(mp, imap->br_blockcount);
- 	iomap->bdev = xfs_find_bdev_for_inode(VFS_I(ip));
-+	iomap->dax_inode = xfs_find_dax_for_inode(VFS_I(ip));
- }
- 
- xfs_extlen_t
-diff --git a/fs/xfs/xfs_super.c b/fs/xfs/xfs_super.c
-index eecbaac08eba..1a99013a0701 100644
---- a/fs/xfs/xfs_super.c
-+++ b/fs/xfs/xfs_super.c
-@@ -774,6 +774,9 @@ xfs_open_devices(
- 	if (!mp->m_ddev_targp)
- 		goto out_close_rtdev;
- 
-+	/* associate dax inode for filesystem-dax */
-+	mp->m_ddev_targp->bt_dax = mp->m_super->s_dax;
-+
- 	if (rtdev) {
- 		mp->m_rtdev_targp = xfs_alloc_buftarg(mp, rtdev);
- 		if (!mp->m_rtdev_targp)
-diff --git a/include/linux/iomap.h b/include/linux/iomap.h
-index a4c94b86401e..01e265e7cf55 100644
---- a/include/linux/iomap.h
-+++ b/include/linux/iomap.h
-@@ -41,6 +41,7 @@ struct iomap {
- 	u16			type;	/* type of mapping */
- 	u16			flags;	/* flags for mapping */
- 	struct block_device	*bdev;	/* block device for I/O */
-+	struct dax_inode	*dax_inode; /* dax_inode for dax operations */
- };
- 
- /*
++				begin = index << PAGE_SHIFT;
+ 				if (!did_range_unmap) {
+ 					/*
+ 					 * Zap the rest of the file in one hit.
+ 					 */
++					len = (loff_t)(1 + end - index) <<
++						PAGE_SHIFT;
++					if (len < hpage_size(page))
++						len = hpage_size(page);
+ 					unmap_mapping_range(mapping,
+-					   (loff_t)index << PAGE_SHIFT,
+-					   (loff_t)(1 + end - index)
+-							 << PAGE_SHIFT,
+-							 0);
++							begin, len, 0);
+ 					did_range_unmap = 1;
+ 				} else {
+ 					/*
+ 					 * Just zap this page
+ 					 */
+-					unmap_mapping_range(mapping,
+-					   (loff_t)index << PAGE_SHIFT,
+-					   PAGE_SIZE, 0);
++					len = hpage_size(page);
++					unmap_mapping_range(mapping, begin,
++							len, 0);
+ 				}
+ 			}
+-			BUG_ON(page_mapped(page));
++			VM_BUG_ON_PAGE(page_mapped(page), page);
+ 			ret2 = do_launder_page(mapping, page);
+ 			if (ret2 == 0) {
+ 				if (!invalidate_complete_page2(mapping, page))
+@@ -734,9 +739,9 @@ int invalidate_inode_pages2_range(struct address_space *mapping,
+ 			unlock_page(page);
+ 		}
+ 		pagevec_remove_exceptionals(&pvec);
++		index += pvec.nr ? hpage_nr_pages(pvec.pages[pvec.nr - 1]) : 1;
+ 		pagevec_release(&pvec);
+ 		cond_resched();
+-		index++;
+ 	}
+ 	cleancache_invalidate_inode(mapping);
+ 	return ret;
+-- 
+2.11.0
 
