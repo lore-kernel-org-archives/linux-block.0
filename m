@@ -1,47 +1,117 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-yb0-f176.google.com ([209.85.213.176]:33446 "EHLO
-        mail-yb0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751977AbdATNlS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 Jan 2017 08:41:18 -0500
-Received: by mail-yb0-f176.google.com with SMTP id w194so54026191ybe.0
-        for <linux-block@vger.kernel.org>; Fri, 20 Jan 2017 05:41:17 -0800 (PST)
-MIME-Version: 1.0
-From: Suraj Choudhari <surajschoudhari@gmail.com>
-Date: Fri, 20 Jan 2017 19:11:16 +0530
-Message-ID: <CAGvB2rO4MXAmThRaVh5-OUsXJ5bYiDngor5O9KZYvT=Xx7gRZg@mail.gmail.com>
-Subject: Doubt related to immutable biovecs
-To: linux-block@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv6 13/37] mm: make write_cache_pages() work on huge pages
+Date: Thu, 26 Jan 2017 14:57:55 +0300
+Message-Id: <20170126115819.58875-14-kirill.shutemov@linux.intel.com>
+In-Reply-To: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
+References: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Hello,
+We writeback whole huge page a time. Let's adjust iteration this way.
 
-I've some queries related to accessing the 'bio_vec' and 'bi_vcnt'
-members in the BIO structure after the kernel changes implemented for
-the 'immutable biovecs' -
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+---
+ include/linux/mm.h      |  1 +
+ include/linux/pagemap.h |  1 +
+ mm/page-writeback.c     | 17 ++++++++++++-----
+ 3 files changed, 14 insertions(+), 5 deletions(-)
 
-Background -
--  From the changes done for the immutable biovecs, I understand that
-the driver code now no longer needs to reference the 'bi_vcnt' and
-'bi_io_vec' fields directly. Instead we can use the 'bvec_iter'
-iterator in order to to access the bio_vec.
--  We've iterator functions bio_iter_iovec() and bio_advance_iter() as
-well, which return us literal 'struct biovecs' taking into account the
-bi_bvec_done and bi_size values.
+diff --git a/include/linux/mm.h b/include/linux/mm.h
+index b84615b0f64c..9e87155af456 100644
+--- a/include/linux/mm.h
++++ b/include/linux/mm.h
+@@ -1045,6 +1045,7 @@ extern pgoff_t __page_file_index(struct page *page);
+  */
+ static inline pgoff_t page_index(struct page *page)
+ {
++	page = compound_head(page);
+ 	if (unlikely(PageSwapCache(page)))
+ 		return __page_file_index(page);
+ 	return page->index;
+diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
+index 9a93b9c3d662..e3eb6dc03286 100644
+--- a/include/linux/pagemap.h
++++ b/include/linux/pagemap.h
+@@ -545,6 +545,7 @@ static inline int wait_on_page_locked_killable(struct page *page)
+  */
+ static inline void wait_on_page_writeback(struct page *page)
+ {
++	page = compound_head(page);
+ 	if (PageWriteback(page))
+ 		wait_on_page_bit(page, PG_writeback);
+ }
+diff --git a/mm/page-writeback.c b/mm/page-writeback.c
+index 290e8b7d3181..47d5b12c460e 100644
+--- a/mm/page-writeback.c
++++ b/mm/page-writeback.c
+@@ -2209,7 +2209,7 @@ int write_cache_pages(struct address_space *mapping,
+ 			 * mapping. However, page->index will not change
+ 			 * because we have a reference on the page.
+ 			 */
+-			if (page->index > end) {
++			if (page_to_pgoff(page) > end) {
+ 				/*
+ 				 * can't be range_cyclic (1st pass) because
+ 				 * end == -1 in that case.
+@@ -2218,7 +2218,12 @@ int write_cache_pages(struct address_space *mapping,
+ 				break;
+ 			}
+ 
+-			done_index = page->index;
++			done_index = page_to_pgoff(page);
++			if (PageTransCompound(page)) {
++				index = round_up(index + 1, HPAGE_PMD_NR);
++				i += HPAGE_PMD_NR -
++					done_index % HPAGE_PMD_NR - 1;
++			}
+ 
+ 			lock_page(page);
+ 
+@@ -2230,7 +2235,7 @@ int write_cache_pages(struct address_space *mapping,
+ 			 * even if there is now a new, dirty page at the same
+ 			 * pagecache address.
+ 			 */
+-			if (unlikely(page->mapping != mapping)) {
++			if (unlikely(page_mapping(page) != mapping)) {
+ continue_unlock:
+ 				unlock_page(page);
+ 				continue;
+@@ -2268,7 +2273,8 @@ int write_cache_pages(struct address_space *mapping,
+ 					 * not be suitable for data integrity
+ 					 * writeout).
+ 					 */
+-					done_index = page->index + 1;
++					done_index = compound_head(page)->index
++						+ hpage_nr_pages(page);
+ 					done = 1;
+ 					break;
+ 				}
+@@ -2280,7 +2286,8 @@ int write_cache_pages(struct address_space *mapping,
+ 			 * keep going until we have written all the pages
+ 			 * we tagged for writeback prior to entering this loop.
+ 			 */
+-			if (--wbc->nr_to_write <= 0 &&
++			wbc->nr_to_write -= hpage_nr_pages(page);
++			if (wbc->nr_to_write <= 0 &&
+ 			    wbc->sync_mode == WB_SYNC_NONE) {
+ 				done = 1;
+ 				break;
+-- 
+2.11.0
 
-Doubts  -
-1)  Few functions in the block layer and some drivers still directly
-refer to the 'bi_vcnt' and 'bio_vec' members of the BIO structure
-[instead of accessing bio_vecs using the bvec_iter iterator].
-Would there be some changes in the functions to compulsorily use the
-'bvec_iter' in order to access bio_vecs?  If yes, are such changes
-related to the 'multipage biovec' feature ?
-
-2)  Can there be some problem if a driver directly accesses the
-bi_io_vec [bio_vec] in the bio structure based on the values of bi_idx
-and bi_vcnt ? [instead of using the bvec_iter iterator].
-
-Thanks & Regards,
-Suraj
