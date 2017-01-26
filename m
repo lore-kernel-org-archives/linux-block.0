@@ -1,79 +1,124 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga14.intel.com ([192.55.52.115]:29049 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750713AbdANAUK (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Jan 2017 19:20:10 -0500
-Date: Fri, 13 Jan 2017 17:20:08 -0700
-From: Ross Zwisler <ross.zwisler@linux.intel.com>
-To: lsf-pc@lists.linux-foundation.org
-Cc: linux-fsdevel@vger.kernel.org, linux-nvdimm@lists.01.org,
-        linux-block@vger.kernel.org, linux-mm@kvack.org
-Subject: [LSF/MM TOPIC] Future direction of DAX
-Message-ID: <20170114002008.GA25379@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Received: from mail-lf0-f46.google.com ([209.85.215.46]:32958 "EHLO
+        mail-lf0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753104AbdAZPFD (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 26 Jan 2017 10:05:03 -0500
+Received: by mail-lf0-f46.google.com with SMTP id x1so60238489lff.0
+        for <linux-block@vger.kernel.org>; Thu, 26 Jan 2017 07:05:02 -0800 (PST)
+From: Linus Walleij <linus.walleij@linaro.org>
+To: linux-mmc@vger.kernel.org, linux-block@vger.kernel.org,
+        Ulf Hansson <ulf.hansson@linaro.org>
+Cc: Chunyan Zhang <zhang.chunyan@linaro.org>,
+        Baolin Wang <baolin.wang@linaro.org>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Linus Walleij <linus.walleij@linaro.org>
+Subject: [PATCH 6/6] mmc: queue: turn queue flags into bools
+Date: Thu, 26 Jan 2017 16:04:33 +0100
+Message-Id: <20170126150433.14038-6-linus.walleij@linaro.org>
+In-Reply-To: <20170126150433.14038-1-linus.walleij@linaro.org>
+References: <20170126150433.14038-1-linus.walleij@linaro.org>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-This past year has seen a lot of new DAX development.  We have added support
-for fsync/msync, moved to the new iomap I/O data structure, introduced radix
-tree based locking, re-enabled PMD support (twice!), and have fixed a bunch of
-bugs.
+Instead of masking and setting two bits in the "flags" field
+for the mmc_queue, just use two bools named "suspended" and
+"new_request".
 
-We still have a lot of work to do, though, and I'd like to propose a discussion
-around what features people would like to see enabled in the coming year as
-well as what what use cases their customers have that we might not be aware of.
+The masking and setting would likely have race conditions
+anyways, it is better to use a simple member like this.
 
-Here are a few topics to start the conversation:
+Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+---
+ drivers/mmc/core/block.c |  6 +++---
+ drivers/mmc/core/queue.c | 12 ++++++------
+ drivers/mmc/core/queue.h |  5 ++---
+ 3 files changed, 11 insertions(+), 12 deletions(-)
 
-- The current plan to allow users to safely flush dirty data from userspace is
-  built around the PMEM_IMMUTABLE feature [1].  I'm hoping that by LSF/MM we
-  will have at least started work on PMEM_IMMUTABLE, but I'm guessing there
-  will be more to discuss.
+diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
+index 04c7162f444e..7be50ebf300f 100644
+--- a/drivers/mmc/core/block.c
++++ b/drivers/mmc/core/block.c
+@@ -1665,7 +1665,7 @@ static void mmc_blk_issue_rw_rq(struct mmc_queue *mq, struct request *new_req)
+ 			 * complete.
+ 			 */
+ 			if (status == MMC_BLK_NEW_REQUEST)
+-				mq->flags |= MMC_QUEUE_NEW_REQUEST;
++				mq->new_request = true;
+ 			return;
+ 		}
+ 
+@@ -1804,7 +1804,7 @@ void mmc_blk_issue_rq(struct mmc_queue *mq, struct request *req)
+ 		goto out;
+ 	}
+ 
+-	mq->flags &= ~MMC_QUEUE_NEW_REQUEST;
++	mq->new_request = false;
+ 	if (req && req_op(req) == REQ_OP_DISCARD) {
+ 		/* complete ongoing async transfer before issuing discard */
+ 		if (card->host->areq)
+@@ -1825,7 +1825,7 @@ void mmc_blk_issue_rq(struct mmc_queue *mq, struct request *req)
+ 	}
+ 
+ out:
+-	if ((!req && !(mq->flags & MMC_QUEUE_NEW_REQUEST)) || req_is_special)
++	if ((!req && !mq->new_request) || req_is_special)
+ 		/*
+ 		 * Release host when there are no more requests
+ 		 * and after special request(discard, flush) is done.
+diff --git a/drivers/mmc/core/queue.c b/drivers/mmc/core/queue.c
+index 611f5c6d1950..5cb369c2664b 100644
+--- a/drivers/mmc/core/queue.c
++++ b/drivers/mmc/core/queue.c
+@@ -86,8 +86,8 @@ static int mmc_queue_thread(void *d)
+ 			set_current_state(TASK_RUNNING);
+ 			mmc_blk_issue_rq(mq, req);
+ 			cond_resched();
+-			if (mq->flags & MMC_QUEUE_NEW_REQUEST) {
+-				mq->flags &= ~MMC_QUEUE_NEW_REQUEST;
++			if (mq->new_request) {
++				mq->new_request = false;
+ 				continue; /* fetch again */
+ 			}
+ 
+@@ -401,8 +401,8 @@ void mmc_queue_suspend(struct mmc_queue *mq)
+ 	struct request_queue *q = mq->queue;
+ 	unsigned long flags;
+ 
+-	if (!(mq->flags & MMC_QUEUE_SUSPENDED)) {
+-		mq->flags |= MMC_QUEUE_SUSPENDED;
++	if (!mq->suspended) {
++		mq->suspended |= true;
+ 
+ 		spin_lock_irqsave(q->queue_lock, flags);
+ 		blk_stop_queue(q);
+@@ -421,8 +421,8 @@ void mmc_queue_resume(struct mmc_queue *mq)
+ 	struct request_queue *q = mq->queue;
+ 	unsigned long flags;
+ 
+-	if (mq->flags & MMC_QUEUE_SUSPENDED) {
+-		mq->flags &= ~MMC_QUEUE_SUSPENDED;
++	if (mq->suspended) {
++		mq->suspended = false;
+ 
+ 		up(&mq->thread_sem);
+ 
+diff --git a/drivers/mmc/core/queue.h b/drivers/mmc/core/queue.h
+index e0cd5b1f40ee..e298f100101b 100644
+--- a/drivers/mmc/core/queue.h
++++ b/drivers/mmc/core/queue.h
+@@ -40,9 +40,8 @@ struct mmc_queue {
+ 	struct mmc_card		*card;
+ 	struct task_struct	*thread;
+ 	struct semaphore	thread_sem;
+-	unsigned int		flags;
+-#define MMC_QUEUE_SUSPENDED	(1 << 0)
+-#define MMC_QUEUE_NEW_REQUEST	(1 << 1)
++	bool			new_request;
++	bool			suspended;
+ 	bool			asleep;
+ 	struct mmc_blk_data	*blkdata;
+ 	struct request_queue	*queue;
+-- 
+2.9.3
 
-- The DAX fsync/msync model was built for platforms that need to flush dirty
-  processor cache lines in order to make data durable on NVDIMMs.  There exist
-  platforms, however, that are set up so that the processor caches are
-  effectively part of the ADR safe zone.  This means that dirty data can be
-  assumed to be durable even in the processor cache, obviating the need to
-  manually flush the cache during fsync/msync.  These platforms still need to
-  call fsync/msync to ensure that filesystem metadata updates are properly
-  written to media.  Our first idea on how to properly support these platforms
-  would be for DAX to be made aware that in some cases doesn't need to keep
-  metadata about dirty cache lines.  A similar issue exists for volatile uses
-  of DAX such as with BRD or with PMEM and the memmap command line parameter,
-  and we'd like a solution that covers them all.
-
-- If I recall correctly, at one point Dave Chinner suggested that we change
-  DAX so that I/O would use cached stores instead of the non-temporal stores
-  that it currently uses.  We would then track pages that were written to by
-  DAX in the radix tree so that they would be flushed later during
-  fsync/msync.  Does this sound like a win?  Also, assuming that we can find a
-  solution for platforms where the processor cache is part of the ADR safe
-  zone (above topic) this would be a clear improvement, moving us from using
-  non-temporal stores to faster cached stores with no downside.
-
-- Jan suggested [2] that we could use the radix tree as a cache to service DAX
-  faults without needing to call into the filesystem.  Are there any issues
-  with this approach, and should we move forward with it as an optimization?
-
-- Whenever you mount a filesystem with DAX, it spits out a message that says
-  "DAX enabled. Warning: EXPERIMENTAL, use at your own risk".  What criteria
-  needs to be met for DAX to no longer be considered experimental?
-
-- When we msync() a huge page, if the range is less than the entire huge page,
-  should we flush the entire huge page and mark it clean in the radix tree, or
-  should we only flush the requested range and leave the radix tree entry
-  dirty?
-
-- Should we enable 1 GiB huge pages in filesystem DAX?  Does anyone have any
-  specific customer requests for this or performance data suggesting it would
-  be a win?  If so, what work needs to be done to get 1 GiB sized and aligned
-  filesystem block allocations, to get the required enabling in the MM layer,
-  etc?
-
-Thanks,
-- Ross
-
-[1] https://lkml.org/lkml/2016/12/19/571
-[2] https://lkml.org/lkml/2016/10/12/70
