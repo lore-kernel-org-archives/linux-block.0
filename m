@@ -1,87 +1,196 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga07.intel.com ([134.134.136.100]:55662 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753623AbdAZL72 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 26 Jan 2017 06:59:28 -0500
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv6 32/37] ext4: make EXT4_IOC_MOVE_EXT work with huge pages
-Date: Thu, 26 Jan 2017 14:58:14 +0300
-Message-Id: <20170126115819.58875-33-kirill.shutemov@linux.intel.com>
-In-Reply-To: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
-References: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
+Received: from mail-lf0-f43.google.com ([209.85.215.43]:35208 "EHLO
+        mail-lf0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753104AbdAZPEs (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 26 Jan 2017 10:04:48 -0500
+Received: by mail-lf0-f43.google.com with SMTP id n124so146577060lfd.2
+        for <linux-block@vger.kernel.org>; Thu, 26 Jan 2017 07:04:47 -0800 (PST)
+From: Linus Walleij <linus.walleij@linaro.org>
+To: linux-mmc@vger.kernel.org, linux-block@vger.kernel.org,
+        Ulf Hansson <ulf.hansson@linaro.org>
+Cc: Chunyan Zhang <zhang.chunyan@linaro.org>,
+        Baolin Wang <baolin.wang@linaro.org>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Linus Walleij <linus.walleij@linaro.org>
+Subject: [PATCH 2/6] mmc: block: rename rqc and req
+Date: Thu, 26 Jan 2017 16:04:29 +0100
+Message-Id: <20170126150433.14038-2-linus.walleij@linaro.org>
+In-Reply-To: <20170126150433.14038-1-linus.walleij@linaro.org>
+References: <20170126150433.14038-1-linus.walleij@linaro.org>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Adjust how we find relevant block within page and how we clear the
-required part of the page.
+In the function mmc_blk_issue_rw_rq() the new request coming in
+from the block layer is called "rqc" and the old request that
+was potentially just returned back from the asynchronous
+mechanism is called "req".
 
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+This is really confusing when trying to analyze and understand
+the code, it becomes a perceptual nightmare to me. Maybe others
+have better parserheads but it is not working for me.
+
+Rename "rqc" to "new_req" and "req" to "old_req" to reflect what
+is semantically going on into the syntax.
+
+Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
 ---
- fs/ext4/move_extent.c | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+ drivers/mmc/core/block.c | 56 ++++++++++++++++++++++++------------------------
+ 1 file changed, 28 insertions(+), 28 deletions(-)
 
-diff --git a/fs/ext4/move_extent.c b/fs/ext4/move_extent.c
-index 6fc14def0c70..2efa9deb47a9 100644
---- a/fs/ext4/move_extent.c
-+++ b/fs/ext4/move_extent.c
-@@ -210,7 +210,9 @@ mext_page_mkuptodate(struct page *page, unsigned from, unsigned to)
- 				return err;
- 			}
- 			if (!buffer_mapped(bh)) {
--				zero_user(page, block_start, blocksize);
-+				zero_user(page + block_start / PAGE_SIZE,
-+						block_start % PAGE_SIZE,
-+						blocksize);
- 				set_buffer_uptodate(bh);
- 				continue;
- 			}
-@@ -267,10 +269,11 @@ move_extent_per_page(struct file *o_filp, struct inode *donor_inode,
- 	unsigned int tmp_data_size, data_size, replaced_size;
- 	int i, err2, jblocks, retries = 0;
- 	int replaced_count = 0;
--	int from = data_offset_in_page << orig_inode->i_blkbits;
-+	int from;
- 	int blocks_per_page = PAGE_SIZE >> orig_inode->i_blkbits;
- 	struct super_block *sb = orig_inode->i_sb;
- 	struct buffer_head *bh = NULL;
-+	int diff;
- 
- 	/*
- 	 * It needs twice the amount of ordinary journal buffers because
-@@ -355,6 +358,9 @@ move_extent_per_page(struct file *o_filp, struct inode *donor_inode,
- 		goto unlock_pages;
+diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
+index 8f91d7ddfc56..aaade079603e 100644
+--- a/drivers/mmc/core/block.c
++++ b/drivers/mmc/core/block.c
+@@ -1616,7 +1616,7 @@ static void mmc_blk_rw_start_new(struct mmc_queue *mq, struct mmc_card *card,
  	}
- data_copy:
-+	diff = (pagep[0] - compound_head(pagep[0])) * blocks_per_page;
-+	from = (data_offset_in_page + diff) << orig_inode->i_blkbits;
-+	pagep[0] = compound_head(pagep[0]);
- 	*err = mext_page_mkuptodate(pagep[0], from, from + replaced_size);
- 	if (*err)
- 		goto unlock_pages;
-@@ -384,7 +390,7 @@ move_extent_per_page(struct file *o_filp, struct inode *donor_inode,
- 	if (!page_has_buffers(pagep[0]))
- 		create_empty_buffers(pagep[0], 1 << orig_inode->i_blkbits, 0);
- 	bh = page_buffers(pagep[0]);
--	for (i = 0; i < data_offset_in_page; i++)
-+	for (i = 0; i < data_offset_in_page + diff; i++)
- 		bh = bh->b_this_page;
- 	for (i = 0; i < block_len_in_page; i++) {
- 		*err = ext4_get_block(orig_inode, orig_blk_offset + i, bh, 0);
+ }
+ 
+-static void mmc_blk_issue_rw_rq(struct mmc_queue *mq, struct request *rqc)
++static void mmc_blk_issue_rw_rq(struct mmc_queue *mq, struct request *new_req)
+ {
+ 	struct mmc_blk_data *md = mq->blkdata;
+ 	struct mmc_card *card = md->queue.card;
+@@ -1624,24 +1624,24 @@ static void mmc_blk_issue_rw_rq(struct mmc_queue *mq, struct request *rqc)
+ 	int ret = 1, disable_multi = 0, retry = 0, type, retune_retry_done = 0;
+ 	enum mmc_blk_status status;
+ 	struct mmc_queue_req *mq_rq;
+-	struct request *req;
++	struct request *old_req;
+ 	struct mmc_async_req *new_areq;
+ 	struct mmc_async_req *old_areq;
+ 
+-	if (!rqc && !mq->mqrq_prev->req)
++	if (!new_req && !mq->mqrq_prev->req)
+ 		return;
+ 
+ 	do {
+-		if (rqc) {
++		if (new_req) {
+ 			/*
+ 			 * When 4KB native sector is enabled, only 8 blocks
+ 			 * multiple read or write is allowed
+ 			 */
+ 			if (mmc_large_sector(card) &&
+-				!IS_ALIGNED(blk_rq_sectors(rqc), 8)) {
++				!IS_ALIGNED(blk_rq_sectors(new_req), 8)) {
+ 				pr_err("%s: Transfer size is not 4KB sector size aligned\n",
+-					rqc->rq_disk->disk_name);
+-				mmc_blk_rw_cmd_abort(card, rqc);
++					new_req->rq_disk->disk_name);
++				mmc_blk_rw_cmd_abort(card, new_req);
+ 				return;
+ 			}
+ 
+@@ -1668,8 +1668,8 @@ static void mmc_blk_issue_rw_rq(struct mmc_queue *mq, struct request *rqc)
+ 		 */
+ 		mq_rq =	container_of(old_areq, struct mmc_queue_req, mmc_active);
+ 		brq = &mq_rq->brq;
+-		req = mq_rq->req;
+-		type = rq_data_dir(req) == READ ? MMC_BLK_READ : MMC_BLK_WRITE;
++		old_req = mq_rq->req;
++		type = rq_data_dir(old_req) == READ ? MMC_BLK_READ : MMC_BLK_WRITE;
+ 		mmc_queue_bounce_post(mq_rq);
+ 
+ 		switch (status) {
+@@ -1680,7 +1680,7 @@ static void mmc_blk_issue_rw_rq(struct mmc_queue *mq, struct request *rqc)
+ 			 */
+ 			mmc_blk_reset_success(md, type);
+ 
+-			ret = blk_end_request(req, 0,
++			ret = blk_end_request(old_req, 0,
+ 					brq->data.bytes_xfered);
+ 
+ 			/*
+@@ -1690,21 +1690,21 @@ static void mmc_blk_issue_rw_rq(struct mmc_queue *mq, struct request *rqc)
+ 			 */
+ 			if (status == MMC_BLK_SUCCESS && ret) {
+ 				pr_err("%s BUG rq_tot %d d_xfer %d\n",
+-				       __func__, blk_rq_bytes(req),
++				       __func__, blk_rq_bytes(old_req),
+ 				       brq->data.bytes_xfered);
+-				mmc_blk_rw_cmd_abort(card, req);
++				mmc_blk_rw_cmd_abort(card, old_req);
+ 				return;
+ 			}
+ 			break;
+ 		case MMC_BLK_CMD_ERR:
+-			ret = mmc_blk_cmd_err(md, card, brq, req, ret);
++			ret = mmc_blk_cmd_err(md, card, brq, old_req, ret);
+ 			if (mmc_blk_reset(md, card->host, type)) {
+-				mmc_blk_rw_cmd_abort(card, req);
+-				mmc_blk_rw_start_new(mq, card, rqc);
++				mmc_blk_rw_cmd_abort(card, old_req);
++				mmc_blk_rw_start_new(mq, card, new_req);
+ 				return;
+ 			}
+ 			if (!ret) {
+-				mmc_blk_rw_start_new(mq, card, rqc);
++				mmc_blk_rw_start_new(mq, card, new_req);
+ 				return;
+ 			}
+ 			break;
+@@ -1716,8 +1716,8 @@ static void mmc_blk_issue_rw_rq(struct mmc_queue *mq, struct request *rqc)
+ 		case MMC_BLK_ABORT:
+ 			if (!mmc_blk_reset(md, card->host, type))
+ 				break;
+-			mmc_blk_rw_cmd_abort(card, req);
+-			mmc_blk_rw_start_new(mq, card, rqc);
++			mmc_blk_rw_cmd_abort(card, old_req);
++			mmc_blk_rw_start_new(mq, card, new_req);
+ 			return;
+ 		case MMC_BLK_DATA_ERR: {
+ 			int err;
+@@ -1726,8 +1726,8 @@ static void mmc_blk_issue_rw_rq(struct mmc_queue *mq, struct request *rqc)
+ 			if (!err)
+ 				break;
+ 			if (err == -ENODEV) {
+-				mmc_blk_rw_cmd_abort(card, req);
+-				mmc_blk_rw_start_new(mq, card, rqc);
++				mmc_blk_rw_cmd_abort(card, old_req);
++				mmc_blk_rw_start_new(mq, card, new_req);
+ 				return;
+ 			}
+ 			/* Fall through */
+@@ -1736,7 +1736,7 @@ static void mmc_blk_issue_rw_rq(struct mmc_queue *mq, struct request *rqc)
+ 			if (brq->data.blocks > 1) {
+ 				/* Redo read one sector at a time */
+ 				pr_warn("%s: retrying using single block read\n",
+-					req->rq_disk->disk_name);
++					old_req->rq_disk->disk_name);
+ 				disable_multi = 1;
+ 				break;
+ 			}
+@@ -1745,22 +1745,22 @@ static void mmc_blk_issue_rw_rq(struct mmc_queue *mq, struct request *rqc)
+ 			 * time, so we only reach here after trying to
+ 			 * read a single sector.
+ 			 */
+-			ret = blk_end_request(req, -EIO,
++			ret = blk_end_request(old_req, -EIO,
+ 						brq->data.blksz);
+ 			if (!ret) {
+-				mmc_blk_rw_start_new(mq, card, rqc);
++				mmc_blk_rw_start_new(mq, card, new_req);
+ 				return;
+ 			}
+ 			break;
+ 		case MMC_BLK_NOMEDIUM:
+-			mmc_blk_rw_cmd_abort(card, req);
+-			mmc_blk_rw_start_new(mq, card, rqc);
++			mmc_blk_rw_cmd_abort(card, old_req);
++			mmc_blk_rw_start_new(mq, card, new_req);
+ 			return;
+ 		default:
+ 			pr_err("%s: Unhandled return value (%d)",
+-					req->rq_disk->disk_name, status);
+-			mmc_blk_rw_cmd_abort(card, req);
+-			mmc_blk_rw_start_new(mq, card, rqc);
++					old_req->rq_disk->disk_name, status);
++			mmc_blk_rw_cmd_abort(card, old_req);
++			mmc_blk_rw_start_new(mq, card, new_req);
+ 			return;
+ 		}
+ 
 -- 
-2.11.0
+2.9.3
 
