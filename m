@@ -1,30 +1,33 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-sn1nam02on0057.outbound.protection.outlook.com ([104.47.36.57]:36576
-        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752148AbdAZWjI (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 26 Jan 2017 17:39:08 -0500
-From: Bart Van Assche <Bart.VanAssche@sandisk.com>
-To: "hch@lst.de" <hch@lst.de>, "axboe@fb.com" <axboe@fb.com>
-CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-raid@vger.kernel.org" <linux-raid@vger.kernel.org>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "snitzer@redhat.com" <snitzer@redhat.com>,
-        "j-nomura@ce.jp.nec.com" <j-nomura@ce.jp.nec.com>
+Received: from aserp1040.oracle.com ([141.146.126.69]:47780 "EHLO
+        aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752556AbdAZC6g (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 25 Jan 2017 21:58:36 -0500
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@fb.com>, Mike Snitzer <snitzer@redhat.com>,
+        Junichi Nomura <j-nomura@ce.jp.nec.com>,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-raid@vger.kernel.org, dm-devel@redhat.com
 Subject: Re: [PATCH 01/18] block: add a op_is_flush helper
-Date: Thu, 26 Jan 2017 22:38:48 +0000
-Message-ID: <1485470308.2540.15.camel@sandisk.com>
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
 References: <1485365126-23210-1-git-send-email-hch@lst.de>
-         <1485365126-23210-2-git-send-email-hch@lst.de>
-In-Reply-To: <1485365126-23210-2-git-send-email-hch@lst.de>
-Content-Type: text/plain; charset="iso-8859-1"
+        <1485365126-23210-2-git-send-email-hch@lst.de>
+Date: Wed, 25 Jan 2017 21:58:23 -0500
+In-Reply-To: <1485365126-23210-2-git-send-email-hch@lst.de> (Christoph
+        Hellwig's message of "Wed, 25 Jan 2017 18:25:09 +0100")
+Message-ID: <yq1mveea5o0.fsf@oracle.com>
 MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Wed, 2017-01-25 at 18:25 +0100, Christoph Hellwig wrote:
-> This centralizes the checks for bios that needs to be go into the flush
-> state machine.
+>>>>> "Christoph" == Christoph Hellwig <hch@lst.de> writes:
 
-Reviewed-by: Bart Van Assche <bart.vanassche@sandisk.com>
+Christoph> This centralizes the checks for bios that needs to be go into
+Christoph> the flush state machine.
+
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+
+-- 
+Martin K. Petersen	Oracle Linux Engineering
