@@ -1,8 +1,4 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga04.intel.com ([192.55.52.120]:61790 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751056AbdAZL6b (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 26 Jan 2017 06:58:31 -0500
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
 From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
 To: "Theodore Ts'o" <tytso@mit.edu>,
         Andreas Dilger <adilger.kernel@dilger.ca>,
@@ -19,55 +15,86 @@ Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         linux-block@vger.kernel.org,
         "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv6 03/37] page-flags: relax page flag policy for few flags
-Date: Thu, 26 Jan 2017 14:57:45 +0300
-Message-Id: <20170126115819.58875-4-kirill.shutemov@linux.intel.com>
+Subject: [PATCHv6 05/37] thp: try to free page's buffers before attempt split
+Date: Thu, 26 Jan 2017 14:57:47 +0300
+Message-Id: <20170126115819.58875-6-kirill.shutemov@linux.intel.com>
 In-Reply-To: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
 References: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-These flags are in use for filesystems with backing storage: PG_error,
-PG_writeback and PG_readahead.
+We want page to be isolated from the rest of the system before splitting
+it. We rely on page count to be 2 for file pages to make sure nobody
+uses the page: one pin to caller, one to radix-tree.
+
+Filesystems with backing storage can have page count increased if it has
+buffers.
+
+Let's try to free them, before attempt split. And remove one guarding
+VM_BUG_ON_PAGE().
 
 Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- include/linux/page-flags.h | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ include/linux/buffer_head.h |  1 +
+ mm/huge_memory.c            | 19 ++++++++++++++++++-
+ 2 files changed, 19 insertions(+), 1 deletion(-)
 
-diff --git a/include/linux/page-flags.h b/include/linux/page-flags.h
-index 6b5818d6de32..b85b73cfb1b3 100644
---- a/include/linux/page-flags.h
-+++ b/include/linux/page-flags.h
-@@ -263,7 +263,7 @@ static inline int TestClearPage##uname(struct page *page) { return 0; }
+diff --git a/include/linux/buffer_head.h b/include/linux/buffer_head.h
+index d67ab83823ad..fd4134ce9c54 100644
+--- a/include/linux/buffer_head.h
++++ b/include/linux/buffer_head.h
+@@ -400,6 +400,7 @@ extern int __set_page_dirty_buffers(struct page *page);
+ #else /* CONFIG_BLOCK */
  
- __PAGEFLAG(Locked, locked, PF_NO_TAIL)
- PAGEFLAG(Waiters, waiters, PF_ONLY_HEAD) __CLEARPAGEFLAG(Waiters, waiters, PF_ONLY_HEAD)
--PAGEFLAG(Error, error, PF_NO_COMPOUND) TESTCLEARFLAG(Error, error, PF_NO_COMPOUND)
-+PAGEFLAG(Error, error, PF_NO_TAIL) TESTCLEARFLAG(Error, error, PF_NO_TAIL)
- PAGEFLAG(Referenced, referenced, PF_HEAD)
- 	TESTCLEARFLAG(Referenced, referenced, PF_HEAD)
- 	__SETPAGEFLAG(Referenced, referenced, PF_HEAD)
-@@ -303,15 +303,15 @@ PAGEFLAG(OwnerPriv1, owner_priv_1, PF_ANY)
-  * Only test-and-set exist for PG_writeback.  The unconditional operators are
-  * risky: they bypass page accounting.
-  */
--TESTPAGEFLAG(Writeback, writeback, PF_NO_COMPOUND)
--	TESTSCFLAG(Writeback, writeback, PF_NO_COMPOUND)
-+TESTPAGEFLAG(Writeback, writeback, PF_NO_TAIL)
-+	TESTSCFLAG(Writeback, writeback, PF_NO_TAIL)
- PAGEFLAG(MappedToDisk, mappedtodisk, PF_NO_TAIL)
+ static inline void buffer_init(void) {}
++static inline int page_has_buffers(struct page *page) { return 0; }
+ static inline int try_to_free_buffers(struct page *page) { return 1; }
+ static inline int inode_has_buffers(struct inode *inode) { return 0; }
+ static inline void invalidate_inode_buffers(struct inode *inode) {}
+diff --git a/mm/huge_memory.c b/mm/huge_memory.c
+index 89819fe4debc..55aee62e8444 100644
+--- a/mm/huge_memory.c
++++ b/mm/huge_memory.c
+@@ -30,6 +30,7 @@
+ #include <linux/userfaultfd_k.h>
+ #include <linux/page_idle.h>
+ #include <linux/shmem_fs.h>
++#include <linux/buffer_head.h>
  
- /* PG_readahead is only used for reads; PG_reclaim is only for writes */
- PAGEFLAG(Reclaim, reclaim, PF_NO_TAIL)
- 	TESTCLEARFLAG(Reclaim, reclaim, PF_NO_TAIL)
--PAGEFLAG(Readahead, reclaim, PF_NO_COMPOUND)
--	TESTCLEARFLAG(Readahead, reclaim, PF_NO_COMPOUND)
-+PAGEFLAG(Readahead, reclaim, PF_NO_TAIL)
-+	TESTCLEARFLAG(Readahead, reclaim, PF_NO_TAIL)
+ #include <asm/tlb.h>
+ #include <asm/pgalloc.h>
+@@ -2117,7 +2118,6 @@ int split_huge_page_to_list(struct page *page, struct list_head *list)
  
- #ifdef CONFIG_HIGHMEM
- /*
+ 	VM_BUG_ON_PAGE(is_huge_zero_page(page), page);
+ 	VM_BUG_ON_PAGE(!PageLocked(page), page);
+-	VM_BUG_ON_PAGE(!PageSwapBacked(page), page);
+ 	VM_BUG_ON_PAGE(!PageCompound(page), page);
+ 
+ 	if (PageAnon(head)) {
+@@ -2146,6 +2146,23 @@ int split_huge_page_to_list(struct page *page, struct list_head *list)
+ 			goto out;
+ 		}
+ 
++		/* Try to free buffers before attempt split */
++		if (!PageSwapBacked(head) && PagePrivate(page)) {
++			/*
++			 * We cannot trigger writeback from here due possible
++			 * recursion if triggered from vmscan, only wait.
++			 *
++			 * Caller can trigger writeback it on its own, if safe.
++			 */
++			wait_on_page_writeback(head);
++
++			if (page_has_buffers(head) && !try_to_release_page(head,
++						GFP_KERNEL)) {
++				ret = -EBUSY;
++				goto out;
++			}
++		}
++
+ 		/* Addidional pin from radix tree */
+ 		extra_pins = 1;
+ 		anon_vma = NULL;
 -- 
 2.11.0
 
