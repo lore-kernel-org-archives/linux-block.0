@@ -1,142 +1,112 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:56432 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750732AbdAWP3d (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Jan 2017 10:29:33 -0500
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@fb.com>
-Cc: Mike Snitzer <snitzer@redhat.com>, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org, dm-devel@redhat.com
-Subject: [PATCH 02/16] block: simplify blk_init_allocated_queue
-Date: Mon, 23 Jan 2017 16:29:07 +0100
-Message-Id: <1485185361-29786-3-git-send-email-hch@lst.de>
-In-Reply-To: <1485185361-29786-1-git-send-email-hch@lst.de>
-References: <1485185361-29786-1-git-send-email-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv6 28/37] ext4: make ext4_block_write_begin() aware about huge pages
+Date: Thu, 26 Jan 2017 14:58:10 +0300
+Message-Id: <20170126115819.58875-29-kirill.shutemov@linux.intel.com>
+In-Reply-To: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
+References: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Return an errno value instead of the passed in queue so that the callers
-don't have to keep track of two queues, and move the assignment of the
-request_fn and lock to the caller as passing them as argument doesn't
-simplify anything.  While we're at it also remove two pointless NULL
-assignments, given that the request structure is zeroed on allocation.
+It simply matches changes to __block_write_begin_int().
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- block/blk-core.c       | 38 +++++++++++++++-----------------------
- drivers/md/dm-rq.c     |  3 ++-
- include/linux/blkdev.h |  3 +--
- 3 files changed, 18 insertions(+), 26 deletions(-)
+ fs/ext4/inode.c | 35 +++++++++++++++++++++--------------
+ 1 file changed, 21 insertions(+), 14 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 732b719..d2c2fc9 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -823,15 +823,19 @@ EXPORT_SYMBOL(blk_init_queue);
- struct request_queue *
- blk_init_queue_node(request_fn_proc *rfn, spinlock_t *lock, int node_id)
+diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
+index 7e65a5b78cf1..3eae2d058fd0 100644
+--- a/fs/ext4/inode.c
++++ b/fs/ext4/inode.c
+@@ -1093,9 +1093,8 @@ int do_journal_get_write_access(handle_t *handle,
+ static int ext4_block_write_begin(struct page *page, loff_t pos, unsigned len,
+ 				  get_block_t *get_block)
  {
--	struct request_queue *uninit_q, *q;
-+	struct request_queue *q;
+-	unsigned from = pos & (PAGE_SIZE - 1);
+-	unsigned to = from + len;
+-	struct inode *inode = page->mapping->host;
++	unsigned from, to;
++	struct inode *inode = page_mapping(page)->host;
+ 	unsigned block_start, block_end;
+ 	sector_t block;
+ 	int err = 0;
+@@ -1103,10 +1102,14 @@ static int ext4_block_write_begin(struct page *page, loff_t pos, unsigned len,
+ 	unsigned bbits;
+ 	struct buffer_head *bh, *head, *wait[2], **wait_bh = wait;
+ 	bool decrypt = false;
++	bool uptodate = PageUptodate(page);
  
--	uninit_q = blk_alloc_queue_node(GFP_KERNEL, node_id);
--	if (!uninit_q)
-+	q = blk_alloc_queue_node(GFP_KERNEL, node_id);
-+	if (!q)
- 		return NULL;
++	page = compound_head(page);
++	from = pos & ~hpage_mask(page);
++	to = from + len;
+ 	BUG_ON(!PageLocked(page));
+-	BUG_ON(from > PAGE_SIZE);
+-	BUG_ON(to > PAGE_SIZE);
++	BUG_ON(from > hpage_size(page));
++	BUG_ON(to > hpage_size(page));
+ 	BUG_ON(from > to);
  
--	q = blk_init_allocated_queue(uninit_q, rfn, lock);
--	if (!q)
--		blk_cleanup_queue(uninit_q);
-+	q->request_fn = rfn;
-+	if (lock)
-+		q->queue_lock = lock;
-+	if (blk_init_allocated_queue(q) < 0) {
-+		blk_cleanup_queue(q);
-+		return NULL;
-+	}
- 
- 	return q;
- }
-@@ -839,30 +843,19 @@ EXPORT_SYMBOL(blk_init_queue_node);
- 
- static blk_qc_t blk_queue_bio(struct request_queue *q, struct bio *bio);
- 
--struct request_queue *
--blk_init_allocated_queue(struct request_queue *q, request_fn_proc *rfn,
--			 spinlock_t *lock)
--{
--	if (!q)
--		return NULL;
- 
-+int blk_init_allocated_queue(struct request_queue *q)
-+{
- 	q->fq = blk_alloc_flush_queue(q, NUMA_NO_NODE, 0);
- 	if (!q->fq)
--		return NULL;
-+		return -ENOMEM;
- 
- 	if (blk_init_rl(&q->root_rl, q, GFP_KERNEL))
- 		goto fail;
- 
- 	INIT_WORK(&q->timeout_work, blk_timeout_work);
--	q->request_fn		= rfn;
--	q->prep_rq_fn		= NULL;
--	q->unprep_rq_fn		= NULL;
- 	q->queue_flags		|= QUEUE_FLAG_DEFAULT;
- 
--	/* Override internal queue lock with supplied lock pointer */
--	if (lock)
--		q->queue_lock		= lock;
--
- 	/*
- 	 * This also sets hw/phys segments, boundary and size
- 	 */
-@@ -880,13 +873,12 @@ blk_init_allocated_queue(struct request_queue *q, request_fn_proc *rfn,
- 	}
- 
- 	mutex_unlock(&q->sysfs_lock);
--
--	return q;
-+	return 0;
- 
- fail:
- 	blk_free_flush_queue(q->fq);
- 	wbt_exit(q);
--	return NULL;
-+	return -ENOMEM;
- }
- EXPORT_SYMBOL(blk_init_allocated_queue);
- 
-diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
-index 9d7275f..93f6e9f 100644
---- a/drivers/md/dm-rq.c
-+++ b/drivers/md/dm-rq.c
-@@ -823,7 +823,8 @@ static void dm_old_request_fn(struct request_queue *q)
- int dm_old_init_request_queue(struct mapped_device *md)
- {
- 	/* Fully initialize the queue */
--	if (!blk_init_allocated_queue(md->queue, dm_old_request_fn, NULL))
-+	md->queue->request_fn = dm_old_request_fn;
-+	if (blk_init_allocated_queue(md->queue) < 0)
- 		return -EINVAL;
- 
- 	/* disable dm_old_request_fn's merge heuristic by default */
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 8e0b57e..a036c4a 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1131,8 +1131,7 @@ extern void blk_unprep_request(struct request *);
- extern struct request_queue *blk_init_queue_node(request_fn_proc *rfn,
- 					spinlock_t *lock, int node_id);
- extern struct request_queue *blk_init_queue(request_fn_proc *, spinlock_t *);
--extern struct request_queue *blk_init_allocated_queue(struct request_queue *,
--						      request_fn_proc *, spinlock_t *);
-+extern int blk_init_allocated_queue(struct request_queue *);
- extern void blk_cleanup_queue(struct request_queue *);
- extern void blk_queue_make_request(struct request_queue *, make_request_fn *);
- extern void blk_queue_bounce_limit(struct request_queue *, u64);
+ 	if (!page_has_buffers(page))
+@@ -1119,10 +1122,8 @@ static int ext4_block_write_begin(struct page *page, loff_t pos, unsigned len,
+ 	    block++, block_start = block_end, bh = bh->b_this_page) {
+ 		block_end = block_start + blocksize;
+ 		if (block_end <= from || block_start >= to) {
+-			if (PageUptodate(page)) {
+-				if (!buffer_uptodate(bh))
+-					set_buffer_uptodate(bh);
+-			}
++			if (uptodate && !buffer_uptodate(bh))
++				set_buffer_uptodate(bh);
+ 			continue;
+ 		}
+ 		if (buffer_new(bh))
+@@ -1134,19 +1135,25 @@ static int ext4_block_write_begin(struct page *page, loff_t pos, unsigned len,
+ 				break;
+ 			if (buffer_new(bh)) {
+ 				clean_bdev_bh_alias(bh);
+-				if (PageUptodate(page)) {
++				if (uptodate) {
+ 					clear_buffer_new(bh);
+ 					set_buffer_uptodate(bh);
+ 					mark_buffer_dirty(bh);
+ 					continue;
+ 				}
+-				if (block_end > to || block_start < from)
+-					zero_user_segments(page, to, block_end,
+-							   block_start, from);
++				if (block_end > to || block_start < from) {
++					BUG_ON(to - from  > PAGE_SIZE);
++					zero_user_segments(page +
++							block_start / PAGE_SIZE,
++							to % PAGE_SIZE,
++							(block_start % PAGE_SIZE) + blocksize,
++							block_start % PAGE_SIZE,
++							from % PAGE_SIZE);
++				}
+ 				continue;
+ 			}
+ 		}
+-		if (PageUptodate(page)) {
++		if (uptodate) {
+ 			if (!buffer_uptodate(bh))
+ 				set_buffer_uptodate(bh);
+ 			continue;
 -- 
-2.1.4
+2.11.0
 
