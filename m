@@ -1,51 +1,101 @@
-Return-Path: <keith.busch@intel.com>
-From: Keith Busch <keith.busch@intel.com>
-To: linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>,
-	Jens Axboe <axboe@fb.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Thomas Gleixner <tglx@linutronix.de>
-Cc: Marc Merlin <marc@merlins.org>,
-	Keith Busch <keith.busch@intel.com>
-Subject: [PATCH 0/6] NVMe related fixes
-Date: Wed,  4 Jan 2017 17:41:05 -0500
-Message-Id: <1483569671-1462-1-git-send-email-keith.busch@intel.com>
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+Content-Type: text/plain; charset=windows-1252
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Subject: Re: [PATCHSET v4] blk-mq-scheduling framework
+From: Paolo Valente <paolo.valente@linaro.org>
+In-Reply-To: <0e047692-5ff2-d404-a400-8484e060218b@fb.com>
+Date: Thu, 26 Jan 2017 15:23:39 +0100
+Cc: Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org,
+ Linux-Kernal <linux-kernel@vger.kernel.org>,
+ Omar Sandoval <osandov@fb.com>,
+ Linus Walleij <linus.walleij@linaro.org>,
+ Ulf Hansson <ulf.hansson@linaro.org>,
+ Mark Brown <broonie@kernel.org>
+Message-Id: <CAC36074-9BB6-4A35-94EA-73ACCFD6C86E@linaro.org>
+References: <1481933536-12844-1-git-send-email-axboe@fb.com> <7A8A5078-E9B8-4EBF-BAB1-9E8EEBF3A043@linaro.org> <dd9501e9-5fc2-66d3-5c62-f8b727a6b6c9@fb.com> <CF1D593B-8BD0-4B59-9193-9D1D4E8BE3E4@linaro.org> <f5303f81-811a-8d0a-b271-d091d8839778@fb.com> <37570439-97C8-4009-B143-C5E78789A137@linaro.org> <b258d716-5c9a-c999-cec4-6bea38a8b975@fb.com> <C5DAF0C3-0509-4297-B12F-C436923A8311@linaro.org> <2028A64C-40E5-403D-B5E9-05863E94B4C5@linaro.org> <59b134de-5d2d-5f16-3118-bdc16bc6e36b@fb.com> <22EDFDE7-71FF-4265-8DDE-B141D3FD26B2@linaro.org> <d75c44df-8eac-b324-ac11-9bb7b6190603@fb.com> <15FC1715-D77C-4E31-811B-60898C0C6DAA@linaro.org> <0e047692-5ff2-d404-a400-8484e060218b@fb.com>
+To: Jens Axboe <axboe@fb.com>
 List-ID: <linux-block@vger.kernel.org>
 
-I've been looking into an old regression origianlly reported here:
 
-  http://lists.infradead.org/pipermail/linux-nvme/2016-August/005699.html
+> Il giorno 25 gen 2017, alle ore 17:13, Jens Axboe <axboe@fb.com> ha =
+scritto:
+>=20
+> On 01/25/2017 01:46 AM, Paolo Valente wrote:
+>>=20
+>>> Il giorno 23 gen 2017, alle ore 18:42, Jens Axboe <axboe@fb.com> ha =
+scritto:
+>>>=20
+>>> On 01/23/2017 10:04 AM, Paolo Valente wrote:
+>>>>=20
+>>>>> Il giorno 18 gen 2017, alle ore 17:21, Jens Axboe <axboe@fb.com> =
+ha scritto:
+>>>>>=20
+>>>>> On 01/18/2017 08:14 AM, Paolo Valente wrote:
+>>>>>> according to the function blk_mq_sched_put_request, the
+>>>>>> mq.completed_request hook seems to always be invoked (if set) for =
+a
+>>>>>> request for which the mq.put_rq_priv is invoked (if set).
+>>>>>=20
+>>>>> Correct, any request that came out of blk_mq_sched_get_request()
+>>>>> will always have completed called on it, regardless of whether it
+>>>>> had IO started on it or not.
+>>>>>=20
+>>>>=20
+>>>> It seems that some request, after being dispatched, happens to have =
+no
+>>>> mq.put_rq_priv invoked on it now or then.  Is it expected?  If it =
+is,
+>>>> could you point me to the path through which the end of the life of
+>>>> such a request is handled?
+>>>=20
+>>> I'm guessing that's a flush request. I added RQF_QUEUED to check for
+>>> that, if RQF_QUEUED is set, you know it has come from your =
+get_request
+>>> handler.
+>>>=20
+>>=20
+>> Exactly, the completion-without-put_rq_priv pattern seems to occur
+>> only for requests coming from the flusher, precisely because they =
+have
+>> the flag RQF_ELVPRIV unset.  Just to understand: why is this flag
+>> unset for these requests, if they do have private elevator (bfq)
+>> data attached?  What am I misunderstanding?
+>>=20
+>> Just to be certain: this should be the only case where the
+>> completed_request hook is invoked while the put_rq_priv is not, =
+right?
+>=20
+> They must NOT have scheduler data attached. In your get_request
+> function, you must bypass if blk_mq_sched_bypass_insert() returns =
+true.
 
-The root cause is blk-mq's hot cpu notifier is stuck indefinitely during
-suspend on requests that entered a stopped hardware context, and that
-hardware context will not be restarted until suspend completes.
+Yes, sorry.  I'm already using blk_mq_sched_bypass_insert() to bypass
+insertion in the insert hook, as done in mq-deadline, and I have no
+get_request defined (see below).
 
-I originally set out to unwind the requests and block on reentry,
-but blk-mq doesn't support doing that: once a request enters a hardware
-context, it needs to complete on that context. Since the context won't be
-starting again, we need to do _something_ with those entered requests,
-and unfortunately ending them in error is the simplest way to resolve
-the deadlock.
+The source of my confusion was that I assumed that flush requests had
+not to leave any trace in the scheduler, since the scheduler does not
+decide anything for them.  Accordingly, I thought they did not trigger
+any put or completion hook.  In contrast, these requests get the
+flag QUEUED set, in case the get_request hook is set, and then trigger
+both a put_request and a completed_request.  In this respect, in bfq-mq
+I'm not using any of these three hooks (they are all NULL).  I hope
+I'm not doing something unexpected or incoherent.
 
-Alternatively, it might have been nice if we didn't need to freeze at
-all if we could leverage the new blk_mq_quiesce_queue, but that wouldn't
-work when the queue map needs to be redone...
+UPDATE: bfq-mq now survives for minutes.  I'm debugging two occasional
+failures, which (un)fortunately become more and more occasional as I
+go on with debugging and instrumenting the code.
 
-Any feedback appreciated. Thanks!
+Thanks,
+Paolo
 
-Keith Busch (6):
-  irq/affinity: Assign all online CPUs to vectors
-  irq/affinity: Assign offline CPUs a vector
-  nvme/pci: Start queues after tagset is updated
-  blk-mq: Update queue map when changing queue count
-  blk-mq: Fix freeze deadlock
-  blk-mq: Remove unused variable
-
- block/blk-mq.c          | 86 +++++++++++++++++++++++++++++++++++++++++--------
- drivers/nvme/host/pci.c |  2 +-
- kernel/irq/affinity.c   | 17 ++++++++--
- 3 files changed, 87 insertions(+), 18 deletions(-)
-
--- 
-2.5.5
+> See how mq-deadline does that. This is important, or you will get =
+hangs
+> with flushes as well, since the IO scheduler private data and the =
+flush
+> data is unionized in the request.
+>=20
+> --=20
+> Jens Axboe
