@@ -1,100 +1,71 @@
-Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
-Subject: Re: [LSF/MM TOPIC] status update on stream IDs
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-From: Andreas Dilger <adilger@dilger.ca>
-In-Reply-To: <E86FC13D-0058-473C-B9D6-36B988ABEFFE@dilger.ca>
-Date: Fri, 6 Jan 2017 16:58:43 -0700
-Message-Id: <7B0B6B53-D692-4084-AC63-55138132F509@dilger.ca>
-References: <E86FC13D-0058-473C-B9D6-36B988ABEFFE@dilger.ca>
-To: lsf-pc@lists.linux-foundation.org
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
-List-Post: <mailto:linux-nvme@lists.infradead.org>
-List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
-Cc: linux-fsdevel <linux-fsdevel@vger.kernel.org>, linux-block@vger.kernel.org,
- linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
- linux-ide@vger.kernel.org
-Content-Type: multipart/mixed; boundary="===============0713261989583723528=="
-Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
-Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv6 14/37] thp: introduce hpage_size() and hpage_mask()
+Date: Thu, 26 Jan 2017 14:57:56 +0300
+Message-Id: <20170126115819.58875-15-kirill.shutemov@linux.intel.com>
+In-Reply-To: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
+References: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
+Introduce new helpers which return size/mask of the page:
+HPAGE_PMD_SIZE/HPAGE_PMD_MASK if the page is PageTransHuge() and
+PAGE_SIZE/PAGE_MASK otherwise.
 
---===============0713261989583723528==
-Content-Type: multipart/signed; boundary="Apple-Mail=_740B886B-92C7-4B32-8221-08D49D933AD6"; protocol="application/pgp-signature"; micalg=pgp-sha256
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+---
+ include/linux/huge_mm.h | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
+diff --git a/include/linux/huge_mm.h b/include/linux/huge_mm.h
+index 97e478d6b690..e5c9c26d2439 100644
+--- a/include/linux/huge_mm.h
++++ b/include/linux/huge_mm.h
+@@ -142,6 +142,20 @@ static inline int hpage_nr_pages(struct page *page)
+ 	return 1;
+ }
+ 
++static inline int hpage_size(struct page *page)
++{
++	if (unlikely(PageTransHuge(page)))
++		return HPAGE_PMD_SIZE;
++	return PAGE_SIZE;
++}
++
++static inline unsigned long hpage_mask(struct page *page)
++{
++	if (unlikely(PageTransHuge(page)))
++		return HPAGE_PMD_MASK;
++	return PAGE_MASK;
++}
++
+ extern int do_huge_pmd_numa_page(struct vm_fault *vmf, pmd_t orig_pmd);
+ 
+ extern struct page *huge_zero_page;
+@@ -167,6 +181,8 @@ void mm_put_huge_zero_page(struct mm_struct *mm);
+ #define HPAGE_PMD_SIZE ({ BUILD_BUG(); 0; })
+ 
+ #define hpage_nr_pages(x) 1
++#define hpage_size(x) PAGE_SIZE
++#define hpage_mask(x) PAGE_MASK
+ 
+ #define transparent_hugepage_enabled(__vma) 0
+ 
+-- 
+2.11.0
 
---Apple-Mail=_740B886B-92C7-4B32-8221-08D49D933AD6
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain;
-	charset=us-ascii
-
-[resend to include other relevant lists]
-
-On Jan 6, 2017, at 4:54 PM, Andreas Dilger <adilger@dilger.ca> wrote:
->=20
-> At LSF/MM'16 and Linux FAST (https://lwn.net/Articles/685499/) there =
-were
-> discussions about adding stream IDs to the block/device layer to allow =
-higher
-> layers (filesystems, applications) to identify IO streams so lower =
-layers
-> (SSDs, hybrid storage, etc.) can make better allocation/placement =
-decisions.
->=20
-> It would be useful to get an update on the state of this work, and =
-discuss
-> any obstacles that need to be resolved for getting this code landed.
-
-
-Cheers, Andreas
-
-
-
-
-
-
---Apple-Mail=_740B886B-92C7-4B32-8221-08D49D933AD6
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename=signature.asc
-Content-Type: application/pgp-signature;
-	name=signature.asc
-Content-Description: Message signed with OpenPGP using GPGMail
-
------BEGIN PGP SIGNATURE-----
-Comment: GPGTools - http://gpgtools.org
-
-iQIVAwUBWHAvM3Kl2rkXzB/gAQgqsBAArtsTzEdg40ycfKoGyOPpQ865W4Y9A0R8
-7jI8Zyc22LLEsadZIVXWIeaQH3wzUqr7lzXg2dRgdUGvL1GYVB2UH4rktwRizo1k
-pnOfm6vJTAGZfe8nPXg2vg8hagSGIfjn+we/Id/qx0EhjX2p4RE7grWlmInKX59B
-WDnyUa7xeN2I8BNlKaZOIbtpvfAa2nPVCv6B4mJOvPkPPtXZFvXTaWUaKk2lXIIt
-xtV45Ee4u8p7SOM6OP9Fagb9ONQgJ5Vnz0jiF8Slykork/T9ZUqV4A4pX1fd0gL/
-CEEJPsRRuL9TO1IUPMn3rR7FJoc6VuTKKkefT8IcEONwSbPYqKIi7Dv7f8CkWq4r
-Vc4I/sB7WS34UOPKjk+EQNddRj25g3zI/Ff57EMUt81WsTV89HywIHrDZa/1Axnq
-kDl+HN3nt94ptBQnBMzPYAV+9+2q3auQ7zTtZu0GHY9/49Z3IJJAMxg9MTek4vi1
-AXuV0YpYf2ExU13odNxJpyR0DTcML+wQ3JH8AVyZliVu2Qiz5DhSk2E1/1+LhwA8
-nveZLZ8RZdDIDBBDNApAJfSRRv5AKcEGRjLL1sMix5c0TarHE58LcPN9wAMH7ufx
-KrU+Xem8Q+23EA81yMgbP1f/33mj8RzLR4oBL3xiacsAl/tHlKH/kVjAUCOAggJH
-eOqm/E2EVxI=
-=1v4F
------END PGP SIGNATURE-----
-
---Apple-Mail=_740B886B-92C7-4B32-8221-08D49D933AD6--
-
-
---===============0713261989583723528==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-_______________________________________________
-Linux-nvme mailing list
-Linux-nvme@lists.infradead.org
-http://lists.infradead.org/mailman/listinfo/linux-nvme
-
---===============0713261989583723528==--
