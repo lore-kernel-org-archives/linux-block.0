@@ -1,74 +1,87 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f43.google.com ([74.125.83.43]:36119 "EHLO
-        mail-pg0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751375AbdAYQH1 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 Jan 2017 11:07:27 -0500
-Received: by mail-pg0-f43.google.com with SMTP id 3so6991250pgj.3
-        for <linux-block@vger.kernel.org>; Wed, 25 Jan 2017 08:07:27 -0800 (PST)
-From: Omar Sandoval <osandov@osandov.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: kernel-team@fb.com
-Subject: [PATCH v2 06/10] blk-mq: export software queue pending map to debugfs
-Date: Wed, 25 Jan 2017 08:06:45 -0800
-Message-Id: <7d7f0b56d453193f821f7f22fca3e2d4174017ae.1485360145.git.osandov@fb.com>
-In-Reply-To: <cover.1485360145.git.osandov@fb.com>
-References: <cover.1485360145.git.osandov@fb.com>
-In-Reply-To: <cover.1485360145.git.osandov@fb.com>
-References: <cover.1485360145.git.osandov@fb.com>
+Received: from mga07.intel.com ([134.134.136.100]:55662 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753623AbdAZL72 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 26 Jan 2017 06:59:28 -0500
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv6 32/37] ext4: make EXT4_IOC_MOVE_EXT work with huge pages
+Date: Thu, 26 Jan 2017 14:58:14 +0300
+Message-Id: <20170126115819.58875-33-kirill.shutemov@linux.intel.com>
+In-Reply-To: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
+References: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Omar Sandoval <osandov@fb.com>
+Adjust how we find relevant block within page and how we clear the
+required part of the page.
 
-This is useful for debugging problems where we've gotten stuck with
-requests in the software queues.
-
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Signed-off-by: Omar Sandoval <osandov@fb.com>
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- block/blk-mq-debugfs.c | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+ fs/ext4/move_extent.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index ee947f2f605b..857bdadc6b1f 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -134,6 +134,26 @@ static const struct file_operations hctx_dispatch_fops = {
- 	.release	= seq_release,
- };
+diff --git a/fs/ext4/move_extent.c b/fs/ext4/move_extent.c
+index 6fc14def0c70..2efa9deb47a9 100644
+--- a/fs/ext4/move_extent.c
++++ b/fs/ext4/move_extent.c
+@@ -210,7 +210,9 @@ mext_page_mkuptodate(struct page *page, unsigned from, unsigned to)
+ 				return err;
+ 			}
+ 			if (!buffer_mapped(bh)) {
+-				zero_user(page, block_start, blocksize);
++				zero_user(page + block_start / PAGE_SIZE,
++						block_start % PAGE_SIZE,
++						blocksize);
+ 				set_buffer_uptodate(bh);
+ 				continue;
+ 			}
+@@ -267,10 +269,11 @@ move_extent_per_page(struct file *o_filp, struct inode *donor_inode,
+ 	unsigned int tmp_data_size, data_size, replaced_size;
+ 	int i, err2, jblocks, retries = 0;
+ 	int replaced_count = 0;
+-	int from = data_offset_in_page << orig_inode->i_blkbits;
++	int from;
+ 	int blocks_per_page = PAGE_SIZE >> orig_inode->i_blkbits;
+ 	struct super_block *sb = orig_inode->i_sb;
+ 	struct buffer_head *bh = NULL;
++	int diff;
  
-+static int hctx_ctx_map_show(struct seq_file *m, void *v)
-+{
-+	struct blk_mq_hw_ctx *hctx = m->private;
-+
-+	sbitmap_bitmap_show(&hctx->ctx_map, m);
-+	return 0;
-+}
-+
-+static int hctx_ctx_map_open(struct inode *inode, struct file *file)
-+{
-+	return single_open(file, hctx_ctx_map_show, inode->i_private);
-+}
-+
-+static const struct file_operations hctx_ctx_map_fops = {
-+	.open		= hctx_ctx_map_open,
-+	.read		= seq_read,
-+	.llseek		= seq_lseek,
-+	.release	= single_release,
-+};
-+
- static void *ctx_rq_list_start(struct seq_file *m, loff_t *pos)
- {
- 	struct blk_mq_ctx *ctx = m->private;
-@@ -179,6 +199,7 @@ static const struct blk_mq_debugfs_attr blk_mq_debugfs_hctx_attrs[] = {
- 	{"state", 0400, &hctx_state_fops},
- 	{"flags", 0400, &hctx_flags_fops},
- 	{"dispatch", 0400, &hctx_dispatch_fops},
-+	{"ctx_map", 0400, &hctx_ctx_map_fops},
- };
- 
- static const struct blk_mq_debugfs_attr blk_mq_debugfs_ctx_attrs[] = {
+ 	/*
+ 	 * It needs twice the amount of ordinary journal buffers because
+@@ -355,6 +358,9 @@ move_extent_per_page(struct file *o_filp, struct inode *donor_inode,
+ 		goto unlock_pages;
+ 	}
+ data_copy:
++	diff = (pagep[0] - compound_head(pagep[0])) * blocks_per_page;
++	from = (data_offset_in_page + diff) << orig_inode->i_blkbits;
++	pagep[0] = compound_head(pagep[0]);
+ 	*err = mext_page_mkuptodate(pagep[0], from, from + replaced_size);
+ 	if (*err)
+ 		goto unlock_pages;
+@@ -384,7 +390,7 @@ move_extent_per_page(struct file *o_filp, struct inode *donor_inode,
+ 	if (!page_has_buffers(pagep[0]))
+ 		create_empty_buffers(pagep[0], 1 << orig_inode->i_blkbits, 0);
+ 	bh = page_buffers(pagep[0]);
+-	for (i = 0; i < data_offset_in_page; i++)
++	for (i = 0; i < data_offset_in_page + diff; i++)
+ 		bh = bh->b_this_page;
+ 	for (i = 0; i < block_len_in_page; i++) {
+ 		*err = ext4_get_block(orig_inode, orig_blk_offset + i, bh, 0);
 -- 
 2.11.0
 
