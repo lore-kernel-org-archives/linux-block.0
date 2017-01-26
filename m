@@ -1,32 +1,38 @@
-Return-Path: <konrad.wilk@oracle.com>
-Date: Fri, 27 Jan 2017 13:47:43 -0500
-From: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-To: axboe@kernel.dk, linux-block@vger.kernel.org,
-        xen-devel@lists.xensource.com, linux-kernel@vger.kernel.org
-Cc: jbeulich@suse.com
-Subject: [GIT PULL] (xen-blkfront) stable/for-jens-4.10 for your 'linux-next'
- branch.
-Message-ID: <20170127184743.GB31429@char.us.oracle.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from aserp1040.oracle.com ([141.146.126.69]:16976 "EHLO
+        aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752453AbdAZDS6 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 25 Jan 2017 22:18:58 -0500
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@fb.com>, Mike Snitzer <snitzer@redhat.com>,
+        Junichi Nomura <j-nomura@ce.jp.nec.com>,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-raid@vger.kernel.org, dm-devel@redhat.com,
+        Hannes Reinecke <hare@suse.de>, Hannes Reinecke <hare@suse.com>
+Subject: Re: [PATCH 08/18] scsi_dh_rdac: switch to scsi_execute_req_flags()
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <1485365126-23210-1-git-send-email-hch@lst.de>
+        <1485365126-23210-9-git-send-email-hch@lst.de>
+Date: Wed, 25 Jan 2017 22:18:39 -0500
+In-Reply-To: <1485365126-23210-9-git-send-email-hch@lst.de> (Christoph
+        Hellwig's message of "Wed, 25 Jan 2017 18:25:16 +0100")
+Message-ID: <yq11svqa4q8.fsf@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Hey Jens,
+>>>>> "Christoph" == Christoph Hellwig <hch@lst.de> writes:
 
-Please pull in your 'for-linus' branch two little fixes for Xen
-block front:
+Christoph> From: Hannes Reinecke <hare@suse.de> Switch to
+Christoph> scsi_execute_req_flags() and scsi_get_vpd_page() instead of
+Christoph> open-coding it.  Using scsi_execute_req_flags() will set
+Christoph> REQ_QUIET and REQ_PREEMPT, but this is okay as we're
+Christoph> evaluating the errors anyway and should be able to send the
+Christoph> command even if the device is quiesced.
 
-git://git.kernel.org/pub/scm/linux/kernel/git/konrad/xen.git stable/for-jens-4.10
+Acked-by: Martin K. Petersen <martin.petersen@oracle.com>
 
-One fix is for handling the XEN_PAGE_SIZE != PAGE_SIZE (4KB vs 64KB
-on ARM for example) mishandling while the other is fixing
-the accounting for the configuration changes.
-
-Thank you!
-
-drivers/block/xen-blkfront.c | 22 ++++++++++++++--------
- 1 file changed, 14 insertions(+), 8 deletions(-)
-
-Jan Beulich (2):
-      xen-blkfront: feature flags handling adjustments
-      xen-blkfront: correct maximum segment accounting
+-- 
+Martin K. Petersen	Oracle Linux Engineering
