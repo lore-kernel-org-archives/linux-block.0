@@ -1,79 +1,188 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx.ewheeler.net ([66.155.3.69]:33056 "EHLO mail.ewheeler.net"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751599AbdAaTHj (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 31 Jan 2017 14:07:39 -0500
-Date: Tue, 31 Jan 2017 11:01:22 -0800 (PST)
-From: Eric Wheeler <bcache@lists.ewheeler.net>
-To: Coly Li <i@coly.li>
-cc: Kai Krakow <hurikhan77@gmail.com>, linux-bcache@vger.kernel.org,
-        linux-block@vger.kernel.org
-Subject: IOPRIO_PRIO_VALUE needs parens around (data)  (was: [4.9.1] Compiler
- warnings in bcache)
-In-Reply-To: <8ca97b22-9888-fa22-5086-46f36eaaa931@coly.li>
-Message-ID: <alpine.LRH.2.11.1701311100090.28608@mail.ewheeler.net>
-References: <20170109193422.734b3088@jupiter.sol.kaishome.de> <8ca97b22-9888-fa22-5086-46f36eaaa931@coly.li>
-MIME-Version: 1.0
-Content-Type: MULTIPART/MIXED; BOUNDARY="1641074820-930125809-1485889293=:28608"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Theodore Ts'o" <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv6 18/37] fs: make block_write_{begin,end}() be able to handle huge pages
+Date: Thu, 26 Jan 2017 14:58:00 +0300
+Message-Id: <20170126115819.58875-19-kirill.shutemov@linux.intel.com>
+In-Reply-To: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
+References: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+It's more or less straight-forward.
 
---1641074820-930125809-1485889293=:28608
-Content-Type: TEXT/PLAIN; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Most changes are around getting offset/len withing page right and zero
+out desired part of the page.
 
-On Tue, 10 Jan 2017, Coly Li wrote:
-> On 2017/1/10 上午2:34, Kai Krakow wrote:
-> > When compiling kernel 4.9.1, I'm seeing the following warnings:
-> > 
-> > In file included from ./include/linux/bio.h:23:0,
-> >                  from drivers/md/bcache/bcache.h:181,
-> >                  from drivers/md/bcache/writeback.c:9:
-> > drivers/md/bcache/writeback.c: In Funktion »bch_cached_dev_writeback_init«:
-> > ./include/linux/ioprio.h:15:73: Warnung: Klammern um Arithmetik in Operand von »|« empfohlen [-Wparentheses]
-> >  #define IOPRIO_PRIO_VALUE(class, data) (((class) << IOPRIO_CLASS_SHIFT) | data)
-> >                                                                          ^
-> > drivers/md/bcache/writeback.c:515:25: Anmerkung: bei Substitution des Makros »IOPRIO_PRIO_VALUE«
-> >   dc->ioprio_bypass    = IOPRIO_PRIO_VALUE(IOPRIO_CLASS_BE, IOPRIO_BE_NR-1);
-> >                          ^
-> > 
-> > It suggests to put parentheses around the expression with the "|"
-> > operand. No other kernel source files show warnings for me, so maybe it
-> > should be fixed.
-> > 
-> > I would create a patch myself but I'm not sure if it would be correct
-> > and sufficient to put parenthesis around "data" like this:
-> > 
-> > #define IOPRIO_PRIO_VALUE(class, data) (((class) << IOPRIO_CLASS_SHIFT) | (data))
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+---
+ fs/buffer.c | 70 +++++++++++++++++++++++++++++++++++--------------------------
+ 1 file changed, 40 insertions(+), 30 deletions(-)
 
-I caught that before submitting to Jens, so its in 4.10.  I agree with 
-Coly, however, that (data) should be added but I'm unable to do that at 
-the moment.
+diff --git a/fs/buffer.c b/fs/buffer.c
+index 72462beca909..d05524f14846 100644
+--- a/fs/buffer.c
++++ b/fs/buffer.c
+@@ -1902,6 +1902,7 @@ void page_zero_new_buffers(struct page *page, unsigned from, unsigned to)
+ {
+ 	unsigned int block_start, block_end;
+ 	struct buffer_head *head, *bh;
++	bool uptodate = PageUptodate(page);
+ 
+ 	BUG_ON(!PageLocked(page));
+ 	if (!page_has_buffers(page))
+@@ -1912,21 +1913,21 @@ void page_zero_new_buffers(struct page *page, unsigned from, unsigned to)
+ 	do {
+ 		block_end = block_start + bh->b_size;
+ 
+-		if (buffer_new(bh)) {
+-			if (block_end > from && block_start < to) {
+-				if (!PageUptodate(page)) {
+-					unsigned start, size;
++		if (buffer_new(bh) && block_end > from && block_start < to) {
++			if (!uptodate) {
++				unsigned start, size;
+ 
+-					start = max(from, block_start);
+-					size = min(to, block_end) - start;
++				start = max(from, block_start);
++				size = min(to, block_end) - start;
+ 
+-					zero_user(page, start, size);
+-					set_buffer_uptodate(bh);
+-				}
+-
+-				clear_buffer_new(bh);
+-				mark_buffer_dirty(bh);
++				zero_user(page + block_start / PAGE_SIZE,
++						start % PAGE_SIZE,
++						size);
++				set_buffer_uptodate(bh);
+ 			}
++
++			clear_buffer_new(bh);
++			mark_buffer_dirty(bh);
+ 		}
+ 
+ 		block_start = block_end;
+@@ -1992,18 +1993,21 @@ iomap_to_bh(struct inode *inode, sector_t block, struct buffer_head *bh,
+ int __block_write_begin_int(struct page *page, loff_t pos, unsigned len,
+ 		get_block_t *get_block, struct iomap *iomap)
+ {
+-	unsigned from = pos & (PAGE_SIZE - 1);
+-	unsigned to = from + len;
+-	struct inode *inode = page->mapping->host;
++	unsigned from, to;
++	struct inode *inode = page_mapping(page)->host;
+ 	unsigned block_start, block_end;
+ 	sector_t block;
+ 	int err = 0;
+ 	unsigned blocksize, bbits;
+ 	struct buffer_head *bh, *head, *wait[2], **wait_bh=wait;
++	bool uptodate = PageUptodate(page);
+ 
++	page = compound_head(page);
++	from = pos & ~hpage_mask(page);
++	to = from + len;
+ 	BUG_ON(!PageLocked(page));
+-	BUG_ON(from > PAGE_SIZE);
+-	BUG_ON(to > PAGE_SIZE);
++	BUG_ON(from > hpage_size(page));
++	BUG_ON(to > hpage_size(page));
+ 	BUG_ON(from > to);
+ 
+ 	head = create_page_buffers(page, inode, 0);
+@@ -2016,10 +2020,8 @@ int __block_write_begin_int(struct page *page, loff_t pos, unsigned len,
+ 	    block++, block_start=block_end, bh = bh->b_this_page) {
+ 		block_end = block_start + blocksize;
+ 		if (block_end <= from || block_start >= to) {
+-			if (PageUptodate(page)) {
+-				if (!buffer_uptodate(bh))
+-					set_buffer_uptodate(bh);
+-			}
++			if (uptodate && !buffer_uptodate(bh))
++				set_buffer_uptodate(bh);
+ 			continue;
+ 		}
+ 		if (buffer_new(bh))
+@@ -2036,23 +2038,28 @@ int __block_write_begin_int(struct page *page, loff_t pos, unsigned len,
+ 
+ 			if (buffer_new(bh)) {
+ 				clean_bdev_bh_alias(bh);
+-				if (PageUptodate(page)) {
++				if (uptodate) {
+ 					clear_buffer_new(bh);
+ 					set_buffer_uptodate(bh);
+ 					mark_buffer_dirty(bh);
+ 					continue;
+ 				}
+-				if (block_end > to || block_start < from)
+-					zero_user_segments(page,
+-						to, block_end,
+-						block_start, from);
++				if (block_end > to || block_start < from) {
++					BUG_ON(to - from  > PAGE_SIZE);
++					zero_user_segments(page +
++							block_start / PAGE_SIZE,
++						to % PAGE_SIZE,
++						(block_start % PAGE_SIZE) + blocksize,
++						block_start % PAGE_SIZE,
++						from % PAGE_SIZE);
++				}
+ 				continue;
+ 			}
+ 		}
+-		if (PageUptodate(page)) {
++		if (uptodate) {
+ 			if (!buffer_uptodate(bh))
+ 				set_buffer_uptodate(bh);
+-			continue; 
++			continue;
+ 		}
+ 		if (!buffer_uptodate(bh) && !buffer_delay(bh) &&
+ 		    !buffer_unwritten(bh) &&
+@@ -2089,6 +2096,7 @@ static int __block_commit_write(struct inode *inode, struct page *page,
+ 	unsigned blocksize;
+ 	struct buffer_head *bh, *head;
+ 
++	VM_BUG_ON_PAGE(PageTail(page), page);
+ 	bh = head = page_buffers(page);
+ 	blocksize = bh->b_size;
+ 
+@@ -2102,7 +2110,8 @@ static int __block_commit_write(struct inode *inode, struct page *page,
+ 			set_buffer_uptodate(bh);
+ 			mark_buffer_dirty(bh);
+ 		}
+-		clear_buffer_new(bh);
++		if (buffer_new(bh))
++			clear_buffer_new(bh);
+ 
+ 		block_start = block_end;
+ 		bh = bh->b_this_page;
+@@ -2155,7 +2164,8 @@ int block_write_end(struct file *file, struct address_space *mapping,
+ 	struct inode *inode = mapping->host;
+ 	unsigned start;
+ 
+-	start = pos & (PAGE_SIZE - 1);
++	page = compound_head(page);
++	start = pos & ~hpage_mask(page);
+ 
+ 	if (unlikely(copied < len)) {
+ 		/*
+-- 
+2.11.0
 
-
---
-Eric Wheeler
-
-
-
-> > 
-> 
-> Hi Kai Krakow,
-> 
-> This fix is necessary, please send a patch to IOPRIO_PRIO_VALUE().
-> 
-> BTW, I don't see dc->ioprio_bypass from upstream kernel source, is it
-> from a development tree ?
-> 
-> 
-> -- 
-> Coly Li
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bcache" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> 
---1641074820-930125809-1485889293=:28608--
