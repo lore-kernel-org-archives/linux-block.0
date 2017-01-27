@@ -1,156 +1,135 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-io0-f174.google.com ([209.85.223.174]:33383 "EHLO
-        mail-io0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753373AbdA3NFl (ORCPT
+Received: from mail.free-electrons.com ([62.4.15.54]:48767 "EHLO
+        mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932356AbdA0Jr3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Jan 2017 08:05:41 -0500
-Received: by mail-io0-f174.google.com with SMTP id v96so10053534ioi.0
-        for <linux-block@vger.kernel.org>; Mon, 30 Jan 2017 05:05:40 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <CAPDyKFq6wzw=_6oc=hyW3B_tBAGfqzrixoy-gr=ki=M2wyhiNg@mail.gmail.com>
-References: <20170124101757.19676-1-linus.walleij@linaro.org>
- <CAPDyKFrB9UfkfGD08fTKegSB2W65pdWuDU=10mGukQmB=yhaqQ@mail.gmail.com> <CAPDyKFq6wzw=_6oc=hyW3B_tBAGfqzrixoy-gr=ki=M2wyhiNg@mail.gmail.com>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Mon, 30 Jan 2017 14:05:39 +0100
-Message-ID: <CACRpkdaL0qNXKOp9J-yLAN3njPoViE7iGtCr=mhmPGHdY+9LBQ@mail.gmail.com>
-Subject: Re: [PATCH 0/6] mmc: block: command issue cleanups
+        Fri, 27 Jan 2017 04:47:29 -0500
+Date: Fri, 27 Jan 2017 10:46:36 +0100
+From: Maxime Ripard <maxime.ripard@free-electrons.com>
 To: Ulf Hansson <ulf.hansson@linaro.org>
-Cc: "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
+Cc: Linus Walleij <linus.walleij@linaro.org>,
+        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
         linux-block@vger.kernel.org,
         Chunyan Zhang <zhang.chunyan@linaro.org>,
         Baolin Wang <baolin.wang@linaro.org>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Maxime Ripard <maxime.ripard@free-electrons.com>
-Content-Type: text/plain; charset=UTF-8
+        Paolo Valente <paolo.valente@linaro.org>
+Subject: Re: [PATCH 0/6] mmc: block: command issue cleanups
+Message-ID: <20170127094635.uxuhh5vcexdx4i5h@lukather>
+References: <20170124101757.19676-1-linus.walleij@linaro.org>
+ <CAPDyKFrB9UfkfGD08fTKegSB2W65pdWuDU=10mGukQmB=yhaqQ@mail.gmail.com>
+ <CAPDyKFq6wzw=_6oc=hyW3B_tBAGfqzrixoy-gr=ki=M2wyhiNg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="mst7ckrlkdvdljgj"
+In-Reply-To: <CAPDyKFq6wzw=_6oc=hyW3B_tBAGfqzrixoy-gr=ki=M2wyhiNg@mail.gmail.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Fri, Jan 27, 2017 at 8:58 AM, Ulf Hansson <ulf.hansson@linaro.org> wrote:
 
->>> Linus Walleij (6):
->>>   mmc: block: break out mmc_blk_rw_cmd_abort()
->>>   mmc: block: break out mmc_blk_rw_start_new()
->>>   mmc: block: do not assign mq_rq when aborting command
->>>   mmc: block: inline command abortions
->>>   mmc: block: introduce new_areq and old_areq
->>>   mmc: block: stop passing around pointless return values
-(...)
+--mst7ckrlkdvdljgj
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+Hi Ulf,
+
+On Fri, Jan 27, 2017 at 08:58:16AM +0100, Ulf Hansson wrote:
+> On 26 January 2017 at 09:07, Ulf Hansson <ulf.hansson@linaro.org> wrote:
+> > On 24 January 2017 at 11:17, Linus Walleij <linus.walleij@linaro.org> w=
+rote:
+> >> The function mmc_blk_issue_rw_rq() is hopelessly convoluted and
+> >> need to be refactored to it can be understood by humans.
+> >>
+> >> In the process I found some weird magic return values passed
+> >> around for no good reason.
+> >>
+> >> Things are more readable after this.
+> >>
+> >> This work is done towards the goal of breaking the function in
+> >> two parts: one just submitting the requests and one checking the
+> >> result and possibly resubmitting the command on error, so we
+> >> can make the usual path (non-errorpath) smooth and quick, and
+> >> be called directly when the driver completes a request.
+> >>
+> >> That in turn is a prerequisite for proper blk-mq integration
+> >> with the MMC/SD stack.
+> >>
+> >> All that comes later.
+> >>
+> >> Linus Walleij (6):
+> >>   mmc: block: break out mmc_blk_rw_cmd_abort()
+> >>   mmc: block: break out mmc_blk_rw_start_new()
+> >>   mmc: block: do not assign mq_rq when aborting command
+> >>   mmc: block: inline command abortions
+> >>   mmc: block: introduce new_areq and old_areq
+> >>   mmc: block: stop passing around pointless return values
+> >>
+> >>  drivers/mmc/core/block.c | 108 ++++++++++++++++++++++++++------------=
+---------
+> >>  drivers/mmc/core/block.h |   2 +-
+> >>  2 files changed, 60 insertions(+), 50 deletions(-)
+> >>
+> >> --
+> >> 2.9.3
+> >>
+> >
+> > Thanks, applied for next!
+>=20
+> Linus,
+>=20
 > Seems like this series may have issues. I have looked at boot reports
 > from kernelci, and particular the reports for
 > https://kernelci.org/boot/sun7i-a20-bananapi/job/ulfh/ are
 > interesting.
->
+>=20
 > Apparently, this board has an SD card attached. There have been errors
 > reported in the log for a while when doing data transfers, although
 > none of these errors have triggered the kernelci to report a boot
 > error.
-
-Damned I wish I could be hands-on with this system and bisect
-it. It's very helpful with shaky systems really. Sadly the errors are
-hard to reproduce :(
-
-The old errors look like so:
-
-[    6.099124] sunxi-mmc 1c0f000.mmc: smc 0 err, cmd 18, RD SBE !!
-[    6.105211] sunxi-mmc 1c0f000.mmc: data error, sending stop command
-[    6.122394] mmcblk0: timed out sending r/w cmd command, card status 0x900
-[    6.665013] sunxi-mmc 1c0f000.mmc: smc 0 err, cmd 18, RD DTO !!
-[    6.671011] sunxi-mmc 1c0f000.mmc: data error, sending stop command
-[    6.677812] mmcblk0: timed out sending r/w cmd command, card status 0x900
-[    7.123727] sunxi-mmc 1c0f000.mmc: smc 0 err, cmd 18, RD DTO !!
-[    7.129692] sunxi-mmc 1c0f000.mmc: data error, sending stop command
-[    7.136489] mmcblk0: timed out sending r/w cmd command, card status 0x900
-[    7.143349] blk_update_request: I/O error, dev mmcblk0, sector 124800
-[    7.493691] sunxi-mmc 1c0f000.mmc: smc 0 err, cmd 18, RD DTO !!
-[    7.499651] sunxi-mmc 1c0f000.mmc: data error, sending stop command
-[    7.506229] mmcblk0: timed out sending r/w cmd command, card status 0x900
-[    7.943641] sunxi-mmc 1c0f000.mmc: smc 0 err, cmd 18, RD DTO !!
-[    7.949595] sunxi-mmc 1c0f000.mmc: data error, sending stop command
-[    7.956222] mmcblk0: timed out sending r/w cmd command, card status 0x900
-[    7.963010] blk_update_request: I/O error, dev mmcblk0, sector 124800
-[    7.969499] Buffer I/O error on dev mmcblk0p1, logical block 15344,
-async page read
-[    8.321411] sunxi-mmc 1c0f000.mmc: smc 0 err, cmd 18, RD DTO !!
-[    8.327378] sunxi-mmc 1c0f000.mmc: data error, sending stop command
-[    8.334018] mmcblk0: timed out sending r/w cmd command, card status 0x900
-[    8.763338] sunxi-mmc 1c0f000.mmc: smc 0 err, cmd 18, RD DTO !!
-[    8.769276] sunxi-mmc 1c0f000.mmc: data error, sending stop command
-[    8.775960] mmcblk0: timed out sending r/w cmd command, card status 0x900
-[    8.782750] blk_update_request: I/O error, dev mmcblk0, sector 124928
-[    9.125126] sunxi-mmc 1c0f000.mmc: smc 0 err, cmd 18, RD DTO !!
-[    9.131084] sunxi-mmc 1c0f000.mmc: data error, sending stop command
-[    9.137624] mmcblk0: timed out sending r/w cmd command, card status 0x900
-[    9.144445] blk_update_request: I/O error, dev mmcblk0, sector 124928
-[    9.150881] Buffer I/O error on dev mmcblk0p2, logical block 0,
-async page read
-
-So something was causing errors on the read command.
-
+>=20
 > However, I suspect that some of the changes in this series make it
 > worse. Perhaps because of a changed error handling the mmc block
 > layer!?
->
+>=20
 > Particular, look at the difference between these [1] boot logs, it
 > might give you some hints. I have also added Maxime to this thread,
 > perhaps he can help out with the sunxi mmc driver.
 
-The new errors look like so:
+We also had a patch on the pinctrl side in 4.10, whose side effects
+would be to disable the pull ups on some boards that have not been
+configuring their pins properly (while the previous behaviour was to
+keep what the bootloader set).
 
-[    6.099171] sunxi-mmc 1c0f000.mmc: smc 0 err, cmd 18, RD SBE !!
-[    6.105259] sunxi-mmc 1c0f000.mmc: data error, sending stop command
-[    6.127415] mmcblk0: timed out sending r/w cmd command, card status 0x900
-[    6.666628] sunxi-mmc 1c0f000.mmc: smc 0 err, cmd 18, RD DTO !!
-[    6.672626] sunxi-mmc 1c0f000.mmc: data error, sending stop command
-[    6.679420] mmcblk0: timed out sending r/w cmd command, card status 0x900
-[    7.503256] sunxi-mmc 1c0f000.mmc: fatal err update clk timeout
-[    8.623257] sunxi-mmc 1c0f000.mmc: fatal err update clk timeout
+That board seems to fall in that category.
 
-This "fatal err update clk timeout" is new and is coming from the driver.
+That behaviour has been reverted, and Linus merged it already, so it
+might be entirely unrelated to that serie.
 
-[    8.630370] mmc0: tried to reset card, got error -5
-[    8.635309] blk_update_request: I/O error, dev mmcblk0, sector 124800
-[    8.642366] mmcblk0: error -5 sending status command, retrying
-[    8.648279] mmcblk0: error -5 sending status command, retrying
-[    8.654132] mmcblk0: error -5 sending status command, aborting
-[    8.659961] blk_update_request: I/O error, dev mmcblk0, sector 7167872
-[    8.667201] mmcblk0: error -5 sending status command, retrying
-[    8.673031] mmcblk0: error -5 sending status command, retrying
-[    8.678916] mmcblk0: error -5 sending status command, aborting
-[    8.684758] blk_update_request: I/O error, dev mmcblk0, sector 124800
-[    8.691195] Buffer I/O error on dev mmcblk0p1, logical block 15344,
-async page read
-[    8.700492] mmcblk0: error -5 sending status command, retrying
-[    8.706405] mmcblk0: error -5 sending status command, retrying
-[    8.712232] mmcblk0: error -5 sending status command, aborting
-[    8.718103] blk_update_request: I/O error, dev mmcblk0, sector 7167872
-[    8.724643] Buffer I/O error on dev mmcblk0p2, logical block
-880368, async page read
-[    8.732403] Unable to handle kernel NULL pointer dereference at
-virtual address 00000028
-[    8.740501] pgd = c0004000
-[    8.743204] [00000028] *pgd=00000000
-[    8.746794] Internal error: Oops: 17 [#1] SMP ARM
-[    8.751491] Modules linked in:
-[    8.754547] CPU: 0 PID: 65 Comm: mmcqd/0 Not tainted
-4.10.0-rc5-00097-ge1defa2da4d3 #1
-[    8.762450] Hardware name: Allwinner sun7i (A20) Family
-[    8.767666] task: ee9b0fc0 task.stack: ee9d8000
-[    8.772201] PC is at mmc_blk_rw_rq_prep+0x20/0x39c
-[    8.776985] LR is at mmc_blk_issue_rw_rq+0x124/0x370
+Maxime
 
-And now it is crashing at mmc_blk_rw_rq_prep() + 0x20 so I suspect it is one of
-these:
+--=20
+Maxime Ripard, Free Electrons
+Embedded Linux and Kernel engineering
+http://free-electrons.com
 
-struct mmc_blk_request *brq = &mqrq->brq;
-struct request *req = mqrq->req;
-struct mmc_blk_data *md = mq->blkdata;
+--mst7ckrlkdvdljgj
+Content-Type: application/pgp-signature; name="signature.asc"
 
-I guess the first: mqrq is NULL.
+-----BEGIN PGP SIGNATURE-----
 
-So I suspect the oneliner in commit 0ebd6e72b5ee2592625d5ae567a729345dfe07b6
-"mmc: block: do not assign mq_rq when aborting command"
+iQIcBAEBCAAGBQJYixb7AAoJEBx+YmzsjxAgqg0P/AuPFT9H6XGT4GL3r2CJDfFk
+BDkeQjUlqgTKv0MDEt55GrtDLHSBdkHr+5zSEMmCOa/YxPZ20lYWOQHt8WjGVBuT
+sqlIME68tfF8Ghwc7CwFZW4CXo8k3XlUa9gLRiMzVrhsIvzgi3+vN9hEhMaoTGrQ
+XAiYCQPS0sxnsjT9z6F/O6mInOV+ItN5266OlWOvuIcUbwWkF1XwbAk8BUjF1TgR
+gTbuVf+Ti5w5T2IkXCoqcg2SUp/Onw8GAe59s8H8jihSoJNcKU/jtMhc4UNa+fWD
+QPKIDMVp/q0+RC70M/nkk+UoS0QtGYdU1mqPfPcY7JBm1BKxpsNTfnduQ7xwFlqI
+OqkQUW/DnX8VfUOfLxXdWgMk/721GzTMuw3nWB38hWRWXzPBF3bw2LgAtstwH35m
+ZRCUIJ5XSmcmF3ssYjugjFCwSz5H1qF0Y+NVi1s5X+PU+tbgM1UP2GBsH9C8xSK2
+tsqTqi7e/GnMzqHE3Yu1VaWTwN6/Y5pS1ne9wBrMI80/fKXM36j2AqYQrgNmzSeW
+qYlkylQuuH1WDqq9IxoISPEYqcrm1Uxs4ucmwcubkCT4vcmSl1zpc52OAowFfL/J
+37vmg4ybpnc/oQAmImilBJ5TeKirePGoNgPs8NDhESuHkXckxuQozaXEKg9whffT
+1LyLeBeNqb2SQaHmiKGS
+=jSRQ
+-----END PGP SIGNATURE-----
 
-That is not easily reverted so I will sent a RTF patch to restore the behaviour.
-
-Yours,
-Linus Walleij
+--mst7ckrlkdvdljgj--
