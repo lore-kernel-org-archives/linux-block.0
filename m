@@ -1,48 +1,82 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-bn3nam01on0043.outbound.protection.outlook.com ([104.47.33.43]:32224
-        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752021AbdAaMSY (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 31 Jan 2017 07:18:24 -0500
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
-To: <axboe@fb.com>
-CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <jg@lightnvm.io>,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
-Subject: [PATCH 10/12] lightnvm: Add CRC read error
-Date: Tue, 31 Jan 2017 13:17:18 +0100
-Message-ID: <20170131121720.10971-11-matias@cnexlabs.com>
-In-Reply-To: <20170131121720.10971-1-matias@cnexlabs.com>
-References: <20170131121720.10971-1-matias@cnexlabs.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <BATV+3cdfc0cdff764882efbb+4905+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: mst@redhat.com,
+	jasowang@redhat.com
+Cc: axboe@kernel.dk,
+	pbonzini@redhat.com,
+	virtualization@lists.linux-foundation.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 8/9] virtio_blk: use virtio IRQ affinity
+Date: Fri, 27 Jan 2017 09:16:36 +0100
+Message-Id: <1485504997-17584-9-git-send-email-hch@lst.de>
+In-Reply-To: <1485504997-17584-1-git-send-email-hch@lst.de>
+References: <1485504997-17584-1-git-send-email-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Javier González <jg@lightnvm.io>
+Use automatic IRQ affinity assignment in the virtio layer if available,
+and build the blk-mq queues based on it.
 
-Let the host differentiate between a read error and a CRC check error on
-the device side.
-
-Signed-off-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- include/linux/lightnvm.h | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/block/virtio_blk.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
 
-diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
-index 17cd454..bc282d2 100644
---- a/include/linux/lightnvm.h
-+++ b/include/linux/lightnvm.h
-@@ -107,6 +107,7 @@ enum {
- 	NVM_RSP_ERR_FAILWRITE	= 0x40ff,
- 	NVM_RSP_ERR_EMPTYPAGE	= 0x42ff,
- 	NVM_RSP_ERR_FAILECC	= 0x4281,
-+	NVM_RSP_ERR_FAILCRC	= 0x4004,
- 	NVM_RSP_WARN_HIGHECC	= 0x4700,
+diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+index c54118b..1028dfe 100644
+--- a/drivers/block/virtio_blk.c
++++ b/drivers/block/virtio_blk.c
+@@ -5,6 +5,7 @@
+ #include <linux/hdreg.h>
+ #include <linux/module.h>
+ #include <linux/mutex.h>
++#include <linux/interrupt.h>
+ #include <linux/virtio.h>
+ #include <linux/virtio_blk.h>
+ #include <linux/scatterlist.h>
+@@ -12,6 +13,7 @@
+ #include <scsi/scsi_cmnd.h>
+ #include <linux/idr.h>
+ #include <linux/blk-mq.h>
++#include <linux/blk-mq-virtio.h>
+ #include <linux/numa.h>
  
- 	/* Device opcodes */
+ #define PART_BITS 4
+@@ -385,6 +387,7 @@ static int init_vq(struct virtio_blk *vblk)
+ 	struct virtqueue **vqs;
+ 	unsigned short num_vqs;
+ 	struct virtio_device *vdev = vblk->vdev;
++	struct irq_affinity desc = { 0, };
+ 
+ 	err = virtio_cread_feature(vdev, VIRTIO_BLK_F_MQ,
+ 				   struct virtio_blk_config, num_queues,
+@@ -412,7 +415,7 @@ static int init_vq(struct virtio_blk *vblk)
+ 
+ 	/* Discover virtqueues and write information to configuration.  */
+ 	err = vdev->config->find_vqs(vdev, num_vqs, vqs, callbacks, names,
+-			NULL);
++			&desc);
+ 	if (err)
+ 		goto out;
+ 
+@@ -543,10 +546,18 @@ static int virtblk_init_request(void *data, struct request *rq,
+ 	return 0;
+ }
+ 
++static int virtblk_map_queues(struct blk_mq_tag_set *set)
++{
++	struct virtio_blk *vblk = set->driver_data;
++
++	return blk_mq_virtio_map_queues(set, vblk->vdev, 0);
++}
++
+ static struct blk_mq_ops virtio_mq_ops = {
+ 	.queue_rq	= virtio_queue_rq,
+ 	.complete	= virtblk_request_done,
+ 	.init_request	= virtblk_init_request,
++	.map_queues	= virtblk_map_queues,
+ };
+ 
+ static unsigned int virtblk_queue_depth;
 -- 
-2.9.3
-
+2.1.4
