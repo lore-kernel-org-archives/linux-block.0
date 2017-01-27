@@ -1,44 +1,74 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:56182 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S966738AbdAKNnP (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Jan 2017 08:43:15 -0500
-Date: Wed, 11 Jan 2017 14:43:12 +0100
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: "lsf-pc@lists.linux-foundation.org"
-        <lsf-pc@lists.linux-foundation.org>
-Cc: linux-block@vger.kernel.org, Linux-scsi@vger.kernel.org,
-        Sagi Grimberg <sagi@grimberg.me>,
-        linux-nvme@lists.infradead.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Keith Busch <keith.busch@intel.com>
-Subject: [LSF/MM TOPIC][LSF/MM ATTEND] NAPI polling for block drivers
-Message-ID: <20170111134312.GH6286@linux-x5ow.site>
+Return-Path: <hare@suse.de>
+Subject: Re: [PATCH] queue stall with blk-mq-sched
+To: Jens Axboe <axboe@kernel.dk>
+References: <aa1c23e1-1beb-a26d-3e77-fe78aa281771@suse.de>
+ <762cb508-1de0-93e2-5643-3fe946428eb5@fb.com>
+ <8abc2430-e1fd-bece-ad52-c6d1d482c1e0@suse.de>
+ <1663de5d-cdf7-a6ed-7539-c7d1f5e98f6c@fb.com>
+ <717c595a-a3a6-0508-b537-8cf9e273271e@kernel.dk>
+ <8178340b-dd64-c02d-0ef2-97ad5f928dc8@suse.de>
+ <2b40b443-3bd6-717a-11ba-043886780adf@suse.de>
+ <6035003f-029c-6cff-c35f-4e90496cab50@suse.de>
+ <be2e5182-9cd8-5fea-77ac-4efd64e869ff@kernel.dk>
+ <57539c5d-be3b-ab26-c6d4-a7ff554ded8b@suse.de>
+ <3261ba64-cd7b-a7da-c407-c3b9828c3b57@kernel.dk>
+ <262c4739-be6c-94e9-8e8c-6e97a602e881@kernel.dk>
+ <1447bc07-9336-14f2-8495-a109113050ec@kernel.dk>
+ <4e7abe98-6374-e4d6-5252-42f4fd585e64@suse.de>
+ <5240a94e-56f3-4332-5e4a-4b8d39ba3880@kernel.dk>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ Omar Sandoval <osandov@osandov.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <94c43936-6f7e-0b4e-c09c-f103e0057711@suse.de>
+Date: Fri, 27 Jan 2017 07:58:09 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <5240a94e-56f3-4332-5e4a-4b8d39ba3880@kernel.dk>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-Hi all,
+On 01/26/2017 05:42 PM, Jens Axboe wrote:
+> On 01/26/2017 09:35 AM, Hannes Reinecke wrote:
+>> On 01/25/2017 11:27 PM, Jens Axboe wrote:
+[ .. ]
+>>> And another variant, this one should be better in that it should result
+>>> in less queue runs and get better merging. Hope it works with your
+>>> stalls as well.
+>>>
+>>>
+>>
+>> Looking good; queue stalls are gone, and performance is okay-ish.
+>> I'm getting 84k IOPs now, which is not bad.
+> 
+> Is that a tested-by?
+> 
+Not yet; while doing the performance analysis the system now got a queue
+stalled with _legacy_ SQ.
+Need to figure out if it's my mpt3sas patches or something else.
 
-I'd like to attend LSF/MM and would like to discuss polling for block drivers.
+>> But we absolutely need to work on I/O merging; with CFQ I'm seeing
+>> requests having about double the size of those done by mq-deadline.
+>> (Bit unfair, I know :-)
+>>
+>> I'll be having some more data in time for LSF/MM.
+> 
+> I agree, looking at the performance delta, it's all about merging. It's
+> fairly easy to observe with mq-deadline, as merging rates drop
+> proportionally to the number of queues configured. But even with 1 queue
+> with scsi-mq, we're still seeing lower merging rates than !mq +
+> deadline, for instance.
+> 
+> I'll look at the merging case, it should not be that hard to bring at
+> least the single queue case to parity with !mq. I'm actually surprised
+> it isn't already.
+> 
+Thanks.
 
-Currently there is blk-iopoll but it is neither as widely used as NAPI in the
-networking field and accoring to Sagi's findings in [1] performance with
-polling is not on par with IRQ usage.
+Cheers,
 
-On LSF/MM I'd like to whether it is desirable to have NAPI like polling in
-more block drivers and how to overcome the currently seen performance issues.
-
-[1] http://lists.infradead.org/pipermail/linux-nvme/2016-October/006975.html
-
-Byte,
-	Johannes
-
+Hannes
 -- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: Felix Imend�rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N�rnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
