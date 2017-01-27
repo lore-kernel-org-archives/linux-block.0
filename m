@@ -1,547 +1,392 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:50914 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750865AbdAaP65 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 31 Jan 2017 10:58:57 -0500
+Return-Path: <BATV+3cdfc0cdff764882efbb+4905+infradead.org+hch@bombadil.srs.infradead.org>
 From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 09/10] ide: don't abuse cmd_type
-Date: Tue, 31 Jan 2017 16:57:30 +0100
-Message-Id: <1485878251-6107-10-git-send-email-hch@lst.de>
-In-Reply-To: <1485878251-6107-1-git-send-email-hch@lst.de>
-References: <1485878251-6107-1-git-send-email-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+To: mst@redhat.com,
+	jasowang@redhat.com
+Cc: axboe@kernel.dk,
+	pbonzini@redhat.com,
+	virtualization@lists.linux-foundation.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 1/9] virtio_pci: remove struct virtio_pci_vq_info
+Date: Fri, 27 Jan 2017 09:16:29 +0100
+Message-Id: <1485504997-17584-2-git-send-email-hch@lst.de>
+In-Reply-To: <1485504997-17584-1-git-send-email-hch@lst.de>
+References: <1485504997-17584-1-git-send-email-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-Currently the legacy ide driver defines several request types of it's own,
-which is in the way of removing that field entirely.
+We don't really need struct virtio_pci_vq_info, as most field in there
+are redundant:
 
-Instead add a type field to struct ide_request and use that to distinguish
-the different types of IDE-internal requests.
-
-It's a bit of a mess, but so is the surrounding code..
+ - the vq backpointer is not strictly neede to start with
+ - the entry in the vqs list is not needed - the generic virtqueue already
+   has list, we only need to check if it has a callback to get the same
+   semantics
+ - we can use a simple array to look up the MSI-X vec if needed.
+ - That simple array now also duoble serves to replace the per_vq_vectors
+   flag
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/ide/ide-atapi.c    | 18 ++++++++++-----
- drivers/ide/ide-cd.c       | 25 ++++++++++++---------
- drivers/ide/ide-cd_ioctl.c |  1 +
- drivers/ide/ide-devsets.c  |  1 +
- drivers/ide/ide-disk.c     |  6 +++--
- drivers/ide/ide-eh.c       |  4 ++--
- drivers/ide/ide-floppy.c   | 18 ++++++++++-----
- drivers/ide/ide-io.c       |  8 +++----
- drivers/ide/ide-ioctls.c   |  4 +++-
- drivers/ide/ide-park.c     |  2 ++
- drivers/ide/ide-pm.c       | 16 ++++++++-----
- drivers/ide/ide-tape.c     |  6 +++--
- drivers/ide/ide-taskfile.c |  3 ++-
- include/linux/ide.h        | 56 +++++++++++++++++++++++++++++++++++++---------
- 14 files changed, 117 insertions(+), 51 deletions(-)
+ drivers/virtio/virtio_pci_common.c | 117 +++++++++++--------------------------
+ drivers/virtio/virtio_pci_common.h |  25 +-------
+ drivers/virtio/virtio_pci_legacy.c |   6 +-
+ drivers/virtio/virtio_pci_modern.c |   6 +-
+ 4 files changed, 39 insertions(+), 115 deletions(-)
 
-diff --git a/drivers/ide/ide-atapi.c b/drivers/ide/ide-atapi.c
-index 7c826ec..a8c650e 100644
---- a/drivers/ide/ide-atapi.c
-+++ b/drivers/ide/ide-atapi.c
-@@ -95,6 +95,7 @@ int ide_queue_pc_tail(ide_drive_t *drive, struct gendisk *disk,
- 	rq = blk_get_request(drive->queue, READ, __GFP_RECLAIM);
- 	scsi_req_init(rq);
- 	rq->cmd_type = REQ_TYPE_DRV_PRIV;
-+	ide_req(rq)->type = ATA_PRIV_MISC;
- 	rq->special = (char *)pc;
- 
- 	if (buf && bufflen) {
-@@ -193,7 +194,7 @@ void ide_prep_sense(ide_drive_t *drive, struct request *rq)
- 
- 	BUG_ON(sense_len > sizeof(*sense));
- 
--	if (rq->cmd_type == REQ_TYPE_ATA_SENSE || drive->sense_rq_armed)
-+	if (ata_sense_request(rq) || drive->sense_rq_armed)
- 		return;
- 
- 	memset(sense, 0, sizeof(*sense));
-@@ -211,7 +212,8 @@ void ide_prep_sense(ide_drive_t *drive, struct request *rq)
- 	}
- 
- 	sense_rq->rq_disk = rq->rq_disk;
--	sense_rq->cmd_type = REQ_TYPE_ATA_SENSE;
-+	sense_rq->cmd_type = REQ_TYPE_DRV_PRIV;
-+	ide_req(sense_rq)->type = ATA_PRIV_SENSE;
- 	sense_rq->rq_flags |= RQF_PREEMPT;
- 
- 	req->cmd[0] = GPCMD_REQUEST_SENSE;
-@@ -313,10 +315,14 @@ int ide_cd_get_xferlen(struct request *rq)
- 	switch (rq->cmd_type) {
- 	case REQ_TYPE_FS:
- 		return 32768;
--	case REQ_TYPE_ATA_SENSE:
- 	case REQ_TYPE_BLOCK_PC:
--	case REQ_TYPE_ATA_PC:
- 		return blk_rq_bytes(rq);
-+	case REQ_TYPE_DRV_PRIV:
-+		switch (ide_req(rq)->type) {
-+		case ATA_PRIV_PC:
-+		case ATA_PRIV_SENSE:
-+			return blk_rq_bytes(rq);
-+		}
- 	default:
- 		return 0;
- 	}
-@@ -377,7 +383,7 @@ int ide_check_ireason(ide_drive_t *drive, struct request *rq, int len,
- 				drive->name, __func__, ireason);
- 	}
- 
--	if (dev_is_idecd(drive) && rq->cmd_type == REQ_TYPE_ATA_PC)
-+	if (dev_is_idecd(drive) && ata_pc_request(rq))
- 		rq->rq_flags |= RQF_FAILED;
- 
- 	return 1;
-@@ -480,7 +486,7 @@ static ide_startstop_t ide_pc_intr(ide_drive_t *drive)
- 		if (uptodate == 0)
- 			drive->failed_pc = NULL;
- 
--		if (rq->cmd_type == REQ_TYPE_DRV_PRIV) {
-+		if (ata_misc_request(rq)) {
- 			rq->errors = 0;
- 			error = 0;
- 		} else {
-diff --git a/drivers/ide/ide-cd.c b/drivers/ide/ide-cd.c
-index 6eb9872..207af78 100644
---- a/drivers/ide/ide-cd.c
-+++ b/drivers/ide/ide-cd.c
-@@ -210,7 +210,7 @@ static void cdrom_analyze_sense_data(ide_drive_t *drive,
- static void ide_cd_complete_failed_rq(ide_drive_t *drive, struct request *rq)
+diff --git a/drivers/virtio/virtio_pci_common.c b/drivers/virtio/virtio_pci_common.c
+index 186cbab..a3376731 100644
+--- a/drivers/virtio/virtio_pci_common.c
++++ b/drivers/virtio/virtio_pci_common.c
+@@ -62,16 +62,13 @@ static irqreturn_t vp_config_changed(int irq, void *opaque)
+ static irqreturn_t vp_vring_interrupt(int irq, void *opaque)
  {
- 	/*
--	 * For REQ_TYPE_ATA_SENSE, "rq->special" points to the original
-+	 * For ATA_PRIV_SENSE, "rq->special" points to the original
- 	 * failed request.  Also, the sense data should be read
- 	 * directly from rq which might be different from the original
- 	 * sense buffer if it got copied during mapping.
-@@ -282,7 +282,7 @@ static int cdrom_decode_status(ide_drive_t *drive, u8 stat)
- 				  "stat 0x%x",
- 				  rq->cmd[0], rq->cmd_type, err, stat);
+ 	struct virtio_pci_device *vp_dev = opaque;
+-	struct virtio_pci_vq_info *info;
+ 	irqreturn_t ret = IRQ_NONE;
+-	unsigned long flags;
++	struct virtqueue *vq;
  
--	if (rq->cmd_type == REQ_TYPE_ATA_SENSE) {
-+	if (ata_sense_request(rq)) {
- 		/*
- 		 * We got an error trying to get sense info from the drive
- 		 * (probably while trying to recover from a former error).
-@@ -438,7 +438,8 @@ int ide_cd_queue_pc(ide_drive_t *drive, const unsigned char *cmd,
- 		rq = blk_get_request(drive->queue, write, __GFP_RECLAIM);
- 		scsi_req_init(rq);
- 		memcpy(scsi_req(rq)->cmd, cmd, BLK_MAX_CDB);
--		rq->cmd_type = REQ_TYPE_ATA_PC;
-+		rq->cmd_type = REQ_TYPE_DRV_PRIV;
-+		ide_req(rq)->type = ATA_PRIV_PC;
- 		rq->rq_flags |= rq_flags;
- 		rq->timeout = timeout;
- 		if (buffer) {
-@@ -520,7 +521,7 @@ static ide_startstop_t cdrom_newpc_intr(ide_drive_t *drive)
- 	ide_expiry_t *expiry = NULL;
- 	int dma_error = 0, dma, thislen, uptodate = 0;
- 	int write = (rq_data_dir(rq) == WRITE) ? 1 : 0, rc = 0;
--	int sense = (rq->cmd_type == REQ_TYPE_ATA_SENSE);
-+	int sense = ata_sense_request(rq);
- 	unsigned int timeout;
- 	u16 len;
- 	u8 ireason, stat;
-@@ -785,18 +786,22 @@ static ide_startstop_t ide_cd_do_request(ide_drive_t *drive, struct request *rq,
- 		if (cdrom_start_rw(drive, rq) == ide_stopped)
- 			goto out_end;
- 		break;
--	case REQ_TYPE_ATA_SENSE:
- 	case REQ_TYPE_BLOCK_PC:
--	case REQ_TYPE_ATA_PC:
-+	handle_pc:
- 		if (!rq->timeout)
- 			rq->timeout = ATAPI_WAIT_PC;
+-	spin_lock_irqsave(&vp_dev->lock, flags);
+-	list_for_each_entry(info, &vp_dev->virtqueues, node) {
+-		if (vring_interrupt(irq, info->vq) == IRQ_HANDLED)
++	list_for_each_entry(vq, &vp_dev->vdev.vqs, list) {
++		if (vq->callback && vring_interrupt(irq, vq) == IRQ_HANDLED)
+ 			ret = IRQ_HANDLED;
+ 	}
+-	spin_unlock_irqrestore(&vp_dev->lock, flags);
+ 
+ 	return ret;
+ }
+@@ -167,55 +164,6 @@ static int vp_request_msix_vectors(struct virtio_device *vdev, int nvectors,
+ 	return err;
+ }
+ 
+-static struct virtqueue *vp_setup_vq(struct virtio_device *vdev, unsigned index,
+-				     void (*callback)(struct virtqueue *vq),
+-				     const char *name,
+-				     u16 msix_vec)
+-{
+-	struct virtio_pci_device *vp_dev = to_vp_device(vdev);
+-	struct virtio_pci_vq_info *info = kmalloc(sizeof *info, GFP_KERNEL);
+-	struct virtqueue *vq;
+-	unsigned long flags;
 -
- 		cdrom_do_block_pc(drive, rq);
- 		break;
- 	case REQ_TYPE_DRV_PRIV:
--		/* right now this can only be a reset... */
--		uptodate = 1;
--		goto out_end;
-+		switch (ide_req(rq)->type) {
-+		case ATA_PRIV_MISC:
-+			/* right now this can only be a reset... */
-+			uptodate = 1;
-+			goto out_end;
-+		case ATA_PRIV_SENSE:
-+		case ATA_PRIV_PC:
-+			goto handle_pc;
-+		}
- 	default:
- 		BUG();
- 	}
-diff --git a/drivers/ide/ide-cd_ioctl.c b/drivers/ide/ide-cd_ioctl.c
-index da0aa01..3f03eed 100644
---- a/drivers/ide/ide-cd_ioctl.c
-+++ b/drivers/ide/ide-cd_ioctl.c
-@@ -306,6 +306,7 @@ int ide_cdrom_reset(struct cdrom_device_info *cdi)
- 	rq = blk_get_request(drive->queue, READ, __GFP_RECLAIM);
- 	scsi_req_init(rq);
- 	rq->cmd_type = REQ_TYPE_DRV_PRIV;
-+	ide_req(rq)->type = ATA_PRIV_MISC;
- 	rq->rq_flags = RQF_QUIET;
- 	ret = blk_execute_rq(drive->queue, cd->disk, rq, 0);
- 	blk_put_request(rq);
-diff --git a/drivers/ide/ide-devsets.c b/drivers/ide/ide-devsets.c
-index fd56c9d..c040b9d 100644
---- a/drivers/ide/ide-devsets.c
-+++ b/drivers/ide/ide-devsets.c
-@@ -168,6 +168,7 @@ int ide_devset_execute(ide_drive_t *drive, const struct ide_devset *setting,
- 	rq = blk_get_request(q, READ, __GFP_RECLAIM);
- 	scsi_req_init(rq);
- 	rq->cmd_type = REQ_TYPE_DRV_PRIV;
-+	ide_req(rq)->type = ATA_PRIV_MISC;
- 	scsi_req(rq)->cmd_len = 5;
- 	scsi_req(rq)->cmd[0] = REQ_DEVSET_EXEC;
- 	*(int *)&scsi_req(rq)->cmd[1] = arg;
-diff --git a/drivers/ide/ide-disk.c b/drivers/ide/ide-disk.c
-index 3437c5b..69cf717 100644
---- a/drivers/ide/ide-disk.c
-+++ b/drivers/ide/ide-disk.c
-@@ -453,7 +453,8 @@ static int idedisk_prep_fn(struct request_queue *q, struct request *rq)
- 	cmd->tf_flags = IDE_TFLAG_DYN;
- 	cmd->protocol = ATA_PROT_NODATA;
- 
--	rq->cmd_type = REQ_TYPE_ATA_TASKFILE;
-+	rq->cmd_type = REQ_TYPE_DRV_PRIV;
-+	ide_req(rq)->type = ATA_PRIV_TASKFILE;
- 	rq->special = cmd;
- 	cmd->rq = rq;
- 
-@@ -479,7 +480,8 @@ static int set_multcount(ide_drive_t *drive, int arg)
- 
- 	rq = blk_get_request(drive->queue, READ, __GFP_RECLAIM);
- 	scsi_req_init(rq);
--	rq->cmd_type = REQ_TYPE_ATA_TASKFILE;
-+	rq->cmd_type = REQ_TYPE_DRV_PRIV;
-+	ide_req(rq)->type = ATA_PRIV_TASKFILE;
- 
- 	drive->mult_req = arg;
- 	drive->special_flags |= IDE_SFLAG_SET_MULTMODE;
-diff --git a/drivers/ide/ide-eh.c b/drivers/ide/ide-eh.c
-index 35e5b89..1e4b147 100644
---- a/drivers/ide/ide-eh.c
-+++ b/drivers/ide/ide-eh.c
-@@ -124,7 +124,7 @@ ide_startstop_t ide_error(ide_drive_t *drive, const char *msg, u8 stat)
- 
- 	/* retry only "normal" I/O: */
- 	if (rq->cmd_type != REQ_TYPE_FS) {
--		if (rq->cmd_type == REQ_TYPE_ATA_TASKFILE) {
-+		if (ata_taskfile_request(rq)) {
- 			struct ide_cmd *cmd = rq->special;
- 
- 			if (cmd)
-@@ -147,7 +147,7 @@ static inline void ide_complete_drive_reset(ide_drive_t *drive, int err)
- {
- 	struct request *rq = drive->hwif->rq;
- 
--	if (rq && rq->cmd_type == REQ_TYPE_DRV_PRIV &&
-+	if (rq && ata_misc_request(rq) &&
- 	    scsi_req(rq)->cmd[0] == REQ_DRIVE_RESET) {
- 		if (err <= 0 && rq->errors == 0)
- 			rq->errors = -EIO;
-diff --git a/drivers/ide/ide-floppy.c b/drivers/ide/ide-floppy.c
-index 3bd678a..24c6d36 100644
---- a/drivers/ide/ide-floppy.c
-+++ b/drivers/ide/ide-floppy.c
-@@ -97,7 +97,7 @@ static int ide_floppy_callback(ide_drive_t *drive, int dsc)
- 			       "Aborting request!\n");
- 	}
- 
--	if (rq->cmd_type == REQ_TYPE_DRV_PRIV)
-+	if (ata_misc_request(rq))
- 		rq->errors = uptodate ? 0 : IDE_DRV_ERROR_GENERAL;
- 
- 	return uptodate;
-@@ -246,7 +246,7 @@ static ide_startstop_t ide_floppy_do_request(ide_drive_t *drive,
- 		} else
- 			printk(KERN_ERR PFX "%s: I/O error\n", drive->name);
- 
--		if (rq->cmd_type == REQ_TYPE_DRV_PRIV) {
-+		if (ata_misc_request(rq)) {
- 			rq->errors = 0;
- 			ide_complete_rq(drive, 0, blk_rq_bytes(rq));
- 			return ide_stopped;
-@@ -265,14 +265,20 @@ static ide_startstop_t ide_floppy_do_request(ide_drive_t *drive,
- 		pc = &floppy->queued_pc;
- 		idefloppy_create_rw_cmd(drive, pc, rq, (unsigned long)block);
- 		break;
--	case REQ_TYPE_DRV_PRIV:
--	case REQ_TYPE_ATA_SENSE:
--		pc = (struct ide_atapi_pc *)rq->special;
--		break;
- 	case REQ_TYPE_BLOCK_PC:
- 		pc = &floppy->queued_pc;
- 		idefloppy_blockpc_cmd(floppy, pc, rq);
- 		break;
-+	case REQ_TYPE_DRV_PRIV:
-+		switch (ide_req(rq)->type) {
-+		case ATA_PRIV_MISC:
-+		case ATA_PRIV_SENSE:
-+			pc = (struct ide_atapi_pc *)rq->special;
-+			break;
-+		default:
-+			BUG();
-+		}
-+		break;
- 	default:
- 		BUG();
- 	}
-diff --git a/drivers/ide/ide-io.c b/drivers/ide/ide-io.c
-index 3378503..6735c92 100644
---- a/drivers/ide/ide-io.c
-+++ b/drivers/ide/ide-io.c
-@@ -102,7 +102,7 @@ void ide_complete_cmd(ide_drive_t *drive, struct ide_cmd *cmd, u8 stat, u8 err)
- 			drive->dev_flags |= IDE_DFLAG_PARKED;
- 	}
- 
--	if (rq && rq->cmd_type == REQ_TYPE_ATA_TASKFILE) {
-+	if (rq && ata_taskfile_request(rq)) {
- 		struct ide_cmd *orig_cmd = rq->special;
- 
- 		if (cmd->tf_flags & IDE_TFLAG_DYN)
-@@ -135,7 +135,7 @@ EXPORT_SYMBOL(ide_complete_rq);
- 
- void ide_kill_rq(ide_drive_t *drive, struct request *rq)
- {
--	u8 drv_req = (rq->cmd_type == REQ_TYPE_DRV_PRIV) && rq->rq_disk;
-+	u8 drv_req = ata_misc_request(rq) && rq->rq_disk;
- 	u8 media = drive->media;
- 
- 	drive->failed_pc = NULL;
-@@ -340,7 +340,7 @@ static ide_startstop_t start_request (ide_drive_t *drive, struct request *rq)
- 		if (drive->current_speed == 0xff)
- 			ide_config_drive_speed(drive, drive->desired_speed);
- 
--		if (rq->cmd_type == REQ_TYPE_ATA_TASKFILE)
-+		if (ata_taskfile_request(rq))
- 			return execute_drive_cmd(drive, rq);
- 		else if (ata_pm_request(rq)) {
- 			struct ide_pm_state *pm = rq->special;
-@@ -353,7 +353,7 @@ static ide_startstop_t start_request (ide_drive_t *drive, struct request *rq)
- 			    pm->pm_step == IDE_PM_COMPLETED)
- 				ide_complete_pm_rq(drive, rq);
- 			return startstop;
--		} else if (!rq->rq_disk && rq->cmd_type == REQ_TYPE_DRV_PRIV)
-+		} else if (!rq->rq_disk && ata_misc_request(rq))
- 			/*
- 			 * TODO: Once all ULDs have been modified to
- 			 * check for specific op codes rather than
-diff --git a/drivers/ide/ide-ioctls.c b/drivers/ide/ide-ioctls.c
-index a5d22c6..fc19e84 100644
---- a/drivers/ide/ide-ioctls.c
-+++ b/drivers/ide/ide-ioctls.c
-@@ -127,7 +127,8 @@ static int ide_cmd_ioctl(ide_drive_t *drive, unsigned long arg)
- 
- 		rq = blk_get_request(drive->queue, READ, __GFP_RECLAIM);
- 		scsi_req_init(rq);
--		rq->cmd_type = REQ_TYPE_ATA_TASKFILE;
-+		rq->cmd_type = REQ_TYPE_DRV_PRIV;
-+		ide_req(rq)->type = ATA_PRIV_TASKFILE;
- 		err = blk_execute_rq(drive->queue, NULL, rq, 0);
- 		blk_put_request(rq);
- 
-@@ -225,6 +226,7 @@ static int generic_drive_reset(ide_drive_t *drive)
- 	rq = blk_get_request(drive->queue, READ, __GFP_RECLAIM);
- 	scsi_req_init(rq);
- 	rq->cmd_type = REQ_TYPE_DRV_PRIV;
-+	ide_req(rq)->type = ATA_PRIV_MISC;
- 	scsi_req(rq)->cmd_len = 1;
- 	scsi_req(rq)->cmd[0] = REQ_DRIVE_RESET;
- 	if (blk_execute_rq(drive->queue, NULL, rq, 1))
-diff --git a/drivers/ide/ide-park.c b/drivers/ide/ide-park.c
-index c37604a..fc3c944 100644
---- a/drivers/ide/ide-park.c
-+++ b/drivers/ide/ide-park.c
-@@ -36,6 +36,7 @@ static void issue_park_cmd(ide_drive_t *drive, unsigned long timeout)
- 	scsi_req(rq)->cmd[0] = REQ_PARK_HEADS;
- 	scsi_req(rq)->cmd_len = 1;
- 	rq->cmd_type = REQ_TYPE_DRV_PRIV;
-+	ide_req(rq)->type = ATA_PRIV_MISC;
- 	rq->special = &timeout;
- 	rc = blk_execute_rq(q, NULL, rq, 1);
- 	blk_put_request(rq);
-@@ -54,6 +55,7 @@ static void issue_park_cmd(ide_drive_t *drive, unsigned long timeout)
- 	scsi_req(rq)->cmd[0] = REQ_UNPARK_HEADS;
- 	scsi_req(rq)->cmd_len = 1;
- 	rq->cmd_type = REQ_TYPE_DRV_PRIV;
-+	ide_req(rq)->type = ATA_PRIV_MISC;
- 	elv_add_request(q, rq, ELEVATOR_INSERT_FRONT);
- 
- out:
-diff --git a/drivers/ide/ide-pm.c b/drivers/ide/ide-pm.c
-index f6767ab..0c12968 100644
---- a/drivers/ide/ide-pm.c
-+++ b/drivers/ide/ide-pm.c
-@@ -20,7 +20,8 @@ int generic_ide_suspend(struct device *dev, pm_message_t mesg)
- 	memset(&rqpm, 0, sizeof(rqpm));
- 	rq = blk_get_request(drive->queue, READ, __GFP_RECLAIM);
- 	scsi_req_init(rq);
--	rq->cmd_type = REQ_TYPE_ATA_PM_SUSPEND;
-+	rq->cmd_type = REQ_TYPE_DRV_PRIV;
-+	ide_req(rq)->type = ATA_PRIV_PM_SUSPEND;
- 	rq->special = &rqpm;
- 	rqpm.pm_step = IDE_PM_START_SUSPEND;
- 	if (mesg.event == PM_EVENT_PRETHAW)
-@@ -91,7 +92,8 @@ int generic_ide_resume(struct device *dev)
- 	memset(&rqpm, 0, sizeof(rqpm));
- 	rq = blk_get_request(drive->queue, READ, __GFP_RECLAIM);
- 	scsi_req_init(rq);
--	rq->cmd_type = REQ_TYPE_ATA_PM_RESUME;
-+	rq->cmd_type = REQ_TYPE_DRV_PRIV;
-+	ide_req(rq)->type = ATA_PRIV_PM_RESUME;
- 	rq->rq_flags |= RQF_PREEMPT;
- 	rq->special = &rqpm;
- 	rqpm.pm_step = IDE_PM_START_RESUME;
-@@ -223,10 +225,10 @@ void ide_complete_pm_rq(ide_drive_t *drive, struct request *rq)
- 
- #ifdef DEBUG_PM
- 	printk("%s: completing PM request, %s\n", drive->name,
--	       (rq->cmd_type == REQ_TYPE_ATA_PM_SUSPEND) ? "suspend" : "resume");
-+	       (ide_req(rq)->type == ATA_PRIV_PM_SUSPEND) ? "suspend" : "resume");
- #endif
- 	spin_lock_irqsave(q->queue_lock, flags);
--	if (rq->cmd_type == REQ_TYPE_ATA_PM_SUSPEND)
-+	if (ide_req(rq)->type == ATA_PRIV_PM_SUSPEND)
- 		blk_stop_queue(q);
- 	else
- 		drive->dev_flags &= ~IDE_DFLAG_BLOCKED;
-@@ -242,11 +244,13 @@ void ide_check_pm_state(ide_drive_t *drive, struct request *rq)
- {
- 	struct ide_pm_state *pm = rq->special;
- 
--	if (rq->cmd_type == REQ_TYPE_ATA_PM_SUSPEND &&
-+	if (rq->cmd_type == REQ_TYPE_DRV_PRIV &&
-+	    ide_req(rq)->type == ATA_PRIV_PM_SUSPEND &&
- 	    pm->pm_step == IDE_PM_START_SUSPEND)
- 		/* Mark drive blocked when starting the suspend sequence. */
- 		drive->dev_flags |= IDE_DFLAG_BLOCKED;
--	else if (rq->cmd_type == REQ_TYPE_ATA_PM_RESUME &&
-+	else if (rq->cmd_type == REQ_TYPE_DRV_PRIV &&
-+	         ide_req(rq)->type == ATA_PRIV_PM_RESUME &&
- 		 pm->pm_step == IDE_PM_START_RESUME) {
- 		/*
- 		 * The first thing we do on wakeup is to wait for BSY bit to
-diff --git a/drivers/ide/ide-tape.c b/drivers/ide/ide-tape.c
-index f6bc1e2..37c7bea 100644
---- a/drivers/ide/ide-tape.c
-+++ b/drivers/ide/ide-tape.c
-@@ -577,8 +577,9 @@ static ide_startstop_t idetape_do_request(ide_drive_t *drive,
- 		      req->cmd[0], (unsigned long long)blk_rq_pos(rq),
- 		      blk_rq_sectors(rq));
- 
--	BUG_ON(!(rq->cmd_type == REQ_TYPE_DRV_PRIV ||
--		 rq->cmd_type == REQ_TYPE_ATA_SENSE));
-+	BUG_ON(rq->cmd_type != REQ_TYPE_DRV_PRIV);
-+	BUG_ON(ide_req(rq)->type != ATA_PRIV_MISC &&
-+	       ide_req(rq)->type != ATA_PRIV_SENSE);
- 
- 	/* Retry a failed packet command */
- 	if (drive->failed_pc && drive->pc->c[0] == REQUEST_SENSE) {
-@@ -856,6 +857,7 @@ static int idetape_queue_rw_tail(ide_drive_t *drive, int cmd, int size)
- 	rq = blk_get_request(drive->queue, READ, __GFP_RECLAIM);
- 	scsi_req_init(rq);
- 	rq->cmd_type = REQ_TYPE_DRV_PRIV;
-+	ide_req(rq)->type = ATA_PRIV_MISC;
- 	scsi_req(rq)->cmd[13] = cmd;
- 	rq->rq_disk = tape->disk;
- 	rq->__sector = tape->first_frame;
-diff --git a/drivers/ide/ide-taskfile.c b/drivers/ide/ide-taskfile.c
-index a393e13..9ccc1d5 100644
---- a/drivers/ide/ide-taskfile.c
-+++ b/drivers/ide/ide-taskfile.c
-@@ -432,7 +432,8 @@ int ide_raw_taskfile(ide_drive_t *drive, struct ide_cmd *cmd, u8 *buf,
- 
- 	rq = blk_get_request(drive->queue, rw, __GFP_RECLAIM);
- 	scsi_req_init(rq);
--	rq->cmd_type = REQ_TYPE_ATA_TASKFILE;
-+	rq->cmd_type = REQ_TYPE_DRV_PRIV;
-+	ide_req(rq)->type = ATA_PRIV_TASKFILE;
- 
- 	/*
- 	 * (ks) We transfer currently only whole sectors.
-diff --git a/include/linux/ide.h b/include/linux/ide.h
-index 086fbe1..5cc6caa 100644
---- a/include/linux/ide.h
-+++ b/include/linux/ide.h
-@@ -40,24 +40,58 @@
- 
- struct device;
- 
--/* IDE-specific values for req->cmd_type */
--enum ata_cmd_type_bits {
--	REQ_TYPE_ATA_TASKFILE = REQ_TYPE_DRV_PRIV + 1,
--	REQ_TYPE_ATA_PC,
--	REQ_TYPE_ATA_SENSE,	/* sense request */
--	REQ_TYPE_ATA_PM_SUSPEND,/* suspend request */
--	REQ_TYPE_ATA_PM_RESUME,	/* resume request */
-+/* values for ide_request.type */
-+enum ata_priv_type {
-+	ATA_PRIV_MISC,
-+	ATA_PRIV_TASKFILE,
-+	ATA_PRIV_PC,
-+	ATA_PRIV_SENSE,		/* sense request */
-+	ATA_PRIV_PM_SUSPEND,	/* suspend request */
-+	ATA_PRIV_PM_RESUME,	/* resume request */
- };
- 
--#define ata_pm_request(rq)	\
--	((rq)->cmd_type == REQ_TYPE_ATA_PM_SUSPEND || \
--	 (rq)->cmd_type == REQ_TYPE_ATA_PM_RESUME)
+-	/* fill out our structure that represents an active queue */
+-	if (!info)
+-		return ERR_PTR(-ENOMEM);
 -
- struct ide_request {
- 	struct scsi_request sreq;
- 	u8 sense[SCSI_SENSE_BUFFERSIZE];
-+	u8 type;
- };
+-	vq = vp_dev->setup_vq(vp_dev, info, index, callback, name, msix_vec);
+-	if (IS_ERR(vq))
+-		goto out_info;
+-
+-	info->vq = vq;
+-	if (callback) {
+-		spin_lock_irqsave(&vp_dev->lock, flags);
+-		list_add(&info->node, &vp_dev->virtqueues);
+-		spin_unlock_irqrestore(&vp_dev->lock, flags);
+-	} else {
+-		INIT_LIST_HEAD(&info->node);
+-	}
+-
+-	vp_dev->vqs[index] = info;
+-	return vq;
+-
+-out_info:
+-	kfree(info);
+-	return vq;
+-}
+-
+-static void vp_del_vq(struct virtqueue *vq)
+-{
+-	struct virtio_pci_device *vp_dev = to_vp_device(vq->vdev);
+-	struct virtio_pci_vq_info *info = vp_dev->vqs[vq->index];
+-	unsigned long flags;
+-
+-	spin_lock_irqsave(&vp_dev->lock, flags);
+-	list_del(&info->node);
+-	spin_unlock_irqrestore(&vp_dev->lock, flags);
+-
+-	vp_dev->del_vq(info);
+-	kfree(info);
+-}
+-
+ /* the config->del_vqs() implementation */
+ void vp_del_vqs(struct virtio_device *vdev)
+ {
+@@ -224,16 +172,15 @@ void vp_del_vqs(struct virtio_device *vdev)
+ 	int i;
  
-+static inline struct ide_request *ide_req(struct request *rq)
-+{
-+	return blk_mq_rq_to_pdu(rq);
-+}
+ 	list_for_each_entry_safe(vq, n, &vdev->vqs, list) {
+-		if (vp_dev->per_vq_vectors) {
+-			int v = vp_dev->vqs[vq->index]->msix_vector;
++		if (vp_dev->msix_vector_map) {
++			int v = vp_dev->msix_vector_map[vq->index];
+ 
+ 			if (v != VIRTIO_MSI_NO_VECTOR)
+ 				free_irq(pci_irq_vector(vp_dev->pci_dev, v),
+ 					vq);
+ 		}
+-		vp_del_vq(vq);
++		vp_dev->del_vq(vq);
+ 	}
+-	vp_dev->per_vq_vectors = false;
+ 
+ 	if (vp_dev->intx_enabled) {
+ 		free_irq(vp_dev->pci_dev->irq, vp_dev);
+@@ -261,8 +208,8 @@ void vp_del_vqs(struct virtio_device *vdev)
+ 	vp_dev->msix_names = NULL;
+ 	kfree(vp_dev->msix_affinity_masks);
+ 	vp_dev->msix_affinity_masks = NULL;
+-	kfree(vp_dev->vqs);
+-	vp_dev->vqs = NULL;
++	kfree(vp_dev->msix_vector_map);
++	vp_dev->msix_vector_map = NULL;
+ }
+ 
+ static int vp_find_vqs_msix(struct virtio_device *vdev, unsigned nvqs,
+@@ -275,10 +222,6 @@ static int vp_find_vqs_msix(struct virtio_device *vdev, unsigned nvqs,
+ 	u16 msix_vec;
+ 	int i, err, nvectors, allocated_vectors;
+ 
+-	vp_dev->vqs = kcalloc(nvqs, sizeof(*vp_dev->vqs), GFP_KERNEL);
+-	if (!vp_dev->vqs)
+-		return -ENOMEM;
+-
+ 	if (per_vq_vectors) {
+ 		/* Best option: one for change interrupt, one per vq. */
+ 		nvectors = 1;
+@@ -294,7 +237,13 @@ static int vp_find_vqs_msix(struct virtio_device *vdev, unsigned nvqs,
+ 	if (err)
+ 		goto error_find;
+ 
+-	vp_dev->per_vq_vectors = per_vq_vectors;
++	if (per_vq_vectors) {
++		vp_dev->msix_vector_map = kmalloc_array(nvqs,
++				sizeof(*vp_dev->msix_vector_map), GFP_KERNEL);
++		if (!vp_dev->msix_vector_map)
++			goto error_find;
++	}
 +
-+static inline bool ata_misc_request(struct request *rq)
-+{
-+	return rq->cmd_type == REQ_TYPE_DRV_PRIV &&
-+               ide_req(rq)->type == ATA_PRIV_MISC;
-+}
+ 	allocated_vectors = vp_dev->msix_used_vectors;
+ 	for (i = 0; i < nvqs; ++i) {
+ 		if (!names[i]) {
+@@ -304,19 +253,25 @@ static int vp_find_vqs_msix(struct virtio_device *vdev, unsigned nvqs,
+ 
+ 		if (!callbacks[i])
+ 			msix_vec = VIRTIO_MSI_NO_VECTOR;
+-		else if (vp_dev->per_vq_vectors)
++		else if (per_vq_vectors)
+ 			msix_vec = allocated_vectors++;
+ 		else
+ 			msix_vec = VP_MSIX_VQ_VECTOR;
+-		vqs[i] = vp_setup_vq(vdev, i, callbacks[i], names[i], msix_vec);
++		vqs[i] = vp_dev->setup_vq(vp_dev, i, callbacks[i], names[i],
++				msix_vec);
+ 		if (IS_ERR(vqs[i])) {
+ 			err = PTR_ERR(vqs[i]);
+ 			goto error_find;
+ 		}
+ 
+-		if (!vp_dev->per_vq_vectors || msix_vec == VIRTIO_MSI_NO_VECTOR)
++		if (!per_vq_vectors)
+ 			continue;
+ 
++		if (msix_vec == VIRTIO_MSI_NO_VECTOR) {
++			vp_dev->msix_vector_map[i] = VIRTIO_MSI_NO_VECTOR;
++			continue;
++		}
 +
-+static inline bool ata_taskfile_request(struct request *rq)
-+{
-+	return rq->cmd_type == REQ_TYPE_DRV_PRIV &&
-+               ide_req(rq)->type == ATA_PRIV_TASKFILE;
-+}
+ 		/* allocate per-vq irq if available and necessary */
+ 		snprintf(vp_dev->msix_names[msix_vec],
+ 			 sizeof *vp_dev->msix_names,
+@@ -326,8 +281,12 @@ static int vp_find_vqs_msix(struct virtio_device *vdev, unsigned nvqs,
+ 				  vring_interrupt, 0,
+ 				  vp_dev->msix_names[msix_vec],
+ 				  vqs[i]);
+-		if (err)
++		if (err) {
++			/* don't free this irq on error */
++			vp_dev->msix_vector_map[i] = VIRTIO_MSI_NO_VECTOR;
+ 			goto error_find;
++		}
++		vp_dev->msix_vector_map[i] = msix_vec;
+ 	}
+ 	return 0;
+ 
+@@ -343,23 +302,18 @@ static int vp_find_vqs_intx(struct virtio_device *vdev, unsigned nvqs,
+ 	struct virtio_pci_device *vp_dev = to_vp_device(vdev);
+ 	int i, err;
+ 
+-	vp_dev->vqs = kcalloc(nvqs, sizeof(*vp_dev->vqs), GFP_KERNEL);
+-	if (!vp_dev->vqs)
+-		return -ENOMEM;
+-
+ 	err = request_irq(vp_dev->pci_dev->irq, vp_interrupt, IRQF_SHARED,
+ 			dev_name(&vdev->dev), vp_dev);
+ 	if (err)
+ 		goto out_del_vqs;
+ 
+ 	vp_dev->intx_enabled = 1;
+-	vp_dev->per_vq_vectors = false;
+ 	for (i = 0; i < nvqs; ++i) {
+ 		if (!names[i]) {
+ 			vqs[i] = NULL;
+ 			continue;
+ 		}
+-		vqs[i] = vp_setup_vq(vdev, i, callbacks[i], names[i],
++		vqs[i] = vp_dev->setup_vq(vp_dev, i, callbacks[i], names[i],
+ 				VIRTIO_MSI_NO_VECTOR);
+ 		if (IS_ERR(vqs[i])) {
+ 			err = PTR_ERR(vqs[i]);
+@@ -409,16 +363,15 @@ int vp_set_vq_affinity(struct virtqueue *vq, int cpu)
+ {
+ 	struct virtio_device *vdev = vq->vdev;
+ 	struct virtio_pci_device *vp_dev = to_vp_device(vdev);
+-	struct virtio_pci_vq_info *info = vp_dev->vqs[vq->index];
+-	struct cpumask *mask;
+-	unsigned int irq;
+ 
+ 	if (!vq->callback)
+ 		return -EINVAL;
+ 
+ 	if (vp_dev->msix_enabled) {
+-		mask = vp_dev->msix_affinity_masks[info->msix_vector];
+-		irq = pci_irq_vector(vp_dev->pci_dev, info->msix_vector);
++		int vec = vp_dev->msix_vector_map[vq->index];
++		struct cpumask *mask = vp_dev->msix_affinity_masks[vec];
++		unsigned int irq = pci_irq_vector(vp_dev->pci_dev, vec);
 +
-+static inline bool ata_pc_request(struct request *rq)
-+{
-+	return rq->cmd_type == REQ_TYPE_DRV_PRIV &&
-+               ide_req(rq)->type == ATA_PRIV_PC;
-+}
-+
-+static inline bool ata_sense_request(struct request *rq)
-+{
-+	return rq->cmd_type == REQ_TYPE_DRV_PRIV &&
-+               ide_req(rq)->type == ATA_PRIV_SENSE;
-+}
-+
-+static inline bool ata_pm_request(struct request *rq)
-+{
-+	return rq->cmd_type == REQ_TYPE_DRV_PRIV &&
-+		(ide_req(rq)->type == ATA_PRIV_PM_SUSPEND ||
-+		 ide_req(rq)->type == ATA_PRIV_PM_RESUME);
-+}
-+
- /* Error codes returned in rq->errors to the higher part of the driver. */
- enum {
- 	IDE_DRV_ERROR_GENERAL	= 101,
+ 		if (cpu == -1)
+ 			irq_set_affinity_hint(irq, NULL);
+ 		else {
+@@ -498,8 +451,6 @@ static int virtio_pci_probe(struct pci_dev *pci_dev,
+ 	vp_dev->vdev.dev.parent = &pci_dev->dev;
+ 	vp_dev->vdev.dev.release = virtio_pci_release_dev;
+ 	vp_dev->pci_dev = pci_dev;
+-	INIT_LIST_HEAD(&vp_dev->virtqueues);
+-	spin_lock_init(&vp_dev->lock);
+ 
+ 	/* enable the device */
+ 	rc = pci_enable_device(pci_dev);
+diff --git a/drivers/virtio/virtio_pci_common.h b/drivers/virtio/virtio_pci_common.h
+index b2f6662..2038887 100644
+--- a/drivers/virtio/virtio_pci_common.h
++++ b/drivers/virtio/virtio_pci_common.h
+@@ -31,17 +31,6 @@
+ #include <linux/highmem.h>
+ #include <linux/spinlock.h>
+ 
+-struct virtio_pci_vq_info {
+-	/* the actual virtqueue */
+-	struct virtqueue *vq;
+-
+-	/* the list node for the virtqueues list */
+-	struct list_head node;
+-
+-	/* MSI-X vector (or none) */
+-	unsigned msix_vector;
+-};
+-
+ /* Our device structure */
+ struct virtio_pci_device {
+ 	struct virtio_device vdev;
+@@ -75,13 +64,6 @@ struct virtio_pci_device {
+ 	/* the IO mapping for the PCI config space */
+ 	void __iomem *ioaddr;
+ 
+-	/* a list of queues so we can dispatch IRQs */
+-	spinlock_t lock;
+-	struct list_head virtqueues;
+-
+-	/* array of all queues for house-keeping */
+-	struct virtio_pci_vq_info **vqs;
+-
+ 	/* MSI-X support */
+ 	int msix_enabled;
+ 	int intx_enabled;
+@@ -94,16 +76,15 @@ struct virtio_pci_device {
+ 	/* Vectors allocated, excluding per-vq vectors if any */
+ 	unsigned msix_used_vectors;
+ 
+-	/* Whether we have vector per vq */
+-	bool per_vq_vectors;
++	/* Map of per-VQ MSI-X vectors, may be NULL */
++	unsigned *msix_vector_map;
+ 
+ 	struct virtqueue *(*setup_vq)(struct virtio_pci_device *vp_dev,
+-				      struct virtio_pci_vq_info *info,
+ 				      unsigned idx,
+ 				      void (*callback)(struct virtqueue *vq),
+ 				      const char *name,
+ 				      u16 msix_vec);
+-	void (*del_vq)(struct virtio_pci_vq_info *info);
++	void (*del_vq)(struct virtqueue *vq);
+ 
+ 	u16 (*config_vector)(struct virtio_pci_device *vp_dev, u16 vector);
+ };
+diff --git a/drivers/virtio/virtio_pci_legacy.c b/drivers/virtio/virtio_pci_legacy.c
+index 6d9e517..47292da 100644
+--- a/drivers/virtio/virtio_pci_legacy.c
++++ b/drivers/virtio/virtio_pci_legacy.c
+@@ -112,7 +112,6 @@ static u16 vp_config_vector(struct virtio_pci_device *vp_dev, u16 vector)
+ }
+ 
+ static struct virtqueue *setup_vq(struct virtio_pci_device *vp_dev,
+-				  struct virtio_pci_vq_info *info,
+ 				  unsigned index,
+ 				  void (*callback)(struct virtqueue *vq),
+ 				  const char *name,
+@@ -130,8 +129,6 @@ static struct virtqueue *setup_vq(struct virtio_pci_device *vp_dev,
+ 	if (!num || ioread32(vp_dev->ioaddr + VIRTIO_PCI_QUEUE_PFN))
+ 		return ERR_PTR(-ENOENT);
+ 
+-	info->msix_vector = msix_vec;
+-
+ 	/* create the vring */
+ 	vq = vring_create_virtqueue(index, num,
+ 				    VIRTIO_PCI_VRING_ALIGN, &vp_dev->vdev,
+@@ -162,9 +159,8 @@ static struct virtqueue *setup_vq(struct virtio_pci_device *vp_dev,
+ 	return ERR_PTR(err);
+ }
+ 
+-static void del_vq(struct virtio_pci_vq_info *info)
++static void del_vq(struct virtqueue *vq)
+ {
+-	struct virtqueue *vq = info->vq;
+ 	struct virtio_pci_device *vp_dev = to_vp_device(vq->vdev);
+ 
+ 	iowrite16(vq->index, vp_dev->ioaddr + VIRTIO_PCI_QUEUE_SEL);
+diff --git a/drivers/virtio/virtio_pci_modern.c b/drivers/virtio/virtio_pci_modern.c
+index 4bf7ab3..00e6fc1 100644
+--- a/drivers/virtio/virtio_pci_modern.c
++++ b/drivers/virtio/virtio_pci_modern.c
+@@ -293,7 +293,6 @@ static u16 vp_config_vector(struct virtio_pci_device *vp_dev, u16 vector)
+ }
+ 
+ static struct virtqueue *setup_vq(struct virtio_pci_device *vp_dev,
+-				  struct virtio_pci_vq_info *info,
+ 				  unsigned index,
+ 				  void (*callback)(struct virtqueue *vq),
+ 				  const char *name,
+@@ -323,8 +322,6 @@ static struct virtqueue *setup_vq(struct virtio_pci_device *vp_dev,
+ 	/* get offset of notification word for this vq */
+ 	off = vp_ioread16(&cfg->queue_notify_off);
+ 
+-	info->msix_vector = msix_vec;
+-
+ 	/* create the vring */
+ 	vq = vring_create_virtqueue(index, num,
+ 				    SMP_CACHE_BYTES, &vp_dev->vdev,
+@@ -409,9 +406,8 @@ static int vp_modern_find_vqs(struct virtio_device *vdev, unsigned nvqs,
+ 	return 0;
+ }
+ 
+-static void del_vq(struct virtio_pci_vq_info *info)
++static void del_vq(struct virtqueue *vq)
+ {
+-	struct virtqueue *vq = info->vq;
+ 	struct virtio_pci_device *vp_dev = to_vp_device(vq->vdev);
+ 
+ 	vp_iowrite16(vq->index, &vp_dev->common->queue_select);
 -- 
 2.1.4
-
