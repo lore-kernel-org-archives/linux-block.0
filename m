@@ -1,32 +1,32 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [GIT PULL] (xen-blkfront) stable/for-jens-4.10 for your
- 'linux-next' branch.
-To: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
- linux-block@vger.kernel.org, xen-devel@lists.xensource.com,
- linux-kernel@vger.kernel.org
-References: <20170127184743.GB31429@char.us.oracle.com>
+Return-Path: <konrad.wilk@oracle.com>
+Date: Fri, 27 Jan 2017 13:47:43 -0500
+From: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+To: axboe@kernel.dk, linux-block@vger.kernel.org,
+        xen-devel@lists.xensource.com, linux-kernel@vger.kernel.org
 Cc: jbeulich@suse.com
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <35658a30-43e6-8972-fd2a-0d5131f1a77a@kernel.dk>
-Date: Fri, 27 Jan 2017 11:57:32 -0700
+Subject: [GIT PULL] (xen-blkfront) stable/for-jens-4.10 for your 'linux-next'
+ branch.
+Message-ID: <20170127184743.GB31429@char.us.oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <20170127184743.GB31429@char.us.oracle.com>
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=us-ascii
 List-ID: <linux-block@vger.kernel.org>
 
-On 01/27/2017 11:47 AM, Konrad Rzeszutek Wilk wrote:
-> Hey Jens,
-> 
-> Please pull in your 'for-linus' branch two little fixes for Xen
-> block front:
-> 
-> git://git.kernel.org/pub/scm/linux/kernel/git/konrad/xen.git stable/for-jens-4.10
-> 
-> One fix is for handling the XEN_PAGE_SIZE != PAGE_SIZE (4KB vs 64KB
-> on ARM for example) mishandling while the other is fixing
-> the accounting for the configuration changes.
+Hey Jens,
 
-Pulled, thanks.
+Please pull in your 'for-linus' branch two little fixes for Xen
+block front:
 
--- 
-Jens Axboe
+git://git.kernel.org/pub/scm/linux/kernel/git/konrad/xen.git stable/for-jens-4.10
+
+One fix is for handling the XEN_PAGE_SIZE != PAGE_SIZE (4KB vs 64KB
+on ARM for example) mishandling while the other is fixing
+the accounting for the configuration changes.
+
+Thank you!
+
+drivers/block/xen-blkfront.c | 22 ++++++++++++++--------
+ 1 file changed, 14 insertions(+), 8 deletions(-)
+
+Jan Beulich (2):
+      xen-blkfront: feature flags handling adjustments
+      xen-blkfront: correct maximum segment accounting
