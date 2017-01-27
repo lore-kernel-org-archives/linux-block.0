@@ -1,35 +1,49 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from verein.lst.de ([213.95.11.211]:35903 "EHLO newverein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751176AbdA1IXw (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 28 Jan 2017 03:23:52 -0500
-Date: Sat, 28 Jan 2017 09:23:32 +0100
-From: "hch@lst.de" <hch@lst.de>
-To: Bart Van Assche <Bart.VanAssche@sandisk.com>
-Cc: "hch@lst.de" <hch@lst.de>, "axboe@fb.com" <axboe@fb.com>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+From: Bart Van Assche <Bart.VanAssche@sandisk.com>
+To: "hch@lst.de" <hch@lst.de>, "axboe@fb.com" <axboe@fb.com>
+CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
         "linux-raid@vger.kernel.org" <linux-raid@vger.kernel.org>,
         "dm-devel@redhat.com" <dm-devel@redhat.com>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "snitzer@redhat.com" <snitzer@redhat.com>,
         "j-nomura@ce.jp.nec.com" <j-nomura@ce.jp.nec.com>
 Subject: Re: [PATCH 14/18] scsi: remove __scsi_alloc_queue
-Message-ID: <20170128082332.GA4728@lst.de>
-References: <1485365126-23210-1-git-send-email-hch@lst.de> <1485365126-23210-15-git-send-email-hch@lst.de> <1485539862.4267.17.camel@sandisk.com>
+Date: Fri, 27 Jan 2017 17:58:02 +0000
+Message-ID: <1485539862.4267.17.camel@sandisk.com>
+References: <1485365126-23210-1-git-send-email-hch@lst.de>
+         <1485365126-23210-15-git-send-email-hch@lst.de>
+In-Reply-To: <1485365126-23210-15-git-send-email-hch@lst.de>
+Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1485539862.4267.17.camel@sandisk.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Sender: linux-scsi-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-On Fri, Jan 27, 2017 at 05:58:02PM +0000, Bart Van Assche wrote:
-> Since __scsi_init_queue() modifies data in the Scsi_Host structure, have you
-> considered to add the declaration for this function to <scsi/scsi_host.h>?
-> If you want to keep this declaration in <scsi/scsi_transport.h> please add a
-> direct include of that header file to drivers/scsi/scsi_lib.c such that the
-> declaration remains visible to the compiler if someone would minimize the
-> number of #include directives in SCSI header files.
+On Wed, 2017-01-25 at 18:25 +0100, Christoph Hellwig wrote:
+> diff --git a/include/scsi/scsi_transport.h b/include/scsi/scsi_transport.=
+h
+> index 8129239..b6e07b5 100644
+> --- a/include/scsi/scsi_transport.h
+> +++ b/include/scsi/scsi_transport.h
+> @@ -119,4 +119,6 @@ scsi_transport_device_data(struct scsi_device *sdev)
+>  		+ shost->transportt->device_private_offset;
+>  }
+> =20
+> +void __scsi_init_queue(struct Scsi_Host *shost, struct request_queue *q)=
+;
+> +
+>  #endif /* SCSI_TRANSPORT_H */
 
-Feel free to send an incremental patch either way.  In the long run
-I'd really like to kill off __scsi_init_queue and remove the transport
-BSG queue abuse of SCSI internals, though.
+Hello Christoph,
+
+Since __scsi_init_queue() modifies data in the Scsi_Host structure, have yo=
+u
+considered to add the declaration for this function to <scsi/scsi_host.h>?
+If you want to keep this declaration in <scsi/scsi_transport.h> please add =
+a
+direct include of that header file to drivers/scsi/scsi_lib.c such that the
+declaration remains visible to the compiler if someone would minimize the
+number of #include directives in SCSI header files.
+
+Thanks,
+
+Bart.=
