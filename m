@@ -1,45 +1,36 @@
-Return-Path: <jmoyer@redhat.com>
-From: Jeff Moyer <jmoyer@redhat.com>
-To: axboe@kernel.dk, Chandan Rajendra <chandan@linux.vnet.ibm.com>
-Cc: jack@suse.cz, linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, anton@samba.org,
-        linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH] direct-io: don't introduce another read of inode->i_blkbits
-References: <1483886830-23878-1-git-send-email-chandan@linux.vnet.ibm.com>
-Date: Mon, 09 Jan 2017 16:42:58 -0500
-In-Reply-To: <1483886830-23878-1-git-send-email-chandan@linux.vnet.ibm.com>
-	(Chandan Rajendra's message of "Sun, 8 Jan 2017 20:17:10 +0530")
-Message-ID: <x49r34bgba5.fsf@segfault.boston.devel.redhat.com>
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+Date: Fri, 27 Jan 2017 11:44:53 -0500
+From: Mike Snitzer <snitzer@redhat.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-block@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-scsi@vger.kernel.org, Jens Axboe <axboe@fb.com>,
+        dm-devel@redhat.com, Junichi Nomura <j-nomura@ce.jp.nec.com>
+Subject: Re: [PATCH 07/18] dm: always defer request allocation to the owner
+ of the request_queue
+Message-ID: <20170127164453.GB30221@redhat.com>
+References: <1485365126-23210-1-git-send-email-hch@lst.de>
+ <1485365126-23210-8-git-send-email-hch@lst.de>
+ <20170127163434.GA30221@redhat.com>
+ <20170127163604.GA17337@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170127163604.GA17337@lst.de>
+Sender: linux-scsi-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Commit 20ce44d545844 ("do_direct_IO: Use inode->i_blkbits to compute
-block count to be cleaned") introduced a regression: if the block size
-of the block device is changed while a direct I/O request is being
-setup, it can result in a panic.  See commit ab73857e354ab ("direct-io:
-don't read inode->i_blkbits multiple times") for the reasoning, and
-commit b87570f5d3496 ("Fix a crash when block device is read and block
-size is changed at the same time") for a more detailed problem
-description and reproducer.
+On Fri, Jan 27 2017 at 11:36am -0500,
+Christoph Hellwig <hch@lst.de> wrote:
 
-Fixes: 20ce44d545844
-Signed-off-by: Jeff Moyer <jmoyer@redhat.com>
+> On Fri, Jan 27, 2017 at 11:34:34AM -0500, Mike Snitzer wrote:
+> > Noticed after further review that it seems a bit weird to have the non
+> > blk-mq support in drivers calling blk_mq_rq_to_pdu().  But I'm not sure
+> > a blk_rq_to_pdu() macro to blk_mq_rq_to_pdu() is the right thing.  What
+> > do you guys think?
+> 
+> My first version had an additional name for it, but it caused more
+> confusion than help.
 
----
-Chandan, can you please test this to ensure this still fixes your problem?
+And renaming blk_mq_rq_to_pdu() to blk_rq_to_pdu() tree-wide would be
+too much churn?
 
-diff --git a/fs/direct-io.c b/fs/direct-io.c
-index b20adf9..c87bae4 100644
---- a/fs/direct-io.c
-+++ b/fs/direct-io.c
-@@ -905,8 +905,8 @@ static inline void dio_zero_block(struct dio *dio, struct dio_submit *sdio,
- static int do_direct_IO(struct dio *dio, struct dio_submit *sdio,
- 			struct buffer_head *map_bh)
- {
--	const unsigned i_blkbits = dio->inode->i_blkbits;
- 	const unsigned blkbits = sdio->blkbits;
-+	const unsigned i_blkbits = blkbits + sdio->blkfactor;
- 	int ret = 0;
- 
- 	while (sdio->block_in_file < sdio->final_block_in_request) {
+I can live with blk_mq_rq_to_pdu(); just figured I'd ask.
