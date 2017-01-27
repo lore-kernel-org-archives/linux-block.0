@@ -1,21 +1,27 @@
-Return-Path: <jack@suse.cz>
-Date: Mon, 30 Jan 2017 18:19:56 +0100
-From: Jan Kara <jack@suse.cz>
+Return-Path: <osandov@osandov.com>
+Return-Path: <osandov@osandov.com>
+Date: Fri, 27 Jan 2017 11:49:19 -0800
+From: Omar Sandoval <osandov@osandov.com>
 To: Dan Williams <dan.j.williams@intel.com>
 Cc: Jan Kara <jack@suse.cz>, linux-block@vger.kernel.org,
 	Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>,
 	Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
 	Laurent Dufour <ldufour@linux.vnet.ibm.com>
 Subject: Re: [PATCH 0/4 RFC] BDI lifetime fix
-Message-ID: <20170130171956.GF23022@quack2.suse.cz>
+Message-ID: <20170127194919.GA21371@vader.DHCP.thefacebook.com>
 References: <20170126174532.15189-1-jack@suse.cz>
  <CAPcyv4hJR_4WZFhKkfbnAz0iLtu-bgSJVE804+ywaFTeYC51bQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/mixed; boundary="HcAYCG3uE/tztfnV"
 In-Reply-To: <CAPcyv4hJR_4WZFhKkfbnAz0iLtu-bgSJVE804+ywaFTeYC51bQ@mail.gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu 26-01-17 22:15:06, Dan Williams wrote:
+
+--HcAYCG3uE/tztfnV
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+On Thu, Jan 26, 2017 at 10:15:06PM -0800, Dan Williams wrote:
 > On Thu, Jan 26, 2017 at 9:45 AM, Jan Kara <jack@suse.cz> wrote:
 > > Hello,
 > >
@@ -36,9 +42,7 @@ On Thu 26-01-17 22:15:06, Dan Williams wrote:
 > This survives a several runs of the libnvdimm unit tests which stress
 > del_gendisk() and blk_cleanup_queue(). I'll keep testing since the
 > failure was intermittent, but this is looking good.
-
-Thanks for testing!
-
+> 
 > > I'd also appreciate if people had a look whether the approach I took looks
 > > sensible.
 > 
@@ -49,15 +53,34 @@ Thanks for testing!
 > device_rename(bdi->dev, ...) when we know scsi is done with the old
 > bdi but it has not finished being deleted
 
-Do you mean I should not speak about it in the changelog? The problems I
-have are not as much with reusing device *name* here (and resulting sysfs
-conflicts) but rather a major:minor number pair which results in reusing
-block device inode and we are not prepared for that since the bdi
-associated with that inode may be already unregistered and reusing it would
-be difficult.
+What's the status of the device name issue? We're hitting it a lot here.
+It's really easy to reproduce with scsi_debug, script attached. I'd be
+happy to test out any patches.
 
-								Honza
+--HcAYCG3uE/tztfnV
+Content-Type: application/x-sh
+Content-Disposition: attachment; filename="stress_test_scsi_debug.sh"
+Content-Transfer-Encoding: quoted-printable
 
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+#!/bin/bash=0A=0Aset -eu=0A=0Ausage () {=0A	USAGE_STRING=3D"Usage: $0 [-H H=
+OSTS] [-t TARGETS]=0A$0 -h=0A=0AOptions:=0A  -H    number of SCSI hosts (de=
+fault: 1)=0A  -t    number of SCSI targets per host (default: 1)=0A=0AMisce=
+llaneous:=0A  -h    display this help message and exit"=0A=0A	case "$1" in=
+=0A		out)=0A			echo "$USAGE_STRING"=0A			exit 0=0A			;;=0A		err)=0A			echo =
+"$USAGE_STRING" >&2=0A			exit 1=0A			;;=0A	esac=0A}=0A=0Anum_hosts=3D1=0Anu=
+m_targets=3D1=0A=0Awhile getopts "hH:t:" OPT; do=0A	case "$OPT" in=0A		H)=
+=0A			num_hosts=3D"$OPTARG"=0A			;;=0A		t)=0A			num_targets=3D"$OPTARG"=0A	=
+		;;=0A		h)=0A			usage "out"=0A			;;=0A		*)=0A			usage "err"=0A			;;=0A	esa=
+c=0Adone=0A=0Amodprobe -r scsi_debug=0Amodprobe scsi_debug add_host=3D"${nu=
+m_hosts}" num_tgts=3D"${num_targets}"=0A=0Ahosts=3D()=0Afor scsi_host in /s=
+ys/class/scsi_host/*; do=0A	if grep '^scsi_debug' "${scsi_host}/proc_name" =
+>/dev/null 2>&1; then=0A		host=3D"$(basename "${scsi_host}")"=0A		hosts+=3D=
+("${host#host}")=0A	fi=0Adone=0A=0Atargets=3D()=0Afor host in "${hosts[@]}"=
+; do=0A	for scsi_disk in "/sys/class/scsi_disk/${host}:"*; do=0A		targets+=
+=3D("$(basename "${scsi_disk}")")=0A	done=0Adone=0A=0Aecho "Hosts: ${hosts[=
+@]}"=0Aecho "Targets: ${targets[@]}"=0A=0Aprocesses=3D()=0Afor target in "$=
+{targets[@]}"; do=0A	(=0A	host=3D"${target%%:*}"=0A	scan=3D"${target#*:}"=
+=0A	scan=3D"${scan//:/ }"=0A	while true; do=0A		echo 1 > "/sys/class/scsi_d=
+isk/${target}/device/delete"=0A		echo "${scan}" > "/sys/class/scsi_host/hos=
+t${host}/scan"=0A	done=0A	) &=0A	processes+=3D($!)=0Adone=0Await=0A
+--HcAYCG3uE/tztfnV--
