@@ -1,216 +1,119 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:55276 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1754806AbdAKVkS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Jan 2017 16:40:18 -0500
-From: Jens Axboe <axboe@fb.com>
-To: <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>
-CC: <osandov@osandov.com>, <bart.vanassche@sandisk.com>,
-        Jens Axboe <axboe@fb.com>
-Subject: [PATCH 10/10] blk-mq-sched: allow setting of default IO scheduler
-Date: Wed, 11 Jan 2017 14:40:03 -0700
-Message-ID: <1484170803-9311-11-git-send-email-axboe@fb.com>
-In-Reply-To: <1484170803-9311-1-git-send-email-axboe@fb.com>
-References: <1484170803-9311-1-git-send-email-axboe@fb.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <BATV+3cdfc0cdff764882efbb+4905+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: mst@redhat.com,
+	jasowang@redhat.com
+Cc: axboe@kernel.dk,
+	pbonzini@redhat.com,
+	virtualization@lists.linux-foundation.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 6/9] virtio: provide a method to get the IRQ affinity mask for a virtqueue
+Date: Fri, 27 Jan 2017 09:16:34 +0100
+Message-Id: <1485504997-17584-7-git-send-email-hch@lst.de>
+In-Reply-To: <1485504997-17584-1-git-send-email-hch@lst.de>
+References: <1485504997-17584-1-git-send-email-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-Add Kconfig entries to manage what devices get assigned an MQ
-scheduler, and add a blk-mq flag for drivers to opt out of scheduling.
-The latter is useful for admin type queues that still allocate a blk-mq
-queue and tag set, but aren't use for normal IO.
+This basically passed up the pci_irq_get_affinity information through
+virtio through an optional get_vq_affinity method.  It is only implemented
+by the PCI backend for now, and only when we use per-virtqueue IRQs.
 
-Signed-off-by: Jens Axboe <axboe@fb.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/Kconfig.iosched   | 56 +++++++++++++++++++++++++++++++++++++++++++------
- block/blk-mq-sched.c    | 20 ++++++++++++++++++
- block/blk-mq-sched.h    |  2 ++
- block/blk-mq.c          |  8 +++++++
- block/elevator.c        |  8 ++++++-
- drivers/nvme/host/pci.c |  1 +
- include/linux/blk-mq.h  |  1 +
- 7 files changed, 89 insertions(+), 7 deletions(-)
+ drivers/virtio/virtio_pci_common.c | 11 +++++++++++
+ drivers/virtio/virtio_pci_common.h |  2 ++
+ drivers/virtio/virtio_pci_legacy.c |  1 +
+ drivers/virtio/virtio_pci_modern.c |  2 ++
+ include/linux/virtio_config.h      |  3 +++
+ 5 files changed, 19 insertions(+)
 
-diff --git a/block/Kconfig.iosched b/block/Kconfig.iosched
-index 490ef2850fae..0715ce93daef 100644
---- a/block/Kconfig.iosched
-+++ b/block/Kconfig.iosched
-@@ -32,12 +32,6 @@ config IOSCHED_CFQ
- 
- 	  This is the default I/O scheduler.
- 
--config MQ_IOSCHED_DEADLINE
--	tristate "MQ deadline I/O scheduler"
--	default y
--	---help---
--	  MQ version of the deadline IO scheduler.
--
- config CFQ_GROUP_IOSCHED
- 	bool "CFQ Group Scheduling support"
- 	depends on IOSCHED_CFQ && BLK_CGROUP
-@@ -69,6 +63,56 @@ config DEFAULT_IOSCHED
- 	default "cfq" if DEFAULT_CFQ
- 	default "noop" if DEFAULT_NOOP
- 
-+config MQ_IOSCHED_DEADLINE
-+	tristate "MQ deadline I/O scheduler"
-+	default y
-+	---help---
-+	  MQ version of the deadline IO scheduler.
-+
-+config MQ_IOSCHED_NONE
-+	bool
-+	default y
-+
-+choice
-+	prompt "Default single-queue blk-mq I/O scheduler"
-+	default DEFAULT_SQ_NONE
-+	help
-+	  Select the I/O scheduler which will be used by default for blk-mq
-+	  managed block devices with a single queue.
-+
-+	config DEFAULT_SQ_DEADLINE
-+		bool "MQ Deadline" if MQ_IOSCHED_DEADLINE=y
-+
-+	config DEFAULT_SQ_NONE
-+		bool "None"
-+
-+endchoice
-+
-+config DEFAULT_SQ_IOSCHED
-+	string
-+	default "mq-deadline" if DEFAULT_SQ_DEADLINE
-+	default "none" if DEFAULT_SQ_NONE
-+
-+choice
-+	prompt "Default multi-queue blk-mq I/O scheduler"
-+	default DEFAULT_MQ_NONE
-+	help
-+	  Select the I/O scheduler which will be used by default for blk-mq
-+	  managed block devices with multiple queues.
-+
-+	config DEFAULT_MQ_DEADLINE
-+		bool "MQ Deadline" if MQ_IOSCHED_DEADLINE=y
-+
-+	config DEFAULT_MQ_NONE
-+		bool "None"
-+
-+endchoice
-+
-+config DEFAULT_MQ_IOSCHED
-+	string
-+	default "mq-deadline" if DEFAULT_MQ_DEADLINE
-+	default "none" if DEFAULT_MQ_NONE
-+
- endmenu
- 
- endif
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 44cf30eb1589..26e9e20f67ce 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -332,3 +332,23 @@ int blk_mq_sched_teardown(struct request_queue *q)
- 
+diff --git a/drivers/virtio/virtio_pci_common.c b/drivers/virtio/virtio_pci_common.c
+index c244212..31ba259 100644
+--- a/drivers/virtio/virtio_pci_common.c
++++ b/drivers/virtio/virtio_pci_common.c
+@@ -361,6 +361,17 @@ int vp_set_vq_affinity(struct virtqueue *vq, int cpu)
  	return 0;
  }
-+
-+int blk_mq_sched_init(struct request_queue *q)
+ 
++const struct cpumask *vp_get_vq_affinity(struct virtio_device *vdev, int index)
 +{
-+	int ret;
++	struct virtio_pci_device *vp_dev = to_vp_device(vdev);
++	unsigned int *map = vp_dev->msix_vector_map;
 +
-+#if defined(CONFIG_DEFAULT_SQ_NONE)
-+	if (q->nr_hw_queues == 1)
-+		return 0;
-+#endif
-+#if defined(CONFIG_DEFAULT_MQ_NONE)
-+	if (q->nr_hw_queues > 1)
-+		return 0;
-+#endif
++	if (!map || map[index] == VIRTIO_MSI_NO_VECTOR)
++		return NULL;
 +
-+	mutex_lock(&q->sysfs_lock);
-+	ret = elevator_init(q, NULL);
-+	mutex_unlock(&q->sysfs_lock);
-+
-+	return ret;
++	return pci_irq_get_affinity(vp_dev->pci_dev, map[index]);
 +}
-diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
-index 68d6a202b827..77859eae19c9 100644
---- a/block/blk-mq-sched.h
-+++ b/block/blk-mq-sched.h
-@@ -25,6 +25,8 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx);
- int blk_mq_sched_setup(struct request_queue *q);
- int blk_mq_sched_teardown(struct request_queue *q);
- 
-+int blk_mq_sched_init(struct request_queue *q);
 +
- static inline bool
- blk_mq_sched_bio_merge(struct request_queue *q, struct bio *bio)
+ #ifdef CONFIG_PM_SLEEP
+ static int virtio_pci_freeze(struct device *dev)
  {
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 3180b5fac88c..0dcd593e4ddd 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2227,6 +2227,14 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
- 	mutex_unlock(&all_q_mutex);
- 	put_online_cpus();
+diff --git a/drivers/virtio/virtio_pci_common.h b/drivers/virtio/virtio_pci_common.h
+index a6ad9ec..ac8c9d7 100644
+--- a/drivers/virtio/virtio_pci_common.h
++++ b/drivers/virtio/virtio_pci_common.h
+@@ -108,6 +108,8 @@ const char *vp_bus_name(struct virtio_device *vdev);
+  */
+ int vp_set_vq_affinity(struct virtqueue *vq, int cpu);
  
-+	if (!(set->flags & BLK_MQ_F_NO_SCHED)) {
-+		int ret;
++const struct cpumask *vp_get_vq_affinity(struct virtio_device *vdev, int index);
 +
-+		ret = blk_mq_sched_init(q);
-+		if (ret)
-+			return ERR_PTR(ret);
-+	}
-+
- 	return q;
+ #if IS_ENABLED(CONFIG_VIRTIO_PCI_LEGACY)
+ int virtio_pci_legacy_probe(struct virtio_pci_device *);
+ void virtio_pci_legacy_remove(struct virtio_pci_device *);
+diff --git a/drivers/virtio/virtio_pci_legacy.c b/drivers/virtio/virtio_pci_legacy.c
+index 2ab6aee..f7362c5 100644
+--- a/drivers/virtio/virtio_pci_legacy.c
++++ b/drivers/virtio/virtio_pci_legacy.c
+@@ -190,6 +190,7 @@ static const struct virtio_config_ops virtio_pci_config_ops = {
+ 	.finalize_features = vp_finalize_features,
+ 	.bus_name	= vp_bus_name,
+ 	.set_vq_affinity = vp_set_vq_affinity,
++	.get_vq_affinity = vp_get_vq_affinity,
+ };
  
- err_hctxs:
-diff --git a/block/elevator.c b/block/elevator.c
-index 79e74da26343..b3ea721e51b4 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -219,7 +219,13 @@ int elevator_init(struct request_queue *q, char *name)
- 	}
+ /* the PCI probing function */
+diff --git a/drivers/virtio/virtio_pci_modern.c b/drivers/virtio/virtio_pci_modern.c
+index a7a0981..7bc3004 100644
+--- a/drivers/virtio/virtio_pci_modern.c
++++ b/drivers/virtio/virtio_pci_modern.c
+@@ -437,6 +437,7 @@ static const struct virtio_config_ops virtio_pci_config_nodev_ops = {
+ 	.finalize_features = vp_finalize_features,
+ 	.bus_name	= vp_bus_name,
+ 	.set_vq_affinity = vp_set_vq_affinity,
++	.get_vq_affinity = vp_get_vq_affinity,
+ };
  
- 	if (!e) {
--		e = elevator_get(CONFIG_DEFAULT_IOSCHED, false);
-+		if (q->mq_ops && q->nr_hw_queues == 1)
-+			e = elevator_get(CONFIG_DEFAULT_SQ_IOSCHED, false);
-+		else if (q->mq_ops)
-+			e = elevator_get(CONFIG_DEFAULT_MQ_IOSCHED, false);
-+		else
-+			e = elevator_get(CONFIG_DEFAULT_IOSCHED, false);
-+
- 		if (!e) {
- 			printk(KERN_ERR
- 				"Default I/O scheduler not found. " \
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index 19beeb7b2ac2..e1b4e603b1cf 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -1181,6 +1181,7 @@ static int nvme_alloc_admin_tags(struct nvme_dev *dev)
- 		dev->admin_tagset.timeout = ADMIN_TIMEOUT;
- 		dev->admin_tagset.numa_node = dev_to_node(dev->dev);
- 		dev->admin_tagset.cmd_size = nvme_cmd_size(dev);
-+		dev->admin_tagset.flags = BLK_MQ_F_NO_SCHED;
- 		dev->admin_tagset.driver_data = dev;
+ static const struct virtio_config_ops virtio_pci_config_ops = {
+@@ -452,6 +453,7 @@ static const struct virtio_config_ops virtio_pci_config_ops = {
+ 	.finalize_features = vp_finalize_features,
+ 	.bus_name	= vp_bus_name,
+ 	.set_vq_affinity = vp_set_vq_affinity,
++	.get_vq_affinity = vp_get_vq_affinity,
+ };
  
- 		if (blk_mq_alloc_tag_set(&dev->admin_tagset))
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 63569eb46d15..8e4df3d6c8cd 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -153,6 +153,7 @@ enum {
- 	BLK_MQ_F_SG_MERGE	= 1 << 2,
- 	BLK_MQ_F_DEFER_ISSUE	= 1 << 4,
- 	BLK_MQ_F_BLOCKING	= 1 << 5,
-+	BLK_MQ_F_NO_SCHED	= 1 << 6,
- 	BLK_MQ_F_ALLOC_POLICY_START_BIT = 8,
- 	BLK_MQ_F_ALLOC_POLICY_BITS = 1,
+ /**
+diff --git a/include/linux/virtio_config.h b/include/linux/virtio_config.h
+index 2ebe506..8355bab 100644
+--- a/include/linux/virtio_config.h
++++ b/include/linux/virtio_config.h
+@@ -58,6 +58,7 @@ struct irq_affinity;
+  *      This returns a pointer to the bus name a la pci_name from which
+  *      the caller can then copy.
+  * @set_vq_affinity: set the affinity for a virtqueue.
++ * @get_vq_affinity: get the affinity for a virtqueue (optional).
+  */
+ typedef void vq_callback_t(struct virtqueue *);
+ struct virtio_config_ops {
+@@ -77,6 +78,8 @@ struct virtio_config_ops {
+ 	int (*finalize_features)(struct virtio_device *vdev);
+ 	const char *(*bus_name)(struct virtio_device *vdev);
+ 	int (*set_vq_affinity)(struct virtqueue *vq, int cpu);
++	const struct cpumask *(*get_vq_affinity)(struct virtio_device *vdev,
++			int index);
+ };
  
+ /* If driver didn't advertise the feature, it will never appear. */
 -- 
-2.7.4
-
+2.1.4
