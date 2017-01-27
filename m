@@ -1,82 +1,59 @@
-Return-Path: <BATV+3cdfc0cdff764882efbb+4905+infradead.org+hch@bombadil.srs.infradead.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([65.50.211.133]:32770 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933449AbdA0Qfg (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 27 Jan 2017 11:35:36 -0500
 From: Christoph Hellwig <hch@lst.de>
-To: mst@redhat.com,
-	jasowang@redhat.com
-Cc: axboe@kernel.dk,
-	pbonzini@redhat.com,
-	virtualization@lists.linux-foundation.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 8/9] virtio_blk: use virtio IRQ affinity
-Date: Fri, 27 Jan 2017 09:16:36 +0100
-Message-Id: <1485504997-17584-9-git-send-email-hch@lst.de>
-In-Reply-To: <1485504997-17584-1-git-send-email-hch@lst.de>
-References: <1485504997-17584-1-git-send-email-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+To: Jens Axboe <axboe@fb.com>
+Cc: Mike Snitzer <snitzer@redhat.com>,
+        Junichi Nomura <j-nomura@ce.jp.nec.com>,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-raid@vger.kernel.org, dm-devel@redhat.com
+Subject: [PATCH 02/19] md: cleanup bio op / flags handling in raid1_write_request
+Date: Fri, 27 Jan 2017 17:35:01 +0100
+Message-Id: <1485534918-18239-3-git-send-email-hch@lst.de>
+In-Reply-To: <1485534918-18239-1-git-send-email-hch@lst.de>
+References: <1485534918-18239-1-git-send-email-hch@lst.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Use automatic IRQ affinity assignment in the virtio layer if available,
-and build the blk-mq queues based on it.
+No need for the local variables, the bio is still live and we can just
+assign the bits we want directly.  Make me wonder why we can't assign
+all the bio flags to start with.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Bart Van Assche <bart.vanassche@sandisk.com>
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
 ---
- drivers/block/virtio_blk.c | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+ drivers/md/raid1.c | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index c54118b..1028dfe 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -5,6 +5,7 @@
- #include <linux/hdreg.h>
- #include <linux/module.h>
- #include <linux/mutex.h>
-+#include <linux/interrupt.h>
- #include <linux/virtio.h>
- #include <linux/virtio_blk.h>
- #include <linux/scatterlist.h>
-@@ -12,6 +13,7 @@
- #include <scsi/scsi_cmnd.h>
- #include <linux/idr.h>
- #include <linux/blk-mq.h>
-+#include <linux/blk-mq-virtio.h>
- #include <linux/numa.h>
- 
- #define PART_BITS 4
-@@ -385,6 +387,7 @@ static int init_vq(struct virtio_blk *vblk)
- 	struct virtqueue **vqs;
- 	unsigned short num_vqs;
- 	struct virtio_device *vdev = vblk->vdev;
-+	struct irq_affinity desc = { 0, };
- 
- 	err = virtio_cread_feature(vdev, VIRTIO_BLK_F_MQ,
- 				   struct virtio_blk_config, num_queues,
-@@ -412,7 +415,7 @@ static int init_vq(struct virtio_blk *vblk)
- 
- 	/* Discover virtqueues and write information to configuration.  */
- 	err = vdev->config->find_vqs(vdev, num_vqs, vqs, callbacks, names,
--			NULL);
-+			&desc);
- 	if (err)
- 		goto out;
- 
-@@ -543,10 +546,18 @@ static int virtblk_init_request(void *data, struct request *rq,
- 	return 0;
- }
- 
-+static int virtblk_map_queues(struct blk_mq_tag_set *set)
-+{
-+	struct virtio_blk *vblk = set->driver_data;
-+
-+	return blk_mq_virtio_map_queues(set, vblk->vdev, 0);
-+}
-+
- static struct blk_mq_ops virtio_mq_ops = {
- 	.queue_rq	= virtio_queue_rq,
- 	.complete	= virtblk_request_done,
- 	.init_request	= virtblk_init_request,
-+	.map_queues	= virtblk_map_queues,
- };
- 
- static unsigned int virtblk_queue_depth;
+diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
+index 7b0f647..67b0365 100644
+--- a/drivers/md/raid1.c
++++ b/drivers/md/raid1.c
+@@ -1170,10 +1170,6 @@ static void raid1_write_request(struct mddev *mddev, struct bio *bio,
+ 	int i, disks;
+ 	struct bitmap *bitmap = mddev->bitmap;
+ 	unsigned long flags;
+-	const int op = bio_op(bio);
+-	const unsigned long do_sync = (bio->bi_opf & REQ_SYNC);
+-	const unsigned long do_flush_fua = (bio->bi_opf &
+-						(REQ_PREFLUSH | REQ_FUA));
+ 	struct md_rdev *blocked_rdev;
+ 	struct blk_plug_cb *cb;
+ 	struct raid1_plug_cb *plug = NULL;
+@@ -1389,7 +1385,8 @@ static void raid1_write_request(struct mddev *mddev, struct bio *bio,
+ 				   conf->mirrors[i].rdev->data_offset);
+ 		mbio->bi_bdev = conf->mirrors[i].rdev->bdev;
+ 		mbio->bi_end_io	= raid1_end_write_request;
+-		bio_set_op_attrs(mbio, op, do_flush_fua | do_sync);
++		mbio->bi_opf = bio_op(bio) |
++			(bio->bi_opf & (REQ_SYNC | REQ_PREFLUSH | REQ_FUA));
+ 		if (test_bit(FailFast, &conf->mirrors[i].rdev->flags) &&
+ 		    !test_bit(WriteMostly, &conf->mirrors[i].rdev->flags) &&
+ 		    conf->raid_disks - mddev->degraded > 1)
 -- 
 2.1.4
+
