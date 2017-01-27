@@ -22,7 +22,6 @@ References: <1485365126-23210-1-git-send-email-hch@lst.de>
  <2d971693-b79d-c1b9-fb2a-f5dd04128c68@fb.com>
  <1485479738.2540.30.camel@sandisk.com>
  <ecca734c-7a9c-f060-9335-c2de089849c2@fb.com>
- <37ab009a-bc2d-d2ae-a875-269ab563a430@fb.com>
 CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
         "linux-raid@vger.kernel.org" <linux-raid@vger.kernel.org>,
         "dm-devel@redhat.com" <dm-devel@redhat.com>,
@@ -30,66 +29,63 @@ CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
         "snitzer@redhat.com" <snitzer@redhat.com>,
         "j-nomura@ce.jp.nec.com" <j-nomura@ce.jp.nec.com>
 From: Jens Axboe <axboe@fb.com>
-Message-ID: <9cbf0ce5-ed79-0252-fd2d-34bebaafffa3@fb.com>
-Date: Fri, 27 Jan 2017 01:04:06 -0700
+Message-ID: <37ab009a-bc2d-d2ae-a875-269ab563a430@fb.com>
+Date: Thu, 26 Jan 2017 23:40:06 -0700
 MIME-Version: 1.0
-In-Reply-To: <37ab009a-bc2d-d2ae-a875-269ab563a430@fb.com>
+In-Reply-To: <ecca734c-7a9c-f060-9335-c2de089849c2@fb.com>
 Content-Type: text/plain; charset="windows-1252"
 Sender: linux-scsi-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-On 01/26/2017 11:40 PM, Jens Axboe wrote:
-> On 01/26/2017 06:22 PM, Jens Axboe wrote:
->> On 01/26/2017 06:15 PM, Bart Van Assche wrote:
->>> On Thu, 2017-01-26 at 17:41 -0700, Jens Axboe wrote:
->>>> On 01/26/2017 05:38 PM, Bart Van Assche wrote:
->>>>> I see similar behavior with the blk-mq-sched branch of
->>>>> git://git.kernel.dk/linux-block.git (git commit ID 0efe27068ecf):
->>>>> booting happens much slower than usual and I/O hangs if I run the
->>>>> srp-test software.
->>>>
->>>> Please don't run that, run for-4.11/block and merge it to master.
->>>> Same behavior?
+On 01/26/2017 06:22 PM, Jens Axboe wrote:
+> On 01/26/2017 06:15 PM, Bart Van Assche wrote:
+>> On Thu, 2017-01-26 at 17:41 -0700, Jens Axboe wrote:
+>>> On 01/26/2017 05:38 PM, Bart Van Assche wrote:
+>>>> I see similar behavior with the blk-mq-sched branch of
+>>>> git://git.kernel.dk/linux-block.git (git commit ID 0efe27068ecf):
+>>>> booting happens much slower than usual and I/O hangs if I run the
+>>>> srp-test software.
 >>>
->>> I have not yet had the chance to run the srp-test software against that
->>> kernel. But I already see that booting takes more than ten times longer
->>> than usual. Note: as far as I know the dm-mpath driver is not involved
->>> in the boot process of my test system.
+>>> Please don't run that, run for-4.11/block and merge it to master.
+>>> Same behavior?
 >>
->> What's your boot device? I've been booting this on a variety of setups,
->> no problems observed. It's booting my laptop, and on SCSI and SATA as
->> well. What is your root drive? What is the queue depth of it?
->> Controller?
+>> I have not yet had the chance to run the srp-test software against that
+>> kernel. But I already see that booting takes more than ten times longer
+>> than usual. Note: as far as I know the dm-mpath driver is not involved
+>> in the boot process of my test system.
 > 
-> Are you using dm for your root device?
-> 
-> I think I see what is going on. The scheduler framework put the
-> insertion of flushes on the side, whereas it's integrated "nicely"
-> on the legacy side.
-> 
-> Can you try with this applied? This is on top of the previous two that
-> we already went through. Or, you can just pull:
-> 
-> git://git.kernel.dk/linux-block for-4.11/next
-> 
-> which is for-4.11/block with the next set of fixes on top that I haven't
-> pulled in yet.
+> What's your boot device? I've been booting this on a variety of setups,
+> no problems observed. It's booting my laptop, and on SCSI and SATA as
+> well. What is your root drive? What is the queue depth of it?
+> Controller?
 
-The previous patch had a bug if you didn't use a scheduler, here's a
-version that should work fine in both cases. I've also updated the
-above mentioned branch, so feel free to pull that as well and merge to
-master like before.
+Are you using dm for your root device?
 
-commit 2f54ba92a274a7c1a5ceb34a56565f84f7b994b7
+I think I see what is going on. The scheduler framework put the
+insertion of flushes on the side, whereas it's integrated "nicely"
+on the legacy side.
+
+Can you try with this applied? This is on top of the previous two that
+we already went through. Or, you can just pull:
+
+git://git.kernel.dk/linux-block for-4.11/next
+
+which is for-4.11/block with the next set of fixes on top that I haven't
+pulled in yet.
+
+
+commit 995447bfd14dd871e0c8771261ed7d1f2b5b4c86
 Author: Jens Axboe <axboe@fb.com>
-Date:   Fri Jan 27 01:00:47 2017 -0700
+Date:   Thu Jan 26 23:34:56 2017 -0700
 
-    blk-mq-sched: add flush insertion into blk_mq_sched_insert_request()
+    blk-mq-sched: integrate flush insertion into blk_mq_sched_get_request()
     
     Instead of letting the caller check this and handle the details
     of inserting a flush request, put the logic in the scheduler
-    insertion function. This fixes direct flush insertion outside
-    of the usual make_request_fn calls, like from dm via
+    insertion function.
+    
+    Outside of cleaning up the code, this handles the case where
+    outside callers insert a flush, like through
     blk_insert_cloned_request().
     
     Signed-off-by: Jens Axboe <axboe@fb.com>
@@ -134,7 +130,7 @@ index d7de34ee39c2..4427896641ac 100644
  			list_add_tail(&rq->queuelist, &q->queue_head);
  		return;
 diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index c27613de80c5..5e91743e193a 100644
+index c27613de80c5..fa2ff0f458fa 100644
 --- a/block/blk-mq-sched.c
 +++ b/block/blk-mq-sched.c
 @@ -336,6 +336,64 @@ void blk_mq_sched_restart_queues(struct blk_mq_hw_ctx *hctx)
@@ -151,7 +147,7 @@ index c27613de80c5..5e91743e193a 100644
 +{
 +	if (blk_mq_get_driver_tag(rq, &hctx, can_block)) {
 +		blk_insert_flush(rq);
-+		blk_mq_run_hw_queue(hctx, true);
++		blk_mq_run_hw_queue(hctx, !can_block);
 +	} else
 +		blk_mq_add_to_requeue_list(rq, true, true);
 +}
@@ -306,7 +302,7 @@ index 1b156ca79af6..78bbacd129c9 100644
  
  found_tag:
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 4df397910251..888868b62018 100644
+index 4df397910251..9046f7802de3 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
 @@ -568,13 +568,13 @@ static void blk_mq_requeue_work(struct work_struct *work)
@@ -349,21 +345,26 @@ index 4df397910251..888868b62018 100644
  }
  
  /*
-@@ -1446,10 +1445,12 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
+@@ -1445,12 +1444,8 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
+ 
  	cookie = request_to_qc_t(data.hctx, rq);
  
- 	if (unlikely(is_flush_fua)) {
-+		blk_mq_put_ctx(data.ctx);
- 		blk_mq_bio_to_request(rq, bio);
- 		blk_mq_get_driver_tag(rq, NULL, true);
- 		blk_insert_flush(rq);
+-	if (unlikely(is_flush_fua)) {
+-		blk_mq_bio_to_request(rq, bio);
+-		blk_mq_get_driver_tag(rq, NULL, true);
+-		blk_insert_flush(rq);
 -		goto run_queue;
-+		blk_mq_run_hw_queue(data.hctx, true);
-+		goto done;
- 	}
+-	}
++	if (unlikely(is_flush_fua))
++		goto insert;
  
  	plug = current->plug;
-@@ -1502,7 +1503,7 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
+ 	/*
+@@ -1499,10 +1494,11 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
+ 	}
+ 
+ 	if (q->elevator) {
++insert:
  		blk_mq_put_ctx(data.ctx);
  		blk_mq_bio_to_request(rq, bio);
  		blk_mq_sched_insert_request(rq, false, true,
@@ -372,7 +373,7 @@ index 4df397910251..888868b62018 100644
  		goto done;
  	}
  	if (!blk_mq_merge_queue_io(data.hctx, data.ctx, rq, bio)) {
-@@ -1512,7 +1513,6 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
+@@ -1512,7 +1508,6 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
  		 * latter allows for merging opportunities and more efficient
  		 * dispatching.
  		 */
@@ -380,21 +381,26 @@ index 4df397910251..888868b62018 100644
  		blk_mq_run_hw_queue(data.hctx, !is_sync || is_flush_fua);
  	}
  	blk_mq_put_ctx(data.ctx);
-@@ -1568,10 +1568,12 @@ static blk_qc_t blk_sq_make_request(struct request_queue *q, struct bio *bio)
+@@ -1567,12 +1562,8 @@ static blk_qc_t blk_sq_make_request(struct request_queue *q, struct bio *bio)
+ 
  	cookie = request_to_qc_t(data.hctx, rq);
  
- 	if (unlikely(is_flush_fua)) {
-+		blk_mq_put_ctx(data.ctx);
- 		blk_mq_bio_to_request(rq, bio);
- 		blk_mq_get_driver_tag(rq, NULL, true);
- 		blk_insert_flush(rq);
+-	if (unlikely(is_flush_fua)) {
+-		blk_mq_bio_to_request(rq, bio);
+-		blk_mq_get_driver_tag(rq, NULL, true);
+-		blk_insert_flush(rq);
 -		goto run_queue;
-+		blk_mq_run_hw_queue(data.hctx, true);
-+		goto done;
- 	}
+-	}
++	if (unlikely(is_flush_fua))
++		goto insert;
  
  	/*
-@@ -1612,7 +1614,7 @@ static blk_qc_t blk_sq_make_request(struct request_queue *q, struct bio *bio)
+ 	 * A task plug currently exists. Since this is completely lockless,
+@@ -1609,10 +1600,11 @@ static blk_qc_t blk_sq_make_request(struct request_queue *q, struct bio *bio)
+ 	}
+ 
+ 	if (q->elevator) {
++insert:
  		blk_mq_put_ctx(data.ctx);
  		blk_mq_bio_to_request(rq, bio);
  		blk_mq_sched_insert_request(rq, false, true,
@@ -403,7 +409,7 @@ index 4df397910251..888868b62018 100644
  		goto done;
  	}
  	if (!blk_mq_merge_queue_io(data.hctx, data.ctx, rq, bio)) {
-@@ -1622,7 +1624,6 @@ static blk_qc_t blk_sq_make_request(struct request_queue *q, struct bio *bio)
+@@ -1622,7 +1614,6 @@ static blk_qc_t blk_sq_make_request(struct request_queue *q, struct bio *bio)
  		 * latter allows for merging opportunities and more efficient
  		 * dispatching.
  		 */
