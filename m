@@ -1,69 +1,46 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv6 29/37] ext4: handle huge pages in ext4_da_write_end()
-Date: Thu, 26 Jan 2017 14:58:11 +0300
-Message-Id: <20170126115819.58875-30-kirill.shutemov@linux.intel.com>
-In-Reply-To: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
-References: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+Date: Sat, 28 Jan 2017 09:25:13 +0100
+From: "hch@lst.de" <hch@lst.de>
+To: Bart Van Assche <Bart.VanAssche@sandisk.com>
+Cc: "hch@lst.de" <hch@lst.de>, "axboe@fb.com" <axboe@fb.com>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-raid@vger.kernel.org" <linux-raid@vger.kernel.org>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "snitzer@redhat.com" <snitzer@redhat.com>,
+        "j-nomura@ce.jp.nec.com" <j-nomura@ce.jp.nec.com>
+Subject: Re: [PATCH 15/18] scsi: allocate scsi_cmnd structures as part of
+        struct request
+Message-ID: <20170128082513.GB4728@lst.de>
+References: <1485365126-23210-1-git-send-email-hch@lst.de> <1485365126-23210-16-git-send-email-hch@lst.de> <1485542367.4267.19.camel@sandisk.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <1485542367.4267.19.camel@sandisk.com>
+Sender: linux-scsi-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Call ext4_da_should_update_i_disksize() for head page with offset
-relative to head page.
+On Fri, Jan 27, 2017 at 06:39:46PM +0000, Bart Van Assche wrote:
+> Why�have the�scsi_release_buffers() and scsi_put_command(cmd) calls been
+> moved up? I haven't found an explanation for this change in the patch
+> description.
 
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
----
- fs/ext4/inode.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+Because they reference the scsi_cmnd, which are now part of the request
+and thus freed by blk_finish_request.  And yes, I should have mentioned
+it in the changelog, sorry.
 
-diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
-index 3eae2d058fd0..bdd62dcaa0b2 100644
---- a/fs/ext4/inode.c
-+++ b/fs/ext4/inode.c
-@@ -3019,7 +3019,6 @@ static int ext4_da_write_end(struct file *file,
- 	int ret = 0, ret2;
- 	handle_t *handle = ext4_journal_current_handle();
- 	loff_t new_i_size;
--	unsigned long start, end;
- 	int write_mode = (int)(unsigned long)fsdata;
- 
- 	if (write_mode == FALL_BACK_TO_NONDELALLOC)
-@@ -3027,8 +3026,6 @@ static int ext4_da_write_end(struct file *file,
- 				      len, copied, page, fsdata);
- 
- 	trace_ext4_da_write_end(inode, pos, len, copied);
--	start = pos & (PAGE_SIZE - 1);
--	end = start + copied - 1;
- 
- 	/*
- 	 * generic_write_end() will run mark_inode_dirty() if i_size
-@@ -3037,8 +3034,10 @@ static int ext4_da_write_end(struct file *file,
- 	 */
- 	new_i_size = pos + copied;
- 	if (copied && new_i_size > EXT4_I(inode)->i_disksize) {
-+		struct page *head = compound_head(page);
-+		unsigned long end = (pos & ~hpage_mask(head)) + copied - 1;
- 		if (ext4_has_inline_data(inode) ||
--		    ext4_da_should_update_i_disksize(page, end)) {
-+		    ext4_da_should_update_i_disksize(head, end)) {
- 			ext4_update_i_disksize(inode, new_i_size);
- 			/* We need to mark inode dirty even if
- 			 * new_i_size is less that inode->i_size
--- 
-2.11.0
+> Please also consider to remove the cmd->request->special = NULL assignments
+> via this patch. Since this patch makes the lifetime of struct scsi_cmnd and
+> struct request identical these assignments are no longer needed.
 
+True.  If I had to resend again I would have fixed it up, but it's probably
+not worth the churn now.
+
+> This patch introduces the function scsi_exit_rq(). Having two functions
+> for the single-queue path that release resources (scsi_release_buffers()
+> and scsi_exit_rq()) is confusing. Since every scsi_release_buffers() call
+> is followed by a blk_unprep_request() call, have you considered to move
+> the scsi_release_buffers() call into scsi_unprep_fn() via an additional
+> patch?
+
+We could have done that.  But it's just more change for a code path
+that I hope won't survive this calendar year.
