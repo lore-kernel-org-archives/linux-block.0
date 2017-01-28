@@ -1,167 +1,174 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-bn3nam01on0043.outbound.protection.outlook.com ([104.47.33.43]:32224
-        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752003AbdAaMSO (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 31 Jan 2017 07:18:14 -0500
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
-To: <axboe@fb.com>
-CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
-Subject: [PATCH 03/12] lightnvm: remove nvm_submit_ppa* functions
-Date: Tue, 31 Jan 2017 13:17:11 +0100
-Message-ID: <20170131121720.10971-4-matias@cnexlabs.com>
-In-Reply-To: <20170131121720.10971-1-matias@cnexlabs.com>
-References: <20170131121720.10971-1-matias@cnexlabs.com>
+Received: from mga05.intel.com ([192.55.52.43]:18151 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751010AbdA1Inz (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 28 Jan 2017 03:43:55 -0500
+Subject: [RFC PATCH 08/17] dcssblk: add dax_operations support
+From: Dan Williams <dan.j.williams@intel.com>
+To: linux-nvdimm@lists.01.org
+Cc: snitzer@redhat.com, toshi.kani@hpe.com, mawilcox@microsoft.com,
+        linux-block@vger.kernel.org, jmoyer@redhat.com,
+        linux-fsdevel@vger.kernel.org, ross.zwisler@linux.intel.com,
+        hch@lst.de
+Date: Sat, 28 Jan 2017 00:36:47 -0800
+Message-ID: <148559260698.11180.11351610034052668852.stgit@dwillia2-desk3.amr.corp.intel.com>
+In-Reply-To: <148559256378.11180.8957776806175202312.stgit@dwillia2-desk3.amr.corp.intel.com>
+References: <148559256378.11180.8957776806175202312.stgit@dwillia2-desk3.amr.corp.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-The nvm_submit_ppa* functions are no longer needed after gennvm and core
-have been merged.
+Setup a dax_inode to have the same lifetime as the dcssblk block device
+and add a ->direct_access() method that is equivalent to
+dcssblk_direct_access(). Once fs/dax.c has been converted to use
+dax_operations the old dcssblk_direct_access() will be removed.
 
-Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
+Signed-off-by: Dan Williams <dan.j.williams@intel.com>
 ---
- drivers/lightnvm/core.c  | 109 -----------------------------------------------
- include/linux/lightnvm.h |   4 --
- 2 files changed, 113 deletions(-)
+ drivers/s390/block/Kconfig   |    1 +
+ drivers/s390/block/dcssblk.c |   53 +++++++++++++++++++++++++++++++++++-------
+ 2 files changed, 45 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-index a4e2e3b..ffdf048 100644
---- a/drivers/lightnvm/core.c
-+++ b/drivers/lightnvm/core.c
-@@ -883,115 +883,6 @@ void nvm_end_io(struct nvm_rq *rqd, int error)
- }
- EXPORT_SYMBOL(nvm_end_io);
+diff --git a/drivers/s390/block/Kconfig b/drivers/s390/block/Kconfig
+index 4a3b62326183..0acb8c2f9475 100644
+--- a/drivers/s390/block/Kconfig
++++ b/drivers/s390/block/Kconfig
+@@ -14,6 +14,7 @@ config BLK_DEV_XPRAM
  
--static void nvm_end_io_sync(struct nvm_rq *rqd)
--{
--	struct completion *waiting = rqd->wait;
--
--	rqd->wait = NULL;
--
--	complete(waiting);
--}
--
--static int __nvm_submit_ppa(struct nvm_dev *dev, struct nvm_rq *rqd, int opcode,
--						int flags, void *buf, int len)
--{
--	DECLARE_COMPLETION_ONSTACK(wait);
--	struct bio *bio;
--	int ret;
--	unsigned long hang_check;
--
--	bio = bio_map_kern(dev->q, buf, len, GFP_KERNEL);
--	if (IS_ERR_OR_NULL(bio))
--		return -ENOMEM;
--
--	nvm_generic_to_addr_mode(dev, rqd);
--
--	rqd->dev = NULL;
--	rqd->opcode = opcode;
--	rqd->flags = flags;
--	rqd->bio = bio;
--	rqd->wait = &wait;
--	rqd->end_io = nvm_end_io_sync;
--
--	ret = dev->ops->submit_io(dev, rqd);
--	if (ret) {
--		bio_put(bio);
--		return ret;
--	}
--
--	/* Prevent hang_check timer from firing at us during very long I/O */
--	hang_check = sysctl_hung_task_timeout_secs;
--	if (hang_check)
--		while (!wait_for_completion_io_timeout(&wait,
--							hang_check * (HZ/2)))
--			;
--	else
--		wait_for_completion_io(&wait);
--
--	return rqd->error;
--}
--
--/**
-- * nvm_submit_ppa_list - submit user-defined ppa list to device. The user must
-- *			 take to free ppa list if necessary.
-- * @dev:	device
-- * @ppa_list:	user created ppa_list
-- * @nr_ppas:	length of ppa_list
-- * @opcode:	device opcode
-- * @flags:	device flags
-- * @buf:	data buffer
-- * @len:	data buffer length
-- */
--int nvm_submit_ppa_list(struct nvm_dev *dev, struct ppa_addr *ppa_list,
--			int nr_ppas, int opcode, int flags, void *buf, int len)
--{
--	struct nvm_rq rqd;
--
--	if (dev->ops->max_phys_sect < nr_ppas)
--		return -EINVAL;
--
--	memset(&rqd, 0, sizeof(struct nvm_rq));
--
--	rqd.nr_ppas = nr_ppas;
--	if (nr_ppas > 1)
--		rqd.ppa_list = ppa_list;
--	else
--		rqd.ppa_addr = ppa_list[0];
--
--	return __nvm_submit_ppa(dev, &rqd, opcode, flags, buf, len);
--}
--EXPORT_SYMBOL(nvm_submit_ppa_list);
--
--/**
-- * nvm_submit_ppa - submit PPAs to device. PPAs will automatically be unfolded
-- *		    as single, dual, quad plane PPAs depending on device type.
-- * @dev:	device
-- * @ppa:	user created ppa_list
-- * @nr_ppas:	length of ppa_list
-- * @opcode:	device opcode
-- * @flags:	device flags
-- * @buf:	data buffer
-- * @len:	data buffer length
-- */
--int nvm_submit_ppa(struct nvm_dev *dev, struct ppa_addr *ppa, int nr_ppas,
--				int opcode, int flags, void *buf, int len)
--{
--	struct nvm_rq rqd;
--	int ret;
--
--	memset(&rqd, 0, sizeof(struct nvm_rq));
--	ret = nvm_set_rqd_ppalist(dev, &rqd, ppa, nr_ppas, 1);
--	if (ret)
--		return ret;
--
--	ret = __nvm_submit_ppa(dev, &rqd, opcode, flags, buf, len);
--
--	nvm_free_rqd_ppalist(dev, &rqd);
--
--	return ret;
--}
--EXPORT_SYMBOL(nvm_submit_ppa);
--
- /*
-  * folds a bad block list from its plane representation to its virtual
-  * block representation. The fold is done in place and reduced size is
-diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
-index f2007b2..abb3d55 100644
---- a/include/linux/lightnvm.h
-+++ b/include/linux/lightnvm.h
-@@ -489,10 +489,6 @@ extern int nvm_get_l2p_tbl(struct nvm_tgt_dev *, u64, u32, nvm_l2p_update_fn *,
- extern int nvm_get_area(struct nvm_tgt_dev *, sector_t *, sector_t);
- extern void nvm_put_area(struct nvm_tgt_dev *, sector_t);
- extern void nvm_end_io(struct nvm_rq *, int);
--extern int nvm_submit_ppa(struct nvm_dev *, struct ppa_addr *, int, int, int,
--								void *, int);
--extern int nvm_submit_ppa_list(struct nvm_dev *, struct ppa_addr *, int, int,
--							int, void *, int);
- extern int nvm_bb_tbl_fold(struct nvm_dev *, u8 *, int);
- extern int nvm_get_bb_tbl(struct nvm_dev *, struct ppa_addr, u8 *);
- extern int nvm_get_tgt_bb_tbl(struct nvm_tgt_dev *, struct ppa_addr, u8 *);
--- 
-2.9.3
+ config DCSSBLK
+ 	def_tristate m
++	select DAX
+ 	prompt "DCSSBLK support"
+ 	depends on S390 && BLOCK
+ 	help
+diff --git a/drivers/s390/block/dcssblk.c b/drivers/s390/block/dcssblk.c
+index 9d66b4fb174b..67b0885b4d12 100644
+--- a/drivers/s390/block/dcssblk.c
++++ b/drivers/s390/block/dcssblk.c
+@@ -18,6 +18,7 @@
+ #include <linux/interrupt.h>
+ #include <linux/platform_device.h>
+ #include <linux/pfn_t.h>
++#include <linux/dax.h>
+ #include <asm/extmem.h>
+ #include <asm/io.h>
+ 
+@@ -30,8 +31,10 @@ static int dcssblk_open(struct block_device *bdev, fmode_t mode);
+ static void dcssblk_release(struct gendisk *disk, fmode_t mode);
+ static blk_qc_t dcssblk_make_request(struct request_queue *q,
+ 						struct bio *bio);
+-static long dcssblk_direct_access(struct block_device *bdev, sector_t secnum,
++static long dcssblk_blk_direct_access(struct block_device *bdev, sector_t secnum,
+ 			 void **kaddr, pfn_t *pfn, long size);
++static long dcssblk_dax_direct_access(struct dax_inode *dax_inode,
++		phys_addr_t dev_addr, void **kaddr, pfn_t *pfn, long size);
+ 
+ static char dcssblk_segments[DCSSBLK_PARM_LEN] = "\0";
+ 
+@@ -40,7 +43,11 @@ static const struct block_device_operations dcssblk_devops = {
+ 	.owner   	= THIS_MODULE,
+ 	.open    	= dcssblk_open,
+ 	.release 	= dcssblk_release,
+-	.direct_access 	= dcssblk_direct_access,
++	.direct_access 	= dcssblk_blk_direct_access,
++};
++
++static const struct dax_operations dcssblk_dax_ops = {
++	.direct_access = dcssblk_dax_direct_access,
+ };
+ 
+ struct dcssblk_dev_info {
+@@ -57,6 +64,7 @@ struct dcssblk_dev_info {
+ 	struct request_queue *dcssblk_queue;
+ 	int num_of_segments;
+ 	struct list_head seg_list;
++	struct dax_inode *dax_inode;
+ };
+ 
+ struct segment_info {
+@@ -389,6 +397,8 @@ dcssblk_shared_store(struct device *dev, struct device_attribute *attr, const ch
+ 	}
+ 	list_del(&dev_info->lh);
+ 
++	kill_dax_inode(dev_info->dax_inode);
++	put_dax_inode(dev_info->dax_inode);
+ 	del_gendisk(dev_info->gd);
+ 	blk_cleanup_queue(dev_info->dcssblk_queue);
+ 	dev_info->gd->queue = NULL;
+@@ -525,6 +535,7 @@ dcssblk_add_store(struct device *dev, struct device_attribute *attr, const char
+ 	int rc, i, j, num_of_segments;
+ 	struct dcssblk_dev_info *dev_info;
+ 	struct segment_info *seg_info, *temp;
++	struct dax_inode *dax_inode;
+ 	char *local_buf;
+ 	unsigned long seg_byte_size;
+ 
+@@ -654,6 +665,11 @@ dcssblk_add_store(struct device *dev, struct device_attribute *attr, const char
+ 	if (rc)
+ 		goto put_dev;
+ 
++	dax_inode = alloc_dax_inode(dev_info, dev_info->gd->disk_name,
++			&dcssblk_dax_ops);
++	if (!dax_inode)
++		goto put_dev;
++
+ 	get_device(&dev_info->dev);
+ 	device_add_disk(&dev_info->dev, dev_info->gd);
+ 
+@@ -752,6 +768,8 @@ dcssblk_remove_store(struct device *dev, struct device_attribute *attr, const ch
+ 	}
+ 
+ 	list_del(&dev_info->lh);
++	kill_dax_inode(dev_info->dax_inode);
++	put_dax_inode(dev_info->dax_inode);
+ 	del_gendisk(dev_info->gd);
+ 	blk_cleanup_queue(dev_info->dcssblk_queue);
+ 	dev_info->gd->queue = NULL;
+@@ -883,21 +901,38 @@ dcssblk_make_request(struct request_queue *q, struct bio *bio)
+ }
+ 
+ static long
+-dcssblk_direct_access (struct block_device *bdev, sector_t secnum,
++__dcssblk_direct_access(struct dcssblk_dev_info *dev_info, phys_addr_t offset,
++		void **kaddr, pfn_t *pfn, long size)
++{
++	unsigned long dev_sz;
++
++	dev_sz = dev_info->end - dev_info->start;
++	*kaddr = (void *) dev_info->start + offset;
++	*pfn = __pfn_to_pfn_t(PFN_DOWN(dev_info->start + offset), PFN_DEV);
++
++	return dev_sz - offset;
++}
++
++static long
++dcssblk_blk_direct_access(struct block_device *bdev, sector_t secnum,
+ 			void **kaddr, pfn_t *pfn, long size)
+ {
+ 	struct dcssblk_dev_info *dev_info;
+-	unsigned long offset, dev_sz;
+ 
+ 	dev_info = bdev->bd_disk->private_data;
+ 	if (!dev_info)
+ 		return -ENODEV;
+-	dev_sz = dev_info->end - dev_info->start;
+-	offset = secnum * 512;
+-	*kaddr = (void *) dev_info->start + offset;
+-	*pfn = __pfn_to_pfn_t(PFN_DOWN(dev_info->start + offset), PFN_DEV);
++	return __dcssblk_direct_access(dev_info, secnum * 512, kaddr, pfn,
++			size);
++}
+ 
+-	return dev_sz - offset;
++static long
++dcssblk_dax_direct_access(struct dax_inode *dax_inode, phys_addr_t dev_addr,
++			void **kaddr, pfn_t *pfn, long size)
++{
++	struct dcssblk_dev_info *dev_info = dax_inode_get_private(dax_inode);
++
++	return __dcssblk_direct_access(dev_info, dev_addr, kaddr, pfn, size);
+ }
+ 
+ static void
 
