@@ -1,268 +1,184 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f48.google.com ([74.125.83.48]:32867 "EHLO
-        mail-pg0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750711AbdAYQHY (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 Jan 2017 11:07:24 -0500
-Received: by mail-pg0-f48.google.com with SMTP id 204so65718123pge.0
-        for <linux-block@vger.kernel.org>; Wed, 25 Jan 2017 08:07:24 -0800 (PST)
-From: Omar Sandoval <osandov@osandov.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: kernel-team@fb.com
-Subject: [PATCH v2 03/10] blk-mq: move hctx->dispatch and ctx->rq_list from sysfs to debugfs
-Date: Wed, 25 Jan 2017 08:06:42 -0800
-Message-Id: <4a761343fab2fc3d74689fa64e397a6aa2704819.1485360145.git.osandov@fb.com>
-In-Reply-To: <cover.1485360145.git.osandov@fb.com>
-References: <cover.1485360145.git.osandov@fb.com>
-In-Reply-To: <cover.1485360145.git.osandov@fb.com>
-References: <cover.1485360145.git.osandov@fb.com>
+Received: from mga04.intel.com ([192.55.52.120]:17034 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750904AbdA1IkV (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 28 Jan 2017 03:40:21 -0500
+Subject: [RFC PATCH 02/17] dax: convert dax_inode locking to srcu
+From: Dan Williams <dan.j.williams@intel.com>
+To: linux-nvdimm@lists.01.org
+Cc: snitzer@redhat.com, toshi.kani@hpe.com, mawilcox@microsoft.com,
+        linux-block@vger.kernel.org, jmoyer@redhat.com,
+        linux-fsdevel@vger.kernel.org, ross.zwisler@linux.intel.com,
+        hch@lst.de
+Date: Sat, 28 Jan 2017 00:36:15 -0800
+Message-ID: <148559257511.11180.7445606032994481709.stgit@dwillia2-desk3.amr.corp.intel.com>
+In-Reply-To: <148559256378.11180.8957776806175202312.stgit@dwillia2-desk3.amr.corp.intel.com>
+References: <148559256378.11180.8957776806175202312.stgit@dwillia2-desk3.amr.corp.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Omar Sandoval <osandov@fb.com>
+In preparation for adding dax_operations that perform ->direct_access()
+and user copy operations relative to a dax_inode, convert the existing
+dax_inode locking to srcu. Some dax drivers need to sleep in their
+->direct_access() methods and user copying may fault / sleep.
 
-These lists are only useful for debugging; they definitely don't belong
-in sysfs. Putting them in debugfs also removes the limitation of a
-single page of output.
-
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Signed-off-by: Omar Sandoval <osandov@fb.com>
+Signed-off-by: Dan Williams <dan.j.williams@intel.com>
 ---
- block/blk-mq-debugfs.c | 106 +++++++++++++++++++++++++++++++++++++++++++++++++
- block/blk-mq-sysfs.c   |  57 --------------------------
- 2 files changed, 106 insertions(+), 57 deletions(-)
+ drivers/dax/Kconfig  |    1 +
+ drivers/dax/device.c |   18 +++++++++---------
+ drivers/dax/super.c  |   20 ++++++++++++++++----
+ include/linux/dax.h  |    3 +++
+ 4 files changed, 29 insertions(+), 13 deletions(-)
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 0c14511fa9e0..1967c06d80e0 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -29,6 +29,20 @@ struct blk_mq_debugfs_attr {
+diff --git a/drivers/dax/Kconfig b/drivers/dax/Kconfig
+index 39bcbf4c5e40..b7053eafd88e 100644
+--- a/drivers/dax/Kconfig
++++ b/drivers/dax/Kconfig
+@@ -1,5 +1,6 @@
+ menuconfig DAX
+ 	tristate "DAX: direct access to differentiated memory"
++	select SRCU
+ 	default m if NVDIMM_DAX
  
- static struct dentry *block_debugfs_root;
+ if DAX
+diff --git a/drivers/dax/device.c b/drivers/dax/device.c
+index 5b5572314929..af06d0bfd6ea 100644
+--- a/drivers/dax/device.c
++++ b/drivers/dax/device.c
+@@ -333,16 +333,16 @@ static int __dax_dev_fault(struct dax_dev *dax_dev, struct vm_area_struct *vma,
  
-+static int blk_mq_debugfs_seq_open(struct inode *inode, struct file *file,
-+				   const struct seq_operations *ops)
-+{
-+	struct seq_file *m;
-+	int ret;
-+
-+	ret = seq_open(file, ops);
-+	if (!ret) {
-+		m = file->private_data;
-+		m->private = inode->i_private;
-+	}
-+	return ret;
-+}
-+
- static int hctx_state_show(struct seq_file *m, void *v)
+ static int dax_dev_fault(struct vm_area_struct *vma, struct vm_fault *vmf)
  {
- 	struct blk_mq_hw_ctx *hctx = m->private;
-@@ -69,12 +83,104 @@ static const struct file_operations hctx_flags_fops = {
- 	.release	= single_release,
- };
+-	int rc;
++	int rc, id;
+ 	struct file *filp = vma->vm_file;
+ 	struct dax_dev *dax_dev = filp->private_data;
  
-+static int blk_mq_debugfs_rq_show(struct seq_file *m, void *v)
-+{
-+	struct request *rq = list_entry_rq(v);
-+
-+	seq_printf(m, "%p\n", rq);
-+	return 0;
-+}
-+
-+static void *hctx_dispatch_start(struct seq_file *m, loff_t *pos)
-+{
-+	struct blk_mq_hw_ctx *hctx = m->private;
-+
-+	spin_lock(&hctx->lock);
-+	return seq_list_start(&hctx->dispatch, *pos);
-+}
-+
-+static void *hctx_dispatch_next(struct seq_file *m, void *v, loff_t *pos)
-+{
-+	struct blk_mq_hw_ctx *hctx = m->private;
-+
-+	return seq_list_next(v, &hctx->dispatch, pos);
-+}
-+
-+static void hctx_dispatch_stop(struct seq_file *m, void *v)
-+{
-+	struct blk_mq_hw_ctx *hctx = m->private;
-+
-+	spin_unlock(&hctx->lock);
-+}
-+
-+static const struct seq_operations hctx_dispatch_seq_ops = {
-+	.start	= hctx_dispatch_start,
-+	.next	= hctx_dispatch_next,
-+	.stop	= hctx_dispatch_stop,
-+	.show	= blk_mq_debugfs_rq_show,
-+};
-+
-+static int hctx_dispatch_open(struct inode *inode, struct file *file)
-+{
-+	return blk_mq_debugfs_seq_open(inode, file, &hctx_dispatch_seq_ops);
-+}
-+
-+static const struct file_operations hctx_dispatch_fops = {
-+	.open		= hctx_dispatch_open,
-+	.read		= seq_read,
-+	.llseek		= seq_lseek,
-+	.release	= seq_release,
-+};
-+
-+static void *ctx_rq_list_start(struct seq_file *m, loff_t *pos)
-+{
-+	struct blk_mq_ctx *ctx = m->private;
-+
-+	spin_lock(&ctx->lock);
-+	return seq_list_start(&ctx->rq_list, *pos);
-+}
-+
-+static void *ctx_rq_list_next(struct seq_file *m, void *v, loff_t *pos)
-+{
-+	struct blk_mq_ctx *ctx = m->private;
-+
-+	return seq_list_next(v, &ctx->rq_list, pos);
-+}
-+
-+static void ctx_rq_list_stop(struct seq_file *m, void *v)
-+{
-+	struct blk_mq_ctx *ctx = m->private;
-+
-+	spin_unlock(&ctx->lock);
-+}
-+
-+static const struct seq_operations ctx_rq_list_seq_ops = {
-+	.start	= ctx_rq_list_start,
-+	.next	= ctx_rq_list_next,
-+	.stop	= ctx_rq_list_stop,
-+	.show	= blk_mq_debugfs_rq_show,
-+};
-+
-+static int ctx_rq_list_open(struct inode *inode, struct file *file)
-+{
-+	return blk_mq_debugfs_seq_open(inode, file, &ctx_rq_list_seq_ops);
-+}
-+
-+static const struct file_operations ctx_rq_list_fops = {
-+	.open		= ctx_rq_list_open,
-+	.read		= seq_read,
-+	.llseek		= seq_lseek,
-+	.release	= seq_release,
-+};
-+
- static const struct blk_mq_debugfs_attr blk_mq_debugfs_hctx_attrs[] = {
- 	{"state", 0400, &hctx_state_fops},
- 	{"flags", 0400, &hctx_flags_fops},
-+	{"dispatch", 0400, &hctx_dispatch_fops},
- };
+ 	dev_dbg(&dax_dev->dev, "%s: %s: %s (%#lx - %#lx)\n", __func__,
+ 			current->comm, (vmf->flags & FAULT_FLAG_WRITE)
+ 			? "write" : "read", vma->vm_start, vma->vm_end);
+-	rcu_read_lock();
++	id = dax_read_lock();
+ 	rc = __dax_dev_fault(dax_dev, vma, vmf);
+-	rcu_read_unlock();
++	dax_read_unlock(id);
  
- static const struct blk_mq_debugfs_attr blk_mq_debugfs_ctx_attrs[] = {
-+	{"rq_list", 0400, &ctx_rq_list_fops},
- };
- 
- int blk_mq_debugfs_register(struct request_queue *q, const char *name)
-diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
-index 91b93ca1c1e0..ee3694d8c4ee 100644
---- a/block/blk-mq-sysfs.c
-+++ b/block/blk-mq-sysfs.c
-@@ -139,41 +139,6 @@ static ssize_t blk_mq_sysfs_completed_show(struct blk_mq_ctx *ctx, char *page)
- 				ctx->rq_completed[0]);
+ 	return rc;
  }
- 
--static ssize_t sysfs_list_show(char *page, struct list_head *list, char *msg)
--{
--	struct request *rq;
--	int len = snprintf(page, PAGE_SIZE - 1, "%s:\n", msg);
--
--	list_for_each_entry(rq, list, queuelist) {
--		const int rq_len = 2 * sizeof(rq) + 2;
--
--		/* if the output will be truncated */
--		if (PAGE_SIZE - 1 < len + rq_len) {
--			/* backspacing if it can't hold '\t...\n' */
--			if (PAGE_SIZE - 1 < len + 5)
--				len -= rq_len;
--			len += snprintf(page + len, PAGE_SIZE - 1 - len,
--					"\t...\n");
--			break;
--		}
--		len += snprintf(page + len, PAGE_SIZE - 1 - len,
--				"\t%p\n", rq);
--	}
--
--	return len;
--}
--
--static ssize_t blk_mq_sysfs_rq_list_show(struct blk_mq_ctx *ctx, char *page)
--{
--	ssize_t ret;
--
--	spin_lock(&ctx->lock);
--	ret = sysfs_list_show(page, &ctx->rq_list, "CTX pending");
--	spin_unlock(&ctx->lock);
--
--	return ret;
--}
--
- static ssize_t blk_mq_hw_sysfs_poll_show(struct blk_mq_hw_ctx *hctx, char *page)
+@@ -390,7 +390,7 @@ static int __dax_dev_pmd_fault(struct dax_dev *dax_dev,
+ static int dax_dev_pmd_fault(struct vm_area_struct *vma, unsigned long addr,
+ 		pmd_t *pmd, unsigned int flags)
  {
- 	return sprintf(page, "considered=%lu, invoked=%lu, success=%lu\n",
-@@ -219,18 +184,6 @@ static ssize_t blk_mq_hw_sysfs_dispatched_show(struct blk_mq_hw_ctx *hctx,
- 	return page - start_page;
+-	int rc;
++	int rc, id;
+ 	struct file *filp = vma->vm_file;
+ 	struct dax_dev *dax_dev = filp->private_data;
+ 
+@@ -398,9 +398,9 @@ static int dax_dev_pmd_fault(struct vm_area_struct *vma, unsigned long addr,
+ 			current->comm, (flags & FAULT_FLAG_WRITE)
+ 			? "write" : "read", vma->vm_start, vma->vm_end);
+ 
+-	rcu_read_lock();
++	id = dax_read_lock();
+ 	rc = __dax_dev_pmd_fault(dax_dev, vma, addr, pmd, flags);
+-	rcu_read_unlock();
++	dax_read_unlock(id);
+ 
+ 	return rc;
  }
+@@ -412,8 +412,8 @@ static const struct vm_operations_struct dax_dev_vm_ops = {
  
--static ssize_t blk_mq_hw_sysfs_rq_list_show(struct blk_mq_hw_ctx *hctx,
--					    char *page)
--{
--	ssize_t ret;
--
--	spin_lock(&hctx->lock);
--	ret = sysfs_list_show(page, &hctx->dispatch, "HCTX pending");
--	spin_unlock(&hctx->lock);
--
--	return ret;
--}
--
- static ssize_t blk_mq_hw_sysfs_sched_tags_show(struct blk_mq_hw_ctx *hctx, char *page)
+ static int dax_mmap(struct file *filp, struct vm_area_struct *vma)
  {
- 	if (hctx->sched_tags)
-@@ -320,16 +273,11 @@ static struct blk_mq_ctx_sysfs_entry blk_mq_sysfs_completed = {
- 	.attr = {.name = "completed", .mode = S_IRUGO },
- 	.show = blk_mq_sysfs_completed_show,
- };
--static struct blk_mq_ctx_sysfs_entry blk_mq_sysfs_rq_list = {
--	.attr = {.name = "rq_list", .mode = S_IRUGO },
--	.show = blk_mq_sysfs_rq_list_show,
--};
++	int rc, id;
+ 	struct dax_dev *dax_dev = filp->private_data;
+-	int rc;
  
- static struct attribute *default_ctx_attrs[] = {
- 	&blk_mq_sysfs_dispatched.attr,
- 	&blk_mq_sysfs_merged.attr,
- 	&blk_mq_sysfs_completed.attr,
--	&blk_mq_sysfs_rq_list.attr,
- 	NULL,
- };
+ 	dev_dbg(&dax_dev->dev, "%s\n", __func__);
  
-@@ -349,10 +297,6 @@ static struct blk_mq_hw_ctx_sysfs_entry blk_mq_hw_sysfs_active = {
- 	.attr = {.name = "active", .mode = S_IRUGO },
- 	.show = blk_mq_hw_sysfs_active_show,
- };
--static struct blk_mq_hw_ctx_sysfs_entry blk_mq_hw_sysfs_pending = {
--	.attr = {.name = "pending", .mode = S_IRUGO },
--	.show = blk_mq_hw_sysfs_rq_list_show,
--};
- static struct blk_mq_hw_ctx_sysfs_entry blk_mq_hw_sysfs_sched_tags = {
- 	.attr = {.name = "sched_tags", .mode = S_IRUGO },
- 	.show = blk_mq_hw_sysfs_sched_tags_show,
-@@ -380,7 +324,6 @@ static struct attribute *default_hw_ctx_attrs[] = {
- 	&blk_mq_hw_sysfs_queued.attr,
- 	&blk_mq_hw_sysfs_run.attr,
- 	&blk_mq_hw_sysfs_dispatched.attr,
--	&blk_mq_hw_sysfs_pending.attr,
- 	&blk_mq_hw_sysfs_tags.attr,
- 	&blk_mq_hw_sysfs_sched_tags.attr,
- 	&blk_mq_hw_sysfs_cpus.attr,
--- 
-2.11.0
+@@ -421,9 +421,9 @@ static int dax_mmap(struct file *filp, struct vm_area_struct *vma)
+ 	 * We lock to check dax_inode liveness and will re-check at
+ 	 * fault time.
+ 	 */
+-	rcu_read_lock();
++	id = dax_read_lock();
+ 	rc = check_vma(dax_dev, vma, __func__);
+-	rcu_read_unlock();
++	dax_read_unlock(id);
+ 	if (rc)
+ 		return rc;
+ 
+diff --git a/drivers/dax/super.c b/drivers/dax/super.c
+index e6369b851619..7c4dc97d53a8 100644
+--- a/drivers/dax/super.c
++++ b/drivers/dax/super.c
+@@ -24,11 +24,24 @@ module_param(nr_dax, int, S_IRUGO);
+ MODULE_PARM_DESC(nr_dax, "max number of dax device instances");
+ 
+ static dev_t dax_devt;
++DEFINE_STATIC_SRCU(dax_srcu);
+ static struct vfsmount *dax_mnt;
+ static DEFINE_IDA(dax_minor_ida);
+ static struct kmem_cache *dax_cache __read_mostly;
+ static struct super_block *dax_superblock __read_mostly;
+ 
++int dax_read_lock(void)
++{
++	return srcu_read_lock(&dax_srcu);
++}
++EXPORT_SYMBOL_GPL(dax_read_lock);
++
++void dax_read_unlock(int id)
++{
++	srcu_read_unlock(&dax_srcu, id);
++}
++EXPORT_SYMBOL_GPL(dax_read_unlock);
++
+ /**
+  * struct dax_inode - anchor object for dax services
+  * @inode: core vfs
+@@ -45,8 +58,7 @@ struct dax_inode {
+ 
+ bool dax_inode_alive(struct dax_inode *dax_inode)
+ {
+-	RCU_LOCKDEP_WARN(!rcu_read_lock_held(),
+-			"dax operations require rcu_read_lock()\n");
++	lockdep_assert_held(&dax_srcu);
+ 	return dax_inode->alive;
+ }
+ EXPORT_SYMBOL_GPL(dax_inode_alive);
+@@ -55,7 +67,7 @@ EXPORT_SYMBOL_GPL(dax_inode_alive);
+  * Note, rcu is not protecting the liveness of dax_inode, rcu is
+  * ensuring that any fault handlers or operations that might have seen
+  * dax_inode_alive(), have completed.  Any operations that start after
+- * synchronize_rcu() has run will abort upon seeing !dax_inode_alive().
++ * synchronize_srcu() has run will abort upon seeing !dax_inode_alive().
+  */
+ void kill_dax_inode(struct dax_inode *dax_inode)
+ {
+@@ -63,7 +75,7 @@ void kill_dax_inode(struct dax_inode *dax_inode)
+ 		return;
+ 
+ 	dax_inode->alive = false;
+-	synchronize_rcu();
++	synchronize_srcu(&dax_srcu);
+ 	dax_inode->private = NULL;
+ }
+ EXPORT_SYMBOL_GPL(kill_dax_inode);
+diff --git a/include/linux/dax.h b/include/linux/dax.h
+index 24ad71173995..67002898d130 100644
+--- a/include/linux/dax.h
++++ b/include/linux/dax.h
+@@ -8,6 +8,9 @@
+ 
+ struct iomap_ops;
+ 
++int dax_read_lock(void);
++void dax_read_unlock(int id);
++
+ /*
+  * We use lowest available bit in exceptional entry for locking, one bit for
+  * the entry size (PMD) and two more to tell us if the entry is a huge zero
 
