@@ -1,72 +1,68 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:43461 "EHLO mga11.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753478AbdAZL7N (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 26 Jan 2017 06:59:13 -0500
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv6 27/37] ext4: handle huge pages in __ext4_block_zero_page_range()
-Date: Thu, 26 Jan 2017 14:58:09 +0300
-Message-Id: <20170126115819.58875-28-kirill.shutemov@linux.intel.com>
-In-Reply-To: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
-References: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
+Received: from bombadil.infradead.org ([65.50.211.133]:57126 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750829AbdA1Jcq (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sat, 28 Jan 2017 04:32:46 -0500
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@fb.com>, mst@redhat.com, jasowang@redhat.com
+Cc: linux-block@vger.kernel.org,
+        virtualization@lists.linux-foundation.org
+Subject: [PATCH 2/5] skd: implement trivial scsi ioctls directly
+Date: Sat, 28 Jan 2017 09:32:50 +0100
+Message-Id: <1485592373-29837-3-git-send-email-hch@lst.de>
+In-Reply-To: <1485592373-29837-1-git-send-email-hch@lst.de>
+References: <1485592373-29837-1-git-send-email-hch@lst.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-As the function handles zeroing range only within one block, the
-required changes are trivial, just remove assuption on page size.
+This way there is no need to drag in a dependency on the
+BLOCK_PC code, which is going to become optional.
 
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- fs/ext4/inode.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ drivers/block/skd_main.c | 15 +++++++++++----
+ 1 file changed, 11 insertions(+), 4 deletions(-)
 
-diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
-index a25be1cf4506..7e65a5b78cf1 100644
---- a/fs/ext4/inode.c
-+++ b/fs/ext4/inode.c
-@@ -3785,7 +3785,7 @@ static int __ext4_block_zero_page_range(handle_t *handle,
- 		struct address_space *mapping, loff_t from, loff_t length)
+diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
+index abf805e..27833e4 100644
+--- a/drivers/block/skd_main.c
++++ b/drivers/block/skd_main.c
+@@ -1204,10 +1204,11 @@ static void skd_complete_special(struct skd_device *skdev,
+ static int skd_bdev_ioctl(struct block_device *bdev, fmode_t mode,
+ 			  uint cmd_in, ulong arg)
  {
- 	ext4_fsblk_t index = from >> PAGE_SHIFT;
--	unsigned offset = from & (PAGE_SIZE-1);
-+	unsigned offset;
- 	unsigned blocksize, pos;
- 	ext4_lblk_t iblock;
- 	struct inode *inode = mapping->host;
-@@ -3798,6 +3798,9 @@ static int __ext4_block_zero_page_range(handle_t *handle,
- 	if (!page)
- 		return -ENOMEM;
+-	int rc = 0;
++	static const int sg_version_num = 30527;
++	int rc = 0, timeout;
+ 	struct gendisk *disk = bdev->bd_disk;
+ 	struct skd_device *skdev = disk->private_data;
+-	void __user *p = (void *)arg;
++	int __user *p = (int __user *)arg;
  
-+	page = compound_head(page);
-+	offset = from & ~hpage_mask(page);
-+
- 	blocksize = inode->i_sb->s_blocksize;
+ 	pr_debug("%s:%s:%d %s: CMD[%s] ioctl  mode 0x%x, cmd 0x%x arg %0lx\n",
+ 		 skdev->name, __func__, __LINE__,
+@@ -1218,12 +1219,18 @@ static int skd_bdev_ioctl(struct block_device *bdev, fmode_t mode,
  
- 	iblock = index << (PAGE_SHIFT - inode->i_sb->s_blocksize_bits);
-@@ -3853,7 +3856,7 @@ static int __ext4_block_zero_page_range(handle_t *handle,
- 		if (err)
- 			goto unlock;
- 	}
--	zero_user(page, offset, length);
-+	zero_user(page + offset / PAGE_SIZE, offset % PAGE_SIZE, length);
- 	BUFFER_TRACE(bh, "zeroed end of block");
+ 	switch (cmd_in) {
+ 	case SG_SET_TIMEOUT:
++		rc = get_user(timeout, p);
++		if (!rc)
++			disk->queue->sg_timeout = clock_t_to_jiffies(timeout);
++		break;
+ 	case SG_GET_TIMEOUT:
++		rc = jiffies_to_clock_t(disk->queue->sg_timeout);
++		break;
+ 	case SG_GET_VERSION_NUM:
+-		rc = scsi_cmd_ioctl(disk->queue, disk, mode, cmd_in, p);
++		rc = put_user(sg_version_num, p);
+ 		break;
+ 	case SG_IO:
+-		rc = skd_ioctl_sg_io(skdev, mode, p);
++		rc = skd_ioctl_sg_io(skdev, mode, (void __user *)arg);
+ 		break;
  
- 	if (ext4_should_journal_data(inode)) {
+ 	default:
 -- 
-2.11.0
+2.1.4
 
