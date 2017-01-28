@@ -1,55 +1,126 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lf0-f53.google.com ([209.85.215.53]:35430 "EHLO
-        mail-lf0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750765AbdAXKSH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Jan 2017 05:18:07 -0500
-Received: by mail-lf0-f53.google.com with SMTP id n124so107878813lfd.2
-        for <linux-block@vger.kernel.org>; Tue, 24 Jan 2017 02:18:06 -0800 (PST)
-From: Linus Walleij <linus.walleij@linaro.org>
-To: linux-mmc@vger.kernel.org, linux-block@vger.kernel.org,
-        Ulf Hansson <ulf.hansson@linaro.org>
-Cc: Chunyan Zhang <zhang.chunyan@linaro.org>,
-        Baolin Wang <baolin.wang@linaro.org>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Linus Walleij <linus.walleij@linaro.org>
-Subject: [PATCH 0/6] mmc: block: command issue cleanups
-Date: Tue, 24 Jan 2017 11:17:51 +0100
-Message-Id: <20170124101757.19676-1-linus.walleij@linaro.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Subject: [RFC PATCH 04/17] dax: introduce dax_operations
+From: Dan Williams <dan.j.williams@intel.com>
+To: linux-nvdimm@lists.01.org
+Cc: snitzer@redhat.com, toshi.kani@hpe.com, mawilcox@microsoft.com,
+        linux-block@vger.kernel.org, jmoyer@redhat.com,
+        linux-fsdevel@vger.kernel.org, ross.zwisler@linux.intel.com,
+        hch@lst.de
+Date: Sat, 28 Jan 2017 00:36:26 -0800
+Message-ID: <148559258599.11180.15865082041593158216.stgit@dwillia2-desk3.amr.corp.intel.com>
+In-Reply-To: <148559256378.11180.8957776806175202312.stgit@dwillia2-desk3.amr.corp.intel.com>
+References: <148559256378.11180.8957776806175202312.stgit@dwillia2-desk3.amr.corp.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-The function mmc_blk_issue_rw_rq() is hopelessly convoluted and
-need to be refactored to it can be understood by humans.
+Track a set of dax_operations per dax_inode that can be set at
+alloc_dax_inode() time. These operations will be used to stop the abuse
+of block_device_operations for communicating dax capabilities to
+filesystems. It will also be used to replace the "pmem api" and move
+pmem-specific cache maintenance, and other dax-driver-specific
+filesystem-dax operations, to dax inode methods. In particular this
+allows us to stop abusing __copy_user_nocache(), via memcpy_to_pmem(),
+with a driver specific replacement.
 
-In the process I found some weird magic return values passed
-around for no good reason.
+This is a standalone introduction of the operations. Follow on patches
+convert each dax-driver and teach fs/dax.c to use ->direct_access() from
+dax_operations instead of block_device_operations.
 
-Things are more readable after this.
+Suggested-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Dan Williams <dan.j.williams@intel.com>
+---
+ drivers/dax/dax.h    |    4 +++-
+ drivers/dax/device.c |    6 +++++-
+ drivers/dax/super.c  |    6 +++++-
+ include/linux/dax.h  |    5 +++++
+ 4 files changed, 18 insertions(+), 3 deletions(-)
 
-This work is done towards the goal of breaking the function in
-two parts: one just submitting the requests and one checking the
-result and possibly resubmitting the command on error, so we
-can make the usual path (non-errorpath) smooth and quick, and
-be called directly when the driver completes a request.
-
-That in turn is a prerequisite for proper blk-mq integration
-with the MMC/SD stack.
-
-All that comes later.
-
-Linus Walleij (6):
-  mmc: block: break out mmc_blk_rw_cmd_abort()
-  mmc: block: break out mmc_blk_rw_start_new()
-  mmc: block: do not assign mq_rq when aborting command
-  mmc: block: inline command abortions
-  mmc: block: introduce new_areq and old_areq
-  mmc: block: stop passing around pointless return values
-
- drivers/mmc/core/block.c | 108 ++++++++++++++++++++++++++---------------------
- drivers/mmc/core/block.h |   2 +-
- 2 files changed, 60 insertions(+), 50 deletions(-)
-
--- 
-2.9.3
+diff --git a/drivers/dax/dax.h b/drivers/dax/dax.h
+index f33c16ed2ec6..aeb1d49aafb8 100644
+--- a/drivers/dax/dax.h
++++ b/drivers/dax/dax.h
+@@ -13,7 +13,9 @@
+ #ifndef __DAX_H__
+ #define __DAX_H__
+ struct dax_inode;
+-struct dax_inode *alloc_dax_inode(void *private, const char *host);
++struct dax_operations;
++struct dax_inode *alloc_dax_inode(void *private, const char *host,
++		const struct dax_operations *ops);
+ void put_dax_inode(struct dax_inode *dax_inode);
+ bool dax_inode_alive(struct dax_inode *dax_inode);
+ void kill_dax_inode(struct dax_inode *dax_inode);
+diff --git a/drivers/dax/device.c b/drivers/dax/device.c
+index 6d0a3241a608..c3d9405ec285 100644
+--- a/drivers/dax/device.c
++++ b/drivers/dax/device.c
+@@ -560,7 +560,11 @@ struct dax_dev *devm_create_dax_dev(struct dax_region *dax_region,
+ 		goto err_id;
+ 	}
+ 
+-	dax_inode = alloc_dax_inode(dax_dev, NULL);
++	/*
++	 * No 'host' or dax_operations since there is no access to this
++	 * device outside of mmap of the resulting character device.
++	 */
++	dax_inode = alloc_dax_inode(dax_dev, NULL, NULL);
+ 	if (!dax_inode)
+ 		goto err_inode;
+ 
+diff --git a/drivers/dax/super.c b/drivers/dax/super.c
+index 7ac048f94b2b..eb844ffea3cf 100644
+--- a/drivers/dax/super.c
++++ b/drivers/dax/super.c
+@@ -17,6 +17,7 @@
+ #include <linux/cdev.h>
+ #include <linux/hash.h>
+ #include <linux/slab.h>
++#include <linux/dax.h>
+ #include <linux/fs.h>
+ 
+ static int nr_dax = CONFIG_NR_DEV_DAX;
+@@ -61,6 +62,7 @@ struct dax_inode {
+ 	const char *host;
+ 	void *private;
+ 	bool alive;
++	const struct dax_operations *ops;
+ };
+ 
+ bool dax_inode_alive(struct dax_inode *dax_inode)
+@@ -204,7 +206,8 @@ static void dax_add_host(struct dax_inode *dax_inode, const char *host)
+ 	spin_unlock(&dax_host_lock);
+ }
+ 
+-struct dax_inode *alloc_dax_inode(void *private, const char *__host)
++struct dax_inode *alloc_dax_inode(void *private, const char *__host,
++		const struct dax_operations *ops)
+ {
+ 	struct dax_inode *dax_inode;
+ 	const char *host;
+@@ -225,6 +228,7 @@ struct dax_inode *alloc_dax_inode(void *private, const char *__host)
+ 		goto err_inode;
+ 
+ 	dax_add_host(dax_inode, host);
++	dax_inode->ops = ops;
+ 	dax_inode->private = private;
+ 	return dax_inode;
+ 
+diff --git a/include/linux/dax.h b/include/linux/dax.h
+index 8fe19230e118..def9a9d118c9 100644
+--- a/include/linux/dax.h
++++ b/include/linux/dax.h
+@@ -7,6 +7,11 @@
+ #include <asm/pgtable.h>
+ 
+ struct iomap_ops;
++struct dax_inode;
++struct dax_operations {
++	long (*direct_access)(struct dax_inode *, phys_addr_t, void **,
++			pfn_t *, long);
++};
+ 
+ int dax_read_lock(void);
+ void dax_read_unlock(int id);
 
