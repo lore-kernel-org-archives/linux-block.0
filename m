@@ -1,270 +1,290 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:56552 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750723AbdAWP3z (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Jan 2017 10:29:55 -0500
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@fb.com>
-Cc: Mike Snitzer <snitzer@redhat.com>, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org, dm-devel@redhat.com
-Subject: [PATCH 10/16] scsi: respect unchecked_isa_dma for blk-mq
-Date: Mon, 23 Jan 2017 16:29:15 +0100
-Message-Id: <1485185361-29786-11-git-send-email-hch@lst.de>
-In-Reply-To: <1485185361-29786-1-git-send-email-hch@lst.de>
-References: <1485185361-29786-1-git-send-email-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Subject: [RFC PATCH 12/17] dm: add dax_operations support (consumer)
+From: Dan Williams <dan.j.williams@intel.com>
+To: linux-nvdimm@lists.01.org
+Cc: snitzer@redhat.com, toshi.kani@hpe.com, mawilcox@microsoft.com,
+        linux-block@vger.kernel.org, jmoyer@redhat.com,
+        linux-fsdevel@vger.kernel.org, ross.zwisler@linux.intel.com,
+        hch@lst.de
+Date: Sat, 28 Jan 2017 00:37:08 -0800
+Message-ID: <148559262885.11180.15866050277537726376.stgit@dwillia2-desk3.amr.corp.intel.com>
+In-Reply-To: <148559256378.11180.8957776806175202312.stgit@dwillia2-desk3.amr.corp.intel.com>
+References: <148559256378.11180.8957776806175202312.stgit@dwillia2-desk3.amr.corp.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Currently blk-mq always allocates the sense buffer using normal GFP_KERNEL
-allocation.  Refactor the cmd pool code to split the cmd and sense allocation
-and share the code to allocate the sense buffers as well as the sense buffer
-slab caches between the legacy and blk-mq path.
+Arrange for dm to lookup the dax services available from member
+devices. Update the dax-capable targets, linear and stripe, to route dax
+operations to the underlying device.
 
-Note that this switches to lazy allocation of the sense slab caches - the
-slab caches (not the actual allocations) won't be destroy until the scsi
-module is unloaded instead of keeping track of hosts using them.
-
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Dan Williams <dan.j.williams@intel.com>
 ---
- drivers/scsi/hosts.c     |  4 ++++
- drivers/scsi/scsi.c      | 24 ++++---------------
- drivers/scsi/scsi_lib.c  | 62 +++++++++++++++++++++++++++++++++++++++++++++---
- drivers/scsi/scsi_priv.h |  5 ++++
- 4 files changed, 73 insertions(+), 22 deletions(-)
+ drivers/md/dm-linear.c        |   24 ++++++++++++++++++++++++
+ drivers/md/dm-snap.c          |   12 ++++++++++++
+ drivers/md/dm-stripe.c        |   30 ++++++++++++++++++++++++++++++
+ drivers/md/dm-target.c        |   11 +++++++++++
+ drivers/md/dm.c               |   16 ++++++++++++----
+ include/linux/device-mapper.h |    7 +++++++
+ 6 files changed, 96 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/scsi/hosts.c b/drivers/scsi/hosts.c
-index 258a3f9..6d29c4a 100644
---- a/drivers/scsi/hosts.c
-+++ b/drivers/scsi/hosts.c
-@@ -213,6 +213,10 @@ int scsi_add_host_with_dma(struct Scsi_Host *shost, struct device *dev,
- 		goto fail;
- 	}
- 
-+	error = scsi_init_sense_cache(shost);
-+	if (error)
-+		goto fail;
-+
- 	if (shost_use_blk_mq(shost)) {
- 		error = scsi_mq_setup_tags(shost);
- 		if (error)
-diff --git a/drivers/scsi/scsi.c b/drivers/scsi/scsi.c
-index 0f93892..469aa0f 100644
---- a/drivers/scsi/scsi.c
-+++ b/drivers/scsi/scsi.c
-@@ -100,22 +100,18 @@ EXPORT_SYMBOL(scsi_sd_pm_domain);
- 
- struct scsi_host_cmd_pool {
- 	struct kmem_cache	*cmd_slab;
--	struct kmem_cache	*sense_slab;
- 	unsigned int		users;
- 	char			*cmd_name;
--	char			*sense_name;
- 	unsigned int		slab_flags;
- };
- 
- static struct scsi_host_cmd_pool scsi_cmd_pool = {
- 	.cmd_name	= "scsi_cmd_cache",
--	.sense_name	= "scsi_sense_cache",
- 	.slab_flags	= SLAB_HWCACHE_ALIGN,
- };
- 
- static struct scsi_host_cmd_pool scsi_cmd_dma_pool = {
- 	.cmd_name	= "scsi_cmd_cache(DMA)",
--	.sense_name	= "scsi_sense_cache(DMA)",
- 	.slab_flags	= SLAB_HWCACHE_ALIGN|SLAB_CACHE_DMA,
- };
- 
-@@ -136,7 +132,7 @@ scsi_host_free_command(struct Scsi_Host *shost, struct scsi_cmnd *cmd)
- 
- 	if (cmd->prot_sdb)
- 		kmem_cache_free(scsi_sdb_cache, cmd->prot_sdb);
--	kmem_cache_free(pool->sense_slab, cmd->sense_buffer);
-+	scsi_free_sense_buffer(shost, cmd->sense_buffer);
- 	kmem_cache_free(pool->cmd_slab, cmd);
+diff --git a/drivers/md/dm-linear.c b/drivers/md/dm-linear.c
+index 4788b0b989a9..e91ca8089333 100644
+--- a/drivers/md/dm-linear.c
++++ b/drivers/md/dm-linear.c
+@@ -159,6 +159,29 @@ static long linear_direct_access(struct dm_target *ti, sector_t sector,
+ 	return ret;
  }
  
-@@ -158,7 +154,8 @@ scsi_host_alloc_command(struct Scsi_Host *shost, gfp_t gfp_mask)
- 	if (!cmd)
- 		goto fail;
- 
--	cmd->sense_buffer = kmem_cache_alloc(pool->sense_slab, gfp_mask);
-+	cmd->sense_buffer = scsi_alloc_sense_buffer(shost, gfp_mask,
-+			NUMA_NO_NODE);
- 	if (!cmd->sense_buffer)
- 		goto fail_free_cmd;
- 
-@@ -171,7 +168,7 @@ scsi_host_alloc_command(struct Scsi_Host *shost, gfp_t gfp_mask)
- 	return cmd;
- 
- fail_free_sense:
--	kmem_cache_free(pool->sense_slab, cmd->sense_buffer);
-+	scsi_free_sense_buffer(shost, cmd->sense_buffer);
- fail_free_cmd:
- 	kmem_cache_free(pool->cmd_slab, cmd);
- fail:
-@@ -301,7 +298,6 @@ scsi_find_host_cmd_pool(struct Scsi_Host *shost)
- static void
- scsi_free_host_cmd_pool(struct scsi_host_cmd_pool *pool)
- {
--	kfree(pool->sense_name);
- 	kfree(pool->cmd_name);
- 	kfree(pool);
- }
-@@ -317,8 +313,7 @@ scsi_alloc_host_cmd_pool(struct Scsi_Host *shost)
- 		return NULL;
- 
- 	pool->cmd_name = kasprintf(GFP_KERNEL, "%s_cmd", hostt->proc_name);
--	pool->sense_name = kasprintf(GFP_KERNEL, "%s_sense", hostt->proc_name);
--	if (!pool->cmd_name || !pool->sense_name) {
-+	if (!pool->cmd_name) {
- 		scsi_free_host_cmd_pool(pool);
- 		return NULL;
- 	}
-@@ -357,12 +352,6 @@ scsi_get_host_cmd_pool(struct Scsi_Host *shost)
- 						   pool->slab_flags, NULL);
- 		if (!pool->cmd_slab)
- 			goto out_free_pool;
--
--		pool->sense_slab = kmem_cache_create(pool->sense_name,
--						     SCSI_SENSE_BUFFERSIZE, 0,
--						     pool->slab_flags, NULL);
--		if (!pool->sense_slab)
--			goto out_free_slab;
- 	}
- 
- 	pool->users++;
-@@ -371,8 +360,6 @@ scsi_get_host_cmd_pool(struct Scsi_Host *shost)
- 	mutex_unlock(&host_cmd_pool_mutex);
- 	return retval;
- 
--out_free_slab:
--	kmem_cache_destroy(pool->cmd_slab);
- out_free_pool:
- 	if (hostt->cmd_size) {
- 		scsi_free_host_cmd_pool(pool);
-@@ -398,7 +385,6 @@ static void scsi_put_host_cmd_pool(struct Scsi_Host *shost)
- 
- 	if (!--pool->users) {
- 		kmem_cache_destroy(pool->cmd_slab);
--		kmem_cache_destroy(pool->sense_slab);
- 		if (hostt->cmd_size) {
- 			scsi_free_host_cmd_pool(pool);
- 			hostt->cmd_pool = NULL;
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index e9e1e14..3d6b364 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -39,6 +39,58 @@
- 
- 
- struct kmem_cache *scsi_sdb_cache;
-+static struct kmem_cache *scsi_sense_cache;
-+static struct kmem_cache *scsi_sense_isadma_cache;
-+static DEFINE_MUTEX(scsi_sense_cache_mutex);
-+
-+static inline struct kmem_cache *
-+scsi_select_sense_cache(struct Scsi_Host *shost)
++static long linear_dax_direct_access(struct dm_target *ti, phys_addr_t dev_addr,
++				     void **kaddr, pfn_t *pfn, long size)
 +{
-+	return shost->unchecked_isa_dma ?
-+		scsi_sense_isadma_cache : scsi_sense_cache;
-+}
++	struct linear_c *lc = ti->private;
++	struct block_device *bdev = lc->dev->bdev;
++	struct dax_inode *dax_inode = lc->dev->dax_inode;
++	struct blk_dax_ctl dax = {
++		.sector = linear_map_sector(ti, dev_addr >> SECTOR_SHIFT),
++		.size = size,
++	};
++	long ret;
 +
-+void scsi_free_sense_buffer(struct Scsi_Host *shost,
-+		unsigned char *sense_buffer)
-+{
-+	kmem_cache_free(scsi_select_sense_cache(shost), sense_buffer);
-+}
++	ret = bdev_dax_direct_access(bdev, dax_inode, &dax);
++	*kaddr = dax.addr;
++	*pfn = dax.pfn;
 +
-+unsigned char *scsi_alloc_sense_buffer(struct Scsi_Host *shost, gfp_t gfp_mask,
-+		int numa_node)
-+{
-+	return kmem_cache_alloc_node(scsi_select_sense_cache(shost), gfp_mask,
-+			numa_node);
-+}
-+
-+int scsi_init_sense_cache(struct Scsi_Host *shost)
-+{
-+	struct kmem_cache *cache;
-+	int ret = 0;
-+
-+	cache = scsi_select_sense_cache(shost);
-+	if (cache)
-+		return 0;
-+
-+	mutex_lock(&scsi_sense_cache_mutex);
-+	if (shost->unchecked_isa_dma) {
-+		scsi_sense_isadma_cache =
-+			kmem_cache_create("scsi_sense_cache(DMA)",
-+			SCSI_SENSE_BUFFERSIZE, 0,
-+			SLAB_HWCACHE_ALIGN | SLAB_CACHE_DMA, NULL);
-+		if (!scsi_sense_isadma_cache)
-+			ret = -ENOMEM;
-+	} else {
-+		scsi_sense_cache =
-+			kmem_cache_create("scsi_sense_cache",
-+			SCSI_SENSE_BUFFERSIZE, 0, SLAB_HWCACHE_ALIGN, NULL);
-+		if (!scsi_sense_cache)
-+			ret = -ENOMEM;
-+	}
-+
-+	mutex_unlock(&scsi_sense_cache_mutex);
 +	return ret;
 +}
++
++static const struct dm_dax_operations linear_dax_ops = {
++	.dm_direct_access = linear_dax_direct_access,
++};
++
+ static struct target_type linear_target = {
+ 	.name   = "linear",
+ 	.version = {1, 3, 0},
+@@ -170,6 +193,7 @@ static struct target_type linear_target = {
+ 	.prepare_ioctl = linear_prepare_ioctl,
+ 	.iterate_devices = linear_iterate_devices,
+ 	.direct_access = linear_direct_access,
++	.dax_ops = &linear_dax_ops,
+ };
+ 
+ int __init dm_linear_init(void)
+diff --git a/drivers/md/dm-snap.c b/drivers/md/dm-snap.c
+index c65feeada864..1990e3bd6958 100644
+--- a/drivers/md/dm-snap.c
++++ b/drivers/md/dm-snap.c
+@@ -2309,6 +2309,13 @@ static long origin_direct_access(struct dm_target *ti, sector_t sector,
+ 	return -EIO;
+ }
+ 
++static long origin_dax_direct_access(struct dm_target *ti, phys_addr_t dev_addr,
++		void **kaddr, pfn_t *pfn, long size)
++{
++	DMWARN("device does not support dax.");
++	return -EIO;
++}
++
+ /*
+  * Set the target "max_io_len" field to the minimum of all the snapshots'
+  * chunk sizes.
+@@ -2357,6 +2364,10 @@ static int origin_iterate_devices(struct dm_target *ti,
+ 	return fn(ti, o->dev, 0, ti->len, data);
+ }
+ 
++static const struct dm_dax_operations origin_dax_ops = {
++	.dm_direct_access = origin_dax_direct_access,
++};
++
+ static struct target_type origin_target = {
+ 	.name    = "snapshot-origin",
+ 	.version = {1, 9, 0},
+@@ -2369,6 +2380,7 @@ static struct target_type origin_target = {
+ 	.status  = origin_status,
+ 	.iterate_devices = origin_iterate_devices,
+ 	.direct_access = origin_direct_access,
++	.dax_ops = &origin_dax_ops,
+ };
+ 
+ static struct target_type snapshot_target = {
+diff --git a/drivers/md/dm-stripe.c b/drivers/md/dm-stripe.c
+index 28193a57bf47..47fb56a6184a 100644
+--- a/drivers/md/dm-stripe.c
++++ b/drivers/md/dm-stripe.c
+@@ -331,6 +331,31 @@ static long stripe_direct_access(struct dm_target *ti, sector_t sector,
+ 	return ret;
+ }
+ 
++static long stripe_dax_direct_access(struct dm_target *ti, phys_addr_t dev_addr,
++		void **kaddr, pfn_t *pfn, long size)
++{
++	struct stripe_c *sc = ti->private;
++	uint32_t stripe;
++	struct block_device *bdev;
++	struct dax_inode *dax_inode;
++	struct blk_dax_ctl dax = {
++		.size = size,
++	};
++	long ret;
++
++	stripe_map_sector(sc, dev_addr >> SECTOR_SHIFT, &stripe, &dax.sector);
++
++	dax.sector += sc->stripe[stripe].physical_start;
++	bdev = sc->stripe[stripe].dev->bdev;
++	dax_inode = sc->stripe[stripe].dev->dax_inode;
++
++	ret = bdev_dax_direct_access(bdev, dax_inode, &dax);
++	*kaddr = dax.addr;
++	*pfn = dax.pfn;
++
++	return ret;
++}
++
+ /*
+  * Stripe status:
+  *
+@@ -437,6 +462,10 @@ static void stripe_io_hints(struct dm_target *ti,
+ 	blk_limits_io_opt(limits, chunk_size * sc->stripes);
+ }
+ 
++static const struct dm_dax_operations stripe_dax_ops = {
++	.dm_direct_access = stripe_dax_direct_access,
++};
++
+ static struct target_type stripe_target = {
+ 	.name   = "striped",
+ 	.version = {1, 6, 0},
+@@ -449,6 +478,7 @@ static struct target_type stripe_target = {
+ 	.iterate_devices = stripe_iterate_devices,
+ 	.io_hints = stripe_io_hints,
+ 	.direct_access = stripe_direct_access,
++	.dax_ops = &stripe_dax_ops,
+ };
+ 
+ int __init dm_stripe_init(void)
+diff --git a/drivers/md/dm-target.c b/drivers/md/dm-target.c
+index 710ae28fd618..ab072f53cf24 100644
+--- a/drivers/md/dm-target.c
++++ b/drivers/md/dm-target.c
+@@ -154,6 +154,16 @@ static long io_err_direct_access(struct dm_target *ti, sector_t sector,
+ 	return -EIO;
+ }
+ 
++static long io_err_dax_direct_access(struct dm_target *ti, phys_addr_t dev_addr,
++				     void **kaddr, pfn_t *pfn, long size)
++{
++	return -EIO;
++}
++
++static const struct dm_dax_operations err_dax_ops = {
++	.dm_direct_access = io_err_dax_direct_access,
++};
++
+ static struct target_type error_target = {
+ 	.name = "error",
+ 	.version = {1, 5, 0},
+@@ -165,6 +175,7 @@ static struct target_type error_target = {
+ 	.clone_and_map_rq = io_err_clone_and_map_rq,
+ 	.release_clone_rq = io_err_release_clone_rq,
+ 	.direct_access = io_err_direct_access,
++	.dax_ops = &err_dax_ops,
+ };
+ 
+ int __init dm_target_init(void)
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index 1b3d9253e92c..5c5eeda0eb0a 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -627,6 +627,7 @@ static int open_table_device(struct table_device *td, dev_t dev,
+ 	}
+ 
+ 	td->dm_dev.bdev = bdev;
++	td->dm_dev.dax_inode = dax_get_by_host(bdev->bd_disk->disk_name);
+ 	return 0;
+ }
+ 
+@@ -640,7 +641,9 @@ static void close_table_device(struct table_device *td, struct mapped_device *md
+ 
+ 	bd_unlink_disk_holder(td->dm_dev.bdev, dm_disk(md));
+ 	blkdev_put(td->dm_dev.bdev, td->dm_dev.mode | FMODE_EXCL);
++	put_dax_inode(td->dm_dev.dax_inode);
+ 	td->dm_dev.bdev = NULL;
++	td->dm_dev.dax_inode = NULL;
+ }
+ 
+ static struct table_device *find_table_device(struct list_head *l, dev_t dev,
+@@ -907,7 +910,7 @@ int dm_set_target_max_io_len(struct dm_target *ti, sector_t len)
+ EXPORT_SYMBOL_GPL(dm_set_target_max_io_len);
+ 
+ static long __dm_direct_access(struct mapped_device *md, phys_addr_t dev_addr,
+-			       void **kaddr, pfn_t *pfn, long size)
++			       void **kaddr, pfn_t *pfn, long size, bool blk)
+ {
+ 	sector_t sector = dev_addr >> SECTOR_SHIFT;
+ 	struct dm_table *map;
+@@ -926,8 +929,11 @@ static long __dm_direct_access(struct mapped_device *md, phys_addr_t dev_addr,
+ 	len = max_io_len(sector, ti) << SECTOR_SHIFT;
+ 	size = min(len, size);
+ 
+-	if (ti->type->direct_access)
++	if (blk && ti->type->direct_access)
+ 		ret = ti->type->direct_access(ti, sector, kaddr, pfn, size);
++	else if (ti->type->dax_ops)
++		ret = ti->type->dax_ops->dm_direct_access(ti, dev_addr, kaddr,
++				pfn, size);
+ out:
+ 	dm_put_live_table(md, srcu_idx);
+ 	return min(ret, size);
+@@ -938,7 +944,8 @@ static long dm_blk_direct_access(struct block_device *bdev, sector_t sector,
+ {
+ 	struct mapped_device *md = bdev->bd_disk->private_data;
+ 
+-	return __dm_direct_access(md, sector << SECTOR_SHIFT, kaddr, pfn, size);
++	return __dm_direct_access(md, sector << SECTOR_SHIFT, kaddr, pfn, size,
++			true);
+ }
+ 
+ static long dm_dax_direct_access(struct dax_inode *dax_inode,
+@@ -947,7 +954,8 @@ static long dm_dax_direct_access(struct dax_inode *dax_inode,
+ {
+ 	struct mapped_device *md = dax_inode_get_private(dax_inode);
+ 
+-	return __dm_direct_access(md, dev_addr, kaddr, pfn, size);
++	return __dm_direct_access(md, dev_addr, kaddr, pfn, size,
++			false);
+ }
  
  /*
-  * When to reinvoke queueing after a resource shortage. It's 3 msecs to
-@@ -1981,10 +2033,11 @@ static int scsi_init_request(void *data, struct request *rq,
- 		unsigned int hctx_idx, unsigned int request_idx,
- 		unsigned int numa_node)
- {
-+	struct Scsi_Host *shost = data;
- 	struct scsi_cmnd *cmd = blk_mq_rq_to_pdu(rq);
+diff --git a/include/linux/device-mapper.h b/include/linux/device-mapper.h
+index ef7962e84444..1b64f412bb45 100644
+--- a/include/linux/device-mapper.h
++++ b/include/linux/device-mapper.h
+@@ -137,12 +137,18 @@ void dm_error(const char *message);
  
--	cmd->sense_buffer = kzalloc_node(SCSI_SENSE_BUFFERSIZE, GFP_KERNEL,
--			numa_node);
-+	cmd->sense_buffer =
-+		scsi_alloc_sense_buffer(shost, GFP_KERNEL, numa_node);
- 	if (!cmd->sense_buffer)
- 		return -ENOMEM;
- 	return 0;
-@@ -1993,9 +2046,10 @@ static int scsi_init_request(void *data, struct request *rq,
- static void scsi_exit_request(void *data, struct request *rq,
- 		unsigned int hctx_idx, unsigned int request_idx)
- {
-+	struct Scsi_Host *shost = data;
- 	struct scsi_cmnd *cmd = blk_mq_rq_to_pdu(rq);
+ struct dm_dev {
+ 	struct block_device *bdev;
++	struct dax_inode *dax_inode;
+ 	fmode_t mode;
+ 	char name[16];
+ };
  
--	kfree(cmd->sense_buffer);
-+	scsi_free_sense_buffer(shost, cmd->sense_buffer);
- }
+ dev_t dm_get_dev_t(const char *path);
  
- static int scsi_map_queues(struct blk_mq_tag_set *set)
-@@ -2208,6 +2262,8 @@ int __init scsi_init_queue(void)
++struct dm_dax_operations {
++	long (*dm_direct_access)(struct dm_target *ti, phys_addr_t dev_addr,
++			void **kaddr, pfn_t *pfn, long size);
++};
++
+ /*
+  * Constructors should call these functions to ensure destination devices
+  * are opened/closed correctly.
+@@ -180,6 +186,7 @@ struct target_type {
+ 	dm_iterate_devices_fn iterate_devices;
+ 	dm_io_hints_fn io_hints;
+ 	dm_direct_access_fn direct_access;
++	const struct dm_dax_operations *dax_ops;
  
- void scsi_exit_queue(void)
- {
-+	kmem_cache_destroy(scsi_sense_cache);
-+	kmem_cache_destroy(scsi_sense_isadma_cache);
- 	kmem_cache_destroy(scsi_sdb_cache);
- }
- 
-diff --git a/drivers/scsi/scsi_priv.h b/drivers/scsi/scsi_priv.h
-index 193636a..1a712c6 100644
---- a/drivers/scsi/scsi_priv.h
-+++ b/drivers/scsi/scsi_priv.h
-@@ -30,6 +30,11 @@ extern void scsi_exit_hosts(void);
- 
- /* scsi.c */
- extern bool scsi_use_blk_mq;
-+void scsi_free_sense_buffer(struct Scsi_Host *shost,
-+		unsigned char *sense_buffer);
-+unsigned char *scsi_alloc_sense_buffer(struct Scsi_Host *shost, gfp_t gfp_mask,
-+		int numa_node);
-+int scsi_init_sense_cache(struct Scsi_Host *shost);
- extern int scsi_setup_command_freelist(struct Scsi_Host *shost);
- extern void scsi_destroy_command_freelist(struct Scsi_Host *shost);
- #ifdef CONFIG_SCSI_LOGGING
--- 
-2.1.4
+ 	/* For internal device-mapper use. */
+ 	struct list_head list;
 
