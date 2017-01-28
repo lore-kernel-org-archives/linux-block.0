@@ -1,88 +1,279 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:32935 "EHLO
-        mx0b-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1750946AbdBAEZz (ORCPT
+Received: from bombadil.infradead.org ([65.50.211.133]:58312 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750858AbdA1Jcw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 31 Jan 2017 23:25:55 -0500
-Received: from pps.filterd (m0109331.ppops.net [127.0.0.1])
-        by mx0a-00082601.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id v114Mxxu020814
-        for <linux-block@vger.kernel.org>; Tue, 31 Jan 2017 20:25:54 -0800
-Received: from mail.thefacebook.com ([199.201.64.23])
-        by mx0a-00082601.pphosted.com with ESMTP id 28b7p183jf-2
-        (version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT)
-        for <linux-block@vger.kernel.org>; Tue, 31 Jan 2017 20:25:54 -0800
-Received: from facebook.com (2401:db00:21:603d:face:0:19:0)     by
- mx-out.facebook.com (10.103.99.99) with ESMTP  id
- 845a1618e83611e68b200002c9dfb610-751f7a50 for <linux-block@vger.kernel.org>;
-        Tue, 31 Jan 2017 20:25:52 -0800
-From: Shaohua Li <shli@fb.com>
-To: <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>
-CC: <hch@lst.de>, <axboe@fb.com>
-Subject: [PATCH 2/2] nvme: allocate nvme_queue in correct node
-Date: Tue, 31 Jan 2017 20:25:52 -0800
-Message-ID: <7119c172f8916bd21aeffc006b04cd73281afb25.1485922654.git.shli@fb.com>
-In-Reply-To: <1c91ab2c0073598592f66f007ff72cfa58a17a54.1485922654.git.shli@fb.com>
-References: <1c91ab2c0073598592f66f007ff72cfa58a17a54.1485922654.git.shli@fb.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+        Sat, 28 Jan 2017 04:32:52 -0500
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@fb.com>, mst@redhat.com, jasowang@redhat.com
+Cc: linux-block@vger.kernel.org,
+        virtualization@lists.linux-foundation.org
+Subject: [PATCH 5/5] virtio_blk: make SCSI passthrough support configurable
+Date: Sat, 28 Jan 2017 09:32:53 +0100
+Message-Id: <1485592373-29837-6-git-send-email-hch@lst.de>
+In-Reply-To: <1485592373-29837-1-git-send-email-hch@lst.de>
+References: <1485592373-29837-1-git-send-email-hch@lst.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-nvme_queue is per-cpu queue (mostly). Allocating it in node where blk-mq
-will use it.
+The SCSI passthrough idea was a a bad idea to start with (guess who came
+up with it?), and has been removed from the virtio 1.O spec, and is not
+enabled by defauly by any host I know of.  Add a separate config option
+for it so that we don't need to enable it for most setups.  That way
+any bugs related to it (like the one recently fixed for vmapped stacks)
+do not affect other users, and the size of the virtblk_req structure
+also shrinks significantly.
 
-Signed-off-by: Shaohua Li <shli@fb.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/nvme/host/pci.c | 19 +++++++++++++++----
- 1 file changed, 15 insertions(+), 4 deletions(-)
+ drivers/block/Kconfig      |  11 +++-
+ drivers/block/virtio_blk.c | 143 +++++++++++++++++++++++++++++----------------
+ 2 files changed, 104 insertions(+), 50 deletions(-)
 
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index 3faefab..f81c0ed 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -1041,9 +1041,10 @@ static int nvme_alloc_sq_cmds(struct nvme_dev *dev, struct nvme_queue *nvmeq,
+diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
+index 7a4c787..f744de7 100644
+--- a/drivers/block/Kconfig
++++ b/drivers/block/Kconfig
+@@ -500,11 +500,20 @@ config XEN_BLKDEV_BACKEND
+ config VIRTIO_BLK
+ 	tristate "Virtio block driver"
+ 	depends on VIRTIO
+-	select BLK_SCSI_REQUEST
+ 	---help---
+ 	  This is the virtual block driver for virtio.  It can be used with
+           lguest or QEMU based VMMs (like KVM or Xen).  Say Y or M.
+ 
++config VIRTIO_BLK_SCSI
++	bool "SCSI passthrough request for the Virtio block driver"
++	depends on VIRTIO_BLK
++	select BLK_SCSI_REQUEST
++	---help---
++	  Enable support for SCSI passthrough (e.g. the SG_IO ioctl) on
++	  virtio-blk devices.  This is only supported for the legacy
++	  virtio protocol and not enabled by default by any hypervisor.
++	  Your probably want to virtio-scsi instead.
++
+ config BLK_DEV_HD
+ 	bool "Very old hard disk (MFM/RLL/IDE) driver"
+ 	depends on HAVE_IDE
+diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+index 7c730e2..d9491bd 100644
+--- a/drivers/block/virtio_blk.c
++++ b/drivers/block/virtio_blk.c
+@@ -52,11 +52,13 @@ struct virtio_blk {
+ };
+ 
+ struct virtblk_req {
+-	struct scsi_request sreq;	/* for SCSI passthrough */
+-	struct virtio_blk_outhdr out_hdr;
++#ifdef CONFIG_VIRTIO_BLK_SCSI
++	struct scsi_request sreq;	/* for SCSI passthrough, must be first */
++	u8 sense[SCSI_SENSE_BUFFERSIZE];
+ 	struct virtio_scsi_inhdr in_hdr;
++#endif
++	struct virtio_blk_outhdr out_hdr;
+ 	u8 status;
+-	u8 sense[SCSI_SENSE_BUFFERSIZE];
+ 	struct scatterlist sg[];
+ };
+ 
+@@ -72,28 +74,88 @@ static inline int virtblk_result(struct virtblk_req *vbr)
+ 	}
  }
  
- static struct nvme_queue *nvme_alloc_queue(struct nvme_dev *dev, int qid,
--							int depth)
-+							int depth, int node)
+-static int __virtblk_add_req(struct virtqueue *vq,
+-			     struct virtblk_req *vbr,
+-			     struct scatterlist *data_sg,
+-			     bool have_data)
++/*
++ * If this is a packet command we need a couple of additional headers.  Behind
++ * the normal outhdr we put a segment with the scsi command block, and before
++ * the normal inhdr we put the sense data and the inhdr with additional status
++ * information.
++ */
++#ifdef CONFIG_VIRTIO_BLK_SCSI
++static int virtblk_add_req_scsi(struct virtqueue *vq, struct virtblk_req *vbr,
++		struct scatterlist *data_sg, bool have_data)
  {
--	struct nvme_queue *nvmeq = kzalloc(sizeof(*nvmeq), GFP_KERNEL);
-+	struct nvme_queue *nvmeq = kzalloc_node(sizeof(*nvmeq), GFP_KERNEL,
-+							node);
- 	if (!nvmeq)
- 		return NULL;
+ 	struct scatterlist hdr, status, cmd, sense, inhdr, *sgs[6];
+ 	unsigned int num_out = 0, num_in = 0;
+-	__virtio32 type = vbr->out_hdr.type & ~cpu_to_virtio32(vq->vdev, VIRTIO_BLK_T_OUT);
  
-@@ -1219,7 +1220,8 @@ static int nvme_configure_admin_queue(struct nvme_dev *dev)
+ 	sg_init_one(&hdr, &vbr->out_hdr, sizeof(vbr->out_hdr));
+ 	sgs[num_out++] = &hdr;
++	sg_init_one(&cmd, vbr->sreq.cmd, vbr->sreq.cmd_len);
++	sgs[num_out++] = &cmd;
++
++	if (have_data) {
++		if (vbr->out_hdr.type & cpu_to_virtio32(vq->vdev, VIRTIO_BLK_T_OUT))
++			sgs[num_out++] = data_sg;
++		else
++			sgs[num_out + num_in++] = data_sg;
++	}
++
++	sg_init_one(&sense, vbr->sense, SCSI_SENSE_BUFFERSIZE);
++	sgs[num_out + num_in++] = &sense;
++	sg_init_one(&inhdr, &vbr->in_hdr, sizeof(vbr->in_hdr));
++	sgs[num_out + num_in++] = &inhdr;
++	sg_init_one(&status, &vbr->status, sizeof(vbr->status));
++	sgs[num_out + num_in++] = &status;
++
++	return virtqueue_add_sgs(vq, sgs, num_out, num_in, vbr, GFP_ATOMIC);
++}
++
++static inline void virtblk_scsi_reques_done(struct request *req)
++{
++	struct virtblk_req *vbr = blk_mq_rq_to_pdu(req);
++	struct virtio_blk *vblk = req->q->queuedata;
++	struct scsi_request *sreq = &vbr->sreq;
++
++	sreq->resid_len = virtio32_to_cpu(vblk->vdev, vbr->in_hdr.residual);
++	sreq->sense_len = virtio32_to_cpu(vblk->vdev, vbr->in_hdr.sense_len);
++	req->errors = virtio32_to_cpu(vblk->vdev, vbr->in_hdr.errors);
++}
++
++static int virtblk_ioctl(struct block_device *bdev, fmode_t mode,
++			     unsigned int cmd, unsigned long data)
++{
++	struct gendisk *disk = bdev->bd_disk;
++	struct virtio_blk *vblk = disk->private_data;
  
- 	nvmeq = dev->queues[0];
- 	if (!nvmeq) {
--		nvmeq = nvme_alloc_queue(dev, 0, NVME_AQ_DEPTH);
-+		nvmeq = nvme_alloc_queue(dev, 0, NVME_AQ_DEPTH,
-+						dev_to_node(dev->dev));
- 		if (!nvmeq)
- 			return -ENOMEM;
+ 	/*
+-	 * If this is a packet command we need a couple of additional headers.
+-	 * Behind the normal outhdr we put a segment with the scsi command
+-	 * block, and before the normal inhdr we put the sense data and the
+-	 * inhdr with additional status information.
++	 * Only allow the generic SCSI ioctls if the host can support it.
+ 	 */
+-	if (type == cpu_to_virtio32(vq->vdev, VIRTIO_BLK_T_SCSI_CMD)) {
+-		sg_init_one(&cmd, vbr->sreq.cmd, vbr->sreq.cmd_len);
+-		sgs[num_out++] = &cmd;
+-	}
++	if (!virtio_has_feature(vblk->vdev, VIRTIO_BLK_F_SCSI))
++		return -ENOTTY;
++
++	return scsi_cmd_blk_ioctl(bdev, mode, cmd,
++				  (void __user *)data);
++}
++#else
++static inline int virtblk_add_req_scsi(struct virtqueue *vq,
++		struct virtblk_req *vbr, struct scatterlist *data_sg,
++		bool have_data)
++{
++	return -EIO;
++}
++static inline void virtblk_scsi_reques_done(struct request *req)
++{
++}
++#define virtblk_ioctl	NULL
++#endif /* CONFIG_VIRTIO_BLK_SCSI */
++
++static int virtblk_add_req(struct virtqueue *vq, struct virtblk_req *vbr,
++		struct scatterlist *data_sg, bool have_data)
++{
++	struct scatterlist hdr, status, *sgs[3];
++	unsigned int num_out = 0, num_in = 0;
++
++	sg_init_one(&hdr, &vbr->out_hdr, sizeof(vbr->out_hdr));
++	sgs[num_out++] = &hdr;
+ 
+ 	if (have_data) {
+ 		if (vbr->out_hdr.type & cpu_to_virtio32(vq->vdev, VIRTIO_BLK_T_OUT))
+@@ -102,13 +164,6 @@ static int __virtblk_add_req(struct virtqueue *vq,
+ 			sgs[num_out + num_in++] = data_sg;
  	}
-@@ -1309,9 +1311,18 @@ static int nvme_create_io_queues(struct nvme_dev *dev)
- {
- 	unsigned i, max;
- 	int ret = 0;
-+	const struct cpumask *mask;
  
- 	for (i = dev->queue_count; i <= dev->max_qid; i++) {
--		if (!nvme_alloc_queue(dev, i, dev->q_depth)) {
-+		int node = dev_to_node(dev->dev);
-+
-+		mask = pci_irq_get_affinity(to_pci_dev(dev->dev), i);
-+		if (mask) {
-+			node = cpu_to_node(cpumask_first(mask));
-+			node = local_memory_node(node);
-+		}
-+
-+		if (!nvme_alloc_queue(dev, i, dev->q_depth, node)) {
- 			ret = -ENOMEM;
- 			break;
- 		}
+-	if (type == cpu_to_virtio32(vq->vdev, VIRTIO_BLK_T_SCSI_CMD)) {
+-		sg_init_one(&sense, vbr->sense, SCSI_SENSE_BUFFERSIZE);
+-		sgs[num_out + num_in++] = &sense;
+-		sg_init_one(&inhdr, &vbr->in_hdr, sizeof(vbr->in_hdr));
+-		sgs[num_out + num_in++] = &inhdr;
+-	}
+-
+ 	sg_init_one(&status, &vbr->status, sizeof(vbr->status));
+ 	sgs[num_out + num_in++] = &status;
+ 
+@@ -118,17 +173,15 @@ static int __virtblk_add_req(struct virtqueue *vq,
+ static inline void virtblk_request_done(struct request *req)
+ {
+ 	struct virtblk_req *vbr = blk_mq_rq_to_pdu(req);
+-	struct virtio_blk *vblk = req->q->queuedata;
+ 	int error = virtblk_result(vbr);
+ 
+-	if (req->cmd_type == REQ_TYPE_BLOCK_PC) {
+-		scsi_req(req)->resid_len =
+-			virtio32_to_cpu(vblk->vdev, vbr->in_hdr.residual);
+-		vbr->sreq.sense_len =
+-			virtio32_to_cpu(vblk->vdev, vbr->in_hdr.sense_len);
+-		req->errors = virtio32_to_cpu(vblk->vdev, vbr->in_hdr.errors);
+-	} else if (req->cmd_type == REQ_TYPE_DRV_PRIV) {
++	switch (req->cmd_type) {
++	case REQ_TYPE_BLOCK_PC:
++		virtblk_scsi_reques_done(req);
++		break;
++	case REQ_TYPE_DRV_PRIV:
+ 		req->errors = (error != 0);
++		break;
+ 	}
+ 
+ 	blk_mq_end_request(req, error);
+@@ -214,7 +267,10 @@ static int virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 	}
+ 
+ 	spin_lock_irqsave(&vblk->vqs[qid].lock, flags);
+-	err = __virtblk_add_req(vblk->vqs[qid].vq, vbr, vbr->sg, num);
++	if (req->cmd_type == REQ_TYPE_BLOCK_PC)
++		err = virtblk_add_req_scsi(vblk->vqs[qid].vq, vbr, vbr->sg, num);
++	else
++		err = virtblk_add_req(vblk->vqs[qid].vq, vbr, vbr->sg, num);
+ 	if (err) {
+ 		virtqueue_kick(vblk->vqs[qid].vq);
+ 		blk_mq_stop_hw_queue(hctx);
+@@ -259,22 +315,6 @@ static int virtblk_get_id(struct gendisk *disk, char *id_str)
+ 	return err;
+ }
+ 
+-static int virtblk_ioctl(struct block_device *bdev, fmode_t mode,
+-			     unsigned int cmd, unsigned long data)
+-{
+-	struct gendisk *disk = bdev->bd_disk;
+-	struct virtio_blk *vblk = disk->private_data;
+-
+-	/*
+-	 * Only allow the generic SCSI ioctls if the host can support it.
+-	 */
+-	if (!virtio_has_feature(vblk->vdev, VIRTIO_BLK_F_SCSI))
+-		return -ENOTTY;
+-
+-	return scsi_cmd_blk_ioctl(bdev, mode, cmd,
+-				  (void __user *)data);
+-}
+-
+ /* We provide getgeo only to please some old bootloader/partitioning tools */
+ static int virtblk_getgeo(struct block_device *bd, struct hd_geometry *geo)
+ {
+@@ -540,7 +580,9 @@ static int virtblk_init_request(void *data, struct request *rq,
+ 	struct virtio_blk *vblk = data;
+ 	struct virtblk_req *vbr = blk_mq_rq_to_pdu(rq);
+ 
++#ifdef CONFIG_VIRTIO_BLK_SCSI
+ 	vbr->sreq.sense = vbr->sense;
++#endif
+ 	sg_init_table(vbr->sg, vblk->sg_elems);
+ 	return 0;
+ }
+@@ -824,7 +866,10 @@ static const struct virtio_device_id id_table[] = {
+ 
+ static unsigned int features_legacy[] = {
+ 	VIRTIO_BLK_F_SEG_MAX, VIRTIO_BLK_F_SIZE_MAX, VIRTIO_BLK_F_GEOMETRY,
+-	VIRTIO_BLK_F_RO, VIRTIO_BLK_F_BLK_SIZE, VIRTIO_BLK_F_SCSI,
++	VIRTIO_BLK_F_RO, VIRTIO_BLK_F_BLK_SIZE,
++#ifdef CONFIG_VIRTIO_BLK_SCSI
++	VIRTIO_BLK_F_SCSI,
++#endif
+ 	VIRTIO_BLK_F_FLUSH, VIRTIO_BLK_F_TOPOLOGY, VIRTIO_BLK_F_CONFIG_WCE,
+ 	VIRTIO_BLK_F_MQ,
+ }
 -- 
-2.9.3
+2.1.4
 
