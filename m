@@ -1,75 +1,36 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:39934 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751732AbdAaQUQ (ORCPT
+Received: from mail-ot0-f178.google.com ([74.125.82.178]:34144 "EHLO
+        mail-ot0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750730AbdA3RMP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 31 Jan 2017 11:20:16 -0500
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 07/10] nbd: move request validity checking into nbd_send_cmd
-Date: Tue, 31 Jan 2017 16:57:28 +0100
-Message-Id: <1485878251-6107-8-git-send-email-hch@lst.de>
-In-Reply-To: <1485878251-6107-1-git-send-email-hch@lst.de>
-References: <1485878251-6107-1-git-send-email-hch@lst.de>
+        Mon, 30 Jan 2017 12:12:15 -0500
+Received: by mail-ot0-f178.google.com with SMTP id f9so247000839otd.1
+        for <linux-block@vger.kernel.org>; Mon, 30 Jan 2017 09:12:15 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <20170130122817.GC9043@lst.de>
+References: <148559256378.11180.8957776806175202312.stgit@dwillia2-desk3.amr.corp.intel.com>
+ <148559256970.11180.2541041546993320141.stgit@dwillia2-desk3.amr.corp.intel.com>
+ <20170130122817.GC9043@lst.de>
+From: Dan Williams <dan.j.williams@intel.com>
+Date: Mon, 30 Jan 2017 09:12:14 -0800
+Message-ID: <CAPcyv4jx433Y1As=GjpjYcLVLBHyJvXtTdrs-kmo_K4pkKfzGQ@mail.gmail.com>
+Subject: Re: [RFC PATCH 01/17] dax: refactor dax-fs into a generic provider of
+ dax inodes
+To: Christoph Hellwig <hch@lst.de>
+Cc: "linux-nvdimm@lists.01.org" <linux-nvdimm@lists.01.org>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Toshi Kani <toshi.kani@hpe.com>,
+        Matthew Wilcox <mawilcox@microsoft.com>,
+        linux-block@vger.kernel.org, jmoyer <jmoyer@redhat.com>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-This is where we do the rest of the request handling, which will
-become much simpler soon, too.
+On Mon, Jan 30, 2017 at 4:28 AM, Christoph Hellwig <hch@lst.de> wrote:
+> I really don't like the dax_inode name.  Why not something like
+> dax_device or dax_region?
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/block/nbd.c | 21 ++++++++++-----------
- 1 file changed, 10 insertions(+), 11 deletions(-)
-
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index d4c6281..8bce1c7c 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -271,6 +271,9 @@ static int nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd, int index)
- 	u32 type;
- 	u32 tag = blk_mq_unique_tag(req);
- 
-+	if (req->cmd_type != REQ_TYPE_FS)
-+		return -EIO;
-+
- 	if (req_op(req) == REQ_OP_DISCARD)
- 		type = NBD_CMD_TRIM;
- 	else if (req_op(req) == REQ_OP_FLUSH)
-@@ -280,6 +283,13 @@ static int nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd, int index)
- 	else
- 		type = NBD_CMD_READ;
- 
-+	if (rq_data_dir(req) == WRITE &&
-+	    (nbd->flags & NBD_FLAG_READ_ONLY)) {
-+		dev_err_ratelimited(disk_to_dev(nbd->disk),
-+				    "Write on read-only\n");
-+		return -EIO;
-+	}
-+
- 	memset(&request, 0, sizeof(request));
- 	request.magic = htonl(NBD_REQUEST_MAGIC);
- 	request.type = htonl(type);
-@@ -503,17 +513,6 @@ static void nbd_handle_cmd(struct nbd_cmd *cmd, int index)
- 		goto error_out;
- 	}
- 
--	if (req->cmd_type != REQ_TYPE_FS)
--		goto error_out;
--
--	if (req->cmd_type == REQ_TYPE_FS &&
--	    rq_data_dir(req) == WRITE &&
--	    (nbd->flags & NBD_FLAG_READ_ONLY)) {
--		dev_err_ratelimited(disk_to_dev(nbd->disk),
--				    "Write on read-only\n");
--		goto error_out;
--	}
--
- 	req->errors = 0;
- 
- 	nsock = nbd->socks[index];
--- 
-2.1.4
-
+Fair enough, I'll switch struct dax_inode to dax_device and switch the
+existing struct dax_dev to dax_info.
