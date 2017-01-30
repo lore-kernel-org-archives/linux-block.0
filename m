@@ -1,122 +1,47 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-bn3nam01on0058.outbound.protection.outlook.com ([104.47.33.58]:53760
-        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751656AbdAaMSA (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 31 Jan 2017 07:18:00 -0500
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
-To: <axboe@fb.com>
-CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
-Subject: [PATCH 02/12] lightnvm: collapse nvm_erase_ppa and nvm_erase_blk
-Date: Tue, 31 Jan 2017 13:17:10 +0100
-Message-ID: <20170131121720.10971-3-matias@cnexlabs.com>
-In-Reply-To: <20170131121720.10971-1-matias@cnexlabs.com>
-References: <20170131121720.10971-1-matias@cnexlabs.com>
+Received: from mail-wm0-f48.google.com ([74.125.82.48]:33125 "EHLO
+        mail-wm0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751168AbdA3KuL (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 30 Jan 2017 05:50:11 -0500
+Received: by mail-wm0-f48.google.com with SMTP id t18so9311008wmt.0
+        for <linux-block@vger.kernel.org>; Mon, 30 Jan 2017 02:50:10 -0800 (PST)
+Subject: Re: [PATCH] lightnvm: free properly on target creation error
+To: =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <jg@lightnvm.io>
+References: <1485446259-2396-1-git-send-email-javier@cnexlabs.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@cnexlabs.com>
+From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
+Message-ID: <2d46b6b6-4339-a51d-a3fb-1de70b48fe82@lightnvm.io>
+Date: Mon, 30 Jan 2017 11:19:31 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <1485446259-2396-1-git-send-email-javier@cnexlabs.com>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-After gennvm and core have been merged, there are no more callers to
-nvm_erase_ppa. Therefore collapse the device specific and target
-specific erase functions.
+On 01/26/2017 04:57 PM, Javier González wrote:
+> Fix a memory leak when target creation fails. More specifically, free
+> the entire device structure given to the target (tgt_dev).
+> 
+> Signed-off-by: Javier González <javier@cnexlabs.com>
+> ---
+>  drivers/lightnvm/core.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+> index 8baae61..d5bb5e1 100644
+> --- a/drivers/lightnvm/core.c
+> +++ b/drivers/lightnvm/core.c
+> @@ -309,7 +309,7 @@ static int nvm_create_tgt(struct nvm_dev *dev, struct nvm_ioctl_create *create)
+>  err_queue:
+>  	blk_cleanup_queue(tqueue);
+>  err_dev:
+> -	kfree(tgt_dev);
+> +	nvm_remove_tgt_dev(tgt_dev);
+>  err_t:
+>  	kfree(t);
+>  err_reserve:
+> 
 
-Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
----
- drivers/lightnvm/core.c  | 57 ++++++++++++++++++++++--------------------------
- include/linux/lightnvm.h |  1 -
- 2 files changed, 26 insertions(+), 32 deletions(-)
-
-diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-index e9a4956..a4e2e3b 100644
---- a/drivers/lightnvm/core.c
-+++ b/drivers/lightnvm/core.c
-@@ -683,12 +683,34 @@ int nvm_submit_io(struct nvm_tgt_dev *tgt_dev, struct nvm_rq *rqd)
- }
- EXPORT_SYMBOL(nvm_submit_io);
- 
--int nvm_erase_blk(struct nvm_tgt_dev *tgt_dev, struct ppa_addr *p, int flags)
-+int nvm_erase_blk(struct nvm_tgt_dev *tgt_dev, struct ppa_addr *ppas, int flags)
- {
--	/* Convert address space */
--	nvm_map_to_dev(tgt_dev, p);
-+	struct nvm_dev *dev = tgt_dev->parent;
-+	struct nvm_rq rqd;
-+	int ret;
- 
--	return nvm_erase_ppa(tgt_dev->parent, p, 1, flags);
-+	if (!dev->ops->erase_block)
-+		return 0;
-+
-+	ret = nvm_map_to_dev(tgt_dev, ppas);
-+	if (ret)
-+		return ret;
-+
-+	memset(&rqd, 0, sizeof(struct nvm_rq));
-+
-+	ret = nvm_set_rqd_ppalist(dev, &rqd, ppas, 1, 1);
-+	if (ret)
-+		return ret;
-+
-+	nvm_generic_to_addr_mode(dev, &rqd);
-+
-+	rqd.flags = flags;
-+
-+	ret = dev->ops->erase_block(dev, &rqd);
-+
-+	nvm_free_rqd_ppalist(dev, &rqd);
-+
-+	return ret;
- }
- EXPORT_SYMBOL(nvm_erase_blk);
- 
-@@ -847,33 +869,6 @@ void nvm_free_rqd_ppalist(struct nvm_dev *dev, struct nvm_rq *rqd)
- }
- EXPORT_SYMBOL(nvm_free_rqd_ppalist);
- 
--int nvm_erase_ppa(struct nvm_dev *dev, struct ppa_addr *ppas, int nr_ppas,
--								int flags)
--{
--	struct nvm_rq rqd;
--	int ret;
--
--	if (!dev->ops->erase_block)
--		return 0;
--
--	memset(&rqd, 0, sizeof(struct nvm_rq));
--
--	ret = nvm_set_rqd_ppalist(dev, &rqd, ppas, nr_ppas, 1);
--	if (ret)
--		return ret;
--
--	nvm_generic_to_addr_mode(dev, &rqd);
--
--	rqd.flags = flags;
--
--	ret = dev->ops->erase_block(dev, &rqd);
--
--	nvm_free_rqd_ppalist(dev, &rqd);
--
--	return ret;
--}
--EXPORT_SYMBOL(nvm_erase_ppa);
--
- void nvm_end_io(struct nvm_rq *rqd, int error)
- {
- 	struct nvm_tgt_dev *tgt_dev = rqd->dev;
-diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
-index 84309fe..f2007b2 100644
---- a/include/linux/lightnvm.h
-+++ b/include/linux/lightnvm.h
-@@ -483,7 +483,6 @@ extern void nvm_addr_to_generic_mode(struct nvm_dev *, struct nvm_rq *);
- extern int nvm_set_rqd_ppalist(struct nvm_dev *, struct nvm_rq *,
- 					const struct ppa_addr *, int, int);
- extern void nvm_free_rqd_ppalist(struct nvm_dev *, struct nvm_rq *);
--extern int nvm_erase_ppa(struct nvm_dev *, struct ppa_addr *, int, int);
- extern int nvm_erase_blk(struct nvm_tgt_dev *, struct ppa_addr *, int);
- extern int nvm_get_l2p_tbl(struct nvm_tgt_dev *, u64, u32, nvm_l2p_update_fn *,
- 			   void *);
--- 
-2.9.3
-
+Thanks. Applied.
