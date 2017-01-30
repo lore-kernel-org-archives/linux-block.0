@@ -1,39 +1,27 @@
-Return-Path: <linux-ide-owner@vger.kernel.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 01/10] scm_blk: remove unneeded REQ_TYPE_FS check
-Date: Tue, 31 Jan 2017 16:57:22 +0100
-Message-Id: <1485878251-6107-2-git-send-email-hch@lst.de>
-In-Reply-To: <1485878251-6107-1-git-send-email-hch@lst.de>
-References: <1485878251-6107-1-git-send-email-hch@lst.de>
-Sender: linux-ide-owner@vger.kernel.org
+Return-Path: <dan.j.williams@intel.com>
+MIME-Version: 1.0
+In-Reply-To: <20170130122452.GA9043@lst.de>
+References: <148566590827.1627.3631056985359212959.stgit@dwillia2-desk3.amr.corp.intel.com>
+ <20170130122452.GA9043@lst.de>
+From: Dan Williams <dan.j.williams@intel.com>
+Date: Mon, 30 Jan 2017 13:53:36 -0800
+Message-ID: <CAPcyv4jJ5VMNueBTkYhTS=DmAQVDT6qJV0Do86ZNVGLGoTJ=gQ@mail.gmail.com>
+Subject: Re: [RFC PATCH] scsi, block: fix duplicate bdi name registration crashes
+To: Christoph Hellwig <hch@lst.de>
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org, linux-scsi <linux-scsi@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	James Bottomley <James.Bottomley@hansenpartnership.com>,
+	Bart Van Assche <bart.vanassche@sandisk.com>, Omar Sandoval <osandov@osandov.com>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/s390/block/scm_blk.c | 7 -------
- 1 file changed, 7 deletions(-)
+On Mon, Jan 30, 2017 at 4:24 AM, Christoph Hellwig <hch@lst.de> wrote:
+> Hi Dan,
+>
+> this looks mostly fine to me.  A few code comments below, but except
+> for this there is another issue with it:  We still have drivers
+> that share a single request_queue for multiple gendisks, so I wonder
 
-diff --git a/drivers/s390/block/scm_blk.c b/drivers/s390/block/scm_blk.c
-index 9f16ea6..152de68 100644
---- a/drivers/s390/block/scm_blk.c
-+++ b/drivers/s390/block/scm_blk.c
-@@ -300,13 +300,6 @@ static void scm_blk_request(struct request_queue *rq)
- 	struct request *req;
- 
- 	while ((req = blk_peek_request(rq))) {
--		if (req->cmd_type != REQ_TYPE_FS) {
--			blk_start_request(req);
--			blk_dump_rq_flags(req, KMSG_COMPONENT " bad request");
--			__blk_end_request_all(req, -EIO);
--			continue;
--		}
--
- 		if (!scm_permit_request(bdev, req))
- 			goto out;
- 
--- 
-2.1.4
-
+scsi drivers or others? If those drivers can switch to dynamically
+allocated devt (GENHD_FL_EXT_DEVT), then they don't need this fix.
