@@ -1,131 +1,47 @@
-Return-Path: <BATV+3cdfc0cdff764882efbb+4905+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: mst@redhat.com,
-	jasowang@redhat.com
-Cc: axboe@kernel.dk,
-	pbonzini@redhat.com,
-	virtualization@lists.linux-foundation.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 7/9] blk-mq: provide a default queue mapping for virtio device
-Date: Fri, 27 Jan 2017 09:16:35 +0100
-Message-Id: <1485504997-17584-8-git-send-email-hch@lst.de>
-In-Reply-To: <1485504997-17584-1-git-send-email-hch@lst.de>
-References: <1485504997-17584-1-git-send-email-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f47.google.com ([74.125.82.47]:35650 "EHLO
+        mail-wm0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751141AbdA3KQS (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 30 Jan 2017 05:16:18 -0500
+Received: by mail-wm0-f47.google.com with SMTP id b65so25618210wmf.0
+        for <linux-block@vger.kernel.org>; Mon, 30 Jan 2017 02:16:18 -0800 (PST)
+Subject: Re: [PATCH 3/3] lightnvm: Add CRC read error
+To: =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <jg@lightnvm.io>
+References: <1485431260-20268-1-git-send-email-javier@cnexlabs.com>
+ <1485431260-20268-3-git-send-email-javier@cnexlabs.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@cnexlabs.com>
+From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
+Message-ID: <fe372dff-b191-0284-90c7-d93c91fc0620@lightnvm.io>
+Date: Mon, 30 Jan 2017 11:16:10 +0100
+MIME-Version: 1.0
+In-Reply-To: <1485431260-20268-3-git-send-email-javier@cnexlabs.com>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Similar to the PCI version, just calling into virtio instead.
+On 01/26/2017 12:47 PM, Javier González wrote:
+> Let the host differentiate between a read error and a CRC check error on
+> the device side.
+> 
+> Signed-off-by: Javier González <javier@cnexlabs.com>
+> ---
+>  include/linux/lightnvm.h | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
+> index 11c318e..51cda67 100644
+> --- a/include/linux/lightnvm.h
+> +++ b/include/linux/lightnvm.h
+> @@ -108,6 +108,7 @@ enum {
+>  	NVM_RSP_ERR_FAILWRITE	= 0x40ff,
+>  	NVM_RSP_ERR_EMPTYPAGE	= 0x42ff,
+>  	NVM_RSP_ERR_FAILECC	= 0x4281,
+> +	NVM_RSP_ERR_FAILCRC	= 0x4004,
+>  	NVM_RSP_WARN_HIGHECC	= 0x4700,
+>  
+>  	/* Device opcodes */
+> 
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/Kconfig                 |  5 ++++
- block/Makefile                |  1 +
- block/blk-mq-virtio.c         | 54 +++++++++++++++++++++++++++++++++++++++++++
- include/linux/blk-mq-virtio.h | 10 ++++++++
- 4 files changed, 70 insertions(+)
- create mode 100644 block/blk-mq-virtio.c
- create mode 100644 include/linux/blk-mq-virtio.h
-
-diff --git a/block/Kconfig b/block/Kconfig
-index 8bf114a..3523b4f 100644
---- a/block/Kconfig
-+++ b/block/Kconfig
-@@ -165,4 +165,9 @@ config BLK_MQ_PCI
- 	depends on BLOCK && PCI
- 	default y
- 
-+config BLK_MQ_VIRTIO
-+	bool
-+	depends on BLOCK && VIRTIO
-+	default y
-+
- source block/Kconfig.iosched
-diff --git a/block/Makefile b/block/Makefile
-index a827f98..6069194 100644
---- a/block/Makefile
-+++ b/block/Makefile
-@@ -23,5 +23,6 @@ obj-$(CONFIG_BLOCK_COMPAT)	+= compat_ioctl.o
- obj-$(CONFIG_BLK_CMDLINE_PARSER)	+= cmdline-parser.o
- obj-$(CONFIG_BLK_DEV_INTEGRITY) += bio-integrity.o blk-integrity.o t10-pi.o
- obj-$(CONFIG_BLK_MQ_PCI)	+= blk-mq-pci.o
-+obj-$(CONFIG_BLK_MQ_VIRTIO)	+= blk-mq-virtio.o
- obj-$(CONFIG_BLK_DEV_ZONED)	+= blk-zoned.o
- obj-$(CONFIG_BLK_WBT)		+= blk-wbt.o
-diff --git a/block/blk-mq-virtio.c b/block/blk-mq-virtio.c
-new file mode 100644
-index 0000000..c3afbca
---- /dev/null
-+++ b/block/blk-mq-virtio.c
-@@ -0,0 +1,54 @@
-+/*
-+ * Copyright (c) 2016 Christoph Hellwig.
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-+ * more details.
-+ */
-+#include <linux/device.h>
-+#include <linux/blk-mq.h>
-+#include <linux/blk-mq-virtio.h>
-+#include <linux/virtio_config.h>
-+#include <linux/module.h>
-+#include "blk-mq.h"
-+
-+/**
-+ * blk_mq_virtio_map_queues - provide a default queue mapping for virtio device
-+ * @set:	tagset to provide the mapping for
-+ * @vdev:	virtio device associated with @set.
-+ * @first_vec:	first interrupt vectors to use for queues (usually 0)
-+ *
-+ * This function assumes the virtio device @vdev has at least as many available
-+ * interrupt vetors as @set has queues.  It will then queuery the vector
-+ * corresponding to each queue for it's affinity mask and built queue mapping
-+ * that maps a queue to the CPUs that have irq affinity for the corresponding
-+ * vector.
-+ */
-+int blk_mq_virtio_map_queues(struct blk_mq_tag_set *set,
-+		struct virtio_device *vdev, int first_vec)
-+{
-+	const struct cpumask *mask;
-+	unsigned int queue, cpu;
-+
-+	if (!vdev->config->get_vq_affinity)
-+		goto fallback;
-+
-+	for (queue = 0; queue < set->nr_hw_queues; queue++) {
-+		mask = vdev->config->get_vq_affinity(vdev, first_vec + queue);
-+		if (!mask)
-+			goto fallback;
-+
-+		for_each_cpu(cpu, mask)
-+			set->mq_map[cpu] = queue;
-+	}
-+
-+	return 0;
-+fallback:
-+	return blk_mq_map_queues(set);
-+}
-+EXPORT_SYMBOL_GPL(blk_mq_virtio_map_queues);
-diff --git a/include/linux/blk-mq-virtio.h b/include/linux/blk-mq-virtio.h
-new file mode 100644
-index 0000000..b1ef6e1
---- /dev/null
-+++ b/include/linux/blk-mq-virtio.h
-@@ -0,0 +1,10 @@
-+#ifndef _LINUX_BLK_MQ_VIRTIO_H
-+#define _LINUX_BLK_MQ_VIRTIO_H
-+
-+struct blk_mq_tag_set;
-+struct virtio_device;
-+
-+int blk_mq_virtio_map_queues(struct blk_mq_tag_set *set,
-+		struct virtio_device *vdev, int first_vec);
-+
-+#endif /* _LINUX_BLK_MQ_VIRTIO_H */
--- 
-2.1.4
+Thanks. Applied.
