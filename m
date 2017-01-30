@@ -1,98 +1,76 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-sn1nam02on0080.outbound.protection.outlook.com ([104.47.36.80]:6992
-        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1754530AbdAaBMz (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Jan 2017 20:12:55 -0500
-From: Bart Van Assche <Bart.VanAssche@sandisk.com>
-To: "hch@lst.de" <hch@lst.de>, "axboe@fb.com" <axboe@fb.com>
-CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+Received: from mx2.suse.de ([195.135.220.15]:37452 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752113AbdA3G62 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 30 Jan 2017 01:58:28 -0500
+Subject: Re: split scsi passthrough fields out of struct request V2
+To: Bart Van Assche <Bart.VanAssche@sandisk.com>,
+        "hch@lst.de" <hch@lst.de>, "axboe@fb.com" <axboe@fb.com>
+References: <1485365126-23210-1-git-send-email-hch@lst.de>
+ <1485552454.4267.29.camel@sandisk.com>
+Cc: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
         "linux-raid@vger.kernel.org" <linux-raid@vger.kernel.org>,
         "dm-devel@redhat.com" <dm-devel@redhat.com>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "snitzer@redhat.com" <snitzer@redhat.com>,
         "j-nomura@ce.jp.nec.com" <j-nomura@ce.jp.nec.com>
-Subject: Re: [dm-devel] split scsi passthrough fields out of struct request
- V2
-Date: Tue, 31 Jan 2017 01:12:46 +0000
-Message-ID: <1485825148.2669.18.camel@sandisk.com>
-References: <1485365126-23210-1-git-send-email-hch@lst.de>
-         <1485456745.2540.9.camel@sandisk.com>
-         <db7f9165-19db-d1f2-a2fa-7546da57741b@fb.com>
-         <20170126185924.GA25289@lst.de>
-         <ee95c6dd-cdb4-7da5-2d4a-ec14034eac7a@fb.com>
-         <71e22257-0592-fdd3-25e5-a78ceced2ab9@sandisk.com>
-         <4054e944-b28d-1cd6-574f-6cd90e28c301@fb.com>
-         <1485464486.2540.12.camel@sandisk.com>
-         <6995c991-65a4-8dca-c36e-fb2eff277ca9@fb.com>
-         <1485467235.2540.14.camel@sandisk.com>
-         <e1d5f4e6-c63f-545d-710f-d4d10fa8d2e0@fb.com>
-         <1485472465.2540.19.camel@sandisk.com>
-         <e222c541-3239-104d-e0b0-40d19b012b66@fb.com>
-         <1485474426.2540.25.camel@sandisk.com>
-         <b98195e7-6e04-5a59-8b83-ce2e1c5c4e1a@fb.com>
-         <1485477510.2540.27.camel@sandisk.com>
-         <2d971693-b79d-c1b9-fb2a-f5dd04128c68@fb.com>
-         <1485479738.2540.30.camel@sandisk.com>
-         <ecca734c-7a9c-f060-9335-c2de089849c2@fb.com>
-         <37ab009a-bc2d-d2ae-a875-269ab563a430@fb.com>
-         <9cbf0ce5-ed79-0252-fd2d-34bebaafffa3@fb.com>
-         <1485535925.4267.1.camel@sandisk.com>
-         <2c696943-2a44-4f36-f0f8-0bebceb95a4a@fb.com>
-In-Reply-To: <2c696943-2a44-4f36-f0f8-0bebceb95a4a@fb.com>
-Content-Type: text/plain; charset="iso-8859-1"
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <00141930-e69b-ccfa-3f1f-4dff5cd3b680@suse.de>
+Date: Mon, 30 Jan 2017 07:58:24 +0100
 MIME-Version: 1.0
+In-Reply-To: <1485552454.4267.29.camel@sandisk.com>
+Content-Type: text/plain; charset=windows-1252
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Fri, 2017-01-27 at 09:56 -0700, Jens Axboe wrote:
-> On 01/27/2017 09:52 AM, Bart Van Assche wrote:
-> > [  215.724452] general protection fault: 0000 [#1] SMP
-> > [  215.725060] Call Trace:
-> > [  215.725086]  scsi_disk_put+0x2d/0x40
-> > [  215.725110]  sd_release+0x3d/0xb0
-> > [  215.725137]  __blkdev_put+0x29e/0x360
-> > [  215.725163]  blkdev_put+0x49/0x170
-> > [  215.725192]  dm_put_table_device+0x58/0xc0 [dm_mod]
-> > [  215.725219]  dm_put_device+0x70/0xc0 [dm_mod]
-> > [  215.725269]  free_priority_group+0x92/0xc0 [dm_multipath]
-> > [  215.725295]  free_multipath+0x70/0xc0 [dm_multipath]
-> > [  215.725320]  multipath_dtr+0x19/0x20 [dm_multipath]
-> > [  215.725348]  dm_table_destroy+0x67/0x120 [dm_mod]
-> > [  215.725379]  dev_suspend+0xde/0x240 [dm_mod]
-> > [  215.725434]  ctl_ioctl+0x1f5/0x520 [dm_mod]
-> > [  215.725489]  dm_ctl_ioctl+0xe/0x20 [dm_mod]
-> > [  215.725515]  do_vfs_ioctl+0x8f/0x700
-> > [  215.725589]  SyS_ioctl+0x3c/0x70
-> > [  215.725614]  entry_SYSCALL_64_fastpath+0x18/0xad
-> >=20
->=20
-> I have no idea what this is, I haven't messed with life time or devices
-> or queues at all in that branch.
+On 01/27/2017 10:27 PM, Bart Van Assche wrote:
+> On Wed, 2017-01-25 at 18:25 +0100, Christoph Hellwig wrote:
+>> this series splits the support for SCSI passthrough commands from the
+>> main struct request used all over the block layer into a separate
+>> scsi_request structure that drivers that want to support SCSI passthough
+>> need to embedded as the first thing into their request-private data,
+>> similar to how we handle NVMe passthrough commands.
+>>
+>> To support this I've added support for that the private data after
+>> request structure to the legacy request path instead, so that it can
+>> be treated the same way as the blk-mq path.  Compare to the current
+>> scsi_cmnd allocator that actually is a major simplification.
+>>
+>> Changes since V1:
+>>  - fix handling of a NULL sense pointer in __scsi_execute
+>>  - clean up handling of the flush flags in the block layer and MD
+>>  - additional small cleanup in dm-rq
+> 
+> Hello Christoph,
+> 
+> A general comment: patch "block: allow specifying size for extra
+> command data" is a very welcome improvement but unfortunately also
+> introduces an inconsistency among block drivers. This patch series
+> namely creates two kinds of block drivers:
+> - Block drivers that use the block layer core to allocate
+>   request-private data. These block drivers set request.cmd_size
+>   to a non-zero value and do not need request.special.
+> - Block drivers that allocate request-private data themselves.
+>   These block drivers set request.cmd_size to zero and use
+>   request.special to translate a request pointer into the private
+>   data pointer.
+> 
+> Have you considered to convert all block drivers to the new
+> approach and to get rid of request.special? If so, do you already
+> have plans to start working on this? I'm namely wondering wheter I
+> should start working on this myself.
+> 
+I was actually looking into it, too.
+Once scsi passthrough is removed from struct request there is no
+reasonable need to rely on '->special' for anything, and we should just
+ditch it.
 
-Hello Jens,
+Cheers,
 
-Running the srp-test software against kernel 4.9.6 and kernel 4.10-rc5
-went fine. With your for-4.11/block branch (commit 400f73b23f457a) however
-I just ran into the following:
-
-[ =A0214.555527] ------------[ cut here ]------------
-[ =A0214.555565] WARNING: CPU: 5 PID: 13201 at kernel/locking/lockdep.c:351=
-4 lock_release+0x346/0x480
-[ =A0214.555588] DEBUG_LOCKS_WARN_ON(depth <=3D 0)
-[ =A0214.555824] CPU: 5 PID: 13201 Comm: fio Not tainted 4.10.0-rc3-dbg+ #1
-[ =A0214.555846] Hardware name: Dell Inc. PowerEdge R430/03XKDV, BIOS 1.0.2=
- 11/17/2014
-[ =A0214.555867] Call Trace:
-[ =A0214.555889] =A0dump_stack+0x68/0x93
-[ =A0214.555911] =A0__warn+0xc6/0xe0
-[ =A0214.555953] =A0warn_slowpath_fmt+0x4a/0x50
-[ =A0214.555973] =A0lock_release+0x346/0x480
-[ =A0214.556021] =A0aio_write+0x106/0x140
-[ =A0214.556067] =A0do_io_submit+0x37d/0x900
-[ =A0214.556108] =A0SyS_io_submit+0xb/0x10
-[ =A0214.556131] =A0entry_SYSCALL_64_fastpath+0x18/0xad
-
-I will continue to try to figure out what is causing this behavior.
-
-Bart.=
+Hannes
+-- 
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: F. Imend�rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG N�rnberg)
