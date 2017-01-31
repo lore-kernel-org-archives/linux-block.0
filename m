@@ -1,30 +1,75 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:60801 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1753437AbdAZTs2 (ORCPT
+Received: from bombadil.infradead.org ([65.50.211.133]:39934 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751732AbdAaQUQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 26 Jan 2017 14:48:28 -0500
-From: Jens Axboe <axboe@fb.com>
-To: <linux-block@vger.kernel.org>
-CC: <bart.vanassche@sandisk.com>, <hch@lst.de>, <osandov@fb.com>,
-        <paolo.valente@linaro.org>, <hare@suse.com>
-Subject: [PATCH 0/5] blk-mq: various blk-mq/blk-mq-sched fixes
-Date: Thu, 26 Jan 2017 12:48:13 -0700
-Message-ID: <1485460098-16608-1-git-send-email-axboe@fb.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+        Tue, 31 Jan 2017 11:20:16 -0500
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH 07/10] nbd: move request validity checking into nbd_send_cmd
+Date: Tue, 31 Jan 2017 16:57:28 +0100
+Message-Id: <1485878251-6107-8-git-send-email-hch@lst.de>
+In-Reply-To: <1485878251-6107-1-git-send-email-hch@lst.de>
+References: <1485878251-6107-1-git-send-email-hch@lst.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-I've been diving into the problems that Hannes reported, both the
-stalls related to shared tag maps and multiple hardware queues,
-but also the cases where we get suboptimal merging.
+This is where we do the rest of the request handling, which will
+become much simpler soon, too.
 
-This series attempts to fix that.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/block/nbd.c | 21 ++++++++++-----------
+ 1 file changed, 10 insertions(+), 11 deletions(-)
 
-Hannes, this should be identical to what I sent you as a bundled up
-patch earlier today. Would be great if you could run this through
-your testing.
-
-The patches are against for-4.11/block
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index d4c6281..8bce1c7c 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -271,6 +271,9 @@ static int nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd, int index)
+ 	u32 type;
+ 	u32 tag = blk_mq_unique_tag(req);
+ 
++	if (req->cmd_type != REQ_TYPE_FS)
++		return -EIO;
++
+ 	if (req_op(req) == REQ_OP_DISCARD)
+ 		type = NBD_CMD_TRIM;
+ 	else if (req_op(req) == REQ_OP_FLUSH)
+@@ -280,6 +283,13 @@ static int nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd, int index)
+ 	else
+ 		type = NBD_CMD_READ;
+ 
++	if (rq_data_dir(req) == WRITE &&
++	    (nbd->flags & NBD_FLAG_READ_ONLY)) {
++		dev_err_ratelimited(disk_to_dev(nbd->disk),
++				    "Write on read-only\n");
++		return -EIO;
++	}
++
+ 	memset(&request, 0, sizeof(request));
+ 	request.magic = htonl(NBD_REQUEST_MAGIC);
+ 	request.type = htonl(type);
+@@ -503,17 +513,6 @@ static void nbd_handle_cmd(struct nbd_cmd *cmd, int index)
+ 		goto error_out;
+ 	}
+ 
+-	if (req->cmd_type != REQ_TYPE_FS)
+-		goto error_out;
+-
+-	if (req->cmd_type == REQ_TYPE_FS &&
+-	    rq_data_dir(req) == WRITE &&
+-	    (nbd->flags & NBD_FLAG_READ_ONLY)) {
+-		dev_err_ratelimited(disk_to_dev(nbd->disk),
+-				    "Write on read-only\n");
+-		goto error_out;
+-	}
+-
+ 	req->errors = 0;
+ 
+ 	nsock = nbd->socks[index];
+-- 
+2.1.4
 
