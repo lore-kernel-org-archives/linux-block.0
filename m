@@ -1,47 +1,49 @@
-Return-Path: <keith.busch@intel.com>
-From: Keith Busch <keith.busch@intel.com>
-To: linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>,
-	Jens Axboe <axboe@fb.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Thomas Gleixner <tglx@linutronix.de>
-Cc: Marc Merlin <marc@merlins.org>,
-	Keith Busch <keith.busch@intel.com>
-Subject: [PATCH 2/6] irq/affinity: Assign offline CPUs a vector
-Date: Wed,  4 Jan 2017 17:41:07 -0500
-Message-Id: <1483569671-1462-3-git-send-email-keith.busch@intel.com>
-In-Reply-To: <1483569671-1462-1-git-send-email-keith.busch@intel.com>
-References: <1483569671-1462-1-git-send-email-keith.busch@intel.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-bn3nam01on0058.outbound.protection.outlook.com ([104.47.33.58]:53760
+        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1752043AbdAaMSk (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 31 Jan 2017 07:18:40 -0500
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
+To: <axboe@fb.com>
+CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <jg@lightnvm.io>,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
+Subject: [PATCH 11/12] lightnvm: free properly on target creation error
+Date: Tue, 31 Jan 2017 13:17:19 +0100
+Message-ID: <20170131121720.10971-12-matias@cnexlabs.com>
+In-Reply-To: <20170131121720.10971-1-matias@cnexlabs.com>
+References: <20170131121720.10971-1-matias@cnexlabs.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-The offline CPUs need to assigned to something incase they come online
-later, otherwise anyone using the mapping for things other than affinity
-will have blank entries for that online CPU.
+From: Javier González <jg@lightnvm.io>
 
-Signed-off-by: Keith Busch <keith.busch@intel.com>
+Fix a memory leak when target creation fails. More specifically, free
+the entire device structure given to the target (tgt_dev).
+
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
 ---
- kernel/irq/affinity.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ drivers/lightnvm/core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/kernel/irq/affinity.c b/kernel/irq/affinity.c
-index b25dce0..2367531 100644
---- a/kernel/irq/affinity.c
-+++ b/kernel/irq/affinity.c
-@@ -129,6 +129,14 @@ irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
- 	}
- 
- done:
-+	/*
-+	 * Assign offline CPUs to first mask in case they come online later. A
-+	 * driver can rerun this from a cpu notifier if they want a more optimal
-+	 * spread.
-+	 */
-+	cpumask_andnot(nmsk, cpu_possible_mask, cpu_online_mask);
-+	irq_spread_init_one(masks, nmsk, cpumask_weight(nmsk));
-+
- 	put_online_cpus();
- 
- 	/* Fill out vectors at the end that don't need affinity */
+diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+index 4f4db99..b2cd3d6 100644
+--- a/drivers/lightnvm/core.c
++++ b/drivers/lightnvm/core.c
+@@ -303,7 +303,7 @@ static int nvm_create_tgt(struct nvm_dev *dev, struct nvm_ioctl_create *create)
+ err_queue:
+ 	blk_cleanup_queue(tqueue);
+ err_dev:
+-	kfree(tgt_dev);
++	nvm_remove_tgt_dev(tgt_dev);
+ err_t:
+ 	kfree(t);
+ err_reserve:
 -- 
-2.5.5
+2.9.3
+
