@@ -1,184 +1,231 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga04.intel.com ([192.55.52.120]:17034 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750904AbdA1IkV (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 28 Jan 2017 03:40:21 -0500
-Subject: [RFC PATCH 02/17] dax: convert dax_inode locking to srcu
-From: Dan Williams <dan.j.williams@intel.com>
-To: linux-nvdimm@lists.01.org
-Cc: snitzer@redhat.com, toshi.kani@hpe.com, mawilcox@microsoft.com,
-        linux-block@vger.kernel.org, jmoyer@redhat.com,
-        linux-fsdevel@vger.kernel.org, ross.zwisler@linux.intel.com,
-        hch@lst.de
-Date: Sat, 28 Jan 2017 00:36:15 -0800
-Message-ID: <148559257511.11180.7445606032994481709.stgit@dwillia2-desk3.amr.corp.intel.com>
-In-Reply-To: <148559256378.11180.8957776806175202312.stgit@dwillia2-desk3.amr.corp.intel.com>
-References: <148559256378.11180.8957776806175202312.stgit@dwillia2-desk3.amr.corp.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jack@suse.cz>
+From: Jan Kara <jack@suse.cz>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
+	Laurent Dufour <ldufour@linux.vnet.ibm.com>,
+	Jan Kara <jack@suse.cz>
+Subject: [PATCH 3/4] block: Dynamically allocate and refcount backing_dev_info
+Date: Tue, 31 Jan 2017 13:54:28 +0100
+Message-Id: <20170131125429.14303-4-jack@suse.cz>
+In-Reply-To: <20170131125429.14303-1-jack@suse.cz>
+References: <20170131125429.14303-1-jack@suse.cz>
+List-ID: <linux-block@vger.kernel.org>
 
-In preparation for adding dax_operations that perform ->direct_access()
-and user copy operations relative to a dax_inode, convert the existing
-dax_inode locking to srcu. Some dax drivers need to sleep in their
-->direct_access() methods and user copying may fault / sleep.
+Instead of storing backing_dev_info inside struct request_queue,
+allocate it dynamically, reference count it, and free it when the last
+reference is dropped. Currently only request_queue holds the reference
+but in the following patch we add other users referencing
+backing_dev_info.
 
-Signed-off-by: Dan Williams <dan.j.williams@intel.com>
+Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- drivers/dax/Kconfig  |    1 +
- drivers/dax/device.c |   18 +++++++++---------
- drivers/dax/super.c  |   20 ++++++++++++++++----
- include/linux/dax.h  |    3 +++
- 4 files changed, 29 insertions(+), 13 deletions(-)
+ block/blk-core.c                 | 12 +++++-------
+ block/blk-sysfs.c                |  2 +-
+ include/linux/backing-dev-defs.h |  2 ++
+ include/linux/backing-dev.h      | 10 +++++++++-
+ include/linux/blkdev.h           |  1 -
+ mm/backing-dev.c                 | 37 ++++++++++++++++++++++++++++++++++++-
+ 6 files changed, 53 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/dax/Kconfig b/drivers/dax/Kconfig
-index 39bcbf4c5e40..b7053eafd88e 100644
---- a/drivers/dax/Kconfig
-+++ b/drivers/dax/Kconfig
-@@ -1,5 +1,6 @@
- menuconfig DAX
- 	tristate "DAX: direct access to differentiated memory"
-+	select SRCU
- 	default m if NVDIMM_DAX
- 
- if DAX
-diff --git a/drivers/dax/device.c b/drivers/dax/device.c
-index 5b5572314929..af06d0bfd6ea 100644
---- a/drivers/dax/device.c
-+++ b/drivers/dax/device.c
-@@ -333,16 +333,16 @@ static int __dax_dev_fault(struct dax_dev *dax_dev, struct vm_area_struct *vma,
- 
- static int dax_dev_fault(struct vm_area_struct *vma, struct vm_fault *vmf)
+diff --git a/block/blk-core.c b/block/blk-core.c
+index a9ff1b919ae7..545ccb4b96f3 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -693,7 +693,6 @@ static void blk_rq_timed_out_timer(unsigned long data)
+ struct request_queue *blk_alloc_queue_node(gfp_t gfp_mask, int node_id)
  {
--	int rc;
-+	int rc, id;
- 	struct file *filp = vma->vm_file;
- 	struct dax_dev *dax_dev = filp->private_data;
+ 	struct request_queue *q;
+-	int err;
  
- 	dev_dbg(&dax_dev->dev, "%s: %s: %s (%#lx - %#lx)\n", __func__,
- 			current->comm, (vmf->flags & FAULT_FLAG_WRITE)
- 			? "write" : "read", vma->vm_start, vma->vm_end);
--	rcu_read_lock();
-+	id = dax_read_lock();
- 	rc = __dax_dev_fault(dax_dev, vma, vmf);
--	rcu_read_unlock();
-+	dax_read_unlock(id);
+ 	q = kmem_cache_alloc_node(blk_requestq_cachep,
+ 				gfp_mask | __GFP_ZERO, node_id);
+@@ -708,17 +707,16 @@ struct request_queue *blk_alloc_queue_node(gfp_t gfp_mask, int node_id)
+ 	if (!q->bio_split)
+ 		goto fail_id;
  
- 	return rc;
- }
-@@ -390,7 +390,7 @@ static int __dax_dev_pmd_fault(struct dax_dev *dax_dev,
- static int dax_dev_pmd_fault(struct vm_area_struct *vma, unsigned long addr,
- 		pmd_t *pmd, unsigned int flags)
- {
--	int rc;
-+	int rc, id;
- 	struct file *filp = vma->vm_file;
- 	struct dax_dev *dax_dev = filp->private_data;
+-	q->backing_dev_info = &q->_backing_dev_info;
++	q->backing_dev_info = bdi_alloc_node(gfp_mask, node_id);
++	if (!q->backing_dev_info)
++		goto fail_split;
++
+ 	q->backing_dev_info->ra_pages =
+ 			(VM_MAX_READAHEAD * 1024) / PAGE_SIZE;
+ 	q->backing_dev_info->capabilities = BDI_CAP_CGROUP_WRITEBACK;
+ 	q->backing_dev_info->name = "block";
+ 	q->node = node_id;
  
-@@ -398,9 +398,9 @@ static int dax_dev_pmd_fault(struct vm_area_struct *vma, unsigned long addr,
- 			current->comm, (flags & FAULT_FLAG_WRITE)
- 			? "write" : "read", vma->vm_start, vma->vm_end);
+-	err = bdi_init(q->backing_dev_info);
+-	if (err)
+-		goto fail_split;
+-
+ 	setup_timer(&q->backing_dev_info->laptop_mode_wb_timer,
+ 		    laptop_mode_timer_fn, (unsigned long) q);
+ 	setup_timer(&q->timeout, blk_rq_timed_out_timer, (unsigned long) q);
+@@ -769,7 +767,7 @@ struct request_queue *blk_alloc_queue_node(gfp_t gfp_mask, int node_id)
+ fail_ref:
+ 	percpu_ref_exit(&q->q_usage_counter);
+ fail_bdi:
+-	bdi_destroy(q->backing_dev_info);
++	bdi_put(q->backing_dev_info);
+ fail_split:
+ 	bioset_free(q->bio_split);
+ fail_id:
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index 64fb54c6b41c..4cbaa519ec2d 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -799,7 +799,7 @@ static void blk_release_queue(struct kobject *kobj)
+ 		container_of(kobj, struct request_queue, kobj);
  
--	rcu_read_lock();
-+	id = dax_read_lock();
- 	rc = __dax_dev_pmd_fault(dax_dev, vma, addr, pmd, flags);
--	rcu_read_unlock();
-+	dax_read_unlock(id);
+ 	wbt_exit(q);
+-	bdi_exit(q->backing_dev_info);
++	bdi_put(q->backing_dev_info);
+ 	blkcg_exit_queue(q);
  
- 	return rc;
- }
-@@ -412,8 +412,8 @@ static const struct vm_operations_struct dax_dev_vm_ops = {
+ 	if (q->elevator) {
+diff --git a/include/linux/backing-dev-defs.h b/include/linux/backing-dev-defs.h
+index e850e76acaaf..ad955817916d 100644
+--- a/include/linux/backing-dev-defs.h
++++ b/include/linux/backing-dev-defs.h
+@@ -10,6 +10,7 @@
+ #include <linux/flex_proportions.h>
+ #include <linux/timer.h>
+ #include <linux/workqueue.h>
++#include <linux/kref.h>
  
- static int dax_mmap(struct file *filp, struct vm_area_struct *vma)
- {
-+	int rc, id;
- 	struct dax_dev *dax_dev = filp->private_data;
--	int rc;
+ struct page;
+ struct device;
+@@ -144,6 +145,7 @@ struct backing_dev_info {
  
- 	dev_dbg(&dax_dev->dev, "%s\n", __func__);
+ 	char *name;
  
-@@ -421,9 +421,9 @@ static int dax_mmap(struct file *filp, struct vm_area_struct *vma)
- 	 * We lock to check dax_inode liveness and will re-check at
- 	 * fault time.
- 	 */
--	rcu_read_lock();
-+	id = dax_read_lock();
- 	rc = check_vma(dax_dev, vma, __func__);
--	rcu_read_unlock();
-+	dax_read_unlock(id);
- 	if (rc)
- 		return rc;
++	struct kref refcnt;	/* Reference counter for the structure */
+ 	unsigned int capabilities; /* Device capabilities */
+ 	unsigned int min_ratio;
+ 	unsigned int max_ratio, max_prop_frac;
+diff --git a/include/linux/backing-dev.h b/include/linux/backing-dev.h
+index 43b93a947e61..efb6ca992d05 100644
+--- a/include/linux/backing-dev.h
++++ b/include/linux/backing-dev.h
+@@ -18,7 +18,14 @@
+ #include <linux/slab.h>
  
-diff --git a/drivers/dax/super.c b/drivers/dax/super.c
-index e6369b851619..7c4dc97d53a8 100644
---- a/drivers/dax/super.c
-+++ b/drivers/dax/super.c
-@@ -24,11 +24,24 @@ module_param(nr_dax, int, S_IRUGO);
- MODULE_PARM_DESC(nr_dax, "max number of dax device instances");
- 
- static dev_t dax_devt;
-+DEFINE_STATIC_SRCU(dax_srcu);
- static struct vfsmount *dax_mnt;
- static DEFINE_IDA(dax_minor_ida);
- static struct kmem_cache *dax_cache __read_mostly;
- static struct super_block *dax_superblock __read_mostly;
- 
-+int dax_read_lock(void)
+ int __must_check bdi_init(struct backing_dev_info *bdi);
+-void bdi_exit(struct backing_dev_info *bdi);
++
++static inline struct backing_dev_info *bdi_get(struct backing_dev_info *bdi)
 +{
-+	return srcu_read_lock(&dax_srcu);
++	kref_get(&bdi->refcnt);
++	return bdi;
 +}
-+EXPORT_SYMBOL_GPL(dax_read_lock);
 +
-+void dax_read_unlock(int id)
-+{
-+	srcu_read_unlock(&dax_srcu, id);
-+}
-+EXPORT_SYMBOL_GPL(dax_read_unlock);
++void bdi_put(struct backing_dev_info *bdi);
+ 
+ __printf(3, 4)
+ int bdi_register(struct backing_dev_info *bdi, struct device *parent,
+@@ -29,6 +36,7 @@ void bdi_unregister(struct backing_dev_info *bdi);
+ 
+ int __must_check bdi_setup_and_register(struct backing_dev_info *, char *);
+ void bdi_destroy(struct backing_dev_info *bdi);
++struct backing_dev_info *bdi_alloc_node(gfp_t gfp_mask, int node_id);
+ 
+ void wb_start_writeback(struct bdi_writeback *wb, long nr_pages,
+ 			bool range_cyclic, enum wb_reason reason);
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 069e4a102a73..de85701cc699 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -433,7 +433,6 @@ struct request_queue {
+ 	struct delayed_work	delay_work;
+ 
+ 	struct backing_dev_info	*backing_dev_info;
+-	struct backing_dev_info	_backing_dev_info;
+ 
+ 	/*
+ 	 * The queue owner gets to use this for whatever they like.
+diff --git a/mm/backing-dev.c b/mm/backing-dev.c
+index 3bfed5ab2475..db7d33a898a8 100644
+--- a/mm/backing-dev.c
++++ b/mm/backing-dev.c
+@@ -20,6 +20,8 @@ struct backing_dev_info noop_backing_dev_info = {
+ };
+ EXPORT_SYMBOL_GPL(noop_backing_dev_info);
+ 
++static struct kmem_cache *bdi_cachep;
 +
- /**
-  * struct dax_inode - anchor object for dax services
-  * @inode: core vfs
-@@ -45,8 +58,7 @@ struct dax_inode {
+ static struct class *bdi_class;
  
- bool dax_inode_alive(struct dax_inode *dax_inode)
- {
--	RCU_LOCKDEP_WARN(!rcu_read_lock_held(),
--			"dax operations require rcu_read_lock()\n");
-+	lockdep_assert_held(&dax_srcu);
- 	return dax_inode->alive;
- }
- EXPORT_SYMBOL_GPL(dax_inode_alive);
-@@ -55,7 +67,7 @@ EXPORT_SYMBOL_GPL(dax_inode_alive);
-  * Note, rcu is not protecting the liveness of dax_inode, rcu is
-  * ensuring that any fault handlers or operations that might have seen
-  * dax_inode_alive(), have completed.  Any operations that start after
-- * synchronize_rcu() has run will abort upon seeing !dax_inode_alive().
-+ * synchronize_srcu() has run will abort upon seeing !dax_inode_alive().
-  */
- void kill_dax_inode(struct dax_inode *dax_inode)
- {
-@@ -63,7 +75,7 @@ void kill_dax_inode(struct dax_inode *dax_inode)
- 		return;
- 
- 	dax_inode->alive = false;
--	synchronize_rcu();
-+	synchronize_srcu(&dax_srcu);
- 	dax_inode->private = NULL;
- }
- EXPORT_SYMBOL_GPL(kill_dax_inode);
-diff --git a/include/linux/dax.h b/include/linux/dax.h
-index 24ad71173995..67002898d130 100644
---- a/include/linux/dax.h
-+++ b/include/linux/dax.h
-@@ -8,6 +8,9 @@
- 
- struct iomap_ops;
- 
-+int dax_read_lock(void);
-+void dax_read_unlock(int id);
-+
  /*
-  * We use lowest available bit in exceptional entry for locking, one bit for
-  * the entry size (PMD) and two more to tell us if the entry is a huge zero
-
+@@ -237,6 +239,9 @@ static __init int bdi_class_init(void)
+ 
+ 	bdi_class->dev_groups = bdi_dev_groups;
+ 	bdi_debug_init();
++
++	bdi_cachep = KMEM_CACHE(backing_dev_info, SLAB_PANIC);
++
+ 	return 0;
+ }
+ postcore_initcall(bdi_class_init);
+@@ -776,6 +781,7 @@ int bdi_init(struct backing_dev_info *bdi)
+ 
+ 	bdi->dev = NULL;
+ 
++	kref_init(&bdi->refcnt);
+ 	bdi->min_ratio = 0;
+ 	bdi->max_ratio = 100;
+ 	bdi->max_prop_frac = FPROP_FRAC_BASE;
+@@ -791,6 +797,21 @@ int bdi_init(struct backing_dev_info *bdi)
+ }
+ EXPORT_SYMBOL(bdi_init);
+ 
++struct backing_dev_info *bdi_alloc_node(gfp_t gfp_mask, int node_id)
++{
++	struct backing_dev_info *bdi;
++
++	bdi = kmem_cache_alloc_node(bdi_cachep, gfp_mask | __GFP_ZERO, node_id);
++	if (!bdi)
++		return NULL;
++
++	if (bdi_init(bdi)) {
++		kmem_cache_free(bdi_cachep, bdi);
++		return NULL;
++	}
++	return bdi;
++}
++
+ int bdi_register(struct backing_dev_info *bdi, struct device *parent,
+ 		const char *fmt, ...)
+ {
+@@ -871,12 +892,26 @@ void bdi_unregister(struct backing_dev_info *bdi)
+ 	}
+ }
+ 
+-void bdi_exit(struct backing_dev_info *bdi)
++static void bdi_exit(struct backing_dev_info *bdi)
+ {
+ 	WARN_ON_ONCE(bdi->dev);
+ 	wb_exit(&bdi->wb);
+ }
+ 
++static void release_bdi(struct kref *ref)
++{
++	struct backing_dev_info *bdi =
++			container_of(ref, struct backing_dev_info, refcnt);
++
++	bdi_exit(bdi);
++	kmem_cache_free(bdi_cachep, bdi);
++}
++
++void bdi_put(struct backing_dev_info *bdi)
++{
++	kref_put(&bdi->refcnt, release_bdi);
++}
++
+ void bdi_destroy(struct backing_dev_info *bdi)
+ {
+ 	bdi_unregister(bdi);
+-- 
+2.10.2
