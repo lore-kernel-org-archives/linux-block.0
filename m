@@ -1,71 +1,62 @@
-Return-Path: <hare@suse.com>
+Return-Path: <Bart.VanAssche@sandisk.com>
+From: Bart Van Assche <Bart.VanAssche@sandisk.com>
+To: "hare@suse.de" <hare@suse.de>, "axboe@kernel.dk" <axboe@kernel.dk>
+CC: "hch@lst.de" <hch@lst.de>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "jth@kernel.org" <jth@kernel.org>,
+	"hare@suse.com" <hare@suse.com>
 Subject: Re: [PATCH] genhd: Do not hold event lock when scheduling workqueue
  elements
-To: Bart Van Assche <Bart.VanAssche@sandisk.com>, "hare@suse.de"
- <hare@suse.de>, "axboe@kernel.dk" <axboe@kernel.dk>
+Date: Tue, 31 Jan 2017 00:31:01 +0000
+Message-ID: <1485822639.2669.16.camel@sandisk.com>
 References: <1484732896-22941-1-git-send-email-hare@suse.de>
- <1485822639.2669.16.camel@sandisk.com>
-Cc: "hch@lst.de" <hch@lst.de>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "jth@kernel.org" <jth@kernel.org>
-From: Hannes Reinecke <hare@suse.com>
-Message-ID: <532c55c4-15da-d2f9-401c-36bc4343756b@suse.com>
-Date: Tue, 31 Jan 2017 17:15:06 +0100
+In-Reply-To: <1484732896-22941-1-git-send-email-hare@suse.de>
+Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
-In-Reply-To: <1485822639.2669.16.camel@sandisk.com>
-Content-Type: text/plain; charset=windows-1252
+Return-Path: Bart.VanAssche@sandisk.com
 List-ID: <linux-block@vger.kernel.org>
 
-On 01/31/2017 01:31 AM, Bart Van Assche wrote:
-> On Wed, 2017-01-18 at 10:48 +0100, Hannes Reinecke wrote:
->> @@ -1488,26 +1487,13 @@ static unsigned long disk_events_poll_jiffies(struct gendisk *disk)
->>  void disk_block_events(struct gendisk *disk)
->>  {
->>         struct disk_events *ev = disk->ev;
->> -       unsigned long flags;
->> -       bool cancel;
->>  
->>         if (!ev)
->>                 return;
->>  
->> -       /*
->> -        * Outer mutex ensures that the first blocker completes canceling
->> -        * the event work before further blockers are allowed to finish.
->> -        */
->> -       mutex_lock(&ev->block_mutex);
->> -
->> -       spin_lock_irqsave(&ev->lock, flags);
->> -       cancel = !ev->block++;
->> -       spin_unlock_irqrestore(&ev->lock, flags);
->> -
->> -       if (cancel)
->> +       if (atomic_inc_return(&ev->block) == 1)
->>                 cancel_delayed_work_sync(&disk->ev->dwork);
->>  
->> -       mutex_unlock(&ev->block_mutex);
->>  }
-> 
-> Hello Hannes,
-> 
-> I have already encountered a few times a deadlock that was caused by the
-> event checking code so I agree with you that it would be a big step forward
-> if such deadlocks wouldn't occur anymore. However, this patch realizes a
-> change that has not been described in the patch description, namely that
-> disk_block_events() calls are no longer serialized. Are you sure it is safe
-> to drop the serialization of disk_block_events() calls?
-> 
-Well, this whole synchronization stuff it a bit weird; I so totally fail
-to see the rationale for it.
-But anyway, once we've converted ev->block to atomics I _think_ the
-mutex_lock can remain; will be checking.
+On Wed, 2017-01-18 at 10:48 +0100, Hannes Reinecke wrote:
+> @@ -1488,26 +1487,13 @@ static unsigned long disk_events_poll_jiffies(str=
+uct gendisk *disk)
+> =A0void disk_block_events(struct gendisk *disk)
+> =A0{
+> =A0=A0=A0=A0=A0=A0=A0=A0struct disk_events *ev =3D disk->ev;
+> -=A0=A0=A0=A0=A0=A0=A0unsigned long flags;
+> -=A0=A0=A0=A0=A0=A0=A0bool cancel;
+> =A0
+> =A0=A0=A0=A0=A0=A0=A0=A0if (!ev)
+> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0return;
+> =A0
+> -=A0=A0=A0=A0=A0=A0=A0/*
+> -=A0=A0=A0=A0=A0=A0=A0 * Outer mutex ensures that the first blocker compl=
+etes canceling
+> -=A0=A0=A0=A0=A0=A0=A0 * the event work before further blockers are allow=
+ed to finish.
+> -=A0=A0=A0=A0=A0=A0=A0 */
+> -=A0=A0=A0=A0=A0=A0=A0mutex_lock(&ev->block_mutex);
+> -
+> -=A0=A0=A0=A0=A0=A0=A0spin_lock_irqsave(&ev->lock, flags);
+> -=A0=A0=A0=A0=A0=A0=A0cancel =3D !ev->block++;
+> -=A0=A0=A0=A0=A0=A0=A0spin_unlock_irqrestore(&ev->lock, flags);
+> -
+> -=A0=A0=A0=A0=A0=A0=A0if (cancel)
+> +=A0=A0=A0=A0=A0=A0=A0if (atomic_inc_return(&ev->block) =3D=3D 1)
+> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0cancel_delayed_work_sync(=
+&disk->ev->dwork);
+> =A0
+> -=A0=A0=A0=A0=A0=A0=A0mutex_unlock(&ev->block_mutex);
+> =A0}
 
-Cheers,
+Hello Hannes,
 
-Hannes
--- 
-Dr. Hannes Reinecke		               zSeries & Storage
-hare@suse.com			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: F. Imend�rffer, J. Smithard, D. Upmanyu, G. Norton
-HRB 21284 (AG N�rnberg)
+I have already encountered a few times a deadlock that was caused by the
+event checking code so I agree with you that it would be a big step forward
+if such deadlocks wouldn't occur anymore. However, this patch realizes a
+change that has not been described in the patch description, namely that
+disk_block_events() calls are no longer serialized. Are you sure it is safe
+to drop the serialization of disk_block_events() calls?
+
+Thanks,
+
+Bart.=
