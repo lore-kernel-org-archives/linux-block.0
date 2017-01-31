@@ -1,100 +1,122 @@
-Subject: Re: [PATCH 6/8] blk-mq-sched: add framework for MQ capable IO
- schedulers
-To: Paolo Valente <paolo.valente@linaro.org>
-References: <1481933536-12844-1-git-send-email-axboe@fb.com>
- <1481933536-12844-7-git-send-email-axboe@fb.com>
- <9936D33B-AE98-46DF-B1DA-D54142A338FD@linaro.org>
- <A117E4ED-1D8B-452F-9EF3-44E7714B5C75@linaro.org>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
- Linux-Kernal <linux-kernel@vger.kernel.org>, osandov@fb.com
-From: Jens Axboe <axboe@fb.com>
-Message-ID: <8d900827-3569-b695-86d6-3cfe27884d6a@fb.com>
-Date: Mon, 16 Jan 2017 18:47:14 -0800
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-bn3nam01on0058.outbound.protection.outlook.com ([104.47.33.58]:53760
+        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751656AbdAaMSA (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 31 Jan 2017 07:18:00 -0500
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
+To: <axboe@fb.com>
+CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
+Subject: [PATCH 02/12] lightnvm: collapse nvm_erase_ppa and nvm_erase_blk
+Date: Tue, 31 Jan 2017 13:17:10 +0100
+Message-ID: <20170131121720.10971-3-matias@cnexlabs.com>
+In-Reply-To: <20170131121720.10971-1-matias@cnexlabs.com>
+References: <20170131121720.10971-1-matias@cnexlabs.com>
 MIME-Version: 1.0
-In-Reply-To: <A117E4ED-1D8B-452F-9EF3-44E7714B5C75@linaro.org>
-Content-Type: text/plain; charset=windows-1252
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On 12/22/2016 04:13 AM, Paolo Valente wrote:
-> 
->> Il giorno 22 dic 2016, alle ore 10:59, Paolo Valente <paolo.valente@linaro.org> ha scritto:
->>
->>>
->>> Il giorno 17 dic 2016, alle ore 01:12, Jens Axboe <axboe@fb.com> ha scritto:
->>>
->>> This adds a set of hooks that intercepts the blk-mq path of
->>> allocating/inserting/issuing/completing requests, allowing
->>> us to develop a scheduler within that framework.
->>>
->>> We reuse the existing elevator scheduler API on the registration
->>> side, but augment that with the scheduler flagging support for
->>> the blk-mq interfce, and with a separate set of ops hooks for MQ
->>> devices.
->>>
->>> Schedulers can opt in to using shadow requests. Shadow requests
->>> are internal requests that the scheduler uses for for the allocate
->>> and insert part, which are then mapped to a real driver request
->>> at dispatch time. This is needed to separate the device queue depth
->>> from the pool of requests that the scheduler has to work with.
->>>
->>> Signed-off-by: Jens Axboe <axboe@fb.com>
->>>
->> ...
->>
->>> diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
->>> new file mode 100644
->>> index 000000000000..b7e1839d4785
->>> --- /dev/null
->>> +++ b/block/blk-mq-sched.c
->>
->>> ...
->>> +static inline bool
->>> +blk_mq_sched_allow_merge(struct request_queue *q, struct request *rq,
->>> +			 struct bio *bio)
->>> +{
->>> +	struct elevator_queue *e = q->elevator;
->>> +
->>> +	if (e && e->type->ops.mq.allow_merge)
->>> +		return e->type->ops.mq.allow_merge(q, rq, bio);
->>> +
->>> +	return true;
->>> +}
->>> +
->>
->> Something does not seem to add up here:
->> e->type->ops.mq.allow_merge may be called only in
->> blk_mq_sched_allow_merge, which, in its turn, may be called only in
->> blk_mq_attempt_merge, which, finally, may be called only in
->> blk_mq_merge_queue_io.  Yet the latter may be called only if there is
->> no elevator (line 1399 and 1507 in blk-mq.c).
->>
->> Therefore, e->type->ops.mq.allow_merge can never be called, both if
->> there is and if there is not an elevator.  Be patient if I'm missing
->> something huge, but I thought it was worth reporting this.
->>
-> 
-> Just another detail: if e->type->ops.mq.allow_merge does get invoked
-> from the above path, then it is invoked of course without the
-> scheduler lock held.  In contrast, if this function gets invoked
-> from dd_bio_merge, then the scheduler lock is held.
+After gennvm and core have been merged, there are no more callers to
+nvm_erase_ppa. Therefore collapse the device specific and target
+specific erase functions.
 
-But the scheduler controls that itself. So it'd be perfectly fine to
-have a locked and unlocked variant. The way that's typically done is to
-have function() grabbing the lock, and __function() is invoked with the
-lock held.
+Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
+---
+ drivers/lightnvm/core.c  | 57 ++++++++++++++++++++++--------------------------
+ include/linux/lightnvm.h |  1 -
+ 2 files changed, 26 insertions(+), 32 deletions(-)
 
-> To handle this opposite alternatives, I don't know whether checking if
-> the lock is held (and possibly taking it) from inside
-> e->type->ops.mq.allow_merge is a good solution.  In any case, before
-> possibly trying it, I will wait for some feedback on the main problem,
-> i.e., on the fact that e->type->ops.mq.allow_merge
-> seems unreachable in the above path.
-
-Checking if a lock is held is NEVER a good idea, as it leads to both bad
-and incorrect code. If you just check if a lock is held when being
-called, you don't necessarily know if it was the caller that grabbed it
-or it just happens to be held by someone else for unrelated reasons.
-
-
+diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+index e9a4956..a4e2e3b 100644
+--- a/drivers/lightnvm/core.c
++++ b/drivers/lightnvm/core.c
+@@ -683,12 +683,34 @@ int nvm_submit_io(struct nvm_tgt_dev *tgt_dev, struct nvm_rq *rqd)
+ }
+ EXPORT_SYMBOL(nvm_submit_io);
+ 
+-int nvm_erase_blk(struct nvm_tgt_dev *tgt_dev, struct ppa_addr *p, int flags)
++int nvm_erase_blk(struct nvm_tgt_dev *tgt_dev, struct ppa_addr *ppas, int flags)
+ {
+-	/* Convert address space */
+-	nvm_map_to_dev(tgt_dev, p);
++	struct nvm_dev *dev = tgt_dev->parent;
++	struct nvm_rq rqd;
++	int ret;
+ 
+-	return nvm_erase_ppa(tgt_dev->parent, p, 1, flags);
++	if (!dev->ops->erase_block)
++		return 0;
++
++	ret = nvm_map_to_dev(tgt_dev, ppas);
++	if (ret)
++		return ret;
++
++	memset(&rqd, 0, sizeof(struct nvm_rq));
++
++	ret = nvm_set_rqd_ppalist(dev, &rqd, ppas, 1, 1);
++	if (ret)
++		return ret;
++
++	nvm_generic_to_addr_mode(dev, &rqd);
++
++	rqd.flags = flags;
++
++	ret = dev->ops->erase_block(dev, &rqd);
++
++	nvm_free_rqd_ppalist(dev, &rqd);
++
++	return ret;
+ }
+ EXPORT_SYMBOL(nvm_erase_blk);
+ 
+@@ -847,33 +869,6 @@ void nvm_free_rqd_ppalist(struct nvm_dev *dev, struct nvm_rq *rqd)
+ }
+ EXPORT_SYMBOL(nvm_free_rqd_ppalist);
+ 
+-int nvm_erase_ppa(struct nvm_dev *dev, struct ppa_addr *ppas, int nr_ppas,
+-								int flags)
+-{
+-	struct nvm_rq rqd;
+-	int ret;
+-
+-	if (!dev->ops->erase_block)
+-		return 0;
+-
+-	memset(&rqd, 0, sizeof(struct nvm_rq));
+-
+-	ret = nvm_set_rqd_ppalist(dev, &rqd, ppas, nr_ppas, 1);
+-	if (ret)
+-		return ret;
+-
+-	nvm_generic_to_addr_mode(dev, &rqd);
+-
+-	rqd.flags = flags;
+-
+-	ret = dev->ops->erase_block(dev, &rqd);
+-
+-	nvm_free_rqd_ppalist(dev, &rqd);
+-
+-	return ret;
+-}
+-EXPORT_SYMBOL(nvm_erase_ppa);
+-
+ void nvm_end_io(struct nvm_rq *rqd, int error)
+ {
+ 	struct nvm_tgt_dev *tgt_dev = rqd->dev;
+diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
+index 84309fe..f2007b2 100644
+--- a/include/linux/lightnvm.h
++++ b/include/linux/lightnvm.h
+@@ -483,7 +483,6 @@ extern void nvm_addr_to_generic_mode(struct nvm_dev *, struct nvm_rq *);
+ extern int nvm_set_rqd_ppalist(struct nvm_dev *, struct nvm_rq *,
+ 					const struct ppa_addr *, int, int);
+ extern void nvm_free_rqd_ppalist(struct nvm_dev *, struct nvm_rq *);
+-extern int nvm_erase_ppa(struct nvm_dev *, struct ppa_addr *, int, int);
+ extern int nvm_erase_blk(struct nvm_tgt_dev *, struct ppa_addr *, int);
+ extern int nvm_get_l2p_tbl(struct nvm_tgt_dev *, u64, u32, nvm_l2p_update_fn *,
+ 			   void *);
 -- 
-Jens Axboe
+2.9.3
+
