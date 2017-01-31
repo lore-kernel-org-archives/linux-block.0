@@ -1,90 +1,32 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv6 11/37] HACK: readahead: alloc huge pages, if allowed
-Date: Thu, 26 Jan 2017 14:57:53 +0300
-Message-Id: <20170126115819.58875-12-kirill.shutemov@linux.intel.com>
-In-Reply-To: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
-References: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <jack@suse.cz>
+From: Jan Kara <jack@suse.cz>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
+	Laurent Dufour <ldufour@linux.vnet.ibm.com>,
+	Jan Kara <jack@suse.cz>
+Subject: [PATCH 0/4 v2] BDI lifetime fix
+Date: Tue, 31 Jan 2017 13:54:25 +0100
+Message-Id: <20170131125429.14303-1-jack@suse.cz>
 List-ID: <linux-block@vger.kernel.org>
 
-Most page cache allocation happens via readahead (sync or async), so if
-we want to have significant number of huge pages in page cache we need
-to find a ways to allocate them from readahead.
+Hello,
 
-Unfortunately, huge pages doesn't fit into current readahead design:
-128 max readahead window, assumption on page size, PageReadahead() to
-track hit/miss.
+this is a second version of the patch series that attempts to solve the
+problems with the life time of a backing_dev_info structure. Currently it lives
+inside request_queue structure and thus it gets destroyed as soon as request
+queue goes away. However the block device inode still stays around and thus
+inode_to_bdi() call on that inode (e.g. from flusher worker) may happen after
+request queue has been destroyed resulting in oops.
 
-I haven't found a ways to get it right yet.
+This patch set tries to solve these problems by making backing_dev_info
+independent structure referenced from block device inode. That makes sure
+inode_to_bdi() cannot ever oops. I gave some basic testing to the patches
+in KVM and on a real machine, Dan was running them with libnvdimm test suite
+which was previously triggering the oops and things look good. So they should
+be reasonably healthy. Laurent, if you can give these patches testing in your
+environment where you were triggering the oops, it would be nice.
 
-This patch just allocates huge page if allowed, but doesn't really
-provide any readahead if huge page is allocated. We read out 2M a time
-and I would expect spikes in latancy without readahead.
-
-Therefore HACK.
-
-Having that said, I don't think it should prevent huge page support to
-be applied. Future will show if lacking readahead is a big deal with
-huge pages in page cache.
-
-Any suggestions are welcome.
-
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
----
- mm/readahead.c | 17 ++++++++++++++++-
- 1 file changed, 16 insertions(+), 1 deletion(-)
-
-diff --git a/mm/readahead.c b/mm/readahead.c
-index c4ca70239233..289527a06254 100644
---- a/mm/readahead.c
-+++ b/mm/readahead.c
-@@ -174,6 +174,21 @@ int __do_page_cache_readahead(struct address_space *mapping, struct file *filp,
- 		if (page_offset > end_index)
- 			break;
- 
-+		if (IS_ENABLED(CONFIG_TRANSPARENT_HUGE_PAGECACHE) &&
-+				(!page_idx || !(page_offset % HPAGE_PMD_NR)) &&
-+				page_cache_allow_huge(mapping, page_offset)) {
-+			page = __page_cache_alloc_order(gfp_mask | __GFP_COMP,
-+					HPAGE_PMD_ORDER);
-+			if (page) {
-+				prep_transhuge_page(page);
-+				page->index = round_down(page_offset,
-+						HPAGE_PMD_NR);
-+				list_add(&page->lru, &page_pool);
-+				ret++;
-+				goto start_io;
-+			}
-+		}
-+
- 		rcu_read_lock();
- 		page = radix_tree_lookup(&mapping->page_tree, page_offset);
- 		rcu_read_unlock();
-@@ -189,7 +204,7 @@ int __do_page_cache_readahead(struct address_space *mapping, struct file *filp,
- 			SetPageReadahead(page);
- 		ret++;
- 	}
--
-+start_io:
- 	/*
- 	 * Now start the IO.  We ignore I/O errors - if the page is not
- 	 * uptodate then the caller will launch readpage again, and
--- 
-2.11.0
-
+								Honza
