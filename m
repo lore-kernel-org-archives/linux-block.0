@@ -1,44 +1,52 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
+Return-Path: <linux-ide-owner@vger.kernel.org>
 From: Christoph Hellwig <hch@lst.de>
 To: axboe@kernel.dk
 Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
         linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 03/10] mmc: remove pointless request type check in mmc_prep_request
-Date: Tue, 31 Jan 2017 16:57:24 +0100
-Message-Id: <1485878251-6107-4-git-send-email-hch@lst.de>
+Subject: [PATCH 06/10] nbd: remove REQ_TYPE_DRV_PRIV leftovers
+Date: Tue, 31 Jan 2017 16:57:27 +0100
+Message-Id: <1485878251-6107-7-git-send-email-hch@lst.de>
 In-Reply-To: <1485878251-6107-1-git-send-email-hch@lst.de>
 References: <1485878251-6107-1-git-send-email-hch@lst.de>
-Sender: linux-scsi-owner@vger.kernel.org
+Sender: linux-ide-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-The block layer won't send requests the driver isn't asking for,
-so remove this check.
+Disconnects don't use block layer requests these days, so all handling
+of private requests is dead code.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/mmc/core/queue.c | 9 ---------
- 1 file changed, 9 deletions(-)
+ drivers/block/nbd.c | 10 +---------
+ 1 file changed, 1 insertion(+), 9 deletions(-)
 
-diff --git a/drivers/mmc/core/queue.c b/drivers/mmc/core/queue.c
-index a6496d8..033f641 100644
---- a/drivers/mmc/core/queue.c
-+++ b/drivers/mmc/core/queue.c
-@@ -30,15 +30,6 @@ static int mmc_prep_request(struct request_queue *q, struct request *req)
- {
- 	struct mmc_queue *mq = q->queuedata;
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index 9fd06ee..d4c6281 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -193,13 +193,6 @@ static enum blk_eh_timer_return nbd_xmit_timeout(struct request *req,
+ 	set_bit(NBD_TIMEDOUT, &nbd->runtime_flags);
+ 	req->errors++;
  
 -	/*
--	 * We only like normal block requests and discards.
+-	 * If our disconnect packet times out then we're already holding the
+-	 * config_lock and could deadlock here, so just set an error and return,
+-	 * we'll handle shutting everything down later.
 -	 */
--	if (req->cmd_type != REQ_TYPE_FS && req_op(req) != REQ_OP_DISCARD &&
--	    req_op(req) != REQ_OP_SECURE_ERASE) {
--		blk_dump_rq_flags(req, "MMC bad request");
--		return BLKPREP_KILL;
--	}
--
- 	if (mq && (mmc_card_removed(mq->card) || mmc_access_rpmb(mq)))
- 		return BLKPREP_KILL;
+-	if (req->cmd_type == REQ_TYPE_DRV_PRIV)
+-		return BLK_EH_HANDLED;
+ 	mutex_lock(&nbd->config_lock);
+ 	sock_shutdown(nbd);
+ 	mutex_unlock(&nbd->config_lock);
+@@ -510,8 +503,7 @@ static void nbd_handle_cmd(struct nbd_cmd *cmd, int index)
+ 		goto error_out;
+ 	}
  
+-	if (req->cmd_type != REQ_TYPE_FS &&
+-	    req->cmd_type != REQ_TYPE_DRV_PRIV)
++	if (req->cmd_type != REQ_TYPE_FS)
+ 		goto error_out;
+ 
+ 	if (req->cmd_type == REQ_TYPE_FS &&
 -- 
 2.1.4
 
