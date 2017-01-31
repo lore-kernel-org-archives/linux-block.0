@@ -1,279 +1,196 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:58312 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750858AbdA1Jcw (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sat, 28 Jan 2017 04:32:52 -0500
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@fb.com>, mst@redhat.com, jasowang@redhat.com
-Cc: linux-block@vger.kernel.org,
-        virtualization@lists.linux-foundation.org
-Subject: [PATCH 5/5] virtio_blk: make SCSI passthrough support configurable
-Date: Sat, 28 Jan 2017 09:32:53 +0100
-Message-Id: <1485592373-29837-6-git-send-email-hch@lst.de>
-In-Reply-To: <1485592373-29837-1-git-send-email-hch@lst.de>
-References: <1485592373-29837-1-git-send-email-hch@lst.de>
+Received: from mail-bn3nam01on0043.outbound.protection.outlook.com ([104.47.33.43]:32224
+        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751513AbdAaMST (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 31 Jan 2017 07:18:19 -0500
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
+To: <axboe@fb.com>
+CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
+Subject: [PATCH 09/12] lightnvm: use end_io callback instead of instance
+Date: Tue, 31 Jan 2017 13:17:17 +0100
+Message-ID: <20170131121720.10971-10-matias@cnexlabs.com>
+In-Reply-To: <20170131121720.10971-1-matias@cnexlabs.com>
+References: <20170131121720.10971-1-matias@cnexlabs.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-The SCSI passthrough idea was a a bad idea to start with (guess who came
-up with it?), and has been removed from the virtio 1.O spec, and is not
-enabled by defauly by any host I know of.  Add a separate config option
-for it so that we don't need to enable it for most setups.  That way
-any bugs related to it (like the one recently fixed for vmapped stacks)
-do not affect other users, and the size of the virtblk_req structure
-also shrinks significantly.
+When the lightnvm core had the "gennvm" layer between the device and the
+target, there was a need for the core to be able to figure out which
+target it should send an end_io callback to. Leading to a "double"
+end_io, first for the media manager instance, and then for the target
+instance. Now that core and gennvm is merged, there is no longer a need
+for this, and a single end_io callback will do.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
 ---
- drivers/block/Kconfig      |  11 +++-
- drivers/block/virtio_blk.c | 143 +++++++++++++++++++++++++++++----------------
- 2 files changed, 104 insertions(+), 50 deletions(-)
+ drivers/block/null_blk.c     |  3 ++-
+ drivers/lightnvm/core.c      |  7 +++----
+ drivers/lightnvm/rrpc.c      |  7 +++----
+ drivers/lightnvm/rrpc.h      |  3 ---
+ drivers/nvme/host/lightnvm.c |  3 ++-
+ include/linux/lightnvm.h     | 10 +++-------
+ 6 files changed, 13 insertions(+), 20 deletions(-)
 
-diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
-index 7a4c787..f744de7 100644
---- a/drivers/block/Kconfig
-+++ b/drivers/block/Kconfig
-@@ -500,11 +500,20 @@ config XEN_BLKDEV_BACKEND
- config VIRTIO_BLK
- 	tristate "Virtio block driver"
- 	depends on VIRTIO
--	select BLK_SCSI_REQUEST
- 	---help---
- 	  This is the virtual block driver for virtio.  It can be used with
-           lguest or QEMU based VMMs (like KVM or Xen).  Say Y or M.
+diff --git a/drivers/block/null_blk.c b/drivers/block/null_blk.c
+index e666095..a67b7ea 100644
+--- a/drivers/block/null_blk.c
++++ b/drivers/block/null_blk.c
+@@ -420,7 +420,8 @@ static void null_lnvm_end_io(struct request *rq, int error)
+ {
+ 	struct nvm_rq *rqd = rq->end_io_data;
  
-+config VIRTIO_BLK_SCSI
-+	bool "SCSI passthrough request for the Virtio block driver"
-+	depends on VIRTIO_BLK
-+	select BLK_SCSI_REQUEST
-+	---help---
-+	  Enable support for SCSI passthrough (e.g. the SG_IO ioctl) on
-+	  virtio-blk devices.  This is only supported for the legacy
-+	  virtio protocol and not enabled by default by any hypervisor.
-+	  Your probably want to virtio-scsi instead.
-+
- config BLK_DEV_HD
- 	bool "Very old hard disk (MFM/RLL/IDE) driver"
- 	depends on HAVE_IDE
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index 7c730e2..d9491bd 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -52,11 +52,13 @@ struct virtio_blk {
+-	nvm_end_io(rqd, error);
++	rqd->error = error;
++	nvm_end_io(rqd);
+ 
+ 	blk_put_request(rq);
+ }
+diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+index 80cd767..4f4db99 100644
+--- a/drivers/lightnvm/core.c
++++ b/drivers/lightnvm/core.c
+@@ -773,17 +773,16 @@ void nvm_free_rqd_ppalist(struct nvm_dev *dev, struct nvm_rq *rqd)
+ }
+ EXPORT_SYMBOL(nvm_free_rqd_ppalist);
+ 
+-void nvm_end_io(struct nvm_rq *rqd, int error)
++void nvm_end_io(struct nvm_rq *rqd)
+ {
+ 	struct nvm_tgt_dev *tgt_dev = rqd->dev;
+-	struct nvm_tgt_instance *ins = rqd->ins;
+ 
+ 	/* Convert address space */
+ 	if (tgt_dev)
+ 		nvm_rq_dev_to_tgt(tgt_dev, rqd);
+ 
+-	rqd->error = error;
+-	ins->tt->end_io(rqd);
++	if (rqd->end_io)
++		rqd->end_io(rqd);
+ }
+ EXPORT_SYMBOL(nvm_end_io);
+ 
+diff --git a/drivers/lightnvm/rrpc.c b/drivers/lightnvm/rrpc.c
+index 9fb7de3..e00b1d7 100644
+--- a/drivers/lightnvm/rrpc.c
++++ b/drivers/lightnvm/rrpc.c
+@@ -779,7 +779,7 @@ static void rrpc_end_io_write(struct rrpc *rrpc, struct rrpc_rq *rrqd,
+ 
+ static void rrpc_end_io(struct nvm_rq *rqd)
+ {
+-	struct rrpc *rrpc = container_of(rqd->ins, struct rrpc, instance);
++	struct rrpc *rrpc = rqd->private;
+ 	struct nvm_tgt_dev *dev = rrpc->dev;
+ 	struct rrpc_rq *rrqd = nvm_rq_to_pdu(rqd);
+ 	uint8_t npages = rqd->nr_ppas;
+@@ -972,8 +972,9 @@ static int rrpc_submit_io(struct rrpc *rrpc, struct bio *bio,
+ 
+ 	bio_get(bio);
+ 	rqd->bio = bio;
+-	rqd->ins = &rrpc->instance;
++	rqd->private = rrpc;
+ 	rqd->nr_ppas = nr_pages;
++	rqd->end_io = rrpc_end_io;
+ 	rrq->flags = flags;
+ 
+ 	err = nvm_submit_io(dev, rqd);
+@@ -1532,7 +1533,6 @@ static void *rrpc_init(struct nvm_tgt_dev *dev, struct gendisk *tdisk)
+ 	if (!rrpc)
+ 		return ERR_PTR(-ENOMEM);
+ 
+-	rrpc->instance.tt = &tt_rrpc;
+ 	rrpc->dev = dev;
+ 	rrpc->disk = tdisk;
+ 
+@@ -1611,7 +1611,6 @@ static struct nvm_tgt_type tt_rrpc = {
+ 
+ 	.make_rq	= rrpc_make_rq,
+ 	.capacity	= rrpc_capacity,
+-	.end_io		= rrpc_end_io,
+ 
+ 	.init		= rrpc_init,
+ 	.exit		= rrpc_exit,
+diff --git a/drivers/lightnvm/rrpc.h b/drivers/lightnvm/rrpc.h
+index 94e4d73..fdb6ff9 100644
+--- a/drivers/lightnvm/rrpc.h
++++ b/drivers/lightnvm/rrpc.h
+@@ -102,9 +102,6 @@ struct rrpc_lun {
  };
  
- struct virtblk_req {
--	struct scsi_request sreq;	/* for SCSI passthrough */
--	struct virtio_blk_outhdr out_hdr;
-+#ifdef CONFIG_VIRTIO_BLK_SCSI
-+	struct scsi_request sreq;	/* for SCSI passthrough, must be first */
-+	u8 sense[SCSI_SENSE_BUFFERSIZE];
- 	struct virtio_scsi_inhdr in_hdr;
-+#endif
-+	struct virtio_blk_outhdr out_hdr;
- 	u8 status;
--	u8 sense[SCSI_SENSE_BUFFERSIZE];
- 	struct scatterlist sg[];
+ struct rrpc {
+-	/* instance must be kept in top to resolve rrpc in unprep */
+-	struct nvm_tgt_instance instance;
+-
+ 	struct nvm_tgt_dev *dev;
+ 	struct gendisk *disk;
+ 
+diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
+index 3b6cd9b..21cac85 100644
+--- a/drivers/nvme/host/lightnvm.c
++++ b/drivers/nvme/host/lightnvm.c
+@@ -484,7 +484,8 @@ static void nvme_nvm_end_io(struct request *rq, int error)
+ 	struct nvm_rq *rqd = rq->end_io_data;
+ 
+ 	rqd->ppa_status = nvme_req(rq)->result.u64;
+-	nvm_end_io(rqd, error);
++	rqd->error = error;
++	nvm_end_io(rqd);
+ 
+ 	kfree(nvme_req(rq)->cmd);
+ 	blk_mq_free_request(rq);
+diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
+index ce0b2da..17cd454 100644
+--- a/include/linux/lightnvm.h
++++ b/include/linux/lightnvm.h
+@@ -213,10 +213,6 @@ struct nvm_target {
+ 	struct gendisk *disk;
  };
  
-@@ -72,28 +74,88 @@ static inline int virtblk_result(struct virtblk_req *vbr)
- 	}
- }
- 
--static int __virtblk_add_req(struct virtqueue *vq,
--			     struct virtblk_req *vbr,
--			     struct scatterlist *data_sg,
--			     bool have_data)
-+/*
-+ * If this is a packet command we need a couple of additional headers.  Behind
-+ * the normal outhdr we put a segment with the scsi command block, and before
-+ * the normal inhdr we put the sense data and the inhdr with additional status
-+ * information.
-+ */
-+#ifdef CONFIG_VIRTIO_BLK_SCSI
-+static int virtblk_add_req_scsi(struct virtqueue *vq, struct virtblk_req *vbr,
-+		struct scatterlist *data_sg, bool have_data)
- {
- 	struct scatterlist hdr, status, cmd, sense, inhdr, *sgs[6];
- 	unsigned int num_out = 0, num_in = 0;
--	__virtio32 type = vbr->out_hdr.type & ~cpu_to_virtio32(vq->vdev, VIRTIO_BLK_T_OUT);
- 
- 	sg_init_one(&hdr, &vbr->out_hdr, sizeof(vbr->out_hdr));
- 	sgs[num_out++] = &hdr;
-+	sg_init_one(&cmd, vbr->sreq.cmd, vbr->sreq.cmd_len);
-+	sgs[num_out++] = &cmd;
-+
-+	if (have_data) {
-+		if (vbr->out_hdr.type & cpu_to_virtio32(vq->vdev, VIRTIO_BLK_T_OUT))
-+			sgs[num_out++] = data_sg;
-+		else
-+			sgs[num_out + num_in++] = data_sg;
-+	}
-+
-+	sg_init_one(&sense, vbr->sense, SCSI_SENSE_BUFFERSIZE);
-+	sgs[num_out + num_in++] = &sense;
-+	sg_init_one(&inhdr, &vbr->in_hdr, sizeof(vbr->in_hdr));
-+	sgs[num_out + num_in++] = &inhdr;
-+	sg_init_one(&status, &vbr->status, sizeof(vbr->status));
-+	sgs[num_out + num_in++] = &status;
-+
-+	return virtqueue_add_sgs(vq, sgs, num_out, num_in, vbr, GFP_ATOMIC);
-+}
-+
-+static inline void virtblk_scsi_reques_done(struct request *req)
-+{
-+	struct virtblk_req *vbr = blk_mq_rq_to_pdu(req);
-+	struct virtio_blk *vblk = req->q->queuedata;
-+	struct scsi_request *sreq = &vbr->sreq;
-+
-+	sreq->resid_len = virtio32_to_cpu(vblk->vdev, vbr->in_hdr.residual);
-+	sreq->sense_len = virtio32_to_cpu(vblk->vdev, vbr->in_hdr.sense_len);
-+	req->errors = virtio32_to_cpu(vblk->vdev, vbr->in_hdr.errors);
-+}
-+
-+static int virtblk_ioctl(struct block_device *bdev, fmode_t mode,
-+			     unsigned int cmd, unsigned long data)
-+{
-+	struct gendisk *disk = bdev->bd_disk;
-+	struct virtio_blk *vblk = disk->private_data;
- 
- 	/*
--	 * If this is a packet command we need a couple of additional headers.
--	 * Behind the normal outhdr we put a segment with the scsi command
--	 * block, and before the normal inhdr we put the sense data and the
--	 * inhdr with additional status information.
-+	 * Only allow the generic SCSI ioctls if the host can support it.
- 	 */
--	if (type == cpu_to_virtio32(vq->vdev, VIRTIO_BLK_T_SCSI_CMD)) {
--		sg_init_one(&cmd, vbr->sreq.cmd, vbr->sreq.cmd_len);
--		sgs[num_out++] = &cmd;
--	}
-+	if (!virtio_has_feature(vblk->vdev, VIRTIO_BLK_F_SCSI))
-+		return -ENOTTY;
-+
-+	return scsi_cmd_blk_ioctl(bdev, mode, cmd,
-+				  (void __user *)data);
-+}
-+#else
-+static inline int virtblk_add_req_scsi(struct virtqueue *vq,
-+		struct virtblk_req *vbr, struct scatterlist *data_sg,
-+		bool have_data)
-+{
-+	return -EIO;
-+}
-+static inline void virtblk_scsi_reques_done(struct request *req)
-+{
-+}
-+#define virtblk_ioctl	NULL
-+#endif /* CONFIG_VIRTIO_BLK_SCSI */
-+
-+static int virtblk_add_req(struct virtqueue *vq, struct virtblk_req *vbr,
-+		struct scatterlist *data_sg, bool have_data)
-+{
-+	struct scatterlist hdr, status, *sgs[3];
-+	unsigned int num_out = 0, num_in = 0;
-+
-+	sg_init_one(&hdr, &vbr->out_hdr, sizeof(vbr->out_hdr));
-+	sgs[num_out++] = &hdr;
- 
- 	if (have_data) {
- 		if (vbr->out_hdr.type & cpu_to_virtio32(vq->vdev, VIRTIO_BLK_T_OUT))
-@@ -102,13 +164,6 @@ static int __virtblk_add_req(struct virtqueue *vq,
- 			sgs[num_out + num_in++] = data_sg;
- 	}
- 
--	if (type == cpu_to_virtio32(vq->vdev, VIRTIO_BLK_T_SCSI_CMD)) {
--		sg_init_one(&sense, vbr->sense, SCSI_SENSE_BUFFERSIZE);
--		sgs[num_out + num_in++] = &sense;
--		sg_init_one(&inhdr, &vbr->in_hdr, sizeof(vbr->in_hdr));
--		sgs[num_out + num_in++] = &inhdr;
--	}
+-struct nvm_tgt_instance {
+-	struct nvm_tgt_type *tt;
+-};
 -
- 	sg_init_one(&status, &vbr->status, sizeof(vbr->status));
- 	sgs[num_out + num_in++] = &status;
+ #define ADDR_EMPTY (~0ULL)
  
-@@ -118,17 +173,15 @@ static int __virtblk_add_req(struct virtqueue *vq,
- static inline void virtblk_request_done(struct request *req)
- {
- 	struct virtblk_req *vbr = blk_mq_rq_to_pdu(req);
--	struct virtio_blk *vblk = req->q->queuedata;
- 	int error = virtblk_result(vbr);
+ #define NVM_VERSION_MAJOR 1
+@@ -227,7 +223,6 @@ struct nvm_rq;
+ typedef void (nvm_end_io_fn)(struct nvm_rq *);
  
--	if (req->cmd_type == REQ_TYPE_BLOCK_PC) {
--		scsi_req(req)->resid_len =
--			virtio32_to_cpu(vblk->vdev, vbr->in_hdr.residual);
--		vbr->sreq.sense_len =
--			virtio32_to_cpu(vblk->vdev, vbr->in_hdr.sense_len);
--		req->errors = virtio32_to_cpu(vblk->vdev, vbr->in_hdr.errors);
--	} else if (req->cmd_type == REQ_TYPE_DRV_PRIV) {
-+	switch (req->cmd_type) {
-+	case REQ_TYPE_BLOCK_PC:
-+		virtblk_scsi_reques_done(req);
-+		break;
-+	case REQ_TYPE_DRV_PRIV:
- 		req->errors = (error != 0);
-+		break;
- 	}
+ struct nvm_rq {
+-	struct nvm_tgt_instance *ins;
+ 	struct nvm_tgt_dev *dev;
  
- 	blk_mq_end_request(req, error);
-@@ -214,7 +267,10 @@ static int virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	}
+ 	struct bio *bio;
+@@ -251,6 +246,8 @@ struct nvm_rq {
  
- 	spin_lock_irqsave(&vblk->vqs[qid].lock, flags);
--	err = __virtblk_add_req(vblk->vqs[qid].vq, vbr, vbr->sg, num);
-+	if (req->cmd_type == REQ_TYPE_BLOCK_PC)
-+		err = virtblk_add_req_scsi(vblk->vqs[qid].vq, vbr, vbr->sg, num);
-+	else
-+		err = virtblk_add_req(vblk->vqs[qid].vq, vbr, vbr->sg, num);
- 	if (err) {
- 		virtqueue_kick(vblk->vqs[qid].vq);
- 		blk_mq_stop_hw_queue(hctx);
-@@ -259,22 +315,6 @@ static int virtblk_get_id(struct gendisk *disk, char *id_str)
- 	return err;
- }
+ 	u64 ppa_status; /* ppa media status */
+ 	int error;
++
++	void *private;
+ };
  
--static int virtblk_ioctl(struct block_device *bdev, fmode_t mode,
--			     unsigned int cmd, unsigned long data)
--{
--	struct gendisk *disk = bdev->bd_disk;
--	struct virtio_blk *vblk = disk->private_data;
--
--	/*
--	 * Only allow the generic SCSI ioctls if the host can support it.
--	 */
--	if (!virtio_has_feature(vblk->vdev, VIRTIO_BLK_F_SCSI))
--		return -ENOTTY;
--
--	return scsi_cmd_blk_ioctl(bdev, mode, cmd,
--				  (void __user *)data);
--}
--
- /* We provide getgeo only to please some old bootloader/partitioning tools */
- static int virtblk_getgeo(struct block_device *bd, struct hd_geometry *geo)
- {
-@@ -540,7 +580,9 @@ static int virtblk_init_request(void *data, struct request *rq,
- 	struct virtio_blk *vblk = data;
- 	struct virtblk_req *vbr = blk_mq_rq_to_pdu(rq);
+ static inline struct nvm_rq *nvm_rq_from_pdu(void *pdu)
+@@ -450,7 +447,6 @@ struct nvm_tgt_type {
+ 	/* target entry points */
+ 	nvm_tgt_make_rq_fn *make_rq;
+ 	nvm_tgt_capacity_fn *capacity;
+-	nvm_end_io_fn *end_io;
  
-+#ifdef CONFIG_VIRTIO_BLK_SCSI
- 	vbr->sreq.sense = vbr->sense;
-+#endif
- 	sg_init_table(vbr->sg, vblk->sg_elems);
- 	return 0;
- }
-@@ -824,7 +866,10 @@ static const struct virtio_device_id id_table[] = {
+ 	/* module-specific init/teardown */
+ 	nvm_tgt_init_fn *init;
+@@ -484,7 +480,7 @@ extern int nvm_get_l2p_tbl(struct nvm_tgt_dev *, u64, u32, nvm_l2p_update_fn *,
+ 			   void *);
+ extern int nvm_get_area(struct nvm_tgt_dev *, sector_t *, sector_t);
+ extern void nvm_put_area(struct nvm_tgt_dev *, sector_t);
+-extern void nvm_end_io(struct nvm_rq *, int);
++extern void nvm_end_io(struct nvm_rq *);
+ extern int nvm_bb_tbl_fold(struct nvm_dev *, u8 *, int);
+ extern int nvm_get_tgt_bb_tbl(struct nvm_tgt_dev *, struct ppa_addr, u8 *);
  
- static unsigned int features_legacy[] = {
- 	VIRTIO_BLK_F_SEG_MAX, VIRTIO_BLK_F_SIZE_MAX, VIRTIO_BLK_F_GEOMETRY,
--	VIRTIO_BLK_F_RO, VIRTIO_BLK_F_BLK_SIZE, VIRTIO_BLK_F_SCSI,
-+	VIRTIO_BLK_F_RO, VIRTIO_BLK_F_BLK_SIZE,
-+#ifdef CONFIG_VIRTIO_BLK_SCSI
-+	VIRTIO_BLK_F_SCSI,
-+#endif
- 	VIRTIO_BLK_F_FLUSH, VIRTIO_BLK_F_TOPOLOGY, VIRTIO_BLK_F_CONFIG_WCE,
- 	VIRTIO_BLK_F_MQ,
- }
 -- 
-2.1.4
+2.9.3
 
