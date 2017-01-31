@@ -1,154 +1,167 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@fb.com>
-Cc: Mike Snitzer <snitzer@redhat.com>,
-        Junichi Nomura <j-nomura@ce.jp.nec.com>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-raid@vger.kernel.org, dm-devel@redhat.com
-Subject: [PATCH 14/18] scsi: remove __scsi_alloc_queue
-Date: Wed, 25 Jan 2017 18:25:22 +0100
-Message-Id: <1485365126-23210-15-git-send-email-hch@lst.de>
-In-Reply-To: <1485365126-23210-1-git-send-email-hch@lst.de>
-References: <1485365126-23210-1-git-send-email-hch@lst.de>
-Sender: linux-scsi-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-bn3nam01on0043.outbound.protection.outlook.com ([104.47.33.43]:32224
+        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1752003AbdAaMSO (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 31 Jan 2017 07:18:14 -0500
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
+To: <axboe@fb.com>
+CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
+Subject: [PATCH 03/12] lightnvm: remove nvm_submit_ppa* functions
+Date: Tue, 31 Jan 2017 13:17:11 +0100
+Message-ID: <20170131121720.10971-4-matias@cnexlabs.com>
+In-Reply-To: <20170131121720.10971-1-matias@cnexlabs.com>
+References: <20170131121720.10971-1-matias@cnexlabs.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Instead do an internal export of __scsi_init_queue for the transport
-classes that export BSG nodes.
+The nvm_submit_ppa* functions are no longer needed after gennvm and core
+have been merged.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
 ---
- drivers/scsi/scsi_lib.c             | 19 ++++---------------
- drivers/scsi/scsi_transport_fc.c    |  6 ++++--
- drivers/scsi/scsi_transport_iscsi.c |  3 ++-
- include/scsi/scsi_host.h            |  2 --
- include/scsi/scsi_transport.h       |  2 ++
- 5 files changed, 12 insertions(+), 20 deletions(-)
+ drivers/lightnvm/core.c  | 109 -----------------------------------------------
+ include/linux/lightnvm.h |   4 --
+ 2 files changed, 113 deletions(-)
 
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 3d6b364..7950516 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -2082,7 +2082,7 @@ static u64 scsi_calculate_bounce_limit(struct Scsi_Host *shost)
- 	return bounce_limit;
+diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+index a4e2e3b..ffdf048 100644
+--- a/drivers/lightnvm/core.c
++++ b/drivers/lightnvm/core.c
+@@ -883,115 +883,6 @@ void nvm_end_io(struct nvm_rq *rqd, int error)
  }
+ EXPORT_SYMBOL(nvm_end_io);
  
--static void __scsi_init_queue(struct Scsi_Host *shost, struct request_queue *q)
-+void __scsi_init_queue(struct Scsi_Host *shost, struct request_queue *q)
- {
- 	struct device *dev = shost->dma_dev;
- 
-@@ -2117,28 +2117,17 @@ static void __scsi_init_queue(struct Scsi_Host *shost, struct request_queue *q)
- 	 */
- 	blk_queue_dma_alignment(q, 0x03);
- }
--
--struct request_queue *__scsi_alloc_queue(struct Scsi_Host *shost,
--					 request_fn_proc *request_fn)
+-static void nvm_end_io_sync(struct nvm_rq *rqd)
 -{
--	struct request_queue *q;
+-	struct completion *waiting = rqd->wait;
 -
--	q = blk_init_queue(request_fn, NULL);
--	if (!q)
--		return NULL;
--	__scsi_init_queue(shost, q);
--	return q;
+-	rqd->wait = NULL;
+-
+-	complete(waiting);
 -}
--EXPORT_SYMBOL(__scsi_alloc_queue);
-+EXPORT_SYMBOL_GPL(__scsi_init_queue);
- 
- struct request_queue *scsi_alloc_queue(struct scsi_device *sdev)
- {
- 	struct request_queue *q;
- 
--	q = __scsi_alloc_queue(sdev->host, scsi_request_fn);
-+	q = blk_init_queue(scsi_request_fn, NULL);
- 	if (!q)
- 		return NULL;
- 
-+	__scsi_init_queue(sdev->host, q);
- 	blk_queue_prep_rq(q, scsi_prep_fn);
- 	blk_queue_unprep_rq(q, scsi_unprep_fn);
- 	blk_queue_softirq_done(q, scsi_softirq_done);
-diff --git a/drivers/scsi/scsi_transport_fc.c b/drivers/scsi/scsi_transport_fc.c
-index 03577bd..afcedec 100644
---- a/drivers/scsi/scsi_transport_fc.c
-+++ b/drivers/scsi/scsi_transport_fc.c
-@@ -3776,7 +3776,7 @@ fc_bsg_hostadd(struct Scsi_Host *shost, struct fc_host_attrs *fc_host)
- 	snprintf(bsg_name, sizeof(bsg_name),
- 		 "fc_host%d", shost->host_no);
- 
--	q = __scsi_alloc_queue(shost, bsg_request_fn);
-+	q = blk_init_queue(bsg_request_fn, NULL);
- 	if (!q) {
- 		dev_err(dev,
- 			"fc_host%d: bsg interface failed to initialize - no request queue\n",
-@@ -3784,6 +3784,7 @@ fc_bsg_hostadd(struct Scsi_Host *shost, struct fc_host_attrs *fc_host)
- 		return -ENOMEM;
- 	}
- 
-+	__scsi_init_queue(shost, q);
- 	err = bsg_setup_queue(dev, q, bsg_name, fc_bsg_dispatch,
- 				 i->f->dd_bsg_size);
- 	if (err) {
-@@ -3831,12 +3832,13 @@ fc_bsg_rportadd(struct Scsi_Host *shost, struct fc_rport *rport)
- 	if (!i->f->bsg_request)
- 		return -ENOTSUPP;
- 
--	q = __scsi_alloc_queue(shost, bsg_request_fn);
-+	q = blk_init_queue(bsg_request_fn, NULL);
- 	if (!q) {
- 		dev_err(dev, "bsg interface failed to initialize - no request queue\n");
- 		return -ENOMEM;
- 	}
- 
-+	__scsi_init_queue(shost, q);
- 	err = bsg_setup_queue(dev, q, NULL, fc_bsg_dispatch, i->f->dd_bsg_size);
- 	if (err) {
- 		dev_err(dev, "failed to setup bsg queue\n");
-diff --git a/drivers/scsi/scsi_transport_iscsi.c b/drivers/scsi/scsi_transport_iscsi.c
-index 42bca61..04ebe6e 100644
---- a/drivers/scsi/scsi_transport_iscsi.c
-+++ b/drivers/scsi/scsi_transport_iscsi.c
-@@ -1544,10 +1544,11 @@ iscsi_bsg_host_add(struct Scsi_Host *shost, struct iscsi_cls_host *ihost)
- 
- 	snprintf(bsg_name, sizeof(bsg_name), "iscsi_host%d", shost->host_no);
- 
--	q = __scsi_alloc_queue(shost, bsg_request_fn);
-+	q = blk_init_queue(bsg_request_fn, NULL);
- 	if (!q)
- 		return -ENOMEM;
- 
-+	__scsi_init_queue(shost, q);
- 	ret = bsg_setup_queue(dev, q, bsg_name, iscsi_bsg_host_dispatch, 0);
- 	if (ret) {
- 		shost_printk(KERN_ERR, shost, "bsg interface failed to "
-diff --git a/include/scsi/scsi_host.h b/include/scsi/scsi_host.h
-index 36680f1..f4964d7 100644
---- a/include/scsi/scsi_host.h
-+++ b/include/scsi/scsi_host.h
-@@ -826,8 +826,6 @@ extern void scsi_block_requests(struct Scsi_Host *);
- 
- struct class_container;
- 
--extern struct request_queue *__scsi_alloc_queue(struct Scsi_Host *shost,
--						void (*) (struct request_queue *));
+-
+-static int __nvm_submit_ppa(struct nvm_dev *dev, struct nvm_rq *rqd, int opcode,
+-						int flags, void *buf, int len)
+-{
+-	DECLARE_COMPLETION_ONSTACK(wait);
+-	struct bio *bio;
+-	int ret;
+-	unsigned long hang_check;
+-
+-	bio = bio_map_kern(dev->q, buf, len, GFP_KERNEL);
+-	if (IS_ERR_OR_NULL(bio))
+-		return -ENOMEM;
+-
+-	nvm_generic_to_addr_mode(dev, rqd);
+-
+-	rqd->dev = NULL;
+-	rqd->opcode = opcode;
+-	rqd->flags = flags;
+-	rqd->bio = bio;
+-	rqd->wait = &wait;
+-	rqd->end_io = nvm_end_io_sync;
+-
+-	ret = dev->ops->submit_io(dev, rqd);
+-	if (ret) {
+-		bio_put(bio);
+-		return ret;
+-	}
+-
+-	/* Prevent hang_check timer from firing at us during very long I/O */
+-	hang_check = sysctl_hung_task_timeout_secs;
+-	if (hang_check)
+-		while (!wait_for_completion_io_timeout(&wait,
+-							hang_check * (HZ/2)))
+-			;
+-	else
+-		wait_for_completion_io(&wait);
+-
+-	return rqd->error;
+-}
+-
+-/**
+- * nvm_submit_ppa_list - submit user-defined ppa list to device. The user must
+- *			 take to free ppa list if necessary.
+- * @dev:	device
+- * @ppa_list:	user created ppa_list
+- * @nr_ppas:	length of ppa_list
+- * @opcode:	device opcode
+- * @flags:	device flags
+- * @buf:	data buffer
+- * @len:	data buffer length
+- */
+-int nvm_submit_ppa_list(struct nvm_dev *dev, struct ppa_addr *ppa_list,
+-			int nr_ppas, int opcode, int flags, void *buf, int len)
+-{
+-	struct nvm_rq rqd;
+-
+-	if (dev->ops->max_phys_sect < nr_ppas)
+-		return -EINVAL;
+-
+-	memset(&rqd, 0, sizeof(struct nvm_rq));
+-
+-	rqd.nr_ppas = nr_ppas;
+-	if (nr_ppas > 1)
+-		rqd.ppa_list = ppa_list;
+-	else
+-		rqd.ppa_addr = ppa_list[0];
+-
+-	return __nvm_submit_ppa(dev, &rqd, opcode, flags, buf, len);
+-}
+-EXPORT_SYMBOL(nvm_submit_ppa_list);
+-
+-/**
+- * nvm_submit_ppa - submit PPAs to device. PPAs will automatically be unfolded
+- *		    as single, dual, quad plane PPAs depending on device type.
+- * @dev:	device
+- * @ppa:	user created ppa_list
+- * @nr_ppas:	length of ppa_list
+- * @opcode:	device opcode
+- * @flags:	device flags
+- * @buf:	data buffer
+- * @len:	data buffer length
+- */
+-int nvm_submit_ppa(struct nvm_dev *dev, struct ppa_addr *ppa, int nr_ppas,
+-				int opcode, int flags, void *buf, int len)
+-{
+-	struct nvm_rq rqd;
+-	int ret;
+-
+-	memset(&rqd, 0, sizeof(struct nvm_rq));
+-	ret = nvm_set_rqd_ppalist(dev, &rqd, ppa, nr_ppas, 1);
+-	if (ret)
+-		return ret;
+-
+-	ret = __nvm_submit_ppa(dev, &rqd, opcode, flags, buf, len);
+-
+-	nvm_free_rqd_ppalist(dev, &rqd);
+-
+-	return ret;
+-}
+-EXPORT_SYMBOL(nvm_submit_ppa);
+-
  /*
-  * These two functions are used to allocate and free a pseudo device
-  * which will connect to the host adapter itself rather than any
-diff --git a/include/scsi/scsi_transport.h b/include/scsi/scsi_transport.h
-index 8129239..b6e07b5 100644
---- a/include/scsi/scsi_transport.h
-+++ b/include/scsi/scsi_transport.h
-@@ -119,4 +119,6 @@ scsi_transport_device_data(struct scsi_device *sdev)
- 		+ shost->transportt->device_private_offset;
- }
- 
-+void __scsi_init_queue(struct Scsi_Host *shost, struct request_queue *q);
-+
- #endif /* SCSI_TRANSPORT_H */
+  * folds a bad block list from its plane representation to its virtual
+  * block representation. The fold is done in place and reduced size is
+diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
+index f2007b2..abb3d55 100644
+--- a/include/linux/lightnvm.h
++++ b/include/linux/lightnvm.h
+@@ -489,10 +489,6 @@ extern int nvm_get_l2p_tbl(struct nvm_tgt_dev *, u64, u32, nvm_l2p_update_fn *,
+ extern int nvm_get_area(struct nvm_tgt_dev *, sector_t *, sector_t);
+ extern void nvm_put_area(struct nvm_tgt_dev *, sector_t);
+ extern void nvm_end_io(struct nvm_rq *, int);
+-extern int nvm_submit_ppa(struct nvm_dev *, struct ppa_addr *, int, int, int,
+-								void *, int);
+-extern int nvm_submit_ppa_list(struct nvm_dev *, struct ppa_addr *, int, int,
+-							int, void *, int);
+ extern int nvm_bb_tbl_fold(struct nvm_dev *, u8 *, int);
+ extern int nvm_get_bb_tbl(struct nvm_dev *, struct ppa_addr, u8 *);
+ extern int nvm_get_tgt_bb_tbl(struct nvm_tgt_dev *, struct ppa_addr, u8 *);
 -- 
-2.1.4
+2.9.3
 
