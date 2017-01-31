@@ -1,95 +1,77 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga05.intel.com ([192.55.52.43]:48629 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753266AbdAZL7J (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 26 Jan 2017 06:59:09 -0500
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv6 21/37] truncate: make invalidate_inode_pages2_range() aware about huge pages
-Date: Thu, 26 Jan 2017 14:58:03 +0300
-Message-Id: <20170126115819.58875-22-kirill.shutemov@linux.intel.com>
-In-Reply-To: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
-References: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
+Received: from mail-pf0-f175.google.com ([209.85.192.175]:32977 "EHLO
+        mail-pf0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750796AbdAaXBG (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 31 Jan 2017 18:01:06 -0500
+Received: by mail-pf0-f175.google.com with SMTP id y143so112699878pfb.0
+        for <linux-block@vger.kernel.org>; Tue, 31 Jan 2017 15:01:05 -0800 (PST)
+From: Omar Sandoval <osandov@osandov.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
+Cc: kernel-team@fb.com
+Subject: [PATCH 6/6] blktrace: use existing disk debugfs directory
+Date: Tue, 31 Jan 2017 14:53:22 -0800
+Message-Id: <d5352b86e54c7596cfb8c511868b54b724110d09.1485902856.git.osandov@fb.com>
+In-Reply-To: <cover.1485902856.git.osandov@fb.com>
+References: <cover.1485902856.git.osandov@fb.com>
+In-Reply-To: <cover.1485902856.git.osandov@fb.com>
+References: <cover.1485902856.git.osandov@fb.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-For huge pages we need to unmap whole range covered by the huge page.
+From: Omar Sandoval <osandov@fb.com>
 
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+We may already have a directory to put the blktrace stuff in if
+
+1. The disk uses blk-mq
+2. CONFIG_BLK_DEBUG_FS is enabled
+3. We are tracing the whole disk and not a partition
+
+Instead of hardcoding this very specific case, let's use the new
+debugfs_lookup(). If the directory exists, we use it, otherwise we
+create one and clean it up later.
+
+Fixes: 07e4fead45e6 ("blk-mq: create debugfs directory tree")
+Signed-off-by: Omar Sandoval <osandov@fb.com>
 ---
- mm/truncate.c | 23 ++++++++++++++---------
- 1 file changed, 14 insertions(+), 9 deletions(-)
+ kernel/trace/blktrace.c | 13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
 
-diff --git a/mm/truncate.c b/mm/truncate.c
-index 81e1a13acb63..ddb615e6a193 100644
---- a/mm/truncate.c
-+++ b/mm/truncate.c
-@@ -703,27 +703,32 @@ int invalidate_inode_pages2_range(struct address_space *mapping,
- 				continue;
- 			}
- 			wait_on_page_writeback(page);
-+
- 			if (page_mapped(page)) {
-+				loff_t begin, len;
-+
-+				begin = index << PAGE_SHIFT;
- 				if (!did_range_unmap) {
- 					/*
- 					 * Zap the rest of the file in one hit.
- 					 */
-+					len = (loff_t)(1 + end - index) <<
-+						PAGE_SHIFT;
-+					if (len < hpage_size(page))
-+						len = hpage_size(page);
- 					unmap_mapping_range(mapping,
--					   (loff_t)index << PAGE_SHIFT,
--					   (loff_t)(1 + end - index)
--							 << PAGE_SHIFT,
--							 0);
-+							begin, len, 0);
- 					did_range_unmap = 1;
- 				} else {
- 					/*
- 					 * Just zap this page
- 					 */
--					unmap_mapping_range(mapping,
--					   (loff_t)index << PAGE_SHIFT,
--					   PAGE_SIZE, 0);
-+					len = hpage_size(page);
-+					unmap_mapping_range(mapping, begin,
-+							len, 0);
- 				}
- 			}
--			BUG_ON(page_mapped(page));
-+			VM_BUG_ON_PAGE(page_mapped(page), page);
- 			ret2 = do_launder_page(mapping, page);
- 			if (ret2 == 0) {
- 				if (!invalidate_complete_page2(mapping, page))
-@@ -734,9 +739,9 @@ int invalidate_inode_pages2_range(struct address_space *mapping,
- 			unlock_page(page);
- 		}
- 		pagevec_remove_exceptionals(&pvec);
-+		index += pvec.nr ? hpage_nr_pages(pvec.pages[pvec.nr - 1]) : 1;
- 		pagevec_release(&pvec);
- 		cond_resched();
--		index++;
- 	}
- 	cleancache_invalidate_inode(mapping);
+diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+index 38052f625a0f..cc9d23692a35 100644
+--- a/kernel/trace/blktrace.c
++++ b/kernel/trace/blktrace.c
+@@ -470,12 +470,12 @@ static int do_blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
+ 	if (!blk_debugfs_root)
+ 		goto err;
+ 
+-	dir = debugfs_create_dir(buts->name, blk_debugfs_root);
+-
++	dir = debugfs_lookup(buts->name, blk_debugfs_root);
++	if (!dir)
++		bt->dir = dir = debugfs_create_dir(buts->name, blk_debugfs_root);
+ 	if (!dir)
+ 		goto err;
+ 
+-	bt->dir = dir;
+ 	bt->dev = dev;
+ 	atomic_set(&bt->dropped, 0);
+ 	INIT_LIST_HEAD(&bt->running_list);
+@@ -517,9 +517,12 @@ static int do_blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
+ 	if (atomic_inc_return(&blk_probes_ref) == 1)
+ 		blk_register_tracepoints();
+ 
+-	return 0;
++	ret = 0;
+ err:
+-	blk_trace_free(bt);
++	if (dir && !bt->dir)
++		dput(dir);
++	if (ret)
++		blk_trace_free(bt);
  	return ret;
+ }
+ 
 -- 
 2.11.0
 
