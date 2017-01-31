@@ -1,39 +1,50 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <sergei.shtylyov@cogentembedded.com>
+Return-Path: <sergei.shtylyov@cogentembedded.com>
 Subject: Re: remove the cmd_type field from struct request
-To: Christoph Hellwig <hch@lst.de>
+To: James Bottomley <James.Bottomley@HansenPartnership.com>,
+ Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>
 References: <1485878251-6107-1-git-send-email-hch@lst.de>
+ <bbe16fc1-5652-bbc2-03a5-0298c3f16645@kernel.dk>
+ <1485888674.3199.49.camel@HansenPartnership.com>
 Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
  linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <13b5993e-5b1b-696c-cdea-50c1ffade5ec@kernel.dk>
-Date: Tue, 31 Jan 2017 13:07:01 -0800
+From: Sergei Shtylyov <sergei.shtylyov@cogentembedded.com>
+Message-ID: <ebcc36be-9c02-eff3-33a0-20f7dedc3c0b@cogentembedded.com>
+Date: Tue, 31 Jan 2017 21:58:15 +0300
 MIME-Version: 1.0
-In-Reply-To: <1485878251-6107-1-git-send-email-hch@lst.de>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <1485888674.3199.49.camel@HansenPartnership.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-On 01/31/2017 07:57 AM, Christoph Hellwig wrote:
-> Hi Jens,
-> 
-> this series gets rid of the cmd_type field in struct request and
-> instead folds it into the REQ_OP* space.  This reduces the size of
-> struct request, and leads to a single op namespace that drivers
-> can easily switch on.  Except for the legacy ide driver which has
-> a mess of different request types [1] this also nicely cleans up the
-> code.
-> 
-> Note that the patches are on top of the
-> 
->     "make SCSI passthrough support optional"
-> 
-> series I sent out on Saturday.  To make life easier I also have a git
-> tree available here:
-> 
-> 	git://git.infradead.org/users/hch/block.git cmd_type
-> 
-> 	http://git.infradead.org/users/hch/block.git/shortlog/refs/heads/cmd_type
+On 01/31/2017 09:51 PM, James Bottomley wrote:
 
-Looks good to me, applied for 4.11.
+>>> [1] which were a pain in the ass to untangle and debug during
+>>> development, it's really time for it to die..
+>>
+>> Outside of the patch series in question, how to we expedite the
+>> euthanasia of IDE? What explicit features/support are we missing
+>> through libata that would need to be added, before we can git rm
+>> drivers/ide/?
+>
+> I thought the primary objection was actually embedded in that libata
 
--- 
-Jens Axboe
+    Back at MontaVista, even embedded uses switched to libata years ago...
+DaveM thinks we still can't prove that libata works everywhere the IDE works.
+Besided, there are still a number of non-x86 drivers not converted over to 
+libata (like DaVinci, etc.)...
+
+> with its reliance on SCSI was just too large a dependency, so they have
+> to keep using drivers/ide.
+
+    Do you remember how many years ago a libata's own block driver was 
+promised to you? ;-)
+    I'd gladly wrote one, getting tired of my current OSS work... :-)
+
+> Perhaps nvme and flash is obviating this
+> problem and we can ask them again, though?
+
+    What's wrong with those? I'm not really following NVMe...
+
+> James
+
+MBR, Sergei
