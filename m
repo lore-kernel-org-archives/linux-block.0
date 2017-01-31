@@ -1,188 +1,71 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv6 18/37] fs: make block_write_{begin,end}() be able to handle huge pages
-Date: Thu, 26 Jan 2017 14:58:00 +0300
-Message-Id: <20170126115819.58875-19-kirill.shutemov@linux.intel.com>
-In-Reply-To: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
-References: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <hare@suse.com>
+Subject: Re: [PATCH] genhd: Do not hold event lock when scheduling workqueue
+ elements
+To: Bart Van Assche <Bart.VanAssche@sandisk.com>, "hare@suse.de"
+ <hare@suse.de>, "axboe@kernel.dk" <axboe@kernel.dk>
+References: <1484732896-22941-1-git-send-email-hare@suse.de>
+ <1485822639.2669.16.camel@sandisk.com>
+Cc: "hch@lst.de" <hch@lst.de>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "jth@kernel.org" <jth@kernel.org>
+From: Hannes Reinecke <hare@suse.com>
+Message-ID: <532c55c4-15da-d2f9-401c-36bc4343756b@suse.com>
+Date: Tue, 31 Jan 2017 17:15:06 +0100
+MIME-Version: 1.0
+In-Reply-To: <1485822639.2669.16.camel@sandisk.com>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-block@vger.kernel.org>
 
-It's more or less straight-forward.
+On 01/31/2017 01:31 AM, Bart Van Assche wrote:
+> On Wed, 2017-01-18 at 10:48 +0100, Hannes Reinecke wrote:
+>> @@ -1488,26 +1487,13 @@ static unsigned long disk_events_poll_jiffies(struct gendisk *disk)
+>>  void disk_block_events(struct gendisk *disk)
+>>  {
+>>         struct disk_events *ev = disk->ev;
+>> -       unsigned long flags;
+>> -       bool cancel;
+>>  
+>>         if (!ev)
+>>                 return;
+>>  
+>> -       /*
+>> -        * Outer mutex ensures that the first blocker completes canceling
+>> -        * the event work before further blockers are allowed to finish.
+>> -        */
+>> -       mutex_lock(&ev->block_mutex);
+>> -
+>> -       spin_lock_irqsave(&ev->lock, flags);
+>> -       cancel = !ev->block++;
+>> -       spin_unlock_irqrestore(&ev->lock, flags);
+>> -
+>> -       if (cancel)
+>> +       if (atomic_inc_return(&ev->block) == 1)
+>>                 cancel_delayed_work_sync(&disk->ev->dwork);
+>>  
+>> -       mutex_unlock(&ev->block_mutex);
+>>  }
+> 
+> Hello Hannes,
+> 
+> I have already encountered a few times a deadlock that was caused by the
+> event checking code so I agree with you that it would be a big step forward
+> if such deadlocks wouldn't occur anymore. However, this patch realizes a
+> change that has not been described in the patch description, namely that
+> disk_block_events() calls are no longer serialized. Are you sure it is safe
+> to drop the serialization of disk_block_events() calls?
+> 
+Well, this whole synchronization stuff it a bit weird; I so totally fail
+to see the rationale for it.
+But anyway, once we've converted ev->block to atomics I _think_ the
+mutex_lock can remain; will be checking.
 
-Most changes are around getting offset/len withing page right and zero
-out desired part of the page.
+Cheers,
 
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
----
- fs/buffer.c | 70 +++++++++++++++++++++++++++++++++++--------------------------
- 1 file changed, 40 insertions(+), 30 deletions(-)
-
-diff --git a/fs/buffer.c b/fs/buffer.c
-index 72462beca909..d05524f14846 100644
---- a/fs/buffer.c
-+++ b/fs/buffer.c
-@@ -1902,6 +1902,7 @@ void page_zero_new_buffers(struct page *page, unsigned from, unsigned to)
- {
- 	unsigned int block_start, block_end;
- 	struct buffer_head *head, *bh;
-+	bool uptodate = PageUptodate(page);
- 
- 	BUG_ON(!PageLocked(page));
- 	if (!page_has_buffers(page))
-@@ -1912,21 +1913,21 @@ void page_zero_new_buffers(struct page *page, unsigned from, unsigned to)
- 	do {
- 		block_end = block_start + bh->b_size;
- 
--		if (buffer_new(bh)) {
--			if (block_end > from && block_start < to) {
--				if (!PageUptodate(page)) {
--					unsigned start, size;
-+		if (buffer_new(bh) && block_end > from && block_start < to) {
-+			if (!uptodate) {
-+				unsigned start, size;
- 
--					start = max(from, block_start);
--					size = min(to, block_end) - start;
-+				start = max(from, block_start);
-+				size = min(to, block_end) - start;
- 
--					zero_user(page, start, size);
--					set_buffer_uptodate(bh);
--				}
--
--				clear_buffer_new(bh);
--				mark_buffer_dirty(bh);
-+				zero_user(page + block_start / PAGE_SIZE,
-+						start % PAGE_SIZE,
-+						size);
-+				set_buffer_uptodate(bh);
- 			}
-+
-+			clear_buffer_new(bh);
-+			mark_buffer_dirty(bh);
- 		}
- 
- 		block_start = block_end;
-@@ -1992,18 +1993,21 @@ iomap_to_bh(struct inode *inode, sector_t block, struct buffer_head *bh,
- int __block_write_begin_int(struct page *page, loff_t pos, unsigned len,
- 		get_block_t *get_block, struct iomap *iomap)
- {
--	unsigned from = pos & (PAGE_SIZE - 1);
--	unsigned to = from + len;
--	struct inode *inode = page->mapping->host;
-+	unsigned from, to;
-+	struct inode *inode = page_mapping(page)->host;
- 	unsigned block_start, block_end;
- 	sector_t block;
- 	int err = 0;
- 	unsigned blocksize, bbits;
- 	struct buffer_head *bh, *head, *wait[2], **wait_bh=wait;
-+	bool uptodate = PageUptodate(page);
- 
-+	page = compound_head(page);
-+	from = pos & ~hpage_mask(page);
-+	to = from + len;
- 	BUG_ON(!PageLocked(page));
--	BUG_ON(from > PAGE_SIZE);
--	BUG_ON(to > PAGE_SIZE);
-+	BUG_ON(from > hpage_size(page));
-+	BUG_ON(to > hpage_size(page));
- 	BUG_ON(from > to);
- 
- 	head = create_page_buffers(page, inode, 0);
-@@ -2016,10 +2020,8 @@ int __block_write_begin_int(struct page *page, loff_t pos, unsigned len,
- 	    block++, block_start=block_end, bh = bh->b_this_page) {
- 		block_end = block_start + blocksize;
- 		if (block_end <= from || block_start >= to) {
--			if (PageUptodate(page)) {
--				if (!buffer_uptodate(bh))
--					set_buffer_uptodate(bh);
--			}
-+			if (uptodate && !buffer_uptodate(bh))
-+				set_buffer_uptodate(bh);
- 			continue;
- 		}
- 		if (buffer_new(bh))
-@@ -2036,23 +2038,28 @@ int __block_write_begin_int(struct page *page, loff_t pos, unsigned len,
- 
- 			if (buffer_new(bh)) {
- 				clean_bdev_bh_alias(bh);
--				if (PageUptodate(page)) {
-+				if (uptodate) {
- 					clear_buffer_new(bh);
- 					set_buffer_uptodate(bh);
- 					mark_buffer_dirty(bh);
- 					continue;
- 				}
--				if (block_end > to || block_start < from)
--					zero_user_segments(page,
--						to, block_end,
--						block_start, from);
-+				if (block_end > to || block_start < from) {
-+					BUG_ON(to - from  > PAGE_SIZE);
-+					zero_user_segments(page +
-+							block_start / PAGE_SIZE,
-+						to % PAGE_SIZE,
-+						(block_start % PAGE_SIZE) + blocksize,
-+						block_start % PAGE_SIZE,
-+						from % PAGE_SIZE);
-+				}
- 				continue;
- 			}
- 		}
--		if (PageUptodate(page)) {
-+		if (uptodate) {
- 			if (!buffer_uptodate(bh))
- 				set_buffer_uptodate(bh);
--			continue; 
-+			continue;
- 		}
- 		if (!buffer_uptodate(bh) && !buffer_delay(bh) &&
- 		    !buffer_unwritten(bh) &&
-@@ -2089,6 +2096,7 @@ static int __block_commit_write(struct inode *inode, struct page *page,
- 	unsigned blocksize;
- 	struct buffer_head *bh, *head;
- 
-+	VM_BUG_ON_PAGE(PageTail(page), page);
- 	bh = head = page_buffers(page);
- 	blocksize = bh->b_size;
- 
-@@ -2102,7 +2110,8 @@ static int __block_commit_write(struct inode *inode, struct page *page,
- 			set_buffer_uptodate(bh);
- 			mark_buffer_dirty(bh);
- 		}
--		clear_buffer_new(bh);
-+		if (buffer_new(bh))
-+			clear_buffer_new(bh);
- 
- 		block_start = block_end;
- 		bh = bh->b_this_page;
-@@ -2155,7 +2164,8 @@ int block_write_end(struct file *file, struct address_space *mapping,
- 	struct inode *inode = mapping->host;
- 	unsigned start;
- 
--	start = pos & (PAGE_SIZE - 1);
-+	page = compound_head(page);
-+	start = pos & ~hpage_mask(page);
- 
- 	if (unlikely(copied < len)) {
- 		/*
+Hannes
 -- 
-2.11.0
-
+Dr. Hannes Reinecke		               zSeries & Storage
+hare@suse.com			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: F. Imend�rffer, J. Smithard, D. Upmanyu, G. Norton
+HRB 21284 (AG N�rnberg)
