@@ -1,479 +1,397 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mailout2.samsung.com ([203.254.224.25]:36715 "EHLO
-        mailout2.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1759998AbdACRbW (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Jan 2017 12:31:22 -0500
-From: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
-To: Linus Walleij <linus.walleij@linaro.org>
-Cc: Ulf Hansson <ulf.hansson@linaro.org>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Jens Axboe <axboe@fb.com>, Hannes Reinecke <hare@suse.com>,
-        Tejun Heo <tj@kernel.org>, Omar Sandoval <osandov@osandov.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <Bart.VanAssche@sandisk.com>,
-        baolin.wang@linaro.org, riteshh@codeaurora.org, arnd@arndb.de,
-        zhang.chunyan@linaro.org, linux-mmc@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        b.zolnierkie@samsung.com
-Subject: [PATCH PoCv2 1/2] Revert
- "mmc: queue: Share mmc request array between partitions"
-Date: Tue, 03 Jan 2017 18:30:17 +0100
-Message-id: <1483464618-16133-2-git-send-email-b.zolnierkie@samsung.com>
-In-reply-to: <1483464618-16133-1-git-send-email-b.zolnierkie@samsung.com>
-References: <1483464618-16133-1-git-send-email-b.zolnierkie@samsung.com>
- <CGME20170103173119epcas5p32d141b74cc44c2eb5197695d66829720@epcas5p3.samsung.com>
+Received: from mail-bn3nam01on0058.outbound.protection.outlook.com ([104.47.33.58]:53760
+        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751656AbdAaMSU (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 31 Jan 2017 07:18:20 -0500
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
+To: <axboe@fb.com>
+CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>,
+        "Simon A . F . Lund" <slund@cnexlabs.com>
+Subject: [PATCH 08/12] lightnvm: add ioctls for vector I/Os
+Date: Tue, 31 Jan 2017 13:17:16 +0100
+Message-ID: <20170131121720.10971-9-matias@cnexlabs.com>
+In-Reply-To: <20170131121720.10971-1-matias@cnexlabs.com>
+References: <20170131121720.10971-1-matias@cnexlabs.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Shared mmc queue changes break mmc-mq ones currently.
+Enable user-space to issue vector I/O commands through ioctls. To issue
+a vector I/O, the ppa list with addresses is also required and must be
+mapped for the controller to access.
 
-This reverts commit 6540ce8420b7790ef0696ccfd6e911df7ba84c33.
+For each ioctl, the result and status bits are returned as well, such
+that user-space can retrieve the open-channel SSD completion bits.
 
-Conflicts:
-	drivers/mmc/core/queue.c
+The implementation covers the traditional use-cases of bad block
+management, and vectored read/write/erase.
 
-Signed-off-by: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
+Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
+Metadata implementation, test, and fixes.
+Signed-off-by: Simon A.F. Lund <slund@cnexlabs.com>
+Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
 ---
- drivers/mmc/core/block.c |  11 +--
- drivers/mmc/core/queue.c | 252 +++++++++++++++++++----------------------------
- drivers/mmc/core/queue.h |   2 -
- include/linux/mmc/card.h |   5 -
- 4 files changed, 105 insertions(+), 165 deletions(-)
+ drivers/nvme/host/core.c      |   4 +
+ drivers/nvme/host/lightnvm.c  | 220 ++++++++++++++++++++++++++++++++++++++++++
+ drivers/nvme/host/nvme.h      |   6 ++
+ include/uapi/linux/lightnvm.h |  50 ++++++++++
+ 4 files changed, 280 insertions(+)
 
-diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
-index d4362f4..d87b613 100644
---- a/drivers/mmc/core/block.c
-+++ b/drivers/mmc/core/block.c
-@@ -2183,7 +2183,6 @@ static int mmc_blk_probe(struct mmc_card *card)
- {
- 	struct mmc_blk_data *md, *part_md;
- 	char cap_str[10];
--	int ret;
- 
- 	/*
- 	 * Check that the card supports the command class(es) we need.
-@@ -2193,15 +2192,9 @@ static int mmc_blk_probe(struct mmc_card *card)
- 
- 	mmc_fixup_device(card, blk_fixups);
- 
--	ret = mmc_queue_alloc_shared_queue(card);
--	if (ret)
--		return ret;
--
- 	md = mmc_blk_alloc(card);
--	if (IS_ERR(md)) {
--		mmc_queue_free_shared_queue(card);
-+	if (IS_ERR(md))
- 		return PTR_ERR(md);
--	}
- 
- 	string_get_size((u64)get_capacity(md->disk), 512, STRING_UNITS_2,
- 			cap_str, sizeof(cap_str));
-@@ -2239,7 +2232,6 @@ static int mmc_blk_probe(struct mmc_card *card)
-  out:
- 	mmc_blk_remove_parts(card, md);
- 	mmc_blk_remove_req(md);
--	mmc_queue_free_shared_queue(card);
- 	return 0;
- }
- 
-@@ -2257,7 +2249,6 @@ static void mmc_blk_remove(struct mmc_card *card)
- 	pm_runtime_put_noidle(&card->dev);
- 	mmc_blk_remove_req(md);
- 	dev_set_drvdata(&card->dev, NULL);
--	mmc_queue_free_shared_queue(card);
- }
- 
- static int _mmc_blk_suspend(struct mmc_card *card)
-diff --git a/drivers/mmc/core/queue.c b/drivers/mmc/core/queue.c
-index aa98f1b..6284101 100644
---- a/drivers/mmc/core/queue.c
-+++ b/drivers/mmc/core/queue.c
-@@ -156,13 +156,17 @@ static void mmc_request_fn(struct request_queue *q)
- 		wake_up_process(mq->thread);
- }
- 
--static struct scatterlist *mmc_alloc_sg(int sg_len)
-+static struct scatterlist *mmc_alloc_sg(int sg_len, int *err)
- {
- 	struct scatterlist *sg;
- 
--	sg = kmalloc_array(sg_len, sizeof(*sg), GFP_KERNEL);
--	if (sg)
-+	sg = kmalloc(sizeof(struct scatterlist)*sg_len, GFP_KERNEL);
-+	if (!sg)
-+		*err = -ENOMEM;
-+	else {
-+		*err = 0;
- 		sg_init_table(sg, sg_len);
-+	}
- 
- 	return sg;
- }
-@@ -188,178 +192,94 @@ static void mmc_queue_setup_discard(struct request_queue *q,
- 		queue_flag_set_unlocked(QUEUE_FLAG_SECERASE, q);
- }
- 
--static void mmc_queue_req_free_bufs(struct mmc_queue_req *mqrq)
--{
--	kfree(mqrq->bounce_sg);
--	mqrq->bounce_sg = NULL;
--
--	kfree(mqrq->sg);
--	mqrq->sg = NULL;
--
--	kfree(mqrq->bounce_buf);
--	mqrq->bounce_buf = NULL;
--}
--
--static void mmc_queue_reqs_free_bufs(struct mmc_queue_req *mqrq, int qdepth)
-+#ifdef CONFIG_MMC_BLOCK_BOUNCE
-+static bool mmc_queue_alloc_bounce_bufs(struct mmc_queue *mq,
-+					unsigned int bouncesz)
- {
- 	int i;
- 
--	for (i = 0; i < qdepth; i++)
--		mmc_queue_req_free_bufs(&mqrq[i]);
--}
--
--static void mmc_queue_free_mqrqs(struct mmc_queue_req *mqrq, int qdepth)
--{
--	mmc_queue_reqs_free_bufs(mqrq, qdepth);
--	kfree(mqrq);
--}
-+	for (i = 0; i < mq->qdepth; i++) {
-+		mq->mqrq[i].bounce_buf = kmalloc(bouncesz, GFP_KERNEL);
-+		if (!mq->mqrq[i].bounce_buf)
-+			goto out_err;
-+	}
- 
--static struct mmc_queue_req *mmc_queue_alloc_mqrqs(int qdepth)
--{
--	struct mmc_queue_req *mqrq;
--	int i;
-+	return true;
- 
--	mqrq = kcalloc(qdepth, sizeof(*mqrq), GFP_KERNEL);
--	if (mqrq) {
--		for (i = 0; i < qdepth; i++)
--			mqrq[i].task_id = i;
-+out_err:
-+	while (--i >= 0) {
-+		kfree(mq->mqrq[i].bounce_buf);
-+		mq->mqrq[i].bounce_buf = NULL;
- 	}
--
--	return mqrq;
-+	pr_warn("%s: unable to allocate bounce buffers\n",
-+		mmc_card_name(mq->card));
-+	return false;
- }
- 
--#ifdef CONFIG_MMC_BLOCK_BOUNCE
--static int mmc_queue_alloc_bounce_bufs(struct mmc_queue_req *mqrq, int qdepth,
--				       unsigned int bouncesz)
-+static int mmc_queue_alloc_bounce_sgs(struct mmc_queue *mq,
-+				      unsigned int bouncesz)
- {
--	int i;
-+	int i, ret;
- 
--	for (i = 0; i < qdepth; i++) {
--		mqrq[i].bounce_buf = kmalloc(bouncesz, GFP_KERNEL);
--		if (!mqrq[i].bounce_buf)
--			return -ENOMEM;
--
--		mqrq[i].sg = mmc_alloc_sg(1);
--		if (!mqrq[i].sg)
--			return -ENOMEM;
-+	for (i = 0; i < mq->qdepth; i++) {
-+		mq->mqrq[i].sg = mmc_alloc_sg(1, &ret);
-+		if (ret)
-+			return ret;
- 
--		mqrq[i].bounce_sg = mmc_alloc_sg(bouncesz / 512);
--		if (!mqrq[i].bounce_sg)
--			return -ENOMEM;
-+		mq->mqrq[i].bounce_sg = mmc_alloc_sg(bouncesz / 512, &ret);
-+		if (ret)
-+			return ret;
- 	}
- 
- 	return 0;
- }
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 2fc86dc..037ee99 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -784,6 +784,10 @@ static int nvme_ioctl(struct block_device *bdev, fmode_t mode,
+ 		return nvme_sg_io(ns, (void __user *)arg);
+ #endif
+ 	default:
++#ifdef CONFIG_NVM
++		if (ns->ndev)
++			return nvme_nvm_ioctl(ns, cmd, arg);
 +#endif
- 
--static bool mmc_queue_alloc_bounce(struct mmc_queue_req *mqrq, int qdepth,
--				   unsigned int bouncesz)
-+static int mmc_queue_alloc_sgs(struct mmc_queue *mq, int max_segs)
- {
--	int ret;
-+	int i, ret;
- 
--	ret = mmc_queue_alloc_bounce_bufs(mqrq, qdepth, bouncesz);
--	if (ret)
--		mmc_queue_reqs_free_bufs(mqrq, qdepth);
-+	for (i = 0; i < mq->qdepth; i++) {
-+		mq->mqrq[i].sg = mmc_alloc_sg(max_segs, &ret);
-+		if (ret)
-+			return ret;
-+	}
- 
--	return !ret;
-+	return 0;
- }
- 
--static unsigned int mmc_queue_calc_bouncesz(struct mmc_host *host)
-+static void mmc_queue_req_free_bufs(struct mmc_queue_req *mqrq)
- {
--	unsigned int bouncesz = MMC_QUEUE_BOUNCESZ;
--
--	if (host->max_segs != 1)
--		return 0;
--
--	if (bouncesz > host->max_req_size)
--		bouncesz = host->max_req_size;
--	if (bouncesz > host->max_seg_size)
--		bouncesz = host->max_seg_size;
--	if (bouncesz > host->max_blk_count * 512)
--		bouncesz = host->max_blk_count * 512;
--
--	if (bouncesz <= 512)
--		return 0;
-+	kfree(mqrq->bounce_sg);
-+	mqrq->bounce_sg = NULL;
- 
--	return bouncesz;
--}
--#else
--static inline bool mmc_queue_alloc_bounce(struct mmc_queue_req *mqrq,
--					  int qdepth, unsigned int bouncesz)
--{
--	return false;
--}
-+	kfree(mqrq->sg);
-+	mqrq->sg = NULL;
- 
--static unsigned int mmc_queue_calc_bouncesz(struct mmc_host *host)
--{
--	return 0;
-+	kfree(mqrq->bounce_buf);
-+	mqrq->bounce_buf = NULL;
- }
--#endif
- 
--static int mmc_queue_alloc_sgs(struct mmc_queue_req *mqrq, int qdepth,
--			       int max_segs)
-+static void mmc_queue_reqs_free_bufs(struct mmc_queue *mq)
- {
- 	int i;
- 
--	for (i = 0; i < qdepth; i++) {
--		mqrq[i].sg = mmc_alloc_sg(max_segs);
--		if (!mqrq[i].sg)
--			return -ENOMEM;
--	}
--
--	return 0;
-+	for (i = 0; i < mq->qdepth; i++)
-+		mmc_queue_req_free_bufs(&mq->mqrq[i]);
- }
- 
--void mmc_queue_free_shared_queue(struct mmc_card *card)
--{
--	if (card->mqrq) {
--		mmc_queue_free_mqrqs(card->mqrq, card->qdepth);
--		card->mqrq = NULL;
--	}
--}
--
--static int __mmc_queue_alloc_shared_queue(struct mmc_card *card, int qdepth)
-+static struct mmc_queue_req *mmc_queue_alloc_mqrqs(int qdepth)
- {
--	struct mmc_host *host = card->host;
- 	struct mmc_queue_req *mqrq;
--	unsigned int bouncesz;
--	int ret = 0;
--
--	if (card->mqrq)
--		return -EINVAL;
--
--	mqrq = mmc_queue_alloc_mqrqs(qdepth);
--	if (!mqrq)
--		return -ENOMEM;
--
--	card->mqrq = mqrq;
--	card->qdepth = qdepth;
--
--	bouncesz = mmc_queue_calc_bouncesz(host);
--
--	if (bouncesz && !mmc_queue_alloc_bounce(mqrq, qdepth, bouncesz)) {
--		bouncesz = 0;
--		pr_warn("%s: unable to allocate bounce buffers\n",
--			mmc_card_name(card));
--	}
--
--	card->bouncesz = bouncesz;
-+	int i;
- 
--	if (!bouncesz) {
--		ret = mmc_queue_alloc_sgs(mqrq, qdepth, host->max_segs);
--		if (ret)
--			goto out_err;
-+	mqrq = kcalloc(qdepth, sizeof(*mqrq), GFP_KERNEL);
-+	if (mqrq) {
-+		for (i = 0; i < qdepth; i++)
-+			mqrq[i].task_id = i;
+ 		return -ENOTTY;
  	}
- 
--	return ret;
--
--out_err:
--	mmc_queue_free_shared_queue(card);
--	return ret;
--}
--
--int mmc_queue_alloc_shared_queue(struct mmc_card *card)
--{
--	return __mmc_queue_alloc_shared_queue(card, 2);
-+	return mqrq;
  }
+diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
+index 733992a..3b6cd9b 100644
+--- a/drivers/nvme/host/lightnvm.c
++++ b/drivers/nvme/host/lightnvm.c
+@@ -26,6 +26,8 @@
+ #include <linux/bitops.h>
+ #include <linux/lightnvm.h>
+ #include <linux/vmalloc.h>
++#include <linux/sched/sysctl.h>
++#include <uapi/linux/lightnvm.h>
  
- /**
-@@ -376,6 +296,7 @@ int mmc_init_queue(struct mmc_queue *mq, struct mmc_card *card,
- {
- 	struct mmc_host *host = card->host;
- 	u64 limit = BLK_BOUNCE_HIGH;
-+	bool bounce = false;
- 	int ret = -ENOMEM;
+ enum nvme_nvm_admin_opcode {
+ 	nvme_nvm_admin_identity		= 0xe2,
+@@ -583,6 +585,224 @@ static struct nvm_dev_ops nvme_nvm_dev_ops = {
+ 	.max_phys_sect		= 64,
+ };
  
- 	if (mmc_dev(host)->dma_mask && *mmc_dev(host)->dma_mask)
-@@ -386,8 +307,10 @@ int mmc_init_queue(struct mmc_queue *mq, struct mmc_card *card,
- 	if (!mq->queue)
- 		return -ENOMEM;
- 
--	mq->mqrq = card->mqrq;
--	mq->qdepth = card->qdepth;
-+	mq->qdepth = 2;
-+	mq->mqrq = mmc_queue_alloc_mqrqs(mq->qdepth);
-+	if (!mq->mqrq)
-+		goto blk_cleanup;
- 	mq->queue->queuedata = mq;
- 
- 	blk_queue_prep_rq(mq->queue, mmc_prep_request);
-@@ -396,17 +319,44 @@ int mmc_init_queue(struct mmc_queue *mq, struct mmc_card *card,
- 	if (mmc_can_erase(card))
- 		mmc_queue_setup_discard(mq->queue, card);
- 
--	if (card->bouncesz) {
--		blk_queue_bounce_limit(mq->queue, BLK_BOUNCE_ANY);
--		blk_queue_max_hw_sectors(mq->queue, card->bouncesz / 512);
--		blk_queue_max_segments(mq->queue, card->bouncesz / 512);
--		blk_queue_max_segment_size(mq->queue, card->bouncesz);
--	} else {
-+#ifdef CONFIG_MMC_BLOCK_BOUNCE
-+	if (host->max_segs == 1) {
-+		unsigned int bouncesz;
++static void nvme_nvm_end_user_vio(struct request *rq, int error)
++{
++	struct completion *waiting = rq->end_io_data;
 +
-+		bouncesz = MMC_QUEUE_BOUNCESZ;
++	complete(waiting);
++}
 +
-+		if (bouncesz > host->max_req_size)
-+			bouncesz = host->max_req_size;
-+		if (bouncesz > host->max_seg_size)
-+			bouncesz = host->max_seg_size;
-+		if (bouncesz > (host->max_blk_count * 512))
-+			bouncesz = host->max_blk_count * 512;
++static int nvme_nvm_submit_user_cmd(struct request_queue *q,
++				struct nvme_ns *ns,
++				struct nvme_nvm_command *vcmd,
++				void __user *ubuf, unsigned int bufflen,
++				void __user *meta_buf, unsigned int meta_len,
++				void __user *ppa_buf, unsigned int ppa_len,
++				u32 *result, u64 *status, unsigned int timeout)
++{
++	bool write = nvme_is_write((struct nvme_command *)vcmd);
++	struct nvm_dev *dev = ns->ndev;
++	struct gendisk *disk = ns->disk;
++	struct request *rq;
++	struct bio *bio = NULL;
++	__le64 *ppa_list = NULL;
++	dma_addr_t ppa_dma;
++	__le64 *metadata = NULL;
++	dma_addr_t metadata_dma;
++	DECLARE_COMPLETION_ONSTACK(wait);
++	int ret;
 +
-+		if (bouncesz > 512 &&
-+		    mmc_queue_alloc_bounce_bufs(mq, bouncesz)) {
-+			blk_queue_bounce_limit(mq->queue, BLK_BOUNCE_ANY);
-+			blk_queue_max_hw_sectors(mq->queue, bouncesz / 512);
-+			blk_queue_max_segments(mq->queue, bouncesz / 512);
-+			blk_queue_max_segment_size(mq->queue, bouncesz);
++	rq = nvme_alloc_request(q, (struct nvme_command *)vcmd, 0,
++			NVME_QID_ANY);
++	if (IS_ERR(rq)) {
++		ret = -ENOMEM;
++		goto err_cmd;
++	}
 +
-+			ret = mmc_queue_alloc_bounce_sgs(mq, bouncesz);
-+			if (ret)
-+				goto cleanup_queue;
-+			bounce = true;
++	rq->timeout = timeout ? timeout : ADMIN_TIMEOUT;
++
++	rq->cmd_flags &= ~REQ_FAILFAST_DRIVER;
++	rq->end_io_data = &wait;
++
++	if (ppa_buf && ppa_len) {
++		ppa_list = dma_pool_alloc(dev->dma_pool, GFP_KERNEL, &ppa_dma);
++		if (!ppa_list) {
++			ret = -ENOMEM;
++			goto err_rq;
++		}
++		if (copy_from_user(ppa_list, (void __user *)ppa_buf,
++						sizeof(u64) * (ppa_len + 1))) {
++			ret = -EFAULT;
++			goto err_ppa;
++		}
++		vcmd->ph_rw.spba = cpu_to_le64(ppa_dma);
++	} else {
++		vcmd->ph_rw.spba = cpu_to_le64((uintptr_t)ppa_buf);
++	}
++
++	if (ubuf && bufflen) {
++		ret = blk_rq_map_user(q, rq, NULL, ubuf, bufflen, GFP_KERNEL);
++		if (ret)
++			goto err_ppa;
++		bio = rq->bio;
++
++		if (meta_buf && meta_len) {
++			metadata = dma_pool_alloc(dev->dma_pool, GFP_KERNEL,
++								&metadata_dma);
++			if (!metadata) {
++				ret = -ENOMEM;
++				goto err_map;
++			}
++
++			if (write) {
++				if (copy_from_user(metadata,
++						(void __user *)meta_buf,
++						meta_len)) {
++					ret = -EFAULT;
++					goto err_meta;
++				}
++			}
++			vcmd->ph_rw.metadata = cpu_to_le64(metadata_dma);
++		}
++
++		if (!disk)
++			goto submit;
++
++		bio->bi_bdev = bdget_disk(disk, 0);
++		if (!bio->bi_bdev) {
++			ret = -ENODEV;
++			goto err_meta;
 +		}
 +	}
-+#endif
 +
-+	if (!bounce) {
- 		blk_queue_bounce_limit(mq->queue, limit);
- 		blk_queue_max_hw_sectors(mq->queue,
- 			min(host->max_blk_count, host->max_req_size / 512));
- 		blk_queue_max_segments(mq->queue, host->max_segs);
- 		blk_queue_max_segment_size(mq->queue, host->max_seg_size);
++submit:
++	blk_execute_rq_nowait(q, NULL, rq, 0, nvme_nvm_end_user_vio);
 +
-+		ret = mmc_queue_alloc_sgs(mq, host->max_segs);
-+		if (ret)
-+			goto cleanup_queue;
- 	}
- 
- 	sema_init(&mq->thread_sem, 1);
-@@ -421,8 +371,11 @@ int mmc_init_queue(struct mmc_queue *mq, struct mmc_card *card,
- 
++	wait_for_completion_io(&wait);
++
++	ret = nvme_error_status(rq->errors);
++	if (result)
++		*result = rq->errors & 0x7ff;
++	if (status)
++		*status = le64_to_cpu(nvme_req(rq)->result.u64);
++
++	if (metadata && !ret && !write) {
++		if (copy_to_user(meta_buf, (void *)metadata, meta_len))
++			ret = -EFAULT;
++	}
++err_meta:
++	if (meta_buf && meta_len)
++		dma_pool_free(dev->dma_pool, metadata, metadata_dma);
++err_map:
++	if (bio) {
++		if (disk && bio->bi_bdev)
++			bdput(bio->bi_bdev);
++		blk_rq_unmap_user(bio);
++	}
++err_ppa:
++	if (ppa_buf && ppa_len)
++		dma_pool_free(dev->dma_pool, ppa_list, ppa_dma);
++err_rq:
++	blk_mq_free_request(rq);
++err_cmd:
++	return ret;
++}
++
++static int nvme_nvm_submit_vio(struct nvme_ns *ns,
++					struct nvm_user_vio __user *uvio)
++{
++	struct nvm_user_vio vio;
++	struct nvme_nvm_command c;
++	unsigned int length;
++	int ret;
++
++	if (copy_from_user(&vio, uvio, sizeof(vio)))
++		return -EFAULT;
++	if (vio.flags)
++		return -EINVAL;
++
++	memset(&c, 0, sizeof(c));
++	c.ph_rw.opcode = vio.opcode;
++	c.ph_rw.nsid = cpu_to_le32(ns->ns_id);
++	c.ph_rw.control = cpu_to_le16(vio.control);
++	c.ph_rw.length = cpu_to_le16(vio.nppas);
++
++	length = (vio.nppas + 1) << ns->lba_shift;
++
++	ret = nvme_nvm_submit_user_cmd(ns->queue, ns, &c,
++			(void __user *)(uintptr_t)vio.addr, length,
++			(void __user *)(uintptr_t)vio.metadata,
++							vio.metadata_len,
++			(void __user *)(uintptr_t)vio.ppa_list, vio.nppas,
++			&vio.result, &vio.status, 0);
++
++	if (ret && copy_to_user(uvio, &vio, sizeof(vio)))
++		return -EFAULT;
++
++	return ret;
++}
++
++static int nvme_nvm_user_vcmd(struct nvme_ns *ns, int admin,
++					struct nvm_passthru_vio __user *uvcmd)
++{
++	struct nvm_passthru_vio vcmd;
++	struct nvme_nvm_command c;
++	struct request_queue *q;
++	unsigned int timeout = 0;
++	int ret;
++
++	if (copy_from_user(&vcmd, uvcmd, sizeof(vcmd)))
++		return -EFAULT;
++	if ((vcmd.opcode != 0xF2) && (!capable(CAP_SYS_ADMIN)))
++		return -EACCES;
++	if (vcmd.flags)
++		return -EINVAL;
++
++	memset(&c, 0, sizeof(c));
++	c.common.opcode = vcmd.opcode;
++	c.common.nsid = cpu_to_le32(ns->ns_id);
++	c.common.cdw2[0] = cpu_to_le32(vcmd.cdw2);
++	c.common.cdw2[1] = cpu_to_le32(vcmd.cdw3);
++	/* cdw11-12 */
++	c.ph_rw.length = cpu_to_le16(vcmd.nppas);
++	c.ph_rw.control  = cpu_to_le32(vcmd.control);
++	c.common.cdw10[3] = cpu_to_le32(vcmd.cdw13);
++	c.common.cdw10[4] = cpu_to_le32(vcmd.cdw14);
++	c.common.cdw10[5] = cpu_to_le32(vcmd.cdw15);
++
++	if (vcmd.timeout_ms)
++		timeout = msecs_to_jiffies(vcmd.timeout_ms);
++
++	q = admin ? ns->ctrl->admin_q : ns->queue;
++
++	ret = nvme_nvm_submit_user_cmd(q, ns,
++			(struct nvme_nvm_command *)&c,
++			(void __user *)(uintptr_t)vcmd.addr, vcmd.data_len,
++			(void __user *)(uintptr_t)vcmd.metadata,
++							vcmd.metadata_len,
++			(void __user *)(uintptr_t)vcmd.ppa_list, vcmd.nppas,
++			&vcmd.result, &vcmd.status, timeout);
++
++	if (ret && copy_to_user(uvcmd, &vcmd, sizeof(vcmd)))
++		return -EFAULT;
++
++	return ret;
++}
++
++int nvme_nvm_ioctl(struct nvme_ns *ns, unsigned int cmd, unsigned long arg)
++{
++	switch (cmd) {
++	case NVME_NVM_IOCTL_ADMIN_VIO:
++		return nvme_nvm_user_vcmd(ns, 1, (void __user *)arg);
++	case NVME_NVM_IOCTL_IO_VIO:
++		return nvme_nvm_user_vcmd(ns, 0, (void __user *)arg);
++	case NVME_NVM_IOCTL_SUBMIT_VIO:
++		return nvme_nvm_submit_vio(ns, (void __user *)arg);
++	default:
++		return -ENOTTY;
++	}
++}
++
+ int nvme_nvm_register(struct nvme_ns *ns, char *disk_name, int node)
+ {
+ 	struct request_queue *q = ns->queue;
+diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+index 6377e14..330713c 100644
+--- a/drivers/nvme/host/nvme.h
++++ b/drivers/nvme/host/nvme.h
+@@ -326,6 +326,7 @@ int nvme_nvm_register(struct nvme_ns *ns, char *disk_name, int node);
+ void nvme_nvm_unregister(struct nvme_ns *ns);
+ int nvme_nvm_register_sysfs(struct nvme_ns *ns);
+ void nvme_nvm_unregister_sysfs(struct nvme_ns *ns);
++int nvme_nvm_ioctl(struct nvme_ns *ns, unsigned int cmd, unsigned long arg);
+ #else
+ static inline int nvme_nvm_register(struct nvme_ns *ns, char *disk_name,
+ 				    int node)
+@@ -343,6 +344,11 @@ static inline int nvme_nvm_ns_supported(struct nvme_ns *ns, struct nvme_id_ns *i
+ {
  	return 0;
- 
--cleanup_queue:
-+ cleanup_queue:
-+	mmc_queue_reqs_free_bufs(mq);
-+	kfree(mq->mqrq);
- 	mq->mqrq = NULL;
-+blk_cleanup:
- 	blk_cleanup_queue(mq->queue);
- 	return ret;
  }
-@@ -444,7 +397,10 @@ void mmc_cleanup_queue(struct mmc_queue *mq)
- 	blk_start_queue(q);
- 	spin_unlock_irqrestore(q->queue_lock, flags);
++static inline int nvme_nvm_ioctl(struct nvme_ns *ns, unsigned int cmd,
++							unsigned long arg)
++{
++	return -ENOTTY;
++}
+ #endif /* CONFIG_NVM */
  
-+	mmc_queue_reqs_free_bufs(mq);
-+	kfree(mq->mqrq);
- 	mq->mqrq = NULL;
+ static inline struct nvme_ns *nvme_get_ns_from_dev(struct device *dev)
+diff --git a/include/uapi/linux/lightnvm.h b/include/uapi/linux/lightnvm.h
+index 774a431..fd19f36 100644
+--- a/include/uapi/linux/lightnvm.h
++++ b/include/uapi/linux/lightnvm.h
+@@ -122,6 +122,44 @@ struct nvm_ioctl_dev_factory {
+ 	__u32 flags;
+ };
+ 
++struct nvm_user_vio {
++	__u8 opcode;
++	__u8 flags;
++	__u16 control;
++	__u16 nppas;
++	__u16 rsvd;
++	__u64 metadata;
++	__u64 addr;
++	__u64 ppa_list;
++	__u32 metadata_len;
++	__u32 data_len;
++	__u64 status;
++	__u32 result;
++	__u32 rsvd3[3];
++};
 +
- 	mq->card = NULL;
- }
- EXPORT_SYMBOL(mmc_cleanup_queue);
-diff --git a/drivers/mmc/core/queue.h b/drivers/mmc/core/queue.h
-index ee26724..95ca330 100644
---- a/drivers/mmc/core/queue.h
-+++ b/drivers/mmc/core/queue.h
-@@ -48,8 +48,6 @@ struct mmc_queue {
- 	unsigned long		qslots;
++struct nvm_passthru_vio {
++	__u8 opcode;
++	__u8 flags;
++	__u8 rsvd[2];
++	__u32 nsid;
++	__u32 cdw2;
++	__u32 cdw3;
++	__u64 metadata;
++	__u64 addr;
++	__u32 metadata_len;
++	__u32 data_len;
++	__u64 ppa_list;
++	__u16 nppas;
++	__u16 control;
++	__u32 cdw13;
++	__u32 cdw14;
++	__u32 cdw15;
++	__u64 status;
++	__u32 result;
++	__u32 timeout_ms;
++};
++
+ /* The ioctl type, 'L', 0x20 - 0x2F documented in ioctl-number.txt */
+ enum {
+ 	/* top level cmds */
+@@ -137,6 +175,11 @@ enum {
+ 
+ 	/* Factory reset device */
+ 	NVM_DEV_FACTORY_CMD,
++
++	/* Vector user I/O */
++	NVM_DEV_VIO_ADMIN_CMD = 0x41,
++	NVM_DEV_VIO_CMD = 0x42,
++	NVM_DEV_VIO_USER_CMD = 0x43,
  };
  
--extern int mmc_queue_alloc_shared_queue(struct mmc_card *card);
--extern void mmc_queue_free_shared_queue(struct mmc_card *card);
- extern int mmc_init_queue(struct mmc_queue *, struct mmc_card *, spinlock_t *,
- 			  const char *);
- extern void mmc_cleanup_queue(struct mmc_queue *);
-diff --git a/include/linux/mmc/card.h b/include/linux/mmc/card.h
-index 514ed4e..95d69d4 100644
---- a/include/linux/mmc/card.h
-+++ b/include/linux/mmc/card.h
-@@ -206,7 +206,6 @@ struct sdio_cis {
- struct mmc_ios;
- struct sdio_func;
- struct sdio_func_tuple;
--struct mmc_queue_req;
+ #define NVM_IOCTL 'L' /* 0x4c */
+@@ -154,6 +197,13 @@ enum {
+ #define NVM_DEV_FACTORY		_IOW(NVM_IOCTL, NVM_DEV_FACTORY_CMD, \
+ 						struct nvm_ioctl_dev_factory)
  
- #define SDIO_MAX_FUNCS		7
- 
-@@ -307,10 +306,6 @@ struct mmc_card {
- 	struct dentry		*debugfs_root;
- 	struct mmc_part	part[MMC_NUM_PHY_PARTITION]; /* physical partitions */
- 	unsigned int    nr_parts;
--
--	struct mmc_queue_req	*mqrq;		/* Shared queue structure */
--	unsigned int		bouncesz;	/* Bounce buffer size */
--	int			qdepth;		/* Shared queue depth */
- };
- 
- /*
++#define NVME_NVM_IOCTL_IO_VIO		_IOWR(NVM_IOCTL, NVM_DEV_VIO_USER_CMD, \
++						struct nvm_passthru_vio)
++#define NVME_NVM_IOCTL_ADMIN_VIO	_IOWR(NVM_IOCTL, NVM_DEV_VIO_ADMIN_CMD,\
++						struct nvm_passthru_vio)
++#define NVME_NVM_IOCTL_SUBMIT_VIO	_IOWR(NVM_IOCTL, NVM_DEV_VIO_CMD,\
++						struct nvm_user_vio)
++
+ #define NVM_VERSION_MAJOR	1
+ #define NVM_VERSION_MINOR	0
+ #define NVM_VERSION_PATCHLEVEL	0
 -- 
-1.9.1
+2.9.3
 
