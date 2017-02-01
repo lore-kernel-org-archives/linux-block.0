@@ -1,57 +1,27 @@
-Return-Path: <BATV+1f42f42caf748e0126fd+4912+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk,
-	snitzer@redhat.com
-Cc: agk@redhat.com,
-	pbonzini@redhat.com,
-	dm-devel@redhat.com,
-	linux-block@vger.kernel.org
-Subject: [PATCH] dm: don't allow ioctls to targets that don't map to whole devices
-Date: Fri,  3 Feb 2017 11:06:13 +0100
-Message-Id: <20170203100613.9023-1-hch@lst.de>
+Return-Path: <osandov@osandov.com>
+Return-Path: <osandov@osandov.com>
+Date: Wed, 1 Feb 2017 11:07:41 -0800
+From: Omar Sandoval <osandov@osandov.com>
+To: Bart Van Assche <bart.vanassche@sandisk.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Omar Sandoval <osandov@fb.com>
+Subject: Re: [PATCH 1/4] blk-mq-debugfs: Add missing __acquires() /
+ __releases() annotations
+Message-ID: <20170201190741.GA2299@vader>
+References: <20170201182059.25601-1-bart.vanassche@sandisk.com>
+ <20170201182059.25601-2-bart.vanassche@sandisk.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170201182059.25601-2-bart.vanassche@sandisk.com>
 List-ID: <linux-block@vger.kernel.org>
 
-.. at least for unprivilegued users.  Before we called into the SCSI
-ioctl code to allow excemptions for a few SCSI passthrough ioctls,
-but this is pretty unsafe and except for this call dm knows nothing
-about SCSI ioctls.  As SCSI the SCSI ioctl code is made optionally
-now we really don't want to drag it in for DM, and the exception is
-not very useful anyway.
+On Wed, Feb 01, 2017 at 10:20:56AM -0800, Bart Van Assche wrote:
+> This patch avoids that sparse complains about lock imbalances.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Omar Sandoval <osandov@fb.com>
 
-Note: this should go into the block tree, as that's where
-scsi_verify_blk_ioctl becomes optional.
-
----
- drivers/md/dm.c | 13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index 9e958bc94fed..adc9dcfd5e9c 100644
---- a/drivers/md/dm.c
-+++ b/drivers/md/dm.c
-@@ -465,13 +465,16 @@ static int dm_blk_ioctl(struct block_device *bdev, fmode_t mode,
- 
- 	if (r > 0) {
- 		/*
--		 * Target determined this ioctl is being issued against
--		 * a logical partition of the parent bdev; so extra
--		 * validation is needed.
-+		 * Target determined this ioctl is being issued against a
-+		 * subset of the parent bdev; require extra privilegues.
- 		 */
--		r = scsi_verify_blk_ioctl(NULL, cmd);
--		if (r)
-+		if (!capable(CAP_SYS_RAWIO)) {
-+			printk_ratelimited(KERN_WARNING
-+				"%s: sending ioctl %x to DM device!\n",
-+				current->comm, cmd);
-+			r = -ENOIOCTLCMD;
- 			goto out;
-+		}
- 	}
- 
- 	r =  __blkdev_driver_ioctl(bdev, mode, cmd, arg);
--- 
-2.11.0
+> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+> Cc: Omar Sandoval <osandov@fb.com>
+> ---
+>  block/blk-mq-debugfs.c | 4 ++++
+>  1 file changed, 4 insertions(+)
