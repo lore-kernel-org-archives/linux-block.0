@@ -5,12 +5,12 @@ Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
 Subject: Re: [PATCH 7/8] mq-deadline: add blk-mq adaptation of the deadline IO scheduler
 From: Paolo Valente <paolo.valente@linaro.org>
 In-Reply-To: <1481933536-12844-8-git-send-email-axboe@fb.com>
-Date: Wed, 1 Feb 2017 12:56:14 +0100
+Date: Wed, 1 Feb 2017 12:11:27 +0100
 Cc: Jens Axboe <axboe@kernel.dk>,
  linux-block@vger.kernel.org,
  Linux-Kernal <linux-kernel@vger.kernel.org>,
  osandov@fb.com
-Message-Id: <26ED11F4-2507-4A5D-ACB9-C501AA9CBB29@linaro.org>
+Message-Id: <84DA10A3-5055-4D48-A990-6CB5A5D34F0C@linaro.org>
 References: <1481933536-12844-1-git-send-email-axboe@fb.com> <1481933536-12844-8-git-send-email-axboe@fb.com>
 To: Jens Axboe <axboe@fb.com>
 List-ID: <linux-block@vger.kernel.org>
@@ -490,6 +490,43 @@ elevator_type *e)
 > +	ret =3D blk_mq_sched_try_merge(q, bio);
 > +	spin_unlock(&dd->lock);
 > +
+
+Hi Jens,
+first, good news, bfq is passing my first sanity checks.  Still, I
+need a little more help for the following issue.  There is a case that
+would be impossible to handle without modifying code outside bfq.  But
+so far such a case never occurred, and I hope that it can never occur.
+I'll try to briefly list all relevant details on this concern of mine,
+so that you can quickly confirm my hope, or highlight where or what I
+am missing.
+
+First, as done above for mq-deadline, invoking blk_mq_sched_try_merge
+with the scheduler lock held is of course necessary (for example, to
+protect q->last_merge).  This may lead to put_rq_private invoked
+with the lock held, in case of successful merge.
+
+As a consequence, put_rq_private may be invoked:
+(1) in IRQ context, no scheduler lock held, because of a completion:
+can be handled by deferring work and lock grabbing, because the
+completed request is not queued in the scheduler any more;
+(2) in process context, scheduler lock held, because of the above
+successful merge: must be handled immediately, for consistency,
+because the request is still queued in the scheduler;
+(3) in process context, no scheduler lock held, for some other reason:
+some path apparently may lead to this case, although I've never seen
+it to happen.  Immediate handling, and hence locking, may be needed,
+depending on whether the request is still queued in the scheduler.
+
+So, my main question is: is case (3) actually impossible?  Should it
+be possible, I guess we would have a problem, because of the
+different lock state with respect to (2).
+
+Finally, I hope that it is certainly impossible to have a case (4): in
+IRQ context, no lock held, but with the request in the scheduler.
+
+Thanks,
+Paolo
+
 > +	return ret;
 > +}
 > +
@@ -507,16 +544,6 @@ request *rq,
 > +	if (blk_mq_sched_try_insert_merge(q, rq))
 > +		return;
 > +
-
-A related doubt: shouldn't blk_mq_sched_try_insert_merge be invoked with =
-the scheduler lock held too, as blk_mq_sched_try_merge, to protect (at =
-least) q->last_merge?
-
-In bfq this function is invoked with the lock held.
-
-Thanks,
-Paolo
-
 > +	blk_mq_sched_request_inserted(rq);
 > +
 > +	/*
@@ -799,8 +826,3 @@ INT_MAX, 0);
 > --=20
 > 2.7.4
 >=20
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-block" =
-in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
