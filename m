@@ -1,41 +1,46 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-Date: Fri, 10 Feb 2017 09:58:52 -0800
-From: Matthew Wilcox <willy@infradead.org>
-To: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Cc: Theodore Ts'o <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCHv6 17/37] fs: make block_read_full_page() be able to read
- huge page
-Message-ID: <20170210175852.GE2267@bombadil.infradead.org>
-References: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
- <20170126115819.58875-18-kirill.shutemov@linux.intel.com>
+Return-Path: <sergei.shtylyov@cogentembedded.com>
+Return-Path: <sergei.shtylyov@cogentembedded.com>
+Subject: Re: remove the cmd_type field from struct request
+To: Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@kernel.dk>,
+ Christoph Hellwig <hch@lst.de>
+References: <1485878251-6107-1-git-send-email-hch@lst.de>
+ <bbe16fc1-5652-bbc2-03a5-0298c3f16645@kernel.dk>
+ <c61b9b98-8e4a-ac23-bf0c-002d112d5468@suse.de>
+Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+ linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org
+From: Sergei Shtylyov <sergei.shtylyov@cogentembedded.com>
+Message-ID: <f7db63ea-7bae-8faf-b22e-42678018e04b@cogentembedded.com>
+Date: Wed, 1 Feb 2017 13:55:34 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170126115819.58875-18-kirill.shutemov@linux.intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+In-Reply-To: <c61b9b98-8e4a-ac23-bf0c-002d112d5468@suse.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Jan 26, 2017 at 02:57:59PM +0300, Kirill A. Shutemov wrote:
-> The approach is straight-forward: for compound pages we read out whole
-> huge page.
+On 2/1/2017 9:53 AM, Hannes Reinecke wrote:
 
-Ouch.  bufferheads must die ;-)
+>>> [1] which were a pain in the ass to untangle and debug during development,
+>>> it's really time for it to die..
+>>
+>> Outside of the patch series in question, how to we expedite the
+>> euthanasia of IDE? What explicit features/support are we missing through
+>> libata that would need to be added, before we can git rm drivers/ide/ ?
+>>
+> There is only a single driver (sgi_ide) which hasn't been moved over to
+> libata.
 
-> For huge page we cannot have array of buffer head pointers on stack --
-> it's 4096 pointers on x86-64 -- 'arr' is allocated with kmalloc() for
-> huge pages.
-> 
-> Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+    Huh? What about Toshiba TC86C001 and TX4938/9, TI DaVinci? That's off the 
+top of my head only...
 
-Reviewed-by: Matthew Wilcox <mawilcox@microsoft.com>
+> But this is for an old Itanium-based server only, and even SGI didn't
+> press us to have this ported.
+> (And we have disabled the IDE drivers since SLES11, where we still support
+> Itanium.)
+
+    Or do you mean only the drivers SuSe is interested in?
+
+[...]
+> Cheers,
+>
+> Hannes
+
+MBR, Sergei
