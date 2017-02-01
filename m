@@ -4,8 +4,8 @@ To: "axboe@kernel.dk" <axboe@kernel.dk>
 CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Subject: Re: [dm-devel] split scsi passthrough fields out of struct request
  V2
-Date: Wed, 1 Feb 2017 19:21:33 +0000
-Message-ID: <1485976879.2560.7.camel@sandisk.com>
+Date: Wed, 1 Feb 2017 17:28:02 +0000
+Message-ID: <1485970063.2560.3.camel@sandisk.com>
 References: <1485365126-23210-1-git-send-email-hch@lst.de>
 	 <1485467235.2540.14.camel@sandisk.com>
 	 <e1d5f4e6-c63f-545d-710f-d4d10fa8d2e0@fb.com>
@@ -36,11 +36,100 @@ Return-Path: Bart.VanAssche@sandisk.com
 List-ID: <linux-block@vger.kernel.org>
 
 On Wed, 2017-02-01 at 09:13 -0800, Jens Axboe wrote:
+> On 02/01/2017 08:46 AM, Bart Van Assche wrote:
+> > Thanks for having looked into this. However, after having pulled the la=
+test
+> > block for-next tree (dbb85b06229f) another lockup was triggered soon (0=
+2-sq
+> > is the name of a shell script of the srp-test suite):
+> >=20
+> > [  243.021265] sysrq: SysRq : Show Blocked State
+> > [  243.021301]   task                        PC stack   pid father
+> > [  243.022909] 02-sq           D    0 10864  10509 0x00000000
+> > [  243.022933] Call Trace:
+> > [  243.022956]  __schedule+0x2da/0xb00
+> > [  243.022979]  schedule+0x38/0x90
+> > [  243.023002]  blk_mq_freeze_queue_wait+0x51/0xa0
+> > [  243.023025]  ? remove_wait_queue+0x70/0x70
+> > [  243.023047]  blk_mq_freeze_queue+0x15/0x20
+> > [  243.023070]  elevator_switch+0x24/0x220
+> > [  243.023093]  __elevator_change+0xd3/0x110
+> > [  243.023115]  elv_iosched_store+0x21/0x60
+> > [  243.023140]  queue_attr_store+0x54/0x90
+> > [  243.023164]  sysfs_kf_write+0x40/0x50
+> > [  243.023188]  kernfs_fop_write+0x137/0x1c0
+> > [  243.023214]  __vfs_write+0x23/0x140
+> > [  243.023242]  ? rcu_read_lock_sched_held+0x45/0x80
+> > [  243.023265]  ? rcu_sync_lockdep_assert+0x2a/0x50
+> > [  243.023287]  ? __sb_start_write+0xde/0x200
+> > [  243.023308]  ? vfs_write+0x190/0x1e0
+> > [  243.023329]  vfs_write+0xc3/0x1e0
+> > [  243.023351]  SyS_write+0x44/0xa0
+> > [  243.023373]  entry_SYSCALL_64_fastpath+0x18/0xad
+>=20
 > So that's changing the elevator - did this happen while heavy IO was
 > going to the drive, or was it idle?
 
-I just ran into an I/O hang while running test 02-sq on top of kernel
-v4.9.6. I will have a closer look at the dm code to see whether I can
-find anything that is wrong in the dm code.
+Hello Jens,
+
+The shell command that was used to set the elevator is the following
+($realdev is a dm device):
+
+echo none > /sys/class/block/$(basename "$realdev")/queue/scheduler
+
+I'm not sure whether any I/O was ongoing when the scheduler was being
+changed from "none" into "none". There are two other processes that got
+stuck but running lsof against these processes did not reveal what block
+device these two processes were trying to examine:
+
+[  243.021672] systemd-udevd   D    0 10585    504 0x00000000
+[  243.021700] Call Trace:
+[  243.021726]  __schedule+0x2da/0xb00
+[  243.021749]  schedule+0x38/0x90
+[  243.021771]  schedule_timeout+0x2fe/0x640
+[  243.021882]  io_schedule_timeout+0x9f/0x110
+[  243.021930]  wait_on_page_bit_common+0x121/0x1e0
+[  243.021977]  generic_file_read_iter+0x17c/0x790
+[  243.022030]  blkdev_read_iter+0x30/0x40
+[  243.022053]  __vfs_read+0xbb/0x130
+[  243.022075]  vfs_read+0xa3/0x170
+[  243.022098]  SyS_read+0x44/0xa0
+[  243.022120]  entry_SYSCALL_64_fastpath+0x18/0xad
+[  243.022298] systemd-udevd   D    0 10612    504 0x00000000
+[  243.022320] Call Trace:
+[  243.022341]  __schedule+0x2da/0xb00
+[  243.022363]  schedule+0x38/0x90
+[  243.022383]  schedule_timeout+0x2fe/0x640
+[  243.022490]  io_schedule_timeout+0x9f/0x110
+[  243.022543]  wait_on_page_bit_common+0x121/0x1e0
+[  243.022595]  generic_file_read_iter+0x17c/0x790
+[  243.022640]  blkdev_read_iter+0x30/0x40
+[  243.022663]  __vfs_read+0xbb/0x130
+[  243.022685]  vfs_read+0xa3/0x170
+[  243.022707]  SyS_read+0x44/0xa0
+[  243.022729]  entry_SYSCALL_64_fastpath+0x18/0xad
+
+# lsof -p10585
+COMMAND =A0=A0=A0=A0PID USER =A0=A0FD =A0=A0=A0=A0=A0TYPE DEVICE SIZE/OFF N=
+ODE NAME
+systemd-u 10585 root =A0cwd =A0=A0unknown =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0/proc/10585/cwd (readlink: No such file or di=
+rectory)
+systemd-u 10585 root =A0rtd =A0=A0unknown =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0/proc/10585/root (readlink: No such file or d=
+irectory)
+systemd-u 10585 root =A0txt =A0=A0unknown =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0/proc/10585/exe
+# lsof -p10612
+COMMAND =A0=A0=A0=A0PID USER =A0=A0FD =A0=A0=A0=A0=A0TYPE DEVICE SIZE/OFF N=
+ODE NAME
+systemd-u 10612 root =A0cwd =A0=A0unknown =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0/proc/10612/cwd (readlink: No such file or di=
+rectory)
+systemd-u 10612 root =A0rtd =A0=A0unknown =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0/proc/10612/root (readlink: No such file or d=
+irectory)
+systemd-u 10612 root =A0txt =A0=A0unknown =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0/proc/10612/exe
 
 Bart.=
