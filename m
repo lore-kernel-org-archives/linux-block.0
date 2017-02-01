@@ -1,52 +1,44 @@
-Return-Path: <linux-ide-owner@vger.kernel.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 06/10] nbd: remove REQ_TYPE_DRV_PRIV leftovers
-Date: Tue, 31 Jan 2017 16:57:27 +0100
-Message-Id: <1485878251-6107-7-git-send-email-hch@lst.de>
-In-Reply-To: <1485878251-6107-1-git-send-email-hch@lst.de>
-References: <1485878251-6107-1-git-send-email-hch@lst.de>
-Sender: linux-ide-owner@vger.kernel.org
+Return-Path: <tahsin@google.com>
+Return-Path: <tahsin@google.com>
+From: Tahsin Erdogan <tahsin@google.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	Tahsin Erdogan <tahsin@google.com>
+Subject: [PATCH] block: queue lock must be acquired when iterating over rls
+Date: Tue, 31 Jan 2017 22:36:50 -0800
+Message-Id: <20170201063650.15060-1-tahsin@google.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Disconnects don't use block layer requests these days, so all handling
-of private requests is dead code.
+blk_set_queue_dying() does not acquire queue lock before it calls
+blk_queue_for_each_rl(). This allows a racing blkg_destroy() to
+remove blkg->q_node from the linked list and have
+blk_queue_for_each_rl() loop infitely over the removed blkg->q_node
+list node.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Tahsin Erdogan <tahsin@google.com>
 ---
- drivers/block/nbd.c | 10 +---------
- 1 file changed, 1 insertion(+), 9 deletions(-)
+ block/blk-core.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 9fd06ee..d4c6281 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -193,13 +193,6 @@ static enum blk_eh_timer_return nbd_xmit_timeout(struct request *req,
- 	set_bit(NBD_TIMEDOUT, &nbd->runtime_flags);
- 	req->errors++;
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 61ba08c58b64..0488a2b55bf0 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -525,12 +525,14 @@ void blk_set_queue_dying(struct request_queue *q)
+ 	else {
+ 		struct request_list *rl;
  
--	/*
--	 * If our disconnect packet times out then we're already holding the
--	 * config_lock and could deadlock here, so just set an error and return,
--	 * we'll handle shutting everything down later.
--	 */
--	if (req->cmd_type == REQ_TYPE_DRV_PRIV)
--		return BLK_EH_HANDLED;
- 	mutex_lock(&nbd->config_lock);
- 	sock_shutdown(nbd);
- 	mutex_unlock(&nbd->config_lock);
-@@ -510,8 +503,7 @@ static void nbd_handle_cmd(struct nbd_cmd *cmd, int index)
- 		goto error_out;
++		spin_lock_irq(q->queue_lock);
+ 		blk_queue_for_each_rl(rl, q) {
+ 			if (rl->rq_pool) {
+ 				wake_up(&rl->wait[BLK_RW_SYNC]);
+ 				wake_up(&rl->wait[BLK_RW_ASYNC]);
+ 			}
+ 		}
++		spin_unlock_irq(q->queue_lock);
  	}
- 
--	if (req->cmd_type != REQ_TYPE_FS &&
--	    req->cmd_type != REQ_TYPE_DRV_PRIV)
-+	if (req->cmd_type != REQ_TYPE_FS)
- 		goto error_out;
- 
- 	if (req->cmd_type == REQ_TYPE_FS &&
+ }
+ EXPORT_SYMBOL_GPL(blk_set_queue_dying);
 -- 
-2.1.4
-
+2.11.0.483.g087da7b7c-goog
