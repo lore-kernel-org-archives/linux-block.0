@@ -1,59 +1,23 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f67.google.com ([74.125.83.67]:34977 "EHLO
-        mail-pg0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751327AbdBXPoD (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 24 Feb 2017 10:44:03 -0500
-From: Ming Lei <tom.leiming@gmail.com>
-To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
-        linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>
-Cc: Ming Lei <tom.leiming@gmail.com>
-Subject: [PATCH v1 14/14] md: raid10: avoid direct access to bvec table in handle_reshape_read_error
-Date: Fri, 24 Feb 2017 23:42:51 +0800
-Message-Id: <1487950971-1131-15-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1487950971-1131-1-git-send-email-tom.leiming@gmail.com>
-References: <1487950971-1131-1-git-send-email-tom.leiming@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] block: Update comments that refer to __bio_map_user() and
+ bio_map_user()
+To: Bart Van Assche <bart.vanassche@sandisk.com>
+References: <20170201162008.4628-1-bart.vanassche@sandisk.com>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+ Ming Lei <tom.leiming@gmail.com>, Jens Axboe <axboe@fb.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <fe736984-698e-a5f2-4251-31c12aac4138@kernel.dk>
+Date: Wed, 1 Feb 2017 11:33:02 -0800
+MIME-Version: 1.0
+In-Reply-To: <20170201162008.4628-1-bart.vanassche@sandisk.com>
+Content-Type: text/plain; charset=windows-1252
+List-ID: <linux-block@vger.kernel.org>
 
-The cost is 128bytes(8*16) stack space in kernel thread context, and
-just use the bio helper to retrieve pages from bio.
+On 02/01/2017 08:20 AM, Bart Van Assche wrote:
+> Since __bio_map_user() and bio_map_user() have been removed, update
+> the comments that still refer to these functions.
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
----
- drivers/md/raid10.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+Applied, thanks Bart.
 
-diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
-index ae162d542bf4..705cb9af03ef 100644
---- a/drivers/md/raid10.c
-+++ b/drivers/md/raid10.c
-@@ -4689,7 +4689,15 @@ static int handle_reshape_read_error(struct mddev *mddev,
- 	struct r10bio *r10b = &on_stack.r10_bio;
- 	int slot = 0;
- 	int idx = 0;
--	struct bio_vec *bvec = r10_bio->master_bio->bi_io_vec;
-+	struct bio_vec *bvl;
-+	struct page *pages[RESYNC_PAGES];
-+
-+	/*
-+	 * This bio is allocated in reshape_request(), and size
-+	 * is still RESYNC_PAGES
-+	 */
-+	bio_for_each_segment_all(bvl, r10_bio->master_bio, idx)
-+		pages[idx] = bvl->bv_page;
- 
- 	r10b->sector = r10_bio->sector;
- 	__raid10_find_phys(&conf->prev, r10b);
-@@ -4718,7 +4726,7 @@ static int handle_reshape_read_error(struct mddev *mddev,
- 			success = sync_page_io(rdev,
- 					       addr,
- 					       s << 9,
--					       bvec[idx].bv_page,
-+					       pages[idx],
- 					       REQ_OP_READ, 0, false);
- 			rdev_dec_pending(rdev, mddev);
- 			rcu_read_lock();
 -- 
-2.7.4
+Jens Axboe
