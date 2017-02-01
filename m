@@ -1,86 +1,24 @@
-Return-Path: <jack@suse.cz>
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
-	Lekshmi Pillai <lekshmicpillai@in.ibm.com>,
-	Tejun Heo <tj@kernel.org>,
-	NeilBrown <neilb@suse.de>,
-	Omar Sandoval <osandov@osandov.com>,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH 13/13] block: Fix oops scsi_disk_get()
-Date: Tue, 21 Feb 2017 18:09:58 +0100
-Message-Id: <20170221170958.21845-14-jack@suse.cz>
-In-Reply-To: <20170221170958.21845-1-jack@suse.cz>
-References: <20170221170958.21845-1-jack@suse.cz>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from verein.lst.de ([213.95.11.211]:34034 "EHLO newverein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751759AbdBAJcF (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 1 Feb 2017 04:32:05 -0500
+Date: Wed, 1 Feb 2017 10:32:03 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Shaohua Li <shli@fb.com>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        hch@lst.de, axboe@fb.com
+Subject: Re: [PATCH 1/2] blk-mq: allocate blk_mq_tags and requests in
+        correct node
+Message-ID: <20170201093203.GA1189@lst.de>
+References: <1c91ab2c0073598592f66f007ff72cfa58a17a54.1485922654.git.shli@fb.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1c91ab2c0073598592f66f007ff72cfa58a17a54.1485922654.git.shli@fb.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-When device open races with device shutdown, we can get the following
-oops in scsi_disk_get():
+Hi Shaohua,
 
-[11863.044351] general protection fault: 0000 [#1] SMP
-[11863.045561] Modules linked in: scsi_debug xfs libcrc32c netconsole btrfs raid6_pq zlib_deflate lzo_compress xor [last unloaded: loop]
-[11863.047853] CPU: 3 PID: 13042 Comm: hald-probe-stor Tainted: G W      4.10.0-rc2-xen+ #35
-[11863.048030] Hardware name: Bochs Bochs, BIOS Bochs 01/01/2011
-[11863.048030] task: ffff88007f438200 task.stack: ffffc90000fd0000
-[11863.048030] RIP: 0010:scsi_disk_get+0x43/0x70
-[11863.048030] RSP: 0018:ffffc90000fd3a08 EFLAGS: 00010202
-[11863.048030] RAX: 6b6b6b6b6b6b6b6b RBX: ffff88007f56d000 RCX: 0000000000000000
-[11863.048030] RDX: 0000000000000001 RSI: 0000000000000004 RDI: ffffffff81a8d880
-[11863.048030] RBP: ffffc90000fd3a18 R08: 0000000000000000 R09: 0000000000000001
-[11863.059217] R10: 0000000000000000 R11: 0000000000000000 R12: 00000000fffffffa
-[11863.059217] R13: ffff880078872800 R14: ffff880070915540 R15: 000000000000001d
-[11863.059217] FS:  00007f2611f71800(0000) GS:ffff88007f0c0000(0000) knlGS:0000000000000000
-[11863.059217] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[11863.059217] CR2: 000000000060e048 CR3: 00000000778d4000 CR4: 00000000000006e0
-[11863.059217] Call Trace:
-[11863.059217]  ? disk_get_part+0x22/0x1f0
-[11863.059217]  sd_open+0x39/0x130
-[11863.059217]  __blkdev_get+0x69/0x430
-[11863.059217]  ? bd_acquire+0x7f/0xc0
-[11863.059217]  ? bd_acquire+0x96/0xc0
-[11863.059217]  ? blkdev_get+0x350/0x350
-[11863.059217]  blkdev_get+0x126/0x350
-[11863.059217]  ? _raw_spin_unlock+0x2b/0x40
-[11863.059217]  ? bd_acquire+0x7f/0xc0
-[11863.059217]  ? blkdev_get+0x350/0x350
-[11863.059217]  blkdev_open+0x65/0x80
-...
-
-As you can see RAX value is already poisoned showing that gendisk we got
-is already freed. The problem is that get_gendisk() looks up device
-number in ext_devt_idr and then does get_disk() which does kobject_get()
-on the disks kobject. However the disk gets removed from ext_devt_idr
-only in disk_release() (through blk_free_devt()) at which moment it has
-already 0 refcount and is already on its way to be freed. Indeed we've
-got a warning from kobject_get() about 0 refcount shortly before the
-oops.
-
-We fix the problem by using kobject_get_unless_zero() in get_disk() so
-that get_disk() cannot get reference on a disk that is already being
-freed.
-
-Tested-by: Lekshmi Pillai <lekshmicpillai@in.ibm.com>
-Acked-by: Tejun Heo <tj@kernel.org>
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- block/genhd.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/block/genhd.c b/block/genhd.c
-index 68c613edb93a..2baacfea7b5e 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -1350,7 +1350,7 @@ struct kobject *get_disk(struct gendisk *disk)
- 	owner = disk->fops->owner;
- 	if (owner && !try_module_get(owner))
- 		return NULL;
--	kobj = kobject_get(&disk_to_dev(disk)->kobj);
-+	kobj = kobject_get_unless_zero(&disk_to_dev(disk)->kobj);
- 	if (kobj == NULL) {
- 		module_put(owner);
- 		return NULL;
--- 
-2.10.2
+the code your patching has changed a lot in Jens' tree, so I think
+you'll have to respin it.  But the idea looks fine.
