@@ -1,31 +1,28 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:46069 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1751734AbdBBQGS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 2 Feb 2017 11:06:18 -0500
-From: Jens Axboe <axboe@fb.com>
-To: <linux-block@vger.kernel.org>
-CC: <paolo.valente@linaro.org>, <osandov@osandov.com>
-Subject: [PATCH 0/2] blk-mq-sched: fix put_rq_private() lock inconsistency
-Date: Thu, 2 Feb 2017 09:06:11 -0700
-Message-ID: <1486051573-13445-1-git-send-email-axboe@fb.com>
+Return-Path: <osandov@osandov.com>
+Return-Path: <osandov@osandov.com>
+Date: Wed, 1 Feb 2017 11:08:27 -0800
+From: Omar Sandoval <osandov@osandov.com>
+To: Bart Van Assche <bart.vanassche@sandisk.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Omar Sandoval <osandov@fb.com>
+Subject: Re: [PATCH 3/4] blk-mq-debug: Make show() operations interruptible
+Message-ID: <20170201190827.GC2299@vader>
+References: <20170201182059.25601-1-bart.vanassche@sandisk.com>
+ <20170201182059.25601-4-bart.vanassche@sandisk.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170201182059.25601-4-bart.vanassche@sandisk.com>
+List-ID: <linux-block@vger.kernel.org>
 
-I tested the patch I sent to Paolo yesterday, and it seems to work
-fine. I broke it up into two pieces, so the functional change is
-restricted to patch #2.
+On Wed, Feb 01, 2017 at 10:20:58AM -0800, Bart Van Assche wrote:
+> Allow users to interrupt show operations instead of making a user
+> space process unkillable if ownership of q->sysfs_lock cannot be
+> obtained.
 
-Basically this fixes the case where we can invoke the blk-mq-sched
-put request functions in an inconsistent state. Most of the time we
-invoke them without any locks held, but for the case where we get
-a successful request-to-request merge on the back of a bio-to-request
-merge, we can invoke it with whatever lock the scheduler held when
-it called blk_mq_sched_try_merge().
+Reviewed-by: Omar Sandoval <osandov@fb.com>
 
--- 
-Jens Axboe
-
+> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+> Cc: Omar Sandoval <osandov@fb.com>
+> ---
+>  block/blk-mq-debugfs.c | 34 ++++++++++++++++++++++++++--------
+>  1 file changed, 26 insertions(+), 8 deletions(-)
