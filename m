@@ -1,59 +1,35 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:40682 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1751917AbdBBX5D (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 2 Feb 2017 18:57:03 -0500
-Subject: Re: block for-next: zram build error
-To: Bart Van Assche <Bart.VanAssche@sandisk.com>
-References: <1486078839.2816.24.camel@sandisk.com>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Jan Kara <jack@suse.cz>
-From: Jens Axboe <axboe@fb.com>
-Message-ID: <57303c09-8bf3-3660-ca01-80d13fcca98c@fb.com>
-Date: Thu, 2 Feb 2017 16:56:50 -0700
-MIME-Version: 1.0
-In-Reply-To: <1486078839.2816.24.camel@sandisk.com>
+Received: from mail-bn3nam01on0087.outbound.protection.outlook.com ([104.47.33.87]:58368
+        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751570AbdBBXlF (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 2 Feb 2017 18:41:05 -0500
+From: Bart Van Assche <Bart.VanAssche@sandisk.com>
+To: "axboe@fb.com" <axboe@fb.com>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: block for-next: zram build error
+Date: Thu, 2 Feb 2017 23:40:54 +0000
+Message-ID: <1486078839.2816.24.camel@sandisk.com>
 Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 02/02/2017 04:40 PM, Bart Van Assche wrote:
-> Hello Jens,
-> 
-> I noticed accidentally that with the for-next branch of the block
-> git repository that the zram driver doesn't build anymore:
-> 
-> 
-> $ make M=drivers/block/zram
->   LD      drivers/block/zram/built-in.o
->   CC [M]  drivers/block/zram/zcomp.o
->   CC [M]  drivers/block/zram/zram_drv.o
-> drivers/block/zram/zram_drv.c: In function ‘zram_revalidate_disk’:
-> drivers/block/zram/zram_drv.c:120:37: error: ‘zram->disk->queue->backing_dev_info’ is a pointer; did you mean to use ‘->’?
->   zram->disk->queue->backing_dev_info.capabilities |=
->                                      ^
->                                      ->
-> make[1]: *** [scripts/Makefile.build:294: drivers/block/zram/zram_drv.o] Error 1
-> make: *** [Makefile:1490: _module_drivers/block/zram] Error 2
-> 
-> Compilation exited abnormally with code 2 at Thu Feb  2 15:37:19
-> 
-> 
-> I have not yet tried to figure out which commit broke the build.
-
-Thanks for catching that, Bart. I fixed it here after your report:
-
-http://git.kernel.dk/cgit/linux-block/commit/?h=for-4.11/next&id=e17354961bb50931ec7b33f59c0713dcf98ac7d2
-
-It's caused by commit:
-
-commit dc3b17cc8bf21307c7e076e7c778d5db756f7871
-Author: Jan Kara <jack@suse.cz>
-Date:   Thu Feb 2 15:56:50 2017 +0100
-
-    block: Use pointer to backing_dev_info from request_queue
-
--- 
-Jens Axboe
-
+SGVsbG8gSmVucywNCg0KSSBub3RpY2VkIGFjY2lkZW50YWxseSB0aGF0IHdpdGggdGhlIGZvci1u
+ZXh0IGJyYW5jaCBvZiB0aGUgYmxvY2sNCmdpdCByZXBvc2l0b3J5IHRoYXQgdGhlIHpyYW0gZHJp
+dmVyIGRvZXNuJ3QgYnVpbGQgYW55bW9yZToNCg0KDQokIG1ha2UgTT1kcml2ZXJzL2Jsb2NrL3py
+YW0NCsKgIExEwqDCoMKgwqDCoMKgZHJpdmVycy9ibG9jay96cmFtL2J1aWx0LWluLm8NCsKgIEND
+IFtNXcKgwqBkcml2ZXJzL2Jsb2NrL3pyYW0vemNvbXAubw0KwqAgQ0MgW01dwqDCoGRyaXZlcnMv
+YmxvY2svenJhbS96cmFtX2Rydi5vDQpkcml2ZXJzL2Jsb2NrL3pyYW0venJhbV9kcnYuYzogSW4g
+ZnVuY3Rpb24g4oCYenJhbV9yZXZhbGlkYXRlX2Rpc2vigJk6DQpkcml2ZXJzL2Jsb2NrL3pyYW0v
+enJhbV9kcnYuYzoxMjA6Mzc6IGVycm9yOiDigJh6cmFtLT5kaXNrLT5xdWV1ZS0+YmFja2luZ19k
+ZXZfaW5mb+KAmSBpcyBhIHBvaW50ZXI7IGRpZCB5b3UgbWVhbiB0byB1c2Ug4oCYLT7igJk/DQrC
+oCB6cmFtLT5kaXNrLT5xdWV1ZS0+YmFja2luZ19kZXZfaW5mby5jYXBhYmlsaXRpZXMgfD0NCsKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgXg0KwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAtPg0KbWFrZVsxXTogKioqIFtzY3Jp
+cHRzL01ha2VmaWxlLmJ1aWxkOjI5NDogZHJpdmVycy9ibG9jay96cmFtL3pyYW1fZHJ2Lm9dIEVy
+cm9yIDENCm1ha2U6ICoqKiBbTWFrZWZpbGU6MTQ5MDogX21vZHVsZV9kcml2ZXJzL2Jsb2NrL3py
+YW1dIEVycm9yIDINCg0KQ29tcGlsYXRpb24gZXhpdGVkIGFibm9ybWFsbHkgd2l0aCBjb2RlIDIg
+YXQgVGh1IEZlYsKgwqAyIDE1OjM3OjE5DQoNCg0KSSBoYXZlIG5vdCB5ZXQgdHJpZWQgdG8gZmln
+dXJlIG91dCB3aGljaCBjb21taXQgYnJva2UgdGhlIGJ1aWxkLg0KDQpCYXJ0Lg==
