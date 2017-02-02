@@ -1,47 +1,22 @@
-Return-Path: <prvs=423213d9ff=jbacik@fb.com>
-From: Josef Bacik <jbacik@fb.com>
-To: <axboe@kernel.dk>, <nbd-general@lists.sourceforge.net>,
+Return-Path: <prvs=32061165df=axboe@fb.com>
+Subject: Re: [PATCH] nbd: use our own workqueue for recv threads
+To: Josef Bacik <jbacik@fb.com>, <axboe@kernel.dk>,
         <linux-block@vger.kernel.org>, <kernel-team@fb.com>
-Subject: [PATCH 0/6] Lots of NBD fixes and enhancements
-Date: Tue, 28 Feb 2017 11:57:05 -0500
-Message-ID: <1488301031-3199-1-git-send-email-jbacik@fb.com>
+References: <1485983471-3717-1-git-send-email-jbacik@fb.com>
+From: Jens Axboe <axboe@fb.com>
+Message-ID: <bb9bc1c1-c7be-9339-d3c8-a02e79f33db9@fb.com>
+Date: Wed, 1 Feb 2017 17:35:59 -0800
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <1485983471-3717-1-git-send-email-jbacik@fb.com>
+Content-Type: text/plain; charset="windows-1252"
 List-ID: <linux-block@vger.kernel.org>
 
-This is kind of a big batch of patches, but they all depend on eachother so it
-was hard to tease out the fixes from the enhancements without making my life
-miserable.
+On 02/01/2017 01:11 PM, Josef Bacik wrote:
+> Since we are in the memory reclaim path we need our recv work to be on a
+> workqueue that has WQ_MEM_RECLAIM set so we can avoid deadlocks.  Also
+> set WQ_HIGHPRI since we are in the completion path for IO.
 
-FIXES:
-nbd: set queue timeout properly
-nbd: handle ERESTARTSYS properly
+Applied for 4.11.
 
-The ERSTARTSYS one in particular is pretty awful as we can tear down a whole
-device if a userspace app has a signal pending while submitting IO.  This is big
-and scary but I had a debug patch on top of this to randomly induce ERESTARTSYS
-to make sure it was behaving properly.
-
-ENHANCEMENTS:
-
-1) Handle signle path failures gracefully.  This is the first step to handling
-reconnects gracefully, but for right now we can easily fall back on other
-connections if we happen to lose one connection.
-
-2) Ref counting and bdev change.  This is in preparation for the netlink patch
-and handling reconnects and the such better.
-
-3) Netlink interface.  Trying to add the nbd-control thing was controversial,
-and I realized the more I wanted to do with monitoring and stuff I would need to
-use netlink for anyway.  With this new interface we can easily configure and
-disconnect devices, dynamically add devices if we are past our pre-allocated
-limit, and dynamically find free devices to use if we don't want to try and hunt
-for a device.  The userspace patch to utilize this is kind of rough but can be
-found in my github tree
-
-https://github.com/josefbacik/nbd
-
-These have been pretty well tested, but I'd like to hear any thoughts on the new
-interface.  Thanks,
-
-Josef
+-- 
+Jens Axboe
