@@ -1,76 +1,92 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Return-Path: <jack@suse.cz>
 From: Jan Kara <jack@suse.cz>
-To: <linux-fsdevel@vger.kernel.org>
-Cc: Christoph Hellwig <hch@infradead.org>, linux-block@vger.kernel.org,
-        Jan Kara <jack@suse.cz>
-Subject: [PATCH 03/24] block: Unregister bdi on last reference drop
-Date: Thu,  2 Feb 2017 18:34:01 +0100
-Message-Id: <20170202173422.3240-4-jack@suse.cz>
-In-Reply-To: <20170202173422.3240-1-jack@suse.cz>
-References: <20170202173422.3240-1-jack@suse.cz>
-Sender: linux-fsdevel-owner@vger.kernel.org
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
+	Laurent Dufour <ldufour@linux.vnet.ibm.com>,
+	Jan Kara <jack@suse.cz>
+Subject: [PATCH 1/5] block: Unhash block device inodes on gendisk destruction
+Date: Thu,  2 Feb 2017 15:56:49 +0100
+Message-Id: <20170202145653.19614-2-jack@suse.cz>
+In-Reply-To: <20170202145653.19614-1-jack@suse.cz>
+References: <20170202145653.19614-1-jack@suse.cz>
 List-ID: <linux-block@vger.kernel.org>
 
-Most users will want to unregister bdi when dropping last reference to a
-bdi. Only a few users (like block devices) want to play more complex
-tricks with bdi registration and unregistration. So unregister bdi when
-the last reference to bdi is dropped and just make sure we don't
-unregister the bdi the second time if it is already unregistered.
+Currently, block device inodes stay around after corresponding gendisk
+hash died until memory reclaim finds them and frees them. Since we will
+make block device inode pin the bdi, we want to free the block device
+inode as soon as the device goes away so that bdi does not stay around
+unnecessarily. Furthermore we need to avoid issues when new device with
+the same major,minor pair gets created since reusing the bdi structure
+would be rather difficult in this case.
 
+Unhashing block device inode on gendisk destruction nicely deals with
+these problems. Once last block device inode reference is dropped (which
+may be directly in del_gendisk()), the inode gets evicted. Furthermore if
+the major,minor pair gets reallocated, we are guaranteed to get new
+block device inode even if old block device inode is not yet evicted and
+thus we avoid issues with possible reuse of bdi.
+
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- include/linux/backing-dev-defs.h |  3 ++-
- mm/backing-dev.c                 | 10 ++++++++++
- 2 files changed, 12 insertions(+), 1 deletion(-)
+ block/genhd.c      |  2 ++
+ fs/block_dev.c     | 15 +++++++++++++++
+ include/linux/fs.h |  1 +
+ 3 files changed, 18 insertions(+)
 
-diff --git a/include/linux/backing-dev-defs.h b/include/linux/backing-dev-defs.h
-index ad955817916d..2ecafc8a2d06 100644
---- a/include/linux/backing-dev-defs.h
-+++ b/include/linux/backing-dev-defs.h
-@@ -146,7 +146,8 @@ struct backing_dev_info {
- 	char *name;
+diff --git a/block/genhd.c b/block/genhd.c
+index fcd6d4fae657..f2f22d0e8e14 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -648,6 +648,8 @@ void del_gendisk(struct gendisk *disk)
+ 	disk_part_iter_init(&piter, disk,
+ 			     DISK_PITER_INCL_EMPTY | DISK_PITER_REVERSE);
+ 	while ((part = disk_part_iter_next(&piter))) {
++		bdev_unhash_inode(MKDEV(disk->major,
++					disk->first_minor + part->partno));
+ 		invalidate_partition(disk, part->partno);
+ 		delete_partition(disk, part->partno);
+ 	}
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index 5db5d1340d69..ed6a34be7a1e 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -954,6 +954,21 @@ static int bdev_set(struct inode *inode, void *data)
  
- 	struct kref refcnt;	/* Reference counter for the structure */
--	unsigned int capabilities; /* Device capabilities */
-+	unsigned int registered:1;	/* Is bdi registered? */
-+	unsigned int capabilities:31;	/* Device capabilities */
- 	unsigned int min_ratio;
- 	unsigned int max_ratio, max_prop_frac;
+ static LIST_HEAD(all_bdevs);
  
-diff --git a/mm/backing-dev.c b/mm/backing-dev.c
-index d59571023df7..82fee0f52d06 100644
---- a/mm/backing-dev.c
-+++ b/mm/backing-dev.c
-@@ -843,6 +843,7 @@ int bdi_register_va(struct backing_dev_info *bdi, struct device *parent,
- 
- 	spin_lock_bh(&bdi_lock);
- 	list_add_tail_rcu(&bdi->bdi_list, &bdi_list);
-+	bdi->registered = 1;
- 	spin_unlock_bh(&bdi_lock);
- 
- 	trace_writeback_bdi_register(bdi);
-@@ -897,6 +898,14 @@ static void bdi_remove_from_list(struct backing_dev_info *bdi)
- 
- void bdi_unregister(struct backing_dev_info *bdi)
- {
-+	spin_lock_bh(&bdi_lock);
-+	if (!bdi->registered) {
-+		spin_unlock_bh(&bdi_lock);
-+		return;
-+	}
-+	bdi->registered = 0;
-+	spin_unlock_bh(&bdi_lock);
++/*
++ * If there is a bdev inode for this device, unhash it so that it gets evicted
++ * as soon as last inode reference is dropped.
++ */
++void bdev_unhash_inode(dev_t dev)
++{
++	struct inode *inode;
 +
- 	/* make sure nobody finds us on the bdi_list anymore */
- 	bdi_remove_from_list(bdi);
- 	wb_shutdown(&bdi->wb);
-@@ -925,6 +934,7 @@ static void release_bdi(struct kref *ref)
- 	struct backing_dev_info *bdi =
- 			container_of(ref, struct backing_dev_info, refcnt);
- 
-+	bdi_unregister(bdi);
- 	bdi_exit(bdi);
- 	kfree(bdi);
- }
++	inode = ilookup5(blockdev_superblock, hash(dev), bdev_test, &dev);
++	if (inode) {
++		remove_inode_hash(inode);
++		iput(inode);
++	}
++}
++
+ struct block_device *bdget(dev_t dev)
+ {
+ 	struct block_device *bdev;
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index 2ba074328894..702cb6c50194 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -2342,6 +2342,7 @@ extern struct kmem_cache *names_cachep;
+ #ifdef CONFIG_BLOCK
+ extern int register_blkdev(unsigned int, const char *);
+ extern void unregister_blkdev(unsigned int, const char *);
++extern void bdev_unhash_inode(dev_t dev);
+ extern struct block_device *bdget(dev_t);
+ extern struct block_device *bdgrab(struct block_device *bdev);
+ extern void bd_set_size(struct block_device *, loff_t size);
 -- 
 2.10.2
