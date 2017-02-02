@@ -1,61 +1,41 @@
-Return-Path: <jasowang@redhat.com>
-Subject: Re: [PATCH 1/9] virtio_pci: remove struct virtio_pci_vq_info
-To: Christoph Hellwig <hch@lst.de>, mst@redhat.com
-References: <1485504997-17584-1-git-send-email-hch@lst.de>
- <1485504997-17584-2-git-send-email-hch@lst.de>
-Cc: axboe@kernel.dk, pbonzini@redhat.com,
- virtualization@lists.linux-foundation.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <a5568074-d92e-8322-6955-19c640006fda@redhat.com>
-Date: Fri, 3 Feb 2017 15:54:36 +0800
+Subject: Re: [PATCH 0/6] block: fix blk-mq debugfs vs. blktrace
+To: Omar Sandoval <osandov@osandov.com>, linux-block@vger.kernel.org
+References: <cover.1485902856.git.osandov@fb.com>
+Cc: kernel-team@fb.com, Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+From: Jens Axboe <axboe@fb.com>
+Message-ID: <6ec81ae3-159f-999f-a3ea-0a245b8f2366@fb.com>
+Date: Thu, 2 Feb 2017 10:20:49 -0700
 MIME-Version: 1.0
-In-Reply-To: <1485504997-17584-2-git-send-email-hch@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+In-Reply-To: <cover.1485902856.git.osandov@fb.com>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-block@vger.kernel.org>
 
+On 01/31/2017 03:53 PM, Omar Sandoval wrote:
+> From: Omar Sandoval <osandov@fb.com>
+> 
+> When I moved the blk-mq debugging information to debugfs, I didn't
+> realize that blktrace also created directories in debugfs that
+> conflicted with the blk-mq directories. This series fixes that.
+> 
+> Patch 1 adds a new debugfs helper needed for patch 6. Greg, could I get
+> an ack on that if it makes sense? Jens and I went back and forth on this
+> for a little while, but patch 6 has more of the rationale on why we
+> decided that this approach was the cleanest.
+> 
+> Patches 2 and 3 are cleanups.
+> 
+> Patch 4 is the first part of the fix, making blk-mq and blktrace use the
+> same top-level "block" directory.
+> 
+> Patches 5 and 6 make blk-mq and blktrace play nicely with each other
+> w.r.t. the debugfs "block/$dev" directories.
+> 
+> I tested this with multiple configurations, so hopefully I didn't mess
+> that up this time.
+> 
+> Applies to for-4.11/block.
 
+Applied with Greg's ack on the first patch, thanks Omar.
 
-On 2017年01月27日 16:16, Christoph Hellwig wrote:
-> We don't really need struct virtio_pci_vq_info, as most field in there
-> are redundant:
->
->   - the vq backpointer is not strictly neede to start with
->   - the entry in the vqs list is not needed - the generic virtqueue already
->     has list, we only need to check if it has a callback to get the same
->     semantics
->   - we can use a simple array to look up the MSI-X vec if needed.
->   - That simple array now also duoble serves to replace the per_vq_vectors
->     flag
->
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->   drivers/virtio/virtio_pci_common.c | 117 +++++++++++--------------------------
->   drivers/virtio/virtio_pci_common.h |  25 +-------
->   drivers/virtio/virtio_pci_legacy.c |   6 +-
->   drivers/virtio/virtio_pci_modern.c |   6 +-
->   4 files changed, 39 insertions(+), 115 deletions(-)
->
-> diff --git a/drivers/virtio/virtio_pci_common.c b/drivers/virtio/virtio_pci_common.c
-> index 186cbab..a3376731 100644
-> --- a/drivers/virtio/virtio_pci_common.c
-> +++ b/drivers/virtio/virtio_pci_common.c
-> @@ -62,16 +62,13 @@ static irqreturn_t vp_config_changed(int irq, void *opaque)
->   static irqreturn_t vp_vring_interrupt(int irq, void *opaque)
->   {
->   	struct virtio_pci_device *vp_dev = opaque;
-> -	struct virtio_pci_vq_info *info;
->   	irqreturn_t ret = IRQ_NONE;
-> -	unsigned long flags;
-> +	struct virtqueue *vq;
->   
-> -	spin_lock_irqsave(&vp_dev->lock, flags);
-> -	list_for_each_entry(info, &vp_dev->virtqueues, node) {
-> -		if (vring_interrupt(irq, info->vq) == IRQ_HANDLED)
-> +	list_for_each_entry(vq, &vp_dev->vdev.vqs, list) {
-> +		if (vq->callback && vring_interrupt(irq, vq) == IRQ_HANDLED)
-
-The check of vq->callback seems redundant, we will check it soon in 
-vring_interrupt().
-
-Thanks
+-- 
+Jens Axboe
