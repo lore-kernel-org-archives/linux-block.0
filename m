@@ -1,52 +1,25 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-Content-Type: text/plain; charset=us-ascii
-Subject: [WIP BRANCH] cgroups support in bfq-mq WIP branch
-Message-Id: <CBE2870C-EEB4-4C2E-A5A3-20C37E16B6AE@linaro.org>
-Date: Sat, 25 Feb 2017 18:44:26 +0100
-To: "ulf.hansson@linaro.org" <ulf.hansson@linaro.org>,
- "tj@kernel.org" <tj@kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "broonie@kernel.org" <broonie@kernel.org>,
- "linus.walleij@linaro.org" <linus.walleij@linaro.org>,
- "axboe@kernel.dk" <axboe@kernel.dk>,
- Bart Van Assche <bart.vanassche@sandisk.com>
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Subject: Re: [PATCH] blk-mq-sched: bypass the scheduler for flushes entirely
+To: Omar Sandoval <osandov@osandov.com>, linux-block@vger.kernel.org
+References: <0d437b20c5eafb38997dbb4695c6387cbe18991a.1486078616.git.osandov@fb.com>
+Cc: kernel-team@fb.com
+From: Jens Axboe <axboe@fb.com>
+Message-ID: <54e0a7c4-5cf2-13a6-a059-32964fa37b2b@fb.com>
+Date: Thu, 2 Feb 2017 16:57:30 -0700
+MIME-Version: 1.0
+In-Reply-To: <0d437b20c5eafb38997dbb4695c6387cbe18991a.1486078616.git.osandov@fb.com>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-block@vger.kernel.org>
 
-Hi,
-I've just completed cgroups support, and I'd like to highlight the
-main blk-mq issue that I have found along the way.  I have pushed the
-commit that completes the support for cgroups to the usual WIP branch
-[1].  Before moving to this issue, I have preliminary question about
-the scheduler name, since I'm about to start preparing the patch
-series for submission.  So far, I have used bfq-mq as a temporary
-name.  Are we fine with it, or should I change it, for example, to
-just bfq?  Jens?
+On 02/02/2017 04:42 PM, Omar Sandoval wrote:
+> From: Omar Sandoval <osandov@fb.com>
+> 
+> There's a weird inconsistency that flushes are mostly hidden from the
+> scheduler, but it needs to be aware of them in ->insert_requests().
+> Instead of having every scheduler call blk_mq_sched_bypass_insert(),
+> let's do it in the common framework.
 
-I've found a sort of circular dependency in blk-mq, related to
-scheduler initialization.  To describe both the issue and how I've
-addressed it, I'm pasting the message of the new commit.
+Thanks Omar, looks good to me. After a cycle or two, we can kill
+the debug loop in blk_mq_sched_insert_requests().
 
-    This commit completes cgroups support for bfq-mq. In particular, it =
-deals with
-    a sort of circular dependency introduced in blk-mq: the function
-    blkcg_activate_policy, invoked during scheduler initialization, =
-triggers the
-    invocation of the has_work scheduler hook (before the init function =
-is
-    finished). To adress this issue, this commit moves the invocation of
-    blkcg_activate_policy after the initialization of all the fields =
-that could be
-    initialized before invoking blkcg_activate_policy itself. This =
-enables has_work
-    to correctly return false, and thus to prevent the blk-mq stack from =
-invoking
-    further scheduler hooks before the init function is finished.
-
-Thanks,
-Paolo
-
-[1] https://github.com/Algodev-github/bfq-mq=
+-- 
+Jens Axboe
