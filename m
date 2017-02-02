@@ -1,38 +1,117 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from b.ns.miles-group.at ([95.130.255.144]:44723 "EHLO radon.swed.at"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751476AbdBBUe4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 2 Feb 2017 15:34:56 -0500
-Subject: Re: [PATCH 22/24] ubifs: Convert to separately allocated bdi
-To: Jan Kara <jack@suse.cz>, linux-fsdevel@vger.kernel.org
-References: <20170202173422.3240-1-jack@suse.cz>
- <20170202173422.3240-23-jack@suse.cz>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Jan Kara <jack@suse.cz>
+To: <linux-fsdevel@vger.kernel.org>
 Cc: Christoph Hellwig <hch@infradead.org>, linux-block@vger.kernel.org,
+        Jan Kara <jack@suse.cz>, Richard Weinberger <richard@nod.at>,
         Artem Bityutskiy <dedekind1@gmail.com>,
         Adrian Hunter <adrian.hunter@intel.com>,
         linux-mtd@lists.infradead.org
-From: Richard Weinberger <richard@nod.at>
-Message-ID: <26c70615-f98c-23a6-abb7-de675fb658b6@nod.at>
-Date: Thu, 2 Feb 2017 21:34:32 +0100
-MIME-Version: 1.0
-In-Reply-To: <20170202173422.3240-23-jack@suse.cz>
-Content-Type: text/plain; charset=iso-8859-15
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Subject: [PATCH 22/24] ubifs: Convert to separately allocated bdi
+Date: Thu,  2 Feb 2017 18:34:20 +0100
+Message-Id: <20170202173422.3240-23-jack@suse.cz>
+In-Reply-To: <20170202173422.3240-1-jack@suse.cz>
+References: <20170202173422.3240-1-jack@suse.cz>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Jan,
+Allocate struct backing_dev_info separately instead of embedding it
+inside the superblock. This unifies handling of bdi among users.
 
-Am 02.02.2017 um 18:34 schrieb Jan Kara:
-> Allocate struct backing_dev_info separately instead of embedding it
-> inside the superblock. This unifies handling of bdi among users.
-> 
-> CC: Richard Weinberger <richard@nod.at>
-> CC: Artem Bityutskiy <dedekind1@gmail.com>
-> CC: Adrian Hunter <adrian.hunter@intel.com>
-> CC: linux-mtd@lists.infradead.org
-> Signed-off-by: Jan Kara <jack@suse.cz>
+CC: Richard Weinberger <richard@nod.at>
+CC: Artem Bityutskiy <dedekind1@gmail.com>
+CC: Adrian Hunter <adrian.hunter@intel.com>
+CC: linux-mtd@lists.infradead.org
+Signed-off-by: Jan Kara <jack@suse.cz>
+---
+ fs/ubifs/super.c | 23 +++++++----------------
+ fs/ubifs/ubifs.h |  3 ---
+ 2 files changed, 7 insertions(+), 19 deletions(-)
 
-Is this series available at some git tree, please?
-
-Thanks,
-//richard
+diff --git a/fs/ubifs/super.c b/fs/ubifs/super.c
+index e08aa04fc835..34810eb52b22 100644
+--- a/fs/ubifs/super.c
++++ b/fs/ubifs/super.c
+@@ -1827,7 +1827,6 @@ static void ubifs_put_super(struct super_block *sb)
+ 	}
+ 
+ 	ubifs_umount(c);
+-	bdi_destroy(&c->bdi);
+ 	ubi_close_volume(c->ubi);
+ 	mutex_unlock(&c->umount_mutex);
+ }
+@@ -2019,29 +2018,23 @@ static int ubifs_fill_super(struct super_block *sb, void *data, int silent)
+ 		goto out;
+ 	}
+ 
++	err = ubifs_parse_options(c, data, 0);
++	if (err)
++		goto out_close;
++
+ 	/*
+ 	 * UBIFS provides 'backing_dev_info' in order to disable read-ahead. For
+ 	 * UBIFS, I/O is not deferred, it is done immediately in readpage,
+ 	 * which means the user would have to wait not just for their own I/O
+ 	 * but the read-ahead I/O as well i.e. completely pointless.
+ 	 *
+-	 * Read-ahead will be disabled because @c->bdi.ra_pages is 0.
++	 * Read-ahead will be disabled because @sb->s_bdi->ra_pages is 0.
+ 	 */
+-	c->bdi.name = "ubifs",
+-	c->bdi.capabilities = 0;
+-	err  = bdi_init(&c->bdi);
++	err = super_setup_bdi_name(sb, "ubifs_%d_%d", c->vi.ubi_num,
++				   c->vi.vol_id);
+ 	if (err)
+ 		goto out_close;
+-	err = bdi_register(&c->bdi, NULL, "ubifs_%d_%d",
+-			   c->vi.ubi_num, c->vi.vol_id);
+-	if (err)
+-		goto out_bdi;
+-
+-	err = ubifs_parse_options(c, data, 0);
+-	if (err)
+-		goto out_bdi;
+ 
+-	sb->s_bdi = &c->bdi;
+ 	sb->s_fs_info = c;
+ 	sb->s_magic = UBIFS_SUPER_MAGIC;
+ 	sb->s_blocksize = UBIFS_BLOCK_SIZE;
+@@ -2080,8 +2073,6 @@ static int ubifs_fill_super(struct super_block *sb, void *data, int silent)
+ 	ubifs_umount(c);
+ out_unlock:
+ 	mutex_unlock(&c->umount_mutex);
+-out_bdi:
+-	bdi_destroy(&c->bdi);
+ out_close:
+ 	ubi_close_volume(c->ubi);
+ out:
+diff --git a/fs/ubifs/ubifs.h b/fs/ubifs/ubifs.h
+index ca72382ce6cc..41b42a425b42 100644
+--- a/fs/ubifs/ubifs.h
++++ b/fs/ubifs/ubifs.h
+@@ -968,7 +968,6 @@ struct ubifs_debug_info;
+  * struct ubifs_info - UBIFS file-system description data structure
+  * (per-superblock).
+  * @vfs_sb: VFS @struct super_block object
+- * @bdi: backing device info object to make VFS happy and disable read-ahead
+  *
+  * @highest_inum: highest used inode number
+  * @max_sqnum: current global sequence number
+@@ -1216,7 +1215,6 @@ struct ubifs_debug_info;
+  */
+ struct ubifs_info {
+ 	struct super_block *vfs_sb;
+-	struct backing_dev_info bdi;
+ 
+ 	ino_t highest_inum;
+ 	unsigned long long max_sqnum;
+@@ -1457,7 +1455,6 @@ extern const struct inode_operations ubifs_file_inode_operations;
+ extern const struct file_operations ubifs_dir_operations;
+ extern const struct inode_operations ubifs_dir_inode_operations;
+ extern const struct inode_operations ubifs_symlink_inode_operations;
+-extern struct backing_dev_info ubifs_backing_dev_info;
+ extern struct ubifs_compressor *ubifs_compressors[UBIFS_COMPR_TYPES_CNT];
+ 
+ /* io.c */
+-- 
+2.10.2
