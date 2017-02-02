@@ -1,151 +1,78 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:45491 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752254AbdBBRgD (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 2 Feb 2017 12:36:03 -0500
-From: Jan Kara <jack@suse.cz>
-To: <linux-fsdevel@vger.kernel.org>
-Cc: Christoph Hellwig <hch@infradead.org>, linux-block@vger.kernel.org,
-        Jan Kara <jack@suse.cz>, Chris Mason <clm@fb.com>,
-        Josef Bacik <jbacik@fb.com>, David Sterba <dsterba@suse.com>,
-        linux-btrfs@vger.kernel.org
-Subject: [PATCH 08/24] btrfs: Convert to separately allocated bdi
-Date: Thu,  2 Feb 2017 18:34:06 +0100
-Message-Id: <20170202173422.3240-9-jack@suse.cz>
-In-Reply-To: <20170202173422.3240-1-jack@suse.cz>
-References: <20170202173422.3240-1-jack@suse.cz>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH v3] scsi, block: fix duplicate bdi name registration
+ crashes
+To: Dan Williams <dan.j.williams@intel.com>
+References: <148598661794.11527.10024529085859239448.stgit@dwillia2-desk3.amr.corp.intel.com>
+ <e331cf91-37a2-d886-1136-4f33279e65ad@kernel.dk>
+ <CAPcyv4jC5mVednFh8crsa0-GGFyPPEBKHUz5itCQ_4Tc1tX6Ew@mail.gmail.com>
+ <f3671618-eab3-7597-eebb-f46fefbac12a@kernel.dk>
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
+ linux-block@vger.kernel.org, Jan Kara <jack@suse.cz>,
+ linux-scsi <linux-scsi@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ Christoph Hellwig <hch@lst.de>,
+ James Bottomley <James.Bottomley@hansenpartnership.com>,
+ Bart Van Assche <bart.vanassche@sandisk.com>,
+ Omar Sandoval <osandov@osandov.com>, Omar Sandoval <osandov@fb.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <07c52003-cd32-ee02-1d73-64586de7e9eb@kernel.dk>
+Date: Thu, 2 Feb 2017 08:23:55 -0700
+MIME-Version: 1.0
+In-Reply-To: <f3671618-eab3-7597-eebb-f46fefbac12a@kernel.dk>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-Allocate struct backing_dev_info separately instead of embedding it
-inside superblock. This unifies handling of bdi among users.
+On 02/01/2017 03:43 PM, Jens Axboe wrote:
+> On 02/01/2017 02:40 PM, Dan Williams wrote:
+>> On Wed, Feb 1, 2017 at 2:35 PM, Jens Axboe <axboe@kernel.dk> wrote:
+>>> On 02/01/2017 02:05 PM, Dan Williams wrote:
+>>>> Warnings of the following form occur because scsi reuses a devt number
+>>>> while the block layer still has it referenced as the name of the bdi
+>>>> [1]:
+>>>>
+>>>>  WARNING: CPU: 1 PID: 93 at fs/sysfs/dir.c:31 sysfs_warn_dup+0x62/0x80
+>>>>  sysfs: cannot create duplicate filename '/devices/virtual/bdi/8:192'
+>>>>  [..]
+>>>>  Call Trace:
+>>>>   dump_stack+0x86/0xc3
+>>>>   __warn+0xcb/0xf0
+>>>>   warn_slowpath_fmt+0x5f/0x80
+>>>>   ? kernfs_path_from_node+0x4f/0x60
+>>>>   sysfs_warn_dup+0x62/0x80
+>>>>   sysfs_create_dir_ns+0x77/0x90
+>>>>   kobject_add_internal+0xb2/0x350
+>>>>   kobject_add+0x75/0xd0
+>>>>   device_add+0x15a/0x650
+>>>>   device_create_groups_vargs+0xe0/0xf0
+>>>>   device_create_vargs+0x1c/0x20
+>>>>   bdi_register+0x90/0x240
+>>>>   ? lockdep_init_map+0x57/0x200
+>>>>   bdi_register_owner+0x36/0x60
+>>>>   device_add_disk+0x1bb/0x4e0
+>>>>   ? __pm_runtime_use_autosuspend+0x5c/0x70
+>>>>   sd_probe_async+0x10d/0x1c0
+>>>>   async_run_entry_fn+0x39/0x170
+>>>>
+>>>> This is a brute-force fix to pass the devt release information from
+>>>> sd_probe() to the locations where we register the bdi,
+>>>> device_add_disk(), and unregister the bdi, blk_cleanup_queue().
+>>>>
+>>>> Thanks to Omar for the quick reproducer script [2]. This patch survives
+>>>> where an unmodified kernel fails in a few seconds.
+>>>
+>>> What is the patch against? Doesn't seem to apply cleanly for me on
+>>> master, nor the 4.11 block tree.
+>>>
+>>
+>> I built it on top of Jan's bdi fixes series [1]. I can rebase to
+>> block/for-next, just let me know which patches you want to take first.
+>>
+>> [1]: http://marc.info/?l=linux-block&m=148586843819160&w=2
+> 
+> Ah, no that's fine, we'll just pull Jan's stuff in first. Makes sense.
 
-CC: Chris Mason <clm@fb.com>
-CC: Josef Bacik <jbacik@fb.com>
-CC: David Sterba <dsterba@suse.com>
-CC: linux-btrfs@vger.kernel.org
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- fs/btrfs/ctree.h   |  1 -
- fs/btrfs/disk-io.c | 36 +++++++-----------------------------
- fs/btrfs/super.c   |  7 +++++++
- 3 files changed, 14 insertions(+), 30 deletions(-)
+Both are now applied, thanks Dan.
 
-diff --git a/fs/btrfs/ctree.h b/fs/btrfs/ctree.h
-index 6a823719b6c5..1dc06f66dfcf 100644
---- a/fs/btrfs/ctree.h
-+++ b/fs/btrfs/ctree.h
-@@ -801,7 +801,6 @@ struct btrfs_fs_info {
- 	struct btrfs_super_block *super_for_commit;
- 	struct super_block *sb;
- 	struct inode *btree_inode;
--	struct backing_dev_info bdi;
- 	struct mutex tree_log_mutex;
- 	struct mutex transaction_kthread_mutex;
- 	struct mutex cleaner_mutex;
-diff --git a/fs/btrfs/disk-io.c b/fs/btrfs/disk-io.c
-index 37a31b12bb0c..b25723e729c0 100644
---- a/fs/btrfs/disk-io.c
-+++ b/fs/btrfs/disk-io.c
-@@ -1810,21 +1810,6 @@ static int btrfs_congested_fn(void *congested_data, int bdi_bits)
- 	return ret;
- }
- 
--static int setup_bdi(struct btrfs_fs_info *info, struct backing_dev_info *bdi)
--{
--	int err;
--
--	err = bdi_setup_and_register(bdi, "btrfs");
--	if (err)
--		return err;
--
--	bdi->ra_pages = VM_MAX_READAHEAD * 1024 / PAGE_SIZE;
--	bdi->congested_fn	= btrfs_congested_fn;
--	bdi->congested_data	= info;
--	bdi->capabilities |= BDI_CAP_CGROUP_WRITEBACK;
--	return 0;
--}
--
- /*
-  * called by the kthread helper functions to finally call the bio end_io
-  * functions.  This is where read checksum verification actually happens
-@@ -2598,16 +2583,10 @@ int open_ctree(struct super_block *sb,
- 		goto fail;
- 	}
- 
--	ret = setup_bdi(fs_info, &fs_info->bdi);
--	if (ret) {
--		err = ret;
--		goto fail_srcu;
--	}
--
- 	ret = percpu_counter_init(&fs_info->dirty_metadata_bytes, 0, GFP_KERNEL);
- 	if (ret) {
- 		err = ret;
--		goto fail_bdi;
-+		goto fail_srcu;
- 	}
- 	fs_info->dirty_metadata_batch = PAGE_SIZE *
- 					(1 + ilog2(nr_cpu_ids));
-@@ -2715,7 +2694,6 @@ int open_ctree(struct super_block *sb,
- 
- 	sb->s_blocksize = 4096;
- 	sb->s_blocksize_bits = blksize_bits(4096);
--	sb->s_bdi = &fs_info->bdi;
- 
- 	btrfs_init_btree_inode(fs_info);
- 
-@@ -2912,9 +2890,12 @@ int open_ctree(struct super_block *sb,
- 		goto fail_sb_buffer;
- 	}
- 
--	fs_info->bdi.ra_pages *= btrfs_super_num_devices(disk_super);
--	fs_info->bdi.ra_pages = max(fs_info->bdi.ra_pages,
--				    SZ_4M / PAGE_SIZE);
-+	sb->s_bdi->congested_fn = btrfs_congested_fn;
-+	sb->s_bdi->congested_data = fs_info;
-+	sb->s_bdi->capabilities |= BDI_CAP_CGROUP_WRITEBACK;
-+	sb->s_bdi->ra_pages = VM_MAX_READAHEAD * 1024 / PAGE_SIZE;
-+	sb->s_bdi->ra_pages *= btrfs_super_num_devices(disk_super);
-+	sb->s_bdi->ra_pages = max(sb->s_bdi->ra_pages, SZ_4M / PAGE_SIZE);
- 
- 	sb->s_blocksize = sectorsize;
- 	sb->s_blocksize_bits = blksize_bits(sectorsize);
-@@ -3282,8 +3263,6 @@ int open_ctree(struct super_block *sb,
- 	percpu_counter_destroy(&fs_info->delalloc_bytes);
- fail_dirty_metadata_bytes:
- 	percpu_counter_destroy(&fs_info->dirty_metadata_bytes);
--fail_bdi:
--	bdi_destroy(&fs_info->bdi);
- fail_srcu:
- 	cleanup_srcu_struct(&fs_info->subvol_srcu);
- fail:
-@@ -4010,7 +3989,6 @@ void close_ctree(struct btrfs_fs_info *fs_info)
- 	percpu_counter_destroy(&fs_info->dirty_metadata_bytes);
- 	percpu_counter_destroy(&fs_info->delalloc_bytes);
- 	percpu_counter_destroy(&fs_info->bio_counter);
--	bdi_destroy(&fs_info->bdi);
- 	cleanup_srcu_struct(&fs_info->subvol_srcu);
- 
- 	btrfs_free_stripe_hash_table(fs_info);
-diff --git a/fs/btrfs/super.c b/fs/btrfs/super.c
-index b5ae7d3d1896..08ef08b63132 100644
---- a/fs/btrfs/super.c
-+++ b/fs/btrfs/super.c
-@@ -1133,6 +1133,13 @@ static int btrfs_fill_super(struct super_block *sb,
- #endif
- 	sb->s_flags |= MS_I_VERSION;
- 	sb->s_iflags |= SB_I_CGROUPWB;
-+
-+	err = super_setup_bdi(sb);
-+	if (err) {
-+		btrfs_err(fs_info, "super_setup_bdi failed");
-+		return err;
-+	}
-+
- 	err = open_ctree(sb, fs_devices, (char *)data);
- 	if (err) {
- 		btrfs_err(fs_info, "open_ctree failed");
+
 -- 
-2.10.2
-
+Jens Axboe
