@@ -1,76 +1,83 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:44672 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752107AbdB1O6E (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Feb 2017 09:58:04 -0500
-From: Christoph Hellwig <hch@lst.de>
-To: linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
-        linux-block@vger.kernel.org
-Subject: [PATCH 08/12] xfs: implement the F_IOINFO fcntl
-Date: Tue, 28 Feb 2017 06:57:33 -0800
-Message-Id: <20170228145737.19016-9-hch@lst.de>
-In-Reply-To: <20170228145737.19016-1-hch@lst.de>
-References: <20170228145737.19016-1-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Jan Kara <jack@suse.cz>
+To: <linux-fsdevel@vger.kernel.org>
+Cc: Christoph Hellwig <hch@infradead.org>, linux-block@vger.kernel.org,
+        Jan Kara <jack@suse.cz>, Jan Harkes <jaharkes@cs.cmu.edu>,
+        coda@cs.cmu.edu, codalist@coda.cs.cmu.edu
+Subject: [PATCH 15/24] coda: Convert to separately allocated bdi
+Date: Thu,  2 Feb 2017 18:34:13 +0100
+Message-Id: <20170202173422.3240-16-jack@suse.cz>
+In-Reply-To: <20170202173422.3240-1-jack@suse.cz>
+References: <20170202173422.3240-1-jack@suse.cz>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Allocate struct backing_dev_info separately instead of embedding it
+inside the superblock. This unifies handling of bdi among users.
+
+CC: Jan Harkes <jaharkes@cs.cmu.edu>
+CC: coda@cs.cmu.edu
+CC: codalist@coda.cs.cmu.edu
+Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- fs/xfs/xfs_file.c | 34 ++++++++++++++++++++++++++++++++++
- 1 file changed, 34 insertions(+)
+ fs/coda/inode.c            | 11 ++++-------
+ include/linux/coda_psdev.h |  1 -
+ 2 files changed, 4 insertions(+), 8 deletions(-)
 
-diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
-index a7d8324b59c5..4d955b3266df 100644
---- a/fs/xfs/xfs_file.c
-+++ b/fs/xfs/xfs_file.c
-@@ -898,6 +898,39 @@ xfs_file_dedupe_range(
- 	return len;
- }
+diff --git a/fs/coda/inode.c b/fs/coda/inode.c
+index 71dbe7e287ce..b72eb96f3f96 100644
+--- a/fs/coda/inode.c
++++ b/fs/coda/inode.c
+@@ -183,10 +183,6 @@ static int coda_fill_super(struct super_block *sb, void *data, int silent)
+ 		goto unlock_out;
+ 	}
  
-+static uint16_t
-+xfs_dio_alignment(struct file *file)
-+{
-+	struct xfs_inode	*ip = XFS_I(file_inode(file));
-+	struct xfs_mount	*mp = ip->i_mount;
+-	error = bdi_setup_and_register(&vc->bdi, "coda");
+-	if (error)
+-		goto unlock_out;
+-
+ 	vc->vc_sb = sb;
+ 	mutex_unlock(&vc->vc_mutex);
+ 
+@@ -197,7 +193,10 @@ static int coda_fill_super(struct super_block *sb, void *data, int silent)
+ 	sb->s_magic = CODA_SUPER_MAGIC;
+ 	sb->s_op = &coda_super_operations;
+ 	sb->s_d_op = &coda_dentry_operations;
+-	sb->s_bdi = &vc->bdi;
 +
-+	if (file->f_flags & O_ATOMIC)
-+		return mp->m_sb.sb_blocksize;
-+	else if (XFS_IS_REALTIME_INODE(ip))
-+		return mp->m_rtdev_targp->bt_logical_sectorsize;
-+	else
-+		return mp->m_ddev_targp->bt_logical_sectorsize;
-+}
-+
-+static int
-+xfs_file_ioinfo(
-+	struct file		*file,
-+	struct fcntl_ioinfo	*fio)
-+{
-+	if (file->f_flags & O_DIRECT)
-+		fio->fio_alignment = xfs_dio_alignment(file);
-+
-+	if (file->f_flags & O_ATOMIC) {
-+		fio->fio_flags = FIO_FL_ATOMIC_OSYNC | FIO_FL_ATOMIC_FSYNC;
-+		fio->fio_max_atomic = INT_MAX;
-+		if (fio->fio_alignment)
-+			fio->fio_max_atomic &= ~(fio->fio_alignment - 1);
-+	}
-+
-+
-+	return 0;
-+};
-+
- STATIC int
- xfs_file_open(
- 	struct inode	*inode,
-@@ -1556,6 +1589,7 @@ const struct file_operations xfs_file_operations = {
- 	.fallocate	= xfs_file_fallocate,
- 	.clone_file_range = xfs_file_clone_range,
- 	.dedupe_file_range = xfs_file_dedupe_range,
-+	.ioinfo		= xfs_file_ioinfo,
++	error = super_setup_bdi(sb);
++	if (error)
++		goto error;
+ 
+ 	/* get root fid from Venus: this needs the root inode */
+ 	error = venus_rootfid(sb, &fid);
+@@ -228,7 +227,6 @@ static int coda_fill_super(struct super_block *sb, void *data, int silent)
+ 
+ error:
+ 	mutex_lock(&vc->vc_mutex);
+-	bdi_destroy(&vc->bdi);
+ 	vc->vc_sb = NULL;
+ 	sb->s_fs_info = NULL;
+ unlock_out:
+@@ -240,7 +238,6 @@ static void coda_put_super(struct super_block *sb)
+ {
+ 	struct venus_comm *vcp = coda_vcp(sb);
+ 	mutex_lock(&vcp->vc_mutex);
+-	bdi_destroy(&vcp->bdi);
+ 	vcp->vc_sb = NULL;
+ 	sb->s_fs_info = NULL;
+ 	mutex_unlock(&vcp->vc_mutex);
+diff --git a/include/linux/coda_psdev.h b/include/linux/coda_psdev.h
+index 5b8721efa948..31e4e1f1547c 100644
+--- a/include/linux/coda_psdev.h
++++ b/include/linux/coda_psdev.h
+@@ -15,7 +15,6 @@ struct venus_comm {
+ 	struct list_head    vc_processing;
+ 	int                 vc_inuse;
+ 	struct super_block *vc_sb;
+-	struct backing_dev_info bdi;
+ 	struct mutex	    vc_mutex;
  };
  
- const struct file_operations xfs_dir_file_operations = {
 -- 
-2.11.0
+2.10.2
