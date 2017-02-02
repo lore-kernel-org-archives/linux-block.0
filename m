@@ -1,189 +1,150 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:14865 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752397AbdBMQUs (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 Feb 2017 11:20:48 -0500
-From: Scott Bauer <scott.bauer@intel.com>
-To: linux-nvme@lists.infradead.org
-Cc: David.Laight@ACULAB.COM, arnd@arndb.de, axboe@fb.com,
-        keith.busch@intel.com, jonathan.derrick@intel.com,
-        hch@infradead.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, Scott Bauer <scott.bauer@intel.com>
-Subject: [PATCH V5 3/4] Move stack parameters for sed_ioctl to prevent oversized stack with CONFIG_KASAN
-Date: Mon, 13 Feb 2017 09:11:11 -0700
-Message-Id: <1487002272-17940-4-git-send-email-scott.bauer@intel.com>
-In-Reply-To: <1487002272-17940-1-git-send-email-scott.bauer@intel.com>
-References: <1487002272-17940-1-git-send-email-scott.bauer@intel.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Jan Kara <jack@suse.cz>
+To: <linux-fsdevel@vger.kernel.org>
+Cc: Christoph Hellwig <hch@infradead.org>, linux-block@vger.kernel.org,
+        Jan Kara <jack@suse.cz>, David Woodhouse <dwmw2@infradead.org>,
+        Brian Norris <computersforpeace@gmail.com>,
+        linux-mtd@lists.infradead.org
+Subject: [PATCH 14/24] mtd: Convert to dynamically allocated bdi infrastructure
+Date: Thu,  2 Feb 2017 18:34:12 +0100
+Message-Id: <20170202173422.3240-15-jack@suse.cz>
+In-Reply-To: <20170202173422.3240-1-jack@suse.cz>
+References: <20170202173422.3240-1-jack@suse.cz>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-When CONFIG_KASAN is enabled, compilation fails:
+MTD already allocates backing_dev_info dynamically. Convert it to use
+generic infrastructure for this including proper refcounting. We drop
+mtd->backing_dev_info as its only use was to pass mtd_bdi pointer from
+one file into another and if we wanted to keep that in a clean way, we'd
+have to make mtd hold and drop bdi reference as needed which seems
+pointless for passing one global pointer...
 
-block/sed-opal.c: In function 'sed_ioctl':
-block/sed-opal.c:2447:1: error: the frame size of 2256 bytes is larger than 2048 bytes [-Werror=frame-larger-than=]
-
-Moved all the ioctl structures off the stack and dynamically activate
-using _IOC_SIZE()
-
-Fixes: 455a7b238cd6 ("block: Add Sed-opal library")
-
-Reported-by: Arnd Bergmann <arnd@arndb.de>
-Signed-off-by: Scott Bauer <scott.bauer@intel.com>
+CC: David Woodhouse <dwmw2@infradead.org>
+CC: Brian Norris <computersforpeace@gmail.com>
+CC: linux-mtd@lists.infradead.org
+Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- block/sed-opal.c | 130 +++++++++++++++++++------------------------------------
- 1 file changed, 45 insertions(+), 85 deletions(-)
+ drivers/mtd/mtdcore.c   | 23 ++++++++++++-----------
+ drivers/mtd/mtdsuper.c  |  7 ++++++-
+ include/linux/mtd/mtd.h |  5 -----
+ 3 files changed, 18 insertions(+), 17 deletions(-)
 
-diff --git a/block/sed-opal.c b/block/sed-opal.c
-index 2448d4a..5733248 100644
---- a/block/sed-opal.c
-+++ b/block/sed-opal.c
-@@ -2348,7 +2348,6 @@ int sed_ioctl(struct opal_dev *dev, unsigned int cmd, void __user *arg)
- {
- 	void *ioctl_ptr;
- 	int ret = -ENOTTY;
--	unsigned int cmd_size = _IOC_SIZE(cmd);
+diff --git a/drivers/mtd/mtdcore.c b/drivers/mtd/mtdcore.c
+index 052772f7caef..a05063de362f 100644
+--- a/drivers/mtd/mtdcore.c
++++ b/drivers/mtd/mtdcore.c
+@@ -46,7 +46,7 @@
  
- 	if (!capable(CAP_SYS_ADMIN))
- 		return -EACCES;
-@@ -2357,94 +2356,55 @@ int sed_ioctl(struct opal_dev *dev, unsigned int cmd, void __user *arg)
- 		return -ENOTSUPP;
- 	}
+ #include "mtdcore.h"
  
--	switch (cmd) {
--	case IOC_OPAL_SAVE: {
--		struct opal_lock_unlock lk_unlk;
--
--		if (copy_from_user(&lk_unlk, arg, sizeof(lk_unlk)))
--			return -EFAULT;
--		return opal_save(dev, &lk_unlk);
--	}
--	case IOC_OPAL_LOCK_UNLOCK: {
--		struct opal_lock_unlock lk_unlk;
--
--		if (copy_from_user(&lk_unlk, arg, sizeof(lk_unlk)))
--			return -EFAULT;
--		return opal_lock_unlock(dev, &lk_unlk);
--	}
--	case IOC_OPAL_TAKE_OWNERSHIP: {
--		struct opal_key opal_key;
--
--		if (copy_from_user(&opal_key, arg, sizeof(opal_key)))
--			return -EFAULT;
--		return opal_take_ownership(dev, &opal_key);
--	}
--	case IOC_OPAL_ACTIVATE_LSP: {
--		struct opal_lr_act opal_lr_act;
--
--		if (copy_from_user(&opal_lr_act, arg, sizeof(opal_lr_act)))
--			return -EFAULT;
--		return opal_activate_lsp(dev, &opal_lr_act);
--	}
--	case IOC_OPAL_SET_PW: {
--		struct opal_new_pw opal_pw;
--
--		if (copy_from_user(&opal_pw, arg, sizeof(opal_pw)))
--			return -EFAULT;
--		return opal_set_new_pw(dev, &opal_pw);
--	}
--	case IOC_OPAL_ACTIVATE_USR: {
--		struct opal_session_info session;
--
--		if (copy_from_user(&session, arg, sizeof(session)))
--			return -EFAULT;
--		return opal_activate_user(dev, &session);
--	}
--	case IOC_OPAL_REVERT_TPR: {
--		struct opal_key opal_key;
--
--		if (copy_from_user(&opal_key, arg, sizeof(opal_key)))
--			return -EFAULT;
--		return opal_reverttper(dev, &opal_key);
--	}
--	case IOC_OPAL_LR_SETUP: {
--		struct opal_user_lr_setup lrs;
--
--		if (copy_from_user(&lrs, arg, sizeof(lrs)))
--			return -EFAULT;
--		return opal_setup_locking_range(dev, &lrs);
--	}
--	case IOC_OPAL_ADD_USR_TO_LR: {
--		struct opal_lock_unlock lk_unlk;
--
--		if (copy_from_user(&lk_unlk, arg, sizeof(lk_unlk)))
--			return -EFAULT;
--		return opal_add_user_to_lr(dev, &lk_unlk);
--	}
--	case IOC_OPAL_ENABLE_DISABLE_MBR: {
--		struct opal_mbr_data mbr;
--
--		if (copy_from_user(&mbr, arg, sizeof(mbr)))
--			return -EFAULT;
--		return opal_enable_disable_shadow_mbr(dev, &mbr);
--	}
--	case IOC_OPAL_ERASE_LR: {
--		struct opal_session_info session;
--
--		if (copy_from_user(&session, arg, sizeof(session)))
--			return -EFAULT;
--		return opal_erase_locking_range(dev, &session);
-+	ioctl_ptr = memdup_user(arg,  _IOC_SIZE(cmd));
-+	if (IS_ERR_OR_NULL(ioctl_ptr)) {
-+		ret = PTR_ERR(ioctl_ptr);
-+		goto out;
- 	}
--	case IOC_OPAL_SECURE_ERASE_LR: {
--		struct opal_session_info session;
+-static struct backing_dev_info *mtd_bdi;
++struct backing_dev_info *mtd_bdi;
  
--		if (copy_from_user(&session, arg, sizeof(session)))
--			return -EFAULT;
--		return opal_secure_erase_locking_range(dev, &session);
--	}
-+	switch (cmd) {
-+	case IOC_OPAL_SAVE:
-+		ret = opal_save(dev, ioctl_ptr);
-+		break;
-+	case IOC_OPAL_LOCK_UNLOCK:
-+		ret = opal_lock_unlock(dev, ioctl_ptr);
-+		break;
-+	case IOC_OPAL_TAKE_OWNERSHIP:
-+		ret = opal_take_ownership(dev, ioctl_ptr);
-+		break;
-+	case IOC_OPAL_ACTIVATE_LSP:
-+		ret = opal_activate_lsp(dev, ioctl_ptr);
-+		break;
-+	case IOC_OPAL_SET_PW:
-+		ret = opal_set_new_pw(dev, ioctl_ptr);
-+		break;
-+	case IOC_OPAL_ACTIVATE_USR:
-+		ret = opal_activate_user(dev, ioctl_ptr);
-+		break;
-+	case IOC_OPAL_REVERT_TPR:
-+		ret = opal_reverttper(dev, ioctl_ptr);
-+		break;
-+	case IOC_OPAL_LR_SETUP:
-+		ret = opal_setup_locking_range(dev, ioctl_ptr);
-+		break;
-+	case IOC_OPAL_ADD_USR_TO_LR:
-+		ret = opal_add_user_to_lr(dev, ioctl_ptr);
-+		break;
-+	case IOC_OPAL_ENABLE_DISABLE_MBR:
-+		ret = opal_enable_disable_shadow_mbr(dev, ioctl_ptr);
-+		break;
-+	case IOC_OPAL_ERASE_LR:
-+		ret = opal_erase_locking_range(dev, ioctl_ptr);
-+		break;
-+	case IOC_OPAL_SECURE_ERASE_LR:
-+		ret = opal_secure_erase_locking_range(dev, ioctl_ptr);
-+		break;
- 	default:
- 		pr_warn("No such Opal Ioctl %u\n", cmd);
- 	}
--	return -ENOTTY;
-+
-+ out:
-+	kfree(ioctl_ptr);
-+	return ret;
+ #ifdef CONFIG_PM_SLEEP
+ 
+@@ -496,11 +496,9 @@ int add_mtd_device(struct mtd_info *mtd)
+ 	 * mtd_device_parse_register() multiple times on the same master MTD,
+ 	 * especially with CONFIG_MTD_PARTITIONED_MASTER=y.
+ 	 */
+-	if (WARN_ONCE(mtd->backing_dev_info, "MTD already registered\n"))
++	if (WARN_ONCE(mtd->dev.type, "MTD already registered\n"))
+ 		return -EEXIST;
+ 
+-	mtd->backing_dev_info = mtd_bdi;
+-
+ 	BUG_ON(mtd->writesize == 0);
+ 	mutex_lock(&mtd_table_mutex);
+ 
+@@ -1775,13 +1773,18 @@ static struct backing_dev_info * __init mtd_bdi_init(char *name)
+ 	struct backing_dev_info *bdi;
+ 	int ret;
+ 
+-	bdi = kzalloc(sizeof(*bdi), GFP_KERNEL);
++	bdi = bdi_alloc(GFP_KERNEL);
+ 	if (!bdi)
+ 		return ERR_PTR(-ENOMEM);
+ 
+-	ret = bdi_setup_and_register(bdi, name);
++	bdi->name = name;
++	/*
++	 * We put '-0' suffix to the name to get the same name format as we
++	 * used to get. Since this is called only once, we get a unique name. 
++	 */
++	ret = bdi_register(bdi, NULL, "%.28s-0", name);
+ 	if (ret)
+-		kfree(bdi);
++		bdi_put(bdi);
+ 
+ 	return ret ? ERR_PTR(ret) : bdi;
  }
- EXPORT_SYMBOL_GPL(sed_ioctl);
+@@ -1813,8 +1816,7 @@ static int __init init_mtd(void)
+ out_procfs:
+ 	if (proc_mtd)
+ 		remove_proc_entry("mtd", NULL);
+-	bdi_destroy(mtd_bdi);
+-	kfree(mtd_bdi);
++	bdi_put(mtd_bdi);
+ err_bdi:
+ 	class_unregister(&mtd_class);
+ err_reg:
+@@ -1828,8 +1830,7 @@ static void __exit cleanup_mtd(void)
+ 	if (proc_mtd)
+ 		remove_proc_entry("mtd", NULL);
+ 	class_unregister(&mtd_class);
+-	bdi_destroy(mtd_bdi);
+-	kfree(mtd_bdi);
++	bdi_put(mtd_bdi);
+ 	idr_destroy(&mtd_idr);
+ }
+ 
+diff --git a/drivers/mtd/mtdsuper.c b/drivers/mtd/mtdsuper.c
+index 20c02a3b7417..e69e7855e31f 100644
+--- a/drivers/mtd/mtdsuper.c
++++ b/drivers/mtd/mtdsuper.c
+@@ -18,6 +18,7 @@
+ #include <linux/ctype.h>
+ #include <linux/slab.h>
+ #include <linux/major.h>
++#include <linux/backing-dev.h>
+ 
+ /*
+  * compare superblocks to see if they're equivalent
+@@ -38,6 +39,8 @@ static int get_sb_mtd_compare(struct super_block *sb, void *_mtd)
+ 	return 0;
+ }
+ 
++extern struct backing_dev_info *mtd_bdi;
++
+ /*
+  * mark the superblock by the MTD device it is using
+  * - set the device number to be the correct MTD block device for pesuperstence
+@@ -49,7 +52,9 @@ static int get_sb_mtd_set(struct super_block *sb, void *_mtd)
+ 
+ 	sb->s_mtd = mtd;
+ 	sb->s_dev = MKDEV(MTD_BLOCK_MAJOR, mtd->index);
+-	sb->s_bdi = mtd->backing_dev_info;
++	sb->s_bdi = bdi_get(mtd_bdi);
++	sb->s_iflags |= SB_I_DYNBDI;
++
+ 	return 0;
+ }
+ 
+diff --git a/include/linux/mtd/mtd.h b/include/linux/mtd/mtd.h
+index 13f8052b9ff9..de64f87abbe0 100644
+--- a/include/linux/mtd/mtd.h
++++ b/include/linux/mtd/mtd.h
+@@ -332,11 +332,6 @@ struct mtd_info {
+ 	int (*_get_device) (struct mtd_info *mtd);
+ 	void (*_put_device) (struct mtd_info *mtd);
+ 
+-	/* Backing device capabilities for this device
+-	 * - provides mmap capabilities
+-	 */
+-	struct backing_dev_info *backing_dev_info;
+-
+ 	struct notifier_block reboot_notifier;  /* default mode before reboot */
+ 
+ 	/* ECC status information */
 -- 
-2.7.4
+2.10.2
