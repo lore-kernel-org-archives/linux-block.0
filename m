@@ -1,22 +1,43 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH RESEND] blkcg: fix double free of new_blkg in
- blkcg_init_queue
-To: Hou Tao <houtao1@huawei.com>, linux-block@vger.kernel.org
-References: <1486113547-43833-1-git-send-email-houtao1@huawei.com>
-Cc: tj@kernel.org
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <6ee8c902-9c38-d5b3-055f-3dacd2f20c48@kernel.dk>
-Date: Fri, 3 Feb 2017 08:25:51 -0700
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from szxga02-in.huawei.com ([119.145.14.65]:28957 "EHLO
+        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752514AbdBCJSa (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Feb 2017 04:18:30 -0500
+From: Hou Tao <houtao1@huawei.com>
+To: <linux-block@vger.kernel.org>
+CC: <axboe@kernel.dk>, <tj@kernel.org>
+Subject: [PATCH RESEND] blkcg: fix double free of new_blkg in blkcg_init_queue
+Date: Fri, 3 Feb 2017 17:19:07 +0800
+Message-ID: <1486113547-43833-1-git-send-email-houtao1@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <1486113547-43833-1-git-send-email-houtao1@huawei.com>
-Content-Type: text/plain; charset=windows-1252
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On 02/03/2017 02:19 AM, Hou Tao wrote:
-> If blkg_create fails, new_blkg passed as an argument will
-> be freed by blkg_create, so there is no need to free it again.
+If blkg_create fails, new_blkg passed as an argument will
+be freed by blkg_create, so there is no need to free it again.
 
-Thanks, looks good to me. Applied.
+Signed-off-by: Hou Tao <houtao1@huawei.com>
+---
+ block/blk-cgroup.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index 8ba0af7..f570f38 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -1079,10 +1079,8 @@ int blkcg_init_queue(struct request_queue *q)
+ 	if (preloaded)
+ 		radix_tree_preload_end();
+ 
+-	if (IS_ERR(blkg)) {
+-		blkg_free(new_blkg);
++	if (IS_ERR(blkg))
+ 		return PTR_ERR(blkg);
+-	}
+ 
+ 	q->root_blkg = blkg;
+ 	q->root_rl.blkg = blkg;
 -- 
-Jens Axboe
+2.5.0
+
