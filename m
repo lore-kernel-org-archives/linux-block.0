@@ -1,30 +1,38 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <Bart.VanAssche@sandisk.com>
-To: "hch@lst.de" <hch@lst.de>, "jthumshirn@suse.de" <jthumshirn@suse.de>,
-	"snitzer@redhat.com" <snitzer@redhat.com>
-CC: "agk@redhat.com" <agk@redhat.com>, "dm-devel@redhat.com"
-	<dm-devel@redhat.com>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
-	"axboe@kernel.dk" <axboe@kernel.dk>
+Return-Path: <jthumshirn@suse.de>
 Subject: Re: [PATCH v3] dm: don't allow ioctls to targets that don't map to
  whole devices
-Date: Fri, 3 Feb 2017 21:41:16 +0000
-Message-ID: <1486158062.2553.12.camel@sandisk.com>
+To: Christoph Hellwig <hch@lst.de>, Mike Snitzer <snitzer@redhat.com>
 References: <20170203163708.13943-1-hch@lst.de>
-	 <20170203163921.GA823@redhat.com> <20170203164129.GA4755@lst.de>
-	 <4435311b-80e1-8764-fa12-140203e9231f@suse.de>
-In-Reply-To: <4435311b-80e1-8764-fa12-140203e9231f@suse.de>
-Content-Type: text/plain; charset="iso-8859-1"
+ <20170203163921.GA823@redhat.com> <20170203164129.GA4755@lst.de>
+Cc: axboe@kernel.dk, agk@redhat.com, pbonzini@redhat.com,
+ dm-devel@redhat.com, linux-block@vger.kernel.org
+From: Johannes Thumshirn <jthumshirn@suse.de>
+Message-ID: <4435311b-80e1-8764-fa12-140203e9231f@suse.de>
+Date: Fri, 3 Feb 2017 19:17:22 +0100
 MIME-Version: 1.0
-Return-Path: Bart.VanAssche@sandisk.com
+In-Reply-To: <20170203164129.GA4755@lst.de>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-On Fri, 2017-02-03 at 19:17 +0100, Johannes Thumshirn wrote:
-> Forgotten git add? git commit --amend without git add is such a classic=20
-> mistake on my side as well :-/
+On 02/03/2017 05:41 PM, Christoph Hellwig wrote:
+> On Fri, Feb 03, 2017 at 11:39:22AM -0500, Mike Snitzer wrote:
+>> I assume you meant for v3 to remove the newline? ;)
+> I did.  And I swear I did edit the file, but I guess the ammend
+> didn't work.  I guess it's time for the weekend..  I'll resend after
+> I got some rest.
 
-Are you familiar with the -a option of git commit? Just run
+Forgotten git add? git commit --amend without git add is such a classic 
+mistake on my side as well :-/
 
-git commit -a --amend
 
-Bart.=
+Anyways,
+
+Reviewed-by: Johannes Thumshirn <jthumshirn@kernel.org>
+
+-- 
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
