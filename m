@@ -1,87 +1,114 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Jan Kara <jack@suse.cz>
-To: <linux-fsdevel@vger.kernel.org>
-Cc: Christoph Hellwig <hch@infradead.org>, linux-block@vger.kernel.org,
-        Jan Kara <jack@suse.cz>, David Howells <dhowells@redhat.com>,
-        linux-afs@lists.infradead.org
-Subject: [PATCH 12/24] afs: Convert to separately allocated bdi
-Date: Thu,  2 Feb 2017 18:34:10 +0100
-Message-Id: <20170202173422.3240-13-jack@suse.cz>
-In-Reply-To: <20170202173422.3240-1-jack@suse.cz>
-References: <20170202173422.3240-1-jack@suse.cz>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <jasowang@redhat.com>
+Subject: Re: [PATCH 3/9] virtio_pci: don't duplicate the msix_enable flag in
+ struct pci_dev
+To: Christoph Hellwig <hch@lst.de>, mst@redhat.com
+References: <1485504997-17584-1-git-send-email-hch@lst.de>
+ <1485504997-17584-4-git-send-email-hch@lst.de>
+Cc: axboe@kernel.dk, pbonzini@redhat.com,
+        virtualization@lists.linux-foundation.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <e3316a3d-4ad7-c64a-59a2-33470cb88424@redhat.com>
+Date: Fri, 3 Feb 2017 15:56:26 +0800
+MIME-Version: 1.0
+In-Reply-To: <1485504997-17584-4-git-send-email-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-Allocate struct backing_dev_info separately instead of embedding it
-inside the superblock. This unifies handling of bdi among users.
 
-CC: David Howells <dhowells@redhat.com>
-CC: linux-afs@lists.infradead.org
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- fs/afs/internal.h | 1 -
- fs/afs/super.c    | 4 +++-
- fs/afs/volume.c   | 7 -------
- 3 files changed, 3 insertions(+), 9 deletions(-)
 
-diff --git a/fs/afs/internal.h b/fs/afs/internal.h
-index 535a38d2c1d0..f8d52c36e6ec 100644
---- a/fs/afs/internal.h
-+++ b/fs/afs/internal.h
-@@ -310,7 +310,6 @@ struct afs_volume {
- 	unsigned short		rjservers;	/* number of servers discarded due to -ENOMEDIUM */
- 	struct afs_server	*servers[8];	/* servers on which volume resides (ordered) */
- 	struct rw_semaphore	server_sem;	/* lock for accessing current server */
--	struct backing_dev_info	bdi;
- };
- 
- /*
-diff --git a/fs/afs/super.c b/fs/afs/super.c
-index fbdb022b75a2..3bae29cd277f 100644
---- a/fs/afs/super.c
-+++ b/fs/afs/super.c
-@@ -319,7 +319,9 @@ static int afs_fill_super(struct super_block *sb,
- 	sb->s_blocksize_bits	= PAGE_SHIFT;
- 	sb->s_magic		= AFS_FS_MAGIC;
- 	sb->s_op		= &afs_super_ops;
--	sb->s_bdi		= &as->volume->bdi;
-+	ret = super_setup_bdi(sb);
-+	if (ret)
-+		return ret;
- 	strlcpy(sb->s_id, as->volume->vlocation->vldb.name, sizeof(sb->s_id));
- 
- 	/* allocate the root inode and dentry */
-diff --git a/fs/afs/volume.c b/fs/afs/volume.c
-index d142a2449e65..db73d6dad02b 100644
---- a/fs/afs/volume.c
-+++ b/fs/afs/volume.c
-@@ -106,10 +106,6 @@ struct afs_volume *afs_volume_lookup(struct afs_mount_params *params)
- 	volume->cell		= params->cell;
- 	volume->vid		= vlocation->vldb.vid[params->type];
- 
--	ret = bdi_setup_and_register(&volume->bdi, "afs");
--	if (ret)
--		goto error_bdi;
--
- 	init_rwsem(&volume->server_sem);
- 
- 	/* look up all the applicable server records */
-@@ -155,8 +151,6 @@ struct afs_volume *afs_volume_lookup(struct afs_mount_params *params)
- 	return ERR_PTR(ret);
- 
- error_discard:
--	bdi_destroy(&volume->bdi);
--error_bdi:
- 	up_write(&params->cell->vl_sem);
- 
- 	for (loop = volume->nservers - 1; loop >= 0; loop--)
-@@ -206,7 +200,6 @@ void afs_put_volume(struct afs_volume *volume)
- 	for (loop = volume->nservers - 1; loop >= 0; loop--)
- 		afs_put_server(volume->servers[loop]);
- 
--	bdi_destroy(&volume->bdi);
- 	kfree(volume);
- 
- 	_leave(" [destroyed]");
--- 
-2.10.2
+On 2017年01月27日 16:16, Christoph Hellwig wrote:
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+
+Reviewed-by: Jason Wang <jasowang@redhat.com>
+
+>   drivers/virtio/virtio_pci_common.c | 5 ++---
+>   drivers/virtio/virtio_pci_common.h | 2 --
+>   drivers/virtio/virtio_pci_legacy.c | 2 +-
+>   drivers/virtio/virtio_pci_modern.c | 2 +-
+>   include/uapi/linux/virtio_pci.h    | 2 +-
+>   5 files changed, 5 insertions(+), 8 deletions(-)
+>
+> diff --git a/drivers/virtio/virtio_pci_common.c b/drivers/virtio/virtio_pci_common.c
+> index 5880e86..9c4ad7d3f 100644
+> --- a/drivers/virtio/virtio_pci_common.c
+> +++ b/drivers/virtio/virtio_pci_common.c
+> @@ -125,7 +125,7 @@ void vp_del_vqs(struct virtio_device *vdev)
+>   
+>   	vp_remove_vqs(vdev);
+>   
+> -	if (vp_dev->msix_enabled) {
+> +	if (vp_dev->pci_dev->msix_enabled) {
+>   		for (i = 0; i < vp_dev->msix_vectors; i++)
+>   			free_cpumask_var(vp_dev->msix_affinity_masks[i]);
+>   
+> @@ -245,7 +245,6 @@ static int vp_find_vqs_msix(struct virtio_device *vdev, unsigned nvqs,
+>   			allocated_vectors++;
+>   	}
+>   
+> -	vp_dev->msix_enabled = 1;
+>   	return 0;
+>   
+>   out_remove_vqs:
+> @@ -341,7 +340,7 @@ int vp_set_vq_affinity(struct virtqueue *vq, int cpu)
+>   	if (!vq->callback)
+>   		return -EINVAL;
+>   
+> -	if (vp_dev->msix_enabled) {
+> +	if (vp_dev->pci_dev->msix_enabled) {
+>   		int vec = vp_dev->msix_vector_map[vq->index];
+>   		struct cpumask *mask = vp_dev->msix_affinity_masks[vec];
+>   		unsigned int irq = pci_irq_vector(vp_dev->pci_dev, vec);
+> diff --git a/drivers/virtio/virtio_pci_common.h b/drivers/virtio/virtio_pci_common.h
+> index 8559386..217ca87 100644
+> --- a/drivers/virtio/virtio_pci_common.h
+> +++ b/drivers/virtio/virtio_pci_common.h
+> @@ -64,8 +64,6 @@ struct virtio_pci_device {
+>   	/* the IO mapping for the PCI config space */
+>   	void __iomem *ioaddr;
+>   
+> -	/* MSI-X support */
+> -	int msix_enabled;
+>   	cpumask_var_t *msix_affinity_masks;
+>   	/* Name strings for interrupts. This size should be enough,
+>   	 * and I'm too lazy to allocate each name separately. */
+> diff --git a/drivers/virtio/virtio_pci_legacy.c b/drivers/virtio/virtio_pci_legacy.c
+> index 47292da..2ab6aee 100644
+> --- a/drivers/virtio/virtio_pci_legacy.c
+> +++ b/drivers/virtio/virtio_pci_legacy.c
+> @@ -165,7 +165,7 @@ static void del_vq(struct virtqueue *vq)
+>   
+>   	iowrite16(vq->index, vp_dev->ioaddr + VIRTIO_PCI_QUEUE_SEL);
+>   
+> -	if (vp_dev->msix_enabled) {
+> +	if (vp_dev->pci_dev->msix_enabled) {
+>   		iowrite16(VIRTIO_MSI_NO_VECTOR,
+>   			  vp_dev->ioaddr + VIRTIO_MSI_QUEUE_VECTOR);
+>   		/* Flush the write out to device */
+> diff --git a/drivers/virtio/virtio_pci_modern.c b/drivers/virtio/virtio_pci_modern.c
+> index 00e6fc1..e5ce310 100644
+> --- a/drivers/virtio/virtio_pci_modern.c
+> +++ b/drivers/virtio/virtio_pci_modern.c
+> @@ -412,7 +412,7 @@ static void del_vq(struct virtqueue *vq)
+>   
+>   	vp_iowrite16(vq->index, &vp_dev->common->queue_select);
+>   
+> -	if (vp_dev->msix_enabled) {
+> +	if (vp_dev->pci_dev->msix_enabled) {
+>   		vp_iowrite16(VIRTIO_MSI_NO_VECTOR,
+>   			     &vp_dev->common->queue_msix_vector);
+>   		/* Flush the write out to device */
+> diff --git a/include/uapi/linux/virtio_pci.h b/include/uapi/linux/virtio_pci.h
+> index 90007a1..15b4385 100644
+> --- a/include/uapi/linux/virtio_pci.h
+> +++ b/include/uapi/linux/virtio_pci.h
+> @@ -79,7 +79,7 @@
+>    * configuration space */
+>   #define VIRTIO_PCI_CONFIG_OFF(msix_enabled)	((msix_enabled) ? 24 : 20)
+>   /* Deprecated: please use VIRTIO_PCI_CONFIG_OFF instead */
+> -#define VIRTIO_PCI_CONFIG(dev)	VIRTIO_PCI_CONFIG_OFF((dev)->msix_enabled)
+> +#define VIRTIO_PCI_CONFIG(dev)	VIRTIO_PCI_CONFIG_OFF((dev)->pci_dev->msix_enabled)
+>   
+>   /* Virtio ABI version, this must match exactly */
+>   #define VIRTIO_PCI_ABI_VERSION		0
