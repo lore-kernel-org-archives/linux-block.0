@@ -1,87 +1,75 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:45400 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751880AbdBBRf6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 2 Feb 2017 12:35:58 -0500
-From: Jan Kara <jack@suse.cz>
-To: <linux-fsdevel@vger.kernel.org>
-Cc: Christoph Hellwig <hch@infradead.org>, linux-block@vger.kernel.org,
-        Jan Kara <jack@suse.cz>
-Subject: [PATCH 02/24] bdi: Provide bdi_register_va()
-Date: Thu,  2 Feb 2017 18:34:00 +0100
-Message-Id: <20170202173422.3240-3-jack@suse.cz>
-In-Reply-To: <20170202173422.3240-1-jack@suse.cz>
-References: <20170202173422.3240-1-jack@suse.cz>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <msnitzer@redhat.com>
+Date: Fri, 3 Feb 2017 09:35:27 -0500
+From: Mike Snitzer <snitzer@redhat.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: axboe@kernel.dk, agk@redhat.com, pbonzini@redhat.com, dm-devel@redhat.com,
+        linux-block@vger.kernel.org
+Subject: Re: dm: don't allow ioctls to targets that don't map to whole devices
+Message-ID: <20170203143526.GB28599@redhat.com>
+References: <20170203100613.9023-1-hch@lst.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170203100613.9023-1-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-Add function that registers bdi and takes va_list instead of variable
-number of arguments.
+On Fri, Feb 03 2017 at  5:06am -0500,
+Christoph Hellwig <hch@lst.de> wrote:
 
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- include/linux/backing-dev.h |  2 ++
- mm/backing-dev.c            | 20 +++++++++++++++-----
- 2 files changed, 17 insertions(+), 5 deletions(-)
+> .. at least for unprivilegued users.  Before we called into the SCSI
+> ioctl code to allow excemptions for a few SCSI passthrough ioctls,
+> but this is pretty unsafe and except for this call dm knows nothing
+> about SCSI ioctls.  As SCSI the SCSI ioctl code is made optionally
+> now we really don't want to drag it in for DM, and the exception is
+> not very useful anyway.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> 
+> Note: this should go into the block tree, as that's where
+> scsi_verify_blk_ioctl becomes optional.
+> 
+> ---
+>  drivers/md/dm.c | 13 ++++++++-----
+>  1 file changed, 8 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+> index 9e958bc94fed..adc9dcfd5e9c 100644
+> --- a/drivers/md/dm.c
+> +++ b/drivers/md/dm.c
+> @@ -465,13 +465,16 @@ static int dm_blk_ioctl(struct block_device *bdev, fmode_t mode,
+>  
+>  	if (r > 0) {
+>  		/*
+> -		 * Target determined this ioctl is being issued against
+> -		 * a logical partition of the parent bdev; so extra
+> -		 * validation is needed.
+> +		 * Target determined this ioctl is being issued against a
+> +		 * subset of the parent bdev; require extra privilegues.
+>  		 */
+> -		r = scsi_verify_blk_ioctl(NULL, cmd);
+> -		if (r)
+> +		if (!capable(CAP_SYS_RAWIO)) {
+> +			printk_ratelimited(KERN_WARNING
+> +				"%s: sending ioctl %x to DM device!\n",
+> +				current->comm, cmd);
+> +			r = -ENOIOCTLCMD;
+>  			goto out;
+> +		}
+>  	}
+>  
+>  	r =  __blkdev_driver_ioctl(bdev, mode, cmd, arg);
+> -- 
+> 2.11.0
+> 
 
-diff --git a/include/linux/backing-dev.h b/include/linux/backing-dev.h
-index 81c07ade4305..6865b1c8b122 100644
---- a/include/linux/backing-dev.h
-+++ b/include/linux/backing-dev.h
-@@ -30,6 +30,8 @@ void bdi_put(struct backing_dev_info *bdi);
- __printf(3, 4)
- int bdi_register(struct backing_dev_info *bdi, struct device *parent,
- 		const char *fmt, ...);
-+int bdi_register_va(struct backing_dev_info *bdi, struct device *parent,
-+		const char *fmt, va_list args);
- int bdi_register_dev(struct backing_dev_info *bdi, dev_t dev);
- int bdi_register_owner(struct backing_dev_info *bdi, struct device *owner);
- void bdi_unregister(struct backing_dev_info *bdi);
-diff --git a/mm/backing-dev.c b/mm/backing-dev.c
-index 7a5ba4163656..d59571023df7 100644
---- a/mm/backing-dev.c
-+++ b/mm/backing-dev.c
-@@ -824,18 +824,15 @@ struct backing_dev_info *bdi_alloc(gfp_t gfp_mask)
- }
- EXPORT_SYMBOL(bdi_alloc);
- 
--int bdi_register(struct backing_dev_info *bdi, struct device *parent,
--		const char *fmt, ...)
-+int bdi_register_va(struct backing_dev_info *bdi, struct device *parent,
-+		const char *fmt, va_list args)
- {
--	va_list args;
- 	struct device *dev;
- 
- 	if (bdi->dev)	/* The driver needs to use separate queues per device */
- 		return 0;
- 
--	va_start(args, fmt);
- 	dev = device_create_vargs(bdi_class, parent, MKDEV(0, 0), bdi, fmt, args);
--	va_end(args);
- 	if (IS_ERR(dev))
- 		return PTR_ERR(dev);
- 
-@@ -851,6 +848,19 @@ int bdi_register(struct backing_dev_info *bdi, struct device *parent,
- 	trace_writeback_bdi_register(bdi);
- 	return 0;
- }
-+EXPORT_SYMBOL(bdi_register_va);
-+
-+int bdi_register(struct backing_dev_info *bdi, struct device *parent,
-+		const char *fmt, ...)
-+{
-+	va_list args;
-+	int ret;
-+
-+	va_start(args, fmt);
-+	ret = bdi_register_va(bdi, parent, fmt, args);
-+	va_end(args);
-+	return ret;
-+}
- EXPORT_SYMBOL(bdi_register);
- 
- int bdi_register_dev(struct backing_dev_info *bdi, dev_t dev)
--- 
-2.10.2
+Would prefer to see the use of DMERR_LIMIT() or DMWARN_LIMIT() as those
+wrappers provide error message consistency across DM core and DM
+targets.  Also, would make sense to say: "sending ioctl %x to DM device
+without required privilege (CAP_SYS_RAWIO)."
 
+(you have a couple s/privilegue/privilege typos)
+
+And this patch will need Paolo's ack before being staged.
+
+Otherwise, look good:
+
+Acked-by: Mike Snitzer <snitzer@redhat.com>
