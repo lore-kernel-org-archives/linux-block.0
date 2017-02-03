@@ -1,117 +1,55 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Jan Kara <jack@suse.cz>
-To: <linux-fsdevel@vger.kernel.org>
-Cc: Christoph Hellwig <hch@infradead.org>, linux-block@vger.kernel.org,
-        Jan Kara <jack@suse.cz>, Richard Weinberger <richard@nod.at>,
-        Artem Bityutskiy <dedekind1@gmail.com>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        linux-mtd@lists.infradead.org
-Subject: [PATCH 22/24] ubifs: Convert to separately allocated bdi
-Date: Thu,  2 Feb 2017 18:34:20 +0100
-Message-Id: <20170202173422.3240-23-jack@suse.cz>
-In-Reply-To: <20170202173422.3240-1-jack@suse.cz>
-References: <20170202173422.3240-1-jack@suse.cz>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <BATV+1f42f42caf748e0126fd+4912+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Thomas Gleixner <tglx@linutronix.de>,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Keith Busch <keith.busch@intel.com>,
+	linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 4/6] blk-mq: include all present CPUs in the default queue mapping
+Date: Fri,  3 Feb 2017 15:35:58 +0100
+Message-Id: <20170203143600.32307-5-hch@lst.de>
+In-Reply-To: <20170203143600.32307-1-hch@lst.de>
+References: <20170203143600.32307-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Allocate struct backing_dev_info separately instead of embedding it
-inside the superblock. This unifies handling of bdi among users.
+This way we get a nice distribution independent of the current cpu
+online / offline state.
 
-CC: Richard Weinberger <richard@nod.at>
-CC: Artem Bityutskiy <dedekind1@gmail.com>
-CC: Adrian Hunter <adrian.hunter@intel.com>
-CC: linux-mtd@lists.infradead.org
-Signed-off-by: Jan Kara <jack@suse.cz>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- fs/ubifs/super.c | 23 +++++++----------------
- fs/ubifs/ubifs.h |  3 ---
- 2 files changed, 7 insertions(+), 19 deletions(-)
+ block/blk-mq-cpumap.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/fs/ubifs/super.c b/fs/ubifs/super.c
-index e08aa04fc835..34810eb52b22 100644
---- a/fs/ubifs/super.c
-+++ b/fs/ubifs/super.c
-@@ -1827,7 +1827,6 @@ static void ubifs_put_super(struct super_block *sb)
- 	}
+diff --git a/block/blk-mq-cpumap.c b/block/blk-mq-cpumap.c
+index 8e61e8640e17..5eaecd40f701 100644
+--- a/block/blk-mq-cpumap.c
++++ b/block/blk-mq-cpumap.c
+@@ -35,7 +35,6 @@ int blk_mq_map_queues(struct blk_mq_tag_set *set)
+ {
+ 	unsigned int *map = set->mq_map;
+ 	unsigned int nr_queues = set->nr_hw_queues;
+-	const struct cpumask *online_mask = cpu_online_mask;
+ 	unsigned int i, nr_cpus, nr_uniq_cpus, queue, first_sibling;
+ 	cpumask_var_t cpus;
  
- 	ubifs_umount(c);
--	bdi_destroy(&c->bdi);
- 	ubi_close_volume(c->ubi);
- 	mutex_unlock(&c->umount_mutex);
- }
-@@ -2019,29 +2018,23 @@ static int ubifs_fill_super(struct super_block *sb, void *data, int silent)
- 		goto out;
- 	}
+@@ -44,7 +43,7 @@ int blk_mq_map_queues(struct blk_mq_tag_set *set)
  
-+	err = ubifs_parse_options(c, data, 0);
-+	if (err)
-+		goto out_close;
-+
- 	/*
- 	 * UBIFS provides 'backing_dev_info' in order to disable read-ahead. For
- 	 * UBIFS, I/O is not deferred, it is done immediately in readpage,
- 	 * which means the user would have to wait not just for their own I/O
- 	 * but the read-ahead I/O as well i.e. completely pointless.
- 	 *
--	 * Read-ahead will be disabled because @c->bdi.ra_pages is 0.
-+	 * Read-ahead will be disabled because @sb->s_bdi->ra_pages is 0.
- 	 */
--	c->bdi.name = "ubifs",
--	c->bdi.capabilities = 0;
--	err  = bdi_init(&c->bdi);
-+	err = super_setup_bdi_name(sb, "ubifs_%d_%d", c->vi.ubi_num,
-+				   c->vi.vol_id);
- 	if (err)
- 		goto out_close;
--	err = bdi_register(&c->bdi, NULL, "ubifs_%d_%d",
--			   c->vi.ubi_num, c->vi.vol_id);
--	if (err)
--		goto out_bdi;
--
--	err = ubifs_parse_options(c, data, 0);
--	if (err)
--		goto out_bdi;
+ 	cpumask_clear(cpus);
+ 	nr_cpus = nr_uniq_cpus = 0;
+-	for_each_cpu(i, online_mask) {
++	for_each_present_cpu(i) {
+ 		nr_cpus++;
+ 		first_sibling = get_first_sibling(i);
+ 		if (!cpumask_test_cpu(first_sibling, cpus))
+@@ -54,7 +53,7 @@ int blk_mq_map_queues(struct blk_mq_tag_set *set)
  
--	sb->s_bdi = &c->bdi;
- 	sb->s_fs_info = c;
- 	sb->s_magic = UBIFS_SUPER_MAGIC;
- 	sb->s_blocksize = UBIFS_BLOCK_SIZE;
-@@ -2080,8 +2073,6 @@ static int ubifs_fill_super(struct super_block *sb, void *data, int silent)
- 	ubifs_umount(c);
- out_unlock:
- 	mutex_unlock(&c->umount_mutex);
--out_bdi:
--	bdi_destroy(&c->bdi);
- out_close:
- 	ubi_close_volume(c->ubi);
- out:
-diff --git a/fs/ubifs/ubifs.h b/fs/ubifs/ubifs.h
-index ca72382ce6cc..41b42a425b42 100644
---- a/fs/ubifs/ubifs.h
-+++ b/fs/ubifs/ubifs.h
-@@ -968,7 +968,6 @@ struct ubifs_debug_info;
-  * struct ubifs_info - UBIFS file-system description data structure
-  * (per-superblock).
-  * @vfs_sb: VFS @struct super_block object
-- * @bdi: backing device info object to make VFS happy and disable read-ahead
-  *
-  * @highest_inum: highest used inode number
-  * @max_sqnum: current global sequence number
-@@ -1216,7 +1215,6 @@ struct ubifs_debug_info;
-  */
- struct ubifs_info {
- 	struct super_block *vfs_sb;
--	struct backing_dev_info bdi;
- 
- 	ino_t highest_inum;
- 	unsigned long long max_sqnum;
-@@ -1457,7 +1455,6 @@ extern const struct inode_operations ubifs_file_inode_operations;
- extern const struct file_operations ubifs_dir_operations;
- extern const struct inode_operations ubifs_dir_inode_operations;
- extern const struct inode_operations ubifs_symlink_inode_operations;
--extern struct backing_dev_info ubifs_backing_dev_info;
- extern struct ubifs_compressor *ubifs_compressors[UBIFS_COMPR_TYPES_CNT];
- 
- /* io.c */
+ 	queue = 0;
+ 	for_each_possible_cpu(i) {
+-		if (!cpumask_test_cpu(i, online_mask)) {
++		if (!cpumask_test_cpu(i, cpu_present_mask)) {
+ 			map[i] = 0;
+ 			continue;
+ 		}
 -- 
-2.10.2
+2.11.0
