@@ -1,38 +1,60 @@
-Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
-From: Scott Bauer <scott.bauer@intel.com>
-To: linux-nvme@lists.infradead.org
-Subject: Sed-opal Fixes
-Date: Fri, 10 Feb 2017 09:00:52 -0700
-Message-Id: <1486742454-3254-1-git-send-email-scott.bauer@intel.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
-List-Post: <mailto:linux-nvme@lists.infradead.org>
-List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
-Cc: keith.busch@intel.com, arnd@arndb.de, hch@infradead.org,
- linux-kernel@vger.kernel.org, axboe@fb.com, David.Laight@ACULAB.COM,
- linux-block@vger.kernel.org, jonathan.derrick@intel.com
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:39562 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751565AbdBCAmH (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 2 Feb 2017 19:42:07 -0500
+Date: Thu, 2 Feb 2017 19:42:06 -0500
+From: Mike Snitzer <snitzer@redhat.com>
+To: Bart Van Assche <Bart.VanAssche@sandisk.com>
+Cc: "hch@lst.de" <hch@lst.de>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "axboe@fb.com" <axboe@fb.com>
+Subject: Re: split scsi passthrough fields out of struct request V2
+Message-ID: <20170203004206.GA28599@redhat.com>
+References: <7e963480-edf9-5687-25f3-83890373a26f@kernel.dk>
+ <1485986472.2560.14.camel@sandisk.com>
+ <1486056424.2816.4.camel@sandisk.com>
+ <20170202183334.GB26910@redhat.com>
+ <1486060991.2816.8.camel@sandisk.com>
+ <20170202191330.GA27107@redhat.com>
+ <1486064795.2816.14.camel@sandisk.com>
+ <20170202210434.GA27548@redhat.com>
+ <20170202211014.GA27604@redhat.com>
+ <1486081190.2816.26.camel@sandisk.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
-Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1486081190.2816.26.camel@sandisk.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-changes from v3->v4:
+On Thu, Feb 02 2017 at  7:20pm -0500,
+Bart Van Assche <Bart.VanAssche@sandisk.com> wrote:
 
-Changed manual kzalloc + copy from user to memdup_user.
+> On Thu, 2017-02-02 at 16:10 -0500, Mike Snitzer wrote:
+> > Care to try moving the dm_get(md) at the end of dm_start_request() to
+> > the beginning of dm_start_request() and report back on whether it helps
+> > at all?
+> 
+> Hello Mike,
+> 
+> Sorry but I don't see how that could make a difference.
 
-This small series fixes a small ABI issue when using the _IOC_SIZE
-with the Activate Locking SP ioctl. I had put the wrong structure
-in the IOW macro in the uapi header which caused issues when trying
-to copy in the contents for the command.
+Yeah, I thought about it further after I suggested it and agree that it
+shouldn't make a difference (request isn't actually issued during
+dm_start_request).
 
+> While we are at it:
+> since dm_start_request() calls dm_get() and since rq_completed() calls
+> dm_put(), calls to these two functions should always be paired. There is
+> only one dm_start_request() call in the dm-mq code, namely the one in
+> dm_mq_queue_rq(). However, if map_request() returns DM_MAPIO_REQUEUE then
+> rq_completed() is called twice: a first time by
+> dm_requeue_original_request() and a second time by the dm_mq_queue_rq().
+> Do you agree with this?
 
+Not seeing it.
 
+DM_MAPIO_DELAY_REQUEUE will call dm_requeue_original_request(), but
+dm_mq_queue_rq() won't call rq_completed() in that case.
 
-_______________________________________________
-Linux-nvme mailing list
-Linux-nvme@lists.infradead.org
-http://lists.infradead.org/mailman/listinfo/linux-nvme
+And for DM_MAPIO_REQUEUE dm_mq_queue_rq() will call rq_completed().
