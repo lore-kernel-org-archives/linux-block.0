@@ -1,64 +1,22 @@
-Return-Path: <pbonzini@redhat.com>
+Return-Path: <hch@lst.de>
+Date: Fri, 3 Feb 2017 17:41:29 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Mike Snitzer <snitzer@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>, axboe@kernel.dk, agk@redhat.com,
+	pbonzini@redhat.com, dm-devel@redhat.com,
+	linux-block@vger.kernel.org
 Subject: Re: [PATCH v3] dm: don't allow ioctls to targets that don't map to
- whole devices
-To: Christoph Hellwig <hch@lst.de>, snitzer@redhat.com, axboe@kernel.dk
-References: <20170203163708.13943-1-hch@lst.de>
-Cc: agk@redhat.com, dm-devel@redhat.com, linux-block@vger.kernel.org
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <aa7c07db-3dc7-0293-7ad1-901015a340fb@redhat.com>
-Date: Fri, 3 Feb 2017 08:56:40 -0800
+	whole devices
+Message-ID: <20170203164129.GA4755@lst.de>
+References: <20170203163708.13943-1-hch@lst.de> <20170203163921.GA823@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170203163708.13943-1-hch@lst.de>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170203163921.GA823@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
+On Fri, Feb 03, 2017 at 11:39:22AM -0500, Mike Snitzer wrote:
+> I assume you meant for v3 to remove the newline? ;)
 
-
-On 03/02/2017 08:37, Christoph Hellwig wrote:
-> .. at least for unprivileged users.  Before we called into the SCSI
-> ioctl code to allow excemptions for a few SCSI passthrough ioctls,
-> but this is pretty unsafe and except for this call dm knows nothing
-> about SCSI ioctls.
-> 
-> As the SCSI ioctl code is now optional, we really don't want to
-> drag it in for DM, and the exception is not very useful anyway.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> Acked-by: Mike Snitzer <snitzer@redhat.com>
-> ---
->  drivers/md/dm.c | 13 ++++++++-----
->  1 file changed, 8 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-> index 9e958bc94fed..fd4331aa2e19 100644
-> --- a/drivers/md/dm.c
-> +++ b/drivers/md/dm.c
-> @@ -465,13 +465,16 @@ static int dm_blk_ioctl(struct block_device *bdev, fmode_t mode,
->  
->  	if (r > 0) {
->  		/*
-> -		 * Target determined this ioctl is being issued against
-> -		 * a logical partition of the parent bdev; so extra
-> -		 * validation is needed.
-> +		 * Target determined this ioctl is being issued against a
-> +		 * subset of the parent bdev; require extra privileges.
->  		 */
-> -		r = scsi_verify_blk_ioctl(NULL, cmd);
-> -		if (r)
-> +		if (!capable(CAP_SYS_RAWIO)) {
-> +			DMWARN_LIMIT(
-> +	"%s: sending ioctl %x to DM device without required privilege.\n",
-> +				current->comm, cmd);
-> +			r = -ENOIOCTLCMD;
->  			goto out;
-> +		}
->  	}
->  
->  	r =  __blkdev_driver_ioctl(bdev, mode, cmd, arg);
-> 
-
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-
-Thanks,
-
-Paolo
+I did.  And I swear I did edit the file, but I guess the ammend
+didn't work.  I guess it's time for the weekend..  I'll resend after
+I got some rest.
