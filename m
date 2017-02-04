@@ -1,49 +1,26 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lf0-f66.google.com ([209.85.215.66]:33738 "EHLO
-        mail-lf0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750789AbdBSGFk (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 19 Feb 2017 01:05:40 -0500
+Return-Path: <hch@lst.de>
+Date: Sat, 4 Feb 2017 09:48:07 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Junichi Nomura <j-nomura@ce.jp.nec.com>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	linux-scsi <linux-scsi@vger.kernel.org>,
+	Chaitanya Kulkarni <chaitanya.kulkarni@hgst.com>
+Subject: Re: [REGRESSION v4.10-rc1] blkdev_issue_zeroout() returns
+	-EREMOTEIO on the first call for SCSI device that doesn't support
+	WRITE SAME
+Message-ID: <20170204084807.GA17559@lst.de>
+References: <cc14c28a-0f0a-640a-b576-cdfbaee75dc5@ce.jp.nec.com> <d360a634-2c95-2de5-8647-4e740e92e10a@kernel.dk> <20170203161239.GA3880@lst.de> <1e819f0d-ecdc-e54a-bd3d-17de2f71c8a7@kernel.dk> <yq1wpd6vqpm.fsf@oracle.com> <34e7f917-8fff-d8f9-c498-3431a27113ca@kernel.dk>
 MIME-Version: 1.0
-In-Reply-To: <20170217082752.GA18258@lst.de>
-References: <1487257943-72264-1-git-send-email-hare@suse.de>
- <20170216170519.GA9630@localhost.localdomain> <c889eed7-6262-2e54-0b1e-1d833c033324@suse.de>
- <20170217082752.GA18258@lst.de>
-From: Mike Snitzer <snitzer@redhat.com>
-Date: Sun, 19 Feb 2017 00:59:06 -0500
-Message-ID: <CAMM=eLfpNCxj4yegh3vNGYawh0X+-ya3ZHjoPC9ogRKGa8azFw@mail.gmail.com>
-Subject: Re: [PATCHv2] scsi: use 'scsi_device_from_queue()' for scsi_dh
-To: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.de>,
-        Keith Busch <keith.busch@intel.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        Bart van Assche <bart.vanassche@sandisk.com>,
-        Hannes Reinecke <hare@suse.com>,
-        device-mapper development <dm-devel@redhat.com>,
-        linux-block@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <34e7f917-8fff-d8f9-c498-3431a27113ca@kernel.dk>
+List-ID: <linux-block@vger.kernel.org>
 
-On Fri, Feb 17, 2017 at 3:27 AM, Christoph Hellwig <hch@lst.de> wrote:
->
-> On Fri, Feb 17, 2017 at 09:06:14AM +0100, Hannes Reinecke wrote:
-> > We could, but why?
-> > ATM we're only having SCSI devices able to use device handler; adding
-> > another layer of indirection doesn't solve anything here.
-> > Moving the infrastructure one level up will only make sense if we're
-> > getting non-SCSI device handler (ANA?), but until then I'd think it's
-> > just overengineering.
->
-> Agreed.  Independent of what does the balancing between queues hardware
-> handler should be attached by the low-level driver for any future
-> transport without any control from DM.
+On Fri, Feb 03, 2017 at 08:17:10PM -0700, Jens Axboe wrote:
+> We're at (almost) -rc7 time, we have to do more than hand wave about
+> this. What's the plan for 4.10 final?
 
-But doesn't Keith's abstraction makes a lot of sense given that you're
-providing a device handler interface for NVMe?
-
-The most important part of scsi_dh that DM uses is its calls to
-scsi_dh_activate.  Attachment isn't interesting or the issue (DM's
-call to scsi_dh_attach is purely legacy now that SCSI attaches the
-proper scsi_dh during SCSI's device scan).
+I'll send your a fix to revert the async write same changes for now,
+as suggested in the last mail from me.
