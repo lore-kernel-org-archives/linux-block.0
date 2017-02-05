@@ -1,44 +1,51 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:52098 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753126AbdBNTQI (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Feb 2017 14:16:08 -0500
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernek.dk
-Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
-Subject: [PATCH 1/6] scsi: always zero sshdr in scsi_normalize_sense
-Date: Tue, 14 Feb 2017 20:15:55 +0100
-Message-Id: <20170214191600.17480-2-hch@lst.de>
-In-Reply-To: <20170214191600.17480-1-hch@lst.de>
-References: <20170214191600.17480-1-hch@lst.de>
+Received: from mail-pg0-f68.google.com ([74.125.83.68]:33576 "EHLO
+        mail-pg0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751385AbdBEGW3 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 5 Feb 2017 01:22:29 -0500
+From: Ming Lei <tom.leiming@gmail.com>
+To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
+        linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        NeilBrown <neilb@suse.com>
+Cc: Ming Lei <tom.leiming@gmail.com>
+Subject: [PATCH 0/4] md: use bio_clone_fast()
+Date: Sun,  5 Feb 2017 14:22:09 +0800
+Message-Id: <1486275733-7268-1-git-send-email-tom.leiming@gmail.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-This gives us a clear state even if a command didn't return sense data.
+Hi,
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/scsi/scsi_common.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+This patches replaces bio_clone() with bio_fast_clone() in
+bio_clone_mddev() because:
 
-diff --git a/drivers/scsi/scsi_common.c b/drivers/scsi/scsi_common.c
-index b1383a71400e..a75673bb82b3 100644
---- a/drivers/scsi/scsi_common.c
-+++ b/drivers/scsi/scsi_common.c
-@@ -137,11 +137,11 @@ EXPORT_SYMBOL(int_to_scsilun);
- bool scsi_normalize_sense(const u8 *sense_buffer, int sb_len,
- 			  struct scsi_sense_hdr *sshdr)
- {
-+	memset(sshdr, 0, sizeof(struct scsi_sense_hdr));
-+
- 	if (!sense_buffer || !sb_len)
- 		return false;
- 
--	memset(sshdr, 0, sizeof(struct scsi_sense_hdr));
--
- 	sshdr->response_code = (sense_buffer[0] & 0x7f);
- 
- 	if (!scsi_sense_valid(sshdr))
+1) bio_clone_mddev() is used in raid normal I/O and isn't in
+resync I/O path, and all the direct access to bvec table in
+raid happens on resync I/O only except for write behind of raid1.
+Write behind is treated specially, so the replacement is safe.
+
+2) for write behind, bio_clone() is kept, but this patchset
+introduces bio_clone_bioset_partial() to just clone one specific 
+bvecs range instead of whole table. Then write behind is improved
+too.
+
+
+Thanks,
+Ming
+
+Ming Lei (4):
+  block: introduce bio_clone_bioset_partial()
+  md: introduce bio_clone_slow_mddev_partial()
+  md/raid1: use bio_clone_slow_mddev_partial in case of write behind
+  md: fast clone bio in bio_clone_mddev()
+
+ block/bio.c         | 61 +++++++++++++++++++++++++++++++++++++++++------------
+ drivers/md/md.c     | 24 +++++++++++++++++++--
+ drivers/md/md.h     |  3 +++
+ drivers/md/raid1.c  | 21 +++++++++++++-----
+ include/linux/bio.h | 11 ++++++++--
+ 5 files changed, 98 insertions(+), 22 deletions(-)
+
 -- 
-2.11.0
+2.7.4
