@@ -1,95 +1,174 @@
-Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
-From: Scott Bauer <scott.bauer@intel.com>
-To: linux-nvme@lists.infradead.org
-Subject: [PATCH V5 1/4] block: sed-opal: change ioctl to take user pointer
- instead of unsinged long
-Date: Mon, 13 Feb 2017 09:11:09 -0700
-Message-Id: <1487002272-17940-2-git-send-email-scott.bauer@intel.com>
-In-Reply-To: <1487002272-17940-1-git-send-email-scott.bauer@intel.com>
-References: <1487002272-17940-1-git-send-email-scott.bauer@intel.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
-List-Post: <mailto:linux-nvme@lists.infradead.org>
-List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
-Cc: keith.busch@intel.com, arnd@arndb.de, hch@infradead.org,
- linux-kernel@vger.kernel.org, axboe@fb.com, David.Laight@ACULAB.COM,
- linux-block@vger.kernel.org, Scott Bauer <scott.bauer@intel.com>,
- jonathan.derrick@intel.com
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
-Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pf0-f193.google.com ([209.85.192.193]:33939 "EHLO
+        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751385AbdBEGWd (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 5 Feb 2017 01:22:33 -0500
+From: Ming Lei <tom.leiming@gmail.com>
+To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
+        linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        NeilBrown <neilb@suse.com>
+Cc: Ming Lei <tom.leiming@gmail.com>
+Subject: [PATCH 1/4] block: introduce bio_clone_bioset_partial()
+Date: Sun,  5 Feb 2017 14:22:10 +0800
+Message-Id: <1486275733-7268-2-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1486275733-7268-1-git-send-email-tom.leiming@gmail.com>
+References: <1486275733-7268-1-git-send-email-tom.leiming@gmail.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Signed-off-by: Scott Bauer <scott.bauer@intel.com>
+md still need bio clone(not the fast version) for behind write,
+and it is more efficient to use bio_clone_bioset_partial().
+
+The idea is simple and just copy the bvecs range specified from
+parameters.
+
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- block/sed-opal.c         | 6 ++++--
- drivers/nvme/host/core.c | 3 ++-
- include/linux/sed-opal.h | 4 ++--
- 3 files changed, 8 insertions(+), 5 deletions(-)
+ block/bio.c         | 61 +++++++++++++++++++++++++++++++++++++++++------------
+ include/linux/bio.h | 11 ++++++++--
+ 2 files changed, 57 insertions(+), 15 deletions(-)
 
-diff --git a/block/sed-opal.c b/block/sed-opal.c
-index bf1406e..2448d4a 100644
---- a/block/sed-opal.c
-+++ b/block/sed-opal.c
-@@ -2344,9 +2344,11 @@ bool opal_unlock_from_suspend(struct opal_dev *dev)
+diff --git a/block/bio.c b/block/bio.c
+index 4b564d0c3e29..5eec5e08417f 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -625,21 +625,20 @@ struct bio *bio_clone_fast(struct bio *bio, gfp_t gfp_mask, struct bio_set *bs)
  }
- EXPORT_SYMBOL(opal_unlock_from_suspend);
+ EXPORT_SYMBOL(bio_clone_fast);
  
--int sed_ioctl(struct opal_dev *dev, unsigned int cmd, unsigned long ptr)
-+int sed_ioctl(struct opal_dev *dev, unsigned int cmd, void __user *arg)
+-/**
+- * 	bio_clone_bioset - clone a bio
+- * 	@bio_src: bio to clone
+- *	@gfp_mask: allocation priority
+- *	@bs: bio_set to allocate from
+- *
+- *	Clone bio. Caller will own the returned bio, but not the actual data it
+- *	points to. Reference count of returned bio will be one.
+- */
+-struct bio *bio_clone_bioset(struct bio *bio_src, gfp_t gfp_mask,
+-			     struct bio_set *bs)
++static struct bio *__bio_clone_bioset(struct bio *bio_src, gfp_t gfp_mask,
++				      struct bio_set *bs, int offset,
++				      int size)
  {
--	void __user *arg = (void __user *)ptr;
-+	void *ioctl_ptr;
-+	int ret = -ENOTTY;
-+	unsigned int cmd_size = _IOC_SIZE(cmd);
+ 	struct bvec_iter iter;
+ 	struct bio_vec bv;
+ 	struct bio *bio;
++	struct bvec_iter iter_src = bio_src->bi_iter;
++
++	/* for supporting partial clone */
++	if (offset || size != bio_src->bi_iter.bi_size) {
++		bio_advance_iter(bio_src, &iter_src, offset);
++		iter_src.bi_size = size;
++	}
  
- 	if (!capable(CAP_SYS_ADMIN))
- 		return -EACCES;
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index d9f4903..04c48e7 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -811,7 +811,8 @@ static int nvme_ioctl(struct block_device *bdev, fmode_t mode,
- 			return nvme_nvm_ioctl(ns, cmd, arg);
- #endif
- 		if (is_sed_ioctl(cmd))
--			return sed_ioctl(&ns->ctrl->opal_dev, cmd, arg);
-+			return sed_ioctl(&ns->ctrl->opal_dev, cmd,
-+					 (void __user *) arg);
- 		return -ENOTTY;
+ 	/*
+ 	 * Pre immutable biovecs, __bio_clone() used to just do a memcpy from
+@@ -663,7 +662,8 @@ struct bio *bio_clone_bioset(struct bio *bio_src, gfp_t gfp_mask,
+ 	 *    __bio_clone_fast() anyways.
+ 	 */
+ 
+-	bio = bio_alloc_bioset(gfp_mask, bio_segments(bio_src), bs);
++	bio = bio_alloc_bioset(gfp_mask, __bio_segments(bio_src,
++			       &iter_src), bs);
+ 	if (!bio)
+ 		return NULL;
+ 	bio->bi_bdev		= bio_src->bi_bdev;
+@@ -680,7 +680,7 @@ struct bio *bio_clone_bioset(struct bio *bio_src, gfp_t gfp_mask,
+ 		bio->bi_io_vec[bio->bi_vcnt++] = bio_src->bi_io_vec[0];
+ 		break;
+ 	default:
+-		bio_for_each_segment(bv, bio_src, iter)
++		__bio_for_each_segment(bv, bio_src, iter, iter_src)
+ 			bio->bi_io_vec[bio->bi_vcnt++] = bv;
+ 		break;
  	}
- }
-diff --git a/include/linux/sed-opal.h b/include/linux/sed-opal.h
-index af1a85e..205d520 100644
---- a/include/linux/sed-opal.h
-+++ b/include/linux/sed-opal.h
-@@ -132,7 +132,7 @@ struct opal_dev {
- #ifdef CONFIG_BLK_SED_OPAL
- bool opal_unlock_from_suspend(struct opal_dev *dev);
- void init_opal_dev(struct opal_dev *opal_dev, sec_send_recv *send_recv);
--int sed_ioctl(struct opal_dev *dev, unsigned int cmd, unsigned long ptr);
-+int sed_ioctl(struct opal_dev *dev, unsigned int cmd, void __user *ioctl_ptr);
+@@ -699,9 +699,44 @@ struct bio *bio_clone_bioset(struct bio *bio_src, gfp_t gfp_mask,
  
- static inline bool is_sed_ioctl(unsigned int cmd)
+ 	return bio;
+ }
++
++/**
++ * 	bio_clone_bioset - clone a bio
++ * 	@bio_src: bio to clone
++ *	@gfp_mask: allocation priority
++ *	@bs: bio_set to allocate from
++ *
++ *	Clone bio. Caller will own the returned bio, but not the actual data it
++ *	points to. Reference count of returned bio will be one.
++ */
++struct bio *bio_clone_bioset(struct bio *bio_src, gfp_t gfp_mask,
++			     struct bio_set *bs)
++{
++	return __bio_clone_bioset(bio_src, gfp_mask, bs, 0,
++				  bio_src->bi_iter.bi_size);
++}
+ EXPORT_SYMBOL(bio_clone_bioset);
+ 
+ /**
++ * 	bio_clone_bioset_partial - clone a partial bio
++ * 	@bio_src: bio to clone
++ *	@gfp_mask: allocation priority
++ *	@bs: bio_set to allocate from
++ *	@offset: cloned starting from the offset
++ *	@size: size for the cloned bio
++ *
++ *	Clone bio. Caller will own the returned bio, but not the actual data it
++ *	points to. Reference count of returned bio will be one.
++ */
++struct bio *bio_clone_bioset_partial(struct bio *bio_src, gfp_t gfp_mask,
++				     struct bio_set *bs, int offset,
++				     int size)
++{
++	return __bio_clone_bioset(bio_src, gfp_mask, bs, offset, size);
++}
++EXPORT_SYMBOL(bio_clone_bioset_partial);
++
++/**
+  *	bio_add_pc_page	-	attempt to add page to bio
+  *	@q: the target queue
+  *	@bio: destination bio
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index 7cf8a6c70a3f..8e521194f6fc 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -183,7 +183,7 @@ static inline void bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
+ 
+ #define bio_iter_last(bvec, iter) ((iter).bi_size == (bvec).bv_len)
+ 
+-static inline unsigned bio_segments(struct bio *bio)
++static inline unsigned __bio_segments(struct bio *bio, struct bvec_iter *bvec)
  {
-@@ -160,7 +160,7 @@ static inline bool is_sed_ioctl(unsigned int cmd)
+ 	unsigned segs = 0;
+ 	struct bio_vec bv;
+@@ -205,12 +205,17 @@ static inline unsigned bio_segments(struct bio *bio)
+ 		break;
+ 	}
+ 
+-	bio_for_each_segment(bv, bio, iter)
++	__bio_for_each_segment(bv, bio, iter, *bvec)
+ 		segs++;
+ 
+ 	return segs;
  }
  
- static inline int sed_ioctl(struct opal_dev *dev, unsigned int cmd,
--			    unsigned long ptr)
-+			    void __user *ioctl_ptr)
- {
- 	return 0;
- }
++static inline unsigned bio_segments(struct bio *bio)
++{
++	return __bio_segments(bio, &bio->bi_iter);
++}
++
+ /*
+  * get a reference to a bio, so it won't disappear. the intended use is
+  * something like:
+@@ -384,6 +389,8 @@ extern void bio_put(struct bio *);
+ extern void __bio_clone_fast(struct bio *, struct bio *);
+ extern struct bio *bio_clone_fast(struct bio *, gfp_t, struct bio_set *);
+ extern struct bio *bio_clone_bioset(struct bio *, gfp_t, struct bio_set *bs);
++extern struct bio *bio_clone_bioset_partial(struct bio *, gfp_t,
++					    struct bio_set *, int, int);
+ 
+ extern struct bio_set *fs_bio_set;
+ 
 -- 
 2.7.4
-
-
-_______________________________________________
-Linux-nvme mailing list
-Linux-nvme@lists.infradead.org
-http://lists.infradead.org/mailman/listinfo/linux-nvme
