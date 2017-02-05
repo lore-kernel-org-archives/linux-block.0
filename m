@@ -1,100 +1,83 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from szxga03-in.huawei.com ([119.145.14.66]:6682 "EHLO
-        szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752510AbdBIJkn (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Feb 2017 04:40:43 -0500
-To: <linux-block@vger.kernel.org>
-From: Hou Tao <houtao1@huawei.com>
-Subject: rate-capped fio jobs in a CFQ group degrade performance of fio jobs
- in another CFQ group with the same weight
-CC: <axboe@fb.com>, Shaohua Li <shli@fb.com>, <tj@kernel.org>,
-        Vivek Goyal <vgoyal@redhat.com>
-Message-ID: <d3c53b1b-ec45-4a37-35bd-36489b5aaf4a@huawei.com>
-Date: Thu, 9 Feb 2017 17:40:16 +0800
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Received: from mail-pf0-f195.google.com ([209.85.192.195]:33188 "EHLO
+        mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751891AbdBEGWp (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 5 Feb 2017 01:22:45 -0500
+From: Ming Lei <tom.leiming@gmail.com>
+To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
+        linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        NeilBrown <neilb@suse.com>
+Cc: Ming Lei <tom.leiming@gmail.com>
+Subject: [PATCH 3/4] md/raid1: use bio_clone_slow_mddev_partial in case of write behind
+Date: Sun,  5 Feb 2017 14:22:12 +0800
+Message-Id: <1486275733-7268-4-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1486275733-7268-1-git-send-email-tom.leiming@gmail.com>
+References: <1486275733-7268-1-git-send-email-tom.leiming@gmail.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hi all,
+Write behind need to replace pages in bio's bvecs, and we have
+to clone a fresh bio with new bvec table, so use the introduced
+bio_clone_slow_mddev_partial() for it.
 
-During our test of the CFQ group schedule, we found a performance related problem.
-Rate-capped fio jobs in a CFQ group will degrade the performance of fio jobs in
-another CFQ group. Both of the CFQ groups have the same blkio.weight.
+For other bio_clone_mddev() cases, we will use fast clone since
+they don't need to touch bvec table.
 
-We launch two fios in difference terminals. The following is the content of
-these two job files:
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+---
+ drivers/md/raid1.c | 21 ++++++++++++++++-----
+ 1 file changed, 16 insertions(+), 5 deletions(-)
 
-# cat a.job
-[global]
-bs=4k
-ioengine=psync
-iodepth=1
-direct=1
-rw=randwrite
-time_based
-runtime=30
-cgroup_nodelete=1
-group_reporting=1
-
-[test1]
-filename=test1.dat
-size=2G
-cgroup_weight=500
-cgroup=testA
-thread=1
-numjobs=2
-
-[test3]
-stonewall
-filename=test3.dat
-size=2G
-rate=4m
-cgroup_weight=500
-cgroup=testA
-thread=1
-numjobs=2
-
-
-# cat b.job
-[global]
-bs=4k
-ioengine=psync
-iodepth=1
-direct=1
-rw=randwrite
-time_based
-runtime=60
-cgroup_nodelete=1
-group_reporting=1
-
-[test2]
-filename=test2.dat
-size=2G
-cgroup_weight=500
-cgroup=testB
-thread=1
-numjobs=2
-
-In the first 30 seconds, the iops of both "test1" and "test3" is ~5000 and
-the rate is about 20MBps.
-
-In the last 30 seconds, we start "test3" and the rate of "test3" is limited to
-8MBps (4MBps * 2 jobs). The cap works fine, but the iops of "test2" also
-degraded from ~5000 to ~2040 or lower. This may seems reasonable for CFQ group
-schedule because it needs to dispatch disk time equally to these two CFQ group,
-but it doesn't fully utilize the disk throughput.
-
-It can be reproduced on 4.4 and 4.10.0-rc7, the version of fio is 2.2.4.
-The configuration options of CFQ are untouched.
-
-I am not sure whether this situation is a bug or not. Are there some
-configuration options we can used to alleviate the performance degradation
-problem ? And how CFQ group schedule handles the trace-off between fairness
-and performance ?
-
-Any suggestion will be appreciated.
-
-Regards,
-
-Tao
+diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
+index 830ff2b20346..e1c5639febdb 100644
+--- a/drivers/md/raid1.c
++++ b/drivers/md/raid1.c
+@@ -1341,13 +1341,12 @@ static void raid1_write_request(struct mddev *mddev, struct bio *bio,
+ 
+ 	first_clone = 1;
+ 	for (i = 0; i < disks; i++) {
+-		struct bio *mbio;
++		struct bio *mbio = NULL;
++		int offset;
+ 		if (!r1_bio->bios[i])
+ 			continue;
+ 
+-		mbio = bio_clone_mddev(bio, GFP_NOIO, mddev);
+-		bio_trim(mbio, r1_bio->sector - bio->bi_iter.bi_sector,
+-			 max_sectors);
++		offset = r1_bio->sector - bio->bi_iter.bi_sector;
+ 
+ 		if (first_clone) {
+ 			/* do behind I/O ?
+@@ -1357,8 +1356,14 @@ static void raid1_write_request(struct mddev *mddev, struct bio *bio,
+ 			if (bitmap &&
+ 			    (atomic_read(&bitmap->behind_writes)
+ 			     < mddev->bitmap_info.max_write_behind) &&
+-			    !waitqueue_active(&bitmap->behind_wait))
++			    !waitqueue_active(&bitmap->behind_wait)) {
++				mbio = bio_clone_slow_mddev_partial(bio,
++								    GFP_NOIO,
++								    mddev,
++								    offset,
++								    max_sectors);
+ 				alloc_behind_pages(mbio, r1_bio);
++			}
+ 
+ 			bitmap_startwrite(bitmap, r1_bio->sector,
+ 					  r1_bio->sectors,
+@@ -1366,6 +1371,12 @@ static void raid1_write_request(struct mddev *mddev, struct bio *bio,
+ 						   &r1_bio->state));
+ 			first_clone = 0;
+ 		}
++
++		if (!mbio) {
++			mbio = bio_clone_mddev(bio, GFP_NOIO, mddev);
++			bio_trim(mbio, offset, max_sectors);
++		}
++
+ 		if (r1_bio->behind_bvecs) {
+ 			struct bio_vec *bvec;
+ 			int j;
+-- 
+2.7.4
