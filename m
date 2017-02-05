@@ -7,104 +7,114 @@ Cc: axboe@kernel.dk,
 	virtualization@lists.linux-foundation.org,
 	linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 3/9] virtio_pci: don't duplicate the msix_enable flag in struct pci_dev
-Date: Sun,  5 Feb 2017 18:15:20 +0100
-Message-Id: <20170205171526.6224-4-hch@lst.de>
+Subject: [PATCH 6/9] virtio: provide a method to get the IRQ affinity mask for a virtqueue
+Date: Sun,  5 Feb 2017 18:15:23 +0100
+Message-Id: <20170205171526.6224-7-hch@lst.de>
 In-Reply-To: <20170205171526.6224-1-hch@lst.de>
 References: <20170205171526.6224-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
+This basically passed up the pci_irq_get_affinity information through
+virtio through an optional get_vq_affinity method.  It is only implemented
+by the PCI backend for now, and only when we use per-virtqueue IRQs.
+
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 Reviewed-by: Jason Wang <jasowang@redhat.com>
 ---
- drivers/virtio/virtio_pci_common.c | 5 ++---
- drivers/virtio/virtio_pci_common.h | 2 --
- drivers/virtio/virtio_pci_legacy.c | 2 +-
- drivers/virtio/virtio_pci_modern.c | 2 +-
- include/uapi/linux/virtio_pci.h    | 2 +-
- 5 files changed, 5 insertions(+), 8 deletions(-)
+ drivers/virtio/virtio_pci_common.c | 11 +++++++++++
+ drivers/virtio/virtio_pci_common.h |  2 ++
+ drivers/virtio/virtio_pci_legacy.c |  1 +
+ drivers/virtio/virtio_pci_modern.c |  2 ++
+ include/linux/virtio_config.h      |  3 +++
+ 5 files changed, 19 insertions(+)
 
 diff --git a/drivers/virtio/virtio_pci_common.c b/drivers/virtio/virtio_pci_common.c
-index 274dc1ff09c0..b83053082875 100644
+index 7902e920fc73..df548a6fb844 100644
 --- a/drivers/virtio/virtio_pci_common.c
 +++ b/drivers/virtio/virtio_pci_common.c
-@@ -125,7 +125,7 @@ void vp_del_vqs(struct virtio_device *vdev)
- 
- 	vp_remove_vqs(vdev);
- 
--	if (vp_dev->msix_enabled) {
-+	if (vp_dev->pci_dev->msix_enabled) {
- 		for (i = 0; i < vp_dev->msix_vectors; i++)
- 			free_cpumask_var(vp_dev->msix_affinity_masks[i]);
- 
-@@ -244,7 +244,6 @@ static int vp_find_vqs_msix(struct virtio_device *vdev, unsigned nvqs,
- 			allocated_vectors++;
- 	}
- 
--	vp_dev->msix_enabled = 1;
+@@ -361,6 +361,17 @@ int vp_set_vq_affinity(struct virtqueue *vq, int cpu)
  	return 0;
+ }
  
- out_remove_vqs:
-@@ -340,7 +339,7 @@ int vp_set_vq_affinity(struct virtqueue *vq, int cpu)
- 	if (!vq->callback)
- 		return -EINVAL;
- 
--	if (vp_dev->msix_enabled) {
-+	if (vp_dev->pci_dev->msix_enabled) {
- 		int vec = vp_dev->msix_vector_map[vq->index];
- 		struct cpumask *mask = vp_dev->msix_affinity_masks[vec];
- 		unsigned int irq = pci_irq_vector(vp_dev->pci_dev, vec);
++const struct cpumask *vp_get_vq_affinity(struct virtio_device *vdev, int index)
++{
++	struct virtio_pci_device *vp_dev = to_vp_device(vdev);
++	unsigned int *map = vp_dev->msix_vector_map;
++
++	if (!map || map[index] == VIRTIO_MSI_NO_VECTOR)
++		return NULL;
++
++	return pci_irq_get_affinity(vp_dev->pci_dev, map[index]);
++}
++
+ #ifdef CONFIG_PM_SLEEP
+ static int virtio_pci_freeze(struct device *dev)
+ {
 diff --git a/drivers/virtio/virtio_pci_common.h b/drivers/virtio/virtio_pci_common.h
-index 85593867e712..217ca876eed7 100644
+index a6ad9ec6baef..ac8c9d788964 100644
 --- a/drivers/virtio/virtio_pci_common.h
 +++ b/drivers/virtio/virtio_pci_common.h
-@@ -64,8 +64,6 @@ struct virtio_pci_device {
- 	/* the IO mapping for the PCI config space */
- 	void __iomem *ioaddr;
+@@ -108,6 +108,8 @@ const char *vp_bus_name(struct virtio_device *vdev);
+  */
+ int vp_set_vq_affinity(struct virtqueue *vq, int cpu);
  
--	/* MSI-X support */
--	int msix_enabled;
- 	cpumask_var_t *msix_affinity_masks;
- 	/* Name strings for interrupts. This size should be enough,
- 	 * and I'm too lazy to allocate each name separately. */
++const struct cpumask *vp_get_vq_affinity(struct virtio_device *vdev, int index);
++
+ #if IS_ENABLED(CONFIG_VIRTIO_PCI_LEGACY)
+ int virtio_pci_legacy_probe(struct virtio_pci_device *);
+ void virtio_pci_legacy_remove(struct virtio_pci_device *);
 diff --git a/drivers/virtio/virtio_pci_legacy.c b/drivers/virtio/virtio_pci_legacy.c
-index 47292dad0ff9..2ab6aee51bf6 100644
+index 2ab6aee51bf6..f7362c5fe18a 100644
 --- a/drivers/virtio/virtio_pci_legacy.c
 +++ b/drivers/virtio/virtio_pci_legacy.c
-@@ -165,7 +165,7 @@ static void del_vq(struct virtqueue *vq)
+@@ -190,6 +190,7 @@ static const struct virtio_config_ops virtio_pci_config_ops = {
+ 	.finalize_features = vp_finalize_features,
+ 	.bus_name	= vp_bus_name,
+ 	.set_vq_affinity = vp_set_vq_affinity,
++	.get_vq_affinity = vp_get_vq_affinity,
+ };
  
- 	iowrite16(vq->index, vp_dev->ioaddr + VIRTIO_PCI_QUEUE_SEL);
- 
--	if (vp_dev->msix_enabled) {
-+	if (vp_dev->pci_dev->msix_enabled) {
- 		iowrite16(VIRTIO_MSI_NO_VECTOR,
- 			  vp_dev->ioaddr + VIRTIO_MSI_QUEUE_VECTOR);
- 		/* Flush the write out to device */
+ /* the PCI probing function */
 diff --git a/drivers/virtio/virtio_pci_modern.c b/drivers/virtio/virtio_pci_modern.c
-index 00e6fc1df407..e5ce31091953 100644
+index a7a0981e441c..7bc3004b840e 100644
 --- a/drivers/virtio/virtio_pci_modern.c
 +++ b/drivers/virtio/virtio_pci_modern.c
-@@ -412,7 +412,7 @@ static void del_vq(struct virtqueue *vq)
+@@ -437,6 +437,7 @@ static const struct virtio_config_ops virtio_pci_config_nodev_ops = {
+ 	.finalize_features = vp_finalize_features,
+ 	.bus_name	= vp_bus_name,
+ 	.set_vq_affinity = vp_set_vq_affinity,
++	.get_vq_affinity = vp_get_vq_affinity,
+ };
  
- 	vp_iowrite16(vq->index, &vp_dev->common->queue_select);
+ static const struct virtio_config_ops virtio_pci_config_ops = {
+@@ -452,6 +453,7 @@ static const struct virtio_config_ops virtio_pci_config_ops = {
+ 	.finalize_features = vp_finalize_features,
+ 	.bus_name	= vp_bus_name,
+ 	.set_vq_affinity = vp_set_vq_affinity,
++	.get_vq_affinity = vp_get_vq_affinity,
+ };
  
--	if (vp_dev->msix_enabled) {
-+	if (vp_dev->pci_dev->msix_enabled) {
- 		vp_iowrite16(VIRTIO_MSI_NO_VECTOR,
- 			     &vp_dev->common->queue_msix_vector);
- 		/* Flush the write out to device */
-diff --git a/include/uapi/linux/virtio_pci.h b/include/uapi/linux/virtio_pci.h
-index 90007a1abcab..15b4385a2be1 100644
---- a/include/uapi/linux/virtio_pci.h
-+++ b/include/uapi/linux/virtio_pci.h
-@@ -79,7 +79,7 @@
-  * configuration space */
- #define VIRTIO_PCI_CONFIG_OFF(msix_enabled)	((msix_enabled) ? 24 : 20)
- /* Deprecated: please use VIRTIO_PCI_CONFIG_OFF instead */
--#define VIRTIO_PCI_CONFIG(dev)	VIRTIO_PCI_CONFIG_OFF((dev)->msix_enabled)
-+#define VIRTIO_PCI_CONFIG(dev)	VIRTIO_PCI_CONFIG_OFF((dev)->pci_dev->msix_enabled)
+ /**
+diff --git a/include/linux/virtio_config.h b/include/linux/virtio_config.h
+index 2ebe506fe41a..8355bab175e1 100644
+--- a/include/linux/virtio_config.h
++++ b/include/linux/virtio_config.h
+@@ -58,6 +58,7 @@ struct irq_affinity;
+  *      This returns a pointer to the bus name a la pci_name from which
+  *      the caller can then copy.
+  * @set_vq_affinity: set the affinity for a virtqueue.
++ * @get_vq_affinity: get the affinity for a virtqueue (optional).
+  */
+ typedef void vq_callback_t(struct virtqueue *);
+ struct virtio_config_ops {
+@@ -77,6 +78,8 @@ struct virtio_config_ops {
+ 	int (*finalize_features)(struct virtio_device *vdev);
+ 	const char *(*bus_name)(struct virtio_device *vdev);
+ 	int (*set_vq_affinity)(struct virtqueue *vq, int cpu);
++	const struct cpumask *(*get_vq_affinity)(struct virtio_device *vdev,
++			int index);
+ };
  
- /* Virtio ABI version, this must match exactly */
- #define VIRTIO_PCI_ABI_VERSION		0
+ /* If driver didn't advertise the feature, it will never appear. */
 -- 
 2.11.0
