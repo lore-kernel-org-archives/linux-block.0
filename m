@@ -1,42 +1,39 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:38168 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750941AbdBIUfj (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Feb 2017 15:35:39 -0500
-Date: Thu, 9 Feb 2017 12:19:09 -0800
-From: Matthew Wilcox <willy@infradead.org>
-To: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Cc: Theodore Ts'o <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCHv6 06/37] thp: handle write-protection faults for file THP
-Message-ID: <20170209201909.GU2267@bombadil.infradead.org>
-References: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
- <20170126115819.58875-7-kirill.shutemov@linux.intel.com>
+Received: from mail-wr0-f196.google.com ([209.85.128.196]:33099 "EHLO
+        mail-wr0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751923AbdBEWbw (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 5 Feb 2017 17:31:52 -0500
+Received: by mail-wr0-f196.google.com with SMTP id i10so1895458wrb.0
+        for <linux-block@vger.kernel.org>; Sun, 05 Feb 2017 14:31:52 -0800 (PST)
+Subject: Re: [PATCH] nbd: handle single path failures gracefully
+To: Josef Bacik <jbacik@fb.com>, linux-block@vger.kernel.org,
+        kernel-team@fb.com, nbd-general@lists.sourceforge.net
+References: <1486156702-9417-1-git-send-email-jbacik@fb.com>
+From: Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <c660d5d9-90d3-300d-4362-f34ee22b8ee7@grimberg.me>
+Date: Mon, 6 Feb 2017 00:31:48 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170126115819.58875-7-kirill.shutemov@linux.intel.com>
+In-Reply-To: <1486156702-9417-1-git-send-email-jbacik@fb.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Thu, Jan 26, 2017 at 02:57:48PM +0300, Kirill A. Shutemov wrote:
-> For filesystems that wants to be write-notified (has mkwrite), we will
-> encount write-protection faults for huge PMDs in shared mappings.
-> 
-> The easiest way to handle them is to clear the PMD and let it refault as
-> wriable.
-> 
-> Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
-> Reviewed-by: Jan Kara <jack@suse.cz>
 
-Reviewed-by: Matthew Wilcox <mawilcox@microsoft.com>
+> Currently if we have multiple connections and one of them goes down we will tear
+> down the whole device.  However there's no reason we need to do this as we
+> could have other connections that are working fine.  Deal with this by keeping
+> track of the state of the different connections, and if we lose one we mark it
+> as dead and send all IO destined for that socket to one of the other healthy
+> sockets.  Any outstanding requests that were on the dead socket will timeout and
+> be re-submitted properly.
+
+Hey Josef,
+
+are you trying to address link failures?
+
+Any reason not to leave DM for this kind of work? Note that the rest
+of the block drivers implement periodic reconnects and let DM handle
+multipathing.
+
+It took a long time remove all the driver specific multipathing in the
+stack.
