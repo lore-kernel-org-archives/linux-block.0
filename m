@@ -1,40 +1,77 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:36397 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751664AbdBFIxG (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Feb 2017 03:53:06 -0500
-Date: Mon, 6 Feb 2017 00:52:59 -0800
-From: Christoph Hellwig <hch@infradead.org>
-To: Ming Lei <tom.leiming@gmail.com>
-Cc: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
+Received: from mail-pf0-f196.google.com ([209.85.192.196]:35965 "EHLO
+        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751891AbdBEGWg (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 5 Feb 2017 01:22:36 -0500
+From: Ming Lei <tom.leiming@gmail.com>
+To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
         linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
         linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
         NeilBrown <neilb@suse.com>
-Subject: Re: [PATCH 2/4] md: introduce bio_clone_slow_mddev_partial()
-Message-ID: <20170206085259.GA6411@infradead.org>
+Cc: Ming Lei <tom.leiming@gmail.com>
+Subject: [PATCH 2/4] md: introduce bio_clone_slow_mddev_partial()
+Date: Sun,  5 Feb 2017 14:22:11 +0800
+Message-Id: <1486275733-7268-3-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1486275733-7268-1-git-send-email-tom.leiming@gmail.com>
 References: <1486275733-7268-1-git-send-email-tom.leiming@gmail.com>
- <1486275733-7268-3-git-send-email-tom.leiming@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1486275733-7268-3-git-send-email-tom.leiming@gmail.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-> +struct bio *bio_clone_slow_mddev_partial(struct bio *bio, gfp_t gfp_mask,
-> +					 struct mddev *mddev, int offset,
-> +					 int size)
-> +{
-> +	struct bio_set *bs;
-> +
-> +	if (!mddev || !mddev->bio_set)
-> +		bs = fs_bio_set;
-> +	else
-> +		bs = mddev->bio_set;
-> +
-> +	return bio_clone_bioset_partial(bio, gfp_mask, bs, offset << 9,
-> +					size << 9);
-> +}
-> +EXPORT_SYMBOL_GPL(bio_clone_slow_mddev_partial);
+In raid1/raid10, most users of bio_clone_mddev() need bio_trim() too,
+that means only part of the bio is required to be cloned, and not
+necessary to clone the whole bio each time, and it is just enough
+to clone the specified bvecs range.
 
-As far as I can tell the caller always has a mddev, and an active
-mddev always has a bio_set.  So let's just skip this wrapper.
+So this patch introduces bio_clone_slow_mddev_partial() to improve
+the situation, and it is named as slow because the following patch
+will switch to bio_clone_fast() in bio_clone_mddev().
+
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+---
+ drivers/md/md.c | 16 ++++++++++++++++
+ drivers/md/md.h |  3 +++
+ 2 files changed, 19 insertions(+)
+
+diff --git a/drivers/md/md.c b/drivers/md/md.c
+index 4c1b82defa78..704be11355a9 100644
+--- a/drivers/md/md.c
++++ b/drivers/md/md.c
+@@ -200,6 +200,22 @@ struct bio *bio_clone_mddev(struct bio *bio, gfp_t gfp_mask,
+ }
+ EXPORT_SYMBOL_GPL(bio_clone_mddev);
+ 
++struct bio *bio_clone_slow_mddev_partial(struct bio *bio, gfp_t gfp_mask,
++					 struct mddev *mddev, int offset,
++					 int size)
++{
++	struct bio_set *bs;
++
++	if (!mddev || !mddev->bio_set)
++		bs = fs_bio_set;
++	else
++		bs = mddev->bio_set;
++
++	return bio_clone_bioset_partial(bio, gfp_mask, bs, offset << 9,
++					size << 9);
++}
++EXPORT_SYMBOL_GPL(bio_clone_slow_mddev_partial);
++
+ /*
+  * We have a system wide 'event count' that is incremented
+  * on any 'interesting' event, and readers of /proc/mdstat
+diff --git a/drivers/md/md.h b/drivers/md/md.h
+index 968bbe72b237..4f4e6ded59e5 100644
+--- a/drivers/md/md.h
++++ b/drivers/md/md.h
+@@ -675,6 +675,9 @@ extern void mddev_suspend(struct mddev *mddev);
+ extern void mddev_resume(struct mddev *mddev);
+ extern struct bio *bio_clone_mddev(struct bio *bio, gfp_t gfp_mask,
+ 				   struct mddev *mddev);
++extern struct bio *bio_clone_slow_mddev_partial(struct bio *bio, gfp_t gfp_mask,
++						struct mddev *mddev, int offset,
++						int size);
+ extern struct bio *bio_alloc_mddev(gfp_t gfp_mask, int nr_iovecs,
+ 				   struct mddev *mddev);
+ 
+-- 
+2.7.4
