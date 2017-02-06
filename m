@@ -1,141 +1,82 @@
-Return-Path: <linus.walleij@linaro.org>
-Return-Path: <linus.walleij@linaro.org>
-From: Linus Walleij <linus.walleij@linaro.org>
-To: linux-mmc@vger.kernel.org,
-	Ulf Hansson <ulf.hansson@linaro.org>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	Paolo Valente <paolo.valente@linaro.org>
-Cc: Chunyan Zhang <zhang.chunyan@linaro.org>,
-	Baolin Wang <baolin.wang@linaro.org>,
-	linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Linus Walleij <linus.walleij@linaro.org>
-Subject: [PATCH 02/16] mmc: core: refactor asynchronous request finalization
-Date: Thu,  9 Feb 2017 16:33:49 +0100
-Message-Id: <20170209153403.9730-3-linus.walleij@linaro.org>
-In-Reply-To: <20170209153403.9730-1-linus.walleij@linaro.org>
-References: <20170209153403.9730-1-linus.walleij@linaro.org>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pg0-f53.google.com ([74.125.83.53]:36094 "EHLO
+        mail-pg0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752093AbdBFUPy (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Feb 2017 15:15:54 -0500
+Received: by mail-pg0-f53.google.com with SMTP id v184so31200048pgv.3
+        for <linux-block@vger.kernel.org>; Mon, 06 Feb 2017 12:15:54 -0800 (PST)
+Date: Mon, 6 Feb 2017 12:15:21 -0800
+From: Omar Sandoval <osandov@osandov.com>
+To: Jens Axboe <axboe@fb.com>
+Cc: linux-block@vger.kernel.org, kernel-team@fb.com
+Subject: Re: [PATCH v2] blk-mq-sched: separate mark hctx and queue restart
+ operations
+Message-ID: <20170206201521.GC20714@vader>
+References: <0ec9b1167d22966cdf77a1d5140499493ea888a2.1486408944.git.osandov@fb.com>
+ <182de41f-33d3-bbf8-c591-9e577b0f1762@fb.com>
+ <20170206195330.GB20714@vader>
+ <f26e16b9-2e54-3e06-adca-190c952804a7@fb.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <f26e16b9-2e54-3e06-adca-190c952804a7@fb.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-mmc_wait_for_data_req_done() is called in exactly one place,
-and having it spread out is making things hard to oversee.
-Factor this function into mmc_finalize_areq().
+On Mon, Feb 06, 2017 at 01:07:41PM -0700, Jens Axboe wrote:
+> On 02/06/2017 12:53 PM, Omar Sandoval wrote:
+> > On Mon, Feb 06, 2017 at 12:39:57PM -0700, Jens Axboe wrote:
+> >> On 02/06/2017 12:24 PM, Omar Sandoval wrote:
+> >>> From: Omar Sandoval <osandov@fb.com>
+> >>>
+> >>> In blk_mq_sched_dispatch_requests(), we call blk_mq_sched_mark_restart()
+> >>> after we dispatch requests left over on our hardware queue dispatch
+> >>> list. This is so we'll go back and dispatch requests from the scheduler.
+> >>> In this case, it's only necessary to restart the hardware queue that we
+> >>> are running; there's no reason to run other hardware queues just because
+> >>> we are using shared tags.
+> >>>
+> >>> So, split out blk_mq_sched_mark_restart() into two operations, one for
+> >>> just the hardware queue and one for the whole request queue. The core
+> >>> code uses both, and I/O schedulers may also want to use them.
+> >>>
+> >>> Signed-off-by: Omar Sandoval <osandov@fb.com>
+> >>> ---
+> >>> Patch based on block/for-next.
+> >>>
+> >>>  block/blk-mq-sched.c |  2 +-
+> >>>  block/blk-mq-sched.h | 25 ++++++++++++++++++-------
+> >>>  block/blk-mq.c       |  5 ++++-
+> >>>  3 files changed, 23 insertions(+), 9 deletions(-)
+> >>>
+> >>> diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+> >>> index ee455e7cf9d8..7538565359ea 100644
+> >>> --- a/block/blk-mq-sched.c
+> >>> +++ b/block/blk-mq-sched.c
+> >>> @@ -201,7 +201,7 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
+> >>>  	 * needing a restart in that case.
+> >>>  	 */
+> >>>  	if (!list_empty(&rq_list)) {
+> >>> -		blk_mq_sched_mark_restart(hctx);
+> >>> +		blk_mq_sched_mark_restart_hctx(hctx);
+> >>>  		blk_mq_dispatch_rq_list(hctx, &rq_list);
+> >>
+> >> What if we dispatched nothing on this hardware queue, and it currently
+> >> doesn't have any IO pending?
+> > 
+> > Hm, so there are two ways that could happen. If it's because
+> > ->queue_rq() returned BLK_MQ_RQ_QUEUE_BUSY, then the driver is supposed
+> > to kick I/O off again, right?
+> > 
+> > If it's because we failed to get a driver tag, then we'll call
+> > blk_mq_sched_mark_restart_queue() in the shared case. I just realized
+> > that there's a bug there, though. Since we already set the hctx restart
+> > bit, we won't set the queue restart bit. The below should work, and
+> > makes more sense in general.
+> > 
+> > Or were you thinking of something else?
+> 
+> No, I think that covers it, I had not read far enough either to see that
+> you handle the shared tag case for tag starvation in the caller.
 
-Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
----
- drivers/mmc/core/core.c | 86 +++++++++++++++++++------------------------------
- 1 file changed, 33 insertions(+), 53 deletions(-)
-
-diff --git a/drivers/mmc/core/core.c b/drivers/mmc/core/core.c
-index 53065d1cebf7..b2e7a6dfcbf0 100644
---- a/drivers/mmc/core/core.c
-+++ b/drivers/mmc/core/core.c
-@@ -485,56 +485,6 @@ static int __mmc_start_req(struct mmc_host *host, struct mmc_request *mrq)
- 	return err;
- }
- 
--/*
-- * mmc_wait_for_data_req_done() - wait for request completed
-- * @host: MMC host to prepare the command.
-- * @mrq: MMC request to wait for
-- *
-- * Blocks MMC context till host controller will ack end of data request
-- * execution or new request notification arrives from the block layer.
-- * Handles command retries.
-- *
-- * Returns enum mmc_blk_status after checking errors.
-- */
--static enum mmc_blk_status mmc_wait_for_data_req_done(struct mmc_host *host,
--						      struct mmc_request *mrq)
--{
--	struct mmc_command *cmd;
--	struct mmc_context_info *context_info = &host->context_info;
--	enum mmc_blk_status status;
--
--	while (1) {
--		wait_event_interruptible(context_info->wait,
--				(context_info->is_done_rcv ||
--				 context_info->is_new_req));
--
--		if (context_info->is_done_rcv) {
--			context_info->is_done_rcv = false;
--			cmd = mrq->cmd;
--
--			if (!cmd->error || !cmd->retries ||
--			    mmc_card_removed(host->card)) {
--				status = host->areq->err_check(host->card,
--							       host->areq);
--				break; /* return status */
--			} else {
--				mmc_retune_recheck(host);
--				pr_info("%s: req failed (CMD%u): %d, retrying...\n",
--					mmc_hostname(host),
--					cmd->opcode, cmd->error);
--				cmd->retries--;
--				cmd->error = 0;
--				__mmc_start_request(host, mrq);
--				continue; /* wait for done/new event again */
--			}
--		}
--
--		return MMC_BLK_NEW_REQUEST;
--	}
--	mmc_retune_release(host);
--	return status;
--}
--
- void mmc_wait_for_req_done(struct mmc_host *host, struct mmc_request *mrq)
- {
- 	struct mmc_command *cmd;
-@@ -639,14 +589,44 @@ static void mmc_post_req(struct mmc_host *host, struct mmc_request *mrq,
-  */
- static enum mmc_blk_status mmc_finalize_areq(struct mmc_host *host)
- {
-+	struct mmc_context_info *context_info = &host->context_info;
- 	enum mmc_blk_status status;
- 
- 	if (!host->areq)
- 		return MMC_BLK_SUCCESS;
- 
--	status = mmc_wait_for_data_req_done(host, host->areq->mrq);
--	if (status == MMC_BLK_NEW_REQUEST)
--		return status;
-+	while (1) {
-+		wait_event_interruptible(context_info->wait,
-+				(context_info->is_done_rcv ||
-+				 context_info->is_new_req));
-+
-+		if (context_info->is_done_rcv) {
-+			struct mmc_command *cmd;
-+
-+			context_info->is_done_rcv = false;
-+			cmd = host->areq->mrq->cmd;
-+
-+			if (!cmd->error || !cmd->retries ||
-+			    mmc_card_removed(host->card)) {
-+				status = host->areq->err_check(host->card,
-+							       host->areq);
-+				break; /* return status */
-+			} else {
-+				mmc_retune_recheck(host);
-+				pr_info("%s: req failed (CMD%u): %d, retrying...\n",
-+					mmc_hostname(host),
-+					cmd->opcode, cmd->error);
-+				cmd->retries--;
-+				cmd->error = 0;
-+				__mmc_start_request(host, host->areq->mrq);
-+				continue; /* wait for done/new event again */
-+			}
-+		}
-+
-+		return MMC_BLK_NEW_REQUEST;
-+	}
-+
-+	mmc_retune_release(host);
- 
- 	/*
- 	 * Check BKOPS urgency for each R1 response
--- 
-2.9.3
+Yup, I considered making that its own helper but I figured we could do
+that when we need the same logic elsewhere.
