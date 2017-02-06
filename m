@@ -1,41 +1,33 @@
-Return-Path: <jack@suse.cz>
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Tejun Heo <tj@kernel.org>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
-	NeilBrown <neilb@suse.de>,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH 02/10] block: Unhash also block device inode for the whole device
-Date: Thu,  9 Feb 2017 13:44:25 +0100
-Message-Id: <20170209124433.2626-3-jack@suse.cz>
-In-Reply-To: <20170209124433.2626-1-jack@suse.cz>
-References: <20170209124433.2626-1-jack@suse.cz>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([65.50.211.133]:39256 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752857AbdBFOYx (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Feb 2017 09:24:53 -0500
+Date: Mon, 6 Feb 2017 06:24:51 -0800
+From: Christoph Hellwig <hch@infradead.org>
+To: Ming Lei <tom.leiming@gmail.com>
+Cc: Christoph Hellwig <hch@infradead.org>,
+        Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "open list:SOFTWARE RAID (Multiple Disks) SUPPORT"
+        <linux-raid@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        NeilBrown <neilb@suse.com>
+Subject: Re: [PATCH 4/4] md: fast clone bio in bio_clone_mddev()
+Message-ID: <20170206142451.GA17008@infradead.org>
+References: <1486275733-7268-1-git-send-email-tom.leiming@gmail.com>
+ <1486275733-7268-5-git-send-email-tom.leiming@gmail.com>
+ <20170206085433.GB6411@infradead.org>
+ <CACVXFVNhB5i_5VJ4596ktLRnEM03GhqhZD-x+E_QwK1kZydTJg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CACVXFVNhB5i_5VJ4596ktLRnEM03GhqhZD-x+E_QwK1kZydTJg@mail.gmail.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Iteration over partitions in del_gendisk() omits part0. Add
-bdev_unhash_inode() call for the whole device. Otherwise if the device
-number gets reused, bdev inode will be still associated with the old
-(stale) bdi.
+On Mon, Feb 06, 2017 at 06:43:32PM +0800, Ming Lei wrote:
+> In theory, ->bio_set still might be NULL in case of failed memory allocation,
+> please see md_run().
 
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- block/genhd.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/block/genhd.c b/block/genhd.c
-index 6cb9f3a34a92..f6c4d4400759 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -655,6 +655,7 @@ void del_gendisk(struct gendisk *disk)
- 	disk_part_iter_exit(&piter);
- 
- 	invalidate_partition(disk, 0);
-+	bdev_unhash_inode(disk_devt(disk));
- 	set_capacity(disk, 0);
- 	disk->flags &= ~GENHD_FL_UP;
- 
--- 
-2.10.2
+And that's something that should be fixed.  Silently not having mempool
+is very bad behavior.
