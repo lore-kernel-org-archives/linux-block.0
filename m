@@ -1,340 +1,419 @@
-Return-Path: <prvs=423213d9ff=jbacik@fb.com>
-From: Josef Bacik <jbacik@fb.com>
-To: <axboe@kernel.dk>, <nbd-general@lists.sourceforge.net>,
-        <linux-block@vger.kernel.org>, <kernel-team@fb.com>
-Subject: [PATCH 5/6] nbd: handle ERESTARTSYS properly
-Date: Tue, 28 Feb 2017 11:57:10 -0500
-Message-ID: <1488301031-3199-6-git-send-email-jbacik@fb.com>
-In-Reply-To: <1488301031-3199-1-git-send-email-jbacik@fb.com>
-References: <1488301031-3199-1-git-send-email-jbacik@fb.com>
+Return-Path: <jasowang@redhat.com>
+Subject: Re: [PATCH 2/9] virtio_pci: use shared interrupts for virtqueues
+To: Christoph Hellwig <hch@lst.de>, mst@redhat.com
+References: <20170205171526.6224-1-hch@lst.de>
+ <20170205171526.6224-3-hch@lst.de>
+Cc: axboe@kernel.dk, pbonzini@redhat.com,
+        virtualization@lists.linux-foundation.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <5a5cae94-b56c-4d4b-5ce5-516193e8962f@redhat.com>
+Date: Tue, 7 Feb 2017 15:17:54 +0800
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20170205171526.6224-3-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-We can submit IO in a processes context, which means there can be
-pending signals.  This isn't a fatal error for NBD, but it does require
-some finesse.  If the signal happens before we transmit anything then we
-are ok, just requeue the request and carry on.  However if we've done a
-partial transmit we can't allow anything else to be transmitted on this
-socket until we transmit the remaining part of the request.  Deal with
-this by keeping track of how much we've sent for the current request,
-and if we get an ERESTARTSYS during any part of our transmission save
-the state of that request and requeue the IO.  If anybody tries to
-submit a request that isn't our pending request then requeue that
-request until we are able to service the one that is pending.
 
-Signed-off-by: Josef Bacik <jbacik@fb.com>
----
- drivers/block/nbd.c | 138 +++++++++++++++++++++++++++++++++++++++++++---------
- 1 file changed, 116 insertions(+), 22 deletions(-)
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index ac5a03a..aba1aba 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -49,6 +49,8 @@ struct nbd_sock {
- 	struct mutex tx_lock;
- 	bool dead;
- 	int fallback_index;
-+	struct request *pending;
-+	int sent;
- };
- 
- struct recv_thread_args {
-@@ -145,6 +147,13 @@ static struct device_attribute pid_attr = {
- 	.show = pid_show,
- };
- 
-+static void nbd_mark_nsock_dead(struct nbd_sock *nsock)
-+{
-+	nsock->dead = true;
-+	nsock->pending = NULL;
-+	nsock->sent = 0;
-+}
-+
- static int nbd_get_unless_zero(struct nbd_device *nbd)
- {
- 	return atomic_add_unless(&nbd->refs, 1, 0);
-@@ -200,8 +209,8 @@ static void sock_shutdown(struct nbd_device *nbd)
- 		struct nbd_sock *nsock = nbd->socks[i];
- 		mutex_lock(&nsock->tx_lock);
- 		kernel_sock_shutdown(nsock->sock, SHUT_RDWR);
-+		nbd_mark_nsock_dead(nsock);
- 		mutex_unlock(&nsock->tx_lock);
--		nsock->dead = true;
- 	}
- 	dev_warn(disk_to_dev(nbd->disk), "shutting down sockets\n");
- }
-@@ -229,8 +238,8 @@ static enum blk_eh_timer_return nbd_xmit_timeout(struct request *req,
- 				struct nbd_sock *nsock =
- 					nbd->socks[cmd->index];
- 				mutex_lock(&nsock->tx_lock);
--				nsock->dead = true;
- 				kernel_sock_shutdown(nsock->sock, SHUT_RDWR);
-+				nbd_mark_nsock_dead(nsock);
- 				mutex_unlock(&nsock->tx_lock);
- 			}
- 			blk_mq_requeue_request(req, true);
-@@ -253,7 +262,7 @@ static enum blk_eh_timer_return nbd_xmit_timeout(struct request *req,
-  *  Send or receive packet.
-  */
- static int sock_xmit(struct nbd_device *nbd, int index, int send, void *buf,
--		     int size, int msg_flags)
-+		     int size, int msg_flags, int *sent)
- {
- 	struct socket *sock = nbd->socks[index]->sock;
- 	int result;
-@@ -292,6 +301,8 @@ static int sock_xmit(struct nbd_device *nbd, int index, int send, void *buf,
- 		}
- 		size -= result;
- 		buf += result;
-+		if (sent)
-+			*sent += result;
- 	} while (size > 0);
- 
- 	tsk_restore_flags(current, pflags, PF_MEMALLOC);
-@@ -300,12 +311,28 @@ static int sock_xmit(struct nbd_device *nbd, int index, int send, void *buf,
- }
- 
- static inline int sock_send_bvec(struct nbd_device *nbd, int index,
--				 struct bio_vec *bvec, int flags)
-+				 struct bio_vec *bvec, int flags, int *skip,
-+				 int *sent)
- {
-+	void *kaddr;
-+	unsigned int offset = bvec->bv_offset;
-+	unsigned int len = bvec->bv_len;
- 	int result;
--	void *kaddr = kmap(bvec->bv_page);
--	result = sock_xmit(nbd, index, 1, kaddr + bvec->bv_offset,
--			   bvec->bv_len, flags);
-+
-+	/* If we had partially sent this request previously we need to skip over
-+	 * what we've already sent.
-+	 */
-+	if (*skip) {
-+		if (len <= *skip) {
-+			*skip -= len;
-+			return len;
-+		}
-+		offset += *skip;
-+		len -= *skip;
-+		*skip = 0;
-+	}
-+	kaddr = kmap(bvec->bv_page);
-+	result = sock_xmit(nbd, index, 1, kaddr + offset, len, flags, sent);
- 	kunmap(bvec->bv_page);
- 	return result;
- }
-@@ -314,12 +341,14 @@ static inline int sock_send_bvec(struct nbd_device *nbd, int index,
- static int nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd, int index)
- {
- 	struct request *req = blk_mq_rq_from_pdu(cmd);
-+	struct nbd_sock *nsock = nbd->socks[index];
- 	int result;
- 	struct nbd_request request;
- 	unsigned long size = blk_rq_bytes(req);
- 	struct bio *bio;
- 	u32 type;
- 	u32 tag = blk_mq_unique_tag(req);
-+	int sent = nsock->sent, skip = 0;
- 
- 	switch (req_op(req)) {
- 	case REQ_OP_DISCARD:
-@@ -345,6 +374,15 @@ static int nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd, int index)
- 		return -EIO;
- 	}
- 
-+	/* We did a partial send previously, and we at least sent the whole
-+	 * request struct, so just go and send the rest of the pages in the
-+	 * request.
-+	 */
-+	if (sent && sent >= sizeof(request)) {
-+		skip = sent - sizeof(request);
-+		goto send_pages;
-+	}
-+
- 	cmd->index = index;
- 	memset(&request, 0, sizeof(request));
- 	request.magic = htonl(NBD_REQUEST_MAGIC);
-@@ -358,16 +396,33 @@ static int nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd, int index)
- 	dev_dbg(nbd_to_dev(nbd), "request %p: sending control (%s@%llu,%uB)\n",
- 		cmd, nbdcmd_to_ascii(type),
- 		(unsigned long long)blk_rq_pos(req) << 9, blk_rq_bytes(req));
--	result = sock_xmit(nbd, index, 1, &request, sizeof(request),
--			(type == NBD_CMD_WRITE) ? MSG_MORE : 0);
-+
-+	/* We may have only partially sent the request previously, so handle
-+	 * this horrible, horrible, terrifying possiblity here.
-+	 */
-+	result = sock_xmit(nbd, index, 1, (void *)(&request) + sent,
-+			   sizeof(request) - sent,
-+			   (type == NBD_CMD_WRITE) ? MSG_MORE : 0, &sent);
- 	if (result <= 0) {
-+		if (result == -ERESTARTSYS) {
-+			/* If we havne't sent anything we can just return BUSY,
-+			 * however if we have sent something we need to make
-+			 * sure we only allow this req to be sent until we are
-+			 * completely done.
-+			 */
-+			if (sent) {
-+				nsock->pending = req;
-+				nsock->sent = sent;
-+			}
-+			return BLK_MQ_RQ_QUEUE_BUSY;
-+		}
- 		dev_err_ratelimited(disk_to_dev(nbd->disk),
- 			"Send control failed (result %d)\n", result);
- 		return -EAGAIN;
- 	}
--
-+send_pages:
- 	if (type != NBD_CMD_WRITE)
--		return 0;
-+		goto out;
- 
- 	bio = req->bio;
- 	while (bio) {
-@@ -381,8 +436,18 @@ static int nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd, int index)
- 
- 			dev_dbg(nbd_to_dev(nbd), "request %p: sending %d bytes data\n",
- 				cmd, bvec.bv_len);
--			result = sock_send_bvec(nbd, index, &bvec, flags);
-+			result = sock_send_bvec(nbd, index, &bvec, flags,
-+						&skip, &sent);
- 			if (result <= 0) {
-+				if (result == -ERESTARTSYS) {
-+					/* We've already sent the header, we
-+					 * have no choice but to set pending and
-+					 * return BUSY.
-+					 */
-+					nsock->pending = req;
-+					nsock->sent = sent;
-+					return BLK_MQ_RQ_QUEUE_BUSY;
-+				}
- 				dev_err(disk_to_dev(nbd->disk),
- 					"Send data failed (result %d)\n",
- 					result);
-@@ -399,6 +464,9 @@ static int nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd, int index)
- 		}
- 		bio = next;
- 	}
-+out:
-+	nsock->pending = NULL;
-+	nsock->sent = 0;
- 	return 0;
- }
- 
-@@ -408,7 +476,7 @@ static inline int sock_recv_bvec(struct nbd_device *nbd, int index,
- 	int result;
- 	void *kaddr = kmap(bvec->bv_page);
- 	result = sock_xmit(nbd, index, 0, kaddr + bvec->bv_offset,
--			   bvec->bv_len, MSG_WAITALL);
-+			   bvec->bv_len, MSG_WAITALL, NULL);
- 	kunmap(bvec->bv_page);
- 	return result;
- }
-@@ -430,7 +498,8 @@ static struct nbd_cmd *nbd_read_stat(struct nbd_device *nbd, int index)
- 	u32 tag;
- 
- 	reply.magic = 0;
--	result = sock_xmit(nbd, index, 0, &reply, sizeof(reply), MSG_WAITALL);
-+	result = sock_xmit(nbd, index, 0, &reply, sizeof(reply), MSG_WAITALL,
-+			   NULL);
- 	if (result <= 0) {
- 		if (!nbd_disconnected(nbd))
- 			dev_err(disk_to_dev(nbd->disk),
-@@ -510,7 +579,10 @@ static void recv_work(struct work_struct *work)
- 	while (1) {
- 		cmd = nbd_read_stat(nbd, args->index);
- 		if (IS_ERR(cmd)) {
--			nbd->socks[args->index]->dead = true;
-+			struct nbd_sock *nsock = nbd->socks[args->index];
-+			mutex_lock(&nsock->tx_lock);
-+			nbd_mark_nsock_dead(nsock);
-+			mutex_unlock(&nsock->tx_lock);
- 			ret = PTR_ERR(cmd);
- 			break;
- 		}
-@@ -622,14 +694,26 @@ static int nbd_handle_cmd(struct nbd_cmd *cmd, int index)
- 	 * returns EAGAIN can be retried on a different socket.
- 	 */
- 	mutex_lock(&nsock->tx_lock);
-+
-+	/* Handle the case that we have a pending request that was partially
-+	 * transmitted that _has_ to be serviced first.  We need to call requeue
-+	 * here so that it gets put _after_ the request that is already on the
-+	 * dispatch list.
-+	 */
-+	if (unlikely(nsock->pending && nsock->pending != req)) {
-+		blk_mq_requeue_request(req, true);
-+		ret = 0;
-+		goto out;
-+	}
- 	ret = nbd_send_cmd(nbd, cmd, index);
- 	if (ret == -EAGAIN) {
- 		dev_err_ratelimited(disk_to_dev(nbd->disk),
- 				    "Request send failed trying another connection\n");
--		nsock->dead = true;
-+		nbd_mark_nsock_dead(nsock);
- 		mutex_unlock(&nsock->tx_lock);
- 		goto again;
- 	}
-+out:
- 	mutex_unlock(&nsock->tx_lock);
- 	nbd_put(nbd);
- 	return ret;
-@@ -639,6 +723,7 @@ static int nbd_queue_rq(struct blk_mq_hw_ctx *hctx,
- 			const struct blk_mq_queue_data *bd)
- {
- 	struct nbd_cmd *cmd = blk_mq_rq_to_pdu(bd->rq);
-+	int ret;
- 
- 	/*
- 	 * Since we look at the bio's to send the request over the network we
-@@ -651,13 +736,20 @@ static int nbd_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	 */
- 	init_completion(&cmd->send_complete);
- 	blk_mq_start_request(bd->rq);
--	if (nbd_handle_cmd(cmd, hctx->queue_num) != 0) {
--		bd->rq->errors++;
--		nbd_end_request(cmd);
--	}
-+
-+	/* We can be called directly from the user space process, which means we
-+	 * could possibly have signals pending so our sendmsg will fail.  In
-+	 * this case we need to return that we are busy, otherwise error out as
-+	 * appropriate.
-+	 */
-+	ret = nbd_handle_cmd(cmd, hctx->queue_num);
-+	if (ret < 0)
-+		ret = BLK_MQ_RQ_QUEUE_ERROR;
-+	if (!ret)
-+		ret = BLK_MQ_RQ_QUEUE_OK;
- 	complete(&cmd->send_complete);
- 
--	return BLK_MQ_RQ_QUEUE_OK;
-+	return ret;
- }
- 
- static int nbd_add_socket(struct nbd_device *nbd, unsigned long arg)
-@@ -699,6 +791,8 @@ static int nbd_add_socket(struct nbd_device *nbd, unsigned long arg)
- 	nsock->dead = false;
- 	mutex_init(&nsock->tx_lock);
- 	nsock->sock = sock;
-+	nsock->pending = NULL;
-+	nsock->sent = 0;
- 	socks[nbd->num_connections++] = nsock;
- 
- 	err = 0;
-@@ -751,7 +845,7 @@ static void send_disconnects(struct nbd_device *nbd)
- 	request.type = htonl(NBD_CMD_DISC);
- 
- 	for (i = 0; i < nbd->num_connections; i++) {
--		ret = sock_xmit(nbd, i, 1, &request, sizeof(request), 0);
-+		ret = sock_xmit(nbd, i, 1, &request, sizeof(request), 0, NULL);
- 		if (ret <= 0)
- 			dev_err(disk_to_dev(nbd->disk),
- 				"Send disconnect failed %d\n", ret);
--- 
-2.7.4
+On 2017年02月06日 01:15, Christoph Hellwig wrote:
+> This lets IRQ layer handle dispatching IRQs to separate handlers for the
+> case where we don't have per-VQ MSI-X vectors, and allows us to greatly
+> simplify the code based on the assumption that we always have interrupt
+> vector 0 (legacy INTx or config interrupt for MSI-X) available, and
+> any other interrupt is request/freed throught the VQ, even if the
+> actual interrupt line might be shared in some cases.
+>
+> This allows removing a great deal of variables keeping track of the
+> interrupt state in struct virtio_pci_device, as we can now simply walk the
+> list of VQs and deal with per-VQ interrupt handlers there, and only treat
+> vector 0 special.
+>
+> Additionally clean up the VQ allocation code to properly unwind on error
+> instead of having a single global cleanup label, which is error prone,
+> and in this case also leads to more code.
+>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+
+Reviewed-by: Jason Wang <jasowang@redhat.com>
+
+> ---
+>   drivers/virtio/virtio_pci_common.c | 235 ++++++++++++++++---------------------
+>   drivers/virtio/virtio_pci_common.h |  16 +--
+>   2 files changed, 106 insertions(+), 145 deletions(-)
+>
+> diff --git a/drivers/virtio/virtio_pci_common.c b/drivers/virtio/virtio_pci_common.c
+> index a33767318cbf..274dc1ff09c0 100644
+> --- a/drivers/virtio/virtio_pci_common.c
+> +++ b/drivers/virtio/virtio_pci_common.c
+> @@ -33,10 +33,8 @@ void vp_synchronize_vectors(struct virtio_device *vdev)
+>   	struct virtio_pci_device *vp_dev = to_vp_device(vdev);
+>   	int i;
+>   
+> -	if (vp_dev->intx_enabled)
+> -		synchronize_irq(vp_dev->pci_dev->irq);
+> -
+> -	for (i = 0; i < vp_dev->msix_vectors; ++i)
+> +	synchronize_irq(pci_irq_vector(vp_dev->pci_dev, 0));
+> +	for (i = 1; i < vp_dev->msix_vectors; i++)
+>   		synchronize_irq(pci_irq_vector(vp_dev->pci_dev, i));
+>   }
+>   
+> @@ -99,77 +97,10 @@ static irqreturn_t vp_interrupt(int irq, void *opaque)
+>   	return vp_vring_interrupt(irq, opaque);
+>   }
+>   
+> -static int vp_request_msix_vectors(struct virtio_device *vdev, int nvectors,
+> -				   bool per_vq_vectors)
+> -{
+> -	struct virtio_pci_device *vp_dev = to_vp_device(vdev);
+> -	const char *name = dev_name(&vp_dev->vdev.dev);
+> -	unsigned i, v;
+> -	int err = -ENOMEM;
+> -
+> -	vp_dev->msix_vectors = nvectors;
+> -
+> -	vp_dev->msix_names = kmalloc(nvectors * sizeof *vp_dev->msix_names,
+> -				     GFP_KERNEL);
+> -	if (!vp_dev->msix_names)
+> -		goto error;
+> -	vp_dev->msix_affinity_masks
+> -		= kzalloc(nvectors * sizeof *vp_dev->msix_affinity_masks,
+> -			  GFP_KERNEL);
+> -	if (!vp_dev->msix_affinity_masks)
+> -		goto error;
+> -	for (i = 0; i < nvectors; ++i)
+> -		if (!alloc_cpumask_var(&vp_dev->msix_affinity_masks[i],
+> -					GFP_KERNEL))
+> -			goto error;
+> -
+> -	err = pci_alloc_irq_vectors(vp_dev->pci_dev, nvectors, nvectors,
+> -			PCI_IRQ_MSIX);
+> -	if (err < 0)
+> -		goto error;
+> -	vp_dev->msix_enabled = 1;
+> -
+> -	/* Set the vector used for configuration */
+> -	v = vp_dev->msix_used_vectors;
+> -	snprintf(vp_dev->msix_names[v], sizeof *vp_dev->msix_names,
+> -		 "%s-config", name);
+> -	err = request_irq(pci_irq_vector(vp_dev->pci_dev, v),
+> -			  vp_config_changed, 0, vp_dev->msix_names[v],
+> -			  vp_dev);
+> -	if (err)
+> -		goto error;
+> -	++vp_dev->msix_used_vectors;
+> -
+> -	v = vp_dev->config_vector(vp_dev, v);
+> -	/* Verify we had enough resources to assign the vector */
+> -	if (v == VIRTIO_MSI_NO_VECTOR) {
+> -		err = -EBUSY;
+> -		goto error;
+> -	}
+> -
+> -	if (!per_vq_vectors) {
+> -		/* Shared vector for all VQs */
+> -		v = vp_dev->msix_used_vectors;
+> -		snprintf(vp_dev->msix_names[v], sizeof *vp_dev->msix_names,
+> -			 "%s-virtqueues", name);
+> -		err = request_irq(pci_irq_vector(vp_dev->pci_dev, v),
+> -				  vp_vring_interrupt, 0, vp_dev->msix_names[v],
+> -				  vp_dev);
+> -		if (err)
+> -			goto error;
+> -		++vp_dev->msix_used_vectors;
+> -	}
+> -	return 0;
+> -error:
+> -	return err;
+> -}
+> -
+> -/* the config->del_vqs() implementation */
+> -void vp_del_vqs(struct virtio_device *vdev)
+> +static void vp_remove_vqs(struct virtio_device *vdev)
+>   {
+>   	struct virtio_pci_device *vp_dev = to_vp_device(vdev);
+>   	struct virtqueue *vq, *n;
+> -	int i;
+>   
+>   	list_for_each_entry_safe(vq, n, &vdev->vqs, list) {
+>   		if (vp_dev->msix_vector_map) {
+> @@ -181,35 +112,33 @@ void vp_del_vqs(struct virtio_device *vdev)
+>   		}
+>   		vp_dev->del_vq(vq);
+>   	}
+> +}
+>   
+> -	if (vp_dev->intx_enabled) {
+> -		free_irq(vp_dev->pci_dev->irq, vp_dev);
+> -		vp_dev->intx_enabled = 0;
+> -	}
+> +/* the config->del_vqs() implementation */
+> +void vp_del_vqs(struct virtio_device *vdev)
+> +{
+> +	struct virtio_pci_device *vp_dev = to_vp_device(vdev);
+> +	int i;
+>   
+> -	for (i = 0; i < vp_dev->msix_used_vectors; ++i)
+> -		free_irq(pci_irq_vector(vp_dev->pci_dev, i), vp_dev);
+> +	if (WARN_ON_ONCE(list_empty_careful(&vdev->vqs)))
+> +		return;
+>   
+> -	for (i = 0; i < vp_dev->msix_vectors; i++)
+> -		if (vp_dev->msix_affinity_masks[i])
+> -			free_cpumask_var(vp_dev->msix_affinity_masks[i]);
+> +	vp_remove_vqs(vdev);
+>   
+>   	if (vp_dev->msix_enabled) {
+> +		for (i = 0; i < vp_dev->msix_vectors; i++)
+> +			free_cpumask_var(vp_dev->msix_affinity_masks[i]);
+> +
+>   		/* Disable the vector used for configuration */
+>   		vp_dev->config_vector(vp_dev, VIRTIO_MSI_NO_VECTOR);
+>   
+> -		pci_free_irq_vectors(vp_dev->pci_dev);
+> -		vp_dev->msix_enabled = 0;
+> +		kfree(vp_dev->msix_affinity_masks);
+> +		kfree(vp_dev->msix_names);
+> +		kfree(vp_dev->msix_vector_map);
+>   	}
+>   
+> -	vp_dev->msix_vectors = 0;
+> -	vp_dev->msix_used_vectors = 0;
+> -	kfree(vp_dev->msix_names);
+> -	vp_dev->msix_names = NULL;
+> -	kfree(vp_dev->msix_affinity_masks);
+> -	vp_dev->msix_affinity_masks = NULL;
+> -	kfree(vp_dev->msix_vector_map);
+> -	vp_dev->msix_vector_map = NULL;
+> +	free_irq(pci_irq_vector(vp_dev->pci_dev, 0), vp_dev);
+> +	pci_free_irq_vectors(vp_dev->pci_dev);
+>   }
+>   
+>   static int vp_find_vqs_msix(struct virtio_device *vdev, unsigned nvqs,
+> @@ -219,79 +148,122 @@ static int vp_find_vqs_msix(struct virtio_device *vdev, unsigned nvqs,
+>   			      bool per_vq_vectors)
+>   {
+>   	struct virtio_pci_device *vp_dev = to_vp_device(vdev);
+> +	const char *name = dev_name(&vp_dev->vdev.dev);
+> +	int i, err = -ENOMEM, allocated_vectors, nvectors;
+>   	u16 msix_vec;
+> -	int i, err, nvectors, allocated_vectors;
+> +
+> +	nvectors = 1;
+> +	for (i = 0; i < nvqs; i++)
+> +		if (callbacks[i])
+> +			nvectors++;
+>   
+>   	if (per_vq_vectors) {
+> -		/* Best option: one for change interrupt, one per vq. */
+> -		nvectors = 1;
+> -		for (i = 0; i < nvqs; ++i)
+> -			if (callbacks[i])
+> -				++nvectors;
+> +		err = pci_alloc_irq_vectors(vp_dev->pci_dev, nvectors, nvectors,
+> +				PCI_IRQ_MSIX);
+>   	} else {
+> -		/* Second best: one for change, shared for all vqs. */
+> -		nvectors = 2;
+> +		err = pci_alloc_irq_vectors(vp_dev->pci_dev, 2, 2,
+> +				PCI_IRQ_MSIX);
+>   	}
+> +	if (err < 0)
+> +		return err;
+>   
+> -	err = vp_request_msix_vectors(vdev, nvectors, per_vq_vectors);
+> +	vp_dev->msix_vectors = nvectors;
+> +	vp_dev->msix_names = kmalloc_array(nvectors,
+> +			sizeof(*vp_dev->msix_names), GFP_KERNEL);
+> +	if (!vp_dev->msix_names)
+> +		goto out_free_irq_vectors;
+> +
+> +	vp_dev->msix_affinity_masks = kcalloc(nvectors,
+> +			sizeof(*vp_dev->msix_affinity_masks), GFP_KERNEL);
+> +	if (!vp_dev->msix_affinity_masks)
+> +		goto out_free_msix_names;
+> +
+> +	for (i = 0; i < nvectors; ++i) {
+> +		if (!alloc_cpumask_var(&vp_dev->msix_affinity_masks[i],
+> +				GFP_KERNEL))
+> +			goto out_free_msix_affinity_masks;
+> +	}
+> +
+> +	/* Set the vector used for configuration */
+> +	snprintf(vp_dev->msix_names[0], sizeof(*vp_dev->msix_names),
+> +		 "%s-config", name);
+> +	err = request_irq(pci_irq_vector(vp_dev->pci_dev, 0), vp_config_changed,
+> +			0, vp_dev->msix_names[0], vp_dev);
+>   	if (err)
+> -		goto error_find;
+> +		goto out_free_irq_vectors;
+>   
+> -	if (per_vq_vectors) {
+> -		vp_dev->msix_vector_map = kmalloc_array(nvqs,
+> -				sizeof(*vp_dev->msix_vector_map), GFP_KERNEL);
+> -		if (!vp_dev->msix_vector_map)
+> -			goto error_find;
+> +	/* Verify we had enough resources to assign the vector */
+> +	if (vp_dev->config_vector(vp_dev, 0) == VIRTIO_MSI_NO_VECTOR) {
+> +		err = -EBUSY;
+> +		goto out_free_config_irq;
+>   	}
+>   
+> -	allocated_vectors = vp_dev->msix_used_vectors;
+> +	vp_dev->msix_vector_map = kmalloc_array(nvqs,
+> +			sizeof(*vp_dev->msix_vector_map), GFP_KERNEL);
+> +	if (!vp_dev->msix_vector_map)
+> +		goto out_disable_config_irq;
+> +
+> +	allocated_vectors = 1; /* vector 0 is the config interrupt */
+>   	for (i = 0; i < nvqs; ++i) {
+>   		if (!names[i]) {
+>   			vqs[i] = NULL;
+>   			continue;
+>   		}
+>   
+> -		if (!callbacks[i])
+> -			msix_vec = VIRTIO_MSI_NO_VECTOR;
+> -		else if (per_vq_vectors)
+> -			msix_vec = allocated_vectors++;
+> +		if (callbacks[i])
+> +			msix_vec = allocated_vectors;
+>   		else
+> -			msix_vec = VP_MSIX_VQ_VECTOR;
+> +			msix_vec = VIRTIO_MSI_NO_VECTOR;
+> +
+>   		vqs[i] = vp_dev->setup_vq(vp_dev, i, callbacks[i], names[i],
+>   				msix_vec);
+>   		if (IS_ERR(vqs[i])) {
+>   			err = PTR_ERR(vqs[i]);
+> -			goto error_find;
+> +			goto out_remove_vqs;
+>   		}
+>   
+> -		if (!per_vq_vectors)
+> -			continue;
+> -
+>   		if (msix_vec == VIRTIO_MSI_NO_VECTOR) {
+>   			vp_dev->msix_vector_map[i] = VIRTIO_MSI_NO_VECTOR;
+>   			continue;
+>   		}
+>   
+> -		/* allocate per-vq irq if available and necessary */
+> -		snprintf(vp_dev->msix_names[msix_vec],
+> -			 sizeof *vp_dev->msix_names,
+> -			 "%s-%s",
+> +		snprintf(vp_dev->msix_names[i + 1],
+> +			 sizeof(*vp_dev->msix_names), "%s-%s",
+>   			 dev_name(&vp_dev->vdev.dev), names[i]);
+>   		err = request_irq(pci_irq_vector(vp_dev->pci_dev, msix_vec),
+> -				  vring_interrupt, 0,
+> -				  vp_dev->msix_names[msix_vec],
+> -				  vqs[i]);
+> +				  vring_interrupt, IRQF_SHARED,
+> +				  vp_dev->msix_names[i + 1], vqs[i]);
+>   		if (err) {
+>   			/* don't free this irq on error */
+>   			vp_dev->msix_vector_map[i] = VIRTIO_MSI_NO_VECTOR;
+> -			goto error_find;
+> +			goto out_remove_vqs;
+>   		}
+>   		vp_dev->msix_vector_map[i] = msix_vec;
+> +
+> +		if (per_vq_vectors)
+> +			allocated_vectors++;
+>   	}
+> +
+> +	vp_dev->msix_enabled = 1;
+>   	return 0;
+>   
+> -error_find:
+> -	vp_del_vqs(vdev);
+> +out_remove_vqs:
+> +	vp_remove_vqs(vdev);
+> +	kfree(vp_dev->msix_vector_map);
+> +out_disable_config_irq:
+> +	vp_dev->config_vector(vp_dev, VIRTIO_MSI_NO_VECTOR);
+> +out_free_config_irq:
+> +	free_irq(pci_irq_vector(vp_dev->pci_dev, 0), vp_dev);
+> +out_free_msix_affinity_masks:
+> +	for (i = 0; i < nvectors; i++) {
+> +		if (vp_dev->msix_affinity_masks[i])
+> +			free_cpumask_var(vp_dev->msix_affinity_masks[i]);
+> +	}
+> +	kfree(vp_dev->msix_affinity_masks);
+> +out_free_msix_names:
+> +	kfree(vp_dev->msix_names);
+> +out_free_irq_vectors:
+> +	pci_free_irq_vectors(vp_dev->pci_dev);
+>   	return err;
+>   }
+>   
+> @@ -305,9 +277,8 @@ static int vp_find_vqs_intx(struct virtio_device *vdev, unsigned nvqs,
+>   	err = request_irq(vp_dev->pci_dev->irq, vp_interrupt, IRQF_SHARED,
+>   			dev_name(&vdev->dev), vp_dev);
+>   	if (err)
+> -		goto out_del_vqs;
+> +		return err;
+>   
+> -	vp_dev->intx_enabled = 1;
+>   	for (i = 0; i < nvqs; ++i) {
+>   		if (!names[i]) {
+>   			vqs[i] = NULL;
+> @@ -317,13 +288,15 @@ static int vp_find_vqs_intx(struct virtio_device *vdev, unsigned nvqs,
+>   				VIRTIO_MSI_NO_VECTOR);
+>   		if (IS_ERR(vqs[i])) {
+>   			err = PTR_ERR(vqs[i]);
+> -			goto out_del_vqs;
+> +			goto out_remove_vqs;
+>   		}
+>   	}
+>   
+>   	return 0;
+> -out_del_vqs:
+> -	vp_del_vqs(vdev);
+> +
+> +out_remove_vqs:
+> +	vp_remove_vqs(vdev);
+> +	free_irq(pci_irq_vector(vp_dev->pci_dev, 0), vp_dev);
+>   	return err;
+>   }
+>   
+> diff --git a/drivers/virtio/virtio_pci_common.h b/drivers/virtio/virtio_pci_common.h
+> index 2038887bdf23..85593867e712 100644
+> --- a/drivers/virtio/virtio_pci_common.h
+> +++ b/drivers/virtio/virtio_pci_common.h
+> @@ -66,16 +66,12 @@ struct virtio_pci_device {
+>   
+>   	/* MSI-X support */
+>   	int msix_enabled;
+> -	int intx_enabled;
+>   	cpumask_var_t *msix_affinity_masks;
+>   	/* Name strings for interrupts. This size should be enough,
+>   	 * and I'm too lazy to allocate each name separately. */
+>   	char (*msix_names)[256];
+> -	/* Number of available vectors */
+> -	unsigned msix_vectors;
+> -	/* Vectors allocated, excluding per-vq vectors if any */
+> -	unsigned msix_used_vectors;
+> -
+> +	/* Total Number of MSI-X vectors (including per-VQ ones). */
+> +	int msix_vectors;
+>   	/* Map of per-VQ MSI-X vectors, may be NULL */
+>   	unsigned *msix_vector_map;
+>   
+> @@ -89,14 +85,6 @@ struct virtio_pci_device {
+>   	u16 (*config_vector)(struct virtio_pci_device *vp_dev, u16 vector);
+>   };
+>   
+> -/* Constants for MSI-X */
+> -/* Use first vector for configuration changes, second and the rest for
+> - * virtqueues Thus, we need at least 2 vectors for MSI. */
+> -enum {
+> -	VP_MSIX_CONFIG_VECTOR = 0,
+> -	VP_MSIX_VQ_VECTOR = 1,
+> -};
+> -
+>   /* Convert a generic virtio device to our structure */
+>   static struct virtio_pci_device *to_vp_device(struct virtio_device *vdev)
+>   {
