@@ -1,62 +1,199 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-Date: Fri, 10 Feb 2017 09:46:10 -0800
-From: Matthew Wilcox <willy@infradead.org>
-To: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Cc: Theodore Ts'o <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:44890 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1754142AbdBGOEi (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 7 Feb 2017 09:04:38 -0500
+Date: Tue, 7 Feb 2017 12:35:21 +0100
+From: Jan Kara <jack@suse.cz>
+To: Miklos Szeredi <miklos@szeredi.hu>
+Cc: Jan Kara <jack@suse.cz>, linux-fsdevel@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
         linux-block@vger.kernel.org
-Subject: Re: [PATCHv6 13/37] mm: make write_cache_pages() work on huge pages
-Message-ID: <20170210174610.GC2267@bombadil.infradead.org>
-References: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
- <20170126115819.58875-14-kirill.shutemov@linux.intel.com>
+Subject: Re: [PATCH 17/24] fuse: Convert to separately allocated bdi
+Message-ID: <20170207113521.GC13524@quack2.suse.cz>
+References: <20170202173422.3240-1-jack@suse.cz>
+ <20170202173422.3240-18-jack@suse.cz>
+ <CAJfpeguR+swSEvyhON2oW-V+HnZeSPJLhRcSxC3avWEGGiu92A@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170126115819.58875-14-kirill.shutemov@linux.intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <CAJfpeguR+swSEvyhON2oW-V+HnZeSPJLhRcSxC3avWEGGiu92A@mail.gmail.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Thu, Jan 26, 2017 at 02:57:55PM +0300, Kirill A. Shutemov wrote:
-> We writeback whole huge page a time. Let's adjust iteration this way.
+On Tue 07-02-17 10:16:58, Miklos Szeredi wrote:
+> On Thu, Feb 2, 2017 at 6:34 PM, Jan Kara <jack@suse.cz> wrote:
+> > Allocate struct backing_dev_info separately instead of embedding it
+> > inside the superblock. This unifies handling of bdi among users.
 > 
-> Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+> Acked-by: Miklos Szeredi <mszeredi@redhat.com>
+> 
+> A follow on patch could get rid of fc->bdi_initialized too (replace
+> remaining uses with fc->sb).
 
-I think a lot of the complexity in this patch is from pagevec_lookup_tag
-giving you subpages rather than head pages...
+Yeah, I was looking at that but was not 100% sure about it from a quick
+look. I'll do that.
 
-> @@ -2268,7 +2273,8 @@ int write_cache_pages(struct address_space *mapping,
->  					 * not be suitable for data integrity
->  					 * writeout).
->  					 */
-> -					done_index = page->index + 1;
-> +					done_index = compound_head(page)->index
-> +						+ hpage_nr_pages(page);
->  					done = 1;
->  					break;
->  				}
-
-you'd still need this line, but it'd only be:
-
-					done_index = page->index +
-						(1 << compound_order(page));
-
-I think we want:
-
-#define	nr_pages(page)	(1 << compound_order(page))
-
-because we seem to be repeating that idiom quite a lot in these patches.
-
-					done_index = page->index +
-								nr_pages(page);
-
-Still doesn't quite fit on one line, but it's closer, and it's the
-ridiculous indentation in that function that's the real problem.
+								Honza
+> >
+> > CC: Miklos Szeredi <miklos@szeredi.hu>
+> > CC: linux-fsdevel@vger.kernel.org
+> > Signed-off-by: Jan Kara <jack@suse.cz>
+> > ---
+> >  fs/fuse/dev.c    |  8 ++++----
+> >  fs/fuse/fuse_i.h |  3 ---
+> >  fs/fuse/inode.c  | 42 +++++++++++++-----------------------------
+> >  3 files changed, 17 insertions(+), 36 deletions(-)
+> >
+> > diff --git a/fs/fuse/dev.c b/fs/fuse/dev.c
+> > index 70ea57c7b6bb..1912164d57e9 100644
+> > --- a/fs/fuse/dev.c
+> > +++ b/fs/fuse/dev.c
+> > @@ -382,8 +382,8 @@ static void request_end(struct fuse_conn *fc, struct fuse_req *req)
+> >
+> >                 if (fc->num_background == fc->congestion_threshold &&
+> >                     fc->connected && fc->bdi_initialized) {
+> > -                       clear_bdi_congested(&fc->bdi, BLK_RW_SYNC);
+> > -                       clear_bdi_congested(&fc->bdi, BLK_RW_ASYNC);
+> > +                       clear_bdi_congested(fc->sb->s_bdi, BLK_RW_SYNC);
+> > +                       clear_bdi_congested(fc->sb->s_bdi, BLK_RW_ASYNC);
+> >                 }
+> >                 fc->num_background--;
+> >                 fc->active_background--;
+> > @@ -570,8 +570,8 @@ void fuse_request_send_background_locked(struct fuse_conn *fc,
+> >                 fc->blocked = 1;
+> >         if (fc->num_background == fc->congestion_threshold &&
+> >             fc->bdi_initialized) {
+> > -               set_bdi_congested(&fc->bdi, BLK_RW_SYNC);
+> > -               set_bdi_congested(&fc->bdi, BLK_RW_ASYNC);
+> > +               set_bdi_congested(fc->sb->s_bdi, BLK_RW_SYNC);
+> > +               set_bdi_congested(fc->sb->s_bdi, BLK_RW_ASYNC);
+> >         }
+> >         list_add_tail(&req->list, &fc->bg_queue);
+> >         flush_bg_queue(fc);
+> > diff --git a/fs/fuse/fuse_i.h b/fs/fuse/fuse_i.h
+> > index 91307940c8ac..effab9e9607f 100644
+> > --- a/fs/fuse/fuse_i.h
+> > +++ b/fs/fuse/fuse_i.h
+> > @@ -631,9 +631,6 @@ struct fuse_conn {
+> >         /** Negotiated minor version */
+> >         unsigned minor;
+> >
+> > -       /** Backing dev info */
+> > -       struct backing_dev_info bdi;
+> > -
+> >         /** Entry on the fuse_conn_list */
+> >         struct list_head entry;
+> >
+> > diff --git a/fs/fuse/inode.c b/fs/fuse/inode.c
+> > index 6fe6a88ecb4a..90bacbc87fb3 100644
+> > --- a/fs/fuse/inode.c
+> > +++ b/fs/fuse/inode.c
+> > @@ -386,12 +386,6 @@ static void fuse_send_destroy(struct fuse_conn *fc)
+> >         }
+> >  }
+> >
+> > -static void fuse_bdi_destroy(struct fuse_conn *fc)
+> > -{
+> > -       if (fc->bdi_initialized)
+> > -               bdi_destroy(&fc->bdi);
+> > -}
+> > -
+> >  static void fuse_put_super(struct super_block *sb)
+> >  {
+> >         struct fuse_conn *fc = get_fuse_conn_super(sb);
+> > @@ -403,7 +397,6 @@ static void fuse_put_super(struct super_block *sb)
+> >         list_del(&fc->entry);
+> >         fuse_ctl_remove_conn(fc);
+> >         mutex_unlock(&fuse_mutex);
+> > -       fuse_bdi_destroy(fc);
+> >
+> >         fuse_conn_put(fc);
+> >  }
+> > @@ -928,7 +921,8 @@ static void process_init_reply(struct fuse_conn *fc, struct fuse_req *req)
+> >                         fc->no_flock = 1;
+> >                 }
+> >
+> > -               fc->bdi.ra_pages = min(fc->bdi.ra_pages, ra_pages);
+> > +               fc->sb->s_bdi->ra_pages =
+> > +                               min(fc->sb->s_bdi->ra_pages, ra_pages);
+> >                 fc->minor = arg->minor;
+> >                 fc->max_write = arg->minor < 5 ? 4096 : arg->max_write;
+> >                 fc->max_write = max_t(unsigned, 4096, fc->max_write);
+> > @@ -944,7 +938,7 @@ static void fuse_send_init(struct fuse_conn *fc, struct fuse_req *req)
+> >
+> >         arg->major = FUSE_KERNEL_VERSION;
+> >         arg->minor = FUSE_KERNEL_MINOR_VERSION;
+> > -       arg->max_readahead = fc->bdi.ra_pages * PAGE_SIZE;
+> > +       arg->max_readahead = fc->sb->s_bdi->ra_pages * PAGE_SIZE;
+> >         arg->flags |= FUSE_ASYNC_READ | FUSE_POSIX_LOCKS | FUSE_ATOMIC_O_TRUNC |
+> >                 FUSE_EXPORT_SUPPORT | FUSE_BIG_WRITES | FUSE_DONT_MASK |
+> >                 FUSE_SPLICE_WRITE | FUSE_SPLICE_MOVE | FUSE_SPLICE_READ |
+> > @@ -976,27 +970,20 @@ static void fuse_free_conn(struct fuse_conn *fc)
+> >  static int fuse_bdi_init(struct fuse_conn *fc, struct super_block *sb)
+> >  {
+> >         int err;
+> > +       char *suffix = "";
+> >
+> > -       fc->bdi.name = "fuse";
+> > -       fc->bdi.ra_pages = (VM_MAX_READAHEAD * 1024) / PAGE_SIZE;
+> > -       /* fuse does it's own writeback accounting */
+> > -       fc->bdi.capabilities = BDI_CAP_NO_ACCT_WB | BDI_CAP_STRICTLIMIT;
+> > -
+> > -       err = bdi_init(&fc->bdi);
+> > +       if (sb->s_bdev)
+> > +               suffix = "-fuseblk";
+> > +       err = super_setup_bdi_name(sb, "%u:%u%s", MAJOR(fc->dev),
+> > +                                  MINOR(fc->dev), suffix);
+> >         if (err)
+> >                 return err;
+> >
+> > -       fc->bdi_initialized = 1;
+> > -
+> > -       if (sb->s_bdev) {
+> > -               err =  bdi_register(&fc->bdi, NULL, "%u:%u-fuseblk",
+> > -                                   MAJOR(fc->dev), MINOR(fc->dev));
+> > -       } else {
+> > -               err = bdi_register_dev(&fc->bdi, fc->dev);
+> > -       }
+> > +       sb->s_bdi->ra_pages = (VM_MAX_READAHEAD * 1024) / PAGE_SIZE;
+> > +       /* fuse does it's own writeback accounting */
+> > +       sb->s_bdi->capabilities = BDI_CAP_NO_ACCT_WB | BDI_CAP_STRICTLIMIT;
+> >
+> > -       if (err)
+> > -               return err;
+> > +       fc->bdi_initialized = 1;
+> >
+> >         /*
+> >          * For a single fuse filesystem use max 1% of dirty +
+> > @@ -1010,7 +997,7 @@ static int fuse_bdi_init(struct fuse_conn *fc, struct super_block *sb)
+> >          *
+> >          *    /sys/class/bdi/<bdi>/max_ratio
+> >          */
+> > -       bdi_set_max_ratio(&fc->bdi, 1);
+> > +       bdi_set_max_ratio(sb->s_bdi, 1);
+> >
+> >         return 0;
+> >  }
+> > @@ -1113,8 +1100,6 @@ static int fuse_fill_super(struct super_block *sb, void *data, int silent)
+> >         if (err)
+> >                 goto err_dev_free;
+> >
+> > -       sb->s_bdi = &fc->bdi;
+> > -
+> >         /* Handle umasking inside the fuse code */
+> >         if (sb->s_flags & MS_POSIXACL)
+> >                 fc->dont_mask = 1;
+> > @@ -1182,7 +1167,6 @@ static int fuse_fill_super(struct super_block *sb, void *data, int silent)
+> >   err_dev_free:
+> >         fuse_dev_free(fud);
+> >   err_put_conn:
+> > -       fuse_bdi_destroy(fc);
+> >         fuse_conn_put(fc);
+> >   err_fput:
+> >         fput(file);
+> > --
+> > 2.10.2
+> >
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
