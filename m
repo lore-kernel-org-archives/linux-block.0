@@ -1,41 +1,121 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <Bart.VanAssche@sandisk.com>
-To: "decui@microsoft.com" <decui@microsoft.com>, "hare@suse.com"
-	<hare@suse.com>, "hare@suse.de" <hare@suse.de>, "axboe@kernel.dk"
-	<axboe@kernel.dk>
+Return-Path: <decui@microsoft.com>
+From: Dexuan Cui <decui@microsoft.com>
+To: Hannes Reinecke <hare@suse.com>, Bart Van Assche
+	<Bart.VanAssche@sandisk.com>, "hare@suse.de" <hare@suse.de>,
+	"axboe@kernel.dk" <axboe@kernel.dk>
 CC: "hch@lst.de" <hch@lst.de>, "linux-kernel@vger.kernel.org"
 	<linux-kernel@vger.kernel.org>, "linux-block@vger.kernel.org"
 	<linux-block@vger.kernel.org>, "jth@kernel.org" <jth@kernel.org>
-Subject: Re: [PATCH] genhd: Do not hold event lock when scheduling workqueue
+Subject: RE: [PATCH] genhd: Do not hold event lock when scheduling workqueue
  elements
-Date: Tue, 7 Feb 2017 02:56:50 +0000
-Message-ID: <1486436195.2791.1.camel@sandisk.com>
+Date: Tue, 7 Feb 2017 02:23:06 +0000
+Message-ID: <MWHPR03MB26699D4657FB67A535972208BF430@MWHPR03MB2669.namprd03.prod.outlook.com>
 References: <1484732896-22941-1-git-send-email-hare@suse.de>
-	 <1485822639.2669.16.camel@sandisk.com>
-	 <532c55c4-15da-d2f9-401c-36bc4343756b@suse.com>
-	 <MWHPR03MB2669B8A45A07846AF0A06E46BF4F0@MWHPR03MB2669.namprd03.prod.outlook.com>
-	 <MWHPR03MB26699D4657FB67A535972208BF430@MWHPR03MB2669.namprd03.prod.outlook.com>
-In-Reply-To: <MWHPR03MB26699D4657FB67A535972208BF430@MWHPR03MB2669.namprd03.prod.outlook.com>
-Content-Type: text/plain; charset="utf-8"
+ <1485822639.2669.16.camel@sandisk.com>
+ <532c55c4-15da-d2f9-401c-36bc4343756b@suse.com>
+ <MWHPR03MB2669B8A45A07846AF0A06E46BF4F0@MWHPR03MB2669.namprd03.prod.outlook.com>
+In-Reply-To: <MWHPR03MB2669B8A45A07846AF0A06E46BF4F0@MWHPR03MB2669.namprd03.prod.outlook.com>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-T24gVHVlLCAyMDE3LTAyLTA3IGF0IDAyOjIzICswMDAwLCBEZXh1YW4gQ3VpIHdyb3RlOg0KPiBB
-bnkgbmV3cyBvbiB0aGlzIHRocmVhZD8NCj4gDQo+IFRoZSBpc3N1ZSBpcyBzdGlsbCBibG9ja2lu
-ZyBMaW51eCBmcm9tIGJvb3RpbmcgdXAgbm9ybWFsbHkgaW4gbXkgdGVzdC4gOi0oDQo+IA0KPiBI
-YXZlIHdlIGlkZW50aWZpZWQgdGhlIGZhdWx0eSBwYXRjaD8NCj4gSWYgc28sIGF0IGxlYXN0IEkg
-Y2FuIHRyeSB0byByZXZlcnQgaXQgdG8gYm9vdCB1cC4NCg0KSXQncyBpbnRlcmVzdGluZyB0aGF0
-IHlvdSBoYXZlIGEgcmVwcm9kdWNpYmxlIHRlc3RjYXNlLiBJZiB5b3UgY2FuIHRlbGwgbWUgaG93
-IHRvDQpyZXByb2R1Y2UgdGhpcyBJJ2xsIGhhdmUgYSBsb29rIGF0IGl0IHRvZ2V0aGVyIHdpdGgg
-SGFubmVzLg0KDQpCYXJ0LgpXZXN0ZXJuIERpZ2l0YWwgQ29ycG9yYXRpb24gKGFuZCBpdHMgc3Vi
-c2lkaWFyaWVzKSBFLW1haWwgQ29uZmlkZW50aWFsaXR5IE5vdGljZSAmIERpc2NsYWltZXI6CgpU
-aGlzIGUtbWFpbCBhbmQgYW55IGZpbGVzIHRyYW5zbWl0dGVkIHdpdGggaXQgbWF5IGNvbnRhaW4g
-Y29uZmlkZW50aWFsIG9yIGxlZ2FsbHkgcHJpdmlsZWdlZCBpbmZvcm1hdGlvbiBvZiBXREMgYW5k
-L29yIGl0cyBhZmZpbGlhdGVzLCBhbmQgYXJlIGludGVuZGVkIHNvbGVseSBmb3IgdGhlIHVzZSBv
-ZiB0aGUgaW5kaXZpZHVhbCBvciBlbnRpdHkgdG8gd2hpY2ggdGhleSBhcmUgYWRkcmVzc2VkLiBJ
-ZiB5b3UgYXJlIG5vdCB0aGUgaW50ZW5kZWQgcmVjaXBpZW50LCBhbnkgZGlzY2xvc3VyZSwgY29w
-eWluZywgZGlzdHJpYnV0aW9uIG9yIGFueSBhY3Rpb24gdGFrZW4gb3Igb21pdHRlZCB0byBiZSB0
-YWtlbiBpbiByZWxpYW5jZSBvbiBpdCwgaXMgcHJvaGliaXRlZC4gSWYgeW91IGhhdmUgcmVjZWl2
-ZWQgdGhpcyBlLW1haWwgaW4gZXJyb3IsIHBsZWFzZSBub3RpZnkgdGhlIHNlbmRlciBpbW1lZGlh
-dGVseSBhbmQgZGVsZXRlIHRoZSBlLW1haWwgaW4gaXRzIGVudGlyZXR5IGZyb20geW91ciBzeXN0
-ZW0uCg==
+> From: linux-block-owner@vger.kernel.org [mailto:linux-block-
+> owner@vger.kernel.org] On Behalf Of Dexuan Cui
+> Sent: Friday, February 3, 2017 20:23
+> To: Hannes Reinecke <hare@suse.com>; Bart Van Assche
+> <Bart.VanAssche@sandisk.com>; hare@suse.de; axboe@kernel.dk
+> Cc: hch@lst.de; linux-kernel@vger.kernel.org; linux-block@vger.kernel.org=
+;
+> jth@kernel.org
+> Subject: RE: [PATCH] genhd: Do not hold event lock when scheduling workqu=
+eue
+> elements
+>=20
+> > From: linux-kernel-owner@vger.kernel.org [mailto:linux-kernel-
+> > owner@vger.kernel.org] On Behalf Of Hannes Reinecke
+> > Sent: Wednesday, February 1, 2017 00:15
+> > To: Bart Van Assche <Bart.VanAssche@sandisk.com>; hare@suse.de;
+> > axboe@kernel.dk
+> > Cc: hch@lst.de; linux-kernel@vger.kernel.org; linux-block@vger.kernel.o=
+rg;
+> > jth@kernel.org
+> > Subject: Re: [PATCH] genhd: Do not hold event lock when scheduling
+> workqueue
+> > elements
+> >
+> > On 01/31/2017 01:31 AM, Bart Van Assche wrote:
+> > > On Wed, 2017-01-18 at 10:48 +0100, Hannes Reinecke wrote:
+> > >> @@ -1488,26 +1487,13 @@ static unsigned long
+> > disk_events_poll_jiffies(struct gendisk *disk)
+> > >>  void disk_block_events(struct gendisk *disk)
+> > >>  {
+> > >>         struct disk_events *ev =3D disk->ev;
+> > >> -       unsigned long flags;
+> > >> -       bool cancel;
+> > >>
+> > >>         if (!ev)
+> > >>                 return;
+> > >>
+> > >> -       /*
+> > >> -        * Outer mutex ensures that the first blocker completes canc=
+eling
+> > >> -        * the event work before further blockers are allowed to fin=
+ish.
+> > >> -        */
+> > >> -       mutex_lock(&ev->block_mutex);
+> > >> -
+> > >> -       spin_lock_irqsave(&ev->lock, flags);
+> > >> -       cancel =3D !ev->block++;
+> > >> -       spin_unlock_irqrestore(&ev->lock, flags);
+> > >> -
+> > >> -       if (cancel)
+> > >> +       if (atomic_inc_return(&ev->block) =3D=3D 1)
+> > >>                 cancel_delayed_work_sync(&disk->ev->dwork);
+> > >>
+> > >> -       mutex_unlock(&ev->block_mutex);
+> > >>  }
+> > >
+> > > Hello Hannes,
+> > >
+> > > I have already encountered a few times a deadlock that was caused by =
+the
+> > > event checking code so I agree with you that it would be a big step f=
+orward
+> > > if such deadlocks wouldn't occur anymore. However, this patch realize=
+s a
+> > > change that has not been described in the patch description, namely t=
+hat
+> > > disk_block_events() calls are no longer serialized. Are you sure it i=
+s safe
+> > > to drop the serialization of disk_block_events() calls?
+> > >
+> > Well, this whole synchronization stuff it a bit weird; I so totally fai=
+l
+> > to see the rationale for it.
+> > But anyway, once we've converted ev->block to atomics I _think_ the
+> > mutex_lock can remain; will be checking.
+> >
+> > Cheers,
+> >
+> > Hannes
+> > --
+>=20
+> Hi, I think I got the same calltrace with today's linux-next (next-201702=
+03).
+>=20
+> The issue happened every time when my Linux virtual machine booted and
+> Hannes's patch could NOT help.
+>=20
+> The calltrace is pasted below.
+>=20
+> -- Dexuan
+=20
+Any news on this thread?
+
+The issue is still blocking Linux from booting up normally in my test. :-(
+
+Have we identified the faulty patch?
+If so, at least I can try to revert it to boot up.
+
+Thanks,
+-- Dexuan
