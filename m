@@ -1,18 +1,59 @@
-Return-Path: <sagigrim@gmail.com>
-Return-Path: <sagigrim@gmail.com>
-Subject: Re: [PATCH 1/4] block: move req_set_nomerge to blk.h
-To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Return-Path: <BATV+f649350760d99b9783a0+4916+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org
+Subject: [PATCH 1/4] block: move req_set_nomerge to blk.h
+Date: Tue,  7 Feb 2017 17:46:55 +0100
+Message-Id: <20170207164658.32449-2-hch@lst.de>
+In-Reply-To: <20170207164658.32449-1-hch@lst.de>
 References: <20170207164658.32449-1-hch@lst.de>
- <20170207164658.32449-2-hch@lst.de>
-Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-From: Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <b94eaeea-4458-5b1b-4d5e-e4006d902e1a@grimberg.me>
-Date: Wed, 15 Feb 2017 12:29:07 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170207164658.32449-2-hch@lst.de>
-Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-Looks good,
+This makes it available outside of blk-merge.c, and inlining such a trivial
+helper seems pretty useful to start with.
 
-Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ block/blk-merge.c | 7 -------
+ block/blk.h       | 7 +++++++
+ 2 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index a373416dbc9a..c956d9e7aafd 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -482,13 +482,6 @@ int blk_rq_map_sg(struct request_queue *q, struct request *rq,
+ }
+ EXPORT_SYMBOL(blk_rq_map_sg);
+ 
+-static void req_set_nomerge(struct request_queue *q, struct request *req)
+-{
+-	req->cmd_flags |= REQ_NOMERGE;
+-	if (req == q->last_merge)
+-		q->last_merge = NULL;
+-}
+-
+ static inline int ll_new_hw_segment(struct request_queue *q,
+ 				    struct request *req,
+ 				    struct bio *bio)
+diff --git a/block/blk.h b/block/blk.h
+index 4972b98d47e1..3e08703902a9 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -256,6 +256,13 @@ static inline int blk_do_io_stat(struct request *rq)
+ 		!blk_rq_is_passthrough(rq);
+ }
+ 
++static inline void req_set_nomerge(struct request_queue *q, struct request *req)
++{
++	req->cmd_flags |= REQ_NOMERGE;
++	if (req == q->last_merge)
++		q->last_merge = NULL;
++}
++
+ /*
+  * Internal io_context interface
+  */
+-- 
+2.11.0
