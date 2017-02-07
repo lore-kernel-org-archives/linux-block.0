@@ -1,12 +1,10 @@
-Return-Path: <prvs=3212d1f655=jbacik@fb.com>
+Return-Path: <prvs=3211f4b139=jbacik@fb.com>
 From: Josef Bacik <jbacik@fb.com>
 To: <linux-block@vger.kernel.org>, <kernel-team@fb.com>,
         <nbd-general@lists.sourceforge.net>, <axboe@kernel.dk>
-Subject: [PATCH V2] nbd: ref count the socks array
-Date: Wed, 8 Feb 2017 10:05:05 -0500
-Message-ID: <1486566305-10039-1-git-send-email-jbacik@fb.com>
-In-Reply-To: <1486505453-2976-1-git-send-email-jbacik@fb.com>
-References: <1486505453-2976-1-git-send-email-jbacik@fb.com>
+Subject: [PATCH] nbd: ref count the socks array
+Date: Tue, 7 Feb 2017 17:10:53 -0500
+Message-ID: <1486505453-2976-1-git-send-email-jbacik@fb.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
@@ -23,15 +21,11 @@ previous users of the socks array before initiating a new socks array.
 
 Signed-off-by: Josef Bacik <jbacik@fb.com>
 ---
-V1->V2:
--req->errors++ in the timeout handler if we can't get a ref on our socks.
--drop another use of nbd->config_lock in the timeout handler I missed.
-
- drivers/block/nbd.c | 131 +++++++++++++++++++++++++++++++++++++---------------
- 1 file changed, 93 insertions(+), 38 deletions(-)
+ drivers/block/nbd.c | 126 +++++++++++++++++++++++++++++++++++++---------------
+ 1 file changed, 91 insertions(+), 35 deletions(-)
 
 diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 1914ba2..afb1353 100644
+index 1914ba2..3dc2f1d 100644
 --- a/drivers/block/nbd.c
 +++ b/drivers/block/nbd.c
 @@ -54,19 +54,24 @@ struct nbd_sock {
@@ -105,35 +99,25 @@ index 1914ba2..afb1353 100644
  	}
  	dev_warn(disk_to_dev(nbd->disk), "shutting down sockets\n");
  }
-@@ -200,10 +226,14 @@ static enum blk_eh_timer_return nbd_xmit_timeout(struct request *req,
+@@ -200,6 +226,9 @@ static enum blk_eh_timer_return nbd_xmit_timeout(struct request *req,
  	struct nbd_cmd *cmd = blk_mq_rq_to_pdu(req);
  	struct nbd_device *nbd = cmd->nbd;
  
-+	if (!nbd_socks_get_unless_zero(nbd)) {
-+		req->errors++;
++	if (!nbd_socks_get_unless_zero(nbd))
 +		return BLK_EH_HANDLED;
-+	}
 +
  	if (nbd->num_connections > 1) {
  		dev_err_ratelimited(nbd_to_dev(nbd),
  				    "Connection timed out, retrying\n");
--		mutex_lock(&nbd->config_lock);
- 		/*
- 		 * Hooray we have more connections, requeue this IO, the submit
- 		 * path will put it on a real connection.
-@@ -217,21 +247,19 @@ static enum blk_eh_timer_return nbd_xmit_timeout(struct request *req,
- 				kernel_sock_shutdown(nsock->sock, SHUT_RDWR);
- 				mutex_unlock(&nsock->tx_lock);
+@@ -219,6 +248,7 @@ static enum blk_eh_timer_return nbd_xmit_timeout(struct request *req,
  			}
--			mutex_unlock(&nbd->config_lock);
+ 			mutex_unlock(&nbd->config_lock);
  			blk_mq_requeue_request(req, true);
 +			nbd_socks_put(nbd);
  			return BLK_EH_RESET_TIMER;
  		}
--		mutex_unlock(&nbd->config_lock);
- 	} else {
- 		dev_err_ratelimited(nbd_to_dev(nbd),
- 				    "Connection timed out\n");
+ 		mutex_unlock(&nbd->config_lock);
+@@ -228,10 +258,9 @@ static enum blk_eh_timer_return nbd_xmit_timeout(struct request *req,
  	}
  	set_bit(NBD_TIMEDOUT, &nbd->runtime_flags);
  	req->errors++;
@@ -146,7 +130,7 @@ index 1914ba2..afb1353 100644
  	return BLK_EH_HANDLED;
  }
  
-@@ -523,6 +551,7 @@ static void recv_work(struct work_struct *work)
+@@ -523,6 +552,7 @@ static void recv_work(struct work_struct *work)
  
  		nbd_end_request(cmd);
  	}
@@ -154,7 +138,7 @@ index 1914ba2..afb1353 100644
  	atomic_dec(&nbd->recv_threads);
  	wake_up(&nbd->recv_wq);
  }
-@@ -598,9 +627,16 @@ static int nbd_handle_cmd(struct nbd_cmd *cmd, int index)
+@@ -598,9 +628,16 @@ static int nbd_handle_cmd(struct nbd_cmd *cmd, int index)
  	struct nbd_sock *nsock;
  	int ret;
  
@@ -171,7 +155,7 @@ index 1914ba2..afb1353 100644
  		return -EINVAL;
  	}
  	req->errors = 0;
-@@ -608,8 +644,10 @@ static int nbd_handle_cmd(struct nbd_cmd *cmd, int index)
+@@ -608,8 +645,10 @@ static int nbd_handle_cmd(struct nbd_cmd *cmd, int index)
  	nsock = nbd->socks[index];
  	if (nsock->dead) {
  		index = find_fallback(nbd, index);
@@ -183,7 +167,7 @@ index 1914ba2..afb1353 100644
  		nsock = nbd->socks[index];
  	}
  
-@@ -627,7 +665,7 @@ static int nbd_handle_cmd(struct nbd_cmd *cmd, int index)
+@@ -627,7 +666,7 @@ static int nbd_handle_cmd(struct nbd_cmd *cmd, int index)
  		goto again;
  	}
  	mutex_unlock(&nsock->tx_lock);
@@ -192,7 +176,7 @@ index 1914ba2..afb1353 100644
  	return ret;
  }
  
-@@ -656,6 +694,25 @@ static int nbd_queue_rq(struct blk_mq_hw_ctx *hctx,
+@@ -656,6 +695,25 @@ static int nbd_queue_rq(struct blk_mq_hw_ctx *hctx,
  	return BLK_MQ_RQ_QUEUE_OK;
  }
  
@@ -218,7 +202,7 @@ index 1914ba2..afb1353 100644
  static int nbd_add_socket(struct nbd_device *nbd, struct block_device *bdev,
  			  unsigned long arg)
  {
-@@ -668,21 +725,30 @@ static int nbd_add_socket(struct nbd_device *nbd, struct block_device *bdev,
+@@ -668,21 +726,30 @@ static int nbd_add_socket(struct nbd_device *nbd, struct block_device *bdev,
  	if (!sock)
  		return err;
  
@@ -253,7 +237,7 @@ index 1914ba2..afb1353 100644
  
  	nbd->socks = socks;
  
-@@ -694,7 +760,10 @@ static int nbd_add_socket(struct nbd_device *nbd, struct block_device *bdev,
+@@ -694,7 +761,10 @@ static int nbd_add_socket(struct nbd_device *nbd, struct block_device *bdev,
  
  	if (max_part)
  		bdev->bd_invalidated = 1;
@@ -265,7 +249,7 @@ index 1914ba2..afb1353 100644
  }
  
  /* Reset all properties of an NBD device */
-@@ -750,20 +819,17 @@ static void send_disconnects(struct nbd_device *nbd)
+@@ -750,20 +820,17 @@ static void send_disconnects(struct nbd_device *nbd)
  static int nbd_disconnect(struct nbd_device *nbd, struct block_device *bdev)
  {
  	dev_info(disk_to_dev(nbd->disk), "NBD_DISCONNECT\n");
@@ -288,7 +272,7 @@ index 1914ba2..afb1353 100644
  	return 0;
  }
  
-@@ -773,22 +839,9 @@ static int nbd_clear_sock(struct nbd_device *nbd, struct block_device *bdev)
+@@ -773,22 +840,9 @@ static int nbd_clear_sock(struct nbd_device *nbd, struct block_device *bdev)
  	nbd_clear_que(nbd);
  	kill_bdev(bdev);
  	nbd_bdev_reset(bdev);
@@ -313,7 +297,7 @@ index 1914ba2..afb1353 100644
  	return 0;
  }
  
-@@ -809,7 +862,6 @@ static int nbd_start_device(struct nbd_device *nbd, struct block_device *bdev)
+@@ -809,7 +863,6 @@ static int nbd_start_device(struct nbd_device *nbd, struct block_device *bdev)
  		goto out_err;
  	}
  
@@ -321,7 +305,7 @@ index 1914ba2..afb1353 100644
  	blk_mq_update_nr_hw_queues(&nbd->tag_set, nbd->num_connections);
  	args = kcalloc(num_connections, sizeof(*args), GFP_KERNEL);
  	if (!args) {
-@@ -833,6 +885,7 @@ static int nbd_start_device(struct nbd_device *nbd, struct block_device *bdev)
+@@ -833,6 +886,7 @@ static int nbd_start_device(struct nbd_device *nbd, struct block_device *bdev)
  	for (i = 0; i < num_connections; i++) {
  		sk_set_memalloc(nbd->socks[i]->sock->sk);
  		atomic_inc(&nbd->recv_threads);
@@ -329,7 +313,7 @@ index 1914ba2..afb1353 100644
  		INIT_WORK(&args[i].work, recv_work);
  		args[i].nbd = nbd;
  		args[i].index = i;
-@@ -849,7 +902,6 @@ static int nbd_start_device(struct nbd_device *nbd, struct block_device *bdev)
+@@ -849,7 +903,6 @@ static int nbd_start_device(struct nbd_device *nbd, struct block_device *bdev)
  	mutex_lock(&nbd->config_lock);
  	nbd->task_recv = NULL;
  out_err:
@@ -337,7 +321,7 @@ index 1914ba2..afb1353 100644
  	nbd_clear_sock(nbd, bdev);
  
  	/* user requested, ignore socket errors */
-@@ -1149,12 +1201,15 @@ static int nbd_dev_add(int index)
+@@ -1149,12 +1202,15 @@ static int nbd_dev_add(int index)
  
  	nbd->magic = NBD_MAGIC;
  	mutex_init(&nbd->config_lock);
