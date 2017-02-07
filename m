@@ -1,91 +1,29 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f193.google.com ([209.85.192.193]:36323 "EHLO
-        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751386AbdBXPnk (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 24 Feb 2017 10:43:40 -0500
-From: Ming Lei <tom.leiming@gmail.com>
-To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
-        linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>
-Cc: Ming Lei <tom.leiming@gmail.com>
-Subject: [PATCH v1 08/14] md: raid1: retrieve page from pre-allocated resync page array
-Date: Fri, 24 Feb 2017 23:42:45 +0800
-Message-Id: <1487950971-1131-9-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1487950971-1131-1-git-send-email-tom.leiming@gmail.com>
-References: <1487950971-1131-1-git-send-email-tom.leiming@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=3211f4b139=jbacik@fb.com>
+Message-ID: <1486485392.4094.0.camel@fb.com>
+Subject: Re: [PATCH] nbd: freeze the queue before making changes
+From: Josef Bacik <jbacik@fb.com>
+To: <linux-block@vger.kernel.org>, <kernel-team@fb.com>,
+        <nbd-general@lists.sourceforge.net>, <axboe@kernel.dk>
+Date: Tue, 7 Feb 2017 11:36:32 -0500
+In-Reply-To: <1486396489-2911-1-git-send-email-jbacik@fb.com>
+References: <1486396489-2911-1-git-send-email-jbacik@fb.com>
+Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+List-ID: <linux-block@vger.kernel.org>
 
-Now one page array is allocated for each resync bio, and we can
-retrieve page from this table directly.
+On Mon, 2017-02-06 at 10:54 -0500, Josef Bacik wrote:
+> The way we make changes to the NBD device is inherently racey, as we
+> could be in the middle of a request and suddenly change the number of
+> connections.  In practice this isn't a big deal, but with timeouts we
+> have to take the config_lock in order to protect ourselves since it
+> is
+> important those values don't change.  Fix this by freezing the queue
+> before we do any of our device operations.
+> 
+> Signed-off-by: Josef Bacik <jbacik@fb.com>
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
----
- drivers/md/raid1.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+Actually nevermind, this messes with my plans around reconnections
+since freezing also waits for existing timeouts to fire.  I'll drop
+this and fix it a different way.  Thanks,
 
-diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
-index 4a208220ff0f..9371caace379 100644
---- a/drivers/md/raid1.c
-+++ b/drivers/md/raid1.c
-@@ -1970,6 +1970,7 @@ static int fix_sync_read_error(struct r1bio *r1_bio)
- 	struct mddev *mddev = r1_bio->mddev;
- 	struct r1conf *conf = mddev->private;
- 	struct bio *bio = r1_bio->bios[r1_bio->read_disk];
-+	struct page **pages = get_resync_pages(bio)->pages;
- 	sector_t sect = r1_bio->sector;
- 	int sectors = r1_bio->sectors;
- 	int idx = 0;
-@@ -2003,7 +2004,7 @@ static int fix_sync_read_error(struct r1bio *r1_bio)
- 				 */
- 				rdev = conf->mirrors[d].rdev;
- 				if (sync_page_io(rdev, sect, s<<9,
--						 bio->bi_io_vec[idx].bv_page,
-+						 pages[idx],
- 						 REQ_OP_READ, 0, false)) {
- 					success = 1;
- 					break;
-@@ -2058,7 +2059,7 @@ static int fix_sync_read_error(struct r1bio *r1_bio)
- 				continue;
- 			rdev = conf->mirrors[d].rdev;
- 			if (r1_sync_page_io(rdev, sect, s,
--					    bio->bi_io_vec[idx].bv_page,
-+					    pages[idx],
- 					    WRITE) == 0) {
- 				r1_bio->bios[d]->bi_end_io = NULL;
- 				rdev_dec_pending(rdev, mddev);
-@@ -2073,7 +2074,7 @@ static int fix_sync_read_error(struct r1bio *r1_bio)
- 				continue;
- 			rdev = conf->mirrors[d].rdev;
- 			if (r1_sync_page_io(rdev, sect, s,
--					    bio->bi_io_vec[idx].bv_page,
-+					    pages[idx],
- 					    READ) != 0)
- 				atomic_add(s, &rdev->corrected_errors);
- 		}
-@@ -2149,6 +2150,8 @@ static void process_checks(struct r1bio *r1_bio)
- 		struct bio *pbio = r1_bio->bios[primary];
- 		struct bio *sbio = r1_bio->bios[i];
- 		int error = sbio->bi_error;
-+		struct page **ppages = get_resync_pages(pbio)->pages;
-+		struct page **spages = get_resync_pages(sbio)->pages;
- 
- 		if (sbio->bi_end_io != end_sync_read)
- 			continue;
-@@ -2157,11 +2160,8 @@ static void process_checks(struct r1bio *r1_bio)
- 
- 		if (!error) {
- 			for (j = vcnt; j-- ; ) {
--				struct page *p, *s;
--				p = pbio->bi_io_vec[j].bv_page;
--				s = sbio->bi_io_vec[j].bv_page;
--				if (memcmp(page_address(p),
--					   page_address(s),
-+				if (memcmp(page_address(ppages[j]),
-+					   page_address(spages[j]),
- 					   sbio->bi_io_vec[j].bv_len))
- 					break;
- 			}
--- 
-2.7.4
+Josef
