@@ -1,82 +1,94 @@
-Return-Path: <BATV+7c9ed557eb952ccf5513+4914+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: mst@redhat.com,
-	jasowang@redhat.com
-Cc: axboe@kernel.dk,
-	pbonzini@redhat.com,
-	virtualization@lists.linux-foundation.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 8/9] virtio_blk: use virtio IRQ affinity
-Date: Sun,  5 Feb 2017 18:15:25 +0100
-Message-Id: <20170205171526.6224-9-hch@lst.de>
-In-Reply-To: <20170205171526.6224-1-hch@lst.de>
-References: <20170205171526.6224-1-hch@lst.de>
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+From: Paolo Valente <paolo.valente@linaro.org>
+To: Jens Axboe <axboe@kernel.dk>,
+	Tejun Heo <tj@kernel.org>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ulf.hansson@linaro.org,
+	linus.walleij@linaro.org,
+	broonie@kernel.org,
+	Paolo Valente <paolo.valente@linaro.org>
+Subject: [WIP PATCHSET 3/4] Embed bfq-ioc.c and add locking on request queue
+Date: Tue,  7 Feb 2017 18:24:45 +0100
+Message-Id: <20170207172446.4528-4-paolo.valente@linaro.org>
+In-Reply-To: <20170207172446.4528-1-paolo.valente@linaro.org>
+References: <20170207172446.4528-1-paolo.valente@linaro.org>
 List-ID: <linux-block@vger.kernel.org>
 
-Use automatic IRQ affinity assignment in the virtio layer if available,
-and build the blk-mq queues based on it.
+The version of bfq-ioc.c for bfq-iosched.c is not correct any more for
+bfq-mq, because, in bfq-mq, the request queue lock is not being held
+when bfq_bic_lookup is invoked. That function must then take that look
+on its own. This commit removes the inclusion of bfq-ioc.c, copies the
+content of bfq-ioc.c into bfq-mq-iosched.c, and adds the grabbing of
+the lock.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
 ---
- drivers/block/virtio_blk.c | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+ block/bfq-mq-iosched.c | 39 ++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 36 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index c54118bdc67d..1028dfeb5a7f 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -5,6 +5,7 @@
- #include <linux/hdreg.h>
- #include <linux/module.h>
- #include <linux/mutex.h>
-+#include <linux/interrupt.h>
- #include <linux/virtio.h>
- #include <linux/virtio_blk.h>
- #include <linux/scatterlist.h>
-@@ -12,6 +13,7 @@
- #include <scsi/scsi_cmnd.h>
- #include <linux/idr.h>
- #include <linux/blk-mq.h>
-+#include <linux/blk-mq-virtio.h>
- #include <linux/numa.h>
+diff --git a/block/bfq-mq-iosched.c b/block/bfq-mq-iosched.c
+index 7e3f429..a8679de 100644
+--- a/block/bfq-mq-iosched.c
++++ b/block/bfq-mq-iosched.c
+@@ -190,7 +190,39 @@ static int device_speed_thresh[2];
  
- #define PART_BITS 4
-@@ -385,6 +387,7 @@ static int init_vq(struct virtio_blk *vblk)
- 	struct virtqueue **vqs;
- 	unsigned short num_vqs;
- 	struct virtio_device *vdev = vblk->vdev;
-+	struct irq_affinity desc = { 0, };
+ static void bfq_schedule_dispatch(struct bfq_data *bfqd);
  
- 	err = virtio_cread_feature(vdev, VIRTIO_BLK_F_MQ,
- 				   struct virtio_blk_config, num_queues,
-@@ -412,7 +415,7 @@ static int init_vq(struct virtio_blk *vblk)
- 
- 	/* Discover virtqueues and write information to configuration.  */
- 	err = vdev->config->find_vqs(vdev, num_vqs, vqs, callbacks, names,
--			NULL);
-+			&desc);
- 	if (err)
- 		goto out;
- 
-@@ -543,10 +546,18 @@ static int virtblk_init_request(void *data, struct request *rq,
- 	return 0;
- }
- 
-+static int virtblk_map_queues(struct blk_mq_tag_set *set)
+-#include "bfq-ioc.c"
++/**
++ * icq_to_bic - convert iocontext queue structure to bfq_io_cq.
++ * @icq: the iocontext queue.
++ */
++static struct bfq_io_cq *icq_to_bic(struct io_cq *icq)
 +{
-+	struct virtio_blk *vblk = set->driver_data;
-+
-+	return blk_mq_virtio_map_queues(set, vblk->vdev, 0);
++	/* bic->icq is the first member, %NULL will convert to %NULL */
++	return container_of(icq, struct bfq_io_cq, icq);
 +}
 +
- static struct blk_mq_ops virtio_mq_ops = {
- 	.queue_rq	= virtio_queue_rq,
- 	.complete	= virtblk_request_done,
- 	.init_request	= virtblk_init_request,
-+	.map_queues	= virtblk_map_queues,
- };
++/**
++ * bfq_bic_lookup - search into @ioc a bic associated to @bfqd.
++ * @bfqd: the lookup key.
++ * @ioc: the io_context of the process doing I/O.
++ * @q: the request queue.
++ */
++static struct bfq_io_cq *bfq_bic_lookup(struct bfq_data *bfqd,
++					struct io_context *ioc,
++					struct request_queue *q)
++{
++	if (ioc) {
++		struct bfq_io_cq *icq;
++
++		spin_lock_irq(q->queue_lock);
++		icq = icq_to_bic(ioc_lookup_icq(ioc, q));
++		spin_unlock_irq(q->queue_lock);
++
++		return icq;
++	}
++
++	return NULL;
++}
++
+ #include "bfq-sched.c"
+ #include "bfq-cgroup.c"
  
- static unsigned int virtblk_queue_depth;
+@@ -1480,13 +1512,14 @@ static void bfq_add_request(struct request *rq)
+ }
+ 
+ static struct request *bfq_find_rq_fmerge(struct bfq_data *bfqd,
+-					  struct bio *bio)
++					  struct bio *bio,
++					  struct request_queue *q)
+ {
+ 	struct task_struct *tsk = current;
+ 	struct bfq_io_cq *bic;
+ 	struct bfq_queue *bfqq;
+ 
+-	bic = bfq_bic_lookup(bfqd, tsk->io_context);
++	bic = bfq_bic_lookup(bfqd, tsk->io_context, q);
+ 	if (!bic)
+ 		return NULL;
+ 
 -- 
-2.11.0
+2.10.0
