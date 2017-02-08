@@ -1,10 +1,10 @@
 Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
 From: Scott Bauer <scott.bauer@intel.com>
 To: linux-nvme@lists.infradead.org
-Subject: [PATCH v2] Move stack parameters for sed_ioctl to prevent oversized
+Subject: [PATCH] Move stack parameters for sed_ioctl to prevent oversized
  stack with CONFIG_KASAN
-Date: Wed,  8 Feb 2017 16:00:15 -0700
-Message-Id: <1486594815-2427-1-git-send-email-scott.bauer@intel.com>
+Date: Wed,  8 Feb 2017 15:56:16 -0700
+Message-Id: <1486594576-1621-1-git-send-email-scott.bauer@intel.com>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
  <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
@@ -38,7 +38,7 @@ Signed-off-by: Scott Bauer <scott.bauer@intel.com>
  1 file changed, 102 insertions(+), 85 deletions(-)
 
 diff --git a/block/sed-opal.c b/block/sed-opal.c
-index bf1406e..7979d12 100644
+index bf1406e..b88867d 100644
 --- a/block/sed-opal.c
 +++ b/block/sed-opal.c
 @@ -2344,8 +2344,21 @@ bool opal_unlock_from_suspend(struct opal_dev *dev)
@@ -242,7 +242,7 @@ index bf1406e..7979d12 100644
  	}
 -	return -ENOTTY;
 +
-+out:
++		out:
 +	mutex_unlock(&ioctl_lock);
 +	return ret;
  }
