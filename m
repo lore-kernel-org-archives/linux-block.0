@@ -1,83 +1,408 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f194.google.com ([209.85.192.194]:33996 "EHLO
-        mail-pf0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752604AbdBJK5C (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Feb 2017 05:57:02 -0500
-From: Ming Lei <tom.leiming@gmail.com>
-To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
-        linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        NeilBrown <neilb@suse.com>
-Cc: Ming Lei <tom.leiming@gmail.com>
-Subject: [PATCH v1 2/5] md/raid1: use bio_clone_bioset_partial() in case of write behind
-Date: Fri, 10 Feb 2017 18:56:14 +0800
-Message-Id: <1486724177-14817-3-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1486724177-14817-1-git-send-email-tom.leiming@gmail.com>
-References: <1486724177-14817-1-git-send-email-tom.leiming@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jasowang@redhat.com>
+Subject: Re: [PATCH 1/9] virtio_pci: remove struct virtio_pci_vq_info
+To: Christoph Hellwig <hch@lst.de>
+References: <20170205171526.6224-1-hch@lst.de>
+ <20170205171526.6224-2-hch@lst.de>
+ <c9ce2425-aabb-6b05-2d00-d92ede6b18bf@redhat.com>
+ <20170207093851.GA15267@lst.de>
+Cc: mst@redhat.com, axboe@kernel.dk, pbonzini@redhat.com,
+        virtualization@lists.linux-foundation.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <78b23fe0-f3c7-f669-a9c5-5110f4a8daaf@redhat.com>
+Date: Wed, 8 Feb 2017 10:52:17 +0800
+MIME-Version: 1.0
+In-Reply-To: <20170207093851.GA15267@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+List-ID: <linux-block@vger.kernel.org>
 
-Write behind need to replace pages in bio's bvecs, and we have
-to clone a fresh bio with new bvec table, so use the introduced
-bio_clone_bioset_partial() for it.
 
-For other bio_clone_mddev() cases, we will use fast clone since
-they don't need to touch bvec table.
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
----
- drivers/md/raid1.c | 20 +++++++++++++++-----
- 1 file changed, 15 insertions(+), 5 deletions(-)
+On 2017年02月07日 17:38, Christoph Hellwig wrote:
+> On Tue, Feb 07, 2017 at 03:17:02PM +0800, Jason Wang wrote:
+>> The check is still there.
+> Meh, I could swear I fixed it up.  Here is an updated version:
+>
+> ---
+>  From bf5e3b7fd272aea32388570503f00d0ab592fc2a Mon Sep 17 00:00:00 2001
+> From: Christoph Hellwig <hch@lst.de>
+> Date: Wed, 25 Jan 2017 13:40:21 +0100
+> Subject: virtio_pci: remove struct virtio_pci_vq_info
+>
+> We don't really need struct virtio_pci_vq_info, as most field in there
+> are redundant:
+>
+>   - the vq backpointer is not strictly neede to start with
+>   - the entry in the vqs list is not needed - the generic virtqueue already
+>     has list, we only need to check if it has a callback to get the same
+>     semantics
+>   - we can use a simple array to look up the MSI-X vec if needed.
+>   - That simple array now also duoble serves to replace the per_vq_vectors
+>     flag
+>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
-index 830ff2b20346..4d7852c6ae97 100644
---- a/drivers/md/raid1.c
-+++ b/drivers/md/raid1.c
-@@ -1341,13 +1341,12 @@ static void raid1_write_request(struct mddev *mddev, struct bio *bio,
- 
- 	first_clone = 1;
- 	for (i = 0; i < disks; i++) {
--		struct bio *mbio;
-+		struct bio *mbio = NULL;
-+		int offset;
- 		if (!r1_bio->bios[i])
- 			continue;
- 
--		mbio = bio_clone_mddev(bio, GFP_NOIO, mddev);
--		bio_trim(mbio, r1_bio->sector - bio->bi_iter.bi_sector,
--			 max_sectors);
-+		offset = r1_bio->sector - bio->bi_iter.bi_sector;
- 
- 		if (first_clone) {
- 			/* do behind I/O ?
-@@ -1357,8 +1356,13 @@ static void raid1_write_request(struct mddev *mddev, struct bio *bio,
- 			if (bitmap &&
- 			    (atomic_read(&bitmap->behind_writes)
- 			     < mddev->bitmap_info.max_write_behind) &&
--			    !waitqueue_active(&bitmap->behind_wait))
-+			    !waitqueue_active(&bitmap->behind_wait)) {
-+				mbio = bio_clone_bioset_partial(bio, GFP_NOIO,
-+								mddev->bio_set,
-+								offset,
-+								max_sectors);
- 				alloc_behind_pages(mbio, r1_bio);
-+			}
- 
- 			bitmap_startwrite(bitmap, r1_bio->sector,
- 					  r1_bio->sectors,
-@@ -1366,6 +1370,12 @@ static void raid1_write_request(struct mddev *mddev, struct bio *bio,
- 						   &r1_bio->state));
- 			first_clone = 0;
- 		}
-+
-+		if (!mbio) {
-+			mbio = bio_clone_mddev(bio, GFP_NOIO, mddev);
-+			bio_trim(mbio, offset, max_sectors);
-+		}
-+
- 		if (r1_bio->behind_bvecs) {
- 			struct bio_vec *bvec;
- 			int j;
--- 
-2.7.4
+Reviewed-by: Jason Wang <jasowang@redhat.com>
+
+> ---
+>   drivers/virtio/virtio_pci_common.c | 117 +++++++++++--------------------------
+>   drivers/virtio/virtio_pci_common.h |  25 +-------
+>   drivers/virtio/virtio_pci_legacy.c |   6 +-
+>   drivers/virtio/virtio_pci_modern.c |   6 +-
+>   4 files changed, 39 insertions(+), 115 deletions(-)
+>
+> diff --git a/drivers/virtio/virtio_pci_common.c b/drivers/virtio/virtio_pci_common.c
+> index 186cbab327b8..1f9fac7dad61 100644
+> --- a/drivers/virtio/virtio_pci_common.c
+> +++ b/drivers/virtio/virtio_pci_common.c
+> @@ -62,16 +62,13 @@ static irqreturn_t vp_config_changed(int irq, void *opaque)
+>   static irqreturn_t vp_vring_interrupt(int irq, void *opaque)
+>   {
+>   	struct virtio_pci_device *vp_dev = opaque;
+> -	struct virtio_pci_vq_info *info;
+>   	irqreturn_t ret = IRQ_NONE;
+> -	unsigned long flags;
+> +	struct virtqueue *vq;
+>   
+> -	spin_lock_irqsave(&vp_dev->lock, flags);
+> -	list_for_each_entry(info, &vp_dev->virtqueues, node) {
+> -		if (vring_interrupt(irq, info->vq) == IRQ_HANDLED)
+> +	list_for_each_entry(vq, &vp_dev->vdev.vqs, list) {
+> +		if (vring_interrupt(irq, vq) == IRQ_HANDLED)
+>   			ret = IRQ_HANDLED;
+>   	}
+> -	spin_unlock_irqrestore(&vp_dev->lock, flags);
+>   
+>   	return ret;
+>   }
+> @@ -167,55 +164,6 @@ static int vp_request_msix_vectors(struct virtio_device *vdev, int nvectors,
+>   	return err;
+>   }
+>   
+> -static struct virtqueue *vp_setup_vq(struct virtio_device *vdev, unsigned index,
+> -				     void (*callback)(struct virtqueue *vq),
+> -				     const char *name,
+> -				     u16 msix_vec)
+> -{
+> -	struct virtio_pci_device *vp_dev = to_vp_device(vdev);
+> -	struct virtio_pci_vq_info *info = kmalloc(sizeof *info, GFP_KERNEL);
+> -	struct virtqueue *vq;
+> -	unsigned long flags;
+> -
+> -	/* fill out our structure that represents an active queue */
+> -	if (!info)
+> -		return ERR_PTR(-ENOMEM);
+> -
+> -	vq = vp_dev->setup_vq(vp_dev, info, index, callback, name, msix_vec);
+> -	if (IS_ERR(vq))
+> -		goto out_info;
+> -
+> -	info->vq = vq;
+> -	if (callback) {
+> -		spin_lock_irqsave(&vp_dev->lock, flags);
+> -		list_add(&info->node, &vp_dev->virtqueues);
+> -		spin_unlock_irqrestore(&vp_dev->lock, flags);
+> -	} else {
+> -		INIT_LIST_HEAD(&info->node);
+> -	}
+> -
+> -	vp_dev->vqs[index] = info;
+> -	return vq;
+> -
+> -out_info:
+> -	kfree(info);
+> -	return vq;
+> -}
+> -
+> -static void vp_del_vq(struct virtqueue *vq)
+> -{
+> -	struct virtio_pci_device *vp_dev = to_vp_device(vq->vdev);
+> -	struct virtio_pci_vq_info *info = vp_dev->vqs[vq->index];
+> -	unsigned long flags;
+> -
+> -	spin_lock_irqsave(&vp_dev->lock, flags);
+> -	list_del(&info->node);
+> -	spin_unlock_irqrestore(&vp_dev->lock, flags);
+> -
+> -	vp_dev->del_vq(info);
+> -	kfree(info);
+> -}
+> -
+>   /* the config->del_vqs() implementation */
+>   void vp_del_vqs(struct virtio_device *vdev)
+>   {
+> @@ -224,16 +172,15 @@ void vp_del_vqs(struct virtio_device *vdev)
+>   	int i;
+>   
+>   	list_for_each_entry_safe(vq, n, &vdev->vqs, list) {
+> -		if (vp_dev->per_vq_vectors) {
+> -			int v = vp_dev->vqs[vq->index]->msix_vector;
+> +		if (vp_dev->msix_vector_map) {
+> +			int v = vp_dev->msix_vector_map[vq->index];
+>   
+>   			if (v != VIRTIO_MSI_NO_VECTOR)
+>   				free_irq(pci_irq_vector(vp_dev->pci_dev, v),
+>   					vq);
+>   		}
+> -		vp_del_vq(vq);
+> +		vp_dev->del_vq(vq);
+>   	}
+> -	vp_dev->per_vq_vectors = false;
+>   
+>   	if (vp_dev->intx_enabled) {
+>   		free_irq(vp_dev->pci_dev->irq, vp_dev);
+> @@ -261,8 +208,8 @@ void vp_del_vqs(struct virtio_device *vdev)
+>   	vp_dev->msix_names = NULL;
+>   	kfree(vp_dev->msix_affinity_masks);
+>   	vp_dev->msix_affinity_masks = NULL;
+> -	kfree(vp_dev->vqs);
+> -	vp_dev->vqs = NULL;
+> +	kfree(vp_dev->msix_vector_map);
+> +	vp_dev->msix_vector_map = NULL;
+>   }
+>   
+>   static int vp_find_vqs_msix(struct virtio_device *vdev, unsigned nvqs,
+> @@ -275,10 +222,6 @@ static int vp_find_vqs_msix(struct virtio_device *vdev, unsigned nvqs,
+>   	u16 msix_vec;
+>   	int i, err, nvectors, allocated_vectors;
+>   
+> -	vp_dev->vqs = kcalloc(nvqs, sizeof(*vp_dev->vqs), GFP_KERNEL);
+> -	if (!vp_dev->vqs)
+> -		return -ENOMEM;
+> -
+>   	if (per_vq_vectors) {
+>   		/* Best option: one for change interrupt, one per vq. */
+>   		nvectors = 1;
+> @@ -294,7 +237,13 @@ static int vp_find_vqs_msix(struct virtio_device *vdev, unsigned nvqs,
+>   	if (err)
+>   		goto error_find;
+>   
+> -	vp_dev->per_vq_vectors = per_vq_vectors;
+> +	if (per_vq_vectors) {
+> +		vp_dev->msix_vector_map = kmalloc_array(nvqs,
+> +				sizeof(*vp_dev->msix_vector_map), GFP_KERNEL);
+> +		if (!vp_dev->msix_vector_map)
+> +			goto error_find;
+> +	}
+> +
+>   	allocated_vectors = vp_dev->msix_used_vectors;
+>   	for (i = 0; i < nvqs; ++i) {
+>   		if (!names[i]) {
+> @@ -304,19 +253,25 @@ static int vp_find_vqs_msix(struct virtio_device *vdev, unsigned nvqs,
+>   
+>   		if (!callbacks[i])
+>   			msix_vec = VIRTIO_MSI_NO_VECTOR;
+> -		else if (vp_dev->per_vq_vectors)
+> +		else if (per_vq_vectors)
+>   			msix_vec = allocated_vectors++;
+>   		else
+>   			msix_vec = VP_MSIX_VQ_VECTOR;
+> -		vqs[i] = vp_setup_vq(vdev, i, callbacks[i], names[i], msix_vec);
+> +		vqs[i] = vp_dev->setup_vq(vp_dev, i, callbacks[i], names[i],
+> +				msix_vec);
+>   		if (IS_ERR(vqs[i])) {
+>   			err = PTR_ERR(vqs[i]);
+>   			goto error_find;
+>   		}
+>   
+> -		if (!vp_dev->per_vq_vectors || msix_vec == VIRTIO_MSI_NO_VECTOR)
+> +		if (!per_vq_vectors)
+>   			continue;
+>   
+> +		if (msix_vec == VIRTIO_MSI_NO_VECTOR) {
+> +			vp_dev->msix_vector_map[i] = VIRTIO_MSI_NO_VECTOR;
+> +			continue;
+> +		}
+> +
+>   		/* allocate per-vq irq if available and necessary */
+>   		snprintf(vp_dev->msix_names[msix_vec],
+>   			 sizeof *vp_dev->msix_names,
+> @@ -326,8 +281,12 @@ static int vp_find_vqs_msix(struct virtio_device *vdev, unsigned nvqs,
+>   				  vring_interrupt, 0,
+>   				  vp_dev->msix_names[msix_vec],
+>   				  vqs[i]);
+> -		if (err)
+> +		if (err) {
+> +			/* don't free this irq on error */
+> +			vp_dev->msix_vector_map[i] = VIRTIO_MSI_NO_VECTOR;
+>   			goto error_find;
+> +		}
+> +		vp_dev->msix_vector_map[i] = msix_vec;
+>   	}
+>   	return 0;
+>   
+> @@ -343,23 +302,18 @@ static int vp_find_vqs_intx(struct virtio_device *vdev, unsigned nvqs,
+>   	struct virtio_pci_device *vp_dev = to_vp_device(vdev);
+>   	int i, err;
+>   
+> -	vp_dev->vqs = kcalloc(nvqs, sizeof(*vp_dev->vqs), GFP_KERNEL);
+> -	if (!vp_dev->vqs)
+> -		return -ENOMEM;
+> -
+>   	err = request_irq(vp_dev->pci_dev->irq, vp_interrupt, IRQF_SHARED,
+>   			dev_name(&vdev->dev), vp_dev);
+>   	if (err)
+>   		goto out_del_vqs;
+>   
+>   	vp_dev->intx_enabled = 1;
+> -	vp_dev->per_vq_vectors = false;
+>   	for (i = 0; i < nvqs; ++i) {
+>   		if (!names[i]) {
+>   			vqs[i] = NULL;
+>   			continue;
+>   		}
+> -		vqs[i] = vp_setup_vq(vdev, i, callbacks[i], names[i],
+> +		vqs[i] = vp_dev->setup_vq(vp_dev, i, callbacks[i], names[i],
+>   				VIRTIO_MSI_NO_VECTOR);
+>   		if (IS_ERR(vqs[i])) {
+>   			err = PTR_ERR(vqs[i]);
+> @@ -409,16 +363,15 @@ int vp_set_vq_affinity(struct virtqueue *vq, int cpu)
+>   {
+>   	struct virtio_device *vdev = vq->vdev;
+>   	struct virtio_pci_device *vp_dev = to_vp_device(vdev);
+> -	struct virtio_pci_vq_info *info = vp_dev->vqs[vq->index];
+> -	struct cpumask *mask;
+> -	unsigned int irq;
+>   
+>   	if (!vq->callback)
+>   		return -EINVAL;
+>   
+>   	if (vp_dev->msix_enabled) {
+> -		mask = vp_dev->msix_affinity_masks[info->msix_vector];
+> -		irq = pci_irq_vector(vp_dev->pci_dev, info->msix_vector);
+> +		int vec = vp_dev->msix_vector_map[vq->index];
+> +		struct cpumask *mask = vp_dev->msix_affinity_masks[vec];
+> +		unsigned int irq = pci_irq_vector(vp_dev->pci_dev, vec);
+> +
+>   		if (cpu == -1)
+>   			irq_set_affinity_hint(irq, NULL);
+>   		else {
+> @@ -498,8 +451,6 @@ static int virtio_pci_probe(struct pci_dev *pci_dev,
+>   	vp_dev->vdev.dev.parent = &pci_dev->dev;
+>   	vp_dev->vdev.dev.release = virtio_pci_release_dev;
+>   	vp_dev->pci_dev = pci_dev;
+> -	INIT_LIST_HEAD(&vp_dev->virtqueues);
+> -	spin_lock_init(&vp_dev->lock);
+>   
+>   	/* enable the device */
+>   	rc = pci_enable_device(pci_dev);
+> diff --git a/drivers/virtio/virtio_pci_common.h b/drivers/virtio/virtio_pci_common.h
+> index b2f666250ae0..2038887bdf23 100644
+> --- a/drivers/virtio/virtio_pci_common.h
+> +++ b/drivers/virtio/virtio_pci_common.h
+> @@ -31,17 +31,6 @@
+>   #include <linux/highmem.h>
+>   #include <linux/spinlock.h>
+>   
+> -struct virtio_pci_vq_info {
+> -	/* the actual virtqueue */
+> -	struct virtqueue *vq;
+> -
+> -	/* the list node for the virtqueues list */
+> -	struct list_head node;
+> -
+> -	/* MSI-X vector (or none) */
+> -	unsigned msix_vector;
+> -};
+> -
+>   /* Our device structure */
+>   struct virtio_pci_device {
+>   	struct virtio_device vdev;
+> @@ -75,13 +64,6 @@ struct virtio_pci_device {
+>   	/* the IO mapping for the PCI config space */
+>   	void __iomem *ioaddr;
+>   
+> -	/* a list of queues so we can dispatch IRQs */
+> -	spinlock_t lock;
+> -	struct list_head virtqueues;
+> -
+> -	/* array of all queues for house-keeping */
+> -	struct virtio_pci_vq_info **vqs;
+> -
+>   	/* MSI-X support */
+>   	int msix_enabled;
+>   	int intx_enabled;
+> @@ -94,16 +76,15 @@ struct virtio_pci_device {
+>   	/* Vectors allocated, excluding per-vq vectors if any */
+>   	unsigned msix_used_vectors;
+>   
+> -	/* Whether we have vector per vq */
+> -	bool per_vq_vectors;
+> +	/* Map of per-VQ MSI-X vectors, may be NULL */
+> +	unsigned *msix_vector_map;
+>   
+>   	struct virtqueue *(*setup_vq)(struct virtio_pci_device *vp_dev,
+> -				      struct virtio_pci_vq_info *info,
+>   				      unsigned idx,
+>   				      void (*callback)(struct virtqueue *vq),
+>   				      const char *name,
+>   				      u16 msix_vec);
+> -	void (*del_vq)(struct virtio_pci_vq_info *info);
+> +	void (*del_vq)(struct virtqueue *vq);
+>   
+>   	u16 (*config_vector)(struct virtio_pci_device *vp_dev, u16 vector);
+>   };
+> diff --git a/drivers/virtio/virtio_pci_legacy.c b/drivers/virtio/virtio_pci_legacy.c
+> index 6d9e5173d5fa..47292dad0ff9 100644
+> --- a/drivers/virtio/virtio_pci_legacy.c
+> +++ b/drivers/virtio/virtio_pci_legacy.c
+> @@ -112,7 +112,6 @@ static u16 vp_config_vector(struct virtio_pci_device *vp_dev, u16 vector)
+>   }
+>   
+>   static struct virtqueue *setup_vq(struct virtio_pci_device *vp_dev,
+> -				  struct virtio_pci_vq_info *info,
+>   				  unsigned index,
+>   				  void (*callback)(struct virtqueue *vq),
+>   				  const char *name,
+> @@ -130,8 +129,6 @@ static struct virtqueue *setup_vq(struct virtio_pci_device *vp_dev,
+>   	if (!num || ioread32(vp_dev->ioaddr + VIRTIO_PCI_QUEUE_PFN))
+>   		return ERR_PTR(-ENOENT);
+>   
+> -	info->msix_vector = msix_vec;
+> -
+>   	/* create the vring */
+>   	vq = vring_create_virtqueue(index, num,
+>   				    VIRTIO_PCI_VRING_ALIGN, &vp_dev->vdev,
+> @@ -162,9 +159,8 @@ static struct virtqueue *setup_vq(struct virtio_pci_device *vp_dev,
+>   	return ERR_PTR(err);
+>   }
+>   
+> -static void del_vq(struct virtio_pci_vq_info *info)
+> +static void del_vq(struct virtqueue *vq)
+>   {
+> -	struct virtqueue *vq = info->vq;
+>   	struct virtio_pci_device *vp_dev = to_vp_device(vq->vdev);
+>   
+>   	iowrite16(vq->index, vp_dev->ioaddr + VIRTIO_PCI_QUEUE_SEL);
+> diff --git a/drivers/virtio/virtio_pci_modern.c b/drivers/virtio/virtio_pci_modern.c
+> index 4bf7ab375894..00e6fc1df407 100644
+> --- a/drivers/virtio/virtio_pci_modern.c
+> +++ b/drivers/virtio/virtio_pci_modern.c
+> @@ -293,7 +293,6 @@ static u16 vp_config_vector(struct virtio_pci_device *vp_dev, u16 vector)
+>   }
+>   
+>   static struct virtqueue *setup_vq(struct virtio_pci_device *vp_dev,
+> -				  struct virtio_pci_vq_info *info,
+>   				  unsigned index,
+>   				  void (*callback)(struct virtqueue *vq),
+>   				  const char *name,
+> @@ -323,8 +322,6 @@ static struct virtqueue *setup_vq(struct virtio_pci_device *vp_dev,
+>   	/* get offset of notification word for this vq */
+>   	off = vp_ioread16(&cfg->queue_notify_off);
+>   
+> -	info->msix_vector = msix_vec;
+> -
+>   	/* create the vring */
+>   	vq = vring_create_virtqueue(index, num,
+>   				    SMP_CACHE_BYTES, &vp_dev->vdev,
+> @@ -409,9 +406,8 @@ static int vp_modern_find_vqs(struct virtio_device *vdev, unsigned nvqs,
+>   	return 0;
+>   }
+>   
+> -static void del_vq(struct virtio_pci_vq_info *info)
+> +static void del_vq(struct virtqueue *vq)
+>   {
+> -	struct virtqueue *vq = info->vq;
+>   	struct virtio_pci_device *vp_dev = to_vp_device(vq->vdev);
+>   
+>   	vp_iowrite16(vq->index, &vp_dev->common->queue_select);
