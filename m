@@ -4,10 +4,10 @@ To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org,
 	linux-nvme@lists.infradead.org
 Subject: [PATCH 3/4] block: optionally merge discontiguous discard bios into a single request
-Date: Wed,  8 Feb 2017 14:46:49 +0100
-Message-Id: <20170208134650.5380-4-hch@lst.de>
-In-Reply-To: <20170208134650.5380-1-hch@lst.de>
-References: <20170208134650.5380-1-hch@lst.de>
+Date: Wed,  8 Feb 2017 14:13:42 +0100
+Message-Id: <20170208131343.4003-4-hch@lst.de>
+In-Reply-To: <20170208131343.4003-1-hch@lst.de>
+References: <20170208131343.4003-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
 Add a new merge strategy that merges discard bios into a request until the
