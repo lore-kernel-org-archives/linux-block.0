@@ -1,68 +1,86 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from szxga01-in.huawei.com ([45.249.212.187]:3324 "EHLO
-        dggrg01-dlp.huawei.com" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1751392AbdCAB0G (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Feb 2017 20:26:06 -0500
-From: Jason Yan <yanaijie@huawei.com>
-To: <linux-scsi@vger.kernel.org>, <martin.petersen@oracle.com>
-CC: <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
-        <miaoxie@huawei.com>, <fangwei1@huawei.com>,
-        <wangyijing@huawei.com>, <zhaohongjiang@huawei.com>,
-        Jason Yan <yanaijie@huawei.com>
-Subject: [PATCH] libsas: add sas_unregister_devs_sas_addr in flutter case
-Date: Wed, 1 Mar 2017 09:23:29 +0800
-Message-ID: <1488331409-11336-1-git-send-email-yanaijie@huawei.com>
+Return-Path: <decui@microsoft.com>
+From: Dexuan Cui <decui@microsoft.com>
+To: Jens Axboe <axboe@kernel.dk>, Bart Van Assche
+	<Bart.VanAssche@sandisk.com>, "hare@suse.com" <hare@suse.com>, "hare@suse.de"
+	<hare@suse.de>, "Martin K. Petersen" <martin.petersen@oracle.com>
+CC: "hch@lst.de" <hch@lst.de>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "jth@kernel.org" <jth@kernel.org>
+Subject: RE: [PATCH] genhd: Do not hold event lock when scheduling workqueue
+ elements
+Date: Wed, 8 Feb 2017 10:48:13 +0000
+Message-ID: <MWHPR03MB26697302F28F9C2C7D7390D4BF420@MWHPR03MB2669.namprd03.prod.outlook.com>
+References: <1484732896-22941-1-git-send-email-hare@suse.de>
+ <1485822639.2669.16.camel@sandisk.com>
+ <532c55c4-15da-d2f9-401c-36bc4343756b@suse.com>
+ <MWHPR03MB2669B8A45A07846AF0A06E46BF4F0@MWHPR03MB2669.namprd03.prod.outlook.com>
+ <MWHPR03MB26699D4657FB67A535972208BF430@MWHPR03MB2669.namprd03.prod.outlook.com>
+ <1486436195.2791.1.camel@sandisk.com>
+ <MWHPR03MB26695ACBEBDB30E3E2E108FBBF430@MWHPR03MB2669.namprd03.prod.outlook.com>
+ <MWHPR03MB2669125A47D3CB7EB530D084BF430@MWHPR03MB2669.namprd03.prod.outlook.com>
+ <9199d528-f220-5b77-d657-c510ca210067@kernel.dk>
+In-Reply-To: <9199d528-f220-5b77-d657-c510ca210067@kernel.dk>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-In sas_rediscover_dev when we call sas_get_phy_attached_dev to find the
-device is ok and when in the flutter case when we call
-sas_ex_phy_discover the device is gone, the sas_addr was changed to
-zero.
-[300247.584696] sas: ex 500e004aaaaaaa1f phy0 originated
-BROADCAST(CHANGE)
-[300247.663516] sas: ex 500e004aaaaaaa1f phy00:U:0 attached:
-0000000000000000 (no device)
-[300247.663518] sas: ex 500e004aaaaaaa1f phy 0x0 broadcast flutter
-
-When the device is up again, the libsas checked that the old sas_addr
-zero so just add a new device.
-[300247.846326] sas: Expander phy change count has changed
-[300247.846418] sas: ex 500e004aaaaaaa1f phy0 originated
-BROADCAST(CHANGE)
-[300247.846420] sas: ex 500e004aaaaaaa1f phy0 new device attached
-[300247.846519] sas: ex 500e004aaaaaaa1f phy00:U:A attached:
-500e004aaaaaaa00 (stp)
-[300247.875873] sas: done REVALIDATING DOMAIN on port 0, pid:12565, res
-0x0
-
-This will cause a panic when these two device were destroyed. Fix this
-by call sas_unregister_devs_sas_addr in the flutter case if the sas_addr
-is zero.
-
-Signed-off-by: Jason Yan <yanaijie@huawei.com>
----
- drivers/scsi/libsas/sas_expander.c | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/drivers/scsi/libsas/sas_expander.c b/drivers/scsi/libsas/sas_expander.c
-index 570b2cb..1a784d7 100644
---- a/drivers/scsi/libsas/sas_expander.c
-+++ b/drivers/scsi/libsas/sas_expander.c
-@@ -2032,6 +2032,11 @@ static int sas_rediscover_dev(struct domain_device *dev, int phy_id, bool last)
- 
- 		sas_ex_phy_discover(dev, phy_id);
- 
-+		if (!SAS_ADDR(phy->attached_sas_addr)) {
-+			sas_unregister_devs_sas_addr(dev, phy_id, last);
-+			return res;
-+		}
-+
- 		if (ata_dev && phy->attached_dev_type == SAS_SATA_PENDING)
- 			action = ", needs recovery";
- 		SAS_DPRINTK("ex %016llx phy 0x%x broadcast flutter%s\n",
--- 
-2.5.0
+PiBGcm9tOiBKZW5zIEF4Ym9lIFttYWlsdG86YXhib2VAa2VybmVsLmRrXQ0KPiBTZW50OiBXZWRu
+ZXNkYXksIEZlYnJ1YXJ5IDgsIDIwMTcgMDA6MDkNCj4gVG86IERleHVhbiBDdWkgPGRlY3VpQG1p
+Y3Jvc29mdC5jb20+OyBCYXJ0IFZhbiBBc3NjaGUNCj4gPEJhcnQuVmFuQXNzY2hlQHNhbmRpc2su
+Y29tPjsgaGFyZUBzdXNlLmNvbTsgaGFyZUBzdXNlLmRlDQo+IENjOiBoY2hAbHN0LmRlOyBsaW51
+eC1rZXJuZWxAdmdlci5rZXJuZWwub3JnOyBsaW51eC1ibG9ja0B2Z2VyLmtlcm5lbC5vcmc7DQo+
+IGp0aEBrZXJuZWwub3JnDQo+IFN1YmplY3Q6IFJlOiBbUEFUQ0hdIGdlbmhkOiBEbyBub3QgaG9s
+ZCBldmVudCBsb2NrIHdoZW4gc2NoZWR1bGluZyB3b3JrcXVldWUNCj4gZWxlbWVudHMNCj4gDQo+
+IE9uIDAyLzA2LzIwMTcgMTE6MjkgUE0sIERleHVhbiBDdWkgd3JvdGU6DQo+ID4+IEZyb206IGxp
+bnV4LWJsb2NrLW93bmVyQHZnZXIua2VybmVsLm9yZyBbbWFpbHRvOmxpbnV4LWJsb2NrLQ0KPiA+
+PiBvd25lckB2Z2VyLmtlcm5lbC5vcmddIE9uIEJlaGFsZiBPZiBEZXh1YW4gQ3VpDQo+ID4+IHdp
+dGggdGhlIGxpbnV4LW5leHQga2VybmVsLg0KPiA+Pg0KPiA+PiBJIGNhbiBib290IHRoZSBndWVz
+dCB3aXRoIGxpbnV4LW5leHQncyBuZXh0LTIwMTcwMTMwIHdpdGhvdXQgYW55IGlzc3VlLA0KPiA+
+PiBidXQgc2luY2UgbmV4dC0yMDE3MDEzMSBJIGhhdmVuJ3Qgc3VjY2VlZGVkIGluIGJvb3Rpbmcg
+dGhlIGd1ZXN0Lg0KPiA+Pg0KPiA+PiBXaXRoIG5leHQtMjAxNzAyMDMgKG1lbnRpb25lZCBpbiBt
+eSBtYWlsIGxhc3QgRnJpZGF5KSwgSSBnb3QgdGhlIHNhbWUNCj4gPj4gY2FsbHRyYWNlIGFzIEhh
+bm5lcy4NCj4gPj4NCj4gPj4gV2l0aCB0b2RheSdzIGxpbnV4LW5leHQgKG5leHQtMjAxNzAyMDYp
+LCBhY3R1YWxseSB0aGUgY2FsbHRyYWNlIGNoYW5nZWQgdG8NCj4gPj4gdGhlIGJlbG93Lg0KPiA+
+PiBbICAxMjIuMDIzMDM2XSAgPyByZW1vdmVfd2FpdF9xdWV1ZSsweDcwLzB4NzANCj4gPj4gWyAg
+MTIyLjA1MTM4M10gIGFzeW5jX3N5bmNocm9uaXplX2Z1bGwrMHgxNy8weDIwDQo+ID4+IFsgIDEy
+Mi4wNzY5MjVdICBkb19pbml0X21vZHVsZSsweGMxLzB4MWY5DQo+ID4+IFsgIDEyMi4wOTc1MzBd
+ICBsb2FkX21vZHVsZSsweDI0YmMvMHgyOTgwDQo+ID4NCj4gPiBJIGRvbid0IGtub3cgd2h5IGl0
+IGhhbmdzIGhlcmUsIGJ1dCB0aGlzIGlzIHRoZSBzYW1lIGNhbGx0cmFjZSBpbiBteQ0KPiA+IGxh
+c3QtRnJpZGF5IG1haWwsIHdoaWNoIGNvbnRhaW5zIDIgY2FsbHRyYWNlcy4gSXQgbG9va3MgdGhl
+IG90aGVyIGNhbGx0cmFjZSBoYXMNCj4gPiBiZWVuIHJlc29sdmVkIGJ5IHNvbWUgY2hhbmdlcyBi
+ZXR3ZWVuIG5leHQtMjAxNzAyMDMgYW5kIHRvZGF5Lg0KPiA+DQo+ID4gSGVyZSB0aGUga2VybmVs
+IGlzIHRyeWluZyB0byBsb2FkIHRoZSBIeXBlci1WIHN0b3JhZ2UgZHJpdmVyIChodl9zdG9ydnNj
+KSwgYW5kDQo+ID4gdGhlIGRyaXZlcidzIF9faW5pdCBhbmQgLnByb2JlIGhhdmUgZmluaXNoZWQg
+c3VjY2Vzc2Z1bGx5IGFuZCB0aGVuIHRoZSBrZXJuZWwNCj4gPiBoYW5ncyBoZXJlLg0KPiA+DQo+
+ID4gSSBiZWxpZXZlIHNvbWV0aGluZyBpcyBicm9rZW4gcmVjZW50bHksIGJlY2F1c2UgSSBkb24n
+dCBoYXZlIGFueSBpc3N1ZSBiZWZvcmUNCj4gPiBKYW4gMzEuDQo+IA0KPiBDYW4geW91IHRyeSBh
+bmQgYmlzZWN0IGl0Pw0KPiANCj4gSmVucyBBeGJvZQ0KDQpJIGJpc2VjdGVkIGl0IG9uIHRoZSBi
+cmFuY2ggZm9yLTQuMTEvbmV4dCBvZiB0aGUgbGludXgtYmxvY2sgcmVwbyBhbmQgdGhlIGxvZyBz
+aG93cw0KdGhlIGZpcnN0IGJhZCBjb21taXQgaXMgDQpbZTljNzg3ZTZdIHNjc2k6IGFsbG9jYXRl
+IHNjc2lfY21uZCBzdHJ1Y3R1cmVzIGFzIHBhcnQgb2Ygc3RydWN0IHJlcXVlc3QNCg0KIyBnaXQg
+YmlzZWN0IGxvZw0KZ2l0IGJpc2VjdCBzdGFydA0KIyBiYWQ6IFs4MGM2YjE1NzMyZjBkODgzMDAz
+MjE0OWNiY2JjOGQ2N2UwNzRiNWU4XSBibGstbXEtc2NoZWQ6ICh1bilyZWdpc3RlciBlbGV2YXRv
+ciB3aGVuICh1bilyZWdpc3RlcmluZyBxdWV1ZQ0KZ2l0IGJpc2VjdCBiYWQgODBjNmIxNTczMmYw
+ZDg4MzAwMzIxNDljYmNiYzhkNjdlMDc0YjVlOA0KIyBnb29kOiBbMzA5YmQ5NmFmOWUyNmRhMzAz
+ODY2MWJmNWNkYWQ3ODBlZWY0OWRkOV0gbWQ6IGNsZWFudXAgYmlvIG9wIC8gZmxhZ3MgaGFuZGxp
+bmcgaW4gcmFpZDFfd3JpdGVfcmVxdWVzdA0KZ2l0IGJpc2VjdCBnb29kIDMwOWJkOTZhZjllMjZk
+YTMwMzg2NjFiZjVjZGFkNzgwZWVmNDlkZDkNCiMgYmFkOiBbMjc0MTBhODkyN2ZiODliZDE1MGRl
+MDhkNzQ5YThlZDdmNjdiNzczOV0gbmJkOiByZW1vdmUgUkVRX1RZUEVfRFJWX1BSSVYgbGVmdG92
+ZXJzDQpnaXQgYmlzZWN0IGJhZCAyNzQxMGE4OTI3ZmI4OWJkMTUwZGUwOGQ3NDlhOGVkN2Y2N2I3
+NzM5DQojIGJhZDogW2U5Yzc4N2U2NWMwYzM2NTI5NzQ1YmU0N2Q0OTBkOTk4YjRiNmU1ODldIHNj
+c2k6IGFsbG9jYXRlIHNjc2lfY21uZCBzdHJ1Y3R1cmVzIGFzIHBhcnQgb2Ygc3RydWN0IHJlcXVl
+c3QNCmdpdCBiaXNlY3QgYmFkIGU5Yzc4N2U2NWMwYzM2NTI5NzQ1YmU0N2Q0OTBkOTk4YjRiNmU1
+ODkNCiMgZ29vZDogWzMyNzgyNTU3NDEzMjZiNmQ2NmQ4Y2E3ZDFjYjJjNTc2MzNlZTQzZDldIHNj
+c2lfZGhfcmRhYzogc3dpdGNoIHRvIHNjc2lfZXhlY3V0ZV9yZXFfZmxhZ3MoKQ0KZ2l0IGJpc2Vj
+dCBnb29kIDMyNzgyNTU3NDEzMjZiNmQ2NmQ4Y2E3ZDFjYjJjNTc2MzNlZTQzZDkNCiMgZ29vZDog
+WzBmYmMzZTBmZjYyM2YxMDEyZTdjMmFmOTZlNzgxZWViMjZiY2MwZDddIHNjc2k6IHJlbW92ZSBn
+ZnBfZmxhZ3MgbWVtYmVyIGluIHNjc2lfaG9zdF9jbWRfcG9vbA0KZ2l0IGJpc2VjdCBnb29kIDBm
+YmMzZTBmZjYyM2YxMDEyZTdjMmFmOTZlNzgxZWViMjZiY2MwZDcNCiMgZ29vZDogW2VlZmY2OGM1
+NjE4YzhkMDkyMGIxNDUzM2M3MGIyZGYwMDdiZDk0YjRdIHNjc2k6IHJlbW92ZSBzY3NpX2NtZF9k
+bWFfcG9vbA0KZ2l0IGJpc2VjdCBnb29kIGVlZmY2OGM1NjE4YzhkMDkyMGIxNDUzM2M3MGIyZGYw
+MDdiZDk0YjQNCiMgZ29vZDogW2Q0ODc3N2E2MzNkNmZhN2NjZGUwZjBlNjUwOWYwYzAxZmJmYzUy
+OTldIHNjc2k6IHJlbW92ZSBfX3Njc2lfYWxsb2NfcXVldWUNCmdpdCBiaXNlY3QgZ29vZCBkNDg3
+NzdhNjMzZDZmYTdjY2RlMGYwZTY1MDlmMGMwMWZiZmM1Mjk5DQojIGZpcnN0IGJhZCBjb21taXQ6
+IFtlOWM3ODdlNjVjMGMzNjUyOTc0NWJlNDdkNDkwZDk5OGI0YjZlNTg5XSBzY3NpOiBhbGxvY2F0
+ZSBzY3NpX2NtbmQgc3RydWN0dXJlcyBhcyBwYXJ0IG9mIHN0cnVjdCByZXF1ZXN0DQoNClRoYW5r
+cywNCi0tIERleHVhbg0K
