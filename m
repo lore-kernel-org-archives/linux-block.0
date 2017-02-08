@@ -4,10 +4,10 @@ To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org,
 	linux-nvme@lists.infradead.org
 Subject: [PATCH 2/4] block: enumify ELEVATOR_*_MERGE
-Date: Wed,  8 Feb 2017 14:46:48 +0100
-Message-Id: <20170208134650.5380-3-hch@lst.de>
-In-Reply-To: <20170208134650.5380-1-hch@lst.de>
-References: <20170208134650.5380-1-hch@lst.de>
+Date: Wed,  8 Feb 2017 14:13:41 +0100
+Message-Id: <20170208131343.4003-3-hch@lst.de>
+In-Reply-To: <20170208131343.4003-1-hch@lst.de>
+References: <20170208131343.4003-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
 Switch these constants to an enum, and make let the compiler ensure that
