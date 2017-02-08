@@ -1,60 +1,51 @@
-Return-Path: <David.Laight@aculab.com>
-From: David Laight <David.Laight@ACULAB.COM>
-To: 'Arnd Bergmann' <arnd@arndb.de>, Scott Bauer <scott.bauer@intel.com>,
-	Jonathan Derrick <jonathan.derrick@intel.com>, Rafael Antognolli
-	<rafael.antognolli@intel.com>
-CC: Jens Axboe <axboe@kernel.dk>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linux-nvme@lists.infradead.org"
-	<linux-nvme@lists.infradead.org>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, Paul Mackerras <paulus@samba.org>,
-	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>
-Subject: RE: [PATCH] block: sed-opal: reduce stack size of ioctl handler
-Date: Thu, 9 Feb 2017 14:26:02 +0000
-Message-ID: <063D6719AE5E284EB5DD2968C1650D6DB0281652@AcuExch.aculab.com>
+Return-Path: <scott.bauer@intel.com>
+Date: Wed, 8 Feb 2017 15:12:21 -0700
+From: Scott Bauer <scott.bauer@intel.com>
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Jens Axboe <axboe@kernel.dk>,
+	Rafael Antognolli <rafael.antognolli@intel.com>,
+	Michael Ellerman <mpe@ellerman.id.au>, linux-kernel@vger.kernel.org,
+	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+	Paul Mackerras <paulus@samba.org>,
+	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+	linuxppc-dev@lists.ozlabs.org, hch@lst.de,
+	Jonathan Derrick <jonathan.derrick@intel.com>
+Subject: Re: [PATCH] block: sed-opal: reduce stack size of ioctl handler
+Message-ID: <20170208221221.GA10983@sbauer-Z170X-UD5>
 References: <20170208211546.2789607-1-arnd@arndb.de>
-In-Reply-To: <20170208211546.2789607-1-arnd@arndb.de>
-Content-Type: text/plain; charset="Windows-1252"
+ <20170208215827.GA9733@sbauer-Z170X-UD5>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170208215827.GA9733@sbauer-Z170X-UD5>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Arnd Bergmann
-> Sent: 08 February 2017 21:15
->
-> When CONFIG_KASAN is in use, the sed_ioctl function uses unusually large =
-stack,
-> as each possible ioctl argument gets its own stack area plus redzone:
+On Wed, Feb 08, 2017 at 02:58:28PM -0700, Scott Bauer wrote:
+> On Wed, Feb 08, 2017 at 10:15:28PM +0100, Arnd Bergmann wrote:
+> > When CONFIG_KASAN is in use, the sed_ioctl function uses unusually large stack,
+> > as each possible ioctl argument gets its own stack area plus redzone:
+> > 
+> > block/sed-opal.c: In function 'sed_ioctl':
+> > block/sed-opal.c:2447:1: error: the frame size of 2256 bytes is larger than 2048 bytes [-Werror=frame-larger-than=]
+> > 
+> > Moving the copy_from_user() calls into the individual functions has little
+> > effect on readablility, but significantly reduces the stack size, with the
+> > largest individual function (opal_enable_disable_shadow_mbr) now at
+> > reasonable 456 bytes.
+> > 
+> > Fixes: 455a7b238cd6 ("block: Add Sed-opal library")
+> > Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> 
+> 
+> Hi Arnd,
+> 
+> Thank you for the report. We want to keep the function calls agnostic to userland.
+> In the future we will have in-kernel callers and I don't want to have to do any
+> get_fs(KERNEL_DS) wizardry.
+> 
+> Instead I think we can use a union to lessen the stack burden. I tested this patch just now
+> with config_ksasan and was able to build.
 
-Why not do a single copy_from_user() at the top of sed_ioctl() based on
-the _IOC_DIR() and __IOC_SIZE() values?
-
-Something like:
-int sed_ioctl(..., unsigned int cmd, void __user *arg)
-{
-	u64 buf[??]; /* or a union */
-	unsigned int cmd_sz =3D _IOC_SIZE(cmd);
-
-	if (_IOC_DIR(cmd) & (_IOC_WRITE | _IOC_READ) && cmd_sz > sizeof buf)
-		return -EINVAL;
-
-	if (_IOC_DIR(cmd) & _IOC_WRITE) {
-		if (copy_from_user(buf, arg, cmd_sz))
-			return -EFAULT;
-	} else {
-		if (IOC_DIR(cmd) & _IOC_READ))
-			memzero(buf, cmd_sz);
-	}
-
-	switch (cmd) {
-	...
-		rval =3D ...
-	...
-	}
-
-	if (rval >=3D 0 && (_IOC_DIR(cmd) & _IOC_READ)
-			&& copy_to_user(arg, buf, cmd_sz));
-		return -EFAULT;
-
-	return rval;
-}
-
-	David
+Nack on this patch, it only really masks the issue. Keith pointed out we have a call chain
+up to this ioctl then deeper down into nvme then the block layer. If we use 25% of the stack
+just for this function it's still too dangerous and we'll run into corruption later on and not
+remember this fix. I'll come up with another solution.
