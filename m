@@ -4,10 +4,10 @@ To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org,
 	linux-nvme@lists.infradead.org
 Subject: [PATCH 1/4] block: move req_set_nomerge to blk.h
-Date: Wed,  8 Feb 2017 14:46:47 +0100
-Message-Id: <20170208134650.5380-2-hch@lst.de>
-In-Reply-To: <20170208134650.5380-1-hch@lst.de>
-References: <20170208134650.5380-1-hch@lst.de>
+Date: Wed,  8 Feb 2017 14:13:40 +0100
+Message-Id: <20170208131343.4003-2-hch@lst.de>
+In-Reply-To: <20170208131343.4003-1-hch@lst.de>
+References: <20170208131343.4003-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
 This makes it available outside of blk-merge.c, and inlining such a trivial
