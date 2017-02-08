@@ -1,33 +1,29 @@
-Return-Path: <sagigrim@gmail.com>
-Return-Path: <sagigrim@gmail.com>
+Return-Path: <axboe@kernel.dk>
 Subject: Re: support for multi-range discard requests V3
-To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+To: Christoph Hellwig <hch@lst.de>
 References: <20170208134650.5380-1-hch@lst.de>
 Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-From: Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <4e254502-6beb-6fc5-1905-d86ed5c7f74a@grimberg.me>
-Date: Wed, 15 Feb 2017 12:43:05 +0200
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <229a3478-e370-952a-ae80-ad02a429aacc@kernel.dk>
+Date: Wed, 8 Feb 2017 10:45:48 -0700
 MIME-Version: 1.0
 In-Reply-To: <20170208134650.5380-1-hch@lst.de>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-block@vger.kernel.org>
 
-
+On 02/08/2017 06:46 AM, Christoph Hellwig wrote:
 > Hi all,
->
+> 
 > this series adds support for merging discontiguous discard bios into a
 > single request if the driver supports it.  This reduces the number of
 > discards sent to the device by about a factor of 5-6 for typical
 > workloads on NVMe, and for slower devices that use I/O scheduling
 > the number will probably be even bigger but I've not implemented
 > that support yet.
->
-> Changes since V2:
->   - really fix nr of NVMe ranges to 256
->   - free range on error
->
-> Changes since V1:
->   - hardcoded max ranges for NVMe to 255
->   - minor cleanups
 
-Oops, reviewed v1 before noticing this one...
+This looks good to me. It's running testing now, but provided that
+the tests are successful, we should get this queued up for 4.11.
+
+
+-- 
+Jens Axboe
