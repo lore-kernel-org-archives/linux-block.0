@@ -1,12 +1,11 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f67.google.com ([74.125.82.67]:35308 "EHLO
-        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751703AbdBMNnt (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 Feb 2017 08:43:49 -0500
-Received: by mail-wm0-f67.google.com with SMTP id u63so19591433wmu.2
-        for <linux-block@vger.kernel.org>; Mon, 13 Feb 2017 05:43:48 -0800 (PST)
-Date: Mon, 13 Feb 2017 16:43:45 +0300
+Received: from mail-wr0-f193.google.com ([209.85.128.193]:35990 "EHLO
+        mail-wr0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753938AbdBIQ6X (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Feb 2017 11:58:23 -0500
+Received: by mail-wr0-f193.google.com with SMTP id k90so12495946wrc.3
+        for <linux-block@vger.kernel.org>; Thu, 09 Feb 2017 08:58:22 -0800 (PST)
+Date: Thu, 9 Feb 2017 19:58:20 +0300
 From: "Kirill A. Shutemov" <kirill@shutemov.name>
 To: Matthew Wilcox <willy@infradead.org>
 Cc: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
@@ -25,123 +24,225 @@ Cc: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
         linux-block@vger.kernel.org
 Subject: Re: [PATCHv6 01/37] mm, shmem: swich huge tmpfs to multi-order
  radix-tree entries
-Message-ID: <20170213134345.GA20394@node.shutemov.name>
+Message-ID: <20170209165820.GA12768@node.shutemov.name>
 References: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
  <20170126115819.58875-2-kirill.shutemov@linux.intel.com>
  <20170209035727.GQ2267@bombadil.infradead.org>
- <20170209165820.GA12768@node.shutemov.name>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170209165820.GA12768@node.shutemov.name>
+In-Reply-To: <20170209035727.GQ2267@bombadil.infradead.org>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Thu, Feb 09, 2017 at 07:58:20PM +0300, Kirill A. Shutemov wrote:
-> I'll look into it.
+On Wed, Feb 08, 2017 at 07:57:27PM -0800, Matthew Wilcox wrote:
+> On Thu, Jan 26, 2017 at 02:57:43PM +0300, Kirill A. Shutemov wrote:
+> > +++ b/include/linux/pagemap.h
+> > @@ -332,6 +332,15 @@ static inline struct page *grab_cache_page_nowait(struct address_space *mapping,
+> >  			mapping_gfp_mask(mapping));
+> >  }
+> >  
+> > +static inline struct page *find_subpage(struct page *page, pgoff_t offset)
+> > +{
+> > +	VM_BUG_ON_PAGE(PageTail(page), page);
+> > +	VM_BUG_ON_PAGE(page->index > offset, page);
+> > +	VM_BUG_ON_PAGE(page->index + (1 << compound_order(page)) < offset,
+> > +			page);
+> > +	return page - page->index + offset;
+> > +}
+> 
+> What would you think to:
+> 
+> static inline void check_page_index(struct page *page, pgoff_t offset)
+> {
+> 	VM_BUG_ON_PAGE(PageTail(page), page);
+> 	VM_BUG_ON_PAGE(page->index > offset, page);
+> 	VM_BUG_ON_PAGE(page->index + (1 << compound_order(page)) <= offset,
+> 			page);
+> }
+> 
+> (I think I fixed an off-by-one error up there ...  if
+> index + (1 << order) == offset, this is also a bug, right?
+> because offset would then refer to the next page, not this page)
 
-I ended up with this (I'll test it more later):
+Right, thanks.
 
-void filemap_map_pages(struct vm_fault *vmf,
-		pgoff_t start_pgoff, pgoff_t end_pgoff)
-{
-	struct radix_tree_iter iter;
-	void **slot;
-	struct file *file = vmf->vma->vm_file;
-	struct address_space *mapping = file->f_mapping;
-	pgoff_t last_pgoff = start_pgoff;
-	loff_t size;
-	struct page *page;
-	bool mapped;
+> 
+> static inline struct page *find_subpage(struct page *page, pgoff_t offset)
+> {
+> 	check_page_index(page, offset);
+> 	return page + (offset - page->index);
+> }
+> 
+> ... then you can use check_page_index down ...
 
-	rcu_read_lock();
-	radix_tree_for_each_slot(slot, &mapping->page_tree, &iter,
-			start_pgoff) {
-		unsigned long index = iter.index;
-		if (index < start_pgoff)
-			index = start_pgoff;
-		if (index > end_pgoff)
-			break;
-repeat:
-		page = radix_tree_deref_slot(slot);
-		if (unlikely(!page))
-			continue;
-		if (radix_tree_exception(page)) {
-			if (radix_tree_deref_retry(page))
-				slot = radix_tree_iter_retry(&iter);
-			continue;
-		}
+Okay, makes sense.
 
-		if (!page_cache_get_speculative(page))
-			goto repeat;
+> 
+> > @@ -1250,7 +1233,6 @@ struct page *find_lock_entry(struct address_space *mapping, pgoff_t offset)
+> >  			put_page(page);
+> >  			goto repeat;
+> >  		}
+> > -		VM_BUG_ON_PAGE(page_to_pgoff(page) != offset, page);
+> 
+> ... here?
 
-		/* Has the page moved? */
-		if (unlikely(page != *slot)) {
-			put_page(page);
-			goto repeat;
-		}
+Ok.
 
-		/* For multi-order entries, find relevant subpage */
-		page = find_subpage(page, index);
+> > @@ -1472,25 +1451,35 @@ unsigned find_get_pages(struct address_space *mapping, pgoff_t start,
+> >  			goto repeat;
+> >  		}
+> >  
+> > +		/* For multi-order entries, find relevant subpage */
+> > +		if (PageTransHuge(page)) {
+> > +			VM_BUG_ON(index - page->index < 0);
+> > +			VM_BUG_ON(index - page->index >= HPAGE_PMD_NR);
+> > +			page += index - page->index;
+> > +		}
+> 
+> Use find_subpage() here?
 
-		if (!PageUptodate(page) || PageReadahead(page))
-			goto skip;
-		if (!trylock_page(page))
-			goto skip;
+Ok.
 
-		if (page_mapping(page) != mapping || !PageUptodate(page))
-			goto skip_unlock;
+> >  		pages[ret] = page;
+> >  		if (++ret == nr_pages)
+> >  			break;
+> > +		if (!PageTransCompound(page))
+> > +			continue;
+> > +		for (refs = 0; ret < nr_pages &&
+> > +				(index + 1) % HPAGE_PMD_NR;
+> > +				ret++, refs++, index++)
+> > +			pages[ret] = ++page;
+> > +		if (refs)
+> > +			page_ref_add(compound_head(page), refs);
+> > +		if (ret == nr_pages)
+> > +			break;
+> 
+> Can we avoid referencing huge pages specifically in the page cache?  I'd
+> like us to get to the point where we can put arbitrary compound pages into
+> the page cache.  For example, I think this can be written as:
+> 
+> 		if (!PageCompound(page))
+> 			continue;
+> 		for (refs = 0; ret < nr_pages; refs++, index++) {
+> 			if (index > page->index + (1 << compound_order(page)))
+> 				break;
+> 			pages[ret++] = ++page;
+> 		}
+> 		if (refs)
+> 			page_ref_add(compound_head(page), refs);
+> 		if (ret == nr_pages)
+> 			break;
 
-		size = round_up(i_size_read(mapping->host), PAGE_SIZE);
-		if (compound_head(page)->index >= size >> PAGE_SHIFT)
-			goto skip_unlock;
+That's slightly more costly, but I guess that's fine.
 
-		if (file->f_ra.mmap_miss > 0)
-			file->f_ra.mmap_miss--;
-map_next_subpage:
-		if (PageHWPoison(page))
-			goto next;
+> > @@ -1541,19 +1533,12 @@ unsigned find_get_pages_contig(struct address_space *mapping, pgoff_t index,
+> >  
+> > +		/* For multi-order entries, find relevant subpage */
+> > +		if (PageTransHuge(page)) {
+> > +			VM_BUG_ON(index - page->index < 0);
+> > +			VM_BUG_ON(index - page->index >= HPAGE_PMD_NR);
+> > +			page += index - page->index;
+> > +		}
+> > +
+> >  		pages[ret] = page;
+> >  		if (++ret == nr_pages)
+> >  			break;
+> > +		if (!PageTransCompound(page))
+> > +			continue;
+> > +		for (refs = 0; ret < nr_pages &&
+> > +				(index + 1) % HPAGE_PMD_NR;
+> > +				ret++, refs++, index++)
+> > +			pages[ret] = ++page;
+> > +		if (refs)
+> > +			page_ref_add(compound_head(page), refs);
+> > +		if (ret == nr_pages)
+> > +			break;
+> >  	}
+> >  	rcu_read_unlock();
+> >  	return ret;
+> 
+> Ugh, the same code again.  Hmm ... we only need to modify 'ret' as a result
+> of this ... so could we split it out like this?
+> 
+> static unsigned populate_pages(struct page **pages, unsigned i, unsigned max,
+>                                 struct page *page)
+> {
+>         unsigned refs = 0;
+>         for (;;) {
+>                 pages[i++] = page;
+>                 if (i == max)
+>                         break;
+>                 if (PageHead(page + 1))
+>                         break;
 
-		vmf->address += (index - last_pgoff) << PAGE_SHIFT;
-		if (vmf->pte)
-			vmf->pte += index - last_pgoff;
-		last_pgoff = index;
-		mapped = !alloc_set_pte(vmf, NULL, page);
+Hm? PageHead()? No. The next page can head or small.
 
-		/* Huge page is mapped or last index? No need to proceed. */
-		if (pmd_trans_huge(*vmf->pmd) ||
-				index == end_pgoff) {
-			unlock_page(page);
-			break;
-		}
-next:
-		if (page && PageCompound(page)) {
-			/* Last subpage handled? */
-			if ((index & (compound_nr_pages(page) - 1)) ==
-					compound_nr_pages(page) - 1)
-				goto skip_unlock;
-			index++;
-			page++;
+I *guess* we can get away with !PageTail(page + 1)...
 
-			/*
-			 * One page reference goes to page table mapping.
-			 * Need additional reference, if last alloc_set_pte()
-			 * succeed.
-			 */
-			if (mapped)
-				get_page(page);
-			goto map_next_subpage;
-		}
-skip_unlock:
-		unlock_page(page);
-skip:
-		iter.index = compound_head(page)->index +
-			compound_nr_pages(page) - 1;
-		/* Only give up reference if alloc_set_pte() failed. */
-		if (!mapped)
-			put_page(page);
-	}
-	rcu_read_unlock();
-}
+>                 page++;
+>                 refs++;
+>         }
+>         if (refs)
+>                 page_ref_add(compound_head(page), refs);
+>         return i;
+> }
+> 
+> > +unsigned find_get_pages_tag(struct address_space *mapping, pgoff_t *indexp,
+> >  			int tag, unsigned int nr_pages, struct page **pages)
+> 
+> >  			break;
+> > +		if (!PageTransCompound(page))
+> > +			continue;
+> > +		for (refs = 0; ret < nr_pages &&
+> > +				(index + 1) % HPAGE_PMD_NR;
+> > +				ret++, refs++, index++)
+> > +			pages[ret] = ++page;
+> > +		if (refs)
+> > +			page_ref_add(compound_head(page), refs);
+> > +		if (ret == nr_pages)
+> > +			break;
+> >  	}
+> 
+> ... and again!
+> 
+> > @@ -2326,25 +2337,26 @@ void filemap_map_pages(struct vm_fault *vmf,
+> > +		/* For multi-order entries, find relevant subpage */
+> > +		if (PageTransHuge(page)) {
+> > +			VM_BUG_ON(index - page->index < 0);
+> > +			VM_BUG_ON(index - page->index >= HPAGE_PMD_NR);
+> > +			page += index - page->index;
+> > +		}
+> > +
+> >  		if (!PageUptodate(page) ||
+> >  				PageReadahead(page) ||
+> 
+> Readahead is PF_NO_COMPOUND ... so I don't see why this works?
+
+We wouldn't see pages with readahead flag set/cleared until huge pages
+support in ext4 is enabled at very end of the patchset.
+
+> 
+> > @@ -2378,8 +2390,14 @@ void filemap_map_pages(struct vm_fault *vmf,
+> >  		/* Huge page is mapped? No need to proceed. */
+> >  		if (pmd_trans_huge(*vmf->pmd))
+> >  			break;
+> > -		if (iter.index == end_pgoff)
+> > +		if (index == end_pgoff)
+> >  			break;
+> > +		if (page && PageTransCompound(page) &&
+> > +				(index & (HPAGE_PMD_NR - 1)) !=
+> > +				HPAGE_PMD_NR - 1) {
+> > +			index++;
+> > +			goto repeat;
+> 
+> Do we really have to go all the way back to the beginning of the loop?  It'd
+> be nice to be able to insert all of the relevant PTEs in a shorter loop here.
+> We'd need to bump the reference count N more times, and I think we do need
+> to check HWPoison for each subpage.
+
+I'll look into it.
+
+Thanks for review.
 
 -- 
  Kirill A. Shutemov
