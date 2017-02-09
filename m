@@ -1,9 +1,8 @@
 Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-Date: Mon, 13 Feb 2017 17:32:47 +0300
-From: "Kirill A. Shutemov" <kirill@shutemov.name>
-To: Matthew Wilcox <willy@infradead.org>
-Cc: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        Theodore Ts'o <tytso@mit.edu>,
+Date: Thu, 9 Feb 2017 12:14:16 -0800
+From: Matthew Wilcox <willy@infradead.org>
+To: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Cc: Theodore Ts'o <tytso@mit.edu>,
         Andreas Dilger <adilger.kernel@dilger.ca>,
         Jan Kara <jack@suse.com>,
         Andrew Morton <akpm@linux-foundation.org>,
@@ -18,51 +17,39 @@ Cc: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
         linux-block@vger.kernel.org
 Subject: Re: [PATCHv6 05/37] thp: try to free page's buffers before attempt
  split
-Message-ID: <20170213143247.GC20394@node.shutemov.name>
+Message-ID: <20170209201416.GS2267@bombadil.infradead.org>
 References: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
  <20170126115819.58875-6-kirill.shutemov@linux.intel.com>
- <20170209201416.GS2267@bombadil.infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170209201416.GS2267@bombadil.infradead.org>
+In-Reply-To: <20170126115819.58875-6-kirill.shutemov@linux.intel.com>
 Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Feb 09, 2017 at 12:14:16PM -0800, Matthew Wilcox wrote:
-> On Thu, Jan 26, 2017 at 02:57:47PM +0300, Kirill A. Shutemov wrote:
-> > @@ -2146,6 +2146,23 @@ int split_huge_page_to_list(struct page *page, struct list_head *list)
-> >  			goto out;
-> >  		}
-> >  
-> > +		/* Try to free buffers before attempt split */
-> > +		if (!PageSwapBacked(head) && PagePrivate(page)) {
-> > +			/*
-> > +			 * We cannot trigger writeback from here due possible
-> > +			 * recursion if triggered from vmscan, only wait.
-> > +			 *
-> > +			 * Caller can trigger writeback it on its own, if safe.
-> > +			 */
-> 
-> It took me a few reads to get this.  May I suggest:
-> 
-> 		/*
-> 		 * Cannot split a page with buffers.  If the caller has
-> 		 * already started writeback, we can wait for it to finish,
-> 		 * but we cannot start writeback if we were called from vmscan
-> 		 */
+On Thu, Jan 26, 2017 at 02:57:47PM +0300, Kirill A. Shutemov wrote:
+> @@ -2146,6 +2146,23 @@ int split_huge_page_to_list(struct page *page, struct list_head *list)
+>  			goto out;
+>  		}
+>  
+> +		/* Try to free buffers before attempt split */
+> +		if (!PageSwapBacked(head) && PagePrivate(page)) {
+> +			/*
+> +			 * We cannot trigger writeback from here due possible
+> +			 * recursion if triggered from vmscan, only wait.
+> +			 *
+> +			 * Caller can trigger writeback it on its own, if safe.
+> +			 */
 
-Yeah, that's better.
+It took me a few reads to get this.  May I suggest:
 
-> > +		if (!PageSwapBacked(head) && PagePrivate(page)) {
-> 
-> Also, it looks weird to test PageSwapBacked of *head* and PagePrivate
-> of *page*.  I think it's correct, but it still looks weird.
+		/*
+		 * Cannot split a page with buffers.  If the caller has
+		 * already started writeback, we can wait for it to finish,
+		 * but we cannot start writeback if we were called from vmscan
+		 */
+> +		if (!PageSwapBacked(head) && PagePrivate(page)) {
 
-I'll change this.
+Also, it looks weird to test PageSwapBacked of *head* and PagePrivate
+of *page*.  I think it's correct, but it still looks weird.
 
-> Reviewed-by: Matthew Wilcox <mawilcox@microsoft.com>
-
-Thanks!
-
--- 
- Kirill A. Shutemov
+Reviewed-by: Matthew Wilcox <mawilcox@microsoft.com>
