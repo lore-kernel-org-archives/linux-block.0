@@ -1,102 +1,36 @@
-Return-Path: <BATV+add76be85c7e68b62602+4917+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org
-Subject: [PATCH 4/4] nvme: support ranged discard requests
-Date: Wed,  8 Feb 2017 14:13:43 +0100
-Message-Id: <20170208131343.4003-5-hch@lst.de>
-In-Reply-To: <20170208131343.4003-1-hch@lst.de>
-References: <20170208131343.4003-1-hch@lst.de>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Date: Thu, 9 Feb 2017 13:59:04 -0800
+From: Matthew Wilcox <willy@infradead.org>
+To: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Cc: Theodore Ts'o <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCHv6 09/37] filemap: allocate huge page in
+ pagecache_get_page(), if allowed
+Message-ID: <20170209215904.GX2267@bombadil.infradead.org>
+References: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
+ <20170126115819.58875-10-kirill.shutemov@linux.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170126115819.58875-10-kirill.shutemov@linux.intel.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-NVMe supports up to 255 ranges per DSM command, so wire up support
-for ranged discards up to that limit.
+On Thu, Jan 26, 2017 at 02:57:51PM +0300, Kirill A. Shutemov wrote:
+> Write path allocate pages using pagecache_get_page(). We should be able
+> to allocate huge pages there, if it's allowed. As usually, fallback to
+> small pages, if failed.
+> 
+> Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/nvme/host/core.c | 28 +++++++++++++++++++++-------
- include/linux/nvme.h     |  2 ++
- 2 files changed, 23 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index efe8ec300126..3fb25d1d0512 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -238,26 +238,36 @@ static inline void nvme_setup_flush(struct nvme_ns *ns,
- static inline int nvme_setup_discard(struct nvme_ns *ns, struct request *req,
- 		struct nvme_command *cmnd)
- {
-+	unsigned short segments = blk_rq_nr_discard_segments(req), n = 0;
- 	struct nvme_dsm_range *range;
--	unsigned int nr_bytes = blk_rq_bytes(req);
-+	struct bio *bio;
- 
--	range = kmalloc(sizeof(*range), GFP_ATOMIC);
-+	range = kmalloc_array(segments, sizeof(*range), GFP_ATOMIC);
- 	if (!range)
- 		return BLK_MQ_RQ_QUEUE_BUSY;
- 
--	range->cattr = cpu_to_le32(0);
--	range->nlb = cpu_to_le32(nr_bytes >> ns->lba_shift);
--	range->slba = cpu_to_le64(nvme_block_nr(ns, blk_rq_pos(req)));
-+	__rq_for_each_bio(bio, req) {
-+		u64 slba = nvme_block_nr(ns, bio->bi_iter.bi_sector);
-+		u32 nlb = bio->bi_iter.bi_size >> ns->lba_shift;
-+
-+		range[n].cattr = cpu_to_le32(0);
-+		range[n].nlb = cpu_to_le32(nlb);
-+		range[n].slba = cpu_to_le64(slba);
-+		n++;
-+	}
-+
-+	if (WARN_ON_ONCE(n != segments))
-+		return BLK_MQ_RQ_QUEUE_ERROR;
- 
- 	memset(cmnd, 0, sizeof(*cmnd));
- 	cmnd->dsm.opcode = nvme_cmd_dsm;
- 	cmnd->dsm.nsid = cpu_to_le32(ns->ns_id);
--	cmnd->dsm.nr = 0;
-+	cmnd->dsm.nr = segments - 1;
- 	cmnd->dsm.attributes = cpu_to_le32(NVME_DSMGMT_AD);
- 
- 	req->special_vec.bv_page = virt_to_page(range);
- 	req->special_vec.bv_offset = offset_in_page(range);
--	req->special_vec.bv_len = sizeof(*range);
-+	req->special_vec.bv_len = sizeof(*range) * segments;
- 	req->rq_flags |= RQF_SPECIAL_PAYLOAD;
- 
- 	return BLK_MQ_RQ_QUEUE_OK;
-@@ -877,6 +887,9 @@ static void nvme_config_discard(struct nvme_ns *ns)
- 	struct nvme_ctrl *ctrl = ns->ctrl;
- 	u32 logical_block_size = queue_logical_block_size(ns->queue);
- 
-+	BUILD_BUG_ON(PAGE_SIZE / sizeof(struct nvme_dsm_range) <
-+			NVME_DSM_MAX_RANGES);
-+
- 	if (ctrl->quirks & NVME_QUIRK_DISCARD_ZEROES)
- 		ns->queue->limits.discard_zeroes_data = 1;
- 	else
-@@ -885,6 +898,7 @@ static void nvme_config_discard(struct nvme_ns *ns)
- 	ns->queue->limits.discard_alignment = logical_block_size;
- 	ns->queue->limits.discard_granularity = logical_block_size;
- 	blk_queue_max_discard_sectors(ns->queue, UINT_MAX);
-+	blk_queue_max_discard_segments(ns->queue, NVME_DSM_MAX_RANGES);
- 	queue_flag_set_unlocked(QUEUE_FLAG_DISCARD, ns->queue);
- }
- 
-diff --git a/include/linux/nvme.h b/include/linux/nvme.h
-index 3d1c6f1b15c9..dcea305157c2 100644
---- a/include/linux/nvme.h
-+++ b/include/linux/nvme.h
-@@ -553,6 +553,8 @@ enum {
- 	NVME_DSMGMT_AD		= 1 << 2,
- };
- 
-+#define NVME_DSM_MAX_RANGES	255
-+
- struct nvme_dsm_range {
- 	__le32			cattr;
- 	__le32			nlb;
--- 
-2.11.0
+Reviewed-by: Matthew Wilcox <mawilcox@microsoft.com>
