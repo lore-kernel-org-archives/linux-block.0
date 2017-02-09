@@ -1,15 +1,12 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wr0-f193.google.com ([209.85.128.193]:35990 "EHLO
-        mail-wr0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753938AbdBIQ6X (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Feb 2017 11:58:23 -0500
-Received: by mail-wr0-f193.google.com with SMTP id k90so12495946wrc.3
-        for <linux-block@vger.kernel.org>; Thu, 09 Feb 2017 08:58:22 -0800 (PST)
-Date: Thu, 9 Feb 2017 19:58:20 +0300
-From: "Kirill A. Shutemov" <kirill@shutemov.name>
-To: Matthew Wilcox <willy@infradead.org>
-Cc: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        Theodore Ts'o <tytso@mit.edu>,
+Received: from bombadil.infradead.org ([65.50.211.133]:39733 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751055AbdBID6p (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Feb 2017 22:58:45 -0500
+Date: Wed, 8 Feb 2017 19:57:27 -0800
+From: Matthew Wilcox <willy@infradead.org>
+To: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Cc: Theodore Ts'o <tytso@mit.edu>,
         Andreas Dilger <adilger.kernel@dilger.ca>,
         Jan Kara <jack@suse.com>,
         Andrew Morton <akpm@linux-foundation.org>,
@@ -24,225 +21,195 @@ Cc: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
         linux-block@vger.kernel.org
 Subject: Re: [PATCHv6 01/37] mm, shmem: swich huge tmpfs to multi-order
  radix-tree entries
-Message-ID: <20170209165820.GA12768@node.shutemov.name>
+Message-ID: <20170209035727.GQ2267@bombadil.infradead.org>
 References: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
  <20170126115819.58875-2-kirill.shutemov@linux.intel.com>
- <20170209035727.GQ2267@bombadil.infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170209035727.GQ2267@bombadil.infradead.org>
+In-Reply-To: <20170126115819.58875-2-kirill.shutemov@linux.intel.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Wed, Feb 08, 2017 at 07:57:27PM -0800, Matthew Wilcox wrote:
-> On Thu, Jan 26, 2017 at 02:57:43PM +0300, Kirill A. Shutemov wrote:
-> > +++ b/include/linux/pagemap.h
-> > @@ -332,6 +332,15 @@ static inline struct page *grab_cache_page_nowait(struct address_space *mapping,
-> >  			mapping_gfp_mask(mapping));
-> >  }
-> >  
-> > +static inline struct page *find_subpage(struct page *page, pgoff_t offset)
-> > +{
-> > +	VM_BUG_ON_PAGE(PageTail(page), page);
-> > +	VM_BUG_ON_PAGE(page->index > offset, page);
-> > +	VM_BUG_ON_PAGE(page->index + (1 << compound_order(page)) < offset,
-> > +			page);
-> > +	return page - page->index + offset;
-> > +}
-> 
-> What would you think to:
-> 
-> static inline void check_page_index(struct page *page, pgoff_t offset)
-> {
-> 	VM_BUG_ON_PAGE(PageTail(page), page);
-> 	VM_BUG_ON_PAGE(page->index > offset, page);
-> 	VM_BUG_ON_PAGE(page->index + (1 << compound_order(page)) <= offset,
-> 			page);
-> }
-> 
-> (I think I fixed an off-by-one error up there ...  if
-> index + (1 << order) == offset, this is also a bug, right?
-> because offset would then refer to the next page, not this page)
+On Thu, Jan 26, 2017 at 02:57:43PM +0300, Kirill A. Shutemov wrote:
+> +++ b/include/linux/pagemap.h
+> @@ -332,6 +332,15 @@ static inline struct page *grab_cache_page_nowait(struct address_space *mapping,
+>  			mapping_gfp_mask(mapping));
+>  }
+>  
+> +static inline struct page *find_subpage(struct page *page, pgoff_t offset)
+> +{
+> +	VM_BUG_ON_PAGE(PageTail(page), page);
+> +	VM_BUG_ON_PAGE(page->index > offset, page);
+> +	VM_BUG_ON_PAGE(page->index + (1 << compound_order(page)) < offset,
+> +			page);
+> +	return page - page->index + offset;
+> +}
 
-Right, thanks.
+What would you think to:
 
-> 
-> static inline struct page *find_subpage(struct page *page, pgoff_t offset)
-> {
-> 	check_page_index(page, offset);
-> 	return page + (offset - page->index);
-> }
-> 
-> ... then you can use check_page_index down ...
+static inline void check_page_index(struct page *page, pgoff_t offset)
+{
+	VM_BUG_ON_PAGE(PageTail(page), page);
+	VM_BUG_ON_PAGE(page->index > offset, page);
+	VM_BUG_ON_PAGE(page->index + (1 << compound_order(page)) <= offset,
+			page);
+}
 
-Okay, makes sense.
+(I think I fixed an off-by-one error up there ...  if
+index + (1 << order) == offset, this is also a bug, right?
+because offset would then refer to the next page, not this page)
 
-> 
-> > @@ -1250,7 +1233,6 @@ struct page *find_lock_entry(struct address_space *mapping, pgoff_t offset)
-> >  			put_page(page);
-> >  			goto repeat;
-> >  		}
-> > -		VM_BUG_ON_PAGE(page_to_pgoff(page) != offset, page);
-> 
-> ... here?
+static inline struct page *find_subpage(struct page *page, pgoff_t offset)
+{
+	check_page_index(page, offset);
+	return page + (offset - page->index);
+}
 
-Ok.
+... then you can use check_page_index down ...
 
-> > @@ -1472,25 +1451,35 @@ unsigned find_get_pages(struct address_space *mapping, pgoff_t start,
-> >  			goto repeat;
-> >  		}
-> >  
-> > +		/* For multi-order entries, find relevant subpage */
-> > +		if (PageTransHuge(page)) {
-> > +			VM_BUG_ON(index - page->index < 0);
-> > +			VM_BUG_ON(index - page->index >= HPAGE_PMD_NR);
-> > +			page += index - page->index;
-> > +		}
-> 
-> Use find_subpage() here?
+> @@ -1250,7 +1233,6 @@ struct page *find_lock_entry(struct address_space *mapping, pgoff_t offset)
+>  			put_page(page);
+>  			goto repeat;
+>  		}
+> -		VM_BUG_ON_PAGE(page_to_pgoff(page) != offset, page);
 
-Ok.
+... here?
 
-> >  		pages[ret] = page;
-> >  		if (++ret == nr_pages)
-> >  			break;
-> > +		if (!PageTransCompound(page))
-> > +			continue;
-> > +		for (refs = 0; ret < nr_pages &&
-> > +				(index + 1) % HPAGE_PMD_NR;
-> > +				ret++, refs++, index++)
-> > +			pages[ret] = ++page;
-> > +		if (refs)
-> > +			page_ref_add(compound_head(page), refs);
-> > +		if (ret == nr_pages)
-> > +			break;
-> 
-> Can we avoid referencing huge pages specifically in the page cache?  I'd
-> like us to get to the point where we can put arbitrary compound pages into
-> the page cache.  For example, I think this can be written as:
-> 
-> 		if (!PageCompound(page))
-> 			continue;
-> 		for (refs = 0; ret < nr_pages; refs++, index++) {
-> 			if (index > page->index + (1 << compound_order(page)))
-> 				break;
-> 			pages[ret++] = ++page;
-> 		}
-> 		if (refs)
-> 			page_ref_add(compound_head(page), refs);
-> 		if (ret == nr_pages)
-> 			break;
+> @@ -1472,25 +1451,35 @@ unsigned find_get_pages(struct address_space *mapping, pgoff_t start,
+>  			goto repeat;
+>  		}
+>  
+> +		/* For multi-order entries, find relevant subpage */
+> +		if (PageTransHuge(page)) {
+> +			VM_BUG_ON(index - page->index < 0);
+> +			VM_BUG_ON(index - page->index >= HPAGE_PMD_NR);
+> +			page += index - page->index;
+> +		}
 
-That's slightly more costly, but I guess that's fine.
+Use find_subpage() here?
 
-> > @@ -1541,19 +1533,12 @@ unsigned find_get_pages_contig(struct address_space *mapping, pgoff_t index,
-> >  
-> > +		/* For multi-order entries, find relevant subpage */
-> > +		if (PageTransHuge(page)) {
-> > +			VM_BUG_ON(index - page->index < 0);
-> > +			VM_BUG_ON(index - page->index >= HPAGE_PMD_NR);
-> > +			page += index - page->index;
-> > +		}
-> > +
-> >  		pages[ret] = page;
-> >  		if (++ret == nr_pages)
-> >  			break;
-> > +		if (!PageTransCompound(page))
-> > +			continue;
-> > +		for (refs = 0; ret < nr_pages &&
-> > +				(index + 1) % HPAGE_PMD_NR;
-> > +				ret++, refs++, index++)
-> > +			pages[ret] = ++page;
-> > +		if (refs)
-> > +			page_ref_add(compound_head(page), refs);
-> > +		if (ret == nr_pages)
-> > +			break;
-> >  	}
-> >  	rcu_read_unlock();
-> >  	return ret;
-> 
-> Ugh, the same code again.  Hmm ... we only need to modify 'ret' as a result
-> of this ... so could we split it out like this?
-> 
-> static unsigned populate_pages(struct page **pages, unsigned i, unsigned max,
->                                 struct page *page)
-> {
->         unsigned refs = 0;
->         for (;;) {
->                 pages[i++] = page;
->                 if (i == max)
->                         break;
->                 if (PageHead(page + 1))
->                         break;
+>  		pages[ret] = page;
+>  		if (++ret == nr_pages)
+>  			break;
+> +		if (!PageTransCompound(page))
+> +			continue;
+> +		for (refs = 0; ret < nr_pages &&
+> +				(index + 1) % HPAGE_PMD_NR;
+> +				ret++, refs++, index++)
+> +			pages[ret] = ++page;
+> +		if (refs)
+> +			page_ref_add(compound_head(page), refs);
+> +		if (ret == nr_pages)
+> +			break;
 
-Hm? PageHead()? No. The next page can head or small.
+Can we avoid referencing huge pages specifically in the page cache?  I'd
+like us to get to the point where we can put arbitrary compound pages into
+the page cache.  For example, I think this can be written as:
 
-I *guess* we can get away with !PageTail(page + 1)...
+		if (!PageCompound(page))
+			continue;
+		for (refs = 0; ret < nr_pages; refs++, index++) {
+			if (index > page->index + (1 << compound_order(page)))
+				break;
+			pages[ret++] = ++page;
+		}
+		if (refs)
+			page_ref_add(compound_head(page), refs);
+		if (ret == nr_pages)
+			break;
 
->                 page++;
->                 refs++;
->         }
->         if (refs)
->                 page_ref_add(compound_head(page), refs);
->         return i;
-> }
-> 
-> > +unsigned find_get_pages_tag(struct address_space *mapping, pgoff_t *indexp,
-> >  			int tag, unsigned int nr_pages, struct page **pages)
-> 
-> >  			break;
-> > +		if (!PageTransCompound(page))
-> > +			continue;
-> > +		for (refs = 0; ret < nr_pages &&
-> > +				(index + 1) % HPAGE_PMD_NR;
-> > +				ret++, refs++, index++)
-> > +			pages[ret] = ++page;
-> > +		if (refs)
-> > +			page_ref_add(compound_head(page), refs);
-> > +		if (ret == nr_pages)
-> > +			break;
-> >  	}
-> 
-> ... and again!
-> 
-> > @@ -2326,25 +2337,26 @@ void filemap_map_pages(struct vm_fault *vmf,
-> > +		/* For multi-order entries, find relevant subpage */
-> > +		if (PageTransHuge(page)) {
-> > +			VM_BUG_ON(index - page->index < 0);
-> > +			VM_BUG_ON(index - page->index >= HPAGE_PMD_NR);
-> > +			page += index - page->index;
-> > +		}
-> > +
-> >  		if (!PageUptodate(page) ||
-> >  				PageReadahead(page) ||
-> 
-> Readahead is PF_NO_COMPOUND ... so I don't see why this works?
+> @@ -1541,19 +1533,12 @@ unsigned find_get_pages_contig(struct address_space *mapping, pgoff_t index,
+>  
+> +		/* For multi-order entries, find relevant subpage */
+> +		if (PageTransHuge(page)) {
+> +			VM_BUG_ON(index - page->index < 0);
+> +			VM_BUG_ON(index - page->index >= HPAGE_PMD_NR);
+> +			page += index - page->index;
+> +		}
+> +
+>  		pages[ret] = page;
+>  		if (++ret == nr_pages)
+>  			break;
+> +		if (!PageTransCompound(page))
+> +			continue;
+> +		for (refs = 0; ret < nr_pages &&
+> +				(index + 1) % HPAGE_PMD_NR;
+> +				ret++, refs++, index++)
+> +			pages[ret] = ++page;
+> +		if (refs)
+> +			page_ref_add(compound_head(page), refs);
+> +		if (ret == nr_pages)
+> +			break;
+>  	}
+>  	rcu_read_unlock();
+>  	return ret;
 
-We wouldn't see pages with readahead flag set/cleared until huge pages
-support in ext4 is enabled at very end of the patchset.
+Ugh, the same code again.  Hmm ... we only need to modify 'ret' as a result
+of this ... so could we split it out like this?
 
-> 
-> > @@ -2378,8 +2390,14 @@ void filemap_map_pages(struct vm_fault *vmf,
-> >  		/* Huge page is mapped? No need to proceed. */
-> >  		if (pmd_trans_huge(*vmf->pmd))
-> >  			break;
-> > -		if (iter.index == end_pgoff)
-> > +		if (index == end_pgoff)
-> >  			break;
-> > +		if (page && PageTransCompound(page) &&
-> > +				(index & (HPAGE_PMD_NR - 1)) !=
-> > +				HPAGE_PMD_NR - 1) {
-> > +			index++;
-> > +			goto repeat;
-> 
-> Do we really have to go all the way back to the beginning of the loop?  It'd
-> be nice to be able to insert all of the relevant PTEs in a shorter loop here.
-> We'd need to bump the reference count N more times, and I think we do need
-> to check HWPoison for each subpage.
+static unsigned populate_pages(struct page **pages, unsigned i, unsigned max,
+                                struct page *page)
+{
+        unsigned refs = 0;
+        for (;;) {
+                pages[i++] = page;
+                if (i == max)
+                        break;
+                if (PageHead(page + 1))
+                        break;
+                page++;
+                refs++;
+        }
+        if (refs)
+                page_ref_add(compound_head(page), refs);
+        return i;
+}
 
-I'll look into it.
+> +unsigned find_get_pages_tag(struct address_space *mapping, pgoff_t *indexp,
+>  			int tag, unsigned int nr_pages, struct page **pages)
 
-Thanks for review.
+>  			break;
+> +		if (!PageTransCompound(page))
+> +			continue;
+> +		for (refs = 0; ret < nr_pages &&
+> +				(index + 1) % HPAGE_PMD_NR;
+> +				ret++, refs++, index++)
+> +			pages[ret] = ++page;
+> +		if (refs)
+> +			page_ref_add(compound_head(page), refs);
+> +		if (ret == nr_pages)
+> +			break;
+>  	}
 
--- 
- Kirill A. Shutemov
+... and again!
+
+> @@ -2326,25 +2337,26 @@ void filemap_map_pages(struct vm_fault *vmf,
+> +		/* For multi-order entries, find relevant subpage */
+> +		if (PageTransHuge(page)) {
+> +			VM_BUG_ON(index - page->index < 0);
+> +			VM_BUG_ON(index - page->index >= HPAGE_PMD_NR);
+> +			page += index - page->index;
+> +		}
+> +
+>  		if (!PageUptodate(page) ||
+>  				PageReadahead(page) ||
+
+Readahead is PF_NO_COMPOUND ... so I don't see why this works?
+
+> @@ -2378,8 +2390,14 @@ void filemap_map_pages(struct vm_fault *vmf,
+>  		/* Huge page is mapped? No need to proceed. */
+>  		if (pmd_trans_huge(*vmf->pmd))
+>  			break;
+> -		if (iter.index == end_pgoff)
+> +		if (index == end_pgoff)
+>  			break;
+> +		if (page && PageTransCompound(page) &&
+> +				(index & (HPAGE_PMD_NR - 1)) !=
+> +				HPAGE_PMD_NR - 1) {
+> +			index++;
+> +			goto repeat;
+
+Do we really have to go all the way back to the beginning of the loop?  It'd
+be nice to be able to insert all of the relevant PTEs in a shorter loop here.
+We'd need to bump the reference count N more times, and I think we do need
+to check HWPoison for each subpage.
