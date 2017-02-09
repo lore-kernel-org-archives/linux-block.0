@@ -1,131 +1,100 @@
-Return-Path: <BATV+7c9ed557eb952ccf5513+4914+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: mst@redhat.com,
-	jasowang@redhat.com
-Cc: axboe@kernel.dk,
-	pbonzini@redhat.com,
-	virtualization@lists.linux-foundation.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 7/9] blk-mq: provide a default queue mapping for virtio device
-Date: Sun,  5 Feb 2017 18:15:24 +0100
-Message-Id: <20170205171526.6224-8-hch@lst.de>
-In-Reply-To: <20170205171526.6224-1-hch@lst.de>
-References: <20170205171526.6224-1-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from szxga03-in.huawei.com ([119.145.14.66]:6682 "EHLO
+        szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752510AbdBIJkn (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Feb 2017 04:40:43 -0500
+To: <linux-block@vger.kernel.org>
+From: Hou Tao <houtao1@huawei.com>
+Subject: rate-capped fio jobs in a CFQ group degrade performance of fio jobs
+ in another CFQ group with the same weight
+CC: <axboe@fb.com>, Shaohua Li <shli@fb.com>, <tj@kernel.org>,
+        Vivek Goyal <vgoyal@redhat.com>
+Message-ID: <d3c53b1b-ec45-4a37-35bd-36489b5aaf4a@huawei.com>
+Date: Thu, 9 Feb 2017 17:40:16 +0800
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Similar to the PCI version, just calling into virtio instead.
+Hi all,
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/Kconfig                 |  5 ++++
- block/Makefile                |  1 +
- block/blk-mq-virtio.c         | 54 +++++++++++++++++++++++++++++++++++++++++++
- include/linux/blk-mq-virtio.h | 10 ++++++++
- 4 files changed, 70 insertions(+)
- create mode 100644 block/blk-mq-virtio.c
- create mode 100644 include/linux/blk-mq-virtio.h
+During our test of the CFQ group schedule, we found a performance related problem.
+Rate-capped fio jobs in a CFQ group will degrade the performance of fio jobs in
+another CFQ group. Both of the CFQ groups have the same blkio.weight.
 
-diff --git a/block/Kconfig b/block/Kconfig
-index 8bf114a3858a..3523b4f0cd8b 100644
---- a/block/Kconfig
-+++ b/block/Kconfig
-@@ -165,4 +165,9 @@ config BLK_MQ_PCI
- 	depends on BLOCK && PCI
- 	default y
- 
-+config BLK_MQ_VIRTIO
-+	bool
-+	depends on BLOCK && VIRTIO
-+	default y
-+
- source block/Kconfig.iosched
-diff --git a/block/Makefile b/block/Makefile
-index a827f988c4e6..60691949d28d 100644
---- a/block/Makefile
-+++ b/block/Makefile
-@@ -23,5 +23,6 @@ obj-$(CONFIG_BLOCK_COMPAT)	+= compat_ioctl.o
- obj-$(CONFIG_BLK_CMDLINE_PARSER)	+= cmdline-parser.o
- obj-$(CONFIG_BLK_DEV_INTEGRITY) += bio-integrity.o blk-integrity.o t10-pi.o
- obj-$(CONFIG_BLK_MQ_PCI)	+= blk-mq-pci.o
-+obj-$(CONFIG_BLK_MQ_VIRTIO)	+= blk-mq-virtio.o
- obj-$(CONFIG_BLK_DEV_ZONED)	+= blk-zoned.o
- obj-$(CONFIG_BLK_WBT)		+= blk-wbt.o
-diff --git a/block/blk-mq-virtio.c b/block/blk-mq-virtio.c
-new file mode 100644
-index 000000000000..c3afbca11299
---- /dev/null
-+++ b/block/blk-mq-virtio.c
-@@ -0,0 +1,54 @@
-+/*
-+ * Copyright (c) 2016 Christoph Hellwig.
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-+ * more details.
-+ */
-+#include <linux/device.h>
-+#include <linux/blk-mq.h>
-+#include <linux/blk-mq-virtio.h>
-+#include <linux/virtio_config.h>
-+#include <linux/module.h>
-+#include "blk-mq.h"
-+
-+/**
-+ * blk_mq_virtio_map_queues - provide a default queue mapping for virtio device
-+ * @set:	tagset to provide the mapping for
-+ * @vdev:	virtio device associated with @set.
-+ * @first_vec:	first interrupt vectors to use for queues (usually 0)
-+ *
-+ * This function assumes the virtio device @vdev has at least as many available
-+ * interrupt vetors as @set has queues.  It will then queuery the vector
-+ * corresponding to each queue for it's affinity mask and built queue mapping
-+ * that maps a queue to the CPUs that have irq affinity for the corresponding
-+ * vector.
-+ */
-+int blk_mq_virtio_map_queues(struct blk_mq_tag_set *set,
-+		struct virtio_device *vdev, int first_vec)
-+{
-+	const struct cpumask *mask;
-+	unsigned int queue, cpu;
-+
-+	if (!vdev->config->get_vq_affinity)
-+		goto fallback;
-+
-+	for (queue = 0; queue < set->nr_hw_queues; queue++) {
-+		mask = vdev->config->get_vq_affinity(vdev, first_vec + queue);
-+		if (!mask)
-+			goto fallback;
-+
-+		for_each_cpu(cpu, mask)
-+			set->mq_map[cpu] = queue;
-+	}
-+
-+	return 0;
-+fallback:
-+	return blk_mq_map_queues(set);
-+}
-+EXPORT_SYMBOL_GPL(blk_mq_virtio_map_queues);
-diff --git a/include/linux/blk-mq-virtio.h b/include/linux/blk-mq-virtio.h
-new file mode 100644
-index 000000000000..b1ef6e14744f
---- /dev/null
-+++ b/include/linux/blk-mq-virtio.h
-@@ -0,0 +1,10 @@
-+#ifndef _LINUX_BLK_MQ_VIRTIO_H
-+#define _LINUX_BLK_MQ_VIRTIO_H
-+
-+struct blk_mq_tag_set;
-+struct virtio_device;
-+
-+int blk_mq_virtio_map_queues(struct blk_mq_tag_set *set,
-+		struct virtio_device *vdev, int first_vec);
-+
-+#endif /* _LINUX_BLK_MQ_VIRTIO_H */
--- 
-2.11.0
+We launch two fios in difference terminals. The following is the content of
+these two job files:
+
+# cat a.job
+[global]
+bs=4k
+ioengine=psync
+iodepth=1
+direct=1
+rw=randwrite
+time_based
+runtime=30
+cgroup_nodelete=1
+group_reporting=1
+
+[test1]
+filename=test1.dat
+size=2G
+cgroup_weight=500
+cgroup=testA
+thread=1
+numjobs=2
+
+[test3]
+stonewall
+filename=test3.dat
+size=2G
+rate=4m
+cgroup_weight=500
+cgroup=testA
+thread=1
+numjobs=2
+
+
+# cat b.job
+[global]
+bs=4k
+ioengine=psync
+iodepth=1
+direct=1
+rw=randwrite
+time_based
+runtime=60
+cgroup_nodelete=1
+group_reporting=1
+
+[test2]
+filename=test2.dat
+size=2G
+cgroup_weight=500
+cgroup=testB
+thread=1
+numjobs=2
+
+In the first 30 seconds, the iops of both "test1" and "test3" is ~5000 and
+the rate is about 20MBps.
+
+In the last 30 seconds, we start "test3" and the rate of "test3" is limited to
+8MBps (4MBps * 2 jobs). The cap works fine, but the iops of "test2" also
+degraded from ~5000 to ~2040 or lower. This may seems reasonable for CFQ group
+schedule because it needs to dispatch disk time equally to these two CFQ group,
+but it doesn't fully utilize the disk throughput.
+
+It can be reproduced on 4.4 and 4.10.0-rc7, the version of fio is 2.2.4.
+The configuration options of CFQ are untouched.
+
+I am not sure whether this situation is a bug or not. Are there some
+configuration options we can used to alleviate the performance degradation
+problem ? And how CFQ group schedule handles the trace-off between fairness
+and performance ?
+
+Any suggestion will be appreciated.
+
+Regards,
+
+Tao
