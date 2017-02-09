@@ -1,151 +1,226 @@
 Return-Path: <linus.walleij@linaro.org>
-MIME-Version: 1.0
+Return-Path: <linus.walleij@linaro.org>
 From: Linus Walleij <linus.walleij@linaro.org>
-Date: Fri, 17 Feb 2017 10:33:23 +0100
-Message-ID: <CACRpkdYXk_MKhaeQLqGA+8Q4g5qy-DkRymC0Ecf+_qsm+cBoBQ@mail.gmail.com>
-Subject: Some throughput tests with MQ and BFQ on MMC/SD
-To: "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>, linux-block@vger.kernel.org
-Cc: Ulf Hansson <ulf.hansson@linaro.org>, Adrian Hunter <adrian.hunter@intel.com>,
-	Ritesh Harjani <riteshh@codeaurora.org>, Avri Altman <Avri.Altman@sandisk.com>,
-	Arnd Bergmann <arnd@arndb.de>, Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-	Paolo Valente <paolo.valente@linaro.org>, =?UTF-8?Q?Per_F=C3=B6rlin?= <per.forlin@axis.com>
-Content-Type: text/plain; charset=UTF-8
+To: linux-mmc@vger.kernel.org,
+	Ulf Hansson <ulf.hansson@linaro.org>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	Paolo Valente <paolo.valente@linaro.org>
+Cc: Chunyan Zhang <zhang.chunyan@linaro.org>,
+	Baolin Wang <baolin.wang@linaro.org>,
+	linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Linus Walleij <linus.walleij@linaro.org>
+Subject: [PATCH 15/16] mmc: queue: issue requests in massive parallel
+Date: Thu,  9 Feb 2017 16:34:02 +0100
+Message-Id: <20170209153403.9730-16-linus.walleij@linaro.org>
+In-Reply-To: <20170209153403.9730-1-linus.walleij@linaro.org>
+References: <20170209153403.9730-1-linus.walleij@linaro.org>
 List-ID: <linux-block@vger.kernel.org>
 
-This week I tested the following:
+This makes a crucial change to the issueing mechanism for the
+MMC requests:
 
-- Merge the in-flight BFQ work from Paolo with my MMC MQ patch set
-- Enable BFQ
-- Run a few iterations of classic throughput tests
+Before commit "mmc: core: move the asynchronous post-processing"
+some parallelism on the read/write requests was achieved by
+speculatively postprocessing a request and re-preprocess and
+re-issue the request if something went wrong, which we discover
+later when checking for an error.
 
-dd on whole internal eMMC, 7.38 GiB:
+This is kind of ugly. Instead we need a mechanism like here:
 
-sync
-echo 3 > /proc/sys/vm/drop_caches
-sync
-time dd if=/dev/mmcblk3 of=/dev/null
-time dd if=/dev/mmcblk3 of=/dev/null bs=1M
+We issue requests, and when they come back from the hardware,
+we know if they finished successfully or not. If the request
+was successful, we complete the asynchronous request and let a
+new request immediately start on the hardware. If, and only if,
+it returned an error from the hardware we go down the error
+path.
 
-iozone on a Noname SD card 2GB
+This is achieved by splitting the work path from the hardware
+in two: a successful path ending up calling down to
+mmc_blk_rw_done_success() and an errorpath calling down to
+mmc_blk_rw_done_error().
 
-mount /dev/mmcblk0p1 /mnt
-sync
-echo 3 > /proc/sys/vm/drop_caches
-sync
-iozone -az -i0 -i1 -i2 -s 20m -I -f /mnt/foo.test
+This has a profound effect: we reintroduce the parallelism on
+the successful path as mmc_post_req() can now be called in
+while the next request is in transit (just like prior to
+commit "mmc: core: move the asynchronous post-processing")
+but ALSO we can call mmc_queue_bounce_post() and
+blk_end_request() in parallel.
 
-The results:
+The latter has the profound effect of issuing a new request
+again so that we actually need to have at least three requests
+in transit at the same time: we haven't yet dropped the
+reference to our struct mmc_queue_req so we need at least
+three. I put the pool to 4 requests for now.
 
-Before patches (v4.10-rc8):
+I expect the imrovement to be noticeable on systems that use
+bounce buffers since they can now process requests in parallel
+with post-processing their bounce buffers, but I don't have a
+test target for that.
 
-7918845952 bytes (7.4GB) copied, 194.504059 seconds, 38.8MB/s
-real    3m 14.51s
-user    0m 7.41s
-sys     1m 10.34s
+Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+---
+ drivers/mmc/core/block.c | 61 +++++++++++++++++++++++++++++++++++++-----------
+ drivers/mmc/core/block.h |  4 +++-
+ drivers/mmc/core/core.c  | 27 ++++++++++++++++++---
+ drivers/mmc/core/queue.c |  2 +-
+ 4 files changed, 75 insertions(+), 19 deletions(-)
 
-7918845952 bytes (7.4GB) copied, 176.519531 seconds, 42.8MB/s
-real    2m 56.53s
-user    0m 0.06s
-sys     0m 36.57s
-
-Command line used: iozone -az -i0 -i1 -i2 -s 20m -I -f /mnt/foo.test
-Output is in kBytes/sec
-
-                                                   random    random
-   kB  reclen    write  rewrite    read    reread    read     write
-20480       4     1960     2105     5991     6023     5202       40
-20480       8     4636     4901     9087     9103     9066       80
-20480      16     5522     5663    12237    12242    12206      163
-20480      32     5976     6031    14915    14917    14901      333
-20480      64     6286     6387    16737    16763    16738      678
-20480     128     6720     6757    17876    17857    17865     1403
-20480     256     6846     6909    18230    17568    16719     3039
-20480     512     7204     7229    18471    18751    18834     7209
-20480    1024     7257     7315    18684    18044    18095     7337
-20480    2048     7322     7388    18605    18802    19437     7401
-20480    4096     7553     7652    21510    21108    21503     7688
-20480    8192     7534     7745    22164    22300    22490     7758
-20480   16384     7357     7818    23053    23048    23056     7834
-
-
-After MMC MQ patches:
-
-7918845952 bytes (7.4GB) copied, 196.907776 seconds, 38.4MB/s
-real    3m 16.91s
-user    0m 7.17s
-sys     1m 8.03s
-
-7918845952 bytes (7.4GB) copied, 192.595734 seconds, 39.2MB/s
-real    3m 12.60s
-user    0m 0.12s
-sys     0m 33.11s
-
-Command line used: iozone -az -i0 -i1 -i2 -s 20m -I -f /mnt/foo.test
-                                                   random    random
-   kB  reclen    write  rewrite    read    reread    read     write
-20480       4     2049     2154     5991     5998     5934       40
-20480       8     4654     4921     9081     9075     9028       81
-20480      16     5572     5747    12250    12252    12177      164
-20480      32     6040     6084    14858    14895    14833      335
-20480      64     6370     6449    16759    16770    16715      682
-20480     128     6834     6814    17882    17843    17878     1411
-20480     256     6892     6900    18526    18105    18430     3066
-20480     512     7239     7254    18839    18864    18837     7258
-20480    1024     7342     6453    18787    18161    17522     7343
-20480    2048     7408     7439    17891    18211    19029     7472
-20480    4096     7641     7703    20950    21044    20900     7705
-20480    8192     7584     7811    22261    22170    22385     7809
-20480   16384     7407     7873    23033    23050    23048     7905
-
-
-After MMC MQ+BFQ patches:
-
-7918845952 bytes (7.4GB) copied, 197.097717 seconds, 38.3MB/s
-real    3m 17.10s
-user    0m 7.67s
-sys     1m 7.33s
-
-7552+0 records in
-7552+0 records out
-7918845952 bytes (7.4GB) copied, 187.119538 seconds, 40.4MB/s
-real    3m 7.12s
-user    0m 0.11s
-sys     0m 34.61s
-
-Command line used: iozone -az -i0 -i1 -i2 -s 20m -I -f /mnt/foo.test
-Output is in kBytes/sec
-                                                   random    random
-   kB  reclen    write  rewrite    read    reread    read     write
-20480       4     1734     1786     5923     5166     5894       40
-20480       8     4614     4853     8950     8949     8909       80
-20480      16     5525     5705    12086    12098    12040      164
-20480      32     6027     6040    14765    14793    14755      334
-20480      64     6341     6404    16696    16697    16670      680
-20480     128     6799     6842    17830    17833    17814     1407
-20480     256     6848     6849    17394    18251    17537     3054
-20480     512     7191     7229    18545    18628    18801     7224
-20480    1024     7241     7331    17845    17909    18206     7302
-20480    2048     7375     7433    18794    19288    19675     7426
-20480    4096     7583     7696    21024    21194    21082     7659
-20480    8192     7555     7767    22068    22170    22168     7808
-20480   16384     7350     7831    23021    23032    23050     7870
-
-
-As you can see there are no huge performance regressions with these
-kinds of "raw" throughput tests.
-
-These iozone figures are unintuitive unless your head can
-plot logarithmic, look at the charts here for a more visual presentation
-of the iozone results:
-https://docs.google.com/spreadsheets/d/1rm72TiGlTnzDeGLR__aqvjcJ2UkA-Ro3-XyKA8r1M-c
-
-Compare this to the performance change we got when first introducing
-the asynchronous requests:
-https://wiki.linaro.org/WorkingGroups/KernelArchived/Specs/StoragePerfMMC-async-req
-
-The patches need some issues fixed from the build server
-complaints and some robustness hammering, but after that I
-think they will be ripe for merging for v4.12.
-
-Yours,
-Linus Walleij
+diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
+index acca15cc1807..f1008ce5376b 100644
+--- a/drivers/mmc/core/block.c
++++ b/drivers/mmc/core/block.c
+@@ -1622,8 +1622,51 @@ static void mmc_blk_rw_try_restart(struct mmc_queue_req *mq_rq)
+ 	mmc_restart_areq(mq->card->host, &mq_rq->areq);
+ }
+ 
+-void mmc_blk_rw_done(struct mmc_async_req *areq,
+-		     enum mmc_blk_status status)
++/**
++ * Final handling of an asynchronous request if there was no error.
++ * This is the common path that we take when everything is nice
++ * and smooth. The status from the command is always MMC_BLK_SUCCESS.
++ */
++void mmc_blk_rw_done_success(struct mmc_async_req *areq)
++{
++	struct mmc_queue_req *mq_rq;
++	struct mmc_blk_request *brq;
++	struct mmc_blk_data *md;
++	struct request *old_req;
++	bool req_pending;
++	int type;
++
++	mq_rq =	container_of(areq, struct mmc_queue_req, areq);
++	md = mq_rq->mq->blkdata;
++	brq = &mq_rq->brq;
++	old_req = mq_rq->req;
++	type = rq_data_dir(old_req) == READ ? MMC_BLK_READ : MMC_BLK_WRITE;
++
++	mmc_queue_bounce_post(mq_rq);
++	mmc_blk_reset_success(md, type);
++	req_pending = blk_end_request(old_req, 0,
++				      brq->data.bytes_xfered);
++	/*
++	 * If the blk_end_request function returns non-zero even
++	 * though all data has been transferred and no errors
++	 * were returned by the host controller, it's a bug.
++	 */
++	if (req_pending) {
++		pr_err("%s BUG rq_tot %d d_xfer %d\n",
++		       __func__, blk_rq_bytes(old_req),
++		       brq->data.bytes_xfered);
++		return;
++	}
++}
++
++/**
++ * Error, recapture, retry etc for asynchronous requests.
++ * This is the error path that we take when there is bad status
++ * coming back from the hardware and we need to do a bit of
++ * cleverness.
++ */
++void mmc_blk_rw_done_error(struct mmc_async_req *areq,
++			   enum mmc_blk_status status)
+ {
+ 	struct mmc_queue *mq;
+ 	struct mmc_queue_req *mq_rq;
+@@ -1652,6 +1695,8 @@ void mmc_blk_rw_done(struct mmc_async_req *areq,
+ 
+ 	switch (status) {
+ 	case MMC_BLK_SUCCESS:
++		pr_err("%s: MMC_BLK_SUCCESS on error path\n", __func__);
++		/* This should not happen: anyway fall through */
+ 	case MMC_BLK_PARTIAL:
+ 		/*
+ 		 * A block was successfully transferred.
+@@ -1660,18 +1705,6 @@ void mmc_blk_rw_done(struct mmc_async_req *areq,
+ 
+ 		req_pending = blk_end_request(old_req, 0,
+ 					      brq->data.bytes_xfered);
+-		/*
+-		 * If the blk_end_request function returns non-zero even
+-		 * though all data has been transferred and no errors
+-		 * were returned by the host controller, it's a bug.
+-		 */
+-		if (status == MMC_BLK_SUCCESS && req_pending) {
+-			pr_err("%s BUG rq_tot %d d_xfer %d\n",
+-			       __func__, blk_rq_bytes(old_req),
+-			       brq->data.bytes_xfered);
+-			mmc_blk_rw_cmd_abort(card, old_req);
+-			return;
+-		}
+ 		break;
+ 	case MMC_BLK_CMD_ERR:
+ 		req_pending = mmc_blk_rw_cmd_err(md, card, brq, old_req, req_pending);
+diff --git a/drivers/mmc/core/block.h b/drivers/mmc/core/block.h
+index 0326fa5d8217..eae47ae7c903 100644
+--- a/drivers/mmc/core/block.h
++++ b/drivers/mmc/core/block.h
+@@ -5,7 +5,9 @@ struct mmc_async_req;
+ enum mmc_blk_status;
+ struct mmc_queue_req;
+ 
+-void mmc_blk_rw_done(struct mmc_async_req *areq, enum mmc_blk_status status);
++void mmc_blk_rw_done_success(struct mmc_async_req *areq);
++void mmc_blk_rw_done_error(struct mmc_async_req *areq,
++			   enum mmc_blk_status status);
+ void mmc_blk_issue_rq(struct mmc_queue_req *mq_rq);
+ 
+ #endif
+diff --git a/drivers/mmc/core/core.c b/drivers/mmc/core/core.c
+index 50a8942b98c2..04666ad91df0 100644
+--- a/drivers/mmc/core/core.c
++++ b/drivers/mmc/core/core.c
+@@ -634,11 +634,32 @@ void mmc_finalize_areq(struct kthread_work *work)
+ 		mmc_start_bkops(host->card, true);
+ 	}
+ 
+-	/* Successfully postprocess the old request at this point */
+-	mmc_post_req(host, areq->mrq, 0);
+-	mmc_blk_rw_done(areq, status);
++	/*
++	 * Postprocess the old request at this point:
++	 * on success: take a fast path!
++	 * on error: take the slow path, retrying etc
++	 */
++	if (status != MMC_BLK_SUCCESS) {
++		mmc_post_req(host, areq->mrq, 0);
++		/*
++		 * This call can lead to retransmissions using
++		 * mmc_restart_areq() so do not complete until
++		 * after this call!
++		 */
++		mmc_blk_rw_done_error(areq, status);
++		complete(&areq->complete);
++		mmc_queue_req_put(mq_rq);
++		return;
++	}
+ 
++	/*
++	 * There will not be any retransmissions etc
++	 * at this point, so let the next request get
++	 * access to the hardware.
++	 */
+ 	complete(&areq->complete);
++	mmc_post_req(host, areq->mrq, 0);
++	mmc_blk_rw_done_success(areq);
+ 	mmc_queue_req_put(mq_rq);
+ }
+ EXPORT_SYMBOL(mmc_finalize_areq);
+diff --git a/drivers/mmc/core/queue.c b/drivers/mmc/core/queue.c
+index cab0f51dbb4d..e7ba5bef2df3 100644
+--- a/drivers/mmc/core/queue.c
++++ b/drivers/mmc/core/queue.c
+@@ -307,7 +307,7 @@ int mmc_init_queue(struct mmc_queue *mq, struct mmc_card *card,
+ 	if (!mq->queue)
+ 		return -ENOMEM;
+ 
+-	mq->qdepth = 2;
++	mq->qdepth = 4;
+ 	spin_lock_init(&mq->mqrq_lock);
+ 	mq->mqrq = kcalloc(mq->qdepth, sizeof(struct mmc_queue_req),
+ 			   GFP_KERNEL);
+-- 
+2.9.3
