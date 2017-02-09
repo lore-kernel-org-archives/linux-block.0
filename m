@@ -1,150 +1,39 @@
 Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Jan Kara <jack@suse.cz>
-To: <linux-fsdevel@vger.kernel.org>
-Cc: Christoph Hellwig <hch@infradead.org>, linux-block@vger.kernel.org,
-        Jan Kara <jack@suse.cz>, David Woodhouse <dwmw2@infradead.org>,
-        Brian Norris <computersforpeace@gmail.com>,
-        linux-mtd@lists.infradead.org
-Subject: [PATCH 14/24] mtd: Convert to dynamically allocated bdi infrastructure
-Date: Thu,  2 Feb 2017 18:34:12 +0100
-Message-Id: <20170202173422.3240-15-jack@suse.cz>
-In-Reply-To: <20170202173422.3240-1-jack@suse.cz>
+Subject: Re: [PATCH 22/24] ubifs: Convert to separately allocated bdi
+To: Jan Kara <jack@suse.cz>
 References: <20170202173422.3240-1-jack@suse.cz>
+ <20170202173422.3240-23-jack@suse.cz>
+ <d0d1d396-a340-866b-c931-974fa8ea53a1@nod.at>
+ <20170209121728.GE16825@quack2.suse.cz>
+Cc: linux-fsdevel@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        linux-block@vger.kernel.org,
+        Artem Bityutskiy <dedekind1@gmail.com>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        linux-mtd@lists.infradead.org
+From: Richard Weinberger <richard@nod.at>
+Message-ID: <e9eb0d3c-60ab-f77e-0184-d4be4ad74449@nod.at>
+Date: Thu, 9 Feb 2017 15:56:29 +0100
+MIME-Version: 1.0
+In-Reply-To: <20170209121728.GE16825@quack2.suse.cz>
+Content-Type: text/plain; charset=windows-1252
 Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-MTD already allocates backing_dev_info dynamically. Convert it to use
-generic infrastructure for this including proper refcounting. We drop
-mtd->backing_dev_info as its only use was to pass mtd_bdi pointer from
-one file into another and if we wanted to keep that in a clean way, we'd
-have to make mtd hold and drop bdi reference as needed which seems
-pointless for passing one global pointer...
+Am 09.02.2017 um 13:17 schrieb Jan Kara:
+>> So ->capabilities is now zero by default since you use __GFP_ZERO in
+>> bdi_alloc().
+>> At least for UBIFS I'll add a comment on this, otherwise it is not so
+>> clear that UBIFS wants a BDI with no capabilities and how it achieves that.
+> 
+> OK, I've modified the comment to:
+> 
+>          * Read-ahead will be disabled because @sb->s_bdi->ra_pages is 0. Also
+>          * @sb->s_bdi->capabilities are initialized to 0 so there won't be any
+>          * writeback happening.
+>          */
 
-CC: David Woodhouse <dwmw2@infradead.org>
-CC: Brian Norris <computersforpeace@gmail.com>
-CC: linux-mtd@lists.infradead.org
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- drivers/mtd/mtdcore.c   | 23 ++++++++++++-----------
- drivers/mtd/mtdsuper.c  |  7 ++++++-
- include/linux/mtd/mtd.h |  5 -----
- 3 files changed, 18 insertions(+), 17 deletions(-)
+Nice!
 
-diff --git a/drivers/mtd/mtdcore.c b/drivers/mtd/mtdcore.c
-index 052772f7caef..a05063de362f 100644
---- a/drivers/mtd/mtdcore.c
-+++ b/drivers/mtd/mtdcore.c
-@@ -46,7 +46,7 @@
- 
- #include "mtdcore.h"
- 
--static struct backing_dev_info *mtd_bdi;
-+struct backing_dev_info *mtd_bdi;
- 
- #ifdef CONFIG_PM_SLEEP
- 
-@@ -496,11 +496,9 @@ int add_mtd_device(struct mtd_info *mtd)
- 	 * mtd_device_parse_register() multiple times on the same master MTD,
- 	 * especially with CONFIG_MTD_PARTITIONED_MASTER=y.
- 	 */
--	if (WARN_ONCE(mtd->backing_dev_info, "MTD already registered\n"))
-+	if (WARN_ONCE(mtd->dev.type, "MTD already registered\n"))
- 		return -EEXIST;
- 
--	mtd->backing_dev_info = mtd_bdi;
--
- 	BUG_ON(mtd->writesize == 0);
- 	mutex_lock(&mtd_table_mutex);
- 
-@@ -1775,13 +1773,18 @@ static struct backing_dev_info * __init mtd_bdi_init(char *name)
- 	struct backing_dev_info *bdi;
- 	int ret;
- 
--	bdi = kzalloc(sizeof(*bdi), GFP_KERNEL);
-+	bdi = bdi_alloc(GFP_KERNEL);
- 	if (!bdi)
- 		return ERR_PTR(-ENOMEM);
- 
--	ret = bdi_setup_and_register(bdi, name);
-+	bdi->name = name;
-+	/*
-+	 * We put '-0' suffix to the name to get the same name format as we
-+	 * used to get. Since this is called only once, we get a unique name. 
-+	 */
-+	ret = bdi_register(bdi, NULL, "%.28s-0", name);
- 	if (ret)
--		kfree(bdi);
-+		bdi_put(bdi);
- 
- 	return ret ? ERR_PTR(ret) : bdi;
- }
-@@ -1813,8 +1816,7 @@ static int __init init_mtd(void)
- out_procfs:
- 	if (proc_mtd)
- 		remove_proc_entry("mtd", NULL);
--	bdi_destroy(mtd_bdi);
--	kfree(mtd_bdi);
-+	bdi_put(mtd_bdi);
- err_bdi:
- 	class_unregister(&mtd_class);
- err_reg:
-@@ -1828,8 +1830,7 @@ static void __exit cleanup_mtd(void)
- 	if (proc_mtd)
- 		remove_proc_entry("mtd", NULL);
- 	class_unregister(&mtd_class);
--	bdi_destroy(mtd_bdi);
--	kfree(mtd_bdi);
-+	bdi_put(mtd_bdi);
- 	idr_destroy(&mtd_idr);
- }
- 
-diff --git a/drivers/mtd/mtdsuper.c b/drivers/mtd/mtdsuper.c
-index 20c02a3b7417..e69e7855e31f 100644
---- a/drivers/mtd/mtdsuper.c
-+++ b/drivers/mtd/mtdsuper.c
-@@ -18,6 +18,7 @@
- #include <linux/ctype.h>
- #include <linux/slab.h>
- #include <linux/major.h>
-+#include <linux/backing-dev.h>
- 
- /*
-  * compare superblocks to see if they're equivalent
-@@ -38,6 +39,8 @@ static int get_sb_mtd_compare(struct super_block *sb, void *_mtd)
- 	return 0;
- }
- 
-+extern struct backing_dev_info *mtd_bdi;
-+
- /*
-  * mark the superblock by the MTD device it is using
-  * - set the device number to be the correct MTD block device for pesuperstence
-@@ -49,7 +52,9 @@ static int get_sb_mtd_set(struct super_block *sb, void *_mtd)
- 
- 	sb->s_mtd = mtd;
- 	sb->s_dev = MKDEV(MTD_BLOCK_MAJOR, mtd->index);
--	sb->s_bdi = mtd->backing_dev_info;
-+	sb->s_bdi = bdi_get(mtd_bdi);
-+	sb->s_iflags |= SB_I_DYNBDI;
-+
- 	return 0;
- }
- 
-diff --git a/include/linux/mtd/mtd.h b/include/linux/mtd/mtd.h
-index 13f8052b9ff9..de64f87abbe0 100644
---- a/include/linux/mtd/mtd.h
-+++ b/include/linux/mtd/mtd.h
-@@ -332,11 +332,6 @@ struct mtd_info {
- 	int (*_get_device) (struct mtd_info *mtd);
- 	void (*_put_device) (struct mtd_info *mtd);
- 
--	/* Backing device capabilities for this device
--	 * - provides mmap capabilities
--	 */
--	struct backing_dev_info *backing_dev_info;
--
- 	struct notifier_block reboot_notifier;  /* default mode before reboot */
- 
- 	/* ECC status information */
--- 
-2.10.2
+Thanks,
+//richard
