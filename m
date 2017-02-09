@@ -1,96 +1,56 @@
-Return-Path: <prvs=32104809ab=jbacik@fb.com>
-From: Josef Bacik <jbacik@fb.com>
-To: <linux-block@vger.kernel.org>, <kernel-team@fb.com>,
-        <nbd-general@lists.sourceforge.net>, <axboe@kernel.dk>
-Subject: [PATCH] nbd: freeze the queue before making changes
-Date: Mon, 6 Feb 2017 10:54:49 -0500
-Message-ID: <1486396489-2911-1-git-send-email-jbacik@fb.com>
+Return-Path: <arndbergmann@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Sender: arndbergmann@gmail.com
+In-Reply-To: <20170208221221.GA10983@sbauer-Z170X-UD5>
+References: <20170208211546.2789607-1-arnd@arndb.de> <20170208215827.GA9733@sbauer-Z170X-UD5>
+ <20170208221221.GA10983@sbauer-Z170X-UD5>
+From: Arnd Bergmann <arnd@arndb.de>
+Date: Thu, 9 Feb 2017 15:57:13 +0100
+Message-ID: <CAK8P3a17jfnGGtrb=AmY2_8R2CP8sBoUCC9NQD1w2sd_SFvOBg@mail.gmail.com>
+Subject: Re: [PATCH] block: sed-opal: reduce stack size of ioctl handler
+To: Scott Bauer <scott.bauer@intel.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Rafael Antognolli <rafael.antognolli@intel.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org, Paul Mackerras <paulus@samba.org>,
+	Benjamin Herrenschmidt <benh@kernel.crashing.org>, linuxppc-dev@lists.ozlabs.org, hch@lst.de,
+	Jonathan Derrick <jonathan.derrick@intel.com>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
-The way we make changes to the NBD device is inherently racey, as we
-could be in the middle of a request and suddenly change the number of
-connections.  In practice this isn't a big deal, but with timeouts we
-have to take the config_lock in order to protect ourselves since it is
-important those values don't change.  Fix this by freezing the queue
-before we do any of our device operations.
+On Wed, Feb 8, 2017 at 11:12 PM, Scott Bauer <scott.bauer@intel.com> wrote:
+> On Wed, Feb 08, 2017 at 02:58:28PM -0700, Scott Bauer wrote:
+>> Thank you for the report. We want to keep the function calls agnostic to userland.
+>> In the future we will have in-kernel callers and I don't want to have to do any
+>> get_fs(KERNEL_DS) wizardry.
+>>
+>> Instead I think we can use a union to lessen the stack burden. I tested this patch just now
+>> with config_ksasan and was able to build.
+>
+> Nack on this patch, it only really masks the issue. Keith pointed out we have a call chain
+> up to this ioctl then deeper down into nvme then the block layer. If we use 25% of the stack
+> just for this function it's still too dangerous and we'll run into corruption later on and not
+> remember this fix. I'll come up with another solution.
 
-Signed-off-by: Josef Bacik <jbacik@fb.com>
----
- drivers/block/nbd.c | 13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
+I think there are two issues that cause the stack frame to explode
+with KASAN, and
+your patch addresses one but not the other:
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 164a548..f8b3ecd 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -199,7 +199,6 @@ static enum blk_eh_timer_return nbd_xmit_timeout(struct request *req,
- 	if (nbd->num_connections > 1) {
- 		dev_err_ratelimited(nbd_to_dev(nbd),
- 				    "Connection timed out, retrying\n");
--		mutex_lock(&nbd->config_lock);
- 		/*
- 		 * Hooray we have more connections, requeue this IO, the submit
- 		 * path will put it on a real connection.
-@@ -213,11 +212,9 @@ static enum blk_eh_timer_return nbd_xmit_timeout(struct request *req,
- 				kernel_sock_shutdown(nsock->sock, SHUT_RDWR);
- 				mutex_unlock(&nsock->tx_lock);
- 			}
--			mutex_unlock(&nbd->config_lock);
- 			blk_mq_requeue_request(req, true);
- 			return BLK_EH_RESET_TIMER;
- 		}
--		mutex_unlock(&nbd->config_lock);
- 	} else {
- 		dev_err_ratelimited(nbd_to_dev(nbd),
- 				    "Connection timed out\n");
-@@ -225,9 +222,7 @@ static enum blk_eh_timer_return nbd_xmit_timeout(struct request *req,
- 	set_bit(NBD_TIMEDOUT, &nbd->runtime_flags);
- 	req->errors++;
- 
--	mutex_lock(&nbd->config_lock);
- 	sock_shutdown(nbd);
--	mutex_unlock(&nbd->config_lock);
- 	return BLK_EH_HANDLED;
- }
- 
-@@ -756,7 +751,9 @@ static int __nbd_ioctl(struct block_device *bdev, struct nbd_device *nbd,
- 			return -EINVAL;
- 
- 		mutex_unlock(&nbd->config_lock);
-+		blk_mq_unfreeze_queue(nbd->disk->queue);
- 		fsync_bdev(bdev);
-+		blk_mq_freeze_queue(nbd->disk->queue);
- 		mutex_lock(&nbd->config_lock);
- 
- 		/* Check again after getting mutex back.  */
-@@ -870,10 +867,14 @@ static int __nbd_ioctl(struct block_device *bdev, struct nbd_device *nbd,
- 			args[i].index = i;
- 			queue_work(recv_workqueue, &args[i].work);
- 		}
-+		blk_mq_unfreeze_queue(nbd->disk->queue);
-+
- 		wait_event_interruptible(nbd->recv_wq,
- 					 atomic_read(&nbd->recv_threads) == 0);
- 		for (i = 0; i < num_connections; i++)
- 			flush_work(&args[i].work);
-+
-+		blk_mq_freeze_queue(nbd->disk->queue);
- 		nbd_dev_dbg_close(nbd);
- 		nbd_size_clear(nbd, bdev);
- 		device_remove_file(disk_to_dev(nbd->disk), &pid_attr);
-@@ -924,9 +925,11 @@ static int nbd_ioctl(struct block_device *bdev, fmode_t mode,
- 
- 	BUG_ON(nbd->magic != NBD_MAGIC);
- 
-+	blk_mq_freeze_queue(nbd->disk->queue);
- 	mutex_lock(&nbd->config_lock);
- 	error = __nbd_ioctl(bdev, nbd, cmd, arg);
- 	mutex_unlock(&nbd->config_lock);
-+	blk_mq_unfreeze_queue(nbd->disk->queue);
- 
- 	return error;
- }
--- 
-2.7.4
+1. checks for variables being accessed after they go out of scope.
+This is solved by the
+   union at the start of the function, as they never go out of scope now.
+
+2. checks for array overflows when passing a local variable by
+reference to another
+   function that is not inlined.
+
+To solve the second problem while keeping the in-kernel interface, the
+approach that
+David suggesteed would work, or you could have a wrapper around each function to
+do the copy_from_user in a more obvious but verbose way as I had in my version.
+
+With David's approach, you could actually replace the switch() with a
+lookup table
+as well.
+
+    Arnd
