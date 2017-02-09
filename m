@@ -1,24 +1,26 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:38257 "EHLO mx2.suse.de"
+Received: from mx1.redhat.com ([209.132.183.28]:52956 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751318AbdBIQIv (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 9 Feb 2017 11:08:51 -0500
+        id S1753892AbdBIPiF (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 9 Feb 2017 10:38:05 -0500
+Date: Thu, 9 Feb 2017 10:27:45 -0500
+From: Mike Snitzer <snitzer@redhat.com>
+To: Damien Le Moal <damien.lemoal@wdc.com>
+Cc: dm-devel@redhat.com, Alasdair Kergon <agk@redhat.com>,
+        Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>,
+        linux-block@vger.kernel.org
 Subject: Re: [PATCH 1/1] dm-zoned: Zoned block device target
-To: Damien Le Moal <damien.lemoal@wdc.com>, dm-devel@redhat.com,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>
+Message-ID: <20170209152745.GA10638@redhat.com>
 References: <20170209041849.30964-1-damien.lemoal@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <d2353e66-183c-1f71-7a64-52e4b862bc17@suse.de>
-Date: Thu, 9 Feb 2017 17:07:19 +0100
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <20170209041849.30964-1-damien.lemoal@wdc.com>
-Content-Type: text/plain; charset=windows-1252
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 02/09/2017 05:18 AM, Damien Le Moal wrote:
+On Wed, Feb 08 2017 at 11:18pm -0500,
+Damien Le Moal <damien.lemoal@wdc.com> wrote:
+
 > The dm-zoned device mapper target provides transparent write access
 > to zoned block devices (ZBC and ZAC compliant block devices).
 > dm-zoned hides to the device user (a file system or an application
@@ -34,177 +36,42 @@ On 02/09/2017 05:18 AM, Damien Le Moal wrote:
 > regular write access (such as metadata blocks of an FS) remain stored in
 > conventional zones, resulting in no apparent write overhead.
 > 
-[ .. ]
-> +/*
-> + * CRC32
-> + */
-> +static u32 dmz_sb_crc32(u32 crc, const void *buf, size_t length)
-> +{
-> +	unsigned char *p = (unsigned char *)buf;
-> +	int i;
-> +
-> +#define CRCPOLY_LE 0xedb88320
-> +
-> +	while (length--) {
-> +		crc ^= *p++;
-> +		for (i = 0; i < 8; i++)
-> +			crc = (crc >> 1) ^ ((crc & 1) ? CRCPOLY_LE : 0);
-> +	}
-> +
-> +	return crc;
-> +}
-> +
-Why do you insist on your own CRC32 implementations?
-Don't we have enough already?
+> dm-zoned implementation focus on simplicity and on minimizing overhead
+> (CPU, memory and storage overhead). For a 10TB host-managed disk with
+> 256 MB zones, dm-zoned memory usage per disk instance is at most 4.5 MB
+> and as little as 5 zones will be used internally for storing metadata
+> and performing buffer zone reclaim operations. This is achieved using
+> zone level indirection rather than a full block indirection system for
+> managing block movement between zones.
+> 
+> dm-zoned primary target is host-managed zoned block devices but it can also
+> be used with host-aware device models to mitigate potential device-side
+> performance degradation due to excessive random writing.
+> 
+> dm-zoned backend devices can be formatted and checked using the dmzadm
+> utility available at:
+> 
+> https://github.com/hgst/dm-zoned-tools
+> 
+> This patch applies on top of 4.10-rc7 tree.
+> 
+> Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
 
-[ .. ]
-> +/*
-> + * Write blocks.
-> + */
-> +static int dmz_reclaim_write(struct dm_zoned_target *dzt,
-> +			     struct dm_zone *zone,
-> +			     struct dm_zoned_ioreg **ioregs,
-> +			     unsigned int nr_ioregs)
-> +{
-> +	struct dm_zoned_ioreg *ioreg;
-> +	sector_t chunk_block;
-> +	int i, ret = 0;
-> +
-> +	for (i = 0; i < nr_ioregs; i++) {
-> +
-> +		ioreg = ioregs[i];
-> +
-> +		/* Wait for the read I/O to complete */
-> +		wait_for_completion_io(&ioreg->wait);
-> +
-> +		if (ret || ioreg->err) {
-> +			if (ret == 0)
-> +				ret = ioreg->err;
-> +			dmz_reclaim_free_ioreg(ioreg);
-> +			ioregs[i] = NULL;
-> +			continue;
-> +		}
-> +
-> +		chunk_block = ioreg->chunk_block;
-> +
-> +		dmz_dev_debug(dzt,
-> +			      "Reclaim: Write %s zone %u, block %llu+%u\n",
-> +			      dmz_is_rnd(zone) ? "RND" : "SEQ",
-> +			      dmz_id(dzt, zone),
-> +			      (unsigned long long)chunk_block,
-> +			      ioreg->nr_blocks);
-> +
-> +		/*
-> +		 * If we are writing in a sequential zones,
-> +		 * we must make sure that writes are sequential. So
-> +		 * fill up any eventual hole between writes.
-> +		 */
-> +		if (dmz_is_seq(zone)) {
-> +			ret = dmz_reclaim_align_wp(dzt, zone, chunk_block);
-> +			if (ret)
-> +				break;
-> +		}
-> +
-> +		/* Do write */
-> +		dmz_reclaim_submit_ioreg(dzt, zone, ioreg, REQ_OP_WRITE);
-> +		wait_for_completion_io(&ioreg->wait);
-> +
-> +		ret = ioreg->err;
-> +		if (ret) {
-> +			dmz_dev_err(dzt, "Reclaim: Write failed\n");
-> +		} else {
-> +			if (dmz_is_seq(zone))
-> +				zone->wp_block += ioreg->nr_blocks;
-> +			ret = dmz_validate_blocks(dzt, zone, chunk_block,
-> +						  ioreg->nr_blocks);
-> +		}
-> +
-> +		ioregs[i] = NULL;
-> +		dmz_reclaim_free_ioreg(ioreg);
-> +
-> +	}
-> +
-> +	return ret;
-> +}
-> +
-> +/*
-> + * Move valid blocks of src_zone into dst_zone.
-> + */
-> +static int dmz_reclaim_copy_zone(struct dm_zoned_target *dzt,
-> +				 struct dm_zone *src_zone,
-> +				 struct dm_zone *dst_zone)
-> +{
-> +	struct dm_zoned_ioreg *ioregs[DMZ_RECLAIM_MAX_IOREGS];
-> +	struct dm_zoned_ioreg *ioreg;
-> +	sector_t chunk_block = 0;
-> +	sector_t first_block, end_block;
-> +	int nr_ioregs = 0, i, ret;
-> +
-> +	if (dmz_is_seq(src_zone))
-> +		end_block = src_zone->wp_block;
-> +	else
-> +		end_block = dzt->zone_nr_blocks;
-> +
-> +	while (chunk_block < end_block) {
-> +
-> +		/* Read valid regions from source zone */
-> +		nr_ioregs = 0;
-> +		first_block = chunk_block;
-> +		while (nr_ioregs < DMZ_RECLAIM_MAX_IOREGS &&
-> +		       chunk_block < end_block) {
-> +
-> +			ioreg = dmz_reclaim_read(dzt, src_zone, chunk_block);
-> +			if (IS_ERR(ioreg)) {
-> +				ret = PTR_ERR(ioreg);
-> +				goto err;
-> +			}
-> +			if (!ioreg)
-> +				break;
-> +
-> +			chunk_block = ioreg->chunk_block + ioreg->nr_blocks;
-> +			ioregs[nr_ioregs] = ioreg;
-> +			nr_ioregs++;
-> +
-> +		}
-> +
-> +		/* Are we done ? */
-> +		if (!nr_ioregs)
-> +			break;
-> +
-> +		/* Write in destination zone */
-> +		ret = dmz_reclaim_write(dzt, dst_zone, ioregs, nr_ioregs);
-> +		if (ret != 0) {
-> +			dmz_invalidate_blocks(dzt, dst_zone,
-> +					      first_block,
-> +					      end_block - first_block);
-> +			goto err;
-> +		}
-> +
-> +	}
-> +
-> +	return 0;
-> +
-> +err:
-> +	for (i = 0; i < nr_ioregs; i++) {
-> +		ioreg = ioregs[i];
-> +		if (ioreg) {
-> +			wait_for_completion_io(&ioreg->wait);
-> +			dmz_reclaim_free_ioreg(ioreg);
-> +		}
-> +	}
-> +
-> +	return ret;
-> +}
-> +
-Have you looked at using dm-kcopyd for doing the reclaim?
-What's inhibiting you from using it?
+Looks like this work has come a long way.  While I am _still_ not
+hearing from any customers (or partners) that SMR is a priority I do
+acknowledge that that obviously isn't the case for WDC and others.
 
-Cheers,
+So, I'll sign up for reviewing this DM target, with a focus on DM
+interface and implementation details, _after_ I get some technical
+review (e.g. Reviewed-by) from people like Hannes and others more
+invested in the SMR technologies.  Basically I don't know enough about
+the constraints of these devices to fully appreciate and catch some
+issue in the particulars of the algorithms used to mitigate SMR's
+quirks.
 
-Hannes
--- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: F. Imend�rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG N�rnberg)
+I'd also like to understand how invested WDC is in maintaining this DM
+target for years and years if/when I were to merge this DM target into
+mainline.
+
+Thanks,
+Mike
