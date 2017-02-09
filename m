@@ -1,57 +1,89 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f196.google.com ([209.85.192.196]:33198 "EHLO
-        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751891AbdBEGWx (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 5 Feb 2017 01:22:53 -0500
-From: Ming Lei <tom.leiming@gmail.com>
-To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
-        linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        NeilBrown <neilb@suse.com>
-Cc: Ming Lei <tom.leiming@gmail.com>
-Subject: [PATCH 4/4] md: fast clone bio in bio_clone_mddev()
-Date: Sun,  5 Feb 2017 14:22:13 +0800
-Message-Id: <1486275733-7268-5-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1486275733-7268-1-git-send-email-tom.leiming@gmail.com>
-References: <1486275733-7268-1-git-send-email-tom.leiming@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Subject: Re: [PATCH 16/24] exofs: Convert to separately allocated bdi
+To: Jan Kara <jack@suse.cz>, linux-fsdevel@vger.kernel.org
+References: <20170202173422.3240-1-jack@suse.cz>
+ <20170202173422.3240-17-jack@suse.cz>
+Cc: Christoph Hellwig <hch@infradead.org>, linux-block@vger.kernel.org,
+        Benny Halevy <bhalevy@primarydata.com>, osd-dev@open-osd.org
+From: Boaz Harrosh <ooo@electrozaur.com>
+Message-ID: <e73654c6-d17e-6e47-ac81-0459ae3a51fc@electrozaur.com>
+Date: Thu, 9 Feb 2017 16:23:12 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170202173422.3240-17-jack@suse.cz>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Firstly bio_clone_mddev() is used in raid normal I/O and isn't
-in resync I/O path.
+On 02/02/2017 07:34 PM, Jan Kara wrote:
+> Allocate struct backing_dev_info separately instead of embedding it
+> inside the superblock. This unifies handling of bdi among users.
+> 
+> CC: Boaz Harrosh <ooo@electrozaur.com>
+> CC: Benny Halevy <bhalevy@primarydata.com>
+> CC: osd-dev@open-osd.org
 
-Secondly all the direct access to bvec table in raid happens on
-resync I/O except for write behind of raid1, in which we still
-use bio_clone() for allocating new bvec table.
+ACK-by: Boaz Harrosh <ooo@electrozaur.com>
 
-So this patch replaces bio_clone() with bio_clone_fast()
-in bio_clone_mddev().
+Looks fine thanks
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
----
- drivers/md/md.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/md/md.c b/drivers/md/md.c
-index 704be11355a9..7d176f025add 100644
---- a/drivers/md/md.c
-+++ b/drivers/md/md.c
-@@ -193,10 +193,14 @@ EXPORT_SYMBOL_GPL(bio_alloc_mddev);
- struct bio *bio_clone_mddev(struct bio *bio, gfp_t gfp_mask,
- 			    struct mddev *mddev)
- {
-+	struct bio_set *bs;
-+
- 	if (!mddev || !mddev->bio_set)
--		return bio_clone(bio, gfp_mask);
-+		bs = fs_bio_set;
-+	else
-+		bs = mddev->bio_set;
- 
--	return bio_clone_bioset(bio, gfp_mask, mddev->bio_set);
-+	return bio_clone_fast(bio, gfp_mask, bs);
- }
- EXPORT_SYMBOL_GPL(bio_clone_mddev);
- 
--- 
-2.7.4
+> Signed-off-by: Jan Kara <jack@suse.cz>
+> ---
+>  fs/exofs/exofs.h |  1 -
+>  fs/exofs/super.c | 17 ++++++-----------
+>  2 files changed, 6 insertions(+), 12 deletions(-)
+> 
+> diff --git a/fs/exofs/exofs.h b/fs/exofs/exofs.h
+> index 2e86086bc940..5dc392404559 100644
+> --- a/fs/exofs/exofs.h
+> +++ b/fs/exofs/exofs.h
+> @@ -64,7 +64,6 @@ struct exofs_dev {
+>   * our extension to the in-memory superblock
+>   */
+>  struct exofs_sb_info {
+> -	struct backing_dev_info bdi;		/* register our bdi with VFS  */
+>  	struct exofs_sb_stats s_ess;		/* Written often, pre-allocate*/
+>  	int		s_timeout;		/* timeout for OSD operations */
+>  	uint64_t	s_nextid;		/* highest object ID used     */
+> diff --git a/fs/exofs/super.c b/fs/exofs/super.c
+> index 1076a4233b39..819624cfc8da 100644
+> --- a/fs/exofs/super.c
+> +++ b/fs/exofs/super.c
+> @@ -464,7 +464,6 @@ static void exofs_put_super(struct super_block *sb)
+>  			    sbi->one_comp.obj.partition);
+>  
+>  	exofs_sysfs_sb_del(sbi);
+> -	bdi_destroy(&sbi->bdi);
+>  	exofs_free_sbi(sbi);
+>  	sb->s_fs_info = NULL;
+>  }
+> @@ -809,8 +808,12 @@ static int exofs_fill_super(struct super_block *sb, void *data, int silent)
+>  	__sbi_read_stats(sbi);
+>  
+>  	/* set up operation vectors */
+> -	sbi->bdi.ra_pages = __ra_pages(&sbi->layout);
+> -	sb->s_bdi = &sbi->bdi;
+> +	ret = super_setup_bdi(sb);
+> +	if (ret) {
+> +		EXOFS_DBGMSG("Failed to super_setup_bdi\n");
+> +		goto free_sbi;
+> +	}
+> +	sb->s_bdi->ra_pages = __ra_pages(&sbi->layout);
+>  	sb->s_fs_info = sbi;
+>  	sb->s_op = &exofs_sops;
+>  	sb->s_export_op = &exofs_export_ops;
+> @@ -836,14 +839,6 @@ static int exofs_fill_super(struct super_block *sb, void *data, int silent)
+>  		goto free_sbi;
+>  	}
+>  
+> -	ret = bdi_setup_and_register(&sbi->bdi, "exofs");
+> -	if (ret) {
+> -		EXOFS_DBGMSG("Failed to bdi_setup_and_register\n");
+> -		dput(sb->s_root);
+> -		sb->s_root = NULL;
+> -		goto free_sbi;
+> -	}
+> -
+>  	exofs_sysfs_dbg_print();
+>  	_exofs_print_device("Mounting", opts->dev_name,
+>  			    ore_comp_dev(&sbi->oc, 0),
+> 
