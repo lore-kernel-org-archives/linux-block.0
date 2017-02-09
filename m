@@ -1,215 +1,72 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:39733 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751055AbdBID6p (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Feb 2017 22:58:45 -0500
-Date: Wed, 8 Feb 2017 19:57:27 -0800
-From: Matthew Wilcox <willy@infradead.org>
-To: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Cc: Theodore Ts'o <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCHv6 01/37] mm, shmem: swich huge tmpfs to multi-order
- radix-tree entries
-Message-ID: <20170209035727.GQ2267@bombadil.infradead.org>
-References: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
- <20170126115819.58875-2-kirill.shutemov@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170126115819.58875-2-kirill.shutemov@linux.intel.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linus.walleij@linaro.org>
+Return-Path: <linus.walleij@linaro.org>
+From: Linus Walleij <linus.walleij@linaro.org>
+To: linux-mmc@vger.kernel.org,
+	Ulf Hansson <ulf.hansson@linaro.org>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	Paolo Valente <paolo.valente@linaro.org>
+Cc: Chunyan Zhang <zhang.chunyan@linaro.org>,
+	Baolin Wang <baolin.wang@linaro.org>,
+	linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Linus Walleij <linus.walleij@linaro.org>
+Subject: [PATCH 04/16] mmc: core: move the asynchronous post-processing
+Date: Thu,  9 Feb 2017 16:33:51 +0100
+Message-Id: <20170209153403.9730-5-linus.walleij@linaro.org>
+In-Reply-To: <20170209153403.9730-1-linus.walleij@linaro.org>
+References: <20170209153403.9730-1-linus.walleij@linaro.org>
+List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Jan 26, 2017 at 02:57:43PM +0300, Kirill A. Shutemov wrote:
-> +++ b/include/linux/pagemap.h
-> @@ -332,6 +332,15 @@ static inline struct page *grab_cache_page_nowait(struct address_space *mapping,
->  			mapping_gfp_mask(mapping));
->  }
->  
-> +static inline struct page *find_subpage(struct page *page, pgoff_t offset)
-> +{
-> +	VM_BUG_ON_PAGE(PageTail(page), page);
-> +	VM_BUG_ON_PAGE(page->index > offset, page);
-> +	VM_BUG_ON_PAGE(page->index + (1 << compound_order(page)) < offset,
-> +			page);
-> +	return page - page->index + offset;
-> +}
+This moves the asynchronous post-processing of a request over
+to the finalization function.
 
-What would you think to:
+The patch has a slight semantic change:
 
-static inline void check_page_index(struct page *page, pgoff_t offset)
-{
-	VM_BUG_ON_PAGE(PageTail(page), page);
-	VM_BUG_ON_PAGE(page->index > offset, page);
-	VM_BUG_ON_PAGE(page->index + (1 << compound_order(page)) <= offset,
-			page);
-}
+Both places will be in the code path for if (host->areq) and
+in the same sequence, but before this patch, the next request
+was started before performing post-processing.
 
-(I think I fixed an off-by-one error up there ...  if
-index + (1 << order) == offset, this is also a bug, right?
-because offset would then refer to the next page, not this page)
+The effect is that whereas before, the post- and preprocessing
+happened after starting the next request, now the preprocessing
+will happen after the request is done and before the next has
+started which would cut half of the pre/post optimizations out.
 
-static inline struct page *find_subpage(struct page *page, pgoff_t offset)
-{
-	check_page_index(page, offset);
-	return page + (offset - page->index);
-}
+The idea is to later move the finalization to a worker started
+by mmc_request_done() and introduce a completion where the code
+now has a TODO comment so that we can push in a new request
+as soon as the host has completed the previous one.
 
-... then you can use check_page_index down ...
+Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+---
+ drivers/mmc/core/core.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
-> @@ -1250,7 +1233,6 @@ struct page *find_lock_entry(struct address_space *mapping, pgoff_t offset)
->  			put_page(page);
->  			goto repeat;
->  		}
-> -		VM_BUG_ON_PAGE(page_to_pgoff(page) != offset, page);
-
-... here?
-
-> @@ -1472,25 +1451,35 @@ unsigned find_get_pages(struct address_space *mapping, pgoff_t start,
->  			goto repeat;
->  		}
->  
-> +		/* For multi-order entries, find relevant subpage */
-> +		if (PageTransHuge(page)) {
-> +			VM_BUG_ON(index - page->index < 0);
-> +			VM_BUG_ON(index - page->index >= HPAGE_PMD_NR);
-> +			page += index - page->index;
-> +		}
-
-Use find_subpage() here?
-
->  		pages[ret] = page;
->  		if (++ret == nr_pages)
->  			break;
-> +		if (!PageTransCompound(page))
-> +			continue;
-> +		for (refs = 0; ret < nr_pages &&
-> +				(index + 1) % HPAGE_PMD_NR;
-> +				ret++, refs++, index++)
-> +			pages[ret] = ++page;
-> +		if (refs)
-> +			page_ref_add(compound_head(page), refs);
-> +		if (ret == nr_pages)
-> +			break;
-
-Can we avoid referencing huge pages specifically in the page cache?  I'd
-like us to get to the point where we can put arbitrary compound pages into
-the page cache.  For example, I think this can be written as:
-
-		if (!PageCompound(page))
-			continue;
-		for (refs = 0; ret < nr_pages; refs++, index++) {
-			if (index > page->index + (1 << compound_order(page)))
-				break;
-			pages[ret++] = ++page;
-		}
-		if (refs)
-			page_ref_add(compound_head(page), refs);
-		if (ret == nr_pages)
-			break;
-
-> @@ -1541,19 +1533,12 @@ unsigned find_get_pages_contig(struct address_space *mapping, pgoff_t index,
->  
-> +		/* For multi-order entries, find relevant subpage */
-> +		if (PageTransHuge(page)) {
-> +			VM_BUG_ON(index - page->index < 0);
-> +			VM_BUG_ON(index - page->index >= HPAGE_PMD_NR);
-> +			page += index - page->index;
-> +		}
-> +
->  		pages[ret] = page;
->  		if (++ret == nr_pages)
->  			break;
-> +		if (!PageTransCompound(page))
-> +			continue;
-> +		for (refs = 0; ret < nr_pages &&
-> +				(index + 1) % HPAGE_PMD_NR;
-> +				ret++, refs++, index++)
-> +			pages[ret] = ++page;
-> +		if (refs)
-> +			page_ref_add(compound_head(page), refs);
-> +		if (ret == nr_pages)
-> +			break;
->  	}
->  	rcu_read_unlock();
->  	return ret;
-
-Ugh, the same code again.  Hmm ... we only need to modify 'ret' as a result
-of this ... so could we split it out like this?
-
-static unsigned populate_pages(struct page **pages, unsigned i, unsigned max,
-                                struct page *page)
-{
-        unsigned refs = 0;
-        for (;;) {
-                pages[i++] = page;
-                if (i == max)
-                        break;
-                if (PageHead(page + 1))
-                        break;
-                page++;
-                refs++;
-        }
-        if (refs)
-                page_ref_add(compound_head(page), refs);
-        return i;
-}
-
-> +unsigned find_get_pages_tag(struct address_space *mapping, pgoff_t *indexp,
->  			int tag, unsigned int nr_pages, struct page **pages)
-
->  			break;
-> +		if (!PageTransCompound(page))
-> +			continue;
-> +		for (refs = 0; ret < nr_pages &&
-> +				(index + 1) % HPAGE_PMD_NR;
-> +				ret++, refs++, index++)
-> +			pages[ret] = ++page;
-> +		if (refs)
-> +			page_ref_add(compound_head(page), refs);
-> +		if (ret == nr_pages)
-> +			break;
->  	}
-
-... and again!
-
-> @@ -2326,25 +2337,26 @@ void filemap_map_pages(struct vm_fault *vmf,
-> +		/* For multi-order entries, find relevant subpage */
-> +		if (PageTransHuge(page)) {
-> +			VM_BUG_ON(index - page->index < 0);
-> +			VM_BUG_ON(index - page->index >= HPAGE_PMD_NR);
-> +			page += index - page->index;
-> +		}
-> +
->  		if (!PageUptodate(page) ||
->  				PageReadahead(page) ||
-
-Readahead is PF_NO_COMPOUND ... so I don't see why this works?
-
-> @@ -2378,8 +2390,14 @@ void filemap_map_pages(struct vm_fault *vmf,
->  		/* Huge page is mapped? No need to proceed. */
->  		if (pmd_trans_huge(*vmf->pmd))
->  			break;
-> -		if (iter.index == end_pgoff)
-> +		if (index == end_pgoff)
->  			break;
-> +		if (page && PageTransCompound(page) &&
-> +				(index & (HPAGE_PMD_NR - 1)) !=
-> +				HPAGE_PMD_NR - 1) {
-> +			index++;
-> +			goto repeat;
-
-Do we really have to go all the way back to the beginning of the loop?  It'd
-be nice to be able to insert all of the relevant PTEs in a shorter loop here.
-We'd need to bump the reference count N more times, and I think we do need
-to check HWPoison for each subpage.
+diff --git a/drivers/mmc/core/core.c b/drivers/mmc/core/core.c
+index 8dbed198750f..0972c649ea7a 100644
+--- a/drivers/mmc/core/core.c
++++ b/drivers/mmc/core/core.c
+@@ -643,6 +643,9 @@ static enum mmc_blk_status mmc_finalize_areq(struct mmc_host *host)
+ 		mmc_start_bkops(host->card, true);
+ 	}
+ 
++	/* Successfully postprocess the old request at this point */
++	mmc_post_req(host, host->areq->mrq, 0);
++
+ 	return status;
+ }
+ 
+@@ -687,10 +690,6 @@ struct mmc_async_req *mmc_start_areq(struct mmc_host *host,
+ 	if (status == MMC_BLK_SUCCESS && areq)
+ 		start_err = __mmc_start_data_req(host, areq->mrq);
+ 
+-	/* Postprocess the old request at this point */
+-	if (host->areq)
+-		mmc_post_req(host, host->areq->mrq, 0);
+-
+ 	/* Cancel a prepared request if it was not started. */
+ 	if ((status != MMC_BLK_SUCCESS || start_err) && areq)
+ 		mmc_post_req(host, areq->mrq, -EINVAL);
+-- 
+2.9.3
