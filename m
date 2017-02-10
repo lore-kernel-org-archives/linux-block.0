@@ -1,164 +1,162 @@
-Return-Path: <jack@suse.cz>
-From: Jan Kara <jack@suse.cz>
+Return-Path: <hare@suse.de>
+From: Hannes Reinecke <hare@suse.de>
 To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Tejun Heo <tj@kernel.org>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
-	NeilBrown <neilb@suse.de>,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH 07/10] writeback: Implement reliable switching to default writeback structure
-Date: Thu,  9 Feb 2017 13:44:30 +0100
-Message-Id: <20170209124433.2626-8-jack@suse.cz>
-In-Reply-To: <20170209124433.2626-1-jack@suse.cz>
-References: <20170209124433.2626-1-jack@suse.cz>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Ming Lei <tom.leiming@gmail.com>,
+	Martin Schwidefsky <schwidefsky@de.ibm.com>,
+	linux-block@vger.kernel.org,
+	Linux Kernel Mailinglist <linux-kernel@vger.kernel.org>,
+	Hannes Reinecke <hare@suse.de>,
+	Hannes Reinecke <hare@suse.com>
+Subject: [PATCHv5 2/2] loop: support 4k physical blocksize
+Date: Fri, 10 Feb 2017 09:43:08 +0100
+Message-Id: <1486716188-38638-3-git-send-email-hare@suse.de>
+In-Reply-To: <1486716188-38638-1-git-send-email-hare@suse.de>
+References: <1486716188-38638-1-git-send-email-hare@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Currently switching of inode between different writeback structures is
-asynchronous and not guaranteed to succeed. Add a variant of switching
-that is synchronous and reliable so that it can reliably move inode to
-the default writeback structure (bdi->wb) when writeback on bdi is going
-to be shutdown.
+When generating bootable VM images certain systems (most notably
+s390x) require devices with 4k blocksize. This patch implements
+a new flag 'LO_FLAGS_BLOCKSIZE' which will set the physical
+blocksize to that of the underlying device, and allow to change
+the logical blocksize for up to the physical blocksize.
 
-Signed-off-by: Jan Kara <jack@suse.cz>
+Signed-off-by: Hannes Reinecke <hare@suse.com>
 ---
- fs/fs-writeback.c         | 60 ++++++++++++++++++++++++++++++++++++++++-------
- include/linux/fs.h        |  3 ++-
- include/linux/writeback.h |  6 +++++
- 3 files changed, 60 insertions(+), 9 deletions(-)
+ drivers/block/loop.c      | 36 +++++++++++++++++++++++++++++++-----
+ drivers/block/loop.h      |  1 +
+ include/uapi/linux/loop.h |  3 +++
+ 3 files changed, 35 insertions(+), 5 deletions(-)
 
-diff --git a/fs/fs-writeback.c b/fs/fs-writeback.c
-index 23dc97cf2a50..52992a1036b1 100644
---- a/fs/fs-writeback.c
-+++ b/fs/fs-writeback.c
-@@ -332,14 +332,11 @@ struct inode_switch_wbs_context {
- 	struct work_struct	work;
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 8dae865..776b3c6 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -221,7 +221,8 @@ static void __loop_update_dio(struct loop_device *lo, bool dio)
+ }
+ 
+ static int
+-figure_loop_size(struct loop_device *lo, loff_t offset, loff_t sizelimit)
++figure_loop_size(struct loop_device *lo, loff_t offset, loff_t sizelimit,
++		 loff_t logical_blocksize)
+ {
+ 	loff_t size = get_size(offset, sizelimit, lo->lo_backing_file);
+ 	sector_t x = (sector_t)size;
+@@ -233,6 +234,12 @@ static void __loop_update_dio(struct loop_device *lo, bool dio)
+ 		lo->lo_offset = offset;
+ 	if (lo->lo_sizelimit != sizelimit)
+ 		lo->lo_sizelimit = sizelimit;
++	if (lo->lo_flags & LO_FLAGS_BLOCKSIZE) {
++		lo->lo_logical_blocksize = logical_blocksize;
++		blk_queue_physical_block_size(lo->lo_queue, lo->lo_blocksize);
++		blk_queue_logical_block_size(lo->lo_queue,
++					     lo->lo_logical_blocksize);
++	}
+ 	set_capacity(lo->lo_disk, x);
+ 	bd_set_size(bdev, (loff_t)get_capacity(bdev->bd_disk) << 9);
+ 	/* let user-space know about the new size */
+@@ -814,6 +821,7 @@ static void loop_config_discard(struct loop_device *lo)
+ 	struct file *file = lo->lo_backing_file;
+ 	struct inode *inode = file->f_mapping->host;
+ 	struct request_queue *q = lo->lo_queue;
++	int lo_bits = blksize_bits(lo->lo_logical_blocksize);
+ 
+ 	/*
+ 	 * We use punch hole to reclaim the free space used by the
+@@ -833,7 +841,7 @@ static void loop_config_discard(struct loop_device *lo)
+ 
+ 	q->limits.discard_granularity = inode->i_sb->s_blocksize;
+ 	q->limits.discard_alignment = 0;
+-	blk_queue_max_discard_sectors(q, UINT_MAX >> 9);
++	blk_queue_max_discard_sectors(q, UINT_MAX >> lo_bits);
+ 	q->limits.discard_zeroes_data = 1;
+ 	queue_flag_set_unlocked(QUEUE_FLAG_DISCARD, q);
+ }
+@@ -922,6 +930,7 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
+ 
+ 	lo->use_dio = false;
+ 	lo->lo_blocksize = lo_blocksize;
++	lo->lo_logical_blocksize = 512;
+ 	lo->lo_device = bdev;
+ 	lo->lo_flags = lo_flags;
+ 	lo->lo_backing_file = file;
+@@ -1087,6 +1096,7 @@ static int loop_clr_fd(struct loop_device *lo)
+ 	int err;
+ 	struct loop_func_table *xfer;
+ 	kuid_t uid = current_uid();
++	int lo_flags = lo->lo_flags;
+ 
+ 	if (lo->lo_encrypt_key_size &&
+ 	    !uid_eq(lo->lo_key_owner, uid) &&
+@@ -1116,9 +1126,24 @@ static int loop_clr_fd(struct loop_device *lo)
+ 	if (err)
+ 		return err;
+ 
++	if (info->lo_flags & LO_FLAGS_BLOCKSIZE) {
++		lo->lo_flags |= LO_FLAGS_BLOCKSIZE;
++		if (LO_INFO_BLOCKSIZE(info) != 512 &&
++		    LO_INFO_BLOCKSIZE(info) != 1024 &&
++		    LO_INFO_BLOCKSIZE(info) != 2048 &&
++		    LO_INFO_BLOCKSIZE(info) != 4096)
++			return -EINVAL;
++		if (LO_INFO_BLOCKSIZE(info) > lo->lo_blocksize)
++			return -EINVAL;
++	}
++
+ 	if (lo->lo_offset != info->lo_offset ||
+-	    lo->lo_sizelimit != info->lo_sizelimit)
+-		if (figure_loop_size(lo, info->lo_offset, info->lo_sizelimit))
++	    lo->lo_sizelimit != info->lo_sizelimit ||
++	    lo->lo_flags != lo_flags ||
++	    ((lo->lo_flags & LO_FLAGS_BLOCKSIZE) &&
++	     lo->lo_logical_blocksize != LO_INFO_BLOCKSIZE(info)))
++		if (figure_loop_size(lo, info->lo_offset, info->lo_sizelimit,
++				     info->lo_init[0]))
+ 			return -EFBIG;
+ 
+ 	loop_config_discard(lo);
+@@ -1303,7 +1328,8 @@ static int loop_set_capacity(struct loop_device *lo)
+ 	if (unlikely(lo->lo_state != Lo_bound))
+ 		return -ENXIO;
+ 
+-	return figure_loop_size(lo, lo->lo_offset, lo->lo_sizelimit);
++	return figure_loop_size(lo, lo->lo_offset, lo->lo_sizelimit,
++				lo->lo_logical_blocksize);
+ }
+ 
+ static int loop_set_dio(struct loop_device *lo, unsigned long arg)
+diff --git a/drivers/block/loop.h b/drivers/block/loop.h
+index fb2237c..579f2f7 100644
+--- a/drivers/block/loop.h
++++ b/drivers/block/loop.h
+@@ -49,6 +49,7 @@ struct loop_device {
+ 	struct file *	lo_backing_file;
+ 	struct block_device *lo_device;
+ 	unsigned	lo_blocksize;
++	unsigned	lo_logical_blocksize;
+ 	void		*key_data; 
+ 
+ 	gfp_t		old_gfp_mask;
+diff --git a/include/uapi/linux/loop.h b/include/uapi/linux/loop.h
+index c8125ec..a3960f9 100644
+--- a/include/uapi/linux/loop.h
++++ b/include/uapi/linux/loop.h
+@@ -22,6 +22,7 @@ enum {
+ 	LO_FLAGS_AUTOCLEAR	= 4,
+ 	LO_FLAGS_PARTSCAN	= 8,
+ 	LO_FLAGS_DIRECT_IO	= 16,
++	LO_FLAGS_BLOCKSIZE	= 32,
  };
  
--static void inode_switch_wbs_work_fn(struct work_struct *work)
-+static void do_inode_switch_wbs(struct inode *inode,
-+				struct bdi_writeback *new_wb)
- {
--	struct inode_switch_wbs_context *isw =
--		container_of(work, struct inode_switch_wbs_context, work);
--	struct inode *inode = isw->inode;
- 	struct address_space *mapping = inode->i_mapping;
- 	struct bdi_writeback *old_wb = inode->i_wb;
--	struct bdi_writeback *new_wb = isw->new_wb;
- 	struct radix_tree_iter iter;
- 	bool switched = false;
- 	void **slot;
-@@ -436,15 +433,29 @@ static void inode_switch_wbs_work_fn(struct work_struct *work)
- 	spin_unlock(&new_wb->list_lock);
- 	spin_unlock(&old_wb->list_lock);
+ #include <asm/posix_types.h>	/* for __kernel_old_dev_t */
+@@ -59,6 +60,8 @@ struct loop_info64 {
+ 	__u64		   lo_init[2];
+ };
  
-+	/*
-+	 * Make sure waitqueue_active() check in wake_up_bit() cannot happen
-+	 * before I_WB_SWITCH is cleared. Pairs with the barrier in
-+	 * set_task_state() after wait_on_bit() added waiter to the wait queue.
-+	 */
-+	smp_mb();
-+	wake_up_bit(&inode->i_state, __I_WB_SWITCH);
++#define LO_INFO_BLOCKSIZE(l) (l)->lo_init[0]
 +
- 	if (switched) {
- 		wb_wakeup(new_wb);
- 		wb_put(old_wb);
- 	}
--	wb_put(new_wb);
-+}
- 
--	iput(inode);
--	kfree(isw);
-+static void inode_switch_wbs_work_fn(struct work_struct *work)
-+{
-+	struct inode_switch_wbs_context *isw =
-+		container_of(work, struct inode_switch_wbs_context, work);
- 
-+	do_inode_switch_wbs(isw->inode, isw->new_wb);
-+	wb_put(isw->new_wb);
-+	iput(isw->inode);
-+	kfree(isw);
- 	atomic_dec(&isw_nr_in_flight);
- }
- 
-@@ -521,6 +532,39 @@ static void inode_switch_wbs(struct inode *inode, int new_wb_id)
- }
- 
- /**
-+ * inode_switch_to_default_wb_sync - change the wb association of an inode to
-+ *	the default writeback structure synchronously
-+ * @inode: target inode
-+ *
-+ * Switch @inode's wb association to the default writeback structure (bdi->wb).
-+ * Unlike inode_switch_wbs() the switching is performed synchronously and we
-+ * guarantee the inode is switched to the default writeback structure when this
-+ * function returns. Nothing prevents from someone else switching inode to
-+ * another writeback structure just when we are done though. Preventing that is
-+ * upto the caller if needed.
-+ */
-+void inode_switch_to_default_wb_sync(struct inode *inode)
-+{
-+	struct backing_dev_info *bdi = inode_to_bdi(inode);
-+
-+	/* while holding I_WB_SWITCH, no one else can update the association */
-+	spin_lock(&inode->i_lock);
-+	if (WARN_ON_ONCE(inode->i_state & I_FREEING) ||
-+	    !inode_to_wb_is_valid(inode) || inode_to_wb(inode) == &bdi->wb) {
-+		spin_unlock(&inode->i_lock);
-+		return;
-+	}
-+	__inode_wait_for_state_bit(inode, __I_WB_SWITCH);
-+	inode->i_state |= I_WB_SWITCH;
-+	spin_unlock(&inode->i_lock);
-+
-+	/* Make I_WB_SWITCH setting visible to unlocked users of i_wb */
-+	synchronize_rcu();
-+
-+	do_inode_switch_wbs(inode, &bdi->wb);
-+}
-+
-+/**
-  * wbc_attach_and_unlock_inode - associate wbc with target inode and unlock it
-  * @wbc: writeback_control of interest
-  * @inode: target inode
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index c930cbc19342..319fb76f9081 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -1929,7 +1929,8 @@ static inline bool HAS_UNMAPPED_ID(struct inode *inode)
- #define I_DIRTY_TIME		(1 << 11)
- #define __I_DIRTY_TIME_EXPIRED	12
- #define I_DIRTY_TIME_EXPIRED	(1 << __I_DIRTY_TIME_EXPIRED)
--#define I_WB_SWITCH		(1 << 13)
-+#define __I_WB_SWITCH		13
-+#define I_WB_SWITCH		(1 << __I_WB_SWITCH)
- 
- #define I_DIRTY (I_DIRTY_SYNC | I_DIRTY_DATASYNC | I_DIRTY_PAGES)
- #define I_DIRTY_ALL (I_DIRTY | I_DIRTY_TIME)
-diff --git a/include/linux/writeback.h b/include/linux/writeback.h
-index 5527d910ba3d..0d3ba83a0f7f 100644
---- a/include/linux/writeback.h
-+++ b/include/linux/writeback.h
-@@ -280,6 +280,8 @@ static inline void wbc_init_bio(struct writeback_control *wbc, struct bio *bio)
- 		bio_associate_blkcg(bio, wbc->wb->blkcg_css);
- }
- 
-+void inode_switch_to_default_wb_sync(struct inode *inode);
-+
- #else	/* CONFIG_CGROUP_WRITEBACK */
- 
- static inline void inode_attach_wb(struct inode *inode, struct page *page)
-@@ -319,6 +321,10 @@ static inline void cgroup_writeback_umount(void)
- {
- }
- 
-+static inline void inode_switch_to_default_wb_sync(struct inode *inode)
-+{
-+}
-+
- #endif	/* CONFIG_CGROUP_WRITEBACK */
- 
  /*
+  * Loop filter types
+  */
 -- 
-2.10.2
+1.8.5.6
