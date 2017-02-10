@@ -1,28 +1,51 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:38241 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752189AbdBMNpW (ORCPT
+Received: from mail-pf0-f193.google.com ([209.85.192.193]:36203 "EHLO
+        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752628AbdBJK5C (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 Feb 2017 08:45:22 -0500
-Date: Mon, 13 Feb 2017 05:45:20 -0800
-From: Christoph Hellwig <hch@infradead.org>
-To: Ming Lei <tom.leiming@gmail.com>
-Cc: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
+        Fri, 10 Feb 2017 05:57:02 -0500
+From: Ming Lei <tom.leiming@gmail.com>
+To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
         linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
         linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
         NeilBrown <neilb@suse.com>
-Subject: Re: [PATCH v1 3/5] md: fail if mddev->bio_set can't be created
-Message-ID: <20170213134520.GA22818@infradead.org>
+Cc: Ming Lei <tom.leiming@gmail.com>
+Subject: [PATCH v1 3/5] md: fail if mddev->bio_set can't be created
+Date: Fri, 10 Feb 2017 18:56:15 +0800
+Message-Id: <1486724177-14817-4-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1486724177-14817-1-git-send-email-tom.leiming@gmail.com>
 References: <1486724177-14817-1-git-send-email-tom.leiming@gmail.com>
- <1486724177-14817-4-git-send-email-tom.leiming@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1486724177-14817-4-git-send-email-tom.leiming@gmail.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Looks fine,
+The current behaviour is to fall back to allocate
+bio from 'fs_bio_set', that isn't a correct way
+because it might cause deadlock.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+So this patch simply return failure if mddev->bio_set
+can't be created.
 
-but this really needs to be patch 2 in this series.
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+---
+ drivers/md/md.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/md/md.c b/drivers/md/md.c
+index 4c1b82defa78..3425c2b779a6 100644
+--- a/drivers/md/md.c
++++ b/drivers/md/md.c
+@@ -5270,8 +5270,11 @@ int md_run(struct mddev *mddev)
+ 		sysfs_notify_dirent_safe(rdev->sysfs_state);
+ 	}
+ 
+-	if (mddev->bio_set == NULL)
++	if (mddev->bio_set == NULL) {
+ 		mddev->bio_set = bioset_create(BIO_POOL_SIZE, 0);
++		if (!mddev->bio_set)
++			return -ENOMEM;
++	}
+ 
+ 	spin_lock(&pers_lock);
+ 	pers = find_pers(mddev->level, mddev->clevel);
+-- 
+2.7.4
