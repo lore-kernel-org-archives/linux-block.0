@@ -1,60 +1,84 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f66.google.com ([74.125.83.66]:35988 "EHLO
-        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932096AbdBPLrG (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Feb 2017 06:47:06 -0500
-From: Ming Lei <tom.leiming@gmail.com>
-To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
-        linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        NeilBrown <neilb@suse.com>
-Cc: Ming Lei <tom.leiming@gmail.com>
-Subject: [PATCH 17/17] md: raid10: avoid direct access to bvec table in handle_reshape_read_error
-Date: Thu, 16 Feb 2017 19:45:47 +0800
-Message-Id: <1487245547-24384-18-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1487245547-24384-1-git-send-email-tom.leiming@gmail.com>
-References: <1487245547-24384-1-git-send-email-tom.leiming@gmail.com>
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:57822 "EHLO
+        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751153AbdBJB2M (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Feb 2017 20:28:12 -0500
+Subject: Re: [PATCH 1/1] dm-zoned: Zoned block device target
+To: Hannes Reinecke <hare@suse.de>, dm-devel@redhat.com,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>
+References: <20170209041849.30964-1-damien.lemoal@wdc.com>
+ <d2353e66-183c-1f71-7a64-52e4b862bc17@suse.de>
+Cc: Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org
+From: Damien Le Moal <damien.lemoal@wdc.com>
+Message-ID: <e6e86f98-c9d4-c797-8dc1-f7dccd30fafe@wdc.com>
+Date: Fri, 10 Feb 2017 10:24:59 +0900
+MIME-Version: 1.0
+In-Reply-To: <d2353e66-183c-1f71-7a64-52e4b862bc17@suse.de>
+Content-Type: text/plain; charset=windows-1252
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-The cost is 128bytes(8*16) stack space in kernel thread context, and
-just use the bio helper to retrieve pages from bio.
+Hannes,
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
----
- drivers/md/raid10.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+On 2/10/17 01:07, Hannes Reinecke wrote:
+>> +/*
+>> + * CRC32
+>> + */
+>> +static u32 dmz_sb_crc32(u32 crc, const void *buf, size_t length)
+>> +{
+>> +	unsigned char *p = (unsigned char *)buf;
+>> +	int i;
+>> +
+>> +#define CRCPOLY_LE 0xedb88320
+>> +
+>> +	while (length--) {
+>> +		crc ^= *p++;
+>> +		for (i = 0; i < 8; i++)
+>> +			crc = (crc >> 1) ^ ((crc & 1) ? CRCPOLY_LE : 0);
+>> +	}
+>> +
+>> +	return crc;
+>> +}
+>> +
+> Why do you insist on your own CRC32 implementations?
+> Don't we have enough already?
 
-diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
-index 5016ce8163c3..d9d7c79a3bd4 100644
---- a/drivers/md/raid10.c
-+++ b/drivers/md/raid10.c
-@@ -4689,7 +4689,15 @@ static int handle_reshape_read_error(struct mddev *mddev,
- 	struct r10bio *r10b = &on_stack.r10_bio;
- 	int slot = 0;
- 	int idx = 0;
--	struct bio_vec *bvec = r10_bio->master_bio->bi_io_vec;
-+	struct bio_vec *bvl;
-+	struct page *pages[RESYNC_PAGES];
-+
-+	/*
-+	 * This bio is allocated in reshape_request(), and size
-+	 * is still RESYNC_PAGES
-+	 */
-+	bio_for_each_segment_all(bvl, r10_bio->master_bio, idx)
-+		pages[idx] = bvl->bv_page;
- 
- 	r10b->sector = r10_bio->sector;
- 	__raid10_find_phys(&conf->prev, r10b);
-@@ -4718,7 +4726,7 @@ static int handle_reshape_read_error(struct mddev *mddev,
- 			success = sync_page_io(rdev,
- 					       addr,
- 					       s << 9,
--					       bvec[idx].bv_page,
-+					       pages[idx],
- 					       REQ_OP_READ, 0, false);
- 			rdev_dec_pending(rdev, mddev);
- 			rcu_read_lock();
+Indeed. I will change this to use existing kernel API.
+
+> Have you looked at using dm-kcopyd for doing the reclaim?
+> What's inhibiting you from using it?
+
+I did look at it, and I did like it very much. It would be much more
+simple to use than open coding everything like I did. But the problem is
+that while the read part is fine, the write part is not. The reason is
+that most of the time, the zone being reclaimed is badly fragmented
+(valid blocks all over the place in the zone). Reading those valid
+blocks with kcopyd is fine, but when moving them to the target zone, the
+overall write sequence MUST be sequential, which means that
+blkdev_issue_zeroout calls must be inserted between non sequential
+regions (the indirection system is per zone, not per block, so the
+relative offsets of the blocks read in the zone being reclaimed must be
+preserved in the destination zone).
+
+I could modify kcopyd_copy to do this zeroout insertion of course. In
+fact, I think that would be the better approach. But I think that can be
+done later, once/if Mike accepts dm-zoned. Or I could re-submit dm-zoned
+together with a patch for kcopyd_copy.
+
+Mike,
+Any advice on which approach is best/more acceptable for you ?
+
+Thanks !
+
+Best regards.
+
 -- 
-2.7.4
+Damien Le Moal, Ph.D.
+Sr. Manager, System Software Research Group,
+Western Digital Corporation
+Damien.LeMoal@wdc.com
+(+81) 0466-98-3593 (ext. 513593)
+1 kirihara-cho, Fujisawa,
+Kanagawa, 252-0888 Japan
+www.wdc.com, www.hgst.com
