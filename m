@@ -1,11 +1,11 @@
 Return-Path: <paolo.valente@linaro.org>
 Return-Path: <paolo.valente@linaro.org>
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=iso-8859-1
 Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
 Subject: Re: [WIP PATCHSET 0/4] WIP branch for bfq-mq
 From: Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <4a893c20-5a6b-a16c-073a-57c1a3d91b5a@sandisk.com>
-Date: Fri, 10 Feb 2017 20:49:52 +0100
+In-Reply-To: <1486751635.2840.5.camel@sandisk.com>
+Date: Fri, 10 Feb 2017 20:33:38 +0100
 Cc: "tj@kernel.org" <tj@kernel.org>,
  "axboe@kernel.dk" <axboe@kernel.dk>,
  "ulf.hansson@linaro.org" <ulf.hansson@linaro.org>,
@@ -13,65 +13,33 @@ Cc: "tj@kernel.org" <tj@kernel.org>,
  "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
  "broonie@kernel.org" <broonie@kernel.org>,
  "linus.walleij@linaro.org" <linus.walleij@linaro.org>
-Message-Id: <55E6D3EE-27D1-4D46-ABE5-750445FB941B@linaro.org>
-References: <20170207172446.4528-1-paolo.valente@linaro.org> <1486745110.2840.3.camel@sandisk.com> <1241B224-A446-4C76-87BB-4EA63852B6D1@linaro.org> <4a893c20-5a6b-a16c-073a-57c1a3d91b5a@sandisk.com>
+Message-Id: <D0578FC1-96A8-4B4D-BAC6-0F52A8697DC3@linaro.org>
+References: <20170207172446.4528-1-paolo.valente@linaro.org> <1486751635.2840.5.camel@sandisk.com>
 To: Bart Van Assche <bart.vanassche@sandisk.com>
 List-ID: <linux-block@vger.kernel.org>
 
 
-> Il giorno 10 feb 2017, alle ore 19:13, Bart Van Assche =
+> Il giorno 10 feb 2017, alle ore 19:34, Bart Van Assche =
 <bart.vanassche@sandisk.com> ha scritto:
 >=20
-> On 02/10/2017 08:49 AM, Paolo Valente wrote:
->>> $ grep '^C.*_MQ_' .config
->>> CONFIG_BLK_MQ_PCI=3Dy
->>> CONFIG_MQ_IOSCHED_BFQ=3Dy
->>> CONFIG_MQ_IOSCHED_DEADLINE=3Dy
->>> CONFIG_MQ_IOSCHED_NONE=3Dy
->>> CONFIG_DEFAULT_MQ_BFQ_MQ=3Dy
->>> CONFIG_DEFAULT_MQ_IOSCHED=3D"bfq-mq"
->>> CONFIG_SCSI_MQ_DEFAULT=3Dy
->>> CONFIG_DM_MQ_DEFAULT=3Dy
->>>=20
->>=20
->> Could you reconfigure with none or mq-deadline as default, check
->> whether the system boots, and, it it does, switch manually to bfq-mq,
->> check what happens, and, in the likely case of a failure, try to get
->> the oops?
+> On Tue, 2017-02-07 at 18:24 +0100, Paolo Valente wrote:
+>> (lock assertions, BUG_ONs, ...).
 >=20
 > Hello Paolo,
 >=20
-> I just finished performing that test with the following kernel config:
-> $ grep '^C.*_MQ_' .config
-> CONFIG_BLK_MQ_PCI=3Dy
-> CONFIG_MQ_IOSCHED_BFQ=3Dy
-> CONFIG_MQ_IOSCHED_DEADLINE=3Dy
-> CONFIG_MQ_IOSCHED_NONE=3Dy
-> CONFIG_DEFAULT_MQ_DEADLINE=3Dy
-> CONFIG_DEFAULT_MQ_IOSCHED=3D"mq-deadline"
-> CONFIG_SCSI_MQ_DEFAULT=3Dy
-> CONFIG_DM_MQ_DEFAULT=3Dy
+> If you are using BUG_ON(), does that mean that you are not aware of =
+Linus'
+> opinion about BUG_ON()? Please read https://lkml.org/lkml/2016/10/4/1.
 >=20
-> After the system came up I logged in, switched to the bfq-mq scheduler
-> and ran several I/O tests against the boot disk.
 
-Without any failure, right?
-
-Unfortunately, as you can imagine, no boot failure occurred on
-any of my test systems so far :(
-
-This version of bfq-mq can be configured to print all its activity in
-the kernel log, by just defining a macro.  This will of course slow
-down the system so much to make it probably unusable, if bfq-mq is
-active from boot.  Yet, the failure may still occur so early to make
-this approach useful to discover where bfq-mq gets stuck.  As of now I
-have no better ideas.  Any suggestion is welcome.
+I am, thanks.  But this is a testing version, overfull of assertions
+as a form of hysteric defensive programming.  I will of course remove
+all halting assertions in the submission for merging.
 
 Thanks,
 Paolo
 
-> Sorry but nothing
-> interesting appeared in the kernel log.
+> Thanks,
 >=20
 > Bart.
 > Western Digital Corporation (and its subsidiaries) E-mail =
