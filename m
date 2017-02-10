@@ -1,39 +1,49 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:20831 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752626AbdBMQUs (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 Feb 2017 11:20:48 -0500
-From: Scott Bauer <scott.bauer@intel.com>
-To: linux-nvme@lists.infradead.org
-Cc: David.Laight@ACULAB.COM, arnd@arndb.de, axboe@fb.com,
-        keith.busch@intel.com, jonathan.derrick@intel.com,
-        hch@infradead.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, Scott Bauer <scott.bauer@intel.com>
-Subject: [PATCH V5 4/4] Maintainers: Modify SED list from nvme to block
-Date: Mon, 13 Feb 2017 09:11:12 -0700
-Message-Id: <1487002272-17940-5-git-send-email-scott.bauer@intel.com>
-In-Reply-To: <1487002272-17940-1-git-send-email-scott.bauer@intel.com>
-References: <1487002272-17940-1-git-send-email-scott.bauer@intel.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <hare@suse.de>
+From: Hannes Reinecke <hare@suse.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Ming Lei <tom.leiming@gmail.com>,
+	Martin Schwidefsky <schwidefsky@de.ibm.com>,
+	linux-block@vger.kernel.org,
+	Linux Kernel Mailinglist <linux-kernel@vger.kernel.org>,
+	Hannes Reinecke <hare@suse.de>
+Subject: [PATCHv5 0/2] loop: enable different logical blocksizes
+Date: Fri, 10 Feb 2017 09:43:06 +0100
+Message-Id: <1486716188-38638-1-git-send-email-hare@suse.de>
+List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Scott Bauer <scott.bauer@intel.com>
----
- MAINTAINERS | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Currently the loop driver just simulates 512-byte blocks. When
+creating bootable images for virtual machines it might be required
+to use a different physical blocksize (eg 4k for S/390 DASD), as
+the some bootloaders (like lilo or zipl for S/390) need to know
+the physical block addresses of the kernel and initrd.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index e325373..b983b25 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -11094,7 +11094,7 @@ SECURE ENCRYPTING DEVICE (SED) OPAL DRIVER
- M:	Scott Bauer <scott.bauer@intel.com>
- M:	Jonathan Derrick <jonathan.derrick@intel.com>
- M:	Rafael Antognolli <rafael.antognolli@intel.com>
--L:	linux-nvme@lists.infradead.org
-+L:	linux-block@vger.kernel.org
- S:	Supported
- F:	block/sed*
- F:	block/opal_proto.h
+With this patchset the loop driver will export the logical and
+physical blocksize and the current LOOP_SET_STATUS64 ioctl is
+extended to set the logical blocksize by re-using the existing
+'init' fields, which are currently unused.
+
+As usual, comments and reviews are welcome.
+
+Changes to v1:
+- Move LO_FLAGS_BLOCKSIZE definition
+- Reshuffle patches
+Changes to v2:
+- Include reviews from Ming Lei
+Changes to v3:
+- Include reviews from Christoph
+- Merge patches
+Changes to v4:
+- Add LO_INFO_BLOCKSIZE definition
+
+Hannes Reinecke (2):
+  loop: Remove unused 'bdev' argument from loop_set_capacity
+  loop: support 4k physical blocksize
+
+ drivers/block/loop.c      | 40 +++++++++++++++++++++++++++++++++-------
+ drivers/block/loop.h      |  1 +
+ include/uapi/linux/loop.h |  3 +++
+ 3 files changed, 37 insertions(+), 7 deletions(-)
+
 -- 
-2.7.4
+1.8.5.6
