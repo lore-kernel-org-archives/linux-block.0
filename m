@@ -1,12 +1,13 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:54000 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751569AbdBJPRU (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Feb 2017 10:17:20 -0500
-Date: Fri, 10 Feb 2017 06:51:58 -0800
-From: Matthew Wilcox <willy@infradead.org>
-To: Andreas Dilger <adilger@dilger.ca>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Andreas Dilger <adilger@dilger.ca>
+Message-Id: <7D35EB8E-29F8-41DA-BB46-8BCF7B6C5A72@dilger.ca>
+Content-Type: multipart/signed;
+ boundary="Apple-Mail=_8EE802F7-5284-4DAC-9401-3B192B06662C";
+ protocol="application/pgp-signature"; micalg=pgp-sha1
+Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
+Subject: Re: [PATCHv6 11/37] HACK: readahead: alloc huge pages, if allowed
+Date: Thu, 9 Feb 2017 17:23:31 -0700
+In-Reply-To: <20170209233436.GZ2267@bombadil.infradead.org>
 Cc: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
         Theodore Ts'o <tytso@mit.edu>,
         Andreas Dilger <adilger.kernel@dilger.ca>,
@@ -21,45 +22,98 @@ Cc: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
         linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         linux-block@vger.kernel.org
-Subject: Re: [PATCHv6 11/37] HACK: readahead: alloc huge pages, if allowed
-Message-ID: <20170210145158.GA2267@bombadil.infradead.org>
+To: Matthew Wilcox <willy@infradead.org>
 References: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
  <20170126115819.58875-12-kirill.shutemov@linux.intel.com>
  <20170209233436.GZ2267@bombadil.infradead.org>
- <7D35EB8E-29F8-41DA-BB46-8BCF7B6C5A72@dilger.ca>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <7D35EB8E-29F8-41DA-BB46-8BCF7B6C5A72@dilger.ca>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Feb 09, 2017 at 05:23:31PM -0700, Andreas Dilger wrote:
-> On Feb 9, 2017, at 4:34 PM, Matthew Wilcox <willy@infradead.org> wrote:
-> > Well ... what if we made readahead 2 hugepages in size for inodes which
-> > are using huge pages?  That's only 8x our current readahead window, and
-> > if you're asking for hugepages, you're accepting that IOs are going to
-> > be larger, and you probably have the kind of storage system which can
-> > handle doing larger IOs.
-> 
-> It would be nice if the bdi had a parameter for the maximum readahead size.
-> Currently, readahead is capped at 2MB chunks by force_page_cache_readahead()
-> even if bdi->ra_pages and bdi->io_pages are much larger.
-> 
-> It should be up to the filesystem to decide how large the readahead chunks
-> are rather than imposing some policy in the MM code.  For high-speed (network)
-> storage access it is better to have at least 4MB read chunks, for RAID storage
-> it is desirable to have stripe-aligned readahead to avoid read inflation when
-> verifying the parity.  Any fixed size will eventually be inadequate as disks
-> and filesystems change, so it may as well be a per-bdi tunable that can be set
-> by the filesystem as needed, or possibly with a mount option if needed.
 
-I think the filesystem should provide a hint, but ultimately it needs to
-be up to the MM to decide how far to readahead.  The filesystem doesn't
-(and shouldn't) have the global view into how much memory is available
-for readahead, nor should it be tracking how well this app is being
-served by readahead.
+--Apple-Mail=_8EE802F7-5284-4DAC-9401-3B192B06662C
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset=us-ascii
 
-That 2MB chunk restriction is allegedly there "so that we don't pin too
-much memory at once".  Maybe that should be scaled with the amount of
-memory in the system (pinning 2MB of a 256MB system is a bit different
-from pinning 2MB of a 1TB memory system).
+On Feb 9, 2017, at 4:34 PM, Matthew Wilcox <willy@infradead.org> wrote:
+>=20
+> On Thu, Jan 26, 2017 at 02:57:53PM +0300, Kirill A. Shutemov wrote:
+>> Most page cache allocation happens via readahead (sync or async), so =
+if
+>> we want to have significant number of huge pages in page cache we =
+need
+>> to find a ways to allocate them from readahead.
+>>=20
+>> Unfortunately, huge pages doesn't fit into current readahead design:
+>> 128 max readahead window, assumption on page size, PageReadahead() to
+>> track hit/miss.
+>>=20
+>> I haven't found a ways to get it right yet.
+>>=20
+>> This patch just allocates huge page if allowed, but doesn't really
+>> provide any readahead if huge page is allocated. We read out 2M a =
+time
+>> and I would expect spikes in latancy without readahead.
+>>=20
+>> Therefore HACK.
+>>=20
+>> Having that said, I don't think it should prevent huge page support =
+to
+>> be applied. Future will show if lacking readahead is a big deal with
+>> huge pages in page cache.
+>>=20
+>> Any suggestions are welcome.
+>=20
+> Well ... what if we made readahead 2 hugepages in size for inodes =
+which
+> are using huge pages?  That's only 8x our current readahead window, =
+and
+> if you're asking for hugepages, you're accepting that IOs are going to
+> be larger, and you probably have the kind of storage system which can
+> handle doing larger IOs.
+
+It would be nice if the bdi had a parameter for the maximum readahead =
+size.
+Currently, readahead is capped at 2MB chunks by =
+force_page_cache_readahead()
+even if bdi->ra_pages and bdi->io_pages are much larger.
+
+It should be up to the filesystem to decide how large the readahead =
+chunks
+are rather than imposing some policy in the MM code.  For high-speed =
+(network)
+storage access it is better to have at least 4MB read chunks, for RAID =
+storage
+it is desirable to have stripe-aligned readahead to avoid read inflation =
+when
+verifying the parity.  Any fixed size will eventually be inadequate as =
+disks
+and filesystems change, so it may as well be a per-bdi tunable that can =
+be set
+by the filesystem as needed, or possibly with a mount option if needed.
+
+
+Cheers, Andreas
+
+
+
+
+
+
+--Apple-Mail=_8EE802F7-5284-4DAC-9401-3B192B06662C
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename=signature.asc
+Content-Type: application/pgp-signature;
+	name=signature.asc
+Content-Description: Message signed with OpenPGP
+
+-----BEGIN PGP SIGNATURE-----
+Comment: GPGTools - http://gpgtools.org
+
+iD8DBQFYnQgEpIg59Q01vtYRAtFGAKDvCrR8jSY6QOy14QScouQScGbDSgCeLM1U
+CiznnCvh2NZhwkFRHNE+RvI=
+=rebT
+-----END PGP SIGNATURE-----
+
+--Apple-Mail=_8EE802F7-5284-4DAC-9401-3B192B06662C--
