@@ -1,49 +1,35 @@
-Return-Path: <hare@suse.de>
-From: Hannes Reinecke <hare@suse.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Ming Lei <tom.leiming@gmail.com>,
-	Martin Schwidefsky <schwidefsky@de.ibm.com>,
-	linux-block@vger.kernel.org,
-	Linux Kernel Mailinglist <linux-kernel@vger.kernel.org>,
-	Hannes Reinecke <hare@suse.de>
-Subject: [PATCHv5 0/2] loop: enable different logical blocksizes
-Date: Fri, 10 Feb 2017 09:43:06 +0100
-Message-Id: <1486716188-38638-1-git-send-email-hare@suse.de>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Date: Fri, 10 Feb 2017 09:50:49 -0800
+From: Matthew Wilcox <willy@infradead.org>
+To: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Cc: Theodore Ts'o <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCHv6 16/37] thp: make thp_get_unmapped_area() respect
+ S_HUGE_MODE
+Message-ID: <20170210175049.GD2267@bombadil.infradead.org>
+References: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
+ <20170126115819.58875-17-kirill.shutemov@linux.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170126115819.58875-17-kirill.shutemov@linux.intel.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Currently the loop driver just simulates 512-byte blocks. When
-creating bootable images for virtual machines it might be required
-to use a different physical blocksize (eg 4k for S/390 DASD), as
-the some bootloaders (like lilo or zipl for S/390) need to know
-the physical block addresses of the kernel and initrd.
+On Thu, Jan 26, 2017 at 02:57:58PM +0300, Kirill A. Shutemov wrote:
+> We want mmap(NULL) to return PMD-aligned address if the inode can have
+> huge pages in page cache.
+> 
+> Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 
-With this patchset the loop driver will export the logical and
-physical blocksize and the current LOOP_SET_STATUS64 ioctl is
-extended to set the logical blocksize by re-using the existing
-'init' fields, which are currently unused.
-
-As usual, comments and reviews are welcome.
-
-Changes to v1:
-- Move LO_FLAGS_BLOCKSIZE definition
-- Reshuffle patches
-Changes to v2:
-- Include reviews from Ming Lei
-Changes to v3:
-- Include reviews from Christoph
-- Merge patches
-Changes to v4:
-- Add LO_INFO_BLOCKSIZE definition
-
-Hannes Reinecke (2):
-  loop: Remove unused 'bdev' argument from loop_set_capacity
-  loop: support 4k physical blocksize
-
- drivers/block/loop.c      | 40 +++++++++++++++++++++++++++++++++-------
- drivers/block/loop.h      |  1 +
- include/uapi/linux/loop.h |  3 +++
- 3 files changed, 37 insertions(+), 7 deletions(-)
-
--- 
-1.8.5.6
+Reviewed-by: Matthew Wilcox <mawilcox@microsoft.com>
