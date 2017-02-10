@@ -1,26 +1,160 @@
-Return-Path: <BATV+add76be85c7e68b62602+4917+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org
-Subject: support for multi-range discard requests V3
-Date: Wed,  8 Feb 2017 14:46:46 +0100
-Message-Id: <20170208134650.5380-1-hch@lst.de>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Date: Fri, 10 Feb 2017 09:24:01 -0800
+From: Matthew Wilcox <willy@infradead.org>
+To: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Cc: Theodore Ts'o <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCHv6 12/37] brd: make it handle huge pages
+Message-ID: <20170210172401.GB2267@bombadil.infradead.org>
+References: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
+ <20170126115819.58875-13-kirill.shutemov@linux.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170126115819.58875-13-kirill.shutemov@linux.intel.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Hi all,
+On Thu, Jan 26, 2017 at 02:57:54PM +0300, Kirill A. Shutemov wrote:
+> Do not assume length of bio segment is never larger than PAGE_SIZE.
+> With huge pages it's HPAGE_PMD_SIZE (2M on x86-64).
 
-this series adds support for merging discontiguous discard bios into a
-single request if the driver supports it.  This reduces the number of
-discards sent to the device by about a factor of 5-6 for typical
-workloads on NVMe, and for slower devices that use I/O scheduling
-the number will probably be even bigger but I've not implemented
-that support yet.
+I don't think we even need hugepages for BRD to be buggy.  I think there are
+already places which allocate compound pages (not in highmem, obviously ...)
+and put them in biovecs.  So this is pure and simple a bugfix.
 
-Changes since V2:
-  - really fix nr of NVMe ranges to 256
-  - free range on error
+That said, I find the current code in brd a bit inelegant, and I don't
+think this patch helps... indeed, I think it's buggy:
 
-Changes since V1:
-  - hardcoded max ranges for NVMe to 255
-  - minor cleanups
+> @@ -202,12 +202,15 @@ static int copy_to_brd_setup(struct brd_device *brd, sector_t sector, size_t n)
+>  	size_t copy;
+>  
+>  	copy = min_t(size_t, n, PAGE_SIZE - offset);
+> +	n -= copy;
+>  	if (!brd_insert_page(brd, sector))
+>  		return -ENOSPC;
+> -	if (copy < n) {
+> +	while (n) {
+>  		sector += copy >> SECTOR_SHIFT;
+>  		if (!brd_insert_page(brd, sector))
+>  			return -ENOSPC;
+> +		copy = min_t(size_t, n, PAGE_SIZE);
+> +		n -= copy;
+>  	}
+
+We're decrementing 'n' to 0, then testing it, so we never fill in the
+last page ... right?
+
+Anyway, here's my effort.  Untested.
+
+diff --git a/drivers/block/brd.c b/drivers/block/brd.c
+index 3adc32a3153b..0802a6abcd81 100644
+--- a/drivers/block/brd.c
++++ b/drivers/block/brd.c
+@@ -202,12 +202,14 @@ static int copy_to_brd_setup(struct brd_device *brd, sector_t sector, size_t n)
+ 	size_t copy;
+ 
+ 	copy = min_t(size_t, n, PAGE_SIZE - offset);
+-	if (!brd_insert_page(brd, sector))
+-		return -ENOSPC;
+-	if (copy < n) {
+-		sector += copy >> SECTOR_SHIFT;
++	for (;;) {
+ 		if (!brd_insert_page(brd, sector))
+ 			return -ENOSPC;
++		n -= copy;
++		if (!n)
++			break;
++		sector += copy >> SECTOR_SHIFT;
++		copy = min_t(size_t, n, PAGE_SIZE);
+ 	}
+ 	return 0;
+ }
+@@ -239,26 +241,23 @@ static void copy_to_brd(struct brd_device *brd, const void *src,
+ 	struct page *page;
+ 	void *dst;
+ 	unsigned int offset = (sector & (PAGE_SECTORS-1)) << SECTOR_SHIFT;
+-	size_t copy;
++	size_t copy = min_t(size_t, n, PAGE_SIZE - offset);
+ 
+-	copy = min_t(size_t, n, PAGE_SIZE - offset);
+-	page = brd_lookup_page(brd, sector);
+-	BUG_ON(!page);
+-
+-	dst = kmap_atomic(page);
+-	memcpy(dst + offset, src, copy);
+-	kunmap_atomic(dst);
+-
+-	if (copy < n) {
+-		src += copy;
+-		sector += copy >> SECTOR_SHIFT;
+-		copy = n - copy;
++	for (;;) {
+ 		page = brd_lookup_page(brd, sector);
+ 		BUG_ON(!page);
+ 
+ 		dst = kmap_atomic(page);
+-		memcpy(dst, src, copy);
++		memcpy(dst + offset, src, copy);
+ 		kunmap_atomic(dst);
++
++		n -= copy;
++		if (!n)
++			break;
++		src += copy;
++		sector += copy >> SECTOR_SHIFT;
++		offset = 0;
++		copy = min_t(size_t, n, PAGE_SIZE);
+ 	}
+ }
+ 
+@@ -271,28 +270,24 @@ static void copy_from_brd(void *dst, struct brd_device *brd,
+ 	struct page *page;
+ 	void *src;
+ 	unsigned int offset = (sector & (PAGE_SECTORS-1)) << SECTOR_SHIFT;
+-	size_t copy;
++	size_t copy = min_t(size_t, n, PAGE_SIZE - offset);
+ 
+-	copy = min_t(size_t, n, PAGE_SIZE - offset);
+-	page = brd_lookup_page(brd, sector);
+-	if (page) {
+-		src = kmap_atomic(page);
+-		memcpy(dst, src + offset, copy);
+-		kunmap_atomic(src);
+-	} else
+-		memset(dst, 0, copy);
+-
+-	if (copy < n) {
+-		dst += copy;
+-		sector += copy >> SECTOR_SHIFT;
+-		copy = n - copy;
++	for (;;) {
+ 		page = brd_lookup_page(brd, sector);
+ 		if (page) {
+ 			src = kmap_atomic(page);
+-			memcpy(dst, src, copy);
++			memcpy(dst, src + offset, copy);
+ 			kunmap_atomic(src);
+ 		} else
+ 			memset(dst, 0, copy);
++
++		n -= copy;
++		if (!n)
++			break;
++		dst += copy;
++		sector += copy >> SECTOR_SHIFT;
++		offset = 0;
++		copy = min_t(size_t, n, PAGE_SIZE);
+ 	}
+ }
+ 
