@@ -1,87 +1,38 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from tyo162.gate.nec.co.jp ([114.179.232.162]:38535 "EHLO
-        tyo162.gate.nec.co.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752800AbdBCH4s (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Feb 2017 02:56:48 -0500
-From: Junichi Nomura <j-nomura@ce.jp.nec.com>
-To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        linux-scsi <linux-scsi@vger.kernel.org>
-Subject: [REGRESSION v4.10-rc1] blkdev_issue_zeroout() returns -EREMOTEIO on
- the first call for SCSI device that doesn't support WRITE SAME
-Date: Fri, 3 Feb 2017 07:55:38 +0000
-Message-ID: <cc14c28a-0f0a-640a-b576-cdfbaee75dc5@ce.jp.nec.com>
-Content-Type: text/plain; charset="iso-2022-jp"
+Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
+From: Scott Bauer <scott.bauer@intel.com>
+To: linux-nvme@lists.infradead.org
+Subject: Sed-opal Fixes
+Date: Fri, 10 Feb 2017 09:00:52 -0700
+Message-Id: <1486742454-3254-1-git-send-email-scott.bauer@intel.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
+List-Post: <mailto:linux-nvme@lists.infradead.org>
+List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
+Cc: keith.busch@intel.com, arnd@arndb.de, hch@infradead.org,
+ linux-kernel@vger.kernel.org, axboe@fb.com, David.Laight@ACULAB.COM,
+ linux-block@vger.kernel.org, jonathan.derrick@intel.com
 MIME-Version: 1.0
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
+Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
+List-ID: <linux-block@vger.kernel.org>
 
-I found following ext4 error occurs on a certain storage since v4.10-rc1:
-  EXT4-fs (sdc1): Delayed block allocation failed for inode 12 at logical offset 100 with max blocks 2 with error 121
-  EXT4-fs (sdc1): This should not happen!! Data will be lost
+changes from v3->v4:
 
-Error 121 (EREMOTEIO) was returned from blkdev_issue_zeroout().
-That came from sd driver because WRITE SAME was sent to the device
-which didn't support it.
+Changed manual kzalloc + copy from user to memdup_user.
 
-The problem was introduced by commit e73c23ff736e ("block: add async
-variant of blkdev_issue_zeroout"). Before the commit, blkdev_issue_zeroout
-fell back to normal zero writing when WRITE SAME failed and it seems
-sd driver's heuristics depends on that behaviour.
+This small series fixes a small ABI issue when using the _IOC_SIZE
+with the Activate Locking SP ioctl. I had put the wrong structure
+in the IOW macro in the uapi header which caused issues when trying
+to copy in the contents for the command.
 
-Below is a band-aid fix to restore the fallback behaviour for sd. Although
-there should be better fix as retrying blindly is not a good idea...
 
-v4.10-rc6:
-  # cat /sys/block/sdc/queue/write_same_max_bytes
-  33553920
-  # fallocate -v -z -l 512 /dev/sdc1
-  fallocate: fallocate failed: Remote I/O error
-  # cat /sys/block/sdc/queue/write_same_max_bytes
-  0
-  # fallocate -v -z -l 512 /dev/sdc1
-  # echo $?
-  0
 
-v4.9 or v4.10-rc6 + this patch:
-  # grep . /sys/block/sdc/queue/write_same_max_bytes
-  33553920
-  # fallocate -v -z -l 512 /dev/sdc1
-  # echo $?
-  0
-  # grep . /sys/block/sdc/queue/write_same_max_bytes
-  0
 
-diff --git a/block/blk-lib.c b/block/blk-lib.c
-index f8c82a9..8e53474 100644
---- a/block/blk-lib.c
-+++ b/block/blk-lib.c
-@@ -360,6 +360,7 @@ int blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
- 			 sector_t nr_sects, gfp_t gfp_mask, bool discard)
- {
- 	int ret;
-+	int pass = 0;
- 	struct bio *bio = NULL;
- 	struct blk_plug plug;
- 
-@@ -369,6 +370,7 @@ int blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
- 			return 0;
- 	}
- 
-+  retry_other_method:
- 	blk_start_plug(&plug);
- 	ret = __blkdev_issue_zeroout(bdev, sector, nr_sects, gfp_mask,
- 			&bio, discard);
-@@ -378,6 +380,11 @@ int blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
- 	}
- 	blk_finish_plug(&plug);
- 
-+	if (ret && pass++ == 0) {
-+		bio = NULL;
-+		goto retry_other_method;
-+	}
-+
- 	return ret;
- }
- EXPORT_SYMBOL(blkdev_issue_zeroout);
--- 
-Jun'ichi Nomura, NEC Corporation / NEC Solution Innovators, Ltd.
+_______________________________________________
+Linux-nvme mailing list
+Linux-nvme@lists.infradead.org
+http://lists.infradead.org/mailman/listinfo/linux-nvme
