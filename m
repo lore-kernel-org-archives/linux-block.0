@@ -1,26 +1,45 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:39848 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751643AbdBMNtX (ORCPT
+Received: from mail-pf0-f194.google.com ([209.85.192.194]:36223 "EHLO
+        mail-pf0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752629AbdBJK5C (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 Feb 2017 08:49:23 -0500
-Date: Mon, 13 Feb 2017 05:49:21 -0800
-From: Christoph Hellwig <hch@infradead.org>
-To: Ming Lei <tom.leiming@gmail.com>
-Cc: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
+        Fri, 10 Feb 2017 05:57:02 -0500
+From: Ming Lei <tom.leiming@gmail.com>
+To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
         linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
         linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
         NeilBrown <neilb@suse.com>
-Subject: Re: [PATCH v1 4/5] md: remove unnecessary check on mddev
-Message-ID: <20170213134921.GD22818@infradead.org>
+Cc: Ming Lei <tom.leiming@gmail.com>
+Subject: [PATCH v1 4/5] md: remove unnecessary check on mddev
+Date: Fri, 10 Feb 2017 18:56:16 +0800
+Message-Id: <1486724177-14817-5-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1486724177-14817-1-git-send-email-tom.leiming@gmail.com>
 References: <1486724177-14817-1-git-send-email-tom.leiming@gmail.com>
- <1486724177-14817-5-git-send-email-tom.leiming@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1486724177-14817-5-git-send-email-tom.leiming@gmail.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Looks fine,
+mddev is never NULL and neither is ->bio_set, so
+remove the check.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Suggested-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+---
+ drivers/md/md.c | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/drivers/md/md.c b/drivers/md/md.c
+index 3425c2b779a6..2835f09b9e71 100644
+--- a/drivers/md/md.c
++++ b/drivers/md/md.c
+@@ -193,9 +193,6 @@ EXPORT_SYMBOL_GPL(bio_alloc_mddev);
+ struct bio *bio_clone_mddev(struct bio *bio, gfp_t gfp_mask,
+ 			    struct mddev *mddev)
+ {
+-	if (!mddev || !mddev->bio_set)
+-		return bio_clone(bio, gfp_mask);
+-
+ 	return bio_clone_bioset(bio, gfp_mask, mddev->bio_set);
+ }
+ EXPORT_SYMBOL_GPL(bio_clone_mddev);
+-- 
+2.7.4
