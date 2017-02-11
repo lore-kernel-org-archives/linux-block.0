@@ -1,129 +1,105 @@
-Return-Path: <linus.walleij@linaro.org>
-Return-Path: <linus.walleij@linaro.org>
-From: Linus Walleij <linus.walleij@linaro.org>
-To: linux-mmc@vger.kernel.org,
-	Ulf Hansson <ulf.hansson@linaro.org>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	Paolo Valente <paolo.valente@linaro.org>
-Cc: Chunyan Zhang <zhang.chunyan@linaro.org>,
-	Baolin Wang <baolin.wang@linaro.org>,
-	linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Linus Walleij <linus.walleij@linaro.org>
-Subject: [PATCH 07/16] mmc: core: do away with is_done_rcv
-Date: Thu,  9 Feb 2017 16:33:54 +0100
-Message-Id: <20170209153403.9730-8-linus.walleij@linaro.org>
-In-Reply-To: <20170209153403.9730-1-linus.walleij@linaro.org>
-References: <20170209153403.9730-1-linus.walleij@linaro.org>
+Return-Path: <James.Bottomley@hansenpartnership.com>
+Message-ID: <1486829261.2539.7.camel@HansenPartnership.com>
+Subject: Re: [lkp-robot] [scsi, block] 0dba1314d4:
+ WARNING:at_fs/sysfs/dir.c:#sysfs_warn_dup
+From: James Bottomley <James.Bottomley@HansenPartnership.com>
+To: Jens Axboe <axboe@fb.com>, Dan Williams <dan.j.williams@intel.com>,
+	Christoph Hellwig
+	 <hch@lst.de>
+Cc: kernel test robot <xiaolong.ye@intel.com>, Bart Van Assche
+ <bart.vanassche@sandisk.com>, "Martin K. Petersen"
+ <martin.petersen@oracle.com>,  Jan Kara <jack@suse.cz>, Omar Sandoval
+ <osandov@osandov.com>, Omar Sandoval <osandov@fb.com>, LKML
+ <linux-kernel@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>, LKP
+ <lkp@01.org>,  linux-scsi <linux-scsi@vger.kernel.org>,
+ linux-block@vger.kernel.org
+Date: Sat, 11 Feb 2017 08:07:41 -0800
+In-Reply-To: <01c338e2-2a30-610d-b7fa-00cb3ce2cf86@fb.com>
+References: <20170204070936.GE12121@yexl-desktop>
+	 <CAPcyv4j0syAsinM-KbeefKysJhM9zt6kvrX=0c2HrtPV_tRAHQ@mail.gmail.com>
+	 <CAPcyv4gBQDuj65KRmFvP2q4Qt3d3xycM8L_TypAzYkvhmUSh6A@mail.gmail.com>
+	 <20170205091314.GA3042@lst.de>
+	 <CAPcyv4gE0+3pZQV=V75wxddFVhWeAz1abfJ=q8D1Zi+8Oi17rA@mail.gmail.com>
+	 <1486426467.2474.122.camel@HansenPartnership.com>
+	 <01c338e2-2a30-610d-b7fa-00cb3ce2cf86@fb.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-The "is_done_rcv" in the context info for the host is no longer
-needed: it is clear from context (ha!) that as long as we are
-waiting for the asynchronous request to come to completion,
-we are not done receiving data, and when the finalization work
-has run and completed the completion, we are indeed done.
+On Mon, 2017-02-06 at 21:09 -0700, Jens Axboe wrote:
+> On 02/06/2017 05:14 PM, James Bottomley wrote:
+> > On Sun, 2017-02-05 at 21:13 -0800, Dan Williams wrote:
+> > > On Sun, Feb 5, 2017 at 1:13 AM, Christoph Hellwig <hch@lst.de>
+> > > wrote:
+> > > > Dan,
+> > > > 
+> > > > can you please quote your emails?  I can't find any content 
+> > > > inbetween all these quotes.
+> > > 
+> > > Sorry, I'm using gmail, but I'll switch to attaching the logs.
+> > > 
+> > > So with help from Xiaolong I was able to reproduce this, and it
+> > > does
+> > > not appear to be a regression. We simply change the failure
+> > > output of
+> > > an existing bug. Attached is a log of the same test on v4.10-rc7 
+> > > (i.e. without the recent block/scsi fixes), and it shows sda
+> > > being
+> > > registered twice.
+> > > 
+> > > "[    6.647077] kobject (d5078ca4): tried to init an initialized
+> > > object, something is seriously wrong."
+> > > 
+> > > The change that "scsi, block: fix duplicate bdi name registration
+> > > crashes" makes is to properly try to register sdb since the sda
+> > > devt
+> > > is still alive. However that's not a fix because we've managed to
+> > > call blk_register_queue() twice on the same queue.
+> > 
+> > OK, time to involve others: linux-scsi and linux-block cc'd and
+> > I've
+> > inserted the log below.
+> > 
+> > James
+> > 
+> > ---
+> > 
+> > [    5.969672] scsi host0: scsi_debug: version 1.86 [20160430]
+> > [    5.969672]   dev_size_mb=8, opts=0x0, submit_queues=1,
+> > statistics=0
+> > [    5.971895] scsi 0:0:0:0: Direct-Access     Linux    scsi_debug 
+> >       0186 PQ: 0 ANSI: 7
+> > [    6.006983] sd 0:0:0:0: [sda] 16384 512-byte logical blocks:
+> > (8.39 MB/8.00 MiB)
+> > [    6.026965] sd 0:0:0:0: [sda] Write Protect is off
+> > [    6.027870] sd 0:0:0:0: [sda] Mode Sense: 73 00 10 08
+> > [    6.066962] sd 0:0:0:0: [sda] Write cache: enabled, read cache:
+> > enabled, supports DPO and FUA
+> > [    6.486962] sd 0:0:0:0: [sda] Attached SCSI disk
+> > [    6.488377] sd 0:0:0:0: [sda] Synchronizing SCSI cache
+> > [    6.489455] sd 0:0:0:0: Attached scsi generic sg0 type 0
+> > [    6.526982] sd 0:0:0:0: [sda] 16384 512-byte logical blocks:
+> > (8.39 MB/8.00 MiB)
+> > [    6.546964] sd 0:0:0:0: [sda] Write Protect is off
+> > [    6.547873] sd 0:0:0:0: [sda] Mode Sense: 73 00 10 08
+> > [    6.586963] sd 0:0:0:0: [sda] Write cache: enabled, read cache:
+> > enabled, supports DPO and FUA
+> > [    6.647077] kobject (d5078ca4): tried to init an initialized
+> > object, something is seriously wrong.
+> 
+> So sda is probed twice, and hilarity ensues when we try to register 
+> it twice.  I can't reproduce this, using scsi_debug and with 
+> scsi_async enabled.
 
-Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
----
- drivers/mmc/core/core.c  | 40 ++++++++++++++++------------------------
- include/linux/mmc/host.h |  2 --
- 2 files changed, 16 insertions(+), 26 deletions(-)
+Actually, when you look closely, it's not a double add; it's an
+add/remove/add.  You can see this from
 
-diff --git a/drivers/mmc/core/core.c b/drivers/mmc/core/core.c
-index 8ecf61e51662..fcb40ade9b82 100644
---- a/drivers/mmc/core/core.c
-+++ b/drivers/mmc/core/core.c
-@@ -416,10 +416,8 @@ EXPORT_SYMBOL(mmc_start_bkops);
- static void mmc_wait_data_done(struct mmc_request *mrq)
- {
- 	struct mmc_host *host = mrq->host;
--	struct mmc_context_info *context_info = &host->context_info;
- 	struct mmc_async_req *areq = host->areq;
- 
--	context_info->is_done_rcv = true;
- 	/* Schedule a work to deal with finalizing this request */
- 	kthread_queue_work(&host->req_done_worker, &areq->finalization_work);
- }
-@@ -551,7 +549,7 @@ EXPORT_SYMBOL(mmc_wait_for_req_done);
- bool mmc_is_req_done(struct mmc_host *host, struct mmc_request *mrq)
- {
- 	if (host->areq)
--		return host->context_info.is_done_rcv;
-+		return completion_done(&host->areq->complete);
- 	else
- 		return completion_done(&mrq->completion);
- }
-@@ -600,29 +598,24 @@ void mmc_finalize_areq(struct kthread_work *work)
- 	struct mmc_async_req *areq =
- 		container_of(work, struct mmc_async_req, finalization_work);
- 	struct mmc_host *host = areq->host;
--	struct mmc_context_info *context_info = &host->context_info;
- 	enum mmc_blk_status status = MMC_BLK_SUCCESS;
-+	struct mmc_command *cmd;
- 
--	if (context_info->is_done_rcv) {
--		struct mmc_command *cmd;
--
--		context_info->is_done_rcv = false;
--		cmd = areq->mrq->cmd;
-+	cmd = areq->mrq->cmd;
- 
--		if (!cmd->error || !cmd->retries ||
--		    mmc_card_removed(host->card)) {
--			status = areq->err_check(host->card,
--						 areq);
--		} else {
--			mmc_retune_recheck(host);
--			pr_info("%s: req failed (CMD%u): %d, retrying...\n",
--				mmc_hostname(host),
--				cmd->opcode, cmd->error);
--			cmd->retries--;
--			cmd->error = 0;
--			__mmc_start_request(host, areq->mrq);
--			return; /* wait for done/new event again */
--		}
-+	if (!cmd->error || !cmd->retries ||
-+	    mmc_card_removed(host->card)) {
-+		status = areq->err_check(host->card,
-+					 areq);
-+	} else {
-+		mmc_retune_recheck(host);
-+		pr_info("%s: req failed (CMD%u): %d, retrying...\n",
-+			mmc_hostname(host),
-+			cmd->opcode, cmd->error);
-+		cmd->retries--;
-+		cmd->error = 0;
-+		__mmc_start_request(host, areq->mrq);
-+		return; /* wait for done/new event again */
- 	}
- 
- 	mmc_retune_release(host);
-@@ -2993,7 +2986,6 @@ void mmc_unregister_pm_notifier(struct mmc_host *host)
- void mmc_init_context_info(struct mmc_host *host)
- {
- 	host->context_info.is_new_req = false;
--	host->context_info.is_done_rcv = false;
- 	host->context_info.is_waiting_last_req = false;
- }
- 
-diff --git a/include/linux/mmc/host.h b/include/linux/mmc/host.h
-index c5f61f2f2310..cbb40682024a 100644
---- a/include/linux/mmc/host.h
-+++ b/include/linux/mmc/host.h
-@@ -194,12 +194,10 @@ struct mmc_slot {
- 
- /**
-  * mmc_context_info - synchronization details for mmc context
-- * @is_done_rcv		wake up reason was done request
-  * @is_new_req		wake up reason was new request
-  * @is_waiting_last_req	mmc context waiting for single running request
-  */
- struct mmc_context_info {
--	bool			is_done_rcv;
- 	bool			is_new_req;
- 	bool			is_waiting_last_req;
- };
--- 
-2.9.3
+[    6.488377] sd 0:0:0:0: [sda] Synchronizing SCSI cache
+
+That's from sd_shutdown() as the driver is removing.  It looks like
+something with the config caused the built in SCSI debug to do this
+(not sure why), but since the stack trace is in block, I think the bug
+is in the remove path: something didn't release the mq object
+correctly.
+
+James
