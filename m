@@ -1,64 +1,74 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f68.google.com ([74.125.83.68]:34487 "EHLO
-        mail-pg0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932246AbdBPLrE (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Feb 2017 06:47:04 -0500
-From: Ming Lei <tom.leiming@gmail.com>
-To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
-        linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+Received: from mail.kernel.org ([198.145.29.136]:41650 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751243AbdBKAi7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 10 Feb 2017 19:38:59 -0500
+Date: Fri, 10 Feb 2017 16:38:55 -0800
+From: Shaohua Li <shli@kernel.org>
+To: Ming Lei <tom.leiming@gmail.com>
+Cc: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org,
+        linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
         NeilBrown <neilb@suse.com>
-Cc: Ming Lei <tom.leiming@gmail.com>
-Subject: [PATCH 15/17] md: raid10: avoid direct access to bvec table in fix_recovery_read_error
-Date: Thu, 16 Feb 2017 19:45:45 +0800
-Message-Id: <1487245547-24384-16-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1487245547-24384-1-git-send-email-tom.leiming@gmail.com>
-References: <1487245547-24384-1-git-send-email-tom.leiming@gmail.com>
+Subject: Re: [PATCH v1 0/5] md: use bio_clone_fast()
+Message-ID: <20170211003855.lbiwidqmz4s6zvjo@kernel.org>
+References: <1486724177-14817-1-git-send-email-tom.leiming@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1486724177-14817-1-git-send-email-tom.leiming@gmail.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-The cost is 128bytes(8*16) stack space in kernel thread context, and just
-use the bio helper to retrieve pages from bio.
+On Fri, Feb 10, 2017 at 06:56:12PM +0800, Ming Lei wrote:
+> Hi,
+> 
+> This patches replaces bio_clone() with bio_fast_clone() in
+> bio_clone_mddev() because:
+> 
+> 1) bio_clone_mddev() is used in raid normal I/O and isn't in
+> resync I/O path, and all the direct access to bvec table in
+> raid happens on resync I/O only except for write behind of raid1.
+> Write behind is treated specially, so the replacement is safe.
+> 
+> 2) for write behind, bio_clone() is kept, but this patchset
+> introduces bio_clone_bioset_partial() to just clone one specific 
+> bvecs range instead of whole table. Then write behind is improved
+> too.
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
----
- drivers/md/raid10.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+Thanks! this patch set looks good to me.
+Jens,
+can you look at the first patch? If it's ok, I'll carry it in my tree.
 
-diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
-index 69fe2a3cef89..c7d2f73565d9 100644
---- a/drivers/md/raid10.c
-+++ b/drivers/md/raid10.c
-@@ -2184,6 +2184,11 @@ static void fix_recovery_read_error(struct r10bio *r10_bio)
- 	int idx = 0;
- 	int dr = r10_bio->devs[0].devnum;
- 	int dw = r10_bio->devs[1].devnum;
-+	struct bio_vec *bvl;
-+	struct page *pages[RESYNC_PAGES];
-+
-+	bio_for_each_segment_all(bvl, bio, idx)
-+		pages[idx] = bvl->bv_page;
+Thanks,
+Shaohua
  
- 	while (sectors) {
- 		int s = sectors;
-@@ -2199,7 +2204,7 @@ static void fix_recovery_read_error(struct r10bio *r10_bio)
- 		ok = sync_page_io(rdev,
- 				  addr,
- 				  s << 9,
--				  bio->bi_io_vec[idx].bv_page,
-+				  pages[idx],
- 				  REQ_OP_READ, 0, false);
- 		if (ok) {
- 			rdev = conf->mirrors[dw].rdev;
-@@ -2207,7 +2212,7 @@ static void fix_recovery_read_error(struct r10bio *r10_bio)
- 			ok = sync_page_io(rdev,
- 					  addr,
- 					  s << 9,
--					  bio->bi_io_vec[idx].bv_page,
-+					  pages[idx],
- 					  REQ_OP_WRITE, 0, false);
- 			if (!ok) {
- 				set_bit(WriteErrorSeen, &rdev->flags);
--- 
-2.7.4
+> V1:
+> 	1) don't introduce bio_clone_slow_mddev_partial()
+> 	2) return failure if mddev->bio_set can't be created
+> 	3) remove check in bio_clone_mddev() as suggested by
+> 	Christoph Hellwig.
+> 	4) rename bio_clone_mddev() as bio_clone_fast_mddev()
+> 
+> 
+> Ming Lei (5):
+>   block: introduce bio_clone_bioset_partial()
+>   md/raid1: use bio_clone_bioset_partial() in case of write behind
+>   md: fail if mddev->bio_set can't be created
+>   md: remove unnecessary check on mddev
+>   md: fast clone bio in bio_clone_mddev()
+> 
+>  block/bio.c         | 61 +++++++++++++++++++++++++++++++++++++++++------------
+>  drivers/md/faulty.c |  2 +-
+>  drivers/md/md.c     | 14 ++++++------
+>  drivers/md/md.h     |  4 ++--
+>  drivers/md/raid1.c  | 26 ++++++++++++++++-------
+>  drivers/md/raid10.c | 11 +++++-----
+>  drivers/md/raid5.c  |  4 ++--
+>  include/linux/bio.h | 11 ++++++++--
+>  8 files changed, 92 insertions(+), 41 deletions(-)
+> 
+> -- 
+> 2.7.4
+> 
+> Thanks,
+> Ming
