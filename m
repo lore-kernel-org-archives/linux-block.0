@@ -1,62 +1,74 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f41.google.com ([74.125.83.41]:33271 "EHLO
-        mail-pg0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751341AbdB0Rtu (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Feb 2017 12:49:50 -0500
-Received: by mail-pg0-f41.google.com with SMTP id 25so17473184pgy.0
-        for <linux-block@vger.kernel.org>; Mon, 27 Feb 2017 09:48:44 -0800 (PST)
-From: Omar Sandoval <osandov@osandov.com>
-To: Jens Axboe <axboe@fb.com>, Sagi Grimberg <sagi@grimberg.me>,
-        linux-block@vger.kernel.org
-Cc: kernel-team@fb.com
-Subject: [PATCH 3/3] blk-mq: move update of tags->rqs to __blk_mq_alloc_request()
-Date: Mon, 27 Feb 2017 09:47:55 -0800
-Message-Id: <4715cce107df8b579734a074093a34001efd01d0.1488217516.git.osandov@fb.com>
-In-Reply-To: <dcfe49f597dc1eec3b326024c86a6ad3afb82fa8.1488217516.git.osandov@fb.com>
-References: <dcfe49f597dc1eec3b326024c86a6ad3afb82fa8.1488217516.git.osandov@fb.com>
-In-Reply-To: <dcfe49f597dc1eec3b326024c86a6ad3afb82fa8.1488217516.git.osandov@fb.com>
-References: <dcfe49f597dc1eec3b326024c86a6ad3afb82fa8.1488217516.git.osandov@fb.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Sun, 12 Feb 2017 13:43:56 +0900
+From: Tejun Heo <tj@kernel.org>
+To: Jan Kara <jack@suse.cz>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
+	NeilBrown <neilb@suse.de>
+Subject: Re: [PATCH 10/10] block: Fix oops scsi_disk_get()
+Message-ID: <20170212044356.GH29323@mtj.duckdns.org>
+References: <20170209124433.2626-1-jack@suse.cz>
+ <20170209124433.2626-11-jack@suse.cz>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170209124433.2626-11-jack@suse.cz>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Omar Sandoval <osandov@fb.com>
+On Thu, Feb 09, 2017 at 01:44:33PM +0100, Jan Kara wrote:
+> When device open races with device shutdown, we can get the following
+> oops in scsi_disk_get():
+> 
+> [11863.044351] general protection fault: 0000 [#1] SMP
+> [11863.045561] Modules linked in: scsi_debug xfs libcrc32c netconsole btrfs raid6_pq zlib_deflate lzo_compress xor [last unloaded: loop]
+> [11863.047853] CPU: 3 PID: 13042 Comm: hald-probe-stor Tainted: G W      4.10.0-rc2-xen+ #35
+> [11863.048030] Hardware name: Bochs Bochs, BIOS Bochs 01/01/2011
+> [11863.048030] task: ffff88007f438200 task.stack: ffffc90000fd0000
+> [11863.048030] RIP: 0010:scsi_disk_get+0x43/0x70
+> [11863.048030] RSP: 0018:ffffc90000fd3a08 EFLAGS: 00010202
+> [11863.048030] RAX: 6b6b6b6b6b6b6b6b RBX: ffff88007f56d000 RCX: 0000000000000000
+> [11863.048030] RDX: 0000000000000001 RSI: 0000000000000004 RDI: ffffffff81a8d880
+> [11863.048030] RBP: ffffc90000fd3a18 R08: 0000000000000000 R09: 0000000000000001
+> [11863.059217] R10: 0000000000000000 R11: 0000000000000000 R12: 00000000fffffffa
+> [11863.059217] R13: ffff880078872800 R14: ffff880070915540 R15: 000000000000001d
+> [11863.059217] FS:  00007f2611f71800(0000) GS:ffff88007f0c0000(0000) knlGS:0000000000000000
+> [11863.059217] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [11863.059217] CR2: 000000000060e048 CR3: 00000000778d4000 CR4: 00000000000006e0
+> [11863.059217] Call Trace:
+> [11863.059217]  ? disk_get_part+0x22/0x1f0
+> [11863.059217]  sd_open+0x39/0x130
+> [11863.059217]  __blkdev_get+0x69/0x430
+> [11863.059217]  ? bd_acquire+0x7f/0xc0
+> [11863.059217]  ? bd_acquire+0x96/0xc0
+> [11863.059217]  ? blkdev_get+0x350/0x350
+> [11863.059217]  blkdev_get+0x126/0x350
+> [11863.059217]  ? _raw_spin_unlock+0x2b/0x40
+> [11863.059217]  ? bd_acquire+0x7f/0xc0
+> [11863.059217]  ? blkdev_get+0x350/0x350
+> [11863.059217]  blkdev_open+0x65/0x80
+> ...
+> 
+> As you can see RAX value is already poisoned showing that gendisk we got
+> is already freed. The problem is that get_gendisk() looks up device
+> number in ext_devt_idr and then does get_disk() which does kobject_get()
+> on the disks kobject. However the disk gets removed from ext_devt_idr
+> only in disk_release() (through blk_free_devt()) at which moment it has
+> already 0 refcount and is already on its way to be freed. Indeed we've
+> got a warning from kobject_get() about 0 refcount shortly before the
+> oops.
+> 
+> We fix the problem by using kobject_get_unless_zero() in get_disk() so
+> that get_disk() cannot get reference on a disk that is already being
+> freed.
+> 
+> Signed-off-by: Jan Kara <jack@suse.cz>
 
-No functional difference, it just makes a little more sense to update
-the tag map where we actually allocate the tag.
+Acked-by: Tejun Heo <tj@kernel.org>
 
-Signed-off-by: Omar Sandoval <osandov@fb.com>
----
-Optional cleanup, since there's only one place that does this.
+Thanks.
 
- block/blk-mq-sched.c | 2 --
- block/blk-mq.c       | 1 +
- 2 files changed, 1 insertion(+), 2 deletions(-)
-
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 5697b23412a1..09af8ff18719 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -134,8 +134,6 @@ struct request *blk_mq_sched_get_request(struct request_queue *q,
- 			rq = __blk_mq_alloc_request(data, op);
- 	} else {
- 		rq = __blk_mq_alloc_request(data, op);
--		if (rq)
--			data->hctx->tags->rqs[rq->tag] = rq;
- 	}
- 
- 	if (rq) {
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index cc9713f574a5..452c1caf978f 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -234,6 +234,7 @@ struct request *__blk_mq_alloc_request(struct blk_mq_alloc_data *data,
- 			}
- 			rq->tag = tag;
- 			rq->internal_tag = -1;
-+			data->hctx->tags->rqs[rq->tag] = rq;
- 		}
- 
- 		blk_mq_rq_ctx_init(data->q, data->ctx, rq, op);
 -- 
-2.12.0
+tejun
