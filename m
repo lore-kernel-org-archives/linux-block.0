@@ -1,45 +1,34 @@
-Return-Path: <jack@suse.cz>
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Sun, 12 Feb 2017 13:41:34 +0900
+From: Tejun Heo <tj@kernel.org>
+To: Jan Kara <jack@suse.cz>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
 	Christoph Hellwig <hch@infradead.org>,
 	Dan Williams <dan.j.williams@intel.com>,
 	Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
-	Lekshmi Pillai <lekshmicpillai@in.ibm.com>,
-	Tejun Heo <tj@kernel.org>,
-	NeilBrown <neilb@suse.de>,
-	Omar Sandoval <osandov@osandov.com>,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH 02/13] block: Unhash also block device inode for the whole device
-Date: Tue, 21 Feb 2017 18:09:47 +0100
-Message-Id: <20170221170958.21845-3-jack@suse.cz>
-In-Reply-To: <20170221170958.21845-1-jack@suse.cz>
-References: <20170221170958.21845-1-jack@suse.cz>
+	NeilBrown <neilb@suse.de>
+Subject: Re: [PATCH 09/10] kobject: Export kobject_get_unless_zero()
+Message-ID: <20170212044134.GG29323@mtj.duckdns.org>
+References: <20170209124433.2626-1-jack@suse.cz>
+ <20170209124433.2626-10-jack@suse.cz>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170209124433.2626-10-jack@suse.cz>
 List-ID: <linux-block@vger.kernel.org>
 
-Iteration over partitions in del_gendisk() omits part0. Add
-bdev_unhash_inode() call for the whole device. Otherwise if the device
-number gets reused, bdev inode will be still associated with the old
-(stale) bdi.
+On Thu, Feb 09, 2017 at 01:44:32PM +0100, Jan Kara wrote:
+> Make the function available for outside use and fortify it against NULL
+> kobject.
+> 
+> Signed-off-by: Jan Kara <jack@suse.cz>
 
-Tested-by: Lekshmi Pillai <lekshmicpillai@in.ibm.com>
 Acked-by: Tejun Heo <tj@kernel.org>
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- block/genhd.c | 1 +
- 1 file changed, 1 insertion(+)
 
-diff --git a/block/genhd.c b/block/genhd.c
-index 6cb9f3a34a92..f6c4d4400759 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -655,6 +655,7 @@ void del_gendisk(struct gendisk *disk)
- 	disk_part_iter_exit(&piter);
- 
- 	invalidate_partition(disk, 0);
-+	bdev_unhash_inode(disk_devt(disk));
- 	set_capacity(disk, 0);
- 	disk->flags &= ~GENHD_FL_UP;
- 
+Cc Greg?
+
+Thanks.
+
 -- 
-2.10.2
+tejun
