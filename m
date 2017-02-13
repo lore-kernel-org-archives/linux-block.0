@@ -6,105 +6,78 @@ To: Omar Sandoval <osandov@osandov.com>,
 References: <20170213210107.4848-1-paolo.valente@linaro.org>
  <20170213210107.4848-2-paolo.valente@linaro.org>
  <20170213220900.GA11052@vader.DHCP.thefacebook.com>
- <89b98d59-fcae-6b13-a6a1-6fe62967929d@kernel.dk>
 Cc: Tejun Heo <tj@kernel.org>, linux-block@vger.kernel.org,
  linux-kernel@vger.kernel.org, ulf.hansson@linaro.org,
  linus.walleij@linaro.org, broonie@kernel.org
 From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <b1a1ad6d-6e22-7d55-bbad-40807d95f59b@kernel.dk>
-Date: Mon, 13 Feb 2017 16:10:30 -0700
+Message-ID: <89b98d59-fcae-6b13-a6a1-6fe62967929d@kernel.dk>
+Date: Mon, 13 Feb 2017 15:28:01 -0700
 MIME-Version: 1.0
-In-Reply-To: <89b98d59-fcae-6b13-a6a1-6fe62967929d@kernel.dk>
+In-Reply-To: <20170213220900.GA11052@vader.DHCP.thefacebook.com>
 Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-block@vger.kernel.org>
 
-On 02/13/2017 03:28 PM, Jens Axboe wrote:
-> On 02/13/2017 03:09 PM, Omar Sandoval wrote:
->> On Mon, Feb 13, 2017 at 10:01:07PM +0100, Paolo Valente wrote:
->>> If, at boot, a legacy I/O scheduler is chosen for a device using blk-mq,
->>> or, viceversa, a blk-mq scheduler is chosen for a device using blk, then
->>> that scheduler is set and initialized without any check, driving the
->>> system into an inconsistent state. This commit addresses this issue by
->>> letting elevator_get fail for these wrong cross choices.
->>>
->>> Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
->>> ---
->>>  block/elevator.c | 26 ++++++++++++++++++--------
->>>  1 file changed, 18 insertions(+), 8 deletions(-)
+On 02/13/2017 03:09 PM, Omar Sandoval wrote:
+> On Mon, Feb 13, 2017 at 10:01:07PM +0100, Paolo Valente wrote:
+>> If, at boot, a legacy I/O scheduler is chosen for a device using blk-mq,
+>> or, viceversa, a blk-mq scheduler is chosen for a device using blk, then
+>> that scheduler is set and initialized without any check, driving the
+>> system into an inconsistent state. This commit addresses this issue by
+>> letting elevator_get fail for these wrong cross choices.
 >>
->> Hey, Paolo,
->>
->> How exactly are you triggering this? In __elevator_change(), we do check
->> for mq or not mq:
->>
->> 	if (!e->uses_mq && q->mq_ops) {
->> 		elevator_put(e);
->> 		return -EINVAL;
->> 	}
->> 	if (e->uses_mq && !q->mq_ops) {
->> 		elevator_put(e);
->> 		return -EINVAL;
->> 	}
->>
->> We don't ever appear to call elevator_init() with a specific scheduler
->> name, and for the default we switch off of q->mq_ops and use the
->> defaults from Kconfig:
->>
->> 	if (q->mq_ops && q->nr_hw_queues == 1)
->> 		e = elevator_get(CONFIG_DEFAULT_SQ_IOSCHED, false);
->> 	else if (q->mq_ops)
->> 		e = elevator_get(CONFIG_DEFAULT_MQ_IOSCHED, false);
->> 	else
->> 		e = elevator_get(CONFIG_DEFAULT_IOSCHED, false);
->>
->> 	if (!e) {
->> 		printk(KERN_ERR
->> 			"Default I/O scheduler not found. " \
->> 			"Using noop/none.\n");
->> 		e = elevator_get("noop", false);
->> 	}
->>
->> So I guess this could happen if someone manually changed those Kconfig
->> options, but I don't see what other case would make this happen, could
->> you please explain?
+>> Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+>> ---
+>>  block/elevator.c | 26 ++++++++++++++++++--------
+>>  1 file changed, 18 insertions(+), 8 deletions(-)
 > 
-> Was wondering the same - is it using the 'elevator=' boot parameter?
-> Didn't look at that path just now, but that's the only one I could
-> think of. If it is, I'd much prefer only using 'chosen_elevator' for
-> the non-mq stuff, and the fix should be just that instead.
+> Hey, Paolo,
 > 
-> So instead of:
+> How exactly are you triggering this? In __elevator_change(), we do check
+> for mq or not mq:
 > 
-> 	if (!e && *chosen_elevator) {
+> 	if (!e->uses_mq && q->mq_ops) {
+> 		elevator_put(e);
+> 		return -EINVAL;
+> 	}
+> 	if (e->uses_mq && !q->mq_ops) {
+> 		elevator_put(e);
+> 		return -EINVAL;
+> 	}
 > 
-> do
+> We don't ever appear to call elevator_init() with a specific scheduler
+> name, and for the default we switch off of q->mq_ops and use the
+> defaults from Kconfig:
 > 
-> 	if (!e && !q->mq_ops && && *chosen_elevator) {
+> 	if (q->mq_ops && q->nr_hw_queues == 1)
+> 		e = elevator_get(CONFIG_DEFAULT_SQ_IOSCHED, false);
+> 	else if (q->mq_ops)
+> 		e = elevator_get(CONFIG_DEFAULT_MQ_IOSCHED, false);
+> 	else
+> 		e = elevator_get(CONFIG_DEFAULT_IOSCHED, false);
+> 
+> 	if (!e) {
+> 		printk(KERN_ERR
+> 			"Default I/O scheduler not found. " \
+> 			"Using noop/none.\n");
+> 		e = elevator_get("noop", false);
+> 	}
+> 
+> So I guess this could happen if someone manually changed those Kconfig
+> options, but I don't see what other case would make this happen, could
+> you please explain?
 
-Confirmed, that's what it seems to be, and here's a real diff of the
-above example that works for me:
+Was wondering the same - is it using the 'elevator=' boot parameter?
+Didn't look at that path just now, but that's the only one I could
+think of. If it is, I'd much prefer only using 'chosen_elevator' for
+the non-mq stuff, and the fix should be just that instead.
 
-diff --git a/block/elevator.c b/block/elevator.c
-index 27ff1ed5a6fa..699d10f71a2c 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -207,11 +207,12 @@ int elevator_init(struct request_queue *q, char *name)
- 	}
- 
- 	/*
--	 * Use the default elevator specified by config boot param or
--	 * config option.  Don't try to load modules as we could be running
--	 * off async and request_module() isn't allowed from async.
-+	 * Use the default elevator specified by config boot param for
-+	 * non-mq devices, or by config option. Don't try to load modules
-+	 * as we could be running off async and request_module() isn't
-+	 * allowed from async.
- 	 */
--	if (!e && *chosen_elevator) {
-+	if (!e && !q->mq_ops && *chosen_elevator) {
- 		e = elevator_get(chosen_elevator, false);
- 		if (!e)
- 			printk(KERN_ERR "I/O scheduler %s not found\n",
+So instead of:
+
+	if (!e && *chosen_elevator) {
+
+do
+
+	if (!e && !q->mq_ops && && *chosen_elevator) {
 
 -- 
 Jens Axboe
