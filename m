@@ -1,64 +1,90 @@
 Return-Path: <paolo.valente@linaro.org>
 Return-Path: <paolo.valente@linaro.org>
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=windows-1252
 Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
 Subject: Re: [WIP PATCHSET 0/4] WIP branch for bfq-mq
 From: Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <20170207172446.4528-1-paolo.valente@linaro.org>
-Date: Mon, 13 Feb 2017 22:09:45 +0100
-Cc: Jens Axboe <axboe@kernel.dk>,
- Tejun Heo <tj@kernel.org>,
- linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org,
- ulf.hansson@linaro.org,
- linus.walleij@linaro.org,
- broonie@kernel.org
-Message-Id: <478A4EBE-9218-4527-9F8A-42AAEBDC9470@linaro.org>
-References: <20170207172446.4528-1-paolo.valente@linaro.org>
-To: Paolo Valente <paolo.valente@linaro.org>
+In-Reply-To: <55E6D3EE-27D1-4D46-ABE5-750445FB941B@linaro.org>
+Date: Mon, 13 Feb 2017 22:07:12 +0100
+Cc: "tj@kernel.org" <tj@kernel.org>,
+ "axboe@kernel.dk" <axboe@kernel.dk>,
+ "ulf.hansson@linaro.org" <ulf.hansson@linaro.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "broonie@kernel.org" <broonie@kernel.org>,
+ "linus.walleij@linaro.org" <linus.walleij@linaro.org>
+Message-Id: <1A8DF6A8-C251-472A-9CE1-ACB1BCD0E9AB@linaro.org>
+References: <20170207172446.4528-1-paolo.valente@linaro.org> <1486745110.2840.3.camel@sandisk.com> <1241B224-A446-4C76-87BB-4EA63852B6D1@linaro.org> <4a893c20-5a6b-a16c-073a-57c1a3d91b5a@sandisk.com> <55E6D3EE-27D1-4D46-ABE5-750445FB941B@linaro.org>
+To: Bart Van Assche <bart.vanassche@sandisk.com>
 List-ID: <linux-block@vger.kernel.org>
 
 
-> Il giorno 07 feb 2017, alle ore 18:24, Paolo Valente =
+> Il giorno 10 feb 2017, alle ore 20:49, Paolo Valente =
 <paolo.valente@linaro.org> ha scritto:
 >=20
-> Hi,
+>>=20
+>> Il giorno 10 feb 2017, alle ore 19:13, Bart Van Assche =
+<bart.vanassche@sandisk.com> ha scritto:
+>>=20
+>> On 02/10/2017 08:49 AM, Paolo Valente wrote:
+>>>> $ grep '^C.*_MQ_' .config
+>>>> CONFIG_BLK_MQ_PCI=3Dy
+>>>> CONFIG_MQ_IOSCHED_BFQ=3Dy
+>>>> CONFIG_MQ_IOSCHED_DEADLINE=3Dy
+>>>> CONFIG_MQ_IOSCHED_NONE=3Dy
+>>>> CONFIG_DEFAULT_MQ_BFQ_MQ=3Dy
+>>>> CONFIG_DEFAULT_MQ_IOSCHED=3D"bfq-mq"
+>>>> CONFIG_SCSI_MQ_DEFAULT=3Dy
+>>>> CONFIG_DM_MQ_DEFAULT=3Dy
+>>>>=20
+>>>=20
+>>> Could you reconfigure with none or mq-deadline as default, check
+>>> whether the system boots, and, it it does, switch manually to =
+bfq-mq,
+>>> check what happens, and, in the likely case of a failure, try to get
+>>> the oops?
+>>=20
+>> Hello Paolo,
+>>=20
+>> I just finished performing that test with the following kernel =
+config:
+>> $ grep '^C.*_MQ_' .config
+>> CONFIG_BLK_MQ_PCI=3Dy
+>> CONFIG_MQ_IOSCHED_BFQ=3Dy
+>> CONFIG_MQ_IOSCHED_DEADLINE=3Dy
+>> CONFIG_MQ_IOSCHED_NONE=3Dy
+>> CONFIG_DEFAULT_MQ_DEADLINE=3Dy
+>> CONFIG_DEFAULT_MQ_IOSCHED=3D"mq-deadline"
+>> CONFIG_SCSI_MQ_DEFAULT=3Dy
+>> CONFIG_DM_MQ_DEFAULT=3Dy
+>>=20
+>> After the system came up I logged in, switched to the bfq-mq =
+scheduler
+>> and ran several I/O tests against the boot disk.
 >=20
-> I have finally pushed here [1] the current WIP branch of bfq for
-> blk-mq, which I have tentatively named bfq-mq.
+> Without any failure, right?
 >=20
-> This branch *IS NOT* meant for merging into mainline and contain code
-> that mau easily violate code style, and not only, in many
-> places. Commits implement the following main steps:
-> 1) Add the last version of bfq for blk
-> 2) Clone bfq source files into identical bfq-mq source files
-> 3) Modify bfq-mq files to get a working version of bfq for blk-mq
-> (cgroups support not yet functional)
+> Unfortunately, as you can imagine, no boot failure occurred on
+> any of my test systems so far :(
 >=20
-> In my intentions, the main goals of this branch are:
->=20
-> 1) Show, as soon as I could, the changes I made to let bfq-mq comply
-> with blk-mq-sched framework. I though this could be particularly
-> useful for Jens, being BFQ identical to CFQ in terms of hook
-> interfaces and io-context handling, and almost identical in terms
-> request-merging.
->=20
-> 2) Enable people to test this first version bfq-mq. Code is purposely
-> overfull of log messages and invariant checks that halt the system on
-> failure (lock assertions, BUG_ONs, ...).
->=20
-> To make it easier to revise commits, I'm sending the patches that
-> transform bfq into bfq-mq (last four patches in the branch [1]). They
-> work on two files, bfq-mq-iosched.c and bfq-mq.h, which, at the
-> beginning, are just copies of bfq-iosched.c and bfq.h.
+> This version of bfq-mq can be configured to print all its activity in
+> the kernel log, by just defining a macro.  This will of course slow
+> down the system so much to make it probably unusable, if bfq-mq is
+> active from boot.  Yet, the failure may still occur so early to make
+> this approach useful to discover where bfq-mq gets stuck.  As of now I
+> have no better ideas.  Any suggestion is welcome.
 >=20
 
-Hi,
-this is just to inform that, as I just wrote to Bart, I have rebase
-the branch [1] against the current content of for-4.11/next.
+Hi Bart,
+I have found a machine crashing at boot, yet not only when bfq-mq is
+chosen, but also when mq-deadline is chosen as the default
+scheduler.  I have found and just reported the cause of the failure,
+together with a fix.  Probably this is not the cause of your failure,
+but what do you think about trying this fix?  BTW, I have rebased the
+branch [1] against the new commits in Jens for-4.11/next.
 
-Jens, Omar, did you find the time to have a look at the main commits
-or to run some test?
+Otherwise, if you have no news or suggestions, would you be willing to
+try my micro-logging proposal?
 
 Thanks,
 Paolo
@@ -68,22 +94,18 @@ Paolo
 > Thanks,
 > Paolo
 >=20
-> [1] https://github.com/Algodev-github/bfq-mq
->=20
-> Paolo Valente (4):
->  blk-mq: pass bio to blk_mq_sched_get_rq_priv
->  Move thinktime from bic to bfqq
->  Embed bfq-ioc.c and add locking on request queue
->  Modify interface and operation to comply with blk-mq-sched
->=20
-> block/bfq-cgroup.c       |   4 -
-> block/bfq-mq-iosched.c   | 852 =
-+++++++++++++++++++++++++++++------------------
-> block/bfq-mq.h           |  65 ++--
-> block/blk-mq-sched.c     |   8 +-
-> block/blk-mq-sched.h     |   5 +-
-> include/linux/elevator.h |   2 +-
-> 6 files changed, 567 insertions(+), 369 deletions(-)
->=20
-> --
-> 2.10.0
+>> Sorry but nothing
+>> interesting appeared in the kernel log.
+>>=20
+>> Bart.
+>> Western Digital Corporation (and its subsidiaries) E-mail =
+Confidentiality Notice & Disclaimer:
+>>=20
+>> This e-mail and any files transmitted with it may contain =
+confidential or legally privileged information of WDC and/or its =
+affiliates, and are intended solely for the use of the individual or =
+entity to which they are addressed. If you are not the intended =
+recipient, any disclosure, copying, distribution or any action taken or =
+omitted to be taken in reliance on it, is prohibited. If you have =
+received this e-mail in error, please notify the sender immediately and =
+delete the e-mail in its entirety from your system.
