@@ -1,74 +1,69 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <Bart.VanAssche@sandisk.com>
-To: "paolo.valente@linaro.org" <paolo.valente@linaro.org>
-CC: "ulf.hansson@linaro.org" <ulf.hansson@linaro.org>, "tj@kernel.org"
-	<tj@kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "broonie@kernel.org" <broonie@kernel.org>,
-	"linus.walleij@linaro.org" <linus.walleij@linaro.org>, "axboe@kernel.dk"
-	<axboe@kernel.dk>
+Return-Path: <axboe@kernel.dk>
 Subject: Re: [WIP PATCHSET 0/4] WIP branch for bfq-mq
-Date: Mon, 13 Feb 2017 22:38:57 +0000
-Message-ID: <1487025524.2719.11.camel@sandisk.com>
+To: Paolo Valente <paolo.valente@linaro.org>
 References: <20170207172446.4528-1-paolo.valente@linaro.org>
-	 <1486745110.2840.3.camel@sandisk.com>
-	 <1241B224-A446-4C76-87BB-4EA63852B6D1@linaro.org>
-	 <4a893c20-5a6b-a16c-073a-57c1a3d91b5a@sandisk.com>
-	 <55E6D3EE-27D1-4D46-ABE5-750445FB941B@linaro.org>
-	 <1A8DF6A8-C251-472A-9CE1-ACB1BCD0E9AB@linaro.org>
-	 <1487023626.2719.9.camel@sandisk.com>
-In-Reply-To: <1487023626.2719.9.camel@sandisk.com>
-Content-Type: text/plain; charset="iso-8859-1"
+ <478A4EBE-9218-4527-9F8A-42AAEBDC9470@linaro.org>
+Cc: Tejun Heo <tj@kernel.org>, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, ulf.hansson@linaro.org,
+ linus.walleij@linaro.org, broonie@kernel.org
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <0425b6c7-d6be-b019-e750-bf858e864307@kernel.dk>
+Date: Mon, 13 Feb 2017 15:29:35 -0700
 MIME-Version: 1.0
+In-Reply-To: <478A4EBE-9218-4527-9F8A-42AAEBDC9470@linaro.org>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, 2017-02-13 at 22:07 +0000, Bart Van Assche wrote:
-> On Mon, 2017-02-13 at 22:07 +0100, Paolo Valente wrote:
-> > but what do you think about trying this fix?
-> =
+On 02/13/2017 02:09 PM, Paolo Valente wrote:
+> 
+>> Il giorno 07 feb 2017, alle ore 18:24, Paolo Valente <paolo.valente@linaro.org> ha scritto:
+>>
+>> Hi,
+>>
+>> I have finally pushed here [1] the current WIP branch of bfq for
+>> blk-mq, which I have tentatively named bfq-mq.
+>>
+>> This branch *IS NOT* meant for merging into mainline and contain code
+>> that mau easily violate code style, and not only, in many
+>> places. Commits implement the following main steps:
+>> 1) Add the last version of bfq for blk
+>> 2) Clone bfq source files into identical bfq-mq source files
+>> 3) Modify bfq-mq files to get a working version of bfq for blk-mq
+>> (cgroups support not yet functional)
+>>
+>> In my intentions, the main goals of this branch are:
+>>
+>> 1) Show, as soon as I could, the changes I made to let bfq-mq comply
+>> with blk-mq-sched framework. I though this could be particularly
+>> useful for Jens, being BFQ identical to CFQ in terms of hook
+>> interfaces and io-context handling, and almost identical in terms
+>> request-merging.
+>>
+>> 2) Enable people to test this first version bfq-mq. Code is purposely
+>> overfull of log messages and invariant checks that halt the system on
+>> failure (lock assertions, BUG_ONs, ...).
+>>
+>> To make it easier to revise commits, I'm sending the patches that
+>> transform bfq into bfq-mq (last four patches in the branch [1]). They
+>> work on two files, bfq-mq-iosched.c and bfq-mq.h, which, at the
+>> beginning, are just copies of bfq-iosched.c and bfq.h.
+>>
+> 
+> Hi,
+> this is just to inform that, as I just wrote to Bart, I have rebase
+> the branch [1] against the current content of for-4.11/next.
+> 
+> Jens, Omar, did you find the time to have a look at the main commits
+> or to run some test?
 
-> Sorry but with ... the same server I used for the previous test still
-> didn't boot up properly. A screenshot is available at
-> https://goo.gl/photos/Za9QVGCNe2BJBwxVA.
-> =
+I only looked at the core change you proposed for passing in the
+bio as well, and Omar fixed up the icq exit part and I also applied
+that patch. I haven't look at any of the bfq-mq patches at all yet.
+Not sure what I can do with those, I don't think those are
+particularly useful to anyone but you.
 
-> > Otherwise, if you have no news or suggestions, would you be willing to
-> > try my micro-logging proposal https://github.com/Algodev-github/bfq-mq?
-> =
+Might make more sense to post the conversion for review as a
+whole.
 
-> Sorry but it's not clear to me what logging mechanism you are referring
-> to and how to enable it? Are you perhaps referring to
-> CONFIG_BFQ_REDIRECT_TO_CONSOLE?
-
-Anyway, a second screenshot has been added to the same album after I had
-applied the following patch:
-
-diff --git a/block/Makefile b/block/Makefile
-index 1c04fe19e825..bf472ac82c08 100644
---- a/block/Makefile
-+++ b/block/Makefile
-@@ -2,6 +2,8 @@
- # Makefile for the kernel block layer
- #
- =A0
-+KBUILD_CFLAGS +=3D -DCONFIG_BFQ_REDIRECT_TO_CONSOLE
-+
-
- obj-$(CONFIG_BLOCK) :=3D bio.o elevator.o blk-core.o blk-tag.o blk-sysfs.o=
- \
- =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0blk-f=
-lush.o blk-settings.o blk-ioc.o blk-map.o \
- =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0blk-e=
-xec.o blk-merge.o blk-softirq.o blk-timeout.o \
-
-Bart.
-Western Digital Corporation (and its subsidiaries) E-mail Confidentiality N=
-otice & Disclaimer:
-
-This e-mail and any files transmitted with it may contain confidential or l=
-egally privileged information of WDC and/or its affiliates, and are intende=
-d solely for the use of the individual or entity to which they are addresse=
-d. If you are not the intended recipient, any disclosure, copying, distribu=
-tion or any action taken or omitted to be taken in reliance on it, is prohi=
-bited. If you have received this e-mail in error, please notify the sender =
-immediately and delete the e-mail in its entirety from your system.
+-- 
+Jens Axboe
