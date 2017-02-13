@@ -1,66 +1,60 @@
-Return-Path: <osandov@osandov.com>
-Return-Path: <osandov@osandov.com>
-Date: Mon, 13 Feb 2017 14:09:00 -0800
-From: Omar Sandoval <osandov@osandov.com>
-To: Paolo Valente <paolo.valente@linaro.org>
-Cc: Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org, linus.walleij@linaro.org,
-	broonie@kernel.org
+Return-Path: <Bart.VanAssche@sandisk.com>
+From: Bart Van Assche <Bart.VanAssche@sandisk.com>
+To: "tj@kernel.org" <tj@kernel.org>, "paolo.valente@linaro.org"
+	<paolo.valente@linaro.org>, "axboe@kernel.dk" <axboe@kernel.dk>
+CC: "ulf.hansson@linaro.org" <ulf.hansson@linaro.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"broonie@kernel.org" <broonie@kernel.org>, "linus.walleij@linaro.org"
+	<linus.walleij@linaro.org>
 Subject: Re: [PATCH BUGFIX] block: make elevator_get robust against cross
  blk/blk-mq choice
-Message-ID: <20170213220900.GA11052@vader.DHCP.thefacebook.com>
+Date: Mon, 13 Feb 2017 21:12:59 +0000
+Message-ID: <1487020366.2719.5.camel@sandisk.com>
 References: <20170213210107.4848-1-paolo.valente@linaro.org>
- <20170213210107.4848-2-paolo.valente@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+	 <20170213210107.4848-2-paolo.valente@linaro.org>
 In-Reply-To: <20170213210107.4848-2-paolo.valente@linaro.org>
+Content-Type: text/plain; charset="iso-8859-1"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Feb 13, 2017 at 10:01:07PM +0100, Paolo Valente wrote:
-> If, at boot, a legacy I/O scheduler is chosen for a device using blk-mq,
-> or, viceversa, a blk-mq scheduler is chosen for a device using blk, then
-> that scheduler is set and initialized without any check, driving the
-> system into an inconsistent state. This commit addresses this issue by
-> letting elevator_get fail for these wrong cross choices.
-> 
-> Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
-> ---
->  block/elevator.c | 26 ++++++++++++++++++--------
->  1 file changed, 18 insertions(+), 8 deletions(-)
+On Mon, 2017-02-13 at 22:01 +0100, Paolo Valente wrote:
+> -static struct elevator_type *elevator_get(const char *name, bool try_loa=
+ding)
+> +static struct elevator_type *elevator_get(const char *name, bool try_loa=
+ding,
+> +					  bool mq_ops)
 
-Hey, Paolo,
+Please choose a better name for that argument, e.q. "mq". To me the name "m=
+q_ops"
+means "a pointer to a data structure with operation function pointers".
 
-How exactly are you triggering this? In __elevator_change(), we do check
-for mq or not mq:
+> +	if (e && (e->uses_mq !=3D mq_ops)) {
+> +		pr_err("ERROR: attempted to choose %s %s I/O scheduler in blk%s",
+> +		       name, e->uses_mq ? "blk-mq" : "legacy", mq_ops ? "-mq" : "");
+> +		e =3D NULL;
+> +	}
 
-	if (!e->uses_mq && q->mq_ops) {
-		elevator_put(e);
-		return -EINVAL;
-	}
-	if (e->uses_mq && !q->mq_ops) {
-		elevator_put(e);
-		return -EINVAL;
-	}
+How about changing the above into:
 
-We don't ever appear to call elevator_init() with a specific scheduler
-name, and for the default we switch off of q->mq_ops and use the
-defaults from Kconfig:
++=A0=A0=A0=A0=A0=A0=A0if (e && e->uses_mq !=3D mq) {
++=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0pr_err("ERROR: attempt to con=
+figure %s as I/O scheduler for a %s queue\n",
++=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0name, mq=
+ ? "blk-mq" : "legacy");
++=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0e =3D NULL;
++=A0=A0=A0=A0=A0=A0=A0}
 
-	if (q->mq_ops && q->nr_hw_queues == 1)
-		e = elevator_get(CONFIG_DEFAULT_SQ_IOSCHED, false);
-	else if (q->mq_ops)
-		e = elevator_get(CONFIG_DEFAULT_MQ_IOSCHED, false);
-	else
-		e = elevator_get(CONFIG_DEFAULT_IOSCHED, false);
+Thanks,
 
-	if (!e) {
-		printk(KERN_ERR
-			"Default I/O scheduler not found. " \
-			"Using noop/none.\n");
-		e = elevator_get("noop", false);
-	}
+Bart.
+Western Digital Corporation (and its subsidiaries) E-mail Confidentiality N=
+otice & Disclaimer:
 
-So I guess this could happen if someone manually changed those Kconfig
-options, but I don't see what other case would make this happen, could
-you please explain?
+This e-mail and any files transmitted with it may contain confidential or l=
+egally privileged information of WDC and/or its affiliates, and are intende=
+d solely for the use of the individual or entity to which they are addresse=
+d. If you are not the intended recipient, any disclosure, copying, distribu=
+tion or any action taken or omitted to be taken in reliance on it, is prohi=
+bited. If you have received this e-mail in error, please notify the sender =
+immediately and delete the e-mail in its entirety from your system.
