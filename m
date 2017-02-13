@@ -1,7 +1,7 @@
 Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-Date: Mon, 13 Feb 2017 08:01:17 -0800
-From: Matthew Wilcox <willy@infradead.org>
-To: "Kirill A. Shutemov" <kirill@shutemov.name>
+Date: Mon, 13 Feb 2017 18:33:42 +0300
+From: "Kirill A. Shutemov" <kirill@shutemov.name>
+To: Matthew Wilcox <willy@infradead.org>
 Cc: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
         Theodore Ts'o <tytso@mit.edu>,
         Andreas Dilger <adilger.kernel@dilger.ca>,
@@ -18,42 +18,52 @@ Cc: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
         linux-block@vger.kernel.org
 Subject: Re: [PATCHv6 08/37] filemap: handle huge pages in
  do_generic_file_read()
-Message-ID: <20170213160117.GA6416@bombadil.infradead.org>
+Message-ID: <20170213153342.GE20394@node.shutemov.name>
 References: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
  <20170126115819.58875-9-kirill.shutemov@linux.intel.com>
  <20170209215505.GW2267@bombadil.infradead.org>
- <20170213153342.GE20394@node.shutemov.name>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170213153342.GE20394@node.shutemov.name>
+In-Reply-To: <20170209215505.GW2267@bombadil.infradead.org>
 Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Feb 13, 2017 at 06:33:42PM +0300, Kirill A. Shutemov wrote:
-> No. pagecache_get_page() returns subpage. See description of the first
-> patch.
-
-Your description says:
-
-> We also change interface for page-cache lookup function:
+On Thu, Feb 09, 2017 at 01:55:05PM -0800, Matthew Wilcox wrote:
+> On Thu, Jan 26, 2017 at 02:57:50PM +0300, Kirill A. Shutemov wrote:
+> > +++ b/mm/filemap.c
+> > @@ -1886,6 +1886,7 @@ static ssize_t do_generic_file_read(struct file *filp, loff_t *ppos,
+> >  			if (unlikely(page == NULL))
+> >  				goto no_cached_page;
+> >  		}
+> > +		page = compound_head(page);
 > 
->   - functions that lookup for pages[1] would return subpages of THP
->     relevant for requested indexes;
-> 
->   - functions that lookup for entries[2] would return one entry per-THP
->     and index will point to index of head page (basically, round down to
->     HPAGE_PMD_NR);
-> 
-> This would provide balanced exposure of multi-order entires to the rest
-> of the kernel.
-> 
-> [1] find_get_pages(), pagecache_get_page(), pagevec_lookup(), etc.
-> [2] find_get_entry(), find_get_entries(), pagevec_lookup_entries(), etc.
+> We got this page from find_get_page(), which gets it from
+> pagecache_get_page(), which gets it from find_get_entry() ... which
+> (unless I'm lost in your patch series) returns the head page.  So this
+> line is redundant, right?
 
-I'm saying:
+No. pagecache_get_page() returns subpage. See description of the first
+patch.
 
-> > We got this page from find_get_page(), which gets it from
-> > pagecache_get_page(), which gets it from find_get_entry() ... which
-> > (unless I'm lost in your patch series) returns the head page.
+> But then down in filemap_fault, we have:
+> 
+>         VM_BUG_ON_PAGE(page->index != offset, page);
+> 
+> ... again, maybe I'm lost somewhere in your patch series, but I don't see
+> anywhere you remove that line (or modify it).
 
-Am I guilty of debugging documentation rather than code?
+This should be fine as find_get_page() returns subpage.
+
+> So are you not testing
+> with VM debugging enabled, or are you not doing a test which includes
+> mapping a file with huge pages, reading from it (to get the page in cache),
+> then faulting on an address that is not in the first 4kB of that 2MB?
+> 
+> --
+> To unsubscribe, send a message with 'unsubscribe linux-mm' in
+> the body to majordomo@kvack.org.  For more info on Linux MM,
+> see: http://www.linux-mm.org/ .
+> Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
+
+-- 
+ Kirill A. Shutemov
