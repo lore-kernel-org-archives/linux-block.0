@@ -1,24 +1,68 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:36183 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755550AbdBQM7s (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Feb 2017 07:59:48 -0500
-From: Christoph Hellwig <hch@lst.de>
-To: scott.bauer@intel.com, keith.busch@intel.com,
-        jonathan.derrick@intel.com, axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-Subject: OPAL fixups
-Date: Fri, 17 Feb 2017 13:59:37 +0100
-Message-Id: <20170217125941.14319-1-hch@lst.de>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Date: Mon, 13 Feb 2017 17:32:47 +0300
+From: "Kirill A. Shutemov" <kirill@shutemov.name>
+To: Matthew Wilcox <willy@infradead.org>
+Cc: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCHv6 05/37] thp: try to free page's buffers before attempt
+ split
+Message-ID: <20170213143247.GC20394@node.shutemov.name>
+References: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
+ <20170126115819.58875-6-kirill.shutemov@linux.intel.com>
+ <20170209201416.GS2267@bombadil.infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170209201416.GS2267@bombadil.infradead.org>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Hi all,
+On Thu, Feb 09, 2017 at 12:14:16PM -0800, Matthew Wilcox wrote:
+> On Thu, Jan 26, 2017 at 02:57:47PM +0300, Kirill A. Shutemov wrote:
+> > @@ -2146,6 +2146,23 @@ int split_huge_page_to_list(struct page *page, struct list_head *list)
+> >  			goto out;
+> >  		}
+> >  
+> > +		/* Try to free buffers before attempt split */
+> > +		if (!PageSwapBacked(head) && PagePrivate(page)) {
+> > +			/*
+> > +			 * We cannot trigger writeback from here due possible
+> > +			 * recursion if triggered from vmscan, only wait.
+> > +			 *
+> > +			 * Caller can trigger writeback it on its own, if safe.
+> > +			 */
+> 
+> It took me a few reads to get this.  May I suggest:
+> 
+> 		/*
+> 		 * Cannot split a page with buffers.  If the caller has
+> 		 * already started writeback, we can wait for it to finish,
+> 		 * but we cannot start writeback if we were called from vmscan
+> 		 */
 
-this contains a few more OPAL-related fixups.  It tones down warnings a bit,
-allocates the OPAL-ѕpecific data structure in a separate dynamic allocation,
-checks for support of Security Send/Receive in NVMe before using them,
-and makes sure we re-discovery the security capabilities after each reset.
+Yeah, that's better.
+
+> > +		if (!PageSwapBacked(head) && PagePrivate(page)) {
+> 
+> Also, it looks weird to test PageSwapBacked of *head* and PagePrivate
+> of *page*.  I think it's correct, but it still looks weird.
+
+I'll change this.
+
+> Reviewed-by: Matthew Wilcox <mawilcox@microsoft.com>
+
+Thanks!
+
+-- 
+ Kirill A. Shutemov
