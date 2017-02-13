@@ -1,19 +1,33 @@
-Return-Path: <BATV+1f42f42caf748e0126fd+4912+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Thomas Gleixner <tglx@linutronix.de>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <keith.busch@intel.com>,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: spread MSI(-X) vectors to all possible CPUs
-Date: Fri,  3 Feb 2017 15:35:54 +0100
-Message-Id: <20170203143600.32307-1-hch@lst.de>
+Return-Path: <bauerman@linux.vnet.ibm.com>
+From: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
+To: Jan Kara <jack@suse.cz>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>, Tejun Heo <tj@kernel.org>,
+        Dan Williams <dan.j.williams@intel.com>, NeilBrown <neilb@suse.de>,
+        lekshmicpillai@in.ibm.com
+Subject: Re: [PATCH 0/10] block: Fix block device shutdown related races
+Date: Mon, 13 Feb 2017 12:27:14 -0200
+In-Reply-To: <20170209124433.2626-1-jack@suse.cz>
+References: <20170209124433.2626-1-jack@suse.cz>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Message-Id: <2573999.VcEKEPpiaH@morokweng>
 List-ID: <linux-block@vger.kernel.org>
 
-Hi all,
+Hi,
 
-this series changes our automatic MSI-X vector assignment so that it
-takes all present CPUs into account instead of all online ones.  This
-allows to better deal with cpu hotplug events, which could happen
-frequently due to power management for example.
+Am Donnerstag, 9. Februar 2017, 13:44:23 BRST schrieb Jan Kara:
+> People, please have a look at patches. The are mostly simple however the
+> interactions are rather complex so I may have missed something. Also I'm
+> happy for any additional testing these patches can get - I've stressed them
+> with Omar's script, tested memcg writeback, tested static (not udev managed)
+> device inodes.
+
+Lekshmi has been stress-testing these patches for 4 days now without problems.
+If this is the version that goes in, you can add:
+
+Tested-by: Lekshmi Pillai <lekshmicpillai@in.ibm.com>
+
+-- 
+Thiago Jung Bauermann
+IBM Linux Technology Center
