@@ -1,69 +1,54 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f49.google.com ([74.125.82.49]:35401 "EHLO
-        mail-wm0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753651AbdBGRZA (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Feb 2017 12:25:00 -0500
-Received: by mail-wm0-f49.google.com with SMTP id v186so20597132wmd.0
-        for <linux-block@vger.kernel.org>; Tue, 07 Feb 2017 09:25:00 -0800 (PST)
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        ulf.hansson@linaro.org, linus.walleij@linaro.org,
-        broonie@kernel.org, Paolo Valente <paolo.valente@linaro.org>
-Subject: [WIP PATCHSET 0/4] WIP branch for bfq-mq
-Date: Tue,  7 Feb 2017 18:24:42 +0100
-Message-Id: <20170207172446.4528-1-paolo.valente@linaro.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Subject: Re: [PATCH] block/loop: fix race between I/O and set_status
+To: Ming Lei <tom.leiming@gmail.com>, linux-kernel@vger.kernel.org
+References: <1486784445-25300-1-git-send-email-tom.leiming@gmail.com>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+ Dmitry Vyukov <dvyukov@google.com>, stable@vger.kernel.org
+From: Jens Axboe <axboe@fb.com>
+Message-ID: <a8f3d1d9-e299-3169-98b3-23334d881889@fb.com>
+Date: Mon, 13 Feb 2017 09:37:34 -0700
+MIME-Version: 1.0
+In-Reply-To: <1486784445-25300-1-git-send-email-tom.leiming@gmail.com>
+Content-Type: text/plain; charset=windows-1252
+List-ID: <linux-block@vger.kernel.org>
 
-Hi,
+On 02/10/2017 08:40 PM, Ming Lei wrote:
+> Inside set_status, transfer need to setup again, so
+> we have to drain IO before the transition, otherwise
+> oops may be triggered like the following:
+> 
+> 	divide error: 0000 [#1] SMP KASAN
+> 	CPU: 0 PID: 2935 Comm: loop7 Not tainted 4.10.0-rc7+ #213
+> 	Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Bochs
+> 	01/01/2011
+> 	task: ffff88006ba1e840 task.stack: ffff880067338000
+> 	RIP: 0010:transfer_xor+0x1d1/0x440 drivers/block/loop.c:110
+> 	RSP: 0018:ffff88006733f108 EFLAGS: 00010246
+> 	RAX: 0000000000000000 RBX: ffff8800688d7000 RCX: 0000000000000059
+> 	RDX: 0000000000000000 RSI: 1ffff1000d743f43 RDI: ffff880068891c08
+> 	RBP: ffff88006733f160 R08: ffff8800688d7001 R09: 0000000000000000
+> 	R10: 0000000000000000 R11: 0000000000000000 R12: ffff8800688d7000
+> 	R13: ffff880067b7d000 R14: dffffc0000000000 R15: 0000000000000000
+> 	FS:  0000000000000000(0000) GS:ffff88006d000000(0000)
+> 	knlGS:0000000000000000
+> 	CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> 	CR2: 00000000006c17e0 CR3: 0000000066e3b000 CR4: 00000000001406f0
+> 	Call Trace:
+> 	 lo_do_transfer drivers/block/loop.c:251 [inline]
+> 	 lo_read_transfer drivers/block/loop.c:392 [inline]
+> 	 do_req_filebacked drivers/block/loop.c:541 [inline]
+> 	 loop_handle_cmd drivers/block/loop.c:1677 [inline]
+> 	 loop_queue_work+0xda0/0x49b0 drivers/block/loop.c:1689
+> 	 kthread_worker_fn+0x4c3/0xa30 kernel/kthread.c:630
+> 	 kthread+0x326/0x3f0 kernel/kthread.c:227
+> 	 ret_from_fork+0x31/0x40 arch/x86/entry/entry_64.S:430
+> 	Code: 03 83 e2 07 41 29 df 42 0f b6 04 30 4d 8d 44 24 01 38 d0 7f 08
+> 	84 c0 0f 85 62 02 00 00 44 89 f8 41 0f b6 48 ff 25 ff 01 00 00 99 <f7>
+> 	7d c8 48 63 d2 48 03 55 d0 48 89 d0 48 89 d7 48 c1 e8 03 83
+> 	RIP: transfer_xor+0x1d1/0x440 drivers/block/loop.c:110 RSP:
+> 	ffff88006733f108
+> 	---[ end trace 0166f7bd3b0c0933 ]---
 
-I have finally pushed here [1] the current WIP branch of bfq for
-blk-mq, which I have tentatively named bfq-mq.
+Thanks Ming, added for 4.11.
 
-This branch *IS NOT* meant for merging into mainline and contain code
-that mau easily violate code style, and not only, in many
-places. Commits implement the following main steps:
-1) Add the last version of bfq for blk
-2) Clone bfq source files into identical bfq-mq source files
-3) Modify bfq-mq files to get a working version of bfq for blk-mq
-(cgroups support not yet functional)
-
-In my intentions, the main goals of this branch are:
-
-1) Show, as soon as I could, the changes I made to let bfq-mq comply
-with blk-mq-sched framework. I though this could be particularly
-useful for Jens, being BFQ identical to CFQ in terms of hook
-interfaces and io-context handling, and almost identical in terms
-request-merging.
-
-2) Enable people to test this first version bfq-mq. Code is purposely
-overfull of log messages and invariant checks that halt the system on
-failure (lock assertions, BUG_ONs, ...).
-
-To make it easier to revise commits, I'm sending the patches that
-transform bfq into bfq-mq (last four patches in the branch [1]). They
-work on two files, bfq-mq-iosched.c and bfq-mq.h, which, at the
-beginning, are just copies of bfq-iosched.c and bfq.h.
-
-Thanks,
-Paolo
-
-[1] https://github.com/Algodev-github/bfq-mq
-
-Paolo Valente (4):
-  blk-mq: pass bio to blk_mq_sched_get_rq_priv
-  Move thinktime from bic to bfqq
-  Embed bfq-ioc.c and add locking on request queue
-  Modify interface and operation to comply with blk-mq-sched
-
- block/bfq-cgroup.c       |   4 -
- block/bfq-mq-iosched.c   | 852 +++++++++++++++++++++++++++++------------------
- block/bfq-mq.h           |  65 ++--
- block/blk-mq-sched.c     |   8 +-
- block/blk-mq-sched.h     |   5 +-
- include/linux/elevator.h |   2 +-
- 6 files changed, 567 insertions(+), 369 deletions(-)
-
---
-2.10.0
+-- 
+Jens Axboe
