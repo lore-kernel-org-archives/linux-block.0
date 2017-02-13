@@ -1,7 +1,7 @@
-Return-Path: <hare@suse.de>
+Return-Path: <axboe@kernel.dk>
 Subject: Re: [PATCH BUGFIX] block: make elevator_get robust against cross
  blk/blk-mq choice
-To: Jens Axboe <axboe@kernel.dk>, Omar Sandoval <osandov@osandov.com>,
+To: Omar Sandoval <osandov@osandov.com>,
  Paolo Valente <paolo.valente@linaro.org>
 References: <20170213210107.4848-1-paolo.valente@linaro.org>
  <20170213210107.4848-2-paolo.valente@linaro.org>
@@ -10,15 +10,15 @@ References: <20170213210107.4848-1-paolo.valente@linaro.org>
 Cc: Tejun Heo <tj@kernel.org>, linux-block@vger.kernel.org,
  linux-kernel@vger.kernel.org, ulf.hansson@linaro.org,
  linus.walleij@linaro.org, broonie@kernel.org
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <d6e69d7b-dc69-90ec-0130-dc774fd4da2a@suse.de>
-Date: Tue, 14 Feb 2017 07:58:22 +0100
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <b1a1ad6d-6e22-7d55-bbad-40807d95f59b@kernel.dk>
+Date: Mon, 13 Feb 2017 16:10:30 -0700
 MIME-Version: 1.0
 In-Reply-To: <89b98d59-fcae-6b13-a6a1-6fe62967929d@kernel.dk>
 Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-block@vger.kernel.org>
 
-On 02/13/2017 11:28 PM, Jens Axboe wrote:
+On 02/13/2017 03:28 PM, Jens Axboe wrote:
 > On 02/13/2017 03:09 PM, Omar Sandoval wrote:
 >> On Mon, Feb 13, 2017 at 10:01:07PM +0100, Paolo Valente wrote:
 >>> If, at boot, a legacy I/O scheduler is chosen for a device using blk-mq,
@@ -73,22 +73,38 @@ On 02/13/2017 11:28 PM, Jens Axboe wrote:
 > think of. If it is, I'd much prefer only using 'chosen_elevator' for
 > the non-mq stuff, and the fix should be just that instead.
 > 
-[ .. ]
-While we're at the topic:
+> So instead of:
+> 
+> 	if (!e && *chosen_elevator) {
+> 
+> do
+> 
+> 	if (!e && !q->mq_ops && && *chosen_elevator) {
 
-Can't we use the same names for legacy and mq scheduler?
-It's quite an unnecessary complication to have
-'noop', 'deadline', and 'cfq' for legacy, but 'none' and 'mq-deadline'
-for mq. If we could use 'noop' and 'deadline' for mq, too, the existing
-settings or udev rules will continue to work and we wouldn't get any
-annoying and pointless warnings here...
+Confirmed, that's what it seems to be, and here's a real diff of the
+above example that works for me:
 
-Cheers,
+diff --git a/block/elevator.c b/block/elevator.c
+index 27ff1ed5a6fa..699d10f71a2c 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -207,11 +207,12 @@ int elevator_init(struct request_queue *q, char *name)
+ 	}
+ 
+ 	/*
+-	 * Use the default elevator specified by config boot param or
+-	 * config option.  Don't try to load modules as we could be running
+-	 * off async and request_module() isn't allowed from async.
++	 * Use the default elevator specified by config boot param for
++	 * non-mq devices, or by config option. Don't try to load modules
++	 * as we could be running off async and request_module() isn't
++	 * allowed from async.
+ 	 */
+-	if (!e && *chosen_elevator) {
++	if (!e && !q->mq_ops && *chosen_elevator) {
+ 		e = elevator_get(chosen_elevator, false);
+ 		if (!e)
+ 			printk(KERN_ERR "I/O scheduler %s not found\n",
 
-Hannes
 -- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: F. Imend�rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG N�rnberg)
+Jens Axboe
