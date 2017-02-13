@@ -1,44 +1,48 @@
-Return-Path: <jack@suse.cz>
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Tejun Heo <tj@kernel.org>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
-	NeilBrown <neilb@suse.de>,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH 01/10] block: Move bdev_unhash_inode() after invalidate_partition()
-Date: Thu,  9 Feb 2017 13:44:24 +0100
-Message-Id: <20170209124433.2626-2-jack@suse.cz>
-In-Reply-To: <20170209124433.2626-1-jack@suse.cz>
-References: <20170209124433.2626-1-jack@suse.cz>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wr0-f196.google.com ([209.85.128.196]:35297 "EHLO
+        mail-wr0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752528AbdBMN7y (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 13 Feb 2017 08:59:54 -0500
+Received: by mail-wr0-f196.google.com with SMTP id o16so24312262wra.2
+        for <linux-block@vger.kernel.org>; Mon, 13 Feb 2017 05:59:53 -0800 (PST)
+Date: Mon, 13 Feb 2017 16:59:50 +0300
+From: "Kirill A. Shutemov" <kirill@shutemov.name>
+To: Matthew Wilcox <willy@infradead.org>
+Cc: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCHv6 03/37] page-flags: relax page flag policy for few flags
+Message-ID: <20170213135950.GB20394@node.shutemov.name>
+References: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
+ <20170126115819.58875-4-kirill.shutemov@linux.intel.com>
+ <20170209040113.GR2267@bombadil.infradead.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170209040113.GR2267@bombadil.infradead.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Move bdev_unhash_inode() after invalidate_partition() as
-invalidate_partition() looks up bdev and will unnecessarily recreate it
-if bdev_unhash_inode() destroyed it. Also use part_devt() when calling
-bdev_unhash_inode() instead of manually creating the device number.
+On Wed, Feb 08, 2017 at 08:01:13PM -0800, Matthew Wilcox wrote:
+> On Thu, Jan 26, 2017 at 02:57:45PM +0300, Kirill A. Shutemov wrote:
+> > These flags are in use for filesystems with backing storage: PG_error,
+> > PG_writeback and PG_readahead.
+> 
+> Oh ;-)  Then I amend my comment on patch 1 to be "patch 3 needs to go
+> ahead of patch 1" ;-)
 
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- block/genhd.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+It doesn't really matter as long as both before patch 37 :P
 
-diff --git a/block/genhd.c b/block/genhd.c
-index d9ccd42f3675..6cb9f3a34a92 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -648,9 +648,8 @@ void del_gendisk(struct gendisk *disk)
- 	disk_part_iter_init(&piter, disk,
- 			     DISK_PITER_INCL_EMPTY | DISK_PITER_REVERSE);
- 	while ((part = disk_part_iter_next(&piter))) {
--		bdev_unhash_inode(MKDEV(disk->major,
--					disk->first_minor + part->partno));
- 		invalidate_partition(disk, part->partno);
-+		bdev_unhash_inode(part_devt(part));
- 		delete_partition(disk, part->partno);
- 	}
- 	disk_part_iter_exit(&piter);
 -- 
-2.10.2
+ Kirill A. Shutemov
