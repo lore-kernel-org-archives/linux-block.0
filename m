@@ -1,853 +1,316 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga05.intel.com ([192.55.52.43]:7552 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750766AbdBRAAi (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Feb 2017 19:00:38 -0500
-From: Jon Derrick <jonathan.derrick@intel.com>
-Cc: Jon Derrick <jonathan.derrick@intel.com>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        Scott Bauer <scott.bauer@intel.com>,
-        Rafael Antognolli <rafael.antognolli@intel.com>,
-        Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@lst.de>
-Subject: [PATCHv2 4/5] block/sed: Embed function data into the function sequence
-Date: Fri, 17 Feb 2017 17:00:28 -0700
-Message-Id: <1487376029-22662-5-git-send-email-jonathan.derrick@intel.com>
-In-Reply-To: <1487376029-22662-1-git-send-email-jonathan.derrick@intel.com>
-References: <1487376029-22662-1-git-send-email-jonathan.derrick@intel.com>
-To: unlisted-recipients:; (no To-header on input)
+Received: from bombadil.infradead.org ([65.50.211.133]:48213 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753126AbdBNTQU (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 14 Feb 2017 14:16:20 -0500
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernek.dk
+Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
+Subject: [PATCH 5/6] scsi: merge __scsi_execute into scsi_execute
+Date: Tue, 14 Feb 2017 20:15:59 +0100
+Message-Id: <20170214191600.17480-6-hch@lst.de>
+In-Reply-To: <20170214191600.17480-1-hch@lst.de>
+References: <20170214191600.17480-1-hch@lst.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-By embedding the function data with the function sequence, this
-eliminates a lot of the code that needs to set it in other places.
+All but one caller want the decoded sense header, so offer the existing
+__scsi_execute helper as the public scsi_execute API to simply the
+callers.
 
-Signed-off-by: Jon Derrick <jonathan.derrick@intel.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/sed-opal.c | 358 +++++++++++++++++++++----------------------------------
- 1 file changed, 138 insertions(+), 220 deletions(-)
+ drivers/ata/libata-scsi.c         | 12 ++++------
+ drivers/scsi/cxlflash/superpipe.c |  8 +++----
+ drivers/scsi/cxlflash/vlun.c      |  4 ++--
+ drivers/scsi/scsi_lib.c           | 48 +++++++++++++++++----------------------
+ drivers/scsi/scsi_transport_spi.c | 24 ++++++++------------
+ drivers/scsi/sr_ioctl.c           | 19 +++-------------
+ include/scsi/scsi_device.h        |  5 ++--
+ 7 files changed, 46 insertions(+), 74 deletions(-)
 
-diff --git a/block/sed-opal.c b/block/sed-opal.c
-index 4fc4d7b..e2e3228 100644
---- a/block/sed-opal.c
-+++ b/block/sed-opal.c
-@@ -34,7 +34,11 @@
- #define IO_BUFFER_LENGTH 2048
- #define MAX_TOKS 64
+diff --git a/drivers/ata/libata-scsi.c b/drivers/ata/libata-scsi.c
+index c771d4c341ea..0b1e6762c6f9 100644
+--- a/drivers/ata/libata-scsi.c
++++ b/drivers/ata/libata-scsi.c
+@@ -607,6 +607,7 @@ int ata_cmd_ioctl(struct scsi_device *scsidev, void __user *arg)
+ 	u8 args[4], *argbuf = NULL, *sensebuf = NULL;
+ 	int argsize = 0;
+ 	enum dma_data_direction data_dir;
++	struct scsi_sense_hdr sshdr;
+ 	int cmd_result;
  
--typedef int (*opal_step)(struct opal_dev *dev);
-+typedef struct opal_step {
-+	int (*fn)(struct opal_dev *dev, void *data);
-+	void *data;
-+} opal_step;
-+typedef int (cont_fn)(struct opal_dev *dev);
+ 	if (arg == NULL)
+@@ -655,7 +656,7 @@ int ata_cmd_ioctl(struct scsi_device *scsidev, void __user *arg)
+ 	/* Good values for timeout and retries?  Values below
+ 	   from scsi_ioctl_send_command() for default case... */
+ 	cmd_result = scsi_execute(scsidev, scsi_cmd, data_dir, argbuf, argsize,
+-				  sensebuf, (10*HZ), 5, 0, NULL);
++				  sensebuf, &sshdr, (10*HZ), 5, 0, 0, NULL);
  
- enum opal_atom_width {
- 	OPAL_WIDTH_TINY,
-@@ -80,8 +84,7 @@ struct opal_dev {
- 	void *data;
- 	sec_send_recv *send_recv;
+ 	if (driver_byte(cmd_result) == DRIVER_SENSE) {/* sense data available */
+ 		u8 *desc = sensebuf + 8;
+@@ -664,9 +665,6 @@ int ata_cmd_ioctl(struct scsi_device *scsidev, void __user *arg)
+ 		/* If we set cc then ATA pass-through will cause a
+ 		 * check condition even if no error. Filter that. */
+ 		if (cmd_result & SAM_STAT_CHECK_CONDITION) {
+-			struct scsi_sense_hdr sshdr;
+-			scsi_normalize_sense(sensebuf, SCSI_SENSE_BUFFERSIZE,
+-					     &sshdr);
+ 			if (sshdr.sense_key == RECOVERED_ERROR &&
+ 			    sshdr.asc == 0 && sshdr.ascq == 0x1d)
+ 				cmd_result &= ~SAM_STAT_CHECK_CONDITION;
+@@ -714,6 +712,7 @@ int ata_task_ioctl(struct scsi_device *scsidev, void __user *arg)
+ 	int rc = 0;
+ 	u8 scsi_cmd[MAX_COMMAND_SIZE];
+ 	u8 args[7], *sensebuf = NULL;
++	struct scsi_sense_hdr sshdr;
+ 	int cmd_result;
  
--	const opal_step *funcs;
--	void **func_data;
-+	opal_step *funcs;
- 	int state;
- 	struct mutex dev_lock;
- 	u16 comid;
-@@ -213,8 +216,6 @@ struct opal_dev {
- 		{ 0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x08, 0x03 },
- };
+ 	if (arg == NULL)
+@@ -741,7 +740,7 @@ int ata_task_ioctl(struct scsi_device *scsidev, void __user *arg)
+ 	/* Good values for timeout and retries?  Values below
+ 	   from scsi_ioctl_send_command() for default case... */
+ 	cmd_result = scsi_execute(scsidev, scsi_cmd, DMA_NONE, NULL, 0,
+-				sensebuf, (10*HZ), 5, 0, NULL);
++				sensebuf, &sshdr, (10*HZ), 5, 0, 0, NULL);
  
--typedef int (cont_fn)(struct opal_dev *dev);
+ 	if (driver_byte(cmd_result) == DRIVER_SENSE) {/* sense data available */
+ 		u8 *desc = sensebuf + 8;
+@@ -750,9 +749,6 @@ int ata_task_ioctl(struct scsi_device *scsidev, void __user *arg)
+ 		/* If we set cc then ATA pass-through will cause a
+ 		 * check condition even if no error. Filter that. */
+ 		if (cmd_result & SAM_STAT_CHECK_CONDITION) {
+-			struct scsi_sense_hdr sshdr;
+-			scsi_normalize_sense(sensebuf, SCSI_SENSE_BUFFERSIZE,
+-						&sshdr);
+ 			if (sshdr.sense_key == RECOVERED_ERROR &&
+ 			    sshdr.asc == 0 && sshdr.ascq == 0x1d)
+ 				cmd_result &= ~SAM_STAT_CHECK_CONDITION;
+diff --git a/drivers/scsi/cxlflash/superpipe.c b/drivers/scsi/cxlflash/superpipe.c
+index 9636970d9611..005a377a427f 100644
+--- a/drivers/scsi/cxlflash/superpipe.c
++++ b/drivers/scsi/cxlflash/superpipe.c
+@@ -305,6 +305,7 @@ static int read_cap16(struct scsi_device *sdev, struct llun_info *lli)
+ 	struct cxlflash_cfg *cfg = (struct cxlflash_cfg *)sdev->host->hostdata;
+ 	struct device *dev = &cfg->dev->dev;
+ 	struct glun_info *gli = lli->parent;
++	struct scsi_sense_hdr sshdr;
+ 	u8 *cmd_buf = NULL;
+ 	u8 *scsi_cmd = NULL;
+ 	u8 *sense_buf = NULL;
+@@ -332,7 +333,8 @@ static int read_cap16(struct scsi_device *sdev, struct llun_info *lli)
+ 	/* Drop the ioctl read semahpore across lengthy call */
+ 	up_read(&cfg->ioctl_rwsem);
+ 	result = scsi_execute(sdev, scsi_cmd, DMA_FROM_DEVICE, cmd_buf,
+-			      CMD_BUFSIZE, sense_buf, to, CMD_RETRIES, 0, NULL);
++			      CMD_BUFSIZE, sense_buf, &sshdr, to, CMD_RETRIES,
++			      0, 0, NULL);
+ 	down_read(&cfg->ioctl_rwsem);
+ 	rc = check_state(cfg);
+ 	if (rc) {
+@@ -345,10 +347,6 @@ static int read_cap16(struct scsi_device *sdev, struct llun_info *lli)
+ 	if (driver_byte(result) == DRIVER_SENSE) {
+ 		result &= ~(0xFF<<24); /* DRIVER_SENSE is not an error */
+ 		if (result & SAM_STAT_CHECK_CONDITION) {
+-			struct scsi_sense_hdr sshdr;
 -
- static int end_opal_session_error(struct opal_dev *dev);
- 
- struct opal_suspend_data {
-@@ -375,15 +376,15 @@ static void check_geometry(struct opal_dev *dev, const void *data)
- 
- static int next(struct opal_dev *dev)
- {
--	opal_step func;
-+	opal_step *func;
- 	int error = 0;
- 
- 	do {
--		func = dev->funcs[dev->state];
--		if (!func)
-+		func = &dev->funcs[dev->state];
-+		if (!func->fn)
- 			break;
- 
--		error = func(dev);
-+		error = func->fn(dev, func->data);
- 		if (error) {
- 			pr_err("Error on step function: %d with error %d: %s\n",
- 			       dev->state, error,
-@@ -483,7 +484,7 @@ static int opal_discovery0_end(struct opal_dev *dev)
- 	return 0;
+-			scsi_normalize_sense(sense_buf, SCSI_SENSE_BUFFERSIZE,
+-					    &sshdr);
+ 			switch (sshdr.sense_key) {
+ 			case NO_SENSE:
+ 			case RECOVERED_ERROR:
+diff --git a/drivers/scsi/cxlflash/vlun.c b/drivers/scsi/cxlflash/vlun.c
+index 90c5d7f5278e..6d191db1d874 100644
+--- a/drivers/scsi/cxlflash/vlun.c
++++ b/drivers/scsi/cxlflash/vlun.c
+@@ -454,8 +454,8 @@ static int write_same16(struct scsi_device *sdev,
+ 		/* Drop the ioctl read semahpore across lengthy call */
+ 		up_read(&cfg->ioctl_rwsem);
+ 		result = scsi_execute(sdev, scsi_cmd, DMA_TO_DEVICE, cmd_buf,
+-				      CMD_BUFSIZE, sense_buf, to, CMD_RETRIES,
+-				      0, NULL);
++				      CMD_BUFSIZE, sense_buf, NULL, to,
++				      CMD_RETRIES, 0, 0, NULL);
+ 		down_read(&cfg->ioctl_rwsem);
+ 		rc = check_state(cfg);
+ 		if (rc) {
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index 35b43a8f1bfa..a15c188c2a7f 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -213,7 +213,26 @@ void scsi_queue_insert(struct scsi_cmnd *cmd, int reason)
+ 	__scsi_queue_insert(cmd, reason, 1);
  }
  
--static int opal_discovery0(struct opal_dev *dev)
-+static int opal_discovery0(struct opal_dev *dev, void *data)
- {
- 	int ret;
+-static int __scsi_execute(struct scsi_device *sdev, const unsigned char *cmd,
++
++/**
++ * scsi_execute - insert request and wait for the result
++ * @sdev:	scsi device
++ * @cmd:	scsi command
++ * @data_direction: data direction
++ * @buffer:	data buffer
++ * @bufflen:	len of buffer
++ * @sense:	optional sense buffer
++ * @sshdr:	optional decoded sense header
++ * @timeout:	request timeout in seconds
++ * @retries:	number of times to retry request
++ * @flags:	flags for ->cmd_flags
++ * @rq_flags:	flags for ->rq_flags
++ * @resid:	optional residual length
++ *
++ * returns the req->errors value which is the scsi_cmnd result
++ * field.
++ */
++int scsi_execute(struct scsi_device *sdev, const unsigned char *cmd,
+ 		 int data_direction, void *buffer, unsigned bufflen,
+ 		 unsigned char *sense, struct scsi_sense_hdr *sshdr,
+ 		 int timeout, int retries, u64 flags, req_flags_t rq_flags,
+@@ -268,31 +287,6 @@ static int __scsi_execute(struct scsi_device *sdev, const unsigned char *cmd,
  
-@@ -1018,7 +1019,7 @@ static int finalize_and_send(struct opal_dev *dev, cont_fn cont)
- 	return opal_send_recv(dev, cont);
- }
- 
--static int gen_key(struct opal_dev *dev)
-+static int gen_key(struct opal_dev *dev, void *data)
- {
- 	const u8 *method;
- 	u8 uid[OPAL_UID_LENGTH];
-@@ -1072,15 +1073,14 @@ static int get_active_key_cont(struct opal_dev *dev)
- 	return 0;
- }
- 
--static int get_active_key(struct opal_dev *dev)
-+static int get_active_key(struct opal_dev *dev, void *data)
- {
- 	u8 uid[OPAL_UID_LENGTH];
- 	int err = 0;
--	u8 *lr;
-+	u8 *lr = data;
- 
- 	clear_opal_cmd(dev);
- 	set_comid(dev, dev->comid);
--	lr = dev->func_data[dev->state];
- 
- 	err = build_locking_range(uid, sizeof(uid), *lr);
- 	if (err)
-@@ -1163,17 +1163,16 @@ static inline int enable_global_lr(struct opal_dev *dev, u8 *uid,
- 	return err;
- }
- 
--static int setup_locking_range(struct opal_dev *dev)
-+static int setup_locking_range(struct opal_dev *dev, void *data)
- {
- 	u8 uid[OPAL_UID_LENGTH];
--	struct opal_user_lr_setup *setup;
-+	struct opal_user_lr_setup *setup = data;
- 	u8 lr;
- 	int err = 0;
- 
- 	clear_opal_cmd(dev);
- 	set_comid(dev, dev->comid);
- 
--	setup = dev->func_data[dev->state];
- 	lr = setup->session.opal_key.lr;
- 	err = build_locking_range(uid, sizeof(uid), lr);
- 	if (err)
-@@ -1286,20 +1285,19 @@ static int start_generic_opal_session(struct opal_dev *dev,
- 	return finalize_and_send(dev, start_opal_session_cont);
- }
- 
--static int start_anybodyASP_opal_session(struct opal_dev *dev)
-+static int start_anybodyASP_opal_session(struct opal_dev *dev, void *data)
- {
- 	return start_generic_opal_session(dev, OPAL_ANYBODY_UID,
- 					  OPAL_ADMINSP_UID, NULL, 0);
- }
- 
--static int start_SIDASP_opal_session(struct opal_dev *dev)
-+static int start_SIDASP_opal_session(struct opal_dev *dev, void *data)
- {
- 	int ret;
- 	const u8 *key = dev->prev_data;
--	struct opal_key *okey;
- 
- 	if (!key) {
--		okey = dev->func_data[dev->state];
-+		const struct opal_key *okey = data;
- 		ret = start_generic_opal_session(dev, OPAL_SID_UID,
- 						 OPAL_ADMINSP_UID,
- 						 okey->key,
-@@ -1314,22 +1312,21 @@ static int start_SIDASP_opal_session(struct opal_dev *dev)
  	return ret;
  }
- 
--static inline int start_admin1LSP_opal_session(struct opal_dev *dev)
-+static inline int start_admin1LSP_opal_session(struct opal_dev *dev, void *data)
- {
--	struct opal_key *key = dev->func_data[dev->state];
 -
-+	struct opal_key *key = data;
- 	return start_generic_opal_session(dev, OPAL_ADMIN1_UID,
- 					  OPAL_LOCKINGSP_UID,
- 					  key->key, key->key_len);
- }
- 
--static int start_auth_opal_session(struct opal_dev *dev)
-+static int start_auth_opal_session(struct opal_dev *dev, void *data)
- {
-+	struct opal_session_info *session = data;
- 	u8 lk_ul_user[OPAL_UID_LENGTH];
-+	size_t keylen = session->opal_key.key_len;
- 	int err = 0;
- 
--	struct opal_session_info *session = dev->func_data[dev->state];
--	size_t keylen = session->opal_key.key_len;
- 	u8 *key = session->opal_key.key;
- 	u32 hsn = GENERIC_HOST_SESSION_NUM;
- 
-@@ -1379,7 +1376,7 @@ static int start_auth_opal_session(struct opal_dev *dev)
- 	return finalize_and_send(dev, start_opal_session_cont);
- }
- 
--static int revert_tper(struct opal_dev *dev)
-+static int revert_tper(struct opal_dev *dev, void *data)
- {
- 	int err = 0;
- 
-@@ -1401,9 +1398,9 @@ static int revert_tper(struct opal_dev *dev)
- 	return finalize_and_send(dev, parse_and_check_status);
- }
- 
--static int internal_activate_user(struct opal_dev *dev)
-+static int internal_activate_user(struct opal_dev *dev, void *data)
- {
--	struct opal_session_info *session = dev->func_data[dev->state];
-+	struct opal_session_info *session = data;
- 	u8 uid[OPAL_UID_LENGTH];
- 	int err = 0;
- 
-@@ -1436,15 +1433,14 @@ static int internal_activate_user(struct opal_dev *dev)
- 	return finalize_and_send(dev, parse_and_check_status);
- }
- 
--static int erase_locking_range(struct opal_dev *dev)
-+static int erase_locking_range(struct opal_dev *dev, void *data)
- {
--	struct opal_session_info *session;
-+	struct opal_session_info *session = data;
- 	u8 uid[OPAL_UID_LENGTH];
- 	int err = 0;
- 
- 	clear_opal_cmd(dev);
- 	set_comid(dev, dev->comid);
--	session = dev->func_data[dev->state];
- 
- 	if (build_locking_range(uid, sizeof(uid), session->opal_key.lr) < 0)
- 		return -ERANGE;
-@@ -1463,9 +1459,9 @@ static int erase_locking_range(struct opal_dev *dev)
- 	return finalize_and_send(dev, parse_and_check_status);
- }
- 
--static int set_mbr_done(struct opal_dev *dev)
-+static int set_mbr_done(struct opal_dev *dev, void *data)
- {
--	u8 mbr_done_tf = *(u8 *)dev->func_data[dev->state];
-+	u8 mbr_done_tf = *(u8 *)data;
- 	int err = 0;
- 
- 	clear_opal_cmd(dev);
-@@ -1495,9 +1491,9 @@ static int set_mbr_done(struct opal_dev *dev)
- 	return finalize_and_send(dev, parse_and_check_status);
- }
- 
--static int set_mbr_enable_disable(struct opal_dev *dev)
-+static int set_mbr_enable_disable(struct opal_dev *dev, void *data)
- {
--	u8 mbr_en_dis = *(u8 *)dev->func_data[dev->state];
-+	u8 mbr_en_dis = *(u8 *)data;
- 	int err = 0;
- 
- 	clear_opal_cmd(dev);
-@@ -1554,11 +1550,10 @@ static int generic_pw_cmd(u8 *key, size_t key_len, u8 *cpin_uid,
- 	return err;
- }
- 
--static int set_new_pw(struct opal_dev *dev)
-+static int set_new_pw(struct opal_dev *dev, void *data)
- {
- 	u8 cpin_uid[OPAL_UID_LENGTH];
--	struct opal_session_info *usr = dev->func_data[dev->state];
--
-+	struct opal_session_info *usr = data;
- 
- 	memcpy(cpin_uid, opaluid[OPAL_C_PIN_ADMIN1], OPAL_UID_LENGTH);
- 
-@@ -1579,10 +1574,10 @@ static int set_new_pw(struct opal_dev *dev)
- 	return finalize_and_send(dev, parse_and_check_status);
- }
- 
--static int set_sid_cpin_pin(struct opal_dev *dev)
-+static int set_sid_cpin_pin(struct opal_dev *dev, void *data)
- {
- 	u8 cpin_uid[OPAL_UID_LENGTH];
--	struct opal_key *key = dev->func_data[dev->state];
-+	struct opal_key *key = data;
- 
- 	memcpy(cpin_uid, opaluid[OPAL_C_PIN_SID], OPAL_UID_LENGTH);
- 
-@@ -1593,18 +1588,16 @@ static int set_sid_cpin_pin(struct opal_dev *dev)
- 	return finalize_and_send(dev, parse_and_check_status);
- }
- 
--static int add_user_to_lr(struct opal_dev *dev)
-+static int add_user_to_lr(struct opal_dev *dev, void *data)
- {
- 	u8 lr_buffer[OPAL_UID_LENGTH];
- 	u8 user_uid[OPAL_UID_LENGTH];
--	struct opal_lock_unlock *lkul;
-+	struct opal_lock_unlock *lkul = data;
- 	int err = 0;
- 
- 	clear_opal_cmd(dev);
- 	set_comid(dev, dev->comid);
- 
--	lkul = dev->func_data[dev->state];
--
- 	memcpy(lr_buffer, opaluid[OPAL_LOCKINGRANGE_ACE_RDLOCKED],
- 	       OPAL_UID_LENGTH);
- 
-@@ -1671,11 +1664,11 @@ static int add_user_to_lr(struct opal_dev *dev)
- 	return finalize_and_send(dev, parse_and_check_status);
- }
- 
--static int lock_unlock_locking_range(struct opal_dev *dev)
-+static int lock_unlock_locking_range(struct opal_dev *dev, void *data)
- {
- 	u8 lr_buffer[OPAL_UID_LENGTH];
- 	const u8 *method;
--	struct opal_lock_unlock *lkul;
-+	struct opal_lock_unlock *lkul = data;
- 	u8 read_locked = 1, write_locked = 1;
- 	int err = 0;
- 
-@@ -1683,7 +1676,6 @@ static int lock_unlock_locking_range(struct opal_dev *dev)
- 	set_comid(dev, dev->comid);
- 
- 	method = opalmethod[OPAL_SET];
--	lkul = dev->func_data[dev->state];
- 	if (build_locking_range(lr_buffer, sizeof(lr_buffer),
- 				lkul->session.opal_key.lr) < 0)
- 		return -ERANGE;
-@@ -1735,19 +1727,18 @@ static int lock_unlock_locking_range(struct opal_dev *dev)
- }
- 
- 
--static int lock_unlock_locking_range_sum(struct opal_dev *dev)
-+static int lock_unlock_locking_range_sum(struct opal_dev *dev, void *data)
- {
- 	u8 lr_buffer[OPAL_UID_LENGTH];
- 	u8 read_locked = 1, write_locked = 1;
- 	const u8 *method;
--	struct opal_lock_unlock *lkul;
-+	struct opal_lock_unlock *lkul = data;
- 	int ret;
- 
- 	clear_opal_cmd(dev);
- 	set_comid(dev, dev->comid);
- 
- 	method = opalmethod[OPAL_SET];
--	lkul = dev->func_data[dev->state];
- 	if (build_locking_range(lr_buffer, sizeof(lr_buffer),
- 				lkul->session.opal_key.lr) < 0)
- 		return -ERANGE;
-@@ -1778,9 +1769,9 @@ static int lock_unlock_locking_range_sum(struct opal_dev *dev)
- 	return finalize_and_send(dev, parse_and_check_status);
- }
- 
--static int activate_lsp(struct opal_dev *dev)
-+static int activate_lsp(struct opal_dev *dev, void *data)
- {
--	struct opal_lr_act *opal_act;
-+	struct opal_lr_act *opal_act = data;
- 	u8 user_lr[OPAL_UID_LENGTH];
- 	u8 uint_3 = 0x83;
- 	int err = 0, i;
-@@ -1788,8 +1779,6 @@ static int activate_lsp(struct opal_dev *dev)
- 	clear_opal_cmd(dev);
- 	set_comid(dev, dev->comid);
- 
--	opal_act = dev->func_data[dev->state];
--
- 	add_token_u8(&err, dev, OPAL_CALL);
- 	add_token_bytestring(&err, dev, opaluid[OPAL_LOCKINGSP_UID],
- 			     OPAL_UID_LENGTH);
-@@ -1854,7 +1843,7 @@ static int get_lsp_lifecycle_cont(struct opal_dev *dev)
- }
- 
- /* Determine if we're in the Manufactured Inactive or Active state */
--static int get_lsp_lifecycle(struct opal_dev *dev)
-+static int get_lsp_lifecycle(struct opal_dev *dev, void *data)
- {
- 	int err = 0;
- 
-@@ -1915,14 +1904,13 @@ static int get_msid_cpin_pin_cont(struct opal_dev *dev)
- 	return 0;
- }
- 
--static int get_msid_cpin_pin(struct opal_dev *dev)
-+static int get_msid_cpin_pin(struct opal_dev *dev, void *data)
- {
- 	int err = 0;
- 
- 	clear_opal_cmd(dev);
- 	set_comid(dev, dev->comid);
- 
--
- 	add_token_u8(&err, dev, OPAL_CALL);
- 	add_token_bytestring(&err, dev, opaluid[OPAL_C_PIN_MSID],
- 			     OPAL_UID_LENGTH);
-@@ -1963,7 +1951,7 @@ static int build_end_opal_session(struct opal_dev *dev)
- 	return err;
- }
- 
--static int end_opal_session(struct opal_dev *dev)
-+static int end_opal_session(struct opal_dev *dev, void *data)
- {
- 	int ret = build_end_opal_session(dev);
- 
-@@ -1974,9 +1962,9 @@ static int end_opal_session(struct opal_dev *dev)
- 
- static int end_opal_session_error(struct opal_dev *dev)
- {
--	const opal_step error_end_session[] = {
--		end_opal_session,
--		NULL,
-+	opal_step error_end_session[] = {
-+		{ end_opal_session, },
-+		{ NULL, }
- 	};
- 	dev->funcs = error_end_session;
- 	dev->state = 0;
-@@ -1984,21 +1972,20 @@ static int end_opal_session_error(struct opal_dev *dev)
- }
- 
- static inline void setup_opal_dev(struct opal_dev *dev,
--				  const opal_step *funcs)
-+				  opal_step *funcs)
- {
- 	dev->state = 0;
- 	dev->funcs = funcs;
- 	dev->tsn = 0;
- 	dev->hsn = 0;
--	dev->func_data = NULL;
- 	dev->prev_data = NULL;
- }
- 
- static int check_opal_support(struct opal_dev *dev)
- {
--	static const opal_step funcs[] = {
--		opal_discovery0,
--		NULL
-+	opal_step funcs[] = {
-+		{ opal_discovery0, },
-+		{ NULL, }
- 	};
- 	int ret;
- 
-@@ -2034,24 +2021,18 @@ struct opal_dev *init_opal_dev(void *data, sec_send_recv *send_recv)
- static int opal_secure_erase_locking_range(struct opal_dev *dev,
- 					   struct opal_session_info *opal_session)
- {
--	void *data[3] = { NULL };
--	static const opal_step erase_funcs[] = {
--		opal_discovery0,
--		start_auth_opal_session,
--		get_active_key,
--		gen_key,
--		end_opal_session,
--		NULL,
-+	opal_step erase_funcs[] = {
-+		{ opal_discovery0, },
-+		{ start_auth_opal_session, opal_session },
-+		{ get_active_key, &opal_session->opal_key.lr },
-+		{ gen_key, },
-+		{ end_opal_session, },
-+		{ NULL, }
- 	};
- 	int ret;
- 
- 	mutex_lock(&dev->dev_lock);
- 	setup_opal_dev(dev, erase_funcs);
--
--	dev->func_data = data;
--	dev->func_data[1] = opal_session;
--	dev->func_data[2] = &opal_session->opal_key.lr;
--
- 	ret = next(dev);
- 	mutex_unlock(&dev->dev_lock);
- 	return ret;
-@@ -2060,23 +2041,17 @@ static int opal_secure_erase_locking_range(struct opal_dev *dev,
- static int opal_erase_locking_range(struct opal_dev *dev,
- 				    struct opal_session_info *opal_session)
- {
--	void *data[3] = { NULL };
--	static const opal_step erase_funcs[] = {
--		opal_discovery0,
--		start_auth_opal_session,
--		erase_locking_range,
--		end_opal_session,
--		NULL,
-+	opal_step erase_funcs[] = {
-+		{ opal_discovery0, },
-+		{ start_auth_opal_session, opal_session },
-+		{ erase_locking_range, opal_session },
-+		{ end_opal_session, },
-+		{ NULL, }
- 	};
- 	int ret;
- 
- 	mutex_lock(&dev->dev_lock);
- 	setup_opal_dev(dev, erase_funcs);
--
--	dev->func_data = data;
--	dev->func_data[1] = opal_session;
--	dev->func_data[2] = opal_session;
--
- 	ret = next(dev);
- 	mutex_unlock(&dev->dev_lock);
- 	return ret;
-@@ -2085,16 +2060,15 @@ static int opal_erase_locking_range(struct opal_dev *dev,
- static int opal_enable_disable_shadow_mbr(struct opal_dev *dev,
- 					  struct opal_mbr_data *opal_mbr)
- {
--	void *func_data[6] = { NULL };
--	static const opal_step mbr_funcs[] = {
--		opal_discovery0,
--		start_admin1LSP_opal_session,
--		set_mbr_done,
--		end_opal_session,
--		start_admin1LSP_opal_session,
--		set_mbr_enable_disable,
--		end_opal_session,
--		NULL,
-+	opal_step mbr_funcs[] = {
-+		{ opal_discovery0, },
-+		{ start_admin1LSP_opal_session, &opal_mbr->key },
-+		{ set_mbr_done, &opal_mbr->enable_disable },
-+		{ end_opal_session, },
-+		{ start_admin1LSP_opal_session, &opal_mbr->key },
-+		{ set_mbr_enable_disable, &opal_mbr->enable_disable },
-+		{ end_opal_session, },
-+		{ NULL, }
- 	};
- 	int ret;
- 
-@@ -2104,11 +2078,6 @@ static int opal_enable_disable_shadow_mbr(struct opal_dev *dev,
- 
- 	mutex_lock(&dev->dev_lock);
- 	setup_opal_dev(dev, mbr_funcs);
--	dev->func_data = func_data;
--	dev->func_data[1] = &opal_mbr->key;
--	dev->func_data[2] = &opal_mbr->enable_disable;
--	dev->func_data[4] = &opal_mbr->key;
--	dev->func_data[5] = &opal_mbr->enable_disable;
- 	ret = next(dev);
- 	mutex_unlock(&dev->dev_lock);
- 	return ret;
-@@ -2135,13 +2104,12 @@ static int opal_save(struct opal_dev *dev, struct opal_lock_unlock *lk_unlk)
- static int opal_add_user_to_lr(struct opal_dev *dev,
- 			       struct opal_lock_unlock *lk_unlk)
- {
--	void *func_data[3] = { NULL };
--	static const opal_step funcs[] = {
--		opal_discovery0,
--		start_admin1LSP_opal_session,
--		add_user_to_lr,
--		end_opal_session,
--		NULL
-+	opal_step funcs[] = {
-+		{ opal_discovery0, },
-+		{ start_admin1LSP_opal_session, &lk_unlk->session.opal_key },
-+		{ add_user_to_lr, lk_unlk },
-+		{ end_opal_session, },
-+		{ NULL, }
- 	};
- 	int ret;
- 
-@@ -2164,9 +2132,6 @@ static int opal_add_user_to_lr(struct opal_dev *dev,
- 
- 	mutex_lock(&dev->dev_lock);
- 	setup_opal_dev(dev, funcs);
--	dev->func_data = func_data;
--	dev->func_data[1] = &lk_unlk->session.opal_key;
--	dev->func_data[2] = lk_unlk;
- 	ret = next(dev);
- 	mutex_unlock(&dev->dev_lock);
- 	return ret;
-@@ -2174,55 +2139,44 @@ static int opal_add_user_to_lr(struct opal_dev *dev,
- 
- static int opal_reverttper(struct opal_dev *dev, struct opal_key *opal)
- {
--	void *data[2] = { NULL };
--	static const opal_step revert_funcs[] = {
--		opal_discovery0,
--		start_SIDASP_opal_session,
--		revert_tper, /* controller will terminate session */
--		NULL,
-+	opal_step revert_funcs[] = {
-+		{ opal_discovery0, },
-+		{ start_SIDASP_opal_session, opal },
-+		{ revert_tper, }, /* controller will terminate session */
-+		{ NULL, }
- 	};
- 	int ret;
- 
- 	mutex_lock(&dev->dev_lock);
- 	setup_opal_dev(dev, revert_funcs);
--	dev->func_data = data;
--	dev->func_data[1] = opal;
- 	ret = next(dev);
- 	mutex_unlock(&dev->dev_lock);
- 	return ret;
- }
- 
--static int __opal_lock_unlock_sum(struct opal_dev *dev)
-+static int __opal_lock_unlock(struct opal_dev *dev,
-+			      struct opal_lock_unlock *lk_unlk)
- {
--	static const opal_step ulk_funcs_sum[] = {
--		opal_discovery0,
--		start_auth_opal_session,
--		lock_unlock_locking_range_sum,
--		end_opal_session,
--		NULL
-+	opal_step _unlock_funcs[] = {
-+		{ opal_discovery0, },
-+		{ start_auth_opal_session, &lk_unlk->session },
-+		{ NULL, lk_unlk },
-+		{ end_opal_session, },
-+		{ NULL, }
- 	};
- 
--	dev->funcs = ulk_funcs_sum;
--	return next(dev);
--}
--
--static int __opal_lock_unlock(struct opal_dev *dev)
+-/**
+- * scsi_execute - insert request and wait for the result
+- * @sdev:	scsi device
+- * @cmd:	scsi command
+- * @data_direction: data direction
+- * @buffer:	data buffer
+- * @bufflen:	len of buffer
+- * @sense:	optional sense buffer
+- * @timeout:	request timeout in seconds
+- * @retries:	number of times to retry request
+- * @flags:	or into request flags;
+- * @resid:	optional residual length
+- *
+- * returns the req->errors value which is the scsi_cmnd result
+- * field.
+- */
+-int scsi_execute(struct scsi_device *sdev, const unsigned char *cmd,
+-		 int data_direction, void *buffer, unsigned bufflen,
+-		 unsigned char *sense, int timeout, int retries, u64 flags,
+-		 int *resid)
 -{
--	static const opal_step _unlock_funcs[] = {
--		opal_discovery0,
--		start_auth_opal_session,
--		lock_unlock_locking_range,
--		end_opal_session,
--		NULL
--	};
-+	if (lk_unlk->session.sum)
-+		_unlock_funcs[2].fn = lock_unlock_locking_range_sum;
-+	else
-+		_unlock_funcs[2].fn = lock_unlock_locking_range;
+-	return __scsi_execute(sdev, cmd, data_direction, buffer, bufflen, sense,
+-			NULL, timeout, retries, flags, 0, resid);
+-}
+ EXPORT_SYMBOL(scsi_execute);
  
- 	dev->funcs = _unlock_funcs;
- 	return next(dev);
+ int scsi_execute_req_flags(struct scsi_device *sdev, const unsigned char *cmd,
+@@ -300,7 +294,7 @@ int scsi_execute_req_flags(struct scsi_device *sdev, const unsigned char *cmd,
+ 		     struct scsi_sense_hdr *sshdr, int timeout, int retries,
+ 		     int *resid, u64 flags, req_flags_t rq_flags)
+ {
+-	return __scsi_execute(sdev, cmd, data_direction, buffer, bufflen,
++	return scsi_execute(sdev, cmd, data_direction, buffer, bufflen,
+ 			      NULL, sshdr, timeout, retries, flags, rq_flags,
+ 			      resid);
  }
- 
--static int opal_lock_unlock(struct opal_dev *dev, struct opal_lock_unlock *lk_unlk)
-+static int opal_lock_unlock(struct opal_dev *dev,
-+			    struct opal_lock_unlock *lk_unlk)
+diff --git a/drivers/scsi/scsi_transport_spi.c b/drivers/scsi/scsi_transport_spi.c
+index 319868f3f674..d0219e36080c 100644
+--- a/drivers/scsi/scsi_transport_spi.c
++++ b/drivers/scsi/scsi_transport_spi.c
+@@ -123,25 +123,21 @@ static int spi_execute(struct scsi_device *sdev, const void *cmd,
  {
--	void *func_data[3] = { NULL };
- 	int ret;
+ 	int i, result;
+ 	unsigned char sense[SCSI_SENSE_BUFFERSIZE];
++	struct scsi_sense_hdr sshdr_tmp;
++
++	if (!sshdr)
++		sshdr = &sshdr_tmp;
  
- 	if (lk_unlk->session.who < OPAL_ADMIN1 ||
-@@ -2231,32 +2185,23 @@ static int opal_lock_unlock(struct opal_dev *dev, struct opal_lock_unlock *lk_un
- 
- 	mutex_lock(&dev->dev_lock);
- 	setup_opal_dev(dev, NULL);
--	dev->func_data = func_data;
--	dev->func_data[1] = &lk_unlk->session;
--	dev->func_data[2] = lk_unlk;
+ 	for(i = 0; i < DV_RETRIES; i++) {
+-		result = scsi_execute(sdev, cmd, dir, buffer, bufflen,
+-				      sense, DV_TIMEOUT, /* retries */ 1,
++		result = scsi_execute(sdev, cmd, dir, buffer, bufflen, sense,
++				      sshdr, DV_TIMEOUT, /* retries */ 1,
+ 				      REQ_FAILFAST_DEV |
+ 				      REQ_FAILFAST_TRANSPORT |
+ 				      REQ_FAILFAST_DRIVER,
+-				      NULL);
+-		if (driver_byte(result) & DRIVER_SENSE) {
+-			struct scsi_sense_hdr sshdr_tmp;
+-			if (!sshdr)
+-				sshdr = &sshdr_tmp;
 -
--	if (lk_unlk->session.sum)
--		ret = __opal_lock_unlock_sum(dev);
--	else
--		ret = __opal_lock_unlock(dev);
--
-+	ret = __opal_lock_unlock(dev, lk_unlk);
- 	mutex_unlock(&dev->dev_lock);
- 	return ret;
+-			if (scsi_normalize_sense(sense, SCSI_SENSE_BUFFERSIZE,
+-						 sshdr)
+-			    && sshdr->sense_key == UNIT_ATTENTION)
+-				continue;
+-		}
+-		break;
++				      0, NULL);
++		if (!(driver_byte(result) & DRIVER_SENSE) ||
++		    sshdr->sense_key != UNIT_ATTENTION)
++			break;
+ 	}
+ 	return result;
  }
+diff --git a/drivers/scsi/sr_ioctl.c b/drivers/scsi/sr_ioctl.c
+index dfffdf63e44c..4610c8c5693f 100644
+--- a/drivers/scsi/sr_ioctl.c
++++ b/drivers/scsi/sr_ioctl.c
+@@ -187,30 +187,19 @@ int sr_do_ioctl(Scsi_CD *cd, struct packet_command *cgc)
+ 	struct scsi_device *SDev;
+ 	struct scsi_sense_hdr sshdr;
+ 	int result, err = 0, retries = 0;
+-	struct request_sense *sense = cgc->sense;
  
- static int opal_take_ownership(struct opal_dev *dev, struct opal_key *opal)
- {
--	static const opal_step owner_funcs[] = {
--		opal_discovery0,
--		start_anybodyASP_opal_session,
--		get_msid_cpin_pin,
--		end_opal_session,
--		start_SIDASP_opal_session,
--		set_sid_cpin_pin,
--		end_opal_session,
--		NULL
-+	opal_step owner_funcs[] = {
-+		{ opal_discovery0, },
-+		{ start_anybodyASP_opal_session, },
-+		{ get_msid_cpin_pin, },
-+		{ end_opal_session, },
-+		{ start_SIDASP_opal_session, opal },
-+		{ set_sid_cpin_pin, opal },
-+		{ end_opal_session, },
-+		{ NULL, }
- 	};
--	void *data[6] = { NULL };
- 	int ret;
+ 	SDev = cd->device;
  
- 	if (!dev)
-@@ -2264,9 +2209,6 @@ static int opal_take_ownership(struct opal_dev *dev, struct opal_key *opal)
- 
- 	mutex_lock(&dev->dev_lock);
- 	setup_opal_dev(dev, owner_funcs);
--	dev->func_data = data;
--	dev->func_data[4] = opal;
--	dev->func_data[5] = opal;
- 	ret = next(dev);
- 	mutex_unlock(&dev->dev_lock);
- 	return ret;
-@@ -2274,14 +2216,13 @@ static int opal_take_ownership(struct opal_dev *dev, struct opal_key *opal)
- 
- static int opal_activate_lsp(struct opal_dev *dev, struct opal_lr_act *opal_lr_act)
- {
--	void *data[4] = { NULL };
--	static const opal_step active_funcs[] = {
--		opal_discovery0,
--		start_SIDASP_opal_session, /* Open session as SID auth */
--		get_lsp_lifecycle,
--		activate_lsp,
--		end_opal_session,
--		NULL
-+	opal_step active_funcs[] = {
-+		{ opal_discovery0, },
-+		{ start_SIDASP_opal_session, &opal_lr_act->key },
-+		{ get_lsp_lifecycle, },
-+		{ activate_lsp, opal_lr_act },
-+		{ end_opal_session, },
-+		{ NULL, }
- 	};
- 	int ret;
- 
-@@ -2290,9 +2231,6 @@ static int opal_activate_lsp(struct opal_dev *dev, struct opal_lr_act *opal_lr_a
- 
- 	mutex_lock(&dev->dev_lock);
- 	setup_opal_dev(dev, active_funcs);
--	dev->func_data = data;
--	dev->func_data[1] = &opal_lr_act->key;
--	dev->func_data[3] = opal_lr_act;
- 	ret = next(dev);
- 	mutex_unlock(&dev->dev_lock);
- 	return ret;
-@@ -2301,21 +2239,17 @@ static int opal_activate_lsp(struct opal_dev *dev, struct opal_lr_act *opal_lr_a
- static int opal_setup_locking_range(struct opal_dev *dev,
- 				    struct opal_user_lr_setup *opal_lrs)
- {
--	void *data[3] = { NULL };
--	static const opal_step lr_funcs[] = {
--		opal_discovery0,
--		start_auth_opal_session,
--		setup_locking_range,
--		end_opal_session,
--		NULL,
-+	opal_step lr_funcs[] = {
-+		{ opal_discovery0, },
-+		{ start_auth_opal_session, &opal_lrs->session },
-+		{ setup_locking_range, opal_lrs },
-+		{ end_opal_session, },
-+		{ NULL, }
- 	};
- 	int ret;
- 
- 	mutex_lock(&dev->dev_lock);
- 	setup_opal_dev(dev, lr_funcs);
--	dev->func_data = data;
--	dev->func_data[1] = &opal_lrs->session;
--	dev->func_data[2] = opal_lrs;
- 	ret = next(dev);
- 	mutex_unlock(&dev->dev_lock);
- 	return ret;
-@@ -2323,14 +2257,13 @@ static int opal_setup_locking_range(struct opal_dev *dev,
- 
- static int opal_set_new_pw(struct opal_dev *dev, struct opal_new_pw *opal_pw)
- {
--	static const opal_step pw_funcs[] = {
--		opal_discovery0,
--		start_auth_opal_session,
--		set_new_pw,
--		end_opal_session,
--		NULL
-+	opal_step pw_funcs[] = {
-+		{ opal_discovery0, },
-+		{ start_auth_opal_session, &opal_pw->session },
-+		{ set_new_pw, &opal_pw->new_user_pw },
-+		{ end_opal_session, },
-+		{ NULL }
- 	};
--	void *data[3] = { NULL };
- 	int ret;
- 
- 	if (opal_pw->session.who < OPAL_ADMIN1 ||
-@@ -2341,10 +2274,6 @@ static int opal_set_new_pw(struct opal_dev *dev, struct opal_new_pw *opal_pw)
- 
- 	mutex_lock(&dev->dev_lock);
- 	setup_opal_dev(dev, pw_funcs);
--	dev->func_data = data;
--	dev->func_data[1] = (void *) &opal_pw->session;
--	dev->func_data[2] = (void *) &opal_pw->new_user_pw;
+-	if (!sense) {
+-		sense = kmalloc(SCSI_SENSE_BUFFERSIZE, GFP_KERNEL);
+-		if (!sense) {
+-			err = -ENOMEM;
+-			goto out;
+-		}
+-	}
 -
- 	ret = next(dev);
- 	mutex_unlock(&dev->dev_lock);
- 	return ret;
-@@ -2353,14 +2282,13 @@ static int opal_set_new_pw(struct opal_dev *dev, struct opal_new_pw *opal_pw)
- static int opal_activate_user(struct opal_dev *dev,
- 			      struct opal_session_info *opal_session)
- {
--	static const opal_step act_funcs[] = {
--		opal_discovery0,
--		start_admin1LSP_opal_session,
--		internal_activate_user,
--		end_opal_session,
--		NULL
-+	opal_step act_funcs[] = {
-+		{ opal_discovery0, },
-+		{ start_admin1LSP_opal_session, &opal_session->opal_key },
-+		{ internal_activate_user, opal_session },
-+		{ end_opal_session, },
-+		{ NULL, }
- 	};
--	void *data[3] = { NULL };
- 	int ret;
+       retry:
+ 	if (!scsi_block_when_processing_errors(SDev)) {
+ 		err = -ENODEV;
+ 		goto out;
+ 	}
  
- 	/* We can't activate Admin1 it's active as manufactured */
-@@ -2372,9 +2300,6 @@ static int opal_activate_user(struct opal_dev *dev,
+-	memset(sense, 0, sizeof(*sense));
+ 	result = scsi_execute(SDev, cgc->cmd, cgc->data_direction,
+-			      cgc->buffer, cgc->buflen, (char *)sense,
+-			      cgc->timeout, IOCTL_RETRIES, 0, NULL);
+-
+-	scsi_normalize_sense((char *)sense, sizeof(*sense), &sshdr);
++			      cgc->buffer, cgc->buflen,
++			      (unsigned char *)cgc->sense, &sshdr,
++			      cgc->timeout, IOCTL_RETRIES, 0, 0, NULL);
  
- 	mutex_lock(&dev->dev_lock);
- 	setup_opal_dev(dev, act_funcs);
--	dev->func_data = data;
--	dev->func_data[1] = &opal_session->opal_key;
--	dev->func_data[2] = opal_session;
- 	ret = next(dev);
- 	mutex_unlock(&dev->dev_lock);
- 	return ret;
-@@ -2383,7 +2308,6 @@ static int opal_activate_user(struct opal_dev *dev,
- bool opal_unlock_from_suspend(struct opal_dev *dev)
- {
- 	struct opal_suspend_data *suspend;
--	void *func_data[3] = { NULL };
- 	bool was_failure = false;
- 	int ret = 0;
+ 	/* Minimal error checking.  Ignore cases we know about, and report the rest. */
+ 	if (driver_byte(result) != 0) {
+@@ -261,8 +250,6 @@ int sr_do_ioctl(Scsi_CD *cd, struct packet_command *cgc)
  
-@@ -2394,19 +2318,13 @@ bool opal_unlock_from_suspend(struct opal_dev *dev)
- 
- 	mutex_lock(&dev->dev_lock);
- 	setup_opal_dev(dev, NULL);
--	dev->func_data = func_data;
- 
- 	list_for_each_entry(suspend, &dev->unlk_lst, node) {
- 		dev->state = 0;
--		dev->func_data[1] = &suspend->unlk.session;
--		dev->func_data[2] = &suspend->unlk;
- 		dev->tsn = 0;
- 		dev->hsn = 0;
- 
--		if (suspend->unlk.session.sum)
--			ret = __opal_lock_unlock_sum(dev);
--		else
--			ret = __opal_lock_unlock(dev);
-+		ret = __opal_lock_unlock(dev, &suspend->unlk);
- 		if (ret) {
- 			pr_warn("Failed to unlock LR %hhu with sum %d\n",
- 				suspend->unlk.session.opal_key.lr,
+ 	/* Wake up a process waiting for device */
+       out:
+-	if (!cgc->sense)
+-		kfree(sense);
+ 	cgc->stat = err;
+ 	return err;
+ }
+diff --git a/include/scsi/scsi_device.h b/include/scsi/scsi_device.h
+index 8990e580b278..8c8d243db32b 100644
+--- a/include/scsi/scsi_device.h
++++ b/include/scsi/scsi_device.h
+@@ -409,8 +409,9 @@ extern int scsi_is_target_device(const struct device *);
+ extern void scsi_sanitize_inquiry_string(unsigned char *s, int len);
+ extern int scsi_execute(struct scsi_device *sdev, const unsigned char *cmd,
+ 			int data_direction, void *buffer, unsigned bufflen,
+-			unsigned char *sense, int timeout, int retries,
+-			u64 flags, int *resid);
++			unsigned char *sense, struct scsi_sense_hdr *sshdr,
++			int timeout, int retries, u64 flags,
++			req_flags_t rq_flags, int *resid);
+ extern int scsi_execute_req_flags(struct scsi_device *sdev,
+ 	const unsigned char *cmd, int data_direction, void *buffer,
+ 	unsigned bufflen, struct scsi_sense_hdr *sshdr, int timeout,
 -- 
-1.8.3.1
+2.11.0
