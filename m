@@ -1,55 +1,45 @@
-Return-Path: <BATV+1f42f42caf748e0126fd+4912+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Thomas Gleixner <tglx@linutronix.de>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <keith.busch@intel.com>,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 4/6] blk-mq: include all present CPUs in the default queue mapping
-Date: Fri,  3 Feb 2017 15:35:58 +0100
-Message-Id: <20170203143600.32307-5-hch@lst.de>
-In-Reply-To: <20170203143600.32307-1-hch@lst.de>
-References: <20170203143600.32307-1-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-ot0-f195.google.com ([74.125.82.195]:33103 "EHLO
+        mail-ot0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932100AbdBNP3d (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 14 Feb 2017 10:29:33 -0500
+From: Ming Lei <tom.leiming@gmail.com>
+To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
+        linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        NeilBrown <neilb@suse.com>
+Cc: Ming Lei <tom.leiming@gmail.com>
+Subject: [PATCH v2 4/5] md: remove unnecessary check on mddev
+Date: Tue, 14 Feb 2017 23:29:02 +0800
+Message-Id: <1487086143-10255-5-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1487086143-10255-1-git-send-email-tom.leiming@gmail.com>
+References: <1487086143-10255-1-git-send-email-tom.leiming@gmail.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This way we get a nice distribution independent of the current cpu
-online / offline state.
+mddev is never NULL and neither is ->bio_set, so
+remove the check.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- block/blk-mq-cpumap.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ drivers/md/md.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-diff --git a/block/blk-mq-cpumap.c b/block/blk-mq-cpumap.c
-index 8e61e8640e17..5eaecd40f701 100644
---- a/block/blk-mq-cpumap.c
-+++ b/block/blk-mq-cpumap.c
-@@ -35,7 +35,6 @@ int blk_mq_map_queues(struct blk_mq_tag_set *set)
+diff --git a/drivers/md/md.c b/drivers/md/md.c
+index b5e2adf3493b..6cd96fde2a67 100644
+--- a/drivers/md/md.c
++++ b/drivers/md/md.c
+@@ -193,9 +193,6 @@ EXPORT_SYMBOL_GPL(bio_alloc_mddev);
+ struct bio *bio_clone_mddev(struct bio *bio, gfp_t gfp_mask,
+ 			    struct mddev *mddev)
  {
- 	unsigned int *map = set->mq_map;
- 	unsigned int nr_queues = set->nr_hw_queues;
--	const struct cpumask *online_mask = cpu_online_mask;
- 	unsigned int i, nr_cpus, nr_uniq_cpus, queue, first_sibling;
- 	cpumask_var_t cpus;
- 
-@@ -44,7 +43,7 @@ int blk_mq_map_queues(struct blk_mq_tag_set *set)
- 
- 	cpumask_clear(cpus);
- 	nr_cpus = nr_uniq_cpus = 0;
--	for_each_cpu(i, online_mask) {
-+	for_each_present_cpu(i) {
- 		nr_cpus++;
- 		first_sibling = get_first_sibling(i);
- 		if (!cpumask_test_cpu(first_sibling, cpus))
-@@ -54,7 +53,7 @@ int blk_mq_map_queues(struct blk_mq_tag_set *set)
- 
- 	queue = 0;
- 	for_each_possible_cpu(i) {
--		if (!cpumask_test_cpu(i, online_mask)) {
-+		if (!cpumask_test_cpu(i, cpu_present_mask)) {
- 			map[i] = 0;
- 			continue;
- 		}
+-	if (!mddev || !mddev->bio_set)
+-		return bio_clone(bio, gfp_mask);
+-
+ 	return bio_clone_bioset(bio, gfp_mask, mddev->bio_set);
+ }
+ EXPORT_SYMBOL_GPL(bio_clone_mddev);
 -- 
-2.11.0
+2.7.4
