@@ -1,115 +1,55 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:58626 "EHLO
+Received: from bombadil.infradead.org ([65.50.211.133]:43480 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753126AbdBNTQO (ORCPT
+        with ESMTP id S1752418AbdBNIR4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Feb 2017 14:16:14 -0500
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernek.dk
-Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
-Subject: [PATCH 3/6] scsi: make the sense header argument to scsi_test_unit_ready mandatory
-Date: Tue, 14 Feb 2017 20:15:57 +0100
-Message-Id: <20170214191600.17480-4-hch@lst.de>
-In-Reply-To: <20170214191600.17480-1-hch@lst.de>
-References: <20170214191600.17480-1-hch@lst.de>
+        Tue, 14 Feb 2017 03:17:56 -0500
+Date: Tue, 14 Feb 2017 00:17:50 -0800
+From: Christoph Hellwig <hch@infradead.org>
+To: Scott Bauer <scott.bauer@intel.com>
+Cc: linux-nvme@lists.infradead.org, David.Laight@ACULAB.COM,
+        arnd@arndb.de, axboe@fb.com, keith.busch@intel.com,
+        jonathan.derrick@intel.com, hch@infradead.org,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH V5 1/4] block: sed-opal: change ioctl to take user
+ pointer instead of unsinged long
+Message-ID: <20170214081750.GA20251@infradead.org>
+References: <1487002272-17940-1-git-send-email-scott.bauer@intel.com>
+ <1487002272-17940-2-git-send-email-scott.bauer@intel.com>
+ <20170213161509.GA18913@sbauer-Z170X-UD5>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170213161509.GA18913@sbauer-Z170X-UD5>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-It's a tiny structure that can be allocated on the stack, don't
-complicate the code by making it optional.
+On Mon, Feb 13, 2017 at 09:15:10AM -0700, Scott Bauer wrote:
+> esOn Mon, Feb 13, 2017 at 09:11:09AM -0700, Scott Bauer wrote:
+> > Signed-off-by: Scott Bauer <scott.bauer@intel.com>
+> > ---
+> >  block/sed-opal.c         | 6 ++++--
+> >  drivers/nvme/host/core.c | 3 ++-
+> >  include/linux/sed-opal.h | 4 ++--
+> >  3 files changed, 8 insertions(+), 5 deletions(-)
+> > 
+> > diff --git a/block/sed-opal.c b/block/sed-opal.c
+> > index bf1406e..2448d4a 100644
+> > --- a/block/sed-opal.c
+> > +++ b/block/sed-opal.c
+> > @@ -2344,9 +2344,11 @@ bool opal_unlock_from_suspend(struct opal_dev *dev)
+> >  }
+> >  EXPORT_SYMBOL(opal_unlock_from_suspend);
+> >  
+> > -int sed_ioctl(struct opal_dev *dev, unsigned int cmd, unsigned long ptr)
+> > +int sed_ioctl(struct opal_dev *dev, unsigned int cmd, void __user *arg)
+> >  {
+> > -	void __user *arg = (void __user *)ptr;
+> > +	void *ioctl_ptr;
+> > +	int ret = -ENOTTY;
+> > +	unsigned int cmd_size = _IOC_SIZE(cmd);
+> 
+> ugh, I apparently messed up my rebase these should be in patch 2 or maybe I should
+> sqash p1 and p2  together.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/scsi/osd/osd_uld.c |  3 ++-
- drivers/scsi/scsi_ioctl.c  |  3 ++-
- drivers/scsi/scsi_lib.c    | 14 ++------------
- 3 files changed, 6 insertions(+), 14 deletions(-)
-
-diff --git a/drivers/scsi/osd/osd_uld.c b/drivers/scsi/osd/osd_uld.c
-index 243eab3d10d0..e0ce5d2fd14d 100644
---- a/drivers/scsi/osd/osd_uld.c
-+++ b/drivers/scsi/osd/osd_uld.c
-@@ -372,6 +372,7 @@ EXPORT_SYMBOL(osduld_device_same);
- static int __detect_osd(struct osd_uld_device *oud)
- {
- 	struct scsi_device *scsi_device = oud->od.scsi_device;
-+	struct scsi_sense_hdr sense_hdr;
- 	char caps[OSD_CAP_LEN];
- 	int error;
- 
-@@ -380,7 +381,7 @@ static int __detect_osd(struct osd_uld_device *oud)
- 	 */
- 	OSD_DEBUG("start scsi_test_unit_ready %p %p %p\n",
- 			oud, scsi_device, scsi_device->request_queue);
--	error = scsi_test_unit_ready(scsi_device, 10*HZ, 5, NULL);
-+	error = scsi_test_unit_ready(scsi_device, 10*HZ, 5, &sense_hdr);
- 	if (error)
- 		OSD_ERR("warning: scsi_test_unit_ready failed\n");
- 
-diff --git a/drivers/scsi/scsi_ioctl.c b/drivers/scsi/scsi_ioctl.c
-index 8b8c814df5c7..b6bf3f29a12a 100644
---- a/drivers/scsi/scsi_ioctl.c
-+++ b/drivers/scsi/scsi_ioctl.c
-@@ -199,6 +199,7 @@ static int scsi_ioctl_get_pci(struct scsi_device *sdev, void __user *arg)
- int scsi_ioctl(struct scsi_device *sdev, int cmd, void __user *arg)
- {
- 	char scsi_cmd[MAX_COMMAND_SIZE];
-+	struct scsi_sense_hdr sense_hdr;
- 
- 	/* Check for deprecated ioctls ... all the ioctls which don't
- 	 * follow the new unique numbering scheme are deprecated */
-@@ -243,7 +244,7 @@ int scsi_ioctl(struct scsi_device *sdev, int cmd, void __user *arg)
- 		return scsi_set_medium_removal(sdev, SCSI_REMOVAL_ALLOW);
- 	case SCSI_IOCTL_TEST_UNIT_READY:
- 		return scsi_test_unit_ready(sdev, IOCTL_NORMAL_TIMEOUT,
--					    NORMAL_RETRIES, NULL);
-+					    NORMAL_RETRIES, &sense_hdr);
- 	case SCSI_IOCTL_START_UNIT:
- 		scsi_cmd[0] = START_STOP;
- 		scsi_cmd[1] = 0;
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 90f65c8f487a..227a77869e13 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -2496,28 +2496,20 @@ EXPORT_SYMBOL(scsi_mode_sense);
-  *	@sdev:	scsi device to change the state of.
-  *	@timeout: command timeout
-  *	@retries: number of retries before failing
-- *	@sshdr_external: Optional pointer to struct scsi_sense_hdr for
-- *		returning sense. Make sure that this is cleared before passing
-- *		in.
-+ *	@sshdr: outpout pointer for decoded sense information.
-  *
-  *	Returns zero if unsuccessful or an error if TUR failed.  For
-  *	removable media, UNIT_ATTENTION sets ->changed flag.
-  **/
- int
- scsi_test_unit_ready(struct scsi_device *sdev, int timeout, int retries,
--		     struct scsi_sense_hdr *sshdr_external)
-+		     struct scsi_sense_hdr *sshdr)
- {
- 	char cmd[] = {
- 		TEST_UNIT_READY, 0, 0, 0, 0, 0,
- 	};
--	struct scsi_sense_hdr *sshdr;
- 	int result;
- 
--	if (!sshdr_external)
--		sshdr = kzalloc(sizeof(*sshdr), GFP_KERNEL);
--	else
--		sshdr = sshdr_external;
--
- 	/* try to eat the UNIT_ATTENTION if there are enough retries */
- 	do {
- 		result = scsi_execute_req(sdev, cmd, DMA_NONE, NULL, 0, sshdr,
-@@ -2528,8 +2520,6 @@ scsi_test_unit_ready(struct scsi_device *sdev, int timeout, int retries,
- 	} while (scsi_sense_valid(sshdr) &&
- 		 sshdr->sense_key == UNIT_ATTENTION && --retries);
- 
--	if (!sshdr_external)
--		kfree(sshdr);
- 	return result;
- }
- EXPORT_SYMBOL(scsi_test_unit_ready);
--- 
-2.11.0
+I guess it should be 1 and 3.  No real opinipon on that, but can you
+chose a simpler and more fitting name than ioctl_ptr?  I'd suggest 'p'.
