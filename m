@@ -1,78 +1,52 @@
-Return-Path: <jack@suse.cz>
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Tejun Heo <tj@kernel.org>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
-	NeilBrown <neilb@suse.de>,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH 05/10] writeback: Generalize and standardize I_SYNC waiting function
-Date: Thu,  9 Feb 2017 13:44:28 +0100
-Message-Id: <20170209124433.2626-6-jack@suse.cz>
-In-Reply-To: <20170209124433.2626-1-jack@suse.cz>
-References: <20170209124433.2626-1-jack@suse.cz>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-ot0-f195.google.com ([74.125.82.195]:34757 "EHLO
+        mail-ot0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754460AbdBNP3T (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 14 Feb 2017 10:29:19 -0500
+From: Ming Lei <tom.leiming@gmail.com>
+To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
+        linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        NeilBrown <neilb@suse.com>
+Cc: Ming Lei <tom.leiming@gmail.com>
+Subject: [PATCH v2 2/5] md: fail if mddev->bio_set can't be created
+Date: Tue, 14 Feb 2017 23:29:00 +0800
+Message-Id: <1487086143-10255-3-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1487086143-10255-1-git-send-email-tom.leiming@gmail.com>
+References: <1487086143-10255-1-git-send-email-tom.leiming@gmail.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-__inode_wait_for_writeback() waits for I_SYNC on inode to get cleared.
-There's nothing specific regarting I_SYNC for that function. Generalize
-it so that we can use it also for I_WB_SWITCH bit. Also the function
-uses __wait_on_bit() unnecessarily. Switch it to wait_on_bit() to remove
-some code.
+The current behaviour is to fall back to allocate
+bio from 'fs_bio_set', that isn't a correct way
+because it might cause deadlock.
 
-Signed-off-by: Jan Kara <jack@suse.cz>
+So this patch simply return failure if mddev->bio_set
+can't be created.
+
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- fs/fs-writeback.c | 17 ++++++-----------
- 1 file changed, 6 insertions(+), 11 deletions(-)
+ drivers/md/md.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/fs/fs-writeback.c b/fs/fs-writeback.c
-index ef600591d96f..c9770de11650 100644
---- a/fs/fs-writeback.c
-+++ b/fs/fs-writeback.c
-@@ -1170,21 +1170,16 @@ static int write_inode(struct inode *inode, struct writeback_control *wbc)
- }
- 
- /*
-- * Wait for writeback on an inode to complete. Called with i_lock held.
-+ * Wait for bit in inode->i_state to clear. Called with i_lock held.
-  * Caller must make sure inode cannot go away when we drop i_lock.
-  */
--static void __inode_wait_for_writeback(struct inode *inode)
-+static void __inode_wait_for_state_bit(struct inode *inode, int bit_nr)
- 	__releases(inode->i_lock)
- 	__acquires(inode->i_lock)
- {
--	DEFINE_WAIT_BIT(wq, &inode->i_state, __I_SYNC);
--	wait_queue_head_t *wqh;
--
--	wqh = bit_waitqueue(&inode->i_state, __I_SYNC);
--	while (inode->i_state & I_SYNC) {
-+	while (inode->i_state & (1 << bit_nr)) {
- 		spin_unlock(&inode->i_lock);
--		__wait_on_bit(wqh, &wq, bit_wait,
--			      TASK_UNINTERRUPTIBLE);
-+		wait_on_bit(&inode->i_state, bit_nr, TASK_UNINTERRUPTIBLE);
- 		spin_lock(&inode->i_lock);
+diff --git a/drivers/md/md.c b/drivers/md/md.c
+index 7e9a495e4160..b5e2adf3493b 100644
+--- a/drivers/md/md.c
++++ b/drivers/md/md.c
+@@ -5228,8 +5228,11 @@ int md_run(struct mddev *mddev)
+ 		sysfs_notify_dirent_safe(rdev->sysfs_state);
  	}
- }
-@@ -1195,7 +1190,7 @@ static void __inode_wait_for_writeback(struct inode *inode)
- void inode_wait_for_writeback(struct inode *inode)
- {
- 	spin_lock(&inode->i_lock);
--	__inode_wait_for_writeback(inode);
-+	__inode_wait_for_state_bit(inode, __I_SYNC);
- 	spin_unlock(&inode->i_lock);
- }
  
-@@ -1397,7 +1392,7 @@ static int writeback_single_inode(struct inode *inode,
- 		 * inode reference or inode has I_WILL_FREE set, it cannot go
- 		 * away under us.
- 		 */
--		__inode_wait_for_writeback(inode);
-+		__inode_wait_for_state_bit(inode, __I_SYNC);
- 	}
- 	WARN_ON(inode->i_state & I_SYNC);
- 	/*
+-	if (mddev->bio_set == NULL)
++	if (mddev->bio_set == NULL) {
+ 		mddev->bio_set = bioset_create(BIO_POOL_SIZE, 0);
++		if (!mddev->bio_set)
++			return -ENOMEM;
++	}
+ 
+ 	spin_lock(&pers_lock);
+ 	pers = find_pers(mddev->level, mddev->clevel);
 -- 
-2.10.2
+2.7.4
