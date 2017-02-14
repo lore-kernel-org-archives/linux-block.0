@@ -1,109 +1,232 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f66.google.com ([74.125.83.66]:33226 "EHLO
-        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751716AbdBKDkz (ORCPT
+Received: from bombadil.infradead.org ([65.50.211.133]:56963 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753126AbdBNTQX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Feb 2017 22:40:55 -0500
-From: Ming Lei <tom.leiming@gmail.com>
-To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Ming Lei <tom.leiming@gmail.com>, stable@vger.kernel.org
-Subject: [PATCH] block/loop: fix race between I/O and set_status
-Date: Sat, 11 Feb 2017 11:40:45 +0800
-Message-Id: <1486784445-25300-1-git-send-email-tom.leiming@gmail.com>
+        Tue, 14 Feb 2017 14:16:23 -0500
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernek.dk
+Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
+Subject: [PATCH 6/6] scsi: remove scsi_execute_req_flags
+Date: Tue, 14 Feb 2017 20:16:00 +0100
+Message-Id: <20170214191600.17480-7-hch@lst.de>
+In-Reply-To: <20170214191600.17480-1-hch@lst.de>
+References: <20170214191600.17480-1-hch@lst.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Inside set_status, transfer need to setup again, so
-we have to drain IO before the transition, otherwise
-oops may be triggered like the following:
+And switch all callers to use scsi_execute instead.
 
-	divide error: 0000 [#1] SMP KASAN
-	CPU: 0 PID: 2935 Comm: loop7 Not tainted 4.10.0-rc7+ #213
-	Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Bochs
-	01/01/2011
-	task: ffff88006ba1e840 task.stack: ffff880067338000
-	RIP: 0010:transfer_xor+0x1d1/0x440 drivers/block/loop.c:110
-	RSP: 0018:ffff88006733f108 EFLAGS: 00010246
-	RAX: 0000000000000000 RBX: ffff8800688d7000 RCX: 0000000000000059
-	RDX: 0000000000000000 RSI: 1ffff1000d743f43 RDI: ffff880068891c08
-	RBP: ffff88006733f160 R08: ffff8800688d7001 R09: 0000000000000000
-	R10: 0000000000000000 R11: 0000000000000000 R12: ffff8800688d7000
-	R13: ffff880067b7d000 R14: dffffc0000000000 R15: 0000000000000000
-	FS:  0000000000000000(0000) GS:ffff88006d000000(0000)
-	knlGS:0000000000000000
-	CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-	CR2: 00000000006c17e0 CR3: 0000000066e3b000 CR4: 00000000001406f0
-	Call Trace:
-	 lo_do_transfer drivers/block/loop.c:251 [inline]
-	 lo_read_transfer drivers/block/loop.c:392 [inline]
-	 do_req_filebacked drivers/block/loop.c:541 [inline]
-	 loop_handle_cmd drivers/block/loop.c:1677 [inline]
-	 loop_queue_work+0xda0/0x49b0 drivers/block/loop.c:1689
-	 kthread_worker_fn+0x4c3/0xa30 kernel/kthread.c:630
-	 kthread+0x326/0x3f0 kernel/kthread.c:227
-	 ret_from_fork+0x31/0x40 arch/x86/entry/entry_64.S:430
-	Code: 03 83 e2 07 41 29 df 42 0f b6 04 30 4d 8d 44 24 01 38 d0 7f 08
-	84 c0 0f 85 62 02 00 00 44 89 f8 41 0f b6 48 ff 25 ff 01 00 00 99 <f7>
-	7d c8 48 63 d2 48 03 55 d0 48 89 d0 48 89 d7 48 c1 e8 03 83
-	RIP: transfer_xor+0x1d1/0x440 drivers/block/loop.c:110 RSP:
-	ffff88006733f108
-	---[ end trace 0166f7bd3b0c0933 ]---
-
-Reported-by: Dmitry Vyukov <dvyukov@google.com>
-Cc: stable@vger.kernel.org
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/block/loop.c | 17 ++++++++++++-----
- 1 file changed, 12 insertions(+), 5 deletions(-)
+ drivers/scsi/device_handler/scsi_dh_alua.c  | 16 ++++++----------
+ drivers/scsi/device_handler/scsi_dh_emc.c   |  7 +++----
+ drivers/scsi/device_handler/scsi_dh_hp_sw.c | 10 ++++------
+ drivers/scsi/device_handler/scsi_dh_rdac.c  |  7 +++----
+ drivers/scsi/scsi_lib.c                     | 11 -----------
+ drivers/scsi/sd.c                           |  9 ++++-----
+ drivers/scsi/ufs/ufshcd.c                   | 10 +++++-----
+ include/scsi/scsi_device.h                  |  8 ++------
+ 8 files changed, 27 insertions(+), 51 deletions(-)
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index ed5259510857..4b52a1690329 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -1097,9 +1097,12 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
- 	if ((unsigned int) info->lo_encrypt_key_size > LO_KEY_SIZE)
- 		return -EINVAL;
+diff --git a/drivers/scsi/device_handler/scsi_dh_alua.c b/drivers/scsi/device_handler/scsi_dh_alua.c
+index d704752b6332..48e200102221 100644
+--- a/drivers/scsi/device_handler/scsi_dh_alua.c
++++ b/drivers/scsi/device_handler/scsi_dh_alua.c
+@@ -151,11 +151,9 @@ static int submit_rtpg(struct scsi_device *sdev, unsigned char *buff,
+ 		cdb[1] = MI_REPORT_TARGET_PGS;
+ 	put_unaligned_be32(bufflen, &cdb[6]);
  
-+	/* I/O need to be drained during transfer transition */
-+	blk_mq_freeze_queue(lo->lo_queue);
-+
- 	err = loop_release_xfer(lo);
- 	if (err)
--		return err;
-+		goto exit;
- 
- 	if (info->lo_encrypt_type) {
- 		unsigned int type = info->lo_encrypt_type;
-@@ -1114,12 +1117,14 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
- 
- 	err = loop_init_xfer(lo, xfer, info);
- 	if (err)
--		return err;
-+		goto exit;
- 
- 	if (lo->lo_offset != info->lo_offset ||
- 	    lo->lo_sizelimit != info->lo_sizelimit)
--		if (figure_loop_size(lo, info->lo_offset, info->lo_sizelimit))
--			return -EFBIG;
-+		if (figure_loop_size(lo, info->lo_offset, info->lo_sizelimit)) {
-+			err = -EFBIG;
-+			goto exit;
-+		}
- 
- 	loop_config_discard(lo);
- 
-@@ -1156,7 +1161,9 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
- 	/* update dio if lo_offset or transfer is changed */
- 	__loop_update_dio(lo, lo->use_dio);
- 
--	return 0;
-+ exit:
-+	blk_mq_unfreeze_queue(lo->lo_queue);
-+	return err;
+-	return scsi_execute_req_flags(sdev, cdb, DMA_FROM_DEVICE,
+-				      buff, bufflen, sshdr,
+-				      ALUA_FAILOVER_TIMEOUT * HZ,
+-				      ALUA_FAILOVER_RETRIES, NULL,
+-				      req_flags, 0);
++	return scsi_execute(sdev, cdb, DMA_FROM_DEVICE, buff, bufflen, NULL,
++			sshdr, ALUA_FAILOVER_TIMEOUT * HZ,
++			ALUA_FAILOVER_RETRIES, req_flags, 0, NULL);
  }
  
- static int
+ /*
+@@ -185,11 +183,9 @@ static int submit_stpg(struct scsi_device *sdev, int group_id,
+ 	cdb[1] = MO_SET_TARGET_PGS;
+ 	put_unaligned_be32(stpg_len, &cdb[6]);
+ 
+-	return scsi_execute_req_flags(sdev, cdb, DMA_TO_DEVICE,
+-				      stpg_data, stpg_len,
+-				      sshdr, ALUA_FAILOVER_TIMEOUT * HZ,
+-				      ALUA_FAILOVER_RETRIES, NULL,
+-				      req_flags, 0);
++	return scsi_execute(sdev, cdb, DMA_TO_DEVICE, stpg_data, stpg_len, NULL,
++			sshdr, ALUA_FAILOVER_TIMEOUT * HZ,
++			ALUA_FAILOVER_RETRIES, req_flags, 0, NULL);
+ }
+ 
+ static struct alua_port_group *alua_find_get_pg(char *id_str, size_t id_size,
+diff --git a/drivers/scsi/device_handler/scsi_dh_emc.c b/drivers/scsi/device_handler/scsi_dh_emc.c
+index 4a7679f6c73d..3997f21794df 100644
+--- a/drivers/scsi/device_handler/scsi_dh_emc.c
++++ b/drivers/scsi/device_handler/scsi_dh_emc.c
+@@ -276,10 +276,9 @@ static int send_trespass_cmd(struct scsi_device *sdev,
+ 	BUG_ON((len > CLARIION_BUFFER_SIZE));
+ 	memcpy(csdev->buffer, page22, len);
+ 
+-	err = scsi_execute_req_flags(sdev, cdb, DMA_TO_DEVICE,
+-				     csdev->buffer, len, &sshdr,
+-				     CLARIION_TIMEOUT * HZ, CLARIION_RETRIES,
+-				     NULL, req_flags, 0);
++	err = scsi_execute(sdev, cdb, DMA_TO_DEVICE, csdev->buffer, len, NULL,
++			&sshdr, CLARIION_TIMEOUT * HZ, CLARIION_RETRIES,
++			req_flags, 0, NULL);
+ 	if (err) {
+ 		if (scsi_sense_valid(&sshdr))
+ 			res = trespass_endio(sdev, &sshdr);
+diff --git a/drivers/scsi/device_handler/scsi_dh_hp_sw.c b/drivers/scsi/device_handler/scsi_dh_hp_sw.c
+index be43c940636d..62d314e07d11 100644
+--- a/drivers/scsi/device_handler/scsi_dh_hp_sw.c
++++ b/drivers/scsi/device_handler/scsi_dh_hp_sw.c
+@@ -100,9 +100,8 @@ static int hp_sw_tur(struct scsi_device *sdev, struct hp_sw_dh_data *h)
+ 		REQ_FAILFAST_DRIVER;
+ 
+ retry:
+-	res = scsi_execute_req_flags(sdev, cmd, DMA_NONE, NULL, 0, &sshdr,
+-				     HP_SW_TIMEOUT, HP_SW_RETRIES,
+-				     NULL, req_flags, 0);
++	res = scsi_execute(sdev, cmd, DMA_NONE, NULL, 0, NULL, &sshdr,
++			HP_SW_TIMEOUT, HP_SW_RETRIES, req_flags, 0, NULL);
+ 	if (res) {
+ 		if (scsi_sense_valid(&sshdr))
+ 			ret = tur_done(sdev, h, &sshdr);
+@@ -139,9 +138,8 @@ static int hp_sw_start_stop(struct hp_sw_dh_data *h)
+ 		REQ_FAILFAST_DRIVER;
+ 
+ retry:
+-	res = scsi_execute_req_flags(sdev, cmd, DMA_NONE, NULL, 0, &sshdr,
+-				     HP_SW_TIMEOUT, HP_SW_RETRIES,
+-				     NULL, req_flags, 0);
++	res = scsi_execute(sdev, cmd, DMA_NONE, NULL, 0, NULL, &sshdr,
++			HP_SW_TIMEOUT, HP_SW_RETRIES, req_flags, 0, NULL);
+ 	if (res) {
+ 		if (!scsi_sense_valid(&sshdr)) {
+ 			sdev_printk(KERN_WARNING, sdev,
+diff --git a/drivers/scsi/device_handler/scsi_dh_rdac.c b/drivers/scsi/device_handler/scsi_dh_rdac.c
+index b64eaae8533d..3cbab8710e58 100644
+--- a/drivers/scsi/device_handler/scsi_dh_rdac.c
++++ b/drivers/scsi/device_handler/scsi_dh_rdac.c
+@@ -555,10 +555,9 @@ static void send_mode_select(struct work_struct *work)
+ 		(char *) h->ctlr->array_name, h->ctlr->index,
+ 		(retry_cnt == RDAC_RETRY_COUNT) ? "queueing" : "retrying");
+ 
+-	if (scsi_execute_req_flags(sdev, cdb, DMA_TO_DEVICE,
+-				   &h->ctlr->mode_select, data_size, &sshdr,
+-				   RDAC_TIMEOUT * HZ,
+-				   RDAC_RETRIES, NULL, req_flags, 0)) {
++	if (scsi_execute(sdev, cdb, DMA_TO_DEVICE, &h->ctlr->mode_select,
++			data_size, NULL, &sshdr, RDAC_TIMEOUT * HZ,
++			RDAC_RETRIES, req_flags, 0, NULL)) {
+ 		err = mode_select_handle_sense(sdev, &sshdr);
+ 		if (err == SCSI_DH_RETRY && retry_cnt--)
+ 			goto retry;
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index a15c188c2a7f..e689a358cd05 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -289,17 +289,6 @@ int scsi_execute(struct scsi_device *sdev, const unsigned char *cmd,
+ }
+ EXPORT_SYMBOL(scsi_execute);
+ 
+-int scsi_execute_req_flags(struct scsi_device *sdev, const unsigned char *cmd,
+-		     int data_direction, void *buffer, unsigned bufflen,
+-		     struct scsi_sense_hdr *sshdr, int timeout, int retries,
+-		     int *resid, u64 flags, req_flags_t rq_flags)
+-{
+-	return scsi_execute(sdev, cmd, data_direction, buffer, bufflen,
+-			      NULL, sshdr, timeout, retries, flags, rq_flags,
+-			      resid);
+-}
+-EXPORT_SYMBOL(scsi_execute_req_flags);
+-
+ /*
+  * Function:    scsi_init_cmd_errh()
+  *
+diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
+index 11e290d1dbff..817e0aa78f68 100644
+--- a/drivers/scsi/sd.c
++++ b/drivers/scsi/sd.c
+@@ -1508,9 +1508,8 @@ static int sd_sync_cache(struct scsi_disk *sdkp)
+ 		 * Leave the rest of the command zero to indicate
+ 		 * flush everything.
+ 		 */
+-		res = scsi_execute_req_flags(sdp, cmd, DMA_NONE, NULL, 0,
+-					     &sshdr, timeout, SD_MAX_RETRIES,
+-					     NULL, 0, RQF_PM);
++		res = scsi_execute(sdp, cmd, DMA_NONE, NULL, 0, NULL, &sshdr,
++				timeout, SD_MAX_RETRIES, 0, RQF_PM, NULL);
+ 		if (res == 0)
+ 			break;
+ 	}
+@@ -3296,8 +3295,8 @@ static int sd_start_stop_device(struct scsi_disk *sdkp, int start)
+ 	if (!scsi_device_online(sdp))
+ 		return -ENODEV;
+ 
+-	res = scsi_execute_req_flags(sdp, cmd, DMA_NONE, NULL, 0, &sshdr,
+-			       SD_TIMEOUT, SD_MAX_RETRIES, NULL, 0, RQF_PM);
++	res = scsi_execute(sdp, cmd, DMA_NONE, NULL, 0, NULL, &sshdr,
++			SD_TIMEOUT, SD_MAX_RETRIES, 0, RQF_PM, NULL);
+ 	if (res) {
+ 		sd_print_result(sdkp, "Start/Stop Unit failed", res);
+ 		if (driver_byte(res) & DRIVER_SENSE)
+diff --git a/drivers/scsi/ufs/ufshcd.c b/drivers/scsi/ufs/ufshcd.c
+index 20e5e5fb048c..9b6956662980 100644
+--- a/drivers/scsi/ufs/ufshcd.c
++++ b/drivers/scsi/ufs/ufshcd.c
+@@ -5859,9 +5859,9 @@ ufshcd_send_request_sense(struct ufs_hba *hba, struct scsi_device *sdp)
+ 		goto out;
+ 	}
+ 
+-	ret = scsi_execute_req_flags(sdp, cmd, DMA_FROM_DEVICE, buffer,
+-				UFSHCD_REQ_SENSE_SIZE, NULL,
+-				msecs_to_jiffies(1000), 3, NULL, 0, RQF_PM);
++	ret = scsi_execute(sdp, cmd, DMA_FROM_DEVICE, buffer,
++			UFSHCD_REQ_SENSE_SIZE, NULL, NULL,
++			msecs_to_jiffies(1000), 3, 0, RQF_PM, NULL);
+ 	if (ret)
+ 		pr_err("%s: failed with err %d\n", __func__, ret);
+ 
+@@ -5926,8 +5926,8 @@ static int ufshcd_set_dev_pwr_mode(struct ufs_hba *hba,
+ 	 * callbacks hence set the RQF_PM flag so that it doesn't resume the
+ 	 * already suspended childs.
+ 	 */
+-	ret = scsi_execute_req_flags(sdp, cmd, DMA_NONE, NULL, 0, &sshdr,
+-				     START_STOP_TIMEOUT, 0, NULL, 0, RQF_PM);
++	ret = scsi_execute(sdp, cmd, DMA_NONE, NULL, 0, NULL, &sshdr,
++			START_STOP_TIMEOUT, 0, 0, RQF_PM, NULL);
+ 	if (ret) {
+ 		sdev_printk(KERN_WARNING, sdp,
+ 			    "START_STOP failed for power mode: %d, result %x\n",
+diff --git a/include/scsi/scsi_device.h b/include/scsi/scsi_device.h
+index 8c8d243db32b..c741a20f49e6 100644
+--- a/include/scsi/scsi_device.h
++++ b/include/scsi/scsi_device.h
+@@ -412,17 +412,13 @@ extern int scsi_execute(struct scsi_device *sdev, const unsigned char *cmd,
+ 			unsigned char *sense, struct scsi_sense_hdr *sshdr,
+ 			int timeout, int retries, u64 flags,
+ 			req_flags_t rq_flags, int *resid);
+-extern int scsi_execute_req_flags(struct scsi_device *sdev,
+-	const unsigned char *cmd, int data_direction, void *buffer,
+-	unsigned bufflen, struct scsi_sense_hdr *sshdr, int timeout,
+-	int retries, int *resid, u64 flags, req_flags_t rq_flags);
+ static inline int scsi_execute_req(struct scsi_device *sdev,
+ 	const unsigned char *cmd, int data_direction, void *buffer,
+ 	unsigned bufflen, struct scsi_sense_hdr *sshdr, int timeout,
+ 	int retries, int *resid)
+ {
+-	return scsi_execute_req_flags(sdev, cmd, data_direction, buffer,
+-		bufflen, sshdr, timeout, retries, resid, 0, 0);
++	return scsi_execute(sdev, cmd, data_direction, buffer,
++		bufflen, NULL, sshdr, timeout, retries,  0, 0, resid);
+ }
+ extern void sdev_disable_disk_events(struct scsi_device *sdev);
+ extern void sdev_enable_disk_events(struct scsi_device *sdev);
 -- 
-2.7.4
+2.11.0
