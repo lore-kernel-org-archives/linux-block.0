@@ -1,59 +1,28 @@
-Return-Path: <BATV+f649350760d99b9783a0+4916+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org
-Subject: [PATCH 1/4] block: move req_set_nomerge to blk.h
-Date: Tue,  7 Feb 2017 17:46:55 +0100
-Message-Id: <20170207164658.32449-2-hch@lst.de>
-In-Reply-To: <20170207164658.32449-1-hch@lst.de>
-References: <20170207164658.32449-1-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([65.50.211.133]:32831 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751515AbdBNISP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 14 Feb 2017 03:18:15 -0500
+Date: Tue, 14 Feb 2017 00:18:11 -0800
+From: Christoph Hellwig <hch@infradead.org>
+To: Scott Bauer <scott.bauer@intel.com>
+Cc: linux-nvme@lists.infradead.org, David.Laight@ACULAB.COM,
+        arnd@arndb.de, axboe@fb.com, keith.busch@intel.com,
+        jonathan.derrick@intel.com, hch@infradead.org,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH V5 2/4] uapi: sed-opal fix IOW for activate lsp to use
+ correct struct
+Message-ID: <20170214081811.GB20251@infradead.org>
+References: <1487002272-17940-1-git-send-email-scott.bauer@intel.com>
+ <1487002272-17940-3-git-send-email-scott.bauer@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1487002272-17940-3-git-send-email-scott.bauer@intel.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This makes it available outside of blk-merge.c, and inlining such a trivial
-helper seems pretty useful to start with.
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-merge.c | 7 -------
- block/blk.h       | 7 +++++++
- 2 files changed, 7 insertions(+), 7 deletions(-)
-
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index a373416dbc9a..c956d9e7aafd 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -482,13 +482,6 @@ int blk_rq_map_sg(struct request_queue *q, struct request *rq,
- }
- EXPORT_SYMBOL(blk_rq_map_sg);
- 
--static void req_set_nomerge(struct request_queue *q, struct request *req)
--{
--	req->cmd_flags |= REQ_NOMERGE;
--	if (req == q->last_merge)
--		q->last_merge = NULL;
--}
--
- static inline int ll_new_hw_segment(struct request_queue *q,
- 				    struct request *req,
- 				    struct bio *bio)
-diff --git a/block/blk.h b/block/blk.h
-index 4972b98d47e1..3e08703902a9 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -256,6 +256,13 @@ static inline int blk_do_io_stat(struct request *rq)
- 		!blk_rq_is_passthrough(rq);
- }
- 
-+static inline void req_set_nomerge(struct request_queue *q, struct request *req)
-+{
-+	req->cmd_flags |= REQ_NOMERGE;
-+	if (req == q->last_merge)
-+		q->last_merge = NULL;
-+}
-+
- /*
-  * Internal io_context interface
-  */
--- 
-2.11.0
+Let's get this one in ASAP while waiting for a respin of the KASAN
+fix.
