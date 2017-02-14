@@ -1,40 +1,82 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:51367 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751007AbdBOIAs (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Feb 2017 03:00:48 -0500
-Subject: Re: [PATCH 2/6] sd: improve TUR handling in sd_check_events
-To: Christoph Hellwig <hch@lst.de>, axboe@kernek.dk
-References: <20170214191600.17480-1-hch@lst.de>
- <20170214191600.17480-3-hch@lst.de>
+Received: from bombadil.infradead.org ([65.50.211.133]:33860 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753357AbdBNTQL (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 14 Feb 2017 14:16:11 -0500
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernek.dk
 Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <235244db-9821-b6b8-7926-e937a06d25d6@suse.de>
-Date: Wed, 15 Feb 2017 09:00:45 +0100
-MIME-Version: 1.0
-In-Reply-To: <20170214191600.17480-3-hch@lst.de>
-Content-Type: text/plain; charset=windows-1252
+Subject: [PATCH 2/6] sd: improve TUR handling in sd_check_events
+Date: Tue, 14 Feb 2017 20:15:56 +0100
+Message-Id: <20170214191600.17480-3-hch@lst.de>
+In-Reply-To: <20170214191600.17480-1-hch@lst.de>
+References: <20170214191600.17480-1-hch@lst.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 02/14/2017 08:15 PM, Christoph Hellwig wrote:
-> Remove bogus evaluations of retval and sshdr when the device is offline,
-> and fix a possible NULL pointer dereference by allocating the 8 byte
-> sized sense header on stack.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  drivers/scsi/sd.c | 25 +++++++++++--------------
->  1 file changed, 11 insertions(+), 14 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+Remove bogus evaluations of retval and sshdr when the device is offline,
+and fix a possible NULL pointer dereference by allocating the 8 byte
+sized sense header on stack.
 
-Cheers,
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/scsi/sd.c | 25 +++++++++++--------------
+ 1 file changed, 11 insertions(+), 14 deletions(-)
 
-Hannes
+diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
+index 40b4038c019e..11e290d1dbff 100644
+--- a/drivers/scsi/sd.c
++++ b/drivers/scsi/sd.c
+@@ -1425,7 +1425,6 @@ static unsigned int sd_check_events(struct gendisk *disk, unsigned int clearing)
+ {
+ 	struct scsi_disk *sdkp = scsi_disk_get(disk);
+ 	struct scsi_device *sdp;
+-	struct scsi_sense_hdr *sshdr = NULL;
+ 	int retval;
+ 
+ 	if (!sdkp)
+@@ -1454,22 +1453,21 @@ static unsigned int sd_check_events(struct gendisk *disk, unsigned int clearing)
+ 	 * by sd_spinup_disk() from sd_revalidate_disk(), which happens whenever
+ 	 * sd_revalidate() is called.
+ 	 */
+-	retval = -ENODEV;
+-
+ 	if (scsi_block_when_processing_errors(sdp)) {
+-		sshdr  = kzalloc(sizeof(*sshdr), GFP_KERNEL);
++		struct scsi_sense_hdr sshdr = { 0, };
++
+ 		retval = scsi_test_unit_ready(sdp, SD_TIMEOUT, SD_MAX_RETRIES,
+-					      sshdr);
+-	}
++					      &sshdr);
+ 
+-	/* failed to execute TUR, assume media not present */
+-	if (host_byte(retval)) {
+-		set_media_not_present(sdkp);
+-		goto out;
+-	}
++		/* failed to execute TUR, assume media not present */
++		if (host_byte(retval)) {
++			set_media_not_present(sdkp);
++			goto out;
++		}
+ 
+-	if (media_not_present(sdkp, sshdr))
+-		goto out;
++		if (media_not_present(sdkp, &sshdr))
++			goto out;
++	}
+ 
+ 	/*
+ 	 * For removable scsi disk we have to recognise the presence
+@@ -1485,7 +1483,6 @@ static unsigned int sd_check_events(struct gendisk *disk, unsigned int clearing)
+ 	 *	Medium present state has changed in either direction.
+ 	 *	Device has indicated UNIT_ATTENTION.
+ 	 */
+-	kfree(sshdr);
+ 	retval = sdp->changed ? DISK_EVENT_MEDIA_CHANGE : 0;
+ 	sdp->changed = 0;
+ 	scsi_disk_put(sdkp);
 -- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: F. Imend�rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG N�rnberg)
+2.11.0
