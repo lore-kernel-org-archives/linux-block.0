@@ -1,162 +1,84 @@
-Return-Path: <hare@suse.de>
-From: Hannes Reinecke <hare@suse.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Ming Lei <tom.leiming@gmail.com>,
-	Martin Schwidefsky <schwidefsky@de.ibm.com>,
-	linux-block@vger.kernel.org,
-	Linux Kernel Mailinglist <linux-kernel@vger.kernel.org>,
-	Hannes Reinecke <hare@suse.de>,
-	Hannes Reinecke <hare@suse.com>
-Subject: [PATCHv5 2/2] loop: support 4k physical blocksize
-Date: Fri, 10 Feb 2017 09:43:08 +0100
-Message-Id: <1486716188-38638-3-git-send-email-hare@suse.de>
-In-Reply-To: <1486716188-38638-1-git-send-email-hare@suse.de>
-References: <1486716188-38638-1-git-send-email-hare@suse.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-ot0-f194.google.com ([74.125.82.194]:33061 "EHLO
+        mail-ot0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752542AbdBNP3Y (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 14 Feb 2017 10:29:24 -0500
+From: Ming Lei <tom.leiming@gmail.com>
+To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
+        linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        NeilBrown <neilb@suse.com>
+Cc: Ming Lei <tom.leiming@gmail.com>
+Subject: [PATCH v2 3/5] md/raid1: use bio_clone_bioset_partial() in case of write behind
+Date: Tue, 14 Feb 2017 23:29:01 +0800
+Message-Id: <1487086143-10255-4-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1487086143-10255-1-git-send-email-tom.leiming@gmail.com>
+References: <1487086143-10255-1-git-send-email-tom.leiming@gmail.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-When generating bootable VM images certain systems (most notably
-s390x) require devices with 4k blocksize. This patch implements
-a new flag 'LO_FLAGS_BLOCKSIZE' which will set the physical
-blocksize to that of the underlying device, and allow to change
-the logical blocksize for up to the physical blocksize.
+Write behind need to replace pages in bio's bvecs, and we have
+to clone a fresh bio with new bvec table, so use the introduced
+bio_clone_bioset_partial() for it.
 
-Signed-off-by: Hannes Reinecke <hare@suse.com>
+For other bio_clone_mddev() cases, we will use fast clone since
+they don't need to touch bvec table.
+
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- drivers/block/loop.c      | 36 +++++++++++++++++++++++++++++++-----
- drivers/block/loop.h      |  1 +
- include/uapi/linux/loop.h |  3 +++
- 3 files changed, 35 insertions(+), 5 deletions(-)
+ drivers/md/raid1.c | 20 +++++++++++++++-----
+ 1 file changed, 15 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 8dae865..776b3c6 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -221,7 +221,8 @@ static void __loop_update_dio(struct loop_device *lo, bool dio)
- }
+diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
+index 830ff2b20346..b7548e0a9eca 100644
+--- a/drivers/md/raid1.c
++++ b/drivers/md/raid1.c
+@@ -1341,13 +1341,12 @@ static void raid1_write_request(struct mddev *mddev, struct bio *bio,
  
- static int
--figure_loop_size(struct loop_device *lo, loff_t offset, loff_t sizelimit)
-+figure_loop_size(struct loop_device *lo, loff_t offset, loff_t sizelimit,
-+		 loff_t logical_blocksize)
- {
- 	loff_t size = get_size(offset, sizelimit, lo->lo_backing_file);
- 	sector_t x = (sector_t)size;
-@@ -233,6 +234,12 @@ static void __loop_update_dio(struct loop_device *lo, bool dio)
- 		lo->lo_offset = offset;
- 	if (lo->lo_sizelimit != sizelimit)
- 		lo->lo_sizelimit = sizelimit;
-+	if (lo->lo_flags & LO_FLAGS_BLOCKSIZE) {
-+		lo->lo_logical_blocksize = logical_blocksize;
-+		blk_queue_physical_block_size(lo->lo_queue, lo->lo_blocksize);
-+		blk_queue_logical_block_size(lo->lo_queue,
-+					     lo->lo_logical_blocksize);
-+	}
- 	set_capacity(lo->lo_disk, x);
- 	bd_set_size(bdev, (loff_t)get_capacity(bdev->bd_disk) << 9);
- 	/* let user-space know about the new size */
-@@ -814,6 +821,7 @@ static void loop_config_discard(struct loop_device *lo)
- 	struct file *file = lo->lo_backing_file;
- 	struct inode *inode = file->f_mapping->host;
- 	struct request_queue *q = lo->lo_queue;
-+	int lo_bits = blksize_bits(lo->lo_logical_blocksize);
+ 	first_clone = 1;
+ 	for (i = 0; i < disks; i++) {
+-		struct bio *mbio;
++		struct bio *mbio = NULL;
++		sector_t offset;
+ 		if (!r1_bio->bios[i])
+ 			continue;
  
- 	/*
- 	 * We use punch hole to reclaim the free space used by the
-@@ -833,7 +841,7 @@ static void loop_config_discard(struct loop_device *lo)
+-		mbio = bio_clone_mddev(bio, GFP_NOIO, mddev);
+-		bio_trim(mbio, r1_bio->sector - bio->bi_iter.bi_sector,
+-			 max_sectors);
++		offset = r1_bio->sector - bio->bi_iter.bi_sector;
  
- 	q->limits.discard_granularity = inode->i_sb->s_blocksize;
- 	q->limits.discard_alignment = 0;
--	blk_queue_max_discard_sectors(q, UINT_MAX >> 9);
-+	blk_queue_max_discard_sectors(q, UINT_MAX >> lo_bits);
- 	q->limits.discard_zeroes_data = 1;
- 	queue_flag_set_unlocked(QUEUE_FLAG_DISCARD, q);
- }
-@@ -922,6 +930,7 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
+ 		if (first_clone) {
+ 			/* do behind I/O ?
+@@ -1357,8 +1356,13 @@ static void raid1_write_request(struct mddev *mddev, struct bio *bio,
+ 			if (bitmap &&
+ 			    (atomic_read(&bitmap->behind_writes)
+ 			     < mddev->bitmap_info.max_write_behind) &&
+-			    !waitqueue_active(&bitmap->behind_wait))
++			    !waitqueue_active(&bitmap->behind_wait)) {
++				mbio = bio_clone_bioset_partial(bio, GFP_NOIO,
++								mddev->bio_set,
++								offset,
++								max_sectors);
+ 				alloc_behind_pages(mbio, r1_bio);
++			}
  
- 	lo->use_dio = false;
- 	lo->lo_blocksize = lo_blocksize;
-+	lo->lo_logical_blocksize = 512;
- 	lo->lo_device = bdev;
- 	lo->lo_flags = lo_flags;
- 	lo->lo_backing_file = file;
-@@ -1087,6 +1096,7 @@ static int loop_clr_fd(struct loop_device *lo)
- 	int err;
- 	struct loop_func_table *xfer;
- 	kuid_t uid = current_uid();
-+	int lo_flags = lo->lo_flags;
- 
- 	if (lo->lo_encrypt_key_size &&
- 	    !uid_eq(lo->lo_key_owner, uid) &&
-@@ -1116,9 +1126,24 @@ static int loop_clr_fd(struct loop_device *lo)
- 	if (err)
- 		return err;
- 
-+	if (info->lo_flags & LO_FLAGS_BLOCKSIZE) {
-+		lo->lo_flags |= LO_FLAGS_BLOCKSIZE;
-+		if (LO_INFO_BLOCKSIZE(info) != 512 &&
-+		    LO_INFO_BLOCKSIZE(info) != 1024 &&
-+		    LO_INFO_BLOCKSIZE(info) != 2048 &&
-+		    LO_INFO_BLOCKSIZE(info) != 4096)
-+			return -EINVAL;
-+		if (LO_INFO_BLOCKSIZE(info) > lo->lo_blocksize)
-+			return -EINVAL;
-+	}
+ 			bitmap_startwrite(bitmap, r1_bio->sector,
+ 					  r1_bio->sectors,
+@@ -1366,6 +1370,12 @@ static void raid1_write_request(struct mddev *mddev, struct bio *bio,
+ 						   &r1_bio->state));
+ 			first_clone = 0;
+ 		}
 +
- 	if (lo->lo_offset != info->lo_offset ||
--	    lo->lo_sizelimit != info->lo_sizelimit)
--		if (figure_loop_size(lo, info->lo_offset, info->lo_sizelimit))
-+	    lo->lo_sizelimit != info->lo_sizelimit ||
-+	    lo->lo_flags != lo_flags ||
-+	    ((lo->lo_flags & LO_FLAGS_BLOCKSIZE) &&
-+	     lo->lo_logical_blocksize != LO_INFO_BLOCKSIZE(info)))
-+		if (figure_loop_size(lo, info->lo_offset, info->lo_sizelimit,
-+				     info->lo_init[0]))
- 			return -EFBIG;
- 
- 	loop_config_discard(lo);
-@@ -1303,7 +1328,8 @@ static int loop_set_capacity(struct loop_device *lo)
- 	if (unlikely(lo->lo_state != Lo_bound))
- 		return -ENXIO;
- 
--	return figure_loop_size(lo, lo->lo_offset, lo->lo_sizelimit);
-+	return figure_loop_size(lo, lo->lo_offset, lo->lo_sizelimit,
-+				lo->lo_logical_blocksize);
- }
- 
- static int loop_set_dio(struct loop_device *lo, unsigned long arg)
-diff --git a/drivers/block/loop.h b/drivers/block/loop.h
-index fb2237c..579f2f7 100644
---- a/drivers/block/loop.h
-+++ b/drivers/block/loop.h
-@@ -49,6 +49,7 @@ struct loop_device {
- 	struct file *	lo_backing_file;
- 	struct block_device *lo_device;
- 	unsigned	lo_blocksize;
-+	unsigned	lo_logical_blocksize;
- 	void		*key_data; 
- 
- 	gfp_t		old_gfp_mask;
-diff --git a/include/uapi/linux/loop.h b/include/uapi/linux/loop.h
-index c8125ec..a3960f9 100644
---- a/include/uapi/linux/loop.h
-+++ b/include/uapi/linux/loop.h
-@@ -22,6 +22,7 @@ enum {
- 	LO_FLAGS_AUTOCLEAR	= 4,
- 	LO_FLAGS_PARTSCAN	= 8,
- 	LO_FLAGS_DIRECT_IO	= 16,
-+	LO_FLAGS_BLOCKSIZE	= 32,
- };
- 
- #include <asm/posix_types.h>	/* for __kernel_old_dev_t */
-@@ -59,6 +60,8 @@ struct loop_info64 {
- 	__u64		   lo_init[2];
- };
- 
-+#define LO_INFO_BLOCKSIZE(l) (l)->lo_init[0]
++		if (!mbio) {
++			mbio = bio_clone_mddev(bio, GFP_NOIO, mddev);
++			bio_trim(mbio, offset, max_sectors);
++		}
 +
- /*
-  * Loop filter types
-  */
+ 		if (r1_bio->behind_bvecs) {
+ 			struct bio_vec *bvec;
+ 			int j;
 -- 
-1.8.5.6
+2.7.4
