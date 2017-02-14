@@ -1,95 +1,35 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f68.google.com ([74.125.83.68]:34005 "EHLO
-        mail-pg0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751308AbdBXPn7 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 24 Feb 2017 10:43:59 -0500
-From: Ming Lei <tom.leiming@gmail.com>
-To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
-        linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>
-Cc: Ming Lei <tom.leiming@gmail.com>
-Subject: [PATCH v1 13/14] md: raid10: retrieve page from preallocated resync page array
-Date: Fri, 24 Feb 2017 23:42:50 +0800
-Message-Id: <1487950971-1131-14-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1487950971-1131-1-git-send-email-tom.leiming@gmail.com>
-References: <1487950971-1131-1-git-send-email-tom.leiming@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
+Date: Tue, 14 Feb 2017 00:18:25 -0800
+From: Christoph Hellwig <hch@infradead.org>
+To: Scott Bauer <scott.bauer@intel.com>
+Subject: Re: [PATCH V5 4/4] Maintainers: Modify SED list from nvme to block
+Message-ID: <20170214081825.GC20251@infradead.org>
+References: <1487002272-17940-1-git-send-email-scott.bauer@intel.com>
+ <1487002272-17940-5-git-send-email-scott.bauer@intel.com>
+MIME-Version: 1.0
+In-Reply-To: <1487002272-17940-5-git-send-email-scott.bauer@intel.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
+List-Post: <mailto:linux-nvme@lists.infradead.org>
+List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
+Cc: keith.busch@intel.com, arnd@arndb.de, hch@infradead.org,
+ linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org, axboe@fb.com,
+ David.Laight@ACULAB.COM, linux-block@vger.kernel.org,
+ jonathan.derrick@intel.com
+Content-Type: text/plain; charset="us-ascii"
+Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
+Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
+List-ID: <linux-block@vger.kernel.org>
 
-Now one page array is allocated for each resync bio, and we can
-retrieve page from this table directly.
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
----
- drivers/md/raid10.c | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 
-diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
-index 931f5d80608b..ae162d542bf4 100644
---- a/drivers/md/raid10.c
-+++ b/drivers/md/raid10.c
-@@ -2065,6 +2065,7 @@ static void sync_request_write(struct mddev *mddev, struct r10bio *r10_bio)
- 	int i, first;
- 	struct bio *tbio, *fbio;
- 	int vcnt;
-+	struct page **tpages, **fpages;
- 
- 	atomic_set(&r10_bio->remaining, 1);
- 
-@@ -2080,6 +2081,7 @@ static void sync_request_write(struct mddev *mddev, struct r10bio *r10_bio)
- 	fbio = r10_bio->devs[i].bio;
- 	fbio->bi_iter.bi_size = r10_bio->sectors << 9;
- 	fbio->bi_iter.bi_idx = 0;
-+	fpages = get_resync_pages(fbio)->pages;
- 
- 	vcnt = (r10_bio->sectors + (PAGE_SIZE >> 9) - 1) >> (PAGE_SHIFT - 9);
- 	/* now find blocks with errors */
-@@ -2094,6 +2096,8 @@ static void sync_request_write(struct mddev *mddev, struct r10bio *r10_bio)
- 			continue;
- 		if (i == first)
- 			continue;
-+
-+		tpages = get_resync_pages(tbio)->pages;
- 		d = r10_bio->devs[i].devnum;
- 		rdev = conf->mirrors[d].rdev;
- 		if (!r10_bio->devs[i].bio->bi_error) {
-@@ -2106,8 +2110,8 @@ static void sync_request_write(struct mddev *mddev, struct r10bio *r10_bio)
- 				int len = PAGE_SIZE;
- 				if (sectors < (len / 512))
- 					len = sectors * 512;
--				if (memcmp(page_address(fbio->bi_io_vec[j].bv_page),
--					   page_address(tbio->bi_io_vec[j].bv_page),
-+				if (memcmp(page_address(fpages[j]),
-+					   page_address(tpages[j]),
- 					   len))
- 					break;
- 				sectors -= len/512;
-@@ -2205,6 +2209,7 @@ static void fix_recovery_read_error(struct r10bio *r10_bio)
- 	int idx = 0;
- 	int dr = r10_bio->devs[0].devnum;
- 	int dw = r10_bio->devs[1].devnum;
-+	struct page **pages = get_resync_pages(bio)->pages;
- 
- 	while (sectors) {
- 		int s = sectors;
-@@ -2220,7 +2225,7 @@ static void fix_recovery_read_error(struct r10bio *r10_bio)
- 		ok = sync_page_io(rdev,
- 				  addr,
- 				  s << 9,
--				  bio->bi_io_vec[idx].bv_page,
-+				  pages[idx],
- 				  REQ_OP_READ, 0, false);
- 		if (ok) {
- 			rdev = conf->mirrors[dw].rdev;
-@@ -2228,7 +2233,7 @@ static void fix_recovery_read_error(struct r10bio *r10_bio)
- 			ok = sync_page_io(rdev,
- 					  addr,
- 					  s << 9,
--					  bio->bi_io_vec[idx].bv_page,
-+					  pages[idx],
- 					  REQ_OP_WRITE, 0, false);
- 			if (!ok) {
- 				set_bit(WriteErrorSeen, &rdev->flags);
--- 
-2.7.4
+Let's get it in ASAP as well.
+
+_______________________________________________
+Linux-nvme mailing list
+Linux-nvme@lists.infradead.org
+http://lists.infradead.org/mailman/listinfo/linux-nvme
