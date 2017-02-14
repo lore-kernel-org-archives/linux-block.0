@@ -1,124 +1,43 @@
-Return-Path: <BATV+1f42f42caf748e0126fd+4912+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Thomas Gleixner <tglx@linutronix.de>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <keith.busch@intel.com>,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 2/6] genirq/affinity: assign vectors to all present CPUs
-Date: Fri,  3 Feb 2017 15:35:56 +0100
-Message-Id: <20170203143600.32307-3-hch@lst.de>
-In-Reply-To: <20170203143600.32307-1-hch@lst.de>
-References: <20170203143600.32307-1-hch@lst.de>
+Return-Path: <hare@suse.de>
+Subject: Re: [PATCH v2] sd: Check for unaligned partial completion
+To: Damien Le Moal <damien.lemoal@wdc.com>, Jens Axboe <axboe@kernel.dk>
+References: <20170214090049.29910-1-damien.lemoal@wdc.com>
+Cc: linux-block@vger.kernel.org, Shaun Tancheff <shaun@tancheff.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <e6e85814-66ae-7b59-47f7-a48fdff5a3f4@suse.de>
+Date: Tue, 14 Feb 2017 10:08:14 +0100
+MIME-Version: 1.0
+In-Reply-To: <20170214090049.29910-1-damien.lemoal@wdc.com>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-block@vger.kernel.org>
 
-Currently we only assign spread vectors to online CPUs, which ties the
-IRQ mapping to the currently online devices and doesn't deal nicely with
-the fact that CPUs could come and go rapidly due to e.g. power management.
+On 02/14/2017 10:00 AM, Damien Le Moal wrote:
+> Commit "mpt3sas: Force request partial completion alignment" was not
+> considering the case of REQ_TYPE_FS commands not operating on sector
+> size units (e.g. REQ_OP_ZONE_REPORT and its 64B aligned partial
+> replies). This could result is incorrectly retrying (forever) those
+> commands.
+> 
+> Move the partial completion alignement check of mpt3sas to sd_done so
+> that the check comes after good_bytes & resid corrections of done in
+> that function depending on the request command to avoid false positive.
+> 
+> Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+> ---
+>  drivers/scsi/mpt3sas/mpt3sas_scsih.c | 15 ---------------
+>  drivers/scsi/sd.c                    | 20 ++++++++++++++++++++
+>  2 files changed, 20 insertions(+), 15 deletions(-)
+> 
+And indeed, I like this version far better than the mpt3sas-specific one.
 
-Instead assign vectors to all present CPUs to avoid this churn.
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- kernel/irq/affinity.c | 43 ++++++++++++++++++++++++++++---------------
- 1 file changed, 28 insertions(+), 15 deletions(-)
+Cheers,
 
-diff --git a/kernel/irq/affinity.c b/kernel/irq/affinity.c
-index 4544b115f5eb..6cd20a569359 100644
---- a/kernel/irq/affinity.c
-+++ b/kernel/irq/affinity.c
-@@ -4,6 +4,8 @@
- #include <linux/slab.h>
- #include <linux/cpu.h>
- 
-+static cpumask_var_t node_to_present_cpumask[MAX_NUMNODES] __read_mostly;
-+
- static void irq_spread_init_one(struct cpumask *irqmsk, struct cpumask *nmsk,
- 				int cpus_per_vec)
- {
-@@ -40,8 +42,8 @@ static int get_nodes_in_cpumask(const struct cpumask *mask, nodemask_t *nodemsk)
- 	int n, nodes = 0;
- 
- 	/* Calculate the number of nodes in the supplied affinity mask */
--	for_each_online_node(n) {
--		if (cpumask_intersects(mask, cpumask_of_node(n))) {
-+	for_each_node(n) {
-+		if (cpumask_intersects(mask, node_to_present_cpumask[n])) {
- 			node_set(n, *nodemsk);
- 			nodes++;
- 		}
-@@ -77,9 +79,7 @@ irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
- 	for (curvec = 0; curvec < affd->pre_vectors; curvec++)
- 		cpumask_copy(masks + curvec, irq_default_affinity);
- 
--	/* Stabilize the cpumasks */
--	get_online_cpus();
--	nodes = get_nodes_in_cpumask(cpu_online_mask, &nodemsk);
-+	nodes = get_nodes_in_cpumask(cpu_present_mask, &nodemsk);
- 
- 	/*
- 	 * If the number of nodes in the mask is greater than or equal the
-@@ -87,7 +87,8 @@ irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
- 	 */
- 	if (affv <= nodes) {
- 		for_each_node_mask(n, nodemsk) {
--			cpumask_copy(masks + curvec, cpumask_of_node(n));
-+			cpumask_copy(masks + curvec,
-+				     node_to_present_cpumask[n]);
- 			if (++curvec == last_affv)
- 				break;
- 		}
-@@ -103,7 +104,7 @@ irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
- 		int ncpus, v, vecs_to_assign = vecs_per_node;
- 
- 		/* Get the cpus on this node which are in the mask */
--		cpumask_and(nmsk, cpu_online_mask, cpumask_of_node(n));
-+		cpumask_and(nmsk, cpu_present_mask, node_to_present_cpumask[n]);
- 
- 		/* Calculate the number of cpus per vector */
- 		ncpus = cpumask_weight(nmsk);
-@@ -126,8 +127,6 @@ irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
- 	}
- 
- done:
--	put_online_cpus();
--
- 	/* Fill out vectors at the end that don't need affinity */
- 	for (; curvec < nvecs; curvec++)
- 		cpumask_copy(masks + curvec, irq_default_affinity);
-@@ -145,12 +144,26 @@ int irq_calc_affinity_vectors(int maxvec, const struct irq_affinity *affd)
- {
- 	int resv = affd->pre_vectors + affd->post_vectors;
- 	int vecs = maxvec - resv;
--	int cpus;
- 
--	/* Stabilize the cpumasks */
--	get_online_cpus();
--	cpus = cpumask_weight(cpu_online_mask);
--	put_online_cpus();
-+	return min_t(int, cpumask_weight(cpu_present_mask), vecs) + resv;
-+}
-+
-+static int __init irq_build_cpumap(void)
-+{
-+	int node, cpu;
-+
-+	for (node = 0; node < nr_node_ids; node++) {
-+		if (!zalloc_cpumask_var(&node_to_present_cpumask[node],
-+				GFP_KERNEL))
-+			panic("can't allocate early memory\n");
-+	}
- 
--	return min(cpus, vecs) + resv;
-+	for_each_present_cpu(cpu) {
-+		node = cpu_to_node(cpu);
-+		cpumask_set_cpu(cpu, node_to_present_cpumask[node]);
-+	}
-+
-+	return 0;
- }
-+
-+subsys_initcall(irq_build_cpumap);
+Hannes
 -- 
-2.11.0
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: F. Imend�rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG N�rnberg)
