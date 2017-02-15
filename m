@@ -10,11 +10,11 @@ Cc: Jon Derrick <jonathan.derrick@intel.com>,
 	Jens Axboe <axboe@kernel.dk>,
 	Christoph Hellwig <hch@lst.de>,
 	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: [PATCHv3 1/4] block/sed: Use ssize_t on atom parsers to return errors
-Date: Wed, 15 Feb 2017 12:42:06 -0700
-Message-Id: <1487187731-10293-2-git-send-email-jonathan.derrick@intel.com>
-In-Reply-To: <1487187731-10293-1-git-send-email-jonathan.derrick@intel.com>
-References: <1487187731-10293-1-git-send-email-jonathan.derrick@intel.com>
+Subject: [PATCHv2 1/4] block/sed: Use ssize_t on atom parsers to return errors
+Date: Wed, 15 Feb 2017 14:04:57 -0700
+Message-Id: <1487192712-31120-2-git-send-email-jonathan.derrick@intel.com>
+In-Reply-To: <1487192712-31120-1-git-send-email-jonathan.derrick@intel.com>
+References: <1487192712-31120-1-git-send-email-jonathan.derrick@intel.com>
 List-ID: <linux-block@vger.kernel.org>
 
 The short atom parser can return an errno from decoding but does not
