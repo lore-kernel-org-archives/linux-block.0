@@ -10,11 +10,11 @@ Cc: Jon Derrick <jonathan.derrick@intel.com>,
 	Jens Axboe <axboe@kernel.dk>,
 	Christoph Hellwig <hch@lst.de>,
 	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: [PATCHv4 4/4] MAINTAINERS: Remove powerpc's opal match
-Date: Wed, 15 Feb 2017 14:45:57 -0700
-Message-Id: <1487195159-12599-5-git-send-email-jonathan.derrick@intel.com>
-In-Reply-To: <1487195159-12599-1-git-send-email-jonathan.derrick@intel.com>
-References: <1487195159-12599-1-git-send-email-jonathan.derrick@intel.com>
+Subject: [PATCHv3 4/4] MAINTAINERS: Remove powerpc's opal match
+Date: Wed, 15 Feb 2017 12:42:09 -0700
+Message-Id: <1487187731-10293-5-git-send-email-jonathan.derrick@intel.com>
+In-Reply-To: <1487187731-10293-1-git-send-email-jonathan.derrick@intel.com>
+References: <1487187731-10293-1-git-send-email-jonathan.derrick@intel.com>
 List-ID: <linux-block@vger.kernel.org>
 
 PPC's 'opal' match pattern also matches block/sed-opal.c, where it looks
