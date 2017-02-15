@@ -1,50 +1,37 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-Date: Thu, 9 Feb 2017 13:55:05 -0800
-From: Matthew Wilcox <willy@infradead.org>
-To: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Cc: Theodore Ts'o <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCHv6 08/37] filemap: handle huge pages in
- do_generic_file_read()
-Message-ID: <20170209215505.GW2267@bombadil.infradead.org>
-References: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
- <20170126115819.58875-9-kirill.shutemov@linux.intel.com>
+Return-Path: <prvs=32195039d6=jbacik@fb.com>
+From: Josef Bacik <jbacik@fb.com>
+To: <axboe@kernel.dk>, <nbd-general@lists.sourceforge.net>,
+        <linux-block@vger.kernel.org>, <kernel-team@fb.com>
+Subject: [PATCH] nbd: cleanup workqueue on error properly
+Date: Wed, 15 Feb 2017 16:49:48 -0500
+Message-ID: <1487195388-28532-1-git-send-email-jbacik@fb.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170126115819.58875-9-kirill.shutemov@linux.intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Jan 26, 2017 at 02:57:50PM +0300, Kirill A. Shutemov wrote:
-> +++ b/mm/filemap.c
-> @@ -1886,6 +1886,7 @@ static ssize_t do_generic_file_read(struct file *filp, loff_t *ppos,
->  			if (unlikely(page == NULL))
->  				goto no_cached_page;
->  		}
-> +		page = compound_head(page);
+If we fail to register the blockdev we need to make sure to destroy the
+recv workqueue.
 
-We got this page from find_get_page(), which gets it from
-pagecache_get_page(), which gets it from find_get_entry() ... which
-(unless I'm lost in your patch series) returns the head page.  So this
-line is redundant, right?
+Signed-off-by: Josef Bacik <jbacik@fb.com>
+---
+ drivers/block/nbd.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-But then down in filemap_fault, we have:
-
-        VM_BUG_ON_PAGE(page->index != offset, page);
-
-... again, maybe I'm lost somewhere in your patch series, but I don't see
-anywhere you remove that line (or modify it).  So are you not testing
-with VM debugging enabled, or are you not doing a test which includes
-mapping a file with huge pages, reading from it (to get the page in cache),
-then faulting on an address that is not in the first 4kB of that 2MB?
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index 0623f8f..a032a00 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -1271,8 +1271,10 @@ static int __init nbd_init(void)
+ 	if (!recv_workqueue)
+ 		return -ENOMEM;
+ 
+-	if (register_blkdev(NBD_MAJOR, "nbd"))
++	if (register_blkdev(NBD_MAJOR, "nbd")) {
++		destroy_workqueue(recv_workqueue);
+ 		return -EIO;
++	}
+ 
+ 	nbd_dbg_init();
+ 
+-- 
+2.7.4
