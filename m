@@ -10,11 +10,11 @@ Cc: Jon Derrick <jonathan.derrick@intel.com>,
 	Jens Axboe <axboe@kernel.dk>,
 	Christoph Hellwig <hch@lst.de>,
 	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: [PATCHv3 2/4] block/sed: Add helper to qualify response tokens
-Date: Wed, 15 Feb 2017 12:42:07 -0700
-Message-Id: <1487187731-10293-3-git-send-email-jonathan.derrick@intel.com>
-In-Reply-To: <1487187731-10293-1-git-send-email-jonathan.derrick@intel.com>
-References: <1487187731-10293-1-git-send-email-jonathan.derrick@intel.com>
+Subject: [PATCHv2 2/4] block/sed: Add helper to qualify response tokens
+Date: Wed, 15 Feb 2017 14:04:58 -0700
+Message-Id: <1487192712-31120-3-git-send-email-jonathan.derrick@intel.com>
+In-Reply-To: <1487192712-31120-1-git-send-email-jonathan.derrick@intel.com>
+References: <1487192712-31120-1-git-send-email-jonathan.derrick@intel.com>
 List-ID: <linux-block@vger.kernel.org>
 
 Add helper which verifies the response token is valid and matches the
