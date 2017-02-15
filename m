@@ -1,31 +1,24 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:40845 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751357AbdBAJxW (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Feb 2017 04:53:22 -0500
-Date: Wed, 1 Feb 2017 01:53:20 -0800
-From: Christoph Hellwig <hch@infradead.org>
-To: Jan Kara <jack@suse.cz>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
-        Laurent Dufour <ldufour@linux.vnet.ibm.com>
-Subject: Re: [PATCH 4/4] block: Make blk_get_backing_dev_info() safe without
- open bdev
-Message-ID: <20170201095320.GD17386@infradead.org>
-References: <20170131125429.14303-1-jack@suse.cz>
- <20170131125429.14303-5-jack@suse.cz>
+Return-Path: <scott.bauer@intel.com>
+Date: Wed, 15 Feb 2017 14:09:26 -0700
+From: Scott Bauer <scott.bauer@intel.com>
+To: Jon Derrick <jonathan.derrick@intel.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	Rafael Antognolli <rafael.antognolli@intel.com>,
+	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: Re: [PATCHv3 3/4] block/sed: Check received header lengths
+Message-ID: <20170215210926.GB2178@sbauer-Z170X-UD5>
+References: <1487187731-10293-1-git-send-email-jonathan.derrick@intel.com>
+ <1487187731-10293-4-git-send-email-jonathan.derrick@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170131125429.14303-5-jack@suse.cz>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <1487187731-10293-4-git-send-email-jonathan.derrick@intel.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Looks fine:
-
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-
-But can you also add another patch to kill off blk_get_backing_dev_info?
-The direct dereference is short and cleaner.  Additionally the bt_bdi
-field in XFS could go away, too.
+On Wed, Feb 15, 2017 at 12:42:08PM -0700, Jon Derrick wrote:
+> Add a buffer size check against discovery and response header lengths
+> before we loop over their buffers.
+> 
+> Signed-off-by: Jon Derrick <jonathan.derrick@intel.com>
+Reviewed-by: Scott Bauer <scott.bauer@intel.com>
