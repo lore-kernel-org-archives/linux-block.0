@@ -1,37 +1,19 @@
-Return-Path: <prvs=32195039d6=jbacik@fb.com>
-From: Josef Bacik <jbacik@fb.com>
-To: <axboe@kernel.dk>, <nbd-general@lists.sourceforge.net>,
-        <linux-block@vger.kernel.org>, <kernel-team@fb.com>
-Subject: [PATCH] nbd: cleanup workqueue on error properly
-Date: Wed, 15 Feb 2017 16:49:48 -0500
-Message-ID: <1487195388-28532-1-git-send-email-jbacik@fb.com>
+Return-Path: <sagigrim@gmail.com>
+Return-Path: <sagigrim@gmail.com>
+Subject: Re: [PATCH 3/4] block: optionally merge discontiguous discard bios
+ into a single request
+To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+References: <20170207164658.32449-1-hch@lst.de>
+ <20170207164658.32449-4-hch@lst.de>
+Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+From: Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <9bdc9a0f-f447-0d24-328f-1c448125f394@grimberg.me>
+Date: Wed, 15 Feb 2017 12:36:49 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20170207164658.32449-4-hch@lst.de>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-If we fail to register the blockdev we need to make sure to destroy the
-recv workqueue.
+Looks good,
 
-Signed-off-by: Josef Bacik <jbacik@fb.com>
----
- drivers/block/nbd.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 0623f8f..a032a00 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -1271,8 +1271,10 @@ static int __init nbd_init(void)
- 	if (!recv_workqueue)
- 		return -ENOMEM;
- 
--	if (register_blkdev(NBD_MAJOR, "nbd"))
-+	if (register_blkdev(NBD_MAJOR, "nbd")) {
-+		destroy_workqueue(recv_workqueue);
- 		return -EIO;
-+	}
- 
- 	nbd_dbg_init();
- 
--- 
-2.7.4
+Reviewed-by: Sagi Grimberg <sagi@grimbeg.me>
