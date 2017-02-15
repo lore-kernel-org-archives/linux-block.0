@@ -2,19 +2,14 @@ Return-Path: <jonathan.derrick@intel.com>
 From: Jon Derrick <jonathan.derrick@intel.com>
 To: 
 Cc: Jon Derrick <jonathan.derrick@intel.com>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
 	Scott Bauer <scott.bauer@intel.com>,
 	Rafael Antognolli <rafael.antognolli@intel.com>,
 	Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: [PATCHv2 1/4] block/sed: Use ssize_t on atom parsers to return errors
-Date: Wed, 15 Feb 2017 14:04:57 -0700
-Message-Id: <1487192712-31120-2-git-send-email-jonathan.derrick@intel.com>
-In-Reply-To: <1487192712-31120-1-git-send-email-jonathan.derrick@intel.com>
-References: <1487192712-31120-1-git-send-email-jonathan.derrick@intel.com>
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 1/4] block/sed: Use ssize_t on atom parsers to return errors
+Date: Wed, 15 Feb 2017 12:38:51 -0700
+Message-Id: <1487187535-10503-1-git-send-email-jonathan.derrick@intel.com>
 List-ID: <linux-block@vger.kernel.org>
 
 The short atom parser can return an errno from decoding but does not
@@ -23,8 +18,9 @@ to ssize_t.
 
 Signed-off-by: Jon Derrick <jonathan.derrick@intel.com>
 ---
- block/sed-opal.c | 28 ++++++++++++++--------------
- 1 file changed, 14 insertions(+), 14 deletions(-)
+ block/sed-opal.c         | 28 ++++++++++++++--------------
+ include/linux/sed-opal.h |  2 +-
+ 2 files changed, 15 insertions(+), 15 deletions(-)
 
 diff --git a/block/sed-opal.c b/block/sed-opal.c
 index e95b8a5..77623ad 100644
@@ -114,5 +110,18 @@ index e95b8a5..77623ad 100644
  
  		pos += token_length;
  		total -= token_length;
+diff --git a/include/linux/sed-opal.h b/include/linux/sed-opal.h
+index 205d520..4fc72d4 100644
+--- a/include/linux/sed-opal.h
++++ b/include/linux/sed-opal.h
+@@ -69,7 +69,7 @@ enum opal_response_token {
+  */
+ struct opal_resp_tok {
+ 	const u8 *pos;
+-	size_t len;
++	ssize_t len;
+ 	enum opal_response_token type;
+ 	enum opal_atom_width width;
+ 	union {
 -- 
 1.8.3.1
