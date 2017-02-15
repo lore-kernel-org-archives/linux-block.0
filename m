@@ -1,39 +1,37 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:17385 "EHLO
-        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750806AbdBOPaU (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Feb 2017 10:30:20 -0500
-From: Bart Van Assche <Bart.VanAssche@sandisk.com>
-To: "hch@lst.de" <hch@lst.de>, "hare@suse.de" <hare@suse.de>
-CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "axboe@kernek.dk" <axboe@kernek.dk>
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+Date: Wed, 15 Feb 2017 16:04:06 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Hannes Reinecke <hare@suse.de>
+Cc: Christoph Hellwig <hch@lst.de>, axboe@kernek.dk,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
 Subject: Re: sense handling improvements
-Date: Wed, 15 Feb 2017 15:30:00 +0000
-Message-ID: <1487172586.2990.4.camel@sandisk.com>
-References: <20170214191600.17480-1-hch@lst.de>
-         <cfc712df-f0e6-59c0-46d8-6af02542f14b@suse.de>
-         <20170215150406.GA26549@lst.de>
-In-Reply-To: <20170215150406.GA26549@lst.de>
-Content-Type: text/plain; charset="utf-8"
+Message-ID: <20170215150406.GA26549@lst.de>
+References: <20170214191600.17480-1-hch@lst.de> <cfc712df-f0e6-59c0-46d8-6af02542f14b@suse.de>
 MIME-Version: 1.0
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <cfc712df-f0e6-59c0-46d8-6af02542f14b@suse.de>
+Sender: linux-scsi-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-T24gV2VkLCAyMDE3LTAyLTE1IGF0IDE2OjA0ICswMTAwLCBDaHJpc3RvcGggSGVsbHdpZyB3cm90
-ZToNCj4gT24gV2VkLCBGZWIgMTUsIDIwMTcgYXQgMDk6MTk6MThBTSArMDEwMCwgSGFubmVzIFJl
-aW5lY2tlIHdyb3RlOg0KPiA+IE9uIDAyLzE0LzIwMTcgMDg6MTUgUE0sIENocmlzdG9waCBIZWxs
-d2lnIHdyb3RlOg0KPiA+ID4gSGkgYWxsLA0KPiA+ID4gDQo+ID4gPiB0aGlzIHNlcmllcyBpcyBv
-biB0b3Agb2YgdGhlIHNjc2lfcmVxdWVzdCBjaGFuZ2VzIGluIEplbnMnIHRyZWUgYW5kDQo+ID4g
-PiBmdXJ0aGVyIGltcHJvdmVzIHRoZSBoYW5kbGluZyBvZiB0aGUgc2Vuc2UgYnVmZmVyLg0KPiA+
-ID4gDQo+ID4gDQo+ID4gU29ycnksIGJ1dCBJJ20gZmVlbGluZyByZWFsbHkgZGFmdDogd2hpY2gg
-c2NzaV9yZXF1ZXN0IGNoYW5nZXM/DQo+IA0KPiBUaGF0IGlzIHRoZSAic3BsaXQgc2NzaSBwYXNz
-dGhyb3VnaCBmaWVsZHMgb3V0IG9mIHN0cnVjdCByZXF1ZXN0Ig0KPiBzZXJpZXMuDQo+IA0KPiA+
-IFRvIGJlIGZvdW5kIGluIHdoaWNoIHRyZWU/DQo+IA0KPiBKZW5zJyBmb3ItbmV4dCB0cmVlLCBh
-cyBtZW50aW9uZWQgYWJvdmUuDQoNCkhlbGxvIENocmlzdG9waCwNCg0KQXJlIHlvdSBhd2FyZSB0
-aGF0ICJzcGxpdCBzY3NpIHBhc3N0aHJvdWdoIGZpZWxkcyBvdXQgb2Ygc3RydWN0IHJlcXVlc3Qi
-DQpzZXJpZXMgaW50cm9kdWNlcyBhIG5ldyBidWcsIGEgYnVnIHRoYXQgSSBoYXZlIGFscmVhZHkg
-cmVwb3J0ZWQgYnV0IHRoYXQNCmhhcyBub3QgeWV0IGJlZW4gYWRkcmVzc2VkPyBTZWUgYWxzbw0K
-aHR0cHM6Ly93d3cuc3Bpbmljcy5uZXQvbGlzdHMvcmFpZC9tc2c1NTQ5NC5odG1sLg0KDQpCYXJ0
-Lg==
+On Wed, Feb 15, 2017 at 09:19:18AM +0100, Hannes Reinecke wrote:
+> On 02/14/2017 08:15 PM, Christoph Hellwig wrote:
+> > Hi all,
+> > 
+> > this series is on top of the scsi_request changes in Jens' tree and
+> > further improves the handling of the sense buffer.
+> > 
+> Sorry, but I'm feeling really daft: which scsi_request changes?
+
+That is the "split scsi passthrough fields out of struct request"
+series.
+
+> To be found in which tree?
+
+Jens' for-next tree, as mentioned above.
+
+> Have we audited all drivers to _not_ do DMA into the sense buffer?
+> By first glance some still do, so they'll break horribly when moving the
+> sense buffer onto the stack ...
+
+With the above series the sense buffer is allocate by the driver,
+and they will always DMA into that.
