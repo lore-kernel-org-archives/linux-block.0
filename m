@@ -10,23 +10,18 @@ Cc: Jon Derrick <jonathan.derrick@intel.com>,
 	Jens Axboe <axboe@kernel.dk>,
 	Christoph Hellwig <hch@lst.de>,
 	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: [PATCHv3 0/4] OPAL patches
-Date: Wed, 15 Feb 2017 12:42:05 -0700
-Message-Id: <1487187731-10293-1-git-send-email-jonathan.derrick@intel.com>
+Subject: [PATCHv2 0/4] OPAL patches
+Date: Wed, 15 Feb 2017 14:04:56 -0700
+Message-Id: <1487192712-31120-1-git-send-email-jonathan.derrick@intel.com>
 List-ID: <linux-block@vger.kernel.org>
 
 Just a couple of fixes for sed-opal to prevent faulty firmware from
 allowing us to go off in the weeds, and a helper to remove some
 duplicate code.
 
-v2->v3:
-corrected the bad calculation on the response parser check and changed
-it to only check the subpacket length
-
 v1->v2:
 left tok->len as a size_t
 got everyone important on the same email thread
-
 
 Jon Derrick (4):
   block/sed: Use ssize_t on atom parsers to return errors
