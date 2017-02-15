@@ -1,70 +1,57 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f177.google.com ([209.85.192.177]:34325 "EHLO
-        mail-pf0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752433AbdBFUxI (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Feb 2017 15:53:08 -0500
-Received: by mail-pf0-f177.google.com with SMTP id e4so26550943pfg.1
-        for <linux-block@vger.kernel.org>; Mon, 06 Feb 2017 12:53:02 -0800 (PST)
-From: Omar Sandoval <osandov@osandov.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: kernel-team@fb.com
-Subject: [PATCH] blk-mq-sched: (un)register elevator when (un)registering queue
-Date: Mon,  6 Feb 2017 12:52:24 -0800
-Message-Id: <ff62b5d76fa68f6595446d2a6c4aa13db4113d71.1486414181.git.osandov@fb.com>
+Received: from mx2.suse.de ([195.135.220.15]:51315 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751290AbdBOH7c (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 15 Feb 2017 02:59:32 -0500
+Subject: Re: [PATCH 1/6] scsi: always zero sshdr in scsi_normalize_sense
+To: Christoph Hellwig <hch@lst.de>, axboe@kernek.dk
+References: <20170214191600.17480-1-hch@lst.de>
+ <20170214191600.17480-2-hch@lst.de>
+Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <247fa6d0-ed72-e89b-ad36-8d004a2c9923@suse.de>
+Date: Wed, 15 Feb 2017 08:59:23 +0100
+MIME-Version: 1.0
+In-Reply-To: <20170214191600.17480-2-hch@lst.de>
+Content-Type: text/plain; charset=windows-1252
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Omar Sandoval <osandov@fb.com>
+On 02/14/2017 08:15 PM, Christoph Hellwig wrote:
+> This gives us a clear state even if a command didn't return sense data.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  drivers/scsi/scsi_common.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/scsi/scsi_common.c b/drivers/scsi/scsi_common.c
+> index b1383a71400e..a75673bb82b3 100644
+> --- a/drivers/scsi/scsi_common.c
+> +++ b/drivers/scsi/scsi_common.c
+> @@ -137,11 +137,11 @@ EXPORT_SYMBOL(int_to_scsilun);
+>  bool scsi_normalize_sense(const u8 *sense_buffer, int sb_len,
+>  			  struct scsi_sense_hdr *sshdr)
+>  {
+> +	memset(sshdr, 0, sizeof(struct scsi_sense_hdr));
+> +
+>  	if (!sense_buffer || !sb_len)
+>  		return false;
+>  
+> -	memset(sshdr, 0, sizeof(struct scsi_sense_hdr));
+> -
+>  	sshdr->response_code = (sense_buffer[0] & 0x7f);
+>  
+>  	if (!scsi_sense_valid(sshdr))
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-I noticed that when booting with a default blk-mq I/O scheduler, the
-/sys/block/*/queue/iosched directory was missing. However, switching
-after boot did create the directory. This is because we skip the initial
-elevator register/unregister when we don't have a ->request_fn(), but we
-should still do it for the ->mq_ops case.
+Cheers,
 
-Signed-off-by: Omar Sandoval <osandov@fb.com>
----
- block/blk-sysfs.c | 21 ++++++++++-----------
- 1 file changed, 10 insertions(+), 11 deletions(-)
-
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 3ce1217778f4..48032c4759a7 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -903,16 +903,15 @@ int blk_register_queue(struct gendisk *disk)
- 
- 	blk_wb_init(q);
- 
--	if (!q->request_fn)
--		return 0;
--
--	ret = elv_register_queue(q);
--	if (ret) {
--		kobject_uevent(&q->kobj, KOBJ_REMOVE);
--		kobject_del(&q->kobj);
--		blk_trace_remove_sysfs(dev);
--		kobject_put(&dev->kobj);
--		return ret;
-+	if (q->request_fn || (q->mq_ops && q->elevator)) {
-+		ret = elv_register_queue(q);
-+		if (ret) {
-+			kobject_uevent(&q->kobj, KOBJ_REMOVE);
-+			kobject_del(&q->kobj);
-+			blk_trace_remove_sysfs(dev);
-+			kobject_put(&dev->kobj);
-+			return ret;
-+		}
- 	}
- 
- 	return 0;
-@@ -928,7 +927,7 @@ void blk_unregister_queue(struct gendisk *disk)
- 	if (q->mq_ops)
- 		blk_mq_unregister_dev(disk_to_dev(disk), q);
- 
--	if (q->request_fn)
-+	if (q->request_fn || (q->mq_ops && q->elevator))
- 		elv_unregister_queue(q);
- 
- 	kobject_uevent(&q->kobj, KOBJ_REMOVE);
+Hannes
 -- 
-2.11.1
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: F. Imend�rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG N�rnberg)
