@@ -1,57 +1,71 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f66.google.com ([74.125.83.66]:33617 "EHLO
-        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754791AbdBPLrH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Feb 2017 06:47:07 -0500
-From: Ming Lei <tom.leiming@gmail.com>
-To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
-        linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+Received: from mail.kernel.org ([198.145.29.136]:56260 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751298AbdBOTUA (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 15 Feb 2017 14:20:00 -0500
+Date: Wed, 15 Feb 2017 11:19:56 -0800
+From: Shaohua Li <shli@kernel.org>
+To: Ming Lei <tom.leiming@gmail.com>
+Cc: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org,
+        linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
         NeilBrown <neilb@suse.com>
-Cc: Ming Lei <tom.leiming@gmail.com>
-Subject: [PATCH 16/17] md: raid10: avoid direct access to bvec table in reshape_request
-Date: Thu, 16 Feb 2017 19:45:46 +0800
-Message-Id: <1487245547-24384-17-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1487245547-24384-1-git-send-email-tom.leiming@gmail.com>
-References: <1487245547-24384-1-git-send-email-tom.leiming@gmail.com>
+Subject: Re: [PATCH v2 0/5] md: use bio_clone_fast()
+Message-ID: <20170215191956.bdeusjyi3mazerbe@kernel.org>
+References: <1487086143-10255-1-git-send-email-tom.leiming@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1487086143-10255-1-git-send-email-tom.leiming@gmail.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-The cost is 128bytes(8*16) stack space in kernel thread context, and
-just use the bio helper to retrieve pages from bio.
+On Tue, Feb 14, 2017 at 11:28:58PM +0800, Ming Lei wrote:
+> Hi,
+> 
+> This patches replaces bio_clone() with bio_fast_clone() in
+> bio_clone_mddev() because:
+> 
+> 1) bio_clone_mddev() is used in raid normal I/O and isn't in
+> resync I/O path, and all the direct access to bvec table in
+> raid happens on resync I/O only except for write behind of raid1.
+> Write behind is treated specially, so the replacement is safe.
+> 
+> 2) for write behind, bio_clone() is kept, but this patchset
+> introduces bio_clone_bioset_partial() to just clone one specific 
+> bvecs range instead of whole table. Then write behind is improved
+> too.
+> 
+> V2:
+> 	1) move 3rd patch into 2nd one
+> 	2) kill  bio_clone_mddev() and use  bio_clone_fast() directly
+> 	3) define local variable 'offset' as sector_t in raid1_write_request()
+> 
+> V1:
+> 	1) don't introduce bio_clone_slow_mddev_partial()
+> 	2) return failure if mddev->bio_set can't be created
+> 	3) remove check in bio_clone_mddev() as suggested by
+> 	Christoph Hellwig.
+> 	4) rename bio_clone_mddev() as bio_clone_fast_mddev()
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
----
- drivers/md/raid10.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
-index c7d2f73565d9..5016ce8163c3 100644
---- a/drivers/md/raid10.c
-+++ b/drivers/md/raid10.c
-@@ -4383,6 +4383,8 @@ static sector_t reshape_request(struct mddev *mddev, sector_t sector_nr,
- 	struct bio *blist;
- 	struct bio *bio, *read_bio;
- 	int sectors_done = 0;
-+	struct bio_vec *bvl;
-+	struct page *pages[RESYNC_PAGES];
+Applied, thanks!
  
- 	if (sector_nr == 0) {
- 		/* If restarting in the middle, skip the initial sectors */
-@@ -4546,9 +4548,12 @@ static sector_t reshape_request(struct mddev *mddev, sector_t sector_nr,
- 
- 	/* Now add as many pages as possible to all of these bios. */
- 
-+	bio_for_each_segment_all(bvl, r10_bio->devs[0].bio, s)
-+		pages[s] = bvl->bv_page;
-+
- 	nr_sectors = 0;
- 	for (s = 0 ; s < max_sectors; s += PAGE_SIZE >> 9) {
--		struct page *page = r10_bio->devs[0].bio->bi_io_vec[s/(PAGE_SIZE>>9)].bv_page;
-+		struct page *page = pages[s / (PAGE_SIZE >> 9)];
- 		int len = (max_sectors - s) << 9;
- 		if (len > PAGE_SIZE)
- 			len = PAGE_SIZE;
--- 
-2.7.4
+> Ming Lei (5):
+>   block: introduce bio_clone_bioset_partial()
+>   md: fail if mddev->bio_set can't be created
+>   md/raid1: use bio_clone_bioset_partial() in case of write behind
+>   md: remove unnecessary check on mddev
+>   md: fast clone bio in bio_clone_mddev()
+> 
+>  block/bio.c         | 61 +++++++++++++++++++++++++++++++++++++++++------------
+>  drivers/md/faulty.c |  2 +-
+>  drivers/md/md.c     | 15 ++++---------
+>  drivers/md/md.h     |  2 --
+>  drivers/md/raid1.c  | 28 +++++++++++++++++-------
+>  drivers/md/raid10.c | 11 +++++-----
+>  drivers/md/raid5.c  |  4 ++--
+>  include/linux/bio.h | 11 ++++++++--
+>  8 files changed, 89 insertions(+), 45 deletions(-)
+> 
+> -- 
+> 2.7.4
+> 
