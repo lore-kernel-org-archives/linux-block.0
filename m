@@ -1,80 +1,51 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:46664 "EHLO
-        mx0b-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1751505AbdBOSEq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Feb 2017 13:04:46 -0500
 Subject: Re: [PATCH] blk-mq-sched: don't hold queue_lock when calling exit_icq
 To: Paolo Valente <paolo.valente@linaro.org>,
-        Omar Sandoval <osandov@osandov.com>
+ Omar Sandoval <osandov@osandov.com>
 References: <73cd0cf484e8b75a771d908c172cd3a931dc00a3.1486751329.git.osandov@fb.com>
  <A71AF11B-8A3A-42A5-845A-B9FBEEF74FBA@linaro.org>
- <a3e62a57-d401-99e0-6487-fc8277204e71@fb.com>
-CC: <linux-block@vger.kernel.org>, <kernel-team@fb.com>
+Cc: linux-block@vger.kernel.org, kernel-team@fb.com
 From: Jens Axboe <axboe@fb.com>
-Message-ID: <9fe1b3a9-2a80-8891-1044-f83558e28d15@fb.com>
-Date: Wed, 15 Feb 2017 11:04:17 -0700
+Message-ID: <a3e62a57-d401-99e0-6487-fc8277204e71@fb.com>
+Date: Wed, 15 Feb 2017 10:58:12 -0700
 MIME-Version: 1.0
-In-Reply-To: <a3e62a57-d401-99e0-6487-fc8277204e71@fb.com>
-Content-Type: text/plain; charset="windows-1252"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <A71AF11B-8A3A-42A5-845A-B9FBEEF74FBA@linaro.org>
+Content-Type: text/plain; charset=windows-1252
+List-ID: <linux-block@vger.kernel.org>
 
-On 02/15/2017 10:58 AM, Jens Axboe wrote:
-> On 02/15/2017 10:24 AM, Paolo Valente wrote:
->>
->>> Il giorno 10 feb 2017, alle ore 19:32, Omar Sandoval <osandov@osandov.com> ha scritto:
->>>
->>> From: Omar Sandoval <osandov@fb.com>
->>>
->>> None of the other blk-mq elevator hooks are called with this lock held.
->>> Additionally, it can lead to circular locking dependencies between
->>> queue_lock and the private scheduler lock.
->>>
->>
->> Hi Omar,
->> I'm sorry but it seems that a new potential deadlock has showed up.
->> See lockdep splat below.
->>
->> I've tried to think about different solutions than turning back to
->> deferring the body of exit_icq, but at no avail.
+On 02/15/2017 10:24 AM, Paolo Valente wrote:
 > 
-> Looks like a interaction between bfqd->lock and q->queue_lock. Since the
-> core has no notion of you bfqd->lock, the naturally dependency here
-> would be to nest bfqd->lock inside q->queue_lock. Is that possible for
-> you?
+>> Il giorno 10 feb 2017, alle ore 19:32, Omar Sandoval <osandov@osandov.com> ha scritto:
+>>
+>> From: Omar Sandoval <osandov@fb.com>
+>>
+>> None of the other blk-mq elevator hooks are called with this lock held.
+>> Additionally, it can lead to circular locking dependencies between
+>> queue_lock and the private scheduler lock.
+>>
 > 
-> Looking at the code a bit, maybe it'd just be simpler to get rid of
-> holding the queue lock for that spot. For the mq scheduler, we really
-> don't want places where we invoke with that held already. Does the below
-> work for you?
+> Hi Omar,
+> I'm sorry but it seems that a new potential deadlock has showed up.
+> See lockdep splat below.
+> 
+> I've tried to think about different solutions than turning back to
+> deferring the body of exit_icq, but at no avail.
 
-Would need to remove one more lockdep assert. And only test this for
-the mq parts, we'd need to spread a bit of love on the classic
-scheduling icq exit path for this to work on that side.
+Looks like a interaction between bfqd->lock and q->queue_lock. Since the
+core has no notion of you bfqd->lock, the naturally dependency here
+would be to nest bfqd->lock inside q->queue_lock. Is that possible for
+you?
+
+Looking at the code a bit, maybe it'd just be simpler to get rid of
+holding the queue lock for that spot. For the mq scheduler, we really
+don't want places where we invoke with that held already. Does the below
+work for you?
+
 
 diff --git a/block/blk-ioc.c b/block/blk-ioc.c
-index b12f9c87b4c3..546ff8f81ede 100644
+index b12f9c87b4c3..0f50b1296cf9 100644
 --- a/block/blk-ioc.c
 +++ b/block/blk-ioc.c
-@@ -54,7 +54,7 @@ static void ioc_exit_icq(struct io_cq *icq)
- 	icq->flags |= ICQ_EXITED;
- }
- 
--/* Release an icq.  Called with both ioc and q locked. */
-+/* Release an icq.  Called with ioc locked. */
- static void ioc_destroy_icq(struct io_cq *icq)
- {
- 	struct io_context *ioc = icq->ioc;
-@@ -62,7 +62,6 @@ static void ioc_destroy_icq(struct io_cq *icq)
- 	struct elevator_type *et = q->elevator->type;
- 
- 	lockdep_assert_held(&ioc->lock);
--	lockdep_assert_held(q->queue_lock);
- 
- 	radix_tree_delete(&ioc->icq_tree, icq->q->id);
- 	hlist_del_init(&icq->ioc_node);
-@@ -222,25 +221,34 @@ void exit_io_context(struct task_struct *task)
+@@ -222,25 +222,34 @@ void exit_io_context(struct task_struct *task)
  	put_io_context_active(ioc);
  }
  
