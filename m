@@ -1,174 +1,193 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f193.google.com ([209.85.192.193]:33939 "EHLO
-        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751385AbdBEGWd (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 5 Feb 2017 01:22:33 -0500
-From: Ming Lei <tom.leiming@gmail.com>
-To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
-        linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        NeilBrown <neilb@suse.com>
-Cc: Ming Lei <tom.leiming@gmail.com>
-Subject: [PATCH 1/4] block: introduce bio_clone_bioset_partial()
-Date: Sun,  5 Feb 2017 14:22:10 +0800
-Message-Id: <1486275733-7268-2-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1486275733-7268-1-git-send-email-tom.leiming@gmail.com>
-References: <1486275733-7268-1-git-send-email-tom.leiming@gmail.com>
+Received: from mx2.suse.de ([195.135.220.15]:39773 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751108AbdBOLNb (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 15 Feb 2017 06:13:31 -0500
+Subject: Re: [PATCH 4/7] nonblocking aio: return on congested block device
+To: Ming Lei <tom.leiming@gmail.com>,
+        Goldwyn Rodrigues <rgoldwyn@suse.de>
+References: <20170214024603.9563-1-rgoldwyn@suse.de>
+ <20170214024603.9563-5-rgoldwyn@suse.de>
+ <CACVXFVMx4=WBpYq0a3vtQri_D3NCnGJk4J5yyZwHzktTwO1yFw@mail.gmail.com>
+Cc: Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        Jan Kara <jack@suse.cz>,
+        linux-block <linux-block@vger.kernel.org>
+From: Goldwyn Rodrigues <rgoldwyn@suse.de>
+Message-ID: <50b81116-efbd-77cd-7b9d-994938aefb09@suse.de>
+Date: Wed, 15 Feb 2017 05:13:26 -0600
+MIME-Version: 1.0
+In-Reply-To: <CACVXFVMx4=WBpYq0a3vtQri_D3NCnGJk4J5yyZwHzktTwO1yFw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-md still need bio clone(not the fast version) for behind write,
-and it is more efficient to use bio_clone_bioset_partial().
 
-The idea is simple and just copy the bvecs range specified from
-parameters.
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
----
- block/bio.c         | 61 +++++++++++++++++++++++++++++++++++++++++------------
- include/linux/bio.h | 11 ++++++++--
- 2 files changed, 57 insertions(+), 15 deletions(-)
+On 02/13/2017 09:55 PM, Ming Lei wrote:
+> On Tue, Feb 14, 2017 at 10:46 AM, Goldwyn Rodrigues <rgoldwyn@suse.de> wrote:
+>> From: Goldwyn Rodrigues <rgoldwyn@suse.com>
+>>
+>> A new flag BIO_NONBLOCKING is introduced to identify bio's
+>> orignating from iocb with IOCB_NONBLOCKING. struct request
+>> are requested using BLK_MQ_REQ_NOWAIT if BIO_NONBLOCKING is set.
+>>
+>> Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
+>> ---
+>>  block/blk-core.c          | 13 +++++++++++--
+>>  block/blk-mq.c            | 18 ++++++++++++++++--
+>>  fs/direct-io.c            | 11 +++++++++--
+>>  include/linux/blk_types.h |  1 +
+>>  4 files changed, 37 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/block/blk-core.c b/block/blk-core.c
+>> index 14d7c07..9767573 100644
+>> --- a/block/blk-core.c
+>> +++ b/block/blk-core.c
+>> @@ -1257,6 +1257,11 @@ static struct request *get_request(struct request_queue *q, int op,
+>>         if (!IS_ERR(rq))
+>>                 return rq;
+>>
+>> +       if (bio_flagged(bio, BIO_NONBLOCKING)) {
+>> +               blk_put_rl(rl);
+>> +               return ERR_PTR(-EAGAIN);
+>> +       }
+>> +
+>>         if (!gfpflags_allow_blocking(gfp_mask) || unlikely(blk_queue_dying(q))) {
+>>                 blk_put_rl(rl);
+>>                 return rq;
+>> @@ -2035,7 +2040,7 @@ blk_qc_t generic_make_request(struct bio *bio)
+>>         do {
+>>                 struct request_queue *q = bdev_get_queue(bio->bi_bdev);
+>>
+>> -               if (likely(blk_queue_enter(q, false) == 0)) {
+>> +               if (likely(blk_queue_enter(q, bio_flagged(bio, BIO_NONBLOCKING)) == 0)) {
+>>                         ret = q->make_request_fn(q, bio);
+>>
+>>                         blk_queue_exit(q);
+>> @@ -2044,7 +2049,11 @@ blk_qc_t generic_make_request(struct bio *bio)
+>>                 } else {
+>>                         struct bio *bio_next = bio_list_pop(current->bio_list);
+>>
+>> -                       bio_io_error(bio);
+>> +                       if (unlikely(bio_flagged(bio, BIO_NONBLOCKING))) {
+>> +                               bio->bi_error = -EAGAIN;
+>> +                               bio_endio(bio);
+>> +                       } else
+>> +                               bio_io_error(bio);
+>>                         bio = bio_next;
+>>                 }
+>>         } while (bio);
+>> diff --git a/block/blk-mq.c b/block/blk-mq.c
+>> index 81caceb..7a7c674 100644
+>> --- a/block/blk-mq.c
+>> +++ b/block/blk-mq.c
+>> @@ -1213,6 +1213,8 @@ static struct request *blk_mq_map_request(struct request_queue *q,
+>>
+>>         trace_block_getrq(q, bio, op);
+>>         blk_mq_set_alloc_data(&alloc_data, q, 0, ctx, hctx);
+>> +       if (bio_flagged(bio, BIO_NONBLOCKING))
+>> +               alloc_data.flags |= BLK_MQ_REQ_NOWAIT;
+>>         rq = __blk_mq_alloc_request(&alloc_data, op, op_flags);
+>>
+>>         data->hctx = alloc_data.hctx;
+>> @@ -1286,8 +1288,14 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
+>>                 return BLK_QC_T_NONE;
+>>
+>>         rq = blk_mq_map_request(q, bio, &data);
+>> -       if (unlikely(!rq))
+>> +       if (unlikely(!rq)) {
+>> +               if (bio_flagged(bio, BIO_NONBLOCKING))
+>> +                       bio->bi_error = -EAGAIN;
+>> +               else
+>> +                       bio->bi_error = -EIO;
+>> +               bio_endio(bio);
+>>                 return BLK_QC_T_NONE;
+>> +       }
+>>
+>>         cookie = blk_tag_to_qc_t(rq->tag, data.hctx->queue_num);
+>>
+>> @@ -1381,8 +1389,14 @@ static blk_qc_t blk_sq_make_request(struct request_queue *q, struct bio *bio)
+>>                 request_count = blk_plug_queued_count(q);
+>>
+>>         rq = blk_mq_map_request(q, bio, &data);
+>> -       if (unlikely(!rq))
+>> +       if (unlikely(!rq)) {
+>> +               if (bio_flagged(bio, BIO_NONBLOCKING))
+>> +                       bio->bi_error = -EAGAIN;
+>> +               else
+>> +                       bio->bi_error = -EIO;
+>> +               bio_endio(bio);
+>>                 return BLK_QC_T_NONE;
+>> +       }
+> 
+> There are other places in which blocking may be triggered, such
+> as allocating for bio clone, wbt_wait(), and sleep in .make_request(),
+> like md, dm and bcache's.
+> 
+> IMO it should be hard to deal with all, so what is the expection for
+> flag of BIO_NONBLOCKING?
+> 
 
-diff --git a/block/bio.c b/block/bio.c
-index 4b564d0c3e29..5eec5e08417f 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -625,21 +625,20 @@ struct bio *bio_clone_fast(struct bio *bio, gfp_t gfp_mask, struct bio_set *bs)
- }
- EXPORT_SYMBOL(bio_clone_fast);
- 
--/**
-- * 	bio_clone_bioset - clone a bio
-- * 	@bio_src: bio to clone
-- *	@gfp_mask: allocation priority
-- *	@bs: bio_set to allocate from
-- *
-- *	Clone bio. Caller will own the returned bio, but not the actual data it
-- *	points to. Reference count of returned bio will be one.
-- */
--struct bio *bio_clone_bioset(struct bio *bio_src, gfp_t gfp_mask,
--			     struct bio_set *bs)
-+static struct bio *__bio_clone_bioset(struct bio *bio_src, gfp_t gfp_mask,
-+				      struct bio_set *bs, int offset,
-+				      int size)
- {
- 	struct bvec_iter iter;
- 	struct bio_vec bv;
- 	struct bio *bio;
-+	struct bvec_iter iter_src = bio_src->bi_iter;
-+
-+	/* for supporting partial clone */
-+	if (offset || size != bio_src->bi_iter.bi_size) {
-+		bio_advance_iter(bio_src, &iter_src, offset);
-+		iter_src.bi_size = size;
-+	}
- 
- 	/*
- 	 * Pre immutable biovecs, __bio_clone() used to just do a memcpy from
-@@ -663,7 +662,8 @@ struct bio *bio_clone_bioset(struct bio *bio_src, gfp_t gfp_mask,
- 	 *    __bio_clone_fast() anyways.
- 	 */
- 
--	bio = bio_alloc_bioset(gfp_mask, bio_segments(bio_src), bs);
-+	bio = bio_alloc_bioset(gfp_mask, __bio_segments(bio_src,
-+			       &iter_src), bs);
- 	if (!bio)
- 		return NULL;
- 	bio->bi_bdev		= bio_src->bi_bdev;
-@@ -680,7 +680,7 @@ struct bio *bio_clone_bioset(struct bio *bio_src, gfp_t gfp_mask,
- 		bio->bi_io_vec[bio->bi_vcnt++] = bio_src->bi_io_vec[0];
- 		break;
- 	default:
--		bio_for_each_segment(bv, bio_src, iter)
-+		__bio_for_each_segment(bv, bio_src, iter, iter_src)
- 			bio->bi_io_vec[bio->bi_vcnt++] = bv;
- 		break;
- 	}
-@@ -699,9 +699,44 @@ struct bio *bio_clone_bioset(struct bio *bio_src, gfp_t gfp_mask,
- 
- 	return bio;
- }
-+
-+/**
-+ * 	bio_clone_bioset - clone a bio
-+ * 	@bio_src: bio to clone
-+ *	@gfp_mask: allocation priority
-+ *	@bs: bio_set to allocate from
-+ *
-+ *	Clone bio. Caller will own the returned bio, but not the actual data it
-+ *	points to. Reference count of returned bio will be one.
-+ */
-+struct bio *bio_clone_bioset(struct bio *bio_src, gfp_t gfp_mask,
-+			     struct bio_set *bs)
-+{
-+	return __bio_clone_bioset(bio_src, gfp_mask, bs, 0,
-+				  bio_src->bi_iter.bi_size);
-+}
- EXPORT_SYMBOL(bio_clone_bioset);
- 
- /**
-+ * 	bio_clone_bioset_partial - clone a partial bio
-+ * 	@bio_src: bio to clone
-+ *	@gfp_mask: allocation priority
-+ *	@bs: bio_set to allocate from
-+ *	@offset: cloned starting from the offset
-+ *	@size: size for the cloned bio
-+ *
-+ *	Clone bio. Caller will own the returned bio, but not the actual data it
-+ *	points to. Reference count of returned bio will be one.
-+ */
-+struct bio *bio_clone_bioset_partial(struct bio *bio_src, gfp_t gfp_mask,
-+				     struct bio_set *bs, int offset,
-+				     int size)
-+{
-+	return __bio_clone_bioset(bio_src, gfp_mask, bs, offset, size);
-+}
-+EXPORT_SYMBOL(bio_clone_bioset_partial);
-+
-+/**
-  *	bio_add_pc_page	-	attempt to add page to bio
-  *	@q: the target queue
-  *	@bio: destination bio
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 7cf8a6c70a3f..8e521194f6fc 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -183,7 +183,7 @@ static inline void bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
- 
- #define bio_iter_last(bvec, iter) ((iter).bi_size == (bvec).bv_len)
- 
--static inline unsigned bio_segments(struct bio *bio)
-+static inline unsigned __bio_segments(struct bio *bio, struct bvec_iter *bvec)
- {
- 	unsigned segs = 0;
- 	struct bio_vec bv;
-@@ -205,12 +205,17 @@ static inline unsigned bio_segments(struct bio *bio)
- 		break;
- 	}
- 
--	bio_for_each_segment(bv, bio, iter)
-+	__bio_for_each_segment(bv, bio, iter, *bvec)
- 		segs++;
- 
- 	return segs;
- }
- 
-+static inline unsigned bio_segments(struct bio *bio)
-+{
-+	return __bio_segments(bio, &bio->bi_iter);
-+}
-+
- /*
-  * get a reference to a bio, so it won't disappear. the intended use is
-  * something like:
-@@ -384,6 +389,8 @@ extern void bio_put(struct bio *);
- extern void __bio_clone_fast(struct bio *, struct bio *);
- extern struct bio *bio_clone_fast(struct bio *, gfp_t, struct bio_set *);
- extern struct bio *bio_clone_bioset(struct bio *, gfp_t, struct bio_set *bs);
-+extern struct bio *bio_clone_bioset_partial(struct bio *, gfp_t,
-+					    struct bio_set *, int, int);
- 
- extern struct bio_set *fs_bio_set;
- 
+
+This is a part of the effort of making direct AIO nonblocking. I should
+have posted all patches to all lists.
+
+BIO_NONBLOCKING is a bio generated from a non-blocking AIO. Ideally it
+should bail whenever it sees that it would block and sleep if the
+blockqueue is congested (only). While earlier we had thought of limiting
+it to get_request(), I expanded it to blk-mq (which now I think may not
+be as useful).
+
+>>
+>>         cookie = blk_tag_to_qc_t(rq->tag, data.hctx->queue_num);
+>>
+>> diff --git a/fs/direct-io.c b/fs/direct-io.c
+>> index fb9aa16..9997fed 100644
+>> --- a/fs/direct-io.c
+>> +++ b/fs/direct-io.c
+>> @@ -386,6 +386,9 @@ dio_bio_alloc(struct dio *dio, struct dio_submit *sdio,
+>>         else
+>>                 bio->bi_end_io = dio_bio_end_io;
+>>
+>> +       if (dio->iocb->ki_flags & IOCB_NONBLOCKING)
+>> +               bio_set_flag(bio, BIO_NONBLOCKING);
+>> +
+>>         sdio->bio = bio;
+>>         sdio->logical_offset_in_bio = sdio->cur_page_fs_offset;
+>>  }
+>> @@ -480,8 +483,12 @@ static int dio_bio_complete(struct dio *dio, struct bio *bio)
+>>         unsigned i;
+>>         int err;
+>>
+>> -       if (bio->bi_error)
+>> -               dio->io_error = -EIO;
+>> +       if (bio->bi_error) {
+>> +               if (bio_flagged(bio, BIO_NONBLOCKING))
+>> +                       dio->io_error = bio->bi_error;
+>> +               else
+>> +                       dio->io_error = -EIO;
+>> +       }
+>>
+>>         if (dio->is_async && dio->op == REQ_OP_READ && dio->should_dirty) {
+>>                 err = bio->bi_error;
+>> diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+>> index cd395ec..94855cf 100644
+>> --- a/include/linux/blk_types.h
+>> +++ b/include/linux/blk_types.h
+>> @@ -119,6 +119,7 @@ struct bio {
+>>  #define BIO_QUIET      6       /* Make BIO Quiet */
+>>  #define BIO_CHAIN      7       /* chained bio, ->bi_remaining in effect */
+>>  #define BIO_REFFED     8       /* bio has elevated ->bi_cnt */
+>> +#define BIO_NONBLOCKING 9      /* don't block over blk device congestion */
+>>
+>>  /*
+>>   * Flags starting here get preserved by bio_reset() - this includes
+>> --
+>> 2.10.2
+>>
+> 
+> 
+> 
+
 -- 
-2.7.4
+Goldwyn
