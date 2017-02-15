@@ -2,19 +2,16 @@ Return-Path: <jonathan.derrick@intel.com>
 From: Jon Derrick <jonathan.derrick@intel.com>
 To: 
 Cc: Jon Derrick <jonathan.derrick@intel.com>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
 	Scott Bauer <scott.bauer@intel.com>,
 	Rafael Antognolli <rafael.antognolli@intel.com>,
 	Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: [PATCHv2 3/4] block/sed: Check received header lengths
-Date: Wed, 15 Feb 2017 14:04:59 -0700
-Message-Id: <1487192712-31120-4-git-send-email-jonathan.derrick@intel.com>
-In-Reply-To: <1487192712-31120-1-git-send-email-jonathan.derrick@intel.com>
-References: <1487192712-31120-1-git-send-email-jonathan.derrick@intel.com>
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 3/4] block/sed: Check received header lengths
+Date: Wed, 15 Feb 2017 12:38:53 -0700
+Message-Id: <1487187535-10503-3-git-send-email-jonathan.derrick@intel.com>
+In-Reply-To: <1487187535-10503-1-git-send-email-jonathan.derrick@intel.com>
+References: <1487187535-10503-1-git-send-email-jonathan.derrick@intel.com>
 List-ID: <linux-block@vger.kernel.org>
 
 Add a buffer size check against discovery and response header lengths
