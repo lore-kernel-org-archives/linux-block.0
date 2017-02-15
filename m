@@ -1,81 +1,39 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernek.dk
-Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
-Subject: [PATCH 4/6] scsi: simplify scsi_execute_req_flags
-Date: Tue, 14 Feb 2017 20:15:58 +0100
-Message-Id: <20170214191600.17480-5-hch@lst.de>
-In-Reply-To: <20170214191600.17480-1-hch@lst.de>
-References: <20170214191600.17480-1-hch@lst.de>
-Sender: linux-scsi-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga11.intel.com ([192.55.52.93]:46734 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750943AbdBOAjW (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 14 Feb 2017 19:39:22 -0500
+From: Scott Bauer <scott.bauer@intel.com>
+To: linux-nvme@lists.infradead.org
+Cc: David.Laight@ACULAB.COM, arnd@arndb.de, axboe@fb.com,
+        keith.busch@intel.com, jonathan.derrick@intel.com,
+        hch@infradead.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, Scott Bauer <scott.bauer@intel.com>
+Subject: [PATCH V6 3/3] Maintainers: Modify SED list from nvme to block
+Date: Tue, 14 Feb 2017 17:29:37 -0700
+Message-Id: <1487118577-1719-3-git-send-email-scott.bauer@intel.com>
+In-Reply-To: <1487118577-1719-1-git-send-email-scott.bauer@intel.com>
+References: <1487118577-1719-1-git-send-email-scott.bauer@intel.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Add a sshdr argument to __scsi_execute so that we can decode the sense
-data directly into the sense header instead of needing a copy of it.
-
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Scott Bauer <scott.bauer@intel.com>
 ---
- drivers/scsi/scsi_lib.c | 27 +++++++++------------------
- 1 file changed, 9 insertions(+), 18 deletions(-)
+ MAINTAINERS | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 227a77869e13..35b43a8f1bfa 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -215,8 +215,9 @@ void scsi_queue_insert(struct scsi_cmnd *cmd, int reason)
- 
- static int __scsi_execute(struct scsi_device *sdev, const unsigned char *cmd,
- 		 int data_direction, void *buffer, unsigned bufflen,
--		 unsigned char *sense, int timeout, int retries, u64 flags,
--		 req_flags_t rq_flags, int *resid)
-+		 unsigned char *sense, struct scsi_sense_hdr *sshdr,
-+		 int timeout, int retries, u64 flags, req_flags_t rq_flags,
-+		 int *resid)
- {
- 	struct request *req;
- 	struct scsi_request *rq;
-@@ -259,6 +260,8 @@ static int __scsi_execute(struct scsi_device *sdev, const unsigned char *cmd,
- 		*resid = rq->resid_len;
- 	if (sense && rq->sense_len)
- 		memcpy(sense, rq->sense, SCSI_SENSE_BUFFERSIZE);
-+	if (sshdr)
-+		scsi_normalize_sense(rq->sense, rq->sense_len, sshdr);
- 	ret = req->errors;
-  out:
- 	blk_put_request(req);
-@@ -288,7 +291,7 @@ int scsi_execute(struct scsi_device *sdev, const unsigned char *cmd,
- 		 int *resid)
- {
- 	return __scsi_execute(sdev, cmd, data_direction, buffer, bufflen, sense,
--			timeout, retries, flags, 0, resid);
-+			NULL, timeout, retries, flags, 0, resid);
- }
- EXPORT_SYMBOL(scsi_execute);
- 
-@@ -297,21 +300,9 @@ int scsi_execute_req_flags(struct scsi_device *sdev, const unsigned char *cmd,
- 		     struct scsi_sense_hdr *sshdr, int timeout, int retries,
- 		     int *resid, u64 flags, req_flags_t rq_flags)
- {
--	char *sense = NULL;
--	int result;
--	
--	if (sshdr) {
--		sense = kzalloc(SCSI_SENSE_BUFFERSIZE, GFP_NOIO);
--		if (!sense)
--			return DRIVER_ERROR << 24;
--	}
--	result = __scsi_execute(sdev, cmd, data_direction, buffer, bufflen,
--			      sense, timeout, retries, flags, rq_flags, resid);
--	if (sshdr)
--		scsi_normalize_sense(sense, SCSI_SENSE_BUFFERSIZE, sshdr);
--
--	kfree(sense);
--	return result;
-+	return __scsi_execute(sdev, cmd, data_direction, buffer, bufflen,
-+			      NULL, sshdr, timeout, retries, flags, rq_flags,
-+			      resid);
- }
- EXPORT_SYMBOL(scsi_execute_req_flags);
- 
+diff --git a/MAINTAINERS b/MAINTAINERS
+index e325373..b983b25 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -11094,7 +11094,7 @@ SECURE ENCRYPTING DEVICE (SED) OPAL DRIVER
+ M:	Scott Bauer <scott.bauer@intel.com>
+ M:	Jonathan Derrick <jonathan.derrick@intel.com>
+ M:	Rafael Antognolli <rafael.antognolli@intel.com>
+-L:	linux-nvme@lists.infradead.org
++L:	linux-block@vger.kernel.org
+ S:	Supported
+ F:	block/sed*
+ F:	block/opal_proto.h
 -- 
-2.11.0
+2.7.4
