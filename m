@@ -1,45 +1,47 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:20831 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752361AbdBMQUr (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 Feb 2017 11:20:47 -0500
-From: Scott Bauer <scott.bauer@intel.com>
-To: linux-nvme@lists.infradead.org
-Cc: David.Laight@ACULAB.COM, arnd@arndb.de, axboe@fb.com,
-        keith.busch@intel.com, jonathan.derrick@intel.com,
-        hch@infradead.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, Scott Bauer <scott.bauer@intel.com>
-Subject: [PATCH V5 2/4] uapi: sed-opal fix IOW for activate lsp to use correct struct
-Date: Mon, 13 Feb 2017 09:11:10 -0700
-Message-Id: <1487002272-17940-3-git-send-email-scott.bauer@intel.com>
-In-Reply-To: <1487002272-17940-1-git-send-email-scott.bauer@intel.com>
-References: <1487002272-17940-1-git-send-email-scott.bauer@intel.com>
+Received: from mail-pg0-f67.google.com ([74.125.83.67]:34278 "EHLO
+        mail-pg0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753434AbdBPLqK (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 16 Feb 2017 06:46:10 -0500
+From: Ming Lei <tom.leiming@gmail.com>
+To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
+        linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        NeilBrown <neilb@suse.com>
+Cc: Ming Lei <tom.leiming@gmail.com>
+Subject: [PATCH 01/17] block: introduce bio_segments_all()
+Date: Thu, 16 Feb 2017 19:45:31 +0800
+Message-Id: <1487245547-24384-2-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1487245547-24384-1-git-send-email-tom.leiming@gmail.com>
+References: <1487245547-24384-1-git-send-email-tom.leiming@gmail.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-the IOW for the IOC_OPAL_ACTIVATE_LSP took the wrong strcure which
-would give us the wrong size when using _IOC_SIZE, switch it to the
-right structure.
+So that we can replace the direct access to .bi_vcnt.
 
-Fixes: 058f8a2 ("Include: Uapi: Add user ABI for Sed/Opal")
-
-Signed-off-by: Scott Bauer <scott.bauer@intel.com>
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- include/uapi/linux/sed-opal.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ include/linux/bio.h | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/include/uapi/linux/sed-opal.h b/include/uapi/linux/sed-opal.h
-index fc06e3a..c72e073 100644
---- a/include/uapi/linux/sed-opal.h
-+++ b/include/uapi/linux/sed-opal.h
-@@ -106,7 +106,7 @@ struct opal_mbr_data {
- #define IOC_OPAL_SAVE		    _IOW('p', 220, struct opal_lock_unlock)
- #define IOC_OPAL_LOCK_UNLOCK	    _IOW('p', 221, struct opal_lock_unlock)
- #define IOC_OPAL_TAKE_OWNERSHIP	    _IOW('p', 222, struct opal_key)
--#define IOC_OPAL_ACTIVATE_LSP       _IOW('p', 223, struct opal_key)
-+#define IOC_OPAL_ACTIVATE_LSP       _IOW('p', 223, struct opal_lr_act)
- #define IOC_OPAL_SET_PW             _IOW('p', 224, struct opal_new_pw)
- #define IOC_OPAL_ACTIVATE_USR       _IOW('p', 225, struct opal_session_info)
- #define IOC_OPAL_REVERT_TPR         _IOW('p', 226, struct opal_key)
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index 8e521194f6fc..3364b3ed90e7 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -293,6 +293,13 @@ static inline void bio_get_last_bvec(struct bio *bio, struct bio_vec *bv)
+ 		bv->bv_len = iter.bi_bvec_done;
+ }
+ 
++static inline unsigned bio_segments_all(struct bio *bio)
++{
++	WARN_ON_ONCE(bio_flagged(bio, BIO_CLONED));
++
++	return bio->bi_vcnt;
++}
++
+ enum bip_flags {
+ 	BIP_BLOCK_INTEGRITY	= 1 << 0, /* block layer owns integrity data */
+ 	BIP_MAPPED_INTEGRITY	= 1 << 1, /* ref tag has been remapped */
 -- 
 2.7.4
