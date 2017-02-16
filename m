@@ -1,157 +1,58 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:34199 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750943AbdBNCqf (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 Feb 2017 21:46:35 -0500
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-To: linux-fsdevel@vger.kernel.org
-Cc: jack@suse.cz, Goldwyn Rodrigues <rgoldwyn@suse.com>,
-        linux-block@vger.kernel.org
-Subject: [PATCH 4/7] nonblocking aio: return on congested block device
-Date: Mon, 13 Feb 2017 20:46:00 -0600
-Message-Id: <20170214024603.9563-5-rgoldwyn@suse.de>
-In-Reply-To: <20170214024603.9563-1-rgoldwyn@suse.de>
-References: <20170214024603.9563-1-rgoldwyn@suse.de>
+Received: from mail-pg0-f67.google.com ([74.125.83.67]:35848 "EHLO
+        mail-pg0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754759AbdBPLqh (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 16 Feb 2017 06:46:37 -0500
+From: Ming Lei <tom.leiming@gmail.com>
+To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
+        linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        NeilBrown <neilb@suse.com>
+Cc: Ming Lei <tom.leiming@gmail.com>
+Subject: [PATCH 07/17] md: raid1/raid10: don't use .bi_vcnt to check if all pages are added
+Date: Thu, 16 Feb 2017 19:45:37 +0800
+Message-Id: <1487245547-24384-8-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1487245547-24384-1-git-send-email-tom.leiming@gmail.com>
+References: <1487245547-24384-1-git-send-email-tom.leiming@gmail.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Goldwyn Rodrigues <rgoldwyn@suse.com>
+Instead we use the index of the pre-allocated pages buffer, it should
+be more explicit because the index(.bi_error) just means how many pages
+are added to the bio.
 
-A new flag BIO_NONBLOCKING is introduced to identify bio's
-orignating from iocb with IOCB_NONBLOCKING. struct request
-are requested using BLK_MQ_REQ_NOWAIT if BIO_NONBLOCKING is set.
-
-Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- block/blk-core.c          | 13 +++++++++++--
- block/blk-mq.c            | 18 ++++++++++++++++--
- fs/direct-io.c            | 11 +++++++++--
- include/linux/blk_types.h |  1 +
- 4 files changed, 37 insertions(+), 6 deletions(-)
+ drivers/md/raid1.c  | 2 +-
+ drivers/md/raid10.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 14d7c07..9767573 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1257,6 +1257,11 @@ static struct request *get_request(struct request_queue *q, int op,
- 	if (!IS_ERR(rq))
- 		return rq;
- 
-+	if (bio_flagged(bio, BIO_NONBLOCKING)) {
-+		blk_put_rl(rl);
-+		return ERR_PTR(-EAGAIN);
-+	}
-+
- 	if (!gfpflags_allow_blocking(gfp_mask) || unlikely(blk_queue_dying(q))) {
- 		blk_put_rl(rl);
- 		return rq;
-@@ -2035,7 +2040,7 @@ blk_qc_t generic_make_request(struct bio *bio)
- 	do {
- 		struct request_queue *q = bdev_get_queue(bio->bi_bdev);
- 
--		if (likely(blk_queue_enter(q, false) == 0)) {
-+		if (likely(blk_queue_enter(q, bio_flagged(bio, BIO_NONBLOCKING)) == 0)) {
- 			ret = q->make_request_fn(q, bio);
- 
- 			blk_queue_exit(q);
-@@ -2044,7 +2049,11 @@ blk_qc_t generic_make_request(struct bio *bio)
- 		} else {
- 			struct bio *bio_next = bio_list_pop(current->bio_list);
- 
--			bio_io_error(bio);
-+			if (unlikely(bio_flagged(bio, BIO_NONBLOCKING))) {
-+				bio->bi_error = -EAGAIN;
-+				bio_endio(bio);
-+			} else
-+				bio_io_error(bio);
- 			bio = bio_next;
+diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
+index 8904a9149671..23a3a678a9ed 100644
+--- a/drivers/md/raid1.c
++++ b/drivers/md/raid1.c
+@@ -2835,7 +2835,7 @@ static sector_t raid1_sync_request(struct mddev *mddev, sector_t sector_nr,
+ 		nr_sectors += len>>9;
+ 		sector_nr += len>>9;
+ 		sync_blocks -= (len>>9);
+-	} while (r1_bio->bios[disk]->bi_vcnt < RESYNC_PAGES);
++	} while (r1_bio->bios[disk]->bi_error < RESYNC_PAGES);
+  bio_full:
+ 	/* return .bi_error back to bio */
+ 	for (i = 0 ; i < conf->raid_disks * 2; i++) {
+diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
+index 9cfc22cd1330..8262f3e1dd93 100644
+--- a/drivers/md/raid10.c
++++ b/drivers/md/raid10.c
+@@ -3453,7 +3453,7 @@ static sector_t raid10_sync_request(struct mddev *mddev, sector_t sector_nr,
  		}
- 	} while (bio);
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 81caceb..7a7c674 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1213,6 +1213,8 @@ static struct request *blk_mq_map_request(struct request_queue *q,
- 
- 	trace_block_getrq(q, bio, op);
- 	blk_mq_set_alloc_data(&alloc_data, q, 0, ctx, hctx);
-+	if (bio_flagged(bio, BIO_NONBLOCKING))
-+		alloc_data.flags |= BLK_MQ_REQ_NOWAIT;
- 	rq = __blk_mq_alloc_request(&alloc_data, op, op_flags);
- 
- 	data->hctx = alloc_data.hctx;
-@@ -1286,8 +1288,14 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
- 		return BLK_QC_T_NONE;
- 
- 	rq = blk_mq_map_request(q, bio, &data);
--	if (unlikely(!rq))
-+	if (unlikely(!rq)) {
-+		if (bio_flagged(bio, BIO_NONBLOCKING))
-+			bio->bi_error = -EAGAIN;
-+		else
-+			bio->bi_error = -EIO;
-+		bio_endio(bio);
- 		return BLK_QC_T_NONE;
-+	}
- 
- 	cookie = blk_tag_to_qc_t(rq->tag, data.hctx->queue_num);
- 
-@@ -1381,8 +1389,14 @@ static blk_qc_t blk_sq_make_request(struct request_queue *q, struct bio *bio)
- 		request_count = blk_plug_queued_count(q);
- 
- 	rq = blk_mq_map_request(q, bio, &data);
--	if (unlikely(!rq))
-+	if (unlikely(!rq)) {
-+		if (bio_flagged(bio, BIO_NONBLOCKING))
-+			bio->bi_error = -EAGAIN;
-+		else
-+			bio->bi_error = -EIO;
-+		bio_endio(bio);
- 		return BLK_QC_T_NONE;
-+	}
- 
- 	cookie = blk_tag_to_qc_t(rq->tag, data.hctx->queue_num);
- 
-diff --git a/fs/direct-io.c b/fs/direct-io.c
-index fb9aa16..9997fed 100644
---- a/fs/direct-io.c
-+++ b/fs/direct-io.c
-@@ -386,6 +386,9 @@ dio_bio_alloc(struct dio *dio, struct dio_submit *sdio,
- 	else
- 		bio->bi_end_io = dio_bio_end_io;
- 
-+	if (dio->iocb->ki_flags & IOCB_NONBLOCKING)
-+		bio_set_flag(bio, BIO_NONBLOCKING);
-+
- 	sdio->bio = bio;
- 	sdio->logical_offset_in_bio = sdio->cur_page_fs_offset;
- }
-@@ -480,8 +483,12 @@ static int dio_bio_complete(struct dio *dio, struct bio *bio)
- 	unsigned i;
- 	int err;
- 
--	if (bio->bi_error)
--		dio->io_error = -EIO;
-+	if (bio->bi_error) {
-+		if (bio_flagged(bio, BIO_NONBLOCKING))
-+			dio->io_error = bio->bi_error;
-+		else
-+			dio->io_error = -EIO;
-+	}
- 
- 	if (dio->is_async && dio->op == REQ_OP_READ && dio->should_dirty) {
- 		err = bio->bi_error;
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index cd395ec..94855cf 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -119,6 +119,7 @@ struct bio {
- #define BIO_QUIET	6	/* Make BIO Quiet */
- #define BIO_CHAIN	7	/* chained bio, ->bi_remaining in effect */
- #define BIO_REFFED	8	/* bio has elevated ->bi_cnt */
-+#define BIO_NONBLOCKING 9	/* don't block over blk device congestion */
- 
- /*
-  * Flags starting here get preserved by bio_reset() - this includes
+ 		nr_sectors += len>>9;
+ 		sector_nr += len>>9;
+-	} while (biolist->bi_vcnt < RESYNC_PAGES);
++	} while (biolist->bi_error < RESYNC_PAGES);
+  bio_full:
+ 	/* return .bi_error back to bio, and set resync's as -EIO */
+ 	for (bio= biolist ; bio ; bio=bio->bi_next)
 -- 
-2.10.2
+2.7.4
