@@ -1,64 +1,57 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga04.intel.com ([192.55.52.120]:64327 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752822AbdBPAIR (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Feb 2017 19:08:17 -0500
-From: Keith Busch <keith.busch@intel.com>
-To: linux-block@vger.kernel.org, Scott Bauer <scott.bauer@intel.com>,
-        Jonathan Derrick <jonathan.derrick@intel.com>
-Cc: Jens Axboe <axboe@fb.com>, Keith Busch <keith.busch@intel.com>
-Subject: [PATCH] opal: Use empty structure when not defined
-Date: Wed, 15 Feb 2017 19:16:27 -0500
-Message-Id: <1487204187-4004-1-git-send-email-keith.busch@intel.com>
+Received: from mail-pg0-f66.google.com ([74.125.83.66]:33617 "EHLO
+        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754791AbdBPLrH (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 16 Feb 2017 06:47:07 -0500
+From: Ming Lei <tom.leiming@gmail.com>
+To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
+        linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        NeilBrown <neilb@suse.com>
+Cc: Ming Lei <tom.leiming@gmail.com>
+Subject: [PATCH 16/17] md: raid10: avoid direct access to bvec table in reshape_request
+Date: Thu, 16 Feb 2017 19:45:46 +0800
+Message-Id: <1487245547-24384-17-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1487245547-24384-1-git-send-email-tom.leiming@gmail.com>
+References: <1487245547-24384-1-git-send-email-tom.leiming@gmail.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-No need to use space if it can't be used. This reduces the size of struct
-nvme_ctrl by a little over 4k when CONFIG_BLK_SED_OPAL is not set.
+The cost is 128bytes(8*16) stack space in kernel thread context, and
+just use the bio helper to retrieve pages from bio.
 
-Signed-off-by: Keith Busch <keith.busch@intel.com>
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- include/linux/sed-opal.h | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ drivers/md/raid10.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/include/linux/sed-opal.h b/include/linux/sed-opal.h
-index 205d520..ed19902 100644
---- a/include/linux/sed-opal.h
-+++ b/include/linux/sed-opal.h
-@@ -91,6 +91,7 @@ struct parsed_resp {
- 	struct opal_resp_tok toks[MAX_TOKS];
- };
+diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
+index c7d2f73565d9..5016ce8163c3 100644
+--- a/drivers/md/raid10.c
++++ b/drivers/md/raid10.c
+@@ -4383,6 +4383,8 @@ static sector_t reshape_request(struct mddev *mddev, sector_t sector_nr,
+ 	struct bio *blist;
+ 	struct bio *bio, *read_bio;
+ 	int sectors_done = 0;
++	struct bio_vec *bvl;
++	struct page *pages[RESYNC_PAGES];
  
-+#ifdef CONFIG_BLK_SED_OPAL
- /**
-  * struct opal_dev - The structure representing a OPAL enabled SED.
-  * @supported: Whether or not OPAL is supported on this controller.
-@@ -129,7 +130,6 @@ struct opal_dev {
- 	struct list_head unlk_lst;
- };
+ 	if (sector_nr == 0) {
+ 		/* If restarting in the middle, skip the initial sectors */
+@@ -4546,9 +4548,12 @@ static sector_t reshape_request(struct mddev *mddev, sector_t sector_nr,
  
--#ifdef CONFIG_BLK_SED_OPAL
- bool opal_unlock_from_suspend(struct opal_dev *dev);
- void init_opal_dev(struct opal_dev *opal_dev, sec_send_recv *send_recv);
- int sed_ioctl(struct opal_dev *dev, unsigned int cmd, void __user *ioctl_ptr);
-@@ -154,6 +154,9 @@ static inline bool is_sed_ioctl(unsigned int cmd)
- 	return false;
- }
- #else
-+struct opal_dev {
-+};
+ 	/* Now add as many pages as possible to all of these bios. */
+ 
++	bio_for_each_segment_all(bvl, r10_bio->devs[0].bio, s)
++		pages[s] = bvl->bv_page;
 +
- static inline bool is_sed_ioctl(unsigned int cmd)
- {
- 	return false;
-@@ -171,8 +174,6 @@ static inline bool opal_unlock_from_suspend(struct opal_dev *dev)
- static inline void init_opal_dev(struct opal_dev *opal_dev,
- 				 sec_send_recv *send_recv)
- {
--	opal_dev->supported = false;
--	opal_dev->initialized = true;
- }
- #endif /* CONFIG_BLK_SED_OPAL */
- #endif /* LINUX_OPAL_H */
+ 	nr_sectors = 0;
+ 	for (s = 0 ; s < max_sectors; s += PAGE_SIZE >> 9) {
+-		struct page *page = r10_bio->devs[0].bio->bi_io_vec[s/(PAGE_SIZE>>9)].bv_page;
++		struct page *page = pages[s / (PAGE_SIZE >> 9)];
+ 		int len = (max_sectors - s) << 9;
+ 		if (len > PAGE_SIZE)
+ 			len = PAGE_SIZE;
 -- 
-2.5.5
+2.7.4
