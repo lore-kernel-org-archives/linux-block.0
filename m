@@ -1,55 +1,29 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-Date: Thu, 9 Feb 2017 12:14:16 -0800
-From: Matthew Wilcox <willy@infradead.org>
-To: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Cc: Theodore Ts'o <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCHv6 05/37] thp: try to free page's buffers before attempt
- split
-Message-ID: <20170209201416.GS2267@bombadil.infradead.org>
-References: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
- <20170126115819.58875-6-kirill.shutemov@linux.intel.com>
+Return-Path: <hch@lst.de>
+Date: Thu, 16 Feb 2017 15:33:48 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Jon Derrick <jonathan.derrick@intel.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, Scott Bauer <scott.bauer@intel.com>,
+	Rafael Antognolli <rafael.antognolli@intel.com>,
+	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: Re: [PATCHv4 1/4] block/sed: Use ssize_t on atom parsers to return
+	errors
+Message-ID: <20170216143348.GD32058@lst.de>
+References: <1487195159-12599-1-git-send-email-jonathan.derrick@intel.com> <1487195159-12599-2-git-send-email-jonathan.derrick@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170126115819.58875-6-kirill.shutemov@linux.intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+In-Reply-To: <1487195159-12599-2-git-send-email-jonathan.derrick@intel.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Jan 26, 2017 at 02:57:47PM +0300, Kirill A. Shutemov wrote:
-> @@ -2146,6 +2146,23 @@ int split_huge_page_to_list(struct page *page, struct list_head *list)
->  			goto out;
->  		}
->  
-> +		/* Try to free buffers before attempt split */
-> +		if (!PageSwapBacked(head) && PagePrivate(page)) {
-> +			/*
-> +			 * We cannot trigger writeback from here due possible
-> +			 * recursion if triggered from vmscan, only wait.
-> +			 *
-> +			 * Caller can trigger writeback it on its own, if safe.
-> +			 */
+On Wed, Feb 15, 2017 at 02:45:54PM -0700, Jon Derrick wrote:
+> The short atom parser can return an errno from decoding but does not
+> currently return the error as a signed value. Convert all of the parsers
+> to ssize_t.
+> 
+> Signed-off-by: Jon Derrick <jonathan.derrick@intel.com>
+> Reviewed-by: Scott Bauer <scott.bauer@intel.com>
 
-It took me a few reads to get this.  May I suggest:
+Looks fine,
 
-		/*
-		 * Cannot split a page with buffers.  If the caller has
-		 * already started writeback, we can wait for it to finish,
-		 * but we cannot start writeback if we were called from vmscan
-		 */
-> +		if (!PageSwapBacked(head) && PagePrivate(page)) {
-
-Also, it looks weird to test PageSwapBacked of *head* and PagePrivate
-of *page*.  I think it's correct, but it still looks weird.
-
-Reviewed-by: Matthew Wilcox <mawilcox@microsoft.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
