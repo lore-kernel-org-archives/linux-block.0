@@ -1,58 +1,80 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f66.google.com ([74.125.83.66]:35352 "EHLO
-        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932096AbdBPLqw (ORCPT
+Received: from mail-pg0-f68.google.com ([74.125.83.68]:35316 "EHLO
+        mail-pg0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932096AbdBPLq5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Feb 2017 06:46:52 -0500
+        Thu, 16 Feb 2017 06:46:57 -0500
 From: Ming Lei <tom.leiming@gmail.com>
 To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
         linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
         linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
         NeilBrown <neilb@suse.com>
 Cc: Ming Lei <tom.leiming@gmail.com>
-Subject: [PATCH 13/17] md: raid1: use bio_segments_all()
-Date: Thu, 16 Feb 2017 19:45:43 +0800
-Message-Id: <1487245547-24384-14-git-send-email-tom.leiming@gmail.com>
+Subject: [PATCH 10/17] md: raid1: remove direct access to bvec table in fix_sync_read_error
+Date: Thu, 16 Feb 2017 19:45:40 +0800
+Message-Id: <1487245547-24384-11-git-send-email-tom.leiming@gmail.com>
 In-Reply-To: <1487245547-24384-1-git-send-email-tom.leiming@gmail.com>
 References: <1487245547-24384-1-git-send-email-tom.leiming@gmail.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Use this helper, instead of direct access to .bi_vcnt.
+This patch uses a stack variable to hold the pages in bio, so
+that we can remove direct access to bvec table in fix_sync_read_error().
+
+This 16*8 stack variable is just fine for kernel thread context.
 
 Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- drivers/md/raid1.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ drivers/md/raid1.c | 16 +++++++++++++---
+ 1 file changed, 13 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
-index 54ec32be3277..02cfece74981 100644
+index 1dd6b2760fba..02ee8542295d 100644
 --- a/drivers/md/raid1.c
 +++ b/drivers/md/raid1.c
-@@ -998,7 +998,8 @@ static void alloc_behind_pages(struct bio *bio, struct r1bio *r1_bio)
- {
- 	int i;
- 	struct bio_vec *bvec;
--	struct bio_vec *bvecs = kzalloc(bio->bi_vcnt * sizeof(struct bio_vec),
-+	unsigned vcnt = bio_segments_all(bio);
-+	struct bio_vec *bvecs = kzalloc(vcnt * sizeof(struct bio_vec),
- 					GFP_NOIO);
- 	if (unlikely(!bvecs))
- 		return;
-@@ -1014,12 +1015,12 @@ static void alloc_behind_pages(struct bio *bio, struct r1bio *r1_bio)
- 		kunmap(bvec->bv_page);
- 	}
- 	r1_bio->behind_bvecs = bvecs;
--	r1_bio->behind_page_count = bio->bi_vcnt;
-+	r1_bio->behind_page_count = vcnt;
- 	set_bit(R1BIO_BehindIO, &r1_bio->state);
- 	return;
+@@ -1874,6 +1874,16 @@ static int fix_sync_read_error(struct r1bio *r1_bio)
+ 	int sectors = r1_bio->sectors;
+ 	int idx = 0;
+ 	struct md_rdev *rdev;
++	struct bio_vec *bvl;
++	int i;
++	struct page *pages[RESYNC_PAGES];
++
++	/*
++	 * bio for read_disk is filled up, so we can use
++	 * bio_for_each_segment_all() to retrieve all pages.
++	 */
++	bio_for_each_segment_all(bvl, bio, i)
++		pages[i] = bvl->bv_page;
  
- do_sync_io:
--	for (i = 0; i < bio->bi_vcnt; i++)
-+	for (i = 0; i < vcnt; i++)
- 		if (bvecs[i].bv_page)
- 			put_page(bvecs[i].bv_page);
- 	kfree(bvecs);
+ 	rdev = conf->mirrors[r1_bio->read_disk].rdev;
+ 	if (test_bit(FailFast, &rdev->flags)) {
+@@ -1903,7 +1913,7 @@ static int fix_sync_read_error(struct r1bio *r1_bio)
+ 				 */
+ 				rdev = conf->mirrors[d].rdev;
+ 				if (sync_page_io(rdev, sect, s<<9,
+-						 bio->bi_io_vec[idx].bv_page,
++						 pages[idx],
+ 						 REQ_OP_READ, 0, false)) {
+ 					success = 1;
+ 					break;
+@@ -1958,7 +1968,7 @@ static int fix_sync_read_error(struct r1bio *r1_bio)
+ 				continue;
+ 			rdev = conf->mirrors[d].rdev;
+ 			if (r1_sync_page_io(rdev, sect, s,
+-					    bio->bi_io_vec[idx].bv_page,
++					    pages[idx],
+ 					    WRITE) == 0) {
+ 				r1_bio->bios[d]->bi_end_io = NULL;
+ 				rdev_dec_pending(rdev, mddev);
+@@ -1973,7 +1983,7 @@ static int fix_sync_read_error(struct r1bio *r1_bio)
+ 				continue;
+ 			rdev = conf->mirrors[d].rdev;
+ 			if (r1_sync_page_io(rdev, sect, s,
+-					    bio->bi_io_vec[idx].bv_page,
++					    pages[idx],
+ 					    READ) != 0)
+ 				atomic_add(s, &rdev->corrected_errors);
+ 		}
 -- 
 2.7.4
