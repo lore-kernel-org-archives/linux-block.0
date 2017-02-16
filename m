@@ -1,96 +1,74 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f193.google.com ([209.85.192.193]:35906 "EHLO
+Received: from mail-pf0-f193.google.com ([209.85.192.193]:36434 "EHLO
         mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751768AbdB1PmU (ORCPT
+        with ESMTP id S932170AbdBPLq4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Feb 2017 10:42:20 -0500
+        Thu, 16 Feb 2017 06:46:56 -0500
 From: Ming Lei <tom.leiming@gmail.com>
 To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
-        linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
+        linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        NeilBrown <neilb@suse.com>
 Cc: Ming Lei <tom.leiming@gmail.com>
-Subject: [PATCH v2 04/13] md: prepare for managing resync I/O pages in clean way
-Date: Tue, 28 Feb 2017 23:41:34 +0800
-Message-Id: <1488296503-4987-5-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1488296503-4987-1-git-send-email-tom.leiming@gmail.com>
-References: <1488296503-4987-1-git-send-email-tom.leiming@gmail.com>
+Subject: [PATCH 14/17] md: raid10: avoid direct access to bvec table in sync_request_write()
+Date: Thu, 16 Feb 2017 19:45:44 +0800
+Message-Id: <1487245547-24384-15-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1487245547-24384-1-git-send-email-tom.leiming@gmail.com>
+References: <1487245547-24384-1-git-send-email-tom.leiming@gmail.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Now resync I/O use bio's bec table to manage pages,
-this way is very hacky, and may not work any more
-once multipage bvec is introduced.
-
-So introduce helpers and new data structure for
-managing resync I/O pages more cleanly.
+The cost is 256bytes(8*16*2) stack space, and just use the bio
+helper to retrieve pages from bio.
 
 Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- drivers/md/md.h | 54 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 54 insertions(+)
+ drivers/md/raid10.c | 15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/md/md.h b/drivers/md/md.h
-index 1d63239a1be4..b5a638d85cb4 100644
---- a/drivers/md/md.h
-+++ b/drivers/md/md.h
-@@ -720,4 +720,58 @@ static inline void mddev_check_writesame(struct mddev *mddev, struct bio *bio)
- #define RESYNC_BLOCK_SIZE (64*1024)
- #define RESYNC_PAGES ((RESYNC_BLOCK_SIZE + PAGE_SIZE-1) / PAGE_SIZE)
+diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
+index 5c698f3d3083..69fe2a3cef89 100644
+--- a/drivers/md/raid10.c
++++ b/drivers/md/raid10.c
+@@ -2036,6 +2036,8 @@ static void sync_request_write(struct mddev *mddev, struct r10bio *r10_bio)
+ 	int i, first;
+ 	struct bio *tbio, *fbio;
+ 	int vcnt;
++	struct bio_vec *bvl;
++	struct page *fbio_pages[RESYNC_PAGES], *tbio_pages[RESYNC_PAGES];
  
-+/* for managing resync I/O pages */
-+struct resync_pages {
-+	unsigned	idx;	/* for get/put page from the pool */
-+	void		*raid_bio;
-+	struct page	*pages[RESYNC_PAGES];
-+};
+ 	atomic_set(&r10_bio->remaining, 1);
+ 
+@@ -2052,6 +2054,10 @@ static void sync_request_write(struct mddev *mddev, struct r10bio *r10_bio)
+ 	fbio->bi_iter.bi_size = r10_bio->sectors << 9;
+ 	fbio->bi_iter.bi_idx = 0;
+ 
++	/* the bio has been filled up in raid10_sync_request */
++	bio_for_each_segment_all(bvl, fbio, i)
++		fbio_pages[i] = bvl->bv_page;
 +
-+static inline int resync_alloc_pages(struct resync_pages *rp,
-+				     gfp_t gfp_flags)
-+{
-+	int i;
+ 	vcnt = (r10_bio->sectors + (PAGE_SIZE >> 9) - 1) >> (PAGE_SHIFT - 9);
+ 	/* now find blocks with errors */
+ 	for (i=0 ; i < conf->copies ; i++) {
+@@ -2072,12 +2078,17 @@ static void sync_request_write(struct mddev *mddev, struct r10bio *r10_bio)
+ 			 * All vec entries are PAGE_SIZE;
+ 			 */
+ 			int sectors = r10_bio->sectors;
 +
-+	for (i = 0; i < RESYNC_PAGES; i++) {
-+		rp->pages[i] = alloc_page(gfp_flags);
-+		if (!rp->pages[i])
-+			goto out_free;
-+	}
++			/* the bio has been filled up in raid10_sync_request */
++			bio_for_each_segment_all(bvl, tbio, j)
++				tbio_pages[j] = bvl->bv_page;
 +
-+	return 0;
-+
-+ out_free:
-+	while (--i >= 0)
-+		__free_page(rp->pages[i]);
-+	return -ENOMEM;
-+}
-+
-+static inline void resync_free_pages(struct resync_pages *rp)
-+{
-+	int i;
-+
-+	for (i = 0; i < RESYNC_PAGES; i++)
-+		__free_page(rp->pages[i]);
-+}
-+
-+static inline void resync_get_all_pages(struct resync_pages *rp)
-+{
-+	int i;
-+
-+	for (i = 0; i < RESYNC_PAGES; i++)
-+		get_page(rp->pages[i]);
-+}
-+
-+static inline struct page *resync_fetch_page(struct resync_pages *rp)
-+{
-+	if (WARN_ON_ONCE(rp->idx >= RESYNC_PAGES))
-+		return NULL;
-+	return rp->pages[rp->idx++];
-+}
-+
-+static inline bool resync_page_available(struct resync_pages *rp)
-+{
-+	return rp->idx < RESYNC_PAGES;
-+}
-+
- #endif /* _MD_MD_H */
+ 			for (j = 0; j < vcnt; j++) {
+ 				int len = PAGE_SIZE;
+ 				if (sectors < (len / 512))
+ 					len = sectors * 512;
+-				if (memcmp(page_address(fbio->bi_io_vec[j].bv_page),
+-					   page_address(tbio->bi_io_vec[j].bv_page),
++				if (memcmp(page_address(fbio_pages[j]),
++					   page_address(tbio_pages[j]),
+ 					   len))
+ 					break;
+ 				sectors -= len/512;
 -- 
 2.7.4
