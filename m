@@ -1,56 +1,27 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-Date: Thu, 9 Feb 2017 15:03:58 -0800
-From: Matthew Wilcox <willy@infradead.org>
-To: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Cc: Theodore Ts'o <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCHv6 10/37] filemap: handle huge pages in
- filemap_fdatawait_range()
-Message-ID: <20170209230358.GY2267@bombadil.infradead.org>
-References: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
- <20170126115819.58875-11-kirill.shutemov@linux.intel.com>
+Return-Path: <hch@lst.de>
+Date: Thu, 16 Feb 2017 15:40:48 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Jon Derrick <jonathan.derrick@intel.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, Scott Bauer <scott.bauer@intel.com>,
+	Rafael Antognolli <rafael.antognolli@intel.com>,
+	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: Re: [PATCHv4 3/4] block/sed: Check received header lengths
+Message-ID: <20170216144048.GB32375@lst.de>
+References: <1487195159-12599-1-git-send-email-jonathan.derrick@intel.com> <1487195159-12599-4-git-send-email-jonathan.derrick@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170126115819.58875-11-kirill.shutemov@linux.intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+In-Reply-To: <1487195159-12599-4-git-send-email-jonathan.derrick@intel.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Jan 26, 2017 at 02:57:52PM +0300, Kirill A. Shutemov wrote:
-> @@ -405,9 +405,14 @@ static int __filemap_fdatawait_range(struct address_space *mapping,
->  			if (page->index > end)
->  				continue;
->  
-> +			page = compound_head(page);
->  			wait_on_page_writeback(page);
->  			if (TestClearPageError(page))
->  				ret = -EIO;
-> +			if (PageTransHuge(page)) {
-> +				index = page->index + HPAGE_PMD_NR;
-> +				i += index - pvec.pages[i]->index - 1;
-> +			}
->  		}
+On Wed, Feb 15, 2017 at 02:45:56PM -0700, Jon Derrick wrote:
+> Add a buffer size check against discovery and response header lengths
+> before we loop over their buffers.
+> 
+> Signed-off-by: Jon Derrick <jonathan.derrick@intel.com>
+> Reviewed-by: Scott Bauer <scott.bauer@intel.com>
 
-I'm really not sure about your decision to have some interfaces expose
-subpages and other expose huge pages.  I think I'd be happier to see
-all the existing interfaces made to continue exposing subpages, then
-start adding in new interfaces and converting users one at a time
-to use them.  For example here, we'd add find_get_huge_pages_tag(),
-then pagevec_lookup_huge_tag(), and switch this function from calling
-pagevec_lookup_tag() to calling pagevec_lookup_huge_tag() ... then this
-function is done; there's no messing around with calling compound_head
-or PageTransHuge.
+Looks fine,
 
-My dream is that eventually all callers will be able to cope with getting
-a compound page back from the page cache and we can delete the versions
-that return subpages, and rename the 'huge_' variations.
+Reviewed-by: Christoph Hellwig <hch@lst.de>
