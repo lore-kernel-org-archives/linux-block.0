@@ -1,36 +1,63 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from verein.lst.de ([213.95.11.211]:34052 "EHLO newverein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751420AbdBAJek (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 1 Feb 2017 04:34:40 -0500
-Date: Wed, 1 Feb 2017 10:34:37 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Shaohua Li <shli@fb.com>
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        hch@lst.de, axboe@fb.com
-Subject: Re: [PATCH 2/2] nvme: allocate nvme_queue in correct node
-Message-ID: <20170201093437.GB1189@lst.de>
-References: <1c91ab2c0073598592f66f007ff72cfa58a17a54.1485922654.git.shli@fb.com> <7119c172f8916bd21aeffc006b04cd73281afb25.1485922654.git.shli@fb.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <7119c172f8916bd21aeffc006b04cd73281afb25.1485922654.git.shli@fb.com>
+Received: from mail-pg0-f65.google.com ([74.125.83.65]:34331 "EHLO
+        mail-pg0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754487AbdBPLqc (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 16 Feb 2017 06:46:32 -0500
+From: Ming Lei <tom.leiming@gmail.com>
+To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
+        linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        NeilBrown <neilb@suse.com>
+Cc: Ming Lei <tom.leiming@gmail.com>
+Subject: [PATCH 04/17] md: introduce helpers for dealing with fetch/store preallocated pages in bio
+Date: Thu, 16 Feb 2017 19:45:34 +0800
+Message-Id: <1487245547-24384-5-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1487245547-24384-1-git-send-email-tom.leiming@gmail.com>
+References: <1487245547-24384-1-git-send-email-tom.leiming@gmail.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-> +		mask = pci_irq_get_affinity(to_pci_dev(dev->dev), i);
-> +		if (mask) {
-> +			node = cpu_to_node(cpumask_first(mask));
-> +			node = local_memory_node(node);
-> +		}
+Both raid1 and raid10 uses bio's bvec table to store pre-allocated
+pages, then fetch and add it to bio.
 
-Can you move this to a PCI-layer helper, e.g. something like:
+This patch introduces two helpers for dealing with the special case,
+like what bio_iov_iter_get_pages() does.
 
-int pci_irq_get_node(struct pci_dev *dev, unsigned vec)
-{
-	const struct cpumask *mask = pci_irq_get_affinity(dev), i);
-	if (mask)
-		return local_memory_node(cpu_to_node(cpumask_first(mask)));
-	return dev_to_node(&dev->dev);
-}
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+---
+ drivers/md/md.h | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
-Otherwise this looks fine.
+diff --git a/drivers/md/md.h b/drivers/md/md.h
+index a86ad62079de..21897cb514af 100644
+--- a/drivers/md/md.h
++++ b/drivers/md/md.h
+@@ -708,4 +708,25 @@ static inline void mddev_clear_unsupported_flags(struct mddev *mddev,
+ {
+ 	mddev->flags &= ~unsupported_flags;
+ }
++
++/*
++ * Both raid1 and raid10 use bio's bvec table to store the preallocated
++ * pages, so we introduces the following helpers for this kind of usage.
++ *
++ * Actually the usage is a bit similar with bio_iov_iter_get_pages().
++ *
++ * Please make sure .bi_io_vec[idx] points to one unused vector by the
++ * bio.
++ */
++static inline struct page *mdev_get_page_from_bio(struct bio *bio, unsigned idx)
++{
++	return bio->bi_io_vec[idx].bv_page;
++}
++
++static inline void mdev_put_page_to_bio(struct bio *bio, unsigned idx,
++					struct page *page)
++{
++	bio->bi_io_vec[idx].bv_page = page;
++}
++
+ #endif /* _MD_MD_H */
+-- 
+2.7.4
