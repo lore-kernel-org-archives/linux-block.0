@@ -1,46 +1,55 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-by2nam03on0073.outbound.protection.outlook.com ([104.47.42.73]:11538
-        "EHLO NAM03-BY2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751380AbdBXRRa (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 24 Feb 2017 12:17:30 -0500
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
-To: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
-Subject: [PATCH 1/2] lightnvm: add generic ocssd detection
-Date: Fri, 24 Feb 2017 18:16:48 +0100
-Message-ID: <20170224171649.27409-1-matias@cnexlabs.com>
+Received: from mail-vk0-f68.google.com ([209.85.213.68]:35434 "EHLO
+        mail-vk0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753285AbdBPNiG (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 16 Feb 2017 08:38:06 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <fc4d24ec-55a1-7280-f734-c9b8c4a0ecae@suse.de>
+References: <1487245547-24384-1-git-send-email-tom.leiming@gmail.com>
+ <1487245547-24384-14-git-send-email-tom.leiming@gmail.com>
+ <4a700de4-8540-d5d8-8c58-3465c0a7a55a@suse.de> <CACVXFVOf=4yjNRfemcYEYCc7eeQeL9Esp_WM9ELgX77S1LT+1g@mail.gmail.com>
+ <fc4d24ec-55a1-7280-f734-c9b8c4a0ecae@suse.de>
+From: Ming Lei <tom.leiming@gmail.com>
+Date: Thu, 16 Feb 2017 21:38:05 +0800
+Message-ID: <CACVXFVNrFkfz2vCAb4=01EO5ud0NCghhvurU5RyQ-vaE5=34sg@mail.gmail.com>
+Subject: Re: [PATCH 13/17] md: raid1: use bio_segments_all()
+To: Johannes Thumshirn <jthumshirn@suse.de>
+Cc: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "open list:SOFTWARE RAID (Multiple Disks) SUPPORT"
+        <linux-raid@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        NeilBrown <neilb@suse.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-More implementations of OCSSDs are becoming available. Adding each using
-pci ids are becoming a hassle. Instead, use a 16 byte string in the
-vendor-specific area of the identification command to identify an
-Open-Channel SSD.
+On Thu, Feb 16, 2017 at 9:34 PM, Johannes Thumshirn <jthumshirn@suse.de> wrote:
+> On 02/16/2017 02:32 PM, Ming Lei wrote:
+>> On Thu, Feb 16, 2017 at 8:35 PM, Johannes Thumshirn <jthumshirn@suse.de> wrote:
+>>> On 02/16/2017 12:45 PM, Ming Lei wrote:
+>>>> @@ -998,7 +998,8 @@ static void alloc_behind_pages(struct bio *bio, struct r1bio *r1_bio)
+>>>>  {
+>>>>       int i;
+>>>>       struct bio_vec *bvec;
+>>>> -     struct bio_vec *bvecs = kzalloc(bio->bi_vcnt * sizeof(struct bio_vec),
+>>>> +     unsigned vcnt = bio_segments_all(bio);
+>>>> +     struct bio_vec *bvecs = kzalloc(vcnt * sizeof(struct bio_vec),
+>>>>                                       GFP_NOIO);
+>>>
+>>> Maybe use kcalloc() instead of kzalloc() with a multiplication.
+>>
+>> That doesn't belong to this patch, which just wants to remove direct
+>> access to .bi_vcnt.
+>
+> But you're touching it anyways, aren't you?
 
-The large string should make the collision probability with other
-vendor-specific strings to be near nil.
+Don't you know the policy of 'do one thing, do it better' in one patch?
 
-Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
----
- drivers/nvme/host/lightnvm.c | 3 +++
- 1 file changed, 3 insertions(+)
+If you want to switch to kcalloc(), just post a patch, that is fine, but
+please don't push me to do that in this patch.
 
-diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
-index 4ea9c93..e37b432 100644
---- a/drivers/nvme/host/lightnvm.c
-+++ b/drivers/nvme/host/lightnvm.c
-@@ -986,6 +986,9 @@ int nvme_nvm_ns_supported(struct nvme_ns *ns, struct nvme_id_ns *id)
- 	/* XXX: this is poking into PCI structures from generic code! */
- 	struct pci_dev *pdev = to_pci_dev(ctrl->dev);
- 
-+	if (!strncmp((char *)id->vs, "open-channel ssd", 16))
-+		return 1;
-+
- 	/* QEMU NVMe simulator - PCI ID + Vendor specific bit */
- 	if (pdev->vendor == PCI_VENDOR_ID_CNEX &&
- 				pdev->device == PCI_DEVICE_ID_CNEX_QEMU &&
--- 
-2.9.3
+Thanks,
+Ming Lei
