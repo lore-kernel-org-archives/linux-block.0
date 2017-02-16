@@ -1,89 +1,64 @@
-Return-Path: <elena.reshetova@intel.com>
-From: Elena Reshetova <elena.reshetova@intel.com>
-To: linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	peterz@infradead.org,
-	gregkh@linuxfoundation.org,
-	axboe@kernel.dk,
-	fujita.tomonori@lab.ntt.co.jp,
-	mingo@redhat.com,
-	clm@fb.com,
-	jbacik@fb.com,
-	dsterba@suse.com,
-	Elena Reshetova <elena.reshetova@intel.com>,
-	Hans Liljestrand <ishkamiel@gmail.com>,
-	Kees Cook <keescook@chromium.org>,
-	David Windsor <dwindsor@gmail.com>
-Subject: [PATCH 5/5] block: convert bsg_device.ref_count from atomic_t to refcount_t
-Date: Mon, 20 Feb 2017 13:16:08 +0200
-Message-Id: <1487589368-17666-6-git-send-email-elena.reshetova@intel.com>
-In-Reply-To: <1487589368-17666-1-git-send-email-elena.reshetova@intel.com>
-References: <1487589368-17666-1-git-send-email-elena.reshetova@intel.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pg0-f68.google.com ([74.125.83.68]:34487 "EHLO
+        mail-pg0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932246AbdBPLrE (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 16 Feb 2017 06:47:04 -0500
+From: Ming Lei <tom.leiming@gmail.com>
+To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
+        linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        NeilBrown <neilb@suse.com>
+Cc: Ming Lei <tom.leiming@gmail.com>
+Subject: [PATCH 15/17] md: raid10: avoid direct access to bvec table in fix_recovery_read_error
+Date: Thu, 16 Feb 2017 19:45:45 +0800
+Message-Id: <1487245547-24384-16-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1487245547-24384-1-git-send-email-tom.leiming@gmail.com>
+References: <1487245547-24384-1-git-send-email-tom.leiming@gmail.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-refcount_t type and corresponding API should be
-used instead of atomic_t when the variable is used as
-a reference counter. This allows to avoid accidental
-refcounter overflows that might lead to use-after-free
-situations.
+The cost is 128bytes(8*16) stack space in kernel thread context, and just
+use the bio helper to retrieve pages from bio.
 
-Signed-off-by: Elena Reshetova <elena.reshetova@intel.com>
-Signed-off-by: Hans Liljestrand <ishkamiel@gmail.com>
-Signed-off-by: Kees Cook <keescook@chromium.org>
-Signed-off-by: David Windsor <dwindsor@gmail.com>
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- block/bsg.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+ drivers/md/raid10.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/block/bsg.c b/block/bsg.c
-index 74835db..6d0ceb9 100644
---- a/block/bsg.c
-+++ b/block/bsg.c
-@@ -21,6 +21,7 @@
- #include <linux/idr.h>
- #include <linux/bsg.h>
- #include <linux/slab.h>
-+#include <linux/refcount.h>
+diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
+index 69fe2a3cef89..c7d2f73565d9 100644
+--- a/drivers/md/raid10.c
++++ b/drivers/md/raid10.c
+@@ -2184,6 +2184,11 @@ static void fix_recovery_read_error(struct r10bio *r10_bio)
+ 	int idx = 0;
+ 	int dr = r10_bio->devs[0].devnum;
+ 	int dw = r10_bio->devs[1].devnum;
++	struct bio_vec *bvl;
++	struct page *pages[RESYNC_PAGES];
++
++	bio_for_each_segment_all(bvl, bio, idx)
++		pages[idx] = bvl->bv_page;
  
- #include <scsi/scsi.h>
- #include <scsi/scsi_ioctl.h>
-@@ -38,7 +39,7 @@ struct bsg_device {
- 	struct list_head busy_list;
- 	struct list_head done_list;
- 	struct hlist_node dev_list;
--	atomic_t ref_count;
-+	refcount_t ref_count;
- 	int queued_cmds;
- 	int done_cmds;
- 	wait_queue_head_t wq_done;
-@@ -711,7 +712,7 @@ static int bsg_put_device(struct bsg_device *bd)
- 
- 	mutex_lock(&bsg_mutex);
- 
--	do_free = atomic_dec_and_test(&bd->ref_count);
-+	do_free = refcount_dec_and_test(&bd->ref_count);
- 	if (!do_free) {
- 		mutex_unlock(&bsg_mutex);
- 		goto out;
-@@ -763,7 +764,7 @@ static struct bsg_device *bsg_add_device(struct inode *inode,
- 
- 	bsg_set_block(bd, file);
- 
--	atomic_set(&bd->ref_count, 1);
-+	refcount_set(&bd->ref_count, 1);
- 	mutex_lock(&bsg_mutex);
- 	hlist_add_head(&bd->dev_list, bsg_dev_idx_hash(iminor(inode)));
- 
-@@ -783,7 +784,7 @@ static struct bsg_device *__bsg_get_device(int minor, struct request_queue *q)
- 
- 	hlist_for_each_entry(bd, bsg_dev_idx_hash(minor), dev_list) {
- 		if (bd->queue == q) {
--			atomic_inc(&bd->ref_count);
-+			refcount_inc(&bd->ref_count);
- 			goto found;
- 		}
- 	}
+ 	while (sectors) {
+ 		int s = sectors;
+@@ -2199,7 +2204,7 @@ static void fix_recovery_read_error(struct r10bio *r10_bio)
+ 		ok = sync_page_io(rdev,
+ 				  addr,
+ 				  s << 9,
+-				  bio->bi_io_vec[idx].bv_page,
++				  pages[idx],
+ 				  REQ_OP_READ, 0, false);
+ 		if (ok) {
+ 			rdev = conf->mirrors[dw].rdev;
+@@ -2207,7 +2212,7 @@ static void fix_recovery_read_error(struct r10bio *r10_bio)
+ 			ok = sync_page_io(rdev,
+ 					  addr,
+ 					  s << 9,
+-					  bio->bi_io_vec[idx].bv_page,
++					  pages[idx],
+ 					  REQ_OP_WRITE, 0, false);
+ 			if (!ok) {
+ 				set_bit(WriteErrorSeen, &rdev->flags);
 -- 
 2.7.4
