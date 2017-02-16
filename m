@@ -1,72 +1,77 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:52184 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1754420AbdBPMIY (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Feb 2017 07:08:24 -0500
-Subject: Re: [PATCH 02/17] block: introduce bio_remove_last_page()
-To: Ming Lei <tom.leiming@gmail.com>, Shaohua Li <shli@kernel.org>,
-        Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org,
-        linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
+Received: from mail-pf0-f193.google.com ([209.85.192.193]:33902 "EHLO
+        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754648AbdBPLqN (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 16 Feb 2017 06:46:13 -0500
+From: Ming Lei <tom.leiming@gmail.com>
+To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
+        linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
         NeilBrown <neilb@suse.com>
+Cc: Ming Lei <tom.leiming@gmail.com>
+Subject: [PATCH 02/17] block: introduce bio_remove_last_page()
+Date: Thu, 16 Feb 2017 19:45:32 +0800
+Message-Id: <1487245547-24384-3-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1487245547-24384-1-git-send-email-tom.leiming@gmail.com>
 References: <1487245547-24384-1-git-send-email-tom.leiming@gmail.com>
- <1487245547-24384-3-git-send-email-tom.leiming@gmail.com>
-From: Johannes Thumshirn <jthumshirn@suse.de>
-Message-ID: <b443b3a1-ecc9-8238-1b3d-90870a25c793@suse.de>
-Date: Thu, 16 Feb 2017 13:08:22 +0100
-MIME-Version: 1.0
-In-Reply-To: <1487245547-24384-3-git-send-email-tom.leiming@gmail.com>
-Content-Type: text/plain; charset=windows-1252
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 02/16/2017 12:45 PM, Ming Lei wrote:
-> MD need this helper to remove the last added page, so introduce
-> it.
-> 
-> Signed-off-by: Ming Lei <tom.leiming@gmail.com>
-> ---
->  block/bio.c         | 23 +++++++++++++++++++++++
->  include/linux/bio.h |  1 +
->  2 files changed, 24 insertions(+)
-> 
-> diff --git a/block/bio.c b/block/bio.c
-> index 5eec5e08417f..0ce7ffcd7939 100644
-> --- a/block/bio.c
-> +++ b/block/bio.c
-> @@ -837,6 +837,29 @@ int bio_add_pc_page(struct request_queue *q, struct bio *bio, struct page
->  EXPORT_SYMBOL(bio_add_pc_page);
->  
->  /**
-> + *	bio_remove_last_page	-	remove the last added page
-> + *	@bio: destination bio
-> + *
-> + *	Attempt to remove the last added page from the bio_vec maplist.
-> + */
-> +void bio_remove_last_page(struct bio *bio)
-> +{
-> +	/*
-> +	 * cloned bio must not modify vec list
-> +	 */
-> +	if (WARN_ON_ONCE(bio_flagged(bio, BIO_CLONED)))
-> +		return;
-> +
-> +	if (bio->bi_vcnt > 0) {
+MD need this helper to remove the last added page, so introduce
+it.
 
-In patch 1 you introduce bio_segments_all() with the log message 'So
-that we can replace the direct access to .bi_vcnt.' Here you introduce a
-new direct access to it (plus the duplicated WARN_ON_ONCE()).
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+---
+ block/bio.c         | 23 +++++++++++++++++++++++
+ include/linux/bio.h |  1 +
+ 2 files changed, 24 insertions(+)
 
-Maybe use the helper directly here (I admit I haven't gone through the
-whole series yet, so I can't see if the change is made later).
-
-Byte,
-	Johannes
-
+diff --git a/block/bio.c b/block/bio.c
+index 5eec5e08417f..0ce7ffcd7939 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -837,6 +837,29 @@ int bio_add_pc_page(struct request_queue *q, struct bio *bio, struct page
+ EXPORT_SYMBOL(bio_add_pc_page);
+ 
+ /**
++ *	bio_remove_last_page	-	remove the last added page
++ *	@bio: destination bio
++ *
++ *	Attempt to remove the last added page from the bio_vec maplist.
++ */
++void bio_remove_last_page(struct bio *bio)
++{
++	/*
++	 * cloned bio must not modify vec list
++	 */
++	if (WARN_ON_ONCE(bio_flagged(bio, BIO_CLONED)))
++		return;
++
++	if (bio->bi_vcnt > 0) {
++		struct bio_vec *bv = &bio->bi_io_vec[bio->bi_vcnt - 1];
++
++		bio->bi_iter.bi_size -= bv->bv_len;
++		bio->bi_vcnt--;
++	}
++}
++EXPORT_SYMBOL(bio_remove_last_page);
++
++/**
+  *	bio_add_page	-	attempt to add page to bio
+  *	@bio: destination bio
+  *	@page: page to add
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index 3364b3ed90e7..32aeb493d1fe 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -443,6 +443,7 @@ extern void bio_init(struct bio *bio, struct bio_vec *table,
+ extern void bio_reset(struct bio *);
+ void bio_chain(struct bio *, struct bio *);
+ 
++extern void bio_remove_last_page(struct bio *bio);
+ extern int bio_add_page(struct bio *, struct page *, unsigned int,unsigned int);
+ extern int bio_add_pc_page(struct request_queue *, struct bio *, struct page *,
+ 			   unsigned int, unsigned int);
 -- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: Felix Imend�rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N�rnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+2.7.4
