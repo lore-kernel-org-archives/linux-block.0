@@ -1,80 +1,27 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f68.google.com ([74.125.83.68]:35316 "EHLO
-        mail-pg0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932096AbdBPLq5 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Feb 2017 06:46:57 -0500
-From: Ming Lei <tom.leiming@gmail.com>
-To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
-        linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        NeilBrown <neilb@suse.com>
-Cc: Ming Lei <tom.leiming@gmail.com>
-Subject: [PATCH 10/17] md: raid1: remove direct access to bvec table in fix_sync_read_error
-Date: Thu, 16 Feb 2017 19:45:40 +0800
-Message-Id: <1487245547-24384-11-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1487245547-24384-1-git-send-email-tom.leiming@gmail.com>
-References: <1487245547-24384-1-git-send-email-tom.leiming@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <hch@lst.de>
+Date: Thu, 16 Feb 2017 15:40:30 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Jon Derrick <jonathan.derrick@intel.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, Scott Bauer <scott.bauer@intel.com>,
+	Rafael Antognolli <rafael.antognolli@intel.com>,
+	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: Re: [PATCHv4 2/4] block/sed: Add helper to qualify response tokens
+Message-ID: <20170216144030.GA32375@lst.de>
+References: <1487195159-12599-1-git-send-email-jonathan.derrick@intel.com> <1487195159-12599-3-git-send-email-jonathan.derrick@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1487195159-12599-3-git-send-email-jonathan.derrick@intel.com>
+List-ID: <linux-block@vger.kernel.org>
 
-This patch uses a stack variable to hold the pages in bio, so
-that we can remove direct access to bvec table in fix_sync_read_error().
+On Wed, Feb 15, 2017 at 02:45:55PM -0700, Jon Derrick wrote:
+> Add helper which verifies the response token is valid and matches the
+> expected value. Merges token_type and response_get_token.
+> 
+> Signed-off-by: Jon Derrick <jonathan.derrick@intel.com>
+> Reviewed-by: Scott Bauer <scott.bauer@intel.com>
 
-This 16*8 stack variable is just fine for kernel thread context.
+Looks fine,
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
----
- drivers/md/raid1.c | 16 +++++++++++++---
- 1 file changed, 13 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
-index 1dd6b2760fba..02ee8542295d 100644
---- a/drivers/md/raid1.c
-+++ b/drivers/md/raid1.c
-@@ -1874,6 +1874,16 @@ static int fix_sync_read_error(struct r1bio *r1_bio)
- 	int sectors = r1_bio->sectors;
- 	int idx = 0;
- 	struct md_rdev *rdev;
-+	struct bio_vec *bvl;
-+	int i;
-+	struct page *pages[RESYNC_PAGES];
-+
-+	/*
-+	 * bio for read_disk is filled up, so we can use
-+	 * bio_for_each_segment_all() to retrieve all pages.
-+	 */
-+	bio_for_each_segment_all(bvl, bio, i)
-+		pages[i] = bvl->bv_page;
- 
- 	rdev = conf->mirrors[r1_bio->read_disk].rdev;
- 	if (test_bit(FailFast, &rdev->flags)) {
-@@ -1903,7 +1913,7 @@ static int fix_sync_read_error(struct r1bio *r1_bio)
- 				 */
- 				rdev = conf->mirrors[d].rdev;
- 				if (sync_page_io(rdev, sect, s<<9,
--						 bio->bi_io_vec[idx].bv_page,
-+						 pages[idx],
- 						 REQ_OP_READ, 0, false)) {
- 					success = 1;
- 					break;
-@@ -1958,7 +1968,7 @@ static int fix_sync_read_error(struct r1bio *r1_bio)
- 				continue;
- 			rdev = conf->mirrors[d].rdev;
- 			if (r1_sync_page_io(rdev, sect, s,
--					    bio->bi_io_vec[idx].bv_page,
-+					    pages[idx],
- 					    WRITE) == 0) {
- 				r1_bio->bios[d]->bi_end_io = NULL;
- 				rdev_dec_pending(rdev, mddev);
-@@ -1973,7 +1983,7 @@ static int fix_sync_read_error(struct r1bio *r1_bio)
- 				continue;
- 			rdev = conf->mirrors[d].rdev;
- 			if (r1_sync_page_io(rdev, sect, s,
--					    bio->bi_io_vec[idx].bv_page,
-+					    pages[idx],
- 					    READ) != 0)
- 				atomic_add(s, &rdev->corrected_errors);
- 		}
--- 
-2.7.4
+Reviewed-by: Christoph Hellwig <hch@lst.de>
