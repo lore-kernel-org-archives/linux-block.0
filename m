@@ -1,34 +1,36 @@
-Return-Path: <sagi@grimberg.me>
-From: Sagi Grimberg <sagi@grimberg.me>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org
-Subject: [PATCH 2/2] blk-mq: make sure to back-assign the request to rq_map in blk_mq_alloc_request_hctx
-Date: Mon, 27 Feb 2017 17:36:21 +0200
-Message-Id: <1488209781-1084-2-git-send-email-sagi@grimberg.me>
-In-Reply-To: <1488209781-1084-1-git-send-email-sagi@grimberg.me>
-References: <1488209781-1084-1-git-send-email-sagi@grimberg.me>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga05.intel.com ([192.55.52.43]:22646 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S964776AbdBQW40 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 17 Feb 2017 17:56:26 -0500
+From: Jon Derrick <jonathan.derrick@intel.com>
+Cc: Jon Derrick <jonathan.derrick@intel.com>,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        Scott Bauer <scott.bauer@intel.com>,
+        Rafael Antognolli <rafael.antognolli@intel.com>,
+        Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@lst.de>
+Subject: [PATCH 0/5] OPAL patches cont'd
+Date: Fri, 17 Feb 2017 15:56:13 -0700
+Message-Id: <1487372178-15715-1-git-send-email-jonathan.derrick@intel.com>
+To: unlisted-recipients:; (no To-header on input)
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Otherwise we won't be able to retrieve the request from
-the tag.
+The first three in the series have been reviewed already but I wanted to
+squash them with the next two since they haven't been pulled yet.
 
-Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
----
- block/blk-mq.c | 1 +
- 1 file changed, 1 insertion(+)
+The latter 2 are an attempt to refactor some of the awkward func data
+and state separation into a common struct
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index d84c66fb37b7..9611cd9920e9 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -312,6 +312,7 @@ struct request *blk_mq_alloc_request_hctx(struct request_queue *q, int rw,
- 		ret = -EWOULDBLOCK;
- 		goto out_queue_exit;
- 	}
-+	alloc_data.hctx->tags->rqs[rq->tag] = rq;
- 
- 	return rq;
- 
+Jon Derrick (5):
+  block/sed: Use ssize_t on atom parsers to return errors
+  block/sed: Add helper to qualify response tokens
+  block/sed: Check received header lengths
+  block/sed: embedded function data into the function sequence
+  block/sed: Eliminate state variable
+
+ block/sed-opal.c | 494 +++++++++++++++++++++++--------------------------------
+ 1 file changed, 202 insertions(+), 292 deletions(-)
+
 -- 
-2.7.4
+1.8.3.1
