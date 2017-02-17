@@ -1,11 +1,17 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.136]:56254 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1754684AbdBQEQk (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Feb 2017 23:16:40 -0500
-Date: Thu, 16 Feb 2017 20:16:35 -0800
-From: Shaohua Li <shli@kernel.org>
-To: Ming Lei <tom.leiming@gmail.com>
+Received: from mail-vk0-f54.google.com ([209.85.213.54]:34832 "EHLO
+        mail-vk0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753901AbdBQBZ3 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 16 Feb 2017 20:25:29 -0500
+MIME-Version: 1.0
+In-Reply-To: <20170216221642.sobqndndd7fbjoo7@kernel.org>
+References: <1487245547-24384-1-git-send-email-tom.leiming@gmail.com> <20170216221642.sobqndndd7fbjoo7@kernel.org>
+From: Ming Lei <tom.leiming@gmail.com>
+Date: Fri, 17 Feb 2017 09:25:27 +0800
+Message-ID: <CACVXFVPRuikOn=zJ5fboGMyQs3rMxaUK4f-Lk0s-+HpPy+ov8w@mail.gmail.com>
+Subject: Re: [PATCH 00/17] md: cleanup on direct access to bvec table
+To: Shaohua Li <shli@kernel.org>
 Cc: Jens Axboe <axboe@fb.com>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         "open list:SOFTWARE RAID (Multiple Disks) SUPPORT"
@@ -13,45 +19,35 @@ Cc: Jens Axboe <axboe@fb.com>,
         linux-block <linux-block@vger.kernel.org>,
         Christoph Hellwig <hch@infradead.org>,
         NeilBrown <neilb@suse.com>
-Subject: Re: [PATCH 00/17] md: cleanup on direct access to bvec table
-Message-ID: <20170217041635.4hxnlqf7mh2wwtok@kernel.org>
-References: <1487245547-24384-1-git-send-email-tom.leiming@gmail.com>
- <20170216221642.sobqndndd7fbjoo7@kernel.org>
- <CACVXFVPRuikOn=zJ5fboGMyQs3rMxaUK4f-Lk0s-+HpPy+ov8w@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CACVXFVPRuikOn=zJ5fboGMyQs3rMxaUK4f-Lk0s-+HpPy+ov8w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Fri, Feb 17, 2017 at 09:25:27AM +0800, Ming Lei wrote:
-> Hi Shaohua,
-> 
-> On Fri, Feb 17, 2017 at 6:16 AM, Shaohua Li <shli@kernel.org> wrote:
-> > On Thu, Feb 16, 2017 at 07:45:30PM +0800, Ming Lei wrote:
-> >> In MD's resync I/O path, there are lots of direct access to bio's
-> >> bvec table. This patchset kills most of them, and the conversion
-> >> is quite straightforward.
-> >
-> > I don't like this approach. The MD uses a hacky way to manage pages allocated,
-> > this is the root of the problem. The patches add another hack way to do the
-> 
-> Yes, I agree, and bio_iov_iter_get_pages() uses this kind of hacky way too
-> actually.
-> 
-> > management. I'd like to see explict management of the pages, for example, add
-> > data structure in r1bio to manage the pages, then we can use existing API for
-> > all the stuffes we need.
-> 
-> Yeah, that is definitely clean, but we have to pay the following cost:
-> 
-> - allocate at least N * (128 + 4) bytes per each r1_bio/r10_bio
-> - N is pool_info.raid_disks for raid1, and conf->copies for raid10
-> 
-> If we are happy to introduce the cost, I can take this way in V1.
+Hi Shaohua,
 
-It's not a big deal. The inflight bio shouldn't be big, so the r1_bio count
-isn't big. We don't waste much.
+On Fri, Feb 17, 2017 at 6:16 AM, Shaohua Li <shli@kernel.org> wrote:
+> On Thu, Feb 16, 2017 at 07:45:30PM +0800, Ming Lei wrote:
+>> In MD's resync I/O path, there are lots of direct access to bio's
+>> bvec table. This patchset kills most of them, and the conversion
+>> is quite straightforward.
+>
+> I don't like this approach. The MD uses a hacky way to manage pages allocated,
+> this is the root of the problem. The patches add another hack way to do the
+
+Yes, I agree, and bio_iov_iter_get_pages() uses this kind of hacky way too
+actually.
+
+> management. I'd like to see explict management of the pages, for example, add
+> data structure in r1bio to manage the pages, then we can use existing API for
+> all the stuffes we need.
+
+Yeah, that is definitely clean, but we have to pay the following cost:
+
+- allocate at least N * (128 + 4) bytes per each r1_bio/r10_bio
+- N is pool_info.raid_disks for raid1, and conf->copies for raid10
+
+If we are happy to introduce the cost, I can take this way in V1.
+
 
 Thanks,
-Shaohua
+Ming Lei
