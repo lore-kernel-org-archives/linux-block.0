@@ -1,19 +1,19 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga05.intel.com ([192.55.52.43]:42880 "EHLO mga05.intel.com"
+Received: from mga05.intel.com ([192.55.52.43]:22646 "EHLO mga05.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750918AbdBRAAh (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Feb 2017 19:00:37 -0500
+        id S964776AbdBQW4a (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 17 Feb 2017 17:56:30 -0500
 From: Jon Derrick <jonathan.derrick@intel.com>
 Cc: Jon Derrick <jonathan.derrick@intel.com>,
         linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
         Scott Bauer <scott.bauer@intel.com>,
         Rafael Antognolli <rafael.antognolli@intel.com>,
         Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@lst.de>
-Subject: [PATCHv2 3/5] block/sed: Check received header lengths
-Date: Fri, 17 Feb 2017 17:00:27 -0700
-Message-Id: <1487376029-22662-4-git-send-email-jonathan.derrick@intel.com>
-In-Reply-To: <1487376029-22662-1-git-send-email-jonathan.derrick@intel.com>
-References: <1487376029-22662-1-git-send-email-jonathan.derrick@intel.com>
+Subject: [PATCH 3/5] block/sed: Check received header lengths
+Date: Fri, 17 Feb 2017 15:56:16 -0700
+Message-Id: <1487372178-15715-4-git-send-email-jonathan.derrick@intel.com>
+In-Reply-To: <1487372178-15715-1-git-send-email-jonathan.derrick@intel.com>
+References: <1487372178-15715-1-git-send-email-jonathan.derrick@intel.com>
 To: unlisted-recipients:; (no To-header on input)
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
