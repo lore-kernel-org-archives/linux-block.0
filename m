@@ -1,127 +1,31 @@
-Return-Path: <jonathan.derrick@intel.com>
-From: Jon Derrick <jonathan.derrick@intel.com>
-To: 
-Cc: Jon Derrick <jonathan.derrick@intel.com>,
-	Scott Bauer <scott.bauer@intel.com>,
-	Rafael Antognolli <rafael.antognolli@intel.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 1/4] block/sed: Use ssize_t on atom parsers to return errors
-Date: Wed, 15 Feb 2017 12:38:51 -0700
-Message-Id: <1487187535-10503-1-git-send-email-jonathan.derrick@intel.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from verein.lst.de ([213.95.11.211]:49193 "EHLO newverein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752971AbdBRQPc (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 18 Feb 2017 11:15:32 -0500
+Date: Sat, 18 Feb 2017 17:14:57 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Scott Bauer <scott.bauer@intel.com>
+Cc: linux-block@vger.kernel.org, axboe@fb.com, keith.busch@intel.com,
+        jonathan.derrick@intel.com, hch@lst.de
+Subject: Re: [PATCH] block/sed-opal: Introduce free_opal_dev to free the
+        structure and clean up state
+Message-ID: <20170218161457.GA17922@lst.de>
+References: <1487352313-3539-1-git-send-email-scott.bauer@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1487352313-3539-1-git-send-email-scott.bauer@intel.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-The short atom parser can return an errno from decoding but does not
-currently return the error as a signed value. Convert all of the parsers
-to ssize_t.
+On Fri, Feb 17, 2017 at 10:25:13AM -0700, Scott Bauer wrote:
+> Before we free the opal structure we need to clean up any saved
+> locking ranges that the user had told us to unlock from a suspend.
+> Also fixup a list_for_each to list_for_each_safe in the save path.
+> 
+> Signed-off-by: Scott Bauer <scott.bauer@intel.com>
 
-Signed-off-by: Jon Derrick <jonathan.derrick@intel.com>
----
- block/sed-opal.c         | 28 ++++++++++++++--------------
- include/linux/sed-opal.h |  2 +-
- 2 files changed, 15 insertions(+), 15 deletions(-)
+This looks fine to me, but I think the fix to add_suspend_info
+should be a separate patch:
 
-diff --git a/block/sed-opal.c b/block/sed-opal.c
-index e95b8a5..77623ad 100644
---- a/block/sed-opal.c
-+++ b/block/sed-opal.c
-@@ -635,8 +635,8 @@ static enum opal_token response_get_token(const struct parsed_resp *resp,
- 	return tok->pos[0];
- }
- 
--static size_t response_parse_tiny(struct opal_resp_tok *tok,
--				  const u8 *pos)
-+static ssize_t response_parse_tiny(struct opal_resp_tok *tok,
-+				   const u8 *pos)
- {
- 	tok->pos = pos;
- 	tok->len = 1;
-@@ -652,8 +652,8 @@ static size_t response_parse_tiny(struct opal_resp_tok *tok,
- 	return tok->len;
- }
- 
--static size_t response_parse_short(struct opal_resp_tok *tok,
--				   const u8 *pos)
-+static ssize_t response_parse_short(struct opal_resp_tok *tok,
-+				    const u8 *pos)
- {
- 	tok->pos = pos;
- 	tok->len = (pos[0] & SHORT_ATOM_LEN_MASK) + 1;
-@@ -665,7 +665,7 @@ static size_t response_parse_short(struct opal_resp_tok *tok,
- 		tok->type = OPAL_DTA_TOKENID_SINT;
- 	} else {
- 		u64 u_integer = 0;
--		int i, b = 0;
-+		ssize_t i, b = 0;
- 
- 		tok->type = OPAL_DTA_TOKENID_UINT;
- 		if (tok->len > 9) {
-@@ -682,8 +682,8 @@ static size_t response_parse_short(struct opal_resp_tok *tok,
- 	return tok->len;
- }
- 
--static size_t response_parse_medium(struct opal_resp_tok *tok,
--				    const u8 *pos)
-+static ssize_t response_parse_medium(struct opal_resp_tok *tok,
-+				     const u8 *pos)
- {
- 	tok->pos = pos;
- 	tok->len = (((pos[0] & MEDIUM_ATOM_LEN_MASK) << 8) | pos[1]) + 2;
-@@ -699,8 +699,8 @@ static size_t response_parse_medium(struct opal_resp_tok *tok,
- 	return tok->len;
- }
- 
--static size_t response_parse_long(struct opal_resp_tok *tok,
--				  const u8 *pos)
-+static ssize_t response_parse_long(struct opal_resp_tok *tok,
-+				   const u8 *pos)
- {
- 	tok->pos = pos;
- 	tok->len = ((pos[1] << 16) | (pos[2] << 8) | pos[3]) + 4;
-@@ -716,8 +716,8 @@ static size_t response_parse_long(struct opal_resp_tok *tok,
- 	return tok->len;
- }
- 
--static size_t response_parse_token(struct opal_resp_tok *tok,
--				   const u8 *pos)
-+static ssize_t response_parse_token(struct opal_resp_tok *tok,
-+				    const u8 *pos)
- {
- 	tok->pos = pos;
- 	tok->len = 1;
-@@ -734,7 +734,7 @@ static int response_parse(const u8 *buf, size_t length,
- 	struct opal_resp_tok *iter;
- 	int num_entries = 0;
- 	int total;
--	size_t token_length;
-+	ssize_t token_length;
- 	const u8 *pos;
- 
- 	if (!buf)
-@@ -780,8 +780,8 @@ static int response_parse(const u8 *buf, size_t length,
- 		else /* TOKEN */
- 			token_length = response_parse_token(iter, pos);
- 
--		if (token_length == -EINVAL)
--			return -EINVAL;
-+		if (token_length < 0)
-+			return token_length;
- 
- 		pos += token_length;
- 		total -= token_length;
-diff --git a/include/linux/sed-opal.h b/include/linux/sed-opal.h
-index 205d520..4fc72d4 100644
---- a/include/linux/sed-opal.h
-+++ b/include/linux/sed-opal.h
-@@ -69,7 +69,7 @@ enum opal_response_token {
-  */
- struct opal_resp_tok {
- 	const u8 *pos;
--	size_t len;
-+	ssize_t len;
- 	enum opal_response_token type;
- 	enum opal_atom_width width;
- 	union {
--- 
-1.8.3.1
+Reviewed-by: Christoph Hellwig <hch@lst.de>
