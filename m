@@ -1,120 +1,129 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f193.google.com ([209.85.192.193]:33358 "EHLO
-        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753869AbdBPLqj (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Feb 2017 06:46:39 -0500
-From: Ming Lei <tom.leiming@gmail.com>
-To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
-        linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        NeilBrown <neilb@suse.com>
-Cc: Ming Lei <tom.leiming@gmail.com>
-Subject: [PATCH 06/17] md: raid1/raid10: borrow .bi_error as pre-allocated page index
-Date: Thu, 16 Feb 2017 19:45:36 +0800
-Message-Id: <1487245547-24384-7-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1487245547-24384-1-git-send-email-tom.leiming@gmail.com>
-References: <1487245547-24384-1-git-send-email-tom.leiming@gmail.com>
+Received: from mga05.intel.com ([192.55.52.43]:42880 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750902AbdBRAAg (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 17 Feb 2017 19:00:36 -0500
+From: Jon Derrick <jonathan.derrick@intel.com>
+Cc: Jon Derrick <jonathan.derrick@intel.com>,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        Scott Bauer <scott.bauer@intel.com>,
+        Rafael Antognolli <rafael.antognolli@intel.com>,
+        Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@lst.de>
+Subject: [PATCHv2 2/5] block/sed: Add helper to qualify response tokens
+Date: Fri, 17 Feb 2017 17:00:26 -0700
+Message-Id: <1487376029-22662-3-git-send-email-jonathan.derrick@intel.com>
+In-Reply-To: <1487376029-22662-1-git-send-email-jonathan.derrick@intel.com>
+References: <1487376029-22662-1-git-send-email-jonathan.derrick@intel.com>
+To: unlisted-recipients:; (no To-header on input)
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Before bio is submitted, it is safe to borrow .bi_error. This
-patch uses .bi_error as index of pre-allocated page in bio, so
-that we can avoid to mess .bi_vcnt. Especially the old way
-will not work any more when multipage bvec is introduced.
+Add helper which verifies the response token is valid and matches the
+expected value. Merges token_type and response_get_token.
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+Signed-off-by: Jon Derrick <jonathan.derrick@intel.com>
 ---
- drivers/md/raid1.c  | 12 ++++++++++--
- drivers/md/raid10.c | 14 ++++++++++----
- 2 files changed, 20 insertions(+), 6 deletions(-)
+ block/sed-opal.c | 61 +++++++++++++++++++++++---------------------------------
+ 1 file changed, 25 insertions(+), 36 deletions(-)
 
-diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
-index c4791fbd69ac..8904a9149671 100644
---- a/drivers/md/raid1.c
-+++ b/drivers/md/raid1.c
-@@ -2811,13 +2811,14 @@ static sector_t raid1_sync_request(struct mddev *mddev, sector_t sector_nr,
- 				len = sync_blocks<<9;
- 		}
+diff --git a/block/sed-opal.c b/block/sed-opal.c
+index 4675fd8..d3d6db2 100644
+--- a/block/sed-opal.c
++++ b/block/sed-opal.c
+@@ -662,48 +662,25 @@ static int cmd_finalize(struct opal_dev *cmd, u32 hsn, u32 tsn)
+ 	return 0;
+ }
  
-+		/* borrow .bi_error as pre-allocated page index */
- 		for (i = 0 ; i < conf->raid_disks * 2; i++) {
- 			bio = r1_bio->bios[i];
- 			if (bio->bi_end_io) {
--				page = mdev_get_page_from_bio(bio, bio->bi_vcnt);
-+				page = mdev_get_page_from_bio(bio, bio->bi_error++);
- 				if (bio_add_page(bio, page, len, 0) == 0) {
- 					/* stop here */
--					mdev_put_page_to_bio(bio, bio->bi_vcnt, page);
-+					mdev_put_page_to_bio(bio, --bio->bi_error, page);
- 					while (i > 0) {
- 						i--;
- 						bio = r1_bio->bios[i];
-@@ -2836,6 +2837,13 @@ static sector_t raid1_sync_request(struct mddev *mddev, sector_t sector_nr,
- 		sync_blocks -= (len>>9);
- 	} while (r1_bio->bios[disk]->bi_vcnt < RESYNC_PAGES);
-  bio_full:
-+	/* return .bi_error back to bio */
-+	for (i = 0 ; i < conf->raid_disks * 2; i++) {
-+		bio = r1_bio->bios[i];
-+		if (bio->bi_end_io)
-+			bio->bi_error = 0;
-+	}
+-static enum opal_response_token token_type(const struct parsed_resp *resp,
+-					   int n)
++static const struct opal_resp_tok *response_get_token(
++				const struct parsed_resp *resp,
++				int n)
+ {
+ 	const struct opal_resp_tok *tok;
+ 
+ 	if (n >= resp->num) {
+ 		pr_err("Token number doesn't exist: %d, resp: %d\n",
+ 		       n, resp->num);
+-		return OPAL_DTA_TOKENID_INVALID;
++		return ERR_PTR(-EINVAL);
+ 	}
+ 
+ 	tok = &resp->toks[n];
+ 	if (tok->len == 0) {
+ 		pr_err("Token length must be non-zero\n");
+-		return OPAL_DTA_TOKENID_INVALID;
++		return ERR_PTR(-EINVAL);
+ 	}
+ 
+-	return tok->type;
+-}
+-
+-/*
+- * This function returns 0 in case of invalid token. One should call
+- * token_type() first to find out if the token is valid or not.
+- */
+-static enum opal_token response_get_token(const struct parsed_resp *resp,
+-					  int n)
+-{
+-	const struct opal_resp_tok *tok;
+-
+-	if (n >= resp->num) {
+-		pr_err("Token number doesn't exist: %d, resp: %d\n",
+-		       n, resp->num);
+-		return 0;
+-	}
+-
+-	tok = &resp->toks[n];
+-	if (tok->len == 0) {
+-		pr_err("Token length must be non-zero\n");
+-		return 0;
+-	}
+-
+-	return tok->pos[0];
++	return tok;
+ }
+ 
+ static ssize_t response_parse_tiny(struct opal_resp_tok *tok,
+@@ -922,20 +899,32 @@ static u64 response_get_u64(const struct parsed_resp *resp, int n)
+ 	return resp->toks[n].stored.u;
+ }
+ 
++static bool response_token_matches(const struct opal_resp_tok *token, u8 match)
++{
++	if (IS_ERR(token) ||
++	    token->type != OPAL_DTA_TOKENID_TOKEN ||
++	    token->pos[0] != match)
++		return false;
++	return true;
++}
 +
- 	r1_bio->sectors = nr_sectors;
- 
- 	if (mddev_is_clustered(mddev) &&
-diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
-index b7dfbca869a3..9cfc22cd1330 100644
---- a/drivers/md/raid10.c
-+++ b/drivers/md/raid10.c
-@@ -3348,7 +3348,6 @@ static sector_t raid10_sync_request(struct mddev *mddev, sector_t sector_nr,
- 
- 			bio = r10_bio->devs[i].bio;
- 			bio_reset(bio);
--			bio->bi_error = -EIO;
- 			rcu_read_lock();
- 			rdev = rcu_dereference(conf->mirrors[d].rdev);
- 			if (rdev == NULL || test_bit(Faulty, &rdev->flags)) {
-@@ -3392,7 +3391,6 @@ static sector_t raid10_sync_request(struct mddev *mddev, sector_t sector_nr,
- 			/* Need to set up for writing to the replacement */
- 			bio = r10_bio->devs[i].repl_bio;
- 			bio_reset(bio);
--			bio->bi_error = -EIO;
- 
- 			sector = r10_bio->devs[i].addr;
- 			bio->bi_next = biolist;
-@@ -3435,14 +3433,15 @@ static sector_t raid10_sync_request(struct mddev *mddev, sector_t sector_nr,
- 			len = (max_sector - sector_nr) << 9;
- 		if (len == 0)
- 			break;
-+		/* borrow .bi_error as pre-allocated page index */
- 		for (bio= biolist ; bio ; bio=bio->bi_next) {
- 			struct bio *bio2;
--			page = mdev_get_page_from_bio(bio, bio->bi_vcnt);
-+			page = mdev_get_page_from_bio(bio, bio->bi_error++);
- 			if (bio_add_page(bio, page, len, 0))
- 				continue;
- 
- 			/* stop here */
--			mdev_put_page_to_bio(bio, bio->bi_vcnt, page);
-+			mdev_put_page_to_bio(bio, --bio->bi_error, page);
- 			for (bio2 = biolist;
- 			     bio2 && bio2 != bio;
- 			     bio2 = bio2->bi_next) {
-@@ -3456,6 +3455,13 @@ static sector_t raid10_sync_request(struct mddev *mddev, sector_t sector_nr,
- 		sector_nr += len>>9;
- 	} while (biolist->bi_vcnt < RESYNC_PAGES);
-  bio_full:
-+	/* return .bi_error back to bio, and set resync's as -EIO */
-+	for (bio= biolist ; bio ; bio=bio->bi_next)
-+		if (test_bit(MD_RECOVERY_SYNC, &mddev->recovery))
-+			bio->bi_error = -EIO;
-+		else
-+			bio->bi_error = 0;
+ static u8 response_status(const struct parsed_resp *resp)
+ {
+-	if (token_type(resp, 0) == OPAL_DTA_TOKENID_TOKEN &&
+-	    response_get_token(resp, 0) == OPAL_ENDOFSESSION) {
++	const struct opal_resp_tok *tok;
 +
- 	r10_bio->sectors = nr_sectors;
++	tok = response_get_token(resp, 0);
++	if (response_token_matches(tok, OPAL_ENDOFSESSION))
+ 		return 0;
+-	}
  
- 	while (biolist) {
+ 	if (resp->num < 5)
+ 		return DTAERROR_NO_METHOD_STATUS;
+ 
+-	if (token_type(resp, resp->num - 1) != OPAL_DTA_TOKENID_TOKEN ||
+-	    token_type(resp, resp->num - 5) != OPAL_DTA_TOKENID_TOKEN ||
+-	    response_get_token(resp, resp->num - 1) != OPAL_ENDLIST ||
+-	    response_get_token(resp, resp->num - 5) != OPAL_STARTLIST)
++	tok = response_get_token(resp, resp->num - 5);
++	if (!response_token_matches(tok, OPAL_STARTLIST))
++		return DTAERROR_NO_METHOD_STATUS;
++
++	tok = response_get_token(resp, resp->num - 1);
++	if (!response_token_matches(tok, OPAL_ENDLIST))
+ 		return DTAERROR_NO_METHOD_STATUS;
+ 
+ 	return response_get_u64(resp, resp->num - 4);
 -- 
-2.7.4
+1.8.3.1
