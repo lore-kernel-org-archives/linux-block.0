@@ -1,90 +1,30 @@
-Return-Path: <linus.walleij@linaro.org>
-Return-Path: <linus.walleij@linaro.org>
-From: Linus Walleij <linus.walleij@linaro.org>
-To: linux-mmc@vger.kernel.org,
-	Ulf Hansson <ulf.hansson@linaro.org>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	Paolo Valente <paolo.valente@linaro.org>
-Cc: Chunyan Zhang <zhang.chunyan@linaro.org>,
-	Baolin Wang <baolin.wang@linaro.org>,
-	linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Linus Walleij <linus.walleij@linaro.org>
-Subject: [PATCH 03/16] mmc: core: refactor mmc_request_done()
-Date: Thu,  9 Feb 2017 16:33:50 +0100
-Message-Id: <20170209153403.9730-4-linus.walleij@linaro.org>
-In-Reply-To: <20170209153403.9730-1-linus.walleij@linaro.org>
-References: <20170209153403.9730-1-linus.walleij@linaro.org>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from verein.lst.de ([213.95.11.211]:47449 "EHLO newverein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750742AbdBRIYn (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 18 Feb 2017 03:24:43 -0500
+Date: Sat, 18 Feb 2017 09:24:40 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Jon Derrick <jonathan.derrick@intel.com>
+Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        Scott Bauer <scott.bauer@intel.com>,
+        Rafael Antognolli <rafael.antognolli@intel.com>,
+        Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCHv2 0/5] OPAL patche'd cont'd
+Message-ID: <20170218082440.GA11798@lst.de>
+References: <1487376029-22662-1-git-send-email-jonathan.derrick@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1487376029-22662-1-git-send-email-jonathan.derrick@intel.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-We have this construction:
+On Fri, Feb 17, 2017 at 05:00:24PM -0700, Jon Derrick wrote:
+> v1->v2:
+> Moved misplaced code from 5/5 to 4/5
+> 
+> The first three in the series have been reviewed already but I wanted to
+> squash them with the next two since they haven't been pulled yet.
 
-if (a && b && !c)
-   finalize;
-else
-   block;
-   finalize;
-
-Which is equivalent by boolean logic to:
-
-if (!a || !b || c)
-   block;
-finalize;
-
-Which is simpler code.
-
-Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
----
- drivers/mmc/core/core.c | 27 ++++++++++++++++-----------
- 1 file changed, 16 insertions(+), 11 deletions(-)
-
-diff --git a/drivers/mmc/core/core.c b/drivers/mmc/core/core.c
-index b2e7a6dfcbf0..8dbed198750f 100644
---- a/drivers/mmc/core/core.c
-+++ b/drivers/mmc/core/core.c
-@@ -172,14 +172,16 @@ void mmc_request_done(struct mmc_host *host, struct mmc_request *mrq)
- 
- 	trace_mmc_request_done(host, mrq);
- 
--	if (err && cmd->retries && !mmc_card_removed(host->card)) {
--		/*
--		 * Request starter must handle retries - see
--		 * mmc_wait_for_req_done().
--		 */
--		if (mrq->done)
--			mrq->done(mrq);
--	} else {
-+	/*
-+	 * We list various conditions for the command to be considered
-+	 * properly done:
-+	 *
-+	 * - There was no error, OK fine then
-+	 * - We are not doing some kind of retry
-+	 * - The card was removed (...so just complete everything no matter
-+	 *   if there are errors or retries)
-+	 */
-+	if (!err || !cmd->retries || mmc_card_removed(host->card)) {
- 		mmc_should_fail_request(host, mrq);
- 
- 		if (!host->ongoing_mrq)
-@@ -211,10 +213,13 @@ void mmc_request_done(struct mmc_host *host, struct mmc_request *mrq)
- 				mrq->stop->resp[0], mrq->stop->resp[1],
- 				mrq->stop->resp[2], mrq->stop->resp[3]);
- 		}
--
--		if (mrq->done)
--			mrq->done(mrq);
- 	}
-+	/*
-+	 * Request starter must handle retries - see
-+	 * mmc_wait_for_req_done().
-+	 */
-+	if (mrq->done)
-+		mrq->done(mrq);
- }
- 
- EXPORT_SYMBOL(mmc_request_done);
--- 
-2.9.3
+Next time please carry the reviewed-by tags over to make everyones
+life easier.
