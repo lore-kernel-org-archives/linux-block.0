@@ -1,32 +1,42 @@
-Return-Path: <adrian.hunter@intel.com>
+Return-Path: <huziji@marvell.com>
 Subject: Re: Some throughput tests with MQ and BFQ on MMC/SD
-To: Linus Walleij <linus.walleij@linaro.org>, Ziji Hu <huziji@marvell.com>
+To: Linus Walleij <linus.walleij@linaro.org>
 References: <CACRpkdYXk_MKhaeQLqGA+8Q4g5qy-DkRymC0Ecf+_qsm+cBoBQ@mail.gmail.com>
  <e4836ece-d990-667c-27d0-4b19a2b4b160@marvell.com>
  <CACRpkda+p4erE9CdMUWi55-Ji8rj8TNOeJadHeOkHT7a1wbLmA@mail.gmail.com>
-Cc: "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
- linux-block@vger.kernel.org, Ulf Hansson <ulf.hansson@linaro.org>,
- Ritesh Harjani <riteshh@codeaurora.org>,
- Avri Altman <Avri.Altman@sandisk.com>, Arnd Bergmann <arnd@arndb.de>,
- Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
- Paolo Valente <paolo.valente@linaro.org>, =?UTF-8?Q?Per_F=c3=b6rlin?=
- <per.forlin@axis.com>
-From: Adrian Hunter <adrian.hunter@intel.com>
-Message-ID: <2995d066-ebee-c05c-a4cc-63d5b86df0be@intel.com>
-Date: Mon, 20 Feb 2017 10:03:35 +0200
+CC: "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, Ulf Hansson <ulf.hansson@linaro.org>,
+        Adrian
+ Hunter <adrian.hunter@intel.com>,
+        Ritesh Harjani <riteshh@codeaurora.org>,
+        Avri Altman <Avri.Altman@sandisk.com>, Arnd Bergmann <arnd@arndb.de>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Paolo Valente
+	<paolo.valente@linaro.org>,
+        =?UTF-8?Q?Per_F=c3=b6rlin?= <per.forlin@axis.com>
+From: Ziji Hu <huziji@marvell.com>
+Message-ID: <631e1706-620e-0247-1d77-7c7d6374ce65@marvell.com>
+Date: Sat, 18 Feb 2017 12:57:20 +0800
 MIME-Version: 1.0
 In-Reply-To: <CACRpkda+p4erE9CdMUWi55-Ji8rj8TNOeJadHeOkHT7a1wbLmA@mail.gmail.com>
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="utf-8"
 List-ID: <linux-block@vger.kernel.org>
 
-On 17/02/17 15:22, Linus Walleij wrote:
+Hi Linus,
+
+On 2017/2/17 21:22, Linus Walleij wrote:
 > On Fri, Feb 17, 2017 at 12:53 PM, Ziji Hu <huziji@marvell.com> wrote:
 > 
 >>         I would like to suggest that you should try the multiple thread
 >>         test mode of iozone, since you are testing *Multi* Queue.
 > 
 > Good point. This target has only 2 CPUs but still, maybe it performs!
-> 
+>
+	In my very own opinion, (although I'm not the expert of marketing),
+	quad-core platforms will be more and more popular.
+	Quad-core might have a different result, especially when we are
+	testing multiple threads. 
+
 >>         Besides, it seems that your eMMC transfer speed is quite low.
 >>         It is normal that read speed can reach more than 100MB/s in HS400.
 >>         Could you try a higher speed mode? The test result might be
@@ -39,6 +49,15 @@ On 17/02/17 15:22, Linus Walleij wrote:
 > 
 > But OK I'll just take the risk and run iozone on the eMMC.
 > 
+	Actually, there is a parameter to limit the size of test file in iozone.
+	I'm not sure why you need to scan the whole eMMC. But I personally
+	believe it is unnecessary.
+
+	Sorry for delay reply. Hope your eMMC is not broken yet. :p
+	eMMC usually contains much more physical pages than the capacity
+	it shows. Thus I guess your eMMC should be fine unless you torture
+	it by entirely writing it again and again.
+
 >>         Actually I have been following your thread for some time.
 >>         But currently I'm a little confused.
 >>         May I know the purpose of your patch?
@@ -65,21 +84,20 @@ On 17/02/17 15:22, Linus Walleij wrote:
 > I would like to make 1+2 happen in the next merge window
 > ultimately, but yeah, maybe I'm overly optimistic. But I will sure
 > try.
+	I see. Thank you for the details.
 > 
 > Maybe I should add:
 > 
 > 3. MQ is a better and future-proof fit for command queueing.
+	I strongly agree with you on it.
 
-MQ is not better - it is just different.  Because mmc devices do not have
-multiple hardware queues, blk-mq essentially offers nothing but a different
-way of doing the same thing.  And there are problems, such as blk-mq assumes
-that the primary arbiter of whether a request can be issued is the queue
-depth.  As I wrote here:
-  https://marc.info/?l=linux-mmc&m=148336571720463&w=2
-that is not the case for mmc, even with command queuing.
+	Thank you.
 
-Also I wouldn't be surprise if BFQ needs some changes to work well with
-command queuing.
+Best regards,
+Hu Ziji
 
-It would be better if blk-mq support was experimental until we can see how
-well it works in practice.
+
+> 
+> Yours,
+> Linus Walleij
+> 
