@@ -1,66 +1,71 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f67.google.com ([74.125.83.67]:33423 "EHLO
-        mail-pg0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754648AbdBPLqR (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Feb 2017 06:46:17 -0500
-From: Ming Lei <tom.leiming@gmail.com>
-To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
-        linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        NeilBrown <neilb@suse.com>
-Cc: Ming Lei <tom.leiming@gmail.com>
-Subject: [PATCH 03/17] md: raid1/raid10: use bio_remove_last_page()
-Date: Thu, 16 Feb 2017 19:45:33 +0800
-Message-Id: <1487245547-24384-4-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1487245547-24384-1-git-send-email-tom.leiming@gmail.com>
-References: <1487245547-24384-1-git-send-email-tom.leiming@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jack@suse.cz>
+Date: Mon, 20 Feb 2017 17:58:11 +0100
+From: Jan Kara <jack@suse.cz>
+To: Tejun Heo <tj@kernel.org>
+Cc: Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
+	NeilBrown <neilb@suse.de>
+Subject: Re: [PATCH 08/10] block: Fix oops in
+ locked_inode_to_wb_and_lock_list()
+Message-ID: <20170220165811.GD2315@quack2.suse.cz>
+References: <20170209124433.2626-1-jack@suse.cz>
+ <20170209124433.2626-9-jack@suse.cz>
+ <20170212044027.GF29323@mtj.duckdns.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170212044027.GF29323@mtj.duckdns.org>
+List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
----
- drivers/md/raid1.c  | 3 +--
- drivers/md/raid10.c | 6 ++----
- 2 files changed, 3 insertions(+), 6 deletions(-)
+On Sun 12-02-17 13:40:27, Tejun Heo wrote:
+> Hello, Jan.
+> 
+> On Thu, Feb 09, 2017 at 01:44:31PM +0100, Jan Kara wrote:
+> > When block device is closed, we call inode_detach_wb() in __blkdev_put()
+> > which sets inode->i_wb to NULL. That is contrary to expectations that
+> > inode->i_wb stays valid once set during the whole inode's lifetime and
+> > leads to oops in wb_get() in locked_inode_to_wb_and_lock_list() because
+> > inode_to_wb() returned NULL.
+> > 
+> > The reason why we called inode_detach_wb() is not valid anymore though.
+> > BDI is guaranteed to stay along until we call bdi_put() from
+> > bdev_evict_inode() so we can postpone calling inode_detach_wb() to that
+> > moment. A complication is that i_wb can point to non-root wb_writeback
+> > structure and in that case we do need to clean it up as bdi_unregister()
+> > blocks waiting for all non-root wb_writeback references to get dropped.
+> > Thus this i_wb reference could block device removal e.g. from
+> > __scsi_remove_device() (which indirectly ends up calling
+> > bdi_unregister()). We cannot rely on block device inode to go away soon
+> > (and thus i_wb reference to get dropped) as the device may got
+> > hot-removed e.g. under a mounted filesystem. We deal with these issues
+> > by switching block device inode from non-root wb_writeback structure to
+> > bdi->wb when needed.  Since this is rather expensive (requires
+> > synchronize_rcu()) we do the switching only in del_gendisk() when we
+> > know the device is going away.
+> 
+> So, the only reason cgwb_bdi_destroy() is synchronous is because bdi
+> destruction was synchronous.  Now that bdi is properly reference
+> counted and can be decoupled from gendisk / q destruction, I can't
+> think of a reason to keep cgwb destruction synchronous.  Switching
+> wb's on destruction is kinda clumsy and it almost always hurts to
+> expose synchronize_rcu() in userland visible paths.
+> 
+> Wouldn't something like the following work?
+> 
+> * Remove bdi->usage_cnt and the synchronous waiting in
+>   cgwb_bdi_destroy().
+> 
+> * Instead, make cgwb's hold bdi->refcnt and put it from
+>   cgwb_release_workfn().
+> 
+> Then, we don't have to switch during shutdown and can just let things
+> drain.
 
-diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
-index 85f309836fd7..6e4e0b868ff2 100644
---- a/drivers/md/raid1.c
-+++ b/drivers/md/raid1.c
-@@ -2824,8 +2824,7 @@ static sector_t raid1_sync_request(struct mddev *mddev, sector_t sector_nr,
- 						if (bio->bi_end_io==NULL)
- 							continue;
- 						/* remove last page from this bio */
--						bio->bi_vcnt--;
--						bio->bi_iter.bi_size -= len;
-+						bio_remove_last_page(bio);
- 						bio_clear_flag(bio, BIO_SEG_VALID);
- 					}
- 					goto bio_full;
-diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
-index 063c43d83b72..aa37d4c7900a 100644
---- a/drivers/md/raid10.c
-+++ b/drivers/md/raid10.c
-@@ -3447,8 +3447,7 @@ static sector_t raid10_sync_request(struct mddev *mddev, sector_t sector_nr,
- 			     bio2 && bio2 != bio;
- 			     bio2 = bio2->bi_next) {
- 				/* remove last page from this bio */
--				bio2->bi_vcnt--;
--				bio2->bi_iter.bi_size -= len;
-+				bio_remove_last_page(bio2);
- 				bio_clear_flag(bio2, BIO_SEG_VALID);
- 			}
- 			goto bio_full;
-@@ -4538,8 +4537,7 @@ static sector_t reshape_request(struct mddev *mddev, sector_t sector_nr,
- 			     bio2 && bio2 != bio;
- 			     bio2 = bio2->bi_next) {
- 				/* Remove last page from this bio */
--				bio2->bi_vcnt--;
--				bio2->bi_iter.bi_size -= len;
-+				bio_remove_last_page(bio2);
- 				bio_clear_flag(bio2, BIO_SEG_VALID);
- 			}
- 			goto bio_full;
+At first sight this looks workable and would mean less special code so I
+like it. I'll experiment with it and see how it works out.
+
+								Honza
 -- 
-2.7.4
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
