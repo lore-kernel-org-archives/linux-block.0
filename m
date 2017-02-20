@@ -1,60 +1,92 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from userp1040.oracle.com ([156.151.31.81]:37055 "EHLO
-        userp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752717AbdBVElT (ORCPT
+Received: from mail-vk0-f67.google.com ([209.85.213.67]:36248 "EHLO
+        mail-vk0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750868AbdBTSxz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Feb 2017 23:41:19 -0500
-To: Ilya Dryomov <idryomov@gmail.com>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Ceph Development <ceph-devel@vger.kernel.org>,
+        Mon, 20 Feb 2017 13:53:55 -0500
+MIME-Version: 1.0
+From: Ilya Dryomov <idryomov@gmail.com>
+Date: Mon, 20 Feb 2017 19:45:42 +0100
+Message-ID: <CAOi1vP8M91kiF-FnT=EoJgTxfstMEsC-nhLY5KtRkrKROjWPWA@mail.gmail.com>
+Subject: blk_integrity_revalidate() clears BDI_CAP_STABLE_WRITES
+To: "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: Ceph Development <ceph-devel@vger.kernel.org>,
         linux-block@vger.kernel.org,
         Dan Williams <dan.j.williams@intel.com>,
         Christoph Hellwig <hch@lst.de>
-Subject: Re: blk_integrity_revalidate() clears BDI_CAP_STABLE_WRITES
-From: "Martin K. Petersen" <martin.petersen@oracle.com>
-References: <CAOi1vP8M91kiF-FnT=EoJgTxfstMEsC-nhLY5KtRkrKROjWPWA@mail.gmail.com>
-Date: Tue, 21 Feb 2017 23:41:09 -0500
-In-Reply-To: <CAOi1vP8M91kiF-FnT=EoJgTxfstMEsC-nhLY5KtRkrKROjWPWA@mail.gmail.com>
-        (Ilya Dryomov's message of "Mon, 20 Feb 2017 19:45:42 +0100")
-Message-ID: <yq1efyq25y2.fsf@oracle.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
->>>>> "Ilya" == Ilya Dryomov <idryomov@gmail.com> writes:
+Hello,
 
-Ilya,
+rbd requires stable pages if ceph message data CRCs are enabled.  To
+that end we set BDI_CAP_STABLE_WRITES in rbd_init_disk(), but since
+commit 25520d55cdb6 ("block: Inline blk_integrity in struct gendisk",
+went into 4.4) this bit is almost immediately cleared:
 
-Ilya> could you please explain blk_integrity_revalidate() and
-Ilya> its GENHD_FL_UP check in particular?  We have the queue,
-Ilya> bi->profile can't be NULL after blk_integrity_register(), and
-Ilya> since the latter "must" be used for registering the profile with
-Ilya> the block layer, wouldn't the following be sufficient for
-Ilya> blk_integrity users?
+add_disk
+  register_disk
+    blkdev_get
+      rescan_partitions
+        blk_integrity_revalidate
 
-IIrc, the FL_UP check fixed a registration problem in the nvme driver.
+void blk_integrity_revalidate(struct gendisk *disk)
+{
+        struct blk_integrity *bi = &disk->queue->integrity;
 
-The rationale behind revalidate was that we need to handle devices which
-lose the integrity capability at runtime (i.e. a integrity-enabled DM
-device is extended with a non-cable drive forcing the feature to be
-turned off). The clearing of the integrity profile is more important in
-that case than zapping the stable pages flag. But that was the original
-reason for not just ORing BDI_CAP_STABLE_WRITES.
+        if (!(disk->flags & GENHD_FL_UP))
+                return;
 
-I don't have a huge problem with keeping stable pages on if a device
-suddenly stops being integrity capable. However, I'd like to understand
-your use case a bit better.
+        if (bi->profile)
+                disk->queue->backing_dev_info.capabilities |=
+                        BDI_CAP_STABLE_WRITES;
+        else
+                disk->queue->backing_dev_info.capabilities &=
+                        ~BDI_CAP_STABLE_WRITES;
+}
 
-Ilya> The alternative seems to be to set up a bogus
-Ilya> blk_integrity_profile (nop_profile won't do -- this one would have
-Ilya> to be truly bogus w/ NULL *_fn) under BLK_DEV_INTEGRITY ifdefs and
-Ilya> hope that nothing breaks.
+ceph messenger is responsible for generating/verifying CRCs, so we
+don't call blk_integrity_register() -- bi->profile is NULL.
 
-Can you point me to the relevant code on your end?
+Martin, could you please explain blk_integrity_revalidate() and its
+GENHD_FL_UP check in particular?  We have the queue, bi->profile can't
+be NULL after blk_integrity_register(), and since the latter "must" be
+used for registering the profile with the block layer, wouldn't the
+following be sufficient for blk_integrity users?
+
+diff --git a/block/blk-integrity.c b/block/blk-integrity.c
+index d69c5c79f98e..319f2e4f4a8b 100644
+--- a/block/blk-integrity.c
++++ b/block/blk-integrity.c
+@@ -417,7 +417,7 @@ void blk_integrity_register(struct gendisk *disk,
+struct blk_integrity *template
+        bi->tuple_size = template->tuple_size;
+        bi->tag_size = template->tag_size;
+
+-       blk_integrity_revalidate(disk);
++       disk->queue->backing_dev_info.capabilities |= BDI_CAP_STABLE_WRITES;
+ }
+ EXPORT_SYMBOL(blk_integrity_register);
+
+@@ -430,26 +430,11 @@ EXPORT_SYMBOL(blk_integrity_register);
+  */
+ void blk_integrity_unregister(struct gendisk *disk)
+ {
+-       blk_integrity_revalidate(disk);
++       disk->queue->backing_dev_info.capabilities &= ~BDI_CAP_STABLE_WRITES;
+        memset(&disk->queue->integrity, 0, sizeof(struct blk_integrity));
+ }
+ EXPORT_SYMBOL(blk_integrity_unregister);
+
+blk_integrity_revalidate() can then go away -- I can send the full
+patch later.
+
+The alternative seems to be to set up a bogus blk_integrity_profile
+(nop_profile won't do -- this one would have to be truly bogus w/ NULL
+->*_fn) under BLK_DEV_INTEGRITY ifdefs and hope that nothing breaks.
+That can't be the right thing to do here...
 
 Thanks,
-Martin
 
--- 
-Martin K. Petersen	Oracle Linux Engineering
+                Ilya
