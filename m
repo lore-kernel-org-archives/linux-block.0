@@ -1,36 +1,52 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga05.intel.com ([192.55.52.43]:22646 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S964776AbdBQW40 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Feb 2017 17:56:26 -0500
-From: Jon Derrick <jonathan.derrick@intel.com>
-Cc: Jon Derrick <jonathan.derrick@intel.com>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        Scott Bauer <scott.bauer@intel.com>,
-        Rafael Antognolli <rafael.antognolli@intel.com>,
-        Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@lst.de>
-Subject: [PATCH 0/5] OPAL patches cont'd
-Date: Fri, 17 Feb 2017 15:56:13 -0700
-Message-Id: <1487372178-15715-1-git-send-email-jonathan.derrick@intel.com>
-To: unlisted-recipients:; (no To-header on input)
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <James.Bottomley@hansenpartnership.com>
+Message-ID: <1487611446.2337.19.camel@HansenPartnership.com>
+Subject: Re: [PATCH 0/5] block subsystem refcounter conversions
+From: James Bottomley <James.Bottomley@HansenPartnership.com>
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: Jens Axboe <axboe@kernel.dk>, Elena Reshetova
+ <elena.reshetova@intel.com>,  linux-kernel@vger.kernel.org,
+ linux-block@vger.kernel.org,  linux-scsi@vger.kernel.org,
+ linux-btrfs@vger.kernel.org,  gregkh@linuxfoundation.org,
+ fujita.tomonori@lab.ntt.co.jp, mingo@redhat.com,  clm@fb.com,
+ jbacik@fb.com, dsterba@suse.com
+Date: Mon, 20 Feb 2017 09:24:06 -0800
+In-Reply-To: <20170220165639.GE6515@twins.programming.kicks-ass.net>
+References: <1487589368-17666-1-git-send-email-elena.reshetova@intel.com>
+	 <5fd906c2-61ba-319c-1bc2-cb48b2b378b4@kernel.dk>
+	 <1487605261.2337.4.camel@HansenPartnership.com>
+	 <20170220165639.GE6515@twins.programming.kicks-ass.net>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+List-ID: <linux-block@vger.kernel.org>
 
-The first three in the series have been reviewed already but I wanted to
-squash them with the next two since they haven't been pulled yet.
+On Mon, 2017-02-20 at 17:56 +0100, Peter Zijlstra wrote:
+> On Mon, Feb 20, 2017 at 07:41:01AM -0800, James Bottomley wrote:
+> > On Mon, 2017-02-20 at 08:15 -0700, Jens Axboe wrote:
+> > > On 02/20/2017 04:16 AM, Elena Reshetova wrote:
+> > > > Now when new refcount_t type and API are finally merged
+> > > > (see include/linux/refcount.h), the following
+> > > > patches convert various refcounters in the block susystem from 
+> > > > atomic_t to refcount_t. By doing this we prevent intentional or
+> > > > accidental underflows or overflows that can led to use-after
+> > > > -free vulnerabilities.
+> > 
+> > This description isn't right ... nothing is prevented; we get 
+> > warnings on saturation and use after free with this.
+> 
+> The thing that is prevented is overflow and then a use-after-free by
+> making it a leak.
+> 
+> Modular stuff, you put and free at: (n+1) mod n, by saturating at n-1
+> we'll never get there.
+> 
+> So you loose use-after-free, you gain a resource leak. The general 
+> idea being that use-after-free is a nice trampoline for exploits, 
+> leaks are 'only' a DoS.
 
-The latter 2 are an attempt to refactor some of the awkward func data
-and state separation into a common struct
+OK, I see the intention: it's protection from outside influence.  It
+still doesn't prevent *us* from screwing up in the kernel and inducing
+a use after free by doing too many puts (or too few gets) ... that's
+what the message suggests to me (me coding wrongly is accidental
+underflows or overflows as I read it).
 
-Jon Derrick (5):
-  block/sed: Use ssize_t on atom parsers to return errors
-  block/sed: Add helper to qualify response tokens
-  block/sed: Check received header lengths
-  block/sed: embedded function data into the function sequence
-  block/sed: Eliminate state variable
-
- block/sed-opal.c | 494 +++++++++++++++++++++++--------------------------------
- 1 file changed, 202 insertions(+), 292 deletions(-)
-
--- 
-1.8.3.1
+James
