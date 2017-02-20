@@ -1,47 +1,103 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Jan Kara <jack@suse.cz>
-To: <linux-fsdevel@vger.kernel.org>
-Cc: Christoph Hellwig <hch@infradead.org>, linux-block@vger.kernel.org,
-        Jan Kara <jack@suse.cz>
-Subject: [PATCH 05/24] fs: Get proper reference for s_bdi
-Date: Thu,  2 Feb 2017 18:34:03 +0100
-Message-Id: <20170202173422.3240-6-jack@suse.cz>
-In-Reply-To: <20170202173422.3240-1-jack@suse.cz>
-References: <20170202173422.3240-1-jack@suse.cz>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <elena.reshetova@intel.com>
+From: Elena Reshetova <elena.reshetova@intel.com>
+To: linux-kernel@vger.kernel.org
+Cc: linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	peterz@infradead.org,
+	gregkh@linuxfoundation.org,
+	axboe@kernel.dk,
+	fujita.tomonori@lab.ntt.co.jp,
+	mingo@redhat.com,
+	clm@fb.com,
+	jbacik@fb.com,
+	dsterba@suse.com,
+	Elena Reshetova <elena.reshetova@intel.com>,
+	Hans Liljestrand <ishkamiel@gmail.com>,
+	Kees Cook <keescook@chromium.org>,
+	David Windsor <dwindsor@gmail.com>
+Subject: [PATCH 2/5] block: convert blk_queue_tag.refcnt from atomic_t to refcount_t
+Date: Mon, 20 Feb 2017 13:16:05 +0200
+Message-Id: <1487589368-17666-3-git-send-email-elena.reshetova@intel.com>
+In-Reply-To: <1487589368-17666-1-git-send-email-elena.reshetova@intel.com>
+References: <1487589368-17666-1-git-send-email-elena.reshetova@intel.com>
 List-ID: <linux-block@vger.kernel.org>
 
-So far we just relied on block device to hold a bdi reference for us
-while the filesystem is mounted. While that works perfectly fine, it is
-a bit awkward that we have a pointer to a refcounted structure in the
-superblock without proper reference. So make s_bdi hold a proper
-reference to block device's BDI. No filesystem using mount_bdev()
-actually changes s_bdi so this is safe and will make bdev filesystems
-work the same way as filesystems needing to set up their private bdi.
+refcount_t type and corresponding API should be
+used instead of atomic_t when the variable is used as
+a reference counter. This allows to avoid accidental
+refcounter overflows that might lead to use-after-free
+situations.
 
-Signed-off-by: Jan Kara <jack@suse.cz>
+Signed-off-by: Elena Reshetova <elena.reshetova@intel.com>
+Signed-off-by: Hans Liljestrand <ishkamiel@gmail.com>
+Signed-off-by: Kees Cook <keescook@chromium.org>
+Signed-off-by: David Windsor <dwindsor@gmail.com>
 ---
- fs/super.c | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
+ block/blk-tag.c        | 8 ++++----
+ include/linux/blkdev.h | 3 ++-
+ 2 files changed, 6 insertions(+), 5 deletions(-)
 
-diff --git a/fs/super.c b/fs/super.c
-index 31dc4c6450ef..dfb95ccd4351 100644
---- a/fs/super.c
-+++ b/fs/super.c
-@@ -1047,12 +1047,9 @@ static int set_bdev_super(struct super_block *s, void *data)
+diff --git a/block/blk-tag.c b/block/blk-tag.c
+index 07cc329..d83555e 100644
+--- a/block/blk-tag.c
++++ b/block/blk-tag.c
+@@ -35,7 +35,7 @@ EXPORT_SYMBOL(blk_queue_find_tag);
+  */
+ void blk_free_tags(struct blk_queue_tag *bqt)
  {
- 	s->s_bdev = data;
- 	s->s_dev = s->s_bdev->bd_dev;
-+	s->s_bdi = bdi_get(s->s_bdev->bd_bdi);
-+	s->s_iflags |= SB_I_DYNBDI;
+-	if (atomic_dec_and_test(&bqt->refcnt)) {
++	if (refcount_dec_and_test(&bqt->refcnt)) {
+ 		BUG_ON(find_first_bit(bqt->tag_map, bqt->max_depth) <
+ 							bqt->max_depth);
  
--	/*
--	 * We set the bdi here to the queue backing, file systems can
--	 * overwrite this in ->fill_super()
--	 */
--	s->s_bdi = bdev_get_queue(s->s_bdev)->backing_dev_info;
- 	return 0;
- }
+@@ -130,7 +130,7 @@ static struct blk_queue_tag *__blk_queue_init_tags(struct request_queue *q,
+ 	if (init_tag_map(q, tags, depth))
+ 		goto fail;
  
+-	atomic_set(&tags->refcnt, 1);
++	refcount_set(&tags->refcnt, 1);
+ 	tags->alloc_policy = alloc_policy;
+ 	tags->next_tag = 0;
+ 	return tags;
+@@ -180,7 +180,7 @@ int blk_queue_init_tags(struct request_queue *q, int depth,
+ 		queue_flag_set(QUEUE_FLAG_QUEUED, q);
+ 		return 0;
+ 	} else
+-		atomic_inc(&tags->refcnt);
++		refcount_inc(&tags->refcnt);
+ 
+ 	/*
+ 	 * assign it, all done
+@@ -225,7 +225,7 @@ int blk_queue_resize_tags(struct request_queue *q, int new_depth)
+ 	 * Currently cannot replace a shared tag map with a new
+ 	 * one, so error out if this is the case
+ 	 */
+-	if (atomic_read(&bqt->refcnt) != 1)
++	if (refcount_read(&bqt->refcnt) != 1)
+ 		return -EBUSY;
+ 
+ 	/*
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index aecca0e..95ef11c 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -25,6 +25,7 @@
+ #include <linux/percpu-refcount.h>
+ #include <linux/scatterlist.h>
+ #include <linux/blkzoned.h>
++#include <linux/refcount.h>
+ 
+ struct module;
+ struct scsi_ioctl_command;
+@@ -288,7 +289,7 @@ struct blk_queue_tag {
+ 	unsigned long *tag_map;		/* bit map of free/busy tags */
+ 	int max_depth;			/* what we will send to device */
+ 	int real_max_depth;		/* what the array can hold */
+-	atomic_t refcnt;		/* map can be shared */
++	refcount_t refcnt;		/* map can be shared */
+ 	int alloc_policy;		/* tag allocation policy */
+ 	int next_tag;			/* next tag */
+ };
 -- 
-2.10.2
+2.7.4
