@@ -1,58 +1,89 @@
-Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
-From: Jon Derrick <jonathan.derrick@intel.com>
-To: 
-Subject: [PATCHv4 0/4] OPAL patches, cont'd
-Date: Tue, 21 Feb 2017 11:59:12 -0700
-Message-Id: <1487703556-19913-1-git-send-email-jonathan.derrick@intel.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
-List-Post: <mailto:linux-nvme@lists.infradead.org>
-List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
-Cc: Jens Axboe <axboe@fb.com>, Rafael Antognolli <rafael.antognolli@intel.com>,
- linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
- Jon Derrick <jonathan.derrick@intel.com>, Christoph Hellwig <hch@lst.de>,
- Scott Bauer <scott.bauer@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
-Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
+Return-Path: <elena.reshetova@intel.com>
+From: Elena Reshetova <elena.reshetova@intel.com>
+To: linux-kernel@vger.kernel.org
+Cc: linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	peterz@infradead.org,
+	gregkh@linuxfoundation.org,
+	axboe@kernel.dk,
+	fujita.tomonori@lab.ntt.co.jp,
+	mingo@redhat.com,
+	clm@fb.com,
+	jbacik@fb.com,
+	dsterba@suse.com,
+	Elena Reshetova <elena.reshetova@intel.com>,
+	Hans Liljestrand <ishkamiel@gmail.com>,
+	Kees Cook <keescook@chromium.org>,
+	David Windsor <dwindsor@gmail.com>
+Subject: [PATCH 5/5] block: convert bsg_device.ref_count from atomic_t to refcount_t
+Date: Mon, 20 Feb 2017 13:16:08 +0200
+Message-Id: <1487589368-17666-6-git-send-email-elena.reshetova@intel.com>
+In-Reply-To: <1487589368-17666-1-git-send-email-elena.reshetova@intel.com>
+References: <1487589368-17666-1-git-send-email-elena.reshetova@intel.com>
 List-ID: <linux-block@vger.kernel.org>
 
-v3->v4:
-Passes in 'lock_held' into opal_lock_unlock() so we don't need to
-mutex_trylock(). I wasn't totally confident in that approach anyways.
+refcount_t type and corresponding API should be
+used instead of atomic_t when the variable is used as
+a reference counter. This allows to avoid accidental
+refcounter overflows that might lead to use-after-free
+situations.
 
-v2->v3:
-Squashed 5/5 into 4/5
-Changed opal_step structs back to const
-Cleaned up opal_lock_unlock
+Signed-off-by: Elena Reshetova <elena.reshetova@intel.com>
+Signed-off-by: Hans Liljestrand <ishkamiel@gmail.com>
+Signed-off-by: Kees Cook <keescook@chromium.org>
+Signed-off-by: David Windsor <dwindsor@gmail.com>
+---
+ block/bsg.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-v1->v2:
-Moved misplaced code from 5/5 to 4/5
-
-The first three in the series have been reviewed already but I wanted to
-squash them with the last patch since they haven't been pulled yet.
-
-The last patch is an attempt to refactor some of the awkward func data
-and state separation into a common struct
-
-Jon Derrick (4):
-  block/sed: Use ssize_t on atom parsers to return errors
-  block/sed: Add helper to qualify response tokens
-  block/sed: Check received header lengths
-  block/sed: Embed function data into the function sequence
-
- block/sed-opal.c | 552 +++++++++++++++++++++++--------------------------------
- 1 file changed, 227 insertions(+), 325 deletions(-)
-
+diff --git a/block/bsg.c b/block/bsg.c
+index 74835db..6d0ceb9 100644
+--- a/block/bsg.c
++++ b/block/bsg.c
+@@ -21,6 +21,7 @@
+ #include <linux/idr.h>
+ #include <linux/bsg.h>
+ #include <linux/slab.h>
++#include <linux/refcount.h>
+ 
+ #include <scsi/scsi.h>
+ #include <scsi/scsi_ioctl.h>
+@@ -38,7 +39,7 @@ struct bsg_device {
+ 	struct list_head busy_list;
+ 	struct list_head done_list;
+ 	struct hlist_node dev_list;
+-	atomic_t ref_count;
++	refcount_t ref_count;
+ 	int queued_cmds;
+ 	int done_cmds;
+ 	wait_queue_head_t wq_done;
+@@ -711,7 +712,7 @@ static int bsg_put_device(struct bsg_device *bd)
+ 
+ 	mutex_lock(&bsg_mutex);
+ 
+-	do_free = atomic_dec_and_test(&bd->ref_count);
++	do_free = refcount_dec_and_test(&bd->ref_count);
+ 	if (!do_free) {
+ 		mutex_unlock(&bsg_mutex);
+ 		goto out;
+@@ -763,7 +764,7 @@ static struct bsg_device *bsg_add_device(struct inode *inode,
+ 
+ 	bsg_set_block(bd, file);
+ 
+-	atomic_set(&bd->ref_count, 1);
++	refcount_set(&bd->ref_count, 1);
+ 	mutex_lock(&bsg_mutex);
+ 	hlist_add_head(&bd->dev_list, bsg_dev_idx_hash(iminor(inode)));
+ 
+@@ -783,7 +784,7 @@ static struct bsg_device *__bsg_get_device(int minor, struct request_queue *q)
+ 
+ 	hlist_for_each_entry(bd, bsg_dev_idx_hash(minor), dev_list) {
+ 		if (bd->queue == q) {
+-			atomic_inc(&bd->ref_count);
++			refcount_inc(&bd->ref_count);
+ 			goto found;
+ 		}
+ 	}
 -- 
-1.8.3.1
-
-
-_______________________________________________
-Linux-nvme mailing list
-Linux-nvme@lists.infradead.org
-http://lists.infradead.org/mailman/listinfo/linux-nvme
+2.7.4
