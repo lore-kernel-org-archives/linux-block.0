@@ -1,84 +1,120 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-ot0-f194.google.com ([74.125.82.194]:33061 "EHLO
-        mail-ot0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752542AbdBNP3Y (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Feb 2017 10:29:24 -0500
-From: Ming Lei <tom.leiming@gmail.com>
-To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
-        linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        NeilBrown <neilb@suse.com>
-Cc: Ming Lei <tom.leiming@gmail.com>
-Subject: [PATCH v2 3/5] md/raid1: use bio_clone_bioset_partial() in case of write behind
-Date: Tue, 14 Feb 2017 23:29:01 +0800
-Message-Id: <1487086143-10255-4-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1487086143-10255-1-git-send-email-tom.leiming@gmail.com>
-References: <1487086143-10255-1-git-send-email-tom.leiming@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <elena.reshetova@intel.com>
+From: Elena Reshetova <elena.reshetova@intel.com>
+To: linux-kernel@vger.kernel.org
+Cc: linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	peterz@infradead.org,
+	gregkh@linuxfoundation.org,
+	axboe@kernel.dk,
+	fujita.tomonori@lab.ntt.co.jp,
+	mingo@redhat.com,
+	clm@fb.com,
+	jbacik@fb.com,
+	dsterba@suse.com,
+	Elena Reshetova <elena.reshetova@intel.com>,
+	Hans Liljestrand <ishkamiel@gmail.com>,
+	Kees Cook <keescook@chromium.org>,
+	David Windsor <dwindsor@gmail.com>
+Subject: [PATCH 4/5] block: convert io_context.active_ref from atomic_t to refcount_t
+Date: Mon, 20 Feb 2017 13:16:07 +0200
+Message-Id: <1487589368-17666-5-git-send-email-elena.reshetova@intel.com>
+In-Reply-To: <1487589368-17666-1-git-send-email-elena.reshetova@intel.com>
+References: <1487589368-17666-1-git-send-email-elena.reshetova@intel.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Write behind need to replace pages in bio's bvecs, and we have
-to clone a fresh bio with new bvec table, so use the introduced
-bio_clone_bioset_partial() for it.
+refcount_t type and corresponding API should be
+used instead of atomic_t when the variable is used as
+a reference counter. This allows to avoid accidental
+refcounter overflows that might lead to use-after-free
+situations.
 
-For other bio_clone_mddev() cases, we will use fast clone since
-they don't need to touch bvec table.
-
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+Signed-off-by: Elena Reshetova <elena.reshetova@intel.com>
+Signed-off-by: Hans Liljestrand <ishkamiel@gmail.com>
+Signed-off-by: Kees Cook <keescook@chromium.org>
+Signed-off-by: David Windsor <dwindsor@gmail.com>
 ---
- drivers/md/raid1.c | 20 +++++++++++++++-----
- 1 file changed, 15 insertions(+), 5 deletions(-)
+ block/blk-ioc.c           | 4 ++--
+ block/cfq-iosched.c       | 4 ++--
+ include/linux/iocontext.h | 7 ++++---
+ 3 files changed, 8 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
-index 830ff2b20346..b7548e0a9eca 100644
---- a/drivers/md/raid1.c
-+++ b/drivers/md/raid1.c
-@@ -1341,13 +1341,12 @@ static void raid1_write_request(struct mddev *mddev, struct bio *bio,
+diff --git a/block/blk-ioc.c b/block/blk-ioc.c
+index b12f9c8..130dc23 100644
+--- a/block/blk-ioc.c
++++ b/block/blk-ioc.c
+@@ -173,7 +173,7 @@ void put_io_context_active(struct io_context *ioc)
+ 	unsigned long flags;
+ 	struct io_cq *icq;
  
- 	first_clone = 1;
- 	for (i = 0; i < disks; i++) {
--		struct bio *mbio;
-+		struct bio *mbio = NULL;
-+		sector_t offset;
- 		if (!r1_bio->bios[i])
- 			continue;
+-	if (!atomic_dec_and_test(&ioc->active_ref)) {
++	if (!refcount_dec_and_test(&ioc->active_ref)) {
+ 		put_io_context(ioc);
+ 		return;
+ 	}
+@@ -256,7 +256,7 @@ int create_task_io_context(struct task_struct *task, gfp_t gfp_flags, int node)
+ 	/* initialize */
+ 	atomic_long_set(&ioc->refcount, 1);
+ 	atomic_set(&ioc->nr_tasks, 1);
+-	atomic_set(&ioc->active_ref, 1);
++	refcount_set(&ioc->active_ref, 1);
+ 	spin_lock_init(&ioc->lock);
+ 	INIT_RADIX_TREE(&ioc->icq_tree, GFP_ATOMIC | __GFP_HIGH);
+ 	INIT_HLIST_HEAD(&ioc->icq_list);
+diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
+index 9212627..2871bb9 100644
+--- a/block/cfq-iosched.c
++++ b/block/cfq-iosched.c
+@@ -2959,7 +2959,7 @@ static void cfq_arm_slice_timer(struct cfq_data *cfqd)
+ 	 * task has exited, don't wait
+ 	 */
+ 	cic = cfqd->active_cic;
+-	if (!cic || !atomic_read(&cic->icq.ioc->active_ref))
++	if (!cic || !refcount_read(&cic->icq.ioc->active_ref))
+ 		return;
  
--		mbio = bio_clone_mddev(bio, GFP_NOIO, mddev);
--		bio_trim(mbio, r1_bio->sector - bio->bi_iter.bi_sector,
--			 max_sectors);
-+		offset = r1_bio->sector - bio->bi_iter.bi_sector;
+ 	/*
+@@ -3959,7 +3959,7 @@ cfq_update_idle_window(struct cfq_data *cfqd, struct cfq_queue *cfqq,
  
- 		if (first_clone) {
- 			/* do behind I/O ?
-@@ -1357,8 +1356,13 @@ static void raid1_write_request(struct mddev *mddev, struct bio *bio,
- 			if (bitmap &&
- 			    (atomic_read(&bitmap->behind_writes)
- 			     < mddev->bitmap_info.max_write_behind) &&
--			    !waitqueue_active(&bitmap->behind_wait))
-+			    !waitqueue_active(&bitmap->behind_wait)) {
-+				mbio = bio_clone_bioset_partial(bio, GFP_NOIO,
-+								mddev->bio_set,
-+								offset,
-+								max_sectors);
- 				alloc_behind_pages(mbio, r1_bio);
-+			}
+ 	if (cfqq->next_rq && req_noidle(cfqq->next_rq))
+ 		enable_idle = 0;
+-	else if (!atomic_read(&cic->icq.ioc->active_ref) ||
++	else if (!refcount_read(&cic->icq.ioc->active_ref) ||
+ 		 !cfqd->cfq_slice_idle ||
+ 		 (!cfq_cfqq_deep(cfqq) && CFQQ_SEEKY(cfqq)))
+ 		enable_idle = 0;
+diff --git a/include/linux/iocontext.h b/include/linux/iocontext.h
+index df38db2..a1e28c3 100644
+--- a/include/linux/iocontext.h
++++ b/include/linux/iocontext.h
+@@ -3,6 +3,7 @@
  
- 			bitmap_startwrite(bitmap, r1_bio->sector,
- 					  r1_bio->sectors,
-@@ -1366,6 +1370,12 @@ static void raid1_write_request(struct mddev *mddev, struct bio *bio,
- 						   &r1_bio->state));
- 			first_clone = 0;
- 		}
-+
-+		if (!mbio) {
-+			mbio = bio_clone_mddev(bio, GFP_NOIO, mddev);
-+			bio_trim(mbio, offset, max_sectors);
-+		}
-+
- 		if (r1_bio->behind_bvecs) {
- 			struct bio_vec *bvec;
- 			int j;
+ #include <linux/radix-tree.h>
+ #include <linux/rcupdate.h>
++#include <linux/refcount.h>
+ #include <linux/workqueue.h>
+ 
+ enum {
+@@ -96,7 +97,7 @@ struct io_cq {
+  */
+ struct io_context {
+ 	atomic_long_t refcount;
+-	atomic_t active_ref;
++	refcount_t active_ref;
+ 	atomic_t nr_tasks;
+ 
+ 	/* all the fields below are protected by this lock */
+@@ -128,9 +129,9 @@ struct io_context {
+ static inline void get_io_context_active(struct io_context *ioc)
+ {
+ 	WARN_ON_ONCE(atomic_long_read(&ioc->refcount) <= 0);
+-	WARN_ON_ONCE(atomic_read(&ioc->active_ref) <= 0);
++	WARN_ON_ONCE(refcount_read(&ioc->active_ref) == 0);
+ 	atomic_long_inc(&ioc->refcount);
+-	atomic_inc(&ioc->active_ref);
++	refcount_inc(&ioc->active_ref);
+ }
+ 
+ static inline void ioc_task_link(struct io_context *ioc)
 -- 
 2.7.4
