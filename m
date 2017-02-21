@@ -1,65 +1,57 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-ua0-f173.google.com ([209.85.217.173]:35088 "EHLO
-        mail-ua0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932084AbdBVKVo (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Feb 2017 05:21:44 -0500
-MIME-Version: 1.0
-In-Reply-To: <20170221171441.GA15875@quack2.suse.cz>
-References: <20170218003015.GA19776@vader.DHCP.thefacebook.com>
- <1487378636.4351.45.camel@HansenPartnership.com> <20170220021958.GA26238@vader>
- <20170221171441.GA15875@quack2.suse.cz>
-From: Ming Lei <tom.leiming@gmail.com>
-Date: Wed, 22 Feb 2017 18:21:42 +0800
-Message-ID: <CACVXFVOzpiXF=0vi5-y4hB+XZK2asDYyeQj9k0btRguiJVKeOw@mail.gmail.com>
-Subject: Re: Manual driver binding and unbinding broken for SCSI
-To: Jan Kara <jack@suse.cz>
-Cc: Omar Sandoval <osandov@osandov.com>,
-        James Bottomley <James.Bottomley@hansenpartnership.com>,
+Received: from mx2.suse.de ([195.135.220.15]:56596 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753514AbdBUROp (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 21 Feb 2017 12:14:45 -0500
+Date: Tue, 21 Feb 2017 18:14:41 +0100
+From: Jan Kara <jack@suse.cz>
+To: Omar Sandoval <osandov@osandov.com>
+Cc: James Bottomley <James.Bottomley@HansenPartnership.com>,
         Dan Williams <dan.j.williams@intel.com>,
+        Jan Kara <jack@suse.cz>,
         "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Jens Axboe <axboe@fb.com>,
-        Linux SCSI List <linux-scsi@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+        Jens Axboe <axboe@fb.com>, linux-scsi@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: Re: Manual driver binding and unbinding broken for SCSI
+Message-ID: <20170221171441.GA15875@quack2.suse.cz>
+References: <20170218003015.GA19776@vader.DHCP.thefacebook.com>
+ <1487378636.4351.45.camel@HansenPartnership.com>
+ <20170220021958.GA26238@vader>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170220021958.GA26238@vader>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Wed, Feb 22, 2017 at 1:14 AM, Jan Kara <jack@suse.cz> wrote:
-> On Sun 19-02-17 18:19:58, Omar Sandoval wrote:
->> On Fri, Feb 17, 2017 at 04:43:56PM -0800, James Bottomley wrote:
->> > This seems to be related to a 0day test we got on the block tree,
->> > details here:
->> >
->> > http://marc.info/?t=148624068800001
->> >
->> > I root caused the above to something not being released when it should
->> > be, so it looks like you have the same problem.  It seems to be a
->> > recent commit in the block tree, so could you bisect it since you have
->> > a nice reproducer?
->>
->> These appear to actually be two separate issues.
->>
->> The unbind followed by bind crash only happens with scsi-mq. It reproes
->> since at least 4.0.
->>
->> The unbind followed by a new device coming up crash happens both with
->> and without scsi-mq. The earliest version I was able to check for that
->> was 4.6, which did reproduce.
->>
->> I'll see if I can get some more info on these two issues separately.
->
-> Actually, the second issue is only a warning right? And if I understand the
-> issue correctly, it should be fixed by either Dan's patches in linux-block
-> or my patch 4 in the series which matches your test results. So that is
-> dealt with. I have no idea about the first issue though.
+On Sun 19-02-17 18:19:58, Omar Sandoval wrote:
+> On Fri, Feb 17, 2017 at 04:43:56PM -0800, James Bottomley wrote:
+> > This seems to be related to a 0day test we got on the block tree,
+> > details here:
+> > 
+> > http://marc.info/?t=148624068800001
+> > 
+> > I root caused the above to something not being released when it should
+> > be, so it looks like you have the same problem.  It seems to be a
+> > recent commit in the block tree, so could you bisect it since you have
+> > a nice reproducer?
+> 
+> These appear to actually be two separate issues.
+> 
+> The unbind followed by bind crash only happens with scsi-mq. It reproes
+> since at least 4.0.
+> 
+> The unbind followed by a new device coming up crash happens both with
+> and without scsi-mq. The earliest version I was able to check for that
+> was 4.6, which did reproduce.
+> 
+> I'll see if I can get some more info on these two issues separately.
 
-Looks the 1st one is one old issue in blk-mq, and I have sent one patchset
-to address it:
+Actually, the second issue is only a warning right? And if I understand the
+issue correctly, it should be fixed by either Dan's patches in linux-block
+or my patch 4 in the series which matches your test results. So that is
+dealt with. I have no idea about the first issue though.
 
-http://marc.info/?l=linux-kernel&m=148775847517071&w=2
-
-Omar, feel free to give a test.
-
-thanks,
-Ming Lei
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
