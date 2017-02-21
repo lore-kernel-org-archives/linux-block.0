@@ -1,95 +1,50 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f65.google.com ([74.125.83.65]:36605 "EHLO
-        mail-pg0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752366AbdB1Pmw (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Feb 2017 10:42:52 -0500
-From: Ming Lei <tom.leiming@gmail.com>
-To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
-        linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Ming Lei <tom.leiming@gmail.com>
-Subject: [PATCH v2 12/13] md: raid10: retrieve page from preallocated resync page array
-Date: Tue, 28 Feb 2017 23:41:42 +0800
-Message-Id: <1488296503-4987-13-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1488296503-4987-1-git-send-email-tom.leiming@gmail.com>
-References: <1488296503-4987-1-git-send-email-tom.leiming@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jack@suse.cz>
+From: Jan Kara <jack@suse.cz>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
+	Lekshmi Pillai <lekshmicpillai@in.ibm.com>,
+	Tejun Heo <tj@kernel.org>,
+	NeilBrown <neilb@suse.de>,
+	Omar Sandoval <osandov@osandov.com>,
+	Jan Kara <jack@suse.cz>
+Subject: [PATCH 01/13] block: Move bdev_unhash_inode() after invalidate_partition()
+Date: Tue, 21 Feb 2017 18:09:46 +0100
+Message-Id: <20170221170958.21845-2-jack@suse.cz>
+In-Reply-To: <20170221170958.21845-1-jack@suse.cz>
+References: <20170221170958.21845-1-jack@suse.cz>
+List-ID: <linux-block@vger.kernel.org>
 
-Now one page array is allocated for each resync bio, and we can
-retrieve page from this table directly.
+Move bdev_unhash_inode() after invalidate_partition() as
+invalidate_partition() looks up bdev and it cannot find the right bdev
+inode after bdev_unhash_inode() is called. Thus invalidate_partition()
+would not invalidate page cache of the previously used bdev. Also use
+part_devt() when calling bdev_unhash_inode() instead of manually
+creating the device number.
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+Tested-by: Lekshmi Pillai <lekshmicpillai@in.ibm.com>
+Acked-by: Tejun Heo <tj@kernel.org>
+Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- drivers/md/raid10.c | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
+ block/genhd.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
-index f887b21332e7..0b97631e3905 100644
---- a/drivers/md/raid10.c
-+++ b/drivers/md/raid10.c
-@@ -2065,6 +2065,7 @@ static void sync_request_write(struct mddev *mddev, struct r10bio *r10_bio)
- 	int i, first;
- 	struct bio *tbio, *fbio;
- 	int vcnt;
-+	struct page **tpages, **fpages;
- 
- 	atomic_set(&r10_bio->remaining, 1);
- 
-@@ -2080,6 +2081,7 @@ static void sync_request_write(struct mddev *mddev, struct r10bio *r10_bio)
- 	fbio = r10_bio->devs[i].bio;
- 	fbio->bi_iter.bi_size = r10_bio->sectors << 9;
- 	fbio->bi_iter.bi_idx = 0;
-+	fpages = get_resync_pages(fbio)->pages;
- 
- 	vcnt = (r10_bio->sectors + (PAGE_SIZE >> 9) - 1) >> (PAGE_SHIFT - 9);
- 	/* now find blocks with errors */
-@@ -2094,6 +2096,8 @@ static void sync_request_write(struct mddev *mddev, struct r10bio *r10_bio)
- 			continue;
- 		if (i == first)
- 			continue;
-+
-+		tpages = get_resync_pages(tbio)->pages;
- 		d = r10_bio->devs[i].devnum;
- 		rdev = conf->mirrors[d].rdev;
- 		if (!r10_bio->devs[i].bio->bi_error) {
-@@ -2106,8 +2110,8 @@ static void sync_request_write(struct mddev *mddev, struct r10bio *r10_bio)
- 				int len = PAGE_SIZE;
- 				if (sectors < (len / 512))
- 					len = sectors * 512;
--				if (memcmp(page_address(fbio->bi_io_vec[j].bv_page),
--					   page_address(tbio->bi_io_vec[j].bv_page),
-+				if (memcmp(page_address(fpages[j]),
-+					   page_address(tpages[j]),
- 					   len))
- 					break;
- 				sectors -= len/512;
-@@ -2205,6 +2209,7 @@ static void fix_recovery_read_error(struct r10bio *r10_bio)
- 	int idx = 0;
- 	int dr = r10_bio->devs[0].devnum;
- 	int dw = r10_bio->devs[1].devnum;
-+	struct page **pages = get_resync_pages(bio)->pages;
- 
- 	while (sectors) {
- 		int s = sectors;
-@@ -2220,7 +2225,7 @@ static void fix_recovery_read_error(struct r10bio *r10_bio)
- 		ok = sync_page_io(rdev,
- 				  addr,
- 				  s << 9,
--				  bio->bi_io_vec[idx].bv_page,
-+				  pages[idx],
- 				  REQ_OP_READ, 0, false);
- 		if (ok) {
- 			rdev = conf->mirrors[dw].rdev;
-@@ -2228,7 +2233,7 @@ static void fix_recovery_read_error(struct r10bio *r10_bio)
- 			ok = sync_page_io(rdev,
- 					  addr,
- 					  s << 9,
--					  bio->bi_io_vec[idx].bv_page,
-+					  pages[idx],
- 					  REQ_OP_WRITE, 0, false);
- 			if (!ok) {
- 				set_bit(WriteErrorSeen, &rdev->flags);
+diff --git a/block/genhd.c b/block/genhd.c
+index d9ccd42f3675..6cb9f3a34a92 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -648,9 +648,8 @@ void del_gendisk(struct gendisk *disk)
+ 	disk_part_iter_init(&piter, disk,
+ 			     DISK_PITER_INCL_EMPTY | DISK_PITER_REVERSE);
+ 	while ((part = disk_part_iter_next(&piter))) {
+-		bdev_unhash_inode(MKDEV(disk->major,
+-					disk->first_minor + part->partno));
+ 		invalidate_partition(disk, part->partno);
++		bdev_unhash_inode(part_devt(part));
+ 		delete_partition(disk, part->partno);
+ 	}
+ 	disk_part_iter_exit(&piter);
 -- 
-2.7.4
+2.10.2
