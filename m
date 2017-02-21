@@ -1,19 +1,19 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:51814 "EHLO mga02.intel.com"
+Received: from mga03.intel.com ([134.134.136.65]:2024 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753278AbdBUS7q (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Feb 2017 13:59:46 -0500
+        id S1753922AbdBUSoy (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 21 Feb 2017 13:44:54 -0500
 From: Jon Derrick <jonathan.derrick@intel.com>
 Cc: Jon Derrick <jonathan.derrick@intel.com>,
         linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
         Scott Bauer <scott.bauer@intel.com>,
         Rafael Antognolli <rafael.antognolli@intel.com>,
         Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@lst.de>
-Subject: [PATCHv4 4/4] block/sed: Embed function data into the function sequence
-Date: Tue, 21 Feb 2017 11:59:16 -0700
-Message-Id: <1487703556-19913-5-git-send-email-jonathan.derrick@intel.com>
-In-Reply-To: <1487703556-19913-1-git-send-email-jonathan.derrick@intel.com>
-References: <1487703556-19913-1-git-send-email-jonathan.derrick@intel.com>
+Subject: [PATCHv3 4/4] block/sed: Embed function data into the function sequence
+Date: Tue, 21 Feb 2017 11:44:36 -0700
+Message-Id: <1487702676-10658-5-git-send-email-jonathan.derrick@intel.com>
+In-Reply-To: <1487702676-10658-1-git-send-email-jonathan.derrick@intel.com>
+References: <1487702676-10658-1-git-send-email-jonathan.derrick@intel.com>
 To: unlisted-recipients:; (no To-header on input)
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
@@ -24,11 +24,11 @@ made obvious some other small cleanups.
 
 Signed-off-by: Jon Derrick <jonathan.derrick@intel.com>
 ---
- block/sed-opal.c | 428 ++++++++++++++++++++++---------------------------------
- 1 file changed, 167 insertions(+), 261 deletions(-)
+ block/sed-opal.c | 427 +++++++++++++++++++++----------------------------------
+ 1 file changed, 165 insertions(+), 262 deletions(-)
 
 diff --git a/block/sed-opal.c b/block/sed-opal.c
-index 4fc4d7b..bd8605b 100644
+index 4fc4d7b..bdcf1c9 100644
 --- a/block/sed-opal.c
 +++ b/block/sed-opal.c
 @@ -34,7 +34,11 @@
@@ -637,7 +637,7 @@ index 4fc4d7b..bd8605b 100644
  	ret = next(dev);
  	mutex_unlock(&dev->dev_lock);
  	return ret;
-@@ -2174,99 +2129,75 @@ static int opal_add_user_to_lr(struct opal_dev *dev,
+@@ -2174,99 +2129,72 @@ static int opal_add_user_to_lr(struct opal_dev *dev,
  
  static int opal_reverttper(struct opal_dev *dev, struct opal_key *opal)
  {
@@ -667,7 +667,7 @@ index 4fc4d7b..bd8605b 100644
  
 -static int __opal_lock_unlock_sum(struct opal_dev *dev)
 +static int opal_lock_unlock(struct opal_dev *dev,
-+			    struct opal_lock_unlock *lk_unlk, bool lock_held)
++			    struct opal_lock_unlock *lk_unlk)
  {
 -	static const opal_step ulk_funcs_sum[] = {
 -		opal_discovery0,
@@ -710,7 +710,8 @@ index 4fc4d7b..bd8605b 100644
 -static int opal_lock_unlock(struct opal_dev *dev, struct opal_lock_unlock *lk_unlk)
 -{
 -	void *func_data[3] = { NULL };
- 	int ret;
+-	int ret;
++	int ret, acquired;
  
  	if (lk_unlk->session.who < OPAL_ADMIN1 ||
  	    lk_unlk->session.who > OPAL_USER9)
@@ -721,19 +722,18 @@ index 4fc4d7b..bd8605b 100644
 -	dev->func_data = func_data;
 -	dev->func_data[1] = &lk_unlk->session;
 -	dev->func_data[2] = lk_unlk;
-+	if (!lock_held)
-+		mutex_lock(&dev->dev_lock);
- 
+-
 -	if (lk_unlk->session.sum)
 -		ret = __opal_lock_unlock_sum(dev);
 -	else
 -		ret = __opal_lock_unlock(dev);
+-
+-	mutex_unlock(&dev->dev_lock);
++	acquired = mutex_trylock(&dev->dev_lock);
 +	setup_opal_dev(dev, lk_unlk->session.sum ?
 +		       unlock_sum_steps : unlock_steps);
 +	ret = next(dev);
- 
--	mutex_unlock(&dev->dev_lock);
-+	if (!lock_held)
++	if (acquired)
 +		mutex_unlock(&dev->dev_lock);
  	return ret;
  }
@@ -774,7 +774,7 @@ index 4fc4d7b..bd8605b 100644
  	ret = next(dev);
  	mutex_unlock(&dev->dev_lock);
  	return ret;
-@@ -2274,14 +2205,13 @@ static int opal_take_ownership(struct opal_dev *dev, struct opal_key *opal)
+@@ -2274,14 +2202,13 @@ static int opal_take_ownership(struct opal_dev *dev, struct opal_key *opal)
  
  static int opal_activate_lsp(struct opal_dev *dev, struct opal_lr_act *opal_lr_act)
  {
@@ -796,7 +796,7 @@ index 4fc4d7b..bd8605b 100644
  	};
  	int ret;
  
-@@ -2289,10 +2219,7 @@ static int opal_activate_lsp(struct opal_dev *dev, struct opal_lr_act *opal_lr_a
+@@ -2289,10 +2216,7 @@ static int opal_activate_lsp(struct opal_dev *dev, struct opal_lr_act *opal_lr_a
  		return -EINVAL;
  
  	mutex_lock(&dev->dev_lock);
@@ -808,7 +808,7 @@ index 4fc4d7b..bd8605b 100644
  	ret = next(dev);
  	mutex_unlock(&dev->dev_lock);
  	return ret;
-@@ -2301,21 +2228,17 @@ static int opal_activate_lsp(struct opal_dev *dev, struct opal_lr_act *opal_lr_a
+@@ -2301,21 +2225,17 @@ static int opal_activate_lsp(struct opal_dev *dev, struct opal_lr_act *opal_lr_a
  static int opal_setup_locking_range(struct opal_dev *dev,
  				    struct opal_user_lr_setup *opal_lrs)
  {
@@ -837,7 +837,7 @@ index 4fc4d7b..bd8605b 100644
  	ret = next(dev);
  	mutex_unlock(&dev->dev_lock);
  	return ret;
-@@ -2323,14 +2246,13 @@ static int opal_setup_locking_range(struct opal_dev *dev,
+@@ -2323,14 +2243,13 @@ static int opal_setup_locking_range(struct opal_dev *dev,
  
  static int opal_set_new_pw(struct opal_dev *dev, struct opal_new_pw *opal_pw)
  {
@@ -858,7 +858,7 @@ index 4fc4d7b..bd8605b 100644
  	int ret;
  
  	if (opal_pw->session.who < OPAL_ADMIN1 ||
-@@ -2340,11 +2262,7 @@ static int opal_set_new_pw(struct opal_dev *dev, struct opal_new_pw *opal_pw)
+@@ -2340,11 +2259,7 @@ static int opal_set_new_pw(struct opal_dev *dev, struct opal_new_pw *opal_pw)
  		return -EINVAL;
  
  	mutex_lock(&dev->dev_lock);
@@ -871,7 +871,7 @@ index 4fc4d7b..bd8605b 100644
  	ret = next(dev);
  	mutex_unlock(&dev->dev_lock);
  	return ret;
-@@ -2353,14 +2271,13 @@ static int opal_set_new_pw(struct opal_dev *dev, struct opal_new_pw *opal_pw)
+@@ -2353,14 +2268,13 @@ static int opal_set_new_pw(struct opal_dev *dev, struct opal_new_pw *opal_pw)
  static int opal_activate_user(struct opal_dev *dev,
  			      struct opal_session_info *opal_session)
  {
@@ -892,7 +892,7 @@ index 4fc4d7b..bd8605b 100644
  	int ret;
  
  	/* We can't activate Admin1 it's active as manufactured */
-@@ -2371,10 +2288,7 @@ static int opal_activate_user(struct opal_dev *dev,
+@@ -2371,10 +2285,7 @@ static int opal_activate_user(struct opal_dev *dev,
  	}
  
  	mutex_lock(&dev->dev_lock);
@@ -904,7 +904,7 @@ index 4fc4d7b..bd8605b 100644
  	ret = next(dev);
  	mutex_unlock(&dev->dev_lock);
  	return ret;
-@@ -2383,7 +2297,6 @@ static int opal_activate_user(struct opal_dev *dev,
+@@ -2383,7 +2294,6 @@ static int opal_activate_user(struct opal_dev *dev,
  bool opal_unlock_from_suspend(struct opal_dev *dev)
  {
  	struct opal_suspend_data *suspend;
@@ -912,7 +912,7 @@ index 4fc4d7b..bd8605b 100644
  	bool was_failure = false;
  	int ret = 0;
  
-@@ -2394,19 +2307,12 @@ bool opal_unlock_from_suspend(struct opal_dev *dev)
+@@ -2394,19 +2304,12 @@ bool opal_unlock_from_suspend(struct opal_dev *dev)
  
  	mutex_lock(&dev->dev_lock);
  	setup_opal_dev(dev, NULL);
@@ -929,27 +929,9 @@ index 4fc4d7b..bd8605b 100644
 -			ret = __opal_lock_unlock_sum(dev);
 -		else
 -			ret = __opal_lock_unlock(dev);
-+		ret = opal_lock_unlock(dev, &suspend->unlk, true);
++		ret = opal_lock_unlock(dev, &suspend->unlk);
  		if (ret) {
  			pr_warn("Failed to unlock LR %hhu with sum %d\n",
  				suspend->unlk.session.opal_key.lr,
-@@ -2433,7 +2339,7 @@ int sed_ioctl(struct opal_dev *dev, unsigned int cmd, void __user *arg)
- 		return -ENOTSUPP;
- 	}
- 
--	p = memdup_user(arg,  _IOC_SIZE(cmd));
-+	p = memdup_user(arg, _IOC_SIZE(cmd));
- 	if (IS_ERR(p))
- 		return PTR_ERR(p);
- 
-@@ -2442,7 +2348,7 @@ int sed_ioctl(struct opal_dev *dev, unsigned int cmd, void __user *arg)
- 		ret = opal_save(dev, p);
- 		break;
- 	case IOC_OPAL_LOCK_UNLOCK:
--		ret = opal_lock_unlock(dev, p);
-+		ret = opal_lock_unlock(dev, p, false);
- 		break;
- 	case IOC_OPAL_TAKE_OWNERSHIP:
- 		ret = opal_take_ownership(dev, p);
 -- 
 1.8.3.1
