@@ -1,88 +1,54 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f195.google.com ([209.85.192.195]:34026 "EHLO
-        mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932152AbdBPLqy (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Feb 2017 06:46:54 -0500
-From: Ming Lei <tom.leiming@gmail.com>
-To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
-        linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        NeilBrown <neilb@suse.com>
-Cc: Ming Lei <tom.leiming@gmail.com>
-Subject: [PATCH 12/17] md: raid1: avoid direct access to bvec table in process_checks()
-Date: Thu, 16 Feb 2017 19:45:42 +0800
-Message-Id: <1487245547-24384-13-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1487245547-24384-1-git-send-email-tom.leiming@gmail.com>
-References: <1487245547-24384-1-git-send-email-tom.leiming@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
+From: Jon Derrick <jonathan.derrick@intel.com>
+To: 
+Subject: [PATCHv3 0/4] OPAL patches cont'd
+Date: Tue, 21 Feb 2017 11:44:32 -0700
+Message-Id: <1487702676-10658-1-git-send-email-jonathan.derrick@intel.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
+List-Post: <mailto:linux-nvme@lists.infradead.org>
+List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
+Cc: Jens Axboe <axboe@fb.com>, Rafael Antognolli <rafael.antognolli@intel.com>,
+ linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+ Jon Derrick <jonathan.derrick@intel.com>, Christoph Hellwig <hch@lst.de>,
+ Scott Bauer <scott.bauer@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
+Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
+List-ID: <linux-block@vger.kernel.org>
 
-Given process_checks is only called in resync path, it should be
-ok to allocate three stack variable(total 320byteds) to store
-pages from bios.
+v2->v3:
+Squashed 5/5 into 4/5
+Changed opal_step structs back to const
+Cleaned up opal_lock_unlock
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
----
- drivers/md/raid1.c | 20 ++++++++++++++++----
- 1 file changed, 16 insertions(+), 4 deletions(-)
+v1->v2:
+Moved misplaced code from 5/5 to 4/5
 
-diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
-index 4400fbe7ce8c..54ec32be3277 100644
---- a/drivers/md/raid1.c
-+++ b/drivers/md/raid1.c
-@@ -2010,6 +2010,9 @@ static void process_checks(struct r1bio *r1_bio)
- 	int primary;
- 	int i;
- 	int vcnt;
-+	struct bio_vec *bi;
-+	int page_len[RESYNC_PAGES];
-+	struct page *pbio_pages[RESYNC_PAGES], *sbio_pages[RESYNC_PAGES];
- 
- 	/* Fix variable parts of all bios */
- 	vcnt = (r1_bio->sectors + PAGE_SIZE / 512 - 1) >> (PAGE_SHIFT - 9);
-@@ -2017,7 +2020,6 @@ static void process_checks(struct r1bio *r1_bio)
- 		int j;
- 		int size;
- 		int error;
--		struct bio_vec *bi;
- 		struct bio *b = r1_bio->bios[i];
- 		if (b->bi_end_io != end_sync_read)
- 			continue;
-@@ -2051,6 +2053,11 @@ static void process_checks(struct r1bio *r1_bio)
- 			break;
- 		}
- 	r1_bio->read_disk = primary;
-+
-+	/* .bi_vcnt has been set for all read bios */
-+	bio_for_each_segment_all(bi, r1_bio->bios[primary], i)
-+		pbio_pages[i] = bi->bv_page;
-+
- 	for (i = 0; i < conf->raid_disks * 2; i++) {
- 		int j;
- 		struct bio *pbio = r1_bio->bios[primary];
-@@ -2062,14 +2069,19 @@ static void process_checks(struct r1bio *r1_bio)
- 		/* Now we can 'fixup' the error value */
- 		sbio->bi_error = 0;
- 
-+		bio_for_each_segment_all(bi, sbio, j) {
-+			sbio_pages[j] = bi->bv_page;
-+			page_len[j] = bi->bv_len;
-+		}
-+
- 		if (!error) {
- 			for (j = vcnt; j-- ; ) {
- 				struct page *p, *s;
--				p = pbio->bi_io_vec[j].bv_page;
--				s = sbio->bi_io_vec[j].bv_page;
-+				p = pbio_pages[j];
-+				s = sbio_pages[j];
- 				if (memcmp(page_address(p),
- 					   page_address(s),
--					   sbio->bi_io_vec[j].bv_len))
-+					   page_len[j]))
- 					break;
- 			}
- 		} else
+The first three in the series have been reviewed already but I wanted to
+squash them with the last patch since they haven't been pulled yet.
+
+The last patch is an attempt to refactor some of the awkward func data
+and state separation into a common struct
+
+Jon Derrick (4):
+  block/sed: Use ssize_t on atom parsers to return errors
+  block/sed: Add helper to qualify response tokens
+  block/sed: Check received header lengths
+  block/sed: Embed function data into the function sequence
+
+ block/sed-opal.c | 551 +++++++++++++++++++++++--------------------------------
+ 1 file changed, 225 insertions(+), 326 deletions(-)
+
 -- 
-2.7.4
+1.8.3.1
+
+
+_______________________________________________
+Linux-nvme mailing list
+Linux-nvme@lists.infradead.org
+http://lists.infradead.org/mailman/listinfo/linux-nvme
