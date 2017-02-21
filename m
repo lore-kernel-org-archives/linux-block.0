@@ -1,30 +1,23 @@
-Return-Path: <axboe@kernel.dk>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Single block fix for 4.10
-Message-ID: <54dbd96a-8900-1fc8-0e8b-6501bf49c567@kernel.dk>
-Date: Fri, 17 Feb 2017 12:50:16 -0700
+Return-Path: <Bart.VanAssche@sandisk.com>
+From: Bart Van Assche <Bart.VanAssche@sandisk.com>
+To: Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, "Christoph
+ Hellwig" <hch@infradead.org>, Dan Williams <dan.j.williams@intel.com>, Thiago
+ Jung Bauermann <bauerman@linux.vnet.ibm.com>, Lekshmi Pillai
+	<lekshmicpillai@in.ibm.com>, Tejun Heo <tj@kernel.org>, NeilBrown
+	<neilb@suse.de>, Omar Sandoval <osandov@osandov.com>
+Subject: Re: [PATCH 13/13] block: Fix oops scsi_disk_get()
+Date: Tue, 21 Feb 2017 19:33:26 +0000
+Message-ID: <1D08B61A9CF0974AA09887BE32D889DA0AC6AF@ULS-OP-MBXIP03.sdcorp.global.sandisk.com>
+References: <20170221170958.21845-1-jack@suse.cz>
+ <20170221170958.21845-14-jack@suse.cz>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Return-Path: Bart.VanAssche@sandisk.com
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Linus,
-
-Single fix in this pull request, fixing a lockdep splat reported by
-Thomas and Gabriel. Please pull for 4.10 final! Thanks.
-
-
-  git://git.kernel.dk/linux-block.git for-linus
-
-
-----------------------------------------------------------------
-Jens Axboe (1):
-      cfq-iosched: don't call wbt_disable_default() with IRQs disabled
-
- block/cfq-iosched.c | 25 +++++++++++++------------
- 1 file changed, 13 insertions(+), 12 deletions(-)
-
--- 
-Jens Axboe
+On 02/21/2017 09:55 AM, Jan Kara wrote:=0A=
+> When device open races with device shutdown, we can get the following=0A=
+> oops in scsi_disk_get(): [ ... ]=0A=
+=0A=
+Reviewed-by: Bart Van Assche <bart.vanassche@sandisk.com>=0A=
