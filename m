@@ -1,45 +1,59 @@
-Return-Path: <htejun@gmail.com>
-Return-Path: <htejun@gmail.com>
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Tue, 28 Feb 2017 11:44:36 -0500
-From: Tejun Heo <tj@kernel.org>
-To: Jan Kara <jack@suse.cz>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+Return-Path: <jack@suse.cz>
+From: Jan Kara <jack@suse.cz>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
 	Christoph Hellwig <hch@infradead.org>,
 	Dan Williams <dan.j.williams@intel.com>,
 	Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
 	Lekshmi Pillai <lekshmicpillai@in.ibm.com>,
-	NeilBrown <neilb@suse.de>, Omar Sandoval <osandov@osandov.com>
-Subject: Re: [PATCH 08/13] bdi: Shutdown writeback on all cgwbs in
- cgwb_bdi_destroy()
-Message-ID: <20170228164436.GD15287@htj.duckdns.org>
+	Tejun Heo <tj@kernel.org>,
+	NeilBrown <neilb@suse.de>,
+	Omar Sandoval <osandov@osandov.com>,
+	Jan Kara <jack@suse.cz>
+Subject: [PATCH 08/13] bdi: Shutdown writeback on all cgwbs in cgwb_bdi_destroy()
+Date: Tue, 21 Feb 2017 18:09:53 +0100
+Message-Id: <20170221170958.21845-9-jack@suse.cz>
+In-Reply-To: <20170221170958.21845-1-jack@suse.cz>
 References: <20170221170958.21845-1-jack@suse.cz>
- <20170221170958.21845-9-jack@suse.cz>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170221170958.21845-9-jack@suse.cz>
 List-ID: <linux-block@vger.kernel.org>
 
-Hello,
+Currently we waited for all cgwbs to get freed in cgwb_bdi_destroy()
+which also means that writeback has been shutdown on them. Since this
+wait is going away, directly shutdown writeback on cgwbs from
+cgwb_bdi_destroy() to avoid live writeback structures after
+bdi_unregister() has finished.
 
-On Tue, Feb 21, 2017 at 06:09:53PM +0100, Jan Kara wrote:
-> Currently we waited for all cgwbs to get freed in cgwb_bdi_destroy()
-> which also means that writeback has been shutdown on them. Since this
-> wait is going away, directly shutdown writeback on cgwbs from
-> cgwb_bdi_destroy() to avoid live writeback structures after
-> bdi_unregister() has finished.
+Signed-off-by: Jan Kara <jack@suse.cz>
+---
+ mm/backing-dev.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-Hmmm... the only thing which is a bit bothering is that after removing
-the shutdown from release_workfn this would make the final flushing
-sequential, one cgwb at a time, which in certain cases can take an
-unnecessarily long time.  It's not a correctness issue tho and if it
-becomes a problem we can deal with it by splitting wb_shutdown() into
-two pieces - the unregistration / issuing of the work items, and the
-flushing of those.  Other than that, looks good to me.
-
-Acked-by: Tejun Heo <tj@kernel.org>
-
-Thanks.
-
+diff --git a/mm/backing-dev.c b/mm/backing-dev.c
+index 54b9e934eef4..c9623b410170 100644
+--- a/mm/backing-dev.c
++++ b/mm/backing-dev.c
+@@ -700,6 +700,7 @@ static void cgwb_bdi_destroy(struct backing_dev_info *bdi)
+ 	struct radix_tree_iter iter;
+ 	struct rb_node *rbn;
+ 	void **slot;
++	struct wb_writeback *wb;
+ 
+ 	WARN_ON(test_bit(WB_registered, &bdi->wb.state));
+ 
+@@ -716,6 +717,14 @@ static void cgwb_bdi_destroy(struct backing_dev_info *bdi)
+ 		congested->__bdi = NULL;	/* mark @congested unlinked */
+ 	}
+ 
++	while (!list_empty(&bdi->wb_list)) {
++		wb = list_first_entry(&bdi->wb_list, struct bdi_writeback,
++				      bdi_node);
++		spin_unlock_irq(&cgwb_lock);
++		wb_shutdown(wb);
++		spin_lock_irq(&cgwb_lock);
++	}
++
+ 	spin_unlock_irq(&cgwb_lock);
+ 
+ 	/*
 -- 
-tejun
+2.10.2
