@@ -1,158 +1,141 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f42.google.com ([74.125.83.42]:35590 "EHLO
-        mail-pg0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751397AbdBUVap (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Feb 2017 16:30:45 -0500
-Received: by mail-pg0-f42.google.com with SMTP id b129so41352104pgc.2
-        for <linux-block@vger.kernel.org>; Tue, 21 Feb 2017 13:30:45 -0800 (PST)
-From: Omar Sandoval <osandov@osandov.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: kernel-team@fb.com
-Subject: [PATCH v2 1/2] blk-mq: use sbq wait queues instead of restart for driver tags
-Date: Tue, 21 Feb 2017 13:29:56 -0800
-Message-Id: <19bf336f1d329df8d12fbdc5ab8842f81880c71d.1487712413.git.osandov@fb.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
+From: Jon Derrick <jonathan.derrick@intel.com>
+To: 
+Subject: [PATCHv3 2/4] block/sed: Add helper to qualify response tokens
+Date: Tue, 21 Feb 2017 11:44:34 -0700
+Message-Id: <1487702676-10658-3-git-send-email-jonathan.derrick@intel.com>
+In-Reply-To: <1487702676-10658-1-git-send-email-jonathan.derrick@intel.com>
+References: <1487702676-10658-1-git-send-email-jonathan.derrick@intel.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
+List-Post: <mailto:linux-nvme@lists.infradead.org>
+List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
+Cc: Jens Axboe <axboe@fb.com>, Rafael Antognolli <rafael.antognolli@intel.com>,
+ linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+ Jon Derrick <jonathan.derrick@intel.com>, Christoph Hellwig <hch@lst.de>,
+ Scott Bauer <scott.bauer@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
+Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
+List-ID: <linux-block@vger.kernel.org>
 
-From: Omar Sandoval <osandov@fb.com>
+Add helper which verifies the response token is valid and matches the
+expected value. Merges token_type and response_get_token.
 
-Commit 50e1dab86aa2 ("blk-mq-sched: fix starvation for multiple hardware
-queues and shared tags") fixed one starvation issue for shared tags.
-However, we can still get into a situation where we fail to allocate a
-tag because all tags are allocated but we don't have any pending
-requests on any hardware queue.
-
-One solution for this would be to restart all queues that share a tag
-map, but that really sucks. Ideally, we could just block and wait for a
-tag, but that isn't always possible from blk_mq_dispatch_rq_list().
-
-However, we can still use the struct sbitmap_queue wait queues with a
-custom callback instead of blocking. This has a few benefits:
-
-1. It avoids iterating over all hardware queues when completing an I/O,
-   which the current restart code has to do.
-2. It benefits from the existing rolling wakeup code.
-3. It avoids punting to another thread just to have it block.
-
-Signed-off-by: Omar Sandoval <osandov@fb.com>
-Signed-off-by: Jens Axboe <axboe@fb.com>
+Signed-off-by: Jon Derrick <jonathan.derrick@intel.com>
+Reviewed-by: Scott Bauer <scott.bauer@intel.com>
 ---
-Changed from v1:
+ block/sed-opal.c | 61 +++++++++++++++++++++++---------------------------------
+ 1 file changed, 25 insertions(+), 36 deletions(-)
 
-- Call blk_mq_get_driver_tag() with &hctx, not NULL, to make sure we
-  handle the case of a request from a different hardware queue than the
-  one we're running (e.g., with nvme+mq-deadline)
-
- block/blk-mq.c         | 58 ++++++++++++++++++++++++++++++++++++++++++++------
- include/linux/blk-mq.h |  2 ++
- 2 files changed, 54 insertions(+), 6 deletions(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index b29e7dc7b309..bcb9f8742f72 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -904,6 +904,44 @@ static bool reorder_tags_to_front(struct list_head *list)
- 	return first != NULL;
+diff --git a/block/sed-opal.c b/block/sed-opal.c
+index 4675fd8..d3d6db2 100644
+--- a/block/sed-opal.c
++++ b/block/sed-opal.c
+@@ -662,48 +662,25 @@ static int cmd_finalize(struct opal_dev *cmd, u32 hsn, u32 tsn)
+ 	return 0;
  }
  
-+static int blk_mq_dispatch_wake(wait_queue_t *wait, unsigned mode, int flags,
-+				void *key)
+-static enum opal_response_token token_type(const struct parsed_resp *resp,
+-					   int n)
++static const struct opal_resp_tok *response_get_token(
++				const struct parsed_resp *resp,
++				int n)
+ {
+ 	const struct opal_resp_tok *tok;
+ 
+ 	if (n >= resp->num) {
+ 		pr_err("Token number doesn't exist: %d, resp: %d\n",
+ 		       n, resp->num);
+-		return OPAL_DTA_TOKENID_INVALID;
++		return ERR_PTR(-EINVAL);
+ 	}
+ 
+ 	tok = &resp->toks[n];
+ 	if (tok->len == 0) {
+ 		pr_err("Token length must be non-zero\n");
+-		return OPAL_DTA_TOKENID_INVALID;
++		return ERR_PTR(-EINVAL);
+ 	}
+ 
+-	return tok->type;
+-}
+-
+-/*
+- * This function returns 0 in case of invalid token. One should call
+- * token_type() first to find out if the token is valid or not.
+- */
+-static enum opal_token response_get_token(const struct parsed_resp *resp,
+-					  int n)
+-{
+-	const struct opal_resp_tok *tok;
+-
+-	if (n >= resp->num) {
+-		pr_err("Token number doesn't exist: %d, resp: %d\n",
+-		       n, resp->num);
+-		return 0;
+-	}
+-
+-	tok = &resp->toks[n];
+-	if (tok->len == 0) {
+-		pr_err("Token length must be non-zero\n");
+-		return 0;
+-	}
+-
+-	return tok->pos[0];
++	return tok;
+ }
+ 
+ static ssize_t response_parse_tiny(struct opal_resp_tok *tok,
+@@ -922,20 +899,32 @@ static u64 response_get_u64(const struct parsed_resp *resp, int n)
+ 	return resp->toks[n].stored.u;
+ }
+ 
++static bool response_token_matches(const struct opal_resp_tok *token, u8 match)
 +{
-+	struct blk_mq_hw_ctx *hctx;
-+
-+	hctx = container_of(wait, struct blk_mq_hw_ctx, dispatch_wait);
-+
-+	list_del(&wait->task_list);
-+	clear_bit_unlock(BLK_MQ_S_TAG_WAITING, &hctx->state);
-+	blk_mq_run_hw_queue(hctx, true);
-+	return 1;
-+}
-+
-+static bool blk_mq_dispatch_wait_add(struct blk_mq_hw_ctx *hctx)
-+{
-+	struct sbq_wait_state *ws;
-+
-+	/*
-+	 * The TAG_WAITING bit serves as a lock protecting hctx->dispatch_wait.
-+	 * The thread which wins the race to grab this bit adds the hardware
-+	 * queue to the wait queue.
-+	 */
-+	if (test_bit(BLK_MQ_S_TAG_WAITING, &hctx->state) ||
-+	    test_and_set_bit_lock(BLK_MQ_S_TAG_WAITING, &hctx->state))
++	if (IS_ERR(token) ||
++	    token->type != OPAL_DTA_TOKENID_TOKEN ||
++	    token->pos[0] != match)
 +		return false;
-+
-+	init_waitqueue_func_entry(&hctx->dispatch_wait, blk_mq_dispatch_wake);
-+	ws = bt_wait_ptr(&hctx->tags->bitmap_tags, hctx);
-+
-+	/*
-+	 * As soon as this returns, it's no longer safe to fiddle with
-+	 * hctx->dispatch_wait, since a completion can wake up the wait queue
-+	 * and unlock the bit.
-+	 */
-+	add_wait_queue(&ws->wait, &hctx->dispatch_wait);
 +	return true;
 +}
 +
- bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list)
+ static u8 response_status(const struct parsed_resp *resp)
  {
- 	struct request_queue *q = hctx->queue;
-@@ -931,15 +969,22 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list)
- 				continue;
- 
- 			/*
--			 * We failed getting a driver tag. Mark the queue(s)
--			 * as needing a restart. Retry getting a tag again,
--			 * in case the needed IO completed right before we
--			 * marked the queue as needing a restart.
-+			 * The initial allocation attempt failed, so we need to
-+			 * rerun the hardware queue when a tag is freed.
- 			 */
--			blk_mq_sched_mark_restart(hctx);
--			if (!blk_mq_get_driver_tag(rq, &hctx, false))
-+			if (blk_mq_dispatch_wait_add(hctx)) {
-+				/*
-+				 * It's possible that a tag was freed in the
-+				 * window between the allocation failure and
-+				 * adding the hardware queue to the wait queue.
-+				 */
-+				if (!blk_mq_get_driver_tag(rq, &hctx, false))
-+					break;
-+			} else {
- 				break;
-+			}
- 		}
+-	if (token_type(resp, 0) == OPAL_DTA_TOKENID_TOKEN &&
+-	    response_get_token(resp, 0) == OPAL_ENDOFSESSION) {
++	const struct opal_resp_tok *tok;
 +
- 		list_del_init(&rq->queuelist);
++	tok = response_get_token(resp, 0);
++	if (response_token_matches(tok, OPAL_ENDOFSESSION))
+ 		return 0;
+-	}
  
- 		bd.rq = rq;
-@@ -1051,6 +1096,7 @@ static int blk_mq_hctx_next_cpu(struct blk_mq_hw_ctx *hctx)
- void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
- {
- 	if (unlikely(blk_mq_hctx_stopped(hctx) ||
-+		     test_bit(BLK_MQ_S_TAG_WAITING, &hctx->state) ||
- 		     !blk_mq_hw_queue_mapped(hctx)))
- 		return;
+ 	if (resp->num < 5)
+ 		return DTAERROR_NO_METHOD_STATUS;
  
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 8e4df3d6c8cd..001d30d727c5 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -33,6 +33,7 @@ struct blk_mq_hw_ctx {
- 	struct blk_mq_ctx	**ctxs;
- 	unsigned int		nr_ctx;
+-	if (token_type(resp, resp->num - 1) != OPAL_DTA_TOKENID_TOKEN ||
+-	    token_type(resp, resp->num - 5) != OPAL_DTA_TOKENID_TOKEN ||
+-	    response_get_token(resp, resp->num - 1) != OPAL_ENDLIST ||
+-	    response_get_token(resp, resp->num - 5) != OPAL_STARTLIST)
++	tok = response_get_token(resp, resp->num - 5);
++	if (!response_token_matches(tok, OPAL_STARTLIST))
++		return DTAERROR_NO_METHOD_STATUS;
++
++	tok = response_get_token(resp, resp->num - 1);
++	if (!response_token_matches(tok, OPAL_ENDLIST))
+ 		return DTAERROR_NO_METHOD_STATUS;
  
-+	wait_queue_t		dispatch_wait;
- 	atomic_t		wait_index;
- 
- 	struct blk_mq_tags	*tags;
-@@ -160,6 +161,7 @@ enum {
- 	BLK_MQ_S_STOPPED	= 0,
- 	BLK_MQ_S_TAG_ACTIVE	= 1,
- 	BLK_MQ_S_SCHED_RESTART	= 2,
-+	BLK_MQ_S_TAG_WAITING	= 3,
- 
- 	BLK_MQ_MAX_DEPTH	= 10240,
- 
+ 	return response_get_u64(resp, resp->num - 4);
 -- 
-2.11.1
+1.8.3.1
+
+
+_______________________________________________
+Linux-nvme mailing list
+Linux-nvme@lists.infradead.org
+http://lists.infradead.org/mailman/listinfo/linux-nvme
