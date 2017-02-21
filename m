@@ -1,142 +1,100 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:45490 "EHLO mx2.suse.de"
+Received: from mga03.intel.com ([134.134.136.65]:23842 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751465AbdBBRgC (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 2 Feb 2017 12:36:02 -0500
-From: Jan Kara <jack@suse.cz>
-To: <linux-fsdevel@vger.kernel.org>
-Cc: Christoph Hellwig <hch@infradead.org>, linux-block@vger.kernel.org,
-        Jan Kara <jack@suse.cz>,
-        Eric Van Hensbergen <ericvh@gmail.com>,
-        Ron Minnich <rminnich@sandia.gov>,
-        Latchesar Ionkov <lucho@ionkov.net>,
-        v9fs-developer@lists.sourceforge.net
-Subject: [PATCH 07/24] 9p: Convert to separately allocated bdi
-Date: Thu,  2 Feb 2017 18:34:05 +0100
-Message-Id: <20170202173422.3240-8-jack@suse.cz>
-In-Reply-To: <20170202173422.3240-1-jack@suse.cz>
-References: <20170202173422.3240-1-jack@suse.cz>
+        id S1753881AbdBUSow (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 21 Feb 2017 13:44:52 -0500
+From: Jon Derrick <jonathan.derrick@intel.com>
+Cc: Jon Derrick <jonathan.derrick@intel.com>,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        Scott Bauer <scott.bauer@intel.com>,
+        Rafael Antognolli <rafael.antognolli@intel.com>,
+        Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@lst.de>
+Subject: [PATCHv3 3/4] block/sed: Check received header lengths
+Date: Tue, 21 Feb 2017 11:44:35 -0700
+Message-Id: <1487702676-10658-4-git-send-email-jonathan.derrick@intel.com>
+In-Reply-To: <1487702676-10658-1-git-send-email-jonathan.derrick@intel.com>
+References: <1487702676-10658-1-git-send-email-jonathan.derrick@intel.com>
+To: unlisted-recipients:; (no To-header on input)
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Allocate struct backing_dev_info separately instead of embedding it
-inside session. This unifies handling of bdi among users.
+Add a buffer size check against discovery and response header lengths
+before we loop over their buffers.
 
-CC: Eric Van Hensbergen <ericvh@gmail.com>
-CC: Ron Minnich <rminnich@sandia.gov>
-CC: Latchesar Ionkov <lucho@ionkov.net>
-CC: v9fs-developer@lists.sourceforge.net
-Signed-off-by: Jan Kara <jack@suse.cz>
+Signed-off-by: Jon Derrick <jonathan.derrick@intel.com>
+Reviewed-by: Scott Bauer <scott.bauer@intel.com>
 ---
- fs/9p/v9fs.c      | 10 +---------
- fs/9p/v9fs.h      |  1 -
- fs/9p/vfs_super.c | 15 ++++++++++++---
- 3 files changed, 13 insertions(+), 13 deletions(-)
+ block/sed-opal.c | 35 +++++++++++++++++++++--------------
+ 1 file changed, 21 insertions(+), 14 deletions(-)
 
-diff --git a/fs/9p/v9fs.c b/fs/9p/v9fs.c
-index 072e7599583a..0898a1a774fa 100644
---- a/fs/9p/v9fs.c
-+++ b/fs/9p/v9fs.c
-@@ -332,10 +332,6 @@ struct p9_fid *v9fs_session_init(struct v9fs_session_info *v9ses,
- 		goto err_names;
- 	init_rwsem(&v9ses->rename_sem);
+diff --git a/block/sed-opal.c b/block/sed-opal.c
+index d3d6db2..4fc4d7b 100644
+--- a/block/sed-opal.c
++++ b/block/sed-opal.c
+@@ -411,10 +411,17 @@ static int opal_discovery0_end(struct opal_dev *dev)
+ 	const struct d0_header *hdr = (struct d0_header *)dev->resp;
+ 	const u8 *epos = dev->resp, *cpos = dev->resp;
+ 	u16 comid = 0;
++	u32 hlen = be32_to_cpu(hdr->length);
  
--	rc = bdi_setup_and_register(&v9ses->bdi, "9p");
--	if (rc)
--		goto err_names;
+-	print_buffer(dev->resp, be32_to_cpu(hdr->length));
++	print_buffer(dev->resp, hlen);
+ 
+-	epos += be32_to_cpu(hdr->length); /* end of buffer */
++	if (hlen > IO_BUFFER_LENGTH - sizeof(*hdr)) {
++		pr_warn("Discovery length overflows buffer (%zu+%u)/%u\n",
++			sizeof(*hdr), hlen, IO_BUFFER_LENGTH);
++		return -EFAULT;
++	}
++
++	epos += hlen; /* end of buffer */
+ 	cpos += sizeof(*hdr); /* current position on buffer */
+ 
+ 	while (cpos < epos && supported) {
+@@ -784,6 +791,7 @@ static int response_parse(const u8 *buf, size_t length,
+ 	int total;
+ 	ssize_t token_length;
+ 	const u8 *pos;
++	u32 clen, plen, slen;
+ 
+ 	if (!buf)
+ 		return -EFAULT;
+@@ -795,17 +803,16 @@ static int response_parse(const u8 *buf, size_t length,
+ 	pos = buf;
+ 	pos += sizeof(*hdr);
+ 
+-	pr_debug("Response size: cp: %d, pkt: %d, subpkt: %d\n",
+-		 be32_to_cpu(hdr->cp.length),
+-		 be32_to_cpu(hdr->pkt.length),
+-		 be32_to_cpu(hdr->subpkt.length));
 -
- 	v9ses->uid = INVALID_UID;
- 	v9ses->dfltuid = V9FS_DEFUID;
- 	v9ses->dfltgid = V9FS_DEFGID;
-@@ -344,7 +340,7 @@ struct p9_fid *v9fs_session_init(struct v9fs_session_info *v9ses,
- 	if (IS_ERR(v9ses->clnt)) {
- 		rc = PTR_ERR(v9ses->clnt);
- 		p9_debug(P9_DEBUG_ERROR, "problem initializing 9p client\n");
--		goto err_bdi;
-+		goto err_names;
+-	if (hdr->cp.length == 0 || hdr->pkt.length == 0 ||
+-	    hdr->subpkt.length == 0) {
+-		pr_err("Bad header length. cp: %d, pkt: %d, subpkt: %d\n",
+-		       be32_to_cpu(hdr->cp.length),
+-		       be32_to_cpu(hdr->pkt.length),
+-		       be32_to_cpu(hdr->subpkt.length));
++	clen = be32_to_cpu(hdr->cp.length);
++	plen = be32_to_cpu(hdr->pkt.length);
++	slen = be32_to_cpu(hdr->subpkt.length);
++	pr_debug("Response size: cp: %u, pkt: %u, subpkt: %u\n",
++		 clen, plen, slen);
++
++	if (clen == 0 || plen == 0 || slen == 0 ||
++	    slen > IO_BUFFER_LENGTH - sizeof(*hdr)) {
++		pr_err("Bad header length. cp: %u, pkt: %u, subpkt: %u\n",
++		       clen, plen, slen);
+ 		print_buffer(pos, sizeof(*hdr));
+ 		return -EINVAL;
  	}
+@@ -814,7 +821,7 @@ static int response_parse(const u8 *buf, size_t length,
+ 		return -EFAULT;
  
- 	v9ses->flags = V9FS_ACCESS_USER;
-@@ -414,8 +410,6 @@ struct p9_fid *v9fs_session_init(struct v9fs_session_info *v9ses,
- 
- err_clnt:
- 	p9_client_destroy(v9ses->clnt);
--err_bdi:
--	bdi_destroy(&v9ses->bdi);
- err_names:
- 	kfree(v9ses->uname);
- 	kfree(v9ses->aname);
-@@ -444,8 +438,6 @@ void v9fs_session_close(struct v9fs_session_info *v9ses)
- 	kfree(v9ses->uname);
- 	kfree(v9ses->aname);
- 
--	bdi_destroy(&v9ses->bdi);
--
- 	spin_lock(&v9fs_sessionlist_lock);
- 	list_del(&v9ses->slist);
- 	spin_unlock(&v9fs_sessionlist_lock);
-diff --git a/fs/9p/v9fs.h b/fs/9p/v9fs.h
-index 443d12e02043..76eaf49abd3a 100644
---- a/fs/9p/v9fs.h
-+++ b/fs/9p/v9fs.h
-@@ -114,7 +114,6 @@ struct v9fs_session_info {
- 	kuid_t uid;		/* if ACCESS_SINGLE, the uid that has access */
- 	struct p9_client *clnt;	/* 9p client */
- 	struct list_head slist; /* list of sessions registered with v9fs */
--	struct backing_dev_info bdi;
- 	struct rw_semaphore rename_sem;
- };
- 
-diff --git a/fs/9p/vfs_super.c b/fs/9p/vfs_super.c
-index de3ed8629196..a0965fb587a5 100644
---- a/fs/9p/vfs_super.c
-+++ b/fs/9p/vfs_super.c
-@@ -72,10 +72,12 @@ static int v9fs_set_super(struct super_block *s, void *data)
-  *
-  */
- 
--static void
-+static int
- v9fs_fill_super(struct super_block *sb, struct v9fs_session_info *v9ses,
- 		int flags, void *data)
- {
-+	int ret;
-+
- 	sb->s_maxbytes = MAX_LFS_FILESIZE;
- 	sb->s_blocksize_bits = fls(v9ses->maxdata - 1);
- 	sb->s_blocksize = 1 << sb->s_blocksize_bits;
-@@ -85,7 +87,11 @@ v9fs_fill_super(struct super_block *sb, struct v9fs_session_info *v9ses,
- 		sb->s_xattr = v9fs_xattr_handlers;
- 	} else
- 		sb->s_op = &v9fs_super_ops;
--	sb->s_bdi = &v9ses->bdi;
-+
-+	ret = super_setup_bdi(sb);
-+	if (ret)
-+		return ret;
-+
- 	if (v9ses->cache)
- 		sb->s_bdi->ra_pages = (VM_MAX_READAHEAD * 1024)/PAGE_SIZE;
- 
-@@ -99,6 +105,7 @@ v9fs_fill_super(struct super_block *sb, struct v9fs_session_info *v9ses,
- #endif
- 
- 	save_mount_options(sb, data);
-+	return 0;
- }
- 
- /**
-@@ -138,7 +145,9 @@ static struct dentry *v9fs_mount(struct file_system_type *fs_type, int flags,
- 		retval = PTR_ERR(sb);
- 		goto clunk_fid;
- 	}
--	v9fs_fill_super(sb, v9ses, flags, data);
-+	retval = v9fs_fill_super(sb, v9ses, flags, data);
-+	if (retval)
-+		goto release_sb;
- 
- 	if (v9ses->cache == CACHE_LOOSE || v9ses->cache == CACHE_FSCACHE)
- 		sb->s_d_op = &v9fs_cached_dentry_operations;
+ 	iter = resp->toks;
+-	total = be32_to_cpu(hdr->subpkt.length);
++	total = slen;
+ 	print_buffer(pos, total);
+ 	while (total > 0) {
+ 		if (pos[0] <= TINY_ATOM_BYTE) /* tiny atom */
 -- 
-2.10.2
-
+1.8.3.1
