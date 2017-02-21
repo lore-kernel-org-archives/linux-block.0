@@ -1,86 +1,71 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:33162 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752010AbdB1O6E (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Feb 2017 09:58:04 -0500
-From: Christoph Hellwig <hch@lst.de>
-To: linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
-        linux-block@vger.kernel.org
-Subject: [PATCH 03/12] iomap: add a IOMAP_ATOMIC flag
-Date: Tue, 28 Feb 2017 06:57:28 -0800
-Message-Id: <20170228145737.19016-4-hch@lst.de>
-In-Reply-To: <20170228145737.19016-1-hch@lst.de>
-References: <20170228145737.19016-1-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jack@suse.cz>
+From: Jan Kara <jack@suse.cz>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
+	Lekshmi Pillai <lekshmicpillai@in.ibm.com>,
+	Tejun Heo <tj@kernel.org>,
+	NeilBrown <neilb@suse.de>,
+	Omar Sandoval <osandov@osandov.com>,
+	Jan Kara <jack@suse.cz>
+Subject: [PATCH 03/13] block: Revalidate i_bdev reference in bd_aquire()
+Date: Tue, 21 Feb 2017 18:09:48 +0100
+Message-Id: <20170221170958.21845-4-jack@suse.cz>
+In-Reply-To: <20170221170958.21845-1-jack@suse.cz>
+References: <20170221170958.21845-1-jack@suse.cz>
+List-ID: <linux-block@vger.kernel.org>
 
-To pass through O_ATOMIC to the iomap_begin methods.
+When a device gets removed, block device inode unhashed so that it is not
+used anymore (bdget() will not find it anymore). Later when a new device
+gets created with the same device number, we create new block device
+inode. However there may be file system device inodes whose i_bdev still
+points to the original block device inode and thus we get two active
+block device inodes for the same device. They will share the same
+gendisk so the only visible differences will be that page caches will
+not be coherent and BDIs will be different (the old block device inode
+still points to unregistered BDI).
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Fix the problem by checking in bd_acquire() whether i_bdev still points
+to active block device inode and re-lookup the block device if not. That
+way any open of a block device happening after the old device has been
+removed will get correct block device inode.
+
+Tested-by: Lekshmi Pillai <lekshmicpillai@in.ibm.com>
+Acked-by: Tejun Heo <tj@kernel.org>
+Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- fs/iomap.c            | 13 +++++++++++--
- include/linux/iomap.h |  1 +
- 2 files changed, 12 insertions(+), 2 deletions(-)
+ fs/block_dev.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/fs/iomap.c b/fs/iomap.c
-index 16a9d2b89cb6..096cbf573932 100644
---- a/fs/iomap.c
-+++ b/fs/iomap.c
-@@ -237,6 +237,10 @@ iomap_file_buffered_write(struct kiocb *iocb, struct iov_iter *iter,
- {
- 	struct inode *inode = iocb->ki_filp->f_mapping->host;
- 	loff_t pos = iocb->ki_pos, ret = 0, written = 0;
-+	unsigned flags = IOMAP_WRITE;
-+
-+	if (iocb->ki_filp->f_flags & O_ATOMIC)
-+		flags |= IOMAP_ATOMIC;
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index 601b71b76d7f..68e855fdce58 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -1043,13 +1043,22 @@ static struct block_device *bd_acquire(struct inode *inode)
  
- 	while (iov_iter_count(iter)) {
- 		ret = iomap_apply(inode, pos, iov_iter_count(iter),
-@@ -452,8 +456,12 @@ int iomap_page_mkwrite(struct vm_area_struct *vma, struct vm_fault *vmf,
- 	struct inode *inode = file_inode(vma->vm_file);
- 	unsigned long length;
- 	loff_t offset, size;
-+	unsigned flags = IOMAP_WRITE | IOMAP_FAULT;
- 	ssize_t ret;
- 
-+	if (vma->vm_file->f_flags & O_ATOMIC)
-+		flags |= IOMAP_ATOMIC;
-+
- 	lock_page(page);
- 	size = i_size_read(inode);
- 	if ((page->mapping != inode->i_mapping) ||
-@@ -471,8 +479,7 @@ int iomap_page_mkwrite(struct vm_area_struct *vma, struct vm_fault *vmf,
- 
- 	offset = page_offset(page);
- 	while (length > 0) {
--		ret = iomap_apply(inode, offset, length,
--				IOMAP_WRITE | IOMAP_FAULT, ops, page,
-+		ret = iomap_apply(inode, offset, length, flags, ops, page,
- 				iomap_page_mkwrite_actor);
- 		if (unlikely(ret <= 0))
- 			goto out_unlock;
-@@ -883,6 +890,8 @@ iomap_dio_rw(struct kiocb *iocb, struct iov_iter *iter,
- 	} else {
- 		dio->flags |= IOMAP_DIO_WRITE;
- 		flags |= IOMAP_WRITE;
-+		if (iocb->ki_filp->f_flags & O_ATOMIC)
-+			flags |= IOMAP_ATOMIC;
+ 	spin_lock(&bdev_lock);
+ 	bdev = inode->i_bdev;
+-	if (bdev) {
++	if (bdev && !inode_unhashed(bdev->bd_inode)) {
+ 		bdgrab(bdev);
+ 		spin_unlock(&bdev_lock);
+ 		return bdev;
  	}
+ 	spin_unlock(&bdev_lock);
  
- 	if (mapping->nrpages) {
-diff --git a/include/linux/iomap.h b/include/linux/iomap.h
-index 891459caa278..a670ff18ccd6 100644
---- a/include/linux/iomap.h
-+++ b/include/linux/iomap.h
-@@ -51,6 +51,7 @@ struct iomap {
- #define IOMAP_REPORT		(1 << 2) /* report extent status, e.g. FIEMAP */
- #define IOMAP_FAULT		(1 << 3) /* mapping for page fault */
- #define IOMAP_DIRECT		(1 << 4) /* direct I/O */
-+#define IOMAP_ATOMIC		(1 << 5) /* atomic write vs power fail */
- 
- struct iomap_ops {
- 	/*
++	/*
++	 * i_bdev references block device inode that was already shut down
++	 * (corresponding device got removed).  Remove the reference and look
++	 * up block device inode again just in case new device got
++	 * reestablished under the same device number.
++	 */
++	if (bdev)
++		bd_forget(inode);
++
+ 	bdev = bdget(inode->i_rdev);
+ 	if (bdev) {
+ 		spin_lock(&bdev_lock);
 -- 
-2.11.0
+2.10.2
