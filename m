@@ -1,109 +1,52 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga07.intel.com ([134.134.136.100]:61954 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S934096AbdBQRfb (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Feb 2017 12:35:31 -0500
-From: Scott Bauer <scott.bauer@intel.com>
-To: linux-block@vger.kernel.org
-Cc: axboe@fb.com, keith.busch@intel.com, jonathan.derrick@intel.com,
-        hch@lst.de, Scott Bauer <scott.bauer@intel.com>
-Subject: [PATCH] block/sed-opal: Introduce free_opal_dev to free the structure and clean up state
-Date: Fri, 17 Feb 2017 10:25:13 -0700
-Message-Id: <1487352313-3539-1-git-send-email-scott.bauer@intel.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <hare@suse.de>
+Subject: Re: [PATCH] scsi: zero per-cmd driver data before each I/O
+To: Christoph Hellwig <hch@lst.de>, axboe@kernel.dk,
+ martin.petersen@oracle.com
+References: <20170220165239.25669-1-hch@lst.de>
+Cc: decui@microsoft.com, linux-block@vger.kernel.org,
+ linux-scsi@vger.kernel.org
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <e145c8c8-43e1-5a6a-56c0-72cb6a01941b@suse.de>
+Date: Tue, 21 Feb 2017 07:48:18 +0100
+MIME-Version: 1.0
+In-Reply-To: <20170220165239.25669-1-hch@lst.de>
+Content-Type: text/plain; charset=windows-1252
+List-ID: <linux-block@vger.kernel.org>
 
-Before we free the opal structure we need to clean up any saved
-locking ranges that the user had told us to unlock from a suspend.
-Also fixup a list_for_each to list_for_each_safe in the save path.
+On 02/20/2017 05:52 PM, Christoph Hellwig wrote:
+> Without this drivers that don't clear the state themselves can see off
+> effects.  For example Hyper-V VMs using the storvsc driver will often
+> hang during boot due to uncleared Test Unit Ready failures.
+> 
+> Fixes: e9c787e6 ("scsi: allocate scsi_cmnd structures as part of struct request")
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Reported-by: Dexuan Cui <decui@microsoft.com>
+> Tested-by: Dexuan Cui <decui@microsoft.com>
+> ---
+>  drivers/scsi/scsi_lib.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+> index 90f65c8f487a..daced9db8af8 100644
+> --- a/drivers/scsi/scsi_lib.c
+> +++ b/drivers/scsi/scsi_lib.c
+> @@ -1167,6 +1167,7 @@ void scsi_init_command(struct scsi_device *dev, struct scsi_cmnd *cmd)
+>  	/* zero out the cmd, except for the embedded scsi_request */
+>  	memset((char *)cmd + sizeof(cmd->req), 0,
+>  		sizeof(*cmd) - sizeof(cmd->req));
+> +	memset((char *)(cmd + 1), 0, dev->host->hostt->cmd_size);
+>  
+>  	cmd->device = dev;
+>  	cmd->sense_buffer = buf;
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Signed-off-by: Scott Bauer <scott.bauer@intel.com>
----
- block/sed-opal.c         | 33 +++++++++++++++++++++++++++++++--
- include/linux/sed-opal.h |  5 +++++
- 2 files changed, 36 insertions(+), 2 deletions(-)
+Cheers,
 
-diff --git a/block/sed-opal.c b/block/sed-opal.c
-index d1c52ba..1be5c72 100644
---- a/block/sed-opal.c
-+++ b/block/sed-opal.c
-@@ -988,9 +988,9 @@ static int start_opal_session_cont(struct opal_dev *dev)
- static void add_suspend_info(struct opal_dev *dev,
- 			     struct opal_suspend_data *sus)
- {
--	struct opal_suspend_data *iter;
-+	struct opal_suspend_data *iter, *next;
- 
--	list_for_each_entry(iter, &dev->unlk_lst, node) {
-+	list_for_each_entry_safe(iter, next, &dev->unlk_lst, node) {
- 		if (iter->lr == sus->lr) {
- 			list_del(&iter->node);
- 			kfree(iter);
-@@ -2014,6 +2014,28 @@ static int check_opal_support(struct opal_dev *dev)
- 	return ret;
- }
- 
-+static void clean_opal_dev(struct opal_dev *dev)
-+{
-+
-+	struct opal_suspend_data *suspend, *next;
-+
-+	mutex_lock(&dev->dev_lock);
-+	list_for_each_entry_safe(suspend, next, &dev->unlk_lst, node) {
-+		list_del(&suspend->node);
-+		kfree(suspend);
-+	}
-+	mutex_unlock(&dev->dev_lock);
-+}
-+
-+void free_opal_dev(struct opal_dev *dev)
-+{
-+	if (!dev)
-+		return;
-+	clean_opal_dev(dev);
-+	kfree(dev);
-+}
-+EXPORT_SYMBOL(free_opal_dev);
-+
- struct opal_dev *init_opal_dev(void *data, sec_send_recv *send_recv)
- {
- 	struct opal_dev *dev;
-@@ -2193,6 +2215,13 @@ static int opal_reverttper(struct opal_dev *dev, struct opal_key *opal)
- 	dev->func_data[1] = opal;
- 	ret = next(dev);
- 	mutex_unlock(&dev->dev_lock);
-+
-+	/* If we succesfully reverted lets clean
-+	 * any saved locking ranges.
-+	 */
-+	if (!ret)
-+		clean_opal_dev(dev);
-+
- 	return ret;
- }
- 
-diff --git a/include/linux/sed-opal.h b/include/linux/sed-opal.h
-index deee23d..04b124f 100644
---- a/include/linux/sed-opal.h
-+++ b/include/linux/sed-opal.h
-@@ -27,6 +27,7 @@ typedef int (sec_send_recv)(void *data, u16 spsp, u8 secp, void *buffer,
- 		size_t len, bool send);
- 
- #ifdef CONFIG_BLK_SED_OPAL
-+void free_opal_dev(struct opal_dev *dev);
- bool opal_unlock_from_suspend(struct opal_dev *dev);
- struct opal_dev *init_opal_dev(void *data, sec_send_recv *send_recv);
- int sed_ioctl(struct opal_dev *dev, unsigned int cmd, void __user *ioctl_ptr);
-@@ -51,6 +52,10 @@ static inline bool is_sed_ioctl(unsigned int cmd)
- 	return false;
- }
- #else
-+static inline void free_opal_dev(struct opal_dev *dev)
-+{
-+}
-+
- static inline bool is_sed_ioctl(unsigned int cmd)
- {
- 	return false;
+Hannes
 -- 
-2.7.4
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: F. Imend�rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG N�rnberg)
