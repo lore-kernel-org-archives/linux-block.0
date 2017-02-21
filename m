@@ -1,148 +1,128 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:46070 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1751817AbdBBQGS (ORCPT
+Received: from mail-pg0-f44.google.com ([74.125.83.44]:36728 "EHLO
+        mail-pg0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751397AbdBUVaq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 2 Feb 2017 11:06:18 -0500
-From: Jens Axboe <axboe@fb.com>
-To: <linux-block@vger.kernel.org>
-CC: <paolo.valente@linaro.org>, <osandov@osandov.com>,
-        Jens Axboe <axboe@fb.com>
-Subject: [PATCH 1/2] blk-merge: return the merged request
-Date: Thu, 2 Feb 2017 09:06:12 -0700
-Message-ID: <1486051573-13445-2-git-send-email-axboe@fb.com>
-In-Reply-To: <1486051573-13445-1-git-send-email-axboe@fb.com>
-References: <1486051573-13445-1-git-send-email-axboe@fb.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+        Tue, 21 Feb 2017 16:30:46 -0500
+Received: by mail-pg0-f44.google.com with SMTP id s67so30139675pgb.3
+        for <linux-block@vger.kernel.org>; Tue, 21 Feb 2017 13:30:46 -0800 (PST)
+From: Omar Sandoval <osandov@osandov.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
+Cc: kernel-team@fb.com
+Subject: [PATCH v2 2/2] blk-mq-sched: separate mark hctx and queue restart operations
+Date: Tue, 21 Feb 2017 13:29:57 -0800
+Message-Id: <9e507577a8db5f856e0263a28ef908d1689a64c8.1487712413.git.osandov@fb.com>
+In-Reply-To: <19bf336f1d329df8d12fbdc5ab8842f81880c71d.1487712413.git.osandov@fb.com>
+References: <19bf336f1d329df8d12fbdc5ab8842f81880c71d.1487712413.git.osandov@fb.com>
+In-Reply-To: <19bf336f1d329df8d12fbdc5ab8842f81880c71d.1487712413.git.osandov@fb.com>
+References: <19bf336f1d329df8d12fbdc5ab8842f81880c71d.1487712413.git.osandov@fb.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-When we attempt to merge request-to-request, we return a 0/1 if we
-ended up merging or not. Change that to return the pointer to the
-request that we freed. We will use this to move the freeing of
-that request out of the merge logic, so that callers can drop
-locks before freeing the request.
+From: Omar Sandoval <osandov@fb.com>
 
-There should be no functional changes in this patch.
+In blk_mq_sched_dispatch_requests(), we call blk_mq_sched_mark_restart()
+after we dispatch requests left over on our hardware queue dispatch
+list. This is so we'll go back and dispatch requests from the scheduler.
+In this case, it's only necessary to restart the hardware queue that we
+are running; there's no reason to run other hardware queues just because
+we are using shared tags.
 
+So, split out blk_mq_sched_mark_restart() into two operations, one for
+just the hardware queue and one for the whole request queue. The core
+code only needs the hctx variant, but I/O schedulers will want to use
+both.
+
+This also requires adjusting blk_mq_sched_restart_queues() to always
+check the queue restart flag, not just when using shared tags.
+
+Signed-off-by: Omar Sandoval <osandov@fb.com>
 Signed-off-by: Jens Axboe <axboe@fb.com>
 ---
- block/blk-merge.c | 31 ++++++++++++++++---------------
- block/blk.h       |  4 ++--
- 2 files changed, 18 insertions(+), 17 deletions(-)
+ block/blk-mq-sched.c | 20 ++++++++------------
+ block/blk-mq-sched.h | 26 ++++++++++++++++++--------
+ 2 files changed, 26 insertions(+), 20 deletions(-)
 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 6aa43dec5af4..3826fc32b72c 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -659,31 +659,32 @@ static void blk_account_io_merge(struct request *req)
- }
- 
- /*
-- * Has to be called with the request spinlock acquired
-+ * For non-mq, this has to be called with the request spinlock acquired.
-+ * For mq with scheduling, the appropriate queue wide lock should be held.
-  */
--static int attempt_merge(struct request_queue *q, struct request *req,
--			  struct request *next)
-+static struct request *attempt_merge(struct request_queue *q,
-+				     struct request *req, struct request *next)
- {
- 	if (!rq_mergeable(req) || !rq_mergeable(next))
--		return 0;
-+		return NULL;
- 
- 	if (req_op(req) != req_op(next))
--		return 0;
-+		return NULL;
- 
- 	/*
- 	 * not contiguous
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index 9e8d6795a8c1..16df0a5e7046 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -205,7 +205,7 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
+ 	 * needing a restart in that case.
  	 */
- 	if (blk_rq_pos(req) + blk_rq_sectors(req) != blk_rq_pos(next))
--		return 0;
-+		return NULL;
+ 	if (!list_empty(&rq_list)) {
+-		blk_mq_sched_mark_restart(hctx);
++		blk_mq_sched_mark_restart_hctx(hctx);
+ 		did_work = blk_mq_dispatch_rq_list(hctx, &rq_list);
+ 	} else if (!has_sched_dispatch) {
+ 		blk_mq_flush_busy_ctxs(hctx, &rq_list);
+@@ -331,20 +331,16 @@ static void blk_mq_sched_restart_hctx(struct blk_mq_hw_ctx *hctx)
  
- 	if (rq_data_dir(req) != rq_data_dir(next)
- 	    || req->rq_disk != next->rq_disk
- 	    || req_no_special_merge(next))
--		return 0;
-+		return NULL;
- 
- 	if (req_op(req) == REQ_OP_WRITE_SAME &&
- 	    !blk_write_same_mergeable(req->bio, next->bio))
--		return 0;
-+		return NULL;
- 
- 	/*
- 	 * If we are allowed to merge, then append bio list
-@@ -692,7 +693,7 @@ static int attempt_merge(struct request_queue *q, struct request *req,
- 	 * counts here.
- 	 */
- 	if (!ll_merge_requests_fn(q, req, next))
--		return 0;
-+		return NULL;
- 
- 	/*
- 	 * If failfast settings disagree or any of the two is already
-@@ -735,27 +736,27 @@ static int attempt_merge(struct request_queue *q, struct request *req,
- 	/* owner-ship of bio passed from next to req */
- 	next->bio = NULL;
- 	__blk_put_request(q, next);
--	return 1;
-+	return next;
- }
- 
--int attempt_back_merge(struct request_queue *q, struct request *rq)
-+struct request *attempt_back_merge(struct request_queue *q, struct request *rq)
+ void blk_mq_sched_restart_queues(struct blk_mq_hw_ctx *hctx)
  {
- 	struct request *next = elv_latter_request(q, rq);
++	struct request_queue *q = hctx->queue;
+ 	unsigned int i;
  
- 	if (next)
- 		return attempt_merge(q, rq, next);
- 
--	return 0;
-+	return NULL;
+-	if (!(hctx->flags & BLK_MQ_F_TAG_SHARED))
++	if (test_bit(QUEUE_FLAG_RESTART, &q->queue_flags)) {
++		if (test_and_clear_bit(QUEUE_FLAG_RESTART, &q->queue_flags)) {
++			queue_for_each_hw_ctx(q, hctx, i)
++				blk_mq_sched_restart_hctx(hctx);
++		}
++	} else {
+ 		blk_mq_sched_restart_hctx(hctx);
+-	else {
+-		struct request_queue *q = hctx->queue;
+-
+-		if (!test_bit(QUEUE_FLAG_RESTART, &q->queue_flags))
+-			return;
+-
+-		clear_bit(QUEUE_FLAG_RESTART, &q->queue_flags);
+-
+-		queue_for_each_hw_ctx(q, hctx, i)
+-			blk_mq_sched_restart_hctx(hctx);
+ 	}
  }
  
--int attempt_front_merge(struct request_queue *q, struct request *rq)
-+struct request *attempt_front_merge(struct request_queue *q, struct request *rq)
+diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
+index 7b5f3b95c78e..a75b16b123f7 100644
+--- a/block/blk-mq-sched.h
++++ b/block/blk-mq-sched.h
+@@ -122,17 +122,27 @@ static inline bool blk_mq_sched_has_work(struct blk_mq_hw_ctx *hctx)
+ 	return false;
+ }
+ 
+-static inline void blk_mq_sched_mark_restart(struct blk_mq_hw_ctx *hctx)
++/*
++ * Mark a hardware queue as needing a restart.
++ */
++static inline void blk_mq_sched_mark_restart_hctx(struct blk_mq_hw_ctx *hctx)
  {
- 	struct request *prev = elv_former_request(q, rq);
+-	if (!test_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state)) {
++	if (!test_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state))
+ 		set_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state);
+-		if (hctx->flags & BLK_MQ_F_TAG_SHARED) {
+-			struct request_queue *q = hctx->queue;
++}
++
++/*
++ * Mark a hardware queue and the request queue it belongs to as needing a
++ * restart.
++ */
++static inline void blk_mq_sched_mark_restart_queue(struct blk_mq_hw_ctx *hctx)
++{
++	struct request_queue *q = hctx->queue;
  
- 	if (prev)
- 		return attempt_merge(q, prev, rq);
- 
--	return 0;
-+	return NULL;
+-			if (!test_bit(QUEUE_FLAG_RESTART, &q->queue_flags))
+-				set_bit(QUEUE_FLAG_RESTART, &q->queue_flags);
+-		}
+-	}
++	if (!test_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state))
++		set_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state);
++	if (!test_bit(QUEUE_FLAG_RESTART, &q->queue_flags))
++		set_bit(QUEUE_FLAG_RESTART, &q->queue_flags);
  }
  
- int blk_attempt_req_merge(struct request_queue *q, struct request *rq,
-@@ -767,7 +768,7 @@ int blk_attempt_req_merge(struct request_queue *q, struct request *rq,
- 		if (!e->type->ops.sq.elevator_allow_rq_merge_fn(q, rq, next))
- 			return 0;
- 
--	return attempt_merge(q, rq, next);
-+	return attempt_merge(q, rq, next) != NULL;
- }
- 
- bool blk_rq_merge_ok(struct request *rq, struct bio *bio)
-diff --git a/block/blk.h b/block/blk.h
-index c1bd4bf9e645..918cea38d51e 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -204,8 +204,8 @@ int ll_back_merge_fn(struct request_queue *q, struct request *req,
- 		     struct bio *bio);
- int ll_front_merge_fn(struct request_queue *q, struct request *req, 
- 		      struct bio *bio);
--int attempt_back_merge(struct request_queue *q, struct request *rq);
--int attempt_front_merge(struct request_queue *q, struct request *rq);
-+struct request *attempt_back_merge(struct request_queue *q, struct request *rq);
-+struct request *attempt_front_merge(struct request_queue *q, struct request *rq);
- int blk_attempt_req_merge(struct request_queue *q, struct request *rq,
- 				struct request *next);
- void blk_recalc_rq_segments(struct request *rq);
+ static inline bool blk_mq_sched_needs_restart(struct blk_mq_hw_ctx *hctx)
 -- 
-2.7.4
-
+2.11.1
