@@ -1,23 +1,86 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <Bart.VanAssche@sandisk.com>
-To: Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, "Christoph
- Hellwig" <hch@infradead.org>, Dan Williams <dan.j.williams@intel.com>, Thiago
- Jung Bauermann <bauerman@linux.vnet.ibm.com>, Lekshmi Pillai
-	<lekshmicpillai@in.ibm.com>, Tejun Heo <tj@kernel.org>, NeilBrown
-	<neilb@suse.de>, Omar Sandoval <osandov@osandov.com>
-Subject: Re: [PATCH 13/13] block: Fix oops scsi_disk_get()
-Date: Tue, 21 Feb 2017 19:33:26 +0000
-Message-ID: <1D08B61A9CF0974AA09887BE32D889DA0AC6AF@ULS-OP-MBXIP03.sdcorp.global.sandisk.com>
+Return-Path: <jack@suse.cz>
+From: Jan Kara <jack@suse.cz>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
+	Lekshmi Pillai <lekshmicpillai@in.ibm.com>,
+	Tejun Heo <tj@kernel.org>,
+	NeilBrown <neilb@suse.de>,
+	Omar Sandoval <osandov@osandov.com>,
+	Jan Kara <jack@suse.cz>
+Subject: [PATCH 13/13] block: Fix oops scsi_disk_get()
+Date: Tue, 21 Feb 2017 18:09:58 +0100
+Message-Id: <20170221170958.21845-14-jack@suse.cz>
+In-Reply-To: <20170221170958.21845-1-jack@suse.cz>
 References: <20170221170958.21845-1-jack@suse.cz>
- <20170221170958.21845-14-jack@suse.cz>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Return-Path: Bart.VanAssche@sandisk.com
 List-ID: <linux-block@vger.kernel.org>
 
-On 02/21/2017 09:55 AM, Jan Kara wrote:=0A=
-> When device open races with device shutdown, we can get the following=0A=
-> oops in scsi_disk_get(): [ ... ]=0A=
-=0A=
-Reviewed-by: Bart Van Assche <bart.vanassche@sandisk.com>=0A=
+When device open races with device shutdown, we can get the following
+oops in scsi_disk_get():
+
+[11863.044351] general protection fault: 0000 [#1] SMP
+[11863.045561] Modules linked in: scsi_debug xfs libcrc32c netconsole btrfs raid6_pq zlib_deflate lzo_compress xor [last unloaded: loop]
+[11863.047853] CPU: 3 PID: 13042 Comm: hald-probe-stor Tainted: G W      4.10.0-rc2-xen+ #35
+[11863.048030] Hardware name: Bochs Bochs, BIOS Bochs 01/01/2011
+[11863.048030] task: ffff88007f438200 task.stack: ffffc90000fd0000
+[11863.048030] RIP: 0010:scsi_disk_get+0x43/0x70
+[11863.048030] RSP: 0018:ffffc90000fd3a08 EFLAGS: 00010202
+[11863.048030] RAX: 6b6b6b6b6b6b6b6b RBX: ffff88007f56d000 RCX: 0000000000000000
+[11863.048030] RDX: 0000000000000001 RSI: 0000000000000004 RDI: ffffffff81a8d880
+[11863.048030] RBP: ffffc90000fd3a18 R08: 0000000000000000 R09: 0000000000000001
+[11863.059217] R10: 0000000000000000 R11: 0000000000000000 R12: 00000000fffffffa
+[11863.059217] R13: ffff880078872800 R14: ffff880070915540 R15: 000000000000001d
+[11863.059217] FS:  00007f2611f71800(0000) GS:ffff88007f0c0000(0000) knlGS:0000000000000000
+[11863.059217] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[11863.059217] CR2: 000000000060e048 CR3: 00000000778d4000 CR4: 00000000000006e0
+[11863.059217] Call Trace:
+[11863.059217]  ? disk_get_part+0x22/0x1f0
+[11863.059217]  sd_open+0x39/0x130
+[11863.059217]  __blkdev_get+0x69/0x430
+[11863.059217]  ? bd_acquire+0x7f/0xc0
+[11863.059217]  ? bd_acquire+0x96/0xc0
+[11863.059217]  ? blkdev_get+0x350/0x350
+[11863.059217]  blkdev_get+0x126/0x350
+[11863.059217]  ? _raw_spin_unlock+0x2b/0x40
+[11863.059217]  ? bd_acquire+0x7f/0xc0
+[11863.059217]  ? blkdev_get+0x350/0x350
+[11863.059217]  blkdev_open+0x65/0x80
+...
+
+As you can see RAX value is already poisoned showing that gendisk we got
+is already freed. The problem is that get_gendisk() looks up device
+number in ext_devt_idr and then does get_disk() which does kobject_get()
+on the disks kobject. However the disk gets removed from ext_devt_idr
+only in disk_release() (through blk_free_devt()) at which moment it has
+already 0 refcount and is already on its way to be freed. Indeed we've
+got a warning from kobject_get() about 0 refcount shortly before the
+oops.
+
+We fix the problem by using kobject_get_unless_zero() in get_disk() so
+that get_disk() cannot get reference on a disk that is already being
+freed.
+
+Tested-by: Lekshmi Pillai <lekshmicpillai@in.ibm.com>
+Acked-by: Tejun Heo <tj@kernel.org>
+Signed-off-by: Jan Kara <jack@suse.cz>
+---
+ block/genhd.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/block/genhd.c b/block/genhd.c
+index 68c613edb93a..2baacfea7b5e 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -1350,7 +1350,7 @@ struct kobject *get_disk(struct gendisk *disk)
+ 	owner = disk->fops->owner;
+ 	if (owner && !try_module_get(owner))
+ 		return NULL;
+-	kobj = kobject_get(&disk_to_dev(disk)->kobj);
++	kobj = kobject_get_unless_zero(&disk_to_dev(disk)->kobj);
+ 	if (kobj == NULL) {
+ 		module_put(owner);
+ 		return NULL;
+-- 
+2.10.2
