@@ -1,91 +1,158 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f195.google.com ([209.85.192.195]:34906 "EHLO
-        mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752366AbdB1Pma (ORCPT
+Received: from mail-pg0-f42.google.com ([74.125.83.42]:35590 "EHLO
+        mail-pg0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751397AbdBUVap (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Feb 2017 10:42:30 -0500
-From: Ming Lei <tom.leiming@gmail.com>
-To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
-        linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Ming Lei <tom.leiming@gmail.com>
-Subject: [PATCH v2 07/13] md: raid1: retrieve page from pre-allocated resync page array
-Date: Tue, 28 Feb 2017 23:41:37 +0800
-Message-Id: <1488296503-4987-8-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1488296503-4987-1-git-send-email-tom.leiming@gmail.com>
-References: <1488296503-4987-1-git-send-email-tom.leiming@gmail.com>
+        Tue, 21 Feb 2017 16:30:45 -0500
+Received: by mail-pg0-f42.google.com with SMTP id b129so41352104pgc.2
+        for <linux-block@vger.kernel.org>; Tue, 21 Feb 2017 13:30:45 -0800 (PST)
+From: Omar Sandoval <osandov@osandov.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
+Cc: kernel-team@fb.com
+Subject: [PATCH v2 1/2] blk-mq: use sbq wait queues instead of restart for driver tags
+Date: Tue, 21 Feb 2017 13:29:56 -0800
+Message-Id: <19bf336f1d329df8d12fbdc5ab8842f81880c71d.1487712413.git.osandov@fb.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Now one page array is allocated for each resync bio, and we can
-retrieve page from this table directly.
+From: Omar Sandoval <osandov@fb.com>
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+Commit 50e1dab86aa2 ("blk-mq-sched: fix starvation for multiple hardware
+queues and shared tags") fixed one starvation issue for shared tags.
+However, we can still get into a situation where we fail to allocate a
+tag because all tags are allocated but we don't have any pending
+requests on any hardware queue.
+
+One solution for this would be to restart all queues that share a tag
+map, but that really sucks. Ideally, we could just block and wait for a
+tag, but that isn't always possible from blk_mq_dispatch_rq_list().
+
+However, we can still use the struct sbitmap_queue wait queues with a
+custom callback instead of blocking. This has a few benefits:
+
+1. It avoids iterating over all hardware queues when completing an I/O,
+   which the current restart code has to do.
+2. It benefits from the existing rolling wakeup code.
+3. It avoids punting to another thread just to have it block.
+
+Signed-off-by: Omar Sandoval <osandov@fb.com>
+Signed-off-by: Jens Axboe <axboe@fb.com>
 ---
- drivers/md/raid1.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+Changed from v1:
 
-diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
-index 900144f39630..d0cb5c026506 100644
---- a/drivers/md/raid1.c
-+++ b/drivers/md/raid1.c
-@@ -1970,6 +1970,7 @@ static int fix_sync_read_error(struct r1bio *r1_bio)
- 	struct mddev *mddev = r1_bio->mddev;
- 	struct r1conf *conf = mddev->private;
- 	struct bio *bio = r1_bio->bios[r1_bio->read_disk];
-+	struct page **pages = get_resync_pages(bio)->pages;
- 	sector_t sect = r1_bio->sector;
- 	int sectors = r1_bio->sectors;
- 	int idx = 0;
-@@ -2003,7 +2004,7 @@ static int fix_sync_read_error(struct r1bio *r1_bio)
- 				 */
- 				rdev = conf->mirrors[d].rdev;
- 				if (sync_page_io(rdev, sect, s<<9,
--						 bio->bi_io_vec[idx].bv_page,
-+						 pages[idx],
- 						 REQ_OP_READ, 0, false)) {
- 					success = 1;
- 					break;
-@@ -2058,7 +2059,7 @@ static int fix_sync_read_error(struct r1bio *r1_bio)
+- Call blk_mq_get_driver_tag() with &hctx, not NULL, to make sure we
+  handle the case of a request from a different hardware queue than the
+  one we're running (e.g., with nvme+mq-deadline)
+
+ block/blk-mq.c         | 58 ++++++++++++++++++++++++++++++++++++++++++++------
+ include/linux/blk-mq.h |  2 ++
+ 2 files changed, 54 insertions(+), 6 deletions(-)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index b29e7dc7b309..bcb9f8742f72 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -904,6 +904,44 @@ static bool reorder_tags_to_front(struct list_head *list)
+ 	return first != NULL;
+ }
+ 
++static int blk_mq_dispatch_wake(wait_queue_t *wait, unsigned mode, int flags,
++				void *key)
++{
++	struct blk_mq_hw_ctx *hctx;
++
++	hctx = container_of(wait, struct blk_mq_hw_ctx, dispatch_wait);
++
++	list_del(&wait->task_list);
++	clear_bit_unlock(BLK_MQ_S_TAG_WAITING, &hctx->state);
++	blk_mq_run_hw_queue(hctx, true);
++	return 1;
++}
++
++static bool blk_mq_dispatch_wait_add(struct blk_mq_hw_ctx *hctx)
++{
++	struct sbq_wait_state *ws;
++
++	/*
++	 * The TAG_WAITING bit serves as a lock protecting hctx->dispatch_wait.
++	 * The thread which wins the race to grab this bit adds the hardware
++	 * queue to the wait queue.
++	 */
++	if (test_bit(BLK_MQ_S_TAG_WAITING, &hctx->state) ||
++	    test_and_set_bit_lock(BLK_MQ_S_TAG_WAITING, &hctx->state))
++		return false;
++
++	init_waitqueue_func_entry(&hctx->dispatch_wait, blk_mq_dispatch_wake);
++	ws = bt_wait_ptr(&hctx->tags->bitmap_tags, hctx);
++
++	/*
++	 * As soon as this returns, it's no longer safe to fiddle with
++	 * hctx->dispatch_wait, since a completion can wake up the wait queue
++	 * and unlock the bit.
++	 */
++	add_wait_queue(&ws->wait, &hctx->dispatch_wait);
++	return true;
++}
++
+ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list)
+ {
+ 	struct request_queue *q = hctx->queue;
+@@ -931,15 +969,22 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list)
  				continue;
- 			rdev = conf->mirrors[d].rdev;
- 			if (r1_sync_page_io(rdev, sect, s,
--					    bio->bi_io_vec[idx].bv_page,
-+					    pages[idx],
- 					    WRITE) == 0) {
- 				r1_bio->bios[d]->bi_end_io = NULL;
- 				rdev_dec_pending(rdev, mddev);
-@@ -2073,7 +2074,7 @@ static int fix_sync_read_error(struct r1bio *r1_bio)
- 				continue;
- 			rdev = conf->mirrors[d].rdev;
- 			if (r1_sync_page_io(rdev, sect, s,
--					    bio->bi_io_vec[idx].bv_page,
-+					    pages[idx],
- 					    READ) != 0)
- 				atomic_add(s, &rdev->corrected_errors);
+ 
+ 			/*
+-			 * We failed getting a driver tag. Mark the queue(s)
+-			 * as needing a restart. Retry getting a tag again,
+-			 * in case the needed IO completed right before we
+-			 * marked the queue as needing a restart.
++			 * The initial allocation attempt failed, so we need to
++			 * rerun the hardware queue when a tag is freed.
+ 			 */
+-			blk_mq_sched_mark_restart(hctx);
+-			if (!blk_mq_get_driver_tag(rq, &hctx, false))
++			if (blk_mq_dispatch_wait_add(hctx)) {
++				/*
++				 * It's possible that a tag was freed in the
++				 * window between the allocation failure and
++				 * adding the hardware queue to the wait queue.
++				 */
++				if (!blk_mq_get_driver_tag(rq, &hctx, false))
++					break;
++			} else {
+ 				break;
++			}
  		}
-@@ -2149,6 +2150,8 @@ static void process_checks(struct r1bio *r1_bio)
- 		struct bio *pbio = r1_bio->bios[primary];
- 		struct bio *sbio = r1_bio->bios[i];
- 		int error = sbio->bi_error;
-+		struct page **ppages = get_resync_pages(pbio)->pages;
-+		struct page **spages = get_resync_pages(sbio)->pages;
++
+ 		list_del_init(&rq->queuelist);
  
- 		if (sbio->bi_end_io != end_sync_read)
- 			continue;
-@@ -2157,11 +2160,8 @@ static void process_checks(struct r1bio *r1_bio)
+ 		bd.rq = rq;
+@@ -1051,6 +1096,7 @@ static int blk_mq_hctx_next_cpu(struct blk_mq_hw_ctx *hctx)
+ void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
+ {
+ 	if (unlikely(blk_mq_hctx_stopped(hctx) ||
++		     test_bit(BLK_MQ_S_TAG_WAITING, &hctx->state) ||
+ 		     !blk_mq_hw_queue_mapped(hctx)))
+ 		return;
  
- 		if (!error) {
- 			for (j = vcnt; j-- ; ) {
--				struct page *p, *s;
--				p = pbio->bi_io_vec[j].bv_page;
--				s = sbio->bi_io_vec[j].bv_page;
--				if (memcmp(page_address(p),
--					   page_address(s),
-+				if (memcmp(page_address(ppages[j]),
-+					   page_address(spages[j]),
- 					   sbio->bi_io_vec[j].bv_len))
- 					break;
- 			}
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 8e4df3d6c8cd..001d30d727c5 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -33,6 +33,7 @@ struct blk_mq_hw_ctx {
+ 	struct blk_mq_ctx	**ctxs;
+ 	unsigned int		nr_ctx;
+ 
++	wait_queue_t		dispatch_wait;
+ 	atomic_t		wait_index;
+ 
+ 	struct blk_mq_tags	*tags;
+@@ -160,6 +161,7 @@ enum {
+ 	BLK_MQ_S_STOPPED	= 0,
+ 	BLK_MQ_S_TAG_ACTIVE	= 1,
+ 	BLK_MQ_S_SCHED_RESTART	= 2,
++	BLK_MQ_S_TAG_WAITING	= 3,
+ 
+ 	BLK_MQ_MAX_DEPTH	= 10240,
+ 
 -- 
-2.7.4
+2.11.1
