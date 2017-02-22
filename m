@@ -1,127 +1,65 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f42.google.com ([74.125.83.42]:33900 "EHLO
-        mail-pg0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751977AbdBRBGA (ORCPT
+Received: from mail-ua0-f173.google.com ([209.85.217.173]:35088 "EHLO
+        mail-ua0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932084AbdBVKVo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Feb 2017 20:06:00 -0500
-Received: by mail-pg0-f42.google.com with SMTP id z67so19623814pgb.1
-        for <linux-block@vger.kernel.org>; Fri, 17 Feb 2017 17:05:59 -0800 (PST)
-From: Omar Sandoval <osandov@osandov.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: kernel-team@fb.com
-Subject: [PATCH 2/2] blk-mq-sched: separate mark hctx and queue restart operations
-Date: Fri, 17 Feb 2017 17:05:07 -0800
-Message-Id: <2729e47a81dc34eb838d7d854bb0e3f8a82ec7f0.1487379857.git.osandov@fb.com>
-In-Reply-To: <d91d1df06ad9292459400637118bca8d09c88dcf.1487379857.git.osandov@fb.com>
-References: <d91d1df06ad9292459400637118bca8d09c88dcf.1487379857.git.osandov@fb.com>
-In-Reply-To: <d91d1df06ad9292459400637118bca8d09c88dcf.1487379857.git.osandov@fb.com>
-References: <d91d1df06ad9292459400637118bca8d09c88dcf.1487379857.git.osandov@fb.com>
+        Wed, 22 Feb 2017 05:21:44 -0500
+MIME-Version: 1.0
+In-Reply-To: <20170221171441.GA15875@quack2.suse.cz>
+References: <20170218003015.GA19776@vader.DHCP.thefacebook.com>
+ <1487378636.4351.45.camel@HansenPartnership.com> <20170220021958.GA26238@vader>
+ <20170221171441.GA15875@quack2.suse.cz>
+From: Ming Lei <tom.leiming@gmail.com>
+Date: Wed, 22 Feb 2017 18:21:42 +0800
+Message-ID: <CACVXFVOzpiXF=0vi5-y4hB+XZK2asDYyeQj9k0btRguiJVKeOw@mail.gmail.com>
+Subject: Re: Manual driver binding and unbinding broken for SCSI
+To: Jan Kara <jack@suse.cz>
+Cc: Omar Sandoval <osandov@osandov.com>,
+        James Bottomley <James.Bottomley@hansenpartnership.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Jens Axboe <axboe@fb.com>,
+        Linux SCSI List <linux-scsi@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Omar Sandoval <osandov@fb.com>
+On Wed, Feb 22, 2017 at 1:14 AM, Jan Kara <jack@suse.cz> wrote:
+> On Sun 19-02-17 18:19:58, Omar Sandoval wrote:
+>> On Fri, Feb 17, 2017 at 04:43:56PM -0800, James Bottomley wrote:
+>> > This seems to be related to a 0day test we got on the block tree,
+>> > details here:
+>> >
+>> > http://marc.info/?t=148624068800001
+>> >
+>> > I root caused the above to something not being released when it should
+>> > be, so it looks like you have the same problem.  It seems to be a
+>> > recent commit in the block tree, so could you bisect it since you have
+>> > a nice reproducer?
+>>
+>> These appear to actually be two separate issues.
+>>
+>> The unbind followed by bind crash only happens with scsi-mq. It reproes
+>> since at least 4.0.
+>>
+>> The unbind followed by a new device coming up crash happens both with
+>> and without scsi-mq. The earliest version I was able to check for that
+>> was 4.6, which did reproduce.
+>>
+>> I'll see if I can get some more info on these two issues separately.
+>
+> Actually, the second issue is only a warning right? And if I understand the
+> issue correctly, it should be fixed by either Dan's patches in linux-block
+> or my patch 4 in the series which matches your test results. So that is
+> dealt with. I have no idea about the first issue though.
 
-In blk_mq_sched_dispatch_requests(), we call blk_mq_sched_mark_restart()
-after we dispatch requests left over on our hardware queue dispatch
-list. This is so we'll go back and dispatch requests from the scheduler.
-In this case, it's only necessary to restart the hardware queue that we
-are running; there's no reason to run other hardware queues just because
-we are using shared tags.
+Looks the 1st one is one old issue in blk-mq, and I have sent one patchset
+to address it:
 
-So, split out blk_mq_sched_mark_restart() into two operations, one for
-just the hardware queue and one for the whole request queue. The core
-code only needs the hctx variant, but I/O schedulers will want to use
-both.
+http://marc.info/?l=linux-kernel&m=148775847517071&w=2
 
-This also requires adjusting blk_mq_sched_restart_queues() to always
-check the queue restart flag, not just when using shared tags.
+Omar, feel free to give a test.
 
-Signed-off-by: Omar Sandoval <osandov@fb.com>
----
- block/blk-mq-sched.c | 20 ++++++++------------
- block/blk-mq-sched.h | 26 ++++++++++++++++++--------
- 2 files changed, 26 insertions(+), 20 deletions(-)
-
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 97fe904f0a04..aa27ecab0d3f 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -203,7 +203,7 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
- 	 * needing a restart in that case.
- 	 */
- 	if (!list_empty(&rq_list)) {
--		blk_mq_sched_mark_restart(hctx);
-+		blk_mq_sched_mark_restart_hctx(hctx);
- 		blk_mq_dispatch_rq_list(hctx, &rq_list);
- 	} else if (!e || !e->type->ops.mq.dispatch_request) {
- 		blk_mq_flush_busy_ctxs(hctx, &rq_list);
-@@ -322,20 +322,16 @@ static void blk_mq_sched_restart_hctx(struct blk_mq_hw_ctx *hctx)
- 
- void blk_mq_sched_restart_queues(struct blk_mq_hw_ctx *hctx)
- {
-+	struct request_queue *q = hctx->queue;
- 	unsigned int i;
- 
--	if (!(hctx->flags & BLK_MQ_F_TAG_SHARED))
-+	if (test_bit(QUEUE_FLAG_RESTART, &q->queue_flags)) {
-+		if (test_and_clear_bit(QUEUE_FLAG_RESTART, &q->queue_flags)) {
-+			queue_for_each_hw_ctx(q, hctx, i)
-+				blk_mq_sched_restart_hctx(hctx);
-+		}
-+	} else {
- 		blk_mq_sched_restart_hctx(hctx);
--	else {
--		struct request_queue *q = hctx->queue;
--
--		if (!test_bit(QUEUE_FLAG_RESTART, &q->queue_flags))
--			return;
--
--		clear_bit(QUEUE_FLAG_RESTART, &q->queue_flags);
--
--		queue_for_each_hw_ctx(q, hctx, i)
--			blk_mq_sched_restart_hctx(hctx);
- 	}
- }
- 
-diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
-index 7b5f3b95c78e..a75b16b123f7 100644
---- a/block/blk-mq-sched.h
-+++ b/block/blk-mq-sched.h
-@@ -122,17 +122,27 @@ static inline bool blk_mq_sched_has_work(struct blk_mq_hw_ctx *hctx)
- 	return false;
- }
- 
--static inline void blk_mq_sched_mark_restart(struct blk_mq_hw_ctx *hctx)
-+/*
-+ * Mark a hardware queue as needing a restart.
-+ */
-+static inline void blk_mq_sched_mark_restart_hctx(struct blk_mq_hw_ctx *hctx)
- {
--	if (!test_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state)) {
-+	if (!test_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state))
- 		set_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state);
--		if (hctx->flags & BLK_MQ_F_TAG_SHARED) {
--			struct request_queue *q = hctx->queue;
-+}
-+
-+/*
-+ * Mark a hardware queue and the request queue it belongs to as needing a
-+ * restart.
-+ */
-+static inline void blk_mq_sched_mark_restart_queue(struct blk_mq_hw_ctx *hctx)
-+{
-+	struct request_queue *q = hctx->queue;
- 
--			if (!test_bit(QUEUE_FLAG_RESTART, &q->queue_flags))
--				set_bit(QUEUE_FLAG_RESTART, &q->queue_flags);
--		}
--	}
-+	if (!test_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state))
-+		set_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state);
-+	if (!test_bit(QUEUE_FLAG_RESTART, &q->queue_flags))
-+		set_bit(QUEUE_FLAG_RESTART, &q->queue_flags);
- }
- 
- static inline bool blk_mq_sched_needs_restart(struct blk_mq_hw_ctx *hctx)
--- 
-2.11.1
+thanks,
+Ming Lei
