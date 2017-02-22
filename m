@@ -1,114 +1,128 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f65.google.com ([74.125.83.65]:34767 "EHLO
-        mail-pg0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932080AbdBVKOW (ORCPT
+Received: from mail-pg0-f52.google.com ([74.125.83.52]:35823 "EHLO
+        mail-pg0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933076AbdBVS7T (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Feb 2017 05:14:22 -0500
-From: Ming Lei <tom.leiming@gmail.com>
-To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        Omar Sandoval <osandov@osandov.com>
-Cc: Ming Lei <tom.leiming@gmail.com>
-Subject: [PATCH 1/4] blk-mq: initialize mq kobjects in blk_mq_init_allocated_queue()
-Date: Wed, 22 Feb 2017 18:13:59 +0800
-Message-Id: <1487758442-5855-2-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1487758442-5855-1-git-send-email-tom.leiming@gmail.com>
-References: <1487758442-5855-1-git-send-email-tom.leiming@gmail.com>
+        Wed, 22 Feb 2017 13:59:19 -0500
+Received: by mail-pg0-f52.google.com with SMTP id b129so4371651pgc.2
+        for <linux-block@vger.kernel.org>; Wed, 22 Feb 2017 10:59:19 -0800 (PST)
+From: Omar Sandoval <osandov@osandov.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
+Cc: kernel-team@fb.com
+Subject: [PATCH v3 2/2] blk-mq-sched: separate mark hctx and queue restart operations
+Date: Wed, 22 Feb 2017 10:58:30 -0800
+Message-Id: <2ef9f8450d7b15ac3af143583f1e6ae61938f5e0.1487789478.git.osandov@fb.com>
+In-Reply-To: <ff44cc50b198ea38b4040fd66e8301249d6be69b.1487789478.git.osandov@fb.com>
+References: <ff44cc50b198ea38b4040fd66e8301249d6be69b.1487789478.git.osandov@fb.com>
+In-Reply-To: <ff44cc50b198ea38b4040fd66e8301249d6be69b.1487789478.git.osandov@fb.com>
+References: <ff44cc50b198ea38b4040fd66e8301249d6be69b.1487789478.git.osandov@fb.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Both q->mq_kobj and sw queues' kobjects should have been initialized
-once, instead of doing that each add_disk context.
+From: Omar Sandoval <osandov@fb.com>
 
-Also this patch removes clearing of ctx in blk_mq_init_cpu_queues()
-because percpu allocator fills zero to allocated variable.
+In blk_mq_sched_dispatch_requests(), we call blk_mq_sched_mark_restart()
+after we dispatch requests left over on our hardware queue dispatch
+list. This is so we'll go back and dispatch requests from the scheduler.
+In this case, it's only necessary to restart the hardware queue that we
+are running; there's no reason to run other hardware queues just because
+we are using shared tags.
 
-This patch fixes one issue[1] reported from Omar.
+So, split out blk_mq_sched_mark_restart() into two operations, one for
+just the hardware queue and one for the whole request queue. The core
+code only needs the hctx variant, but I/O schedulers will want to use
+both.
 
-[1] kernel wearning when doing unbind/bind on one scsi-mq device
+This also requires adjusting blk_mq_sched_restart_queues() to always
+check the queue restart flag, not just when using shared tags.
 
-[   19.347924] kobject (ffff8800791ea0b8): tried to init an initialized object, something is seriously wrong.
-[   19.349781] CPU: 1 PID: 84 Comm: kworker/u8:1 Not tainted 4.10.0-rc7-00210-g53f39eeaa263 #34
-[   19.350686] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.1-20161122_114906-anatol 04/01/2014
-[   19.350920] Workqueue: events_unbound async_run_entry_fn
-[   19.350920] Call Trace:
-[   19.350920]  dump_stack+0x63/0x83
-[   19.350920]  kobject_init+0x77/0x90
-[   19.350920]  blk_mq_register_dev+0x40/0x130
-[   19.350920]  blk_register_queue+0xb6/0x190
-[   19.350920]  device_add_disk+0x1ec/0x4b0
-[   19.350920]  sd_probe_async+0x10d/0x1c0 [sd_mod]
-[   19.350920]  async_run_entry_fn+0x48/0x150
-[   19.350920]  process_one_work+0x1d0/0x480
-[   19.350920]  worker_thread+0x48/0x4e0
-[   19.350920]  kthread+0x101/0x140
-[   19.350920]  ? process_one_work+0x480/0x480
-[   19.350920]  ? kthread_create_on_node+0x60/0x60
-[   19.350920]  ret_from_fork+0x2c/0x40
-
-Cc: Omar Sandoval <osandov@osandov.com>
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+Signed-off-by: Omar Sandoval <osandov@fb.com>
+Signed-off-by: Jens Axboe <axboe@fb.com>
 ---
- block/blk-mq-sysfs.c | 4 +---
- block/blk-mq.c       | 4 +++-
- block/blk-mq.h       | 1 +
- 3 files changed, 5 insertions(+), 4 deletions(-)
+ block/blk-mq-sched.c | 20 ++++++++------------
+ block/blk-mq-sched.h | 26 ++++++++++++++++++--------
+ 2 files changed, 26 insertions(+), 20 deletions(-)
 
-diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
-index 295e69670c39..124305407c80 100644
---- a/block/blk-mq-sysfs.c
-+++ b/block/blk-mq-sysfs.c
-@@ -277,7 +277,7 @@ void blk_mq_hctx_kobj_init(struct blk_mq_hw_ctx *hctx)
- 	kobject_init(&hctx->kobj, &blk_mq_hw_ktype);
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index 9e8d6795a8c1..16df0a5e7046 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -205,7 +205,7 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
+ 	 * needing a restart in that case.
+ 	 */
+ 	if (!list_empty(&rq_list)) {
+-		blk_mq_sched_mark_restart(hctx);
++		blk_mq_sched_mark_restart_hctx(hctx);
+ 		did_work = blk_mq_dispatch_rq_list(hctx, &rq_list);
+ 	} else if (!has_sched_dispatch) {
+ 		blk_mq_flush_busy_ctxs(hctx, &rq_list);
+@@ -331,20 +331,16 @@ static void blk_mq_sched_restart_hctx(struct blk_mq_hw_ctx *hctx)
+ 
+ void blk_mq_sched_restart_queues(struct blk_mq_hw_ctx *hctx)
+ {
++	struct request_queue *q = hctx->queue;
+ 	unsigned int i;
+ 
+-	if (!(hctx->flags & BLK_MQ_F_TAG_SHARED))
++	if (test_bit(QUEUE_FLAG_RESTART, &q->queue_flags)) {
++		if (test_and_clear_bit(QUEUE_FLAG_RESTART, &q->queue_flags)) {
++			queue_for_each_hw_ctx(q, hctx, i)
++				blk_mq_sched_restart_hctx(hctx);
++		}
++	} else {
+ 		blk_mq_sched_restart_hctx(hctx);
+-	else {
+-		struct request_queue *q = hctx->queue;
+-
+-		if (!test_bit(QUEUE_FLAG_RESTART, &q->queue_flags))
+-			return;
+-
+-		clear_bit(QUEUE_FLAG_RESTART, &q->queue_flags);
+-
+-		queue_for_each_hw_ctx(q, hctx, i)
+-			blk_mq_sched_restart_hctx(hctx);
+ 	}
  }
  
--static void blk_mq_sysfs_init(struct request_queue *q)
-+void blk_mq_sysfs_init(struct request_queue *q)
+diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
+index 7b5f3b95c78e..a75b16b123f7 100644
+--- a/block/blk-mq-sched.h
++++ b/block/blk-mq-sched.h
+@@ -122,17 +122,27 @@ static inline bool blk_mq_sched_has_work(struct blk_mq_hw_ctx *hctx)
+ 	return false;
+ }
+ 
+-static inline void blk_mq_sched_mark_restart(struct blk_mq_hw_ctx *hctx)
++/*
++ * Mark a hardware queue as needing a restart.
++ */
++static inline void blk_mq_sched_mark_restart_hctx(struct blk_mq_hw_ctx *hctx)
  {
- 	struct blk_mq_ctx *ctx;
- 	int cpu;
-@@ -297,8 +297,6 @@ int blk_mq_register_dev(struct device *dev, struct request_queue *q)
- 
- 	blk_mq_disable_hotplug();
- 
--	blk_mq_sysfs_init(q);
--
- 	ret = kobject_add(&q->mq_kobj, kobject_get(&dev->kobj), "%s", "mq");
- 	if (ret < 0)
- 		goto out;
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index b29e7dc7b309..ade1d7cde37e 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1941,7 +1941,6 @@ static void blk_mq_init_cpu_queues(struct request_queue *q,
- 		struct blk_mq_ctx *__ctx = per_cpu_ptr(q->queue_ctx, i);
- 		struct blk_mq_hw_ctx *hctx;
- 
--		memset(__ctx, 0, sizeof(*__ctx));
- 		__ctx->cpu = i;
- 		spin_lock_init(&__ctx->lock);
- 		INIT_LIST_HEAD(&__ctx->rq_list);
-@@ -2248,6 +2247,9 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
- 	if (!q->queue_ctx)
- 		goto err_exit;
- 
-+	/* init q->mq_kobj and sw queues' kobjects */
-+	blk_mq_sysfs_init(q);
+-	if (!test_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state)) {
++	if (!test_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state))
+ 		set_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state);
+-		if (hctx->flags & BLK_MQ_F_TAG_SHARED) {
+-			struct request_queue *q = hctx->queue;
++}
 +
- 	q->queue_hw_ctx = kzalloc_node(nr_cpu_ids * sizeof(*(q->queue_hw_ctx)),
- 						GFP_KERNEL, set->numa_node);
- 	if (!q->queue_hw_ctx)
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 24b2256186f3..445343425f6d 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -77,6 +77,7 @@ static inline struct blk_mq_hw_ctx *blk_mq_map_queue(struct request_queue *q,
- /*
-  * sysfs helpers
-  */
-+extern void blk_mq_sysfs_init(struct request_queue *q);
- extern int blk_mq_sysfs_register(struct request_queue *q);
- extern void blk_mq_sysfs_unregister(struct request_queue *q);
- extern void blk_mq_hctx_kobj_init(struct blk_mq_hw_ctx *hctx);
++/*
++ * Mark a hardware queue and the request queue it belongs to as needing a
++ * restart.
++ */
++static inline void blk_mq_sched_mark_restart_queue(struct blk_mq_hw_ctx *hctx)
++{
++	struct request_queue *q = hctx->queue;
+ 
+-			if (!test_bit(QUEUE_FLAG_RESTART, &q->queue_flags))
+-				set_bit(QUEUE_FLAG_RESTART, &q->queue_flags);
+-		}
+-	}
++	if (!test_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state))
++		set_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state);
++	if (!test_bit(QUEUE_FLAG_RESTART, &q->queue_flags))
++		set_bit(QUEUE_FLAG_RESTART, &q->queue_flags);
+ }
+ 
+ static inline bool blk_mq_sched_needs_restart(struct blk_mq_hw_ctx *hctx)
 -- 
-2.7.4
+2.11.1
