@@ -1,141 +1,114 @@
-Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
-From: Jon Derrick <jonathan.derrick@intel.com>
-To: 
-Subject: [PATCHv3 2/4] block/sed: Add helper to qualify response tokens
-Date: Tue, 21 Feb 2017 11:44:34 -0700
-Message-Id: <1487702676-10658-3-git-send-email-jonathan.derrick@intel.com>
-In-Reply-To: <1487702676-10658-1-git-send-email-jonathan.derrick@intel.com>
-References: <1487702676-10658-1-git-send-email-jonathan.derrick@intel.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
-List-Post: <mailto:linux-nvme@lists.infradead.org>
-List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
-Cc: Jens Axboe <axboe@fb.com>, Rafael Antognolli <rafael.antognolli@intel.com>,
- linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
- Jon Derrick <jonathan.derrick@intel.com>, Christoph Hellwig <hch@lst.de>,
- Scott Bauer <scott.bauer@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
-Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pg0-f65.google.com ([74.125.83.65]:34767 "EHLO
+        mail-pg0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932080AbdBVKOW (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 22 Feb 2017 05:14:22 -0500
+From: Ming Lei <tom.leiming@gmail.com>
+To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        Omar Sandoval <osandov@osandov.com>
+Cc: Ming Lei <tom.leiming@gmail.com>
+Subject: [PATCH 1/4] blk-mq: initialize mq kobjects in blk_mq_init_allocated_queue()
+Date: Wed, 22 Feb 2017 18:13:59 +0800
+Message-Id: <1487758442-5855-2-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1487758442-5855-1-git-send-email-tom.leiming@gmail.com>
+References: <1487758442-5855-1-git-send-email-tom.leiming@gmail.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Add helper which verifies the response token is valid and matches the
-expected value. Merges token_type and response_get_token.
+Both q->mq_kobj and sw queues' kobjects should have been initialized
+once, instead of doing that each add_disk context.
 
-Signed-off-by: Jon Derrick <jonathan.derrick@intel.com>
-Reviewed-by: Scott Bauer <scott.bauer@intel.com>
+Also this patch removes clearing of ctx in blk_mq_init_cpu_queues()
+because percpu allocator fills zero to allocated variable.
+
+This patch fixes one issue[1] reported from Omar.
+
+[1] kernel wearning when doing unbind/bind on one scsi-mq device
+
+[   19.347924] kobject (ffff8800791ea0b8): tried to init an initialized object, something is seriously wrong.
+[   19.349781] CPU: 1 PID: 84 Comm: kworker/u8:1 Not tainted 4.10.0-rc7-00210-g53f39eeaa263 #34
+[   19.350686] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.1-20161122_114906-anatol 04/01/2014
+[   19.350920] Workqueue: events_unbound async_run_entry_fn
+[   19.350920] Call Trace:
+[   19.350920]  dump_stack+0x63/0x83
+[   19.350920]  kobject_init+0x77/0x90
+[   19.350920]  blk_mq_register_dev+0x40/0x130
+[   19.350920]  blk_register_queue+0xb6/0x190
+[   19.350920]  device_add_disk+0x1ec/0x4b0
+[   19.350920]  sd_probe_async+0x10d/0x1c0 [sd_mod]
+[   19.350920]  async_run_entry_fn+0x48/0x150
+[   19.350920]  process_one_work+0x1d0/0x480
+[   19.350920]  worker_thread+0x48/0x4e0
+[   19.350920]  kthread+0x101/0x140
+[   19.350920]  ? process_one_work+0x480/0x480
+[   19.350920]  ? kthread_create_on_node+0x60/0x60
+[   19.350920]  ret_from_fork+0x2c/0x40
+
+Cc: Omar Sandoval <osandov@osandov.com>
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- block/sed-opal.c | 61 +++++++++++++++++++++++---------------------------------
- 1 file changed, 25 insertions(+), 36 deletions(-)
+ block/blk-mq-sysfs.c | 4 +---
+ block/blk-mq.c       | 4 +++-
+ block/blk-mq.h       | 1 +
+ 3 files changed, 5 insertions(+), 4 deletions(-)
 
-diff --git a/block/sed-opal.c b/block/sed-opal.c
-index 4675fd8..d3d6db2 100644
---- a/block/sed-opal.c
-+++ b/block/sed-opal.c
-@@ -662,48 +662,25 @@ static int cmd_finalize(struct opal_dev *cmd, u32 hsn, u32 tsn)
- 	return 0;
+diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
+index 295e69670c39..124305407c80 100644
+--- a/block/blk-mq-sysfs.c
++++ b/block/blk-mq-sysfs.c
+@@ -277,7 +277,7 @@ void blk_mq_hctx_kobj_init(struct blk_mq_hw_ctx *hctx)
+ 	kobject_init(&hctx->kobj, &blk_mq_hw_ktype);
  }
  
--static enum opal_response_token token_type(const struct parsed_resp *resp,
--					   int n)
-+static const struct opal_resp_tok *response_get_token(
-+				const struct parsed_resp *resp,
-+				int n)
+-static void blk_mq_sysfs_init(struct request_queue *q)
++void blk_mq_sysfs_init(struct request_queue *q)
  {
- 	const struct opal_resp_tok *tok;
+ 	struct blk_mq_ctx *ctx;
+ 	int cpu;
+@@ -297,8 +297,6 @@ int blk_mq_register_dev(struct device *dev, struct request_queue *q)
  
- 	if (n >= resp->num) {
- 		pr_err("Token number doesn't exist: %d, resp: %d\n",
- 		       n, resp->num);
--		return OPAL_DTA_TOKENID_INVALID;
-+		return ERR_PTR(-EINVAL);
- 	}
+ 	blk_mq_disable_hotplug();
  
- 	tok = &resp->toks[n];
- 	if (tok->len == 0) {
- 		pr_err("Token length must be non-zero\n");
--		return OPAL_DTA_TOKENID_INVALID;
-+		return ERR_PTR(-EINVAL);
- 	}
- 
--	return tok->type;
--}
+-	blk_mq_sysfs_init(q);
 -
--/*
-- * This function returns 0 in case of invalid token. One should call
-- * token_type() first to find out if the token is valid or not.
-- */
--static enum opal_token response_get_token(const struct parsed_resp *resp,
--					  int n)
--{
--	const struct opal_resp_tok *tok;
--
--	if (n >= resp->num) {
--		pr_err("Token number doesn't exist: %d, resp: %d\n",
--		       n, resp->num);
--		return 0;
--	}
--
--	tok = &resp->toks[n];
--	if (tok->len == 0) {
--		pr_err("Token length must be non-zero\n");
--		return 0;
--	}
--
--	return tok->pos[0];
-+	return tok;
- }
+ 	ret = kobject_add(&q->mq_kobj, kobject_get(&dev->kobj), "%s", "mq");
+ 	if (ret < 0)
+ 		goto out;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index b29e7dc7b309..ade1d7cde37e 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1941,7 +1941,6 @@ static void blk_mq_init_cpu_queues(struct request_queue *q,
+ 		struct blk_mq_ctx *__ctx = per_cpu_ptr(q->queue_ctx, i);
+ 		struct blk_mq_hw_ctx *hctx;
  
- static ssize_t response_parse_tiny(struct opal_resp_tok *tok,
-@@ -922,20 +899,32 @@ static u64 response_get_u64(const struct parsed_resp *resp, int n)
- 	return resp->toks[n].stored.u;
- }
+-		memset(__ctx, 0, sizeof(*__ctx));
+ 		__ctx->cpu = i;
+ 		spin_lock_init(&__ctx->lock);
+ 		INIT_LIST_HEAD(&__ctx->rq_list);
+@@ -2248,6 +2247,9 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+ 	if (!q->queue_ctx)
+ 		goto err_exit;
  
-+static bool response_token_matches(const struct opal_resp_tok *token, u8 match)
-+{
-+	if (IS_ERR(token) ||
-+	    token->type != OPAL_DTA_TOKENID_TOKEN ||
-+	    token->pos[0] != match)
-+		return false;
-+	return true;
-+}
++	/* init q->mq_kobj and sw queues' kobjects */
++	blk_mq_sysfs_init(q);
 +
- static u8 response_status(const struct parsed_resp *resp)
- {
--	if (token_type(resp, 0) == OPAL_DTA_TOKENID_TOKEN &&
--	    response_get_token(resp, 0) == OPAL_ENDOFSESSION) {
-+	const struct opal_resp_tok *tok;
-+
-+	tok = response_get_token(resp, 0);
-+	if (response_token_matches(tok, OPAL_ENDOFSESSION))
- 		return 0;
--	}
- 
- 	if (resp->num < 5)
- 		return DTAERROR_NO_METHOD_STATUS;
- 
--	if (token_type(resp, resp->num - 1) != OPAL_DTA_TOKENID_TOKEN ||
--	    token_type(resp, resp->num - 5) != OPAL_DTA_TOKENID_TOKEN ||
--	    response_get_token(resp, resp->num - 1) != OPAL_ENDLIST ||
--	    response_get_token(resp, resp->num - 5) != OPAL_STARTLIST)
-+	tok = response_get_token(resp, resp->num - 5);
-+	if (!response_token_matches(tok, OPAL_STARTLIST))
-+		return DTAERROR_NO_METHOD_STATUS;
-+
-+	tok = response_get_token(resp, resp->num - 1);
-+	if (!response_token_matches(tok, OPAL_ENDLIST))
- 		return DTAERROR_NO_METHOD_STATUS;
- 
- 	return response_get_u64(resp, resp->num - 4);
+ 	q->queue_hw_ctx = kzalloc_node(nr_cpu_ids * sizeof(*(q->queue_hw_ctx)),
+ 						GFP_KERNEL, set->numa_node);
+ 	if (!q->queue_hw_ctx)
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index 24b2256186f3..445343425f6d 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -77,6 +77,7 @@ static inline struct blk_mq_hw_ctx *blk_mq_map_queue(struct request_queue *q,
+ /*
+  * sysfs helpers
+  */
++extern void blk_mq_sysfs_init(struct request_queue *q);
+ extern int blk_mq_sysfs_register(struct request_queue *q);
+ extern void blk_mq_sysfs_unregister(struct request_queue *q);
+ extern void blk_mq_hctx_kobj_init(struct blk_mq_hw_ctx *hctx);
 -- 
-1.8.3.1
-
-
-_______________________________________________
-Linux-nvme mailing list
-Linux-nvme@lists.infradead.org
-http://lists.infradead.org/mailman/listinfo/linux-nvme
+2.7.4
