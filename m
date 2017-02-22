@@ -1,88 +1,60 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f67.google.com ([74.125.83.67]:33162 "EHLO
-        mail-pg0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751291AbdBXPnv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 24 Feb 2017 10:43:51 -0500
-From: Ming Lei <tom.leiming@gmail.com>
-To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
-        linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>
-Cc: Ming Lei <tom.leiming@gmail.com>
-Subject: [PATCH v1 11/14] md: raid10: refactor code of read reshape's .bi_end_io
-Date: Fri, 24 Feb 2017 23:42:48 +0800
-Message-Id: <1487950971-1131-12-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1487950971-1131-1-git-send-email-tom.leiming@gmail.com>
-References: <1487950971-1131-1-git-send-email-tom.leiming@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
+From: Scott Bauer <scott.bauer@intel.com>
+To: linux-block@vger.kernel.org
+Subject: [PATCH 3/3] block/sed-opal: Propagate original error message to
+ userland.
+Date: Wed, 22 Feb 2017 10:15:08 -0700
+Message-Id: <1487783708-16285-4-git-send-email-scott.bauer@intel.com>
+In-Reply-To: <1487783708-16285-1-git-send-email-scott.bauer@intel.com>
+References: <1487783708-16285-1-git-send-email-scott.bauer@intel.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
+List-Post: <mailto:linux-nvme@lists.infradead.org>
+List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
+Cc: keith.busch@intel.com, linux-nvme@lists.infradead.org, axboe@fb.com,
+ jonathan.derrick@intel.com, hch@lst.de, Scott Bauer <scott.bauer@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
+Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
+List-ID: <linux-block@vger.kernel.org>
 
-reshape read request is a bit special and requires one extra
-bio which isn't allocated from r10buf_pool.
+During an error on a comannd, ex: user provides wrong pw to unlock
+range, we will gracefully terminate the opal session. We want to
+propagate the original error to userland instead of the result of
+the session termination, which is almost always a success.
 
-Refactor the .bi_end_io for read reshape, so that we can use
-raid10's resync page mangement approach easily in the following
-patches.
-
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+Signed-off-by: Scott Bauer <scott.bauer@intel.com>
 ---
- drivers/md/raid10.c | 28 ++++++++++++++++++----------
- 1 file changed, 18 insertions(+), 10 deletions(-)
+ block/sed-opal.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
-index 227dd6ad7716..c76e08ea4b92 100644
---- a/drivers/md/raid10.c
-+++ b/drivers/md/raid10.c
-@@ -1907,17 +1907,9 @@ static int raid10_remove_disk(struct mddev *mddev, struct md_rdev *rdev)
- 	return err;
- }
- 
--static void end_sync_read(struct bio *bio)
-+static void __end_sync_read(struct r10bio *r10_bio, struct bio *bio, int d)
- {
--	struct r10bio *r10_bio = bio->bi_private;
- 	struct r10conf *conf = r10_bio->mddev->private;
--	int d;
--
--	if (bio == r10_bio->master_bio) {
--		/* this is a reshape read */
--		d = r10_bio->read_slot; /* really the read dev */
--	} else
--		d = find_bio_disk(conf, r10_bio, bio, NULL, NULL);
- 
- 	if (!bio->bi_error)
- 		set_bit(R10BIO_Uptodate, &r10_bio->state);
-@@ -1941,6 +1933,22 @@ static void end_sync_read(struct bio *bio)
- 	}
- }
- 
-+static void end_sync_read(struct bio *bio)
-+{
-+	struct r10bio *r10_bio = bio->bi_private;
-+	struct r10conf *conf = r10_bio->mddev->private;
-+	int d = find_bio_disk(conf, r10_bio, bio, NULL, NULL);
+diff --git a/block/sed-opal.c b/block/sed-opal.c
+index 020bf3e..1e18dca 100644
+--- a/block/sed-opal.c
++++ b/block/sed-opal.c
+@@ -396,8 +396,11 @@ static int next(struct opal_dev *dev)
+ 			 * session. Therefore we shouldn't attempt to terminate
+ 			 * a session, as one has not yet been created.
+ 			 */
+-			if (state > 1)
+-				return end_opal_session_error(dev);
++			if (state > 1) {
++				end_opal_session_error(dev);
++				return error;
++			}
 +
-+	__end_sync_read(r10_bio, bio, d);
-+}
-+
-+static void end_reshape_read(struct bio *bio)
-+{
-+	struct r10bio *r10_bio = bio->bi_private;
-+
-+	__end_sync_read(r10_bio, bio, r10_bio->read_slot);
-+}
-+
- static void end_sync_request(struct r10bio *r10_bio)
- {
- 	struct mddev *mddev = r10_bio->mddev;
-@@ -4474,7 +4482,7 @@ static sector_t reshape_request(struct mddev *mddev, sector_t sector_nr,
- 	read_bio->bi_iter.bi_sector = (r10_bio->devs[r10_bio->read_slot].addr
- 			       + rdev->data_offset);
- 	read_bio->bi_private = r10_bio;
--	read_bio->bi_end_io = end_sync_read;
-+	read_bio->bi_end_io = end_reshape_read;
- 	bio_set_op_attrs(read_bio, REQ_OP_READ, 0);
- 	read_bio->bi_flags &= (~0UL << BIO_RESET_BITS);
- 	read_bio->bi_error = 0;
+ 		}
+ 		state++;
+ 	} while (!error);
 -- 
 2.7.4
+
+
+_______________________________________________
+Linux-nvme mailing list
+Linux-nvme@lists.infradead.org
+http://lists.infradead.org/mailman/listinfo/linux-nvme
