@@ -1,158 +1,116 @@
-Return-Path: <linus.walleij@linaro.org>
-Return-Path: <linus.walleij@linaro.org>
-From: Linus Walleij <linus.walleij@linaro.org>
-To: linux-mmc@vger.kernel.org,
-	Ulf Hansson <ulf.hansson@linaro.org>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	Paolo Valente <paolo.valente@linaro.org>
-Cc: Chunyan Zhang <zhang.chunyan@linaro.org>,
-	Baolin Wang <baolin.wang@linaro.org>,
-	linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Linus Walleij <linus.walleij@linaro.org>
-Subject: [PATCH 09/16] mmc: core: kill off the context info
-Date: Thu,  9 Feb 2017 16:33:56 +0100
-Message-Id: <20170209153403.9730-10-linus.walleij@linaro.org>
-In-Reply-To: <20170209153403.9730-1-linus.walleij@linaro.org>
-References: <20170209153403.9730-1-linus.walleij@linaro.org>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pg0-f66.google.com ([74.125.83.66]:33297 "EHLO
+        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932116AbdBVKO0 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 22 Feb 2017 05:14:26 -0500
+From: Ming Lei <tom.leiming@gmail.com>
+To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        Omar Sandoval <osandov@osandov.com>
+Cc: Ming Lei <tom.leiming@gmail.com>
+Subject: [PATCH 2/4] blk-mq: make lifetime consitent between q/ctx and its kobject
+Date: Wed, 22 Feb 2017 18:14:00 +0800
+Message-Id: <1487758442-5855-3-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1487758442-5855-1-git-send-email-tom.leiming@gmail.com>
+References: <1487758442-5855-1-git-send-email-tom.leiming@gmail.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-The last member of the context info: is_waiting_last_req is
-just assigned values, never checked. Delete that and the whole
-context info as a result.
+Currently from kobject view, both q->mq_kobj and ctx->kobj can
+be released during one cycle of blk_mq_register_dev() and
+blk_mq_unregister_dev(). Actually, sw queue's lifetime is
+same with its request queue's, which is covered by request_queue->kobj.
 
-Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+So we don't need to call kobject_put() for the two kinds of
+kobject in __blk_mq_unregister_dev(), instead we do that
+in release handler of request queue.
+
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- drivers/mmc/core/bus.c   |  1 -
- drivers/mmc/core/core.c  | 13 -------------
- drivers/mmc/core/core.h  |  2 --
- drivers/mmc/core/queue.c |  9 +--------
- include/linux/mmc/host.h |  9 ---------
- 5 files changed, 1 insertion(+), 33 deletions(-)
+ block/blk-mq-sysfs.c | 20 +++++++++++++-------
+ block/blk-mq.c       |  7 ++++++-
+ block/blk-mq.h       |  1 +
+ 3 files changed, 20 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/mmc/core/bus.c b/drivers/mmc/core/bus.c
-index 301246513a37..22ed11ac961b 100644
---- a/drivers/mmc/core/bus.c
-+++ b/drivers/mmc/core/bus.c
-@@ -348,7 +348,6 @@ int mmc_add_card(struct mmc_card *card)
- #ifdef CONFIG_DEBUG_FS
- 	mmc_add_card_debugfs(card);
- #endif
--	mmc_init_context_info(card->host);
+diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
+index 124305407c80..77fb238af2be 100644
+--- a/block/blk-mq-sysfs.c
++++ b/block/blk-mq-sysfs.c
+@@ -242,15 +242,11 @@ static int blk_mq_register_hctx(struct blk_mq_hw_ctx *hctx)
+ static void __blk_mq_unregister_dev(struct device *dev, struct request_queue *q)
+ {
+ 	struct blk_mq_hw_ctx *hctx;
+-	struct blk_mq_ctx *ctx;
+-	int i, j;
++	int i;
  
- 	card->dev.of_node = mmc_of_find_child_device(card->host, 0);
+ 	queue_for_each_hw_ctx(q, hctx, i) {
+ 		blk_mq_unregister_hctx(hctx);
  
-diff --git a/drivers/mmc/core/core.c b/drivers/mmc/core/core.c
-index 933a4d1f20d5..4b84f18518ac 100644
---- a/drivers/mmc/core/core.c
-+++ b/drivers/mmc/core/core.c
-@@ -2975,19 +2975,6 @@ void mmc_unregister_pm_notifier(struct mmc_host *host)
- }
- #endif
- 
--/**
-- * mmc_init_context_info() - init synchronization context
-- * @host: mmc host
-- *
-- * Init struct context_info needed to implement asynchronous
-- * request mechanism, used by mmc core, host driver and mmc requests
-- * supplier.
-- */
--void mmc_init_context_info(struct mmc_host *host)
--{
--	host->context_info.is_waiting_last_req = false;
--}
+-		hctx_for_each_ctx(hctx, ctx, j)
+-			kobject_put(&ctx->kobj);
 -
- static int __init mmc_init(void)
- {
- 	int ret;
-diff --git a/drivers/mmc/core/core.h b/drivers/mmc/core/core.h
-index 8a95c82554be..620bea373c3a 100644
---- a/drivers/mmc/core/core.h
-+++ b/drivers/mmc/core/core.h
-@@ -90,8 +90,6 @@ void mmc_remove_host_debugfs(struct mmc_host *host);
- void mmc_add_card_debugfs(struct mmc_card *card);
- void mmc_remove_card_debugfs(struct mmc_card *card);
- 
--void mmc_init_context_info(struct mmc_host *host);
--
- int mmc_execute_tuning(struct mmc_card *card);
- int mmc_hs200_to_hs400(struct mmc_card *card);
- int mmc_hs400_to_hs200(struct mmc_card *card);
-diff --git a/drivers/mmc/core/queue.c b/drivers/mmc/core/queue.c
-index 63927ffd6825..a845fe8d4fd1 100644
---- a/drivers/mmc/core/queue.c
-+++ b/drivers/mmc/core/queue.c
-@@ -53,7 +53,6 @@ static int mmc_queue_thread(void *d)
- {
- 	struct mmc_queue *mq = d;
- 	struct request_queue *q = mq->queue;
--	struct mmc_context_info *cntx = &mq->card->host->context_info;
- 
- 	current->flags |= PF_MEMALLOC;
- 
-@@ -65,15 +64,12 @@ static int mmc_queue_thread(void *d)
- 		set_current_state(TASK_INTERRUPTIBLE);
- 		req = blk_fetch_request(q);
- 		mq->asleep = false;
--		cntx->is_waiting_last_req = false;
- 		if (!req) {
- 			/*
- 			 * Dispatch queue is empty so set flags for
- 			 * mmc_request_fn() to wake us up.
- 			 */
--			if (mq->mqrq_prev->req)
--				cntx->is_waiting_last_req = true;
--			else
-+			if (!mq->mqrq_prev->req)
- 				mq->asleep = true;
- 		}
- 		mq->mqrq_cur->req = req;
-@@ -123,7 +119,6 @@ static void mmc_request_fn(struct request_queue *q)
- {
- 	struct mmc_queue *mq = q->queuedata;
- 	struct request *req;
--	struct mmc_context_info *cntx;
- 
- 	if (!mq) {
- 		while ((req = blk_fetch_request(q)) != NULL) {
-@@ -133,8 +128,6 @@ static void mmc_request_fn(struct request_queue *q)
- 		return;
+ 		kobject_put(&hctx->kobj);
  	}
  
--	cntx = &mq->card->host->context_info;
+@@ -258,8 +254,6 @@ static void __blk_mq_unregister_dev(struct device *dev, struct request_queue *q)
+ 
+ 	kobject_uevent(&q->mq_kobj, KOBJ_REMOVE);
+ 	kobject_del(&q->mq_kobj);
+-	kobject_put(&q->mq_kobj);
 -
- 	if (mq->asleep)
- 		wake_up_process(mq->thread);
+ 	kobject_put(&dev->kobj);
+ 
+ 	q->mq_sysfs_init_done = false;
+@@ -277,6 +271,18 @@ void blk_mq_hctx_kobj_init(struct blk_mq_hw_ctx *hctx)
+ 	kobject_init(&hctx->kobj, &blk_mq_hw_ktype);
  }
-diff --git a/include/linux/mmc/host.h b/include/linux/mmc/host.h
-index 970d7f9b1eba..a7c0ed887391 100644
---- a/include/linux/mmc/host.h
-+++ b/include/linux/mmc/host.h
-@@ -192,14 +192,6 @@ struct mmc_slot {
- 	void *handler_priv;
- };
  
--/**
-- * mmc_context_info - synchronization details for mmc context
-- * @is_waiting_last_req	mmc context waiting for single running request
-- */
--struct mmc_context_info {
--	bool			is_waiting_last_req;
--};
--
- struct regulator;
- struct mmc_pwrseq;
++void blk_mq_sysfs_deinit(struct request_queue *q)
++{
++	struct blk_mq_ctx *ctx;
++	int cpu;
++
++	for_each_possible_cpu(cpu) {
++		ctx = per_cpu_ptr(q->queue_ctx, cpu);
++		kobject_put(&ctx->kobj);
++	}
++	kobject_put(&q->mq_kobj);
++}
++
+ void blk_mq_sysfs_init(struct request_queue *q)
+ {
+ 	struct blk_mq_ctx *ctx;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index ade1d7cde37e..bc45736d70ba 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2160,7 +2160,12 @@ void blk_mq_release(struct request_queue *q)
  
-@@ -373,7 +365,6 @@ struct mmc_host {
- 	struct dentry		*debugfs_root;
+ 	kfree(q->queue_hw_ctx);
  
- 	struct mmc_async_req	*areq;		/* active async req */
--	struct mmc_context_info	context_info;	/* async synchronization info */
+-	/* ctx kobj stays in queue_ctx */
++	/*
++	 * release .mq_kobj and sw queue's kobject now because
++	 * both share lifetime with request queue.
++	 */
++	blk_mq_sysfs_deinit(q);
++
+ 	free_percpu(q->queue_ctx);
+ }
  
- 	/* finalization work thread, handles finalizing requests */
- 	struct kthread_worker	req_done_worker;
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index 445343425f6d..2cd73b762351 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -78,6 +78,7 @@ static inline struct blk_mq_hw_ctx *blk_mq_map_queue(struct request_queue *q,
+  * sysfs helpers
+  */
+ extern void blk_mq_sysfs_init(struct request_queue *q);
++extern void blk_mq_sysfs_deinit(struct request_queue *q);
+ extern int blk_mq_sysfs_register(struct request_queue *q);
+ extern void blk_mq_sysfs_unregister(struct request_queue *q);
+ extern void blk_mq_hctx_kobj_init(struct blk_mq_hw_ctx *hctx);
 -- 
-2.9.3
+2.7.4
