@@ -1,62 +1,30 @@
-Return-Path: <jack@suse.cz>
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Tejun Heo <tj@kernel.org>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
-	NeilBrown <neilb@suse.de>,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH 09/10] kobject: Export kobject_get_unless_zero()
-Date: Thu,  9 Feb 2017 13:44:32 +0100
-Message-Id: <20170209124433.2626-10-jack@suse.cz>
-In-Reply-To: <20170209124433.2626-1-jack@suse.cz>
-References: <20170209124433.2626-1-jack@suse.cz>
+Subject: Re: Final opal patches for rc1
+To: Scott Bauer <scott.bauer@intel.com>, linux-block@vger.kernel.org
+References: <1487783708-16285-1-git-send-email-scott.bauer@intel.com>
+Cc: keith.busch@intel.com, linux-nvme@lists.infradead.org, hch@lst.de,
+ jonathan.derrick@intel.com
+From: Jens Axboe <axboe@fb.com>
+Message-ID: <8f4f0a3a-be80-8704-0168-c74d4dbe4feb@fb.com>
+Date: Thu, 23 Feb 2017 11:57:02 -0700
+MIME-Version: 1.0
+In-Reply-To: <1487783708-16285-1-git-send-email-scott.bauer@intel.com>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-block@vger.kernel.org>
 
-Make the function available for outside use and fortify it against NULL
-kobject.
+On 02/22/2017 10:15 AM, Scott Bauer wrote:
+> These are the final changes for rc1.
+> 
+> Patch 1 contains some code to clean up an opal structure if something changes
+> at runtime. (already reviewed by Christoph)
+> 
+> Patch 2 contains changes to the nvme driver to use the above patch. If a new
+> FW is loaded and we no longer support opal we clean up. This patch is based off
+> code from Keith and Christoph.
+> 
+> Patch 3 is a one line change to propagate an original error messaage to user
+> land instead of the return status of the session termination code.
 
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- include/linux/kobject.h | 2 ++
- lib/kobject.c           | 5 ++++-
- 2 files changed, 6 insertions(+), 1 deletion(-)
+Applied, thanks.
 
-diff --git a/include/linux/kobject.h b/include/linux/kobject.h
-index e6284591599e..ca85cb80e99a 100644
---- a/include/linux/kobject.h
-+++ b/include/linux/kobject.h
-@@ -108,6 +108,8 @@ extern int __must_check kobject_rename(struct kobject *, const char *new_name);
- extern int __must_check kobject_move(struct kobject *, struct kobject *);
- 
- extern struct kobject *kobject_get(struct kobject *kobj);
-+extern struct kobject * __must_check kobject_get_unless_zero(
-+						struct kobject *kobj);
- extern void kobject_put(struct kobject *kobj);
- 
- extern const void *kobject_namespace(struct kobject *kobj);
-diff --git a/lib/kobject.c b/lib/kobject.c
-index 445dcaeb0f56..763d70a18941 100644
---- a/lib/kobject.c
-+++ b/lib/kobject.c
-@@ -601,12 +601,15 @@ struct kobject *kobject_get(struct kobject *kobj)
- }
- EXPORT_SYMBOL(kobject_get);
- 
--static struct kobject * __must_check kobject_get_unless_zero(struct kobject *kobj)
-+struct kobject * __must_check kobject_get_unless_zero(struct kobject *kobj)
- {
-+	if (!kobj)
-+		return NULL;
- 	if (!kref_get_unless_zero(&kobj->kref))
- 		kobj = NULL;
- 	return kobj;
- }
-+EXPORT_SYMBOL(kobject_get_unless_zero);
- 
- /*
-  * kobject_cleanup - free kobject resources.
 -- 
-2.10.2
+Jens Axboe
