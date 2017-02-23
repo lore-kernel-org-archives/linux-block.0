@@ -1,80 +1,83 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f67.google.com ([74.125.83.67]:36659 "EHLO
-        mail-pg0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932138AbdBVKOc (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Feb 2017 05:14:32 -0500
-From: Ming Lei <tom.leiming@gmail.com>
-To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        Omar Sandoval <osandov@osandov.com>
-Cc: Ming Lei <tom.leiming@gmail.com>
-Subject: [PATCH 4/4] blk-mq: free hctx->cpumask in release handler of hctx's kobject
-Date: Wed, 22 Feb 2017 18:14:02 +0800
-Message-Id: <1487758442-5855-5-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1487758442-5855-1-git-send-email-tom.leiming@gmail.com>
-References: <1487758442-5855-1-git-send-email-tom.leiming@gmail.com>
+Received: from mail.kernel.org ([198.145.29.136]:33556 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751165AbdBWSvN (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 23 Feb 2017 13:51:13 -0500
+Date: Thu, 23 Feb 2017 10:41:27 -0800
+From: Jaegeuk Kim <jaegeuk@kernel.org>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, linux-block@vger.kernel.org
+Subject: Re: [PATCH 1/4] f2fs: avoid very large discard command
+Message-ID: <20170223184127.GB2026@jaegeuk.local>
+References: <20170223042850.43456-1-jaegeuk@kernel.org>
+ <20170223101627.GA31074@infradead.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170223101627.GA31074@infradead.org>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-It is obviously that hctx->cpumask is per hctx, and both
-share same lifetime, so this patch moves freeing of hctx->cpumask
-into release handler of hctx's kobject.
+On 02/23, Christoph Hellwig wrote:
+> On Wed, Feb 22, 2017 at 08:28:47PM -0800, Jaegeuk Kim wrote:
+> > This patch adds MAX_DISCARD_BLOCKS() to avoid issuing too much large single
+> > discard command.
+> 
+> Needs an explanation in the code on why this number was chosen.
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
----
- block/blk-mq-sysfs.c |  1 +
- block/blk-mq.c       | 12 ------------
- 2 files changed, 1 insertion(+), 12 deletions(-)
+No need to add a trivial comment, since it's the section size which we can
+easily translate it.
 
-diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
-index cb19ec16a7fc..d745ab81033a 100644
---- a/block/blk-mq-sysfs.c
-+++ b/block/blk-mq-sysfs.c
-@@ -21,6 +21,7 @@ static void blk_mq_hw_sysfs_release(struct kobject *kobj)
- {
- 	struct blk_mq_hw_ctx *hctx = container_of(kobj, struct blk_mq_hw_ctx,
- 						  kobj);
-+	free_cpumask_var(hctx->cpumask);
- 	kfree(hctx->ctxs);
- 	kfree(hctx);
- }
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 993bb4d4d909..db97f53e99d0 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1851,16 +1851,6 @@ static void blk_mq_exit_hw_queues(struct request_queue *q,
- 	}
- }
- 
--static void blk_mq_free_hw_queues(struct request_queue *q,
--		struct blk_mq_tag_set *set)
--{
--	struct blk_mq_hw_ctx *hctx;
--	unsigned int i;
--
--	queue_for_each_hw_ctx(q, hctx, i)
--		free_cpumask_var(hctx->cpumask);
--}
--
- static int blk_mq_init_hctx(struct request_queue *q,
- 		struct blk_mq_tag_set *set,
- 		struct blk_mq_hw_ctx *hctx, unsigned hctx_idx)
-@@ -2229,7 +2219,6 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
- 			if (hctx->tags)
- 				blk_mq_free_map_and_requests(set, j);
- 			blk_mq_exit_hctx(q, set, hctx, j);
--			free_cpumask_var(hctx->cpumask);
- 			kobject_put(&hctx->kobj);
- 			hctxs[j] = NULL;
- 
-@@ -2342,7 +2331,6 @@ void blk_mq_free_queue(struct request_queue *q)
- 	blk_mq_del_queue_tag_set(q);
- 
- 	blk_mq_exit_hw_queues(q, set, set->nr_hw_queues);
--	blk_mq_free_hw_queues(q, set);
- }
- 
- /* Basically redo blk_mq_init_queue with queue frozen */
--- 
-2.7.4
+> In doubt I suspect it should be a quirk in the driver for the device,
+> and not something decided by the fs.
+
+The block allocator checks all the issued bios whether any of them contains
+the newly allocated address or not. If one large discard command was issued,
+it needs to wait for its completion, even if we want to allocate part of its
+address space.
+
+In addition, HM-SMR is required to issue discard/reset in a unit of section
+size.
+
+Thanks,
+
+> 
+> > 
+> > Signed-off-by: Jaegeuk Kim <jaegeuk@kernel.org>
+> > ---
+> >  fs/f2fs/f2fs.h    | 3 ++-
+> >  fs/f2fs/segment.c | 3 ++-
+> >  2 files changed, 4 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/fs/f2fs/f2fs.h b/fs/f2fs/f2fs.h
+> > index d076b94530bc..5f3fe97df055 100644
+> > --- a/fs/f2fs/f2fs.h
+> > +++ b/fs/f2fs/f2fs.h
+> > @@ -133,7 +133,8 @@ enum {
+> >  		(SM_I(sbi)->trim_sections * (sbi)->segs_per_sec)
+> >  #define BATCHED_TRIM_BLOCKS(sbi)	\
+> >  		(BATCHED_TRIM_SEGMENTS(sbi) << (sbi)->log_blocks_per_seg)
+> > -
+> > +#define MAX_DISCARD_BLOCKS(sbi)						\
+> > +		((1 << (sbi)->log_blocks_per_seg) * (sbi)->segs_per_sec)
+> >  #define DISCARD_ISSUE_RATE	8
+> >  #define DEF_CP_INTERVAL			60	/* 60 secs */
+> >  #define DEF_IDLE_INTERVAL		5	/* 5 secs */
+> > diff --git a/fs/f2fs/segment.c b/fs/f2fs/segment.c
+> > index fe434cd872b4..567019940e9b 100644
+> > --- a/fs/f2fs/segment.c
+> > +++ b/fs/f2fs/segment.c
+> > @@ -886,7 +886,8 @@ static void __add_discard_entry(struct f2fs_sb_info *sbi,
+> >  	if (!list_empty(head)) {
+> >  		last = list_last_entry(head, struct discard_entry, list);
+> >  		if (START_BLOCK(sbi, cpc->trim_start) + start ==
+> > -						last->blkaddr + last->len) {
+> > +				last->blkaddr + last->len &&
+> > +				last->len < MAX_DISCARD_BLOCKS(sbi)) {
+> >  			last->len += end - start;
+> >  			goto done;
+> >  		}
+> > -- 
+> > 2.11.0
+> > 
+> ---end quoted text---
