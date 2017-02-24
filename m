@@ -1,82 +1,60 @@
-Return-Path: <jack@suse.cz>
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Tejun Heo <tj@kernel.org>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
-	NeilBrown <neilb@suse.de>,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH 10/10] block: Fix oops scsi_disk_get()
-Date: Thu,  9 Feb 2017 13:44:33 +0100
-Message-Id: <20170209124433.2626-11-jack@suse.cz>
-In-Reply-To: <20170209124433.2626-1-jack@suse.cz>
-References: <20170209124433.2626-1-jack@suse.cz>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pg0-f66.google.com ([74.125.83.66]:35578 "EHLO
+        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751219AbdBXPnJ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 24 Feb 2017 10:43:09 -0500
+From: Ming Lei <tom.leiming@gmail.com>
+To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
+        linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>
+Cc: Ming Lei <tom.leiming@gmail.com>
+Subject: [PATCH v1 00/14] md: cleanup on direct access to bvec table
+Date: Fri, 24 Feb 2017 23:42:37 +0800
+Message-Id: <1487950971-1131-1-git-send-email-tom.leiming@gmail.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-When device open races with device shutdown, we can get the following
-oops in scsi_disk_get():
+In MD's resync I/O path, there are lots of direct access to bio's
+bvec table. This patchset kills almost all, and the conversion
+is quite straightforward. One root cause of direct access to bvec
+table is that resync I/O uses the bio's bvec to manage pages.
+In V1, as suggested by Shaohua, a new approach is used to manage
+these pages for resync I/O, turns out code becomes more clean
+and readable.
 
-[11863.044351] general protection fault: 0000 [#1] SMP
-[11863.045561] Modules linked in: scsi_debug xfs libcrc32c netconsole btrfs raid6_pq zlib_deflate lzo_compress xor [last unloaded: loop]
-[11863.047853] CPU: 3 PID: 13042 Comm: hald-probe-stor Tainted: G W      4.10.0-rc2-xen+ #35
-[11863.048030] Hardware name: Bochs Bochs, BIOS Bochs 01/01/2011
-[11863.048030] task: ffff88007f438200 task.stack: ffffc90000fd0000
-[11863.048030] RIP: 0010:scsi_disk_get+0x43/0x70
-[11863.048030] RSP: 0018:ffffc90000fd3a08 EFLAGS: 00010202
-[11863.048030] RAX: 6b6b6b6b6b6b6b6b RBX: ffff88007f56d000 RCX: 0000000000000000
-[11863.048030] RDX: 0000000000000001 RSI: 0000000000000004 RDI: ffffffff81a8d880
-[11863.048030] RBP: ffffc90000fd3a18 R08: 0000000000000000 R09: 0000000000000001
-[11863.059217] R10: 0000000000000000 R11: 0000000000000000 R12: 00000000fffffffa
-[11863.059217] R13: ffff880078872800 R14: ffff880070915540 R15: 000000000000001d
-[11863.059217] FS:  00007f2611f71800(0000) GS:ffff88007f0c0000(0000) knlGS:0000000000000000
-[11863.059217] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[11863.059217] CR2: 000000000060e048 CR3: 00000000778d4000 CR4: 00000000000006e0
-[11863.059217] Call Trace:
-[11863.059217]  ? disk_get_part+0x22/0x1f0
-[11863.059217]  sd_open+0x39/0x130
-[11863.059217]  __blkdev_get+0x69/0x430
-[11863.059217]  ? bd_acquire+0x7f/0xc0
-[11863.059217]  ? bd_acquire+0x96/0xc0
-[11863.059217]  ? blkdev_get+0x350/0x350
-[11863.059217]  blkdev_get+0x126/0x350
-[11863.059217]  ? _raw_spin_unlock+0x2b/0x40
-[11863.059217]  ? bd_acquire+0x7f/0xc0
-[11863.059217]  ? blkdev_get+0x350/0x350
-[11863.059217]  blkdev_open+0x65/0x80
-...
+Once direct access to bvec table in MD is cleaned up, we may make
+multipage bvec moving on.
 
-As you can see RAX value is already poisoned showing that gendisk we got
-is already freed. The problem is that get_gendisk() looks up device
-number in ext_devt_idr and then does get_disk() which does kobject_get()
-on the disks kobject. However the disk gets removed from ext_devt_idr
-only in disk_release() (through blk_free_devt()) at which moment it has
-already 0 refcount and is already on its way to be freed. Indeed we've
-got a warning from kobject_get() about 0 refcount shortly before the
-oops.
+V1:
+	- allocate page array to manage resync pages
 
-We fix the problem by using kobject_get_unless_zero() in get_disk() so
-that get_disk() cannot get reference on a disk that is already being
-freed.
+Thanks,
+Ming
 
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- block/genhd.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Ming Lei (14):
+  block: introduce bio_segments_all()
+  block: introduce bio_remove_last_page()
+  md: raid1/raid10: use bio_remove_last_page()
+  md: move two macros into md.h
+  md: prepare for managing resync I/O pages in clean way
+  md: raid1: simplify r1buf_pool_free()
+  md: raid1: don't use bio's vec table to manage resync pages
+  md: raid1: retrieve page from pre-allocated resync page array
+  md: raid1: use bio helper in process_checks()
+  md: raid1: use bio_segments_all()
+  md: raid10: refactor code of read reshape's .bi_end_io
+  md: raid10: don't use bio's vec table to manage resync pages
+  md: raid10: retrieve page from preallocated resync page array
+  md: raid10: avoid direct access to bvec table in
+    handle_reshape_read_error
 
-diff --git a/block/genhd.c b/block/genhd.c
-index 721921a140cc..e3dbc311c323 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -1350,7 +1350,7 @@ struct kobject *get_disk(struct gendisk *disk)
- 	owner = disk->fops->owner;
- 	if (owner && !try_module_get(owner))
- 		return NULL;
--	kobj = kobject_get(&disk_to_dev(disk)->kobj);
-+	kobj = kobject_get_unless_zero(&disk_to_dev(disk)->kobj);
- 	if (kobj == NULL) {
- 		module_put(owner);
- 		return NULL;
+ block/bio.c         |  23 +++++++
+ drivers/md/md.h     |  66 +++++++++++++++++++
+ drivers/md/raid1.c  | 125 +++++++++++++++++++++--------------
+ drivers/md/raid10.c | 187 +++++++++++++++++++++++++++++++---------------------
+ include/linux/bio.h |   8 +++
+ 5 files changed, 285 insertions(+), 124 deletions(-)
+
 -- 
-2.10.2
+2.7.4
