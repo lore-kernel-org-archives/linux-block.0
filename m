@@ -1,101 +1,57 @@
-Return-Path: <Damien.LeMoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	linux-scsi@vger.kernel.org
-Cc: MPT-FusionLinux.pdl@broadcom.com,
-	Hannes Reinecke <hare@suse.de>,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@sandisk.com>
-Subject: [PATCH 1/3] block: Introduce blk_rq_accesses_medium()
-Date: Tue, 28 Feb 2017 19:25:33 +0900
-Message-Id: <20170228102535.15966-2-damien.lemoal@wdc.com>
-In-Reply-To: <20170228102535.15966-1-damien.lemoal@wdc.com>
-References: <20170228102535.15966-1-damien.lemoal@wdc.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: damien.lemoal@wdc.com
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pf0-f194.google.com ([209.85.192.194]:34615 "EHLO
+        mail-pf0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751312AbdBXPnr (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 24 Feb 2017 10:43:47 -0500
+From: Ming Lei <tom.leiming@gmail.com>
+To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
+        linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>
+Cc: Ming Lei <tom.leiming@gmail.com>
+Subject: [PATCH v1 10/14] md: raid1: use bio_segments_all()
+Date: Fri, 24 Feb 2017 23:42:47 +0800
+Message-Id: <1487950971-1131-11-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1487950971-1131-1-git-send-email-tom.leiming@gmail.com>
+References: <1487950971-1131-1-git-send-email-tom.leiming@gmail.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Bart Van Assche <bart.vanassche@sandisk.com>
+Use this helper, instead of direct access to .bi_vcnt.
 
-A medium access request is defined as an internal regular request that
-operates on a whole number of logical blocks of the storage medium.
-These include REQ_OP_READ, REQ_OP_WRITE, REQ_OP_FLUSH, REQ_OP_DISCARD,
-REQ_OP_SECURE_ERASE, REQ_OP_WRITE_SAME and REQ_OP_WRITE_ZEROES.
-
-Zoned block device requests (REQ_OP_ZONE_REPORT and REQ_OP_ZONE_RESET)
-as well as SCSI passthrough and driver private commands are not
-considered medium access request.
-
-Reshuffle enum req_opf definitions grouping medium access request up
-to REQ_OP_MEDIUM_LAST and introduce the helper function
-blk_rq_accesses_medium() to test a request.
-
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- include/linux/blk_types.h | 17 ++++++++++-------
- include/linux/blkdev.h    | 12 ++++++++++++
- 2 files changed, 22 insertions(+), 7 deletions(-)
+ drivers/md/raid1.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index d703acb..6420057 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -151,16 +151,19 @@ enum req_opf {
- 	REQ_OP_FLUSH		= 2,
- 	/* discard sectors */
- 	REQ_OP_DISCARD		= 3,
--	/* get zone information */
--	REQ_OP_ZONE_REPORT	= 4,
- 	/* securely erase sectors */
--	REQ_OP_SECURE_ERASE	= 5,
--	/* seset a zone write pointer */
--	REQ_OP_ZONE_RESET	= 6,
-+	REQ_OP_SECURE_ERASE	= 4,
- 	/* write the same sector many times */
--	REQ_OP_WRITE_SAME	= 7,
-+	REQ_OP_WRITE_SAME	= 5,
- 	/* write the zero filled sector many times */
--	REQ_OP_WRITE_ZEROES	= 8,
-+	REQ_OP_WRITE_ZEROES	= 6,
-+
-+	REQ_OP_MEDIUM_LAST = REQ_OP_WRITE_ZEROES,
-+
-+	/* get zone information */
-+	REQ_OP_ZONE_REPORT	= 16,
-+	/* reset a zone write pointer */
-+	REQ_OP_ZONE_RESET	= 17,
- 
- 	/* SCSI passthrough using struct scsi_request */
- 	REQ_OP_SCSI_IN		= 32,
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index aecca0e..7d1ce2d 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -248,6 +248,18 @@ static inline bool blk_rq_is_passthrough(struct request *rq)
- 	return blk_rq_is_scsi(rq) || blk_rq_is_private(rq);
- }
- 
-+/**
-+ * blk_rq_accesses_medium - test if a request is a medium access request
-+ * @rq: A block layer request.
-+ *
-+ * A medium access request is a regular internal request that operates on
-+ * a whole number of logical blocks of the storage medium.
-+ */
-+static inline bool blk_rq_accesses_medium(const struct request *rq)
-+{
-+	return req_op(rq) <= REQ_OP_MEDIUM_LAST;
-+}
-+
- static inline unsigned short req_get_ioprio(struct request *req)
+diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
+index 7363bf56f3b4..391da975e092 100644
+--- a/drivers/md/raid1.c
++++ b/drivers/md/raid1.c
+@@ -1091,7 +1091,8 @@ static void alloc_behind_pages(struct bio *bio, struct r1bio *r1_bio)
  {
- 	return req->ioprio;
+ 	int i;
+ 	struct bio_vec *bvec;
+-	struct bio_vec *bvecs = kzalloc(bio->bi_vcnt * sizeof(struct bio_vec),
++	unsigned vcnt = bio_segments_all(bio);
++	struct bio_vec *bvecs = kzalloc(vcnt * sizeof(struct bio_vec),
+ 					GFP_NOIO);
+ 	if (unlikely(!bvecs))
+ 		return;
+@@ -1107,12 +1108,12 @@ static void alloc_behind_pages(struct bio *bio, struct r1bio *r1_bio)
+ 		kunmap(bvec->bv_page);
+ 	}
+ 	r1_bio->behind_bvecs = bvecs;
+-	r1_bio->behind_page_count = bio->bi_vcnt;
++	r1_bio->behind_page_count = vcnt;
+ 	set_bit(R1BIO_BehindIO, &r1_bio->state);
+ 	return;
+ 
+ do_sync_io:
+-	for (i = 0; i < bio->bi_vcnt; i++)
++	for (i = 0; i < vcnt; i++)
+ 		if (bvecs[i].bv_page)
+ 			put_page(bvecs[i].bv_page);
+ 	kfree(bvecs);
 -- 
-2.9.3
-
-Western Digital Corporation (and its subsidiaries) E-mail Confidentiality Notice & Disclaimer:
-
-This e-mail and any files transmitted with it may contain confidential or legally privileged information of WDC and/or its affiliates, and are intended solely for the use of the individual or entity to which they are addressed. If you are not the intended recipient, any disclosure, copying, distribution or any action taken or omitted to be taken in reliance on it, is prohibited. If you have received this e-mail in error, please notify the sender immediately and delete the e-mail in its entirety from your system.
+2.7.4
