@@ -1,85 +1,74 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:39622 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933787AbdBQNAH (ORCPT
+Received: from mail-pg0-f66.google.com ([74.125.83.66]:33017 "EHLO
+        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751364AbdBXPnZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Feb 2017 08:00:07 -0500
-From: Christoph Hellwig <hch@lst.de>
-To: scott.bauer@intel.com, keith.busch@intel.com,
-        jonathan.derrick@intel.com, axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-Subject: [PATCH 3/4] nvme: Check for Security send/recv support before issuing commands.
-Date: Fri, 17 Feb 2017 13:59:40 +0100
-Message-Id: <20170217125941.14319-4-hch@lst.de>
-In-Reply-To: <20170217125941.14319-1-hch@lst.de>
-References: <20170217125941.14319-1-hch@lst.de>
+        Fri, 24 Feb 2017 10:43:25 -0500
+From: Ming Lei <tom.leiming@gmail.com>
+To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
+        linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>
+Cc: Ming Lei <tom.leiming@gmail.com>
+Subject: [PATCH v1 04/14] md: move two macros into md.h
+Date: Fri, 24 Feb 2017 23:42:41 +0800
+Message-Id: <1487950971-1131-5-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1487950971-1131-1-git-send-email-tom.leiming@gmail.com>
+References: <1487950971-1131-1-git-send-email-tom.leiming@gmail.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Scott Bauer <scott.bauer@intel.com>
+Both raid1 and raid10 share common resync
+block size and page count, so move them into md.h.
 
-We need to verify that the controller supports the security
-commands before actually trying to issue them.
-
-Signed-off-by: Scott Bauer <scott.bauer@intel.com>
-[hch: moved the check so that we don't call into the OPAL code if not
-      supported]
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- drivers/nvme/host/core.c | 1 +
- drivers/nvme/host/nvme.h | 1 +
- drivers/nvme/host/pci.c  | 2 +-
- include/linux/nvme.h     | 1 +
- 4 files changed, 4 insertions(+), 1 deletion(-)
+ drivers/md/md.h     | 5 +++++
+ drivers/md/raid1.c  | 2 --
+ drivers/md/raid10.c | 3 ---
+ 3 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 8aeb4a623b65..44a1a257e0b5 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -1285,6 +1285,7 @@ int nvme_init_identify(struct nvme_ctrl *ctrl)
- 		return -EIO;
- 	}
+diff --git a/drivers/md/md.h b/drivers/md/md.h
+index b8859cbf84b6..1d63239a1be4 100644
+--- a/drivers/md/md.h
++++ b/drivers/md/md.h
+@@ -715,4 +715,9 @@ static inline void mddev_check_writesame(struct mddev *mddev, struct bio *bio)
+ 	    !bdev_get_queue(bio->bi_bdev)->limits.max_write_same_sectors)
+ 		mddev->queue->limits.max_write_same_sectors = 0;
+ }
++
++/* Maximum size of each resync request */
++#define RESYNC_BLOCK_SIZE (64*1024)
++#define RESYNC_PAGES ((RESYNC_BLOCK_SIZE + PAGE_SIZE-1) / PAGE_SIZE)
++
+ #endif /* _MD_MD_H */
+diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
+index 2a0bf5b430c9..2013e5870761 100644
+--- a/drivers/md/raid1.c
++++ b/drivers/md/raid1.c
+@@ -91,10 +91,8 @@ static void r1bio_pool_free(void *r1_bio, void *data)
+ 	kfree(r1_bio);
+ }
  
-+	ctrl->oacs = le16_to_cpu(id->oacs);
- 	ctrl->vid = le16_to_cpu(id->vid);
- 	ctrl->oncs = le16_to_cpup(&id->oncs);
- 	atomic_set(&ctrl->abort_limit, id->acl + 1);
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index 5126c4bbee1a..14cfc6f7facb 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -140,6 +140,7 @@ struct nvme_ctrl {
- 	u32 max_hw_sectors;
- 	u16 oncs;
- 	u16 vid;
-+	u16 oacs;
- 	atomic_t abort_limit;
- 	u8 event_limit;
- 	u8 vwc;
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index 5db8a38a8b43..ddc51adb594d 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -1789,7 +1789,7 @@ static void nvme_reset_work(struct work_struct *work)
- 	if (result)
- 		goto out;
+-#define RESYNC_BLOCK_SIZE (64*1024)
+ #define RESYNC_DEPTH 32
+ #define RESYNC_SECTORS (RESYNC_BLOCK_SIZE >> 9)
+-#define RESYNC_PAGES ((RESYNC_BLOCK_SIZE + PAGE_SIZE-1) / PAGE_SIZE)
+ #define RESYNC_WINDOW (RESYNC_BLOCK_SIZE * RESYNC_DEPTH)
+ #define RESYNC_WINDOW_SECTORS (RESYNC_WINDOW >> 9)
+ #define CLUSTER_RESYNC_WINDOW (16 * RESYNC_WINDOW)
+diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
+index 125d74dba27e..227dd6ad7716 100644
+--- a/drivers/md/raid10.c
++++ b/drivers/md/raid10.c
+@@ -125,9 +125,6 @@ static void r10bio_pool_free(void *r10_bio, void *data)
+ 	kfree(r10_bio);
+ }
  
--	if (!dev->ctrl.opal_dev) {
-+	if ((dev->ctrl.oacs & NVME_CTRL_OACS_SEC_SUPP) && !dev->ctrl.opal_dev) {
- 		dev->ctrl.opal_dev =
- 			init_opal_dev(&dev->ctrl, &nvme_sec_submit);
- 	}
-diff --git a/include/linux/nvme.h b/include/linux/nvme.h
-index 3e2ed49c3ad8..0b676a02cf3e 100644
---- a/include/linux/nvme.h
-+++ b/include/linux/nvme.h
-@@ -244,6 +244,7 @@ enum {
- 	NVME_CTRL_ONCS_DSM			= 1 << 2,
- 	NVME_CTRL_ONCS_WRITE_ZEROES		= 1 << 3,
- 	NVME_CTRL_VWC_PRESENT			= 1 << 0,
-+	NVME_CTRL_OACS_SEC_SUPP                 = 1 << 0,
- };
- 
- struct nvme_lbaf {
+-/* Maximum size of each resync request */
+-#define RESYNC_BLOCK_SIZE (64*1024)
+-#define RESYNC_PAGES ((RESYNC_BLOCK_SIZE + PAGE_SIZE-1) / PAGE_SIZE)
+ /* amount of memory to reserve for resync requests */
+ #define RESYNC_WINDOW (1024*1024)
+ /* maximum number of concurrent requests, memory permitting */
 -- 
-2.11.0
+2.7.4
