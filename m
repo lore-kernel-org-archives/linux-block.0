@@ -1,75 +1,262 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f66.google.com ([74.125.83.66]:33111 "EHLO
-        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751318AbdBXPnn (ORCPT
+Received: from mail-wr0-f178.google.com ([209.85.128.178]:33961 "EHLO
+        mail-wr0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751426AbdBXRIP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 24 Feb 2017 10:43:43 -0500
-From: Ming Lei <tom.leiming@gmail.com>
-To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
-        linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>
-Cc: Ming Lei <tom.leiming@gmail.com>
-Subject: [PATCH v1 09/14] md: raid1: use bio helper in process_checks()
-Date: Fri, 24 Feb 2017 23:42:46 +0800
-Message-Id: <1487950971-1131-10-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1487950971-1131-1-git-send-email-tom.leiming@gmail.com>
-References: <1487950971-1131-1-git-send-email-tom.leiming@gmail.com>
+        Fri, 24 Feb 2017 12:08:15 -0500
+Received: by mail-wr0-f178.google.com with SMTP id o22so11586562wro.1
+        for <linux-block@vger.kernel.org>; Fri, 24 Feb 2017 09:08:14 -0800 (PST)
+Subject: Re: [PATCH 1/3] lightnvm: submit erases using the I/O path
+To: =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <jg@lightnvm.io>
+References: <1487952846-29476-1-git-send-email-javier@cnexlabs.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@cnexlabs.com>,
+        =?UTF-8?Q?Matias_Bj=c3=b8rling?= <matias@cnexlabs.com>
+From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
+Message-ID: <c87f9dad-8420-2c9b-4bf8-2d9c0b89cb73@lightnvm.io>
+Date: Fri, 24 Feb 2017 18:08:05 +0100
+MIME-Version: 1.0
+In-Reply-To: <1487952846-29476-1-git-send-email-javier@cnexlabs.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Avoid to direct access to bvec table.
+On 02/24/2017 05:14 PM, Javier González wrote:
+> Until now erases have been submitted as synchronous commands through a
+> dedicated erase function. In order to enable targets implementing
+> asynchronous erases, refactor the erase path so that it uses the normal
+> async I/O submission functions. If a target requires sync I/O, it can
+> implement it internally. Also, adapt rrpc to use the new erase path.
+>
+> Signed-off-by: Javier González <javier@cnexlabs.com>
+> Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
+> ---
+>  drivers/lightnvm/core.c      | 54 +++++++++++++++++++++++++++-----------------
+>  drivers/lightnvm/rrpc.c      |  3 +--
+>  drivers/nvme/host/lightnvm.c | 32 ++++++++------------------
+>  include/linux/lightnvm.h     |  8 +++----
+>  4 files changed, 47 insertions(+), 50 deletions(-)
+>
+> diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+> index fcbd82f..ca48792 100644
+> --- a/drivers/lightnvm/core.c
+> +++ b/drivers/lightnvm/core.c
+> @@ -592,11 +592,11 @@ int nvm_set_tgt_bb_tbl(struct nvm_tgt_dev *tgt_dev, struct ppa_addr *ppas,
+>
+>  	memset(&rqd, 0, sizeof(struct nvm_rq));
+>
+> -	nvm_set_rqd_ppalist(dev, &rqd, ppas, nr_ppas, 1);
+> +	nvm_set_rqd_ppalist(tgt_dev, &rqd, ppas, nr_ppas, 1);
+>  	nvm_rq_tgt_to_dev(tgt_dev, &rqd);
+>
+>  	ret = dev->ops->set_bb_tbl(dev, &rqd.ppa_addr, rqd.nr_ppas, type);
+> -	nvm_free_rqd_ppalist(dev, &rqd);
+> +	nvm_free_rqd_ppalist(tgt_dev, &rqd);
+>  	if (ret) {
+>  		pr_err("nvm: failed bb mark\n");
+>  		return -EINVAL;
+> @@ -628,34 +628,45 @@ int nvm_submit_io(struct nvm_tgt_dev *tgt_dev, struct nvm_rq *rqd)
+>  }
+>  EXPORT_SYMBOL(nvm_submit_io);
+>
+> -int nvm_erase_blk(struct nvm_tgt_dev *tgt_dev, struct ppa_addr *ppas, int flags)
+> +static void nvm_end_io_sync(struct nvm_rq *rqd)
+>  {
+> -	struct nvm_dev *dev = tgt_dev->parent;
+> +	struct completion *waiting = rqd->private;
+> +
+> +	complete(waiting);
+> +}
+> +
+> +int nvm_erase_sync(struct nvm_tgt_dev *tgt_dev, struct ppa_addr *ppas,
+> +								int nr_ppas)
+> +{
+> +	struct nvm_geo *geo = &tgt_dev->geo;
+>  	struct nvm_rq rqd;
+>  	int ret;
+> -
+> -	if (!dev->ops->erase_block)
+> -		return 0;
+> -
+> -	nvm_map_to_dev(tgt_dev, ppas);
+> +	DECLARE_COMPLETION_ONSTACK(wait);
+>
+>  	memset(&rqd, 0, sizeof(struct nvm_rq));
+>
+> -	ret = nvm_set_rqd_ppalist(dev, &rqd, ppas, 1, 1);
+> +	rqd.opcode = NVM_OP_ERASE;
+> +	rqd.end_io = nvm_end_io_sync;
+> +	rqd.private = &wait;
+> +	rqd.flags = geo->plane_mode >> 1;
+> +
+> +	ret = nvm_set_rqd_ppalist(tgt_dev, &rqd, ppas, nr_ppas, 1);
+>  	if (ret)
+>  		return ret;
+>
+> -	nvm_rq_tgt_to_dev(tgt_dev, &rqd);
+> +	ret = nvm_submit_io(tgt_dev, &rqd);
+> +	if (ret) {
+> +		pr_err("rrpr: erase I/O submission falied: %d\n", ret);
+> +		goto free_ppa_list;
+> +	}
+> +	wait_for_completion_io(&wait);
+>
+> -	rqd.flags = flags;
+> -
+> -	ret = dev->ops->erase_block(dev, &rqd);
+> -
+> -	nvm_free_rqd_ppalist(dev, &rqd);
+> +free_ppa_list:
+> +	nvm_free_rqd_ppalist(tgt_dev, &rqd);
+>
+>  	return ret;
+>  }
+> -EXPORT_SYMBOL(nvm_erase_blk);
+> +EXPORT_SYMBOL(nvm_erase_sync);
+>
+>  int nvm_get_l2p_tbl(struct nvm_tgt_dev *tgt_dev, u64 slba, u32 nlb,
+>  		    nvm_l2p_update_fn *update_l2p, void *priv)
+> @@ -734,10 +745,11 @@ void nvm_put_area(struct nvm_tgt_dev *tgt_dev, sector_t begin)
+>  }
+>  EXPORT_SYMBOL(nvm_put_area);
+>
+> -int nvm_set_rqd_ppalist(struct nvm_dev *dev, struct nvm_rq *rqd,
+> +int nvm_set_rqd_ppalist(struct nvm_tgt_dev *tgt_dev, struct nvm_rq *rqd,
+>  			const struct ppa_addr *ppas, int nr_ppas, int vblk)
+>  {
+> -	struct nvm_geo *geo = &dev->geo;
+> +	struct nvm_dev *dev = tgt_dev->parent;
+> +	struct nvm_geo *geo = &tgt_dev->geo;
+>  	int i, plane_cnt, pl_idx;
+>  	struct ppa_addr ppa;
+>
+> @@ -775,12 +787,12 @@ int nvm_set_rqd_ppalist(struct nvm_dev *dev, struct nvm_rq *rqd,
+>  }
+>  EXPORT_SYMBOL(nvm_set_rqd_ppalist);
+>
+> -void nvm_free_rqd_ppalist(struct nvm_dev *dev, struct nvm_rq *rqd)
+> +void nvm_free_rqd_ppalist(struct nvm_tgt_dev *tgt_dev, struct nvm_rq *rqd)
+>  {
+>  	if (!rqd->ppa_list)
+>  		return;
+>
+> -	nvm_dev_dma_free(dev, rqd->ppa_list, rqd->dma_ppa_list);
+> +	nvm_dev_dma_free(tgt_dev->parent, rqd->ppa_list, rqd->dma_ppa_list);
+>  }
+>  EXPORT_SYMBOL(nvm_free_rqd_ppalist);
+>
+> diff --git a/drivers/lightnvm/rrpc.c b/drivers/lightnvm/rrpc.c
+> index e68efbc..4e4c299 100644
+> --- a/drivers/lightnvm/rrpc.c
+> +++ b/drivers/lightnvm/rrpc.c
+> @@ -414,7 +414,6 @@ static void rrpc_block_gc(struct work_struct *work)
+>  	struct rrpc *rrpc = gcb->rrpc;
+>  	struct rrpc_block *rblk = gcb->rblk;
+>  	struct rrpc_lun *rlun = rblk->rlun;
+> -	struct nvm_tgt_dev *dev = rrpc->dev;
+>  	struct ppa_addr ppa;
+>
+>  	mempool_free(gcb, rrpc->gcb_pool);
+> @@ -430,7 +429,7 @@ static void rrpc_block_gc(struct work_struct *work)
+>  	ppa.g.lun = rlun->bppa.g.lun;
+>  	ppa.g.blk = rblk->id;
+>
+> -	if (nvm_erase_blk(dev, &ppa, 0))
+> +	if (nvm_erase_sync(rrpc->dev, &ppa, 1))
+>  		goto put_back;
+>
+>  	rrpc_put_blk(rrpc, rblk);
+> diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
+> index a057a36..faf8419 100644
+> --- a/drivers/nvme/host/lightnvm.c
+> +++ b/drivers/nvme/host/lightnvm.c
+> @@ -606,12 +606,16 @@ static int nvme_nvm_submit_io(struct nvm_dev *dev, struct nvm_rq *rqd)
+>  	}
+>  	rq->cmd_flags &= ~REQ_FAILFAST_DRIVER;
+>
+> -	rq->ioprio = bio_prio(bio);
+> -	if (bio_has_data(bio))
+> -		rq->nr_phys_segments = bio_phys_segments(q, bio);
+> -
+> -	rq->__data_len = bio->bi_iter.bi_size;
+> -	rq->bio = rq->biotail = bio;
+> +	if (bio) {
+> +		rq->ioprio = bio_prio(bio);
+> +		rq->__data_len = bio->bi_iter.bi_size;
+> +		rq->bio = rq->biotail = bio;
+> +		if (bio_has_data(bio))
+> +			rq->nr_phys_segments = bio_phys_segments(q, bio);
+> +	} else {
+> +		rq->ioprio = IOPRIO_PRIO_VALUE(IOPRIO_CLASS_BE, IOPRIO_NORM);
+> +		rq->__data_len = 0;
+> +	}
+>
+>  	nvme_nvm_rqtocmd(rq, rqd, ns, cmd);
+>
+> @@ -622,21 +626,6 @@ static int nvme_nvm_submit_io(struct nvm_dev *dev, struct nvm_rq *rqd)
+>  	return 0;
+>  }
+>
+> -static int nvme_nvm_erase_block(struct nvm_dev *dev, struct nvm_rq *rqd)
+> -{
+> -	struct request_queue *q = dev->q;
+> -	struct nvme_ns *ns = q->queuedata;
+> -	struct nvme_nvm_command c = {};
+> -
+> -	c.erase.opcode = NVM_OP_ERASE;
+> -	c.erase.nsid = cpu_to_le32(ns->ns_id);
+> -	c.erase.spba = cpu_to_le64(rqd->ppa_addr.ppa);
+> -	c.erase.length = cpu_to_le16(rqd->nr_ppas - 1);
+> -	c.erase.control = cpu_to_le16(rqd->flags);
+> -
+> -	return nvme_submit_sync_cmd(q, (struct nvme_command *)&c, NULL, 0);
+> -}
+> -
+>  static void *nvme_nvm_create_dma_pool(struct nvm_dev *nvmdev, char *name)
+>  {
+>  	struct nvme_ns *ns = nvmdev->q->queuedata;
+> @@ -672,7 +661,6 @@ static struct nvm_dev_ops nvme_nvm_dev_ops = {
+>  	.set_bb_tbl		= nvme_nvm_set_bb_tbl,
+>
+>  	.submit_io		= nvme_nvm_submit_io,
+> -	.erase_block		= nvme_nvm_erase_block,
+>
+>  	.create_dma_pool	= nvme_nvm_create_dma_pool,
+>  	.destroy_dma_pool	= nvme_nvm_destroy_dma_pool,
+> diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
+> index 33c29cc..6a3534b 100644
+> --- a/include/linux/lightnvm.h
+> +++ b/include/linux/lightnvm.h
+> @@ -56,7 +56,6 @@ typedef int (nvm_get_l2p_tbl_fn)(struct nvm_dev *, u64, u32,
+>  typedef int (nvm_op_bb_tbl_fn)(struct nvm_dev *, struct ppa_addr, u8 *);
+>  typedef int (nvm_op_set_bb_fn)(struct nvm_dev *, struct ppa_addr *, int, int);
+>  typedef int (nvm_submit_io_fn)(struct nvm_dev *, struct nvm_rq *);
+> -typedef int (nvm_erase_blk_fn)(struct nvm_dev *, struct nvm_rq *);
+>  typedef void *(nvm_create_dma_pool_fn)(struct nvm_dev *, char *);
+>  typedef void (nvm_destroy_dma_pool_fn)(void *);
+>  typedef void *(nvm_dev_dma_alloc_fn)(struct nvm_dev *, void *, gfp_t,
+> @@ -70,7 +69,6 @@ struct nvm_dev_ops {
+>  	nvm_op_set_bb_fn	*set_bb_tbl;
+>
+>  	nvm_submit_io_fn	*submit_io;
+> -	nvm_erase_blk_fn	*erase_block;
+>
+>  	nvm_create_dma_pool_fn	*create_dma_pool;
+>  	nvm_destroy_dma_pool_fn	*destroy_dma_pool;
+> @@ -479,10 +477,10 @@ extern int nvm_set_tgt_bb_tbl(struct nvm_tgt_dev *, struct ppa_addr *,
+>  			      int, int);
+>  extern int nvm_max_phys_sects(struct nvm_tgt_dev *);
+>  extern int nvm_submit_io(struct nvm_tgt_dev *, struct nvm_rq *);
+> -extern int nvm_set_rqd_ppalist(struct nvm_dev *, struct nvm_rq *,
+> +extern int nvm_erase_sync(struct nvm_tgt_dev *, struct ppa_addr *, int);
+> +extern int nvm_set_rqd_ppalist(struct nvm_tgt_dev *, struct nvm_rq *,
+>  					const struct ppa_addr *, int, int);
+> -extern void nvm_free_rqd_ppalist(struct nvm_dev *, struct nvm_rq *);
+> -extern int nvm_erase_blk(struct nvm_tgt_dev *, struct ppa_addr *, int);
+> +extern void nvm_free_rqd_ppalist(struct nvm_tgt_dev *, struct nvm_rq *);
+>  extern int nvm_get_l2p_tbl(struct nvm_tgt_dev *, u64, u32, nvm_l2p_update_fn *,
+>  			   void *);
+>  extern int nvm_get_area(struct nvm_tgt_dev *, sector_t *, sector_t);
+>
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
----
- drivers/md/raid1.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
-index 9371caace379..7363bf56f3b4 100644
---- a/drivers/md/raid1.c
-+++ b/drivers/md/raid1.c
-@@ -2108,6 +2108,7 @@ static void process_checks(struct r1bio *r1_bio)
- 		int j;
- 		int size;
- 		int error;
-+		struct bio_vec *bi;
- 		struct bio *b = r1_bio->bios[i];
- 		struct resync_pages *rp = get_resync_pages(b);
- 		if (b->bi_end_io != end_sync_read)
-@@ -2126,9 +2127,7 @@ static void process_checks(struct r1bio *r1_bio)
- 		b->bi_private = rp;
- 
- 		size = b->bi_iter.bi_size;
--		for (j = 0; j < vcnt ; j++) {
--			struct bio_vec *bi;
--			bi = &b->bi_io_vec[j];
-+		bio_for_each_segment_all(bi, b, j) {
- 			bi->bv_offset = 0;
- 			if (size > PAGE_SIZE)
- 				bi->bv_len = PAGE_SIZE;
-@@ -2152,17 +2151,22 @@ static void process_checks(struct r1bio *r1_bio)
- 		int error = sbio->bi_error;
- 		struct page **ppages = get_resync_pages(pbio)->pages;
- 		struct page **spages = get_resync_pages(sbio)->pages;
-+		struct bio_vec *bi;
-+		int page_len[RESYNC_PAGES];
- 
- 		if (sbio->bi_end_io != end_sync_read)
- 			continue;
- 		/* Now we can 'fixup' the error value */
- 		sbio->bi_error = 0;
- 
-+		bio_for_each_segment_all(bi, sbio, j)
-+			page_len[j] = bi->bv_len;
-+
- 		if (!error) {
- 			for (j = vcnt; j-- ; ) {
- 				if (memcmp(page_address(ppages[j]),
- 					   page_address(spages[j]),
--					   sbio->bi_io_vec[j].bv_len))
-+					   page_len[j]))
- 					break;
- 			}
- 		} else
--- 
-2.7.4
+Thanks, applied for 4.12.
