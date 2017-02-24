@@ -1,100 +1,57 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Christoph Hellwig <hch@lst.de>
-To: linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
-        linux-block@vger.kernel.org
-Subject: [PATCH 05/12] fs: add a F_IOINFO fcntl
-Date: Tue, 28 Feb 2017 06:57:30 -0800
-Message-Id: <20170228145737.19016-6-hch@lst.de>
-In-Reply-To: <20170228145737.19016-1-hch@lst.de>
-References: <20170228145737.19016-1-hch@lst.de>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-by2nam03on0073.outbound.protection.outlook.com ([104.47.42.73]:11538
+        "EHLO NAM03-BY2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1750995AbdBXRRY (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 24 Feb 2017 12:17:24 -0500
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
+To: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
+Subject: [PATCH 2/2] lightnvm: fix assert fixes and enable checks
+Date: Fri, 24 Feb 2017 18:16:49 +0100
+Message-ID: <20170224171649.27409-2-matias@cnexlabs.com>
+In-Reply-To: <20170224171649.27409-1-matias@cnexlabs.com>
+References: <20170224171649.27409-1-matias@cnexlabs.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This fcntl can be used to query I/O parameters for the given file
-descriptor.  Initially it is used for the I/O alignment and atomic
-write parameters.
+The asserts in _nvme_nvm_check_size are not compiled due to the function
+not begin called. Make sure that it is called, and also fix the wrong
+sizes of asserts for nvme_nvm_addr_format, and nvme_nvm_bb_tbl, which
+checked for number of bits instead of bytes.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reported-by: Scott Bauer <scott.bauer@intel.com>
+Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
 ---
- fs/fcntl.c                 | 18 ++++++++++++++++++
- include/linux/fs.h         |  1 +
- include/uapi/linux/fcntl.h | 16 ++++++++++++++++
- 3 files changed, 35 insertions(+)
+ drivers/nvme/host/lightnvm.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/fs/fcntl.c b/fs/fcntl.c
-index ca5d228be7ea..248fb4cc66a6 100644
---- a/fs/fcntl.c
-+++ b/fs/fcntl.c
-@@ -241,6 +241,21 @@ static int f_getowner_uids(struct file *filp, unsigned long arg)
+diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
+index e37b432..b6a67ad 100644
+--- a/drivers/nvme/host/lightnvm.c
++++ b/drivers/nvme/host/lightnvm.c
+@@ -241,9 +241,9 @@ static inline void _nvme_nvm_check_size(void)
+ 	BUILD_BUG_ON(sizeof(struct nvme_nvm_l2ptbl) != 64);
+ 	BUILD_BUG_ON(sizeof(struct nvme_nvm_erase_blk) != 64);
+ 	BUILD_BUG_ON(sizeof(struct nvme_nvm_id_group) != 960);
+-	BUILD_BUG_ON(sizeof(struct nvme_nvm_addr_format) != 128);
++	BUILD_BUG_ON(sizeof(struct nvme_nvm_addr_format) != 16);
+ 	BUILD_BUG_ON(sizeof(struct nvme_nvm_id) != 4096);
+-	BUILD_BUG_ON(sizeof(struct nvme_nvm_bb_tbl) != 512);
++	BUILD_BUG_ON(sizeof(struct nvme_nvm_bb_tbl) != 64);
  }
- #endif
  
-+static int fcntl_ioinfo(struct file *file, void __user *argp)
-+{
-+	struct fcntl_ioinfo fio = { 0, };
-+
-+	if (file->f_op->ioinfo) {
-+		int ret = file->f_op->ioinfo(file, &fio);
-+		if (ret)
-+			return ret;
-+	}
-+
-+	if (copy_to_user(argp, &fio, sizeof(fio)))
-+		return -EFAULT;
-+	return 0;
-+}
-+
- static long do_fcntl(int fd, unsigned int cmd, unsigned long arg,
- 		struct file *filp)
- {
-@@ -335,6 +350,9 @@ static long do_fcntl(int fd, unsigned int cmd, unsigned long arg,
- 	case F_GET_SEALS:
- 		err = shmem_fcntl(filp, cmd, arg);
- 		break;
-+	case F_IOINFO:
-+		err = fcntl_ioinfo(filp, (void __user *)arg);
-+		break;
- 	default:
- 		break;
- 	}
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 2ba074328894..33b08a8c2bc3 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -1680,6 +1680,7 @@ struct file_operations {
- 			u64);
- 	ssize_t (*dedupe_file_range)(struct file *, u64, u64, struct file *,
- 			u64);
-+	int (*ioinfo)(struct file *, struct fcntl_ioinfo *);
- };
+ static int init_grps(struct nvm_id *nvm_id, struct nvme_nvm_id *nvme_nvm_id)
+@@ -797,6 +797,8 @@ int nvme_nvm_register(struct nvme_ns *ns, char *disk_name, int node)
+ 	struct request_queue *q = ns->queue;
+ 	struct nvm_dev *dev;
  
- struct inode_operations {
-diff --git a/include/uapi/linux/fcntl.h b/include/uapi/linux/fcntl.h
-index beed138bd359..6b0aaba7c623 100644
---- a/include/uapi/linux/fcntl.h
-+++ b/include/uapi/linux/fcntl.h
-@@ -42,6 +42,22 @@
- #define F_SEAL_WRITE	0x0008	/* prevent writes */
- /* (1U << 31) is reserved for signed error codes */
- 
++	_nvme_nvm_check_size();
 +
-+#define F_IOINFO	(F_LINUX_SPECIFIC_BASE +  11)
-+
-+struct fcntl_ioinfo {
-+	__u16		fio_flags;	/* FIO_FL_* */
-+	__u16		fio_alignment;	/* required I/O alignment on disk */
-+	__u32		__reserved1;	/* must be zero */
-+	__u64		fio_max_atomic;	/* max size for atomic writes */
-+	__u64		__reserved2[14];/* must be zero */
-+};
-+
-+/* supports atomic writes using O_(D)SYNC */
-+#define FIO_FL_ATOMIC_OSYNC	(1 << 0)
-+/* supports atomic writes committed using fsync/fdatasync/msync */
-+#define FIO_FL_ATOMIC_FSYNC	(1 << 1)
-+
- /*
-  * Types of directory notifications that may be requested.
-  */
+ 	dev = nvm_alloc_dev(node);
+ 	if (!dev)
+ 		return -ENOMEM;
 -- 
-2.11.0
+2.9.3
