@@ -1,79 +1,238 @@
-Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
-From: Scott Bauer <scott.bauer@intel.com>
-To: linux-block@vger.kernel.org
-Subject: [PATCH 2/3] nvme/pci: re-check security protocol support after reset
-Date: Wed, 22 Feb 2017 10:15:07 -0700
-Message-Id: <1487783708-16285-3-git-send-email-scott.bauer@intel.com>
-In-Reply-To: <1487783708-16285-1-git-send-email-scott.bauer@intel.com>
-References: <1487783708-16285-1-git-send-email-scott.bauer@intel.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
-List-Post: <mailto:linux-nvme@lists.infradead.org>
-List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
-Cc: keith.busch@intel.com, linux-nvme@lists.infradead.org, axboe@fb.com,
- jonathan.derrick@intel.com, hch@lst.de, Scott Bauer <scott.bauer@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
-Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pf0-f195.google.com ([209.85.192.195]:34568 "EHLO
+        mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751320AbdBXPng (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 24 Feb 2017 10:43:36 -0500
+From: Ming Lei <tom.leiming@gmail.com>
+To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
+        linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>
+Cc: Ming Lei <tom.leiming@gmail.com>
+Subject: [PATCH v1 07/14] md: raid1: don't use bio's vec table to manage resync pages
+Date: Fri, 24 Feb 2017 23:42:44 +0800
+Message-Id: <1487950971-1131-8-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1487950971-1131-1-git-send-email-tom.leiming@gmail.com>
+References: <1487950971-1131-1-git-send-email-tom.leiming@gmail.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-A device may change capabilities after each reset, e.g. due to a firmware
-upgrade.  We should thus check for Security Send/Receive and OPAL support
-after each reset.
+Now we allocate one page array for managing resync pages, instead
+of using bio's vec table to do that, and the old way is very hacky
+and won't work any more if multipage bvec is enabled.
 
-Based on patches from Christoph and Keith.
+The introduced cost is that we need to allocate (128 + 16) * raid_disks
+bytes per r1_bio, and it is fine because the inflight r1_bio for
+resync shouldn't be much, as pointed by Shaohua.
 
-Signed-off-by: Scott Bauer <scott.bauer@intel.com>
+Also the bio_reset() in raid1_sync_request() is removed because
+all bios are freshly new now and not necessary to reset any more.
+
+This patch can be thought as a cleanup too
+
+Suggested-by: Shaohua Li <shli@kernel.org>
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- drivers/nvme/host/pci.c | 17 ++++++++++-------
- 1 file changed, 10 insertions(+), 7 deletions(-)
+ drivers/md/raid1.c | 86 +++++++++++++++++++++++++++++++++++-------------------
+ 1 file changed, 56 insertions(+), 30 deletions(-)
 
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index ddc51ad..f660fc2 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -1739,7 +1739,7 @@ static void nvme_pci_free_ctrl(struct nvme_ctrl *ctrl)
- 	if (dev->ctrl.admin_q)
- 		blk_put_queue(dev->ctrl.admin_q);
- 	kfree(dev->queues);
--	kfree(dev->ctrl.opal_dev);
-+	free_opal_dev(dev->ctrl.opal_dev);
- 	kfree(dev);
- }
+diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
+index 2de0bd69d8da..4a208220ff0f 100644
+--- a/drivers/md/raid1.c
++++ b/drivers/md/raid1.c
+@@ -77,6 +77,16 @@ static void lower_barrier(struct r1conf *conf, sector_t sector_nr);
+ #define raid1_log(md, fmt, args...)				\
+ 	do { if ((md)->queue) blk_add_trace_msg((md)->queue, "raid1 " fmt, ##args); } while (0)
  
-@@ -1789,14 +1789,17 @@ static void nvme_reset_work(struct work_struct *work)
- 	if (result)
- 		goto out;
++static inline struct resync_pages *get_resync_pages(struct bio *bio)
++{
++	return bio->bi_private;
++}
++
++static inline struct r1bio *get_resync_r1bio(struct bio *bio)
++{
++	return get_resync_pages(bio)->raid_bio;
++}
++
+ static void * r1bio_pool_alloc(gfp_t gfp_flags, void *data)
+ {
+ 	struct pool_info *pi = data;
+@@ -104,12 +114,18 @@ static void * r1buf_pool_alloc(gfp_t gfp_flags, void *data)
+ 	struct r1bio *r1_bio;
+ 	struct bio *bio;
+ 	int need_pages;
+-	int i, j;
++	int j;
++	struct resync_pages *rps;
  
--	if ((dev->ctrl.oacs & NVME_CTRL_OACS_SEC_SUPP) && !dev->ctrl.opal_dev) {
--		dev->ctrl.opal_dev =
--			init_opal_dev(&dev->ctrl, &nvme_sec_submit);
-+	if (dev->ctrl.oacs & NVME_CTRL_OACS_SEC_SUPP) {
-+		if (!dev->ctrl.opal_dev)
-+			dev->ctrl.opal_dev =
-+				init_opal_dev(&dev->ctrl, &nvme_sec_submit);
-+		else if (was_suspend)
-+			opal_unlock_from_suspend(dev->ctrl.opal_dev);
-+	} else {
-+		free_opal_dev(dev->ctrl.opal_dev);
-+		dev->ctrl.opal_dev = NULL;
+ 	r1_bio = r1bio_pool_alloc(gfp_flags, pi);
+ 	if (!r1_bio)
+ 		return NULL;
+ 
++	rps = kmalloc(sizeof(struct resync_pages) * pi->raid_disks,
++		      gfp_flags);
++	if (!rps)
++		goto out_free_r1bio;
++
+ 	/*
+ 	 * Allocate bios : 1 for reading, n-1 for writing
+ 	 */
+@@ -129,22 +145,22 @@ static void * r1buf_pool_alloc(gfp_t gfp_flags, void *data)
+ 		need_pages = pi->raid_disks;
+ 	else
+ 		need_pages = 1;
+-	for (j = 0; j < need_pages; j++) {
++	for (j = 0; j < pi->raid_disks; j++) {
++		struct resync_pages *rp = &rps[j];
++
+ 		bio = r1_bio->bios[j];
+-		bio->bi_vcnt = RESYNC_PAGES;
+-
+-		if (bio_alloc_pages(bio, gfp_flags))
+-			goto out_free_pages;
+-	}
+-	/* If not user-requests, copy the page pointers to all bios */
+-	if (!test_bit(MD_RECOVERY_REQUESTED, &pi->mddev->recovery)) {
+-		for (i=0; i<RESYNC_PAGES ; i++)
+-			for (j=1; j<pi->raid_disks; j++) {
+-				struct page *page =
+-					r1_bio->bios[0]->bi_io_vec[i].bv_page;
+-				get_page(page);
+-				r1_bio->bios[j]->bi_io_vec[i].bv_page = page;
+-			}
++
++		if (j < need_pages) {
++			if (resync_alloc_pages(rp, gfp_flags))
++				goto out_free_pages;
++		} else {
++			memcpy(rp, &rps[0], sizeof(*rp));
++			resync_get_all_pages(rp);
++		}
++
++		rp->idx = 0;
++		rp->raid_bio = r1_bio;
++		bio->bi_private = rp;
  	}
  
--	if (was_suspend)
--		opal_unlock_from_suspend(dev->ctrl.opal_dev);
--
- 	result = nvme_setup_io_queues(dev);
- 	if (result)
- 		goto out;
+ 	r1_bio->master_bio = NULL;
+@@ -153,11 +169,14 @@ static void * r1buf_pool_alloc(gfp_t gfp_flags, void *data)
+ 
+ out_free_pages:
+ 	while (--j >= 0)
+-		bio_free_pages(r1_bio->bios[j]);
++		resync_free_pages(&rps[j]);
+ 
+ out_free_bio:
+ 	while (++j < pi->raid_disks)
+ 		bio_put(r1_bio->bios[j]);
++	kfree(rps);
++
++out_free_r1bio:
+ 	r1bio_pool_free(r1_bio, data);
+ 	return NULL;
+ }
+@@ -165,14 +184,18 @@ static void * r1buf_pool_alloc(gfp_t gfp_flags, void *data)
+ static void r1buf_pool_free(void *__r1_bio, void *data)
+ {
+ 	struct pool_info *pi = data;
+-	int i,j;
++	int i;
+ 	struct r1bio *r1bio = __r1_bio;
++	struct resync_pages *rp = NULL;
+ 
+-	for (i = 0; i < RESYNC_PAGES; i++)
+-		for (j = pi->raid_disks; j-- ;)
+-			safe_put_page(r1bio->bios[j]->bi_io_vec[i].bv_page);
+-	for (i=0 ; i < pi->raid_disks; i++)
++	for (i = pi->raid_disks; i--; ) {
++		rp = get_resync_pages(r1bio->bios[i]);
++		resync_free_pages(rp);
+ 		bio_put(r1bio->bios[i]);
++	}
++
++	/* resync pages array stored in the 1st bio's .bi_private */
++	kfree(rp);
+ 
+ 	r1bio_pool_free(r1bio, data);
+ }
+@@ -1849,7 +1872,7 @@ static int raid1_remove_disk(struct mddev *mddev, struct md_rdev *rdev)
+ 
+ static void end_sync_read(struct bio *bio)
+ {
+-	struct r1bio *r1_bio = bio->bi_private;
++	struct r1bio *r1_bio = get_resync_r1bio(bio);
+ 
+ 	update_head_pos(r1_bio->read_disk, r1_bio);
+ 
+@@ -1868,7 +1891,7 @@ static void end_sync_read(struct bio *bio)
+ static void end_sync_write(struct bio *bio)
+ {
+ 	int uptodate = !bio->bi_error;
+-	struct r1bio *r1_bio = bio->bi_private;
++	struct r1bio *r1_bio = get_resync_r1bio(bio);
+ 	struct mddev *mddev = r1_bio->mddev;
+ 	struct r1conf *conf = mddev->private;
+ 	sector_t first_bad;
+@@ -2085,6 +2108,7 @@ static void process_checks(struct r1bio *r1_bio)
+ 		int size;
+ 		int error;
+ 		struct bio *b = r1_bio->bios[i];
++		struct resync_pages *rp = get_resync_pages(b);
+ 		if (b->bi_end_io != end_sync_read)
+ 			continue;
+ 		/* fixup the bio for reuse, but preserve errno */
+@@ -2097,7 +2121,8 @@ static void process_checks(struct r1bio *r1_bio)
+ 			conf->mirrors[i].rdev->data_offset;
+ 		b->bi_bdev = conf->mirrors[i].rdev->bdev;
+ 		b->bi_end_io = end_sync_read;
+-		b->bi_private = r1_bio;
++		rp->raid_bio = r1_bio;
++		b->bi_private = rp;
+ 
+ 		size = b->bi_iter.bi_size;
+ 		for (j = 0; j < vcnt ; j++) {
+@@ -2755,7 +2780,6 @@ static sector_t raid1_sync_request(struct mddev *mddev, sector_t sector_nr,
+ 	for (i = 0; i < conf->raid_disks * 2; i++) {
+ 		struct md_rdev *rdev;
+ 		bio = r1_bio->bios[i];
+-		bio_reset(bio);
+ 
+ 		rdev = rcu_dereference(conf->mirrors[i].rdev);
+ 		if (rdev == NULL ||
+@@ -2811,7 +2835,6 @@ static sector_t raid1_sync_request(struct mddev *mddev, sector_t sector_nr,
+ 			atomic_inc(&rdev->nr_pending);
+ 			bio->bi_iter.bi_sector = sector_nr + rdev->data_offset;
+ 			bio->bi_bdev = rdev->bdev;
+-			bio->bi_private = r1_bio;
+ 			if (test_bit(FailFast, &rdev->flags))
+ 				bio->bi_opf |= MD_FAILFAST;
+ 		}
+@@ -2897,12 +2920,15 @@ static sector_t raid1_sync_request(struct mddev *mddev, sector_t sector_nr,
+ 		}
+ 
+ 		for (i = 0 ; i < conf->raid_disks * 2; i++) {
++			struct resync_pages *rp;
++
+ 			bio = r1_bio->bios[i];
++			rp = get_resync_pages(bio);
+ 			if (bio->bi_end_io) {
+-				page = bio->bi_io_vec[bio->bi_vcnt].bv_page;
++				page = resync_fetch_page(rp);
+ 				if (bio_add_page(bio, page, len, 0) == 0) {
+ 					/* stop here */
+-					bio->bi_io_vec[bio->bi_vcnt].bv_page = page;
++					resync_store_page(rp, page);
+ 					while (i > 0) {
+ 						i--;
+ 						bio = r1_bio->bios[i];
+@@ -2919,7 +2945,7 @@ static sector_t raid1_sync_request(struct mddev *mddev, sector_t sector_nr,
+ 		nr_sectors += len>>9;
+ 		sector_nr += len>>9;
+ 		sync_blocks -= (len>>9);
+-	} while (r1_bio->bios[disk]->bi_vcnt < RESYNC_PAGES);
++	} while (resync_page_available(r1_bio->bios[disk]->bi_private));
+  bio_full:
+ 	r1_bio->sectors = nr_sectors;
+ 
 -- 
 2.7.4
-
-
-_______________________________________________
-Linux-nvme mailing list
-Linux-nvme@lists.infradead.org
-http://lists.infradead.org/mailman/listinfo/linux-nvme
