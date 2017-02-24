@@ -1,71 +1,88 @@
-Return-Path: <jack@suse.cz>
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
-	Lekshmi Pillai <lekshmicpillai@in.ibm.com>,
-	Tejun Heo <tj@kernel.org>,
-	NeilBrown <neilb@suse.de>,
-	Omar Sandoval <osandov@osandov.com>,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH 03/13] block: Revalidate i_bdev reference in bd_aquire()
-Date: Tue, 21 Feb 2017 18:09:48 +0100
-Message-Id: <20170221170958.21845-4-jack@suse.cz>
-In-Reply-To: <20170221170958.21845-1-jack@suse.cz>
-References: <20170221170958.21845-1-jack@suse.cz>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pg0-f67.google.com ([74.125.83.67]:33162 "EHLO
+        mail-pg0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751291AbdBXPnv (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 24 Feb 2017 10:43:51 -0500
+From: Ming Lei <tom.leiming@gmail.com>
+To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
+        linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>
+Cc: Ming Lei <tom.leiming@gmail.com>
+Subject: [PATCH v1 11/14] md: raid10: refactor code of read reshape's .bi_end_io
+Date: Fri, 24 Feb 2017 23:42:48 +0800
+Message-Id: <1487950971-1131-12-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1487950971-1131-1-git-send-email-tom.leiming@gmail.com>
+References: <1487950971-1131-1-git-send-email-tom.leiming@gmail.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-When a device gets removed, block device inode unhashed so that it is not
-used anymore (bdget() will not find it anymore). Later when a new device
-gets created with the same device number, we create new block device
-inode. However there may be file system device inodes whose i_bdev still
-points to the original block device inode and thus we get two active
-block device inodes for the same device. They will share the same
-gendisk so the only visible differences will be that page caches will
-not be coherent and BDIs will be different (the old block device inode
-still points to unregistered BDI).
+reshape read request is a bit special and requires one extra
+bio which isn't allocated from r10buf_pool.
 
-Fix the problem by checking in bd_acquire() whether i_bdev still points
-to active block device inode and re-lookup the block device if not. That
-way any open of a block device happening after the old device has been
-removed will get correct block device inode.
+Refactor the .bi_end_io for read reshape, so that we can use
+raid10's resync page mangement approach easily in the following
+patches.
 
-Tested-by: Lekshmi Pillai <lekshmicpillai@in.ibm.com>
-Acked-by: Tejun Heo <tj@kernel.org>
-Signed-off-by: Jan Kara <jack@suse.cz>
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- fs/block_dev.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+ drivers/md/raid10.c | 28 ++++++++++++++++++----------
+ 1 file changed, 18 insertions(+), 10 deletions(-)
 
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 601b71b76d7f..68e855fdce58 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -1043,13 +1043,22 @@ static struct block_device *bd_acquire(struct inode *inode)
+diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
+index 227dd6ad7716..c76e08ea4b92 100644
+--- a/drivers/md/raid10.c
++++ b/drivers/md/raid10.c
+@@ -1907,17 +1907,9 @@ static int raid10_remove_disk(struct mddev *mddev, struct md_rdev *rdev)
+ 	return err;
+ }
  
- 	spin_lock(&bdev_lock);
- 	bdev = inode->i_bdev;
--	if (bdev) {
-+	if (bdev && !inode_unhashed(bdev->bd_inode)) {
- 		bdgrab(bdev);
- 		spin_unlock(&bdev_lock);
- 		return bdev;
+-static void end_sync_read(struct bio *bio)
++static void __end_sync_read(struct r10bio *r10_bio, struct bio *bio, int d)
+ {
+-	struct r10bio *r10_bio = bio->bi_private;
+ 	struct r10conf *conf = r10_bio->mddev->private;
+-	int d;
+-
+-	if (bio == r10_bio->master_bio) {
+-		/* this is a reshape read */
+-		d = r10_bio->read_slot; /* really the read dev */
+-	} else
+-		d = find_bio_disk(conf, r10_bio, bio, NULL, NULL);
+ 
+ 	if (!bio->bi_error)
+ 		set_bit(R10BIO_Uptodate, &r10_bio->state);
+@@ -1941,6 +1933,22 @@ static void end_sync_read(struct bio *bio)
  	}
- 	spin_unlock(&bdev_lock);
+ }
  
-+	/*
-+	 * i_bdev references block device inode that was already shut down
-+	 * (corresponding device got removed).  Remove the reference and look
-+	 * up block device inode again just in case new device got
-+	 * reestablished under the same device number.
-+	 */
-+	if (bdev)
-+		bd_forget(inode);
++static void end_sync_read(struct bio *bio)
++{
++	struct r10bio *r10_bio = bio->bi_private;
++	struct r10conf *conf = r10_bio->mddev->private;
++	int d = find_bio_disk(conf, r10_bio, bio, NULL, NULL);
 +
- 	bdev = bdget(inode->i_rdev);
- 	if (bdev) {
- 		spin_lock(&bdev_lock);
++	__end_sync_read(r10_bio, bio, d);
++}
++
++static void end_reshape_read(struct bio *bio)
++{
++	struct r10bio *r10_bio = bio->bi_private;
++
++	__end_sync_read(r10_bio, bio, r10_bio->read_slot);
++}
++
+ static void end_sync_request(struct r10bio *r10_bio)
+ {
+ 	struct mddev *mddev = r10_bio->mddev;
+@@ -4474,7 +4482,7 @@ static sector_t reshape_request(struct mddev *mddev, sector_t sector_nr,
+ 	read_bio->bi_iter.bi_sector = (r10_bio->devs[r10_bio->read_slot].addr
+ 			       + rdev->data_offset);
+ 	read_bio->bi_private = r10_bio;
+-	read_bio->bi_end_io = end_sync_read;
++	read_bio->bi_end_io = end_reshape_read;
+ 	bio_set_op_attrs(read_bio, REQ_OP_READ, 0);
+ 	read_bio->bi_flags &= (~0UL << BIO_RESET_BITS);
+ 	read_bio->bi_error = 0;
 -- 
-2.10.2
+2.7.4
