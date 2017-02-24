@@ -1,128 +1,103 @@
-Return-Path: <elena.reshetova@intel.com>
-From: Elena Reshetova <elena.reshetova@intel.com>
-To: linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	peterz@infradead.org,
-	gregkh@linuxfoundation.org,
-	axboe@kernel.dk,
-	fujita.tomonori@lab.ntt.co.jp,
-	mingo@redhat.com,
-	clm@fb.com,
-	jbacik@fb.com,
-	dsterba@suse.com,
-	Elena Reshetova <elena.reshetova@intel.com>,
-	Hans Liljestrand <ishkamiel@gmail.com>,
-	Kees Cook <keescook@chromium.org>,
-	David Windsor <dwindsor@gmail.com>
-Subject: [PATCH 1/5] block: convert bio.__bi_cnt from atomic_t to refcount_t
-Date: Mon, 20 Feb 2017 13:16:04 +0200
-Message-Id: <1487589368-17666-2-git-send-email-elena.reshetova@intel.com>
-In-Reply-To: <1487589368-17666-1-git-send-email-elena.reshetova@intel.com>
-References: <1487589368-17666-1-git-send-email-elena.reshetova@intel.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pg0-f67.google.com ([74.125.83.67]:34813 "EHLO
+        mail-pg0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751360AbdBXPn3 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 24 Feb 2017 10:43:29 -0500
+From: Ming Lei <tom.leiming@gmail.com>
+To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
+        linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>
+Cc: Ming Lei <tom.leiming@gmail.com>
+Subject: [PATCH v1 05/14] md: prepare for managing resync I/O pages in clean way
+Date: Fri, 24 Feb 2017 23:42:42 +0800
+Message-Id: <1487950971-1131-6-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1487950971-1131-1-git-send-email-tom.leiming@gmail.com>
+References: <1487950971-1131-1-git-send-email-tom.leiming@gmail.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-refcount_t type and corresponding API should be
-used instead of atomic_t when the variable is used as
-a reference counter. This allows to avoid accidental
-refcounter overflows that might lead to use-after-free
-situations.
+Now resync I/O use bio's bec table to manage pages,
+this way is very hacky, and may not work any more
+once multipage bvec is introduced.
 
-Signed-off-by: Elena Reshetova <elena.reshetova@intel.com>
-Signed-off-by: Hans Liljestrand <ishkamiel@gmail.com>
-Signed-off-by: Kees Cook <keescook@chromium.org>
-Signed-off-by: David Windsor <dwindsor@gmail.com>
+So introduce helpers and new data structure for
+managing resync I/O pages more cleanly.
+
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- block/bio.c               | 6 +++---
- fs/btrfs/volumes.c        | 2 +-
- include/linux/bio.h       | 4 ++--
- include/linux/blk_types.h | 3 ++-
- 4 files changed, 8 insertions(+), 7 deletions(-)
+ drivers/md/md.h | 61 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 61 insertions(+)
 
-diff --git a/block/bio.c b/block/bio.c
-index 5eec5e0..3dffc17 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -275,7 +275,7 @@ void bio_init(struct bio *bio, struct bio_vec *table,
- {
- 	memset(bio, 0, sizeof(*bio));
- 	atomic_set(&bio->__bi_remaining, 1);
--	atomic_set(&bio->__bi_cnt, 1);
-+	refcount_set(&bio->__bi_cnt, 1);
+diff --git a/drivers/md/md.h b/drivers/md/md.h
+index 1d63239a1be4..df18ae05838d 100644
+--- a/drivers/md/md.h
++++ b/drivers/md/md.h
+@@ -720,4 +720,65 @@ static inline void mddev_check_writesame(struct mddev *mddev, struct bio *bio)
+ #define RESYNC_BLOCK_SIZE (64*1024)
+ #define RESYNC_PAGES ((RESYNC_BLOCK_SIZE + PAGE_SIZE-1) / PAGE_SIZE)
  
- 	bio->bi_io_vec = table;
- 	bio->bi_max_vecs = max_vecs;
-@@ -543,12 +543,12 @@ void bio_put(struct bio *bio)
- 	if (!bio_flagged(bio, BIO_REFFED))
- 		bio_free(bio);
- 	else {
--		BIO_BUG_ON(!atomic_read(&bio->__bi_cnt));
-+		BIO_BUG_ON(!refcount_read(&bio->__bi_cnt));
- 
- 		/*
- 		 * last put frees it
- 		 */
--		if (atomic_dec_and_test(&bio->__bi_cnt))
-+		if (refcount_dec_and_test(&bio->__bi_cnt))
- 			bio_free(bio);
- 	}
- }
-diff --git a/fs/btrfs/volumes.c b/fs/btrfs/volumes.c
-index 13e55d1..ff1fe9d 100644
---- a/fs/btrfs/volumes.c
-+++ b/fs/btrfs/volumes.c
-@@ -441,7 +441,7 @@ static noinline void run_scheduled_bios(struct btrfs_device *device)
- 		    waitqueue_active(&fs_info->async_submit_wait))
- 			wake_up(&fs_info->async_submit_wait);
- 
--		BUG_ON(atomic_read(&cur->__bi_cnt) == 0);
-+		BUG_ON(refcount_read(&cur->__bi_cnt) == 0);
- 
- 		/*
- 		 * if we're doing the sync list, record that our
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 8e52119..44ac678 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -234,7 +234,7 @@ static inline void bio_get(struct bio *bio)
- {
- 	bio->bi_flags |= (1 << BIO_REFFED);
- 	smp_mb__before_atomic();
--	atomic_inc(&bio->__bi_cnt);
-+	refcount_inc(&bio->__bi_cnt);
- }
- 
- static inline void bio_cnt_set(struct bio *bio, unsigned int count)
-@@ -243,7 +243,7 @@ static inline void bio_cnt_set(struct bio *bio, unsigned int count)
- 		bio->bi_flags |= (1 << BIO_REFFED);
- 		smp_mb__before_atomic();
- 	}
--	atomic_set(&bio->__bi_cnt, count);
-+	refcount_set(&bio->__bi_cnt, count);
- }
- 
- static inline bool bio_flagged(struct bio *bio, unsigned int bit)
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index d703acb..c41407f 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -7,6 +7,7 @@
- 
- #include <linux/types.h>
- #include <linux/bvec.h>
-+#include <linux/refcount.h>
- 
- struct bio_set;
- struct bio;
-@@ -73,7 +74,7 @@ struct bio {
- 
- 	unsigned short		bi_max_vecs;	/* max bvl_vecs we can hold */
- 
--	atomic_t		__bi_cnt;	/* pin count */
-+	refcount_t		__bi_cnt;	/* pin count */
- 
- 	struct bio_vec		*bi_io_vec;	/* the actual vec list */
- 
++/* for managing resync I/O pages */
++struct resync_pages {
++	unsigned	idx;	/* for get/put page from the pool */
++	void		*raid_bio;
++	struct page	*pages[RESYNC_PAGES];
++};
++
++static inline int resync_alloc_pages(struct resync_pages *rp,
++				     gfp_t gfp_flags)
++{
++	int i;
++
++	for (i = 0; i < RESYNC_PAGES; i++) {
++		rp->pages[i] = alloc_page(gfp_flags);
++		if (!rp->pages[i])
++			goto out_free;
++	}
++
++	return 0;
++
++ out_free:
++	while (--i >= 0)
++		__free_page(rp->pages[i]);
++	return -ENOMEM;
++}
++
++static inline void resync_free_pages(struct resync_pages *rp)
++{
++	int i;
++
++	for (i = 0; i < RESYNC_PAGES; i++)
++		__free_page(rp->pages[i]);
++}
++
++static inline void resync_get_all_pages(struct resync_pages *rp)
++{
++	int i;
++
++	for (i = 0; i < RESYNC_PAGES; i++)
++		get_page(rp->pages[i]);
++}
++
++static inline void resync_store_page(struct resync_pages *rp, struct page *page)
++{
++	if (WARN_ON(!rp->idx))
++		return;
++	rp->pages[--rp->idx] = page;
++}
++
++static inline struct page *resync_fetch_page(struct resync_pages *rp)
++{
++	if (WARN_ON_ONCE(rp->idx >= RESYNC_PAGES))
++		return NULL;
++	return rp->pages[rp->idx++];
++}
++
++static inline bool resync_page_available(struct resync_pages *rp)
++{
++	return rp->idx < RESYNC_PAGES;
++}
++
+ #endif /* _MD_MD_H */
 -- 
 2.7.4
