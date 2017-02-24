@@ -1,119 +1,95 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:42254 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752577AbdBHQmR (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 8 Feb 2017 11:42:17 -0500
-Date: Wed, 8 Feb 2017 11:34:07 -0500
-From: Mike Snitzer <snitzer@redhat.com>
-To: Kent Overstreet <kent.overstreet@gmail.com>
-Cc: Pavel Machek <pavel@ucw.cz>,
-        kernel list <linux-kernel@vger.kernel.org>, axboe@fb.com,
-        hch@lst.de, neilb@suse.de, martin.petersen@oracle.com,
-        dpark@posteo.net, ming.l@ssi.samsung.com, dm-devel@redhat.com,
-        ming.lei@canonical.com, agk@redhat.com, jkosina@suse.cz,
-        geoff@infradead.org, jim@jtan.com, pjk1939@linux.vnet.ibm.com,
-        minchan@kernel.org, ngupta@vflare.org, oleg.drokin@intel.com,
-        andreas.dilger@intel.com, linux-block@vger.kernel.org
-Subject: Re: v4.9, 4.4-final: 28 bioset threads on small notebook, 36 threads
- on cellphone
-Message-ID: <20170208163407.GA3646@redhat.com>
-References: <20151211140841.GA22873@redhat.com>
- <20160220174035.GA16459@amd>
- <20160220184258.GA3753@amd>
- <20160220195136.GA27149@redhat.com>
- <20160220200432.GB22120@amd>
- <20170206125309.GA29395@amd>
- <20170207014724.74tb37jj7u66lww3@moria.home.lan>
- <20170207024906.4oswyuvxfnqkvbhr@moria.home.lan>
- <20170207203911.GA16980@amd>
- <20170207204510.qr2l2rg42ez2hobh@moria.home.lan>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170207204510.qr2l2rg42ez2hobh@moria.home.lan>
+Received: from mail-pg0-f68.google.com ([74.125.83.68]:34005 "EHLO
+        mail-pg0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751308AbdBXPn7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 24 Feb 2017 10:43:59 -0500
+From: Ming Lei <tom.leiming@gmail.com>
+To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
+        linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>
+Cc: Ming Lei <tom.leiming@gmail.com>
+Subject: [PATCH v1 13/14] md: raid10: retrieve page from preallocated resync page array
+Date: Fri, 24 Feb 2017 23:42:50 +0800
+Message-Id: <1487950971-1131-14-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1487950971-1131-1-git-send-email-tom.leiming@gmail.com>
+References: <1487950971-1131-1-git-send-email-tom.leiming@gmail.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Tue, Feb 07 2017 at 11:58pm -0500,
-Kent Overstreet <kent.overstreet@gmail.com> wrote:
+Now one page array is allocated for each resync bio, and we can
+retrieve page from this table directly.
 
-> On Tue, Feb 07, 2017 at 09:39:11PM +0100, Pavel Machek wrote:
-> > On Mon 2017-02-06 17:49:06, Kent Overstreet wrote:
-> > > On Mon, Feb 06, 2017 at 04:47:24PM -0900, Kent Overstreet wrote:
-> > > > On Mon, Feb 06, 2017 at 01:53:09PM +0100, Pavel Machek wrote:
-> > > > > Still there on v4.9, 36 threads on nokia n900 cellphone.
-> > > > > 
-> > > > > So.. what needs to be done there?
-> > > 
-> > > > But, I just got an idea for how to handle this that might be halfway sane, maybe
-> > > > I'll try and come up with a patch...
-> > > 
-> > > Ok, here's such a patch, only lightly tested:
-> > 
-> > I guess it would be nice for me to test it... but what it is against?
-> > I tried after v4.10-rc5 and linux-next, but got rejects in both cases.
-> 
-> Sorry, I forgot I had a few other patches in my branch that touch
-> mempool/biosets code.
-> 
-> Also, after thinking about it more and looking at the relevant code, I'm pretty
-> sure we don't need rescuer threads for block devices that just split bios - i.e.
-> most of them, so I changed my patch to do that.
-> 
-> Tested it by ripping out the current->bio_list checks/workarounds from the
-> bcache code, appears to work:
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+---
+ drivers/md/raid10.c | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
 
-Feedback on this patch below, but first:
-
-There are deeper issues with the current->bio_list and rescue workqueues
-than thread counts.
-
-I cannot help but feel like you (and Jens) are repeatedly ignoring the
-issue that has been raised numerous times, most recently:
-https://www.redhat.com/archives/dm-devel/2017-February/msg00059.html
-
-FYI, this test (albeit ugly) can be used to check if the dm-snapshot
-deadlock is fixed:
-https://www.redhat.com/archives/dm-devel/2017-January/msg00064.html
-
-This situation is the unfortunate pathological worst case for what
-happens when changes are merged and nobody wants to own fixing the
-unforseen implications/regressions.   Like everyone else in a position
-of Linux maintenance I've tried to stay away from owning the
-responsibility of a fix -- it isn't working.  Ok, I'll stop bitching
-now.. I do bear responsibility for not digging in myself.  We're all
-busy and this issue is "hard".
-
-> -- >8 --
-> Subject: [PATCH] block: Make rescuer threads per request_queue, not per bioset
-> 
-> Also, trigger rescuing whenever with bios on current->bio_list, instead
-> of only when we block in bio_alloc_bioset(). This is more correct, and
-> should result in fewer rescuer threads.
-> 
-> XXX: The current->bio_list plugging needs to be unified with the
-> blk_plug mechanism.
-> 
-> Signed-off-by: Kent Overstreet <kent.overstreet@gmail.com>
-> ---
-...
-> diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-> index 3086da5664..e1b22a68d9 100644
-> --- a/drivers/md/dm.c
-> +++ b/drivers/md/dm.c
-> @@ -1490,7 +1490,7 @@ static struct mapped_device *alloc_dev(int minor)
->  	INIT_LIST_HEAD(&md->table_devices);
->  	spin_lock_init(&md->uevent_lock);
->  
-> -	md->queue = blk_alloc_queue_node(GFP_KERNEL, numa_node_id);
-> +	md->queue = blk_alloc_queue_node(GFP_KERNEL, numa_node_id, 0);
->  	if (!md->queue)
->  		goto bad;
->  
-
-This should be BLK_QUEUE_NO_RESCUER as DM isn't making direct use of
-bio_queue_split() for its own internal spliting (maybe it should and
-that'd start to fix the issue I've been harping about?) but as is DM
-destroys the rescuer workqueue (since commit dbba42d8a9eb "dm: eliminate
-unused "bioset" process for each bio-based DM device").
-
-Mike
+diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
+index 931f5d80608b..ae162d542bf4 100644
+--- a/drivers/md/raid10.c
++++ b/drivers/md/raid10.c
+@@ -2065,6 +2065,7 @@ static void sync_request_write(struct mddev *mddev, struct r10bio *r10_bio)
+ 	int i, first;
+ 	struct bio *tbio, *fbio;
+ 	int vcnt;
++	struct page **tpages, **fpages;
+ 
+ 	atomic_set(&r10_bio->remaining, 1);
+ 
+@@ -2080,6 +2081,7 @@ static void sync_request_write(struct mddev *mddev, struct r10bio *r10_bio)
+ 	fbio = r10_bio->devs[i].bio;
+ 	fbio->bi_iter.bi_size = r10_bio->sectors << 9;
+ 	fbio->bi_iter.bi_idx = 0;
++	fpages = get_resync_pages(fbio)->pages;
+ 
+ 	vcnt = (r10_bio->sectors + (PAGE_SIZE >> 9) - 1) >> (PAGE_SHIFT - 9);
+ 	/* now find blocks with errors */
+@@ -2094,6 +2096,8 @@ static void sync_request_write(struct mddev *mddev, struct r10bio *r10_bio)
+ 			continue;
+ 		if (i == first)
+ 			continue;
++
++		tpages = get_resync_pages(tbio)->pages;
+ 		d = r10_bio->devs[i].devnum;
+ 		rdev = conf->mirrors[d].rdev;
+ 		if (!r10_bio->devs[i].bio->bi_error) {
+@@ -2106,8 +2110,8 @@ static void sync_request_write(struct mddev *mddev, struct r10bio *r10_bio)
+ 				int len = PAGE_SIZE;
+ 				if (sectors < (len / 512))
+ 					len = sectors * 512;
+-				if (memcmp(page_address(fbio->bi_io_vec[j].bv_page),
+-					   page_address(tbio->bi_io_vec[j].bv_page),
++				if (memcmp(page_address(fpages[j]),
++					   page_address(tpages[j]),
+ 					   len))
+ 					break;
+ 				sectors -= len/512;
+@@ -2205,6 +2209,7 @@ static void fix_recovery_read_error(struct r10bio *r10_bio)
+ 	int idx = 0;
+ 	int dr = r10_bio->devs[0].devnum;
+ 	int dw = r10_bio->devs[1].devnum;
++	struct page **pages = get_resync_pages(bio)->pages;
+ 
+ 	while (sectors) {
+ 		int s = sectors;
+@@ -2220,7 +2225,7 @@ static void fix_recovery_read_error(struct r10bio *r10_bio)
+ 		ok = sync_page_io(rdev,
+ 				  addr,
+ 				  s << 9,
+-				  bio->bi_io_vec[idx].bv_page,
++				  pages[idx],
+ 				  REQ_OP_READ, 0, false);
+ 		if (ok) {
+ 			rdev = conf->mirrors[dw].rdev;
+@@ -2228,7 +2233,7 @@ static void fix_recovery_read_error(struct r10bio *r10_bio)
+ 			ok = sync_page_io(rdev,
+ 					  addr,
+ 					  s << 9,
+-					  bio->bi_io_vec[idx].bv_page,
++					  pages[idx],
+ 					  REQ_OP_WRITE, 0, false);
+ 			if (!ok) {
+ 				set_bit(WriteErrorSeen, &rdev->flags);
+-- 
+2.7.4
