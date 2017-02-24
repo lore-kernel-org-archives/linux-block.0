@@ -1,82 +1,91 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Jan Kara <jack@suse.cz>
-To: <linux-fsdevel@vger.kernel.org>
-Cc: Christoph Hellwig <hch@infradead.org>, linux-block@vger.kernel.org,
-        Jan Kara <jack@suse.cz>, Boaz Harrosh <ooo@electrozaur.com>,
-        Benny Halevy <bhalevy@primarydata.com>, osd-dev@open-osd.org
-Subject: [PATCH 16/24] exofs: Convert to separately allocated bdi
-Date: Thu,  2 Feb 2017 18:34:14 +0100
-Message-Id: <20170202173422.3240-17-jack@suse.cz>
-In-Reply-To: <20170202173422.3240-1-jack@suse.cz>
-References: <20170202173422.3240-1-jack@suse.cz>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pf0-f193.google.com ([209.85.192.193]:36323 "EHLO
+        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751386AbdBXPnk (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 24 Feb 2017 10:43:40 -0500
+From: Ming Lei <tom.leiming@gmail.com>
+To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
+        linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>
+Cc: Ming Lei <tom.leiming@gmail.com>
+Subject: [PATCH v1 08/14] md: raid1: retrieve page from pre-allocated resync page array
+Date: Fri, 24 Feb 2017 23:42:45 +0800
+Message-Id: <1487950971-1131-9-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1487950971-1131-1-git-send-email-tom.leiming@gmail.com>
+References: <1487950971-1131-1-git-send-email-tom.leiming@gmail.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Allocate struct backing_dev_info separately instead of embedding it
-inside the superblock. This unifies handling of bdi among users.
+Now one page array is allocated for each resync bio, and we can
+retrieve page from this table directly.
 
-CC: Boaz Harrosh <ooo@electrozaur.com>
-CC: Benny Halevy <bhalevy@primarydata.com>
-CC: osd-dev@open-osd.org
-Signed-off-by: Jan Kara <jack@suse.cz>
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- fs/exofs/exofs.h |  1 -
- fs/exofs/super.c | 17 ++++++-----------
- 2 files changed, 6 insertions(+), 12 deletions(-)
+ drivers/md/raid1.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/fs/exofs/exofs.h b/fs/exofs/exofs.h
-index 2e86086bc940..5dc392404559 100644
---- a/fs/exofs/exofs.h
-+++ b/fs/exofs/exofs.h
-@@ -64,7 +64,6 @@ struct exofs_dev {
-  * our extension to the in-memory superblock
-  */
- struct exofs_sb_info {
--	struct backing_dev_info bdi;		/* register our bdi with VFS  */
- 	struct exofs_sb_stats s_ess;		/* Written often, pre-allocate*/
- 	int		s_timeout;		/* timeout for OSD operations */
- 	uint64_t	s_nextid;		/* highest object ID used     */
-diff --git a/fs/exofs/super.c b/fs/exofs/super.c
-index 1076a4233b39..819624cfc8da 100644
---- a/fs/exofs/super.c
-+++ b/fs/exofs/super.c
-@@ -464,7 +464,6 @@ static void exofs_put_super(struct super_block *sb)
- 			    sbi->one_comp.obj.partition);
+diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
+index 4a208220ff0f..9371caace379 100644
+--- a/drivers/md/raid1.c
++++ b/drivers/md/raid1.c
+@@ -1970,6 +1970,7 @@ static int fix_sync_read_error(struct r1bio *r1_bio)
+ 	struct mddev *mddev = r1_bio->mddev;
+ 	struct r1conf *conf = mddev->private;
+ 	struct bio *bio = r1_bio->bios[r1_bio->read_disk];
++	struct page **pages = get_resync_pages(bio)->pages;
+ 	sector_t sect = r1_bio->sector;
+ 	int sectors = r1_bio->sectors;
+ 	int idx = 0;
+@@ -2003,7 +2004,7 @@ static int fix_sync_read_error(struct r1bio *r1_bio)
+ 				 */
+ 				rdev = conf->mirrors[d].rdev;
+ 				if (sync_page_io(rdev, sect, s<<9,
+-						 bio->bi_io_vec[idx].bv_page,
++						 pages[idx],
+ 						 REQ_OP_READ, 0, false)) {
+ 					success = 1;
+ 					break;
+@@ -2058,7 +2059,7 @@ static int fix_sync_read_error(struct r1bio *r1_bio)
+ 				continue;
+ 			rdev = conf->mirrors[d].rdev;
+ 			if (r1_sync_page_io(rdev, sect, s,
+-					    bio->bi_io_vec[idx].bv_page,
++					    pages[idx],
+ 					    WRITE) == 0) {
+ 				r1_bio->bios[d]->bi_end_io = NULL;
+ 				rdev_dec_pending(rdev, mddev);
+@@ -2073,7 +2074,7 @@ static int fix_sync_read_error(struct r1bio *r1_bio)
+ 				continue;
+ 			rdev = conf->mirrors[d].rdev;
+ 			if (r1_sync_page_io(rdev, sect, s,
+-					    bio->bi_io_vec[idx].bv_page,
++					    pages[idx],
+ 					    READ) != 0)
+ 				atomic_add(s, &rdev->corrected_errors);
+ 		}
+@@ -2149,6 +2150,8 @@ static void process_checks(struct r1bio *r1_bio)
+ 		struct bio *pbio = r1_bio->bios[primary];
+ 		struct bio *sbio = r1_bio->bios[i];
+ 		int error = sbio->bi_error;
++		struct page **ppages = get_resync_pages(pbio)->pages;
++		struct page **spages = get_resync_pages(sbio)->pages;
  
- 	exofs_sysfs_sb_del(sbi);
--	bdi_destroy(&sbi->bdi);
- 	exofs_free_sbi(sbi);
- 	sb->s_fs_info = NULL;
- }
-@@ -809,8 +808,12 @@ static int exofs_fill_super(struct super_block *sb, void *data, int silent)
- 	__sbi_read_stats(sbi);
+ 		if (sbio->bi_end_io != end_sync_read)
+ 			continue;
+@@ -2157,11 +2160,8 @@ static void process_checks(struct r1bio *r1_bio)
  
- 	/* set up operation vectors */
--	sbi->bdi.ra_pages = __ra_pages(&sbi->layout);
--	sb->s_bdi = &sbi->bdi;
-+	ret = super_setup_bdi(sb);
-+	if (ret) {
-+		EXOFS_DBGMSG("Failed to super_setup_bdi\n");
-+		goto free_sbi;
-+	}
-+	sb->s_bdi->ra_pages = __ra_pages(&sbi->layout);
- 	sb->s_fs_info = sbi;
- 	sb->s_op = &exofs_sops;
- 	sb->s_export_op = &exofs_export_ops;
-@@ -836,14 +839,6 @@ static int exofs_fill_super(struct super_block *sb, void *data, int silent)
- 		goto free_sbi;
- 	}
- 
--	ret = bdi_setup_and_register(&sbi->bdi, "exofs");
--	if (ret) {
--		EXOFS_DBGMSG("Failed to bdi_setup_and_register\n");
--		dput(sb->s_root);
--		sb->s_root = NULL;
--		goto free_sbi;
--	}
--
- 	exofs_sysfs_dbg_print();
- 	_exofs_print_device("Mounting", opts->dev_name,
- 			    ore_comp_dev(&sbi->oc, 0),
+ 		if (!error) {
+ 			for (j = vcnt; j-- ; ) {
+-				struct page *p, *s;
+-				p = pbio->bi_io_vec[j].bv_page;
+-				s = sbio->bi_io_vec[j].bv_page;
+-				if (memcmp(page_address(p),
+-					   page_address(s),
++				if (memcmp(page_address(ppages[j]),
++					   page_address(spages[j]),
+ 					   sbio->bi_io_vec[j].bv_len))
+ 					break;
+ 			}
 -- 
-2.10.2
+2.7.4
