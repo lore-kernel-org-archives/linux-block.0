@@ -1,25 +1,59 @@
-Subject: Re: [PATCH] blk-mq-sched: bypass the scheduler for flushes entirely
-To: Omar Sandoval <osandov@osandov.com>, linux-block@vger.kernel.org
-References: <0d437b20c5eafb38997dbb4695c6387cbe18991a.1486078616.git.osandov@fb.com>
-Cc: kernel-team@fb.com
-From: Jens Axboe <axboe@fb.com>
-Message-ID: <54e0a7c4-5cf2-13a6-a059-32964fa37b2b@fb.com>
-Date: Thu, 2 Feb 2017 16:57:30 -0700
-MIME-Version: 1.0
-In-Reply-To: <0d437b20c5eafb38997dbb4695c6387cbe18991a.1486078616.git.osandov@fb.com>
-Content-Type: text/plain; charset=windows-1252
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pg0-f67.google.com ([74.125.83.67]:34977 "EHLO
+        mail-pg0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751327AbdBXPoD (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 24 Feb 2017 10:44:03 -0500
+From: Ming Lei <tom.leiming@gmail.com>
+To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
+        linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>
+Cc: Ming Lei <tom.leiming@gmail.com>
+Subject: [PATCH v1 14/14] md: raid10: avoid direct access to bvec table in handle_reshape_read_error
+Date: Fri, 24 Feb 2017 23:42:51 +0800
+Message-Id: <1487950971-1131-15-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1487950971-1131-1-git-send-email-tom.leiming@gmail.com>
+References: <1487950971-1131-1-git-send-email-tom.leiming@gmail.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On 02/02/2017 04:42 PM, Omar Sandoval wrote:
-> From: Omar Sandoval <osandov@fb.com>
-> 
-> There's a weird inconsistency that flushes are mostly hidden from the
-> scheduler, but it needs to be aware of them in ->insert_requests().
-> Instead of having every scheduler call blk_mq_sched_bypass_insert(),
-> let's do it in the common framework.
+The cost is 128bytes(8*16) stack space in kernel thread context, and
+just use the bio helper to retrieve pages from bio.
 
-Thanks Omar, looks good to me. After a cycle or two, we can kill
-the debug loop in blk_mq_sched_insert_requests().
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+---
+ drivers/md/raid10.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
+diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
+index ae162d542bf4..705cb9af03ef 100644
+--- a/drivers/md/raid10.c
++++ b/drivers/md/raid10.c
+@@ -4689,7 +4689,15 @@ static int handle_reshape_read_error(struct mddev *mddev,
+ 	struct r10bio *r10b = &on_stack.r10_bio;
+ 	int slot = 0;
+ 	int idx = 0;
+-	struct bio_vec *bvec = r10_bio->master_bio->bi_io_vec;
++	struct bio_vec *bvl;
++	struct page *pages[RESYNC_PAGES];
++
++	/*
++	 * This bio is allocated in reshape_request(), and size
++	 * is still RESYNC_PAGES
++	 */
++	bio_for_each_segment_all(bvl, r10_bio->master_bio, idx)
++		pages[idx] = bvl->bv_page;
+ 
+ 	r10b->sector = r10_bio->sector;
+ 	__raid10_find_phys(&conf->prev, r10b);
+@@ -4718,7 +4726,7 @@ static int handle_reshape_read_error(struct mddev *mddev,
+ 			success = sync_page_io(rdev,
+ 					       addr,
+ 					       s << 9,
+-					       bvec[idx].bv_page,
++					       pages[idx],
+ 					       REQ_OP_READ, 0, false);
+ 			rdev_dec_pending(rdev, mddev);
+ 			rcu_read_lock();
 -- 
-Jens Axboe
+2.7.4
