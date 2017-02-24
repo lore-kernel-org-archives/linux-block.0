@@ -1,113 +1,38 @@
-Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
-From: Scott Bauer <scott.bauer@intel.com>
-To: linux-block@vger.kernel.org
-Subject: [PATCH 1/3] block/sed-opal: Introduce free_opal_dev to free the
- structure and clean up state
-Date: Wed, 22 Feb 2017 10:15:06 -0700
-Message-Id: <1487783708-16285-2-git-send-email-scott.bauer@intel.com>
-In-Reply-To: <1487783708-16285-1-git-send-email-scott.bauer@intel.com>
-References: <1487783708-16285-1-git-send-email-scott.bauer@intel.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
-List-Post: <mailto:linux-nvme@lists.infradead.org>
-List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
-Cc: keith.busch@intel.com, linux-nvme@lists.infradead.org, axboe@fb.com,
- jonathan.derrick@intel.com, hch@lst.de, Scott Bauer <scott.bauer@intel.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:33993 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1751571AbdBXXB5 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 24 Feb 2017 18:01:57 -0500
+Subject: Re: [PATCH V2 2/3] PCI: add an API to get node from vector
+To: Bjorn Helgaas <helgaas@kernel.org>, Shaohua Li <shli@fb.com>
+References: <a52afb3e09691267f2240331ef0b9962f793703d.1485971427.git.shli@fb.com>
+ <d0f9b1bda8c27f058c95f88015e013b9d8131dc0.1485971427.git.shli@fb.com>
+ <20170224222943.GB26430@bhelgaas-glaptop.roam.corp.google.com>
+CC: <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <bhelgaas@google.com>, <hch@lst.de>
+From: Jens Axboe <axboe@fb.com>
+Message-ID: <0d5a492c-33b2-27b4-38f6-3087616a8cb5@fb.com>
+Date: Fri, 24 Feb 2017 15:34:44 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
-Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <20170224222943.GB26430@bhelgaas-glaptop.roam.corp.google.com>
+Content-Type: text/plain; charset="windows-1252"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Before we free the opal structure we need to clean up any saved
-locking ranges that the user had told us to unlock from a suspend.
+On 02/24/2017 03:29 PM, Bjorn Helgaas wrote:
+> On Wed, Feb 01, 2017 at 09:53:15AM -0800, Shaohua Li wrote:
+>> Next patch will use the API to get the node from vector for nvme device
+>>
+>> Signed-off-by: Shaohua Li <shli@fb.com>
+> 
+> Acked-by: Bjorn Helgaas <bhelgaas@google.com>
+> 
+> Sorry I missed this; I normally work from the linux-pci patchwork, and
+> this didn't show up there because it wasn't cc'd to linux-pci.  But I
+> should have noticed anyway.
 
-Signed-off-by: Scott Bauer <scott.bauer@intel.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
----
- block/sed-opal.c         | 30 ++++++++++++++++++++++++++++++
- include/linux/sed-opal.h |  5 +++++
- 2 files changed, 35 insertions(+)
+Thanks Bjorn!
 
-diff --git a/block/sed-opal.c b/block/sed-opal.c
-index 8935575..020bf3e 100644
---- a/block/sed-opal.c
-+++ b/block/sed-opal.c
-@@ -1987,6 +1987,28 @@ static int check_opal_support(struct opal_dev *dev)
- 	return ret;
- }
- 
-+static void clean_opal_dev(struct opal_dev *dev)
-+{
-+
-+	struct opal_suspend_data *suspend, *next;
-+
-+	mutex_lock(&dev->dev_lock);
-+	list_for_each_entry_safe(suspend, next, &dev->unlk_lst, node) {
-+		list_del(&suspend->node);
-+		kfree(suspend);
-+	}
-+	mutex_unlock(&dev->dev_lock);
-+}
-+
-+void free_opal_dev(struct opal_dev *dev)
-+{
-+	if (!dev)
-+		return;
-+	clean_opal_dev(dev);
-+	kfree(dev);
-+}
-+EXPORT_SYMBOL(free_opal_dev);
-+
- struct opal_dev *init_opal_dev(void *data, sec_send_recv *send_recv)
- {
- 	struct opal_dev *dev;
-@@ -2141,6 +2163,14 @@ static int opal_reverttper(struct opal_dev *dev, struct opal_key *opal)
- 	setup_opal_dev(dev, revert_steps);
- 	ret = next(dev);
- 	mutex_unlock(&dev->dev_lock);
-+
-+	/*
-+	 * If we successfully reverted lets clean
-+	 * any saved locking ranges.
-+	 */
-+	if (!ret)
-+		clean_opal_dev(dev);
-+
- 	return ret;
- }
- 
-diff --git a/include/linux/sed-opal.h b/include/linux/sed-opal.h
-index deee23d..04b124f 100644
---- a/include/linux/sed-opal.h
-+++ b/include/linux/sed-opal.h
-@@ -27,6 +27,7 @@ typedef int (sec_send_recv)(void *data, u16 spsp, u8 secp, void *buffer,
- 		size_t len, bool send);
- 
- #ifdef CONFIG_BLK_SED_OPAL
-+void free_opal_dev(struct opal_dev *dev);
- bool opal_unlock_from_suspend(struct opal_dev *dev);
- struct opal_dev *init_opal_dev(void *data, sec_send_recv *send_recv);
- int sed_ioctl(struct opal_dev *dev, unsigned int cmd, void __user *ioctl_ptr);
-@@ -51,6 +52,10 @@ static inline bool is_sed_ioctl(unsigned int cmd)
- 	return false;
- }
- #else
-+static inline void free_opal_dev(struct opal_dev *dev)
-+{
-+}
-+
- static inline bool is_sed_ioctl(unsigned int cmd)
- {
- 	return false;
 -- 
-2.7.4
-
-
-_______________________________________________
-Linux-nvme mailing list
-Linux-nvme@lists.infradead.org
-http://lists.infradead.org/mailman/listinfo/linux-nvme
+Jens Axboe
