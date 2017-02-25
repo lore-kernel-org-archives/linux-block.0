@@ -1,160 +1,61 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-Date: Fri, 10 Feb 2017 09:24:01 -0800
-From: Matthew Wilcox <willy@infradead.org>
-To: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Cc: Theodore Ts'o <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCHv6 12/37] brd: make it handle huge pages
-Message-ID: <20170210172401.GB2267@bombadil.infradead.org>
-References: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
- <20170126115819.58875-13-kirill.shutemov@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170126115819.58875-13-kirill.shutemov@linux.intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+Content-Type: text/plain; charset=iso-8859-1
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Subject: Re: [WIP PATCHSET 0/4] WIP branch for bfq-mq
+From: Paolo Valente <paolo.valente@linaro.org>
+In-Reply-To: <1487961857.2575.8.camel@sandisk.com>
+Date: Sat, 25 Feb 2017 18:45:58 +0100
+Cc: "ulf.hansson@linaro.org" <ulf.hansson@linaro.org>,
+ "tj@kernel.org" <tj@kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "broonie@kernel.org" <broonie@kernel.org>,
+ "linus.walleij@linaro.org" <linus.walleij@linaro.org>,
+ "axboe@kernel.dk" <axboe@kernel.dk>
+Message-Id: <19D7658C-BF04-4A52-AD1D-37842AE1E8C0@linaro.org>
+References: <20170207172446.4528-1-paolo.valente@linaro.org> <1486745110.2840.3.camel@sandisk.com> <1241B224-A446-4C76-87BB-4EA63852B6D1@linaro.org> <4a893c20-5a6b-a16c-073a-57c1a3d91b5a@sandisk.com> <55E6D3EE-27D1-4D46-ABE5-750445FB941B@linaro.org> <1A8DF6A8-C251-472A-9CE1-ACB1BCD0E9AB@linaro.org> <1487023626.2719.9.camel@sandisk.com> <1487025524.2719.11.camel@sandisk.com> <62F8F65E-A376-44EB-B53C-C2CFB8F8693F@linaro.org> <1487961857.2575.8.camel@sandisk.com>
+To: Bart Van Assche <bart.vanassche@sandisk.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Jan 26, 2017 at 02:57:54PM +0300, Kirill A. Shutemov wrote:
-> Do not assume length of bio segment is never larger than PAGE_SIZE.
-> With huge pages it's HPAGE_PMD_SIZE (2M on x86-64).
 
-I don't think we even need hugepages for BRD to be buggy.  I think there are
-already places which allocate compound pages (not in highmem, obviously ...)
-and put them in biovecs.  So this is pure and simple a bugfix.
+> Il giorno 24 feb 2017, alle ore 19:44, Bart Van Assche =
+<bart.vanassche@sandisk.com> ha scritto:
+>=20
+> On Wed, 2017-02-22 at 22:29 +0100, Paolo Valente wrote:
+>> thanks for this second attempt of yours.  Although, unfortunately, =
+not
+>> providing some clear indication of the exact cause of your hang =
+(apart
+>> from a possible deadlock), your log helped me notice another bug.
+>>=20
+>> At any rate, as I have just written to Jens, I have pushed a new
+>> version of the branch [1] (not just added new commits, but also
+>> integrated some old commit with new changes, to make it more =
+quickly).
+>> The branch now contains both a fix for the above bug, and, more
+>> importantly, a fix for the circular dependencies that were still
+>> lurking around.  Could you please test it?
+>=20
+> Hello Paolo,
+>=20
 
-That said, I find the current code in brd a bit inelegant, and I don't
-think this patch helps... indeed, I think it's buggy:
+Hi
 
-> @@ -202,12 +202,15 @@ static int copy_to_brd_setup(struct brd_device *brd, sector_t sector, size_t n)
->  	size_t copy;
->  
->  	copy = min_t(size_t, n, PAGE_SIZE - offset);
-> +	n -= copy;
->  	if (!brd_insert_page(brd, sector))
->  		return -ENOSPC;
-> -	if (copy < n) {
-> +	while (n) {
->  		sector += copy >> SECTOR_SHIFT;
->  		if (!brd_insert_page(brd, sector))
->  			return -ENOSPC;
-> +		copy = min_t(size_t, n, PAGE_SIZE);
-> +		n -= copy;
->  	}
+> I have good news: the same test system boots normally with the same
+> kernel config I used during my previous tests and with the latest
+> bfq-mq code (commit a965d19585c0) merged with kernel v4.10.
+>=20
 
-We're decrementing 'n' to 0, then testing it, so we never fill in the
-last page ... right?
+Whew, I was longing for you reply, thanks :)
 
-Anyway, here's my effort.  Untested.
+Should you want to have a look at it, I have just finished completing
+cgroups support too, as you have probably already read from my
+previous email.
 
-diff --git a/drivers/block/brd.c b/drivers/block/brd.c
-index 3adc32a3153b..0802a6abcd81 100644
---- a/drivers/block/brd.c
-+++ b/drivers/block/brd.c
-@@ -202,12 +202,14 @@ static int copy_to_brd_setup(struct brd_device *brd, sector_t sector, size_t n)
- 	size_t copy;
- 
- 	copy = min_t(size_t, n, PAGE_SIZE - offset);
--	if (!brd_insert_page(brd, sector))
--		return -ENOSPC;
--	if (copy < n) {
--		sector += copy >> SECTOR_SHIFT;
-+	for (;;) {
- 		if (!brd_insert_page(brd, sector))
- 			return -ENOSPC;
-+		n -= copy;
-+		if (!n)
-+			break;
-+		sector += copy >> SECTOR_SHIFT;
-+		copy = min_t(size_t, n, PAGE_SIZE);
- 	}
- 	return 0;
- }
-@@ -239,26 +241,23 @@ static void copy_to_brd(struct brd_device *brd, const void *src,
- 	struct page *page;
- 	void *dst;
- 	unsigned int offset = (sector & (PAGE_SECTORS-1)) << SECTOR_SHIFT;
--	size_t copy;
-+	size_t copy = min_t(size_t, n, PAGE_SIZE - offset);
- 
--	copy = min_t(size_t, n, PAGE_SIZE - offset);
--	page = brd_lookup_page(brd, sector);
--	BUG_ON(!page);
--
--	dst = kmap_atomic(page);
--	memcpy(dst + offset, src, copy);
--	kunmap_atomic(dst);
--
--	if (copy < n) {
--		src += copy;
--		sector += copy >> SECTOR_SHIFT;
--		copy = n - copy;
-+	for (;;) {
- 		page = brd_lookup_page(brd, sector);
- 		BUG_ON(!page);
- 
- 		dst = kmap_atomic(page);
--		memcpy(dst, src, copy);
-+		memcpy(dst + offset, src, copy);
- 		kunmap_atomic(dst);
-+
-+		n -= copy;
-+		if (!n)
-+			break;
-+		src += copy;
-+		sector += copy >> SECTOR_SHIFT;
-+		offset = 0;
-+		copy = min_t(size_t, n, PAGE_SIZE);
- 	}
- }
- 
-@@ -271,28 +270,24 @@ static void copy_from_brd(void *dst, struct brd_device *brd,
- 	struct page *page;
- 	void *src;
- 	unsigned int offset = (sector & (PAGE_SECTORS-1)) << SECTOR_SHIFT;
--	size_t copy;
-+	size_t copy = min_t(size_t, n, PAGE_SIZE - offset);
- 
--	copy = min_t(size_t, n, PAGE_SIZE - offset);
--	page = brd_lookup_page(brd, sector);
--	if (page) {
--		src = kmap_atomic(page);
--		memcpy(dst, src + offset, copy);
--		kunmap_atomic(src);
--	} else
--		memset(dst, 0, copy);
--
--	if (copy < n) {
--		dst += copy;
--		sector += copy >> SECTOR_SHIFT;
--		copy = n - copy;
-+	for (;;) {
- 		page = brd_lookup_page(brd, sector);
- 		if (page) {
- 			src = kmap_atomic(page);
--			memcpy(dst, src, copy);
-+			memcpy(dst, src + offset, copy);
- 			kunmap_atomic(src);
- 		} else
- 			memset(dst, 0, copy);
-+
-+		n -= copy;
-+		if (!n)
-+			break;
-+		dst += copy;
-+		sector += copy >> SECTOR_SHIFT;
-+		offset = 0;
-+		copy = min_t(size_t, n, PAGE_SIZE);
- 	}
- }
- 
+Thanks,
+Paolo
+
+> Thanks,
+>=20
+> Bart.
