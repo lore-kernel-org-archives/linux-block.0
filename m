@@ -1,119 +1,70 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga05.intel.com ([192.55.52.43]:22646 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S964811AbdBQW42 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Feb 2017 17:56:28 -0500
-From: Jon Derrick <jonathan.derrick@intel.com>
-Cc: Jon Derrick <jonathan.derrick@intel.com>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        Scott Bauer <scott.bauer@intel.com>,
-        Rafael Antognolli <rafael.antognolli@intel.com>,
-        Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@lst.de>
-Subject: [PATCH 1/5] block/sed: Use ssize_t on atom parsers to return errors
-Date: Fri, 17 Feb 2017 15:56:14 -0700
-Message-Id: <1487372178-15715-2-git-send-email-jonathan.derrick@intel.com>
-In-Reply-To: <1487372178-15715-1-git-send-email-jonathan.derrick@intel.com>
-References: <1487372178-15715-1-git-send-email-jonathan.derrick@intel.com>
-To: unlisted-recipients:; (no To-header on input)
+Received: from mail-wr0-f171.google.com ([209.85.128.171]:34324 "EHLO
+        mail-wr0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751445AbdBYQxI (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sat, 25 Feb 2017 11:53:08 -0500
+Received: by mail-wr0-f171.google.com with SMTP id o22so24722826wro.1
+        for <linux-block@vger.kernel.org>; Sat, 25 Feb 2017 08:53:07 -0800 (PST)
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
+To: mb@lightnvm.io
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
+Subject: [RFC PATCH v2] lightnvm: pblk
+Date: Sat, 25 Feb 2017 17:53:00 +0100
+Message-Id: <1488041581-17379-1-git-send-email-javier@cnexlabs.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-The short atom parser can return an errno from decoding but does not
-currently return the error as a signed value. Convert all of the parsers
-to ssize_t.
+This patch introduces pblk, a new target for LightNVM implementing a
+full host-based FTL. Details on the commit message.
 
-Signed-off-by: Jon Derrick <jonathan.derrick@intel.com>
----
- block/sed-opal.c | 28 ++++++++++++++--------------
- 1 file changed, 14 insertions(+), 14 deletions(-)
+Changes since v1:
+* Rebase on top of Matias' for-4.12/core
+* Move from per-LUN block allocation to a line model. This means that a
+  whole lines across all LUNs is allocated at a time. Data is still
+  stripped in a round-robin fashion at a page granurality.
+* Implement new disk format scheme, where metadata is stored per line
+  instead of per LUN. This allows for space optimizations.
+* Improvements on GC workqueue management and victim selection.
+* Implement sysfs interface to query pblk's operation and statistics.
+* Implement a user - GC I/O rate-limiter
+* Various bug fixes
 
-diff --git a/block/sed-opal.c b/block/sed-opal.c
-index d1c52ba..4675fd8 100644
---- a/block/sed-opal.c
-+++ b/block/sed-opal.c
-@@ -706,8 +706,8 @@ static enum opal_token response_get_token(const struct parsed_resp *resp,
- 	return tok->pos[0];
- }
- 
--static size_t response_parse_tiny(struct opal_resp_tok *tok,
--				  const u8 *pos)
-+static ssize_t response_parse_tiny(struct opal_resp_tok *tok,
-+				   const u8 *pos)
- {
- 	tok->pos = pos;
- 	tok->len = 1;
-@@ -723,8 +723,8 @@ static size_t response_parse_tiny(struct opal_resp_tok *tok,
- 	return tok->len;
- }
- 
--static size_t response_parse_short(struct opal_resp_tok *tok,
--				   const u8 *pos)
-+static ssize_t response_parse_short(struct opal_resp_tok *tok,
-+				    const u8 *pos)
- {
- 	tok->pos = pos;
- 	tok->len = (pos[0] & SHORT_ATOM_LEN_MASK) + 1;
-@@ -736,7 +736,7 @@ static size_t response_parse_short(struct opal_resp_tok *tok,
- 		tok->type = OPAL_DTA_TOKENID_SINT;
- 	} else {
- 		u64 u_integer = 0;
--		int i, b = 0;
-+		ssize_t i, b = 0;
- 
- 		tok->type = OPAL_DTA_TOKENID_UINT;
- 		if (tok->len > 9) {
-@@ -753,8 +753,8 @@ static size_t response_parse_short(struct opal_resp_tok *tok,
- 	return tok->len;
- }
- 
--static size_t response_parse_medium(struct opal_resp_tok *tok,
--				    const u8 *pos)
-+static ssize_t response_parse_medium(struct opal_resp_tok *tok,
-+				     const u8 *pos)
- {
- 	tok->pos = pos;
- 	tok->len = (((pos[0] & MEDIUM_ATOM_LEN_MASK) << 8) | pos[1]) + 2;
-@@ -770,8 +770,8 @@ static size_t response_parse_medium(struct opal_resp_tok *tok,
- 	return tok->len;
- }
- 
--static size_t response_parse_long(struct opal_resp_tok *tok,
--				  const u8 *pos)
-+static ssize_t response_parse_long(struct opal_resp_tok *tok,
-+				   const u8 *pos)
- {
- 	tok->pos = pos;
- 	tok->len = ((pos[1] << 16) | (pos[2] << 8) | pos[3]) + 4;
-@@ -787,8 +787,8 @@ static size_t response_parse_long(struct opal_resp_tok *tok,
- 	return tok->len;
- }
- 
--static size_t response_parse_token(struct opal_resp_tok *tok,
--				   const u8 *pos)
-+static ssize_t response_parse_token(struct opal_resp_tok *tok,
-+				    const u8 *pos)
- {
- 	tok->pos = pos;
- 	tok->len = 1;
-@@ -805,7 +805,7 @@ static int response_parse(const u8 *buf, size_t length,
- 	struct opal_resp_tok *iter;
- 	int num_entries = 0;
- 	int total;
--	size_t token_length;
-+	ssize_t token_length;
- 	const u8 *pos;
- 
- 	if (!buf)
-@@ -851,8 +851,8 @@ static int response_parse(const u8 *buf, size_t length,
- 		else /* TOKEN */
- 			token_length = response_parse_token(iter, pos);
- 
--		if (token_length == -EINVAL)
--			return -EINVAL;
-+		if (token_length < 0)
-+			return token_length;
- 
- 		pos += token_length;
- 		total -= token_length;
+Javier González (1):
+  lightnvm: physical block device (pblk) target
+
+ Documentation/lightnvm/pblk.txt  |   21 +
+ drivers/lightnvm/Kconfig         |   18 +
+ drivers/lightnvm/Makefile        |    5 +
+ drivers/lightnvm/pblk-cache.c    |  119 +++
+ drivers/lightnvm/pblk-core.c     | 1539 ++++++++++++++++++++++++++++++++++++++
+ drivers/lightnvm/pblk-gc.c       |  401 ++++++++++
+ drivers/lightnvm/pblk-init.c     |  937 +++++++++++++++++++++++
+ drivers/lightnvm/pblk-map.c      |  146 ++++
+ drivers/lightnvm/pblk-rb.c       |  857 +++++++++++++++++++++
+ drivers/lightnvm/pblk-read.c     |  512 +++++++++++++
+ drivers/lightnvm/pblk-recovery.c |  142 ++++
+ drivers/lightnvm/pblk-rl.c       |  219 ++++++
+ drivers/lightnvm/pblk-sysfs.c    |  947 +++++++++++++++++++++++
+ drivers/lightnvm/pblk-write.c    |  407 ++++++++++
+ drivers/lightnvm/pblk.h          |  958 ++++++++++++++++++++++++
+ 15 files changed, 7228 insertions(+)
+ create mode 100644 Documentation/lightnvm/pblk.txt
+ create mode 100644 drivers/lightnvm/pblk-cache.c
+ create mode 100644 drivers/lightnvm/pblk-core.c
+ create mode 100644 drivers/lightnvm/pblk-gc.c
+ create mode 100644 drivers/lightnvm/pblk-init.c
+ create mode 100644 drivers/lightnvm/pblk-map.c
+ create mode 100644 drivers/lightnvm/pblk-rb.c
+ create mode 100644 drivers/lightnvm/pblk-read.c
+ create mode 100644 drivers/lightnvm/pblk-recovery.c
+ create mode 100644 drivers/lightnvm/pblk-rl.c
+ create mode 100644 drivers/lightnvm/pblk-sysfs.c
+ create mode 100644 drivers/lightnvm/pblk-write.c
+ create mode 100644 drivers/lightnvm/pblk.h
+
 -- 
-1.8.3.1
+2.7.4
