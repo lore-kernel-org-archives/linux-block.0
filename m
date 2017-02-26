@@ -1,100 +1,126 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-qk0-f175.google.com ([209.85.220.175]:33341 "EHLO
-        mail-qk0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751221AbdBZWn5 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 26 Feb 2017 17:43:57 -0500
-Received: by mail-qk0-f175.google.com with SMTP id n127so73456757qkf.0
-        for <linux-block@vger.kernel.org>; Sun, 26 Feb 2017 14:43:57 -0800 (PST)
-Message-ID: <1488149033.2855.2.camel@redhat.com>
-Subject: Re: [LSF/MM TOPIC] do we really need PG_error at all?
-From: Jeff Layton <jlayton@redhat.com>
-To: NeilBrown <neilb@suse.com>,
-        James Bottomley <James.Bottomley@HansenPartnership.com>,
+Received: from mx2.suse.de ([195.135.220.15]:42809 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751161AbdBZVXs (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 26 Feb 2017 16:23:48 -0500
+From: NeilBrown <neilb@suse.com>
+To: James Bottomley <James.Bottomley@HansenPartnership.com>,
+        Jeff Layton <jlayton@redhat.com>,
         linux-mm <linux-mm@kvack.org>,
         linux-fsdevel <linux-fsdevel@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>
+Date: Mon, 27 Feb 2017 08:03:51 +1100
 Cc: lsf-pc <lsf-pc@lists.linuxfoundation.org>,
         Neil Brown <neilb@suse.de>,
         linux-scsi <linux-scsi@vger.kernel.org>,
         linux-block@vger.kernel.org
-Date: Sun, 26 Feb 2017 17:43:53 -0500
-In-Reply-To: <877f4cr7ew.fsf@notabene.neil.brown.name>
-References: <1488120164.2948.4.camel@redhat.com>
-         <1488129033.4157.8.camel@HansenPartnership.com>
-         <877f4cr7ew.fsf@notabene.neil.brown.name>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Subject: Re: [LSF/MM TOPIC] do we really need PG_error at all?
+In-Reply-To: <1488129033.4157.8.camel@HansenPartnership.com>
+References: <1488120164.2948.4.camel@redhat.com> <1488129033.4157.8.camel@HansenPartnership.com>
+Message-ID: <877f4cr7ew.fsf@notabene.neil.brown.name>
+MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="=-=-=";
+        micalg=pgp-sha256; protocol="application/pgp-signature"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Mon, 2017-02-27 at 08:03 +1100, NeilBrown wrote:
-> On Sun, Feb 26 2017, James Bottomley wrote:
-> 
-> > [added linux-scsi and linux-block because this is part of our error
-> > handling as well]
-> > On Sun, 2017-02-26 at 09:42 -0500, Jeff Layton wrote:
-> > > Proposing this as a LSF/MM TOPIC, but it may turn out to be me just 
-> > > not understanding the semantics here.
-> > > 
-> > > As I was looking into -ENOSPC handling in cephfs, I noticed that
-> > > PG_error is only ever tested in one place [1] 
-> > > __filemap_fdatawait_range, which does this:
-> > > 
-> > > 	if (TestClearPageError(page))
-> > > 		ret = -EIO;
-> > > 
-> > > This error code will override any AS_* error that was set in the
-> > > mapping. Which makes me wonder...why don't we just set this error in 
-> > > the mapping and not bother with a per-page flag? Could we potentially
-> > > free up a page flag by eliminating this?
-> > 
-> > Note that currently the AS_* codes are only set for write errors not
-> > for reads and we have no mapping error handling at all for swap pages,
-> > but I'm sure this is fixable.
-> 
-> How is a read error different from a failure to set PG_uptodate?
-> Does PG_error suppress retries?
-> 
+--=-=-=
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
-The thing is that we only ever TestClearError in write and fsync type
-codepaths. Does it make sense to report read errors _at_all_ in fsync?
+On Sun, Feb 26 2017, James Bottomley wrote:
 
-> > 
-> > From the I/O layer point of view we take great pains to try to pinpoint
-> > the error exactly to the sector.  We reflect this up by setting the
-> > PG_error flag on the page where the error occurred.  If we only set the
-> > error on the mapping, we lose that granularity, because the mapping is
-> > mostly at the file level (or VMA level for anon pages).
-> 
-> Are you saying that the IO layer finds the page in the bi_io_vec and
-> explicitly sets PG_error, rather than just passing an error indication
-> to bi_end_io ??  That would seem to be wrong as the page may not be in
-> the page cache. So I guess I misunderstand you.
-> 
-> > 
-> > So I think the question for filesystem people from us would be do you
-> > care about this accuracy?  If it's OK just to know an error occurred
-> > somewhere in this file, then perhaps we don't need it.
-> 
-> I had always assumed that a bio would either succeed or fail, and that
-> no finer granularity could be available.
-> 
-> I think the question here is: Do filesystems need the pagecache to
-> record which pages have seen an IO error?
-> I think that for write errors, there is no value in recording
-> block-oriented error status - only file-oriented status.
-> For read errors, it might if help to avoid indefinite read retries, but
-> I don't know the code well enough to be sure if this is an issue.
-> 
+> [added linux-scsi and linux-block because this is part of our error
+> handling as well]
+> On Sun, 2017-02-26 at 09:42 -0500, Jeff Layton wrote:
+>> Proposing this as a LSF/MM TOPIC, but it may turn out to be me just=20
+>> not understanding the semantics here.
+>>=20
+>> As I was looking into -ENOSPC handling in cephfs, I noticed that
+>> PG_error is only ever tested in one place [1]=20
+>> __filemap_fdatawait_range, which does this:
+>>=20
+>> 	if (TestClearPageError(page))
+>> 		ret =3D -EIO;
+>>=20
+>> This error code will override any AS_* error that was set in the
+>> mapping. Which makes me wonder...why don't we just set this error in=20
+>> the mapping and not bother with a per-page flag? Could we potentially
+>> free up a page flag by eliminating this?
+>
+> Note that currently the AS_* codes are only set for write errors not
+> for reads and we have no mapping error handling at all for swap pages,
+> but I'm sure this is fixable.
 
-Yeah, it might be useful for preventing failing read retries, but I
-don't see that it's being used in that way today, unless I'm missing
-something.
+How is a read error different from a failure to set PG_uptodate?
+Does PG_error suppress retries?
 
-If PG_error is ultimately needed, I'd like to have some more clearly
-defined semantics for it. It's sprinkled all over the place today, and
-it's not clear to me that it's being used correctly everywhere.
+>
+> From the I/O layer point of view we take great pains to try to pinpoint
+> the error exactly to the sector.  We reflect this up by setting the
+> PG_error flag on the page where the error occurred.  If we only set the
+> error on the mapping, we lose that granularity, because the mapping is
+> mostly at the file level (or VMA level for anon pages).
 
--- 
-Jeff Layton <jlayton@redhat.com>
+Are you saying that the IO layer finds the page in the bi_io_vec and
+explicitly sets PG_error, rather than just passing an error indication
+to bi_end_io ??  That would seem to be wrong as the page may not be in
+the page cache. So I guess I misunderstand you.
+
+>
+> So I think the question for filesystem people from us would be do you
+> care about this accuracy?  If it's OK just to know an error occurred
+> somewhere in this file, then perhaps we don't need it.
+
+I had always assumed that a bio would either succeed or fail, and that
+no finer granularity could be available.
+
+I think the question here is: Do filesystems need the pagecache to
+record which pages have seen an IO error?
+I think that for write errors, there is no value in recording
+block-oriented error status - only file-oriented status.
+For read errors, it might if help to avoid indefinite read retries, but
+I don't know the code well enough to be sure if this is an issue.
+
+NeilBrown
+
+
+>
+> James
+>
+>> The main argument I could see for keeping it is that removing it=20
+>> might subtly change the behavior of sync_file_range if you have tasks
+>> syncing different ranges in a file concurrently. I'm not sure if that=20
+>> would break any guarantees though.
+>>=20
+>> Even if we do need it, I think we might need some cleanup here=20
+>> anyway. A lot of readpage operations end up setting that flag when=20
+>> they hit an error. Isn't it wrong to return an error on fsync, just=20
+>> because we had a read error somewhere in the file in a range that was
+>> never dirtied?
+>>=20
+>> --
+>> [1]: there is another place in f2fs, but it's more or less equivalent=20
+>> to the call site in __filemap_fdatawait_range.
+>>=20
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEG8Yp69OQ2HB7X0l6Oeye3VZigbkFAlizQrcACgkQOeye3VZi
+gbnJBQ//X+H1BAE9cC1V24BQ+Xn4aLAmkspAnwRuKvOqbFIkUp+PIodvRlO/2oVi
+YI+MqlDclDn9IVMiySSHbMZ+f5Zg+iSpcX0eQkQ6JMQKJWFAj+bWvXdSEslfAbon
+BvYJEiHBRFiGxBgihpBczb/GMU+2g9HrIHg9fWh3cL7eFtQ8h2THfclWVEmQcSYf
+loesYK/q7Q0NJ7MfTAxv6I2fOxP/Fdea5Mp8l3ttoyzwIsHkxHYudPQ2xRPB762N
+ShPr4cAefsOTfh1Tyzk0VffVM/kW9icgliE4sxjIa2pCORZidFzEV0jTDMpvCJGB
+9YqBtNZiwc4OD0n3ItR4VvsvBl+F3V7BM/mzKkq7POlZhEsE66mTNEhF6l27Y2Rg
+/5pA0cgepQoqgPP3BlbclHlT75PIQIbIAMsGM+MMtC1yglsPgPuqRxAm+fYH0cko
+pVtRkL0u4JDSABINRxhMuI3qwHqWP9JfQaZFoHXo11iIgI9wPr9Ym5+QTHjU/sDi
+cjz8PnZ+oL//1GT3hdu/iBLao3cX4LCcOdTaII6stZub6r0CLRKtd5T27t68qwTp
+7GaRvdeLuVDo/2bSYW0nudHSyTJicbO8YUVFXp69KgYppSfmdWxEUL5ibaSRfLfc
+EwnTM24697cseThxlZA/ItAwo9/kc31A79VGO/gDTgTJ+g+L8Uw=
+=Ajz+
+-----END PGP SIGNATURE-----
+--=-=-=--
