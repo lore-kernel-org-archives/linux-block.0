@@ -1,74 +1,62 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f67.google.com ([74.125.83.67]:33518 "EHLO
-        mail-pg0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932096AbdBPLqt (ORCPT
+Received: from mail-pg0-f41.google.com ([74.125.83.41]:33271 "EHLO
+        mail-pg0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751341AbdB0Rtu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Feb 2017 06:46:49 -0500
-From: Ming Lei <tom.leiming@gmail.com>
-To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
-        linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        NeilBrown <neilb@suse.com>
-Cc: Ming Lei <tom.leiming@gmail.com>
-Subject: [PATCH 09/17] md: raid1/raid10: use bio helper in *_pool_free
-Date: Thu, 16 Feb 2017 19:45:39 +0800
-Message-Id: <1487245547-24384-10-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1487245547-24384-1-git-send-email-tom.leiming@gmail.com>
-References: <1487245547-24384-1-git-send-email-tom.leiming@gmail.com>
+        Mon, 27 Feb 2017 12:49:50 -0500
+Received: by mail-pg0-f41.google.com with SMTP id 25so17473184pgy.0
+        for <linux-block@vger.kernel.org>; Mon, 27 Feb 2017 09:48:44 -0800 (PST)
+From: Omar Sandoval <osandov@osandov.com>
+To: Jens Axboe <axboe@fb.com>, Sagi Grimberg <sagi@grimberg.me>,
+        linux-block@vger.kernel.org
+Cc: kernel-team@fb.com
+Subject: [PATCH 3/3] blk-mq: move update of tags->rqs to __blk_mq_alloc_request()
+Date: Mon, 27 Feb 2017 09:47:55 -0800
+Message-Id: <4715cce107df8b579734a074093a34001efd01d0.1488217516.git.osandov@fb.com>
+In-Reply-To: <dcfe49f597dc1eec3b326024c86a6ad3afb82fa8.1488217516.git.osandov@fb.com>
+References: <dcfe49f597dc1eec3b326024c86a6ad3afb82fa8.1488217516.git.osandov@fb.com>
+In-Reply-To: <dcfe49f597dc1eec3b326024c86a6ad3afb82fa8.1488217516.git.osandov@fb.com>
+References: <dcfe49f597dc1eec3b326024c86a6ad3afb82fa8.1488217516.git.osandov@fb.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
----
- drivers/md/raid1.c  | 13 ++++++++++---
- drivers/md/raid10.c | 11 +++++++----
- 2 files changed, 17 insertions(+), 7 deletions(-)
+From: Omar Sandoval <osandov@fb.com>
 
-diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
-index ebea8615344a..1dd6b2760fba 100644
---- a/drivers/md/raid1.c
-+++ b/drivers/md/raid1.c
-@@ -172,9 +172,16 @@ static void r1buf_pool_free(void *__r1_bio, void *data)
- 	int i,j;
- 	struct r1bio *r1bio = __r1_bio;
+No functional difference, it just makes a little more sense to update
+the tag map where we actually allocate the tag.
+
+Signed-off-by: Omar Sandoval <osandov@fb.com>
+---
+Optional cleanup, since there's only one place that does this.
+
+ block/blk-mq-sched.c | 2 --
+ block/blk-mq.c       | 1 +
+ 2 files changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index 5697b23412a1..09af8ff18719 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -134,8 +134,6 @@ struct request *blk_mq_sched_get_request(struct request_queue *q,
+ 			rq = __blk_mq_alloc_request(data, op);
+ 	} else {
+ 		rq = __blk_mq_alloc_request(data, op);
+-		if (rq)
+-			data->hctx->tags->rqs[rq->tag] = rq;
+ 	}
  
--	for (i = 0; i < RESYNC_PAGES; i++)
--		for (j = pi->raid_disks; j-- ;)
--			safe_put_page(r1bio->bios[j]->bi_io_vec[i].bv_page);
-+	for (i = 0; i < pi->raid_disks; i++) {
-+		struct bio_vec *bvl;
-+		struct bio *bio = r1bio->bios[i];
-+
-+		/* make sure all pages can be freed */
-+		bio->bi_vcnt = RESYNC_PAGES;
-+
-+		bio_for_each_segment_all(bvl, bio, j)
-+			safe_put_page(bvl->bv_page);
-+	}
- 	for (i=0 ; i < pi->raid_disks; i++)
- 		bio_put(r1bio->bios[i]);
- 
-diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
-index 8262f3e1dd93..5c698f3d3083 100644
---- a/drivers/md/raid10.c
-+++ b/drivers/md/raid10.c
-@@ -230,10 +230,13 @@ static void r10buf_pool_free(void *__r10_bio, void *data)
- 	for (j=0; j < conf->copies; j++) {
- 		struct bio *bio = r10bio->devs[j].bio;
- 		if (bio) {
--			for (i = 0; i < RESYNC_PAGES; i++) {
--				safe_put_page(bio->bi_io_vec[i].bv_page);
--				bio->bi_io_vec[i].bv_page = NULL;
--			}
-+			struct bio_vec *bvl;
-+
-+			/* make sure all pages can be freed */
-+			bio->bi_vcnt = RESYNC_PAGES;
-+
-+			bio_for_each_segment_all(bvl, bio, i)
-+				safe_put_page(bvl->bv_page);
- 			bio_put(bio);
+ 	if (rq) {
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index cc9713f574a5..452c1caf978f 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -234,6 +234,7 @@ struct request *__blk_mq_alloc_request(struct blk_mq_alloc_data *data,
+ 			}
+ 			rq->tag = tag;
+ 			rq->internal_tag = -1;
++			data->hctx->tags->rqs[rq->tag] = rq;
  		}
- 		bio = r10bio->devs[j].repl_bio;
+ 
+ 		blk_mq_rq_ctx_init(data->q, data->ctx, rq, op);
 -- 
-2.7.4
+2.12.0
