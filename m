@@ -1,52 +1,56 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f65.google.com ([74.125.83.65]:35330 "EHLO
-        mail-pg0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932168AbdBPLq4 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Feb 2017 06:46:56 -0500
-From: Ming Lei <tom.leiming@gmail.com>
-To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
-        linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        NeilBrown <neilb@suse.com>
-Cc: Ming Lei <tom.leiming@gmail.com>
-Subject: [PATCH 11/17] md: raid1: use bio helper in process_checks()
-Date: Thu, 16 Feb 2017 19:45:41 +0800
-Message-Id: <1487245547-24384-12-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1487245547-24384-1-git-send-email-tom.leiming@gmail.com>
-References: <1487245547-24384-1-git-send-email-tom.leiming@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+From: Jens Axboe <axboe@kernel.dk>
+Date: Mon, 27 Feb 2017 08:33:33 -0700
+To: Sagi Grimberg <sagi@grimberg.me>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	linux-nvme <linux-nvme@lists.infradead.org>
+Subject: Re: nvmf regression with mq-deadline
+Message-ID: <20170227153333.GA25478@kernel.dk>
+References: <8384a5c8-c8e6-4e46-65d6-208b802f6957@grimberg.me>
+ <34fb43d6-37e7-feb3-73c6-63140993ba7c@grimberg.me>
+ <0f06d732-fe32-bca0-8a4d-299a6cce7a6e@grimberg.me>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <0f06d732-fe32-bca0-8a4d-299a6cce7a6e@grimberg.me>
+List-ID: <linux-block@vger.kernel.org>
 
-Avoid to direct access to bvec table.
+On Mon, Feb 27 2017, Sagi Grimberg wrote:
+> 
+> >Now I'm getting a NULL deref with nvme-rdma [1].
+> >
+> >For some reason blk_mq_tag_to_rq() is returning NULL on
+> >tag 0x0 which is io queue connect.
+> >
+> >I'll try to see where this is coming from.
+> >This does not happen with loop though...
+> 
+> That's because the loop driver does not rely on the
+> cqe.command_id to resolve the submitted request (I'll
+> fix that).
+> 
+> Looks like blk_mq_alloc_request_hctx was overlooked when
+> the back assignment of the request to the rq_map...
+> 
+> This patch solves the issue for fabrics:
+> --
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index d84c66fb37b7..9611cd9920e9 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -312,6 +312,7 @@ struct request *blk_mq_alloc_request_hctx(struct
+> request_queue *q, int rw,
+>                 ret = -EWOULDBLOCK;
+>                 goto out_queue_exit;
+>         }
+> +       alloc_data.hctx->tags->rqs[rq->tag] = rq;
+> 
+>         return rq;
+> --
+> 
+> If its agreed with everyone I'll send a proper patch
+> for this and the blk_mq_sched_setup fix?
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
----
- drivers/md/raid1.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+Thanks Sagi, yes please send a proper patch for those two conditions!
 
-diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
-index 02ee8542295d..4400fbe7ce8c 100644
---- a/drivers/md/raid1.c
-+++ b/drivers/md/raid1.c
-@@ -2017,6 +2017,7 @@ static void process_checks(struct r1bio *r1_bio)
- 		int j;
- 		int size;
- 		int error;
-+		struct bio_vec *bi;
- 		struct bio *b = r1_bio->bios[i];
- 		if (b->bi_end_io != end_sync_read)
- 			continue;
-@@ -2033,9 +2034,7 @@ static void process_checks(struct r1bio *r1_bio)
- 		b->bi_private = r1_bio;
- 
- 		size = b->bi_iter.bi_size;
--		for (j = 0; j < vcnt ; j++) {
--			struct bio_vec *bi;
--			bi = &b->bi_io_vec[j];
-+		bio_for_each_segment_all(bi, b, j) {
- 			bi->bv_offset = 0;
- 			if (size > PAGE_SIZE)
- 				bi->bv_len = PAGE_SIZE;
 -- 
-2.7.4
+Jens Axboe
