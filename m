@@ -1,117 +1,58 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f46.google.com ([74.125.83.46]:36509 "EHLO
-        mail-pg0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751291AbdB0WwX (ORCPT
+Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:60531 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1751468AbdB0TyZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Feb 2017 17:52:23 -0500
-Received: by mail-pg0-f46.google.com with SMTP id s67so49405272pgb.3
-        for <linux-block@vger.kernel.org>; Mon, 27 Feb 2017 14:50:39 -0800 (PST)
-From: Omar Sandoval <osandov@osandov.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: kernel-team@fb.com
-Subject: [PATCH v2] blk-mq: make blk_mq_alloc_request_hctx() allocate a scheduler request
-Date: Mon, 27 Feb 2017 10:28:27 -0800
-Message-Id: <fd943d5d48a94d75c250087b681cdb1fea669504.1488220062.git.osandov@fb.com>
-In-Reply-To: <dcfe49f597dc1eec3b326024c86a6ad3afb82fa8.1488217516.git.osandov@fb.com>
+        Mon, 27 Feb 2017 14:54:25 -0500
+Subject: Re: [PATCH 1/3] blk-mq: make blk_mq_alloc_request_hctx() allocate a
+ scheduler request
+To: Sagi Grimberg <sagi@grimberg.me>,
+        Omar Sandoval <osandov@osandov.com>
 References: <dcfe49f597dc1eec3b326024c86a6ad3afb82fa8.1488217516.git.osandov@fb.com>
+ <6137d2c6-816e-83b2-103c-cdf0840f49fd@fb.com> <20170227183021.GG10715@vader>
+ <5d9bc14d-9a90-8915-f538-f61452420677@fb.com>
+ <719e3d15-73e2-0b11-e205-e733b882c2ae@grimberg.me>
+CC: <linux-block@vger.kernel.org>, <kernel-team@fb.com>
+From: Jens Axboe <axboe@fb.com>
+Message-ID: <9314f153-0264-2efb-fe52-a7823ce18051@fb.com>
+Date: Mon, 27 Feb 2017 11:44:32 -0700
+MIME-Version: 1.0
+In-Reply-To: <719e3d15-73e2-0b11-e205-e733b882c2ae@grimberg.me>
+Content-Type: text/plain; charset="windows-1252"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Omar Sandoval <osandov@fb.com>
+On 02/27/2017 11:41 AM, Sagi Grimberg wrote:
+> 
+>>>>> blk_mq_alloc_request_hctx() allocates a driver request directly, unlike
+>>>>> its blk_mq_alloc_request() counterpart. It also crashes because it
+>>>>> doesn't update the tags->rqs map.
+>>>>>
+>>>>> Fix it by making it allocate a scheduler request.
+>>>>
+>>>> All three look good to me. Would you mind respinning #1, it doesn't
+>>>> apply on top of the reserved tag patch.
+>>>
+>>> Yup, I had those based on Sagi's original patches for some reason. I
+>>> fat-fingered send-email, sent as a reply to the original patch 1 instead
+>>> of this email.
+>>
+>> I got it, applied all 3, thanks Omar!
+> 
+> FWIW, you can add my:
+> 
+> Tested-by: Sagi Grimberg <sagi@grmberg.me>
 
-blk_mq_alloc_request_hctx() allocates a driver request directly, unlike
-its blk_mq_alloc_request() counterpart. It also crashes because it
-doesn't update the tags->rqs map.
+Done, I fixed up your typo, though :-)
 
-Fix it by making it allocate a scheduler request.
+> Although I didn't try to trigger reserved vs. normal tag
+> competition which will never ever happen for nvmf btw, but
+> I assume it can happen in drivers who use reserved for error
+> handling.
 
-Reported-by: Sagi Grimberg <sagi@grimberg.me>
-Signed-off-by: Omar Sandoval <osandov@fb.com>
----
- block/blk-mq-sched.c | 11 +++++------
- block/blk-mq.c       | 33 +++++++++++++++------------------
- 2 files changed, 20 insertions(+), 24 deletions(-)
+As long as we verify they work independently, there should not
+be a need to check that edge case separately. We should have
+identical behavior there now to previously.
 
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 46ca965fff5c..5697b23412a1 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -110,15 +110,14 @@ struct request *blk_mq_sched_get_request(struct request_queue *q,
- 					 struct blk_mq_alloc_data *data)
- {
- 	struct elevator_queue *e = q->elevator;
--	struct blk_mq_hw_ctx *hctx;
--	struct blk_mq_ctx *ctx;
- 	struct request *rq;
- 
- 	blk_queue_enter_live(q);
--	ctx = blk_mq_get_ctx(q);
--	hctx = blk_mq_map_queue(q, ctx->cpu);
--
--	blk_mq_set_alloc_data(data, q, data->flags, ctx, hctx);
-+	data->q = q;
-+	if (likely(!data->ctx))
-+		data->ctx = blk_mq_get_ctx(q);
-+	if (likely(!data->hctx))
-+		data->hctx = blk_mq_map_queue(q, data->ctx->cpu);
- 
- 	if (e) {
- 		data->flags |= BLK_MQ_REQ_INTERNAL;
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 4df5fb42c74f..85a7047d8b03 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -273,10 +273,9 @@ EXPORT_SYMBOL(blk_mq_alloc_request);
- struct request *blk_mq_alloc_request_hctx(struct request_queue *q, int rw,
- 		unsigned int flags, unsigned int hctx_idx)
- {
--	struct blk_mq_hw_ctx *hctx;
--	struct blk_mq_ctx *ctx;
-+	struct blk_mq_alloc_data alloc_data = { .flags = flags };
- 	struct request *rq;
--	struct blk_mq_alloc_data alloc_data;
-+	unsigned int cpu;
- 	int ret;
- 
- 	/*
-@@ -299,25 +298,23 @@ struct request *blk_mq_alloc_request_hctx(struct request_queue *q, int rw,
- 	 * Check if the hardware context is actually mapped to anything.
- 	 * If not tell the caller that it should skip this queue.
- 	 */
--	hctx = q->queue_hw_ctx[hctx_idx];
--	if (!blk_mq_hw_queue_mapped(hctx)) {
--		ret = -EXDEV;
--		goto out_queue_exit;
-+	alloc_data.hctx = q->queue_hw_ctx[hctx_idx];
-+	if (!blk_mq_hw_queue_mapped(alloc_data.hctx)) {
-+		blk_queue_exit(q);
-+		return ERR_PTR(-EXDEV);
- 	}
--	ctx = __blk_mq_get_ctx(q, cpumask_first(hctx->cpumask));
-+	cpu = cpumask_first(alloc_data.hctx->cpumask);
-+	alloc_data.ctx = __blk_mq_get_ctx(q, cpu);
- 
--	blk_mq_set_alloc_data(&alloc_data, q, flags, ctx, hctx);
--	rq = __blk_mq_alloc_request(&alloc_data, rw);
--	if (!rq) {
--		ret = -EWOULDBLOCK;
--		goto out_queue_exit;
--	}
--
--	return rq;
-+	rq = blk_mq_sched_get_request(q, NULL, rw, &alloc_data);
- 
--out_queue_exit:
-+	blk_mq_put_ctx(alloc_data.ctx);
- 	blk_queue_exit(q);
--	return ERR_PTR(ret);
-+
-+	if (!rq)
-+		return ERR_PTR(-EWOULDBLOCK);
-+
-+	return rq;
- }
- EXPORT_SYMBOL_GPL(blk_mq_alloc_request_hctx);
- 
 -- 
-2.12.0
+Jens Axboe
