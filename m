@@ -1,66 +1,127 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f67.google.com ([74.125.83.67]:35236 "EHLO
-        mail-pg0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751810AbdB1PmW (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Feb 2017 10:42:22 -0500
-From: Ming Lei <tom.leiming@gmail.com>
-To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
-        linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Ming Lei <tom.leiming@gmail.com>
-Subject: [PATCH v2 05/13] md: raid1: simplify r1buf_pool_free()
-Date: Tue, 28 Feb 2017 23:41:35 +0800
-Message-Id: <1488296503-4987-6-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1488296503-4987-1-git-send-email-tom.leiming@gmail.com>
-References: <1488296503-4987-1-git-send-email-tom.leiming@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Christoph Hellwig <hch@lst.de>
+To: linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: [PATCH 04/12] fs: add a BH_Atomic flag
+Date: Tue, 28 Feb 2017 06:57:29 -0800
+Message-Id: <20170228145737.19016-5-hch@lst.de>
+In-Reply-To: <20170228145737.19016-1-hch@lst.de>
+References: <20170228145737.19016-1-hch@lst.de>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-This patch gets each page's reference of each bio for resync,
-then r1buf_pool_free() gets simplified a lot.
+This allows us propagate the O_ATOMIC flag through the writeback code.
 
-The same policy has been taken in raid10's buf pool allocation/free
-too.
-
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/md/raid1.c | 15 +++++++--------
- 1 file changed, 7 insertions(+), 8 deletions(-)
+ fs/buffer.c                 | 13 +++++++++----
+ fs/internal.h               |  2 +-
+ fs/iomap.c                  |  4 ++--
+ include/linux/buffer_head.h |  2 ++
+ 4 files changed, 14 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
-index 25c9172db639..c442b4657e2f 100644
---- a/drivers/md/raid1.c
-+++ b/drivers/md/raid1.c
-@@ -139,9 +139,12 @@ static void * r1buf_pool_alloc(gfp_t gfp_flags, void *data)
- 	/* If not user-requests, copy the page pointers to all bios */
- 	if (!test_bit(MD_RECOVERY_REQUESTED, &pi->mddev->recovery)) {
- 		for (i=0; i<RESYNC_PAGES ; i++)
--			for (j=1; j<pi->raid_disks; j++)
--				r1_bio->bios[j]->bi_io_vec[i].bv_page =
-+			for (j=1; j<pi->raid_disks; j++) {
-+				struct page *page =
- 					r1_bio->bios[0]->bi_io_vec[i].bv_page;
-+				get_page(page);
-+				r1_bio->bios[j]->bi_io_vec[i].bv_page = page;
-+			}
+diff --git a/fs/buffer.c b/fs/buffer.c
+index 0e87401cf335..85b0dce31b34 100644
+--- a/fs/buffer.c
++++ b/fs/buffer.c
+@@ -1937,7 +1937,7 @@ EXPORT_SYMBOL(page_zero_new_buffers);
+ 
+ static void
+ iomap_to_bh(struct inode *inode, sector_t block, struct buffer_head *bh,
+-		struct iomap *iomap)
++		struct iomap *iomap, unsigned flags)
+ {
+ 	loff_t offset = block << inode->i_blkbits;
+ 
+@@ -1987,10 +1987,15 @@ iomap_to_bh(struct inode *inode, sector_t block, struct buffer_head *bh,
+ 		set_buffer_mapped(bh);
+ 		break;
  	}
++
++	if (flags & IOMAP_ATOMIC)
++		set_buffer_atomic(bh);
++	else
++		clear_buffer_atomic(bh);
+ }
  
- 	r1_bio->master_bio = NULL;
-@@ -166,12 +169,8 @@ static void r1buf_pool_free(void *__r1_bio, void *data)
- 	struct r1bio *r1bio = __r1_bio;
+ int __block_write_begin_int(struct page *page, loff_t pos, unsigned len,
+-		get_block_t *get_block, struct iomap *iomap)
++		get_block_t *get_block, struct iomap *iomap, unsigned flags)
+ {
+ 	unsigned from = pos & (PAGE_SIZE - 1);
+ 	unsigned to = from + len;
+@@ -2031,7 +2036,7 @@ int __block_write_begin_int(struct page *page, loff_t pos, unsigned len,
+ 				if (err)
+ 					break;
+ 			} else {
+-				iomap_to_bh(inode, block, bh, iomap);
++				iomap_to_bh(inode, block, bh, iomap, flags);
+ 			}
  
- 	for (i = 0; i < RESYNC_PAGES; i++)
--		for (j = pi->raid_disks; j-- ;) {
--			if (j == 0 ||
--			    r1bio->bios[j]->bi_io_vec[i].bv_page !=
--			    r1bio->bios[0]->bi_io_vec[i].bv_page)
--				safe_put_page(r1bio->bios[j]->bi_io_vec[i].bv_page);
--		}
-+		for (j = pi->raid_disks; j-- ;)
-+			safe_put_page(r1bio->bios[j]->bi_io_vec[i].bv_page);
- 	for (i=0 ; i < pi->raid_disks; i++)
- 		bio_put(r1bio->bios[i]);
+ 			if (buffer_new(bh)) {
+@@ -2077,7 +2082,7 @@ int __block_write_begin_int(struct page *page, loff_t pos, unsigned len,
+ int __block_write_begin(struct page *page, loff_t pos, unsigned len,
+ 		get_block_t *get_block)
+ {
+-	return __block_write_begin_int(page, pos, len, get_block, NULL);
++	return __block_write_begin_int(page, pos, len, get_block, NULL, 0);
+ }
+ EXPORT_SYMBOL(__block_write_begin);
+ 
+diff --git a/fs/internal.h b/fs/internal.h
+index 1934fdb2bb27..5f4cbdedafdb 100644
+--- a/fs/internal.h
++++ b/fs/internal.h
+@@ -42,7 +42,7 @@ static inline int __sync_blockdev(struct block_device *bdev, int wait)
+  */
+ extern void guard_bio_eod(int rw, struct bio *bio);
+ extern int __block_write_begin_int(struct page *page, loff_t pos, unsigned len,
+-		get_block_t *get_block, struct iomap *iomap);
++		get_block_t *get_block, struct iomap *iomap, unsigned flags);
+ 
+ /*
+  * char_dev.c
+diff --git a/fs/iomap.c b/fs/iomap.c
+index 096cbf573932..3c3c09104dcd 100644
+--- a/fs/iomap.c
++++ b/fs/iomap.c
+@@ -119,7 +119,7 @@ iomap_write_begin(struct inode *inode, loff_t pos, unsigned len,
+ 	if (!page)
+ 		return -ENOMEM;
+ 
+-	status = __block_write_begin_int(page, pos, len, NULL, iomap);
++	status = __block_write_begin_int(page, pos, len, NULL, iomap, flags);
+ 	if (unlikely(status)) {
+ 		unlock_page(page);
+ 		put_page(page);
+@@ -441,7 +441,7 @@ iomap_page_mkwrite_actor(struct inode *inode, loff_t pos, loff_t length,
+ 	struct page *page = data;
+ 	int ret;
+ 
+-	ret = __block_write_begin_int(page, pos, length, NULL, iomap);
++	ret = __block_write_begin_int(page, pos, length, NULL, iomap, flags);
+ 	if (ret)
+ 		return ret;
+ 
+diff --git a/include/linux/buffer_head.h b/include/linux/buffer_head.h
+index d67ab83823ad..baff49fdfbe8 100644
+--- a/include/linux/buffer_head.h
++++ b/include/linux/buffer_head.h
+@@ -37,6 +37,7 @@ enum bh_state_bits {
+ 	BH_Meta,	/* Buffer contains metadata */
+ 	BH_Prio,	/* Buffer should be submitted with REQ_PRIO */
+ 	BH_Defer_Completion, /* Defer AIO completion to workqueue */
++	BH_Atomic,	/* part of an O_ATOMIC write */
+ 
+ 	BH_PrivateStart,/* not a state bit, but the first bit available
+ 			 * for private allocation by other entities
+@@ -130,6 +131,7 @@ BUFFER_FNS(Unwritten, unwritten)
+ BUFFER_FNS(Meta, meta)
+ BUFFER_FNS(Prio, prio)
+ BUFFER_FNS(Defer_Completion, defer_completion)
++BUFFER_FNS(Atomic, atomic);
+ 
+ #define bh_offset(bh)		((unsigned long)(bh)->b_data & ~PAGE_MASK)
  
 -- 
-2.7.4
+2.11.0
