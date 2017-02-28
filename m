@@ -1,59 +1,36 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Bart Van Assche
-	<bart.vanassche@sandisk.com>, Omar Sandoval <osandov@fb.com>
-Subject: [PATCH 2/4] blk-mq-debug: Avoid that sparse complains about req_flags_t usage
-Date: Wed, 1 Feb 2017 10:20:57 -0800
-Message-ID: <20170201182059.25601-3-bart.vanassche@sandisk.com>
-In-Reply-To: <20170201182059.25601-1-bart.vanassche@sandisk.com>
-References: <20170201182059.25601-1-bart.vanassche@sandisk.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@sandisk.com
+Return-Path: <b.zolnierkie@samsung.com>
+From: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
+To: Linus Walleij <linus.walleij@linaro.org>
+Cc: linux-mmc@vger.kernel.org, Ulf Hansson <ulf.hansson@linaro.org>,
+ Adrian Hunter <adrian.hunter@intel.com>,
+ Paolo Valente <paolo.valente@linaro.org>,
+ Chunyan Zhang <zhang.chunyan@linaro.org>,
+ Baolin Wang <baolin.wang@linaro.org>, linux-block@vger.kernel.org,
+ Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+ Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [PATCH 02/16] mmc: core: refactor asynchronous request finalization
+Date: Tue, 28 Feb 2017 15:55:50 +0100
+Message-id: <29187792.gZrQT0n5Uu@amdc3058>
+In-reply-to: <20170209153403.9730-3-linus.walleij@linaro.org>
+MIME-version: 1.0
+Content-type: text/plain; charset=us-ascii
+References: <20170209153403.9730-1-linus.walleij@linaro.org>
+ <20170209153403.9730-3-linus.walleij@linaro.org>
+ <CGME20170228145552epcas5p4a43c23971d58b30ad6ab9d2c612abe9a@epcas5p4.samsung.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Avoid that sparse reports the following complaints:
 
-block/elevator.c:541:29: warning: incorrect type in assignment (different base types)
-block/elevator.c:541:29:    expected bool [unsigned] [usertype] next_sorted
-block/elevator.c:541:29:    got restricted req_flags_t
+On Thursday, February 09, 2017 04:33:49 PM Linus Walleij wrote:
+> mmc_wait_for_data_req_done() is called in exactly one place,
+> and having it spread out is making things hard to oversee.
+> Factor this function into mmc_finalize_areq().
+> 
+> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
 
-block/blk-mq-debugfs.c:92:54: warning: cast from restricted req_flags_t
+Reviewed-by: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
 
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Omar Sandoval <osandov@fb.com>
----
- block/blk-mq-debugfs.c | 3 ++-
- block/elevator.c       | 2 +-
- 2 files changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 7bcd4b6edf83..aece9116b4f6 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -89,7 +89,8 @@ static int blk_mq_debugfs_rq_show(struct seq_file *m, void *v)
- 	struct request *rq = list_entry_rq(v);
- 
- 	seq_printf(m, "%p {.cmd_type=%u, .cmd_flags=0x%x, .rq_flags=0x%x, .tag=%d, .internal_tag=%d}\n",
--		   rq, rq->cmd_type, rq->cmd_flags, (unsigned int)rq->rq_flags,
-+		   rq, rq->cmd_type, rq->cmd_flags,
-+		   (__force unsigned int)rq->rq_flags,
- 		   rq->tag, rq->internal_tag);
- 	return 0;
- }
-diff --git a/block/elevator.c b/block/elevator.c
-index ef7f59469acc..9138efeee0c8 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -538,7 +538,7 @@ void elv_merge_requests(struct request_queue *q, struct request *rq,
- 	if (e->uses_mq && e->type->ops.mq.requests_merged)
- 		e->type->ops.mq.requests_merged(q, rq, next);
- 	else if (e->type->ops.sq.elevator_merge_req_fn) {
--		next_sorted = next->rq_flags & RQF_SORTED;
-+		next_sorted = (__force bool)(next->rq_flags & RQF_SORTED);
- 		if (next_sorted)
- 			e->type->ops.sq.elevator_merge_req_fn(q, rq, next);
- 	}
--- 
-2.11.0
+Best regards,
+--
+Bartlomiej Zolnierkiewicz
+Samsung R&D Institute Poland
+Samsung Electronics
