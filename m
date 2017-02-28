@@ -1,59 +1,67 @@
-Return-Path: <jack@suse.cz>
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
-	Lekshmi Pillai <lekshmicpillai@in.ibm.com>,
-	Tejun Heo <tj@kernel.org>,
-	NeilBrown <neilb@suse.de>,
-	Omar Sandoval <osandov@osandov.com>,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH 08/13] bdi: Shutdown writeback on all cgwbs in cgwb_bdi_destroy()
-Date: Tue, 21 Feb 2017 18:09:53 +0100
-Message-Id: <20170221170958.21845-9-jack@suse.cz>
-In-Reply-To: <20170221170958.21845-1-jack@suse.cz>
-References: <20170221170958.21845-1-jack@suse.cz>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail.kernel.org ([198.145.29.136]:48472 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751617AbdB1XsW (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 28 Feb 2017 18:48:22 -0500
+Date: Tue, 28 Feb 2017 15:37:16 -0800
+From: Shaohua Li <shli@kernel.org>
+To: Ming Lei <tom.leiming@gmail.com>
+Cc: Jens Axboe <axboe@fb.com>, linux-raid@vger.kernel.org,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>
+Subject: Re: [PATCH v2 06/13] md: raid1: don't use bio's vec table to manage
+ resync pages
+Message-ID: <20170228233716.v3izfseg3dpdyexc@kernel.org>
+References: <1488296503-4987-1-git-send-email-tom.leiming@gmail.com>
+ <1488296503-4987-7-git-send-email-tom.leiming@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1488296503-4987-7-git-send-email-tom.leiming@gmail.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Currently we waited for all cgwbs to get freed in cgwb_bdi_destroy()
-which also means that writeback has been shutdown on them. Since this
-wait is going away, directly shutdown writeback on cgwbs from
-cgwb_bdi_destroy() to avoid live writeback structures after
-bdi_unregister() has finished.
+On Tue, Feb 28, 2017 at 11:41:36PM +0800, Ming Lei wrote:
+> Now we allocate one page array for managing resync pages, instead
+> of using bio's vec table to do that, and the old way is very hacky
+> and won't work any more if multipage bvec is enabled.
+> 
+> The introduced cost is that we need to allocate (128 + 16) * raid_disks
+> bytes per r1_bio, and it is fine because the inflight r1_bio for
+> resync shouldn't be much, as pointed by Shaohua.
+> 
+> Also the bio_reset() in raid1_sync_request() is removed because
+> all bios are freshly new now and not necessary to reset any more.
+> 
+> This patch can be thought as a cleanup too
+> 
+> Suggested-by: Shaohua Li <shli@kernel.org>
+> Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+> ---
+>  drivers/md/raid1.c | 83 ++++++++++++++++++++++++++++++++++--------------------
+>  1 file changed, 53 insertions(+), 30 deletions(-)
+> 
+> diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
+> index c442b4657e2f..900144f39630 100644
+> --- a/drivers/md/raid1.c
+> +++ b/drivers/md/raid1.c
+> @@ -77,6 +77,16 @@ static void lower_barrier(struct r1conf *conf, sector_t sector_nr);
+>  #define raid1_log(md, fmt, args...)				\
+>  	do { if ((md)->queue) blk_add_trace_msg((md)->queue, "raid1 " fmt, ##args); } while (0)
+>  
+> +static inline struct resync_pages *get_resync_pages(struct bio *bio)
+> +{
+> +	return bio->bi_private;
+> +}
+> +
+> +static inline struct r1bio *get_resync_r1bio(struct bio *bio)
+> +{
+> +	return get_resync_pages(bio)->raid_bio;
+> +}
 
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- mm/backing-dev.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+This is a weird between bio, r1bio and the resync_pages. I'd like the pages are
+embedded in r1bio. Maybe a pointer of r1bio to the pages. It's cleaner and more
+straightforward.
 
-diff --git a/mm/backing-dev.c b/mm/backing-dev.c
-index 54b9e934eef4..c9623b410170 100644
---- a/mm/backing-dev.c
-+++ b/mm/backing-dev.c
-@@ -700,6 +700,7 @@ static void cgwb_bdi_destroy(struct backing_dev_info *bdi)
- 	struct radix_tree_iter iter;
- 	struct rb_node *rbn;
- 	void **slot;
-+	struct wb_writeback *wb;
- 
- 	WARN_ON(test_bit(WB_registered, &bdi->wb.state));
- 
-@@ -716,6 +717,14 @@ static void cgwb_bdi_destroy(struct backing_dev_info *bdi)
- 		congested->__bdi = NULL;	/* mark @congested unlinked */
- 	}
- 
-+	while (!list_empty(&bdi->wb_list)) {
-+		wb = list_first_entry(&bdi->wb_list, struct bdi_writeback,
-+				      bdi_node);
-+		spin_unlock_irq(&cgwb_lock);
-+		wb_shutdown(wb);
-+		spin_lock_irq(&cgwb_lock);
-+	}
-+
- 	spin_unlock_irq(&cgwb_lock);
- 
- 	/*
--- 
-2.10.2
+I think the patch 6, 7 8 should be in a same patch. Otherwise bisect will be broken.
+
+Thanks,
+Shaohua
