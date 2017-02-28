@@ -1,21 +1,56 @@
-Return-Path: <hch@lst.de>
-Date: Tue, 28 Feb 2017 17:02:59 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Damien Le Moal <damien.lemoal@wdc.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+Return-Path: <Damien.LeMoal@wdc.com>
+From: Damien Le Moal <damien.lemoal@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org,
 	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	linux-scsi@vger.kernel.org, MPT-FusionLinux.pdl@broadcom.com,
-	Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@sandisk.com>
-Subject: Re: [PATCH 0/3] Separate zone requests from medium access requests
-Message-ID: <20170228160259.GA22755@lst.de>
-References: <20170228102535.15966-1-damien.lemoal@wdc.com>
+	linux-scsi@vger.kernel.org
+Cc: MPT-FusionLinux.pdl@broadcom.com,
+	Hannes Reinecke <hare@suse.de>,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bart.vanassche@sandisk.com>,
+	Damien Le Moal <damien.lemoal@wdc.com>
+Subject: [PATCH 0/3] Separate zone requests from medium access requests
+Date: Tue, 28 Feb 2017 19:25:32 +0900
+Message-Id: <20170228102535.15966-1-damien.lemoal@wdc.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170228102535.15966-1-damien.lemoal@wdc.com>
+Content-Type: text/plain
+Return-Path: damien.lemoal@wdc.com
 List-ID: <linux-block@vger.kernel.org>
 
-I don't really like this too much - this is too many SCSI specifics
-for the block layer to care.  Maybe using bios for the zone ops was a
-mistake after all, and we should just have operations in struct block_device
-instead..
+This series introduces blk_rq_accesses_medium(), which is equivalent to
+!blk_rq_is_passthrough() minus the zone request operations REQ_OP_ZONE_REPORT
+and REQ_OP_ZONE_RESET. This new helper allows avoiding problems due to the
+non-standard nature of these commands (report zones does no operate on logical
+block size units while reset zone operates on entire zones only).
+
+Using blk_rq_accesses_medium(), patch 2 excludes the zone commands from
+request accounting (these commands are not accessing the device medium).
+Exclusion from request scheduling is also added.
+
+Finally, patch 3 uses the blk_rq_accesses_medium() helper to fix improperly
+unaligned resid values only and only for medium access commands. This
+correctly excludes from the resid correction zone requests as well as
+passthrough requests.
+
+ALl 3 patches are originally from Bart.
+
+Bart Van Assche (3):
+  block: Introduce blk_rq_accesses_medium()
+  block: Separate zone requests from medium access requests
+  mpt3sas: Do not check resid for non medium access commands
+
+ block/blk-core.c                     |  2 +-
+ block/blk.h                          |  2 +-
+ block/elevator.c                     | 12 ++++++++----
+ block/mq-deadline.c                  |  2 +-
+ drivers/scsi/mpt3sas/mpt3sas_scsih.c |  4 ++--
+ include/linux/blk_types.h            | 17 ++++++++++-------
+ include/linux/blkdev.h               | 18 +++++++++++++++---
+ 7 files changed, 38 insertions(+), 19 deletions(-)
+
+-- 
+2.9.3
+
+Western Digital Corporation (and its subsidiaries) E-mail Confidentiality Notice & Disclaimer:
+
+This e-mail and any files transmitted with it may contain confidential or legally privileged information of WDC and/or its affiliates, and are intended solely for the use of the individual or entity to which they are addressed. If you are not the intended recipient, any disclosure, copying, distribution or any action taken or omitted to be taken in reliance on it, is prohibited. If you have received this e-mail in error, please notify the sender immediately and delete the e-mail in its entirety from your system.
