@@ -1,35 +1,35 @@
-Return-Path: <martin.petersen@oracle.com>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Damien Le Moal <damien.lemoal@wdc.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-scsi@vger.kernel.org, MPT-FusionLinux.pdl@broadcom.com,
-        Hannes Reinecke <hare@suse.de>,
-        Bart Van Assche <bart.vanassche@sandisk.com>
+Return-Path: <Bart.VanAssche@sandisk.com>
+From: Bart Van Assche <Bart.VanAssche@sandisk.com>
+To: "hch@lst.de" <hch@lst.de>, Damien Le Moal <Damien.LeMoal@wdc.com>
+CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>, "hare@suse.de"
+	<hare@suse.de>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"MPT-FusionLinux.pdl@broadcom.com" <MPT-FusionLinux.pdl@broadcom.com>,
+	"martin.petersen@oracle.com" <martin.petersen@oracle.com>, "axboe@kernel.dk"
+	<axboe@kernel.dk>
 Subject: Re: [PATCH 0/3] Separate zone requests from medium access requests
-From: "Martin K. Petersen" <martin.petersen@oracle.com>
+Date: Tue, 28 Feb 2017 16:16:46 +0000
+Message-ID: <1488298588.2370.1.camel@sandisk.com>
 References: <20170228102535.15966-1-damien.lemoal@wdc.com>
-	<20170228160259.GA22755@lst.de>
-Date: Tue, 28 Feb 2017 21:52:31 -0500
-In-Reply-To: <20170228160259.GA22755@lst.de> (Christoph Hellwig's message of
-	"Tue, 28 Feb 2017 17:02:59 +0100")
-Message-ID: <yq160jtu2s0.fsf@oracle.com>
+	 <20170228160259.GA22755@lst.de>
+In-Reply-To: <20170228160259.GA22755@lst.de>
+Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
-Content-Type: text/plain
+Return-Path: Bart.VanAssche@sandisk.com
 List-ID: <linux-block@vger.kernel.org>
 
->>>>> "Christoph" == Christoph Hellwig <hch@lst.de> writes:
+On Tue, 2017-02-28 at 17:02 +0100, Christoph Hellwig wrote:
+> I don't really like this too much - this is too many SCSI specifics
+> for the block layer to care.  Maybe using bios for the zone ops was a
+> mistake after all, and we should just have operations in struct block_dev=
+ice
+> instead..
 
-Christoph> I don't really like this too much - this is too many SCSI
-Christoph> specifics for the block layer to care.  Maybe using bios for
-Christoph> the zone ops was a mistake after all, and we should just have
-Christoph> operations in struct block_device instead..
+blk_rq_accesses_medium() has nothing to do with SCSI. It is a reintroductio=
+n
+of what REQ_TYPE_FS stood for before ZBC was introduced but with another na=
+me.
+BTW, I think that all blk_rq_is_passthrough() callers have to be reviewed t=
+o
+see whether or not !blk_rq_accesses_medium() is perhaps what was intended.
 
-Yeah, I'm afraid I don't like this either.
-
-Short term I still think we should adjust in sd. And then maybe longer
-term revisit whether these hybrid commands should be something other
-than bios.
-
--- 
-Martin K. Petersen	Oracle Linux Engineering
+Bart.=
