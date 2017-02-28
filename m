@@ -1,132 +1,40 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f68.google.com ([74.125.83.68]:34459 "EHLO
-        mail-pg0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751709AbdB1PmU (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Feb 2017 10:42:20 -0500
-From: Ming Lei <tom.leiming@gmail.com>
-To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
-        linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Ming Lei <tom.leiming@gmail.com>
-Subject: [PATCH v2 02/13] md: raid1/raid10: don't handle failure of bio_add_page()
-Date: Tue, 28 Feb 2017 23:41:32 +0800
-Message-Id: <1488296503-4987-3-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1488296503-4987-1-git-send-email-tom.leiming@gmail.com>
-References: <1488296503-4987-1-git-send-email-tom.leiming@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <osandov@osandov.com>
+Return-Path: <osandov@osandov.com>
+Date: Tue, 28 Feb 2017 11:15:12 -0800
+From: Omar Sandoval <osandov@osandov.com>
+To: Hannes Reinecke <hare@suse.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Omar Sandoval <osandov@fb.com>,
+	linux-block@vger.kernel.org, Hannes Reinecke <hare@suse.com>
+Subject: Re: [PATCH] sbitmap: boundary checks for resized bitmap
+Message-ID: <20170228191512.GA28004@vader.DHCP.thefacebook.com>
+References: <1487157042-5621-1-git-send-email-hare@suse.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1487157042-5621-1-git-send-email-hare@suse.de>
+List-ID: <linux-block@vger.kernel.org>
 
-All bio_add_page() is for adding one page into resync bio,
-which is big enough to hold RESYNC_PAGES pages, and
-the current bio_add_page() doesn't check queue limit any more,
-so it won't fail at all.
+On Wed, Feb 15, 2017 at 12:10:42PM +0100, Hannes Reinecke wrote:
+> If the sbitmap gets resized we need to ensure not to overflow
+> the original allocation. And we should limit the search in
+> sbitmap_any_bit_set() to the available depth to avoid looking
+> into unused space.
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
----
- drivers/md/raid1.c  | 21 ++++++---------------
- drivers/md/raid10.c | 41 ++++++++++-------------------------------
- 2 files changed, 16 insertions(+), 46 deletions(-)
+Hey, Hannes, I don't really like this change. It's easy enough for the
+caller to keep track of this and check themselves if they really care. I
+even included a comment in sbitmap.h to that effect:
 
-diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
-index 0628c07dd16d..b3021355c7e2 100644
---- a/drivers/md/raid1.c
-+++ b/drivers/md/raid1.c
-@@ -2903,21 +2903,12 @@ static sector_t raid1_sync_request(struct mddev *mddev, sector_t sector_nr,
- 			bio = r1_bio->bios[i];
- 			if (bio->bi_end_io) {
- 				page = bio->bi_io_vec[bio->bi_vcnt].bv_page;
--				if (bio_add_page(bio, page, len, 0) == 0) {
--					/* stop here */
--					bio->bi_io_vec[bio->bi_vcnt].bv_page = page;
--					while (i > 0) {
--						i--;
--						bio = r1_bio->bios[i];
--						if (bio->bi_end_io==NULL)
--							continue;
--						/* remove last page from this bio */
--						bio->bi_vcnt--;
--						bio->bi_iter.bi_size -= len;
--						bio_clear_flag(bio, BIO_SEG_VALID);
--					}
--					goto bio_full;
--				}
-+
-+				/*
-+				 * won't fail because the vec table is big
-+				 * enough to hold all these pages
-+				 */
-+				bio_add_page(bio, page, len, 0);
- 			}
- 		}
- 		nr_sectors += len>>9;
-diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
-index 33f6a535dc1f..ceb3acc793cf 100644
---- a/drivers/md/raid10.c
-+++ b/drivers/md/raid10.c
-@@ -3435,27 +3435,16 @@ static sector_t raid10_sync_request(struct mddev *mddev, sector_t sector_nr,
- 		if (len == 0)
- 			break;
- 		for (bio= biolist ; bio ; bio=bio->bi_next) {
--			struct bio *bio2;
- 			page = bio->bi_io_vec[bio->bi_vcnt].bv_page;
--			if (bio_add_page(bio, page, len, 0))
--				continue;
--
--			/* stop here */
--			bio->bi_io_vec[bio->bi_vcnt].bv_page = page;
--			for (bio2 = biolist;
--			     bio2 && bio2 != bio;
--			     bio2 = bio2->bi_next) {
--				/* remove last page from this bio */
--				bio2->bi_vcnt--;
--				bio2->bi_iter.bi_size -= len;
--				bio_clear_flag(bio2, BIO_SEG_VALID);
--			}
--			goto bio_full;
-+			/*
-+			 * won't fail because the vec table is big enough
-+			 * to hold all these pages
-+			 */
-+			bio_add_page(bio, page, len, 0);
- 		}
- 		nr_sectors += len>>9;
- 		sector_nr += len>>9;
- 	} while (biolist->bi_vcnt < RESYNC_PAGES);
-- bio_full:
- 	r10_bio->sectors = nr_sectors;
- 
- 	while (biolist) {
-@@ -4528,25 +4517,15 @@ static sector_t reshape_request(struct mddev *mddev, sector_t sector_nr,
- 		if (len > PAGE_SIZE)
- 			len = PAGE_SIZE;
- 		for (bio = blist; bio ; bio = bio->bi_next) {
--			struct bio *bio2;
--			if (bio_add_page(bio, page, len, 0))
--				continue;
--
--			/* Didn't fit, must stop */
--			for (bio2 = blist;
--			     bio2 && bio2 != bio;
--			     bio2 = bio2->bi_next) {
--				/* Remove last page from this bio */
--				bio2->bi_vcnt--;
--				bio2->bi_iter.bi_size -= len;
--				bio_clear_flag(bio2, BIO_SEG_VALID);
--			}
--			goto bio_full;
-+			/*
-+			 * won't fail because the vec table is big enough
-+			 * to hold all these pages
-+			 */
-+			bio_add_page(bio, page, len, 0);
- 		}
- 		sector_nr += len >> 9;
- 		nr_sectors += len >> 9;
- 	}
--bio_full:
- 	rcu_read_unlock();
- 	r10_bio->sectors = nr_sectors;
- 
--- 
-2.7.4
+/**
+ * sbitmap_resize() - Resize a &struct sbitmap.
+ * @sb: Bitmap to resize.
+ * @depth: New number of bits to resize to.
+ *
+ * Doesn't reallocate anything. It's up to the caller to ensure that the new
+ * depth doesn't exceed the depth that the sb was initialized with.
+ */
+
+
+As for the sbitmap_any_bit_set() change, the bits beyond the actual
+depth should all be zero, so I don't think that change is worth it,
+either.
+
+Thanks!
