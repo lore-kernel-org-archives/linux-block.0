@@ -1,39 +1,42 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:46734 "EHLO mga11.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750943AbdBOAjW (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Feb 2017 19:39:22 -0500
-From: Scott Bauer <scott.bauer@intel.com>
-To: linux-nvme@lists.infradead.org
-Cc: David.Laight@ACULAB.COM, arnd@arndb.de, axboe@fb.com,
-        keith.busch@intel.com, jonathan.derrick@intel.com,
-        hch@infradead.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, Scott Bauer <scott.bauer@intel.com>
-Subject: [PATCH V6 3/3] Maintainers: Modify SED list from nvme to block
-Date: Tue, 14 Feb 2017 17:29:37 -0700
-Message-Id: <1487118577-1719-3-git-send-email-scott.bauer@intel.com>
-In-Reply-To: <1487118577-1719-1-git-send-email-scott.bauer@intel.com>
-References: <1487118577-1719-1-git-send-email-scott.bauer@intel.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <b.zolnierkie@samsung.com>
+From: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
+To: Linus Walleij <linus.walleij@linaro.org>
+Cc: linux-mmc@vger.kernel.org, Ulf Hansson <ulf.hansson@linaro.org>,
+ Adrian Hunter <adrian.hunter@intel.com>,
+ Paolo Valente <paolo.valente@linaro.org>,
+ Chunyan Zhang <zhang.chunyan@linaro.org>,
+ Baolin Wang <baolin.wang@linaro.org>, linux-block@vger.kernel.org,
+ Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+ Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [PATCH 14/16] mmc: queue: get/put struct mmc_queue_req
+Date: Tue, 28 Feb 2017 19:21:47 +0100
+Message-id: <5050667.2Ad8qcsgns@amdc3058>
+In-reply-to: <20170209153403.9730-15-linus.walleij@linaro.org>
+MIME-version: 1.0
+Content-type: text/plain; charset=us-ascii
+References: <20170209153403.9730-1-linus.walleij@linaro.org>
+ <20170209153403.9730-15-linus.walleij@linaro.org>
+ <CGME20170228182149epcas1p28789bce5433cee1579e8b8d083ba5811@epcas1p2.samsung.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Scott Bauer <scott.bauer@intel.com>
----
- MAINTAINERS | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Thursday, February 09, 2017 04:34:01 PM Linus Walleij wrote:
+> The per-hardware-transaction struct mmc_queue_req is assigned
+> from a pool of 2 requests using a current/previous scheme and
+> then swapped around.
+> 
+> This is confusing, especially if we need more than two to make
+> our work efficient and parallel.
+> 
+> Rewrite the mechanism to have a pool of struct mmc_queue_req
+> and take one when we need one and put it back when we don't
+> need it anymore.
+> 
+> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index e325373..b983b25 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -11094,7 +11094,7 @@ SECURE ENCRYPTING DEVICE (SED) OPAL DRIVER
- M:	Scott Bauer <scott.bauer@intel.com>
- M:	Jonathan Derrick <jonathan.derrick@intel.com>
- M:	Rafael Antognolli <rafael.antognolli@intel.com>
--L:	linux-nvme@lists.infradead.org
-+L:	linux-block@vger.kernel.org
- S:	Supported
- F:	block/sed*
- F:	block/opal_proto.h
--- 
-2.7.4
+Reviewed-by: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
+
+Best regards,
+--
+Bartlomiej Zolnierkiewicz
+Samsung R&D Institute Poland
+Samsung Electronics
