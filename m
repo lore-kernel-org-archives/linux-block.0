@@ -1,55 +1,91 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga04.intel.com ([192.55.52.120]:21956 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751402AbdBXA1t (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Feb 2017 19:27:49 -0500
-From: Keith Busch <keith.busch@intel.com>
-To: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@lst.de>,
-        Sagi Grimberg <sagi@grimberg.me>
-Cc: Marc MERLIN <marc@merlins.org>, Keith Busch <keith.busch@intel.com>
-Subject: [PATCHv2 1/2] blk-mq: Export blk_mq_freeze_queue_wait
-Date: Thu, 23 Feb 2017 19:36:00 -0500
-Message-Id: <1487896561-10454-1-git-send-email-keith.busch@intel.com>
+Received: from mail-pf0-f195.google.com ([209.85.192.195]:34906 "EHLO
+        mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752366AbdB1Pma (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 28 Feb 2017 10:42:30 -0500
+From: Ming Lei <tom.leiming@gmail.com>
+To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
+        linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Ming Lei <tom.leiming@gmail.com>
+Subject: [PATCH v2 07/13] md: raid1: retrieve page from pre-allocated resync page array
+Date: Tue, 28 Feb 2017 23:41:37 +0800
+Message-Id: <1488296503-4987-8-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1488296503-4987-1-git-send-email-tom.leiming@gmail.com>
+References: <1488296503-4987-1-git-send-email-tom.leiming@gmail.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Drivers can start a freeze, so this provides a way to wait for frozen.
+Now one page array is allocated for each resync bio, and we can
+retrieve page from this table directly.
 
-Signed-off-by: Keith Busch <keith.busch@intel.com>
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- block/blk-mq.c         | 3 ++-
- include/linux/blk-mq.h | 1 +
- 2 files changed, 3 insertions(+), 1 deletion(-)
+ drivers/md/raid1.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 9e6b064..d5b9a15 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -75,10 +75,11 @@ void blk_mq_freeze_queue_start(struct request_queue *q)
- }
- EXPORT_SYMBOL_GPL(blk_mq_freeze_queue_start);
+diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
+index 900144f39630..d0cb5c026506 100644
+--- a/drivers/md/raid1.c
++++ b/drivers/md/raid1.c
+@@ -1970,6 +1970,7 @@ static int fix_sync_read_error(struct r1bio *r1_bio)
+ 	struct mddev *mddev = r1_bio->mddev;
+ 	struct r1conf *conf = mddev->private;
+ 	struct bio *bio = r1_bio->bios[r1_bio->read_disk];
++	struct page **pages = get_resync_pages(bio)->pages;
+ 	sector_t sect = r1_bio->sector;
+ 	int sectors = r1_bio->sectors;
+ 	int idx = 0;
+@@ -2003,7 +2004,7 @@ static int fix_sync_read_error(struct r1bio *r1_bio)
+ 				 */
+ 				rdev = conf->mirrors[d].rdev;
+ 				if (sync_page_io(rdev, sect, s<<9,
+-						 bio->bi_io_vec[idx].bv_page,
++						 pages[idx],
+ 						 REQ_OP_READ, 0, false)) {
+ 					success = 1;
+ 					break;
+@@ -2058,7 +2059,7 @@ static int fix_sync_read_error(struct r1bio *r1_bio)
+ 				continue;
+ 			rdev = conf->mirrors[d].rdev;
+ 			if (r1_sync_page_io(rdev, sect, s,
+-					    bio->bi_io_vec[idx].bv_page,
++					    pages[idx],
+ 					    WRITE) == 0) {
+ 				r1_bio->bios[d]->bi_end_io = NULL;
+ 				rdev_dec_pending(rdev, mddev);
+@@ -2073,7 +2074,7 @@ static int fix_sync_read_error(struct r1bio *r1_bio)
+ 				continue;
+ 			rdev = conf->mirrors[d].rdev;
+ 			if (r1_sync_page_io(rdev, sect, s,
+-					    bio->bi_io_vec[idx].bv_page,
++					    pages[idx],
+ 					    READ) != 0)
+ 				atomic_add(s, &rdev->corrected_errors);
+ 		}
+@@ -2149,6 +2150,8 @@ static void process_checks(struct r1bio *r1_bio)
+ 		struct bio *pbio = r1_bio->bios[primary];
+ 		struct bio *sbio = r1_bio->bios[i];
+ 		int error = sbio->bi_error;
++		struct page **ppages = get_resync_pages(pbio)->pages;
++		struct page **spages = get_resync_pages(sbio)->pages;
  
--static void blk_mq_freeze_queue_wait(struct request_queue *q)
-+void blk_mq_freeze_queue_wait(struct request_queue *q)
- {
- 	wait_event(q->mq_freeze_wq, percpu_ref_is_zero(&q->q_usage_counter));
- }
-+EXPORT_SYMBOL_GPL(blk_mq_freeze_queue_wait);
+ 		if (sbio->bi_end_io != end_sync_read)
+ 			continue;
+@@ -2157,11 +2160,8 @@ static void process_checks(struct r1bio *r1_bio)
  
- /*
-  * Guarantee no request is in use, so we can change any data structure of
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 001d30d..8dacf68 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -245,6 +245,7 @@ void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
- void blk_mq_freeze_queue(struct request_queue *q);
- void blk_mq_unfreeze_queue(struct request_queue *q);
- void blk_mq_freeze_queue_start(struct request_queue *q);
-+void blk_mq_freeze_queue_wait(struct request_queue *q);
- int blk_mq_reinit_tagset(struct blk_mq_tag_set *set);
- 
- int blk_mq_map_queues(struct blk_mq_tag_set *set);
+ 		if (!error) {
+ 			for (j = vcnt; j-- ; ) {
+-				struct page *p, *s;
+-				p = pbio->bi_io_vec[j].bv_page;
+-				s = sbio->bi_io_vec[j].bv_page;
+-				if (memcmp(page_address(p),
+-					   page_address(s),
++				if (memcmp(page_address(ppages[j]),
++					   page_address(spages[j]),
+ 					   sbio->bi_io_vec[j].bv_len))
+ 					break;
+ 			}
 -- 
-2.5.5
+2.7.4
