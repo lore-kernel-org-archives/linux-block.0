@@ -1,444 +1,267 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:33098 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932740AbdBPULL (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Feb 2017 15:11:11 -0500
-From: Christoph Hellwig <hch@lst.de>
-To: scott.bauer@intel.com, keith.busch@intel.com,
-        jonathan.derrick@intel.com, axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-Subject: [PATCH 2/2] block/sed-opal: allocate struct opal_dev dynamically
-Date: Thu, 16 Feb 2017 21:10:53 +0100
-Message-Id: <20170216201053.1190-2-hch@lst.de>
-In-Reply-To: <20170216201053.1190-1-hch@lst.de>
-References: <20170216201053.1190-1-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=423213d9ff=jbacik@fb.com>
+From: Josef Bacik <jbacik@fb.com>
+To: <axboe@kernel.dk>, <nbd-general@lists.sourceforge.net>,
+        <linux-block@vger.kernel.org>, <kernel-team@fb.com>
+Subject: [PATCH 3/6] nbd: stop using the bdev everywhere
+Date: Tue, 28 Feb 2017 11:57:08 -0500
+Message-ID: <1488301031-3199-4-git-send-email-jbacik@fb.com>
+In-Reply-To: <1488301031-3199-1-git-send-email-jbacik@fb.com>
+References: <1488301031-3199-1-git-send-email-jbacik@fb.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+List-ID: <linux-block@vger.kernel.org>
 
-Insted of bloating the containing structure with it all the time this
-allocates struct opal_dev dynamically.  Additionally this allows moving
-the definition of struct opal_dev into sed-opal.c.  For this a new
-private data field is added to it that is passed to the send/receive
-callback.  After that a lot of internals can be made private as well.
+In preparation for the upcoming netlink interface we need to not rely on
+already having the bdev for the NBD device we are doing operations on.
+Instead of passing the bdev around, just use it in places where we know
+we already have the bdev.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Josef Bacik <jbacik@fb.com>
 ---
- block/opal_proto.h       |  23 ++++++++++
- block/sed-opal.c         | 101 +++++++++++++++++++++++++++++++++++++----
- drivers/nvme/host/core.c |   9 ++--
- drivers/nvme/host/nvme.h |  14 ++----
- drivers/nvme/host/pci.c  |   8 +++-
- include/linux/sed-opal.h | 116 ++---------------------------------------------
- 6 files changed, 131 insertions(+), 140 deletions(-)
+ drivers/block/nbd.c | 93 ++++++++++++++++++++++-------------------------------
+ 1 file changed, 39 insertions(+), 54 deletions(-)
 
-diff --git a/block/opal_proto.h b/block/opal_proto.h
-index af9abc56c157..f40c9acf8895 100644
---- a/block/opal_proto.h
-+++ b/block/opal_proto.h
-@@ -19,6 +19,29 @@
- #ifndef _OPAL_PROTO_H
- #define _OPAL_PROTO_H
- 
-+/*
-+ * These constant values come from:
-+ * SPC-4 section
-+ * 6.30 SECURITY PROTOCOL IN command / table 265.
-+ */
-+enum {
-+	TCG_SECP_00 = 0,
-+	TCG_SECP_01,
-+};
-+
-+/*
-+ * Token defs derived from:
-+ * TCG_Storage_Architecture_Core_Spec_v2.01_r1.00
-+ * 3.2.2 Data Stream Encoding
-+ */
-+enum opal_response_token {
-+	OPAL_DTA_TOKENID_BYTESTRING = 0xe0,
-+	OPAL_DTA_TOKENID_SINT = 0xe1,
-+	OPAL_DTA_TOKENID_UINT = 0xe2,
-+	OPAL_DTA_TOKENID_TOKEN = 0xe3, /* actual token is returned */
-+	OPAL_DTA_TOKENID_INVALID = 0X0
-+};
-+
- #define DTAERROR_NO_METHOD_STATUS 0x89
- #define GENERIC_HOST_SESSION_NUM 0x41
- 
-diff --git a/block/sed-opal.c b/block/sed-opal.c
-index bcdd5b6d02e8..d1c52ba4d62d 100644
---- a/block/sed-opal.c
-+++ b/block/sed-opal.c
-@@ -31,6 +31,77 @@
- 
- #include "opal_proto.h"
- 
-+#define IO_BUFFER_LENGTH 2048
-+#define MAX_TOKS 64
-+
-+typedef int (*opal_step)(struct opal_dev *dev);
-+
-+enum opal_atom_width {
-+	OPAL_WIDTH_TINY,
-+	OPAL_WIDTH_SHORT,
-+	OPAL_WIDTH_MEDIUM,
-+	OPAL_WIDTH_LONG,
-+	OPAL_WIDTH_TOKEN
-+};
-+
-+/*
-+ * On the parsed response, we don't store again the toks that are already
-+ * stored in the response buffer. Instead, for each token, we just store a
-+ * pointer to the position in the buffer where the token starts, and the size
-+ * of the token in bytes.
-+ */
-+struct opal_resp_tok {
-+	const u8 *pos;
-+	size_t len;
-+	enum opal_response_token type;
-+	enum opal_atom_width width;
-+	union {
-+		u64 u;
-+		s64 s;
-+	} stored;
-+};
-+
-+/*
-+ * From the response header it's not possible to know how many tokens there are
-+ * on the payload. So we hardcode that the maximum will be MAX_TOKS, and later
-+ * if we start dealing with messages that have more than that, we can increase
-+ * this number. This is done to avoid having to make two passes through the
-+ * response, the first one counting how many tokens we have and the second one
-+ * actually storing the positions.
-+ */
-+struct parsed_resp {
-+	int num;
-+	struct opal_resp_tok toks[MAX_TOKS];
-+};
-+
-+struct opal_dev {
-+	bool supported;
-+
-+	void *data;
-+	sec_send_recv *send_recv;
-+
-+	const opal_step *funcs;
-+	void **func_data;
-+	int state;
-+	struct mutex dev_lock;
-+	u16 comid;
-+	u32 hsn;
-+	u32 tsn;
-+	u64 align;
-+	u64 lowest_lba;
-+
-+	size_t pos;
-+	u8 cmd[IO_BUFFER_LENGTH];
-+	u8 resp[IO_BUFFER_LENGTH];
-+
-+	struct parsed_resp parsed;
-+	size_t prev_d_len;
-+	void *prev_data;
-+
-+	struct list_head unlk_lst;
-+};
-+
-+
- static const u8 opaluid[][OPAL_UID_LENGTH] = {
- 	/* users */
- 	[OPAL_SMUID_UID] =
-@@ -243,14 +314,14 @@ static u16 get_comid_v200(const void *data)
- 
- static int opal_send_cmd(struct opal_dev *dev)
- {
--	return dev->send_recv(dev, dev->comid, TCG_SECP_01,
-+	return dev->send_recv(dev->data, dev->comid, TCG_SECP_01,
- 			      dev->cmd, IO_BUFFER_LENGTH,
- 			      true);
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index 6760ee5..059c80a 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -119,11 +119,6 @@ static inline struct device *nbd_to_dev(struct nbd_device *nbd)
+ 	return disk_to_dev(nbd->disk);
  }
  
- static int opal_recv_cmd(struct opal_dev *dev)
- {
--	return dev->send_recv(dev, dev->comid, TCG_SECP_01,
-+	return dev->send_recv(dev->data, dev->comid, TCG_SECP_01,
- 			      dev->resp, IO_BUFFER_LENGTH,
- 			      false);
- }
-@@ -1943,16 +2014,24 @@ static int check_opal_support(struct opal_dev *dev)
- 	return ret;
- }
- 
--void init_opal_dev(struct opal_dev *opal_dev, sec_send_recv *send_recv)
-+struct opal_dev *init_opal_dev(void *data, sec_send_recv *send_recv)
- {
--	if (opal_dev->initialized)
--		return;
--	INIT_LIST_HEAD(&opal_dev->unlk_lst);
--	mutex_init(&opal_dev->dev_lock);
--	opal_dev->send_recv = send_recv;
--	if (check_opal_support(opal_dev) < 0)
-+	struct opal_dev *dev;
-+
-+	dev = kmalloc(sizeof(*dev), GFP_KERNEL);
-+	if (!dev)
-+		return NULL;
-+
-+	INIT_LIST_HEAD(&dev->unlk_lst);
-+	mutex_init(&dev->dev_lock);
-+	dev->data = data;
-+	dev->send_recv = send_recv;
-+	if (check_opal_support(dev) != 0) {
- 		pr_debug("Opal is not supported on this device\n");
--	opal_dev->initialized = true;
-+		kfree(dev);
-+		return NULL;
-+	}
-+	return dev;
- }
- EXPORT_SYMBOL(init_opal_dev);
- 
-@@ -2351,6 +2430,8 @@ int sed_ioctl(struct opal_dev *dev, unsigned int cmd, void __user *arg)
- 
- 	if (!capable(CAP_SYS_ADMIN))
- 		return -EACCES;
-+	if (!dev)
-+		return -ENOTSUPP;
- 	if (!dev->supported) {
- 		pr_err("Not supported\n");
- 		return -ENOTSUPP;
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 04c48e75ff16..8aeb4a623b65 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -811,7 +811,7 @@ static int nvme_ioctl(struct block_device *bdev, fmode_t mode,
- 			return nvme_nvm_ioctl(ns, cmd, arg);
- #endif
- 		if (is_sed_ioctl(cmd))
--			return sed_ioctl(&ns->ctrl->opal_dev, cmd,
-+			return sed_ioctl(ns->ctrl->opal_dev, cmd,
- 					 (void __user *) arg);
- 		return -ENOTTY;
- 	}
-@@ -1085,18 +1085,17 @@ static const struct pr_ops nvme_pr_ops = {
- };
- 
- #ifdef CONFIG_BLK_SED_OPAL
--int nvme_sec_submit(struct opal_dev *dev, u16 spsp, u8 secp,
--		    void *buffer, size_t len, bool send)
-+int nvme_sec_submit(void *data, u16 spsp, u8 secp, void *buffer, size_t len,
-+		bool send)
- {
-+	struct nvme_ctrl *ctrl = data;
- 	struct nvme_command cmd;
--	struct nvme_ctrl *ctrl = NULL;
- 
- 	memset(&cmd, 0, sizeof(cmd));
- 	if (send)
- 		cmd.common.opcode = nvme_admin_security_send;
- 	else
- 		cmd.common.opcode = nvme_admin_security_recv;
--	ctrl = container_of(dev, struct nvme_ctrl, opal_dev);
- 	cmd.common.nsid = 0;
- 	cmd.common.cdw10[0] = cpu_to_le32(((u32)secp) << 24 | ((u32)spsp) << 8);
- 	cmd.common.cdw10[1] = cpu_to_le32(len);
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index 569cba14cede..5126c4bbee1a 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -126,7 +126,7 @@ struct nvme_ctrl {
- 	struct list_head node;
- 	struct ida ns_ida;
- 
--	struct opal_dev opal_dev;
-+	struct opal_dev *opal_dev;
- 
- 	char name[12];
- 	char serial[20];
-@@ -270,16 +270,8 @@ int nvme_init_identify(struct nvme_ctrl *ctrl);
- void nvme_queue_scan(struct nvme_ctrl *ctrl);
- void nvme_remove_namespaces(struct nvme_ctrl *ctrl);
- 
--#ifdef CONFIG_BLK_SED_OPAL
--int nvme_sec_submit(struct opal_dev *dev, u16 spsp, u8 secp,
--		    void *buffer, size_t len, bool send);
--#else
--static inline int nvme_sec_submit(struct opal_dev *dev, u16 spsp, u8 secp,
--				  void *buffer, size_t len, bool send)
+-static bool nbd_is_connected(struct nbd_device *nbd)
 -{
+-	return !!nbd->task_recv;
+-}
+-
+ static const char *nbdcmd_to_ascii(int cmd)
+ {
+ 	switch (cmd) {
+@@ -155,31 +150,26 @@ static int nbd_get_unless_zero(struct nbd_device *nbd)
+ 	return atomic_add_unless(&nbd->refs, 1, 0);
+ }
+ 
+-static int nbd_size_clear(struct nbd_device *nbd, struct block_device *bdev)
++static void nbd_size_clear(struct nbd_device *nbd)
+ {
+-	bd_set_size(bdev, 0);
+ 	set_capacity(nbd->disk, 0);
+ 	kobject_uevent(&nbd_to_dev(nbd)->kobj, KOBJ_CHANGE);
+-
 -	return 0;
--}
--#endif /* CONFIG_BLK_DEV_SED_OPAL */
-+int nvme_sec_submit(void *data, u16 spsp, u8 secp, void *buffer, size_t len,
-+		bool send);
- 
- #define NVME_NR_AERS	1
- void nvme_complete_async_event(struct nvme_ctrl *ctrl, __le16 status,
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index e25d632bd9f2..5db8a38a8b43 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -1739,6 +1739,7 @@ static void nvme_pci_free_ctrl(struct nvme_ctrl *ctrl)
- 	if (dev->ctrl.admin_q)
- 		blk_put_queue(dev->ctrl.admin_q);
- 	kfree(dev->queues);
-+	kfree(dev->ctrl.opal_dev);
- 	kfree(dev);
  }
  
-@@ -1788,10 +1789,13 @@ static void nvme_reset_work(struct work_struct *work)
- 	if (result)
- 		goto out;
- 
--	init_opal_dev(&dev->ctrl.opal_dev, &nvme_sec_submit);
-+	if (!dev->ctrl.opal_dev) {
-+		dev->ctrl.opal_dev =
-+			init_opal_dev(&dev->ctrl, &nvme_sec_submit);
-+	}
- 
- 	if (was_suspend)
--		opal_unlock_from_suspend(&dev->ctrl.opal_dev);
-+		opal_unlock_from_suspend(dev->ctrl.opal_dev);
- 
- 	result = nvme_setup_io_queues(dev);
- 	if (result)
-diff --git a/include/linux/sed-opal.h b/include/linux/sed-opal.h
-index 205d520ea688..deee23d012e7 100644
---- a/include/linux/sed-opal.h
-+++ b/include/linux/sed-opal.h
-@@ -21,117 +21,14 @@
- #include <uapi/linux/sed-opal.h>
- #include <linux/kernel.h>
- 
--/*
-- * These constant values come from:
-- * SPC-4 section
-- * 6.30 SECURITY PROTOCOL IN command / table 265.
-- */
--enum {
--	TCG_SECP_00 = 0,
--	TCG_SECP_01,
--};
- struct opal_dev;
- 
--#define IO_BUFFER_LENGTH 2048
--#define MAX_TOKS 64
--
--typedef int (*opal_step)(struct opal_dev *dev);
--typedef int (sec_send_recv)(struct opal_dev *ctx, u16 spsp, u8 secp,
--			    void *buffer, size_t len, bool send);
--
--
--enum opal_atom_width {
--	OPAL_WIDTH_TINY,
--	OPAL_WIDTH_SHORT,
--	OPAL_WIDTH_MEDIUM,
--	OPAL_WIDTH_LONG,
--	OPAL_WIDTH_TOKEN
--};
--
--/*
-- * Token defs derived from:
-- * TCG_Storage_Architecture_Core_Spec_v2.01_r1.00
-- * 3.2.2 Data Stream Encoding
-- */
--enum opal_response_token {
--	OPAL_DTA_TOKENID_BYTESTRING = 0xe0,
--	OPAL_DTA_TOKENID_SINT = 0xe1,
--	OPAL_DTA_TOKENID_UINT = 0xe2,
--	OPAL_DTA_TOKENID_TOKEN = 0xe3, /* actual token is returned */
--	OPAL_DTA_TOKENID_INVALID = 0X0
--};
--
--/*
-- * On the parsed response, we don't store again the toks that are already
-- * stored in the response buffer. Instead, for each token, we just store a
-- * pointer to the position in the buffer where the token starts, and the size
-- * of the token in bytes.
-- */
--struct opal_resp_tok {
--	const u8 *pos;
--	size_t len;
--	enum opal_response_token type;
--	enum opal_atom_width width;
--	union {
--		u64 u;
--		s64 s;
--	} stored;
--};
--
--/*
-- * From the response header it's not possible to know how many tokens there are
-- * on the payload. So we hardcode that the maximum will be MAX_TOKS, and later
-- * if we start dealing with messages that have more than that, we can increase
-- * this number. This is done to avoid having to make two passes through the
-- * response, the first one counting how many tokens we have and the second one
-- * actually storing the positions.
-- */
--struct parsed_resp {
--	int num;
--	struct opal_resp_tok toks[MAX_TOKS];
--};
--
--/**
-- * struct opal_dev - The structure representing a OPAL enabled SED.
-- * @supported: Whether or not OPAL is supported on this controller.
-- * @send_recv: The combined sec_send/sec_recv function pointer.
-- * @opal_step: A series of opal methods that are necessary to complete a command.
-- * @func_data: An array of parameters for the opal methods above.
-- * @state: Describes the current opal_step we're working on.
-- * @dev_lock: Locks the entire opal_dev structure.
-- * @parsed: Parsed response from controller.
-- * @prev_data: Data returned from a method to the controller.
-- * @unlk_lst: A list of Locking ranges to unlock on this device during a resume.
-- */
--struct opal_dev {
--	bool initialized;
--	bool supported;
--	sec_send_recv *send_recv;
--
--	const opal_step *funcs;
--	void **func_data;
--	int state;
--	struct mutex dev_lock;
--	u16 comid;
--	u32 hsn;
--	u32 tsn;
--	u64 align;
--	u64 lowest_lba;
--
--	size_t pos;
--	u8 cmd[IO_BUFFER_LENGTH];
--	u8 resp[IO_BUFFER_LENGTH];
--
--	struct parsed_resp parsed;
--	size_t prev_d_len;
--	void *prev_data;
--
--	struct list_head unlk_lst;
--};
-+typedef int (sec_send_recv)(void *data, u16 spsp, u8 secp, void *buffer,
-+		size_t len, bool send);
- 
- #ifdef CONFIG_BLK_SED_OPAL
- bool opal_unlock_from_suspend(struct opal_dev *dev);
--void init_opal_dev(struct opal_dev *opal_dev, sec_send_recv *send_recv);
-+struct opal_dev *init_opal_dev(void *data, sec_send_recv *send_recv);
- int sed_ioctl(struct opal_dev *dev, unsigned int cmd, void __user *ioctl_ptr);
- 
- static inline bool is_sed_ioctl(unsigned int cmd)
-@@ -168,11 +65,6 @@ static inline bool opal_unlock_from_suspend(struct opal_dev *dev)
+-static void nbd_size_update(struct nbd_device *nbd, struct block_device *bdev)
++static void nbd_size_update(struct nbd_device *nbd)
  {
- 	return false;
+ 	blk_queue_logical_block_size(nbd->disk->queue, nbd->blksize);
+ 	blk_queue_physical_block_size(nbd->disk->queue, nbd->blksize);
+-	bd_set_size(bdev, nbd->bytesize);
+ 	set_capacity(nbd->disk, nbd->bytesize >> 9);
+ 	kobject_uevent(&nbd_to_dev(nbd)->kobj, KOBJ_CHANGE);
  }
--static inline void init_opal_dev(struct opal_dev *opal_dev,
--				 sec_send_recv *send_recv)
--{
--	opal_dev->supported = false;
--	opal_dev->initialized = true;
--}
-+#define init_opal_dev(data, send_recv)		NULL
- #endif /* CONFIG_BLK_SED_OPAL */
- #endif /* LINUX_OPAL_H */
+ 
+-static void nbd_size_set(struct nbd_device *nbd, struct block_device *bdev,
+-			loff_t blocksize, loff_t nr_blocks)
++static void nbd_size_set(struct nbd_device *nbd, loff_t blocksize,
++			 loff_t nr_blocks)
+ {
+ 	nbd->blksize = blocksize;
+ 	nbd->bytesize = blocksize * nr_blocks;
+-	if (nbd_is_connected(nbd))
+-		nbd_size_update(nbd, bdev);
++	nbd_size_update(nbd);
+ }
+ 
+ static void nbd_end_request(struct nbd_cmd *cmd)
+@@ -670,8 +660,7 @@ static int nbd_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 	return BLK_MQ_RQ_QUEUE_OK;
+ }
+ 
+-static int nbd_add_socket(struct nbd_device *nbd, struct block_device *bdev,
+-			  unsigned long arg)
++static int nbd_add_socket(struct nbd_device *nbd, unsigned long arg)
+ {
+ 	struct socket *sock;
+ 	struct nbd_sock **socks;
+@@ -712,8 +701,6 @@ static int nbd_add_socket(struct nbd_device *nbd, struct block_device *bdev,
+ 	nsock->sock = sock;
+ 	socks[nbd->num_connections++] = nsock;
+ 
+-	if (max_part)
+-		bdev->bd_invalidated = 1;
+ 	err = 0;
+ out:
+ 	return err;
+@@ -734,18 +721,19 @@ static void nbd_reset(struct nbd_device *nbd)
+ 
+ static void nbd_bdev_reset(struct block_device *bdev)
+ {
+-	set_device_ro(bdev, false);
+-	bdev->bd_inode->i_size = 0;
++	bd_set_size(bdev, 0);
+ 	if (max_part > 0) {
+ 		blkdev_reread_part(bdev);
+ 		bdev->bd_invalidated = 1;
+ 	}
+ }
+ 
+-static void nbd_parse_flags(struct nbd_device *nbd, struct block_device *bdev)
++static void nbd_parse_flags(struct nbd_device *nbd)
+ {
+ 	if (nbd->flags & NBD_FLAG_READ_ONLY)
+-		set_device_ro(bdev, true);
++		set_disk_ro(nbd->disk, true);
++	else
++		set_disk_ro(nbd->disk, false);
+ 	if (nbd->flags & NBD_FLAG_SEND_TRIM)
+ 		queue_flag_set_unlocked(QUEUE_FLAG_DISCARD, nbd->disk->queue);
+ 	if (nbd->flags & NBD_FLAG_SEND_FLUSH)
+@@ -770,16 +758,11 @@ static void send_disconnects(struct nbd_device *nbd)
+ 	}
+ }
+ 
+-static int nbd_disconnect(struct nbd_device *nbd, struct block_device *bdev)
++static int nbd_disconnect(struct nbd_device *nbd)
+ {
+ 	dev_info(disk_to_dev(nbd->disk), "NBD_DISCONNECT\n");
+ 	if (!nbd_get_unless_zero(nbd))
+ 		return -EINVAL;
+-
+-	mutex_unlock(&nbd->config_lock);
+-	fsync_bdev(bdev);
+-	mutex_lock(&nbd->config_lock);
+-
+ 	if (!test_and_set_bit(NBD_DISCONNECT_REQUESTED,
+ 			      &nbd->runtime_flags))
+ 		send_disconnects(nbd);
+@@ -787,33 +770,22 @@ static int nbd_disconnect(struct nbd_device *nbd, struct block_device *bdev)
+ 	return 0;
+ }
+ 
+-static int nbd_clear_sock(struct nbd_device *nbd, struct block_device *bdev)
++static void nbd_clear_sock(struct nbd_device *nbd)
+ {
+ 	sock_shutdown(nbd);
+ 	nbd_clear_que(nbd);
+-	kill_bdev(bdev);
+-	nbd_bdev_reset(bdev);
+ 	nbd->task_setup = NULL;
+-	if (test_and_clear_bit(NBD_HAS_SOCKS_REF, &nbd->runtime_flags))
+-		nbd_put(nbd);
+-	return 0;
+ }
+ 
+ static void nbd_put(struct nbd_device *nbd)
+ {
+ 	if (atomic_dec_and_test(&nbd->refs)) {
+-		struct block_device *bdev;
+-
+-		bdev = bdget_disk(nbd->disk, 0);
+-		if (!bdev)
+-			return;
+-
+ 		mutex_lock(&nbd->config_lock);
+ 		nbd_dev_dbg_close(nbd);
+-		nbd_size_clear(nbd, bdev);
++		nbd_size_clear(nbd);
+ 		device_remove_file(disk_to_dev(nbd->disk), &pid_attr);
+ 		nbd->task_recv = NULL;
+-		nbd_clear_sock(nbd, bdev);
++		nbd_clear_sock(nbd);
+ 		if (nbd->num_connections) {
+ 			int i;
+ 			for (i = 0; i < nbd->num_connections; i++)
+@@ -825,7 +797,6 @@ static void nbd_put(struct nbd_device *nbd)
+ 		kfree(nbd->args);
+ 		nbd_reset(nbd);
+ 		mutex_unlock(&nbd->config_lock);
+-		bdput(bdev);
+ 		module_put(THIS_MODULE);
+ 	}
+ }
+@@ -846,7 +817,6 @@ static int nbd_start_device(struct nbd_device *nbd, struct block_device *bdev)
+ 		error = -EINVAL;
+ 		goto out;
+ 	}
+-
+ 	if (num_connections > 1 &&
+ 	    !(nbd->flags & NBD_FLAG_CAN_MULTI_CONN)) {
+ 		dev_err(disk_to_dev(nbd->disk), "server does not support multiple connections per device.\n");
+@@ -854,6 +824,9 @@ static int nbd_start_device(struct nbd_device *nbd, struct block_device *bdev)
+ 		goto out;
+ 	}
+ 
++	if (max_part)
++		bdev->bd_invalidated = 1;
++
+ 	blk_mq_update_nr_hw_queues(&nbd->tag_set, nbd->num_connections);
+ 	args = kcalloc(num_connections, sizeof(*args), GFP_KERNEL);
+ 	if (!args) {
+@@ -864,15 +837,16 @@ static int nbd_start_device(struct nbd_device *nbd, struct block_device *bdev)
+ 	nbd->task_recv = current;
+ 	mutex_unlock(&nbd->config_lock);
+ 
+-	nbd_parse_flags(nbd, bdev);
++	nbd_parse_flags(nbd);
+ 
+ 	error = device_create_file(disk_to_dev(nbd->disk), &pid_attr);
+ 	if (error) {
+ 		dev_err(disk_to_dev(nbd->disk), "device_create_file failed!\n");
+ 		goto out;
+ 	}
+-
+-	nbd_size_update(nbd, bdev);
++	if (max_part)
++		bdev->bd_invalidated = 1;
++	bd_set_size(bdev, nbd->bytesize);
+ 
+ 	nbd_dev_dbg_init(nbd);
+ 	for (i = 0; i < num_connections; i++) {
+@@ -901,27 +875,38 @@ static int nbd_start_device(struct nbd_device *nbd, struct block_device *bdev)
+ 	return error;
+ }
+ 
++static void nbd_clear_sock_ioctl(struct nbd_device *nbd,
++				 struct block_device *bdev)
++{
++	nbd_clear_sock(nbd);
++	kill_bdev(bdev);
++	nbd_bdev_reset(bdev);
++	if (test_and_clear_bit(NBD_HAS_SOCKS_REF, &nbd->runtime_flags))
++		nbd_put(nbd);
++}
++
+ /* Must be called with config_lock held */
+ static int __nbd_ioctl(struct block_device *bdev, struct nbd_device *nbd,
+ 		       unsigned int cmd, unsigned long arg)
+ {
+ 	switch (cmd) {
+ 	case NBD_DISCONNECT:
+-		return nbd_disconnect(nbd, bdev);
++		return nbd_disconnect(nbd);
+ 	case NBD_CLEAR_SOCK:
+-		return nbd_clear_sock(nbd, bdev);
++		nbd_clear_sock_ioctl(nbd, bdev);
++		return 0;
+ 	case NBD_SET_SOCK:
+-		return nbd_add_socket(nbd, bdev, arg);
++		return nbd_add_socket(nbd, arg);
+ 	case NBD_SET_BLKSIZE:
+-		nbd_size_set(nbd, bdev, arg,
++		nbd_size_set(nbd, arg,
+ 			     div_s64(nbd->bytesize, arg));
+ 		return 0;
+ 	case NBD_SET_SIZE:
+-		nbd_size_set(nbd, bdev, nbd->blksize,
++		nbd_size_set(nbd, nbd->blksize,
+ 			     div_s64(arg, nbd->blksize));
+ 		return 0;
+ 	case NBD_SET_SIZE_BLOCKS:
+-		nbd_size_set(nbd, bdev, nbd->blksize, arg);
++		nbd_size_set(nbd, nbd->blksize, arg);
+ 		return 0;
+ 	case NBD_SET_TIMEOUT:
+ 		nbd->tag_set.timeout = arg * HZ;
 -- 
-2.11.0
+2.7.4
