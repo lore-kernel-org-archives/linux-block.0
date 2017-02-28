@@ -1,66 +1,75 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-Subject: Re: [RFC] failure atomic writes for file systems and block devices
-To: Christoph Hellwig <hch@lst.de>, <linux-fsdevel@vger.kernel.org>,
-        <linux-xfs@vger.kernel.org>, <linux-block@vger.kernel.org>
-References: <20170228145737.19016-1-hch@lst.de>
-From: Chris Mason <clm@fb.com>
-Message-ID: <e4bc2911-99ee-0049-a11d-3944c1770cff@fb.com>
-Date: Tue, 28 Feb 2017 15:48:16 -0500
-MIME-Version: 1.0
-In-Reply-To: <20170228145737.19016-1-hch@lst.de>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([65.50.211.133]:59596 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751639AbdB1O6E (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 28 Feb 2017 09:58:04 -0500
+From: Christoph Hellwig <hch@lst.de>
+To: linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: [RFC] failure atomic writes for file systems and block devices
+Date: Tue, 28 Feb 2017 06:57:25 -0800
+Message-Id: <20170228145737.19016-1-hch@lst.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
+Hi all,
 
+this series implements a new O_ATOMIC flag for failure atomic writes
+to files.   It is based on and tries to unify to earlier proposals,
+the first one for block devices by Chris Mason:
 
-On 02/28/2017 09:57 AM, Christoph Hellwig wrote:
-> Hi all,
->
-> this series implements a new O_ATOMIC flag for failure atomic writes
-> to files.   It is based on and tries to unify to earlier proposals,
-> the first one for block devices by Chris Mason:
->
-> 	https://urldefense.proofpoint.com/v2/url?u=https-3A__lwn.net_Articles_573092_&d=DwIBAg&c=5VD0RTtNlTh3ycd41b3MUw&r=9QPtTAxcitoznaWRKKHoEQ&m=P5byIhbDCF-kdlNpZVpxMKG3E36-cQ-lK27coqUFUng&s=rqXtuRMvf2rijHel_VAiO-KQ8AtQ5DXEI2obnCI_ljQ&e=
->
-> and the second one for regular files, published by HP Research at
-> Usenix FAST 2015:
->
-> 	https://urldefense.proofpoint.com/v2/url?u=https-3A__www.usenix.org_conference_fast15_technical-2Dsessions_presentation_verma&d=DwIBAg&c=5VD0RTtNlTh3ycd41b3MUw&r=9QPtTAxcitoznaWRKKHoEQ&m=P5byIhbDCF-kdlNpZVpxMKG3E36-cQ-lK27coqUFUng&s=ilnrrNs8nG4_UV2xx7tc2Efm20d2Wa8PHoJE8WUTCwI&e=
->
-> It adds a new O_ATOMIC flag for open, which requests writes to be
-> failure-atomic, that is either the whole write makes it to persistent
-> storage, or none of it, even in case of power of other failures.
->
-> There are two implementation various of this:  on block devices O_ATOMIC
-> must be combined with O_(D)SYNC so that storage devices that can handle
-> large writes atomically can simply do that without any additional work.
-> This case is supported by NVMe.
->
+	https://lwn.net/Articles/573092/
 
-Hi Christoph,
+and the second one for regular files, published by HP Research at
+Usenix FAST 2015:
 
-This is great, and supporting code in both dio and bio get rid of some 
-of the warts from when I tried.  The DIO_PAGES define used to be an 
-upper limit on the max contiguous bio that would get built, but that's 
-much better now.
+	https://www.usenix.org/conference/fast15/technical-sessions/presentation/verma
 
-One thing that isn't clear to me is how we're dealing with boundary bio 
-mappings, which will get submitted by submit_page_section()
+It adds a new O_ATOMIC flag for open, which requests writes to be
+failure-atomic, that is either the whole write makes it to persistent
+storage, or none of it, even in case of power of other failures.
 
-sdio->boundary = buffer_boundary(map_bh);
+There are two implementation various of this:  on block devices O_ATOMIC
+must be combined with O_(D)SYNC so that storage devices that can handle
+large writes atomically can simply do that without any additional work.
+This case is supported by NVMe.
 
-In btrfs I'd just chain things together and do the extent pointer swap 
-afterwards, but I didn't follow the XFS code well enough to see how its 
-handled there.  But either way it feels like an error prone surprise 
-waiting for later, and one gap we really want to get right in the FS 
-support is O_ATOMIC across a fragmented extent.
+The second case is for file systems, where we simply write new blocks
+out of places and then remap them into the file atomically on either
+completion of an O_(D)SYNC write or when fsync is called explicitly.
 
-If I'm reading the XFS patches right, the code always cows for atomic. 
-Are you planning on adding an optimization to use atomic support in the 
-device to skip COW when possible?
+The semantics of the latter case are explained in detail at the Usenix
+paper above.
 
-To turn off mysql double buffering, we only need 16K or 64K writes, 
-which most of the time you'd be able to pass down directly without cows.
+Last but not least a new fcntl is implemented to provide information
+about I/O restrictions such as alignment requirements and the maximum
+atomic write size.
 
--chris
+The implementation is simple and clean, but I'm rather unhappy about
+the interface as it has too many failure modes to bullet proof.  For
+one old kernels ignore unknown open flags silently, so applications
+have to check the F_IOINFO fcntl before, which is a bit of a killer.
+Because of that I've also not implemented any other validity checks
+yet, as they might make thing even worse when an open on a not supported
+file system or device fails, but not on an old kernel.  Maybe we need
+a new open version that checks arguments properly first?
+
+Also I'm really worried about the NVMe failure modes - devices simply
+advertise an atomic write size, with no way for the device to know
+that the host requested a given write to be atomic, and thus no
+error reporting.  This is made worse by NVMe 1.2 adding per-namespace
+atomic I/O parameters that devices can use to introduce additional
+odd alignment quirks - while there is some language in the spec
+requiring them not to weaken the per-controller guarantees it all
+looks rather weak and I'm not too confident in all implementations
+getting everything right.
+
+Last but not least this depends on a few XFS patches, so to actually
+apply / run the patches please use this git tree:
+
+    git://git.infradead.org/users/hch/vfs.git O_ATOMIC
+
+Gitweb:
+
+    http://git.infradead.org/users/hch/vfs.git/shortlog/refs/heads/O_ATOMIC
