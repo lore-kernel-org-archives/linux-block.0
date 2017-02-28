@@ -1,56 +1,76 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Jan Kara <jack@suse.cz>
-To: <linux-fsdevel@vger.kernel.org>
-Cc: Christoph Hellwig <hch@infradead.org>, linux-block@vger.kernel.org,
-        Jan Kara <jack@suse.cz>,
-        Steven Whitehouse <swhiteho@redhat.com>,
-        Bob Peterson <rpeterso@redhat.com>, cluster-devel@redhat.com
-Subject: [PATCH 18/24] gfs2: Convert to properly refcounting bdi
-Date: Thu,  2 Feb 2017 18:34:16 +0100
-Message-Id: <20170202173422.3240-19-jack@suse.cz>
-In-Reply-To: <20170202173422.3240-1-jack@suse.cz>
-References: <20170202173422.3240-1-jack@suse.cz>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([65.50.211.133]:44672 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752107AbdB1O6E (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 28 Feb 2017 09:58:04 -0500
+From: Christoph Hellwig <hch@lst.de>
+To: linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: [PATCH 08/12] xfs: implement the F_IOINFO fcntl
+Date: Tue, 28 Feb 2017 06:57:33 -0800
+Message-Id: <20170228145737.19016-9-hch@lst.de>
+In-Reply-To: <20170228145737.19016-1-hch@lst.de>
+References: <20170228145737.19016-1-hch@lst.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Similarly to set_bdev_super() GFS2 just used block device reference to
-bdi. Convert it to properly getting bdi reference. The reference will
-get automatically dropped on superblock destruction.
-
-CC: Steven Whitehouse <swhiteho@redhat.com>
-CC: Bob Peterson <rpeterso@redhat.com>
-CC: cluster-devel@redhat.com
-Signed-off-by: Jan Kara <jack@suse.cz>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- fs/gfs2/ops_fstype.c | 9 +++------
- 1 file changed, 3 insertions(+), 6 deletions(-)
+ fs/xfs/xfs_file.c | 34 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 34 insertions(+)
 
-diff --git a/fs/gfs2/ops_fstype.c b/fs/gfs2/ops_fstype.c
-index c0e5b9a8bf5f..fe8248f8b54b 100644
---- a/fs/gfs2/ops_fstype.c
-+++ b/fs/gfs2/ops_fstype.c
-@@ -23,6 +23,7 @@
- #include <linux/quotaops.h>
- #include <linux/lockdep.h>
- #include <linux/module.h>
-+#include <linux/backing-dev.h>
- 
- #include "gfs2.h"
- #include "incore.h"
-@@ -1221,12 +1222,8 @@ static int set_gfs2_super(struct super_block *s, void *data)
- {
- 	s->s_bdev = data;
- 	s->s_dev = s->s_bdev->bd_dev;
--
--	/*
--	 * We set the bdi here to the queue backing, file systems can
--	 * overwrite this in ->fill_super()
--	 */
--	s->s_bdi = bdev_get_queue(s->s_bdev)->backing_dev_info;
-+	s->s_bdi = bdi_get(s->s_bdev->bd_bdi);
-+	s->s_iflags |= SB_I_DYNBDI;
- 	return 0;
+diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
+index a7d8324b59c5..4d955b3266df 100644
+--- a/fs/xfs/xfs_file.c
++++ b/fs/xfs/xfs_file.c
+@@ -898,6 +898,39 @@ xfs_file_dedupe_range(
+ 	return len;
  }
  
++static uint16_t
++xfs_dio_alignment(struct file *file)
++{
++	struct xfs_inode	*ip = XFS_I(file_inode(file));
++	struct xfs_mount	*mp = ip->i_mount;
++
++	if (file->f_flags & O_ATOMIC)
++		return mp->m_sb.sb_blocksize;
++	else if (XFS_IS_REALTIME_INODE(ip))
++		return mp->m_rtdev_targp->bt_logical_sectorsize;
++	else
++		return mp->m_ddev_targp->bt_logical_sectorsize;
++}
++
++static int
++xfs_file_ioinfo(
++	struct file		*file,
++	struct fcntl_ioinfo	*fio)
++{
++	if (file->f_flags & O_DIRECT)
++		fio->fio_alignment = xfs_dio_alignment(file);
++
++	if (file->f_flags & O_ATOMIC) {
++		fio->fio_flags = FIO_FL_ATOMIC_OSYNC | FIO_FL_ATOMIC_FSYNC;
++		fio->fio_max_atomic = INT_MAX;
++		if (fio->fio_alignment)
++			fio->fio_max_atomic &= ~(fio->fio_alignment - 1);
++	}
++
++
++	return 0;
++};
++
+ STATIC int
+ xfs_file_open(
+ 	struct inode	*inode,
+@@ -1556,6 +1589,7 @@ const struct file_operations xfs_file_operations = {
+ 	.fallocate	= xfs_file_fallocate,
+ 	.clone_file_range = xfs_file_clone_range,
+ 	.dedupe_file_range = xfs_file_dedupe_range,
++	.ioinfo		= xfs_file_ioinfo,
+ };
+ 
+ const struct file_operations xfs_dir_file_operations = {
 -- 
-2.10.2
+2.11.0
