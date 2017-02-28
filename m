@@ -1,99 +1,101 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f66.google.com ([74.125.83.66]:36625 "EHLO
-        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932129AbdBVKO3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Feb 2017 05:14:29 -0500
-From: Ming Lei <tom.leiming@gmail.com>
-To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        Omar Sandoval <osandov@osandov.com>
-Cc: Ming Lei <tom.leiming@gmail.com>
-Subject: [PATCH 3/4] blk-mq: make lifetime consistent between hctx and its kobject
-Date: Wed, 22 Feb 2017 18:14:01 +0800
-Message-Id: <1487758442-5855-4-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1487758442-5855-1-git-send-email-tom.leiming@gmail.com>
-References: <1487758442-5855-1-git-send-email-tom.leiming@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <Damien.LeMoal@wdc.com>
+From: Damien Le Moal <damien.lemoal@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	linux-scsi@vger.kernel.org
+Cc: MPT-FusionLinux.pdl@broadcom.com,
+	Hannes Reinecke <hare@suse.de>,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bart.vanassche@sandisk.com>
+Subject: [PATCH 1/3] block: Introduce blk_rq_accesses_medium()
+Date: Tue, 28 Feb 2017 19:25:33 +0900
+Message-Id: <20170228102535.15966-2-damien.lemoal@wdc.com>
+In-Reply-To: <20170228102535.15966-1-damien.lemoal@wdc.com>
+References: <20170228102535.15966-1-damien.lemoal@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Return-Path: damien.lemoal@wdc.com
+List-ID: <linux-block@vger.kernel.org>
 
-This patch removes kobject_put() over hctx in __blk_mq_unregister_dev(),
-and trys to keep lifetime consistent between hctx and hctx's kobject.
+From: Bart Van Assche <bart.vanassche@sandisk.com>
 
-Now blk_mq_sysfs_register() and blk_mq_sysfs_unregister() become
-totally symmetrical, and kobject's refcounter drops to zero just
-when the hctx is freed.
+A medium access request is defined as an internal regular request that
+operates on a whole number of logical blocks of the storage medium.
+These include REQ_OP_READ, REQ_OP_WRITE, REQ_OP_FLUSH, REQ_OP_DISCARD,
+REQ_OP_SECURE_ERASE, REQ_OP_WRITE_SAME and REQ_OP_WRITE_ZEROES.
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+Zoned block device requests (REQ_OP_ZONE_REPORT and REQ_OP_ZONE_RESET)
+as well as SCSI passthrough and driver private commands are not
+considered medium access request.
+
+Reshuffle enum req_opf definitions grouping medium access request up
+to REQ_OP_MEDIUM_LAST and introduce the helper function
+blk_rq_accesses_medium() to test a request.
+
+Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
 ---
- block/blk-mq-sysfs.c | 15 ++++++++++-----
- block/blk-mq.c       |  5 +----
- 2 files changed, 11 insertions(+), 9 deletions(-)
+ include/linux/blk_types.h | 17 ++++++++++-------
+ include/linux/blkdev.h    | 12 ++++++++++++
+ 2 files changed, 22 insertions(+), 7 deletions(-)
 
-diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
-index 77fb238af2be..cb19ec16a7fc 100644
---- a/block/blk-mq-sysfs.c
-+++ b/block/blk-mq-sysfs.c
-@@ -17,6 +17,14 @@ static void blk_mq_sysfs_release(struct kobject *kobj)
- {
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index d703acb..6420057 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -151,16 +151,19 @@ enum req_opf {
+ 	REQ_OP_FLUSH		= 2,
+ 	/* discard sectors */
+ 	REQ_OP_DISCARD		= 3,
+-	/* get zone information */
+-	REQ_OP_ZONE_REPORT	= 4,
+ 	/* securely erase sectors */
+-	REQ_OP_SECURE_ERASE	= 5,
+-	/* seset a zone write pointer */
+-	REQ_OP_ZONE_RESET	= 6,
++	REQ_OP_SECURE_ERASE	= 4,
+ 	/* write the same sector many times */
+-	REQ_OP_WRITE_SAME	= 7,
++	REQ_OP_WRITE_SAME	= 5,
+ 	/* write the zero filled sector many times */
+-	REQ_OP_WRITE_ZEROES	= 8,
++	REQ_OP_WRITE_ZEROES	= 6,
++
++	REQ_OP_MEDIUM_LAST = REQ_OP_WRITE_ZEROES,
++
++	/* get zone information */
++	REQ_OP_ZONE_REPORT	= 16,
++	/* reset a zone write pointer */
++	REQ_OP_ZONE_RESET	= 17,
+ 
+ 	/* SCSI passthrough using struct scsi_request */
+ 	REQ_OP_SCSI_IN		= 32,
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index aecca0e..7d1ce2d 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -248,6 +248,18 @@ static inline bool blk_rq_is_passthrough(struct request *rq)
+ 	return blk_rq_is_scsi(rq) || blk_rq_is_private(rq);
  }
  
-+static void blk_mq_hw_sysfs_release(struct kobject *kobj)
++/**
++ * blk_rq_accesses_medium - test if a request is a medium access request
++ * @rq: A block layer request.
++ *
++ * A medium access request is a regular internal request that operates on
++ * a whole number of logical blocks of the storage medium.
++ */
++static inline bool blk_rq_accesses_medium(const struct request *rq)
 +{
-+	struct blk_mq_hw_ctx *hctx = container_of(kobj, struct blk_mq_hw_ctx,
-+						  kobj);
-+	kfree(hctx->ctxs);
-+	kfree(hctx);
++	return req_op(rq) <= REQ_OP_MEDIUM_LAST;
 +}
 +
- struct blk_mq_ctx_sysfs_entry {
- 	struct attribute attr;
- 	ssize_t (*show)(struct blk_mq_ctx *, char *);
-@@ -200,7 +208,7 @@ static struct kobj_type blk_mq_ctx_ktype = {
- static struct kobj_type blk_mq_hw_ktype = {
- 	.sysfs_ops	= &blk_mq_hw_sysfs_ops,
- 	.default_attrs	= default_hw_ctx_attrs,
--	.release	= blk_mq_sysfs_release,
-+	.release	= blk_mq_hw_sysfs_release,
- };
- 
- static void blk_mq_unregister_hctx(struct blk_mq_hw_ctx *hctx)
-@@ -244,12 +252,9 @@ static void __blk_mq_unregister_dev(struct device *dev, struct request_queue *q)
- 	struct blk_mq_hw_ctx *hctx;
- 	int i;
- 
--	queue_for_each_hw_ctx(q, hctx, i) {
-+	queue_for_each_hw_ctx(q, hctx, i)
- 		blk_mq_unregister_hctx(hctx);
- 
--		kobject_put(&hctx->kobj);
--	}
--
- 	blk_mq_debugfs_unregister_hctxs(q);
- 
- 	kobject_uevent(&q->mq_kobj, KOBJ_REMOVE);
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index bc45736d70ba..993bb4d4d909 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2152,8 +2152,7 @@ void blk_mq_release(struct request_queue *q)
- 	queue_for_each_hw_ctx(q, hctx, i) {
- 		if (!hctx)
- 			continue;
--		kfree(hctx->ctxs);
--		kfree(hctx);
-+		kobject_put(&hctx->kobj);
- 	}
- 
- 	q->mq_map = NULL;
-@@ -2232,8 +2231,6 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
- 			blk_mq_exit_hctx(q, set, hctx, j);
- 			free_cpumask_var(hctx->cpumask);
- 			kobject_put(&hctx->kobj);
--			kfree(hctx->ctxs);
--			kfree(hctx);
- 			hctxs[j] = NULL;
- 
- 		}
+ static inline unsigned short req_get_ioprio(struct request *req)
+ {
+ 	return req->ioprio;
 -- 
-2.7.4
+2.9.3
+
+Western Digital Corporation (and its subsidiaries) E-mail Confidentiality Notice & Disclaimer:
+
+This e-mail and any files transmitted with it may contain confidential or legally privileged information of WDC and/or its affiliates, and are intended solely for the use of the individual or entity to which they are addressed. If you are not the intended recipient, any disclosure, copying, distribution or any action taken or omitted to be taken in reliance on it, is prohibited. If you have received this e-mail in error, please notify the sender immediately and delete the e-mail in its entirety from your system.
