@@ -1,77 +1,45 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f193.google.com ([209.85.192.193]:33902 "EHLO
-        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754648AbdBPLqN (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Feb 2017 06:46:13 -0500
-From: Ming Lei <tom.leiming@gmail.com>
-To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
-        linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        NeilBrown <neilb@suse.com>
-Cc: Ming Lei <tom.leiming@gmail.com>
-Subject: [PATCH 02/17] block: introduce bio_remove_last_page()
-Date: Thu, 16 Feb 2017 19:45:32 +0800
-Message-Id: <1487245547-24384-3-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1487245547-24384-1-git-send-email-tom.leiming@gmail.com>
-References: <1487245547-24384-1-git-send-email-tom.leiming@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Goldwyn Rodrigues <rgoldwyn@suse.de>
+To: jack@suse.com
+Cc: hch@infradead.org, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org,
+        Goldwyn Rodrigues <rgoldwyn@suse.com>
+Subject: [PATCH 2/8] nowait aio: Return if cannot get hold of i_rwsem
+Date: Tue, 28 Feb 2017 17:36:04 -0600
+Message-Id: <20170228233610.25456-3-rgoldwyn@suse.de>
+In-Reply-To: <20170228233610.25456-1-rgoldwyn@suse.de>
+References: <20170228233610.25456-1-rgoldwyn@suse.de>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-MD need this helper to remove the last added page, so introduce
-it.
+From: Goldwyn Rodrigues <rgoldwyn@suse.com>
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+A failure to lock i_rwsem would mean there is I/O being performed
+by another thread. So, let's bail.
+
+Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
 ---
- block/bio.c         | 23 +++++++++++++++++++++++
- include/linux/bio.h |  1 +
- 2 files changed, 24 insertions(+)
+ mm/filemap.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index 5eec5e08417f..0ce7ffcd7939 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -837,6 +837,29 @@ int bio_add_pc_page(struct request_queue *q, struct bio *bio, struct page
- EXPORT_SYMBOL(bio_add_pc_page);
+diff --git a/mm/filemap.c b/mm/filemap.c
+index 3f9afde..78dd50e 100644
+--- a/mm/filemap.c
++++ b/mm/filemap.c
+@@ -2973,7 +2973,12 @@ ssize_t generic_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
+ 	struct inode *inode = file->f_mapping->host;
+ 	ssize_t ret;
  
- /**
-+ *	bio_remove_last_page	-	remove the last added page
-+ *	@bio: destination bio
-+ *
-+ *	Attempt to remove the last added page from the bio_vec maplist.
-+ */
-+void bio_remove_last_page(struct bio *bio)
-+{
-+	/*
-+	 * cloned bio must not modify vec list
-+	 */
-+	if (WARN_ON_ONCE(bio_flagged(bio, BIO_CLONED)))
-+		return;
-+
-+	if (bio->bi_vcnt > 0) {
-+		struct bio_vec *bv = &bio->bi_io_vec[bio->bi_vcnt - 1];
-+
-+		bio->bi_iter.bi_size -= bv->bv_len;
-+		bio->bi_vcnt--;
+-	inode_lock(inode);
++	if (!inode_trylock(inode)) {
++		/* Don't sleep on inode rwsem */
++		if (iocb->ki_flags & IOCB_NOWAIT)
++			return -EAGAIN;
++		inode_lock(inode);
 +	}
-+}
-+EXPORT_SYMBOL(bio_remove_last_page);
-+
-+/**
-  *	bio_add_page	-	attempt to add page to bio
-  *	@bio: destination bio
-  *	@page: page to add
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 3364b3ed90e7..32aeb493d1fe 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -443,6 +443,7 @@ extern void bio_init(struct bio *bio, struct bio_vec *table,
- extern void bio_reset(struct bio *);
- void bio_chain(struct bio *, struct bio *);
- 
-+extern void bio_remove_last_page(struct bio *bio);
- extern int bio_add_page(struct bio *, struct page *, unsigned int,unsigned int);
- extern int bio_add_pc_page(struct request_queue *, struct bio *, struct page *,
- 			   unsigned int, unsigned int);
+ 	ret = generic_write_checks(iocb, from);
+ 	if (ret > 0)
+ 		ret = __generic_file_write_iter(iocb, from);
 -- 
-2.7.4
+2.10.2
