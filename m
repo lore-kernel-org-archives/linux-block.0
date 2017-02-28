@@ -1,35 +1,21 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <Bart.VanAssche@sandisk.com>
-To: "hch@lst.de" <hch@lst.de>, Damien Le Moal <Damien.LeMoal@wdc.com>
-CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>, "hare@suse.de"
-	<hare@suse.de>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"MPT-FusionLinux.pdl@broadcom.com" <MPT-FusionLinux.pdl@broadcom.com>,
-	"martin.petersen@oracle.com" <martin.petersen@oracle.com>, "axboe@kernel.dk"
-	<axboe@kernel.dk>
+Return-Path: <hch@lst.de>
+Date: Tue, 28 Feb 2017 17:02:59 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Damien Le Moal <damien.lemoal@wdc.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	linux-scsi@vger.kernel.org, MPT-FusionLinux.pdl@broadcom.com,
+	Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bart.vanassche@sandisk.com>
 Subject: Re: [PATCH 0/3] Separate zone requests from medium access requests
-Date: Tue, 28 Feb 2017 16:16:46 +0000
-Message-ID: <1488298588.2370.1.camel@sandisk.com>
+Message-ID: <20170228160259.GA22755@lst.de>
 References: <20170228102535.15966-1-damien.lemoal@wdc.com>
-	 <20170228160259.GA22755@lst.de>
-In-Reply-To: <20170228160259.GA22755@lst.de>
-Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
-Return-Path: Bart.VanAssche@sandisk.com
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170228102535.15966-1-damien.lemoal@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Tue, 2017-02-28 at 17:02 +0100, Christoph Hellwig wrote:
-> I don't really like this too much - this is too many SCSI specifics
-> for the block layer to care.  Maybe using bios for the zone ops was a
-> mistake after all, and we should just have operations in struct block_dev=
-ice
-> instead..
-
-blk_rq_accesses_medium() has nothing to do with SCSI. It is a reintroductio=
-n
-of what REQ_TYPE_FS stood for before ZBC was introduced but with another na=
-me.
-BTW, I think that all blk_rq_is_passthrough() callers have to be reviewed t=
-o
-see whether or not !blk_rq_accesses_medium() is perhaps what was intended.
-
-Bart.=
+I don't really like this too much - this is too many SCSI specifics
+for the block layer to care.  Maybe using bios for the zone ops was a
+mistake after all, and we should just have operations in struct block_device
+instead..
