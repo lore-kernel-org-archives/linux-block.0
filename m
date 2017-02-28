@@ -1,58 +1,91 @@
 Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Christoph Hellwig <hch@lst.de>
-To: linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
-        linux-block@vger.kernel.org
-Subject: [PATCH 11/12] block_dev: implement the F_IOINFO fcntl
-Date: Tue, 28 Feb 2017 06:57:36 -0800
-Message-Id: <20170228145737.19016-12-hch@lst.de>
-In-Reply-To: <20170228145737.19016-1-hch@lst.de>
-References: <20170228145737.19016-1-hch@lst.de>
+From: Goldwyn Rodrigues <rgoldwyn@suse.de>
+To: jack@suse.com
+Cc: hch@infradead.org, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org,
+        Goldwyn Rodrigues <rgoldwyn@suse.com>
+Subject: [PATCH 8/8] nowait aio: btrfs
+Date: Tue, 28 Feb 2017 17:36:10 -0600
+Message-Id: <20170228233610.25456-9-rgoldwyn@suse.de>
+In-Reply-To: <20170228233610.25456-1-rgoldwyn@suse.de>
+References: <20170228233610.25456-1-rgoldwyn@suse.de>
 Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- fs/block_dev.c | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+From: Goldwyn Rodrigues <rgoldwyn@suse.com>
 
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 4dd5c54cdefb..48a799964e1d 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -2116,6 +2116,26 @@ static long blkdev_fallocate(struct file *file, int mode, loff_t start,
- 					     end >> PAGE_SHIFT);
- }
+Return EAGAIN if any of the following checks fail
+ + i_rwsem is not lockable
+ + NODATACOW or PREALLOC is not set
+ + Cannot nocow at the desired location
+ + Writing beyond end of file which is not allocated
+
+Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
+---
+ fs/btrfs/file.c  | 25 ++++++++++++++++++++-----
+ fs/btrfs/inode.c |  3 +++
+ 2 files changed, 23 insertions(+), 5 deletions(-)
+
+diff --git a/fs/btrfs/file.c b/fs/btrfs/file.c
+index b5c5da2..8640280 100644
+--- a/fs/btrfs/file.c
++++ b/fs/btrfs/file.c
+@@ -1819,12 +1819,29 @@ static ssize_t btrfs_file_write_iter(struct kiocb *iocb,
+ 	ssize_t num_written = 0;
+ 	bool sync = (file->f_flags & O_DSYNC) || IS_SYNC(file->f_mapping->host);
+ 	ssize_t err;
+-	loff_t pos;
+-	size_t count;
++	loff_t pos = iocb->ki_pos;
++	size_t count = iov_iter_count(from);
+ 	loff_t oldsize;
+ 	int clean_page = 0;
  
-+static int blkdev_ioinfo(struct file *file, struct fcntl_ioinfo *fio)
-+{
-+	struct block_device *bdev = I_BDEV(bdev_file_inode(file));
-+	struct request_queue *q = bdev_get_queue(bdev);
-+	unsigned int atomic_sectors = queue_max_atomic_write_sectors(q);
-+
-+	if (file->f_flags & O_DIRECT) {
-+		fio->fio_alignment = bdev_logical_block_size(bdev);
-+
-+		if ((file->f_flags & O_ATOMIC) && atomic_sectors) {
-+			fio->fio_flags = FIO_FL_ATOMIC_OSYNC;
-+			fio->fio_max_atomic = (atomic_sectors << 9);
-+			if (fio->fio_alignment)
-+				fio->fio_max_atomic &= ~(fio->fio_alignment - 1);
+-	inode_lock(inode);
++	if ((iocb->ki_flags & IOCB_NOWAIT) &&
++			(iocb->ki_flags & IOCB_DIRECT)) {
++		/* Don't sleep on inode rwsem */
++		if (!inode_trylock(inode))
++			return -EAGAIN;
++		/*
++		 * We will allocate space in case nodatacow is not set,
++		 * so bail
++		 */
++		if (!(BTRFS_I(inode)->flags & (BTRFS_INODE_NODATACOW |
++					      BTRFS_INODE_PREALLOC)) ||
++		    check_can_nocow(inode, pos, &count) <= 0) {
++			inode_unlock(inode);
++			return -EAGAIN;
 +		}
-+	}
++	} else
++		inode_lock(inode);
 +
-+	return 0;
-+};
-+
- const struct file_operations def_blk_fops = {
- 	.open		= blkdev_open,
- 	.release	= blkdev_close,
-@@ -2131,6 +2151,7 @@ const struct file_operations def_blk_fops = {
- 	.splice_read	= generic_file_splice_read,
- 	.splice_write	= iter_file_splice_write,
- 	.fallocate	= blkdev_fallocate,
-+	.ioinfo		= blkdev_ioinfo,
- };
+ 	err = generic_write_checks(iocb, from);
+ 	if (err <= 0) {
+ 		inode_unlock(inode);
+@@ -1858,8 +1875,6 @@ static ssize_t btrfs_file_write_iter(struct kiocb *iocb,
+ 	 */
+ 	update_time_for_write(inode);
  
- int ioctl_by_bdev(struct block_device *bdev, unsigned cmd, unsigned long arg)
+-	pos = iocb->ki_pos;
+-	count = iov_iter_count(from);
+ 	start_pos = round_down(pos, fs_info->sectorsize);
+ 	oldsize = i_size_read(inode);
+ 	if (start_pos > oldsize) {
+diff --git a/fs/btrfs/inode.c b/fs/btrfs/inode.c
+index 1e861a0..c5041ea 100644
+--- a/fs/btrfs/inode.c
++++ b/fs/btrfs/inode.c
+@@ -8681,6 +8681,9 @@ static ssize_t btrfs_direct_IO(struct kiocb *iocb, struct iov_iter *iter)
+ 		if (offset + count <= inode->i_size) {
+ 			inode_unlock(inode);
+ 			relock = true;
++		} else if (iocb->ki_flags & IOCB_NOWAIT) {
++			ret = -EAGAIN;
++			goto out;
+ 		}
+ 		ret = btrfs_delalloc_reserve_space(inode, offset, count);
+ 		if (ret)
 -- 
-2.11.0
+2.10.2
