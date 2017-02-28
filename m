@@ -1,91 +1,46 @@
-Return-Path: <jack@suse.cz>
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
-	Lekshmi Pillai <lekshmicpillai@in.ibm.com>,
-	Tejun Heo <tj@kernel.org>,
-	NeilBrown <neilb@suse.de>,
-	Omar Sandoval <osandov@osandov.com>,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH 05/13] bdi: Mark congested->bdi as internal
-Date: Tue, 21 Feb 2017 18:09:50 +0100
-Message-Id: <20170221170958.21845-6-jack@suse.cz>
-In-Reply-To: <20170221170958.21845-1-jack@suse.cz>
-References: <20170221170958.21845-1-jack@suse.cz>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pg0-f65.google.com ([74.125.83.65]:35114 "EHLO
+        mail-pg0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751660AbdB1PmU (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 28 Feb 2017 10:42:20 -0500
+From: Ming Lei <tom.leiming@gmail.com>
+To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
+        linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Ming Lei <tom.leiming@gmail.com>
+Subject: [PATCH v2 01/13] block: introduce bio_segments_all()
+Date: Tue, 28 Feb 2017 23:41:31 +0800
+Message-Id: <1488296503-4987-2-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1488296503-4987-1-git-send-email-tom.leiming@gmail.com>
+References: <1488296503-4987-1-git-send-email-tom.leiming@gmail.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-congested->bdi pointer is used only to be able to remove congested
-structure from bdi->cgwb_congested_tree on structure release. Moreover
-the pointer can become NULL when we unregister the bdi. Rename the field
-to __bdi and add a comment to make it more explicit this is internal
-stuff of memcg writeback code and people should not use the field as
-such use will be likely race prone.
+So that we can replace the direct access to .bi_vcnt.
 
-We do not bother with converting congested->bdi to a proper refcounted
-reference. It will be slightly ugly to special-case bdi->wb.congested to
-avoid effectively a cyclic reference of bdi to itself and the reference
-gets cleared from bdi_unregister() making it impossible to reference
-a freed bdi.
-
-Signed-off-by: Jan Kara <jack@suse.cz>
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- include/linux/backing-dev-defs.h |  4 +++-
- mm/backing-dev.c                 | 10 +++++-----
- 2 files changed, 8 insertions(+), 6 deletions(-)
+ include/linux/bio.h | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/include/linux/backing-dev-defs.h b/include/linux/backing-dev-defs.h
-index ad955817916d..8fb3dcdebc80 100644
---- a/include/linux/backing-dev-defs.h
-+++ b/include/linux/backing-dev-defs.h
-@@ -54,7 +54,9 @@ struct bdi_writeback_congested {
- 	atomic_t refcnt;		/* nr of attached wb's and blkg */
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index 8e521194f6fc..3364b3ed90e7 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -293,6 +293,13 @@ static inline void bio_get_last_bvec(struct bio *bio, struct bio_vec *bv)
+ 		bv->bv_len = iter.bi_bvec_done;
+ }
  
- #ifdef CONFIG_CGROUP_WRITEBACK
--	struct backing_dev_info *bdi;	/* the associated bdi */
-+	struct backing_dev_info *__bdi;	/* the associated bdi, set to NULL
-+					 * on bdi unregistration. For memcg-wb
-+					 * internal use only! */
- 	int blkcg_id;			/* ID of the associated blkcg */
- 	struct rb_node rb_node;		/* on bdi->cgwb_congestion_tree */
- #endif
-diff --git a/mm/backing-dev.c b/mm/backing-dev.c
-index 28ce6cf7b2ff..c324eae17f0d 100644
---- a/mm/backing-dev.c
-+++ b/mm/backing-dev.c
-@@ -438,7 +438,7 @@ wb_congested_get_create(struct backing_dev_info *bdi, int blkcg_id, gfp_t gfp)
- 		return NULL;
- 
- 	atomic_set(&new_congested->refcnt, 0);
--	new_congested->bdi = bdi;
-+	new_congested->__bdi = bdi;
- 	new_congested->blkcg_id = blkcg_id;
- 	goto retry;
- 
-@@ -466,10 +466,10 @@ void wb_congested_put(struct bdi_writeback_congested *congested)
- 	}
- 
- 	/* bdi might already have been destroyed leaving @congested unlinked */
--	if (congested->bdi) {
-+	if (congested->__bdi) {
- 		rb_erase(&congested->rb_node,
--			 &congested->bdi->cgwb_congested_tree);
--		congested->bdi = NULL;
-+			 &congested->__bdi->cgwb_congested_tree);
-+		congested->__bdi = NULL;
- 	}
- 
- 	spin_unlock_irqrestore(&cgwb_lock, flags);
-@@ -698,7 +698,7 @@ static void cgwb_bdi_destroy(struct backing_dev_info *bdi)
- 			rb_entry(rbn, struct bdi_writeback_congested, rb_node);
- 
- 		rb_erase(rbn, &bdi->cgwb_congested_tree);
--		congested->bdi = NULL;	/* mark @congested unlinked */
-+		congested->__bdi = NULL;	/* mark @congested unlinked */
- 	}
- 
- 	spin_unlock_irq(&cgwb_lock);
++static inline unsigned bio_segments_all(struct bio *bio)
++{
++	WARN_ON_ONCE(bio_flagged(bio, BIO_CLONED));
++
++	return bio->bi_vcnt;
++}
++
+ enum bip_flags {
+ 	BIP_BLOCK_INTEGRITY	= 1 << 0, /* block layer owns integrity data */
+ 	BIP_MAPPED_INTEGRITY	= 1 << 1, /* ref tag has been remapped */
 -- 
-2.10.2
+2.7.4
