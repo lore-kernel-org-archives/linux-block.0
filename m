@@ -1,57 +1,50 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f193.google.com ([209.85.192.193]:35998 "EHLO
-        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752475AbdB1Pmm (ORCPT
+Received: from bombadil.infradead.org ([65.50.211.133]:57751 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752134AbdB1O6E (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Feb 2017 10:42:42 -0500
-From: Ming Lei <tom.leiming@gmail.com>
-To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
-        linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Ming Lei <tom.leiming@gmail.com>
-Subject: [PATCH v2 09/13] md: raid1: use bio_segments_all()
-Date: Tue, 28 Feb 2017 23:41:39 +0800
-Message-Id: <1488296503-4987-10-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1488296503-4987-1-git-send-email-tom.leiming@gmail.com>
-References: <1488296503-4987-1-git-send-email-tom.leiming@gmail.com>
+        Tue, 28 Feb 2017 09:58:04 -0500
+From: Christoph Hellwig <hch@lst.de>
+To: linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: [PATCH 10/12] block_dev: set REQ_NOMERGE for O_ATOMIC writes
+Date: Tue, 28 Feb 2017 06:57:35 -0800
+Message-Id: <20170228145737.19016-11-hch@lst.de>
+In-Reply-To: <20170228145737.19016-1-hch@lst.de>
+References: <20170228145737.19016-1-hch@lst.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Use this helper, instead of direct access to .bi_vcnt.
-
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/md/raid1.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ fs/block_dev.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
-index 316bd6dd6cc1..7396c99ff7b1 100644
---- a/drivers/md/raid1.c
-+++ b/drivers/md/raid1.c
-@@ -1091,7 +1091,8 @@ static void alloc_behind_pages(struct bio *bio, struct r1bio *r1_bio)
- {
- 	int i;
- 	struct bio_vec *bvec;
--	struct bio_vec *bvecs = kzalloc(bio->bi_vcnt * sizeof(struct bio_vec),
-+	unsigned vcnt = bio_segments_all(bio);
-+	struct bio_vec *bvecs = kzalloc(vcnt * sizeof(struct bio_vec),
- 					GFP_NOIO);
- 	if (unlikely(!bvecs))
- 		return;
-@@ -1107,12 +1108,12 @@ static void alloc_behind_pages(struct bio *bio, struct r1bio *r1_bio)
- 		kunmap(bvec->bv_page);
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index 3c47614a4b32..4dd5c54cdefb 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -242,6 +242,10 @@ __blkdev_direct_IO_simple(struct kiocb *iocb, struct iov_iter *iter,
+ 		task_io_account_write(ret);
  	}
- 	r1_bio->behind_bvecs = bvecs;
--	r1_bio->behind_page_count = bio->bi_vcnt;
-+	r1_bio->behind_page_count = vcnt;
- 	set_bit(R1BIO_BehindIO, &r1_bio->state);
- 	return;
  
- do_sync_io:
--	for (i = 0; i < bio->bi_vcnt; i++)
-+	for (i = 0; i < vcnt; i++)
- 		if (bvecs[i].bv_page)
- 			put_page(bvecs[i].bv_page);
- 	kfree(bvecs);
++	/* don't merge atomic requests to avoid going over the limit */
++	if (iocb->ki_filp->f_flags & O_ATOMIC)
++		bio.bi_opf |= REQ_NOMERGE;
++
+ 	qc = submit_bio(&bio);
+ 	for (;;) {
+ 		set_current_state(TASK_UNINTERRUPTIBLE);
+@@ -377,6 +381,10 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
+ 			task_io_account_write(bio->bi_iter.bi_size);
+ 		}
+ 
++		/* don't merge atomic requests to avoid going over the limit */
++		if (iocb->ki_filp->f_flags & O_ATOMIC)
++			bio->bi_opf |= REQ_NOMERGE;
++
+ 		dio->size += bio->bi_iter.bi_size;
+ 		pos += bio->bi_iter.bi_size;
+ 
 -- 
-2.7.4
+2.11.0
