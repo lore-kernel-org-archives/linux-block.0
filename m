@@ -1,151 +1,74 @@
-Return-Path: <Damien.LeMoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	linux-scsi@vger.kernel.org
-Cc: MPT-FusionLinux.pdl@broadcom.com,
-	Hannes Reinecke <hare@suse.de>,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@sandisk.com>
-Subject: [PATCH 2/3] block: Separate zone requests from medium access requests
-Date: Tue, 28 Feb 2017 19:25:34 +0900
-Message-Id: <20170228102535.15966-3-damien.lemoal@wdc.com>
-In-Reply-To: <20170228102535.15966-1-damien.lemoal@wdc.com>
-References: <20170228102535.15966-1-damien.lemoal@wdc.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: damien.lemoal@wdc.com
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pg0-f68.google.com ([74.125.83.68]:34484 "EHLO
+        mail-pg0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751737AbdB1PmU (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 28 Feb 2017 10:42:20 -0500
+From: Ming Lei <tom.leiming@gmail.com>
+To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
+        linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Ming Lei <tom.leiming@gmail.com>
+Subject: [PATCH v2 03/13] md: move two macros into md.h
+Date: Tue, 28 Feb 2017 23:41:33 +0800
+Message-Id: <1488296503-4987-4-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1488296503-4987-1-git-send-email-tom.leiming@gmail.com>
+References: <1488296503-4987-1-git-send-email-tom.leiming@gmail.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Bart Van Assche <bart.vanassche@sandisk.com>
+Both raid1 and raid10 share common resync
+block size and page count, so move them into md.h.
 
-Use blk_rq_accesses_medium() instead of !blk_rq_is_passthrough() to
-ensure that code that is intended for normal medium access requests,
-e.g. DISCARD, READ and WRITE requests, is not applied to
-REQ_OP_ZONE_REPORT requests nor to REQ_OP_ZONE_RESET requests.
-This allows excluding these zone requests from request accounting
-and from request scheduling.
-
-Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- block/blk-core.c       |  2 +-
- block/blk.h            |  2 +-
- block/elevator.c       | 12 ++++++++----
- block/mq-deadline.c    |  2 +-
- include/linux/blkdev.h |  6 +++---
- 5 files changed, 14 insertions(+), 10 deletions(-)
+ drivers/md/md.h     | 5 +++++
+ drivers/md/raid1.c  | 2 --
+ drivers/md/raid10.c | 3 ---
+ 3 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index b9e857f..addd8e1 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -2608,7 +2608,7 @@ bool blk_update_request(struct request *req, int error, unsigned int nr_bytes)
- 	req->__data_len -= total_bytes;
- 
- 	/* update sector only for requests with clear definition of sector */
--	if (!blk_rq_is_passthrough(req))
-+	if (blk_rq_accesses_medium(req))
- 		req->__sector += total_bytes >> 9;
- 
- 	/* mixed attributes always follow the first bio */
-diff --git a/block/blk.h b/block/blk.h
-index d1ea4bd9..9b63db7 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -255,7 +255,7 @@ static inline int blk_do_io_stat(struct request *rq)
- {
- 	return rq->rq_disk &&
- 	       (rq->rq_flags & RQF_IO_STAT) &&
--		!blk_rq_is_passthrough(rq);
-+		blk_rq_accesses_medium(rq);
+diff --git a/drivers/md/md.h b/drivers/md/md.h
+index b8859cbf84b6..1d63239a1be4 100644
+--- a/drivers/md/md.h
++++ b/drivers/md/md.h
+@@ -715,4 +715,9 @@ static inline void mddev_check_writesame(struct mddev *mddev, struct bio *bio)
+ 	    !bdev_get_queue(bio->bi_bdev)->limits.max_write_same_sectors)
+ 		mddev->queue->limits.max_write_same_sectors = 0;
+ }
++
++/* Maximum size of each resync request */
++#define RESYNC_BLOCK_SIZE (64*1024)
++#define RESYNC_PAGES ((RESYNC_BLOCK_SIZE + PAGE_SIZE-1) / PAGE_SIZE)
++
+ #endif /* _MD_MD_H */
+diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
+index b3021355c7e2..25c9172db639 100644
+--- a/drivers/md/raid1.c
++++ b/drivers/md/raid1.c
+@@ -91,10 +91,8 @@ static void r1bio_pool_free(void *r1_bio, void *data)
+ 	kfree(r1_bio);
  }
  
- static inline void req_set_nomerge(struct request_queue *q, struct request *req)
-diff --git a/block/elevator.c b/block/elevator.c
-index 699d10f..cbf81c6 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -635,16 +635,20 @@ void __elv_add_request(struct request_queue *q, struct request *rq, int where)
- 
- 	rq->q = q;
- 
--	if (rq->rq_flags & RQF_SOFTBARRIER) {
-+	if (!blk_rq_accesses_medium(rq)) {
-+		/* Do not schedule zone requests */
-+		where = ELEVATOR_INSERT_FRONT;
-+	} if (rq->rq_flags & RQF_SOFTBARRIER) {
- 		/* barriers are scheduling boundary, update end_sector */
--		if (!blk_rq_is_passthrough(rq)) {
-+		if (blk_rq_accesses_medium(rq)) {
- 			q->end_sector = rq_end_sector(rq);
- 			q->boundary_rq = rq;
- 		}
- 	} else if (!(rq->rq_flags & RQF_ELVPRIV) &&
- 		    (where == ELEVATOR_INSERT_SORT ||
--		     where == ELEVATOR_INSERT_SORT_MERGE))
-+		     where == ELEVATOR_INSERT_SORT_MERGE)) {
- 		where = ELEVATOR_INSERT_BACK;
-+	}
- 
- 	switch (where) {
- 	case ELEVATOR_INSERT_REQUEUE:
-@@ -679,7 +683,7 @@ void __elv_add_request(struct request_queue *q, struct request *rq, int where)
- 		if (elv_attempt_insert_merge(q, rq))
- 			break;
- 	case ELEVATOR_INSERT_SORT:
--		BUG_ON(blk_rq_is_passthrough(rq));
-+		BUG_ON(!blk_rq_accesses_medium(rq));
- 		rq->rq_flags |= RQF_SORTED;
- 		q->nr_sorted++;
- 		if (rq_mergeable(rq)) {
-diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-index 23612163..389c1af 100644
---- a/block/mq-deadline.c
-+++ b/block/mq-deadline.c
-@@ -399,7 +399,7 @@ static void dd_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
- 
- 	blk_mq_sched_request_inserted(rq);
- 
--	if (at_head || blk_rq_is_passthrough(rq)) {
-+	if (at_head || !blk_rq_accesses_medium(rq)) {
- 		if (at_head)
- 			list_add(&rq->queuelist, &dd->dispatch);
- 		else
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 7d1ce2d..dcf926d 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -720,7 +720,7 @@ static inline void queue_flag_clear(unsigned int flag, struct request_queue *q)
- 
- static inline bool blk_account_rq(struct request *rq)
- {
--	return (rq->rq_flags & RQF_STARTED) && !blk_rq_is_passthrough(rq);
-+	return (rq->rq_flags & RQF_STARTED) && blk_rq_accesses_medium(rq);
+-#define RESYNC_BLOCK_SIZE (64*1024)
+ #define RESYNC_DEPTH 32
+ #define RESYNC_SECTORS (RESYNC_BLOCK_SIZE >> 9)
+-#define RESYNC_PAGES ((RESYNC_BLOCK_SIZE + PAGE_SIZE-1) / PAGE_SIZE)
+ #define RESYNC_WINDOW (RESYNC_BLOCK_SIZE * RESYNC_DEPTH)
+ #define RESYNC_WINDOW_SECTORS (RESYNC_WINDOW >> 9)
+ #define CLUSTER_RESYNC_WINDOW (16 * RESYNC_WINDOW)
+diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
+index ceb3acc793cf..c5f1a117494b 100644
+--- a/drivers/md/raid10.c
++++ b/drivers/md/raid10.c
+@@ -125,9 +125,6 @@ static void r10bio_pool_free(void *r10_bio, void *data)
+ 	kfree(r10_bio);
  }
  
- #define blk_rq_cpu_valid(rq)	((rq)->cpu != -1)
-@@ -796,7 +796,7 @@ static inline void blk_clear_rl_full(struct request_list *rl, bool sync)
- 
- static inline bool rq_mergeable(struct request *rq)
- {
--	if (blk_rq_is_passthrough(rq))
-+	if (!blk_rq_accesses_medium(rq))
- 		return false;
- 
- 	if (req_op(rq) == REQ_OP_FLUSH)
-@@ -1070,7 +1070,7 @@ static inline unsigned int blk_rq_get_max_sectors(struct request *rq,
- {
- 	struct request_queue *q = rq->q;
- 
--	if (blk_rq_is_passthrough(rq))
-+	if (!blk_rq_accesses_medium(rq))
- 		return q->limits.max_hw_sectors;
- 
- 	if (!q->limits.chunk_sectors ||
+-/* Maximum size of each resync request */
+-#define RESYNC_BLOCK_SIZE (64*1024)
+-#define RESYNC_PAGES ((RESYNC_BLOCK_SIZE + PAGE_SIZE-1) / PAGE_SIZE)
+ /* amount of memory to reserve for resync requests */
+ #define RESYNC_WINDOW (1024*1024)
+ /* maximum number of concurrent requests, memory permitting */
 -- 
-2.9.3
-
-Western Digital Corporation (and its subsidiaries) E-mail Confidentiality Notice & Disclaimer:
-
-This e-mail and any files transmitted with it may contain confidential or legally privileged information of WDC and/or its affiliates, and are intended solely for the use of the individual or entity to which they are addressed. If you are not the intended recipient, any disclosure, copying, distribution or any action taken or omitted to be taken in reliance on it, is prohibited. If you have received this e-mail in error, please notify the sender immediately and delete the e-mail in its entirety from your system.
+2.7.4
