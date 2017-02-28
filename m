@@ -1,165 +1,72 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:42871 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752295AbdBIVSx (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Feb 2017 16:18:53 -0500
-Date: Thu, 9 Feb 2017 13:18:35 -0800
-From: Matthew Wilcox <willy@infradead.org>
-To: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Cc: Theodore Ts'o <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCHv6 07/37] filemap: allocate huge page in
- page_cache_read(), if allowed
-Message-ID: <20170209211835.GV2267@bombadil.infradead.org>
-References: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
- <20170126115819.58875-8-kirill.shutemov@linux.intel.com>
+Received: from mail.kernel.org ([198.145.29.136]:46960 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751291AbdB1XlS (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 28 Feb 2017 18:41:18 -0500
+Date: Tue, 28 Feb 2017 15:39:09 -0800
+From: Shaohua Li <shli@kernel.org>
+To: Ming Lei <tom.leiming@gmail.com>
+Cc: Jens Axboe <axboe@fb.com>, linux-raid@vger.kernel.org,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>
+Subject: Re: [PATCH v2 08/13] md: raid1: use bio helper in process_checks()
+Message-ID: <20170228233909.slbbjuh24p77pcrv@kernel.org>
+References: <1488296503-4987-1-git-send-email-tom.leiming@gmail.com>
+ <1488296503-4987-9-git-send-email-tom.leiming@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170126115819.58875-8-kirill.shutemov@linux.intel.com>
+In-Reply-To: <1488296503-4987-9-git-send-email-tom.leiming@gmail.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Thu, Jan 26, 2017 at 02:57:49PM +0300, Kirill A. Shutemov wrote:
-> Later we can add logic to accumulate information from shadow entires to
-> return to caller (average eviction time?).
-
-I would say minimum rather than average.  That will become the refault
-time of the entire page, so minimum would probably have us making better
-decisions?
-
-> +	/* Wipe shadow entires */
-> +	radix_tree_for_each_slot(slot, &mapping->page_tree, &iter,
-> +			page->index) {
-> +		if (iter.index >= page->index + hpage_nr_pages(page))
-> +			break;
+On Tue, Feb 28, 2017 at 11:41:38PM +0800, Ming Lei wrote:
+> Avoid to direct access to bvec table.
+> 
+> Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+> ---
+>  drivers/md/raid1.c | 12 ++++++++----
+>  1 file changed, 8 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
+> index d0cb5c026506..316bd6dd6cc1 100644
+> --- a/drivers/md/raid1.c
+> +++ b/drivers/md/raid1.c
+> @@ -2108,6 +2108,7 @@ static void process_checks(struct r1bio *r1_bio)
+>  		int j;
+>  		int size;
+>  		int error;
+> +		struct bio_vec *bi;
+>  		struct bio *b = r1_bio->bios[i];
+>  		struct resync_pages *rp = get_resync_pages(b);
+>  		if (b->bi_end_io != end_sync_read)
+> @@ -2126,9 +2127,7 @@ static void process_checks(struct r1bio *r1_bio)
+>  		b->bi_private = rp;
 >  
->  		p = radix_tree_deref_slot_protected(slot, &mapping->tree_lock);
-> -		if (!radix_tree_exceptional_entry(p))
-> +		if (!p)
-> +			continue;
-
-Just FYI, this can't happen.  You're holding the tree lock so nobody
-else gets to remove things from the tree.  radix_tree_for_each_slot()
-only gives you the full slots; it skips the empty ones for you.  I'm
-OK if you want to leave it in out of an abundance of caution.
-
-> +		__radix_tree_replace(&mapping->page_tree, iter.node, slot, NULL,
-> +				workingset_update_node, mapping);
-
-I may add an update_node argument to radix_tree_join at some point,
-so you can use it here.  Or maybe we don't need to do that, and what
-you have here works just fine.
-
->  		mapping->nrexceptional--;
-
-... because adjusting the exceptional count is going to be a pain.
-
-> +	error = __radix_tree_insert(&mapping->page_tree,
-> +			page->index, compound_order(page), page);
-> +	/* This shouldn't happen */
-> +	if (WARN_ON_ONCE(error))
-> +		return error;
-
-A lesser man would have just ignored the return value from
-__radix_tree_insert.  I salute you.
-
-> @@ -2078,18 +2155,34 @@ static int page_cache_read(struct file *file, pgoff_t offset, gfp_t gfp_mask)
->  {
->  	struct address_space *mapping = file->f_mapping;
->  	struct page *page;
-> +	pgoff_t hoffset;
->  	int ret;
+>  		size = b->bi_iter.bi_size;
+> -		for (j = 0; j < vcnt ; j++) {
+> -			struct bio_vec *bi;
+> -			bi = &b->bi_io_vec[j];
+> +		bio_for_each_segment_all(bi, b, j) {
+>  			bi->bv_offset = 0;
+>  			if (size > PAGE_SIZE)
+>  				bi->bv_len = PAGE_SIZE;
+> @@ -2152,17 +2151,22 @@ static void process_checks(struct r1bio *r1_bio)
+>  		int error = sbio->bi_error;
+>  		struct page **ppages = get_resync_pages(pbio)->pages;
+>  		struct page **spages = get_resync_pages(sbio)->pages;
+> +		struct bio_vec *bi;
+> +		int page_len[RESYNC_PAGES];
 >  
->  	do {
-> -		page = __page_cache_alloc(gfp_mask|__GFP_COLD);
-> +		page = page_cache_alloc_huge(mapping, offset, gfp_mask);
-> +no_huge:
-> +		if (!page)
-> +			page = __page_cache_alloc(gfp_mask|__GFP_COLD);
->  		if (!page)
->  			return -ENOMEM;
+>  		if (sbio->bi_end_io != end_sync_read)
+>  			continue;
+>  		/* Now we can 'fixup' the error value */
+>  		sbio->bi_error = 0;
 >  
-> -		ret = add_to_page_cache_lru(page, mapping, offset, gfp_mask & GFP_KERNEL);
-> -		if (ret == 0)
-> +		if (PageTransHuge(page))
-> +			hoffset = round_down(offset, HPAGE_PMD_NR);
-> +		else
-> +			hoffset = offset;
+> +		bio_for_each_segment_all(bi, sbio, j)
+> +			page_len[j] = bi->bv_len;
 > +
-> +		ret = add_to_page_cache_lru(page, mapping, hoffset,
-> +				gfp_mask & GFP_KERNEL);
-> +
-> +		if (ret == -EEXIST && PageTransHuge(page)) {
-> +			put_page(page);
-> +			page = NULL;
-> +			goto no_huge;
-> +		} else if (ret == 0) {
->  			ret = mapping->a_ops->readpage(file, page);
-> -		else if (ret == -EEXIST)
-> +		} else if (ret == -EEXIST) {
->  			ret = 0; /* losing race to add is OK */
-> +		}
->  
->  		put_page(page);
 
-If the filesystem returns AOP_TRUNCATED_PAGE, you'll go round this loop
-again trying the huge page again, even if the huge page didn't work
-the first time.  I would tend to think that if the huge page failed the
-first time, we shouldn't try it again, so I propose this:
+If we record length for each page in resync_pages (don't need offset, because
+it should be 0), we don't need to access the bio_vec too.
 
-        struct address_space *mapping = file->f_mapping;
-        struct page *page;
-        pgoff_t index;
-        int ret;
-        bool try_huge = true;
-
-        do {
-                if (try_huge) {
-                        page = page_cache_alloc_huge(gfp_mask|__GFP_COLD);
-                        if (page)
-                                index = round_down(offset, HPAGE_PMD_NR);
-                        else
-                                try_huge = false;
-                }
-
-                if (!try_huge) {
-                        page = __page_cache_alloc(gfp_mask|__GFP_COLD);
-                        index = offset;
-                }
-
-                if (!page)
-                        return -ENOMEM;
-
-                ret = add_to_page_cache_lru(page, mapping, index,
-                                                        gfp_mask & GFP_KERNEL);
-                if (ret < 0) {
-                        if (try_huge) {
-                                try_huge = false;
-                                ret = AOP_TRUNCATED_PAGE;
-                        } else if (ret == -EEXIST)
-                                ret = 0; /* losing race to add is OK */
-                } else {
-                        ret = mapping->a_ops->readpage(file, page);
-                }
-
-                put_page(page);
-        } while (ret == AOP_TRUNCATED_PAGE);
-
-But ... maybe it's OK to retry the huge page.  I mean, not many
-filesystems return AOP_TRUNCATED_PAGE, and they only do so rarely.
-
-Anyway, I'm fine with the patch going in as-is.  I just wanted to type out
-my review notes.
-
-Reviewed-by: Matthew Wilcox <mawilcox@microsoft.com>
+Thanks,
+Shaohua
