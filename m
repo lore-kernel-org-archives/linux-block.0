@@ -1,60 +1,45 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Christoph Hellwig <hch@lst.de>
-To: linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
-        linux-block@vger.kernel.org
-Subject: [PATCH 12/12] nvme: export the atomic write limit
-Date: Tue, 28 Feb 2017 06:57:37 -0800
-Message-Id: <20170228145737.19016-13-hch@lst.de>
-In-Reply-To: <20170228145737.19016-1-hch@lst.de>
-References: <20170228145737.19016-1-hch@lst.de>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Tue, 28 Feb 2017 11:44:36 -0500
+From: Tejun Heo <tj@kernel.org>
+To: Jan Kara <jack@suse.cz>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
+	Lekshmi Pillai <lekshmicpillai@in.ibm.com>,
+	NeilBrown <neilb@suse.de>, Omar Sandoval <osandov@osandov.com>
+Subject: Re: [PATCH 08/13] bdi: Shutdown writeback on all cgwbs in
+ cgwb_bdi_destroy()
+Message-ID: <20170228164436.GD15287@htj.duckdns.org>
+References: <20170221170958.21845-1-jack@suse.cz>
+ <20170221170958.21845-9-jack@suse.cz>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170221170958.21845-9-jack@suse.cz>
 List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/nvme/host/core.c | 10 ++++++++++
- drivers/nvme/host/nvme.h |  1 +
- 2 files changed, 11 insertions(+)
+Hello,
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 8a3c3e32a704..e86d07589f18 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -926,6 +926,15 @@ static void __nvme_revalidate_disk(struct gendisk *disk, struct nvme_id_ns *id)
- 	ns->pi_type = pi_type;
- 	blk_queue_logical_block_size(ns->queue, bs);
- 
-+	/*
-+	 * Advertisze the maximum atomic write size.  Don't bother with the
-+	 * per-namespace values due to their alignment constraints.
-+	 */
-+	if (ns->ctrl->awupf > 1) {
-+		blk_queue_max_atomic_write_sectors(ns->queue,
-+			(ns->ctrl->awupf + 1) << (ns->lba_shift - 9));
-+	}
-+
- 	if (ns->ms && !blk_get_integrity(disk) && !ns->ext)
- 		nvme_init_integrity(ns);
- 	if (ns->ms && !(ns->ms == 8 && ns->pi_type) && !blk_get_integrity(disk))
-@@ -1232,6 +1241,7 @@ int nvme_init_identify(struct nvme_ctrl *ctrl)
- 
- 	ctrl->vid = le16_to_cpu(id->vid);
- 	ctrl->oncs = le16_to_cpup(&id->oncs);
-+	ctrl->awupf = le16_to_cpu(id->awupf);
- 	atomic_set(&ctrl->abort_limit, id->acl + 1);
- 	ctrl->vwc = id->vwc;
- 	ctrl->cntlid = le16_to_cpup(&id->cntlid);
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index aead6d08ed2c..020ffd6f7863 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -143,6 +143,7 @@ struct nvme_ctrl {
- 	u32 vs;
- 	u32 sgls;
- 	u16 kas;
-+	u16 awupf;
- 	unsigned int kato;
- 	bool subsystem;
- 	unsigned long quirks;
+On Tue, Feb 21, 2017 at 06:09:53PM +0100, Jan Kara wrote:
+> Currently we waited for all cgwbs to get freed in cgwb_bdi_destroy()
+> which also means that writeback has been shutdown on them. Since this
+> wait is going away, directly shutdown writeback on cgwbs from
+> cgwb_bdi_destroy() to avoid live writeback structures after
+> bdi_unregister() has finished.
+
+Hmmm... the only thing which is a bit bothering is that after removing
+the shutdown from release_workfn this would make the final flushing
+sequential, one cgwb at a time, which in certain cases can take an
+unnecessarily long time.  It's not a correctness issue tho and if it
+becomes a problem we can deal with it by splitting wb_shutdown() into
+two pieces - the unregistration / issuing of the work items, and the
+flushing of those.  Other than that, looks good to me.
+
+Acked-by: Tejun Heo <tj@kernel.org>
+
+Thanks.
+
 -- 
-2.11.0
+tejun
