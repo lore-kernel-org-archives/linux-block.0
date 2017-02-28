@@ -1,107 +1,151 @@
-Return-Path: <Damien.LeMoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Shaun Tancheff <shaun@tancheff.com>,
-	Damien Le Moal <damien.lemoal@wdc.com>
-Subject: [PATCH v2] sd: Check for unaligned partial completion
-Date: Tue, 14 Feb 2017 18:00:49 +0900
-Message-Id: <20170214090049.29910-1-damien.lemoal@wdc.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: damien.lemoal@wdc.com
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([65.50.211.133]:45839 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752125AbdB1O6E (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 28 Feb 2017 09:58:04 -0500
+From: Christoph Hellwig <hch@lst.de>
+To: linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: [PATCH 09/12] block: advertize max atomic write limit
+Date: Tue, 28 Feb 2017 06:57:34 -0800
+Message-Id: <20170228145737.19016-10-hch@lst.de>
+In-Reply-To: <20170228145737.19016-1-hch@lst.de>
+References: <20170228145737.19016-1-hch@lst.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Commit "mpt3sas: Force request partial completion alignment" was not
-considering the case of REQ_TYPE_FS commands not operating on sector
-size units (e.g. REQ_OP_ZONE_REPORT and its 64B aligned partial
-replies). This could result is incorrectly retrying (forever) those
-commands.
-
-Move the partial completion alignement check of mpt3sas to sd_done so
-that the check comes after good_bytes & resid corrections of done in
-that function depending on the request command to avoid false positive.
-
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/scsi/mpt3sas/mpt3sas_scsih.c | 15 ---------------
- drivers/scsi/sd.c                    | 20 ++++++++++++++++++++
- 2 files changed, 20 insertions(+), 15 deletions(-)
+ block/blk-settings.c   | 22 ++++++++++++++++++++++
+ block/blk-sysfs.c      | 12 ++++++++++++
+ include/linux/blkdev.h |  9 +++++++++
+ 3 files changed, 43 insertions(+)
 
-diff --git a/drivers/scsi/mpt3sas/mpt3sas_scsih.c b/drivers/scsi/mpt3sas/mpt3sas_scsih.c
-index 0b5b423..1961535 100644
---- a/drivers/scsi/mpt3sas/mpt3sas_scsih.c
-+++ b/drivers/scsi/mpt3sas/mpt3sas_scsih.c
-@@ -4658,7 +4658,6 @@ _scsih_io_done(struct MPT3SAS_ADAPTER *ioc, u16 smid, u8 msix_index, u32 reply)
- 	struct MPT3SAS_DEVICE *sas_device_priv_data;
- 	u32 response_code = 0;
- 	unsigned long flags;
--	unsigned int sector_sz;
+diff --git a/block/blk-settings.c b/block/blk-settings.c
+index 529e55f52a03..9279542472fb 100644
+--- a/block/blk-settings.c
++++ b/block/blk-settings.c
+@@ -93,6 +93,7 @@ void blk_set_default_limits(struct queue_limits *lim)
+ 	lim->virt_boundary_mask = 0;
+ 	lim->max_segment_size = BLK_MAX_SEGMENT_SIZE;
+ 	lim->max_sectors = lim->max_hw_sectors = BLK_SAFE_MAX_SECTORS;
++	lim->max_atomic_write_sectors = 0;
+ 	lim->max_dev_sectors = 0;
+ 	lim->chunk_sectors = 0;
+ 	lim->max_write_same_sectors = 0;
+@@ -129,6 +130,7 @@ void blk_set_stacking_limits(struct queue_limits *lim)
+ 	lim->discard_zeroes_data = 1;
+ 	lim->max_segments = USHRT_MAX;
+ 	lim->max_hw_sectors = UINT_MAX;
++	lim->max_atomic_write_sectors = 0;
+ 	lim->max_segment_size = UINT_MAX;
+ 	lim->max_sectors = UINT_MAX;
+ 	lim->max_dev_sectors = UINT_MAX;
+@@ -258,6 +260,24 @@ void blk_queue_max_hw_sectors(struct request_queue *q, unsigned int max_hw_secto
+ EXPORT_SYMBOL(blk_queue_max_hw_sectors);
  
- 	mpi_reply = mpt3sas_base_get_reply_virt_addr(ioc, reply);
- 	scmd = _scsih_scsi_lookup_get_clear(ioc, smid);
-@@ -4717,20 +4716,6 @@ _scsih_io_done(struct MPT3SAS_ADAPTER *ioc, u16 smid, u8 msix_index, u32 reply)
- 	}
- 
- 	xfer_cnt = le32_to_cpu(mpi_reply->TransferCount);
--
--	/* In case of bogus fw or device, we could end up having
--	 * unaligned partial completion. We can force alignment here,
--	 * then scsi-ml does not need to handle this misbehavior.
--	 */
--	sector_sz = scmd->device->sector_size;
--	if (unlikely(scmd->request->cmd_type == REQ_TYPE_FS && sector_sz &&
--		     xfer_cnt % sector_sz)) {
--		sdev_printk(KERN_INFO, scmd->device,
--		    "unaligned partial completion avoided (xfer_cnt=%u, sector_sz=%u)\n",
--			    xfer_cnt, sector_sz);
--		xfer_cnt = round_down(xfer_cnt, sector_sz);
--	}
--
- 	scsi_set_resid(scmd, scsi_bufflen(scmd) - xfer_cnt);
- 	if (ioc_status & MPI2_IOCSTATUS_FLAG_LOG_INFO_AVAILABLE)
- 		log_info =  le32_to_cpu(mpi_reply->IOCLogInfo);
-diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
-index 1f5d92a..b0cb9c5 100644
---- a/drivers/scsi/sd.c
-+++ b/drivers/scsi/sd.c
-@@ -1790,6 +1790,8 @@ static int sd_done(struct scsi_cmnd *SCpnt)
- {
- 	int result = SCpnt->result;
- 	unsigned int good_bytes = result ? 0 : scsi_bufflen(SCpnt);
-+	unsigned int sector_size = SCpnt->device->sector_size;
-+	unsigned int resid;
- 	struct scsi_sense_hdr sshdr;
- 	struct scsi_disk *sdkp = scsi_disk(SCpnt->request->rq_disk);
- 	struct request *req = SCpnt->request;
-@@ -1829,6 +1831,24 @@ static int sd_done(struct scsi_cmnd *SCpnt)
- 	}
- 	sdkp->medium_access_timed_out = 0;
- 
-+	/*
-+	 * In case of bogus fw or device, we could end up having
-+	 * unaligned partial completion. Check this here and force
-+	 * alignment.
-+	 */
-+	resid = scsi_get_resid(SCpnt);
-+	if (resid & (sector_size - 1)) {
-+		SCSI_LOG_HLCOMPLETE(1, scmd_printk(KERN_INFO, SCpnt,
-+			"Unaligned partial completion (resid=%u, sector_sz=%u)\n",
-+			resid, sector_size));
-+		resid = round_up(resid, sector_size);
-+		if (resid < good_bytes)
-+			good_bytes -= resid;
-+		else
-+			good_bytes = 0;
-+		scsi_set_resid(SCpnt, resid);
-+	}
+ /**
++ * blk_queue_max_atomic_write_sectors - maximum sectors written atomically
++ * @q:  the request queue for the device
++ * @max_hw_sectors:  max hardware sectors in the usual 512b unit
++ *
++ * Description:
++ *    Enables a low level driver to advertise that it supports writing
++ *    multi-sector I/O atomically.  If the driver has any requirements
++ *    in addition to the maximum size it should not set this field to
++ *    indicate that it supports multi-sector atomic writes.
++ **/
++void blk_queue_max_atomic_write_sectors(struct request_queue *q,
++		unsigned int max_atomic_write_sectors)
++{
++	q->limits.max_atomic_write_sectors = max_atomic_write_sectors;
++}
++EXPORT_SYMBOL_GPL(blk_queue_max_atomic_write_sectors);
 +
- 	if (driver_byte(result) != DRIVER_SENSE &&
- 	    (!sense_valid || sense_deferred))
- 		goto out;
++/**
+  * blk_queue_chunk_sectors - set size of the chunk for this queue
+  * @q:  the request queue for the device
+  * @chunk_sectors:  chunk sectors in the usual 512b unit
+@@ -541,6 +561,8 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
+ 	t->max_sectors = min_not_zero(t->max_sectors, b->max_sectors);
+ 	t->max_hw_sectors = min_not_zero(t->max_hw_sectors, b->max_hw_sectors);
+ 	t->max_dev_sectors = min_not_zero(t->max_dev_sectors, b->max_dev_sectors);
++	/* no support for stacking atomic writes */
++	t->max_atomic_write_sectors = 0;
+ 	t->max_write_same_sectors = min(t->max_write_same_sectors,
+ 					b->max_write_same_sectors);
+ 	t->max_write_zeroes_sectors = min(t->max_write_zeroes_sectors,
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index 1dbce057592d..2f39009731f6 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -249,6 +249,12 @@ static ssize_t queue_max_hw_sectors_show(struct request_queue *q, char *page)
+ 	return queue_var_show(max_hw_sectors_kb, (page));
+ }
+ 
++static ssize_t queue_max_atomic_write_sectors_show(struct request_queue *q,
++		char *page)
++{
++	return queue_var_show(queue_max_atomic_write_sectors(q) << 1, page);
++}
++
+ #define QUEUE_SYSFS_BIT_FNS(name, flag, neg)				\
+ static ssize_t								\
+ queue_show_##name(struct request_queue *q, char *page)			\
+@@ -540,6 +546,11 @@ static struct queue_sysfs_entry queue_max_hw_sectors_entry = {
+ 	.show = queue_max_hw_sectors_show,
+ };
+ 
++static struct queue_sysfs_entry queue_max_atomic_write_sectors_entry = {
++	.attr = {.name = "max_atomic_write_sectors_kb", .mode = S_IRUGO },
++	.show = queue_max_atomic_write_sectors_show,
++};
++
+ static struct queue_sysfs_entry queue_max_segments_entry = {
+ 	.attr = {.name = "max_segments", .mode = S_IRUGO },
+ 	.show = queue_max_segments_show,
+@@ -695,6 +706,7 @@ static struct attribute *default_attrs[] = {
+ 	&queue_requests_entry.attr,
+ 	&queue_ra_entry.attr,
+ 	&queue_max_hw_sectors_entry.attr,
++	&queue_max_atomic_write_sectors_entry.attr,
+ 	&queue_max_sectors_entry.attr,
+ 	&queue_max_segments_entry.attr,
+ 	&queue_max_integrity_segments_entry.attr,
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 1ca8e8fd1078..c43d952557f9 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -323,6 +323,7 @@ struct queue_limits {
+ 	unsigned int		alignment_offset;
+ 	unsigned int		io_min;
+ 	unsigned int		io_opt;
++	unsigned int		max_atomic_write_sectors;
+ 	unsigned int		max_discard_sectors;
+ 	unsigned int		max_hw_discard_sectors;
+ 	unsigned int		max_write_same_sectors;
+@@ -1135,6 +1136,8 @@ extern void blk_cleanup_queue(struct request_queue *);
+ extern void blk_queue_make_request(struct request_queue *, make_request_fn *);
+ extern void blk_queue_bounce_limit(struct request_queue *, u64);
+ extern void blk_queue_max_hw_sectors(struct request_queue *, unsigned int);
++extern void blk_queue_max_atomic_write_sectors(struct request_queue *,
++		unsigned int);
+ extern void blk_queue_chunk_sectors(struct request_queue *, unsigned int);
+ extern void blk_queue_max_segments(struct request_queue *, unsigned short);
+ extern void blk_queue_max_segment_size(struct request_queue *, unsigned int);
+@@ -1371,6 +1374,12 @@ static inline unsigned int queue_max_hw_sectors(struct request_queue *q)
+ 	return q->limits.max_hw_sectors;
+ }
+ 
++static inline unsigned int queue_max_atomic_write_sectors(
++		struct request_queue *q)
++{
++	return q->limits.max_atomic_write_sectors;
++}
++
+ static inline unsigned short queue_max_segments(struct request_queue *q)
+ {
+ 	return q->limits.max_segments;
 -- 
-2.9.3
-
-Western Digital Corporation (and its subsidiaries) E-mail Confidentiality Notice & Disclaimer:
-
-This e-mail and any files transmitted with it may contain confidential or legally privileged information of WDC and/or its affiliates, and are intended solely for the use of the individual or entity to which they are addressed. If you are not the intended recipient, any disclosure, copying, distribution or any action taken or omitted to be taken in reliance on it, is prohibited. If you have received this e-mail in error, please notify the sender immediately and delete the e-mail in its entirety from your system.
+2.11.0
