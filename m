@@ -1,63 +1,48 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:59106 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933787AbdBQM7z (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Feb 2017 07:59:55 -0500
-From: Christoph Hellwig <hch@lst.de>
-To: scott.bauer@intel.com, keith.busch@intel.com,
-        jonathan.derrick@intel.com, axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-Subject: [PATCH 1/4] block/sed-opal: tone down not supported warnings
-Date: Fri, 17 Feb 2017 13:59:38 +0100
-Message-Id: <20170217125941.14319-2-hch@lst.de>
-In-Reply-To: <20170217125941.14319-1-hch@lst.de>
-References: <20170217125941.14319-1-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <b.zolnierkie@samsung.com>
+From: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
+To: Linus Walleij <linus.walleij@linaro.org>
+Cc: linux-mmc@vger.kernel.org, Ulf Hansson <ulf.hansson@linaro.org>,
+ Adrian Hunter <adrian.hunter@intel.com>,
+ Paolo Valente <paolo.valente@linaro.org>,
+ Chunyan Zhang <zhang.chunyan@linaro.org>,
+ Baolin Wang <baolin.wang@linaro.org>, linux-block@vger.kernel.org,
+ Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+ Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [PATCH 03/16] mmc: core: refactor mmc_request_done()
+Date: Tue, 28 Feb 2017 15:56:26 +0100
+Message-id: <24010300.RcWSA2N5Oi@amdc3058>
+In-reply-to: <20170209153403.9730-4-linus.walleij@linaro.org>
+MIME-version: 1.0
+Content-type: text/plain; charset=us-ascii
+References: <20170209153403.9730-1-linus.walleij@linaro.org>
+ <20170209153403.9730-4-linus.walleij@linaro.org>
+ <CGME20170228145627epcas1p18fb6390b7ae14a6961fac9703712e0a0@epcas1p1.samsung.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Not having OPAL or a sub-feature supported is an entirely normal
-condition for many drives, so don't warn about it.  Keep the messages,
-but tone them down to debug only.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Scott Bauer <scott.bauer@intel.com>
----
- block/sed-opal.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+On Thursday, February 09, 2017 04:33:50 PM Linus Walleij wrote:
+> We have this construction:
+> 
+> if (a && b && !c)
+>    finalize;
+> else
+>    block;
+>    finalize;
+> 
+> Which is equivalent by boolean logic to:
+> 
+> if (!a || !b || c)
+>    block;
+> finalize;
+> 
+> Which is simpler code.
+> 
+> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
 
-diff --git a/block/sed-opal.c b/block/sed-opal.c
-index e95b8a57053d..bcdd5b6d02e8 100644
---- a/block/sed-opal.c
-+++ b/block/sed-opal.c
-@@ -387,16 +387,16 @@ static int opal_discovery0_end(struct opal_dev *dev)
- 	}
- 
- 	if (!supported) {
--		pr_err("This device is not Opal enabled. Not Supported!\n");
-+		pr_debug("This device is not Opal enabled. Not Supported!\n");
- 		return -EOPNOTSUPP;
- 	}
- 
- 	if (!single_user)
--		pr_warn("Device doesn't support single user mode\n");
-+		pr_debug("Device doesn't support single user mode\n");
- 
- 
- 	if (!found_com_id) {
--		pr_warn("Could not find OPAL comid for device. Returning early\n");
-+		pr_debug("Could not find OPAL comid for device. Returning early\n");
- 		return -EOPNOTSUPP;;
- 	}
- 
-@@ -1951,7 +1951,7 @@ void init_opal_dev(struct opal_dev *opal_dev, sec_send_recv *send_recv)
- 	mutex_init(&opal_dev->dev_lock);
- 	opal_dev->send_recv = send_recv;
- 	if (check_opal_support(opal_dev) < 0)
--		pr_warn("Opal is not supported on this device\n");
-+		pr_debug("Opal is not supported on this device\n");
- 	opal_dev->initialized = true;
- }
- EXPORT_SYMBOL(init_opal_dev);
--- 
-2.11.0
+Reviewed-by: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
+
+Best regards,
+--
+Bartlomiej Zolnierkiewicz
+Samsung R&D Institute Poland
+Samsung Electronics
