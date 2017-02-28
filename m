@@ -1,50 +1,39 @@
-Return-Path: <jack@suse.cz>
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
-	Lekshmi Pillai <lekshmicpillai@in.ibm.com>,
-	Tejun Heo <tj@kernel.org>,
-	NeilBrown <neilb@suse.de>,
-	Omar Sandoval <osandov@osandov.com>,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH 01/13] block: Move bdev_unhash_inode() after invalidate_partition()
-Date: Tue, 21 Feb 2017 18:09:46 +0100
-Message-Id: <20170221170958.21845-2-jack@suse.cz>
-In-Reply-To: <20170221170958.21845-1-jack@suse.cz>
-References: <20170221170958.21845-1-jack@suse.cz>
+Return-Path: <prvs=423213d9ff=jbacik@fb.com>
+From: Josef Bacik <jbacik@fb.com>
+To: <axboe@kernel.dk>, <nbd-general@lists.sourceforge.net>,
+        <linux-block@vger.kernel.org>, <kernel-team@fb.com>
+Subject: [PATCH 4/6] nbd: set queue timeout properly
+Date: Tue, 28 Feb 2017 11:57:09 -0500
+Message-ID: <1488301031-3199-5-git-send-email-jbacik@fb.com>
+In-Reply-To: <1488301031-3199-1-git-send-email-jbacik@fb.com>
+References: <1488301031-3199-1-git-send-email-jbacik@fb.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-Move bdev_unhash_inode() after invalidate_partition() as
-invalidate_partition() looks up bdev and it cannot find the right bdev
-inode after bdev_unhash_inode() is called. Thus invalidate_partition()
-would not invalidate page cache of the previously used bdev. Also use
-part_devt() when calling bdev_unhash_inode() instead of manually
-creating the device number.
+We can't just set the timeout on the tagset, we have to set it on the
+queue as it would have been setup already at this point.
 
-Tested-by: Lekshmi Pillai <lekshmicpillai@in.ibm.com>
-Acked-by: Tejun Heo <tj@kernel.org>
-Signed-off-by: Jan Kara <jack@suse.cz>
+Signed-off-by: Josef Bacik <jbacik@fb.com>
 ---
- block/genhd.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ drivers/block/nbd.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/block/genhd.c b/block/genhd.c
-index d9ccd42f3675..6cb9f3a34a92 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -648,9 +648,8 @@ void del_gendisk(struct gendisk *disk)
- 	disk_part_iter_init(&piter, disk,
- 			     DISK_PITER_INCL_EMPTY | DISK_PITER_REVERSE);
- 	while ((part = disk_part_iter_next(&piter))) {
--		bdev_unhash_inode(MKDEV(disk->major,
--					disk->first_minor + part->partno));
- 		invalidate_partition(disk, part->partno);
-+		bdev_unhash_inode(part_devt(part));
- 		delete_partition(disk, part->partno);
- 	}
- 	disk_part_iter_exit(&piter);
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index 059c80a..ac5a03a 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -909,7 +909,10 @@ static int __nbd_ioctl(struct block_device *bdev, struct nbd_device *nbd,
+ 		nbd_size_set(nbd, nbd->blksize, arg);
+ 		return 0;
+ 	case NBD_SET_TIMEOUT:
+-		nbd->tag_set.timeout = arg * HZ;
++		if (arg) {
++			nbd->tag_set.timeout = arg * HZ;
++			blk_queue_rq_timeout(nbd->disk->queue, arg * HZ);
++		}
+ 		return 0;
+ 
+ 	case NBD_SET_FLAGS:
 -- 
-2.10.2
+2.7.4
