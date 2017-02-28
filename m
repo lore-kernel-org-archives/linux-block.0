@@ -1,136 +1,72 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-To: jack@suse.com
-Cc: hch@infradead.org, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org,
-        Goldwyn Rodrigues <rgoldwyn@suse.com>
-Subject: [PATCH 6/8] nowait aio: ext4
-Date: Tue, 28 Feb 2017 17:36:08 -0600
-Message-Id: <20170228233610.25456-7-rgoldwyn@suse.de>
-In-Reply-To: <20170228233610.25456-1-rgoldwyn@suse.de>
-References: <20170228233610.25456-1-rgoldwyn@suse.de>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail.kernel.org ([198.145.29.136]:46258 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751552AbdB1Xba (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 28 Feb 2017 18:31:30 -0500
+Date: Tue, 28 Feb 2017 15:31:05 -0800
+From: Shaohua Li <shli@kernel.org>
+To: Ming Lei <tom.leiming@gmail.com>
+Cc: Jens Axboe <axboe@fb.com>, linux-raid@vger.kernel.org,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>
+Subject: Re: [PATCH v2 05/13] md: raid1: simplify r1buf_pool_free()
+Message-ID: <20170228233105.npftquaf3fr5sfpl@kernel.org>
+References: <1488296503-4987-1-git-send-email-tom.leiming@gmail.com>
+ <1488296503-4987-6-git-send-email-tom.leiming@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1488296503-4987-6-git-send-email-tom.leiming@gmail.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Goldwyn Rodrigues <rgoldwyn@suse.com>
+On Tue, Feb 28, 2017 at 11:41:35PM +0800, Ming Lei wrote:
+> This patch gets each page's reference of each bio for resync,
+> then r1buf_pool_free() gets simplified a lot.
+> 
+> The same policy has been taken in raid10's buf pool allocation/free
+> too.
 
-Return EAGAIN if any of the following checks fail for direct I/O:
- + i_rwsem is lockable
- + Writing beyond end of file (will trigger allocation)
- + Blocks are not allocated at the write location
+We are going to delete the code, this simplify isn't really required.
 
-Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
----
- fs/ext4/file.c | 53 +++++++++++++++++++++++++++++++++++------------------
- 1 file changed, 35 insertions(+), 18 deletions(-)
-
-diff --git a/fs/ext4/file.c b/fs/ext4/file.c
-index d663d3d..391e03b 100644
---- a/fs/ext4/file.c
-+++ b/fs/ext4/file.c
-@@ -124,27 +124,22 @@ ext4_unaligned_aio(struct inode *inode, struct iov_iter *from, loff_t pos)
- 	return 0;
- }
- 
--/* Is IO overwriting allocated and initialized blocks? */
--static bool ext4_overwrite_io(struct inode *inode, loff_t pos, loff_t len)
-+/* Are IO blocks allocated */
-+static bool ext4_blocks_mapped(struct inode *inode, loff_t pos, loff_t len,
-+				struct ext4_map_blocks *map)
- {
--	struct ext4_map_blocks map;
- 	unsigned int blkbits = inode->i_blkbits;
- 	int err, blklen;
- 
- 	if (pos + len > i_size_read(inode))
- 		return false;
- 
--	map.m_lblk = pos >> blkbits;
--	map.m_len = EXT4_MAX_BLOCKS(len, pos, blkbits);
--	blklen = map.m_len;
-+	map->m_lblk = pos >> blkbits;
-+	map->m_len = EXT4_MAX_BLOCKS(len, pos, blkbits);
-+	blklen = map->m_len;
- 
--	err = ext4_map_blocks(NULL, inode, &map, 0);
--	/*
--	 * 'err==len' means that all of the blocks have been preallocated,
--	 * regardless of whether they have been initialized or not. To exclude
--	 * unwritten extents, we need to check m_flags.
--	 */
--	return err == blklen && (map.m_flags & EXT4_MAP_MAPPED);
-+	err = ext4_map_blocks(NULL, inode, map, 0);
-+	return err == blklen;
- }
- 
- static ssize_t ext4_write_checks(struct kiocb *iocb, struct iov_iter *from)
-@@ -176,6 +171,7 @@ ext4_dax_write_iter(struct kiocb *iocb, struct iov_iter *from)
- 	struct inode *inode = file_inode(iocb->ki_filp);
- 	ssize_t ret;
- 	bool overwrite = false;
-+	struct ext4_map_blocks map;
- 
- 	inode_lock(inode);
- 	ret = ext4_write_checks(iocb, from);
-@@ -188,7 +184,9 @@ ext4_dax_write_iter(struct kiocb *iocb, struct iov_iter *from)
- 	if (ret)
- 		goto out;
- 
--	if (ext4_overwrite_io(inode, iocb->ki_pos, iov_iter_count(from))) {
-+	if (ext4_blocks_mapped(inode, iocb->ki_pos,
-+				iov_iter_count(from), &map) &&
-+	    (map.m_flags & EXT4_MAP_MAPPED)) {
- 		overwrite = true;
- 		downgrade_write(&inode->i_rwsem);
- 	}
-@@ -209,6 +207,7 @@ ext4_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
- {
- 	struct inode *inode = file_inode(iocb->ki_filp);
- 	int o_direct = iocb->ki_flags & IOCB_DIRECT;
-+	int nowait = iocb->ki_flags & IOCB_NOWAIT;
- 	int unaligned_aio = 0;
- 	int overwrite = 0;
- 	ssize_t ret;
-@@ -218,7 +217,13 @@ ext4_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
- 		return ext4_dax_write_iter(iocb, from);
- #endif
- 
--	inode_lock(inode);
-+	if (o_direct && nowait) {
-+		if (!inode_trylock(inode))
-+			return -EAGAIN;
-+	} else {
-+		inode_lock(inode);
-+	}
-+
- 	ret = ext4_write_checks(iocb, from);
- 	if (ret <= 0)
- 		goto out;
-@@ -237,9 +242,21 @@ ext4_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
- 
- 	iocb->private = &overwrite;
- 	/* Check whether we do a DIO overwrite or not */
--	if (o_direct && ext4_should_dioread_nolock(inode) && !unaligned_aio &&
--	    ext4_overwrite_io(inode, iocb->ki_pos, iov_iter_count(from)))
--		overwrite = 1;
-+	if (o_direct && !unaligned_aio) {
-+		struct ext4_map_blocks map;
-+		if (ext4_blocks_mapped(inode, iocb->ki_pos,
-+				      iov_iter_count(from), &map)) {
-+	 		/* To exclude unwritten extents, we need to check
-+			 * m_flags.
-+			 */
-+			if (ext4_should_dioread_nolock(inode) &&
-+			    (map.m_flags & EXT4_MAP_MAPPED))
-+				overwrite = 1;
-+		} else if (iocb->ki_flags & IOCB_NOWAIT) {
-+			ret = -EAGAIN;
-+			goto out;
-+		}
-+	}
- 
- 	ret = __generic_file_write_iter(iocb, from);
- 	inode_unlock(inode);
--- 
-2.10.2
+> 
+> Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+> ---
+>  drivers/md/raid1.c | 15 +++++++--------
+>  1 file changed, 7 insertions(+), 8 deletions(-)
+> 
+> diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
+> index 25c9172db639..c442b4657e2f 100644
+> --- a/drivers/md/raid1.c
+> +++ b/drivers/md/raid1.c
+> @@ -139,9 +139,12 @@ static void * r1buf_pool_alloc(gfp_t gfp_flags, void *data)
+>  	/* If not user-requests, copy the page pointers to all bios */
+>  	if (!test_bit(MD_RECOVERY_REQUESTED, &pi->mddev->recovery)) {
+>  		for (i=0; i<RESYNC_PAGES ; i++)
+> -			for (j=1; j<pi->raid_disks; j++)
+> -				r1_bio->bios[j]->bi_io_vec[i].bv_page =
+> +			for (j=1; j<pi->raid_disks; j++) {
+> +				struct page *page =
+>  					r1_bio->bios[0]->bi_io_vec[i].bv_page;
+> +				get_page(page);
+> +				r1_bio->bios[j]->bi_io_vec[i].bv_page = page;
+> +			}
+>  	}
+>  
+>  	r1_bio->master_bio = NULL;
+> @@ -166,12 +169,8 @@ static void r1buf_pool_free(void *__r1_bio, void *data)
+>  	struct r1bio *r1bio = __r1_bio;
+>  
+>  	for (i = 0; i < RESYNC_PAGES; i++)
+> -		for (j = pi->raid_disks; j-- ;) {
+> -			if (j == 0 ||
+> -			    r1bio->bios[j]->bi_io_vec[i].bv_page !=
+> -			    r1bio->bios[0]->bi_io_vec[i].bv_page)
+> -				safe_put_page(r1bio->bios[j]->bi_io_vec[i].bv_page);
+> -		}
+> +		for (j = pi->raid_disks; j-- ;)
+> +			safe_put_page(r1bio->bios[j]->bi_io_vec[i].bv_page);
+>  	for (i=0 ; i < pi->raid_disks; i++)
+>  		bio_put(r1bio->bios[i]);
+>  
+> -- 
+> 2.7.4
+> 
