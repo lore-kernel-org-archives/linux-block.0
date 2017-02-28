@@ -1,108 +1,165 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:42035 "EHLO
-        mx0b-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1753452AbdBARxU (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 1 Feb 2017 12:53:20 -0500
-Received: from pps.filterd (m0109331.ppops.net [127.0.0.1])
-        by mx0a-00082601.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id v11Hqcrv023532
-        for <linux-block@vger.kernel.org>; Wed, 1 Feb 2017 09:53:19 -0800
-Received: from mail.thefacebook.com ([199.201.64.23])
-        by mx0a-00082601.pphosted.com with ESMTP id 28b7p19y12-2
-        (version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT)
-        for <linux-block@vger.kernel.org>; Wed, 01 Feb 2017 09:53:19 -0800
-Received: from facebook.com (2401:db00:21:603d:face:0:19:0)     by
- mx-out.facebook.com (10.212.236.89) with ESMTP id
- 4fb06176e8a711e6b90e0002c95209d8-e1bf1a50 for <linux-block@vger.kernel.org>;
-        Wed, 01 Feb 2017 09:53:17 -0800
-From: Shaohua Li <shli@fb.com>
-To: <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>
-CC: <bhelgaas@google.com>, <hch@lst.de>, <axboe@fb.com>
-Subject: [PATCH V2 1/3] blk-mq: allocate blk_mq_tags and requests in correct node
-Date: Wed, 1 Feb 2017 09:53:14 -0800
-Message-ID: <a52afb3e09691267f2240331ef0b9962f793703d.1485971427.git.shli@fb.com>
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+From: NeilBrown <neilb@suse.com>
+To: Jeff Layton <jlayton@redhat.com>,
+        Andreas Dilger <adilger@dilger.ca>
+Date: Wed, 01 Mar 2017 07:45:47 +1100
+Cc: linux-block@vger.kernel.org,
+        linux-scsi <linux-scsi@vger.kernel.org>,
+        lsf-pc <lsf-pc@lists.linuxfoundation.org>,
+        Neil Brown <neilb@suse.de>,
+        LKML <linux-kernel@vger.kernel.org>,
+        James Bottomley <James.Bottomley@HansenPartnership.com>,
+        linux-mm <linux-mm@kvack.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>
+Subject: Re: [Lsf-pc] [LSF/MM TOPIC] do we really need PG_error at all?
+In-Reply-To: <1488244308.7627.5.camel@redhat.com>
+References: <1488120164.2948.4.camel@redhat.com> <1488129033.4157.8.camel@HansenPartnership.com> <877f4cr7ew.fsf@notabene.neil.brown.name> <1488151856.4157.50.camel@HansenPartnership.com> <874lzgqy06.fsf@notabene.neil.brown.name> <1488208047.2876.6.camel@redhat.com> <DC27F5BA-BCCA-41FF-8D41-7BB99AA4DB26@dilger.ca> <87varvp5v1.fsf@notabene.neil.brown.name> <1488244308.7627.5.camel@redhat.com>
+Message-ID: <87h93eoxhg.fsf@notabene.neil.brown.name>
 MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: multipart/signed; boundary="=-=-=";
+        micalg=pgp-sha256; protocol="application/pgp-signature"
+Sender: linux-scsi-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-blk_mq_tags/requests of specific hardware queue are mostly used in
-specific cpus, which might not be in the same numa node as disk. For
-example, a nvme card is in node 0. half hardware queue will be used by
-node 0, the other node 1.
+--=-=-=
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Shaohua Li <shli@fb.com>
----
- block/blk-mq.c | 21 +++++++++++++++------
- 1 file changed, 15 insertions(+), 6 deletions(-)
+On Mon, Feb 27 2017, Jeff Layton wrote:
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 48df5fd..888077c 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1666,16 +1666,20 @@ struct blk_mq_tags *blk_mq_alloc_rq_map(struct blk_mq_tag_set *set,
- 					unsigned int reserved_tags)
- {
- 	struct blk_mq_tags *tags;
-+	int node;
-+
-+	node = blk_mq_hw_queue_to_node(set->mq_map, hctx_idx);
-+	if (node == NUMA_NO_NODE)
-+		node = set->numa_node;
- 
--	tags = blk_mq_init_tags(nr_tags, reserved_tags,
--				set->numa_node,
-+	tags = blk_mq_init_tags(nr_tags, reserved_tags, node,
- 				BLK_MQ_FLAG_TO_ALLOC_POLICY(set->flags));
- 	if (!tags)
- 		return NULL;
- 
- 	tags->rqs = kzalloc_node(nr_tags * sizeof(struct request *),
- 				 GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY,
--				 set->numa_node);
-+				 node);
- 	if (!tags->rqs) {
- 		blk_mq_free_tags(tags);
- 		return NULL;
-@@ -1683,7 +1687,7 @@ struct blk_mq_tags *blk_mq_alloc_rq_map(struct blk_mq_tag_set *set,
- 
- 	tags->static_rqs = kzalloc_node(nr_tags * sizeof(struct request *),
- 				 GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY,
--				 set->numa_node);
-+				 node);
- 	if (!tags->static_rqs) {
- 		kfree(tags->rqs);
- 		blk_mq_free_tags(tags);
-@@ -1703,6 +1707,11 @@ int blk_mq_alloc_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
- {
- 	unsigned int i, j, entries_per_page, max_order = 4;
- 	size_t rq_size, left;
-+	int node;
-+
-+	node = blk_mq_hw_queue_to_node(set->mq_map, hctx_idx);
-+	if (node == NUMA_NO_NODE)
-+		node = set->numa_node;
- 
- 	INIT_LIST_HEAD(&tags->page_list);
- 
-@@ -1724,7 +1733,7 @@ int blk_mq_alloc_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
- 			this_order--;
- 
- 		do {
--			page = alloc_pages_node(set->numa_node,
-+			page = alloc_pages_node(node,
- 				GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY | __GFP_ZERO,
- 				this_order);
- 			if (page)
-@@ -1757,7 +1766,7 @@ int blk_mq_alloc_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
- 			if (set->ops->init_request) {
- 				if (set->ops->init_request(set->driver_data,
- 						rq, hctx_idx, i,
--						set->numa_node)) {
-+						node)) {
- 					tags->static_rqs[i] = NULL;
- 					goto fail;
- 				}
--- 
-2.9.3
+> On Tue, 2017-02-28 at 10:32 +1100, NeilBrown wrote:
+>> On Mon, Feb 27 2017, Andreas Dilger wrote:
+>>=20
+>> >=20
+>> > My thought is that PG_error is definitely useful for applications to g=
+et
+>> > correct errors back when doing write()/sync_file_range() so that they =
+know
+>> > there is an error in the data that _they_ wrote, rather than receiving=
+ an
+>> > error for data that may have been written by another thread, and in tu=
+rn
+>> > clearing the error from another thread so it *doesn't* know it had a w=
+rite
+>> > error.
+>>=20
+>> It might be useful in that way, but it is not currently used that way.
+>> Such usage would be a change in visible behaviour.
+>>=20
+>> sync_file_range() calls filemap_fdatawait_range(), which calls
+>> filemap_check_errors().
+>> If there have been any errors in the file recently, inside or outside
+>> the range, the latter will return an error which will propagate up.
+>>=20
+>> >=20
+>> > As for stray sync() clearing PG_error from underneath an application, =
+that
+>> > shouldn't happen since filemap_fdatawait_keep_errors() doesn't clear e=
+rrors
+>> > and is used by device flushing code (fdatawait_one_bdev(), wait_sb_ino=
+des()).
+>>=20
+>> filemap_fdatawait_keep_errors() calls __filemap_fdatawait_range() which
+>> clears PG_error on every page.
+>> What it doesn't do is call filemap_check_errors(), and so doesn't clear
+>> AS_ENOSPC or AS_EIO.
+>>=20
+>>=20
+>
+> I think it's helpful to get a clear idea of what happens now in the face
+> of errors and what we expect to happen, and I don't quite have that yet:
+>
+> --------------------------8<-----------------------------
+> void page_endio(struct page *page, bool is_write, int err)
+> {
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (!is_write) {
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0if (!err) {
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Set=
+PageUptodate(page);
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0} else {
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Cle=
+arPageUptodate(page);
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Set=
+PageError(page);
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0}
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0unlock_page(page);
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0} else {
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0if (err) {
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Set=
+PageError(page);
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if =
+(page->mapping)
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0mapping_set_error(page->mappin=
+g, err);
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0}
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0end_page_writeback(page);
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
+> }
+> --------------------------8<-----------------------------
+>
+> ...not everything uses page_endio, but it's a good place to look since
+> we have both flavors of error handling in one place.
+>
+> On a write error, we SetPageError and set the error in the mapping.
+>
+> What I'm not clear on is:
+>
+> 1) what happens to the page at that point when we get a writeback error?
+> Does it just remain in-core and is allowed to service reads (assuming
+> that it was uptodate before)?
 
+Yes, it remains in core and can service reads.  It is no different from
+a page on which a write recent succeeded, except that the write didn't
+succeed so the contents of backing store might be different from the
+contents of the page.
+
+>
+> Can I redirty it and have it retry the write? Is there standard behavior
+> for this or is it just up to the whim of the filesystem?
+
+Everything is at the whim of the filesystem, but I doubt if many differ
+from the above.
+
+NeilBrown
+
+>
+> I'll probably have questions about the read side as well, but for now it
+> looks like it's mostly used in an ad-hoc way to communicate errors
+> across subsystems (block to fs layer, for instance).
+> --
+> Jeff Layton <jlayton@redhat.com>
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEG8Yp69OQ2HB7X0l6Oeye3VZigbkFAli14XsACgkQOeye3VZi
+gbkAxw/+KrG891w3m+XtN0xeZWu2kOV5dk3TBi4HFmfFjnuZZNRsNJM3XaHip8Xu
+7VjFrARSFgRGcXBlDIosIWDjvN033afHV5Nn7CFPBT3WyJB5IOTDK4290NwH83pg
+6l0y8LJWRdPUu3rsvb82XwzRVldnM0GxqEqJNhN8qAWjFjKJq+MhLdlHvTQ8IpRg
+ZuSIsUB6WbBrOFJTKuTSQiYEUs8sQ0vrMfk4x954Rm7hxLVRz+ohIPnzn/PF4dt8
+gOkeH7wISOaZa7DuWb6b92WvhvRalj9GH6F5D9QAWr0JPq5hAtpxblkppNTmWYmz
+lGYln6XZ8fvxZuZdo4J7Z5f3TwraOWf/BafLag46ni6qSVIQcXtMrvp+AIciYR24
+75W+ai6o5yvwQqzJjg03JPuX2wMK6gxZ5gDmLwRLXMnswHGYdSRLvYPmeVgRN1pZ
+NCsNqQWudPhwSl+glJLQmqjvIFMytrIQYEBxHN2zisZfjML4+wylLMj5K45h5/8H
+2hFIEa71pUl0HeouZkVTOWpKKbTjsjp2xIkyViez1fas/2wDsjr/7PqYT53/87Ms
+4hagW9McbsWGmPhfrWpKSEOPdbI0oNEQ9sOmal+6lSkp+Yt3wGRai+dLm1c3pzfd
+YdH3Y13mM0+m+N/8TULPmES7rGO1qnnPu6M8yOUG1YUi8FnwutI=
+=SfiP
+-----END PGP SIGNATURE-----
+--=-=-=--
