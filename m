@@ -1,84 +1,54 @@
-Return-Path: <linus.walleij@linaro.org>
-Return-Path: <linus.walleij@linaro.org>
-From: Linus Walleij <linus.walleij@linaro.org>
-To: linux-mmc@vger.kernel.org,
-	Ulf Hansson <ulf.hansson@linaro.org>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	Paolo Valente <paolo.valente@linaro.org>
-Cc: Chunyan Zhang <zhang.chunyan@linaro.org>,
-	Baolin Wang <baolin.wang@linaro.org>,
-	linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Linus Walleij <linus.walleij@linaro.org>
-Subject: [PATCH 08/16] mmc: core: do away with is_new_req
-Date: Thu,  9 Feb 2017 16:33:55 +0100
-Message-Id: <20170209153403.9730-9-linus.walleij@linaro.org>
-In-Reply-To: <20170209153403.9730-1-linus.walleij@linaro.org>
-References: <20170209153403.9730-1-linus.walleij@linaro.org>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Christoph Hellwig <hch@lst.de>
+To: linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: [PATCH 01/12] uapi/fs: add O_ATOMIC to the open flags
+Date: Tue, 28 Feb 2017 06:57:26 -0800
+Message-Id: <20170228145737.19016-2-hch@lst.de>
+In-Reply-To: <20170228145737.19016-1-hch@lst.de>
+References: <20170228145737.19016-1-hch@lst.de>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-The host context member "is_new_req" is only assigned values,
-never checked. Delete it.
-
-Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/mmc/core/core.c  | 1 -
- drivers/mmc/core/queue.c | 5 -----
- include/linux/mmc/host.h | 2 --
- 3 files changed, 8 deletions(-)
+ fs/fcntl.c                       | 3 ++-
+ include/uapi/asm-generic/fcntl.h | 2 ++
+ 2 files changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/mmc/core/core.c b/drivers/mmc/core/core.c
-index fcb40ade9b82..933a4d1f20d5 100644
---- a/drivers/mmc/core/core.c
-+++ b/drivers/mmc/core/core.c
-@@ -2985,7 +2985,6 @@ void mmc_unregister_pm_notifier(struct mmc_host *host)
-  */
- void mmc_init_context_info(struct mmc_host *host)
- {
--	host->context_info.is_new_req = false;
- 	host->context_info.is_waiting_last_req = false;
- }
+diff --git a/fs/fcntl.c b/fs/fcntl.c
+index e1c54f20325c..ca5d228be7ea 100644
+--- a/fs/fcntl.c
++++ b/fs/fcntl.c
+@@ -741,7 +741,7 @@ static int __init fcntl_init(void)
+ 	 * Exceptions: O_NONBLOCK is a two bit define on parisc; O_NDELAY
+ 	 * is defined as O_NONBLOCK on some platforms and not on others.
+ 	 */
+-	BUILD_BUG_ON(21 - 1 /* for O_RDONLY being 0 */ != HWEIGHT32(
++	BUILD_BUG_ON(22 - 1 /* for O_RDONLY being 0 */ != HWEIGHT32(
+ 		O_RDONLY	| O_WRONLY	| O_RDWR	|
+ 		O_CREAT		| O_EXCL	| O_NOCTTY	|
+ 		O_TRUNC		| O_APPEND	| /* O_NONBLOCK	| */
+@@ -749,6 +749,7 @@ static int __init fcntl_init(void)
+ 		O_DIRECT	| O_LARGEFILE	| O_DIRECTORY	|
+ 		O_NOFOLLOW	| O_NOATIME	| O_CLOEXEC	|
+ 		__FMODE_EXEC	| O_PATH	| __O_TMPFILE	|
++		O_ATOMIC	|
+ 		__FMODE_NONOTIFY
+ 		));
  
-diff --git a/drivers/mmc/core/queue.c b/drivers/mmc/core/queue.c
-index 73250ed8f093..63927ffd6825 100644
---- a/drivers/mmc/core/queue.c
-+++ b/drivers/mmc/core/queue.c
-@@ -66,7 +66,6 @@ static int mmc_queue_thread(void *d)
- 		req = blk_fetch_request(q);
- 		mq->asleep = false;
- 		cntx->is_waiting_last_req = false;
--		cntx->is_new_req = false;
- 		if (!req) {
- 			/*
- 			 * Dispatch queue is empty so set flags for
-@@ -136,10 +135,6 @@ static void mmc_request_fn(struct request_queue *q)
+diff --git a/include/uapi/asm-generic/fcntl.h b/include/uapi/asm-generic/fcntl.h
+index e063effe0cc1..26ab7622238a 100644
+--- a/include/uapi/asm-generic/fcntl.h
++++ b/include/uapi/asm-generic/fcntl.h
+@@ -92,6 +92,8 @@
+ #define O_TMPFILE (__O_TMPFILE | O_DIRECTORY)
+ #define O_TMPFILE_MASK (__O_TMPFILE | O_DIRECTORY | O_CREAT)      
  
- 	cntx = &mq->card->host->context_info;
- 
--	if (cntx->is_waiting_last_req) {
--		cntx->is_new_req = true;
--	}
--
- 	if (mq->asleep)
- 		wake_up_process(mq->thread);
- }
-diff --git a/include/linux/mmc/host.h b/include/linux/mmc/host.h
-index cbb40682024a..970d7f9b1eba 100644
---- a/include/linux/mmc/host.h
-+++ b/include/linux/mmc/host.h
-@@ -194,11 +194,9 @@ struct mmc_slot {
- 
- /**
-  * mmc_context_info - synchronization details for mmc context
-- * @is_new_req		wake up reason was new request
-  * @is_waiting_last_req	mmc context waiting for single running request
-  */
- struct mmc_context_info {
--	bool			is_new_req;
- 	bool			is_waiting_last_req;
- };
- 
++#define O_ATOMIC	040000000
++
+ #ifndef O_NDELAY
+ #define O_NDELAY	O_NONBLOCK
+ #endif
 -- 
-2.9.3
+2.11.0
