@@ -1,61 +1,42 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f195.google.com ([209.85.192.195]:33974 "EHLO
-        mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751507AbdB1PmU (ORCPT
+Received: from bombadil.infradead.org ([65.50.211.133]:55878 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751737AbdB1Jr4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Feb 2017 10:42:20 -0500
-From: Ming Lei <tom.leiming@gmail.com>
-To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
-        linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Ming Lei <tom.leiming@gmail.com>
-Subject: [PATCH v2 00/14] md: cleanup on direct access to bvec table
-Date: Tue, 28 Feb 2017 23:41:30 +0800
-Message-Id: <1488296503-4987-1-git-send-email-tom.leiming@gmail.com>
+        Tue, 28 Feb 2017 04:47:56 -0500
+Date: Tue, 28 Feb 2017 10:46:43 +0100
+From: Peter Zijlstra <peterz@infradead.org>
+To: Ming Lei <tom.leiming@gmail.com>
+Cc: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        Omar Sandoval <osandov@osandov.com>
+Subject: Re: [PATCH 0/4] blk-mq: cleanup on all kinds of kobjects
+Message-ID: <20170228094643.GE6557@twins.programming.kicks-ass.net>
+References: <1487758442-5855-1-git-send-email-tom.leiming@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1487758442-5855-1-git-send-email-tom.leiming@gmail.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-In MD's resync I/O path, there are lots of direct access to bio's
-bvec table. This patchset kills almost all, and the conversion
-is quite straightforward. One root cause of direct access to bvec
-table is that resync I/O uses the bio's bvec to manage pages.
-In V1, as suggested by Shaohua, a new approach is used to manage
-these pages for resync I/O, turns out code becomes more clean
-and readable.
+On Wed, Feb 22, 2017 at 06:13:58PM +0800, Ming Lei wrote:
+> This patchset cleans up on kojects of request_queue.mq_kobj,
+> sw queue's kobject and hw queue's kobject.
+> 
+> The 1st patch initialized kobject of request_queue and sw queue
+> in blk_mq_init_allocated_queue(), so we can avoid to initialize
+> these kobjects several times, and this patch fixes one kerne
+> warning reported from Omar Sandoval.
+> 
+> The 2nd patch makes lifetime consitent between mq request queue/sw
+> queue and their kobjects.
+> 
+> The 3rd patch makes lifetime consitent between hw queue and their
+> kobjects.
+> 
+> The last patch is a followup of 3rd patch.
 
-Once direct access to bvec table in MD is cleaned up, we may make
-multipage bvec moving on.
+These do indeed make the kobject warnings, and the resulting refcount
+warning, go away.
 
-V2:
-	- remove the patch for introducing/applying bio_remove_last_page()
-
-V1:
-	- allocate page array to manage resync pages
-
-Thanks,
-Ming
-
-Ming Lei (13):
-  block: introduce bio_segments_all()
-  md: raid1/raid10: don't handle failure of bio_add_page()
-  md: move two macros into md.h
-  md: prepare for managing resync I/O pages in clean way
-  md: raid1: simplify r1buf_pool_free()
-  md: raid1: don't use bio's vec table to manage resync pages
-  md: raid1: retrieve page from pre-allocated resync page array
-  md: raid1: use bio helper in process_checks()
-  md: raid1: use bio_segments_all()
-  md: raid10: refactor code of read reshape's .bi_end_io
-  md: raid10: don't use bio's vec table to manage resync pages
-  md: raid10: retrieve page from preallocated resync page array
-  md: raid10: avoid direct access to bvec table in
-    handle_reshape_read_error
-
- drivers/md/md.h     |  59 ++++++++++++++
- drivers/md/raid1.c  | 140 ++++++++++++++++++---------------
- drivers/md/raid10.c | 220 ++++++++++++++++++++++++++++------------------------
- include/linux/bio.h |   7 ++
- 4 files changed, 263 insertions(+), 163 deletions(-)
-
--- 
-2.7.4
+Tested-by: Peter Zijlstra (Intel) <peterz@infradead.org>
