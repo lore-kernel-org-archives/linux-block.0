@@ -1,75 +1,71 @@
-Return-Path: <jack@suse.cz>
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
-	Lekshmi Pillai <lekshmicpillai@in.ibm.com>,
-	Tejun Heo <tj@kernel.org>,
-	NeilBrown <neilb@suse.de>,
-	Omar Sandoval <osandov@osandov.com>,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH 06/13] bdi: Make wb->bdi a proper reference
-Date: Tue, 21 Feb 2017 18:09:51 +0100
-Message-Id: <20170221170958.21845-7-jack@suse.cz>
-In-Reply-To: <20170221170958.21845-1-jack@suse.cz>
-References: <20170221170958.21845-1-jack@suse.cz>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail.kernel.org ([198.145.29.136]:48464 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751598AbdB1XsW (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 28 Feb 2017 18:48:22 -0500
+Date: Tue, 28 Feb 2017 15:42:12 -0800
+From: Shaohua Li <shli@kernel.org>
+To: Ming Lei <tom.leiming@gmail.com>
+Cc: Jens Axboe <axboe@fb.com>, linux-raid@vger.kernel.org,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>
+Subject: Re: [PATCH v2 09/13] md: raid1: use bio_segments_all()
+Message-ID: <20170228234212.3wjwxsegg4v57nxu@kernel.org>
+References: <1488296503-4987-1-git-send-email-tom.leiming@gmail.com>
+ <1488296503-4987-10-git-send-email-tom.leiming@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1488296503-4987-10-git-send-email-tom.leiming@gmail.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Make wb->bdi a proper refcounted reference to bdi for all bdi_writeback
-structures except for the one embedded inside struct backing_dev_info.
-That will allow us to simplify bdi unregistration.
+On Tue, Feb 28, 2017 at 11:41:39PM +0800, Ming Lei wrote:
+> Use this helper, instead of direct access to .bi_vcnt.
 
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- mm/backing-dev.c | 13 +++++++++++--
- 1 file changed, 11 insertions(+), 2 deletions(-)
+what We really need to do for the behind IO is:
+- allocate memory and copy bio data to the memory
+- let behind bio do IO against the memory
 
-diff --git a/mm/backing-dev.c b/mm/backing-dev.c
-index c324eae17f0d..d7aaf2517c30 100644
---- a/mm/backing-dev.c
-+++ b/mm/backing-dev.c
-@@ -294,6 +294,8 @@ static int wb_init(struct bdi_writeback *wb, struct backing_dev_info *bdi,
+The behind bio doesn't need to have the exactly same bio_vec setting. If we
+just track the new memory, we don't need use the bio_segments_all and access
+bio_vec too.
+
+Thanks,
+Shaohua
  
- 	memset(wb, 0, sizeof(*wb));
- 
-+	if (wb != &bdi->wb)
-+		bdi_get(bdi);
- 	wb->bdi = bdi;
- 	wb->last_old_flush = jiffies;
- 	INIT_LIST_HEAD(&wb->b_dirty);
-@@ -314,8 +316,10 @@ static int wb_init(struct bdi_writeback *wb, struct backing_dev_info *bdi,
- 	wb->dirty_sleep = jiffies;
- 
- 	wb->congested = wb_congested_get_create(bdi, blkcg_id, gfp);
--	if (!wb->congested)
--		return -ENOMEM;
-+	if (!wb->congested) {
-+		err = -ENOMEM;
-+		goto out_put_bdi;
-+	}
- 
- 	err = fprop_local_init_percpu(&wb->completions, gfp);
- 	if (err)
-@@ -335,6 +339,9 @@ static int wb_init(struct bdi_writeback *wb, struct backing_dev_info *bdi,
- 	fprop_local_destroy_percpu(&wb->completions);
- out_put_cong:
- 	wb_congested_put(wb->congested);
-+out_put_bdi:
-+	if (wb != &bdi->wb)
-+		bdi_put(bdi);
- 	return err;
- }
- 
-@@ -372,6 +379,8 @@ static void wb_exit(struct bdi_writeback *wb)
- 
- 	fprop_local_destroy_percpu(&wb->completions);
- 	wb_congested_put(wb->congested);
-+	if (wb != &wb->bdi->wb)
-+		bdi_put(wb->bdi);
- }
- 
- #ifdef CONFIG_CGROUP_WRITEBACK
--- 
-2.10.2
+> Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+> ---
+>  drivers/md/raid1.c | 7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
+> index 316bd6dd6cc1..7396c99ff7b1 100644
+> --- a/drivers/md/raid1.c
+> +++ b/drivers/md/raid1.c
+> @@ -1091,7 +1091,8 @@ static void alloc_behind_pages(struct bio *bio, struct r1bio *r1_bio)
+>  {
+>  	int i;
+>  	struct bio_vec *bvec;
+> -	struct bio_vec *bvecs = kzalloc(bio->bi_vcnt * sizeof(struct bio_vec),
+> +	unsigned vcnt = bio_segments_all(bio);
+> +	struct bio_vec *bvecs = kzalloc(vcnt * sizeof(struct bio_vec),
+>  					GFP_NOIO);
+>  	if (unlikely(!bvecs))
+>  		return;
+> @@ -1107,12 +1108,12 @@ static void alloc_behind_pages(struct bio *bio, struct r1bio *r1_bio)
+>  		kunmap(bvec->bv_page);
+>  	}
+>  	r1_bio->behind_bvecs = bvecs;
+> -	r1_bio->behind_page_count = bio->bi_vcnt;
+> +	r1_bio->behind_page_count = vcnt;
+>  	set_bit(R1BIO_BehindIO, &r1_bio->state);
+>  	return;
+>  
+>  do_sync_io:
+> -	for (i = 0; i < bio->bi_vcnt; i++)
+> +	for (i = 0; i < vcnt; i++)
+>  		if (bvecs[i].bv_page)
+>  			put_page(bvecs[i].bv_page);
+>  	kfree(bvecs);
+> -- 
+> 2.7.4
+> 
