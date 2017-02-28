@@ -1,113 +1,81 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga06.intel.com ([134.134.136.31]:26594 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750800AbdA1IkL (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 28 Jan 2017 03:40:11 -0500
-Subject: [RFC PATCH 00/17] introduce a dax_inode for dax_operations
-From: Dan Williams <dan.j.williams@intel.com>
-To: linux-nvdimm@lists.01.org
-Cc: snitzer@redhat.com, toshi.kani@hpe.com, mawilcox@microsoft.com,
-        linux-block@vger.kernel.org, jmoyer@redhat.com,
-        linux-fsdevel@vger.kernel.org, ross.zwisler@linux.intel.com,
-        hch@lst.de
-Date: Sat, 28 Jan 2017 00:36:04 -0800
-Message-ID: <148559256378.11180.8957776806175202312.stgit@dwillia2-desk3.amr.corp.intel.com>
+Received: from mail-ua0-f170.google.com ([209.85.217.170]:36113 "EHLO
+        mail-ua0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751781AbdB1IZk (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 28 Feb 2017 03:25:40 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <yq1fuj44geq.fsf@oracle.com>
+References: <CAOi1vP8M91kiF-FnT=EoJgTxfstMEsC-nhLY5KtRkrKROjWPWA@mail.gmail.com>
+ <yq1efyq25y2.fsf@oracle.com> <CAOi1vP-amFyFHbPV3FhG3F1Tp+df6V7a4mcP8LLWY0GZx+JsFw@mail.gmail.com>
+ <yq1fuj44geq.fsf@oracle.com>
+From: Ilya Dryomov <idryomov@gmail.com>
+Date: Tue, 28 Feb 2017 09:19:14 +0100
+Message-ID: <CAOi1vP_g-MMe9XvWDgkVL4R6UjckMQVC_CDF9+hQEpZbxwx0Jw@mail.gmail.com>
+Subject: Re: blk_integrity_revalidate() clears BDI_CAP_STABLE_WRITES
+To: "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: Ceph Development <ceph-devel@vger.kernel.org>,
+        linux-block@vger.kernel.org,
+        Dan Williams <dan.j.williams@intel.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Mike Snitzer <snitzer@redhat.com>, Jens Axboe <axboe@fb.com>,
+        linux-nvme@lists.infradead.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Recently there was an effort to introduce dax_operations to unwind the
-abuse of the user-copy api in the pmem api [1]. Christoph noted that we
-should not add new block-dax operations as it is further abuse of struct
-block_device [2].
+On Fri, Feb 24, 2017 at 12:49 AM, Martin K. Petersen
+<martin.petersen@oracle.com> wrote:
+>>>>>> "Ilya" == Ilya Dryomov <idryomov@gmail.com> writes:
+>
+> Ilya,
+>
+> Ilya> Well, blk_integrity_revalidate() doesn't clear the profile, it
+> Ilya> just clears the stable pages flag.  Whoever calls
+> Ilya> blk_integrity_unregister() to clear the profile can also clear the
+> Ilya> stable pages flag -- why not let blk_integrity_unregister() clear
+> Ilya> the flag like I suggested?
+>
+> That's what it used to do.
+>
+> blk_integrity_revalidate() was obviously introduced to overcome some
+> problem. Unfortunately, I can't recall what that was and Google isn't
+> being particularly helpful. I suspect it was either in the NVDIMM or
+> NVMe camps since that's where the churn was.
 
-The ->direct_access() method in block_device_operations was an expedient
-way to get the filesystem-dax capability bootstrapped. However, looking
-forward to native persistent memory filesystems, they can forgo the
-block layer and mount directly on a provider of dax services, a dax
-inode.
+Adding more people from 25520d55cdb6 -- does anyone remember the story
+behind blk_integrity_revalidate()?
 
-For the time being, since current dax capable filesystems are block
-based, we need a facility to look up this dax object via the
-block-device name. If this approach looks reasonable I'll follow up with
-reworking the proposed ->copy_from_iter(), ->flush(), and ->clear() dax
-operations into this new scheme.
+>
+> I don't have a problem with your patch as long as we're sure there are
+> no regressions. I would carry the gendisk check over, though.
 
-These patches survive a run of the libnvdimm unit tests, but I have not
-tested the non-libnvdimm dax drivers.
+I spent quite some time trying to do basic tests on nvme, since it uses
+both nop_profile and real integrity profiles.  Unfortunately I don't
+have access to an nvme card with separate-metadata capability and
+upstream qemu driver doesn't support any metadata capabilities at all,
+so I turned to https://github.com/OpenChannelSSD/qemu-nvme.  It lets
+you configure mc and multiple lbafs, but
 
-[1]: https://lists.01.org/pipermail/linux-nvdimm/2017-January/008586.html
-[2]: https://lists.01.org/pipermail/linux-nvdimm/2017-January/008638.html
+    commit ff646a5841f743fdd9cfef138ac6be1f0ba4fbfb
+    Author: Keith Busch <keith.busch@intel.com> Thu Oct 23 20:02:44 2014
 
----
+    As part of this, I am removing all meta-data support. It's not well
+    supported in any immediatly available operating system, so the code
+    is not well tested.
 
-Dan Williams (17):
-      dax: refactor dax-fs into a generic provider of dax inodes
-      dax: convert dax_inode locking to srcu
-      dax: add a facility to lookup a dax inode by 'host' device name
-      dax: introduce dax_operations
-      pmem: add dax_operations support
-      axon_ram: add dax_operations support
-      brd: add dax_operations support
-      dcssblk: add dax_operations support
-      block: kill bdev_dax_capable()
-      block: introduce bdev_dax_direct_access()
-      dm: add dax_operations support (producer)
-      dm: add dax_operations support (consumer)
-      fs: update mount_bdev() to lookup dax infrastructure
-      ext2, ext4, xfs: retrieve dax_inode through iomap operations
-      Revert "block: use DAX for partition table reads"
-      fs, dax: convert filesystem-dax to bdev_dax_direct_access
-      block: remove block_device_operations.direct_access and related infrastructure
+In the end I got it into a semi-working state by checking out an old
+version and dropping some sanity checks.  I formatted the namespace in
+a number of ways -- bdi/stable_pages_required and integrity/format
+behaved as expected ("none", "nop", "T10-DIF-TYPE1-CRC").
 
+Given the above, I'm not sure what the baseline is -- blk_integrity
+code isn't invoked for data-only lbafs.  Could nvme folks please look
+at this?  rbd regression caused by integrity revalidate change goes
+back to 4.4 and I'd really like to get it fixed.  The proposed patch
+is attached to my earlier reply on linux-block.
 
- arch/powerpc/platforms/Kconfig  |    1 
- arch/powerpc/sysdev/axonram.c   |   37 +++
- block/Kconfig                   |    1 
- block/partition-generic.c       |   17 --
- drivers/Makefile                |    2 
- drivers/block/Kconfig           |    1 
- drivers/block/brd.c             |   48 +++-
- drivers/dax/Kconfig             |    9 +
- drivers/dax/Makefile            |    5 
- drivers/dax/dax.h               |   19 +-
- drivers/dax/device-dax.h        |   25 ++
- drivers/dax/device.c            |  257 ++++-------------------
- drivers/dax/pmem.c              |    2 
- drivers/dax/super.c             |  434 +++++++++++++++++++++++++++++++++++++++
- drivers/md/Kconfig              |    1 
- drivers/md/dm-core.h            |    3 
- drivers/md/dm-linear.c          |   15 +
- drivers/md/dm-snap.c            |    8 +
- drivers/md/dm-stripe.c          |   16 +
- drivers/md/dm-table.c           |    2 
- drivers/md/dm-target.c          |   10 +
- drivers/md/dm.c                 |   43 +++-
- drivers/nvdimm/Kconfig          |    1 
- drivers/nvdimm/pmem.c           |   46 +++-
- drivers/nvdimm/pmem.h           |    7 -
- drivers/s390/block/Kconfig      |    1 
- drivers/s390/block/dcssblk.c    |   41 +++-
- fs/block_dev.c                  |   75 ++-----
- fs/dax.c                        |  149 ++++++-------
- fs/ext2/inode.c                 |    1 
- fs/ext4/inode.c                 |    1 
- fs/iomap.c                      |    3 
- fs/super.c                      |   32 +++
- fs/xfs/xfs_aops.c               |   13 +
- fs/xfs/xfs_aops.h               |    1 
- fs/xfs/xfs_buf.h                |    1 
- fs/xfs/xfs_iomap.c              |    1 
- fs/xfs/xfs_super.c              |    3 
- include/linux/blkdev.h          |    7 -
- include/linux/dax.h             |   29 ++-
- include/linux/device-mapper.h   |   16 +
- include/linux/fs.h              |    1 
- include/linux/iomap.h           |    1 
- tools/testing/nvdimm/Kbuild     |    6 -
- tools/testing/nvdimm/pmem-dax.c |   12 -
- 45 files changed, 927 insertions(+), 477 deletions(-)
- create mode 100644 drivers/dax/device-dax.h
- rename drivers/dax/{dax.c => device.c} (74%)
- create mode 100644 drivers/dax/super.c
+Thanks,
+
+                Ilya
