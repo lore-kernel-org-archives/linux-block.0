@@ -1,75 +1,98 @@
-Return-Path: <linus.walleij@linaro.org>
-Return-Path: <linus.walleij@linaro.org>
-From: Linus Walleij <linus.walleij@linaro.org>
-To: linux-mmc@vger.kernel.org,
-	Ulf Hansson <ulf.hansson@linaro.org>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	Paolo Valente <paolo.valente@linaro.org>
-Cc: Chunyan Zhang <zhang.chunyan@linaro.org>,
-	Baolin Wang <baolin.wang@linaro.org>,
-	linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Linus Walleij <linus.walleij@linaro.org>
-Subject: [PATCH 01/16] mmc: core: move some code in mmc_start_areq()
-Date: Thu,  9 Feb 2017 16:33:48 +0100
-Message-Id: <20170209153403.9730-2-linus.walleij@linaro.org>
-In-Reply-To: <20170209153403.9730-1-linus.walleij@linaro.org>
-References: <20170209153403.9730-1-linus.walleij@linaro.org>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from userp1040.oracle.com ([156.151.31.81]:34399 "EHLO
+        userp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751756AbdB1XWU (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 28 Feb 2017 18:22:20 -0500
+Date: Tue, 28 Feb 2017 15:22:04 -0800
+From: "Darrick J. Wong" <darrick.wong@oracle.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: Re: [RFC] failure atomic writes for file systems and block devices
+Message-ID: <20170228232204.GB5269@birch.djwong.org>
+References: <20170228145737.19016-1-hch@lst.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170228145737.19016-1-hch@lst.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-"previous" is a better name for the variable storing the previous
-asynchronous request, better than the opaque name "data" atleast.
-We see that we assign the return status to the returned variable
-on all code paths, so we might as well just do that immediately
-after calling mmc_finalize_areq().
+On Tue, Feb 28, 2017 at 06:57:25AM -0800, Christoph Hellwig wrote:
+> Hi all,
+> 
+> this series implements a new O_ATOMIC flag for failure atomic writes
+> to files.   It is based on and tries to unify to earlier proposals,
+> the first one for block devices by Chris Mason:
+> 
+> 	https://lwn.net/Articles/573092/
+> 
+> and the second one for regular files, published by HP Research at
+> Usenix FAST 2015:
+> 
+> 	https://www.usenix.org/conference/fast15/technical-sessions/presentation/verma
+> 
+> It adds a new O_ATOMIC flag for open, which requests writes to be
+> failure-atomic, that is either the whole write makes it to persistent
+> storage, or none of it, even in case of power of other failures.
+> 
+> There are two implementation various of this:  on block devices O_ATOMIC
+> must be combined with O_(D)SYNC so that storage devices that can handle
+> large writes atomically can simply do that without any additional work.
+> This case is supported by NVMe.
+> 
+> The second case is for file systems, where we simply write new blocks
+> out of places and then remap them into the file atomically on either
+> completion of an O_(D)SYNC write or when fsync is called explicitly.
+> 
+> The semantics of the latter case are explained in detail at the Usenix
+> paper above.
 
-Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
----
- drivers/mmc/core/core.c | 13 +++++--------
- 1 file changed, 5 insertions(+), 8 deletions(-)
+(Assuming there's no syncv involved here...?)
 
-diff --git a/drivers/mmc/core/core.c b/drivers/mmc/core/core.c
-index 41b4cd01fccc..53065d1cebf7 100644
---- a/drivers/mmc/core/core.c
-+++ b/drivers/mmc/core/core.c
-@@ -683,7 +683,7 @@ struct mmc_async_req *mmc_start_areq(struct mmc_host *host,
- {
- 	enum mmc_blk_status status;
- 	int start_err = 0;
--	struct mmc_async_req *data = host->areq;
-+	struct mmc_async_req *previous = host->areq;
- 
- 	/* Prepare a new request */
- 	if (areq)
-@@ -691,13 +691,12 @@ struct mmc_async_req *mmc_start_areq(struct mmc_host *host,
- 
- 	/* Finalize previous request */
- 	status = mmc_finalize_areq(host);
-+	if (ret_stat)
-+		*ret_stat = status;
- 
- 	/* The previous request is still going on... */
--	if (status == MMC_BLK_NEW_REQUEST) {
--		if (ret_stat)
--			*ret_stat = status;
-+	if (status == MMC_BLK_NEW_REQUEST)
- 		return NULL;
--	}
- 
- 	/* Fine so far, start the new request! */
- 	if (status == MMC_BLK_SUCCESS && areq)
-@@ -716,9 +715,7 @@ struct mmc_async_req *mmc_start_areq(struct mmc_host *host,
- 	else
- 		host->areq = areq;
- 
--	if (ret_stat)
--		*ret_stat = status;
--	return data;
-+	return previous;
- }
- EXPORT_SYMBOL(mmc_start_areq);
- 
--- 
-2.9.3
+> Last but not least a new fcntl is implemented to provide information
+> about I/O restrictions such as alignment requirements and the maximum
+> atomic write size.
+> 
+> The implementation is simple and clean, but I'm rather unhappy about
+> the interface as it has too many failure modes to bullet proof.  For
+> one old kernels ignore unknown open flags silently, so applications
+
+Ok, heh, disregard my review comment (for the xfs part) about the
+seemingly insufficient O_ATOMIC validation.
+
+> have to check the F_IOINFO fcntl before, which is a bit of a killer.
+> Because of that I've also not implemented any other validity checks
+> yet, as they might make thing even worse when an open on a not supported
+> file system or device fails, but not on an old kernel.  Maybe we need
+> a new open version that checks arguments properly first?
+
+Does fcntl(F_SETFL...) suffer from this?
+
+> Also I'm really worried about the NVMe failure modes - devices simply
+> advertise an atomic write size, with no way for the device to know
+> that the host requested a given write to be atomic, and thus no
+> error reporting.
+
+Yikes!
+
+> This is made worse by NVMe 1.2 adding per-namespace
+> atomic I/O parameters that devices can use to introduce additional
+> odd alignment quirks - while there is some language in the spec
+> requiring them not to weaken the per-controller guarantees it all
+> looks rather weak and I'm not too confident in all implementations
+> getting everything right.
+> 
+> Last but not least this depends on a few XFS patches, so to actually
+> apply / run the patches please use this git tree:
+
+Well, the XFS parts don't look too bad....
+
+--D
+
+> 
+>     git://git.infradead.org/users/hch/vfs.git O_ATOMIC
+> 
+> Gitweb:
+> 
+>     http://git.infradead.org/users/hch/vfs.git/shortlog/refs/heads/O_ATOMIC
