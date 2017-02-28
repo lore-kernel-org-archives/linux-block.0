@@ -1,46 +1,46 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f193.google.com ([209.85.192.193]:34449 "EHLO
-        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751326AbdBXPnN (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 24 Feb 2017 10:43:13 -0500
-From: Ming Lei <tom.leiming@gmail.com>
-To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
-        linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>
-Cc: Ming Lei <tom.leiming@gmail.com>
-Subject: [PATCH v1 01/14] block: introduce bio_segments_all()
-Date: Fri, 24 Feb 2017 23:42:38 +0800
-Message-Id: <1487950971-1131-2-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1487950971-1131-1-git-send-email-tom.leiming@gmail.com>
-References: <1487950971-1131-1-git-send-email-tom.leiming@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Tue, 28 Feb 2017 11:52:14 -0500
+From: Tejun Heo <tj@kernel.org>
+To: Jan Kara <jack@suse.cz>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
+	Lekshmi Pillai <lekshmicpillai@in.ibm.com>,
+	NeilBrown <neilb@suse.de>, Omar Sandoval <osandov@osandov.com>
+Subject: Re: [PATCH 11/13] block: Fix oops in
+ locked_inode_to_wb_and_lock_list()
+Message-ID: <20170228165214.GG15287@htj.duckdns.org>
+References: <20170221170958.21845-1-jack@suse.cz>
+ <20170221170958.21845-12-jack@suse.cz>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170221170958.21845-12-jack@suse.cz>
+List-ID: <linux-block@vger.kernel.org>
 
-So that we can replace the direct access to .bi_vcnt.
+On Tue, Feb 21, 2017 at 06:09:56PM +0100, Jan Kara wrote:
+> When block device is closed, we call inode_detach_wb() in __blkdev_put()
+> which sets inode->i_wb to NULL. That is contrary to expectations that
+> inode->i_wb stays valid once set during the whole inode's lifetime and
+> leads to oops in wb_get() in locked_inode_to_wb_and_lock_list() because
+> inode_to_wb() returned NULL.
+> 
+> The reason why we called inode_detach_wb() is not valid anymore though.
+> BDI is guaranteed to stay along until we call bdi_put() from
+> bdev_evict_inode() so we can postpone calling inode_detach_wb() to that
+> moment.
+> 
+> Also add a warning to catch if someone uses inode_detach_wb() in a
+> dangerous way.
+> 
+> Reported-by: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
+> Signed-off-by: Jan Kara <jack@suse.cz>
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
----
- include/linux/bio.h | 7 +++++++
- 1 file changed, 7 insertions(+)
+Acked-by: Tejun Heo <tj@kernel.org>
 
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 8e521194f6fc..3364b3ed90e7 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -293,6 +293,13 @@ static inline void bio_get_last_bvec(struct bio *bio, struct bio_vec *bv)
- 		bv->bv_len = iter.bi_bvec_done;
- }
- 
-+static inline unsigned bio_segments_all(struct bio *bio)
-+{
-+	WARN_ON_ONCE(bio_flagged(bio, BIO_CLONED));
-+
-+	return bio->bi_vcnt;
-+}
-+
- enum bip_flags {
- 	BIP_BLOCK_INTEGRITY	= 1 << 0, /* block layer owns integrity data */
- 	BIP_MAPPED_INTEGRITY	= 1 << 1, /* ref tag has been remapped */
+Thanks.
+
 -- 
-2.7.4
+tejun
