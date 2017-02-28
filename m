@@ -1,46 +1,40 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f65.google.com ([74.125.83.65]:35114 "EHLO
-        mail-pg0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751660AbdB1PmU (ORCPT
+Received: from mail-ua0-f196.google.com ([209.85.217.196]:33828 "EHLO
+        mail-ua0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752337AbdB1M1a (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Feb 2017 10:42:20 -0500
+        Tue, 28 Feb 2017 07:27:30 -0500
+MIME-Version: 1.0
+In-Reply-To: <20170225182216.GB26447@infradead.org>
+References: <1487950971-1131-1-git-send-email-tom.leiming@gmail.com>
+ <1487950971-1131-2-git-send-email-tom.leiming@gmail.com> <20170225182216.GB26447@infradead.org>
 From: Ming Lei <tom.leiming@gmail.com>
-To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
-        linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Ming Lei <tom.leiming@gmail.com>
-Subject: [PATCH v2 01/13] block: introduce bio_segments_all()
-Date: Tue, 28 Feb 2017 23:41:31 +0800
-Message-Id: <1488296503-4987-2-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1488296503-4987-1-git-send-email-tom.leiming@gmail.com>
-References: <1488296503-4987-1-git-send-email-tom.leiming@gmail.com>
+Date: Tue, 28 Feb 2017 20:15:37 +0800
+Message-ID: <CACVXFVMjf0trmc8jggdYUm8k1HS+vHa26=godzJ-jQ_23yha0w@mail.gmail.com>
+Subject: Re: [PATCH v1 01/14] block: introduce bio_segments_all()
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "open list:SOFTWARE RAID (Multiple Disks) SUPPORT"
+        <linux-raid@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-So that we can replace the direct access to .bi_vcnt.
+On Sun, Feb 26, 2017 at 2:22 AM, Christoph Hellwig <hch@infradead.org> wrote:
+>> +static inline unsigned bio_segments_all(struct bio *bio)
+>> +{
+>> +     WARN_ON_ONCE(bio_flagged(bio, BIO_CLONED));
+>> +
+>> +     return bio->bi_vcnt;
+>> +}
+>
+> I don't think this helpers really adds any benefit.
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
----
- include/linux/bio.h | 7 +++++++
- 1 file changed, 7 insertions(+)
+IMO the first benefit is that misusing of .bi_vcnt can be warned, and
+another one is that we have to introduce this helper if multipage bvec
+is supported.
 
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 8e521194f6fc..3364b3ed90e7 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -293,6 +293,13 @@ static inline void bio_get_last_bvec(struct bio *bio, struct bio_vec *bv)
- 		bv->bv_len = iter.bi_bvec_done;
- }
- 
-+static inline unsigned bio_segments_all(struct bio *bio)
-+{
-+	WARN_ON_ONCE(bio_flagged(bio, BIO_CLONED));
-+
-+	return bio->bi_vcnt;
-+}
-+
- enum bip_flags {
- 	BIP_BLOCK_INTEGRITY	= 1 << 0, /* block layer owns integrity data */
- 	BIP_MAPPED_INTEGRITY	= 1 << 1, /* ref tag has been remapped */
--- 
-2.7.4
+Thanks,
+Ming Lei
