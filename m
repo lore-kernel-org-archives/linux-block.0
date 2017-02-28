@@ -1,68 +1,95 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-Message-ID: <1488129033.4157.8.camel@HansenPartnership.com>
-Subject: Re: [LSF/MM TOPIC] do we really need PG_error at all?
-From: James Bottomley <James.Bottomley@HansenPartnership.com>
-To: Jeff Layton <jlayton@redhat.com>, linux-mm <linux-mm@kvack.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Cc: lsf-pc <lsf-pc@lists.linuxfoundation.org>,
-        Neil Brown <neilb@suse.de>,
-        linux-scsi <linux-scsi@vger.kernel.org>,
-        linux-block@vger.kernel.org
-Date: Sun, 26 Feb 2017 09:10:33 -0800
-In-Reply-To: <1488120164.2948.4.camel@redhat.com>
-References: <1488120164.2948.4.camel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Sender: linux-scsi-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pg0-f65.google.com ([74.125.83.65]:36605 "EHLO
+        mail-pg0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752366AbdB1Pmw (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 28 Feb 2017 10:42:52 -0500
+From: Ming Lei <tom.leiming@gmail.com>
+To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
+        linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Ming Lei <tom.leiming@gmail.com>
+Subject: [PATCH v2 12/13] md: raid10: retrieve page from preallocated resync page array
+Date: Tue, 28 Feb 2017 23:41:42 +0800
+Message-Id: <1488296503-4987-13-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1488296503-4987-1-git-send-email-tom.leiming@gmail.com>
+References: <1488296503-4987-1-git-send-email-tom.leiming@gmail.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-[added linux-scsi and linux-block because this is part of our error
-handling as well]
-On Sun, 2017-02-26 at 09:42 -0500, Jeff Layton wrote:
-> Proposing this as a LSF/MM TOPIC, but it may turn out to be me just 
-> not understanding the semantics here.
-> 
-> As I was looking into -ENOSPC handling in cephfs, I noticed that
-> PG_error is only ever tested in one place [1] 
-> __filemap_fdatawait_range, which does this:
-> 
-> 	if (TestClearPageError(page))
-> 		ret = -EIO;
-> 
-> This error code will override any AS_* error that was set in the
-> mapping. Which makes me wonder...why don't we just set this error in 
-> the mapping and not bother with a per-page flag? Could we potentially
-> free up a page flag by eliminating this?
+Now one page array is allocated for each resync bio, and we can
+retrieve page from this table directly.
 
-Note that currently the AS_* codes are only set for write errors not
-for reads and we have no mapping error handling at all for swap pages,
-but I'm sure this is fixable.
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+---
+ drivers/md/raid10.c | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
 
->From the I/O layer point of view we take great pains to try to pinpoint
-the error exactly to the sector.  We reflect this up by setting the
-PG_error flag on the page where the error occurred.  If we only set the
-error on the mapping, we lose that granularity, because the mapping is
-mostly at the file level (or VMA level for anon pages).
-
-So I think the question for filesystem people from us would be do you
-care about this accuracy?  If it's OK just to know an error occurred
-somewhere in this file, then perhaps we don't need it.
-
-James
-
-> The main argument I could see for keeping it is that removing it 
-> might subtly change the behavior of sync_file_range if you have tasks
-> syncing different ranges in a file concurrently. I'm not sure if that 
-> would break any guarantees though.
-> 
-> Even if we do need it, I think we might need some cleanup here 
-> anyway. A lot of readpage operations end up setting that flag when 
-> they hit an error. Isn't it wrong to return an error on fsync, just 
-> because we had a read error somewhere in the file in a range that was
-> never dirtied?
-> 
-> --
-> [1]: there is another place in f2fs, but it's more or less equivalent 
-> to the call site in __filemap_fdatawait_range.
-> 
+diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
+index f887b21332e7..0b97631e3905 100644
+--- a/drivers/md/raid10.c
++++ b/drivers/md/raid10.c
+@@ -2065,6 +2065,7 @@ static void sync_request_write(struct mddev *mddev, struct r10bio *r10_bio)
+ 	int i, first;
+ 	struct bio *tbio, *fbio;
+ 	int vcnt;
++	struct page **tpages, **fpages;
+ 
+ 	atomic_set(&r10_bio->remaining, 1);
+ 
+@@ -2080,6 +2081,7 @@ static void sync_request_write(struct mddev *mddev, struct r10bio *r10_bio)
+ 	fbio = r10_bio->devs[i].bio;
+ 	fbio->bi_iter.bi_size = r10_bio->sectors << 9;
+ 	fbio->bi_iter.bi_idx = 0;
++	fpages = get_resync_pages(fbio)->pages;
+ 
+ 	vcnt = (r10_bio->sectors + (PAGE_SIZE >> 9) - 1) >> (PAGE_SHIFT - 9);
+ 	/* now find blocks with errors */
+@@ -2094,6 +2096,8 @@ static void sync_request_write(struct mddev *mddev, struct r10bio *r10_bio)
+ 			continue;
+ 		if (i == first)
+ 			continue;
++
++		tpages = get_resync_pages(tbio)->pages;
+ 		d = r10_bio->devs[i].devnum;
+ 		rdev = conf->mirrors[d].rdev;
+ 		if (!r10_bio->devs[i].bio->bi_error) {
+@@ -2106,8 +2110,8 @@ static void sync_request_write(struct mddev *mddev, struct r10bio *r10_bio)
+ 				int len = PAGE_SIZE;
+ 				if (sectors < (len / 512))
+ 					len = sectors * 512;
+-				if (memcmp(page_address(fbio->bi_io_vec[j].bv_page),
+-					   page_address(tbio->bi_io_vec[j].bv_page),
++				if (memcmp(page_address(fpages[j]),
++					   page_address(tpages[j]),
+ 					   len))
+ 					break;
+ 				sectors -= len/512;
+@@ -2205,6 +2209,7 @@ static void fix_recovery_read_error(struct r10bio *r10_bio)
+ 	int idx = 0;
+ 	int dr = r10_bio->devs[0].devnum;
+ 	int dw = r10_bio->devs[1].devnum;
++	struct page **pages = get_resync_pages(bio)->pages;
+ 
+ 	while (sectors) {
+ 		int s = sectors;
+@@ -2220,7 +2225,7 @@ static void fix_recovery_read_error(struct r10bio *r10_bio)
+ 		ok = sync_page_io(rdev,
+ 				  addr,
+ 				  s << 9,
+-				  bio->bi_io_vec[idx].bv_page,
++				  pages[idx],
+ 				  REQ_OP_READ, 0, false);
+ 		if (ok) {
+ 			rdev = conf->mirrors[dw].rdev;
+@@ -2228,7 +2233,7 @@ static void fix_recovery_read_error(struct r10bio *r10_bio)
+ 			ok = sync_page_io(rdev,
+ 					  addr,
+ 					  s << 9,
+-					  bio->bi_io_vec[idx].bv_page,
++					  pages[idx],
+ 					  REQ_OP_WRITE, 0, false);
+ 			if (!ok) {
+ 				set_bit(WriteErrorSeen, &rdev->flags);
+-- 
+2.7.4
