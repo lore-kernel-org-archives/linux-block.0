@@ -1,64 +1,41 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-ot0-f196.google.com ([74.125.82.196]:34696 "EHLO
-        mail-ot0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752542AbdBNP3L (ORCPT
+Received: from mail-ua0-f175.google.com ([209.85.217.175]:35705 "EHLO
+        mail-ua0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751968AbdB1MUQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Feb 2017 10:29:11 -0500
+        Tue, 28 Feb 2017 07:20:16 -0500
+MIME-Version: 1.0
+In-Reply-To: <20170225182306.GC26447@infradead.org>
+References: <1487950971-1131-1-git-send-email-tom.leiming@gmail.com>
+ <1487950971-1131-3-git-send-email-tom.leiming@gmail.com> <20170225182306.GC26447@infradead.org>
 From: Ming Lei <tom.leiming@gmail.com>
-To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
-        linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        NeilBrown <neilb@suse.com>
-Cc: Ming Lei <tom.leiming@gmail.com>
-Subject: [PATCH v2 0/5] md: use bio_clone_fast()
-Date: Tue, 14 Feb 2017 23:28:58 +0800
-Message-Id: <1487086143-10255-1-git-send-email-tom.leiming@gmail.com>
+Date: Tue, 28 Feb 2017 20:18:53 +0800
+Message-ID: <CACVXFVOzaZ70UB8+1WM1Xukb=PRi9-C13GSDy8YtQda+WMrOSA@mail.gmail.com>
+Subject: Re: [PATCH v1 02/14] block: introduce bio_remove_last_page()
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "open list:SOFTWARE RAID (Multiple Disks) SUPPORT"
+        <linux-raid@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hi,
+On Sun, Feb 26, 2017 at 2:23 AM, Christoph Hellwig <hch@infradead.org> wrote:
+> On Fri, Feb 24, 2017 at 11:42:39PM +0800, Ming Lei wrote:
+>> MD need this helper to remove the last added page, so introduce
+>> it.
+>
+> If MD really has a valid use case for this it should open code the
+> operation.  The semantics look deeply fishy to me.
 
-This patches replaces bio_clone() with bio_fast_clone() in
-bio_clone_mddev() because:
+Thinking about MD's case further, and looks bio_add_page() won't
+fail at all in case that queue's limit isn't applied in bio_add_page()
+in future.
 
-1) bio_clone_mddev() is used in raid normal I/O and isn't in
-resync I/O path, and all the direct access to bvec table in
-raid happens on resync I/O only except for write behind of raid1.
-Write behind is treated specially, so the replacement is safe.
+So I will change MD's handling in this case and avoid to introduce
+bio_remove_last_page() in V2.
 
-2) for write behind, bio_clone() is kept, but this patchset
-introduces bio_clone_bioset_partial() to just clone one specific 
-bvecs range instead of whole table. Then write behind is improved
-too.
-
-V2:
-	1) move 3rd patch into 2nd one
-	2) kill  bio_clone_mddev() and use  bio_clone_fast() directly
-	3) define local variable 'offset' as sector_t in raid1_write_request()
-
-V1:
-	1) don't introduce bio_clone_slow_mddev_partial()
-	2) return failure if mddev->bio_set can't be created
-	3) remove check in bio_clone_mddev() as suggested by
-	Christoph Hellwig.
-	4) rename bio_clone_mddev() as bio_clone_fast_mddev()
-
-Ming Lei (5):
-  block: introduce bio_clone_bioset_partial()
-  md: fail if mddev->bio_set can't be created
-  md/raid1: use bio_clone_bioset_partial() in case of write behind
-  md: remove unnecessary check on mddev
-  md: fast clone bio in bio_clone_mddev()
-
- block/bio.c         | 61 +++++++++++++++++++++++++++++++++++++++++------------
- drivers/md/faulty.c |  2 +-
- drivers/md/md.c     | 15 ++++---------
- drivers/md/md.h     |  2 --
- drivers/md/raid1.c  | 28 +++++++++++++++++-------
- drivers/md/raid10.c | 11 +++++-----
- drivers/md/raid5.c  |  4 ++--
- include/linux/bio.h | 11 ++++++++--
- 8 files changed, 89 insertions(+), 45 deletions(-)
-
--- 
-2.7.4
+Thanks,
+Ming Lei
