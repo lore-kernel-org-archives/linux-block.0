@@ -1,47 +1,65 @@
-Return-Path: <jack@suse.cz>
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Tue, 28 Feb 2017 11:51:04 -0500
+From: Tejun Heo <tj@kernel.org>
+To: Jan Kara <jack@suse.cz>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
 	Christoph Hellwig <hch@infradead.org>,
 	Dan Williams <dan.j.williams@intel.com>,
 	Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
 	Lekshmi Pillai <lekshmicpillai@in.ibm.com>,
-	Tejun Heo <tj@kernel.org>,
-	NeilBrown <neilb@suse.de>,
-	Omar Sandoval <osandov@osandov.com>,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH 0/13 v2] block: Fix block device shutdown related races
-Date: Tue, 21 Feb 2017 18:09:45 +0100
-Message-Id: <20170221170958.21845-1-jack@suse.cz>
+	NeilBrown <neilb@suse.de>, Omar Sandoval <osandov@osandov.com>
+Subject: Re: [PATCH 09/13] bdi: Do not wait for cgwbs release in
+ bdi_unregister()
+Message-ID: <20170228165104.GE15287@htj.duckdns.org>
+References: <20170221170958.21845-1-jack@suse.cz>
+ <20170221170958.21845-10-jack@suse.cz>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170221170958.21845-10-jack@suse.cz>
 List-ID: <linux-block@vger.kernel.org>
 
 Hello,
 
-this is a second revision of the patch set to fix several different races and
-issues I've found when testing device shutdown and reuse. The first three
-patches are fixes to problems in my previous series fixing BDI lifetime issues.
-Patch 4 fixes issues with reuse of BDI name with scsi devices. With it I cannot
-reproduce the BDI name reuse issues using Omar's stress test using scsi_debug
-so it can be used as a replacement of Dan's patches. Patches 5-11 fix oops that
-is triggered by __blkdev_put() calling inode_detach_wb() too early (the problem
-reported by Thiago). Patches 12 and 13 fix oops due to a bug in gendisk code
-where get_gendisk() can return already freed gendisk structure (again triggered
-by Omar's stress test).
+On Tue, Feb 21, 2017 at 06:09:54PM +0100, Jan Kara wrote:
+> @@ -726,14 +718,6 @@ static void cgwb_bdi_destroy(struct backing_dev_info *bdi)
+>  	}
+>  
+>  	spin_unlock_irq(&cgwb_lock);
+> -
+> -	/*
+> -	 * All cgwb's and their congested states must be shutdown and
+> -	 * released before returning.  Drain the usage counter to wait for
+> -	 * all cgwb's and cgwb_congested's ever created on @bdi.
+> -	 */
+> -	atomic_dec(&bdi->usage_cnt);
+> -	wait_event(cgwb_release_wait, !atomic_read(&bdi->usage_cnt));
+>  }
 
-People, please have a look at patches. They are mostly simple however the
-interactions are rather complex so I may have missed something. Also I'm
-happy for any additional testing these patches can get - I've stressed them
-with Omar's script, tested memcg writeback, tested static (not udev managed)
-device inodes.
+Hmm... I'm not sure about wb_shutdown() synchronization.  If you look
+at the function, it's allowed to be called multiple times but doesn't
+synchronize the end of the operation.  With usage_cnt, it was okay
+because cgwb_bdi_destroy() would have waited until everything is
+finished via usage_cnt, but with that gone, we can have a race like
+the following.
 
-Jens, I think at least patches 1-3 should go in together with my fixes you
-already have in your tree (or shortly after them). It is up to you whether
-you decide to delay my first fixes or pick these up quickly. Patch 4 is
-(IMHO a cleaner) replacement of Dan's patches so consider whether you want
-to use it instead of those patches.
+	A					B
+ a cgroup gets removed
+ a cgwb starts to get destroyed
+ it starts wb_shutdown()
+					bdi starts getting destroyed
+					calls cgwb_bdi_destroy()
+					calls wb_shutdown() on the same cgwb
+					  but it returns because it lost to
+ wb_shutdown() is still in progress	  A's wb_shutdown()
+					bdi destruction proceeds
+ Oops.
 
-Changes since v1:
-* Added Acks and Tested-by tags for patches in areas that did not change
-* Reworked inode_detach_wb() related fixes based on Tejun's feedback
+So, I think we need to make sure that wb_shutdown()'s are properly
+synchronized from start to end to get rid of the usage_cnt waiting.
 
-								Honza
+Thanks.
+
+-- 
+tejun
