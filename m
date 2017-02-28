@@ -1,85 +1,88 @@
-Return-Path: <hare@suse.de>
-From: Hannes Reinecke <hare@suse.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Omar Sandoval <osandov@fb.com>,
-	linux-block@vger.kernel.org,
-	Hannes Reinecke <hare@suse.de>,
-	Hannes Reinecke <hare@suse.com>
-Subject: [PATCH] sbitmap: boundary checks for resized bitmap
-Date: Wed, 15 Feb 2017 12:10:42 +0100
-Message-Id: <1487157042-5621-1-git-send-email-hare@suse.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pg0-f66.google.com ([74.125.83.66]:34707 "EHLO
+        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752366AbdB1Pml (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 28 Feb 2017 10:42:41 -0500
+From: Ming Lei <tom.leiming@gmail.com>
+To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
+        linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Ming Lei <tom.leiming@gmail.com>
+Subject: [PATCH v2 10/13] md: raid10: refactor code of read reshape's .bi_end_io
+Date: Tue, 28 Feb 2017 23:41:40 +0800
+Message-Id: <1488296503-4987-11-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1488296503-4987-1-git-send-email-tom.leiming@gmail.com>
+References: <1488296503-4987-1-git-send-email-tom.leiming@gmail.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-If the sbitmap gets resized we need to ensure not to overflow
-the original allocation. And we should limit the search in
-sbitmap_any_bit_set() to the available depth to avoid looking
-into unused space.
+reshape read request is a bit special and requires one extra
+bio which isn't allocated from r10buf_pool.
 
-Signed-off-by: Hannes Reinecke <hare@suse.com>
+Refactor the .bi_end_io for read reshape, so that we can use
+raid10's resync page mangement approach easily in the following
+patches.
+
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- include/linux/sbitmap.h |  5 +++++
- lib/sbitmap.c           | 12 +++++++++---
- 2 files changed, 14 insertions(+), 3 deletions(-)
+ drivers/md/raid10.c | 28 ++++++++++++++++++----------
+ 1 file changed, 18 insertions(+), 10 deletions(-)
 
-diff --git a/include/linux/sbitmap.h b/include/linux/sbitmap.h
-index d4e0a20..5ed3815 100644
---- a/include/linux/sbitmap.h
-+++ b/include/linux/sbitmap.h
-@@ -61,6 +61,11 @@ struct sbitmap {
- 	unsigned int map_nr;
- 
- 	/**
-+	 * @map_nr: Number of words (cachelines) allocated for the bitmap.
-+	 */
-+	unsigned int max_map_nr;
-+
-+	/**
- 	 * @map: Allocated bitmap.
- 	 */
- 	struct sbitmap_word *map;
-diff --git a/lib/sbitmap.c b/lib/sbitmap.c
-index 55e11c4..f6f18b7 100644
---- a/lib/sbitmap.c
-+++ b/lib/sbitmap.c
-@@ -44,7 +44,7 @@ int sbitmap_init_node(struct sbitmap *sb, unsigned int depth, int shift,
- 
- 	sb->shift = shift;
- 	sb->depth = depth;
--	sb->map_nr = DIV_ROUND_UP(sb->depth, bits_per_word);
-+	sb->map_nr = sb->max_map_nr = DIV_ROUND_UP(sb->depth, bits_per_word);
- 
- 	if (depth == 0) {
- 		sb->map = NULL;
-@@ -70,7 +70,8 @@ void sbitmap_resize(struct sbitmap *sb, unsigned int depth)
- 
- 	sb->depth = depth;
- 	sb->map_nr = DIV_ROUND_UP(sb->depth, bits_per_word);
--
-+	if (sb->map_nr > sb->max_map_nr)
-+		sb->map_nr = sb->max_map_nr;
- 	for (i = 0; i < sb->map_nr; i++) {
- 		sb->map[i].depth = min(depth, bits_per_word);
- 		depth -= sb->map[i].depth;
-@@ -145,7 +146,11 @@ bool sbitmap_any_bit_set(const struct sbitmap *sb)
- 	unsigned int i;
- 
- 	for (i = 0; i < sb->map_nr; i++) {
--		if (sb->map[i].word)
-+		const struct sbitmap_word *word = &sb->map[i];
-+		unsigned long ret;
-+
-+		ret = find_first_bit(&word->word, word->depth);
-+		if (ret < word->depth)
- 			return true;
- 	}
- 	return false;
-@@ -187,6 +192,7 @@ void sbitmap_show(struct sbitmap *sb, struct seq_file *m)
- 	seq_printf(m, "busy=%u\n", sbitmap_weight(sb));
- 	seq_printf(m, "bits_per_word=%u\n", 1U << sb->shift);
- 	seq_printf(m, "map_nr=%u\n", sb->map_nr);
-+	seq_printf(m, "max_map_nr=%u\n", sb->max_map_nr);
+diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
+index c5f1a117494b..a9ddd4f14008 100644
+--- a/drivers/md/raid10.c
++++ b/drivers/md/raid10.c
+@@ -1907,17 +1907,9 @@ static int raid10_remove_disk(struct mddev *mddev, struct md_rdev *rdev)
+ 	return err;
  }
- EXPORT_SYMBOL_GPL(sbitmap_show);
  
+-static void end_sync_read(struct bio *bio)
++static void __end_sync_read(struct r10bio *r10_bio, struct bio *bio, int d)
+ {
+-	struct r10bio *r10_bio = bio->bi_private;
+ 	struct r10conf *conf = r10_bio->mddev->private;
+-	int d;
+-
+-	if (bio == r10_bio->master_bio) {
+-		/* this is a reshape read */
+-		d = r10_bio->read_slot; /* really the read dev */
+-	} else
+-		d = find_bio_disk(conf, r10_bio, bio, NULL, NULL);
+ 
+ 	if (!bio->bi_error)
+ 		set_bit(R10BIO_Uptodate, &r10_bio->state);
+@@ -1941,6 +1933,22 @@ static void end_sync_read(struct bio *bio)
+ 	}
+ }
+ 
++static void end_sync_read(struct bio *bio)
++{
++	struct r10bio *r10_bio = bio->bi_private;
++	struct r10conf *conf = r10_bio->mddev->private;
++	int d = find_bio_disk(conf, r10_bio, bio, NULL, NULL);
++
++	__end_sync_read(r10_bio, bio, d);
++}
++
++static void end_reshape_read(struct bio *bio)
++{
++	struct r10bio *r10_bio = bio->bi_private;
++
++	__end_sync_read(r10_bio, bio, r10_bio->read_slot);
++}
++
+ static void end_sync_request(struct r10bio *r10_bio)
+ {
+ 	struct mddev *mddev = r10_bio->mddev;
+@@ -4464,7 +4472,7 @@ static sector_t reshape_request(struct mddev *mddev, sector_t sector_nr,
+ 	read_bio->bi_iter.bi_sector = (r10_bio->devs[r10_bio->read_slot].addr
+ 			       + rdev->data_offset);
+ 	read_bio->bi_private = r10_bio;
+-	read_bio->bi_end_io = end_sync_read;
++	read_bio->bi_end_io = end_reshape_read;
+ 	bio_set_op_attrs(read_bio, REQ_OP_READ, 0);
+ 	read_bio->bi_flags &= (~0UL << BIO_RESET_BITS);
+ 	read_bio->bi_error = 0;
 -- 
-1.8.5.6
+2.7.4
