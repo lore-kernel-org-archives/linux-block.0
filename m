@@ -1,24 +1,70 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:20831 "EHLO mga09.intel.com"
+Received: from mail.kernel.org ([198.145.29.136]:48460 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751765AbdBMQUq (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 Feb 2017 11:20:46 -0500
-From: Scott Bauer <scott.bauer@intel.com>
-To: linux-nvme@lists.infradead.org
-Cc: David.Laight@ACULAB.COM, arnd@arndb.de, axboe@fb.com,
-        keith.busch@intel.com, jonathan.derrick@intel.com,
-        hch@infradead.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org
-Subject: SED Opal Fixups
-Date: Mon, 13 Feb 2017 09:11:08 -0700
-Message-Id: <1487002272-17940-1-git-send-email-scott.bauer@intel.com>
+        id S1751637AbdB1XsW (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 28 Feb 2017 18:48:22 -0500
+Date: Tue, 28 Feb 2017 15:46:27 -0800
+From: Shaohua Li <shli@kernel.org>
+To: Ming Lei <tom.leiming@gmail.com>
+Cc: Jens Axboe <axboe@fb.com>, linux-raid@vger.kernel.org,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>
+Subject: Re: [PATCH v2 13/13] md: raid10: avoid direct access to bvec table
+ in handle_reshape_read_error
+Message-ID: <20170228234627.3h6tospuz33yhdig@kernel.org>
+References: <1488296503-4987-1-git-send-email-tom.leiming@gmail.com>
+ <1488296503-4987-14-git-send-email-tom.leiming@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1488296503-4987-14-git-send-email-tom.leiming@gmail.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-So we have a few patches here, they're pretty small. First patch changes
-the sed-opal ioctl function parameters to take a void __user* instead of
-an unsigned long, this required a small cast in the nvme driver.
-Patch 2 is a UAPI fixup for the IOW to make an ioctl
-the right size. Patch 3 fixes a compiliation error when building using
-KSAN due to the stack frame being too large. And lastly we move the
-Maintainers list from nvme to linux-block.
+On Tue, Feb 28, 2017 at 11:41:43PM +0800, Ming Lei wrote:
+> The cost is 128bytes(8*16) stack space in kernel thread context, and
+> just use the bio helper to retrieve pages from bio.
+> 
+> Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+> ---
+>  drivers/md/raid10.c | 12 ++++++++++--
+>  1 file changed, 10 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
+> index 0b97631e3905..6ffb64ab45f8 100644
+> --- a/drivers/md/raid10.c
+> +++ b/drivers/md/raid10.c
+> @@ -4670,7 +4670,15 @@ static int handle_reshape_read_error(struct mddev *mddev,
+>  	struct r10bio *r10b = &on_stack.r10_bio;
+>  	int slot = 0;
+>  	int idx = 0;
+> -	struct bio_vec *bvec = r10_bio->master_bio->bi_io_vec;
+> +	struct bio_vec *bvl;
+> +	struct page *pages[RESYNC_PAGES];
+> +
+> +	/*
+> +	 * This bio is allocated in reshape_request(), and size
+> +	 * is still RESYNC_PAGES
+> +	 */
+> +	bio_for_each_segment_all(bvl, r10_bio->master_bio, idx)
+> +		pages[idx] = bvl->bv_page;
+
+The reshape bio is doing IO against the memory we allocated for r10_bio, I'm
+wondering why we can't get the pages from r10_bio. In this way, we don't need
+access the bio_vec any more.
+
+Thanks,
+Shaohua
+ 
+>  	r10b->sector = r10_bio->sector;
+>  	__raid10_find_phys(&conf->prev, r10b);
+> @@ -4699,7 +4707,7 @@ static int handle_reshape_read_error(struct mddev *mddev,
+>  			success = sync_page_io(rdev,
+>  					       addr,
+>  					       s << 9,
+> -					       bvec[idx].bv_page,
+> +					       pages[idx],
+>  					       REQ_OP_READ, 0, false);
+>  			rdev_dec_pending(rdev, mddev);
+>  			rcu_read_lock();
+> -- 
+> 2.7.4
+> 
