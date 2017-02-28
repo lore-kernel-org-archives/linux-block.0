@@ -1,8 +1,9 @@
 Return-Path: <linux-scsi-owner@vger.kernel.org>
-From: NeilBrown <neilb@suse.com>
-To: Jeff Layton <jlayton@redhat.com>,
+Message-ID: <1488281559.2874.1.camel@redhat.com>
+Subject: Re: [Lsf-pc] [LSF/MM TOPIC] do we really need PG_error at all?
+From: Jeff Layton <jlayton@redhat.com>
+To: Boaz Harrosh <openosd@gmail.com>, NeilBrown <neilb@suse.com>,
         Andreas Dilger <adilger@dilger.ca>
-Date: Wed, 01 Mar 2017 07:45:47 +1100
 Cc: linux-block@vger.kernel.org,
         linux-scsi <linux-scsi@vger.kernel.org>,
         lsf-pc <lsf-pc@lists.linuxfoundation.org>,
@@ -11,155 +12,67 @@ Cc: linux-block@vger.kernel.org,
         James Bottomley <James.Bottomley@HansenPartnership.com>,
         linux-mm <linux-mm@kvack.org>,
         linux-fsdevel <linux-fsdevel@vger.kernel.org>
-Subject: Re: [Lsf-pc] [LSF/MM TOPIC] do we really need PG_error at all?
-In-Reply-To: <1488244308.7627.5.camel@redhat.com>
-References: <1488120164.2948.4.camel@redhat.com> <1488129033.4157.8.camel@HansenPartnership.com> <877f4cr7ew.fsf@notabene.neil.brown.name> <1488151856.4157.50.camel@HansenPartnership.com> <874lzgqy06.fsf@notabene.neil.brown.name> <1488208047.2876.6.camel@redhat.com> <DC27F5BA-BCCA-41FF-8D41-7BB99AA4DB26@dilger.ca> <87varvp5v1.fsf@notabene.neil.brown.name> <1488244308.7627.5.camel@redhat.com>
-Message-ID: <87h93eoxhg.fsf@notabene.neil.brown.name>
-MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-        micalg=pgp-sha256; protocol="application/pgp-signature"
+Date: Tue, 28 Feb 2017 06:32:39 -0500
+In-Reply-To: <0bea2b1c-ddb1-f2bf-8ef7-b83d6a6404fc@gmail.com>
+References: <1488120164.2948.4.camel@redhat.com>
+         <1488129033.4157.8.camel@HansenPartnership.com>
+         <877f4cr7ew.fsf@notabene.neil.brown.name>
+         <1488151856.4157.50.camel@HansenPartnership.com>
+         <874lzgqy06.fsf@notabene.neil.brown.name>
+         <1488208047.2876.6.camel@redhat.com>
+         <DC27F5BA-BCCA-41FF-8D41-7BB99AA4DB26@dilger.ca>
+         <87varvp5v1.fsf@notabene.neil.brown.name>
+         <1488244308.7627.5.camel@redhat.com>
+         <0bea2b1c-ddb1-f2bf-8ef7-b83d6a6404fc@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-scsi-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
---=-=-=
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Tue, 2017-02-28 at 12:12 +0200, Boaz Harrosh wrote:
+> On 02/28/2017 03:11 AM, Jeff Layton wrote:
+> <>
+> > 
+> > I'll probably have questions about the read side as well, but for now it
+> > looks like it's mostly used in an ad-hoc way to communicate errors
+> > across subsystems (block to fs layer, for instance).
+> 
+> If memory does not fail me it used to be checked long time ago in the
+> read-ahead case. On the buffered read case, the first page is read synchronous
+> and any error is returned to the caller, but then a read-ahead chunk is
+> read async all the while the original thread returned to the application.
+> So any errors are only recorded on the page-bit, since otherwise the uptodate
+> is off and the IO will be retransmitted. Then the move to read_iter changed
+> all that I think.
+> But again this is like 5-6 years ago, and maybe I didn't even understand
+> very well.
+> 
 
-On Mon, Feb 27 2017, Jeff Layton wrote:
+Yep, that's what I meant about using it to communicate errors between
+layers. e.g. end_buffer_async_read will check PageError and only
+SetPageUptodate if it's not set. That has morphed a lot in the last few
+years though and it looks like it may rely on PG_error less than it used
+to.
 
-> On Tue, 2017-02-28 at 10:32 +1100, NeilBrown wrote:
->> On Mon, Feb 27 2017, Andreas Dilger wrote:
->>=20
->> >=20
->> > My thought is that PG_error is definitely useful for applications to g=
-et
->> > correct errors back when doing write()/sync_file_range() so that they =
-know
->> > there is an error in the data that _they_ wrote, rather than receiving=
- an
->> > error for data that may have been written by another thread, and in tu=
-rn
->> > clearing the error from another thread so it *doesn't* know it had a w=
-rite
->> > error.
->>=20
->> It might be useful in that way, but it is not currently used that way.
->> Such usage would be a change in visible behaviour.
->>=20
->> sync_file_range() calls filemap_fdatawait_range(), which calls
->> filemap_check_errors().
->> If there have been any errors in the file recently, inside or outside
->> the range, the latter will return an error which will propagate up.
->>=20
->> >=20
->> > As for stray sync() clearing PG_error from underneath an application, =
-that
->> > shouldn't happen since filemap_fdatawait_keep_errors() doesn't clear e=
-rrors
->> > and is used by device flushing code (fdatawait_one_bdev(), wait_sb_ino=
-des()).
->>=20
->> filemap_fdatawait_keep_errors() calls __filemap_fdatawait_range() which
->> clears PG_error on every page.
->> What it doesn't do is call filemap_check_errors(), and so doesn't clear
->> AS_ENOSPC or AS_EIO.
->>=20
->>=20
->
-> I think it's helpful to get a clear idea of what happens now in the face
-> of errors and what we expect to happen, and I don't quite have that yet:
->
-> --------------------------8<-----------------------------
-> void page_endio(struct page *page, bool is_write, int err)
-> {
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (!is_write) {
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0if (!err) {
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Set=
-PageUptodate(page);
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0} else {
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Cle=
-arPageUptodate(page);
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Set=
-PageError(page);
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0}
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0unlock_page(page);
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0} else {
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0if (err) {
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Set=
-PageError(page);
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if =
-(page->mapping)
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0mapping_set_error(page->mappin=
-g, err);
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0}
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0end_page_writeback(page);
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
-> }
-> --------------------------8<-----------------------------
->
-> ...not everything uses page_endio, but it's a good place to look since
-> we have both flavors of error handling in one place.
->
-> On a write error, we SetPageError and set the error in the mapping.
->
-> What I'm not clear on is:
->
-> 1) what happens to the page at that point when we get a writeback error?
-> Does it just remain in-core and is allowed to service reads (assuming
-> that it was uptodate before)?
+> 
+> I would like a Documentation of all this as well please. Where are the
+> tests for this?
+> 
 
-Yes, it remains in core and can service reads.  It is no different from
-a page on which a write recent succeeded, except that the write didn't
-succeed so the contents of backing store might be different from the
-contents of the page.
+Documentation is certainly doable (and I'd like to write some once we
+have this all straightened out). In particular, I think we need clear
+guidelines for fs authors on how to handle pagecache read and write
+errors. Tests are a little tougher -- this is all kernel-internal stuff
+and not easily visible to userland.
 
->
-> Can I redirty it and have it retry the write? Is there standard behavior
-> for this or is it just up to the whim of the filesystem?
+The one thing I have noticed is that even if you set AS_ENOSPC in the
+mapping, you'll still get back -EIO on the first fsync if any PG_error
+bits are set. I think we ought to fix that by not doing the
+TestClearPageError call in __filemap_fdatawait_range, and just rely on
+the mapping error there.
 
-Everything is at the whim of the filesystem, but I doubt if many differ
-from the above.
+We could maybe roll a test for that, but it's rather hard to test ENOSPC
+conditions in a fs-agnostic way. I'm open to suggestions here though.
 
-NeilBrown
-
->
-> I'll probably have questions about the read side as well, but for now it
-> looks like it's mostly used in an ad-hoc way to communicate errors
-> across subsystems (block to fs layer, for instance).
-> --
-> Jeff Layton <jlayton@redhat.com>
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEG8Yp69OQ2HB7X0l6Oeye3VZigbkFAli14XsACgkQOeye3VZi
-gbkAxw/+KrG891w3m+XtN0xeZWu2kOV5dk3TBi4HFmfFjnuZZNRsNJM3XaHip8Xu
-7VjFrARSFgRGcXBlDIosIWDjvN033afHV5Nn7CFPBT3WyJB5IOTDK4290NwH83pg
-6l0y8LJWRdPUu3rsvb82XwzRVldnM0GxqEqJNhN8qAWjFjKJq+MhLdlHvTQ8IpRg
-ZuSIsUB6WbBrOFJTKuTSQiYEUs8sQ0vrMfk4x954Rm7hxLVRz+ohIPnzn/PF4dt8
-gOkeH7wISOaZa7DuWb6b92WvhvRalj9GH6F5D9QAWr0JPq5hAtpxblkppNTmWYmz
-lGYln6XZ8fvxZuZdo4J7Z5f3TwraOWf/BafLag46ni6qSVIQcXtMrvp+AIciYR24
-75W+ai6o5yvwQqzJjg03JPuX2wMK6gxZ5gDmLwRLXMnswHGYdSRLvYPmeVgRN1pZ
-NCsNqQWudPhwSl+glJLQmqjvIFMytrIQYEBxHN2zisZfjML4+wylLMj5K45h5/8H
-2hFIEa71pUl0HeouZkVTOWpKKbTjsjp2xIkyViez1fas/2wDsjr/7PqYT53/87Ms
-4hagW9McbsWGmPhfrWpKSEOPdbI0oNEQ9sOmal+6lSkp+Yt3wGRai+dLm1c3pzfd
-YdH3Y13mM0+m+N/8TULPmES7rGO1qnnPu6M8yOUG1YUi8FnwutI=
-=SfiP
------END PGP SIGNATURE-----
---=-=-=--
+-- 
+Jeff Layton <jlayton@redhat.com>
