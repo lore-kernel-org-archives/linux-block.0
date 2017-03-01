@@ -1,56 +1,37 @@
-Return-Path: <hare@suse.de>
-Subject: Re: [PATCH] sbitmap: boundary checks for resized bitmap
-To: Omar Sandoval <osandov@osandov.com>
-References: <1487157042-5621-1-git-send-email-hare@suse.de>
- <20170228191512.GA28004@vader.DHCP.thefacebook.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Omar Sandoval <osandov@fb.com>,
- linux-block@vger.kernel.org, Hannes Reinecke <hare@suse.com>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <45968daf-5424-d273-d38d-d5c7f992f562@suse.de>
-Date: Wed, 1 Mar 2017 16:39:38 +0100
+Return-Path: <prvs=42332f6725=axboe@fb.com>
+Subject: Re: [PATCH 0/3] nvme suspend/resume fix
+To: Keith Busch <keith.busch@intel.com>, Sagi Grimberg <sagi@grimberg.me>,
+        Christoph Hellwig <hch@lst.de>, <linux-nvme@lists.infradead.org>,
+        <linux-block@vger.kernel.org>
+References: <1488396132-11369-1-git-send-email-keith.busch@intel.com>
+CC: Marc MERLIN <marc@merlins.org>, Jens Axboe <axboe@kernel.dk>
+From: Jens Axboe <axboe@fb.com>
+Message-ID: <2d236d6a-f8dd-c585-8f6a-edd0be6fa115@fb.com>
+Date: Wed, 1 Mar 2017 16:29:09 -0700
 MIME-Version: 1.0
-In-Reply-To: <20170228191512.GA28004@vader.DHCP.thefacebook.com>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <1488396132-11369-1-git-send-email-keith.busch@intel.com>
+Content-Type: text/plain; charset="windows-1252"
 List-ID: <linux-block@vger.kernel.org>
 
-On 02/28/2017 08:15 PM, Omar Sandoval wrote:
-> On Wed, Feb 15, 2017 at 12:10:42PM +0100, Hannes Reinecke wrote:
->> If the sbitmap gets resized we need to ensure not to overflow
->> the original allocation. And we should limit the search in
->> sbitmap_any_bit_set() to the available depth to avoid looking
->> into unused space.
+On 03/01/2017 12:22 PM, Keith Busch wrote:
+> Hi Jens,
 > 
-> Hey, Hannes, I don't really like this change. It's easy enough for the
-> caller to keep track of this and check themselves if they really care. I
-> even included a comment in sbitmap.h to that effect:
+> This is hopefully the last version to fix nvme stopping blk-mq's CPU
+> event from making forward progress. The solution requires a couple new
+> blk-mq exports so the nvme driver can properly sync with queue states.
 > 
-Okay.
+> Since this depends on the blk-mq parts, and if you approve of the
+> proposal, I think it'd be easiest if you can take this directly into
+> linux-block/for-linus. Otherwise, we can send you a pull request if you
+> Ack the blk-mq parts.
+> 
+> The difference from the previous patch is an update that Artur
+> confirmed passes hibernate on a stacked request queue. Personally,
+> I tested this for several hours with fio running buffered writes
+> in the back-ground and rtcwake running suspend/resume at intervals.
+> This succeeded with no fio errors.
 
-> /**
->  * sbitmap_resize() - Resize a &struct sbitmap.
->  * @sb: Bitmap to resize.
->  * @depth: New number of bits to resize to.
->  *
->  * Doesn't reallocate anything. It's up to the caller to ensure that the new
->  * depth doesn't exceed the depth that the sb was initialized with.
->  */
-> 
-> 
-> As for the sbitmap_any_bit_set() change, the bits beyond the actual
-> depth should all be zero, so I don't think that change is worth it,
-> either.
-> 
-Hmm. That would be okay if we can be sure that the remaining bits really
-are zero. Which probably would need to be checked by the caller, too.
+I've queued it up for this series, thanks Keith.
 
-So yeah, if you don't like it, okay.
-Just ignore it then.
-
-Cheers,
-
-Hannes
 -- 
-Dr. Hannes Reinecke		      zSeries & Storage
-hare@suse.de			      +49 911 74053 688
-SUSE LINUX Products GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: J. Hawn, J. Guild, F. Imend�rffer, HRB 16746 (AG N�rnberg)
+Jens Axboe
