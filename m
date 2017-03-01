@@ -1,67 +1,91 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f43.google.com ([74.125.83.43]:35647 "EHLO
-        mail-pg0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753299AbdCAVeq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Mar 2017 16:34:46 -0500
-Received: by mail-pg0-f43.google.com with SMTP id b129so24286805pgc.2
-        for <linux-block@vger.kernel.org>; Wed, 01 Mar 2017 13:34:32 -0800 (PST)
-From: Omar Sandoval <osandov@osandov.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: kernel-team@fb.com, Ming Lei <tom.leiming@gmail.com>,
-        stable@vger.kernel.org
-Subject: [PATCH 1/2] loop: fix LO_FLAGS_PARTSCAN hang
-Date: Wed,  1 Mar 2017 10:42:38 -0800
-Message-Id: <7e888cad9e6c35835559281d3ab9e05ea48836d0.1488393750.git.osandov@fb.com>
+Received: from verein.lst.de ([213.95.11.211]:51931 "EHLO newverein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751243AbdCAPSA (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 1 Mar 2017 10:18:00 -0500
+Date: Wed, 1 Mar 2017 16:17:57 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: "Darrick J. Wong" <darrick.wong@oracle.com>
+Cc: Christoph Hellwig <hch@lst.de>, linux-fsdevel@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH 07/12] xfs: implement failure-atomic writes
+Message-ID: <20170301151757.GH12248@lst.de>
+References: <20170228145737.19016-1-hch@lst.de> <20170228145737.19016-8-hch@lst.de> <20170228230940.GB26319@birch.djwong.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170228230940.GB26319@birch.djwong.org>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Omar Sandoval <osandov@fb.com>
+On Tue, Feb 28, 2017 at 03:09:40PM -0800, Darrick J. Wong wrote:
+> By the way, the copy on write code remembers the extents it has
+> allocated for CoW staging in the refcount btree so that it can free them
+> after a crash, which means that O_ATOMIC requires reflink to be enabled.
 
-loop_reread_partitions() needs to do I/O, but we just froze the queue,
-so we end up waiting forever. This can easily be reproduced with losetup
--P. Fix it by moving the reread to after we unfreeze the queue.
+Yeah.
 
-Fixes: ecdd09597a57 ("block/loop: fix race between I/O and set_status")
-Reported-by: Tejun Heo <tj@kernel.org>
-Cc: Ming Lei <tom.leiming@gmail.com>
-Cc: stable@vger.kernel.org
-Signed-off-by: Omar Sandoval <osandov@fb.com>
----
- drivers/block/loop.c | 15 ++++++++-------
- 1 file changed, 8 insertions(+), 7 deletions(-)
+> There doesn't seem to be any explicit checking that reflink is even
+> enabled, which will probably just lead to weird crashes on a pre-reflink
+> xfs.
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 4b52a1690329..132c9f371dce 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -1142,13 +1142,6 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
- 	     (info->lo_flags & LO_FLAGS_AUTOCLEAR))
- 		lo->lo_flags ^= LO_FLAGS_AUTOCLEAR;
- 
--	if ((info->lo_flags & LO_FLAGS_PARTSCAN) &&
--	     !(lo->lo_flags & LO_FLAGS_PARTSCAN)) {
--		lo->lo_flags |= LO_FLAGS_PARTSCAN;
--		lo->lo_disk->flags &= ~GENHD_FL_NO_PART_SCAN;
--		loop_reread_partitions(lo, lo->lo_device);
--	}
--
- 	lo->lo_encrypt_key_size = info->lo_encrypt_key_size;
- 	lo->lo_init[0] = info->lo_init[0];
- 	lo->lo_init[1] = info->lo_init[1];
-@@ -1163,6 +1156,14 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
- 
-  exit:
- 	blk_mq_unfreeze_queue(lo->lo_queue);
-+
-+	if (!err && (info->lo_flags & LO_FLAGS_PARTSCAN) &&
-+	     !(lo->lo_flags & LO_FLAGS_PARTSCAN)) {
-+		lo->lo_flags |= LO_FLAGS_PARTSCAN;
-+		lo->lo_disk->flags &= ~GENHD_FL_NO_PART_SCAN;
-+		loop_reread_partitions(lo, lo->lo_device);
-+	}
-+
- 	return err;
- }
- 
--- 
-2.12.0
+True.  I had this earlier when I hat basic O_ATOMIC validity checking,
+but that was dropped from the series I posted.
+
+> 
+> FWIW I didn't see any checking anywhere (vfs or xfs) that the filesystem
+> can actually support O_ATOMIC.  If the FS doesn't support atomic writes,
+> shouldn't the kernel send EINVAL or something back to userspace?
+
+Older kernels can't check it, so having new ones check it creates even
+more of a mess.
+
+I'm still not feeling very well about O_ATOMIC - either we need an
+open2 that checks for unknown flags, or I need to change this to
+a per-op flag - RWF_ATOMIC for write (pwritev2 actually), and MAP_ATOMIC
+for mmap.  But given that pwritev2 isn't really supported in common
+userland yet that might be rather painful.
+
+> At the start of xfs_reflink.c is a long block comment describing how the
+> copy on write mechanism works.  Since O_ATOMIC is a variant on CoW (it's
+> basically CoW with remapping deferred until fsync), please update the
+> comment so that the comments capture the details of how atomic writes
+> work.
+> 
+> (IOWs: Dave asked me to leave the big comment, so I'm going to try to
+> keep it fairly up to date.)
+
+I'll add some information to it.
+
+> I suppose it goes without saying that userspace will have to coordinate
+> its O_ATOMIC writes to the file.
+
+It does - but if you have multiple writers to a file they really need
+to be coordinated anyway.  If you have threads whose updates race
+you'd need something like
+
+open(O_TMPFILE)
+clone file (or range) into tempfile
+
+update tempfile
+
+clone region you want atomically inserted back into the original file.
+
+We can actually do that with existing primitives, but it's a bit more
+heavyweight.  We could opimize this a bit by checking if an extent
+already points to the same physical blocks before replacing it in
+clone_file_range.
+
+> > +	if (file->f_flags & O_ATOMIC)
+> > +		printk_ratelimited("O_ATOMIC!\n");
+> 
+> Per above,
+> 
+> if (file->f_flags & O_ATOMIC) {
+> 	if (!xfs_sb_version_hasreflink(...))
+> 		return -EPROTONOSUPPORT;
+
+Yeah.
+
+> 	printk_ratelimited("EXPERIMENTAL atomic writes feature in use!\n");
+
+And that should just go away - it was a local debug aid :)
