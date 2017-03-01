@@ -1,27 +1,40 @@
-Return-Path: <prvs=42332f6725=axboe@fb.com>
-Subject: Re: [PATCH] nbd: stop leaking sockets
-To: Josef Bacik <jbacik@fb.com>, <axboe@kernel.dk>,
-        <nbd-general@lists.sourceforge.net>, <linux-block@vger.kernel.org>,
-        <kernel-team@fb.com>
-References: <1488386842-16515-1-git-send-email-jbacik@fb.com>
+Return-Path: <prvs=4233a57768=jbacik@fb.com>
+From: Josef Bacik <jbacik@fb.com>
+To: <axboe@kernel.dk>, <nbd-general@lists.sourceforge.net>,
+        <linux-block@vger.kernel.org>, <kernel-team@fb.com>
 CC: <stable@vger.kernel.org>
-From: Jens Axboe <axboe@fb.com>
-Message-ID: <55d2e5d8-e4b4-4a5e-8365-598244c9b8dd@fb.com>
-Date: Wed, 1 Mar 2017 09:53:26 -0700
+Subject: [PATCH] nbd: stop leaking sockets
+Date: Wed, 1 Mar 2017 11:47:22 -0500
+Message-ID: <1488386842-16515-1-git-send-email-jbacik@fb.com>
 MIME-Version: 1.0
-In-Reply-To: <1488386842-16515-1-git-send-email-jbacik@fb.com>
-Content-Type: text/plain; charset="windows-1252"
+Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-On 03/01/2017 09:47 AM, Josef Bacik wrote:
-> This was introduced in the multi-connection patch, we've been leaking
-> socket's ever since.
-> 
-> Fixes: 9561a7a ("nbd: add multi-connection support")
-> cc: stable@vger.kernel.org
-> Signed-off-by: Josef Bacik <jbacik@fb.com>
+This was introduced in the multi-connection patch, we've been leaking
+socket's ever since.
 
-Applied for this series, thanks Josef.
+Fixes: 9561a7a ("nbd: add multi-connection support")
+cc: stable@vger.kernel.org
+Signed-off-by: Josef Bacik <jbacik@fb.com>
+---
+ drivers/block/nbd.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index 0bf2b21..c7e93f6 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -689,8 +689,10 @@ static int nbd_clear_sock(struct nbd_device *nbd, struct block_device *bdev)
+ 	    nbd->num_connections) {
+ 		int i;
+ 
+-		for (i = 0; i < nbd->num_connections; i++)
++		for (i = 0; i < nbd->num_connections; i++) {
++			sockfd_put(nbd->socks[i]->sock);
+ 			kfree(nbd->socks[i]);
++		}
+ 		kfree(nbd->socks);
+ 		nbd->socks = NULL;
+ 		nbd->num_connections = 0;
 -- 
-Jens Axboe
+2.7.4
