@@ -1,54 +1,37 @@
 Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Christoph Hellwig <hch@lst.de>
-To: linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
-        linux-block@vger.kernel.org
-Subject: [PATCH 01/12] uapi/fs: add O_ATOMIC to the open flags
-Date: Tue, 28 Feb 2017 06:57:26 -0800
-Message-Id: <20170228145737.19016-2-hch@lst.de>
-In-Reply-To: <20170228145737.19016-1-hch@lst.de>
-References: <20170228145737.19016-1-hch@lst.de>
+Date: Tue, 28 Feb 2017 19:46:06 -0800
+From: Matthew Wilcox <willy@infradead.org>
+To: Goldwyn Rodrigues <rgoldwyn@suse.de>
+Cc: jack@suse.com, hch@infradead.org, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org,
+        Goldwyn Rodrigues <rgoldwyn@suse.com>
+Subject: Re: [PATCH 3/8] nowait aio: return if direct write will trigger
+ writeback
+Message-ID: <20170301034606.GK16328@bombadil.infradead.org>
+References: <20170228233610.25456-1-rgoldwyn@suse.de>
+ <20170228233610.25456-4-rgoldwyn@suse.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170228233610.25456-4-rgoldwyn@suse.de>
 Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- fs/fcntl.c                       | 3 ++-
- include/uapi/asm-generic/fcntl.h | 2 ++
- 2 files changed, 4 insertions(+), 1 deletion(-)
+On Tue, Feb 28, 2017 at 05:36:05PM -0600, Goldwyn Rodrigues wrote:
+> Find out if the write will trigger a wait due to writeback. If yes,
+> return -EAGAIN.
+> 
+> This introduces a new function filemap_range_has_page() which
+> returns true if the file's mapping has a page within the range
+> mentioned.
 
-diff --git a/fs/fcntl.c b/fs/fcntl.c
-index e1c54f20325c..ca5d228be7ea 100644
---- a/fs/fcntl.c
-+++ b/fs/fcntl.c
-@@ -741,7 +741,7 @@ static int __init fcntl_init(void)
- 	 * Exceptions: O_NONBLOCK is a two bit define on parisc; O_NDELAY
- 	 * is defined as O_NONBLOCK on some platforms and not on others.
- 	 */
--	BUILD_BUG_ON(21 - 1 /* for O_RDONLY being 0 */ != HWEIGHT32(
-+	BUILD_BUG_ON(22 - 1 /* for O_RDONLY being 0 */ != HWEIGHT32(
- 		O_RDONLY	| O_WRONLY	| O_RDWR	|
- 		O_CREAT		| O_EXCL	| O_NOCTTY	|
- 		O_TRUNC		| O_APPEND	| /* O_NONBLOCK	| */
-@@ -749,6 +749,7 @@ static int __init fcntl_init(void)
- 		O_DIRECT	| O_LARGEFILE	| O_DIRECTORY	|
- 		O_NOFOLLOW	| O_NOATIME	| O_CLOEXEC	|
- 		__FMODE_EXEC	| O_PATH	| __O_TMPFILE	|
-+		O_ATOMIC	|
- 		__FMODE_NONOTIFY
- 		));
- 
-diff --git a/include/uapi/asm-generic/fcntl.h b/include/uapi/asm-generic/fcntl.h
-index e063effe0cc1..26ab7622238a 100644
---- a/include/uapi/asm-generic/fcntl.h
-+++ b/include/uapi/asm-generic/fcntl.h
-@@ -92,6 +92,8 @@
- #define O_TMPFILE (__O_TMPFILE | O_DIRECTORY)
- #define O_TMPFILE_MASK (__O_TMPFILE | O_DIRECTORY | O_CREAT)      
- 
-+#define O_ATOMIC	040000000
-+
- #ifndef O_NDELAY
- #define O_NDELAY	O_NONBLOCK
- #endif
--- 
-2.11.0
+Ugh, this is pretty inefficient.  If that's all you want to know, then
+using the radix tree directly will be far more efficient than spinning
+up all the pagevec machinery only to discard the pages found.
+
+But what's going to kick these pages out of cache?  Shouldn't we rather
+find the pages, kick them out if clean, start writeback if not, and *then*
+return -EAGAIN?
+
+So maybe we want to spin up the pagevec machinery after all so we can
+do that extra work?
