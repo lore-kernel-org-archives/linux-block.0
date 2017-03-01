@@ -1,65 +1,59 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f66.google.com ([74.125.83.66]:36113 "EHLO
-        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751285AbdBXPnU (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 24 Feb 2017 10:43:20 -0500
-From: Ming Lei <tom.leiming@gmail.com>
-To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
-        linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>
-Cc: Ming Lei <tom.leiming@gmail.com>
-Subject: [PATCH v1 03/14] md: raid1/raid10: use bio_remove_last_page()
-Date: Fri, 24 Feb 2017 23:42:40 +0800
-Message-Id: <1487950971-1131-4-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1487950971-1131-1-git-send-email-tom.leiming@gmail.com>
-References: <1487950971-1131-1-git-send-email-tom.leiming@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <houtao1@huawei.com>
+From: Hou Tao <houtao1@huawei.com>
+To: <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, <jmoyer@redhat.com>, <jack@suse.cz>,
+        <stable@vger.kernel.org>
+Subject: [PATCH] cfq-iosched: fix the delay of cfq_group's vdisktime under iops mode
+Date: Wed, 1 Mar 2017 10:07:44 +0800
+Message-ID: <1488334064-34883-1-git-send-email-houtao1@huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+When adding a cfq_group into the cfq service tree, we use CFQ_IDLE_DELAY
+as the delay of cfq_group's vdisktime if there have been other cfq_groups
+already.
+
+When cfq is under iops mode, commit 9a7f38c42c2b ("cfq-iosched: Convert
+from jiffies to nanoseconds") could result in a large iops delay and
+lead to an abnormal io schedule delay for the added cfq_group. To fix
+it, we just need to revert to the old CFQ_IDLE_DELAY value: HZ / 5
+when iops mode is enabled.
+
+Cc: <stable@vger.kernel.org> # 4.8+
+Signed-off-by: Hou Tao <houtao1@huawei.com>
 ---
- drivers/md/raid1.c  | 3 +--
- drivers/md/raid10.c | 6 ++----
- 2 files changed, 3 insertions(+), 6 deletions(-)
+ block/cfq-iosched.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
-index 0628c07dd16d..2a0bf5b430c9 100644
---- a/drivers/md/raid1.c
-+++ b/drivers/md/raid1.c
-@@ -2912,8 +2912,7 @@ static sector_t raid1_sync_request(struct mddev *mddev, sector_t sector_nr,
- 						if (bio->bi_end_io==NULL)
- 							continue;
- 						/* remove last page from this bio */
--						bio->bi_vcnt--;
--						bio->bi_iter.bi_size -= len;
-+						bio_remove_last_page(bio);
- 						bio_clear_flag(bio, BIO_SEG_VALID);
- 					}
- 					goto bio_full;
-diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
-index 33f6a535dc1f..125d74dba27e 100644
---- a/drivers/md/raid10.c
-+++ b/drivers/md/raid10.c
-@@ -3446,8 +3446,7 @@ static sector_t raid10_sync_request(struct mddev *mddev, sector_t sector_nr,
- 			     bio2 && bio2 != bio;
- 			     bio2 = bio2->bi_next) {
- 				/* remove last page from this bio */
--				bio2->bi_vcnt--;
--				bio2->bi_iter.bi_size -= len;
-+				bio_remove_last_page(bio2);
- 				bio_clear_flag(bio2, BIO_SEG_VALID);
- 			}
- 			goto bio_full;
-@@ -4537,8 +4536,7 @@ static sector_t reshape_request(struct mddev *mddev, sector_t sector_nr,
- 			     bio2 && bio2 != bio;
- 			     bio2 = bio2->bi_next) {
- 				/* Remove last page from this bio */
--				bio2->bi_vcnt--;
--				bio2->bi_iter.bi_size -= len;
-+				bio_remove_last_page(bio2);
- 				bio_clear_flag(bio2, BIO_SEG_VALID);
- 			}
- 			goto bio_full;
+diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
+index 1379447..fdeb70b 100644
+--- a/block/cfq-iosched.c
++++ b/block/cfq-iosched.c
+@@ -1361,6 +1361,14 @@ cfq_group_service_tree_add(struct cfq_rb_root *st, struct cfq_group *cfqg)
+ 	cfqg->vfraction = max_t(unsigned, vfr, 1);
+ }
+ 
++static inline u64 cfq_get_cfqg_vdisktime_delay(struct cfq_data *cfqd)
++{
++	if (!iops_mode(cfqd))
++		return CFQ_IDLE_DELAY;
++	else
++		return nsecs_to_jiffies64(CFQ_IDLE_DELAY);
++}
++
+ static void
+ cfq_group_notify_queue_add(struct cfq_data *cfqd, struct cfq_group *cfqg)
+ {
+@@ -1380,7 +1388,8 @@ cfq_group_notify_queue_add(struct cfq_data *cfqd, struct cfq_group *cfqg)
+ 	n = rb_last(&st->rb);
+ 	if (n) {
+ 		__cfqg = rb_entry_cfqg(n);
+-		cfqg->vdisktime = __cfqg->vdisktime + CFQ_IDLE_DELAY;
++		cfqg->vdisktime = __cfqg->vdisktime +
++			cfq_get_cfqg_vdisktime_delay(cfqd);
+ 	} else
+ 		cfqg->vdisktime = st->min_vdisktime;
+ 	cfq_group_service_tree_add(st, cfqg);
 -- 
-2.7.4
+2.5.0
