@@ -1,91 +1,56 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from verein.lst.de ([213.95.11.211]:51931 "EHLO newverein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751243AbdCAPSA (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 1 Mar 2017 10:18:00 -0500
-Date: Wed, 1 Mar 2017 16:17:57 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: "Darrick J. Wong" <darrick.wong@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>, linux-fsdevel@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH 07/12] xfs: implement failure-atomic writes
-Message-ID: <20170301151757.GH12248@lst.de>
-References: <20170228145737.19016-1-hch@lst.de> <20170228145737.19016-8-hch@lst.de> <20170228230940.GB26319@birch.djwong.org>
+Return-Path: <hare@suse.de>
+Subject: Re: [PATCH] sbitmap: boundary checks for resized bitmap
+To: Omar Sandoval <osandov@osandov.com>
+References: <1487157042-5621-1-git-send-email-hare@suse.de>
+ <20170228191512.GA28004@vader.DHCP.thefacebook.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Omar Sandoval <osandov@fb.com>,
+ linux-block@vger.kernel.org, Hannes Reinecke <hare@suse.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <45968daf-5424-d273-d38d-d5c7f992f562@suse.de>
+Date: Wed, 1 Mar 2017 16:39:38 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170228230940.GB26319@birch.djwong.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <20170228191512.GA28004@vader.DHCP.thefacebook.com>
+Content-Type: text/plain; charset=windows-1252
+List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Feb 28, 2017 at 03:09:40PM -0800, Darrick J. Wong wrote:
-> By the way, the copy on write code remembers the extents it has
-> allocated for CoW staging in the refcount btree so that it can free them
-> after a crash, which means that O_ATOMIC requires reflink to be enabled.
-
-Yeah.
-
-> There doesn't seem to be any explicit checking that reflink is even
-> enabled, which will probably just lead to weird crashes on a pre-reflink
-> xfs.
-
-True.  I had this earlier when I hat basic O_ATOMIC validity checking,
-but that was dropped from the series I posted.
-
+On 02/28/2017 08:15 PM, Omar Sandoval wrote:
+> On Wed, Feb 15, 2017 at 12:10:42PM +0100, Hannes Reinecke wrote:
+>> If the sbitmap gets resized we need to ensure not to overflow
+>> the original allocation. And we should limit the search in
+>> sbitmap_any_bit_set() to the available depth to avoid looking
+>> into unused space.
 > 
-> FWIW I didn't see any checking anywhere (vfs or xfs) that the filesystem
-> can actually support O_ATOMIC.  If the FS doesn't support atomic writes,
-> shouldn't the kernel send EINVAL or something back to userspace?
-
-Older kernels can't check it, so having new ones check it creates even
-more of a mess.
-
-I'm still not feeling very well about O_ATOMIC - either we need an
-open2 that checks for unknown flags, or I need to change this to
-a per-op flag - RWF_ATOMIC for write (pwritev2 actually), and MAP_ATOMIC
-for mmap.  But given that pwritev2 isn't really supported in common
-userland yet that might be rather painful.
-
-> At the start of xfs_reflink.c is a long block comment describing how the
-> copy on write mechanism works.  Since O_ATOMIC is a variant on CoW (it's
-> basically CoW with remapping deferred until fsync), please update the
-> comment so that the comments capture the details of how atomic writes
-> work.
+> Hey, Hannes, I don't really like this change. It's easy enough for the
+> caller to keep track of this and check themselves if they really care. I
+> even included a comment in sbitmap.h to that effect:
 > 
-> (IOWs: Dave asked me to leave the big comment, so I'm going to try to
-> keep it fairly up to date.)
+Okay.
 
-I'll add some information to it.
-
-> I suppose it goes without saying that userspace will have to coordinate
-> its O_ATOMIC writes to the file.
-
-It does - but if you have multiple writers to a file they really need
-to be coordinated anyway.  If you have threads whose updates race
-you'd need something like
-
-open(O_TMPFILE)
-clone file (or range) into tempfile
-
-update tempfile
-
-clone region you want atomically inserted back into the original file.
-
-We can actually do that with existing primitives, but it's a bit more
-heavyweight.  We could opimize this a bit by checking if an extent
-already points to the same physical blocks before replacing it in
-clone_file_range.
-
-> > +	if (file->f_flags & O_ATOMIC)
-> > +		printk_ratelimited("O_ATOMIC!\n");
+> /**
+>  * sbitmap_resize() - Resize a &struct sbitmap.
+>  * @sb: Bitmap to resize.
+>  * @depth: New number of bits to resize to.
+>  *
+>  * Doesn't reallocate anything. It's up to the caller to ensure that the new
+>  * depth doesn't exceed the depth that the sb was initialized with.
+>  */
 > 
-> Per above,
 > 
-> if (file->f_flags & O_ATOMIC) {
-> 	if (!xfs_sb_version_hasreflink(...))
-> 		return -EPROTONOSUPPORT;
+> As for the sbitmap_any_bit_set() change, the bits beyond the actual
+> depth should all be zero, so I don't think that change is worth it,
+> either.
+> 
+Hmm. That would be okay if we can be sure that the remaining bits really
+are zero. Which probably would need to be checked by the caller, too.
 
-Yeah.
+So yeah, if you don't like it, okay.
+Just ignore it then.
 
-> 	printk_ratelimited("EXPERIMENTAL atomic writes feature in use!\n");
+Cheers,
 
-And that should just go away - it was a local debug aid :)
+Hannes
+-- 
+Dr. Hannes Reinecke		      zSeries & Storage
+hare@suse.de			      +49 911 74053 688
+SUSE LINUX Products GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: J. Hawn, J. Guild, F. Imend�rffer, HRB 16746 (AG N�rnberg)
