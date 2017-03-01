@@ -1,36 +1,58 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-Date: Thu, 9 Feb 2017 13:59:04 -0800
-From: Matthew Wilcox <willy@infradead.org>
-To: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Cc: Theodore Ts'o <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCHv6 09/37] filemap: allocate huge page in
- pagecache_get_page(), if allowed
-Message-ID: <20170209215904.GX2267@bombadil.infradead.org>
-References: <20170126115819.58875-1-kirill.shutemov@linux.intel.com>
- <20170126115819.58875-10-kirill.shutemov@linux.intel.com>
+Return-Path: <martin.petersen@oracle.com>
+To: Damien Le Moal <damien.lemoal@wdc.com>
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        MPT-FusionLinux.pdl@broadcom.com, Hannes Reinecke <hare@suse.de>,
+        Bart Van Assche <bart.vanassche@sandisk.com>
+Subject: Re: [PATCH 0/3] Separate zone requests from medium access requests
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <20170228102535.15966-1-damien.lemoal@wdc.com>
+	<20170228160259.GA22755@lst.de> <yq160jtu2s0.fsf@oracle.com>
+	<6f1c8be1-9366-b32e-621e-8b05f22a1753@wdc.com>
+Date: Tue, 28 Feb 2017 22:21:47 -0500
+In-Reply-To: <6f1c8be1-9366-b32e-621e-8b05f22a1753@wdc.com> (Damien Le Moal's
+	message of "Wed, 1 Mar 2017 12:02:14 +0900")
+Message-ID: <yq1shmxsmus.fsf@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170126115819.58875-10-kirill.shutemov@linux.intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Jan 26, 2017 at 02:57:51PM +0300, Kirill A. Shutemov wrote:
-> Write path allocate pages using pagecache_get_page(). We should be able
-> to allocate huge pages there, if it's allowed. As usually, fallback to
-> small pages, if failed.
-> 
-> Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+>>>>> "Damien" == Damien Le Moal <damien.lemoal@wdc.com> writes:
 
-Reviewed-by: Matthew Wilcox <mawilcox@microsoft.com>
+Damien,
+
+Damien> The problem remains that the mpt3sas driver needs fixing. As you
+Damien> suggest, we can do that in sd, or directly in mpt3sas.  I tried
+Damien> to do a clean fix in sd, but always end up consuming a lot of
+Damien> aspirin because of all the potential corner cases to deal
+Damien> with.
+
+What? You expected this to be easy? :)
+
+FWIW, I'm perfectly happy with the desire to shuffle the ZBC-specifics
+over to sd_zbc.c.
+
+Damien> The file sd.h has the inline function
+Damien> scsi_medium_access_command() defined. We could move that to
+Damien> include/scsi/scsi.h (or scsi_proto.h) and use it in place of
+Damien> blk_rq_accesses_medium() in the mpt3sas driver to not force
+Damien> unaligned resid corrections for zone commands. Would that be
+Damien> acceptable ?
+
+I'd still rather keep it in sd. If you don't have sufficient supplies of
+aspirin for the sd_completed_bytes() approach then I'm OK with a simple
+tweak to sd_done(). We need something we can reasonably Cc: to stable
+for 4.10.
+
+You are welcome to key off of scsi_medium_access_command() if you like
+but I don't think it's necessary. Just having a default for the req_op
+switch should suffice.
+
+I believe that was your original sd approach. If you post it again I'll
+have another look.
+
+And then I'll put the bigger completion rework back on my todo list.
+
+-- 
+Martin K. Petersen	Oracle Linux Engineering
