@@ -1,59 +1,58 @@
-Return-Path: <jack@suse.cz>
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Tejun Heo <tj@kernel.org>,
-	linux-block@vger.kernel.org,
-	Dan Williams <dan.j.williams@intel.com>,
-	Omar Sandoval <osandov@osandov.com>,
-	Arthur Marsh <arthur.marsh@internode.on.net>,
-	linux-scsi@vger.kernel.org,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH 3/4] block: Make del_gendisk() safer for disks without queues
-Date: Wed,  8 Mar 2017 17:48:33 +0100
-Message-Id: <20170308164834.14302-4-jack@suse.cz>
-In-Reply-To: <20170308164834.14302-1-jack@suse.cz>
-References: <20170308164834.14302-1-jack@suse.cz>
+Return-Path: <keith.busch@intel.com>
+From: Keith Busch <keith.busch@intel.com>
+To: Jens Axboe <axboe@fb.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Christoph Hellwig <hch@lst.de>,
+	linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org
+Cc: Marc MERLIN <marc@merlins.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <keith.busch@intel.com>
+Subject: [PATCH 1/3] blk-mq: Export blk_mq_freeze_queue_wait
+Date: Wed,  1 Mar 2017 14:22:10 -0500
+Message-Id: <1488396132-11369-2-git-send-email-keith.busch@intel.com>
+In-Reply-To: <1488396132-11369-1-git-send-email-keith.busch@intel.com>
+References: <1488396132-11369-1-git-send-email-keith.busch@intel.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Commit 165a5e22fafb "block: Move bdi_unregister() to del_gendisk()"
-added disk->queue dereference to del_gendisk(). Although del_gendisk()
-is not supposed to be called without disk->queue valid and
-blk_unregister_queue() warns in that case, this change will make it oops
-instead. Return to the old more robust behavior of just warning when
-del_gendisk() gets called for gendisk with disk->queue being NULL.
+Drivers can start a freeze, so this provides a way to wait for frozen.
 
-Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
-Signed-off-by: Jan Kara <jack@suse.cz>
+Signed-off-by: Keith Busch <keith.busch@intel.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
 ---
- block/genhd.c | 16 ++++++++++------
- 1 file changed, 10 insertions(+), 6 deletions(-)
+ block/blk-mq.c         | 3 ++-
+ include/linux/blk-mq.h | 1 +
+ 2 files changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/block/genhd.c b/block/genhd.c
-index b26a5ea115d0..94f323842b52 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -681,12 +681,16 @@ void del_gendisk(struct gendisk *disk)
- 	disk->flags &= ~GENHD_FL_UP;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 94593c6..8da2c04 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -75,10 +75,11 @@ void blk_mq_freeze_queue_start(struct request_queue *q)
+ }
+ EXPORT_SYMBOL_GPL(blk_mq_freeze_queue_start);
  
- 	sysfs_remove_link(&disk_to_dev(disk)->kobj, "bdi");
--	/*
--	 * Unregister bdi before releasing device numbers (as they can get
--	 * reused and we'd get clashes in sysfs).
--	 */
--	bdi_unregister(disk->queue->backing_dev_info);
--	blk_unregister_queue(disk);
-+	if (disk->queue) {
-+		/*
-+		 * Unregister bdi before releasing device numbers (as they can
-+		 * get reused and we'd get clashes in sysfs).
-+		 */
-+		bdi_unregister(disk->queue->backing_dev_info);
-+		blk_unregister_queue(disk);
-+	} else {
-+		WARN_ON(1);
-+	}
- 	blk_unregister_region(disk_devt(disk), disk->minors);
+-static void blk_mq_freeze_queue_wait(struct request_queue *q)
++void blk_mq_freeze_queue_wait(struct request_queue *q)
+ {
+ 	wait_event(q->mq_freeze_wq, percpu_ref_is_zero(&q->q_usage_counter));
+ }
++EXPORT_SYMBOL_GPL(blk_mq_freeze_queue_wait);
  
- 	part_stat_set_all(&disk->part0, 0);
+ /*
+  * Guarantee no request is in use, so we can change any data structure of
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 001d30d..8dacf68 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -245,6 +245,7 @@ void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
+ void blk_mq_freeze_queue(struct request_queue *q);
+ void blk_mq_unfreeze_queue(struct request_queue *q);
+ void blk_mq_freeze_queue_start(struct request_queue *q);
++void blk_mq_freeze_queue_wait(struct request_queue *q);
+ int blk_mq_reinit_tagset(struct blk_mq_tag_set *set);
+ 
+ int blk_mq_map_queues(struct blk_mq_tag_set *set);
 -- 
-2.10.2
+2.5.5
