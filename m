@@ -1,99 +1,31 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:63362 "EHLO mga11.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752785AbdCFPlq (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 6 Mar 2017 10:41:46 -0500
-From: Jon Derrick <jonathan.derrick@intel.com>
-To: Jens Axboe <axboe@fb.com>
-Cc: Jon Derrick <jonathan.derrick@intel.com>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        David Binderman <dcb314@hotmail.com>,
-        Scott Bauer <scott.bauer@intel.com>,
-        Rafael Antognolli <rafael.antognolli@intel.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Keith Busch <keith.busch@intel.com>
-Subject: [PATCH] block/sed: Fix opal user range check and unused variables
-Date: Mon,  6 Mar 2017 08:41:04 -0700
-Message-Id: <1488814864-28478-1-git-send-email-jonathan.derrick@intel.com>
+Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:35050 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1752845AbdCBDRq (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 1 Mar 2017 22:17:46 -0500
+Subject: Re: [PATCH 1/2] loop: fix LO_FLAGS_PARTSCAN hang
+To: Omar Sandoval <osandov@osandov.com>, <linux-block@vger.kernel.org>
+References: <7e888cad9e6c35835559281d3ab9e05ea48836d0.1488393750.git.osandov@fb.com>
+CC: <kernel-team@fb.com>, Ming Lei <tom.leiming@gmail.com>,
+        <stable@vger.kernel.org>
+From: Jens Axboe <axboe@fb.com>
+Message-ID: <c868e1be-e224-c1fa-1c32-7c73c1f7359b@fb.com>
+Date: Wed, 1 Mar 2017 19:26:48 -0700
+MIME-Version: 1.0
+In-Reply-To: <7e888cad9e6c35835559281d3ab9e05ea48836d0.1488393750.git.osandov@fb.com>
+Content-Type: text/plain; charset="windows-1252"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Fixes check that the opal user is within the range, and cleans up unused
-method variables.
+On 03/01/2017 11:42 AM, Omar Sandoval wrote:
+> From: Omar Sandoval <osandov@fb.com>
+> 
+> loop_reread_partitions() needs to do I/O, but we just froze the queue,
+> so we end up waiting forever. This can easily be reproduced with losetup
+> -P. Fix it by moving the reread to after we unfreeze the queue.
 
-Signed-off-by: Jon Derrick <jonathan.derrick@intel.com>
----
- block/sed-opal.c | 10 ++--------
- 1 file changed, 2 insertions(+), 8 deletions(-)
+Thanks Omar, applied. That's a brown paper bag bug.
 
-diff --git a/block/sed-opal.c b/block/sed-opal.c
-index 1e18dca..14035f8 100644
---- a/block/sed-opal.c
-+++ b/block/sed-opal.c
-@@ -1023,7 +1023,6 @@ static int finalize_and_send(struct opal_dev *dev, cont_fn cont)
- 
- static int gen_key(struct opal_dev *dev, void *data)
- {
--	const u8 *method;
- 	u8 uid[OPAL_UID_LENGTH];
- 	int err = 0;
- 
-@@ -1031,7 +1030,6 @@ static int gen_key(struct opal_dev *dev, void *data)
- 	set_comid(dev, dev->comid);
- 
- 	memcpy(uid, dev->prev_data, min(sizeof(uid), dev->prev_d_len));
--	method = opalmethod[OPAL_GENKEY];
- 	kfree(dev->prev_data);
- 	dev->prev_data = NULL;
- 
-@@ -1669,7 +1667,6 @@ static int add_user_to_lr(struct opal_dev *dev, void *data)
- static int lock_unlock_locking_range(struct opal_dev *dev, void *data)
- {
- 	u8 lr_buffer[OPAL_UID_LENGTH];
--	const u8 *method;
- 	struct opal_lock_unlock *lkul = data;
- 	u8 read_locked = 1, write_locked = 1;
- 	int err = 0;
-@@ -1677,7 +1674,6 @@ static int lock_unlock_locking_range(struct opal_dev *dev, void *data)
- 	clear_opal_cmd(dev);
- 	set_comid(dev, dev->comid);
- 
--	method = opalmethod[OPAL_SET];
- 	if (build_locking_range(lr_buffer, sizeof(lr_buffer),
- 				lkul->session.opal_key.lr) < 0)
- 		return -ERANGE;
-@@ -1733,14 +1729,12 @@ static int lock_unlock_locking_range_sum(struct opal_dev *dev, void *data)
- {
- 	u8 lr_buffer[OPAL_UID_LENGTH];
- 	u8 read_locked = 1, write_locked = 1;
--	const u8 *method;
- 	struct opal_lock_unlock *lkul = data;
- 	int ret;
- 
- 	clear_opal_cmd(dev);
- 	set_comid(dev, dev->comid);
- 
--	method = opalmethod[OPAL_SET];
- 	if (build_locking_range(lr_buffer, sizeof(lr_buffer),
- 				lkul->session.opal_key.lr) < 0)
- 		return -ERANGE;
-@@ -2133,7 +2127,7 @@ static int opal_add_user_to_lr(struct opal_dev *dev,
- 		pr_err("Locking state was not RO or RW\n");
- 		return -EINVAL;
- 	}
--	if (lk_unlk->session.who < OPAL_USER1 &&
-+	if (lk_unlk->session.who < OPAL_USER1 ||
- 	    lk_unlk->session.who > OPAL_USER9) {
- 		pr_err("Authority was not within the range of users: %d\n",
- 		       lk_unlk->session.who);
-@@ -2316,7 +2310,7 @@ static int opal_activate_user(struct opal_dev *dev,
- 	int ret;
- 
- 	/* We can't activate Admin1 it's active as manufactured */
--	if (opal_session->who < OPAL_USER1 &&
-+	if (opal_session->who < OPAL_USER1 ||
- 	    opal_session->who > OPAL_USER9) {
- 		pr_err("Who was not a valid user: %d\n", opal_session->who);
- 		return -EINVAL;
 -- 
-1.8.3.1
+Jens Axboe
