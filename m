@@ -1,102 +1,65 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 4.11-rc1
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Message-ID: <8fcf6068-2a97-214e-b745-b57078233fb5@kernel.dk>
-Date: Thu, 2 Mar 2017 21:07:33 -0700
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Date: Thu, 2 Mar 2017 16:22:45 +0100
+From: Jan Kara <jack@suse.cz>
+To: Matthew Wilcox <willy@infradead.org>
+Cc: Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@infradead.org>,
+        Goldwyn Rodrigues <rgoldwyn@suse.de>, jack@suse.com,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-xfs@vger.kernel.org, Goldwyn Rodrigues <rgoldwyn@suse.com>
+Subject: Re: [PATCH 3/8] nowait aio: return if direct write will trigger
+ writeback
+Message-ID: <20170302152245.GC23354@quack2.suse.cz>
+References: <20170228233610.25456-1-rgoldwyn@suse.de>
+ <20170228233610.25456-4-rgoldwyn@suse.de>
+ <20170301034606.GK16328@bombadil.infradead.org>
+ <20170301153857.GC30631@infradead.org>
+ <20170302103845.GB31792@quack2.suse.cz>
+ <20170302141245.GO16328@bombadil.infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170302141245.GO16328@bombadil.infradead.org>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Linus,
+On Thu 02-03-17 06:12:45, Matthew Wilcox wrote:
+> On Thu, Mar 02, 2017 at 11:38:45AM +0100, Jan Kara wrote:
+> > On Wed 01-03-17 07:38:57, Christoph Hellwig wrote:
+> > > On Tue, Feb 28, 2017 at 07:46:06PM -0800, Matthew Wilcox wrote:
+> > > > But what's going to kick these pages out of cache?  Shouldn't we rather
+> > > > find the pages, kick them out if clean, start writeback if not, and *then*
+> > > > return -EAGAIN?
+> > > 
+> > > As pointed out in the last round of these patches I think we really
+> > > need to pass a flags argument to filemap_write_and_wait_range to
+> > > communicate the non-blocking nature and only return -EAGAIN if we'd
+> > > block.  As a bonus that can indeed start to kick the pages out.
+> > 
+> > Aren't flags to filemap_write_and_wait_range() unnecessary complication?
+> > Realistically, most users wanting performance from AIO DIO so badly that
+> > they bother with this API won't have any pages to write / evict. If they do
+> > by some bad accident, they can fall back to standard "blocking" AIO DIO.
+> > So I don't see much value in teaching filemap_write_and_wait_range() about
+> > a non-blocking mode...
+> 
+> That lets me execute a DoS against a user using this API.  All I have
+> to do is open the file they're using read-only and read a byte from it.
+> Page goes into page-cache, and they'll only get -EAGAIN from calling
+> this syscall until the page ages out.
 
-A collection of fixes for this merge window, either fixes for existing
-issues, or parts that were waiting for acks to come in. This pull
-request contains:
+It will not be a DoS. This non-blocking AIO can always return EAGAIN when
+it feels like it and the caller is required to fall back to a blocking
+version in that case if he wants to guarantee forward progress. It is just
+a performance optimization which allows user (database) to submit IO from a
+computation thread instead of having to offload it to an IO thread...
 
-- Allocation of nvme queues on the right node from Shaohua. This was
-  ready long before the merge window, but waiting on an ack from Bjorn
-  on the PCI bit. Now that we have that, the three patches can go in.
+> Also, I don't understand why this is a flag.  Isn't the point of AIO to
+> be non-blocking?  Why isn't this just a change to how we do AIO?
 
-- Two fixes for blk-mq-sched with nvmeof, which uses hctx specific
-  request allocations. This caused an oops. One part from Sagi, one part
-  from Omar.
+Because this is an API change and the caller has to implement some handling
+to guarantee a forward progress of non-blocking IO...
 
-- A loop partition scan deadlock fix from Omar, fixing a regression in
-  this merge window.
-
-- A 3 patch series from Keith, closing up a hole on clearing out
-  requests on shutdown/resume.
-
-- A stable fix for nbd from Josef, fixing a leak of sockets.
-
-- Two fixes for a regression in this window from Jan, fixing a problem
-  with one of his earlier patches dealing with queue vs bdi life times.
-
-- A fix for a regression with virtio-blk, causing an IO stall if
-  scheduling is used. From me.
-
-- A fix for an io context lock ordering problem. From me.
-
-Please pull!
-
-
-  git://git.kernel.dk/linux-block.git for-linus
-
-
-----------------------------------------------------------------
-Jan Kara (2):
-      block: Initialize bd_bdi on inode initialization
-      block: Move bdi_unregister() to del_gendisk()
-
-Jens Axboe (2):
-      block: don't call ioc_exit_icq() with the queue lock held for blk-mq
-      blk-mq: ensure that bd->last is always set correctly
-
-Josef Bacik (1):
-      nbd: stop leaking sockets
-
-Keith Busch (3):
-      blk-mq: Export blk_mq_freeze_queue_wait
-      blk-mq: Provide freeze queue timeout
-      nvme: Complete all stuck requests
-
-Omar Sandoval (4):
-      blk-mq: make blk_mq_alloc_request_hctx() allocate a scheduler request
-      blk-mq: kill blk_mq_set_alloc_data()
-      blk-mq: move update of tags->rqs to __blk_mq_alloc_request()
-      loop: fix LO_FLAGS_PARTSCAN hang
-
-Sagi Grimberg (1):
-      blk-mq-sched: Allocate sched reserved tags as specified in the original queue tagset
-
-Shaohua Li (3):
-      blk-mq: allocate blk_mq_tags and requests in correct node
-      PCI: add an API to get node from vector
-      nvme: allocate nvme_queue in correct node
-
- block/blk-core.c         |   1 -
- block/blk-ioc.c          |  44 ++++++++++++-----
- block/blk-mq-sched.c     |  16 +++----
- block/blk-mq-tag.c       |   2 +-
- block/blk-mq-tag.h       |   6 +++
- block/blk-mq.c           | 120 ++++++++++++++++++++++++++++++++++-------------
- block/blk-mq.h           |  10 ----
- block/blk-sysfs.c        |   2 -
- block/elevator.c         |   2 -
- block/genhd.c            |   5 ++
- drivers/block/loop.c     |  15 +++---
- drivers/block/nbd.c      |   4 +-
- drivers/nvme/host/core.c |  47 +++++++++++++++++++
- drivers/nvme/host/nvme.h |   4 ++
- drivers/nvme/host/pci.c  |  45 ++++++++++++++----
- drivers/pci/msi.c        |  16 +++++++
- fs/block_dev.c           |   6 ++-
- include/linux/blk-mq.h   |   3 ++
- include/linux/pci.h      |   6 +++
- 19 files changed, 265 insertions(+), 89 deletions(-)
-
+								Honza
 -- 
-Jens Axboe
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
