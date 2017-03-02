@@ -1,126 +1,106 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-ua0-f172.google.com ([209.85.217.172]:35321 "EHLO
-        mail-ua0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751276AbdCCCmP (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Mar 2017 21:42:15 -0500
-MIME-Version: 1.0
-In-Reply-To: <20170302174803.ds45hdbzkofl5hkh@kernel.org>
-References: <1488296503-4987-1-git-send-email-tom.leiming@gmail.com>
- <1488296503-4987-7-git-send-email-tom.leiming@gmail.com> <20170228233716.v3izfseg3dpdyexc@kernel.org>
- <CACVXFVPqFyvsdwjdcHbKm8J8Ni=d5isSxguRVJZoF3m2kaO98Q@mail.gmail.com> <20170302174803.ds45hdbzkofl5hkh@kernel.org>
-From: Ming Lei <tom.leiming@gmail.com>
-Date: Fri, 3 Mar 2017 10:11:31 +0800
-Message-ID: <CACVXFVPQx0rQqQS0PG2MoYh+pGvVQb_H_+fMCGbWeVDM3JNcnQ@mail.gmail.com>
-Subject: Re: [PATCH v2 06/13] md: raid1: don't use bio's vec table to manage
- resync pages
-To: Shaohua Li <shli@kernel.org>
+Received: from mail.kernel.org ([198.145.29.136]:43124 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753134AbdCBSlY (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 2 Mar 2017 13:41:24 -0500
+Date: Thu, 2 Mar 2017 09:48:03 -0800
+From: Shaohua Li <shli@kernel.org>
+To: Ming Lei <tom.leiming@gmail.com>
 Cc: Jens Axboe <axboe@fb.com>,
         "open list:SOFTWARE RAID (Multiple Disks) SUPPORT"
         <linux-raid@vger.kernel.org>,
         linux-block <linux-block@vger.kernel.org>,
         Christoph Hellwig <hch@infradead.org>
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [PATCH v2 06/13] md: raid1: don't use bio's vec table to manage
+ resync pages
+Message-ID: <20170302174803.ds45hdbzkofl5hkh@kernel.org>
+References: <1488296503-4987-1-git-send-email-tom.leiming@gmail.com>
+ <1488296503-4987-7-git-send-email-tom.leiming@gmail.com>
+ <20170228233716.v3izfseg3dpdyexc@kernel.org>
+ <CACVXFVPqFyvsdwjdcHbKm8J8Ni=d5isSxguRVJZoF3m2kaO98Q@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CACVXFVPqFyvsdwjdcHbKm8J8Ni=d5isSxguRVJZoF3m2kaO98Q@mail.gmail.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Fri, Mar 3, 2017 at 1:48 AM, Shaohua Li <shli@kernel.org> wrote:
-> On Thu, Mar 02, 2017 at 10:25:10AM +0800, Ming Lei wrote:
->> Hi Shaohua,
->>
->> On Wed, Mar 1, 2017 at 7:37 AM, Shaohua Li <shli@kernel.org> wrote:
->> > On Tue, Feb 28, 2017 at 11:41:36PM +0800, Ming Lei wrote:
->> >> Now we allocate one page array for managing resync pages, instead
->> >> of using bio's vec table to do that, and the old way is very hacky
->> >> and won't work any more if multipage bvec is enabled.
->> >>
->> >> The introduced cost is that we need to allocate (128 + 16) * raid_disks
->> >> bytes per r1_bio, and it is fine because the inflight r1_bio for
->> >> resync shouldn't be much, as pointed by Shaohua.
->> >>
->> >> Also the bio_reset() in raid1_sync_request() is removed because
->> >> all bios are freshly new now and not necessary to reset any more.
->> >>
->> >> This patch can be thought as a cleanup too
->> >>
->> >> Suggested-by: Shaohua Li <shli@kernel.org>
->> >> Signed-off-by: Ming Lei <tom.leiming@gmail.com>
->> >> ---
->> >>  drivers/md/raid1.c | 83 ++++++++++++++++++++++++++++++++++--------------------
->> >>  1 file changed, 53 insertions(+), 30 deletions(-)
->> >>
->> >> diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
->> >> index c442b4657e2f..900144f39630 100644
->> >> --- a/drivers/md/raid1.c
->> >> +++ b/drivers/md/raid1.c
->> >> @@ -77,6 +77,16 @@ static void lower_barrier(struct r1conf *conf, sector_t sector_nr);
->> >>  #define raid1_log(md, fmt, args...)                          \
->> >>       do { if ((md)->queue) blk_add_trace_msg((md)->queue, "raid1 " fmt, ##args); } while (0)
->> >>
->> >> +static inline struct resync_pages *get_resync_pages(struct bio *bio)
->> >> +{
->> >> +     return bio->bi_private;
->> >> +}
->> >> +
->> >> +static inline struct r1bio *get_resync_r1bio(struct bio *bio)
->> >> +{
->> >> +     return get_resync_pages(bio)->raid_bio;
->> >> +}
->> >
->> > This is a weird between bio, r1bio and the resync_pages. I'd like the pages are
->>
->> It is only a bit weird inside allocating and freeing r1bio, once all
->> are allocated, you
->> can see everthing is clean and simple:
->>
->>     - r1bio includes lots of bioes,
->>     - and one bio is attached by one resync_pages via .bi_private
->
-> I don't how complex to let r1bio pointer to the pages, but that's the nartual
-> way. r1bio owns the pages, not the pages own r1bio, so we should let r1bio
-> points to the pages. The bio.bi_private still points to r1bio.
+On Thu, Mar 02, 2017 at 10:25:10AM +0800, Ming Lei wrote:
+> Hi Shaohua,
+> 
+> On Wed, Mar 1, 2017 at 7:37 AM, Shaohua Li <shli@kernel.org> wrote:
+> > On Tue, Feb 28, 2017 at 11:41:36PM +0800, Ming Lei wrote:
+> >> Now we allocate one page array for managing resync pages, instead
+> >> of using bio's vec table to do that, and the old way is very hacky
+> >> and won't work any more if multipage bvec is enabled.
+> >>
+> >> The introduced cost is that we need to allocate (128 + 16) * raid_disks
+> >> bytes per r1_bio, and it is fine because the inflight r1_bio for
+> >> resync shouldn't be much, as pointed by Shaohua.
+> >>
+> >> Also the bio_reset() in raid1_sync_request() is removed because
+> >> all bios are freshly new now and not necessary to reset any more.
+> >>
+> >> This patch can be thought as a cleanup too
+> >>
+> >> Suggested-by: Shaohua Li <shli@kernel.org>
+> >> Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+> >> ---
+> >>  drivers/md/raid1.c | 83 ++++++++++++++++++++++++++++++++++--------------------
+> >>  1 file changed, 53 insertions(+), 30 deletions(-)
+> >>
+> >> diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
+> >> index c442b4657e2f..900144f39630 100644
+> >> --- a/drivers/md/raid1.c
+> >> +++ b/drivers/md/raid1.c
+> >> @@ -77,6 +77,16 @@ static void lower_barrier(struct r1conf *conf, sector_t sector_nr);
+> >>  #define raid1_log(md, fmt, args...)                          \
+> >>       do { if ((md)->queue) blk_add_trace_msg((md)->queue, "raid1 " fmt, ##args); } while (0)
+> >>
+> >> +static inline struct resync_pages *get_resync_pages(struct bio *bio)
+> >> +{
+> >> +     return bio->bi_private;
+> >> +}
+> >> +
+> >> +static inline struct r1bio *get_resync_r1bio(struct bio *bio)
+> >> +{
+> >> +     return get_resync_pages(bio)->raid_bio;
+> >> +}
+> >
+> > This is a weird between bio, r1bio and the resync_pages. I'd like the pages are
+> 
+> It is only a bit weird inside allocating and freeing r1bio, once all
+> are allocated, you
+> can see everthing is clean and simple:
+> 
+>     - r1bio includes lots of bioes,
+>     - and one bio is attached by one resync_pages via .bi_private
 
-Actually it is bio which owns the pages for doing its own I/O, and the only
-thing related with r10bio is that bios may share these pages, but using
-page refcount trick will make the relation quite implicit.
+I don't how complex to let r1bio pointer to the pages, but that's the nartual
+way. r1bio owns the pages, not the pages own r1bio, so we should let r1bio
+points to the pages. The bio.bi_private still points to r1bio.
 
-The only reason to allocate all resync_pages together is for sake of efficiency,
-and just for avoiding to allocate one resync_pages one time for each bio.
+> > embedded in r1bio. Maybe a pointer of r1bio to the pages. It's cleaner and more
+> > straightforward.
+> 
+> In theory, the cleanest way is to allocate one resync_pages for each resync bio,
+> but that isn't efficient. That is why this patch allocates all
+> resync_pages together
+> in r1buf_pool_alloc(), and split them into bio.
+> 
+> BTW, the only trick is just that the whole page array is stored in .bi_private
+> of the 1st bio, then we can avoid to add one pointer into r1bio.
 
-We have to make .bi_private point to resync_pages(per bio), otherwise we
-can't fetch pages into one bio at all, thinking about where to store the index
-for each bio's pre-allocated pages, and it has to be per bio.
+You will need to add pointer in resync_pages which points to r1bio
+ 
+> >
+> > I think the patch 6, 7 8 should be in a same patch. Otherwise bisect will be broken.
+> >
+> 
+> No, it won't. Both patch 7 and patch 8 just replacing reading from bvec table
+> with reading from the pre-allocated page array.  Both should be fine, but the
+> latter is cleaner and simpler to do.
 
->
->> > embedded in r1bio. Maybe a pointer of r1bio to the pages. It's cleaner and more
->> > straightforward.
->>
->> In theory, the cleanest way is to allocate one resync_pages for each resync bio,
->> but that isn't efficient. That is why this patch allocates all
->> resync_pages together
->> in r1buf_pool_alloc(), and split them into bio.
->>
->> BTW, the only trick is just that the whole page array is stored in .bi_private
->> of the 1st bio, then we can avoid to add one pointer into r1bio.
->
-> You will need to add pointer in resync_pages which points to r1bio
-
-Yeah, that is just what this patchset is doing.
-
->
->> >
->> > I think the patch 6, 7 8 should be in a same patch. Otherwise bisect will be broken.
->> >
->>
->> No, it won't. Both patch 7 and patch 8 just replacing reading from bvec table
->> with reading from the pre-allocated page array.  Both should be fine, but the
->> latter is cleaner and simpler to do.
->
-> Ok, sounds good, though I doubt it's really worthy.
-
-Small patch with one purpose is always easy to review, do one thing,
-do it better,
-:-)
-
+Ok, sounds good, though I doubt it's really worthy.
 
 Thanks,
-Ming Lei
+Shaohua
