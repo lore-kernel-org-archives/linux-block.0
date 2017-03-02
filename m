@@ -1,43 +1,61 @@
-Return-Path: <BATV+f1fc5bea56d51e2fc981+4960+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk,
-	martin.petersen@oracle.com,
-	agk@redhat.com,
-	snitzer@redhat.com,
-	shli@kernel.org,
-	philipp.reisner@linbit.com,
-	lars.ellenberg@linbit.com
-Cc: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	drbd-dev@lists.linbit.com,
-	dm-devel@redhat.com,
-	linux-raid@vger.kernel.org
-Subject: [PATCH 17/23] rbd: remove the discard_zeroes_data flag
-Date: Thu, 23 Mar 2017 10:33:35 -0400
-Message-Id: <20170323143341.31549-18-hch@lst.de>
-In-Reply-To: <20170323143341.31549-1-hch@lst.de>
-References: <20170323143341.31549-1-hch@lst.de>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [WIP BRANCH] cgroups support in bfq-mq WIP branch
+To: Paolo Valente <paolo.valente@linaro.org>
+References: <CBE2870C-EEB4-4C2E-A5A3-20C37E16B6AE@linaro.org>
+ <97eadcb9-5049-399a-e5a7-d4f8b821756b@kernel.dk>
+ <3410FACF-D8AF-41FA-B38B-9EFAE6B301F0@linaro.org>
+Cc: "ulf.hansson@linaro.org" <ulf.hansson@linaro.org>,
+ "tj@kernel.org" <tj@kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "broonie@kernel.org" <broonie@kernel.org>,
+ "linus.walleij@linaro.org" <linus.walleij@linaro.org>,
+ Bart Van Assche <bart.vanassche@sandisk.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <fd6a9297-3987-d0ed-22ae-b490b8dc5496@kernel.dk>
+Date: Thu, 2 Mar 2017 08:19:05 -0700
+MIME-Version: 1.0
+In-Reply-To: <3410FACF-D8AF-41FA-B38B-9EFAE6B301F0@linaro.org>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-block@vger.kernel.org>
 
-rbd only supports discarding on large alignments, so the zeroing code
-would always fall back to explicit writings of zeroes.
+On 03/02/2017 03:15 AM, Paolo Valente wrote:
+> 
+>> Il giorno 25 feb 2017, alle ore 19:52, Jens Axboe <axboe@kernel.dk> ha scritto:
+>>
+>> On 02/25/2017 10:44 AM, Paolo Valente wrote:
+>>> Hi,
+>>> I've just completed cgroups support, and I'd like to highlight the
+>>> main blk-mq issue that I have found along the way.  I have pushed the
+>>> commit that completes the support for cgroups to the usual WIP branch
+>>> [1].  Before moving to this issue, I have preliminary question about
+>>> the scheduler name, since I'm about to start preparing the patch
+>>> series for submission.  So far, I have used bfq-mq as a temporary
+>>> name.  Are we fine with it, or should I change it, for example, to
+>>> just bfq?  Jens?
+>>
+>> Just call it 'bfq', that doesn't conflict with anything that's
+>> in the kernel already.
+>>
+> 
+> ok
+> 
+>>> I've found a sort of circular dependency in blk-mq, related to
+>>> scheduler initialization.  To describe both the issue and how I've
+>>> addressed it, I'm pasting the message of the new commit.
+>>
+>> Rebase your patches on top of Linus current master, some of them
+>> will need to change and some can be dropped.
+>>
+> 
+> Done, but the last deadlock issue shows up again :( To help you get
+> context, I'm going to reply to the email in which your sent the patch that
+> solved it.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/block/rbd.c | 1 -
- 1 file changed, 1 deletion(-)
+OK, I got that sent to you. When you have tested it, just add it as
+a prep patch in your series. If it works for you, then let me know
+and I'll add your Tested-by: to that patch and post it for more
+thorough review.
 
-diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
-index 517838b65964..0ec3b430e81d 100644
---- a/drivers/block/rbd.c
-+++ b/drivers/block/rbd.c
-@@ -4380,7 +4380,6 @@ static int rbd_init_disk(struct rbd_device *rbd_dev)
- 	q->limits.discard_granularity = segment_size;
- 	q->limits.discard_alignment = segment_size;
- 	blk_queue_max_discard_sectors(q, segment_size / SECTOR_SIZE);
--	q->limits.discard_zeroes_data = 1;
- 
- 	if (!ceph_test_opt(rbd_dev->rbd_client->client, NOCRC))
- 		q->backing_dev_info->capabilities |= BDI_CAP_STABLE_WRITES;
 -- 
-2.11.0
+Jens Axboe
