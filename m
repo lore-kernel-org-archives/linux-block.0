@@ -1,17 +1,11 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f49.google.com ([74.125.83.49]:36190 "EHLO
-        mail-pg0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750941AbdCBUyV (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Mar 2017 15:54:21 -0500
-Received: by mail-pg0-f49.google.com with SMTP id s67so35912127pgb.3
-        for <linux-block@vger.kernel.org>; Thu, 02 Mar 2017 12:54:06 -0800 (PST)
-Date: Thu, 2 Mar 2017 12:53:22 -0800
-From: Omar Sandoval <osandov@osandov.com>
-To: Jens Axboe <axboe@fb.com>
-Cc: Paolo Valente <paolo.valente@linaro.org>,
-        linux-block@vger.kernel.org, kernel-team@fb.com
+Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:44671 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1751821AbdCBUsS (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 2 Mar 2017 15:48:18 -0500
 Subject: Re: [PATCH] blk-mq-sched: don't hold queue_lock when calling exit_icq
-Message-ID: <20170302205322.GB7792@vader>
+To: Paolo Valente <paolo.valente@linaro.org>
 References: <73cd0cf484e8b75a771d908c172cd3a931dc00a3.1486751329.git.osandov@fb.com>
  <A71AF11B-8A3A-42A5-845A-B9FBEEF74FBA@linaro.org>
  <a3e62a57-d401-99e0-6487-fc8277204e71@fb.com>
@@ -21,52 +15,96 @@ References: <73cd0cf484e8b75a771d908c172cd3a931dc00a3.1486751329.git.osandov@fb.
  <80de4554-a14b-4ce6-7c6e-ec66f70b14b1@fb.com>
  <6C03BF2A-0902-431A-A545-933F56D3E134@linaro.org>
  <75978d1d-8022-75c2-7799-aa65132fdcdd@fb.com>
+ <54B1C78E-F58F-4F59-A31B-2E9E64444773@linaro.org>
+CC: Omar Sandoval <osandov@osandov.com>, <linux-block@vger.kernel.org>,
+        <kernel-team@fb.com>
+From: Jens Axboe <axboe@fb.com>
+Message-ID: <d182fad4-d108-2d3d-06ea-72748ea166b4@fb.com>
+Date: Thu, 2 Mar 2017 11:25:06 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <75978d1d-8022-75c2-7799-aa65132fdcdd@fb.com>
+In-Reply-To: <54B1C78E-F58F-4F59-A31B-2E9E64444773@linaro.org>
+Content-Type: text/plain; charset="windows-1252"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Thu, Mar 02, 2017 at 09:13:30AM -0700, Jens Axboe wrote:
-> I was worried about that. How about the below? We need to grab the lock
-> at some point for legacy scheduling, but the ordering should be correct.
+On 03/02/2017 11:07 AM, Paolo Valente wrote:
+> 
+>> Il giorno 02 mar 2017, alle ore 17:13, Jens Axboe <axboe@fb.com> ha scritto:
+>>
+>> On 03/02/2017 09:07 AM, Paolo Valente wrote:
+>>>
+>>>> Il giorno 02 mar 2017, alle ore 16:13, Jens Axboe <axboe@fb.com> ha scritto:
+>>>>
+>>>> On 03/02/2017 08:00 AM, Jens Axboe wrote:
+>>>>> On 03/02/2017 03:28 AM, Paolo Valente wrote:
+>>>>>>
+>>>>>>> Il giorno 15 feb 2017, alle ore 19:04, Jens Axboe <axboe@fb.com> ha scritto:
+>>>>>>>
+>>>>>>> On 02/15/2017 10:58 AM, Jens Axboe wrote:
+>>>>>>>> On 02/15/2017 10:24 AM, Paolo Valente wrote:
+>>>>>>>>>
+>>>>>>>>>> Il giorno 10 feb 2017, alle ore 19:32, Omar Sandoval <osandov@osandov.com> ha scritto:
+>>>>>>>>>>
+>>>>>>>>>> From: Omar Sandoval <osandov@fb.com>
+>>>>>>>>>>
+>>>>>>>>>> None of the other blk-mq elevator hooks are called with this lock held.
+>>>>>>>>>> Additionally, it can lead to circular locking dependencies between
+>>>>>>>>>> queue_lock and the private scheduler lock.
+>>>>>>>>>>
+>>>>>>>>>
+>>>>>>>>> Hi Omar,
+>>>>>>>>> I'm sorry but it seems that a new potential deadlock has showed up.
+>>>>>>>>> See lockdep splat below.
+>>>>>>>>>
+>>>>>>>>> I've tried to think about different solutions than turning back to
+>>>>>>>>> deferring the body of exit_icq, but at no avail.
+>>>>>>>>
+>>>>>>>> Looks like a interaction between bfqd->lock and q->queue_lock. Since the
+>>>>>>>> core has no notion of you bfqd->lock, the naturally dependency here
+>>>>>>>> would be to nest bfqd->lock inside q->queue_lock. Is that possible for
+>>>>>>>> you?
+>>>>>>>>
+>>>>>>>> Looking at the code a bit, maybe it'd just be simpler to get rid of
+>>>>>>>> holding the queue lock for that spot. For the mq scheduler, we really
+>>>>>>>> don't want places where we invoke with that held already. Does the below
+>>>>>>>> work for you?
+>>>>>>>
+>>>>>>> Would need to remove one more lockdep assert. And only test this for
+>>>>>>> the mq parts, we'd need to spread a bit of love on the classic
+>>>>>>> scheduling icq exit path for this to work on that side.
+>>>>>>>
+>>>>>>
+>>>>>>
+>>>>>> Jens,
+>>>>>> here is the reply I anticipated in my previous email: after rebasing
+>>>>>> against master, I'm getting again the deadlock that this patch of
+>>>>>> yours solved (together with some changes in bfq-mq).  I thought you added a
+>>>>>> sort of equivalent commit (now) to the mainline branch.  Am I wrong?
+>>>>>
+>>>>> The patch I posted was never pulled to completion, it wasn't clear
+>>>>> to me if it fixed your issue or not. Maybe I missed a reply on
+>>>>> that?
+>>>>>
+>>>>> Let me take another stab at it today, I'll send you a version to test
+>>>>> on top of my for-linus branch.
+>>>>
+>>>> I took at look at my last posting, and I think it was only missing a
+>>>> lock grab in cfq, since we don't hold that for icq exit anymore.  Paolo,
+>>>> it'd be great if you could verify that this works. Not for bfq-mq (we
+>>>> already know it does), but for CFQ.
+>>>
+>>> No luck, sorry :(
+>>>
+>>> It looks like to have just not to take q->queue_lock in cfq_exit_icq.
+>>
+>> I was worried about that. How about the below? We need to grab the lock
+>> at some point for legacy scheduling, but the ordering should be correct.
+>>
+>>
+> 
+> It seems to be: no more crashes or lockdep complains after several tests, boots and shutdowns :)
 
-Makes sense, now the locking is consistent with the other place we call
-ioc_exit_icq(). One nit below, and you can add
+Great! Can I add your Tested-by?
 
-Reviewed-by: Omar Sandoval <osandov@fb.com>
-
-> diff --git a/block/blk-ioc.c b/block/blk-ioc.c
-> index b12f9c87b4c3..6fd633b5d567 100644
-> --- a/block/blk-ioc.c
-> +++ b/block/blk-ioc.c
-> @@ -54,7 +54,7 @@ static void ioc_exit_icq(struct io_cq *icq)
->  	icq->flags |= ICQ_EXITED;
->  }
->  
-> -/* Release an icq.  Called with both ioc and q locked. */
-> +/* Release an icq.  Called with ioc locked. */
-
-For ioc_exit_icq(), we have the more explicit comment
-
-/*
- * Exit an icq. Called with both ioc and q locked for sq, only ioc locked for
- * mq.
- */
-
-Could you document that here, too?
-
->  static void ioc_destroy_icq(struct io_cq *icq)
->  {
->  	struct io_context *ioc = icq->ioc;
-> @@ -62,7 +62,6 @@ static void ioc_destroy_icq(struct io_cq *icq)
->  	struct elevator_type *et = q->elevator->type;
->  
->  	lockdep_assert_held(&ioc->lock);
-> -	lockdep_assert_held(q->queue_lock);
->  
->  	radix_tree_delete(&ioc->icq_tree, icq->q->id);
->  	hlist_del_init(&icq->ioc_node);
-> @@ -222,24 +221,40 @@ void exit_io_context(struct task_struct *task)
->  	put_io_context_active(ioc);
->  }
+-- 
+Jens Axboe
