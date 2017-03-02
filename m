@@ -1,70 +1,28 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f196.google.com ([209.85.192.196]:33648 "EHLO
-        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754621AbdCPQOU (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Mar 2017 12:14:20 -0400
-From: Ming Lei <tom.leiming@gmail.com>
-To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
-        linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Ming Lei <tom.leiming@gmail.com>
-Subject: [PATCH v3 00/14]  md: cleanup on direct access to bvec table
-Date: Fri, 17 Mar 2017 00:12:21 +0800
-Message-Id: <20170316161235.27110-1-tom.leiming@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <hch@lst.de>
+Date: Thu, 2 Mar 2017 01:14:59 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Keith Busch <keith.busch@intel.com>
+Cc: Jens Axboe <axboe@fb.com>, Sagi Grimberg <sagi@grimberg.me>,
+	Christoph Hellwig <hch@lst.de>, linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org, Marc MERLIN <marc@merlins.org>,
+	Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH 2/3] blk-mq: Provide freeze queue timeout
+Message-ID: <20170302001459.GA23070@lst.de>
+References: <1488396132-11369-1-git-send-email-keith.busch@intel.com> <1488396132-11369-3-git-send-email-keith.busch@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1488396132-11369-3-git-send-email-keith.busch@intel.com>
+List-ID: <linux-block@vger.kernel.org>
 
-In MD's resync I/O path, there are lots of direct access to bio's
-bvec table. This patchset kills almost all, and the conversion
-is quite straightforward. One root cause of direct access to bvec
-table is that resync I/O uses the bio's bvec to manage pages.
-In V1, as suggested by Shaohua, a new approach is used to manage
-these pages for resync I/O, turns out code becomes more clean
-and readable.
+> +int blk_mq_freeze_queue_wait_timeout(struct request_queue *q,
+> +				     unsigned long timeout)
+> +{
+> +	return wait_event_timeout(q->mq_freeze_wq,
+> +					percpu_ref_is_zero(&q->q_usage_counter),
+> +					timeout);
+> +}
+> +EXPORT_SYMBOL_GPL(blk_mq_freeze_queue_wait_timeout);
 
-Once direct access to bvec table in MD is cleaned up, we may make
-multipage bvec moving on.
-
-V3:
-	- improve pages allocation & bio clone for write behind(10/14)
-	- retrieve pages from preallocated page array, and avoid to user
-	bio helpers(14/14)
-	- change on helpers about managing resync io pages(03/14)
-
-V2:
-	- remove the patch for introducing/applying bio_remove_last_page()
-
-V1:
-	- allocate page array to manage resync pages
-
-Thanks,
-Ming
-
-Ming Lei (14):
-  md: raid1/raid10: don't handle failure of bio_add_page()
-  md: move two macros into md.h
-  md: prepare for managing resync I/O pages in clean way
-  md: raid1: simplify r1buf_pool_free()
-  md: raid1: don't use bio's vec table to manage resync pages
-  md: raid1: retrieve page from pre-allocated resync page array
-  md: raid1: use bio helper in process_checks()
-  block: introduce bio_copy_data_partial
-  md: raid1: move 'offset' out of loop
-  md: raid1: improve write behind
-  md: raid10: refactor code of read reshape's .bi_end_io
-  md: raid10: don't use bio's vec table to manage resync pages
-  md: raid10: retrieve page from preallocated resync page array
-  md: raid10: avoid direct access to bvec table in
-    handle_reshape_read_error
-
- block/bio.c         |  60 +++++++++---
- drivers/md/md.h     |  55 +++++++++++
- drivers/md/raid1.c  | 267 ++++++++++++++++++++++++++++------------------------
- drivers/md/raid1.h  |  10 +-
- drivers/md/raid10.c | 224 +++++++++++++++++++++++--------------------
- include/linux/bio.h |   2 +
- 6 files changed, 376 insertions(+), 242 deletions(-)
-
--- 
-2.9.3
+Can you just add the timeout argument to blk_mq_freeze_queue_wait?
+Existing callers can pass 0, which is interpreted as no timeout by
+the low-level wait code.
