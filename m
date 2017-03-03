@@ -1,79 +1,103 @@
-Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
-From: Sagi Grimberg <sagi@grimberg.me>
-To: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
- linux-rdma@vger.kernel.org, target-devel@vger.kernel.org
-Subject: [PATCH rfc 02/10] nvme-pci: Add budget to __nvme_process_cq
-Date: Thu,  9 Mar 2017 15:16:34 +0200
-Message-Id: <1489065402-14757-3-git-send-email-sagi@grimberg.me>
-In-Reply-To: <1489065402-14757-1-git-send-email-sagi@grimberg.me>
-References: <1489065402-14757-1-git-send-email-sagi@grimberg.me>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
-List-Post: <mailto:linux-nvme@lists.infradead.org>
-List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail.kernel.org ([198.145.29.136]:33156 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752335AbdCCRqO (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 3 Mar 2017 12:46:14 -0500
+Date: Fri, 3 Mar 2017 09:38:00 -0800
+From: Shaohua Li <shli@kernel.org>
+To: Ming Lei <tom.leiming@gmail.com>
+Cc: Jens Axboe <axboe@fb.com>,
+        "open list:SOFTWARE RAID (Multiple Disks) SUPPORT"
+        <linux-raid@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Christoph Hellwig <hch@infradead.org>
+Subject: Re: [PATCH v2 06/13] md: raid1: don't use bio's vec table to manage
+ resync pages
+Message-ID: <20170303173800.tj43oir24fuw5yb2@kernel.org>
+References: <1488296503-4987-1-git-send-email-tom.leiming@gmail.com>
+ <1488296503-4987-7-git-send-email-tom.leiming@gmail.com>
+ <20170228233716.v3izfseg3dpdyexc@kernel.org>
+ <CACVXFVPqFyvsdwjdcHbKm8J8Ni=d5isSxguRVJZoF3m2kaO98Q@mail.gmail.com>
+ <20170302174803.ds45hdbzkofl5hkh@kernel.org>
+ <CACVXFVPQx0rQqQS0PG2MoYh+pGvVQb_H_+fMCGbWeVDM3JNcnQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
-Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CACVXFVPQx0rQqQS0PG2MoYh+pGvVQb_H_+fMCGbWeVDM3JNcnQ@mail.gmail.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Prepare to allow passing a batch size to nvme cq processing.
+On Fri, Mar 03, 2017 at 10:11:31AM +0800, Ming Lei wrote:
+> On Fri, Mar 3, 2017 at 1:48 AM, Shaohua Li <shli@kernel.org> wrote:
+> > On Thu, Mar 02, 2017 at 10:25:10AM +0800, Ming Lei wrote:
+> >> Hi Shaohua,
+> >>
+> >> On Wed, Mar 1, 2017 at 7:37 AM, Shaohua Li <shli@kernel.org> wrote:
+> >> > On Tue, Feb 28, 2017 at 11:41:36PM +0800, Ming Lei wrote:
+> >> >> Now we allocate one page array for managing resync pages, instead
+> >> >> of using bio's vec table to do that, and the old way is very hacky
+> >> >> and won't work any more if multipage bvec is enabled.
+> >> >>
+> >> >> The introduced cost is that we need to allocate (128 + 16) * raid_disks
+> >> >> bytes per r1_bio, and it is fine because the inflight r1_bio for
+> >> >> resync shouldn't be much, as pointed by Shaohua.
+> >> >>
+> >> >> Also the bio_reset() in raid1_sync_request() is removed because
+> >> >> all bios are freshly new now and not necessary to reset any more.
+> >> >>
+> >> >> This patch can be thought as a cleanup too
+> >> >>
+> >> >> Suggested-by: Shaohua Li <shli@kernel.org>
+> >> >> Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+> >> >> ---
+> >> >>  drivers/md/raid1.c | 83 ++++++++++++++++++++++++++++++++++--------------------
+> >> >>  1 file changed, 53 insertions(+), 30 deletions(-)
+> >> >>
+> >> >> diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
+> >> >> index c442b4657e2f..900144f39630 100644
+> >> >> --- a/drivers/md/raid1.c
+> >> >> +++ b/drivers/md/raid1.c
+> >> >> @@ -77,6 +77,16 @@ static void lower_barrier(struct r1conf *conf, sector_t sector_nr);
+> >> >>  #define raid1_log(md, fmt, args...)                          \
+> >> >>       do { if ((md)->queue) blk_add_trace_msg((md)->queue, "raid1 " fmt, ##args); } while (0)
+> >> >>
+> >> >> +static inline struct resync_pages *get_resync_pages(struct bio *bio)
+> >> >> +{
+> >> >> +     return bio->bi_private;
+> >> >> +}
+> >> >> +
+> >> >> +static inline struct r1bio *get_resync_r1bio(struct bio *bio)
+> >> >> +{
+> >> >> +     return get_resync_pages(bio)->raid_bio;
+> >> >> +}
+> >> >
+> >> > This is a weird between bio, r1bio and the resync_pages. I'd like the pages are
+> >>
+> >> It is only a bit weird inside allocating and freeing r1bio, once all
+> >> are allocated, you
+> >> can see everthing is clean and simple:
+> >>
+> >>     - r1bio includes lots of bioes,
+> >>     - and one bio is attached by one resync_pages via .bi_private
+> >
+> > I don't how complex to let r1bio pointer to the pages, but that's the nartual
+> > way. r1bio owns the pages, not the pages own r1bio, so we should let r1bio
+> > points to the pages. The bio.bi_private still points to r1bio.
+> 
+> Actually it is bio which owns the pages for doing its own I/O, and the only
+> thing related with r10bio is that bios may share these pages, but using
+> page refcount trick will make the relation quite implicit.
+>
+> The only reason to allocate all resync_pages together is for sake of efficiency,
+> and just for avoiding to allocate one resync_pages one time for each bio.
+> 
+> We have to make .bi_private point to resync_pages(per bio), otherwise we
+> can't fetch pages into one bio at all, thinking about where to store the index
+> for each bio's pre-allocated pages, and it has to be per bio.
 
-This patch does not change an functionality.
+So the reason is we can't find the corresponding pages of the bio if bi_private
+points to r1bio, right? Got it. We don't have many choices in this way. Ok, I
+don't insist. Please add some comments in the get_resync_r1bio to describe how
+the data structure is organized.
 
-Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
----
- drivers/nvme/host/pci.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index d3f74fa40f26..4ed67f194cfd 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -716,14 +716,15 @@ static inline bool nvme_read_cqe(struct nvme_queue *nvmeq,
- 	return false;
- }
- 
--static int __nvme_process_cq(struct nvme_queue *nvmeq, int *tag)
-+static int __nvme_process_cq(struct nvme_queue *nvmeq, int budget, int *tag)
- {
- 	struct nvme_completion cqe;
- 	int consumed = 0;
- 
- 	while (nvme_read_cqe(nvmeq, &cqe)) {
- 		nvme_handle_cqe(nvmeq, &cqe);
--		consumed++;
-+		if (++consumed == budget)
-+			break;
- 
- 		if (tag && *tag == cqe.command_id) {
- 			*tag = -1;
-@@ -741,7 +742,7 @@ static int __nvme_process_cq(struct nvme_queue *nvmeq, int *tag)
- 
- static int nvme_process_cq(struct nvme_queue *nvmeq)
- {
--	return __nvme_process_cq(nvmeq, NULL);
-+	return __nvme_process_cq(nvmeq, INT_MAX, NULL);
- }
- 
- static irqreturn_t nvme_irq(int irq, void *data)
-@@ -772,7 +773,7 @@ static int nvme_poll(struct blk_mq_hw_ctx *hctx, unsigned int tag)
- 
- 	if (nvme_cqe_valid(nvmeq, nvmeq->cq_head, nvmeq->cq_phase)) {
- 		spin_lock_irq(&nvmeq->q_lock);
--		__nvme_process_cq(nvmeq, &tag);
-+		__nvme_process_cq(nvmeq, INT_MAX, &tag);
- 		spin_unlock_irq(&nvmeq->q_lock);
- 
- 		if (tag == -1)
--- 
-2.7.4
-
-
-_______________________________________________
-Linux-nvme mailing list
-Linux-nvme@lists.infradead.org
-http://lists.infradead.org/mailman/listinfo/linux-nvme
+Thanks,
+Shaohua
