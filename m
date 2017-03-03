@@ -1,91 +1,165 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f195.google.com ([209.85.192.195]:33735 "EHLO
-        mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755095AbdCPQO2 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Mar 2017 12:14:28 -0400
+Received: from mail-ua0-f195.google.com ([209.85.217.195]:33069 "EHLO
+        mail-ua0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751409AbdCCCVN (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Mar 2017 21:21:13 -0500
+MIME-Version: 1.0
+In-Reply-To: <20170302175543.ta2tmjveatjiiapc@kernel.org>
+References: <1488296503-4987-1-git-send-email-tom.leiming@gmail.com>
+ <1488296503-4987-5-git-send-email-tom.leiming@gmail.com> <20170228233011.rdqtde22zwsimbz7@kernel.org>
+ <CACVXFVMJ-h+TwKT8eVbg3AxUjBzzEsCV0SeuDUaQ3FvFdfni3w@mail.gmail.com> <20170302175543.ta2tmjveatjiiapc@kernel.org>
 From: Ming Lei <tom.leiming@gmail.com>
-To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
-        linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
+Date: Fri, 3 Mar 2017 09:54:37 +0800
+Message-ID: <CACVXFVODAM6sise1FjwFhkJq9bXrFGjEgj=KLw6fuHrefV55DA@mail.gmail.com>
+Subject: Re: [PATCH v2 04/13] md: prepare for managing resync I/O pages in
+ clean way
+To: Shaohua Li <shli@kernel.org>
+Cc: Jens Axboe <axboe@fb.com>,
+        "open list:SOFTWARE RAID (Multiple Disks) SUPPORT"
+        <linux-raid@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
         Christoph Hellwig <hch@infradead.org>
-Cc: Ming Lei <tom.leiming@gmail.com>
-Subject: [PATCH v3 06/14] md: raid1: retrieve page from pre-allocated resync page array
-Date: Fri, 17 Mar 2017 00:12:27 +0800
-Message-Id: <20170316161235.27110-7-tom.leiming@gmail.com>
-In-Reply-To: <20170316161235.27110-1-tom.leiming@gmail.com>
-References: <20170316161235.27110-1-tom.leiming@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Now one page array is allocated for each resync bio, and we can
-retrieve page from this table directly.
+On Fri, Mar 3, 2017 at 1:55 AM, Shaohua Li <shli@kernel.org> wrote:
+> On Thu, Mar 02, 2017 at 10:09:14AM +0800, Ming Lei wrote:
+>> Hi Shaohua,
+>>
+>> On Wed, Mar 1, 2017 at 7:30 AM, Shaohua Li <shli@kernel.org> wrote:
+>> > On Tue, Feb 28, 2017 at 11:41:34PM +0800, Ming Lei wrote:
+>> >> Now resync I/O use bio's bec table to manage pages,
+>> >> this way is very hacky, and may not work any more
+>> >> once multipage bvec is introduced.
+>> >>
+>> >> So introduce helpers and new data structure for
+>> >> managing resync I/O pages more cleanly.
+>> >>
+>> >> Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+>> >> ---
+>> >>  drivers/md/md.h | 54 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>> >>  1 file changed, 54 insertions(+)
+>> >>
+>> >> diff --git a/drivers/md/md.h b/drivers/md/md.h
+>> >> index 1d63239a1be4..b5a638d85cb4 100644
+>> >> --- a/drivers/md/md.h
+>> >> +++ b/drivers/md/md.h
+>> >> @@ -720,4 +720,58 @@ static inline void mddev_check_writesame(struct mddev *mddev, struct bio *bio)
+>> >>  #define RESYNC_BLOCK_SIZE (64*1024)
+>> >>  #define RESYNC_PAGES ((RESYNC_BLOCK_SIZE + PAGE_SIZE-1) / PAGE_SIZE)
+>> >>
+>> >> +/* for managing resync I/O pages */
+>> >> +struct resync_pages {
+>> >> +     unsigned        idx;    /* for get/put page from the pool */
+>> >> +     void            *raid_bio;
+>> >> +     struct page     *pages[RESYNC_PAGES];
+>> >> +};
+>> >
+>> > I'd like this to be embedded into r1bio directly. Not sure if we really need a
+>> > structure.
+>>
+>> There are two reasons we can't put this into r1bio:
+>> - r1bio is used in both normal and resync I/O, not fair to allocate more
+>> in normal I/O, and that is why this patch wouldn't like to touch r1bio or r10bio
+>>
+>> - the count of 'struct resync_pages' instance depends on raid_disks(raid1)
+>> or copies(raid10), both can't be decided during compiling.
+>
+> Yes, I said it should be a pointer of r1bio pointing to the pages in other emails.
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
----
- drivers/md/raid1.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+OK, got it, :-)
 
-diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
-index 0e64beb60e4d..b1345aa4efd8 100644
---- a/drivers/md/raid1.c
-+++ b/drivers/md/raid1.c
-@@ -1992,6 +1992,7 @@ static int fix_sync_read_error(struct r1bio *r1_bio)
- 	struct mddev *mddev = r1_bio->mddev;
- 	struct r1conf *conf = mddev->private;
- 	struct bio *bio = r1_bio->bios[r1_bio->read_disk];
-+	struct page **pages = get_resync_pages(bio)->pages;
- 	sector_t sect = r1_bio->sector;
- 	int sectors = r1_bio->sectors;
- 	int idx = 0;
-@@ -2025,7 +2026,7 @@ static int fix_sync_read_error(struct r1bio *r1_bio)
- 				 */
- 				rdev = conf->mirrors[d].rdev;
- 				if (sync_page_io(rdev, sect, s<<9,
--						 bio->bi_io_vec[idx].bv_page,
-+						 pages[idx],
- 						 REQ_OP_READ, 0, false)) {
- 					success = 1;
- 					break;
-@@ -2080,7 +2081,7 @@ static int fix_sync_read_error(struct r1bio *r1_bio)
- 				continue;
- 			rdev = conf->mirrors[d].rdev;
- 			if (r1_sync_page_io(rdev, sect, s,
--					    bio->bi_io_vec[idx].bv_page,
-+					    pages[idx],
- 					    WRITE) == 0) {
- 				r1_bio->bios[d]->bi_end_io = NULL;
- 				rdev_dec_pending(rdev, mddev);
-@@ -2095,7 +2096,7 @@ static int fix_sync_read_error(struct r1bio *r1_bio)
- 				continue;
- 			rdev = conf->mirrors[d].rdev;
- 			if (r1_sync_page_io(rdev, sect, s,
--					    bio->bi_io_vec[idx].bv_page,
-+					    pages[idx],
- 					    READ) != 0)
- 				atomic_add(s, &rdev->corrected_errors);
- 		}
-@@ -2171,6 +2172,8 @@ static void process_checks(struct r1bio *r1_bio)
- 		struct bio *pbio = r1_bio->bios[primary];
- 		struct bio *sbio = r1_bio->bios[i];
- 		int error = sbio->bi_error;
-+		struct page **ppages = get_resync_pages(pbio)->pages;
-+		struct page **spages = get_resync_pages(sbio)->pages;
- 
- 		if (sbio->bi_end_io != end_sync_read)
- 			continue;
-@@ -2179,11 +2182,8 @@ static void process_checks(struct r1bio *r1_bio)
- 
- 		if (!error) {
- 			for (j = vcnt; j-- ; ) {
--				struct page *p, *s;
--				p = pbio->bi_io_vec[j].bv_page;
--				s = sbio->bi_io_vec[j].bv_page;
--				if (memcmp(page_address(p),
--					   page_address(s),
-+				if (memcmp(page_address(ppages[j]),
-+					   page_address(spages[j]),
- 					   sbio->bi_io_vec[j].bv_len))
- 					break;
- 			}
--- 
-2.9.3
+Actually I did that in my local tree, and finally I figured out not
+necessary to introduce this pointor, which only usage is for freeing,
+and we can get the
+pointor from .bi_private of the 1st bio. And this stuff can be commented
+clearly.
+
+>
+>> >
+>> >> +}
+>> >> +
+>> >> +static inline bool resync_page_available(struct resync_pages *rp)
+>> >> +{
+>> >> +     return rp->idx < RESYNC_PAGES;
+>> >> +}
+>> >
+>> > Then we don't need this obscure API.
+>>
+>> That is fine.
+>>
+>>
+>> Thanks,
+>> Ming Lei
+>
+>> >
+>> >> +
+>> >> +static inline int resync_alloc_pages(struct resync_pages *rp,
+>> >> +                                  gfp_t gfp_flags)
+>> >> +{
+>> >> +     int i;
+>> >> +
+>> >> +     for (i = 0; i < RESYNC_PAGES; i++) {
+>> >> +             rp->pages[i] = alloc_page(gfp_flags);
+>> >> +             if (!rp->pages[i])
+>> >> +                     goto out_free;
+>> >> +     }
+>> >> +
+>> >> +     return 0;
+>> >> +
+>> >> + out_free:
+>> >> +     while (--i >= 0)
+>> >> +             __free_page(rp->pages[i]);
+>> >> +     return -ENOMEM;
+>> >> +}
+>> >> +
+>> >> +static inline void resync_free_pages(struct resync_pages *rp)
+>> >> +{
+>> >> +     int i;
+>> >> +
+>> >> +     for (i = 0; i < RESYNC_PAGES; i++)
+>> >> +             __free_page(rp->pages[i]);
+>> >
+>> > Since we will use get_page, shouldn't this be put_page?
+>>
+>> You are right, will fix in v3.
+>>
+>> >
+>> >> +}
+>> >> +
+>> >> +static inline void resync_get_all_pages(struct resync_pages *rp)
+>> >> +{
+>> >> +     int i;
+>> >> +
+>> >> +     for (i = 0; i < RESYNC_PAGES; i++)
+>> >> +             get_page(rp->pages[i]);
+>> >> +}
+>> >> +
+>> >> +static inline struct page *resync_fetch_page(struct resync_pages *rp)
+>> >> +{
+>> >> +     if (WARN_ON_ONCE(rp->idx >= RESYNC_PAGES))
+>> >> +             return NULL;
+>> >> +     return rp->pages[rp->idx++];
+>> >
+>> > I'd like the caller explicitly specify the index instead of a global variable
+>> > to track it, which will make the code more understandable and less error prone.
+>>
+>> That is fine, but the index has to be per bio, and finally the index
+>> has to be stored
+>> in 'struct resync_pages', so every user has to call it in the following way:
+>>
+>>           resync_fetch_page(rp, rp->idx);
+>>
+>> then looks no benefit to pass index explicitly.
+>
+> I suppose the callers always iterate though page 0 to RESYNC_PAGES - 1. Then
+> the callers can use an index by themselves. That will clearly show which page
+> the callers are using. The resync_fetch_page() wrap is a blackbox we always
+> need to refer to the definition.
+
+OK, understood.
+
+
+Thanks,
+Ming Lei
