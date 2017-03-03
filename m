@@ -1,87 +1,88 @@
-Return-Path: <jack@suse.cz>
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
-	Lekshmi Pillai <lekshmicpillai@in.ibm.com>,
-	Tejun Heo <tj@kernel.org>,
-	NeilBrown <neilb@suse.de>,
-	Omar Sandoval <osandov@osandov.com>,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH 11/11] block: Fix oops scsi_disk_get()
-Date: Mon,  6 Mar 2017 17:34:04 +0100
-Message-Id: <20170306163404.1238-12-jack@suse.cz>
-In-Reply-To: <20170306163404.1238-1-jack@suse.cz>
-References: <20170306163404.1238-1-jack@suse.cz>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-ua0-f193.google.com ([209.85.217.193]:35058 "EHLO
+        mail-ua0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750709AbdCCCi1 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Mar 2017 21:38:27 -0500
+MIME-Version: 1.0
+In-Reply-To: <20170302074753.6zsdspg5e67l24xu@kernel.org>
+References: <1488296503-4987-1-git-send-email-tom.leiming@gmail.com>
+ <1488296503-4987-14-git-send-email-tom.leiming@gmail.com> <20170228234627.3h6tospuz33yhdig@kernel.org>
+ <CACVXFVN8aE_Cd=ssBuhmVRK5YYRe2q4+jXoxsfztFLZiimH_xA@mail.gmail.com> <20170302074753.6zsdspg5e67l24xu@kernel.org>
+From: Ming Lei <tom.leiming@gmail.com>
+Date: Fri, 3 Mar 2017 10:30:08 +0800
+Message-ID: <CACVXFVMLGPmO1s=MOkQJN30RdMnitL3=3POSc77iscxGr6BwNg@mail.gmail.com>
+Subject: Re: [PATCH v2 13/13] md: raid10: avoid direct access to bvec table in handle_reshape_read_error
+To: Shaohua Li <shli@kernel.org>
+Cc: Jens Axboe <axboe@fb.com>,
+        "open list:SOFTWARE RAID (Multiple Disks) SUPPORT"
+        <linux-raid@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Christoph Hellwig <hch@infradead.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-When device open races with device shutdown, we can get the following
-oops in scsi_disk_get():
+On Thu, Mar 2, 2017 at 3:47 PM, Shaohua Li <shli@kernel.org> wrote:
+> On Thu, Mar 02, 2017 at 10:37:49AM +0800, Ming Lei wrote:
+>> Hi Shaohua,
+>>
+>> On Wed, Mar 1, 2017 at 7:46 AM, Shaohua Li <shli@kernel.org> wrote:
+>> > On Tue, Feb 28, 2017 at 11:41:43PM +0800, Ming Lei wrote:
+>> >> The cost is 128bytes(8*16) stack space in kernel thread context, and
+>> >> just use the bio helper to retrieve pages from bio.
+>> >>
+>> >> Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+>> >> ---
+>> >>  drivers/md/raid10.c | 12 ++++++++++--
+>> >>  1 file changed, 10 insertions(+), 2 deletions(-)
+>> >>
+>> >> diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
+>> >> index 0b97631e3905..6ffb64ab45f8 100644
+>> >> --- a/drivers/md/raid10.c
+>> >> +++ b/drivers/md/raid10.c
+>> >> @@ -4670,7 +4670,15 @@ static int handle_reshape_read_error(struct mddev *mddev,
+>> >>       struct r10bio *r10b = &on_stack.r10_bio;
+>> >>       int slot = 0;
+>> >>       int idx = 0;
+>> >> -     struct bio_vec *bvec = r10_bio->master_bio->bi_io_vec;
+>> >> +     struct bio_vec *bvl;
+>> >> +     struct page *pages[RESYNC_PAGES];
+>> >> +
+>> >> +     /*
+>> >> +      * This bio is allocated in reshape_request(), and size
+>> >> +      * is still RESYNC_PAGES
+>> >> +      */
+>> >> +     bio_for_each_segment_all(bvl, r10_bio->master_bio, idx)
+>> >> +             pages[idx] = bvl->bv_page;
+>> >
+>> > The reshape bio is doing IO against the memory we allocated for r10_bio, I'm
+>> > wondering why we can't get the pages from r10_bio. In this way, we don't need
+>> > access the bio_vec any more.
+>>
+>> Reshap read is special and the bio(r10_bio->master_bio) isn't allocated from
+>> .r10buf_pool, please see reshape_request().
+>
+> Why does this matter? The bio is still doing IO to the memory allocated in
+> r10_bio. bi_private->r10_bio->the pages.
 
-[11863.044351] general protection fault: 0000 [#1] SMP
-[11863.045561] Modules linked in: scsi_debug xfs libcrc32c netconsole btrfs raid6_pq zlib_deflate lzo_compress xor [last unloaded: loop]
-[11863.047853] CPU: 3 PID: 13042 Comm: hald-probe-stor Tainted: G W      4.10.0-rc2-xen+ #35
-[11863.048030] Hardware name: Bochs Bochs, BIOS Bochs 01/01/2011
-[11863.048030] task: ffff88007f438200 task.stack: ffffc90000fd0000
-[11863.048030] RIP: 0010:scsi_disk_get+0x43/0x70
-[11863.048030] RSP: 0018:ffffc90000fd3a08 EFLAGS: 00010202
-[11863.048030] RAX: 6b6b6b6b6b6b6b6b RBX: ffff88007f56d000 RCX: 0000000000000000
-[11863.048030] RDX: 0000000000000001 RSI: 0000000000000004 RDI: ffffffff81a8d880
-[11863.048030] RBP: ffffc90000fd3a18 R08: 0000000000000000 R09: 0000000000000001
-[11863.059217] R10: 0000000000000000 R11: 0000000000000000 R12: 00000000fffffffa
-[11863.059217] R13: ffff880078872800 R14: ffff880070915540 R15: 000000000000001d
-[11863.059217] FS:  00007f2611f71800(0000) GS:ffff88007f0c0000(0000) knlGS:0000000000000000
-[11863.059217] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[11863.059217] CR2: 000000000060e048 CR3: 00000000778d4000 CR4: 00000000000006e0
-[11863.059217] Call Trace:
-[11863.059217]  ? disk_get_part+0x22/0x1f0
-[11863.059217]  sd_open+0x39/0x130
-[11863.059217]  __blkdev_get+0x69/0x430
-[11863.059217]  ? bd_acquire+0x7f/0xc0
-[11863.059217]  ? bd_acquire+0x96/0xc0
-[11863.059217]  ? blkdev_get+0x350/0x350
-[11863.059217]  blkdev_get+0x126/0x350
-[11863.059217]  ? _raw_spin_unlock+0x2b/0x40
-[11863.059217]  ? bd_acquire+0x7f/0xc0
-[11863.059217]  ? blkdev_get+0x350/0x350
-[11863.059217]  blkdev_open+0x65/0x80
-...
+Good question, :-)
 
-As you can see RAX value is already poisoned showing that gendisk we got
-is already freed. The problem is that get_gendisk() looks up device
-number in ext_devt_idr and then does get_disk() which does kobject_get()
-on the disks kobject. However the disk gets removed from ext_devt_idr
-only in disk_release() (through blk_free_devt()) at which moment it has
-already 0 refcount and is already on its way to be freed. Indeed we've
-got a warning from kobject_get() about 0 refcount shortly before the
-oops.
+>
+> My guess why you think the reshape read is special is the bio->bi_private
+> doesn't pointer to resync_pages. And since you let resync_pages pointer to
+> r10_bio and not vice versa, we can't find r10_bio, correct? I think this is
+> another reason why r10_bio embeds resync_pages (I mean a pointer to
+> resync_pages). With this way I suggested, the reshape read isn't special at
 
-We fix the problem by using kobject_get_unless_zero() in get_disk() so
-that get_disk() cannot get reference on a disk that is already being
-freed.
+We still can get the resync_pages for r10_bio->master_bio via
+r10_bio->devs[0].bio in handle_reshape_read_error(), will do that in v3.
 
-Tested-by: Lekshmi Pillai <lekshmicpillai@in.ibm.com>
-Reviewed-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Acked-by: Tejun Heo <tj@kernel.org>
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- block/genhd.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> all. If we allocate memory for r10_bio/r1_bio, we shouldn't need access any bio
+> bvec.
 
-diff --git a/block/genhd.c b/block/genhd.c
-index e8df37de03af..7fa59bc231dd 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -1374,7 +1374,7 @@ struct kobject *get_disk(struct gendisk *disk)
- 	owner = disk->fops->owner;
- 	if (owner && !try_module_get(owner))
- 		return NULL;
--	kobj = kobject_get(&disk_to_dev(disk)->kobj);
-+	kobj = kobject_get_unless_zero(&disk_to_dev(disk)->kobj);
- 	if (kobj == NULL) {
- 		module_put(owner);
- 		return NULL;
--- 
-2.10.2
+Right.
+
+
+
+Thanks,
+Ming Lei
