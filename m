@@ -1,106 +1,43 @@
-Return-Path: <BATV+f1fc5bea56d51e2fc981+4960+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk,
-	martin.petersen@oracle.com,
-	agk@redhat.com,
-	snitzer@redhat.com,
-	shli@kernel.org,
-	philipp.reisner@linbit.com,
-	lars.ellenberg@linbit.com
-Cc: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	drbd-dev@lists.linbit.com,
-	dm-devel@redhat.com,
-	linux-raid@vger.kernel.org
-Subject: [PATCH 13/23] nvme: implement REQ_OP_WRITE_ZEROES
-Date: Thu, 23 Mar 2017 10:33:31 -0400
-Message-Id: <20170323143341.31549-14-hch@lst.de>
-In-Reply-To: <20170323143341.31549-1-hch@lst.de>
-References: <20170323143341.31549-1-hch@lst.de>
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Fri, 3 Mar 2017 11:12:22 -0800
+From: Tejun Heo <tj@kernel.org>
+To: Hou Tao <houtao1@huawei.com>
+Cc: linux-block@vger.kernel.org, axboe@kernel.dk
+Subject: Re: [PATCH] block: use put_io_context_active() to disassociate bio
+ from a task
+Message-ID: <20170303191222.GA20854@wtj.duckdns.org>
+References: <1488524470-570-1-git-send-email-houtao1@huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1488524470-570-1-git-send-email-houtao1@huawei.com>
 List-ID: <linux-block@vger.kernel.org>
 
-But now for the real NVMe Write Zeroes yet, just to get rid of the
-discard abuse for zeroing.  Also rename the quirk flag to be a bit
-more self-explanatory.
+Hello,
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/nvme/host/core.c | 10 +++++-----
- drivers/nvme/host/nvme.h |  6 +++---
- drivers/nvme/host/pci.c  |  6 +++---
- 3 files changed, 11 insertions(+), 11 deletions(-)
+On Fri, Mar 03, 2017 at 03:01:10PM +0800, Hou Tao wrote:
+> bio_associate_current() invokes get_io_context_active() to tell
+> CFQ scheduler that the current io_context is still issuing IOs
+> by increasing active_ref. When the bio is done, we also need
+> to invoke put_io_context_active() to decrease active_ref else
+> the associated io_context will always be active.
+> 
+> Signed-off-by: Hou Tao <houtao1@huawei.com>
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 9b3b57fef446..bfa0595dc767 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -335,6 +335,8 @@ int nvme_setup_cmd(struct nvme_ns *ns, struct request *req,
- 	case REQ_OP_FLUSH:
- 		nvme_setup_flush(ns, cmd);
- 		break;
-+	case REQ_OP_WRITE_ZEROES:
-+		/* currently only aliased to deallocate for a few ctrls: */
- 	case REQ_OP_DISCARD:
- 		ret = nvme_setup_discard(ns, req, cmd);
- 		break;
-@@ -900,16 +902,14 @@ static void nvme_config_discard(struct nvme_ns *ns)
- 	BUILD_BUG_ON(PAGE_SIZE / sizeof(struct nvme_dsm_range) <
- 			NVME_DSM_MAX_RANGES);
- 
--	if (ctrl->quirks & NVME_QUIRK_DISCARD_ZEROES)
--		ns->queue->limits.discard_zeroes_data = 1;
--	else
--		ns->queue->limits.discard_zeroes_data = 0;
--
- 	ns->queue->limits.discard_alignment = logical_block_size;
- 	ns->queue->limits.discard_granularity = logical_block_size;
- 	blk_queue_max_discard_sectors(ns->queue, UINT_MAX);
- 	blk_queue_max_discard_segments(ns->queue, NVME_DSM_MAX_RANGES);
- 	queue_flag_set_unlocked(QUEUE_FLAG_DISCARD, ns->queue);
-+
-+	if (ctrl->quirks & NVME_QUIRK_DEALLOCATE_ZEROES)
-+		blk_queue_max_write_zeroes_sectors(ns->queue, UINT_MAX);
- }
- 
- static int nvme_revalidate_ns(struct nvme_ns *ns, struct nvme_id_ns **id)
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index 2aa20e3e5675..07ebc4a1c8fc 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -68,10 +68,10 @@ enum nvme_quirks {
- 	NVME_QUIRK_IDENTIFY_CNS			= (1 << 1),
- 
- 	/*
--	 * The controller deterministically returns O's on reads to discarded
--	 * logical blocks.
-+	 * The controller deterministically returns O's on reads to
-+	 * logical blocks that deallocate was called on.
- 	 */
--	NVME_QUIRK_DISCARD_ZEROES		= (1 << 2),
-+	NVME_QUIRK_DEALLOCATE_ZEROES		= (1 << 2),
- 
- 	/*
- 	 * The controller needs a delay before starts checking the device
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index 26a5fd05fe88..0a28787267f0 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -2135,13 +2135,13 @@ static const struct pci_error_handlers nvme_err_handler = {
- static const struct pci_device_id nvme_id_table[] = {
- 	{ PCI_VDEVICE(INTEL, 0x0953),
- 		.driver_data = NVME_QUIRK_STRIPE_SIZE |
--				NVME_QUIRK_DISCARD_ZEROES, },
-+				NVME_QUIRK_DEALLOCATE_ZEROES, },
- 	{ PCI_VDEVICE(INTEL, 0x0a53),
- 		.driver_data = NVME_QUIRK_STRIPE_SIZE |
--				NVME_QUIRK_DISCARD_ZEROES, },
-+				NVME_QUIRK_DEALLOCATE_ZEROES, },
- 	{ PCI_VDEVICE(INTEL, 0x0a54),
- 		.driver_data = NVME_QUIRK_STRIPE_SIZE |
--				NVME_QUIRK_DISCARD_ZEROES, },
-+				NVME_QUIRK_DEALLOCATE_ZEROES, },
- 	{ PCI_VDEVICE(INTEL, 0x5845),	/* Qemu emulated controller */
- 		.driver_data = NVME_QUIRK_IDENTIFY_CNS, },
- 	{ PCI_DEVICE(0x1c58, 0x0003),	/* HGST adapter */
+Can you please explain how you noticed issue and verified the patch?
+Also, the patch will need the following.
+
+ Fixes: 852c788f8365 ("block: implement bio_associate_current()")
+ Cc: stable@vger.kernel.org # v3.5+
+
+I think the failure mode isn't severe.  We'll be carrying around ioc's
+longer than necessary but that's about it.  I wonder whether the logic
+can be simplified in general.  Anyways, please feel free to add
+
+ Acked-by: Tejun Heo <tj@kernel.org>
+
+Thanks.
+
 -- 
-2.11.0
+tejun
