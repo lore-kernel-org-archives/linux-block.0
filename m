@@ -1,221 +1,181 @@
-Return-Path: <jack@suse.cz>
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Tejun Heo <tj@kernel.org>,
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+From: Paolo Valente <paolo.valente@linaro.org>
+To: Jens Axboe <axboe@kernel.dk>,
+	Tejun Heo <tj@kernel.org>
+Cc: Fabio Checconi <fchecconi@gmail.com>,
+	Arianna Avanzini <avanzini.arianna@gmail.com>,
 	linux-block@vger.kernel.org,
-	Dan Williams <dan.j.williams@intel.com>,
-	Omar Sandoval <osandov@osandov.com>,
-	Arthur Marsh <arthur.marsh@internode.on.net>,
-	linux-scsi@vger.kernel.org,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH 4/4] Revert "scsi, block: fix duplicate bdi name registration crashes"
-Date: Thu,  9 Mar 2017 11:16:24 +0100
-Message-Id: <20170309101624.25901-5-jack@suse.cz>
-In-Reply-To: <20170309101624.25901-1-jack@suse.cz>
-References: <20170309101624.25901-1-jack@suse.cz>
+	linux-kernel@vger.kernel.org,
+	ulf.hansson@linaro.org,
+	linus.walleij@linaro.org,
+	broonie@kernel.org,
+	Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH RFC 09/14] block, bfq: reduce latency during request-pool saturation
+Date: Sat,  4 Mar 2017 17:01:26 +0100
+Message-Id: <20170304160131.57366-10-paolo.valente@linaro.org>
+In-Reply-To: <20170304160131.57366-1-paolo.valente@linaro.org>
+References: <20170304160131.57366-1-paolo.valente@linaro.org>
 List-ID: <linux-block@vger.kernel.org>
 
-This reverts commit 0dba1314d4f81115dce711292ec7981d17231064. It causes
-leaking of device numbers for SCSI when SCSI registers multiple gendisks
-for one request_queue in succession. It can be easily reproduced using
-Omar's script [1] on kernel with CONFIG_DEBUG_TEST_DRIVER_REMOVE.
-Furthermore the protection provided by this commit is not needed anymore
-as the problem it was fixing got also fixed by commit 165a5e22fafb
-"block: Move bdi_unregister() to del_gendisk()".
+This patch introduces an heuristic that reduces latency when the
+I/O-request pool is saturated. This goal is achieved by disabling
+device idling, for non-weight-raised queues, when there are weight-
+raised queues with pending or in-flight requests. In fact, as
+explained in more detail in the comment on the function
+bfq_bfqq_may_idle(), this reduces the rate at which processes
+associated with non-weight-raised queues grab requests from the pool,
+thereby increasing the probability that processes associated with
+weight-raised queues get a request immediately (or at least soon) when
+they need one. Along the same line, if there are weight-raised queues,
+then this patch halves the service rate of async (write) requests for
+non-weight-raised queues.
 
-[1]: http://marc.info/?l=linux-block&m=148554717109098&w=2
-
-Tested-by: Omar Sandoval <osandov@fb.com>
-Acked-by: Dan Williams <dan.j.williams@intel.com>
-Signed-off-by: Jan Kara <jack@suse.cz>
+Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+Signed-off-by: Arianna Avanzini <avanzini.arianna@gmail.com>
 ---
- block/blk-core.c       |  2 --
- block/genhd.c          | 21 ---------------------
- drivers/scsi/sd.c      | 41 ++++++++---------------------------------
- include/linux/blkdev.h |  1 -
- include/linux/genhd.h  |  8 --------
- 5 files changed, 8 insertions(+), 65 deletions(-)
+ block/bfq-iosched.c | 66 ++++++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 63 insertions(+), 3 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 1086dac8724c..a76895c9776d 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -578,8 +578,6 @@ void blk_cleanup_queue(struct request_queue *q)
- 		q->queue_lock = &q->__queue_lock;
- 	spin_unlock_irq(lock);
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index b439779..b22ef42 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -401,6 +401,8 @@ struct bfq_data {
+ 	 * queue in service, even if it is idling).
+ 	 */
+ 	int busy_queues;
++	/* number of weight-raised busy @bfq_queues */
++	int wr_busy_queues;
+ 	/* number of queued requests */
+ 	int queued;
+ 	/* number of requests dispatched and waiting for completion */
+@@ -2436,6 +2438,9 @@ static void bfq_del_bfqq_busy(struct bfq_data *bfqd, struct bfq_queue *bfqq,
  
--	put_disk_devt(q->disk_devt);
--
- 	/* @q is and will stay empty, shutdown and put */
- 	blk_put_queue(q);
- }
-diff --git a/block/genhd.c b/block/genhd.c
-index 94f323842b52..a9c516a8b37d 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -572,20 +572,6 @@ static void register_disk(struct device *parent, struct gendisk *disk)
- 	disk_part_iter_exit(&piter);
- }
+ 	bfqd->busy_queues--;
  
--void put_disk_devt(struct disk_devt *disk_devt)
--{
--	if (disk_devt && atomic_dec_and_test(&disk_devt->count))
--		disk_devt->release(disk_devt);
--}
--EXPORT_SYMBOL(put_disk_devt);
--
--void get_disk_devt(struct disk_devt *disk_devt)
--{
--	if (disk_devt)
--		atomic_inc(&disk_devt->count);
--}
--EXPORT_SYMBOL(get_disk_devt);
--
- /**
-  * device_add_disk - add partitioning information to kernel list
-  * @parent: parent device for the disk
-@@ -626,13 +612,6 @@ void device_add_disk(struct device *parent, struct gendisk *disk)
- 
- 	disk_alloc_events(disk);
- 
--	/*
--	 * Take a reference on the devt and assign it to queue since it
--	 * must not be reallocated while the bdi is registered
--	 */
--	disk->queue->disk_devt = disk->disk_devt;
--	get_disk_devt(disk->disk_devt);
--
- 	/* Register BDI before referencing it from bdev */
- 	bdi = disk->queue->backing_dev_info;
- 	bdi_register_owner(bdi, disk_to_dev(disk));
-diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
-index c7839f6c35cc..d277e8620e3e 100644
---- a/drivers/scsi/sd.c
-+++ b/drivers/scsi/sd.c
-@@ -3075,23 +3075,6 @@ static void sd_probe_async(void *data, async_cookie_t cookie)
- 	put_device(&sdkp->dev);
- }
- 
--struct sd_devt {
--	int idx;
--	struct disk_devt disk_devt;
--};
--
--static void sd_devt_release(struct disk_devt *disk_devt)
--{
--	struct sd_devt *sd_devt = container_of(disk_devt, struct sd_devt,
--			disk_devt);
--
--	spin_lock(&sd_index_lock);
--	ida_remove(&sd_index_ida, sd_devt->idx);
--	spin_unlock(&sd_index_lock);
--
--	kfree(sd_devt);
--}
--
- /**
-  *	sd_probe - called during driver initialization and whenever a
-  *	new scsi device is attached to the system. It is called once
-@@ -3113,7 +3096,6 @@ static void sd_devt_release(struct disk_devt *disk_devt)
- static int sd_probe(struct device *dev)
- {
- 	struct scsi_device *sdp = to_scsi_device(dev);
--	struct sd_devt *sd_devt;
- 	struct scsi_disk *sdkp;
- 	struct gendisk *gd;
- 	int index;
-@@ -3139,13 +3121,9 @@ static int sd_probe(struct device *dev)
- 	if (!sdkp)
- 		goto out;
- 
--	sd_devt = kzalloc(sizeof(*sd_devt), GFP_KERNEL);
--	if (!sd_devt)
--		goto out_free;
--
- 	gd = alloc_disk(SD_MINORS);
- 	if (!gd)
--		goto out_free_devt;
-+		goto out_free;
- 
- 	do {
- 		if (!ida_pre_get(&sd_index_ida, GFP_KERNEL))
-@@ -3161,11 +3139,6 @@ static int sd_probe(struct device *dev)
- 		goto out_put;
- 	}
- 
--	atomic_set(&sd_devt->disk_devt.count, 1);
--	sd_devt->disk_devt.release = sd_devt_release;
--	sd_devt->idx = index;
--	gd->disk_devt = &sd_devt->disk_devt;
--
- 	error = sd_format_disk_name("sd", index, gd->disk_name, DISK_NAME_LEN);
- 	if (error) {
- 		sdev_printk(KERN_WARNING, sdp, "SCSI disk (sd) name length exceeded.\n");
-@@ -3205,12 +3178,11 @@ static int sd_probe(struct device *dev)
- 	return 0;
- 
-  out_free_index:
--	put_disk_devt(&sd_devt->disk_devt);
--	sd_devt = NULL;
-+	spin_lock(&sd_index_lock);
-+	ida_remove(&sd_index_ida, index);
-+	spin_unlock(&sd_index_lock);
-  out_put:
- 	put_disk(gd);
-- out_free_devt:
--	kfree(sd_devt);
-  out_free:
- 	kfree(sdkp);
-  out:
-@@ -3271,7 +3243,10 @@ static void scsi_disk_release(struct device *dev)
- 	struct scsi_disk *sdkp = to_scsi_disk(dev);
- 	struct gendisk *disk = sdkp->disk;
- 	
--	put_disk_devt(disk->disk_devt);
-+	spin_lock(&sd_index_lock);
-+	ida_remove(&sd_index_ida, sdkp->index);
-+	spin_unlock(&sd_index_lock);
++	if (bfqq->wr_coeff > 1)
++		bfqd->wr_busy_queues--;
 +
- 	disk->private_data = NULL;
- 	put_disk(disk);
- 	put_device(&sdkp->device->sdev_gendev);
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 796016e63c1d..5a7da607ca04 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -435,7 +435,6 @@ struct request_queue {
- 	struct delayed_work	delay_work;
+ 	bfqg_stats_update_dequeue(bfqq_group(bfqq));
  
- 	struct backing_dev_info	*backing_dev_info;
--	struct disk_devt	*disk_devt;
+ 	bfq_deactivate_bfqq(bfqd, bfqq, true, expiration);
+@@ -2452,6 +2457,9 @@ static void bfq_add_bfqq_busy(struct bfq_data *bfqd, struct bfq_queue *bfqq)
+ 
+ 	bfq_mark_bfqq_busy(bfqq);
+ 	bfqd->busy_queues++;
++
++	if (bfqq->wr_coeff > 1)
++		bfqd->wr_busy_queues++;
+ }
+ 
+ #ifdef CONFIG_BFQ_GROUP_IOSCHED
+@@ -3725,7 +3733,16 @@ static unsigned long bfq_serv_to_charge(struct request *rq,
+ 	if (bfq_bfqq_sync(bfqq) || bfqq->wr_coeff > 1)
+ 		return blk_rq_sectors(rq);
+ 
+-	return blk_rq_sectors(rq) * bfq_async_charge_factor;
++	/*
++	 * If there are no weight-raised queues, then amplify service
++	 * by just the async charge factor; otherwise amplify service
++	 * by twice the async charge factor, to further reduce latency
++	 * for weight-raised queues.
++	 */
++	if (bfqq->bfqd->wr_busy_queues == 0)
++		return blk_rq_sectors(rq) * bfq_async_charge_factor;
++
++	return blk_rq_sectors(rq) * 2 * bfq_async_charge_factor;
+ }
+ 
+ /**
+@@ -4180,6 +4197,7 @@ static void bfq_add_request(struct request *rq)
+ 			bfqq->wr_coeff = bfqd->bfq_wr_coeff;
+ 			bfqq->wr_cur_max_time = bfq_wr_duration(bfqd);
+ 
++			bfqd->wr_busy_queues++;
+ 			bfqq->entity.prio_changed = 1;
+ 		}
+ 		if (prev != bfqq->next_rq)
+@@ -4428,6 +4446,8 @@ static void bfq_requests_merged(struct request_queue *q, struct request *rq,
+ /* Must be called with bfqq != NULL */
+ static void bfq_bfqq_end_wr(struct bfq_queue *bfqq)
+ {
++	if (bfq_bfqq_busy(bfqq))
++		bfqq->bfqd->wr_busy_queues--;
+ 	bfqq->wr_coeff = 1;
+ 	bfqq->wr_cur_max_time = 0;
+ 	bfqq->last_wr_start_finish = jiffies;
+@@ -5447,7 +5467,8 @@ static bool bfq_may_expire_for_budg_timeout(struct bfq_queue *bfqq)
+ static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
+ {
+ 	struct bfq_data *bfqd = bfqq->bfqd;
+-	bool idling_boosts_thr, asymmetric_scenario;
++	bool idling_boosts_thr, idling_boosts_thr_without_issues,
++		asymmetric_scenario;
+ 
+ 	if (bfqd->strict_guarantees)
+ 		return true;
+@@ -5470,6 +5491,44 @@ static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
+ 	idling_boosts_thr = !bfqd->hw_tag || bfq_bfqq_IO_bound(bfqq);
  
  	/*
- 	 * The queue owner gets to use this for whatever they like.
-diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index a999d281a2f1..76f39754e7b0 100644
---- a/include/linux/genhd.h
-+++ b/include/linux/genhd.h
-@@ -167,13 +167,6 @@ struct blk_integrity {
- };
++	 * The value of the next variable,
++	 * idling_boosts_thr_without_issues, is equal to that of
++	 * idling_boosts_thr, unless a special case holds. In this
++	 * special case, described below, idling may cause problems to
++	 * weight-raised queues.
++	 *
++	 * When the request pool is saturated (e.g., in the presence
++	 * of write hogs), if the processes associated with
++	 * non-weight-raised queues ask for requests at a lower rate,
++	 * then processes associated with weight-raised queues have a
++	 * higher probability to get a request from the pool
++	 * immediately (or at least soon) when they need one. Thus
++	 * they have a higher probability to actually get a fraction
++	 * of the device throughput proportional to their high
++	 * weight. This is especially true with NCQ-capable drives,
++	 * which enqueue several requests in advance, and further
++	 * reorder internally-queued requests.
++	 *
++	 * For this reason, we force to false the value of
++	 * idling_boosts_thr_without_issues if there are weight-raised
++	 * busy queues. In this case, and if bfqq is not weight-raised,
++	 * this guarantees that the device is not idled for bfqq (if,
++	 * instead, bfqq is weight-raised, then idling will be
++	 * guaranteed by another variable, see below). Combined with
++	 * the timestamping rules of BFQ (see [1] for details), this
++	 * behavior causes bfqq, and hence any sync non-weight-raised
++	 * queue, to get a lower number of requests served, and thus
++	 * to ask for a lower number of requests from the request
++	 * pool, before the busy weight-raised queues get served
++	 * again. This often mitigates starvation problems in the
++	 * presence of heavy write workloads and NCQ, thereby
++	 * guaranteeing a higher application and system responsiveness
++	 * in these hostile scenarios.
++	 */
++	idling_boosts_thr_without_issues = idling_boosts_thr &&
++		bfqd->wr_busy_queues == 0;
++
++	/*
+ 	 * There is then a case where idling must be performed not for
+ 	 * throughput concerns, but to preserve service guarantees. To
+ 	 * introduce it, we can note that allowing the drive to
+@@ -5543,7 +5602,7 @@ static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
+ 	 *    is necessary to preserve service guarantees.
+ 	 */
+ 	return bfq_bfqq_sync(bfqq) &&
+-		(idling_boosts_thr || asymmetric_scenario);
++		(idling_boosts_thr_without_issues || asymmetric_scenario);
+ }
  
- #endif	/* CONFIG_BLK_DEV_INTEGRITY */
--struct disk_devt {
--	atomic_t count;
--	void (*release)(struct disk_devt *disk_devt);
--};
--
--void put_disk_devt(struct disk_devt *disk_devt);
--void get_disk_devt(struct disk_devt *disk_devt);
+ /*
+@@ -6748,6 +6807,7 @@ static int bfq_init_queue(struct request_queue *q, struct elevator_type *e)
+ 					      * high-definition compressed
+ 					      * video.
+ 					      */
++	bfqd->wr_busy_queues = 0;
  
- struct gendisk {
- 	/* major, first_minor and minors are input parameters only,
-@@ -183,7 +176,6 @@ struct gendisk {
- 	int first_minor;
- 	int minors;                     /* maximum number of minors, =1 for
-                                          * disks that can't be partitioned. */
--	struct disk_devt *disk_devt;
- 
- 	char disk_name[DISK_NAME_LEN];	/* name of major driver */
- 	char *(*devnode)(struct gendisk *gd, umode_t *mode);
+ 	/*
+ 	 * Begin by assuming, optimistically, that the device is a
 -- 
-2.10.2
+2.10.0
