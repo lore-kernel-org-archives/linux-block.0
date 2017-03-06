@@ -2,10 +2,11 @@ Return-Path: <houtao1@huawei.com>
 From: Hou Tao <houtao1@huawei.com>
 Subject: cfq-iosched: two questions about the hrtimer version of CFQ
 To: Jan Kara <jack@suse.cz>, <linux-block@vger.kernel.org>
-CC: Jens Axboe <axboe@kernel.dk>, <linux-kernel@vger.kernel.org>,
-        <jmoyer@redhat.com>, Vivek Goyal <vgoyal@redhat.com>
-Message-ID: <a718858f-95b1-32f6-eb8d-ba389b92a937@huawei.com>
-Date: Tue, 7 Mar 2017 08:11:44 +0800
+CC: <axboe@kernel.dk>, <linux-kernel@vger.kernel.org>,
+        Vivek Goyal
+	<vgoyal@redhat.com>
+Message-ID: <775f3ecb-45d1-4264-885a-f14e0458d36b@huawei.com>
+Date: Mon, 6 Mar 2017 21:50:09 +0800
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 List-ID: <linux-block@vger.kernel.org>
@@ -21,9 +22,8 @@ The following is the test process:
 * filesystem and block device
 	* XFS + /dev/sda mounted on /tmp/sda
 * CFQ configuration
-	* default configuration
-* run "fio ./cfq.job"
-* fio job configuration cfq.job
+	* default configurations
+* fio job configuration
 	[global]
 	bs=4k
 	ioengine=psync
@@ -53,6 +53,7 @@ The following is the test process:
 	thread=1
 	numjobs=2
 
+
 The following is the test result:
 * with 0b31c10:
 	* fio report
@@ -81,7 +82,7 @@ The following is the test result:
 		./cfq_b/blkio.time:8:0 5849949812
 
 We want to known the reason why you revert the minimal used slice to 1 jiffy
-when the slice has not been allocated. Doest it lead to some performance
+when the slice has not been allocated. Does it lead to some performance
 regressions or something similar ? If not, I think we could revert the minimal
 slice to 1 ns again.
 
