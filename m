@@ -1,140 +1,81 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-ua0-f193.google.com ([209.85.217.193]:35124 "EHLO
-        mail-ua0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753489AbdCBCPq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Mar 2017 21:15:46 -0500
-MIME-Version: 1.0
-In-Reply-To: <20170228233011.rdqtde22zwsimbz7@kernel.org>
-References: <1488296503-4987-1-git-send-email-tom.leiming@gmail.com>
- <1488296503-4987-5-git-send-email-tom.leiming@gmail.com> <20170228233011.rdqtde22zwsimbz7@kernel.org>
-From: Ming Lei <tom.leiming@gmail.com>
-Date: Thu, 2 Mar 2017 10:09:14 +0800
-Message-ID: <CACVXFVMJ-h+TwKT8eVbg3AxUjBzzEsCV0SeuDUaQ3FvFdfni3w@mail.gmail.com>
-Subject: Re: [PATCH v2 04/13] md: prepare for managing resync I/O pages in
- clean way
-To: Shaohua Li <shli@kernel.org>
-Cc: Jens Axboe <axboe@fb.com>,
-        "open list:SOFTWARE RAID (Multiple Disks) SUPPORT"
-        <linux-raid@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Christoph Hellwig <hch@infradead.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jack@suse.cz>
+From: Jan Kara <jack@suse.cz>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
+	Lekshmi Pillai <lekshmicpillai@in.ibm.com>,
+	Tejun Heo <tj@kernel.org>,
+	NeilBrown <neilb@suse.de>,
+	Omar Sandoval <osandov@osandov.com>,
+	Jan Kara <jack@suse.cz>
+Subject: [PATCH 09/11] block: Fix oops in locked_inode_to_wb_and_lock_list()
+Date: Mon,  6 Mar 2017 17:34:02 +0100
+Message-Id: <20170306163404.1238-10-jack@suse.cz>
+In-Reply-To: <20170306163404.1238-1-jack@suse.cz>
+References: <20170306163404.1238-1-jack@suse.cz>
+List-ID: <linux-block@vger.kernel.org>
 
-Hi Shaohua,
+When block device is closed, we call inode_detach_wb() in __blkdev_put()
+which sets inode->i_wb to NULL. That is contrary to expectations that
+inode->i_wb stays valid once set during the whole inode's lifetime and
+leads to oops in wb_get() in locked_inode_to_wb_and_lock_list() because
+inode_to_wb() returned NULL.
 
-On Wed, Mar 1, 2017 at 7:30 AM, Shaohua Li <shli@kernel.org> wrote:
-> On Tue, Feb 28, 2017 at 11:41:34PM +0800, Ming Lei wrote:
->> Now resync I/O use bio's bec table to manage pages,
->> this way is very hacky, and may not work any more
->> once multipage bvec is introduced.
->>
->> So introduce helpers and new data structure for
->> managing resync I/O pages more cleanly.
->>
->> Signed-off-by: Ming Lei <tom.leiming@gmail.com>
->> ---
->>  drivers/md/md.h | 54 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
->>  1 file changed, 54 insertions(+)
->>
->> diff --git a/drivers/md/md.h b/drivers/md/md.h
->> index 1d63239a1be4..b5a638d85cb4 100644
->> --- a/drivers/md/md.h
->> +++ b/drivers/md/md.h
->> @@ -720,4 +720,58 @@ static inline void mddev_check_writesame(struct mddev *mddev, struct bio *bio)
->>  #define RESYNC_BLOCK_SIZE (64*1024)
->>  #define RESYNC_PAGES ((RESYNC_BLOCK_SIZE + PAGE_SIZE-1) / PAGE_SIZE)
->>
->> +/* for managing resync I/O pages */
->> +struct resync_pages {
->> +     unsigned        idx;    /* for get/put page from the pool */
->> +     void            *raid_bio;
->> +     struct page     *pages[RESYNC_PAGES];
->> +};
->
-> I'd like this to be embedded into r1bio directly. Not sure if we really need a
-> structure.
+The reason why we called inode_detach_wb() is not valid anymore though.
+BDI is guaranteed to stay along until we call bdi_put() from
+bdev_evict_inode() so we can postpone calling inode_detach_wb() to that
+moment.
 
-There are two reasons we can't put this into r1bio:
-- r1bio is used in both normal and resync I/O, not fair to allocate more
-in normal I/O, and that is why this patch wouldn't like to touch r1bio or r10bio
+Also add a warning to catch if someone uses inode_detach_wb() in a
+dangerous way.
 
-- the count of 'struct resync_pages' instance depends on raid_disks(raid1)
-or copies(raid10), both can't be decided during compiling.
+Reported-by: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
+Acked-by: Tejun Heo <tj@kernel.org>
+Signed-off-by: Jan Kara <jack@suse.cz>
+---
+ fs/block_dev.c            | 8 ++------
+ include/linux/writeback.h | 1 +
+ 2 files changed, 3 insertions(+), 6 deletions(-)
 
->
->> +
->> +static inline int resync_alloc_pages(struct resync_pages *rp,
->> +                                  gfp_t gfp_flags)
->> +{
->> +     int i;
->> +
->> +     for (i = 0; i < RESYNC_PAGES; i++) {
->> +             rp->pages[i] = alloc_page(gfp_flags);
->> +             if (!rp->pages[i])
->> +                     goto out_free;
->> +     }
->> +
->> +     return 0;
->> +
->> + out_free:
->> +     while (--i >= 0)
->> +             __free_page(rp->pages[i]);
->> +     return -ENOMEM;
->> +}
->> +
->> +static inline void resync_free_pages(struct resync_pages *rp)
->> +{
->> +     int i;
->> +
->> +     for (i = 0; i < RESYNC_PAGES; i++)
->> +             __free_page(rp->pages[i]);
->
-> Since we will use get_page, shouldn't this be put_page?
-
-You are right, will fix in v3.
-
->
->> +}
->> +
->> +static inline void resync_get_all_pages(struct resync_pages *rp)
->> +{
->> +     int i;
->> +
->> +     for (i = 0; i < RESYNC_PAGES; i++)
->> +             get_page(rp->pages[i]);
->> +}
->> +
->> +static inline struct page *resync_fetch_page(struct resync_pages *rp)
->> +{
->> +     if (WARN_ON_ONCE(rp->idx >= RESYNC_PAGES))
->> +             return NULL;
->> +     return rp->pages[rp->idx++];
->
-> I'd like the caller explicitly specify the index instead of a global variable
-> to track it, which will make the code more understandable and less error prone.
-
-That is fine, but the index has to be per bio, and finally the index
-has to be stored
-in 'struct resync_pages', so every user has to call it in the following way:
-
-          resync_fetch_page(rp, rp->idx);
-
-then looks no benefit to pass index explicitly.
-
->
->> +}
->> +
->> +static inline bool resync_page_available(struct resync_pages *rp)
->> +{
->> +     return rp->idx < RESYNC_PAGES;
->> +}
->
-> Then we don't need this obscure API.
-
-That is fine.
-
-
-Thanks,
-Ming Lei
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index 9e1993a2827f..4b8a0f871f2d 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -885,6 +885,8 @@ static void bdev_evict_inode(struct inode *inode)
+ 	spin_lock(&bdev_lock);
+ 	list_del_init(&bdev->bd_list);
+ 	spin_unlock(&bdev_lock);
++	/* Detach inode from wb early as bdi_put() may free bdi->wb */
++	inode_detach_wb(inode);
+ 	if (bdev->bd_bdi != &noop_backing_dev_info) {
+ 		bdi_put(bdev->bd_bdi);
+ 		bdev->bd_bdi = &noop_backing_dev_info;
+@@ -1878,12 +1880,6 @@ static void __blkdev_put(struct block_device *bdev, fmode_t mode, int for_part)
+ 		kill_bdev(bdev);
+ 
+ 		bdev_write_inode(bdev);
+-		/*
+-		 * Detaching bdev inode from its wb in __destroy_inode()
+-		 * is too late: the queue which embeds its bdi (along with
+-		 * root wb) can be gone as soon as we put_disk() below.
+-		 */
+-		inode_detach_wb(bdev->bd_inode);
+ 	}
+ 	if (bdev->bd_contains == bdev) {
+ 		if (disk->fops->release)
+diff --git a/include/linux/writeback.h b/include/linux/writeback.h
+index a3c0cbd7c888..d5815794416c 100644
+--- a/include/linux/writeback.h
++++ b/include/linux/writeback.h
+@@ -237,6 +237,7 @@ static inline void inode_attach_wb(struct inode *inode, struct page *page)
+ static inline void inode_detach_wb(struct inode *inode)
+ {
+ 	if (inode->i_wb) {
++		WARN_ON_ONCE(!(inode->i_state & I_CLEAR));
+ 		wb_put(inode->i_wb);
+ 		inode->i_wb = NULL;
+ 	}
+-- 
+2.10.2
