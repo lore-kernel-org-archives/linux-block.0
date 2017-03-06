@@ -1,64 +1,46 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from LGEAMRELO13.lge.com ([156.147.23.53]:48118 "EHLO
-        lgeamrelo13.lge.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752363AbdCGGJL (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Mar 2017 01:09:11 -0500
-Date: Tue, 7 Mar 2017 14:22:42 +0900
-From: Minchan Kim <minchan@kernel.org>
-To: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: Jens Axboe <axboe@fb.com>, Nitin Gupta <ngupta@vflare.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
-        Hannes Reinecke <hare@suse.de>, yizhan@redhat.com,
-        Linux Block Layer Mailinglist <linux-block@vger.kernel.org>,
-        Linux Kernel Mailinglist <linux-kernel@vger.kernel.org>
+Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:51548 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1754072AbdCFVzZ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 6 Mar 2017 16:55:25 -0500
 Subject: Re: [PATCH] zram: set physical queue limits to avoid array out of
  bounds accesses
-Message-ID: <20170307052242.GA29458@bbox>
+To: Andrew Morton <akpm@linux-foundation.org>
 References: <20170306102335.9180-1-jthumshirn@suse.de>
+ <96ed9003-6299-b303-a901-d040a8cfe03f@fb.com>
+ <20170306121840.aaa0525d3dbdeb82aad3c284@linux-foundation.org>
+CC: Johannes Thumshirn <jthumshirn@suse.de>,
+        Minchan Kim <minchan@kernel.org>,
+        Nitin Gupta <ngupta@vflare.org>,
+        Christoph Hellwig <hch@lst.de>,
+        "Sergey Senozhatsky" <sergey.senozhatsky.work@gmail.com>,
+        Hannes Reinecke <hare@suse.de>, <yizhan@redhat.com>,
+        Linux Block Layer Mailinglist <linux-block@vger.kernel.org>,
+        Linux Kernel Mailinglist <linux-kernel@vger.kernel.org>
+From: Jens Axboe <axboe@fb.com>
+Message-ID: <bffdf6fc-becb-32c7-2669-fb18ebc3e172@fb.com>
+Date: Mon, 6 Mar 2017 13:19:56 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170306102335.9180-1-jthumshirn@suse.de>
+In-Reply-To: <20170306121840.aaa0525d3dbdeb82aad3c284@linux-foundation.org>
+Content-Type: text/plain; charset="windows-1252"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hello Johannes,
-
-On Mon, Mar 06, 2017 at 11:23:35AM +0100, Johannes Thumshirn wrote:
-> zram can handle at most SECTORS_PER_PAGE sectors in a bio's bvec. When using
-> the NVMe over Fabrics loopback target which potentially sends a huge bulk of
-> pages attached to the bio's bvec this results in a kernel panic because of
-> array out of bounds accesses in zram_decompress_page().
-
-First of all, thanks for the report and fix up!
-Unfortunately, I'm not familiar with that interface of block layer.
-
-It seems this is a material for stable so I want to understand it clear.
-Could you say more specific things to educate me?
-
-What scenario/When/How it is problem?  It will help for me to understand!
-
-Thanks.
-
+On 03/06/2017 01:18 PM, Andrew Morton wrote:
+> On Mon, 6 Mar 2017 08:21:11 -0700 Jens Axboe <axboe@fb.com> wrote:
 > 
-> Signed-off-by: Johannes Thumshirn <jthumshirn@suse.de>
-> ---
->  drivers/block/zram/zram_drv.c | 2 ++
->  1 file changed, 2 insertions(+)
+>> On 03/06/2017 03:23 AM, Johannes Thumshirn wrote:
+>>> zram can handle at most SECTORS_PER_PAGE sectors in a bio's bvec. When using
+>>> the NVMe over Fabrics loopback target which potentially sends a huge bulk of
+>>> pages attached to the bio's bvec this results in a kernel panic because of
+>>> array out of bounds accesses in zram_decompress_page().
+>>
+>> Applied, thanks.
 > 
-> diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-> index e27d89a..dceb5ed 100644
-> --- a/drivers/block/zram/zram_drv.c
-> +++ b/drivers/block/zram/zram_drv.c
-> @@ -1189,6 +1189,8 @@ static int zram_add(void)
->  	blk_queue_io_min(zram->disk->queue, PAGE_SIZE);
->  	blk_queue_io_opt(zram->disk->queue, PAGE_SIZE);
->  	zram->disk->queue->limits.discard_granularity = PAGE_SIZE;
-> +	zram->disk->queue->limits.max_sectors = SECTORS_PER_PAGE;
-> +	zram->disk->queue->limits.chunk_sectors = 0;
->  	blk_queue_max_discard_sectors(zram->disk->queue, UINT_MAX);
->  	/*
->  	 * zram_bio_discard() will clear all logical blocks if logical block
-> -- 
-> 1.8.5.6
-> 
+> With an added cc:stable, hopefully?
+
+I didn't. But I can email it to stable@ when it lands in Linus's tree.
+
+-- 
+Jens Axboe
