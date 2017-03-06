@@ -1,23 +1,26 @@
-Return-Path: <hare@suse.de>
-Subject: Re: [PATCH 01/11] block: Fix bdi assignment to bdev inode when racing
- with disk delete
-To: Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Mon, 6 Mar 2017 17:01:16 -0500
+From: Tejun Heo <tj@kernel.org>
+To: Jan Kara <jack@suse.cz>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
+	Lekshmi Pillai <lekshmicpillai@in.ibm.com>,
+	NeilBrown <neilb@suse.de>, Omar Sandoval <osandov@osandov.com>
+Subject: Re: [PATCH 01/11] block: Fix bdi assignment to bdev inode when
+ racing with disk delete
+Message-ID: <20170306220116.GI26127@htj.duckdns.org>
 References: <20170306163404.1238-1-jack@suse.cz>
  <20170306163404.1238-2-jack@suse.cz>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
- Dan Williams <dan.j.williams@intel.com>,
- Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
- Lekshmi Pillai <lekshmicpillai@in.ibm.com>, Tejun Heo <tj@kernel.org>,
- NeilBrown <neilb@suse.de>, Omar Sandoval <osandov@osandov.com>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <052a2b21-cf6e-68c3-00a7-ad0aae5c5cb8@suse.de>
-Date: Tue, 7 Mar 2017 07:47:14 +0100
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <20170306163404.1238-2-jack@suse.cz>
-Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-block@vger.kernel.org>
 
-On 03/06/2017 05:33 PM, Jan Kara wrote:
+On Mon, Mar 06, 2017 at 05:33:54PM +0100, Jan Kara wrote:
 > When disk->fops->open() in __blkdev_get() returns -ERESTARTSYS, we
 > restart the process of opening the block device. However we forget to
 > switch bdev->bd_bdi back to noop_backing_dev_info and as a result bdev
@@ -25,18 +28,10 @@ On 03/06/2017 05:33 PM, Jan Kara wrote:
 > bdev->bd_bdi later when __blkdev_get() is already guaranteed to succeed.
 > 
 > Signed-off-by: Jan Kara <jack@suse.cz>
-> ---
->  fs/block_dev.c | 7 +++----
->  1 file changed, 3 insertions(+), 4 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Cheers,
+Acked-by: Tejun Heo <tj@kernel.org>
 
-Hannes
+Thanks.
+
 -- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: F. Imend�rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG N�rnberg)
+tejun
