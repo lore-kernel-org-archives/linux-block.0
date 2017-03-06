@@ -1,122 +1,88 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Return-Path: <jack@suse.cz>
 From: Jan Kara <jack@suse.cz>
-To: <linux-fsdevel@vger.kernel.org>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        Jan Kara <jack@suse.cz>
-Subject: [PATCH 23/25] fs: Remove SB_I_DYNBDI flag
-Date: Wed, 29 Mar 2017 12:56:21 +0200
-Message-Id: <20170329105623.18241-24-jack@suse.cz>
-In-Reply-To: <20170329105623.18241-1-jack@suse.cz>
-References: <20170329105623.18241-1-jack@suse.cz>
-Sender: linux-fsdevel-owner@vger.kernel.org
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
+	Lekshmi Pillai <lekshmicpillai@in.ibm.com>,
+	Tejun Heo <tj@kernel.org>,
+	NeilBrown <neilb@suse.de>,
+	Omar Sandoval <osandov@osandov.com>,
+	Jan Kara <jack@suse.cz>
+Subject: [PATCH 05/11] bdi: Move removal from bdi->wb_list into wb_shutdown()
+Date: Mon,  6 Mar 2017 17:33:58 +0100
+Message-Id: <20170306163404.1238-6-jack@suse.cz>
+In-Reply-To: <20170306163404.1238-1-jack@suse.cz>
+References: <20170306163404.1238-1-jack@suse.cz>
 List-ID: <linux-block@vger.kernel.org>
 
-Now that all bdi structures filesystems use are properly refcounted, we
-can remove the SB_I_DYNBDI flag.
+Currently the removal from bdi->wb_list happens directly in
+cgwb_release_workfn(). Move it to wb_shutdown() which is functionally
+equivalent and more logical (the list gets only used for distributing
+writeback works among bdi_writeback structures). It will also allow us
+to simplify writeback shutdown in cgwb_bdi_destroy().
 
+Acked-by: Tejun Heo <tj@kernel.org>
 Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- drivers/mtd/mtdsuper.c | 1 -
- fs/gfs2/ops_fstype.c   | 1 -
- fs/nfs/super.c         | 1 -
- fs/nilfs2/super.c      | 1 -
- fs/super.c             | 5 +----
- include/linux/fs.h     | 3 ---
- 6 files changed, 1 insertion(+), 11 deletions(-)
+ mm/backing-dev.c | 16 ++++++++++++----
+ 1 file changed, 12 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/mtd/mtdsuper.c b/drivers/mtd/mtdsuper.c
-index e69e7855e31f..e43fea896d1e 100644
---- a/drivers/mtd/mtdsuper.c
-+++ b/drivers/mtd/mtdsuper.c
-@@ -53,7 +53,6 @@ static int get_sb_mtd_set(struct super_block *sb, void *_mtd)
- 	sb->s_mtd = mtd;
- 	sb->s_dev = MKDEV(MTD_BLOCK_MAJOR, mtd->index);
- 	sb->s_bdi = bdi_get(mtd_bdi);
--	sb->s_iflags |= SB_I_DYNBDI;
- 
- 	return 0;
- }
-diff --git a/fs/gfs2/ops_fstype.c b/fs/gfs2/ops_fstype.c
-index e6b6f97d0fc1..ed67548b286c 100644
---- a/fs/gfs2/ops_fstype.c
-+++ b/fs/gfs2/ops_fstype.c
-@@ -1224,7 +1224,6 @@ static int set_gfs2_super(struct super_block *s, void *data)
- 	s->s_bdev = data;
- 	s->s_dev = s->s_bdev->bd_dev;
- 	s->s_bdi = bdi_get(s->s_bdev->bd_bdi);
--	s->s_iflags |= SB_I_DYNBDI;
- 	return 0;
+diff --git a/mm/backing-dev.c b/mm/backing-dev.c
+index 37cd1adae979..4dffae6e2d7b 100644
+--- a/mm/backing-dev.c
++++ b/mm/backing-dev.c
+@@ -345,6 +345,8 @@ static int wb_init(struct bdi_writeback *wb, struct backing_dev_info *bdi,
+ 	return err;
  }
  
-diff --git a/fs/nfs/super.c b/fs/nfs/super.c
-index 8d97aa70407e..dc69314d455e 100644
---- a/fs/nfs/super.c
-+++ b/fs/nfs/super.c
-@@ -2379,7 +2379,6 @@ int nfs_clone_super(struct super_block *sb, struct nfs_mount_info *mount_info)
-  	nfs_initialise_sb(sb);
- 
- 	sb->s_bdi = bdi_get(old_sb->s_bdi);
--	sb->s_iflags |= SB_I_DYNBDI;
- 
- 	return 0;
- }
-diff --git a/fs/nilfs2/super.c b/fs/nilfs2/super.c
-index feb796a38b8d..926682981d61 100644
---- a/fs/nilfs2/super.c
-+++ b/fs/nilfs2/super.c
-@@ -1069,7 +1069,6 @@ nilfs_fill_super(struct super_block *sb, void *data, int silent)
- 	sb->s_max_links = NILFS_LINK_MAX;
- 
- 	sb->s_bdi = bdi_get(sb->s_bdev->bd_bdi);
--	sb->s_iflags |= SB_I_DYNBDI;
- 
- 	err = load_nilfs(nilfs, sb);
- 	if (err)
-diff --git a/fs/super.c b/fs/super.c
-index e267d3a00144..8444d26926ef 100644
---- a/fs/super.c
-+++ b/fs/super.c
-@@ -446,10 +446,9 @@ void generic_shutdown_super(struct super_block *sb)
- 	hlist_del_init(&sb->s_instances);
- 	spin_unlock(&sb_lock);
- 	up_write(&sb->s_umount);
--	if (sb->s_iflags & SB_I_DYNBDI) {
-+	if (sb->s_bdi != &noop_backing_dev_info) {
- 		bdi_put(sb->s_bdi);
- 		sb->s_bdi = &noop_backing_dev_info;
--		sb->s_iflags &= ~SB_I_DYNBDI;
++static void cgwb_remove_from_bdi_list(struct bdi_writeback *wb);
++
+ /*
+  * Remove bdi from the global list and shutdown any threads we have running
+  */
+@@ -358,6 +360,7 @@ static void wb_shutdown(struct bdi_writeback *wb)
  	}
- }
+ 	spin_unlock_bh(&wb->work_lock);
  
-@@ -1055,7 +1054,6 @@ static int set_bdev_super(struct super_block *s, void *data)
- 	s->s_bdev = data;
- 	s->s_dev = s->s_bdev->bd_dev;
- 	s->s_bdi = bdi_get(s->s_bdev->bd_bdi);
--	s->s_iflags |= SB_I_DYNBDI;
++	cgwb_remove_from_bdi_list(wb);
+ 	/*
+ 	 * Drain work list and shutdown the delayed_work.  !WB_registered
+ 	 * tells wb_workfn() that @wb is dying and its work_list needs to
+@@ -491,10 +494,6 @@ static void cgwb_release_workfn(struct work_struct *work)
+ 						release_work);
+ 	struct backing_dev_info *bdi = wb->bdi;
  
- 	return 0;
- }
-@@ -1282,7 +1280,6 @@ int super_setup_bdi_name(struct super_block *sb, char *fmt, ...)
- 	}
- 	WARN_ON(sb->s_bdi != &noop_backing_dev_info);
- 	sb->s_bdi = bdi;
--	sb->s_iflags |= SB_I_DYNBDI;
- 
- 	return 0;
- }
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 98cf14ea78c0..30e5c14bd743 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -1272,9 +1272,6 @@ struct mm_struct;
- /* sb->s_iflags to limit user namespace mounts */
- #define SB_I_USERNS_VISIBLE		0x00000010 /* fstype already mounted */
- 
--/* Temporary flag until all filesystems are converted to dynamic bdis */
--#define SB_I_DYNBDI	0x00000100
+-	spin_lock_irq(&cgwb_lock);
+-	list_del_rcu(&wb->bdi_node);
+-	spin_unlock_irq(&cgwb_lock);
 -
- /* Possible states of 'frozen' field */
- enum {
- 	SB_UNFROZEN = 0,		/* FS is unfrozen */
+ 	wb_shutdown(wb);
+ 
+ 	css_put(wb->memcg_css);
+@@ -526,6 +525,13 @@ static void cgwb_kill(struct bdi_writeback *wb)
+ 	percpu_ref_kill(&wb->refcnt);
+ }
+ 
++static void cgwb_remove_from_bdi_list(struct bdi_writeback *wb)
++{
++	spin_lock_irq(&cgwb_lock);
++	list_del_rcu(&wb->bdi_node);
++	spin_unlock_irq(&cgwb_lock);
++}
++
+ static int cgwb_create(struct backing_dev_info *bdi,
+ 		       struct cgroup_subsys_state *memcg_css, gfp_t gfp)
+ {
+@@ -783,6 +789,8 @@ static void cgwb_bdi_destroy(struct backing_dev_info *bdi)
+ 	wb_congested_put(bdi->wb_congested);
+ }
+ 
++static void cgwb_remove_from_bdi_list(struct bdi_writeback *wb) { }
++
+ #endif	/* CONFIG_CGROUP_WRITEBACK */
+ 
+ int bdi_init(struct backing_dev_info *bdi)
 -- 
 2.10.2
