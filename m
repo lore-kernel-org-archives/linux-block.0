@@ -1,81 +1,68 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from 0.mx.nanl.de ([217.115.11.12]:44389 "EHLO 0.mx.nanl.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753560AbdCGKwk (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 7 Mar 2017 05:52:40 -0500
-Received: from [217.115.11.14] (unknown [217.115.11.14])
-        by 0.mx.nanl.de (Postfix) with ESMTPSA id 118E2497FD
-        for <linux-block@vger.kernel.org>; Tue,  7 Mar 2017 10:32:39 +0000 (UTC)
-To: linux-block@vger.kernel.org
-From: Mirko Vogt <lkml@nanl.de>
-Subject: LOOP_CLR_FD on partition removes mapping for whole device
-Message-ID: <56123a0c-2841-339e-23c7-c5f5e906124e@nanl.de>
-Date: Tue, 7 Mar 2017 11:34:16 +0100
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jack@suse.cz>
+From: Jan Kara <jack@suse.cz>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
+	Lekshmi Pillai <lekshmicpillai@in.ibm.com>,
+	Tejun Heo <tj@kernel.org>,
+	NeilBrown <neilb@suse.de>,
+	Omar Sandoval <osandov@osandov.com>,
+	Jan Kara <jack@suse.cz>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: [PATCH 10/11] kobject: Export kobject_get_unless_zero()
+Date: Mon,  6 Mar 2017 17:34:03 +0100
+Message-Id: <20170306163404.1238-11-jack@suse.cz>
+In-Reply-To: <20170306163404.1238-1-jack@suse.cz>
+References: <20170306163404.1238-1-jack@suse.cz>
+List-ID: <linux-block@vger.kernel.org>
 
-Hello,
+Make the function available for outside use and fortify it against NULL
+kobject.
 
-I'm experiencing unexpected behaviour with the ioctl LOOP_CLR_FD on a
-*partition* of a loop device: it disassociates the whole (parent) loop
-*device*, rather than (trying to) remove the mapping of the addressed
-partition.
+CC: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Reviewed-by: Bart Van Assche <bart.vanassche@sandisk.com>
+Acked-by: Tejun Heo <tj@kernel.org>
+Signed-off-by: Jan Kara <jack@suse.cz>
+---
+ include/linux/kobject.h | 2 ++
+ lib/kobject.c           | 5 ++++-
+ 2 files changed, 6 insertions(+), 1 deletion(-)
 
-== Scenario / Environment / Use
-
-In my scenario, I `partprobe` a loop device for having convenient access
-to its partitions (I think it uses ioctl(BLKRRPART), but I'm not totally
-sure..).
-
-When now calling ioctl(LOOP_CLR_FD) on the loop *partition*, the mapping
-of its parent - the overall loop *device* - is removed.
-
-A `strace` reveals, that umount indeed opens the loop partition, so the
-ioctl is called on the right inode (I first assumed it being a bug in
-umount calling the parent device).
-
-I would not expect ioctl(LOOP_CLR_FD) being called on a loop partition
-would result in disassociation of the overall device holding that partition.
-
-Long story short (userland is busybox which behaves slightly different
-than the typical tools from util-linux, e.g. umount *by default* gets
-rid of the loop device mapping when being called on a dir mounting a
-loop device[1]):
-
-root@LEDE:/# loop=$(losetup -f)
-root@LEDE:/# echo ${loop}
-/dev/loop2
-root@LEDE:/# losetup ${loop} /IMAGE
-root@LEDE:/# ls -l ${loop}*
-brw-------  1 root root     7,   2 Mar  6 20:09 /dev/loop2
-root@LEDE:/# partprobe ${loop}
-root@LEDE:/# ls -l ${loop}*
-brw-------  1 root  root    7,   2 Mar  6 20:09 /dev/loop2
-brw-------  1 root  root  259,   8 Mar  6 21:59 /dev/loop2p1
-brw-------  1 root  root  259,   9 Mar  6 21:59 /dev/loop2p2
-brw-------  1 root  root  259,  10 Mar  6 21:59 /dev/loop2p3
-brw-------  1 root  root  259,  11 Mar  6 21:59 /dev/loop2p4
-brw-------  1 root  root  259,  12 Mar  6 21:59 /dev/loop2p5
-brw-------  1 root  root  259,  13 Mar  6 21:59 /dev/loop2p6
-brw-------  1 root  root  259,  14 Mar  6 21:59 /dev/loop2p7
-brw-------  1 root  root  259,  15 Mar  6 21:59 /dev/loop2p8
-root@LEDE:/# mount ${loop}p8 /MOUNT       # mount loop partition
-root@LEDE:/# losetup -a | grep $loop      # loop dev mapping still there
-/dev/loop2: 0 /mnt/IMAGE
-root@LEDE:/# strace umount /MOUNT 2> /log # unmount loop partition
-root@LEDE:/# losetup -a | grep ${loop}    # loop device mapping is gone
-root@LEDE:/# grep -i loop /log
-open("/dev/loop2p7", O_RDONLY|O_LARGEFILE) = 3
-ioctl(3, LOOP_CLR_FD)                   = 0
-root@LEDE:/#
-
-Is this intended behaviour or a bug?
-
-Cheers
-
-  mirko
-
-
-http://lists.busybox.net/pipermail/busybox/2012-April/077619.html
+diff --git a/include/linux/kobject.h b/include/linux/kobject.h
+index e6284591599e..ca85cb80e99a 100644
+--- a/include/linux/kobject.h
++++ b/include/linux/kobject.h
+@@ -108,6 +108,8 @@ extern int __must_check kobject_rename(struct kobject *, const char *new_name);
+ extern int __must_check kobject_move(struct kobject *, struct kobject *);
+ 
+ extern struct kobject *kobject_get(struct kobject *kobj);
++extern struct kobject * __must_check kobject_get_unless_zero(
++						struct kobject *kobj);
+ extern void kobject_put(struct kobject *kobj);
+ 
+ extern const void *kobject_namespace(struct kobject *kobj);
+diff --git a/lib/kobject.c b/lib/kobject.c
+index 445dcaeb0f56..763d70a18941 100644
+--- a/lib/kobject.c
++++ b/lib/kobject.c
+@@ -601,12 +601,15 @@ struct kobject *kobject_get(struct kobject *kobj)
+ }
+ EXPORT_SYMBOL(kobject_get);
+ 
+-static struct kobject * __must_check kobject_get_unless_zero(struct kobject *kobj)
++struct kobject * __must_check kobject_get_unless_zero(struct kobject *kobj)
+ {
++	if (!kobj)
++		return NULL;
+ 	if (!kref_get_unless_zero(&kobj->kref))
+ 		kobj = NULL;
+ 	return kobj;
+ }
++EXPORT_SYMBOL(kobject_get_unless_zero);
+ 
+ /*
+  * kobject_cleanup - free kobject resources.
+-- 
+2.10.2
