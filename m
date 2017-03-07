@@ -1,62 +1,45 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Return-Path: <Bart.VanAssche@sandisk.com>
+From: Bart Van Assche <Bart.VanAssche@sandisk.com>
+To: "tj@kernel.org" <tj@kernel.org>, "paolo.valente@linaro.org"
+	<paolo.valente@linaro.org>, "axboe@kernel.dk" <axboe@kernel.dk>
+CC: "ulf.hansson@linaro.org" <ulf.hansson@linaro.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"fchecconi@gmail.com" <fchecconi@gmail.com>, "avanzini.arianna@gmail.com"
+	<avanzini.arianna@gmail.com>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "linus.walleij@linaro.org"
+	<linus.walleij@linaro.org>, "broonie@kernel.org" <broonie@kernel.org>
 Subject: Re: [PATCH RFC 00/14] Add the BFQ I/O Scheduler to blk-mq
-From: Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <1D08B61A9CF0974AA09887BE32D889DA0DA827@ULS-OP-MBXIP03.sdcorp.global.sandisk.com>
-Date: Tue, 14 Mar 2017 15:12:06 +0100
-Cc: Jens Axboe <axboe@kernel.dk>,
- Tejun Heo <tj@kernel.org>,
- Fabio Checconi <fchecconi@gmail.com>,
- Arianna Avanzini <avanzini.arianna@gmail.com>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "ulf.hansson@linaro.org" <ulf.hansson@linaro.org>,
- "linus.walleij@linaro.org" <linus.walleij@linaro.org>,
- "broonie@kernel.org" <broonie@kernel.org>
-Message-Id: <3498DE72-65D0-4D1A-9CA6-9176137AF6CE@linaro.org>
-References: <20170304160131.57366-1-paolo.valente@linaro.org> <1D08B61A9CF0974AA09887BE32D889DA0DA827@ULS-OP-MBXIP03.sdcorp.global.sandisk.com>
-To: Bart Van Assche <bart.vanassche@sandisk.com>
+Date: Tue, 7 Mar 2017 01:00:03 +0000
+Message-ID: <1488848390.3125.14.camel@sandisk.com>
+References: <20170304160131.57366-1-paolo.valente@linaro.org>
+In-Reply-To: <20170304160131.57366-1-paolo.valente@linaro.org>
+Content-Type: text/plain; charset="iso-8859-1"
+MIME-Version: 1.0
+Return-Path: Bart.VanAssche@sandisk.com
 List-ID: <linux-block@vger.kernel.org>
 
-
-> Il giorno 07 mar 2017, alle ore 01:22, Bart Van Assche =
-<bart.vanassche@sandisk.com> ha scritto:
+On Sat, 2017-03-04 at 17:01 +0100, Paolo Valente wrote:
+> Finally, a few details on the patchset.
 >=20
-> On 03/04/2017 08:01 AM, Paolo Valente wrote:
->> Some patch generates WARNINGS with checkpatch.pl, but these WARNINGS
->> seem to be either unavoidable for the involved pieces of code (which
->> the patch just extends), or false positives.
->=20
-> The code in this series looks reasonably clean from a code style point
-> of view,
+> The first two patches introduce BFQ-v0, which is more or less the
+> first version of BFQ submitted a few years ago [1].  The remaining
+> patches turn progressively BFQ-v0 into BFQ-v8r8, the current version
+> of BFQ.
 
-Great, thanks!
+Hello Paolo,
 
-> but please address all checkpatch warnings that can be
-> addressed easily. A few examples of such checkpatch warnings:
->=20
-> ERROR: "foo * bar" should be "foo *bar"
->=20
-
-The offending line is:
-*(__PTR) =3D (u64)__data * NSEC_PER_USEC;
-
-so this seems a false positive.
-
-> WARNING: Symbolic permissions 'S_IRUGO|S_IWUSR' are not preferred.
-> Consider using octal permissions '0644'.
->=20
-
-I have used symbolic permissions because I find them much easier to
-remember and decode than numeric constants, and because it is done so
-in cfq-iosched.c, deadline-iosched.c and now mq-deadline.c.  But,
-since you share this checkpatch complain, I will switch to constants.
+Thank you for having done the work to improve, test, fix and post the
+BFQ scheduler as a patch series. However, from what I have seen in the
+patches there is a large number of tunable constants in the code for
+which no scientific approach exists to chose an optimal value.
+Additionally, the complexity of the code is huge. Just like for CFQ,
+sooner or later someone will run into a bug or a performance issue
+and will post a patch to fix it. However, the complexity of BFQ is
+such that a source code review alone won't be sufficient to verify
+whether or not such a patch negatively affects a workload or device
+that has not been tested by the author of the patch. This makes me
+wonder what process should be followed to verify future BFQ patches?
 
 Thanks,
-Paolo
 
-> Thanks,
->=20
-> Bart.
+Bart.=
