@@ -1,21 +1,23 @@
-Return-Path: <jack@suse.cz>
-Date: Wed, 8 Mar 2017 15:24:11 +0100
-From: Jan Kara <jack@suse.cz>
-To: Hou Tao <houtao1@huawei.com>
-Cc: Jan Kara <jack@suse.cz>, linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
-	jmoyer@redhat.com, Vivek Goyal <vgoyal@redhat.com>
+Return-Path: <houtao1@huawei.com>
 Subject: Re: cfq-iosched: two questions about the hrtimer version of CFQ
-Message-ID: <20170308142411.GF19740@quack2.suse.cz>
-References: <a718858f-95b1-32f6-eb8d-ba389b92a937@huawei.com>
+To: Jan Kara <jack@suse.cz>, <linux-block@vger.kernel.org>
+References: <775f3ecb-45d1-4264-885a-f14e0458d36b@huawei.com>
+CC: <axboe@kernel.dk>, <linux-kernel@vger.kernel.org>,
+        Vivek Goyal
+	<vgoyal@redhat.com>
+From: Hou Tao <houtao1@huawei.com>
+Message-ID: <fb6bd2ca-3ccc-0b43-951f-123a31dadd12@huawei.com>
+Date: Tue, 7 Mar 2017 09:22:45 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <a718858f-95b1-32f6-eb8d-ba389b92a937@huawei.com>
+In-Reply-To: <775f3ecb-45d1-4264-885a-f14e0458d36b@huawei.com>
+Content-Type: text/plain; charset="utf-8"
 List-ID: <linux-block@vger.kernel.org>
 
-Hi,
+Sorry for the resend, please refer to the later one.
 
-On Tue 07-03-17 08:11:44, Hou Tao wrote:
+On 2017/3/6 21:50, Hou Tao wrote:
+> Hi Jan and list,
+> 
 > When testing the hrtimer version of CFQ, we found a performance degradation
 > problem which seems to be caused by commit 0b31c10 ("cfq-iosched: Charge at
 > least 1 jiffie instead of 1 ns").
@@ -25,9 +27,8 @@ On Tue 07-03-17 08:11:44, Hou Tao wrote:
 > * filesystem and block device
 > 	* XFS + /dev/sda mounted on /tmp/sda
 > * CFQ configuration
-> 	* default configuration
-> * run "fio ./cfq.job"
-> * fio job configuration cfq.job
+> 	* default configurations
+> * fio job configuration
 > 	[global]
 > 	bs=4k
 > 	ioengine=psync
@@ -57,6 +58,7 @@ On Tue 07-03-17 08:11:44, Hou Tao wrote:
 > 	thread=1
 > 	numjobs=2
 > 
+> 
 > The following is the test result:
 > * with 0b31c10:
 > 	* fio report
@@ -85,28 +87,22 @@ On Tue 07-03-17 08:11:44, Hou Tao wrote:
 > 		./cfq_b/blkio.time:8:0 5849949812
 > 
 > We want to known the reason why you revert the minimal used slice to 1 jiffy
-> when the slice has not been allocated. Doest it lead to some performance
+> when the slice has not been allocated. Does it lead to some performance
 > regressions or something similar ? If not, I think we could revert the minimal
 > slice to 1 ns again.
-
-So I reverted to accounting 1 jiffie because it was that way before my
-commit 9a7f38c42c2b "cfq-iosched: Convert from jiffies to nanoseconds". I
-am not aware of any particular issue caused by charging only 1 ns however
-it is certainly underestimating the time used by cfqq for that one request
-and could be possibly abused by malicious cgroups. How much should be
-accounted to cfqq in case no request has completed yet is questionable and
-frankly I don't have a good answer for that.
-
-> Another problem is about the time comparison in CFQ code. In no-hrtimer
-> version of CFQ, it uses time_after or time_before when possible, Why the
-> hrtimer version doesn't use the equivalent time_after64/time_before64 ?
-> Can ktime_get_ns() ensure there will be no wrapping problem ?
-
-time_after64() and friends is for 64-bit jiffie values. CFQ is now working
-in nanoseconds and not jiffies so you cannot use those functions. WRT
-wrapping: 2^64 ns is ~584 years so I'm not concerned about wrapping.
-
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+> 
+> Another problem is about the time comparison in CFQ code. In no-hrtimer version
+> of CFQ, it uses time_after or time_before when possible, Why the hrtimer version
+> doesn't use the equivalent time_after64/time_before64 ? Can ktime_get_ns()
+> ensure there will be no wrapping problem ?
+> 
+> Thanks very much.
+> 
+> Regards,
+> 
+> Tao
+> 
+> 
+> 
+> .
+> 
