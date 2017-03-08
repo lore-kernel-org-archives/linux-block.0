@@ -1,460 +1,247 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>,
-	Tejun Heo <tj@kernel.org>
-Cc: Fabio Checconi <fchecconi@gmail.com>,
-	Arianna Avanzini <avanzini.arianna@gmail.com>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	linus.walleij@linaro.org,
-	broonie@kernel.org,
-	Riccardo Pizzetti <riccardo.pizzetti@gmail.com>,
-	Samuele Zecchini <samuele.zecchini92@gmail.com>,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH RFC 11/14] block, bfq: reduce idling only in symmetric scenarios
-Date: Sat,  4 Mar 2017 17:01:28 +0100
-Message-Id: <20170304160131.57366-12-paolo.valente@linaro.org>
-In-Reply-To: <20170304160131.57366-1-paolo.valente@linaro.org>
-References: <20170304160131.57366-1-paolo.valente@linaro.org>
+Return-Path: <jack@suse.cz>
+Date: Wed, 8 Mar 2017 14:21:25 +0100
+From: Jan Kara <jack@suse.cz>
+To: Omar Sandoval <osandov@osandov.com>
+Cc: Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
+	Lekshmi Pillai <lekshmicpillai@in.ibm.com>,
+	Tejun Heo <tj@kernel.org>, NeilBrown <neilb@suse.de>
+Subject: Re: [PATCH 0/13 v2] block: Fix block device shutdown related races
+Message-ID: <20170308132125.GD19740@quack2.suse.cz>
+References: <20170221170958.21845-1-jack@suse.cz>
+ <7734fd93-e4fd-65a7-bf32-08012de83c1e@kernel.dk>
+ <20170222102425.GB23312@quack2.suse.cz>
+ <20170301072528.GA9377@vader>
+ <20170301072653.GB9377@vader>
+ <20170301151109.GI20512@quack2.suse.cz>
+ <20170306203818.GC16893@vader.DHCP.thefacebook.com>
+ <20170307135730.GG2578@quack2.suse.cz>
+ <20170307162823.GA20922@vader>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="n2Pv11Ogg/Ox8ay5"
+In-Reply-To: <20170307162823.GA20922@vader>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Arianna Avanzini <avanzini.arianna@gmail.com>
 
-A seeky queue (i..e, a queue containing random requests) is assigned a
-very small device-idling slice, for throughput issues. Unfortunately,
-given the process associated with a seeky queue, this behavior causes
-the following problem: if the process, say P, performs sync I/O and
-has a higher weight than some other processes doing I/O and associated
-with non-seeky queues, then BFQ may fail to guarantee to P its
-reserved share of the throughput. The reason is that idling is key
-for providing service guarantees to processes doing sync I/O [1].
+--n2Pv11Ogg/Ox8ay5
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-This commit addresses this issue by allowing the device-idling slice
-to be reduced for a seeky queue only if the scenario happens to be
-symmetric, i.e., if all the queues are to receive the same share of
-the throughput.
+On Tue 07-03-17 08:28:23, Omar Sandoval wrote:
+> On Tue, Mar 07, 2017 at 02:57:30PM +0100, Jan Kara wrote:
+> > On Mon 06-03-17 12:38:18, Omar Sandoval wrote:
+> > > Unfortunately, this patch actually seems to have introduced a
+> > > regression. Reverting the patch fixes it.
+> > > 
+> > > I'm running a QEMU kvm vm with a virtio-scsi device and I get oopses
+> > > like this:
+> > 
+> > What workload do you run? Or is it enough to just boot the kvm with
+> > virtio-scsi enabled? Can you send me the kvm setup so that I can reproduce
+> > this?
+> 
+> This is just while booting. In fact, you don't even need a virtio-scsi
+> disk attached, it's enough to have the virtio-scsi-pci controller. This
+> is my exact command line:
+> 
+> qemu-system-x86_64 -nodefaults -nographic -serial mon:stdio -cpu kvm64 \
+> 	-enable-kvm -smp 1 -m 2G -watchdog i6300esb \
+> 	-netdev user,id=vlan0,hostfwd=tcp:127.0.0.1:2222-:22 \
+> 	-device virtio-net,netdev=vlan0 \
+> 	-drive file=Silver/Silver.qcow2,index=0,media=disk,if=virtio,cache=none \
+> 	-device virtio-scsi-pci \
+> 	-kernel /home/osandov/linux/builds/virtio-scsi-crash/arch/x86/boot/bzImage \
+> 	-virtfs local,path=/home/osandov/linux/builds/virtio-scsi-crash,security_model=none,readonly,mount_tag=modules \
+> 	-append 'root=/dev/vda1 console=ttyS0,115200 scsi_mod.use_blk_mq=y'
+> 
+> My kernel config is here:
+> https://github.com/osandov/osandov-linux/blob/master/configs/qemu.config
 
-[1] P. Valente, A. Avanzini, "Evolution of the BFQ Storage I/O
-    Scheduler", Proceedings of the First Workshop on Mobile System
-    Technologies (MST-2015), May 2015.
-    http://algogroup.unimore.it/people/paolo/disk_sched/mst-2015.pdf
+Thanks. I was able to reproduce. Do attached two patches help?
 
-Signed-off-by: Arianna Avanzini <avanzini.arianna@gmail.com>
-Signed-off-by: Riccardo Pizzetti <riccardo.pizzetti@gmail.com>
-Signed-off-by: Samuele Zecchini <samuele.zecchini92@gmail.com>
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
----
- block/bfq-iosched.c | 269 ++++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 263 insertions(+), 6 deletions(-)
-
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 05b9421..6bda6ea 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -171,6 +171,20 @@ struct bfq_sched_data {
- };
- 
- /**
-+ * struct bfq_weight_counter - counter of the number of all active entities
-+ *                             with a given weight.
-+ */
-+struct bfq_weight_counter {
-+	unsigned int weight; /* weight of the entities this counter refers to */
-+	unsigned int num_active; /* nr of active entities with this weight */
-+	/*
-+	 * Weights tree member (see bfq_data's @queue_weights_tree and
-+	 * @group_weights_tree)
-+	 */
-+	struct rb_node weights_node;
-+};
-+
-+/**
-  * struct bfq_entity - schedulable entity.
-  *
-  * A bfq_entity is used to represent either a bfq_queue (leaf node in the
-@@ -199,6 +213,8 @@ struct bfq_sched_data {
-  */
- struct bfq_entity {
- 	struct rb_node rb_node; /* service_tree member */
-+	/* pointer to the weight counter associated with this entity */
-+	struct bfq_weight_counter *weight_counter;
- 
- 	/*
- 	 * Flag, true if the entity is on a tree (either the active or
-@@ -437,6 +453,25 @@ struct bfq_data {
- 	struct bfq_group *root_group;
- 
- 	/*
-+	 * rbtree of weight counters of @bfq_queues, sorted by
-+	 * weight. Used to keep track of whether all @bfq_queues have
-+	 * the same weight. The tree contains one counter for each
-+	 * distinct weight associated to some active and not
-+	 * weight-raised @bfq_queue (see the comments to the functions
-+	 * bfq_weights_tree_[add|remove] for further details).
-+	 */
-+	struct rb_root queue_weights_tree;
-+	/*
-+	 * rbtree of non-queue @bfq_entity weight counters, sorted by
-+	 * weight. Used to keep track of whether all @bfq_groups have
-+	 * the same weight. The tree contains one counter for each
-+	 * distinct weight associated to some active @bfq_group (see
-+	 * the comments to the functions bfq_weights_tree_[add|remove]
-+	 * for further details).
-+	 */
-+	struct rb_root group_weights_tree;
-+
-+	/*
- 	 * Number of bfq_queues containing requests (including the
- 	 * queue in service, even if it is idling).
- 	 */
-@@ -767,6 +802,11 @@ struct bfq_group_data {
-  *             to avoid too many special cases during group creation/
-  *             migration.
-  * @stats: stats for this bfqg.
-+ * @active_entities: number of active entities belonging to the group;
-+ *                   unused for the root group. Used to know whether there
-+ *                   are groups with more than one active @bfq_entity
-+ *                   (see the comments to the function
-+ *                   bfq_bfqq_may_idle()).
-  * @rq_pos_tree: rbtree sorted by next_request position, used when
-  *               determining if two or more queues have interleaving
-  *               requests (see bfq_find_close_cooperator()).
-@@ -794,6 +834,8 @@ struct bfq_group {
- 
- 	struct bfq_entity *my_entity;
- 
-+	int active_entities;
-+
- 	struct rb_root rq_pos_tree;
- 
- 	struct bfqg_stats stats;
-@@ -1224,12 +1266,27 @@ static bool bfq_update_parent_budget(struct bfq_entity *next_in_service)
-  * a candidate for next service (i.e, a candidate entity to serve
-  * after the in-service entity is expired). The function then returns
-  * true.
-+ *
-+ * In contrast, the entity could stil be a candidate for next service
-+ * if it is not a queue, and has more than one child. In fact, even if
-+ * one of its children is about to be set in service, other children
-+ * may still be the next to serve. As a consequence, a non-queue
-+ * entity is not a candidate for next-service only if it has only one
-+ * child. And only if this condition holds, then the function returns
-+ * true for a non-queue entity.
-  */
- static bool bfq_no_longer_next_in_service(struct bfq_entity *entity)
- {
-+	struct bfq_group *bfqg;
-+
- 	if (bfq_entity_to_bfqq(entity))
- 		return true;
- 
-+	bfqg = container_of(entity, struct bfq_group, entity);
-+
-+	if (bfqg->active_entities == 1)
-+		return true;
-+
- 	return false;
- }
- 
-@@ -1463,6 +1520,15 @@ static void bfq_update_active_tree(struct rb_node *node)
- 	goto up;
- }
- 
-+static void bfq_weights_tree_add(struct bfq_data *bfqd,
-+				 struct bfq_entity *entity,
-+				 struct rb_root *root);
-+
-+static void bfq_weights_tree_remove(struct bfq_data *bfqd,
-+				    struct bfq_entity *entity,
-+				    struct rb_root *root);
-+
-+
- /**
-  * bfq_active_insert - insert an entity in the active tree of its
-  *                     group/device.
-@@ -1501,6 +1567,13 @@ static void bfq_active_insert(struct bfq_service_tree *st,
- #endif
- 	if (bfqq)
- 		list_add(&bfqq->bfqq_list, &bfqq->bfqd->active_list);
-+#ifdef CONFIG_BFQ_GROUP_IOSCHED
-+	else /* bfq_group */
-+		bfq_weights_tree_add(bfqd, entity, &bfqd->group_weights_tree);
-+
-+	if (bfqg != bfqd->root_group)
-+		bfqg->active_entities++;
-+#endif
- }
- 
- /**
-@@ -1596,6 +1669,14 @@ static void bfq_active_extract(struct bfq_service_tree *st,
- #endif
- 	if (bfqq)
- 		list_del(&bfqq->bfqq_list);
-+#ifdef CONFIG_BFQ_GROUP_IOSCHED
-+	else /* bfq_group */
-+		bfq_weights_tree_remove(bfqd, entity,
-+					&bfqd->group_weights_tree);
-+
-+	if (bfqg != bfqd->root_group)
-+		bfqg->active_entities--;
-+#endif
- }
- 
- /**
-@@ -1693,6 +1774,7 @@ __bfq_entity_update_weight_prio(struct bfq_service_tree *old_st,
- 		struct bfq_queue *bfqq = bfq_entity_to_bfqq(entity);
- 		unsigned int prev_weight, new_weight;
- 		struct bfq_data *bfqd = NULL;
-+		struct rb_root *root;
- #ifdef CONFIG_BFQ_GROUP_IOSCHED
- 		struct bfq_sched_data *sd;
- 		struct bfq_group *bfqg;
-@@ -1742,7 +1824,26 @@ __bfq_entity_update_weight_prio(struct bfq_service_tree *old_st,
- 		prev_weight = entity->weight;
- 		new_weight = entity->orig_weight *
- 			     (bfqq ? bfqq->wr_coeff : 1);
-+		/*
-+		 * If the weight of the entity changes, remove the entity
-+		 * from its old weight counter (if there is a counter
-+		 * associated with the entity), and add it to the counter
-+		 * associated with its new weight.
-+		 */
-+		if (prev_weight != new_weight) {
-+			root = bfqq ? &bfqd->queue_weights_tree :
-+				      &bfqd->group_weights_tree;
-+			bfq_weights_tree_remove(bfqd, entity, root);
-+		}
- 		entity->weight = new_weight;
-+		/*
-+		 * Add the entity to its weights tree only if it is
-+		 * not associated with a weight-raised queue.
-+		 */
-+		if (prev_weight != new_weight &&
-+		    (bfqq ? bfqq->wr_coeff == 1 : 1))
-+			/* If we get here, root has been initialized. */
-+			bfq_weights_tree_add(bfqd, entity, root);
- 
- 		new_st->wsum += entity->weight;
- 
-@@ -2552,6 +2653,10 @@ static void bfq_del_bfqq_busy(struct bfq_data *bfqd, struct bfq_queue *bfqq,
- 
- 	bfqd->busy_queues--;
- 
-+	if (!bfqq->dispatched)
-+		bfq_weights_tree_remove(bfqd, &bfqq->entity,
-+					&bfqd->queue_weights_tree);
-+
- 	if (bfqq->wr_coeff > 1)
- 		bfqd->wr_busy_queues--;
- 
-@@ -2572,6 +2677,11 @@ static void bfq_add_bfqq_busy(struct bfq_data *bfqd, struct bfq_queue *bfqq)
- 	bfq_mark_bfqq_busy(bfqq);
- 	bfqd->busy_queues++;
- 
-+	if (!bfqq->dispatched)
-+		if (bfqq->wr_coeff == 1)
-+			bfq_weights_tree_add(bfqd, &bfqq->entity,
-+					     &bfqd->queue_weights_tree);
-+
- 	if (bfqq->wr_coeff > 1)
- 		bfqd->wr_busy_queues++;
- }
-@@ -2974,6 +3084,7 @@ static void bfq_pd_init(struct blkg_policy_data *pd)
- 				   * in bfq_init_queue()
- 				   */
- 	bfqg->bfqd = bfqd;
-+	bfqg->active_entities = 0;
- 	bfqg->rq_pos_tree = RB_ROOT;
- }
- 
-@@ -3862,6 +3973,142 @@ static void bfq_pos_tree_add_move(struct bfq_data *bfqd, struct bfq_queue *bfqq)
- }
- 
- /*
-+ * Tell whether there are active queues or groups with differentiated weights.
-+ */
-+static bool bfq_differentiated_weights(struct bfq_data *bfqd)
-+{
-+	/*
-+	 * For weights to differ, at least one of the trees must contain
-+	 * at least two nodes.
-+	 */
-+	return (!RB_EMPTY_ROOT(&bfqd->queue_weights_tree) &&
-+		(bfqd->queue_weights_tree.rb_node->rb_left ||
-+		 bfqd->queue_weights_tree.rb_node->rb_right)
-+#ifdef CONFIG_BFQ_GROUP_IOSCHED
-+	       ) ||
-+	       (!RB_EMPTY_ROOT(&bfqd->group_weights_tree) &&
-+		(bfqd->group_weights_tree.rb_node->rb_left ||
-+		 bfqd->group_weights_tree.rb_node->rb_right)
-+#endif
-+	       );
-+}
-+
-+/*
-+ * The following function returns true if every queue must receive the
-+ * same share of the throughput (this condition is used when deciding
-+ * whether idling may be disabled, see the comments in the function
-+ * bfq_bfqq_may_idle()).
-+ *
-+ * Such a scenario occurs when:
-+ * 1) all active queues have the same weight,
-+ * 2) all active groups at the same level in the groups tree have the same
-+ *    weight,
-+ * 3) all active groups at the same level in the groups tree have the same
-+ *    number of children.
-+ *
-+ * Unfortunately, keeping the necessary state for evaluating exactly the
-+ * above symmetry conditions would be quite complex and time-consuming.
-+ * Therefore this function evaluates, instead, the following stronger
-+ * sub-conditions, for which it is much easier to maintain the needed
-+ * state:
-+ * 1) all active queues have the same weight,
-+ * 2) all active groups have the same weight,
-+ * 3) all active groups have at most one active child each.
-+ * In particular, the last two conditions are always true if hierarchical
-+ * support and the cgroups interface are not enabled, thus no state needs
-+ * to be maintained in this case.
-+ */
-+static bool bfq_symmetric_scenario(struct bfq_data *bfqd)
-+{
-+	return !bfq_differentiated_weights(bfqd);
-+}
-+
-+/*
-+ * If the weight-counter tree passed as input contains no counter for
-+ * the weight of the input entity, then add that counter; otherwise just
-+ * increment the existing counter.
-+ *
-+ * Note that weight-counter trees contain few nodes in mostly symmetric
-+ * scenarios. For example, if all queues have the same weight, then the
-+ * weight-counter tree for the queues may contain at most one node.
-+ * This holds even if low_latency is on, because weight-raised queues
-+ * are not inserted in the tree.
-+ * In most scenarios, the rate at which nodes are created/destroyed
-+ * should be low too.
-+ */
-+static void bfq_weights_tree_add(struct bfq_data *bfqd,
-+				 struct bfq_entity *entity,
-+				 struct rb_root *root)
-+{
-+	struct rb_node **new = &(root->rb_node), *parent = NULL;
-+
-+	/*
-+	 * Do not insert if the entity is already associated with a
-+	 * counter, which happens if:
-+	 *   1) the entity is associated with a queue,
-+	 *   2) a request arrival has caused the queue to become both
-+	 *      non-weight-raised, and hence change its weight, and
-+	 *      backlogged; in this respect, each of the two events
-+	 *      causes an invocation of this function,
-+	 *   3) this is the invocation of this function caused by the
-+	 *      second event. This second invocation is actually useless,
-+	 *      and we handle this fact by exiting immediately. More
-+	 *      efficient or clearer solutions might possibly be adopted.
-+	 */
-+	if (entity->weight_counter)
-+		return;
-+
-+	while (*new) {
-+		struct bfq_weight_counter *__counter = container_of(*new,
-+						struct bfq_weight_counter,
-+						weights_node);
-+		parent = *new;
-+
-+		if (entity->weight == __counter->weight) {
-+			entity->weight_counter = __counter;
-+			goto inc_counter;
-+		}
-+		if (entity->weight < __counter->weight)
-+			new = &((*new)->rb_left);
-+		else
-+			new = &((*new)->rb_right);
-+	}
-+
-+	entity->weight_counter = kzalloc(sizeof(struct bfq_weight_counter),
-+					 GFP_ATOMIC);
-+	entity->weight_counter->weight = entity->weight;
-+	rb_link_node(&entity->weight_counter->weights_node, parent, new);
-+	rb_insert_color(&entity->weight_counter->weights_node, root);
-+
-+inc_counter:
-+	entity->weight_counter->num_active++;
-+}
-+
-+/*
-+ * Decrement the weight counter associated with the entity, and, if the
-+ * counter reaches 0, remove the counter from the tree.
-+ * See the comments to the function bfq_weights_tree_add() for considerations
-+ * about overhead.
-+ */
-+static void bfq_weights_tree_remove(struct bfq_data *bfqd,
-+				    struct bfq_entity *entity,
-+				    struct rb_root *root)
-+{
-+	if (!entity->weight_counter)
-+		return;
-+
-+	entity->weight_counter->num_active--;
-+	if (entity->weight_counter->num_active > 0)
-+		goto reset_entity_pointer;
-+
-+	rb_erase(&entity->weight_counter->weights_node, root);
-+	kfree(entity->weight_counter);
-+
-+reset_entity_pointer:
-+	entity->weight_counter = NULL;
-+}
-+
-+/*
-  * Return expired entry, or NULL to just start from scratch in rbtree.
-  */
- static struct request *bfq_check_fifo(struct bfq_queue *bfqq,
-@@ -5246,13 +5493,17 @@ static void bfq_arm_slice_timer(struct bfq_data *bfqd)
- 	 */
- 	sl = bfqd->bfq_slice_idle;
- 	/*
--	 * Unless the queue is being weight-raised, grant only minimum
--	 * idle time if the queue is seeky. A long idling is preserved
--	 * for a weight-raised queue, because it is needed for
--	 * guaranteeing to the queue its reserved share of the
--	 * throughput.
-+	 * Unless the queue is being weight-raised or the scenario is
-+	 * asymmetric, grant only minimum idle time if the queue
-+	 * is seeky. A long idling is preserved for a weight-raised
-+	 * queue, or, more in general, in an asymmetric scenario,
-+	 * because a long idling is needed for guaranteeing to a queue
-+	 * its reserved share of the throughput (in particular, it is
-+	 * needed if the queue has a higher weight than some other
-+	 * queue).
- 	 */
--	if (BFQQ_SEEKY(bfqq) && bfqq->wr_coeff == 1)
-+	if (BFQQ_SEEKY(bfqq) && bfqq->wr_coeff == 1 &&
-+	    bfq_symmetric_scenario(bfqd))
- 		sl = min_t(u64, sl, BFQ_MIN_TT);
- 
- 	bfqd->last_idling_start = ktime_get();
-@@ -7146,6 +7397,9 @@ static void bfq_completed_request(struct bfq_queue *bfqq, struct bfq_data *bfqd)
- 		 * mechanism).
- 		 */
- 		bfqq->budget_timeout = jiffies;
-+
-+		bfq_weights_tree_remove(bfqd, &bfqq->entity,
-+					&bfqd->queue_weights_tree);
- 	}
- 
- 	now_ns = ktime_get_ns();
-@@ -7576,6 +7830,9 @@ static int bfq_init_queue(struct request_queue *q, struct elevator_type *e)
- 		     HRTIMER_MODE_REL);
- 	bfqd->idle_slice_timer.function = bfq_idle_slice_timer;
- 
-+	bfqd->queue_weights_tree = RB_ROOT;
-+	bfqd->group_weights_tree = RB_ROOT;
-+
- 	INIT_LIST_HEAD(&bfqd->active_list);
- 	INIT_LIST_HEAD(&bfqd->idle_list);
- 
+								Honza
 -- 
-2.10.0
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
+
+--n2Pv11Ogg/Ox8ay5
+Content-Type: text/x-patch; charset=us-ascii
+Content-Disposition: attachment; filename="0001-block-Allow-bdi-re-registration.patch"
+
+>From 60623ea9de6309f7717fc3536e3594b079735af0 Mon Sep 17 00:00:00 2001
+From: Jan Kara <jack@suse.cz>
+Date: Tue, 7 Mar 2017 18:01:51 +0100
+Subject: [PATCH 1/2] block: Allow bdi re-registration
+
+SCSI can call device_add_disk() several times for one request queue when
+a device in unbound and bound, creating new gendisk each time. This will
+lead to bdi being repeatedly registered and unregistered. This was not a
+big problem until commit 165a5e22fafb "block: Move bdi_unregister() to
+del_gendisk()" since bdi was only registered repeatedly (bdi_register()
+handles repeated calls fine, only we ended up leaking reference to
+gendisk due to overwriting bdi->owner) but unregistered only in
+blk_cleanup_queue() which didn't get called repeatedly. After
+165a5e22fafb we were doing correct bdi_register() - bdi_unregister()
+cycles however bdi_unregister() is not prepared for it. So make sure
+bdi_unregister() cleans up bdi in such a way that it is prepared for
+a possible following bdi_register() call.
+
+An easy way to provoke this behavior is to enable
+CONFIG_DEBUG_TEST_DRIVER_REMOVE and use scsi_debug driver to create a
+scsi disk which immediately hangs without this fix.
+
+Fixes: 165a5e22fafb127ecb5914e12e8c32a1f0d3f820
+Signed-off-by: Jan Kara <jack@suse.cz>
+---
+ mm/backing-dev.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/mm/backing-dev.c b/mm/backing-dev.c
+index 6d861d090e9f..6ac932210f56 100644
+--- a/mm/backing-dev.c
++++ b/mm/backing-dev.c
+@@ -710,6 +710,11 @@ static void cgwb_bdi_destroy(struct backing_dev_info *bdi)
+ 	 */
+ 	atomic_dec(&bdi->usage_cnt);
+ 	wait_event(cgwb_release_wait, !atomic_read(&bdi->usage_cnt));
++	/*
++	 * Grab back our reference so that we hold it when @bdi gets
++	 * re-registered.
++	 */
++	atomic_inc(&bdi->usage_cnt);
+ }
+ 
+ /**
+@@ -857,6 +862,8 @@ int bdi_register_owner(struct backing_dev_info *bdi, struct device *owner)
+ 			MINOR(owner->devt));
+ 	if (rc)
+ 		return rc;
++	/* Leaking owner reference... */
++	WARN_ON(bdi->owner);
+ 	bdi->owner = owner;
+ 	get_device(owner);
+ 	return 0;
+-- 
+2.10.2
+
+
+--n2Pv11Ogg/Ox8ay5
+Content-Type: text/x-patch; charset=us-ascii
+Content-Disposition: attachment; filename="0002-bdi-Fix-use-after-free-in-wb_congested_put.patch"
+
+>From b9a6424cabd0eb4a663a1faeb11afef268faebc6 Mon Sep 17 00:00:00 2001
+From: Jan Kara <jack@suse.cz>
+Date: Wed, 8 Mar 2017 13:24:47 +0100
+Subject: [PATCH 2/2] bdi: Fix use-after-free in wb_congested_put()
+
+bdi_writeback_congested structures get created for each blkcg and bdi
+regardless whether bdi is registered or not. When they are created in
+unregistered bdi and the request queue (and thus bdi) is then destroyed
+while blkg still holds reference to bdi_writeback_congested structure,
+this structure will be referencing freed bdi and last wb_congested_put()
+will try to remove the structure from already freed bdi.
+
+With commit 165a5e22fafb "block: Move bdi_unregister() to
+del_gendisk()", SCSI started to destroy bdis without calling
+bdi_unregister() first (previously it was calling bdi_unregister() even
+for unregistered bdis) and thus the code detaching
+bdi_writeback_congested in cgwb_bdi_destroy() was not triggered and we
+started hitting this use-after-free bug. It is enough to boot a KVM
+instance with virtio-scsi device to trigger this behavior.
+
+Fix the problem by detaching bdi_writeback_congested structures in
+bdi_exit() instead of bdi_unregister(). This is also more logical as
+they can get attached to bdi regardless whether it ever got registered
+or not.
+
+Fixes: 165a5e22fafb127ecb5914e12e8c32a1f0d3f820
+Signed-off-by: Jan Kara <jack@suse.cz>
+---
+ mm/backing-dev.c | 36 +++++++++++++++++++++---------------
+ 1 file changed, 21 insertions(+), 15 deletions(-)
+
+diff --git a/mm/backing-dev.c b/mm/backing-dev.c
+index 6ac932210f56..c6f2a37028c2 100644
+--- a/mm/backing-dev.c
++++ b/mm/backing-dev.c
+@@ -683,30 +683,18 @@ static int cgwb_bdi_init(struct backing_dev_info *bdi)
+ static void cgwb_bdi_destroy(struct backing_dev_info *bdi)
+ {
+ 	struct radix_tree_iter iter;
+-	struct rb_node *rbn;
+ 	void **slot;
+ 
+ 	WARN_ON(test_bit(WB_registered, &bdi->wb.state));
+ 
+ 	spin_lock_irq(&cgwb_lock);
+-
+ 	radix_tree_for_each_slot(slot, &bdi->cgwb_tree, &iter, 0)
+ 		cgwb_kill(*slot);
+-
+-	while ((rbn = rb_first(&bdi->cgwb_congested_tree))) {
+-		struct bdi_writeback_congested *congested =
+-			rb_entry(rbn, struct bdi_writeback_congested, rb_node);
+-
+-		rb_erase(rbn, &bdi->cgwb_congested_tree);
+-		congested->bdi = NULL;	/* mark @congested unlinked */
+-	}
+-
+ 	spin_unlock_irq(&cgwb_lock);
+ 
+ 	/*
+-	 * All cgwb's and their congested states must be shutdown and
+-	 * released before returning.  Drain the usage counter to wait for
+-	 * all cgwb's and cgwb_congested's ever created on @bdi.
++	 * All cgwb's must be shutdown and released before returning.  Drain
++	 * the usage counter to wait for all cgwb's ever created on @bdi.
+ 	 */
+ 	atomic_dec(&bdi->usage_cnt);
+ 	wait_event(cgwb_release_wait, !atomic_read(&bdi->usage_cnt));
+@@ -754,6 +742,21 @@ void wb_blkcg_offline(struct blkcg *blkcg)
+ 	spin_unlock_irq(&cgwb_lock);
+ }
+ 
++static void cgwb_bdi_exit(struct backing_dev_info *bdi)
++{
++	struct rb_node *rbn;
++
++	spin_lock_irq(&cgwb_lock);
++	while ((rbn = rb_first(&bdi->cgwb_congested_tree))) {
++		struct bdi_writeback_congested *congested =
++			rb_entry(rbn, struct bdi_writeback_congested, rb_node);
++
++		rb_erase(rbn, &bdi->cgwb_congested_tree);
++		congested->bdi = NULL;	/* mark @congested unlinked */
++	}
++	spin_unlock_irq(&cgwb_lock);
++}
++
+ #else	/* CONFIG_CGROUP_WRITEBACK */
+ 
+ static int cgwb_bdi_init(struct backing_dev_info *bdi)
+@@ -774,7 +777,9 @@ static int cgwb_bdi_init(struct backing_dev_info *bdi)
+ 	return 0;
+ }
+ 
+-static void cgwb_bdi_destroy(struct backing_dev_info *bdi)
++static void cgwb_bdi_destroy(struct backing_dev_info *bdi) { }
++
++static void cgwb_bdi_exit(struct backing_dev_info *bdi)
+ {
+ 	wb_congested_put(bdi->wb_congested);
+ }
+@@ -905,6 +910,7 @@ static void bdi_exit(struct backing_dev_info *bdi)
+ {
+ 	WARN_ON_ONCE(bdi->dev);
+ 	wb_exit(&bdi->wb);
++	cgwb_bdi_exit(bdi);
+ }
+ 
+ static void release_bdi(struct kref *ref)
+-- 
+2.10.2
+
+
+--n2Pv11Ogg/Ox8ay5--
