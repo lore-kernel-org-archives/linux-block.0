@@ -1,37 +1,33 @@
-Return-Path: <houtao1@huawei.com>
-From: Hou Tao <houtao1@huawei.com>
-To: <linux-block@vger.kernel.org>
-CC: <axboe@kernel.dk>, <tj@kernel.org>
-Subject: [PATCH] block: use put_io_context_active() to disassociate bio from a task
-Date: Fri, 3 Mar 2017 15:01:10 +0800
-Message-ID: <1488524470-570-1-git-send-email-houtao1@huawei.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: BIO request larger than our storage device supports in linux
+ kernel 4.x
+To: Umesh Patel <Umesh.Patel@wdc.com>, Christoph Hellwig <hch@infradead.org>
+References: <CY1PR0401MB13538108F3DFD6738AFC8A34E12E0@CY1PR0401MB1353.namprd04.prod.outlook.com>
+ <CY1PR0401MB1353279ED2A07E69F8ED42B5E12E0@CY1PR0401MB1353.namprd04.prod.outlook.com>
+ <04c47362-2e9d-b32a-fb98-14113b45b6f7@kernel.dk>
+ <CY1PR0401MB1353F97FF898FB07AB7E5AD3E12E0@CY1PR0401MB1353.namprd04.prod.outlook.com>
+ <211c3042-5f72-def6-4ede-510fa99ef683@kernel.dk>
+ <CY1PR0401MB1353D1D8B5FB4E58AE1ABA5EE12E0@CY1PR0401MB1353.namprd04.prod.outlook.com>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <cbd74faf-455d-eacb-9d1b-e10687d6541d@kernel.dk>
+Date: Wed, 8 Mar 2017 11:22:50 -0700
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <CY1PR0401MB1353D1D8B5FB4E58AE1ABA5EE12E0@CY1PR0401MB1353.namprd04.prod.outlook.com>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-block@vger.kernel.org>
 
-bio_associate_current() invokes get_io_context_active() to tell
-CFQ scheduler that the current io_context is still issuing IOs
-by increasing active_ref. When the bio is done, we also need
-to invoke put_io_context_active() to decrease active_ref else
-the associated io_context will always be active.
+On 03/08/2017 11:20 AM, Umesh Patel wrote:
+>> You are doing it wrong, you should be writing this as a blk-mq driver.
+>> Not only would that fix your issue, it would also solve a host of
+>> other issues that I'm sure your driver has since it hasn't even been
+>> reviewed.
+> 
+> [Umesh] : This has been working since 2.x kernel to till 3.18. It has
+> this issue only in 4.x.
 
-Signed-off-by: Hou Tao <houtao1@huawei.com>
----
- block/bio.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+And had your driver been in the kernel, it would still be working. I already
+told you what is wrong, go back and read the first reply.
 
-diff --git a/block/bio.c b/block/bio.c
-index 5eec5e0..d8ed36f 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -2072,7 +2072,7 @@ EXPORT_SYMBOL_GPL(bio_associate_current);
- void bio_disassociate_task(struct bio *bio)
- {
- 	if (bio->bi_ioc) {
--		put_io_context(bio->bi_ioc);
-+		put_io_context_active(bio->bi_ioc);
- 		bio->bi_ioc = NULL;
- 	}
- 	if (bio->bi_css) {
 -- 
-2.5.0
+Jens Axboe
