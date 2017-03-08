@@ -1,92 +1,112 @@
 Return-Path: <jack@suse.cz>
+Date: Wed, 8 Mar 2017 15:24:11 +0100
 From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
-	Lekshmi Pillai <lekshmicpillai@in.ibm.com>,
-	Tejun Heo <tj@kernel.org>,
-	NeilBrown <neilb@suse.de>,
-	Omar Sandoval <osandov@osandov.com>,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH 03/11] bdi: Mark congested->bdi as internal
-Date: Mon,  6 Mar 2017 17:33:56 +0100
-Message-Id: <20170306163404.1238-4-jack@suse.cz>
-In-Reply-To: <20170306163404.1238-1-jack@suse.cz>
-References: <20170306163404.1238-1-jack@suse.cz>
+To: Hou Tao <houtao1@huawei.com>
+Cc: Jan Kara <jack@suse.cz>, linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
+	jmoyer@redhat.com, Vivek Goyal <vgoyal@redhat.com>
+Subject: Re: cfq-iosched: two questions about the hrtimer version of CFQ
+Message-ID: <20170308142411.GF19740@quack2.suse.cz>
+References: <a718858f-95b1-32f6-eb8d-ba389b92a937@huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <a718858f-95b1-32f6-eb8d-ba389b92a937@huawei.com>
 List-ID: <linux-block@vger.kernel.org>
 
-congested->bdi pointer is used only to be able to remove congested
-structure from bdi->cgwb_congested_tree on structure release. Moreover
-the pointer can become NULL when we unregister the bdi. Rename the field
-to __bdi and add a comment to make it more explicit this is internal
-stuff of memcg writeback code and people should not use the field as
-such use will be likely race prone.
+Hi,
 
-We do not bother with converting congested->bdi to a proper refcounted
-reference. It will be slightly ugly to special-case bdi->wb.congested to
-avoid effectively a cyclic reference of bdi to itself and the reference
-gets cleared from bdi_unregister() making it impossible to reference
-a freed bdi.
+On Tue 07-03-17 08:11:44, Hou Tao wrote:
+> When testing the hrtimer version of CFQ, we found a performance degradation
+> problem which seems to be caused by commit 0b31c10 ("cfq-iosched: Charge at
+> least 1 jiffie instead of 1 ns").
+> 
+> The following is the test process:
+> 
+> * filesystem and block device
+> 	* XFS + /dev/sda mounted on /tmp/sda
+> * CFQ configuration
+> 	* default configuration
+> * run "fio ./cfq.job"
+> * fio job configuration cfq.job
+> 	[global]
+> 	bs=4k
+> 	ioengine=psync
+> 	iodepth=1
+> 	direct=1
+> 	rw=randwrite
+> 	time_based
+> 	runtime=15
+> 	cgroup_nodelete=1
+> 	group_reporting=1
+> 
+> 	[cfq_a]
+> 	filename=/tmp/sda/cfq_a.dat
+> 	size=2G
+> 	cgroup_weight=500
+> 	cgroup=cfq_a
+> 	thread=1
+> 	numjobs=2
+> 
+> 	[cfq_b]
+> 	new_group
+> 	filename=/tmp/sda/cfq_b.dat
+> 	size=2G
+> 	rate=4m
+> 	cgroup_weight=500
+> 	cgroup=cfq_b
+> 	thread=1
+> 	numjobs=2
+> 
+> The following is the test result:
+> * with 0b31c10:
+> 	* fio report
+> 		cfq_a: bw=5312.6KB/s, iops=1328
+> 		cfq_b: bw=8192.6KB/s, iops=2048
+> 
+> 	* blkcg debug files
+> 		./cfq_a/blkio.group_wait_time:8:0 12062571233
+> 		./cfq_b/blkio.group_wait_time:8:0 155841600
+> 		./cfq_a/blkio.io_serviced:Total 19922
+> 		./cfq_b/blkio.io_serviced:Total 30722
+> 		./cfq_a/blkio.time:8:0 19406083246
+> 		./cfq_b/blkio.time:8:0 19417146869
+> 
+> * without 0b31c10:
+> 	* fio report
+> 		cfq_a: bw=21670KB/s, iops=5417
+> 		cfq_b: bw=8191.2KB/s, iops=2047
+> 
+> 	* blkcg debug files
+> 		./cfq_a/blkio.group_wait_time:8:0 5798452504
+> 		./cfq_b/blkio.group_wait_time:8:0 5131844007
+> 		./cfq_a/blkio.io_serviced:8:0 Write 81261
+> 		./cfq_b/blkio.io_serviced:8:0 Write 30722
+> 		./cfq_a/blkio.time:8:0 5642608173
+> 		./cfq_b/blkio.time:8:0 5849949812
+> 
+> We want to known the reason why you revert the minimal used slice to 1 jiffy
+> when the slice has not been allocated. Doest it lead to some performance
+> regressions or something similar ? If not, I think we could revert the minimal
+> slice to 1 ns again.
 
-Acked-by: Tejun Heo <tj@kernel.org>
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- include/linux/backing-dev-defs.h |  4 +++-
- mm/backing-dev.c                 | 10 +++++-----
- 2 files changed, 8 insertions(+), 6 deletions(-)
+So I reverted to accounting 1 jiffie because it was that way before my
+commit 9a7f38c42c2b "cfq-iosched: Convert from jiffies to nanoseconds". I
+am not aware of any particular issue caused by charging only 1 ns however
+it is certainly underestimating the time used by cfqq for that one request
+and could be possibly abused by malicious cgroups. How much should be
+accounted to cfqq in case no request has completed yet is questionable and
+frankly I don't have a good answer for that.
 
-diff --git a/include/linux/backing-dev-defs.h b/include/linux/backing-dev-defs.h
-index ad955817916d..8fb3dcdebc80 100644
---- a/include/linux/backing-dev-defs.h
-+++ b/include/linux/backing-dev-defs.h
-@@ -54,7 +54,9 @@ struct bdi_writeback_congested {
- 	atomic_t refcnt;		/* nr of attached wb's and blkg */
- 
- #ifdef CONFIG_CGROUP_WRITEBACK
--	struct backing_dev_info *bdi;	/* the associated bdi */
-+	struct backing_dev_info *__bdi;	/* the associated bdi, set to NULL
-+					 * on bdi unregistration. For memcg-wb
-+					 * internal use only! */
- 	int blkcg_id;			/* ID of the associated blkcg */
- 	struct rb_node rb_node;		/* on bdi->cgwb_congestion_tree */
- #endif
-diff --git a/mm/backing-dev.c b/mm/backing-dev.c
-index 6d861d090e9f..fec27da14aea 100644
---- a/mm/backing-dev.c
-+++ b/mm/backing-dev.c
-@@ -438,7 +438,7 @@ wb_congested_get_create(struct backing_dev_info *bdi, int blkcg_id, gfp_t gfp)
- 		return NULL;
- 
- 	atomic_set(&new_congested->refcnt, 0);
--	new_congested->bdi = bdi;
-+	new_congested->__bdi = bdi;
- 	new_congested->blkcg_id = blkcg_id;
- 	goto retry;
- 
-@@ -466,10 +466,10 @@ void wb_congested_put(struct bdi_writeback_congested *congested)
- 	}
- 
- 	/* bdi might already have been destroyed leaving @congested unlinked */
--	if (congested->bdi) {
-+	if (congested->__bdi) {
- 		rb_erase(&congested->rb_node,
--			 &congested->bdi->cgwb_congested_tree);
--		congested->bdi = NULL;
-+			 &congested->__bdi->cgwb_congested_tree);
-+		congested->__bdi = NULL;
- 	}
- 
- 	spin_unlock_irqrestore(&cgwb_lock, flags);
-@@ -698,7 +698,7 @@ static void cgwb_bdi_destroy(struct backing_dev_info *bdi)
- 			rb_entry(rbn, struct bdi_writeback_congested, rb_node);
- 
- 		rb_erase(rbn, &bdi->cgwb_congested_tree);
--		congested->bdi = NULL;	/* mark @congested unlinked */
-+		congested->__bdi = NULL;	/* mark @congested unlinked */
- 	}
- 
- 	spin_unlock_irq(&cgwb_lock);
+> Another problem is about the time comparison in CFQ code. In no-hrtimer
+> version of CFQ, it uses time_after or time_before when possible, Why the
+> hrtimer version doesn't use the equivalent time_after64/time_before64 ?
+> Can ktime_get_ns() ensure there will be no wrapping problem ?
+
+time_after64() and friends is for 64-bit jiffie values. CFQ is now working
+in nanoseconds and not jiffies so you cannot use those functions. WRT
+wrapping: 2^64 ns is ~584 years so I'm not concerned about wrapping.
+
+								Honza
 -- 
-2.10.2
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
