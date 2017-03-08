@@ -1,20 +1,22 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH 0/4] block: Fixes for bdi handling
+Return-Path: <osandov@osandov.com>
+Return-Path: <osandov@osandov.com>
+Date: Wed, 8 Mar 2017 08:50:51 -0800
+From: Omar Sandoval <osandov@osandov.com>
 To: Jan Kara <jack@suse.cz>
+Cc: Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+	linux-block@vger.kernel.org,
+	Dan Williams <dan.j.williams@intel.com>,
+	Arthur Marsh <arthur.marsh@internode.on.net>,
+	linux-scsi@vger.kernel.org
+Subject: Re: [PATCH 0/4] block: Fixes for bdi handling
+Message-ID: <20170308165051.GA8598@vader>
 References: <20170308164834.14302-1-jack@suse.cz>
-Cc: Tejun Heo <tj@kernel.org>, linux-block@vger.kernel.org,
- Dan Williams <dan.j.williams@intel.com>, Omar Sandoval
- <osandov@osandov.com>, Arthur Marsh <arthur.marsh@internode.on.net>,
- linux-scsi@vger.kernel.org
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <3637d996-6e69-def6-ee56-60a14a560428@kernel.dk>
-Date: Wed, 8 Mar 2017 09:55:04 -0700
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <20170308164834.14302-1-jack@suse.cz>
-Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-block@vger.kernel.org>
 
-On 03/08/2017 09:48 AM, Jan Kara wrote:
+On Wed, Mar 08, 2017 at 05:48:30PM +0100, Jan Kara wrote:
 > Hi!
 > 
 > patches in this series fix the most urgent bugs that were introduced by commit
@@ -31,10 +33,8 @@ On 03/08/2017 09:48 AM, Jan Kara wrote:
 > Other BDI handling fixes I have in my queue can wait a bit more since they are
 > either theoretical or long-standing issues. So I'll repost them once these four
 > are sorted out.
+> 
+> 								Honza
 
-Agree, we'll need to get this sorted for -rc2, thanks a lot for looking
-into it. I'll queue these up for testing as well, and hopefully ship
-them off tomorrow (or Friday, at the latest).
-
--- 
-Jens Axboe
+Applying patches 1 and 2 indeed fixed my virtio-scsi problem. I'll apply
+the whole series and test that my sd/sr test cases still work.
