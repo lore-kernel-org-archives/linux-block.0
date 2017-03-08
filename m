@@ -1,45 +1,30 @@
-Return-Path: <jack@suse.cz>
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
-	Lekshmi Pillai <lekshmicpillai@in.ibm.com>,
-	Tejun Heo <tj@kernel.org>,
-	NeilBrown <neilb@suse.de>,
-	Omar Sandoval <osandov@osandov.com>,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH 0/11 v3] block: Fix block device shutdown related races
-Date: Mon,  6 Mar 2017 17:33:53 +0100
-Message-Id: <20170306163404.1238-1-jack@suse.cz>
+Return-Path: <dan.j.williams@intel.com>
+MIME-Version: 1.0
+In-Reply-To: <20170308164834.14302-5-jack@suse.cz>
+References: <20170308164834.14302-1-jack@suse.cz> <20170308164834.14302-5-jack@suse.cz>
+From: Dan Williams <dan.j.williams@intel.com>
+Date: Wed, 8 Mar 2017 09:12:24 -0800
+Message-ID: <CAPcyv4hbn77kDaDyzP0Nutfh_S-6Hv5bUphnndEgATb_-UsbAA@mail.gmail.com>
+Subject: Re: [PATCH 4/4] Revert "scsi, block: fix duplicate bdi name
+ registration crashes"
+To: Jan Kara <jack@suse.cz>
+Cc: Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>, linux-block@vger.kernel.org,
+	Omar Sandoval <osandov@osandov.com>, Arthur Marsh <arthur.marsh@internode.on.net>,
+	linux-scsi <linux-scsi@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
-Hello,
+On Wed, Mar 8, 2017 at 8:48 AM, Jan Kara <jack@suse.cz> wrote:
+> This reverts commit 0dba1314d4f81115dce711292ec7981d17231064. It causes
+> leaking of device numbers for SCSI when SCSI registers multiple gendisks
+> for one request_queue in succession. It can be easily reproduced using
+> Omar's script [1] on kernel with CONFIG_DEBUG_TEST_DRIVER_REMOVE.
+> Furthermore the protection provided by this commit is not needed anymore
+> as the problem it was fixing got also fixed by commit 165a5e22fafb
+> "block: Move bdi_unregister() to del_gendisk()".
+>
+> [1]: http://marc.info/?l=linux-block&m=148554717109098&w=2
+>
+> Signed-off-by: Jan Kara <jack@suse.cz>
 
-this is a series with the remaining patches (on top of 3.11-rc1) to fix several
-different races and issues I've found when testing device shutdown and reuse.
-The first two patches fix possible (theoretical) problems when opening of a
-block device races with shutdown of a gendisk structure. Patches 3-9 fix oops
-that is triggered by __blkdev_put() calling inode_detach_wb() too early (the
-problem reported by Thiago). Patches 10 and 11 fix oops due to a bug in gendisk
-code where get_gendisk() can return already freed gendisk structure (again
-triggered by Omar's stress test).
-
-People, please have a look at patches. They are mostly simple however the
-interactions are rather complex so I may have missed something. Also I'm
-happy for any additional testing these patches can get - I've stressed them
-with Omar's script, tested memcg writeback, tested static (not udev managed)
-device inodes.
-
-Changes since v2:
-* Added Tejun's acks
-* Rebased on top of 4.11-rc1
-* Fixed two possible races between blkdev_open() and del_gendisk()
-* Fixed possible race between concurrent shutdown of cgwb spotted by Tejun
-
-Changes since v1:
-* Added Acks and Tested-by tags for patches in areas that did not change
-* Reworked inode_detach_wb() related fixes based on Tejun's feedback
-
-								Honza
+Acked-by: Dan Williams <dan.j.williams@intel.com>
