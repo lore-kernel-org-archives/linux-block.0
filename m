@@ -1,61 +1,53 @@
-Return-Path: <rgoldwyn@suse.de>
+Return-Path: <axboe@kernel.dk>
 Subject: Re: [PATCH 5/8] nowait aio: return on congested block device
-To: Jens Axboe <axboe@kernel.dk>, Sagi Grimberg <sagi@grimberg.me>,
+To: Goldwyn Rodrigues <rgoldwyn@suse.de>, Sagi Grimberg <sagi@grimberg.me>,
  jack@suse.com
 References: <20170228233610.25456-1-rgoldwyn@suse.de>
  <20170228233610.25456-6-rgoldwyn@suse.de>
  <0d1ba678-69c0-16ce-6c3e-475cd8da203c@grimberg.me>
  <44cc02b1-f7ac-cbc6-6f09-726ae8225358@suse.de>
- <a661cdc7-4859-4a39-3037-8036cc8c4712@kernel.dk>
 Cc: hch@infradead.org, linux-fsdevel@vger.kernel.org,
  linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org,
  linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org,
  Goldwyn Rodrigues <rgoldwyn@suse.com>
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-Message-ID: <310c6725-3263-2790-a445-d58e464fd3e4@suse.de>
-Date: Wed, 8 Mar 2017 20:18:54 -0600
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <a661cdc7-4859-4a39-3037-8036cc8c4712@kernel.dk>
+Date: Wed, 8 Mar 2017 09:17:04 -0700
 MIME-Version: 1.0
-In-Reply-To: <a661cdc7-4859-4a39-3037-8036cc8c4712@kernel.dk>
+In-Reply-To: <44cc02b1-f7ac-cbc6-6f09-726ae8225358@suse.de>
 Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-block@vger.kernel.org>
 
-
-
-On 03/08/2017 10:17 AM, Jens Axboe wrote:
-> On 03/08/2017 08:00 AM, Goldwyn Rodrigues wrote:
+On 03/08/2017 08:00 AM, Goldwyn Rodrigues wrote:
+> 
+> 
+> On 03/08/2017 01:03 AM, Sagi Grimberg wrote:
 >>
+>>> -        if (likely(blk_queue_enter(q, false) == 0)) {
+>>> +        if (likely(blk_queue_enter(q, bio_flagged(bio, BIO_NOWAIT))
+>>> == 0)) {
+>>>              ret = q->make_request_fn(q, bio);
 >>
->> On 03/08/2017 01:03 AM, Sagi Grimberg wrote:
->>>
->>>> -        if (likely(blk_queue_enter(q, false) == 0)) {
->>>> +        if (likely(blk_queue_enter(q, bio_flagged(bio, BIO_NOWAIT))
->>>> == 0)) {
->>>>              ret = q->make_request_fn(q, bio);
->>>
->>> I think that for ->make_request to not block we'd need to set
->>> BLK_MQ_REQ_NOWAIT in blk_mq_alloc_data to avoid blocking on a tag
->>> allocation.
->>>
->>> Something like the untested addition below:
+>> I think that for ->make_request to not block we'd need to set
+>> BLK_MQ_REQ_NOWAIT in blk_mq_alloc_data to avoid blocking on a tag
+>> allocation.
 >>
->> I did that in the first series, but there are too many reasons to block
->> in blk-mq [1]. I dropped blk-mq work in v2.
+>> Something like the untested addition below:
 > 
-> That's complete nonsense, there are no more places in blk-mq that will
-> block that in the legacy path. Most of the examples from your URL:
-> 
->> [1] https://patchwork.kernel.org/patch/9571051/
-> 
-> are not blk-mq, but writeback throttling, and drivers that explicitly
-> hook into ->make_request_fn.
-> 
-> As others have mentioned, it's a total non-starter to focus on the
-> deprecated IO path and just ignore the new one. Back to the drawing
-> board.
-> 
+> I did that in the first series, but there are too many reasons to block
+> in blk-mq [1]. I dropped blk-mq work in v2.
 
-Thanks, I understood what I was doing wrong. I will include blk-mq in
-the patch.
+That's complete nonsense, there are no more places in blk-mq that will
+block that in the legacy path. Most of the examples from your URL:
+
+> [1] https://patchwork.kernel.org/patch/9571051/
+
+are not blk-mq, but writeback throttling, and drivers that explicitly
+hook into ->make_request_fn.
+
+As others have mentioned, it's a total non-starter to focus on the
+deprecated IO path and just ignore the new one. Back to the drawing
+board.
 
 -- 
-Goldwyn
+Jens Axboe
