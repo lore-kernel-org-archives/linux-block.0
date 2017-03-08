@@ -1,41 +1,44 @@
 Return-Path: <linux-fsdevel-owner@vger.kernel.org>
 Subject: Re: [PATCH 5/8] nowait aio: return on congested block device
-To: Sagi Grimberg <sagi@grimberg.me>, jack@suse.com
+To: Goldwyn Rodrigues <rgoldwyn@suse.de>, jack@suse.com
 References: <20170228233610.25456-1-rgoldwyn@suse.de>
  <20170228233610.25456-6-rgoldwyn@suse.de>
- <0d1ba678-69c0-16ce-6c3e-475cd8da203c@grimberg.me>
 Cc: hch@infradead.org, linux-fsdevel@vger.kernel.org,
         linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org,
         linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org,
         Goldwyn Rodrigues <rgoldwyn@suse.com>
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-Message-ID: <44cc02b1-f7ac-cbc6-6f09-726ae8225358@suse.de>
-Date: Wed, 8 Mar 2017 09:00:09 -0600
+From: Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <0d1ba678-69c0-16ce-6c3e-475cd8da203c@grimberg.me>
+Date: Wed, 8 Mar 2017 09:03:08 +0200
 MIME-Version: 1.0
-In-Reply-To: <0d1ba678-69c0-16ce-6c3e-475cd8da203c@grimberg.me>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <20170228233610.25456-6-rgoldwyn@suse.de>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
 
+> -		if (likely(blk_queue_enter(q, false) == 0)) {
+> +		if (likely(blk_queue_enter(q, bio_flagged(bio, BIO_NOWAIT)) == 0)) {
+>  			ret = q->make_request_fn(q, bio);
 
-On 03/08/2017 01:03 AM, Sagi Grimberg wrote:
-> 
->> -        if (likely(blk_queue_enter(q, false) == 0)) {
->> +        if (likely(blk_queue_enter(q, bio_flagged(bio, BIO_NOWAIT))
->> == 0)) {
->>              ret = q->make_request_fn(q, bio);
-> 
-> I think that for ->make_request to not block we'd need to set
-> BLK_MQ_REQ_NOWAIT in blk_mq_alloc_data to avoid blocking on a tag
-> allocation.
-> 
-> Something like the untested addition below:
+I think that for ->make_request to not block we'd need to set
+BLK_MQ_REQ_NOWAIT in blk_mq_alloc_data to avoid blocking on a tag
+allocation.
 
-I did that in the first series, but there are too many reasons to block
-in blk-mq [1]. I dropped blk-mq work in v2.
+Something like the untested addition below:
+--
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index 09af8ff18719..40e78b57fb44 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -119,6 +119,9 @@ struct request *blk_mq_sched_get_request(struct 
+request_queue *q,
+         if (likely(!data->hctx))
+                 data->hctx = blk_mq_map_queue(q, data->ctx->cpu);
 
-[1] https://patchwork.kernel.org/patch/9571051/
-
--- 
-Goldwyn
++       if (likely(bio) && bio_flagged(bio, BIO_NOWAIT))
++               data->flags |= BLK_MQ_REQ_NOWAIT;
++
+         if (e) {
+                 data->flags |= BLK_MQ_REQ_INTERNAL;
+--
