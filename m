@@ -1,38 +1,59 @@
-Return-Path: <htejun@gmail.com>
-Return-Path: <htejun@gmail.com>
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Wed, 8 Mar 2017 17:57:24 -0500
-From: Tejun Heo <tj@kernel.org>
-To: Jan Kara <jack@suse.cz>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+Return-Path: <jack@suse.cz>
+From: Jan Kara <jack@suse.cz>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Tejun Heo <tj@kernel.org>,
+	linux-block@vger.kernel.org,
 	Dan Williams <dan.j.williams@intel.com>,
 	Omar Sandoval <osandov@osandov.com>,
 	Arthur Marsh <arthur.marsh@internode.on.net>,
-	linux-scsi@vger.kernel.org
-Subject: Re: [PATCH 3/4] block: Make del_gendisk() safer for disks without
- queues
-Message-ID: <20170308225724.GD21117@htj.duckdns.org>
+	linux-scsi@vger.kernel.org,
+	Jan Kara <jack@suse.cz>
+Subject: [PATCH 3/4] block: Make del_gendisk() safer for disks without queues
+Date: Wed,  8 Mar 2017 17:48:33 +0100
+Message-Id: <20170308164834.14302-4-jack@suse.cz>
+In-Reply-To: <20170308164834.14302-1-jack@suse.cz>
 References: <20170308164834.14302-1-jack@suse.cz>
- <20170308164834.14302-4-jack@suse.cz>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170308164834.14302-4-jack@suse.cz>
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed, Mar 08, 2017 at 05:48:33PM +0100, Jan Kara wrote:
-> Commit 165a5e22fafb "block: Move bdi_unregister() to del_gendisk()"
-> added disk->queue dereference to del_gendisk(). Although del_gendisk()
-> is not supposed to be called without disk->queue valid and
-> blk_unregister_queue() warns in that case, this change will make it oops
-> instead. Return to the old more robust behavior of just warning when
-> del_gendisk() gets called for gendisk with disk->queue being NULL.
-> 
-> Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
-> Signed-off-by: Jan Kara <jack@suse.cz>
+Commit 165a5e22fafb "block: Move bdi_unregister() to del_gendisk()"
+added disk->queue dereference to del_gendisk(). Although del_gendisk()
+is not supposed to be called without disk->queue valid and
+blk_unregister_queue() warns in that case, this change will make it oops
+instead. Return to the old more robust behavior of just warning when
+del_gendisk() gets called for gendisk with disk->queue being NULL.
 
-Acked-by: Tejun Heo <tj@kernel.org>
+Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
+Signed-off-by: Jan Kara <jack@suse.cz>
+---
+ block/genhd.c | 16 ++++++++++------
+ 1 file changed, 10 insertions(+), 6 deletions(-)
 
-Thanks.
-
+diff --git a/block/genhd.c b/block/genhd.c
+index b26a5ea115d0..94f323842b52 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -681,12 +681,16 @@ void del_gendisk(struct gendisk *disk)
+ 	disk->flags &= ~GENHD_FL_UP;
+ 
+ 	sysfs_remove_link(&disk_to_dev(disk)->kobj, "bdi");
+-	/*
+-	 * Unregister bdi before releasing device numbers (as they can get
+-	 * reused and we'd get clashes in sysfs).
+-	 */
+-	bdi_unregister(disk->queue->backing_dev_info);
+-	blk_unregister_queue(disk);
++	if (disk->queue) {
++		/*
++		 * Unregister bdi before releasing device numbers (as they can
++		 * get reused and we'd get clashes in sysfs).
++		 */
++		bdi_unregister(disk->queue->backing_dev_info);
++		blk_unregister_queue(disk);
++	} else {
++		WARN_ON(1);
++	}
+ 	blk_unregister_region(disk_devt(disk), disk->minors);
+ 
+ 	part_stat_set_all(&disk->part0, 0);
 -- 
-tejun
+2.10.2
