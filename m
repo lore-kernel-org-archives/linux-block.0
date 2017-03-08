@@ -1,84 +1,50 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f44.google.com ([74.125.83.44]:33981 "EHLO
-        mail-pg0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751106AbdCAUYm (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Mar 2017 15:24:42 -0500
-Received: by mail-pg0-f44.google.com with SMTP id p5so23736115pga.1
-        for <linux-block@vger.kernel.org>; Wed, 01 Mar 2017 12:24:06 -0800 (PST)
-From: Omar Sandoval <osandov@osandov.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: kernel-team@fb.com
-Subject: [PATCH 2/2] blk-mq-debugfs: add q->mq_freeze_depth output
-Date: Wed,  1 Mar 2017 10:42:39 -0800
-Message-Id: <d4ab26006c6b454db94d548df10da3ce8908c8a1.1488393750.git.osandov@fb.com>
-In-Reply-To: <7e888cad9e6c35835559281d3ab9e05ea48836d0.1488393750.git.osandov@fb.com>
-References: <7e888cad9e6c35835559281d3ab9e05ea48836d0.1488393750.git.osandov@fb.com>
-In-Reply-To: <7e888cad9e6c35835559281d3ab9e05ea48836d0.1488393750.git.osandov@fb.com>
-References: <7e888cad9e6c35835559281d3ab9e05ea48836d0.1488393750.git.osandov@fb.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Wed, 8 Mar 2017 17:56:51 -0500
+From: Tejun Heo <tj@kernel.org>
+To: Jan Kara <jack@suse.cz>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Dan Williams <dan.j.williams@intel.com>,
+	Omar Sandoval <osandov@osandov.com>,
+	Arthur Marsh <arthur.marsh@internode.on.net>,
+	linux-scsi@vger.kernel.org
+Subject: Re: [PATCH 2/4] bdi: Fix use-after-free in wb_congested_put()
+Message-ID: <20170308225651.GC21117@htj.duckdns.org>
+References: <20170308164834.14302-1-jack@suse.cz>
+ <20170308164834.14302-3-jack@suse.cz>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170308164834.14302-3-jack@suse.cz>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Omar Sandoval <osandov@fb.com>
+On Wed, Mar 08, 2017 at 05:48:32PM +0100, Jan Kara wrote:
+> bdi_writeback_congested structures get created for each blkcg and bdi
+> regardless whether bdi is registered or not. When they are created in
+> unregistered bdi and the request queue (and thus bdi) is then destroyed
+> while blkg still holds reference to bdi_writeback_congested structure,
+> this structure will be referencing freed bdi and last wb_congested_put()
+> will try to remove the structure from already freed bdi.
+> 
+> With commit 165a5e22fafb "block: Move bdi_unregister() to
+> del_gendisk()", SCSI started to destroy bdis without calling
+> bdi_unregister() first (previously it was calling bdi_unregister() even
+> for unregistered bdis) and thus the code detaching
+> bdi_writeback_congested in cgwb_bdi_destroy() was not triggered and we
+> started hitting this use-after-free bug. It is enough to boot a KVM
+> instance with virtio-scsi device to trigger this behavior.
+> 
+> Fix the problem by detaching bdi_writeback_congested structures in
+> bdi_exit() instead of bdi_unregister(). This is also more logical as
+> they can get attached to bdi regardless whether it ever got registered
+> or not.
+> 
+> Fixes: 165a5e22fafb127ecb5914e12e8c32a1f0d3f820
+> Signed-off-by: Jan Kara <jack@suse.cz>
 
-This can be used to diagnose freeze-related hangs.
+Acked-by: Tejun Heo <tj@kernel.org>
 
-Signed-off-by: Omar Sandoval <osandov@fb.com>
----
- block/blk-mq-debugfs.c | 28 ++++++++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
+Thanks.
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index f6d917977b33..1459546788da 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -29,6 +29,26 @@ struct blk_mq_debugfs_attr {
- 	const struct file_operations *fops;
- };
- 
-+static int queue_freeze_depth_show(struct seq_file *m, void *v)
-+{
-+	struct request_queue *q = m->private;
-+
-+	seq_printf(m, "%d\n", atomic_read(&q->mq_freeze_depth));
-+	return 0;
-+}
-+
-+static int queue_freeze_depth_open(struct inode *inode, struct file *file)
-+{
-+	return single_open(file, queue_freeze_depth_show, inode->i_private);
-+}
-+
-+static const struct file_operations queue_freeze_depth_fops = {
-+	.open		= queue_freeze_depth_open,
-+	.read		= seq_read,
-+	.llseek		= seq_lseek,
-+	.release	= single_release,
-+};
-+
- static int blk_mq_debugfs_seq_open(struct inode *inode, struct file *file,
- 				   const struct seq_operations *ops)
- {
-@@ -636,6 +656,11 @@ static const struct file_operations ctx_completed_fops = {
- 	.release	= single_release,
- };
- 
-+static const struct blk_mq_debugfs_attr blk_mq_debugfs_queue_attrs[] = {
-+	{"freeze_depth", 0400, &queue_freeze_depth_fops},
-+	{},
-+};
-+
- static const struct blk_mq_debugfs_attr blk_mq_debugfs_hctx_attrs[] = {
- 	{"state", 0400, &hctx_state_fops},
- 	{"flags", 0400, &hctx_flags_fops},
-@@ -753,6 +778,9 @@ int blk_mq_debugfs_register_hctxs(struct request_queue *q)
- 	if (!q->mq_debugfs_dir)
- 		goto err;
- 
-+	if (!debugfs_create_files(q->mq_debugfs_dir, q, blk_mq_debugfs_queue_attrs))
-+		return -ENOMEM;
-+
- 	queue_for_each_hw_ctx(q, hctx, i) {
- 		if (blk_mq_debugfs_register_hctx(q, hctx))
- 			goto err;
 -- 
-2.12.0
+tejun
