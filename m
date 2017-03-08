@@ -1,88 +1,248 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:45464 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751320AbdCMPOR (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 Mar 2017 11:14:17 -0400
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
-        Tejun Heo <tj@kernel.org>, Tahsin Erdogan <tahsin@google.com>,
-        Omar Sandoval <osandov@osandov.com>, Jan Kara <jack@suse.cz>
-Subject: [PATCH 11/11] block: Fix oops scsi_disk_get()
-Date: Mon, 13 Mar 2017 16:14:10 +0100
-Message-Id: <20170313151410.5586-12-jack@suse.cz>
-In-Reply-To: <20170313151410.5586-1-jack@suse.cz>
-References: <20170313151410.5586-1-jack@suse.cz>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Date: Wed, 8 Mar 2017 13:43:11 -0800
+From: Jaegeuk Kim <jaegeuk@kernel.org>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, linux-block@vger.kernel.org
+Subject: Re: [PATCH] f2fs: allocate a bio for discarding when actually
+ issuing it
+Message-ID: <20170308214311.GD5483@jaegeuk.local>
+References: <20170308023333.15034-1-jaegeuk@kernel.org>
+ <20170308150311.GA17999@infradead.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170308150311.GA17999@infradead.org>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-When device open races with device shutdown, we can get the following
-oops in scsi_disk_get():
+On 03/08, Christoph Hellwig wrote:
+> On Tue, Mar 07, 2017 at 06:33:33PM -0800, Jaegeuk Kim wrote:
+> > Let's allocate a bio when issuing discard commands later.
+> 
+> Does this solve the issue with your queue stalls?
 
-[11863.044351] general protection fault: 0000 [#1] SMP
-[11863.045561] Modules linked in: scsi_debug xfs libcrc32c netconsole btrfs raid6_pq zlib_deflate lzo_compress xor [last unloaded: loop]
-[11863.047853] CPU: 3 PID: 13042 Comm: hald-probe-stor Tainted: G W      4.10.0-rc2-xen+ #35
-[11863.048030] Hardware name: Bochs Bochs, BIOS Bochs 01/01/2011
-[11863.048030] task: ffff88007f438200 task.stack: ffffc90000fd0000
-[11863.048030] RIP: 0010:scsi_disk_get+0x43/0x70
-[11863.048030] RSP: 0018:ffffc90000fd3a08 EFLAGS: 00010202
-[11863.048030] RAX: 6b6b6b6b6b6b6b6b RBX: ffff88007f56d000 RCX: 0000000000000000
-[11863.048030] RDX: 0000000000000001 RSI: 0000000000000004 RDI: ffffffff81a8d880
-[11863.048030] RBP: ffffc90000fd3a18 R08: 0000000000000000 R09: 0000000000000001
-[11863.059217] R10: 0000000000000000 R11: 0000000000000000 R12: 00000000fffffffa
-[11863.059217] R13: ffff880078872800 R14: ffff880070915540 R15: 000000000000001d
-[11863.059217] FS:  00007f2611f71800(0000) GS:ffff88007f0c0000(0000) knlGS:0000000000000000
-[11863.059217] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[11863.059217] CR2: 000000000060e048 CR3: 00000000778d4000 CR4: 00000000000006e0
-[11863.059217] Call Trace:
-[11863.059217]  ? disk_get_part+0x22/0x1f0
-[11863.059217]  sd_open+0x39/0x130
-[11863.059217]  __blkdev_get+0x69/0x430
-[11863.059217]  ? bd_acquire+0x7f/0xc0
-[11863.059217]  ? bd_acquire+0x96/0xc0
-[11863.059217]  ? blkdev_get+0x350/0x350
-[11863.059217]  blkdev_get+0x126/0x350
-[11863.059217]  ? _raw_spin_unlock+0x2b/0x40
-[11863.059217]  ? bd_acquire+0x7f/0xc0
-[11863.059217]  ? blkdev_get+0x350/0x350
-[11863.059217]  blkdev_open+0x65/0x80
-...
+No, the patch just changes bio_alloc timings, but the stall happens when doing
+submit_bio.
 
-As you can see RAX value is already poisoned showing that gendisk we got
-is already freed. The problem is that get_gendisk() looks up device
-number in ext_devt_idr and then does get_disk() which does kobject_get()
-on the disks kobject. However the disk gets removed from ext_devt_idr
-only in disk_release() (through blk_free_devt()) at which moment it has
-already 0 refcount and is already on its way to be freed. Indeed we've
-got a warning from kobject_get() about 0 refcount shortly before the
-oops.
+Thanks,
 
-We fix the problem by using kobject_get_unless_zero() in get_disk() so
-that get_disk() cannot get reference on a disk that is already being
-freed.
-
-Tested-by: Lekshmi Pillai <lekshmicpillai@in.ibm.com>
-Reviewed-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Acked-by: Tejun Heo <tj@kernel.org>
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- block/genhd.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/block/genhd.c b/block/genhd.c
-index a9c516a8b37d..510aac1486cb 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -1352,7 +1352,7 @@ struct kobject *get_disk(struct gendisk *disk)
- 	owner = disk->fops->owner;
- 	if (owner && !try_module_get(owner))
- 		return NULL;
--	kobj = kobject_get(&disk_to_dev(disk)->kobj);
-+	kobj = kobject_get_unless_zero(&disk_to_dev(disk)->kobj);
- 	if (kobj == NULL) {
- 		module_put(owner);
- 		return NULL;
--- 
-2.10.2
+> 
+> > 
+> > Signed-off-by: Jaegeuk Kim <jaegeuk@kernel.org>
+> > ---
+> >  fs/f2fs/f2fs.h    |   4 +-
+> >  fs/f2fs/segment.c | 113 ++++++++++++++++++++++++++++--------------------------
+> >  2 files changed, 62 insertions(+), 55 deletions(-)
+> > 
+> > diff --git a/fs/f2fs/f2fs.h b/fs/f2fs/f2fs.h
+> > index a58c2e43bd2a..870bb4d9bc65 100644
+> > --- a/fs/f2fs/f2fs.h
+> > +++ b/fs/f2fs/f2fs.h
+> > @@ -197,10 +197,12 @@ enum {
+> >  struct discard_cmd {
+> >  	struct list_head list;		/* command list */
+> >  	struct completion wait;		/* compleation */
+> > +	struct block_device *bdev;	/* bdev */
+> >  	block_t lstart;			/* logical start address */
+> > +	block_t start;			/* actual start address in dev */
+> >  	block_t len;			/* length */
+> > -	struct bio *bio;		/* bio */
+> >  	int state;			/* state */
+> > +	int error;			/* bio error */
+> >  };
+> >  
+> >  struct discard_cmd_control {
+> > diff --git a/fs/f2fs/segment.c b/fs/f2fs/segment.c
+> > index 50c65cc4645a..d8f9e6c895cd 100644
+> > --- a/fs/f2fs/segment.c
+> > +++ b/fs/f2fs/segment.c
+> > @@ -636,7 +636,8 @@ static void locate_dirty_segment(struct f2fs_sb_info *sbi, unsigned int segno)
+> >  }
+> >  
+> >  static void __add_discard_cmd(struct f2fs_sb_info *sbi,
+> > -			struct bio *bio, block_t lstart, block_t len)
+> > +		struct block_device *bdev, block_t lstart,
+> > +		block_t start, block_t len)
+> >  {
+> >  	struct discard_cmd_control *dcc = SM_I(sbi)->dcc_info;
+> >  	struct list_head *cmd_list = &(dcc->discard_cmd_list);
+> > @@ -644,9 +645,9 @@ static void __add_discard_cmd(struct f2fs_sb_info *sbi,
+> >  
+> >  	dc = f2fs_kmem_cache_alloc(discard_cmd_slab, GFP_NOFS);
+> >  	INIT_LIST_HEAD(&dc->list);
+> > -	dc->bio = bio;
+> > -	bio->bi_private = dc;
+> > +	dc->bdev = bdev;
+> >  	dc->lstart = lstart;
+> > +	dc->start = start;
+> >  	dc->len = len;
+> >  	dc->state = D_PREP;
+> >  	init_completion(&dc->wait);
+> > @@ -658,22 +659,66 @@ static void __add_discard_cmd(struct f2fs_sb_info *sbi,
+> >  
+> >  static void __remove_discard_cmd(struct f2fs_sb_info *sbi, struct discard_cmd *dc)
+> >  {
+> > -	int err = dc->bio->bi_error;
+> > -
+> >  	if (dc->state == D_DONE)
+> >  		atomic_dec(&(SM_I(sbi)->dcc_info->submit_discard));
+> >  
+> > -	if (err == -EOPNOTSUPP)
+> > -		err = 0;
+> > +	if (dc->error == -EOPNOTSUPP)
+> > +		dc->error = 0;
+> >  
+> > -	if (err)
+> > +	if (dc->error)
+> >  		f2fs_msg(sbi->sb, KERN_INFO,
+> > -				"Issue discard failed, ret: %d", err);
+> > -	bio_put(dc->bio);
+> > +				"Issue discard failed, ret: %d", dc->error);
+> >  	list_del(&dc->list);
+> >  	kmem_cache_free(discard_cmd_slab, dc);
+> >  }
+> >  
+> > +static void f2fs_submit_discard_endio(struct bio *bio)
+> > +{
+> > +	struct discard_cmd *dc = (struct discard_cmd *)bio->bi_private;
+> > +
+> > +	complete(&dc->wait);
+> > +	dc->error = bio->bi_error;
+> > +	dc->state = D_DONE;
+> > +	bio_put(bio);
+> > +}
+> > +
+> > +/* this function is copied from blkdev_issue_discard from block/blk-lib.c */
+> > +static int __submit_discard_cmd(struct discard_cmd *dc)
+> > +{
+> > +	struct bio *bio = NULL;
+> > +	int err;
+> > +
+> > +	err = __blkdev_issue_discard(dc->bdev,
+> > +				SECTOR_FROM_BLOCK(dc->start),
+> > +				SECTOR_FROM_BLOCK(dc->len),
+> > +				GFP_NOFS, 0, &bio);
+> > +	if (!err && bio) {
+> > +		bio->bi_private = dc;
+> > +		bio->bi_end_io = f2fs_submit_discard_endio;
+> > +		bio->bi_opf |= REQ_SYNC;
+> > +		submit_bio(bio);
+> > +	}
+> > +	dc->state = D_SUBMIT;
+> > +	return err;
+> > +}
+> > +
+> > +static int __queue_discard_cmd(struct f2fs_sb_info *sbi,
+> > +		struct block_device *bdev, block_t blkstart, block_t blklen)
+> > +{
+> > +	block_t lblkstart = blkstart;
+> > +
+> > +	trace_f2fs_issue_discard(bdev, blkstart, blklen);
+> > +
+> > +	if (sbi->s_ndevs) {
+> > +		int devi = f2fs_target_device_index(sbi, blkstart);
+> > +
+> > +		blkstart -= FDEV(devi).start_blk;
+> > +	}
+> > +	__add_discard_cmd(sbi, bdev, lblkstart, blkstart, blklen);
+> > +	wake_up(&SM_I(sbi)->dcc_info->discard_wait_queue);
+> > +	return 0;
+> > +}
+> > +
+> >  /* This should be covered by global mutex, &sit_i->sentry_lock */
+> >  void f2fs_wait_discard_bio(struct f2fs_sb_info *sbi, block_t blkaddr)
+> >  {
+> > @@ -690,8 +735,7 @@ void f2fs_wait_discard_bio(struct f2fs_sb_info *sbi, block_t blkaddr)
+> >  
+> >  		if (blkaddr == NULL_ADDR) {
+> >  			if (dc->state == D_PREP) {
+> > -				dc->state = D_SUBMIT;
+> > -				submit_bio(dc->bio);
+> > +				__submit_discard_cmd(dc);
+> >  				atomic_inc(&dcc->submit_discard);
+> >  			}
+> >  			continue;
+> > @@ -716,14 +760,6 @@ void f2fs_wait_discard_bio(struct f2fs_sb_info *sbi, block_t blkaddr)
+> >  	mutex_unlock(&dcc->cmd_lock);
+> >  }
+> >  
+> > -static void f2fs_submit_discard_endio(struct bio *bio)
+> > -{
+> > -	struct discard_cmd *dc = (struct discard_cmd *)bio->bi_private;
+> > -
+> > -	complete(&dc->wait);
+> > -	dc->state = D_DONE;
+> > -}
+> > -
+> >  static int issue_discard_thread(void *data)
+> >  {
+> >  	struct f2fs_sb_info *sbi = data;
+> > @@ -742,8 +778,7 @@ static int issue_discard_thread(void *data)
+> >  	mutex_lock(&dcc->cmd_lock);
+> >  	list_for_each_entry_safe(dc, tmp, cmd_list, list) {
+> >  		if (dc->state == D_PREP) {
+> > -			dc->state = D_SUBMIT;
+> > -			submit_bio(dc->bio);
+> > +			__submit_discard_cmd(dc);
+> >  			atomic_inc(&dcc->submit_discard);
+> >  			if (iter++ > DISCARD_ISSUE_RATE)
+> >  				break;
+> > @@ -763,36 +798,6 @@ static int issue_discard_thread(void *data)
+> >  	goto repeat;
+> >  }
+> >  
+> > -
+> > -/* this function is copied from blkdev_issue_discard from block/blk-lib.c */
+> > -static int __f2fs_issue_discard_async(struct f2fs_sb_info *sbi,
+> > -		struct block_device *bdev, block_t blkstart, block_t blklen)
+> > -{
+> > -	struct bio *bio = NULL;
+> > -	block_t lblkstart = blkstart;
+> > -	int err;
+> > -
+> > -	trace_f2fs_issue_discard(bdev, blkstart, blklen);
+> > -
+> > -	if (sbi->s_ndevs) {
+> > -		int devi = f2fs_target_device_index(sbi, blkstart);
+> > -
+> > -		blkstart -= FDEV(devi).start_blk;
+> > -	}
+> > -	err = __blkdev_issue_discard(bdev,
+> > -				SECTOR_FROM_BLOCK(blkstart),
+> > -				SECTOR_FROM_BLOCK(blklen),
+> > -				GFP_NOFS, 0, &bio);
+> > -	if (!err && bio) {
+> > -		bio->bi_end_io = f2fs_submit_discard_endio;
+> > -		bio->bi_opf |= REQ_SYNC;
+> > -
+> > -		__add_discard_cmd(sbi, bio, lblkstart, blklen);
+> > -		wake_up(&SM_I(sbi)->dcc_info->discard_wait_queue);
+> > -	}
+> > -	return err;
+> > -}
+> > -
+> >  #ifdef CONFIG_BLK_DEV_ZONED
+> >  static int __f2fs_issue_discard_zone(struct f2fs_sb_info *sbi,
+> >  		struct block_device *bdev, block_t blkstart, block_t blklen)
+> > @@ -816,7 +821,7 @@ static int __f2fs_issue_discard_zone(struct f2fs_sb_info *sbi,
+> >  	case BLK_ZONE_TYPE_CONVENTIONAL:
+> >  		if (!blk_queue_discard(bdev_get_queue(bdev)))
+> >  			return 0;
+> > -		return __f2fs_issue_discard_async(sbi, bdev, lblkstart, blklen);
+> > +		return __queue_discard_cmd(sbi, bdev, lblkstart, blklen);
+> >  	case BLK_ZONE_TYPE_SEQWRITE_REQ:
+> >  	case BLK_ZONE_TYPE_SEQWRITE_PREF:
+> >  		sector = SECTOR_FROM_BLOCK(blkstart);
+> > @@ -848,7 +853,7 @@ static int __issue_discard_async(struct f2fs_sb_info *sbi,
+> >  				bdev_zoned_model(bdev) != BLK_ZONED_NONE)
+> >  		return __f2fs_issue_discard_zone(sbi, bdev, blkstart, blklen);
+> >  #endif
+> > -	return __f2fs_issue_discard_async(sbi, bdev, blkstart, blklen);
+> > +	return __queue_discard_cmd(sbi, bdev, blkstart, blklen);
+> >  }
+> >  
+> >  static int f2fs_issue_discard(struct f2fs_sb_info *sbi,
+> > -- 
+> > 2.11.0
+> > 
+> ---end quoted text---
