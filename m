@@ -1,95 +1,68 @@
-Return-Path: <jack@suse.cz>
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
-	Lekshmi Pillai <lekshmicpillai@in.ibm.com>,
-	Tejun Heo <tj@kernel.org>,
-	NeilBrown <neilb@suse.de>,
-	Omar Sandoval <osandov@osandov.com>,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH 02/11] block: Fix race of bdev open with gendisk shutdown
-Date: Mon,  6 Mar 2017 17:33:55 +0100
-Message-Id: <20170306163404.1238-3-jack@suse.cz>
-In-Reply-To: <20170306163404.1238-1-jack@suse.cz>
-References: <20170306163404.1238-1-jack@suse.cz>
+Return-Path: <wouter@grep.be>
+Date: Wed, 8 Mar 2017 21:44:41 +0100
+From: Wouter Verhelst <w@uter.be>
+To: Josef Bacik <jbacik@fb.com>
+Cc: axboe@kernel.dk, nbd-general@lists.sourceforge.net,
+	linux-block@vger.kernel.org, kernel-team@fb.com
+Subject: Re: [Nbd] [PATCH 6/6] nbd: add a basic netlink interface
+Message-ID: <20170308204441.ywvrsoyrk2qpyji7@grep.be>
+References: <1488301031-3199-1-git-send-email-jbacik@fb.com>
+ <1488301031-3199-7-git-send-email-jbacik@fb.com>
+ <20170308100704.xdxuhlpsttigfreq@grep.be>
+ <1488985008.9307.29.camel@fb.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <1488985008.9307.29.camel@fb.com>
 List-ID: <linux-block@vger.kernel.org>
 
-blkdev_open() may race with gendisk shutdown in such a way that
-del_gendisk() has already unhashed block device inode (and thus
-bd_acquire() will end up creating new block device inode) however
-gen_gendisk() will still return the gendisk that is being destroyed.
-This will result in the new bdev inode being associated with bdi of the
-request queue that is going away and when the device number gets
-eventually reused, the block device will still be pointing to the stale
-bdi.
+On Wed, Mar 08, 2017 at 09:56:48AM -0500, Josef Bacik wrote:
+> On Wed, 2017-03-08 at 11:07 +0100, Wouter Verhelst wrote:
+> > On Tue, Feb 28, 2017 at 11:57:11AM -0500, Josef Bacik wrote:
+> > > 
+> > > The existing ioctl interface for configuring NBD devices is a bit
+> > > cumbersome and hard to extend.��The other problem is we leave a
+> > > userspace app sitting in it's syscall until the device disconnects,
+> > > which is less than ideal.
+> > True.
+> > 
+> > On the other hand, it has the advantage that you leave a userspace
+> > app
+> > sitting around until the device disconnects, which allows for some
+> > form
+> > of recovery in case you're doing root-on-NBD and the server has a
+> > hiccup. Don't underestimate the advantage of that.
+> > 
+> > (of course, that requires that the return value of NBD_DO_IT makes a
+> > difference between "unexpected connection drop" and "we sent
+> > NBD_CMD_DISC", but that's a different matter entirely)
+> 
+> Stay tuned for further developments ;).
 
-Fix the problem by checking whether the gendisk is still alive when
-associating bdev inode with it and its bdi. That way we are sure that
-once we are unhashing block device inodes in del_gendisk(), newly
-created bdev inodes cannot be associated with bdi of the deleted gendisk
-anymore. We actually already do this check when opening a partition so
-we need to add it only for the case when the whole device is opened.
+Heh.
 
-Also add a warning that will tell us about unexpected inconsistencies
-between bdi associated with the bdev inode and bdi associated with the
-disk.
+> Yeah the problem is that even
+> though we can return and allow the user to reconnect, we completely
+> tear down the device and will return EIO to anything that comes in
+> while we're reconnecting, which sucks for users.
 
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- block/genhd.c  | 7 ++++++-
- fs/block_dev.c | 5 ++++-
- 2 files changed, 10 insertions(+), 2 deletions(-)
+Quite, yes.
 
-diff --git a/block/genhd.c b/block/genhd.c
-index b26a5ea115d0..e8df37de03af 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -662,6 +662,12 @@ void del_gendisk(struct gendisk *disk)
- 	struct disk_part_iter piter;
- 	struct hd_struct *part;
- 
-+	disk->flags &= ~GENHD_FL_UP;
-+	/*
-+	 * Make sure __blkdev_open() sees the disk is going away before
-+	 * starting to unhash bdev inodes.
-+	 */
-+	smp_wmb();
- 	blk_integrity_del(disk);
- 	disk_del_events(disk);
- 
-@@ -678,7 +684,6 @@ void del_gendisk(struct gendisk *disk)
- 	invalidate_partition(disk, 0);
- 	bdev_unhash_inode(disk_devt(disk));
- 	set_capacity(disk, 0);
--	disk->flags &= ~GENHD_FL_UP;
- 
- 	sysfs_remove_link(&disk_to_dev(disk)->kobj, "bdi");
- 	/*
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 53e2389ae4d4..9e1993a2827f 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -1560,7 +1560,7 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
- 		if (!partno) {
- 			ret = -ENXIO;
- 			bdev->bd_part = disk_get_part(disk, partno);
--			if (!bdev->bd_part)
-+			if (!(disk->flags & GENHD_FL_UP) || !bdev->bd_part)
- 				goto out_clear;
- 
- 			ret = 0;
-@@ -1623,6 +1623,9 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
- 
- 		if (bdev->bd_bdi == &noop_backing_dev_info)
- 			bdev->bd_bdi = bdi_get(disk->queue->backing_dev_info);
-+		else
-+			WARN_ON_ONCE(bdev->bd_bdi !=
-+				     disk->queue->backing_dev_info);
- 	} else {
- 		if (bdev->bd_contains == bdev) {
- 			ret = 0;
+>�The patches that I'm testing now will multi-cast messages over netlink
+> when a link goes down so a user space application can reconnect and
+> provide a new connection seamlessly. �The next step after that is to
+> allow a complete failure of all connections and we will simply sit
+> there and queue IO until userspace reconnects or the configured
+> timeout elapses at which point we'll tear down the device. �The end
+> goal of all of this is seamless reconnects without throwing errors.
+
+Awesome. That would mean userspace would need to sit around, but I
+suppose that isn't something we can't live with (and actually has other
+advantages, too).
+
+Thanks,
+
 -- 
-2.10.2
+< ron> I mean, the main *practical* problem with C++, is there's like a dozen
+       people in the world who think they really understand all of its rules,
+       and pretty much all of them are just lying to themselves too.
+ -- #debian-devel, OFTC, 2016-02-12
