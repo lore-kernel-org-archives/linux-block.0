@@ -1,80 +1,94 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f196.google.com ([209.85.192.196]:36806 "EHLO
-        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932434AbdCXMgh (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 24 Mar 2017 08:36:37 -0400
-Received: by mail-pf0-f196.google.com with SMTP id r137so193538pfr.3
-        for <linux-block@vger.kernel.org>; Fri, 24 Mar 2017 05:36:36 -0700 (PDT)
-From: Ming Lei <tom.leiming@gmail.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Ming Lei <tom.leiming@gmail.com>
-Subject: [PATCH v2 1/4] blk-mq: comment on races related with timeout handler
-Date: Fri, 24 Mar 2017 20:36:18 +0800
-Message-Id: <20170324123621.5227-2-tom.leiming@gmail.com>
-In-Reply-To: <20170324123621.5227-1-tom.leiming@gmail.com>
-References: <20170324123621.5227-1-tom.leiming@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
+From: Sagi Grimberg <sagi@grimberg.me>
+To: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+ linux-rdma@vger.kernel.org, target-devel@vger.kernel.org
+Subject: [PATCH rfc 00/10] non selective polling block interface
+Date: Thu,  9 Mar 2017 15:16:32 +0200
+Message-Id: <1489065402-14757-1-git-send-email-sagi@grimberg.me>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
+List-Post: <mailto:linux-nvme@lists.infradead.org>
+List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
+Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
+List-ID: <linux-block@vger.kernel.org>
 
-This patch adds comment on two races related with
-timeout handler:
+Today, our only polling interface is selective in the sense that
+it polls for a specific tag (cookie). blk_mq_poll will not complete
+until the specific tag has completed (given that the block driver
+implements it obviously).
 
-- requeue from queue busy vs. timeout
-- rq free & reallocation vs. timeout
+target mode drivers like our nvme and scsi target, can benefit
+from opportunistically polling the block device when we submit
+a bio to it, but it doesn't make sense to use a selective
+polling interface (like nvmet does at the moment) for it
+because we don't care about specific I/O for the time being.
 
-Both the races themselves and current solution aren't
-explicit enough, so add comments on them.
+Instead, allow to poll for batch of completions and return if
+we don't have any completions or we exhausted our budget (batch).
 
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
----
- block/blk-mq.c | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
+This set also adds poll_batch support for nvme-pci and nvme-rdma,
+and converts nvmet and scsi target to use it. Note that I couldn't
+come up with a hero value for the batch size, so I left it at
+magic 4 for now, perhaps someone can have a better idea for this.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index c212b9644a9f..b36f0481ba0e 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -523,6 +523,15 @@ void blk_mq_start_request(struct request *rq)
- }
- EXPORT_SYMBOL(blk_mq_start_request);
- 
-+/*
-+ * When we reach here because queue is busy, REQ_ATOM_COMPLETE
-+ * flag isn't set yet, so there may be race with timeout hanlder,
-+ * but given rq->deadline is just set in .queue_rq() under
-+ * this situation, the race won't be possible in reality because
-+ * rq->timeout should be set as big enough to cover the window
-+ * between blk_mq_start_request() called from .queue_rq() and
-+ * clearing REQ_ATOM_STARTED here.
-+ */
- static void __blk_mq_requeue_request(struct request *rq)
- {
- 	struct request_queue *q = rq->q;
-@@ -696,6 +705,19 @@ static void blk_mq_check_expired(struct blk_mq_hw_ctx *hctx,
- 	if (!test_bit(REQ_ATOM_STARTED, &rq->atomic_flags))
- 		return;
- 
-+	/*
-+	 * The rq being checked may have been freed and reallocated
-+	 * out already here, we avoid this race by checking rq->deadline
-+	 * and REQ_ATOM_COMPLETE flag together:
-+	 *
-+	 * - if rq->deadline is observed as new value because of
-+	 *   reusing, the rq won't be timed out because of timing.
-+	 * - if rq->deadline is observed as previous value,
-+	 *   REQ_ATOM_COMPLETE flag won't be cleared in reuse path
-+	 *   because we put a barrier between setting rq->deadline
-+	 *   and clearing the flag in blk_mq_start_request(), so
-+	 *   this rq won't be timed out too.
-+	 */
- 	if (time_after_eq(jiffies, rq->deadline)) {
- 		if (!blk_mark_rq_complete(rq))
- 			blk_mq_rq_timed_out(rq, reserved);
+In addition, I'd like to see if we can hook this with frontend
+context (nvmet-rdma, srpt or isert) to avoid scheduling for interrupt
+if we have pending block IO that we can poll for.
+
+I would also like to somehow allow aio-dio user-space reap to also have
+access to this in the future, but I have yet to come up with something
+good for it.
+
+I experimented with this code on nvmet-rdma with a strong initiator
+bombarding small 512B IOs (4k block size saturates my network) against
+a 4 cpu-core nvmet-rdma target system.
+
+Without this patchset I got:
+590K/590K read/write IOPs
+
+With this patchset applied I got:
+680K/680K read/write IOPs
+
+The canonical read latency (QD=1) did not have a noticeable
+change (29-30 usec).
+
+Hopefully if this is appealing, people can experiment with this
+and report back their results.
+
+Sagi Grimberg (10):
+  nvme-pci: Split __nvme_process_cq to poll and handle
+  nvme-pci: Add budget to __nvme_process_cq
+  nvme-pci: open-code polling logic in nvme_poll
+  block: Add a non-selective polling interface
+  nvme-pci: Support blk_poll_batch
+  IB/cq: Don't force IB_POLL_DIRECT poll context for
+    ib_process_cq_direct
+  nvme-rdma: Don't rearm the CQ when polling directly
+  nvme-rdma: Support blk_poll_batch
+  nvmet: Use non-selective polling
+  target: Use non-selective polling
+
+ block/blk-mq.c                      |  14 ++++
+ drivers/infiniband/core/cq.c        |   2 -
+ drivers/nvme/host/pci.c             | 146 +++++++++++++++++++++++-------------
+ drivers/nvme/host/rdma.c            |   9 ++-
+ drivers/nvme/target/io-cmd.c        |   8 +-
+ drivers/target/target_core_iblock.c |   1 +
+ include/linux/blk-mq.h              |   2 +
+ include/linux/blkdev.h              |   1 +
+ 8 files changed, 125 insertions(+), 58 deletions(-)
+
 -- 
-2.9.3
+2.7.4
+
+
+_______________________________________________
+Linux-nvme mailing list
+Linux-nvme@lists.infradead.org
+http://lists.infradead.org/mailman/listinfo/linux-nvme
