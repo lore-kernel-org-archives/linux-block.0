@@ -1,48 +1,68 @@
-Return-Path: <htejun@gmail.com>
-Return-Path: <htejun@gmail.com>
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Thu, 9 Mar 2017 11:39:39 -0500
-From: Tejun Heo <tj@kernel.org>
-To: Jan Kara <jack@suse.cz>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+Return-Path: <jack@suse.cz>
+From: Jan Kara <jack@suse.cz>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Tejun Heo <tj@kernel.org>,
+	linux-block@vger.kernel.org,
 	Dan Williams <dan.j.williams@intel.com>,
 	Omar Sandoval <osandov@osandov.com>,
 	Arthur Marsh <arthur.marsh@internode.on.net>,
-	linux-scsi@vger.kernel.org
-Subject: Re: [PATCH 1/4] block: Allow bdi re-registration
-Message-ID: <20170309163939.GA28982@htj.duckdns.org>
+	linux-scsi@vger.kernel.org,
+	Jan Kara <jack@suse.cz>
+Subject: [PATCH 1/4] block: Allow bdi re-registration
+Date: Thu,  9 Mar 2017 11:16:21 +0100
+Message-Id: <20170309101624.25901-2-jack@suse.cz>
+In-Reply-To: <20170309101624.25901-1-jack@suse.cz>
 References: <20170309101624.25901-1-jack@suse.cz>
- <20170309101624.25901-2-jack@suse.cz>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170309101624.25901-2-jack@suse.cz>
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Mar 09, 2017 at 11:16:21AM +0100, Jan Kara wrote:
-> SCSI can call device_add_disk() several times for one request queue when
-> a device in unbound and bound, creating new gendisk each time. This will
-> lead to bdi being repeatedly registered and unregistered. This was not a
-> big problem until commit 165a5e22fafb "block: Move bdi_unregister() to
-> del_gendisk()" since bdi was only registered repeatedly (bdi_register()
-> handles repeated calls fine, only we ended up leaking reference to
-> gendisk due to overwriting bdi->owner) but unregistered only in
-> blk_cleanup_queue() which didn't get called repeatedly. After
-> 165a5e22fafb we were doing correct bdi_register() - bdi_unregister()
-> cycles however bdi_unregister() is not prepared for it. So make sure
-> bdi_unregister() cleans up bdi in such a way that it is prepared for
-> a possible following bdi_register() call.
-> 
-> An easy way to provoke this behavior is to enable
-> CONFIG_DEBUG_TEST_DRIVER_REMOVE and use scsi_debug driver to create a
-> scsi disk which immediately hangs without this fix.
-> 
-> Fixes: 165a5e22fafb127ecb5914e12e8c32a1f0d3f820
-> Tested-by: Omar Sandoval <osandov@fb.com>
-> Signed-off-by: Jan Kara <jack@suse.cz>
+SCSI can call device_add_disk() several times for one request queue when
+a device in unbound and bound, creating new gendisk each time. This will
+lead to bdi being repeatedly registered and unregistered. This was not a
+big problem until commit 165a5e22fafb "block: Move bdi_unregister() to
+del_gendisk()" since bdi was only registered repeatedly (bdi_register()
+handles repeated calls fine, only we ended up leaking reference to
+gendisk due to overwriting bdi->owner) but unregistered only in
+blk_cleanup_queue() which didn't get called repeatedly. After
+165a5e22fafb we were doing correct bdi_register() - bdi_unregister()
+cycles however bdi_unregister() is not prepared for it. So make sure
+bdi_unregister() cleans up bdi in such a way that it is prepared for
+a possible following bdi_register() call.
 
-Acked-by: Tejun Heo <tj@kernel.org>
+An easy way to provoke this behavior is to enable
+CONFIG_DEBUG_TEST_DRIVER_REMOVE and use scsi_debug driver to create a
+scsi disk which immediately hangs without this fix.
 
-Thanks!
+Fixes: 165a5e22fafb127ecb5914e12e8c32a1f0d3f820
+Tested-by: Omar Sandoval <osandov@fb.com>
+Signed-off-by: Jan Kara <jack@suse.cz>
+---
+ mm/backing-dev.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
+diff --git a/mm/backing-dev.c b/mm/backing-dev.c
+index 6d861d090e9f..51325489aae5 100644
+--- a/mm/backing-dev.c
++++ b/mm/backing-dev.c
+@@ -710,6 +710,11 @@ static void cgwb_bdi_destroy(struct backing_dev_info *bdi)
+ 	 */
+ 	atomic_dec(&bdi->usage_cnt);
+ 	wait_event(cgwb_release_wait, !atomic_read(&bdi->usage_cnt));
++	/*
++	 * Reinitialize usage_cnt so that we hold reference when @bdi gets
++	 * re-registered.
++	 */
++	atomic_set(&bdi->usage_cnt, 1);
+ }
+ 
+ /**
+@@ -857,6 +862,8 @@ int bdi_register_owner(struct backing_dev_info *bdi, struct device *owner)
+ 			MINOR(owner->devt));
+ 	if (rc)
+ 		return rc;
++	/* Leaking owner reference... */
++	WARN_ON(bdi->owner);
+ 	bdi->owner = owner;
+ 	get_device(owner);
+ 	return 0;
 -- 
-tejun
+2.10.2
