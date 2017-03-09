@@ -1,89 +1,55 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:38178 "EHLO
-        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752459AbdCJDE0 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Mar 2017 22:04:26 -0500
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:12413 "EHLO
+        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754648AbdCIQZk (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Mar 2017 11:25:40 -0500
+From: Bart Van Assche <Bart.VanAssche@sandisk.com>
+To: "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "target-devel@vger.kernel.org" <target-devel@vger.kernel.org>,
+        "sagi@grimberg.me" <sagi@grimberg.me>
 Subject: Re: [PATCH rfc 04/10] block: Add a non-selective polling interface
-To: Johannes Thumshirn <jthumshirn@suse.de>,
-        Sagi Grimberg <sagi@grimberg.me>, linux-block@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-rdma@vger.kernel.org,
-        target-devel@vger.kernel.org
+Date: Thu, 9 Mar 2017 16:25:26 +0000
+Message-ID: <1489076712.2597.1.camel@sandisk.com>
 References: <1489065402-14757-1-git-send-email-sagi@grimberg.me>
- <1489065402-14757-5-git-send-email-sagi@grimberg.me>
- <83713ef7-168d-e1f6-8220-b7d6264ea29a@suse.de>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-Message-ID: <c5ef3bd9-42dc-53c9-d2f7-2e49399f7a8d@wdc.com>
-Date: Fri, 10 Mar 2017 12:04:12 +0900
+         <1489065402-14757-5-git-send-email-sagi@grimberg.me>
+In-Reply-To: <1489065402-14757-5-git-send-email-sagi@grimberg.me>
+Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
-In-Reply-To: <83713ef7-168d-e1f6-8220-b7d6264ea29a@suse.de>
-Content-Type: text/plain; charset=windows-1252
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 3/9/17 22:44, Johannes Thumshirn wrote:
-> On 03/09/2017 02:16 PM, Sagi Grimberg wrote:
->> For a server/target appliance mode where we don't
->> necessarily care about specific IOs but rather want
->> to poll opportunisticly, it is useful to have a
->> non-selective polling interface.
->>
->> Expose a blk_poll_batch for a batched blkdev polling
->> interface so our nvme target (and others) can use.
->>
->> Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
->> ---
->>  block/blk-mq.c         | 14 ++++++++++++++
->>  include/linux/blk-mq.h |  2 ++
->>  include/linux/blkdev.h |  1 +
->>  3 files changed, 17 insertions(+)
->>
->> diff --git a/block/blk-mq.c b/block/blk-mq.c
->> index b2fd175e84d7..1962785b571a 100644
->> --- a/block/blk-mq.c
->> +++ b/block/blk-mq.c
->> @@ -2911,6 +2911,20 @@ bool blk_mq_poll(struct request_queue *q, blk_qc_t cookie)
->>  }
->>  EXPORT_SYMBOL_GPL(blk_mq_poll);
->>  
->> +int blk_mq_poll_batch(struct request_queue *q, unsigned int batch)
->> +{
->> +	struct blk_mq_hw_ctx *hctx;
->> +
->> +	if (!q->mq_ops || !q->mq_ops->poll_batch)
->> +		return 0;
->> +
->> +	hctx = blk_mq_map_queue(q, smp_processor_id());
->> +	return q->mq_ops->poll_batch(hctx, batch);
->> +}
->> +EXPORT_SYMBOL_GPL(blk_mq_poll_batch);
->> +
->> +
->> +
-> 
-> Quite some additional newlines and I'm not really fond of the
-> ->poll_batch() name. It's a bit confusing with ->poll() and we also have
-> irq_poll(). But the only thing that would come to my mind is
-> complete_batch() which "races" with ->complete().
+On Thu, 2017-03-09 at 15:16 +0200, Sagi Grimberg wrote:
+> +int blk_mq_poll_batch(struct request_queue *q, unsigned int batch)
+> +{
+> +	struct blk_mq_hw_ctx *hctx;
+> +
+> +	if (!q->mq_ops || !q->mq_ops->poll_batch)
+> +		return 0;
+> +
+> +	hctx =3D blk_mq_map_queue(q, smp_processor_id());
+> +	return q->mq_ops->poll_batch(hctx, batch);
+> +}
+> +EXPORT_SYMBOL_GPL(blk_mq_poll_batch);
 
-What about ->check_completions()? After all, that is what both ->poll()
-and ->poll_batch do but with a different stop condition, no ?
-So it would also be easy to merge the two: both tag and batch are
-unsigned int which could be called "cookie", and add a flag to tell how
-to interpret it (as a tag or a batch limit).
-e.g. something like:
+A new exported function without any documentation? Wow. Please add a header
+above this function that documents at least which other completion processi=
+ng
+code can execute concurrently with this function and from which contexts th=
+e
+other completion processing code can be called (e.g. blk_mq_poll() and
+.complete()).
 
-+typedef int (check_completions_fn)(struct blk_mq_hw_ctx *,
-		enum blk_mq_check_flags, /* flag (TAG or BATCH) */
-		unsigned int); /* Target tag or batch limit */
+Why to return if (!q->mq_ops || !q->mq_ops->poll_batch)? Shouldn't that be =
+a
+WARN_ON_ONCE() instead? I think it is an error to calling blk_mq_poll_batch=
+()
+against a queue that does not define .poll_batch().
 
-Best regards.
+Additionally, I think making the hardware context an argument of this funct=
+ion
+instead of using blk_mq_map_queue(q, smp_processor_id()) would make this
+function much more versatile.
 
--- 
-Damien Le Moal, Ph.D.
-Sr. Manager, System Software Research Group,
-Western Digital Corporation
-Damien.LeMoal@wdc.com
-(+81) 0466-98-3593 (ext. 513593)
-1 kirihara-cho, Fujisawa,
-Kanagawa, 252-0888 Japan
-www.wdc.com, www.hgst.com
+Bart.=
