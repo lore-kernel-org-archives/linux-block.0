@@ -1,95 +1,45 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f195.google.com ([209.85.192.195]:35079 "EHLO
-        mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753959AbdCPQOs (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Mar 2017 12:14:48 -0400
-From: Ming Lei <tom.leiming@gmail.com>
-To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
-        linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Ming Lei <tom.leiming@gmail.com>
-Subject: [PATCH v3 13/14] md: raid10: retrieve page from preallocated resync page array
-Date: Fri, 17 Mar 2017 00:12:34 +0800
-Message-Id: <20170316161235.27110-14-tom.leiming@gmail.com>
-In-Reply-To: <20170316161235.27110-1-tom.leiming@gmail.com>
-References: <20170316161235.27110-1-tom.leiming@gmail.com>
+Received: from mx2.suse.de ([195.135.220.15]:45117 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1754618AbdCINzG (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 9 Mar 2017 08:55:06 -0500
+Subject: Re: [PATCH rfc 09/10] nvmet: Use non-selective polling
+To: Sagi Grimberg <sagi@grimberg.me>, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-rdma@vger.kernel.org,
+        target-devel@vger.kernel.org
+References: <1489065402-14757-1-git-send-email-sagi@grimberg.me>
+ <1489065402-14757-10-git-send-email-sagi@grimberg.me>
+From: Johannes Thumshirn <jthumshirn@suse.de>
+Message-ID: <74284e7b-ae3f-4bbd-c28a-2dccab58cdc0@suse.de>
+Date: Thu, 9 Mar 2017 14:54:47 +0100
+MIME-Version: 1.0
+In-Reply-To: <1489065402-14757-10-git-send-email-sagi@grimberg.me>
+Content-Type: text/plain; charset=windows-1252
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Now one page array is allocated for each resync bio, and we can
-retrieve page from this table directly.
+On 03/09/2017 02:16 PM, Sagi Grimberg wrote:
+> It doesn't really make sense to do selective polling
+> because we never care about specific IOs. Non selective
+> polling can actually help by doing some useful work
+> while we're submitting a command.
+> 
+> We ask for a batch of (magic) 4 completions which looks
+> like a decent network<->backend proportion, if less are
+> available we'll see less.
+> 
+> Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
+> ---
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
----
- drivers/md/raid10.c | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
+Just out of curiosity, how did you come up with the magic 4?
 
-diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
-index d2cb68971486..8db3b0869be4 100644
---- a/drivers/md/raid10.c
-+++ b/drivers/md/raid10.c
-@@ -2075,6 +2075,7 @@ static void sync_request_write(struct mddev *mddev, struct r10bio *r10_bio)
- 	int i, first;
- 	struct bio *tbio, *fbio;
- 	int vcnt;
-+	struct page **tpages, **fpages;
- 
- 	atomic_set(&r10_bio->remaining, 1);
- 
-@@ -2090,6 +2091,7 @@ static void sync_request_write(struct mddev *mddev, struct r10bio *r10_bio)
- 	fbio = r10_bio->devs[i].bio;
- 	fbio->bi_iter.bi_size = r10_bio->sectors << 9;
- 	fbio->bi_iter.bi_idx = 0;
-+	fpages = get_resync_pages(fbio)->pages;
- 
- 	vcnt = (r10_bio->sectors + (PAGE_SIZE >> 9) - 1) >> (PAGE_SHIFT - 9);
- 	/* now find blocks with errors */
-@@ -2104,6 +2106,8 @@ static void sync_request_write(struct mddev *mddev, struct r10bio *r10_bio)
- 			continue;
- 		if (i == first)
- 			continue;
-+
-+		tpages = get_resync_pages(tbio)->pages;
- 		d = r10_bio->devs[i].devnum;
- 		rdev = conf->mirrors[d].rdev;
- 		if (!r10_bio->devs[i].bio->bi_error) {
-@@ -2116,8 +2120,8 @@ static void sync_request_write(struct mddev *mddev, struct r10bio *r10_bio)
- 				int len = PAGE_SIZE;
- 				if (sectors < (len / 512))
- 					len = sectors * 512;
--				if (memcmp(page_address(fbio->bi_io_vec[j].bv_page),
--					   page_address(tbio->bi_io_vec[j].bv_page),
-+				if (memcmp(page_address(fpages[j]),
-+					   page_address(tpages[j]),
- 					   len))
- 					break;
- 				sectors -= len/512;
-@@ -2215,6 +2219,7 @@ static void fix_recovery_read_error(struct r10bio *r10_bio)
- 	int idx = 0;
- 	int dr = r10_bio->devs[0].devnum;
- 	int dw = r10_bio->devs[1].devnum;
-+	struct page **pages = get_resync_pages(bio)->pages;
- 
- 	while (sectors) {
- 		int s = sectors;
-@@ -2230,7 +2235,7 @@ static void fix_recovery_read_error(struct r10bio *r10_bio)
- 		ok = sync_page_io(rdev,
- 				  addr,
- 				  s << 9,
--				  bio->bi_io_vec[idx].bv_page,
-+				  pages[idx],
- 				  REQ_OP_READ, 0, false);
- 		if (ok) {
- 			rdev = conf->mirrors[dw].rdev;
-@@ -2238,7 +2243,7 @@ static void fix_recovery_read_error(struct r10bio *r10_bio)
- 			ok = sync_page_io(rdev,
- 					  addr,
- 					  s << 9,
--					  bio->bi_io_vec[idx].bv_page,
-+					  pages[idx],
- 					  REQ_OP_WRITE, 0, false);
- 			if (!ok) {
- 				set_bit(WriteErrorSeen, &rdev->flags);
+Thanks,
+	Johannes
+
 -- 
-2.9.3
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
