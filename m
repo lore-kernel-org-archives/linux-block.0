@@ -1,106 +1,83 @@
-Return-Path: <BATV+2133f6211fed31f2c605+4968+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk,
-	martin.petersen@oracle.com,
-	agk@redhat.com,
-	snitzer@redhat.com,
-	shli@kernel.org,
-	philipp.reisner@linbit.com,
-	lars.ellenberg@linbit.com
-Cc: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	drbd-dev@lists.linbit.com,
-	dm-devel@redhat.com,
-	linux-raid@vger.kernel.org
-Subject: [PATCH 11/25] block: add a REQ_UNMAP flag for REQ_OP_WRITE_ZEROES
-Date: Fri, 31 Mar 2017 18:32:59 +0200
-Message-Id: <20170331163313.31821-12-hch@lst.de>
-In-Reply-To: <20170331163313.31821-1-hch@lst.de>
-References: <20170331163313.31821-1-hch@lst.de>
+Return-Path: <axboe@kernel.dk>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 4.11-rc2
+Message-ID: <2faede4d-81ff-9f64-399b-51b328e2425b@kernel.dk>
+Date: Thu, 9 Mar 2017 09:02:24 -0700
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-If this flag is set logical provisioning capable device should
-release space for the zeroed blocks if possible, if it is not set
-devices should keep the blocks anchored.
+Hi Linus,
 
-Also remove an out of sync kerneldoc comment for a static function
-that would have become even more out of data with this change.
+Sending this a bit sooner than I otherwise would have, as a fix in the
+merge window had some unfortunate issues and side effects for some
+folks.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-lib.c           | 19 +++++--------------
- include/linux/blk_types.h |  6 ++++++
- 2 files changed, 11 insertions(+), 14 deletions(-)
+This pull request contains:
 
-diff --git a/block/blk-lib.c b/block/blk-lib.c
-index f9f24ec69c27..2f6d2cb2e1a2 100644
---- a/block/blk-lib.c
-+++ b/block/blk-lib.c
-@@ -226,20 +226,9 @@ int blkdev_issue_write_same(struct block_device *bdev, sector_t sector,
- }
- EXPORT_SYMBOL(blkdev_issue_write_same);
- 
--/**
-- * __blkdev_issue_write_zeroes - generate number of bios with WRITE ZEROES
-- * @bdev:	blockdev to issue
-- * @sector:	start sector
-- * @nr_sects:	number of sectors to write
-- * @gfp_mask:	memory allocation flags (for bio_alloc)
-- * @biop:	pointer to anchor bio
-- *
-- * Description:
-- *  Generate and issue number of bios(REQ_OP_WRITE_ZEROES) with zerofiled pages.
-- */
- static int __blkdev_issue_write_zeroes(struct block_device *bdev,
- 		sector_t sector, sector_t nr_sects, gfp_t gfp_mask,
--		struct bio **biop)
-+		struct bio **biop, unsigned flags)
- {
- 	struct bio *bio = *biop;
- 	unsigned int max_write_zeroes_sectors;
-@@ -258,7 +247,9 @@ static int __blkdev_issue_write_zeroes(struct block_device *bdev,
- 		bio = next_bio(bio, 0, gfp_mask);
- 		bio->bi_iter.bi_sector = sector;
- 		bio->bi_bdev = bdev;
--		bio_set_op_attrs(bio, REQ_OP_WRITE_ZEROES, 0);
-+		bio->bi_opf = REQ_OP_WRITE_ZEROES;
-+		if (flags & BLKDEV_ZERO_NOUNMAP)
-+			bio->bi_opf |= REQ_NOUNMAP;
- 
- 		if (nr_sects > max_write_zeroes_sectors) {
- 			bio->bi_iter.bi_size = max_write_zeroes_sectors << 9;
-@@ -306,7 +297,7 @@ int __blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
- 		return -EINVAL;
- 
- 	ret = __blkdev_issue_write_zeroes(bdev, sector, nr_sects, gfp_mask,
--			biop);
-+			biop, flags);
- 	if (ret == 0 || (ret && ret != -EOPNOTSUPP))
- 		goto out;
- 
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 4eae30bfbfca..8eaa7dca7057 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -195,6 +195,10 @@ enum req_flag_bits {
- 	__REQ_PREFLUSH,		/* request for cache flush */
- 	__REQ_RAHEAD,		/* read ahead, can fail anytime */
- 	__REQ_BACKGROUND,	/* background IO */
-+
-+	/* command specific flags for REQ_OP_WRITE_ZEROES: */
-+	__REQ_NOUNMAP,		/* do not free blocks when zeroing */
-+
- 	__REQ_NR_BITS,		/* stops here */
- };
- 
-@@ -212,6 +216,8 @@ enum req_flag_bits {
- #define REQ_RAHEAD		(1ULL << __REQ_RAHEAD)
- #define REQ_BACKGROUND		(1ULL << __REQ_BACKGROUND)
- 
-+#define REQ_NOUNMAP		(1ULL << __REQ_NOUNMAP)
-+
- #define REQ_FAILFAST_MASK \
- 	(REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT | REQ_FAILFAST_DRIVER)
- 
+- Fixes from Jan for the bdi registration/unregistration. These have
+  been tested by the various parties reporting issues, and should be
+  solid at this point.
+
+- Also from Jan, fix for axonram gendisk registration.
+
+- A stable fix for zram from Johannes.
+
+- A small series from Ming, fixing up some long standing issues with
+  blk-mq hardware queue kobject initialization and registration.
+
+- A fix for sed opal from Jon, fixing a nonsensical range check and some
+  set-but-not-used variables.
+
+- A fix from Neil for a long standing deadlock issue for stacking device
+  drivers. With this in place, dm/md don't have to work around the issue
+  anymore, and can be properly fixed up.
+
+Please pull!
+
+
+  git://git.kernel.dk/linux-block.git for-linus
+
+
+----------------------------------------------------------------
+Jan Kara (5):
+      block: Allow bdi re-registration
+      bdi: Fix use-after-free in wb_congested_put()
+      block: Make del_gendisk() safer for disks without queues
+      Revert "scsi, block: fix duplicate bdi name registration crashes"
+      axonram: Fix gendisk handling
+
+Johannes Thumshirn (1):
+      zram: set physical queue limits to avoid array out of bounds accesses
+
+Jon Derrick (1):
+      block/sed: Fix opal user range check and unused variables
+
+Ming Lei (4):
+      blk-mq: initialize mq kobjects in blk_mq_init_allocated_queue()
+      blk-mq: make lifetime consitent between q/ctx and its kobject
+      blk-mq: make lifetime consistent between hctx and its kobject
+      blk-mq: free hctx->cpumask in release handler of hctx's kobject
+
+NeilBrown (1):
+      blk: improve order of bio handling in generic_make_request()
+
+ arch/powerpc/sysdev/axonram.c |  5 ++++-
+ block/blk-core.c              | 27 +++++++++++++++++++++------
+ block/blk-mq-sysfs.c          | 40 +++++++++++++++++++++++++---------------
+ block/blk-mq.c                | 28 ++++++++++------------------
+ block/blk-mq.h                |  2 ++
+ block/genhd.c                 | 37 ++++++++++---------------------------
+ block/sed-opal.c              | 10 ++--------
+ drivers/block/zram/zram_drv.c |  2 ++
+ drivers/scsi/sd.c             | 41 ++++++++---------------------------------
+ include/linux/blkdev.h        |  1 -
+ include/linux/genhd.h         |  8 --------
+ mm/backing-dev.c              | 43 ++++++++++++++++++++++++++++---------------
+ 12 files changed, 112 insertions(+), 132 deletions(-)
+
 -- 
-2.11.0
+Jens Axboe
