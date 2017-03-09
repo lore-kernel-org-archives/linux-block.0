@@ -1,26 +1,47 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:12413 "EHLO
-        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754648AbdCIQZk (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Mar 2017 11:25:40 -0500
-From: Bart Van Assche <Bart.VanAssche@sandisk.com>
-To: "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "target-devel@vger.kernel.org" <target-devel@vger.kernel.org>,
-        "sagi@grimberg.me" <sagi@grimberg.me>
+Received: from mx2.suse.de ([195.135.220.15]:44215 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S932299AbdCINov (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 9 Mar 2017 08:44:51 -0500
 Subject: Re: [PATCH rfc 04/10] block: Add a non-selective polling interface
-Date: Thu, 9 Mar 2017 16:25:26 +0000
-Message-ID: <1489076712.2597.1.camel@sandisk.com>
+To: Sagi Grimberg <sagi@grimberg.me>, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-rdma@vger.kernel.org,
+        target-devel@vger.kernel.org
 References: <1489065402-14757-1-git-send-email-sagi@grimberg.me>
-         <1489065402-14757-5-git-send-email-sagi@grimberg.me>
-In-Reply-To: <1489065402-14757-5-git-send-email-sagi@grimberg.me>
-Content-Type: text/plain; charset="iso-8859-1"
+ <1489065402-14757-5-git-send-email-sagi@grimberg.me>
+From: Johannes Thumshirn <jthumshirn@suse.de>
+Message-ID: <83713ef7-168d-e1f6-8220-b7d6264ea29a@suse.de>
+Date: Thu, 9 Mar 2017 14:44:48 +0100
 MIME-Version: 1.0
+In-Reply-To: <1489065402-14757-5-git-send-email-sagi@grimberg.me>
+Content-Type: text/plain; charset=windows-1252
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Thu, 2017-03-09 at 15:16 +0200, Sagi Grimberg wrote:
+On 03/09/2017 02:16 PM, Sagi Grimberg wrote:
+> For a server/target appliance mode where we don't
+> necessarily care about specific IOs but rather want
+> to poll opportunisticly, it is useful to have a
+> non-selective polling interface.
+> 
+> Expose a blk_poll_batch for a batched blkdev polling
+> interface so our nvme target (and others) can use.
+> 
+> Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
+> ---
+>  block/blk-mq.c         | 14 ++++++++++++++
+>  include/linux/blk-mq.h |  2 ++
+>  include/linux/blkdev.h |  1 +
+>  3 files changed, 17 insertions(+)
+> 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index b2fd175e84d7..1962785b571a 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -2911,6 +2911,20 @@ bool blk_mq_poll(struct request_queue *q, blk_qc_t cookie)
+>  }
+>  EXPORT_SYMBOL_GPL(blk_mq_poll);
+>  
 > +int blk_mq_poll_batch(struct request_queue *q, unsigned int batch)
 > +{
 > +	struct blk_mq_hw_ctx *hctx;
@@ -28,28 +49,26 @@ On Thu, 2017-03-09 at 15:16 +0200, Sagi Grimberg wrote:
 > +	if (!q->mq_ops || !q->mq_ops->poll_batch)
 > +		return 0;
 > +
-> +	hctx =3D blk_mq_map_queue(q, smp_processor_id());
+> +	hctx = blk_mq_map_queue(q, smp_processor_id());
 > +	return q->mq_ops->poll_batch(hctx, batch);
 > +}
 > +EXPORT_SYMBOL_GPL(blk_mq_poll_batch);
+> +
+> +
+> +
 
-A new exported function without any documentation? Wow. Please add a header
-above this function that documents at least which other completion processi=
-ng
-code can execute concurrently with this function and from which contexts th=
-e
-other completion processing code can be called (e.g. blk_mq_poll() and
-.complete()).
+Quite some additional newlines and I'm not really fond of the
+->poll_batch() name. It's a bit confusing with ->poll() and we also have
+irq_poll(). But the only thing that would come to my mind is
+complete_batch() which "races" with ->complete().
 
-Why to return if (!q->mq_ops || !q->mq_ops->poll_batch)? Shouldn't that be =
-a
-WARN_ON_ONCE() instead? I think it is an error to calling blk_mq_poll_batch=
-()
-against a queue that does not define .poll_batch().
+Otherwise looks OK,
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
 
-Additionally, I think making the hardware context an argument of this funct=
-ion
-instead of using blk_mq_map_queue(q, smp_processor_id()) would make this
-function much more versatile.
-
-Bart.=
+-- 
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
