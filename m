@@ -1,24 +1,69 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:3733 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751689AbdCMJOS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 Mar 2017 05:14:18 -0400
-From: Umesh Patel <Umesh.Patel@wdc.com>
-To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: blk_init_queue vs blk_alloc_queue
-Date: Mon, 13 Mar 2017 09:14:12 +0000
-Message-ID: <CY1PR0401MB1353F4C37A081FCB3E6E145EE1250@CY1PR0401MB1353.namprd04.prod.outlook.com>
-Content-Type: text/plain; charset="us-ascii"
+Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
+From: Sagi Grimberg <sagi@grimberg.me>
+To: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+ linux-rdma@vger.kernel.org, target-devel@vger.kernel.org
+Subject: [PATCH rfc 05/10] nvme-pci: Support blk_poll_batch
+Date: Thu,  9 Mar 2017 15:16:37 +0200
+Message-Id: <1489065402-14757-6-git-send-email-sagi@grimberg.me>
+In-Reply-To: <1489065402-14757-1-git-send-email-sagi@grimberg.me>
+References: <1489065402-14757-1-git-send-email-sagi@grimberg.me>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
+List-Post: <mailto:linux-nvme@lists.infradead.org>
+List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
 MIME-Version: 1.0
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
+Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
+List-ID: <linux-block@vger.kernel.org>
 
-Hello,
+Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
+---
+ drivers/nvme/host/pci.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-I Would like to know difference between blk_init_queue and blk_alloc_queue =
-API.
-Can anyone explain when to use what ?
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index a7ad514c2451..f8dcd0bd19f8 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -789,6 +789,21 @@ static int nvme_poll(struct blk_mq_hw_ctx *hctx, unsigned int tag)
+ 	return found;
+ }
+ 
++static int nvme_poll_batch(struct blk_mq_hw_ctx *hctx, unsigned int batch)
++{
++	struct nvme_queue *nvmeq = hctx->driver_data;
++	int completed;
++
++	if (!nvme_cqe_valid(nvmeq, nvmeq->cq_head, nvmeq->cq_phase))
++		return 0;
++
++	spin_lock_irq(&nvmeq->q_lock);
++	completed = __nvme_process_cq(nvmeq, batch);
++	spin_unlock_irq(&nvmeq->q_lock);
++
++	return completed;
++}
++
+ static void nvme_pci_submit_async_event(struct nvme_ctrl *ctrl, int aer_idx)
+ {
+ 	struct nvme_dev *dev = to_nvme_dev(ctrl);
+@@ -1174,6 +1189,7 @@ static struct blk_mq_ops nvme_mq_ops = {
+ 	.map_queues	= nvme_pci_map_queues,
+ 	.timeout	= nvme_timeout,
+ 	.poll		= nvme_poll,
++	.poll_batch	= nvme_poll_batch,
+ };
+ 
+ static void nvme_dev_remove_admin(struct nvme_dev *dev)
+-- 
+2.7.4
 
 
-Thanks
+_______________________________________________
+Linux-nvme mailing list
+Linux-nvme@lists.infradead.org
+http://lists.infradead.org/mailman/listinfo/linux-nvme
