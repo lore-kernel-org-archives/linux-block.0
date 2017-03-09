@@ -1,67 +1,43 @@
-Return-Path: <jack@suse.cz>
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
-	Tejun Heo <tj@kernel.org>,
-	Tahsin Erdogan <tahsin@google.com>,
-	Omar Sandoval <osandov@osandov.com>,
-	Jan Kara <jack@suse.cz>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: [PATCH 09/10] kobject: Export kobject_get_unless_zero()
-Date: Thu, 23 Mar 2017 01:37:01 +0100
-Message-Id: <20170323003702.27571-10-jack@suse.cz>
-In-Reply-To: <20170323003702.27571-1-jack@suse.cz>
-References: <20170323003702.27571-1-jack@suse.cz>
+Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
+Subject: Re: [PATCH rfc 07/10] nvme-rdma: Don't rearm the CQ when polling
+ directly
+To: Sagi Grimberg <sagi@grimberg.me>, linux-block@vger.kernel.org,
+ linux-nvme@lists.infradead.org, linux-rdma@vger.kernel.org,
+ target-devel@vger.kernel.org
+References: <1489065402-14757-1-git-send-email-sagi@grimberg.me>
+ <1489065402-14757-8-git-send-email-sagi@grimberg.me>
+From: Johannes Thumshirn <jthumshirn@suse.de>
+Message-ID: <1999891a-f19a-f705-705c-98afed65497b@suse.de>
+Date: Thu, 9 Mar 2017 14:52:20 +0100
+MIME-Version: 1.0
+In-Reply-To: <1489065402-14757-8-git-send-email-sagi@grimberg.me>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
+List-Post: <mailto:linux-nvme@lists.infradead.org>
+List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
+Content-Type: text/plain; charset="windows-1252"
+Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
+Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
 List-ID: <linux-block@vger.kernel.org>
 
-Make the function available for outside use and fortify it against NULL
-kobject.
+On 03/09/2017 02:16 PM, Sagi Grimberg wrote:
+> We don't need it as the core polling context will take
+> are of rearming the completion queue.
+ ^ care?
 
-CC: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Reviewed-by: Bart Van Assche <bart.vanassche@sandisk.com>
-Acked-by: Tejun Heo <tj@kernel.org>
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- include/linux/kobject.h | 2 ++
- lib/kobject.c           | 5 ++++-
- 2 files changed, 6 insertions(+), 1 deletion(-)
+-- =
 
-diff --git a/include/linux/kobject.h b/include/linux/kobject.h
-index e6284591599e..ca85cb80e99a 100644
---- a/include/linux/kobject.h
-+++ b/include/linux/kobject.h
-@@ -108,6 +108,8 @@ extern int __must_check kobject_rename(struct kobject *, const char *new_name);
- extern int __must_check kobject_move(struct kobject *, struct kobject *);
- 
- extern struct kobject *kobject_get(struct kobject *kobj);
-+extern struct kobject * __must_check kobject_get_unless_zero(
-+						struct kobject *kobj);
- extern void kobject_put(struct kobject *kobj);
- 
- extern const void *kobject_namespace(struct kobject *kobj);
-diff --git a/lib/kobject.c b/lib/kobject.c
-index 445dcaeb0f56..763d70a18941 100644
---- a/lib/kobject.c
-+++ b/lib/kobject.c
-@@ -601,12 +601,15 @@ struct kobject *kobject_get(struct kobject *kobj)
- }
- EXPORT_SYMBOL(kobject_get);
- 
--static struct kobject * __must_check kobject_get_unless_zero(struct kobject *kobj)
-+struct kobject * __must_check kobject_get_unless_zero(struct kobject *kobj)
- {
-+	if (!kobj)
-+		return NULL;
- 	if (!kref_get_unless_zero(&kobj->kref))
- 		kobj = NULL;
- 	return kobj;
- }
-+EXPORT_SYMBOL(kobject_get_unless_zero);
- 
- /*
-  * kobject_cleanup - free kobject resources.
--- 
-2.10.2
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N=FCrnberg
+GF: Felix Imend=F6rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N=FCrnberg)
+Key fingerprint =3D EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+
+_______________________________________________
+Linux-nvme mailing list
+Linux-nvme@lists.infradead.org
+http://lists.infradead.org/mailman/listinfo/linux-nvme
