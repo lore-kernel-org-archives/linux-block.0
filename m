@@ -1,244 +1,120 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f196.google.com ([209.85.192.196]:34329 "EHLO
-        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754974AbdCPQOZ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Mar 2017 12:14:25 -0400
-From: Ming Lei <tom.leiming@gmail.com>
-To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
-        linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Ming Lei <tom.leiming@gmail.com>
-Subject: [PATCH v3 05/14] md: raid1: don't use bio's vec table to manage resync pages
-Date: Fri, 17 Mar 2017 00:12:26 +0800
-Message-Id: <20170316161235.27110-6-tom.leiming@gmail.com>
-In-Reply-To: <20170316161235.27110-1-tom.leiming@gmail.com>
-References: <20170316161235.27110-1-tom.leiming@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <houtao1@huawei.com>
+Subject: Re: [PATCH v2] cfq-iosched: fix the delay of cfq_group's vdisktime
+ under iops mode
+To: Jan Kara <jack@suse.cz>, <axboe@kernel.dk>
+References: <1488975415-40417-1-git-send-email-houtao1@huawei.com>
+ <20170308140518.GE19740@quack2.suse.cz>
+CC: <linux-block@vger.kernel.org>, <jmoyer@redhat.com>,
+        <stable@vger.kernel.org>, <vgoyal@redhat.com>
+From: Hou Tao <houtao1@huawei.com>
+Message-ID: <dc6db873-1958-7812-bfea-5d9396c53818@huawei.com>
+Date: Thu, 9 Mar 2017 19:22:20 +0800
+MIME-Version: 1.0
+In-Reply-To: <20170308140518.GE19740@quack2.suse.cz>
+Content-Type: text/plain; charset="windows-1252"
+List-ID: <linux-block@vger.kernel.org>
 
-Now we allocate one page array for managing resync pages, instead
-of using bio's vec table to do that, and the old way is very hacky
-and won't work any more if multipage bvec is enabled.
+On 2017/3/8 22:05, Jan Kara wrote:
+> On Wed 08-03-17 20:16:55, Hou Tao wrote:
+>> When adding a cfq_group into the cfq service tree, we use CFQ_IDLE_DELAY
+>> as the delay of cfq_group's vdisktime if there have been other cfq_groups
+>> already.
+>>
+>> When cfq is under iops mode, commit 9a7f38c42c2b ("cfq-iosched: Convert
+>> from jiffies to nanoseconds") could result in a large iops delay and
+>> lead to an abnormal io schedule delay for the added cfq_group. To fix
+>> it, we just need to revert to the old CFQ_IDLE_DELAY value: HZ / 5
+>> when iops mode is enabled.
+>>
+>> Despite having the same value, the delay of a cfq_queue in idle class
+>> and the delay of cfq_queue are different things, so I define two new
+>> macros for the delay of a cfq_group under time-slice mode and IOPs mode.
+>>
+>> Fixes: 9a7f38c42c2b92391d9dabaf9f51df7cfe5608e4
+>> Cc: <stable@vger.kernel.org> # 4.8+
+>> Signed-off-by: Hou Tao <houtao1@huawei.com>
+> 
+> OK, the number 200 is somewhat arbitrary but so is HZ/5 so I guess we are
+> OK. You can add:
+> 
+> Acked-by: Jan Kara <jack@suse.cz>
+Oops, sorry for the arbitrary 200. My intention was to use HZ / 5 instead of 200
+to keep consistent with the old CFQ_IDLE_DELAY. And I spot two typos in commit
+message: "the delay of cfq_queue" -> "the delay of cfq_group" and "IOPs" -> "iops".
 
-The introduced cost is that we need to allocate (128 + 16) * raid_disks
-bytes per r1_bio, and it is fine because the inflight r1_bio for
-resync shouldn't be much, as pointed by Shaohua.
+Jan, could you please fix them ? And I also attach a revised patch to fix them.
 
-Also the bio_reset() in raid1_sync_request() is removed because
-all bios are freshly new now and not necessary to reset any more.
 
-This patch can be thought as a cleanup too
+From: Hou Tao <houtao1@huawei.com>
+Date: Wed, 1 Mar 2017 09:02:33 +0800
+Subject: [PATCH] cfq-iosched: fix the delay of cfq_group's vdisktime under
+ iops mode
 
-Suggested-by: Shaohua Li <shli@kernel.org>
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+When adding a cfq_group into the cfq service tree, we use CFQ_IDLE_DELAY
+as the delay of cfq_group's vdisktime if there have been other cfq_groups
+already.
+
+When cfq is under iops mode, commit 9a7f38c42c2b ("cfq-iosched: Convert
+from jiffies to nanoseconds") could result in a large iops delay and
+lead to an abnormal io schedule delay for the added cfq_group. To fix
+it, we just need to revert to the old CFQ_IDLE_DELAY value: HZ / 5
+when iops mode is enabled.
+
+Despite having the same value, the delay of a cfq_queue in idle class
+and the delay of cfq_group are different things, so I define two new
+macros for the delay of a cfq_group under time-slice mode and iops mode.
+
+Fixes: 9a7f38c42c2b92391d9dabaf9f51df7cfe5608e4
+Cc: <stable@vger.kernel.org> # 4.8+
+Signed-off-by: Hou Tao <houtao1@huawei.com>
+Acked-by: Jan Kara <jack@suse.cz>
 ---
- drivers/md/raid1.c | 94 +++++++++++++++++++++++++++++++++++++-----------------
- 1 file changed, 64 insertions(+), 30 deletions(-)
+ block/cfq-iosched.c | 17 +++++++++++++++--
+ 1 file changed, 15 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
-index e30d89690109..0e64beb60e4d 100644
---- a/drivers/md/raid1.c
-+++ b/drivers/md/raid1.c
-@@ -80,6 +80,24 @@ static void lower_barrier(struct r1conf *conf, sector_t sector_nr);
- #define raid1_log(md, fmt, args...)				\
- 	do { if ((md)->queue) blk_add_trace_msg((md)->queue, "raid1 " fmt, ##args); } while (0)
- 
-+/*
-+ * 'strct resync_pages' stores actual pages used for doing the resync
-+ *  IO, and it is per-bio, so make .bi_private points to it.
-+ */
-+static inline struct resync_pages *get_resync_pages(struct bio *bio)
+diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
+index 440b95e..2762505 100644
+--- a/block/cfq-iosched.c
++++ b/block/cfq-iosched.c
+@@ -38,9 +38,13 @@ static const u64 cfq_target_latency = (u64)NSEC_PER_SEC * 3/10; /* 300 ms */
+ static const int cfq_hist_divisor = 4;
+
+ /*
+- * offset from end of service tree
++ * offset from end of queue service tree for idle class
+  */
+ #define CFQ_IDLE_DELAY		(NSEC_PER_SEC / 5)
++/* offset from end of group service tree under time slice mode */
++#define CFQ_SLICE_MODE_GROUP_DELAY (NSEC_PER_SEC / 5)
++/* offset from end of group service under IOPS mode */
++#define CFQ_IOPS_MODE_GROUP_DELAY (HZ / 5)
+
+ /*
+  * below this threshold, we consider thinktime immediate
+@@ -1362,6 +1366,14 @@ cfq_group_service_tree_add(struct cfq_rb_root *st, struct cfq_group *cfqg)
+ 	cfqg->vfraction = max_t(unsigned, vfr, 1);
+ }
+
++static inline u64 cfq_get_cfqg_vdisktime_delay(struct cfq_data *cfqd)
 +{
-+	return bio->bi_private;
++	if (!iops_mode(cfqd))
++		return CFQ_SLICE_MODE_GROUP_DELAY;
++	else
++		return CFQ_IOPS_MODE_GROUP_DELAY;
 +}
 +
-+/*
-+ * for resync bio, r1bio pointer can be retrieved from the per-bio
-+ * 'struct resync_pages'.
-+ */
-+static inline struct r1bio *get_resync_r1bio(struct bio *bio)
-+{
-+	return get_resync_pages(bio)->raid_bio;
-+}
-+
- static void * r1bio_pool_alloc(gfp_t gfp_flags, void *data)
+ static void
+ cfq_group_notify_queue_add(struct cfq_data *cfqd, struct cfq_group *cfqg)
  {
- 	struct pool_info *pi = data;
-@@ -107,12 +125,18 @@ static void * r1buf_pool_alloc(gfp_t gfp_flags, void *data)
- 	struct r1bio *r1_bio;
- 	struct bio *bio;
- 	int need_pages;
--	int i, j;
-+	int j;
-+	struct resync_pages *rps;
- 
- 	r1_bio = r1bio_pool_alloc(gfp_flags, pi);
- 	if (!r1_bio)
- 		return NULL;
- 
-+	rps = kmalloc(sizeof(struct resync_pages) * pi->raid_disks,
-+		      gfp_flags);
-+	if (!rps)
-+		goto out_free_r1bio;
-+
- 	/*
- 	 * Allocate bios : 1 for reading, n-1 for writing
- 	 */
-@@ -132,22 +156,22 @@ static void * r1buf_pool_alloc(gfp_t gfp_flags, void *data)
- 		need_pages = pi->raid_disks;
- 	else
- 		need_pages = 1;
--	for (j = 0; j < need_pages; j++) {
-+	for (j = 0; j < pi->raid_disks; j++) {
-+		struct resync_pages *rp = &rps[j];
-+
- 		bio = r1_bio->bios[j];
--		bio->bi_vcnt = RESYNC_PAGES;
--
--		if (bio_alloc_pages(bio, gfp_flags))
--			goto out_free_pages;
--	}
--	/* If not user-requests, copy the page pointers to all bios */
--	if (!test_bit(MD_RECOVERY_REQUESTED, &pi->mddev->recovery)) {
--		for (i=0; i<RESYNC_PAGES ; i++)
--			for (j=1; j<pi->raid_disks; j++) {
--				struct page *page =
--					r1_bio->bios[0]->bi_io_vec[i].bv_page;
--				get_page(page);
--				r1_bio->bios[j]->bi_io_vec[i].bv_page = page;
--			}
-+
-+		if (j < need_pages) {
-+			if (resync_alloc_pages(rp, gfp_flags))
-+				goto out_free_pages;
-+		} else {
-+			memcpy(rp, &rps[0], sizeof(*rp));
-+			resync_get_all_pages(rp);
-+		}
-+
-+		rp->idx = 0;
-+		rp->raid_bio = r1_bio;
-+		bio->bi_private = rp;
- 	}
- 
- 	r1_bio->master_bio = NULL;
-@@ -156,11 +180,14 @@ static void * r1buf_pool_alloc(gfp_t gfp_flags, void *data)
- 
- out_free_pages:
- 	while (--j >= 0)
--		bio_free_pages(r1_bio->bios[j]);
-+		resync_free_pages(&rps[j]);
- 
- out_free_bio:
- 	while (++j < pi->raid_disks)
- 		bio_put(r1_bio->bios[j]);
-+	kfree(rps);
-+
-+out_free_r1bio:
- 	r1bio_pool_free(r1_bio, data);
- 	return NULL;
- }
-@@ -168,14 +195,18 @@ static void * r1buf_pool_alloc(gfp_t gfp_flags, void *data)
- static void r1buf_pool_free(void *__r1_bio, void *data)
- {
- 	struct pool_info *pi = data;
--	int i,j;
-+	int i;
- 	struct r1bio *r1bio = __r1_bio;
-+	struct resync_pages *rp = NULL;
- 
--	for (i = 0; i < RESYNC_PAGES; i++)
--		for (j = pi->raid_disks; j-- ;)
--			safe_put_page(r1bio->bios[j]->bi_io_vec[i].bv_page);
--	for (i=0 ; i < pi->raid_disks; i++)
-+	for (i = pi->raid_disks; i--; ) {
-+		rp = get_resync_pages(r1bio->bios[i]);
-+		resync_free_pages(rp);
- 		bio_put(r1bio->bios[i]);
-+	}
-+
-+	/* resync pages array stored in the 1st bio's .bi_private */
-+	kfree(rp);
- 
- 	r1bio_pool_free(r1bio, data);
- }
-@@ -1863,7 +1894,7 @@ static int raid1_remove_disk(struct mddev *mddev, struct md_rdev *rdev)
- 
- static void end_sync_read(struct bio *bio)
- {
--	struct r1bio *r1_bio = bio->bi_private;
-+	struct r1bio *r1_bio = get_resync_r1bio(bio);
- 
- 	update_head_pos(r1_bio->read_disk, r1_bio);
- 
-@@ -1882,7 +1913,7 @@ static void end_sync_read(struct bio *bio)
- static void end_sync_write(struct bio *bio)
- {
- 	int uptodate = !bio->bi_error;
--	struct r1bio *r1_bio = bio->bi_private;
-+	struct r1bio *r1_bio = get_resync_r1bio(bio);
- 	struct mddev *mddev = r1_bio->mddev;
- 	struct r1conf *conf = mddev->private;
- 	sector_t first_bad;
-@@ -2099,6 +2130,7 @@ static void process_checks(struct r1bio *r1_bio)
- 		int size;
- 		int error;
- 		struct bio *b = r1_bio->bios[i];
-+		struct resync_pages *rp = get_resync_pages(b);
- 		if (b->bi_end_io != end_sync_read)
- 			continue;
- 		/* fixup the bio for reuse, but preserve errno */
-@@ -2111,7 +2143,8 @@ static void process_checks(struct r1bio *r1_bio)
- 			conf->mirrors[i].rdev->data_offset;
- 		b->bi_bdev = conf->mirrors[i].rdev->bdev;
- 		b->bi_end_io = end_sync_read;
--		b->bi_private = r1_bio;
-+		rp->raid_bio = r1_bio;
-+		b->bi_private = rp;
- 
- 		size = b->bi_iter.bi_size;
- 		for (j = 0; j < vcnt ; j++) {
-@@ -2769,7 +2802,6 @@ static sector_t raid1_sync_request(struct mddev *mddev, sector_t sector_nr,
- 	for (i = 0; i < conf->raid_disks * 2; i++) {
- 		struct md_rdev *rdev;
- 		bio = r1_bio->bios[i];
--		bio_reset(bio);
- 
- 		rdev = rcu_dereference(conf->mirrors[i].rdev);
- 		if (rdev == NULL ||
-@@ -2825,7 +2857,6 @@ static sector_t raid1_sync_request(struct mddev *mddev, sector_t sector_nr,
- 			atomic_inc(&rdev->nr_pending);
- 			bio->bi_iter.bi_sector = sector_nr + rdev->data_offset;
- 			bio->bi_bdev = rdev->bdev;
--			bio->bi_private = r1_bio;
- 			if (test_bit(FailFast, &rdev->flags))
- 				bio->bi_opf |= MD_FAILFAST;
- 		}
-@@ -2911,9 +2942,12 @@ static sector_t raid1_sync_request(struct mddev *mddev, sector_t sector_nr,
- 		}
- 
- 		for (i = 0 ; i < conf->raid_disks * 2; i++) {
-+			struct resync_pages *rp;
-+
- 			bio = r1_bio->bios[i];
-+			rp = get_resync_pages(bio);
- 			if (bio->bi_end_io) {
--				page = bio->bi_io_vec[bio->bi_vcnt].bv_page;
-+				page = resync_fetch_page(rp, rp->idx++);
- 
- 				/*
- 				 * won't fail because the vec table is big
-@@ -2925,8 +2959,8 @@ static sector_t raid1_sync_request(struct mddev *mddev, sector_t sector_nr,
- 		nr_sectors += len>>9;
- 		sector_nr += len>>9;
- 		sync_blocks -= (len>>9);
--	} while (r1_bio->bios[disk]->bi_vcnt < RESYNC_PAGES);
-- bio_full:
-+	} while (get_resync_pages(r1_bio->bios[disk]->bi_private)->idx < RESYNC_PAGES);
-+
- 	r1_bio->sectors = nr_sectors;
- 
- 	if (mddev_is_clustered(mddev) &&
+@@ -1381,7 +1393,8 @@ cfq_group_notify_queue_add(struct cfq_data *cfqd, struct cfq_group *cfqg)
+ 	n = rb_last(&st->rb);
+ 	if (n) {
+ 		__cfqg = rb_entry_cfqg(n);
+-		cfqg->vdisktime = __cfqg->vdisktime + CFQ_IDLE_DELAY;
++		cfqg->vdisktime = __cfqg->vdisktime +
++			cfq_get_cfqg_vdisktime_delay(cfqd);
+ 	} else
+ 		cfqg->vdisktime = st->min_vdisktime;
+ 	cfq_group_service_tree_add(st, cfqg);
 -- 
-2.9.3
+2.5.0
