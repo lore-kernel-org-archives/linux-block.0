@@ -1,207 +1,61 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>,
-	Tejun Heo <tj@kernel.org>
-Cc: Fabio Checconi <fchecconi@gmail.com>,
-	Arianna Avanzini <avanzini.arianna@gmail.com>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	linus.walleij@linaro.org,
-	broonie@kernel.org,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH RFC 03/14] block, bfq: improve throughput boosting
-Date: Sat,  4 Mar 2017 17:01:20 +0100
-Message-Id: <20170304160131.57366-4-paolo.valente@linaro.org>
-In-Reply-To: <20170304160131.57366-1-paolo.valente@linaro.org>
-References: <20170304160131.57366-1-paolo.valente@linaro.org>
+Return-Path: <rgoldwyn@suse.de>
+Subject: Re: [PATCH 5/8] nowait aio: return on congested block device
+To: Jens Axboe <axboe@kernel.dk>, Sagi Grimberg <sagi@grimberg.me>,
+ jack@suse.com
+References: <20170228233610.25456-1-rgoldwyn@suse.de>
+ <20170228233610.25456-6-rgoldwyn@suse.de>
+ <0d1ba678-69c0-16ce-6c3e-475cd8da203c@grimberg.me>
+ <44cc02b1-f7ac-cbc6-6f09-726ae8225358@suse.de>
+ <a661cdc7-4859-4a39-3037-8036cc8c4712@kernel.dk>
+Cc: hch@infradead.org, linux-fsdevel@vger.kernel.org,
+ linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org,
+ linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org,
+ Goldwyn Rodrigues <rgoldwyn@suse.com>
+From: Goldwyn Rodrigues <rgoldwyn@suse.de>
+Message-ID: <310c6725-3263-2790-a445-d58e464fd3e4@suse.de>
+Date: Wed, 8 Mar 2017 20:18:54 -0600
+MIME-Version: 1.0
+In-Reply-To: <a661cdc7-4859-4a39-3037-8036cc8c4712@kernel.dk>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-block@vger.kernel.org>
 
-The feedback-loop algorithm used by BFQ to compute queue (process)
-budgets is basically a set of three update rules, one for each of the
-main reasons why a queue may be expired. If many processes suddenly
-switch from sporadic I/O to greedy and sequential I/O, then these
-rules are quite slow to assign large budgets to these processes, and
-hence to achieve a high throughput. On the opposite side, BFQ assigns
-the maximum possible budget B_max to a just-created queue. This allows
-a high throughput to be achieved immediately if the associated process
-is I/O-bound and performs sequential I/O from the beginning. But it
-also increases the worst-case latency experienced by the first
-requests issued by the process, because the larger the budget of a
-queue waiting for service is, the later the queue will be served by
-B-WF2Q+ (Subsec 3.3 in [1]). This is detrimental for an interactive or
-soft real-time application.
 
-To tackle these throughput and latency problems, on one hand this
-patch changes the initial budget value to B_max/2. On the other hand,
-it re-tunes the three rules, adopting a more aggressive,
-multiplicative increase/linear decrease scheme. This scheme trades
-latency for throughput more than before, and tends to assign large
-budgets quickly to processes that are or become I/O-bound. For two of
-the expiration reasons, the new version of the rules also contains
-some more little improvements, briefly described below.
 
-*No more backlog.* In this case, the budget was larger than the number
-of sectors actually read/written by the process before it stopped
-doing I/O. Hence, to reduce latency for the possible future I/O
-requests of the process, the old rule simply set the next budget to
-the number of sectors actually consumed by the process. However, if
-there are still outstanding requests, then the process may have not
-yet issued its next request just because it is still waiting for the
-completion of some of the still outstanding ones. If this sub-case
-holds true, then the new rule, instead of decreasing the budget,
-doubles it, proactively, in the hope that: 1) a larger budget will fit
-the actual needs of the process, and 2) the process is sequential and
-hence a higher throughput will be achieved by serving the process
-longer after granting it access to the device.
+On 03/08/2017 10:17 AM, Jens Axboe wrote:
+> On 03/08/2017 08:00 AM, Goldwyn Rodrigues wrote:
+>>
+>>
+>> On 03/08/2017 01:03 AM, Sagi Grimberg wrote:
+>>>
+>>>> -        if (likely(blk_queue_enter(q, false) == 0)) {
+>>>> +        if (likely(blk_queue_enter(q, bio_flagged(bio, BIO_NOWAIT))
+>>>> == 0)) {
+>>>>              ret = q->make_request_fn(q, bio);
+>>>
+>>> I think that for ->make_request to not block we'd need to set
+>>> BLK_MQ_REQ_NOWAIT in blk_mq_alloc_data to avoid blocking on a tag
+>>> allocation.
+>>>
+>>> Something like the untested addition below:
+>>
+>> I did that in the first series, but there are too many reasons to block
+>> in blk-mq [1]. I dropped blk-mq work in v2.
+> 
+> That's complete nonsense, there are no more places in blk-mq that will
+> block that in the legacy path. Most of the examples from your URL:
+> 
+>> [1] https://patchwork.kernel.org/patch/9571051/
+> 
+> are not blk-mq, but writeback throttling, and drivers that explicitly
+> hook into ->make_request_fn.
+> 
+> As others have mentioned, it's a total non-starter to focus on the
+> deprecated IO path and just ignore the new one. Back to the drawing
+> board.
+> 
 
-*Budget timeout*. The original rule set the new budget to the maximum
-value B_max, to maximize throughput and let all processes experiencing
-budget timeouts receive the same share of the device time. In our
-experiments we verified that this sudden jump to B_max did not provide
-sensible benefits; rather it increased the latency of processes
-performing sporadic and short I/O. The new rule only doubles the
-budget.
+Thanks, I understood what I was doing wrong. I will include blk-mq in
+the patch.
 
-[1] P. Valente and M. Andreolini, "Improving Application
-    Responsiveness with the BFQ Disk I/O Scheduler", Proceedings of
-    the 5th Annual International Systems and Storage Conference
-    (SYSTOR '12), June 2012.
-    Slightly extended version:
-    http://algogroup.unimore.it/people/paolo/disk_sched/bfq-v1-suite-
-							results.pdf
-
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
-Signed-off-by: Arianna Avanzini <avanzini.arianna@gmail.com>
----
- block/bfq-iosched.c | 83 ++++++++++++++++++++++++++---------------------------
- 1 file changed, 41 insertions(+), 42 deletions(-)
-
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 35c3dd2..a7415f4 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -733,9 +733,6 @@ static struct kmem_cache *bfq_pool;
- #define BFQQ_CLOSE_THR		(sector_t)(8 * 1024)
- #define BFQQ_SEEKY(bfqq)	(hweight32(bfqq->seek_history) > 32/8)
- 
--/* Budget feedback step. */
--#define BFQ_BUDGET_STEP         128
--
- /* Min samples used for peak rate estimation (for autotuning). */
- #define BFQ_PEAK_RATE_SAMPLES	32
- 
-@@ -4027,36 +4024,6 @@ static struct bfq_queue *bfq_set_in_service_queue(struct bfq_data *bfqd)
- 	return bfqq;
- }
- 
--/*
-- * bfq_default_budget - return the default budget for @bfqq on @bfqd.
-- * @bfqd: the device descriptor.
-- * @bfqq: the queue to consider.
-- *
-- * We use 3/4 of the @bfqd maximum budget as the default value
-- * for the max_budget field of the queues.  This lets the feedback
-- * mechanism to start from some middle ground, then the behavior
-- * of the process will drive the heuristics towards high values, if
-- * it behaves as a greedy sequential reader, or towards small values
-- * if it shows a more intermittent behavior.
-- */
--static unsigned long bfq_default_budget(struct bfq_data *bfqd,
--					struct bfq_queue *bfqq)
--{
--	unsigned long budget;
--
--	/*
--	 * When we need an estimate of the peak rate we need to avoid
--	 * to give budgets that are too short due to previous measurements.
--	 * So, in the first 10 assignments use a ``safe'' budget value.
--	 */
--	if (bfqd->budgets_assigned < 194 && bfqd->bfq_user_max_budget == 0)
--		budget = bfq_default_max_budget;
--	else
--		budget = bfqd->bfq_max_budget;
--
--	return budget - budget / 4;
--}
--
- static void bfq_arm_slice_timer(struct bfq_data *bfqd)
- {
- 	struct bfq_queue *bfqq = bfqd->in_service_queue;
-@@ -4181,13 +4148,47 @@ static void __bfq_bfqq_recalc_budget(struct bfq_data *bfqd,
- 		 * for throughput.
- 		 */
- 		case BFQ_BFQQ_TOO_IDLE:
--			if (budget > min_budget + BFQ_BUDGET_STEP)
--				budget -= BFQ_BUDGET_STEP;
--			else
--				budget = min_budget;
-+			/*
-+			 * This is the only case where we may reduce
-+			 * the budget: if there is no request of the
-+			 * process still waiting for completion, then
-+			 * we assume (tentatively) that the timer has
-+			 * expired because the batch of requests of
-+			 * the process could have been served with a
-+			 * smaller budget.  Hence, betting that
-+			 * process will behave in the same way when it
-+			 * becomes backlogged again, we reduce its
-+			 * next budget.  As long as we guess right,
-+			 * this budget cut reduces the latency
-+			 * experienced by the process.
-+			 *
-+			 * However, if there are still outstanding
-+			 * requests, then the process may have not yet
-+			 * issued its next request just because it is
-+			 * still waiting for the completion of some of
-+			 * the still outstanding ones.  So in this
-+			 * subcase we do not reduce its budget, on the
-+			 * contrary we increase it to possibly boost
-+			 * the throughput, as discussed in the
-+			 * comments to the BUDGET_TIMEOUT case.
-+			 */
-+			if (bfqq->dispatched > 0) /* still outstanding reqs */
-+				budget = min(budget * 2, bfqd->bfq_max_budget);
-+			else {
-+				if (budget > 5 * min_budget)
-+					budget -= 4 * min_budget;
-+				else
-+					budget = min_budget;
-+			}
- 			break;
- 		case BFQ_BFQQ_BUDGET_TIMEOUT:
--			budget = bfq_default_budget(bfqd, bfqq);
-+			/*
-+			 * We double the budget here because it gives
-+			 * the chance to boost the throughput if this
-+			 * is not a seeky process (and has bumped into
-+			 * this timeout because of, e.g., ZBR).
-+			 */
-+			budget = min(budget * 2, bfqd->bfq_max_budget);
- 			break;
- 		case BFQ_BFQQ_BUDGET_EXHAUSTED:
- 			/*
-@@ -4199,8 +4200,7 @@ static void __bfq_bfqq_recalc_budget(struct bfq_data *bfqd,
- 			 * definitely increase the budget of this good
- 			 * candidate to boost the disk throughput.
- 			 */
--			budget = min(budget + 8 * BFQ_BUDGET_STEP,
--				     bfqd->bfq_max_budget);
-+			budget = min(budget * 4, bfqd->bfq_max_budget);
- 			break;
- 		case BFQ_BFQQ_NO_MORE_REQUESTS:
- 			/*
-@@ -4962,9 +4962,8 @@ static void bfq_init_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq,
- 	bfqq->pid = pid;
- 
- 	/* Tentative initial value to trade off between thr and lat */
--	bfqq->max_budget = bfq_default_budget(bfqd, bfqq);
-+	bfqq->max_budget = (2 * bfq_max_budget(bfqd)) / 3;
- 	bfqq->budget_timeout = bfq_smallest_from_now();
--	bfqq->pid = pid;
- 
- 	/* first request is almost certainly seeky */
- 	bfqq->seek_history = 1;
 -- 
-2.10.0
+Goldwyn
