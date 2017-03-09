@@ -1,41 +1,125 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:59567 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751945AbdCAPj4 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Mar 2017 10:39:56 -0500
-Date: Wed, 1 Mar 2017 07:38:57 -0800
-From: Christoph Hellwig <hch@infradead.org>
-To: Matthew Wilcox <willy@infradead.org>
-Cc: Goldwyn Rodrigues <rgoldwyn@suse.de>, jack@suse.com,
-        hch@infradead.org, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org,
-        Goldwyn Rodrigues <rgoldwyn@suse.com>
-Subject: Re: [PATCH 3/8] nowait aio: return if direct write will trigger
- writeback
-Message-ID: <20170301153857.GC30631@infradead.org>
-References: <20170228233610.25456-1-rgoldwyn@suse.de>
- <20170228233610.25456-4-rgoldwyn@suse.de>
- <20170301034606.GK16328@bombadil.infradead.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170301034606.GK16328@bombadil.infradead.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jack@suse.cz>
+From: Jan Kara <jack@suse.cz>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Tejun Heo <tj@kernel.org>,
+	linux-block@vger.kernel.org,
+	Dan Williams <dan.j.williams@intel.com>,
+	Omar Sandoval <osandov@osandov.com>,
+	Arthur Marsh <arthur.marsh@internode.on.net>,
+	linux-scsi@vger.kernel.org,
+	Jan Kara <jack@suse.cz>
+Subject: [PATCH 2/4] bdi: Fix use-after-free in wb_congested_put()
+Date: Thu,  9 Mar 2017 11:16:22 +0100
+Message-Id: <20170309101624.25901-3-jack@suse.cz>
+In-Reply-To: <20170309101624.25901-1-jack@suse.cz>
+References: <20170309101624.25901-1-jack@suse.cz>
+List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Feb 28, 2017 at 07:46:06PM -0800, Matthew Wilcox wrote:
-> Ugh, this is pretty inefficient.  If that's all you want to know, then
-> using the radix tree directly will be far more efficient than spinning
-> up all the pagevec machinery only to discard the pages found.
-> 
-> But what's going to kick these pages out of cache?  Shouldn't we rather
-> find the pages, kick them out if clean, start writeback if not, and *then*
-> return -EAGAIN?
-> 
-> So maybe we want to spin up the pagevec machinery after all so we can
-> do that extra work?
+bdi_writeback_congested structures get created for each blkcg and bdi
+regardless whether bdi is registered or not. When they are created in
+unregistered bdi and the request queue (and thus bdi) is then destroyed
+while blkg still holds reference to bdi_writeback_congested structure,
+this structure will be referencing freed bdi and last wb_congested_put()
+will try to remove the structure from already freed bdi.
 
-As pointed out in the last round of these patches I think we really
-need to pass a flags argument to filemap_write_and_wait_range to
-communicate the non-blocking nature and only return -EAGAIN if we'd
-block.  As a bonus that can indeed start to kick the pages out.
+With commit 165a5e22fafb "block: Move bdi_unregister() to
+del_gendisk()", SCSI started to destroy bdis without calling
+bdi_unregister() first (previously it was calling bdi_unregister() even
+for unregistered bdis) and thus the code detaching
+bdi_writeback_congested in cgwb_bdi_destroy() was not triggered and we
+started hitting this use-after-free bug. It is enough to boot a KVM
+instance with virtio-scsi device to trigger this behavior.
+
+Fix the problem by detaching bdi_writeback_congested structures in
+bdi_exit() instead of bdi_unregister(). This is also more logical as
+they can get attached to bdi regardless whether it ever got registered
+or not.
+
+Fixes: 165a5e22fafb127ecb5914e12e8c32a1f0d3f820
+Tested-by: Omar Sandoval <osandov@fb.com>
+Acked-by: Tejun Heo <tj@kernel.org>
+Signed-off-by: Jan Kara <jack@suse.cz>
+---
+ mm/backing-dev.c | 36 +++++++++++++++++++++---------------
+ 1 file changed, 21 insertions(+), 15 deletions(-)
+
+diff --git a/mm/backing-dev.c b/mm/backing-dev.c
+index 51325489aae5..b05ace3ba178 100644
+--- a/mm/backing-dev.c
++++ b/mm/backing-dev.c
+@@ -683,30 +683,18 @@ static int cgwb_bdi_init(struct backing_dev_info *bdi)
+ static void cgwb_bdi_destroy(struct backing_dev_info *bdi)
+ {
+ 	struct radix_tree_iter iter;
+-	struct rb_node *rbn;
+ 	void **slot;
+ 
+ 	WARN_ON(test_bit(WB_registered, &bdi->wb.state));
+ 
+ 	spin_lock_irq(&cgwb_lock);
+-
+ 	radix_tree_for_each_slot(slot, &bdi->cgwb_tree, &iter, 0)
+ 		cgwb_kill(*slot);
+-
+-	while ((rbn = rb_first(&bdi->cgwb_congested_tree))) {
+-		struct bdi_writeback_congested *congested =
+-			rb_entry(rbn, struct bdi_writeback_congested, rb_node);
+-
+-		rb_erase(rbn, &bdi->cgwb_congested_tree);
+-		congested->bdi = NULL;	/* mark @congested unlinked */
+-	}
+-
+ 	spin_unlock_irq(&cgwb_lock);
+ 
+ 	/*
+-	 * All cgwb's and their congested states must be shutdown and
+-	 * released before returning.  Drain the usage counter to wait for
+-	 * all cgwb's and cgwb_congested's ever created on @bdi.
++	 * All cgwb's must be shutdown and released before returning.  Drain
++	 * the usage counter to wait for all cgwb's ever created on @bdi.
+ 	 */
+ 	atomic_dec(&bdi->usage_cnt);
+ 	wait_event(cgwb_release_wait, !atomic_read(&bdi->usage_cnt));
+@@ -754,6 +742,21 @@ void wb_blkcg_offline(struct blkcg *blkcg)
+ 	spin_unlock_irq(&cgwb_lock);
+ }
+ 
++static void cgwb_bdi_exit(struct backing_dev_info *bdi)
++{
++	struct rb_node *rbn;
++
++	spin_lock_irq(&cgwb_lock);
++	while ((rbn = rb_first(&bdi->cgwb_congested_tree))) {
++		struct bdi_writeback_congested *congested =
++			rb_entry(rbn, struct bdi_writeback_congested, rb_node);
++
++		rb_erase(rbn, &bdi->cgwb_congested_tree);
++		congested->bdi = NULL;	/* mark @congested unlinked */
++	}
++	spin_unlock_irq(&cgwb_lock);
++}
++
+ #else	/* CONFIG_CGROUP_WRITEBACK */
+ 
+ static int cgwb_bdi_init(struct backing_dev_info *bdi)
+@@ -774,7 +777,9 @@ static int cgwb_bdi_init(struct backing_dev_info *bdi)
+ 	return 0;
+ }
+ 
+-static void cgwb_bdi_destroy(struct backing_dev_info *bdi)
++static void cgwb_bdi_destroy(struct backing_dev_info *bdi) { }
++
++static void cgwb_bdi_exit(struct backing_dev_info *bdi)
+ {
+ 	wb_congested_put(bdi->wb_congested);
+ }
+@@ -905,6 +910,7 @@ static void bdi_exit(struct backing_dev_info *bdi)
+ {
+ 	WARN_ON_ONCE(bdi->dev);
+ 	wb_exit(&bdi->wb);
++	cgwb_bdi_exit(bdi);
+ }
+ 
+ static void release_bdi(struct kref *ref)
+-- 
+2.10.2
