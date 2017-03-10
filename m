@@ -1,21 +1,21 @@
 Return-Path: <neilb@suse.de>
 From: NeilBrown <neilb@suse.com>
-To: Jens Axboe <axboe@kernel.dk>
-Date: Fri, 10 Mar 2017 17:00:47 +1100
+To: Jens Axboe <axboe@kernel.dk>, Jack Wang <jinpu.wang@profitbricks.com>
+Date: Fri, 10 Mar 2017 15:36:20 +1100
+Cc: LKML <linux-kernel@vger.kernel.org>, Lars Ellenberg <lars.ellenberg@linbit.com>, Kent Overstreet <kent.overstreet@gmail.com>, Pavel Machek <pavel@ucw.cz>, Mike Snitzer <snitzer@redhat.com>, Mikulas Patocka <mpatocka@redhat.com>, linux-raid@vger.kernel.org, device-mapper development <dm-devel@redhat.com>, linux-block@vger.kernel.org
 Subject: [PATCH 4/5] blk: use non-rescuing bioset for q->bio_split.
-Cc: linux-block@vger.kernel.org, Mike Snitzer <snitzer@redhat.com>,
- LKML <linux-kernel@vger.kernel.org>, linux-raid@vger.kernel.org,
- device-mapper development <dm-devel@redhat.com>,
- Mikulas Patocka <mpatocka@redhat.com>, Pavel Machek <pavel@ucw.cz>,
- Jack Wang <jinpu.wang@profitbricks.com>,
- Lars Ellenberg <lars.ellenberg@linbit.com>,
- Kent Overstreet <kent.overstreet@gmail.com>
-Message-ID: <148912564749.4002.12977222491155249514.stgit@noble>
-In-Reply-To: <148912539296.4002.219258660543808741.stgit@noble>
-References: <148912539296.4002.219258660543808741.stgit@noble>
+In-Reply-To: <87d1dphhuy.fsf@notabene.neil.brown.name>
+References: <87h93blz6g.fsf@notabene.neil.brown.name> <71562c2c-97f4-9a0a-32ec-30e0702ca575@profitbricks.com> <87lgsjj9w8.fsf@notabene.neil.brown.name> <a674456d-fb93-437e-c50e-195e7a035ba4@kernel.dk> <87r328j00i.fsf@notabene.neil.brown.name> <87d1dphhuy.fsf@notabene.neil.brown.name>
+Message-ID: <871su5hhob.fsf@notabene.neil.brown.name>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha256; protocol="application/pgp-signature"
 List-ID: <linux-block@vger.kernel.org>
+
+--=-=-=
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
+
 
 A rescuing bioset is only useful if there might be bios from
 that same bioset on the bio_list_on_stack queue at a time
@@ -44,25 +44,49 @@ splitting or (more likely) are destined for a different queue.
 The next time that the original q->bio_split might be used
 by this thread is when A is processed again, as it might
 still be too big to handle directly.  By this time there
-cannot be any other bios allocated from q->bio_split in the
+cannot be and other bios allocated fro q->bio_split in the
 generic_make_request() queue.  So no rescuing will ever be
 needed.
 
 Signed-off-by: NeilBrown <neilb@suse.com>
----
+=2D--
  block/blk-core.c |    2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/block/blk-core.c b/block/blk-core.c
-index 430c82f646eb..fae7966e1f98 100644
---- a/block/blk-core.c
+index c3992d17dc2c..375006c94c15 100644
+=2D-- a/block/blk-core.c
 +++ b/block/blk-core.c
-@@ -712,7 +712,7 @@ struct request_queue *blk_alloc_queue_node(gfp_t gfp_mask, int node_id)
+@@ -714,7 +714,7 @@ struct request_queue *blk_alloc_queue_node(gfp_t gfp_ma=
+sk, int node_id)
  	if (q->id < 0)
  		goto fail_q;
- 
--	q->bio_split = bioset_create_rescued(BIO_POOL_SIZE, 0);
-+	q->bio_split = bioset_create(BIO_POOL_SIZE, 0);
+=20
+=2D	q->bio_split =3D bioset_create_rescued(BIO_POOL_SIZE, 0);
++	q->bio_split =3D bioset_create(BIO_POOL_SIZE, 0);
  	if (!q->bio_split)
  		goto fail_id;
- 
+=20
+
+
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEG8Yp69OQ2HB7X0l6Oeye3VZigbkFAljCLUQACgkQOeye3VZi
+gbmtbw//Vqna/c1XoVNNyGIbpl7CVQfYE1gHgFUo/NG9BuGrZw7iF2NRUhTr3BzS
+7vNIgMsj5feegCG6d4yKS6LGck6sYNWu62yWvjG+DuaK9PhGL7yt5xZyyxDe42y9
+2HUkQVpg8XT2UgxhpTpEHYp2TQTkz6QebGchdeU6ExmUr1hLoPi/DXAiLr48H9NQ
+bHii/ukL5BymRm9cydsEPOuHLAWndZgWNQwOq2k87AT7kXobWzEpLdoNtLZpMHc+
+aPMpAyYg6+rZRxn4WOuCvkeYlwIB8WeWWOlqolsCzSriY+974lwGv2IOSN7MxEtV
+v/Mlm/z1AHbbeNwfE6hHM5KoaemWV/gGx2zATGBiNUBV3jawkBdWhExcmvqkt+bt
+A+Fac/jOKee0WuLiFwU24sB4v128KKrXUrlNvpDGZIjhbQ3uIGDBV3zeVwPrMZhh
+8hHCfs8NiiSR2u19xbeiIwHtbrW2QtFvAPbv/RmvFZMgWammMUVUTByMHoPfjLcR
+YhQwooNnTj7Q/qorLRtxLT2Ut0ZRXBhXJIt3Bcrvq1M3lN+UQLXVDQ7s4YsKzhZL
+baATDHgykZ0jl+6dh62YSQJw8ij3O/tmme+z6bn/o3UBWujPGN8CRSkgeQogWcaX
+MOre5eE4IFu0Vlk1vG0K/5wxQpmzMldpglKXOo+0z28BMsgTaXQ=
+=taSq
+-----END PGP SIGNATURE-----
+--=-=-=--
