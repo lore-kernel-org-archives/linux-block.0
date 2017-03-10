@@ -1,88 +1,68 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f66.google.com ([74.125.83.66]:34278 "EHLO
-        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755151AbdCPQOs (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Mar 2017 12:14:48 -0400
-From: Ming Lei <tom.leiming@gmail.com>
-To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
-        linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Ming Lei <tom.leiming@gmail.com>
-Subject: [PATCH v3 11/14] md: raid10: refactor code of read reshape's .bi_end_io
-Date: Fri, 17 Mar 2017 00:12:32 +0800
-Message-Id: <20170316161235.27110-12-tom.leiming@gmail.com>
-In-Reply-To: <20170316161235.27110-1-tom.leiming@gmail.com>
-References: <20170316161235.27110-1-tom.leiming@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <neilb@suse.de>
+From: NeilBrown <neilb@suse.com>
+To: Jens Axboe <axboe@kernel.dk>
+Date: Fri, 10 Mar 2017 17:00:47 +1100
+Subject: [PATCH 4/5] blk: use non-rescuing bioset for q->bio_split.
+Cc: linux-block@vger.kernel.org, Mike Snitzer <snitzer@redhat.com>,
+ LKML <linux-kernel@vger.kernel.org>, linux-raid@vger.kernel.org,
+ device-mapper development <dm-devel@redhat.com>,
+ Mikulas Patocka <mpatocka@redhat.com>, Pavel Machek <pavel@ucw.cz>,
+ Jack Wang <jinpu.wang@profitbricks.com>,
+ Lars Ellenberg <lars.ellenberg@linbit.com>,
+ Kent Overstreet <kent.overstreet@gmail.com>
+Message-ID: <148912564749.4002.12977222491155249514.stgit@noble>
+In-Reply-To: <148912539296.4002.219258660543808741.stgit@noble>
+References: <148912539296.4002.219258660543808741.stgit@noble>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+List-ID: <linux-block@vger.kernel.org>
 
-reshape read request is a bit special and requires one extra
-bio which isn't allocated from r10buf_pool.
+A rescuing bioset is only useful if there might be bios from
+that same bioset on the bio_list_on_stack queue at a time
+when bio_alloc_bioset() is called.  This never applies to
+q->bio_split.
 
-Refactor the .bi_end_io for read reshape, so that we can use
-raid10's resync page mangement approach easily in the following
-patches.
+Allocations from q->bio_split are only ever made from
+blk_queue_split() which is only ever called early in each of
+various make_request_fn()s.  The original bio (call this A)
+is then passed to generic_make_request() and is placed on
+the bio_list_on_stack queue, and the bio that was allocated
+from q->bio_split (B) is processed.
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+The processing of this may cause other bios to be passed to
+generic_make_request() or may even cause the bio B itself to
+be passed, possible after some prefix has been split off
+(using some other bioset).
+
+generic_make_request() now guarantees that all of these bios
+(B and dependants) will be fully processed before the tail
+of the original bio A gets handled.  None of these early bios
+can possible trigger an allocation from the original
+q->bio_split as they are either too small to require
+splitting or (more likely) are destined for a different queue.
+
+The next time that the original q->bio_split might be used
+by this thread is when A is processed again, as it might
+still be too big to handle directly.  By this time there
+cannot be any other bios allocated from q->bio_split in the
+generic_make_request() queue.  So no rescuing will ever be
+needed.
+
+Signed-off-by: NeilBrown <neilb@suse.com>
 ---
- drivers/md/raid10.c | 28 ++++++++++++++++++----------
- 1 file changed, 18 insertions(+), 10 deletions(-)
+ block/blk-core.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
-index 2b40420299e3..98e53f39b66e 100644
---- a/drivers/md/raid10.c
-+++ b/drivers/md/raid10.c
-@@ -1909,17 +1909,9 @@ static int raid10_remove_disk(struct mddev *mddev, struct md_rdev *rdev)
- 	return err;
- }
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 430c82f646eb..fae7966e1f98 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -712,7 +712,7 @@ struct request_queue *blk_alloc_queue_node(gfp_t gfp_mask, int node_id)
+ 	if (q->id < 0)
+ 		goto fail_q;
  
--static void end_sync_read(struct bio *bio)
-+static void __end_sync_read(struct r10bio *r10_bio, struct bio *bio, int d)
- {
--	struct r10bio *r10_bio = bio->bi_private;
- 	struct r10conf *conf = r10_bio->mddev->private;
--	int d;
--
--	if (bio == r10_bio->master_bio) {
--		/* this is a reshape read */
--		d = r10_bio->read_slot; /* really the read dev */
--	} else
--		d = find_bio_disk(conf, r10_bio, bio, NULL, NULL);
+-	q->bio_split = bioset_create_rescued(BIO_POOL_SIZE, 0);
++	q->bio_split = bioset_create(BIO_POOL_SIZE, 0);
+ 	if (!q->bio_split)
+ 		goto fail_id;
  
- 	if (!bio->bi_error)
- 		set_bit(R10BIO_Uptodate, &r10_bio->state);
-@@ -1943,6 +1935,22 @@ static void end_sync_read(struct bio *bio)
- 	}
- }
- 
-+static void end_sync_read(struct bio *bio)
-+{
-+	struct r10bio *r10_bio = bio->bi_private;
-+	struct r10conf *conf = r10_bio->mddev->private;
-+	int d = find_bio_disk(conf, r10_bio, bio, NULL, NULL);
-+
-+	__end_sync_read(r10_bio, bio, d);
-+}
-+
-+static void end_reshape_read(struct bio *bio)
-+{
-+	struct r10bio *r10_bio = bio->bi_private;
-+
-+	__end_sync_read(r10_bio, bio, r10_bio->read_slot);
-+}
-+
- static void end_sync_request(struct r10bio *r10_bio)
- {
- 	struct mddev *mddev = r10_bio->mddev;
-@@ -4466,7 +4474,7 @@ static sector_t reshape_request(struct mddev *mddev, sector_t sector_nr,
- 	read_bio->bi_iter.bi_sector = (r10_bio->devs[r10_bio->read_slot].addr
- 			       + rdev->data_offset);
- 	read_bio->bi_private = r10_bio;
--	read_bio->bi_end_io = end_sync_read;
-+	read_bio->bi_end_io = end_reshape_read;
- 	bio_set_op_attrs(read_bio, REQ_OP_READ, 0);
- 	read_bio->bi_flags &= (~0UL << BIO_RESET_BITS);
- 	read_bio->bi_error = 0;
--- 
-2.9.3
