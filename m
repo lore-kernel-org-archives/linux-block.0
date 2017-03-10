@@ -1,44 +1,73 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-Date: Wed, 1 Mar 2017 07:40:58 -0800
-From: Christoph Hellwig <hch@infradead.org>
-To: Goldwyn Rodrigues <rgoldwyn@suse.de>
-Cc: jack@suse.com, hch@infradead.org, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org,
-        Goldwyn Rodrigues <rgoldwyn@suse.com>
-Subject: Re: [PATCH 7/8] nowait aio: xfs
-Message-ID: <20170301154058.GD30631@infradead.org>
-References: <20170228233610.25456-1-rgoldwyn@suse.de>
- <20170228233610.25456-8-rgoldwyn@suse.de>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:43100 "EHLO
+        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755276AbdCJTiM (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 10 Mar 2017 14:38:12 -0500
+From: Bart Van Assche <Bart.VanAssche@sandisk.com>
+To: Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
+        "lsf-pc@lists.linux-foundation.org"
+        <lsf-pc@lists.linux-foundation.org>
+CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-ide@vger.kernel.org" <linux-ide@vger.kernel.org>
+Subject: Re: [LFS/MM TOPIC][LFS/MM ATTEND]: - Storage Stack and Driver
+ Testing methodology.
+Date: Fri, 10 Mar 2017 19:37:58 +0000
+Message-ID: <1489174661.2548.5.camel@sandisk.com>
+References: <CO2PR04MB218427BF42159B20FB26F74186670@CO2PR04MB2184.namprd04.prod.outlook.com>
+         <CO2PR04MB2184DB653C04FB620B41435486670@CO2PR04MB2184.namprd04.prod.outlook.com>
+In-Reply-To: <CO2PR04MB2184DB653C04FB620B41435486670@CO2PR04MB2184.namprd04.prod.outlook.com>
+Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170228233610.25456-8-rgoldwyn@suse.de>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-> @@ -528,12 +528,17 @@ xfs_file_dio_aio_write(
->  	    ((iocb->ki_pos + count) & mp->m_blockmask)) {
->  		unaligned_io = 1;
->  		iolock = XFS_IOLOCK_EXCL;
-> +		if (iocb->ki_flags & IOCB_NOWAIT)
-> +			return -EAGAIN;
+On Tue, 2017-01-10 at 22:40 +0000, Chaitanya Kulkarni wrote:
+> Participants:-
+> ------------------
+> I'd like to invite developers from different subsystems to discuss an app=
+roach towards=A0
+> a unified testing methodology for storage stack and device drivers belong=
+s to=A0
+> different subsystems.
+>=20
+> Topics for Discussion:-
+> ------------------------------
+> As a part of discussion following are some of the key points which we can=
+ focus on:-
+> 1. What are the common components of the kernel used by the various subsy=
+stems?
+> 2. What are the potential target drivers which can benefit from this appr=
+oach?=A0
+> =A0 (e.g. NVMe, NVMe Over Fabric, Open Channel Solid State Drives etc.)
+> 3. What are the desired features that can be implemented in this Framewor=
+k?
+> =A0 (code coverage, unit tests, stress testings, regression, generating C=
+occinelle reports etc.)=A0
+> 4. Desirable Report generation mechanism?
+> 5. Basic performance validation?
+> 6. Whether QEMU can be used to emulate some of the H/W functionality to c=
+reate a test=A0
+> =A0 platform? (Optional subsystem specific)
 
-So all unaligned I/O will return -EAGAIN?  Why?  Also please explain
-that reason in a comment right here.
+Regarding existing test software: the SRP test software is a thorough test =
+of
+the Linux block layer, SCSI core, dm-mpath driver, dm core, SRP initiator a=
+nd
+target drivers and also of the asynchronous I/O subsystem. This test suite
+includes experimental support for the NVMeOF drivers. This test suite suppo=
+rts
+the rdma_rxe driver which means that an Ethernet adapter is sufficient to r=
+un
+these tests.
 
-> diff --git a/fs/xfs/xfs_iomap.c b/fs/xfs/xfs_iomap.c
-> index 1aa3abd..84f981a 100644
-> --- a/fs/xfs/xfs_iomap.c
-> +++ b/fs/xfs/xfs_iomap.c
-> @@ -1020,6 +1020,11 @@ xfs_file_iomap_begin(
->  	if ((flags & IOMAP_REPORT) ||
->  	    (xfs_is_reflink_inode(ip) &&
->  	     (flags & IOMAP_WRITE) && (flags & IOMAP_DIRECT))) {
-> +		/* Allocations due to reflinks */
-> +		if ((flags & IOMAP_NOWAIT) && !(flags & IOMAP_REPORT)) {
-> +			error = -EAGAIN;
-> +			goto out_unlock;
-> +		}
+Note: the focus of this test suite is the regular I/O path and device remov=
+al.
+This test suite neither replaces the libiscsi tests nor xfstests.
 
-FYI, this code looks very different in current Linus' tree - I think
-you're on some old kernel base.
+See also https://github.com/bvanassche/srp-test.
+
+Bart.=
