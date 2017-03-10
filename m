@@ -1,66 +1,59 @@
-Return-Path: <BATV+f1fc5bea56d51e2fc981+4960+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk,
-	martin.petersen@oracle.com,
-	agk@redhat.com,
-	snitzer@redhat.com,
-	shli@kernel.org,
-	philipp.reisner@linbit.com,
-	lars.ellenberg@linbit.com
-Cc: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	drbd-dev@lists.linbit.com,
-	dm-devel@redhat.com,
-	linux-raid@vger.kernel.org
-Subject: [PATCH 02/23] block: implement splitting of REQ_OP_WRITE_ZEROES bios
-Date: Thu, 23 Mar 2017 10:33:20 -0400
-Message-Id: <20170323143341.31549-3-hch@lst.de>
-In-Reply-To: <20170323143341.31549-1-hch@lst.de>
-References: <20170323143341.31549-1-hch@lst.de>
+Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
+MIME-Version: 1.0
+In-Reply-To: <yq1zih4pdhn.fsf@oracle.com>
+References: <CAOi1vP8M91kiF-FnT=EoJgTxfstMEsC-nhLY5KtRkrKROjWPWA@mail.gmail.com>
+ <yq1efyq25y2.fsf@oracle.com>
+ <CAOi1vP-amFyFHbPV3FhG3F1Tp+df6V7a4mcP8LLWY0GZx+JsFw@mail.gmail.com>
+ <yq1fuj44geq.fsf@oracle.com>
+ <CAOi1vP_g-MMe9XvWDgkVL4R6UjckMQVC_CDF9+hQEpZbxwx0Jw@mail.gmail.com>
+ <yq1zih4pdhn.fsf@oracle.com>
+From: Ilya Dryomov <idryomov@gmail.com>
+Date: Fri, 10 Mar 2017 17:49:22 +0100
+Message-ID: <CAOi1vP-VAUYwnuxMMgknpGLKgZR=8+JV_naASKE8vx8h9+R=pQ@mail.gmail.com>
+Subject: Re: blk_integrity_revalidate() clears BDI_CAP_STABLE_WRITES
+To: "Martin K. Petersen" <martin.petersen@oracle.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
+List-Post: <mailto:linux-nvme@lists.infradead.org>
+List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
+Cc: Jens Axboe <axboe@fb.com>, Sagi Grimberg <sagi@grimberg.me>,
+ Mike Snitzer <snitzer@redhat.com>, linux-nvme@lists.infradead.org,
+ Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
+ Ceph Development <ceph-devel@vger.kernel.org>,
+ Dan Williams <dan.j.williams@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
+Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
 List-ID: <linux-block@vger.kernel.org>
 
-Copy and past the REQ_OP_WRITE_SAME code to prepare to implementations
-that limit the write zeroes size.
+On Thu, Mar 2, 2017 at 4:24 AM, Martin K. Petersen
+<martin.petersen@oracle.com> wrote:
+>>>>>> "Ilya" == Ilya Dryomov <idryomov@gmail.com> writes:
+>
+> Ilya,
+>
+> Ilya> Given the above, I'm not sure what the baseline is --
+> Ilya> blk_integrity code isn't invoked for data-only lbafs.  Could nvme
+> Ilya> folks please look at this?  rbd regression caused by integrity
+> Ilya> revalidate change goes back to 4.4 and I'd really like to get it
+> Ilya> fixed.  The proposed patch is attached to my earlier reply on
+> Ilya> linux-block.
+>
+> I've had a couple of fires to attend to this week. I'll try and give
+> your patch a spin on my FC setup tomorrow or Friday.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-merge.c | 17 +++++++++++++++--
- 1 file changed, 15 insertions(+), 2 deletions(-)
+Hi Martin,
 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index c62a6f0325e0..f9e5a3e0944b 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -63,6 +63,20 @@ static struct bio *blk_bio_discard_split(struct request_queue *q,
- 	return bio_split(bio, split_sectors, GFP_NOIO, bs);
- }
- 
-+static struct bio *blk_bio_write_zeroes_split(struct request_queue *q,
-+		struct bio *bio, struct bio_set *bs, unsigned *nsegs)
-+{
-+	*nsegs = 1;
-+
-+	if (!q->limits.max_write_zeroes_sectors)
-+		return NULL;
-+
-+	if (bio_sectors(bio) <= q->limits.max_write_zeroes_sectors)
-+		return NULL;
-+
-+	return bio_split(bio, q->limits.max_write_zeroes_sectors, GFP_NOIO, bs);
-+}
-+
- static struct bio *blk_bio_write_same_split(struct request_queue *q,
- 					    struct bio *bio,
- 					    struct bio_set *bs,
-@@ -209,8 +223,7 @@ void blk_queue_split(struct request_queue *q, struct bio **bio,
- 		split = blk_bio_discard_split(q, *bio, bs, &nsegs);
- 		break;
- 	case REQ_OP_WRITE_ZEROES:
--		split = NULL;
--		nsegs = (*bio)->bi_phys_segments;
-+		split = blk_bio_write_zeroes_split(q, *bio, bs, &nsegs);
- 		break;
- 	case REQ_OP_WRITE_SAME:
- 		split = blk_bio_write_same_split(q, *bio, bs, &nsegs);
--- 
-2.11.0
+Ping...  Did you get a chance to try it?
+
+Thanks,
+
+                Ilya
+
+_______________________________________________
+Linux-nvme mailing list
+Linux-nvme@lists.infradead.org
+http://lists.infradead.org/mailman/listinfo/linux-nvme
