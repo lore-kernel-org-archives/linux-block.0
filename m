@@ -1,37 +1,25 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:63681 "EHLO
-        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750905AbdCMKFs (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 Mar 2017 06:05:48 -0400
-From: Umesh Patel <Umesh.Patel@wdc.com>
-To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Getting kernel crash
-Date: Mon, 13 Mar 2017 10:05:46 +0000
-Message-ID: <CY1PR0401MB1353BBDD3F1049AD32C64BD1E1250@CY1PR0401MB1353.namprd04.prod.outlook.com>
-Content-Type: text/plain; charset="us-ascii"
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH v3] don't forget to call pd_online_fn when activate policy
+To: Zhou Chengming <zhouchengming1@huawei.com>
+References: <1489203980-46134-1-git-send-email-zhouchengming1@huawei.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ miaoxie@huawei.com
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <8f877e5c-4ceb-7c6e-c44b-c6ca3a72a5f1@kernel.dk>
+Date: Sat, 11 Mar 2017 15:25:30 -0700
 MIME-Version: 1.0
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <1489203980-46134-1-git-send-email-zhouchengming1@huawei.com>
+Content-Type: text/plain; charset=windows-1252
+List-ID: <linux-block@vger.kernel.org>
 
-Hi,
+On 03/10/2017 08:46 PM, Zhou Chengming wrote:
+> When we activate policy on the request_queue, we will create policy_date
+> for all the existing blkgs of the request_queue, so we should call
+> pd_init_fn() and pd_online_fn() on these newly created policy_data.
 
-I'm calling blk_queue_split kernel function from my driver to split larger =
-BIO and that is working fine for block size 4K and 8K but getting below cra=
-sh for block size 1M.
-Using stable 4.10.1 kernel version
+I'm not looking at this until you tell me that you have runtime
+tested it. I'm assuming you originally ran into some issue
+with the lack of calling pd_online_fn?
 
-
-[  890.227865] BUG: unable to handle kernel NULL pointer dereference at 000=
-0000000000724
-[  890.305384] IP: _raw_spin_lock_irqsave+0x22/0x3f
-[  890.343896] PGD 0
-[  891.381744] Call Trace:
-[  891.415424]  try_to_wake_up+0x40/0x3e0
-[  891.449074]  ? mempool_free_slab+0x17/0x20
-[  891.483213]  wake_up_process+0x15/0x20
-[  891.517492]  blkdev_bio_end_io_simple+0x1d/0x20
-[  891.551363]  bio_endio+0x56/0x60
-
-
-Thx.
+-- 
+Jens Axboe
