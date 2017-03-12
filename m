@@ -1,103 +1,61 @@
-Return-Path: <jack@suse.cz>
-From: Jan Kara <jack@suse.cz>
+Return-Path: <neilb@suse.de>
+From: NeilBrown <neilb@suse.com>
 To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
-	Tejun Heo <tj@kernel.org>,
-	Tahsin Erdogan <tahsin@google.com>,
-	Omar Sandoval <osandov@osandov.com>,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH 06/11] bdi: Shutdown writeback on all cgwbs in cgwb_bdi_destroy()
-Date: Mon, 13 Mar 2017 16:14:05 +0100
-Message-Id: <20170313151410.5586-7-jack@suse.cz>
-In-Reply-To: <20170313151410.5586-1-jack@suse.cz>
-References: <20170313151410.5586-1-jack@suse.cz>
+Date: Mon, 13 Mar 2017 08:52:50 +1100
+Cc: linux-raid@vger.kernel.org, Mike Snitzer <snitzer@redhat.com>, LKML <linux-kernel@vger.kernel.org>, linux-block@vger.kernel.org, device-mapper development <dm-devel@redhat.com>, Mikulas Patocka <mpatocka@redhat.com>, Pavel Machek <pavel@ucw.cz>, Jack Wang <jinpu.wang@profitbricks.com>, Lars Ellenberg <lars.ellenberg@linbit.com>, Kent Overstreet <kent.overstreet@gmail.com>
+Subject: Re: [dm-devel] [PATCH 0/5] Updates following recent generic_make_request improvement
+In-Reply-To: <3c5e786a-ba42-ada8-c943-17e8b72c63d1@kernel.dk>
+References: <148912539296.4002.219258660543808741.stgit@noble> <3c5e786a-ba42-ada8-c943-17e8b72c63d1@kernel.dk>
+Message-ID: <87lgsaf9hp.fsf@notabene.neil.brown.name>
+MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha256; protocol="application/pgp-signature"
 List-ID: <linux-block@vger.kernel.org>
 
-Currently we waited for all cgwbs to get freed in cgwb_bdi_destroy()
-which also means that writeback has been shutdown on them. Since this
-wait is going away, directly shutdown writeback on cgwbs from
-cgwb_bdi_destroy() to avoid live writeback structures after
-bdi_unregister() has finished. To make that safe with concurrent
-shutdown from cgwb_release_workfn(), we also have to make sure
-wb_shutdown() returns only after the bdi_writeback structure is really
-shutdown.
+--=-=-=
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
-Acked-by: Tejun Heo <tj@kernel.org>
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- include/linux/backing-dev-defs.h |  1 +
- mm/backing-dev.c                 | 22 ++++++++++++++++++++++
- 2 files changed, 23 insertions(+)
+On Sat, Mar 11 2017, Jens Axboe wrote:
 
-diff --git a/include/linux/backing-dev-defs.h b/include/linux/backing-dev-defs.h
-index 8fb3dcdebc80..8af720f22a2d 100644
---- a/include/linux/backing-dev-defs.h
-+++ b/include/linux/backing-dev-defs.h
-@@ -21,6 +21,7 @@ struct dentry;
-  */
- enum wb_state {
- 	WB_registered,		/* bdi_register() was done */
-+	WB_shutting_down,	/* wb_shutdown() in progress */
- 	WB_writeback_running,	/* Writeback is in progress */
- 	WB_has_dirty_io,	/* Dirty inodes on ->b_{dirty|io|more_io} */
- };
-diff --git a/mm/backing-dev.c b/mm/backing-dev.c
-index e3d56dba4da8..b67be4fc12c4 100644
---- a/mm/backing-dev.c
-+++ b/mm/backing-dev.c
-@@ -356,8 +356,15 @@ static void wb_shutdown(struct bdi_writeback *wb)
- 	spin_lock_bh(&wb->work_lock);
- 	if (!test_and_clear_bit(WB_registered, &wb->state)) {
- 		spin_unlock_bh(&wb->work_lock);
-+		/*
-+		 * Wait for wb shutdown to finish if someone else is just
-+		 * running wb_shutdown(). Otherwise we could proceed to wb /
-+		 * bdi destruction before wb_shutdown() is finished.
-+		 */
-+		wait_on_bit(&wb->state, WB_shutting_down, TASK_UNINTERRUPTIBLE);
- 		return;
- 	}
-+	set_bit(WB_shutting_down, &wb->state);
- 	spin_unlock_bh(&wb->work_lock);
- 
- 	cgwb_remove_from_bdi_list(wb);
-@@ -369,6 +376,12 @@ static void wb_shutdown(struct bdi_writeback *wb)
- 	mod_delayed_work(bdi_wq, &wb->dwork, 0);
- 	flush_delayed_work(&wb->dwork);
- 	WARN_ON(!list_empty(&wb->work_list));
-+	/*
-+	 * Make sure bit gets cleared after shutdown is finished. Matches with
-+	 * the barrier provided by test_and_clear_bit() above.
-+	 */
-+	smp_wmb();
-+	clear_bit(WB_shutting_down, &wb->state);
- }
- 
- static void wb_exit(struct bdi_writeback *wb)
-@@ -699,12 +712,21 @@ static void cgwb_bdi_destroy(struct backing_dev_info *bdi)
- {
- 	struct radix_tree_iter iter;
- 	void **slot;
-+	struct bdi_writeback *wb;
- 
- 	WARN_ON(test_bit(WB_registered, &bdi->wb.state));
- 
- 	spin_lock_irq(&cgwb_lock);
- 	radix_tree_for_each_slot(slot, &bdi->cgwb_tree, &iter, 0)
- 		cgwb_kill(*slot);
-+
-+	while (!list_empty(&bdi->wb_list)) {
-+		wb = list_first_entry(&bdi->wb_list, struct bdi_writeback,
-+				      bdi_node);
-+		spin_unlock_irq(&cgwb_lock);
-+		wb_shutdown(wb);
-+		spin_lock_irq(&cgwb_lock);
-+	}
- 	spin_unlock_irq(&cgwb_lock);
- 
- 	/*
--- 
-2.10.2
+> On 03/09/2017 11:00 PM, NeilBrown wrote:
+>> This is a rebase of the series I sent earlier, based on the
+>> very latest from Linus, which included my first patch.
+>>=20
+>> The first fixes a problem that patch introduced, and so should go to
+>> Linux promptly.
+>> The others are more general improvements and can go in the normal
+>> course of events.
+>>=20
+>> It is possible that the changes to btrfs and xfs can just be dropped
+>> as a subsequent patch will be needed to revert them anyway.  They are
+>> there only to be able to say that "blk: make the bioset
+>> rescue_workqueue optional." doesn't change any functionality at all.
+>
+> I have applied the first patch for this series, and added the Fixes
+> tag. We'll let the rest simmer a bit, then aim for 4.12 for those.
+>
+
+Sounds good, thanks.
+NeilBrown
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEG8Yp69OQ2HB7X0l6Oeye3VZigbkFAljFwzIACgkQOeye3VZi
+gblP4g/+OK2+Il19jFe3uEH7tSZmXRJCYWJQhOEE6SoHelttD53TBgSBlxGW/SyB
+L7gP8yN8FmO5xCrY3sWvVIgx9iVS2uJIu6ndgo6eJ+8sDmtDCkSIP9iuCVO+Dyq1
+sgri4XNmVR494EyFR3P5fdPwelY4yd0C5nwSkqOqLuB7TKZ3Mo3RixMJmNEmdzY5
+cyhbsfxXERfcxaUmTV32fNO7Kp+LILrFG6ACv0OQjhejCIJXh9EB5DFJI8Jz9OcR
+OWNR+y5RDb+p5Obpmd8vsWLMuvppm5pUSMvu8VJwV/fKqocBVsiRNA3d8Jr6faAh
+AcQC0OneOVGmUFSdwwYBuI7HRw6QTYG+ykjh6TsmeP5L/R9v91uDupJzSf6oMBLj
+HCFYty2XXubydpt2vceWFVezfqlf/zqqncop3POxDfthzVdAuOVrjTkOhSUoxEYY
+5ySXDN/YTGXqLO35m7stHdHHkHBGLlJI0o3Mv9e76QIv8phbXtlkovqBi9kVhPjn
+xv4RLYnO8ZsNRUzwdfq8jekvM4iXeBLXsQDYTNZhLXMFxwg4TLFxRRuT9VVROGnS
+1NymqgUZZlfc2RS3bbVhAU6pFPDvzsyZh4C9xOZfXRZYMRAn3sJcu6En5mBPxDm0
+QnXW3CKjr0tMYTW7SYhJ0IXobxaTI0I5UQiG56C/fv/c2rke23Y=
+=nvb5
+-----END PGP SIGNATURE-----
+--=-=-=--
