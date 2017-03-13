@@ -1,220 +1,103 @@
-Return-Path: <BATV+250fd2a736c995bcc4cb+4957+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: tj@kernel.org,
-	martin.petersen@oracle.com,
-	axboe@kernel.dk
-Cc: linux-ide@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH 1/7] =?UTF-8?q?=D1=95d:=20split=20sd=5Fsetup=5Fdiscard=5Fc?= =?UTF-8?q?mnd?=
-Date: Mon, 20 Mar 2017 16:43:13 -0400
-Message-Id: <20170320204319.12628-2-hch@lst.de>
-In-Reply-To: <20170320204319.12628-1-hch@lst.de>
-References: <20170320204319.12628-1-hch@lst.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Return-Path: <jack@suse.cz>
+From: Jan Kara <jack@suse.cz>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
+	Tejun Heo <tj@kernel.org>,
+	Tahsin Erdogan <tahsin@google.com>,
+	Omar Sandoval <osandov@osandov.com>,
+	Jan Kara <jack@suse.cz>
+Subject: [PATCH 06/11] bdi: Shutdown writeback on all cgwbs in cgwb_bdi_destroy()
+Date: Mon, 13 Mar 2017 16:14:05 +0100
+Message-Id: <20170313151410.5586-7-jack@suse.cz>
+In-Reply-To: <20170313151410.5586-1-jack@suse.cz>
+References: <20170313151410.5586-1-jack@suse.cz>
 List-ID: <linux-block@vger.kernel.org>
 
-Split sd_setup_discard_cmnd into one function per provisioning type.  While
-this creates some very slight duplication of boilerplate code it keeps the
-code modular for additions of new provisioning types, and for reusing the
-write same functions for the upcoming scsi implementation of the Write Zeroes
-operation.
+Currently we waited for all cgwbs to get freed in cgwb_bdi_destroy()
+which also means that writeback has been shutdown on them. Since this
+wait is going away, directly shutdown writeback on cgwbs from
+cgwb_bdi_destroy() to avoid live writeback structures after
+bdi_unregister() has finished. To make that safe with concurrent
+shutdown from cgwb_release_workfn(), we also have to make sure
+wb_shutdown() returns only after the bdi_writeback structure is really
+shutdown.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Acked-by: Tejun Heo <tj@kernel.org>
+Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- drivers/scsi/sd.c | 153 ++++++++++++++++++++++++++++++------------------------
- 1 file changed, 84 insertions(+), 69 deletions(-)
+ include/linux/backing-dev-defs.h |  1 +
+ mm/backing-dev.c                 | 22 ++++++++++++++++++++++
+ 2 files changed, 23 insertions(+)
 
-diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
-index fcfeddc79331..b853f91fb3da 100644
---- a/drivers/scsi/sd.c
-+++ b/drivers/scsi/sd.c
-@@ -701,93 +701,97 @@ static void sd_config_discard(struct scsi_disk *sdkp, unsigned int mode)
- 	queue_flag_set_unlocked(QUEUE_FLAG_DISCARD, q);
+diff --git a/include/linux/backing-dev-defs.h b/include/linux/backing-dev-defs.h
+index 8fb3dcdebc80..8af720f22a2d 100644
+--- a/include/linux/backing-dev-defs.h
++++ b/include/linux/backing-dev-defs.h
+@@ -21,6 +21,7 @@ struct dentry;
+  */
+ enum wb_state {
+ 	WB_registered,		/* bdi_register() was done */
++	WB_shutting_down,	/* wb_shutdown() in progress */
+ 	WB_writeback_running,	/* Writeback is in progress */
+ 	WB_has_dirty_io,	/* Dirty inodes on ->b_{dirty|io|more_io} */
+ };
+diff --git a/mm/backing-dev.c b/mm/backing-dev.c
+index e3d56dba4da8..b67be4fc12c4 100644
+--- a/mm/backing-dev.c
++++ b/mm/backing-dev.c
+@@ -356,8 +356,15 @@ static void wb_shutdown(struct bdi_writeback *wb)
+ 	spin_lock_bh(&wb->work_lock);
+ 	if (!test_and_clear_bit(WB_registered, &wb->state)) {
+ 		spin_unlock_bh(&wb->work_lock);
++		/*
++		 * Wait for wb shutdown to finish if someone else is just
++		 * running wb_shutdown(). Otherwise we could proceed to wb /
++		 * bdi destruction before wb_shutdown() is finished.
++		 */
++		wait_on_bit(&wb->state, WB_shutting_down, TASK_UNINTERRUPTIBLE);
+ 		return;
+ 	}
++	set_bit(WB_shutting_down, &wb->state);
+ 	spin_unlock_bh(&wb->work_lock);
+ 
+ 	cgwb_remove_from_bdi_list(wb);
+@@ -369,6 +376,12 @@ static void wb_shutdown(struct bdi_writeback *wb)
+ 	mod_delayed_work(bdi_wq, &wb->dwork, 0);
+ 	flush_delayed_work(&wb->dwork);
+ 	WARN_ON(!list_empty(&wb->work_list));
++	/*
++	 * Make sure bit gets cleared after shutdown is finished. Matches with
++	 * the barrier provided by test_and_clear_bit() above.
++	 */
++	smp_wmb();
++	clear_bit(WB_shutting_down, &wb->state);
  }
  
--/**
-- * sd_setup_discard_cmnd - unmap blocks on thinly provisioned device
-- * @sdp: scsi device to operate on
-- * @rq: Request to prepare
-- *
-- * Will issue either UNMAP or WRITE SAME(16) depending on preference
-- * indicated by target device.
-- **/
--static int sd_setup_discard_cmnd(struct scsi_cmnd *cmd)
-+static int sd_setup_unmap_cmnd(struct scsi_cmnd *cmd)
+ static void wb_exit(struct bdi_writeback *wb)
+@@ -699,12 +712,21 @@ static void cgwb_bdi_destroy(struct backing_dev_info *bdi)
  {
--	struct request *rq = cmd->request;
- 	struct scsi_device *sdp = cmd->device;
--	struct scsi_disk *sdkp = scsi_disk(rq->rq_disk);
--	sector_t sector = blk_rq_pos(rq);
--	unsigned int nr_sectors = blk_rq_sectors(rq);
--	unsigned int len;
--	int ret;
-+	struct request *rq = cmd->request;
-+	u64 sector = blk_rq_pos(rq) >> (ilog2(sdp->sector_size) - 9);
-+	u32 nr_sectors = blk_rq_sectors(rq) >> (ilog2(sdp->sector_size) - 9);
-+	unsigned int data_len = 24;
- 	char *buf;
--	struct page *page;
+ 	struct radix_tree_iter iter;
+ 	void **slot;
++	struct bdi_writeback *wb;
  
--	sector >>= ilog2(sdp->sector_size) - 9;
--	nr_sectors >>= ilog2(sdp->sector_size) - 9;
--
--	page = alloc_page(GFP_ATOMIC | __GFP_ZERO);
--	if (!page)
-+	rq->special_vec.bv_page = alloc_page(GFP_ATOMIC | __GFP_ZERO);
-+	if (!rq->special_vec.bv_page)
- 		return BLKPREP_DEFER;
-+	rq->special_vec.bv_offset = 0;
-+	rq->special_vec.bv_len = data_len;
-+	rq->rq_flags |= RQF_SPECIAL_PAYLOAD;
+ 	WARN_ON(test_bit(WB_registered, &bdi->wb.state));
  
--	switch (sdkp->provisioning_mode) {
--	case SD_LBP_UNMAP:
--		buf = page_address(page);
--
--		cmd->cmd_len = 10;
--		cmd->cmnd[0] = UNMAP;
--		cmd->cmnd[8] = 24;
--
--		put_unaligned_be16(6 + 16, &buf[0]);
--		put_unaligned_be16(16, &buf[2]);
--		put_unaligned_be64(sector, &buf[8]);
--		put_unaligned_be32(nr_sectors, &buf[16]);
-+	cmd->cmd_len = 10;
-+	cmd->cmnd[0] = UNMAP;
-+	cmd->cmnd[8] = 24;
- 
--		len = 24;
--		break;
-+	buf = page_address(rq->special_vec.bv_page);
-+	put_unaligned_be16(6 + 16, &buf[0]);
-+	put_unaligned_be16(16, &buf[2]);
-+	put_unaligned_be64(sector, &buf[8]);
-+	put_unaligned_be32(nr_sectors, &buf[16]);
- 
--	case SD_LBP_WS16:
--		cmd->cmd_len = 16;
--		cmd->cmnd[0] = WRITE_SAME_16;
--		cmd->cmnd[1] = 0x8; /* UNMAP */
--		put_unaligned_be64(sector, &cmd->cmnd[2]);
--		put_unaligned_be32(nr_sectors, &cmd->cmnd[10]);
-+	cmd->allowed = SD_MAX_RETRIES;
-+	cmd->transfersize = data_len;
-+	rq->timeout = SD_TIMEOUT;
-+	scsi_req(rq)->resid_len = data_len;
- 
--		len = sdkp->device->sector_size;
--		break;
-+	return scsi_init_io(cmd);
-+}
- 
--	case SD_LBP_WS10:
--	case SD_LBP_ZERO:
--		cmd->cmd_len = 10;
--		cmd->cmnd[0] = WRITE_SAME;
--		if (sdkp->provisioning_mode == SD_LBP_WS10)
--			cmd->cmnd[1] = 0x8; /* UNMAP */
--		put_unaligned_be32(sector, &cmd->cmnd[2]);
--		put_unaligned_be16(nr_sectors, &cmd->cmnd[7]);
-+static int sd_setup_write_same16_cmnd(struct scsi_cmnd *cmd)
-+{
-+	struct scsi_device *sdp = cmd->device;
-+	struct request *rq = cmd->request;
-+	u64 sector = blk_rq_pos(rq) >> (ilog2(sdp->sector_size) - 9);
-+	u32 nr_sectors = blk_rq_sectors(rq) >> (ilog2(sdp->sector_size) - 9);
-+	u32 data_len = sdp->sector_size;
- 
--		len = sdkp->device->sector_size;
--		break;
-+	rq->special_vec.bv_page = alloc_page(GFP_ATOMIC | __GFP_ZERO);
-+	if (!rq->special_vec.bv_page)
-+		return BLKPREP_DEFER;
-+	rq->special_vec.bv_offset = 0;
-+	rq->special_vec.bv_len = data_len;
-+	rq->rq_flags |= RQF_SPECIAL_PAYLOAD;
- 
--	default:
--		ret = BLKPREP_INVALID;
--		goto out;
--	}
-+	cmd->cmd_len = 16;
-+	cmd->cmnd[0] = WRITE_SAME_16;
-+	cmd->cmnd[1] = 0x8; /* UNMAP */
-+	put_unaligned_be64(sector, &cmd->cmnd[2]);
-+	put_unaligned_be32(nr_sectors, &cmd->cmnd[10]);
- 
-+	cmd->allowed = SD_MAX_RETRIES;
-+	cmd->transfersize = data_len;
- 	rq->timeout = SD_TIMEOUT;
-+	scsi_req(rq)->resid_len = data_len;
- 
--	cmd->transfersize = len;
--	cmd->allowed = SD_MAX_RETRIES;
-+	return scsi_init_io(cmd);
-+}
- 
--	rq->special_vec.bv_page = page;
--	rq->special_vec.bv_offset = 0;
--	rq->special_vec.bv_len = len;
-+static int sd_setup_write_same10_cmnd(struct scsi_cmnd *cmd, bool unmap)
-+{
-+	struct scsi_device *sdp = cmd->device;
-+	struct request *rq = cmd->request;
-+	u64 sector = blk_rq_pos(rq) >> (ilog2(sdp->sector_size) - 9);
-+	u32 nr_sectors = blk_rq_sectors(rq) >> (ilog2(sdp->sector_size) - 9);
-+	u32 data_len = sdp->sector_size;
- 
-+	rq->special_vec.bv_page = alloc_page(GFP_ATOMIC | __GFP_ZERO);
-+	if (!rq->special_vec.bv_page)
-+		return BLKPREP_DEFER;
-+	rq->special_vec.bv_offset = 0;
-+	rq->special_vec.bv_len = data_len;
- 	rq->rq_flags |= RQF_SPECIAL_PAYLOAD;
--	scsi_req(rq)->resid_len = len;
- 
--	ret = scsi_init_io(cmd);
--out:
--	if (ret != BLKPREP_OK)
--		__free_page(page);
--	return ret;
-+	cmd->cmd_len = 10;
-+	cmd->cmnd[0] = WRITE_SAME;
-+	if (unmap)
-+		cmd->cmnd[1] = 0x8; /* UNMAP */
-+	put_unaligned_be32(sector, &cmd->cmnd[2]);
-+	put_unaligned_be16(nr_sectors, &cmd->cmnd[7]);
+ 	spin_lock_irq(&cgwb_lock);
+ 	radix_tree_for_each_slot(slot, &bdi->cgwb_tree, &iter, 0)
+ 		cgwb_kill(*slot);
 +
-+	cmd->allowed = SD_MAX_RETRIES;
-+	cmd->transfersize = data_len;
-+	rq->timeout = SD_TIMEOUT;
-+	scsi_req(rq)->resid_len = data_len;
-+
-+	return scsi_init_io(cmd);
- }
++	while (!list_empty(&bdi->wb_list)) {
++		wb = list_first_entry(&bdi->wb_list, struct bdi_writeback,
++				      bdi_node);
++		spin_unlock_irq(&cgwb_lock);
++		wb_shutdown(wb);
++		spin_lock_irq(&cgwb_lock);
++	}
+ 	spin_unlock_irq(&cgwb_lock);
  
- static void sd_config_write_same(struct scsi_disk *sdkp)
-@@ -1155,7 +1159,18 @@ static int sd_init_command(struct scsi_cmnd *cmd)
- 
- 	switch (req_op(rq)) {
- 	case REQ_OP_DISCARD:
--		return sd_setup_discard_cmnd(cmd);
-+		switch (scsi_disk(rq->rq_disk)->provisioning_mode) {
-+		case SD_LBP_UNMAP:
-+			return sd_setup_unmap_cmnd(cmd);
-+		case SD_LBP_WS16:
-+			return sd_setup_write_same16_cmnd(cmd);
-+		case SD_LBP_WS10:
-+			return sd_setup_write_same10_cmnd(cmd, true);
-+		case SD_LBP_ZERO:
-+			return sd_setup_write_same10_cmnd(cmd, false);
-+		default:
-+			return BLKPREP_INVALID;
-+		}
- 	case REQ_OP_WRITE_SAME:
- 		return sd_setup_write_same_cmnd(cmd);
- 	case REQ_OP_FLUSH:
+ 	/*
 -- 
-2.11.0
+2.10.2
