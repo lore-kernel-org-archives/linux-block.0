@@ -1,141 +1,63 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f41.google.com ([74.125.83.41]:33348 "EHLO
-        mail-pg0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753925AbdC1G3z (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Mar 2017 02:29:55 -0400
-Received: by mail-pg0-f41.google.com with SMTP id n5so55446574pgh.0
-        for <linux-block@vger.kernel.org>; Mon, 27 Mar 2017 23:29:49 -0700 (PDT)
-From: Omar Sandoval <osandov@osandov.com>
-To: Jens Axboe <axboe@fb.com>, Vivek Goyal <vgoyal@redhat.com>,
-        linux-block@vger.kernel.org
-Cc: kernel-team@fb.com, Tim Waugh <tim@cyberelk.net>
-Subject: [PATCH 2/6] parport/pd: stop sharing request queue across multiple gendisks
-Date: Mon, 27 Mar 2017 23:28:43 -0700
-Message-Id: <70d4d7b67848ee2fdcbfcf6b1accc89ac7a1659c.1490681910.git.osandov@fb.com>
-In-Reply-To: <cover.1490681910.git.osandov@fb.com>
-References: <cover.1490681910.git.osandov@fb.com>
-In-Reply-To: <cover.1490681910.git.osandov@fb.com>
-References: <cover.1490681910.git.osandov@fb.com>
+Received: from mx2.suse.de ([195.135.220.15]:45465 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751361AbdCMPOR (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 13 Mar 2017 11:14:17 -0400
+From: Jan Kara <jack@suse.cz>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
+        Tejun Heo <tj@kernel.org>, Tahsin Erdogan <tahsin@google.com>,
+        Omar Sandoval <osandov@osandov.com>, Jan Kara <jack@suse.cz>
+Subject: [PATCH 08/11] bdi: Rename cgwb_bdi_destroy() to cgwb_bdi_unregister()
+Date: Mon, 13 Mar 2017 16:14:07 +0100
+Message-Id: <20170313151410.5586-9-jack@suse.cz>
+In-Reply-To: <20170313151410.5586-1-jack@suse.cz>
+References: <20170313151410.5586-1-jack@suse.cz>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Omar Sandoval <osandov@fb.com>
+Rename cgwb_bdi_destroy() to cgwb_bdi_unregister() as it gets called
+from bdi_unregister() which is not necessarily called from bdi_destroy()
+and thus the name is somewhat misleading.
 
-Compile-tested only.
-
-Cc: Tim Waugh <tim@cyberelk.net>
-Signed-off-by: Omar Sandoval <osandov@fb.com>
+Acked-by: Tejun Heo <tj@kernel.org>
+Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- drivers/block/paride/pd.c | 50 ++++++++++++++++++++++++++++++++---------------
- 1 file changed, 34 insertions(+), 16 deletions(-)
+ mm/backing-dev.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/block/paride/pd.c b/drivers/block/paride/pd.c
-index 9cfd2e06a649..b05e151c9b38 100644
---- a/drivers/block/paride/pd.c
-+++ b/drivers/block/paride/pd.c
-@@ -381,12 +381,33 @@ static enum action do_pd_write_start(void);
- static enum action do_pd_read_drq(void);
- static enum action do_pd_write_done(void);
+diff --git a/mm/backing-dev.c b/mm/backing-dev.c
+index 8c30b1a7aae5..3ea3bbd921d6 100644
+--- a/mm/backing-dev.c
++++ b/mm/backing-dev.c
+@@ -700,7 +700,7 @@ static int cgwb_bdi_init(struct backing_dev_info *bdi)
+ 	return ret;
+ }
  
--static struct request_queue *pd_queue;
-+static int pd_queue;
- static int pd_claimed;
- 
- static struct pd_unit *pd_current; /* current request's drive */
- static PIA *pi_current; /* current request's PIA */
- 
-+static int set_next_request(void)
-+{
-+	struct gendisk *disk;
-+	struct request_queue *q;
-+	int old_pos = pd_queue;
-+
-+	do {
-+		disk = pd[pd_queue].gd;
-+		q = disk ? disk->queue : NULL;
-+		if (++pd_queue == PD_UNITS)
-+			pd_queue = 0;
-+		if (q) {
-+			pd_req = blk_fetch_request(q);
-+			if (pd_req)
-+				break;
-+		}
-+	} while (pd_queue != old_pos);
-+
-+	return pd_req != NULL;
-+}
-+
- static void run_fsm(void)
+-static void cgwb_bdi_destroy(struct backing_dev_info *bdi)
++static void cgwb_bdi_unregister(struct backing_dev_info *bdi)
  {
- 	while (1) {
-@@ -418,8 +439,7 @@ static void run_fsm(void)
- 				spin_lock_irqsave(&pd_lock, saved_flags);
- 				if (!__blk_end_request_cur(pd_req,
- 						res == Ok ? 0 : -EIO)) {
--					pd_req = blk_fetch_request(pd_queue);
--					if (!pd_req)
-+					if (!set_next_request())
- 						stop = 1;
- 				}
- 				spin_unlock_irqrestore(&pd_lock, saved_flags);
-@@ -839,7 +859,13 @@ static void pd_probe_drive(struct pd_unit *disk)
- 	p->first_minor = (disk - pd) << PD_BITS;
- 	disk->gd = p;
- 	p->private_data = disk;
--	p->queue = pd_queue;
-+	p->queue = blk_init_queue(do_pd_request, &pd_lock);
-+	if (!p->queue) {
-+		disk->gd = NULL;
-+		put_disk(p);
-+		return;
-+	}
-+	blk_queue_max_hw_sectors(p->queue, cluster);
- 
- 	if (disk->drive == -1) {
- 		for (disk->drive = 0; disk->drive <= 1; disk->drive++)
-@@ -919,26 +945,18 @@ static int __init pd_init(void)
- 	if (disable)
- 		goto out1;
- 
--	pd_queue = blk_init_queue(do_pd_request, &pd_lock);
--	if (!pd_queue)
--		goto out1;
--
--	blk_queue_max_hw_sectors(pd_queue, cluster);
--
- 	if (register_blkdev(major, name))
--		goto out2;
-+		goto out1;
- 
- 	printk("%s: %s version %s, major %d, cluster %d, nice %d\n",
- 	       name, name, PD_VERSION, major, cluster, nice);
- 	if (!pd_detect())
--		goto out3;
-+		goto out2;
- 
+ 	struct radix_tree_iter iter;
+ 	void **slot;
+@@ -801,7 +801,7 @@ static int cgwb_bdi_init(struct backing_dev_info *bdi)
  	return 0;
- 
--out3:
--	unregister_blkdev(major, name);
- out2:
--	blk_cleanup_queue(pd_queue);
-+	unregister_blkdev(major, name);
- out1:
- 	return -ENODEV;
- }
-@@ -953,11 +971,11 @@ static void __exit pd_exit(void)
- 		if (p) {
- 			disk->gd = NULL;
- 			del_gendisk(p);
-+			blk_cleanup_queue(p->queue);
- 			put_disk(p);
- 			pi_release(disk->pi);
- 		}
- 	}
--	blk_cleanup_queue(pd_queue);
  }
  
- MODULE_LICENSE("GPL");
+-static void cgwb_bdi_destroy(struct backing_dev_info *bdi) { }
++static void cgwb_bdi_unregister(struct backing_dev_info *bdi) { }
+ 
+ static void cgwb_bdi_exit(struct backing_dev_info *bdi)
+ {
+@@ -925,7 +925,7 @@ void bdi_unregister(struct backing_dev_info *bdi)
+ 	/* make sure nobody finds us on the bdi_list anymore */
+ 	bdi_remove_from_list(bdi);
+ 	wb_shutdown(&bdi->wb);
+-	cgwb_bdi_destroy(bdi);
++	cgwb_bdi_unregister(bdi);
+ 
+ 	if (bdi->dev) {
+ 		bdi_debug_unregister(bdi);
 -- 
-2.12.1
+2.10.2
