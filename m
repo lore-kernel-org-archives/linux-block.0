@@ -1,58 +1,65 @@
-Return-Path: <keith.busch@intel.com>
-From: Keith Busch <keith.busch@intel.com>
-To: Jens Axboe <axboe@fb.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Christoph Hellwig <hch@lst.de>,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org
-Cc: Marc MERLIN <marc@merlins.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <keith.busch@intel.com>
-Subject: [PATCH 1/3] blk-mq: Export blk_mq_freeze_queue_wait
-Date: Wed,  1 Mar 2017 14:22:10 -0500
-Message-Id: <1488396132-11369-2-git-send-email-keith.busch@intel.com>
-In-Reply-To: <1488396132-11369-1-git-send-email-keith.busch@intel.com>
-References: <1488396132-11369-1-git-send-email-keith.busch@intel.com>
+Return-Path: <jack@suse.cz>
+From: Jan Kara <jack@suse.cz>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
+	Tejun Heo <tj@kernel.org>,
+	Tahsin Erdogan <tahsin@google.com>,
+	Omar Sandoval <osandov@osandov.com>,
+	Jan Kara <jack@suse.cz>
+Subject: [PATCH 01/11] block: Fix bdi assignment to bdev inode when racing with disk delete
+Date: Mon, 13 Mar 2017 16:14:00 +0100
+Message-Id: <20170313151410.5586-2-jack@suse.cz>
+In-Reply-To: <20170313151410.5586-1-jack@suse.cz>
+References: <20170313151410.5586-1-jack@suse.cz>
 List-ID: <linux-block@vger.kernel.org>
 
-Drivers can start a freeze, so this provides a way to wait for frozen.
+When disk->fops->open() in __blkdev_get() returns -ERESTARTSYS, we
+restart the process of opening the block device. However we forget to
+switch bdev->bd_bdi back to noop_backing_dev_info and as a result bdev
+inode will be pointing to a stale bdi. Fix the problem by setting
+bdev->bd_bdi later when __blkdev_get() is already guaranteed to succeed.
 
-Signed-off-by: Keith Busch <keith.busch@intel.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
+Acked-by: Tejun Heo <tj@kernel.org>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- block/blk-mq.c         | 3 ++-
- include/linux/blk-mq.h | 1 +
- 2 files changed, 3 insertions(+), 1 deletion(-)
+ fs/block_dev.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 94593c6..8da2c04 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -75,10 +75,11 @@ void blk_mq_freeze_queue_start(struct request_queue *q)
- }
- EXPORT_SYMBOL_GPL(blk_mq_freeze_queue_start);
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index 2eca00ec4370..53e2389ae4d4 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -1556,8 +1556,6 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
+ 		bdev->bd_disk = disk;
+ 		bdev->bd_queue = disk->queue;
+ 		bdev->bd_contains = bdev;
+-		if (bdev->bd_bdi == &noop_backing_dev_info)
+-			bdev->bd_bdi = bdi_get(disk->queue->backing_dev_info);
  
--static void blk_mq_freeze_queue_wait(struct request_queue *q)
-+void blk_mq_freeze_queue_wait(struct request_queue *q)
- {
- 	wait_event(q->mq_freeze_wq, percpu_ref_is_zero(&q->q_usage_counter));
- }
-+EXPORT_SYMBOL_GPL(blk_mq_freeze_queue_wait);
- 
- /*
-  * Guarantee no request is in use, so we can change any data structure of
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 001d30d..8dacf68 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -245,6 +245,7 @@ void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
- void blk_mq_freeze_queue(struct request_queue *q);
- void blk_mq_unfreeze_queue(struct request_queue *q);
- void blk_mq_freeze_queue_start(struct request_queue *q);
-+void blk_mq_freeze_queue_wait(struct request_queue *q);
- int blk_mq_reinit_tagset(struct blk_mq_tag_set *set);
- 
- int blk_mq_map_queues(struct blk_mq_tag_set *set);
+ 		if (!partno) {
+ 			ret = -ENXIO;
+@@ -1622,6 +1620,9 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
+ 			}
+ 			bd_set_size(bdev, (loff_t)bdev->bd_part->nr_sects << 9);
+ 		}
++
++		if (bdev->bd_bdi == &noop_backing_dev_info)
++			bdev->bd_bdi = bdi_get(disk->queue->backing_dev_info);
+ 	} else {
+ 		if (bdev->bd_contains == bdev) {
+ 			ret = 0;
+@@ -1653,8 +1654,6 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
+ 	bdev->bd_disk = NULL;
+ 	bdev->bd_part = NULL;
+ 	bdev->bd_queue = NULL;
+-	bdi_put(bdev->bd_bdi);
+-	bdev->bd_bdi = &noop_backing_dev_info;
+ 	if (bdev != bdev->bd_contains)
+ 		__blkdev_put(bdev->bd_contains, mode, 1);
+ 	bdev->bd_contains = NULL;
 -- 
-2.5.5
+2.10.2
