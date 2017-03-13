@@ -1,149 +1,84 @@
-Return-Path: <htejun@gmail.com>
-Return-Path: <htejun@gmail.com>
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Tue, 21 Mar 2017 12:19:07 -0400
-From: Tejun Heo <tj@kernel.org>
-To: Jan Kara <jack@suse.cz>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+Return-Path: <jack@suse.cz>
+From: Jan Kara <jack@suse.cz>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
 	Christoph Hellwig <hch@infradead.org>,
 	Dan Williams <dan.j.williams@intel.com>,
 	Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
+	Tejun Heo <tj@kernel.org>,
 	Tahsin Erdogan <tahsin@google.com>,
-	Omar Sandoval <osandov@osandov.com>
-Subject: Re: [PATCH 02/11] block: Fix race of bdev open with gendisk shutdown
-Message-ID: <20170321161907.GB30919@htj.duckdns.org>
+	Omar Sandoval <osandov@osandov.com>,
+	Jan Kara <jack@suse.cz>
+Subject: [PATCH 02/11] block: Fix race of bdev open with gendisk shutdown
+Date: Mon, 13 Mar 2017 16:14:01 +0100
+Message-Id: <20170313151410.5586-3-jack@suse.cz>
+In-Reply-To: <20170313151410.5586-1-jack@suse.cz>
 References: <20170313151410.5586-1-jack@suse.cz>
- <20170313151410.5586-3-jack@suse.cz>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170313151410.5586-3-jack@suse.cz>
 List-ID: <linux-block@vger.kernel.org>
 
-Hello, Jan.
+blkdev_open() may race with gendisk shutdown in two different ways.
+Either del_gendisk() has already unhashed block device inode (and thus
+bd_acquire() will end up creating new block device inode) however
+gen_gendisk() will still return the gendisk that is being destroyed.
+Or bdev returned by bd_acquire() will get unhashed and gendisk destroyed
+before we get to get_gendisk() and get_gendisk() will return new gendisk
+that got allocated for device that reused the device number.
 
-On Mon, Mar 13, 2017 at 04:14:01PM +0100, Jan Kara wrote:
-> blkdev_open() may race with gendisk shutdown in two different ways.
-> Either del_gendisk() has already unhashed block device inode (and thus
-> bd_acquire() will end up creating new block device inode) however
-> gen_gendisk() will still return the gendisk that is being destroyed.
-> Or bdev returned by bd_acquire() will get unhashed and gendisk destroyed
-> before we get to get_gendisk() and get_gendisk() will return new gendisk
-> that got allocated for device that reused the device number.
-> 
-> In both cases this will result in possible inconsistencies between
-> bdev->bd_disk and bdev->bd_bdi (in the first case after gendisk gets
-> destroyed and device number reused, in the second case immediately).
-> 
-> Fix the problem by checking whether the gendisk is still alive and inode
-> hashed when associating bdev inode with it and its bdi. That way we are
-> sure that we will not associate bdev inode with disk that got past
-> blk_unregister_region() in del_gendisk() (and thus device number can get
-> reused). Similarly, we will not associate bdev that was once associated
-> with gendisk that is going away (and thus the corresponding bdev inode
-> will get unhashed in del_gendisk()) with a new gendisk that is just
-> reusing the device number.
-> 
-> Also add a warning that will tell us about unexpected inconsistencies
-> between bdi associated with the bdev inode and bdi associated with the
-> disk.
+In both cases this will result in possible inconsistencies between
+bdev->bd_disk and bdev->bd_bdi (in the first case after gendisk gets
+destroyed and device number reused, in the second case immediately).
 
-Hmm... let's see if I got this straight.
+Fix the problem by checking whether the gendisk is still alive and inode
+hashed when associating bdev inode with it and its bdi. That way we are
+sure that we will not associate bdev inode with disk that got past
+blk_unregister_region() in del_gendisk() (and thus device number can get
+reused). Similarly, we will not associate bdev that was once associated
+with gendisk that is going away (and thus the corresponding bdev inode
+will get unhashed in del_gendisk()) with a new gendisk that is just
+reusing the device number.
 
-It used to be that blockdevs are essentially stateless while nobody
-has it open.  It acquires all its actual associations during the
-initial open and loses them on the last release.  The immediate
-release semantics got us into trouble because upper layers had nothing
-to serve as the proper sever point when the underlying qblock device
-goes away.
+Also add a warning that will tell us about unexpected inconsistencies
+between bdi associated with the bdev inode and bdi associated with the
+disk.
 
-So, we decided that bdi should serve that purpose, which makes perfect
-sense as it's what upper layers talk to when they wanna reach to the
-block device, so we decoupled its lifetime from the request_queue and
-implements sever there.
+Signed-off-by: Jan Kara <jack@suse.cz>
+---
+ fs/block_dev.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-Now that bdis are persistent, we can solve bdev-access-while-not-open
-problem by making bdi point to the respective bdi from the beginning
-until it's released, which means that bdevs are now stateful objects
-which are associated with specific bdis and thus request_queues.
-
-Because there are multiple ways that these objects are looked up and
-handled, now we can get into situations where the request_queue
-(gendisk) we look up during open may not match the bdi that a bdev is
-associated with, and this patch solves that problem by detecting the
-conditions where these mismatches would take place.  More
-specifically, we don't want to be using a dead bdev during open.
-
-If I misunderstood something, please let me know.
-
-> diff --git a/fs/block_dev.c b/fs/block_dev.c
-> index 53e2389ae4d4..5ec8750f5332 100644
-> --- a/fs/block_dev.c
-> +++ b/fs/block_dev.c
-> @@ -1560,7 +1560,8 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
->  		if (!partno) {
->  			ret = -ENXIO;
->  			bdev->bd_part = disk_get_part(disk, partno);
-> -			if (!bdev->bd_part)
-> +			if (!(disk->flags & GENHD_FL_UP) || !bdev->bd_part ||
-> +			    inode_unhashed(bdev->bd_inode))
->  				goto out_clear;
-
-This adds both GENHD_FL_UP and unhashed testing; however, I'm not sure
-whether the former is meaningful here.  GENHD flag updates are not
-synchronized when seen from outside the party which is updating it.
-The actual synchronization against dead device should happen inside
-disk->fops->open().
-
->  			ret = 0;
-> @@ -1614,7 +1615,8 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
->  			bdev->bd_contains = whole;
->  			bdev->bd_part = disk_get_part(disk, partno);
->  			if (!(disk->flags & GENHD_FL_UP) ||
-> -			    !bdev->bd_part || !bdev->bd_part->nr_sects) {
-> +			    !bdev->bd_part || !bdev->bd_part->nr_sects ||
-> +			    inode_unhashed(bdev->bd_inode)) {
->  				ret = -ENXIO;
->  				goto out_clear;
->  			}
-
-Which is different from here.  As the device is already open, we're
-just incrementing the ref before granting another open without
-consulting the driver.  As the device is open already, whether
-granting a new ref or not can't break anything.  Block layer is just
-doing a best effort thing to not give out new ref on a dead one with
-the UP test, which is completely fine.
-
-> @@ -1623,6 +1625,9 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
->  
->  		if (bdev->bd_bdi == &noop_backing_dev_info)
->  			bdev->bd_bdi = bdi_get(disk->queue->backing_dev_info);
-> +		else
-> +			WARN_ON_ONCE(bdev->bd_bdi !=
-> +				     disk->queue->backing_dev_info);
-
-While I can't think of cases where this wouldn't work, it seems a bit
-roundabout to me.
-
-* A bdi is the object which knows which request_queue it's associated
-  and when that association dies.
-
-* bdev is permanently associated with a bdi.
-
-So, it's kinda weird to look up the request_queue again on each open
-and then verify that the bd_bdi and request_queue match.  I think it
-would make more sense to skip disk look up and just go through bdi to
-determine the associated request_queue as that's the primary nexus
-object tying everything up now.
-
-That said, it's totally possible that that would take too much
-restructuring to implement right now with everything else, but if we
-think that that's the right long term direction, I think it would make
-more sense to just test whether bdev->bd_bdi matches the disk right
-after looking up the disk and fail the open if not.  That's the
-ultimate condition we wanna avoid after all and it also would ease
-replacing it with going through bdi instead of looking up again.
-
-Thanks.
-
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index 53e2389ae4d4..5ec8750f5332 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -1560,7 +1560,8 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
+ 		if (!partno) {
+ 			ret = -ENXIO;
+ 			bdev->bd_part = disk_get_part(disk, partno);
+-			if (!bdev->bd_part)
++			if (!(disk->flags & GENHD_FL_UP) || !bdev->bd_part ||
++			    inode_unhashed(bdev->bd_inode))
+ 				goto out_clear;
+ 
+ 			ret = 0;
+@@ -1614,7 +1615,8 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
+ 			bdev->bd_contains = whole;
+ 			bdev->bd_part = disk_get_part(disk, partno);
+ 			if (!(disk->flags & GENHD_FL_UP) ||
+-			    !bdev->bd_part || !bdev->bd_part->nr_sects) {
++			    !bdev->bd_part || !bdev->bd_part->nr_sects ||
++			    inode_unhashed(bdev->bd_inode)) {
+ 				ret = -ENXIO;
+ 				goto out_clear;
+ 			}
+@@ -1623,6 +1625,9 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
+ 
+ 		if (bdev->bd_bdi == &noop_backing_dev_info)
+ 			bdev->bd_bdi = bdi_get(disk->queue->backing_dev_info);
++		else
++			WARN_ON_ONCE(bdev->bd_bdi !=
++				     disk->queue->backing_dev_info);
+ 	} else {
+ 		if (bdev->bd_contains == bdev) {
+ 			ret = 0;
 -- 
-tejun
+2.10.2
