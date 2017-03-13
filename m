@@ -1,53 +1,78 @@
-Return-Path: <rgoldwyn@suse.de>
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-To: linux-fsdevel@vger.kernel.org
-Cc: jack@suse.com,
-	hch@infradead.org,
-	linux-block@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	sagi@grimberg.me,
-	avi@scylladb.com,
-	axboe@kernel.dk,
-	linux-api@vger.kernel.org,
-	willy@infradead.org,
-	Goldwyn Rodrigues <rgoldwyn@suse.com>
-Subject: [PATCH 2/8] nowait aio: Return if cannot get hold of i_rwsem
-Date: Wed, 15 Mar 2017 16:51:01 -0500
-Message-Id: <20170315215107.5628-3-rgoldwyn@suse.de>
-In-Reply-To: <20170315215107.5628-1-rgoldwyn@suse.de>
-References: <20170315215107.5628-1-rgoldwyn@suse.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wr0-f193.google.com ([209.85.128.193]:33585 "EHLO
+        mail-wr0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753722AbdCMVqH (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 13 Mar 2017 17:46:07 -0400
+Received: by mail-wr0-f193.google.com with SMTP id g10so21724137wrg.0
+        for <linux-block@vger.kernel.org>; Mon, 13 Mar 2017 14:46:06 -0700 (PDT)
+Subject: Re: NULL deref in cpu hot unplug on jens for-linus branch
+To: Jens Axboe <axboe@fb.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        linux-nvme <linux-nvme@lists.infradead.org>
+References: <a4e0cb7c-c779-b681-e66c-2159c5f2b09f@grimberg.me>
+ <54f833f1-ab98-5d22-e7d4-5e6059a4c467@fb.com>
+From: Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <f6f85d2f-ac94-874e-e247-ccf9ffbe4b9e@grimberg.me>
+Date: Mon, 13 Mar 2017 23:46:02 +0200
+MIME-Version: 1.0
+In-Reply-To: <54f833f1-ab98-5d22-e7d4-5e6059a4c467@fb.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Goldwyn Rodrigues <rgoldwyn@suse.com>
 
-A failure to lock i_rwsem would mean there is I/O being performed
-by another thread. So, let's bail.
+> Are you saying your code works on top of 4.11-rc2, but not on top of my
+> for-linus?
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
----
- mm/filemap.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+I was actually on Linus 4.11-rc1 before I rebased on top of your
+for-linus.
 
-diff --git a/mm/filemap.c b/mm/filemap.c
-index 1694623..e08f3b9 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -2982,7 +2982,12 @@ ssize_t generic_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
- 	struct inode *inode = file->f_mapping->host;
- 	ssize_t ret;
- 
--	inode_lock(inode);
-+	if (!inode_trylock(inode)) {
-+		/* Don't sleep on inode rwsem */
-+		if (iocb->ki_flags & IOCB_NOWAIT)
-+			return -EAGAIN;
-+		inode_lock(inode);
-+	}
- 	ret = generic_write_checks(iocb, from);
- 	if (ret > 0)
- 		ret = __generic_file_write_iter(iocb, from);
--- 
-2.10.2
+> That seems odd. Looking at the oops, you are crashing with
+> !tags in __blk_mq_tag_idle. The below should work around it, but I'm
+> puzzled why this is new.
+
+I got it just once (out of a single run :)), but maybe it is
+possible that its racy and not really new.
+
+But another example where this can happen:
+blk_mq_realloc_hw_ctxs explicitly checks on hctx->tags != NULL
+but right after calls blk_mq_exit_hctx() which goes in the
+same route, won't this happen there too? Or is it assumed that
+hctx->state does not have BLK_MQ_S_TAG_ACTIVE on here?
+
+> Is it related to the other path you fixed in this patch:
+>
+> commit 0067d4b020ea07a58540acb2c5fcd3364bf326e0
+> Author: Sagi Grimberg <sagi@grimberg.me>
+> Date:   Mon Mar 13 16:10:11 2017 +0200
+>
+>     blk-mq: Fix tagset reinit in the presence of cpu hot-unplug
+>
+> Since that's also handling hctx->tags == NULL.
+
+The above patch prevented a NULL deref earlier when the
+tags were reinitialized, now we are all setup and we
+happen to remove an old namespace.
+
+> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+> index 9d97bfc4d465..1283f74bfdfb 100644
+> --- a/block/blk-mq-tag.c
+> +++ b/block/blk-mq-tag.c
+> @@ -54,9 +54,11 @@ void __blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx)
+>  	if (!test_and_clear_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
+>  		return;
+>
+> -	atomic_dec(&tags->active_queues);
+> +	if (tags) {
+> +		atomic_dec(&tags->active_queues);
+>
+> -	blk_mq_tag_wakeup_all(tags, false);
+> +		blk_mq_tag_wakeup_all(tags, false);
+> +	}
+>  }
+>
+>  /*
+>
+
+I'll see if I can test it out later this week. thanks.
