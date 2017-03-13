@@ -1,39 +1,50 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <bart.vanassche@sandisk.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, "Martin K . Petersen"
-	<martin.petersen@oracle.com>, James Bottomley
-	<James.Bottomley@HansenPartnership.com>, Bart Van Assche
-	<bart.vanassche@sandisk.com>
-Subject: [PATCH 0/3] Avoid that scsi-mq queue processing stalls
-Date: Fri, 31 Mar 2017 16:12:02 -0700
-Message-ID: <20170331231205.16640-1-bart.vanassche@sandisk.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:24160 "EHLO
+        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752313AbdCMOXR (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 13 Mar 2017 10:23:17 -0400
+From: Umesh Patel <Umesh.Patel@wdc.com>
+To: Christoph Hellwig <hch@infradead.org>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: RE: blk_init_queue vs blk_alloc_queue
+Date: Mon, 13 Mar 2017 14:23:13 +0000
+Message-ID: <CY1PR0401MB1353DF0CD31F0D4FAC7C3EA3E1250@CY1PR0401MB1353.namprd04.prod.outlook.com>
+References: <CY1PR0401MB1353F4C37A081FCB3E6E145EE1250@CY1PR0401MB1353.namprd04.prod.outlook.com>
+ <20170313133629.GA29232@infradead.org>
+In-Reply-To: <20170313133629.GA29232@infradead.org>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: Bart.VanAssche@sandisk.com
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Hello Jens,
+Currently we are using below API to initialize request queues for our devic=
+e which is not calling blk_queue_split. But there is one more function blk_=
+init_queues which is internally calling blk_queue_split.=20
+So I was thinking to replace blk_alloc_queue with blk_init_queue but since =
+I was not aware of impact I shoot this mail.
+I wanted to use blk_queue_split to split BIO that block layer is sending si=
+nce it it too large.
 
-The three patches in this patch series fix the queue lockup I reported
-a few days ago on the linux-block mailing list. Please consider these
-patches for kernel v4.11.
 
-Thanks,
+Thx
 
-Bart.
 
-Bart Van Assche (3):
-  blk-mq: Introduce blk_mq_ops.restart_queues
-  scsi: Add scsi_restart_queues()
-  scsi: Ensure that scsi_run_queue() runs all hardware queues
+dev->osdev.queue =3D blk_alloc_queue(GFP_KERNEL);
 
- block/blk-mq-sched.c    | 11 +++--------
- block/blk-mq-sched.h    | 14 --------------
- drivers/scsi/scsi_lib.c | 20 +++++++++++++++++---
- include/linux/blk-mq.h  |  4 ++++
- include/linux/blkdev.h  |  1 -
- 5 files changed, 24 insertions(+), 26 deletions(-)
+-----Original Message-----
+From: Christoph Hellwig [mailto:hch@infradead.org]=20
+Sent: Monday, March 13, 2017 7:06 PM
+To: Umesh Patel
+Cc: linux-block@vger.kernel.org
+Subject: Re: blk_init_queue vs blk_alloc_queue
 
--- 
-2.12.0
+On Mon, Mar 13, 2017 at 09:14:12AM +0000, Umesh Patel wrote:
+> Hello,
+>=20
+> I Would like to know difference between blk_init_queue and blk_alloc_queu=
+e API.
+> Can anyone explain when to use what ?
+
+The short answer is that you should neither.  The long answer is that you s=
+hould send a link to your driver source if you want anyone to help you.
