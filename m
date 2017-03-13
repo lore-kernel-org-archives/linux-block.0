@@ -1,158 +1,117 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f177.google.com ([209.85.192.177]:36020 "EHLO
-        mail-pf0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753034AbdCNVEb (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Mar 2017 17:04:31 -0400
-Received: by mail-pf0-f177.google.com with SMTP id o126so75584444pfb.3
-        for <linux-block@vger.kernel.org>; Tue, 14 Mar 2017 14:04:30 -0700 (PDT)
-From: Omar Sandoval <osandov@osandov.com>
-To: linux-block@vger.kernel.org
-Cc: kernel-team@fb.com
-Subject: [PATCH 1/4] block: tear out blk-stat debugfs/sysfs entries
-Date: Tue, 14 Mar 2017 14:03:28 -0700
-Message-Id: <d6844f36f6d54c021e411068165a5b163031628f.1489524591.git.osandov@fb.com>
-In-Reply-To: <cover.1489524591.git.osandov@fb.com>
-References: <cover.1489524591.git.osandov@fb.com>
-In-Reply-To: <cover.1489524591.git.osandov@fb.com>
-References: <cover.1489524591.git.osandov@fb.com>
+Received: from mx2.suse.de ([195.135.220.15]:45470 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751409AbdCMPOS (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 13 Mar 2017 11:14:18 -0400
+From: Jan Kara <jack@suse.cz>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
+        Tejun Heo <tj@kernel.org>, Tahsin Erdogan <tahsin@google.com>,
+        Omar Sandoval <osandov@osandov.com>, Jan Kara <jack@suse.cz>
+Subject: [PATCH 07/11] bdi: Do not wait for cgwbs release in bdi_unregister()
+Date: Mon, 13 Mar 2017 16:14:06 +0100
+Message-Id: <20170313151410.5586-8-jack@suse.cz>
+In-Reply-To: <20170313151410.5586-1-jack@suse.cz>
+References: <20170313151410.5586-1-jack@suse.cz>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Omar Sandoval <osandov@fb.com>
+Currently we wait for all cgwbs to get released in cgwb_bdi_destroy()
+(called from bdi_unregister()). That is however unnecessary now when
+cgwb->bdi is a proper refcounted reference (thus bdi cannot get
+released before all cgwbs are released) and when cgwb_bdi_destroy()
+shuts down writeback directly.
 
-These made sense when there was a single stats buffer for the request
-queue, but that's going away.
-
-Signed-off-by: Omar Sandoval <osandov@fb.com>
+Acked-by: Tejun Heo <tj@kernel.org>
+Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- block/blk-mq-debugfs.c | 55 --------------------------------------------------
- block/blk-sysfs.c      | 26 ------------------------
- 2 files changed, 81 deletions(-)
+ include/linux/backing-dev-defs.h |  1 -
+ mm/backing-dev.c                 | 22 +---------------------
+ 2 files changed, 1 insertion(+), 22 deletions(-)
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index f6d917977b33..18672225c417 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -322,60 +322,6 @@ static const struct file_operations hctx_io_poll_fops = {
- 	.release	= single_release,
- };
+diff --git a/include/linux/backing-dev-defs.h b/include/linux/backing-dev-defs.h
+index 8af720f22a2d..e66d4722db8e 100644
+--- a/include/linux/backing-dev-defs.h
++++ b/include/linux/backing-dev-defs.h
+@@ -164,7 +164,6 @@ struct backing_dev_info {
+ #ifdef CONFIG_CGROUP_WRITEBACK
+ 	struct radix_tree_root cgwb_tree; /* radix tree of active cgroup wbs */
+ 	struct rb_root cgwb_congested_tree; /* their congested states */
+-	atomic_t usage_cnt; /* counts both cgwbs and cgwb_contested's */
+ #else
+ 	struct bdi_writeback_congested *wb_congested;
+ #endif
+diff --git a/mm/backing-dev.c b/mm/backing-dev.c
+index b67be4fc12c4..8c30b1a7aae5 100644
+--- a/mm/backing-dev.c
++++ b/mm/backing-dev.c
+@@ -406,11 +406,9 @@ static void wb_exit(struct bdi_writeback *wb)
+ /*
+  * cgwb_lock protects bdi->cgwb_tree, bdi->cgwb_congested_tree,
+  * blkcg->cgwb_list, and memcg->cgwb_list.  bdi->cgwb_tree is also RCU
+- * protected.  cgwb_release_wait is used to wait for the completion of cgwb
+- * releases from bdi destruction path.
++ * protected.
+  */
+ static DEFINE_SPINLOCK(cgwb_lock);
+-static DECLARE_WAIT_QUEUE_HEAD(cgwb_release_wait);
  
--static void print_stat(struct seq_file *m, struct blk_rq_stat *stat)
--{
--	seq_printf(m, "samples=%d, mean=%lld, min=%llu, max=%llu",
--		   stat->nr_samples, stat->mean, stat->min, stat->max);
--}
--
--static int hctx_stats_show(struct seq_file *m, void *v)
--{
--	struct blk_mq_hw_ctx *hctx = m->private;
--	struct blk_rq_stat stat[2];
--
--	blk_stat_init(&stat[BLK_STAT_READ]);
--	blk_stat_init(&stat[BLK_STAT_WRITE]);
--
--	blk_hctx_stat_get(hctx, stat);
--
--	seq_puts(m, "read: ");
--	print_stat(m, &stat[BLK_STAT_READ]);
--	seq_puts(m, "\n");
--
--	seq_puts(m, "write: ");
--	print_stat(m, &stat[BLK_STAT_WRITE]);
--	seq_puts(m, "\n");
--	return 0;
--}
--
--static int hctx_stats_open(struct inode *inode, struct file *file)
--{
--	return single_open(file, hctx_stats_show, inode->i_private);
--}
--
--static ssize_t hctx_stats_write(struct file *file, const char __user *buf,
--				size_t count, loff_t *ppos)
--{
--	struct seq_file *m = file->private_data;
--	struct blk_mq_hw_ctx *hctx = m->private;
--	struct blk_mq_ctx *ctx;
--	int i;
--
--	hctx_for_each_ctx(hctx, ctx, i) {
--		blk_stat_init(&ctx->stat[BLK_STAT_READ]);
--		blk_stat_init(&ctx->stat[BLK_STAT_WRITE]);
--	}
--	return count;
--}
--
--static const struct file_operations hctx_stats_fops = {
--	.open		= hctx_stats_open,
--	.read		= seq_read,
--	.write		= hctx_stats_write,
--	.llseek		= seq_lseek,
--	.release	= single_release,
--};
--
- static int hctx_dispatched_show(struct seq_file *m, void *v)
+ /**
+  * wb_congested_get_create - get or create a wb_congested
+@@ -505,7 +503,6 @@ static void cgwb_release_workfn(struct work_struct *work)
  {
- 	struct blk_mq_hw_ctx *hctx = m->private;
-@@ -646,7 +592,6 @@ static const struct blk_mq_debugfs_attr blk_mq_debugfs_hctx_attrs[] = {
- 	{"sched_tags", 0400, &hctx_sched_tags_fops},
- 	{"sched_tags_bitmap", 0400, &hctx_sched_tags_bitmap_fops},
- 	{"io_poll", 0600, &hctx_io_poll_fops},
--	{"stats", 0600, &hctx_stats_fops},
- 	{"dispatched", 0600, &hctx_dispatched_fops},
- 	{"queued", 0600, &hctx_queued_fops},
- 	{"run", 0600, &hctx_run_fops},
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index c44b321335f3..6e1cf622af21 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -503,26 +503,6 @@ static ssize_t queue_dax_show(struct request_queue *q, char *page)
- 	return queue_var_show(blk_queue_dax(q), page);
+ 	struct bdi_writeback *wb = container_of(work, struct bdi_writeback,
+ 						release_work);
+-	struct backing_dev_info *bdi = wb->bdi;
+ 
+ 	wb_shutdown(wb);
+ 
+@@ -516,9 +513,6 @@ static void cgwb_release_workfn(struct work_struct *work)
+ 	percpu_ref_exit(&wb->refcnt);
+ 	wb_exit(wb);
+ 	kfree_rcu(wb, rcu);
+-
+-	if (atomic_dec_and_test(&bdi->usage_cnt))
+-		wake_up_all(&cgwb_release_wait);
  }
  
--static ssize_t print_stat(char *page, struct blk_rq_stat *stat, const char *pre)
--{
--	return sprintf(page, "%s samples=%llu, mean=%lld, min=%lld, max=%lld\n",
--			pre, (long long) stat->nr_samples,
--			(long long) stat->mean, (long long) stat->min,
--			(long long) stat->max);
--}
--
--static ssize_t queue_stats_show(struct request_queue *q, char *page)
--{
--	struct blk_rq_stat stat[2];
--	ssize_t ret;
--
--	blk_queue_stat_get(q, stat);
--
--	ret = print_stat(page, &stat[BLK_STAT_READ], "read :");
--	ret += print_stat(page + ret, &stat[BLK_STAT_WRITE], "write:");
--	return ret;
--}
--
- static struct queue_sysfs_entry queue_requests_entry = {
- 	.attr = {.name = "nr_requests", .mode = S_IRUGO | S_IWUSR },
- 	.show = queue_requests_show,
-@@ -691,11 +671,6 @@ static struct queue_sysfs_entry queue_dax_entry = {
- 	.show = queue_dax_show,
- };
+ static void cgwb_release(struct percpu_ref *refcnt)
+@@ -608,7 +602,6 @@ static int cgwb_create(struct backing_dev_info *bdi,
+ 		/* we might have raced another instance of this function */
+ 		ret = radix_tree_insert(&bdi->cgwb_tree, memcg_css->id, wb);
+ 		if (!ret) {
+-			atomic_inc(&bdi->usage_cnt);
+ 			list_add_tail_rcu(&wb->bdi_node, &bdi->wb_list);
+ 			list_add(&wb->memcg_node, memcg_cgwb_list);
+ 			list_add(&wb->blkcg_node, blkcg_cgwb_list);
+@@ -698,7 +691,6 @@ static int cgwb_bdi_init(struct backing_dev_info *bdi)
  
--static struct queue_sysfs_entry queue_stats_entry = {
--	.attr = {.name = "stats", .mode = S_IRUGO },
--	.show = queue_stats_show,
--};
+ 	INIT_RADIX_TREE(&bdi->cgwb_tree, GFP_ATOMIC);
+ 	bdi->cgwb_congested_tree = RB_ROOT;
+-	atomic_set(&bdi->usage_cnt, 1);
+ 
+ 	ret = wb_init(&bdi->wb, bdi, 1, GFP_KERNEL);
+ 	if (!ret) {
+@@ -728,18 +720,6 @@ static void cgwb_bdi_destroy(struct backing_dev_info *bdi)
+ 		spin_lock_irq(&cgwb_lock);
+ 	}
+ 	spin_unlock_irq(&cgwb_lock);
 -
- static struct queue_sysfs_entry queue_wb_lat_entry = {
- 	.attr = {.name = "wbt_lat_usec", .mode = S_IRUGO | S_IWUSR },
- 	.show = queue_wb_lat_show,
-@@ -733,7 +708,6 @@ static struct attribute *default_attrs[] = {
- 	&queue_poll_entry.attr,
- 	&queue_wc_entry.attr,
- 	&queue_dax_entry.attr,
--	&queue_stats_entry.attr,
- 	&queue_wb_lat_entry.attr,
- 	&queue_poll_delay_entry.attr,
- 	NULL,
+-	/*
+-	 * All cgwb's must be shutdown and released before returning.  Drain
+-	 * the usage counter to wait for all cgwb's ever created on @bdi.
+-	 */
+-	atomic_dec(&bdi->usage_cnt);
+-	wait_event(cgwb_release_wait, !atomic_read(&bdi->usage_cnt));
+-	/*
+-	 * Grab back our reference so that we hold it when @bdi gets
+-	 * re-registered.
+-	 */
+-	atomic_inc(&bdi->usage_cnt);
+ }
+ 
+ /**
 -- 
-2.12.0
+2.10.2
