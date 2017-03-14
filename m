@@ -1,108 +1,59 @@
-Return-Path: <jinpu.wang@profitbricks.com>
-Return-Path: <jinpu.wang@profitbricks.com>
-From: Jack Wang <jinpu.wang@profitbricks.com>
-To: linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Cc: dledford@redhat.com,
-	axboe@kernel.dk,
-	hch@lst.de,
-	mail@fholler.de,
-	Milind.dumbare@gmail.com,
-	yun.wang@profitbricks.com,
-	Jack Wang <jinpu.wang@profitbricks.com>,
-	Kleber Souza <kleber.souza@profitbricks.com>,
-	Danil Kipnis <danil.kipnis@profitbricks.com>
-Subject: [PATCH 24/28] ibnbd_srv: add log helpers
-Date: Fri, 24 Mar 2017 11:45:39 +0100
-Message-Id: <1490352343-20075-25-git-send-email-jinpu.wangl@profitbricks.com>
-In-Reply-To: <1490352343-20075-1-git-send-email-jinpu.wangl@profitbricks.com>
-References: <1490352343-20075-1-git-send-email-jinpu.wangl@profitbricks.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pg0-f48.google.com ([74.125.83.48]:36772 "EHLO
+        mail-pg0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753134AbdCNVEc (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 14 Mar 2017 17:04:32 -0400
+Received: by mail-pg0-f48.google.com with SMTP id g2so78617157pge.3
+        for <linux-block@vger.kernel.org>; Tue, 14 Mar 2017 14:04:31 -0700 (PDT)
+From: Omar Sandoval <osandov@osandov.com>
+To: linux-block@vger.kernel.org
+Cc: kernel-team@fb.com
+Subject: [PATCH 2/4] block: remove extra calls to wbt_exit()
+Date: Tue, 14 Mar 2017 14:03:29 -0700
+Message-Id: <271bf1f64b59245a9ba25a6ec7ceeb39ae1a582e.1489524591.git.osandov@fb.com>
+In-Reply-To: <cover.1489524591.git.osandov@fb.com>
+References: <cover.1489524591.git.osandov@fb.com>
+In-Reply-To: <cover.1489524591.git.osandov@fb.com>
+References: <cover.1489524591.git.osandov@fb.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Jack Wang <jinpu.wang@profitbricks.com>
+From: Omar Sandoval <osandov@fb.com>
 
-Signed-off-by: Jack Wang <jinpu.wang@profitbricks.com>
-Signed-off-by: Kleber Souza <kleber.souza@profitbricks.com>
-Signed-off-by: Danil Kipnis <danil.kipnis@profitbricks.com>
+We always call wbt_exit() from blk_release_queue(), so these are
+unnecessary.
+
+Signed-off-by: Omar Sandoval <osandov@fb.com>
 ---
- drivers/block/ibnbd_server/ibnbd_srv_log.h | 69 ++++++++++++++++++++++++++++++
- 1 file changed, 69 insertions(+)
- create mode 100644 drivers/block/ibnbd_server/ibnbd_srv_log.h
+ block/blk-core.c | 1 -
+ block/blk-mq.c   | 2 --
+ 2 files changed, 3 deletions(-)
 
-diff --git a/drivers/block/ibnbd_server/ibnbd_srv_log.h b/drivers/block/ibnbd_server/ibnbd_srv_log.h
-new file mode 100644
-index 0000000..9217804
---- /dev/null
-+++ b/drivers/block/ibnbd_server/ibnbd_srv_log.h
-@@ -0,0 +1,69 @@
-+/*
-+ * InfiniBand Network Block Driver
-+ *
-+ * Copyright (c) 2014 - 2017 ProfitBricks GmbH. All rights reserved.
-+ * Authors: Fabian Holler < mail@fholler.de>
-+ *          Jack Wang <jinpu.wang@profitbricks.com>
-+ *   	    Kleber Souza <kleber.souza@profitbricks.com>
-+ * 	    Danil Kipnis <danil.kipnis@profitbricks.com>
-+ *   	    Roman Pen <roman.penyaev@profitbricks.com>
-+ *          Milind Dumbare <Milind.dumbare@gmail.com>
-+ *
-+ *
-+ * Redistribution and use in source and binary forms, with or without
-+ * modification, are permitted provided that the following conditions
-+ * are met:
-+ * 1. Redistributions of source code must retain the above copyright
-+ *    notice, this list of conditions, and the following disclaimer,
-+ *    without modification.
-+ * 2. Redistributions in binary form must reproduce at minimum a disclaimer
-+ *    substantially similar to the "NO WARRANTY" disclaimer below
-+ *    ("Disclaimer") and any redistribution must be conditioned upon
-+ *    including a substantially similar Disclaimer requirement for further
-+ *    binary redistribution.
-+ * 3. Neither the names of the above-listed copyright holders nor the names
-+ *    of any contributors may be used to endorse or promote products derived
-+ *    from this software without specific prior written permission.
-+ *
-+ * Alternatively, this software may be distributed under the terms of the
-+ * GNU General Public License ("GPL") version 2 as published by the Free
-+ * Software Foundation.
-+ *
-+ * NO WARRANTY
-+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR
-+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-+ * HOLDERS OR CONTRIBUTORS BE LIABLE FOR SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
-+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
-+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
-+ * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-+ * POSSIBILITY OF SUCH DAMAGES.
-+ *
-+ */
-+
-+#ifndef __IBNBD_SRV_LOG_H__
-+#define __IBNBD_SRV_LOG_H__
-+
-+#include "../ibnbd_inc/log.h"
-+
-+#define ERR(dev, fmt, ...) pr_err("ibnbd L%d <%s@%s> ERR: " fmt, \
-+				__LINE__, dev->pathname, ibnbd_prefix(dev),\
-+				##__VA_ARGS__)
-+#define ERR_RL(dev, fmt, ...) pr_err_ratelimited("ibnbd L%d <%s@%s> ERR: " fmt,\
-+				__LINE__, dev->pathname, ibnbd_prefix(dev),\
-+				##__VA_ARGS__)
-+#define WRN(dev, fmt, ...) pr_warn("ibnbd L%d <%s@%s> WARN: " fmt,\
-+				__LINE__, dev->pathname, ibnbd_prefix(dev),\
-+				##__VA_ARGS__)
-+#define WRN_RL(dev, fmt, ...) pr_warn_ratelimited("ibnbd L%d <%s@%s> WARN: " \
-+			fmt, __LINE__, dev->pathname, ibnbd_prefix(dev),\
-+			##__VA_ARGS__)
-+#define INFO(dev, fmt, ...) pr_info("ibnbd <%s@%s>: " \
-+			fmt, dev->pathname, ibnbd_prefix(dev), ##__VA_ARGS__)
-+#define INFO_RL(dev, fmt, ...) pr_info_ratelimited("ibnbd <%s@%s>: " \
-+			fmt, dev->pathname, ibnbd_prefix(dev), ##__VA_ARGS__)
-+
-+#endif /*__IBNBD_SRV_LOG_H__*/
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 0eeb99ef654f..82425017c9b8 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -889,7 +889,6 @@ int blk_init_allocated_queue(struct request_queue *q)
+ 		q->exit_rq_fn(q, q->fq->flush_rq);
+ out_free_flush_queue:
+ 	blk_free_flush_queue(q->fq);
+-	wbt_exit(q);
+ 	return -ENOMEM;
+ }
+ EXPORT_SYMBOL(blk_init_allocated_queue);
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 159187a28d66..eb84daf550f4 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2430,8 +2430,6 @@ void blk_mq_free_queue(struct request_queue *q)
+ 	list_del_init(&q->all_q_node);
+ 	mutex_unlock(&all_q_mutex);
+ 
+-	wbt_exit(q);
+-
+ 	blk_mq_del_queue_tag_set(q);
+ 
+ 	blk_mq_exit_hw_queues(q, set, set->nr_hw_queues);
 -- 
-2.7.4
+2.12.0
