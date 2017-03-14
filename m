@@ -1,67 +1,35 @@
-Return-Path: <jack@suse.cz>
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Tejun Heo <tj@kernel.org>,
-	linux-block@vger.kernel.org,
-	Dan Williams <dan.j.williams@intel.com>,
-	Omar Sandoval <osandov@osandov.com>,
-	Arthur Marsh <arthur.marsh@internode.on.net>,
-	linux-scsi@vger.kernel.org,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH 1/4] block: Allow bdi re-registration
-Date: Wed,  8 Mar 2017 17:48:31 +0100
-Message-Id: <20170308164834.14302-2-jack@suse.cz>
-In-Reply-To: <20170308164834.14302-1-jack@suse.cz>
-References: <20170308164834.14302-1-jack@suse.cz>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pg0-f46.google.com ([74.125.83.46]:34606 "EHLO
+        mail-pg0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751336AbdCNVHy (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 14 Mar 2017 17:07:54 -0400
+Received: by mail-pg0-f46.google.com with SMTP id 141so273732pgd.1
+        for <linux-block@vger.kernel.org>; Tue, 14 Mar 2017 14:07:53 -0700 (PDT)
+Date: Tue, 14 Mar 2017 14:07:05 -0700
+From: Omar Sandoval <osandov@osandov.com>
+To: linux-block@vger.kernel.org
+Cc: kernel-team@fb.com
+Subject: Re: [PATCH 0/4] block: callback-based statistics
+Message-ID: <20170314210705.GC2352@vader.DHCP.thefacebook.com>
+References: <cover.1489524591.git.osandov@fb.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <cover.1489524591.git.osandov@fb.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-SCSI can call device_add_disk() several times for one request queue when
-a device in unbound and bound, creating new gendisk each time. This will
-lead to bdi being repeatedly registered and unregistered. This was not a
-big problem until commit 165a5e22fafb "block: Move bdi_unregister() to
-del_gendisk()" since bdi was only registered repeatedly (bdi_register()
-handles repeated calls fine, only we ended up leaking reference to
-gendisk due to overwriting bdi->owner) but unregistered only in
-blk_cleanup_queue() which didn't get called repeatedly. After
-165a5e22fafb we were doing correct bdi_register() - bdi_unregister()
-cycles however bdi_unregister() is not prepared for it. So make sure
-bdi_unregister() cleans up bdi in such a way that it is prepared for
-a possible following bdi_register() call.
+On Tue, Mar 14, 2017 at 02:03:27PM -0700, Omar Sandoval wrote:
+> From: Omar Sandoval <osandov@fb.com>
+> 
+> This patchset generalizes the blk-stats infrastructure to allow users to
+> register a callback to be called at a given time with the statistics of
+> requests completed during that window. Writeback throttling and hybrid
+> polling are converted to the new infrastructure. The ultimate goal is to
+> use this infrastructure for the mq I/O scheduler.
+> 
+> The details are in patch 4, which is the actual conversion. Patches 1-3
+> are preparation cleanups.
 
-An easy way to provoke this behavior is to enable
-CONFIG_DEBUG_TEST_DRIVER_REMOVE and use scsi_debug driver to create a
-scsi disk which immediately hangs without this fix.
-
-Fixes: 165a5e22fafb127ecb5914e12e8c32a1f0d3f820
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- mm/backing-dev.c | 7 +++++++
- 1 file changed, 7 insertions(+)
-
-diff --git a/mm/backing-dev.c b/mm/backing-dev.c
-index 6d861d090e9f..6ac932210f56 100644
---- a/mm/backing-dev.c
-+++ b/mm/backing-dev.c
-@@ -710,6 +710,11 @@ static void cgwb_bdi_destroy(struct backing_dev_info *bdi)
- 	 */
- 	atomic_dec(&bdi->usage_cnt);
- 	wait_event(cgwb_release_wait, !atomic_read(&bdi->usage_cnt));
-+	/*
-+	 * Grab back our reference so that we hold it when @bdi gets
-+	 * re-registered.
-+	 */
-+	atomic_inc(&bdi->usage_cnt);
- }
- 
- /**
-@@ -857,6 +862,8 @@ int bdi_register_owner(struct backing_dev_info *bdi, struct device *owner)
- 			MINOR(owner->devt));
- 	if (rc)
- 		return rc;
-+	/* Leaking owner reference... */
-+	WARN_ON(bdi->owner);
- 	bdi->owner = owner;
- 	get_device(owner);
- 	return 0;
--- 
-2.10.2
+FYI, the diff of block/blk-stat.[ch] is a pain to read. It's easier to
+just apply the patches and look at the whole files.
