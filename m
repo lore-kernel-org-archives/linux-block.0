@@ -1,224 +1,158 @@
-Return-Path: <BATV+b8442eb9fd62b0a9e465+4950+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org
-Subject: [PATCH 2/4] blk-mq: merge mq and sq make_request instances
-Date: Mon, 13 Mar 2017 09:48:31 -0600
-Message-Id: <20170313154833.14165-3-hch@lst.de>
-In-Reply-To: <20170313154833.14165-1-hch@lst.de>
-References: <20170313154833.14165-1-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pf0-f177.google.com ([209.85.192.177]:36020 "EHLO
+        mail-pf0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753034AbdCNVEb (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 14 Mar 2017 17:04:31 -0400
+Received: by mail-pf0-f177.google.com with SMTP id o126so75584444pfb.3
+        for <linux-block@vger.kernel.org>; Tue, 14 Mar 2017 14:04:30 -0700 (PDT)
+From: Omar Sandoval <osandov@osandov.com>
+To: linux-block@vger.kernel.org
+Cc: kernel-team@fb.com
+Subject: [PATCH 1/4] block: tear out blk-stat debugfs/sysfs entries
+Date: Tue, 14 Mar 2017 14:03:28 -0700
+Message-Id: <d6844f36f6d54c021e411068165a5b163031628f.1489524591.git.osandov@fb.com>
+In-Reply-To: <cover.1489524591.git.osandov@fb.com>
+References: <cover.1489524591.git.osandov@fb.com>
+In-Reply-To: <cover.1489524591.git.osandov@fb.com>
+References: <cover.1489524591.git.osandov@fb.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-They are mostly the same code anyway - this just one small conditional
-for the plug case that is different for both variants.
+From: Omar Sandoval <osandov@fb.com>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+These made sense when there was a single stats buffer for the request
+queue, but that's going away.
+
+Signed-off-by: Omar Sandoval <osandov@fb.com>
 ---
- block/blk-mq.c | 164 +++++++++++----------------------------------------------
- 1 file changed, 31 insertions(+), 133 deletions(-)
+ block/blk-mq-debugfs.c | 55 --------------------------------------------------
+ block/blk-sysfs.c      | 26 ------------------------
+ 2 files changed, 81 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index acf0ddf4af52..53e49a3f6f0a 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1478,11 +1478,6 @@ static void blk_mq_try_issue_directly(struct request *rq, blk_qc_t *cookie)
- 	blk_mq_sched_insert_request(rq, false, true, true, false);
- }
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index f6d917977b33..18672225c417 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -322,60 +322,6 @@ static const struct file_operations hctx_io_poll_fops = {
+ 	.release	= single_release,
+ };
  
--/*
-- * Multiple hardware queue variant. This will not use per-process plugs,
-- * but will attempt to bypass the hctx queueing if we can go straight to
-- * hardware for SYNC IO.
-- */
- static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
- {
- 	const int is_sync = op_is_sync(bio->bi_opf);
-@@ -1534,7 +1529,36 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
- 	}
- 
- 	plug = current->plug;
--	if (((plug && !blk_queue_nomerges(q)) || is_sync)) {
-+	if (plug && q->nr_hw_queues == 1) {
-+		struct request *last = NULL;
-+
-+		blk_mq_bio_to_request(rq, bio);
-+
-+		/*
-+		 * @request_count may become stale because of schedule
-+		 * out, so check the list again.
-+		 */
-+		if (list_empty(&plug->mq_list))
-+			request_count = 0;
-+		else if (blk_queue_nomerges(q))
-+			request_count = blk_plug_queued_count(q);
-+
-+		if (!request_count)
-+			trace_block_plug(q);
-+		else
-+			last = list_entry_rq(plug->mq_list.prev);
-+
-+		blk_mq_put_ctx(data.ctx);
-+
-+		if (request_count >= BLK_MAX_REQUEST_COUNT || (last &&
-+		    blk_rq_bytes(last) >= BLK_PLUG_FLUSH_SIZE)) {
-+			blk_flush_plug_list(plug, false);
-+			trace_block_plug(q);
-+		}
-+
-+		list_add_tail(&rq->queuelist, &plug->mq_list);
-+		goto done;
-+	} else if (((plug && !blk_queue_nomerges(q)) || is_sync)) {
- 		struct request *old_rq = NULL;
- 
- 		blk_mq_bio_to_request(rq, bio);
-@@ -1596,119 +1620,6 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
- 	return cookie;
- }
- 
--/*
-- * Single hardware queue variant. This will attempt to use any per-process
-- * plug for merging and IO deferral.
-- */
--static blk_qc_t blk_sq_make_request(struct request_queue *q, struct bio *bio)
+-static void print_stat(struct seq_file *m, struct blk_rq_stat *stat)
 -{
--	const int is_sync = op_is_sync(bio->bi_opf);
--	const int is_flush_fua = op_is_flush(bio->bi_opf);
--	struct blk_plug *plug;
--	unsigned int request_count = 0;
--	struct blk_mq_alloc_data data = { .flags = 0 };
--	struct request *rq;
--	blk_qc_t cookie;
--	unsigned int wb_acct;
--
--	blk_queue_bounce(q, &bio);
--
--	if (bio_integrity_enabled(bio) && bio_integrity_prep(bio)) {
--		bio_io_error(bio);
--		return BLK_QC_T_NONE;
--	}
--
--	blk_queue_split(q, &bio, q->bio_split);
--
--	if (!is_flush_fua && !blk_queue_nomerges(q)) {
--		if (blk_attempt_plug_merge(q, bio, &request_count, NULL))
--			return BLK_QC_T_NONE;
--	} else
--		request_count = blk_plug_queued_count(q);
--
--	if (blk_mq_sched_bio_merge(q, bio))
--		return BLK_QC_T_NONE;
--
--	wb_acct = wbt_wait(q->rq_wb, bio, NULL);
--
--	trace_block_getrq(q, bio, bio->bi_opf);
--
--	rq = blk_mq_sched_get_request(q, bio, bio->bi_opf, &data);
--	if (unlikely(!rq)) {
--		__wbt_done(q->rq_wb, wb_acct);
--		return BLK_QC_T_NONE;
--	}
--
--	wbt_track(&rq->issue_stat, wb_acct);
--
--	cookie = request_to_qc_t(data.hctx, rq);
--
--	if (unlikely(is_flush_fua)) {
--		if (q->elevator)
--			goto elv_insert;
--		blk_mq_bio_to_request(rq, bio);
--		blk_insert_flush(rq);
--		goto run_queue;
--	}
--
--	/*
--	 * A task plug currently exists. Since this is completely lockless,
--	 * utilize that to temporarily store requests until the task is
--	 * either done or scheduled away.
--	 */
--	plug = current->plug;
--	if (plug) {
--		struct request *last = NULL;
--
--		blk_mq_bio_to_request(rq, bio);
--
--		/*
--		 * @request_count may become stale because of schedule
--		 * out, so check the list again.
--		 */
--		if (list_empty(&plug->mq_list))
--			request_count = 0;
--		if (!request_count)
--			trace_block_plug(q);
--		else
--			last = list_entry_rq(plug->mq_list.prev);
--
--		blk_mq_put_ctx(data.ctx);
--
--		if (request_count >= BLK_MAX_REQUEST_COUNT || (last &&
--		    blk_rq_bytes(last) >= BLK_PLUG_FLUSH_SIZE)) {
--			blk_flush_plug_list(plug, false);
--			trace_block_plug(q);
--		}
--
--		list_add_tail(&rq->queuelist, &plug->mq_list);
--		return cookie;
--	}
--
--	if (q->elevator) {
--elv_insert:
--		blk_mq_put_ctx(data.ctx);
--		blk_mq_bio_to_request(rq, bio);
--		blk_mq_sched_insert_request(rq, false, true,
--						!is_sync || is_flush_fua, true);
--		goto done;
--	}
--	if (!blk_mq_merge_queue_io(data.hctx, data.ctx, rq, bio)) {
--		/*
--		 * For a SYNC request, send it to the hardware immediately. For
--		 * an ASYNC request, just ensure that we run it later on. The
--		 * latter allows for merging opportunities and more efficient
--		 * dispatching.
--		 */
--run_queue:
--		blk_mq_run_hw_queue(data.hctx, !is_sync || is_flush_fua);
--	}
--
--	blk_mq_put_ctx(data.ctx);
--done:
--	return cookie;
+-	seq_printf(m, "samples=%d, mean=%lld, min=%llu, max=%llu",
+-		   stat->nr_samples, stat->mean, stat->min, stat->max);
 -}
 -
- void blk_mq_free_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
- 		     unsigned int hctx_idx)
+-static int hctx_stats_show(struct seq_file *m, void *v)
+-{
+-	struct blk_mq_hw_ctx *hctx = m->private;
+-	struct blk_rq_stat stat[2];
+-
+-	blk_stat_init(&stat[BLK_STAT_READ]);
+-	blk_stat_init(&stat[BLK_STAT_WRITE]);
+-
+-	blk_hctx_stat_get(hctx, stat);
+-
+-	seq_puts(m, "read: ");
+-	print_stat(m, &stat[BLK_STAT_READ]);
+-	seq_puts(m, "\n");
+-
+-	seq_puts(m, "write: ");
+-	print_stat(m, &stat[BLK_STAT_WRITE]);
+-	seq_puts(m, "\n");
+-	return 0;
+-}
+-
+-static int hctx_stats_open(struct inode *inode, struct file *file)
+-{
+-	return single_open(file, hctx_stats_show, inode->i_private);
+-}
+-
+-static ssize_t hctx_stats_write(struct file *file, const char __user *buf,
+-				size_t count, loff_t *ppos)
+-{
+-	struct seq_file *m = file->private_data;
+-	struct blk_mq_hw_ctx *hctx = m->private;
+-	struct blk_mq_ctx *ctx;
+-	int i;
+-
+-	hctx_for_each_ctx(hctx, ctx, i) {
+-		blk_stat_init(&ctx->stat[BLK_STAT_READ]);
+-		blk_stat_init(&ctx->stat[BLK_STAT_WRITE]);
+-	}
+-	return count;
+-}
+-
+-static const struct file_operations hctx_stats_fops = {
+-	.open		= hctx_stats_open,
+-	.read		= seq_read,
+-	.write		= hctx_stats_write,
+-	.llseek		= seq_lseek,
+-	.release	= single_release,
+-};
+-
+ static int hctx_dispatched_show(struct seq_file *m, void *v)
  {
-@@ -2366,10 +2277,7 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
- 	INIT_LIST_HEAD(&q->requeue_list);
- 	spin_lock_init(&q->requeue_lock);
+ 	struct blk_mq_hw_ctx *hctx = m->private;
+@@ -646,7 +592,6 @@ static const struct blk_mq_debugfs_attr blk_mq_debugfs_hctx_attrs[] = {
+ 	{"sched_tags", 0400, &hctx_sched_tags_fops},
+ 	{"sched_tags_bitmap", 0400, &hctx_sched_tags_bitmap_fops},
+ 	{"io_poll", 0600, &hctx_io_poll_fops},
+-	{"stats", 0600, &hctx_stats_fops},
+ 	{"dispatched", 0600, &hctx_dispatched_fops},
+ 	{"queued", 0600, &hctx_queued_fops},
+ 	{"run", 0600, &hctx_run_fops},
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index c44b321335f3..6e1cf622af21 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -503,26 +503,6 @@ static ssize_t queue_dax_show(struct request_queue *q, char *page)
+ 	return queue_var_show(blk_queue_dax(q), page);
+ }
  
--	if (q->nr_hw_queues > 1)
--		blk_queue_make_request(q, blk_mq_make_request);
--	else
--		blk_queue_make_request(q, blk_sq_make_request);
-+	blk_queue_make_request(q, blk_mq_make_request);
- 
- 	/*
- 	 * Do this after blk_queue_make_request() overrides it...
-@@ -2717,16 +2625,6 @@ void blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set, int nr_hw_queues)
- 	set->nr_hw_queues = nr_hw_queues;
- 	list_for_each_entry(q, &set->tag_list, tag_set_list) {
- 		blk_mq_realloc_hw_ctxs(set, q);
+-static ssize_t print_stat(char *page, struct blk_rq_stat *stat, const char *pre)
+-{
+-	return sprintf(page, "%s samples=%llu, mean=%lld, min=%lld, max=%lld\n",
+-			pre, (long long) stat->nr_samples,
+-			(long long) stat->mean, (long long) stat->min,
+-			(long long) stat->max);
+-}
 -
--		/*
--		 * Manually set the make_request_fn as blk_queue_make_request
--		 * resets a lot of the queue settings.
--		 */
--		if (q->nr_hw_queues > 1)
--			q->make_request_fn = blk_mq_make_request;
--		else
--			q->make_request_fn = blk_sq_make_request;
+-static ssize_t queue_stats_show(struct request_queue *q, char *page)
+-{
+-	struct blk_rq_stat stat[2];
+-	ssize_t ret;
 -
- 		blk_mq_queue_reinit(q, cpu_online_mask);
- 	}
+-	blk_queue_stat_get(q, stat);
+-
+-	ret = print_stat(page, &stat[BLK_STAT_READ], "read :");
+-	ret += print_stat(page + ret, &stat[BLK_STAT_WRITE], "write:");
+-	return ret;
+-}
+-
+ static struct queue_sysfs_entry queue_requests_entry = {
+ 	.attr = {.name = "nr_requests", .mode = S_IRUGO | S_IWUSR },
+ 	.show = queue_requests_show,
+@@ -691,11 +671,6 @@ static struct queue_sysfs_entry queue_dax_entry = {
+ 	.show = queue_dax_show,
+ };
  
+-static struct queue_sysfs_entry queue_stats_entry = {
+-	.attr = {.name = "stats", .mode = S_IRUGO },
+-	.show = queue_stats_show,
+-};
+-
+ static struct queue_sysfs_entry queue_wb_lat_entry = {
+ 	.attr = {.name = "wbt_lat_usec", .mode = S_IRUGO | S_IWUSR },
+ 	.show = queue_wb_lat_show,
+@@ -733,7 +708,6 @@ static struct attribute *default_attrs[] = {
+ 	&queue_poll_entry.attr,
+ 	&queue_wc_entry.attr,
+ 	&queue_dax_entry.attr,
+-	&queue_stats_entry.attr,
+ 	&queue_wb_lat_entry.attr,
+ 	&queue_poll_delay_entry.attr,
+ 	NULL,
 -- 
-2.11.0
+2.12.0
