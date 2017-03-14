@@ -1,44 +1,40 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-Subject: Re: [PATCH 5/8] nowait aio: return on congested block device
-To: Goldwyn Rodrigues <rgoldwyn@suse.de>, jack@suse.com
-References: <20170228233610.25456-1-rgoldwyn@suse.de>
- <20170228233610.25456-6-rgoldwyn@suse.de>
-Cc: hch@infradead.org, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org,
-        Goldwyn Rodrigues <rgoldwyn@suse.com>
-From: Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <0d1ba678-69c0-16ce-6c3e-475cd8da203c@grimberg.me>
-Date: Wed, 8 Mar 2017 09:03:08 +0200
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:22569 "EHLO
+        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753150AbdCNVWO (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 14 Mar 2017 17:22:14 -0400
+From: Bart Van Assche <Bart.VanAssche@sandisk.com>
+To: "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "target-devel@vger.kernel.org" <target-devel@vger.kernel.org>,
+        "sagi@grimberg.me" <sagi@grimberg.me>
+Subject: Re: [PATCH rfc 04/10] block: Add a non-selective polling interface
+Date: Tue, 14 Mar 2017 21:21:59 +0000
+Message-ID: <1489526506.2676.13.camel@sandisk.com>
+References: <1489065402-14757-1-git-send-email-sagi@grimberg.me>
+         <1489065402-14757-5-git-send-email-sagi@grimberg.me>
+         <1489076712.2597.1.camel@sandisk.com>
+         <b8124df3-bd09-2eb2-9899-3c9195605510@grimberg.me>
+In-Reply-To: <b8124df3-bd09-2eb2-9899-3c9195605510@grimberg.me>
+Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
-In-Reply-To: <20170228233610.25456-6-rgoldwyn@suse.de>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
+On Mon, 2017-03-13 at 10:15 +0200, Sagi Grimberg wrote:
+> > Additionally, I think making the hardware context an argument of this f=
+unction
+> > instead of using blk_mq_map_queue(q, smp_processor_id()) would make thi=
+s
+> > function much more versatile.
+>=20
+> What do you mean? remember that the callers interface to the device is
+> a request queue, it doesn't even know if its a blk-mq device. Can you
+> explain in more details what you would like to see?
 
-> -		if (likely(blk_queue_enter(q, false) == 0)) {
-> +		if (likely(blk_queue_enter(q, bio_flagged(bio, BIO_NOWAIT)) == 0)) {
->  			ret = q->make_request_fn(q, bio);
+Have you considered to make the CPU ID an argument instead of using the
+smp_processor_id() result?
 
-I think that for ->make_request to not block we'd need to set
-BLK_MQ_REQ_NOWAIT in blk_mq_alloc_data to avoid blocking on a tag
-allocation.
-
-Something like the untested addition below:
---
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 09af8ff18719..40e78b57fb44 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -119,6 +119,9 @@ struct request *blk_mq_sched_get_request(struct 
-request_queue *q,
-         if (likely(!data->hctx))
-                 data->hctx = blk_mq_map_queue(q, data->ctx->cpu);
-
-+       if (likely(bio) && bio_flagged(bio, BIO_NOWAIT))
-+               data->flags |= BLK_MQ_REQ_NOWAIT;
-+
-         if (e) {
-                 data->flags |= BLK_MQ_REQ_INTERNAL;
---
+Bart.=
