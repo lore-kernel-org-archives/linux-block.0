@@ -1,100 +1,98 @@
-Return-Path: <BATV+250fd2a736c995bcc4cb+4957+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: tj@kernel.org,
-	martin.petersen@oracle.com,
-	axboe@kernel.dk
-Cc: linux-ide@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH 6/7] sd: support multi-range TRIM for ATA disks
-Date: Mon, 20 Mar 2017 16:43:18 -0400
-Message-Id: <20170320204319.12628-7-hch@lst.de>
-In-Reply-To: <20170320204319.12628-1-hch@lst.de>
-References: <20170320204319.12628-1-hch@lst.de>
+Return-Path: <rgoldwyn@suse.de>
+From: Goldwyn Rodrigues <rgoldwyn@suse.de>
+To: linux-fsdevel@vger.kernel.org
+Cc: jack@suse.com,
+	hch@infradead.org,
+	linux-block@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	linux-ext4@vger.kernel.org,
+	linux-xfs@vger.kernel.org,
+	sagi@grimberg.me,
+	avi@scylladb.com,
+	axboe@kernel.dk,
+	linux-api@vger.kernel.org,
+	willy@infradead.org,
+	Goldwyn Rodrigues <rgoldwyn@suse.com>
+Subject: [PATCH 8/8] nowait aio: btrfs
+Date: Wed, 15 Mar 2017 16:51:07 -0500
+Message-Id: <20170315215107.5628-9-rgoldwyn@suse.de>
+In-Reply-To: <20170315215107.5628-1-rgoldwyn@suse.de>
+References: <20170315215107.5628-1-rgoldwyn@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Almost the same scheme as the older multi-range support for NVMe.
+From: Goldwyn Rodrigues <rgoldwyn@suse.com>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Return EAGAIN if any of the following checks fail
+ + i_rwsem is not lockable
+ + NODATACOW or PREALLOC is not set
+ + Cannot nocow at the desired location
+ + Writing beyond end of file which is not allocated
+
+Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
 ---
- drivers/scsi/sd.c | 37 +++++++++++++++++++++++++------------
- 1 file changed, 25 insertions(+), 12 deletions(-)
+ fs/btrfs/file.c  | 25 ++++++++++++++++++++-----
+ fs/btrfs/inode.c |  3 +++
+ 2 files changed, 23 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
-index cc8684818305..c18fe9ff1f8f 100644
---- a/drivers/scsi/sd.c
-+++ b/drivers/scsi/sd.c
-@@ -643,7 +643,7 @@ static void sd_config_discard(struct scsi_disk *sdkp, unsigned int mode)
- {
- 	struct request_queue *q = sdkp->disk->queue;
- 	unsigned int logical_block_size = sdkp->device->sector_size;
--	unsigned int max_blocks = 0;
-+	unsigned int max_blocks = 0, max_ranges = 0, max_range_size = 0;
+diff --git a/fs/btrfs/file.c b/fs/btrfs/file.c
+index 520cb72..a870e5d 100644
+--- a/fs/btrfs/file.c
++++ b/fs/btrfs/file.c
+@@ -1823,12 +1823,29 @@ static ssize_t btrfs_file_write_iter(struct kiocb *iocb,
+ 	ssize_t num_written = 0;
+ 	bool sync = (file->f_flags & O_DSYNC) || IS_SYNC(file->f_mapping->host);
+ 	ssize_t err;
+-	loff_t pos;
+-	size_t count;
++	loff_t pos = iocb->ki_pos;
++	size_t count = iov_iter_count(from);
+ 	loff_t oldsize;
+ 	int clean_page = 0;
  
- 	q->limits.discard_zeroes_data = 0;
- 
-@@ -698,13 +698,19 @@ static void sd_config_discard(struct scsi_disk *sdkp, unsigned int mode)
- 		break;
- 
- 	case SD_LBP_ATA_TRIM:
--		max_blocks = 65535 * (512 / sizeof(__le64));
-+		max_ranges = 512 / sizeof(__le64);
-+		max_range_size = USHRT_MAX;
-+		max_blocks = max_ranges * max_range_size;
- 		if (sdkp->device->ata_trim_zeroes_data)
- 			q->limits.discard_zeroes_data = 1;
- 		break;
- 	}
- 
- 	blk_queue_max_discard_sectors(q, max_blocks * (logical_block_size >> 9));
-+	if (max_ranges)
-+		blk_queue_max_discard_segments(q, max_ranges);
-+	if (max_range_size)
-+		blk_queue_max_discard_segment_size(q, max_range_size);
- 	queue_flag_set_unlocked(QUEUE_FLAG_DISCARD, q);
- }
- 
-@@ -805,9 +811,9 @@ static int sd_setup_ata_trim_cmnd(struct scsi_cmnd *cmd)
- {
- 	struct scsi_device *sdp = cmd->device;
- 	struct request *rq = cmd->request;
--	u64 sector = blk_rq_pos(rq) >> (ilog2(sdp->sector_size) - 9);
--	u32 nr_sectors = blk_rq_sectors(rq) >> (ilog2(sdp->sector_size) - 9);
--	u32 data_len = sdp->sector_size, i;
-+	u32 sector_shift = ilog2(sdp->sector_size);
-+	u32 data_len = sdp->sector_size, i = 0;
-+	struct bio *bio;
- 	__le64 *buf;
- 
- 	rq->special_vec.bv_page = alloc_page(GFP_ATOMIC | __GFP_ZERO);
-@@ -826,14 +832,21 @@ static int sd_setup_ata_trim_cmnd(struct scsi_cmnd *cmd)
- 	cmd->cmnd[8] = data_len;
- 
- 	buf = page_address(rq->special_vec.bv_page);
--	for (i = 0; i < (data_len >> 3); i++) {
--		u64 n = min(nr_sectors, 0xffffu);
-+	__rq_for_each_bio(bio, rq) {
-+		u64 sector = bio->bi_iter.bi_sector >> (sector_shift - 9);
-+		u32 nr_sectors = bio->bi_iter.bi_size >> sector_shift;
- 
--		buf[i] = cpu_to_le64(sector | (n << 48));
--		if (nr_sectors <= 0xffff)
--			break;
--		sector += 0xffff;
--		nr_sectors -= 0xffff;
-+		do {
-+			u64 n = min(nr_sectors, 0xffffu);
+-	inode_lock(inode);
++	if ((iocb->ki_flags & IOCB_NOWAIT) &&
++			(iocb->ki_flags & IOCB_DIRECT)) {
++		/* Don't sleep on inode rwsem */
++		if (!inode_trylock(inode))
++			return -EAGAIN;
++		/*
++		 * We will allocate space in case nodatacow is not set,
++		 * so bail
++		 */
++		if (!(BTRFS_I(inode)->flags & (BTRFS_INODE_NODATACOW |
++					      BTRFS_INODE_PREALLOC)) ||
++		    check_can_nocow(BTRFS_I(inode), pos, &count) <= 0) {
++			inode_unlock(inode);
++			return -EAGAIN;
++		}
++	} else
++		inode_lock(inode);
 +
-+			buf[i] = cpu_to_le64(sector | (n << 48));
-+			if (nr_sectors <= 0xffff)
-+				break;
-+			sector += 0xffff;
-+			nr_sectors -= 0xffff;
-+			i++;
-+
-+		} while (!WARN_ON_ONCE(i >= data_len >> 3));
- 	}
+ 	err = generic_write_checks(iocb, from);
+ 	if (err <= 0) {
+ 		inode_unlock(inode);
+@@ -1862,8 +1879,6 @@ static ssize_t btrfs_file_write_iter(struct kiocb *iocb,
+ 	 */
+ 	update_time_for_write(inode);
  
- 	cmd->allowed = SD_MAX_RETRIES;
+-	pos = iocb->ki_pos;
+-	count = iov_iter_count(from);
+ 	start_pos = round_down(pos, fs_info->sectorsize);
+ 	oldsize = i_size_read(inode);
+ 	if (start_pos > oldsize) {
+diff --git a/fs/btrfs/inode.c b/fs/btrfs/inode.c
+index c40060c..788bb93 100644
+--- a/fs/btrfs/inode.c
++++ b/fs/btrfs/inode.c
+@@ -8613,6 +8613,9 @@ static ssize_t btrfs_direct_IO(struct kiocb *iocb, struct iov_iter *iter)
+ 			dio_data.overwrite = 1;
+ 			inode_unlock(inode);
+ 			relock = true;
++		} else if (iocb->ki_flags & IOCB_NOWAIT) {
++			ret = -EAGAIN;
++			goto out;
+ 		}
+ 		ret = btrfs_delalloc_reserve_space(inode, offset, count);
+ 		if (ret)
 -- 
-2.11.0
+2.10.2
