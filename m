@@ -1,58 +1,53 @@
-Return-Path: <axboe@kernel.dk>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 4.11-rc
-Message-ID: <14098b6d-8eb1-0990-49dc-1cb911179456@kernel.dk>
-Date: Wed, 15 Mar 2017 15:06:59 -0600
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Return-Path: <rgoldwyn@suse.de>
+From: Goldwyn Rodrigues <rgoldwyn@suse.de>
+To: linux-fsdevel@vger.kernel.org
+Cc: jack@suse.com,
+	hch@infradead.org,
+	linux-block@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	linux-ext4@vger.kernel.org,
+	linux-xfs@vger.kernel.org,
+	sagi@grimberg.me,
+	avi@scylladb.com,
+	axboe@kernel.dk,
+	linux-api@vger.kernel.org,
+	willy@infradead.org,
+	Goldwyn Rodrigues <rgoldwyn@suse.com>
+Subject: [PATCH 2/8] nowait aio: Return if cannot get hold of i_rwsem
+Date: Wed, 15 Mar 2017 16:51:01 -0500
+Message-Id: <20170315215107.5628-3-rgoldwyn@suse.de>
+In-Reply-To: <20170315215107.5628-1-rgoldwyn@suse.de>
+References: <20170315215107.5628-1-rgoldwyn@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Linus,
+From: Goldwyn Rodrigues <rgoldwyn@suse.com>
 
-Four small fixes for this cycle. This pull request contains:
+A failure to lock i_rwsem would mean there is I/O being performed
+by another thread. So, let's bail.
 
-- Followup fix from Neil for a fix that went in before -rc2, ensuring
-  that we always see the full per-task bio_list.
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
+---
+ mm/filemap.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-- Fix for blk-mq-sched from me that ensures that we retain similar
-  direct-to-issue behavior on running the queue.
-
-- Fix from Sagi fixing a potential NULL pointer dereference in blk-mq on
-  spurious CPU unplug.
-
-- A memory leak fix in writeback from Tahsin, fixing a case where device
-  removal of a mounted device can leak a struct wb_writeback_work.
-
-Please pull!
-
-
-  git://git.kernel.dk/linux-block.git for-linus
-
-
-----------------------------------------------------------------
-Jens Axboe (1):
-      blk-mq-sched: don't run the queue async from blk_mq_try_issue_directly()
-
-NeilBrown (1):
-      blk: Ensure users for current->bio_list can see the full list.
-
-Sagi Grimberg (1):
-      blk-mq: Fix tagset reinit in the presence of cpu hot-unplug
-
-Tahsin Erdogan (1):
-      writeback: fix memory leak in wb_queue_work()
-
- block/bio.c         | 12 +++++++++---
- block/blk-core.c    | 30 ++++++++++++++++++------------
- block/blk-mq-tag.c  |  3 +++
- block/blk-mq.c      |  9 +++++----
- drivers/md/dm.c     | 29 ++++++++++++++++-------------
- drivers/md/raid10.c |  3 ++-
- fs/fs-writeback.c   | 35 +++++++++++++++++++++--------------
- 7 files changed, 74 insertions(+), 47 deletions(-)
-
+diff --git a/mm/filemap.c b/mm/filemap.c
+index 1694623..e08f3b9 100644
+--- a/mm/filemap.c
++++ b/mm/filemap.c
+@@ -2982,7 +2982,12 @@ ssize_t generic_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
+ 	struct inode *inode = file->f_mapping->host;
+ 	ssize_t ret;
+ 
+-	inode_lock(inode);
++	if (!inode_trylock(inode)) {
++		/* Don't sleep on inode rwsem */
++		if (iocb->ki_flags & IOCB_NOWAIT)
++			return -EAGAIN;
++		inode_lock(inode);
++	}
+ 	ret = generic_write_checks(iocb, from);
+ 	if (ret > 0)
+ 		ret = __generic_file_write_iter(iocb, from);
 -- 
-Jens Axboe
+2.10.2
