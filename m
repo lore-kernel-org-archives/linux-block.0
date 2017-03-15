@@ -1,61 +1,117 @@
-Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
-From: Sagi Grimberg <sagi@grimberg.me>
-To: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
- linux-rdma@vger.kernel.org, target-devel@vger.kernel.org
-Subject: [PATCH rfc 08/10] nvme-rdma: Support blk_poll_batch
-Date: Thu,  9 Mar 2017 15:16:40 +0200
-Message-Id: <1489065402-14757-9-git-send-email-sagi@grimberg.me>
-In-Reply-To: <1489065402-14757-1-git-send-email-sagi@grimberg.me>
-References: <1489065402-14757-1-git-send-email-sagi@grimberg.me>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
-List-Post: <mailto:linux-nvme@lists.infradead.org>
-List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
-Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
+Return-Path: <rgoldwyn@suse.de>
+From: Goldwyn Rodrigues <rgoldwyn@suse.de>
+To: linux-fsdevel@vger.kernel.org
+Cc: jack@suse.com,
+	hch@infradead.org,
+	linux-block@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	linux-ext4@vger.kernel.org,
+	linux-xfs@vger.kernel.org,
+	sagi@grimberg.me,
+	avi@scylladb.com,
+	axboe@kernel.dk,
+	linux-api@vger.kernel.org,
+	willy@infradead.org,
+	Goldwyn Rodrigues <rgoldwyn@suse.com>
+Subject: [PATCH 1/8] nowait aio: Introduce IOCB_RW_FLAG_NOWAIT
+Date: Wed, 15 Mar 2017 16:51:00 -0500
+Message-Id: <20170315215107.5628-2-rgoldwyn@suse.de>
+In-Reply-To: <20170315215107.5628-1-rgoldwyn@suse.de>
+References: <20170315215107.5628-1-rgoldwyn@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
+From: Goldwyn Rodrigues <rgoldwyn@suse.com>
+
+This flag informs kernel to bail out if an AIO request will block
+for reasons such as file allocations, or a writeback triggered,
+or would block while allocating requests while performing
+direct I/O.
+
+Unfortunately, aio_flags is not checked for validity. If we
+add the flags to aio_flags, it would break existing applications
+which have it set to anything besides zero or IOCB_FLAG_RESFD.
+So, we are using aio_reserved1 and renaming it to aio_rw_flags.
+
+IOCB_RW_FLAG_NOWAIT is translated to IOCB_NOWAIT for
+iocb->ki_flags.
+
+Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
 ---
- drivers/nvme/host/rdma.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ fs/aio.c                     | 10 +++++++++-
+ include/linux/fs.h           |  1 +
+ include/uapi/linux/aio_abi.h |  9 ++++++++-
+ 3 files changed, 18 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
-index a17eef3ef6ff..29ac8fcb8d2c 100644
---- a/drivers/nvme/host/rdma.c
-+++ b/drivers/nvme/host/rdma.c
-@@ -1488,6 +1488,13 @@ static int nvme_rdma_poll(struct blk_mq_hw_ctx *hctx, unsigned int tag)
- 	return found;
- }
+diff --git a/fs/aio.c b/fs/aio.c
+index f52d925..41409ac 100644
+--- a/fs/aio.c
++++ b/fs/aio.c
+@@ -1541,11 +1541,16 @@ static int io_submit_one(struct kioctx *ctx, struct iocb __user *user_iocb,
+ 	ssize_t ret;
  
-+static int nvme_rdma_poll_batch(struct blk_mq_hw_ctx *hctx, unsigned int batch)
-+{
-+	struct nvme_rdma_queue *queue = hctx->driver_data;
-+
-+	return ib_process_cq_direct(queue->ib_cq, batch);
-+}
-+
- static void nvme_rdma_complete_rq(struct request *rq)
- {
- 	struct nvme_rdma_request *req = blk_mq_rq_to_pdu(rq);
-@@ -1519,6 +1526,7 @@ static struct blk_mq_ops nvme_rdma_mq_ops = {
- 	.reinit_request	= nvme_rdma_reinit_request,
- 	.init_hctx	= nvme_rdma_init_hctx,
- 	.poll		= nvme_rdma_poll,
-+	.poll_batch	= nvme_rdma_poll_batch,
- 	.timeout	= nvme_rdma_timeout,
- };
+ 	/* enforce forwards compatibility on users */
+-	if (unlikely(iocb->aio_reserved1 || iocb->aio_reserved2)) {
++	if (unlikely(iocb->aio_reserved2)) {
+ 		pr_debug("EINVAL: reserve field set\n");
+ 		return -EINVAL;
+ 	}
  
++	if (unlikely(iocb->aio_rw_flags & ~IOCB_RW_FLAG_NOWAIT)) {
++		pr_debug("EINVAL: aio_rw_flags set with incompatible flags\n");
++		return -EINVAL;
++	}
++
+ 	/* prevent overflows */
+ 	if (unlikely(
+ 	    (iocb->aio_buf != (unsigned long)iocb->aio_buf) ||
+@@ -1586,6 +1591,9 @@ static int io_submit_one(struct kioctx *ctx, struct iocb __user *user_iocb,
+ 		req->common.ki_flags |= IOCB_EVENTFD;
+ 	}
+ 
++	if (iocb->aio_rw_flags & IOCB_RW_FLAG_NOWAIT)
++		req->common.ki_flags |= IOCB_NOWAIT;
++
+ 	ret = put_user(KIOCB_KEY, &user_iocb->aio_key);
+ 	if (unlikely(ret)) {
+ 		pr_debug("EFAULT: aio_key\n");
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index 7251f7b..e8d9346 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -270,6 +270,7 @@ struct writeback_control;
+ #define IOCB_DSYNC		(1 << 4)
+ #define IOCB_SYNC		(1 << 5)
+ #define IOCB_WRITE		(1 << 6)
++#define IOCB_NOWAIT		(1 << 7)
+ 
+ struct kiocb {
+ 	struct file		*ki_filp;
+diff --git a/include/uapi/linux/aio_abi.h b/include/uapi/linux/aio_abi.h
+index bb2554f..6d98cbe 100644
+--- a/include/uapi/linux/aio_abi.h
++++ b/include/uapi/linux/aio_abi.h
+@@ -54,6 +54,13 @@ enum {
+  */
+ #define IOCB_FLAG_RESFD		(1 << 0)
+ 
++/*
++ * Flags for aio_rw_flags member of "struct iocb".
++ * IOCB_RW_FLAG_NOWAIT - Set if the user wants the iocb to fail if it
++ *			would block for operations such as disk allocation.
++ */
++#define IOCB_RW_FLAG_NOWAIT	(1 << 1)
++
+ /* read() from /dev/aio returns these structures. */
+ struct io_event {
+ 	__u64		data;		/* the data field from the iocb */
+@@ -79,7 +86,7 @@ struct io_event {
+ struct iocb {
+ 	/* these are internal to the kernel/libc. */
+ 	__u64	aio_data;	/* data to be returned in event's data */
+-	__u32	PADDED(aio_key, aio_reserved1);
++	__u32	PADDED(aio_key, aio_rw_flags);
+ 				/* the kernel sets aio_key to the req # */
+ 
+ 	/* common fields */
 -- 
-2.7.4
-
-
-_______________________________________________
-Linux-nvme mailing list
-Linux-nvme@lists.infradead.org
-http://lists.infradead.org/mailman/listinfo/linux-nvme
+2.10.2
