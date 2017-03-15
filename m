@@ -1,74 +1,104 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f65.google.com ([74.125.83.65]:35183 "EHLO
-        mail-pg0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754974AbdCPQOW (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Mar 2017 12:14:22 -0400
-From: Ming Lei <tom.leiming@gmail.com>
-To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
-        linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Ming Lei <tom.leiming@gmail.com>
-Subject: [PATCH v3 02/14] md: move two macros into md.h
-Date: Fri, 17 Mar 2017 00:12:23 +0800
-Message-Id: <20170316161235.27110-3-tom.leiming@gmail.com>
-In-Reply-To: <20170316161235.27110-1-tom.leiming@gmail.com>
-References: <20170316161235.27110-1-tom.leiming@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <rgoldwyn@suse.de>
+From: Goldwyn Rodrigues <rgoldwyn@suse.de>
+To: linux-fsdevel@vger.kernel.org
+Cc: jack@suse.com,
+	hch@infradead.org,
+	linux-block@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	linux-ext4@vger.kernel.org,
+	linux-xfs@vger.kernel.org,
+	sagi@grimberg.me,
+	avi@scylladb.com,
+	axboe@kernel.dk,
+	linux-api@vger.kernel.org,
+	willy@infradead.org,
+	Goldwyn Rodrigues <rgoldwyn@suse.com>
+Subject: [PATCH 7/8] nowait aio: xfs
+Date: Wed, 15 Mar 2017 16:51:06 -0500
+Message-Id: <20170315215107.5628-8-rgoldwyn@suse.de>
+In-Reply-To: <20170315215107.5628-1-rgoldwyn@suse.de>
+References: <20170315215107.5628-1-rgoldwyn@suse.de>
+List-ID: <linux-block@vger.kernel.org>
 
-Both raid1 and raid10 share common resync
-block size and page count, so move them into md.h.
+From: Goldwyn Rodrigues <rgoldwyn@suse.com>
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+If IOCB_NOWAIT is set, bail if the i_rwsem is not lockable
+immediately.
+
+IF IOMAP_NOWAIT is set, return EAGAIN in xfs_file_iomap_begin
+if it needs allocation either due to file extension, writing to a hole,
+or COW or waiting for other DIOs to finish.
+
+Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
 ---
- drivers/md/md.h     | 5 +++++
- drivers/md/raid1.c  | 2 --
- drivers/md/raid10.c | 3 ---
- 3 files changed, 5 insertions(+), 5 deletions(-)
+ fs/xfs/xfs_file.c  | 15 +++++++++++----
+ fs/xfs/xfs_iomap.c | 13 +++++++++++++
+ 2 files changed, 24 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/md/md.h b/drivers/md/md.h
-index b8859cbf84b6..1d63239a1be4 100644
---- a/drivers/md/md.h
-+++ b/drivers/md/md.h
-@@ -715,4 +715,9 @@ static inline void mddev_check_writesame(struct mddev *mddev, struct bio *bio)
- 	    !bdev_get_queue(bio->bi_bdev)->limits.max_write_same_sectors)
- 		mddev->queue->limits.max_write_same_sectors = 0;
- }
-+
-+/* Maximum size of each resync request */
-+#define RESYNC_BLOCK_SIZE (64*1024)
-+#define RESYNC_PAGES ((RESYNC_BLOCK_SIZE + PAGE_SIZE-1) / PAGE_SIZE)
-+
- #endif /* _MD_MD_H */
-diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
-index 4a0b2ad5025e..908e2caeb704 100644
---- a/drivers/md/raid1.c
-+++ b/drivers/md/raid1.c
-@@ -94,10 +94,8 @@ static void r1bio_pool_free(void *r1_bio, void *data)
- 	kfree(r1_bio);
- }
+diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
+index 35703a8..08a5eef 100644
+--- a/fs/xfs/xfs_file.c
++++ b/fs/xfs/xfs_file.c
+@@ -541,8 +541,11 @@ xfs_file_dio_aio_write(
+ 		iolock = XFS_IOLOCK_SHARED;
+ 	}
  
--#define RESYNC_BLOCK_SIZE (64*1024)
- #define RESYNC_DEPTH 32
- #define RESYNC_SECTORS (RESYNC_BLOCK_SIZE >> 9)
--#define RESYNC_PAGES ((RESYNC_BLOCK_SIZE + PAGE_SIZE-1) / PAGE_SIZE)
- #define RESYNC_WINDOW (RESYNC_BLOCK_SIZE * RESYNC_DEPTH)
- #define RESYNC_WINDOW_SECTORS (RESYNC_WINDOW >> 9)
- #define CLUSTER_RESYNC_WINDOW (16 * RESYNC_WINDOW)
-diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
-index b4a56a488668..2b40420299e3 100644
---- a/drivers/md/raid10.c
-+++ b/drivers/md/raid10.c
-@@ -125,9 +125,6 @@ static void r10bio_pool_free(void *r10_bio, void *data)
- 	kfree(r10_bio);
- }
+-	xfs_ilock(ip, iolock);
+-
++	if (!xfs_ilock_nowait(ip, iolock)) {
++		if (iocb->ki_flags & IOCB_NOWAIT)
++			return -EAGAIN;
++		xfs_ilock(ip, iolock);
++	}
+ 	ret = xfs_file_aio_write_checks(iocb, from, &iolock);
+ 	if (ret)
+ 		goto out;
+@@ -553,9 +556,13 @@ xfs_file_dio_aio_write(
+ 	 * otherwise demote the lock if we had to take the exclusive lock
+ 	 * for other reasons in xfs_file_aio_write_checks.
+ 	 */
+-	if (unaligned_io)
++	if (unaligned_io) {
++		/* If we are going to wait for other DIO to finish, bail */
++		if ((iocb->ki_flags & IOCB_NOWAIT) &&
++		     atomic_read(&inode->i_dio_count))
++			return -EAGAIN;
+ 		inode_dio_wait(inode);
+-	else if (iolock == XFS_IOLOCK_EXCL) {
++	} else if (iolock == XFS_IOLOCK_EXCL) {
+ 		xfs_ilock_demote(ip, XFS_IOLOCK_EXCL);
+ 		iolock = XFS_IOLOCK_SHARED;
+ 	}
+diff --git a/fs/xfs/xfs_iomap.c b/fs/xfs/xfs_iomap.c
+index 288ee5b..6843725 100644
+--- a/fs/xfs/xfs_iomap.c
++++ b/fs/xfs/xfs_iomap.c
+@@ -1015,6 +1015,11 @@ xfs_file_iomap_begin(
  
--/* Maximum size of each resync request */
--#define RESYNC_BLOCK_SIZE (64*1024)
--#define RESYNC_PAGES ((RESYNC_BLOCK_SIZE + PAGE_SIZE-1) / PAGE_SIZE)
- /* amount of memory to reserve for resync requests */
- #define RESYNC_WINDOW (1024*1024)
- /* maximum number of concurrent requests, memory permitting */
+ 	if ((flags & (IOMAP_WRITE | IOMAP_ZERO)) && xfs_is_reflink_inode(ip)) {
+ 		if (flags & IOMAP_DIRECT) {
++			/* A reflinked inode will result in CoW alloc */
++			if (flags & IOMAP_NOWAIT) {
++				error = -EAGAIN;
++				goto out_unlock;
++			}
+ 			/* may drop and re-acquire the ilock */
+ 			error = xfs_reflink_allocate_cow(ip, &imap, &shared,
+ 					&lockmode);
+@@ -1032,6 +1037,14 @@ xfs_file_iomap_begin(
+ 
+ 	if ((flags & IOMAP_WRITE) && imap_needs_alloc(inode, &imap, nimaps)) {
+ 		/*
++		 * If nowait is set bail since we are going to make
++		 * allocations.
++		 */
++		if (flags & IOMAP_NOWAIT) {
++			error = -EAGAIN;
++			goto out_unlock;
++		}
++		/*
+ 		 * We cap the maximum length we map here to MAX_WRITEBACK_PAGES
+ 		 * pages to keep the chunks of work done where somewhat symmetric
+ 		 * with the work writeback does. This is a completely arbitrary
 -- 
-2.9.3
+2.10.2
