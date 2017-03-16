@@ -1,202 +1,244 @@
-Return-Path: <jhugo@codeaurora.org>
-From: Jeffrey Hugo <jhugo@codeaurora.org>
-Subject: [BUG] Deadlock due due to interactions of block, RCU, and cpu offline
-To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Cc: pprakash@codeaurora.org, "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>,
- Josh Triplett <josh@joshtriplett.org>, Steven Rostedt <rostedt@goodmis.org>,
- Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- Lai Jiangshan <jiangshanlai@gmail.com>, Jens Axboe <axboe@kernel.dk>,
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- Thomas Gleixner <tglx@linutronix.de>,
- Richard Cochran <rcochran@linutronix.de>,
- Boris Ostrovsky <boris.ostrovsky@oracle.com>,
- Richard Weinberger <richard@nod.at>
-Message-ID: <db9c91f6-1b17-6136-84f0-03c3c2581ab4@codeaurora.org>
-Date: Sun, 26 Mar 2017 17:10:40 -0600
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pf0-f196.google.com ([209.85.192.196]:34329 "EHLO
+        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754974AbdCPQOZ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 16 Mar 2017 12:14:25 -0400
+From: Ming Lei <tom.leiming@gmail.com>
+To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
+        linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Ming Lei <tom.leiming@gmail.com>
+Subject: [PATCH v3 05/14] md: raid1: don't use bio's vec table to manage resync pages
+Date: Fri, 17 Mar 2017 00:12:26 +0800
+Message-Id: <20170316161235.27110-6-tom.leiming@gmail.com>
+In-Reply-To: <20170316161235.27110-1-tom.leiming@gmail.com>
+References: <20170316161235.27110-1-tom.leiming@gmail.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Hello,
+Now we allocate one page array for managing resync pages, instead
+of using bio's vec table to do that, and the old way is very hacky
+and won't work any more if multipage bvec is enabled.
 
-I observe that running stress-ng with the cpu-online and fstat tests 
-results in a deadlock of hung tasks:
+The introduced cost is that we need to allocate (128 + 16) * raid_disks
+bytes per r1_bio, and it is fine because the inflight r1_bio for
+resync shouldn't be much, as pointed by Shaohua.
 
-[  366.810486] INFO: task stress-ng-cpu-o:2590 blocked for more than 120 
-seconds.
-[  366.817689]       Not tainted 4.9.0 #39
-[  366.821504] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" 
-disables this message.
-[  366.829320] stress-ng-cpu-o D    0  2590   2589 0x00000008
-[  366.834803] Call trace:
-[  366.837222] [<ffff000008085dd0>] __switch_to+0x60/0x70
-[  366.842338] [<ffff000008a23c18>] __schedule+0x178/0x648
-[  366.847550] [<ffff000008a24120>] schedule+0x38/0x98
-[  366.852408] [<ffff00000848b774>] blk_mq_freeze_queue_wait+0x64/0x1a8
-[  366.858749] [<ffff00000848e9d4>] blk_mq_queue_reinit_work+0x74/0x110
-[  366.865081] [<ffff00000848ea94>] blk_mq_queue_reinit_dead+0x24/0x30
-[  366.871335] [<ffff0000080c9898>] cpuhp_invoke_callback+0x98/0x4a8
-[  366.877411] [<ffff0000080cb084>] cpuhp_down_callbacks+0x114/0x150
-[  366.883484] [<ffff000008a22578>] _cpu_down+0x100/0x1d8
-[  366.888609] [<ffff0000080cbfdc>] do_cpu_down+0x4c/0x78
-[  366.893727] [<ffff0000080cc02c>] cpu_down+0x24/0x30
-[  366.898593] [<ffff0000086aaf28>] cpu_subsys_offline+0x20/0x30
-[  366.904318] [<ffff0000086a53d8>] device_offline+0xa8/0xd8
-[  366.909704] [<ffff0000086a550c>] online_store+0x4c/0xa8
-[  366.914907] [<ffff0000086a241c>] dev_attr_store+0x44/0x60
-[  366.920294] [<ffff0000082b6a24>] sysfs_kf_write+0x5c/0x78
-[  366.925672] [<ffff0000082b5cec>] kernfs_fop_write+0xbc/0x1e8
-[  366.931318] [<ffff000008238320>] __vfs_write+0x48/0x138
-[  366.936526] [<ffff000008239078>] vfs_write+0xa8/0x1c0
-[  366.941557] [<ffff00000823a08c>] SyS_write+0x54/0xb0
-[  366.946511] [<ffff000008083370>] el0_svc_naked+0x24/0x28
-[  366.951800] INFO: task stress-ng-fstat:2591 blocked for more than 120 
-seconds.
-[  366.959008]       Not tainted 4.9.0 #39
-[  366.962823] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" 
-disables this message.
-[  366.970640] stress-ng-fstat D    0  2591   2589 0x00000000
-[  366.976105] Call trace:
-[  366.978540] [<ffff000008085dd0>] __switch_to+0x60/0x70
-[  366.983658] [<ffff000008a23c18>] __schedule+0x178/0x648
-[  366.988870] [<ffff000008a24120>] schedule+0x38/0x98
-[  366.993727] [<ffff00000848b774>] blk_mq_freeze_queue_wait+0x64/0x1a8
-[  367.000068] [<ffff00000848e2d0>] blk_mq_freeze_queue+0x28/0x38
-[  367.005880] [<ffff0000086d480c>] lo_release+0x64/0x90
-[  367.010919] [<ffff000008278bd4>] __blkdev_put+0x26c/0x2c8
-[  367.016300] [<ffff000008278fec>] blkdev_put+0x54/0x128
-[  367.021418] [<ffff0000082790ec>] blkdev_close+0x2c/0x40
-[  367.026631] [<ffff00000823ab58>] __fput+0xa0/0x1e0
-[  367.031401] [<ffff00000823ad10>] ____fput+0x20/0x30
-[  367.036266] [<ffff0000080e7a40>] task_work_run+0xc8/0xe8
-[  367.041557] [<ffff0000080882b4>] do_notify_resume+0xac/0xb8
-[  367.047116] [<ffff000008083294>] work_pending+0x8/0x10
+Also the bio_reset() in raid1_sync_request() is removed because
+all bios are freshly new now and not necessary to reset any more.
 
-I have tested and found this issue to be reproducible on both x86 and 
-ARM64 architectures on 4.7, 4.8, 4.9, 4.10, and 4.11-rc3 kernels.
+This patch can be thought as a cleanup too
 
-Using the below test methodology [1], the issue reproduces within a few 
-minutes.
+Suggested-by: Shaohua Li <shli@kernel.org>
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+---
+ drivers/md/raid1.c | 94 +++++++++++++++++++++++++++++++++++++-----------------
+ 1 file changed, 64 insertions(+), 30 deletions(-)
 
-Using ftrace, I have analyzed the issue on 4.9 and I believe I've found 
-the root cause [2].
-
-Based on my analysis, I have developed a fix [3], which addresses the 
-issue as I am able to run stress-ng for over an hour where I was unable 
-to do so before, however I do not know the full extend of impacts from 
-this fix, and look for guidance from the community to determine the 
-final fix.
-
-
-[1] Test methodology
---------------------
-Boot a multicore system such as a desktop i5 system with nr_cpus=2
-
-Enable all logging to determine when the deadlock occurs (prints from 
-test stop flowing out of the serial port)
-      echo 1 > /sys/module/printk/parameters/ignore_loglevel
-
-Run stress-ng
-      stress-ng --fstat 1 --cpu-online 1 -t 3600
-
-Wait for the test output to stop, and the hung task watchdog to fire.
-
-
-[2] Analysis
-------------
-Again, this analysis is based upon the 4.9 kernel, but believe it to 
-still apply to newer kernels.
-
-I conclude that the hung tasks occur due to a race condition which 
-results in a deadlock.
-
-The race condition occurs between "normal" work in the block layer on a 
-core (the stress-ng-fstat task in the above dump) and cpu offline of 
-that core (the stress-ng-cpu-o task in the above dump).
-
-The fput() from userspace in the fstat task results in a call to 
-blk_mq_freeze_queue(), which drops the last reference to the queue via 
-percpu_ref_kill(), and then waits for the ref count of the queue to hit 
-0 in blk_mq_freeze_queue_wait().  percpu_ref_kill() will result in 
-__percpu_ref_switch_to_atomic() which will use call_rcu_sched() to setup 
-delayed work to finalize the percpu_ref cleanup and drop the ref count to 0.
-
-Note that call_rcu_sched() queues the work to a per-cpu queue, thus the 
-work can only be run on the core it is queued on, by the work thread 
-that is pinned to that core.
-
-It is a race between this work running, and the cpu offline processing.
-
-If the cpu offline processing is able to get to and process the 
-RCU/tree:online state before the queued work from the block layer,  then 
-the pinned work thread will be migrated to another core via 
-rcutree_offline_cpu(), and the work will not be able to execute.
-
-This race condition does not result in deadlock until later in the cpu 
-offline processing.  Once we hit the block/mq:prepare state the block 
-layer freezes all the queues and waits for the ref counts to hit 0. 
-This normally works because at this point the cpu being offlined is dead 
-from cpu:teardown, and the offline processing is occuring on another 
-active cpu, so call_rcu_sched() will queue work to an active cpu where 
-it can get processed.  However the fstat process already did that work 
-for one of the queues to be frozen in the block layer, so the processing 
-of the block/mq:prepare state waits on the same ref count as fstat to 
-hit 0.  Thus we see the result of this as the stress-ng-cpu-o task above.
-
-The block/mq:prepare processing stalls the cpu offline processing which 
-causes a deadlock because the processing does not get to the 
-RCU/tree:prepare state which migrates all of the queued work from the 
-offline cpu to another cpu, which would allow the work that the fstat 
-task queued to execute, drop the ref count to 0, and unblock both 
-stalled tasks.
-
-By reordering the cpu offline states such the shutdown processing of 
-RCU/tree:prepare occurs before block/mq:prepare [3], we prevent deadlock 
-by enabling the queued work in the RCU framework to run elsewhere, and 
-eventually unblock the tasks waiting on the ref count.
-
-However, it is not entirely clear what are the full ramifications of 
-this reorder.  I assume the ordering of these cpu online/offline states 
-is carefully considered, and without that knowledge, I could not say for 
-certain that my fix [3] is safe.
-
-What is the opinion of the domain experts?
-
+diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
+index e30d89690109..0e64beb60e4d 100644
+--- a/drivers/md/raid1.c
++++ b/drivers/md/raid1.c
+@@ -80,6 +80,24 @@ static void lower_barrier(struct r1conf *conf, sector_t sector_nr);
+ #define raid1_log(md, fmt, args...)				\
+ 	do { if ((md)->queue) blk_add_trace_msg((md)->queue, "raid1 " fmt, ##args); } while (0)
+ 
++/*
++ * 'strct resync_pages' stores actual pages used for doing the resync
++ *  IO, and it is per-bio, so make .bi_private points to it.
++ */
++static inline struct resync_pages *get_resync_pages(struct bio *bio)
++{
++	return bio->bi_private;
++}
++
++/*
++ * for resync bio, r1bio pointer can be retrieved from the per-bio
++ * 'struct resync_pages'.
++ */
++static inline struct r1bio *get_resync_r1bio(struct bio *bio)
++{
++	return get_resync_pages(bio)->raid_bio;
++}
++
+ static void * r1bio_pool_alloc(gfp_t gfp_flags, void *data)
+ {
+ 	struct pool_info *pi = data;
+@@ -107,12 +125,18 @@ static void * r1buf_pool_alloc(gfp_t gfp_flags, void *data)
+ 	struct r1bio *r1_bio;
+ 	struct bio *bio;
+ 	int need_pages;
+-	int i, j;
++	int j;
++	struct resync_pages *rps;
+ 
+ 	r1_bio = r1bio_pool_alloc(gfp_flags, pi);
+ 	if (!r1_bio)
+ 		return NULL;
+ 
++	rps = kmalloc(sizeof(struct resync_pages) * pi->raid_disks,
++		      gfp_flags);
++	if (!rps)
++		goto out_free_r1bio;
++
+ 	/*
+ 	 * Allocate bios : 1 for reading, n-1 for writing
+ 	 */
+@@ -132,22 +156,22 @@ static void * r1buf_pool_alloc(gfp_t gfp_flags, void *data)
+ 		need_pages = pi->raid_disks;
+ 	else
+ 		need_pages = 1;
+-	for (j = 0; j < need_pages; j++) {
++	for (j = 0; j < pi->raid_disks; j++) {
++		struct resync_pages *rp = &rps[j];
++
+ 		bio = r1_bio->bios[j];
+-		bio->bi_vcnt = RESYNC_PAGES;
+-
+-		if (bio_alloc_pages(bio, gfp_flags))
+-			goto out_free_pages;
+-	}
+-	/* If not user-requests, copy the page pointers to all bios */
+-	if (!test_bit(MD_RECOVERY_REQUESTED, &pi->mddev->recovery)) {
+-		for (i=0; i<RESYNC_PAGES ; i++)
+-			for (j=1; j<pi->raid_disks; j++) {
+-				struct page *page =
+-					r1_bio->bios[0]->bi_io_vec[i].bv_page;
+-				get_page(page);
+-				r1_bio->bios[j]->bi_io_vec[i].bv_page = page;
+-			}
++
++		if (j < need_pages) {
++			if (resync_alloc_pages(rp, gfp_flags))
++				goto out_free_pages;
++		} else {
++			memcpy(rp, &rps[0], sizeof(*rp));
++			resync_get_all_pages(rp);
++		}
++
++		rp->idx = 0;
++		rp->raid_bio = r1_bio;
++		bio->bi_private = rp;
+ 	}
+ 
+ 	r1_bio->master_bio = NULL;
+@@ -156,11 +180,14 @@ static void * r1buf_pool_alloc(gfp_t gfp_flags, void *data)
+ 
+ out_free_pages:
+ 	while (--j >= 0)
+-		bio_free_pages(r1_bio->bios[j]);
++		resync_free_pages(&rps[j]);
+ 
+ out_free_bio:
+ 	while (++j < pi->raid_disks)
+ 		bio_put(r1_bio->bios[j]);
++	kfree(rps);
++
++out_free_r1bio:
+ 	r1bio_pool_free(r1_bio, data);
+ 	return NULL;
+ }
+@@ -168,14 +195,18 @@ static void * r1buf_pool_alloc(gfp_t gfp_flags, void *data)
+ static void r1buf_pool_free(void *__r1_bio, void *data)
+ {
+ 	struct pool_info *pi = data;
+-	int i,j;
++	int i;
+ 	struct r1bio *r1bio = __r1_bio;
++	struct resync_pages *rp = NULL;
+ 
+-	for (i = 0; i < RESYNC_PAGES; i++)
+-		for (j = pi->raid_disks; j-- ;)
+-			safe_put_page(r1bio->bios[j]->bi_io_vec[i].bv_page);
+-	for (i=0 ; i < pi->raid_disks; i++)
++	for (i = pi->raid_disks; i--; ) {
++		rp = get_resync_pages(r1bio->bios[i]);
++		resync_free_pages(rp);
+ 		bio_put(r1bio->bios[i]);
++	}
++
++	/* resync pages array stored in the 1st bio's .bi_private */
++	kfree(rp);
+ 
+ 	r1bio_pool_free(r1bio, data);
+ }
+@@ -1863,7 +1894,7 @@ static int raid1_remove_disk(struct mddev *mddev, struct md_rdev *rdev)
+ 
+ static void end_sync_read(struct bio *bio)
+ {
+-	struct r1bio *r1_bio = bio->bi_private;
++	struct r1bio *r1_bio = get_resync_r1bio(bio);
+ 
+ 	update_head_pos(r1_bio->read_disk, r1_bio);
+ 
+@@ -1882,7 +1913,7 @@ static void end_sync_read(struct bio *bio)
+ static void end_sync_write(struct bio *bio)
+ {
+ 	int uptodate = !bio->bi_error;
+-	struct r1bio *r1_bio = bio->bi_private;
++	struct r1bio *r1_bio = get_resync_r1bio(bio);
+ 	struct mddev *mddev = r1_bio->mddev;
+ 	struct r1conf *conf = mddev->private;
+ 	sector_t first_bad;
+@@ -2099,6 +2130,7 @@ static void process_checks(struct r1bio *r1_bio)
+ 		int size;
+ 		int error;
+ 		struct bio *b = r1_bio->bios[i];
++		struct resync_pages *rp = get_resync_pages(b);
+ 		if (b->bi_end_io != end_sync_read)
+ 			continue;
+ 		/* fixup the bio for reuse, but preserve errno */
+@@ -2111,7 +2143,8 @@ static void process_checks(struct r1bio *r1_bio)
+ 			conf->mirrors[i].rdev->data_offset;
+ 		b->bi_bdev = conf->mirrors[i].rdev->bdev;
+ 		b->bi_end_io = end_sync_read;
+-		b->bi_private = r1_bio;
++		rp->raid_bio = r1_bio;
++		b->bi_private = rp;
+ 
+ 		size = b->bi_iter.bi_size;
+ 		for (j = 0; j < vcnt ; j++) {
+@@ -2769,7 +2802,6 @@ static sector_t raid1_sync_request(struct mddev *mddev, sector_t sector_nr,
+ 	for (i = 0; i < conf->raid_disks * 2; i++) {
+ 		struct md_rdev *rdev;
+ 		bio = r1_bio->bios[i];
+-		bio_reset(bio);
+ 
+ 		rdev = rcu_dereference(conf->mirrors[i].rdev);
+ 		if (rdev == NULL ||
+@@ -2825,7 +2857,6 @@ static sector_t raid1_sync_request(struct mddev *mddev, sector_t sector_nr,
+ 			atomic_inc(&rdev->nr_pending);
+ 			bio->bi_iter.bi_sector = sector_nr + rdev->data_offset;
+ 			bio->bi_bdev = rdev->bdev;
+-			bio->bi_private = r1_bio;
+ 			if (test_bit(FailFast, &rdev->flags))
+ 				bio->bi_opf |= MD_FAILFAST;
+ 		}
+@@ -2911,9 +2942,12 @@ static sector_t raid1_sync_request(struct mddev *mddev, sector_t sector_nr,
+ 		}
+ 
+ 		for (i = 0 ; i < conf->raid_disks * 2; i++) {
++			struct resync_pages *rp;
++
+ 			bio = r1_bio->bios[i];
++			rp = get_resync_pages(bio);
+ 			if (bio->bi_end_io) {
+-				page = bio->bi_io_vec[bio->bi_vcnt].bv_page;
++				page = resync_fetch_page(rp, rp->idx++);
+ 
+ 				/*
+ 				 * won't fail because the vec table is big
+@@ -2925,8 +2959,8 @@ static sector_t raid1_sync_request(struct mddev *mddev, sector_t sector_nr,
+ 		nr_sectors += len>>9;
+ 		sector_nr += len>>9;
+ 		sync_blocks -= (len>>9);
+-	} while (r1_bio->bios[disk]->bi_vcnt < RESYNC_PAGES);
+- bio_full:
++	} while (get_resync_pages(r1_bio->bios[disk]->bi_private)->idx < RESYNC_PAGES);
++
+ 	r1_bio->sectors = nr_sectors;
+ 
+ 	if (mddev_is_clustered(mddev) &&
 -- 
-Jeffrey Hugo
-Qualcomm Datacenter Technologies as an affiliate of Qualcomm 
-Technologies, Inc.
-Qualcomm Technologies, Inc. is a member of the
-Code Aurora Forum, a Linux Foundation Collaborative Project.
-
-
-[3] Proposed fix
----8>---
-diff --git a/include/linux/cpuhotplug.h b/include/linux/cpuhotplug.h
-index afe641c..9b86db9 100644
---- a/include/linux/cpuhotplug.h
-+++ b/include/linux/cpuhotplug.h
-@@ -49,6 +49,7 @@ enum cpuhp_state {
-         CPUHP_ARM_SHMOBILE_SCU_PREPARE,
-         CPUHP_SH_SH3X_PREPARE,
-         CPUHP_BLK_MQ_PREPARE,
-+       CPUHP_RCUTREE_PREP2,
-         CPUHP_TIMERS_DEAD,
-         CPUHP_NOTF_ERR_INJ_PREPARE,
-         CPUHP_MIPS_SOC_PREPARE,
-diff --git a/kernel/cpu.c b/kernel/cpu.c
-index 29de1a9..b46c573 100644
---- a/kernel/cpu.c
-+++ b/kernel/cpu.c
-@@ -1289,6 +1289,11 @@ static int __init cpu_hotplug_pm_sync_init(void)
-         [CPUHP_RCUTREE_PREP] = {
-                 .name                   = "RCU/tree:prepare",
-                 .startup.single         = rcutree_prepare_cpu,
-+               .teardown.single        = NULL,
-+       },
-+       [CPUHP_RCUTREE_PREP2] = {
-+               .name                   = "RCU/tree:dead",
-+               .startup.single         = NULL,
-                 .teardown.single        = rcutree_dead_cpu,
-         },
-         /*
+2.9.3
