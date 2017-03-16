@@ -1,70 +1,70 @@
-Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
-Subject: Re: [PATCHv2 2/2] nvme: Complete all stuck requests
-To: Keith Busch <keith.busch@intel.com>
-References: <1487896561-10454-1-git-send-email-keith.busch@intel.com>
- <1487896561-10454-2-git-send-email-keith.busch@intel.com>
- <b66a614e-140e-86e9-56bf-d3eafb750aa5@grimberg.me>
- <20170227150107.GA5789@localhost.localdomain>
- <4c952c67-9871-249d-86b0-5f81acf00571@grimberg.me>
- <20170227191459.GA1170@localhost.localdomain>
- <913d4d24-b80b-b7f6-2374-8095bc6fc047@intel.com>
- <20170228165719.GA23236@localhost.localdomain>
-From: Artur Paszkiewicz <artur.paszkiewicz@intel.com>
-Message-ID: <a1e30246-20d4-ac78-89f9-b0fbd3b3f7de@intel.com>
-Date: Wed, 1 Mar 2017 09:54:17 +0100
-MIME-Version: 1.0
-In-Reply-To: <20170228165719.GA23236@localhost.localdomain>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
-List-Post: <mailto:linux-nvme@lists.infradead.org>
-List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
-Cc: Jens Axboe <axboe@fb.com>, Sagi Grimberg <sagi@grimberg.me>,
- Marc MERLIN <marc@merlins.org>, linux-nvme@lists.infradead.org,
- linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
-Content-Type: text/plain; charset="us-ascii"
-Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
-Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pf0-f196.google.com ([209.85.192.196]:33648 "EHLO
+        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754621AbdCPQOU (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 16 Mar 2017 12:14:20 -0400
+From: Ming Lei <tom.leiming@gmail.com>
+To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
+        linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Ming Lei <tom.leiming@gmail.com>
+Subject: [PATCH v3 00/14]  md: cleanup on direct access to bvec table
+Date: Fri, 17 Mar 2017 00:12:21 +0800
+Message-Id: <20170316161235.27110-1-tom.leiming@gmail.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On 02/28/2017 05:57 PM, Keith Busch wrote:
-> On Tue, Feb 28, 2017 at 08:42:19AM +0100, Artur Paszkiewicz wrote:
->>
->> I'm observing the same thing when hibernating during mdraid resync on
->> nvme - it hangs in blk_mq_freeze_queue_wait() after "Disabling non-boot
->> CPUs ...".
-> 
-> The patch guarantees forward progress for blk-mq's hot-cpu notifier on
-> nvme request queues by failing all entered requests. It sounds like some
-> part of your setup needs those requests to succeed in order to hibernate.
-> 
-> If your mdraid uses a stacking request_queue that submits retries while
-> it's request queue is entered, that may explain how you remain stuck
-> at blk_mq_freeze_queue_wait.
-> 
->> This patch did not help but when I put nvme_wait_freeze()
->> right after nvme_start_freeze() it appeared to be working. Maybe the
->> difference here is that requests are submitted from a non-freezable
->> kernel thread (md sync_thread)?
-> 
-> Wait freeze prior to quiescing the queue is ok when the controller is
-> functioning, but it'd be impossible to complete a reset if the controller
-> is in a failed or degraded state.
-> 
-> We probably want to give those requests a chance to succeed, and I think
-> we'd need to be able to timeout the freeze wait. Below are two patches
-> I tested. Prior to these, the fio test would report IO errors from some
-> of its jobs; no errors with these.
+In MD's resync I/O path, there are lots of direct access to bio's
+bvec table. This patchset kills almost all, and the conversion
+is quite straightforward. One root cause of direct access to bvec
+table is that resync I/O uses the bio's bvec to manage pages.
+In V1, as suggested by Shaohua, a new approach is used to manage
+these pages for resync I/O, turns out code becomes more clean
+and readable.
 
-With these patches it works fine. I tested multiple iterations on 2
-platforms and they were able to hibernate and resume without issues.
+Once direct access to bvec table in MD is cleaned up, we may make
+multipage bvec moving on.
+
+V3:
+	- improve pages allocation & bio clone for write behind(10/14)
+	- retrieve pages from preallocated page array, and avoid to user
+	bio helpers(14/14)
+	- change on helpers about managing resync io pages(03/14)
+
+V2:
+	- remove the patch for introducing/applying bio_remove_last_page()
+
+V1:
+	- allocate page array to manage resync pages
 
 Thanks,
-Artur
+Ming
 
-_______________________________________________
-Linux-nvme mailing list
-Linux-nvme@lists.infradead.org
-http://lists.infradead.org/mailman/listinfo/linux-nvme
+Ming Lei (14):
+  md: raid1/raid10: don't handle failure of bio_add_page()
+  md: move two macros into md.h
+  md: prepare for managing resync I/O pages in clean way
+  md: raid1: simplify r1buf_pool_free()
+  md: raid1: don't use bio's vec table to manage resync pages
+  md: raid1: retrieve page from pre-allocated resync page array
+  md: raid1: use bio helper in process_checks()
+  block: introduce bio_copy_data_partial
+  md: raid1: move 'offset' out of loop
+  md: raid1: improve write behind
+  md: raid10: refactor code of read reshape's .bi_end_io
+  md: raid10: don't use bio's vec table to manage resync pages
+  md: raid10: retrieve page from preallocated resync page array
+  md: raid10: avoid direct access to bvec table in
+    handle_reshape_read_error
+
+ block/bio.c         |  60 +++++++++---
+ drivers/md/md.h     |  55 +++++++++++
+ drivers/md/raid1.c  | 267 ++++++++++++++++++++++++++++------------------------
+ drivers/md/raid1.h  |  10 +-
+ drivers/md/raid10.c | 224 +++++++++++++++++++++++--------------------
+ include/linux/bio.h |   2 +
+ 6 files changed, 376 insertions(+), 242 deletions(-)
+
+-- 
+2.9.3
