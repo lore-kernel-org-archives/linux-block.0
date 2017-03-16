@@ -1,44 +1,66 @@
-Return-Path: <BATV+2133f6211fed31f2c605+4968+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk,
-	martin.petersen@oracle.com,
-	agk@redhat.com,
-	snitzer@redhat.com,
-	shli@kernel.org,
-	philipp.reisner@linbit.com,
-	lars.ellenberg@linbit.com
-Cc: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	drbd-dev@lists.linbit.com,
-	dm-devel@redhat.com,
-	linux-raid@vger.kernel.org
-Subject: [PATCH 21/25] mmc: remove the discard_zeroes_data flag
-Date: Fri, 31 Mar 2017 18:33:09 +0200
-Message-Id: <20170331163313.31821-22-hch@lst.de>
-In-Reply-To: <20170331163313.31821-1-hch@lst.de>
-References: <20170331163313.31821-1-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pf0-f196.google.com ([209.85.192.196]:34954 "EHLO
+        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755068AbdCPQO2 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 16 Mar 2017 12:14:28 -0400
+From: Ming Lei <tom.leiming@gmail.com>
+To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
+        linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Ming Lei <tom.leiming@gmail.com>
+Subject: [PATCH v3 04/14] md: raid1: simplify r1buf_pool_free()
+Date: Fri, 17 Mar 2017 00:12:25 +0800
+Message-Id: <20170316161235.27110-5-tom.leiming@gmail.com>
+In-Reply-To: <20170316161235.27110-1-tom.leiming@gmail.com>
+References: <20170316161235.27110-1-tom.leiming@gmail.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-mmc only supports discarding on large alignments, so the zeroing code
-would always fall back to explicit writings of zeroes.
+This patch gets each page's reference of each bio for resync,
+then r1buf_pool_free() gets simplified a lot.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+The same policy has been taken in raid10's buf pool allocation/free
+too.
+
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- drivers/mmc/core/queue.c | 2 --
- 1 file changed, 2 deletions(-)
+ drivers/md/raid1.c | 15 +++++++--------
+ 1 file changed, 7 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/mmc/core/queue.c b/drivers/mmc/core/queue.c
-index 493eb10ce580..4c54ad34e17a 100644
---- a/drivers/mmc/core/queue.c
-+++ b/drivers/mmc/core/queue.c
-@@ -167,8 +167,6 @@ static void mmc_queue_setup_discard(struct request_queue *q,
+diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
+index 908e2caeb704..e30d89690109 100644
+--- a/drivers/md/raid1.c
++++ b/drivers/md/raid1.c
+@@ -142,9 +142,12 @@ static void * r1buf_pool_alloc(gfp_t gfp_flags, void *data)
+ 	/* If not user-requests, copy the page pointers to all bios */
+ 	if (!test_bit(MD_RECOVERY_REQUESTED, &pi->mddev->recovery)) {
+ 		for (i=0; i<RESYNC_PAGES ; i++)
+-			for (j=1; j<pi->raid_disks; j++)
+-				r1_bio->bios[j]->bi_io_vec[i].bv_page =
++			for (j=1; j<pi->raid_disks; j++) {
++				struct page *page =
+ 					r1_bio->bios[0]->bi_io_vec[i].bv_page;
++				get_page(page);
++				r1_bio->bios[j]->bi_io_vec[i].bv_page = page;
++			}
+ 	}
  
- 	queue_flag_set_unlocked(QUEUE_FLAG_DISCARD, q);
- 	blk_queue_max_discard_sectors(q, max_discard);
--	if (card->erased_byte == 0 && !mmc_can_discard(card))
--		q->limits.discard_zeroes_data = 1;
- 	q->limits.discard_granularity = card->pref_erase << 9;
- 	/* granularity must not be greater than max. discard */
- 	if (card->pref_erase > max_discard)
+ 	r1_bio->master_bio = NULL;
+@@ -169,12 +172,8 @@ static void r1buf_pool_free(void *__r1_bio, void *data)
+ 	struct r1bio *r1bio = __r1_bio;
+ 
+ 	for (i = 0; i < RESYNC_PAGES; i++)
+-		for (j = pi->raid_disks; j-- ;) {
+-			if (j == 0 ||
+-			    r1bio->bios[j]->bi_io_vec[i].bv_page !=
+-			    r1bio->bios[0]->bi_io_vec[i].bv_page)
+-				safe_put_page(r1bio->bios[j]->bi_io_vec[i].bv_page);
+-		}
++		for (j = pi->raid_disks; j-- ;)
++			safe_put_page(r1bio->bios[j]->bi_io_vec[i].bv_page);
+ 	for (i=0 ; i < pi->raid_disks; i++)
+ 		bio_put(r1bio->bios[i]);
+ 
 -- 
-2.11.0
+2.9.3
