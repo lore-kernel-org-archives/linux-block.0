@@ -1,40 +1,57 @@
-Return-Path: <zhouchengming1@huawei.com>
-From: Zhou Chengming <zhouchengming1@huawei.com>
-To: <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <miaoxie@huawei.com>, <zhouchengming1@huawei.com>
-Subject: [PATCH v2] don't forget to call pd_online_fn when activate policy
-Date: Thu, 9 Mar 2017 10:20:08 +0800
-Message-ID: <1489026008-161611-1-git-send-email-zhouchengming1@huawei.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pf0-f196.google.com ([209.85.192.196]:34397 "EHLO
+        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755117AbdCPQOh (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 16 Mar 2017 12:14:37 -0400
+From: Ming Lei <tom.leiming@gmail.com>
+To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
+        linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Ming Lei <tom.leiming@gmail.com>
+Subject: [PATCH v3 09/14] md: raid1: move 'offset' out of loop
+Date: Fri, 17 Mar 2017 00:12:30 +0800
+Message-Id: <20170316161235.27110-10-tom.leiming@gmail.com>
+In-Reply-To: <20170316161235.27110-1-tom.leiming@gmail.com>
+References: <20170316161235.27110-1-tom.leiming@gmail.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-When we activate policy on the request_queue, we will create policy_date
-for all the existing blkgs of the request_queue, so we should call
-pd_init_fn() and pd_online_fn() on these newly created policy_data.
+The 'offset' local variable can't be changed inside the loop, so
+move it out.
 
-Signed-off-by: Zhou Chengming <zhouchengming1@huawei.com>
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- block/blk-cgroup.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ drivers/md/raid1.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 8ba0af7..0dd9e76 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -1254,6 +1254,12 @@ int blkcg_activate_policy(struct request_queue *q,
- 		pd->plid = pol->plid;
- 		if (pol->pd_init_fn)
- 			pol->pd_init_fn(pd);
-+
-+		if (pol->pd_online_fn) {
-+			spin_lock(blkg->blkcg->lock);
-+			pol->pd_online_fn(pd);
-+			spin_unlock(blkg->blkcg->lock);
-+		}
- 	}
+diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
+index 4034a2963da8..2f3622c695ce 100644
+--- a/drivers/md/raid1.c
++++ b/drivers/md/raid1.c
+@@ -1317,6 +1317,7 @@ static void raid1_write_request(struct mddev *mddev, struct bio *bio)
+ 	int first_clone;
+ 	int sectors_handled;
+ 	int max_sectors;
++	sector_t offset;
  
- 	__set_bit(pol->plid, q->blkcg_pols);
+ 	/*
+ 	 * Register the new request and wait if the reconstruction
+@@ -1481,13 +1482,13 @@ static void raid1_write_request(struct mddev *mddev, struct bio *bio)
+ 	atomic_set(&r1_bio->behind_remaining, 0);
+ 
+ 	first_clone = 1;
++
++	offset = r1_bio->sector - bio->bi_iter.bi_sector;
+ 	for (i = 0; i < disks; i++) {
+ 		struct bio *mbio = NULL;
+-		sector_t offset;
+ 		if (!r1_bio->bios[i])
+ 			continue;
+ 
+-		offset = r1_bio->sector - bio->bi_iter.bi_sector;
+ 
+ 		if (first_clone) {
+ 			/* do behind I/O ?
 -- 
-1.8.3.1
+2.9.3
