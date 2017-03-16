@@ -1,75 +1,54 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.136]:52814 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1755054AbdCTW7D (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 20 Mar 2017 18:59:03 -0400
-From: Ming Lin <mlin@kernel.org>
-To: nbd-general@lists.sourceforge.net, Josef Bacik <jbacik@fb.com>,
-        Ratna Manoj Bolla <manoj.br@gmail.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        jianshu.ljs@alibaba-inc.com, xiongwei.jiang@alibaba-inc.com,
-        james.liu@alibaba-inc.com, Markus Pargmann <mpa@pengutronix.de>
-Subject: [RFC PATCH 1/1] nbd: replace kill_bdev() with __invalidate_device()
-Date: Mon, 20 Mar 2017 15:58:49 -0700
-Message-Id: <1490050729-3578-2-git-send-email-mlin@kernel.org>
-In-Reply-To: <1490050729-3578-1-git-send-email-mlin@kernel.org>
-References: <1490050729-3578-1-git-send-email-mlin@kernel.org>
+Received: from mail-pf0-f193.google.com ([209.85.192.193]:34463 "EHLO
+        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755151AbdCPQOv (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 16 Mar 2017 12:14:51 -0400
+From: Ming Lei <tom.leiming@gmail.com>
+To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
+        linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Ming Lei <tom.leiming@gmail.com>
+Subject: [PATCH v3 14/14] md: raid10: avoid direct access to bvec table in handle_reshape_read_error
+Date: Fri, 17 Mar 2017 00:12:35 +0800
+Message-Id: <20170316161235.27110-15-tom.leiming@gmail.com>
+In-Reply-To: <20170316161235.27110-1-tom.leiming@gmail.com>
+References: <20170316161235.27110-1-tom.leiming@gmail.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Ratna Manoj Bolla <manoj.br@gmail.com>
+All reshape I/O share pages from 1st copy device, so just use that pages
+for avoiding direct access to bvec table in handle_reshape_read_error.
 
-When a filesystem is mounted on a nbd device and on a disconnect, because
-of kill_bdev(), and resetting bdev size to zero, buffer_head mappings are
-getting destroyed under mounted filesystem.
-
-After a bdev size reset(i.e bdev->bd_inode->i_size = 0) on a disconnect,
-followed by a sys_umount(),
-        generic_shutdown_super()->...
-        ->__sync_blockdev()->...
-        -blkdev_writepages()->...
-        ->do_invalidatepage()->...
-        -discard_buffer()   is discarding superblock buffer_head assumed
-to be in mapped state by ext4_commit_super().
-
-[mlin: ported to 4.11-rc2]
-Signed-off-by: Ratna Manoj Bolla <manoj.br@gmail.com
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- drivers/block/nbd.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ drivers/md/raid10.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index cb4ccfc..a6a3643 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -125,7 +125,8 @@ static const char *nbdcmd_to_ascii(int cmd)
- 
- static int nbd_size_clear(struct nbd_device *nbd, struct block_device *bdev)
- {
--	bd_set_size(bdev, 0);
-+	if (bdev->bd_openers <= 1)
-+		bd_set_size(bdev, 0);
- 	set_capacity(nbd->disk, 0);
- 	kobject_uevent(&nbd_to_dev(nbd)->kobj, KOBJ_CHANGE);
- 
-@@ -603,6 +604,8 @@ static void nbd_reset(struct nbd_device *nbd)
- 
- static void nbd_bdev_reset(struct block_device *bdev)
- {
-+	if (bdev->bd_openers > 1)
-+		return;
- 	set_device_ro(bdev, false);
- 	bdev->bd_inode->i_size = 0;
- 	if (max_part > 0) {
-@@ -666,7 +669,8 @@ static int nbd_clear_sock(struct nbd_device *nbd, struct block_device *bdev)
- {
- 	sock_shutdown(nbd);
- 	nbd_clear_que(nbd);
--	kill_bdev(bdev);
+diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
+index 8db3b0869be4..67cf09c0c649 100644
+--- a/drivers/md/raid10.c
++++ b/drivers/md/raid10.c
+@@ -4681,7 +4681,10 @@ static int handle_reshape_read_error(struct mddev *mddev,
+ 	struct r10bio *r10b = &on_stack.r10_bio;
+ 	int slot = 0;
+ 	int idx = 0;
+-	struct bio_vec *bvec = r10_bio->master_bio->bi_io_vec;
++	struct page **pages;
 +
-+	__invalidate_device(bdev, true);
- 	nbd_bdev_reset(bdev);
- 	/*
- 	 * We want to give the run thread a chance to wait for everybody
++	/* reshape IOs share pages from .devs[0].bio */
++	pages = get_resync_pages(r10_bio->devs[0].bio)->pages;
+ 
+ 	r10b->sector = r10_bio->sector;
+ 	__raid10_find_phys(&conf->prev, r10b);
+@@ -4710,7 +4713,7 @@ static int handle_reshape_read_error(struct mddev *mddev,
+ 			success = sync_page_io(rdev,
+ 					       addr,
+ 					       s << 9,
+-					       bvec[idx].bv_page,
++					       pages[idx],
+ 					       REQ_OP_READ, 0, false);
+ 			rdev_dec_pending(rdev, mddev);
+ 			rcu_read_lock();
 -- 
-1.8.3.1
+2.9.3
