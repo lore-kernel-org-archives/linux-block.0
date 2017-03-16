@@ -1,55 +1,53 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-vk0-f65.google.com ([209.85.213.65]:34965 "EHLO
-        mail-vk0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752353AbdCQAHo (ORCPT
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:49736 "EHLO
+        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752122AbdCPVi0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Mar 2017 20:07:44 -0400
-MIME-Version: 1.0
-In-Reply-To: <1489700141.2574.16.camel@sandisk.com>
-References: <1489064578-17305-1-git-send-email-tom.leiming@gmail.com>
- <1489064578-17305-3-git-send-email-tom.leiming@gmail.com> <1489536441.2676.21.camel@sandisk.com>
- <20170315121851.GA15807@ming.t460p> <20170315124024.GA16549@ming.t460p>
- <1489592177.2660.1.camel@sandisk.com> <20170315162158.GA18768@ming.t460p>
- <1489613678.2660.9.camel@sandisk.com> <20170316000747.GA19948@ming.t460p> <1489700141.2574.16.camel@sandisk.com>
-From: Ming Lei <tom.leiming@gmail.com>
-Date: Fri, 17 Mar 2017 08:07:42 +0800
-Message-ID: <CACVXFVNHA4Dh-rx8VsVnwaY4iZJY2tucKF7V-WcNNa4=F5twfA@mail.gmail.com>
-Subject: Re: [PATCH 1/2] blk-mq: don't complete un-started request in timeout handler
-To: Bart Van Assche <Bart.VanAssche@sandisk.com>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Thu, 16 Mar 2017 17:38:26 -0400
+From: Bart Van Assche <Bart.VanAssche@sandisk.com>
+To: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "hch@infradead.org" <hch@infradead.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "yizhan@redhat.com" <yizhan@redhat.com>,
-        "axboe@fb.com" <axboe@fb.com>,
+        "tom.leiming@gmail.com" <tom.leiming@gmail.com>,
+        "axboe@fb.com" <axboe@fb.com>
+CC: "yizhan@redhat.com" <yizhan@redhat.com>,
         "stable@vger.kernel.org" <stable@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [PATCH 1/2] blk-mq: don't complete un-started request in
+ timeout handler
+Date: Thu, 16 Mar 2017 21:37:23 +0000
+Message-ID: <1489700230.2574.18.camel@sandisk.com>
+References: <1489064578-17305-1-git-send-email-tom.leiming@gmail.com>
+         <1489064578-17305-3-git-send-email-tom.leiming@gmail.com>
+In-Reply-To: <1489064578-17305-3-git-send-email-tom.leiming@gmail.com>
+Content-Type: text/plain; charset="iso-8859-1"
+MIME-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Fri, Mar 17, 2017 at 5:35 AM, Bart Van Assche
-<Bart.VanAssche@sandisk.com> wrote:
-> On Thu, 2017-03-16 at 08:07 +0800, Ming Lei wrote:
->> > * Check whether REQ_ATOM_STARTED has been set.
->> > * Check whether REQ_ATOM_COMPLETE has not yet been set.
->> > * If both conditions have been met, set REQ_ATOM_COMPLETE.
->> >
->> > I don't think there is another solution than using a single state variable to
->> > represent the REQ_ATOM_STARTED and REQ_ATOM_COMPLETE states instead of two
->> > independent bits. How about the patch below?
->>
->> I would review it if you can confirm me that it is a real issue, :-)
->
-> Hello Ming,
->
-> I was chasing a v4.11 regression in the SCSI stack. Since my tests of today
-> revealed that it's probably not a block layer issue, let's proceed with your
-> patch.
+On Thu, 2017-03-09 at 21:02 +0800, Ming Lei wrote:
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 159187a28d66..0aff380099d5 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -697,17 +697,8 @@ static void blk_mq_check_expired(struct blk_mq_hw_ct=
+x *hctx,
+>  {
+>  	struct blk_mq_timeout_data *data =3D priv;
+> =20
+> -	if (!test_bit(REQ_ATOM_STARTED, &rq->atomic_flags)) {
+> -		/*
+> -		 * If a request wasn't started before the queue was
+> -		 * marked dying, kill it here or it'll go unnoticed.
+> -		 */
+> -		if (unlikely(blk_queue_dying(rq->q))) {
+> -			rq->errors =3D -EIO;
+> -			blk_mq_end_request(rq, rq->errors);
+> -		}
+> +	if (!test_bit(REQ_ATOM_STARTED, &rq->atomic_flags))
+>  		return;
+> -	}
+> =20
+>  	if (time_after_eq(jiffies, rq->deadline)) {
+>  		if (!blk_mark_rq_complete(rq))
 
-Yeah, it shouldn't have been related with blk-mq timeout handler which
-isn't changed much
-recently, and thanks for your review!
-
-
-
-Thanks,
-Ming Lei
+Reviewed-by: Bart Van Assche <bart.vanassche@sandisk.com>=
