@@ -1,43 +1,45 @@
-Return-Path: <BATV+2133f6211fed31f2c605+4968+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk,
-	martin.petersen@oracle.com,
-	agk@redhat.com,
-	snitzer@redhat.com,
-	shli@kernel.org,
-	philipp.reisner@linbit.com,
-	lars.ellenberg@linbit.com
-Cc: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	drbd-dev@lists.linbit.com,
-	dm-devel@redhat.com,
-	linux-raid@vger.kernel.org
-Subject: [PATCH 19/25] rbd: remove the discard_zeroes_data flag
-Date: Fri, 31 Mar 2017 18:33:07 +0200
-Message-Id: <20170331163313.31821-20-hch@lst.de>
-In-Reply-To: <20170331163313.31821-1-hch@lst.de>
-References: <20170331163313.31821-1-hch@lst.de>
+Return-Path: <rgoldwyn@suse.de>
+Subject: Re: [PATCH 3/8] nowait aio: return if direct write will trigger
+ writeback
+To: Matthew Wilcox <willy@infradead.org>
+References: <20170315215107.5628-1-rgoldwyn@suse.de>
+ <20170315215107.5628-4-rgoldwyn@suse.de>
+ <20170316132052.GG4033@bombadil.infradead.org>
+Cc: linux-fsdevel@vger.kernel.org, jack@suse.com, hch@infradead.org,
+ linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org,
+ linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org, sagi@grimberg.me,
+ avi@scylladb.com, axboe@kernel.dk, linux-api@vger.kernel.org,
+ Goldwyn Rodrigues <rgoldwyn@suse.com>
+From: Goldwyn Rodrigues <rgoldwyn@suse.de>
+Message-ID: <8a799ad5-6481-66d3-7f21-6eaeb33eaa7b@suse.de>
+Date: Thu, 16 Mar 2017 08:46:31 -0500
+MIME-Version: 1.0
+In-Reply-To: <20170316132052.GG4033@bombadil.infradead.org>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-block@vger.kernel.org>
 
-rbd only supports discarding on large alignments, so the zeroing code
-would always fall back to explicit writings of zeroes.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/block/rbd.c | 1 -
- 1 file changed, 1 deletion(-)
 
-diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
-index 517838b65964..0ec3b430e81d 100644
---- a/drivers/block/rbd.c
-+++ b/drivers/block/rbd.c
-@@ -4380,7 +4380,6 @@ static int rbd_init_disk(struct rbd_device *rbd_dev)
- 	q->limits.discard_granularity = segment_size;
- 	q->limits.discard_alignment = segment_size;
- 	blk_queue_max_discard_sectors(q, segment_size / SECTOR_SIZE);
--	q->limits.discard_zeroes_data = 1;
- 
- 	if (!ceph_test_opt(rbd_dev->rbd_client->client, NOCRC))
- 		q->backing_dev_info->capabilities |= BDI_CAP_STABLE_WRITES;
+On 03/16/2017 08:20 AM, Matthew Wilcox wrote:
+> On Wed, Mar 15, 2017 at 04:51:02PM -0500, Goldwyn Rodrigues wrote:
+>> From: Goldwyn Rodrigues <rgoldwyn@suse.com>
+>>
+>> Find out if the write will trigger a wait due to writeback. If yes,
+>> return -EAGAIN.
+>>
+>> This introduces a new function filemap_range_has_page() which
+>> returns true if the file's mapping has a page within the range
+>> mentioned.
+>>
+>> Return -EINVAL for buffered AIO: there are multiple causes of
+>> delay such as page locks, dirty throttling logic, page loading
+>> from disk etc. which cannot be taken care of.
+> 
+> Also, this patch only touches the write path; we have a similar call to
+> write_and_wait_range() in generic_file_read_iter().
+> 
+
+This patch series is concerned with direct-write AIO paths only.
+
 -- 
-2.11.0
+Goldwyn
