@@ -1,51 +1,72 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <Bart.VanAssche@sandisk.com>
-To: "paolo.valente@linaro.org" <paolo.valente@linaro.org>,
-	"linus.walleij@linaro.org" <linus.walleij@linaro.org>
-CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"fchecconi@gmail.com" <fchecconi@gmail.com>, "axboe@kernel.dk"
-	<axboe@kernel.dk>, "broonie@kernel.org" <broonie@kernel.org>,
-	"avanzini.arianna@gmail.com" <avanzini.arianna@gmail.com>, "tj@kernel.org"
-	<tj@kernel.org>, "ulf.hansson@linaro.org" <ulf.hansson@linaro.org>
-Subject: Re: [PATCH RFC 00/14] Add the BFQ I/O Scheduler to blk-mq
-Date: Sat, 18 Mar 2017 17:46:47 +0000
-Message-ID: <1489859192.2339.12.camel@sandisk.com>
-References: <20170304160131.57366-1-paolo.valente@linaro.org>
-	 <1488848390.3125.14.camel@sandisk.com>
-	 <81048010-02AB-4A7A-8C10-FAF7E3242DCC@linaro.org>
-	 <1489509154.2676.6.camel@sandisk.com>
-	 <A8A05E9B-2FDF-4986-833E-166D92DFEF4F@linaro.org>
-	 <CACRpkdZhA8FY2FH_fnTsnPotZoZwX5qUfhdavWLwfzcnLkZUMQ@mail.gmail.com>
-In-Reply-To: <CACRpkdZhA8FY2FH_fnTsnPotZoZwX5qUfhdavWLwfzcnLkZUMQ@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
+Return-Path: <linus.walleij@linaro.org>
 MIME-Version: 1.0
-Return-Path: Bart.VanAssche@sandisk.com
+In-Reply-To: <A8A05E9B-2FDF-4986-833E-166D92DFEF4F@linaro.org>
+References: <20170304160131.57366-1-paolo.valente@linaro.org>
+ <1488848390.3125.14.camel@sandisk.com> <81048010-02AB-4A7A-8C10-FAF7E3242DCC@linaro.org>
+ <1489509154.2676.6.camel@sandisk.com> <A8A05E9B-2FDF-4986-833E-166D92DFEF4F@linaro.org>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Sat, 18 Mar 2017 18:09:41 +0100
+Message-ID: <CACRpkdZhA8FY2FH_fnTsnPotZoZwX5qUfhdavWLwfzcnLkZUMQ@mail.gmail.com>
+Subject: Re: [PATCH RFC 00/14] Add the BFQ I/O Scheduler to blk-mq
+To: Paolo Valente <paolo.valente@linaro.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, "fchecconi@gmail.com" <fchecconi@gmail.com>,
+	"axboe@kernel.dk" <axboe@kernel.dk>, Arianna Avanzini <avanzini.arianna@gmail.com>,
+	"broonie@kernel.org" <broonie@kernel.org>, "tj@kernel.org" <tj@kernel.org>,
+	"ulf.hansson@linaro.org" <ulf.hansson@linaro.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
-T24gU2F0LCAyMDE3LTAzLTE4IGF0IDE4OjA5ICswMTAwLCBMaW51cyBXYWxsZWlqIHdyb3RlOg0K
-PiBPbiBTYXQsIE1hciAxOCwgMjAxNyBhdCAxMTo1MiBBTSwgUGFvbG8gVmFsZW50ZQ0KPiA8cGFv
-bG8udmFsZW50ZUBsaW5hcm8ub3JnPiB3cm90ZToNCj4gPiA+IElsIGdpb3JubyAxNCBtYXIgMjAx
-NywgYWxsZSBvcmUgMTY6MzIsIEJhcnQgVmFuIEFzc2NoZSA8YmFydC52YW5hc3NjaGVAc2FuZGlz
-ay5jb20+IGhhIHNjcml0dG86DQo+ID4gPiAoLi4uKSB3aGF0IHNob3VsZA0KPiA+ID4gYSBkZXZl
-bG9wZXIgZG8gd2hvIG9ubHkgaGFzIGFjY2VzcyB0byBhIHNtYWxsIHN1YnNldCBvZiBhbGwgdGhl
-IHN0b3JhZ2UNCj4gPiA+IGRldmljZXMgdGhhdCBhcmUgc3VwcG9ydGVkIGJ5IHRoZSBMaW51eCBr
-ZXJuZWwgYW5kIGhlbmNlIHdobyBjYW4gbm90IHJ1biB0aGUNCj4gPiA+IGJlbmNobWFyayBhZ2Fp
-bnN0IGV2ZXJ5IHN1cHBvcnRlZCBzdG9yYWdlIGRldmljZT8NCj4gDQo+IERvbid0IHdlIHVzZSB0
-aGUgY29tbXVuaXR5IGZvciB0aGF0PyBXZSBhcmUgZGVwZW5kZW50IG9uIHBlb3BsZQ0KPiBkb3du
-bG9hZGluZyBhbmQgdGVzdGluZyBvdXIgY29kZSBldmVudHVhbGx5LCBJIG1lYW4gc3VyZSBpdCdz
-IGdvb2QgaWYNCj4gd2UgbWFrZSBzb21lIHJlYXNvbmFibGUgZWZmb3J0IHRvIHRlc3QgY2hhbmdl
-cyB3ZSBkbywgYnV0IHdlIGFyZQ0KPiBvbmx5IGh1bWFucywgYW5kIHdlIGdldCBjb3JyZWN0ZWQg
-YnkgdGhlIGV4cGVyaWVuY2Ugb2Ygb3RoZXIgaHVtYW5zLg0KDQpIZWxsbyBMaW51cywNCg0KRG8g
-eW91IG1lYW4gcmVseWluZyBvbiB0aGUgY29tbXVuaXR5IHRvIHRlc3Qgb3RoZXIgc3RvcmFnZSBk
-ZXZpY2VzIGJlZm9yZQ0Kb3IgYWZ0ZXIgYSBwYXRjaCBpcyB1cHN0cmVhbT8gUmVseWluZyBvbiB0
-aGUgY29tbXVuaXR5IHRvIGZpbGUgYnVnIHJlcG9ydHMNCmFmdGVyIGEgcGF0Y2ggaXMgdXBzdHJl
-YW0gd291bGQgYmUgd3JvbmcuIFRoZSBMaW51eCBrZXJuZWwgc2hvdWxkIG5vdCBiZQ0KdXNlZCBm
-b3IgZXhwZXJpbWVudHMuIEFzIHlvdSBrbm93IHBhdGNoZXMgdGhhdCBhcmUgc2VudCB1cHN0cmVh
-bSBzaG91bGQNCm5vdCBpbnRyb2R1Y2UgcmVncmVzc2lvbnMuDQoNCk15IHByaW1hcnkgY29uY2Vy
-biBhYm91dCBCRlEgaXMgdGhhdCBpdCBpcyBhIHZlcnkgY29tcGxpY2F0ZWQgSS9PIHNjaGVkdWxl
-cg0KYW5kIGFsc28gdGhhdCB0aGUgY29uY2VwdHMgdXNlZCBpbnRlcm5hbGx5IGluIHRoYXQgSS9P
-IHNjaGVkdWxlciBhcmUgZmFyDQphd2F5IGZyb20gdGhlIGNvbmNlcHRzIHdlIGFyZSB1c2VkIHRv
-IHdoZW4gcmVhc29uaW5nIGFib3V0IEkvTyBkZXZpY2VzLiBJJ20NCmNvbmNlcm5lZCB0aGF0IHRo
-aXMgd2lsbCBtYWtlIHRoZSBCRlEgSS9PIHNjaGVkdWxlciBoYXJkIHRvIG1haW50YWluLg0KDQpC
-YXJ0Lg==
+On Sat, Mar 18, 2017 at 11:52 AM, Paolo Valente
+<paolo.valente@linaro.org> wrote:
+>> Il giorno 14 mar 2017, alle ore 16:32, Bart Van Assche <bart.vanassche@sandisk.com> ha scritto:
+
+>> (...) what should
+>> a developer do who only has access to a small subset of all the storage
+>> devices that are supported by the Linux kernel and hence who can not run the
+>> benchmark against every supported storage device?
+
+Don't we use the community for that? We are dependent on people
+downloading and testing our code eventually, I mean sure it's good if
+we make some reasonable effort to test changes we do, but we are
+only humans, and we get corrected by the experience of other humans.
+
+>> Do developers who do not
+>> fully understand the BFQ algorithms and who run into a performance problem
+>> have any other option than trial and error for fixing such performance issues?
+>
+> Hi Bart,
+> maybe I got your point even before, but I did not reply consistently.
+> You are highlighting an important problem, which, I think, can be
+> stated in more general terms: if one makes a change in any complex
+> component, which, in its turn, interacts with complex I/O devices,
+> then it is hard, if ever possible, to prove, that that change will
+> cause no regression with any possible device, just by speculation.
+> Actually, facts show that this often holds even for simple components,
+> given the complexity of the environment in which they work.  Of
+> course, if not only the component is complex, but who modifies it does
+> not even fully understand how that component works, then regressions
+> on untested devices are certainly more probable.
+
+You are running a host of benchmarks on a host of devices, using
+the fio tool that Jens devised for this kind of tests. What more can be
+asked? More tests, more devices?
+
+If you increase the amount of proof that is requested for any change
+to any computer program not to cause unintended side effects or
+regressions, you will eventually end up with the brick wall
+"solve the halting problem".
+
+Alternatively "test it forever on all systems in the world".
+
+It eventually becomes absurd.
+
+This actually occurred to me .. in a certain mission-critical algorithm
+my department was requested to "prove that this will run to completion".
+I was baffled and said that what they were requesting was that I
+solve the halting problem. It turned out they just wanted something like
+a comprehensible test suite.
+
+Yours,
+Linus Walleij
