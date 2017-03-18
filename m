@@ -1,59 +1,81 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <Bart.VanAssche@sandisk.com>
-To: "paolo.valente@linaro.org" <paolo.valente@linaro.org>
-CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"fchecconi@gmail.com" <fchecconi@gmail.com>, "linus.walleij@linaro.org"
-	<linus.walleij@linaro.org>, "axboe@kernel.dk" <axboe@kernel.dk>,
-	"avanzini.arianna@gmail.com" <avanzini.arianna@gmail.com>,
-	"broonie@kernel.org" <broonie@kernel.org>, "tj@kernel.org" <tj@kernel.org>,
-	"ulf.hansson@linaro.org" <ulf.hansson@linaro.org>
-Subject: Re: [PATCH RFC 01/14] block, bfq: introduce the BFQ-v0 I/O
- scheduler as an extra scheduler
-Date: Sat, 18 Mar 2017 15:24:34 +0000
-Message-ID: <1489850658.2339.1.camel@sandisk.com>
-References: <20170304160131.57366-1-paolo.valente@linaro.org>
-	 <20170304160131.57366-2-paolo.valente@linaro.org>
-	 <1D08B61A9CF0974AA09887BE32D889DA0DA145@ULS-OP-MBXIP03.sdcorp.global.sandisk.com>
-	 <0B1F1CFD-C8AB-442D-B5C6-426D19B1FBA3@linaro.org>
-In-Reply-To: <0B1F1CFD-C8AB-442D-B5C6-426D19B1FBA3@linaro.org>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Return-Path: Bart.VanAssche@sandisk.com
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+Content-Type: text/plain; charset=windows-1252
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Subject: Re: [PATCH RFC 01/14] block, bfq: introduce the BFQ-v0 I/O scheduler as an extra scheduler
+From: Paolo Valente <paolo.valente@linaro.org>
+In-Reply-To: <9ddb9586-d97e-e7b2-0081-216521f7be76@kernel.dk>
+Date: Sat, 18 Mar 2017 08:41:52 -0400
+Cc: Tejun Heo <tj@kernel.org>,
+ Fabio Checconi <fchecconi@gmail.com>,
+ Arianna Avanzini <avanzini.arianna@gmail.com>,
+ linux-block@vger.kernel.org,
+ Linux-Kernal <linux-kernel@vger.kernel.org>,
+ Ulf Hansson <ulf.hansson@linaro.org>,
+ Linus Walleij <linus.walleij@linaro.org>,
+ broonie@kernel.org
+Message-Id: <08CE1658-04B0-48F4-BF3D-A6DB0F032905@linaro.org>
+References: <20170304160131.57366-1-paolo.valente@linaro.org> <20170304160131.57366-2-paolo.valente@linaro.org> <9ddb9586-d97e-e7b2-0081-216521f7be76@kernel.dk>
+To: Jens Axboe <axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gU2F0LCAyMDE3LTAzLTE4IGF0IDA4OjA4IC0wNDAwLCBQYW9sbyBWYWxlbnRlIHdyb3RlOg0K
-PiA+IElsIGdpb3JubyAwNiBtYXIgMjAxNywgYWxsZSBvcmUgMTQ6NDAsIEJhcnQgVmFuIEFzc2No
-ZSA8YmFydC52YW5hc3NjaGVAc2FuZGlzay5jb20+IGhhIHNjcml0dG86DQo+ID4gPiArI2RlZmlu
-ZSBCRlFfQkZRUV9GTlMobmFtZSkJCQkJCQlcDQo+ID4gPiArc3RhdGljIHZvaWQgYmZxX21hcmtf
-YmZxcV8jI25hbWUoc3RydWN0IGJmcV9xdWV1ZSAqYmZxcSkJCVwNCj4gPiA+ICt7CQkJCQkJCQkJ
-XA0KPiA+ID4gKwkoYmZxcSktPmZsYWdzIHw9ICgxIDw8IEJGUV9CRlFRX0ZMQUdfIyNuYW1lKTsJ
-CQlcDQo+ID4gPiArfQkJCQkJCQkJCVwNCj4gPiA+ICtzdGF0aWMgdm9pZCBiZnFfY2xlYXJfYmZx
-cV8jI25hbWUoc3RydWN0IGJmcV9xdWV1ZSAqYmZxcSkJCVwNCj4gPiA+ICt7CQkJCQkJCQkJXA0K
-PiA+ID4gKwkoYmZxcSktPmZsYWdzICY9IH4oMSA8PCBCRlFfQkZRUV9GTEFHXyMjbmFtZSk7CQkJ
-XA0KPiA+ID4gK30JCQkJCQkJCQlcDQo+ID4gPiArc3RhdGljIGludCBiZnFfYmZxcV8jI25hbWUo
-Y29uc3Qgc3RydWN0IGJmcV9xdWV1ZSAqYmZxcSkJCVwNCj4gPiA+ICt7CQkJCQkJCQkJXA0KPiA+
-ID4gKwlyZXR1cm4gKChiZnFxKS0+ZmxhZ3MgJiAoMSA8PCBCRlFfQkZRUV9GTEFHXyMjbmFtZSkp
-ICE9IDA7CVwNCj4gPiA+ICt9DQo+ID4gDQo+ID4gQXJlIHRoZSBib2RpZXMgb2YgdGhlIGFib3Zl
-IGZ1bmN0aW9ucyBkdXBsaWNhdGVzIG9mIF9fc2V0X2JpdCgpLA0KPiA+IF9fY2xlYXJfYml0KCkg
-YW5kIHRlc3RfYml0KCk/DQo+IA0KPiBZZXMuICBXZSB3cmFwcGVkIHRoZW0gaW50byBmdW5jdGlv
-bnMsIGJlY2F1c2Ugd3JpdGluZyBtYXJrX2ZsYWdfbmFtZQ0KPiBzZWVtZWQgbW9yZSByZWFkYWJs
-ZSB0aGFuIHdyaXRpbmcgdGhlIGltcGxlbWVudGF0aW9uIG9mIHRoZSBtYXJraW5nIG9mIHRoZQ0K
-PiBmbGFnLg0KDQpQbGVhc2UgZG8gbm90IG9wZW4tY29kZSBfX3NldF9iaXQoKSwgX19jbGVhcl9i
-aXQoKSBhbmQgdGVzdF9iaXQoKSBidXQgdXNlDQp0aGVzZSBtYWNyb3MgaW5zdGVhZC4NCg0KPiA+
-ID4gKwl9IGVsc2UNCj4gPiA+ICsJCS8qDQo+ID4gPiArCQkgKiBBc3luYyBxdWV1ZXMgZ2V0IGFs
-d2F5cyB0aGUgbWF4aW11bSBwb3NzaWJsZQ0KPiA+ID4gKwkJICogYnVkZ2V0LCBhcyBmb3IgdGhl
-bSB3ZSBkbyBub3QgY2FyZSBhYm91dCBsYXRlbmN5DQo+ID4gPiArCQkgKiAoaW4gYWRkaXRpb24s
-IHRoZWlyIGFiaWxpdHkgdG8gZGlzcGF0Y2ggaXMgbGltaXRlZA0KPiA+ID4gKwkJICogYnkgdGhl
-IGNoYXJnaW5nIGZhY3RvcikuDQo+ID4gPiArCQkgKi8NCj4gPiA+ICsJCWJ1ZGdldCA9IGJmcWQt
-PmJmcV9tYXhfYnVkZ2V0Ow0KPiA+ID4gKw0KPiA+IA0KPiA+IFBsZWFzZSBiYWxhbmNlIGJyYWNl
-cy4gQ2hlY2twYXRjaCBzaG91bGQgaGF2ZSB3YXJuZWQgYWJvdXQgdGhlIHVzZSBvZiAifQ0KPiA+
-IGVsc2UiIGluc3RlYWQgb2YgIn0gZWxzZSB7Ii4NCj4gDQo+IE5vIHdhcm5pbmcsIEkgZ3Vlc3Mg
-YmVjYXVzZSB0aGUgYm9keSBvZiB0aGUgZWxzZSBjb250YWlucyBvbmx5IGENCj4gc2ltcGxlIGlu
-c3RydWN0aW9uLiAgSnVzdCB0byBsZWFybiBmb3IgdGhlIGZ1dHVyZTogd2hhdCdzIHRoZQ0KPiBy
-YXRpb25hbGUgZm9yIGFkZGluZyBicmFjZXMgaGVyZSwgYnV0IG5vdCBpbXBvc2luZyBicmFjZXMg
-ZXZlcnl3aGVyZQ0KPiBmb3Igc2luZ2xlLWluc3RydWN0aW9uIGJvZGllcz8NCg0KSXQncyBhIGdl
-bmVyYWwgc3R5bGUgcmVjb21tZW5kYXRpb24gZm9yIGFsbCBrZXJuZWwgY29kZTogaWYgYnJhY2Vz
-IGFyZSB1c2VkDQpmb3Igb25lIHNpZGUgb2YgYW4gaWYtc3RhdGVtZW50LCBhbHNvIHVzZSBicmFj
-ZXMgZm9yIHRoZSBvdGhlciBzaWRlLCBhbmQNCmRlZmluaXRlbHkgaWYgdGhhdCBvdGhlciBzaWRl
-IGNvbnNpc3RzIG9mIG11bHRpcGxlIGxpbmVzIGR1ZSB0byBhIGNvbW1lbnQuDQoNCkJhcnQu
+
+> Il giorno 07 mar 2017, alle ore 18:22, Jens Axboe <axboe@kernel.dk> ha =
+scritto:
+>=20
+>> +/**
+>> + * bfq_entity_of - get an entity from a node.
+>> + * @node: the node field of the entity.
+>> + *
+>> + * Convert a node pointer to the relative entity.  This is used only
+>> + * to simplify the logic of some functions and not as the generic
+>> + * conversion mechanism because, e.g., in the tree walking =
+functions,
+>> + * the check for a %NULL value would be redundant.
+>> + */
+>> +static struct bfq_entity *bfq_entity_of(struct rb_node *node)
+>> +{
+>> +	struct bfq_entity *entity =3D NULL;
+>> +
+>> +	if (node)
+>> +		entity =3D rb_entry(node, struct bfq_entity, rb_node);
+>> +
+>> +	return entity;
+>> +}
+>=20
+> Get rid of pointless wrappers like this, just use rb_entry() in the
+> caller. It's harmful to the readability of the code to have to lookup
+> things like this, if it's a list_entry or rb_entry() in the caller you
+> know exactly what is going on immediately.
+>=20
+
+
+Ok.  Just a quick request for help about this.  The code seems to become
+quite ugly with a verbatim replacement of this function with its body
+(and there are several occurrences of it), so there is probably =
+something I'm
+missing.  For example, given the following loop:
+
+	for (; entity ; entity =3D bfq_entity_of(rb_first(active)))
+		bfq_reparent_leaf_entity(bfqd, entity);
+
+the only non-cryptic, but heavier solution I see is:
+
+	for (; entity ; ) {
+		bfq_reparent_leaf_entity(bfqd, entity);
+		if (rb_first(active))
+			entity =3D rb_entry(rb_first(active), struct =
+bfq_entity, rb_node);
+		else
+			entity =3D NULL;
+	}
+
+Am I missing something?  Or are these extra lines of code a reasonable
+price to pay for increased transparency?
+
+Thanks,
+Paolo
+
+> --=20
+> Jens Axboe
+>=20
