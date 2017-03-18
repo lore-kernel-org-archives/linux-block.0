@@ -1,104 +1,59 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-Subject: Re: [PATCH RFC 01/14] block, bfq: introduce the BFQ-v0 I/O scheduler as an extra scheduler
-From: Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <1489850658.2339.1.camel@sandisk.com>
-Date: Sun, 19 Mar 2017 07:45:30 -0400
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "fchecconi@gmail.com" <fchecconi@gmail.com>,
- "linus.walleij@linaro.org" <linus.walleij@linaro.org>,
- "axboe@kernel.dk" <axboe@kernel.dk>,
- Arianna Avanzini <avanzini.arianna@gmail.com>,
- "broonie@kernel.org" <broonie@kernel.org>,
- "tj@kernel.org" <tj@kernel.org>,
- "ulf.hansson@linaro.org" <ulf.hansson@linaro.org>
-Message-Id: <C37CED4C-5A92-422B-B6C9-4ECCD7E596A3@linaro.org>
-References: <20170304160131.57366-1-paolo.valente@linaro.org> <20170304160131.57366-2-paolo.valente@linaro.org> <1D08B61A9CF0974AA09887BE32D889DA0DA145@ULS-OP-MBXIP03.sdcorp.global.sandisk.com> <0B1F1CFD-C8AB-442D-B5C6-426D19B1FBA3@linaro.org> <1489850658.2339.1.camel@sandisk.com>
-To: Bart Van Assche <bart.vanassche@sandisk.com>
+Return-Path: <Bart.VanAssche@sandisk.com>
+From: Bart Van Assche <Bart.VanAssche@sandisk.com>
+To: "paolo.valente@linaro.org" <paolo.valente@linaro.org>
+CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"fchecconi@gmail.com" <fchecconi@gmail.com>, "linus.walleij@linaro.org"
+	<linus.walleij@linaro.org>, "axboe@kernel.dk" <axboe@kernel.dk>,
+	"avanzini.arianna@gmail.com" <avanzini.arianna@gmail.com>,
+	"broonie@kernel.org" <broonie@kernel.org>, "tj@kernel.org" <tj@kernel.org>,
+	"ulf.hansson@linaro.org" <ulf.hansson@linaro.org>
+Subject: Re: [PATCH RFC 01/14] block, bfq: introduce the BFQ-v0 I/O
+ scheduler as an extra scheduler
+Date: Sat, 18 Mar 2017 15:24:34 +0000
+Message-ID: <1489850658.2339.1.camel@sandisk.com>
+References: <20170304160131.57366-1-paolo.valente@linaro.org>
+	 <20170304160131.57366-2-paolo.valente@linaro.org>
+	 <1D08B61A9CF0974AA09887BE32D889DA0DA145@ULS-OP-MBXIP03.sdcorp.global.sandisk.com>
+	 <0B1F1CFD-C8AB-442D-B5C6-426D19B1FBA3@linaro.org>
+In-Reply-To: <0B1F1CFD-C8AB-442D-B5C6-426D19B1FBA3@linaro.org>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Return-Path: Bart.VanAssche@sandisk.com
 List-ID: <linux-block@vger.kernel.org>
 
-
-> Il giorno 18 mar 2017, alle ore 11:24, Bart Van Assche =
-<bart.vanassche@sandisk.com> ha scritto:
->=20
-> On Sat, 2017-03-18 at 08:08 -0400, Paolo Valente wrote:
->>> Il giorno 06 mar 2017, alle ore 14:40, Bart Van Assche =
-<bart.vanassche@sandisk.com> ha scritto:
->>>> +#define BFQ_BFQQ_FNS(name)						=
-\
->>>> +static void bfq_mark_bfqq_##name(struct bfq_queue *bfqq)		=
-\
->>>> +{									=
-\
->>>> +	(bfqq)->flags |=3D (1 << BFQ_BFQQ_FLAG_##name);			=
-\
->>>> +}									=
-\
->>>> +static void bfq_clear_bfqq_##name(struct bfq_queue *bfqq)		=
-\
->>>> +{									=
-\
->>>> +	(bfqq)->flags &=3D ~(1 << BFQ_BFQQ_FLAG_##name);			=
-\
->>>> +}									=
-\
->>>> +static int bfq_bfqq_##name(const struct bfq_queue *bfqq)		=
-\
->>>> +{									=
-\
->>>> +	return ((bfqq)->flags & (1 << BFQ_BFQQ_FLAG_##name)) !=3D 0;	=
-\
->>>> +}
->>>=20
->>> Are the bodies of the above functions duplicates of __set_bit(),
->>> __clear_bit() and test_bit()?
->>=20
->> Yes.  We wrapped them into functions, because writing mark_flag_name
->> seemed more readable than writing the implementation of the marking =
-of the
->> flag.
->=20
-> Please do not open-code __set_bit(), __clear_bit() and test_bit() but =
-use
-> these macros instead.
->=20
-
-ok, as usual, I misunderstood, and thought you wanted me to remove
-those macros altogether.  I'll fix their bodies, sorry.
-
->>>> +	} else
->>>> +		/*
->>>> +		 * Async queues get always the maximum possible
->>>> +		 * budget, as for them we do not care about latency
->>>> +		 * (in addition, their ability to dispatch is limited
->>>> +		 * by the charging factor).
->>>> +		 */
->>>> +		budget =3D bfqd->bfq_max_budget;
->>>> +
->>>=20
->>> Please balance braces. Checkpatch should have warned about the use =
-of "}
->>> else" instead of "} else {".
->>=20
->> No warning, I guess because the body of the else contains only a
->> simple instruction.  Just to learn for the future: what's the
->> rationale for adding braces here, but not imposing braces everywhere
->> for single-instruction bodies?
->=20
-> It's a general style recommendation for all kernel code: if braces are =
-used
-> for one side of an if-statement, also use braces for the other side, =
-and
-> definitely if that other side consists of multiple lines due to a =
-comment.
->=20
-
-Ok, thanks for repeating this rule for me.
-
-Thanks,
-Paolo
-
-> Bart.
+T24gU2F0LCAyMDE3LTAzLTE4IGF0IDA4OjA4IC0wNDAwLCBQYW9sbyBWYWxlbnRlIHdyb3RlOg0K
+PiA+IElsIGdpb3JubyAwNiBtYXIgMjAxNywgYWxsZSBvcmUgMTQ6NDAsIEJhcnQgVmFuIEFzc2No
+ZSA8YmFydC52YW5hc3NjaGVAc2FuZGlzay5jb20+IGhhIHNjcml0dG86DQo+ID4gPiArI2RlZmlu
+ZSBCRlFfQkZRUV9GTlMobmFtZSkJCQkJCQlcDQo+ID4gPiArc3RhdGljIHZvaWQgYmZxX21hcmtf
+YmZxcV8jI25hbWUoc3RydWN0IGJmcV9xdWV1ZSAqYmZxcSkJCVwNCj4gPiA+ICt7CQkJCQkJCQkJ
+XA0KPiA+ID4gKwkoYmZxcSktPmZsYWdzIHw9ICgxIDw8IEJGUV9CRlFRX0ZMQUdfIyNuYW1lKTsJ
+CQlcDQo+ID4gPiArfQkJCQkJCQkJCVwNCj4gPiA+ICtzdGF0aWMgdm9pZCBiZnFfY2xlYXJfYmZx
+cV8jI25hbWUoc3RydWN0IGJmcV9xdWV1ZSAqYmZxcSkJCVwNCj4gPiA+ICt7CQkJCQkJCQkJXA0K
+PiA+ID4gKwkoYmZxcSktPmZsYWdzICY9IH4oMSA8PCBCRlFfQkZRUV9GTEFHXyMjbmFtZSk7CQkJ
+XA0KPiA+ID4gK30JCQkJCQkJCQlcDQo+ID4gPiArc3RhdGljIGludCBiZnFfYmZxcV8jI25hbWUo
+Y29uc3Qgc3RydWN0IGJmcV9xdWV1ZSAqYmZxcSkJCVwNCj4gPiA+ICt7CQkJCQkJCQkJXA0KPiA+
+ID4gKwlyZXR1cm4gKChiZnFxKS0+ZmxhZ3MgJiAoMSA8PCBCRlFfQkZRUV9GTEFHXyMjbmFtZSkp
+ICE9IDA7CVwNCj4gPiA+ICt9DQo+ID4gDQo+ID4gQXJlIHRoZSBib2RpZXMgb2YgdGhlIGFib3Zl
+IGZ1bmN0aW9ucyBkdXBsaWNhdGVzIG9mIF9fc2V0X2JpdCgpLA0KPiA+IF9fY2xlYXJfYml0KCkg
+YW5kIHRlc3RfYml0KCk/DQo+IA0KPiBZZXMuICBXZSB3cmFwcGVkIHRoZW0gaW50byBmdW5jdGlv
+bnMsIGJlY2F1c2Ugd3JpdGluZyBtYXJrX2ZsYWdfbmFtZQ0KPiBzZWVtZWQgbW9yZSByZWFkYWJs
+ZSB0aGFuIHdyaXRpbmcgdGhlIGltcGxlbWVudGF0aW9uIG9mIHRoZSBtYXJraW5nIG9mIHRoZQ0K
+PiBmbGFnLg0KDQpQbGVhc2UgZG8gbm90IG9wZW4tY29kZSBfX3NldF9iaXQoKSwgX19jbGVhcl9i
+aXQoKSBhbmQgdGVzdF9iaXQoKSBidXQgdXNlDQp0aGVzZSBtYWNyb3MgaW5zdGVhZC4NCg0KPiA+
+ID4gKwl9IGVsc2UNCj4gPiA+ICsJCS8qDQo+ID4gPiArCQkgKiBBc3luYyBxdWV1ZXMgZ2V0IGFs
+d2F5cyB0aGUgbWF4aW11bSBwb3NzaWJsZQ0KPiA+ID4gKwkJICogYnVkZ2V0LCBhcyBmb3IgdGhl
+bSB3ZSBkbyBub3QgY2FyZSBhYm91dCBsYXRlbmN5DQo+ID4gPiArCQkgKiAoaW4gYWRkaXRpb24s
+IHRoZWlyIGFiaWxpdHkgdG8gZGlzcGF0Y2ggaXMgbGltaXRlZA0KPiA+ID4gKwkJICogYnkgdGhl
+IGNoYXJnaW5nIGZhY3RvcikuDQo+ID4gPiArCQkgKi8NCj4gPiA+ICsJCWJ1ZGdldCA9IGJmcWQt
+PmJmcV9tYXhfYnVkZ2V0Ow0KPiA+ID4gKw0KPiA+IA0KPiA+IFBsZWFzZSBiYWxhbmNlIGJyYWNl
+cy4gQ2hlY2twYXRjaCBzaG91bGQgaGF2ZSB3YXJuZWQgYWJvdXQgdGhlIHVzZSBvZiAifQ0KPiA+
+IGVsc2UiIGluc3RlYWQgb2YgIn0gZWxzZSB7Ii4NCj4gDQo+IE5vIHdhcm5pbmcsIEkgZ3Vlc3Mg
+YmVjYXVzZSB0aGUgYm9keSBvZiB0aGUgZWxzZSBjb250YWlucyBvbmx5IGENCj4gc2ltcGxlIGlu
+c3RydWN0aW9uLiAgSnVzdCB0byBsZWFybiBmb3IgdGhlIGZ1dHVyZTogd2hhdCdzIHRoZQ0KPiBy
+YXRpb25hbGUgZm9yIGFkZGluZyBicmFjZXMgaGVyZSwgYnV0IG5vdCBpbXBvc2luZyBicmFjZXMg
+ZXZlcnl3aGVyZQ0KPiBmb3Igc2luZ2xlLWluc3RydWN0aW9uIGJvZGllcz8NCg0KSXQncyBhIGdl
+bmVyYWwgc3R5bGUgcmVjb21tZW5kYXRpb24gZm9yIGFsbCBrZXJuZWwgY29kZTogaWYgYnJhY2Vz
+IGFyZSB1c2VkDQpmb3Igb25lIHNpZGUgb2YgYW4gaWYtc3RhdGVtZW50LCBhbHNvIHVzZSBicmFj
+ZXMgZm9yIHRoZSBvdGhlciBzaWRlLCBhbmQNCmRlZmluaXRlbHkgaWYgdGhhdCBvdGhlciBzaWRl
+IGNvbnNpc3RzIG9mIG11bHRpcGxlIGxpbmVzIGR1ZSB0byBhIGNvbW1lbnQuDQoNCkJhcnQu
