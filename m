@@ -1,54 +1,48 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f193.google.com ([209.85.192.193]:34463 "EHLO
-        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755151AbdCPQOv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Mar 2017 12:14:51 -0400
-From: Ming Lei <tom.leiming@gmail.com>
-To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
-        linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Ming Lei <tom.leiming@gmail.com>
-Subject: [PATCH v3 14/14] md: raid10: avoid direct access to bvec table in handle_reshape_read_error
-Date: Fri, 17 Mar 2017 00:12:35 +0800
-Message-Id: <20170316161235.27110-15-tom.leiming@gmail.com>
-In-Reply-To: <20170316161235.27110-1-tom.leiming@gmail.com>
-References: <20170316161235.27110-1-tom.leiming@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <lsf-bounces@lists.linux-foundation.org>
+To: Paolo Valente <paolo.valente@linaro.org>
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <cover.1489787289.git.osandov@fb.com>
+	<46f16799-86d9-7bf5-6346-be08801dd48e@suse.de>
+	<C191DA3B-3852-4304-A534-008088F97BA7@linaro.org>
+Date: Sat, 18 Mar 2017 16:18:10 -0400
+In-Reply-To: <C191DA3B-3852-4304-A534-008088F97BA7@linaro.org> (Paolo
+	Valente's message of "Sat, 18 Mar 2017 07:15:52 -0400")
+Message-ID: <yq1o9wyjq4d.fsf@oracle.com>
+MIME-Version: 1.0
+Cc: linux-block@vger.kernel.org, lsf@lists.linux-foundation.org,
+	Omar Sandoval <osandov@osandov.com>, kernel-team@fb.com,
+	Hannes Reinecke <hare@suse.de>
+Subject: Re: [Lsf] [RFC PATCH 0/4] blk-mq: multiqueue I/O scheduler
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/lsf>,
+	<mailto:lsf-request@lists.linux-foundation.org?subject=unsubscribe>
+List-Archive: <https://lists.linuxfoundation.org/mailman/private/lsf/>
+List-Post: <mailto:lsf@lists.linux-foundation.org>
+List-Help: <mailto:lsf-request@lists.linux-foundation.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/lsf>,
+	<mailto:lsf-request@lists.linux-foundation.org?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
+Sender: lsf-bounces@lists.linux-foundation.org
+Errors-To: lsf-bounces@lists.linux-foundation.org
+List-ID: <linux-block@vger.kernel.org>
 
-All reshape I/O share pages from 1st copy device, so just use that pages
-for avoiding direct access to bvec table in handle_reshape_read_error.
+Paolo Valente <paolo.valente@linaro.org> writes:
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
----
- drivers/md/raid10.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
-index 8db3b0869be4..67cf09c0c649 100644
---- a/drivers/md/raid10.c
-+++ b/drivers/md/raid10.c
-@@ -4681,7 +4681,10 @@ static int handle_reshape_read_error(struct mddev *mddev,
- 	struct r10bio *r10b = &on_stack.r10_bio;
- 	int slot = 0;
- 	int idx = 0;
--	struct bio_vec *bvec = r10_bio->master_bio->bi_io_vec;
-+	struct page **pages;
-+
-+	/* reshape IOs share pages from .devs[0].bio */
-+	pages = get_resync_pages(r10_bio->devs[0].bio)->pages;
- 
- 	r10b->sector = r10_bio->sector;
- 	__raid10_find_phys(&conf->prev, r10b);
-@@ -4710,7 +4713,7 @@ static int handle_reshape_read_error(struct mddev *mddev,
- 			success = sync_page_io(rdev,
- 					       addr,
- 					       s << 9,
--					       bvec[idx].bv_page,
-+					       pages[idx],
- 					       REQ_OP_READ, 0, false);
- 			rdev_dec_pending(rdev, mddev);
- 			rcu_read_lock();
+>> And actually, I have been looking at properly supporting host-wide tag
+>> maps, so the concept of 'shallow' queue depth might be the way to go here.
+>> 
+>> And as I have some other questions, too (assigning a new tag on
+>> requeue?) it might be an idea to spread this out into a formal session
+>> at LSF. If there are some slots left, that is.
+>> 
+>
+> I would be very interested in such a discussion too.
+
+OK. Added.
+
 -- 
-2.9.3
+Martin K. Petersen	Oracle Linux Engineering
+_______________________________________________
+Lsf mailing list
+Lsf@lists.linux-foundation.org
+https://lists.linuxfoundation.org/mailman/listinfo/lsf
