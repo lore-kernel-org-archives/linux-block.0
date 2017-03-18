@@ -1,297 +1,153 @@
-Return-Path: <prvs=425928092f=shli@fb.com>
-From: Shaohua Li <shli@fb.com>
-To: <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>
-CC: <axboe@kernel.dk>, <tj@kernel.org>, Vivek Goyal <vgoyal@redhat.com>,
-        <jmoyer@redhat.com>, <Kernel-team@fb.com>
-Subject: [PATCH V7 02/18] blk-throttle: prepare support multiple limits
-Date: Mon, 27 Mar 2017 10:51:30 -0700
-Message-ID: <fbc2878357f298a209935b0ca28db3f1a39d4dfd.1490634565.git.shli@fb.com>
-In-Reply-To: <cover.1490634565.git.shli@fb.com>
-References: <cover.1490634565.git.shli@fb.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+Content-Type: text/plain; charset=windows-1252
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Subject: Re: [PATCH RFC 10/14] block, bfq: add Early Queue Merge (EQM)
+From: Paolo Valente <paolo.valente@linaro.org>
+In-Reply-To: <d41a304a-b863-5ea7-29ec-8c5a2ea5bbef@kernel.dk>
+Date: Sat, 18 Mar 2017 10:33:59 +0000
+Cc: Tejun Heo <tj@kernel.org>,
+ Fabio Checconi <fchecconi@gmail.com>,
+ Arianna Avanzini <avanzini.arianna@gmail.com>,
+ linux-block@vger.kernel.org,
+ Linux-Kernal <linux-kernel@vger.kernel.org>,
+ Ulf Hansson <ulf.hansson@linaro.org>,
+ Linus Walleij <linus.walleij@linaro.org>,
+ broonie@kernel.org,
+ Mauro Andreolini <mauro.andreolini@unimore.it>
+Message-Id: <A134A93F-A329-465A-B8E4-AF6D29739EAE@linaro.org>
+References: <20170304160131.57366-1-paolo.valente@linaro.org> <20170304160131.57366-11-paolo.valente@linaro.org> <d37a7169-f279-8244-19f8-440dc1490893@kernel.dk> <1D2EDF98-59BA-4A98-8251-9BEC4AC752C4@linaro.org> <fe98e76a-c4c6-dcd6-93c6-55cbbbc1db76@kernel.dk> <7b7c0d4c-c10d-1e69-4ea0-1ad05a4100a2@kernel.dk> <2086B143-E8E3-43AD-B074-771378579081@linaro.org> <d41a304a-b863-5ea7-29ec-8c5a2ea5bbef@kernel.dk>
+To: Jens Axboe <axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-We are going to support low/max limit, each cgroup will have 2 limits
-after that. This patch prepares for the multiple limits change.
 
-Signed-off-by: Shaohua Li <shli@fb.com>
----
- block/blk-throttle.c | 110 ++++++++++++++++++++++++++++++++-------------------
- 1 file changed, 70 insertions(+), 40 deletions(-)
+> Il giorno 15 mar 2017, alle ore 21:00, Jens Axboe <axboe@kernel.dk> ha =
+scritto:
+>=20
+> On 03/15/2017 10:59 AM, Paolo Valente wrote:
+>>=20
+>>> Il giorno 15 mar 2017, alle ore 17:30, Jens Axboe <axboe@kernel.dk> =
+ha scritto:
+>>>=20
+>>> On 03/15/2017 09:47 AM, Jens Axboe wrote:
+>>>> I think you understood me correctly. Currently I think the putting =
+of
+>>>> the io context is somewhat of a mess. You have seemingly random =
+places
+>>>> where you have to use special unlock functions, to ensure that you
+>>>> notice that some caller deeper down has set ->ioc_to_put. I took a =
+quick
+>>>> look at it, and by far most of the cases can return an io_context =
+to
+>>>> free quite easily. You can mark these functions __must_check to =
+ensure
+>>>> that we don't drop an io_context, inadvertently. That's already a =
+win
+>>>> over the random ->ioc_to_put store. And you can then get rid of
+>>>> bfq_unlock_put_ioc and it's irq variant as well.
+>>>>=20
+>>>> The places where you are already returning a value, like off =
+dispatch
+>>>> for instance, you can just pass in a pointer to an io_context =
+pointer.
+>>>>=20
+>>>> If you get this right, it'll be a lot less fragile and hacky than =
+your
+>>>> current approach.
+>>>=20
+>>> Even just looking a little closer, you also find cases where you
+>>> potentially twice store ->ioc_to_put. That kind of mixup can't =
+happen if
+>>> you return it properly.
+>>>=20
+>>> In __bfq_dispatch_request(), for instance. You call =
+bfq_select_queue(),
+>>> and that in turn calls bfq_bfqq_expire(), which calls
+>>> __bfq_bfqq_expire() which can set ->ioc_to_put. But later on,
+>>> __bfq_dispatch_request() calls bfq_dispatch_rq_from_bfqq(), which in
+>>> turn calls bfq_bfqq_expire() that can also set ->ioc_to_put. There's =
+no
+>>> "magic" bfq_unlock_and_put_ioc() in-between those. Maybe the former =
+call
+>>> never sets ->ioc_to_put if it returns with bfqq =3D=3D NULL? Hard to =
+tell.
+>>>=20
+>>> Or __bfq_insert_request(), it calls bfq_add_request(), which may set
+>>> ->ioc_to_put through bfq_bfqq_handle_idle_busy_switch() ->
+>>> bfq_bfqq_expire(). And then from calling bfq_rq_enqueued() ->
+>>> bfq_bfqq_expire().
+>>>=20
+>>=20
+>> I have checked that.  Basically, since a queue can't be expired =
+twice,
+>> then it should never happen that ioc_to_put is set twice before being
+>> used.  Yet, I do agree that using a shared field and exploiting
+>> collateral effects makes code very complex and fragile (maybe even
+>> buggy if my speculative check is wrong).  Just, it has been the best
+>> solution I found, to avoid deferred work as you asked.  In fact, I
+>> still find quite heavy the alternative of passing a pointer to an ioc
+>> forth and back across seven or eight nested functions.
+>=20
+> It's not heavy at all, I went through all of it this morning.
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 0d5d85b..1da9f30 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -83,6 +83,11 @@ enum tg_state_flags {
- 
- #define rb_entry_tg(node)	rb_entry((node), struct throtl_grp, rb_node)
- 
-+enum {
-+	LIMIT_MAX,
-+	LIMIT_CNT,
-+};
-+
- struct throtl_grp {
- 	/* must be the first member */
- 	struct blkg_policy_data pd;
-@@ -120,10 +125,10 @@ struct throtl_grp {
- 	bool has_rules[2];
- 
- 	/* bytes per second rate limits */
--	uint64_t bps[2];
-+	uint64_t bps[2][LIMIT_CNT];
- 
- 	/* IOPS limits */
--	unsigned int iops[2];
-+	unsigned int iops[2][LIMIT_CNT];
- 
- 	/* Number of bytes disptached in current slice */
- 	uint64_t bytes_disp[2];
-@@ -147,6 +152,8 @@ struct throtl_data
- 
- 	/* Work for dispatching throttled bios */
- 	struct work_struct dispatch_work;
-+	unsigned int limit_index;
-+	bool limit_valid[LIMIT_CNT];
- };
- 
- static void throtl_pending_timer_fn(unsigned long arg);
-@@ -198,6 +205,16 @@ static struct throtl_data *sq_to_td(struct throtl_service_queue *sq)
- 		return container_of(sq, struct throtl_data, service_queue);
- }
- 
-+static uint64_t tg_bps_limit(struct throtl_grp *tg, int rw)
-+{
-+	return tg->bps[rw][tg->td->limit_index];
-+}
-+
-+static unsigned int tg_iops_limit(struct throtl_grp *tg, int rw)
-+{
-+	return tg->iops[rw][tg->td->limit_index];
-+}
-+
- /**
-  * throtl_log - log debug message via blktrace
-  * @sq: the service_queue being reported
-@@ -334,10 +351,10 @@ static struct blkg_policy_data *throtl_pd_alloc(gfp_t gfp, int node)
- 	}
- 
- 	RB_CLEAR_NODE(&tg->rb_node);
--	tg->bps[READ] = U64_MAX;
--	tg->bps[WRITE] = U64_MAX;
--	tg->iops[READ] = UINT_MAX;
--	tg->iops[WRITE] = UINT_MAX;
-+	tg->bps[READ][LIMIT_MAX] = U64_MAX;
-+	tg->bps[WRITE][LIMIT_MAX] = U64_MAX;
-+	tg->iops[READ][LIMIT_MAX] = UINT_MAX;
-+	tg->iops[WRITE][LIMIT_MAX] = UINT_MAX;
- 
- 	return &tg->pd;
- }
-@@ -376,11 +393,14 @@ static void throtl_pd_init(struct blkg_policy_data *pd)
- static void tg_update_has_rules(struct throtl_grp *tg)
- {
- 	struct throtl_grp *parent_tg = sq_to_tg(tg->service_queue.parent_sq);
-+	struct throtl_data *td = tg->td;
- 	int rw;
- 
- 	for (rw = READ; rw <= WRITE; rw++)
- 		tg->has_rules[rw] = (parent_tg && parent_tg->has_rules[rw]) ||
--			(tg->bps[rw] != U64_MAX || tg->iops[rw] != UINT_MAX);
-+			(td->limit_valid[td->limit_index] &&
-+			 (tg_bps_limit(tg, rw) != U64_MAX ||
-+			  tg_iops_limit(tg, rw) != UINT_MAX));
- }
- 
- static void throtl_pd_online(struct blkg_policy_data *pd)
-@@ -632,11 +652,11 @@ static inline void throtl_trim_slice(struct throtl_grp *tg, bool rw)
- 
- 	if (!nr_slices)
- 		return;
--	tmp = tg->bps[rw] * throtl_slice * nr_slices;
-+	tmp = tg_bps_limit(tg, rw) * throtl_slice * nr_slices;
- 	do_div(tmp, HZ);
- 	bytes_trim = tmp;
- 
--	io_trim = (tg->iops[rw] * throtl_slice * nr_slices)/HZ;
-+	io_trim = (tg_iops_limit(tg, rw) * throtl_slice * nr_slices) / HZ;
- 
- 	if (!bytes_trim && !io_trim)
- 		return;
-@@ -682,7 +702,7 @@ static bool tg_with_in_iops_limit(struct throtl_grp *tg, struct bio *bio,
- 	 * have been trimmed.
- 	 */
- 
--	tmp = (u64)tg->iops[rw] * jiffy_elapsed_rnd;
-+	tmp = (u64)tg_iops_limit(tg, rw) * jiffy_elapsed_rnd;
- 	do_div(tmp, HZ);
- 
- 	if (tmp > UINT_MAX)
-@@ -697,7 +717,7 @@ static bool tg_with_in_iops_limit(struct throtl_grp *tg, struct bio *bio,
- 	}
- 
- 	/* Calc approx time to dispatch */
--	jiffy_wait = ((tg->io_disp[rw] + 1) * HZ)/tg->iops[rw] + 1;
-+	jiffy_wait = ((tg->io_disp[rw] + 1) * HZ) / tg_iops_limit(tg, rw) + 1;
- 
- 	if (jiffy_wait > jiffy_elapsed)
- 		jiffy_wait = jiffy_wait - jiffy_elapsed;
-@@ -724,7 +744,7 @@ static bool tg_with_in_bps_limit(struct throtl_grp *tg, struct bio *bio,
- 
- 	jiffy_elapsed_rnd = roundup(jiffy_elapsed_rnd, throtl_slice);
- 
--	tmp = tg->bps[rw] * jiffy_elapsed_rnd;
-+	tmp = tg_bps_limit(tg, rw) * jiffy_elapsed_rnd;
- 	do_div(tmp, HZ);
- 	bytes_allowed = tmp;
- 
-@@ -736,7 +756,7 @@ static bool tg_with_in_bps_limit(struct throtl_grp *tg, struct bio *bio,
- 
- 	/* Calc approx time to dispatch */
- 	extra_bytes = tg->bytes_disp[rw] + bio->bi_iter.bi_size - bytes_allowed;
--	jiffy_wait = div64_u64(extra_bytes * HZ, tg->bps[rw]);
-+	jiffy_wait = div64_u64(extra_bytes * HZ, tg_bps_limit(tg, rw));
- 
- 	if (!jiffy_wait)
- 		jiffy_wait = 1;
-@@ -771,7 +791,8 @@ static bool tg_may_dispatch(struct throtl_grp *tg, struct bio *bio,
- 	       bio != throtl_peek_queued(&tg->service_queue.queued[rw]));
- 
- 	/* If tg->bps = -1, then BW is unlimited */
--	if (tg->bps[rw] == U64_MAX && tg->iops[rw] == UINT_MAX) {
-+	if (tg_bps_limit(tg, rw) == U64_MAX &&
-+	    tg_iops_limit(tg, rw) == UINT_MAX) {
- 		if (wait)
- 			*wait = 0;
- 		return true;
-@@ -1150,8 +1171,8 @@ static void tg_conf_updated(struct throtl_grp *tg)
- 
- 	throtl_log(&tg->service_queue,
- 		   "limit change rbps=%llu wbps=%llu riops=%u wiops=%u",
--		   tg->bps[READ], tg->bps[WRITE],
--		   tg->iops[READ], tg->iops[WRITE]);
-+		   tg_bps_limit(tg, READ), tg_bps_limit(tg, WRITE),
-+		   tg_iops_limit(tg, READ), tg_iops_limit(tg, WRITE));
- 
- 	/*
- 	 * Update has_rules[] flags for the updated tg's subtree.  A tg is
-@@ -1228,25 +1249,25 @@ static ssize_t tg_set_conf_uint(struct kernfs_open_file *of,
- static struct cftype throtl_legacy_files[] = {
- 	{
- 		.name = "throttle.read_bps_device",
--		.private = offsetof(struct throtl_grp, bps[READ]),
-+		.private = offsetof(struct throtl_grp, bps[READ][LIMIT_MAX]),
- 		.seq_show = tg_print_conf_u64,
- 		.write = tg_set_conf_u64,
- 	},
- 	{
- 		.name = "throttle.write_bps_device",
--		.private = offsetof(struct throtl_grp, bps[WRITE]),
-+		.private = offsetof(struct throtl_grp, bps[WRITE][LIMIT_MAX]),
- 		.seq_show = tg_print_conf_u64,
- 		.write = tg_set_conf_u64,
- 	},
- 	{
- 		.name = "throttle.read_iops_device",
--		.private = offsetof(struct throtl_grp, iops[READ]),
-+		.private = offsetof(struct throtl_grp, iops[READ][LIMIT_MAX]),
- 		.seq_show = tg_print_conf_uint,
- 		.write = tg_set_conf_uint,
- 	},
- 	{
- 		.name = "throttle.write_iops_device",
--		.private = offsetof(struct throtl_grp, iops[WRITE]),
-+		.private = offsetof(struct throtl_grp, iops[WRITE][LIMIT_MAX]),
- 		.seq_show = tg_print_conf_uint,
- 		.write = tg_set_conf_uint,
- 	},
-@@ -1272,18 +1293,25 @@ static u64 tg_prfill_max(struct seq_file *sf, struct blkg_policy_data *pd,
- 
- 	if (!dname)
- 		return 0;
--	if (tg->bps[READ] == U64_MAX && tg->bps[WRITE] == U64_MAX &&
--	    tg->iops[READ] == UINT_MAX && tg->iops[WRITE] == UINT_MAX)
-+
-+	if (tg->bps[READ][LIMIT_MAX] == U64_MAX &&
-+	    tg->bps[WRITE][LIMIT_MAX] == U64_MAX &&
-+	    tg->iops[READ][LIMIT_MAX] == UINT_MAX &&
-+	    tg->iops[WRITE][LIMIT_MAX] == UINT_MAX)
- 		return 0;
- 
--	if (tg->bps[READ] != U64_MAX)
--		snprintf(bufs[0], sizeof(bufs[0]), "%llu", tg->bps[READ]);
--	if (tg->bps[WRITE] != U64_MAX)
--		snprintf(bufs[1], sizeof(bufs[1]), "%llu", tg->bps[WRITE]);
--	if (tg->iops[READ] != UINT_MAX)
--		snprintf(bufs[2], sizeof(bufs[2]), "%u", tg->iops[READ]);
--	if (tg->iops[WRITE] != UINT_MAX)
--		snprintf(bufs[3], sizeof(bufs[3]), "%u", tg->iops[WRITE]);
-+	if (tg->bps[READ][LIMIT_MAX] != U64_MAX)
-+		snprintf(bufs[0], sizeof(bufs[0]), "%llu",
-+			tg->bps[READ][LIMIT_MAX]);
-+	if (tg->bps[WRITE][LIMIT_MAX] != U64_MAX)
-+		snprintf(bufs[1], sizeof(bufs[1]), "%llu",
-+			tg->bps[WRITE][LIMIT_MAX]);
-+	if (tg->iops[READ][LIMIT_MAX] != UINT_MAX)
-+		snprintf(bufs[2], sizeof(bufs[2]), "%u",
-+			tg->iops[READ][LIMIT_MAX]);
-+	if (tg->iops[WRITE][LIMIT_MAX] != UINT_MAX)
-+		snprintf(bufs[3], sizeof(bufs[3]), "%u",
-+			tg->iops[WRITE][LIMIT_MAX]);
- 
- 	seq_printf(sf, "%s rbps=%s wbps=%s riops=%s wiops=%s\n",
- 		   dname, bufs[0], bufs[1], bufs[2], bufs[3]);
-@@ -1312,10 +1340,10 @@ static ssize_t tg_set_max(struct kernfs_open_file *of,
- 
- 	tg = blkg_to_tg(ctx.blkg);
- 
--	v[0] = tg->bps[READ];
--	v[1] = tg->bps[WRITE];
--	v[2] = tg->iops[READ];
--	v[3] = tg->iops[WRITE];
-+	v[0] = tg->bps[READ][LIMIT_MAX];
-+	v[1] = tg->bps[WRITE][LIMIT_MAX];
-+	v[2] = tg->iops[READ][LIMIT_MAX];
-+	v[3] = tg->iops[WRITE][LIMIT_MAX];
- 
- 	while (true) {
- 		char tok[27];	/* wiops=18446744073709551616 */
-@@ -1352,10 +1380,10 @@ static ssize_t tg_set_max(struct kernfs_open_file *of,
- 			goto out_finish;
- 	}
- 
--	tg->bps[READ] = v[0];
--	tg->bps[WRITE] = v[1];
--	tg->iops[READ] = v[2];
--	tg->iops[WRITE] = v[3];
-+	tg->bps[READ][LIMIT_MAX] = v[0];
-+	tg->bps[WRITE][LIMIT_MAX] = v[1];
-+	tg->iops[READ][LIMIT_MAX] = v[2];
-+	tg->iops[WRITE][LIMIT_MAX] = v[3];
- 
- 	tg_conf_updated(tg);
- 	ret = 0;
-@@ -1453,8 +1481,9 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
- 	/* out-of-limit, queue to @tg */
- 	throtl_log(sq, "[%c] bio. bdisp=%llu sz=%u bps=%llu iodisp=%u iops=%u queued=%d/%d",
- 		   rw == READ ? 'R' : 'W',
--		   tg->bytes_disp[rw], bio->bi_iter.bi_size, tg->bps[rw],
--		   tg->io_disp[rw], tg->iops[rw],
-+		   tg->bytes_disp[rw], bio->bi_iter.bi_size,
-+		   tg_bps_limit(tg, rw),
-+		   tg->io_disp[rw], tg_iops_limit(tg, rw),
- 		   sq->nr_queued[READ], sq->nr_queued[WRITE]);
- 
- 	bio_associate_current(bio);
-@@ -1565,6 +1594,7 @@ int blk_throtl_init(struct request_queue *q)
- 	q->td = td;
- 	td->queue = q;
- 
-+	td->limit_valid[LIMIT_MAX] = true;
- 	/* activate policy */
- 	ret = blkcg_activate_policy(q, &blkcg_policy_throtl);
- 	if (ret)
--- 
-2.9.3
+Yes, sorry. I meant heavy in terms of code complexity.
+
+> It's not
+> super pretty either, since you end up passing back an io_context which
+> is seemingly unrelated to what the functions otherwise do.
+
+Exactly.
+
+> But that's
+> mostly a reflection of the implementation, not that it's a bad way to =
+go
+> about this in general. The worst bits are the places where you want to
+> add a
+>=20
+> 	WARN_ON(ret !=3D NULL);
+>=20
+> between two calls that potentially both drop the ioc. In terms of
+> overhead, it's not heavy. Punting to a workqueue would be orders of
+> magnitude more expensive.
+>=20
+>>> There might be more, but I think the above is plenty of evidence =
+that
+>>> the current ->ioc_to_put solution is a bad hack, fragile, and =
+already
+>>> has bugs.
+>>>=20
+>>> How often do you expect this putting of the io_context to happen?
+>>=20
+>> Unfortunately often, as it must be done also every time the =
+in-service
+>> queue is reset.  But, in this respect, are we sure that we do need to
+>> grab a reference to the ioc when we set a queue in service (as done =
+in
+>> cfq, and copied into bfq)?  I mean, we have the hook exit_ioc for
+>> controlling the disappearing of an ioc.  Am I missing something here
+>> too?
+>=20
+> No, in fact that'd be perfectly fine. It's easier for CFQ to just =
+retain
+> the reference so we know it's not going away, but for your case, it
+> might in fact make more sense to simply be able to de-service a queue =
+if
+> the process exits. And if you do that, we can drop all this passing =
+back
+> of ioc (or ->ioc_to_put) craziness, without having to punt to a
+> workqueue either.
+>=20
+
+Done, and ... well, it seems to work :)
+
+I'm striving to have a new patch series ready before Monday, but I'm
+not confident I'll make it.
+
+Thanks,
+Paolo
+
+> This will be more efficient too, since it'll be a much more rare
+> occurence.
+>=20
+> --=20
+> Jens Axboe
