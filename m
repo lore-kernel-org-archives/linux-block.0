@@ -1,71 +1,29 @@
-Return-Path: <lsf-bounces@lists.linux-foundation.org>
-To: Omar Sandoval <osandov@osandov.com>, linux-block@vger.kernel.org
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pf0-f182.google.com ([209.85.192.182]:36643 "EHLO
+        mail-pf0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751143AbdCRBEz (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 17 Mar 2017 21:04:55 -0400
+Received: by mail-pf0-f182.google.com with SMTP id o126so44152020pfb.3
+        for <linux-block@vger.kernel.org>; Fri, 17 Mar 2017 18:03:15 -0700 (PDT)
+Date: Fri, 17 Mar 2017 17:55:45 -0700
+From: Omar Sandoval <osandov@osandov.com>
+To: linux-block@vger.kernel.org
+Cc: kernel-team@fb.com
+Subject: Re: [RFC PATCH 0/4] blk-mq: multiqueue I/O scheduler
+Message-ID: <20170318005545.GA16466@mew>
 References: <cover.1489787289.git.osandov@fb.com>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <46f16799-86d9-7bf5-6346-be08801dd48e@suse.de>
-Date: Sat, 18 Mar 2017 12:14:24 +0100
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <cover.1489787289.git.osandov@fb.com>
-Cc: lsf@lists.linux-foundation.org, kernel-team@fb.com
-Subject: Re: [Lsf] [RFC PATCH 0/4] blk-mq: multiqueue I/O scheduler
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/lsf>,
-	<mailto:lsf-request@lists.linux-foundation.org?subject=unsubscribe>
-List-Archive: <https://lists.linuxfoundation.org/mailman/private/lsf/>
-List-Post: <mailto:lsf@lists.linux-foundation.org>
-List-Help: <mailto:lsf-request@lists.linux-foundation.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/lsf>,
-	<mailto:lsf-request@lists.linux-foundation.org?subject=subscribe>
-Content-Type: text/plain; charset="windows-1252"
-Sender: lsf-bounces@lists.linux-foundation.org
-Errors-To: lsf-bounces@lists.linux-foundation.org
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On 03/17/2017 11:03 PM, Omar Sandoval wrote:
+On Fri, Mar 17, 2017 at 03:03:29PM -0700, Omar Sandoval wrote:
 > From: Omar Sandoval <osandov@fb.com>
-> =
+> With Kyber set to a target latency of 1 ms, the reader sees latencies of 8 ms
+> on average. Kyber brings this down to just over 1 ms.
 
-> This patch series implements an I/O scheduler for multiqueue devices
-> combining several techniques: the scalable bitmap library, the new
-> blk-stats API, and queue depth throttling similar to blk-wbt.
-> =
-
-> These patches are on top of my earlier blk-stats series [1]. They also
-> need a fix in Jens' for-linus branch in order to work properly [2].
-> =
-
-> Patches 1 and 2 implement a new sbitmap operation and patch 3 exports a
-> required function. Patch 4 implements the new scheduler, named Kyber.
-> =
-
-> The commit message in patch 4 describes Kyber in detail. The scheduler
-> employs some heuristics that I've experimented with, but that's probably
-> the area that needs the most work. I'll be at LSF/MM next week, and
-> there's currently a lightning talk on the schedule to discuss
-> improvements and extensions.
-> =
-
-[ .. ]
-
-A silent round of applause for you.
-Very much appreciated.
-
-And actually, I have been looking at properly supporting host-wide tag
-maps, so the concept of 'shallow' queue depth might be the way to go here.
-
-And as I have some other questions, too (assigning a new tag on
-requeue?) it might be an idea to spread this out into a formal session
-at LSF. If there are some slots left, that is.
-
-Cheers,
-
-Hannes
--- =
-
-Dr. Hannes Reinecke		      zSeries & Storage
-hare@suse.de			      +49 911 74053 688
-SUSE LINUX Products GmbH, Maxfeldstr. 5, 90409 N=FCrnberg
-GF: J. Hawn, J. Guild, F. Imend=F6rffer, HRB 16746 (AG N=FCrnberg)
-_______________________________________________
-Lsf mailing list
-Lsf@lists.linux-foundation.org
-https://lists.linuxfoundation.org/mailman/listinfo/lsf
+Of course, this is supposed to say, without Kyber, the reader sees
+latencies of 8 ms. With Kyber set to a target latency of 1 ms, the
+actual average latency is just over 1 ms.
