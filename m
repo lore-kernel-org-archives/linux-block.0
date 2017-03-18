@@ -1,73 +1,51 @@
-Return-Path: <linus.walleij@linaro.org>
-MIME-Version: 1.0
-In-Reply-To: <1489859192.2339.12.camel@sandisk.com>
-References: <20170304160131.57366-1-paolo.valente@linaro.org>
- <1488848390.3125.14.camel@sandisk.com> <81048010-02AB-4A7A-8C10-FAF7E3242DCC@linaro.org>
- <1489509154.2676.6.camel@sandisk.com> <A8A05E9B-2FDF-4986-833E-166D92DFEF4F@linaro.org>
- <CACRpkdZhA8FY2FH_fnTsnPotZoZwX5qUfhdavWLwfzcnLkZUMQ@mail.gmail.com> <1489859192.2339.12.camel@sandisk.com>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Sat, 18 Mar 2017 21:46:12 +0100
-Message-ID: <CACRpkdYE=njGbN6QiV3+93ivNfTYtuhYaT8suXtmMAn-BTVzyw@mail.gmail.com>
+Return-Path: <Bart.VanAssche@sandisk.com>
+From: Bart Van Assche <Bart.VanAssche@sandisk.com>
+To: "paolo.valente@linaro.org" <paolo.valente@linaro.org>,
+	"linus.walleij@linaro.org" <linus.walleij@linaro.org>
+CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"fchecconi@gmail.com" <fchecconi@gmail.com>, "axboe@kernel.dk"
+	<axboe@kernel.dk>, "broonie@kernel.org" <broonie@kernel.org>,
+	"avanzini.arianna@gmail.com" <avanzini.arianna@gmail.com>, "tj@kernel.org"
+	<tj@kernel.org>, "ulf.hansson@linaro.org" <ulf.hansson@linaro.org>
 Subject: Re: [PATCH RFC 00/14] Add the BFQ I/O Scheduler to blk-mq
-To: Bart Van Assche <Bart.VanAssche@sandisk.com>
-Cc: "paolo.valente@linaro.org" <paolo.valente@linaro.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, "fchecconi@gmail.com" <fchecconi@gmail.com>,
-	"axboe@kernel.dk" <axboe@kernel.dk>, "broonie@kernel.org" <broonie@kernel.org>,
-	"avanzini.arianna@gmail.com" <avanzini.arianna@gmail.com>, "tj@kernel.org" <tj@kernel.org>,
-	"ulf.hansson@linaro.org" <ulf.hansson@linaro.org>
-Content-Type: text/plain; charset=UTF-8
+Date: Sat, 18 Mar 2017 17:46:47 +0000
+Message-ID: <1489859192.2339.12.camel@sandisk.com>
+References: <20170304160131.57366-1-paolo.valente@linaro.org>
+	 <1488848390.3125.14.camel@sandisk.com>
+	 <81048010-02AB-4A7A-8C10-FAF7E3242DCC@linaro.org>
+	 <1489509154.2676.6.camel@sandisk.com>
+	 <A8A05E9B-2FDF-4986-833E-166D92DFEF4F@linaro.org>
+	 <CACRpkdZhA8FY2FH_fnTsnPotZoZwX5qUfhdavWLwfzcnLkZUMQ@mail.gmail.com>
+In-Reply-To: <CACRpkdZhA8FY2FH_fnTsnPotZoZwX5qUfhdavWLwfzcnLkZUMQ@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Return-Path: Bart.VanAssche@sandisk.com
 List-ID: <linux-block@vger.kernel.org>
 
-On Sat, Mar 18, 2017 at 6:46 PM, Bart Van Assche
-<Bart.VanAssche@sandisk.com> wrote:
-> On Sat, 2017-03-18 at 18:09 +0100, Linus Walleij wrote:
->> On Sat, Mar 18, 2017 at 11:52 AM, Paolo Valente
->> <paolo.valente@linaro.org> wrote:
->> > > Il giorno 14 mar 2017, alle ore 16:32, Bart Van Assche <bart.vanassche@sandisk.com> ha scritto:
->> > > (...) what should
->> > > a developer do who only has access to a small subset of all the storage
->> > > devices that are supported by the Linux kernel and hence who can not run the
->> > > benchmark against every supported storage device?
->>
->> Don't we use the community for that? We are dependent on people
->> downloading and testing our code eventually, I mean sure it's good if
->> we make some reasonable effort to test changes we do, but we are
->> only humans, and we get corrected by the experience of other humans.
->
-> Hello Linus,
->
-> Do you mean relying on the community to test other storage devices before
-> or after a patch is upstream?
-
-I guess they should test it when it is in linux-next?
-
-> Relying on the community to file bug reports
-> after a patch is upstream would be wrong. The Linux kernel should not be
-> used for experiments. As you know patches that are sent upstream should
-> not introduce regressions.
-
-Yeah still people introduce regressions and we have 7-8 release
-candidates for each kernel because of this. Humans have flaws
-I guess.
-
-> My primary concern about BFQ is that it is a very complicated I/O scheduler
-> and also that the concepts used internally in that I/O scheduler are far
-> away from the concepts we are used to when reasoning about I/O devices. I'm
-> concerned that this will make the BFQ I/O scheduler hard to maintain.
-
-I understand that. Let's follow all rules of thumb that make code
-easy to maintain.
-
-We have pretty broad agreement on what makes code easy to
-maintain on the syntactic level, checkpatch and some manual inspection
-easily gives that.
-
-I think where we need the most brainshare is in how to make semantics
-maintainable. It's no fun reading terse code and try to figure out how
-the developer writing it was thinking, so let's focus on anything we do not
-understand and make it understandable, it seems Paolo is onto this task
-for what I can tell.
-
-Yours,
-Linus Walleij
+T24gU2F0LCAyMDE3LTAzLTE4IGF0IDE4OjA5ICswMTAwLCBMaW51cyBXYWxsZWlqIHdyb3RlOg0K
+PiBPbiBTYXQsIE1hciAxOCwgMjAxNyBhdCAxMTo1MiBBTSwgUGFvbG8gVmFsZW50ZQ0KPiA8cGFv
+bG8udmFsZW50ZUBsaW5hcm8ub3JnPiB3cm90ZToNCj4gPiA+IElsIGdpb3JubyAxNCBtYXIgMjAx
+NywgYWxsZSBvcmUgMTY6MzIsIEJhcnQgVmFuIEFzc2NoZSA8YmFydC52YW5hc3NjaGVAc2FuZGlz
+ay5jb20+IGhhIHNjcml0dG86DQo+ID4gPiAoLi4uKSB3aGF0IHNob3VsZA0KPiA+ID4gYSBkZXZl
+bG9wZXIgZG8gd2hvIG9ubHkgaGFzIGFjY2VzcyB0byBhIHNtYWxsIHN1YnNldCBvZiBhbGwgdGhl
+IHN0b3JhZ2UNCj4gPiA+IGRldmljZXMgdGhhdCBhcmUgc3VwcG9ydGVkIGJ5IHRoZSBMaW51eCBr
+ZXJuZWwgYW5kIGhlbmNlIHdobyBjYW4gbm90IHJ1biB0aGUNCj4gPiA+IGJlbmNobWFyayBhZ2Fp
+bnN0IGV2ZXJ5IHN1cHBvcnRlZCBzdG9yYWdlIGRldmljZT8NCj4gDQo+IERvbid0IHdlIHVzZSB0
+aGUgY29tbXVuaXR5IGZvciB0aGF0PyBXZSBhcmUgZGVwZW5kZW50IG9uIHBlb3BsZQ0KPiBkb3du
+bG9hZGluZyBhbmQgdGVzdGluZyBvdXIgY29kZSBldmVudHVhbGx5LCBJIG1lYW4gc3VyZSBpdCdz
+IGdvb2QgaWYNCj4gd2UgbWFrZSBzb21lIHJlYXNvbmFibGUgZWZmb3J0IHRvIHRlc3QgY2hhbmdl
+cyB3ZSBkbywgYnV0IHdlIGFyZQ0KPiBvbmx5IGh1bWFucywgYW5kIHdlIGdldCBjb3JyZWN0ZWQg
+YnkgdGhlIGV4cGVyaWVuY2Ugb2Ygb3RoZXIgaHVtYW5zLg0KDQpIZWxsbyBMaW51cywNCg0KRG8g
+eW91IG1lYW4gcmVseWluZyBvbiB0aGUgY29tbXVuaXR5IHRvIHRlc3Qgb3RoZXIgc3RvcmFnZSBk
+ZXZpY2VzIGJlZm9yZQ0Kb3IgYWZ0ZXIgYSBwYXRjaCBpcyB1cHN0cmVhbT8gUmVseWluZyBvbiB0
+aGUgY29tbXVuaXR5IHRvIGZpbGUgYnVnIHJlcG9ydHMNCmFmdGVyIGEgcGF0Y2ggaXMgdXBzdHJl
+YW0gd291bGQgYmUgd3JvbmcuIFRoZSBMaW51eCBrZXJuZWwgc2hvdWxkIG5vdCBiZQ0KdXNlZCBm
+b3IgZXhwZXJpbWVudHMuIEFzIHlvdSBrbm93IHBhdGNoZXMgdGhhdCBhcmUgc2VudCB1cHN0cmVh
+bSBzaG91bGQNCm5vdCBpbnRyb2R1Y2UgcmVncmVzc2lvbnMuDQoNCk15IHByaW1hcnkgY29uY2Vy
+biBhYm91dCBCRlEgaXMgdGhhdCBpdCBpcyBhIHZlcnkgY29tcGxpY2F0ZWQgSS9PIHNjaGVkdWxl
+cg0KYW5kIGFsc28gdGhhdCB0aGUgY29uY2VwdHMgdXNlZCBpbnRlcm5hbGx5IGluIHRoYXQgSS9P
+IHNjaGVkdWxlciBhcmUgZmFyDQphd2F5IGZyb20gdGhlIGNvbmNlcHRzIHdlIGFyZSB1c2VkIHRv
+IHdoZW4gcmVhc29uaW5nIGFib3V0IEkvTyBkZXZpY2VzLiBJJ20NCmNvbmNlcm5lZCB0aGF0IHRo
+aXMgd2lsbCBtYWtlIHRoZSBCRlEgSS9PIHNjaGVkdWxlciBoYXJkIHRvIG1haW50YWluLg0KDQpC
+YXJ0Lg==
