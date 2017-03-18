@@ -1,51 +1,94 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:6846 "EHLO
-        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751007AbdCRPaS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sat, 18 Mar 2017 11:30:18 -0400
-From: Bart Van Assche <Bart.VanAssche@sandisk.com>
-To: "osandov@osandov.com" <osandov@osandov.com>,
-        "hare@suse.de" <hare@suse.de>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-CC: "lsf@lists.linux-foundation.org" <lsf@lists.linux-foundation.org>,
-        "kernel-team@fb.com" <kernel-team@fb.com>
-Subject: Re: [Lsf] [RFC PATCH 0/4] blk-mq: multiqueue I/O scheduler
-Date: Sat, 18 Mar 2017 15:30:09 +0000
-Message-ID: <1489850994.2339.5.camel@sandisk.com>
-References: <cover.1489787289.git.osandov@fb.com>
-         <46f16799-86d9-7bf5-6346-be08801dd48e@suse.de>
+Return-Path: <lsf-bounces@lists.linux-foundation.org>
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+From: Paolo Valente <paolo.valente@linaro.org>
 In-Reply-To: <46f16799-86d9-7bf5-6346-be08801dd48e@suse.de>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Date: Sat, 18 Mar 2017 07:15:52 -0400
+Message-Id: <C191DA3B-3852-4304-A534-008088F97BA7@linaro.org>
+References: <cover.1489787289.git.osandov@fb.com>
+	<46f16799-86d9-7bf5-6346-be08801dd48e@suse.de>
+To: Hannes Reinecke <hare@suse.de>
+Cc: linux-block@vger.kernel.org, lsf@lists.linux-foundation.org,
+	Omar Sandoval <osandov@osandov.com>, kernel-team@fb.com
+Subject: Re: [Lsf] [RFC PATCH 0/4] blk-mq: multiqueue I/O scheduler
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/lsf>,
+	<mailto:lsf-request@lists.linux-foundation.org?subject=unsubscribe>
+List-Archive: <https://lists.linuxfoundation.org/mailman/private/lsf/>
+List-Post: <mailto:lsf@lists.linux-foundation.org>
+List-Help: <mailto:lsf-request@lists.linux-foundation.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/lsf>,
+	<mailto:lsf-request@lists.linux-foundation.org?subject=subscribe>
+Content-Type: text/plain; charset="windows-1252"
+Sender: lsf-bounces@lists.linux-foundation.org
+Errors-To: lsf-bounces@lists.linux-foundation.org
+List-ID: <linux-block@vger.kernel.org>
 
-T24gU2F0LCAyMDE3LTAzLTE4IGF0IDEyOjE0ICswMTAwLCBIYW5uZXMgUmVpbmVja2Ugd3JvdGU6
-DQo+IE9uIDAzLzE3LzIwMTcgMTE6MDMgUE0sIE9tYXIgU2FuZG92YWwgd3JvdGU6DQo+ID4gRnJv
-bTogT21hciBTYW5kb3ZhbCA8b3NhbmRvdkBmYi5jb20+DQo+ID4gDQo+ID4gVGhpcyBwYXRjaCBz
-ZXJpZXMgaW1wbGVtZW50cyBhbiBJL08gc2NoZWR1bGVyIGZvciBtdWx0aXF1ZXVlIGRldmljZXMN
-Cj4gPiBjb21iaW5pbmcgc2V2ZXJhbCB0ZWNobmlxdWVzOiB0aGUgc2NhbGFibGUgYml0bWFwIGxp
-YnJhcnksIHRoZSBuZXcNCj4gPiBibGstc3RhdHMgQVBJLCBhbmQgcXVldWUgZGVwdGggdGhyb3R0
-bGluZyBzaW1pbGFyIHRvIGJsay13YnQuDQo+ID4gDQo+ID4gVGhlc2UgcGF0Y2hlcyBhcmUgb24g
-dG9wIG9mIG15IGVhcmxpZXIgYmxrLXN0YXRzIHNlcmllcyBbMV0uIFRoZXkgYWxzbw0KPiA+IG5l
-ZWQgYSBmaXggaW4gSmVucycgZm9yLWxpbnVzIGJyYW5jaCBpbiBvcmRlciB0byB3b3JrIHByb3Bl
-cmx5IFsyXS4NCj4gPiANCj4gPiBQYXRjaGVzIDEgYW5kIDIgaW1wbGVtZW50IGEgbmV3IHNiaXRt
-YXAgb3BlcmF0aW9uIGFuZCBwYXRjaCAzIGV4cG9ydHMgYQ0KPiA+IHJlcXVpcmVkIGZ1bmN0aW9u
-LiBQYXRjaCA0IGltcGxlbWVudHMgdGhlIG5ldyBzY2hlZHVsZXIsIG5hbWVkIEt5YmVyLg0KPiA+
-IA0KPiA+IFRoZSBjb21taXQgbWVzc2FnZSBpbiBwYXRjaCA0IGRlc2NyaWJlcyBLeWJlciBpbiBk
-ZXRhaWwuIFRoZSBzY2hlZHVsZXINCj4gPiBlbXBsb3lzIHNvbWUgaGV1cmlzdGljcyB0aGF0IEkn
-dmUgZXhwZXJpbWVudGVkIHdpdGgsIGJ1dCB0aGF0J3MgcHJvYmFibHkNCj4gPiB0aGUgYXJlYSB0
-aGF0IG5lZWRzIHRoZSBtb3N0IHdvcmsuIEknbGwgYmUgYXQgTFNGL01NIG5leHQgd2VlaywgYW5k
-DQo+ID4gdGhlcmUncyBjdXJyZW50bHkgYSBsaWdodG5pbmcgdGFsayBvbiB0aGUgc2NoZWR1bGUg
-dG8gZGlzY3Vzcw0KPiA+IGltcHJvdmVtZW50cyBhbmQgZXh0ZW5zaW9ucy4NCj4gPiANCj4gDQo+
-IFsgLi4gXQ0KPiANCj4gQSBzaWxlbnQgcm91bmQgb2YgYXBwbGF1c2UgZm9yIHlvdS4NCj4gVmVy
-eSBtdWNoIGFwcHJlY2lhdGVkLg0KPiANCj4gQW5kIGFjdHVhbGx5LCBJIGhhdmUgYmVlbiBsb29r
-aW5nIGF0IHByb3Blcmx5IHN1cHBvcnRpbmcgaG9zdC13aWRlIHRhZw0KPiBtYXBzLCBzbyB0aGUg
-Y29uY2VwdCBvZiAnc2hhbGxvdycgcXVldWUgZGVwdGggbWlnaHQgYmUgdGhlIHdheSB0byBnbyBo
-ZXJlLg0KPiANCj4gQW5kIGFzIEkgaGF2ZSBzb21lIG90aGVyIHF1ZXN0aW9ucywgdG9vIChhc3Np
-Z25pbmcgYSBuZXcgdGFnIG9uDQo+IHJlcXVldWU/KSBpdCBtaWdodCBiZSBhbiBpZGVhIHRvIHNw
-cmVhZCB0aGlzIG91dCBpbnRvIGEgZm9ybWFsIHNlc3Npb24NCj4gYXQgTFNGLiBJZiB0aGVyZSBh
-cmUgc29tZSBzbG90cyBsZWZ0LCB0aGF0IGlzLg0KDQpJZiBubyBzbG90IGNhbiBiZSBmb3VuZCwg
-aG93IGFib3V0IG9yZ2FuaXppbmcgYW4gZXZlbmluZyBzZXNzaW9uIGFib3V0IHRoaXMNCm5ldyBz
-Y2hlZHVsZXI/DQoNCkJhcnQu
+
+> Il giorno 18 mar 2017, alle ore 07:14, Hannes Reinecke <hare@suse.de> ha =
+scritto:
+> =
+
+> On 03/17/2017 11:03 PM, Omar Sandoval wrote:
+>> From: Omar Sandoval <osandov@fb.com>
+>> =
+
+>> This patch series implements an I/O scheduler for multiqueue devices
+>> combining several techniques: the scalable bitmap library, the new
+>> blk-stats API, and queue depth throttling similar to blk-wbt.
+>> =
+
+>> These patches are on top of my earlier blk-stats series [1]. They also
+>> need a fix in Jens' for-linus branch in order to work properly [2].
+>> =
+
+>> Patches 1 and 2 implement a new sbitmap operation and patch 3 exports a
+>> required function. Patch 4 implements the new scheduler, named Kyber.
+>> =
+
+>> The commit message in patch 4 describes Kyber in detail. The scheduler
+>> employs some heuristics that I've experimented with, but that's probably
+>> the area that needs the most work. I'll be at LSF/MM next week, and
+>> there's currently a lightning talk on the schedule to discuss
+>> improvements and extensions.
+>> =
+
+> [ .. ]
+> =
+
+> A silent round of applause for you.
+> Very much appreciated.
+> =
+
+> And actually, I have been looking at properly supporting host-wide tag
+> maps, so the concept of 'shallow' queue depth might be the way to go here.
+> =
+
+> And as I have some other questions, too (assigning a new tag on
+> requeue?) it might be an idea to spread this out into a formal session
+> at LSF. If there are some slots left, that is.
+> =
+
+
+I would be very interested in such a discussion too.
+
+Thanks,
+Paolo
+
+> Cheers,
+> =
+
+> Hannes
+> -- =
+
+> Dr. Hannes Reinecke		      zSeries & Storage
+> hare@suse.de			      +49 911 74053 688
+> SUSE LINUX Products GmbH, Maxfeldstr. 5, 90409 N=FCrnberg
+> GF: J. Hawn, J. Guild, F. Imend=F6rffer, HRB 16746 (AG N=FCrnberg)
+> _______________________________________________
+> Lsf mailing list
+> Lsf@lists.linux-foundation.org
+> https://lists.linuxfoundation.org/mailman/listinfo/lsf
+
+_______________________________________________
+Lsf mailing list
+Lsf@lists.linux-foundation.org
+https://lists.linuxfoundation.org/mailman/listinfo/lsf
