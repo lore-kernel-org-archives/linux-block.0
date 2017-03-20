@@ -1,286 +1,290 @@
-Return-Path: <prvs=425928092f=shli@fb.com>
-From: Shaohua Li <shli@fb.com>
-To: <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>
-CC: <axboe@kernel.dk>, <tj@kernel.org>, Vivek Goyal <vgoyal@redhat.com>,
-        <jmoyer@redhat.com>, <Kernel-team@fb.com>
-Subject: [PATCH V7 04/18] blk-throttle: add .low interface
-Date: Mon, 27 Mar 2017 10:51:32 -0700
-Message-ID: <a801410f808acfe754992c62edb08dbc96ded231.1490634565.git.shli@fb.com>
-In-Reply-To: <cover.1490634565.git.shli@fb.com>
-References: <cover.1490634565.git.shli@fb.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Return-Path: <BATV+250fd2a736c995bcc4cb+4957+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: tj@kernel.org,
+	martin.petersen@oracle.com,
+	axboe@kernel.dk
+Cc: linux-ide@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	linux-block@vger.kernel.org
+Subject: [PATCH 4/7] libata: simplify the trim implementation
+Date: Mon, 20 Mar 2017 16:43:16 -0400
+Message-Id: <20170320204319.12628-5-hch@lst.de>
+In-Reply-To: <20170320204319.12628-1-hch@lst.de>
+References: <20170320204319.12628-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Add low limit for cgroup and corresponding cgroup interface. To be
-consistent with memcg, we allow users configure .low limit higher than
-.max limit. But the internal logic always assumes .low limit is lower
-than .max limit. So we add extra bps/iops_conf fields in throtl_grp for
-userspace configuration. Old bps/iops fields in throtl_grp will be the
-actual limit we use for throttling.
+Don't try to fake up basic SCSI logical block provisioning and WRITE SAME
+support, but offer support for the Linux Vendor Specific TRIM command
+instead.  This simplifies the implementation a lot, and avoids rewriting
+the data out buffer in the I/O path.   Note that this new command is only
+offered to the block layer and will fail for pass through commands.
+While this is theoretically a regression in the functionality offered
+through SG_IO the previous support was buggy and corrupted user memory
+by rewriting the data out buffer in place.
 
-Signed-off-by: Shaohua Li <shli@fb.com>
+Last but not least this removes the global ata_scsi_rbuf_lock from
+the trim path.
+
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-throttle.c | 144 +++++++++++++++++++++++++++++++++++++++++----------
- 1 file changed, 116 insertions(+), 28 deletions(-)
+ drivers/ata/libata-scsi.c | 179 ++++++++--------------------------------------
+ 1 file changed, 28 insertions(+), 151 deletions(-)
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 1da9f30..b7b69ec 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -84,6 +84,7 @@ enum tg_state_flags {
- #define rb_entry_tg(node)	rb_entry((node), struct throtl_grp, rb_node)
+diff --git a/drivers/ata/libata-scsi.c b/drivers/ata/libata-scsi.c
+index b93d7e33789a..965b9e7dbb7d 100644
+--- a/drivers/ata/libata-scsi.c
++++ b/drivers/ata/libata-scsi.c
+@@ -1322,6 +1322,16 @@ static int ata_scsi_dev_config(struct scsi_device *sdev,
  
- enum {
-+	LIMIT_LOW,
- 	LIMIT_MAX,
- 	LIMIT_CNT,
- };
-@@ -124,11 +125,15 @@ struct throtl_grp {
- 	/* are there any throtl rules between this group and td? */
- 	bool has_rules[2];
+ 	blk_queue_flush_queueable(q, false);
  
--	/* bytes per second rate limits */
-+	/* internally used bytes per second rate limits */
- 	uint64_t bps[2][LIMIT_CNT];
-+	/* user configured bps limits */
-+	uint64_t bps_conf[2][LIMIT_CNT];
- 
--	/* IOPS limits */
-+	/* internally used IOPS limits */
- 	unsigned int iops[2][LIMIT_CNT];
-+	/* user configured IOPS limits */
-+	unsigned int iops_conf[2][LIMIT_CNT];
- 
- 	/* Number of bytes disptached in current slice */
- 	uint64_t bytes_disp[2];
-@@ -355,6 +360,11 @@ static struct blkg_policy_data *throtl_pd_alloc(gfp_t gfp, int node)
- 	tg->bps[WRITE][LIMIT_MAX] = U64_MAX;
- 	tg->iops[READ][LIMIT_MAX] = UINT_MAX;
- 	tg->iops[WRITE][LIMIT_MAX] = UINT_MAX;
-+	tg->bps_conf[READ][LIMIT_MAX] = U64_MAX;
-+	tg->bps_conf[WRITE][LIMIT_MAX] = U64_MAX;
-+	tg->iops_conf[READ][LIMIT_MAX] = UINT_MAX;
-+	tg->iops_conf[WRITE][LIMIT_MAX] = UINT_MAX;
-+	/* LIMIT_LOW will have default value 0 */
- 
- 	return &tg->pd;
- }
-@@ -412,6 +422,41 @@ static void throtl_pd_online(struct blkg_policy_data *pd)
- 	tg_update_has_rules(pd_to_tg(pd));
- }
- 
-+static void blk_throtl_update_limit_valid(struct throtl_data *td)
-+{
-+	struct cgroup_subsys_state *pos_css;
-+	struct blkcg_gq *blkg;
-+	bool low_valid = false;
-+
-+	rcu_read_lock();
-+	blkg_for_each_descendant_post(blkg, pos_css, td->queue->root_blkg) {
-+		struct throtl_grp *tg = blkg_to_tg(blkg);
-+
-+		if (tg->bps[READ][LIMIT_LOW] || tg->bps[WRITE][LIMIT_LOW] ||
-+		    tg->iops[READ][LIMIT_LOW] || tg->iops[WRITE][LIMIT_LOW])
-+			low_valid = true;
-+	}
-+	rcu_read_unlock();
-+
-+	td->limit_valid[LIMIT_LOW] = low_valid;
-+}
-+
-+static void throtl_pd_offline(struct blkg_policy_data *pd)
-+{
-+	struct throtl_grp *tg = pd_to_tg(pd);
-+
-+	tg->bps[READ][LIMIT_LOW] = 0;
-+	tg->bps[WRITE][LIMIT_LOW] = 0;
-+	tg->iops[READ][LIMIT_LOW] = 0;
-+	tg->iops[WRITE][LIMIT_LOW] = 0;
-+
-+	blk_throtl_update_limit_valid(tg->td);
-+
-+	if (tg->td->limit_index == LIMIT_LOW &&
-+	    !tg->td->limit_valid[LIMIT_LOW])
-+		tg->td->limit_index = LIMIT_MAX;
-+}
-+
- static void throtl_pd_free(struct blkg_policy_data *pd)
- {
- 	struct throtl_grp *tg = pd_to_tg(pd);
-@@ -1284,48 +1329,58 @@ static struct cftype throtl_legacy_files[] = {
- 	{ }	/* terminate */
- };
- 
--static u64 tg_prfill_max(struct seq_file *sf, struct blkg_policy_data *pd,
-+static u64 tg_prfill_limit(struct seq_file *sf, struct blkg_policy_data *pd,
- 			 int off)
- {
- 	struct throtl_grp *tg = pd_to_tg(pd);
- 	const char *dname = blkg_dev_name(pd->blkg);
- 	char bufs[4][21] = { "max", "max", "max", "max" };
-+	u64 bps_dft;
-+	unsigned int iops_dft;
- 
- 	if (!dname)
- 		return 0;
- 
--	if (tg->bps[READ][LIMIT_MAX] == U64_MAX &&
--	    tg->bps[WRITE][LIMIT_MAX] == U64_MAX &&
--	    tg->iops[READ][LIMIT_MAX] == UINT_MAX &&
--	    tg->iops[WRITE][LIMIT_MAX] == UINT_MAX)
-+	if (off == LIMIT_LOW) {
-+		bps_dft = 0;
-+		iops_dft = 0;
-+	} else {
-+		bps_dft = U64_MAX;
-+		iops_dft = UINT_MAX;
++	if (ata_id_has_trim(dev->id) &&
++	    !(dev->horkage & ATA_HORKAGE_NOTRIM)) {
++		sdev->ata_trim = 1;
++		if (ata_id_has_zero_after_trim(dev->id) &&
++		    (dev->horkage & ATA_HORKAGE_ZERO_AFTER_TRIM)) {
++			ata_dev_info(dev, "Enabling discard_zeroes_data\n");
++			sdev->ata_trim_zeroes_data = 1;
++		}
 +	}
 +
-+	if (tg->bps_conf[READ][off] == bps_dft &&
-+	    tg->bps_conf[WRITE][off] == bps_dft &&
-+	    tg->iops_conf[READ][off] == iops_dft &&
-+	    tg->iops_conf[WRITE][off] == iops_dft)
- 		return 0;
- 
--	if (tg->bps[READ][LIMIT_MAX] != U64_MAX)
-+	if (tg->bps_conf[READ][off] != bps_dft)
- 		snprintf(bufs[0], sizeof(bufs[0]), "%llu",
--			tg->bps[READ][LIMIT_MAX]);
--	if (tg->bps[WRITE][LIMIT_MAX] != U64_MAX)
-+			tg->bps_conf[READ][off]);
-+	if (tg->bps_conf[WRITE][off] != bps_dft)
- 		snprintf(bufs[1], sizeof(bufs[1]), "%llu",
--			tg->bps[WRITE][LIMIT_MAX]);
--	if (tg->iops[READ][LIMIT_MAX] != UINT_MAX)
-+			tg->bps_conf[WRITE][off]);
-+	if (tg->iops_conf[READ][off] != iops_dft)
- 		snprintf(bufs[2], sizeof(bufs[2]), "%u",
--			tg->iops[READ][LIMIT_MAX]);
--	if (tg->iops[WRITE][LIMIT_MAX] != UINT_MAX)
-+			tg->iops_conf[READ][off]);
-+	if (tg->iops_conf[WRITE][off] != iops_dft)
- 		snprintf(bufs[3], sizeof(bufs[3]), "%u",
--			tg->iops[WRITE][LIMIT_MAX]);
-+			tg->iops_conf[WRITE][off]);
- 
- 	seq_printf(sf, "%s rbps=%s wbps=%s riops=%s wiops=%s\n",
- 		   dname, bufs[0], bufs[1], bufs[2], bufs[3]);
+ 	dev->sdev = sdev;
+ 	return 0;
+ }
+@@ -2383,21 +2393,6 @@ static unsigned int ata_scsiop_inq_b0(struct ata_scsi_args *args, u8 *rbuf)
+ 	 */
+ 	min_io_sectors = 1 << ata_id_log2_per_physical_sector(args->id);
+ 	put_unaligned_be16(min_io_sectors, &rbuf[6]);
+-
+-	/*
+-	 * Optimal unmap granularity.
+-	 *
+-	 * The ATA spec doesn't even know about a granularity or alignment
+-	 * for the TRIM command.  We can leave away most of the unmap related
+-	 * VPD page entries, but we have specifify a granularity to signal
+-	 * that we support some form of unmap - in thise case via WRITE SAME
+-	 * with the unmap bit set.
+-	 */
+-	if (ata_id_has_trim(args->id)) {
+-		put_unaligned_be64(65535 * ATA_MAX_TRIM_RNUM, &rbuf[36]);
+-		put_unaligned_be32(1, &rbuf[28]);
+-	}
+-
  	return 0;
  }
  
--static int tg_print_max(struct seq_file *sf, void *v)
-+static int tg_print_limit(struct seq_file *sf, void *v)
- {
--	blkcg_print_blkgs(sf, css_to_blkcg(seq_css(sf)), tg_prfill_max,
-+	blkcg_print_blkgs(sf, css_to_blkcg(seq_css(sf)), tg_prfill_limit,
- 			  &blkcg_policy_throtl, seq_cft(sf)->private, false);
- 	return 0;
+@@ -2746,16 +2741,6 @@ static unsigned int ata_scsiop_read_cap(struct ata_scsi_args *args, u8 *rbuf)
+ 		rbuf[14] = (lowest_aligned >> 8) & 0x3f;
+ 		rbuf[15] = lowest_aligned;
+ 
+-		if (ata_id_has_trim(args->id) &&
+-		    !(dev->horkage & ATA_HORKAGE_NOTRIM)) {
+-			rbuf[14] |= 0x80; /* LBPME */
+-
+-			if (ata_id_has_zero_after_trim(args->id) &&
+-			    dev->horkage & ATA_HORKAGE_ZERO_AFTER_TRIM) {
+-				ata_dev_info(dev, "Enabling discard_zeroes_data\n");
+-				rbuf[14] |= 0x40; /* LBPRZ */
+-			}
+-		}
+ 		if (ata_id_zoned_cap(args->id) ||
+ 		    args->dev->class == ATA_DEV_ZAC)
+ 			rbuf[12] = (1 << 4); /* RC_BASIS */
+@@ -3339,141 +3324,45 @@ static unsigned int ata_scsi_pass_thru(struct ata_queued_cmd *qc)
  }
  
--static ssize_t tg_set_max(struct kernfs_open_file *of,
-+static ssize_t tg_set_limit(struct kernfs_open_file *of,
- 			  char *buf, size_t nbytes, loff_t off)
+ /**
+- * ata_format_dsm_trim_descr() - SATL Write Same to DSM Trim
+- * @cmd: SCSI command being translated
+- * @trmax: Maximum number of entries that will fit in sector_size bytes.
+- * @sector: Starting sector
+- * @count: Total Range of request in logical sectors
+- *
+- * Rewrite the WRITE SAME descriptor to be a DSM TRIM little-endian formatted
+- * descriptor.
+- *
+- * Upto 64 entries of the format:
+- *   63:48 Range Length
+- *   47:0  LBA
+- *
+- *  Range Length of 0 is ignored.
+- *  LBA's should be sorted order and not overlap.
+- *
+- * NOTE: this is the same format as ADD LBA(S) TO NV CACHE PINNED SET
+- *
+- * Return: Number of bytes copied into sglist.
+- */
+-static size_t ata_format_dsm_trim_descr(struct scsi_cmnd *cmd, u32 trmax,
+-					u64 sector, u32 count)
+-{
+-	struct scsi_device *sdp = cmd->device;
+-	size_t len = sdp->sector_size;
+-	size_t r;
+-	__le64 *buf;
+-	u32 i = 0;
+-	unsigned long flags;
+-
+-	WARN_ON(len > ATA_SCSI_RBUF_SIZE);
+-
+-	if (len > ATA_SCSI_RBUF_SIZE)
+-		len = ATA_SCSI_RBUF_SIZE;
+-
+-	spin_lock_irqsave(&ata_scsi_rbuf_lock, flags);
+-	buf = ((void *)ata_scsi_rbuf);
+-	memset(buf, 0, len);
+-	while (i < trmax) {
+-		u64 entry = sector |
+-			((u64)(count > 0xffff ? 0xffff : count) << 48);
+-		buf[i++] = __cpu_to_le64(entry);
+-		if (count <= 0xffff)
+-			break;
+-		count -= 0xffff;
+-		sector += 0xffff;
+-	}
+-	r = sg_copy_from_buffer(scsi_sglist(cmd), scsi_sg_count(cmd), buf, len);
+-	spin_unlock_irqrestore(&ata_scsi_rbuf_lock, flags);
+-
+-	return r;
+-}
+-
+-/**
+- * ata_scsi_write_same_xlat() - SATL Write Same to ATA SCT Write Same
++ * ata_scsi_trim_xlat() - Handle the vendor specific TRIM command.
+  * @qc: Command to be translated
+  *
+- * Translate a SCSI WRITE SAME command to be either a DSM TRIM command or
+- * an SCT Write Same command.
+- * Based on WRITE SAME has the UNMAP flag
+- *   When set translate to DSM TRIM
+- *   When clear translate to SCT Write Same
++ * Setup a DSM TRIM command (or it's queued variant) after sd already
++ * prepared the payload for us.
+  */
+-static unsigned int ata_scsi_write_same_xlat(struct ata_queued_cmd *qc)
++static unsigned int ata_scsi_trim_xlat(struct ata_queued_cmd *qc)
  {
- 	struct blkcg *blkcg = css_to_blkcg(of_css(of));
-@@ -1333,6 +1388,7 @@ static ssize_t tg_set_max(struct kernfs_open_file *of,
- 	struct throtl_grp *tg;
- 	u64 v[4];
- 	int ret;
-+	int index = of_cft(of)->private;
+ 	struct ata_taskfile *tf = &qc->tf;
+ 	struct scsi_cmnd *scmd = qc->scsicmd;
+-	struct scsi_device *sdp = scmd->device;
+-	size_t len = sdp->sector_size;
+ 	struct ata_device *dev = qc->dev;
+-	const u8 *cdb = scmd->cmnd;
+-	u64 block;
+-	u32 n_block;
+-	const u32 trmax = len >> 3;
+-	u32 size;
+-	u16 fp;
+-	u8 bp = 0xff;
+-	u8 unmap = cdb[1] & 0x8;
+-
+-	/* we may not issue DMA commands if no DMA mode is set */
+-	if (unlikely(!dev->dma_mode))
+-		goto invalid_opcode;
  
- 	ret = blkg_conf_prep(blkcg, &blkcg_policy_throtl, buf, &ctx);
- 	if (ret)
-@@ -1340,10 +1396,10 @@ static ssize_t tg_set_max(struct kernfs_open_file *of,
+-	if (unlikely(scmd->cmd_len < 16)) {
+-		fp = 15;
+-		goto invalid_fld;
++	if (unlikely(!dev->dma_mode)) {
++		ata_scsi_set_sense(dev, scmd, ILLEGAL_REQUEST, 0x20, 0x0);
++		return 1;
+ 	}
+-	scsi_16_lba_len(cdb, &block, &n_block);
  
- 	tg = blkg_to_tg(ctx.blkg);
- 
--	v[0] = tg->bps[READ][LIMIT_MAX];
--	v[1] = tg->bps[WRITE][LIMIT_MAX];
--	v[2] = tg->iops[READ][LIMIT_MAX];
--	v[3] = tg->iops[WRITE][LIMIT_MAX];
-+	v[0] = tg->bps_conf[READ][index];
-+	v[1] = tg->bps_conf[WRITE][index];
-+	v[2] = tg->iops_conf[READ][index];
-+	v[3] = tg->iops_conf[WRITE][index];
- 
- 	while (true) {
- 		char tok[27];	/* wiops=18446744073709551616 */
-@@ -1380,11 +1436,31 @@ static ssize_t tg_set_max(struct kernfs_open_file *of,
- 			goto out_finish;
+-	if (!unmap ||
+-	    (dev->horkage & ATA_HORKAGE_NOTRIM) ||
+-	    !ata_id_has_trim(dev->id)) {
+-		fp = 1;
+-		bp = 3;
+-		goto invalid_fld;
+-	}
+-	/* If the request is too large the cmd is invalid */
+-	if (n_block > 0xffff * trmax) {
+-		fp = 2;
+-		goto invalid_fld;
++	/* We only allow sending this command through the block layer */
++	if (unlikely(req_op(scmd->request) != REQ_OP_DISCARD)) {
++		ata_scsi_set_sense(dev, scmd, ILLEGAL_REQUEST, 0x20, 0x0);
++		return 1;
  	}
  
--	tg->bps[READ][LIMIT_MAX] = v[0];
--	tg->bps[WRITE][LIMIT_MAX] = v[1];
--	tg->iops[READ][LIMIT_MAX] = v[2];
--	tg->iops[WRITE][LIMIT_MAX] = v[3];
-+	tg->bps_conf[READ][index] = v[0];
-+	tg->bps_conf[WRITE][index] = v[1];
-+	tg->iops_conf[READ][index] = v[2];
-+	tg->iops_conf[WRITE][index] = v[3];
+-	/*
+-	 * WRITE SAME always has a sector sized buffer as payload, this
+-	 * should never be a multiple entry S/G list.
+-	 */
+-	if (!scsi_sg_count(scmd))
+-		goto invalid_param_len;
+-
+-	/*
+-	 * size must match sector size in bytes
+-	 * For DATA SET MANAGEMENT TRIM in ACS-2 nsect (aka count)
+-	 * is defined as number of 512 byte blocks to be transferred.
+-	 */
+-
+-	size = ata_format_dsm_trim_descr(scmd, trmax, block, n_block);
+-	if (size != len)
+-		goto invalid_param_len;
+-
+ 	if (ata_ncq_enabled(dev) && ata_fpdma_dsm_supported(dev)) {
+ 		/* Newer devices support queued TRIM commands */
+ 		tf->protocol = ATA_PROT_NCQ;
+ 		tf->command = ATA_CMD_FPDMA_SEND;
+ 		tf->hob_nsect = ATA_SUBCMD_FPDMA_SEND_DSM & 0x1f;
+ 		tf->nsect = qc->tag << 3;
+-		tf->hob_feature = (size / 512) >> 8;
+-		tf->feature = size / 512;
++		tf->hob_feature = (scmd->device->sector_size / 512) >> 8;
++		tf->feature = scmd->device->sector_size / 512;
  
-+	if (index == LIMIT_MAX) {
-+		tg->bps[READ][index] = v[0];
-+		tg->bps[WRITE][index] = v[1];
-+		tg->iops[READ][index] = v[2];
-+		tg->iops[WRITE][index] = v[3];
-+	}
-+	tg->bps[READ][LIMIT_LOW] = min(tg->bps_conf[READ][LIMIT_LOW],
-+		tg->bps_conf[READ][LIMIT_MAX]);
-+	tg->bps[WRITE][LIMIT_LOW] = min(tg->bps_conf[WRITE][LIMIT_LOW],
-+		tg->bps_conf[WRITE][LIMIT_MAX]);
-+	tg->iops[READ][LIMIT_LOW] = min(tg->iops_conf[READ][LIMIT_LOW],
-+		tg->iops_conf[READ][LIMIT_MAX]);
-+	tg->iops[WRITE][LIMIT_LOW] = min(tg->iops_conf[WRITE][LIMIT_LOW],
-+		tg->iops_conf[WRITE][LIMIT_MAX]);
-+
-+	if (index == LIMIT_LOW) {
-+		blk_throtl_update_limit_valid(tg->td);
-+		if (tg->td->limit_valid[LIMIT_LOW])
-+			tg->td->limit_index = LIMIT_LOW;
-+	}
- 	tg_conf_updated(tg);
- 	ret = 0;
- out_finish:
-@@ -1393,11 +1469,21 @@ static ssize_t tg_set_max(struct kernfs_open_file *of,
+ 		tf->auxiliary = 1;
+ 	} else {
+ 		tf->protocol = ATA_PROT_DMA;
+ 		tf->hob_feature = 0;
+ 		tf->feature = ATA_DSM_TRIM;
+-		tf->hob_nsect = (size / 512) >> 8;
+-		tf->nsect = size / 512;
++		tf->hob_nsect = (scmd->device->sector_size / 512) >> 8;
++		tf->nsect = scmd->device->sector_size / 512;
+ 		tf->command = ATA_CMD_DSM;
+ 	}
+ 
+@@ -3483,18 +3372,6 @@ static unsigned int ata_scsi_write_same_xlat(struct ata_queued_cmd *qc)
+ 	ata_qc_set_pc_nbytes(qc);
+ 
+ 	return 0;
+-
+-invalid_fld:
+-	ata_scsi_set_invalid_field(dev, scmd, fp, bp);
+-	return 1;
+-invalid_param_len:
+-	/* "Parameter list length error" */
+-	ata_scsi_set_sense(dev, scmd, ILLEGAL_REQUEST, 0x1a, 0x0);
+-	return 1;
+-invalid_opcode:
+-	/* "Invalid command operation code" */
+-	ata_scsi_set_sense(dev, scmd, ILLEGAL_REQUEST, 0x20, 0x0);
+-	return 1;
  }
  
- static struct cftype throtl_files[] = {
-+#ifdef CONFIG_BLK_DEV_THROTTLING_LOW
-+	{
-+		.name = "low",
-+		.flags = CFTYPE_NOT_ON_ROOT,
-+		.seq_show = tg_print_limit,
-+		.write = tg_set_limit,
-+		.private = LIMIT_LOW,
-+	},
-+#endif
- 	{
- 		.name = "max",
- 		.flags = CFTYPE_NOT_ON_ROOT,
--		.seq_show = tg_print_max,
--		.write = tg_set_max,
-+		.seq_show = tg_print_limit,
-+		.write = tg_set_limit,
-+		.private = LIMIT_MAX,
- 	},
- 	{ }	/* terminate */
- };
-@@ -1416,6 +1502,7 @@ static struct blkcg_policy blkcg_policy_throtl = {
- 	.pd_alloc_fn		= throtl_pd_alloc,
- 	.pd_init_fn		= throtl_pd_init,
- 	.pd_online_fn		= throtl_pd_online,
-+	.pd_offline_fn		= throtl_pd_offline,
- 	.pd_free_fn		= throtl_pd_free,
- };
+ /**
+@@ -4087,9 +3964,6 @@ static inline ata_xlat_func_t ata_get_xlat_func(struct ata_device *dev, u8 cmd)
+ 	case WRITE_16:
+ 		return ata_scsi_rw_xlat;
  
-@@ -1595,6 +1682,7 @@ int blk_throtl_init(struct request_queue *q)
- 	td->queue = q;
+-	case WRITE_SAME_16:
+-		return ata_scsi_write_same_xlat;
+-
+ 	case SYNCHRONIZE_CACHE:
+ 		if (ata_try_flush_cache(dev))
+ 			return ata_scsi_flush_xlat;
+@@ -4116,6 +3990,9 @@ static inline ata_xlat_func_t ata_get_xlat_func(struct ata_device *dev, u8 cmd)
  
- 	td->limit_valid[LIMIT_MAX] = true;
-+	td->limit_index = LIMIT_MAX;
- 	/* activate policy */
- 	ret = blkcg_activate_policy(q, &blkcg_policy_throtl);
- 	if (ret)
+ 	case START_STOP:
+ 		return ata_scsi_start_stop_xlat;
++
++	case LINUX_VS_TRIM:
++		return ata_scsi_trim_xlat;
+ 	}
+ 
+ 	return NULL;
 -- 
-2.9.3
+2.11.0
