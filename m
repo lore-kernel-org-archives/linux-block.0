@@ -1,77 +1,138 @@
-Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
-From: Sagi Grimberg <sagi@grimberg.me>
-To: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
- linux-rdma@vger.kernel.org, target-devel@vger.kernel.org
-Subject: [PATCH rfc 09/10] nvmet: Use non-selective polling
-Date: Thu,  9 Mar 2017 15:16:41 +0200
-Message-Id: <1489065402-14757-10-git-send-email-sagi@grimberg.me>
-In-Reply-To: <1489065402-14757-1-git-send-email-sagi@grimberg.me>
-References: <1489065402-14757-1-git-send-email-sagi@grimberg.me>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
-List-Post: <mailto:linux-nvme@lists.infradead.org>
-List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
-Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
+Return-Path: <BATV+250fd2a736c995bcc4cb+4957+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk
+Cc: Bart.VanAssche@sandisk.com,
+	linux-block@vger.kernel.org
+Subject: [PATCH 4/4] blk-mq: streamline blk_mq_make_request
+Date: Mon, 20 Mar 2017 16:39:30 -0400
+Message-Id: <20170320203930.12533-5-hch@lst.de>
+In-Reply-To: <20170320203930.12533-1-hch@lst.de>
+References: <20170320203930.12533-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-It doesn't really make sense to do selective polling
-because we never care about specific IOs. Non selective
-polling can actually help by doing some useful work
-while we're submitting a command.
+Turn the different ways of merging or issuing I/O into a series of if/else
+statements instead of the current maze of gotos.  Note that this means we
+pin the CPU a little longer for some cases as the CTX put is moved to
+common code at the end of the function.
 
-We ask for a batch of (magic) 4 completions which looks
-like a decent network<->backend proportion, if less are
-available we'll see less.
-
-Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/nvme/target/io-cmd.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ block/blk-mq.c | 67 +++++++++++++++++++++++-----------------------------------
+ 1 file changed, 27 insertions(+), 40 deletions(-)
 
-diff --git a/drivers/nvme/target/io-cmd.c b/drivers/nvme/target/io-cmd.c
-index 4195115c7e54..8e4fd7ca4a8a 100644
---- a/drivers/nvme/target/io-cmd.c
-+++ b/drivers/nvme/target/io-cmd.c
-@@ -46,7 +46,6 @@ static void nvmet_execute_rw(struct nvmet_req *req)
- 	struct scatterlist *sg;
- 	struct bio *bio;
- 	sector_t sector;
--	blk_qc_t cookie;
- 	int op, op_flags = 0, i;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 48748cb799ed..18e449cc832f 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1534,16 +1534,17 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
  
- 	if (!req->sg_cnt) {
-@@ -85,16 +84,17 @@ static void nvmet_execute_rw(struct nvmet_req *req)
- 			bio_set_op_attrs(bio, op, op_flags);
+ 	cookie = request_to_qc_t(data.hctx, rq);
  
- 			bio_chain(bio, prev);
--			cookie = submit_bio(prev);
-+			submit_bio(prev);
++	plug = current->plug;
+ 	if (unlikely(is_flush_fua)) {
+-		if (q->elevator)
+-			goto elv_insert;
+ 		blk_mq_bio_to_request(rq, bio);
+-		blk_insert_flush(rq);
+-		goto run_queue;
+-	}
+-
+-	plug = current->plug;
+-	if (plug && q->nr_hw_queues == 1) {
++		if (q->elevator) {
++			blk_mq_sched_insert_request(rq, false, true,
++						!is_sync || is_flush_fua, true);
++		} else {
++			blk_insert_flush(rq);
++			blk_mq_run_hw_queue(data.hctx, !is_sync || is_flush_fua);
++		}
++	} else if (plug && q->nr_hw_queues == 1) {
+ 		struct request *last = NULL;
+ 
+ 		blk_mq_bio_to_request(rq, bio);
+@@ -1562,8 +1563,6 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
+ 		else
+ 			last = list_entry_rq(plug->mq_list.prev);
+ 
+-		blk_mq_put_ctx(data.ctx);
+-
+ 		if (request_count >= BLK_MAX_REQUEST_COUNT || (last &&
+ 		    blk_rq_bytes(last) >= BLK_PLUG_FLUSH_SIZE)) {
+ 			blk_flush_plug_list(plug, false);
+@@ -1571,56 +1570,44 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
  		}
  
- 		sector += sg->length >> 9;
- 		sg_cnt--;
+ 		list_add_tail(&rq->queuelist, &plug->mq_list);
+-		goto done;
+-	} else if (((plug && !blk_queue_nomerges(q)) || is_sync)) {
+-		struct request *old_rq = NULL;
+-
++	} else if (plug && !blk_queue_nomerges(q)) {
+ 		blk_mq_bio_to_request(rq, bio);
+ 
+ 		/*
+ 		 * We do limited plugging. If the bio can be merged, do that.
+ 		 * Otherwise the existing request in the plug list will be
+ 		 * issued. So the plug list will have one request at most
++		 *
++		 * The plug list might get flushed before this. If that happens,
++		 * the plug list is emptry and same_queue_rq is invalid.
+ 		 */
+-		if (plug) {
+-			/*
+-			 * The plug list might get flushed before this. If that
+-			 * happens, same_queue_rq is invalid and plug list is
+-			 * empty
+-			 */
+-			if (same_queue_rq && !list_empty(&plug->mq_list)) {
+-				old_rq = same_queue_rq;
+-				list_del_init(&old_rq->queuelist);
+-			}
+-			list_add_tail(&rq->queuelist, &plug->mq_list);
+-		} else /* is_sync */
+-			old_rq = rq;
+-		blk_mq_put_ctx(data.ctx);
+-		if (old_rq)
+-			blk_mq_try_issue_directly(data.hctx, old_rq, &cookie);
+-		goto done;
+-	}
++		if (!list_empty(&plug->mq_list))
++			list_del_init(&same_queue_rq->queuelist);
++		else
++			same_queue_rq = NULL;
+ 
+-	if (q->elevator) {
+-elv_insert:
+-		blk_mq_put_ctx(data.ctx);
++		list_add_tail(&rq->queuelist, &plug->mq_list);
++		if (same_queue_rq)
++			blk_mq_try_issue_directly(data.hctx, same_queue_rq,
++					&cookie);
++	} else if (is_sync) {
++		blk_mq_bio_to_request(rq, bio);
++		blk_mq_try_issue_directly(data.hctx, rq, &cookie);
++	} else if (q->elevator) {
+ 		blk_mq_bio_to_request(rq, bio);
+ 		blk_mq_sched_insert_request(rq, false, true,
+ 						!is_sync || is_flush_fua, true);
+-		goto done;
+-	}
+-	if (!blk_mq_merge_queue_io(data.hctx, data.ctx, rq, bio)) {
++	} else if (!blk_mq_merge_queue_io(data.hctx, data.ctx, rq, bio)) {
+ 		/*
+ 		 * For a SYNC request, send it to the hardware immediately. For
+ 		 * an ASYNC request, just ensure that we run it later on. The
+ 		 * latter allows for merging opportunities and more efficient
+ 		 * dispatching.
+ 		 */
+-run_queue:
+ 		blk_mq_run_hw_queue(data.hctx, !is_sync || is_flush_fua);
  	}
- 
--	cookie = submit_bio(bio);
-+	submit_bio(bio);
- 
--	blk_mq_poll(bdev_get_queue(req->ns->bdev), cookie);
-+	/* magic 4 is what we are willing to grab before we return */
-+	blk_mq_poll_batch(bdev_get_queue(req->ns->bdev), 4);
++
+ 	blk_mq_put_ctx(data.ctx);
+-done:
+ 	return cookie;
  }
  
- static void nvmet_execute_flush(struct nvmet_req *req)
 -- 
-2.7.4
-
-
-_______________________________________________
-Linux-nvme mailing list
-Linux-nvme@lists.infradead.org
-http://lists.infradead.org/mailman/listinfo/linux-nvme
+2.11.0
