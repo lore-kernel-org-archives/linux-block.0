@@ -1,98 +1,100 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <Bart.VanAssche@sandisk.com>
-To: "hch@lst.de" <hch@lst.de>, "tj@kernel.org" <tj@kernel.org>,
-	"martin.petersen@oracle.com" <martin.petersen@oracle.com>, "axboe@kernel.dk"
-	<axboe@kernel.dk>
-CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-ide@vger.kernel.org" <linux-ide@vger.kernel.org>
-Subject: Re: [PATCH 6/7] sd: support multi-range TRIM for ATA disks
-Date: Mon, 27 Mar 2017 23:38:59 +0000
-Message-ID: <1490657921.7897.20.camel@sandisk.com>
+Return-Path: <BATV+250fd2a736c995bcc4cb+4957+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: tj@kernel.org,
+	martin.petersen@oracle.com,
+	axboe@kernel.dk
+Cc: linux-ide@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	linux-block@vger.kernel.org
+Subject: [PATCH 6/7] sd: support multi-range TRIM for ATA disks
+Date: Mon, 20 Mar 2017 16:43:18 -0400
+Message-Id: <20170320204319.12628-7-hch@lst.de>
+In-Reply-To: <20170320204319.12628-1-hch@lst.de>
 References: <20170320204319.12628-1-hch@lst.de>
-	 <20170320204319.12628-7-hch@lst.de>
-In-Reply-To: <20170320204319.12628-7-hch@lst.de>
-Content-Type: text/plain; charset="iso-8859-1"
-MIME-Version: 1.0
-Return-Path: Bart.VanAssche@sandisk.com
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, 2017-03-20 at 16:43 -0400, Christoph Hellwig wrote:
-> @@ -698,13 +698,19 @@ static void sd_config_discard(struct scsi_disk *sdk=
-p, unsigned int mode)
->  		break;
-> =20
->  	case SD_LBP_ATA_TRIM:
-> -		max_blocks =3D 65535 * (512 / sizeof(__le64));
-> +		max_ranges =3D 512 / sizeof(__le64);
-> +		max_range_size =3D USHRT_MAX;
-> +		max_blocks =3D max_ranges * max_range_size;
->  		if (sdkp->device->ata_trim_zeroes_data)
->  			q->limits.discard_zeroes_data =3D 1;
->  		break;
->  	}
-> =20
->  	blk_queue_max_discard_sectors(q, max_blocks * (logical_block_size >> 9)=
-);
-> +	if (max_ranges)
-> +		blk_queue_max_discard_segments(q, max_ranges);
-> +	if (max_range_size)
-> +		blk_queue_max_discard_segment_size(q, max_range_size);
->  	queue_flag_set_unlocked(QUEUE_FLAG_DISCARD, q);
->  }
+Almost the same scheme as the older multi-range support for NVMe.
 
-Hello Christoph,
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/scsi/sd.c | 37 +++++++++++++++++++++++++------------
+ 1 file changed, 25 insertions(+), 12 deletions(-)
 
-Does blk_queue_max_discard_segment_size() expect a second argument that is =
-a
-number of bytes? Is max_range_size a number of logical blocks that each hav=
-e
-a size 1 << sector_shift?
-
-> @@ -826,14 +832,21 @@ static int sd_setup_ata_trim_cmnd(struct scsi_cmnd =
-*cmd)
->  	cmd->cmnd[8] =3D data_len;
-> =20
->  	buf =3D page_address(rq->special_vec.bv_page);
-> -	for (i =3D 0; i < (data_len >> 3); i++) {
-> -		u64 n =3D min(nr_sectors, 0xffffu);
-> +	__rq_for_each_bio(bio, rq) {
-> +		u64 sector =3D bio->bi_iter.bi_sector >> (sector_shift - 9);
-> +		u32 nr_sectors =3D bio->bi_iter.bi_size >> sector_shift;
-> =20
-> -		buf[i] =3D cpu_to_le64(sector | (n << 48));
-> -		if (nr_sectors <=3D 0xffff)
-> -			break;
-> -		sector +=3D 0xffff;
-> -		nr_sectors -=3D 0xffff;
-> +		do {
-> +			u64 n =3D min(nr_sectors, 0xffffu);
-> +
-> +			buf[i] =3D cpu_to_le64(sector | (n << 48));
-> +			if (nr_sectors <=3D 0xffff)
-> +				break;
-> +			sector +=3D 0xffff;
-> +			nr_sectors -=3D 0xffff;
-> +			i++;
-> +
-> +		} while (!WARN_ON_ONCE(i >=3D data_len >> 3));
->  	}
-> =20
->  	cmd->allowed =3D SD_MAX_RETRIES;
-
-It's unfortunate that the loop-end test occurs twice (i < data_len >> 3).
-Please consider using put_unaligned_le64() instead of cpu_to_le64() such
-that the data type of buf can be changed from __le64* into void *. With
-that change and by introducing e.g. the following:
-
-void *end;
-[ ... ]
-end =3D (void *)buf + data_len;
-
-the loop variable 'i' can be eliminated. If buf[i++] =3D ... would be
-changed into *buf++ =3D ... then that would allow to change the two
-occurrences of (i < data_len >> 3) into (buf < end).
-
-Thanks,
-
-Bart.=
+diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
+index cc8684818305..c18fe9ff1f8f 100644
+--- a/drivers/scsi/sd.c
++++ b/drivers/scsi/sd.c
+@@ -643,7 +643,7 @@ static void sd_config_discard(struct scsi_disk *sdkp, unsigned int mode)
+ {
+ 	struct request_queue *q = sdkp->disk->queue;
+ 	unsigned int logical_block_size = sdkp->device->sector_size;
+-	unsigned int max_blocks = 0;
++	unsigned int max_blocks = 0, max_ranges = 0, max_range_size = 0;
+ 
+ 	q->limits.discard_zeroes_data = 0;
+ 
+@@ -698,13 +698,19 @@ static void sd_config_discard(struct scsi_disk *sdkp, unsigned int mode)
+ 		break;
+ 
+ 	case SD_LBP_ATA_TRIM:
+-		max_blocks = 65535 * (512 / sizeof(__le64));
++		max_ranges = 512 / sizeof(__le64);
++		max_range_size = USHRT_MAX;
++		max_blocks = max_ranges * max_range_size;
+ 		if (sdkp->device->ata_trim_zeroes_data)
+ 			q->limits.discard_zeroes_data = 1;
+ 		break;
+ 	}
+ 
+ 	blk_queue_max_discard_sectors(q, max_blocks * (logical_block_size >> 9));
++	if (max_ranges)
++		blk_queue_max_discard_segments(q, max_ranges);
++	if (max_range_size)
++		blk_queue_max_discard_segment_size(q, max_range_size);
+ 	queue_flag_set_unlocked(QUEUE_FLAG_DISCARD, q);
+ }
+ 
+@@ -805,9 +811,9 @@ static int sd_setup_ata_trim_cmnd(struct scsi_cmnd *cmd)
+ {
+ 	struct scsi_device *sdp = cmd->device;
+ 	struct request *rq = cmd->request;
+-	u64 sector = blk_rq_pos(rq) >> (ilog2(sdp->sector_size) - 9);
+-	u32 nr_sectors = blk_rq_sectors(rq) >> (ilog2(sdp->sector_size) - 9);
+-	u32 data_len = sdp->sector_size, i;
++	u32 sector_shift = ilog2(sdp->sector_size);
++	u32 data_len = sdp->sector_size, i = 0;
++	struct bio *bio;
+ 	__le64 *buf;
+ 
+ 	rq->special_vec.bv_page = alloc_page(GFP_ATOMIC | __GFP_ZERO);
+@@ -826,14 +832,21 @@ static int sd_setup_ata_trim_cmnd(struct scsi_cmnd *cmd)
+ 	cmd->cmnd[8] = data_len;
+ 
+ 	buf = page_address(rq->special_vec.bv_page);
+-	for (i = 0; i < (data_len >> 3); i++) {
+-		u64 n = min(nr_sectors, 0xffffu);
++	__rq_for_each_bio(bio, rq) {
++		u64 sector = bio->bi_iter.bi_sector >> (sector_shift - 9);
++		u32 nr_sectors = bio->bi_iter.bi_size >> sector_shift;
+ 
+-		buf[i] = cpu_to_le64(sector | (n << 48));
+-		if (nr_sectors <= 0xffff)
+-			break;
+-		sector += 0xffff;
+-		nr_sectors -= 0xffff;
++		do {
++			u64 n = min(nr_sectors, 0xffffu);
++
++			buf[i] = cpu_to_le64(sector | (n << 48));
++			if (nr_sectors <= 0xffff)
++				break;
++			sector += 0xffff;
++			nr_sectors -= 0xffff;
++			i++;
++
++		} while (!WARN_ON_ONCE(i >= data_len >> 3));
+ 	}
+ 
+ 	cmd->allowed = SD_MAX_RETRIES;
+-- 
+2.11.0
