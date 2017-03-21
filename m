@@ -1,36 +1,30 @@
-Return-Path: <sagi@grimberg.me>
-From: Sagi Grimberg <sagi@grimberg.me>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org
-Subject: [PATCH] blk-mq: Fix tagset reinit in the presence of cpu hot-unplug
-Date: Mon, 13 Mar 2017 16:10:11 +0200
-Message-Id: <1489414211-30437-1-git-send-email-sagi@grimberg.me>
+Return-Path: <jthumshirn@suse.de>
+Date: Tue, 21 Mar 2017 09:33:46 -0400
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Christoph Hellwig <hch@lst.de>
+Cc: axboe@kernel.dk, Bart.VanAssche@sandisk.com,
+	linux-block@vger.kernel.org
+Subject: Re: [PATCH 1/4] blk-mq: remove BLK_MQ_F_DEFER_ISSUE
+Message-ID: <20170321133345.GB30013@linux-x5ow.site>
+References: <20170320203930.12533-1-hch@lst.de>
+ <20170320203930.12533-2-hch@lst.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20170320203930.12533-2-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-In case cpu was unplugged, we need to make sure not to assume
-that the tags for that cpu are still allocated. so check
-for null tags when reinitializing a tagset.
+On Mon, Mar 20, 2017 at 04:39:27PM -0400, Christoph Hellwig wrote:
+> This flag was never used since it was introduced.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
 
-Reported-by: Yi Zhang <yizhan@redhat.com>
-Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
----
- block/blk-mq-tag.c | 3 +++
- 1 file changed, 3 insertions(+)
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
 
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index e48bc2c72615..9d97bfc4d465 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -295,6 +295,9 @@ int blk_mq_reinit_tagset(struct blk_mq_tag_set *set)
- 	for (i = 0; i < set->nr_hw_queues; i++) {
- 		struct blk_mq_tags *tags = set->tags[i];
- 
-+		if (!tags)
-+			continue;
-+
- 		for (j = 0; j < tags->nr_tags; j++) {
- 			if (!tags->static_rqs[j])
- 				continue;
 -- 
-2.7.4
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
