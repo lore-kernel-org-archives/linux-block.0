@@ -1,195 +1,42 @@
-Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
-From: Sagi Grimberg <sagi@grimberg.me>
-To: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
- linux-rdma@vger.kernel.org, target-devel@vger.kernel.org
-Subject: [PATCH rfc 01/10] nvme-pci: Split __nvme_process_cq to poll and handle
-Date: Thu,  9 Mar 2017 15:16:33 +0200
-Message-Id: <1489065402-14757-2-git-send-email-sagi@grimberg.me>
-In-Reply-To: <1489065402-14757-1-git-send-email-sagi@grimberg.me>
-References: <1489065402-14757-1-git-send-email-sagi@grimberg.me>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
-List-Post: <mailto:linux-nvme@lists.infradead.org>
-List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Tue, 21 Mar 2017 12:21:44 -0400
+From: Tejun Heo <tj@kernel.org>
+To: Jan Kara <jack@suse.cz>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
+	Tahsin Erdogan <tahsin@google.com>,
+	Omar Sandoval <osandov@osandov.com>
+Subject: Re: [PATCH 05/11] bdi: Unify bdi->wb_list handling for root
+ wb_writeback
+Message-ID: <20170321162144.GC30919@htj.duckdns.org>
+References: <20170313151410.5586-1-jack@suse.cz>
+ <20170313151410.5586-6-jack@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
-Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170313151410.5586-6-jack@suse.cz>
 List-ID: <linux-block@vger.kernel.org>
 
-Just some rework to split the logic and make it slightly
-more readable. This will help us to easily add the irq-poll
-logic.
+On Mon, Mar 13, 2017 at 04:14:04PM +0100, Jan Kara wrote:
+> Currently root wb_writeback structure is added to bdi->wb_list in
+> bdi_init() and never removed. That is different from all other
+> wb_writeback structures which get added to the list when created and
+> removed from it before wb_shutdown().
+> 
+> So move list addition of root bdi_writeback to bdi_register() and list
+> removal of all wb_writeback structures to wb_shutdown(). That way a
+> wb_writeback structure is on bdi->wb_list if and only if it can handle
+> writeback and it will make it easier for us to handle shutdown of all
+> wb_writeback structures in bdi_unregister().
+> 
+> Signed-off-by: Jan Kara <jack@suse.cz>
 
-Also, introduce nvme_ring_cq_doorbell helper to mask out the
-cq_vector validity check.
+Acked-by: Tejun Heo <tj@kernel.org>
 
-Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
----
- drivers/nvme/host/pci.c | 109 +++++++++++++++++++++++++++++-------------------
- 1 file changed, 65 insertions(+), 44 deletions(-)
+Thanks.
 
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index 26a5fd05fe88..d3f74fa40f26 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -71,7 +71,7 @@ struct nvme_dev;
- struct nvme_queue;
- 
- static int nvme_reset(struct nvme_dev *dev);
--static void nvme_process_cq(struct nvme_queue *nvmeq);
-+static int nvme_process_cq(struct nvme_queue *nvmeq);
- static void nvme_dev_disable(struct nvme_dev *dev, bool shutdown);
- 
- /*
-@@ -665,75 +665,96 @@ static inline bool nvme_cqe_valid(struct nvme_queue *nvmeq, u16 head,
- 	return (le16_to_cpu(nvmeq->cqes[head].status) & 1) == phase;
- }
- 
--static void __nvme_process_cq(struct nvme_queue *nvmeq, unsigned int *tag)
-+static inline void nvme_ring_cq_doorbell(struct nvme_queue *nvmeq)
- {
--	u16 head, phase;
-+	if (likely(nvmeq->cq_vector >= 0))
-+		writel(nvmeq->cq_head, nvmeq->q_db + nvmeq->dev->db_stride);
-+}
- 
--	head = nvmeq->cq_head;
--	phase = nvmeq->cq_phase;
-+static inline void nvme_handle_cqe(struct nvme_queue *nvmeq,
-+		struct nvme_completion *cqe)
-+{
-+	struct request *req;
- 
--	while (nvme_cqe_valid(nvmeq, head, phase)) {
--		struct nvme_completion cqe = nvmeq->cqes[head];
--		struct request *req;
-+	if (unlikely(cqe->command_id >= nvmeq->q_depth)) {
-+		dev_warn(nvmeq->dev->ctrl.device,
-+			"invalid id %d completed on queue %d\n",
-+			cqe->command_id, le16_to_cpu(cqe->sq_id));
-+		return;
-+	}
- 
--		if (++head == nvmeq->q_depth) {
--			head = 0;
--			phase = !phase;
--		}
-+	/*
-+	 * AEN requests are special as they don't time out and can
-+	 * survive any kind of queue freeze and often don't respond to
-+	 * aborts.  We don't even bother to allocate a struct request
-+	 * for them but rather special case them here.
-+	 */
-+	if (unlikely(nvmeq->qid == 0 &&
-+			cqe->command_id >= NVME_AQ_BLKMQ_DEPTH)) {
-+		nvme_complete_async_event(&nvmeq->dev->ctrl,
-+				cqe->status, &cqe->result);
-+		return;
-+	}
- 
--		if (tag && *tag == cqe.command_id)
--			*tag = -1;
-+	req = blk_mq_tag_to_rq(*nvmeq->tags, cqe->command_id);
-+	nvme_req(req)->result = cqe->result;
-+	blk_mq_complete_request(req, le16_to_cpu(cqe->status) >> 1);
-+}
- 
--		if (unlikely(cqe.command_id >= nvmeq->q_depth)) {
--			dev_warn(nvmeq->dev->ctrl.device,
--				"invalid id %d completed on queue %d\n",
--				cqe.command_id, le16_to_cpu(cqe.sq_id));
--			continue;
--		}
-+static inline bool nvme_read_cqe(struct nvme_queue *nvmeq,
-+		struct nvme_completion *cqe)
-+{
-+	if (nvme_cqe_valid(nvmeq, nvmeq->cq_head, nvmeq->cq_phase)) {
-+		*cqe = nvmeq->cqes[nvmeq->cq_head];
- 
--		/*
--		 * AEN requests are special as they don't time out and can
--		 * survive any kind of queue freeze and often don't respond to
--		 * aborts.  We don't even bother to allocate a struct request
--		 * for them but rather special case them here.
--		 */
--		if (unlikely(nvmeq->qid == 0 &&
--				cqe.command_id >= NVME_AQ_BLKMQ_DEPTH)) {
--			nvme_complete_async_event(&nvmeq->dev->ctrl,
--					cqe.status, &cqe.result);
--			continue;
-+		if (++nvmeq->cq_head == nvmeq->q_depth) {
-+			nvmeq->cq_head = 0;
-+			nvmeq->cq_phase = !nvmeq->cq_phase;
- 		}
--
--		req = blk_mq_tag_to_rq(*nvmeq->tags, cqe.command_id);
--		nvme_req(req)->result = cqe.result;
--		blk_mq_complete_request(req, le16_to_cpu(cqe.status) >> 1);
-+		return true;
- 	}
-+	return false;
-+}
- 
--	if (head == nvmeq->cq_head && phase == nvmeq->cq_phase)
--		return;
-+static int __nvme_process_cq(struct nvme_queue *nvmeq, int *tag)
-+{
-+	struct nvme_completion cqe;
-+	int consumed = 0;
- 
--	if (likely(nvmeq->cq_vector >= 0))
--		writel(head, nvmeq->q_db + nvmeq->dev->db_stride);
--	nvmeq->cq_head = head;
--	nvmeq->cq_phase = phase;
-+	while (nvme_read_cqe(nvmeq, &cqe)) {
-+		nvme_handle_cqe(nvmeq, &cqe);
-+		consumed++;
- 
--	nvmeq->cqe_seen = 1;
-+		if (tag && *tag == cqe.command_id) {
-+			*tag = -1;
-+			break;
-+		}
-+	}
-+
-+	if (consumed) {
-+		nvme_ring_cq_doorbell(nvmeq);
-+		nvmeq->cqe_seen = 1;
-+	}
-+
-+	return consumed;
- }
- 
--static void nvme_process_cq(struct nvme_queue *nvmeq)
-+static int nvme_process_cq(struct nvme_queue *nvmeq)
- {
--	__nvme_process_cq(nvmeq, NULL);
-+	return __nvme_process_cq(nvmeq, NULL);
- }
- 
- static irqreturn_t nvme_irq(int irq, void *data)
- {
- 	irqreturn_t result;
- 	struct nvme_queue *nvmeq = data;
-+
- 	spin_lock(&nvmeq->q_lock);
- 	nvme_process_cq(nvmeq);
- 	result = nvmeq->cqe_seen ? IRQ_HANDLED : IRQ_NONE;
- 	nvmeq->cqe_seen = 0;
- 	spin_unlock(&nvmeq->q_lock);
-+
- 	return result;
- }
- 
 -- 
-2.7.4
-
-
-_______________________________________________
-Linux-nvme mailing list
-Linux-nvme@lists.infradead.org
-http://lists.infradead.org/mailman/listinfo/linux-nvme
+tejun
