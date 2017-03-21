@@ -1,45 +1,41 @@
-Return-Path: <BATV+f1fc5bea56d51e2fc981+4960+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk,
-	martin.petersen@oracle.com,
-	agk@redhat.com,
-	snitzer@redhat.com,
-	shli@kernel.org,
-	philipp.reisner@linbit.com,
-	lars.ellenberg@linbit.com
-Cc: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	drbd-dev@lists.linbit.com,
-	dm-devel@redhat.com,
-	linux-raid@vger.kernel.org
-Subject: [PATCH 07/23] block: stop using blkdev_issue_write_same for zeroing
-Date: Thu, 23 Mar 2017 10:33:25 -0400
-Message-Id: <20170323143341.31549-8-hch@lst.de>
-In-Reply-To: <20170323143341.31549-1-hch@lst.de>
-References: <20170323143341.31549-1-hch@lst.de>
+Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
+Subject: Re: [PATCH rfc 10/10] target: Use non-selective polling
+To: "Nicholas A. Bellinger" <nab@linux-iscsi.org>
+References: <1489065402-14757-1-git-send-email-sagi@grimberg.me>
+ <1489065402-14757-11-git-send-email-sagi@grimberg.me>
+ <1489881481.27336.23.camel@haakon3.risingtidesystems.com>
+From: Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <cd47b4c3-34fb-039c-ffb1-b9702701576f@grimberg.me>
+Date: Tue, 21 Mar 2017 13:35:05 +0200
+MIME-Version: 1.0
+In-Reply-To: <1489881481.27336.23.camel@haakon3.risingtidesystems.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
+List-Post: <mailto:linux-nvme@lists.infradead.org>
+List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
+Cc: linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+ target-devel@vger.kernel.org, linux-nvme@lists.infradead.org
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
+Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
 List-ID: <linux-block@vger.kernel.org>
 
-We'll always use the WRITE ZEROES code for zeroing now.
+> Hey Sagi,
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-lib.c | 4 ----
- 1 file changed, 4 deletions(-)
+Hey Nic
 
-diff --git a/block/blk-lib.c b/block/blk-lib.c
-index ed1e78e24db0..a93115ccf461 100644
---- a/block/blk-lib.c
-+++ b/block/blk-lib.c
-@@ -364,10 +364,6 @@ int blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
- 			return 0;
- 	}
- 
--	if (!blkdev_issue_write_same(bdev, sector, nr_sects, gfp_mask,
--			ZERO_PAGE(0)))
--		return 0;
--
- 	blk_start_plug(&plug);
- 	ret = __blkdev_issue_zeroout(bdev, sector, nr_sects, gfp_mask,
- 			&bio, discard);
--- 
-2.11.0
+> Let's make 'batch' into a backend specific attribute so it can be
+> changed on-the-fly per device, instead of a hard-coded value.
+>
+> Here's a quick patch to that end.  Feel free to fold it into your
+> series.
+
+I will, thanks!
+
+_______________________________________________
+Linux-nvme mailing list
+Linux-nvme@lists.infradead.org
+http://lists.infradead.org/mailman/listinfo/linux-nvme
