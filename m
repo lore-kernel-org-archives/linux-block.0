@@ -1,162 +1,225 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f193.google.com ([209.85.192.193]:35228 "EHLO
-        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754526AbdCINLp (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Mar 2017 08:11:45 -0500
-From: Ming Lei <tom.leiming@gmail.com>
-To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>
-Cc: Yi Zhang <yizhan@redhat.com>, Ming Lei <tom.leiming@gmail.com>,
-        stable@vger.kernel.org
-Subject: [PATCH 1/2] blk-mq: don't complete un-started request in timeout handler
-Date: Thu,  9 Mar 2017 21:02:57 +0800
-Message-Id: <1489064578-17305-3-git-send-email-tom.leiming@gmail.com>
-In-Reply-To: <1489064578-17305-1-git-send-email-tom.leiming@gmail.com>
-References: <1489064578-17305-1-git-send-email-tom.leiming@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <BATV+90a41d470eb0ea9eda9a+4959+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk
+Cc: Bart.VanAssche@sandisk.com,
+	linux-block@vger.kernel.org
+Subject: [PATCH 2/5] blk-mq: merge mq and sq make_request instances
+Date: Wed, 22 Mar 2017 15:01:50 -0400
+Message-Id: <20170322190153.12217-3-hch@lst.de>
+In-Reply-To: <20170322190153.12217-1-hch@lst.de>
+References: <20170322190153.12217-1-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-When iterating busy request in timeout handler,
-if the STARTED flag of one request isn't set, that means
-the request is being processed in block layer, and not
-dispatched to low level driver yet.
+They are mostly the same code anyway - this just one small conditional
+for the plug case that is different for both variants.
 
-In current implementation of blk_mq_check_expired(),
-in case that the request queue becomes dying, un-started
-requests are completed immediately. This way can cause
-use-after-free issue[1][2] when doing I/O and removing&resetting
-NVMe device.
-
-This patch fixes several issues reported by Yi Zhang.
-
-[1]. oops log 1
-[  581.789754] ------------[ cut here ]------------
-[  581.789758] kernel BUG at block/blk-mq.c:374!
-[  581.789760] invalid opcode: 0000 [#1] SMP
-[  581.789761] Modules linked in: vfat fat ipmi_ssif intel_rapl sb_edac
-edac_core x86_pkg_temp_thermal intel_powerclamp coretemp kvm_intel kvm nvme
-irqbypass crct10dif_pclmul nvme_core crc32_pclmul ghash_clmulni_intel
-intel_cstate ipmi_si mei_me ipmi_devintf intel_uncore sg ipmi_msghandler
-intel_rapl_perf iTCO_wdt mei iTCO_vendor_support mxm_wmi lpc_ich dcdbas shpchp
-pcspkr acpi_power_meter wmi nfsd auth_rpcgss nfs_acl lockd dm_multipath grace
-sunrpc ip_tables xfs libcrc32c sd_mod mgag200 i2c_algo_bit drm_kms_helper
-syscopyarea sysfillrect sysimgblt fb_sys_fops ttm drm ahci libahci
-crc32c_intel tg3 libata megaraid_sas i2c_core ptp fjes pps_core dm_mirror
-dm_region_hash dm_log dm_mod
-[  581.789796] CPU: 1 PID: 1617 Comm: kworker/1:1H Not tainted 4.10.0.bz1420297+ #4
-[  581.789797] Hardware name: Dell Inc. PowerEdge R730xd/072T6D, BIOS 2.2.5 09/06/2016
-[  581.789804] Workqueue: kblockd blk_mq_timeout_work
-[  581.789806] task: ffff8804721c8000 task.stack: ffffc90006ee4000
-[  581.789809] RIP: 0010:blk_mq_end_request+0x58/0x70
-[  581.789810] RSP: 0018:ffffc90006ee7d50 EFLAGS: 00010202
-[  581.789811] RAX: 0000000000000001 RBX: ffff8802e4195340 RCX: ffff88028e2f4b88
-[  581.789812] RDX: 0000000000001000 RSI: 0000000000001000 RDI: 0000000000000000
-[  581.789813] RBP: ffffc90006ee7d60 R08: 0000000000000003 R09: ffff88028e2f4b00
-[  581.789814] R10: 0000000000001000 R11: 0000000000000001 R12: 00000000fffffffb
-[  581.789815] R13: ffff88042abe5780 R14: 000000000000002d R15: ffff88046fbdff80
-[  581.789817] FS:  0000000000000000(0000) GS:ffff88047fc00000(0000) knlGS:0000000000000000
-[  581.789818] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  581.789819] CR2: 00007f64f403a008 CR3: 000000014d078000 CR4: 00000000001406e0
-[  581.789820] Call Trace:
-[  581.789825]  blk_mq_check_expired+0x76/0x80
-[  581.789828]  bt_iter+0x45/0x50
-[  581.789830]  blk_mq_queue_tag_busy_iter+0xdd/0x1f0
-[  581.789832]  ? blk_mq_rq_timed_out+0x70/0x70
-[  581.789833]  ? blk_mq_rq_timed_out+0x70/0x70
-[  581.789840]  ? __switch_to+0x140/0x450
-[  581.789841]  blk_mq_timeout_work+0x88/0x170
-[  581.789845]  process_one_work+0x165/0x410
-[  581.789847]  worker_thread+0x137/0x4c0
-[  581.789851]  kthread+0x101/0x140
-[  581.789853]  ? rescuer_thread+0x3b0/0x3b0
-[  581.789855]  ? kthread_park+0x90/0x90
-[  581.789860]  ret_from_fork+0x2c/0x40
-[  581.789861] Code: 48 85 c0 74 0d 44 89 e6 48 89 df ff d0 5b 41 5c 5d c3 48
-8b bb 70 01 00 00 48 85 ff 75 0f 48 89 df e8 7d f0 ff ff 5b 41 5c 5d c3 <0f>
-0b e8 71 f0 ff ff 90 eb e9 0f 1f 40 00 66 2e 0f 1f 84 00 00
-[  581.789882] RIP: blk_mq_end_request+0x58/0x70 RSP: ffffc90006ee7d50
-[  581.789889] ---[ end trace bcaf03d9a14a0a70 ]---
-
-[2]. oops log2
-[ 6984.857362] BUG: unable to handle kernel NULL pointer dereference at 0000000000000010
-[ 6984.857372] IP: nvme_queue_rq+0x6e6/0x8cd [nvme]
-[ 6984.857373] PGD 0
-[ 6984.857374]
-[ 6984.857376] Oops: 0000 [#1] SMP
-[ 6984.857379] Modules linked in: ipmi_ssif vfat fat intel_rapl sb_edac
-edac_core x86_pkg_temp_thermal intel_powerclamp coretemp kvm_intel kvm
-irqbypass crct10dif_pclmul crc32_pclmul ghash_clmulni_intel ipmi_si iTCO_wdt
-iTCO_vendor_support mxm_wmi ipmi_devintf intel_cstate sg dcdbas intel_uncore
-mei_me intel_rapl_perf mei pcspkr lpc_ich ipmi_msghandler shpchp
-acpi_power_meter wmi nfsd auth_rpcgss dm_multipath nfs_acl lockd grace sunrpc
-ip_tables xfs libcrc32c sd_mod mgag200 i2c_algo_bit drm_kms_helper syscopyarea
-sysfillrect crc32c_intel sysimgblt fb_sys_fops ttm nvme drm nvme_core ahci
-libahci i2c_core tg3 libata ptp megaraid_sas pps_core fjes dm_mirror
-dm_region_hash dm_log dm_mod
-[ 6984.857416] CPU: 7 PID: 1635 Comm: kworker/7:1H Not tainted
-4.10.0-2.el7.bz1420297.x86_64 #1
-[ 6984.857417] Hardware name: Dell Inc. PowerEdge R730xd/072T6D, BIOS 2.2.5 09/06/2016
-[ 6984.857427] Workqueue: kblockd blk_mq_run_work_fn
-[ 6984.857429] task: ffff880476e3da00 task.stack: ffffc90002e90000
-[ 6984.857432] RIP: 0010:nvme_queue_rq+0x6e6/0x8cd [nvme]
-[ 6984.857433] RSP: 0018:ffffc90002e93c50 EFLAGS: 00010246
-[ 6984.857434] RAX: 0000000000000000 RBX: ffff880275646600 RCX: 0000000000001000
-[ 6984.857435] RDX: 0000000000000fff RSI: 00000002fba2a000 RDI: ffff8804734e6950
-[ 6984.857436] RBP: ffffc90002e93d30 R08: 0000000000002000 R09: 0000000000001000
-[ 6984.857437] R10: 0000000000001000 R11: 0000000000000000 R12: ffff8804741d8000
-[ 6984.857438] R13: 0000000000000040 R14: ffff880475649f80 R15: ffff8804734e6780
-[ 6984.857439] FS:  0000000000000000(0000) GS:ffff88047fcc0000(0000) knlGS:0000000000000000
-[ 6984.857440] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[ 6984.857442] CR2: 0000000000000010 CR3: 0000000001c09000 CR4: 00000000001406e0
-[ 6984.857443] Call Trace:
-[ 6984.857451]  ? mempool_free+0x2b/0x80
-[ 6984.857455]  ? bio_free+0x4e/0x60
-[ 6984.857459]  blk_mq_dispatch_rq_list+0xf5/0x230
-[ 6984.857462]  blk_mq_process_rq_list+0x133/0x170
-[ 6984.857465]  __blk_mq_run_hw_queue+0x8c/0xa0
-[ 6984.857467]  blk_mq_run_work_fn+0x12/0x20
-[ 6984.857473]  process_one_work+0x165/0x410
-[ 6984.857475]  worker_thread+0x137/0x4c0
-[ 6984.857478]  kthread+0x101/0x140
-[ 6984.857480]  ? rescuer_thread+0x3b0/0x3b0
-[ 6984.857481]  ? kthread_park+0x90/0x90
-[ 6984.857489]  ret_from_fork+0x2c/0x40
-[ 6984.857490] Code: 8b bd 70 ff ff ff 89 95 50 ff ff ff 89 8d 58 ff ff ff 44
-89 95 60 ff ff ff e8 b7 dd 12 e1 8b 95 50 ff ff ff 48 89 85 68 ff ff ff <4c>
-8b 48 10 44 8b 58 18 8b 8d 58 ff ff ff 44 8b 95 60 ff ff ff
-[ 6984.857511] RIP: nvme_queue_rq+0x6e6/0x8cd [nvme] RSP: ffffc90002e93c50
-[ 6984.857512] CR2: 0000000000000010
-[ 6984.895359] ---[ end trace 2d7ceb528432bf83 ]---
-
-Cc: stable@vger.kernel.org
-Reported-by: Yi Zhang <yizhan@redhat.com>
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-mq.c | 11 +----------
- 1 file changed, 1 insertion(+), 10 deletions(-)
+ block/blk-mq.c | 164 +++++++++++----------------------------------------------
+ 1 file changed, 31 insertions(+), 133 deletions(-)
 
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 159187a28d66..0aff380099d5 100644
+index 998c041358f2..5a1ff4894285 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -697,17 +697,8 @@ static void blk_mq_check_expired(struct blk_mq_hw_ctx *hctx,
+@@ -1475,11 +1475,6 @@ static void blk_mq_try_issue_directly(struct request *rq, blk_qc_t *cookie,
+ 	blk_mq_sched_insert_request(rq, false, true, false, may_sleep);
+ }
+ 
+-/*
+- * Multiple hardware queue variant. This will not use per-process plugs,
+- * but will attempt to bypass the hctx queueing if we can go straight to
+- * hardware for SYNC IO.
+- */
+ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
  {
- 	struct blk_mq_timeout_data *data = priv;
+ 	const int is_sync = op_is_sync(bio->bi_opf);
+@@ -1531,7 +1526,36 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
+ 	}
  
--	if (!test_bit(REQ_ATOM_STARTED, &rq->atomic_flags)) {
--		/*
--		 * If a request wasn't started before the queue was
--		 * marked dying, kill it here or it'll go unnoticed.
--		 */
--		if (unlikely(blk_queue_dying(rq->q))) {
--			rq->errors = -EIO;
--			blk_mq_end_request(rq, rq->errors);
--		}
-+	if (!test_bit(REQ_ATOM_STARTED, &rq->atomic_flags))
- 		return;
+ 	plug = current->plug;
+-	if (((plug && !blk_queue_nomerges(q)) || is_sync)) {
++	if (plug && q->nr_hw_queues == 1) {
++		struct request *last = NULL;
++
++		blk_mq_bio_to_request(rq, bio);
++
++		/*
++		 * @request_count may become stale because of schedule
++		 * out, so check the list again.
++		 */
++		if (list_empty(&plug->mq_list))
++			request_count = 0;
++		else if (blk_queue_nomerges(q))
++			request_count = blk_plug_queued_count(q);
++
++		if (!request_count)
++			trace_block_plug(q);
++		else
++			last = list_entry_rq(plug->mq_list.prev);
++
++		blk_mq_put_ctx(data.ctx);
++
++		if (request_count >= BLK_MAX_REQUEST_COUNT || (last &&
++		    blk_rq_bytes(last) >= BLK_PLUG_FLUSH_SIZE)) {
++			blk_flush_plug_list(plug, false);
++			trace_block_plug(q);
++		}
++
++		list_add_tail(&rq->queuelist, &plug->mq_list);
++		goto done;
++	} else if (((plug && !blk_queue_nomerges(q)) || is_sync)) {
+ 		struct request *old_rq = NULL;
+ 
+ 		blk_mq_bio_to_request(rq, bio);
+@@ -1593,119 +1617,6 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
+ 	return cookie;
+ }
+ 
+-/*
+- * Single hardware queue variant. This will attempt to use any per-process
+- * plug for merging and IO deferral.
+- */
+-static blk_qc_t blk_sq_make_request(struct request_queue *q, struct bio *bio)
+-{
+-	const int is_sync = op_is_sync(bio->bi_opf);
+-	const int is_flush_fua = op_is_flush(bio->bi_opf);
+-	struct blk_plug *plug;
+-	unsigned int request_count = 0;
+-	struct blk_mq_alloc_data data = { .flags = 0 };
+-	struct request *rq;
+-	blk_qc_t cookie;
+-	unsigned int wb_acct;
+-
+-	blk_queue_bounce(q, &bio);
+-
+-	if (bio_integrity_enabled(bio) && bio_integrity_prep(bio)) {
+-		bio_io_error(bio);
+-		return BLK_QC_T_NONE;
 -	}
+-
+-	blk_queue_split(q, &bio, q->bio_split);
+-
+-	if (!is_flush_fua && !blk_queue_nomerges(q)) {
+-		if (blk_attempt_plug_merge(q, bio, &request_count, NULL))
+-			return BLK_QC_T_NONE;
+-	} else
+-		request_count = blk_plug_queued_count(q);
+-
+-	if (blk_mq_sched_bio_merge(q, bio))
+-		return BLK_QC_T_NONE;
+-
+-	wb_acct = wbt_wait(q->rq_wb, bio, NULL);
+-
+-	trace_block_getrq(q, bio, bio->bi_opf);
+-
+-	rq = blk_mq_sched_get_request(q, bio, bio->bi_opf, &data);
+-	if (unlikely(!rq)) {
+-		__wbt_done(q->rq_wb, wb_acct);
+-		return BLK_QC_T_NONE;
+-	}
+-
+-	wbt_track(&rq->issue_stat, wb_acct);
+-
+-	cookie = request_to_qc_t(data.hctx, rq);
+-
+-	if (unlikely(is_flush_fua)) {
+-		if (q->elevator)
+-			goto elv_insert;
+-		blk_mq_bio_to_request(rq, bio);
+-		blk_insert_flush(rq);
+-		goto run_queue;
+-	}
+-
+-	/*
+-	 * A task plug currently exists. Since this is completely lockless,
+-	 * utilize that to temporarily store requests until the task is
+-	 * either done or scheduled away.
+-	 */
+-	plug = current->plug;
+-	if (plug) {
+-		struct request *last = NULL;
+-
+-		blk_mq_bio_to_request(rq, bio);
+-
+-		/*
+-		 * @request_count may become stale because of schedule
+-		 * out, so check the list again.
+-		 */
+-		if (list_empty(&plug->mq_list))
+-			request_count = 0;
+-		if (!request_count)
+-			trace_block_plug(q);
+-		else
+-			last = list_entry_rq(plug->mq_list.prev);
+-
+-		blk_mq_put_ctx(data.ctx);
+-
+-		if (request_count >= BLK_MAX_REQUEST_COUNT || (last &&
+-		    blk_rq_bytes(last) >= BLK_PLUG_FLUSH_SIZE)) {
+-			blk_flush_plug_list(plug, false);
+-			trace_block_plug(q);
+-		}
+-
+-		list_add_tail(&rq->queuelist, &plug->mq_list);
+-		return cookie;
+-	}
+-
+-	if (q->elevator) {
+-elv_insert:
+-		blk_mq_put_ctx(data.ctx);
+-		blk_mq_bio_to_request(rq, bio);
+-		blk_mq_sched_insert_request(rq, false, true,
+-						!is_sync || is_flush_fua, true);
+-		goto done;
+-	}
+-	if (!blk_mq_merge_queue_io(data.hctx, data.ctx, rq, bio)) {
+-		/*
+-		 * For a SYNC request, send it to the hardware immediately. For
+-		 * an ASYNC request, just ensure that we run it later on. The
+-		 * latter allows for merging opportunities and more efficient
+-		 * dispatching.
+-		 */
+-run_queue:
+-		blk_mq_run_hw_queue(data.hctx, !is_sync || is_flush_fua);
+-	}
+-
+-	blk_mq_put_ctx(data.ctx);
+-done:
+-	return cookie;
+-}
+-
+ void blk_mq_free_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
+ 		     unsigned int hctx_idx)
+ {
+@@ -2370,10 +2281,7 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+ 	INIT_LIST_HEAD(&q->requeue_list);
+ 	spin_lock_init(&q->requeue_lock);
  
- 	if (time_after_eq(jiffies, rq->deadline)) {
- 		if (!blk_mark_rq_complete(rq))
+-	if (q->nr_hw_queues > 1)
+-		blk_queue_make_request(q, blk_mq_make_request);
+-	else
+-		blk_queue_make_request(q, blk_sq_make_request);
++	blk_queue_make_request(q, blk_mq_make_request);
+ 
+ 	/*
+ 	 * Do this after blk_queue_make_request() overrides it...
+@@ -2719,16 +2627,6 @@ void blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set, int nr_hw_queues)
+ 	set->nr_hw_queues = nr_hw_queues;
+ 	list_for_each_entry(q, &set->tag_list, tag_set_list) {
+ 		blk_mq_realloc_hw_ctxs(set, q);
+-
+-		/*
+-		 * Manually set the make_request_fn as blk_queue_make_request
+-		 * resets a lot of the queue settings.
+-		 */
+-		if (q->nr_hw_queues > 1)
+-			q->make_request_fn = blk_mq_make_request;
+-		else
+-			q->make_request_fn = blk_sq_make_request;
+-
+ 		blk_mq_queue_reinit(q, cpu_online_mask);
+ 	}
+ 
 -- 
-2.7.4
+2.11.0
