@@ -1,77 +1,32 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f67.google.com ([74.125.83.67]:36710 "EHLO
-        mail-pg0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751314AbdCQJ7X (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Mar 2017 05:59:23 -0400
-From: Ming Lei <tom.leiming@gmail.com>
-To: Jens Axboe <axboe@fb.com>, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>
-Cc: Yi Zhang <yizhan@redhat.com>,
-        Bart Van Assche <bart.vanassche@sandisk.com>,
-        Ming Lei <tom.leiming@gmail.com>
-Subject: [PATCH v1 2/3] blk-mq: comment on races related with timeout handler
-Date: Fri, 17 Mar 2017 17:57:10 +0800
-Message-Id: <20170317095711.5819-3-tom.leiming@gmail.com>
-In-Reply-To: <20170317095711.5819-1-tom.leiming@gmail.com>
-References: <20170317095711.5819-1-tom.leiming@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
+Date: Wed, 22 Mar 2017 12:09:08 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Sagi Grimberg <sagi@grimberg.me>
+Subject: Re: [PATCH rfc 03/10] nvme-pci: open-code polling logic in nvme_poll
+Message-ID: <20170322190908.GC28374@infradead.org>
+References: <1489065402-14757-1-git-send-email-sagi@grimberg.me>
+ <1489065402-14757-4-git-send-email-sagi@grimberg.me>
+MIME-Version: 1.0
+In-Reply-To: <1489065402-14757-4-git-send-email-sagi@grimberg.me>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
+List-Post: <mailto:linux-nvme@lists.infradead.org>
+List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
+Cc: linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+ target-devel@vger.kernel.org, linux-nvme@lists.infradead.org
+Content-Type: text/plain; charset="us-ascii"
+Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
+Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
+List-ID: <linux-block@vger.kernel.org>
 
-This patch adds comment on two races related with
-timeout handler:
+Looks fine,
 
-- requeue from queue busy vs. timeout
-- rq free & reallocation vs. timeout
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 
-Both the races themselves and current solution aren't
-explicit enough, so add comments on them.
-
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
----
- block/blk-mq.c | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 08a49c69738b..7068779d3bac 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -527,6 +527,15 @@ void blk_mq_start_request(struct request *rq)
- }
- EXPORT_SYMBOL(blk_mq_start_request);
- 
-+/*
-+ * When we reach here because queue is busy, REQ_ATOM_COMPLETE
-+ * flag isn't set yet, so there may be race with timeout hanlder,
-+ * but given rq->deadline is just set in .queue_rq() under
-+ * this sitation, the race won't be possible in reality because
-+ * rq->timeout should be set as big enough to cover the window
-+ * between blk_mq_start_request() called from .queue_rq() and
-+ * clearing REQ_ATOM_STARTED here.
-+ */
- static void __blk_mq_requeue_request(struct request *rq)
- {
- 	struct request_queue *q = rq->q;
-@@ -700,6 +709,19 @@ static void blk_mq_check_expired(struct blk_mq_hw_ctx *hctx,
- 	if (!test_bit(REQ_ATOM_STARTED, &rq->atomic_flags))
- 		return;
- 
-+	/*
-+	 * The rq being checked may have been freed and reallocated
-+	 * out already here, we avoid this race by checking rq->deadline
-+	 * and REQ_ATOM_COMPLETE flag together:
-+	 *
-+	 * - if rq->deadline is observed as new value because of
-+	 *   reusing, the rq won't be timed out because of timing.
-+	 * - if rq->deadline is observed as previous value,
-+	 *   REQ_ATOM_COMPLETE flag won't be cleared in reuse path
-+	 *   because we put a barrier between setting rq->deadline
-+	 *   and clearing the flag in blk_mq_start_request(), so
-+	 *   this rq won't be timed out too.
-+	 */
- 	if (time_after_eq(jiffies, rq->deadline)) {
- 		if (!blk_mark_rq_complete(rq))
- 			blk_mq_rq_timed_out(rq, reserved);
--- 
-2.9.3
+_______________________________________________
+Linux-nvme mailing list
+Linux-nvme@lists.infradead.org
+http://lists.infradead.org/mailman/listinfo/linux-nvme
