@@ -1,62 +1,33 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f175.google.com ([209.85.192.175]:35017 "EHLO
-        mail-pf0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750999AbdCRAN4 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Mar 2017 20:13:56 -0400
-Received: by mail-pf0-f175.google.com with SMTP id x63so38377989pfx.2
-        for <linux-block@vger.kernel.org>; Fri, 17 Mar 2017 17:12:14 -0700 (PDT)
-From: Omar Sandoval <osandov@osandov.com>
-To: linux-block@vger.kernel.org
-Cc: kernel-team@fb.com
-Subject: [RFC PATCH 2/4] blk-mq: add shallow depth option for blk_mq_get_tag()
-Date: Fri, 17 Mar 2017 15:03:31 -0700
-Message-Id: <15f01b81a47fd841684b692efcbbe4a49ce9e323.1489787289.git.osandov@fb.com>
-In-Reply-To: <cover.1489787289.git.osandov@fb.com>
-References: <cover.1489787289.git.osandov@fb.com>
-In-Reply-To: <cover.1489787289.git.osandov@fb.com>
-References: <cover.1489787289.git.osandov@fb.com>
+Received: from mail.kernel.org ([198.145.29.136]:36030 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S932592AbdCWU7E (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 23 Mar 2017 16:59:04 -0400
+MIME-Version: 1.0
+In-Reply-To: <8AA3DAC1-5E9C-438E-904B-D4C708A4F624@fb.com>
+References: <1490050729-3578-1-git-send-email-mlin@kernel.org>
+ <1490050729-3578-2-git-send-email-mlin@kernel.org> <8AA3DAC1-5E9C-438E-904B-D4C708A4F624@fb.com>
+From: Ming Lin <mlin@kernel.org>
+Date: Thu, 23 Mar 2017 13:58:58 -0700
+Message-ID: <CAF1ivSbhnCET2V3iiAG57N_WJtKayJtp2UAX3miJvf+Zrpo3LA@mail.gmail.com>
+Subject: Re: [RFC PATCH 1/1] nbd: replace kill_bdev() with __invalidate_device()
+To: Josef Bacik <jbacik@fb.com>
+Cc: "nbd-general@lists.sourceforge.net"
+        <nbd-general@lists.sourceforge.net>,
+        Ratna Manoj Bolla <manoj.br@gmail.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "jianshu.ljs@alibaba-inc.com" <jianshu.ljs@alibaba-inc.com>,
+        "xiongwei.jiang@alibaba-inc.com" <xiongwei.jiang@alibaba-inc.com>,
+        "james.liu@alibaba-inc.com" <james.liu@alibaba-inc.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Omar Sandoval <osandov@fb.com>
+On Thu, Mar 23, 2017 at 10:51 AM, Josef Bacik <jbacik@fb.com> wrote:
+> Yeah I think this is ok, I’ll throw it on my queue for fixes for this cycle.  Thanks,
 
-Wire up the sbitmap_get_shallow() operation to the tag code so that a
-caller can limit the number of tags available to it.
+Great. Thanks.
 
-Signed-off-by: Omar Sandoval <osandov@fb.com>
----
- block/blk-mq-tag.c | 5 ++++-
- block/blk-mq.h     | 1 +
- 2 files changed, 5 insertions(+), 1 deletion(-)
-
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index e48bc2c72615..1f25d466ebdc 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -96,7 +96,10 @@ static int __blk_mq_get_tag(struct blk_mq_alloc_data *data,
- 	if (!(data->flags & BLK_MQ_REQ_INTERNAL) &&
- 	    !hctx_may_queue(data->hctx, bt))
- 		return -1;
--	return __sbitmap_queue_get(bt);
-+	if (data->shallow_depth)
-+		return __sbitmap_queue_get_shallow(bt, data->shallow_depth);
-+	else
-+		return __sbitmap_queue_get(bt);
- }
- 
- unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 8d49c06fc520..77ec66369f21 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -141,6 +141,7 @@ struct blk_mq_alloc_data {
- 	/* input parameter */
- 	struct request_queue *q;
- 	unsigned int flags;
-+	unsigned int shallow_depth;
- 
- 	/* input & output parameter */
- 	struct blk_mq_ctx *ctx;
--- 
-2.12.0
+>
+> Josef
