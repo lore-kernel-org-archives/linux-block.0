@@ -1,53 +1,43 @@
-Return-Path: <jinpu.wang@profitbricks.com>
-Return-Path: <jinpu.wang@profitbricks.com>
-From: Jack Wang <jinpu.wang@profitbricks.com>
-To: linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Cc: dledford@redhat.com,
-	axboe@kernel.dk,
-	hch@lst.de,
-	mail@fholler.de,
-	Milind.dumbare@gmail.com,
-	yun.wang@profitbricks.com,
-	Jack Wang <jinpu.wang@profitbricks.com>
-Subject: [PATCH 28/28] MAINTRAINERS: Add maintainer for IBNBD/IBTRS
-Date: Fri, 24 Mar 2017 11:45:43 +0100
-Message-Id: <1490352343-20075-29-git-send-email-jinpu.wangl@profitbricks.com>
-In-Reply-To: <1490352343-20075-1-git-send-email-jinpu.wangl@profitbricks.com>
-References: <1490352343-20075-1-git-send-email-jinpu.wangl@profitbricks.com>
+Return-Path: <BATV+f1fc5bea56d51e2fc981+4960+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk,
+	martin.petersen@oracle.com,
+	agk@redhat.com,
+	snitzer@redhat.com,
+	shli@kernel.org,
+	philipp.reisner@linbit.com,
+	lars.ellenberg@linbit.com
+Cc: linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	drbd-dev@lists.linbit.com,
+	dm-devel@redhat.com,
+	linux-raid@vger.kernel.org
+Subject: [PATCH 18/23] rsxx: remove the discard_zeroes_data flag
+Date: Thu, 23 Mar 2017 10:33:36 -0400
+Message-Id: <20170323143341.31549-19-hch@lst.de>
+In-Reply-To: <20170323143341.31549-1-hch@lst.de>
+References: <20170323143341.31549-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Jack Wang <jinpu.wang@profitbricks.com>
+rsxx only supports discarding on large alignments, so the zeroing code
+would always fall back to explicit writings of zeroes.
 
-Signed-off-by: Jack Wang <jinpu.wang@profitbricks.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- MAINTAINERS | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+ drivers/block/rsxx/dev.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index c776906..12a528a 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -6263,6 +6263,20 @@ IBM ServeRAID RAID DRIVER
- S:	Orphan
- F:	drivers/scsi/ips.*
+diff --git a/drivers/block/rsxx/dev.c b/drivers/block/rsxx/dev.c
+index f81d70b39d10..9c566364ac9c 100644
+--- a/drivers/block/rsxx/dev.c
++++ b/drivers/block/rsxx/dev.c
+@@ -300,7 +300,6 @@ int rsxx_setup_dev(struct rsxx_cardinfo *card)
+ 						RSXX_HW_BLK_SIZE >> 9);
+ 		card->queue->limits.discard_granularity = RSXX_HW_BLK_SIZE;
+ 		card->queue->limits.discard_alignment   = RSXX_HW_BLK_SIZE;
+-		card->queue->limits.discard_zeroes_data = 1;
+ 	}
  
-+IBTRS TRANSPORT DRIVERS
-+M:      Jack Wang <jinpu.wang@profitbricks.com>
-+L:      linux-rdma@vger.kernel.org
-+S:      Maintained
-+F:      include/linux/ibtrs*.h
-+F:      drivers/infiniband/ulp/ibtrs*
-+
-+IBNBD BLOCK DRIVERS
-+M:      Jack Wang <jinpu.wang@profitbricks.com>
-+L:      linux-rdma@vger.kernel.org
-+S:      Maintained
-+F:	Documentation/IBNBD.txt
-+F:      drivers/block/ibnbd*
-+
- ICH LPC AND GPIO DRIVER
- M:	Peter Tyser <ptyser@xes-inc.com>
- S:	Maintained
+ 	card->queue->queuedata = card;
 -- 
-2.7.4
+2.11.0
