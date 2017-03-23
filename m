@@ -1,37 +1,76 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <Bart.VanAssche@sandisk.com>
-To: "agk@redhat.com" <agk@redhat.com>, "lars.ellenberg@linbit.com"
-	<lars.ellenberg@linbit.com>, "snitzer@redhat.com" <snitzer@redhat.com>,
-	"hch@lst.de" <hch@lst.de>, "martin.petersen@oracle.com"
-	<martin.petersen@oracle.com>, "philipp.reisner@linbit.com"
-	<philipp.reisner@linbit.com>, "axboe@kernel.dk" <axboe@kernel.dk>,
-	"shli@kernel.org" <shli@kernel.org>
-CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-	"dm-devel@redhat.com" <dm-devel@redhat.com>, "drbd-dev@lists.linbit.com"
-	<drbd-dev@lists.linbit.com>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "linux-raid@vger.kernel.org"
-	<linux-raid@vger.kernel.org>
-Subject: Re: [PATCH 11/23] block_dev: use blkdev_issue_zerout for hole
- punches
-Date: Tue, 28 Mar 2017 16:50:47 +0000
-Message-ID: <1490719834.2573.9.camel@sandisk.com>
+Return-Path: <BATV+f1fc5bea56d51e2fc981+4960+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk,
+	martin.petersen@oracle.com,
+	agk@redhat.com,
+	snitzer@redhat.com,
+	shli@kernel.org,
+	philipp.reisner@linbit.com,
+	lars.ellenberg@linbit.com
+Cc: linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	drbd-dev@lists.linbit.com,
+	dm-devel@redhat.com,
+	linux-raid@vger.kernel.org
+Subject: [PATCH 11/23] block_dev: use blkdev_issue_zerout for hole punches
+Date: Thu, 23 Mar 2017 10:33:29 -0400
+Message-Id: <20170323143341.31549-12-hch@lst.de>
+In-Reply-To: <20170323143341.31549-1-hch@lst.de>
 References: <20170323143341.31549-1-hch@lst.de>
-	 <20170323143341.31549-12-hch@lst.de>
-In-Reply-To: <20170323143341.31549-12-hch@lst.de>
-Content-Type: text/plain; charset="iso-8859-1"
-MIME-Version: 1.0
-Return-Path: Bart.VanAssche@sandisk.com
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, 2017-03-23 at 10:33 -0400, Christoph Hellwig wrote:
-> This gets us support for non-discard efficient write of zeroes (e.g. NVMe=
-)
-> and preparse for removing the discard_zeroes_data flag.
+This gets us support for non-discard efficient write of zeroes (e.g. NVMe)
+and preparse for removing the discard_zeroes_data flag.
 
-Hello Christoph,
+Also remove a pointless discard support check, which is done in
+blkdev_issue_discard already.
 
-"preparse" probably should have been "prepare"?
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ fs/block_dev.c | 16 +++++-----------
+ 1 file changed, 5 insertions(+), 11 deletions(-)
 
-Thanks,
-
-Bart.=
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index 6128283b7830..5c701c16e8ff 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -2074,10 +2074,10 @@ static long blkdev_fallocate(struct file *file, int mode, loff_t start,
+ 			     loff_t len)
+ {
+ 	struct block_device *bdev = I_BDEV(bdev_file_inode(file));
+-	struct request_queue *q = bdev_get_queue(bdev);
+ 	struct address_space *mapping;
+ 	loff_t end = start + len - 1;
+ 	loff_t isize;
++	unsigned flags = 0;
+ 	int error;
+ 
+ 	/* Fail if we don't recognize the flags. */
+@@ -2107,21 +2107,15 @@ static long blkdev_fallocate(struct file *file, int mode, loff_t start,
+ 	truncate_inode_pages_range(mapping, start, end);
+ 
+ 	switch (mode) {
++	case FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE:
++		flags = BLKDEV_ZERO_NOFALLBACK;
++		/*FALLTHRU*/
+ 	case FALLOC_FL_ZERO_RANGE:
+ 	case FALLOC_FL_ZERO_RANGE | FALLOC_FL_KEEP_SIZE:
+ 		error = blkdev_issue_zeroout(bdev, start >> 9, len >> 9,
+-					    GFP_KERNEL, 0);
+-		break;
+-	case FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE:
+-		/* Only punch if the device can do zeroing discard. */
+-		if (!blk_queue_discard(q) || !q->limits.discard_zeroes_data)
+-			return -EOPNOTSUPP;
+-		error = blkdev_issue_discard(bdev, start >> 9, len >> 9,
+-					     GFP_KERNEL, 0);
++					     GFP_KERNEL, flags);
+ 		break;
+ 	case FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE | FALLOC_FL_NO_HIDE_STALE:
+-		if (!blk_queue_discard(q))
+-			return -EOPNOTSUPP;
+ 		error = blkdev_issue_discard(bdev, start >> 9, len >> 9,
+ 					     GFP_KERNEL, 0);
+ 		break;
+-- 
+2.11.0
