@@ -1,63 +1,63 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f68.google.com ([74.125.83.68]:35475 "EHLO
-        mail-pg0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752156AbdBJK5C (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Feb 2017 05:57:02 -0500
-From: Ming Lei <tom.leiming@gmail.com>
-To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
-        linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        NeilBrown <neilb@suse.com>
-Cc: Ming Lei <tom.leiming@gmail.com>
-Subject: [PATCH v1 0/5] md: use bio_clone_fast()
-Date: Fri, 10 Feb 2017 18:56:12 +0800
-Message-Id: <1486724177-14817-1-git-send-email-tom.leiming@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Thu, 23 Mar 2017 11:38:32 -0400
+From: Tejun Heo <tj@kernel.org>
+To: Jan Kara <jack@suse.cz>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
+	Tahsin Erdogan <tahsin@google.com>,
+	Omar Sandoval <osandov@osandov.com>
+Subject: Re: [PATCH 02/11] block: Fix race of bdev open with gendisk shutdown
+Message-ID: <20170323153832.GB3241@htj.duckdns.org>
+References: <20170313151410.5586-1-jack@suse.cz>
+ <20170313151410.5586-3-jack@suse.cz>
+ <20170321161907.GB30919@htj.duckdns.org>
+ <20170323002105.GB18402@quack2.suse.cz>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170323002105.GB18402@quack2.suse.cz>
+List-ID: <linux-block@vger.kernel.org>
 
-Hi,
+Hello, Jan.
 
-This patches replaces bio_clone() with bio_fast_clone() in
-bio_clone_mddev() because:
+On Thu, Mar 23, 2017 at 01:21:05AM +0100, Jan Kara wrote:
+> > * A bdi is the object which knows which request_queue it's associated
+> >   and when that association dies.
+> 
+> So bdi is associated with a request_queue but it does not have any
+> direct pointer or reference to it. It is the request_queue that points to
+> bdi. However you are right that bdi_unregister() call is telling bdi that
+> the device is going away.
+> 
+> > * bdev is permanently associated with a bdi.
+> 
+> Yes.
+> 
+> > So, it's kinda weird to look up the request_queue again on each open
+> > and then verify that the bd_bdi and request_queue match.  I think it
+> > would make more sense to skip disk look up and just go through bdi to
+> > determine the associated request_queue as that's the primary nexus
+> > object tying everything up now.
+> 
+> So I was thinking about this as well. The problem is that you cannot really
+> keep a reference to request_queue (or gendisk) from block device inode or
+> bdi as that could unexpectedly pin the driver in memory after user thinks
+> everything should be cleaned up. So I think we really do have to establish
+> the connection between block device inode and request_queue / gendisk on
+> opening of the block device and drop the reference when the block device is
+> closed.
 
-1) bio_clone_mddev() is used in raid normal I/O and isn't in
-resync I/O path, and all the direct access to bvec table in
-raid happens on resync I/O only except for write behind of raid1.
-Write behind is treated specially, so the replacement is safe.
+Hmmm... but for bdi to be able to serve as the sever point, it must
+know when it gets disassociated (del_gendisk) and be able to safely
+clear its pointer and reject further access to the request_queue.  I
+think we're trying to shift that synchronization to the open path but
+no matter where we do that we have to do that anyway and it'll likely
+be the more straight-forward to do it at the sever point.
 
-2) for write behind, bio_clone() is kept, but this patchset
-introduces bio_clone_bioset_partial() to just clone one specific 
-bvecs range instead of whole table. Then write behind is improved
-too.
-
-V1:
-	1) don't introduce bio_clone_slow_mddev_partial()
-	2) return failure if mddev->bio_set can't be created
-	3) remove check in bio_clone_mddev() as suggested by
-	Christoph Hellwig.
-	4) rename bio_clone_mddev() as bio_clone_fast_mddev()
-
-
-Ming Lei (5):
-  block: introduce bio_clone_bioset_partial()
-  md/raid1: use bio_clone_bioset_partial() in case of write behind
-  md: fail if mddev->bio_set can't be created
-  md: remove unnecessary check on mddev
-  md: fast clone bio in bio_clone_mddev()
-
- block/bio.c         | 61 +++++++++++++++++++++++++++++++++++++++++------------
- drivers/md/faulty.c |  2 +-
- drivers/md/md.c     | 14 ++++++------
- drivers/md/md.h     |  4 ++--
- drivers/md/raid1.c  | 26 ++++++++++++++++-------
- drivers/md/raid10.c | 11 +++++-----
- drivers/md/raid5.c  |  4 ++--
- include/linux/bio.h | 11 ++++++++--
- 8 files changed, 92 insertions(+), 41 deletions(-)
+Thanks.
 
 -- 
-2.7.4
-
-Thanks,
-Ming
+tejun
