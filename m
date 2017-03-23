@@ -1,92 +1,93 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f194.google.com ([209.85.192.194]:34942 "EHLO
-        mail-pf0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755141AbdCPQOe (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Mar 2017 12:14:34 -0400
-From: Ming Lei <tom.leiming@gmail.com>
-To: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@fb.com>,
-        linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Ming Lei <tom.leiming@gmail.com>
-Subject: [PATCH v3 03/14] md: prepare for managing resync I/O pages in clean way
-Date: Fri, 17 Mar 2017 00:12:24 +0800
-Message-Id: <20170316161235.27110-4-tom.leiming@gmail.com>
-In-Reply-To: <20170316161235.27110-1-tom.leiming@gmail.com>
-References: <20170316161235.27110-1-tom.leiming@gmail.com>
+Received: from mx2.suse.de ([195.135.220.15]:56963 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753918AbdCWAhK (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 22 Mar 2017 20:37:10 -0400
+From: Jan Kara <jack@suse.cz>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
+        Tejun Heo <tj@kernel.org>, Tahsin Erdogan <tahsin@google.com>,
+        Omar Sandoval <osandov@osandov.com>, Jan Kara <jack@suse.cz>
+Subject: [PATCH 02/10] bdi: Mark congested->bdi as internal
+Date: Thu, 23 Mar 2017 01:36:54 +0100
+Message-Id: <20170323003702.27571-3-jack@suse.cz>
+In-Reply-To: <20170323003702.27571-1-jack@suse.cz>
+References: <20170323003702.27571-1-jack@suse.cz>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Now resync I/O use bio's bec table to manage pages,
-this way is very hacky, and may not work any more
-once multipage bvec is introduced.
+congested->bdi pointer is used only to be able to remove congested
+structure from bdi->cgwb_congested_tree on structure release. Moreover
+the pointer can become NULL when we unregister the bdi. Rename the field
+to __bdi and add a comment to make it more explicit this is internal
+stuff of memcg writeback code and people should not use the field as
+such use will be likely race prone.
 
-So introduce helpers and new data structure for
-managing resync I/O pages more cleanly.
+We do not bother with converting congested->bdi to a proper refcounted
+reference. It will be slightly ugly to special-case bdi->wb.congested to
+avoid effectively a cyclic reference of bdi to itself and the reference
+gets cleared from bdi_unregister() making it impossible to reference
+a freed bdi.
 
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+Acked-by: Tejun Heo <tj@kernel.org>
+Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- drivers/md/md.h | 50 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 50 insertions(+)
+ include/linux/backing-dev-defs.h |  4 +++-
+ mm/backing-dev.c                 | 10 +++++-----
+ 2 files changed, 8 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/md/md.h b/drivers/md/md.h
-index 1d63239a1be4..20c48032493b 100644
---- a/drivers/md/md.h
-+++ b/drivers/md/md.h
-@@ -720,4 +720,54 @@ static inline void mddev_check_writesame(struct mddev *mddev, struct bio *bio)
- #define RESYNC_BLOCK_SIZE (64*1024)
- #define RESYNC_PAGES ((RESYNC_BLOCK_SIZE + PAGE_SIZE-1) / PAGE_SIZE)
+diff --git a/include/linux/backing-dev-defs.h b/include/linux/backing-dev-defs.h
+index ad955817916d..8fb3dcdebc80 100644
+--- a/include/linux/backing-dev-defs.h
++++ b/include/linux/backing-dev-defs.h
+@@ -54,7 +54,9 @@ struct bdi_writeback_congested {
+ 	atomic_t refcnt;		/* nr of attached wb's and blkg */
  
-+/* for managing resync I/O pages */
-+struct resync_pages {
-+	unsigned	idx;	/* for get/put page from the pool */
-+	void		*raid_bio;
-+	struct page	*pages[RESYNC_PAGES];
-+};
-+
-+static inline int resync_alloc_pages(struct resync_pages *rp,
-+				     gfp_t gfp_flags)
-+{
-+	int i;
-+
-+	for (i = 0; i < RESYNC_PAGES; i++) {
-+		rp->pages[i] = alloc_page(gfp_flags);
-+		if (!rp->pages[i])
-+			goto out_free;
-+	}
-+
-+	return 0;
-+
-+ out_free:
-+	while (--i >= 0)
-+		put_page(rp->pages[i]);
-+	return -ENOMEM;
-+}
-+
-+static inline void resync_free_pages(struct resync_pages *rp)
-+{
-+	int i;
-+
-+	for (i = 0; i < RESYNC_PAGES; i++)
-+		put_page(rp->pages[i]);
-+}
-+
-+static inline void resync_get_all_pages(struct resync_pages *rp)
-+{
-+	int i;
-+
-+	for (i = 0; i < RESYNC_PAGES; i++)
-+		get_page(rp->pages[i]);
-+}
-+
-+static inline struct page *resync_fetch_page(struct resync_pages *rp,
-+					     unsigned idx)
-+{
-+	if (WARN_ON_ONCE(idx >= RESYNC_PAGES))
-+		return NULL;
-+	return rp->pages[idx];
-+}
-+
- #endif /* _MD_MD_H */
+ #ifdef CONFIG_CGROUP_WRITEBACK
+-	struct backing_dev_info *bdi;	/* the associated bdi */
++	struct backing_dev_info *__bdi;	/* the associated bdi, set to NULL
++					 * on bdi unregistration. For memcg-wb
++					 * internal use only! */
+ 	int blkcg_id;			/* ID of the associated blkcg */
+ 	struct rb_node rb_node;		/* on bdi->cgwb_congestion_tree */
+ #endif
+diff --git a/mm/backing-dev.c b/mm/backing-dev.c
+index c6f2a37028c2..12408f86783c 100644
+--- a/mm/backing-dev.c
++++ b/mm/backing-dev.c
+@@ -438,7 +438,7 @@ wb_congested_get_create(struct backing_dev_info *bdi, int blkcg_id, gfp_t gfp)
+ 		return NULL;
+ 
+ 	atomic_set(&new_congested->refcnt, 0);
+-	new_congested->bdi = bdi;
++	new_congested->__bdi = bdi;
+ 	new_congested->blkcg_id = blkcg_id;
+ 	goto retry;
+ 
+@@ -466,10 +466,10 @@ void wb_congested_put(struct bdi_writeback_congested *congested)
+ 	}
+ 
+ 	/* bdi might already have been destroyed leaving @congested unlinked */
+-	if (congested->bdi) {
++	if (congested->__bdi) {
+ 		rb_erase(&congested->rb_node,
+-			 &congested->bdi->cgwb_congested_tree);
+-		congested->bdi = NULL;
++			 &congested->__bdi->cgwb_congested_tree);
++		congested->__bdi = NULL;
+ 	}
+ 
+ 	spin_unlock_irqrestore(&cgwb_lock, flags);
+@@ -752,7 +752,7 @@ static void cgwb_bdi_exit(struct backing_dev_info *bdi)
+ 			rb_entry(rbn, struct bdi_writeback_congested, rb_node);
+ 
+ 		rb_erase(rbn, &bdi->cgwb_congested_tree);
+-		congested->bdi = NULL;	/* mark @congested unlinked */
++		congested->__bdi = NULL;	/* mark @congested unlinked */
+ 	}
+ 	spin_unlock_irq(&cgwb_lock);
+ }
 -- 
-2.9.3
+2.10.2
