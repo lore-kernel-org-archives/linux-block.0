@@ -1,247 +1,115 @@
-Return-Path: <jinpu.wang@profitbricks.com>
-Return-Path: <jinpu.wang@profitbricks.com>
-From: Jack Wang <jinpu.wang@profitbricks.com>
-To: linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Cc: dledford@redhat.com,
-	axboe@kernel.dk,
-	hch@lst.de,
-	mail@fholler.de,
-	Milind.dumbare@gmail.com,
-	yun.wang@profitbricks.com,
-	Jack Wang <jinpu.wang@profitbricks.com>,
-	Kleber Souza <kleber.souza@profitbricks.com>,
-	Danil Kipnis <danil.kipnis@profitbricks.com>,
-	Roman Pen <roman.penyaev@profitbricks.com>
-Subject: [PATCH 09/28] ibtrs_srv: add header file for exported interface
-Date: Fri, 24 Mar 2017 11:45:24 +0100
-Message-Id: <1490352343-20075-10-git-send-email-jinpu.wangl@profitbricks.com>
-In-Reply-To: <1490352343-20075-1-git-send-email-jinpu.wangl@profitbricks.com>
-References: <1490352343-20075-1-git-send-email-jinpu.wangl@profitbricks.com>
+Return-Path: <jack@suse.cz>
+From: Jan Kara <jack@suse.cz>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
+	Tejun Heo <tj@kernel.org>,
+	Tahsin Erdogan <tahsin@google.com>,
+	Omar Sandoval <osandov@osandov.com>,
+	Jan Kara <jack@suse.cz>
+Subject: [PATCH 06/10] bdi: Do not wait for cgwbs release in bdi_unregister()
+Date: Thu, 23 Mar 2017 01:36:58 +0100
+Message-Id: <20170323003702.27571-7-jack@suse.cz>
+In-Reply-To: <20170323003702.27571-1-jack@suse.cz>
+References: <20170323003702.27571-1-jack@suse.cz>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Jack Wang <jinpu.wang@profitbricks.com>
+Currently we wait for all cgwbs to get released in cgwb_bdi_destroy()
+(called from bdi_unregister()). That is however unnecessary now when
+cgwb->bdi is a proper refcounted reference (thus bdi cannot get
+released before all cgwbs are released) and when cgwb_bdi_destroy()
+shuts down writeback directly.
 
-Signed-off-by: Jack Wang <jinpu.wang@profitbricks.com>
-Signed-off-by: Kleber Souza <kleber.souza@profitbricks.com>
-Signed-off-by: Danil Kipnis <danil.kipnis@profitbricks.com>
-Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
+Acked-by: Tejun Heo <tj@kernel.org>
+Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- include/rdma/ibtrs_srv.h | 206 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 206 insertions(+)
- create mode 100644 include/rdma/ibtrs_srv.h
+ include/linux/backing-dev-defs.h |  1 -
+ mm/backing-dev.c                 | 22 +---------------------
+ 2 files changed, 1 insertion(+), 22 deletions(-)
 
-diff --git a/include/rdma/ibtrs_srv.h b/include/rdma/ibtrs_srv.h
-new file mode 100644
-index 0000000..dbd535f
---- /dev/null
-+++ b/include/rdma/ibtrs_srv.h
-@@ -0,0 +1,206 @@
-+/*
-+ * InfiniBand Transport Layer
-+ *
-+ * Copyright (c) 2014 - 2017 ProfitBricks GmbH. All rights reserved.
-+ * Authors: Fabian Holler < mail@fholler.de>
-+ *          Jack Wang <jinpu.wang@profitbricks.com>
-+ *   	    Kleber Souza <kleber.souza@profitbricks.com>
-+ * 	    Danil Kipnis <danil.kipnis@profitbricks.com>
-+ *   	    Roman Pen <roman.penyaev@profitbricks.com>
-+ *          Milind Dumbare <Milind.dumbare@gmail.com>
-+ *
-+ *
-+ * Redistribution and use in source and binary forms, with or without
-+ * modification, are permitted provided that the following conditions
-+ * are met:
-+ * 1. Redistributions of source code must retain the above copyright
-+ *    notice, this list of conditions, and the following disclaimer,
-+ *    without modification.
-+ * 2. Redistributions in binary form must reproduce at minimum a disclaimer
-+ *    substantially similar to the "NO WARRANTY" disclaimer below
-+ *    ("Disclaimer") and any redistribution must be conditioned upon
-+ *    including a substantially similar Disclaimer requirement for further
-+ *    binary redistribution.
-+ * 3. Neither the names of the above-listed copyright holders nor the names
-+ *    of any contributors may be used to endorse or promote products derived
-+ *    from this software without specific prior written permission.
-+ *
-+ * Alternatively, this software may be distributed under the terms of the
-+ * GNU General Public License ("GPL") version 2 as published by the Free
-+ * Software Foundation.
-+ *
-+ * NO WARRANTY
-+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR
-+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-+ * HOLDERS OR CONTRIBUTORS BE LIABLE FOR SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
-+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
-+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
-+ * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-+ * POSSIBILITY OF SUCH DAMAGES.
-+ *
-+ */
-+
-+#ifndef _IBTRS_SRV_H
-+#define _IBTRS_SRV_H
-+
-+#include <linux/socket.h>
-+
-+struct ibtrs_session;
-+struct ibtrs_ops_id;
-+
-+enum ibtrs_srv_rdma_ev {
-+	IBTRS_SRV_RDMA_EV_RECV,
-+	IBTRS_SRV_RDMA_EV_WRITE_REQ,
-+};
-+
-+/**
-+ * enum ibtrs_srv_sess_ev - Session events
-+ * @IBTRS_SRV_SESS_EV_CONNECTED:	Connection from client established
-+ * @IBTRS_SRV_SESS_EV_DISCONNECTING:	Connection is currently disconnected,
-+ *					sending data through the connection may
-+ *					fail, but could still recv messages.
-+ * @IBTRS_SRV_SESS_EV_DISCONNECTED:	Connection was disconnected, all
-+ *					connection IBTRS resources were freed.
-+ */
-+
-+enum ibtrs_srv_sess_ev {
-+	IBTRS_SRV_SESS_EV_CONNECTED,
-+	IBTRS_SRV_SESS_EV_DISCONNECTING,
-+	IBTRS_SRV_SESS_EV_DISCONNECTED,
-+};
-+
-+/**
-+ * &struct ibtrs_srv_ops - Callbacks for ibtrs_server
-+ * @owner:		module that uses ibtrs_server
-+ * @rdma_ev:		Event notification for RDMA operations
-+ *			If the callback returns a value != 0, an error message
-+ *			for the data transfer will be sent to the client.
-+
-+ *	@sess:		Session
-+ *	@priv:		Private data from user
-+ *	@id:		internal IBTRS id
-+ *	@ev:		Event
-+ *	@data:		Data received by the client. The message of the user of
-+ *			ibtrs_client is allocated at the end of the buffer.
-+ *			Before the message the data of the ibtrs_client is
-+ *			located.
-+ *			If the event is %IBTRS_SRV_RDMA_EV_WRITE_REQ, the user
-+ *			can write his response into @data. When
-+ *			ibtrs_srv_resp_rdma() is called, this @data will be
-+ *			transferred to the client.
-+ *	@len:		length of data in @data
-+
-+ * @sess_ev:		Events about connective state changes
-+ *			If the callback returns != 0 and the event
-+ *			%IBTRS_SRV_SESS_EV_CONNECTED the corresponding session
-+ *			was destroyed.
-+ *	@sess:		Session
-+ *	@ev:		event
-+ *	@priv:		Private data from user if previously set with
-+ *			ibtrs_srv_set_sess_priv()
-+
-+ * @recv:		Event notification for infiniband message receival
-+ *	@sess:		Session
-+ *	@priv:		Private data from user if previously set with
-+ *			ibtrs_srv_set_sess_priv()
-+ *	@msg:		Received message
-+ *	@len:		length of @msg
-+ */
-+
-+typedef int (rdma_ev_fn)(struct ibtrs_session *sess, void *priv,
-+			 struct ibtrs_ops_id *id, enum ibtrs_srv_rdma_ev ev,
-+			 void *data, size_t len);
-+typedef int (sess_ev_fn)(struct ibtrs_session *sess, enum ibtrs_srv_sess_ev ev,
-+			 void *priv);
-+typedef void (recv_fn)(struct ibtrs_session *sess, void *priv, const void *msg,
-+		       size_t len);
-+
-+struct ibtrs_srv_ops {
-+	struct module *owner;
-+
-+	rdma_ev_fn	*rdma_ev;
-+	sess_ev_fn	*sess_ev;
-+	recv_fn		*recv;
-+};
-+
-+/**
-+ * ibtrs_srv_register() - register a module with ibtrs_server
-+ * @ops:		callback functions
-+ *
-+ * Registers a module with the ibtrs_server. The user module passes the function
-+ * pointers, that ibtrs_server can call to communicate with it.
-+ *
-+ * Return:
-+ * 0:		Success
-+ * <0:		Error
-+ */
-+int ibtrs_srv_register(const struct ibtrs_srv_ops *ops);
-+
-+/**
-+ * ibtrs_srv_unregister - unregister a module with ibtrs_server
-+ * @ops: the struct that was passed to ibtrs_srv_register() before
-+ *
-+ * Unregisters a module from the ibtrs_server. All open connections will be
-+ * terminated.
-+ */
-+void ibtrs_srv_unregister(const struct ibtrs_srv_ops *ops);
-+
-+/**
-+ * ibtrs_srv_resp_rdma() - Finish an RDMA request
-+ *
-+ * @id:		Internal IBTRS operation identifier
-+ * @errno:	Response Code send to the other side for this operation.
-+ *		0 = success, <=0 error
-+ * Return:
-+ *  0:		Success
-+ * <0:		Error
-+ *
-+ * Finish a RDMA operation. A message is sent to the client and the
-+ * corresponding memory areas will be released.
-+ */
-+int ibtrs_srv_resp_rdma(struct ibtrs_ops_id *id, int errno);
-+
-+/**
-+ * ibtrs_srv_send() - Send data to the ibtrs_server with an infiniband message.
-+ * @sess	Session
-+ * @vec:	Data send to the server
-+ * @nr:		Length of @vec
-+ *
-+ * Return:
-+ * 0:		Success
-+ * <0:		Error
-+ * -EINVAL:	@len is too big
-+ */
-+int ibtrs_srv_send(struct ibtrs_session *sess, const struct kvec *vec,
-+		   size_t nr);
-+
-+/**
-+ * ibtrs_srv_set_sess_priv() - Set private pointer in ibtrs_session.
-+ * @sess	Session
-+ * @priv:	The private pointer that is associated with the session.
-+ */
-+void ibtrs_srv_set_sess_priv(struct ibtrs_session *sess, void *priv);
-+
-+/**
-+ * ibtrs_srv_get_sess_qdepth() - Get ibtrs_session qdepth.
-+ * @sess	Session
-+ */
-+int ibtrs_srv_get_sess_qdepth(struct ibtrs_session *sess);
-+
-+/**
-+ * ibtrs_srv_get_sess_addr() - Get ibtrs_session address.
-+ * @sess	Session
-+ */
-+const char *ibtrs_srv_get_sess_addr(struct ibtrs_session *sess);
-+
-+/**
-+ * ibtrs_srv_get_sess_hostname() - Get ibtrs_session peer hostname.
-+ * @sess	Session
-+ */
-+const char *ibtrs_srv_get_sess_hostname(struct ibtrs_session *sess);
-+
-+#endif
+diff --git a/include/linux/backing-dev-defs.h b/include/linux/backing-dev-defs.h
+index 8af720f22a2d..e66d4722db8e 100644
+--- a/include/linux/backing-dev-defs.h
++++ b/include/linux/backing-dev-defs.h
+@@ -164,7 +164,6 @@ struct backing_dev_info {
+ #ifdef CONFIG_CGROUP_WRITEBACK
+ 	struct radix_tree_root cgwb_tree; /* radix tree of active cgroup wbs */
+ 	struct rb_root cgwb_congested_tree; /* their congested states */
+-	atomic_t usage_cnt; /* counts both cgwbs and cgwb_contested's */
+ #else
+ 	struct bdi_writeback_congested *wb_congested;
+ #endif
+diff --git a/mm/backing-dev.c b/mm/backing-dev.c
+index b67be4fc12c4..8c30b1a7aae5 100644
+--- a/mm/backing-dev.c
++++ b/mm/backing-dev.c
+@@ -406,11 +406,9 @@ static void wb_exit(struct bdi_writeback *wb)
+ /*
+  * cgwb_lock protects bdi->cgwb_tree, bdi->cgwb_congested_tree,
+  * blkcg->cgwb_list, and memcg->cgwb_list.  bdi->cgwb_tree is also RCU
+- * protected.  cgwb_release_wait is used to wait for the completion of cgwb
+- * releases from bdi destruction path.
++ * protected.
+  */
+ static DEFINE_SPINLOCK(cgwb_lock);
+-static DECLARE_WAIT_QUEUE_HEAD(cgwb_release_wait);
+ 
+ /**
+  * wb_congested_get_create - get or create a wb_congested
+@@ -505,7 +503,6 @@ static void cgwb_release_workfn(struct work_struct *work)
+ {
+ 	struct bdi_writeback *wb = container_of(work, struct bdi_writeback,
+ 						release_work);
+-	struct backing_dev_info *bdi = wb->bdi;
+ 
+ 	wb_shutdown(wb);
+ 
+@@ -516,9 +513,6 @@ static void cgwb_release_workfn(struct work_struct *work)
+ 	percpu_ref_exit(&wb->refcnt);
+ 	wb_exit(wb);
+ 	kfree_rcu(wb, rcu);
+-
+-	if (atomic_dec_and_test(&bdi->usage_cnt))
+-		wake_up_all(&cgwb_release_wait);
+ }
+ 
+ static void cgwb_release(struct percpu_ref *refcnt)
+@@ -608,7 +602,6 @@ static int cgwb_create(struct backing_dev_info *bdi,
+ 		/* we might have raced another instance of this function */
+ 		ret = radix_tree_insert(&bdi->cgwb_tree, memcg_css->id, wb);
+ 		if (!ret) {
+-			atomic_inc(&bdi->usage_cnt);
+ 			list_add_tail_rcu(&wb->bdi_node, &bdi->wb_list);
+ 			list_add(&wb->memcg_node, memcg_cgwb_list);
+ 			list_add(&wb->blkcg_node, blkcg_cgwb_list);
+@@ -698,7 +691,6 @@ static int cgwb_bdi_init(struct backing_dev_info *bdi)
+ 
+ 	INIT_RADIX_TREE(&bdi->cgwb_tree, GFP_ATOMIC);
+ 	bdi->cgwb_congested_tree = RB_ROOT;
+-	atomic_set(&bdi->usage_cnt, 1);
+ 
+ 	ret = wb_init(&bdi->wb, bdi, 1, GFP_KERNEL);
+ 	if (!ret) {
+@@ -728,18 +720,6 @@ static void cgwb_bdi_destroy(struct backing_dev_info *bdi)
+ 		spin_lock_irq(&cgwb_lock);
+ 	}
+ 	spin_unlock_irq(&cgwb_lock);
+-
+-	/*
+-	 * All cgwb's must be shutdown and released before returning.  Drain
+-	 * the usage counter to wait for all cgwb's ever created on @bdi.
+-	 */
+-	atomic_dec(&bdi->usage_cnt);
+-	wait_event(cgwb_release_wait, !atomic_read(&bdi->usage_cnt));
+-	/*
+-	 * Grab back our reference so that we hold it when @bdi gets
+-	 * re-registered.
+-	 */
+-	atomic_inc(&bdi->usage_cnt);
+ }
+ 
+ /**
 -- 
-2.7.4
+2.10.2
