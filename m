@@ -1,109 +1,212 @@
-Return-Path: <prvs=425928092f=shli@fb.com>
-From: Shaohua Li <shli@fb.com>
-To: <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>
-CC: <axboe@kernel.dk>, <tj@kernel.org>, Vivek Goyal <vgoyal@redhat.com>,
-        <jmoyer@redhat.com>, <Kernel-team@fb.com>
-Subject: [PATCH V7 18/18] blk-throttle: add latency target support
-Date: Mon, 27 Mar 2017 10:51:46 -0700
-Message-ID: <0d512d4589e1d188a27fea1afd60e5611f1533c9.1490634565.git.shli@fb.com>
-In-Reply-To: <cover.1490634565.git.shli@fb.com>
-References: <cover.1490634565.git.shli@fb.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Return-Path: <BATV+f1fc5bea56d51e2fc981+4960+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk,
+	martin.petersen@oracle.com,
+	agk@redhat.com,
+	snitzer@redhat.com,
+	shli@kernel.org,
+	philipp.reisner@linbit.com,
+	lars.ellenberg@linbit.com
+Cc: linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	drbd-dev@lists.linbit.com,
+	dm-devel@redhat.com,
+	linux-raid@vger.kernel.org
+Subject: [PATCH 21/23] drbd: make intelligent use of blkdev_issue_zeroout
+Date: Thu, 23 Mar 2017 10:33:39 -0400
+Message-Id: <20170323143341.31549-22-hch@lst.de>
+In-Reply-To: <20170323143341.31549-1-hch@lst.de>
+References: <20170323143341.31549-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-One hard problem adding .low limit is to detect idle cgroup. If one
-cgroup doesn't dispatch enough IO against its low limit, we must have a
-mechanism to determine if other cgroups dispatch more IO. We added the
-think time detection mechanism before, but it doesn't work for all
-workloads. Here we add a latency based approach.
+drbd always wants its discard wire operations to zero the blocks, so
+use blkdev_issue_zeroout with the BLKDEV_ZERO_UNMAP flag instead of
+reinventing it poorly.
 
-We already have mechanism to calculate latency threshold for each IO
-size. For every IO dispatched from a cgorup, we compare its latency
-against its threshold and record the info. If most IO latency is below
-threshold (in the code I use 75%), the cgroup could be treated idle and
-other cgroups can dispatch more IO.
-
-Currently this latency target check is only for SSD as we can't
-calcualte the latency target for hard disk. And this is only for cgroup
-leaf node so far.
-
-Signed-off-by: Shaohua Li <shli@fb.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-throttle.c | 39 +++++++++++++++++++++++++++++++++++----
- 1 file changed, 35 insertions(+), 4 deletions(-)
+ drivers/block/drbd/drbd_debugfs.c  |  3 --
+ drivers/block/drbd/drbd_int.h      |  6 ---
+ drivers/block/drbd/drbd_receiver.c | 99 ++------------------------------------
+ drivers/block/drbd/drbd_req.c      |  6 +--
+ 4 files changed, 7 insertions(+), 107 deletions(-)
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 4b9c6a1..e506d94 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -170,6 +170,10 @@ struct throtl_grp {
- 	unsigned long checked_last_finish_time; /* ns / 1024 */
- 	unsigned long avg_idletime; /* ns / 1024 */
- 	unsigned long idletime_threshold; /* us */
-+
-+	unsigned int bio_cnt; /* total bios */
-+	unsigned int bad_bio_cnt; /* bios exceeding latency threshold */
-+	unsigned long bio_cnt_reset_time;
- };
+diff --git a/drivers/block/drbd/drbd_debugfs.c b/drivers/block/drbd/drbd_debugfs.c
+index de5c3ee8a790..494837e59f23 100644
+--- a/drivers/block/drbd/drbd_debugfs.c
++++ b/drivers/block/drbd/drbd_debugfs.c
+@@ -236,9 +236,6 @@ static void seq_print_peer_request_flags(struct seq_file *m, struct drbd_peer_re
+ 	seq_print_rq_state_bit(m, f & EE_CALL_AL_COMPLETE_IO, &sep, "in-AL");
+ 	seq_print_rq_state_bit(m, f & EE_SEND_WRITE_ACK, &sep, "C");
+ 	seq_print_rq_state_bit(m, f & EE_MAY_SET_IN_SYNC, &sep, "set-in-sync");
+-
+-	if (f & EE_IS_TRIM)
+-		__seq_print_rq_state_bit(m, f & EE_IS_TRIM_USE_ZEROOUT, &sep, "zero-out", "trim");
+ 	seq_print_rq_state_bit(m, f & EE_WRITE_SAME, &sep, "write-same");
+ 	seq_putc(m, '\n');
+ }
+diff --git a/drivers/block/drbd/drbd_int.h b/drivers/block/drbd/drbd_int.h
+index 724d1c50fc52..d5da45bb03a6 100644
+--- a/drivers/block/drbd/drbd_int.h
++++ b/drivers/block/drbd/drbd_int.h
+@@ -437,9 +437,6 @@ enum {
  
- /* We measure latency for request size from <= 4k to >= 1M */
-@@ -1725,12 +1729,15 @@ static bool throtl_tg_is_idle(struct throtl_grp *tg)
- 	 * - single idle is too long, longer than a fixed value (in case user
- 	 *   configure a too big threshold) or 4 times of slice
- 	 * - average think time is more than threshold
-+	 * - IO latency is largely below threshold
- 	 */
- 	unsigned long time = jiffies_to_usecs(4 * tg->td->throtl_slice);
+ 	/* is this a TRIM aka REQ_DISCARD? */
+ 	__EE_IS_TRIM,
+-	/* our lower level cannot handle trim,
+-	 * and we want to fall back to zeroout instead */
+-	__EE_IS_TRIM_USE_ZEROOUT,
  
- 	time = min_t(unsigned long, MAX_IDLE_TIME, time);
- 	return (ktime_get_ns() >> 10) - tg->last_finish_time > time ||
--	       tg->avg_idletime > tg->idletime_threshold;
-+	       tg->avg_idletime > tg->idletime_threshold ||
-+	       (tg->latency_target && tg->bio_cnt &&
-+		tg->bad_bio_cnt * 5 < tg->bio_cnt);
+ 	/* In case a barrier failed,
+ 	 * we need to resubmit without the barrier flag. */
+@@ -482,7 +479,6 @@ enum {
+ #define EE_CALL_AL_COMPLETE_IO (1<<__EE_CALL_AL_COMPLETE_IO)
+ #define EE_MAY_SET_IN_SYNC     (1<<__EE_MAY_SET_IN_SYNC)
+ #define EE_IS_TRIM             (1<<__EE_IS_TRIM)
+-#define EE_IS_TRIM_USE_ZEROOUT (1<<__EE_IS_TRIM_USE_ZEROOUT)
+ #define EE_RESUBMITTED         (1<<__EE_RESUBMITTED)
+ #define EE_WAS_ERROR           (1<<__EE_WAS_ERROR)
+ #define EE_HAS_DIGEST          (1<<__EE_HAS_DIGEST)
+@@ -1561,8 +1557,6 @@ extern void start_resync_timer_fn(unsigned long data);
+ extern void drbd_endio_write_sec_final(struct drbd_peer_request *peer_req);
+ 
+ /* drbd_receiver.c */
+-extern int drbd_issue_discard_or_zero_out(struct drbd_device *device,
+-		sector_t start, unsigned int nr_sectors, bool discard);
+ extern int drbd_receiver(struct drbd_thread *thi);
+ extern int drbd_ack_receiver(struct drbd_thread *thi);
+ extern void drbd_send_ping_wf(struct work_struct *ws);
+diff --git a/drivers/block/drbd/drbd_receiver.c b/drivers/block/drbd/drbd_receiver.c
+index aa6bf9692eff..8641776f043a 100644
+--- a/drivers/block/drbd/drbd_receiver.c
++++ b/drivers/block/drbd/drbd_receiver.c
+@@ -1448,105 +1448,14 @@ void drbd_bump_write_ordering(struct drbd_resource *resource, struct drbd_backin
+ 		drbd_info(resource, "Method to ensure write ordering: %s\n", write_ordering_str[resource->write_ordering]);
  }
  
- static bool throtl_tg_can_upgrade(struct throtl_grp *tg)
-@@ -2211,12 +2218,36 @@ void blk_throtl_bio_endio(struct bio *bio)
+-/*
+- * We *may* ignore the discard-zeroes-data setting, if so configured.
+- *
+- * Assumption is that it "discard_zeroes_data=0" is only because the backend
+- * may ignore partial unaligned discards.
+- *
+- * LVM/DM thin as of at least
+- *   LVM version:     2.02.115(2)-RHEL7 (2015-01-28)
+- *   Library version: 1.02.93-RHEL7 (2015-01-28)
+- *   Driver version:  4.29.0
+- * still behaves this way.
+- *
+- * For unaligned (wrt. alignment and granularity) or too small discards,
+- * we zero-out the initial (and/or) trailing unaligned partial chunks,
+- * but discard all the aligned full chunks.
+- *
+- * At least for LVM/DM thin, the result is effectively "discard_zeroes_data=1".
+- */
+-int drbd_issue_discard_or_zero_out(struct drbd_device *device, sector_t start, unsigned int nr_sectors, bool discard)
+-{
+-	struct block_device *bdev = device->ldev->backing_bdev;
+-	struct request_queue *q = bdev_get_queue(bdev);
+-	sector_t tmp, nr;
+-	unsigned int max_discard_sectors, granularity;
+-	int alignment;
+-	int err = 0;
+-
+-	if (!discard)
+-		goto zero_out;
+-
+-	/* Zero-sector (unknown) and one-sector granularities are the same.  */
+-	granularity = max(q->limits.discard_granularity >> 9, 1U);
+-	alignment = (bdev_discard_alignment(bdev) >> 9) % granularity;
+-
+-	max_discard_sectors = min(q->limits.max_discard_sectors, (1U << 22));
+-	max_discard_sectors -= max_discard_sectors % granularity;
+-	if (unlikely(!max_discard_sectors))
+-		goto zero_out;
+-
+-	if (nr_sectors < granularity)
+-		goto zero_out;
+-
+-	tmp = start;
+-	if (sector_div(tmp, granularity) != alignment) {
+-		if (nr_sectors < 2*granularity)
+-			goto zero_out;
+-		/* start + gran - (start + gran - align) % gran */
+-		tmp = start + granularity - alignment;
+-		tmp = start + granularity - sector_div(tmp, granularity);
+-
+-		nr = tmp - start;
+-		err |= blkdev_issue_zeroout(bdev, start, nr, GFP_NOIO, 0);
+-		nr_sectors -= nr;
+-		start = tmp;
+-	}
+-	while (nr_sectors >= granularity) {
+-		nr = min_t(sector_t, nr_sectors, max_discard_sectors);
+-		err |= blkdev_issue_discard(bdev, start, nr, GFP_NOIO, 0);
+-		nr_sectors -= nr;
+-		start += nr;
+-	}
+- zero_out:
+-	if (nr_sectors) {
+-		err |= blkdev_issue_zeroout(bdev, start, nr_sectors, GFP_NOIO, 0);
+-	}
+-	return err != 0;
+-}
+-
+-static bool can_do_reliable_discards(struct drbd_device *device)
+-{
+-	struct request_queue *q = bdev_get_queue(device->ldev->backing_bdev);
+-	struct disk_conf *dc;
+-	bool can_do;
+-
+-	if (!blk_queue_discard(q))
+-		return false;
+-
+-	if (q->limits.discard_zeroes_data)
+-		return true;
+-
+-	rcu_read_lock();
+-	dc = rcu_dereference(device->ldev->disk_conf);
+-	can_do = dc->discard_zeroes_if_aligned;
+-	rcu_read_unlock();
+-	return can_do;
+-}
+-
+ static void drbd_issue_peer_discard(struct drbd_device *device, struct drbd_peer_request *peer_req)
+ {
+-	/* If the backend cannot discard, or does not guarantee
+-	 * read-back zeroes in discarded ranges, we fall back to
+-	 * zero-out.  Unless configuration specifically requested
+-	 * otherwise. */
+-	if (!can_do_reliable_discards(device))
+-		peer_req->flags |= EE_IS_TRIM_USE_ZEROOUT;
++	struct block_device *bdev = device->ldev->backing_bdev;
  
- 	start_time = THROTL_STAT_TIME(bio->bi_throtl_stat) >> 10;
- 	finish_time = THROTL_STAT_TIME(finish_time_ns) >> 10;
--	if (start_time && finish_time > start_time &&
--	    !(bio->bi_throtl_stat & THROTL_SKIP_LAT)) {
--		lat = finish_time - start_time;
-+	if (!start_time || finish_time <= start_time)
-+		return;
+-	if (drbd_issue_discard_or_zero_out(device, peer_req->i.sector,
+-	    peer_req->i.size >> 9, !(peer_req->flags & EE_IS_TRIM_USE_ZEROOUT)))
++	if (blkdev_issue_zeroout(bdev, peer_req->i.sector, peer_req->i.size >> 9,
++			GFP_NOIO, BLKDEV_ZERO_UNMAP))
+ 		peer_req->flags |= EE_WAS_ERROR;
 +
-+	lat = finish_time - start_time;
-+	if (!(bio->bi_throtl_stat & THROTL_SKIP_LAT))
- 		throtl_track_latency(tg->td,
- 			THROTL_STAT_SIZE(bio->bi_throtl_stat),
- 			bio_op(bio), lat);
-+
-+	if (tg->latency_target) {
-+		int bucket;
-+		unsigned int threshold;
-+
-+		bucket = request_bucket_index(
-+			THROTL_STAT_SIZE(bio->bi_throtl_stat));
-+		threshold = tg->td->avg_buckets[bucket].latency +
-+			tg->latency_target;
-+		if (lat > threshold)
-+			tg->bad_bio_cnt++;
-+		/*
-+		 * Not race free, could get wrong count, which means cgroups
-+		 * will be throttled
-+		 */
-+		tg->bio_cnt++;
-+	}
-+
-+	if (time_after(jiffies, tg->bio_cnt_reset_time) || tg->bio_cnt > 1024) {
-+		tg->bio_cnt_reset_time = tg->td->throtl_slice + jiffies;
-+		tg->bio_cnt /= 2;
-+		tg->bad_bio_cnt /= 2;
- 	}
+ 	drbd_endio_write_sec_final(peer_req);
  }
- #endif
+ 
+diff --git a/drivers/block/drbd/drbd_req.c b/drivers/block/drbd/drbd_req.c
+index 652114ae1a8a..bdd42b8360cc 100644
+--- a/drivers/block/drbd/drbd_req.c
++++ b/drivers/block/drbd/drbd_req.c
+@@ -1148,10 +1148,10 @@ static int drbd_process_write_request(struct drbd_request *req)
+ 
+ static void drbd_process_discard_req(struct drbd_request *req)
+ {
+-	int err = drbd_issue_discard_or_zero_out(req->device,
+-				req->i.sector, req->i.size >> 9, true);
++	struct block_device *bdev = req->device->ldev->backing_bdev;
+ 
+-	if (err)
++	if (blkdev_issue_zeroout(bdev, req->i.sector, req->i.size >> 9,
++			GFP_NOIO, BLKDEV_ZERO_UNMAP))
+ 		req->private_bio->bi_error = -EIO;
+ 	bio_endio(req->private_bio);
+ }
 -- 
-2.9.3
+2.11.0
