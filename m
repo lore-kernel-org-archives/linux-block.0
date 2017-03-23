@@ -1,53 +1,67 @@
-Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
-To: Ilya Dryomov <idryomov@gmail.com>
-Subject: Re: blk_integrity_revalidate() clears BDI_CAP_STABLE_WRITES
-From: "Martin K. Petersen" <martin.petersen@oracle.com>
-References: <CAOi1vP8M91kiF-FnT=EoJgTxfstMEsC-nhLY5KtRkrKROjWPWA@mail.gmail.com>
- <yq1efyq25y2.fsf@oracle.com>
- <CAOi1vP-amFyFHbPV3FhG3F1Tp+df6V7a4mcP8LLWY0GZx+JsFw@mail.gmail.com>
- <yq1fuj44geq.fsf@oracle.com>
- <CAOi1vP_g-MMe9XvWDgkVL4R6UjckMQVC_CDF9+hQEpZbxwx0Jw@mail.gmail.com>
-Date: Wed, 01 Mar 2017 22:24:36 -0500
-In-Reply-To: <CAOi1vP_g-MMe9XvWDgkVL4R6UjckMQVC_CDF9+hQEpZbxwx0Jw@mail.gmail.com>
- (Ilya Dryomov's message of "Tue, 28 Feb 2017 09:19:14 +0100")
-Message-ID: <yq1zih4pdhn.fsf@oracle.com>
-MIME-Version: 1.0
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
-List-Post: <mailto:linux-nvme@lists.infradead.org>
-List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
-Cc: Jens Axboe <axboe@fb.com>, Sagi Grimberg <sagi@grimberg.me>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- Mike Snitzer <snitzer@redhat.com>, linux-nvme@lists.infradead.org,
- Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
- Ceph Development <ceph-devel@vger.kernel.org>,
- Dan Williams <dan.j.williams@intel.com>
-Content-Type: text/plain; charset="us-ascii"
-Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
-Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
+Return-Path: <jack@suse.cz>
+From: Jan Kara <jack@suse.cz>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
+	Tejun Heo <tj@kernel.org>,
+	Tahsin Erdogan <tahsin@google.com>,
+	Omar Sandoval <osandov@osandov.com>,
+	Jan Kara <jack@suse.cz>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: [PATCH 09/10] kobject: Export kobject_get_unless_zero()
+Date: Thu, 23 Mar 2017 01:37:01 +0100
+Message-Id: <20170323003702.27571-10-jack@suse.cz>
+In-Reply-To: <20170323003702.27571-1-jack@suse.cz>
+References: <20170323003702.27571-1-jack@suse.cz>
 List-ID: <linux-block@vger.kernel.org>
 
->>>>> "Ilya" == Ilya Dryomov <idryomov@gmail.com> writes:
+Make the function available for outside use and fortify it against NULL
+kobject.
 
-Ilya,
+CC: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Reviewed-by: Bart Van Assche <bart.vanassche@sandisk.com>
+Acked-by: Tejun Heo <tj@kernel.org>
+Signed-off-by: Jan Kara <jack@suse.cz>
+---
+ include/linux/kobject.h | 2 ++
+ lib/kobject.c           | 5 ++++-
+ 2 files changed, 6 insertions(+), 1 deletion(-)
 
-Ilya> Given the above, I'm not sure what the baseline is --
-Ilya> blk_integrity code isn't invoked for data-only lbafs.  Could nvme
-Ilya> folks please look at this?  rbd regression caused by integrity
-Ilya> revalidate change goes back to 4.4 and I'd really like to get it
-Ilya> fixed.  The proposed patch is attached to my earlier reply on
-Ilya> linux-block.
-
-I've had a couple of fires to attend to this week. I'll try and give
-your patch a spin on my FC setup tomorrow or Friday.
-
+diff --git a/include/linux/kobject.h b/include/linux/kobject.h
+index e6284591599e..ca85cb80e99a 100644
+--- a/include/linux/kobject.h
++++ b/include/linux/kobject.h
+@@ -108,6 +108,8 @@ extern int __must_check kobject_rename(struct kobject *, const char *new_name);
+ extern int __must_check kobject_move(struct kobject *, struct kobject *);
+ 
+ extern struct kobject *kobject_get(struct kobject *kobj);
++extern struct kobject * __must_check kobject_get_unless_zero(
++						struct kobject *kobj);
+ extern void kobject_put(struct kobject *kobj);
+ 
+ extern const void *kobject_namespace(struct kobject *kobj);
+diff --git a/lib/kobject.c b/lib/kobject.c
+index 445dcaeb0f56..763d70a18941 100644
+--- a/lib/kobject.c
++++ b/lib/kobject.c
+@@ -601,12 +601,15 @@ struct kobject *kobject_get(struct kobject *kobj)
+ }
+ EXPORT_SYMBOL(kobject_get);
+ 
+-static struct kobject * __must_check kobject_get_unless_zero(struct kobject *kobj)
++struct kobject * __must_check kobject_get_unless_zero(struct kobject *kobj)
+ {
++	if (!kobj)
++		return NULL;
+ 	if (!kref_get_unless_zero(&kobj->kref))
+ 		kobj = NULL;
+ 	return kobj;
+ }
++EXPORT_SYMBOL(kobject_get_unless_zero);
+ 
+ /*
+  * kobject_cleanup - free kobject resources.
 -- 
-Martin K. Petersen	Oracle Linux Engineering
-
-_______________________________________________
-Linux-nvme mailing list
-Linux-nvme@lists.infradead.org
-http://lists.infradead.org/mailman/listinfo/linux-nvme
+2.10.2
