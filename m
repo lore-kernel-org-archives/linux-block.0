@@ -1,55 +1,44 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <Bart.VanAssche@sandisk.com>
-To: "agk@redhat.com" <agk@redhat.com>, "lars.ellenberg@linbit.com"
-	<lars.ellenberg@linbit.com>, "snitzer@redhat.com" <snitzer@redhat.com>,
-	"hch@lst.de" <hch@lst.de>, "martin.petersen@oracle.com"
-	<martin.petersen@oracle.com>, "philipp.reisner@linbit.com"
-	<philipp.reisner@linbit.com>, "axboe@kernel.dk" <axboe@kernel.dk>,
-	"shli@kernel.org" <shli@kernel.org>
-CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-	"dm-devel@redhat.com" <dm-devel@redhat.com>, "drbd-dev@lists.linbit.com"
-	<drbd-dev@lists.linbit.com>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "linux-raid@vger.kernel.org"
-	<linux-raid@vger.kernel.org>
-Subject: Re: [PATCH 01/23] block: renumber REQ_OP_WRITE_ZEROES
-Date: Tue, 28 Mar 2017 16:12:46 +0000
-Message-ID: <1490717553.2573.4.camel@sandisk.com>
+Return-Path: <BATV+f1fc5bea56d51e2fc981+4960+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk,
+	martin.petersen@oracle.com,
+	agk@redhat.com,
+	snitzer@redhat.com,
+	shli@kernel.org,
+	philipp.reisner@linbit.com,
+	lars.ellenberg@linbit.com
+Cc: linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	drbd-dev@lists.linbit.com,
+	dm-devel@redhat.com,
+	linux-raid@vger.kernel.org
+Subject: [PATCH 01/23] block: renumber REQ_OP_WRITE_ZEROES
+Date: Thu, 23 Mar 2017 10:33:19 -0400
+Message-Id: <20170323143341.31549-2-hch@lst.de>
+In-Reply-To: <20170323143341.31549-1-hch@lst.de>
 References: <20170323143341.31549-1-hch@lst.de>
-	 <20170323143341.31549-2-hch@lst.de>
-In-Reply-To: <20170323143341.31549-2-hch@lst.de>
-Content-Type: text/plain; charset="iso-8859-1"
-MIME-Version: 1.0
-Return-Path: Bart.VanAssche@sandisk.com
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, 2017-03-23 at 10:33 -0400, Christoph Hellwig wrote:
-> Make life easy for implementations that needs to send a data buffer
-> to the device (e.g. SCSI) by numbering it as a data out command.
->=20
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  include/linux/blk_types.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-> index d703acb55d0f..6393c13a6498 100644
-> --- a/include/linux/blk_types.h
-> +++ b/include/linux/blk_types.h
-> @@ -160,7 +160,7 @@ enum req_opf {
->  	/* write the same sector many times */
->  	REQ_OP_WRITE_SAME	=3D 7,
->  	/* write the zero filled sector many times */
-> -	REQ_OP_WRITE_ZEROES	=3D 8,
-> +	REQ_OP_WRITE_ZEROES	=3D 9,
-> =20
->  	/* SCSI passthrough using struct scsi_request */
->  	REQ_OP_SCSI_IN		=3D 32,
+Make life easy for implementations that needs to send a data buffer
+to the device (e.g. SCSI) by numbering it as a data out command.
 
-Hello Christoph,
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ include/linux/blk_types.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Since REQ_OP_WRITE_ZEROES was introduced in kernel v4.10, do we need
-"Cc: stable" and "Fixes: a6f0788ec2881" tags for this patch?
-
-Thanks,
-
-Bart.=
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index d703acb55d0f..6393c13a6498 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -160,7 +160,7 @@ enum req_opf {
+ 	/* write the same sector many times */
+ 	REQ_OP_WRITE_SAME	= 7,
+ 	/* write the zero filled sector many times */
+-	REQ_OP_WRITE_ZEROES	= 8,
++	REQ_OP_WRITE_ZEROES	= 9,
+ 
+ 	/* SCSI passthrough using struct scsi_request */
+ 	REQ_OP_SCSI_IN		= 32,
+-- 
+2.11.0
