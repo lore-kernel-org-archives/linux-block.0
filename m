@@ -1,4 +1,4 @@
-Return-Path: <BATV+2133f6211fed31f2c605+4968+infradead.org+hch@bombadil.srs.infradead.org>
+Return-Path: <BATV+f1fc5bea56d51e2fc981+4960+infradead.org+hch@bombadil.srs.infradead.org>
 From: Christoph Hellwig <hch@lst.de>
 To: axboe@kernel.dk,
 	martin.petersen@oracle.com,
@@ -12,60 +12,33 @@ Cc: linux-block@vger.kernel.org,
 	drbd-dev@lists.linbit.com,
 	dm-devel@redhat.com,
 	linux-raid@vger.kernel.org
-Subject: [PATCH 16/25] zram: implement REQ_OP_WRITE_ZEROES
-Date: Fri, 31 Mar 2017 18:33:04 +0200
-Message-Id: <20170331163313.31821-17-hch@lst.de>
-In-Reply-To: <20170331163313.31821-1-hch@lst.de>
-References: <20170331163313.31821-1-hch@lst.de>
+Subject: [PATCH 19/23] mmc: remove the discard_zeroes_data flag
+Date: Thu, 23 Mar 2017 10:33:37 -0400
+Message-Id: <20170323143341.31549-20-hch@lst.de>
+In-Reply-To: <20170323143341.31549-1-hch@lst.de>
+References: <20170323143341.31549-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Just the same as discard if the block size equals the system page size.
+mmc only supports discarding on large alignments, so the zeroing code
+would always fall back to explicit writings of zeroes.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/block/zram/zram_drv.c | 13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
+ drivers/mmc/core/queue.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index dceb5edd1e54..1710b06f04a7 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -829,10 +829,14 @@ static void __zram_make_request(struct zram *zram, struct bio *bio)
- 	offset = (bio->bi_iter.bi_sector &
- 		  (SECTORS_PER_PAGE - 1)) << SECTOR_SHIFT;
+diff --git a/drivers/mmc/core/queue.c b/drivers/mmc/core/queue.c
+index 493eb10ce580..4c54ad34e17a 100644
+--- a/drivers/mmc/core/queue.c
++++ b/drivers/mmc/core/queue.c
+@@ -167,8 +167,6 @@ static void mmc_queue_setup_discard(struct request_queue *q,
  
--	if (unlikely(bio_op(bio) == REQ_OP_DISCARD)) {
-+	switch (bio_op(bio)) {
-+	case REQ_OP_DISCARD:
-+	case REQ_OP_WRITE_ZEROES:
- 		zram_bio_discard(zram, index, offset, bio);
- 		bio_endio(bio);
- 		return;
-+	default:
-+		break;
- 	}
- 
- 	bio_for_each_segment(bvec, bio, iter) {
-@@ -1192,6 +1196,8 @@ static int zram_add(void)
- 	zram->disk->queue->limits.max_sectors = SECTORS_PER_PAGE;
- 	zram->disk->queue->limits.chunk_sectors = 0;
- 	blk_queue_max_discard_sectors(zram->disk->queue, UINT_MAX);
-+	queue_flag_set_unlocked(QUEUE_FLAG_DISCARD, zram->disk->queue);
-+
- 	/*
- 	 * zram_bio_discard() will clear all logical blocks if logical block
- 	 * size is identical with physical block size(PAGE_SIZE). But if it is
-@@ -1201,10 +1207,7 @@ static int zram_add(void)
- 	 * zeroed.
- 	 */
- 	if (ZRAM_LOGICAL_BLOCK_SIZE == PAGE_SIZE)
--		zram->disk->queue->limits.discard_zeroes_data = 1;
--	else
--		zram->disk->queue->limits.discard_zeroes_data = 0;
--	queue_flag_set_unlocked(QUEUE_FLAG_DISCARD, zram->disk->queue);
-+		blk_queue_max_write_zeroes_sectors(zram->disk->queue, UINT_MAX);
- 
- 	add_disk(zram->disk);
- 
+ 	queue_flag_set_unlocked(QUEUE_FLAG_DISCARD, q);
+ 	blk_queue_max_discard_sectors(q, max_discard);
+-	if (card->erased_byte == 0 && !mmc_can_discard(card))
+-		q->limits.discard_zeroes_data = 1;
+ 	q->limits.discard_granularity = card->pref_erase << 9;
+ 	/* granularity must not be greater than max. discard */
+ 	if (card->pref_erase > max_discard)
 -- 
 2.11.0
