@@ -1,225 +1,71 @@
-Return-Path: <BATV+250fd2a736c995bcc4cb+4957+infradead.org+hch@bombadil.srs.infradead.org>
+Return-Path: <BATV+f1fc5bea56d51e2fc981+4960+infradead.org+hch@bombadil.srs.infradead.org>
 From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: Bart.VanAssche@sandisk.com,
-	linux-block@vger.kernel.org
-Subject: [PATCH 2/4] blk-mq: merge mq and sq make_request instances
-Date: Mon, 20 Mar 2017 16:39:28 -0400
-Message-Id: <20170320203930.12533-3-hch@lst.de>
-In-Reply-To: <20170320203930.12533-1-hch@lst.de>
-References: <20170320203930.12533-1-hch@lst.de>
+To: axboe@kernel.dk,
+	martin.petersen@oracle.com,
+	agk@redhat.com,
+	snitzer@redhat.com,
+	shli@kernel.org,
+	philipp.reisner@linbit.com,
+	lars.ellenberg@linbit.com
+Cc: linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	drbd-dev@lists.linbit.com,
+	dm-devel@redhat.com,
+	linux-raid@vger.kernel.org
+Subject: [PATCH 14/23] zram: implement REQ_OP_WRITE_ZEROES
+Date: Thu, 23 Mar 2017 10:33:32 -0400
+Message-Id: <20170323143341.31549-15-hch@lst.de>
+In-Reply-To: <20170323143341.31549-1-hch@lst.de>
+References: <20170323143341.31549-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-They are mostly the same code anyway - this just one small conditional
-for the plug case that is different for both variants.
+Just the same as discard if the block size equals the system page size.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-mq.c | 164 +++++++++++----------------------------------------------
- 1 file changed, 31 insertions(+), 133 deletions(-)
+ drivers/block/zram/zram_drv.c | 13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index acf0ddf4af52..53e49a3f6f0a 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1478,11 +1478,6 @@ static void blk_mq_try_issue_directly(struct request *rq, blk_qc_t *cookie)
- 	blk_mq_sched_insert_request(rq, false, true, true, false);
- }
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index dceb5edd1e54..1710b06f04a7 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -829,10 +829,14 @@ static void __zram_make_request(struct zram *zram, struct bio *bio)
+ 	offset = (bio->bi_iter.bi_sector &
+ 		  (SECTORS_PER_PAGE - 1)) << SECTOR_SHIFT;
  
--/*
-- * Multiple hardware queue variant. This will not use per-process plugs,
-- * but will attempt to bypass the hctx queueing if we can go straight to
-- * hardware for SYNC IO.
-- */
- static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
- {
- 	const int is_sync = op_is_sync(bio->bi_opf);
-@@ -1534,7 +1529,36 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
+-	if (unlikely(bio_op(bio) == REQ_OP_DISCARD)) {
++	switch (bio_op(bio)) {
++	case REQ_OP_DISCARD:
++	case REQ_OP_WRITE_ZEROES:
+ 		zram_bio_discard(zram, index, offset, bio);
+ 		bio_endio(bio);
+ 		return;
++	default:
++		break;
  	}
  
- 	plug = current->plug;
--	if (((plug && !blk_queue_nomerges(q)) || is_sync)) {
-+	if (plug && q->nr_hw_queues == 1) {
-+		struct request *last = NULL;
+ 	bio_for_each_segment(bvec, bio, iter) {
+@@ -1192,6 +1196,8 @@ static int zram_add(void)
+ 	zram->disk->queue->limits.max_sectors = SECTORS_PER_PAGE;
+ 	zram->disk->queue->limits.chunk_sectors = 0;
+ 	blk_queue_max_discard_sectors(zram->disk->queue, UINT_MAX);
++	queue_flag_set_unlocked(QUEUE_FLAG_DISCARD, zram->disk->queue);
 +
-+		blk_mq_bio_to_request(rq, bio);
-+
-+		/*
-+		 * @request_count may become stale because of schedule
-+		 * out, so check the list again.
-+		 */
-+		if (list_empty(&plug->mq_list))
-+			request_count = 0;
-+		else if (blk_queue_nomerges(q))
-+			request_count = blk_plug_queued_count(q);
-+
-+		if (!request_count)
-+			trace_block_plug(q);
-+		else
-+			last = list_entry_rq(plug->mq_list.prev);
-+
-+		blk_mq_put_ctx(data.ctx);
-+
-+		if (request_count >= BLK_MAX_REQUEST_COUNT || (last &&
-+		    blk_rq_bytes(last) >= BLK_PLUG_FLUSH_SIZE)) {
-+			blk_flush_plug_list(plug, false);
-+			trace_block_plug(q);
-+		}
-+
-+		list_add_tail(&rq->queuelist, &plug->mq_list);
-+		goto done;
-+	} else if (((plug && !blk_queue_nomerges(q)) || is_sync)) {
- 		struct request *old_rq = NULL;
- 
- 		blk_mq_bio_to_request(rq, bio);
-@@ -1596,119 +1620,6 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
- 	return cookie;
- }
- 
--/*
-- * Single hardware queue variant. This will attempt to use any per-process
-- * plug for merging and IO deferral.
-- */
--static blk_qc_t blk_sq_make_request(struct request_queue *q, struct bio *bio)
--{
--	const int is_sync = op_is_sync(bio->bi_opf);
--	const int is_flush_fua = op_is_flush(bio->bi_opf);
--	struct blk_plug *plug;
--	unsigned int request_count = 0;
--	struct blk_mq_alloc_data data = { .flags = 0 };
--	struct request *rq;
--	blk_qc_t cookie;
--	unsigned int wb_acct;
--
--	blk_queue_bounce(q, &bio);
--
--	if (bio_integrity_enabled(bio) && bio_integrity_prep(bio)) {
--		bio_io_error(bio);
--		return BLK_QC_T_NONE;
--	}
--
--	blk_queue_split(q, &bio, q->bio_split);
--
--	if (!is_flush_fua && !blk_queue_nomerges(q)) {
--		if (blk_attempt_plug_merge(q, bio, &request_count, NULL))
--			return BLK_QC_T_NONE;
--	} else
--		request_count = blk_plug_queued_count(q);
--
--	if (blk_mq_sched_bio_merge(q, bio))
--		return BLK_QC_T_NONE;
--
--	wb_acct = wbt_wait(q->rq_wb, bio, NULL);
--
--	trace_block_getrq(q, bio, bio->bi_opf);
--
--	rq = blk_mq_sched_get_request(q, bio, bio->bi_opf, &data);
--	if (unlikely(!rq)) {
--		__wbt_done(q->rq_wb, wb_acct);
--		return BLK_QC_T_NONE;
--	}
--
--	wbt_track(&rq->issue_stat, wb_acct);
--
--	cookie = request_to_qc_t(data.hctx, rq);
--
--	if (unlikely(is_flush_fua)) {
--		if (q->elevator)
--			goto elv_insert;
--		blk_mq_bio_to_request(rq, bio);
--		blk_insert_flush(rq);
--		goto run_queue;
--	}
--
--	/*
--	 * A task plug currently exists. Since this is completely lockless,
--	 * utilize that to temporarily store requests until the task is
--	 * either done or scheduled away.
--	 */
--	plug = current->plug;
--	if (plug) {
--		struct request *last = NULL;
--
--		blk_mq_bio_to_request(rq, bio);
--
--		/*
--		 * @request_count may become stale because of schedule
--		 * out, so check the list again.
--		 */
--		if (list_empty(&plug->mq_list))
--			request_count = 0;
--		if (!request_count)
--			trace_block_plug(q);
--		else
--			last = list_entry_rq(plug->mq_list.prev);
--
--		blk_mq_put_ctx(data.ctx);
--
--		if (request_count >= BLK_MAX_REQUEST_COUNT || (last &&
--		    blk_rq_bytes(last) >= BLK_PLUG_FLUSH_SIZE)) {
--			blk_flush_plug_list(plug, false);
--			trace_block_plug(q);
--		}
--
--		list_add_tail(&rq->queuelist, &plug->mq_list);
--		return cookie;
--	}
--
--	if (q->elevator) {
--elv_insert:
--		blk_mq_put_ctx(data.ctx);
--		blk_mq_bio_to_request(rq, bio);
--		blk_mq_sched_insert_request(rq, false, true,
--						!is_sync || is_flush_fua, true);
--		goto done;
--	}
--	if (!blk_mq_merge_queue_io(data.hctx, data.ctx, rq, bio)) {
--		/*
--		 * For a SYNC request, send it to the hardware immediately. For
--		 * an ASYNC request, just ensure that we run it later on. The
--		 * latter allows for merging opportunities and more efficient
--		 * dispatching.
--		 */
--run_queue:
--		blk_mq_run_hw_queue(data.hctx, !is_sync || is_flush_fua);
--	}
--
--	blk_mq_put_ctx(data.ctx);
--done:
--	return cookie;
--}
--
- void blk_mq_free_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
- 		     unsigned int hctx_idx)
- {
-@@ -2366,10 +2277,7 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
- 	INIT_LIST_HEAD(&q->requeue_list);
- 	spin_lock_init(&q->requeue_lock);
- 
--	if (q->nr_hw_queues > 1)
--		blk_queue_make_request(q, blk_mq_make_request);
--	else
--		blk_queue_make_request(q, blk_sq_make_request);
-+	blk_queue_make_request(q, blk_mq_make_request);
- 
  	/*
- 	 * Do this after blk_queue_make_request() overrides it...
-@@ -2717,16 +2625,6 @@ void blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set, int nr_hw_queues)
- 	set->nr_hw_queues = nr_hw_queues;
- 	list_for_each_entry(q, &set->tag_list, tag_set_list) {
- 		blk_mq_realloc_hw_ctxs(set, q);
--
--		/*
--		 * Manually set the make_request_fn as blk_queue_make_request
--		 * resets a lot of the queue settings.
--		 */
--		if (q->nr_hw_queues > 1)
--			q->make_request_fn = blk_mq_make_request;
--		else
--			q->make_request_fn = blk_sq_make_request;
--
- 		blk_mq_queue_reinit(q, cpu_online_mask);
- 	}
+ 	 * zram_bio_discard() will clear all logical blocks if logical block
+ 	 * size is identical with physical block size(PAGE_SIZE). But if it is
+@@ -1201,10 +1207,7 @@ static int zram_add(void)
+ 	 * zeroed.
+ 	 */
+ 	if (ZRAM_LOGICAL_BLOCK_SIZE == PAGE_SIZE)
+-		zram->disk->queue->limits.discard_zeroes_data = 1;
+-	else
+-		zram->disk->queue->limits.discard_zeroes_data = 0;
+-	queue_flag_set_unlocked(QUEUE_FLAG_DISCARD, zram->disk->queue);
++		blk_queue_max_write_zeroes_sectors(zram->disk->queue, UINT_MAX);
+ 
+ 	add_disk(zram->disk);
  
 -- 
 2.11.0
