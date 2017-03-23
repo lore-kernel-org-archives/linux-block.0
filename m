@@ -1,98 +1,66 @@
-Return-Path: <rgoldwyn@suse.de>
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-To: linux-fsdevel@vger.kernel.org
-Cc: jack@suse.com,
-	hch@infradead.org,
-	linux-block@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	sagi@grimberg.me,
-	avi@scylladb.com,
-	axboe@kernel.dk,
-	linux-api@vger.kernel.org,
-	willy@infradead.org,
-	Goldwyn Rodrigues <rgoldwyn@suse.com>
-Subject: [PATCH 8/8] nowait aio: btrfs
-Date: Wed, 15 Mar 2017 16:51:07 -0500
-Message-Id: <20170315215107.5628-9-rgoldwyn@suse.de>
-In-Reply-To: <20170315215107.5628-1-rgoldwyn@suse.de>
-References: <20170315215107.5628-1-rgoldwyn@suse.de>
+Return-Path: <BATV+f1fc5bea56d51e2fc981+4960+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk,
+	martin.petersen@oracle.com,
+	agk@redhat.com,
+	snitzer@redhat.com,
+	shli@kernel.org,
+	philipp.reisner@linbit.com,
+	lars.ellenberg@linbit.com
+Cc: linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	drbd-dev@lists.linbit.com,
+	dm-devel@redhat.com,
+	linux-raid@vger.kernel.org
+Subject: [PATCH 02/23] block: implement splitting of REQ_OP_WRITE_ZEROES bios
+Date: Thu, 23 Mar 2017 10:33:20 -0400
+Message-Id: <20170323143341.31549-3-hch@lst.de>
+In-Reply-To: <20170323143341.31549-1-hch@lst.de>
+References: <20170323143341.31549-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Goldwyn Rodrigues <rgoldwyn@suse.com>
+Copy and past the REQ_OP_WRITE_SAME code to prepare to implementations
+that limit the write zeroes size.
 
-Return EAGAIN if any of the following checks fail
- + i_rwsem is not lockable
- + NODATACOW or PREALLOC is not set
- + Cannot nocow at the desired location
- + Writing beyond end of file which is not allocated
-
-Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- fs/btrfs/file.c  | 25 ++++++++++++++++++++-----
- fs/btrfs/inode.c |  3 +++
- 2 files changed, 23 insertions(+), 5 deletions(-)
+ block/blk-merge.c | 17 +++++++++++++++--
+ 1 file changed, 15 insertions(+), 2 deletions(-)
 
-diff --git a/fs/btrfs/file.c b/fs/btrfs/file.c
-index 520cb72..a870e5d 100644
---- a/fs/btrfs/file.c
-+++ b/fs/btrfs/file.c
-@@ -1823,12 +1823,29 @@ static ssize_t btrfs_file_write_iter(struct kiocb *iocb,
- 	ssize_t num_written = 0;
- 	bool sync = (file->f_flags & O_DSYNC) || IS_SYNC(file->f_mapping->host);
- 	ssize_t err;
--	loff_t pos;
--	size_t count;
-+	loff_t pos = iocb->ki_pos;
-+	size_t count = iov_iter_count(from);
- 	loff_t oldsize;
- 	int clean_page = 0;
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index c62a6f0325e0..f9e5a3e0944b 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -63,6 +63,20 @@ static struct bio *blk_bio_discard_split(struct request_queue *q,
+ 	return bio_split(bio, split_sectors, GFP_NOIO, bs);
+ }
  
--	inode_lock(inode);
-+	if ((iocb->ki_flags & IOCB_NOWAIT) &&
-+			(iocb->ki_flags & IOCB_DIRECT)) {
-+		/* Don't sleep on inode rwsem */
-+		if (!inode_trylock(inode))
-+			return -EAGAIN;
-+		/*
-+		 * We will allocate space in case nodatacow is not set,
-+		 * so bail
-+		 */
-+		if (!(BTRFS_I(inode)->flags & (BTRFS_INODE_NODATACOW |
-+					      BTRFS_INODE_PREALLOC)) ||
-+		    check_can_nocow(BTRFS_I(inode), pos, &count) <= 0) {
-+			inode_unlock(inode);
-+			return -EAGAIN;
-+		}
-+	} else
-+		inode_lock(inode);
++static struct bio *blk_bio_write_zeroes_split(struct request_queue *q,
++		struct bio *bio, struct bio_set *bs, unsigned *nsegs)
++{
++	*nsegs = 1;
 +
- 	err = generic_write_checks(iocb, from);
- 	if (err <= 0) {
- 		inode_unlock(inode);
-@@ -1862,8 +1879,6 @@ static ssize_t btrfs_file_write_iter(struct kiocb *iocb,
- 	 */
- 	update_time_for_write(inode);
- 
--	pos = iocb->ki_pos;
--	count = iov_iter_count(from);
- 	start_pos = round_down(pos, fs_info->sectorsize);
- 	oldsize = i_size_read(inode);
- 	if (start_pos > oldsize) {
-diff --git a/fs/btrfs/inode.c b/fs/btrfs/inode.c
-index c40060c..788bb93 100644
---- a/fs/btrfs/inode.c
-+++ b/fs/btrfs/inode.c
-@@ -8613,6 +8613,9 @@ static ssize_t btrfs_direct_IO(struct kiocb *iocb, struct iov_iter *iter)
- 			dio_data.overwrite = 1;
- 			inode_unlock(inode);
- 			relock = true;
-+		} else if (iocb->ki_flags & IOCB_NOWAIT) {
-+			ret = -EAGAIN;
-+			goto out;
- 		}
- 		ret = btrfs_delalloc_reserve_space(inode, offset, count);
- 		if (ret)
++	if (!q->limits.max_write_zeroes_sectors)
++		return NULL;
++
++	if (bio_sectors(bio) <= q->limits.max_write_zeroes_sectors)
++		return NULL;
++
++	return bio_split(bio, q->limits.max_write_zeroes_sectors, GFP_NOIO, bs);
++}
++
+ static struct bio *blk_bio_write_same_split(struct request_queue *q,
+ 					    struct bio *bio,
+ 					    struct bio_set *bs,
+@@ -209,8 +223,7 @@ void blk_queue_split(struct request_queue *q, struct bio **bio,
+ 		split = blk_bio_discard_split(q, *bio, bs, &nsegs);
+ 		break;
+ 	case REQ_OP_WRITE_ZEROES:
+-		split = NULL;
+-		nsegs = (*bio)->bi_phys_segments;
++		split = blk_bio_write_zeroes_split(q, *bio, bs, &nsegs);
+ 		break;
+ 	case REQ_OP_WRITE_SAME:
+ 		split = blk_bio_write_same_split(q, *bio, bs, &nsegs);
 -- 
-2.10.2
+2.11.0
