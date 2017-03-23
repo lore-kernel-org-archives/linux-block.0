@@ -1,181 +1,88 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>,
-	Tejun Heo <tj@kernel.org>
-Cc: Fabio Checconi <fchecconi@gmail.com>,
-	Arianna Avanzini <avanzini.arianna@gmail.com>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	linus.walleij@linaro.org,
-	broonie@kernel.org,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH V2 09/16] block, bfq: reduce latency during request-pool saturation
-Date: Fri, 31 Mar 2017 14:47:36 +0200
-Message-Id: <20170331124743.3530-10-paolo.valente@linaro.org>
-In-Reply-To: <20170331124743.3530-1-paolo.valente@linaro.org>
-References: <20170331124743.3530-1-paolo.valente@linaro.org>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:57018 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752945AbdCWAhM (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 22 Mar 2017 20:37:12 -0400
+From: Jan Kara <jack@suse.cz>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
+        Tejun Heo <tj@kernel.org>, Tahsin Erdogan <tahsin@google.com>,
+        Omar Sandoval <osandov@osandov.com>, Jan Kara <jack@suse.cz>
+Subject: [PATCH 10/10] block: Fix oops scsi_disk_get()
+Date: Thu, 23 Mar 2017 01:37:02 +0100
+Message-Id: <20170323003702.27571-11-jack@suse.cz>
+In-Reply-To: <20170323003702.27571-1-jack@suse.cz>
+References: <20170323003702.27571-1-jack@suse.cz>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This patch introduces an heuristic that reduces latency when the
-I/O-request pool is saturated. This goal is achieved by disabling
-device idling, for non-weight-raised queues, when there are weight-
-raised queues with pending or in-flight requests. In fact, as
-explained in more detail in the comment on the function
-bfq_bfqq_may_idle(), this reduces the rate at which processes
-associated with non-weight-raised queues grab requests from the pool,
-thereby increasing the probability that processes associated with
-weight-raised queues get a request immediately (or at least soon) when
-they need one. Along the same line, if there are weight-raised queues,
-then this patch halves the service rate of async (write) requests for
-non-weight-raised queues.
+When device open races with device shutdown, we can get the following
+oops in scsi_disk_get():
 
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
-Signed-off-by: Arianna Avanzini <avanzini.arianna@gmail.com>
+[11863.044351] general protection fault: 0000 [#1] SMP
+[11863.045561] Modules linked in: scsi_debug xfs libcrc32c netconsole btrfs raid6_pq zlib_deflate lzo_compress xor [last unloaded: loop]
+[11863.047853] CPU: 3 PID: 13042 Comm: hald-probe-stor Tainted: G W      4.10.0-rc2-xen+ #35
+[11863.048030] Hardware name: Bochs Bochs, BIOS Bochs 01/01/2011
+[11863.048030] task: ffff88007f438200 task.stack: ffffc90000fd0000
+[11863.048030] RIP: 0010:scsi_disk_get+0x43/0x70
+[11863.048030] RSP: 0018:ffffc90000fd3a08 EFLAGS: 00010202
+[11863.048030] RAX: 6b6b6b6b6b6b6b6b RBX: ffff88007f56d000 RCX: 0000000000000000
+[11863.048030] RDX: 0000000000000001 RSI: 0000000000000004 RDI: ffffffff81a8d880
+[11863.048030] RBP: ffffc90000fd3a18 R08: 0000000000000000 R09: 0000000000000001
+[11863.059217] R10: 0000000000000000 R11: 0000000000000000 R12: 00000000fffffffa
+[11863.059217] R13: ffff880078872800 R14: ffff880070915540 R15: 000000000000001d
+[11863.059217] FS:  00007f2611f71800(0000) GS:ffff88007f0c0000(0000) knlGS:0000000000000000
+[11863.059217] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[11863.059217] CR2: 000000000060e048 CR3: 00000000778d4000 CR4: 00000000000006e0
+[11863.059217] Call Trace:
+[11863.059217]  ? disk_get_part+0x22/0x1f0
+[11863.059217]  sd_open+0x39/0x130
+[11863.059217]  __blkdev_get+0x69/0x430
+[11863.059217]  ? bd_acquire+0x7f/0xc0
+[11863.059217]  ? bd_acquire+0x96/0xc0
+[11863.059217]  ? blkdev_get+0x350/0x350
+[11863.059217]  blkdev_get+0x126/0x350
+[11863.059217]  ? _raw_spin_unlock+0x2b/0x40
+[11863.059217]  ? bd_acquire+0x7f/0xc0
+[11863.059217]  ? blkdev_get+0x350/0x350
+[11863.059217]  blkdev_open+0x65/0x80
+...
+
+As you can see RAX value is already poisoned showing that gendisk we got
+is already freed. The problem is that get_gendisk() looks up device
+number in ext_devt_idr and then does get_disk() which does kobject_get()
+on the disks kobject. However the disk gets removed from ext_devt_idr
+only in disk_release() (through blk_free_devt()) at which moment it has
+already 0 refcount and is already on its way to be freed. Indeed we've
+got a warning from kobject_get() about 0 refcount shortly before the
+oops.
+
+We fix the problem by using kobject_get_unless_zero() in get_disk() so
+that get_disk() cannot get reference on a disk that is already being
+freed.
+
+Tested-by: Lekshmi Pillai <lekshmicpillai@in.ibm.com>
+Reviewed-by: Bart Van Assche <bart.vanassche@sandisk.com>
+Acked-by: Tejun Heo <tj@kernel.org>
+Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- block/bfq-iosched.c | 66 ++++++++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 63 insertions(+), 3 deletions(-)
+ block/genhd.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index c43a737..7536b8a 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -420,6 +420,8 @@ struct bfq_data {
- 	 * queue in service, even if it is idling).
- 	 */
- 	int busy_queues;
-+	/* number of weight-raised busy @bfq_queues */
-+	int wr_busy_queues;
- 	/* number of queued requests */
- 	int queued;
- 	/* number of requests dispatched and waiting for completion */
-@@ -2490,6 +2492,9 @@ static void bfq_del_bfqq_busy(struct bfq_data *bfqd, struct bfq_queue *bfqq,
- 
- 	bfqd->busy_queues--;
- 
-+	if (bfqq->wr_coeff > 1)
-+		bfqd->wr_busy_queues--;
-+
- 	bfqg_stats_update_dequeue(bfqq_group(bfqq));
- 
- 	bfq_deactivate_bfqq(bfqd, bfqq, true, expiration);
-@@ -2506,6 +2511,9 @@ static void bfq_add_bfqq_busy(struct bfq_data *bfqd, struct bfq_queue *bfqq)
- 
- 	bfq_mark_bfqq_busy(bfqq);
- 	bfqd->busy_queues++;
-+
-+	if (bfqq->wr_coeff > 1)
-+		bfqd->wr_busy_queues++;
- }
- 
- #ifdef CONFIG_BFQ_GROUP_IOSCHED
-@@ -3779,7 +3787,16 @@ static unsigned long bfq_serv_to_charge(struct request *rq,
- 	if (bfq_bfqq_sync(bfqq) || bfqq->wr_coeff > 1)
- 		return blk_rq_sectors(rq);
- 
--	return blk_rq_sectors(rq) * bfq_async_charge_factor;
-+	/*
-+	 * If there are no weight-raised queues, then amplify service
-+	 * by just the async charge factor; otherwise amplify service
-+	 * by twice the async charge factor, to further reduce latency
-+	 * for weight-raised queues.
-+	 */
-+	if (bfqq->bfqd->wr_busy_queues == 0)
-+		return blk_rq_sectors(rq) * bfq_async_charge_factor;
-+
-+	return blk_rq_sectors(rq) * 2 * bfq_async_charge_factor;
- }
- 
- /**
-@@ -4234,6 +4251,7 @@ static void bfq_add_request(struct request *rq)
- 			bfqq->wr_coeff = bfqd->bfq_wr_coeff;
- 			bfqq->wr_cur_max_time = bfq_wr_duration(bfqd);
- 
-+			bfqd->wr_busy_queues++;
- 			bfqq->entity.prio_changed = 1;
- 		}
- 		if (prev != bfqq->next_rq)
-@@ -4474,6 +4492,8 @@ static void bfq_requests_merged(struct request_queue *q, struct request *rq,
- /* Must be called with bfqq != NULL */
- static void bfq_bfqq_end_wr(struct bfq_queue *bfqq)
- {
-+	if (bfq_bfqq_busy(bfqq))
-+		bfqq->bfqd->wr_busy_queues--;
- 	bfqq->wr_coeff = 1;
- 	bfqq->wr_cur_max_time = 0;
- 	bfqq->last_wr_start_finish = jiffies;
-@@ -5497,7 +5517,8 @@ static bool bfq_may_expire_for_budg_timeout(struct bfq_queue *bfqq)
- static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
- {
- 	struct bfq_data *bfqd = bfqq->bfqd;
--	bool idling_boosts_thr, asymmetric_scenario;
-+	bool idling_boosts_thr, idling_boosts_thr_without_issues,
-+		asymmetric_scenario;
- 
- 	if (bfqd->strict_guarantees)
- 		return true;
-@@ -5520,6 +5541,44 @@ static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
- 	idling_boosts_thr = !bfqd->hw_tag || bfq_bfqq_IO_bound(bfqq);
- 
- 	/*
-+	 * The value of the next variable,
-+	 * idling_boosts_thr_without_issues, is equal to that of
-+	 * idling_boosts_thr, unless a special case holds. In this
-+	 * special case, described below, idling may cause problems to
-+	 * weight-raised queues.
-+	 *
-+	 * When the request pool is saturated (e.g., in the presence
-+	 * of write hogs), if the processes associated with
-+	 * non-weight-raised queues ask for requests at a lower rate,
-+	 * then processes associated with weight-raised queues have a
-+	 * higher probability to get a request from the pool
-+	 * immediately (or at least soon) when they need one. Thus
-+	 * they have a higher probability to actually get a fraction
-+	 * of the device throughput proportional to their high
-+	 * weight. This is especially true with NCQ-capable drives,
-+	 * which enqueue several requests in advance, and further
-+	 * reorder internally-queued requests.
-+	 *
-+	 * For this reason, we force to false the value of
-+	 * idling_boosts_thr_without_issues if there are weight-raised
-+	 * busy queues. In this case, and if bfqq is not weight-raised,
-+	 * this guarantees that the device is not idled for bfqq (if,
-+	 * instead, bfqq is weight-raised, then idling will be
-+	 * guaranteed by another variable, see below). Combined with
-+	 * the timestamping rules of BFQ (see [1] for details), this
-+	 * behavior causes bfqq, and hence any sync non-weight-raised
-+	 * queue, to get a lower number of requests served, and thus
-+	 * to ask for a lower number of requests from the request
-+	 * pool, before the busy weight-raised queues get served
-+	 * again. This often mitigates starvation problems in the
-+	 * presence of heavy write workloads and NCQ, thereby
-+	 * guaranteeing a higher application and system responsiveness
-+	 * in these hostile scenarios.
-+	 */
-+	idling_boosts_thr_without_issues = idling_boosts_thr &&
-+		bfqd->wr_busy_queues == 0;
-+
-+	/*
- 	 * There is then a case where idling must be performed not for
- 	 * throughput concerns, but to preserve service guarantees. To
- 	 * introduce it, we can note that allowing the drive to
-@@ -5593,7 +5652,7 @@ static bool bfq_bfqq_may_idle(struct bfq_queue *bfqq)
- 	 *    is necessary to preserve service guarantees.
- 	 */
- 	return bfq_bfqq_sync(bfqq) &&
--		(idling_boosts_thr || asymmetric_scenario);
-+		(idling_boosts_thr_without_issues || asymmetric_scenario);
- }
- 
- /*
-@@ -6801,6 +6860,7 @@ static int bfq_init_queue(struct request_queue *q, struct elevator_type *e)
- 					      * high-definition compressed
- 					      * video.
- 					      */
-+	bfqd->wr_busy_queues = 0;
- 
- 	/*
- 	 * Begin by assuming, optimistically, that the device is a
+diff --git a/block/genhd.c b/block/genhd.c
+index a9c516a8b37d..510aac1486cb 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -1352,7 +1352,7 @@ struct kobject *get_disk(struct gendisk *disk)
+ 	owner = disk->fops->owner;
+ 	if (owner && !try_module_get(owner))
+ 		return NULL;
+-	kobj = kobject_get(&disk_to_dev(disk)->kobj);
++	kobj = kobject_get_unless_zero(&disk_to_dev(disk)->kobj);
+ 	if (kobj == NULL) {
+ 		module_put(owner);
+ 		return NULL;
 -- 
-2.10.0
+2.10.2
