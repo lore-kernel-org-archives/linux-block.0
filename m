@@ -1,27 +1,67 @@
-Return-Path: <BATV+250fd2a736c995bcc4cb+4957+infradead.org+hch@bombadil.srs.infradead.org>
+Return-Path: <BATV+f1fc5bea56d51e2fc981+4960+infradead.org+hch@bombadil.srs.infradead.org>
 From: Christoph Hellwig <hch@lst.de>
-To: tj@kernel.org,
+To: axboe@kernel.dk,
 	martin.petersen@oracle.com,
-	axboe@kernel.dk
-Cc: linux-ide@vger.kernel.org,
+	agk@redhat.com,
+	snitzer@redhat.com,
+	shli@kernel.org,
+	philipp.reisner@linbit.com,
+	lars.ellenberg@linbit.com
+Cc: linux-block@vger.kernel.org,
 	linux-scsi@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: support ranges TRIM for libata
-Date: Mon, 20 Mar 2017 16:43:12 -0400
-Message-Id: <20170320204319.12628-1-hch@lst.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+	drbd-dev@lists.linbit.com,
+	dm-devel@redhat.com,
+	linux-raid@vger.kernel.org
+Subject: [PATCH 15/23] loop: implement REQ_OP_WRITE_ZEROES
+Date: Thu, 23 Mar 2017 10:33:33 -0400
+Message-Id: <20170323143341.31549-16-hch@lst.de>
+In-Reply-To: <20170323143341.31549-1-hch@lst.de>
+References: <20170323143341.31549-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-This series implements rangeѕ discard for ATA SSDs.  Compared to the
-initial NVMe support there are two things that complicate the ATA
-support:
+It's identical to discard as hole punches will always leave us with
+zeroes on reads.
 
- - ATA only suports 16-bit long ranges
- - the whole mess of generating a SCSI command first and then
-   translating it to an ATA one.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/block/loop.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-This series adds support for limited range size to the block layer,
-and stops translating discard commands - instead we add a new
-Vendor Specific SCSI command that contains the TRIM payload when
-the device asks for it.
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 0ecb6461ed81..265cd2e33ff0 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -528,6 +528,7 @@ static int do_req_filebacked(struct loop_device *lo, struct request *rq)
+ 	case REQ_OP_FLUSH:
+ 		return lo_req_flush(lo, rq);
+ 	case REQ_OP_DISCARD:
++	case REQ_OP_WRITE_ZEROES:
+ 		return lo_discard(lo, rq, pos);
+ 	case REQ_OP_WRITE:
+ 		if (lo->transfer)
+@@ -826,6 +827,7 @@ static void loop_config_discard(struct loop_device *lo)
+ 		q->limits.discard_granularity = 0;
+ 		q->limits.discard_alignment = 0;
+ 		blk_queue_max_discard_sectors(q, 0);
++		blk_queue_max_write_zeroes_sectors(q, 0);
+ 		q->limits.discard_zeroes_data = 0;
+ 		queue_flag_clear_unlocked(QUEUE_FLAG_DISCARD, q);
+ 		return;
+@@ -834,6 +836,7 @@ static void loop_config_discard(struct loop_device *lo)
+ 	q->limits.discard_granularity = inode->i_sb->s_blocksize;
+ 	q->limits.discard_alignment = 0;
+ 	blk_queue_max_discard_sectors(q, UINT_MAX >> 9);
++	blk_queue_max_write_zeroes_sectors(q, UINT_MAX >> 9);
+ 	q->limits.discard_zeroes_data = 1;
+ 	queue_flag_set_unlocked(QUEUE_FLAG_DISCARD, q);
+ }
+@@ -1660,6 +1663,7 @@ static int loop_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 	switch (req_op(cmd->rq)) {
+ 	case REQ_OP_FLUSH:
+ 	case REQ_OP_DISCARD:
++	case REQ_OP_WRITE_ZEROES:
+ 		cmd->use_aio = false;
+ 		break;
+ 	default:
+-- 
+2.11.0
