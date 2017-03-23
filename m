@@ -1,71 +1,156 @@
-Return-Path: <Bart.VanAssche@sandisk.com>
-From: Bart Van Assche <Bart.VanAssche@sandisk.com>
-To: "agk@redhat.com" <agk@redhat.com>, "lars.ellenberg@linbit.com"
-	<lars.ellenberg@linbit.com>, "snitzer@redhat.com" <snitzer@redhat.com>,
-	"hch@lst.de" <hch@lst.de>, "martin.petersen@oracle.com"
-	<martin.petersen@oracle.com>, "philipp.reisner@linbit.com"
-	<philipp.reisner@linbit.com>, "axboe@kernel.dk" <axboe@kernel.dk>,
-	"shli@kernel.org" <shli@kernel.org>
-CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-	"dm-devel@redhat.com" <dm-devel@redhat.com>, "drbd-dev@lists.linbit.com"
-	<drbd-dev@lists.linbit.com>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "linux-raid@vger.kernel.org"
-	<linux-raid@vger.kernel.org>
-Subject: Re: [PATCH 03/23] sd: implement REQ_OP_WRITE_ZEROES
-Date: Tue, 28 Mar 2017 18:50:01 +0000
-Message-ID: <1490726988.2573.16.camel@sandisk.com>
+Return-Path: <BATV+f1fc5bea56d51e2fc981+4960+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk,
+	martin.petersen@oracle.com,
+	agk@redhat.com,
+	snitzer@redhat.com,
+	shli@kernel.org,
+	philipp.reisner@linbit.com,
+	lars.ellenberg@linbit.com
+Cc: linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	drbd-dev@lists.linbit.com,
+	dm-devel@redhat.com,
+	linux-raid@vger.kernel.org
+Subject: [PATCH 03/23] sd: implement REQ_OP_WRITE_ZEROES
+Date: Thu, 23 Mar 2017 10:33:21 -0400
+Message-Id: <20170323143341.31549-4-hch@lst.de>
+In-Reply-To: <20170323143341.31549-1-hch@lst.de>
 References: <20170323143341.31549-1-hch@lst.de>
-	 <20170323143341.31549-4-hch@lst.de>
-In-Reply-To: <20170323143341.31549-4-hch@lst.de>
-Content-Type: text/plain; charset="iso-8859-1"
-MIME-Version: 1.0
-Return-Path: Bart.VanAssche@sandisk.com
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, 2017-03-23 at 10:33 -0400, Christoph Hellwig wrote:
-> diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
-> index af632e350ab4..b6f70a09a301 100644
-> --- a/drivers/scsi/sd.c
-> +++ b/drivers/scsi/sd.c
-> @@ -748,7 +748,7 @@ static int sd_setup_unmap_cmnd(struct scsi_cmnd *cmd)
->  	return scsi_init_io(cmd);
->  }
-> =20
-> -static int sd_setup_write_same16_cmnd(struct scsi_cmnd *cmd)
-> +static int sd_setup_write_same16_cmnd(struct scsi_cmnd *cmd, bool unmap)
->  {
->  	struct scsi_device *sdp =3D cmd->device;
->  	struct request *rq =3D cmd->request;
-> @@ -765,13 +765,14 @@ static int sd_setup_write_same16_cmnd(struct scsi_c=
-mnd *cmd)
-> =20
->  	cmd->cmd_len =3D 16;
->  	cmd->cmnd[0] =3D WRITE_SAME_16;
-> -	cmd->cmnd[1] =3D 0x8; /* UNMAP */
-> +	if (unmap)
-> +		cmd->cmnd[1] =3D 0x8; /* UNMAP */
->  	put_unaligned_be64(sector, &cmd->cmnd[2]);
->  	put_unaligned_be32(nr_sectors, &cmd->cmnd[10]);
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/scsi/sd.c     | 45 ++++++++++++++++++++++++++++++++++++++++-----
+ drivers/scsi/sd_zbc.c |  1 +
+ 2 files changed, 41 insertions(+), 5 deletions(-)
 
-Hello Christoph,
-
-A quote from SBC: "An OPTIMAL UNMAP GRANULARITY field set to a non-zero val=
-ue
-indicates the optimal granularity in logical blocks for unmap requests (e.g=
-.,
-an UNMAP command or a WRITE SAME (16) command with the UNMAP bit set to one=
-).
-An unmap request with a number of logical blocks that is not a multiple of
-this value may result in unmap operations on fewer LBAs than requested."
-
-This means that just like the start and end of a discard must be aligned on=
- a
-discard_granularity boundary, WRITE SAME commands with the UNMAP bit set mu=
-st
-also respect that granularity. I think this means that either
-__blkdev_issue_zeroout() has to be modified such that it rejects unaligned
-REQ_OP_WRITE_ZEROES operations or that blk_bio_write_same_split() has to be
-modified such that it generates REQ_OP_WRITEs for the unaligned start and t=
-ail.
-
-Bart.=
+diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
+index af632e350ab4..b6f70a09a301 100644
+--- a/drivers/scsi/sd.c
++++ b/drivers/scsi/sd.c
+@@ -748,7 +748,7 @@ static int sd_setup_unmap_cmnd(struct scsi_cmnd *cmd)
+ 	return scsi_init_io(cmd);
+ }
+ 
+-static int sd_setup_write_same16_cmnd(struct scsi_cmnd *cmd)
++static int sd_setup_write_same16_cmnd(struct scsi_cmnd *cmd, bool unmap)
+ {
+ 	struct scsi_device *sdp = cmd->device;
+ 	struct request *rq = cmd->request;
+@@ -765,13 +765,14 @@ static int sd_setup_write_same16_cmnd(struct scsi_cmnd *cmd)
+ 
+ 	cmd->cmd_len = 16;
+ 	cmd->cmnd[0] = WRITE_SAME_16;
+-	cmd->cmnd[1] = 0x8; /* UNMAP */
++	if (unmap)
++		cmd->cmnd[1] = 0x8; /* UNMAP */
+ 	put_unaligned_be64(sector, &cmd->cmnd[2]);
+ 	put_unaligned_be32(nr_sectors, &cmd->cmnd[10]);
+ 
+ 	cmd->allowed = SD_MAX_RETRIES;
+ 	cmd->transfersize = data_len;
+-	rq->timeout = SD_TIMEOUT;
++	rq->timeout = unmap ? SD_TIMEOUT : SD_WRITE_SAME_TIMEOUT;
+ 	scsi_req(rq)->resid_len = data_len;
+ 
+ 	return scsi_init_io(cmd);
+@@ -801,7 +802,7 @@ static int sd_setup_write_same10_cmnd(struct scsi_cmnd *cmd, bool unmap)
+ 
+ 	cmd->allowed = SD_MAX_RETRIES;
+ 	cmd->transfersize = data_len;
+-	rq->timeout = SD_TIMEOUT;
++	rq->timeout = unmap ? SD_TIMEOUT : SD_WRITE_SAME_TIMEOUT;
+ 	scsi_req(rq)->resid_len = data_len;
+ 
+ 	return scsi_init_io(cmd);
+@@ -857,11 +858,39 @@ static int sd_setup_ata_trim_cmnd(struct scsi_cmnd *cmd)
+ 	return scsi_init_io(cmd);
+ }
+ 
++static int sd_setup_write_zeroes_cmnd(struct scsi_cmnd *cmd)
++{
++	struct request *rq = cmd->request;
++	struct scsi_device *sdp = cmd->device;
++	struct scsi_disk *sdkp = scsi_disk(rq->rq_disk);
++	u64 sector = blk_rq_pos(rq) >> (ilog2(sdp->sector_size) - 9);
++	u32 nr_sectors = blk_rq_sectors(rq) >> (ilog2(sdp->sector_size) - 9);
++
++	if (sdp->ata_trim) {
++		if (!sdp->ata_trim_zeroes_data)
++			return BLKPREP_INVALID;
++		return sd_setup_ata_trim_cmnd(cmd);
++	}
++	if (sdp->no_write_same)
++		return BLKPREP_INVALID;
++	if (sdkp->ws16 || sector > 0xffffffff || nr_sectors > 0xffff)
++		return sd_setup_write_same16_cmnd(cmd, false);
++	return sd_setup_write_same10_cmnd(cmd, false);
++}
++
+ static void sd_config_write_same(struct scsi_disk *sdkp)
+ {
+ 	struct request_queue *q = sdkp->disk->queue;
+ 	unsigned int logical_block_size = sdkp->device->sector_size;
+ 
++	if (sdkp->device->ata_trim) {
++		if (sdkp->device->ata_trim_zeroes_data)
++			sdkp->max_ws_blocks = 65535 * (512 / sizeof(__le64));
++		else
++			sdkp->max_ws_blocks = 0;
++		goto config_write_zeroes;
++	}
++
+ 	if (sdkp->device->no_write_same) {
+ 		sdkp->max_ws_blocks = 0;
+ 		goto out;
+@@ -886,6 +915,9 @@ static void sd_config_write_same(struct scsi_disk *sdkp)
+ out:
+ 	blk_queue_max_write_same_sectors(q, sdkp->max_ws_blocks *
+ 					 (logical_block_size >> 9));
++config_write_zeroes:
++	blk_queue_max_write_zeroes_sectors(q, sdkp->max_ws_blocks *
++					 (logical_block_size >> 9));
+ }
+ 
+ /**
+@@ -1226,7 +1258,7 @@ static int sd_init_command(struct scsi_cmnd *cmd)
+ 		case SD_LBP_UNMAP:
+ 			return sd_setup_unmap_cmnd(cmd);
+ 		case SD_LBP_WS16:
+-			return sd_setup_write_same16_cmnd(cmd);
++			return sd_setup_write_same16_cmnd(cmd, true);
+ 		case SD_LBP_WS10:
+ 			return sd_setup_write_same10_cmnd(cmd, true);
+ 		case SD_LBP_ZERO:
+@@ -1236,6 +1268,8 @@ static int sd_init_command(struct scsi_cmnd *cmd)
+ 		default:
+ 			return BLKPREP_INVALID;
+ 		}
++	case REQ_OP_WRITE_ZEROES:
++		return sd_setup_write_zeroes_cmnd(cmd);
+ 	case REQ_OP_WRITE_SAME:
+ 		return sd_setup_write_same_cmnd(cmd);
+ 	case REQ_OP_FLUSH:
+@@ -1876,6 +1910,7 @@ static int sd_done(struct scsi_cmnd *SCpnt)
+ 
+ 	switch (req_op(req)) {
+ 	case REQ_OP_DISCARD:
++	case REQ_OP_WRITE_ZEROES:
+ 	case REQ_OP_WRITE_SAME:
+ 	case REQ_OP_ZONE_RESET:
+ 		if (!result) {
+diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
+index 92620c8ea8ad..1994f7799fce 100644
+--- a/drivers/scsi/sd_zbc.c
++++ b/drivers/scsi/sd_zbc.c
+@@ -329,6 +329,7 @@ void sd_zbc_complete(struct scsi_cmnd *cmd,
+ 
+ 	switch (req_op(rq)) {
+ 	case REQ_OP_WRITE:
++	case REQ_OP_WRITE_ZEROES:
+ 	case REQ_OP_WRITE_SAME:
+ 	case REQ_OP_ZONE_RESET:
+ 
+-- 
+2.11.0
