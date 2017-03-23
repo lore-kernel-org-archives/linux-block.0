@@ -1,131 +1,62 @@
-Return-Path: <jack@suse.cz>
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
+Return-Path: <BATV+f1fc5bea56d51e2fc981+4960+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk,
+	martin.petersen@oracle.com,
+	agk@redhat.com,
+	snitzer@redhat.com,
+	shli@kernel.org,
+	philipp.reisner@linbit.com,
+	lars.ellenberg@linbit.com
 Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
-	Tejun Heo <tj@kernel.org>,
-	Tahsin Erdogan <tahsin@google.com>,
-	Omar Sandoval <osandov@osandov.com>,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH 04/10] bdi: Unify bdi->wb_list handling for root wb_writeback
-Date: Thu, 23 Mar 2017 01:36:56 +0100
-Message-Id: <20170323003702.27571-5-jack@suse.cz>
-In-Reply-To: <20170323003702.27571-1-jack@suse.cz>
-References: <20170323003702.27571-1-jack@suse.cz>
+	linux-scsi@vger.kernel.org,
+	drbd-dev@lists.linbit.com,
+	dm-devel@redhat.com,
+	linux-raid@vger.kernel.org
+Subject: [PATCH 20/23] block: stop using discards for zeroing
+Date: Thu, 23 Mar 2017 10:33:38 -0400
+Message-Id: <20170323143341.31549-21-hch@lst.de>
+In-Reply-To: <20170323143341.31549-1-hch@lst.de>
+References: <20170323143341.31549-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Currently root wb_writeback structure is added to bdi->wb_list in
-bdi_init() and never removed. That is different from all other
-wb_writeback structures which get added to the list when created and
-removed from it before wb_shutdown().
+Now that we have REQ_OP_WRITE_ZEROES implemented for all devices that
+support efficient zeroing of devices we can remove the call to
+blkdev_issue_discard.  This means we only have two ways of zeroing left
+and can simply the code.
 
-So move list addition of root bdi_writeback to bdi_register() and list
-removal of all wb_writeback structures to wb_shutdown(). That way a
-wb_writeback structure is on bdi->wb_list if and only if it can handle
-writeback and it will make it easier for us to handle shutdown of all
-wb_writeback structures in bdi_unregister().
-
-Acked-by: Tejun Heo <tj@kernel.org>
-Signed-off-by: Jan Kara <jack@suse.cz>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- mm/backing-dev.c | 34 ++++++++++++++++++++++++++++------
- 1 file changed, 28 insertions(+), 6 deletions(-)
+ block/blk-lib.c | 11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
 
-diff --git a/mm/backing-dev.c b/mm/backing-dev.c
-index 03d4ba27c133..e3d56dba4da8 100644
---- a/mm/backing-dev.c
-+++ b/mm/backing-dev.c
-@@ -345,6 +345,8 @@ static int wb_init(struct bdi_writeback *wb, struct backing_dev_info *bdi,
- 	return err;
- }
+diff --git a/block/blk-lib.c b/block/blk-lib.c
+index 33c5bf373b7f..153ca59393a7 100644
+--- a/block/blk-lib.c
++++ b/block/blk-lib.c
+@@ -279,6 +279,11 @@ static int __blkdev_issue_write_zeroes(struct block_device *bdev,
+  *  Zero-fill a block range, either using hardware offload or by explicitly
+  *  writing zeroes to the device.
+  *
++ *  Note that this function may fail with -EOPNOTSUPP if the driver supports
++ *  efficient zeroing operation, but the device capabilities can only be
++ *  discovered by trial and error.  In this case the caller should call the
++ *  function again, and it will use the fallback path.
++ *
+  *  If a device is using logical block provisioning, the underlying space will
+  *  only be release if %flags contains BLKDEV_ZERO_UNMAP.
+  *
+@@ -349,12 +354,6 @@ int blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
+ 	struct bio *bio = NULL;
+ 	struct blk_plug plug;
  
-+static void cgwb_remove_from_bdi_list(struct bdi_writeback *wb);
-+
- /*
-  * Remove bdi from the global list and shutdown any threads we have running
-  */
-@@ -358,6 +360,7 @@ static void wb_shutdown(struct bdi_writeback *wb)
- 	}
- 	spin_unlock_bh(&wb->work_lock);
- 
-+	cgwb_remove_from_bdi_list(wb);
- 	/*
- 	 * Drain work list and shutdown the delayed_work.  !WB_registered
- 	 * tells wb_workfn() that @wb is dying and its work_list needs to
-@@ -491,10 +494,6 @@ static void cgwb_release_workfn(struct work_struct *work)
- 						release_work);
- 	struct backing_dev_info *bdi = wb->bdi;
- 
--	spin_lock_irq(&cgwb_lock);
--	list_del_rcu(&wb->bdi_node);
--	spin_unlock_irq(&cgwb_lock);
+-	if (flags & BLKDEV_ZERO_UNMAP) {
+-		if (!blkdev_issue_discard(bdev, sector, nr_sects, gfp_mask,
+-				BLKDEV_DISCARD_ZERO))
+-			return 0;
+-	}
 -
- 	wb_shutdown(wb);
- 
- 	css_put(wb->memcg_css);
-@@ -526,6 +525,13 @@ static void cgwb_kill(struct bdi_writeback *wb)
- 	percpu_ref_kill(&wb->refcnt);
- }
- 
-+static void cgwb_remove_from_bdi_list(struct bdi_writeback *wb)
-+{
-+	spin_lock_irq(&cgwb_lock);
-+	list_del_rcu(&wb->bdi_node);
-+	spin_unlock_irq(&cgwb_lock);
-+}
-+
- static int cgwb_create(struct backing_dev_info *bdi,
- 		       struct cgroup_subsys_state *memcg_css, gfp_t gfp)
- {
-@@ -766,6 +772,13 @@ static void cgwb_bdi_exit(struct backing_dev_info *bdi)
- 	spin_unlock_irq(&cgwb_lock);
- }
- 
-+static void cgwb_bdi_register(struct backing_dev_info *bdi)
-+{
-+	spin_lock_irq(&cgwb_lock);
-+	list_add_tail_rcu(&bdi->wb.bdi_node, &bdi->wb_list);
-+	spin_unlock_irq(&cgwb_lock);
-+}
-+
- #else	/* CONFIG_CGROUP_WRITEBACK */
- 
- static int cgwb_bdi_init(struct backing_dev_info *bdi)
-@@ -793,6 +806,16 @@ static void cgwb_bdi_exit(struct backing_dev_info *bdi)
- 	wb_congested_put(bdi->wb_congested);
- }
- 
-+static void cgwb_bdi_register(struct backing_dev_info *bdi)
-+{
-+	list_add_tail_rcu(&bdi->wb.bdi_node, &bdi->wb_list);
-+}
-+
-+static void cgwb_remove_from_bdi_list(struct bdi_writeback *wb)
-+{
-+	list_del_rcu(&wb->bdi_node);
-+}
-+
- #endif	/* CONFIG_CGROUP_WRITEBACK */
- 
- int bdi_init(struct backing_dev_info *bdi)
-@@ -811,8 +834,6 @@ int bdi_init(struct backing_dev_info *bdi)
- 
- 	ret = cgwb_bdi_init(bdi);
- 
--	list_add_tail_rcu(&bdi->wb.bdi_node, &bdi->wb_list);
--
- 	return ret;
- }
- EXPORT_SYMBOL(bdi_init);
-@@ -848,6 +869,7 @@ int bdi_register(struct backing_dev_info *bdi, struct device *parent,
- 	if (IS_ERR(dev))
- 		return PTR_ERR(dev);
- 
-+	cgwb_bdi_register(bdi);
- 	bdi->dev = dev;
- 
- 	bdi_debug_register(bdi, dev_name(dev));
+ 	blk_start_plug(&plug);
+ 	ret = __blkdev_issue_zeroout(bdev, sector, nr_sects, gfp_mask,
+ 			&bio, flags);
 -- 
-2.10.2
+2.11.0
