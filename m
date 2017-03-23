@@ -1,82 +1,47 @@
-Return-Path: <lars.ellenberg@linbit.com>
-Return-Path: <lars.ellenberg@linbit.com>
-Date: Thu, 23 Mar 2017 16:54:10 +0100
-From: Lars Ellenberg <lars.ellenberg@linbit.com>
-To: Christoph Hellwig <hch@lst.de>
-Cc: axboe@kernel.dk, martin.petersen@oracle.com, agk@redhat.com,
-	snitzer@redhat.com, shli@kernel.org, philipp.reisner@linbit.com,
-	linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-	drbd-dev@lists.linbit.com, dm-devel@redhat.com,
+Return-Path: <BATV+f1fc5bea56d51e2fc981+4960+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk,
+	martin.petersen@oracle.com,
+	agk@redhat.com,
+	snitzer@redhat.com,
+	shli@kernel.org,
+	philipp.reisner@linbit.com,
+	lars.ellenberg@linbit.com
+Cc: linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	drbd-dev@lists.linbit.com,
+	dm-devel@redhat.com,
 	linux-raid@vger.kernel.org
-Subject: Re: RFC: always use REQ_OP_WRITE_ZEROES for zeroing offload
-Message-ID: <20170323155410.GD1138@soda.linbit>
-References: <20170323143341.31549-1-hch@lst.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170323143341.31549-1-hch@lst.de>
+Subject: RFC: always use REQ_OP_WRITE_ZEROES for zeroing offload
+Date: Thu, 23 Mar 2017 10:33:18 -0400
+Message-Id: <20170323143341.31549-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Mar 23, 2017 at 10:33:18AM -0400, Christoph Hellwig wrote:
-> This series makes REQ_OP_WRITE_ZEROES the only zeroing offload
-> supported by the block layer, and switches existing implementations
-> of REQ_OP_DISCARD that correctly set discard_zeroes_data to it,
-> removes incorrect discard_zeroes_data, and also switches WRITE SAME
-> based zeroing in SCSI to this new method.
-> 
-> I've done testing with ATA, SCSI and NVMe setups, but there are
-> a few things that will need more attention:
-> 
+This series makes REQ_OP_WRITE_ZEROES the only zeroing offload
+supported by the block layer, and switches existing implementations
+of REQ_OP_DISCARD that correctly set discard_zeroes_data to it,
+removes incorrect discard_zeroes_data, and also switches WRITE SAME
+based zeroing in SCSI to this new method.
 
->  - The DRBD code in this area was very odd,
+I've done testing with ATA, SCSI and NVMe setups, but there are
+a few things that will need more attention:
 
-DRBD wants all replicas to give back identical data.
-If what comes back after a discard is "undefined",
-we cannot really use that.
+ - what is dm-kcopyd doing with the current WRITE SAME usage
+   that gets multiple biovecs?  Can we fix it up in any way.
+ - what are we going to do with discards through parity raid?
+   I suspect we should either just disable it for now entirely
+   or modify raid5.c to issue REQ_OP_WRITE_ZEROES to the underlying
+   devices.  But I need someone with such a setup to test it.
+ - The DRBD code in this area was very odd, and will need an
+   audit from the maintainers.
 
-We used to "stack" discard only if our local backend claimed
-"discard_zeroes_data". We replicate that IO request to the peer
-as discard, and if the peer cannot do discards itself, or has
-discard_zeroes_data == 0, the peer will use zeroout instead.
+Note that this series needs to be applied on top of the
+"support ranges TRIM for libata" series.
 
-One use-case for this is the device mapper "thin provisioning".
-At the time I wrote those "odd" hacks, dm thin targets
-would set discard_zeroes_data=0, NOT change discard granularity,
-but only actually discard (drop from the tree) whole "chunks",
-leaving partial start/end chunks in the mapping tree unchanged.
+A git tree is also avaiable at:
 
-The logic of "only stack discard, if backend discard_zeroes_data"
-would mean that we would not be able to accept and pass down discards
-to dm-thin targets. But with data on dm-thin, you would really like
-to do the occasional fstrim.
+    git://git.infradead.org/users/hch/block.git discard-rework
 
-Also, IO backends on the peers do not have to have the same
-characteristics.  You could have the DRBD Primary on some SSD,
-and the Secondary on some thin-pool LV,
-scheduling thin snapthots in intervals or on demand.
+Gitweb:
 
-With the logic of "use zero-out instead", fstrim would cause it to
-fully allocate what was supposed to be thinly provisioned :-(
-
-So what I did there was optionally tell DRBD that
-"discard_zeroes_data == 0" on that peer would actually mean
-"discard_zeroes_data == 1,
- IF you zero-out the partial chunks of this granularity yourself".
-
-And implemented this "discard aligned chunks of that granularity,
-and zero-out partial start/end chunks, if any".
-
-And then claim to upper layers that, yes, discard_zeroes_data=1,
-in that case, if so configured, even if our backend (dm-thin)
-would say discard_zeroes_data=0.
-
-Does that make sense?  Can we still do that?  Has something like that
-been done in block core or device mapper meanwhile?
-
-
-> and will need an audit from the maintainers.
-
-Will need to make some time for review and testing.
-
-Thanks,
-
-    Lars
+    http://git.infradead.org/users/hch/block.git/shortlog/refs/heads/discard-rework
